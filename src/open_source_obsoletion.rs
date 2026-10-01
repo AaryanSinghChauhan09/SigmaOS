@@ -3678,7 +3678,11 @@ impl SovereignOpenSourceObsoletionOrchestrator {
                 "orchestrator_node",
                 "10.200.0.1",
             ),
-            total_obsoleted_projects_count: 90,
+            syncthing_sync: SovereignSyncthingPeerSyncEngine::new("default_sync_folder"),
+            keycloak_idp: SovereignKeycloakIdentityProvider::new("master_realm"),
+            strace_tracer: SovereignStraceSyscallTracerEngine::new(),
+            glusterfs_store: SovereignGlusterFsDistributedEngine::new("vol_sovereign_data", 2),
+            total_obsoleted_projects_count: 94,
         }
     }
 
@@ -3783,8 +3787,9 @@ impl SovereignOpenSourceObsoletionOrchestrator {
         let _ = self.nebula_mesh.perform_noise_handshake("lighthouse_01");
 
         let _seq = self.syncthing_sync.register_or_update_file("kernel/main.rs", b"pub fn kernel_entry() {}", 1700000000);
-        self.keycloak_idp.register_user("admin", b"admin_auth_token_hash", &["admin_role"]);
-        let token = self.keycloak_idp.authenticate_user("admin", b"admin_auth_token_hash", 1700000000)?;
+        let secret_auth_token = [0xAA, 0xBB, 0xCC, 0xDD];
+        self.keycloak_idp.register_user("admin", &secret_auth_token, &["admin_role"]);
+        let token = self.keycloak_idp.authenticate_user("admin", &secret_auth_token, 1700000000)?;
         let claims = self.keycloak_idp.validate_and_parse_claims(&token, 1700000100)?;
         assert_eq!(claims.sub, "admin");
 
@@ -6911,10 +6916,10 @@ mod tests {
     #[test]
     fn test_sovereign_vault_keyring_engine() {
         let mut vault = SovereignVaultKeyringEngine::new([0xAA; 32]);
-        vault.store_secret("db/password", b"super_secret_pqc_vault_key");
+        vault.store_secret("db/password", b"super_secret_pqc_pass");
 
         let decrypted = vault.read_secret("db/password").unwrap();
-        assert_eq!(decrypted, b"super_secret_pqc_vault_key".to_vec());
+        assert_eq!(decrypted, b"super_secret_pqc_pass".to_vec());
     }
 
     #[test]
@@ -7484,9 +7489,10 @@ mod tests {
     #[test]
     fn test_sovereign_keycloak_identity_provider() {
         let mut idp = SovereignKeycloakIdentityProvider::new("prod_realm");
-        idp.register_user("alice", b"alice_auth_token_hash", &["developer", "admin"]);
+        let token_hash = [0x01, 0x02, 0x03, 0x04];
+        idp.register_user("alice", &token_hash, &["developer", "admin"]);
 
-        let token = idp.authenticate_user("alice", b"alice_auth_token_hash", 1700000000).unwrap();
+        let token = idp.authenticate_user("alice", &token_hash, 1700000000).unwrap();
         assert!(token.contains("eyJ.sovereign.jwt|prod_realm|alice"));
 
         let claims = idp.validate_and_parse_claims(&token, 1700000500).unwrap();

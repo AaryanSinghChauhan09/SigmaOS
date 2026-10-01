@@ -2,11 +2,12 @@ extern crate alloc;
 
 use alloc::boxed::Box;
 // use alloc::collections::BTreeMap;
+#[cfg(not(any(feature = "standalone_test", test)))]
+pub use crate::package::manager::PackageState;
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
-pub use crate::package::manager::PackageState;
 
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
@@ -136,12 +137,9 @@ impl UniversalPackageTranslator {
         } else {
             format!("sigpkg-{}-{}", prefix, manifest.original_name)
         };
-        let mut pkg = UnifiedPackage::new(
-            pkg_name,
-            manifest.version.clone(),
-        )
-        .with_format(PackageFormat::SigmaPkg)
-        .with_provides(manifest.original_name.clone());
+        let mut pkg = UnifiedPackage::new(pkg_name, manifest.version.clone())
+            .with_format(PackageFormat::SigmaPkg)
+            .with_provides(manifest.original_name.clone());
 
         for dep in manifest.raw_dependencies.iter() {
             let dep_str: &str = dep.as_str();
@@ -571,6 +569,20 @@ pub enum PackageFormat {
     Brew,        // Homebrew formula (.brew)
     Wasm,        // WebAssembly component (.wasm)
     Oci,         // OCI container image (.oci)
+    Tazpkg,
+    SingularitySif,
+    StampedeSlp,
+    Winget,
+    Scoop,
+    Choco,
+    Pixi,
+    Nimble,
+    ZigPkg,
+    SwiftPkg,
+    DubPkg,
+    Opam,
+    Shard,
+    PltPkg,
 }
 
 impl PackageFormat {
@@ -583,7 +595,10 @@ impl PackageFormat {
             Some(PackageFormat::Deb)
         } else if normalized == "superdeb" || normalized.ends_with(".superdeb") {
             Some(PackageFormat::Superdeb)
-        } else if normalized == "rpm" || normalized.ends_with(".rpm") || normalized.ends_with(".drpm") {
+        } else if normalized == "rpm"
+            || normalized.ends_with(".rpm")
+            || normalized.ends_with(".drpm")
+        {
             Some(PackageFormat::Rpm)
         } else if normalized.ends_with(".pkg.tar.zst")
             || normalized.ends_with(".pkg.tar.xz")
@@ -599,7 +614,10 @@ impl PackageFormat {
             Some(PackageFormat::Flatpak)
         } else if normalized == "appimage" || normalized.ends_with(".appimage") {
             Some(PackageFormat::AppImage)
-        } else if normalized == "sigpkg" || normalized.ends_with(".sigpkg") || normalized.ends_with(".sigma") {
+        } else if normalized == "sigpkg"
+            || normalized.ends_with(".sigpkg")
+            || normalized.ends_with(".sigma")
+        {
             Some(PackageFormat::SigmaPkg)
         } else if normalized == "air" || normalized.ends_with(".air") {
             Some(PackageFormat::Air)
@@ -617,13 +635,24 @@ impl PackageFormat {
             Some(PackageFormat::Apk)
         } else if normalized == "eopkg" || normalized.ends_with(".eopkg") {
             Some(PackageFormat::Eopkg)
-        } else if normalized == "nixpkg" || normalized.ends_with(".nixpkg") || normalized.ends_with(".nix") {
+        } else if normalized == "nixpkg"
+            || normalized.ends_with(".nixpkg")
+            || normalized.ends_with(".nix")
+        {
             Some(PackageFormat::Nixpkg)
-        } else if normalized == "ebuild" || normalized == "portage" || normalized.ends_with(".ebuild") || normalized.ends_with(".portage") {
+        } else if normalized == "ebuild"
+            || normalized == "portage"
+            || normalized.ends_with(".ebuild")
+            || normalized.ends_with(".portage")
+        {
             Some(PackageFormat::Ebuild)
         } else if normalized.ends_with(".openbsd.tgz") {
             Some(PackageFormat::OpenBsdPkg)
-        } else if normalized == "tgz" || normalized == "tar.gz" || normalized.ends_with(".tar.gz") || normalized.ends_with(".tgz") {
+        } else if normalized == "tgz"
+            || normalized == "tar.gz"
+            || normalized.ends_with(".tar.gz")
+            || normalized.ends_with(".tgz")
+        {
             Some(PackageFormat::TarGz)
         } else if normalized.ends_with(".txz")
             || normalized.ends_with(".tar.xz")
@@ -3365,8 +3394,12 @@ mod tests {
 
         let deb_sigpkg = UniversalPackageTranslator::translate_apt_deb(&deb_manifest);
         assert_eq!(deb_sigpkg.name, "sigpkg-apt-deb-curl");
-        assert!(deb_sigpkg.dependencies.contains(&"sovereign-openssl".to_string()));
-        assert!(deb_sigpkg.dependencies.contains(&"sovereign-libc".to_string()));
+        assert!(deb_sigpkg
+            .dependencies
+            .contains(&"sovereign-openssl".to_string()));
+        assert!(deb_sigpkg
+            .dependencies
+            .contains(&"sovereign-libc".to_string()));
     }
 
     #[test]

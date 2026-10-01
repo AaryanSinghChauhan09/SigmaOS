@@ -34,7 +34,6 @@ impl KptrRestrictLevel {
             KptrRestrictLevel::None => "none",
             KptrRestrictLevel::Restricted => "restricted",
             KptrRestrictLevel::Hidden => "hidden",
-            KptrRestrictLevel::Strict => "strict",
         }
     }
 
@@ -95,7 +94,7 @@ impl KptrRestrict {
         match self.level {
             KptrRestrictLevel::None => true,
             KptrRestrictLevel::Restricted => has_cap_syslog,
-            KptrRestrictLevel::Hidden | KptrRestrictLevel::Strict => false,
+            KptrRestrictLevel::Hidden => false,
         }
     }
 
@@ -140,7 +139,6 @@ impl KptrRestrict {
             KptrRestrictLevel::None => String::from("No restriction - kernel pointers visible to all"),
             KptrRestrictLevel::Restricted => String::from("Restrict to processes with CAP_SYSLOG"),
             KptrRestrictLevel::Hidden => String::from("Completely hide kernel pointers"),
-            KptrRestrictLevel::Strict => String::from("Strictly hide all kernel pointers"),
         }
     }
 }
@@ -238,7 +236,6 @@ impl DmesgRestrict {
         match self.level {
             DmesgRestrictLevel::None => true,
             DmesgRestrictLevel::Restricted => has_cap_syslog,
-            DmesgRestrictLevel::Strict => false,
         }
     }
 
@@ -262,7 +259,6 @@ impl DmesgRestrict {
         match self.level {
             DmesgRestrictLevel::None => String::from("No restriction - dmesg visible to all"),
             DmesgRestrictLevel::Restricted => String::from("Restrict to processes with CAP_SYSLOG"),
-            DmesgRestrictLevel::Strict => String::from("Strictly restrict dmesg access"),
         }
     }
 }
