@@ -579,6 +579,8 @@ mod tests {
 
         let dispatcher = LinuxSyscallDispatcher::new();
 
+        let dispatcher = LinuxSyscallDispatcher::new();
+
         dispatcher.dispatch(LinuxSyscallNumber::Getpid as u64, &[]).unwrap();
         dispatcher.dispatch(LinuxSyscallNumber::Getppid as u64, &[]).unwrap();
 
