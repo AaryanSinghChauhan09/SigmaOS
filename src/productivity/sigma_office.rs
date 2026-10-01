@@ -5271,6 +5271,576 @@ impl Default for SovereignContractLifecycleManagementEngine {
     }
 }
 
+// ----------------------------------------------------------------------------
+// 1. Google Workspace Marketplace / MS Office Add-ins Engine
+// ----------------------------------------------------------------------------
+
+#[derive(Debug, Clone)]
+pub struct WorkspaceAddon {
+    pub addon_id: String,
+    pub name: String,
+    pub scope: String,
+    pub entrypoint_url: String,
+    pub enabled: bool,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct SovereignWorkspaceAddonExtensionEngine {
+    pub addons: HashMap<String, WorkspaceAddon>,
+}
+
+impl SovereignWorkspaceAddonExtensionEngine {
+    pub fn new() -> Self {
+        Self {
+            addons: HashMap::new(),
+        }
+    }
+
+    pub fn register_addon(&mut self, addon_id: &str, name: &str, scope: &str, url: &str) {
+        self.addons.insert(
+            addon_id.to_string(),
+            WorkspaceAddon {
+                addon_id: addon_id.to_string(),
+                name: name.to_string(),
+                scope: scope.to_string(),
+                entrypoint_url: url.to_string(),
+                enabled: true,
+            },
+        );
+    }
+
+    pub fn toggle_addon(&mut self, addon_id: &str, enabled: bool) -> bool {
+        if let Some(addon) = self.addons.get_mut(addon_id) {
+            addon.enabled = enabled;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn execute_addon_event(&self, addon_id: &str, event_name: &str, payload: &str) -> Option<String> {
+        let addon = self.addons.get(addon_id)?;
+        if !addon.enabled {
+            return None;
+        }
+        Some(format!(
+            "Executed Addon '{}' ({}) Event '{}' with payload length {}",
+            addon.name, addon.entrypoint_url, event_name, payload.len()
+        ))
+    }
+}
+
+// ----------------------------------------------------------------------------
+// 2. Microsoft SharePoint / Power Pages Enterprise Intranet Portal Engine
+// ----------------------------------------------------------------------------
+
+#[derive(Debug, Clone)]
+pub enum PortalWidget {
+    Heading(String),
+    AnnouncementList(Vec<String>),
+    MetricCard { title: String, value: String },
+}
+
+#[derive(Debug, Clone)]
+pub struct PortalPage {
+    pub page_id: u32,
+    pub title: String,
+    pub widgets: Vec<PortalWidget>,
+    pub published: bool,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct SovereignEnterpriseIntranetPortalEngine {
+    pub pages: Vec<PortalPage>,
+    pub next_page_id: u32,
+}
+
+impl SovereignEnterpriseIntranetPortalEngine {
+    pub fn new() -> Self {
+        Self {
+            pages: Vec::new(),
+            next_page_id: 1,
+        }
+    }
+
+    pub fn create_page(&mut self, title: &str) -> u32 {
+        let id = self.next_page_id;
+        self.next_page_id += 1;
+        self.pages.push(PortalPage {
+            page_id: id,
+            title: title.to_string(),
+            widgets: Vec::new(),
+            published: false,
+        });
+        id
+    }
+
+    pub fn add_widget(&mut self, page_id: u32, widget: PortalWidget) -> bool {
+        if let Some(page) = self.pages.iter_mut().find(|p| p.page_id == page_id) {
+            page.widgets.push(widget);
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn publish_page(&mut self, page_id: u32) -> bool {
+        if let Some(page) = self.pages.iter_mut().find(|p| p.page_id == page_id) {
+            page.published = true;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn render_portal(&self) -> Vec<String> {
+        self.pages
+            .iter()
+            .filter(|p| p.published)
+            .map(|p| format!("Page #{}: {} ({} widgets)", p.page_id, p.title, p.widgets.len()))
+            .collect()
+    }
+}
+
+// ----------------------------------------------------------------------------
+// 3. Zoho Creator Low-Code Business Process Engine
+// ----------------------------------------------------------------------------
+
+#[derive(Debug, Clone)]
+pub struct LowCodeFormField {
+    pub name: String,
+    pub field_type: String,
+    pub required: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct LowCodeForm {
+    pub form_id: u32,
+    pub name: String,
+    pub fields: Vec<LowCodeFormField>,
+    pub deluge_script: String,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct SovereignLowCodeBusinessProcessEngine {
+    pub forms: HashMap<u32, LowCodeForm>,
+    pub submitted_records: Vec<(u32, HashMap<String, String>)>,
+    pub next_form_id: u32,
+}
+
+impl SovereignLowCodeBusinessProcessEngine {
+    pub fn new() -> Self {
+        Self {
+            forms: HashMap::new(),
+            submitted_records: Vec::new(),
+            next_form_id: 1,
+        }
+    }
+
+    pub fn create_form(&mut self, name: &str, deluge_script: &str) -> u32 {
+        let id = self.next_form_id;
+        self.next_form_id += 1;
+        self.forms.insert(
+            id,
+            LowCodeForm {
+                form_id: id,
+                name: name.to_string(),
+                fields: Vec::new(),
+                deluge_script: deluge_script.to_string(),
+            },
+        );
+        id
+    }
+
+    pub fn add_field(&mut self, form_id: u32, name: &str, field_type: &str, required: bool) -> bool {
+        if let Some(form) = self.forms.get_mut(&form_id) {
+            form.fields.push(LowCodeFormField {
+                name: name.to_string(),
+                field_type: field_type.to_string(),
+                required,
+            });
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn submit_record(&mut self, form_id: u32, record: HashMap<String, String>) -> core::result::Result<usize, &'static str> {
+        let form = self.forms.get(&form_id).ok_or("Form not found")?;
+        for field in &form.fields {
+            if field.required && !record.contains_key(&field.name) {
+                return Err("Missing required field");
+            }
+        }
+        self.submitted_records.push((form_id, record));
+        Ok(self.submitted_records.len())
+    }
+
+    pub fn evaluate_deluge_script(&self, form_id: u32, event: &str) -> Option<String> {
+        let form = self.forms.get(&form_id)?;
+        Some(format!(
+            "Executed Deluge script for form '{}' on event '{}': {}",
+            form.name, event, form.deluge_script
+        ))
+    }
+}
+
+// ----------------------------------------------------------------------------
+// 4. Salesforce CPQ / ASC 606 Revenue Recognition Quote-to-Cash Engine
+// ----------------------------------------------------------------------------
+
+#[derive(Debug, Clone)]
+pub struct RevenueSchedulePeriod {
+    pub month_index: u32,
+    pub recognized_amount: f64,
+}
+
+#[derive(Debug, Clone)]
+pub struct QuoteToCashOrder {
+    pub order_id: u32,
+    pub customer: String,
+    pub total_amount: f64,
+    pub contract_months: u32,
+    pub revenue_schedules: Vec<RevenueSchedulePeriod>,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct SovereignQuoteToCashEngine {
+    pub orders: HashMap<u32, QuoteToCashOrder>,
+    pub next_order_id: u32,
+}
+
+impl SovereignQuoteToCashEngine {
+    pub fn new() -> Self {
+        Self {
+            orders: HashMap::new(),
+            next_order_id: 1,
+        }
+    }
+
+    pub fn create_order(&mut self, customer: &str, total_amount: f64, contract_months: u32) -> u32 {
+        let id = self.next_order_id;
+        self.next_order_id += 1;
+
+        let monthly_recognition = if contract_months > 0 {
+            total_amount / (contract_months as f64)
+        } else {
+            total_amount
+        };
+
+        let mut schedules = Vec::new();
+        for m in 1..=contract_months {
+            schedules.push(RevenueSchedulePeriod {
+                month_index: m,
+                recognized_amount: monthly_recognition,
+            });
+        }
+
+        self.orders.insert(
+            id,
+            QuoteToCashOrder {
+                order_id: id,
+                customer: customer.to_string(),
+                total_amount,
+                contract_months,
+                revenue_schedules: schedules,
+            },
+        );
+        id
+    }
+
+    pub fn get_order(&self, order_id: u32) -> Option<&QuoteToCashOrder> {
+        self.orders.get(&order_id)
+    }
+
+    pub fn calculate_recognized_revenue_up_to(&self, order_id: u32, month: u32) -> Option<f64> {
+        let order = self.orders.get(&order_id)?;
+        let total = order
+            .revenue_schedules
+            .iter()
+            .filter(|s| s.month_index <= month)
+            .map(|s| s.recognized_amount)
+            .sum();
+        Some(total)
+    }
+}
+
+// ----------------------------------------------------------------------------
+// 5. Odoo Total Productive Maintenance (TPM) Equipment Engine
+// ----------------------------------------------------------------------------
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum MaintenanceRequestType {
+    Preventive,
+    Corrective,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum MaintenanceStatus {
+    Pending,
+    InProgress,
+    Completed,
+}
+
+#[derive(Debug, Clone)]
+pub struct EquipmentRecord {
+    pub equipment_id: u32,
+    pub name: String,
+    pub total_operating_hours: f64,
+    pub total_failures: u32,
+    pub total_downtime_hours: f64,
+}
+
+#[derive(Debug, Clone)]
+pub struct MaintenanceWorkOrder {
+    pub wo_id: u32,
+    pub equipment_id: u32,
+    pub request_type: MaintenanceRequestType,
+    pub status: MaintenanceStatus,
+    pub downtime_hours: f64,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct SovereignEquipmentMaintenanceEngine {
+    pub equipment: HashMap<u32, EquipmentRecord>,
+    pub work_orders: Vec<MaintenanceWorkOrder>,
+    pub next_equipment_id: u32,
+    pub next_wo_id: u32,
+}
+
+impl SovereignEquipmentMaintenanceEngine {
+    pub fn new() -> Self {
+        Self {
+            equipment: HashMap::new(),
+            work_orders: Vec::new(),
+            next_equipment_id: 1,
+            next_wo_id: 1,
+        }
+    }
+
+    pub fn register_equipment(&mut self, name: &str, operating_hours: f64) -> u32 {
+        let id = self.next_equipment_id;
+        self.next_equipment_id += 1;
+        self.equipment.insert(
+            id,
+            EquipmentRecord {
+                equipment_id: id,
+                name: name.to_string(),
+                total_operating_hours: operating_hours,
+                total_failures: 0,
+                total_downtime_hours: 0.0,
+            },
+        );
+        id
+    }
+
+    pub fn create_work_order(&mut self, equipment_id: u32, request_type: MaintenanceRequestType) -> Option<u32> {
+        if !self.equipment.contains_key(&equipment_id) {
+            return None;
+        }
+        let id = self.next_wo_id;
+        self.next_wo_id += 1;
+        self.work_orders.push(MaintenanceWorkOrder {
+            wo_id: id,
+            equipment_id,
+            request_type,
+            status: MaintenanceStatus::Pending,
+            downtime_hours: 0.0,
+        });
+        Some(id)
+    }
+
+    pub fn complete_work_order(&mut self, wo_id: u32, downtime_hours: f64) -> bool {
+        let wo = match self.work_orders.iter_mut().find(|w| w.wo_id == wo_id) {
+            Some(w) => w,
+            None => return false,
+        };
+        wo.status = MaintenanceStatus::Completed;
+        wo.downtime_hours = downtime_hours;
+
+        if let Some(eq) = self.equipment.get_mut(&wo.equipment_id) {
+            if wo.request_type == MaintenanceRequestType::Corrective {
+                eq.total_failures += 1;
+            }
+            eq.total_downtime_hours += downtime_hours;
+        }
+        true
+    }
+
+    pub fn calculate_mtbf_mttr(&self, equipment_id: u32) -> Option<(f64, f64)> {
+        let eq = self.equipment.get(&equipment_id)?;
+        let mtbf = if eq.total_failures > 0 {
+            eq.total_operating_hours / (eq.total_failures as f64)
+        } else {
+            eq.total_operating_hours
+        };
+        let mttr = if eq.total_failures > 0 {
+            eq.total_downtime_hours / (eq.total_failures as f64)
+        } else {
+            0.0
+        };
+        Some((mtbf, mttr))
+    }
+}
+
+// ----------------------------------------------------------------------------
+// 6. Bitrix24 Omnichannel Contact Center Live Chat Engine
+// ----------------------------------------------------------------------------
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum LiveChatChannel {
+    WebWidget,
+    WhatsApp,
+    Telegram,
+    Email,
+}
+
+#[derive(Debug, Clone)]
+pub struct OmnichannelChatMessage {
+    pub sender: String,
+    pub text: String,
+    pub timestamp: u64,
+}
+
+#[derive(Debug, Clone)]
+pub struct OmnichannelLiveChatSession {
+    pub session_id: u32,
+    pub visitor_id: String,
+    pub channel: LiveChatChannel,
+    pub agent_id: Option<String>,
+    pub messages: Vec<OmnichannelChatMessage>,
+    pub closed: bool,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct SovereignOmnichannelLiveChatEngine {
+    pub sessions: HashMap<u32, OmnichannelLiveChatSession>,
+    pub next_session_id: u32,
+}
+
+impl SovereignOmnichannelLiveChatEngine {
+    pub fn new() -> Self {
+        Self {
+            sessions: HashMap::new(),
+            next_session_id: 1,
+        }
+    }
+
+    pub fn start_session(&mut self, visitor_id: &str, channel: LiveChatChannel) -> u32 {
+        let id = self.next_session_id;
+        self.next_session_id += 1;
+        self.sessions.insert(
+            id,
+            OmnichannelLiveChatSession {
+                session_id: id,
+                visitor_id: visitor_id.to_string(),
+                channel,
+                agent_id: None,
+                messages: Vec::new(),
+                closed: false,
+            },
+        );
+        id
+    }
+
+    pub fn assign_agent(&mut self, session_id: u32, agent_id: &str) -> bool {
+        if let Some(session) = self.sessions.get_mut(&session_id) {
+            session.agent_id = Some(agent_id.to_string());
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn send_message(&mut self, session_id: u32, sender: &str, text: &str, timestamp: u64) -> bool {
+        if let Some(session) = self.sessions.get_mut(&session_id) {
+            if session.closed {
+                return false;
+            }
+            session.messages.push(OmnichannelChatMessage {
+                sender: sender.to_string(),
+                text: text.to_string(),
+                timestamp,
+            });
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn close_session(&mut self, session_id: u32) -> bool {
+        if let Some(session) = self.sessions.get_mut(&session_id) {
+            session.closed = true;
+            true
+        } else {
+            false
+        }
+    }
+}
+
+// ----------------------------------------------------------------------------
+// 7. Google Looker Studio Calculated Fields & Cross-Filtering Engine
+// ----------------------------------------------------------------------------
+
+#[derive(Debug, Clone)]
+pub struct CalculatedFieldSpec {
+    pub field_name: String,
+    pub formula: String,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct SovereignLookerAdvancedVisualizationEngine {
+    pub calculated_fields: Vec<CalculatedFieldSpec>,
+}
+
+impl SovereignLookerAdvancedVisualizationEngine {
+    pub fn new() -> Self {
+        Self {
+            calculated_fields: Vec::new(),
+        }
+    }
+
+    pub fn add_calculated_field(&mut self, name: &str, formula: &str) {
+        self.calculated_fields.push(CalculatedFieldSpec {
+            field_name: name.to_string(),
+            formula: formula.to_string(),
+        });
+    }
+
+    pub fn evaluate_calculated_field(&self, formula: &str, row: &HashMap<String, f64>) -> f64 {
+        // Simple formula evaluator supporting A + B, A - B, A * B, A / B
+        let parts: Vec<&str> = formula.split_whitespace().collect();
+        if parts.len() == 3 {
+            let val1 = row.get(parts[0]).copied().unwrap_or(0.0);
+            let val2 = row.get(parts[2]).copied().unwrap_or(0.0);
+            match parts[1] {
+                "+" => val1 + val2,
+                "-" => val1 - val2,
+                "*" => val1 * val2,
+                "/" => if val2 != 0.0 { val1 / val2 } else { 0.0 },
+                _ => val1,
+            }
+        } else if parts.len() == 1 {
+            row.get(parts[0]).copied().unwrap_or(0.0)
+        } else {
+            0.0
+        }
+    }
+
+    pub fn apply_cross_filter(
+        &self,
+        dataset: &[HashMap<String, String>],
+        field: &str,
+        filter_value: &str,
+    ) -> Vec<HashMap<String, String>> {
+        dataset
+            .iter()
+            .filter(|row| row.get(field).map(|v| v.as_str()) == Some(filter_value))
+            .cloned()
+            .collect()
+    }
+}
+
 // Placeholder types for compilation
 mod sigma_types {
     pub type Result<T> = core::result::Result<T, &'static str>;
@@ -6162,5 +6732,77 @@ mod tests {
         let expiring = clm.find_expiring_contracts(2500);
         assert_eq!(expiring.len(), 1);
         assert_eq!(expiring[0].contract_id, contract_id);
+
+        // 7. Google Workspace Marketplace / MS Office Add-ins Engine
+        let mut addon_engine = SovereignWorkspaceAddonExtensionEngine::new();
+        addon_engine.register_addon("addon-crm", "CRM Helper", "sheets.readonly", "https://addon.sigmaos.org");
+        assert!(addon_engine.addons.contains_key("addon-crm"));
+        let exec_res = addon_engine.execute_addon_event("addon-crm", "onOpen", "payload_data");
+        assert!(exec_res.unwrap().contains("Executed Addon 'CRM Helper'"));
+        assert!(addon_engine.toggle_addon("addon-crm", false));
+        assert!(addon_engine.execute_addon_event("addon-crm", "onOpen", "payload_data").is_none());
+
+        // 8. Microsoft SharePoint / Power Pages Enterprise Intranet Portal Engine
+        let mut portal_engine = SovereignEnterpriseIntranetPortalEngine::new();
+        let page_id = portal_engine.create_page("Engineering Portal");
+        portal_engine.add_widget(page_id, PortalWidget::Heading("Welcome Engineers".to_string()));
+        portal_engine.add_widget(page_id, PortalWidget::MetricCard { title: "Uptime".to_string(), value: "99.99%".to_string() });
+        assert!(portal_engine.publish_page(page_id));
+        let rendered = portal_engine.render_portal();
+        assert_eq!(rendered.len(), 1);
+        assert!(rendered[0].contains("Engineering Portal"));
+
+        // 9. Zoho Creator Low-Code Business Process Engine
+        let mut lowcode_engine = SovereignLowCodeBusinessProcessEngine::new();
+        let form_id = lowcode_engine.create_form("Expense Claim", "on_submit { approve(); }");
+        lowcode_engine.add_field(form_id, "amount", "number", true);
+        let mut rec = HashMap::new();
+        rec.insert("amount".to_string(), "150.00".to_string());
+        assert_eq!(lowcode_engine.submit_record(form_id, rec).unwrap(), 1);
+        let deluge_res = lowcode_engine.evaluate_deluge_script(form_id, "onSubmit");
+        assert!(deluge_res.unwrap().contains("approve()"));
+
+        // 10. Salesforce CPQ / ASC 606 Revenue Recognition Quote-to-Cash Engine
+        let mut qtc_engine = SovereignQuoteToCashEngine::new();
+        let order_id = qtc_engine.create_order("Acme Corp", 12000.0, 12);
+        assert_eq!(order_id, 1);
+        let order = qtc_engine.get_order(order_id).unwrap();
+        assert_eq!(order.revenue_schedules.len(), 12);
+        assert_eq!(qtc_engine.calculate_recognized_revenue_up_to(order_id, 6), Some(6000.0));
+
+        // 11. Odoo Total Productive Maintenance (TPM) Equipment Engine
+        let mut tpm_engine = SovereignEquipmentMaintenanceEngine::new();
+        let eq_id = tpm_engine.register_equipment("CNC Mill 01", 1000.0);
+        let wo_id = tpm_engine.create_work_order(eq_id, MaintenanceRequestType::Corrective).unwrap();
+        assert!(tpm_engine.complete_work_order(wo_id, 10.0));
+        let (mtbf, mttr) = tpm_engine.calculate_mtbf_mttr(eq_id).unwrap();
+        assert_eq!(mtbf, 1000.0);
+        assert_eq!(mttr, 10.0);
+
+        // 12. Bitrix24 Omnichannel Contact Center Live Chat Engine
+        let mut chat_engine = SovereignOmnichannelLiveChatEngine::new();
+        let session_id = chat_engine.start_session("visitor_99", LiveChatChannel::WebWidget);
+        assert!(chat_engine.assign_agent(session_id, "agent_alice"));
+        assert!(chat_engine.send_message(session_id, "visitor_99", "Need support", 1000));
+        assert!(chat_engine.send_message(session_id, "agent_alice", "How can I help?", 1005));
+        assert_eq!(chat_engine.sessions.get(&session_id).unwrap().messages.len(), 2);
+        assert!(chat_engine.close_session(session_id));
+        assert!(!chat_engine.send_message(session_id, "visitor_99", "Hello?", 1010));
+
+        // 13. Google Looker Studio Calculated Fields & Cross-Filtering Engine
+        let mut looker_adv = SovereignLookerAdvancedVisualizationEngine::new();
+        looker_adv.add_calculated_field("Margin", "Revenue - Cost");
+        let mut row_val = HashMap::new();
+        row_val.insert("Revenue".to_string(), 100.0);
+        row_val.insert("Cost".to_string(), 40.0);
+        assert_eq!(looker_adv.evaluate_calculated_field("Revenue - Cost", &row_val), 60.0);
+
+        let mut row1 = HashMap::new();
+        row1.insert("region".to_string(), "US".to_string());
+        let mut row2 = HashMap::new();
+        row2.insert("region".to_string(), "EU".to_string());
+        let dataset = vec![row1, row2];
+        let filtered = looker_adv.apply_cross_filter(&dataset, "region", "US");
+        assert_eq!(filtered.len(), 1);
     }
 }
