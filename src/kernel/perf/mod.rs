@@ -1,8 +1,18 @@
 // SPDX-License-Identifier: MIT
-// SigmaOS Perf (Performance Events) Subsystem
-// Performance monitoring and profiling inspired by Linux perf
+// SigmaOS Perf (Performance Events & Profiling Suite) Subsystem
+// Performance monitoring and profiling inspired by Linux perf and Omarchy performance architecture
 
 #![allow(dead_code)]
+
+pub mod cache_analyzer;
+pub mod flamegraph;
+pub mod memory_profiler;
+pub mod scheduler_profiler;
+
+pub use cache_analyzer::CacheStats;
+pub use flamegraph::{FlamegraphFrame, FlamegraphGenerator, FlamegraphStackSample};
+pub use memory_profiler::{MemoryAllocationSnapshot, MemoryProfiler};
+pub use scheduler_profiler::{PriorityInheritanceRecord, SchedulerLatencyEntry, SchedulerProfiler};
 
 use std::collections::BTreeMap;
 use std::sync::atomic::{AtomicU32, AtomicU64, Ordering};

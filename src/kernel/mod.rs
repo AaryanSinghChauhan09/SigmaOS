@@ -39,7 +39,19 @@ pub mod io_uring;
 pub mod ipc;
 pub mod kprintf;
 pub mod kqueue;
-pub mod kqueue_event;
+pub mod livepatch;
+pub mod lockdep;
+pub mod module_loader;
+pub mod ebpf_program;
+pub mod cgroups;
+pub mod kobject;
+pub mod ftrace;
+pub mod perf;
+pub use perf::*;
+pub mod seccomp;
+pub mod iommu;
+pub mod interrupt;
+pub mod panic_nvram;
 pub mod linux_absorb;
 pub mod linux_bsd_innovations;
 pub mod linux_parity;
@@ -69,9 +81,11 @@ pub mod process;
 pub mod roundrobin;
 pub mod sched;
 pub mod scheduler;
-pub mod structures;
-pub mod uts_namespace;
-pub mod virtual_cpu;
+pub mod subsystems;
+pub mod timer_subsystem;
+pub mod workqueue;
+pub mod wdk_core;
+pub use wdk_core::*;
 
 pub use missing_linux_kernel_components::{
     BpfRingBufferStreamEngine, EpollCtlOp, EpollEvent, KernelAuditRecord, KernelAuditRecordType,
