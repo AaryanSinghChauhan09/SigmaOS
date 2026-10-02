@@ -82,7 +82,7 @@ impl MemoryProtectionState {
         current: MemoryPermission,
         requested: MemoryPermission,
     ) -> Result<MemoryPermission, &'static str> {
-        if self.check_wx_violation(current, requested) {
+        if self.check_wx_violation(current, requested.clone()) {
             Err("W^X violation: cannot add execute permission to writable memory")
         } else {
             Ok(requested)
