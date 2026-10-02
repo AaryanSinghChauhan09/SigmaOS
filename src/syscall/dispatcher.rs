@@ -66,6 +66,10 @@ pub struct SyscallResult {
     pub error: i32,
 }
 
+// Error constants
+pub const EINVAL: i32 = 22; // Invalid argument
+pub const EFAULT: i32 = 14; // Bad address
+
 impl SyscallResult {
     pub fn success(value: isize) -> Self {
         SyscallResult { value, error: 0 }
@@ -244,6 +248,30 @@ impl SyscallDispatcher {
         }
     }
 
+    /// Validate syscall arguments at security boundary
+    /// Prevents malformed arguments from reaching handlers
+    fn validate_args(&self, number: SyscallNumber, args: &SyscallArgs) -> Result<(), i32> {
+        let index = number as usize;
+        
+        // Check syscall number bounds
+        if index >= 256 {
+            return Err(EINVAL);
+        }
+
+        // Validate pointer alignment for memory operations
+        if matches!(number, SyscallNumber::Read | SyscallNumber::Write) {
+            if args.arg1 % 8 != 0 {
+                return Err(EINVAL); // Misaligned buffer pointer
+            }
+            // Prevent buffer overruns: limit size to 4MB
+            if args.arg2 > 4 * 1024 * 1024 {
+                return Err(EINVAL); // Buffer too large
+            }
+        }
+
+        Ok(())
+    }
+
     /// Dispatch syscall
     /// Hot path: inlined dispatch with relaxed stats tracking
     #[inline]
@@ -253,6 +281,11 @@ impl SyscallDispatcher {
         args: &SyscallArgs,
         caller_capability: Capability,
     ) -> SyscallResult {
+        // Validate arguments at syscall boundary (security check)
+        if let Err(errno) = self.validate_args(number, args) {
+            return SyscallResult::error(errno);
+        }
+
         let index = number as usize;
 
         if index >= 256 {
