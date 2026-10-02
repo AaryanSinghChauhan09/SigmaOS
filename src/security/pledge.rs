@@ -1,8 +1,9 @@
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use crate::security::capability::Permission;
-use crate::security::capability::{CapabilityGate, CapabilityToken};
+#[path = "capability.rs"]
+#[cfg(feature = "standalone_test")]
+mod capability;
 
 #[cfg(feature = "standalone_test")]
 use capability::{CapabilityGate, CapabilityToken, Permission};

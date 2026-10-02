@@ -207,7 +207,20 @@ impl WikiDataTransferEngine {
             return Ok(format!("wiki_repo/{}", spec.spec_filename));
         }
 
+        if let Some(feature) = self.feature_specs.get_mut(filename) {
+            if !feature.is_fully_implemented {
+                return Err("WikiSync Error: Feature specification is not fully implemented yet");
+            }
+            feature.wiki_mirrored = true;
+            self.total_synced_to_wiki += 1;
+            return Ok(format!("wiki_repo/{}", feature.spec_name));
+        }
+
         Err("Specification key not found")
+    }
+
+    pub fn total_synced_specs(&self) -> u32 {
+        self.total_synced_to_wiki
     }
 }
 

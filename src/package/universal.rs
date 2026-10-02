@@ -6,7 +6,6 @@ use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
-pub use crate::package::manager::PackageState;
 
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
@@ -558,6 +557,20 @@ pub enum PackageFormat {
     FlatpakRef,  // Flatpak ref bundle (.flatpakref)
     Makeself,    // Makeself runnable installer (.run)
     ZeroInstall, // ZeroInstall package (.zpk)
+    Tazpkg,
+    SingularitySif,
+    StampedeSlp,
+    Winget,
+    Scoop,
+    Choco,
+    Pixi,
+    Nimble,
+    ZigPkg,
+    SwiftPkg,
+    DubPkg,
+    Opam,
+    Shard,
+    PltPkg,
     Kmod,        // Kernel Module package (.kmp, .kmod)
     Jar,         // Java JAR package (.jar)
     Npm,         // Node.js NPM package (.npm)
@@ -3458,7 +3471,7 @@ mod tests {
                 v
             },
             description: "command line tool for transferring data with URLs".to_string(),
-            priority: PackagePriority::Optional,
+            priority: "optional".to_string(),
         };
 
         let _pkgbuild = PacmanPkgbuild {
