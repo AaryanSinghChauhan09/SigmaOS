@@ -245,7 +245,14 @@ pub struct RcuPointer<T> {
 }
 
 impl<T> RcuPointer<T> {
-    pub const fn new(ptr: *mut T) -> Self {
+    pub const fn new_null() -> Self {
+        Self {
+            ptr: AtomicUsize::new(0),
+            _phantom: core::marker::PhantomData,
+        }
+    }
+
+    pub fn new(ptr: *mut T) -> Self {
         Self {
             ptr: AtomicUsize::new(ptr as usize),
             _phantom: core::marker::PhantomData,

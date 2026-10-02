@@ -82,13 +82,17 @@ impl SlabCache {
     /// Linux: `mm/slub.c:slab_alloc()`
     pub fn allocate(&mut self) -> Option<NonNull<u8>> {
         // Try partial slabs first
-        if let Some(obj) = self.allocate_from_slab_list(&mut self.partial_slabs) {
+        let mut list_ptr = self.partial_slabs;
+        if let Some(obj) = Self::allocate_from_list_ptr(&mut list_ptr) {
+            self.partial_slabs = list_ptr;
             self.allocated_objects.fetch_add(1, Ordering::Relaxed);
             return Some(obj);
         }
 
         // Try empty slabs
-        if let Some(obj) = self.allocate_from_slab_list(&mut self.empty_slabs) {
+        let mut empty_ptr = self.empty_slabs;
+        if let Some(obj) = Self::allocate_from_list_ptr(&mut empty_ptr) {
+            self.empty_slabs = empty_ptr;
             self.allocated_objects.fetch_add(1, Ordering::Relaxed);
             return Some(obj);
         }
@@ -96,6 +100,28 @@ impl SlabCache {
         // Need to allocate new slab
         // In real implementation, this would call page allocator
         None
+    }
+
+    fn allocate_from_list_ptr(list: &mut *mut Slab) -> Option<NonNull<u8>> {
+        if list.is_null() {
+            return None;
+        }
+
+        unsafe {
+            let slab = &mut **list;
+
+            if slab.free_list.is_null() {
+                return None;
+            }
+
+            // Pop from free list
+            let obj = slab.free_list;
+            let free_obj = &*obj;
+            slab.free_list = free_obj.next;
+            slab.free_count -= 1;
+
+            NonNull::new(obj as *mut u8)
+        }
     }
 
     /// Allocate from specific slab list

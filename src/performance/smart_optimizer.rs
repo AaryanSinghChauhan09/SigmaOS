@@ -2,8 +2,7 @@
 // Zero-dependency, #![no_std] compliant, zero-allocation
 // Dynamically tunes CPU cores, compacts memory page fragmentation, and adjusts disk I/O priorities under live workloads.
 
-use crate::kernel::process::Process;
-use crate::kernel::{Priority, ProcessState};
+use crate::kernel::process::{Process, ProcessState};
 use core::sync::atomic::{AtomicBool, AtomicU8, AtomicUsize, Ordering};
 
 // 1. CPU Core Thread-Priority Optimizer
@@ -28,14 +27,14 @@ impl CpuPriorityOptimizer {
         for proc in processes.iter_mut() {
             if proc.state == ProcessState::Running {
                 // Elevate active/running foreground process to High priority (Glary priority booster)
-                proc.priority = Priority::High;
+                proc.scheduling.static_priority = -10;
                 println!(
                     "SmartOptimizer: Elevated active foreground process ID {} to Priority::High.",
                     proc.pid
                 );
-            } else if proc.state == ProcessState::Blocked {
+            } else if proc.state == ProcessState::Sleeping || proc.state == ProcessState::Stopped {
                 // Demote blocked/idle background process to protect CPU bounds
-                proc.priority = Priority::Low;
+                proc.scheduling.static_priority = 10;
                 println!(
                     "SmartOptimizer: Demoted blocked/background process ID {} to Priority::Low.",
                     proc.pid

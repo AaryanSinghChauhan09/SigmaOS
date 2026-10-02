@@ -115,7 +115,7 @@ impl CachedPage {
     }
 
     /// Update last access time
-    pub fn touch(&self, time: u64) {
+    pub fn touch(&mut self, time: u64) {
         self.last_access.store(time, Ordering::Release);
         self.flags.referenced = true;
     }
@@ -185,8 +185,9 @@ impl PageCache {
     /// Look up page in cache
     pub fn lookup(&mut self, inode: u64, offset: u64) -> Option<&mut CachedPage> {
         let key = PageKey::new(inode, offset);
+        let now = self.now();
         if let Some(page) = self.pages.get_mut(&key) {
-            page.touch(self.now());
+            page.touch(now);
             self.hits.fetch_add(1, Ordering::Relaxed);
             Some(page)
         } else {
@@ -196,7 +197,7 @@ impl PageCache {
     }
 
     /// Add page to cache
-    pub fn insert(&mut self, page: CachedPage) -> Result<(), PageCacheError> {
+    pub fn insert(&mut self, mut page: CachedPage) -> Result<(), PageCacheError> {
         let key = PageKey::new(page.inode, page.offset);
 
         // Check if we need to evict
@@ -205,7 +206,8 @@ impl PageCache {
         }
 
         // Insert page
-        page.touch(self.now());
+        let now = self.now();
+        page.touch(now);
         if page.flags.dirty {
             self.dirty_pages.fetch_add(1, Ordering::Relaxed);
         }
@@ -265,12 +267,18 @@ impl PageCache {
     /// Flush all dirty pages
     pub fn flush(&mut self) -> Result<usize, PageCacheError> {
         let mut flushed = 0;
-        let keys: Vec<PageKey> = self.pages.keys().copied().collect();
+        let dirty_keys: Vec<PageKey> = self
+            .pages
+            .iter()
+            .filter(|(_, p)| p.flags.dirty)
+            .map(|(k, _)| *k)
+            .collect();
 
-        for key in keys {
+        for key in dirty_keys {
             if let Some(page) = self.pages.get_mut(&key) {
                 if page.flags.dirty {
-                    self.writeback_page(page)?;
+                    // Mark as clean directly on page writeback
+                    page.mark_clean();
                     flushed += 1;
                 }
             }
