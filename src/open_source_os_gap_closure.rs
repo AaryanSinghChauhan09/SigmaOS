@@ -4064,7 +4064,11 @@ impl SovereignAsahiAppleSiliconGpuEngine {
         Ok(cmd_id)
     }
 
-    pub fn send_rtkit_ipc_message(&mut self, endpoint: u8, msg: &[u8]) -> Result<bool, &'static str> {
+    pub fn send_rtkit_ipc_message(
+        &mut self,
+        endpoint: u8,
+        msg: &[u8],
+    ) -> Result<bool, &'static str> {
         if msg.is_empty() {
             return Err("Asahi RTKit: Empty IPC message");
         }
@@ -4368,7 +4372,10 @@ impl SovereignMojoTensorCompilerEngine {
 
         match kernel.op_kind {
             TensorOpKind::VectorAdd => Ok(inputs.iter().map(|x| x + 1.0).collect()),
-            TensorOpKind::ReLU => Ok(inputs.iter().map(|&x| if x > 0.0 { x } else { 0.0 }).collect()),
+            TensorOpKind::ReLU => Ok(inputs
+                .iter()
+                .map(|&x| if x > 0.0 { x } else { 0.0 })
+                .collect()),
             TensorOpKind::MatMul | TensorOpKind::Conv2D => Ok(inputs.to_vec()),
         }
     }
@@ -5523,8 +5530,13 @@ mod tests {
         let res = engine.inspect_packet("192.168.1.1", "10.0.0.1", 1234, 80, b"NORMAL_PACKET");
         assert_eq!(res, IpsAction::Pass);
 
-        let res_drop =
-            engine.inspect_packet("192.168.1.1", "10.0.0.1", 1234, 80, b"MALWARE_SIGNATURE_PAYLOAD");
+        let res_drop = engine.inspect_packet(
+            "192.168.1.1",
+            "10.0.0.1",
+            1234,
+            80,
+            b"MALWARE_SIGNATURE_PAYLOAD",
+        );
         assert_eq!(res_drop, IpsAction::Drop);
         assert_eq!(engine.total_alerts_generated, 1);
     }
@@ -5537,7 +5549,9 @@ mod tests {
         let mod_id = engine.load_wasm_module("test_mod", wasm_bytes).unwrap();
         engine.grant_wasi_dir(mod_id, "/tmp/host", "/tmp/guest");
 
-        let res = engine.execute_wasm_export(mod_id, "main", &[10, 20, 30]).unwrap();
+        let res = engine
+            .execute_wasm_export(mod_id, "main", &[10, 20, 30])
+            .unwrap();
         assert_eq!(res, 60);
     }
 
@@ -5550,7 +5564,9 @@ mod tests {
         assert_eq!(res, vec![2.0, 3.0, 4.0]);
 
         let relu_kernel = engine.compile_tensor_kernel(TensorOpKind::ReLU, &[4], 8);
-        let res_relu = engine.execute_kernel(&relu_kernel, &[-2.0, 0.0, 5.0]).unwrap();
+        let res_relu = engine
+            .execute_kernel(&relu_kernel, &[-2.0, 0.0, 5.0])
+            .unwrap();
         assert_eq!(res_relu, vec![0.0, 0.0, 5.0]);
     }
 }
@@ -6935,13 +6951,14 @@ impl OpenSourceProjectSupremacySuite {
         indices: u32,
     ) -> Result<u64, &'static str> {
         let buf_addr = self.asahi_gpu_engine.allocate_unified_memory(1024)?;
-        self.asahi_gpu_engine.submit_agx_command_queue(AgxGpuCommand {
-            cmd_id: 101,
-            queue_type: queue_type.to_string(),
-            pipeline_state_addr: 0x4000,
-            vertex_buffer_addr: buf_addr,
-            index_count: indices,
-        })
+        self.asahi_gpu_engine
+            .submit_agx_command_queue(AgxGpuCommand {
+                cmd_id: 101,
+                queue_type: queue_type.to_string(),
+                pipeline_state_addr: 0x4000,
+                vertex_buffer_addr: buf_addr,
+                index_count: indices,
+            })
     }
 
     /// Tetragon eBPF: Trace process execution against security policies
@@ -6970,7 +6987,8 @@ impl OpenSourceProjectSupremacySuite {
         args: &[i64],
     ) -> Result<i64, &'static str> {
         let mod_id = self.wasmtime_engine.load_wasm_module(name, wasm_bytes)?;
-        self.wasmtime_engine.execute_wasm_export(mod_id, "main", args)
+        self.wasmtime_engine
+            .execute_wasm_export(mod_id, "main", args)
     }
 
     /// Mojo Tensor Compiler: Compile and run tensor SIMD operation
@@ -6979,7 +6997,9 @@ impl OpenSourceProjectSupremacySuite {
         op: TensorOpKind,
         inputs: &[f32],
     ) -> Result<Vec<f32>, &'static str> {
-        let spec = self.mojo_compiler.compile_tensor_kernel(op, &[inputs.len()], 16);
+        let spec = self
+            .mojo_compiler
+            .compile_tensor_kernel(op, &[inputs.len()], 16);
         self.mojo_compiler.execute_kernel(&spec, inputs)
     }
 }
