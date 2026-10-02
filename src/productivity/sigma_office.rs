@@ -5841,6 +5841,350 @@ impl SovereignLookerAdvancedVisualizationEngine {
     }
 }
 
+/// Dynamic array and matrix formula engine inspired by Google Sheets & Excel (XLOOKUP, FILTER, UNIQUE, SORT, TRANSPOSE).
+#[derive(Debug, Clone, Default)]
+pub struct SovereignXlookupFilterUniqueFormulaEngine;
+
+impl SovereignXlookupFilterUniqueFormulaEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    /// Performs modern XLOOKUP with fallback default value.
+    pub fn xlookup(
+        &self,
+        lookup_value: &str,
+        lookup_array: &[String],
+        return_array: &[String],
+        if_not_found: &str,
+    ) -> String {
+        if let Some(idx) = lookup_array.iter().position(|item| item == lookup_value) {
+            return_array.get(idx).cloned().unwrap_or_else(|| if_not_found.to_string())
+        } else {
+            if_not_found.to_string()
+        }
+    }
+
+    /// Returns the 0-indexed position of lookup_value in lookup_array (XMATCH).
+    pub fn xmatch(&self, lookup_value: &str, lookup_array: &[String]) -> Option<usize> {
+        lookup_array.iter().position(|item| item == lookup_value)
+    }
+
+    /// Filters array values based on matching boolean condition flags (FILTER).
+    pub fn filter(&self, values: &[String], condition_flags: &[bool]) -> Vec<String> {
+        values
+            .iter()
+            .zip(condition_flags.iter())
+            .filter_map(|(val, &flag)| if flag { Some(val.clone()) } else { None })
+            .collect()
+    }
+
+    /// Returns deduplicated distinct array values preserving insertion order (UNIQUE).
+    pub fn unique(&self, values: &[String]) -> Vec<String> {
+        let mut seen = std::collections::HashSet::new();
+        let mut result = Vec::new();
+        for val in values {
+            if seen.insert(val.clone()) {
+                result.push(val.clone());
+            }
+        }
+        result
+    }
+
+    /// Sorts a numeric array in ascending or descending order (SORT).
+    pub fn sort(&self, values: &[f64], ascending: bool) -> Vec<f64> {
+        let mut sorted = values.to_vec();
+        sorted.sort_by(|a, b| {
+            if ascending {
+                a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal)
+            } else {
+                b.partial_cmp(a).unwrap_or(std::cmp::Ordering::Equal)
+            }
+        });
+        sorted
+    }
+
+    /// Transposes a 2D matrix (rows into columns) (TRANSPOSE).
+    pub fn transpose(&self, matrix: &[Vec<String>]) -> Vec<Vec<String>> {
+        if matrix.is_empty() || matrix[0].is_empty() {
+            return Vec::new();
+        }
+        let rows = matrix.len();
+        let cols = matrix[0].len();
+        let mut transposed = vec![vec![String::new(); rows]; cols];
+        for r in 0..rows {
+            for c in 0..cols {
+                if c < matrix[r].len() {
+                    transposed[c][r] = matrix[r][c].clone();
+                }
+            }
+        }
+        transposed
+    }
+}
+
+/// CRM sales territory and pipeline optimization engine inspired by Salesforce & Bitrix24.
+#[derive(Debug, Clone, Default)]
+pub struct SovereignSalesTerritoryPipelineOptimizationEngine;
+
+impl SovereignSalesTerritoryPipelineOptimizationEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    /// Assigns sales territory based on region and deal size threshold.
+    pub fn assign_territory_by_region_and_size(&self, region: &str, deal_amount: f64) -> String {
+        let tier = if deal_amount >= 100000.0 {
+            "Enterprise"
+        } else if deal_amount >= 25000.0 {
+            "Mid-Market"
+        } else {
+            "SMB"
+        };
+        format!("{} - {}", tier, region)
+    }
+
+    /// Calculates weighted pipeline velocity: `(sum(deal_amount * win_probability) / avg_cycle_days)`.
+    pub fn calculate_weighted_pipeline_velocity(&self, deals: &[(f64, f64, u32)]) -> f64 {
+        if deals.is_empty() {
+            return 0.0;
+        }
+        let total_weighted_value: f64 = deals.iter().map(|(amt, prob, _)| amt * prob).sum();
+        let total_days: u32 = deals.iter().map(|(_, _, days)| *days).sum();
+        let avg_days = total_days as f64 / deals.len() as f64;
+
+        if avg_days > 0.0 {
+            total_weighted_value / avg_days
+        } else {
+            0.0
+        }
+    }
+
+    /// Predicts lead win probability score (0.0 to 100.0) based on engagement touchpoints and budget status.
+    pub fn predict_lead_win_score(
+        &self,
+        company_size: u32,
+        touchpoints: u32,
+        decision_maker_engaged: bool,
+        budget_approved: bool,
+    ) -> f64 {
+        let mut score = 10.0;
+        if company_size > 500 {
+            score += 20.0;
+        } else if company_size > 50 {
+            score += 10.0;
+        }
+
+        score += (touchpoints as f64 * 3.0).min(30.0);
+
+        if decision_maker_engaged {
+            score += 20.0;
+        }
+        if budget_approved {
+            score += 20.0;
+        }
+
+        score.min(100.0)
+    }
+}
+
+/// Business process workflow automation step definition inspired by Power Automate & Zoho Flow.
+#[derive(Debug, Clone)]
+pub struct AutomationWorkflowStep {
+    pub step_id: String,
+    pub action_type: String,
+    pub condition_key: Option<String>,
+    pub condition_value: Option<String>,
+    pub max_retries: u32,
+}
+
+/// Multi-step workflow orchestration engine inspired by Power Automate & Zoho Flow.
+#[derive(Debug, Clone, Default)]
+pub struct SovereignBusinessProcessAutomationOrchestrator {
+    pub steps: Vec<AutomationWorkflowStep>,
+}
+
+impl SovereignBusinessProcessAutomationOrchestrator {
+    pub fn new() -> Self {
+        Self { steps: Vec::new() }
+    }
+
+    /// Registers a new workflow step in sequence.
+    pub fn register_step(
+        &mut self,
+        step_id: &str,
+        action_type: &str,
+        condition_key: Option<&str>,
+        condition_value: Option<&str>,
+        max_retries: u32,
+    ) {
+        self.steps.push(AutomationWorkflowStep {
+            step_id: step_id.to_string(),
+            action_type: action_type.to_string(),
+            condition_key: condition_key.map(|s| s.to_string()),
+            condition_value: condition_value.map(|s| s.to_string()),
+            max_retries,
+        });
+    }
+
+    /// Executes the registered workflow steps against the provided execution context.
+    pub fn execute_workflow(&self, context: &mut HashMap<String, String>) -> Vec<String> {
+        let mut log = Vec::new();
+        for step in &self.steps {
+            // Check condition if present
+            if let (Some(key), Some(expected_val)) = (&step.condition_key, &step.condition_value) {
+                let actual = context.get(key).map(|s| s.as_str()).unwrap_or("");
+                if actual != expected_val {
+                    log.push(format!(
+                        "Step '{}' skipped: condition mismatch (expected '{}', got '{}')",
+                        step.step_id, expected_val, actual
+                    ));
+                    continue;
+                }
+            }
+
+            // Execute action
+            let retries = 0;
+            let mut success = false;
+            while retries <= step.max_retries {
+                // Simulate action execution and context update
+                context.insert(format!("{}_status", step.step_id), "completed".to_string());
+                success = true;
+                break;
+            }
+
+            if success {
+                log.push(format!("Step '{}' ({}) executed successfully", step.step_id, step.action_type));
+            } else {
+                log.push(format!("Step '{}' ({}) failed after {} retries", step.step_id, step.action_type, step.max_retries));
+            }
+        }
+        log
+    }
+}
+
+/// Multi-currency accounting and financial consolidation engine inspired by Odoo Accounting & Zoho Books.
+#[derive(Debug, Clone, Default)]
+pub struct SovereignMultiCurrencyLedgerConsolidationEngine {
+    pub exchange_rates: HashMap<(String, String), f64>,
+}
+
+impl SovereignMultiCurrencyLedgerConsolidationEngine {
+    pub fn new() -> Self {
+        Self {
+            exchange_rates: HashMap::new(),
+        }
+    }
+
+    /// Sets exchange rate from foreign currency to target base currency.
+    pub fn set_exchange_rate(&mut self, from_curr: &str, to_curr: &str, rate: f64) {
+        self.exchange_rates.insert((from_curr.to_uppercase(), to_curr.to_uppercase()), rate);
+    }
+
+    /// Converts monetary amount between currencies using stored exchange rates.
+    pub fn convert(&self, amount: f64, from_curr: &str, to_curr: &str) -> f64 {
+        let from = from_curr.to_uppercase();
+        let to = to_curr.to_uppercase();
+        if from == to {
+            return amount;
+        }
+        if let Some(&rate) = self.exchange_rates.get(&(from, to)) {
+            amount * rate
+        } else {
+            amount
+        }
+    }
+
+    /// Calculates unrealized FX gain (+) or loss (-) based on booking rate vs current revaluation rate.
+    pub fn calculate_unrealized_fx_gain_loss(
+        &self,
+        amount_foreign: f64,
+        booking_rate: f64,
+        current_rate: f64,
+    ) -> f64 {
+        amount_foreign * (current_rate - booking_rate)
+    }
+
+    /// Consolidates multi-subsidiary trial balance ledgers into a single target base currency.
+    pub fn consolidate_trial_balance(
+        &self,
+        subsidiary_ledgers: &[HashMap<String, f64>],
+        subsidiary_currencies: &[&str],
+        target_currency: &str,
+    ) -> HashMap<String, f64> {
+        let mut consolidated = HashMap::new();
+        for (ledger, &curr) in subsidiary_ledgers.iter().zip(subsidiary_currencies.iter()) {
+            for (account_code, &balance) in ledger {
+                let converted = self.convert(balance, curr, target_currency);
+                *consolidated.entry(account_code.clone()).or_insert(0.0) += converted;
+            }
+        }
+        consolidated
+    }
+}
+
+/// Interactive BI dashboard slicer and gauge breakdown engine inspired by Google Looker Studio & Power BI.
+#[derive(Debug, Clone, Default)]
+pub struct SovereignInteractiveDashboardSlicerEngine;
+
+impl SovereignInteractiveDashboardSlicerEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    /// Filters a dashboard dataset using multi-field active slicer filter selections.
+    pub fn apply_multi_slicer_filter(
+        &self,
+        dataset: &[HashMap<String, String>],
+        active_slicers: &HashMap<String, Vec<String>>,
+    ) -> Vec<HashMap<String, String>> {
+        dataset
+            .iter()
+            .filter(|row| {
+                for (field, allowed_values) in active_slicers {
+                    if allowed_values.is_empty() {
+                        continue;
+                    }
+                    let row_val = row.get(field).map(|s| s.as_str()).unwrap_or("");
+                    if !allowed_values.iter().any(|val| val == row_val) {
+                        return false;
+                    }
+                }
+                true
+            })
+            .cloned()
+            .collect()
+    }
+
+    /// Computes percentage fulfillment toward a target for KPI gauge visuals (capped at 100%).
+    pub fn compute_kpi_gauge_percentage(&self, current_value: f64, target_value: f64) -> f64 {
+        if target_value <= 0.0 {
+            0.0
+        } else {
+            ((current_value / target_value) * 100.0).min(100.0).max(0.0)
+        }
+    }
+
+    /// Aggregates metric sums grouped by date/period string field for time-series charts.
+    pub fn aggregate_time_series(
+        &self,
+        dataset: &[HashMap<String, String>],
+        date_field: &str,
+        metric_field: &str,
+    ) -> HashMap<String, f64> {
+        let mut time_series = HashMap::new();
+        for row in dataset {
+            let period = row.get(date_field).cloned().unwrap_or_else(|| "N/A".to_string());
+            let val: f64 = row
+                .get(metric_field)
+                .and_then(|s| s.parse().ok())
+                .unwrap_or(0.0);
+            *time_series.entry(period).or_insert(0.0) += val;
+        }
+        time_series
+    }
+}
+
 // Placeholder types for compilation
 mod sigma_types {
     pub type Result<T> = core::result::Result<T, &'static str>;
@@ -6804,5 +7148,94 @@ mod tests {
         let dataset = vec![row1, row2];
         let filtered = looker_adv.apply_cross_filter(&dataset, "region", "US");
         assert_eq!(filtered.len(), 1);
+    }
+
+    #[test]
+    fn test_sovereign_suite_new_engines() {
+        // 1. SovereignXlookupFilterUniqueFormulaEngine
+        let array_engine = SovereignXlookupFilterUniqueFormulaEngine::new();
+        let lookup_keys = vec!["A101".to_string(), "B202".to_string(), "C303".to_string()];
+        let return_vals = vec!["Widgets".to_string(), "Gadgets".to_string(), "Tools".to_string()];
+        assert_eq!(array_engine.xlookup("B202", &lookup_keys, &return_vals, "N/A"), "Gadgets");
+        assert_eq!(array_engine.xlookup("Z999", &lookup_keys, &return_vals, "N/A"), "N/A");
+        assert_eq!(array_engine.xmatch("C303", &lookup_keys), Some(2));
+
+        let vals = vec!["Apple".to_string(), "Banana".to_string(), "Apple".to_string(), "Cherry".to_string()];
+        let flags = vec![true, false, true, true];
+        assert_eq!(array_engine.filter(&vals, &flags), vec!["Apple".to_string(), "Apple".to_string(), "Cherry".to_string()]);
+        assert_eq!(array_engine.unique(&vals), vec!["Apple".to_string(), "Banana".to_string(), "Cherry".to_string()]);
+
+        let nums = vec![42.0, 10.0, 99.0, 5.0];
+        assert_eq!(array_engine.sort(&nums, true), vec![5.0, 10.0, 42.0, 99.0]);
+
+        let mat = vec![
+            vec!["1".to_string(), "2".to_string()],
+            vec!["3".to_string(), "4".to_string()],
+        ];
+        let transposed = array_engine.transpose(&mat);
+        assert_eq!(transposed[0], vec!["1".to_string(), "3".to_string()]);
+        assert_eq!(transposed[1], vec!["2".to_string(), "4".to_string()]);
+
+        // 2. SovereignSalesTerritoryPipelineOptimizationEngine
+        let sales_engine = SovereignSalesTerritoryPipelineOptimizationEngine::new();
+        assert_eq!(sales_engine.assign_territory_by_region_and_size("NA", 150000.0), "Enterprise - NA");
+        assert_eq!(sales_engine.assign_territory_by_region_and_size("EMEA", 10000.0), "SMB - EMEA");
+
+        let deals = vec![(100000.0, 0.8, 30), (50000.0, 0.5, 30)];
+        let velocity = sales_engine.calculate_weighted_pipeline_velocity(&deals);
+        assert_eq!(velocity, (80000.0 + 25000.0) / 30.0);
+
+        let win_score = sales_engine.predict_lead_win_score(1000, 10, true, true);
+        assert!(win_score >= 80.0);
+
+        // 3. SovereignBusinessProcessAutomationOrchestrator
+        let mut auto_orch = SovereignBusinessProcessAutomationOrchestrator::new();
+        auto_orch.register_step("step1", "send_email", Some("tier"), Some("Enterprise"), 2);
+        auto_orch.register_step("step2", "update_crm", None, None, 1);
+
+        let mut ctx = HashMap::new();
+        ctx.insert("tier".to_string(), "Enterprise".to_string());
+        let log = auto_orch.execute_workflow(&mut ctx);
+        assert_eq!(log.len(), 2);
+        assert_eq!(ctx.get("step1_status").unwrap(), "completed");
+
+        // 4. SovereignMultiCurrencyLedgerConsolidationEngine
+        let mut fx_engine = SovereignMultiCurrencyLedgerConsolidationEngine::new();
+        fx_engine.set_exchange_rate("EUR", "USD", 1.08);
+        assert_eq!(fx_engine.convert(100.0, "EUR", "USD"), 108.0);
+        assert!((fx_engine.calculate_unrealized_fx_gain_loss(1000.0, 1.05, 1.08) - 30.0).abs() < 1e-5);
+
+        let mut ledger_us = HashMap::new();
+        ledger_us.insert("1000".to_string(), 500.0);
+        let mut ledger_eu = HashMap::new();
+        ledger_eu.insert("1000".to_string(), 100.0);
+
+        let consolidated = fx_engine.consolidate_trial_balance(&[ledger_us, ledger_eu], &["USD", "EUR"], "USD");
+        assert_eq!(consolidated.get("1000").copied(), Some(608.0));
+
+        // 5. SovereignInteractiveDashboardSlicerEngine
+        let slicer_engine = SovereignInteractiveDashboardSlicerEngine::new();
+        let mut r1 = HashMap::new();
+        r1.insert("category".to_string(), "Hardware".to_string());
+        r1.insert("date".to_string(), "2026-01".to_string());
+        r1.insert("sales".to_string(), "500".to_string());
+
+        let mut r2 = HashMap::new();
+        r2.insert("category".to_string(), "Software".to_string());
+        r2.insert("date".to_string(), "2026-01".to_string());
+        r2.insert("sales".to_string(), "300".to_string());
+
+        let dataset = vec![r1, r2];
+        let mut active_slicers = HashMap::new();
+        active_slicers.insert("category".to_string(), vec!["Hardware".to_string()]);
+
+        let sliced = slicer_engine.apply_multi_slicer_filter(&dataset, &active_slicers);
+        assert_eq!(sliced.len(), 1);
+        assert_eq!(sliced[0].get("category").unwrap(), "Hardware");
+
+        assert_eq!(slicer_engine.compute_kpi_gauge_percentage(75.0, 100.0), 75.0);
+
+        let ts = slicer_engine.aggregate_time_series(&dataset, "date", "sales");
+        assert_eq!(ts.get("2026-01").copied(), Some(800.0));
     }
 }
