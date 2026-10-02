@@ -189,6 +189,7 @@ pub use pidfd::{
     PidFd, PidFdCapabilities, PidfdProcDescManager, ProcDesc, ProcDescCapabilities, SubreaperEntry,
 };
 pub mod cfi;
+pub mod cfs_scheduler;
 pub mod dma;
 pub mod interrupt;
 pub mod interrupt_controller;

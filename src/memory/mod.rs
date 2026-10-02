@@ -16,6 +16,7 @@ pub mod low_level;
 pub mod paging;
 pub mod quota;
 pub mod segmentation_paging;
+pub mod slab_allocator;
 pub mod sovereign_address_translation;
 #[path = "huge_pages.rs"]
 pub mod thp;
