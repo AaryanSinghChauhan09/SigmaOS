@@ -1,6 +1,7 @@
 // SigmaOS Drivers Module
 pub mod acpi;
 pub mod ata_bus_controller;
+pub mod block_io;
 pub mod boot_init;
 pub mod dde;
 pub mod distro_device_expansion;
