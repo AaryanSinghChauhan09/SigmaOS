@@ -3138,7 +3138,11 @@ impl SovereignDistroInspirationLeapEngine {
 
     pub fn audit_subsystem_readiness(&mut self) -> (usize, bool) {
         let count = self.synchronize_all_subsystems().unwrap_or(0);
-        let valid = self.router.gateway.orchestrator.verify_full_subsystem_matrix();
+        let valid = self
+            .router
+            .gateway
+            .orchestrator
+            .verify_full_subsystem_matrix();
         (182, valid)
     }
 }
@@ -3155,19 +3159,24 @@ mod inspiration_leap_tests {
 
     #[test]
     fn test_event_router_and_inspiration_leap_engine() {
-        let mut leap_engine = SovereignDistroInspirationLeapEngine::new(DistroSubsystemMode::LinuxArch);
+        let mut leap_engine =
+            SovereignDistroInspirationLeapEngine::new(DistroSubsystemMode::LinuxArch);
         assert_eq!(leap_engine.active_inspirations.len(), 13);
 
         let (count, valid) = leap_engine.audit_subsystem_readiness();
         assert!(count > 150);
         assert!(valid);
 
-        let res = leap_engine.router.route_event("process", "memory", "alloc_page", "0x1000");
+        let res = leap_engine
+            .router
+            .route_event("process", "memory", "alloc_page", "0x1000");
         assert!(res.is_ok());
         assert!(res.unwrap().contains("KARL W^X memory page allocation"));
 
         leap_engine.set_distro_mode(DistroSubsystemMode::FreeBsd);
-        let res_bsd = leap_engine.router.route_event("network", "network", "vnet_route", "em0");
+        let res_bsd = leap_engine
+            .router
+            .route_event("network", "network", "vnet_route", "em0");
         assert!(res_bsd.is_ok());
         assert!(res_bsd.unwrap().contains("VNET network stack routing"));
 
@@ -3493,9 +3502,7 @@ mod cross_subsystem_tests {
     fn auth_bridge_fails_closed_without_a_credential_provider() {
         let mut auth = SovereignSystemdHomedAuthBridge::new();
         let auth_token = [0x55; 16];
-        assert!(auth
-            .authenticate_and_mount_token("", &auth_token)
-            .is_err());
+        assert!(auth.authenticate_and_mount_token("", &auth_token).is_err());
         assert!(auth.authenticated_users.is_empty());
     }
 

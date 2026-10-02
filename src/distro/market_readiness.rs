@@ -13,9 +13,9 @@
 // Implements enterprise SLA stability, zero-downtime atomic upgrades, OOTB hardware diagnostics, and ZFS boot environments.
 
 use std::collections::BTreeMap;
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 
 // =========================================================================
 // 1. ENTERPRISE ABI & SLA GOVERNANCE ENGINE (RHEL / ROCKY / ALMA PARITY)
@@ -45,7 +45,9 @@ impl EnterpriseKabiRecord {
     }
 
     pub fn verify_symbol_abi(&self, symbol: &str, expected_hash: &str) -> bool {
-        self.symbol_checksum_map.get(symbol).map_or(false, |h| h == expected_hash)
+        self.symbol_checksum_map
+            .get(symbol)
+            .map_or(false, |h| h == expected_hash)
     }
 }
 
@@ -146,7 +148,12 @@ impl SovereignAtomicUpgradeEngine {
         }
     }
 
-    pub fn stage_next_generation(&mut self, merkle_hash: &str, kernel: &str, pkg_hash: &str) -> u32 {
+    pub fn stage_next_generation(
+        &mut self,
+        merkle_hash: &str,
+        kernel: &str,
+        pkg_hash: &str,
+    ) -> u32 {
         let next_id = self.current_generation + 1;
         let gen = AtomicSystemGeneration {
             generation_id: next_id,
@@ -288,15 +295,26 @@ mod tests {
         let dataset = be_mgr.create_boot_environment("upgrade-2.0").unwrap();
         assert!(dataset.contains("zroot/ROOT/upgrade-2.0"));
         assert!(be_mgr.activate_boot_environment("upgrade-2.0"));
-        assert!(be_mgr.boot_environments.iter().find(|b| b.be_name == "upgrade-2.0").unwrap().is_boot_next);
+        assert!(
+            be_mgr
+                .boot_environments
+                .iter()
+                .find(|b| b.be_name == "upgrade-2.0")
+                .unwrap()
+                .is_boot_next
+        );
     }
 
     #[test]
     fn test_atomic_upgrades_and_diagnostics() {
         let mut upgrade = SovereignAtomicUpgradeEngine::new();
-        let gen2 = upgrade.stage_next_generation("sha256:9999", "/boot/vmlinuz-2.0.0", "sha256:bbbb");
+        let gen2 =
+            upgrade.stage_next_generation("sha256:9999", "/boot/vmlinuz-2.0.0", "sha256:bbbb");
         assert_eq!(gen2, 2);
-        assert_eq!(upgrade.rollback_to_generation(1).unwrap(), "sha256:11112222333344445555666677778888");
+        assert_eq!(
+            upgrade.rollback_to_generation(1).unwrap(),
+            "sha256:11112222333344445555666677778888"
+        );
 
         let matrix = MarketReadinessMatrix::new();
         assert_eq!(matrix.verify_market_readiness_score(), 100);

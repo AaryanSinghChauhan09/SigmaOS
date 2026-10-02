@@ -101,7 +101,9 @@ impl UserThemeMarketplace {
         let q = query.to_lowercase();
         self.themes
             .values()
-            .filter(|t| t.name.to_lowercase().contains(&q) || t.description.to_lowercase().contains(&q))
+            .filter(|t| {
+                t.name.to_lowercase().contains(&q) || t.description.to_lowercase().contains(&q)
+            })
             .collect()
     }
 }
@@ -313,14 +315,22 @@ impl NixOsFlakesCompatLayer {
             lockfile_hash: format!("sha256-nixflake-{}", flake_uri.len()),
         };
 
-        self.evaluated_flakes.insert(flake_uri.to_string(), flake.clone());
+        self.evaluated_flakes
+            .insert(flake_uri.to_string(), flake.clone());
         flake
     }
 
-    pub fn build_flake_package(&self, flake_uri: &str, output_name: &str) -> Result<String, &'static str> {
+    pub fn build_flake_package(
+        &self,
+        flake_uri: &str,
+        output_name: &str,
+    ) -> Result<String, &'static str> {
         if let Some(flake) = self.evaluated_flakes.get(flake_uri) {
             if let Some(target) = flake.outputs.get(output_name) {
-                Ok(format!("NixOsFlakes: Built package '{}' from output '{}'", target, output_name))
+                Ok(format!(
+                    "NixOsFlakes: Built package '{}' from output '{}'",
+                    target, output_name
+                ))
             } else {
                 Err("NixOsFlakes: Specified output name not found in flake")
             }
@@ -352,7 +362,10 @@ impl GuixSchemeRecipeSupport {
         Self::default()
     }
 
-    pub fn parse_guix_scheme(&mut self, scheme_expr: &str) -> Result<GuixSchemePackageSpec, &'static str> {
+    pub fn parse_guix_scheme(
+        &mut self,
+        scheme_expr: &str,
+    ) -> Result<GuixSchemePackageSpec, &'static str> {
         // Parse basic Scheme syntax mock representation
         if !scheme_expr.contains("define-public") || !scheme_expr.contains("package") {
             return Err("GuixScheme: Expression is not a valid Guix package definition");
@@ -393,7 +406,8 @@ impl HomebrewBottleExtractor {
 
         let pkg_name = bottle_filename.split('-').next().unwrap_or("bottle_pkg");
         let target_path = format!("/usr/lib/sigpkg/bottles/{}", pkg_name);
-        self.extracted_bottles.insert(pkg_name.to_string(), target_path.clone());
+        self.extracted_bottles
+            .insert(pkg_name.to_string(), target_path.clone());
 
         Ok(format!(
             "HomebrewBottle: Extracted '{}', patched ELF rpath to SigmaOS system root, repackaged to '{}'",
@@ -445,7 +459,13 @@ impl LinuxKernelModuleShim {
     }
 
     pub fn resolve_kernel_symbol(&self, symbol: &str) -> bool {
-        let std_symbols = ["printk", "kmalloc", "kfree", "pci_register_driver", "request_firmware"];
+        let std_symbols = [
+            "printk",
+            "kmalloc",
+            "kfree",
+            "pci_register_driver",
+            "request_firmware",
+        ];
         std_symbols.contains(&symbol)
     }
 }
@@ -593,7 +613,9 @@ mod tests {
         );
 
         assert_eq!(spec.flake_uri, "github:nixos/nixpkgs/nixos-unstable");
-        let build_res = flakes.build_flake_package("github:nixos/nixpkgs/nixos-unstable", "default").unwrap();
+        let build_res = flakes
+            .build_flake_package("github:nixos/nixpkgs/nixos-unstable", "default")
+            .unwrap();
         assert!(build_res.contains("sigpkg-system-core"));
     }
 
@@ -610,14 +632,22 @@ mod tests {
     #[test]
     fn test_homebrew_bottle_extractor() {
         let mut brew = HomebrewBottleExtractor::new();
-        let res = brew.extract_and_repackage_bottle("wget-1.21.4.x86_64_linux.bottle.tar.gz").unwrap();
+        let res = brew
+            .extract_and_repackage_bottle("wget-1.21.4.x86_64_linux.bottle.tar.gz")
+            .unwrap();
         assert!(res.contains("/usr/lib/sigpkg/bottles/wget"));
     }
 
     #[test]
     fn test_linux_kernel_module_shim() {
         let mut kmod = LinuxKernelModuleShim::new();
-        kmod.register_kernel_module("e1000e", "Intel Corp", "GPLv2", &["printk", "pci_register_driver"]).unwrap();
+        kmod.register_kernel_module(
+            "e1000e",
+            "Intel Corp",
+            "GPLv2",
+            &["printk", "pci_register_driver"],
+        )
+        .unwrap();
 
         assert!(kmod.resolve_kernel_symbol("printk"));
         assert!(kmod.resolve_kernel_symbol("pci_register_driver"));

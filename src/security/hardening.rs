@@ -3,9 +3,9 @@
 // W^X enforcement, stack protection, and memory security
 // Inspired by OpenBSD and Linux security mitigations
 
-use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 #[cfg(feature = "standalone_test")]
 use alloc::vec::Vec;
+use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 
 use crate::security::Permission;
 

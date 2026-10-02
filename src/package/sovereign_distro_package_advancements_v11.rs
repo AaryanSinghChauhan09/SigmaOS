@@ -22,9 +22,9 @@ use alloc::format;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec::Vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::BTreeMap;
@@ -33,9 +33,9 @@ use std::format;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
-#[cfg(any(feature = "standalone_test", test))]
 use std::vec;
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec::Vec;
 
 // ============================================================================
 // 1. Universal Foreign Package Formats
@@ -157,7 +157,9 @@ impl SystemTriggerHook {
         match self {
             Self::LdconfigSharedLibs => "Rebuild dynamic linker cache (/usr/lib / /lib)",
             Self::UpdateDesktopDatabase => "Update desktop entry cache (/usr/share/applications)",
-            Self::GlibCompileSchemas => "Compile GLib GSettings schemas (/usr/share/glib-2.0/schemas)",
+            Self::GlibCompileSchemas => {
+                "Compile GLib GSettings schemas (/usr/share/glib-2.0/schemas)"
+            }
             Self::SystemdTmpfiles => "Create systemd temporary files and directories",
             Self::MimeDatabase => "Update MIME type database (/usr/share/mime)",
             Self::FontsIndex => "Rebuild font directory index (/usr/share/fonts)",
@@ -198,11 +200,19 @@ impl UniversalForeignPackageFormatConverter {
     /// Autodetects foreign package format from manifest header text
     pub fn autodetect_format(&self, manifest_text: &str) -> UniversalForeignFormat {
         let lower = manifest_text.to_lowercase();
-        if lower.contains("package:") && (lower.contains("depends:") || lower.contains("architecture:")) {
+        if lower.contains("package:")
+            && (lower.contains("depends:") || lower.contains("architecture:"))
+        {
             UniversalForeignFormat::DebianApt
-        } else if lower.contains("pkgname=") || lower.contains("pkgver=") || lower.contains("arch=(") {
+        } else if lower.contains("pkgname=")
+            || lower.contains("pkgver=")
+            || lower.contains("arch=(")
+        {
             UniversalForeignFormat::ArchPacman
-        } else if lower.contains("name:") && lower.contains("version:") && lower.contains("release:") {
+        } else if lower.contains("name:")
+            && lower.contains("version:")
+            && lower.contains("release:")
+        {
             UniversalForeignFormat::FedoraDnf
         } else if lower.contains("p:") && lower.contains("v:") && lower.contains("a:") {
             UniversalForeignFormat::AlpineApk
@@ -210,7 +220,8 @@ impl UniversalForeignPackageFormatConverter {
             UniversalForeignFormat::GentooEbuild
         } else if lower.contains("pkgname=") && lower.contains("short_desc=") {
             UniversalForeignFormat::VoidXbps
-        } else if lower.contains("name:") && lower.contains("version:") && lower.contains("origin:") {
+        } else if lower.contains("name:") && lower.contains("version:") && lower.contains("origin:")
+        {
             UniversalForeignFormat::FreeBsdPkg
         } else if lower.contains("@name ") || lower.contains("@comment ") {
             UniversalForeignFormat::OpenBsdPkg
@@ -239,9 +250,8 @@ impl UniversalForeignPackageFormatConverter {
         };
 
         match uncat {
-            "libssl-dev" | "libssl3" | "openssl-devel" | "openssl-dev" | "openssl" | "gnutls-devel" => {
-                "sovereign-openssl".to_string()
-            }
+            "libssl-dev" | "libssl3" | "openssl-devel" | "openssl-dev" | "openssl"
+            | "gnutls-devel" => "sovereign-openssl".to_string(),
             "libc6" | "glibc" | "musl" | "musl-dev" | "libc" | "freebsd-runtime" => {
                 "sovereign-libc".to_string()
             }
@@ -257,16 +267,27 @@ impl UniversalForeignPackageFormatConverter {
             "wayland" | "wayland-devel" | "x11" | "libx11" | "mesa" | "vulkan" => {
                 "sovereign-graphics".to_string()
             }
-            _ => format!("sovereign-{}", uncat.replace("-dev", "").replace("-devel", "")),
+            _ => format!(
+                "sovereign-{}",
+                uncat.replace("-dev", "").replace("-devel", "")
+            ),
         }
     }
 
     /// Classifies system trigger hooks based on declared dependencies and file extensions
-    pub fn detect_trigger_hooks(&self, raw_deps: &[String], manifest_text: &str) -> Vec<SystemTriggerHook> {
+    pub fn detect_trigger_hooks(
+        &self,
+        raw_deps: &[String],
+        manifest_text: &str,
+    ) -> Vec<SystemTriggerHook> {
         let mut hooks = Vec::new();
         let lower = manifest_text.to_lowercase();
 
-        if raw_deps.iter().any(|d| d.contains("lib") || d.contains("so")) || lower.contains(".so") {
+        if raw_deps
+            .iter()
+            .any(|d| d.contains("lib") || d.contains("so"))
+            || lower.contains(".so")
+        {
             hooks.push(SystemTriggerHook::LdconfigSharedLibs);
         }
         if lower.contains(".desktop") || lower.contains("applications") {
@@ -290,7 +311,10 @@ impl UniversalForeignPackageFormatConverter {
     }
 
     /// Transpiles raw foreign package manifest text into canonical `SigmaPkg` representation
-    pub fn transpile_manifest(&self, manifest_text: &str) -> Result<CanonicalPackageManifest, String> {
+    pub fn transpile_manifest(
+        &self,
+        manifest_text: &str,
+    ) -> Result<CanonicalPackageManifest, String> {
         let format = self.autodetect_format(manifest_text);
         let mut name = String::from("unknown-pkg");
         let mut version = String::from("1.0.0");
@@ -306,40 +330,69 @@ impl UniversalForeignPackageFormatConverter {
                 continue;
             }
 
-            if line.starts_with("Package:") || line.starts_with("Name:") || line.starts_with("pkgname=") || line.starts_with("P:") || line.starts_with("name=") || line.starts_with("name:") {
+            if line.starts_with("Package:")
+                || line.starts_with("Name:")
+                || line.starts_with("pkgname=")
+                || line.starts_with("P:")
+                || line.starts_with("name=")
+                || line.starts_with("name:")
+            {
                 if let Some(pos) = line.find(':').or_else(|| line.find('=')) {
                     let val = line[pos + 1..].trim().trim_matches('"').trim_matches('\'');
                     if !val.is_empty() {
                         name = val.to_string();
                     }
                 }
-            } else if line.starts_with("Version:") || line.starts_with("pkgver=") || line.starts_with("V:") || line.starts_with("version=") || line.starts_with("version:") {
+            } else if line.starts_with("Version:")
+                || line.starts_with("pkgver=")
+                || line.starts_with("V:")
+                || line.starts_with("version=")
+                || line.starts_with("version:")
+            {
                 if let Some(pos) = line.find(':').or_else(|| line.find('=')) {
                     let val = line[pos + 1..].trim().trim_matches('"').trim_matches('\'');
                     if !val.is_empty() {
                         version = val.to_string();
                     }
                 }
-            } else if line.starts_with("Architecture:") || line.starts_with("arch=") || line.starts_with("A:") || line.starts_with("arch:") {
+            } else if line.starts_with("Architecture:")
+                || line.starts_with("arch=")
+                || line.starts_with("A:")
+                || line.starts_with("arch:")
+            {
                 if let Some(pos) = line.find(':').or_else(|| line.find('=')) {
                     let val = line[pos + 1..].trim().trim_matches('"').trim_matches('\'');
                     if !val.is_empty() {
                         architecture = val.to_string();
                     }
                 }
-            } else if line.starts_with("Depends:") || line.starts_with("depends=") || line.starts_with("D:") || line.starts_with("run_depends=") || line.starts_with("Requires:") {
+            } else if line.starts_with("Depends:")
+                || line.starts_with("depends=")
+                || line.starts_with("D:")
+                || line.starts_with("run_depends=")
+                || line.starts_with("Requires:")
+            {
                 if let Some(pos) = line.find(':').or_else(|| line.find('=')) {
                     let val = line[pos + 1..].trim().trim_matches('(').trim_matches(')');
                     for dep in val.split(',') {
                         for sub_dep in dep.split_whitespace() {
-                            let clean_dep = sub_dep.trim_matches('"').trim_matches('\'').trim_matches(',');
-                            if !clean_dep.is_empty() && !raw_dependencies.contains(&clean_dep.to_string()) {
+                            let clean_dep = sub_dep
+                                .trim_matches('"')
+                                .trim_matches('\'')
+                                .trim_matches(',');
+                            if !clean_dep.is_empty()
+                                && !raw_dependencies.contains(&clean_dep.to_string())
+                            {
                                 raw_dependencies.push(clean_dep.to_string());
                             }
                         }
                     }
                 }
-            } else if line.starts_with("Description:") || line.starts_with("Summary:") || line.starts_with("short_desc=") || line.starts_with("comment:") {
+            } else if line.starts_with("Description:")
+                || line.starts_with("Summary:")
+                || line.starts_with("short_desc=")
+                || line.starts_with("comment:")
+            {
                 if let Some(pos) = line.find(':').or_else(|| line.find('=')) {
                     let val = line[pos + 1..].trim().trim_matches('"');
                     if !val.is_empty() {
@@ -424,10 +477,24 @@ impl UniversalPmCliInteropDispatcher {
         let mut dry_run = false;
 
         for arg in &args[1..] {
-            if *arg == "--dry-run" || *arg == "-s" || *arg == "--simulate" || *arg == "-n" || *arg == "--print" || *arg == "-pv" || *arg == "-p" {
+            if *arg == "--dry-run"
+                || *arg == "-s"
+                || *arg == "--simulate"
+                || *arg == "-n"
+                || *arg == "--print"
+                || *arg == "-pv"
+                || *arg == "-p"
+            {
                 dry_run = true;
             } else if !arg.starts_with('-') {
-                if *arg != "install" && *arg != "add" && *arg != "get" && *arg != "build" && *arg != "-S" && *arg != "in" && *arg != "it" {
+                if *arg != "install"
+                    && *arg != "add"
+                    && *arg != "get"
+                    && *arg != "build"
+                    && *arg != "-S"
+                    && *arg != "in"
+                    && *arg != "it"
+                {
                     target_package = arg.to_string();
                 }
             }
@@ -510,7 +577,10 @@ impl SovereignUniversalPrGatewayEngine {
 
         // Verify SAT constraints: ensure package has name and non-conflicting dependencies
         let is_sat_valid = !manifest.name.is_empty()
-            && !manifest.canonical_dependencies.iter().any(|d| d.contains("conflict"));
+            && !manifest
+                .canonical_dependencies
+                .iter()
+                .any(|d| d.contains("conflict"));
 
         let slsa_attestation_hash = format!(
             "slsa-v1.0-sha256-sigpkg-pr-{}-{}",
@@ -629,7 +699,9 @@ impl SovereignDistroPackageAdvancementsSuiteV11 {
         submitter: &str,
         manifest_text: &str,
     ) -> Result<u64, String> {
-        let pr_id = self.gateway.submit_and_process_pr(submitter, manifest_text)?;
+        let pr_id = self
+            .gateway
+            .submit_and_process_pr(submitter, manifest_text)?;
         if let Some(record) = self.gateway.pull_requests.get(&pr_id) {
             let primary_canonical = record
                 .manifest
@@ -673,13 +745,22 @@ mod tests {
         assert_eq!(manifest.name, "curl");
         assert_eq!(manifest.version, "7.88.1");
         assert_eq!(manifest.origin_format, UniversalForeignFormat::DebianApt);
-        assert_eq!(manifest.canonical_dependencies, vec!["sovereign-openssl", "sovereign-libc"]);
-        assert!(manifest.trigger_hooks.contains(&SystemTriggerHook::LdconfigSharedLibs));
+        assert_eq!(
+            manifest.canonical_dependencies,
+            vec!["sovereign-openssl", "sovereign-libc"]
+        );
+        assert!(manifest
+            .trigger_hooks
+            .contains(&SystemTriggerHook::LdconfigSharedLibs));
 
-        let arch_text = "pkgname=ripgrep\npkgver=14.1.0\narch=('x86_64')\ndepends=('glibc' 'pcre2')\n";
+        let arch_text =
+            "pkgname=ripgrep\npkgver=14.1.0\narch=('x86_64')\ndepends=('glibc' 'pcre2')\n";
         let arch_manifest = transpiler.transpile_manifest(arch_text).unwrap();
         assert_eq!(arch_manifest.name, "ripgrep");
-        assert_eq!(arch_manifest.origin_format, UniversalForeignFormat::ArchPacman);
+        assert_eq!(
+            arch_manifest.origin_format,
+            UniversalForeignFormat::ArchPacman
+        );
         assert_eq!(arch_manifest.canonical_dependencies[0], "sovereign-libc");
     }
 
@@ -709,7 +790,9 @@ mod tests {
         let mut suite = SovereignDistroPackageAdvancementsSuiteV11::new();
 
         let debian_manifest = "Package: redis\nVersion: 7.0.11\nDepends: libc6, systemd\nDescription: In-memory database\n";
-        let pr_id = suite.import_and_index_foreign_package("jules", debian_manifest).unwrap();
+        let pr_id = suite
+            .import_and_index_foreign_package("jules", debian_manifest)
+            .unwrap();
 
         assert!(pr_id >= 2001);
         let pr = suite.gateway.pull_requests.get(&pr_id).unwrap();
@@ -720,6 +803,9 @@ mod tests {
         let search_results = suite.repo_aggregator.search_package("redis");
         assert_eq!(search_results.len(), 1);
         assert_eq!(search_results[0].name, "redis");
-        assert_eq!(search_results[0].distro_origin, UniversalForeignFormat::DebianApt);
+        assert_eq!(
+            search_results[0].distro_origin,
+            UniversalForeignFormat::DebianApt
+        );
     }
 }

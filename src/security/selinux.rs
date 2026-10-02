@@ -191,7 +191,6 @@ impl SELinuxPolicy {
     }
 }
 
-
 /// Multi-Level Security (MLS) sensitivity levels
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum SensitivityLevel {
@@ -219,14 +218,26 @@ impl DynamicMacEnforcer {
         }
     }
 
-    pub fn set_process_level(&mut self, process_id: &str, level: SensitivityLevel, categories: HashSet<u32>) {
+    pub fn set_process_level(
+        &mut self,
+        process_id: &str,
+        level: SensitivityLevel,
+        categories: HashSet<u32>,
+    ) {
         self.process_levels.insert(process_id.to_string(), level);
-        self.process_categories.insert(process_id.to_string(), categories);
+        self.process_categories
+            .insert(process_id.to_string(), categories);
     }
 
-    pub fn set_object_level(&mut self, object_id: &str, level: SensitivityLevel, categories: HashSet<u32>) {
+    pub fn set_object_level(
+        &mut self,
+        object_id: &str,
+        level: SensitivityLevel,
+        categories: HashSet<u32>,
+    ) {
         self.object_levels.insert(object_id.to_string(), level);
-        self.object_categories.insert(object_id.to_string(), categories);
+        self.object_categories
+            .insert(object_id.to_string(), categories);
     }
 
     /// Read access check: No Read Up (Simple Security Property - Bell-LaPadula)
