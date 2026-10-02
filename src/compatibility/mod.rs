@@ -19,7 +19,6 @@ pub mod canonical;
 pub mod chakra;
 pub mod chimera_linux;
 pub mod clear_linux;
-pub mod antix;
 pub mod zorin;
 
 pub use antix::{
@@ -146,7 +145,6 @@ pub mod sovereign_suite;
 pub mod superiority;
 pub mod tiny_core;
 pub mod wsl;
-pub mod zorin;
 
 pub use wsl::*;
 pub use zorin::*;
@@ -198,7 +196,6 @@ pub use cross_platform_kernel::{
     UmsThreadState, UmsContext, SovereignKernelInternals,
 };
 
-pub mod historic_linux;
 
 pub use historic_linux::{
     Era0_11SyscallEmulator, Era1_0SyscallEmulator, Era2_4SyscallEmulator, HistoricError,

@@ -66,8 +66,6 @@ pub mod hardware;
 pub mod installer;
 pub mod interrupt;
 pub mod ml;
-pub mod storage;
-pub mod system;
 pub mod thread;
 pub mod virtualization;
 pub use desktop::{
@@ -103,7 +101,6 @@ pub use linuxmint_inspirations::{
     Webapp, WebappManager, WelcomeStep, XAppDocumentReader, XAppImageViewer,
     XAppStatusIconBadgeManager, XAppTextEditor, XAppThemeEngine, XAppTrayBadge,
 };
-pub mod access;
 pub mod open_source_obsoletion;
 pub mod tools;
 pub use distro::additional_linux_bsd_components::*;
@@ -125,7 +122,6 @@ pub mod arch;
 pub mod compiler;
 pub mod userland;
 
-pub mod audio;
 pub mod audit;
 pub mod backup;
 pub mod bluetooth;
@@ -374,7 +370,6 @@ pub mod release;
 pub mod resource;
 pub mod robotics;
 pub mod rt;
-pub mod scheduler;
 pub mod scientific;
 pub mod secure;
 pub mod sensor;

@@ -751,7 +751,8 @@ pub struct UeventDeviceNode {
 pub struct UdevDevdHotplugEngine {
     pub active_devices: Vec<UeventDeviceNode>,
     pub loaded_rules: Vec<&'static str>,
-}
+    pub nodes: Vec<String>,
+    pub event_queue: Vec<String>,}
 
 impl UdevDevdHotplugEngine {
     pub fn new() -> Self {
@@ -1250,10 +1251,7 @@ pub struct DnsRecordEntry {
     pub ttl: u32,
 }
 
-pub struct SovereignDnsTlsResolverEngine {
-    pub upstream_dns: [u8; 4],
-    pub records: Vec<DnsRecordEntry>,
-}
+
 
 impl SovereignDnsTlsResolverEngine {
     pub fn new(upstream_dns: [u8; 4]) -> Self {

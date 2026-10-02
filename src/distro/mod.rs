@@ -93,19 +93,16 @@ pub use linux_bsd_inspirations::{
 };
 pub mod ecosystem_dimensions;
 pub mod endeavour_os;
-pub mod enterprise;
 pub mod fedora_parity;
 pub mod fedora_innovations;
 pub use fedora_innovations::*;
 pub mod garuda_nomad_innovations;
 pub mod gentoo;
 pub mod gentoo_inspirations;
-pub mod i18n;
 pub mod improvements;
 pub mod linux_bsd_distro_gaps;
 pub mod linux_bsd_distro_gaps_synthesis;
 pub use linux_bsd_distro_gaps_synthesis::*;
-pub mod linux_bsd_inspirations;
 pub use linux_bsd_inspirations::*;
 
 pub mod linux_bsd_parity;
@@ -119,21 +116,15 @@ pub use garuda_nomad_innovations::{
     ZramCompressionAlgorithm,
 };
 pub mod linux_ideas;
-pub mod manjaro;
 pub mod missing_distro_innovations;
 pub mod missing_linux_bsd_components;
 pub use missing_linux_bsd_components::*;
-pub mod nextgen;
 pub mod nixos_inspirations;
 pub mod parity;
 pub mod power_network_tools;
-pub mod preseed;
 pub mod ready_to_use;
-pub mod recovery;
 pub mod sovereign_system_innovations;
-pub mod specialized;
 pub mod stable_components;
-pub mod tiny_core;
 pub mod visual_dashboard;
 pub mod void_runit;
 pub mod wiki_ideas_implementation;

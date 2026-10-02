@@ -34,7 +34,7 @@ pub struct ContainerCapability {
 pub struct SeccompProfile {
     pub default_action: u32,
     pub allowed_syscalls: Vec<u32>,
-}
+    pub blocked_syscalls_mask: u64,}
 
 #[derive(Debug, Clone)]
 pub struct SeccompProfileV2 {

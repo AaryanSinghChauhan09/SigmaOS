@@ -117,3 +117,5 @@ pub mod prelude {
     pub use super::ZeroDependencyMasterHub;
     pub use super::ZeroDependencyPrimitiveHub;
 }
+
+pub mod path;

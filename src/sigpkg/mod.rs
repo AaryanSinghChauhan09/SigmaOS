@@ -76,7 +76,6 @@ pub use universal_engine::{
 };
 pub use universal_oop_system::*;
 pub mod verifier;
-pub mod universal_adapter;
 pub mod zero_alloc_resolver;
 
 pub use crate::package::sovereign_distro_package_matrix::*;
