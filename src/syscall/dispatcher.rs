@@ -245,6 +245,8 @@ impl SyscallDispatcher {
     }
 
     /// Dispatch syscall
+    /// Hot path: inlined dispatch with relaxed stats tracking
+    #[inline]
     pub unsafe fn dispatch(
         &self,
         number: SyscallNumber,
@@ -267,8 +269,8 @@ impl SyscallDispatcher {
             return SyscallResult::error(-13); // EACCES
         }
 
-        // Increment call count
-        self.call_count[index].fetch_add(1, Ordering::SeqCst);
+        // Increment call count (relaxed ordering: statistics don't require synchronization)
+        self.call_count[index].fetch_add(1, Ordering::Relaxed);
 
         // Call handler
         (entry.handler)(args, caller_capability)
@@ -287,7 +289,7 @@ impl SyscallDispatcher {
     pub fn get_stats(&self, number: SyscallNumber) -> usize {
         let index = number as usize;
         if index < 256 {
-            self.call_count[index].load(Ordering::SeqCst)
+            self.call_count[index].load(Ordering::Relaxed)
         } else {
             0
         }
