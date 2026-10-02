@@ -240,6 +240,18 @@ impl AddressSanitizer {
         region.canary == expected
     }
 
+        region.deallocate();
+        self.deallocation_count += 1;
+
+        // Add to quarantine
+        if self.quarantine.len() < self.config.quarantine_size {
+            self.quarantine.push(address);
+        }
+
+        Ok(())
+    }
+
+    /// Find region by pointer
     fn find_region_by_ptr(&self, ptr: u64) -> Result<u64, &'static str> {
         for (&id, region) in &self.regions {
             let data_start = region.start + self.redzone_size as u64;
@@ -250,7 +262,7 @@ impl AddressSanitizer {
             }
         }
 
-        Err("Pointer not found in allocated regions")
+        Err("Pointer not in any region")
     }
 
     pub fn get_shadow(&self, address: u64) -> Option<u8> {

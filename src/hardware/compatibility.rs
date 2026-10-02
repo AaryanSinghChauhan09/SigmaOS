@@ -1103,7 +1103,7 @@ mod tests {
     fn test_platform_certification_manager() {
         let mut cert_mgr = PlatformCertificationManager::new();
 
-        let laptop_report = cert_mgr.certify_platform(
+        let _laptop_report = cert_mgr.certify_platform(
             "Sigma-Laptop-Ref-2025",
             PlatformType::Laptop,
             &[

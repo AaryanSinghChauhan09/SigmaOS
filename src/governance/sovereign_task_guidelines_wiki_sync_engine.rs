@@ -181,8 +181,8 @@ impl WikiDataTransferEngine {
             },
         );
 
-        self.register_spec_file("UniversalPackageSystem", "SigmaOS Universal Package System", true);
-        self.register_spec_file("Roadmap11Deployment", "SigmaOS Roadmap 11 Deployment", true);
+        self.register_spec_file("UniversalPackageSystem", "Universal Package System", true);
+        self.register_spec_file("Roadmap11Deployment", "Roadmap 11 Deployment", true);
         self.register_spec_file("ROADMAP.md", "SigmaOS Master Development Roadmap", true);
         self.register_spec_file("UniversalPackageSystem", "Universal Package System Spec", true);
         self.register_spec_file("Roadmap11Deployment", "11-Roadmap Deployment Spec", true);
@@ -289,7 +289,7 @@ mod tests {
             .transfer_implemented_data_to_wiki("ROADMAP.md")
             .unwrap();
         assert!(path.contains("wiki_repo/"));
-        assert_eq!(sync.total_synced_specs(), 1);
+        assert_eq!(sync.total_synced_to_wiki, 1);
 
         sync.register_spec_file("DRAFT.md", "Draft Feature", false);
         assert!(sync.transfer_implemented_data_to_wiki("DRAFT.md").is_err());
