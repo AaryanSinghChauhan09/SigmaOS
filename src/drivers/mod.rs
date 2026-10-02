@@ -1,10 +1,12 @@
 // SigmaOS Drivers Module
+pub mod acpi;
 pub mod ata_bus_controller;
 pub mod boot_init;
 pub mod dde;
 pub mod distro_device_expansion;
 pub mod even_more_devices;
 pub mod flipper_gpio_sensor;
+pub mod framebuffer;
 pub mod gpu;
 pub mod input;
 pub mod legacy_audio_ac97;
