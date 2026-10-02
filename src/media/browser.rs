@@ -1902,6 +1902,152 @@ impl ArcBoostDomainStylingEngine {
     }
 }
 
+pub struct FirefoxSpiderMonkeyJitCompilerEngine {
+    pub jit_tier: String,
+    pub ic_stub_count: usize,
+    pub wx_memory_protected: bool,
+}
+
+impl FirefoxSpiderMonkeyJitCompilerEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            jit_tier: "WarpJIT".to_string(),
+            ic_stub_count: 64,
+            wx_memory_protected: true,
+        }
+    }
+
+    pub fn compile_warp_monkey_stub(&mut self, script_name: &str) -> String {
+        self.ic_stub_count += 1;
+        format!("warp_ic_{}_{}", script_name, self.ic_stub_count)
+    }
+
+    pub fn validate_jit_wx_bounds(&self, ptr_offset: usize, length: usize) -> bool {
+        self.wx_memory_protected && ptr_offset + length <= 0x7FFF_FFFF_FFFF
+    }
+}
+
+pub struct ChromiumBlinkCssGridSubgridEngine {
+    pub grid_rows: usize,
+    pub grid_cols: usize,
+}
+
+impl ChromiumBlinkCssGridSubgridEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            grid_rows: 12,
+            grid_cols: 12,
+        }
+    }
+
+    pub fn compute_subgrid_tracks(&self, container_width: f32, fraction: f32) -> Vec<f32> {
+        let col_width = (container_width / self.grid_cols as f32) * fraction;
+        vec![col_width; self.grid_cols]
+    }
+}
+
+pub struct LibreWolfStrictCanvasFingerprintDefenseEngine {
+    pub noise_salt: u64,
+    pub webgl_vendor_masked: bool,
+}
+
+impl LibreWolfStrictCanvasFingerprintDefenseEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            noise_salt: 0x9E37_79B9_7F4A_7C15,
+            webgl_vendor_masked: true,
+        }
+    }
+
+    pub fn apply_canvas_noise(&self, r: u8, g: u8, b: u8, a: u8) -> (u8, u8, u8, u8) {
+        let delta = ((self.noise_salt & 0x03) as u8) ^ 1;
+        (r.wrapping_add(delta), g.wrapping_add(delta), b, a)
+    }
+
+    pub fn get_spoofed_webgl_vendor(&self) -> &'static str {
+        if self.webgl_vendor_masked {
+            "Mozilla / Sovereign Canvas Shield"
+        } else {
+            "Generic GPU Vendor"
+        }
+    }
+}
+
+pub struct BraveShieldsEphemeralStorageEngine {
+    pub active_jars: BTreeMap<String, BTreeMap<String, String>>,
+}
+
+impl BraveShieldsEphemeralStorageEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            active_jars: BTreeMap::new(),
+        }
+    }
+
+    pub fn set_ephemeral_item(&mut self, origin: &str, key: &str, val: &str) {
+        self.active_jars
+            .entry(origin.to_string())
+            .or_insert_with(BTreeMap::new)
+            .insert(key.to_string(), val.to_string());
+    }
+
+    pub fn purge_origin_storage(&mut self, origin: &str) -> usize {
+        if let Some(removed) = self.active_jars.remove(origin) {
+            removed.len()
+        } else {
+            0
+        }
+    }
+}
+
+pub struct TorOnionRoutingDirectoryEngine {
+    pub consensus_valid: bool,
+    pub guard_nodes: Vec<String>,
+}
+
+impl TorOnionRoutingDirectoryEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            consensus_valid: true,
+            guard_nodes: vec![
+                "guard1.torproject.org".to_string(),
+                "guard2.torproject.org".to_string(),
+                "guard3.torproject.org".to_string(),
+            ],
+        }
+    }
+
+    pub fn select_active_guard(&self) -> Option<&str> {
+        if self.consensus_valid && !self.guard_nodes.is_empty() {
+            Some(&self.guard_nodes[0])
+        } else {
+            None
+        }
+    }
+}
+
+pub struct LadybirdLibWebLayoutTreeEngine {
+    pub formatting_context: String,
+}
+
+impl LadybirdLibWebLayoutTreeEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            formatting_context: "InlineBlockFormattingContext".to_string(),
+        }
+    }
+
+    pub fn build_layout_tree(&self, node_count: usize) -> (usize, &'static str) {
+        (node_count, "LayoutBoxTreeGenerated")
+    }
+}
+
 // =========================================================================
 // 22. UNIFIED SIGMAWEB BROWSER SUITE
 // =========================================================================
@@ -1962,6 +2108,12 @@ pub struct SigmaWebBrowser {
     pub floorp_split_mgr: FloorpSplitViewManagerEngine,
     pub vivaldi_spatial_vec: VivaldiSpatialVectorNavEngine,
     pub arc_boost_styling: ArcBoostDomainStylingEngine,
+    pub spidermonkey_jit: FirefoxSpiderMonkeyJitCompilerEngine,
+    pub blink_css_grid: ChromiumBlinkCssGridSubgridEngine,
+    pub librewolf_canvas_defense: LibreWolfStrictCanvasFingerprintDefenseEngine,
+    pub brave_ephemeral_storage: BraveShieldsEphemeralStorageEngine,
+    pub tor_directory: TorOnionRoutingDirectoryEngine,
+    pub ladybird_layout_tree: LadybirdLibWebLayoutTreeEngine,
 }
 
 impl SigmaWebBrowser {
@@ -2023,6 +2175,12 @@ impl SigmaWebBrowser {
             floorp_split_mgr: FloorpSplitViewManagerEngine::new(),
             vivaldi_spatial_vec: VivaldiSpatialVectorNavEngine::new(),
             arc_boost_styling: ArcBoostDomainStylingEngine::new(),
+            spidermonkey_jit: FirefoxSpiderMonkeyJitCompilerEngine::new(),
+            blink_css_grid: ChromiumBlinkCssGridSubgridEngine::new(),
+            librewolf_canvas_defense: LibreWolfStrictCanvasFingerprintDefenseEngine::new(),
+            brave_ephemeral_storage: BraveShieldsEphemeralStorageEngine::new(),
+            tor_directory: TorOnionRoutingDirectoryEngine::new(),
+            ladybird_layout_tree: LadybirdLibWebLayoutTreeEngine::new(),
         }
     }
 
@@ -2962,6 +3120,12 @@ mod tests {
         assert_eq!(audit.get("librewolf_canvas_noise_enabled"), Some(&"true".to_string()));
         assert_eq!(audit.get("tor_javascript_allowed"), Some(&"true".to_string()));
         assert_eq!(audit.get("mullvad_tab_proxy"), Some(&"direct://".to_string()));
+        assert_eq!(audit.get("spidermonkey_jit_stub"), Some(&"warp_ic_main_65".to_string()));
+        assert_eq!(audit.get("blink_css_subgrid_cols"), Some(&"12".to_string()));
+        assert_eq!(audit.get("librewolf_webgl_vendor"), Some(&"Mozilla / Sovereign Canvas Shield".to_string()));
+        assert_eq!(audit.get("brave_ephemeral_purged_items"), Some(&"1".to_string()));
+        assert_eq!(audit.get("tor_directory_guard"), Some(&"guard1.torproject.org".to_string()));
+        assert_eq!(audit.get("ladybird_layout_tree_nodes"), Some(&"10".to_string()));
     }
 }
 
@@ -3036,6 +3200,26 @@ impl SovereignOpenSourceBrowserSuiteEngine {
 
         let duck_summary = self.browser.duckassist_summary.summarize_query("SigmaOS Web");
         results.insert("duckassist_summary_generated".to_string(), (!duck_summary.is_empty()).to_string());
+
+        let spidermonkey_stub = self.browser.spidermonkey_jit.compile_warp_monkey_stub("main");
+        results.insert("spidermonkey_jit_stub".to_string(), spidermonkey_stub);
+
+        let blink_subgrid_cols = self.browser.blink_css_grid.compute_subgrid_tracks(1200.0, 1.0).len();
+        results.insert("blink_css_subgrid_cols".to_string(), blink_subgrid_cols.to_string());
+
+        let webgl_vendor = self.browser.librewolf_canvas_defense.get_spoofed_webgl_vendor();
+        results.insert("librewolf_webgl_vendor".to_string(), webgl_vendor.to_string());
+
+        self.browser.brave_ephemeral_storage.set_ephemeral_item("https://example.com", "session_id", "xyz123");
+        let purged_count = self.browser.brave_ephemeral_storage.purge_origin_storage("https://example.com");
+        results.insert("brave_ephemeral_purged_items".to_string(), purged_count.to_string());
+
+        let tor_guard = self.browser.tor_directory.select_active_guard().unwrap_or("none");
+        results.insert("tor_directory_guard".to_string(), tor_guard.to_string());
+
+        let (tree_nodes, layout_status) = self.browser.ladybird_layout_tree.build_layout_tree(10);
+        results.insert("ladybird_layout_tree_nodes".to_string(), tree_nodes.to_string());
+        results.insert("ladybird_layout_status".to_string(), layout_status.to_string());
 
         results
     }

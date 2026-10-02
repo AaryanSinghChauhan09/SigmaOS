@@ -1069,6 +1069,10 @@ pub enum ShellDialect {
     Csh,
     MinixSh,
     Psh,
+    Pdksh,
+    Lsh,
+    Msh,
+    Sosh,
 }
 
 pub struct FishAbbreviationEngine {
@@ -1290,8 +1294,16 @@ impl UniversalShellCompatibilityEngine {
                     return ShellDialect::Csh;
                 } else if trimmed.contains("mksh") {
                     return ShellDialect::Mksh;
+                } else if trimmed.contains("pdksh") {
+                    return ShellDialect::Pdksh;
                 } else if trimmed.contains("ksh") {
                     return ShellDialect::Ksh;
+                } else if trimmed.contains("lsh") || trimmed.contains("sash") {
+                    return ShellDialect::Lsh;
+                } else if trimmed.contains("msh") {
+                    return ShellDialect::Msh;
+                } else if trimmed.contains("sosh") {
+                    return ShellDialect::Sosh;
                 } else if trimmed.contains("yash") {
                     return ShellDialect::Yash;
                 } else if trimmed.contains("nu") {
@@ -1418,6 +1430,28 @@ impl SovereignUniversalBsdLinuxShellEngine {
     }
 }
 
+pub struct SovereignUniversalPolyglotShellEngine {
+    pub bsd_linux_engine: SovereignUniversalBsdLinuxShellEngine,
+}
+
+impl SovereignUniversalPolyglotShellEngine {
+    pub fn new() -> Self {
+        Self {
+            bsd_linux_engine: SovereignUniversalBsdLinuxShellEngine::new(),
+        }
+    }
+
+    /// Transpiles multi-dialect Linux & BSD scripts into POSIX sh and returns execution pipelines
+    pub fn transpile_and_run_polyglot_script(
+        &mut self,
+        script: &str,
+    ) -> Result<(ShellDialect, String, Vec<ShellPipeline>, usize), &'static str> {
+        let (dialect, posix_sh, pipelines, warnings) =
+            self.bsd_linux_engine.execute_bsd_linux_script(script)?;
+        Ok((dialect, posix_sh, pipelines, warnings.len()))
+    }
+}
+
 pub struct UniversalScriptTranspiler;
 
 impl UniversalScriptTranspiler {
@@ -1474,12 +1508,16 @@ impl UniversalScriptTranspiler {
                 }
                 ShellDialect::Oil => Self::transpile_oil_line(trimmed),
                 ShellDialect::Es => Self::transpile_es_line(trimmed),
+                ShellDialect::Pdksh => Self::transpile_pdksh_line(trimmed),
+                ShellDialect::Lsh => Self::transpile_lsh_line(trimmed),
                 ShellDialect::Dash
                 | ShellDialect::BsdSh
                 | ShellDialect::Bsh
                 | ShellDialect::Ash
                 | ShellDialect::MinixSh
-                | ShellDialect::Psh => trimmed.to_string(),
+                | ShellDialect::Psh
+                | ShellDialect::Msh
+                | ShellDialect::Sosh => trimmed.to_string(),
             };
 
             transpiled.push_str(&converted_line);
@@ -1829,6 +1867,52 @@ impl UniversalScriptTranspiler {
             } else if let Some(bracket_idx) = rest.find('[') {
                 let fn_name = rest[..bracket_idx].trim();
                 return format!("{}() {{", fn_name);
+            }
+        }
+        l.to_string()
+    }
+
+    fn transpile_pdksh_line(line: &str) -> String {
+        let l = line.trim();
+        if l.starts_with("set -A ") {
+            let rest = l.trim_start_matches("set -A ").trim();
+            if let Some(space_idx) = rest.find(' ') {
+                let name = &rest[..space_idx];
+                let elems = &rest[space_idx + 1..];
+                return format!("{}=\"{}\"", name, elems);
+            }
+        }
+        if l.starts_with("typeset -i ") || l.starts_with("integer ") {
+            let rest = l
+                .trim_start_matches("typeset -i ")
+                .trim_start_matches("integer ")
+                .trim();
+            return rest.to_string();
+        }
+        if l.starts_with("print -r -- ") {
+            let rest = l.trim_start_matches("print -r -- ").trim();
+            return format!("printf \"%s\\n\" {}", rest);
+        }
+        l.to_string()
+    }
+
+    fn transpile_lsh_line(line: &str) -> String {
+        let l = line.trim();
+        if l.starts_with("chdir ") {
+            let rest = l.trim_start_matches("chdir ").trim();
+            return format!("cd {}", rest);
+        }
+        if l == "printenv" {
+            return "env".to_string();
+        }
+        if l.starts_with("alias ") {
+            let rest = l.trim_start_matches("alias ");
+            if !rest.contains('=') {
+                if let Some(space_idx) = rest.find(' ') {
+                    let name = &rest[..space_idx];
+                    let cmd = &rest[space_idx + 1..];
+                    return format!("alias {}='{}'", name, cmd);
+                }
             }
         }
         l.to_string()
@@ -3089,5 +3173,34 @@ mod tests {
 
         let cmd_line_result = engine.execute_command_line("echo hello world").unwrap();
         assert_eq!(cmd_line_result.stages.len(), 1);
+    }
+
+    #[test]
+    fn test_polyglot_shell_engine() {
+        let pdksh_script = "#!/bin/pdksh\nset -A arr val1 val2\nprint -r -- hello_pdksh";
+        assert_eq!(
+            UniversalShellCompatibilityEngine::detect_shebang_dialect(pdksh_script),
+            ShellDialect::Pdksh
+        );
+        let posix_pdksh = UniversalScriptTranspiler::transpile_to_posix_sh(pdksh_script, ShellDialect::Pdksh);
+        assert!(posix_pdksh.contains("arr=\"val1 val2\""));
+        assert!(posix_pdksh.contains("printf \"%s\\n\" hello_pdksh"));
+
+        let lsh_script = "#!/bin/lsh\nchdir /tmp\nalias dir ls -l\nprintenv";
+        assert_eq!(
+            UniversalShellCompatibilityEngine::detect_shebang_dialect(lsh_script),
+            ShellDialect::Lsh
+        );
+        let posix_lsh = UniversalScriptTranspiler::transpile_to_posix_sh(lsh_script, ShellDialect::Lsh);
+        assert!(posix_lsh.contains("cd /tmp"));
+        assert!(posix_lsh.contains("alias dir='ls -l'"));
+        assert!(posix_lsh.contains("env"));
+
+        let mut polyglot = SovereignUniversalPolyglotShellEngine::new();
+        let (dialect, transpiled, pipelines, warnings_count) = polyglot.transpile_and_run_polyglot_script(lsh_script).unwrap();
+        assert_eq!(dialect, ShellDialect::Lsh);
+        assert!(transpiled.contains("cd /tmp"));
+        assert!(!pipelines.is_empty());
+        assert_eq!(warnings_count, 0);
     }
 }
