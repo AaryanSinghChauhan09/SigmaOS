@@ -48,7 +48,7 @@ pub struct ShareXFlameshotEngine {
 impl ShareXFlameshotEngine {
     pub fn new() -> Self {
         Self {
-            screenshot_history: VecDeque::new(),
+            screenshot_history: VecDeque::<AdvancedScreenshot>::new(),
             auto_upload_enabled: true,
             target_cloud_destination: "https://sigma-cloud.sharex.org".to_string(),
         }

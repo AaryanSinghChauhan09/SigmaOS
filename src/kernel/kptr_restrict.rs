@@ -167,12 +167,13 @@ impl DmesgRestrictLevel {
         *self as u32
     }
 
+    pub fn is_restricted(&self) -> bool {
+        matches!(self, DmesgRestrictLevel::Restricted | DmesgRestrictLevel::Strict)
+    }
+
     /// Check if kernel pointer should be sanitized
     pub fn should_sanitize_pointer(&self) -> bool {
-        matches!(
-            self.get_kptr_restrict(),
-            KptrRestrictLevel::Restricted | KptrRestrictLevel::Strict
-        )
+        self.is_restricted()
     }
 
     /// Sanitize kernel pointer for display
@@ -186,11 +187,50 @@ impl DmesgRestrictLevel {
 
     /// Check if dmesg message should be displayed
     pub fn should_show_dmesg(&self, level: u32) -> bool {
-        match self.get_dmesg_restrict() {
+        match self {
             DmesgRestrictLevel::None => true,
             DmesgRestrictLevel::Restricted => level >= 6, // Only show critical messages
             DmesgRestrictLevel::Strict => level >= 7,     // Only show emergency messages
         }
+    }
+}
+
+/// Kernel security mitigations helper
+#[derive(Debug, Clone, Default)]
+pub struct KernelSecurityMitigations {
+    pub params: KernelSecurityParams,
+}
+
+impl KernelSecurityMitigations {
+    pub fn new() -> Self {
+        Self { params: KernelSecurityParams::new() }
+    }
+    pub fn get_kptr_restrict(&self) -> KptrRestrictLevel {
+        self.params.kptr_restrict.level
+    }
+    pub fn set_kptr_restrict(&mut self, level: KptrRestrictLevel) {
+        self.params.kptr_restrict.set_level(level);
+    }
+    pub fn get_dmesg_restrict(&self) -> DmesgRestrictLevel {
+        self.params.dmesg_restrict.level
+    }
+    pub fn set_dmesg_restrict(&mut self, level: DmesgRestrictLevel) {
+        self.params.dmesg_restrict.set_level(level);
+    }
+    pub fn sanitize_pointer(&self, ptr: usize) -> usize {
+        self.params.dmesg_restrict.level.sanitize_pointer(ptr)
+    }
+    pub fn are_modules_disabled(&self) -> bool {
+        self.params.modules_disabled
+    }
+    pub fn disable_modules(&mut self) {
+        self.params.disable_module_loading();
+    }
+    pub fn enable_modules(&mut self) {
+        self.params.enable_module_loading();
+    }
+    pub fn should_show_dmesg(&self, level: u32) -> bool {
+        self.params.dmesg_restrict.level.should_show_dmesg(level)
     }
 }
 

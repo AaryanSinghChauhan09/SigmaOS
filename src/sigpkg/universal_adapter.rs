@@ -2003,11 +2003,11 @@ impl UniversalDependencyMapper {
             | "libmbedtls-dev" => "openssl".to_string(),
             "libc6" | "glibc" | "musl" | "musl-dev" | "devel/glibc" | "sys-libs/glibc" | "libc"
             | "freebsd-runtime" | "openbsd-sys" | "dragonfly-runtime" | "bedrock-core"
-            | "haiku-libroot" | "pkgsrc-core" | "libm" | "libpthread" | "libdl" | "librt"
-            | "libutil" => "libc".to_string(),
+            | "haiku-libroot" | "pkgsrc-core" => "libc".to_string(),
             "zlib1g-dev" | "zlib-devel" | "zlib-dev" | "devel/zlib" | "sys-libs/zlib" => {
                 "zlib".to_string()
             }
+            "libm" | "libpthread" | "libdl" | "librt" | "libutil" => "libc".to_string(),
             "bzip2" | "libbz2-dev" | "bzip2-devel" | "brotli" | "libbrotli-dev" | "lzo"
             | "liblzo2-dev" => "compression".to_string(),
             "python" | "python3" | "python3-dev" | "python3-devel" | "python3-base"

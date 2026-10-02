@@ -4050,11 +4050,11 @@ impl SovereignConditionalFormattingDataValidationEngine {
     pub fn evaluate_cell_style(&self, row: usize, col: usize, val: &CellValue) -> Option<ConditionalFormatStyle> {
         for rule in &self.format_rules {
             if row >= rule.range.0 && row <= rule.range.2 && col >= rule.range.1 && col <= rule.range.3 {
-                let matches = match (&rule.condition, val) {
-                    (FormatRuleCondition::GreaterThan(threshold), CellValue::Number(n)) => n > threshold,
-                    (FormatRuleCondition::LessThan(threshold), CellValue::Number(n)) => n < threshold,
-                    (FormatRuleCondition::Equals(threshold), CellValue::Number(n)) => (n - threshold).abs() < 1e-6,
-                    (FormatRuleCondition::TextContains(sub), CellValue::Text(t)) => t.contains(sub),
+                let matches = match (rule.condition.clone(), val) {
+                    (FormatRuleCondition::GreaterThan(threshold), CellValue::Number(n)) => *n > threshold,
+                    (FormatRuleCondition::LessThan(threshold), CellValue::Number(n)) => *n < threshold,
+                    (FormatRuleCondition::Equals(threshold), CellValue::Number(n)) => (*n - threshold).abs() < 1e-6,
+                    (FormatRuleCondition::TextContains(sub), CellValue::Text(t)) => t.contains(&sub),
                     _ => false,
                 };
                 if matches {
@@ -4068,14 +4068,14 @@ impl SovereignConditionalFormattingDataValidationEngine {
     pub fn validate_input(&self, row: usize, col: usize, val: &CellValue) -> core::result::Result<(), String> {
         for rule in &self.validation_rules {
             if rule.row == row && rule.col == col {
-                match (&rule.validation_type, val) {
+                match (rule.validation_type.clone(), val) {
                     (ValidationRuleType::ListFromOptions(opts), CellValue::Text(t)) => {
                         if !opts.contains(t) {
                             return Err(rule.error_message.clone());
                         }
                     }
                     (ValidationRuleType::NumberRange(min, max), CellValue::Number(n)) => {
-                        if n < min || n > max {
+                        if *n < min || *n > max {
                             return Err(rule.error_message.clone());
                         }
                     }

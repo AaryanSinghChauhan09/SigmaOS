@@ -653,6 +653,9 @@ pub enum CpuArchitectureClass {
     AArch64,
     RiscV32,
     RiscV64,
+    LoongArch64,
+    PowerPC64,
+    S390x,
 }
 
 // 6. Unified Architecture Engine
