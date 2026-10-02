@@ -187,11 +187,17 @@ impl UnifiedControlCenter {
         let id = {
             #[cfg(not(target_os = "none"))]
             {
-                plug.lock().unwrap_or_else(|e| e.into_inner()).id().to_string()
+                plug.lock()
+                    .unwrap_or_else(|e| e.into_inner())
+                    .id()
+                    .to_string()
             }
             #[cfg(target_os = "none")]
             {
-                plug.lock().unwrap_or_else(|e| e.into_inner()).id().to_string()
+                plug.lock()
+                    .unwrap_or_else(|e| e.into_inner())
+                    .id()
+                    .to_string()
             }
         };
         self.plugs.insert(id, plug);
@@ -201,7 +207,9 @@ impl UnifiedControlCenter {
         let plug = self.plugs.get(plug_id)?;
         #[cfg(not(target_os = "none"))]
         {
-            plug.lock().unwrap_or_else(|e| e.into_inner()).get_setting(key)
+            plug.lock()
+                .unwrap_or_else(|e| e.into_inner())
+                .get_setting(key)
         }
         #[cfg(target_os = "none")]
         {
@@ -218,7 +226,9 @@ impl UnifiedControlCenter {
         let plug = self.plugs.get(plug_id).ok_or("Plug not found")?;
         #[cfg(not(target_os = "none"))]
         {
-            plug.lock().unwrap_or_else(|e| e.into_inner()).set_setting(key, value)
+            plug.lock()
+                .unwrap_or_else(|e| e.into_inner())
+                .set_setting(key, value)
         }
         #[cfg(target_os = "none")]
         {

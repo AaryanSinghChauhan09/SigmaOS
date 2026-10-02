@@ -328,6 +328,7 @@ impl AddressSanitizer {
         self.deallocation_count = 0;
         self.error_count = 0;
     }
+}
 
 /// ASan statistics
 #[derive(Debug, Clone)]

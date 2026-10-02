@@ -93,7 +93,8 @@ impl UnifiedSecurityPolicyBridge {
     }
 
     pub fn add_unveil(&mut self, path: &str, permissions: &str) {
-        self.unveil_paths.push((path.to_string(), permissions.to_string()));
+        self.unveil_paths
+            .push((path.to_string(), permissions.to_string()));
     }
 
     pub fn is_pledged(&self, promise: &str) -> bool {
@@ -254,9 +255,18 @@ mod tests {
 
     #[test]
     fn test_subsystem_category_names() {
-        assert_eq!(SigmaSubsystemCategory::KernelScheduler.name(), "KernelScheduler");
-        assert_eq!(SigmaSubsystemCategory::SecurityAndSandbox.name(), "SecurityAndSandbox");
-        assert_eq!(SigmaSubsystemCategory::StorageAndFilesystem.name(), "StorageAndFilesystem");
+        assert_eq!(
+            SigmaSubsystemCategory::KernelScheduler.name(),
+            "KernelScheduler"
+        );
+        assert_eq!(
+            SigmaSubsystemCategory::SecurityAndSandbox.name(),
+            "SecurityAndSandbox"
+        );
+        assert_eq!(
+            SigmaSubsystemCategory::StorageAndFilesystem.name(),
+            "StorageAndFilesystem"
+        );
     }
 
     #[test]
