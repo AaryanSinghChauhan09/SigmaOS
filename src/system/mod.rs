@@ -109,3 +109,7 @@ pub use service_manager::{
     SystemServiceState, SystemServiceType, SystemRestartPolicy,
     SystemServiceConfig, SystemService, SystemServiceManager,
 };
+
+pub mod atomic_upgrade;
+
+pub mod runit_supervisor;

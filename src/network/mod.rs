@@ -68,3 +68,5 @@ pub use virtual_switch::{
     BondingMode, FdbEntry, FlowAction, StpPortState, SwitchPort, SwitchPortMode,
     VirtualSwitchBridge, VirtualSwitchEngine,
 };
+
+pub mod quic;

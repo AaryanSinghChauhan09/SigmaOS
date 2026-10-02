@@ -178,3 +178,7 @@ pub use memory_protection::{
 pub use pledge_unveil::{
     PledgePromise as OpenBsdPledgePromise, PledgeSandbox, Sandbox, UnveilPermission, UnveilSandbox,
 };
+
+pub mod dm_crypt;
+
+pub mod tpm2;
