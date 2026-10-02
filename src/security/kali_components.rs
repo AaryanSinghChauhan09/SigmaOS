@@ -218,8 +218,14 @@ impl Default for KaliBloodHoundActiveDirectoryGraph {
 /// Ettercap-inspired ARP Poisoning & DNS Spoofing MITM Packet Analyzer
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum MitmAlert {
-    ArpCachePoisoning { target_ip: [u8; 4], spoofed_mac: [u8; 6] },
-    DnsSpoofingDetected { domain: String, fake_ip: [u8; 4] },
+    ArpCachePoisoning {
+        target_ip: [u8; 4],
+        spoofed_mac: [u8; 6],
+    },
+    DnsSpoofingDetected {
+        domain: String,
+        fake_ip: [u8; 4],
+    },
 }
 
 pub struct KaliEttercapMitmAnalyzer;
@@ -328,7 +334,9 @@ impl KaliNiktoWebScanner {
                 has_x_content_type = true;
             } else if k.eq_ignore_ascii_case("strict-transport-security") {
                 has_hsts = true;
-            } else if k.eq_ignore_ascii_case("server") && (v.contains("Apache/2.2") || v.contains("nginx/1.10")) {
+            } else if k.eq_ignore_ascii_case("server")
+                && (v.contains("Apache/2.2") || v.contains("nginx/1.10"))
+            {
                 findings.push(NiktoScanFinding {
                     category: "Outdated Server Version",
                     description: format!("Server header reports outdated software: {}", v),
@@ -347,7 +355,9 @@ impl KaliNiktoWebScanner {
         if !has_x_content_type {
             findings.push(NiktoScanFinding {
                 category: "Missing Header",
-                description: String::from("X-Content-Type-Options header is missing (MIME sniffing risk)"),
+                description: String::from(
+                    "X-Content-Type-Options header is missing (MIME sniffing risk)",
+                ),
                 severity: "LOW",
             });
         }

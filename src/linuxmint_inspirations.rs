@@ -1268,7 +1268,10 @@ impl StickyNotesManager {
     }
 
     pub fn get_by_category(&self, category: &str) -> Vec<&StickyNote> {
-        self.notes.iter().filter(|n| n.category == category).collect()
+        self.notes
+            .iter()
+            .filter(|n| n.category == category)
+            .collect()
     }
 }
 
@@ -1497,7 +1500,10 @@ impl MintStickIsoVerifier {
     }
 
     pub fn format_partition_table(target_path: &str, scheme: PartitionScheme) -> String {
-        format!("Formatted {} with {:?} partition table", target_path, scheme)
+        format!(
+            "Formatted {} with {:?} partition table",
+            target_path, scheme
+        )
     }
 }
 
@@ -1715,7 +1721,11 @@ impl MintBackupEngine {
         let is_excluded = self.excluded_paths.iter().any(|ex| path.starts_with(ex));
         self.files.push(BackupFileEntry {
             source_path: path.to_string(),
-            destination_path: format!("{}/{}", self.backup_destination.trim_end_matches('/'), path.trim_start_matches('/')),
+            destination_path: format!(
+                "{}/{}",
+                self.backup_destination.trim_end_matches('/'),
+                path.trim_start_matches('/')
+            ),
             size_bytes,
             excluded: is_excluded,
         });
@@ -1761,7 +1771,8 @@ impl MintBackupEngine {
     }
 
     pub fn execute_backup(&mut self) -> Result<usize, &'static str> {
-        let active_files: Vec<&BackupFileEntry> = self.files.iter().filter(|f| !f.excluded).collect();
+        let active_files: Vec<&BackupFileEntry> =
+            self.files.iter().filter(|f| !f.excluded).collect();
         if active_files.is_empty() {
             return Err("No active files to back up");
         }
@@ -1939,9 +1950,16 @@ impl MintDriverIsoMountEngine {
         if !self.is_mounted {
             return Err("Driver ISO media not mounted");
         }
-        if let Some(drv) = self.discovered_drivers.iter_mut().find(|d| d.device_id == device_id) {
+        if let Some(drv) = self
+            .discovered_drivers
+            .iter_mut()
+            .find(|d| d.device_id == device_id)
+        {
             drv.installed = true;
-            Ok(format!("Installed {} from {}", drv.driver_name, self.mounted_iso_path))
+            Ok(format!(
+                "Installed {} from {}",
+                drv.driver_name, self.mounted_iso_path
+            ))
         } else {
             Err("Matching driver not found on mounted ISO media")
         }
@@ -2018,7 +2036,12 @@ impl MintSoftwareCatalogEngine {
             .collect()
     }
 
-    pub fn add_review(&mut self, pkg_id: &str, new_rating: f32, comment: &str) -> Result<(), &'static str> {
+    pub fn add_review(
+        &mut self,
+        pkg_id: &str,
+        new_rating: f32,
+        comment: &str,
+    ) -> Result<(), &'static str> {
         if let Some(p) = self.packages.iter_mut().find(|pkg| pkg.pkg_id == pkg_id) {
             let total_score = p.rating * p.review_count as f32 + new_rating;
             p.review_count += 1;
@@ -2033,7 +2056,11 @@ impl MintSoftwareCatalogEngine {
     pub fn install_package(&mut self, pkg_id: &str) -> Result<String, &'static str> {
         if let Some(p) = self.packages.iter_mut().find(|pkg| pkg.pkg_id == pkg_id) {
             p.installed = true;
-            let source = if p.is_flatpak { "Flatpak Flathub" } else { "System Repository" };
+            let source = if p.is_flatpak {
+                "Flatpak Flathub"
+            } else {
+                "System Repository"
+            };
             Ok(format!("Successfully installed {} via {}", p.name, source))
         } else {
             Err("Package not found in catalog")
@@ -2042,7 +2069,11 @@ impl MintSoftwareCatalogEngine {
 
     pub fn get_top_rated(&self, count: usize) -> Vec<&CatalogPackage> {
         let mut list: Vec<&CatalogPackage> = self.packages.iter().collect();
-        list.sort_by(|a, b| b.rating.partial_cmp(&a.rating).unwrap_or(core::cmp::Ordering::Equal));
+        list.sort_by(|a, b| {
+            b.rating
+                .partial_cmp(&a.rating)
+                .unwrap_or(core::cmp::Ordering::Equal)
+        });
         list.into_iter().take(count).collect()
     }
 }
@@ -2121,7 +2152,10 @@ mod tests {
 
     #[test]
     fn test_mint_stick_verifier_and_xapps() {
-        assert!(MintStickIsoVerifier::verify_checksum("abc123hash", "ABC123HASH"));
+        assert!(MintStickIsoVerifier::verify_checksum(
+            "abc123hash",
+            "ABC123HASH"
+        ));
         let fmt = MintStickIsoVerifier::format_partition_table("/dev/sdb", PartitionScheme::Gpt);
         assert!(fmt.contains("Gpt"));
 
@@ -2334,14 +2368,22 @@ mod tests {
     #[test]
     fn test_mint_software_catalog_engine() {
         let mut catalog = MintSoftwareCatalogEngine::new();
-        catalog.add_package("org.gimp.GIMP", "GIMP", "GNU Image Manipulation Program", "Graphics", true);
+        catalog.add_package(
+            "org.gimp.GIMP",
+            "GIMP",
+            "GNU Image Manipulation Program",
+            "Graphics",
+            true,
+        );
         catalog.add_package("vlc", "VLC", "VLC Media Player", "Multimedia", false);
 
         let search_res = catalog.search("image");
         assert_eq!(search_res.len(), 1);
         assert_eq!(search_res[0].pkg_id, "org.gimp.GIMP");
 
-        assert!(catalog.add_review("org.gimp.GIMP", 4.0, "Very versatile editor").is_ok());
+        assert!(catalog
+            .add_review("org.gimp.GIMP", 4.0, "Very versatile editor")
+            .is_ok());
         assert_eq!(catalog.packages[0].review_count, 2);
         assert_eq!(catalog.packages[0].rating, 4.5);
 

@@ -116,7 +116,8 @@ pub struct CfsScheduler {
     min_granularity: u64,
     latency: u64,
     next_pid: AtomicU64,
-    pub task_count: usize,}
+    pub task_count: usize,
+}
 
 impl CfsScheduler {
     pub fn new(min_granularity: u64, latency: u64) -> Self {

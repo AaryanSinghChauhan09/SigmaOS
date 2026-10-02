@@ -4,8 +4,8 @@ use std::format;
 
 extern crate alloc;
 use alloc::format;
-use alloc::vec::Vec;
 use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 
 /// x86_64 Microarchitecture Feature Level (x86-64-v1 through x86-64-v4)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

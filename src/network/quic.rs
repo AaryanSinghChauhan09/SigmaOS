@@ -7,8 +7,8 @@
 //! - RFC 9001 (QUIC-TLS): https://www.rfc-editor.org/rfc/rfc9001
 //! - quinn (Rust QUIC): https://github.com/quinn-rs/quinn
 
-use std::collections::HashMap;
 use crate::crypto::entropy;
+use std::collections::HashMap;
 
 /// QUIC connection state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -96,7 +96,7 @@ pub enum QuicPacketType {
     Retry,
     Handshake,
     ZeroRtt,
-    OneRtt,   // Short header
+    OneRtt, // Short header
 }
 
 /// QUIC connection
@@ -136,7 +136,7 @@ impl QuicConnection {
             streams: HashMap::new(),
             next_stream_id: 0, // client-initiated bidirectional: 0, 4, 8, ...
             max_stream_data: 1 << 20, // 1MB per stream
-            max_data: 1 << 24,       // 16MB connection total
+            max_data: 1 << 24, // 16MB connection total
             sent_bytes: 0,
             received_bytes: 0,
             rtt_us: 1000, // 1ms initial estimate
@@ -157,7 +157,9 @@ impl QuicConnection {
 
     /// Start connection (send Initial packet).
     pub fn connect(&mut self) -> Result<(), &'static str> {
-        if self.state != QuicConnState::Idle { return Err("Already connecting"); }
+        if self.state != QuicConnState::Idle {
+            return Err("Already connecting");
+        }
         self.state = QuicConnState::Connecting;
         // Simulate TLS 1.3 handshake completion
         self.state = QuicConnState::Connected;
@@ -166,10 +168,13 @@ impl QuicConnection {
 
     /// Open a new bidirectional stream.
     pub fn open_stream(&mut self) -> Result<u64, &'static str> {
-        if self.state != QuicConnState::Connected { return Err("Not connected"); }
+        if self.state != QuicConnState::Connected {
+            return Err("Not connected");
+        }
         let id = self.next_stream_id;
         self.next_stream_id += 4; // RFC 9000: increment by 4 for bidi streams
-        self.streams.insert(id, QuicStream::new(id, self.max_stream_data));
+        self.streams
+            .insert(id, QuicStream::new(id, self.max_stream_data));
         Ok(id)
     }
 
@@ -182,13 +187,21 @@ impl QuicConnection {
     }
 
     /// Receive data from a stream.
-    pub fn stream_recv(&mut self, stream_id: u64, max_bytes: usize) -> Result<Vec<u8>, &'static str> {
+    pub fn stream_recv(
+        &mut self,
+        stream_id: u64,
+        max_bytes: usize,
+    ) -> Result<Vec<u8>, &'static str> {
         let stream = self.streams.get_mut(&stream_id).ok_or("Stream not found")?;
         Ok(stream.read(max_bytes))
     }
 
     /// Simulate delivery of incoming data on a stream (e.g., from network).
-    pub fn deliver_stream_data(&mut self, stream_id: u64, data: &[u8]) -> Result<usize, &'static str> {
+    pub fn deliver_stream_data(
+        &mut self,
+        stream_id: u64,
+        data: &[u8],
+    ) -> Result<usize, &'static str> {
         let stream = self.streams.get_mut(&stream_id).ok_or("Stream not found")?;
         let n = stream.deliver(data);
         self.received_bytes += n as u64;

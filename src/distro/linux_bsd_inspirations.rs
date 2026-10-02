@@ -367,9 +367,12 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxParch
             | DistroSubsystemMode::LinuxOpenWrt => ServiceSupervisorType::Runit,
 
-            DistroSubsystemMode::LinuxPuppy | DistroSubsystemMode::LinuxSlax | DistroSubsystemMode::LinuxLFS | DistroSubsystemMode::LinuxRockLinux | DistroSubsystemMode::LinuxCRUX | DistroSubsystemMode::LinuxArchHurd => {
-                ServiceSupervisorType::Sysvinit
-            }
+            DistroSubsystemMode::LinuxPuppy
+            | DistroSubsystemMode::LinuxSlax
+            | DistroSubsystemMode::LinuxLFS
+            | DistroSubsystemMode::LinuxRockLinux
+            | DistroSubsystemMode::LinuxCRUX
+            | DistroSubsystemMode::LinuxArchHurd => ServiceSupervisorType::Sysvinit,
 
             DistroSubsystemMode::LinuxNix
             | DistroSubsystemMode::LinuxGuix
@@ -381,9 +384,9 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxSlackware | DistroSubsystemMode::LinuxTinyCore => {
                 ServiceSupervisorType::Sysvinit
             }
-            DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SolarisOmniOS | DistroSubsystemMode::SolarisOpenIndiana => {
-                ServiceSupervisorType::Smf
-            }
+            DistroSubsystemMode::SolarisIllumos
+            | DistroSubsystemMode::SolarisOmniOS
+            | DistroSubsystemMode::SolarisOpenIndiana => ServiceSupervisorType::Smf,
             DistroSubsystemMode::SmartOs
             | DistroSubsystemMode::SolarisSmartOS
             | DistroSubsystemMode::NetBsdRump => ServiceSupervisorType::Rcd,
@@ -611,9 +614,9 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxArchHurd
             | DistroSubsystemMode::LinuxLFS
             | DistroSubsystemMode::LinuxPuppy => supervisor == ServiceSupervisorType::Sysvinit,
-            DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SolarisOmniOS | DistroSubsystemMode::SolarisOpenIndiana => {
-                supervisor == ServiceSupervisorType::Smf
-            }
+            DistroSubsystemMode::SolarisIllumos
+            | DistroSubsystemMode::SolarisOmniOS
+            | DistroSubsystemMode::SolarisOpenIndiana => supervisor == ServiceSupervisorType::Smf,
             DistroSubsystemMode::SmartOs
             | DistroSubsystemMode::SolarisSmartOS
             | DistroSubsystemMode::NetBsdRump => supervisor == ServiceSupervisorType::Rcd,
@@ -661,7 +664,9 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxVoid => format!("{}.xbps", input_pkg),
             DistroSubsystemMode::LinuxNix => format!("{}.nix", input_pkg),
             DistroSubsystemMode::LinuxGuix => format!("{}.scm", input_pkg),
-            DistroSubsystemMode::LinuxGentoo | DistroSubsystemMode::LinuxFuntoo => format!("{}.ebuild", input_pkg),
+            DistroSubsystemMode::LinuxGentoo | DistroSubsystemMode::LinuxFuntoo => {
+                format!("{}.ebuild", input_pkg)
+            }
             DistroSubsystemMode::LinuxLFS => format!("{}.tar.xz", input_pkg),
             DistroSubsystemMode::LinuxCRUX => format!("{}.pkg.tar.gz", input_pkg),
             DistroSubsystemMode::LinuxRockLinux => format!("{}.tar.bz2", input_pkg),
@@ -717,7 +722,9 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::SolarisSmartOS => {
                 format!("{}.tgz", input_pkg)
             }
-            DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SolarisOmniOS | DistroSubsystemMode::SolarisOpenIndiana => {
+            DistroSubsystemMode::SolarisIllumos
+            | DistroSubsystemMode::SolarisOmniOS
+            | DistroSubsystemMode::SolarisOpenIndiana => {
                 format!("{}.p5p", input_pkg)
             }
             DistroSubsystemMode::BedrockLinux => format!("{}.stratum", input_pkg),
@@ -773,7 +780,9 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxVoid => format!("{}.xbps", action),
             DistroSubsystemMode::LinuxNix => format!("{}.nix", action),
             DistroSubsystemMode::LinuxGuix => format!("{}.scm", action),
-            DistroSubsystemMode::LinuxGentoo | DistroSubsystemMode::LinuxFuntoo => format!("{}.ebuild", action),
+            DistroSubsystemMode::LinuxGentoo | DistroSubsystemMode::LinuxFuntoo => {
+                format!("{}.ebuild", action)
+            }
             DistroSubsystemMode::LinuxLFS => format!("{}.tar.xz", action),
             DistroSubsystemMode::LinuxCRUX => format!("{}.pkg.tar.gz", action),
             DistroSubsystemMode::LinuxRockLinux => format!("{}.tar.bz2", action),
@@ -824,7 +833,9 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::SolarisSmartOS => format!("{}.tgz", action),
             DistroSubsystemMode::LinuxSlackware => format!("{}.txz", action),
             DistroSubsystemMode::LinuxTinyCore => format!("{}.tcz", action),
-            DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SolarisOmniOS | DistroSubsystemMode::SolarisOpenIndiana => {
+            DistroSubsystemMode::SolarisIllumos
+            | DistroSubsystemMode::SolarisOmniOS
+            | DistroSubsystemMode::SolarisOpenIndiana => {
                 format!("{}.p5p", action)
             }
             DistroSubsystemMode::BedrockLinux => format!("{}.stratum", action),
@@ -3827,20 +3838,39 @@ mod cross_subsystem_tests {
         );
 
         let artix_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxArtix);
-        assert_eq!(artix_bridge.translate_package_specifier("app"), "app.pkg.tar.zst");
-        assert_eq!(artix_bridge.get_supervisor_type(), ServiceSupervisorType::Runit);
+        assert_eq!(
+            artix_bridge.translate_package_specifier("app"),
+            "app.pkg.tar.zst"
+        );
+        assert_eq!(
+            artix_bridge.get_supervisor_type(),
+            ServiceSupervisorType::Runit
+        );
 
         let funtoo_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxFuntoo);
-        assert_eq!(funtoo_bridge.translate_package_specifier("app"), "app.ebuild");
-        assert_eq!(funtoo_bridge.get_supervisor_type(), ServiceSupervisorType::OpenRC);
+        assert_eq!(
+            funtoo_bridge.translate_package_specifier("app"),
+            "app.ebuild"
+        );
+        assert_eq!(
+            funtoo_bridge.get_supervisor_type(),
+            ServiceSupervisorType::OpenRC
+        );
 
         let lfs_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxLFS);
         assert_eq!(lfs_bridge.translate_package_specifier("app"), "app.tar.xz");
-        assert_eq!(lfs_bridge.get_supervisor_type(), ServiceSupervisorType::Sysvinit);
+        assert_eq!(
+            lfs_bridge.get_supervisor_type(),
+            ServiceSupervisorType::Sysvinit
+        );
 
-        let indiana_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::SolarisOpenIndiana);
+        let indiana_bridge =
+            SovereignUniversalDistroBridge::new(DistroSubsystemMode::SolarisOpenIndiana);
         assert_eq!(indiana_bridge.translate_package_specifier("app"), "app.p5p");
-        assert_eq!(indiana_bridge.get_supervisor_type(), ServiceSupervisorType::Smf);
+        assert_eq!(
+            indiana_bridge.get_supervisor_type(),
+            ServiceSupervisorType::Smf
+        );
 
         let pqc_bsd = SovereignUniversalDistroBridge::new(DistroSubsystemMode::FreeBsdHardenedPqc);
         assert_eq!(pqc_bsd.translate_package_specifier("app"), "app.pkg");

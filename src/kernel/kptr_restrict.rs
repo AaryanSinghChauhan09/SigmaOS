@@ -13,7 +13,8 @@ pub enum KptrRestrictLevel {
     Restricted = 1,
     /// Completely hide kernel pointers
     Hidden = 2,
-    Strict,}
+    Strict,
+}
 
 impl KptrRestrictLevel {
     pub fn from_u32(value: u32) -> Self {
@@ -39,7 +40,10 @@ impl KptrRestrictLevel {
     }
 
     pub fn is_restricted(&self) -> bool {
-        matches!(self, KptrRestrictLevel::Restricted | KptrRestrictLevel::Hidden)
+        matches!(
+            self,
+            KptrRestrictLevel::Restricted | KptrRestrictLevel::Hidden
+        )
     }
 
     pub fn is_hidden(&self) -> bool {
@@ -128,7 +132,8 @@ impl KptrRestrict {
     }
 
     pub fn set_from_sysctl(&mut self, value: &str) -> Result<String, String> {
-        let parsed = value.parse::<u32>()
+        let parsed = value
+            .parse::<u32>()
             .map_err(|_| String::from("Invalid numeric value"))?;
 
         self.level = KptrRestrictLevel::from_u32(parsed);
@@ -137,7 +142,9 @@ impl KptrRestrict {
 
     pub fn get_description(&self) -> String {
         match self.level {
-            KptrRestrictLevel::None => String::from("No restriction - kernel pointers visible to all"),
+            KptrRestrictLevel::None => {
+                String::from("No restriction - kernel pointers visible to all")
+            }
             KptrRestrictLevel::Restricted => String::from("Restrict to processes with CAP_SYSLOG"),
             KptrRestrictLevel::Hidden => String::from("Completely hide kernel pointers"),
             KptrRestrictLevel::Strict => String::from("Strict kernel pointer restriction"),
@@ -152,7 +159,8 @@ pub enum DmesgRestrictLevel {
     None = 0,
     /// Restrict to processes with CAP_SYSLOG
     Restricted = 1,
-    Strict,}
+    Strict,
+}
 
 impl DmesgRestrictLevel {
     pub fn from_u32(value: u32) -> Self {
@@ -168,7 +176,10 @@ impl DmesgRestrictLevel {
     }
 
     pub fn is_restricted(&self) -> bool {
-        matches!(self, DmesgRestrictLevel::Restricted | DmesgRestrictLevel::Strict)
+        matches!(
+            self,
+            DmesgRestrictLevel::Restricted | DmesgRestrictLevel::Strict
+        )
     }
 
     /// Check if kernel pointer should be sanitized
@@ -203,7 +214,9 @@ pub struct KernelSecurityMitigations {
 
 impl KernelSecurityMitigations {
     pub fn new() -> Self {
-        Self { params: KernelSecurityParams::new() }
+        Self {
+            params: KernelSecurityParams::new(),
+        }
     }
     pub fn get_kptr_restrict(&self) -> KptrRestrictLevel {
         self.params.kptr_restrict.level
@@ -291,7 +304,8 @@ impl DmesgRestrict {
     }
 
     pub fn set_from_sysctl(&mut self, value: &str) -> Result<String, String> {
-        let parsed = value.parse::<u32>()
+        let parsed = value
+            .parse::<u32>()
             .map_err(|_| String::from("Invalid numeric value"))?;
 
         self.level = DmesgRestrictLevel::from_u32(parsed);
@@ -371,7 +385,10 @@ impl KernelSecurityParams {
     }
 
     pub fn get_security_level(&self) -> SecurityLevel {
-        if self.kptr_restrict.is_hidden() && self.dmesg_restrict.is_restricted() && self.modules_disabled {
+        if self.kptr_restrict.is_hidden()
+            && self.dmesg_restrict.is_restricted()
+            && self.modules_disabled
+        {
             SecurityLevel::Maximum
         } else if self.kptr_restrict.is_restricted() && self.dmesg_restrict.is_restricted() {
             SecurityLevel::High
@@ -384,9 +401,22 @@ impl KernelSecurityParams {
 
     pub fn get_sysctl_configs(&self) -> Vec<(String, String)> {
         vec![
-            (String::from("kernel.kptr_restrict"), self.kptr_restrict.get_sysctl_value()),
-            (String::from("kernel.dmesg_restrict"), self.dmesg_restrict.get_sysctl_value()),
-            (String::from("kernel.modules_disabled"), if self.modules_disabled { String::from("1") } else { String::from("0") }),
+            (
+                String::from("kernel.kptr_restrict"),
+                self.kptr_restrict.get_sysctl_value(),
+            ),
+            (
+                String::from("kernel.dmesg_restrict"),
+                self.dmesg_restrict.get_sysctl_value(),
+            ),
+            (
+                String::from("kernel.modules_disabled"),
+                if self.modules_disabled {
+                    String::from("1")
+                } else {
+                    String::from("0")
+                },
+            ),
         ]
     }
 
@@ -395,7 +425,8 @@ impl KernelSecurityParams {
             "kernel.kptr_restrict" => self.kptr_restrict.set_from_sysctl(value),
             "kernel.dmesg_restrict" => self.dmesg_restrict.set_from_sysctl(value),
             "kernel.modules_disabled" => {
-                let parsed = value.parse::<u32>()
+                let parsed = value
+                    .parse::<u32>()
                     .map_err(|_| String::from("Invalid numeric value"))?;
                 self.modules_disabled = parsed == 1;
                 Ok(String::from("modules_disabled updated"))
@@ -516,7 +547,10 @@ mod tests {
     #[test]
     fn test_dmesg_restrict_level_from_u32() {
         assert_eq!(DmesgRestrictLevel::from_u32(0), DmesgRestrictLevel::None);
-        assert_eq!(DmesgRestrictLevel::from_u32(1), DmesgRestrictLevel::Restricted);
+        assert_eq!(
+            DmesgRestrictLevel::from_u32(1),
+            DmesgRestrictLevel::Restricted
+        );
     }
 
     #[test]

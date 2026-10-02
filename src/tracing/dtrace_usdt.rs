@@ -6,7 +6,10 @@
 //   kernel VNICs, etherstubs, bandwidth limits, flow classification.
 
 use std::collections::{BTreeMap, HashMap, VecDeque};
-use std::sync::{Arc, Mutex, atomic::{AtomicU64, Ordering}};
+use std::sync::{
+    atomic::{AtomicU64, Ordering},
+    Arc, Mutex,
+};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // DTrace Probe Point
@@ -31,7 +34,10 @@ impl ProbeSpec {
     }
 
     pub fn full_name(&self) -> String {
-        format!("{}:{}:{}:{}", self.provider, self.module, self.function, self.name)
+        format!(
+            "{}:{}:{}:{}",
+            self.provider, self.module, self.function, self.name
+        )
     }
 
     /// Check if this probe matches a pattern (supports "*" wildcards)
@@ -61,14 +67,32 @@ pub enum DTraceArg {
 }
 
 impl DTraceArg {
-    pub fn as_int(&self) -> Option<i64> { if let DTraceArg::Int(v) = self { Some(*v) } else { None } }
-    pub fn as_uint(&self) -> Option<u64> { if let DTraceArg::Uint(v) = self { Some(*v) } else { None } }
-    pub fn as_str(&self) -> Option<&str> { if let DTraceArg::Str(v) = self { Some(v) } else { None } }
+    pub fn as_int(&self) -> Option<i64> {
+        if let DTraceArg::Int(v) = self {
+            Some(*v)
+        } else {
+            None
+        }
+    }
+    pub fn as_uint(&self) -> Option<u64> {
+        if let DTraceArg::Uint(v) = self {
+            Some(*v)
+        } else {
+            None
+        }
+    }
+    pub fn as_str(&self) -> Option<&str> {
+        if let DTraceArg::Str(v) = self {
+            Some(v)
+        } else {
+            None
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
 pub struct ProbeEvent {
-    pub probe: String,   // full probe name
+    pub probe: String, // full probe name
     pub args: Vec<DTraceArg>,
     pub timestamp_ns: u64,
     pub cpu: u32,
@@ -84,7 +108,10 @@ pub struct ProbeEvent {
 pub enum Aggregation {
     Count(u64),
     Sum(i64),
-    Avg { total: i64, count: u64 },
+    Avg {
+        total: i64,
+        count: u64,
+    },
     Max(i64),
     Min(i64),
     /// Power-of-2 histogram (like DTrace quantize())
@@ -93,10 +120,14 @@ pub enum Aggregation {
 
 impl Aggregation {
     pub fn update_count(&mut self) {
-        if let Aggregation::Count(n) = self { *n += 1; }
+        if let Aggregation::Count(n) = self {
+            *n += 1;
+        }
     }
     pub fn update_sum(&mut self, v: i64) {
-        if let Aggregation::Sum(s) = self { *s += v; }
+        if let Aggregation::Sum(s) = self {
+            *s += v;
+        }
     }
     pub fn update_avg(&mut self, v: i64) {
         if let Aggregation::Avg { total, count } = self {
@@ -105,14 +136,26 @@ impl Aggregation {
         }
     }
     pub fn update_max(&mut self, v: i64) {
-        if let Aggregation::Max(m) = self { if v > *m { *m = v; } }
+        if let Aggregation::Max(m) = self {
+            if v > *m {
+                *m = v;
+            }
+        }
     }
     pub fn update_min(&mut self, v: i64) {
-        if let Aggregation::Min(m) = self { if v < *m { *m = v; } }
+        if let Aggregation::Min(m) = self {
+            if v < *m {
+                *m = v;
+            }
+        }
     }
     pub fn update_quantize(&mut self, v: i64) {
         if let Aggregation::Quantize(buckets) = self {
-            let bucket = if v <= 0 { 0i32 } else { (v as f64).log2().floor() as i32 };
+            let bucket = if v <= 0 {
+                0i32
+            } else {
+                (v as f64).log2().floor() as i32
+            };
             *buckets.entry(bucket).or_insert(0) += 1;
         }
     }
@@ -121,15 +164,21 @@ impl Aggregation {
         match self {
             Aggregation::Count(n) => format!("count: {}", n),
             Aggregation::Sum(s) => format!("sum: {}", s),
-            Aggregation::Avg { total, count } =>
-                format!("avg: {}", if *count > 0 { total / *count as i64 } else { 0 }),
+            Aggregation::Avg { total, count } => format!(
+                "avg: {}",
+                if *count > 0 { total / *count as i64 } else { 0 }
+            ),
             Aggregation::Max(m) => format!("max: {}", m),
             Aggregation::Min(m) => format!("min: {}", m),
             Aggregation::Quantize(buckets) => {
                 let mut s = String::from("quantize:\n");
                 for (power, count) in buckets {
                     let val = 2i64.pow(*power as u32);
-                    s.push_str(&format!("  [{:>8}] {}\n", val, "*".repeat((*count).min(40) as usize)));
+                    s.push_str(&format!(
+                        "  [{:>8}] {}\n",
+                        val,
+                        "*".repeat((*count).min(40) as usize)
+                    ));
                 }
                 s
             }
@@ -185,15 +234,33 @@ impl DTraceEngine {
     }
 
     pub fn disable_all(&self) {
-        for v in self.enabled.lock().unwrap().values_mut() { *v = false; }
+        for v in self.enabled.lock().unwrap().values_mut() {
+            *v = false;
+        }
     }
 
     /// Fire a USDT probe — returns immediately if probe not enabled (zero overhead)
-    pub fn fire(&self, provider: &str, module: &str, func: &str, name: &str,
-                args: Vec<DTraceArg>, pid: u32, cpu: u32) {
+    pub fn fire(
+        &self,
+        provider: &str,
+        module: &str,
+        func: &str,
+        name: &str,
+        args: Vec<DTraceArg>,
+        pid: u32,
+        cpu: u32,
+    ) {
         let key = format!("{}:{}:{}:{}", provider, module, func, name);
-        let is_enabled = self.enabled.lock().unwrap().get(&key).copied().unwrap_or(false);
-        if !is_enabled { return; }
+        let is_enabled = self
+            .enabled
+            .lock()
+            .unwrap()
+            .get(&key)
+            .copied()
+            .unwrap_or(false);
+        if !is_enabled {
+            return;
+        }
 
         let ts = self.tick_ns.fetch_add(1000, Ordering::Relaxed);
         let event = ProbeEvent {
@@ -218,7 +285,10 @@ impl DTraceEngine {
             Aggregation::Min(_) => agg.update_min(value),
             Aggregation::Quantize(_) => agg.update_quantize(value),
         }
-        self.aggregations.lock().unwrap().insert(key.into(), agg.clone());
+        self.aggregations
+            .lock()
+            .unwrap()
+            .insert(key.into(), agg.clone());
     }
 
     pub fn drain_events(&self) -> Vec<ProbeEvent> {
@@ -229,9 +299,13 @@ impl DTraceEngine {
         self.aggregations.lock().unwrap().get(key).cloned()
     }
 
-    pub fn total_firings(&self) -> u64 { self.total_firings.load(Ordering::Relaxed) }
+    pub fn total_firings(&self) -> u64 {
+        self.total_firings.load(Ordering::Relaxed)
+    }
 
-    pub fn registered_count(&self) -> usize { self.probes.lock().unwrap().len() }
+    pub fn registered_count(&self) -> usize {
+        self.probes.lock().unwrap().len()
+    }
 }
 
 // Built-in kernel probe points:
@@ -255,7 +329,9 @@ pub fn register_kernel_probes(dt: &DTraceEngine) {
         ProbeSpec::new("mm", "kernel", "kmalloc", "entry"),
         ProbeSpec::new("mm", "kernel", "kfree", "entry"),
     ];
-    for probe in probes { dt.register_probe(probe); }
+    for probe in probes {
+        dt.register_probe(probe);
+    }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -266,30 +342,41 @@ pub fn register_kernel_probes(dt: &DTraceEngine) {
 pub struct MacAddress([u8; 6]);
 
 impl MacAddress {
-    pub fn new(bytes: [u8; 6]) -> Self { MacAddress(bytes) }
+    pub fn new(bytes: [u8; 6]) -> Self {
+        MacAddress(bytes)
+    }
     pub fn random(seed: u64) -> Self {
         let b = seed.to_le_bytes();
         MacAddress([0x02 | (b[0] & 0xFE), b[1], b[2], b[3], b[4], b[5]])
     }
     pub fn display(&self) -> String {
-        format!("{:02x}:{:02x}:{:02x}:{:02x}:{:02x}:{:02x}",
-            self.0[0], self.0[1], self.0[2], self.0[3], self.0[4], self.0[5])
+        format!(
+            "{:02x}:{:02x}:{:02x}:{:02x}:{:02x}:{:02x}",
+            self.0[0], self.0[1], self.0[2], self.0[3], self.0[4], self.0[5]
+        )
     }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum VnicLinkState { Up, Down }
+pub enum VnicLinkState {
+    Up,
+    Down,
+}
 
 #[derive(Debug, Clone)]
 pub struct BandwidthLimit {
-    pub max_bps: u64,        // bits per second
-    pub burst_bytes: u64,    // token bucket burst
+    pub max_bps: u64,     // bits per second
+    pub burst_bytes: u64, // token bucket burst
     pub current_tokens: u64,
 }
 
 impl BandwidthLimit {
     pub fn new(max_bps: u64) -> Self {
-        BandwidthLimit { max_bps, burst_bytes: max_bps / 8, current_tokens: max_bps / 8 }
+        BandwidthLimit {
+            max_bps,
+            burst_bytes: max_bps / 8,
+            current_tokens: max_bps / 8,
+        }
     }
 
     /// Token bucket: returns true if packet of `size` bytes can be sent
@@ -315,7 +402,7 @@ pub struct Vnic {
     pub mac: MacAddress,
     pub link_state: VnicLinkState,
     pub mtu: u32,
-    pub over_link: String,  // physical link name this VNIC is created over
+    pub over_link: String, // physical link name this VNIC is created over
     pub bandwidth: Option<BandwidthLimit>,
     pub vlan_id: Option<u16>,
     rx_bytes: AtomicU64,
@@ -345,23 +432,37 @@ impl Vnic {
         self.bandwidth = Some(BandwidthLimit::new(max_bps));
     }
 
-    pub fn set_vlan(&mut self, vlan: u16) { self.vlan_id = Some(vlan); }
-    pub fn bring_up(&mut self) { self.link_state = VnicLinkState::Up; }
-    pub fn bring_down(&mut self) { self.link_state = VnicLinkState::Down; }
+    pub fn set_vlan(&mut self, vlan: u16) {
+        self.vlan_id = Some(vlan);
+    }
+    pub fn bring_up(&mut self) {
+        self.link_state = VnicLinkState::Up;
+    }
+    pub fn bring_down(&mut self) {
+        self.link_state = VnicLinkState::Down;
+    }
 
     pub fn send(&mut self, packet: &[u8]) -> Result<(), &'static str> {
-        if self.link_state != VnicLinkState::Up { return Err("Link down"); }
-        if packet.len() > self.mtu as usize { return Err("MTU exceeded"); }
-        if let Some(ref mut bw) = self.bandwidth {
-            if !bw.consume(packet.len() as u64) { return Err("Bandwidth limit exceeded"); }
+        if self.link_state != VnicLinkState::Up {
+            return Err("Link down");
         }
-        self.tx_bytes.fetch_add(packet.len() as u64, Ordering::Relaxed);
+        if packet.len() > self.mtu as usize {
+            return Err("MTU exceeded");
+        }
+        if let Some(ref mut bw) = self.bandwidth {
+            if !bw.consume(packet.len() as u64) {
+                return Err("Bandwidth limit exceeded");
+            }
+        }
+        self.tx_bytes
+            .fetch_add(packet.len() as u64, Ordering::Relaxed);
         self.tx_packets.fetch_add(1, Ordering::Relaxed);
         Ok(())
     }
 
     pub fn receive(&self, packet: &[u8]) {
-        self.rx_bytes.fetch_add(packet.len() as u64, Ordering::Relaxed);
+        self.rx_bytes
+            .fetch_add(packet.len() as u64, Ordering::Relaxed);
         self.rx_packets.fetch_add(1, Ordering::Relaxed);
     }
 
@@ -398,7 +499,11 @@ pub struct Etherstub {
 
 impl Etherstub {
     pub fn new(name: &str) -> Self {
-        Etherstub { name: name.into(), vnics: Vec::new(), packet_log: VecDeque::new() }
+        Etherstub {
+            name: name.into(),
+            vnics: Vec::new(),
+            packet_log: VecDeque::new(),
+        }
     }
 
     pub fn attach_vnic(&mut self, vnic_name: &str) {
@@ -414,7 +519,10 @@ impl Etherstub {
     /// Broadcast a frame to all attached VNICs except sender
     pub fn broadcast(&mut self, from_vnic: &str, frame: Vec<u8>) -> usize {
         self.packet_log.push_back(frame.clone());
-        self.vnics.iter().filter(|v| v.as_str() != from_vnic).count()
+        self.vnics
+            .iter()
+            .filter(|v| v.as_str() != from_vnic)
+            .count()
     }
 }
 
@@ -429,10 +537,20 @@ mod tests {
         assert!(dt.registered_count() > 0);
         // Enable syscall entry probes using exact wildcard that matches registration
         let n = dt.enable("syscall", "kernel", "*", "entry");
-        assert!(n > 0, "Should enable at least one syscall:kernel:*:entry probe");
+        assert!(
+            n > 0,
+            "Should enable at least one syscall:kernel:*:entry probe"
+        );
         // Fire a probe matching one of the registered ones exactly
-        dt.fire("syscall", "kernel", "read", "entry",
-                vec![DTraceArg::Uint(3), DTraceArg::Uint(1024)], 1234, 0);
+        dt.fire(
+            "syscall",
+            "kernel",
+            "read",
+            "entry",
+            vec![DTraceArg::Uint(3), DTraceArg::Uint(1024)],
+            1234,
+            0,
+        );
         // The fire matches "syscall:kernel:read:entry" but we enabled via wildcard
         // Since enable() enables by pattern match, but fire() uses exact key lookup,
         // we must enable the exact probe key or fire the exact registered key.
@@ -441,7 +559,15 @@ mod tests {
         dt2.register_probe(ProbeSpec::new("syscall", "kernel", "read", "entry"));
         let n2 = dt2.enable("syscall", "*", "*", "entry");
         assert!(n2 > 0);
-        dt2.fire("syscall", "kernel", "read", "entry", vec![DTraceArg::Uint(3)], 1234, 0);
+        dt2.fire(
+            "syscall",
+            "kernel",
+            "read",
+            "entry",
+            vec![DTraceArg::Uint(3)],
+            1234,
+            0,
+        );
         assert_eq!(dt2.total_firings(), 1);
         let events = dt2.drain_events();
         assert_eq!(events.len(), 1);
@@ -478,7 +604,10 @@ mod tests {
             dt.aggregate("calls", &mut count_agg, 1);
             dt.aggregate("latency_ns", &mut sum_agg, 1000 * i);
         }
-        assert!(matches!(dt.get_aggregation("calls"), Some(Aggregation::Count(10))));
+        assert!(matches!(
+            dt.get_aggregation("calls"),
+            Some(Aggregation::Count(10))
+        ));
     }
 
     #[test]
@@ -497,10 +626,10 @@ mod tests {
         let mut vnic = Vnic::new("vnic1", "e1000g0", 0xBEEF0000);
         vnic.bring_up();
         vnic.set_bandwidth_limit(1_000_000); // 1 Mbps = 125 KB/s
-        // First large packet should consume all tokens
+                                             // First large packet should consume all tokens
         let big_packet = vec![0u8; 100_000];
         let _ = vnic.send(&big_packet); // may succeed or not depending on burst
-        // Verify bandwidth object exists
+                                        // Verify bandwidth object exists
         assert!(vnic.bandwidth.is_some());
     }
 
