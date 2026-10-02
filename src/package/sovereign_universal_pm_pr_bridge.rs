@@ -51,7 +51,6 @@ pub enum UniversalDistroPackageFormat {
     OpenBsdPkg,
     FreeBsdPorts,
     OpenBsdPorts,
-    OpenBsdPkg,
     NetBsdPkgsrc,
     HaikuHpkg,
     SlackwareSlackBuild,
@@ -203,8 +202,6 @@ impl UniversalDistroPackageFormat {
             Self::ArchAuditVulnerability => "Arch Linux arch-audit Security Vulnerability Record",
             Self::ArchNamcapLinterReport => "Arch Linux namcap Package Auditor Linter Report",
             Self::ArchMakepkgConfProfile => "Arch Linux makepkg.conf Compiler Optimization Specs",
-            Self::FreeBsdPkg => "FreeBSD pkg Package",
-            Self::OpenBsdPkg => "OpenBSD pkg Package",
         }
     }
 

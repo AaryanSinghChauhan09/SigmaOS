@@ -2,70 +2,77 @@
 
 > **Target Repository:** [https://github.com/AaryanSinghChauhan09/SigmaOS](https://github.com/AaryanSinghChauhan09/SigmaOS)
 > **Branch:** `main`
-> **Status:** Active Operational Handbook & Developer Guidelines
+> **Status:** Active Operational Handbook & Developer/Agent Guidelines
 
 ---
 
 ## 🎯 Purpose of This Guide
 
-This document serves as the operational handbook for developers and AI agents working on **SigmaOS**. It details daily workflows, testing commands, code quality guidelines, continuous tri-agent governance (Bolt ⚡, Palette 🎨, Sentinel 🛡️), and step-by-step procedures for contributing directly on the `main` branch.
+This document provides developer and AI agent operational guidelines for working on the **SigmaOS** codebase. It outlines core workflows, testing commands, coding standards, multi-distro Linux & BSD Pull Request package gateway ingestion protocols, tri-agent governance protocols (⚡ Bolt, 🎨 Palette, 🛡️ Sentinel), and step-by-step procedures for contributing directly on the `main` branch without creating unnecessary pull requests when instructed.
 
 ---
 
 ## 📋 1. Standard Developer & Agent Verification Workflows
 
-Before committing any changes, developers and agents MUST verify system stability using the following standard commands:
+### 1.1 Local Environment & Verification Commands
+Before committing any changes, developers and AI agents must execute the standard diagnostic and test verification commands:
 
 ```bash
-# 1. Verify Rust library compilation & check for warnings
+# 1. Check Rust library compilation and warnings
 cargo check --lib
 
-# 2. Run all standalone Rust subsystem test suites
+# 2. Run Python integration test harness
+pytest tests/
+
+# 3. Run all standalone Rust subsystem test suites (137 tests)
 ./run_sigma_tests.sh
 
-# 3. Run Python integration test suite
-pytest tests/
+# 4. Verify Universal Multi-Distro PR Package Gateway engine tests
+rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/package/sovereign_pr_package_gateway.rs && ./sovereign_pr_package_gateway
 ```
 
-### 1.1 Direct Branch Policy (No PR Directives)
-- When instructed to work directly on the `main` branch, **do not create pull requests**.
-- Ensure all commits are atomic, self-contained, well-documented, and fully verified prior to pushing.
+### 1.2 Direct Branch Policy & PR Controls
+- **No PR Directive:** When instructed to work directly on the `main` branch, **do not create pull requests**.
+- All commits should be atomic, well-formatted, and verified via `./run_sigma_tests.sh` prior to committing.
 
 ---
 
-## ⚡ 2. Tri-Agent Governance Framework
+## 📦 2. Multi-Distro PR Package Ingestion Protocols (Linux & BSD)
 
-SigmaOS utilizes a tri-agent governance model to ensure continuous optimization, user experience polish, and security hardening:
+SigmaOS natively supports package ingestion from **every major Linux and BSD package format** via the Pull Request Gateway (`SovereignUniversalPmPrBridgeEngine` and `SovereignUniversalPrGatewayEngine`):
 
-### 2.1 Bolt ⚡ (Performance Agent)
-- **Focus:** Micro-optimizations (<50 lines) targeting execution latency, memory allocation, and build speed.
-- **Rule:** Measure before optimizing. Maintain `.jules/bolt.md` with critical performance learnings.
-
-### 2.2 Palette 🎨 (UX & Accessibility Agent)
-- **Focus:** Micro-UX enhancements, ARIA accessibility attributes, contrast ratios, and keyboard navigation.
-- **Rule:** Ensure WCAG 2.1 AAA compliance and full keyboard focus accessibility.
-
-### 2.3 Sentinel 🛡️ (Security Agent)
-- **Focus:** Security hardening, CVE remediation, parameter sanitization, and input validation.
-- **Rule:** Fail securely, sanitize inputs at subsystem boundaries, and maintain `.jules/sentinel.md`.
+1. **Apt (.deb):** Ingests Debian, Ubuntu, Mint, and Deepin `.deb` / `.superdeb` manifests.
+2. **Pacman (.pkg.tar.zst / PKGBUILD):** Ingests Arch Linux, Manjaro, CachyOS PKGBUILD recipes, AUR RPC v5, pacman.conf, and mkinitcpio hooks.
+3. **Dnf (.rpm):** Ingests Fedora, RHEL, CentOS, and Rocky Linux RPM manifests.
+4. **Alpine (.apk) / Void (.xbps) / Gentoo (.ebuild):** Ingests APKBUILD, void-packages, and Portage ebuilds with `USE_EXPAND` flag processing.
+5. **BSD Systems (FreeBSD / OpenBSD / NetBSD):** Ingests `pkg` binaries, `ports`, and `pkgsrc` Makefiles with Capsicum jail and Pledge/Unveil sandbox rules.
+6. **Nix / Guix / Zypper / Slackware / Haiku / Solus / Opkg:** Ingests Nix Flakes, Guix Scheme NARs, YAST delta RPMs, `.txz` SlackBuilds, `.hpkg`, `.eopkg`, and `.ipk`.
+7. **Containers & Bundles:** Ingests Flatpak, Snap, and AppImage applications.
 
 ---
 
-## 🏛️ 3. OOP & Software Engineering Standards
+## ⚡ 3. Tri-Agent Governance Framework Guidelines
 
-### 3.1 Object-Oriented Principles in Rust
-1. **Encapsulation:** Keep struct data private (`pub(crate)` or private) and expose constructors (`new()`) and accessor methods.
-2. **Polymorphism:** Utilize traits (`PackageFormatStrategy`, `UniversalPackageASTVisitor`) to define behavioral interfaces.
-3. **Abstraction:** Simplify complex subsystem operations behind unified engines (e.g., `SovereignCompilerToolchainEngine`).
-4. **Design Patterns:** Apply Mediators for subsystem messaging, Mementos for transaction rollback, and Visitors for AST processing.
+SigmaOS employs a continuous tri-agent governance framework. Each agent follows specific operational boundaries and maintains persistent journals under `.jules/`:
 
-### 3.2 `#![no_std]` Kernel Scoping
-- Kernel modules placed under kernel boundaries must adhere to `#![no_std]` constraints.
-- Use `core::*` and `alloc::*` imports; avoid `std::*` in kernel space.
+### 3.1 Bolt ⚡ (Performance & Optimization)
+- **Goal:** Implement micro-optimizations (<50 lines) that make SigmaOS measurably faster.
+- **Boundaries:** Measure before optimizing; do not sacrifice readability for micro-optimizations.
+- **Journal File:** `.jules/bolt.md`
+
+### 3.2 Palette 🎨 (UX & Accessibility)
+- **Goal:** Enhance interface accessibility, keyboard focus states, ARIA roles, and contrast.
+- **Boundaries:** Ensure full keyboard navigation support (Tab / Shift+Tab) and screen reader friendliness.
+- **Journal File:** `.jules/palette.md`
+
+### 3.3 Sentinel 🛡️ (Security & Compliance)
+- **Goal:** Detect and resolve security risks, hardcoded secrets, input validation gaps, and permission flaws.
+- **Boundaries:** Fail securely, sanitize inputs, and enforce least privilege.
+- **Journal File:** `.jules/sentinel.md`
 
 ---
 
-## 🚀 4. Step-by-Step Execution Checklist for Next Steps
+## 🚀 4. Step-by-Step Task Checklist for Contributors
 
 1. [ ] **Clean Compiler Warnings:** Run `cargo fix --lib -p sigmaos --allow-dirty` to auto-clean unused import warnings.
 2. [ ] **Decompose Large Modules:** Split monolithic files like `src/open_source_os_gap_closure.rs` into submodules.
@@ -74,4 +81,4 @@ SigmaOS utilizes a tri-agent governance model to ensure continuous optimization,
 
 ---
 
-*End of SigmaOS Next Steps Guidelines.*
+*End of SigmaOS Next Steps Guidelines & Operational Handbook.*
