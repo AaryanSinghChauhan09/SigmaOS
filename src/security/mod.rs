@@ -173,7 +173,8 @@ pub use hardware_privilege::*;
 
 pub use capsicum::{CapEntry, CapMode, CapRight, CapabilitySandbox};
 pub use memory_protection::{
-    AslrConfig, MemoryProtectionManager, MemoryProtectionMode, StackCanaryConfig,
+    AslrConfig, MemoryProtectionManager, MemoryProtectionMode, PkeyAccessRights, PkruRegister,
+    ProtectionKey, SovereignIntelMpkEngine, StackCanaryConfig,
 };
 pub use pledge_unveil::{
     PledgePromise as OpenBsdPledgePromise, PledgeSandbox, Sandbox, UnveilPermission, UnveilSandbox,

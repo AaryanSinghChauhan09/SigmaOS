@@ -285,8 +285,8 @@ pub use resilience::{
 pub use security::hardening;
 pub use security::{
     AnonSurfShunt, AppSandboxEngine, ArithmeticSubstitutionDeobfuscator, CapabilityGate,
-    CapabilityToken, ForensicStorageFilter, Permission, PledgeManager, PledgePromise, RoutingMode,
-    SandboxPolicy,
+    CapabilityToken, ForensicStorageFilter, Permission, PkeyAccessRights, PkruRegister,
+    PledgeManager, PledgePromise, ProtectionKey, RoutingMode, SandboxPolicy, SovereignIntelMpkEngine,
 };
 pub use shell::{
     ContextualCompleter, HistoryExpansionEngine, JobControlManager, ParameterExpansionEngine,

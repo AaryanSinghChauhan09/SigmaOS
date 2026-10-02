@@ -172,6 +172,179 @@ impl MemoryProtectionManager {
     }
 }
 
+/// Intel Memory Protection Keys (MPK) protection key identifier (0..15)
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct ProtectionKey(pub u8);
+
+impl ProtectionKey {
+    pub const KEY_DEFAULT: Self = ProtectionKey(0);
+    pub const KEY_MAX: u8 = 15;
+
+    pub fn new(key: u8) -> Option<Self> {
+        if key <= Self::KEY_MAX {
+            Some(ProtectionKey(key))
+        } else {
+            None
+        }
+    }
+}
+
+/// Access rights associated with a Memory Protection Key in PKRU register
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PkeyAccessRights {
+    ReadWrite = 0b00,
+    WriteDisable = 0b01,
+    AccessDisable = 0b11,
+}
+
+/// PKRU (Protection Key Rights User-level) hardware register abstraction
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct PkruRegister {
+    pub raw_bits: u32,
+}
+
+impl PkruRegister {
+    pub fn new(raw_bits: u32) -> Self {
+        Self { raw_bits }
+    }
+
+    pub fn allow_all() -> Self {
+        Self { raw_bits: 0 }
+    }
+
+    pub fn disable_all_except_default() -> Self {
+        // Disable access (AD=1, WD=1) for keys 1..15 -> 0xFFFFFFFC
+        Self { raw_bits: 0xFFFFFFFC }
+    }
+
+    /// Read PKRU register state via RDPKRU instruction
+    pub fn read_hardware() -> Self {
+        let pkru: u32;
+        #[cfg(target_arch = "x86_64")]
+        {
+            let ecx: u32 = 0;
+            let eax: u32;
+            let edx: u32;
+            unsafe {
+                core::arch::asm!(
+                    ".byte 0x0f, 0x01, 0xee", // rdpkru
+                    in("ecx") ecx,
+                    out("eax") eax,
+                    out("edx") edx,
+                    options(nomem, nostack, preserves_flags)
+                );
+            }
+            pkru = eax;
+        }
+        #[cfg(not(target_arch = "x86_64"))]
+        {
+            pkru = 0;
+        }
+        Self { raw_bits: pkru }
+    }
+
+    /// Write PKRU register state via WRPKRU instruction
+    pub fn write_hardware(&self) {
+        #[cfg(target_arch = "x86_64")]
+        {
+            let ecx: u32 = 0;
+            let edx: u32 = 0;
+            let eax: u32 = self.raw_bits;
+            unsafe {
+                core::arch::asm!(
+                    ".byte 0x0f, 0x01, 0xef", // wrpkru
+                    in("ecx") ecx,
+                    in("eax") eax,
+                    in("edx") edx,
+                    options(nomem, nostack, preserves_flags)
+                );
+            }
+        }
+    }
+
+    pub fn set_key_rights(&mut self, key: ProtectionKey, rights: PkeyAccessRights) {
+        let shift = (key.0 as u32) * 2;
+        let mask = !(0b11u32 << shift);
+        self.raw_bits = (self.raw_bits & mask) | ((rights as u32) << shift);
+    }
+
+    pub fn get_key_rights(&self, key: ProtectionKey) -> PkeyAccessRights {
+        let shift = (key.0 as u32) * 2;
+        let bits = (self.raw_bits >> shift) & 0b11;
+        match bits {
+            0b00 => PkeyAccessRights::ReadWrite,
+            0b01 => PkeyAccessRights::WriteDisable,
+            _ => PkeyAccessRights::AccessDisable,
+        }
+    }
+}
+
+/// Sovereign Intel MPK Hardware Management Engine
+pub struct SovereignIntelMpkEngine {
+    pub allocated_keys: HashMap<ProtectionKey, u64>, // key -> capability_token_hash
+    pub pledge_pkey_map: HashMap<String, ProtectionKey>, // pledge/unveil domain -> key
+    pub pkru_state: PkruRegister,
+}
+
+impl SovereignIntelMpkEngine {
+    pub fn new() -> Self {
+        let mut allocated = HashMap::new();
+        allocated.insert(ProtectionKey::KEY_DEFAULT, 0);
+
+        Self {
+            allocated_keys: allocated,
+            pledge_pkey_map: HashMap::new(),
+            pkru_state: PkruRegister::allow_all(),
+        }
+    }
+
+    /// Allocate a Protection Key for a capability token
+    pub fn allocate_pkey(&mut self, capability_token_hash: u64) -> Result<ProtectionKey, &'static str> {
+        for key_idx in 1..=ProtectionKey::KEY_MAX {
+            let pkey = ProtectionKey(key_idx);
+            if !self.allocated_keys.contains_key(&pkey) {
+                self.allocated_keys.insert(pkey, capability_token_hash);
+                return Ok(pkey);
+            }
+        }
+        Err("All hardware protection keys (PKEY 1..15) are allocated")
+    }
+
+    /// Free an allocated Protection Key
+    pub fn free_pkey(&mut self, key: ProtectionKey) -> bool {
+        if key == ProtectionKey::KEY_DEFAULT {
+            return false;
+        }
+        self.allocated_keys.remove(&key).is_some()
+    }
+
+    /// Map OpenBSD pledge/unveil domain to a hardware Protection Key
+    pub fn map_pledge_unveil_domain(&mut self, domain: &str, pkey: ProtectionKey) {
+        self.pledge_pkey_map.insert(domain.to_string(), pkey);
+    }
+
+    /// Enforce PKEY access restrictions for pledge/unveil domain
+    pub fn enforce_domain_isolation(&mut self, active_domain: &str) -> Result<PkruRegister, &'static str> {
+        let mut new_pkru = PkruRegister::disable_all_except_default();
+
+        if let Some(&allowed_key) = self.pledge_pkey_map.get(active_domain) {
+            new_pkru.set_key_rights(allowed_key, PkeyAccessRights::ReadWrite);
+            self.pkru_state = new_pkru;
+            Ok(new_pkru)
+        } else {
+            Err("Unrecognized pledge/unveil domain for PKEY isolation")
+        }
+    }
+
+    /// Verify whether a capability token possesses access to a hardware Protection Key
+    pub fn verify_capability_pkey_access(&self, capability_token_hash: u64, pkey: ProtectionKey) -> bool {
+        if pkey == ProtectionKey::KEY_DEFAULT {
+            return true;
+        }
+        self.allocated_keys.get(&pkey) == Some(&capability_token_hash)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -226,5 +399,45 @@ mod tests {
         manager.re_randomize_aslr();
         let new_offset = manager.get_aslr_offset();
         assert_ne!(initial_offset, new_offset);
+    }
+
+    #[test]
+    fn test_intel_mpk_protection_key() {
+        assert_eq!(ProtectionKey::new(0), Some(ProtectionKey(0)));
+        assert_eq!(ProtectionKey::new(15), Some(ProtectionKey(15)));
+        assert_eq!(ProtectionKey::new(16), None);
+    }
+
+    #[test]
+    fn test_pkru_register_rights() {
+        let mut pkru = PkruRegister::allow_all();
+        let pkey = ProtectionKey(3);
+        assert_eq!(pkru.get_key_rights(pkey), PkeyAccessRights::ReadWrite);
+
+        pkru.set_key_rights(pkey, PkeyAccessRights::WriteDisable);
+        assert_eq!(pkru.get_key_rights(pkey), PkeyAccessRights::WriteDisable);
+
+        pkru.set_key_rights(pkey, PkeyAccessRights::AccessDisable);
+        assert_eq!(pkru.get_key_rights(pkey), PkeyAccessRights::AccessDisable);
+    }
+
+    #[test]
+    fn test_sovereign_intel_mpk_engine_allocation_and_pledge() {
+        let mut mpk = SovereignIntelMpkEngine::new();
+        let token_hash = 0x1234_5678_9ABC_DEF0;
+
+        let pkey = mpk.allocate_pkey(token_hash).unwrap();
+        assert_ne!(pkey, ProtectionKey::KEY_DEFAULT);
+        assert!(mpk.verify_capability_pkey_access(token_hash, pkey));
+        assert!(!mpk.verify_capability_pkey_access(0x9999, pkey));
+
+        mpk.map_pledge_unveil_domain("stdio_rpath", pkey);
+        let pkru_state = mpk.enforce_domain_isolation("stdio_rpath").unwrap();
+
+        assert_eq!(pkru_state.get_key_rights(pkey), PkeyAccessRights::ReadWrite);
+        assert_eq!(pkru_state.get_key_rights(ProtectionKey(14)), PkeyAccessRights::AccessDisable);
+
+        assert!(mpk.free_pkey(pkey));
+        assert!(!mpk.free_pkey(pkey));
     }
 }
