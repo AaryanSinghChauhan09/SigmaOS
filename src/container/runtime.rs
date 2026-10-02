@@ -35,7 +35,8 @@ pub struct SeccompProfile {
     pub default_action: u32,
     pub allowed_syscalls: Vec<u32>,
     pub blocked_syscalls_mask: u64,
-    pub hardened: bool,}
+    pub hardened: bool,
+}
 
 #[derive(Debug, Clone)]
 pub struct SeccompProfileV2 {

@@ -8,8 +8,8 @@
 //! - Linux tracepoints: https://www.kernel.org/doc/html/latest/trace/tracepoints.html
 //! - eBPF: https://ebpf.io/
 
-use std::collections::HashMap;
 use core::sync::atomic::{AtomicU64, Ordering};
+use std::collections::HashMap;
 
 /// Tracepoint categories (inspired by Linux kernel tracing subsystem)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -91,19 +91,33 @@ pub struct PerfCounter {
 
 impl PerfCounter {
     pub fn new(t: PerfCounterType) -> Self {
-        Self { counter_type: t, value: AtomicU64::new(0), enabled: true, overflow_count: 0, sample_period: 0 }
+        Self {
+            counter_type: t,
+            value: AtomicU64::new(0),
+            enabled: true,
+            overflow_count: 0,
+            sample_period: 0,
+        }
     }
 
     pub fn increment(&self) {
-        if self.enabled { self.value.fetch_add(1, Ordering::Relaxed); }
+        if self.enabled {
+            self.value.fetch_add(1, Ordering::Relaxed);
+        }
     }
 
     pub fn add(&self, n: u64) {
-        if self.enabled { self.value.fetch_add(n, Ordering::Relaxed); }
+        if self.enabled {
+            self.value.fetch_add(n, Ordering::Relaxed);
+        }
     }
 
-    pub fn read(&self) -> u64 { self.value.load(Ordering::Relaxed) }
-    pub fn reset(&self) { self.value.store(0, Ordering::Relaxed); }
+    pub fn read(&self) -> u64 {
+        self.value.load(Ordering::Relaxed)
+    }
+    pub fn reset(&self) {
+        self.value.store(0, Ordering::Relaxed);
+    }
 }
 
 /// Probe type (inspired by DTrace probes and Linux kprobes/uprobes)
@@ -129,7 +143,7 @@ pub struct Probe {
     pub id: u64,
     pub probe_type: ProbeType,
     pub name: String,
-    pub target: String,  // function name, syscall name, or tracepoint name
+    pub target: String, // function name, syscall name, or tracepoint name
     pub enabled: bool,
     pub hit_count: u64,
 }
@@ -184,10 +198,17 @@ impl SigmaTrace {
     pub fn register_probe(&mut self, probe_type: ProbeType, name: &str, target: &str) -> u64 {
         let id = self.next_probe_id;
         self.next_probe_id += 1;
-        self.probes.insert(id, Probe {
-            id, probe_type, name: name.to_string(), target: target.to_string(),
-            enabled: true, hit_count: 0,
-        });
+        self.probes.insert(
+            id,
+            Probe {
+                id,
+                probe_type,
+                name: name.to_string(),
+                target: target.to_string(),
+                enabled: true,
+                hit_count: 0,
+            },
+        );
         id
     }
 
@@ -196,15 +217,27 @@ impl SigmaTrace {
         if let Some(p) = self.probes.get_mut(&probe_id) {
             p.enabled = enabled;
             true
-        } else { false }
+        } else {
+            false
+        }
     }
 
     /// Fire a probe — records an event and increments hit count.
-    pub fn fire_probe(&mut self, probe_id: u64, pid: u32, cpu: u32,
-                      comm: &str, fields: Vec<(String, TraceValue)>) -> Option<u64> {
-        if !self.enabled { return None; }
+    pub fn fire_probe(
+        &mut self,
+        probe_id: u64,
+        pid: u32,
+        cpu: u32,
+        comm: &str,
+        fields: Vec<(String, TraceValue)>,
+    ) -> Option<u64> {
+        if !self.enabled {
+            return None;
+        }
         let probe = self.probes.get_mut(&probe_id)?;
-        if !probe.enabled { return None; }
+        if !probe.enabled {
+            return None;
+        }
         probe.hit_count += 1;
         self.total_probe_hits += 1;
         let event_id = self.next_event_id.fetch_add(1, Ordering::Relaxed);
@@ -217,7 +250,10 @@ impl SigmaTrace {
             },
             name: probe.name.clone(),
             timestamp_ns: event_id * 1000, // simulated timestamps
-            cpu, pid, comm: comm.to_string(), data: fields,
+            cpu,
+            pid,
+            comm: comm.to_string(),
+            data: fields,
         };
         if self.event_buffer.len() >= self.max_events {
             self.event_buffer.remove(0); // drop oldest
@@ -229,12 +265,16 @@ impl SigmaTrace {
 
     /// Increment a performance counter.
     pub fn perf_inc(&self, counter: PerfCounterType) {
-        if let Some(c) = self.counters.get(&counter) { c.increment(); }
+        if let Some(c) = self.counters.get(&counter) {
+            c.increment();
+        }
     }
 
     /// Increment a performance counter by N.
     pub fn perf_add(&self, counter: PerfCounterType, n: u64) {
-        if let Some(c) = self.counters.get(&counter) { c.add(n); }
+        if let Some(c) = self.counters.get(&counter) {
+            c.add(n);
+        }
     }
 
     /// Read a performance counter value.
@@ -244,7 +284,9 @@ impl SigmaTrace {
 
     /// Reset all performance counters.
     pub fn perf_reset_all(&self) {
-        for c in self.counters.values() { c.reset(); }
+        for c in self.counters.values() {
+            c.reset();
+        }
     }
 
     /// Drain and return captured events.
@@ -254,20 +296,37 @@ impl SigmaTrace {
 
     /// Get events by category.
     pub fn events_by_category(&self, cat: TraceCategory) -> Vec<&TraceEvent> {
-        self.event_buffer.iter().filter(|e| e.category == cat).collect()
+        self.event_buffer
+            .iter()
+            .filter(|e| e.category == cat)
+            .collect()
     }
 
     /// Get probe statistics.
     pub fn probe_stats(&self) -> Vec<(u64, &str, u64, bool)> {
-        self.probes.values().map(|p| (p.id, p.name.as_str(), p.hit_count, p.enabled)).collect()
+        self.probes
+            .values()
+            .map(|p| (p.id, p.name.as_str(), p.hit_count, p.enabled))
+            .collect()
     }
 }
 
 /// Convenience macro-like function for emitting a syscall tracepoint.
-pub fn trace_syscall(tracer: &mut SigmaTrace, probe_id: u64, pid: u32, syscall: &str, args: &[u64]) {
-    let fields: Vec<(String, TraceValue)> = args.iter().enumerate()
+pub fn trace_syscall(
+    tracer: &mut SigmaTrace,
+    probe_id: u64,
+    pid: u32,
+    syscall: &str,
+    args: &[u64],
+) {
+    let fields: Vec<(String, TraceValue)> = args
+        .iter()
+        .enumerate()
         .map(|(i, &v)| (format!("arg{}", i), TraceValue::Uint(v)))
-        .chain(std::iter::once(("syscall".to_string(), TraceValue::Str(syscall.to_string()))))
+        .chain(std::iter::once((
+            "syscall".to_string(),
+            TraceValue::Str(syscall.to_string()),
+        )))
         .collect();
     tracer.fire_probe(probe_id, pid, 0, "kernel", fields);
 }
@@ -280,8 +339,13 @@ mod tests {
     fn test_register_and_fire_probe() {
         let mut tracer = SigmaTrace::new(100);
         let pid = tracer.register_probe(ProbeType::SyscallEntry, "sys_read", "read");
-        tracer.fire_probe(pid, 1234, 0, "bash",
-            vec![("fd".to_string(), TraceValue::Int(3))]);
+        tracer.fire_probe(
+            pid,
+            1234,
+            0,
+            "bash",
+            vec![("fd".to_string(), TraceValue::Int(3))],
+        );
         assert_eq!(tracer.probes[&pid].hit_count, 1);
         assert_eq!(tracer.total_events, 1);
     }

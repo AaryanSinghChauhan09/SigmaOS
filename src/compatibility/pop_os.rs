@@ -3,8 +3,8 @@
 
 extern crate alloc;
 use alloc::collections::BTreeMap;
-use alloc::vec::Vec;
 use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 
 /// Node in Binary Space Partitioning (BSP) window layout tree
 #[derive(Debug, Clone, PartialEq, Eq)]
