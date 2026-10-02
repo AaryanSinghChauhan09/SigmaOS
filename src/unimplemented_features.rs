@@ -4092,12 +4092,7 @@ mod extra_unimplemented_tests {
 // TECH MEDIA & BENCHMARK INTELLIGENCE AGGREGATOR ENGINE
 // =========================================================================
 
-
-// =========================================================================
-// TECH MEDIA & ENTERPRISE FRAMEWORK INSPIRED ENGINES
-// =========================================================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum TechMediaPortal {
     ItsFoss,
     NineToFiveLinux,
@@ -4119,17 +4114,16 @@ pub struct TechMediaFeedItem {
     pub recommended_app: String,
 }
 
+#[derive(Debug, Clone, Default)]
 pub struct TechMediaIntelligenceAggregatorEngine {
     pub feed_items: Vec<TechMediaFeedItem>,
 }
 
 impl TechMediaIntelligenceAggregatorEngine {
     pub fn new() -> Self {
-        let mut engine = Self {
+        Self {
             feed_items: Vec::new(),
-        };
-        engine.seed_curated_media_feeds();
-        engine
+        }
     }
 
     pub fn seed_curated_media_feeds(&mut self) {
@@ -4246,9 +4240,34 @@ impl TechMediaIntelligenceAggregatorEngine {
     }
 }
 
-impl Default for TechMediaIntelligenceAggregatorEngine {
-    fn default() -> Self {
-        Self::new()
+// =========================================================================
+// TECH MEDIA & ENTERPRISE FRAMEWORK INSPIRED ENGINES
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct DocField {
+    pub fieldname: String,
+    pub fieldtype: String,
+    pub label: String,
+    pub reqd: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct FrappeFrameworkDocTypeEngine {
+    pub doctype_name: String,
+    pub fields: Vec<DocField>,
+    pub workflow_state: String,
+    pub is_submittable: bool,
+}
+
+impl FrappeFrameworkDocTypeEngine {
+    pub fn new(doctype_name: &str) -> Self {
+        Self {
+            doctype_name: doctype_name.to_string(),
+            fields: Vec::new(),
+            workflow_state: "Draft".to_string(),
+            is_submittable: true,
+        }
     }
 }
 
@@ -4447,6 +4466,7 @@ mod new_unimplemented_tests {
     #[test]
     fn test_tech_media_intelligence_aggregator_engine() {
         let mut aggregator = TechMediaIntelligenceAggregatorEngine::new();
+        aggregator.seed_curated_media_feeds();
         aggregator.ingest_portal_item(
             TechMediaPortal::ItsFoss,
             "It's FOSS",
