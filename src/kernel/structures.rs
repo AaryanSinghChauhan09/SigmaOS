@@ -268,7 +268,10 @@ impl AdvancedAlgorithmsManager {
                         None => best_idx = Some(idx),
                         Some(best) => {
                             if task.absolute_deadline
-                                < queue[best].as_ref().map(|t| t.absolute_deadline).unwrap_or(u64::MAX)
+                                < queue[best]
+                                    .as_ref()
+                                    .map(|t| t.absolute_deadline)
+                                    .unwrap_or(u64::MAX)
                             {
                                 best_idx = Some(idx);
                             }

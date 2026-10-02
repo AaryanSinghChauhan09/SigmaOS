@@ -136,9 +136,6 @@ use community_toolkit::{
     CommunityHandbookCatalog, PackageRecipe, RecipeSourceFormat, ReproduciblePackageRecipeManager,
     SecurityProfileTemplateStore,
 };
-use statutory_compliance::{
-    DisputeAuditRollbackEngine, PenaltyBreachNotifier, StatutoryGovernanceLayer,
-};
 use pipes::Pipe;
 use process_activity_manager::{
     ActivityManager, ActivityState, RegisterSnapshot as ProcRegisterSnapshot,
@@ -149,6 +146,9 @@ use statutory_compliance::{
     ComplianceRuleStatus, DisputeAuditRollbackEngine, PenaltyBreachNotifier, StatutoryFramework,
     StatutoryGovernanceLayer, StatutoryGovernanceRule,
 };
+use statutory_compliance::{
+    DisputeAuditRollbackEngine, PenaltyBreachNotifier, StatutoryGovernanceLayer,
+};
 use system_user::UserManager as TestUserManager;
 use task_scheduler::{
     Priority, PriorityScheduler, Scheduler, Task, TaskCapability, TaskWorkloadType,
@@ -156,9 +156,7 @@ use task_scheduler::{
 use unveil::{UnveilManager, UnveilPermission};
 use video_editor::{ExportFormat, ExportProfile, VideoClip, VideoTimeline, VideoTrack};
 
-use access_control::{
-    NtfsAce, NtfsDacl, PosixAclTable, SecurityIdentifier,
-};
+use access_control::{NtfsAce, NtfsDacl, PosixAclTable, SecurityIdentifier};
 use alpc::{alpc_flags, AlpcFacility, AlpcManager, AlpcMessage};
 use audio_editor::{AudioEffect, AudioTrack, MultiTrackSession, SpectralNoiseSuppressionEffect};
 use bitmap_pmm::{
@@ -187,17 +185,19 @@ use task_scheduler::{
     Priority, PriorityScheduler, Scheduler, Task, TaskCapability, TaskWorkloadType,
 };
 
+use audio_editor::{AudioEffect, AudioTrack, MultiTrackSession, SpectralNoiseSuppressionEffect};
+use cachy_os::{AnanicyManager, BoreSchedulerGovernor, SchedPolicy};
+use chimera_linux::{
+    ApkPackageMetadata, ApkPackageStore, BsdUserlandCompat, DinitService, DinitServiceManager,
+};
+use debian_compat::{AptRepositorySync, DebianAlternativesSystem, DebianChannel};
+use endeavour_os::{AurPackageSpec, PacmanMirror, ReflectorMirrorManager, YayParuHelper};
+use fedora_compat::{DnfPackageResolver, SeLinuxContext, SeLinuxEngine};
+use geom::{BioRequest, GeomProvider, GeomTopology};
 use pipes::Pipe;
-use unveil::{UnveilManager, UnveilPermission};
-use geom::{GeomProvider, GeomTopology, BioRequest};
-use audio_editor::{MultiTrackSession, AudioTrack, SpectralNoiseSuppressionEffect, AudioEffect};
-use video_editor::{VideoTimeline, VideoTrack, VideoClip, ExportProfile, ExportFormat};
-use chimera_linux::{DinitServiceManager, DinitService, BsdUserlandCompat, ApkPackageStore, ApkPackageMetadata};
-use debian_compat::{DebianAlternativesSystem, AptRepositorySync, DebianChannel};
-use cachy_os::{BoreSchedulerGovernor, AnanicyManager, SchedPolicy};
-use endeavour_os::{ReflectorMirrorManager, PacmanMirror, YayParuHelper, AurPackageSpec};
-use fedora_compat::{DnfPackageResolver, SeLinuxEngine, SeLinuxContext};
 use sigmatools::*;
+use unveil::{UnveilManager, UnveilPermission};
+use video_editor::{ExportFormat, ExportProfile, VideoClip, VideoTimeline, VideoTrack};
 
 use sigma_fs_extended::{Blake3BlockDeduplicationEngine, PfsType, PseudoFilesystemNamespace};
 
@@ -231,7 +231,11 @@ fn test_segmentation_paging_and_aslr() {
     let code_desc = SegmentDescriptor::code_segment_ring0();
     assert_eq!(code_desc.base_address, 0);
 
-    let aslr = RandomizedAddressSpace::compute_aslr_layout(0x0000_0000_0040_0000, AslrEntropyConfig::linux_default(), 0x12345678);
+    let aslr = RandomizedAddressSpace::compute_aslr_layout(
+        0x0000_0000_0040_0000,
+        AslrEntropyConfig::linux_default(),
+        0x12345678,
+    );
     assert!(aslr.text_base >= 0x0000_0000_0040_0000);
 }
 
@@ -299,7 +303,10 @@ fn test_process_activity_manager_and_registers() {
     pam.capture_register_snapshot(500, ctx).unwrap();
 
     let proc_after = pam.get_process_activity(500).unwrap();
-    assert_eq!(proc_after.register_snapshot.unwrap().rip, 0x00007FFF00002000);
+    assert_eq!(
+        proc_after.register_snapshot.unwrap().rip,
+        0x00007FFF00002000
+    );
 }
 
 #[test]
@@ -768,7 +775,10 @@ fn test_statutory_compliance_overlay_and_community_toolkit() {
 
     let mut rollback = DisputeAuditRollbackEngine::new();
     rollback.create_audit_checkpoint(100, "hash:state100");
-    assert_eq!(rollback.rollback_dispute_checkpoint(100).unwrap(), "hash:state100");
+    assert_eq!(
+        rollback.rollback_dispute_checkpoint(100).unwrap(),
+        "hash:state100"
+    );
 
     let handbook = CommunityHandbookCatalog::new();
     assert!(!handbook.search_articles("SigmaOS").is_empty());

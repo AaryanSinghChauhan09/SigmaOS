@@ -25,7 +25,8 @@ pub enum PowerState {
     FullOn,
     Standby,
     Sleep,
-    Unknown,}
+    Unknown,
+}
 
 pub trait BareMetalUnifiedPeripheral {
     fn initialize(&mut self) -> Result<(), &'static str>;
