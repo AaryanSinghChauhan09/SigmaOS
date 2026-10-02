@@ -74,22 +74,22 @@ pub mod compat_layers;
 pub mod compliance;
 pub mod debian_parity;
 pub mod developer;
-pub mod distro_inspiration_synthesis;
-pub use distro_inspiration_synthesis::*;
-pub mod linux_bsd_ultimate_synthesis;
-pub use linux_bsd_ultimate_synthesis::*;
-pub mod linux_bsd_advanced_synthesis;
-pub use linux_bsd_advanced_synthesis::*;
-pub mod distro_inspiration_engine;
-pub use distro_inspiration_engine::{
-    AlpineLbuApkOverlayEngine, ApkovlCommit, ArcCacheBlock, ArcState, ClearLinuxIsaSelectorEngine,
-    DragonFlyHammer2ClusterEngine, FreeBsdZfsArcGeomEngine, GenerationRecord, Hammer2DedupEntry,
-    IsaLevel, MuslLightweightInitEngine, MuslStaticService,
-    NixOsDeclarativeStateReconciliationEngine, NixOsPureStoreDerivationEngine,
-    OpenBsdStatefulPacketFilterEngine, OpenWrtUciSqmRouterEngine, PaxSecurityLevel, PfProtocol,
-    PfStateEntry, PortageUseFlag, PortageUseFlagGovernor, QubeDomainType,
-    QubesHardenedBsdSecurityGuard, ServiceRunState, SqmAlgorithm, StoreDerivationPath, UciSection,
-    UseFlagState, VoidRunitStageController,
+pub mod enterprise;
+pub mod i18n;
+pub mod manjaro;
+pub mod nextgen;
+pub mod recovery;
+pub mod specialized;
+pub mod tiny_core;
+pub mod transformation_engine;
+pub mod preseed;
+pub mod linux_bsd_inspirations;
+
+pub use linux_bsd_inspirations::{
+    ArchDependencyResolver, PackageNode, FreeBSDJail, OpenBSDPledge, NixStyleStore,
+    PinRule, AptPinStore, OpenRCService, SovereignDTraceEngine, DTraceProvider, DTraceAggregation,
+    SovereignRaidSelfHealer, RaidLevel, ScrubResult, SovereignDeclarativeSystemEngine,
+    RollbackStatus, SovereignPrivSepSandbox, PrivSepProcessRole,
 };
 pub mod ecosystem_dimensions;
 pub mod endeavour_os;

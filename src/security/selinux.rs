@@ -146,21 +146,113 @@ impl SELinuxPolicy {
         target_type: &str,
         target_class: &str,
         permission: &str,
-    ) -> bool {
-        for rule in &self.rules {
-            if let PolicyRule::Allow {
-                source_type: src,
-                target_type: tgt,
-                target_class: cls,
-                permissions,
-            } = rule
-            {
-                if src == source_type
-                    && tgt == target_type
-                    && cls == target_class
-                    && permissions.contains(&permission.to_string())
-                {
-                    return true;
+    ) -> Result<bool, &'static str> {
+        if self.mode == SeLinuxMode::Disabled {
+            return Ok(true);
+        }
+
+        let src_context = SecurityContext::parse(source)?;
+        let tgt_context = SecurityContext::parse(target)?;
+
+        let avc_key = AvcKey {
+            source_type: src_context.type_name.clone(),
+            target_type: tgt_context.type_name.clone(),
+            class: class.to_string(),
+            permission: permission.to_string(),
+        };
+
+        // Query AVC cache
+        let allowed = if let Some(decision) = self.avc.query(&avc_key) {
+            decision
+        } else {
+            let decision = self.policies.contains(&avc_key);
+            self.avc.insert(avc_key, decision);
+            decision
+        };
+
+        if !allowed {
+            // Log audit failure to memory buffer in standard auditd format
+            let audit_entry = format!(
+                "type=AVC msg=audit(1700000000.123:456): avc:  denied  {{ {} }} for  pid=1234 comm=\"service\" \
+                 scontext={} tcontext={} tclass={}",
+                permission, source, target, class
+            );
+            self.audit_logs.push(audit_entry);
+
+            if self.mode == SeLinuxMode::Enforcing {
+                return Ok(false); // Gated!
+            } else {
+                // Permissive mode allows but audits the alert
+                return Ok(true);
+            }
+        }
+
+        Ok(true)
+    }
+}
+
+
+/// Multi-Level Security (MLS) sensitivity levels
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum SensitivityLevel {
+    Unclassified = 0,
+    Confidential = 1,
+    Secret = 2,
+    TopSecret = 3,
+}
+
+/// Dynamic Mandatory Access Control (MAC) MLS/MCS Enforcer (RHEL Parity)
+pub struct DynamicMacEnforcer {
+    pub process_levels: HashMap<String, SensitivityLevel>,
+    pub object_levels: HashMap<String, SensitivityLevel>,
+    pub process_categories: HashMap<String, HashSet<u32>>,
+    pub object_categories: HashMap<String, HashSet<u32>>,
+}
+
+impl DynamicMacEnforcer {
+    pub fn new() -> Self {
+        Self {
+            process_levels: HashMap::new(),
+            object_levels: HashMap::new(),
+            process_categories: HashMap::new(),
+            object_categories: HashMap::new(),
+        }
+    }
+
+    pub fn set_process_level(&mut self, process_id: &str, level: SensitivityLevel, categories: HashSet<u32>) {
+        self.process_levels.insert(process_id.to_string(), level);
+        self.process_categories.insert(process_id.to_string(), categories);
+    }
+
+    pub fn set_object_level(&mut self, object_id: &str, level: SensitivityLevel, categories: HashSet<u32>) {
+        self.object_levels.insert(object_id.to_string(), level);
+        self.object_categories.insert(object_id.to_string(), categories);
+    }
+
+    /// Read access check: No Read Up (Simple Security Property - Bell-LaPadula)
+    pub fn can_read(&self, process_id: &str, object_id: &str) -> bool {
+        let p_level = match self.process_levels.get(process_id) {
+            Some(lvl) => *lvl,
+            None => return false,
+        };
+        let o_level = match self.object_levels.get(object_id) {
+            Some(lvl) => *lvl,
+            None => return false,
+        };
+
+        if p_level < o_level {
+            return false; // Read Up prohibited
+        }
+
+        // Category containment check (MCS)
+        if let Some(o_cats) = self.object_categories.get(object_id) {
+            if !o_cats.is_empty() {
+                let p_cats = match self.process_categories.get(process_id) {
+                    Some(cats) => cats,
+                    None => return false,
+                };
+                if !o_cats.is_subset(p_cats) {
+                    return false;
                 }
             }
         }

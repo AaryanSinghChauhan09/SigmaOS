@@ -4,9 +4,7 @@
 
 use crate::klib::collections::HashMap;
 use core::sync::atomic::{AtomicUsize, Ordering};
-use std::boxed::Box;
-use std::string::{String, ToString};
-use std::vec::Vec;
+use crate::klib::collections::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ObjectError {

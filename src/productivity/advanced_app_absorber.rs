@@ -6,9 +6,10 @@ use std::vec::Vec;
 // Absorbs and implements cutting-edge concepts, tools, and designs from industry-standard apps:
 // IrfanView, PotPlayer, VLC, Flameshot, ShareX, OBS Studio, Everything, 7-Zip, OneCommander, Brave, EarTrumpet, Audacity, Notepad++.
 
-use crate::klib::HashMap;
-use std::collections::{BTreeMap, VecDeque};
-// str/String not in no_std
+use std::path::Path;
+use crate::klib::collections::{BTreeMap, HashMap, VecDeque};
+use crate::klib::path::PathBuf;
+use crate::klib::Uuid;
 
 // =========================================================================
 // 1. FLAMESHOT & SHAREX PARITY: ADVANCED SCREENSHOT ENGINE

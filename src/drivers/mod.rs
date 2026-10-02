@@ -30,14 +30,9 @@ pub mod touch_jingos;
 pub mod usb_hid;
 pub mod vesa;
 
-pub use printing::{CupsIppPrintSpooler, LpdSpooler, PpdDriverMatcher, PrintJob, PrintJobState};
-pub use sovereign_comprehensive_drivers::*;
-
-pub use ata_bus_controller::{
-    AhciNcqSlot, AtaBusControllerEngine, AtaBusType, AtaCommand, AtaDeviceIdentity,
-    AtapiPacketCdb12, AtapiPacketDispatcher, IdeBusMasterDmaEngine, IdeChannel, IdeDriveSelect,
-    IdePioTransferEngine, IdePrdEntry, AHCI_MAX_NCQ_TAGS, ATA_SECTOR_SIZE_BYTES, ATA_STATUS_BSY,
-    ATA_STATUS_DF, ATA_STATUS_DRDY, ATA_STATUS_DRQ, ATA_STATUS_ERR,
+pub use gpu::{
+    GpuCommand, GpuCommandBuffer, GpuDriver, GpuError, GpuPipeline,
+    GpuResetState, GpuShader, ShaderStage,
 };
 pub use gpu::{GpuCommand, GpuDriver, GpuError};
 pub use input::{InputDriver, InputEvent, InputType};
@@ -81,19 +76,9 @@ pub use sovereign_usb_xhci::{
 pub use storage::{StorageCommand, StorageDriver, StorageError, StorageType};
 pub use usb_hid::{HidError, HidKeyboardEvent, HidReportType, UsbHidDriver};
 pub use vesa::{VesaDriver, VesaError, VesaModeInfo};
-
-pub use distro_device_expansion::*;
-
-pub mod universal_device_matrix;
-pub use universal_device_matrix::*;
-
-pub mod sovereign_hardware_roadmap;
-pub use sovereign_hardware_roadmap::{
-    SigmaDriverShard, ForeignDriverOrigin, CrossOsDriverAdapter, DeclarativeDriverProfileConfig,
-    SigmaHotplugOrchestrator, DriverSandboxDomain, SigmaSandboxedHardwareModule,
-    SigmaFirmwareBridge, SigmaFirmwareFreeDriver, SecurePeripheralIsolationGuard,
-    SigmaDriverLayeringSystem, ClusterDeviceResource, SigmaDeviceClusterPool,
-    SigmaProgrammableIoStack, TargetCpuArch, CrossArchDriverPortability,
-    DriverSovereigntyPolicy, SigmaHardwarePolicyEngine, SigmaCryptographicBootChain,
-    SigmaHardwareSovereigntyRoadmapEngine,
-};
+pub use legacy_audio_ac97::LegacyAudioAc97;
+pub use modern_audio_intel_hda::ModernAudioIntelHda;
+pub use modern_nvme::ModernNvmeDriver;
+pub use modern_usb_printer::ModernUsbPrinterDriver;
+pub use modern_wifi::ModernWifiDriver;
+pub use touch_jingos::TouchJingosDriver;

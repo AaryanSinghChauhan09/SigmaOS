@@ -1,6 +1,14 @@
 /// OOP-based Volume Management for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 241
 /// Implements logical volume management
+
+extern crate alloc;
+
+#[cfg(not(target_os = "none"))]
+use alloc::boxed::Box;
+#[cfg(not(target_os = "none"))]
+use alloc::vec::Vec;
+
 use core::sync::atomic::{AtomicUsize, Ordering};
 use std::boxed::Box;
 use std::vec::Vec;
@@ -290,22 +298,8 @@ impl SnapshotManager for SimpleSnapshotManager {
 }
 
 #[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
+pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
 impl<T> Vec<T> {
     fn new() -> Self {
@@ -362,7 +356,5 @@ impl<T> Vec<T> {
     }
 }
 
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
+#[cfg(target_os = "none")]
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }

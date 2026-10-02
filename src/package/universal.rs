@@ -12,9 +12,7 @@ use alloc::vec::Vec;
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
 
-// Zero-dependency architecture: Use klib primitives for no_std compatibility
-use std::collections::{HashMap, HashSet};
-use std::sync::Arc;
+use crate::klib::collections::HashMap;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
 use crate::runtime::node_distribution::{NodeBinaryDistroEngine, NodeBinaryPackage};

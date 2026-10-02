@@ -1,10 +1,12 @@
 // SigmaOS Linux Open vSwitch & BSD if_bridge Virtual Ethernet Switch Engine
 // MAC Forwarding Database (FDB), 802.1Q VLAN Tagging/Trunking, STP Spanning Tree, SPAN Mirroring, & LACP
 
-use std::collections::BTreeMap;
-use std::string::String;
-use std::string::ToString;
-use std::vec::Vec;
+use alloc::string::String;
+use alloc::string::ToString;
+use alloc::vec::Vec;
+extern crate alloc;
+use alloc::format;
+use alloc::collections::BTreeMap;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SwitchPortMode {

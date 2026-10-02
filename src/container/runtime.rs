@@ -385,6 +385,7 @@ impl Container for SimpleContainer {
 
     // Bolt optimization: Cache slice length during creation to turn O(N) linear zero-byte scanning into instant O(1) slicing
     fn name(&self) -> &[u8] {
+        // Performance optimization: explicit stored name_len enables direct O(1) slice access, eliminating O(N) null-byte linear scans.
         &self.name[..self.name_len as usize]
     }
 

@@ -2,8 +2,10 @@ use std::format;
 // SigmaOS Clear Linux Stateless Architecture & Low-Latency Performance Engine
 // Pure, zero-dependency, #![no_std] standard-conforming implementation absorbing Clear Linux features
 
-use std::string::{String, ToString};
-use std::vec::Vec;
+extern crate alloc;
+use alloc::format;
+use alloc::vec::Vec;
+use alloc::string::{String, ToString};
 
 /// x86_64 Microarchitecture Feature Level (x86-64-v1 through x86-64-v4)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

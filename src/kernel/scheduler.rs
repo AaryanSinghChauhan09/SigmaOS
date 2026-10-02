@@ -1,8 +1,12 @@
 // Process Scheduler Enhancements
 // Inspired by Linux CFS, RT scheduler, and energy-aware scheduling
 
-use std::collections::BinaryHeap;
-use std::sync::atomic::{AtomicU32, AtomicU64, Ordering};
+extern crate alloc;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
+use core::cmp::Ordering;
+use core::time::Duration;
 
 /// Process priority
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]

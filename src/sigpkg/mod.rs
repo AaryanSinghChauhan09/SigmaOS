@@ -76,6 +76,7 @@ pub use universal_engine::{
 };
 pub use universal_oop_system::*;
 pub mod verifier;
+pub mod universal_adapter;
 pub mod zero_alloc_resolver;
 
 pub use crate::package::sovereign_distro_package_matrix::*;
@@ -184,6 +185,15 @@ pub use pacman_contrib::{
     PacLogEntry, PackageCacheEntry, PendingUpdate, SyncPackage, UpdPkgSumsGenerator,
 };
 pub use portage::{EbuildSpec, PortageResolver, Slot, UseFlag};
+pub use spec::{
+    ManagerCapability, PackageCapability,
+    PackageDependency, PackageError as SpecPackageError, PackageInfo, PackageManager as SpecPackageManager, PackageStats, PackageVersion,
+    SimplePackage, SimplePackageManager,
+    CachyCpuDetector, CachyosPackageAdapter, CpuArchLevel,
+    UniversalPackage, UniversalPackageType, UserDefinedPackageHook,
+};
+pub use universal_adapter::{AdapterError, DebAdapter, RpmAdapter, PacmanAdapter};
+pub use zero_alloc_resolver::{PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES};
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use resolver::SatSolver;
 pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};

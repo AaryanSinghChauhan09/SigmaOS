@@ -19,22 +19,18 @@ pub mod canonical;
 pub mod chakra;
 pub mod chimera_linux;
 pub mod clear_linux;
-pub mod community_foundation;
-pub mod constellation;
-pub mod constellation_mesh;
-pub mod cross_platform;
-pub mod cross_platform_kernel;
-pub mod debian;
-pub use debian::*;
-pub mod distro_bridge;
-pub mod dragonfly_bsd;
-pub mod elf_execution;
-pub mod endeavour;
-pub mod federation;
-pub mod fedora;
-pub use fedora::*;
-pub mod fedora_domination;
-pub mod fedora_missing_components;
+pub mod antix;
+pub mod zorin;
+
+pub use antix::{
+    AntiXInitSystem, AntiXServiceState, AntiXService, AntiXInitSwitcher,
+    AntiXPersistenceMode, AntiXPersistenceManager, AntiXSystemRemasterEngine,
+    AntiXControlCentre,
+};
+pub use zorin::{
+    ZorinLayout, ZorinLayoutMetrics, ZorinLayoutSwitcher, ZorinChameleonColor,
+    ZorinChameleonEngine, ZorinConnectState, ZorinConnectManager, ZorinWindowsAppSupport,
+};
 
 pub use fedora_domination::*;
 pub use fedora_missing_components::{
@@ -197,10 +193,12 @@ pub use lubuntu::{
 };
 
 pub use cross_platform_kernel::{
-    DeferredProcedureCall, IdtEntry, Idtr, Irql, IrqlController, Kpcr, Kpcrb, MemoryArch,
-    PageAccessMode, PageDirectory as CrossPlatformPageDirectory, SovereignKernelInternals,
-    SystemServiceTable, UmsContext, UmsThreadState,
+    PageAccessMode, MemoryArch, PageDirectory, DeferredProcedureCall,
+    Kpcrb, Kpcr, Irql, IrqlController, IdtEntry, Idtr, SystemServiceTable,
+    UmsThreadState, UmsContext, SovereignKernelInternals,
 };
+
+pub mod historic_linux;
 
 pub use historic_linux::{
     Era0_11SyscallEmulator, Era1_0SyscallEmulator, Era2_4SyscallEmulator, HistoricError,

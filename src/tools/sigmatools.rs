@@ -1279,7 +1279,6 @@ impl SovereignPasswordGenerator {
 #[cfg(test_disabled)]
 mod replicated_tests {
     use super::*;
-    use crate::*;
 
     #[test]
     fn test_dpkg_etcher() {

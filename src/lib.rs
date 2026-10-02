@@ -2,14 +2,12 @@
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
-extern crate alloc;
-
-// Core working modules
-pub mod open_source_os_gap_closure;
+pub mod access;
 pub mod accessibility;
-pub mod ai;
-pub mod app;
-pub mod auth;
+pub mod audio;
+pub mod ipc;
+pub mod storage;
+pub mod system;
 pub mod automation;
 pub mod build;
 pub mod community;
@@ -233,9 +231,13 @@ pub use driver::{
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
 };
-pub use governance::{
-    FoundationModel, FoundationMember, ReleaseType, RoadmapMilestone, TransparentRoadmap,
-    DemocraticProposal, DemocraticVoting,
+pub use kernel::{
+    AiNativeRuntime, BuddyAllocator, Channel, EnergyAwareScheduler, FastPathIpc,
+    InterruptMechanism, IpcError, IpcManager,
+    MemoryBlock, Message, PAGE_SIZE, PolicyError, PolicyManager, PrivacyFirstSandbox, Priority, ProcessState,
+    ProtectionDomain, PrivilegeLevel, ResourceBroker, RoundRobinConfig, RoundRobinScheduler,
+    Scheduler, SchedulerError, SelfHealingKernel, SigmaFsPlusPlus, UniversalAbiTranslator,
+    UserDefinedKernelFunctions,
 };
 // pub use ipc::{
 //     StandardStreamController, StandardStreamHandle, StreamBufferMode, StreamTeeSpliceRouter,
@@ -304,39 +306,43 @@ pub use shell::{
     SimpleShellSession as ShellRepl, ZshPromptFormatter,
 };
 pub use sigpkg::{
-    AptDebManifest, BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError,
-    RecipeManager, SatSolver, Transaction,
-};
-pub use unimplemented_tools::{
-    AdaptiveUxAgent, AiAnomalyFirewall, AiCodeAssistant, AiDependencyResolver,
-    AiDifficultyDirector, AiFileOrganizer, AiScheduler, AiSearchAssistant, AiTaskbar,
-    AppSandboxing, AudioEditor, CloudBackupUtility, CloudGaming, CodeProfiler, ControllerMapper,
-    CrossDeviceSync, CrossLanguageBuildTool, DeclarativeBuildSystem, DocumentScanner,
-    EmulatorManager, FlatpakSnapLayer, GameHubLauncher, GameModManager, GamePerformanceBooster,
-    GameRecorder, GamifiedTodo, GanttChartPlanner, GestureControl, GuiAppStore, IotDeviceManager,
-    MemoryLeakDetector, MeshNetworking, MindMapCreator, MultiMonitorManager, MusicLibraryManager,
-    NaturalLanguageShell, OfflinePackageInstaller, PackagePublishingHub, PdfEditor,
-    PluginMarketplace, PodcastRecorder, PrivacyDashboard, SecureContainer, SecureFileSharing,
-    SmartNotificationManager, StaticAnalyzer, SubtitleEditor, VoiceControl, VrArRuntime,
+    BuildSystem, ContentAddressedStore, CryptoVerifier, PackageDependencyResolver, RecipeError, RecipeManager,
+    SatSolver, Transaction, Version, MAX_RECIPE_DEPENDENCIES, AdapterError,
+    DebAdapter, RpmAdapter, PacmanAdapter,
 };
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
 };
 
-pub mod distro;
-pub mod distro_innovations;
-pub mod distro_inspirations;
-pub mod innovation;
-pub mod input;
-pub mod integration;
-pub mod iot;
-pub mod ipc;
-pub use ipc::{
-    AsyncIoRingEngine, CompletionQueueEntry, IoOpCode, KqueueAioFilter,
-    LinuxBsdUniversalIoSubsystemEngine, OpenBsdIoPledgeRights, PosixAioControlBlock,
-    SubmissionQueueEntry, IORING_SETUP_CQSIZE, IORING_SETUP_IOPOLL, IORING_SETUP_SQPOLL,
-    IORING_SETUP_SQ_AFF,
+pub use thread::{Thread, ThreadError, Mutex as ThreadMutex};
+
+pub use process::spawn::{
+    ProcessID, ProcessState as LibProcessState, ProcessError, Process, SimpleProcess, ProcessSpawner, SimpleProcessSpawner, ProcessWaiter, SimpleProcessWaiter, ProcessGroup, SimpleProcessGroup,
+    CLONE_NEWNS, CLONE_NEWNET, CLONE_NEWPID,
+};
+pub use process::activity_manager::{
+    ActivityManager, ActivityState, ProcessActivityRecord, RegisterSnapshot, AddressSpaceBinding,
+};
+pub use memory::segmentation_paging::{
+    AddressBindingMode, AddressType, AslrEntropyConfig, CpuRing, ExecutableAddressBinding,
+    RandomizedAddressSpace, SegmentDescriptor, SegmentSelector, SegmentationPagingEngine,
+    SpaceProtectionFlags, SystemControlRegisters,
+};
+
+pub use community::toolkit::{
+    ArticleCategory, CommunityHandbookCatalog, HandbookArticle, PackageRecipe,
+    RecipeSourceFormat, ReproduciblePackageRecipeManager, SecurityModelType,
+    SecurityProfileTemplateStore, SecurityTemplate,
+};
+
+pub use tools::{
+    AccessibilityFeature as LibAccessibilityFeature, ClusterNode as LibClusterNode, NodeState as LibNodeState,
+    SigmaAccess as LibSigmaAccess, SigmaCluster as LibSigmaCluster, SigmaDeploy as LibSigmaDeploy,
+    SigmaIdentity as LibSigmaIdentity, SigmaToolError as LibSigmaToolError, UserIdentity as LibUserIdentity,
+    SovereignDpkgEtcher, SovereignAptDuo, SovereignImeConvertCase, SovereignTableConverter,
+    SovereignWordCounter, SovereignTextFixer, SovereignImageToDataUri, SovereignKeyboardTester,
+    SovereignIsWebsiteDown,
 };
 pub mod iso;
 pub mod lang;

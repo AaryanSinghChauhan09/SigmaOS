@@ -1,10 +1,14 @@
-/// OOP-based UEFI Bootloader for SigmaOS
-/// Based on Roadmap Item: Complete UEFI Bootloader (Critical Blocker)
-/// Inspired by systemd-boot, GRUB2, and Plymouth from popular Linux distributions.
-use core::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
+/// Advanced High-Fidelity UEFI Bootloader & Secure Boot Chain for SigmaOS
+/// Inspired by Linux systemd-boot and FreeBSD loader architectures, leveraging raw pointer descriptors.
+
+extern crate alloc;
+
+use alloc::vec::Vec;
+use core::sync::atomic::{AtomicU32, Ordering};
 
 pub type BootStatus = usize;
 
+/// Standard UEFI Boot Phases
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BootPhase {
