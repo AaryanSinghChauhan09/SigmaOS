@@ -2,7 +2,14 @@
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
+#[cfg(not(test))]
 use crate::security::capability::{CapabilityGate, CapabilityToken, Permission};
+
+#[cfg(test)]
+#[path = "capability.rs"]
+mod capability;
+#[cfg(test)]
+use capability::{CapabilityGate, CapabilityToken, Permission};
 use core::sync::atomic::{AtomicBool, Ordering};
 
 /// Per-thread sub-pledge context enabling fine-grained worker thread isolation
@@ -286,6 +293,9 @@ impl Default for PledgeManager {
 
 /// Common pledge promises
 pub mod promises {
+    #[cfg(not(test))]
+    use crate::security::capability::Permission;
+    #[cfg(test)]
     use super::capability::Permission;
     use super::PledgePromise;
 
