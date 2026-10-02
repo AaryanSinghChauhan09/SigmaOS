@@ -2,7 +2,17 @@
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
+
+#[cfg(feature = "standalone_test")]
+#[path = "capability.rs"]
+pub mod capability;
+
+#[cfg(feature = "standalone_test")]
+use capability::{CapabilityGate, CapabilityToken, Permission};
+
+#[cfg(not(feature = "standalone_test"))]
 use crate::security::capability::{CapabilityGate, CapabilityToken, Permission};
+
 use core::sync::atomic::{AtomicBool, Ordering};
 
 /// Per-thread sub-pledge context enabling fine-grained worker thread isolation
