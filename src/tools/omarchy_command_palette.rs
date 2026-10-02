@@ -10,6 +10,22 @@ use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
 
+/// Case-insensitive substring search without allocation for ASCII text.
+/// Bolt ⚡ Optimization: Eliminates heap allocations during search operations on ASCII strings.
+#[inline]
+fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
+    if haystack.is_ascii() && needle.is_ascii() {
+        needle.is_empty()
+            || (needle.len() <= haystack.len()
+                && haystack
+                    .as_bytes()
+                    .windows(needle.len())
+                    .any(|window| window.eq_ignore_ascii_case(needle.as_bytes())))
+    } else {
+        haystack.to_lowercase().contains(&needle.to_lowercase())
+    }
+}
+
 /// Command action type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum CommandActionType {
@@ -99,9 +115,10 @@ impl OmarchyCommandPalette {
         }
     }
 
-    /// Search commands by query
+    /// Search commands by query.
+    /// Bolt ⚡ Optimization: Zero-allocation ASCII search matching avoids calling
+    /// `.to_lowercase()` on string fields for every candidate item during command palette search.
     pub fn search(&self, query: &str) -> Vec<&CommandPaletteItem> {
-        let query_lower = query.to_lowercase();
         if query.is_empty() {
             return self.commands.iter().collect();
         }
@@ -109,9 +126,9 @@ impl OmarchyCommandPalette {
         self.commands
             .iter()
             .filter(|cmd| {
-                cmd.label.to_lowercase().contains(&query_lower)
-                    || cmd.description.to_lowercase().contains(&query_lower)
-                    || cmd.category.to_lowercase().contains(&query_lower)
+                contains_ignore_case(&cmd.label, query)
+                    || contains_ignore_case(&cmd.description, query)
+                    || contains_ignore_case(&cmd.category, query)
             })
             .collect()
     }
