@@ -243,7 +243,8 @@ impl PackageDependency for SimplePackageDependency {
         for i in 0..package_len {
             package_array[i] = package[i];
         }
-        self.dependencies.push((runtime_id, package_array, package_len as u8));
+        self.dependencies
+            .push((runtime_id, package_array, package_len as u8));
         Ok(())
     }
 
@@ -433,7 +434,10 @@ mod tests {
         assert_eq!(deps.dependencies.len(), 2);
         assert_eq!(deps.remove_dependency(1, b"numpy"), Ok(()));
         assert_eq!(deps.dependencies.len(), 1);
-        assert_eq!(deps.remove_dependency(1, b"nonexistent"), Err(RuntimeError::NotFound));
+        assert_eq!(
+            deps.remove_dependency(1, b"nonexistent"),
+            Err(RuntimeError::NotFound)
+        );
     }
 
     #[test]
