@@ -158,6 +158,10 @@ impl WikiDataTransferEngine {
         engine
     }
 
+    pub fn total_synced_specs(&self) -> u32 {
+        self.total_synced_to_wiki
+    }
+
     fn seed_known_feature_md_files(&mut self) {
         self.feature_specs.insert(
             "UniversalPackageSystem".to_string(),
@@ -252,8 +256,7 @@ impl SovereignTaskAndWikiGovernanceSuite {
             return false;
         }
 
-        self.wiki_engine.transfer_implemented_data_to_wiki("UniversalPackageSystem").is_ok()
-            && self.wiki_engine.transfer_implemented_data_to_wiki("Roadmap11Deployment").is_ok()
+        self.wiki_engine.transfer_implemented_data_to_wiki("ROADMAP.md").is_ok()
     }
 }
 

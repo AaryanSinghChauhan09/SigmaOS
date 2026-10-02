@@ -93,6 +93,7 @@ pub struct PacmanPkgbuild {
     pub makedepends: Vec<String>,
     pub source_urls: Vec<String>,
 }
+
 #[derive(Debug, Clone)]
 pub enum AdapterError {
     ParseError(String),
@@ -180,54 +181,6 @@ pub struct SlackwarePkgManifest {
     pub slack_required: Vec<String>,
 }
 
-#[derive(Debug, Clone)]
-pub struct GentooEbuildMetadata {
-    pub category: String,
-    pub package_name: String,
-    pub version: String,
-    pub rdepend: Vec<String>,
-    pub depend: Vec<String>,
-    pub description: String,
-    pub use_flags: Vec<String>,
-}
-
-#[derive(Debug, Clone)]
-pub struct ApkIndexManifest {
-    pub pkgname: String,
-    pub pkgver: String,
-    pub pkgdesc: String,
-    pub depends: Vec<String>,
-}
-
-#[derive(Debug, Clone)]
-pub struct XbpsManifest {
-    pub pkgname: String,
-    pub version: String,
-    pub short_desc: String,
-    pub run_depends: Vec<String>,
-}
-
-#[derive(Debug, Clone)]
-pub struct HaikuHpkgManifest {
-    pub name: String,
-    pub version: String,
-    pub summary: String,
-    pub architecture: String,
-    pub requires: Vec<String>,
-}
-
-#[derive(Debug, Clone)]
-pub struct ArchPkgInfoManifest {
-    pub pkgname: String,
-    pub pkgver: String,
-    pub pkgdesc: String,
-    pub arch: String,
-    pub architecture: String,
-    pub depends: Vec<String>,
-    pub depend: Vec<String>,
-    pub makedepend: Vec<String>,
-}
-
 pub struct UniversalPackageAdapter;
 
 impl UniversalPackageAdapter {
@@ -287,7 +240,7 @@ impl UniversalPackageAdapter {
             maintainer: "SigmaOS".to_string(),
             depends,
             description,
-            priority: format!("{:?}", priority),
+            priority,
         })
     }
 

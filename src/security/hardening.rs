@@ -3,24 +3,11 @@
 // W^X enforcement, stack protection, and memory security
 // Inspired by OpenBSD and Linux security mitigations
 
-use core::sync::atomic::AtomicU64;
-use core::sync::atomic::Ordering;
+use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 #[cfg(feature = "standalone_test")]
 use alloc::vec::Vec;
-use core::sync::atomic::AtomicU64;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum MemoryPermission {
-    None,
-    Read,
-    Write,
-    Execute,
-    ReadWrite,
-    ReadExecute,
-    ReadWriteExecute,
-}
 use crate::security::Permission;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Secure Memory Zeroization utility
 /// Overwrites memory containing sensitive keys, credentials, or capability data

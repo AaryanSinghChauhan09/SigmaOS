@@ -75,6 +75,9 @@ pub enum PackageFormat {
     NarInfo,
     Spack,
     Conan,
+    Swupd,
+    Starling,
+    CachyOS,
 }
 
 impl PackageFormat {

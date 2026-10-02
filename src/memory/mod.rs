@@ -17,8 +17,8 @@ pub mod paging;
 pub mod quota;
 pub mod segmentation_paging;
 pub mod sovereign_address_translation;
-pub mod huge_pages;
-pub use huge_pages as thp;
+#[path = "huge_pages.rs"]
+pub mod thp;
 pub mod tlb_associative;
 pub mod zone;
 pub use sovereign_address_translation::*;

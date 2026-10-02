@@ -1,6 +1,11 @@
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
+
+#[cfg(feature = "standalone_test")]
+#[path = "capability.rs"]
+pub mod capability;
+
 #[cfg(feature = "standalone_test")]
 #[path = "capability.rs"]
 mod capability;

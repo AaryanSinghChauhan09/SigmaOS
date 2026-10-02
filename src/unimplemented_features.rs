@@ -2180,7 +2180,6 @@ impl Default for SpecJbd2TransactionLedger {
 }
 
 pub struct Android15PrivateSpaceGovernor;
-pub struct FrappeFrameworkDocTypeEngine;
 pub struct HwbustersPowerSupplyMonitor;
 pub struct MacOsSequoiaWindowManager;
 pub struct S6ServiceInitSupervisor;
@@ -4098,30 +4097,39 @@ mod extra_unimplemented_tests {
 // TECH MEDIA & ENTERPRISE FRAMEWORK INSPIRED ENGINES
 // =========================================================================
 
-#[derive(Debug, Clone)]
-pub struct DocField {
-    pub fieldname: String,
-    pub fieldtype: String,
-    pub label: String,
-    pub reqd: bool,
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TechMediaPortal {
+    ItsFoss,
+    NineToFiveLinux,
+    Phoronix,
+    DistroWatch,
+    XdaDevelopers,
+    TheNewStack,
+    Marktechpost,
+    LinuxCom,
 }
 
 #[derive(Debug, Clone)]
-pub struct FrappeFrameworkDocTypeEngine {
-    pub doctype_name: String,
-    pub fields: Vec<DocField>,
-    pub workflow_state: String,
-    pub is_submittable: bool,
+pub struct TechMediaFeedItem {
+    pub source_portal: TechMediaPortal,
+    pub source_name: String,
+    pub title: String,
+    pub category: String,
+    pub severity_score: u8,
+    pub recommended_app: String,
 }
 
-impl FrappeFrameworkDocTypeEngine {
-    pub fn new(doctype_name: &str) -> Self {
-        Self {
-            doctype_name: doctype_name.to_string(),
-            fields: Vec::new(),
-            workflow_state: "Draft".to_string(),
-            is_submittable: true,
-        }
+pub struct TechMediaIntelligenceAggregatorEngine {
+    pub feed_items: Vec<TechMediaFeedItem>,
+}
+
+impl TechMediaIntelligenceAggregatorEngine {
+    pub fn new() -> Self {
+        let mut engine = Self {
+            feed_items: Vec::new(),
+        };
+        engine.seed_curated_media_feeds();
+        engine
     }
 
     pub fn seed_curated_media_feeds(&mut self) {
@@ -4241,6 +4249,33 @@ impl FrappeFrameworkDocTypeEngine {
 impl Default for TechMediaIntelligenceAggregatorEngine {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct DocField {
+    pub fieldname: String,
+    pub fieldtype: String,
+    pub label: String,
+    pub reqd: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct FrappeFrameworkDocTypeEngine {
+    pub doctype_name: String,
+    pub fields: Vec<DocField>,
+    pub workflow_state: String,
+    pub is_submittable: bool,
+}
+
+impl FrappeFrameworkDocTypeEngine {
+    pub fn new(doctype_name: &str) -> Self {
+        Self {
+            doctype_name: doctype_name.to_string(),
+            fields: Vec::new(),
+            workflow_state: "Draft".to_string(),
+            is_submittable: true,
+        }
     }
 }
 
@@ -4473,7 +4508,7 @@ mod new_unimplemented_tests {
 
     #[test]
     fn test_puppy_linux_overlay_ramdisk_engine() {
-        let mut puppy = PuppyLinuxOverlayRamdiskEngine::new(2048, 2048);
+        let mut puppy = PuppyLinuxOverlayRamdiskEngine::new(2048);
         puppy.load_sfs_module("puppy_sigma_2.0.sfs");
         puppy.mount_persistence("/mnt/home/sigmasave.2fs");
         assert_eq!(puppy.loaded_sfs_modules.len(), 1);

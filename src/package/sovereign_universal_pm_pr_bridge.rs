@@ -48,6 +48,7 @@ pub enum UniversalDistroPackageFormat {
     GentooEbuild,
     BsdPkg,
     FreeBsdPkg,
+    OpenBsdPkg,
     FreeBsdPorts,
     OpenBsdPorts,
     OpenBsdPkg,
@@ -202,6 +203,8 @@ impl UniversalDistroPackageFormat {
             Self::ArchAuditVulnerability => "Arch Linux arch-audit Security Vulnerability Record",
             Self::ArchNamcapLinterReport => "Arch Linux namcap Package Auditor Linter Report",
             Self::ArchMakepkgConfProfile => "Arch Linux makepkg.conf Compiler Optimization Specs",
+            Self::FreeBsdPkg => "FreeBSD pkg Package",
+            Self::OpenBsdPkg => "OpenBSD pkg Package",
         }
     }
 
@@ -1281,6 +1284,11 @@ mod tests {
             UniversalDistroPackageFormat::SlaxLzm,
             UniversalDistroPackageFormat::PuppyPup,
             UniversalDistroPackageFormat::OciContainerImage,
+            UniversalDistroPackageFormat::SystemdSysext,
+            UniversalDistroPackageFormat::PythonWheel,
+            UniversalDistroPackageFormat::CargoCrate,
+            UniversalDistroPackageFormat::RubyGem,
+            UniversalDistroPackageFormat::DotnetNuget,
             UniversalDistroPackageFormat::QemuQcow2VmImage,
             UniversalDistroPackageFormat::RawDiskVmImage,
             UniversalDistroPackageFormat::VagrantVmBox,
