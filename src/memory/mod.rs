@@ -32,6 +32,7 @@ pub use paging::{
 
 pub use allocator::{BuddyAllocator, MemoryBlock, SlabAllocator, SlabCache, SlabObject};
 pub use cgroups::{MemCgroup, MemCgroupManager};
+pub use huge_pages::{HugePageAllocation, HugePageSize, ThpManager, ThpPolicy, ThpStats};
 pub use kswapd::{LinuxKswapd, PageState};
 pub use quota::{
     MemoryController, MemoryStats, MemoryUnit, OomEvent, OomPolicy, PageCacheStat,
@@ -42,6 +43,5 @@ pub use segmentation_paging::{
     RandomizedAddressSpace, SegmentDescriptor, SegmentSelector, SegmentationPagingEngine,
     SpaceProtectionFlags, SystemControlRegisters,
 };
-pub use huge_pages::{HugePageAllocation, HugePageSize, ThpManager, ThpPolicy, ThpStats};
 pub use tlb_associative::{AssociativeTlbCache, TlbAssociativityMode, TlbEntry, TlbPageFlags};
 pub use zone::{BsdZoneAllocator, Slab, Zone, ZoneStats};

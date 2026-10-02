@@ -181,6 +181,7 @@ pub struct JournalTransaction {
     pub action: String,
     pub operation: String,
     pub path: String,
+    pub data: Vec<u8>,
     pub state: JournalState,
 }
 
@@ -824,18 +825,25 @@ impl SigmaFsCow {
     }
 
     pub fn write_block_cow(&mut self, filename: &str, logical: u64, physical: u64) {
-        let pointers = self.block_allocations.entry(filename.to_string()).or_default();
+        let pointers = self
+            .block_allocations
+            .entry(filename.to_string())
+            .or_default();
         // CoW logic: update existing logical mapping to new physical block on-the-fly
         if let Some(p) = pointers.iter_mut().find(|pt| pt.logical_addr == logical) {
             p.physical_addr = physical;
         } else {
-            pointers.push(CowBlockPointer { logical_addr: logical, physical_addr: physical });
+            pointers.push(CowBlockPointer {
+                logical_addr: logical,
+                physical_addr: physical,
+            });
         }
     }
 
     pub fn create_cow_snapshot(&mut self, snap_id: &str) {
         // Save current block mapping tree states (ZFS/btrfs transaction tree copy)
-        self.snapshots.insert(snap_id.to_string(), self.block_allocations.clone());
+        self.snapshots
+            .insert(snap_id.to_string(), self.block_allocations.clone());
     }
 }
 
@@ -1035,8 +1043,12 @@ mod tests {
     #[test]
     fn test_sigma_fs_deduplication() {
         let mut fs = SigmaFS::new();
-        let hash1 = fs.write_file_block("report-q1.txt", b"REVENUE_STABLE").unwrap();
-        let hash2 = fs.write_file_block("report-q2.txt", b"REVENUE_STABLE").unwrap();
+        let hash1 = fs
+            .write_file_block("report-q1.txt", b"REVENUE_STABLE")
+            .unwrap();
+        let hash2 = fs
+            .write_file_block("report-q2.txt", b"REVENUE_STABLE")
+            .unwrap();
 
         // Identical contents must map to the same content hash (deduplicated)
         assert_eq!(hash1, hash2);
@@ -1046,7 +1058,8 @@ mod tests {
     #[test]
     fn test_sigma_fs_semantic_and_audit() {
         let mut fs = SigmaFS::new();
-        fs.write_file_block("financial_report.csv", b"SALES_GROWTH_15_PERCENT").unwrap();
+        fs.write_file_block("financial_report.csv", b"SALES_GROWTH_15_PERCENT")
+            .unwrap();
 
         let found = fs.semantic_search("finance").unwrap();
         assert_eq!(found, "financial_report.csv");
@@ -1083,7 +1096,10 @@ mod tests {
         ns.write_isolated_file("app.py", b"print('hello lts')".to_vec());
 
         assert_eq!(ns.bind_mounts.len(), 1);
-        assert_eq!(ns.read_isolated_file("app.py").unwrap(), &b"print('hello lts')".to_vec());
+        assert_eq!(
+            ns.read_isolated_file("app.py").unwrap(),
+            &b"print('hello lts')".to_vec()
+        );
     }
 
     #[test]
@@ -1102,9 +1118,17 @@ mod tests {
     #[test]
     fn test_sigma_disaster_recovery_cleaner() {
         let mut cleaner = SigmaDisasterRecoveryCleaner::new();
-        cleaner.register_target_file("/home/user/.cache/thumbnails/thumb.png", "SystemCache", 4096);
+        cleaner.register_target_file(
+            "/home/user/.cache/thumbnails/thumb.png",
+            "SystemCache",
+            4096,
+        );
         cleaner.register_target_file("/var/log/httpd/access.log", "TemporaryLogs", 204800);
-        cleaner.register_target_file("/home/user/.mozilla/firefox/places.sqlite", "BrowserHistory", 1024000);
+        cleaner.register_target_file(
+            "/home/user/.mozilla/firefox/places.sqlite",
+            "BrowserHistory",
+            1024000,
+        );
 
         assert_eq!(cleaner.targets.len(), 3);
 
@@ -1200,7 +1224,8 @@ mod tests {
         let win_bin = hierarchy.translate_cross_platform_path("C:\\Windows\\System32\\cmd.exe");
         assert_eq!(win_bin, "/bin/cmd.exe");
 
-        let win_user = hierarchy.translate_cross_platform_path("C:\\Users\\admin\\Documents\\file.txt");
+        let win_user =
+            hierarchy.translate_cross_platform_path("C:\\Users\\admin\\Documents\\file.txt");
         assert_eq!(win_user, "/home/admin/Documents/file.txt");
 
         // BSD path translation

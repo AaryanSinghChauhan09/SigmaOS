@@ -24,8 +24,8 @@ use std::vec::Vec;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PortagePackageSlot {
     pub atom: String,
-    pub slot: String,        // e.g. "0", "3.11", "gui"
-    pub subslot: String,     // e.g. "3.11/2.0"
+    pub slot: String,    // e.g. "0", "3.11", "gui"
+    pub subslot: String, // e.g. "3.11/2.0"
     pub virtual_provides: Vec<String>,
     pub dependencies: Vec<String>,
     pub conflicts: Vec<String>,
@@ -40,7 +40,7 @@ pub struct SatSolverResolutionPlan {
 
 pub struct SatDependencySolverPortageSlottingEngine {
     pub package_database: BTreeMap<String, Vec<PortagePackageSlot>>, // atom -> list of slotted versions
-    pub virtual_providers: BTreeMap<String, Vec<String>>,             // virtual_name -> providing atoms
+    pub virtual_providers: BTreeMap<String, Vec<String>>, // virtual_name -> providing atoms
 }
 
 impl SatDependencySolverPortageSlottingEngine {
@@ -65,10 +65,17 @@ impl SatDependencySolverPortageSlottingEngine {
             .push(slot_spec);
     }
 
-    pub fn solve_atom_slot(&self, atom: &str, requested_slot: Option<&str>) -> Option<PortagePackageSlot> {
+    pub fn solve_atom_slot(
+        &self,
+        atom: &str,
+        requested_slot: Option<&str>,
+    ) -> Option<PortagePackageSlot> {
         if let Some(slots) = self.package_database.get(atom) {
             if let Some(s) = requested_slot {
-                slots.iter().find(|p| p.slot == s || p.subslot.starts_with(s)).cloned()
+                slots
+                    .iter()
+                    .find(|p| p.slot == s || p.subslot.starts_with(s))
+                    .cloned()
             } else {
                 slots.last().cloned() // default to latest slot
             }
@@ -622,7 +629,8 @@ mod tests {
     #[test]
     fn test_pipewire_graph_router() {
         let mut pw = PipeWireAudioPipelineGraphRouterEngine::new(128, 48000);
-        let link = pw.link_audio_ports("alsa_input", "master_sink", SpaBufferFormat::PcmFormatF32Le);
+        let link =
+            pw.link_audio_ports("alsa_input", "master_sink", SpaBufferFormat::PcmFormatF32Le);
         assert_eq!(link.latency_samples, 128);
 
         let lat_ms = pw.compute_pipeline_latency_ms();

@@ -252,7 +252,7 @@ impl SyscallDispatcher {
     /// Prevents malformed arguments from reaching handlers
     fn validate_args(&self, number: SyscallNumber, args: &SyscallArgs) -> Result<(), i32> {
         let index = number as usize;
-        
+
         // Check syscall number bounds
         if index >= 256 {
             return Err(EINVAL);

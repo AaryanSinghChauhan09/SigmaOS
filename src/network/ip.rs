@@ -22,16 +22,16 @@ pub enum IpProtocol {
 /// IPv4 header (RFC 791)
 #[derive(Debug, Clone)]
 pub struct Ipv4Header {
-    pub version: u8,           // 4
-    pub ihl: u8,               // Header length in 32-bit words (5-15)
-    pub dscp: u8,              // Differentiated Services Code Point
-    pub ecn: u8,               // Explicit Congestion Notification
-    pub total_length: u16,     // Total packet length
-    pub identification: u16,   // Fragment identification
+    pub version: u8,         // 4
+    pub ihl: u8,             // Header length in 32-bit words (5-15)
+    pub dscp: u8,            // Differentiated Services Code Point
+    pub ecn: u8,             // Explicit Congestion Notification
+    pub total_length: u16,   // Total packet length
+    pub identification: u16, // Fragment identification
     pub flags: Ipv4Flags,
-    pub fragment_offset: u16,  // 13 bits
-    pub ttl: u8,               // Time to live
-    pub protocol: u8,          // Upper layer protocol
+    pub fragment_offset: u16, // 13 bits
+    pub ttl: u8,              // Time to live
+    pub protocol: u8,         // Upper layer protocol
     pub checksum: u16,
     pub src_addr: Ipv4Addr,
     pub dst_addr: Ipv4Addr,
@@ -69,18 +69,21 @@ impl Ipv4Header {
     pub fn calculate_checksum(&self) -> u16 {
         // Simplified checksum calculation
         let mut sum: u32 = 0;
-        
+
         // Add header fields (16-bit words)
-        sum += ((self.version as u32) << 12) | ((self.ihl as u32) << 8) | ((self.dscp as u32) << 2) | (self.ecn as u32);
+        sum += ((self.version as u32) << 12)
+            | ((self.ihl as u32) << 8)
+            | ((self.dscp as u32) << 2)
+            | (self.ecn as u32);
         sum += self.total_length as u32;
         sum += self.identification as u32;
         sum += self.ttl as u32 | ((self.protocol as u32) << 8);
-        
+
         // Fold 32-bit sum to 16 bits
         while sum >> 16 != 0 {
             sum = (sum & 0xFFFF) + (sum >> 16);
         }
-        
+
         !sum as u16
     }
 }
@@ -88,12 +91,12 @@ impl Ipv4Header {
 /// IPv6 header (RFC 2460)
 #[derive(Debug, Clone)]
 pub struct Ipv6Header {
-    pub version: u8,           // 6
-    pub traffic_class: u8,     // 8 bits
-    pub flow_label: u32,       // 20 bits
-    pub payload_length: u16,   // Excludes header
-    pub next_header: u8,       // Protocol
-    pub hop_limit: u8,         // Like TTL
+    pub version: u8,         // 6
+    pub traffic_class: u8,   // 8 bits
+    pub flow_label: u32,     // 20 bits
+    pub payload_length: u16, // Excludes header
+    pub next_header: u8,     // Protocol
+    pub hop_limit: u8,       // Like TTL
     pub src_addr: Ipv6Addr,
     pub dst_addr: Ipv6Addr,
 }
@@ -131,14 +134,14 @@ impl IpPacket {
         let mut header = Ipv4Header::new(src, dst, protocol);
         header.total_length = 20 + payload.len() as u16;
         header.checksum = header.calculate_checksum();
-        
+
         IpPacket::V4 { header, payload }
     }
 
     pub fn new_v6(src: Ipv6Addr, dst: Ipv6Addr, protocol: IpProtocol, payload: Vec<u8>) -> Self {
         let mut header = Ipv6Header::new(src, dst, protocol);
         header.payload_length = payload.len() as u16;
-        
+
         IpPacket::V6 { header, payload }
     }
 
@@ -236,7 +239,7 @@ impl IpFragmenter {
         match packet {
             IpPacket::V4 { header, payload } => {
                 let max_payload = self.mtu - 20; // IP header size
-                
+
                 if payload.len() <= max_payload {
                     // No fragmentation needed
                     return alloc::vec![packet.clone()];
@@ -244,31 +247,31 @@ impl IpFragmenter {
 
                 let id = self.next_id;
                 self.next_id = self.next_id.wrapping_add(1);
-                
+
                 let mut fragments = Vec::new();
                 let mut offset = 0;
-                
+
                 while offset < payload.len() {
                     let remaining = payload.len() - offset;
                     let frag_size = remaining.min(max_payload);
                     let more_fragments = offset + frag_size < payload.len();
-                    
+
                     let mut frag_header = header.clone();
                     frag_header.identification = id;
                     frag_header.fragment_offset = (offset / 8) as u16;
                     frag_header.flags.more_fragments = more_fragments;
                     frag_header.total_length = 20 + frag_size as u16;
                     frag_header.checksum = frag_header.calculate_checksum();
-                    
+
                     let frag_payload = payload[offset..offset + frag_size].to_vec();
                     fragments.push(IpPacket::V4 {
                         header: frag_header,
                         payload: frag_payload,
                     });
-                    
+
                     offset += frag_size;
                 }
-                
+
                 fragments
             }
             IpPacket::V6 { .. } => {
@@ -328,7 +331,7 @@ mod tests {
         let src = Ipv4Addr::new(192, 168, 1, 1);
         let dst = Ipv4Addr::new(192, 168, 1, 2);
         let header = Ipv4Header::new(src, dst, IpProtocol::Tcp);
-        
+
         assert_eq!(header.version, 4);
         assert_eq!(header.ttl, 64);
         assert_eq!(header.protocol, 6);
@@ -360,7 +363,7 @@ mod tests {
         let src = Ipv4Addr::new(10, 0, 0, 1);
         let dst = Ipv4Addr::new(10, 0, 0, 2);
         let payload = alloc::vec![1, 2, 3, 4, 5];
-        
+
         let packet = IpPacket::new_v4(src, dst, IpProtocol::Tcp, payload.clone());
         assert_eq!(packet.protocol(), 6);
         assert_eq!(packet.payload(), &payload[..]);
@@ -372,10 +375,10 @@ mod tests {
         let src = Ipv4Addr::new(10, 0, 0, 1);
         let dst = Ipv4Addr::new(10, 0, 0, 2);
         let payload = alloc::vec![0u8; 200];
-        
+
         let packet = IpPacket::new_v4(src, dst, IpProtocol::Tcp, payload);
         let fragments = fragmenter.fragment(&packet);
-        
+
         assert!(fragments.len() > 1);
     }
 }

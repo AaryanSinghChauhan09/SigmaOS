@@ -9,8 +9,8 @@
 //! - OpenBSD src/sys/arch/amd64/include/pcb.h (per-CPU canary)
 //! - GCC documentation: -fstack-protector-strong
 
-use core::sync::atomic::{AtomicU64, Ordering};
 use crate::crypto::entropy;
+use core::sync::atomic::{AtomicU64, Ordering};
 
 /// Per-boot stack canary value. Initialized once, used by all stack frames.
 /// On x86_64 Linux this is stored in gs:0x28 (per-CPU).
@@ -29,7 +29,9 @@ pub fn init() {
     let mut canary = u64::from_le_bytes(buf);
     canary |= 0x0100_0000_0000_0000; // set a high bit
     canary &= !0x00FF_0000_0000_0000; // clear byte 6 to avoid NUL patterns
-    if canary == 0 { canary = 0xDEAD_C0DE_FACE_CAFE; }
+    if canary == 0 {
+        canary = 0xDEAD_C0DE_FACE_CAFE;
+    }
     STACK_CANARY.store(canary, Ordering::SeqCst);
 }
 
@@ -62,7 +64,9 @@ pub fn stack_smash_handler() -> ! {
     // For now: spin-halt (equivalent to kernel panic).
     loop {
         #[cfg(target_arch = "x86_64")]
-        unsafe { core::arch::asm!("hlt"); }
+        unsafe {
+            core::arch::asm!("hlt");
+        }
     }
 }
 
@@ -80,7 +84,9 @@ pub struct StackGuard {
 impl StackGuard {
     #[inline(always)]
     pub fn new() -> Self {
-        Self { saved_canary: canary() }
+        Self {
+            saved_canary: canary(),
+        }
     }
 }
 
@@ -94,7 +100,9 @@ impl Drop for StackGuard {
 }
 
 impl Default for StackGuard {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 #[cfg(test)]

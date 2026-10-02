@@ -17,9 +17,9 @@ use alloc::collections::BTreeMap;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec::Vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::BTreeMap;
@@ -91,7 +91,8 @@ impl DebianMultiarchTripleResolutionEngine {
         match decl {
             DebianMultiArchDeclaration::Foreign => true,
             DebianMultiArchDeclaration::Same => {
-                requester_arch == self.primary_arch && self.foreign_architectures.iter().any(|a| a == target_arch)
+                requester_arch == self.primary_arch
+                    && self.foreign_architectures.iter().any(|a| a == target_arch)
             }
             DebianMultiArchDeclaration::Allowed => {
                 self.foreign_architectures.iter().any(|a| a == target_arch)
@@ -136,8 +137,7 @@ impl DebianConffileMergeGovernor {
                 } else {
                     format!(
                         "{}\n# --- Vendor Updates ---\n{}",
-                        local_modified,
-                        new_vendor
+                        local_modified, new_vendor
                     )
                 }
             }
@@ -186,7 +186,11 @@ impl ArchPacmanHooksTransactionGraph {
     }
 
     /// Finds hooks triggered by changed file paths in transaction
-    pub fn get_triggered_hooks(&self, changed_files: &[String], phase: PacmanHookPhase) -> Vec<&PacmanHookSpec> {
+    pub fn get_triggered_hooks(
+        &self,
+        changed_files: &[String],
+        phase: PacmanHookPhase,
+    ) -> Vec<&PacmanHookSpec> {
         self.hooks
             .iter()
             .filter(|h| h.phase == phase)
@@ -387,7 +391,12 @@ impl GentooEapi8SlotOperatorDependencySolver {
     }
 
     /// Evaluates if ABI change in subslot requires rebuild of reverse dependency
-    pub fn requires_rebuild(&self, old_subslot: &str, new_subslot: &str, slot_operator: &str) -> bool {
+    pub fn requires_rebuild(
+        &self,
+        old_subslot: &str,
+        new_subslot: &str,
+        slot_operator: &str,
+    ) -> bool {
         if slot_operator.contains('=') {
             old_subslot != new_subslot
         } else {
@@ -411,7 +420,10 @@ impl FreeBsdPoudriereZfsClonedJailBuildGovernor {
     }
 
     pub fn create_cloned_jail_dataset(&self, jail_name: &str, zfs_pool: &str) -> String {
-        format!("{}/poudriere/jails/{}@snapshot_clean -> {}/poudriere/jails/build_{}", zfs_pool, jail_name, zfs_pool, jail_name)
+        format!(
+            "{}/poudriere/jails/{}@snapshot_clean -> {}/poudriere/jails/build_{}",
+            zfs_pool, jail_name, zfs_pool, jail_name
+        )
     }
 }
 
@@ -437,11 +449,16 @@ impl NixGuixHermeticCasStoreDeduplicationGovernor {
         }
     }
 
-    pub fn register_store_file(&mut self, content_sha256: &str, store_path: &str) -> Option<String> {
+    pub fn register_store_file(
+        &mut self,
+        content_sha256: &str,
+        store_path: &str,
+    ) -> Option<String> {
         if let Some(existing_path) = self.store_hashes.get(content_sha256) {
             Some(existing_path.clone())
         } else {
-            self.store_hashes.insert(content_sha256.to_string(), store_path.to_string());
+            self.store_hashes
+                .insert(content_sha256.to_string(), store_path.to_string());
             None
         }
     }
@@ -538,11 +555,24 @@ mod tests {
         assert_eq!(multiarch.resolve_gnu_triple("amd64"), "x86_64-linux-gnu");
         assert_eq!(multiarch.resolve_gnu_triple("arm64"), "aarch64-linux-gnu");
 
-        assert!(multiarch.can_satisfy_dependency("amd64", "i386", DebianMultiArchDeclaration::Foreign));
-        assert!(!multiarch.can_satisfy_dependency("amd64", "arm64", DebianMultiArchDeclaration::No));
+        assert!(multiarch.can_satisfy_dependency(
+            "amd64",
+            "i386",
+            DebianMultiArchDeclaration::Foreign
+        ));
+        assert!(!multiarch.can_satisfy_dependency(
+            "amd64",
+            "arm64",
+            DebianMultiArchDeclaration::No
+        ));
 
         let conffile_gov = DebianConffileMergeGovernor::new();
-        let merged = conffile_gov.merge_conffile("port=80", "port=8080", "port=80", ConffileMergeStrategy::ThreeWayMerge);
+        let merged = conffile_gov.merge_conffile(
+            "port=80",
+            "port=8080",
+            "port=80",
+            ConffileMergeStrategy::ThreeWayMerge,
+        );
         assert_eq!(merged, "port=8080");
     }
 
@@ -556,7 +586,12 @@ mod tests {
             exec_command: String::from("glib-compile-schemas"),
         });
 
-        let triggered = graph.get_triggered_hooks(&[String::from("usr/share/glib-2.0/schemas/org.gnome.gschema.xml")], PacmanHookPhase::PostTransaction);
+        let triggered = graph.get_triggered_hooks(
+            &[String::from(
+                "usr/share/glib-2.0/schemas/org.gnome.gschema.xml",
+            )],
+            PacmanHookPhase::PostTransaction,
+        );
         assert_eq!(triggered.len(), 1);
         assert_eq!(triggered[0].name, "glib-schemas");
 
@@ -588,10 +623,17 @@ mod tests {
         let mut nix_cas = NixGuixHermeticCasStoreDeduplicationGovernor::new();
         let path1 = "/nix/store/123-libssl.so";
         assert_eq!(nix_cas.register_store_file("sha256-abc", path1), None);
-        assert_eq!(nix_cas.register_store_file("sha256-abc", "/nix/store/456-libssl.so"), Some(path1.to_string()));
+        assert_eq!(
+            nix_cas.register_store_file("sha256-abc", "/nix/store/456-libssl.so"),
+            Some(path1.to_string())
+        );
 
         let moss = SolusMossPassthroughPayloadEngine::new();
-        assert!(moss.validate_stateless_purity(&[String::from("/usr/bin/hello")]).is_ok());
-        assert!(moss.validate_stateless_purity(&[String::from("/etc/hello.conf")]).is_err());
+        assert!(moss
+            .validate_stateless_purity(&[String::from("/usr/bin/hello")])
+            .is_ok());
+        assert!(moss
+            .validate_stateless_purity(&[String::from("/etc/hello.conf")])
+            .is_err());
     }
 }

@@ -5,8 +5,8 @@
 //! Reference: OpenBSD src/sys/arch/amd64/amd64/kaslr.S
 //! SigmaOS adaptation: software-level KASLR with compile-time + runtime mixing.
 
-use core::sync::atomic::{AtomicU64, Ordering};
 use crate::crypto::entropy;
+use core::sync::atomic::{AtomicU64, Ordering};
 
 /// Base virtual address of the kernel image.
 /// In a real implementation, the bootloader passes this at startup.
@@ -28,7 +28,11 @@ pub struct KarlConfig {
 
 impl Default for KarlConfig {
     fn default() -> Self {
-        Self { enabled: true, alignment: 0x20_0000, max_slide: 0x1000_0000 }
+        Self {
+            enabled: true,
+            alignment: 0x20_0000,
+            max_slide: 0x1000_0000,
+        }
     }
 }
 
@@ -38,7 +42,9 @@ impl Default for KarlConfig {
 /// # Safety
 /// Must be called exactly once, before the kernel's virtual address space is active.
 pub unsafe fn init(config: &KarlConfig) {
-    if !config.enabled { return; }
+    if !config.enabled {
+        return;
+    }
     let mut seed = [0u8; 8];
     entropy::get_entropy_bytes(&mut seed);
     let raw = u64::from_le_bytes(seed);

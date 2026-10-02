@@ -19,7 +19,7 @@ use crate::klib::collections::HashSet;
 use std::collections::HashSet;
 
 /// Capability rights (inspired by FreeBSD capsicum rights)
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum CapRight {
     /// Capability to read from a resource
     CapRead = 0x00000001,
@@ -219,9 +219,7 @@ impl CapabilitySandbox {
             }
         } else {
             // Global capability check (no specific path)
-            if self.global_rights.contains(&required_right)
-                || self.mode == CapMode::Unrestricted
-            {
+            if self.global_rights.contains(&required_right) || self.mode == CapMode::Unrestricted {
                 Ok(())
             } else {
                 Err(ECAPMODE)

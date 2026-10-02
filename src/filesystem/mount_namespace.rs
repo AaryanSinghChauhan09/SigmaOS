@@ -281,7 +281,10 @@ impl MountNamespace {
                 0,
             );
 
-            let mut table = namespace.mount_table.lock().unwrap_or_else(|e| e.into_inner());
+            let mut table = namespace
+                .mount_table
+                .lock()
+                .unwrap_or_else(|e| e.into_inner());
             table.add_mount(root_mount);
         }
 

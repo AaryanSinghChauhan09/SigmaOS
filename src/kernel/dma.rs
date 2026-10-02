@@ -136,13 +136,9 @@ impl DmaManager {
 
     /// Setup ISA DMA transfer
     /// Linux: `arch/x86/kernel/pci-dma.c`
-    pub fn setup_transfer(
-        &self,
-        buffer: &DmaBuffer,
-        mode: DmaMode,
-    ) -> Result<(), DmaError> {
+    pub fn setup_transfer(&self, buffer: &DmaBuffer, mode: DmaMode) -> Result<(), DmaError> {
         let channel = buffer.channel as u8;
-        
+
         if channel == 4 {
             return Err(DmaError::InvalidChannel); // Channel 4 is cascade
         }
@@ -375,7 +371,7 @@ mod tests {
             size: 4096,
             channel: DmaChannel::Channel2,
         };
-        
+
         assert!(buffer.is_isa_compatible());
         assert!(!buffer.crosses_64k_boundary());
     }
@@ -388,7 +384,7 @@ mod tests {
             size: 2,
             channel: DmaChannel::Channel1,
         };
-        
+
         assert!(buffer.crosses_64k_boundary());
     }
 
@@ -397,7 +393,7 @@ mod tests {
         let mut sg = ScatterGatherList::new();
         sg.add_entry(0x1000, 4096);
         sg.add_entry(0x2000, 4096);
-        
+
         assert_eq!(sg.entries().len(), 2);
         assert_eq!(sg.total_size(), 8192);
     }

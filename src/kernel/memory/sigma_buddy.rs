@@ -27,11 +27,10 @@ use alloc::vec;
 use alloc::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec;
-#[cfg(any(feature = "standalone_test", test))]
-
 use super::{MemoryBlock, PAGE_SIZE};
 use crate::klib::buddy_allocator::{BuddyAllocator, SimpleBuddyAllocator};
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec;
 
 /// Linux-inspired Page Migration Types for Anti-Fragmentation Buddy Allocator
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]

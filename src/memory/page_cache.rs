@@ -115,7 +115,7 @@ impl CachedPage {
     }
 
     /// Update last access time
-    pub fn touch(&self, time: u64) {
+    pub fn touch(&mut self, time: u64) {
         self.last_access.store(time, Ordering::Release);
         self.flags.referenced = true;
     }
@@ -185,8 +185,9 @@ impl PageCache {
     /// Look up page in cache
     pub fn lookup(&mut self, inode: u64, offset: u64) -> Option<&mut CachedPage> {
         let key = PageKey::new(inode, offset);
+        let now = self.now();
         if let Some(page) = self.pages.get_mut(&key) {
-            page.touch(self.now());
+            page.touch(now);
             self.hits.fetch_add(1, Ordering::Relaxed);
             Some(page)
         } else {
@@ -270,7 +271,7 @@ impl PageCache {
         for key in keys {
             if let Some(page) = self.pages.get_mut(&key) {
                 if page.flags.dirty {
-                    self.writeback_page(page)?;
+                    Self::writeback_page_static(page)?;
                     flushed += 1;
                 }
             }
@@ -278,6 +279,17 @@ impl PageCache {
 
         self.dirty_pages.store(0, Ordering::Relaxed);
         Ok(flushed)
+    }
+
+    fn writeback_page_static(page: &mut CachedPage) -> Result<(), PageCacheError> {
+        if !page.flags.dirty {
+            return Ok(());
+        }
+
+        // In real implementation, would write to disk
+        // For now, just mark as clean
+        page.mark_clean();
+        Ok(())
     }
 
     /// Invalidate page (remove from cache)
@@ -317,7 +329,8 @@ impl PageCache {
 
     /// Get cache statistics
     pub fn stats(&self) -> PageCacheStats {
-        let total_requests = self.hits.load(Ordering::Relaxed) + self.misses.load(Ordering::Relaxed);
+        let total_requests =
+            self.hits.load(Ordering::Relaxed) + self.misses.load(Ordering::Relaxed);
         let hit_rate = if total_requests > 0 {
             (self.hits.load(Ordering::Relaxed) as f64 / total_requests as f64) * 100.0
         } else {

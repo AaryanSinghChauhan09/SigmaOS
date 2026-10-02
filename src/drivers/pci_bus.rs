@@ -52,7 +52,11 @@ pub struct PciAddress {
 
 impl PciAddress {
     pub const fn new(bus: u8, device: u8, function: u8) -> Self {
-        Self { bus, device, function }
+        Self {
+            bus,
+            device,
+            function,
+        }
     }
 
     /// Encode address for configuration space access
@@ -61,7 +65,7 @@ impl PciAddress {
         let device = self.device as u32;
         let function = self.function as u32;
         let offset = (offset & 0xFC) as u32;
-        
+
         0x80000000 | (bus << 16) | (device << 11) | (function << 8) | offset
     }
 }
@@ -177,7 +181,7 @@ impl PciBus {
     fn read_bar(address: PciAddress, bar_index: u8) -> u64 {
         let offset = PCI_BAR0 + (bar_index * 4);
         let bar = Self::config_read_u32(address, offset);
-        
+
         if bar == 0 {
             return 0;
         }
@@ -186,7 +190,7 @@ impl PciBus {
         if (bar & 0x01) == 0 {
             // Memory space
             let is_64bit = (bar & 0x06) == 0x04;
-            
+
             if is_64bit && bar_index < 5 {
                 // 64-bit BAR spans two registers
                 let high = Self::config_read_u32(address, offset + 4);
@@ -241,7 +245,7 @@ impl PciBus {
         for bus in 0..256 {
             for device in 0..32 {
                 let address = PciAddress::new(bus, device, 0);
-                
+
                 if !Self::device_exists(address) {
                     continue;
                 }
@@ -383,7 +387,7 @@ mod tests {
             bars: [0; 6],
             interrupt_line: 0,
         };
-        
+
         assert_eq!(dev.class_name(), "Display Controller");
         assert!(dev.is_gpu());
     }

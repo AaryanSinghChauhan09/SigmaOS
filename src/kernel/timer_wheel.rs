@@ -113,6 +113,8 @@ impl TimerBucket {
     }
 }
 
+const EMPTY_BUCKET: TimerBucket = TimerBucket { head: None };
+
 /// Timer wheel level
 pub struct TimerWheelLevel {
     /// Buckets for this level
@@ -175,9 +177,9 @@ impl TimerWheel {
             current_tick: 0,
             next_id: 1,
             levels: [
-                TimerWheelLevel::new(1),    // Level 0: 1 tick granularity (0-255 ticks)
-                TimerWheelLevel::new(256),  // Level 1: 256 tick granularity (256-65K ticks)
-                TimerWheelLevel::new(65536), // Level 2: 64K tick granularity (64K-16M ticks)
+                TimerWheelLevel::new(1),        // Level 0: 1 tick granularity (0-255 ticks)
+                TimerWheelLevel::new(256),      // Level 1: 256 tick granularity (256-65K ticks)
+                TimerWheelLevel::new(65536),    // Level 2: 64K tick granularity (64K-16M ticks)
                 TimerWheelLevel::new(16777216), // Level 3: 16M tick granularity (16M+ ticks)
             ],
         }
@@ -287,22 +289,22 @@ impl TimerManager {
                 next_id: 1,
                 levels: [
                     TimerWheelLevel {
-                        buckets: [TimerBucket { head: None }; WHEEL_SIZE],
+                        buckets: [EMPTY_BUCKET; WHEEL_SIZE],
                         granularity: 1,
                         index: 0,
                     },
                     TimerWheelLevel {
-                        buckets: [TimerBucket { head: None }; WHEEL_SIZE],
+                        buckets: [EMPTY_BUCKET; WHEEL_SIZE],
                         granularity: 256,
                         index: 0,
                     },
                     TimerWheelLevel {
-                        buckets: [TimerBucket { head: None }; WHEEL_SIZE],
+                        buckets: [EMPTY_BUCKET; WHEEL_SIZE],
                         granularity: 65536,
                         index: 0,
                     },
                     TimerWheelLevel {
-                        buckets: [TimerBucket { head: None }; WHEEL_SIZE],
+                        buckets: [EMPTY_BUCKET; WHEEL_SIZE],
                         granularity: 16777216,
                         index: 0,
                     },

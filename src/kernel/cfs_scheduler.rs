@@ -34,12 +34,12 @@ const MIN_GRANULARITY_NS: u64 = 750_000; // 0.75ms minimum granularity
 const NICE_WEIGHTS: [u32; 40] = [
     88761, 71755, 56483, 46273, 36291, // -20 to -16
     29154, 23254, 18705, 14949, 11916, // -15 to -11
-    9548, 7620, 6100, 4904, 3906,      // -10 to -6
-    3121, 2501, 1991, 1586, 1277,      // -5 to -1
-    1024, 820, 655, 526, 423,          // 0 to 4
-    335, 272, 215, 172, 137,           // 5 to 9
-    110, 87, 70, 56, 45,               // 10 to 14
-    36, 29, 23, 18, 15,                // 15 to 19
+    9548, 7620, 6100, 4904, 3906, // -10 to -6
+    3121, 2501, 1991, 1586, 1277, // -5 to -1
+    1024, 820, 655, 526, 423, // 0 to 4
+    335, 272, 215, 172, 137, // 5 to 9
+    110, 87, 70, 56, 45, // 10 to 14
+    36, 29, 23, 18, 15, // 15 to 19
 ];
 
 /// Convert nice value to weight
@@ -157,7 +157,7 @@ impl CfsRunQueue {
 
         self.load_weight += task.weight as u64;
         self.nr_running += 1;
-        
+
         // Insert into red-black tree (BTreeMap maintains order)
         self.tasks.insert(task.vruntime, task);
     }
@@ -166,7 +166,7 @@ impl CfsRunQueue {
     /// Linux: `kernel/sched/fair.c:dequeue_entity()`
     pub fn dequeue(&mut self, task_id: usize) -> Option<SchedEntity> {
         let mut found = None;
-        
+
         for (&vruntime, task) in &self.tasks {
             if task.id == task_id {
                 found = Some(vruntime);
@@ -201,7 +201,7 @@ impl CfsRunQueue {
         if let Some((&vruntime, _)) = self.tasks.iter().next() {
             self.min_vruntime = self.min_vruntime.max(vruntime);
         }
-        
+
         if let Some(ref current) = self.current {
             self.min_vruntime = self.min_vruntime.max(current.vruntime);
         }
@@ -215,8 +215,9 @@ impl CfsRunQueue {
         }
 
         // Time slice = target_latency * (task_weight / total_weight)
-        let slice = (SCHED_LATENCY_NS as u128 * task.weight as u128 / self.load_weight as u128) as u64;
-        
+        let slice =
+            (SCHED_LATENCY_NS as u128 * task.weight as u128 / self.load_weight as u128) as u64;
+
         // Ensure minimum granularity
         slice.max(MIN_GRANULARITY_NS)
     }
@@ -285,7 +286,7 @@ impl CfsScheduler {
         }
 
         let rq = &mut self.run_queues[cpu];
-        
+
         // Put current task back if it's still runnable
         if let Some(mut current) = rq.current.take() {
             if current.state == TaskState::Runnable {
@@ -297,7 +298,7 @@ impl CfsScheduler {
         let next = rq.pick_next()?;
         rq.current = Some(next.clone());
         rq.update_min_vruntime();
-        
+
         Some(next)
     }
 
@@ -392,10 +393,10 @@ mod tests {
     fn test_runqueue_operations() {
         let mut rq = CfsRunQueue::new();
         let task = SchedEntity::new(1, 0);
-        
+
         rq.enqueue(task);
         assert_eq!(rq.nr_running, 1);
-        
+
         let picked = rq.pick_next();
         assert!(picked.is_some());
         assert_eq!(rq.nr_running, 0);

@@ -18,11 +18,10 @@ use alloc::vec::Vec;
 use std::string::{String, ToString};
 
 #[cfg(any(feature = "standalone_test", test))]
-use std::format;
 #[cfg(any(feature = "standalone_test", test))]
-#[cfg(any(feature = "standalone_test", test))]
-
 use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
+#[cfg(any(feature = "standalone_test", test))]
+use std::format;
 
 // =========================================================================
 // 1. HARDWARE BOOTSTRAP & CPU DESCRIPTOR TABLES (GDT/IDT/CR3)
