@@ -1,5 +1,6 @@
 /// Advanced High-Fidelity UEFI Bootloader & Secure Boot Chain for SigmaOS
 /// Inspired by Linux systemd-boot and FreeBSD loader architectures, leveraging raw pointer descriptors.
+
 extern crate alloc;
 
 use alloc::vec::Vec;

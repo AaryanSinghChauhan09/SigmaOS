@@ -38,12 +38,7 @@ pub struct TilingWindowGeometry {
 
 impl TilingWindowGeometry {
     pub fn new(x: i32, y: i32, width: u32, height: u32) -> Self {
-        Self {
-            x,
-            y,
-            width,
-            height,
-        }
+        Self { x, y, width, height }
     }
 
     pub fn area(&self) -> u32 {
@@ -71,12 +66,7 @@ pub struct TiledWindow {
 
 impl TiledWindow {
     pub fn new(id: u32, name: String, geometry: TilingWindowGeometry) -> Self {
-        Self {
-            id,
-            name,
-            geometry,
-            is_focused: false,
-        }
+        Self { id, name, geometry, is_focused: false }
     }
 
     pub fn focus(&mut self) {
@@ -179,11 +169,11 @@ impl Workspace {
         let screen_width = 1920u32;
         let screen_height = 1080u32;
         match self.layout {
-            TilingLayout::Spiral => self.recalculate_spiral(screen_width, screen_height),
+            TilingLayout::Spiral  => self.recalculate_spiral(screen_width, screen_height),
             TilingLayout::Monocle => self.recalculate_monocle(screen_width, screen_height),
             TilingLayout::Columns => self.recalculate_columns(screen_width, screen_height),
-            TilingLayout::Rows => self.recalculate_rows(screen_width, screen_height),
-            TilingLayout::Grid => self.recalculate_grid(screen_width, screen_height),
+            TilingLayout::Rows    => self.recalculate_rows(screen_width, screen_height),
+            TilingLayout::Grid    => self.recalculate_grid(screen_width, screen_height),
         }
     }
 
@@ -198,36 +188,14 @@ impl Workspace {
         let mut height = screen_height as i32;
         let mut direction = 0u8; // 0: right, 1: down, 2: left, 3: up
         for (i, window) in self.windows.iter_mut().enumerate() {
-            let w = if i == count - 1 {
-                width as u32
-            } else {
-                (width / 2) as u32
-            };
-            let h = if i == count - 1 {
-                height as u32
-            } else {
-                (height / 2) as u32
-            };
+            let w = if i == count - 1 { width as u32 } else { (width / 2) as u32 };
+            let h = if i == count - 1 { height as u32 } else { (height / 2) as u32 };
             window.set_geometry(TilingWindowGeometry::new(x, y, w, h));
             match direction {
-                0 => {
-                    x += w as i32;
-                    width -= w as i32;
-                    direction = 1;
-                }
-                1 => {
-                    y += h as i32;
-                    height -= h as i32;
-                    direction = 2;
-                }
-                2 => {
-                    width -= w as i32;
-                    direction = 3;
-                }
-                3 => {
-                    height -= h as i32;
-                    direction = 0;
-                }
+                0 => { x += w as i32; width -= w as i32; direction = 1; }
+                1 => { y += h as i32; height -= h as i32; direction = 2; }
+                2 => { width -= w as i32; direction = 3; }
+                3 => { height -= h as i32; direction = 0; }
                 _ => {}
             }
         }
@@ -643,9 +611,7 @@ impl TilingWindowManager {
 
     /// Get active workspace layout
     pub fn get_layout(&self) -> Option<TilingLayout> {
-        self.workspaces
-            .get(&self.active_workspace)
-            .map(|w| w.layout)
+        self.workspaces.get(&self.active_workspace).map(|w| w.layout)
     }
 
     /// Focus window
@@ -703,6 +669,14 @@ impl TilingWindowManager {
             active_layout: self.get_layout(),
         }
     }
+
+
+
+
+
+
+
+
 }
 
 impl Default for TilingWindowManager {
@@ -728,14 +702,8 @@ mod tests {
     #[test]
     fn test_tiling_layout_from_str() {
         assert_eq!(TilingLayout::from_str("spiral"), Some(TilingLayout::Spiral));
-        assert_eq!(
-            TilingLayout::from_str("monocle"),
-            Some(TilingLayout::Monocle)
-        );
-        assert_eq!(
-            TilingLayout::from_str("columns"),
-            Some(TilingLayout::Columns)
-        );
+        assert_eq!(TilingLayout::from_str("monocle"), Some(TilingLayout::Monocle));
+        assert_eq!(TilingLayout::from_str("columns"), Some(TilingLayout::Columns));
         assert_eq!(TilingLayout::from_str("rows"), Some(TilingLayout::Rows));
         assert_eq!(TilingLayout::from_str("grid"), Some(TilingLayout::Grid));
         assert_eq!(TilingLayout::from_str("invalid"), None);
@@ -763,11 +731,7 @@ mod tests {
     #[test]
     fn test_workspace_add_window() {
         let mut workspace = Workspace::new(1, "main".to_string(), TilingLayout::Spiral);
-        let window = TiledWindow::new(
-            1,
-            "Test".to_string(),
-            TilingWindowGeometry::new(0, 0, 800, 600),
-        );
+        let window = TiledWindow::new(1, "Test".to_string(), TilingWindowGeometry::new(0, 0, 800, 600));
         workspace.add_window(window);
         assert_eq!(workspace.window_count(), 1);
     }
@@ -775,11 +739,7 @@ mod tests {
     #[test]
     fn test_workspace_remove_window() {
         let mut workspace = Workspace::new(1, "main".to_string(), TilingLayout::Spiral);
-        let window = TiledWindow::new(
-            1,
-            "Test".to_string(),
-            TilingWindowGeometry::new(0, 0, 800, 600),
-        );
+        let window = TiledWindow::new(1, "Test".to_string(), TilingWindowGeometry::new(0, 0, 800, 600));
         workspace.add_window(window);
         let removed = workspace.remove_window(1);
         assert!(removed.is_some());
@@ -789,16 +749,8 @@ mod tests {
     #[test]
     fn test_workspace_focus_window() {
         let mut workspace = Workspace::new(1, "main".to_string(), TilingLayout::Spiral);
-        let window1 = TiledWindow::new(
-            1,
-            "Test1".to_string(),
-            TilingWindowGeometry::new(0, 0, 800, 600),
-        );
-        let window2 = TiledWindow::new(
-            2,
-            "Test2".to_string(),
-            TilingWindowGeometry::new(0, 0, 800, 600),
-        );
+        let window1 = TiledWindow::new(1, "Test1".to_string(), TilingWindowGeometry::new(0, 0, 800, 600));
+        let window2 = TiledWindow::new(2, "Test2".to_string(), TilingWindowGeometry::new(0, 0, 800, 600));
         workspace.add_window(window1);
         workspace.add_window(window2);
         assert!(workspace.focus_window(2).is_ok());
@@ -815,16 +767,8 @@ mod tests {
     #[test]
     fn test_monocle_layout() {
         let mut workspace = Workspace::new(1, "main".to_string(), TilingLayout::Monocle);
-        let window1 = TiledWindow::new(
-            1,
-            "Test1".to_string(),
-            TilingWindowGeometry::new(0, 0, 800, 600),
-        );
-        let window2 = TiledWindow::new(
-            2,
-            "Test2".to_string(),
-            TilingWindowGeometry::new(0, 0, 800, 600),
-        );
+        let window1 = TiledWindow::new(1, "Test1".to_string(), TilingWindowGeometry::new(0, 0, 800, 600));
+        let window2 = TiledWindow::new(2, "Test2".to_string(), TilingWindowGeometry::new(0, 0, 800, 600));
         workspace.add_window(window1);
         workspace.add_window(window2);
         for window in &workspace.windows {
@@ -836,16 +780,8 @@ mod tests {
     #[test]
     fn test_columns_layout() {
         let mut workspace = Workspace::new(1, "main".to_string(), TilingLayout::Columns);
-        let window1 = TiledWindow::new(
-            1,
-            "Test1".to_string(),
-            TilingWindowGeometry::new(0, 0, 800, 600),
-        );
-        let window2 = TiledWindow::new(
-            2,
-            "Test2".to_string(),
-            TilingWindowGeometry::new(0, 0, 800, 600),
-        );
+        let window1 = TiledWindow::new(1, "Test1".to_string(), TilingWindowGeometry::new(0, 0, 800, 600));
+        let window2 = TiledWindow::new(2, "Test2".to_string(), TilingWindowGeometry::new(0, 0, 800, 600));
         workspace.add_window(window1);
         workspace.add_window(window2);
         assert_eq!(workspace.windows[0].geometry.x, 0);
@@ -855,16 +791,8 @@ mod tests {
     #[test]
     fn test_rows_layout() {
         let mut workspace = Workspace::new(1, "main".to_string(), TilingLayout::Rows);
-        let window1 = TiledWindow::new(
-            1,
-            "Test1".to_string(),
-            TilingWindowGeometry::new(0, 0, 800, 600),
-        );
-        let window2 = TiledWindow::new(
-            2,
-            "Test2".to_string(),
-            TilingWindowGeometry::new(0, 0, 800, 600),
-        );
+        let window1 = TiledWindow::new(1, "Test1".to_string(), TilingWindowGeometry::new(0, 0, 800, 600));
+        let window2 = TiledWindow::new(2, "Test2".to_string(), TilingWindowGeometry::new(0, 0, 800, 600));
         workspace.add_window(window1);
         workspace.add_window(window2);
         assert_eq!(workspace.windows[0].geometry.y, 0);

@@ -1636,12 +1636,7 @@ impl FirefoxGeckoFlexboxLayoutEngine {
         Self
     }
 
-    pub fn compute_flex_item_grow(
-        &self,
-        base_width: f32,
-        flex_grow: f32,
-        container_width: f32,
-    ) -> f32 {
+    pub fn compute_flex_item_grow(&self, base_width: f32, flex_grow: f32, container_width: f32) -> f32 {
         if flex_grow > 0.0 && container_width > base_width {
             base_width + (container_width - base_width) * (flex_grow / (flex_grow + 1.0))
         } else {
@@ -1691,8 +1686,7 @@ impl FirefoxTotalCookieProtectionEngine {
 
     pub fn store_partitioned_cookie(&mut self, top_level_domain: &str, cookie_val: &str) {
         let key = self.get_partition_key(top_level_domain);
-        self.isolated_cookie_jars
-            .insert(key, cookie_val.to_string());
+        self.isolated_cookie_jars.insert(key, cookie_val.to_string());
     }
 }
 
@@ -1821,10 +1815,7 @@ impl MullvadODohRelayEngine {
     }
 
     pub fn build_odoh_query_url(&self, domain: &str) -> String {
-        format!(
-            "{}/relay?target={}&q={}",
-            self.proxy_relay, self.target_resolver, domain
-        )
+        format!("{}/relay?target={}&q={}", self.proxy_relay, self.target_resolver, domain)
     }
 }
 
@@ -1841,10 +1832,7 @@ impl DuckDuckGoAiAssistSummarizerEngine {
     }
 
     pub fn summarize_query(&self, query: &str) -> String {
-        format!(
-            "DuckAssist Privacy Summary for '{}': Key verified facts extracted without tracking.",
-            query
-        )
+        format!("DuckAssist Privacy Summary for '{}': Key verified facts extracted without tracking.", query)
     }
 }
 
@@ -1859,12 +1847,7 @@ impl LadybirdLibWebCss3ParserEngine {
     pub fn parse_selector_specificity(&self, selector: &str) -> (u32, u32, u32) {
         let ids = selector.matches('#').count() as u32;
         let classes = selector.matches('.').count() as u32 + selector.matches(':').count() as u32;
-        let elements =
-            if selector.contains("div") || selector.contains("span") || selector.contains("p") {
-                1
-            } else {
-                0
-            };
+        let elements = if selector.contains("div") || selector.contains("span") || selector.contains("p") { 1 } else { 0 };
         (ids, classes, elements)
     }
 }
@@ -1915,8 +1898,7 @@ impl ArcBoostDomainStylingEngine {
     }
 
     pub fn register_domain_css_boost(&mut self, domain: &str, css_rules: &str) {
-        self.active_boosts
-            .insert(domain.to_string(), css_rules.to_string());
+        self.active_boosts.insert(domain.to_string(), css_rules.to_string());
     }
 }
 
@@ -2973,34 +2955,13 @@ mod tests {
         assert_eq!(reflow_count, 1);
 
         let audit = suite.run_comprehensive_browser_suite_audit("https://example.com/index.html");
-        assert_eq!(
-            audit.get("network_request_safety"),
-            Some(&"true".to_string())
-        );
-        assert_eq!(
-            audit.get("firefox_gecko_subgrid_tracks"),
-            Some(&"3".to_string())
-        );
-        assert_eq!(
-            audit.get("chromium_blink_dom_reflow"),
-            Some(&"2".to_string())
-        );
-        assert_eq!(
-            audit.get("brave_cname_uncloaked"),
-            Some(&"tracking.doubleclick.net".to_string())
-        );
-        assert_eq!(
-            audit.get("librewolf_canvas_noise_enabled"),
-            Some(&"true".to_string())
-        );
-        assert_eq!(
-            audit.get("tor_javascript_allowed"),
-            Some(&"true".to_string())
-        );
-        assert_eq!(
-            audit.get("mullvad_tab_proxy"),
-            Some(&"direct://".to_string())
-        );
+        assert_eq!(audit.get("network_request_safety"), Some(&"true".to_string()));
+        assert_eq!(audit.get("firefox_gecko_subgrid_tracks"), Some(&"3".to_string()));
+        assert_eq!(audit.get("chromium_blink_dom_reflow"), Some(&"2".to_string()));
+        assert_eq!(audit.get("brave_cname_uncloaked"), Some(&"tracking.doubleclick.net".to_string()));
+        assert_eq!(audit.get("librewolf_canvas_noise_enabled"), Some(&"true".to_string()));
+        assert_eq!(audit.get("tor_javascript_allowed"), Some(&"true".to_string()));
+        assert_eq!(audit.get("mullvad_tab_proxy"), Some(&"direct://".to_string()));
     }
 }
 
@@ -3034,96 +2995,47 @@ impl SovereignOpenSourceBrowserSuiteEngine {
     }
 
     /// Performs comprehensive open-source web browser privacy, security, and layout audit
-    pub fn run_comprehensive_browser_suite_audit(
-        &mut self,
-        target_url: &str,
-    ) -> BTreeMap<String, String> {
+    pub fn run_comprehensive_browser_suite_audit(&mut self, target_url: &str) -> BTreeMap<String, String> {
         let mut results = BTreeMap::new();
 
         let safe = self.evaluate_network_request_safety(target_url);
         results.insert("network_request_safety".to_string(), safe.to_string());
 
-        let gecko_tracks = self
-            .browser
-            .geckoview_layout
-            .compute_subgrid_tracks(1024.0)
-            .len();
-        results.insert(
-            "firefox_gecko_subgrid_tracks".to_string(),
-            gecko_tracks.to_string(),
-        );
+        let gecko_tracks = self.browser.geckoview_layout.compute_subgrid_tracks(1024.0).len();
+        results.insert("firefox_gecko_subgrid_tracks".to_string(), gecko_tracks.to_string());
 
         let blink_reflow = self.browser.blink_layout.trigger_dom_reflow();
-        results.insert(
-            "chromium_blink_dom_reflow".to_string(),
-            blink_reflow.to_string(),
-        );
+        results.insert("chromium_blink_dom_reflow".to_string(), blink_reflow.to_string());
 
-        let uncloaked = self
-            .browser
-            .brave_shields
-            .resolve_cname_uncloak("metrics.example.com");
+        let uncloaked = self.browser.brave_shields.resolve_cname_uncloak("metrics.example.com");
         results.insert("brave_cname_uncloaked".to_string(), uncloaked);
 
-        let librewolf_canvas_noise = self
-            .browser
-            .librewolf_hardening
-            .canvas_fingerprint_noise_enabled;
-        results.insert(
-            "librewolf_canvas_noise_enabled".to_string(),
-            librewolf_canvas_noise.to_string(),
-        );
+        let librewolf_canvas_noise = self.browser.librewolf_hardening.canvas_fingerprint_noise_enabled;
+        results.insert("librewolf_canvas_noise_enabled".to_string(), librewolf_canvas_noise.to_string());
 
         let tor_js_allowed = self.browser.tor_manager.is_javascript_allowed(true);
-        results.insert(
-            "tor_javascript_allowed".to_string(),
-            tor_js_allowed.to_string(),
-        );
+        results.insert("tor_javascript_allowed".to_string(), tor_js_allowed.to_string());
 
         let mullvad_proxy = self.browser.mullvad_isolation.get_tab_proxy(1);
         results.insert("mullvad_tab_proxy".to_string(), mullvad_proxy);
 
-        let gecko_flex = self
-            .browser
-            .gecko_flexbox
-            .compute_flex_item_grow(100.0, 1.0, 200.0);
-        results.insert(
-            "firefox_gecko_flex_width".to_string(),
-            gecko_flex.to_string(),
-        );
+        let gecko_flex = self.browser.gecko_flexbox.compute_flex_item_grow(100.0, 1.0, 200.0);
+        results.insert("firefox_gecko_flex_width".to_string(), gecko_flex.to_string());
 
-        let sanitized_sdp = self
-            .browser
-            .librewolf_webrtc
-            .sanitize_sdp_candidate("candidate:0 1 UDP 2122260223 192.168.1.10 9 typ host");
+        let sanitized_sdp = self.browser.librewolf_webrtc.sanitize_sdp_candidate("candidate:0 1 UDP 2122260223 192.168.1.10 9 typ host");
         results.insert("librewolf_webrtc_sdp_sanitized".to_string(), sanitized_sdp);
 
         let partitioned_key = self.browser.firefox_tcp.get_partition_key("example.com");
         results.insert("firefox_tcp_partition_key".to_string(), partitioned_key);
 
-        let csp_script_ok = self
-            .browser
-            .firefox_csp
-            .is_script_allowed("https://cdn.example.com");
-        results.insert(
-            "firefox_csp_script_allowed".to_string(),
-            csp_script_ok.to_string(),
-        );
+        let csp_script_ok = self.browser.firefox_csp.is_script_allowed("https://cdn.example.com");
+        results.insert("firefox_csp_script_allowed".to_string(), csp_script_ok.to_string());
 
-        let odoh_url = self
-            .browser
-            .mullvad_odoh
-            .build_odoh_query_url("example.com");
+        let odoh_url = self.browser.mullvad_odoh.build_odoh_query_url("example.com");
         results.insert("mullvad_odoh_query_url".to_string(), odoh_url);
 
-        let duck_summary = self
-            .browser
-            .duckassist_summary
-            .summarize_query("SigmaOS Web");
-        results.insert(
-            "duckassist_summary_generated".to_string(),
-            (!duck_summary.is_empty()).to_string(),
-        );
+        let duck_summary = self.browser.duckassist_summary.summarize_query("SigmaOS Web");
+        results.insert("duckassist_summary_generated".to_string(), (!duck_summary.is_empty()).to_string());
 
         results
     }

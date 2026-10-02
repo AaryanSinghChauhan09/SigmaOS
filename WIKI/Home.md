@@ -43,6 +43,16 @@ Firmware → Bootloader → Kernel Init → Memory Manager → Scheduler →
 
 ---
 
+## 🗺️ Component Future Development Roadmaps
+
+- 🔬 [Kernel & Core Subsystems Roadmap](17-Roadmap-Kernel-and-Core-Subsystems.md)
+- 💾 [Filesystems & Storage Subsystems Roadmap](18-Roadmap-Filesystems-and-Storage.md)
+- 🌐 [Networking & Post-Quantum Security Roadmap](19-Roadmap-Networking-and-Security.md)
+- 🖥️ [Desktop GUI & Userland Tooling Roadmap](20-Roadmap-Desktop-GUI-and-Userland.md)
+- 📦 [Package Management & App Ecosystem Roadmap](21-Roadmap-Package-Management-and-App-Ecosystem.md)
+
+---
+
 ## 🏗️ Architecture
 
 ```

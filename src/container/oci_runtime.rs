@@ -272,11 +272,9 @@ impl ImageManager for SimpleImageManager {
 
     fn remove_image(&mut self, name: &[u8], _tag: &[u8]) -> Result<(), ContainerError> {
         // Performance optimization: explicit stored name_len enables direct O(1) slice lookup, eliminating O(N) null-byte scans.
-        if let Some(pos) = self
-            .images
-            .iter()
-            .position(|img| &img.0[..img.1 as usize] == name)
-        {
+        if let Some(pos) = self.images.iter().position(|img| {
+            &img.0[..img.1 as usize] == name
+        }) {
             self.images.remove(pos);
             Ok(())
         } else {

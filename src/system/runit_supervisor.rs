@@ -11,23 +11,11 @@ use std::collections::HashMap;
 
 /// Service state (mirrors runit's sv states)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ServiceState {
-    Down,
-    Up,
-    Finishing,
-    Exited(i32),
-    Paused,
-    Waiting,
-}
+pub enum ServiceState { Down, Up, Finishing, Exited(i32), Paused, Waiting }
 
 /// Service restart policy
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum RestartPolicy {
-    Never,
-    OnFailure,
-    Always,
-    BackoffExponential,
-}
+pub enum RestartPolicy { Never, OnFailure, Always, BackoffExponential }
 
 /// A supervised service definition
 #[derive(Debug, Clone)]
@@ -71,12 +59,7 @@ pub struct RunitSupervisor {
 
 impl RunitSupervisor {
     pub fn new() -> Self {
-        Self {
-            services: HashMap::new(),
-            total_starts: 0,
-            total_restarts: 0,
-            total_failures: 0,
-        }
+        Self { services: HashMap::new(), total_starts: 0, total_restarts: 0, total_failures: 0 }
     }
 
     pub fn add_service(&mut self, svc: ServiceDef) {
@@ -85,23 +68,15 @@ impl RunitSupervisor {
 
     /// Start a service (and its dependencies first).
     pub fn start(&mut self, name: &str) -> Result<(), &'static str> {
-        let deps: Vec<String> = self
-            .services
-            .get(name)
-            .ok_or("Service not found")?
-            .dependencies
-            .clone();
+        let deps: Vec<String> = self.services.get(name)
+            .ok_or("Service not found")?.dependencies.clone();
         for dep in &deps {
             if let Some(d) = self.services.get(dep) {
-                if d.state != ServiceState::Up {
-                    return Err("Dependency not running");
-                }
+                if d.state != ServiceState::Up { return Err("Dependency not running"); }
             }
         }
         let svc = self.services.get_mut(name).ok_or("Service not found")?;
-        if svc.state == ServiceState::Up {
-            return Ok(());
-        }
+        if svc.state == ServiceState::Up { return Ok(()); }
         svc.pid = Some(1000 + svc.name.len() as u32);
         svc.state = ServiceState::Up;
         self.total_starts += 1;
@@ -117,10 +92,7 @@ impl RunitSupervisor {
     }
 
     pub fn handle_exit(&mut self, name: &str, exit_code: i32) {
-        let svc = match self.services.get_mut(name) {
-            Some(s) => s,
-            None => return,
-        };
+        let svc = match self.services.get_mut(name) { Some(s) => s, None => return };
         svc.state = ServiceState::Exited(exit_code);
         svc.pid = None;
         let should_restart = match svc.restart_policy {
@@ -139,28 +111,18 @@ impl RunitSupervisor {
     }
 
     pub fn running_count(&self) -> usize {
-        self.services
-            .values()
-            .filter(|s| s.state == ServiceState::Up)
-            .count()
+        self.services.values().filter(|s| s.state == ServiceState::Up).count()
     }
 
     pub fn status(&self) -> Vec<(&str, ServiceState, Option<u32>)> {
-        let mut r: Vec<_> = self
-            .services
-            .values()
-            .map(|s| (s.name.as_str(), s.state, s.pid))
-            .collect();
+        let mut r: Vec<_> = self.services.values()
+            .map(|s| (s.name.as_str(), s.state, s.pid)).collect();
         r.sort_by_key(|s| s.0);
         r
     }
 }
 
-impl Default for RunitSupervisor {
-    fn default() -> Self {
-        Self::new()
-    }
-}
+impl Default for RunitSupervisor { fn default() -> Self { Self::new() } }
 
 #[cfg(test)]
 mod tests {

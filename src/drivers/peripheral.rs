@@ -28,8 +28,7 @@ pub enum PowerState {
     Off,
     FullOn,
     Standby,
-    Unknown,
-}
+    Unknown,}
 
 /// Unified Peripheral Device Trait
 /// Any connected peripheral must implement this trait regardless of its generation.

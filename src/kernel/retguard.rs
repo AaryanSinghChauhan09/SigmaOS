@@ -6,8 +6,8 @@
 //! Reference: OpenBSD src/sys/arch/amd64/amd64/retguard.S
 //! SigmaOS: software-layer simulation; hardware CET/shadow stack when available.
 
-use crate::crypto::entropy;
 use core::sync::atomic::{AtomicU64, Ordering};
+use crate::crypto::entropy;
 
 /// Global per-boot cookie used to XOR-mask return addresses.
 static RETGUARD_COOKIE: AtomicU64 = AtomicU64::new(0);
@@ -67,9 +67,7 @@ pub struct RetGuard {
 impl RetGuard {
     /// Encode and store the return address.
     pub fn new(ret_addr: u64) -> Self {
-        Self {
-            encoded: encode_retaddr(ret_addr),
-        }
+        Self { encoded: encode_retaddr(ret_addr) }
     }
 
     /// Verify the return address on drop (simulates epilogue check).
@@ -98,7 +96,7 @@ mod tests {
         let addr = 0xFFFF_FFFF_8012_3456u64;
         let mut encoded = encode_retaddr(addr);
         encoded ^= 0x1; // flip a bit
-                        // corrupted — decode won't match original
+        // corrupted — decode won't match original
         let decoded = verify_retaddr(encoded);
         // Decoded may or may not be Some (depends on value), but encoded != original
         assert_ne!(decoded, Some(addr));

@@ -1,5 +1,5 @@
-pub mod mobile_variant;
 pub mod zenith_config;
+pub mod mobile_variant;
 pub use mobile_variant::*;
 pub mod tiling;
 pub use tiling::{TilingLayout, TilingWindow, TilingWindowManager, WindowArea, Workspace};
@@ -68,8 +68,8 @@ pub use zenith_compositor::{
 };
 
 pub use zenith_config::{
-    AppearanceConfig, CompositorBackend, CompositorConfig, InputConfig, MouseAcceleration,
-    OutputScale, Theme, ZenithConfig,
+    CompositorBackend, CompositorConfig, InputConfig, AppearanceConfig, ZenithConfig,
+    OutputScale, Theme, MouseAcceleration,
 };
 
 pub use crate::desktop::sovereign_navigation_engine::{
@@ -97,7 +97,7 @@ pub mod permission_portal;
 pub use font_manager::*;
 pub use onboarding_wizard::*;
 pub use permission_portal::*;
-pub mod cinnamon_xapp_libgui;
 pub mod display_manager;
 pub mod file_manager_extensions;
 pub mod system_tray;
+pub mod cinnamon_xapp_libgui;

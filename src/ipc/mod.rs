@@ -72,5 +72,5 @@ pub use tech_media_std_streams_synthesis::{
     ZeroCopySpliceTeeStreamEngine,
 };
 pub mod binder_ring_buffer;
-pub mod plan9_9p2000;
 pub mod zircon_channels;
+pub mod plan9_9p2000;

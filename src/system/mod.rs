@@ -83,10 +83,6 @@ pub use sandbox::{
     ResourceLimits, ResourceUsage, SandboxEnforcement, SandboxError, SandboxOperation,
     SandboxProcess, SandboxProfile, SandboxResult,
 };
-pub use service_manager::{
-    SystemRestartPolicy, SystemService, SystemServiceConfig, SystemServiceManager,
-    SystemServiceState, SystemServiceType,
-};
 pub use shredder::{
     Dod5220Shredder, FileShredder, GutmannShredder, RandomPassShredder, ShredderError,
     ShreddingAlgorithm, ShreddingResult, ShreddingStrategy, ZeroPassShredder,
@@ -109,6 +105,10 @@ pub use state::{
 };
 pub use syslog::{LogAction, LogEntry, LogFacility, LogLevel, LogRule, SyslogError, SyslogManager};
 pub use user::{Group, ShadowEntry, SudoPolicyEngine, SudoersRule, User, UserError, UserManager};
+pub use service_manager::{
+    SystemServiceState, SystemServiceType, SystemRestartPolicy,
+    SystemServiceConfig, SystemService, SystemServiceManager,
+};
 
 pub mod atomic_upgrade;
 

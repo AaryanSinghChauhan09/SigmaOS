@@ -3780,7 +3780,12 @@ impl SovereignNixFlakeLockEngine {
         }
     }
 
-    pub fn register_flake_input(&mut self, name: &str, uri: &str, pinned_sha256: &str) {
+    pub fn register_flake_input(
+        &mut self,
+        name: &str,
+        uri: &str,
+        pinned_sha256: &str,
+    ) {
         self.inputs.insert(
             name.to_string(),
             FlakeInputDependency {
@@ -4151,23 +4156,10 @@ impl SovereignOpenSourceObsoletionOrchestrator {
             inserted_text: "// Zed Editor Engine Active\n".to_string(),
             deleted_length: 0,
         })?;
-        let _ = self
-            .uutils_coreutils
-            .copy_file_range_fast(b"coreutils_data")?;
-        let jail_id = self.freebsd_jail_rctl.create_jail(
-            "secure_jail",
-            "/jails/secure",
-            "vnet0",
-            1024,
-            50,
-            1000,
-        );
+        let _ = self.uutils_coreutils.copy_file_range_fast(b"coreutils_data")?;
+        let jail_id = self.freebsd_jail_rctl.create_jail("secure_jail", "/jails/secure", "vnet0", 1024, 50, 1000);
         assert_eq!(jail_id, 1);
-        self.nix_flake_lock.register_flake_input(
-            "nixpkgs",
-            "github:NixOS/nixpkgs",
-            "e0a1b2c3d4e5f6",
-        );
+        self.nix_flake_lock.register_flake_input("nixpkgs", "github:NixOS/nixpkgs", "e0a1b2c3d4e5f6");
         assert!(self.nix_flake_lock.verify_flake_lockfile());
 
         Ok(format!(
@@ -7974,16 +7966,8 @@ mod tests {
     #[test]
     fn test_sovereign_nix_flake_lock_engine() {
         let mut nix = SovereignNixFlakeLockEngine::new();
-        nix.register_flake_input(
-            "nixpkgs",
-            "github:NixOS/nixpkgs/nixos-unstable",
-            "abc123def456",
-        );
-        nix.register_flake_input(
-            "home-manager",
-            "github:nix-community/home-manager",
-            "789012345678",
-        );
+        nix.register_flake_input("nixpkgs", "github:NixOS/nixpkgs/nixos-unstable", "abc123def456");
+        nix.register_flake_input("home-manager", "github:nix-community/home-manager", "789012345678");
 
         assert!(nix.verify_flake_lockfile());
         assert_eq!(nix.evaluated_generations_count, 1);

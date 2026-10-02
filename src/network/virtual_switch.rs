@@ -5,8 +5,8 @@ use alloc::string::String;
 use alloc::string::ToString;
 use alloc::vec::Vec;
 extern crate alloc;
-use alloc::collections::BTreeMap;
 use alloc::format;
+use alloc::collections::BTreeMap;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SwitchPortMode {

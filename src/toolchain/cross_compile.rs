@@ -839,7 +839,12 @@ mod tests {
 
     #[test]
     fn test_simple_toolchain_cached_len() {
-        let tc = SimpleToolchain::new(1, Architecture::X86_64, b"x86_64-linux-gnu-gcc", b"13.2.0");
+        let tc = SimpleToolchain::new(
+            1,
+            Architecture::X86_64,
+            b"x86_64-linux-gnu-gcc",
+            b"13.2.0",
+        );
         assert_eq!(tc.name(), b"x86_64-linux-gnu-gcc");
         assert_eq!(tc.version(), b"13.2.0");
         assert_eq!(tc.name_len, 20);

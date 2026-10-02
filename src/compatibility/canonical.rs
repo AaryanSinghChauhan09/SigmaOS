@@ -740,10 +740,7 @@ impl SigmaCloudInit {
         }
     }
 
-    pub fn poll_metadata_endpoints(
-        &mut self,
-        ip_addr: &str,
-    ) -> Result<HashMap<String, String>, ()> {
+    pub fn poll_metadata_endpoints(&mut self, ip_addr: &str) -> Result<HashMap<String, String>, ()> {
         self.metadata_polled = true;
         let mut metadata = HashMap::new();
         metadata.insert("instance-id".to_string(), "i-08a9f8b449".to_string());
@@ -962,10 +959,7 @@ impl SigmaLiveRemasterBuilder {
             return Err("No system files included in remaster template".to_string());
         }
         self.live_iso_generated = true;
-        Ok(format!(
-            "/var/lib/remaster/live-rescue-{}.iso",
-            self.active_remaster_id
-        ))
+        Ok(format!("/var/lib/remaster/live-rescue-{}.iso", self.active_remaster_id))
     }
 }
 
@@ -1015,10 +1009,7 @@ impl ZorinConnectHub {
         let mut count = 0;
         for dev in &self.paired_devices {
             if dev.is_connected {
-                println!(
-                    "ZORIN_CONNECT: Sending notification [{}] '{}' to device '{}'",
-                    title, body, dev.name
-                );
+                println!("ZORIN_CONNECT: Sending notification [{}] '{}' to device '{}'", title, body, dev.name);
                 count += 1;
             }
         }
@@ -1056,10 +1047,7 @@ impl ZorinWineLayer {
         }
         let app_name = exe_path.split('/').last().unwrap_or("app.exe").to_string();
         self.active_windows_processes.push(app_name.clone());
-        Ok(format!(
-            "ZORIN_WINE: Successfully loaded process '{}' inside prefix '{}'",
-            app_name, self.wine_prefix_path
-        ))
+        Ok(format!("ZORIN_WINE: Successfully loaded process '{}' inside prefix '{}'", app_name, self.wine_prefix_path))
     }
 }
 
@@ -1127,21 +1115,10 @@ impl SigmaEcosystemInit {
                 self.running_services = vec!["udev".to_string(), "syslog".to_string()];
             }
             FhsRunlevel::MultiUser => {
-                self.running_services = vec![
-                    "udev".to_string(),
-                    "syslog".to_string(),
-                    "networking".to_string(),
-                    "cron".to_string(),
-                ];
+                self.running_services = vec!["udev".to_string(), "syslog".to_string(), "networking".to_string(), "cron".to_string()];
             }
             FhsRunlevel::Graphical => {
-                self.running_services = vec![
-                    "udev".to_string(),
-                    "syslog".to_string(),
-                    "networking".to_string(),
-                    "cron".to_string(),
-                    "zenith_desktop".to_string(),
-                ];
+                self.running_services = vec!["udev".to_string(), "syslog".to_string(), "networking".to_string(), "cron".to_string(), "zenith_desktop".to_string()];
             }
         }
     }
