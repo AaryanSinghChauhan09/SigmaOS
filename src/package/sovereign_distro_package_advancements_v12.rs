@@ -38,7 +38,6 @@ use std::vec;
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
 
-
 // ============================================================================
 // 1. Comprehensive Universal Package Formats
 // ============================================================================
@@ -186,36 +185,82 @@ impl SovereignUniversalPackageFormatCompatibilityMatrix {
     }
 
     fn populate_defaults(&mut self) {
-        self.registered_formats.insert(".deb".to_string(), UniversalPackageFormatKind::DebianDeb);
-        self.registered_formats.insert(".udeb".to_string(), UniversalPackageFormatKind::DebianUdeb);
-        self.registered_formats.insert(".superdeb".to_string(), UniversalPackageFormatKind::DeepinSuperdeb);
-        self.registered_formats.insert(".rpm".to_string(), UniversalPackageFormatKind::FedoraRpm);
-        self.registered_formats.insert(".drpm".to_string(), UniversalPackageFormatKind::DeltaRpm);
-        self.registered_formats.insert(".pkg.tar.zst".to_string(), UniversalPackageFormatKind::ArchPacman);
-        self.registered_formats.insert(".apk".to_string(), UniversalPackageFormatKind::AlpineApk);
-        self.registered_formats.insert(".ebuild".to_string(), UniversalPackageFormatKind::GentooEbuild);
-        self.registered_formats.insert(".xbps".to_string(), UniversalPackageFormatKind::VoidXbps);
-        self.registered_formats.insert(".eopkg".to_string(), UniversalPackageFormatKind::SolusEopkg);
-        self.registered_formats.insert(".moss".to_string(), UniversalPackageFormatKind::SerpentMoss);
-        self.registered_formats.insert(".ipk".to_string(), UniversalPackageFormatKind::OpenWrtIpk);
-        self.registered_formats.insert(".pkg".to_string(), UniversalPackageFormatKind::FreeBsdPkg);
-        self.registered_formats.insert(".tgz".to_string(), UniversalPackageFormatKind::OpenBsdPkg);
-        self.registered_formats.insert(".nar".to_string(), UniversalPackageFormatKind::GuixNarArchive);
-        self.registered_formats.insert(".whl".to_string(), UniversalPackageFormatKind::PythonWheel);
-        self.registered_formats.insert(".crate".to_string(), UniversalPackageFormatKind::CargoCrate);
-        self.registered_formats.insert(".gem".to_string(), UniversalPackageFormatKind::RubyGem);
-        self.registered_formats.insert(".nupkg".to_string(), UniversalPackageFormatKind::NuGetNupkg);
-        self.registered_formats.insert(".flatpakref".to_string(), UniversalPackageFormatKind::FlatpakRef);
-        self.registered_formats.insert(".snap".to_string(), UniversalPackageFormatKind::SnapSquashfs);
-        self.registered_formats.insert(".appimage".to_string(), UniversalPackageFormatKind::AppImageBinary);
-        self.registered_formats.insert(".msi".to_string(), UniversalPackageFormatKind::WindowsMsi);
-        self.registered_formats.insert(".apex".to_string(), UniversalPackageFormatKind::AndroidApex);
-        self.registered_formats.insert(".wasm".to_string(), UniversalPackageFormatKind::WasmComponent);
-        self.registered_formats.insert(".sigpkg".to_string(), UniversalPackageFormatKind::SigmaPkg);
+        self.registered_formats
+            .insert(".deb".to_string(), UniversalPackageFormatKind::DebianDeb);
+        self.registered_formats
+            .insert(".udeb".to_string(), UniversalPackageFormatKind::DebianUdeb);
+        self.registered_formats.insert(
+            ".superdeb".to_string(),
+            UniversalPackageFormatKind::DeepinSuperdeb,
+        );
+        self.registered_formats
+            .insert(".rpm".to_string(), UniversalPackageFormatKind::FedoraRpm);
+        self.registered_formats
+            .insert(".drpm".to_string(), UniversalPackageFormatKind::DeltaRpm);
+        self.registered_formats.insert(
+            ".pkg.tar.zst".to_string(),
+            UniversalPackageFormatKind::ArchPacman,
+        );
+        self.registered_formats
+            .insert(".apk".to_string(), UniversalPackageFormatKind::AlpineApk);
+        self.registered_formats.insert(
+            ".ebuild".to_string(),
+            UniversalPackageFormatKind::GentooEbuild,
+        );
+        self.registered_formats
+            .insert(".xbps".to_string(), UniversalPackageFormatKind::VoidXbps);
+        self.registered_formats
+            .insert(".eopkg".to_string(), UniversalPackageFormatKind::SolusEopkg);
+        self.registered_formats
+            .insert(".moss".to_string(), UniversalPackageFormatKind::SerpentMoss);
+        self.registered_formats
+            .insert(".ipk".to_string(), UniversalPackageFormatKind::OpenWrtIpk);
+        self.registered_formats
+            .insert(".pkg".to_string(), UniversalPackageFormatKind::FreeBsdPkg);
+        self.registered_formats
+            .insert(".tgz".to_string(), UniversalPackageFormatKind::OpenBsdPkg);
+        self.registered_formats.insert(
+            ".nar".to_string(),
+            UniversalPackageFormatKind::GuixNarArchive,
+        );
+        self.registered_formats
+            .insert(".whl".to_string(), UniversalPackageFormatKind::PythonWheel);
+        self.registered_formats
+            .insert(".crate".to_string(), UniversalPackageFormatKind::CargoCrate);
+        self.registered_formats
+            .insert(".gem".to_string(), UniversalPackageFormatKind::RubyGem);
+        self.registered_formats
+            .insert(".nupkg".to_string(), UniversalPackageFormatKind::NuGetNupkg);
+        self.registered_formats.insert(
+            ".flatpakref".to_string(),
+            UniversalPackageFormatKind::FlatpakRef,
+        );
+        self.registered_formats.insert(
+            ".snap".to_string(),
+            UniversalPackageFormatKind::SnapSquashfs,
+        );
+        self.registered_formats.insert(
+            ".appimage".to_string(),
+            UniversalPackageFormatKind::AppImageBinary,
+        );
+        self.registered_formats
+            .insert(".msi".to_string(), UniversalPackageFormatKind::WindowsMsi);
+        self.registered_formats
+            .insert(".apex".to_string(), UniversalPackageFormatKind::AndroidApex);
+        self.registered_formats.insert(
+            ".wasm".to_string(),
+            UniversalPackageFormatKind::WasmComponent,
+        );
+        self.registered_formats
+            .insert(".sigpkg".to_string(), UniversalPackageFormatKind::SigmaPkg);
     }
 
     /// Inspect magic byte header or filename extension to identify format
-    pub fn inspect_package_format(&self, filename: &str, header_bytes: &[u8]) -> PackageMagicInspection {
+    pub fn inspect_package_format(
+        &self,
+        filename: &str,
+        header_bytes: &[u8],
+    ) -> PackageMagicInspection {
         // Magic byte inspection
         if header_bytes.len() >= 4 {
             if &header_bytes[0..4] == b"!<arch>\n" || &header_bytes[0..4] == b"\x21\x3c\x61\x72" {
@@ -276,7 +321,10 @@ impl SovereignUniversalPackageFormatCompatibilityMatrix {
     }
 
     /// Synthesize scriptlet sandboxing policy for the target package format
-    pub fn synthesize_sandbox_policy(&self, kind: UniversalPackageFormatKind) -> CrossDistroScriptletSandboxPolicy {
+    pub fn synthesize_sandbox_policy(
+        &self,
+        kind: UniversalPackageFormatKind,
+    ) -> CrossDistroScriptletSandboxPolicy {
         match kind {
             UniversalPackageFormatKind::DebianDeb
             | UniversalPackageFormatKind::FedoraRpm
@@ -370,7 +418,10 @@ impl SovereignCrossDistroAbiDependencySolver {
             {
                 resolved_count += 1;
             } else {
-                return Err(format!("Unsatisfied cross-distro SONAME dependency: {}", soname));
+                return Err(format!(
+                    "Unsatisfied cross-distro SONAME dependency: {}",
+                    soname
+                ));
             }
         }
         Ok(resolved_count)
@@ -500,7 +551,10 @@ impl SovereignUniversalPackageRollbackAndSnapshotGovernor {
     }
 
     /// Rollback to target snapshot ID
-    pub fn rollback_to_snapshot(&mut self, snapshot_id: u64) -> Result<SnapshotBackendKind, &'static str> {
+    pub fn rollback_to_snapshot(
+        &mut self,
+        snapshot_id: u64,
+    ) -> Result<SnapshotBackendKind, &'static str> {
         let mut target_backend = None;
         for snap in &mut self.snapshots {
             if snap.snapshot_id == snapshot_id {
@@ -592,10 +646,22 @@ impl SovereignPqcMultiKeyringPackageTrustGovernor {
     }
 
     fn populate_trusted_keys(&mut self) {
-        self.trusted_keys.insert("openbsd-75-base".to_string(), SignatureSchemeKind::OpenBsdSignify);
-        self.trusted_keys.insert("alpine-3.19-main".to_string(), SignatureSchemeKind::AlpineApkEd25519);
-        self.trusted_keys.insert("archlinux-keyring".to_string(), SignatureSchemeKind::GpgWebOfTrust);
-        self.trusted_keys.insert("sigmaos-pqc-master".to_string(), SignatureSchemeKind::PostQuantumDilithium);
+        self.trusted_keys.insert(
+            "openbsd-75-base".to_string(),
+            SignatureSchemeKind::OpenBsdSignify,
+        );
+        self.trusted_keys.insert(
+            "alpine-3.19-main".to_string(),
+            SignatureSchemeKind::AlpineApkEd25519,
+        );
+        self.trusted_keys.insert(
+            "archlinux-keyring".to_string(),
+            SignatureSchemeKind::GpgWebOfTrust,
+        );
+        self.trusted_keys.insert(
+            "sigmaos-pqc-master".to_string(),
+            SignatureSchemeKind::PostQuantumDilithium,
+        );
     }
 
     /// Verify package signature against registered keyring
@@ -647,12 +713,15 @@ impl SovereignUniversalPackageOrchestratorV12 {
         let inspection = self.matrix.inspect_package_format(filename, header_bytes);
 
         // 2. Trust verification
-        if !signature_bytes.is_empty() && !self.trust_gov.verify_signature(keyring_id, signature_bytes) {
+        if !signature_bytes.is_empty()
+            && !self.trust_gov.verify_signature(keyring_id, signature_bytes)
+        {
             return Err("Package signature verification failed against trust governor".to_string());
         }
 
         // 3. ABI dependency resolution
-        self.abi_solver.resolve_soname_dependencies(required_sonames)?;
+        self.abi_solver
+            .resolve_soname_dependencies(required_sonames)?;
 
         // 4. Pre-transaction snapshot creation
         self.snapshot_gov.create_pre_transaction_snapshot(
@@ -683,16 +752,25 @@ mod tests {
         // Test magic bytes for debian deb
         let deb_header = b"!<arch>\ncontrol.tar.xz";
         let insp_deb = matrix.inspect_package_format("app.deb", deb_header);
-        assert_eq!(insp_deb.detected_kind, UniversalPackageFormatKind::DebianDeb);
+        assert_eq!(
+            insp_deb.detected_kind,
+            UniversalPackageFormatKind::DebianDeb
+        );
 
         // Test RPM magic bytes
         let rpm_header = [0xED, 0xAB, 0xEE, 0xDB];
         let insp_rpm = matrix.inspect_package_format("package.rpm", &rpm_header);
-        assert_eq!(insp_rpm.detected_kind, UniversalPackageFormatKind::FedoraRpm);
+        assert_eq!(
+            insp_rpm.detected_kind,
+            UniversalPackageFormatKind::FedoraRpm
+        );
 
         // Test Extension fallback
         let insp_apk = matrix.inspect_package_format("alpine.apk", &[]);
-        assert_eq!(insp_apk.detected_kind, UniversalPackageFormatKind::AlpineApk);
+        assert_eq!(
+            insp_apk.detected_kind,
+            UniversalPackageFormatKind::AlpineApk
+        );
     }
 
     #[test]
@@ -713,7 +791,9 @@ mod tests {
         let base = b"BASE_PACKAGE_DATA";
         let delta = b"DELTA_PATCH_DATA";
 
-        let res = engine.apply_delta_patch(base, delta, DeltaPatchType::VcDiff).unwrap();
+        let res = engine
+            .apply_delta_patch(base, delta, DeltaPatchType::VcDiff)
+            .unwrap();
         assert_eq!(res.original_size, base.len());
         assert_eq!(res.reconstituted_size, base.len() + delta.len());
         assert!(res.verified);
@@ -722,8 +802,10 @@ mod tests {
     #[test]
     fn test_package_rollback_governor() {
         let mut gov = SovereignUniversalPackageRollbackAndSnapshotGovernor::new();
-        let snap1 = gov.create_pre_transaction_snapshot(SnapshotBackendKind::ZfsBectl, "snap1", 100);
-        let _snap2 = gov.create_pre_transaction_snapshot(SnapshotBackendKind::BtrfsSubvolume, "snap2", 200);
+        let snap1 =
+            gov.create_pre_transaction_snapshot(SnapshotBackendKind::ZfsBectl, "snap1", 100);
+        let _snap2 =
+            gov.create_pre_transaction_snapshot(SnapshotBackendKind::BtrfsSubvolume, "snap2", 200);
 
         let rolled = gov.rollback_to_snapshot(snap1).unwrap();
         assert_eq!(rolled, SnapshotBackendKind::ZfsBectl);

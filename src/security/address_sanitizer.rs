@@ -96,7 +96,7 @@ impl Default for AsanConfig {
     fn default() -> Self {
         Self {
             redzone_size: 16, // 16-byte redzones
-            shadow_scale: 3,   // 1:8 shadow mapping
+            shadow_scale: 3,  // 1:8 shadow mapping
             shadow_offset: 0,
             quarantine_size: 1024 * 1024, // 1MB quarantine
         }
@@ -166,12 +166,15 @@ impl AddressSanitizer {
         region.canary = canary;
 
         for i in 0..self.redzone_size {
-            self.shadow_memory.insert(start + i as u64, ShadowState::Redzone); // Left redzone
-            self.shadow_memory.insert(end - i as u64 - 1, ShadowState::Redzone); // Right redzone
+            self.shadow_memory
+                .insert(start + i as u64, ShadowState::Redzone); // Left redzone
+            self.shadow_memory
+                .insert(end - i as u64 - 1, ShadowState::Redzone); // Right redzone
         }
 
         for i in self.redzone_size..(self.redzone_size + size) {
-            self.shadow_memory.insert(start + i as u64, ShadowState::Allocated); // Accessible
+            self.shadow_memory
+                .insert(start + i as u64, ShadowState::Allocated); // Accessible
         }
 
         let user_ptr = start + self.redzone_size as u64;
@@ -287,7 +290,10 @@ impl AddressSanitizer {
     pub fn check_stack_canary(&mut self, canary: u64, expected: u64) -> Result<(), String> {
         if canary != expected {
             self.error_count += 1;
-            return Err(format!("Stack canary corruption detected: expected 0x{:x}, got 0x{:x}", expected, canary));
+            return Err(format!(
+                "Stack canary corruption detected: expected 0x{:x}, got 0x{:x}",
+                expected, canary
+            ));
         }
         Ok(())
     }

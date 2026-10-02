@@ -575,7 +575,13 @@ impl SovereignDynamicDevfsEngine {
         Self { nodes: Vec::new() }
     }
 
-    pub fn register_device_node(&mut self, name: &str, node_type: DeviceNodeType, major: u32, minor: u32) {
+    pub fn register_device_node(
+        &mut self,
+        name: &str,
+        node_type: DeviceNodeType,
+        major: u32,
+        minor: u32,
+    ) {
         self.nodes.push(DeviceNodeEntry {
             name: name.to_string(),
             node_type,
@@ -676,7 +682,9 @@ pub struct SovereignJournaldBinaryStorageEngine {
 
 impl SovereignJournaldBinaryStorageEngine {
     pub fn new() -> Self {
-        Self { log_records: Vec::new() }
+        Self {
+            log_records: Vec::new(),
+        }
     }
 
     pub fn append_log(&mut self, identifier: &str, message: &str, priority: u8) {
@@ -713,11 +721,17 @@ impl SovereignDnsTlsResolverEngine {
             domain: "localhost".to_string(),
             ip_address: [127, 0, 0, 1],
         });
-        Self { primary_dns_ip, records }
+        Self {
+            primary_dns_ip,
+            records,
+        }
     }
 
     pub fn resolve_domain(&self, domain: &str) -> Option<[u8; 4]> {
-        self.records.iter().find(|r| r.domain == domain).map(|r| r.ip_address)
+        self.records
+            .iter()
+            .find(|r| r.domain == domain)
+            .map(|r| r.ip_address)
     }
 }
 
@@ -752,7 +766,8 @@ pub struct UdevDevdHotplugEngine {
     pub active_devices: Vec<UeventDeviceNode>,
     pub loaded_rules: Vec<&'static str>,
     pub nodes: Vec<String>,
-    pub event_queue: Vec<String>,}
+    pub event_queue: Vec<String>,
+}
 
 impl UdevDevdHotplugEngine {
     pub fn new() -> Self {
@@ -876,7 +891,6 @@ impl SovereignStatefulNatEngine {
             public_ip,
         }
     }
-
 
     pub fn lookup_conntrack(
         &mut self,
@@ -1251,8 +1265,6 @@ pub struct DnsRecordEntry {
     pub ttl: u32,
 }
 
-
-
 impl SovereignDnsTlsResolverEngine {
     pub fn new(upstream_dns: [u8; 4]) -> Self {
         let mut records = Vec::new();
@@ -1609,10 +1621,8 @@ impl CapsicumRightsDelegationManager {
         if let Some(desc) = self.descriptors.iter_mut().find(|d| d.fd == fd) {
             desc.rights_mask &= rights_mask;
         } else {
-            self.descriptors.push(CapsicumDescriptorRights {
-                fd,
-                rights_mask,
-            });
+            self.descriptors
+                .push(CapsicumDescriptorRights { fd, rights_mask });
         }
     }
 

@@ -66,7 +66,11 @@ impl SovereignUniversalPrBuildAttestationEngine {
         }
     }
 
-    pub fn record_slsa_attestation(&mut self, pkg_id: &str, attestation: SlsaProvenanceAttestation) {
+    pub fn record_slsa_attestation(
+        &mut self,
+        pkg_id: &str,
+        attestation: SlsaProvenanceAttestation,
+    ) {
         self.attestations.insert(pkg_id.to_string(), attestation);
     }
 
@@ -103,7 +107,10 @@ pub struct SovereignUniversalPrPatchReconstitutionEngine;
 
 impl SovereignUniversalPrPatchReconstitutionEngine {
     /// Applies a unified diff patch to a raw foreign package spec text
-    pub fn apply_unified_diff_patch(base_spec: &str, diff_patch: &str) -> Result<String, &'static str> {
+    pub fn apply_unified_diff_patch(
+        base_spec: &str,
+        diff_patch: &str,
+    ) -> Result<String, &'static str> {
         if diff_patch.trim().is_empty() {
             return Ok(base_spec.to_string());
         }
@@ -162,11 +169,19 @@ impl SovereignUniversalPrRepositoryIndexSyncEngine {
     }
 
     pub fn export_repository_index_manifest(&self) -> String {
-        let mut manifest = format!("SigmaRepoIndex: {}\nPackages: {}\n\n", self.repo_name, self.index_entries.len());
+        let mut manifest = format!(
+            "SigmaRepoIndex: {}\nPackages: {}\n\n",
+            self.repo_name,
+            self.index_entries.len()
+        );
         for entry in self.index_entries.values() {
             manifest.push_str(&format!(
                 "Package: {}\nVersion: {}\nFormat: {:?}\nSHA256: {}\nDepends: {:?}\n\n",
-                entry.package_name, entry.version, entry.format, entry.sha256_checksum, entry.dependencies
+                entry.package_name,
+                entry.version,
+                entry.format,
+                entry.sha256_checksum,
+                entry.dependencies
             ));
         }
         manifest
@@ -233,7 +248,10 @@ impl SovereignUniversalPrSandboxedBuildExecutor {
             is_successful: true,
         });
 
-        Ok(format!("Sandboxed build completed for '{}' under {:?}", pkg_name, sandbox))
+        Ok(format!(
+            "Sandboxed build completed for '{}' under {:?}",
+            pkg_name, sandbox
+        ))
     }
 }
 
@@ -258,7 +276,9 @@ impl SovereignDistroPackageAdvancementsSuiteV9 {
     pub fn new() -> Self {
         Self {
             attestation_engine: SovereignUniversalPrBuildAttestationEngine::new(),
-            repo_index_sync: SovereignUniversalPrRepositoryIndexSyncEngine::new("sovereign_v9_repo"),
+            repo_index_sync: SovereignUniversalPrRepositoryIndexSyncEngine::new(
+                "sovereign_v9_repo",
+            ),
             build_executor: SovereignUniversalPrSandboxedBuildExecutor::new(),
             processed_prs_count: 0,
         }
@@ -289,20 +309,28 @@ impl SovereignDistroPackageAdvancementsSuiteV9 {
             },
         );
 
-        let fmt = pkg.formats.first().copied().unwrap_or(PackageFormat::SigmaPkg);
-        self.repo_index_sync.index_merged_package(RepoPackageIndexEntry {
-            package_name: pkg.name.clone(),
-            version: pkg.version.clone(),
-            format: fmt,
-            sha256_checksum: format!("sha256_{}", pkg.name),
-            dependencies: pkg.properties.keys().cloned().collect(),
-        });
+        let fmt = pkg
+            .formats
+            .first()
+            .copied()
+            .unwrap_or(PackageFormat::SigmaPkg);
+        self.repo_index_sync
+            .index_merged_package(RepoPackageIndexEntry {
+                package_name: pkg.name.clone(),
+                version: pkg.version.clone(),
+                format: fmt,
+                sha256_checksum: format!("sha256_{}", pkg.name),
+                dependencies: pkg.properties.keys().cloned().collect(),
+            });
 
         pkg.properties
             .insert("v9_advancements_processed".to_string(), "true".to_string());
         self.processed_prs_count += 1;
 
-        Ok(format!("SuiteV9: Package '{}' attested, indexed, and built", pkg.name))
+        Ok(format!(
+            "SuiteV9: Package '{}' attested, indexed, and built",
+            pkg.name
+        ))
     }
 }
 
@@ -329,7 +357,8 @@ mod tests {
                 builder_id: "builder_1".to_string(),
                 build_type: "docker_build".to_string(),
                 source_commit_hash: "abc123hash".to_string(),
-                artifact_sha256: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855".to_string(),
+                artifact_sha256: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                    .to_string(),
                 slsa_level: 3,
             },
         );
@@ -347,7 +376,10 @@ mod tests {
         let base_spec = "Package: curl\nVersion: 8.4.0\nDepends: libssl3";
         let diff = "--- a/curl\n+++ b/curl\n- Version: 8.4.0\n+ Version: 8.5.0";
 
-        let patched = SovereignUniversalPrPatchReconstitutionEngine::apply_unified_diff_patch(base_spec, diff).unwrap();
+        let patched = SovereignUniversalPrPatchReconstitutionEngine::apply_unified_diff_patch(
+            base_spec, diff,
+        )
+        .unwrap();
         assert!(patched.contains("Version: 8.5.0"));
         assert!(!patched.contains("Version: 8.4.0"));
     }
@@ -393,9 +425,16 @@ mod tests {
         let mut suite = SovereignDistroPackageAdvancementsSuiteV9::new();
         let mut pkg = UnifiedPackage::new("zstd".to_string(), "1.5.5".to_string());
 
-        let res = suite.process_pr_package_v9(&mut pkg, "cargo build").unwrap();
+        let res = suite
+            .process_pr_package_v9(&mut pkg, "cargo build")
+            .unwrap();
         assert!(res.contains("zstd"));
         assert_eq!(suite.processed_prs_count, 1);
-        assert_eq!(pkg.properties.get("v9_advancements_processed").map(|s| s.as_str()), Some("true"));
+        assert_eq!(
+            pkg.properties
+                .get("v9_advancements_processed")
+                .map(|s| s.as_str()),
+            Some("true")
+        );
     }
 }

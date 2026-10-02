@@ -5496,15 +5496,26 @@ pub struct UniversalDistroPackageMediator {
 
 impl UniversalDistroPackageMediator {
     pub fn new() -> Self {
-        Self { history: Vec::new() }
+        Self {
+            history: Vec::new(),
+        }
     }
 
     pub fn notify(&mut self, sender: &str, event: MediatorEvent) -> Result<String, &'static str> {
         let log = match &event {
-            MediatorEvent::PackageParsed(name) => format!("[Mediator] Sender '{}': Parsed package {}", sender, name),
-            MediatorEvent::PackageValidated(name) => format!("[Mediator] Sender '{}': Validated package {}", sender, name),
-            MediatorEvent::PackageInstalled(name) => format!("[Mediator] Sender '{}': Installed package {}", sender, name),
-            MediatorEvent::PackageRolledBack(name) => format!("[Mediator] Sender '{}': Rolled back package {}", sender, name),
+            MediatorEvent::PackageParsed(name) => {
+                format!("[Mediator] Sender '{}': Parsed package {}", sender, name)
+            }
+            MediatorEvent::PackageValidated(name) => {
+                format!("[Mediator] Sender '{}': Validated package {}", sender, name)
+            }
+            MediatorEvent::PackageInstalled(name) => {
+                format!("[Mediator] Sender '{}': Installed package {}", sender, name)
+            }
+            MediatorEvent::PackageRolledBack(name) => format!(
+                "[Mediator] Sender '{}': Rolled back package {}",
+                sender, name
+            ),
         };
         self.history.push(event);
         Ok(log)
@@ -5531,7 +5542,10 @@ pub struct SecurityAuditVisitor {
 
 impl SecurityAuditVisitor {
     pub fn new() -> Self {
-        Self { audited_count: 0, vulnerabilities_found: 0 }
+        Self {
+            audited_count: 0,
+            vulnerabilities_found: 0,
+        }
     }
 }
 
@@ -5569,7 +5583,10 @@ pub struct LicenseScannerVisitor {
 
 impl LicenseScannerVisitor {
     pub fn new() -> Self {
-        Self { copyleft_count: 0, permissive_count: 0 }
+        Self {
+            copyleft_count: 0,
+            permissive_count: 0,
+        }
     }
 }
 
@@ -5606,7 +5623,10 @@ pub struct FootprintMetricsVisitor {
 
 impl FootprintMetricsVisitor {
     pub fn new() -> Self {
-        Self { total_installed_bytes: 0, total_file_count: 0 }
+        Self {
+            total_installed_bytes: 0,
+            total_file_count: 0,
+        }
     }
 }
 
@@ -5699,18 +5719,32 @@ pub struct PackageMetadataFlyweightFactory {
 
 impl PackageMetadataFlyweightFactory {
     pub fn new() -> Self {
-        Self { pool: HashMap::new() }
+        Self {
+            pool: HashMap::new(),
+        }
     }
 
-    pub fn get_flyweight(&mut self, license: &str, maintainer: &str, architecture: &str) -> Arc<PackageMetadataFlyweight> {
-        let key = (license.to_string(), maintainer.to_string(), architecture.to_string());
-        self.pool.entry(key.clone()).or_insert_with(|| {
-            Arc::new(PackageMetadataFlyweight {
-                license: key.0,
-                maintainer: key.1,
-                architecture: key.2,
+    pub fn get_flyweight(
+        &mut self,
+        license: &str,
+        maintainer: &str,
+        architecture: &str,
+    ) -> Arc<PackageMetadataFlyweight> {
+        let key = (
+            license.to_string(),
+            maintainer.to_string(),
+            architecture.to_string(),
+        );
+        self.pool
+            .entry(key.clone())
+            .or_insert_with(|| {
+                Arc::new(PackageMetadataFlyweight {
+                    license: key.0,
+                    maintainer: key.1,
+                    architecture: key.2,
+                })
             })
-        }).clone()
+            .clone()
     }
 
     pub fn pool_size(&self) -> usize {
@@ -5742,13 +5776,19 @@ pub struct PackageStateMachine {
 
 impl PackageStateMachine {
     pub fn new() -> Self {
-        Self { current_state: PackageLifecycleState::Uninstalled }
+        Self {
+            current_state: PackageLifecycleState::Uninstalled,
+        }
     }
 
     pub fn transition_to(&mut self, new_state: PackageLifecycleState) -> Result<(), &'static str> {
         let valid = match (self.current_state, new_state) {
-            (PackageLifecycleState::Uninstalled, PackageLifecycleState::ResolvingDependencies) => true,
-            (PackageLifecycleState::ResolvingDependencies, PackageLifecycleState::Downloading) => true,
+            (PackageLifecycleState::Uninstalled, PackageLifecycleState::ResolvingDependencies) => {
+                true
+            }
+            (PackageLifecycleState::ResolvingDependencies, PackageLifecycleState::Downloading) => {
+                true
+            }
             (PackageLifecycleState::Downloading, PackageLifecycleState::Validating) => true,
             (PackageLifecycleState::Validating, PackageLifecycleState::Installing) => true,
             (PackageLifecycleState::Installing, PackageLifecycleState::Installed) => true,
@@ -5795,7 +5835,8 @@ impl LazyPackageLoadProxy {
 
     pub fn load_if_needed(&mut self, factory: &PackageParserFactory) -> Result<(), ParseError> {
         if self.inner_package.is_none() {
-            let parser = factory.get_parser(self.format)
+            let parser = factory
+                .get_parser(self.format)
                 .ok_or_else(|| ParseError::UnsupportedFormat(self.format))?;
             let pkg = parser.parse(&self.raw_data)?;
             self.inner_package = Some(pkg);
@@ -5890,14 +5931,18 @@ impl UniversalPackageBuilder {
 
 pub struct BedrockStratumAdapter;
 impl BedrockStratumAdapter {
-    pub fn new() -> Self { Self }
+    pub fn new() -> Self {
+        Self
+    }
     pub fn resolve_stratum_path(&self, stratum: &str, relative_path: &str) -> String {
         format!("/bedrock/strata/{}{}", stratum, relative_path)
     }
 }
 
 impl Default for BedrockStratumAdapter {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 pub struct DistroboxOciAdapter {
@@ -5906,7 +5951,9 @@ pub struct DistroboxOciAdapter {
 
 impl DistroboxOciAdapter {
     pub fn new() -> Self {
-        Self { exported_binaries: Vec::new() }
+        Self {
+            exported_binaries: Vec::new(),
+        }
     }
 
     pub fn export_binary_shim(&mut self, container_name: &str, binary: &str) -> String {
@@ -5917,7 +5964,9 @@ impl DistroboxOciAdapter {
 }
 
 impl Default for DistroboxOciAdapter {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 pub struct SystemdSysextAdapter {
@@ -5926,7 +5975,9 @@ pub struct SystemdSysextAdapter {
 
 impl SystemdSysextAdapter {
     pub fn new() -> Self {
-        Self { extensions: Vec::new() }
+        Self {
+            extensions: Vec::new(),
+        }
     }
 
     pub fn mount_extension(&mut self, extension_name: &str) -> Result<String, &'static str> {
@@ -5937,12 +5988,16 @@ impl SystemdSysextAdapter {
 }
 
 impl Default for SystemdSysextAdapter {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 pub struct OmarchyPackageBridgeAdapter;
 impl OmarchyPackageBridgeAdapter {
-    pub fn new() -> Self { Self }
+    pub fn new() -> Self {
+        Self
+    }
     pub fn bridge_package(&self, package_name: &str) -> String {
         match package_name {
             "hyprland" | "sway" | "wayfire" => "sovereign-desktop-shell".to_string(),
@@ -5954,7 +6009,9 @@ impl OmarchyPackageBridgeAdapter {
 }
 
 impl Default for OmarchyPackageBridgeAdapter {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 pub struct UrpmiRpmAdapter;
@@ -6282,7 +6339,9 @@ impl UdfCustomScriptletEngine {
 }
 
 impl Default for UdfCustomScriptletEngine {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 pub struct UdfPackageConflictResolverEngine {
@@ -6291,7 +6350,9 @@ pub struct UdfPackageConflictResolverEngine {
 
 impl UdfPackageConflictResolverEngine {
     pub fn new() -> Self {
-        Self { conflict_rules: Vec::new() }
+        Self {
+            conflict_rules: Vec::new(),
+        }
     }
 
     pub fn add_conflict_rule<F>(&mut self, rule: F)
@@ -6312,7 +6373,9 @@ impl UdfPackageConflictResolverEngine {
 }
 
 impl Default for UdfPackageConflictResolverEngine {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 pub struct UdfPackageArchiveTransformerEngine {
@@ -6321,7 +6384,9 @@ pub struct UdfPackageArchiveTransformerEngine {
 
 impl UdfPackageArchiveTransformerEngine {
     pub fn new() -> Self {
-        Self { transformers: Vec::new() }
+        Self {
+            transformers: Vec::new(),
+        }
     }
 
     pub fn add_transformer<F>(&mut self, transformer: F)
@@ -6341,7 +6406,9 @@ impl UdfPackageArchiveTransformerEngine {
 }
 
 impl Default for UdfPackageArchiveTransformerEngine {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 pub struct UdfCustomConstraintSolverFilter {
@@ -7890,7 +7957,12 @@ Description: Hook test";
     fn test_comprehensive_oop_mediator_visitor_memento_flyweight_state_proxy_builder() {
         // 1. Mediator Pattern
         let mut mediator = UniversalDistroPackageMediator::new();
-        let msg = mediator.notify("TestRunner", MediatorEvent::PackageParsed("htop".to_string())).unwrap();
+        let msg = mediator
+            .notify(
+                "TestRunner",
+                MediatorEvent::PackageParsed("htop".to_string()),
+            )
+            .unwrap();
         assert!(msg.contains("Parsed package htop"));
 
         // 2. Visitor Pattern
@@ -7921,7 +7993,11 @@ Description: Hook test";
 
         // 3. Memento Pattern & SystemStateCaretaker
         let mut caretaker = SystemStateCaretaker::new();
-        caretaker.save_state(1, vec!["bash".to_string(), "coreutils".to_string()], 1700000000);
+        caretaker.save_state(
+            1,
+            vec!["bash".to_string(), "coreutils".to_string()],
+            1700000000,
+        );
         assert_eq!(caretaker.mementos.len(), 1);
 
         let undone = caretaker.undo().unwrap();
@@ -7941,17 +8017,35 @@ Description: Hook test";
 
         // 5. State Pattern & StateMachine
         let mut state_machine = PackageStateMachine::new();
-        assert_eq!(state_machine.current_state, PackageLifecycleState::Uninstalled);
+        assert_eq!(
+            state_machine.current_state,
+            PackageLifecycleState::Uninstalled
+        );
 
-        assert!(state_machine.transition_to(PackageLifecycleState::ResolvingDependencies).is_ok());
-        assert!(state_machine.transition_to(PackageLifecycleState::Downloading).is_ok());
-        assert!(state_machine.transition_to(PackageLifecycleState::Validating).is_ok());
-        assert!(state_machine.transition_to(PackageLifecycleState::Installing).is_ok());
-        assert!(state_machine.transition_to(PackageLifecycleState::Installed).is_ok());
-        assert_eq!(state_machine.current_state, PackageLifecycleState::Installed);
+        assert!(state_machine
+            .transition_to(PackageLifecycleState::ResolvingDependencies)
+            .is_ok());
+        assert!(state_machine
+            .transition_to(PackageLifecycleState::Downloading)
+            .is_ok());
+        assert!(state_machine
+            .transition_to(PackageLifecycleState::Validating)
+            .is_ok());
+        assert!(state_machine
+            .transition_to(PackageLifecycleState::Installing)
+            .is_ok());
+        assert!(state_machine
+            .transition_to(PackageLifecycleState::Installed)
+            .is_ok());
+        assert_eq!(
+            state_machine.current_state,
+            PackageLifecycleState::Installed
+        );
 
         // Invalid transition test
-        assert!(state_machine.transition_to(PackageLifecycleState::Downloading).is_err());
+        assert!(state_machine
+            .transition_to(PackageLifecycleState::Downloading)
+            .is_err());
 
         // 6. Proxy Pattern (Lazy Package Load Proxy)
         let factory = PackageParserFactory::new();
@@ -7999,7 +8093,10 @@ Description: Hook test";
 
         // 4. Omarchy Package Bridge
         let omarchy = OmarchyPackageBridgeAdapter::new();
-        assert_eq!(omarchy.bridge_package("hyprland"), "sovereign-desktop-shell");
+        assert_eq!(
+            omarchy.bridge_package("hyprland"),
+            "sovereign-desktop-shell"
+        );
         assert_eq!(omarchy.bridge_package("custom-tool"), "custom-tool");
     }
 
@@ -8020,7 +8117,10 @@ Description: Hook test";
                 None
             }
         });
-        assert_eq!(conflict_resolver.resolve_conflict("legacy-libc", "sovereign-libc"), "sovereign-libc");
+        assert_eq!(
+            conflict_resolver.resolve_conflict("legacy-libc", "sovereign-libc"),
+            "sovereign-libc"
+        );
 
         // 3. UDF Package Archive Transformer Engine
         let mut archive_transformer = UdfPackageArchiveTransformerEngine::new();
