@@ -59,6 +59,10 @@ impl RunitService {
         self
     }
 
+    pub fn add_dependency(&mut self, dep: &str) {
+        self.dependencies.push(dep.to_string());
+    }
+
     pub fn start(&mut self) -> bool {
         if self.status == RunitServiceStatus::Running {
             return true;
@@ -140,13 +144,16 @@ impl RunitSupervisor {
         self.current_stage_num = 2;
 
         let mut started = Vec::new();
-
-        let names: Vec<String> = self.services.keys().cloned().collect();
-        for name in names {
-            if self.can_start_service(&name, &started) {
-                if let Some(s) = self.services.get_mut(&name) {
-                    s.start();
-                    started.push(name.clone());
+        loop {
+            let mut progress = false;
+            let names: Vec<String> = self.services.keys().cloned().collect();
+            for name in names {
+                if !started.contains(&name) && self.can_start_service(&name, &started) {
+                    if let Some(s) = self.services.get_mut(&name) {
+                        s.start();
+                        started.push(name.clone());
+                        progress = true;
+                    }
                 }
             }
             if !progress {
@@ -161,13 +168,16 @@ impl RunitSupervisor {
         self.current_stage_num = 3;
 
         let mut stopped = Vec::new();
-
-        let names: Vec<String> = self.services.keys().cloned().collect();
-        for name in names {
-            if self.can_stop_service(&name, &stopped) {
-                if let Some(s) = self.services.get_mut(&name) {
-                    s.stop();
-                    stopped.push(name.clone());
+        loop {
+            let mut progress = false;
+            let names: Vec<String> = self.services.keys().cloned().collect();
+            for name in names {
+                if !stopped.contains(&name) && self.can_stop_service(&name, &stopped) {
+                    if let Some(s) = self.services.get_mut(&name) {
+                        s.stop();
+                        stopped.push(name.clone());
+                        progress = true;
+                    }
                 }
             }
             if !progress {

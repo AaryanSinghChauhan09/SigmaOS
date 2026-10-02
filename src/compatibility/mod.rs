@@ -19,10 +19,11 @@ pub mod canonical;
 pub mod chakra;
 pub mod chimera_linux;
 pub mod clear_linux;
+pub mod fedora_domination;
 pub mod zorin;
 
 pub use antix::{
-    AntiXInitSystem, AntiXServiceState, AntiXService, AntiXInitSwitcher,
+    AntiXInitSystem, MicroServiceState, MicroService, AntiXInitSwitcher,
     AntiXPersistenceMode, AntiXPersistenceManager, AntiXSystemRemasterEngine,
     AntiXControlCentre,
 };
@@ -32,6 +33,7 @@ pub use zorin::{
 };
 
 pub use fedora_domination::*;
+pub mod fedora_missing_components;
 pub use fedora_missing_components::{
     BodhiStatus, BodhiUpdateRecord, BodhiUpdateType, CoprRepository, CryptoPolicyProfile,
     FedoraBodhiUpdateEngine, FedoraContainerStackEngine, FedoraCoprBuildGatewayEngine,
@@ -62,7 +64,7 @@ pub mod itsfoss_inspiration_suite;
 
 pub use itsfoss_inspiration_suite::{
     ItsFossLocalSendTransferEngine, ItsFossStacerOptimizerEngine, ItsFossTimeshiftBackupEngine,
-    ItsFossVentoyMultiBootUsbEngine, LocalSendPeer, SnapshotMode, StacerCleanCategory,
+    ItsFossVentoyMultiBootUsbEngine, LocalSendPeer, StacerCleanCategory,
     TimeshiftRestorePoint, VentoyIsoEntry,
 };
 pub mod innovations;
@@ -177,6 +179,10 @@ pub use arch_linux::{
 pub use open_source_tier1::{
     LibsodiumIntegration, SmolTcpIntegration, SqliteIntegration, WasmerIntegration,
 };
+
+pub mod cross_platform;
+pub mod cross_platform_kernel;
+pub mod community_foundation;
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,

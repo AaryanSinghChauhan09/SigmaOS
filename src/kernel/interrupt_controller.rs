@@ -63,13 +63,24 @@ impl IrqLine {
 }
 
 /// Interrupt descriptor
-#[derive(Clone)]
 pub struct InterruptDescriptor {
     pub vector: u8,
     pub irq_line: Option<IrqLine>,
     pub handler: Option<InterruptHandler>,
     pub enabled: AtomicBool,
     pub count: AtomicU64,
+}
+
+impl Clone for InterruptDescriptor {
+    fn clone(&self) -> Self {
+        Self {
+            vector: self.vector,
+            irq_line: self.irq_line,
+            handler: self.handler,
+            enabled: AtomicBool::new(self.enabled.load(Ordering::Acquire)),
+            count: AtomicU64::new(self.count.load(Ordering::Acquire)),
+        }
+    }
 }
 
 impl InterruptDescriptor {

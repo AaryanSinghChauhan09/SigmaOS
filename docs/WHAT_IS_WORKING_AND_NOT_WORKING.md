@@ -27,9 +27,6 @@ This diagnostic guide lists code areas, known gaps, root causes, and explicit al
    - [Algorithm C: `no_std` / `alloc` Kernel Unification Protocol](#algorithm-c-no_std--alloc-kernel-unification-protocol)
    - [Algorithm D: Subsystem Parity Gap Closure Protocol](#algorithm-d-subsystem-parity-gap-closure-protocol)
    - [Algorithm E: Cross-Distro Subsystem State Synchronization Protocol](#algorithm-e-cross-distro-subsystem-state-synchronization-protocol)
-   - [Algorithm F: Bare-Metal CPU Ring 0 Register & Context Switching Protocol](#algorithm-f-bare-metal-cpu-ring-0-register--context-switching-protocol)
-   - [Algorithm G: Direct Hardware MMU Page Fault Handler Protocol](#algorithm-g-direct-hardware-mmu-page-fault-handler-protocol)
-   - [Algorithm H: Hardware APIC/GIC Interrupt Vector Routing Protocol](#algorithm-h-hardware-apicgic-interrupt-vector-routing-protocol)
 6. [COMPILER ERROR REMEDIATION MATRIX (E0004 - E0689)](#6-compiler-error-remediation-matrix-e0004---e0689)
 7. [VERIFICATION & QA SUITE EXECUTION PROTOCOL](#7-verification--qa-suite-execution-protocol)
 
@@ -282,52 +279,6 @@ STEP 1: Register the distro mode in `src/distro/linux_bsd_inspirations.rs`.
 STEP 2: Add capability mapping in `query_all_subsystem_capabilities`.
 STEP 3: Implement state sync event handlers in `cross_distro_subsystem_sync`.
 STEP 4: Verify via `test_linux_bsd_interoperability_gateway_matrix_and_sync`.
-```
-
-### Algorithm F: Bare-Metal CPU Ring 0 Register & Context Switching Protocol
-
-```
-INPUT: Request to transition thread context switching from userland simulation to bare-metal ring 0
-OUTPUT: Assembly naked function register save/restore protocol
-
-STEP 1: Locate task context frame structure `CpuContextFrame` in `src/kernel/arch/`.
-STEP 2: Implement naked assembly routines for x86_64 or AArch64:
-   a. Push general-purpose registers (`rax`, `rbx`, `rcx`, `rdx`, `rsi`, `rdi`, `rbp`, `r8`-`r15`).
-   b. Store current stack pointer `rsp` into current task TCB.
-   c. Load target task stack pointer `rsp` from next task TCB.
-   d. Pop general-purpose registers in reverse order.
-   e. Execute `iretq` (x86_64) or `eret` (AArch64) to return from interrupt context.
-STEP 3: Guard bare-metal register instructions with `#[cfg(target_os = "none")]`.
-```
-
-### Algorithm G: Direct Hardware MMU Page Fault Handler Protocol
-
-```
-INPUT: Hardware page fault interrupt `#PF` (Vector 14)
-OUTPUT: Ring 0 page fault handler and TLB flush protocol
-
-STEP 1: Read Faulting Virtual Address from `CR2` control register.
-STEP 2: Extract Fault Error Code (Present bit, Write/Read, User/Supervisor mode).
-STEP 3: Lookup Page Table Entry (PTE) in active page table structure (`CR3`).
-STEP 4: IF demand paging / Copy-On-Write (CoW):
-   a. Allocate physical page frame via `SigmaBuddyAllocator`.
-   b. Map frame into page table with appropriate permissions (`PTE_PRESENT | PTE_WRITABLE | PTE_USER`).
-   c. Execute `invlpg [fault_addr]` or update `CR3` to invalidate TLB entry.
-STEP 5: IF invalid memory access, dispatch `SIGSEGV` signal to target thread.
-```
-
-### Algorithm H: Hardware APIC/GIC Interrupt Vector Routing Protocol
-
-```
-INPUT: Hardware IRQ interrupt line (PCI, Timer, Keyboard)
-OUTPUT: Vector table dispatch & End-Of-Interrupt (EOI) signaling protocol
-
-STEP 1: Map Local APIC / ARM GIC MMIO base registers into kernel address space.
-STEP 2: Register ISR vector handler function pointer in Interrupt Descriptor Table (IDT).
-STEP 3: Upon interrupt arrival:
-   a. Read Vector ID from Local APIC ISR register.
-   b. Dispatch payload to registered driver event queue.
-   c. Write 0x0000_0000 to LAPIC EOI register (`0xFEE0_00B0`) to acknowledge IRQ processing.
 ```
 
 ---

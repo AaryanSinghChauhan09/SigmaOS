@@ -8,28 +8,30 @@ pub type CoprRepository = CoprProjectConfig;
 // 4. COPR Community Build Engine (Custom repository builds, chroot environment builds, RPM repo generation)
 // 5. Rootless OCI Container Engine (Podman / Buildah / Skopeo OCI container lifecycle and rootless user namespace isolation)
 
-#[cfg(not(any(feature = "standalone_test", test)))]
+#[cfg(feature = "standalone_test")]
 extern crate alloc;
 
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::collections::BTreeMap;
-#[cfg(not(any(feature = "standalone_test", test)))]
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::string::{String, ToString};
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec::Vec;
-
-#[cfg(any(feature = "standalone_test", test))]
+#[cfg(not(feature = "standalone_test"))]
 use std::collections::BTreeMap;
-#[cfg(any(feature = "standalone_test", test))]
+#[cfg(not(feature = "standalone_test"))]
 use std::format;
-#[cfg(any(feature = "standalone_test", test))]
+#[cfg(not(feature = "standalone_test"))]
 use std::string::{String, ToString};
-#[cfg(any(feature = "standalone_test", test))]
+#[cfg(not(feature = "standalone_test"))]
 use std::vec;
-#[cfg(any(feature = "standalone_test", test))]
+#[cfg(not(feature = "standalone_test"))]
+use std::vec::Vec;
+
+#[cfg(feature = "standalone_test")]
+use alloc::collections::BTreeMap;
+#[cfg(feature = "standalone_test")]
+use alloc::format;
+#[cfg(feature = "standalone_test")]
+use alloc::string::{String, ToString};
+#[cfg(feature = "standalone_test")]
+use alloc::vec;
+#[cfg(feature = "standalone_test")]
+use alloc::vec::Vec;
 
 // =========================================================================
 // 1. FEDORA KOJI BUILD SYSTEM ENGINE

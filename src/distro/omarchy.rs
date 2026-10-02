@@ -616,29 +616,12 @@ impl Default for OmarchyAudioPipewireConfig {
     }
 }
 
-#[cfg(not(any(feature = "standalone_test", test)))]
 pub use crate::distro::omarchy_inspiration::{
     AiAgentProvider, HerdrAgentTask, OmarchyHerdrAiAgentManager, OmarchyLuaConfigEngine,
     OmarchyPluginMarketplace, OmarchyQuickshellEngine, OmarchyReleaseChannel,
     OmarchyReleaseChannelSnapshotEngine, OmarchySystemThemeStudio, OmarchyThemePalette,
     QuickshellWidget, ShellComponentKind,
 };
-
-#[cfg(any(feature = "standalone_test", test))]
-#[path = "omarchy_inspiration.rs"]
-pub mod omarchy_inspiration;
-#[cfg(any(feature = "standalone_test", test))]
-pub use omarchy_inspiration::{
-    AiAgentProvider, HerdrAgentTask, OmarchyHerdrAiAgentManager, OmarchyLuaConfigEngine,
-    OmarchyPluginMarketplace, OmarchyQuickshellEngine, OmarchyReleaseChannel,
-    OmarchyReleaseChannelSnapshotEngine, OmarchySystemThemeStudio, OmarchyThemePalette,
-    QuickshellWidget, ShellComponentKind,
-};
-
-#[path = "."]
-pub mod distro {
-    pub use crate::distro::omarchy_inspiration;
-}
 
 /// Omarchy Liveboot ISO & Automated Installer Engine
 #[derive(Debug, Clone)]

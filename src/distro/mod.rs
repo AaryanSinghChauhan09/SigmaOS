@@ -14,6 +14,7 @@ pub mod market_readiness;
 pub use market_readiness::*;
 
 pub mod omarchy;
+pub mod omarchy_inspiration;
 pub mod omarchy_advanced_parity;
 pub use omarchy_advanced_parity::*;
 pub mod omarchy_future_roadmap;

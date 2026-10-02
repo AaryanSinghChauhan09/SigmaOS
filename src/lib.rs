@@ -210,7 +210,7 @@ pub use driver::pci_bus::{
     PciHardwareAccess, PciHeaderType, PciInterruptMode, PcieAerLog, PcieAerSeverity, PcieAspmState,
     SimulatedPciHardwareAccess,
 };
-pub use driver::{
+pub use drivers::{
     AudioDspStream, AudioSampleFormat, Bluetooth54LeAudioDriver, BusType, DriverCapability,
     DriverIsolationRingGuard, DrmAtomicKmsState, DrmConnectorType, DrmDisplayMode, EvdevEvent,
     EvdevEventType, EvdevInputDevice, FreeBsdDrmConnector, GpioDirection, GpioState,

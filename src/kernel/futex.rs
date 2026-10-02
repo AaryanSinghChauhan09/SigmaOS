@@ -22,7 +22,7 @@ pub enum FutexOp {
     /// Wake up to val waiters
     Wake = 1,
     /// Atomic compare and requeue
-    Cmp requeue = 4,
+    CmpRequeue = 4,
     /// Wake op (combined wake and modify)
     WakeOp = 5,
     /// Lock private futex
@@ -290,6 +290,7 @@ impl FutexHashTable {
         };
 
         // Add requeued waiters to target queue
+        let requeued_len = requeued.len();
         if !requeued.is_empty() {
             let target_queue = self.get_or_create_queue(target_key);
             for waiter in requeued {
@@ -297,7 +298,7 @@ impl FutexHashTable {
             }
         }
 
-        Ok(woken + requeued.len())
+        Ok(woken + requeued_len)
     }
 
     /// Remove waiter (called on thread cancellation)
