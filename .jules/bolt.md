@@ -23,3 +23,7 @@
 ## 2026-09-30 - Zero-Allocation Substring Match in Foreign Package Index Search
 **Learning:** Multi-distro package repository searching (`DistroRepoSyncEngine::search_indexed_manifests`) filtering foreign package manifests (`original_name`) repeatedly allocated heap strings via `.to_lowercase()`. Utilizing zero-allocation ASCII byte window matching (`contains_ignore_case`) removes heap allocation overhead during package repository search operations.
 **Action:** Replace `.to_lowercase().contains()` with zero-allocation ASCII byte window matching in package manager search functions.
+
+## 2026-10-01 - Zero-Allocation ASCII Substring Search in Mint Locale Manager
+**Learning:** `MintLocaleManager::search_locales` repeatedly allocated lowercased heap `String`s for `language`, `territory`, and `code` fields on every candidate item during search filtering. Using zero-allocation ASCII byte window matching (`contains_ignore_case`) eliminates 4+ heap allocations per locale candidate during locale search queries.
+**Action:** Use zero-allocation ASCII substring window matching for case-insensitive search filtering across system locale managers and settings search utilities.
