@@ -110,7 +110,7 @@ pub use crate::kernel::linux_bsd_innovations::{
     GcdDispatchQueue, GcdPriority, GcdTask, GentooUseFlags, GeomClass, GeomProvider,
     Hammer2PfsSnapshot, HammerBlockTransaction, HammerHistoryFilesystem, HurdTranslator,
     HybridKernelManager, HybridTask, IntelClearLinuxStatelessEngine, InteractiveHybridScheduler,
-    KernelAccessController, KernelCapability, KernelFastPacketEngine, KernelModule, KmdfDriver,
+    KernelAccessController, KernelCapability, KernelFastPacketEngine, KmdfDriver,
     KmdfIoRequest, KmdfPnpState, KmdfPowerState, LandlockAccessRight, LandlockPathRule,
     LinuxDevlinkHealthMonitor, LinuxFutexEngine, LinuxLandlockLsmRuleEngine,
     MemoryCompactionSuperpagesAllocator, MicrokernelCore, MicrokernelTranslatorRegistry,
@@ -188,7 +188,6 @@ pub use sovereign_kernel_pr_gateway::*;
 pub mod low_level_hardware;
 pub use low_level_hardware::*;
 
-pub mod kptr_restrict;
 pub mod pidfd;
 pub use pidfd::{
     PidFd, PidFdCapabilities, PidfdProcDescManager, ProcDesc, ProcDescCapabilities, SubreaperEntry,
@@ -205,7 +204,7 @@ pub use interrupt::{
     IrqTriggerType,
 };
 pub use kptr_restrict::{
-    get_security_mitigations, DmesgRestrictLevel, KernelSecurityMitigations, KptrRestrictLevel,
+    DmesgRestrictLevel, KernelSecurityMitigations,
 };
 pub use scheduler::{
     CfsScheduler, Priority, ProcessState, ProcessTask, RtScheduler, SchedulerPolicy, ThermalState,

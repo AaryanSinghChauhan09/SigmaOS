@@ -42,6 +42,7 @@ pub enum CipherError {
     InvalidKey = 1,
     InvalidIV = 2,
     EncryptionFailed = 3,
+    CryptoUnavailable = 4,
 }
 
 pub trait BlockCipher {

@@ -142,6 +142,13 @@ if [ -f "src/toolchain/distro_compiler_innovations.rs" ]; then
     ./build/distro_compiler_test
 fi
 
+if [ -f "src/automation/macro.rs" ]; then
+    echo "Running Macro recorder and playback test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/automation/macro.rs -o build/macro_test
+    ./build/macro_test
+fi
+
 if [ -f "src/automation/sovereign_hotkeys_synthesis.rs" ]; then
     echo "Running Sovereign Global Hotkeys Synthesis test suite..."
     mkdir -p build
