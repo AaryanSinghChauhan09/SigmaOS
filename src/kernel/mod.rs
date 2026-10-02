@@ -57,6 +57,12 @@ pub use kptr_restrict::{
     KptrRestrictLevel, SecurityMitigations, get_kptr_restrict, set_kptr_restrict,
     should_hide_kptr, format_kptr, get_security_mitigations,
 };
+pub mod perf_events;
+pub use perf_events::{
+    PerfEventType, HardwareEvent, SoftwareEvent, CacheEvent,
+    PerfCounter, PerfEventGroup, SystemPerfCounters,
+    record_page_fault, record_context_switch, record_cache_miss,
+};
 pub mod module_loading_control;
 pub mod module_tools;
 pub mod namespaces;
