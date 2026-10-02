@@ -18,7 +18,7 @@ SigmaOS is designed to eliminate operating system fragmentation, bloat, and lega
 
 ## Master Specification Files
 
-- [Sovereign OS Absolute Omnipresent Self-Sufficiency Ultra Encyclopedia V41](15-Sovereign-OS-Self-Sufficiency-Encyclopedia-V41.md)
+- [Sovereign OS Absolute Omnipresent Self-Sufficiency Ultra Encyclopedia V42](15-Sovereign-OS-Self-Sufficiency-Encyclopedia-V42.md)
 
 ## Component Future Development Roadmaps
 
