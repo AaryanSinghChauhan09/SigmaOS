@@ -96,6 +96,17 @@ impl TaskGuidelinesAndRulesGovernor {
                 description: "Transpile foreign distro package formats (Apt, Pacman, Dnf, Apk, Ports, Nix) to sigma-pkg in PR format.".to_string(),
             },
         );
+
+        self.rules.insert(
+            5,
+            TaskGuidelineCheck {
+                rule_id: 5,
+                name: "Linux & BSD Subsystem Universal Interoperability".to_string(),
+                persona: AgentPersonaRule::SentinelSecurityBoundary,
+                is_mandatory: true,
+                description: "Ensure all Linux & BSD distro subsystem components interoperate seamlessly across SigmaOS engines.".to_string(),
+            },
+        );
     }
 
     pub fn validate_guideline(&mut self, rule_id: u32) -> bool {
@@ -190,11 +201,15 @@ impl WikiDataTransferEngine {
         self.register_spec_file("Roadmap11Deployment", "Roadmap 11 Deployment", true);
         self.register_spec_file("ROADMAP.md", "SigmaOS Master Development Roadmap", true);
         self.register_spec_file(
-            "UniversalPackageSystem",
-            "Universal Package System Spec",
+            "OPEN_SOURCE_OS_COMPARATIVE_GAP_ANALYSIS.md",
+            "Open Source OS Comparative Gap Analysis",
             true,
         );
-        self.register_spec_file("Roadmap11Deployment", "11-Roadmap Deployment Spec", true);
+        self.register_spec_file(
+            "SOVEREIGN_OS_ABSOLUTE_OMNIPRESENT_SELF_SUFFICIENCY_ULTRA_ENCYCLOPEDIA_V41.md",
+            "Self Sufficiency Encyclopedia V41",
+            true,
+        );
     }
 
     pub fn register_spec_file(&mut self, filename: &str, title: &str, fully_implemented: bool) {
@@ -256,10 +271,14 @@ impl SovereignTaskAndWikiGovernanceSuite {
         self.governor.validate_guideline(2);
         self.governor.validate_guideline(3);
         self.governor.validate_guideline(4);
+        self.governor.validate_guideline(5);
 
         if !self.governor.is_governance_compliant() {
             return false;
         }
+
+        let _ = self.wiki_engine.transfer_implemented_data_to_wiki("OPEN_SOURCE_OS_COMPARATIVE_GAP_ANALYSIS.md");
+        let _ = self.wiki_engine.transfer_implemented_data_to_wiki("SOVEREIGN_OS_ABSOLUTE_OMNIPRESENT_SELF_SUFFICIENCY_ULTRA_ENCYCLOPEDIA_V41.md");
 
         self.wiki_engine
             .transfer_implemented_data_to_wiki("ROADMAP.md")
@@ -289,6 +308,7 @@ mod tests {
         governor.validate_guideline(2);
         governor.validate_guideline(3);
         governor.validate_guideline(4);
+        governor.validate_guideline(5);
         assert!(governor.is_governance_compliant());
     }
 
