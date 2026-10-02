@@ -1,8 +1,9 @@
+#![no_std]
+
 //! Boot System (GRUB2/systemd-boot/refind Inspiration)
 //! Advanced boot manager with themes, secure boot, and boot environments
 
 extern crate alloc;
-#![no_std]
 
 pub mod boot_snapshot;
 pub mod bootloader;
