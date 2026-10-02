@@ -78,6 +78,7 @@ pub mod performance;
 pub mod pipes;
 pub mod policy_mechanism;
 pub mod process;
+pub mod rcu;
 pub mod roundrobin;
 pub mod sched;
 pub mod scheduler;
@@ -85,6 +86,7 @@ pub mod structures;
 pub mod timer_wheel;
 pub mod uts_namespace;
 pub mod virtual_cpu;
+pub mod workqueue;
 
 pub use missing_linux_kernel_components::{
     BpfRingBufferStreamEngine, EpollCtlOp, EpollEvent, KernelAuditRecord, KernelAuditRecordType,

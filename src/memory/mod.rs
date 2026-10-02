@@ -13,6 +13,7 @@ pub mod allocator;
 pub mod cgroups;
 pub mod kswapd;
 pub mod low_level;
+pub mod page_cache;
 pub mod paging;
 pub mod quota;
 pub mod segmentation_paging;
