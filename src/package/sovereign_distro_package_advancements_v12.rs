@@ -38,15 +38,6 @@ use std::vec;
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
 
-#[cfg(not(feature = "standalone_test"))]
-use crate::package::universal::PackageFormat;
-
-#[cfg(feature = "standalone_test")]
-#[path = "universal.rs"]
-pub mod universal;
-
-#[cfg(feature = "standalone_test")]
-pub use universal::PackageFormat;
 
 // ============================================================================
 // 1. Comprehensive Universal Package Formats
