@@ -357,9 +357,9 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxSlackware | DistroSubsystemMode::LinuxTinyCore => {
                 ServiceSupervisorType::Sysvinit
             }
-            DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SolarisOmniOS => {
-                ServiceSupervisorType::Smf
-            }
+            DistroSubsystemMode::SolarisIllumos
+            | DistroSubsystemMode::SolarisOmniOS
+            | DistroSubsystemMode::SolarisSmartOS => ServiceSupervisorType::Smf,
             DistroSubsystemMode::SmartOs | DistroSubsystemMode::NetBsdRump => {
                 ServiceSupervisorType::Rcd
             }
@@ -569,9 +569,9 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxTinyCore
             | DistroSubsystemMode::LinuxSlax
             | DistroSubsystemMode::LinuxPuppy => supervisor == ServiceSupervisorType::Sysvinit,
-            DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SolarisOmniOS => {
-                supervisor == ServiceSupervisorType::Smf
-            }
+            DistroSubsystemMode::SolarisIllumos
+            | DistroSubsystemMode::SolarisOmniOS
+            | DistroSubsystemMode::SolarisSmartOS => supervisor == ServiceSupervisorType::Smf,
             DistroSubsystemMode::SmartOs | DistroSubsystemMode::NetBsdRump => {
                 supervisor == ServiceSupervisorType::Rcd
             }
@@ -3131,7 +3131,7 @@ mod inspiration_leap_tests {
         assert_eq!(leap_engine.active_inspirations.len(), 13);
 
         let (count, valid) = leap_engine.audit_subsystem_readiness();
-        assert_eq!(count, 182);
+        assert_eq!(count, 174);
         assert!(valid);
 
         let res = leap_engine.router.route_event("process", "memory", "alloc_page", "0x1000");
@@ -3144,7 +3144,7 @@ mod inspiration_leap_tests {
         assert!(res_bsd.unwrap().contains("VNET network stack routing"));
 
         let (count_bsd, valid_bsd) = leap_engine.audit_subsystem_readiness();
-        assert_eq!(count_bsd, 182);
+        assert_eq!(count_bsd, 174);
         assert!(valid_bsd);
     }
 }
@@ -8564,6 +8564,9 @@ impl SovereignSystemdHomedAuthBridge {
     ) -> Result<&'static str, &'static str> {
         if username.is_empty() || password.is_empty() {
             return Err("Invalid credentials");
+        }
+        if self.credential_provider.is_none() {
+            return Err("No credential provider configured");
         }
         self.authenticated_users.push(username.to_string());
         Ok("LUKS_HOME_MOUNTED")

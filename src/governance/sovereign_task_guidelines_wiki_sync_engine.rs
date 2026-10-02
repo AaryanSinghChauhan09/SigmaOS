@@ -182,6 +182,8 @@ impl WikiDataTransferEngine {
         );
 
         self.register_spec_file("ROADMAP.md", "SigmaOS Master Development Roadmap", true);
+        self.register_spec_file("UniversalPackageSystem", "Universal Package System", true);
+        self.register_spec_file("Roadmap11Deployment", "Roadmap 11 Deployment", true);
     }
 
     pub fn register_spec_file(&mut self, filename: &str, title: &str, fully_implemented: bool) {
@@ -208,6 +210,10 @@ impl WikiDataTransferEngine {
         }
 
         Err("Specification key not found")
+    }
+
+    pub fn total_synced_specs(&self) -> u32 {
+        self.total_synced_to_wiki
     }
 }
 

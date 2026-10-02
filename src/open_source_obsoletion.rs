@@ -3678,7 +3678,11 @@ impl SovereignOpenSourceObsoletionOrchestrator {
                 "orchestrator_node",
                 "10.200.0.1",
             ),
-            total_obsoleted_projects_count: 90,
+            syncthing_sync: SovereignSyncthingPeerSyncEngine::new("default_folder"),
+            keycloak_idp: SovereignKeycloakIdentityProvider::new("sovereign_realm"),
+            strace_tracer: SovereignStraceSyscallTracerEngine::new(),
+            glusterfs_store: SovereignGlusterFsDistributedEngine::new("vol_data", 2),
+            total_obsoleted_projects_count: 94,
         }
     }
 
