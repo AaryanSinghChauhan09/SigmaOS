@@ -52,6 +52,11 @@ pub mod rump_modules;
 pub use rump_modules::{
     KernelModule, ModuleState, ModulePriority, RumpModuleLoader,
 };
+pub mod kptr_restrict;
+pub use kptr_restrict::{
+    KptrRestrictLevel, SecurityMitigations, get_kptr_restrict, set_kptr_restrict,
+    should_hide_kptr, format_kptr, get_security_mitigations,
+};
 pub mod module_loading_control;
 pub mod module_tools;
 pub mod namespaces;
