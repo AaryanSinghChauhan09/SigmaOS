@@ -357,12 +357,12 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxSlackware | DistroSubsystemMode::LinuxTinyCore => {
                 ServiceSupervisorType::Sysvinit
             }
-            DistroSubsystemMode::SolarisIllumos
-            | DistroSubsystemMode::SolarisOmniOS
-            | DistroSubsystemMode::SolarisSmartOS => ServiceSupervisorType::Smf,
-            DistroSubsystemMode::SmartOs | DistroSubsystemMode::NetBsdRump => {
-                ServiceSupervisorType::Rcd
+            DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SolarisOmniOS => {
+                ServiceSupervisorType::Smf
             }
+            DistroSubsystemMode::SmartOs
+            | DistroSubsystemMode::SolarisSmartOS
+            | DistroSubsystemMode::NetBsdRump => ServiceSupervisorType::Rcd,
         }
     }
 
@@ -569,12 +569,12 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxTinyCore
             | DistroSubsystemMode::LinuxSlax
             | DistroSubsystemMode::LinuxPuppy => supervisor == ServiceSupervisorType::Sysvinit,
-            DistroSubsystemMode::SolarisIllumos
-            | DistroSubsystemMode::SolarisOmniOS
-            | DistroSubsystemMode::SolarisSmartOS => supervisor == ServiceSupervisorType::Smf,
-            DistroSubsystemMode::SmartOs | DistroSubsystemMode::NetBsdRump => {
-                supervisor == ServiceSupervisorType::Rcd
+            DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SolarisOmniOS => {
+                supervisor == ServiceSupervisorType::Smf
             }
+            DistroSubsystemMode::SmartOs
+            | DistroSubsystemMode::SolarisSmartOS
+            | DistroSubsystemMode::NetBsdRump => supervisor == ServiceSupervisorType::Rcd,
         };
         supervisor_valid && !pkg_spec.is_empty() && !vfs_etc.is_empty()
     }

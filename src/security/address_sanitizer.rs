@@ -235,20 +235,24 @@ impl AddressSanitizer {
             .wrapping_mul(0x9E3779B97F4A7C15)
     }
 
+    /// Check canary
     fn check_canary(&self, region: &AsanRegion) -> bool {
-        let expected = self.generate_canary(region.start / 1000);
+        let expected = self.generate_canary(region.start);
         region.canary == expected
     }
 
-        region.deallocate();
-        self.deallocation_count += 1;
+    /// Find region by pointer
+    fn find_region_by_ptr(&self, ptr: u64) -> Result<u64, &'static str> {
+        for (&id, region) in &self.regions {
+            let data_start = region.start + self.redzone_size as u64;
+            let data_end = region.end - self.redzone_size as u64;
 
-        // Add to quarantine
-        if self.quarantine.len() < self.config.quarantine_size {
-            self.quarantine.push(address);
+            if ptr >= data_start && ptr < data_end {
+                return Ok(id);
+            }
         }
 
-        Ok(())
+        Err("Pointer region not found")
     }
 
     /// Find region by pointer

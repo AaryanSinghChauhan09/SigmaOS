@@ -46,6 +46,11 @@ pub use zenithnet::{
     PacketType, TcpHeader, TcpState as ZenithTcpState, UdpHeader, ZenithNet,
 };
 
+pub mod sovereign_async_io;
+pub use sovereign_async_io as zero_copy_networking;
+pub use sovereign_async_io::{
+    IoCompletionEntry, IoCompletionQueue, SovereignZeroCopySocket, UmemPool, XdpAction, XdpRing,
+};
 
 pub mod tc_qdisc_sovereign;
 pub use tc_qdisc_sovereign::{

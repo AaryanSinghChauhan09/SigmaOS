@@ -93,17 +93,6 @@ pub struct PacmanPkgbuild {
     pub makedepends: Vec<String>,
     pub source_urls: Vec<String>,
 }
-/// Description of Snapcraft Manifest (snap parity)
-pub struct SnapcraftManifest {
-    pub name: String,
-    pub version: String,
-    pub summary: String,
-    pub description: String,
-    pub confinement: String,
-    pub grade: String,
-    pub apps: Vec<String>,
-    pub plugs: Vec<String>,
-}
 #[derive(Debug, Clone)]
 pub enum AdapterError {
     ParseError(String),
@@ -609,14 +598,12 @@ impl UniversalPackageAdapter {
             name,
             version,
             summary: summary.clone(),
+            description: summary,
             confinement,
             grade: String::from("stable"),
             base: String::from("core22"),
             apps: Vec::new(),
             plugs,
-            apps: Vec::new(),
-            description: summary,
-            grade: "stable".to_string(),
         })
     }
 
