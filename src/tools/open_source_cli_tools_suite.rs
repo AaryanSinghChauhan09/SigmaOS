@@ -20,11 +20,9 @@ use std::format;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
-
 // =========================================================================
 // 1. FD PARALLEL DIRECTORY WALKER ENGINE (fd-find)
 // =========================================================================
-
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FdFileEntry {
     pub path: String,

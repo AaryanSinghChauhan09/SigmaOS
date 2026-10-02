@@ -5,9 +5,6 @@
 pub mod access;
 pub mod accessibility;
 pub mod audio;
-pub mod ipc;
-pub mod storage;
-pub mod system;
 pub mod automation;
 pub mod build;
 pub mod community;
@@ -20,6 +17,9 @@ pub mod desktop;
 pub mod development;
 pub mod device;
 pub mod distro;
+pub mod ipc;
+pub mod storage;
+pub mod system;
 pub use distro::sovereign_linux_bsd_wiki_master_engine::*;
 pub mod driver;
 pub mod drivers;
@@ -89,17 +89,17 @@ pub mod linuxmint_inspirations;
 pub use linuxmint_inspirations::{
     AppTheme, BackupFileEntry, BulkyRenamer, CaptainInstaller, CaptainSource, CatalogPackage,
     ConfigBackend, DebPackage, DesktopIconFlags, DiagnosticField, DocumentBookmark,
-    DocumentSearchMatch, DriverPackageSource, FsFormat, HypnotixIptvPlayer, IsolationMode,
-    IptvProvider, LanPeer, LanWarpEngine, MintBackupEngine, MintConfigHub, MintDesktopEngine,
+    DocumentSearchMatch, DriverPackageSource, FsFormat, HypnotixIptvPlayer, IptvProvider,
+    IsolationMode, LanPeer, LanWarpEngine, MintBackupEngine, MintConfigHub, MintDesktopEngine,
     MintDriverIsoMountEngine, MintLocaleEngine, MintMenuEngine, MintMenuItem,
     MintMirrorSpeedTester, MintNannyFilter, MintReportDiagnostics, MintSoftwareCatalogEngine,
     MintStickFormatter, MintStickIsoVerifier, MintUpgradeEngine, MintUpgradePhase, MintWelcomeFlow,
     NannyDecision, PackageListEntry, PartitionScheme, ProviderType, RenameConflict, RenameRule,
     RenamedFile, RepositoryMirror, RequestIncoming, SessionControlAction, StickyNote,
-    StickyNotesManager, ThingyEntry, ThingyKind, ThingyRecentDocs, TransferOutcome, TransferRequest,
-    TvChannel, UsbDevice, WARP_AUTH_PORT, WARP_MDNS_UDP_PORT, WARP_TRANSFER_PORT, WebEngineKind,
-    Webapp, WebappManager, WelcomeStep, XAppDocumentReader, XAppImageViewer,
-    XAppStatusIconBadgeManager, XAppTextEditor, XAppThemeEngine, XAppTrayBadge,
+    StickyNotesManager, ThingyEntry, ThingyKind, ThingyRecentDocs, TransferOutcome,
+    TransferRequest, TvChannel, UsbDevice, WebEngineKind, Webapp, WebappManager, WelcomeStep,
+    XAppDocumentReader, XAppImageViewer, XAppStatusIconBadgeManager, XAppTextEditor,
+    XAppThemeEngine, XAppTrayBadge, WARP_AUTH_PORT, WARP_MDNS_UDP_PORT, WARP_TRANSFER_PORT,
 };
 pub mod open_source_obsoletion;
 pub mod tools;
@@ -108,11 +108,11 @@ pub use distro::sovereign_2050_distro_supremacy_engine::*;
 pub use distro::sovereign_2055_distro_supremacy_engine::*;
 pub use distro::sovereign_2060_distro_supremacy_engine::*;
 pub use distro::sovereign_2070_distro_supremacy_engine::*;
-pub use distro::SovereignMasterSubsystemDistroHarmonizer;
 pub use distro::sovereign_linux_bsd_master_synthesis::*;
-pub use distro::sovereign_media_and_distro_unimplemented_innovations::*;
 pub use distro::sovereign_linux_bsd_media_wiki_unimplemented_ideas_engine::*;
 pub use distro::sovereign_linux_bsd_pinnacle_innovations_v14::*;
+pub use distro::sovereign_media_and_distro_unimplemented_innovations::*;
+pub use distro::SovereignMasterSubsystemDistroHarmonizer;
 pub use kernel::tss_ring3_user_mode::*;
 pub use open_source_obsoletion::open_source_os_gap_closure::*;
 pub use tools::tech_media_extended_suite::*;
@@ -214,37 +214,34 @@ pub use driver::pci_bus::{
 pub use driver::{
     AudioDspStream, AudioSampleFormat, Bluetooth54LeAudioDriver, BusType, DriverCapability,
     DriverIsolationRingGuard, DrmAtomicKmsState, DrmConnectorType, DrmDisplayMode, EvdevEvent,
-    EvdevEventType, EvdevInputDevice, FreeBsdDrmConnector, GpioDirection, GpioState,
-    GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType,
-    I2cSpiGpioBusController, InputDriver, InputEvent, InputType, IsochannelMode,
-    IsolationRingLevel, LeAudioCodec, LinuxBsdWifi6e7Driver, LinuxUrb, LinuxUrbQueue,
-    MultiTouchSlot, NetBsdRumpDriverHost, NetworkCommand, NetworkDriver, NetworkError, NetworkType,
-    Nvme2ZnsFabricsDriver, NvmeFabricsTransport, NvmeZoneDescriptor, NvmeZoneState,
-    OpenBsdDriverPledge, PacketSlot, StorageCommand, StorageDriver, StorageError, StorageType,
-    Uac3IntelHdaAudioDspDriver, UrbTransferType, UsbHidDriver, VesaDriver, VesaError, VesaModeInfo,
-    Virgl3dCmd, Virgl3dResource, VirtioGpuVirgl3dDriver, WifiBand, WifiMloLink, WifiProtocolMode,
+    EvdevEventType, EvdevInputDevice, FreeBsdDrmConnector, GpioDirection, GpioState, GpuCommand,
+    GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType, I2cSpiGpioBusController,
+    InputDriver, InputEvent, InputType, IsochannelMode, IsolationRingLevel, LeAudioCodec,
+    LinuxBsdWifi6e7Driver, LinuxUrb, LinuxUrbQueue, MultiTouchSlot, NetBsdRumpDriverHost,
+    NetworkCommand, NetworkDriver, NetworkError, NetworkType, Nvme2ZnsFabricsDriver,
+    NvmeFabricsTransport, NvmeZoneDescriptor, NvmeZoneState, OpenBsdDriverPledge, PacketSlot,
+    StorageCommand, StorageDriver, StorageError, StorageType, Uac3IntelHdaAudioDspDriver,
+    UrbTransferType, UsbHidDriver, VesaDriver, VesaError, VesaModeInfo, Virgl3dCmd,
+    Virgl3dResource, VirtioGpuVirgl3dDriver, WifiBand, WifiMloLink, WifiProtocolMode,
     ZeroCopyPacketDriverEngine,
 };
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
 };
-pub use kernel::{
-    AiNativeRuntime, BuddyAllocator, Channel, EnergyAwareScheduler, FastPathIpc,
-    InterruptMechanism, IpcError, IpcManager,
-    MemoryBlock, Message, PAGE_SIZE, PolicyError, PolicyManager, PrivacyFirstSandbox, Priority, ProcessState,
-    ProtectionDomain, PrivilegeLevel, ResourceBroker, RoundRobinConfig, RoundRobinScheduler,
-    Scheduler, SchedulerError, SelfHealingKernel, SigmaFsPlusPlus, UniversalAbiTranslator,
-    UserDefinedKernelFunctions, Process, VirtualCpu,
-    IoUringEngine, IoUringOpcode, SubmissionQueueEntry, CompletionQueueEntry,
-    BoundedBufferProducerConsumer, SoftIrqType, BottomHalfKernelThread, BroadcastReceiver,
-    AndroidBroadcastReceiverRegistry,
-    KernelFastPacketEngine, FastPacketFrame, XdpAction,
-    KernelAccessController, LandlockPathRule, LandlockAccessRight,
-    InteractiveHybridScheduler, HybridTask,
-    CowStorageEngine, CowBlock, Hammer2PfsSnapshot,
-    MemoryCompactionSuperpagesAllocator, PhysicalFrameBlock, SovereignCgroupGovernor, CgroupResourceLimits,
-};
 pub use kernel::roundrobin::SchedulerError as RoundRobinSchedulerError;
+pub use kernel::{
+    AiNativeRuntime, AndroidBroadcastReceiverRegistry, BottomHalfKernelThread,
+    BoundedBufferProducerConsumer, BroadcastReceiver, BuddyAllocator, CgroupResourceLimits,
+    Channel, CompletionQueueEntry, CowBlock, CowStorageEngine, EnergyAwareScheduler,
+    FastPacketFrame, FastPathIpc, Hammer2PfsSnapshot, HybridTask, InteractiveHybridScheduler,
+    InterruptMechanism, IoUringEngine, IoUringOpcode, IpcError, IpcManager, KernelAccessController,
+    KernelFastPacketEngine, LandlockAccessRight, LandlockPathRule, MemoryBlock,
+    MemoryCompactionSuperpagesAllocator, Message, PhysicalFrameBlock, PolicyError, PolicyManager,
+    Priority, PrivacyFirstSandbox, PrivilegeLevel, Process, ProcessState, ProtectionDomain,
+    ResourceBroker, RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError,
+    SelfHealingKernel, SigmaFsPlusPlus, SoftIrqType, SovereignCgroupGovernor, SubmissionQueueEntry,
+    UniversalAbiTranslator, UserDefinedKernelFunctions, VirtualCpu, XdpAction, PAGE_SIZE,
+};
 pub use network::{
     compute_checksum as compute_net_checksum, IPv4Address, NetworkPacket, PacketRingBuffer,
     RingTcpState, TcpConnection, TcpError, TcpSegment, TcpSocket, TcpStack, TcpState,
@@ -263,16 +260,15 @@ pub use package::{
     ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,
 };
-pub use remote::{
-    FileTransfer, RemoteDesktop, RemoteError, RemoteSession,
-    RemoteShell, SessionID, SessionState, ShellError, ShellID, ShellManager,
-    SimpleFileTransfer, SimpleRemoteDesktop, SimpleRemoteSession, SimpleScreenSharing,
-    SimpleShellManager,
-};
 pub use productivity::{
     Achievement, AchievementType, GamifiedProductivity, Goal, LayoutPreset as TmuxLayoutPreset,
     PomodoroState, PomodoroTimer, ProductivityScore, SplitDirection as TmuxSplitDirection,
     TmuxPane, TmuxSession, TmuxSessionManager, TmuxWindow,
+};
+pub use remote::{
+    FileTransfer, RemoteDesktop, RemoteError, RemoteSession, RemoteShell, SessionID, SessionState,
+    ShellError, ShellID, ShellManager, SimpleFileTransfer, SimpleRemoteDesktop,
+    SimpleRemoteSession, SimpleScreenSharing, SimpleShellManager,
 };
 pub use resilience::{
     RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
@@ -284,53 +280,55 @@ pub use security::{
     CapabilityToken, ForensicStorageFilter, Permission, PledgeManager, PledgePromise, RoutingMode,
     SandboxPolicy,
 };
-pub use userland::shell::{
-    Parser as UserlandShellParser, RedirectSpec, RedirectionEngine, Shell as UserlandShell,
-    StreamTarget,
-};
 pub use shell::{
     ContextualCompleter, HistoryExpansionEngine, JobControlManager, ParameterExpansionEngine,
     PipelineExecutor, ShellCommand, ShellPledgeUnveilGuard, ShellSyntaxHighlighter,
     SimpleShellSession as ShellRepl, ZshPromptFormatter,
 };
 pub use sigpkg::{
-    BuildSystem, ContentAddressedStore, CryptoVerifier, PackageDependencyResolver, RecipeError, RecipeManager,
-    SatSolver, Transaction, Version, MAX_RECIPE_DEPENDENCIES, AdapterError,
-    DebAdapter, RpmAdapter, PacmanAdapter,
+    AdapterError, BuildSystem, ContentAddressedStore, CryptoVerifier, DebAdapter,
+    PackageDependencyResolver, PacmanAdapter, RecipeError, RecipeManager, RpmAdapter, SatSolver,
+    Transaction, Version, MAX_RECIPE_DEPENDENCIES,
+};
+pub use userland::shell::{
+    Parser as UserlandShellParser, RedirectSpec, RedirectionEngine, Shell as UserlandShell,
+    StreamTarget,
 };
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
 };
 
-pub use thread::{Thread, ThreadError, Mutex as ThreadMutex};
+pub use thread::{Mutex as ThreadMutex, Thread, ThreadError};
 
-pub use process::spawn::{
-    ProcessID, ProcessState as LibProcessState, ProcessError, Process, SimpleProcess, ProcessSpawner, SimpleProcessSpawner, ProcessWaiter, SimpleProcessWaiter, ProcessGroup, SimpleProcessGroup,
-    CLONE_NEWNS, CLONE_NEWNET, CLONE_NEWPID,
-};
-pub use process::activity_manager::{
-    ActivityManager, ActivityState, ProcessActivityRecord, RegisterSnapshot, AddressSpaceBinding,
-};
 pub use memory::segmentation_paging::{
     AddressBindingMode, AddressType, AslrEntropyConfig, CpuRing, ExecutableAddressBinding,
     RandomizedAddressSpace, SegmentDescriptor, SegmentSelector, SegmentationPagingEngine,
     SpaceProtectionFlags, SystemControlRegisters,
 };
+pub use process::activity_manager::{
+    ActivityManager, ActivityState, AddressSpaceBinding, ProcessActivityRecord, RegisterSnapshot,
+};
+pub use process::spawn::{
+    Process, ProcessError, ProcessGroup, ProcessID, ProcessSpawner,
+    ProcessState as LibProcessState, ProcessWaiter, SimpleProcess, SimpleProcessGroup,
+    SimpleProcessSpawner, SimpleProcessWaiter, CLONE_NEWNET, CLONE_NEWNS, CLONE_NEWPID,
+};
 
 pub use community::toolkit::{
-    ArticleCategory, CommunityHandbookCatalog, HandbookArticle, PackageRecipe,
-    RecipeSourceFormat, ReproduciblePackageRecipeManager, SecurityModelType,
-    SecurityProfileTemplateStore, SecurityTemplate,
+    ArticleCategory, CommunityHandbookCatalog, HandbookArticle, PackageRecipe, RecipeSourceFormat,
+    ReproduciblePackageRecipeManager, SecurityModelType, SecurityProfileTemplateStore,
+    SecurityTemplate,
 };
 
 pub use tools::{
-    AccessibilityFeature as LibAccessibilityFeature, ClusterNode as LibClusterNode, NodeState as LibNodeState,
-    SigmaAccess as LibSigmaAccess, SigmaCluster as LibSigmaCluster, SigmaDeploy as LibSigmaDeploy,
-    SigmaIdentity as LibSigmaIdentity, SigmaToolError as LibSigmaToolError, UserIdentity as LibUserIdentity,
-    SovereignDpkgEtcher, SovereignAptDuo, SovereignImeConvertCase, SovereignTableConverter,
-    SovereignWordCounter, SovereignTextFixer, SovereignImageToDataUri, SovereignKeyboardTester,
-    SovereignIsWebsiteDown,
+    AccessibilityFeature as LibAccessibilityFeature, ClusterNode as LibClusterNode,
+    NodeState as LibNodeState, SigmaAccess as LibSigmaAccess, SigmaCluster as LibSigmaCluster,
+    SigmaDeploy as LibSigmaDeploy, SigmaIdentity as LibSigmaIdentity,
+    SigmaToolError as LibSigmaToolError, SovereignAptDuo, SovereignDpkgEtcher,
+    SovereignImageToDataUri, SovereignImeConvertCase, SovereignIsWebsiteDown,
+    SovereignKeyboardTester, SovereignTableConverter, SovereignTextFixer, SovereignWordCounter,
+    UserIdentity as LibUserIdentity,
 };
 pub mod iso;
 pub mod lang;

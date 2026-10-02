@@ -310,7 +310,8 @@ impl PamacPackageManager {
                 return Err("Missing required AUR build dependency.");
             }
         }
-        self.installed_aur_packages.insert(pkg.name.to_string(), pkg);
+        self.installed_aur_packages
+            .insert(pkg.name.to_string(), pkg);
         Ok(())
     }
 

@@ -17,13 +17,6 @@
 extern crate alloc;
 
 #[cfg(not(feature = "standalone_test"))]
-use std::collections::BTreeMap;
-#[cfg(not(feature = "standalone_test"))]
-use std::format;
-#[cfg(not(feature = "standalone_test"))]
-use std::string::{String, ToString};
-#[cfg(not(feature = "standalone_test"))]
-
 #[cfg(feature = "standalone_test")]
 use alloc::collections::BTreeMap;
 #[cfg(feature = "standalone_test")]
@@ -31,6 +24,12 @@ use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 #[cfg(feature = "standalone_test")]
 use alloc::vec::Vec;
+#[cfg(not(feature = "standalone_test"))]
+use std::collections::BTreeMap;
+#[cfg(not(feature = "standalone_test"))]
+use std::format;
+#[cfg(not(feature = "standalone_test"))]
+use std::string::{String, ToString};
 
 #[cfg(not(feature = "standalone_test"))]
 use crate::package::universal::UnifiedPackage;

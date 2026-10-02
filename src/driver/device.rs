@@ -1,7 +1,6 @@
 #![cfg_attr(target_os = "none", no_main)]
 use core::sync::atomic::{AtomicUsize, Ordering};
 
-
 /// Implements device drivers using OOP principles with traits and structs
 /// No dependency on external driver frameworks
 use core::ptr::{self, NonNull};
@@ -50,26 +49,42 @@ impl LegacyDevice {
         unsafe {
             core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), len);
         }
-        LegacyDevice { base_port, id, name: name_array }
+        LegacyDevice {
+            base_port,
+            id,
+            name: name_array,
+        }
     }
 }
 
 impl Device for LegacyDevice {
-    fn init(&mut self) -> Result<(), DeviceError> { Ok(()) }
+    fn init(&mut self) -> Result<(), DeviceError> {
+        Ok(())
+    }
     fn read(&mut self, buffer: &mut [u8]) -> Result<usize, DeviceError> {
         for b in buffer.iter_mut() {
             *b = 0;
         }
         Ok(buffer.len())
     }
-    fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> { Ok(buffer.len()) }
-    fn ioctl(&mut self, _command: u32, _arg: usize) -> Result<usize, DeviceError> { Ok(0) }
-    fn info(&self) -> DeviceInfo { DeviceInfo::new(DeviceType::Character) }
-    fn shutdown(&mut self) -> Result<(), DeviceError> { Ok(()) }
+    fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
+        Ok(buffer.len())
+    }
+    fn ioctl(&mut self, _command: u32, _arg: usize) -> Result<usize, DeviceError> {
+        Ok(0)
+    }
+    fn info(&self) -> DeviceInfo {
+        DeviceInfo::new(DeviceType::Character)
+    }
+    fn shutdown(&mut self) -> Result<(), DeviceError> {
+        Ok(())
+    }
 }
 
 impl UnifiedPeripheral for LegacyDevice {
-    fn query_channel(&self) -> PortAddress { PortAddress::PortIO(self.base_port) }
+    fn query_channel(&self) -> PortAddress {
+        PortAddress::PortIO(self.base_port)
+    }
     fn read_byte(&mut self, _offset: u32) -> Result<u8, DeviceError> {
         Ok(0)
     }
@@ -92,26 +107,42 @@ impl ModernDevice {
         unsafe {
             core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), len);
         }
-        ModernDevice { base_address, id, name: name_array }
+        ModernDevice {
+            base_address,
+            id,
+            name: name_array,
+        }
     }
 }
 
 impl Device for ModernDevice {
-    fn init(&mut self) -> Result<(), DeviceError> { Ok(()) }
+    fn init(&mut self) -> Result<(), DeviceError> {
+        Ok(())
+    }
     fn read(&mut self, buffer: &mut [u8]) -> Result<usize, DeviceError> {
         for b in buffer.iter_mut() {
             *b = 0;
         }
         Ok(buffer.len())
     }
-    fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> { Ok(buffer.len()) }
-    fn ioctl(&mut self, _command: u32, _arg: usize) -> Result<usize, DeviceError> { Ok(0) }
-    fn info(&self) -> DeviceInfo { DeviceInfo::new(DeviceType::Character) }
-    fn shutdown(&mut self) -> Result<(), DeviceError> { Ok(()) }
+    fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
+        Ok(buffer.len())
+    }
+    fn ioctl(&mut self, _command: u32, _arg: usize) -> Result<usize, DeviceError> {
+        Ok(0)
+    }
+    fn info(&self) -> DeviceInfo {
+        DeviceInfo::new(DeviceType::Character)
+    }
+    fn shutdown(&mut self) -> Result<(), DeviceError> {
+        Ok(())
+    }
 }
 
 impl UnifiedPeripheral for ModernDevice {
-    fn query_channel(&self) -> PortAddress { PortAddress::MemoryMapped(self.base_address) }
+    fn query_channel(&self) -> PortAddress {
+        PortAddress::MemoryMapped(self.base_address)
+    }
     fn read_byte(&mut self, _offset: u32) -> Result<u8, DeviceError> {
         Ok(0)
     }
@@ -134,13 +165,19 @@ impl UdfInterpreter {
         UdfInterpreter { bytecode: code_vec }
     }
 
-    pub fn execute(&self, peripheral: &mut dyn UnifiedPeripheral, registers: &mut [u32; 4]) -> Result<(), DeviceError> {
+    pub fn execute(
+        &self,
+        peripheral: &mut dyn UnifiedPeripheral,
+        registers: &mut [u32; 4],
+    ) -> Result<(), DeviceError> {
         let mut pc = 0;
         while pc < self.bytecode.len() {
             let op = self.bytecode[pc];
             match op {
                 0x01 => {
-                    if pc + 2 >= self.bytecode.len() { return Err(DeviceError::InvalidParameter); }
+                    if pc + 2 >= self.bytecode.len() {
+                        return Err(DeviceError::InvalidParameter);
+                    }
                     let reg_idx = self.bytecode[pc + 1] as usize;
                     let offset = self.bytecode[pc + 2] as u32;
                     if reg_idx < registers.len() {
@@ -149,7 +186,9 @@ impl UdfInterpreter {
                     pc += 3;
                 }
                 0x02 => {
-                    if pc + 2 >= self.bytecode.len() { return Err(DeviceError::InvalidParameter); }
+                    if pc + 2 >= self.bytecode.len() {
+                        return Err(DeviceError::InvalidParameter);
+                    }
                     let offset = self.bytecode[pc + 1] as u32;
                     let reg_idx = self.bytecode[pc + 2] as usize;
                     if reg_idx < registers.len() {
@@ -158,7 +197,9 @@ impl UdfInterpreter {
                     pc += 3;
                 }
                 0x03 => {
-                    if pc + 2 >= self.bytecode.len() { return Err(DeviceError::InvalidParameter); }
+                    if pc + 2 >= self.bytecode.len() {
+                        return Err(DeviceError::InvalidParameter);
+                    }
                     let reg_idx = self.bytecode[pc + 1] as usize;
                     let factor = self.bytecode[pc + 2] as u32;
                     if reg_idx < registers.len() {
@@ -666,7 +707,6 @@ impl Device for SimpleBlockDevice {
     }
 }
 
-
 // =========================================================================
 // ANCIENT AND LEGACY DEVICE SUPPORT (OOP-BASED IMPLEMENTATIONS)
 // =========================================================================
@@ -688,7 +728,8 @@ impl FloppyDiskDevice {
         }
         let mut sectors = Vec::new();
         // Standard floppy disk has 2880 sectors of 512 bytes each
-        for _ in 0..10 { // Seed 10 sectors for testing efficiency
+        for _ in 0..10 {
+            // Seed 10 sectors for testing efficiency
             sectors.push([0xAA; 512]);
         }
         FloppyDiskDevice {
@@ -723,7 +764,8 @@ impl Device for FloppyDiskDevice {
     }
     fn ioctl(&mut self, command: u32, arg: usize) -> Result<usize, DeviceError> {
         match command {
-            0xF001 => { // Turn motor off/on
+            0xF001 => {
+                // Turn motor off/on
                 self.motor_on = arg != 0;
                 Ok(0)
             }
@@ -939,7 +981,8 @@ impl Device for AdLibSoundDevice {
     }
     fn ioctl(&mut self, command: u32, arg: usize) -> Result<usize, DeviceError> {
         match command {
-            0xC001 => { // Set active synth voice
+            0xC001 => {
+                // Set active synth voice
                 self.active_voice = arg as u32;
                 Ok(0)
             }
@@ -989,7 +1032,8 @@ impl Device for IsaBusDevice {
     }
     fn ioctl(&mut self, command: u32, _arg: usize) -> Result<usize, DeviceError> {
         match command {
-            0xB001 => { // Query detected devices count
+            0xB001 => {
+                // Query detected devices count
                 Ok(self.device_count)
             }
             _ => Err(DeviceError::NotSupported),
@@ -2577,7 +2621,10 @@ mod tests {
             PortAddress::MemoryMapped(0xFE000000)
         );
         let mut modern = ModernDevice::new(101, b"modern_mmio", 0xFE000000);
-        assert_eq!(modern.query_channel(), PortAddress::MemoryMapped(0xFE000000));
+        assert_eq!(
+            modern.query_channel(),
+            PortAddress::MemoryMapped(0xFE000000)
+        );
         let mut modern = ModernDevice::new(101, b"modern_mmio", 0xFE000000);
         assert_eq!(
             modern.query_channel(),
@@ -2636,23 +2683,36 @@ mod tests {
         let mut io_mgr = IoManager::new();
 
         // 1. Emulate normal driver installation process
-        let driver_idx = io_mgr.normal_driver_installation_process(b"MySerialDriver", b"\\Registry\\Machine\\System\\CurrentControlSet\\Services\\MySerialDriver").unwrap();
+        let driver_idx = io_mgr
+            .normal_driver_installation_process(
+                b"MySerialDriver",
+                b"\\Registry\\Machine\\System\\CurrentControlSet\\Services\\MySerialDriver",
+            )
+            .unwrap();
         assert_eq!(io_mgr.active_drivers.len(), 1);
 
         let driver = &mut io_mgr.active_drivers[driver_idx];
         assert_eq!(&driver.driver_name[..14], b"MySerialDriver");
-        assert_eq!(&driver.registry_path[..66], b"\\Registry\\Machine\\System\\CurrentControlSet\\Services\\MySerialDriver");
+        assert_eq!(
+            &driver.registry_path[..66],
+            b"\\Registry\\Machine\\System\\CurrentControlSet\\Services\\MySerialDriver"
+        );
 
         // Set DRIVERUNLOAD unload routine callback
         driver.unload_routine = Some(|_drv| {});
 
         // 2. Create Device associated with the Driver Object
-        assert!(io_mgr.io_create_device(driver_idx, b"COM1", DeviceType::Character).is_ok());
+        assert!(io_mgr
+            .io_create_device(driver_idx, b"COM1", DeviceType::Character)
+            .is_ok());
 
         let driver_updated = &io_mgr.active_drivers[driver_idx];
         assert_eq!(driver_updated.device_objects.len(), 1);
         assert_eq!(&driver_updated.device_objects[0].name[..4], b"COM1");
-        assert_eq!(driver_updated.device_objects[0].device_type, DeviceType::Character);
+        assert_eq!(
+            driver_updated.device_objects[0].device_type,
+            DeviceType::Character
+        );
 
         // Configure HW Resource allocations inside Device Extension
         let ext = &mut io_mgr.active_drivers[driver_idx].device_objects[0].device_extension;
@@ -3240,9 +3300,17 @@ impl DeviceManager {
     }
 
     /// Autoprobes and matches a device by vendor/device ID table matching
-    pub fn auto_probe_and_bind(&mut self, vendor_id: u16, device_id: u16, device_type: DeviceType) -> bool {
+    pub fn auto_probe_and_bind(
+        &mut self,
+        vendor_id: u16,
+        device_id: u16,
+        device_type: DeviceType,
+    ) -> bool {
         for entry in self.probe_entries.iter() {
-            if entry.vendor_id == vendor_id && entry.device_id == device_id && entry.device_type == device_type {
+            if entry.vendor_id == vendor_id
+                && entry.device_id == device_id
+                && entry.device_type == device_type
+            {
                 return true;
             }
         }
@@ -3430,8 +3498,7 @@ unsafe fn alloc(size: usize) -> *mut u8 {
 }
 
 #[cfg(not(target_os = "none"))]
-unsafe fn free(_ptr: *mut u8) {
-}
+unsafe fn free(_ptr: *mut u8) {}
 
 #[cfg(target_os = "none")]
 extern "C" {

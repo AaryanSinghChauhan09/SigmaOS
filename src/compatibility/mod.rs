@@ -22,13 +22,12 @@ pub mod clear_linux;
 pub mod zorin;
 
 pub use antix::{
-    AntiXInitSystem, AntiXServiceState, AntiXService, AntiXInitSwitcher,
-    AntiXPersistenceMode, AntiXPersistenceManager, AntiXSystemRemasterEngine,
-    AntiXControlCentre,
+    AntiXControlCentre, AntiXInitSwitcher, AntiXInitSystem, AntiXPersistenceManager,
+    AntiXPersistenceMode, AntiXService, AntiXServiceState, AntiXSystemRemasterEngine,
 };
 pub use zorin::{
-    ZorinLayout, ZorinLayoutMetrics, ZorinLayoutSwitcher, ZorinChameleonColor,
-    ZorinChameleonEngine, ZorinConnectState, ZorinConnectManager, ZorinWindowsAppSupport,
+    ZorinChameleonColor, ZorinChameleonEngine, ZorinConnectManager, ZorinConnectState, ZorinLayout,
+    ZorinLayoutMetrics, ZorinLayoutSwitcher, ZorinWindowsAppSupport,
 };
 
 pub use fedora_domination::*;
@@ -191,11 +190,10 @@ pub use lubuntu::{
 };
 
 pub use cross_platform_kernel::{
-    PageAccessMode, MemoryArch, PageDirectory, DeferredProcedureCall,
-    Kpcrb, Kpcr, Irql, IrqlController, IdtEntry, Idtr, SystemServiceTable,
-    UmsThreadState, UmsContext, SovereignKernelInternals,
+    DeferredProcedureCall, IdtEntry, Idtr, Irql, IrqlController, Kpcr, Kpcrb, MemoryArch,
+    PageAccessMode, PageDirectory, SovereignKernelInternals, SystemServiceTable, UmsContext,
+    UmsThreadState,
 };
-
 
 pub use historic_linux::{
     Era0_11SyscallEmulator, Era1_0SyscallEmulator, Era2_4SyscallEmulator, HistoricError,

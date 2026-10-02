@@ -84,7 +84,9 @@ impl DeviceController {
         // Check deny rules first
         for rule in &self.deny_rules {
             if self.matches_rule(rule, device_type, major, minor, access) {
-                if let Some(val) = self.stats.get_mut("device_access_denied") { *val += 1; }
+                if let Some(val) = self.stats.get_mut("device_access_denied") {
+                    *val += 1;
+                }
                 return false;
             }
         }
@@ -92,7 +94,9 @@ impl DeviceController {
         // Check allow rules
         for rule in &self.allow_rules {
             if self.matches_rule(rule, device_type, major, minor, access) {
-                if let Some(val) = self.stats.get_mut("device_access_allowed") { *val += 1; }
+                if let Some(val) = self.stats.get_mut("device_access_allowed") {
+                    *val += 1;
+                }
                 return true;
             }
         }

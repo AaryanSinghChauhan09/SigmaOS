@@ -19,10 +19,10 @@ use std::vec::Vec;
 // SigmaOS File Shredder
 // OOP-based secure file deletion with multiple overwrite passes
 
+use crate::klib::rng::SigmaRng;
 use std::fs::{self, File, OpenOptions};
 use std::io::{self, Seek, SeekFrom, Write};
 use std::path::Path;
-use crate::klib::rng::SigmaRng;
 
 /// Shredding algorithm
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -179,7 +179,9 @@ impl FileShredder {
     /// Shred a file
     pub fn shred(&mut self, path: &Path) -> Result<ShreddingResult, ShredderError> {
         if path.as_os_str().is_empty() {
-            return Err(ShredderError::FileNotFound(path.to_string_lossy().into_owned()));
+            return Err(ShredderError::FileNotFound(
+                path.to_string_lossy().into_owned(),
+            ));
         }
 
         let result = self.strategy.shred(path)?;

@@ -27,11 +27,9 @@ use std::format;
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec;
 #[cfg(any(feature = "standalone_test", test))]
-
 // =========================================================================
 // 1. NETBSD VERIEXEC FILE EXECUTABLE SECURITY ENGINE
 // =========================================================================
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum VeriexecMode {
     Strict,   // Deny untracked or modified files

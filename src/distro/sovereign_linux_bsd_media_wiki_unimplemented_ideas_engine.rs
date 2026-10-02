@@ -53,23 +53,108 @@ impl SovereignLinuxBsdDistroParityEngine {
 
     fn seed_distro_ideas(&mut self) {
         let ideas = [
-            ("arch_pacman_parallel", "Arch Linux", DistroFamily::LinuxArch, "Pacman parallel zero-copy downloads & AUR automated delta building"),
-            ("ubuntu_snapd_apparmor", "Ubuntu", DistroFamily::LinuxDebianUbuntu, "Strict AppArmor LSM profile generator for containerized snap services"),
-            ("fedora_ostree_silverblue", "Fedora", DistroFamily::LinuxFedoraRedHat, "RPM-OSTree atomic OS image staging with automatic A/B rollback"),
-            ("debian_reproducible_builds", "Debian", DistroFamily::LinuxDebianUbuntu, "100% Bit-for-bit reproducible binary verification pipeline"),
-            ("nixos_flake_hermetic", "NixOS", DistroFamily::LinuxNix, "Hermetic Content-Addressed Store (CAS) flake evaluation engine"),
-            ("alpine_apk_v3_zstd", "Alpine Linux", DistroFamily::LinuxAlpineVoid, "APK v3 multi-repository streaming zstd signature verification"),
-            ("void_xbps_triggers", "Void Linux", DistroFamily::LinuxAlpineVoid, "XBPS declarative state triggers and runit service supervision"),
-            ("gentoo_portage_ebuild", "Gentoo", DistroFamily::LinuxGentoo, "Portage EAPI 8 parallel USE flag dependency solver and slotting"),
-            ("freebsd_vnet_jail", "FreeBSD", DistroFamily::FreeBsd, "VNET network stack virtualization for lightweight jails"),
-            ("openbsd_pledge_unveil", "OpenBSD", DistroFamily::OpenBsd, "Strict pledge() system call filtering and unveil() filesystem restriction"),
-            ("netbsd_rump_kernel", "NetBSD", DistroFamily::NetBsd, "Rump kernel virtualized userland driver architecture"),
-            ("dragonfly_hammer2", "DragonFly BSD", DistroFamily::DragonFlyBsd, "HAMMER2 multi-volume snapshot and streaming replication filesystem"),
-            ("tails_amnesic_ram", "Tails OS", DistroFamily::SpecializedSecurityGaming, "Amnesic cold-boot RAM zeroization and swap scrubbing"),
-            ("nobara_proton_gamemode", "Nobara Linux", DistroFamily::SpecializedSecurityGaming, "Proton/Wine futex2 sync and low-latency GameMode CPU governor"),
-            ("parrot_sec_sandbox", "Parrot OS", DistroFamily::SpecializedSecurityGaming, "Containerized pentesting sandbox for isolated security audits"),
-            ("popos_system76_scheduler", "Pop!_OS", DistroFamily::LinuxDebianUbuntu, "System76 process scheduler for interactive GPU workload prioritization"),
-            ("asahi_apple_silicon", "Asahi Linux", DistroFamily::SpecializedSecurityGaming, "Apple Silicon M1-M4 SoC power domain and DCP display controller governor"),
+            (
+                "arch_pacman_parallel",
+                "Arch Linux",
+                DistroFamily::LinuxArch,
+                "Pacman parallel zero-copy downloads & AUR automated delta building",
+            ),
+            (
+                "ubuntu_snapd_apparmor",
+                "Ubuntu",
+                DistroFamily::LinuxDebianUbuntu,
+                "Strict AppArmor LSM profile generator for containerized snap services",
+            ),
+            (
+                "fedora_ostree_silverblue",
+                "Fedora",
+                DistroFamily::LinuxFedoraRedHat,
+                "RPM-OSTree atomic OS image staging with automatic A/B rollback",
+            ),
+            (
+                "debian_reproducible_builds",
+                "Debian",
+                DistroFamily::LinuxDebianUbuntu,
+                "100% Bit-for-bit reproducible binary verification pipeline",
+            ),
+            (
+                "nixos_flake_hermetic",
+                "NixOS",
+                DistroFamily::LinuxNix,
+                "Hermetic Content-Addressed Store (CAS) flake evaluation engine",
+            ),
+            (
+                "alpine_apk_v3_zstd",
+                "Alpine Linux",
+                DistroFamily::LinuxAlpineVoid,
+                "APK v3 multi-repository streaming zstd signature verification",
+            ),
+            (
+                "void_xbps_triggers",
+                "Void Linux",
+                DistroFamily::LinuxAlpineVoid,
+                "XBPS declarative state triggers and runit service supervision",
+            ),
+            (
+                "gentoo_portage_ebuild",
+                "Gentoo",
+                DistroFamily::LinuxGentoo,
+                "Portage EAPI 8 parallel USE flag dependency solver and slotting",
+            ),
+            (
+                "freebsd_vnet_jail",
+                "FreeBSD",
+                DistroFamily::FreeBsd,
+                "VNET network stack virtualization for lightweight jails",
+            ),
+            (
+                "openbsd_pledge_unveil",
+                "OpenBSD",
+                DistroFamily::OpenBsd,
+                "Strict pledge() system call filtering and unveil() filesystem restriction",
+            ),
+            (
+                "netbsd_rump_kernel",
+                "NetBSD",
+                DistroFamily::NetBsd,
+                "Rump kernel virtualized userland driver architecture",
+            ),
+            (
+                "dragonfly_hammer2",
+                "DragonFly BSD",
+                DistroFamily::DragonFlyBsd,
+                "HAMMER2 multi-volume snapshot and streaming replication filesystem",
+            ),
+            (
+                "tails_amnesic_ram",
+                "Tails OS",
+                DistroFamily::SpecializedSecurityGaming,
+                "Amnesic cold-boot RAM zeroization and swap scrubbing",
+            ),
+            (
+                "nobara_proton_gamemode",
+                "Nobara Linux",
+                DistroFamily::SpecializedSecurityGaming,
+                "Proton/Wine futex2 sync and low-latency GameMode CPU governor",
+            ),
+            (
+                "parrot_sec_sandbox",
+                "Parrot OS",
+                DistroFamily::SpecializedSecurityGaming,
+                "Containerized pentesting sandbox for isolated security audits",
+            ),
+            (
+                "popos_system76_scheduler",
+                "Pop!_OS",
+                DistroFamily::LinuxDebianUbuntu,
+                "System76 process scheduler for interactive GPU workload prioritization",
+            ),
+            (
+                "asahi_apple_silicon",
+                "Asahi Linux",
+                DistroFamily::SpecializedSecurityGaming,
+                "Apple Silicon M1-M4 SoC power domain and DCP display controller governor",
+            ),
         ];
 
         for (id, name, family, desc) in ideas {
@@ -101,7 +186,10 @@ impl SovereignLinuxBsdDistroParityEngine {
     }
 
     pub fn implemented_count(&self) -> usize {
-        self.feature_registry.values().filter(|f| f.is_implemented).count()
+        self.feature_registry
+            .values()
+            .filter(|f| f.is_implemented)
+            .count()
     }
 }
 
@@ -133,7 +221,9 @@ impl SovereignWikiRepoDocumentationEngine {
     }
 
     pub fn verify_wiki_and_md_parity(&self) -> bool {
-        self.wiki_pages_ingested > 0 && self.markdown_files_audited > 0 && self.total_specifications_verified >= 150
+        self.wiki_pages_ingested > 0
+            && self.markdown_files_audited > 0
+            && self.total_specifications_verified >= 150
     }
 }
 
@@ -167,39 +257,237 @@ impl Sovereign33TechMediaIntelligenceEngine {
 
     fn register_all_portals(&mut self) {
         let list = [
-            ("9to5google", "9to5Google", "9to5google.com", "https://9to5google.com/", "Mobile & Android"),
-            ("9to5linux", "9to5Linux", "9to5linux.com", "https://9to5linux.com/", "Linux News"),
-            ("9to5mac", "9to5Mac", "9to5mac.com", "https://9to5mac.com/", "Apple & macOS"),
-            ("androidauthority", "Android Authority", "androidauthority.com", "https://androidauthority.com/", "Mobile Tech"),
-            ("androidpolice", "Android Police", "androidpolice.com", "https://androidpolice.com/", "Android Ecosystem"),
-            ("appuals", "Appuals", "appuals.com", "https://appuals.com/", "Software Troubleshooting"),
-            ("distrowatch", "DistroWatch", "distrowatch.com", "https://distrowatch.com/", "Linux/BSD Distributions"),
-            ("frappe", "Frappe", "frappe.io", "https://frappe.io/", "Enterprise Framework"),
-            ("geekygadgets", "Geeky Gadgets", "geeky-gadgets.com", "https://www.geeky-gadgets.com/", "Hardware Gadgets"),
-            ("hwbusters", "HW Busters", "hwbusters.com", "https://www.hwbusters.com/", "Hardware Benchmarks"),
-            ("howtogeek", "How-To Geek", "howtogeek.com", "https://www.howtogeek.com/", "Tech Guides"),
-            ("infoworld", "InfoWorld", "infoworld.com", "https://www.infoworld.com/", "Enterprise Computing"),
-            ("itsfoss", "It's FOSS", "itsfoss.com", "https://itsfoss.com/", "Open Source & Linux"),
-            ("itdaily", "ITDaily", "itdaily.com", "https://itdaily.com/", "Enterprise IT"),
-            ("kdnuggets", "KDnuggets", "kdnuggets.com", "https://kdnuggets.com/", "Data Science & AI"),
-            ("linuxcom", "Linux.com", "linux.com", "https://linux.com/", "Linux Foundation Portal"),
-            ("linuxorg", "Linux.org", "linux.org", "https://linux.org/", "Linux Community"),
-            ("linuxfoundation", "Linux Foundation", "linuxfoundation.org", "https://linuxfoundation.org/", "Open Source Standards"),
-            ("linuxteck", "LinuxTeck", "linuxteck.com", "https://linuxteck.com/", "Sysadmin Tutorials"),
-            ("makeuseof", "MakeUseOf", "makeuseof.com", "https://www.makeuseof.com/", "Consumer Technology"),
-            ("marktechpost", "MarkTechPost", "marktechpost.com", "https://www.marktechpost.com/", "AI Research News"),
-            ("opensourceforu", "Open Source For You", "opensourceforu.com", "https://www.opensourceforu.com/", "FOSS Development"),
-            ("pcmag", "PCMag", "pcmag.com", "https://www.pcmag.com/", "Hardware & Software Reviews"),
-            ("pcworld", "PCWorld", "pcworld.com", "https://www.pcworld.com/", "PC Hardware & OS"),
-            ("phoronix", "Phoronix", "phoronix.com", "https://www.phoronix.com/", "Linux Hardware Benchmarks"),
-            ("techcrunch", "TechCrunch", "techcrunch.com", "https://techcrunch.com/", "Tech Industry News"),
-            ("techpowerup", "TechPowerUp", "techpowerup.com", "https://techpowerup.com", "GPU & Hardware Tech"),
-            ("techspot", "TechSpot", "techspot.com", "https://techspot.com", "PC Tech & Gaming"),
-            ("thenewstack", "The New Stack", "thenewstack.com", "https://thenewstack.com", "Cloud Native & DevOps"),
-            ("windowscentral", "Windows Central", "windowscentral.com", "https://www.windowscentral.com/", "Windows & PC Ecosystem"),
-            ("windowslatest", "Windows Latest", "windowslatest.com", "https://www.windowslatest.com/", "Windows Updates & OS"),
-            ("xdadevelopers", "XDA Developers", "xda-developers.com", "https://www.xda-developers.com/", "Mobile & Custom ROMs"),
-            ("zdnet", "ZDNET", "zdnet.com", "https://www.zdnet.com/", "Business & Enterprise Tech"),
+            (
+                "9to5google",
+                "9to5Google",
+                "9to5google.com",
+                "https://9to5google.com/",
+                "Mobile & Android",
+            ),
+            (
+                "9to5linux",
+                "9to5Linux",
+                "9to5linux.com",
+                "https://9to5linux.com/",
+                "Linux News",
+            ),
+            (
+                "9to5mac",
+                "9to5Mac",
+                "9to5mac.com",
+                "https://9to5mac.com/",
+                "Apple & macOS",
+            ),
+            (
+                "androidauthority",
+                "Android Authority",
+                "androidauthority.com",
+                "https://androidauthority.com/",
+                "Mobile Tech",
+            ),
+            (
+                "androidpolice",
+                "Android Police",
+                "androidpolice.com",
+                "https://androidpolice.com/",
+                "Android Ecosystem",
+            ),
+            (
+                "appuals",
+                "Appuals",
+                "appuals.com",
+                "https://appuals.com/",
+                "Software Troubleshooting",
+            ),
+            (
+                "distrowatch",
+                "DistroWatch",
+                "distrowatch.com",
+                "https://distrowatch.com/",
+                "Linux/BSD Distributions",
+            ),
+            (
+                "frappe",
+                "Frappe",
+                "frappe.io",
+                "https://frappe.io/",
+                "Enterprise Framework",
+            ),
+            (
+                "geekygadgets",
+                "Geeky Gadgets",
+                "geeky-gadgets.com",
+                "https://www.geeky-gadgets.com/",
+                "Hardware Gadgets",
+            ),
+            (
+                "hwbusters",
+                "HW Busters",
+                "hwbusters.com",
+                "https://www.hwbusters.com/",
+                "Hardware Benchmarks",
+            ),
+            (
+                "howtogeek",
+                "How-To Geek",
+                "howtogeek.com",
+                "https://www.howtogeek.com/",
+                "Tech Guides",
+            ),
+            (
+                "infoworld",
+                "InfoWorld",
+                "infoworld.com",
+                "https://www.infoworld.com/",
+                "Enterprise Computing",
+            ),
+            (
+                "itsfoss",
+                "It's FOSS",
+                "itsfoss.com",
+                "https://itsfoss.com/",
+                "Open Source & Linux",
+            ),
+            (
+                "itdaily",
+                "ITDaily",
+                "itdaily.com",
+                "https://itdaily.com/",
+                "Enterprise IT",
+            ),
+            (
+                "kdnuggets",
+                "KDnuggets",
+                "kdnuggets.com",
+                "https://kdnuggets.com/",
+                "Data Science & AI",
+            ),
+            (
+                "linuxcom",
+                "Linux.com",
+                "linux.com",
+                "https://linux.com/",
+                "Linux Foundation Portal",
+            ),
+            (
+                "linuxorg",
+                "Linux.org",
+                "linux.org",
+                "https://linux.org/",
+                "Linux Community",
+            ),
+            (
+                "linuxfoundation",
+                "Linux Foundation",
+                "linuxfoundation.org",
+                "https://linuxfoundation.org/",
+                "Open Source Standards",
+            ),
+            (
+                "linuxteck",
+                "LinuxTeck",
+                "linuxteck.com",
+                "https://linuxteck.com/",
+                "Sysadmin Tutorials",
+            ),
+            (
+                "makeuseof",
+                "MakeUseOf",
+                "makeuseof.com",
+                "https://www.makeuseof.com/",
+                "Consumer Technology",
+            ),
+            (
+                "marktechpost",
+                "MarkTechPost",
+                "marktechpost.com",
+                "https://www.marktechpost.com/",
+                "AI Research News",
+            ),
+            (
+                "opensourceforu",
+                "Open Source For You",
+                "opensourceforu.com",
+                "https://www.opensourceforu.com/",
+                "FOSS Development",
+            ),
+            (
+                "pcmag",
+                "PCMag",
+                "pcmag.com",
+                "https://www.pcmag.com/",
+                "Hardware & Software Reviews",
+            ),
+            (
+                "pcworld",
+                "PCWorld",
+                "pcworld.com",
+                "https://www.pcworld.com/",
+                "PC Hardware & OS",
+            ),
+            (
+                "phoronix",
+                "Phoronix",
+                "phoronix.com",
+                "https://www.phoronix.com/",
+                "Linux Hardware Benchmarks",
+            ),
+            (
+                "techcrunch",
+                "TechCrunch",
+                "techcrunch.com",
+                "https://techcrunch.com/",
+                "Tech Industry News",
+            ),
+            (
+                "techpowerup",
+                "TechPowerUp",
+                "techpowerup.com",
+                "https://techpowerup.com",
+                "GPU & Hardware Tech",
+            ),
+            (
+                "techspot",
+                "TechSpot",
+                "techspot.com",
+                "https://techspot.com",
+                "PC Tech & Gaming",
+            ),
+            (
+                "thenewstack",
+                "The New Stack",
+                "thenewstack.com",
+                "https://thenewstack.com",
+                "Cloud Native & DevOps",
+            ),
+            (
+                "windowscentral",
+                "Windows Central",
+                "windowscentral.com",
+                "https://www.windowscentral.com/",
+                "Windows & PC Ecosystem",
+            ),
+            (
+                "windowslatest",
+                "Windows Latest",
+                "windowslatest.com",
+                "https://www.windowslatest.com/",
+                "Windows Updates & OS",
+            ),
+            (
+                "xdadevelopers",
+                "XDA Developers",
+                "xda-developers.com",
+                "https://www.xda-developers.com/",
+                "Mobile & Custom ROMs",
+            ),
+            (
+                "zdnet",
+                "ZDNET",
+                "zdnet.com",
+                "https://www.zdnet.com/",
+                "Business & Enterprise Tech",
+            ),
         ];
 
         for (id, name, domain, url, cat) in list {
@@ -256,7 +544,9 @@ impl SovereignLinuxBsdMediaWikiUnimplementedIdeasMasterSuite {
     }
 
     pub fn execute_full_cycle(&mut self) -> bool {
-        let _ = self.distro_engine.execute_distro_feature("arch_pacman_parallel");
+        let _ = self
+            .distro_engine
+            .execute_distro_feature("arch_pacman_parallel");
         let _ = self.wiki_engine.sync_and_audit_documentation();
         let _ = self.media_engine.fetch_portal_feed_telemetry("9to5google");
         self.verify_complete_integration()
@@ -286,7 +576,9 @@ mod tests {
         assert_eq!(engine.implemented_count(), 17);
         assert!(engine.get_feature("arch_pacman_parallel").is_some());
         assert!(engine.get_feature("openbsd_pledge_unveil").is_some());
-        let count = engine.execute_distro_feature("arch_pacman_parallel").unwrap();
+        let count = engine
+            .execute_distro_feature("arch_pacman_parallel")
+            .unwrap();
         assert_eq!(count, 1);
     }
 

@@ -219,9 +219,7 @@ impl CapabilitySandbox {
             }
         } else {
             // Global capability check (no specific path)
-            if self.global_rights.contains(&required_right)
-                || self.mode == CapMode::Unrestricted
-            {
+            if self.global_rights.contains(&required_right) || self.mode == CapMode::Unrestricted {
                 Ok(())
             } else {
                 Err(ECAPMODE)
