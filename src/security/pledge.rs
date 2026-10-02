@@ -1,10 +1,8 @@
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
-
 #[cfg(feature = "standalone_test")]
-#[path = "capability.rs"]
-pub mod capability;
+mod capability;
 
 #[cfg(feature = "standalone_test")]
 use capability::{CapabilityGate, CapabilityToken, Permission};
@@ -296,7 +294,7 @@ impl Default for PledgeManager {
 /// Common pledge promises
 pub mod promises {
     #[cfg(feature = "standalone_test")]
-    use super::capability::Permission;
+    use super::Permission;
 
     #[cfg(not(feature = "standalone_test"))]
     use crate::security::capability::Permission;

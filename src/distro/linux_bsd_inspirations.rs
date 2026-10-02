@@ -361,8 +361,8 @@ impl SovereignUniversalDistroBridge {
                 ServiceSupervisorType::Smf
             }
             DistroSubsystemMode::SmartOs
-            | DistroSubsystemMode::NetBsdRump
-            | DistroSubsystemMode::SolarisSmartOS => ServiceSupervisorType::Rcd,
+            | DistroSubsystemMode::SolarisSmartOS
+            | DistroSubsystemMode::NetBsdRump => ServiceSupervisorType::Rcd,
         }
     }
 
@@ -573,8 +573,8 @@ impl SovereignUniversalDistroBridge {
                 supervisor == ServiceSupervisorType::Smf
             }
             DistroSubsystemMode::SmartOs
-            | DistroSubsystemMode::NetBsdRump
-            | DistroSubsystemMode::SolarisSmartOS => supervisor == ServiceSupervisorType::Rcd,
+            | DistroSubsystemMode::SolarisSmartOS
+            | DistroSubsystemMode::NetBsdRump => supervisor == ServiceSupervisorType::Rcd,
         };
         supervisor_valid && !pkg_spec.is_empty() && !vfs_etc.is_empty()
     }
@@ -1701,7 +1701,10 @@ impl SovereignUniversalDistroBridge {
             "sigpkg",
             "slab",
             "smartcard",
+            "sovereign_wiki_master_engine",
             "storage",
+            "subsystem_sync",
+            "super_matrix",
             "support",
             "syscall",
             "system",
@@ -1720,6 +1723,9 @@ impl SovereignUniversalDistroBridge {
             "tpm",
             "tracing",
             "ui",
+            "unimplemented_features",
+            "unimplemented_tools",
+            "universal_distro_super_matrix",
             "update",
             "usb",
             "userland",
@@ -1730,6 +1736,8 @@ impl SovereignUniversalDistroBridge {
             "vm",
             "wiki",
             "wiki_distro_ideas_deployment",
+            "wiki_ideas",
+            "wiki_unimplemented_ideas",
             "wireless",
             "workflow",
             "zig",
@@ -1779,6 +1787,7 @@ impl SovereignUniversalDistroBridge {
             "compression",
             "config",
             "container",
+            "containers",
             "core",
             "crash",
             "crypto",
@@ -1807,8 +1816,10 @@ impl SovereignUniversalDistroBridge {
             "finance",
             "fingerprint",
             "firewall",
+            "fs",
             "functions",
             "futuristic",
+            "futuristic_modules",
             "gamepad",
             "gap_closure",
             "governance",
@@ -1822,6 +1833,7 @@ impl SovereignUniversalDistroBridge {
             "input",
             "installer",
             "integration",
+            "interop_gateway",
             "interrupt",
             "iot",
             "ipc",
@@ -1852,6 +1864,8 @@ impl SovereignUniversalDistroBridge {
             "observability",
             "obsoletion",
             "onboarding",
+            "open_source_obsoletion",
+            "open_source_os_gap_closure",
             "orchestration",
             "package",
             "performance",
@@ -1881,11 +1895,17 @@ impl SovereignUniversalDistroBridge {
             "security",
             "sensor",
             "shell",
+            "sigma-boot",
+            "sigma_sandbox",
+            "sigma_validation",
             "signal",
             "sigpkg",
             "slab",
             "smartcard",
+            "sovereign_wiki_master_engine",
             "storage",
+            "subsystem_sync",
+            "super_matrix",
             "support",
             "syscall",
             "system",
@@ -1904,13 +1924,21 @@ impl SovereignUniversalDistroBridge {
             "tpm",
             "tracing",
             "ui",
+            "unimplemented_features",
+            "unimplemented_tools",
+            "universal_distro_super_matrix",
             "update",
             "usb",
             "userland",
+            "userspace",
             "vfs",
+            "virt",
             "virtualization",
+            "vm",
             "wiki",
             "wiki_distro_ideas_deployment",
+            "wiki_ideas",
+            "wiki_unimplemented_ideas",
             "wireless",
             "workflow",
             "zig",
@@ -3743,7 +3771,7 @@ mod cross_subsystem_tests {
 
         let sync_count = orchestrator.synchronize_subsystem_pipeline();
         assert!(sync_count.is_ok());
-        assert_eq!(sync_count.unwrap(), 174);
+        assert_eq!(sync_count.unwrap(), 182);
 
         let (supervisor, pkg_spec, vfs_etc, compatible) =
             orchestrator.query_subsystem_capabilities();
@@ -3954,8 +3982,8 @@ mod cross_subsystem_tests {
         let mut gateway =
             LinuxBsdDistroSubsystemInteroperabilityGateway::new(DistroSubsystemMode::LinuxArch);
         let count = gateway.synchronize_and_audit_all_subsystems().unwrap();
-        assert_eq!(count, 174);
-        assert_eq!(gateway.audited_subsystems_count, 174);
+        assert_eq!(count, 182);
+        assert_eq!(gateway.audited_subsystems_count, 182);
 
         let res = gateway.orchestrate_subsystem("kernel", "sched_task");
         assert!(res.is_ok());
@@ -3963,7 +3991,7 @@ mod cross_subsystem_tests {
 
         gateway.set_distro_mode(DistroSubsystemMode::FreeBsd);
         let count_bsd = gateway.synchronize_and_audit_all_subsystems().unwrap();
-        assert_eq!(count_bsd, 174);
+        assert_eq!(count_bsd, 182);
 
         let (supervisor, pkg_spec, vfs_etc, compatible) = gateway.query_gateway_capability_matrix();
         assert_eq!(supervisor, ServiceSupervisorType::OpenRC);
@@ -8562,6 +8590,9 @@ impl SovereignSystemdHomedAuthBridge {
         username: &str,
         password: &str,
     ) -> Result<&'static str, &'static str> {
+        if self.credential_provider.is_none() {
+            return Err("Credential provider unavailable");
+        }
         if username.is_empty() || password.is_empty() {
             return Err("Invalid credentials");
         }

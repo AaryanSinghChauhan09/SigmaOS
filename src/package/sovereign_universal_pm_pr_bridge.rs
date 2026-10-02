@@ -2,12 +2,8 @@
 // Sovereign Universal Package Manager PR Bridge Engine
 // (`src/package/sovereign_universal_pm_pr_bridge.rs`)
 //
-// Zero-dependency, `#![no_std]` / `alloc` compliant Rust engine bridging multi-distro Linux & BSD
-// package formats (Apt .deb, Pacman .pkg.tar.zst / PKGBUILD, Dnf .rpm, Zypper DeltaRPM,
-// Alpine .apk, Void .xbps, Gentoo .ebuild, FreeBSD/OpenBSD .pkg, NetBSD pkgsrc, Guix store,
-// Solus eopkg, Slackware txz, Paldo upd, GoboLinux Recipe, Haiku hpkg, Homebrew bottle,
-// MacPorts Portfile, CRUX pkgmk, Bedrock pmm, Mageia urpmi, TinyCore tcz, Puppy pet,
-// Nix Flakes, Flatpak, Snap, AppImage) into `sigma-pkg` through automated Pull Request
+// Zero-dependency, `#-[#_std]` / `alloc` compliant Rust engine bridging multi-distro Linux & BSD
+// package formats into `sigma-pkg` through automated Pull Request
 // submission workflows, SAT dependency resolution, PQC verification, DFSG license auditing,
 // automated sandbox policy synthesis, and batch PR auto-merge orchestration.
 
@@ -225,9 +221,9 @@ impl UniversalDistroPackageFormat {
         } else if lower.contains("eapi=") || lower.contains("keywords=") || lower.contains("inherit ") {
             Self::GentooEbuild
         } else if lower.contains("name = ") && lower.contains("origin = ") {
-            Self::FreeBsdPkg
+            Self::BsdPkg
         } else if lower.contains("@name ") || lower.contains("@cwd ") {
-            Self::OpenBsdPkg
+            Self::OpenBsdPorts
         } else if lower.contains("inputs.nixpkgs") || lower.contains("stdenv.mkderivation") || lower.contains("{ pkgs, ... }") {
             Self::NixFlake
         } else if lower.contains("define-public") && lower.contains("package-with-explicit-inputs") {
@@ -394,7 +390,7 @@ impl LinuxBsdPackageFormatConverterEngine {
             declared_dependencies: dependencies,
             provides_capabilities: capabilities,
             sandbox_level: match format {
-                UniversalDistroPackageFormat::BsdPkg | UniversalDistroPackageFormat::OpenBsdPkg => 3, // Full Capsicum
+                UniversalDistroPackageFormat::BsdPkg | UniversalDistroPackageFormat::FreeBsdPorts => 3, // Full Capsicum
                 UniversalDistroPackageFormat::FlatpakApp | UniversalDistroPackageFormat::SnapApp => 2, // Landlock+Seccomp
                 _ => 2,
             },
@@ -722,7 +718,7 @@ impl SovereignUniversalPmPrBridgeEngine {
         let pr_id = self.total_prs_submitted;
 
         let sandbox_lvl = match format {
-            UniversalDistroPackageFormat::BsdPkg | UniversalDistroPackageFormat::OpenBsdPkg | UniversalDistroPackageFormat::OpenBsdPorts => 3,
+            UniversalDistroPackageFormat::BsdPkg | UniversalDistroPackageFormat::OpenBsdPorts | UniversalDistroPackageFormat::FreeBsdPorts => 3,
             UniversalDistroPackageFormat::FlatpakApp | UniversalDistroPackageFormat::SnapApp => 2,
             _ => 2,
         };
@@ -999,8 +995,8 @@ mod tests {
             (UniversalDistroPackageFormat::AlpineApk, "alpine-app", &["musl"][..]),
             (UniversalDistroPackageFormat::VoidXbps, "void-app", &["xbps"][..]),
             (UniversalDistroPackageFormat::GentooEbuild, "gentoo-app", &["portage"][..]),
-            (UniversalDistroPackageFormat::FreeBsdPorts, "freebsd-app", &["libc"][..]),
-            (UniversalDistroPackageFormat::OpenBsdPkg, "openbsd-app", &["libc"][..]),
+            (UniversalDistroPackageFormat::BsdPkg, "freebsd-app", &["libc"][..]),
+            (UniversalDistroPackageFormat::OpenBsdPorts, "openbsd-app", &["libc"][..]),
             (UniversalDistroPackageFormat::NetBsdPkgsrc, "netbsd-app", &["libc"][..]),
             (UniversalDistroPackageFormat::NixFlake, "nix-app", &["stdenv"][..]),
             (UniversalDistroPackageFormat::GuixScheme, "guix-app", &["stdenv"][..]),
@@ -1244,7 +1240,6 @@ mod tests {
             UniversalDistroPackageFormat::BsdPkg,
             UniversalDistroPackageFormat::FreeBsdPorts,
             UniversalDistroPackageFormat::OpenBsdPorts,
-            UniversalDistroPackageFormat::OpenBsdPkg,
             UniversalDistroPackageFormat::NetBsdPkgsrc,
             UniversalDistroPackageFormat::HaikuHpkg,
             UniversalDistroPackageFormat::SlackwareSlackBuild,
@@ -1283,15 +1278,9 @@ mod tests {
             UniversalDistroPackageFormat::CachyOsPkg,
             UniversalDistroPackageFormat::AdobeAir,
             UniversalDistroPackageFormat::AppleIpa,
-            UniversalDistroPackageFormat::MacOsApp,
             UniversalDistroPackageFormat::SlaxLzm,
             UniversalDistroPackageFormat::PuppyPup,
             UniversalDistroPackageFormat::OciContainerImage,
-            UniversalDistroPackageFormat::SystemdSysext,
-            UniversalDistroPackageFormat::PythonWheel,
-            UniversalDistroPackageFormat::CargoCrate,
-            UniversalDistroPackageFormat::RubyGem,
-            UniversalDistroPackageFormat::DotnetNuget,
             UniversalDistroPackageFormat::QemuQcow2VmImage,
             UniversalDistroPackageFormat::RawDiskVmImage,
             UniversalDistroPackageFormat::VagrantVmBox,

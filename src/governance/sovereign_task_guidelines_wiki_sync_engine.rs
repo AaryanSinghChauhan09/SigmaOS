@@ -184,6 +184,8 @@ impl WikiDataTransferEngine {
         self.register_spec_file("UniversalPackageSystem", "SigmaOS Universal Package System", true);
         self.register_spec_file("Roadmap11Deployment", "SigmaOS Roadmap 11 Deployment", true);
         self.register_spec_file("ROADMAP.md", "SigmaOS Master Development Roadmap", true);
+        self.register_spec_file("UniversalPackageSystem", "Universal Package System Spec", true);
+        self.register_spec_file("Roadmap11Deployment", "11-Roadmap Deployment Spec", true);
     }
 
     pub fn register_spec_file(&mut self, filename: &str, title: &str, fully_implemented: bool) {
