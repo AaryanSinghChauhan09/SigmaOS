@@ -202,7 +202,6 @@ pub use store::{
     SvnBranchType, SvnRevisionLog,
 };
 pub use transaction::Transaction;
-pub use universal_adapter::UniversalPackageAdapter;
 pub use universal_adapter::{AdapterError, DebAdapter, PacmanAdapter, RpmAdapter};
 pub use verifier::CryptoVerifier;
 
