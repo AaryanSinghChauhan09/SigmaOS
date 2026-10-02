@@ -310,17 +310,18 @@ mod tests {
     #[test]
     fn test_infinite_loop_breakage() {
         let mut map = HashMap::new();
-        map.insert(
-            "/var/log/messages".to_string(),
-            PatternSmartSymlink::new("/var/log/syslog"),
-        );
-        map.insert(
-            "/var/log/syslog".to_string(),
-            PatternSmartSymlink::new("/var/log/messages"),
-        ); // Loop
+        map.insert("/var/log/messages".to_string(), PatternSmartSymlink::new("/var/log/syslog"));
+        map.insert("/var/log/syslog".to_string(), PatternSmartSymlink::new("/var/log/messages")); // Loop
 
         let start_link = PatternSmartSymlink::new("/var/log/messages");
-        let result = start_link.resolve_symlink_path("user1", "en", "/", 0, &map, Vec::new());
+        let result = start_link.resolve_symlink_path(
+            "user1",
+            "en",
+            "/",
+            0,
+            &map,
+            Vec::new(),
+        );
 
         assert_eq!(result, Err(SymlinkError::InfiniteLoopDetected));
     }
@@ -330,8 +331,14 @@ mod tests {
         let map = HashMap::new();
         let symlink = PatternSmartSymlink::new("../../../../etc/shadow"); // Escape attempt
 
-        let result =
-            symlink.resolve_symlink_path("user1", "en", "/home/user1/sandbox", 0, &map, Vec::new());
+        let result = symlink.resolve_symlink_path(
+            "user1",
+            "en",
+            "/home/user1/sandbox",
+            0,
+            &map,
+            Vec::new(),
+        );
 
         assert_eq!(result, Err(SymlinkError::SandboxEscapeAttempted));
     }

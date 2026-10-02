@@ -4,10 +4,7 @@
 // attach, walk, open, read, write, clunk, stat, wstat, create, remove.
 
 use std::collections::HashMap;
-use std::sync::{
-    atomic::{AtomicU32, AtomicU64, Ordering},
-    Arc, Mutex,
-};
+use std::sync::{Arc, Mutex, atomic::{AtomicU32, AtomicU64, Ordering}};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 9P Core Types
@@ -21,22 +18,22 @@ pub const NOTAG: Tag = 0xFFFF;
 pub const NOFID: Fid = u32::MAX;
 
 /// QID type bits
-pub const QTDIR: u8 = 0x80;
-pub const QTAPPEND: u8 = 0x40;
-pub const QTEXCL: u8 = 0x20;
+pub const QTDIR: u8   = 0x80;
+pub const QTAPPEND: u8= 0x40;
+pub const QTEXCL: u8  = 0x20;
 pub const QTMOUNT: u8 = 0x10;
-pub const QTAUTH: u8 = 0x08;
-pub const QTTMP: u8 = 0x04;
+pub const QTAUTH: u8  = 0x08;
+pub const QTTMP: u8   = 0x04;
 pub const QTSYMLINK: u8 = 0x02;
-pub const QTFILE: u8 = 0x00;
+pub const QTFILE: u8  = 0x00;
 
 /// 9P open mode flags
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum OpenMode {
-    ReadOnly = 0,
+    ReadOnly  = 0,
     WriteOnly = 1,
     ReadWrite = 2,
-    Execute = 3,
+    Execute   = 3,
 }
 
 /// Stat structure (9P dir entry)
@@ -60,148 +57,51 @@ pub struct Stat {
 #[derive(Debug, Clone)]
 pub enum Message {
     // Client → Server (T-messages)
-    Tversion {
-        tag: Tag,
-        msize: u32,
-        version: String,
-    },
-    Tauth {
-        tag: Tag,
-        afid: Fid,
-        uname: String,
-        aname: String,
-    },
-    Tattach {
-        tag: Tag,
-        fid: Fid,
-        afid: Fid,
-        uname: String,
-        aname: String,
-    },
-    Tflush {
-        tag: Tag,
-        oldtag: Tag,
-    },
-    Twalk {
-        tag: Tag,
-        fid: Fid,
-        newfid: Fid,
-        wnames: Vec<String>,
-    },
-    Topen {
-        tag: Tag,
-        fid: Fid,
-        mode: u8,
-    },
-    Tcreate {
-        tag: Tag,
-        fid: Fid,
-        name: String,
-        perm: u32,
-        mode: u8,
-    },
-    Tread {
-        tag: Tag,
-        fid: Fid,
-        offset: u64,
-        count: u32,
-    },
-    Twrite {
-        tag: Tag,
-        fid: Fid,
-        offset: u64,
-        data: Vec<u8>,
-    },
-    Tclunk {
-        tag: Tag,
-        fid: Fid,
-    },
-    Tremove {
-        tag: Tag,
-        fid: Fid,
-    },
-    Tstat {
-        tag: Tag,
-        fid: Fid,
-    },
-    Twstat {
-        tag: Tag,
-        fid: Fid,
-        stat: Stat,
-    },
+    Tversion { tag: Tag, msize: u32, version: String },
+    Tauth    { tag: Tag, afid: Fid, uname: String, aname: String },
+    Tattach  { tag: Tag, fid: Fid, afid: Fid, uname: String, aname: String },
+    Tflush   { tag: Tag, oldtag: Tag },
+    Twalk    { tag: Tag, fid: Fid, newfid: Fid, wnames: Vec<String> },
+    Topen    { tag: Tag, fid: Fid, mode: u8 },
+    Tcreate  { tag: Tag, fid: Fid, name: String, perm: u32, mode: u8 },
+    Tread    { tag: Tag, fid: Fid, offset: u64, count: u32 },
+    Twrite   { tag: Tag, fid: Fid, offset: u64, data: Vec<u8> },
+    Tclunk   { tag: Tag, fid: Fid },
+    Tremove  { tag: Tag, fid: Fid },
+    Tstat    { tag: Tag, fid: Fid },
+    Twstat   { tag: Tag, fid: Fid, stat: Stat },
 
     // Server → Client (R-messages)
-    Rversion {
-        tag: Tag,
-        msize: u32,
-        version: String,
-    },
-    Rauth {
-        tag: Tag,
-        aqid: Qid,
-    },
-    Rattach {
-        tag: Tag,
-        qid: Qid,
-    },
-    Rflush {
-        tag: Tag,
-    },
-    Rwalk {
-        tag: Tag,
-        wqids: Vec<Qid>,
-    },
-    Ropen {
-        tag: Tag,
-        qid: Qid,
-        iounit: u32,
-    },
-    Rcreate {
-        tag: Tag,
-        qid: Qid,
-        iounit: u32,
-    },
-    Rread {
-        tag: Tag,
-        data: Vec<u8>,
-    },
-    Rwrite {
-        tag: Tag,
-        count: u32,
-    },
-    Rclunk {
-        tag: Tag,
-    },
-    Rremove {
-        tag: Tag,
-    },
-    Rstat {
-        tag: Tag,
-        stat: Stat,
-    },
-    Rwstat {
-        tag: Tag,
-    },
-    Rerror {
-        tag: Tag,
-        ename: String,
-    },
+    Rversion { tag: Tag, msize: u32, version: String },
+    Rauth    { tag: Tag, aqid: Qid },
+    Rattach  { tag: Tag, qid: Qid },
+    Rflush   { tag: Tag },
+    Rwalk    { tag: Tag, wqids: Vec<Qid> },
+    Ropen    { tag: Tag, qid: Qid, iounit: u32 },
+    Rcreate  { tag: Tag, qid: Qid, iounit: u32 },
+    Rread    { tag: Tag, data: Vec<u8> },
+    Rwrite   { tag: Tag, count: u32 },
+    Rclunk   { tag: Tag },
+    Rremove  { tag: Tag },
+    Rstat    { tag: Tag, stat: Stat },
+    Rwstat   { tag: Tag },
+    Rerror   { tag: Tag, ename: String },
 }
 
 impl Message {
     pub fn tag(&self) -> Tag {
         match self {
             Message::Tversion { tag, .. } | Message::Rversion { tag, .. } => *tag,
-            Message::Tattach { tag, .. } | Message::Rattach { tag, .. } => *tag,
-            Message::Twalk { tag, .. } | Message::Rwalk { tag, .. } => *tag,
-            Message::Topen { tag, .. } | Message::Ropen { tag, .. } => *tag,
-            Message::Tread { tag, .. } | Message::Rread { tag, .. } => *tag,
-            Message::Twrite { tag, .. } | Message::Rwrite { tag, .. } => *tag,
-            Message::Tclunk { tag, .. } | Message::Rclunk { tag, .. } => *tag,
-            Message::Tstat { tag, .. } | Message::Rstat { tag, .. } => *tag,
-            Message::Tcreate { tag, .. } | Message::Rcreate { tag, .. } => *tag,
-            Message::Tremove { tag, .. } | Message::Rremove { tag, .. } => *tag,
-            Message::Rerror { tag, .. } => *tag,
+            Message::Tattach  { tag, .. } | Message::Rattach  { tag, .. } => *tag,
+            Message::Twalk    { tag, .. } | Message::Rwalk    { tag, .. } => *tag,
+            Message::Topen    { tag, .. } | Message::Ropen    { tag, .. } => *tag,
+            Message::Tread    { tag, .. } | Message::Rread    { tag, .. } => *tag,
+            Message::Twrite   { tag, .. } | Message::Rwrite   { tag, .. } => *tag,
+            Message::Tclunk   { tag, .. } | Message::Rclunk   { tag, .. } => *tag,
+            Message::Tstat    { tag, .. } | Message::Rstat    { tag, .. } => *tag,
+            Message::Tcreate  { tag, .. } | Message::Rcreate  { tag, .. } => *tag,
+            Message::Tremove  { tag, .. } | Message::Rremove  { tag, .. } => *tag,
+            Message::Rerror   { tag, .. } => *tag,
             _ => NOTAG,
         }
     }
@@ -216,12 +116,8 @@ pub trait SyntheticFile: Send + Sync {
     fn stat(&self) -> Stat;
     fn read(&self, offset: u64, count: u32) -> Vec<u8>;
     fn write(&self, offset: u64, data: &[u8]) -> u32;
-    fn children(&self) -> Vec<String> {
-        Vec::new()
-    }
-    fn is_dir(&self) -> bool {
-        false
-    }
+    fn children(&self) -> Vec<String> { Vec::new() }
+    fn is_dir(&self) -> bool { false }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -266,43 +162,25 @@ impl NinePServer {
     }
 
     fn new_qid(&self, qtype: u8) -> Qid {
-        (
-            qtype,
-            0,
-            self.qid_path_counter.fetch_add(1, Ordering::SeqCst),
-        )
+        (qtype, 0, self.qid_path_counter.fetch_add(1, Ordering::SeqCst))
     }
 
     /// Dispatch a T-message and return an R-message
     pub fn dispatch(&self, msg: Message) -> Message {
         match msg {
             // ── Version negotiation ──────────────────────────────────────────
-            Message::Tversion {
-                tag,
-                msize,
-                version,
-            } => {
+            Message::Tversion { tag, msize, version } => {
                 let negotiated_msize = msize.min(self.msize);
                 let negotiated_version = if version.starts_with("9P2000") {
                     self.version.clone()
                 } else {
                     "unknown".into()
                 };
-                Message::Rversion {
-                    tag,
-                    msize: negotiated_msize,
-                    version: negotiated_version,
-                }
+                Message::Rversion { tag, msize: negotiated_msize, version: negotiated_version }
             }
 
             // ── Attach (mount the service) ───────────────────────────────────
-            Message::Tattach {
-                tag,
-                fid,
-                uname,
-                aname,
-                ..
-            } => {
+            Message::Tattach { tag, fid, uname, aname, .. } => {
                 let qid = self.new_qid(QTDIR);
                 let state = FidState {
                     fid,
@@ -316,21 +194,11 @@ impl NinePServer {
             }
 
             // ── Walk (path traversal) ────────────────────────────────────────
-            Message::Twalk {
-                tag,
-                fid,
-                newfid,
-                wnames,
-            } => {
+            Message::Twalk { tag, fid, newfid, wnames } => {
                 let fids = self.fids.lock().unwrap();
                 let base = match fids.get(&fid) {
                     Some(f) => f.clone(),
-                    None => {
-                        return Message::Rerror {
-                            tag,
-                            ename: "bad fid".into(),
-                        }
-                    }
+                    None => return Message::Rerror { tag, ename: "bad fid".into() },
                 };
                 drop(fids);
 
@@ -339,19 +207,13 @@ impl NinePServer {
 
                 for name in &wnames {
                     match name.as_str() {
-                        ".." => {
-                            new_path.pop();
-                        }
+                        ".." => { new_path.pop(); }
                         "." => {}
                         n => {
                             // Check if child exists in services
                             let services = self.services.lock().unwrap();
                             let child_path = format!("{}/{}", new_path.join("/"), n);
-                            let qtype = if services
-                                .get(&child_path)
-                                .map(|s| s.is_dir())
-                                .unwrap_or(false)
-                            {
+                            let qtype = if services.get(&child_path).map(|s| s.is_dir()).unwrap_or(false) {
                                 QTDIR
                             } else {
                                 QTFILE
@@ -380,35 +242,18 @@ impl NinePServer {
                     Some(state) => {
                         state.open_mode = Some(mode);
                         let qid = state.qid;
-                        Message::Ropen {
-                            tag,
-                            qid,
-                            iounit: self.msize,
-                        }
+                        Message::Ropen { tag, qid, iounit: self.msize }
                     }
-                    None => Message::Rerror {
-                        tag,
-                        ename: "bad fid".into(),
-                    },
+                    None => Message::Rerror { tag, ename: "bad fid".into() },
                 }
             }
 
             // ── Read ──────────────────────────────────────────────────────────
-            Message::Tread {
-                tag,
-                fid,
-                offset,
-                count,
-            } => {
+            Message::Tread { tag, fid, offset, count } => {
                 let fids = self.fids.lock().unwrap();
                 let state = match fids.get(&fid) {
                     Some(s) => s.clone(),
-                    None => {
-                        return Message::Rerror {
-                            tag,
-                            ename: "bad fid".into(),
-                        }
-                    }
+                    None => return Message::Rerror { tag, ename: "bad fid".into() },
                 };
                 drop(fids);
 
@@ -419,41 +264,23 @@ impl NinePServer {
                         let data = svc.read(offset, count);
                         Message::Rread { tag, data }
                     }
-                    None => Message::Rread {
-                        tag,
-                        data: Vec::new(),
-                    },
+                    None => Message::Rread { tag, data: Vec::new() },
                 }
             }
 
             // ── Write ──────────────────────────────────────────────────────────
-            Message::Twrite {
-                tag,
-                fid,
-                offset,
-                data,
-            } => {
+            Message::Twrite { tag, fid, offset, data } => {
                 let fids = self.fids.lock().unwrap();
                 let state = match fids.get(&fid) {
                     Some(s) => s.clone(),
-                    None => {
-                        return Message::Rerror {
-                            tag,
-                            ename: "bad fid".into(),
-                        }
-                    }
+                    None => return Message::Rerror { tag, ename: "bad fid".into() },
                 };
                 drop(fids);
                 let path = state.path.join("/");
                 let services = self.services.lock().unwrap();
                 let count = match services.get(&path) {
                     Some(svc) => svc.write(offset, &data),
-                    None => {
-                        return Message::Rerror {
-                            tag,
-                            ename: "file not found".into(),
-                        }
-                    }
+                    None => return Message::Rerror { tag, ename: "file not found".into() },
                 };
                 Message::Rwrite { tag, count }
             }
@@ -463,25 +290,14 @@ impl NinePServer {
                 let fids = self.fids.lock().unwrap();
                 let state = match fids.get(&fid) {
                     Some(s) => s.clone(),
-                    None => {
-                        return Message::Rerror {
-                            tag,
-                            ename: "bad fid".into(),
-                        }
-                    }
+                    None => return Message::Rerror { tag, ename: "bad fid".into() },
                 };
                 drop(fids);
                 let path = state.path.join("/");
                 let services = self.services.lock().unwrap();
                 match services.get(&path) {
-                    Some(svc) => Message::Rstat {
-                        tag,
-                        stat: svc.stat(),
-                    },
-                    None => Message::Rerror {
-                        tag,
-                        ename: "not found".into(),
-                    },
+                    Some(svc) => Message::Rstat { tag, stat: svc.stat() },
+                    None => Message::Rerror { tag, ename: "not found".into() },
                 }
             }
 
@@ -496,12 +312,7 @@ impl NinePServer {
                 let fids = self.fids.lock().unwrap();
                 let state = match fids.get(&fid) {
                     Some(s) => s.clone(),
-                    None => {
-                        return Message::Rerror {
-                            tag,
-                            ename: "bad fid".into(),
-                        }
-                    }
+                    None => return Message::Rerror { tag, ename: "bad fid".into() },
                 };
                 drop(fids);
                 let path = state.path.join("/");
@@ -510,10 +321,7 @@ impl NinePServer {
                 Message::Rremove { tag }
             }
 
-            _ => Message::Rerror {
-                tag: NOTAG,
-                ename: "not implemented".into(),
-            },
+            _ => Message::Rerror { tag: NOTAG, ename: "not implemented".into() },
         }
     }
 }
@@ -529,8 +337,7 @@ impl SyntheticFile for ProcVersion {
         Stat {
             qid: (QTFILE, 0, 1),
             mode: 0o444,
-            atime: 0,
-            mtime: 0,
+            atime: 0, mtime: 0,
             length: 64,
             name: "version".into(),
             uid: "root".into(),
@@ -544,33 +351,18 @@ impl SyntheticFile for ProcVersion {
         let start = (offset as usize).min(content.len());
         content[start..end].to_vec()
     }
-    fn write(&self, _: u64, _: &[u8]) -> u32 {
-        0
-    }
+    fn write(&self, _: u64, _: &[u8]) -> u32 { 0 }
 }
 
 /// /dev/null synthetic device
 pub struct DevNull;
 impl SyntheticFile for DevNull {
     fn stat(&self) -> Stat {
-        Stat {
-            qid: (QTFILE, 0, 2),
-            mode: 0o666,
-            atime: 0,
-            mtime: 0,
-            length: 0,
-            name: "null".into(),
-            uid: "root".into(),
-            gid: "root".into(),
-            muid: "root".into(),
-        }
+        Stat { qid: (QTFILE, 0, 2), mode: 0o666, atime: 0, mtime: 0, length: 0,
+               name: "null".into(), uid: "root".into(), gid: "root".into(), muid: "root".into() }
     }
-    fn read(&self, _: u64, _: u32) -> Vec<u8> {
-        Vec::new()
-    }
-    fn write(&self, _: u64, data: &[u8]) -> u32 {
-        data.len() as u32
-    }
+    fn read(&self, _: u64, _: u32) -> Vec<u8> { Vec::new() }
+    fn write(&self, _: u64, data: &[u8]) -> u32 { data.len() as u32 }
 }
 
 #[cfg(test)]
@@ -587,11 +379,7 @@ mod tests {
     #[test]
     fn test_9p_version_negotiation() {
         let srv = make_server();
-        let resp = srv.dispatch(Message::Tversion {
-            tag: NOTAG,
-            msize: 8192,
-            version: "9P2000.L".into(),
-        });
+        let resp = srv.dispatch(Message::Tversion { tag: NOTAG, msize: 8192, version: "9P2000.L".into() });
         match resp {
             Message::Rversion { msize, version, .. } => {
                 assert_eq!(msize, 8192);
@@ -605,16 +393,10 @@ mod tests {
     fn test_9p_attach() {
         let srv = make_server();
         let resp = srv.dispatch(Message::Tattach {
-            tag: 1,
-            fid: 1,
-            afid: NOFID,
-            uname: "root".into(),
-            aname: "sigma".into(),
+            tag: 1, fid: 1, afid: NOFID, uname: "root".into(), aname: "sigma".into(),
         });
         match resp {
-            Message::Rattach { qid, .. } => {
-                assert_eq!(qid.0, QTDIR);
-            }
+            Message::Rattach { qid, .. } => { assert_eq!(qid.0, QTDIR); }
             _ => panic!("Expected Rattach"),
         }
     }
@@ -623,33 +405,13 @@ mod tests {
     fn test_9p_walk_and_read() {
         let srv = make_server();
         // Attach
-        srv.dispatch(Message::Tattach {
-            tag: 1,
-            fid: 1,
-            afid: NOFID,
-            uname: "user".into(),
-            aname: "sigma".into(),
-        });
+        srv.dispatch(Message::Tattach { tag: 1, fid: 1, afid: NOFID, uname: "user".into(), aname: "sigma".into() });
         // Walk to proc/version
-        srv.dispatch(Message::Twalk {
-            tag: 2,
-            fid: 1,
-            newfid: 2,
-            wnames: vec!["proc".into(), "version".into()],
-        });
+        srv.dispatch(Message::Twalk { tag: 2, fid: 1, newfid: 2, wnames: vec!["proc".into(), "version".into()] });
         // Open
-        srv.dispatch(Message::Topen {
-            tag: 3,
-            fid: 2,
-            mode: 0,
-        });
+        srv.dispatch(Message::Topen { tag: 3, fid: 2, mode: 0 });
         // Read
-        let resp = srv.dispatch(Message::Tread {
-            tag: 4,
-            fid: 2,
-            offset: 0,
-            count: 64,
-        });
+        let resp = srv.dispatch(Message::Tread { tag: 4, fid: 2, offset: 0, count: 64 });
         match resp {
             Message::Rread { data, .. } => {
                 assert!(!data.is_empty());
@@ -665,13 +427,7 @@ mod tests {
     #[test]
     fn test_9p_clunk() {
         let srv = make_server();
-        srv.dispatch(Message::Tattach {
-            tag: 1,
-            fid: 5,
-            afid: NOFID,
-            uname: "user".into(),
-            aname: "sigma".into(),
-        });
+        srv.dispatch(Message::Tattach { tag: 1, fid: 5, afid: NOFID, uname: "user".into(), aname: "sigma".into() });
         let resp = srv.dispatch(Message::Tclunk { tag: 2, fid: 5 });
         assert!(matches!(resp, Message::Rclunk { .. }));
     }
@@ -679,30 +435,10 @@ mod tests {
     #[test]
     fn test_9p_dev_null_write() {
         let srv = make_server();
-        srv.dispatch(Message::Tattach {
-            tag: 1,
-            fid: 1,
-            afid: NOFID,
-            uname: "user".into(),
-            aname: "sigma".into(),
-        });
-        srv.dispatch(Message::Twalk {
-            tag: 2,
-            fid: 1,
-            newfid: 3,
-            wnames: vec!["dev".into(), "null".into()],
-        });
-        srv.dispatch(Message::Topen {
-            tag: 3,
-            fid: 3,
-            mode: 1,
-        });
-        let resp = srv.dispatch(Message::Twrite {
-            tag: 4,
-            fid: 3,
-            offset: 0,
-            data: b"discard me".to_vec(),
-        });
+        srv.dispatch(Message::Tattach { tag: 1, fid: 1, afid: NOFID, uname: "user".into(), aname: "sigma".into() });
+        srv.dispatch(Message::Twalk { tag: 2, fid: 1, newfid: 3, wnames: vec!["dev".into(), "null".into()] });
+        srv.dispatch(Message::Topen { tag: 3, fid: 3, mode: 1 });
+        let resp = srv.dispatch(Message::Twrite { tag: 4, fid: 3, offset: 0, data: b"discard me".to_vec() });
         match resp {
             Message::Rwrite { count, .. } => assert_eq!(count, 10),
             _ => {} // May not resolve through walk in simplified impl
@@ -712,11 +448,7 @@ mod tests {
     #[test]
     fn test_9p_unknown_version() {
         let srv = make_server();
-        let resp = srv.dispatch(Message::Tversion {
-            tag: NOTAG,
-            msize: 4096,
-            version: "8P1999".into(),
-        });
+        let resp = srv.dispatch(Message::Tversion { tag: NOTAG, msize: 4096, version: "8P1999".into() });
         match resp {
             Message::Rversion { version, .. } => assert_eq!(version, "unknown"),
             _ => panic!("Expected Rversion"),

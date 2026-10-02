@@ -719,7 +719,10 @@ impl HardwareBackedPasswordManager {
         Err("TPM sealing provider unavailable")
     }
 
-    pub fn check_haveibeenpwned_breach(&self, _password: &str) -> Result<bool, &'static str> {
+    pub fn check_haveibeenpwned_breach(
+        &self,
+        _password: &str,
+    ) -> Result<bool, &'static str> {
         Err("password breach lookup provider unavailable")
     }
 }

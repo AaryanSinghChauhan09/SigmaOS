@@ -5497,26 +5497,15 @@ pub struct UniversalDistroPackageMediator {
 
 impl UniversalDistroPackageMediator {
     pub fn new() -> Self {
-        Self {
-            history: Vec::new(),
-        }
+        Self { history: Vec::new() }
     }
 
     pub fn notify(&mut self, sender: &str, event: MediatorEvent) -> Result<String, &'static str> {
         let log = match &event {
-            MediatorEvent::PackageParsed(name) => {
-                format!("[Mediator] Sender '{}': Parsed package {}", sender, name)
-            }
-            MediatorEvent::PackageValidated(name) => {
-                format!("[Mediator] Sender '{}': Validated package {}", sender, name)
-            }
-            MediatorEvent::PackageInstalled(name) => {
-                format!("[Mediator] Sender '{}': Installed package {}", sender, name)
-            }
-            MediatorEvent::PackageRolledBack(name) => format!(
-                "[Mediator] Sender '{}': Rolled back package {}",
-                sender, name
-            ),
+            MediatorEvent::PackageParsed(name) => format!("[Mediator] Sender '{}': Parsed package {}", sender, name),
+            MediatorEvent::PackageValidated(name) => format!("[Mediator] Sender '{}': Validated package {}", sender, name),
+            MediatorEvent::PackageInstalled(name) => format!("[Mediator] Sender '{}': Installed package {}", sender, name),
+            MediatorEvent::PackageRolledBack(name) => format!("[Mediator] Sender '{}': Rolled back package {}", sender, name),
         };
         self.history.push(event);
         Ok(log)
@@ -5543,10 +5532,7 @@ pub struct SecurityAuditVisitor {
 
 impl SecurityAuditVisitor {
     pub fn new() -> Self {
-        Self {
-            audited_count: 0,
-            vulnerabilities_found: 0,
-        }
+        Self { audited_count: 0, vulnerabilities_found: 0 }
     }
 }
 
@@ -5584,10 +5570,7 @@ pub struct LicenseScannerVisitor {
 
 impl LicenseScannerVisitor {
     pub fn new() -> Self {
-        Self {
-            copyleft_count: 0,
-            permissive_count: 0,
-        }
+        Self { copyleft_count: 0, permissive_count: 0 }
     }
 }
 
@@ -5624,10 +5607,7 @@ pub struct FootprintMetricsVisitor {
 
 impl FootprintMetricsVisitor {
     pub fn new() -> Self {
-        Self {
-            total_installed_bytes: 0,
-            total_file_count: 0,
-        }
+        Self { total_installed_bytes: 0, total_file_count: 0 }
     }
 }
 
@@ -5720,32 +5700,18 @@ pub struct PackageMetadataFlyweightFactory {
 
 impl PackageMetadataFlyweightFactory {
     pub fn new() -> Self {
-        Self {
-            pool: HashMap::new(),
-        }
+        Self { pool: HashMap::new() }
     }
 
-    pub fn get_flyweight(
-        &mut self,
-        license: &str,
-        maintainer: &str,
-        architecture: &str,
-    ) -> Arc<PackageMetadataFlyweight> {
-        let key = (
-            license.to_string(),
-            maintainer.to_string(),
-            architecture.to_string(),
-        );
-        self.pool
-            .entry(key.clone())
-            .or_insert_with(|| {
-                Arc::new(PackageMetadataFlyweight {
-                    license: key.0,
-                    maintainer: key.1,
-                    architecture: key.2,
-                })
+    pub fn get_flyweight(&mut self, license: &str, maintainer: &str, architecture: &str) -> Arc<PackageMetadataFlyweight> {
+        let key = (license.to_string(), maintainer.to_string(), architecture.to_string());
+        self.pool.entry(key.clone()).or_insert_with(|| {
+            Arc::new(PackageMetadataFlyweight {
+                license: key.0,
+                maintainer: key.1,
+                architecture: key.2,
             })
-            .clone()
+        }).clone()
     }
 
     pub fn pool_size(&self) -> usize {
@@ -5777,19 +5743,13 @@ pub struct PackageStateMachine {
 
 impl PackageStateMachine {
     pub fn new() -> Self {
-        Self {
-            current_state: PackageLifecycleState::Uninstalled,
-        }
+        Self { current_state: PackageLifecycleState::Uninstalled }
     }
 
     pub fn transition_to(&mut self, new_state: PackageLifecycleState) -> Result<(), &'static str> {
         let valid = match (self.current_state, new_state) {
-            (PackageLifecycleState::Uninstalled, PackageLifecycleState::ResolvingDependencies) => {
-                true
-            }
-            (PackageLifecycleState::ResolvingDependencies, PackageLifecycleState::Downloading) => {
-                true
-            }
+            (PackageLifecycleState::Uninstalled, PackageLifecycleState::ResolvingDependencies) => true,
+            (PackageLifecycleState::ResolvingDependencies, PackageLifecycleState::Downloading) => true,
             (PackageLifecycleState::Downloading, PackageLifecycleState::Validating) => true,
             (PackageLifecycleState::Validating, PackageLifecycleState::Installing) => true,
             (PackageLifecycleState::Installing, PackageLifecycleState::Installed) => true,
@@ -5836,8 +5796,7 @@ impl LazyPackageLoadProxy {
 
     pub fn load_if_needed(&mut self, factory: &PackageParserFactory) -> Result<(), ParseError> {
         if self.inner_package.is_none() {
-            let parser = factory
-                .get_parser(self.format)
+            let parser = factory.get_parser(self.format)
                 .ok_or_else(|| ParseError::UnsupportedFormat(self.format))?;
             let pkg = parser.parse(&self.raw_data)?;
             self.inner_package = Some(pkg);
@@ -5932,18 +5891,14 @@ impl UniversalPackageBuilder {
 
 pub struct BedrockStratumAdapter;
 impl BedrockStratumAdapter {
-    pub fn new() -> Self {
-        Self
-    }
+    pub fn new() -> Self { Self }
     pub fn resolve_stratum_path(&self, stratum: &str, relative_path: &str) -> String {
         format!("/bedrock/strata/{}{}", stratum, relative_path)
     }
 }
 
 impl Default for BedrockStratumAdapter {
-    fn default() -> Self {
-        Self::new()
-    }
+    fn default() -> Self { Self::new() }
 }
 
 pub struct DistroboxOciAdapter {
@@ -5952,9 +5907,7 @@ pub struct DistroboxOciAdapter {
 
 impl DistroboxOciAdapter {
     pub fn new() -> Self {
-        Self {
-            exported_binaries: Vec::new(),
-        }
+        Self { exported_binaries: Vec::new() }
     }
 
     pub fn export_binary_shim(&mut self, container_name: &str, binary: &str) -> String {
@@ -5965,9 +5918,7 @@ impl DistroboxOciAdapter {
 }
 
 impl Default for DistroboxOciAdapter {
-    fn default() -> Self {
-        Self::new()
-    }
+    fn default() -> Self { Self::new() }
 }
 
 pub struct SystemdSysextAdapter {
@@ -5976,9 +5927,7 @@ pub struct SystemdSysextAdapter {
 
 impl SystemdSysextAdapter {
     pub fn new() -> Self {
-        Self {
-            extensions: Vec::new(),
-        }
+        Self { extensions: Vec::new() }
     }
 
     pub fn mount_extension(&mut self, extension_name: &str) -> Result<String, &'static str> {
@@ -5989,16 +5938,12 @@ impl SystemdSysextAdapter {
 }
 
 impl Default for SystemdSysextAdapter {
-    fn default() -> Self {
-        Self::new()
-    }
+    fn default() -> Self { Self::new() }
 }
 
 pub struct OmarchyPackageBridgeAdapter;
 impl OmarchyPackageBridgeAdapter {
-    pub fn new() -> Self {
-        Self
-    }
+    pub fn new() -> Self { Self }
     pub fn bridge_package(&self, package_name: &str) -> String {
         match package_name {
             "hyprland" | "sway" | "wayfire" => "sovereign-desktop-shell".to_string(),
@@ -6010,9 +5955,7 @@ impl OmarchyPackageBridgeAdapter {
 }
 
 impl Default for OmarchyPackageBridgeAdapter {
-    fn default() -> Self {
-        Self::new()
-    }
+    fn default() -> Self { Self::new() }
 }
 
 pub struct UrpmiRpmAdapter;
@@ -6340,9 +6283,7 @@ impl UdfCustomScriptletEngine {
 }
 
 impl Default for UdfCustomScriptletEngine {
-    fn default() -> Self {
-        Self::new()
-    }
+    fn default() -> Self { Self::new() }
 }
 
 pub struct UdfPackageConflictResolverEngine {
@@ -6351,9 +6292,7 @@ pub struct UdfPackageConflictResolverEngine {
 
 impl UdfPackageConflictResolverEngine {
     pub fn new() -> Self {
-        Self {
-            conflict_rules: Vec::new(),
-        }
+        Self { conflict_rules: Vec::new() }
     }
 
     pub fn add_conflict_rule<F>(&mut self, rule: F)
@@ -6374,9 +6313,7 @@ impl UdfPackageConflictResolverEngine {
 }
 
 impl Default for UdfPackageConflictResolverEngine {
-    fn default() -> Self {
-        Self::new()
-    }
+    fn default() -> Self { Self::new() }
 }
 
 pub struct UdfPackageArchiveTransformerEngine {
@@ -6385,9 +6322,7 @@ pub struct UdfPackageArchiveTransformerEngine {
 
 impl UdfPackageArchiveTransformerEngine {
     pub fn new() -> Self {
-        Self {
-            transformers: Vec::new(),
-        }
+        Self { transformers: Vec::new() }
     }
 
     pub fn add_transformer<F>(&mut self, transformer: F)
@@ -6407,9 +6342,7 @@ impl UdfPackageArchiveTransformerEngine {
 }
 
 impl Default for UdfPackageArchiveTransformerEngine {
-    fn default() -> Self {
-        Self::new()
-    }
+    fn default() -> Self { Self::new() }
 }
 
 pub struct UdfCustomConstraintSolverFilter {
@@ -6503,597 +6436,6 @@ impl UdfPackagePatchTransformerEngine {
 }
 
 impl Default for UdfPackagePatchTransformerEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ============================================================================
-// Step 2: Major Linux Distro Packaging Adapters Expansion
-// ============================================================================
-
-/// 1. Arch Pacman ALPM Adapter (Pacman 7.0 ALPM Sync DB and Hooks)
-#[derive(Debug, Clone)]
-pub struct ArchPacmanAlpmAdapter {
-    pub sync_db_name: String,
-    pub hook_stage: String,
-}
-
-impl ArchPacmanAlpmAdapter {
-    pub fn new(sync_db_name: &str) -> Self {
-        Self {
-            sync_db_name: sync_db_name.to_string(),
-            hook_stage: "PreTransaction".to_string(),
-        }
-    }
-
-    pub fn set_hook_stage(&mut self, stage: &str) {
-        self.hook_stage = stage.to_string();
-    }
-
-    pub fn parse_alpm_db_entry(&self, raw: &str) -> Result<(String, String, String), String> {
-        if raw.contains("%FILENAME%") && raw.contains("%NAME%") {
-            let name = raw
-                .split("%NAME%")
-                .nth(1)
-                .unwrap_or("")
-                .lines()
-                .nth(1)
-                .unwrap_or("")
-                .trim();
-            let ver = raw
-                .split("%VERSION%")
-                .nth(1)
-                .unwrap_or("")
-                .lines()
-                .nth(1)
-                .unwrap_or("")
-                .trim();
-            Ok((name.to_string(), ver.to_string(), self.sync_db_name.clone()))
-        } else {
-            Err("Invalid ALPM db entry format".to_string())
-        }
-    }
-}
-
-/// 2. Debian APT Triggers Adapter (APT 2.8 dpkg interest/activate triggers)
-#[derive(Debug, Clone)]
-pub struct DebianAptTriggersAdapter {
-    pub activated_triggers: Vec<String>,
-}
-
-impl DebianAptTriggersAdapter {
-    pub fn new() -> Self {
-        Self {
-            activated_triggers: Vec::new(),
-        }
-    }
-
-    pub fn register_trigger(&mut self, trigger_type: &str, target: &str) {
-        let entry = format!("{}:{}", trigger_type, target);
-        if !self.activated_triggers.contains(&entry) {
-            self.activated_triggers.push(entry);
-        }
-    }
-
-    pub fn process_triggers(&mut self) -> usize {
-        let count = self.activated_triggers.len();
-        self.activated_triggers.clear();
-        count
-    }
-}
-
-impl Default for DebianAptTriggersAdapter {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// 3. Fedora DNF5 RPM Adapter (DNF5 Transaction Item states & Checkpoints)
-#[derive(Debug, Clone)]
-pub struct FedoraDnf5RpmAdapter {
-    pub transaction_id: u64,
-    pub items: Vec<(String, String)>,
-}
-
-impl FedoraDnf5RpmAdapter {
-    pub fn new(transaction_id: u64) -> Self {
-        Self {
-            transaction_id,
-            items: Vec::new(),
-        }
-    }
-
-    pub fn add_transaction_item(&mut self, pkg_name: &str, state: &str) {
-        self.items.push((pkg_name.to_string(), state.to_string()));
-    }
-
-    pub fn checkpoint_transaction(&self) -> String {
-        format!("dnf5_tx_{}_items_{}", self.transaction_id, self.items.len())
-    }
-}
-
-/// 4. Alpine APK v3 Adapter (APK v3 overlay triggers & checksum verifiers)
-#[derive(Debug, Clone)]
-pub struct AlpineApk3Adapter {
-    pub overlay_fs: bool,
-}
-
-impl AlpineApk3Adapter {
-    pub fn new(overlay_fs: bool) -> Self {
-        Self { overlay_fs }
-    }
-
-    pub fn verify_apk3_index_checksum(&self, header: &[u8], checksum: &[u8]) -> bool {
-        if header.is_empty() || checksum.is_empty() {
-            return false;
-        }
-        header.iter().fold(0u8, |acc, &b| acc.wrapping_add(b)) == checksum[0]
-    }
-}
-
-/// 5. Gentoo Portage EAPI 8 Adapter (EAPI 8 slotting & USE flag evaluation)
-#[derive(Debug, Clone)]
-pub struct GentooPortageEapi8Adapter {
-    pub eapi: u8,
-    pub slots: HashMap<String, String>,
-}
-
-impl GentooPortageEapi8Adapter {
-    pub fn new() -> Self {
-        Self {
-            eapi: 8,
-            slots: HashMap::new(),
-        }
-    }
-
-    pub fn register_slot(&mut self, pkg: &str, slot: &str) {
-        self.slots.insert(pkg.to_string(), slot.to_string());
-    }
-
-    pub fn evaluate_use_dep(&self, pkg: &str, use_flags: &[&str]) -> bool {
-        if let Some(_slot) = self.slots.get(pkg) {
-            !use_flags.contains(&"disabled")
-        } else {
-            false
-        }
-    }
-}
-
-impl Default for GentooPortageEapi8Adapter {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// 6. Void XBPS Template Adapter (xbps-src template parser & hooks)
-#[derive(Debug, Clone)]
-pub struct VoidXbpsTemplateAdapter;
-
-impl VoidXbpsTemplateAdapter {
-    pub fn new() -> Self {
-        Self
-    }
-
-    pub fn parse_xbps_template(&self, content: &str) -> Option<(String, String, String)> {
-        let mut pkgname = None;
-        let mut version = None;
-        let mut revision = None;
-
-        for line in content.lines() {
-            if let Some(val) = line.strip_prefix("pkgname=") {
-                pkgname = Some(val.trim_matches('"').to_string());
-            } else if let Some(val) = line.strip_prefix("version=") {
-                version = Some(val.trim_matches('"').to_string());
-            } else if let Some(val) = line.strip_prefix("revision=") {
-                revision = Some(val.trim_matches('"').to_string());
-            }
-        }
-
-        if let (Some(p), Some(v), Some(r)) = (pkgname, version, revision) {
-            Some((p, format!("{}_{}", v, r), "xbps-src".to_string()))
-        } else {
-            None
-        }
-    }
-}
-
-impl Default for VoidXbpsTemplateAdapter {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// 7. Nix Guix Functional Store Adapter (Nix/Guix generation profiles & GC roots)
-#[derive(Debug, Clone)]
-pub struct NixGuixFunctionalStoreAdapter {
-    pub store_prefix: String,
-    pub active_generation: u32,
-}
-
-impl NixGuixFunctionalStoreAdapter {
-    pub fn new(store_prefix: &str) -> Self {
-        Self {
-            store_prefix: store_prefix.to_string(),
-            active_generation: 1,
-        }
-    }
-
-    pub fn switch_generation(&mut self, target_gen: u32) -> String {
-        self.active_generation = target_gen;
-        format!("{}/profiles/profile-{}", self.store_prefix, target_gen)
-    }
-}
-
-/// 8. Solus Moss Package Adapter (eopkg / Moss binary package state machine)
-#[derive(Debug, Clone)]
-pub struct SolusMossPackageAdapter {
-    pub state: String,
-}
-
-impl SolusMossPackageAdapter {
-    pub fn new() -> Self {
-        Self {
-            state: "Initial".to_string(),
-        }
-    }
-
-    pub fn transition_state(&mut self, action: &str) -> &str {
-        self.state = match action {
-            "fetch" => "Fetched".to_string(),
-            "unpack" => "Unpacked".to_string(),
-            "configure" => "Configured".to_string(),
-            _ => "Unknown".to_string(),
-        };
-        &self.state
-    }
-}
-
-impl Default for SolusMossPackageAdapter {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// 9. Containerized Package Adapter (Flatpak / Snap / AppImage bubblewrap sandboxing)
-#[derive(Debug, Clone)]
-pub struct ContainerizedPackageAdapter {
-    pub format: String,
-    pub sandbox_level: String,
-}
-
-impl ContainerizedPackageAdapter {
-    pub fn new(format: &str, sandbox_level: &str) -> Self {
-        Self {
-            format: format.to_string(),
-            sandbox_level: sandbox_level.to_string(),
-        }
-    }
-
-    pub fn build_bwrap_args(&self, target_bin: &str) -> Vec<String> {
-        let mut args = vec![
-            "bwrap".to_string(),
-            "--ro-bind".to_string(),
-            "/usr".to_string(),
-            "/usr".to_string(),
-        ];
-        if self.sandbox_level == "strict" {
-            args.push("--unshare-all".to_string());
-        }
-        args.push(target_bin.to_string());
-        args
-    }
-}
-
-// ============================================================================
-// Step 3: OOP Design Patterns for Universal Package Lifecycle
-// ============================================================================
-
-/// 1. Abstract Factory Pattern: Universal Package Adapter Factory
-pub struct UniversalPackageAdapterFactory;
-
-impl UniversalPackageAdapterFactory {
-    pub fn create_adapter(format: &str) -> Result<Box<dyn IPackageParser>, String> {
-        match format.to_lowercase().as_str() {
-            "deb" => Ok(Box::new(DebAdapter::new())),
-            "rpm" => Ok(Box::new(RpmAdapter::new())),
-            "pacman" | "tar.zst" => Ok(Box::new(PacmanAdapter::new())),
-            "apk" => Ok(Box::new(ApkAdapter::new())),
-            "ebuild" => Ok(Box::new(EbuildAdapter::new())),
-            "xbps" => Ok(Box::new(XbpsAdapter::new())),
-            _ => Err(format!("Unsupported distro package format: {}", format)),
-        }
-    }
-}
-
-/// 2. Template Method Pattern: Standardized 7-stage Package Lifecycle
-pub trait BasePackageInstallationLifecycle {
-    fn pre_check(&self, pkg: &dyn IPackage) -> Result<(), String> {
-        if pkg.name().is_empty() {
-            Err("Package name cannot be empty".to_string())
-        } else {
-            Ok(())
-        }
-    }
-
-    fn fetch(&self, pkg: &dyn IPackage) -> Result<Vec<u8>, String>;
-    fn verify(&self, payload: &[u8]) -> Result<bool, String>;
-    fn stage(&self, payload: &[u8]) -> Result<String, String>;
-    fn run_hooks(&self, stage_path: &str) -> Result<(), String>;
-    fn commit(&self, stage_path: &str) -> Result<(), String>;
-    fn post_hook(&self, pkg: &dyn IPackage) -> Result<(), String>;
-
-    fn execute_installation_lifecycle(&self, pkg: &dyn IPackage) -> Result<(), String> {
-        self.pre_check(pkg)?;
-        let payload = self.fetch(pkg)?;
-        if !self.verify(&payload)? {
-            return Err("Verification failed for package payload".to_string());
-        }
-        let stage_path = self.stage(&payload)?;
-        self.run_hooks(&stage_path)?;
-        self.commit(&stage_path)?;
-        self.post_hook(pkg)?;
-        Ok(())
-    }
-}
-
-/// Sample Concrete Template Implementation
-pub struct DefaultPackageInstallationLifecycle;
-
-impl BasePackageInstallationLifecycle for DefaultPackageInstallationLifecycle {
-    fn fetch(&self, pkg: &dyn IPackage) -> Result<Vec<u8>, String> {
-        Ok(format!("payload-data-for-{}", pkg.name()).into_bytes())
-    }
-
-    fn verify(&self, payload: &[u8]) -> Result<bool, String> {
-        Ok(!payload.is_empty())
-    }
-
-    fn stage(&self, _payload: &[u8]) -> Result<String, String> {
-        Ok("/tmp/stage/pkg".to_string())
-    }
-
-    fn run_hooks(&self, _stage_path: &str) -> Result<(), String> {
-        Ok(())
-    }
-
-    fn commit(&self, _stage_path: &str) -> Result<(), String> {
-        Ok(())
-    }
-
-    fn post_hook(&self, _pkg: &dyn IPackage) -> Result<(), String> {
-        Ok(())
-    }
-}
-
-/// 3. Command & Memento Pattern: Atomic Package Operations & Instant Rollback
-pub struct TransactionalPackageCommand {
-    pub pkg_name: String,
-    pub action: String,
-    pub memento: Option<SystemStateMemento>,
-}
-
-impl TransactionalPackageCommand {
-    pub fn new(pkg_name: &str, action: &str) -> Self {
-        Self {
-            pkg_name: pkg_name.to_string(),
-            action: action.to_string(),
-            memento: None,
-        }
-    }
-
-    pub fn execute(&mut self, current_ver: &str) -> Result<SystemStateMemento, String> {
-        let mem = SystemStateMemento {
-            checkpoint_id: 42,
-            installed_packages: vec![format!("{}-{}", self.pkg_name, current_ver)],
-            timestamp: 1000,
-        };
-        self.memento = Some(mem.clone());
-        Ok(mem)
-    }
-
-    pub fn rollback(&self, caretaker: &mut SystemStateCaretaker) -> Result<bool, String> {
-        if let Some(ref m) = self.memento {
-            caretaker.save_state(m.checkpoint_id, m.installed_packages.clone(), m.timestamp);
-            Ok(true)
-        } else {
-            Err("No memento found to rollback".to_string())
-        }
-    }
-}
-
-/// 4. Observer Pattern: Real-time Package Lifecycle Broadcaster
-pub trait PackageLifecycleObserver: Send + Sync {
-    fn on_lifecycle_event(&self, event: &str, pkg_name: &str);
-}
-
-pub struct PackageLifecycleSubject {
-    pub observers: Vec<Arc<dyn PackageLifecycleObserver>>,
-}
-
-impl PackageLifecycleSubject {
-    pub fn new() -> Self {
-        Self {
-            observers: Vec::new(),
-        }
-    }
-
-    pub fn register_observer(&mut self, obs: Arc<dyn PackageLifecycleObserver>) {
-        self.observers.push(obs);
-    }
-
-    pub fn notify_event(&self, event: &str, pkg_name: &str) {
-        for obs in &self.observers {
-            obs.on_lifecycle_event(event, pkg_name);
-        }
-    }
-}
-
-impl Default for PackageLifecycleSubject {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// 5. Strategy & Mediator Pattern: Cross-Distro Dependency Mediator
-pub trait DependencyResolverStrategy {
-    fn resolve(&self, dep_str: &str) -> Option<String>;
-}
-
-pub struct DirectDependencyResolverStrategy;
-
-impl DependencyResolverStrategy for DirectDependencyResolverStrategy {
-    fn resolve(&self, dep_str: &str) -> Option<String> {
-        if dep_str.starts_with("lib") {
-            Some(format!("sovereign-{}", dep_str))
-        } else {
-            Some(dep_str.to_string())
-        }
-    }
-}
-
-// ============================================================================
-// Step 4: User-Defined Function (UDF) Engines Expansion
-// ============================================================================
-
-/// 1. UDF Build Hook Engine (custom pre/post build script execution)
-pub struct UdfBuildHookEngine {
-    pub build_hooks: Vec<Arc<dyn Fn(&str) -> Result<(), String> + Send + Sync>>,
-}
-
-impl UdfBuildHookEngine {
-    pub fn new() -> Self {
-        Self {
-            build_hooks: Vec::new(),
-        }
-    }
-
-    pub fn register_build_hook<F>(&mut self, hook: F)
-    where
-        F: Fn(&str) -> Result<(), String> + Send + Sync + 'static,
-    {
-        self.build_hooks.push(Arc::new(hook));
-    }
-
-    pub fn execute_build_phase(&self, phase_name: &str) -> Result<usize, String> {
-        let mut executed = 0;
-        for hook in &self.build_hooks {
-            hook(phase_name)?;
-            executed += 1;
-        }
-        Ok(executed)
-    }
-}
-
-impl Default for UdfBuildHookEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// 2. UDF Dependency Override Engine (custom rule-based dependency replacement)
-pub struct UdfDependencyOverrideEngine {
-    pub override_rules: Vec<Arc<dyn Fn(&str) -> Option<String> + Send + Sync>>,
-}
-
-impl UdfDependencyOverrideEngine {
-    pub fn new() -> Self {
-        Self {
-            override_rules: Vec::new(),
-        }
-    }
-
-    pub fn register_rule<F>(&mut self, rule: F)
-    where
-        F: Fn(&str) -> Option<String> + Send + Sync + 'static,
-    {
-        self.override_rules.push(Arc::new(rule));
-    }
-
-    pub fn resolve_override(&self, dep_name: &str) -> String {
-        for rule in &self.override_rules {
-            if let Some(overridden) = rule(dep_name) {
-                return overridden;
-            }
-        }
-        dep_name.to_string()
-    }
-}
-
-impl Default for UdfDependencyOverrideEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// 3. UDF File Filter Engine (custom post-extraction file exclusion/transformation)
-pub struct UdfFileFilterEngine {
-    pub file_filters: Vec<Arc<dyn Fn(&str) -> bool + Send + Sync>>,
-}
-
-impl UdfFileFilterEngine {
-    pub fn new() -> Self {
-        Self {
-            file_filters: Vec::new(),
-        }
-    }
-
-    pub fn register_filter<F>(&mut self, filter: F)
-    where
-        F: Fn(&str) -> bool + Send + Sync + 'static,
-    {
-        self.file_filters.push(Arc::new(filter));
-    }
-
-    pub fn should_keep_file(&self, path: &str) -> bool {
-        for filter in &self.file_filters {
-            if !filter(path) {
-                return false;
-            }
-        }
-        true
-    }
-}
-
-impl Default for UdfFileFilterEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// 4. UDF Package Signing Verifier Engine (custom GPG/PQC signature validation hooks)
-pub struct UdfPackageSigningVerifierEngine {
-    pub verifiers: Vec<Arc<dyn Fn(&[u8], &[u8]) -> bool + Send + Sync>>,
-}
-
-impl UdfPackageSigningVerifierEngine {
-    pub fn new() -> Self {
-        Self {
-            verifiers: Vec::new(),
-        }
-    }
-
-    pub fn register_verifier<F>(&mut self, verifier: F)
-    where
-        F: Fn(&[u8], &[u8]) -> bool + Send + Sync + 'static,
-    {
-        self.verifiers.push(Arc::new(verifier));
-    }
-
-    pub fn verify_signature(&self, payload: &[u8], signature: &[u8]) -> bool {
-        if self.verifiers.is_empty() {
-            return true;
-        }
-        for v in &self.verifiers {
-            if v(payload, signature) {
-                return true;
-            }
-        }
-        false
-    }
-}
-
-impl Default for UdfPackageSigningVerifierEngine {
     fn default() -> Self {
         Self::new()
     }
@@ -8549,12 +7891,7 @@ Description: Hook test";
     fn test_comprehensive_oop_mediator_visitor_memento_flyweight_state_proxy_builder() {
         // 1. Mediator Pattern
         let mut mediator = UniversalDistroPackageMediator::new();
-        let msg = mediator
-            .notify(
-                "TestRunner",
-                MediatorEvent::PackageParsed("htop".to_string()),
-            )
-            .unwrap();
+        let msg = mediator.notify("TestRunner", MediatorEvent::PackageParsed("htop".to_string())).unwrap();
         assert!(msg.contains("Parsed package htop"));
 
         // 2. Visitor Pattern
@@ -8585,11 +7922,7 @@ Description: Hook test";
 
         // 3. Memento Pattern & SystemStateCaretaker
         let mut caretaker = SystemStateCaretaker::new();
-        caretaker.save_state(
-            1,
-            vec!["bash".to_string(), "coreutils".to_string()],
-            1700000000,
-        );
+        caretaker.save_state(1, vec!["bash".to_string(), "coreutils".to_string()], 1700000000);
         assert_eq!(caretaker.mementos.len(), 1);
 
         let undone = caretaker.undo().unwrap();
@@ -8609,35 +7942,17 @@ Description: Hook test";
 
         // 5. State Pattern & StateMachine
         let mut state_machine = PackageStateMachine::new();
-        assert_eq!(
-            state_machine.current_state,
-            PackageLifecycleState::Uninstalled
-        );
+        assert_eq!(state_machine.current_state, PackageLifecycleState::Uninstalled);
 
-        assert!(state_machine
-            .transition_to(PackageLifecycleState::ResolvingDependencies)
-            .is_ok());
-        assert!(state_machine
-            .transition_to(PackageLifecycleState::Downloading)
-            .is_ok());
-        assert!(state_machine
-            .transition_to(PackageLifecycleState::Validating)
-            .is_ok());
-        assert!(state_machine
-            .transition_to(PackageLifecycleState::Installing)
-            .is_ok());
-        assert!(state_machine
-            .transition_to(PackageLifecycleState::Installed)
-            .is_ok());
-        assert_eq!(
-            state_machine.current_state,
-            PackageLifecycleState::Installed
-        );
+        assert!(state_machine.transition_to(PackageLifecycleState::ResolvingDependencies).is_ok());
+        assert!(state_machine.transition_to(PackageLifecycleState::Downloading).is_ok());
+        assert!(state_machine.transition_to(PackageLifecycleState::Validating).is_ok());
+        assert!(state_machine.transition_to(PackageLifecycleState::Installing).is_ok());
+        assert!(state_machine.transition_to(PackageLifecycleState::Installed).is_ok());
+        assert_eq!(state_machine.current_state, PackageLifecycleState::Installed);
 
         // Invalid transition test
-        assert!(state_machine
-            .transition_to(PackageLifecycleState::Downloading)
-            .is_err());
+        assert!(state_machine.transition_to(PackageLifecycleState::Downloading).is_err());
 
         // 6. Proxy Pattern (Lazy Package Load Proxy)
         let factory = PackageParserFactory::new();
@@ -8685,10 +8000,7 @@ Description: Hook test";
 
         // 4. Omarchy Package Bridge
         let omarchy = OmarchyPackageBridgeAdapter::new();
-        assert_eq!(
-            omarchy.bridge_package("hyprland"),
-            "sovereign-desktop-shell"
-        );
+        assert_eq!(omarchy.bridge_package("hyprland"), "sovereign-desktop-shell");
         assert_eq!(omarchy.bridge_package("custom-tool"), "custom-tool");
     }
 
@@ -8709,10 +8021,7 @@ Description: Hook test";
                 None
             }
         });
-        assert_eq!(
-            conflict_resolver.resolve_conflict("legacy-libc", "sovereign-libc"),
-            "sovereign-libc"
-        );
+        assert_eq!(conflict_resolver.resolve_conflict("legacy-libc", "sovereign-libc"), "sovereign-libc");
 
         // 3. UDF Package Archive Transformer Engine
         let mut archive_transformer = UdfPackageArchiveTransformerEngine::new();
@@ -8806,123 +8115,5 @@ Description: Hook test";
         patcher.add_patch_hook(|pkg, src| format!("// Patched for {}\n{}", pkg, src));
         let patched = patcher.apply_patches("zlib", "int main() {}");
         assert!(patched.contains("Patched for zlib"));
-    }
-
-    #[test]
-    fn test_expanded_major_distro_adapters_oop_patterns_and_udf_engines() {
-        // 1. Arch Pacman ALPM Adapter
-        let alpm = ArchPacmanAlpmAdapter::new("core");
-        let (name, ver, db) = alpm
-            .parse_alpm_db_entry(
-                "%NAME%\nlinux\n%VERSION%\n6.8.1\n%FILENAME%\nlinux-6.8.1.pkg.tar.zst\n",
-            )
-            .unwrap();
-        assert_eq!(name, "linux");
-        assert_eq!(ver, "6.8.1");
-        assert_eq!(db, "core");
-
-        // 2. Debian APT Triggers Adapter
-        let mut apt_trig = DebianAptTriggersAdapter::new();
-        apt_trig.register_trigger("interest", "man-db");
-        assert_eq!(apt_trig.process_triggers(), 1);
-
-        // 3. Fedora DNF5 RPM Adapter
-        let mut dnf5 = FedoraDnf5RpmAdapter::new(101);
-        dnf5.add_transaction_item("glibc", "install");
-        assert_eq!(dnf5.checkpoint_transaction(), "dnf5_tx_101_items_1");
-
-        // 4. Alpine APK v3 Adapter
-        let apk3 = AlpineApk3Adapter::new(true);
-        assert!(apk3.verify_apk3_index_checksum(&[0x10, 0x20], &[0x30]));
-
-        // 5. Gentoo Portage EAPI 8 Adapter
-        let mut portage8 = GentooPortageEapi8Adapter::new();
-        portage8.register_slot("sys-libs/glibc", "2.2");
-        assert!(portage8.evaluate_use_dep("sys-libs/glibc", &["static-libs"]));
-
-        // 6. Void XBPS Template Adapter
-        let xbps_tpl = VoidXbpsTemplateAdapter::new();
-        let (pkg, ver, src) = xbps_tpl
-            .parse_xbps_template("pkgname=\"xbps\"\nversion=\"0.59.1\"\nrevision=\"1\"\n")
-            .unwrap();
-        assert_eq!(pkg, "xbps");
-        assert_eq!(ver, "0.59.1_1");
-        assert_eq!(src, "xbps-src");
-
-        // 7. Nix Guix Functional Store Adapter
-        let mut store = NixGuixFunctionalStoreAdapter::new("/nix/store");
-        let profile = store.switch_generation(5);
-        assert_eq!(profile, "/nix/store/profiles/profile-5");
-
-        // 8. Solus Moss Package Adapter
-        let mut moss = SolusMossPackageAdapter::new();
-        assert_eq!(moss.transition_state("fetch"), "Fetched");
-
-        // 9. Containerized Package Adapter
-        let bwrap_adapter = ContainerizedPackageAdapter::new("flatpak", "strict");
-        let bwrap_args = bwrap_adapter.build_bwrap_args("/usr/bin/app");
-        assert!(bwrap_args.contains(&"--unshare-all".to_string()));
-
-        // 10. Abstract Factory Pattern
-        let parser = UniversalPackageAdapterFactory::create_adapter("deb");
-        assert!(parser.is_ok());
-
-        // 11. Template Method Pattern
-        let lifecycle = DefaultPackageInstallationLifecycle;
-        let test_pkg = UniversalPackageBuilder::new("sovereign-kernel")
-            .build()
-            .unwrap();
-        assert!(lifecycle
-            .execute_installation_lifecycle(test_pkg.as_ref())
-            .is_ok());
-
-        // 12. Command & Memento Pattern
-        let mut cmd = TransactionalPackageCommand::new("bash", "install");
-        let _mem = cmd.execute("5.2").unwrap();
-        let mut caretaker = SystemStateCaretaker::new();
-        assert!(cmd.rollback(&mut caretaker).unwrap());
-        assert_eq!(caretaker.mementos.len(), 1);
-
-        // 13. Observer Pattern
-        struct MockObserver;
-        impl PackageLifecycleObserver for MockObserver {
-            fn on_lifecycle_event(&self, _event: &str, _pkg_name: &str) {}
-        }
-        let mut subject = PackageLifecycleSubject::new();
-        subject.register_observer(Arc::new(MockObserver));
-        subject.notify_event("install", "bash");
-
-        // 14. Strategy Pattern
-        let strategy = DirectDependencyResolverStrategy;
-        assert_eq!(
-            strategy.resolve("libssl"),
-            Some("sovereign-libssl".to_string())
-        );
-
-        // 15. UDF Engines
-        let mut build_hook = UdfBuildHookEngine::new();
-        build_hook.register_build_hook(|_phase| Ok(()));
-        assert_eq!(build_hook.execute_build_phase("compile").unwrap(), 1);
-
-        let mut dep_override = UdfDependencyOverrideEngine::new();
-        dep_override.register_rule(|dep| {
-            if dep == "openssl" {
-                Some("sovereign-openssl".to_string())
-            } else {
-                None
-            }
-        });
-        assert_eq!(
-            dep_override.resolve_override("openssl"),
-            "sovereign-openssl"
-        );
-
-        let mut file_filter = UdfFileFilterEngine::new();
-        file_filter.register_filter(|path| !path.contains("doc"));
-        assert!(!file_filter.should_keep_file("/usr/share/doc/README"));
-
-        let mut signing_verifier = UdfPackageSigningVerifierEngine::new();
-        signing_verifier.register_verifier(|payload, sig| !payload.is_empty() && !sig.is_empty());
-        assert!(signing_verifier.verify_signature(b"data", b"sig"));
     }
 }

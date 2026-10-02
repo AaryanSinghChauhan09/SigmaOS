@@ -121,15 +121,8 @@ impl GentooEselectManager {
     }
 
     /// Set the active target for a given `eselect` module
-    pub fn set_target(
-        &mut self,
-        module_name: &str,
-        target_number: usize,
-    ) -> Result<String, &'static str> {
-        let targets = self
-            .modules
-            .get_mut(module_name)
-            .ok_or("Module not found")?;
+    pub fn set_target(&mut self, module_name: &str, target_number: usize) -> Result<String, &'static str> {
+        let targets = self.modules.get_mut(module_name).ok_or("Module not found")?;
 
         let mut target_name = String::new();
         let mut found = false;
@@ -145,10 +138,7 @@ impl GentooEselectManager {
         }
 
         if found {
-            Ok(format!(
-                "Switched eselect module '{}' target to [{}]",
-                module_name, target_name
-            ))
+            Ok(format!("Switched eselect module '{}' target to [{}]", module_name, target_name))
         } else {
             Err("Target number out of range")
         }
@@ -189,12 +179,7 @@ impl GentooLaymanOverlayManager {
 
         manager.add_overlay("guru", "https://github.com/gentoo/guru.git", "git", 50);
         manager.add_overlay("science", "https://github.com/gentoo/sci.git", "git", 30);
-        manager.add_overlay(
-            "steam-overlay",
-            "https://github.com/anyc/steam-overlay.git",
-            "git",
-            20,
-        );
+        manager.add_overlay("steam-overlay", "https://github.com/anyc/steam-overlay.git", "git", 20);
 
         manager
     }
@@ -228,8 +213,7 @@ impl GentooLaymanOverlayManager {
 
     /// List active overlays ordered by priority
     pub fn list_active_overlays(&self) -> Vec<&LaymanOverlay> {
-        let mut list: Vec<&LaymanOverlay> =
-            self.overlays.values().filter(|o| o.is_enabled).collect();
+        let mut list: Vec<&LaymanOverlay> = self.overlays.values().filter(|o| o.is_enabled).collect();
         list.sort_by(|a, b| b.priority.cmp(&a.priority));
         list
     }
@@ -294,10 +278,7 @@ impl GentooEtcUpdateEngine {
 
     /// Computes 3-way line diff summary between current configuration and new update
     pub fn compute_config_diff(&self, target_path: &str) -> Option<String> {
-        let update = self
-            .pending_updates
-            .iter()
-            .find(|u| u.target_file_path == target_path)?;
+        let update = self.pending_updates.iter().find(|u| u.target_file_path == target_path)?;
 
         let mut diff = String::new();
         diff.push_str(&format!("--- {}\n", update.target_file_path));
@@ -1245,8 +1226,10 @@ mod tests {
         assert!(diff.is_some());
         assert!(diff.unwrap().contains("- USE=\"ssl X\""));
 
-        let merged =
-            etc_update.resolve_update("/etc/portage/make.conf", ConfigMergeAction::ReplaceWithNew);
+        let merged = etc_update.resolve_update(
+            "/etc/portage/make.conf",
+            ConfigMergeAction::ReplaceWithNew,
+        );
         assert!(merged.is_ok());
         assert!(merged.unwrap().contains("wayland"));
     }
@@ -1256,12 +1239,7 @@ mod tests {
         let mut layman = GentooLaymanOverlayManager::new();
         assert_eq!(layman.list_active_overlays().len(), 3);
 
-        layman.add_overlay(
-            "flatpak-overlay",
-            "https://github.com/gentoo/flatpak.git",
-            "git",
-            40,
-        );
+        layman.add_overlay("flatpak-overlay", "https://github.com/gentoo/flatpak.git", "git", 40);
         let synced = layman.sync_all_overlays();
         assert_eq!(synced, 4);
 

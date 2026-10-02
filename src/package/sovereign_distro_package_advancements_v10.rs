@@ -145,36 +145,21 @@ impl SovereignUniversalForeignFormatTranspiler {
             UniversalForeignPackageFormat::DebianApt
         } else if manifest_text.contains("pkgname=") || manifest_text.contains("pkgver=") {
             UniversalForeignPackageFormat::ArchPacman
-        } else if manifest_text.contains("Name:")
-            && manifest_text.contains("Version:")
-            && manifest_text.contains("Release:")
-        {
+        } else if manifest_text.contains("Name:") && manifest_text.contains("Version:") && manifest_text.contains("Release:") {
             UniversalForeignPackageFormat::FedoraDnf
-        } else if manifest_text.contains("P:")
-            && manifest_text.contains("V:")
-            && manifest_text.contains("A:")
-        {
+        } else if manifest_text.contains("P:") && manifest_text.contains("V:") && manifest_text.contains("A:") {
             UniversalForeignPackageFormat::AlpineApk
         } else if manifest_text.contains("EAPI=") || manifest_text.contains("KEYWORDS=") {
             UniversalForeignPackageFormat::GentooEbuild
-        } else if manifest_text.contains("name=")
-            && manifest_text.contains("version=")
-            && manifest_text.contains("short_desc=")
-        {
+        } else if manifest_text.contains("name=") && manifest_text.contains("version=") && manifest_text.contains("short_desc=") {
             UniversalForeignPackageFormat::VoidXbps
-        } else if manifest_text.contains("name:")
-            && manifest_text.contains("version:")
-            && manifest_text.contains("origin:")
-        {
+        } else if manifest_text.contains("name:") && manifest_text.contains("version:") && manifest_text.contains("origin:") {
             UniversalForeignPackageFormat::FreeBsdPkg
-        } else if manifest_text.contains("{ stdenv, fetchurl")
-            || manifest_text.contains("mkDerivation")
-        {
+        } else if manifest_text.contains("{ stdenv, fetchurl") || manifest_text.contains("mkDerivation") {
             UniversalForeignPackageFormat::NixFlake
         } else if manifest_text.contains("app-id:") || manifest_text.contains("runtime:") {
             UniversalForeignPackageFormat::Flatpak
-        } else if manifest_text.contains("BUNDLE_NAME=") || manifest_text.contains("SWUPD_VERSION=")
-        {
+        } else if manifest_text.contains("BUNDLE_NAME=") || manifest_text.contains("SWUPD_VERSION=") {
             UniversalForeignPackageFormat::SwupdBundle
         } else {
             UniversalForeignPackageFormat::DebianApt
@@ -203,44 +188,28 @@ impl SovereignUniversalForeignFormatTranspiler {
                 continue;
             }
 
-            if line.starts_with("Package:")
-                || line.starts_with("Name:")
-                || line.starts_with("pkgname=")
-                || line.starts_with("P:")
-                || line.starts_with("name=")
-            {
+            if line.starts_with("Package:") || line.starts_with("Name:") || line.starts_with("pkgname=") || line.starts_with("P:") || line.starts_with("name=") {
                 if let Some(pos) = line.find(':').or_else(|| line.find('=')) {
                     let val = line[pos + 1..].trim().trim_matches('"').trim_matches('\'');
                     if !val.is_empty() {
                         name = val.to_string();
                     }
                 }
-            } else if line.starts_with("Version:")
-                || line.starts_with("pkgver=")
-                || line.starts_with("V:")
-                || line.starts_with("version=")
-            {
+            } else if line.starts_with("Version:") || line.starts_with("pkgver=") || line.starts_with("V:") || line.starts_with("version=") {
                 if let Some(pos) = line.find(':').or_else(|| line.find('=')) {
                     let val = line[pos + 1..].trim().trim_matches('"').trim_matches('\'');
                     if !val.is_empty() {
                         version = val.to_string();
                     }
                 }
-            } else if line.starts_with("Architecture:")
-                || line.starts_with("arch=")
-                || line.starts_with("A:")
-            {
+            } else if line.starts_with("Architecture:") || line.starts_with("arch=") || line.starts_with("A:") {
                 if let Some(pos) = line.find(':').or_else(|| line.find('=')) {
                     let val = line[pos + 1..].trim().trim_matches('"').trim_matches('\'');
                     if !val.is_empty() {
                         architecture = val.to_string();
                     }
                 }
-            } else if line.starts_with("Depends:")
-                || line.starts_with("depends=")
-                || line.starts_with("D:")
-                || line.starts_with("deps:")
-            {
+            } else if line.starts_with("Depends:") || line.starts_with("depends=") || line.starts_with("D:") || line.starts_with("deps:") {
                 if let Some(pos) = line.find(':').or_else(|| line.find('=')) {
                     let val = line[pos + 1..].trim().trim_matches('(').trim_matches(')');
                     for dep in val.split_whitespace() {
@@ -250,10 +219,7 @@ impl SovereignUniversalForeignFormatTranspiler {
                         }
                     }
                 }
-            } else if line.starts_with("Description:")
-                || line.starts_with("Summary:")
-                || line.starts_with("short_desc=")
-            {
+            } else if line.starts_with("Description:") || line.starts_with("Summary:") || line.starts_with("short_desc=") {
                 if let Some(pos) = line.find(':').or_else(|| line.find('=')) {
                     let val = line[pos + 1..].trim().trim_matches('"');
                     if !val.is_empty() {
@@ -320,14 +286,8 @@ impl SovereignUniversalPrInteroperabilityEngine {
     pub fn new() -> Self {
         let mut map = BTreeMap::new();
         // Populate foreign-to-canonical dependency map
-        map.insert(
-            String::from("libssl-dev"),
-            String::from("sovereign-openssl"),
-        );
-        map.insert(
-            String::from("openssl-devel"),
-            String::from("sovereign-openssl"),
-        );
+        map.insert(String::from("libssl-dev"), String::from("sovereign-openssl"));
+        map.insert(String::from("openssl-devel"), String::from("sovereign-openssl"));
         map.insert(String::from("libssl"), String::from("sovereign-openssl"));
         map.insert(String::from("glibc"), String::from("sovereign-libc"));
         map.insert(String::from("musl"), String::from("sovereign-libc"));
@@ -350,12 +310,7 @@ impl SovereignUniversalPrInteroperabilityEngine {
         self.dependency_map
             .get(foreign_dep)
             .cloned()
-            .unwrap_or_else(|| {
-                format!(
-                    "sovereign-{}",
-                    foreign_dep.replace("-dev", "").replace("-devel", "")
-                )
-            })
+            .unwrap_or_else(|| format!("sovereign-{}", foreign_dep.replace("-dev", "").replace("-devel", "")))
     }
 
     /// Submits a transpiled foreign package manifest as a PR
@@ -471,13 +426,7 @@ impl SovereignUniversalPmCliForwarder {
             if *arg == "--dry-run" || *arg == "-s" || *arg == "--simulate" || *arg == "-n" {
                 dry_run = true;
             } else if !arg.starts_with('-') {
-                if *arg != "install"
-                    && *arg != "add"
-                    && *arg != "get"
-                    && *arg != "build"
-                    && *arg != "-S"
-                    && *arg != "in"
-                {
+                if *arg != "install" && *arg != "add" && *arg != "get" && *arg != "build" && *arg != "-S" && *arg != "in" {
                     target_pkg = arg.to_string();
                 }
             }
@@ -553,42 +502,26 @@ mod tests {
     fn test_autodetect_format() {
         let transpiler = SovereignUniversalForeignFormatTranspiler::new();
         let debian_text = "Package: nginx\nVersion: 1.22.0\nArchitecture: amd64\nDepends: libssl-dev, zlib1g-dev\n";
-        assert_eq!(
-            transpiler.autodetect_format(debian_text),
-            UniversalForeignPackageFormat::DebianApt
-        );
+        assert_eq!(transpiler.autodetect_format(debian_text), UniversalForeignPackageFormat::DebianApt);
 
-        let arch_text =
-            "pkgname=htop\npkgver=3.2.2\narch=('x86_64')\ndepends=('ncurses' 'libcap')\n";
-        assert_eq!(
-            transpiler.autodetect_format(arch_text),
-            UniversalForeignPackageFormat::ArchPacman
-        );
+        let arch_text = "pkgname=htop\npkgver=3.2.2\narch=('x86_64')\ndepends=('ncurses' 'libcap')\n";
+        assert_eq!(transpiler.autodetect_format(arch_text), UniversalForeignPackageFormat::ArchPacman);
 
         let nix_text = "{ stdenv, fetchurl }: stdenv.mkDerivation { name = \"hello\"; }\n";
-        assert_eq!(
-            transpiler.autodetect_format(nix_text),
-            UniversalForeignPackageFormat::NixFlake
-        );
+        assert_eq!(transpiler.autodetect_format(nix_text), UniversalForeignPackageFormat::NixFlake);
     }
 
     #[test]
     fn test_transpile_and_submit_pr() {
         let mut suite = SovereignDistroPackageAdvancementsSuiteV10::new();
-        let debian_manifest =
-            "Package: curl\nVersion: 7.88.1\nArchitecture: amd64\nDepends: libssl-dev, glibc\n";
+        let debian_manifest = "Package: curl\nVersion: 7.88.1\nArchitecture: amd64\nDepends: libssl-dev, glibc\n";
 
-        let pr_id = suite
-            .import_foreign_package_pr("jules", debian_manifest)
-            .unwrap();
+        let pr_id = suite.import_foreign_package_pr("jules", debian_manifest).unwrap();
         let pr = suite.pr_engine.pull_requests.get(&pr_id).unwrap();
 
         assert_eq!(pr.manifest.name, "curl");
         assert_eq!(pr.manifest.version, "7.88.1");
-        assert_eq!(
-            pr.mapped_dependencies,
-            vec!["sovereign-openssl", "sovereign-libc"]
-        );
+        assert_eq!(pr.mapped_dependencies, vec!["sovereign-openssl", "sovereign-libc"]);
         assert_eq!(pr.state, PrSubmissionState::AutoMerged);
     }
 

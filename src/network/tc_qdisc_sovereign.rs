@@ -331,9 +331,7 @@ pub struct FqCodelQdisc {
 
 impl FqCodelQdisc {
     pub fn new(flow_count: usize) -> Self {
-        let flows = (0..flow_count)
-            .map(|_| std::collections::VecDeque::new())
-            .collect();
+        let flows = (0..flow_count).map(|_| std::collections::VecDeque::new()).collect();
         FqCodelQdisc {
             target_delay_ns: 5_000_000, // 5ms
             interval_ns: 100_000_000,   // 100ms

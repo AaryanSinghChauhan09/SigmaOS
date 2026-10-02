@@ -25,8 +25,7 @@ pub enum PowerState {
     FullOn,
     Standby,
     Sleep,
-    Unknown,
-}
+    Unknown,}
 
 pub trait BareMetalUnifiedPeripheral {
     fn initialize(&mut self) -> Result<(), &'static str>;
@@ -4244,6 +4243,33 @@ impl TechMediaIntelligenceAggregatorEngine {
 // =========================================================================
 // TECH MEDIA & ENTERPRISE FRAMEWORK INSPIRED ENGINES
 // =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct DocField {
+    pub fieldname: String,
+    pub fieldtype: String,
+    pub label: String,
+    pub reqd: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct FrappeFrameworkDocTypeEngine {
+    pub doctype_name: String,
+    pub fields: Vec<DocField>,
+    pub workflow_state: String,
+    pub is_submittable: bool,
+}
+
+impl FrappeFrameworkDocTypeEngine {
+    pub fn new(doctype_name: &str) -> Self {
+        Self {
+            doctype_name: doctype_name.to_string(),
+            fields: Vec::new(),
+            workflow_state: "Draft".to_string(),
+            is_submittable: true,
+        }
+    }
+}
 
 #[derive(Debug, Clone)]
 pub struct DocField {

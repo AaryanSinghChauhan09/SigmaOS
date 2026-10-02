@@ -49,10 +49,7 @@ mod tests {
     fn test_entropy_bytes_nonzero() {
         let mut buf = [0u8; 32];
         get_entropy_bytes(&mut buf);
-        assert!(
-            buf.iter().any(|&b| b != 0),
-            "entropy buffer should not be all zeros"
-        );
+        assert!(buf.iter().any(|&b| b != 0), "entropy buffer should not be all zeros");
     }
 
     #[test]

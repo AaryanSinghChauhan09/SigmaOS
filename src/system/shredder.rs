@@ -19,10 +19,10 @@ use std::vec::Vec;
 // SigmaOS File Shredder
 // OOP-based secure file deletion with multiple overwrite passes
 
-use crate::klib::rng::SigmaRng;
 use std::fs::{self, File, OpenOptions};
 use std::io::{self, Seek, SeekFrom, Write};
 use std::path::Path;
+use crate::klib::rng::SigmaRng;
 
 /// Shredding algorithm
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

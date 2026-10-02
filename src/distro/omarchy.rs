@@ -789,8 +789,7 @@ impl OmarchyToggleManager {
     }
 
     pub fn is_toggle_disabled(&self, toggle: OmarchyToggleState) -> bool {
-        self.disabled_flags
-            .contains(&toggle.flag_filename().to_string())
+        self.disabled_flags.contains(&toggle.flag_filename().to_string())
     }
 
     pub fn is_toggle_enabled(&self, toggle: OmarchyToggleState) -> bool {
@@ -853,9 +852,7 @@ impl OmarchyIdleLockManager {
     }
 
     pub fn should_trigger_screensaver(&self, idle_time_secs: u32) -> bool {
-        !self.stay_awake
-            && idle_time_secs >= self.screensaver_delay_secs
-            && idle_time_secs < self.lock_delay_secs
+        !self.stay_awake && idle_time_secs >= self.screensaver_delay_secs && idle_time_secs < self.lock_delay_secs
     }
 
     pub fn should_trigger_lock(&self, idle_time_secs: u32) -> bool {

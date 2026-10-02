@@ -110,9 +110,7 @@ impl TaskGuidelinesAndRulesGovernor {
     }
 
     pub fn is_governance_compliant(&self) -> bool {
-        self.rules
-            .values()
-            .all(|rule| !rule.is_mandatory || self.passed_checks.contains(&rule.rule_id))
+        self.rules.values().all(|rule| !rule.is_mandatory || self.passed_checks.contains(&rule.rule_id))
     }
 }
 
@@ -164,11 +162,8 @@ impl WikiDataTransferEngine {
         self.feature_specs.insert(
             "UniversalPackageSystem".to_string(),
             FeatureMdStatus {
-                spec_name: "SIGMAOS_UNIVERSAL_PACKAGE_SYSTEM_LINUX_BSD_PARITY_PR_PROPOSAL.md"
-                    .to_string(),
-                source_path:
-                    "docs/SIGMAOS_UNIVERSAL_PACKAGE_SYSTEM_LINUX_BSD_PARITY_PR_PROPOSAL.md"
-                        .to_string(),
+                spec_name: "SIGMAOS_UNIVERSAL_PACKAGE_SYSTEM_LINUX_BSD_PARITY_PR_PROPOSAL.md".to_string(),
+                source_path: "docs/SIGMAOS_UNIVERSAL_PACKAGE_SYSTEM_LINUX_BSD_PARITY_PR_PROPOSAL.md".to_string(),
                 is_fully_implemented: true,
                 completion_percentage: 100,
                 wiki_mirrored: true,
@@ -189,11 +184,7 @@ impl WikiDataTransferEngine {
         self.register_spec_file("UniversalPackageSystem", "Universal Package System", true);
         self.register_spec_file("Roadmap11Deployment", "Roadmap 11 Deployment", true);
         self.register_spec_file("ROADMAP.md", "SigmaOS Master Development Roadmap", true);
-        self.register_spec_file(
-            "UniversalPackageSystem",
-            "Universal Package System Spec",
-            true,
-        );
+        self.register_spec_file("UniversalPackageSystem", "Universal Package System Spec", true);
         self.register_spec_file("Roadmap11Deployment", "11-Roadmap Deployment Spec", true);
     }
 
@@ -261,9 +252,7 @@ impl SovereignTaskAndWikiGovernanceSuite {
             return false;
         }
 
-        self.wiki_engine
-            .transfer_implemented_data_to_wiki("ROADMAP.md")
-            .is_ok()
+        self.wiki_engine.transfer_implemented_data_to_wiki("ROADMAP.md").is_ok()
     }
 }
 

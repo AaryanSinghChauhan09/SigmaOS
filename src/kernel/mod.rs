@@ -8,6 +8,7 @@ pub use sovereign_smp_xhci_apc_synthesis::*;
 pub mod architecture;
 pub mod atomic_extended;
 pub mod block_dev;
+pub mod process_monitor;
 pub mod bore;
 pub mod breakthrough;
 pub mod breakthroughs;
@@ -39,7 +40,6 @@ pub mod linux_absorb;
 pub mod linux_bsd_innovations;
 pub mod linux_parity;
 pub mod missing_linux_kernel_components;
-pub mod process_monitor;
 pub mod sysfs_manager;
 pub use linux_parity::{
     CmaRegion, KernelTimer, LinuxCmaAllocatorEngine, LinuxKernelTimerWheel,

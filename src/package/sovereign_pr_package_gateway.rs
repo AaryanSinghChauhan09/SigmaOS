@@ -259,15 +259,7 @@ impl SovereignUniversalPrGatewayEngine {
     /// Processes multi-distro foreign package PR submissions in bulk
     pub fn batch_submit_and_auto_merge_prs(
         &mut self,
-        submissions: &[(
-            &str,
-            &str,
-            &str,
-            PullRequestPackageFormat,
-            &str,
-            &[&str],
-            &[u8],
-        )],
+        submissions: &[(&str, &str, &str, PullRequestPackageFormat, &str, &[&str], &[u8])],
     ) -> Result<Vec<UnifiedPackage>, &'static str> {
         let mut merged_packages = Vec::new();
 
@@ -276,8 +268,15 @@ impl SovereignUniversalPrGatewayEngine {
                 return Err("PQC signature verification failed for batch entry");
             }
 
-            let pr_id =
-                self.submit_distro_package_pr(author, name, ver, *fmt, manifest, deps, pqc_sig);
+            let pr_id = self.submit_distro_package_pr(
+                author,
+                name,
+                ver,
+                *fmt,
+                manifest,
+                deps,
+                pqc_sig,
+            );
 
             self.validate_and_translate_pr(pr_id)?;
             let sigpkg = self.auto_merge_package_pr(pr_id)?;

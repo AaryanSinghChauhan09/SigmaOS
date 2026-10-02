@@ -102,18 +102,18 @@ pub mod vec {
 pub mod prelude {
     // Collections
     pub use super::BTreeMap;
+    pub use super::Vec;
     pub use super::HashMap;
     pub use super::HashSet;
-    pub use super::Vec;
     // Linked structures
-    pub use super::HeapRingBuffer;
     pub use super::LinkedList;
     pub use super::RingBuffer;
+    pub use super::HeapRingBuffer;
     // Utilities
     pub use super::Arc;
+    pub use super::Uuid;
     pub use super::SigmaString;
     pub use super::SlabCache;
-    pub use super::Uuid;
     pub use super::ZeroDependencyMasterHub;
     pub use super::ZeroDependencyPrimitiveHub;
 }

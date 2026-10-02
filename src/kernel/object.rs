@@ -3,8 +3,8 @@
 // driver entry contexts, dynamic unloading, and Non-Paged Pool memory tracking.
 
 use crate::klib::collections::HashMap;
-use crate::klib::collections::HashMap;
 use core::sync::atomic::{AtomicUsize, Ordering};
+use crate::klib::collections::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ObjectError {

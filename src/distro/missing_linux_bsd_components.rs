@@ -599,11 +599,7 @@ impl ManjaroPamacSoftwareCenterEngine {
     }
 
     pub fn search_software(&self, query: &str) -> usize {
-        if query.is_empty() {
-            0
-        } else {
-            12
-        }
+        if query.is_empty() { 0 } else { 12 }
     }
 
     pub fn search_package(&self, query: &str) -> usize {
@@ -865,35 +861,13 @@ impl SovereignMissingLinuxBsdSuite {
             ),
             "urpmi" | "mageia" => format!("Media sources: {}", self.urpmi.media_sources.len()),
             "pax" | "hardened" => format!("PaX ASLR bits: {}", self.pax.aslr_entropy_bits),
-            "tuxedo" | "hardware_control" => format!(
-                "Tuxedo profile: {}, fan RPM: {}",
-                self.tuxedo.active_profile, self.tuxedo.fan_speed_rpm
-            ),
-            "system76" | "cosmic_power" => format!(
-                "System76 graphics: {}, power: {}",
-                self.system76.graphics_mode, self.system76.power_profile
-            ),
-            "ostree" | "atomic" => format!(
-                "OSTree active: {}, pending reboot: {}",
-                self.ostree.active_commit, self.ostree.pending_reboot
-            ),
-            "pamac" | "software_center" => format!(
-                "Pamac packages cached: {}",
-                self.pamac.cached_packages_count
-            ),
-            "garuda" | "snapper" => format!(
-                "Garuda tasks completed: {}",
-                self.garuda.maintenance_tasks_completed
-            ),
-            "cosmic" | "launcher" => format!(
-                "Pop!_OS COSMIC tiling: {}",
-                self.cosmic_launcher.auto_tiling_enabled
-            ),
-            "tails" | "amnesic" => format!(
-                "Tails RAM wipe: {}, Tor: {}",
-                self.tails_amnesic.memory_wipe_on_shutdown,
-                self.tails_amnesic.tor_circuit_established
-            ),
+            "tuxedo" | "hardware_control" => format!("Tuxedo profile: {}, fan RPM: {}", self.tuxedo.active_profile, self.tuxedo.fan_speed_rpm),
+            "system76" | "cosmic_power" => format!("System76 graphics: {}, power: {}", self.system76.graphics_mode, self.system76.power_profile),
+            "ostree" | "atomic" => format!("OSTree active: {}, pending reboot: {}", self.ostree.active_commit, self.ostree.pending_reboot),
+            "pamac" | "software_center" => format!("Pamac packages cached: {}", self.pamac.cached_packages_count),
+            "garuda" | "snapper" => format!("Garuda tasks completed: {}", self.garuda.maintenance_tasks_completed),
+            "cosmic" | "launcher" => format!("Pop!_OS COSMIC tiling: {}", self.cosmic_launcher.auto_tiling_enabled),
+            "tails" | "amnesic" => format!("Tails RAM wipe: {}, Tor: {}", self.tails_amnesic.memory_wipe_on_shutdown, self.tails_amnesic.tor_circuit_established),
             _ => format!("Default resolver active for subsystem: {}", subsystem),
         }
     }

@@ -188,9 +188,7 @@ impl VirtualMemoryManagerV2 {
             pml4_entry.set_frame(addr, flags);
             addr
         } else {
-            pml4_entry
-                .physical_frame()
-                .ok_or("Invalid physical frame in PML4")?
+            pml4_entry.physical_frame().ok_or("Invalid physical frame in PML4")?
         };
 
         let pdpt = &mut *(pdpt_addr as *mut PageTable);
@@ -206,9 +204,7 @@ impl VirtualMemoryManagerV2 {
             pdpt_entry.set_frame(addr, flags);
             addr
         } else {
-            pdpt_entry
-                .physical_frame()
-                .ok_or("Invalid physical frame in PDPT")?
+            pdpt_entry.physical_frame().ok_or("Invalid physical frame in PDPT")?
         };
 
         let pd = &mut *(pd_addr as *mut PageTable);
@@ -224,9 +220,7 @@ impl VirtualMemoryManagerV2 {
             pd_entry.set_frame(addr, flags);
             addr
         } else {
-            pd_entry
-                .physical_frame()
-                .ok_or("Invalid physical frame in PD")?
+            pd_entry.physical_frame().ok_or("Invalid physical frame in PD")?
         };
 
         let pt = &mut *(pt_addr as *mut PageTable);

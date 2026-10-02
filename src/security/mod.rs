@@ -26,8 +26,8 @@ pub mod syscall_filter;
 pub mod user_namespace;
 
 pub mod bridge;
-pub mod capability_based_security;
 pub mod capability_token;
+pub mod capability_based_security;
 pub mod cleaner;
 pub mod clipboard;
 pub mod deobfuscation;
@@ -62,6 +62,14 @@ pub use landlock::{LandlockEngine, LandlockPathBeneathAttr, LandlockRuleset};
 pub mod landlock_sovereign;
 
 pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
+pub use system_audit::{
+    AuditEventType as SystemAuditEventType, AuditEvent as SystemAuditEvent, AuditRule, AuditAction, AuditConfig,
+    SystemAuditManager,
+};
+pub use filesystem_encryption::{
+    EncryptionType as FsEncryptionType, EncryptionAlgorithm as FsEncryptionAlgorithm, EncryptionStatus as FsEncryptionStatus, FscryptDirectory, LuksDevice,
+    FilesystemEncryptionManager,
+};
 pub use bsd_hardening::{
     AslrEngine, BsdHardeningSuite, CapsicumCapability, CapsicumManager, MemoryPermission,
     PaxMprotect, PledgeManager as BsdPledgeManager, PledgePromise as BsdPledgePromise,
@@ -83,10 +91,6 @@ pub use clipboard::{
     SecureClipboardManager, SecurityLevel as ClipboardSecurityLevel, XorEncryption,
 };
 pub use defensive_audit::*;
-pub use filesystem_encryption::{
-    EncryptionAlgorithm as FsEncryptionAlgorithm, EncryptionStatus as FsEncryptionStatus,
-    EncryptionType as FsEncryptionType, FilesystemEncryptionManager, FscryptDirectory, LuksDevice,
-};
 pub use forensics::*;
 pub use hardening::{MemoryProtectionState, RelroState, SecurityHardeningConfig, StackCanary};
 pub use intrusion::{
@@ -105,10 +109,6 @@ pub use kernel_hardening::{
     PagePermissions, PledgePromise as KernelPledgePromise, PrivilegeRing,
     RetpolineKptiMitigationEngine, SmepSmapEnforcer, SovereignKaslrEngine,
     SovereignRing3UserModeTssEngine, SyscallCategory, TaskStateSegment64,
-};
-pub use system_audit::{
-    AuditAction, AuditConfig, AuditEvent as SystemAuditEvent,
-    AuditEventType as SystemAuditEventType, AuditRule, SystemAuditManager,
 };
 
 pub use crate::security::vulnerability::{

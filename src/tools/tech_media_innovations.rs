@@ -1242,9 +1242,7 @@ impl LinuxOrgKernelTuningEngine {
     }
 
     pub fn is_tcp_bbr_enabled(&self) -> bool {
-        self.tcp_congestion_control == "bbr"
-            || self.tcp_congestion_control == "bbr2"
-            || self.tcp_congestion_control == "bbr3"
+        self.tcp_congestion_control == "bbr" || self.tcp_congestion_control == "bbr2" || self.tcp_congestion_control == "bbr3"
     }
 
     pub fn is_realtime_optimized(&self) -> bool {
@@ -1409,11 +1407,7 @@ impl TechPowerUpGpuTelemetryEngine {
             100
         } else {
             let pct = ((max_temp - 45.0) / (95.0 - 45.0) * 100.0) as u8;
-            if pct > 100 {
-                100
-            } else {
-                pct
-            }
+            if pct > 100 { 100 } else { pct }
         }
     }
 

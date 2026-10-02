@@ -47,8 +47,7 @@ pub enum PowerState {
     D3, // Sleep
     D4, // Off
     FullOn,
-    Unknown,
-}
+    Unknown,}
 
 #[repr(C)]
 pub struct SimpleDevice {

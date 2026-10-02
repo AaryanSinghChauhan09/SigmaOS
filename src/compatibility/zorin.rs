@@ -873,12 +873,7 @@ mod zorin_feature_tests {
         let mut sound = ZorinSoundThemeManager::new();
         sound.enable_amplification_boost(true);
         sound.set_volume(120);
-        assert_eq!(
-            sound
-                .master_volume_percent
-                .load(core::sync::atomic::Ordering::SeqCst),
-            120
-        );
+        assert_eq!(sound.master_volume_percent.load(core::sync::atomic::Ordering::SeqCst), 120);
 
         let mut bar = ZorinIntellihideTaskbar::new();
         bar.update_window_overlap(true);

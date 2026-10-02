@@ -108,11 +108,7 @@ fn cmd_pr(args: &[String]) {
     match args[0].as_str() {
         "submit" => {
             let target = if args.len() > 1 { &args[1] } else { "nginx" };
-            let author = if args.len() > 2 {
-                &args[2]
-            } else {
-                "maintainer@sigmaos.org"
-            };
+            let author = if args.len() > 2 { &args[2] } else { "maintainer@sigmaos.org" };
             let pr_id = bridge.submit_foreign_package_pr(
                 author,
                 target,
@@ -122,10 +118,7 @@ fn cmd_pr(args: &[String]) {
                 &["libc"],
                 b"pqc-sig",
             );
-            println!(
-                "Submitted Foreign Package PR #{}: target '{}' v1.24.0 by {}",
-                pr_id, target, author
-            );
+            println!("Submitted Foreign Package PR #{}: target '{}' v1.24.0 by {}", pr_id, target, author);
             exit(0);
         }
         "convert" => {
@@ -142,10 +135,7 @@ fn cmd_pr(args: &[String]) {
             );
             match bridge.convert_to_canonical_sigpkg(pr_id) {
                 Ok(converted) => {
-                    println!(
-                        "PR #{} Converted to Canonical Manifest:\n{}",
-                        pr_id, converted
-                    );
+                    println!("PR #{} Converted to Canonical Manifest:\n{}", pr_id, converted);
                     exit(0);
                 }
                 Err(e) => {
@@ -168,11 +158,7 @@ fn cmd_pr(args: &[String]) {
             );
             match bridge.validate_sat_pr_dependencies(pr_id) {
                 Ok(passed) => {
-                    println!(
-                        "PR #{} SAT Dependency & Gating Audit: {}",
-                        pr_id,
-                        if passed { "PASSED" } else { "FAILED" }
-                    );
+                    println!("PR #{} SAT Dependency & Gating Audit: {}", pr_id, if passed { "PASSED" } else { "FAILED" });
                     exit(0);
                 }
                 Err(e) => {
@@ -196,10 +182,7 @@ fn cmd_pr(args: &[String]) {
             let _ = bridge.validate_sat_pr_dependencies(pr_id);
             match bridge.merge_pr_to_sigma_pkg(pr_id) {
                 Ok(merged) => {
-                    println!(
-                        "Successfully merged PR #{} -> Package '{}' v{}",
-                        pr_id, merged.name, merged.version
-                    );
+                    println!("Successfully merged PR #{} -> Package '{}' v{}", pr_id, merged.name, merged.version);
                     exit(0);
                 }
                 Err(e) => {
@@ -220,16 +203,9 @@ fn cmd_pr(args: &[String]) {
                 b"pqc-sig",
             );
             let results = gateway.search_distro_prs(query);
-            println!(
-                "Package PR Gateway Search ('{}'): {} PR(s) found",
-                query,
-                results.len()
-            );
+            println!("Package PR Gateway Search ('{}'): {} PR(s) found", query, results.len());
             for pr in results {
-                println!(
-                    "  - PR #{}: {} v{} by {} [{:?}]",
-                    pr.pr_id, pr.package_name, pr.package_version, pr.submitter, pr.status
-                );
+                println!("  - PR #{}: {} v{} by {} [{:?}]", pr.pr_id, pr.package_name, pr.package_version, pr.submitter, pr.status);
             }
             exit(0);
         }

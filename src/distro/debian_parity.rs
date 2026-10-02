@@ -303,13 +303,7 @@ impl DebianAptListbugsAuditor {
         }
     }
 
-    pub fn report_bug(
-        &mut self,
-        bug_id: u32,
-        package_name: &str,
-        severity: BugSeverity,
-        title: &str,
-    ) {
+    pub fn report_bug(&mut self, bug_id: u32, package_name: &str, severity: BugSeverity, title: &str) {
         self.reported_bugs.push(AptBugReport {
             bug_id,
             package_name: package_name.to_string(),
@@ -383,16 +377,12 @@ pub struct DebianAlternativesSystem {
 
 impl DebianAlternativesSystem {
     pub fn new() -> Self {
-        Self { groups: Vec::new() }
+        Self {
+            groups: Vec::new(),
+        }
     }
 
-    pub fn register_alternative(
-        &mut self,
-        name: &str,
-        master_link: &str,
-        target_path: &str,
-        priority: u32,
-    ) {
+    pub fn register_alternative(&mut self, name: &str, master_link: &str, target_path: &str, priority: u32) {
         if let Some(group) = self.groups.iter_mut().find(|g| g.name == name) {
             if !group.choices.iter().any(|c| c.path == target_path) {
                 group.choices.push(AlternativeTarget {
@@ -620,12 +610,7 @@ mod tests {
     #[test]
     fn test_apt_listbugs_auditor() {
         let mut auditor = DebianAptListbugsAuditor::new();
-        auditor.report_bug(
-            1001,
-            "openssl",
-            BugSeverity::Critical,
-            "Buffer overflow in TLS",
-        );
+        auditor.report_bug(1001, "openssl", BugSeverity::Critical, "Buffer overflow in TLS");
         auditor.report_bug(1002, "bash", BugSeverity::Minor, "Typo in man page");
 
         let held = auditor.audit_and_hold_buggy_packages(&["openssl", "bash"]);
@@ -640,24 +625,15 @@ mod tests {
         alts.register_alternative("editor", "/usr/bin/editor", "/usr/bin/nano", 40);
 
         // Auto mode picks highest priority (/usr/bin/vim.basic)
-        assert_eq!(
-            alts.get_active_target("editor"),
-            Some("/usr/bin/vim.basic".to_string())
-        );
+        assert_eq!(alts.get_active_target("editor"), Some("/usr/bin/vim.basic".to_string()));
 
         // Manual override
         assert!(alts.set_manual("editor", "/usr/bin/nano"));
-        assert_eq!(
-            alts.get_active_target("editor"),
-            Some("/usr/bin/nano".to_string())
-        );
+        assert_eq!(alts.get_active_target("editor"), Some("/usr/bin/nano".to_string()));
 
         // Reset to auto
         assert!(alts.set_auto("editor"));
-        assert_eq!(
-            alts.get_active_target("editor"),
-            Some("/usr/bin/vim.basic".to_string())
-        );
+        assert_eq!(alts.get_active_target("editor"), Some("/usr/bin/vim.basic".to_string()));
     }
 
     #[test]
@@ -673,16 +649,10 @@ mod tests {
     #[test]
     fn test_backports_pinning_manager() {
         let mut pin_mgr = DebianBackportsPinningManager::new();
-        assert_eq!(
-            pin_mgr.calculate_effective_priority("linux-image", "bookworm-backports"),
-            100
-        );
+        assert_eq!(pin_mgr.calculate_effective_priority("linux-image", "bookworm-backports"), 100);
 
         pin_mgr.add_pin_rule("linux-image", "bookworm-backports", 500);
-        assert_eq!(
-            pin_mgr.calculate_effective_priority("linux-image", "bookworm-backports"),
-            500
-        );
+        assert_eq!(pin_mgr.calculate_effective_priority("linux-image", "bookworm-backports"), 500);
 
         let pref_file = pin_mgr.generate_preferences_file();
         assert!(pref_file.contains("Package: linux-image"));

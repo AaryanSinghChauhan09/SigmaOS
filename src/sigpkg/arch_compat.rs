@@ -165,19 +165,15 @@ impl RollingSyncManager {
     }
 
     pub fn register_installed(&mut self, name: &str, version: Version) {
-        self.installed_packages
-            .insert(crate::klib::string::SigmaString::from(name), version);
+        self.installed_packages.insert(crate::klib::string::SigmaString::from(name), version);
     }
 
     pub fn register_remote(&mut self, name: &str, version: Version) {
-        self.remote_repository
-            .insert(crate::klib::string::SigmaString::from(name), version);
+        self.remote_repository.insert(crate::klib::string::SigmaString::from(name), version);
     }
 
     /// Checks for available package updates in the rolling release stream
-    pub fn list_pending_rolling_updates(
-        &self,
-    ) -> Vec<(crate::klib::string::SigmaString, Version, Version)> {
+    pub fn list_pending_rolling_updates(&self) -> Vec<(crate::klib::string::SigmaString, Version, Version)> {
         let mut updates = Vec::new();
         for (pkg_name, installed_ver) in &self.installed_packages {
             if let Some(remote_ver) = self.remote_repository.get(pkg_name) {
@@ -279,9 +275,7 @@ pub struct AlpmHookManager {
 
 impl AlpmHookManager {
     pub fn new() -> Self {
-        Self {
-            hooks: crate::klib::vec::Vec::new(),
-        }
+        Self { hooks: crate::klib::vec::Vec::new() }
     }
 
     pub fn add_hook(&mut self, hook: AlpmHook) {
@@ -709,22 +703,15 @@ impl MakepkgBuilder {
             checksum = checksum.wrapping_mul(31).wrapping_add(b as u64);
         }
         let computed = crate::klib::string::SigmaString::from(format!("{:016x}", checksum));
-        computed == self.expected_sha256
-            || self.expected_sha256 == crate::klib::string::SigmaString::from("SKIP")
+        computed == self.expected_sha256 || self.expected_sha256 == crate::klib::string::SigmaString::from("SKIP")
     }
 
-    pub fn build_package_archive(
-        &self,
-        source_data: &[u8],
-    ) -> Result<(crate::klib::string::SigmaString, crate::klib::vec::Vec<u8>), &'static str> {
+    pub fn build_package_archive(&self, source_data: &[u8]) -> Result<(crate::klib::string::SigmaString, crate::klib::vec::Vec<u8>), &'static str> {
         if !self.verify_source_integrity(source_data) {
             return Err("makepkg: Source integrity verification failed (SHA256 mismatch)");
         }
 
-        let archive_name = crate::klib::string::SigmaString::from(format!(
-            "{}-{}-{}.pkg.tar.zst",
-            self.pkgname, self.pkgver, self.arch
-        ));
+        let archive_name = crate::klib::string::SigmaString::from(format!("{}-{}-{}.pkg.tar.zst", self.pkgname, self.pkgver, self.arch));
         let mut archive_content = crate::klib::string::SigmaString::from(format!(
             "ARCH_PKG_TAR_ZST_MAGIC | Name: {} | Ver: {} | Arch: {}\n",
             self.pkgname, self.pkgver, self.arch

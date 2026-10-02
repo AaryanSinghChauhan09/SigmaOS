@@ -3177,11 +3177,7 @@ impl SovereignSyncthingPeerSyncEngine {
     }
 
     pub fn detect_sync_conflicts(&self, remote_file: &SyncthingFolderFile) -> bool {
-        if let Some(local) = self
-            .index_files
-            .iter()
-            .find(|f| f.relative_path == remote_file.relative_path)
-        {
+        if let Some(local) = self.index_files.iter().find(|f| f.relative_path == remote_file.relative_path) {
             local.sequence_num != remote_file.sequence_num
                 && local.modified_timestamp_secs != remote_file.modified_timestamp_secs
                 && local.blocks != remote_file.blocks
@@ -3246,12 +3242,7 @@ impl SovereignKeycloakIdentityProvider {
         });
     }
 
-    pub fn authenticate_user(
-        &mut self,
-        username: &str,
-        auth_token: &[u8],
-        current_time: u64,
-    ) -> Result<String, &'static str> {
+    pub fn authenticate_user(&mut self, username: &str, auth_token: &[u8], current_time: u64) -> Result<String, &'static str> {
         let user = self
             .users
             .iter()
@@ -3277,11 +3268,7 @@ impl SovereignKeycloakIdentityProvider {
         Ok(token)
     }
 
-    pub fn validate_and_parse_claims(
-        &self,
-        token: &str,
-        current_time: u64,
-    ) -> Result<JwtTokenClaims, &'static str> {
+    pub fn validate_and_parse_claims(&self, token: &str, current_time: u64) -> Result<JwtTokenClaims, &'static str> {
         if !self.active_tokens.contains(&token.to_string()) {
             return Err("KeycloakIdP: Token revoked or invalid");
         }
@@ -3360,14 +3347,7 @@ impl SovereignStraceSyscallTracerEngine {
         }
     }
 
-    pub fn record_syscall(
-        &mut self,
-        pid: usize,
-        name: &str,
-        args: &[u64],
-        ret: i64,
-        duration_ns: u64,
-    ) -> bool {
+    pub fn record_syscall(&mut self, pid: usize, name: &str, args: &[u64], ret: i64, duration_ns: u64) -> bool {
         if !self.traced_pids.contains(&pid) {
             return false;
         }
@@ -3452,11 +3432,7 @@ impl SovereignGlusterFsDistributedEngine {
         });
     }
 
-    pub fn write_distributed_file(
-        &mut self,
-        file_path: &str,
-        payload: &[u8],
-    ) -> Result<usize, &'static str> {
+    pub fn write_distributed_file(&mut self, file_path: &str, payload: &[u8]) -> Result<usize, &'static str> {
         let online_bricks: Vec<String> = self
             .bricks
             .iter()
@@ -3471,11 +3447,7 @@ impl SovereignGlusterFsDistributedEngine {
         let replicas = online_bricks[..self.replica_count].to_vec();
 
         for target in &replicas {
-            if let Some(brick) = self
-                .bricks
-                .iter_mut()
-                .find(|b| format!("{}:{}", b.node_id, b.brick_path) == *target)
-            {
+            if let Some(brick) = self.bricks.iter_mut().find(|b| format!("{}:{}", b.node_id, b.brick_path) == *target) {
                 brick.free_capacity_bytes -= payload.len() as u64;
             }
         }
@@ -3509,9 +3481,7 @@ impl SovereignGlusterFsDistributedEngine {
 
         let mut healed = 0;
         for brick in &online_bricks {
-            if !file.replica_bricks.contains(brick)
-                && file.replica_bricks.len() < self.replica_count
-            {
+            if !file.replica_bricks.contains(brick) && file.replica_bricks.len() < self.replica_count {
                 file.replica_bricks.push(brick.clone());
                 healed += 1;
             }
@@ -3816,33 +3786,19 @@ impl SovereignOpenSourceObsoletionOrchestrator {
         self.valgrind_debugger.shadow_malloc(0x7fff0000, 1024);
         let _ = self.nebula_mesh.perform_noise_handshake("lighthouse_01");
 
-        let _seq = self.syncthing_sync.register_or_update_file(
-            "kernel/main.rs",
-            b"pub fn kernel_entry() {}",
-            1700000000,
-        );
+        let _seq = self.syncthing_sync.register_or_update_file("kernel/main.rs", b"pub fn kernel_entry() {}", 1700000000);
         let secret_auth_token = [0xAA, 0xBB, 0xCC, 0xDD];
-        self.keycloak_idp
-            .register_user("admin", &secret_auth_token, &["admin_role"]);
-        let token = self
-            .keycloak_idp
-            .authenticate_user("admin", &secret_auth_token, 1700000000)?;
-        let claims = self
-            .keycloak_idp
-            .validate_and_parse_claims(&token, 1700000100)?;
+        self.keycloak_idp.register_user("admin", &secret_auth_token, &["admin_role"]);
+        let token = self.keycloak_idp.authenticate_user("admin", &secret_auth_token, 1700000000)?;
+        let claims = self.keycloak_idp.validate_and_parse_claims(&token, 1700000100)?;
         assert_eq!(claims.sub, "admin");
 
         self.strace_tracer.attach_pid(1);
-        self.strace_tracer
-            .record_syscall(1, "sys_open", &[0x1000, 0], 0, 120);
+        self.strace_tracer.record_syscall(1, "sys_open", &[0x1000, 0], 0, 120);
 
-        self.glusterfs_store
-            .add_brick("node1", "/data/brick1", 1_000_000_000);
-        self.glusterfs_store
-            .add_brick("node2", "/data/brick2", 1_000_000_000);
-        let replicas_written = self
-            .glusterfs_store
-            .write_distributed_file("config/sys.json", b"{\"mode\": \"sovereign\"}")?;
+        self.glusterfs_store.add_brick("node1", "/data/brick1", 1_000_000_000);
+        self.glusterfs_store.add_brick("node2", "/data/brick2", 1_000_000_000);
+        let replicas_written = self.glusterfs_store.write_distributed_file("config/sys.json", b"{\"mode\": \"sovereign\"}")?;
         assert_eq!(replicas_written, 2);
 
         Ok(format!(
@@ -6143,9 +6099,7 @@ impl SovereignAstGrepStructuralEngine {
                     bindings.insert("$VAR".to_string(), var_name);
                     matched = true;
                 }
-            } else if pat_clean.contains("$FUNC")
-                && (trimmed.contains("fn ") || trimmed.contains("def "))
-            {
+            } else if pat_clean.contains("$FUNC") && (trimmed.contains("fn ") || trimmed.contains("def ")) {
                 if let Some(fn_pos) = trimmed.find("fn ") {
                     let rest = &trimmed[fn_pos + 3..];
                     if let Some(paren_pos) = rest.find('(') {
@@ -6239,16 +6193,8 @@ impl SovereignDifftasticSyntaxDiffEngine {
             let l_line = left_lines.get(i).copied().unwrap_or("");
             let r_line = right_lines.get(i).copied().unwrap_or("");
 
-            let l_clean = if self.ignore_whitespace {
-                l_line.trim()
-            } else {
-                l_line
-            };
-            let r_clean = if self.ignore_whitespace {
-                r_line.trim()
-            } else {
-                r_line
-            };
+            let l_clean = if self.ignore_whitespace { l_line.trim() } else { l_line };
+            let r_clean = if self.ignore_whitespace { r_line.trim() } else { r_line };
 
             if l_clean == r_clean {
                 hunks.push(SyntaxDiffHunk {
@@ -6331,8 +6277,7 @@ impl SovereignRcloneCloudSyncEngine {
     }
 
     pub fn add_remote(&mut self, name: &str, backend_type: &str) {
-        self.remote_backends
-            .push(format!("{}:{}", name, backend_type));
+        self.remote_backends.push(format!("{}:{}", name, backend_type));
     }
 
     pub fn sync(&mut self, source: &str, dest: &str, bytes: u64) -> bool {
@@ -7527,8 +7472,7 @@ mod tests {
         let mut sync = SovereignSyncthingPeerSyncEngine::new("folder_alpha");
         sync.connect_device("device_node_1");
 
-        let seq1 =
-            sync.register_or_update_file("docs/readme.txt", b"Sovereign Sync Data", 1700000000);
+        let seq1 = sync.register_or_update_file("docs/readme.txt", b"Sovereign Sync Data", 1700000000);
         assert_eq!(seq1, 1);
         assert_eq!(sync.index_files.len(), 1);
 
@@ -7548,9 +7492,7 @@ mod tests {
         let token_hash = [0x01, 0x02, 0x03, 0x04];
         idp.register_user("alice", &token_hash, &["developer", "admin"]);
 
-        let token = idp
-            .authenticate_user("alice", &token_hash, 1700000000)
-            .unwrap();
+        let token = idp.authenticate_user("alice", &token_hash, 1700000000).unwrap();
         assert!(token.contains("eyJ.sovereign.jwt|prod_realm|alice"));
 
         let claims = idp.validate_and_parse_claims(&token, 1700000500).unwrap();
@@ -7584,9 +7526,7 @@ mod tests {
         gluster.add_brick("nodeB", "/srv/brick2", 10_000_000);
         gluster.add_brick("nodeC", "/srv/brick3", 10_000_000);
 
-        let written_replicas = gluster
-            .write_distributed_file("shared/dataset.csv", b"id,val\n1,100")
-            .unwrap();
+        let written_replicas = gluster.write_distributed_file("shared/dataset.csv", b"id,val\n1,100").unwrap();
         assert_eq!(written_replicas, 2);
         assert_eq!(gluster.files.len(), 1);
 

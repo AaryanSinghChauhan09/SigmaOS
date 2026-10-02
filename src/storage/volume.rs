@@ -1,6 +1,7 @@
 /// OOP-based Volume Management for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 241
 /// Implements logical volume management
+
 extern crate alloc;
 
 #[cfg(not(target_os = "none"))]
@@ -297,11 +298,7 @@ impl SnapshotManager for SimpleSnapshotManager {
 }
 
 #[cfg(target_os = "none")]
-pub struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
+pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 
 #[cfg(target_os = "none")]
 impl<T> Vec<T> {
@@ -360,7 +357,4 @@ impl<T> Vec<T> {
 }
 
 #[cfg(target_os = "none")]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }

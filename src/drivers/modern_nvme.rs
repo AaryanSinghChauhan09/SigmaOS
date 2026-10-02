@@ -174,13 +174,7 @@ pub struct AhciCommandHeader {
 
 impl AhciCommandHeader {
     pub const fn new() -> Self {
-        Self {
-            opts: 0,
-            prdtl: 0,
-            prdbc: 0,
-            ctba: 0,
-            reserved: [0; 4],
-        }
+        Self { opts: 0, prdtl: 0, prdbc: 0, ctba: 0, reserved: [0; 4] }
     }
 }
 
@@ -238,8 +232,7 @@ pub enum PowerState {
     FullOn,
     Standby,
     Sleep,
-    Unknown,
-}
+    Unknown,}
 
 #[cfg(test)]
 pub trait PeripheralDevice {

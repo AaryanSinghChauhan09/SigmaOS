@@ -1,6 +1,6 @@
 extern crate alloc;
-use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use alloc::string::{String, ToString};
 use std::collections::HashMap;
 
 /// Arch Linux inspired AUR-style user repos and minimal base

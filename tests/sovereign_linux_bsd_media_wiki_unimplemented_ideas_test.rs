@@ -9,39 +9,13 @@ fn test_tech_media_portal_intelligence_feed_full_coverage() {
     assert_eq!(feed.total_portals_count(), 33);
 
     let portal_keys = [
-        "9to5google",
-        "9to5linux",
-        "9to5mac",
-        "androidauthority",
-        "androidpolice",
-        "appuals",
-        "distrowatch",
-        "frappe",
-        "geekygadgets",
-        "hwbusters",
-        "howtogeek",
-        "infoworld",
-        "itsfoss",
-        "itdaily",
-        "kdnuggets",
-        "linuxdotcom",
-        "linuxorg",
-        "linuxfoundation",
-        "linuxteck",
-        "makeuseof",
-        "marktechpost",
-        "opensourceforu",
-        "pcmag",
-        "pcworld",
-        "phoronix",
-        "techcrunch",
-        "techpowerup",
-        "techspot",
-        "thenewstack",
-        "windowscentral",
-        "windowslatest",
-        "xdadevelopers",
-        "zdnet",
+        "9to5google", "9to5linux", "9to5mac", "androidauthority", "androidpolice",
+        "appuals", "distrowatch", "frappe", "geekygadgets", "hwbusters",
+        "howtogeek", "infoworld", "itsfoss", "itdaily", "kdnuggets",
+        "linuxdotcom", "linuxorg", "linuxfoundation", "linuxteck", "makeuseof",
+        "marktechpost", "opensourceforu", "pcmag", "pcworld", "phoronix",
+        "techcrunch", "techpowerup", "techspot", "thenewstack", "windowscentral",
+        "windowslatest", "xdadevelopers", "zdnet"
     ];
 
     for key in &portal_keys {
@@ -55,8 +29,7 @@ fn test_tech_media_portal_intelligence_feed_full_coverage() {
     }
 
     assert!(feed.ingest_article("9to5linux", "Kernel 6.12 Sched_ext Release"));
-    assert!(!feed.ingest_article("9to5linux", "Kernel 6.12 Sched_ext Release"));
-    // Duplicate check
+    assert!(!feed.ingest_article("9to5linux", "Kernel 6.12 Sched_ext Release")); // Duplicate check
 }
 
 #[test]
@@ -78,15 +51,11 @@ fn test_github_wiki_and_md_roadmap_fulfillment_suite() {
     assert!(core >= 4);
 
     // GPUDirect DMA descriptor
-    let desc_res = suite
-        .gpudirect_dma
-        .build_dma_descriptor(0x1000_0000, 0xd000_0000, 2048);
+    let desc_res = suite.gpudirect_dma.build_dma_descriptor(0x1000_0000, 0xd000_0000, 2048);
     assert!(desc_res.is_ok());
 
     // eBPF relative jmp calculation
-    let jmp = suite
-        .ebpf_trampoline
-        .generate_x86_relative_jmp(0x1000, 0x5000);
+    let jmp = suite.ebpf_trampoline.generate_x86_relative_jmp(0x1000, 0x5000);
     assert_eq!(jmp[0], 0xE9);
 
     // PQC Kyber peer

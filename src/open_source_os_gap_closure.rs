@@ -5031,14 +5031,10 @@ mod tests {
         cilium.register_security_identity(100, &["role=frontend"]);
         cilium.register_security_identity(200, &["role=backend"]);
 
-        let encrypted = cilium
-            .encapsulate_and_encrypt(100, 200, b"SQL_QUERY")
-            .unwrap();
+        let encrypted = cilium.encapsulate_and_encrypt(100, 200, b"SQL_QUERY").unwrap();
         assert!(encrypted.starts_with(b"CILIUM_WG_TAG[src=100,dst=200]:"));
 
-        assert!(cilium
-            .encapsulate_and_encrypt(100, 999, b"PAYLOAD")
-            .is_err());
+        assert!(cilium.encapsulate_and_encrypt(100, 999, b"PAYLOAD").is_err());
     }
 
     #[test]
@@ -5643,8 +5639,11 @@ impl SovereignKatranL4LoadBalancerEngine {
     pub fn rebuild_maglev_lookup_table(&mut self) {
         let m = self.maglev_lookup_table_size;
         let mut lut = vec![None; m];
-        let healthy_backends: Vec<&KatranBackendServer> =
-            self.backends.values().filter(|b| b.is_healthy).collect();
+        let healthy_backends: Vec<&KatranBackendServer> = self
+            .backends
+            .values()
+            .filter(|b| b.is_healthy)
+            .collect();
 
         if healthy_backends.is_empty() {
             self.lookup_table = lut;
@@ -5692,11 +5691,7 @@ impl SovereignKatranL4LoadBalancerEngine {
         self.lookup_table = lut;
     }
 
-    pub fn route_5tuple_flow(
-        &mut self,
-        client_ip: &str,
-        client_port: u16,
-    ) -> Option<KatranBackendServer> {
+    pub fn route_5tuple_flow(&mut self, client_ip: &str, client_port: u16) -> Option<KatranBackendServer> {
         if self.lookup_table.is_empty() {
             return None;
         }
@@ -5719,16 +5714,8 @@ impl SovereignKatranL4LoadBalancerEngine {
         None
     }
 
-    pub fn encapsulate_gue_packet(
-        &self,
-        backend: &KatranBackendServer,
-        inner_payload: &[u8],
-    ) -> Vec<u8> {
-        let mut gue_hdr = format!(
-            "GUE_ENCAP_VIP:[{}:{}]->REAL:[{}:{}]:",
-            self.vip_address, self.vip_port, backend.ip_address, backend.port
-        )
-        .into_bytes();
+    pub fn encapsulate_gue_packet(&self, backend: &KatranBackendServer, inner_payload: &[u8]) -> Vec<u8> {
+        let mut gue_hdr = format!("GUE_ENCAP_VIP:[{}:{}]->REAL:[{}:{}]:", self.vip_address, self.vip_port, backend.ip_address, backend.port).into_bytes();
         gue_hdr.extend_from_slice(inner_payload);
         gue_hdr
     }
@@ -5789,15 +5776,13 @@ impl SovereignCiliumEbpfEncryptionGuard {
         match self.encryption_mode {
             CiliumEncryptionMode::Disabled => Ok(payload.to_vec()),
             CiliumEncryptionMode::WireGuard => {
-                let mut wireguard_pkt =
-                    format!("CILIUM_WG_TAG[src={},dst={}]:", src_id, dst_id).into_bytes();
+                let mut wireguard_pkt = format!("CILIUM_WG_TAG[src={},dst={}]:", src_id, dst_id).into_bytes();
                 wireguard_pkt.extend_from_slice(payload);
                 self.total_encrypted_bytes += wireguard_pkt.len() as u64;
                 Ok(wireguard_pkt)
             }
             CiliumEncryptionMode::Ipsec => {
-                let mut ipsec_pkt =
-                    format!("CILIUM_IPSEC_ESP[src={},dst={}]:", src_id, dst_id).into_bytes();
+                let mut ipsec_pkt = format!("CILIUM_IPSEC_ESP[src={},dst={}]:", src_id, dst_id).into_bytes();
                 ipsec_pkt.extend_from_slice(payload);
                 self.total_encrypted_bytes += ipsec_pkt.len() as u64;
                 Ok(ipsec_pkt)
@@ -5920,11 +5905,7 @@ impl WaylandHyprlandCompositorEngine {
     }
 
     pub fn recalculate_tiling_layout(&mut self, workspace: u32) {
-        let active_count = self
-            .windows
-            .iter()
-            .filter(|w| w.workspace_id == workspace)
-            .count();
+        let active_count = self.windows.iter().filter(|w| w.workspace_id == workspace).count();
         if active_count == 0 {
             return;
         }
@@ -5933,11 +5914,7 @@ impl WaylandHyprlandCompositorEngine {
         let screen_h = 1080u32;
 
         if active_count == 1 {
-            if let Some(w) = self
-                .windows
-                .iter_mut()
-                .find(|w| w.workspace_id == workspace)
-            {
+            if let Some(w) = self.windows.iter_mut().find(|w| w.workspace_id == workspace) {
                 w.x = 0;
                 w.y = 0;
                 w.width = screen_w;
@@ -5948,11 +5925,7 @@ impl WaylandHyprlandCompositorEngine {
             let stack_h = screen_h / (active_count as u32 - 1);
 
             let mut stack_idx = 0;
-            for w in self
-                .windows
-                .iter_mut()
-                .filter(|w| w.workspace_id == workspace)
-            {
+            for w in self.windows.iter_mut().filter(|w| w.workspace_id == workspace) {
                 if stack_idx == 0 {
                     w.x = 0;
                     w.y = 0;
@@ -6043,8 +6016,7 @@ impl OpenSourceProjectSupremacySuite {
         katran_engine.register_backend(101, "192.168.1.10", 8080, 10);
         katran_engine.register_backend(102, "192.168.1.11", 8080, 10);
 
-        let mut cilium_guard =
-            SovereignCiliumEbpfEncryptionGuard::new(CiliumEncryptionMode::WireGuard);
+        let mut cilium_guard = SovereignCiliumEbpfEncryptionGuard::new(CiliumEncryptionMode::WireGuard);
         cilium_guard.register_security_identity(1001, &["app=web", "env=prod"]);
         cilium_guard.register_security_identity(2002, &["app=db", "env=prod"]);
 
@@ -6083,11 +6055,7 @@ impl OpenSourceProjectSupremacySuite {
     }
 
     /// Meta Katran: Route L4 5-tuple flow to real backend
-    pub fn route_katran_l4_flow(
-        &mut self,
-        client_ip: &str,
-        client_port: u16,
-    ) -> Option<KatranBackendServer> {
+    pub fn route_katran_l4_flow(&mut self, client_ip: &str, client_port: u16) -> Option<KatranBackendServer> {
         self.katran_engine.route_5tuple_flow(client_ip, client_port)
     }
 
@@ -6098,8 +6066,7 @@ impl OpenSourceProjectSupremacySuite {
         dst_id: u32,
         payload: &[u8],
     ) -> Result<Vec<u8>, &'static str> {
-        self.cilium_guard
-            .encapsulate_and_encrypt(src_id, dst_id, payload)
+        self.cilium_guard.encapsulate_and_encrypt(src_id, dst_id, payload)
     }
 
     /// Nix Flakes: Deduplicate identical store blobs using hard-links
@@ -6415,8 +6382,7 @@ impl OpenSourceProjectSupremacySuite {
         }
         #[cfg(any(feature = "standalone_test", feature = "gap_closure_test"))]
         {
-            let mut picker =
-                self::open_source_obsoletion::SovereignTelescopeFuzzyPickerEngine::new();
+            let mut picker = self::open_source_obsoletion::SovereignTelescopeFuzzyPickerEngine::new();
             picker.add_item(1, "Open Terminal", "action", Some("command"));
             picker.add_item(2, "Open Settings", "action", Some("command"));
             picker

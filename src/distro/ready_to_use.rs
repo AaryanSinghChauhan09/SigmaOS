@@ -574,8 +574,7 @@ impl DocumentViewerEngine {
 
     pub fn spool_print_job(&mut self, printer_name: &str) -> String {
         let job_id = format!("job-{}", self.print_spool_queue.len() + 1);
-        self.print_spool_queue
-            .push(format!("{}: {}", job_id, printer_name));
+        self.print_spool_queue.push(format!("{}: {}", job_id, printer_name));
         job_id
     }
 }
@@ -613,102 +612,22 @@ impl DesktopProductionPriorityMatrix {
     pub fn new() -> Self {
         Self {
             components: vec![
-                ProductionComponentItem {
-                    name: "Display Server".to_string(),
-                    priority: ComponentPriorityLevel::Critical,
-                    effort_weeks: 4,
-                    dependencies: vec!["GPU driver".to_string()],
-                },
-                ProductionComponentItem {
-                    name: "Window Manager".to_string(),
-                    priority: ComponentPriorityLevel::Critical,
-                    effort_weeks: 3,
-                    dependencies: vec!["Display Server".to_string()],
-                },
-                ProductionComponentItem {
-                    name: "Terminal Emulator".to_string(),
-                    priority: ComponentPriorityLevel::Critical,
-                    effort_weeks: 2,
-                    dependencies: vec!["Display Server".to_string(), "Fonts".to_string()],
-                },
-                ProductionComponentItem {
-                    name: "Font Rendering".to_string(),
-                    priority: ComponentPriorityLevel::Critical,
-                    effort_weeks: 2,
-                    dependencies: Vec::new(),
-                },
-                ProductionComponentItem {
-                    name: "File Manager".to_string(),
-                    priority: ComponentPriorityLevel::Critical,
-                    effort_weeks: 3,
-                    dependencies: vec!["Display Server".to_string(), "VFS".to_string()],
-                },
-                ProductionComponentItem {
-                    name: "Settings Panel".to_string(),
-                    priority: ComponentPriorityLevel::High,
-                    effort_weeks: 3,
-                    dependencies: vec!["Display Server".to_string()],
-                },
-                ProductionComponentItem {
-                    name: "Authentication".to_string(),
-                    priority: ComponentPriorityLevel::High,
-                    effort_weeks: 3,
-                    dependencies: vec!["Kernel".to_string()],
-                },
-                ProductionComponentItem {
-                    name: "Network Manager".to_string(),
-                    priority: ComponentPriorityLevel::High,
-                    effort_weeks: 4,
-                    dependencies: vec!["Network stack".to_string(), "WiFi".to_string()],
-                },
-                ProductionComponentItem {
-                    name: "Audio System".to_string(),
-                    priority: ComponentPriorityLevel::High,
-                    effort_weeks: 3,
-                    dependencies: vec!["ALSA drivers".to_string()],
-                },
-                ProductionComponentItem {
-                    name: "Text Editor".to_string(),
-                    priority: ComponentPriorityLevel::Medium,
-                    effort_weeks: 2,
-                    dependencies: vec!["Display Server".to_string()],
-                },
-                ProductionComponentItem {
-                    name: "Git".to_string(),
-                    priority: ComponentPriorityLevel::Medium,
-                    effort_weeks: 5,
-                    dependencies: Vec::new(),
-                },
-                ProductionComponentItem {
-                    name: "Debugger".to_string(),
-                    priority: ComponentPriorityLevel::Medium,
-                    effort_weeks: 4,
-                    dependencies: vec!["Kernel".to_string(), "DWARF".to_string()],
-                },
-                ProductionComponentItem {
-                    name: "USB Support".to_string(),
-                    priority: ComponentPriorityLevel::Medium,
-                    effort_weeks: 3,
-                    dependencies: vec!["xHCI driver".to_string()],
-                },
-                ProductionComponentItem {
-                    name: "Document Viewer".to_string(),
-                    priority: ComponentPriorityLevel::Medium,
-                    effort_weeks: 2,
-                    dependencies: vec!["Display Server".to_string(), "PDF lib".to_string()],
-                },
-                ProductionComponentItem {
-                    name: "Service Manager".to_string(),
-                    priority: ComponentPriorityLevel::Medium,
-                    effort_weeks: 2,
-                    dependencies: vec!["Kernel".to_string()],
-                },
-                ProductionComponentItem {
-                    name: "Compression Tools".to_string(),
-                    priority: ComponentPriorityLevel::Low,
-                    effort_weeks: 2,
-                    dependencies: Vec::new(),
-                },
+                ProductionComponentItem { name: "Display Server".to_string(), priority: ComponentPriorityLevel::Critical, effort_weeks: 4, dependencies: vec!["GPU driver".to_string()] },
+                ProductionComponentItem { name: "Window Manager".to_string(), priority: ComponentPriorityLevel::Critical, effort_weeks: 3, dependencies: vec!["Display Server".to_string()] },
+                ProductionComponentItem { name: "Terminal Emulator".to_string(), priority: ComponentPriorityLevel::Critical, effort_weeks: 2, dependencies: vec!["Display Server".to_string(), "Fonts".to_string()] },
+                ProductionComponentItem { name: "Font Rendering".to_string(), priority: ComponentPriorityLevel::Critical, effort_weeks: 2, dependencies: Vec::new() },
+                ProductionComponentItem { name: "File Manager".to_string(), priority: ComponentPriorityLevel::Critical, effort_weeks: 3, dependencies: vec!["Display Server".to_string(), "VFS".to_string()] },
+                ProductionComponentItem { name: "Settings Panel".to_string(), priority: ComponentPriorityLevel::High, effort_weeks: 3, dependencies: vec!["Display Server".to_string()] },
+                ProductionComponentItem { name: "Authentication".to_string(), priority: ComponentPriorityLevel::High, effort_weeks: 3, dependencies: vec!["Kernel".to_string()] },
+                ProductionComponentItem { name: "Network Manager".to_string(), priority: ComponentPriorityLevel::High, effort_weeks: 4, dependencies: vec!["Network stack".to_string(), "WiFi".to_string()] },
+                ProductionComponentItem { name: "Audio System".to_string(), priority: ComponentPriorityLevel::High, effort_weeks: 3, dependencies: vec!["ALSA drivers".to_string()] },
+                ProductionComponentItem { name: "Text Editor".to_string(), priority: ComponentPriorityLevel::Medium, effort_weeks: 2, dependencies: vec!["Display Server".to_string()] },
+                ProductionComponentItem { name: "Git".to_string(), priority: ComponentPriorityLevel::Medium, effort_weeks: 5, dependencies: Vec::new() },
+                ProductionComponentItem { name: "Debugger".to_string(), priority: ComponentPriorityLevel::Medium, effort_weeks: 4, dependencies: vec!["Kernel".to_string(), "DWARF".to_string()] },
+                ProductionComponentItem { name: "USB Support".to_string(), priority: ComponentPriorityLevel::Medium, effort_weeks: 3, dependencies: vec!["xHCI driver".to_string()] },
+                ProductionComponentItem { name: "Document Viewer".to_string(), priority: ComponentPriorityLevel::Medium, effort_weeks: 2, dependencies: vec!["Display Server".to_string(), "PDF lib".to_string()] },
+                ProductionComponentItem { name: "Service Manager".to_string(), priority: ComponentPriorityLevel::Medium, effort_weeks: 2, dependencies: vec!["Kernel".to_string()] },
+                ProductionComponentItem { name: "Compression Tools".to_string(), priority: ComponentPriorityLevel::Low, effort_weeks: 2, dependencies: Vec::new() },
             ],
         }
     }

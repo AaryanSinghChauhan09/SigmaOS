@@ -17,9 +17,9 @@ use alloc::format;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::vec;
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::BTreeMap;
@@ -28,9 +28,9 @@ use std::format;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec;
-#[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec;
 
 // ============================================================================
 // 1. Universal Package Formats & Normalized Manifests
@@ -208,61 +208,37 @@ impl UniversalDistroPackageFormat {
     /// Autodetects foreign package format from raw manifest text content keywords
     pub fn autodetect_format_from_manifest(manifest_text: &str) -> Self {
         let lower = manifest_text.to_lowercase();
-        if lower.contains("package:")
-            && (lower.contains("depends:") || lower.contains("architecture:"))
-        {
+        if lower.contains("package:") && (lower.contains("depends:") || lower.contains("architecture:")) {
             Self::AptDeb
-        } else if lower.contains("pkgname=")
-            || lower.contains("pkgver=")
-            || lower.contains("arch=(")
-        {
+        } else if lower.contains("pkgname=") || lower.contains("pkgver=") || lower.contains("arch=(") {
             Self::PacmanPkg
-        } else if lower.contains("%description")
-            || lower.contains("summary:")
-            || lower.contains("%prep")
-        {
+        } else if lower.contains("%description") || lower.contains("summary:") || lower.contains("%prep") {
             Self::DnfRpm
-        } else if lower.contains("# maintainer:")
-            && (lower.contains("pkgname=") || lower.contains("subpackages="))
-        {
+        } else if lower.contains("# maintainer:") && (lower.contains("pkgname=") || lower.contains("subpackages=")) {
             Self::AlpineApk
         } else if lower.contains("pkgname=") && lower.contains("short_desc=") {
             Self::VoidXbps
-        } else if lower.contains("eapi=")
-            || lower.contains("keywords=")
-            || lower.contains("inherit ")
-        {
+        } else if lower.contains("eapi=") || lower.contains("keywords=") || lower.contains("inherit ") {
             Self::GentooEbuild
         } else if lower.contains("name = ") && lower.contains("origin = ") {
             Self::BsdPkg
         } else if lower.contains("@name ") || lower.contains("@cwd ") {
             Self::OpenBsdPorts
-        } else if lower.contains("inputs.nixpkgs")
-            || lower.contains("stdenv.mkderivation")
-            || lower.contains("{ pkgs, ... }")
-        {
+        } else if lower.contains("inputs.nixpkgs") || lower.contains("stdenv.mkderivation") || lower.contains("{ pkgs, ... }") {
             Self::NixFlake
-        } else if lower.contains("define-public") && lower.contains("package-with-explicit-inputs")
-        {
+        } else if lower.contains("define-public") && lower.contains("package-with-explicit-inputs") {
             Self::GuixScheme
-        } else if lower.contains("app-id:") || lower.contains("runtime:") || lower.contains("sdk:")
-        {
+        } else if lower.contains("app-id:") || lower.contains("runtime:") || lower.contains("sdk:") {
             Self::FlatpakApp
         } else if lower.contains("name:") && lower.contains("confinement:") {
             Self::SnapApp
-        } else if lower.contains("<eopkg>")
-            || lower.contains("<source>")
-            || lower.contains("<package>")
-        {
+        } else if lower.contains("<eopkg>") || lower.contains("<source>") || lower.contains("<package>") {
             Self::SolusEopkg
         } else if lower.contains("swupd") || lower.contains("bundle:") {
             Self::SwupdBundle
         } else if lower.contains("class ") && lower.contains("< formula") {
             Self::HomebrewBottle
-        } else if lower.contains("[package]")
-            && lower.contains("name =")
-            && lower.contains("version =")
-        {
+        } else if lower.contains("[package]") && lower.contains("name =") && lower.contains("version =") {
             Self::CargoCrate
         } else {
             Self::NativeSigPkg
@@ -333,22 +309,11 @@ impl LinuxBsdPackageFormatConverterEngine {
                 }
                 UniversalDistroPackageFormat::PacmanPkg => {
                     if trimmed.starts_with("pkgname=") {
-                        name = trimmed["pkgname=".len()..]
-                            .trim()
-                            .trim_matches('"')
-                            .trim_matches('\'')
-                            .to_string();
+                        name = trimmed["pkgname=".len()..].trim().trim_matches('"').trim_matches('\'').to_string();
                     } else if trimmed.starts_with("pkgver=") {
-                        version = trimmed["pkgver=".len()..]
-                            .trim()
-                            .trim_matches('"')
-                            .trim_matches('\'')
-                            .to_string();
+                        version = trimmed["pkgver=".len()..].trim().trim_matches('"').trim_matches('\'').to_string();
                     } else if trimmed.starts_with("depends=") {
-                        let inner = trimmed["depends=".len()..]
-                            .trim()
-                            .trim_matches('(')
-                            .trim_matches(')');
+                        let inner = trimmed["depends=".len()..].trim().trim_matches('(').trim_matches(')');
                         for dep in inner.split_whitespace() {
                             let dep_clean = dep.trim_matches('"').trim_matches('\'');
                             if !dep_clean.is_empty() {
@@ -373,21 +338,11 @@ impl LinuxBsdPackageFormatConverterEngine {
                 }
                 UniversalDistroPackageFormat::AlpineApk => {
                     if trimmed.starts_with("pkgname=") {
-                        name = trimmed["pkgname=".len()..]
-                            .trim()
-                            .trim_matches('"')
-                            .to_string();
+                        name = trimmed["pkgname=".len()..].trim().trim_matches('"').to_string();
                     } else if trimmed.starts_with("pkgver=") {
-                        version = trimmed["pkgver=".len()..]
-                            .trim()
-                            .trim_matches('"')
-                            .to_string();
+                        version = trimmed["pkgver=".len()..].trim().trim_matches('"').to_string();
                     } else if trimmed.starts_with("depends=") {
-                        for dep in trimmed["depends=".len()..]
-                            .trim()
-                            .trim_matches('"')
-                            .split_whitespace()
-                        {
+                        for dep in trimmed["depends=".len()..].trim().trim_matches('"').split_whitespace() {
                             if !dep.is_empty() {
                                 dependencies.push(dep.to_string());
                             }
@@ -398,15 +353,8 @@ impl LinuxBsdPackageFormatConverterEngine {
                     if trimmed.starts_with("EAPI=") {
                         capabilities.push("gentoo-eapi".to_string());
                     } else if trimmed.starts_with("RDEPEND=") {
-                        for dep in trimmed["RDEPEND=".len()..]
-                            .trim()
-                            .trim_matches('"')
-                            .split_whitespace()
-                        {
-                            let clean_dep = dep
-                                .trim_start_matches(">=")
-                                .trim_start_matches("<=")
-                                .trim_start_matches('=');
+                        for dep in trimmed["RDEPEND=".len()..].trim().trim_matches('"').split_whitespace() {
+                            let clean_dep = dep.trim_start_matches(">=").trim_start_matches("<=").trim_start_matches('=');
                             if !clean_dep.is_empty() {
                                 dependencies.push(clean_dep.to_string());
                             }
@@ -415,34 +363,18 @@ impl LinuxBsdPackageFormatConverterEngine {
                 }
                 UniversalDistroPackageFormat::BsdPkg | UniversalDistroPackageFormat::OpenBsdPkg => {
                     if trimmed.starts_with("name:") {
-                        name = trimmed["name:".len()..]
-                            .trim()
-                            .trim_matches('"')
-                            .to_string();
+                        name = trimmed["name:".len()..].trim().trim_matches('"').to_string();
                     } else if trimmed.starts_with("version:") {
-                        version = trimmed["version:".len()..]
-                            .trim()
-                            .trim_matches('"')
-                            .to_string();
+                        version = trimmed["version:".len()..].trim().trim_matches('"').to_string();
                     } else if trimmed.contains("origin:") {
                         capabilities.push(trimmed.to_string());
                     }
                 }
                 _ => {
                     if trimmed.starts_with("name:") || trimmed.starts_with("name=") {
-                        name = trimmed
-                            .split([':', '='])
-                            .nth(1)
-                            .unwrap_or("app")
-                            .trim()
-                            .to_string();
+                        name = trimmed.split([':', '=']).nth(1).unwrap_or("app").trim().to_string();
                     } else if trimmed.starts_with("version:") || trimmed.starts_with("version=") {
-                        version = trimmed
-                            .split([':', '='])
-                            .nth(1)
-                            .unwrap_or("1.0.0")
-                            .trim()
-                            .to_string();
+                        version = trimmed.split([':', '=']).nth(1).unwrap_or("1.0.0").trim().to_string();
                     }
                 }
             }
@@ -458,10 +390,8 @@ impl LinuxBsdPackageFormatConverterEngine {
             declared_dependencies: dependencies,
             provides_capabilities: capabilities,
             sandbox_level: match format {
-                UniversalDistroPackageFormat::BsdPkg
-                | UniversalDistroPackageFormat::FreeBsdPorts => 3, // Full Capsicum
-                UniversalDistroPackageFormat::FlatpakApp
-                | UniversalDistroPackageFormat::SnapApp => 2, // Landlock+Seccomp
+                UniversalDistroPackageFormat::BsdPkg | UniversalDistroPackageFormat::FreeBsdPorts => 3, // Full Capsicum
+                UniversalDistroPackageFormat::FlatpakApp | UniversalDistroPackageFormat::SnapApp => 2, // Landlock+Seccomp
                 _ => 2,
             },
         }
@@ -471,10 +401,7 @@ impl LinuxBsdPackageFormatConverterEngine {
         format: UniversalDistroPackageFormat,
         raw_content: &str,
     ) -> Result<UniversalDistroPackageManifest, &'static str> {
-        Ok(Self::convert_native_manifest_to_normalized(
-            format,
-            raw_content,
-        ))
+        Ok(Self::convert_native_manifest_to_normalized(format, raw_content))
     }
 }
 
@@ -514,10 +441,7 @@ impl UniversalPmPrAutomatedReviewer {
 
         for dep in &manifest.declared_dependencies {
             if dep.contains("conflict") || dep.contains("vulnerable") {
-                notes.push(format!(
-                    "CONFLICT: Dependency {} violates SAT solver constraints",
-                    dep
-                ));
+                notes.push(format!("CONFLICT: Dependency {} violates SAT solver constraints", dep));
                 sat_passed = false;
                 risk_score += 40;
             }
@@ -531,17 +455,13 @@ impl UniversalPmPrAutomatedReviewer {
             risk_score += 15;
         }
 
-        let sandbox_level = if manifest.name.contains("kernel") || manifest.name.contains("driver")
-        {
+        let sandbox_level = if manifest.name.contains("kernel") || manifest.name.contains("driver") {
             3 // Capsicum sandbox
         } else {
             2 // Landlock + Seccomp
         };
 
-        notes.push(format!(
-            "AUDIT PASSED: Assigned sandbox isolation level {}",
-            sandbox_level
-        ));
+        notes.push(format!("AUDIT PASSED: Assigned sandbox isolation level {}", sandbox_level));
 
         AutomatedPrReviewReport {
             pr_id,
@@ -557,10 +477,7 @@ impl UniversalPmPrAutomatedReviewer {
         bridge: &SovereignUniversalPmPrBridgeEngine,
         pr_id: u64,
     ) -> Result<bool, &'static str> {
-        let tx = bridge
-            .pr_transactions
-            .get(&pr_id)
-            .ok_or("PR ID not found")?;
+        let tx = bridge.pr_transactions.get(&pr_id).ok_or("PR ID not found")?;
         if tx.manifest.name.is_empty() || tx.manifest.version.is_empty() {
             return Err("Invalid package name or version");
         }
@@ -656,10 +573,7 @@ impl UniversalCliCommandBridge {
                     source_pm: "apt",
                     package_name: pkg.to_string(),
                     target_format: UniversalDistroPackageFormat::AptDeb,
-                    generated_manifest: format!(
-                        "Package: {}\nVersion: 1.0.0\nSection: main\nDepends: libc6",
-                        pkg
-                    ),
+                    generated_manifest: format!("Package: {}\nVersion: 1.0.0\nSection: main\nDepends: libc6", pkg),
                     inferred_dependencies: vec!["libc6".to_string()],
                 })
             }
@@ -669,10 +583,7 @@ impl UniversalCliCommandBridge {
                     source_pm: "pacman",
                     package_name: pkg.to_string(),
                     target_format: UniversalDistroPackageFormat::PacmanPkg,
-                    generated_manifest: format!(
-                        "pkgname = {}\npkgver = 1.0.0\ndepend = glibc",
-                        pkg
-                    ),
+                    generated_manifest: format!("pkgname = {}\npkgver = 1.0.0\ndepend = glibc", pkg),
                     inferred_dependencies: vec!["glibc".to_string()],
                 })
             }
@@ -712,10 +623,7 @@ impl UniversalCliCommandBridge {
                     source_pm: "portage",
                     package_name: pkg.to_string(),
                     target_format: UniversalDistroPackageFormat::GentooEbuild,
-                    generated_manifest: format!(
-                        "EAPI=8\nDESCRIPTION=\"{}\"\nRDEPEND=\"sys-libs/glibc\"",
-                        pkg
-                    ),
+                    generated_manifest: format!("EAPI=8\nDESCRIPTION=\"{}\"\nRDEPEND=\"sys-libs/glibc\"", pkg),
                     inferred_dependencies: vec!["sys-libs/glibc".to_string()],
                 })
             }
@@ -725,10 +633,7 @@ impl UniversalCliCommandBridge {
                     source_pm: "pkg",
                     package_name: pkg.to_string(),
                     target_format: UniversalDistroPackageFormat::BsdPkg,
-                    generated_manifest: format!(
-                        "name: {}\nversion: 1.0.0\ndeps: {{ libc: {{ origin: \"devel/libc\" }} }}",
-                        pkg
-                    ),
+                    generated_manifest: format!("name: {}\nversion: 1.0.0\ndeps: {{ libc: {{ origin: \"devel/libc\" }} }}", pkg),
                     inferred_dependencies: vec!["libc".to_string()],
                 })
             }
@@ -738,10 +643,7 @@ impl UniversalCliCommandBridge {
                     source_pm: "nix",
                     package_name: pkg.to_string(),
                     target_format: UniversalDistroPackageFormat::NixFlake,
-                    generated_manifest: format!(
-                        "{{ description = \"{}\"; outputs = {{ self, nixpkgs }}: {{ }}; }}",
-                        pkg
-                    ),
+                    generated_manifest: format!("{{ description = \"{}\"; outputs = {{ self, nixpkgs }}: {{ }}; }}", pkg),
                     inferred_dependencies: vec!["stdenv".to_string()],
                 })
             }
@@ -779,11 +681,7 @@ impl SovereignUniversalPmPrBridgeEngine {
         let translation = UniversalCliCommandBridge::parse_command(cli_command)
             .ok_or("Unsupported foreign package manager CLI command")?;
 
-        let deps_refs: Vec<&str> = translation
-            .inferred_dependencies
-            .iter()
-            .map(|s| s.as_str())
-            .collect();
+        let deps_refs: Vec<&str> = translation.inferred_dependencies.iter().map(|s| s.as_str()).collect();
 
         Ok(self.submit_foreign_package_pr(
             submitter,
@@ -820,9 +718,7 @@ impl SovereignUniversalPmPrBridgeEngine {
         let pr_id = self.total_prs_submitted;
 
         let sandbox_lvl = match format {
-            UniversalDistroPackageFormat::BsdPkg
-            | UniversalDistroPackageFormat::OpenBsdPorts
-            | UniversalDistroPackageFormat::FreeBsdPorts => 3,
+            UniversalDistroPackageFormat::BsdPkg | UniversalDistroPackageFormat::OpenBsdPorts | UniversalDistroPackageFormat::FreeBsdPorts => 3,
             UniversalDistroPackageFormat::FlatpakApp | UniversalDistroPackageFormat::SnapApp => 2,
             _ => 2,
         };
@@ -861,17 +757,12 @@ impl SovereignUniversalPmPrBridgeEngine {
         raw_manifest_content: &str,
         pqc_sig_bytes: &[u8],
     ) -> u64 {
-        let normalized =
-            LinuxBsdPackageFormatConverterEngine::convert_native_manifest_to_normalized(
-                format,
-                raw_manifest_content,
-            );
+        let normalized = LinuxBsdPackageFormatConverterEngine::convert_native_manifest_to_normalized(
+            format,
+            raw_manifest_content,
+        );
 
-        let deps: Vec<&str> = normalized
-            .declared_dependencies
-            .iter()
-            .map(|s| s.as_str())
-            .collect();
+        let deps: Vec<&str> = normalized.declared_dependencies.iter().map(|s| s.as_str()).collect();
 
         self.submit_foreign_package_pr(
             submitter,
@@ -915,9 +806,7 @@ impl SovereignUniversalPmPrBridgeEngine {
             .get_mut(&pr_id)
             .ok_or("PR ID not found")?;
 
-        if tx.status != UniversalPrStatus::SatValidated
-            && tx.status != UniversalPrStatus::ConvertedToSigPkg
-        {
+        if tx.status != UniversalPrStatus::SatValidated && tx.status != UniversalPrStatus::ConvertedToSigPkg {
             return Err("PR must pass SAT validation before conversion");
         }
 
@@ -957,8 +846,7 @@ impl SovereignUniversalPmPrBridgeEngine {
             return Err("Empty manifest text");
         }
 
-        let format =
-            UniversalDistroPackageFormat::autodetect_format_from_manifest(raw_manifest_text);
+        let format = UniversalDistroPackageFormat::autodetect_format_from_manifest(raw_manifest_text);
 
         // Extract package name and version from manifest text or fallback
         let mut extracted_name = String::new();
@@ -967,41 +855,21 @@ impl SovereignUniversalPmPrBridgeEngine {
 
         for line in raw_manifest_text.lines() {
             let l = line.trim();
-            if l.starts_with("Package:")
-                || l.starts_with("pkgname=")
-                || l.starts_with("Name:")
-                || l.starts_with("name =")
-            {
+            if l.starts_with("Package:") || l.starts_with("pkgname=") || l.starts_with("Name:") || l.starts_with("name =") {
                 let parts: Vec<&str> = l.split(&[':', '=', '"', '\''][..]).collect();
                 if parts.len() >= 2 && extracted_name.is_empty() {
-                    extracted_name = parts[1]
-                        .trim()
-                        .trim_matches('"')
-                        .trim_matches('\'')
-                        .to_string();
+                    extracted_name = parts[1].trim().trim_matches('"').trim_matches('\'').to_string();
                 }
-            } else if l.starts_with("Version:")
-                || l.starts_with("pkgver=")
-                || l.starts_with("version =")
-            {
+            } else if l.starts_with("Version:") || l.starts_with("pkgver=") || l.starts_with("version =") {
                 let parts: Vec<&str> = l.split(&[':', '=', '"', '\''][..]).collect();
                 if parts.len() >= 2 && extracted_version.is_empty() {
-                    extracted_version = parts[1]
-                        .trim()
-                        .trim_matches('"')
-                        .trim_matches('\'')
-                        .to_string();
+                    extracted_version = parts[1].trim().trim_matches('"').trim_matches('\'').to_string();
                 }
             } else if l.contains("Depends:") || l.contains("depends=") || l.contains("Requires:") {
                 let parts: Vec<&str> = l.split(&[':', '='][..]).collect();
                 if parts.len() >= 2 {
                     for dep in parts[1].split(',') {
-                        let clean_dep = dep
-                            .trim()
-                            .split_whitespace()
-                            .next()
-                            .unwrap_or("")
-                            .to_string();
+                        let clean_dep = dep.trim().split_whitespace().next().unwrap_or("").to_string();
                         if !clean_dep.is_empty() && !extracted_deps.contains(&clean_dep) {
                             extracted_deps.push(clean_dep);
                         }
@@ -1024,8 +892,7 @@ impl SovereignUniversalPmPrBridgeEngine {
                 let lower = dep.to_lowercase();
                 if lower.contains("glibc") || lower == "musl" || lower.contains("libc") {
                     "sovereign-libc".to_string()
-                } else if lower.contains("ssl") || lower.contains("crypto") || lower.contains("tls")
-                {
+                } else if lower.contains("ssl") || lower.contains("crypto") || lower.contains("tls") {
                     "sovereign-openssl".to_string()
                 } else if lower.contains("zlib") || lower.contains("zstd") || lower.contains("xz") {
                     "sovereign-compression".to_string()
@@ -1086,6 +953,7 @@ impl Default for SovereignUniversalPmPrBridgeEngine {
     }
 }
 
+
 // ============================================================================
 // STANDALONE UNIT TESTS
 // ============================================================================
@@ -1120,96 +988,24 @@ mod tests {
     #[test]
     fn test_all_28_distro_package_format_conversions() {
         let formats = [
-            (
-                UniversalDistroPackageFormat::AptDeb,
-                "debian-app",
-                &["libc6"][..],
-            ),
-            (
-                UniversalDistroPackageFormat::PacmanPkg,
-                "arch-app",
-                &["glibc"][..],
-            ),
-            (
-                UniversalDistroPackageFormat::DnfRpm,
-                "fedora-app",
-                &["systemd"][..],
-            ),
-            (
-                UniversalDistroPackageFormat::ZypperDeltaRpm,
-                "opensuse-app",
-                &["libzypp"][..],
-            ),
-            (
-                UniversalDistroPackageFormat::AlpineApk,
-                "alpine-app",
-                &["musl"][..],
-            ),
-            (
-                UniversalDistroPackageFormat::VoidXbps,
-                "void-app",
-                &["xbps"][..],
-            ),
-            (
-                UniversalDistroPackageFormat::GentooEbuild,
-                "gentoo-app",
-                &["portage"][..],
-            ),
-            (
-                UniversalDistroPackageFormat::BsdPkg,
-                "freebsd-app",
-                &["libc"][..],
-            ),
-            (
-                UniversalDistroPackageFormat::OpenBsdPorts,
-                "openbsd-app",
-                &["libc"][..],
-            ),
-            (
-                UniversalDistroPackageFormat::NetBsdPkgsrc,
-                "netbsd-app",
-                &["libc"][..],
-            ),
-            (
-                UniversalDistroPackageFormat::NixFlake,
-                "nix-app",
-                &["stdenv"][..],
-            ),
-            (
-                UniversalDistroPackageFormat::GuixScheme,
-                "guix-app",
-                &["stdenv"][..],
-            ),
-            (
-                UniversalDistroPackageFormat::FlatpakApp,
-                "flatpak-app",
-                &["org.freedesktop.Sdk"][..],
-            ),
-            (
-                UniversalDistroPackageFormat::SnapApp,
-                "snap-app",
-                &["core22"][..],
-            ),
-            (
-                UniversalDistroPackageFormat::AppImage,
-                "appimage-app",
-                &["fuse"][..],
-            ),
-            (
-                UniversalDistroPackageFormat::SwupdBundle,
-                "clearlinux-app",
-                &["swupd"][..],
-            ),
-            (
-                UniversalDistroPackageFormat::HomebrewBottle,
-                "homebrew-app",
-                &["openssl"][..],
-            ),
-            (
-                UniversalDistroPackageFormat::CargoCrate,
-                "cargo-app",
-                &["serde"][..],
-            ),
+            (UniversalDistroPackageFormat::AptDeb, "debian-app", &["libc6"][..]),
+            (UniversalDistroPackageFormat::PacmanPkg, "arch-app", &["glibc"][..]),
+            (UniversalDistroPackageFormat::DnfRpm, "fedora-app", &["systemd"][..]),
+            (UniversalDistroPackageFormat::ZypperDeltaRpm, "opensuse-app", &["libzypp"][..]),
+            (UniversalDistroPackageFormat::AlpineApk, "alpine-app", &["musl"][..]),
+            (UniversalDistroPackageFormat::VoidXbps, "void-app", &["xbps"][..]),
+            (UniversalDistroPackageFormat::GentooEbuild, "gentoo-app", &["portage"][..]),
+            (UniversalDistroPackageFormat::BsdPkg, "freebsd-app", &["libc"][..]),
+            (UniversalDistroPackageFormat::OpenBsdPorts, "openbsd-app", &["libc"][..]),
+            (UniversalDistroPackageFormat::NetBsdPkgsrc, "netbsd-app", &["libc"][..]),
+            (UniversalDistroPackageFormat::NixFlake, "nix-app", &["stdenv"][..]),
+            (UniversalDistroPackageFormat::GuixScheme, "guix-app", &["stdenv"][..]),
+            (UniversalDistroPackageFormat::FlatpakApp, "flatpak-app", &["org.freedesktop.Sdk"][..]),
+            (UniversalDistroPackageFormat::SnapApp, "snap-app", &["core22"][..]),
+            (UniversalDistroPackageFormat::AppImage, "appimage-app", &["fuse"][..]),
+            (UniversalDistroPackageFormat::SwupdBundle, "clearlinux-app", &["swupd"][..]),
+            (UniversalDistroPackageFormat::HomebrewBottle, "homebrew-app", &["openssl"][..]),
+            (UniversalDistroPackageFormat::CargoCrate, "cargo-app", &["serde"][..]),
         ];
 
         let mut bridge = SovereignUniversalPmPrBridgeEngine::new();
@@ -1239,34 +1035,21 @@ mod tests {
         let mut bridge = SovereignUniversalPmPrBridgeEngine::new();
 
         // Debian manifest text
-        let deb_text =
-            "Package: nginx\nVersion: 1.24.0\nDepends: libc6, libssl-dev\nArchitecture: amd64";
-        let pr1 = bridge
-            .transpile_foreign_manifest_to_pr("alice", deb_text, b"sig_pqc")
-            .unwrap();
+        let deb_text = "Package: nginx\nVersion: 1.24.0\nDepends: libc6, libssl-dev\nArchitecture: amd64";
+        let pr1 = bridge.transpile_foreign_manifest_to_pr("alice", deb_text, b"sig_pqc").unwrap();
         assert!(bridge.validate_sat_pr_dependencies(pr1).unwrap());
         let manifest1 = bridge.merge_pr_to_sigma_pkg(pr1).unwrap();
         assert_eq!(manifest1.name, "nginx");
-        assert_eq!(
-            manifest1.original_format,
-            UniversalDistroPackageFormat::AptDeb
-        );
-        assert!(manifest1
-            .declared_dependencies
-            .contains(&"sovereign-libc".to_string()));
+        assert_eq!(manifest1.original_format, UniversalDistroPackageFormat::AptDeb);
+        assert!(manifest1.declared_dependencies.contains(&"sovereign-libc".to_string()));
 
         // Arch PKGBUILD manifest text
         let arch_text = "pkgname=ripgrep\npkgver=14.1.0\ndepends=('glibc' 'pcre2')";
-        let pr2 = bridge
-            .transpile_foreign_manifest_to_pr("bob", arch_text, b"sig_pqc")
-            .unwrap();
+        let pr2 = bridge.transpile_foreign_manifest_to_pr("bob", arch_text, b"sig_pqc").unwrap();
         assert!(bridge.validate_sat_pr_dependencies(pr2).unwrap());
         let manifest2 = bridge.merge_pr_to_sigma_pkg(pr2).unwrap();
         assert_eq!(manifest2.name, "ripgrep");
-        assert_eq!(
-            manifest2.original_format,
-            UniversalDistroPackageFormat::PacmanPkg
-        );
+        assert_eq!(manifest2.original_format, UniversalDistroPackageFormat::PacmanPkg);
 
         // PR manifest diff test
         let old_manifest = "Package: nginx\nVersion: 1.22.0\nDepends: libc6";
@@ -1282,18 +1065,13 @@ mod tests {
         let manifest = LinuxBsdPackageFormatConverterEngine::parse_raw_metadata(
             UniversalDistroPackageFormat::AptDeb,
             raw,
-        )
-        .unwrap();
+        ).unwrap();
         assert_eq!(manifest.name, "htop");
         assert_eq!(manifest.version, "3.2.2");
-        assert!(manifest
-            .declared_dependencies
-            .contains(&"ncurses".to_string()));
+        assert!(manifest.declared_dependencies.contains(&"ncurses".to_string()));
 
         let mut bridge = SovereignUniversalPmPrBridgeEngine::new();
-        let pr1 = bridge
-            .translate_cli_command_to_pr_submission("cli-user", "apt install htop", b"pqc_cli_sig")
-            .unwrap();
+        let pr1 = bridge.translate_cli_command_to_pr_submission("cli-user", "apt install htop", b"pqc_cli_sig").unwrap();
         assert!(UniversalPmPrAutomatedReviewer::audit_pr_transaction(&bridge, pr1).unwrap());
 
         let merged_count = UniversalPmBatchPrOrchestrator::process_batch_prs(&mut bridge, &[pr1]);
@@ -1323,51 +1101,25 @@ mod tests {
     fn test_cli_command_translation_bridge() {
         let mut bridge = SovereignUniversalPmPrBridgeEngine::new();
 
-        let pr_apt = bridge
-            .translate_cli_command_to_pr_submission("user1", "apt install redis", b"pqc_sig")
-            .unwrap();
+        let pr_apt = bridge.translate_cli_command_to_pr_submission("user1", "apt install redis", b"pqc_sig").unwrap();
         assert!(bridge.validate_sat_pr_dependencies(pr_apt).unwrap());
         let merged_apt = bridge.merge_pr_to_sigma_pkg(pr_apt).unwrap();
         assert_eq!(merged_apt.name, "redis");
-        assert_eq!(
-            merged_apt.original_format,
-            UniversalDistroPackageFormat::AptDeb
-        );
+        assert_eq!(merged_apt.original_format, UniversalDistroPackageFormat::AptDeb);
 
-        let pr_pacman = bridge
-            .translate_cli_command_to_pr_submission("user2", "pacman -S zsh", b"pqc_sig")
-            .unwrap();
+        let pr_pacman = bridge.translate_cli_command_to_pr_submission("user2", "pacman -S zsh", b"pqc_sig").unwrap();
         assert!(bridge.validate_sat_pr_dependencies(pr_pacman).unwrap());
         let merged_pacman = bridge.merge_pr_to_sigma_pkg(pr_pacman).unwrap();
         assert_eq!(merged_pacman.name, "zsh");
-        assert_eq!(
-            merged_pacman.original_format,
-            UniversalDistroPackageFormat::PacmanPkg
-        );
+        assert_eq!(merged_pacman.original_format, UniversalDistroPackageFormat::PacmanPkg);
     }
 
     #[test]
     fn test_batch_pr_orchestrator() {
         let mut bridge = SovereignUniversalPmPrBridgeEngine::new();
 
-        let pr1 = bridge.submit_foreign_package_pr(
-            "a",
-            "pkg1",
-            "1.0",
-            UniversalDistroPackageFormat::AptDeb,
-            "",
-            &[],
-            b"sig",
-        );
-        let pr2 = bridge.submit_foreign_package_pr(
-            "b",
-            "pkg2",
-            "1.0",
-            UniversalDistroPackageFormat::PacmanPkg,
-            "",
-            &[],
-            b"sig",
-        );
+        let pr1 = bridge.submit_foreign_package_pr("a", "pkg1", "1.0", UniversalDistroPackageFormat::AptDeb, "", &[], b"sig");
+        let pr2 = bridge.submit_foreign_package_pr("b", "pkg2", "1.0", UniversalDistroPackageFormat::PacmanPkg, "", &[], b"sig");
 
         let mut orchestrator = UniversalPmBatchPrOrchestrator::new(&mut bridge);
         let merged_count = orchestrator.process_and_auto_merge_batch(&[pr1, pr2]);
@@ -1398,54 +1150,20 @@ mod tests {
     #[test]
     fn test_universal_cli_command_bridge_translation() {
         let test_cases = [
-            (
-                "apt install htop",
-                UniversalDistroPackageFormat::AptDeb,
-                "htop",
-            ),
-            (
-                "pacman -S neofetch",
-                UniversalDistroPackageFormat::PacmanPkg,
-                "neofetch",
-            ),
-            (
-                "dnf install curl",
-                UniversalDistroPackageFormat::DnfRpm,
-                "curl",
-            ),
-            (
-                "apk add bash",
-                UniversalDistroPackageFormat::AlpineApk,
-                "bash",
-            ),
-            (
-                "xbps-install -S git",
-                UniversalDistroPackageFormat::VoidXbps,
-                "git",
-            ),
-            (
-                "emerge --ask gcc",
-                UniversalDistroPackageFormat::GentooEbuild,
-                "gcc",
-            ),
-            (
-                "pkg install vim",
-                UniversalDistroPackageFormat::BsdPkg,
-                "vim",
-            ),
-            (
-                "nix profile install nixpkgs#ripgrep",
-                UniversalDistroPackageFormat::NixFlake,
-                "nixpkgs#ripgrep",
-            ),
+            ("apt install htop", UniversalDistroPackageFormat::AptDeb, "htop"),
+            ("pacman -S neofetch", UniversalDistroPackageFormat::PacmanPkg, "neofetch"),
+            ("dnf install curl", UniversalDistroPackageFormat::DnfRpm, "curl"),
+            ("apk add bash", UniversalDistroPackageFormat::AlpineApk, "bash"),
+            ("xbps-install -S git", UniversalDistroPackageFormat::VoidXbps, "git"),
+            ("emerge --ask gcc", UniversalDistroPackageFormat::GentooEbuild, "gcc"),
+            ("pkg install vim", UniversalDistroPackageFormat::BsdPkg, "vim"),
+            ("nix profile install nixpkgs#ripgrep", UniversalDistroPackageFormat::NixFlake, "nixpkgs#ripgrep"),
         ];
 
         let mut bridge = SovereignUniversalPmPrBridgeEngine::new();
 
         for (cmd, expected_fmt, expected_pkg) in test_cases {
-            let pr_id = bridge
-                .translate_and_submit_cli_command("user", cmd, b"pqc_sig")
-                .unwrap();
+            let pr_id = bridge.translate_and_submit_cli_command("user", cmd, b"pqc_sig").unwrap();
             assert!(pr_id > 0);
             let tx = &bridge.pr_transactions[&pr_id];
             assert_eq!(tx.manifest.original_format, expected_fmt);
@@ -1457,13 +1175,11 @@ mod tests {
     fn test_full_pr_submission_to_sigpkg_merge_workflow() {
         let mut bridge = SovereignUniversalPmPrBridgeEngine::new();
 
-        let pr_id = bridge
-            .translate_and_submit_cli_command(
-                "maintainer",
-                "apt install ripgrep",
-                b"pqc_sig_dilithium5",
-            )
-            .unwrap();
+        let pr_id = bridge.translate_and_submit_cli_command(
+            "maintainer",
+            "apt install ripgrep",
+            b"pqc_sig_dilithium5",
+        ).unwrap();
 
         assert!(bridge.validate_sat_pr_dependencies(pr_id).unwrap());
         let sigpkg_name = bridge.convert_to_canonical_sigpkg(pr_id).unwrap();
@@ -1480,10 +1196,7 @@ mod tests {
             (UniversalDistroPackageFormat::ZypperSpec, "opensuse-pkg"),
             (UniversalDistroPackageFormat::SolusEopkg, "solus-pkg"),
             (UniversalDistroPackageFormat::HaikuHpkg, "haiku-pkg"),
-            (
-                UniversalDistroPackageFormat::SlackwareSlackBuild,
-                "bedrock-pkg",
-            ),
+            (UniversalDistroPackageFormat::SlackwareSlackBuild, "bedrock-pkg"),
             (UniversalDistroPackageFormat::TczPackage, "tc-pkg"),
             (UniversalDistroPackageFormat::GoboPackage, "gobo-pkg"),
             (UniversalDistroPackageFormat::CportsPackage, "chimera-pkg"),

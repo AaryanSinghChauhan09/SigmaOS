@@ -301,10 +301,7 @@ impl ComponentTree {
         }
 
         // Check parent has create_child permission
-        let parent = self
-            .components
-            .get(&parent_id)
-            .ok_or(ComponentError::ParentNotFound)?;
+        let parent = self.components.get(&parent_id).ok_or(ComponentError::ParentNotFound)?;
         let parent_has_permission = parent
             .capabilities
             .values()
