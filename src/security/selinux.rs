@@ -2,9 +2,16 @@
 // Implements Fedora-style mandatory access control adapted for capability-based security
 // Inspired by Fedora's SELinux for enhanced security architecture
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, HashMap, HashSet};
 use std::string::String;
 use std::vec::Vec;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SeLinuxMode {
+    Enforcing,
+    Permissive,
+    Disabled,
+}
 
 /// Security context
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -70,6 +77,7 @@ pub enum PolicyRule {
 /// SELinux policy
 #[derive(Debug, Clone)]
 pub struct SELinuxPolicy {
+    pub mode: SeLinuxMode,
     pub rules: Vec<PolicyRule>,
     pub types: BTreeMap<String, Type>,
     pub attributes: BTreeMap<String, Attribute>,
@@ -106,6 +114,7 @@ pub struct SELinuxUser {
 impl SELinuxPolicy {
     pub fn new() -> Self {
         Self {
+            mode: SeLinuxMode::Enforcing,
             rules: Vec::new(),
             types: BTreeMap::new(),
             attributes: BTreeMap::new(),
@@ -151,43 +160,29 @@ impl SELinuxPolicy {
             return Ok(true);
         }
 
-        let src_context = SecurityContext::parse(source)?;
-        let tgt_context = SecurityContext::parse(target)?;
-
-        let avc_key = AvcKey {
-            source_type: src_context.type_name.clone(),
-            target_type: tgt_context.type_name.clone(),
-            class: class.to_string(),
-            permission: permission.to_string(),
-        };
-
-        // Query AVC cache
-        let allowed = if let Some(decision) = self.avc.query(&avc_key) {
-            decision
-        } else {
-            let decision = self.policies.contains(&avc_key);
-            self.avc.insert(avc_key, decision);
-            decision
-        };
-
-        if !allowed {
-            // Log audit failure to memory buffer in standard auditd format
-            let audit_entry = format!(
-                "type=AVC msg=audit(1700000000.123:456): avc:  denied  {{ {} }} for  pid=1234 comm=\"service\" \
-                 scontext={} tcontext={} tclass={}",
-                permission, source, target, class
-            );
-            self.audit_logs.push(audit_entry);
-
-            if self.mode == SeLinuxMode::Enforcing {
-                return Ok(false); // Gated!
-            } else {
-                // Permissive mode allows but audits the alert
-                return Ok(true);
+        for rule in &self.rules {
+            if let PolicyRule::Allow {
+                source_type: ref st,
+                target_type: ref tt,
+                target_class: ref tc,
+                permissions: ref permissions,
+            } = rule
+            {
+                if (st == "*" || st == source_type)
+                    && (tt == "*" || tt == target_type)
+                    && (tc == "*" || tc == target_class)
+                    && permissions.iter().any(|p| p == "*" || p == permission)
+                {
+                    return Ok(true);
+                }
             }
         }
 
-        Ok(true)
+        if self.mode == SeLinuxMode::Enforcing {
+            Ok(false)
+        } else {
+            Ok(true)
+        }
     }
 }
 
@@ -323,6 +318,7 @@ impl SigmaSELinux {
         if let Some(context) = self.get_context(path) {
             self.policy
                 .check_permission(source_type, &context.type_, "file", permission)
+                .unwrap_or(false)
         } else {
             false
         }
@@ -336,6 +332,7 @@ impl SigmaSELinux {
 
         self.policy
             .check_permission(source_type, target_type, "process", "transition")
+            .unwrap_or(false)
     }
 
     /// Get status

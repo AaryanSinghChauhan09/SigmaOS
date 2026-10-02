@@ -323,11 +323,8 @@ impl UniversalPackageAdapter {
             pkgname,
             pkgver,
             pkgdesc,
-            arch: architecture.clone(),
             architecture,
-            depends: depends.clone(),
-            depend: depends,
-            makedepend: Vec::new(),
+            depends,
         })
     }
 
@@ -1993,17 +1990,11 @@ impl UniversalDependencyMapper {
             "zlib1g-dev" | "zlib-devel" | "zlib-dev" | "devel/zlib" | "sys-libs/zlib" => {
                 "zlib".to_string()
             }
-            | "haiku-libroot" | "pkgsrc-core" | "libm" | "libpthread" | "libdl" | "librt"
-            | "libutil" => "libc".to_string(),
-            "zlib1g-dev" | "zlib-devel" | "zlib-dev" | "devel/zlib" | "sys-libs/zlib" => {
-                "zlib".to_string()
-            }
+            "libm" | "libpthread" | "libdl" | "librt" | "libutil" => "libc".to_string(),
             "bzip2" | "libbz2-dev" | "bzip2-devel" | "brotli" | "libbrotli-dev" | "lzo"
             | "liblzo2-dev" => "compression".to_string(),
             "python" | "python3" | "python3-dev" | "python3-devel" | "python3-base"
             | "python-core" | "dev-lang/python" | "lang/python" => "python".to_string(),
-            "python" | "python3" | "python3-dev" | "python3-devel" | "python3-base" | "python-core" | "dev-lang/python"
-            | "lang/python" => "python".to_string(),
             "curl" | "libcurl" | "libcurl4" | "libcurl-devel" | "libcurl-dev" | "ftp/curl"
             | "net-misc/curl" => "curl".to_string(),
             "bash" | "bash-completion" | "shells/bash" | "app-shells/bash" => "bash".to_string(),

@@ -1103,7 +1103,37 @@ impl FreeBsdCamStorageEngine {
 }
 
 #[derive(Debug, Default)]
-pub struct FreeBsdNetmapHighSpeedPacketEngine;
+pub struct FreeBsdNetmapHighSpeedPacketEngine {
+    pub interface_name: String,
+    pub num_tx_rings: u32,
+    pub num_rx_rings: u32,
+    pub ring_size: u32,
+    pub ring_open: bool,
+}
+
+impl FreeBsdNetmapHighSpeedPacketEngine {
+    pub fn new(interface_name: &str, num_tx_rings: u32, num_rx_rings: u32, ring_size: u32) -> Self {
+        Self {
+            interface_name: interface_name.to_string(),
+            num_tx_rings,
+            num_rx_rings,
+            ring_size,
+            ring_open: false,
+        }
+    }
+
+    pub fn open_netmap_ring(&mut self) -> Result<bool, &'static str> {
+        self.ring_open = true;
+        Ok(true)
+    }
+
+    pub fn transmit_packet_zero_copy(&self, packet: &[u8]) -> Result<usize, &'static str> {
+        if !self.ring_open {
+            return Err("Netmap ring closed");
+        }
+        Ok(packet.len())
+    }
+}
 
 #[derive(Debug, Default)]
 pub struct LinuxNvmeOverFabricsEngine {
