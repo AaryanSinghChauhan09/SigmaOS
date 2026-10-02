@@ -22,7 +22,7 @@ pub enum FutexOp {
     /// Wake up to val waiters
     Wake = 1,
     /// Atomic compare and requeue
-    Cmp requeue = 4,
+    CmpRequeue = 4,
     /// Wake op (combined wake and modify)
     WakeOp = 5,
     /// Lock private futex
