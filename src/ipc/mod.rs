@@ -20,6 +20,7 @@ pub mod ipc;
 pub mod ipc_namespace;
 pub mod mechanism;
 pub mod message;
+pub mod pipe;
 pub mod signals;
 pub mod sovereign_async_procedure_call;
 pub mod std_streams;

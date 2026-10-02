@@ -28,6 +28,7 @@ pub mod ebpf;
 pub mod ebpf_verification;
 pub mod ebpf_vm;
 pub mod exports;
+pub mod futex;
 pub mod gap_closing;
 pub mod gap_filling;
 pub mod generation_manager;
