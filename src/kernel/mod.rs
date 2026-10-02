@@ -48,6 +48,10 @@ pub use linux_parity::{
 pub mod memory;
 pub mod meta;
 pub mod module_loader;
+pub mod rump_modules;
+pub use rump_modules::{
+    KernelModule, ModuleState, ModulePriority, RumpModuleLoader,
+};
 pub mod module_loading_control;
 pub mod module_tools;
 pub mod namespaces;
