@@ -753,7 +753,6 @@ impl SovereignDnsTlsResolverEngine {
     }
 }
 
-
 // ============================================================================
 // 8. Dynamic Device Hotplugging Engine (Linux udev / BSD devd Parity)
 // ============================================================================

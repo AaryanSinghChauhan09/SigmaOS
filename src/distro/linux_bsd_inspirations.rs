@@ -3251,15 +3251,21 @@ mod subsystem_interop_tests {
     #[test]
     fn test_sovereign_master_subsystem_distro_harmonizer() {
         let mut harmonizer = SovereignMasterSubsystemDistroHarmonizer::new();
-        let synced = harmonizer.harmonize_all_subsystems_across_all_distros().unwrap();
+        let synced = harmonizer
+            .harmonize_all_subsystems_across_all_distros()
+            .unwrap();
         assert!(synced > 0);
         assert_eq!(harmonizer.harmonized_distros_count, 34);
         assert!(harmonizer.harmonized_subsystems_count >= 150);
 
-        let res = harmonizer.dispatch_action_to_subsystem("kernel", "schedule").unwrap();
+        let res = harmonizer
+            .dispatch_action_to_subsystem("kernel", "schedule")
+            .unwrap();
         assert!(res.contains("kernel"));
 
-        let event_processed = harmonizer.broadcast_subsystem_event("process", "memory", "sync_page").unwrap();
+        let event_processed = harmonizer
+            .broadcast_subsystem_event("process", "memory", "sync_page")
+            .unwrap();
         assert!(event_processed.contains("Dispatched"));
 
         let score = harmonizer.compute_distro_subsystem_harmonization_score();
@@ -3423,7 +3429,8 @@ impl SovereignMasterSubsystemDistroHarmonizer {
         target: &str,
         payload: &str,
     ) -> Result<String, &'static str> {
-        self.event_router.route_event(source, target, "CROSS_DISTRO_SYNC", payload)
+        self.event_router
+            .route_event(source, target, "CROSS_DISTRO_SYNC", payload)
     }
 
     pub fn query_all_subsystem_capabilities(
