@@ -2,16 +2,13 @@
 // Zero-dependency Rust #![no_std] / std implementation of xfwm4, xfce4-panel, xfconf & Thunar integrations.
 
 #[cfg(not(test))]
-use alloc::format;
 #[cfg(not(test))]
 use alloc::string::{String, ToString};
 #[cfg(not(test))]
 use alloc::vec::Vec;
 
 #[cfg(test)]
-use std::string::String;
 #[cfg(test)]
-use std::vec::Vec;
 
 /// Xfconf Configuration Setting Value
 #[derive(Debug, Clone, PartialEq, Eq)]

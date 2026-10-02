@@ -5,7 +5,6 @@
 extern crate alloc;
 
 use alloc::collections::BTreeMap;
-use alloc::format;
 use alloc::string::{String, ToString};
 
 /// Roadmap & Wiki Development Phases (Phases 1-10)

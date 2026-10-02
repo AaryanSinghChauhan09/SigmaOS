@@ -10,7 +10,6 @@
 
 use std::collections::BTreeMap;
 use std::format;
-use std::string::{String, ToString};
 use std::vec::Vec;
 
 /// Release channels available in Omarchy-style system management

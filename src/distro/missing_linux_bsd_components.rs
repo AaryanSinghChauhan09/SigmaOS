@@ -3,7 +3,6 @@
 // OpenSUSE YaST2, Void xbps-src, Alpine LBU, FreeBSD VNET, NetBSD Rump, OpenBSD Pledge/Unveil, NixOS Flakes.
 
 use std::format;
-use std::string::String;
 use std::vec::Vec;
 
 /// OpenSUSE YaST2 Declarative System Control Engine

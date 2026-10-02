@@ -13,7 +13,6 @@
 
 use std::collections::BTreeMap;
 use std::format;
-use std::string::{String, ToString};
 use std::vec::Vec;
 
 /// Desktop Shell Element Types

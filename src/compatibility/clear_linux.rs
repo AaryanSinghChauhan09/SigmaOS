@@ -3,7 +3,6 @@ use std::format;
 // Pure, zero-dependency, #![no_std] standard-conforming implementation absorbing Clear Linux features
 
 extern crate alloc;
-use alloc::format;
 use alloc::vec::Vec;
 use alloc::string::{String, ToString};
 

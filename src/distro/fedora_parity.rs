@@ -2,7 +2,6 @@
 // Implements DNF package management, SELinux integration, and RPM support
 
 use core::cell::Cell;
-use std::string::String;
 use std::vec::Vec;
 
 pub use crate::compatibility::fedora::BodhiUpdateTriage;

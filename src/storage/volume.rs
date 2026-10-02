@@ -10,8 +10,6 @@ use alloc::boxed::Box;
 use alloc::vec::Vec;
 
 use core::sync::atomic::{AtomicUsize, Ordering};
-use std::boxed::Box;
-use std::vec::Vec;
 
 pub type VolumeID = usize;
 

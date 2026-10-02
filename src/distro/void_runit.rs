@@ -6,7 +6,6 @@
  */
 
 use std::collections::BTreeMap;
-use std::string::String;
 use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]

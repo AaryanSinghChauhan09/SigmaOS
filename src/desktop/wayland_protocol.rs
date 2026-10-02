@@ -19,7 +19,6 @@ use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec;
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
 
 /// Wayland Wire Protocol Message Header (8 bytes)
 /// - object_id: 32-bit sender/receiver object ID

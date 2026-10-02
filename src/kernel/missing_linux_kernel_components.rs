@@ -18,7 +18,6 @@ use alloc::vec::Vec;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
 
 // ============================================================================
 // 1. Linux BPF_MAP_TYPE_RINGBUF Event Ring Buffer Engine

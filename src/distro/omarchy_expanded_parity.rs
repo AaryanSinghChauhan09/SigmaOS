@@ -1,7 +1,6 @@
 // SigmaOS Omarchy Expanded Parity Engine
 // Inspired by Omarchy Linux (Modern Arch + Hyprland + Omakub + Neovim + Starship + Ghostty + Zellij)
 
-use std::string::String;
 use std::vec::Vec;
 
 /// Omakub automated software stack installer & development environment bootstrapper.

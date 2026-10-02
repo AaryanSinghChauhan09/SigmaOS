@@ -1,6 +1,5 @@
 use std::collections::BTreeMap;
 use std::format;
-use std::string::{String, ToString};
 use std::vec::Vec;
 
 /// 1. Hyprland Tiling Window Manager Configuration & Keybindings Engine (`Hyprland` parity)

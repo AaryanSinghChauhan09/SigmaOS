@@ -5,7 +5,6 @@
 use core::cell::Cell;
 use std::collections::BTreeMap;
 use std::format;
-use std::string::{String, ToString};
 use std::vec::Vec;
 
 /// PKGBUILD representation following Arch Linux standards

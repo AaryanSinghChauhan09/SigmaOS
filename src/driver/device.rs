@@ -1,12 +1,10 @@
 #![cfg_attr(target_os = "none", no_main)]
-
 use core::sync::atomic::{AtomicUsize, Ordering};
 
-/// OOP-based Device Driver Framework for SigmaOS
+
 /// Implements device drivers using OOP principles with traits and structs
 /// No dependency on external driver frameworks
 use core::ptr::{self, NonNull};
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Device trait (OOP interface)
 pub trait Device {

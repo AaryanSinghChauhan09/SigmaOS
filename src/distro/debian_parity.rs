@@ -15,7 +15,6 @@ use alloc::vec::Vec;
 
 use core::cell::Cell;
 use std::format;
-use std::string::{String, ToString};
 
 /// Debian package management with APT parity
 pub struct DebianPackageManager {

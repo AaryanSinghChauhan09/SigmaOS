@@ -4,7 +4,6 @@
 // Parity with Linux Mint Timeshift, Pop!_OS Pop Shell auto-tiling, Zorin OS Appearance, Elementary OS AppCenter, antiX low-RAM init, and Tails OS amnesic privacy
 
 use std::format;
-use std::string::{String, ToString};
 use std::vec::Vec;
 
 // ============================================================================

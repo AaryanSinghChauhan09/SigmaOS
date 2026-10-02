@@ -1,4 +1,3 @@
-use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 // SigmaPkg - SigmaOS Package Manager
@@ -65,11 +64,14 @@ pub mod transaction;
 pub mod transaction_log;
 pub mod universal_adapter;
 pub use universal_adapter::{
-    DispatchedPmAction, UniversalDependencyMapper, UniversalDryRunSimulator,
+    AppImageContainer, AptDebManifest, DispatchedPmAction, FlatpakManifest, FreeBsdUclManifest,
+    MappedScriptletHook, NetBsdPkgsrcManifest, OpenBsdContentsManifest, PackageFormatAdapter,
+    PackagePriority, PacmanPkgbuild, RpmSpecManifest, SigPkgUniversalBridgeEngine,
+    SigmaPkgHookType, SlackwarePkgManifest, SnapcraftManifest, UniversalDependencyMapper,
+    UniversalDryRunResult, UniversalDryRunSimulator, UniversalFormatConverter,
     UniversalPackageAdapter, UniversalPmCommandDispatcher, UniversalPmOperation,
-    UniversalScriptletConverter,
+    UniversalScriptletConverter, ZypperSpecManifest,
 };
-pub mod universal_engine;
 pub mod universal_oop_system;
 pub use universal_engine::{
     SovereignUniversalPackageManagerInteropEngine, SovereignUniversalPackageTranslationBridge,
@@ -219,7 +221,6 @@ pub use transaction::Transaction;
 pub use universal_adapter::UniversalPackageAdapter;
 pub use universal_adapter::{AdapterError, DebAdapter, PacmanAdapter, RpmAdapter};
 pub use verifier::CryptoVerifier;
-pub use zero_alloc_resolver::{PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES};
 
 /// Package version using SemVer
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]

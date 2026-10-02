@@ -3,7 +3,6 @@
 // Inspired by enterprise Linux distributions and security-focused BSD systems
 
 use std::format;
-use std::string::String;
 use std::vec;
 use std::vec::Vec;
 

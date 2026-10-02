@@ -9,7 +9,6 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::format;
-use std::string::{String, ToString};
 use std::vec::Vec;
 
 /// 1. Gentoo Portage World Set, Depclean & Preserved-Libs Engine

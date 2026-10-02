@@ -8,7 +8,6 @@
 // 6. FreeBSD GEOM Gate Network Block Storage & CTL SCSI Target Engine
 
 use std::collections::BTreeMap;
-use std::string::{String, ToString};
 use std::vec::Vec;
 
 // =========================================================================

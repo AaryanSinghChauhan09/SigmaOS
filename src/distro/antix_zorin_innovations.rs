@@ -6,7 +6,6 @@
 
 use std::collections::BTreeMap;
 use std::format;
-use std::string::{String, ToString};
 
 /// antiX Service State
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

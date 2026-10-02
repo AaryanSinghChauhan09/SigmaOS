@@ -15,7 +15,6 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::format;
-use std::string::{String, ToString};
 use std::vec::Vec;
 
 use crate::klib::btreemap::BTreeMap;

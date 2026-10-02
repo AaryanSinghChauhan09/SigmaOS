@@ -329,6 +329,7 @@ impl AddressSanitizer {
         self.error_count = 0;
     }
 
+}
 /// ASan statistics
 #[derive(Debug, Clone)]
 pub struct AsanStatistics {

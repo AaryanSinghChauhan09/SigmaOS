@@ -135,9 +135,6 @@ pub mod toolchain {
     pub mod codex;
 }
 pub mod scheduler;
-pub mod crypto {
-    pub mod vectorized_pqc;
-}
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
@@ -387,7 +384,6 @@ pub mod theming;
 pub mod thermal;
 pub mod time;
 pub mod timer;
-pub mod toolchain;
 pub mod touchscreen;
 pub mod tpm;
 pub mod tracing;

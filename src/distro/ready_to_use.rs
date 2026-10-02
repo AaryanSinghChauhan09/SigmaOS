@@ -2,7 +2,6 @@
 // Ready-to-Use OS Usability Primitives
 // Linux & BSD-inspired Service Supervision, Mount Management, User Session Environment, and Hotplug PnP Hardware Driver Binding.
 
-use std::string::{String, ToString};
 use std::vec::Vec;
 
 use std::collections::BTreeMap as HashMap;
