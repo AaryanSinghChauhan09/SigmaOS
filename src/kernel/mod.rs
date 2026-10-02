@@ -86,6 +86,7 @@ pub mod structures;
 pub mod timer_wheel;
 pub mod uts_namespace;
 pub mod virtual_cpu;
+pub mod wait_queue;
 pub mod workqueue;
 
 pub use missing_linux_kernel_components::{
@@ -194,6 +195,7 @@ pub use pidfd::{
 };
 pub mod cfi;
 pub mod cfs_scheduler;
+pub mod cgroup_v2_controller;
 pub mod dma;
 pub mod interrupt;
 pub mod interrupt_controller;
