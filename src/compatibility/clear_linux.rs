@@ -3,8 +3,8 @@ use std::format;
 // Pure, zero-dependency, #![no_std] standard-conforming implementation absorbing Clear Linux features
 
 extern crate alloc;
-use alloc::vec::Vec;
 use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 
 /// x86_64 Microarchitecture Feature Level (x86-64-v1 through x86-64-v4)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

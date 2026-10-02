@@ -236,7 +236,8 @@ impl SystemServiceManager {
         }
 
         // Now get mutable borrow
-        let service = self.get_service_mut(name)
+        let service = self
+            .get_service_mut(name)
             .ok_or_else(|| format!("Service {} not found", name))?;
 
         if service.state == SystemServiceState::Running {
@@ -254,7 +255,8 @@ impl SystemServiceManager {
 
     /// Stop service
     pub fn stop_service(&mut self, name: &str) -> Result<(), String> {
-        let service = self.get_service_mut(name)
+        let service = self
+            .get_service_mut(name)
             .ok_or_else(|| format!("Service {} not found", name))?;
 
         if service.state != SystemServiceState::Running {
@@ -284,7 +286,8 @@ impl SystemServiceManager {
 
     /// Enable service (auto-start)
     pub fn enable_service(&mut self, name: &str) -> Result<(), String> {
-        let service = self.get_service_mut(name)
+        let service = self
+            .get_service_mut(name)
             .ok_or_else(|| format!("Service {} not found", name))?;
 
         service.config.set_auto_start(true);
@@ -293,7 +296,8 @@ impl SystemServiceManager {
 
     /// Disable service (no auto-start)
     pub fn disable_service(&mut self, name: &str) -> Result<(), String> {
-        let service = self.get_service_mut(name)
+        let service = self
+            .get_service_mut(name)
             .ok_or_else(|| format!("Service {} not found", name))?;
 
         service.config.set_auto_start(false);
@@ -302,16 +306,33 @@ impl SystemServiceManager {
 
     /// Get service status
     pub fn get_service_status(&self, name: &str) -> Result<String, String> {
-        let service = self.get_service(name)
+        let service = self
+            .get_service(name)
             .ok_or_else(|| format!("Service {} not found", name))?;
 
         let mut status = format!("Service: {}\n", service.config.name);
         status.push_str(&format!("Description: {}\n", service.config.description));
         status.push_str(&format!("State: {}\n", service.state.as_str()));
         status.push_str(&format!("Type: {}\n", service.config.service_type.as_str()));
-        status.push_str(&format!("PID: {}\n", service.pid.map(|p| p.to_string()).unwrap_or(String::from("N/A"))));
-        status.push_str(&format!("Auto-start: {}\n", if service.config.auto_start { "enabled" } else { "disabled" }));
-        status.push_str(&format!("Restart policy: {}\n", service.config.restart_policy.as_str()));
+        status.push_str(&format!(
+            "PID: {}\n",
+            service
+                .pid
+                .map(|p| p.to_string())
+                .unwrap_or(String::from("N/A"))
+        ));
+        status.push_str(&format!(
+            "Auto-start: {}\n",
+            if service.config.auto_start {
+                "enabled"
+            } else {
+                "disabled"
+            }
+        ));
+        status.push_str(&format!(
+            "Restart policy: {}\n",
+            service.config.restart_policy.as_str()
+        ));
         status.push_str(&format!("Restart count: {}\n", service.restart_count));
 
         Ok(status)
@@ -319,22 +340,42 @@ impl SystemServiceManager {
 
     /// List all services
     pub fn list_services(&self) -> Vec<String> {
-        self.services.iter()
-            .map(|s| format!("{} ({}, {})", s.config.name, s.state.as_str(), if s.config.auto_start { "enabled" } else { "disabled" }))
+        self.services
+            .iter()
+            .map(|s| {
+                format!(
+                    "{} ({}, {})",
+                    s.config.name,
+                    s.state.as_str(),
+                    if s.config.auto_start {
+                        "enabled"
+                    } else {
+                        "disabled"
+                    }
+                )
+            })
             .collect()
     }
 
     /// List running services
     pub fn list_running_services(&self) -> Vec<String> {
-        self.services.iter()
+        self.services
+            .iter()
             .filter(|s| s.state == SystemServiceState::Running)
-            .map(|s| format!("{} (PID: {})", s.config.name, s.pid.map(|p| p.to_string()).unwrap_or(String::from("N/A"))))
+            .map(|s| {
+                format!(
+                    "{} (PID: {})",
+                    s.config.name,
+                    s.pid.map(|p| p.to_string()).unwrap_or(String::from("N/A"))
+                )
+            })
             .collect()
     }
 
     /// List enabled services
     pub fn list_enabled_services(&self) -> Vec<String> {
-        self.services.iter()
+        self.services
+            .iter()
             .filter(|s| s.config.auto_start)
             .map(|s| format!("{} ({})", s.config.name, s.state.as_str()))
             .collect()
@@ -345,9 +386,21 @@ impl SystemServiceManager {
         let mut stats = String::from("Service Manager Statistics:\n");
 
         let total_services = self.services.len();
-        let running_services = self.services.iter().filter(|s| s.state == SystemServiceState::Running).count();
-        let stopped_services = self.services.iter().filter(|s| s.state == SystemServiceState::Stopped).count();
-        let failed_services = self.services.iter().filter(|s| s.state == SystemServiceState::Failed).count();
+        let running_services = self
+            .services
+            .iter()
+            .filter(|s| s.state == SystemServiceState::Running)
+            .count();
+        let stopped_services = self
+            .services
+            .iter()
+            .filter(|s| s.state == SystemServiceState::Stopped)
+            .count();
+        let failed_services = self
+            .services
+            .iter()
+            .filter(|s| s.state == SystemServiceState::Failed)
+            .count();
         let enabled_services = self.services.iter().filter(|s| s.config.auto_start).count();
 
         stats.push_str(&format!("Total services: {}\n", total_services));
@@ -364,7 +417,7 @@ impl SystemServiceManager {
         let mut config = SystemServiceConfig::new(
             String::from("sshd"),
             String::from("OpenSSH server daemon"),
-            String::from("/usr/sbin/sshd -D")
+            String::from("/usr/sbin/sshd -D"),
         );
         config.set_exec_stop(String::from("/usr/bin/pkill sshd"));
         config.set_auto_start(false);
@@ -376,7 +429,7 @@ impl SystemServiceManager {
         let mut config = SystemServiceConfig::new(
             String::from("firewall"),
             String::from("Network firewall service"),
-            String::from("/usr/sbin/sigma-firewall start")
+            String::from("/usr/sbin/sigma-firewall start"),
         );
         config.set_exec_stop(String::from("/usr/sbin/sigma-firewall stop"));
         config.set_auto_start(true);
@@ -396,7 +449,10 @@ mod tests {
 
     #[test]
     fn test_service_state_from_str() {
-        assert_eq!(SystemServiceState::from_str("running"), Some(SystemServiceState::Running));
+        assert_eq!(
+            SystemServiceState::from_str("running"),
+            Some(SystemServiceState::Running)
+        );
         assert_eq!(SystemServiceState::from_str("invalid"), None);
     }
 
@@ -405,7 +461,7 @@ mod tests {
         let config = SystemServiceConfig::new(
             String::from("test"),
             String::from("Test service"),
-            String::from("/usr/bin/test")
+            String::from("/usr/bin/test"),
         );
         assert_eq!(config.name, "test");
         assert_eq!(config.service_type, SystemServiceType::System);
@@ -416,7 +472,7 @@ mod tests {
         let mut config = SystemServiceConfig::new(
             String::from("test"),
             String::from("Test service"),
-            String::from("/usr/bin/test")
+            String::from("/usr/bin/test"),
         );
         config.set_auto_start(true);
         assert!(config.auto_start);
@@ -427,7 +483,7 @@ mod tests {
         let config = SystemServiceConfig::new(
             String::from("test"),
             String::from("Test service"),
-            String::from("/usr/bin/test")
+            String::from("/usr/bin/test"),
         );
         let service = SystemService::new(config);
         assert_eq!(service.state, SystemServiceState::Stopped);
@@ -438,7 +494,7 @@ mod tests {
         let config = SystemServiceConfig::new(
             String::from("test"),
             String::from("Test service"),
-            String::from("/usr/bin/test")
+            String::from("/usr/bin/test"),
         );
         let mut service = SystemService::new(config);
         service.set_state(SystemServiceState::Running);
@@ -457,7 +513,7 @@ mod tests {
         let config = SystemServiceConfig::new(
             String::from("test"),
             String::from("Test service"),
-            String::from("/usr/bin/test")
+            String::from("/usr/bin/test"),
         );
         assert!(manager.add_service(config).is_ok());
         assert_eq!(manager.services.len(), 1);
@@ -469,7 +525,7 @@ mod tests {
         let config = SystemServiceConfig::new(
             String::from("test"),
             String::from("Test service"),
-            String::from("/usr/bin/test")
+            String::from("/usr/bin/test"),
         );
         manager.add_service(config.clone()).unwrap();
         assert!(manager.add_service(config).is_err());
@@ -481,7 +537,7 @@ mod tests {
         let config = SystemServiceConfig::new(
             String::from("test"),
             String::from("Test service"),
-            String::from("/usr/bin/test")
+            String::from("/usr/bin/test"),
         );
         manager.add_service(config).unwrap();
         assert!(manager.start_service("test").is_ok());
@@ -493,7 +549,7 @@ mod tests {
         let config = SystemServiceConfig::new(
             String::from("test"),
             String::from("Test service"),
-            String::from("/usr/bin/test")
+            String::from("/usr/bin/test"),
         );
         manager.add_service(config).unwrap();
         manager.start_service("test").unwrap();
@@ -506,7 +562,7 @@ mod tests {
         let config = SystemServiceConfig::new(
             String::from("test"),
             String::from("Test service"),
-            String::from("/usr/bin/test")
+            String::from("/usr/bin/test"),
         );
         manager.add_service(config).unwrap();
         manager.start_service("test").unwrap();
@@ -519,7 +575,7 @@ mod tests {
         let config = SystemServiceConfig::new(
             String::from("test"),
             String::from("Test service"),
-            String::from("/usr/bin/test")
+            String::from("/usr/bin/test"),
         );
         manager.add_service(config).unwrap();
         assert!(manager.enable_service("test").is_ok());
@@ -531,7 +587,7 @@ mod tests {
         let config = SystemServiceConfig::new(
             String::from("test"),
             String::from("Test service"),
-            String::from("/usr/bin/test")
+            String::from("/usr/bin/test"),
         );
         manager.add_service(config).unwrap();
         let status = manager.get_service_status("test");
@@ -545,7 +601,7 @@ mod tests {
         let config = SystemServiceConfig::new(
             String::from("test"),
             String::from("Test service"),
-            String::from("/usr/bin/test")
+            String::from("/usr/bin/test"),
         );
         manager.add_service(config).unwrap();
         let services = manager.list_services();
@@ -558,7 +614,7 @@ mod tests {
         let config = SystemServiceConfig::new(
             String::from("test"),
             String::from("Test service"),
-            String::from("/usr/bin/test")
+            String::from("/usr/bin/test"),
         );
         manager.add_service(config).unwrap();
         manager.start_service("test").unwrap();
@@ -572,7 +628,7 @@ mod tests {
         let config = SystemServiceConfig::new(
             String::from("test"),
             String::from("Test service"),
-            String::from("/usr/bin/test")
+            String::from("/usr/bin/test"),
         );
         manager.add_service(config).unwrap();
         let stats = manager.get_statistics();

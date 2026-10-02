@@ -1,5 +1,5 @@
 //! Kernel Pointer Restriction (kptr_restrict)
-//! 
+//!
 //! Inspired by Linux kernel's kptr_restrict security feature that prevents
 //! kernel pointer leaks to userspace, mitigating kernel address space layout
 //! information disclosure attacks.
@@ -59,7 +59,7 @@ impl SecurityMitigations {
     pub fn current() -> Self {
         Self {
             kptr_restrict: get_kptr_restrict() != KptrRestrictLevel::Unrestricted,
-            dmesg_restrict: true,  // Assume enabled
+            dmesg_restrict: true, // Assume enabled
             perf_event_paranoid: true,
             unprivileged_bpf_disabled: true,
         }
@@ -73,7 +73,7 @@ pub fn get_kptr_restrict() -> KptrRestrictLevel {
 }
 
 /// Set kptr_restrict level
-/// 
+///
 /// # Safety
 /// Should only be called during early boot or by privileged kernel code
 pub fn set_kptr_restrict(level: KptrRestrictLevel) {
@@ -81,7 +81,7 @@ pub fn set_kptr_restrict(level: KptrRestrictLevel) {
 }
 
 /// Check if kernel pointer should be hidden
-/// 
+///
 /// Returns true if the pointer should be hidden based on current
 /// restriction level and caller privileges
 pub fn should_hide_kptr(has_cap_syslog: bool) -> bool {
@@ -93,7 +93,7 @@ pub fn should_hide_kptr(has_cap_syslog: bool) -> bool {
 }
 
 /// Format kernel pointer for display
-/// 
+///
 /// Returns sanitized pointer representation based on security policy:
 /// - If visible: actual pointer value
 /// - If hidden: "0x0000000000000000" or hashed value
@@ -107,7 +107,7 @@ pub fn format_kptr(ptr: usize, has_cap_syslog: bool) -> u64 {
 }
 
 /// Hash kernel pointer for display (one-way function)
-/// 
+///
 /// Provides a consistent identifier without revealing actual address.
 /// Inspired by Linux %pK format specifier implementation.
 fn hash_ptr(ptr: usize) -> u64 {
@@ -118,14 +118,14 @@ fn hash_ptr(ptr: usize) -> u64 {
 }
 
 /// Check if kernel symbol should be visible
-/// 
+///
 /// Used by /proc/kallsyms and similar interfaces
 pub fn can_view_kernel_symbols(has_cap_syslog: bool) -> bool {
     !should_hide_kptr(has_cap_syslog)
 }
 
 /// Initialize kptr_restrict subsystem
-/// 
+///
 /// Sets up kernel pointer restriction to secure default (level 1)
 pub fn init_kptr_restrict() {
     // Default to privileged mode for security
@@ -133,7 +133,7 @@ pub fn init_kptr_restrict() {
 }
 
 /// Set maximum security mode (level 2)
-/// 
+///
 /// Called for high-security environments where kernel ASLR must be
 /// maximally protected even from privileged users
 pub fn enable_maximum_kptr_security() {

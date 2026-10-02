@@ -1,5 +1,5 @@
 //! Rump Kernel-Inspired Modular Subsystem Loader
-//! 
+//!
 //! Inspired by NetBSD's rump kernel architecture for running kernel components
 //! in userspace or as pluggable modules. Provides a safe, modular approach to
 //! kernel subsystem loading and initialization.
@@ -198,9 +198,7 @@ impl RumpModuleLoader {
     pub fn load_module(&mut self, name: &str) -> Result<(), &'static str> {
         // Check dependencies first
         {
-            let module = self
-                .get_module(name)
-                .ok_or("Module not found")?;
+            let module = self.get_module(name).ok_or("Module not found")?;
 
             if !self.check_dependencies(module) {
                 return Err("Dependencies not satisfied");
@@ -208,9 +206,7 @@ impl RumpModuleLoader {
         }
 
         // Initialize module
-        let module = self
-            .get_module_mut(name)
-            .ok_or("Module not found")?;
+        let module = self.get_module_mut(name).ok_or("Module not found")?;
 
         module.initialize()
     }
@@ -231,8 +227,7 @@ impl RumpModuleLoader {
             for i in 0..self.modules.len() {
                 let can_load = {
                     let module = &self.modules[i];
-                    module.state == ModuleState::Unloaded
-                        && self.check_dependencies(module)
+                    module.state == ModuleState::Unloaded && self.check_dependencies(module)
                 };
 
                 if can_load {
@@ -276,9 +271,7 @@ impl RumpModuleLoader {
             }
         }
 
-        let module = self
-            .get_module_mut(name)
-            .ok_or("Module not found")?;
+        let module = self.get_module_mut(name).ok_or("Module not found")?;
 
         module.shutdown()
     }

@@ -147,9 +147,9 @@ impl RcuState {
 
     /// Check if all CPUs have passed through quiescent state
     fn all_cpus_quiescent(&self, gp: GracePeriod) -> bool {
-        self.cpu_states.iter().all(|state| {
-            state.is_quiescent() || state.gp_acked.load(Ordering::Acquire) >= gp
-        })
+        self.cpu_states
+            .iter()
+            .all(|state| state.is_quiescent() || state.gp_acked.load(Ordering::Acquire) >= gp)
     }
 
     /// Advance RCU state machine

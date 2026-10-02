@@ -4,7 +4,10 @@
 // death notifications, and object handle table.
 
 use std::collections::{BTreeMap, HashMap, VecDeque};
-use std::sync::{Arc, Mutex, atomic::{AtomicU32, AtomicU64, Ordering}};
+use std::sync::{
+    atomic::{AtomicU32, AtomicU64, Ordering},
+    Arc, Mutex,
+};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Object Handle Table (like Binder's proc->refs)
@@ -48,7 +51,10 @@ impl HandleTable {
 
     pub fn acquire(&mut self, handle: Handle) -> Result<(), &'static str> {
         match self.handles.get_mut(&handle) {
-            Some(obj) if !obj.dead => { obj.strong_refs += 1; Ok(()) }
+            Some(obj) if !obj.dead => {
+                obj.strong_refs += 1;
+                Ok(())
+            }
             Some(_) => Err("Object is dead"),
             None => Err("Invalid handle"),
         }
@@ -57,7 +63,9 @@ impl HandleTable {
     pub fn release(&mut self, handle: Handle) -> Result<bool, &'static str> {
         match self.handles.get_mut(&handle) {
             Some(obj) => {
-                if obj.strong_refs == 0 { return Err("Reference underflow"); }
+                if obj.strong_refs == 0 {
+                    return Err("Reference underflow");
+                }
                 obj.strong_refs -= 1;
                 Ok(obj.strong_refs == 0) // true = can be freed
             }
@@ -107,10 +115,10 @@ pub struct BinderTransaction {
     pub to_handle: Handle,
     pub code: u32, // AIDL interface method code
     pub flags: u32,
-    pub data: Vec<u8>,          // flat parcel data
-    pub offsets: Vec<u32>,      // byte offsets of embedded binder objects
+    pub data: Vec<u8>,     // flat parcel data
+    pub offsets: Vec<u32>, // byte offsets of embedded binder objects
     pub reply: bool,
-    pub one_way: bool,          // async (no reply expected)
+    pub one_way: bool, // async (no reply expected)
 }
 
 impl BinderTransaction {
@@ -130,8 +138,14 @@ impl BinderTransaction {
         }
     }
 
-    pub fn one_way(mut self) -> Self { self.one_way = true; self }
-    pub fn with_reply(mut self) -> Self { self.reply = true; self }
+    pub fn one_way(mut self) -> Self {
+        self.one_way = true;
+        self
+    }
+    pub fn with_reply(mut self) -> Self {
+        self.reply = true;
+        self
+    }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -164,10 +178,16 @@ impl BinderRingBuffer {
     pub fn alloc_transaction(&self, size: usize) -> Option<u64> {
         let write = self.write_pos.load(Ordering::Acquire);
         let read = self.read_pos.load(Ordering::Acquire);
-        let used = if write >= read { write - read } else { self.capacity as u64 - read + write };
+        let used = if write >= read {
+            write - read
+        } else {
+            self.capacity as u64 - read + write
+        };
         let free = self.capacity as u64 - used;
 
-        if size as u64 > free { return None; }
+        if size as u64 > free {
+            return None;
+        }
 
         let offset = write % self.capacity as u64;
         self.write_pos.fetch_add(size as u64, Ordering::Release);
@@ -212,17 +232,25 @@ pub struct DeathNotifier {
 }
 
 impl DeathNotifier {
-    pub fn new() -> Self { DeathNotifier { recipients: Vec::new() } }
+    pub fn new() -> Self {
+        DeathNotifier {
+            recipients: Vec::new(),
+        }
+    }
 
-    pub fn register(&mut self, r: DeathRecipient) { self.recipients.push(r); }
+    pub fn register(&mut self, r: DeathRecipient) {
+        self.recipients.push(r);
+    }
 
     pub fn unregister(&mut self, handle: Handle, cookie: u64) {
-        self.recipients.retain(|r| !(r.handle == handle && r.cookie == cookie));
+        self.recipients
+            .retain(|r| !(r.handle == handle && r.cookie == cookie));
     }
 
     /// Called when a service process dies; returns list of notifications to send
     pub fn notify_dead(&self, node_id: BinderNodeId, dead_pid: u32) -> Vec<&DeathRecipient> {
-        self.recipients.iter()
+        self.recipients
+            .iter()
             .filter(|r| r.registered_by_pid != dead_pid)
             .collect()
     }
@@ -254,14 +282,21 @@ impl BinderProcess {
     }
 
     /// Send a transaction to another process
-    pub fn transact(&self, mut txn: BinderTransaction, target: &BinderProcess) -> Result<(), &'static str> {
+    pub fn transact(
+        &self,
+        mut txn: BinderTransaction,
+        target: &BinderProcess,
+    ) -> Result<(), &'static str> {
         // Validate handle
         if !self.handles.lookup(txn.to_handle).is_some() && txn.to_handle != 0 {
             return Err("Invalid handle");
         }
         // Allocate buffer in target's ring
         let size = txn.data.len() + 64; // header overhead
-        let offset = target.ring.alloc_transaction(size).ok_or("Target buffer full")?;
+        let offset = target
+            .ring
+            .alloc_transaction(size)
+            .ok_or("Target buffer full")?;
         target.ring.write_at(offset, &txn.data);
         // Queue to target's incoming
         target.incoming.lock().unwrap().push_back(txn);
@@ -314,7 +349,12 @@ mod tests {
     fn test_handle_table_acquire_release() {
         let mut table = HandleTable::new();
         let obj = BinderObject {
-            node_id: 1, strong_refs: 0, weak_refs: 0, owner_pid: 100, cookie: 0xAB, dead: false,
+            node_id: 1,
+            strong_refs: 0,
+            weak_refs: 0,
+            owner_pid: 100,
+            cookie: 0xAB,
+            dead: false,
         };
         let h = table.insert(obj);
         assert!(table.acquire(h).is_ok());
@@ -348,7 +388,12 @@ mod tests {
         // Sender registers a handle to receiver's service
         let mut sender_mut = BinderProcess::new(100, 65536);
         let node = BinderObject {
-            node_id: 1, strong_refs: 1, weak_refs: 0, owner_pid: 200, cookie: 0, dead: false,
+            node_id: 1,
+            strong_refs: 1,
+            weak_refs: 0,
+            owner_pid: 200,
+            cookie: 0,
+            dead: false,
         };
         let handle = sender_mut.handles.insert(node);
 
@@ -363,8 +408,16 @@ mod tests {
     #[test]
     fn test_death_notification() {
         let mut notifier = DeathNotifier::new();
-        notifier.register(DeathRecipient { handle: 1, cookie: 0xFF, registered_by_pid: 300 });
-        notifier.register(DeathRecipient { handle: 1, cookie: 0xFE, registered_by_pid: 400 });
+        notifier.register(DeathRecipient {
+            handle: 1,
+            cookie: 0xFF,
+            registered_by_pid: 300,
+        });
+        notifier.register(DeathRecipient {
+            handle: 1,
+            cookie: 0xFE,
+            registered_by_pid: 400,
+        });
         // Notify with dead_pid=300: only pid 400 should be notified
         let notifications = notifier.notify_dead(1, 300);
         assert_eq!(notifications.len(), 1);
@@ -375,7 +428,10 @@ mod tests {
     fn test_context_manager() {
         let mut mgr = BinderContextManager::new();
         let id = mgr.add_service("android.hardware.camera.provider");
-        assert_eq!(mgr.check_service("android.hardware.camera.provider"), Some(id));
+        assert_eq!(
+            mgr.check_service("android.hardware.camera.provider"),
+            Some(id)
+        );
         assert!(mgr.check_service("nonexistent").is_none());
         assert_eq!(mgr.list_services().len(), 1);
     }

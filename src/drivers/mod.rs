@@ -36,8 +36,8 @@ pub mod usb_hid;
 pub mod vesa;
 
 pub use gpu::{
-    GpuCommand, GpuCommandBuffer, GpuDriver, GpuError, GpuPipeline,
-    GpuResetState, GpuShader, ShaderStage,
+    GpuCommand, GpuCommandBuffer, GpuDriver, GpuError, GpuPipeline, GpuResetState, GpuShader,
+    ShaderStage,
 };
 pub use input::{InputDriver, InputEvent, InputType};
 pub use legacy_audio_ac97::LegacyAudioAc97;
@@ -56,10 +56,13 @@ pub use linux_bsd_drivers::{
     UrbTransferType, UvcCameraDriver, VideoPixelFormat, VirtioGpu3dDriver, VirtioSoundDriver,
     WacomPrecisionTouchpadDriver, WifiMode,
 };
+pub use modern_audio_intel_hda::ModernAudioIntelHda;
 pub use modern_audio_intel_hda::*;
+pub use modern_nvme::ModernNvmeDriver;
 pub use modern_nvme::*;
 pub use modern_usb::ModernUsbController;
 pub use modern_usb_printer::ModernUsbPrinterDriver;
+pub use modern_wifi::ModernWifiDriver;
 pub use modern_wifi::*;
 pub use network::{NetworkCommand, NetworkDriver, NetworkError, NetworkType};
 pub use peripheral::{DeviceGeneration, PeripheralDevice, PeripheralManager, PowerState};
@@ -78,9 +81,6 @@ pub use sovereign_usb_xhci::{
     UsbEndpointSpeed, XHCI_MAX_PORTS, XHCI_MAX_SLOTS, XHCI_TRB_RING_SIZE,
 };
 pub use storage::{StorageCommand, StorageDriver, StorageError, StorageType};
+pub use touch_jingos::TouchJingosDriver;
 pub use usb_hid::{HidError, HidKeyboardEvent, HidReportType, UsbHidDriver};
 pub use vesa::{VesaDriver, VesaError, VesaModeInfo};
-pub use modern_audio_intel_hda::ModernAudioIntelHda;
-pub use modern_nvme::ModernNvmeDriver;
-pub use modern_wifi::ModernWifiDriver;
-pub use touch_jingos::TouchJingosDriver;

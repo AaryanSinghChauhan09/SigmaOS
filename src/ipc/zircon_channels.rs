@@ -3,7 +3,10 @@
 // Handles as unforgeable capability tokens, typed channels, FIFOs, signals.
 
 use std::collections::{BTreeMap, VecDeque};
-use std::sync::{Arc, Mutex, atomic::{AtomicU32, AtomicU64, Ordering}};
+use std::sync::{
+    atomic::{AtomicU32, AtomicU64, Ordering},
+    Arc, Mutex,
+};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Handle Rights (capability enforcement)
@@ -29,11 +32,25 @@ impl Rights {
     pub const WAIT: Rights = Rights(1);
     pub const INSPECT: Rights = Rights(1);
     pub const SAME_RIGHTS: Rights = Rights(1);
-    pub fn contains(self, other: Rights) -> bool { (self.0 & other.0) == other.0 }
-    pub fn bits(self) -> u32 { self.0 }
+    pub fn contains(self, other: Rights) -> bool {
+        (self.0 & other.0) == other.0
+    }
+    pub fn bits(self) -> u32 {
+        self.0
+    }
 }
-impl core::ops::BitOr for Rights { type Output = Self; fn bitor(self, r: Self) -> Self { Rights(self.0|r.0) } }
-impl core::ops::BitAnd for Rights { type Output = Self; fn bitand(self, r: Self) -> Self { Rights(self.0&r.0) } }
+impl core::ops::BitOr for Rights {
+    type Output = Self;
+    fn bitor(self, r: Self) -> Self {
+        Rights(self.0 | r.0)
+    }
+}
+impl core::ops::BitAnd for Rights {
+    type Output = Self;
+    fn bitand(self, r: Self) -> Self {
+        Rights(self.0 & r.0)
+    }
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Kernel Object Types
@@ -47,17 +64,19 @@ pub enum KobjType {
     EventPair,
     Timer,
     Port,
-    Vmo,  // Virtual Memory Object
+    Vmo, // Virtual Memory Object
     Process,
     Thread,
     Job,
 }
 
 pub type ZxHandle = u32;
-pub type Koid = u64;  // Kernel Object ID
+pub type Koid = u64; // Kernel Object ID
 
 static KOID_COUNTER: AtomicU64 = AtomicU64::new(1);
-fn new_koid() -> Koid { KOID_COUNTER.fetch_add(1, Ordering::SeqCst) }
+fn new_koid() -> Koid {
+    KOID_COUNTER.fetch_add(1, Ordering::SeqCst)
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Signals
@@ -66,7 +85,9 @@ fn new_koid() -> Koid { KOID_COUNTER.fetch_add(1, Ordering::SeqCst) }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Signals(pub u32);
 impl Signals {
-    pub fn from_bits_truncate(bits: u32) -> Self { Signals(bits) }
+    pub fn from_bits_truncate(bits: u32) -> Self {
+        Signals(bits)
+    }
     pub const NONE: Signals = Signals(0);
     pub const READABLE: Signals = Signals(1);
     pub const WRITABLE: Signals = Signals(1);
@@ -76,11 +97,25 @@ impl Signals {
     pub const FIFO_WRITABLE: Signals = Signals(1);
     pub const HANDLE_CLOSED: Signals = Signals(1);
     pub const LAST_HANDLE: Signals = Signals(1);
-    pub fn contains(self, other: Signals) -> bool { (self.0 & other.0) == other.0 }
-    pub fn bits(self) -> u32 { self.0 }
+    pub fn contains(self, other: Signals) -> bool {
+        (self.0 & other.0) == other.0
+    }
+    pub fn bits(self) -> u32 {
+        self.0
+    }
 }
-impl core::ops::BitOr for Signals { type Output = Self; fn bitor(self, r: Self) -> Self { Signals(self.0|r.0) } }
-impl core::ops::BitAnd for Signals { type Output = Self; fn bitand(self, r: Self) -> Self { Signals(self.0&r.0) } }
+impl core::ops::BitOr for Signals {
+    type Output = Self;
+    fn bitor(self, r: Self) -> Self {
+        Signals(self.0 | r.0)
+    }
+}
+impl core::ops::BitAnd for Signals {
+    type Output = Self;
+    fn bitand(self, r: Self) -> Self {
+        Signals(self.0 & r.0)
+    }
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Channel Message
@@ -93,8 +128,15 @@ pub struct ZxMessage {
 }
 
 impl ZxMessage {
-    pub fn new(bytes: Vec<u8>) -> Self { ZxMessage { bytes, handles: Vec::new() } }
-    pub fn with_handles(bytes: Vec<u8>, handles: Vec<ZxHandle>) -> Self { ZxMessage { bytes, handles } }
+    pub fn new(bytes: Vec<u8>) -> Self {
+        ZxMessage {
+            bytes,
+            handles: Vec::new(),
+        }
+    }
+    pub fn with_handles(bytes: Vec<u8>, handles: Vec<ZxHandle>) -> Self {
+        ZxMessage { bytes, handles }
+    }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -124,7 +166,8 @@ impl ChannelEndpoint {
             return ZxStatus::PeerClosed;
         }
         self.queue.lock().unwrap().push_back(msg);
-        self.signals.fetch_or(Signals::READABLE.bits(), Ordering::Release);
+        self.signals
+            .fetch_or(Signals::READABLE.bits(), Ordering::Release);
         ZxStatus::Ok
     }
 
@@ -132,7 +175,8 @@ impl ChannelEndpoint {
         let mut q = self.queue.lock().unwrap();
         if let Some(msg) = q.pop_front() {
             if q.is_empty() {
-                self.signals.fetch_and(!Signals::READABLE.bits(), Ordering::Release);
+                self.signals
+                    .fetch_and(!Signals::READABLE.bits(), Ordering::Release);
             }
             Ok(msg)
         } else {
@@ -142,7 +186,8 @@ impl ChannelEndpoint {
 
     pub fn close(&self) {
         self.peer_closed.store(1, Ordering::Release);
-        self.signals.fetch_or(Signals::PEER_CLOSED.bits(), Ordering::Release);
+        self.signals
+            .fetch_or(Signals::PEER_CLOSED.bits(), Ordering::Release);
     }
 
     pub fn signals(&self) -> Signals {
@@ -168,14 +213,30 @@ impl Channel {
         let b = ChannelEndpoint::new();
         let ka = a.koid;
         let kb = b.koid;
-        let ch1 = Channel { local: Arc::clone(&a), peer: Arc::clone(&b), local_koid: ka, peer_koid: kb };
-        let ch2 = Channel { local: Arc::clone(&b), peer: Arc::clone(&a), local_koid: kb, peer_koid: ka };
+        let ch1 = Channel {
+            local: Arc::clone(&a),
+            peer: Arc::clone(&b),
+            local_koid: ka,
+            peer_koid: kb,
+        };
+        let ch2 = Channel {
+            local: Arc::clone(&b),
+            peer: Arc::clone(&a),
+            local_koid: kb,
+            peer_koid: ka,
+        };
         (ch1, ch2)
     }
 
-    pub fn write(&self, msg: ZxMessage) -> ZxStatus { self.peer.write(msg) }
-    pub fn read(&self) -> Result<ZxMessage, ZxStatus> { self.local.read() }
-    pub fn close(self) { self.local.close(); }
+    pub fn write(&self, msg: ZxMessage) -> ZxStatus {
+        self.peer.write(msg)
+    }
+    pub fn read(&self) -> Result<ZxMessage, ZxStatus> {
+        self.local.read()
+    }
+    pub fn close(self) {
+        self.local.close();
+    }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -213,12 +274,18 @@ impl ZxFifo {
             }
         }
         if !buf.is_empty() {
-            self.signals.fetch_or(Signals::FIFO_READABLE.bits(), Ordering::Release);
+            self.signals
+                .fetch_or(Signals::FIFO_READABLE.bits(), Ordering::Release);
         }
         if buf.len() == self.element_count {
-            self.signals.fetch_and(!Signals::FIFO_WRITABLE.bits(), Ordering::Release);
+            self.signals
+                .fetch_and(!Signals::FIFO_WRITABLE.bits(), Ordering::Release);
         }
-        if to_write < count { (ZxStatus::OutOfRange, to_write) } else { (ZxStatus::Ok, to_write) }
+        if to_write < count {
+            (ZxStatus::OutOfRange, to_write)
+        } else {
+            (ZxStatus::Ok, to_write)
+        }
     }
 
     pub fn read(&self, count: usize) -> (ZxStatus, Vec<Vec<u8>>) {
@@ -226,13 +293,17 @@ impl ZxFifo {
         let to_read = count.min(buf.len());
         let items: Vec<Vec<u8>> = buf.drain(..to_read).collect();
         if buf.is_empty() {
-            self.signals.fetch_and(!Signals::FIFO_READABLE.bits(), Ordering::Release);
+            self.signals
+                .fetch_and(!Signals::FIFO_READABLE.bits(), Ordering::Release);
         }
-        self.signals.fetch_or(Signals::FIFO_WRITABLE.bits(), Ordering::Release);
+        self.signals
+            .fetch_or(Signals::FIFO_WRITABLE.bits(), Ordering::Release);
         (ZxStatus::Ok, items)
     }
 
-    pub fn available_read(&self) -> usize { self.buffer.lock().unwrap().len() }
+    pub fn available_read(&self) -> usize {
+        self.buffer.lock().unwrap().len()
+    }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -246,7 +317,10 @@ pub struct ZxEvent {
 
 impl ZxEvent {
     pub fn new() -> Arc<Self> {
-        Arc::new(ZxEvent { koid: new_koid(), signals: AtomicU32::new(0) })
+        Arc::new(ZxEvent {
+            koid: new_koid(),
+            signals: AtomicU32::new(0),
+        })
     }
 
     pub fn signal(&self, clear: Signals, set: Signals) -> ZxStatus {
@@ -317,7 +391,10 @@ pub struct ZxHandleTable {
 
 impl ZxHandleTable {
     pub fn new() -> Self {
-        ZxHandleTable { table: BTreeMap::new(), next_handle: AtomicU32::new(1) }
+        ZxHandleTable {
+            table: BTreeMap::new(),
+            next_handle: AtomicU32::new(1),
+        }
     }
 
     pub fn insert(&mut self, entry: HandleEntry) -> ZxHandle {
@@ -326,15 +403,23 @@ impl ZxHandleTable {
         h
     }
 
-    pub fn lookup(&self, h: ZxHandle) -> Option<&HandleEntry> { self.table.get(&h) }
+    pub fn lookup(&self, h: ZxHandle) -> Option<&HandleEntry> {
+        self.table.get(&h)
+    }
 
     pub fn close(&mut self, h: ZxHandle) -> ZxStatus {
-        if self.table.remove(&h).is_some() { ZxStatus::Ok } else { ZxStatus::BadHandle }
+        if self.table.remove(&h).is_some() {
+            ZxStatus::Ok
+        } else {
+            ZxStatus::BadHandle
+        }
     }
 
     pub fn duplicate(&mut self, h: ZxHandle, new_rights: Rights) -> Result<ZxHandle, ZxStatus> {
         let entry = self.table.get(&h).ok_or(ZxStatus::BadHandle)?;
-        if !entry.rights.contains(Rights::DUPLICATE) { return Err(ZxStatus::AccessDenied); }
+        if !entry.rights.contains(Rights::DUPLICATE) {
+            return Err(ZxStatus::AccessDenied);
+        }
         let new_entry = HandleEntry {
             kobj: entry.kobj.clone(),
             rights: new_rights,
@@ -343,7 +428,9 @@ impl ZxHandleTable {
         Ok(self.insert(new_entry))
     }
 
-    pub fn count(&self) -> usize { self.table.len() }
+    pub fn count(&self) -> usize {
+        self.table.len()
+    }
 }
 
 #[cfg(test)]
@@ -383,7 +470,7 @@ mod tests {
     #[test]
     fn test_fifo_write_read() {
         let fifo = ZxFifo::new(8, 4);
-        let data = [1u8, 2, 3, 4,   5, 6, 7, 8]; // 2 elements of 4 bytes
+        let data = [1u8, 2, 3, 4, 5, 6, 7, 8]; // 2 elements of 4 bytes
         let (status, written) = fifo.write(&data, 2);
         assert_eq!(status, ZxStatus::Ok);
         assert_eq!(written, 2);
@@ -427,6 +514,9 @@ mod tests {
             koid: 1,
         };
         let h = table.insert(entry);
-        assert_eq!(table.duplicate(h, Rights::READ), Err(ZxStatus::AccessDenied));
+        assert_eq!(
+            table.duplicate(h, Rights::READ),
+            Err(ZxStatus::AccessDenied)
+        );
     }
 }

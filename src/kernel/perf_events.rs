@@ -219,9 +219,7 @@ impl SystemPerfCounters {
     pub fn new() -> Self {
         Self {
             cpu_cycles: PerfCounter::new(PerfEventType::Hardware(HardwareEvent::CpuCycles)),
-            instructions: PerfCounter::new(PerfEventType::Hardware(
-                HardwareEvent::Instructions,
-            )),
+            instructions: PerfCounter::new(PerfEventType::Hardware(HardwareEvent::Instructions)),
             cache_misses: PerfCounter::new(PerfEventType::Hardware(HardwareEvent::CacheMisses)),
             page_faults: PerfCounter::new(PerfEventType::Software(SoftwareEvent::PageFaults)),
             context_switches: PerfCounter::new(PerfEventType::Software(

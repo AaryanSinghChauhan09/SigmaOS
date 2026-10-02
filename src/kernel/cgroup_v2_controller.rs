@@ -268,7 +268,11 @@ impl CgroupManager {
     }
 
     /// Create new cgroup
-    pub fn create_cgroup(&mut self, path: String, parent_path: &str) -> Result<*mut Cgroup, CgroupError> {
+    pub fn create_cgroup(
+        &mut self,
+        path: String,
+        parent_path: &str,
+    ) -> Result<*mut Cgroup, CgroupError> {
         if self.cgroups.contains_key(&path) {
             return Err(CgroupError::AlreadyExists);
         }

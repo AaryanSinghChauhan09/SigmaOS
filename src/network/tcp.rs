@@ -25,28 +25,58 @@ pub struct TcpFlags {
 
 impl TcpFlags {
     pub const NONE: Self = Self {
-        fin: false, syn: false, rst: false, psh: false,
-        ack: false, urg: false, ece: false, cwr: false,
+        fin: false,
+        syn: false,
+        rst: false,
+        psh: false,
+        ack: false,
+        urg: false,
+        ece: false,
+        cwr: false,
     };
 
     pub const SYN: Self = Self {
-        fin: false, syn: true, rst: false, psh: false,
-        ack: false, urg: false, ece: false, cwr: false,
+        fin: false,
+        syn: true,
+        rst: false,
+        psh: false,
+        ack: false,
+        urg: false,
+        ece: false,
+        cwr: false,
     };
 
     pub const SYN_ACK: Self = Self {
-        fin: false, syn: true, rst: false, psh: false,
-        ack: true, urg: false, ece: false, cwr: false,
+        fin: false,
+        syn: true,
+        rst: false,
+        psh: false,
+        ack: true,
+        urg: false,
+        ece: false,
+        cwr: false,
     };
 
     pub const ACK: Self = Self {
-        fin: false, syn: false, rst: false, psh: false,
-        ack: true, urg: false, ece: false, cwr: false,
+        fin: false,
+        syn: false,
+        rst: false,
+        psh: false,
+        ack: true,
+        urg: false,
+        ece: false,
+        cwr: false,
     };
 
     pub const FIN_ACK: Self = Self {
-        fin: true, syn: false, rst: false, psh: false,
-        ack: true, urg: false, ece: false, cwr: false,
+        fin: true,
+        syn: false,
+        rst: false,
+        psh: false,
+        ack: true,
+        urg: false,
+        ece: false,
+        cwr: false,
     };
 }
 
@@ -175,7 +205,8 @@ impl TcpRecvBuffer {
                 return Err(TcpError::BufferFull);
             }
             self.data.extend(data);
-            self.next_seq.fetch_add(data.len() as u32, Ordering::Release);
+            self.next_seq
+                .fetch_add(data.len() as u32, Ordering::Release);
             Ok(())
         } else {
             // Out-of-order (would need reordering logic)
@@ -268,7 +299,7 @@ impl TcpSocket {
             send_buffer: TcpSendBuffer::new(65536),
             recv_buffer: TcpRecvBuffer::new(65536),
             congestion: TcpCongestion::new(),
-            rtt: AtomicU64::new(100000), // 100ms initial
+            rtt: AtomicU64::new(100000),  // 100ms initial
             rto: AtomicU64::new(1000000), // 1s initial
         }
     }
@@ -293,7 +324,10 @@ impl TcpSocket {
     }
 
     /// Process incoming segment
-    pub fn process_segment(&mut self, segment: &TcpSegment) -> Result<Option<TcpSegment>, TcpError> {
+    pub fn process_segment(
+        &mut self,
+        segment: &TcpSegment,
+    ) -> Result<Option<TcpSegment>, TcpError> {
         match self.state {
             TcpState::Listen => {
                 if segment.flags.syn {
@@ -312,7 +346,8 @@ impl TcpSocket {
                 if segment.flags.syn && segment.flags.ack {
                     self.state = TcpState::Established;
                     // Send ACK
-                    let mut response = TcpSegment::new(self.local_port, segment.src_port, segment.ack_num);
+                    let mut response =
+                        TcpSegment::new(self.local_port, segment.src_port, segment.ack_num);
                     response.flags = TcpFlags::ACK;
                     response.ack_num = segment.seq_num + 1;
                     Ok(Some(response))

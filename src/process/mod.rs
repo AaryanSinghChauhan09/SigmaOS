@@ -17,6 +17,6 @@ pub use pidfd_procdesc_subreaper::{
 };
 
 pub use activity_manager::{
-    ActivityManager, AddressSpaceBinding, ApplicationPerformanceProfile,
-    ProcessPledgePromises, ProcessResourceLimits, PsiMetrics,
+    ActivityManager, AddressSpaceBinding, ApplicationPerformanceProfile, ProcessPledgePromises,
+    ProcessResourceLimits, PsiMetrics,
 };
