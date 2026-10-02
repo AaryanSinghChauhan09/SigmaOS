@@ -372,6 +372,10 @@ pub mod sovereign_2055_distro_supremacy_engine;
 
 pub mod sovereign_2060_distro_supremacy_engine;
 
+pub mod sovereign_2065_distro_supremacy_engine;
+
+pub mod sovereign_2070_distro_supremacy_engine;
+
 pub mod sovereign_linux_bsd_master_synthesis;
 
 pub mod sovereign_media_and_distro_unimplemented_innovations;
