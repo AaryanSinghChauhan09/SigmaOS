@@ -82,6 +82,7 @@ pub mod roundrobin;
 pub mod sched;
 pub mod scheduler;
 pub mod structures;
+pub mod timer_wheel;
 pub mod uts_namespace;
 pub mod virtual_cpu;
 
