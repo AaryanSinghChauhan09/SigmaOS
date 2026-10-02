@@ -1126,6 +1126,7 @@ mod tests {
                 .unwrap(),
             3
         );
+    }
 
     #[test]
     fn test_linux_driver_compat_boundary() {
