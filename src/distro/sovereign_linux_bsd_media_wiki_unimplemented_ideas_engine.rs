@@ -8,7 +8,6 @@
 //    - 9to5Google, 9to5Linux, 9to5Mac, Android Authority, Android Police, Appuals, DistroWatch, Frappe, Geeky Gadgets, HW Busters, How-To Geek, InfoWorld, ItsFOSS, ITDaily, KDnuggets, Linux.com, Linux.org, Linux Foundation, LinuxTeck, MakeUseOf, MarkTechPost, Open Source For You, PCMag, PCWorld, Phoronix, TechCrunch, TechPowerUp, TechSpot, The New Stack, Windows Central, Windows Latest, XDA Developers, ZDNET.
 
 use std::collections::BTreeMap;
-use std::vec::Vec;
 
 // =========================================================================
 // 1. LINUX & BSD DISTRO UNIMPLEMENTED IDEAS ENGINE

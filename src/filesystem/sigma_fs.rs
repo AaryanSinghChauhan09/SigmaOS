@@ -181,6 +181,7 @@ pub struct JournalTransaction {
     pub action: String,
     pub operation: String,
     pub path: String,
+    pub data: Vec<u8>,
     pub state: JournalState,
 }
 

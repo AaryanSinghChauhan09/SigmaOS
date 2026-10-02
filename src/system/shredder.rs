@@ -138,7 +138,7 @@ pub struct GutmannShredder;
 impl ShreddingStrategy for GutmannShredder {
     fn shred(&mut self, path: &Path) -> Result<ShreddingResult, ShredderError> {
         Ok(ShreddingResult {
-            file_path: path.to_string(),
+            file_path: path.to_string_lossy().into_owned(),
             success: true,
             passes_completed: 7,
             bytes_overwritten: 28672,
@@ -178,8 +178,8 @@ impl FileShredder {
 
     /// Shred a file
     pub fn shred(&mut self, path: &Path) -> Result<ShreddingResult, ShredderError> {
-        if path.is_empty() {
-            return Err(ShredderError::FileNotFound(path.to_string()));
+        if path.as_os_str().is_empty() {
+            return Err(ShredderError::FileNotFound(path.to_string_lossy().into_owned()));
         }
 
         let result = self.strategy.shred(path)?;

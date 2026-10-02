@@ -750,11 +750,15 @@ pub struct ResolutionPlan {
 pub struct DependencyResolverEngine {
     pub registered_packages: BTreeMap<String, PkgBuild>,
     pub constraints: Vec<Constraint>,
+    pub profiles: Vec<ArchChrootProfile>,
+    pub is_cleanroom_active: bool,
 }
 
 impl DependencyResolverEngine {
     pub fn new() -> Self {
         let mut engine = Self {
+            registered_packages: BTreeMap::new(),
+            constraints: Vec::new(),
             profiles: Vec::new(),
             is_cleanroom_active: true,
         };
@@ -785,11 +789,15 @@ impl DependencyResolverEngine {
 pub struct ArchPkgctlEngine {
     pub active_repos: Vec<String>,
     pub repo_name: String,
+    pub registered_packages: BTreeMap<String, PkgBuild>,
+    pub constraints: Vec<Constraint>,
 }
 
 impl ArchPkgctlEngine {
     pub fn new(repo_name: &str) -> Self {
         Self {
+            active_repos: Vec::new(),
+            repo_name: repo_name.to_string(),
             registered_packages: BTreeMap::new(),
             constraints: Vec::new(),
         }
@@ -845,6 +853,7 @@ pub struct PacmanDatabaseEngine {
     pub db_path: String,
     pub sync_repos: Vec<PacmanRepositoryMirror>,
     pub installed_packages: BTreeMap<String, PkgBuild>,
+    pub articles: Vec<WikiArticle>,
 }
 
 impl PacmanDatabaseEngine {
@@ -872,6 +881,7 @@ impl PacmanDatabaseEngine {
                 },
             ],
             installed_packages: BTreeMap::new(),
+            articles: Vec::new(),
         }
     }
 

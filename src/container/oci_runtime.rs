@@ -280,7 +280,6 @@ impl ImageManager for SimpleImageManager {
         } else {
             Err(ContainerError::InvalidConfig)
         }
-        Err(ContainerError::InvalidConfig)
     }
 }
 
@@ -394,6 +393,16 @@ pub struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
+}
+
+impl<T> FromIterator<T> for Vec<T> {
+    fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
+        let mut v = Vec::new();
+        for item in iter {
+            v.push(item);
+        }
+        v
+    }
 }
 
 impl<T> core::ops::Deref for Vec<T> {

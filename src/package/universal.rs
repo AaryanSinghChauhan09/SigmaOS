@@ -2,8 +2,6 @@ extern crate alloc;
 
 use alloc::boxed::Box;
 // use alloc::collections::BTreeMap;
-#[cfg(not(any(feature = "standalone_test", test)))]
-pub use crate::package::manager::PackageState;
 use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
