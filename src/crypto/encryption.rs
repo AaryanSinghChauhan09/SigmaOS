@@ -41,6 +41,7 @@ impl SimpleEncryptionKey {
             id,
             cipher_type,
             key_data: key_array,
+            key_len: key_len as u8,
         }
     }
 }
@@ -78,6 +79,7 @@ pub enum CryptoError {
     KeyNotFound = 1,
     EncryptionFailed = 2,
     InvalidKey = 3,
+    CryptoUnavailable = 4,
 }
 
 pub struct SimpleEncryptionService {

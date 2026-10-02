@@ -206,24 +206,11 @@ impl NamespaceConfig {
     }
 }
 
-/// Seccomp profile with bitmask and list-based syscall blocking
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct SeccompProfile {
-    pub enabled: bool,
-    pub allow_default: bool,
-    pub allowed_syscalls: Vec<u32>,
-    pub blocked_syscalls: Vec<u32>,
-    pub blocked_syscalls_mask: u32,
-    pub hardened: bool,
-}
-
 impl Default for SeccompProfile {
     fn default() -> Self {
         Self {
-            enabled: false,
-            allow_default: true,
+            default_action: 0,
             allowed_syscalls: Vec::new(),
-            blocked_syscalls: Vec::new(),
             blocked_syscalls_mask: 0,
             hardened: false,
         }
@@ -236,13 +223,13 @@ impl SeccompProfile {
     }
 
     pub fn is_syscall_blocked(&self, syscall_id: u32) -> bool {
-        if !self.hardened && !self.enabled {
+        if !self.hardened {
             return false;
         }
         if syscall_id < 64 && self.blocked_syscalls_mask != 0 {
-            return (self.blocked_syscalls_mask & (1 << syscall_id)) != 0;
+            return (self.blocked_syscalls_mask & (1 << (syscall_id as u64))) != 0;
         }
-        self.blocked_syscalls.contains(&syscall_id)
+        false
     }
 }
 
@@ -337,7 +324,6 @@ impl SimpleContainer {
             capability,
             environment: [0; 512],
             seccomp: SeccompProfile {
-                blocked_syscalls: Vec::new(),
                 hardened: false,
                 blocked_syscalls_mask: 0,
                 ..SeccompProfile::default()
