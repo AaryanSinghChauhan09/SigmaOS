@@ -1,6 +1,7 @@
 // SigmaOS Network Stack Module
 pub mod device_discovery;
 pub mod discovery;
+pub mod ip;
 pub mod ring_buffer_stack;
 pub mod routing;
 pub mod security;
