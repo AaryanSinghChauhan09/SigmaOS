@@ -216,10 +216,11 @@ impl AddressSanitizer {
             .wrapping_mul(0x9E3779B97F4A7C15)
     }
 
-    /// Free memory
-    pub fn free(&mut self, address: u64) -> Result<(), String> {
-        let region = self.regions.get_mut(&address)
-            .ok_or_else(|| format!("Address 0x{:x} not allocated", address))?;
+    /// Check canary
+    fn check_canary(&self, region: &AsanRegion) -> bool {
+        let expected = self.generate_canary(region.start);
+        region.canary == expected
+    }
 
     /// Find region by pointer
     fn find_region_by_ptr(&self, ptr: u64) -> Result<u64, &'static str> {
@@ -232,15 +233,7 @@ impl AddressSanitizer {
             }
         }
 
-        region.deallocate();
-        self.deallocation_count += 1;
-
-        // Add to quarantine
-        if self.quarantine.len() < self.config.quarantine_size {
-            self.quarantine.push(address);
-        }
-
-        Ok(())
+        Err("Pointer region not found")
     }
 
     /// Get shadow memory state for an address

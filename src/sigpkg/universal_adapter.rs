@@ -23,11 +23,8 @@ pub struct ArchPkgInfoManifest {
     pub pkgname: String,
     pub pkgver: String,
     pub pkgdesc: String,
-    pub arch: String,
-    pub architecture: String,
     pub depends: Vec<String>,
-    pub depend: Vec<String>,
-    pub makedepend: Vec<String>,
+    pub architecture: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -87,7 +84,6 @@ pub struct HaikuHpkgManifest {
     pub requires: Vec<String>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PacmanPkgbuild {
     pub pkgname: String,
     pub pkgver: String,
@@ -96,23 +92,6 @@ pub struct PacmanPkgbuild {
     pub depends: Vec<String>,
     pub makedepends: Vec<String>,
     pub source_urls: Vec<String>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct DnfPrimaryXmlManifest {
-    pub name: String,
-    pub version: String,
-    pub arch: String,
-    pub summary: String,
-    pub requires: Vec<String>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct NixExpressionManifest {
-    pub pname: String,
-    pub version: String,
-    pub description: String,
-    pub build_inputs: Vec<String>,
 }
 #[derive(Debug, Clone)]
 pub enum AdapterError {
@@ -201,6 +180,53 @@ pub struct SlackwarePkgManifest {
     pub slack_required: Vec<String>,
 }
 
+#[derive(Debug, Clone)]
+pub struct GentooEbuildMetadata {
+    pub category: String,
+    pub package_name: String,
+    pub version: String,
+    pub rdepend: Vec<String>,
+    pub depend: Vec<String>,
+    pub description: String,
+    pub use_flags: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct ApkIndexManifest {
+    pub pkgname: String,
+    pub pkgver: String,
+    pub pkgdesc: String,
+    pub depends: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct XbpsManifest {
+    pub pkgname: String,
+    pub version: String,
+    pub short_desc: String,
+    pub run_depends: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct HaikuHpkgManifest {
+    pub name: String,
+    pub version: String,
+    pub summary: String,
+    pub architecture: String,
+    pub requires: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct ArchPkgInfoManifest {
+    pub pkgname: String,
+    pub pkgver: String,
+    pub pkgdesc: String,
+    pub arch: String,
+    pub architecture: String,
+    pub depends: Vec<String>,
+    pub depend: Vec<String>,
+    pub makedepend: Vec<String>,
+}
 
 pub struct UniversalPackageAdapter;
 
@@ -2004,95 +2030,96 @@ impl UniversalDependencyMapper {
         };
         let clean = uncat_str.as_str();
 
-        let base_clean = match clean {
+        match clean {
             "libssl-dev" | "libssl3" | "openssl-devel" | "openssl-dev" | "security/openssl"
             | "dev-libs/openssl" | "libgnutls-dev" | "gnutls-devel" | "mbedtls-devel"
-            | "libmbedtls-dev" => "openssl",
+            | "libmbedtls-dev" => "openssl".to_string(),
             "libc6" | "glibc" | "musl" | "musl-dev" | "devel/glibc" | "sys-libs/glibc" | "libc"
             | "freebsd-runtime" | "openbsd-sys" | "dragonfly-runtime" | "bedrock-core"
+            | "haiku-libroot" | "pkgsrc-core" => "libc".to_string(),
+            "zlib1g-dev" | "zlib-devel" | "zlib-dev" | "devel/zlib" | "sys-libs/zlib" => {
+                "zlib".to_string()
+            }
             | "haiku-libroot" | "pkgsrc-core" | "libm" | "libpthread" | "libdl" | "librt"
-            | "libutil" => "libc",
-            "zlib1g-dev" | "zlib-devel" | "zlib-dev" | "devel/zlib" | "sys-libs/zlib" => "zlib",
+            | "libutil" => "libc".to_string(),
+            "zlib1g-dev" | "zlib-devel" | "zlib-dev" | "devel/zlib" | "sys-libs/zlib" => {
+                "zlib".to_string()
+            }
             "bzip2" | "libbz2-dev" | "bzip2-devel" | "brotli" | "libbrotli-dev" | "lzo"
-            | "liblzo2-dev" => "compression",
+            | "liblzo2-dev" => "compression".to_string(),
             "python" | "python3" | "python3-dev" | "python3-devel" | "python3-base"
-            | "python-core" | "dev-lang/python" | "lang/python" => "python",
+            | "python-core" | "dev-lang/python" | "lang/python" => "python".to_string(),
+            "python" | "python3" | "python3-dev" | "python3-devel" | "python3-base" | "python-core" | "dev-lang/python"
+            | "lang/python" => "python".to_string(),
             "curl" | "libcurl" | "libcurl4" | "libcurl-devel" | "libcurl-dev" | "ftp/curl"
-            | "net-misc/curl" => "curl",
-            "bash" | "bash-completion" | "shells/bash" | "app-shells/bash" => "bash",
-            "libx11" | "libx11-dev" | "libx11-devel" | "x11-libs/libx11" | "x11-proto/xorgproto"
-            | "xorg-x11-server" => "libx11",
-            "wayland" | "wayland-devel" | "wayland-dev" | "libwayland-client" | "libwayland-server"
-            | "wayland-protocols" | "dev-libs/wayland" => "wayland",
-            "pipewire" | "media-video/pipewire" | "pipewire-devel" | "libpipewire-0.3-dev"
-            | "pipewire-media-session" => "pipewire",
-            "dbus" | "dbus-devel" | "dbus-daemon" | "libdbus-1-3" | "dbus-x11" | "sys-apps/dbus" => {
-                "dbus"
+            | "net-misc/curl" => "curl".to_string(),
+            "bash" | "bash-completion" | "shells/bash" | "app-shells/bash" => "bash".to_string(),
+            "libx11"
+            | "libx11-dev"
+            | "libx11-devel"
+            | "x11-libs/libx11"
+            | "x11-proto/xorgproto"
+            | "xorg-x11-server" => "libx11".to_string(),
+            "wayland" | "wayland-devel" | "wayland-dev" | "libwayland-client" | "libwayland-server" | "wayland-protocols" | "dev-libs/wayland" => {
+                "wayland".to_string()
             }
-            "pkgconf" | "pkg-config" | "pkgconfig" | "dev-util/pkgconf" => "pkgconf",
-            "ncurses" | "ncurses-devel" | "ncursesw" | "sys-libs/ncurses" => "ncurses",
-            "readline" | "readline-devel" | "sys-libs/readline" => "readline",
-            "xz" | "xz-utils" | "liblzma-dev" | "app-arch/xz-utils" => "xz",
-            "zstd" | "libzstd" | "libzstd1" | "libzstd-dev" | "libzstd-devel" | "zstd-devel"
-            | "app-arch/zstd" => "zstd",
-            "sqlite" | "sqlite3" | "libsqlite3-0" | "libsqlite3-dev" | "sqlite-devel"
-            | "sqlite-dev" | "dev-db/sqlite" => "sqlite",
-            "gtk3" | "libgtk-3-dev" | "gtk3-devel" | "x11-toolkits/gtk30" => "gtk3",
-            "gtk4" | "libgtk-4-dev" | "gtk4-devel" | "x11-toolkits/gtk40" => "gtk4",
-            "qt5" | "qt5-base" | "qt5-base-devel" | "libqt5core5a" => "qt5",
-            "qt6" | "qt6-base" | "qt6-base-devel" => "qt6",
-            "llvm" | "llvm-dev" | "llvm-devel" | "sys-devel/llvm" => "llvm",
-            "gcc" | "gcc-c++" | "sys-devel/gcc" => "gcc",
-            "libffi" | "libffi-dev" | "libffi-devel" | "dev-libs/libffi" => "libffi",
-            "glib" | "glib2" | "glib2-devel" | "libglib2.0-dev" | "dev-libs/glib" => "glib",
-            "pcre" | "pcre2" | "libpcre2-dev" | "pcre2-devel" | "dev-libs/libpcre2" => "pcre",
-            "libuv" | "libuv-dev" | "libuv-devel" | "dev-libs/libuv" => "libuv",
-            "openssh" | "openssh-server" | "openssh-client" | "sshd" | "net-misc/openssh" => {
-                "openssh"
+            "pipewire" | "media-video/pipewire" | "pipewire-devel" | "libpipewire-0.3-dev" | "pipewire-media-session" => "pipewire".to_string(),
+            "dbus" | "dbus-devel" | "dbus-daemon" | "libdbus-1-3" | "dbus-x11" | "sys-apps/dbus" => "dbus".to_string(),
+            "pkgconf" | "pkg-config" | "pkgconfig" | "dev-util/pkgconf" => "pkgconf".to_string(),
+            "ncurses" | "ncurses-devel" | "ncursesw" | "sys-libs/ncurses" => "ncurses".to_string(),
+            "readline" | "readline-devel" | "sys-libs/readline" => "readline".to_string(),
+            "xz" | "xz-utils" | "liblzma-dev" | "app-arch/xz-utils" => "xz".to_string(),
+            "zstd" | "libzstd" | "libzstd1" | "libzstd-dev" | "libzstd-devel" | "zstd-devel" | "app-arch/zstd" => "zstd".to_string(),
+            "sqlite" | "sqlite3" | "libsqlite3-0" | "libsqlite3-dev" | "sqlite-devel" | "sqlite-dev" | "dev-db/sqlite" => {
+                "sqlite".to_string()
             }
-            "mesa" | "mesa-dev" | "mesa-libgl-devel" | "libgl1-mesa-dev" | "mesa-vulkan-drivers"
-            | "mesa-dri-drivers" | "media-libs/mesa" => "mesa",
-            "git" | "git-base" | "dev-vcs/git" => "git",
-            "cmake" | "dev-build/cmake" => "cmake",
-            "ffmpeg" | "libffmpeg-dev" | "media-video/ffmpeg" => "ffmpeg",
-            "rust" | "rustc" | "dev-lang/rust" => "rust",
-            "golang" | "go" | "dev-lang/go" => "go",
-            "ninja" | "ninja-build" | "dev-build/ninja" => "ninja",
-            "systemd" | "systemd-sysv" | "sys-apps/systemd" => "systemd",
-            "openrc" | "sys-apps/openrc" => "openrc",
-            "runit" => "runit",
-            "fastfetch" | "neofetch" => "fastfetch",
-            "btop" | "htop" => "btop",
-            "ripgrep" | "rg" => "ripgrep",
-            "bat" => "bat",
-            "fd" | "fd-find" => "fd",
-            "zoxide" => "zoxide",
-            "eza" | "exa" => "eza",
-            "valgrind" | "gdb" | "strace" | "truss" | "ktrace" | "dtrace" => "debug-tools",
-            "coreutils" | "bsdutils" | "uutils" => "coreutils",
-            "iproute2" | "net-tools" | "ifconfig" => "iproute2",
-            "polkit" | "doas" | "sudo" => "privilege-escalation",
-            "wireguard" | "openvpn" | "tailscale" => "vpn",
-            "hyprland" | "sway" | "i3" | "mutter" | "kwin" => "window-manager",
-            "alacritty" | "kitty" | "foot" | "konsole" | "xterm" => "terminal-emulator",
-            "docker" | "podman" | "containerd" | "cri-o" | "lxc" => "container-runtime",
-            "cuda" | "rocm" | "onnxruntime" | "libtorch" | "tensorflow" | "vllm" => "ai-runtime",
-            other => {
-                if let Some(s) = other.strip_suffix("-devel") {
-                    s
-                } else if let Some(s) = other.strip_suffix("-dev") {
-                    s
-                } else if let Some(s) = other.strip_suffix("-libs") {
-                    s
-                } else if let Some(s) = other.strip_suffix("-lib") {
-                    s
-                } else {
-                    other
-                }
+            "gtk3" | "libgtk-3-dev" | "gtk3-devel" | "x11-toolkits/gtk30" => "gtk3".to_string(),
+            "gtk4" | "libgtk-4-dev" | "gtk4-devel" | "x11-toolkits/gtk40" => "gtk4".to_string(),
+            "qt5" | "qt5-base" | "qt5-base-devel" | "libqt5core5a" => "qt5".to_string(),
+            "qt6" | "qt6-base" | "qt6-base-devel" => "qt6".to_string(),
+            "llvm" | "llvm-dev" | "llvm-devel" | "sys-devel/llvm" => "llvm".to_string(),
+            "gcc" | "gcc-c++" | "sys-devel/gcc" => "gcc".to_string(),
+            "libffi" | "libffi-dev" | "libffi-devel" | "dev-libs/libffi" => "libffi".to_string(),
+            "glib" | "glib2" | "glib2-devel" | "libglib2.0-dev" | "dev-libs/glib" => {
+                "glib".to_string()
             }
-        };
-
-        base_clean.to_string()
+            "pcre" | "pcre2" | "libpcre2-dev" | "pcre2-devel" | "dev-libs/libpcre2" => {
+                "pcre".to_string()
+            }
+            "libuv" | "libuv-dev" | "libuv-devel" | "dev-libs/libuv" => "libuv".to_string(),
+            "openssh" | "openssh-server" | "openssh-client" | "sshd" | "net-misc/openssh" => "openssh".to_string(),
+            "mesa" | "mesa-dev" | "mesa-libgl-devel" | "libgl1-mesa-dev" | "mesa-vulkan-drivers" | "mesa-dri-drivers" | "media-libs/mesa" => "mesa".to_string(),
+            "git" | "git-base" | "dev-vcs/git" => "git".to_string(),
+            "cmake" | "dev-build/cmake" => "cmake".to_string(),
+            "ffmpeg" | "libffmpeg-dev" | "media-video/ffmpeg" => "ffmpeg".to_string(),
+            "rust" | "rustc" | "dev-lang/rust" => "rust".to_string(),
+            "golang" | "go" | "dev-lang/go" => "go".to_string(),
+            "ninja" | "ninja-build" | "dev-build/ninja" => "ninja".to_string(),
+            "systemd" | "systemd-sysv" | "sys-apps/systemd" => "systemd".to_string(),
+            "openrc" | "sys-apps/openrc" => "openrc".to_string(),
+            "runit" => "runit".to_string(),
+            "fastfetch" | "neofetch" => "fastfetch".to_string(),
+            "btop" | "htop" => "btop".to_string(),
+            "ripgrep" | "rg" => "ripgrep".to_string(),
+            "bat" => "bat".to_string(),
+            "fd" | "fd-find" => "fd".to_string(),
+            "zoxide" => "zoxide".to_string(),
+            "eza" | "exa" => "eza".to_string(),
+            "valgrind" | "gdb" | "strace" | "truss" | "ktrace" | "dtrace" => {
+                "debug-tools".to_string()
+            }
+            "coreutils" | "bsdutils" | "uutils" => "coreutils".to_string(),
+            "iproute2" | "net-tools" | "ifconfig" => "iproute2".to_string(),
+            "polkit" | "doas" | "sudo" => "privilege-escalation".to_string(),
+            "wireguard" | "openvpn" | "tailscale" => "vpn".to_string(),
+            "hyprland" | "sway" | "i3" | "mutter" | "kwin" => "window-manager".to_string(),
+            "alacritty" | "kitty" | "foot" | "konsole" | "xterm" => "terminal-emulator".to_string(),
+            "docker" | "podman" | "containerd" | "cri-o" | "lxc" => "container-runtime".to_string(),
+            "cuda" | "rocm" | "onnxruntime" | "libtorch" | "tensorflow" | "vllm" => {
+                "ai-runtime".to_string()
+            }
+            _ => clean.to_string(),
+        }
     }
 }
 
