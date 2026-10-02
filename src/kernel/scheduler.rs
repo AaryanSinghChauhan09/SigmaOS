@@ -11,6 +11,10 @@ use core::time::Duration;
 use std::collections::BinaryHeap;
 
 /// Process priority
+/// 
+/// Priority values range from -20 (highest/realtime) to 19 (lowest/idle).
+/// Lower numeric values indicate higher scheduling priority.
+/// Linux-compatible priority system for fair scheduling.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Priority {
     pub value: i32, // -20 to 19 (lower is higher priority)
@@ -60,6 +64,12 @@ impl Priority {
 }
 
 /// Scheduler policy
+///
+/// Determines which scheduling algorithm to apply to a task:
+/// - Normal: Completely Fair Scheduler (CFS) with vruntime-based scheduling
+/// - Realtime: Fixed-priority preemptive scheduling for time-critical tasks
+/// - Idle: Only runs when no other tasks are runnable
+/// - Batch: CPU-intensive workloads with lower interactivity requirements
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SchedulerPolicy {
     Normal, // CFS
@@ -89,6 +99,10 @@ impl ProcessState {
 }
 
 /// Process task
+///
+/// Represents a schedulable task with CFS scheduling parameters.
+/// Tracks virtual runtime (vruntime) for fair CPU time distribution,
+/// execution statistics, and current scheduling state.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ProcessTask {
     pub pid: u64,
@@ -110,6 +124,15 @@ impl Ord for ProcessTask {
 }
 
 /// CFS Scheduler implementation
+///
+/// Completely Fair Scheduler inspired by Linux CFS.
+/// Uses red-black tree (via BinaryHeap) to track runnable tasks ordered by vruntime.
+/// Each task receives CPU time proportional to its priority weight, ensuring
+/// fairness while allowing priority-based differentiation.
+///
+/// Key parameters:
+/// - min_granularity: Minimum time slice duration
+/// - latency: Target scheduling latency for all tasks
 pub struct CfsScheduler {
     runnable_tasks: BinaryHeap<ProcessTask>,
     current_task: Option<ProcessTask>,
