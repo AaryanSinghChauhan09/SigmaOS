@@ -63,15 +63,6 @@ pub mod store;
 pub mod transaction;
 pub mod transaction_log;
 pub mod universal_adapter;
-pub use universal_adapter::{
-    AppImageContainer, AptDebManifest, DispatchedPmAction, FlatpakManifest, FreeBsdUclManifest,
-    MappedScriptletHook, NetBsdPkgsrcManifest, OpenBsdContentsManifest, PackageFormatAdapter,
-    PackagePriority, PacmanPkgbuild, RpmSpecManifest, SigPkgUniversalBridgeEngine,
-    SigmaPkgHookType, SlackwarePkgManifest, SnapcraftManifest, UniversalDependencyMapper,
-    UniversalDryRunResult, UniversalDryRunSimulator, UniversalFormatConverter,
-    UniversalPackageAdapter, UniversalPmCommandDispatcher, UniversalPmOperation,
-    UniversalScriptletConverter, ZypperSpecManifest,
-};
 pub mod universal_oop_system;
 pub use universal_engine::{
     SovereignUniversalPackageManagerInteropEngine, SovereignUniversalPackageTranslationBridge,
