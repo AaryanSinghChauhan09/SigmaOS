@@ -328,60 +328,19 @@ export function toggleHelp() {
     overlay.setAttribute("aria-label", "Sovereign Desktop Help Matrix");
     overlay.setAttribute("aria-modal", "true");
     if (!overlay.firstElementChild) {
-      const card = document.createElement("div");
-      card.className = "wizard-card";
-      card.setAttribute("role", "document");
-
-      const h2 = document.createElement("h2");
-      h2.textContent = "❓ Help Matrix";
-      card.appendChild(h2);
-
-      const subtitle = document.createElement("p");
-      subtitle.style.color = "var(--text-muted)";
-      subtitle.style.marginBottom = "15px";
-      subtitle.style.fontSize = "0.9rem";
-      subtitle.textContent = "Essential Sovereign Desktop Keyboard Shortcuts";
-      card.appendChild(subtitle);
-
-      const steps = document.createElement("div");
-      steps.className = "wizard-steps";
-      steps.style.textAlign = "left";
-      steps.style.fontSize = "0.85rem";
-      steps.style.gap = "8px";
-
-      const shortcuts = [
-        { kbd: "Alt + Space", text: " Toggle Command Palette" },
-        { kbd: "Alt + F / T / O / S / M / D", text: " Launch Apps" },
-        { kbd: "F1 / ?", text: " Toggle Help Matrix" },
-        { kbd: "Escape", text: " Dismiss active dialogs & menus" },
-      ];
-
-      shortcuts.forEach((sc) => {
-        const item = document.createElement("div");
-        const kbd = document.createElement("kbd");
-        kbd.style.background = "rgba(255,255,255,0.1)";
-        kbd.style.padding = "2px 6px";
-        kbd.style.borderRadius = "4px";
-        kbd.textContent = sc.kbd;
-        const textSpan = document.createElement("span");
-        textSpan.textContent = sc.text;
-        item.appendChild(kbd);
-        item.appendChild(textSpan);
-        steps.appendChild(item);
-      });
-      card.appendChild(steps);
-
-      const closeBtn = document.createElement("button");
-      closeBtn.type = "button";
-      closeBtn.className = "wizard-btn";
-      closeBtn.id = "help-close-btn";
-      closeBtn.style.marginTop = "20px";
-      closeBtn.textContent = "Close";
-      closeBtn.setAttribute("aria-label", "Close Help Matrix");
-      closeBtn.addEventListener("click", toggleHelp);
-      card.appendChild(closeBtn);
-
-      overlay.appendChild(card);
+      overlay.innerHTML = `
+        <div class="wizard-card" role="document">
+          <h2>❓ Help Matrix</h2>
+          <p style="color: var(--text-muted); margin-bottom: 15px; font-size: 0.9rem;">Essential Sovereign Desktop Keyboard Shortcuts</p>
+          <div class="wizard-steps" style="text-align: left; font-size: 0.85rem; gap: 8px;">
+            <div><kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">Alt + Space</kbd> Toggle Command Palette</div>
+            <div><kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">Alt + F / T / O / S / M / D</kbd> Launch Apps</div>
+            <div><kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">F1 / ?</kbd> Toggle Help Matrix</div>
+            <div><kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">Escape</kbd> Dismiss active dialogs & menus</div>
+          </div>
+          <button type="button" class="wizard-btn" id="help-close-btn" style="margin-top: 20px;" onclick="toggleHelp()" aria-label="Close Help Matrix">Close</button>
+        </div>
+      `;
     }
     overlay.classList.remove("wizard-overlay--hidden");
     overlay.setAttribute("aria-hidden", "false");

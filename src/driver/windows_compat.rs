@@ -411,22 +411,13 @@ impl PeDriverLoader {
             return Err("Invalid MZ DOS signature");
         }
 
-        if dos_header.e_lfanew < 0 {
-            return Err("Negative PE offset in e_lfanew");
-        }
         let pe_offset = dos_header.e_lfanew as usize;
-
-        let required_min_size = pe_offset
-            .checked_add(4)
-            .and_then(|o| o.checked_add(core::mem::size_of::<ImageFileHeader>()))
-            .and_then(|o| o.checked_add(core::mem::size_of::<ImageOptionalHeader64>()));
-
-        let min_size = match required_min_size {
-            Some(sz) => sz,
-            None => return Err("PE offset arithmetic overflow"),
-        };
-
-        if min_size > binary.len() {
+        if pe_offset
+            + 4
+            + core::mem::size_of::<ImageFileHeader>()
+            + core::mem::size_of::<ImageOptionalHeader64>()
+            > binary.len()
+        {
             return Err("PE offset bounds overflow");
         }
 
@@ -461,24 +452,13 @@ impl PeDriverLoader {
 
         // Copy Headers
         let headers_size = opt_header.size_of_headers as usize;
-        if headers_size > binary.len() || headers_size > total_image_size {
-            return Err("Invalid PE headers size");
-        }
         self.virtual_memory[..headers_size].copy_from_slice(&binary[..headers_size]);
 
         // Copy Sections
-        let section_offset = match opt_header_offset.checked_add(file_header.size_of_optional_header as usize) {
-            Some(so) => so,
-            None => return Err("Section offset arithmetic overflow"),
-        };
-
+        let section_offset = opt_header_offset + file_header.size_of_optional_header as usize;
         for i in 0..(file_header.number_of_sections as usize) {
-            let offset = match i.checked_mul(core::mem::size_of::<ImageSectionHeader>()).and_then(|o| section_offset.checked_add(o)) {
-                Some(off) => off,
-                None => return Err("Section index calculation overflow"),
-            };
-
-            if offset.checked_add(core::mem::size_of::<ImageSectionHeader>()).map_or(true, |end| end > binary.len()) {
+            let offset = section_offset + i * core::mem::size_of::<ImageSectionHeader>();
+            if offset + core::mem::size_of::<ImageSectionHeader>() > binary.len() {
                 return Err("Section header overflow");
             }
             let section = unsafe { &*(binary.as_ptr().add(offset) as *const ImageSectionHeader) };
