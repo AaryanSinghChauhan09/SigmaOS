@@ -325,6 +325,8 @@ pub use linux_bsd_pinnacle_synthesis::{
     UrpmiMediaSource, UrpmiPackageRecord,
 };
 
+pub mod sovereign_2070_distro_supremacy_engine;
+pub use sovereign_2070_distro_supremacy_engine::*;
 pub mod sovereign_2028_distro_supremacy_engine;
 pub use sovereign_2028_distro_supremacy_engine::{
     BpfSchedExtPolicy, DirectScanoutFrame, EbpfSchedTask, FineIbtCallsiteGuard, MicroVmSpawnSpec,
@@ -371,10 +373,6 @@ pub mod sovereign_2050_distro_supremacy_engine;
 pub mod sovereign_2055_distro_supremacy_engine;
 
 pub mod sovereign_2060_distro_supremacy_engine;
-
-pub mod sovereign_2065_distro_supremacy_engine;
-
-pub mod sovereign_2070_distro_supremacy_engine;
 
 pub mod sovereign_linux_bsd_master_synthesis;
 

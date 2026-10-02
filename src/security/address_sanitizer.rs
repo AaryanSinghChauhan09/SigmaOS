@@ -54,6 +54,7 @@ impl AsanRegion {
 
     pub fn deallocate(&mut self) {
         self.is_allocated = false;
+        self.allocated = false;
     }
 
     /// Check if address is within valid range (excluding redzones)
@@ -117,7 +118,7 @@ impl From<usize> for AsanConfig {
 pub struct AddressSanitizer {
     config: AsanConfig,
     regions: HashMap<u64, AsanRegion>,
-    shadow_memory: HashMap<u64, ShadowState>,
+    shadow_memory: HashMap<u64, u8>,
     quarantine: Vec<u64>,
     allocation_count: u64,
     deallocation_count: u64,
@@ -264,6 +265,17 @@ impl AddressSanitizer {
         region.canary == expected || region.canary == 0
     }
 
+        region.deallocate();
+        self.deallocation_count += 1;
+
+        // Add to quarantine
+        if self.quarantine.len() < self.config.quarantine_size {
+            self.quarantine.push(address);
+        }
+
+        Ok(())
+    }
+
     /// Find region by pointer
     fn find_region_by_ptr(&self, ptr: u64) -> Result<u64, &'static str> {
         for (&id, region) in &self.regions {
@@ -278,7 +290,7 @@ impl AddressSanitizer {
         Err("Pointer not within any allocated region")
     }
 
-    pub fn get_shadow(&self, address: u64) -> Option<ShadowState> {
+    pub fn get_shadow(&self, address: u64) -> Option<u8> {
         self.shadow_memory.get(&address).copied()
     }
 
@@ -302,7 +314,7 @@ impl AddressSanitizer {
     /// Detect use-after-free
     pub fn detect_use_after_free(&mut self, address: u64) -> bool {
         if let Some(state) = self.get_shadow(address) {
-            state == ShadowState::Freed
+            state == 0xFD
         } else {
             false
         }
