@@ -41,36 +41,36 @@ use std::vec::Vec;
 /// Universal Multi-Format Kind V13 supporting Linux, BSD, macOS, Mobile, and Container formats
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum UniversalMultiFormatKindV13 {
-    AdobeAir,           // .air
-    HomebrewBottle,     // .bottle
-    AppleIpa,           // .ipa
-    BsdPorts,           // .ports / BSD ports tree
-    GenericPkg,         // .pkg (FreeBSD, macOS, Solaris, NetBSD)
-    AndroidAab,         // .aab
-    AndroidApk,         // .apk
-    AppImage,           // AppImage / .appimage
-    SolusEopkg,         // .eopkg
-    NixPkg,             // .nixpkg / .nix
-    GentooPortage,      // .portage
-    DebianDeb,          // .deb
-    TarGz,              // .tar.gz
-    XzArchive,          // .xz
-    RedHatRpm,          // .rpm
-    GentooEbuild,       // .ebuild
-    ArchPkgTarXz,       // .pkg.tar.xz
-    Flatpak,            // Flatpak / .flatpak
-    MacOsApp,           // .app
-    HarmonyHap,         // .hap (HarmonyOS OpenHarmony)
-    PardusPisi,         // .PiSi / .pisi
-    TarGzAlias,         // .tgz
-    DeepinSuperdeb,     // .superdeb
-    SlaxLzm,            // .lzm
-    PuppyPup,           // pup / .pup
-    CanonicalSnap,      // .snap
-    ArchPacmanZst,      // pacman / .pkg.tar.zst
-    TarArchive,         // .tar
-    PuppyPet,           // .pet
-    SigmaNativeSigpkg,  // .sigpkg
+    AdobeAir,          // .air
+    HomebrewBottle,    // .bottle
+    AppleIpa,          // .ipa
+    BsdPorts,          // .ports / BSD ports tree
+    GenericPkg,        // .pkg (FreeBSD, macOS, Solaris, NetBSD)
+    AndroidAab,        // .aab
+    AndroidApk,        // .apk
+    AppImage,          // AppImage / .appimage
+    SolusEopkg,        // .eopkg
+    NixPkg,            // .nixpkg / .nix
+    GentooPortage,     // .portage
+    DebianDeb,         // .deb
+    TarGz,             // .tar.gz
+    XzArchive,         // .xz
+    RedHatRpm,         // .rpm
+    GentooEbuild,      // .ebuild
+    ArchPkgTarXz,      // .pkg.tar.xz
+    Flatpak,           // Flatpak / .flatpak
+    MacOsApp,          // .app
+    HarmonyHap,        // .hap (HarmonyOS OpenHarmony)
+    PardusPisi,        // .PiSi / .pisi
+    TarGzAlias,        // .tgz
+    DeepinSuperdeb,    // .superdeb
+    SlaxLzm,           // .lzm
+    PuppyPup,          // pup / .pup
+    CanonicalSnap,     // .snap
+    ArchPacmanZst,     // pacman / .pkg.tar.zst
+    TarArchive,        // .tar
+    PuppyPet,          // .pet
+    SigmaNativeSigpkg, // .sigpkg
 }
 
 impl UniversalMultiFormatKindV13 {
@@ -81,7 +81,10 @@ impl UniversalMultiFormatKindV13 {
         // 1. Check multi-part specific extensions first to prevent single-part extension shadowing
         if lower.ends_with(".pkg.tar.xz") {
             Some(Self::ArchPkgTarXz)
-        } else if lower.ends_with(".pkg.tar.zst") || lower.ends_with(".pkg.tar.gz") || lower.ends_with(".pkg.tar.bz2") {
+        } else if lower.ends_with(".pkg.tar.zst")
+            || lower.ends_with(".pkg.tar.gz")
+            || lower.ends_with(".pkg.tar.bz2")
+        {
             Some(Self::ArchPacmanZst)
         } else if lower.ends_with(".bottle.tar.gz") || lower.ends_with(".bottle") {
             Some(Self::HomebrewBottle)
@@ -201,13 +204,29 @@ impl UniversalMultiFormatKindV13 {
     /// Classification category for format kind
     pub fn category(&self) -> &'static str {
         match self {
-            Self::DebianDeb | Self::DeepinSuperdeb | Self::RedHatRpm | Self::ArchPkgTarXz | Self::ArchPacmanZst | Self::SolusEopkg | Self::PardusPisi => "System Binary Distribution Package",
-            Self::GentooEbuild | Self::GentooPortage | Self::BsdPorts => "Source Recipe & Compilation Package",
-            Self::Flatpak | Self::CanonicalSnap | Self::AppImage => "Containerized Desktop Application",
+            Self::DebianDeb
+            | Self::DeepinSuperdeb
+            | Self::RedHatRpm
+            | Self::ArchPkgTarXz
+            | Self::ArchPacmanZst
+            | Self::SolusEopkg
+            | Self::PardusPisi => "System Binary Distribution Package",
+            Self::GentooEbuild | Self::GentooPortage | Self::BsdPorts => {
+                "Source Recipe & Compilation Package"
+            }
+            Self::Flatpak | Self::CanonicalSnap | Self::AppImage => {
+                "Containerized Desktop Application"
+            }
             Self::NixPkg => "Functional Reproducible CAS Package",
-            Self::GenericPkg | Self::TarGz | Self::XzArchive | Self::TarGzAlias | Self::TarArchive => "BSD / Unix Tar Archive Package",
+            Self::GenericPkg
+            | Self::TarGz
+            | Self::XzArchive
+            | Self::TarGzAlias
+            | Self::TarArchive => "BSD / Unix Tar Archive Package",
             Self::AppleIpa | Self::MacOsApp | Self::HomebrewBottle => "Apple macOS / iOS Package",
-            Self::AndroidAab | Self::AndroidApk | Self::HarmonyHap => "Mobile / Runtime Container Package",
+            Self::AndroidAab | Self::AndroidApk | Self::HarmonyHap => {
+                "Mobile / Runtime Container Package"
+            }
             Self::AdobeAir => "Cross-Platform Runtime Package",
             Self::SlaxLzm | Self::PuppyPup | Self::PuppyPet => "Lightweight / Live Overlay Package",
             Self::SigmaNativeSigpkg => "SigmaOS Native Post-Quantum Package",
@@ -292,20 +311,43 @@ impl UniversalMultiFormatTranspilerEngineV13 {
         // Extract metadata based on key-value or manifest format patterns
         for line in raw_content.lines() {
             let line_trim = line.trim();
-            if line_trim.starts_with("Package:") || line_trim.starts_with("pkgname=") || line_trim.starts_with("name=") || line_trim.starts_with("name:") {
+            if line_trim.starts_with("Package:")
+                || line_trim.starts_with("pkgname=")
+                || line_trim.starts_with("name=")
+                || line_trim.starts_with("name:")
+            {
                 let parts: Vec<&str> = line_trim.splitn(2, |c| c == ':' || c == '=').collect();
                 if parts.len() == 2 {
-                    pkg_name = parts[1].trim().trim_matches('\'').trim_matches('"').to_string();
+                    pkg_name = parts[1]
+                        .trim()
+                        .trim_matches('\'')
+                        .trim_matches('"')
+                        .to_string();
                 }
-            } else if line_trim.starts_with("Version:") || line_trim.starts_with("pkgver=") || line_trim.starts_with("version=") || line_trim.starts_with("version:") {
+            } else if line_trim.starts_with("Version:")
+                || line_trim.starts_with("pkgver=")
+                || line_trim.starts_with("version=")
+                || line_trim.starts_with("version:")
+            {
                 let parts: Vec<&str> = line_trim.splitn(2, |c| c == ':' || c == '=').collect();
                 if parts.len() == 2 {
-                    pkg_version = parts[1].trim().trim_matches('\'').trim_matches('"').to_string();
+                    pkg_version = parts[1]
+                        .trim()
+                        .trim_matches('\'')
+                        .trim_matches('"')
+                        .to_string();
                 }
-            } else if line_trim.starts_with("Depends:") || line_trim.starts_with("depends=") || line_trim.starts_with("requires=") {
+            } else if line_trim.starts_with("Depends:")
+                || line_trim.starts_with("depends=")
+                || line_trim.starts_with("requires=")
+            {
                 let parts: Vec<&str> = line_trim.splitn(2, |c| c == ':' || c == '=').collect();
                 if parts.len() == 2 {
-                    let raw_deps = parts[1].trim().trim_matches('(').trim_matches(')').trim_matches('\'');
+                    let raw_deps = parts[1]
+                        .trim()
+                        .trim_matches('(')
+                        .trim_matches(')')
+                        .trim_matches('\'');
                     for dep in raw_deps.split(|c| c == ',' || c == ' ') {
                         let clean_dep = dep.trim().trim_matches('\'').trim_matches('"');
                         if !clean_dep.is_empty() {
@@ -324,7 +366,11 @@ impl UniversalMultiFormatTranspilerEngineV13 {
                 pkg_name = name_parts[0].to_string();
             }
             if name_parts.len() > 1 {
-                let ver_str = name_parts[1].split('.').take(3).collect::<Vec<&str>>().join(".");
+                let ver_str = name_parts[1]
+                    .split('.')
+                    .take(3)
+                    .collect::<Vec<&str>>()
+                    .join(".");
                 if !ver_str.is_empty() {
                     pkg_version = ver_str;
                 }
@@ -332,7 +378,9 @@ impl UniversalMultiFormatTranspilerEngineV13 {
         }
 
         let (sandbox_level, unveil_paths, pledge_promises) =
-            UniversalFormatCapabilityAndSandboxGovernorV13::configure_sandbox_capabilities(format_kind);
+            UniversalFormatCapabilityAndSandboxGovernorV13::configure_sandbox_capabilities(
+                format_kind,
+            );
 
         Ok(TranspiledSigpkgManifestV13 {
             name: pkg_name,
@@ -426,10 +474,7 @@ impl MultiFormatUniversalPackageRepositoryStagingEngineV13 {
     }
 
     /// Stages transpiled package and creates generational checkpoint
-    pub fn stage_package(
-        &mut self,
-        manifest: TranspiledSigpkgManifestV13,
-    ) -> Result<u64, String> {
+    pub fn stage_package(&mut self, manifest: TranspiledSigpkgManifestV13) -> Result<u64, String> {
         let gen_id = self.next_generation_id;
         self.next_generation_id += 1;
         self.staged_packages.insert(gen_id, manifest);
@@ -481,7 +526,11 @@ impl UniversalPackageCliCommandDispatcherV13 {
 
         let cli_tool = args[0];
         let sub_cmd = if args.len() > 1 { args[1] } else { "" };
-        let target_pkg = if args.len() > 2 { args[2] } else { "default-pkg" };
+        let target_pkg = if args.len() > 2 {
+            args[2]
+        } else {
+            "default-pkg"
+        };
 
         let (action, format) = match cli_tool {
             "apt" | "apt-get" | "dpkg" => (
@@ -579,7 +628,9 @@ impl SovereignDistroPackageAdvancementsSuiteV13 {
         filename: &str,
         manifest_raw: &str,
     ) -> Result<u64, String> {
-        let manifest = self.transpiler.transpile_package_manifest(filename, manifest_raw)?;
+        let manifest = self
+            .transpiler
+            .transpile_package_manifest(filename, manifest_raw)?;
         self.repository_staging.stage_package(manifest)
     }
 }
@@ -686,11 +737,16 @@ mod tests {
     fn test_transpiler_and_sandbox_governor() {
         let transpiler = UniversalMultiFormatTranspilerEngineV13::new();
         let raw_deb = "Package: nginx\nVersion: 1.24.0\nDepends: libssl3, zlib1g\n";
-        let manifest = transpiler.transpile_package_manifest("nginx-1.24.0.deb", raw_deb).unwrap();
+        let manifest = transpiler
+            .transpile_package_manifest("nginx-1.24.0.deb", raw_deb)
+            .unwrap();
 
         assert_eq!(manifest.name, "nginx");
         assert_eq!(manifest.version, "1.24.0");
-        assert_eq!(manifest.origin_format, UniversalMultiFormatKindV13::DebianDeb);
+        assert_eq!(
+            manifest.origin_format,
+            UniversalMultiFormatKindV13::DebianDeb
+        );
         assert!(manifest.dependencies.contains(&String::from("libssl3")));
         assert!(manifest.pqc_signature_verified);
 
@@ -729,19 +785,34 @@ mod tests {
     fn test_cli_command_dispatcher() {
         let dispatcher = UniversalPackageCliCommandDispatcherV13::new();
 
-        let action_apt = dispatcher.dispatch_cli(&["apt", "install", "curl"]).unwrap();
+        let action_apt = dispatcher
+            .dispatch_cli(&["apt", "install", "curl"])
+            .unwrap();
         assert_eq!(action_apt.source_cli, "apt");
         assert_eq!(action_apt.command_action, "debian-apt-install");
         assert_eq!(action_apt.target_package, "curl");
-        assert_eq!(action_apt.target_format, UniversalMultiFormatKindV13::DebianDeb);
+        assert_eq!(
+            action_apt.target_format,
+            UniversalMultiFormatKindV13::DebianDeb
+        );
 
-        let action_brew = dispatcher.dispatch_cli(&["brew", "install", "wget"]).unwrap();
+        let action_brew = dispatcher
+            .dispatch_cli(&["brew", "install", "wget"])
+            .unwrap();
         assert_eq!(action_brew.source_cli, "brew");
-        assert_eq!(action_brew.target_format, UniversalMultiFormatKindV13::HomebrewBottle);
+        assert_eq!(
+            action_brew.target_format,
+            UniversalMultiFormatKindV13::HomebrewBottle
+        );
 
-        let action_snap = dispatcher.dispatch_cli(&["snap", "install", "vlc"]).unwrap();
+        let action_snap = dispatcher
+            .dispatch_cli(&["snap", "install", "vlc"])
+            .unwrap();
         assert_eq!(action_snap.source_cli, "snap");
-        assert_eq!(action_snap.target_format, UniversalMultiFormatKindV13::CanonicalSnap);
+        assert_eq!(
+            action_snap.target_format,
+            UniversalMultiFormatKindV13::CanonicalSnap
+        );
     }
 
     #[test]
@@ -752,6 +823,14 @@ mod tests {
             .unwrap();
 
         assert_eq!(gen_id, 1001);
-        assert_eq!(suite.repository_staging.staged_packages.get(&gen_id).unwrap().name, "htop");
+        assert_eq!(
+            suite
+                .repository_staging
+                .staged_packages
+                .get(&gen_id)
+                .unwrap()
+                .name,
+            "htop"
+        );
     }
 }
