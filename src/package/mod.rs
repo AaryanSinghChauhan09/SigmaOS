@@ -20,8 +20,8 @@ pub mod arch_aur;
 pub mod aur_integration;
 pub mod bsd_linux_package_innovations;
 pub mod cache;
-pub mod cleanup;
 pub mod checkupdates;
+pub mod cleanup;
 pub mod debian;
 pub mod debian_apt;
 pub mod debian_translator;
@@ -83,6 +83,8 @@ pub mod sovereign_distro_package_advancements_v10;
 pub use sovereign_distro_package_advancements_v10::*;
 pub mod sovereign_distro_package_advancements_v11;
 pub use sovereign_distro_package_advancements_v11::*;
+pub mod sovereign_distro_package_advancements_v12;
+pub use sovereign_distro_package_advancements_v12::*;
 pub mod sovereign_universal_multi_distro_pm_gateway;
 pub use sovereign_universal_multi_distro_pm_gateway::*;
 
@@ -119,6 +121,10 @@ pub use bsd_linux_package_innovations::{
     ZypperPackageOffer, ZypperRepository,
 };
 pub use checkupdates::{CheckupdatesEngine, PackageUpdate};
+pub use cleanup::{
+    CachedPackage, CleanupOperation, CleanupResult, OldPackageVersion, OrphanPackage,
+    PackageCleanupManager,
+};
 pub use debian::{
     parse_dpkg_status, parse_sources_list, AptSource, DebControl, DebPackage, DpkgStatusEntry,
 };
@@ -157,10 +163,6 @@ pub use repository::{
     TransactionJournalEntry,
 };
 pub use repository_config::{RepoConfig, RepositoryConfigManager};
-pub use cleanup::{
-    CleanupOperation, CleanupResult, OrphanPackage, CachedPackage, OldPackageVersion,
-    PackageCleanupManager,
-};
 pub use store::{
     SigmaSoftwareStore,
     SoftwareRegistryEntry, /* StoreApp, StoreError, */

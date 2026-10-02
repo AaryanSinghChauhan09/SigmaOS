@@ -103,6 +103,10 @@ pub use sovereign_distro_package_advancements_v6::*;
 pub mod sovereign_distro_package_advancements_v7;
 pub use sovereign_distro_package_advancements_v7::*;
 
+#[path = "../package/sovereign_distro_package_advancements_v12.rs"]
+pub mod sovereign_distro_package_advancements_v12;
+pub use sovereign_distro_package_advancements_v12::*;
+
 #[path = "../package/bsd_linux_package_innovations.rs"]
 pub mod bsd_linux_package_innovations;
 pub use bsd_linux_package_innovations::{
@@ -184,22 +188,14 @@ pub use pacman_contrib::{
     PacLogEntry, PackageCacheEntry, PendingUpdate, SyncPackage, UpdPkgSumsGenerator,
 };
 pub use portage::{EbuildSpec, PortageResolver, Slot, UseFlag};
-pub use spec::{
-    ManagerCapability, PackageCapability,
-    PackageDependency, PackageError as SpecPackageError, PackageInfo, PackageManager as SpecPackageManager, PackageStats, PackageVersion,
-    SimplePackage, SimplePackageManager,
-    CachyCpuDetector, CachyosPackageAdapter, CpuArchLevel,
-    UniversalPackage, UniversalPackageType, UserDefinedPackageHook,
-};
-pub use universal_adapter::{AdapterError, DebAdapter, RpmAdapter, PacmanAdapter};
-pub use zero_alloc_resolver::{PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES};
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use resolver::SatSolver;
 pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};
-pub use store::{BsdPkgRepositoryMirror, ContentAddressedStore, GentooPortageUseFlagMask, NixOsHermeticCasStore};
-pub use transaction::Transaction;
-pub use universal_adapter::{
-    UniversalPackageAdapter,
+pub use spec::{
+    CachyCpuDetector, CachyosPackageAdapter, CpuArchLevel, ManagerCapability, PackageCapability,
+    PackageDependency, PackageError as SpecPackageError, PackageInfo,
+    PackageManager as SpecPackageManager, PackageStats, PackageVersion, SimplePackage,
+    SimplePackageManager, UniversalPackage, UniversalPackageType, UserDefinedPackageHook,
 };
 pub use spec::{
     CachyCpuDetector, CachyosPackageAdapter, CpuArchLevel, ManagerCapability, PackageCapability,
@@ -210,13 +206,20 @@ pub use spec::{
 pub use store::{
     BsdPkgRepositoryMirror, ContentAddressedStore, GentooPortageUseFlagMask, NixOsHermeticCasStore,
 };
+pub use store::{
+    BsdPkgRepositoryMirror, ContentAddressedStore, GentooPortageUseFlagMask, NixOsHermeticCasStore,
+};
 pub use svntogit_repro::{
     BuildArtifact, ConvertedGitCommit, ReproducibilityAttestationReport,
     ReproducibleBuildEnvironment, ReproduciblePackageBuilder, SovereignSvnToGitMigrator,
     SvnBranchType, SvnRevisionLog,
 };
 pub use transaction::Transaction;
+pub use transaction::Transaction;
+pub use universal_adapter::UniversalPackageAdapter;
+pub use universal_adapter::{AdapterError, DebAdapter, PacmanAdapter, RpmAdapter};
 pub use verifier::CryptoVerifier;
+pub use zero_alloc_resolver::{PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES};
 
 /// Package version using SemVer
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
