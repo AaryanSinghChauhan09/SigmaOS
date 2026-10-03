@@ -8,6 +8,7 @@ pub use super::btreemap::BTreeMap;
 pub use super::hashmap::{Entry, HashMap};
 
 /// Simple HashSet implementation for klib (Using BTreeSet internally)
+#[derive(Debug, Clone)]
 pub struct HashSet<T> {
     inner: alloc::collections::BTreeSet<T>,
 }
@@ -43,6 +44,16 @@ impl<T: Ord> HashSet<T> {
 impl<T: Ord> Default for HashSet<T> {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl<T: Ord> core::iter::FromIterator<T> for HashSet<T> {
+    fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
+        let mut set = HashSet::new();
+        for item in iter {
+            set.insert(item);
+        }
+        set
     }
 }
 
