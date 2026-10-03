@@ -267,7 +267,11 @@ impl ImageManager for SimpleImageManager {
     }
 
     fn list_images(&self) -> Vec<([u8; 128], [u8; 32])> {
-        self.images.iter().map(|img| (img.0, img.2)).collect()
+        let mut result = Vec::new();
+        for img in self.images.iter() {
+            result.push((img.0, img.2));
+        }
+        result
     }
 
     fn remove_image(&mut self, name: &[u8], _tag: &[u8]) -> Result<(), ContainerError> {
@@ -282,7 +286,6 @@ impl ImageManager for SimpleImageManager {
         } else {
             Err(ContainerError::InvalidConfig)
         }
-        Err(ContainerError::InvalidConfig)
     }
 }
 

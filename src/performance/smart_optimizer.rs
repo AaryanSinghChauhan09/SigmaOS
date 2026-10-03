@@ -32,7 +32,7 @@ impl CpuPriorityOptimizer {
                     "SmartOptimizer: Elevated active foreground process ID {} to Priority::High.",
                     proc.pid
                 );
-            } else if proc.state == ProcessState::Blocked {
+            } else if proc.state == ProcessState::Sleeping || proc.state == ProcessState::Stopped {
                 // Demote blocked/idle background process to protect CPU bounds
                 proc.scheduling.static_priority = 10;
                 println!(

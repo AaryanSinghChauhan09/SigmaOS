@@ -66,14 +66,14 @@ pub enum CapMode {
 #[derive(Debug, Clone)]
 pub struct CapEntry {
     pub resource_path: String,
-    pub rights: HashSet<CapRight>,
+    pub rights: Vec<CapRight>,
 }
 
 impl CapEntry {
     pub fn new(path: &str, rights: &[CapRight]) -> Self {
         Self {
             resource_path: path.to_string(),
-            rights: rights.iter().cloned().collect(),
+            rights: rights.to_vec(),
         }
     }
 
@@ -84,12 +84,16 @@ impl CapEntry {
 
     /// Grant additional rights
     pub fn grant_right(&mut self, right: CapRight) {
-        self.rights.insert(right);
+        if !self.rights.contains(&right) {
+            self.rights.push(right);
+        }
     }
 
     /// Revoke a right
     pub fn revoke_right(&mut self, right: CapRight) {
-        self.rights.remove(&right);
+        if let Some(pos) = self.rights.iter().position(|r| *r == right) {
+            self.rights.remove(pos);
+        }
     }
 }
 

@@ -82,20 +82,61 @@ impl SlabCache {
     /// Linux: `mm/slub.c:slab_alloc()`
     pub fn allocate(&mut self) -> Option<NonNull<u8>> {
         // Try partial slabs first
-        if let Some(obj) = self.allocate_from_slab_list(&mut self.partial_slabs) {
-            self.allocated_objects.fetch_add(1, Ordering::Relaxed);
-            return Some(obj);
+        if !self.partial_slabs.is_null() {
+            let mut list = self.partial_slabs;
+            if let Some(obj) = Self::allocate_from_slab_list_static(&mut list, &mut self.full_slabs) {
+                self.partial_slabs = list;
+                self.allocated_objects.fetch_add(1, Ordering::Relaxed);
+                return Some(obj);
+            }
         }
 
         // Try empty slabs
-        if let Some(obj) = self.allocate_from_slab_list(&mut self.empty_slabs) {
-            self.allocated_objects.fetch_add(1, Ordering::Relaxed);
-            return Some(obj);
+        if !self.empty_slabs.is_null() {
+            let mut list = self.empty_slabs;
+            if let Some(obj) = Self::allocate_from_slab_list_static(&mut list, &mut self.full_slabs) {
+                self.empty_slabs = list;
+                self.allocated_objects.fetch_add(1, Ordering::Relaxed);
+                return Some(obj);
+            }
         }
 
         // Need to allocate new slab
         // In real implementation, this would call page allocator
         None
+    }
+
+    fn allocate_from_slab_list_static(
+        list: &mut *mut Slab,
+        full_slabs: &mut *mut Slab,
+    ) -> Option<NonNull<u8>> {
+        if list.is_null() {
+            return None;
+        }
+
+        unsafe {
+            let slab = &mut **list;
+
+            if slab.free_list.is_null() {
+                return None;
+            }
+
+            // Pop from free list
+            let obj = slab.free_list;
+            let free_obj = &*obj;
+            slab.free_list = free_obj.next;
+            slab.free_count -= 1;
+
+            // If slab is now full, move to full list
+            if slab.free_count == 0 {
+                let slab_ptr = *list;
+                *list = (*slab_ptr).next;
+                (*slab_ptr).next = *full_slabs;
+                *full_slabs = slab_ptr;
+            }
+
+            NonNull::new(obj as *mut u8)
+        }
     }
 
     /// Allocate from specific slab list

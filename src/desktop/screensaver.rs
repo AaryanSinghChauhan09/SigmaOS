@@ -348,7 +348,7 @@ impl ScreenSaverEngine {
     /// Authenticate passphrase (PAM / BSD auth parity) with zeroing scrub
     pub fn authenticate(&mut self, passphrase: &mut str) -> bool {
         self.lock_state = LockState::Authenticating;
-        if passphrase == self.config.hashed_passphrase {
+        if passphrase as &str == self.config.hashed_passphrase {
             self.lock_state = LockState::Unlocked;
             self.is_active = false;
             self.idle_time_secs = 0;

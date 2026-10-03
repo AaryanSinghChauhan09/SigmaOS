@@ -749,12 +749,14 @@ pub struct ResolutionPlan {
 
 pub struct DependencyResolverEngine {
     pub registered_packages: BTreeMap<String, PkgBuild>,
-    pub constraints: Vec<Constraint>,
+    pub profiles: Vec<ArchChrootProfile>,
+    pub is_cleanroom_active: bool,
 }
 
 impl DependencyResolverEngine {
     pub fn new() -> Self {
         let mut engine = Self {
+            registered_packages: BTreeMap::new(),
             profiles: Vec::new(),
             is_cleanroom_active: true,
         };
@@ -767,6 +769,30 @@ impl DependencyResolverEngine {
             chroot_dir: "/var/lib/archbuild/multilib".to_string(),
         });
         engine
+    }
+
+    pub fn register_package(&mut self, pkg: PkgBuild) {
+        self.registered_packages.insert(pkg.pkgname.clone(), pkg);
+    }
+
+    pub fn resolve(&self, target_pkg: &str) -> Result<ResolutionPlan, &'static str> {
+        if let Some(pkg) = self.registered_packages.get(target_pkg) {
+            let mut plan = ResolutionPlan {
+                to_install: Vec::new(),
+                to_remove: Vec::new(),
+                to_upgrade: Vec::new(),
+            };
+            plan.to_install.push(pkg.clone());
+
+            for dep in &pkg.depends {
+                if let Some(dep_pkg) = self.registered_packages.get(dep) {
+                    plan.to_install.push(dep_pkg.clone());
+                }
+            }
+            Ok(plan)
+        } else {
+            Err("PacmanResolver: Target package not found in repository database")
+        }
     }
 
     pub fn build_in_chroot(&self, target: &str, pkg_name: &str) -> Result<String, &'static str> {
@@ -788,15 +814,11 @@ pub struct ArchPkgctlEngine {
 }
 
 impl ArchPkgctlEngine {
-    pub fn new(repo_name: &str) -> Self {
+    pub fn new() -> Self {
         Self {
-            registered_packages: BTreeMap::new(),
-            constraints: Vec::new(),
+            active_repos: Vec::new(),
+            repo_name: String::new(),
         }
-    }
-
-    pub fn register_package(&mut self, pkg: PkgBuild) {
-        self.registered_packages.insert(pkg.pkgname.clone(), pkg);
     }
 
     pub fn split_package_repo(&self, pkg_name: &str) -> String {
@@ -804,26 +826,6 @@ impl ArchPkgctlEngine {
             "https://gitlab.archlinux.org/archlinux/packaging/packages/{}.git",
             pkg_name
         )
-    }
-
-    pub fn resolve(&self, target_pkg: &str) -> Result<ResolutionPlan, &'static str> {
-        if let Some(pkg) = self.registered_packages.get(target_pkg) {
-            let mut plan = ResolutionPlan {
-                to_install: Vec::new(),
-                to_remove: Vec::new(),
-                to_upgrade: Vec::new(),
-            };
-            plan.to_install.push(pkg.clone());
-
-            for dep in &pkg.depends {
-                if let Some(dep_pkg) = self.registered_packages.get(dep) {
-                    plan.to_install.push(dep_pkg.clone());
-                }
-            }
-            Ok(plan)
-        } else {
-            Err("PacmanResolver: Target package not found in repository database")
-        }
     }
 }
 
@@ -875,12 +877,12 @@ impl PacmanDatabaseEngine {
         }
     }
 
-    pub fn search(&self, query: &str) -> Vec<&WikiArticle> {
+    pub fn search(&self, query: &str) -> Vec<&PkgBuild> {
         let q = query.to_lowercase();
-        self.articles
-            .iter()
-            .filter(|a| {
-                a.title.to_lowercase().contains(&q) || a.content.to_lowercase().contains(&q)
+        self.installed_packages
+            .values()
+            .filter(|p| {
+                p.pkgname.to_lowercase().contains(&q) || p.pkgdesc.to_lowercase().contains(&q)
             })
             .collect()
     }
