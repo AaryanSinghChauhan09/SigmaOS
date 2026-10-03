@@ -18,7 +18,7 @@ impl CpuPriorityOptimizer {
         }
     }
 
-    /// Dynamically elevates foreground processes to high priority and demotes idle ones
+    /// Dynamically elevates foreground processes to real-time priority and demotes idle ones
     pub fn optimize_process_priorities(&self, processes: &mut [Process]) {
         if !self.boost_active.load(Ordering::SeqCst) {
             return;
@@ -26,19 +26,11 @@ impl CpuPriorityOptimizer {
 
         for proc in processes.iter_mut() {
             if proc.state == ProcessState::Running {
-                // Elevate active/running foreground process to high priority (nice -10)
-                proc.scheduling.static_priority = -10;
-                println!(
-                    "SmartOptimizer: Elevated active foreground process ID {} to high priority.",
-                    proc.pid
-                );
+                // Elevate active/running foreground process to High priority (-20 is highest priority)
+                proc.scheduling.static_priority = -20;
             } else if proc.state == ProcessState::Sleeping || proc.state == ProcessState::Stopped {
-                // Demote blocked/idle background process to protect CPU bounds (nice 10)
-                proc.scheduling.static_priority = 10;
-                println!(
-                    "SmartOptimizer: Demoted background process ID {} to low priority.",
-                    proc.pid
-                );
+                // Demote blocked/idle background process to protect CPU bounds (19 is lowest priority)
+                proc.scheduling.static_priority = 19;
             }
         }
     }

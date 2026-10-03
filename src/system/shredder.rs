@@ -66,7 +66,7 @@ pub struct ZeroPassShredder;
 impl ShreddingStrategy for ZeroPassShredder {
     fn shred(&mut self, path: &Path) -> Result<ShreddingResult, ShredderError> {
         Ok(ShreddingResult {
-            file_path: path.display().to_string(),
+            file_path: path.to_string(),
             success: true,
             passes_completed: 1,
             bytes_overwritten: 4096,
@@ -90,7 +90,7 @@ pub struct RandomPassShredder;
 impl ShreddingStrategy for RandomPassShredder {
     fn shred(&mut self, path: &Path) -> Result<ShreddingResult, ShredderError> {
         Ok(ShreddingResult {
-            file_path: path.display().to_string(),
+            file_path: path.to_string(),
             success: true,
             passes_completed: 1,
             bytes_overwritten: 4096,
@@ -114,7 +114,7 @@ pub struct Dod5220Shredder;
 impl ShreddingStrategy for Dod5220Shredder {
     fn shred(&mut self, path: &Path) -> Result<ShreddingResult, ShredderError> {
         Ok(ShreddingResult {
-            file_path: path.display().to_string(),
+            file_path: path.to_string(),
             success: true,
             passes_completed: 3,
             bytes_overwritten: 12288,
@@ -138,7 +138,7 @@ pub struct GutmannShredder;
 impl ShreddingStrategy for GutmannShredder {
     fn shred(&mut self, path: &Path) -> Result<ShreddingResult, ShredderError> {
         Ok(ShreddingResult {
-            file_path: path.display().to_string(),
+            file_path: path.to_string(),
             success: true,
             passes_completed: 7,
             bytes_overwritten: 28672,
@@ -178,8 +178,8 @@ impl FileShredder {
 
     /// Shred a file
     pub fn shred(&mut self, path: &Path) -> Result<ShreddingResult, ShredderError> {
-        if path.as_os_str().is_empty() {
-            return Err(ShredderError::FileNotFound(path.display().to_string()));
+        if path.is_empty() {
+            return Err(ShredderError::FileNotFound(path.to_string()));
         }
 
         let result = self.strategy.shred(path)?;

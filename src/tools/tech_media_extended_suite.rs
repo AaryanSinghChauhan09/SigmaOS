@@ -285,6 +285,8 @@ pub struct PowerRailNoiseReport {
     pub rail_12v_v: f32,
     pub rail_5v_v: f32,
     pub is_within_atx30_spec: bool,
+    pub atx31_12v_2x6_balanced: bool,
+    pub transient_spike_severity: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Default)]
@@ -307,11 +309,26 @@ impl HwbustersPowerTelemetryEngine {
                 rail_12v_v: 12.02,
                 rail_5v_v: 5.01,
                 is_within_atx30_spec: true,
+                atx31_12v_2x6_balanced: true,
+                transient_spike_severity: "Nominal".to_string(),
             },
             thermal_curve: FanThermalCurve {
                 temp_thresholds_c: vec![40.0, 55.0, 70.0, 85.0],
                 fan_speeds_pct: vec![30, 50, 75, 100],
             },
+        }
+    }
+
+    pub fn verify_atx31_power_rail_integrity(&mut self, spike_volts: f32) -> bool {
+        if spike_volts > 13.2 {
+            self.power_report.transient_spike_severity = "Critical".to_string();
+            false
+        } else if spike_volts > 12.6 {
+            self.power_report.transient_spike_severity = "Warning".to_string();
+            true
+        } else {
+            self.power_report.transient_spike_severity = "Nominal".to_string();
+            self.power_report.atx31_12v_2x6_balanced
         }
     }
 

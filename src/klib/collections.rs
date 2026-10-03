@@ -57,6 +57,16 @@ impl<T: Ord> Default for HashSet<T> {
     }
 }
 
+impl<T: Ord> core::iter::FromIterator<T> for HashSet<T> {
+    fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
+        let mut set = HashSet::new();
+        for item in iter {
+            set.insert(item);
+        }
+        set
+    }
+}
+
 /// Simple VecDeque implementation for klib
 #[derive(Clone)]
 pub struct VecDeque<T> {

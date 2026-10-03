@@ -3899,6 +3899,11 @@ pub struct SovereignOpenSourceObsoletionOrchestrator {
     pub uutils_coreutils: SovereignUutilsCoreutilsEngine,
     pub freebsd_jail_rctl: SovereignFreeBsdJailRctlEngine,
     pub nix_flake_lock: SovereignNixFlakeLockEngine,
+    pub asahi_gpu: open_source_os_gap_closure::SovereignAsahiAppleSiliconGpuEngine,
+    pub tetragon_ebpf: open_source_os_gap_closure::SovereignTetragonEbpfSecurityEngine,
+    pub suricata_ips: open_source_os_gap_closure::SovereignSuricataIpsEngine,
+    pub wasmtime_jit: open_source_os_gap_closure::SovereignWasmtimeJitRuntimeEngine,
+    pub mojo_compiler: open_source_os_gap_closure::SovereignMojoTensorCompilerEngine,
     pub total_obsoleted_projects_count: u32,
 }
 
@@ -4011,7 +4016,12 @@ impl SovereignOpenSourceObsoletionOrchestrator {
             uutils_coreutils: SovereignUutilsCoreutilsEngine::new(),
             freebsd_jail_rctl: SovereignFreeBsdJailRctlEngine::new(),
             nix_flake_lock: SovereignNixFlakeLockEngine::new(),
-            total_obsoleted_projects_count: 98,
+            asahi_gpu: open_source_os_gap_closure::SovereignAsahiAppleSiliconGpuEngine::new("M4"),
+            tetragon_ebpf: open_source_os_gap_closure::SovereignTetragonEbpfSecurityEngine::new(),
+            suricata_ips: open_source_os_gap_closure::SovereignSuricataIpsEngine::new(),
+            wasmtime_jit: open_source_os_gap_closure::SovereignWasmtimeJitRuntimeEngine::new(),
+            mojo_compiler: open_source_os_gap_closure::SovereignMojoTensorCompilerEngine::new(),
+            total_obsoleted_projects_count: 103,
         }
     }
 
@@ -7563,8 +7573,8 @@ mod tests {
     fn test_sovereign_orchestrator_bootstrap() {
         let mut orchestrator = SovereignOpenSourceObsoletionOrchestrator::new();
         let status = orchestrator.bootstrap_sovereign_stack().unwrap();
-        assert!(status.contains("98 legacy open-source projects obsoleted"));
-        assert_eq!(orchestrator.total_obsoleted_projects_count, 98);
+        assert!(status.contains("103 legacy open-source projects obsoleted"));
+        assert_eq!(orchestrator.total_obsoleted_projects_count, 103);
         assert_eq!(orchestrator.serenity_async.processed_count, 0);
         assert_eq!(orchestrator.serenity_async.task_queue.len(), 1);
         assert_eq!(orchestrator.qubes_isolation.domains.len(), 1);

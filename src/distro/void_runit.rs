@@ -60,7 +60,7 @@ impl RunitService {
     }
 
     pub fn add_dependency(&mut self, dep: &str) {
-        self.dependencies.push(String::from(dep));
+        self.dependencies.push(dep.to_string());
     }
 
     pub fn start(&mut self) -> bool {

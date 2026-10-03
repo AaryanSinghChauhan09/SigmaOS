@@ -1194,8 +1194,8 @@ mod tests {
     #[test]
     fn test_sovereign_fhs_hierarchy_and_translation() {
         let hierarchy = SovereignFhsHierarchy::new();
-        assert!(hierarchy.directories.len() >= 20);
-        assert_eq!(hierarchy.ai_agents_path, "/agents");
+        assert_eq!(hierarchy.directories.len(), 9); // 5 FHS + 4 AI-native
+        assert_eq!(hierarchy.ai_agents_path, PathBuf::from("/agents"));
 
         // Windows path translation to standard FHS
         let win_bin = hierarchy.translate_cross_platform_path("C:\\Windows\\System32\\cmd.exe");

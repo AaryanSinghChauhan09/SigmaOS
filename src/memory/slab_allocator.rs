@@ -82,13 +82,13 @@ impl SlabCache {
     /// Linux: `mm/slub.c:slab_alloc()`
     pub fn allocate(&mut self) -> Option<NonNull<u8>> {
         // Try partial slabs first
-        if let Some(obj) = self.allocate_from_slab_list(true) {
+        if let Some(obj) = Self::allocate_from_slab_list(&mut self.partial_slabs, &mut self.full_slabs) {
             self.allocated_objects.fetch_add(1, Ordering::Relaxed);
             return Some(obj);
         }
 
         // Try empty slabs
-        if let Some(obj) = self.allocate_from_slab_list(false) {
+        if let Some(obj) = Self::allocate_from_slab_list(&mut self.empty_slabs, &mut self.full_slabs) {
             self.allocated_objects.fetch_add(1, Ordering::Relaxed);
             return Some(obj);
         }
@@ -99,9 +99,8 @@ impl SlabCache {
     }
 
     /// Allocate from specific slab list
-    fn allocate_from_slab_list(&mut self, is_partial: bool) -> Option<NonNull<u8>> {
-        let list_ptr = if is_partial { self.partial_slabs } else { self.empty_slabs };
-        if list_ptr.is_null() {
+    fn allocate_from_slab_list(list: &mut *mut Slab, full_slabs: &mut *mut Slab) -> Option<NonNull<u8>> {
+        if list.is_null() || unsafe { (*list).is_null() } {
             return None;
         }
 
@@ -120,13 +119,7 @@ impl SlabCache {
 
             // If slab is now full, move to full list
             if slab.free_count == 0 {
-                if is_partial {
-                    self.partial_slabs = slab.next;
-                } else {
-                    self.empty_slabs = slab.next;
-                }
-                slab.next = self.full_slabs;
-                self.full_slabs = list_ptr;
+                Self::move_slab_to_full(list, full_slabs);
             }
 
             NonNull::new(obj as *mut u8)
@@ -155,15 +148,15 @@ impl SlabCache {
     }
 
     /// Move slab from one list to another
-    unsafe fn move_slab_to_full(&mut self, from: &mut *mut Slab) {
-        if from.is_null() {
+    unsafe fn move_slab_to_full(from: &mut *mut Slab, full_slabs: &mut *mut Slab) {
+        if from.is_null() || (*from).is_null() {
             return;
         }
 
         let slab = *from;
         *from = (*slab).next;
-        (*slab).next = self.full_slabs;
-        self.full_slabs = slab;
+        (*slab).next = *full_slabs;
+        *full_slabs = slab;
     }
 
     /// Get allocation statistics

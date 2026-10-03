@@ -276,20 +276,19 @@ impl SovereignXhciUsb3Driver {
 
     /// Submit a TRB to a transfer ring
     pub fn submit_transfer(&mut self, ring_idx: usize, trb: SovereignXhciTrb) -> Result<usize, &'static str> {
-        if let Some(ring) = self.transfer_rings.get_mut(ring_idx) {
-            ring.enqueue(trb)
-        } else {
-            Err("Invalid transfer ring index")
+        if ring_idx >= self.transfer_rings.len() {
+            return Err("Invalid transfer ring index");
         }
+        self.transfer_rings[ring_idx].enqueue(trb)
     }
 
-    /// Get transfer ring enqueue and dequeue indices status
+    /// Get enqueue and dequeue indices for a transfer ring
     pub fn get_transfer_ring_status(&self, ring_idx: usize) -> Result<(usize, usize), &'static str> {
-        if let Some(ring) = self.transfer_rings.get(ring_idx) {
-            Ok((ring.enqueue_idx, ring.dequeue_idx))
-        } else {
-            Err("Invalid transfer ring index")
+        if ring_idx >= self.transfer_rings.len() {
+            return Err("Invalid transfer ring index");
         }
+        let ring = &self.transfer_rings[ring_idx];
+        Ok((ring.enqueue_idx, ring.dequeue_idx))
     }
 }
 

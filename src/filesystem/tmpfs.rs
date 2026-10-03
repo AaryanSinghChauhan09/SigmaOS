@@ -1,357 +1,428 @@
-//! Tmpfs (In-Memory Virtual File System) Subsystem
-//! Inspired by Linux's on-demand VM allocations and FreeBSD's swap-backed tmpfs mechanics.
+//! # tmpfs - Temporary Filesystem
+//!
+//! RAM-based temporary filesystem inspired by Linux fs/tmpfs/ and FreeBSD tmpfs.
+//! All data resides in memory and is lost on unmount/reboot.
 
-pub const MAX_TMPFS_INODES: usize = 32;
+#![no_std]
 
-/// Linux & BSD standard "50% rule" ratio for default tmpfs maximum RAM size allocation
-pub const TMPFS_DEFAULT_RAM_50_PERCENT_RATIO: f32 = 0.50;
+extern crate alloc;
+use alloc::collections::BTreeMap;
+use alloc::string::String;
+use alloc::vec::Vec;
+use alloc::sync::Arc;
+use core::sync::atomic::{AtomicU64, AtomicU32, Ordering};
 
-/// Compute default 50% physical RAM memory boundary for tmpfs mounts
-pub fn calculate_50_percent_ram_default(total_ram_bytes: usize) -> usize {
-    ((total_ram_bytes as f64) * (TMPFS_DEFAULT_RAM_50_PERCENT_RATIO as f64)) as usize
-}
-
+/// Inode types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum TmpfsFileType {
-    Regular,
-    Directory,
-    Symlink,
+#[repr(u8)]
+pub enum InodeType {
+    Regular = 1,
+    Directory = 2,
+    Symlink = 3,
 }
 
-#[derive(Debug, Clone, Copy)]
-pub struct TmpfsConfig {
-    pub max_bytes: usize,  // Maximum memory bytes allocation limit
-    pub max_inodes: usize, // Maximum inode registry slots
-    pub uid: u32,          // Owner UID (default 0/root)
-    pub gid: u32,          // Group GID (default 0/root)
-    pub mode: u32,         // Permissions (e.g. 0o1777 sticky-bit tmpfs)
-}
-
-impl TmpfsConfig {
-    /// Linux (/dev/shm) & BSD tmpfs 50% physical RAM limit rule
-    pub fn default_with_system_ram(total_ram_bytes: usize) -> Self {
-        Self {
-            max_bytes: total_ram_bytes / 2, // Linux & BSD 50% total RAM ceiling rule
-            max_inodes: MAX_TMPFS_INODES,
-            uid: 0,
-            gid: 0,
-            mode: 0o1777,
-        }
-    }
-}
-
-#[derive(Debug, Clone, Copy)]
+/// Tmpfs inode
 pub struct TmpfsInode {
-    pub id: usize,
-    pub file_type: TmpfsFileType,
-    pub apparent_size: usize, // Size of file content
-    pub is_swapbacked: bool,  // True if paged out to anonymous swap space
-    pub link_count: u32,      // Hard link count reference
-    pub mtime: u64,           // Modification time
+    pub ino: u64,
+    pub inode_type: InodeType,
+    pub mode: u16,
     pub uid: u32,
     pub gid: u32,
-    pub mode: u32,
+    pub size: AtomicU64,
+    pub atime: AtomicU64,
+    pub mtime: AtomicU64,
+    pub ctime: AtomicU64,
+    pub nlink: AtomicU32,
+    
+    // Data storage
+    pub data: Vec<u8>,              // For regular files
+    pub children: BTreeMap<String, u64>, // For directories (name -> ino)
+    pub symlink_target: Option<String>,  // For symlinks
 }
 
-pub struct TmpfsFileSystem {
-    pub config: TmpfsConfig,
-    pub current_bytes_used: usize,
-    pub current_inodes_used: usize,
-    pub inodes: [Option<TmpfsInode>; MAX_TMPFS_INODES],
-    pub next_inode_id: usize,
-}
-
-impl TmpfsFileSystem {
-    pub fn new(config: TmpfsConfig) -> Self {
+impl TmpfsInode {
+    pub fn new_file(ino: u64, mode: u16, uid: u32, gid: u32) -> Self {
+        let now = 0; // In production: get current timestamp
+        
         Self {
-            config,
-            current_bytes_used: 0,
-            current_inodes_used: 0,
-            inodes: [None; MAX_TMPFS_INODES],
-            next_inode_id: 1,
+            ino,
+            inode_type: InodeType::Regular,
+            mode,
+            uid,
+            gid,
+            size: AtomicU64::new(0),
+            atime: AtomicU64::new(now),
+            mtime: AtomicU64::new(now),
+            ctime: AtomicU64::new(now),
+            nlink: AtomicU32::new(1),
+            data: Vec::new(),
+            children: BTreeMap::new(),
+            symlink_target: None,
         }
     }
+    
+    pub fn new_dir(ino: u64, mode: u16, uid: u32, gid: u32) -> Self {
+        let now = 0;
+        
+        Self {
+            ino,
+            inode_type: InodeType::Directory,
+            mode: mode | 0o040000, // S_IFDIR
+            uid,
+            gid,
+            size: AtomicU64::new(0),
+            atime: AtomicU64::new(now),
+            mtime: AtomicU64::new(now),
+            ctime: AtomicU64::new(now),
+            nlink: AtomicU32::new(2), // . and ..
+            data: Vec::new(),
+            children: BTreeMap::new(),
+            symlink_target: None,
+        }
+    }
+    
+    pub fn new_symlink(ino: u64, target: String, uid: u32, gid: u32) -> Self {
+        let now = 0;
+        
+        Self {
+            ino,
+            inode_type: InodeType::Symlink,
+            mode: 0o120777, // S_IFLNK | 0777
+            uid,
+            gid,
+            size: AtomicU64::new(target.len() as u64),
+            atime: AtomicU64::new(now),
+            mtime: AtomicU64::new(now),
+            ctime: AtomicU64::new(now),
+            nlink: AtomicU32::new(1),
+            data: Vec::new(),
+            children: BTreeMap::new(),
+            symlink_target: Some(target),
+        }
+    }
+    
+    /// Read data from file
+    pub fn read(&self, offset: u64, buf: &mut [u8]) -> Result<usize, TmpfsError> {
+        if self.inode_type != InodeType::Regular {
+            return Err(TmpfsError::NotRegularFile);
+        }
+        
+        let offset = offset as usize;
+        if offset >= self.data.len() {
+            return Ok(0);
+        }
+        
+        let available = self.data.len() - offset;
+        let to_read = available.min(buf.len());
+        
+        buf[..to_read].copy_from_slice(&self.data[offset..offset + to_read]);
+        
+        // Update atime
+        let now = 0; // In production: get timestamp
+        self.atime.store(now, Ordering::Release);
+        
+        Ok(to_read)
+    }
+    
+    /// Write data to file
+    pub fn write(&mut self, offset: u64, data: &[u8]) -> Result<usize, TmpfsError> {
+        if self.inode_type != InodeType::Regular {
+            return Err(TmpfsError::NotRegularFile);
+        }
+        
+        let offset = offset as usize;
+        let end = offset + data.len();
+        
+        // Extend file if necessary
+        if end > self.data.len() {
+            self.data.resize(end, 0);
+        }
+        
+        // Write data
+        self.data[offset..end].copy_from_slice(data);
+        
+        // Update size and timestamps
+        let new_size = self.data.len() as u64;
+        self.size.store(new_size, Ordering::Release);
+        
+        let now = 0;
+        self.mtime.store(now, Ordering::Release);
+        self.ctime.store(now, Ordering::Release);
+        
+        Ok(data.len())
+    }
+    
+    /// Truncate file
+    pub fn truncate(&mut self, size: u64) -> Result<(), TmpfsError> {
+        if self.inode_type != InodeType::Regular {
+            return Err(TmpfsError::NotRegularFile);
+        }
+        
+        self.data.resize(size as usize, 0);
+        self.size.store(size, Ordering::Release);
+        
+        let now = 0;
+        self.mtime.store(now, Ordering::Release);
+        self.ctime.store(now, Ordering::Release);
+        
+        Ok(())
+    }
+}
 
-    /// Initializes a default Tmpfs filesystem following the Linux & BSD 50% RAM rule
-    /// (default tmpfs size = 50% of total physical RAM unless overridden by size= option)
-    pub fn default_with_system_ram(total_ram_bytes: usize) -> Self {
-        let max_bytes = total_ram_bytes / 2; // 50% RAM rule (Linux /dev/shm & BSD tmpfs standard)
-        let config = TmpfsConfig {
-            max_bytes,
-            max_inodes: MAX_TMPFS_INODES,
-            uid: 0,
-            gid: 0,
-            mode: 0o1777, // sticky-bit world writable /tmp permissions
+/// Tmpfs filesystem
+pub struct TmpfsFilesystem {
+    inodes: BTreeMap<u64, Arc<TmpfsInode>>,
+    next_ino: AtomicU64,
+    root_ino: u64,
+    max_size: usize,            // Maximum filesystem size in bytes
+    used_size: AtomicU64,       // Current used size
+}
+
+impl TmpfsFilesystem {
+    const ROOT_INO: u64 = 1;
+    
+    pub fn new(max_size: usize) -> Self {
+        let mut fs = Self {
+            inodes: BTreeMap::new(),
+            next_ino: AtomicU64::new(Self::ROOT_INO + 1),
+            root_ino: Self::ROOT_INO,
+            max_size,
+            used_size: AtomicU64::new(0),
         };
-        Self::new(config)
+        
+        // Create root directory
+        let root = Arc::new(TmpfsInode::new_dir(Self::ROOT_INO, 0o755, 0, 0));
+        fs.inodes.insert(Self::ROOT_INO, root);
+        
+        fs
     }
-
-    /// Create a new in-memory file or directory node (on-demand dynamic RAM allocation)
-    pub fn create_node(
-        &mut self,
-        file_type: TmpfsFileType,
-        size_bytes: usize,
-        mtime: u64,
-    ) -> Result<usize, &'static str> {
-        // 1. Enforce max inodes boundary limit
-        if self.current_inodes_used >= self.config.max_inodes
-            || self.current_inodes_used >= MAX_TMPFS_INODES
-        {
-            return Err("Tmpfs reached maximum inode capacity limit");
-        }
-
-        // 2. Enforce memory byte allocation limit (on-demand page reservation)
-        if self.current_bytes_used + size_bytes > self.config.max_bytes {
-            return Err("Tmpfs allocation request exceeds memory limit");
-        }
-
-        let id = self.next_inode_id;
-        self.next_inode_id += 1;
-
-        let inode = TmpfsInode {
-            id,
-            file_type,
-            apparent_size: size_bytes,
-            is_swapbacked: false,
-            link_count: 1, // baseline single hard link reference
-            mtime,
-            uid: self.config.uid,
-            gid: self.config.gid,
-            mode: self.config.mode,
-        };
-
-        for slot in &mut self.inodes {
-            if slot.is_none() {
-                *slot = Some(inode);
-                self.current_bytes_used += size_bytes;
-                self.current_inodes_used += 1;
-                return Ok(id);
-            }
-        }
-
-        Err("Tmpfs inode registry table error")
+    
+    /// Allocate new inode number
+    fn alloc_ino(&self) -> u64 {
+        self.next_ino.fetch_add(1, Ordering::SeqCst)
     }
-
-    /// Link an existing inode (Linux/BSD style hard links)
-    pub fn link_node(&mut self, id: usize) -> Result<(), &'static str> {
-        for slot in &mut self.inodes {
-            if let Some(ref mut inode) = slot {
-                if inode.id == id {
-                    inode.link_count += 1;
-                    return Ok(());
-                }
-            }
+    
+    /// Lookup inode by path
+    pub fn lookup(&self, path: &str) -> Result<Arc<TmpfsInode>, TmpfsError> {
+        if path == "/" {
+            return self.get_inode(self.root_ino);
         }
-        Err("Inode not found to create link")
+        
+        let components: Vec<&str> = path.trim_start_matches('/').split('/').collect();
+        let mut current_ino = self.root_ino;
+        
+        for component in components {
+            if component.is_empty() {
+                continue;
+            }
+            
+            let inode = self.get_inode(current_ino)?;
+            
+            if inode.inode_type != InodeType::Directory {
+                return Err(TmpfsError::NotDirectory);
+            }
+            
+            current_ino = *inode.children.get(component)
+                .ok_or(TmpfsError::NotFound)?;
+        }
+        
+        self.get_inode(current_ino)
     }
-
-    /// Unlink an inode. Reclaims memory when link count drops to zero
-    pub fn unlink_node(&mut self, id: usize) -> Result<(), &'static str> {
-        let mut index = None;
-        let mut reclaim_bytes = 0;
-        let mut is_deleted = false;
-
-        for (i, slot) in self.inodes.iter_mut().enumerate() {
-            if let Some(ref mut inode) = slot {
-                if inode.id == id {
-                    if inode.link_count > 1 {
-                        inode.link_count -= 1;
-                        return Ok(());
-                    } else {
-                        // link_count is 1, so decrementing drops it to 0 (delete/reclaim)
-                        reclaim_bytes = if inode.is_swapbacked {
-                            0
-                        } else {
-                            inode.apparent_size
-                        };
-                        index = Some(i);
-                        is_deleted = true;
-                        break;
-                    }
-                }
-            }
-        }
-
-        if is_deleted {
-            if let Some(idx) = index {
-                self.inodes[idx] = None;
-                self.current_bytes_used = self.current_bytes_used.saturating_sub(reclaim_bytes);
-                self.current_inodes_used = self.current_inodes_used.saturating_sub(1);
-                return Ok(());
-            }
-        }
-
-        Err("Inode not found to unlink")
+    
+    /// Get inode by number
+    fn get_inode(&self, ino: u64) -> Result<Arc<TmpfsInode>, TmpfsError> {
+        self.inodes.get(&ino)
+            .map(Arc::clone)
+            .ok_or(TmpfsError::NotFound)
     }
-
-    /// Simulate FreeBSD/Linux dynamic swap backing page-outs under extreme memory pressure
-    pub fn swap_out_node(&mut self, id: usize) -> Result<(), &'static str> {
-        for slot in &mut self.inodes {
-            if let Some(ref mut inode) = slot {
-                if inode.id == id {
-                    if inode.is_swapbacked {
-                        return Err("Node is already swapped out");
-                    }
-                    inode.is_swapbacked = true;
-                    // Reclaim physical RAM footprint by paging out to disk block swap mappings
-                    self.current_bytes_used =
-                        self.current_bytes_used.saturating_sub(inode.apparent_size);
-                    return Ok(());
-                }
-            }
+    
+    /// Create file
+    pub fn create_file(&mut self, parent_path: &str, name: &str, mode: u16, uid: u32, gid: u32) -> Result<u64, TmpfsError> {
+        let parent = self.lookup(parent_path)?;
+        
+        if parent.inode_type != InodeType::Directory {
+            return Err(TmpfsError::NotDirectory);
         }
-        Err("Inode not found to swap out")
-    }
-
-    /// Page the swapped-out node back into active physical memory
-    pub fn swap_in_node(&mut self, id: usize) -> Result<(), &'static str> {
-        for slot in &mut self.inodes {
-            if let Some(ref mut inode) = slot {
-                if inode.id == id {
-                    if !inode.is_swapbacked {
-                        return Err("Node is already resident in memory");
-                    }
-                    // Check if bringing back to RAM exceeds limits
-                    if self.current_bytes_used + inode.apparent_size > self.config.max_bytes {
-                        return Err("Insufficient Tmpfs memory to page in node");
-                    }
-                    inode.is_swapbacked = false;
-                    self.current_bytes_used += inode.apparent_size;
-                    return Ok(());
-                }
-            }
+        
+        // Check if already exists
+        if parent.children.contains_key(name) {
+            return Err(TmpfsError::AlreadyExists);
         }
-        Err("Inode not found to swap in")
+        
+        // Allocate inode
+        let ino = self.alloc_ino();
+        let inode = Arc::new(TmpfsInode::new_file(ino, mode, uid, gid));
+        
+        // Add to parent directory
+        let parent_mut = unsafe { &mut *(Arc::as_ptr(&parent) as *mut TmpfsInode) };
+        parent_mut.children.insert(name.into(), ino);
+        parent_mut.nlink.fetch_add(1, Ordering::Release);
+        
+        // Insert inode
+        self.inodes.insert(ino, inode);
+        
+        Ok(ino)
     }
+    
+    /// Create directory
+    pub fn create_dir(&mut self, parent_path: &str, name: &str, mode: u16, uid: u32, gid: u32) -> Result<u64, TmpfsError> {
+        let parent = self.lookup(parent_path)?;
+        
+        if parent.inode_type != InodeType::Directory {
+            return Err(TmpfsError::NotDirectory);
+        }
+        
+        if parent.children.contains_key(name) {
+            return Err(TmpfsError::AlreadyExists);
+        }
+        
+        let ino = self.alloc_ino();
+        let inode = Arc::new(TmpfsInode::new_dir(ino, mode, uid, gid));
+        
+        let parent_mut = unsafe { &mut *(Arc::as_ptr(&parent) as *mut TmpfsInode) };
+        parent_mut.children.insert(name.into(), ino);
+        parent_mut.nlink.fetch_add(1, Ordering::Release);
+        
+        self.inodes.insert(ino, inode);
+        
+        Ok(ino)
+    }
+    
+    /// Create symlink
+    pub fn create_symlink(&mut self, parent_path: &str, name: &str, target: String, uid: u32, gid: u32) -> Result<u64, TmpfsError> {
+        let parent = self.lookup(parent_path)?;
+        
+        if parent.inode_type != InodeType::Directory {
+            return Err(TmpfsError::NotDirectory);
+        }
+        
+        if parent.children.contains_key(name) {
+            return Err(TmpfsError::AlreadyExists);
+        }
+        
+        let ino = self.alloc_ino();
+        let inode = Arc::new(TmpfsInode::new_symlink(ino, target, uid, gid));
+        
+        let parent_mut = unsafe { &mut *(Arc::as_ptr(&parent) as *mut TmpfsInode) };
+        parent_mut.children.insert(name.into(), ino);
+        
+        self.inodes.insert(ino, inode);
+        
+        Ok(ino)
+    }
+    
+    /// Unlink (delete) file or directory
+    pub fn unlink(&mut self, parent_path: &str, name: &str) -> Result<(), TmpfsError> {
+        let parent = self.lookup(parent_path)?;
+        
+        if parent.inode_type != InodeType::Directory {
+            return Err(TmpfsError::NotDirectory);
+        }
+        
+        let ino = parent.children.get(name)
+            .copied()
+            .ok_or(TmpfsError::NotFound)?;
+        
+        let inode = self.get_inode(ino)?;
+        
+        // Cannot unlink non-empty directory
+        if inode.inode_type == InodeType::Directory && !inode.children.is_empty() {
+            return Err(TmpfsError::DirectoryNotEmpty);
+        }
+        
+        // Decrease link count
+        let nlink = inode.nlink.fetch_sub(1, Ordering::Release) - 1;
+        
+        // Remove from parent
+        let parent_mut = unsafe { &mut *(Arc::as_ptr(&parent) as *mut TmpfsInode) };
+        parent_mut.children.remove(name);
+        
+        // Remove inode if no more links
+        if nlink == 0 {
+            self.inodes.remove(&ino);
+        }
+        
+        Ok(())
+    }
+    
+    /// Get filesystem statistics
+    pub fn statfs(&self) -> TmpfsStats {
+        let used = self.used_size.load(Ordering::Acquire);
+        
+        TmpfsStats {
+            total_size: self.max_size as u64,
+            used_size: used,
+            free_size: (self.max_size as u64).saturating_sub(used),
+            total_inodes: self.inodes.len() as u64,
+        }
+    }
+}
+
+/// Tmpfs statistics
+#[derive(Debug, Clone, Copy)]
+pub struct TmpfsStats {
+    pub total_size: u64,
+    pub used_size: u64,
+    pub free_size: u64,
+    pub total_inodes: u64,
+}
+
+/// Tmpfs errors
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TmpfsError {
+    NotFound,
+    AlreadyExists,
+    NotDirectory,
+    NotRegularFile,
+    DirectoryNotEmpty,
+    OutOfSpace,
+    PermissionDenied,
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-
+    
     #[test]
-    fn test_linux_bsd_50_percent_ram_rule_tmpfs() {
-        let total_ram_bytes = 16 * 1024 * 1024 * 1024; // 16GB RAM
-        let tmpfs = TmpfsFileSystem::default_with_system_ram(total_ram_bytes);
-        assert_eq!(tmpfs.config.max_bytes, 8 * 1024 * 1024 * 1024); // 50% = 8GB
-        assert_eq!(tmpfs.config.mode, 0o1777);
+    fn test_tmpfs_creation() {
+        let fs = TmpfsFilesystem::new(1024 * 1024); // 1 MB
+        let root = fs.lookup("/").unwrap();
+        assert_eq!(root.inode_type, InodeType::Directory);
     }
-
+    
     #[test]
-    fn test_tmpfs_dynamic_allocation_limits() {
-        let config = TmpfsConfig {
-            max_bytes: 8192, // 8KB limit
-            max_inodes: 4,
-            uid: 0,
-            gid: 0,
-            mode: 0o1777,
-        };
-
-        let mut fs = TmpfsFileSystem::new(config);
-
-        // Allocate a 4KB file - succeeds
-        let f1 = fs
-            .create_node(TmpfsFileType::Regular, 4096, 1625100000)
-            .unwrap();
-        assert_eq!(fs.current_bytes_used, 4096);
-        assert_eq!(fs.current_inodes_used, 1);
-
-        // Allocate another 4KB file - succeeds
-        let f2 = fs
-            .create_node(TmpfsFileType::Regular, 4096, 1625100005)
-            .unwrap();
-        assert_eq!(fs.current_bytes_used, 8192);
-
-        // Allocate a third 1KB file - fails with exceeds memory limits
-        let f3 = fs.create_node(TmpfsFileType::Regular, 1024, 1625100010);
-        assert_eq!(f3, Err("Tmpfs allocation request exceeds memory limit"));
-
-        // Unlink f1 to reclaim memory
-        fs.unlink_node(f1).unwrap();
-        assert_eq!(fs.current_bytes_used, 4096);
-
-        // Try allocating f3 again - now succeeds!
-        let f3_ok = fs
-            .create_node(TmpfsFileType::Regular, 1024, 1625100010)
-            .unwrap();
-        assert_eq!(fs.current_bytes_used, 5120);
+    fn test_file_creation() {
+        let mut fs = TmpfsFilesystem::new(1024 * 1024);
+        let ino = fs.create_file("/", "test.txt", 0o644, 0, 0).unwrap();
+        
+        let file = fs.get_inode(ino).unwrap();
+        assert_eq!(file.inode_type, InodeType::Regular);
     }
-
+    
     #[test]
-    fn test_tmpfs_link_unlink_lifecycle() {
-        let config = TmpfsConfig {
-            max_bytes: 10240,
-            max_inodes: 10,
-            uid: 0,
-            gid: 0,
-            mode: 0o1777,
-        };
-
-        let mut fs = TmpfsFileSystem::new(config);
-        let fid = fs.create_node(TmpfsFileType::Regular, 1024, 0).unwrap();
-
-        // Initial link count = 1
-        assert_eq!(fs.inodes[0].unwrap().link_count, 1);
-
-        // Hard link the node
-        fs.link_node(fid).unwrap();
-        assert_eq!(fs.inodes[0].unwrap().link_count, 2);
-
-        // Unlink first reference - does not delete inode because link_count = 1
-        fs.unlink_node(fid).unwrap();
-        assert_eq!(fs.inodes[0].unwrap().link_count, 1);
-        assert_eq!(fs.current_bytes_used, 1024);
-
-        // Unlink second reference - drops link_count to 0, deleting the node and reclaiming memory
-        fs.unlink_node(fid).unwrap();
-        assert_eq!(fs.current_bytes_used, 0);
-        assert!(fs.inodes[0].is_none());
+    fn test_directory_creation() {
+        let mut fs = TmpfsFilesystem::new(1024 * 1024);
+        fs.create_dir("/", "testdir", 0o755, 0, 0).unwrap();
+        
+        let dir = fs.lookup("/testdir").unwrap();
+        assert_eq!(dir.inode_type, InodeType::Directory);
     }
-
+    
     #[test]
-    fn test_tmpfs_swap_backing() {
-        let config = TmpfsConfig {
-            max_bytes: 4096, // 4KB limit
-            max_inodes: 10,
-            uid: 0,
-            gid: 0,
-            mode: 0o1777,
-        };
-
-        let mut fs = TmpfsFileSystem::new(config);
-        let fid = fs.create_node(TmpfsFileType::Regular, 4096, 0).unwrap();
-        assert_eq!(fs.current_bytes_used, 4096);
-
-        // Swap out the file - physical RAM is freed (0 bytes used), but inode is retained!
-        fs.swap_out_node(fid).unwrap();
-        assert_eq!(fs.current_bytes_used, 0);
-        assert!(fs.inodes[0].unwrap().is_swapbacked);
-
-        // We can now allocate another 4KB file in RAM!
-        let fid2 = fs.create_node(TmpfsFileType::Regular, 4096, 0).unwrap();
-        assert_eq!(fs.current_bytes_used, 4096);
-
-        // Trying to swap in fid must fail because it would exceed limits (4KB + 4KB > 4KB max_bytes)
-        let swap_in_res = fs.swap_in_node(fid);
-        assert_eq!(
-            swap_in_res,
-            Err("Insufficient Tmpfs memory to page in node")
-        );
-
-        // Delete fid2
-        fs.unlink_node(fid2).unwrap();
-
-        // Swap in succeeds now!
-        fs.swap_in_node(fid).unwrap();
-        assert_eq!(fs.current_bytes_used, 4096);
-        assert!(!fs.inodes[0].unwrap().is_swapbacked);
-    }
-
-    #[test]
-    fn test_tmpfs_50_percent_ram_rule() {
-        let total_ram = 16 * 1024 * 1024 * 1024; // 16 GB RAM
-        let fs = TmpfsFileSystem::default_with_system_ram(total_ram);
-
-        assert_eq!(fs.config.max_bytes, 8 * 1024 * 1024 * 1024); // 8 GB limit (50% rule)
+    fn test_file_read_write() {
+        let mut fs = TmpfsFilesystem::new(1024 * 1024);
+        let ino = fs.create_file("/", "test.txt", 0o644, 0, 0).unwrap();
+        
+        let inode = fs.get_inode(ino).unwrap();
+        let inode_mut = unsafe { &mut *(Arc::as_ptr(&inode) as *mut TmpfsInode) };
+        
+        let data = b"Hello, tmpfs!";
+        inode_mut.write(0, data).unwrap();
+        
+        let mut buf = [0u8; 100];
+        let len = inode.read(0, &mut buf).unwrap();
+        
+        assert_eq!(len, data.len());
+        assert_eq!(&buf[..len], data);
     }
 }
