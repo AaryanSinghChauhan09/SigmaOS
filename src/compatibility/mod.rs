@@ -295,5 +295,8 @@ pub use legacy_adapters::{
     GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER, GLOBAL_WORKLOAD_OPTIMIZER,
 };
 
+pub mod mint_tools_supremacy;
+pub use mint_tools_supremacy::*;
+
 // Re-export stub types
 pub use crate::stubs::compat_stubs::*;

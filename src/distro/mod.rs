@@ -387,6 +387,9 @@ pub use sovereign_2075_distro_supremacy_engine::*;
 pub mod sovereign_mint_omarchy_supremacy_suite;
 pub use sovereign_mint_omarchy_supremacy_suite::*;
 
+pub mod omarchy_gaming_performance_suite;
+pub use omarchy_gaming_performance_suite::*;
+
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;
 pub use crate::stubs::large_distro_stubs::*;
