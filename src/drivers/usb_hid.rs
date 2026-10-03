@@ -1,490 +1,453 @@
-use std::vec::Vec;
-// SigmaOS USB HID Keyboard Driver
-// Hardware abstraction for USB HID devices + PeripheralDevice OOP integration
+//! USB HID (Human Interface Device) Class Driver
+//! Supports keyboards, mice, game controllers, and other HID devices
+//! Reference: USB HID specification 1.11 and Linux drivers/hid/
 
-use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
-use crate::security::CapabilityToken;
+#![no_std]
 
-/// Keyboard Layouts inspired by multi-distro Linux/BSD keyboard subsystem
+extern crate alloc;
+use alloc::vec::Vec;
+use alloc::collections::BTreeMap;
+
+/// HID Class descriptor types
+#[repr(u8)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum KeyboardLayout {
-    UsQwerty,
-    UkQwerty,
-    DeQwertz,
-    FrAzerty,
+pub enum HidDescriptorType {
+    Hid = 0x21,
+    Report = 0x22,
+    Physical = 0x23,
 }
 
-/// USB HID report type
+/// HID class-specific requests
+#[repr(u8)]
+#[derive(Debug, Clone, Copy)]
+pub enum HidRequest {
+    GetReport = 0x01,
+    GetIdle = 0x02,
+    GetProtocol = 0x03,
+    SetReport = 0x09,
+    SetIdle = 0x0A,
+    SetProtocol = 0x0B,
+}
+
+/// HID report types
+#[repr(u8)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum HidReportType {
-    Input,
-    Output,
-    Feature,
+    Input = 1,
+    Output = 2,
+    Feature = 3,
 }
 
-/// USB HID keyboard event
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct HidKeyboardEvent {
-    pub keycode: u8,
-    pub pressed: bool,
-    pub modifiers: u8,
+/// HID descriptor structure
+#[repr(C, packed)]
+#[derive(Debug, Clone, Copy)]
+pub struct HidDescriptor {
+    pub length: u8,
+    pub descriptor_type: u8,
+    pub bcd_hid: u16,                 // HID version (BCD)
+    pub country_code: u8,
+    pub num_descriptors: u8,
+    pub report_desc_type: u8,
+    pub report_desc_length: u16,
 }
 
-/// USB HID driver interface
-pub struct UsbHidDriver {
+/// HID Usage Page IDs (from HID Usage Tables)
+#[repr(u8)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum HidUsagePage {
+    GenericDesktop = 0x01,
+    SimulationControls = 0x02,
+    VrControls = 0x03,
+    SportControls = 0x04,
+    GameControls = 0x05,
+    GenericDevice = 0x06,
+    Keyboard = 0x07,
+    Led = 0x08,
+    Button = 0x09,
+    Ordinal = 0x0A,
+    Telephony = 0x0B,
+    Consumer = 0x0C,
+    Digitizer = 0x0D,
+}
+
+/// HID Generic Desktop usages
+#[repr(u8)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum HidGenericDesktopUsage {
+    Pointer = 0x01,
+    Mouse = 0x02,
+    Joystick = 0x04,
+    Gamepad = 0x05,
+    Keyboard = 0x06,
+    Keypad = 0x07,
+    MultiAxisController = 0x08,
+    X = 0x30,
+    Y = 0x31,
+    Z = 0x32,
+    Rx = 0x33,
+    Ry = 0x34,
+    Rz = 0x35,
+    Slider = 0x36,
+    Dial = 0x37,
+    Wheel = 0x38,
+}
+
+/// Keyboard modifier key flags
+#[derive(Debug, Clone, Copy)]
+pub struct KeyboardModifiers {
+    pub left_ctrl: bool,
+    pub left_shift: bool,
+    pub left_alt: bool,
+    pub left_gui: bool,
+    pub right_ctrl: bool,
+    pub right_shift: bool,
+    pub right_alt: bool,
+    pub right_gui: bool,
+}
+
+impl KeyboardModifiers {
+    pub fn from_byte(byte: u8) -> Self {
+        Self {
+            left_ctrl: (byte & 0x01) != 0,
+            left_shift: (byte & 0x02) != 0,
+            left_alt: (byte & 0x04) != 0,
+            left_gui: (byte & 0x08) != 0,
+            right_ctrl: (byte & 0x10) != 0,
+            right_shift: (byte & 0x20) != 0,
+            right_alt: (byte & 0x40) != 0,
+            right_gui: (byte & 0x80) != 0,
+        }
+    }
+
+    pub fn to_byte(&self) -> u8 {
+        let mut byte = 0u8;
+        if self.left_ctrl { byte |= 0x01; }
+        if self.left_shift { byte |= 0x02; }
+        if self.left_alt { byte |= 0x04; }
+        if self.left_gui { byte |= 0x08; }
+        if self.right_ctrl { byte |= 0x10; }
+        if self.right_shift { byte |= 0x20; }
+        if self.right_alt { byte |= 0x40; }
+        if self.right_gui { byte |= 0x80; }
+        byte
+    }
+}
+
+/// Standard keyboard input report (boot protocol)
+#[repr(C, packed)]
+#[derive(Debug, Clone, Copy)]
+pub struct KeyboardReport {
+    pub modifiers: u8,               // Modifier keys bitfield
+    pub reserved: u8,                // Reserved (always 0)
+    pub keycodes: [u8; 6],          // Up to 6 simultaneous keys
+}
+
+impl KeyboardReport {
+    pub fn new() -> Self {
+        Self {
+            modifiers: 0,
+            reserved: 0,
+            keycodes: [0; 6],
+        }
+    }
+
+    pub fn get_modifiers(&self) -> KeyboardModifiers {
+        KeyboardModifiers::from_byte(self.modifiers)
+    }
+}
+
+/// Standard mouse input report (boot protocol)
+#[repr(C, packed)]
+#[derive(Debug, Clone, Copy)]
+pub struct MouseReport {
+    pub buttons: u8,                 // Button states (bits 0-2)
+    pub x_movement: i8,              // Relative X movement
+    pub y_movement: i8,              // Relative Y movement
+    pub wheel: i8,                   // Wheel movement (optional)
+}
+
+impl MouseReport {
+    pub fn new() -> Self {
+        Self {
+            buttons: 0,
+            x_movement: 0,
+            y_movement: 0,
+            wheel: 0,
+        }
+    }
+
+    pub fn left_button(&self) -> bool {
+        (self.buttons & 0x01) != 0
+    }
+
+    pub fn right_button(&self) -> bool {
+        (self.buttons & 0x02) != 0
+    }
+
+    pub fn middle_button(&self) -> bool {
+        (self.buttons & 0x04) != 0
+    }
+}
+
+/// HID device type enumeration
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum HidDeviceType {
+    Keyboard,
+    Mouse,
+    Gamepad,
+    Joystick,
+    Tablet,
+    Touchscreen,
+    Generic,
+}
+
+/// HID device structure
+pub struct HidDevice {
+    pub device_type: HidDeviceType,
     pub vendor_id: u16,
     pub product_id: u16,
-    pub capabilities: CapabilityToken,
-    pub event_buffer: Vec<HidKeyboardEvent>,
-    pub connected: bool,
-
-    // Typematic auto-repeat control inspired by Linux Input subsystem
-    pub repeat_delay_ms: u32,
-    pub repeat_rate_ms: u32,
-    pub last_pressed_keycode: Option<u8>,
-    pub last_press_time_ms: u32,
-    pub last_repeat_time_ms: u32,
-
-    // Lock key state indicators
-    pub caps_lock_active: bool,
-    pub num_lock_active: bool,
-    pub scroll_lock_active: bool,
-
-    // Rollover tracking (N-Key Rollover / NKRO)
-    pub active_held_keys: Vec<u8>,
-
-    // Keyboard layout selector
-    pub layout: KeyboardLayout,
+    pub report_descriptor: Vec<u8>,
+    pub input_reports: Vec<Vec<u8>>,
+    pub protocol: u8,                // 0 = boot protocol, 1 = report protocol
+    pub idle_rate: u8,               // Idle rate in 4ms units
 }
 
-impl UsbHidDriver {
-    pub fn new(vendor_id: u16, product_id: u16) -> Self {
+impl HidDevice {
+    pub fn new(device_type: HidDeviceType, vendor_id: u16, product_id: u16) -> Self {
         Self {
+            device_type,
             vendor_id,
             product_id,
-            capabilities: CapabilityToken::new(),
-            event_buffer: Vec::new(),
-            connected: false,
-            repeat_delay_ms: 250, // standard Linux default (250ms delay)
-            repeat_rate_ms: 33,   // standard Linux default (30Hz repeat rate / ~33ms interval)
-            last_pressed_keycode: None,
-            last_press_time_ms: 0,
-            last_repeat_time_ms: 0,
-            caps_lock_active: false,
-            num_lock_active: false,
-            scroll_lock_active: false,
-            active_held_keys: Vec::new(),
-            layout: KeyboardLayout::UsQwerty,
+            report_descriptor: Vec::new(),
+            input_reports: Vec::new(),
+            protocol: 1,
+            idle_rate: 0,
         }
     }
 
-    pub fn set_layout(&mut self, layout: KeyboardLayout) {
-        self.layout = layout;
-    }
-
-    pub fn connect(&mut self) -> Result<(), HidError> {
-        // Simulate USB connection
-        self.connected = true;
+    /// Parse HID report descriptor
+    pub fn parse_report_descriptor(&mut self, descriptor: Vec<u8>) -> Result<(), HidError> {
+        self.report_descriptor = descriptor;
+        // In real implementation: parse descriptor to build report structure
         Ok(())
     }
 
-    pub fn disconnect(&mut self) {
-        self.connected = false;
-        self.active_held_keys.clear();
-        self.last_pressed_keycode = None;
-    }
-
-    pub fn poll_event(&mut self) -> Option<HidKeyboardEvent> {
-        if !self.connected {
-            return None;
+    /// Set HID protocol (boot or report)
+    pub fn set_protocol(&mut self, protocol: u8) -> Result<(), HidError> {
+        if protocol > 1 {
+            return Err(HidError::InvalidProtocol);
         }
-        self.event_buffer.pop()
-    }
-
-    pub fn push_event(&mut self, event: HidKeyboardEvent) {
-        // Track N-Key Rollover state
-        if event.pressed {
-            if !self.active_held_keys.contains(&event.keycode) {
-                self.active_held_keys.push(event.keycode);
-            }
-            // Update typematic repeat state
-            self.last_pressed_keycode = Some(event.keycode);
-            self.last_press_time_ms = 0; // Simulated relative start
-            self.last_repeat_time_ms = 0;
-        } else {
-            self.active_held_keys.retain(|&k| k != event.keycode);
-            if self.last_pressed_keycode == Some(event.keycode) {
-                self.last_pressed_keycode = None;
-            }
-        }
-
-        // Toggle Lock States when keycode matches standard keyboard locks
-        // Keycode 0x39 = Caps Lock, 0x53 = Num Lock, 0x47 = Scroll Lock
-        if event.pressed {
-            if event.keycode == 0x39 {
-                self.toggle_caps_lock();
-            } else if event.keycode == 0x53 {
-                self.toggle_num_lock();
-            } else if event.keycode == 0x47 {
-                self.toggle_scroll_lock();
-            }
-        }
-
-        self.event_buffer.push(event);
-    }
-
-    /// Simulates passing CPU timer ticks to evaluate and trigger typematic repeats
-    pub fn tick_repeat(&mut self, current_time_ms: u32) -> Option<HidKeyboardEvent> {
-        if !self.connected {
-            return None;
-        }
-        let keycode = self.last_pressed_keycode?;
-        if self.last_press_time_ms == 0 {
-            self.last_press_time_ms = current_time_ms;
-            self.last_repeat_time_ms = current_time_ms;
-            return None;
-        }
-
-        let elapsed = current_time_ms - self.last_press_time_ms;
-        if elapsed >= self.repeat_delay_ms {
-            let repeat_elapsed = current_time_ms - self.last_repeat_time_ms;
-            if repeat_elapsed >= self.repeat_rate_ms {
-                self.last_repeat_time_ms = current_time_ms;
-                // Dispatch repeat input event
-                return Some(HidKeyboardEvent {
-                    keycode,
-                    pressed: true,
-                    modifiers: 0,
-                });
-            }
-        }
-        None
-    }
-
-    pub fn send_report(
-        &mut self,
-        report_type: HidReportType,
-        _data: &[u8],
-    ) -> Result<(), HidError> {
-        if !self.connected {
-            return Err(HidError::NotConnected);
-        }
-
-        match report_type {
-            HidReportType::Output => {
-                // Send output report (e.g., LED state)
-                Ok(())
-            }
-            HidReportType::Feature => {
-                // Send feature report
-                Ok(())
-            }
-            HidReportType::Input => Err(HidError::InvalidReportType),
-        }
-    }
-
-    pub fn set_leds(&mut self, leds: u8) -> Result<(), HidError> {
-        self.send_report(HidReportType::Output, &[leds])
-    }
-
-    /// Toggles Caps Lock state and formats LED report (Bit 1 = Caps Lock LED)
-    pub fn toggle_caps_lock(&mut self) {
-        self.caps_lock_active = !self.caps_lock_active;
-        self.update_led_report().ok();
-    }
-
-    /// Toggles Num Lock state and formats LED report (Bit 0 = Num Lock LED)
-    pub fn toggle_num_lock(&mut self) {
-        self.num_lock_active = !self.num_lock_active;
-        self.update_led_report().ok();
-    }
-
-    /// Toggles Scroll Lock state and formats LED report (Bit 2 = Scroll Lock LED)
-    pub fn toggle_scroll_lock(&mut self) {
-        self.scroll_lock_active = !self.scroll_lock_active;
-        self.update_led_report().ok();
-    }
-
-    fn update_led_report(&mut self) -> Result<(), HidError> {
-        let mut leds = 0u8;
-        if self.num_lock_active {
-            leds |= 0x01;
-        }
-        if self.caps_lock_active {
-            leds |= 0x02;
-        }
-        if self.scroll_lock_active {
-            leds |= 0x04;
-        }
-        self.set_leds(leds)
-    }
-
-    pub fn set_capabilities(&mut self, capabilities: CapabilityToken) {
-        self.capabilities = capabilities;
-    }
-
-    pub fn has_capability(&self, capability: u64) -> bool {
-        (self.capabilities.bits() & capability) != 0
-    }
-
-    pub fn clear_buffer(&mut self) {
-        self.event_buffer.clear();
-    }
-}
-
-impl Default for UsbHidDriver {
-    fn default() -> Self {
-        Self::new(0x0000, 0x0000)
-    }
-}
-
-/// HID USB Scancode to ASCII mapping (US QWERTY, first 58 scancodes)
-const HID_SCANCODE_TO_ASCII: [u8; 57] = [
-    0, 0, 0, 0, b'a', b'b', b'c', b'd', b'e', b'f', b'g', b'h', b'i', b'j', b'k', b'l', b'm', b'n',
-    b'o', b'p', b'q', b'r', b's', b't', b'u', b'v', b'w', b'x', b'y', b'z', b'1', b'2', b'3', b'4',
-    b'5', b'6', b'7', b'8', b'9', b'0', b'\n', 0, b'\x08', b'\t', b' ', b'-', b'=', b'[', b']',
-    b'\\', 0, b';', b'\'', b'`', b',', b'.', b'/',
-];
-
-/// Standalone HID Keyboard implementing PeripheralDevice for PeripheralManager
-pub struct HidKeyboard {
-    inner: UsbHidDriver,
-    power_state: PowerState,
-}
-
-impl HidKeyboard {
-    pub fn new(vendor_id: u16, product_id: u16) -> Self {
-        Self {
-            inner: UsbHidDriver::new(vendor_id, product_id),
-            power_state: PowerState::Off,
-        }
-    }
-
-    /// Converts a USB HID scancode to ASCII character
-    pub fn scancode_to_ascii(scancode: u8, shift: bool) -> Option<u8> {
-        let idx = scancode as usize;
-        if idx >= HID_SCANCODE_TO_ASCII.len() {
-            return None;
-        }
-        let ch = HID_SCANCODE_TO_ASCII[idx];
-        if ch == 0 {
-            return None;
-        }
-        if shift && ch.is_ascii_alphabetic() {
-            Some(ch.to_ascii_uppercase())
-        } else {
-            Some(ch)
-        }
-    }
-
-    /// Converts a USB HID scancode to ASCII character based on KeyboardLayout
-    pub fn scancode_to_ascii_layout(
-        scancode: u8,
-        shift: bool,
-        layout: KeyboardLayout,
-    ) -> Option<u8> {
-        let ascii = Self::scancode_to_ascii(scancode, shift)?;
-        match layout {
-            KeyboardLayout::UsQwerty | KeyboardLayout::UkQwerty => Some(ascii),
-            KeyboardLayout::DeQwertz => match ascii {
-                b'y' => Some(b'z'),
-                b'Y' => Some(b'Z'),
-                b'z' => Some(b'y'),
-                b'Z' => Some(b'Y'),
-                _ => Some(ascii),
-            },
-            KeyboardLayout::FrAzerty => match ascii {
-                b'q' => Some(b'a'),
-                b'Q' => Some(b'A'),
-                b'a' => Some(b'q'),
-                b'A' => Some(b'Q'),
-                b'w' => Some(b'z'),
-                b'W' => Some(b'Z'),
-                b'z' => Some(b'w'),
-                b'Z' => Some(b'W'),
-                _ => Some(ascii),
-            },
-        }
-    }
-
-    /// Decode a keyboard event to a printable ASCII char
-    pub fn decode_event(event: &HidKeyboardEvent) -> Option<char> {
-        let shift = (event.modifiers & 0x22) != 0;
-        Self::scancode_to_ascii(event.keycode, shift).map(|b| b as char)
-    }
-
-    /// Decode a keyboard event to a printable ASCII char with layout awareness
-    pub fn decode_event_layout(event: &HidKeyboardEvent, layout: KeyboardLayout) -> Option<char> {
-        let shift = (event.modifiers & 0x22) != 0;
-        Self::scancode_to_ascii_layout(event.keycode, shift, layout).map(|b| b as char)
-    }
-}
-
-impl PeripheralDevice for HidKeyboard {
-    fn name(&self) -> &'static str {
-        "USB HID Keyboard"
-    }
-    fn generation(&self) -> DeviceGeneration {
-        DeviceGeneration::Modern
-    }
-
-    fn initialize(&mut self) -> Result<(), &'static str> {
-        self.inner
-            .connect()
-            .map_err(|_| "USB HID: Failed to connect")?;
-        self.power_state = PowerState::On;
+        self.protocol = protocol;
         Ok(())
     }
 
-    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
-        if self.power_state != PowerState::On {
-            return Err("HID Keyboard is not powered on");
-        }
-        let mut count = 0;
-        while count < buffer.len() {
-            match self.inner.poll_event() {
-                Some(event) if event.pressed => {
-                    if let Some(decoded) = Self::decode_event(&event) {
-                        buffer[count] = decoded as u8;
-                        count += 1;
-                    }
+    /// Set idle rate (0 = infinite, non-zero = 4ms * value)
+    pub fn set_idle(&mut self, idle_rate: u8) -> Result<(), HidError> {
+        self.idle_rate = idle_rate;
+        Ok(())
+    }
+
+    /// Process input report
+    pub fn process_input_report(&mut self, report: Vec<u8>) -> Result<HidEvent, HidError> {
+        self.input_reports.push(report.clone());
+
+        match self.device_type {
+            HidDeviceType::Keyboard => {
+                if report.len() >= 8 {
+                    Ok(HidEvent::Keyboard(KeyboardEvent {
+                        modifiers: KeyboardModifiers::from_byte(report[0]),
+                        keycodes: [
+                            report[2], report[3], report[4],
+                            report[5], report[6], report[7],
+                        ],
+                    }))
+                } else {
+                    Err(HidError::InvalidReportLength)
                 }
-                _ => break,
-            }
+            },
+            HidDeviceType::Mouse => {
+                if report.len() >= 3 {
+                    Ok(HidEvent::Mouse(MouseEvent {
+                        buttons: report[0],
+                        x_movement: report[1] as i8,
+                        y_movement: report[2] as i8,
+                        wheel: if report.len() > 3 { report[3] as i8 } else { 0 },
+                    }))
+                } else {
+                    Err(HidError::InvalidReportLength)
+                }
+            },
+            _ => Ok(HidEvent::Generic(report)),
         }
-        Ok(count)
-    }
-
-    fn write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
-        if let Some(&led_byte) = data.first() {
-            self.inner
-                .set_leds(led_byte)
-                .map_err(|_| "HID: LED set failed")?;
-        }
-        Ok(data.len().min(1))
-    }
-
-    fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
-        self.power_state = state;
-        Ok(())
-    }
-
-    fn shutdown(&mut self) -> Result<(), &'static str> {
-        self.inner.disconnect();
-        self.power_state = PowerState::Off;
-        Ok(())
     }
 }
 
-/// HID errors
-#[derive(Debug, Clone, PartialEq, Eq)]
+/// HID event types
+#[derive(Debug, Clone)]
+pub enum HidEvent {
+    Keyboard(KeyboardEvent),
+    Mouse(MouseEvent),
+    Gamepad(GamepadEvent),
+    Generic(Vec<u8>),
+}
+
+#[derive(Debug, Clone)]
+pub struct KeyboardEvent {
+    pub modifiers: KeyboardModifiers,
+    pub keycodes: [u8; 6],
+}
+
+#[derive(Debug, Clone)]
+pub struct MouseEvent {
+    pub buttons: u8,
+    pub x_movement: i8,
+    pub y_movement: i8,
+    pub wheel: i8,
+}
+
+#[derive(Debug, Clone)]
+pub struct GamepadEvent {
+    pub buttons: u16,
+    pub left_stick_x: i16,
+    pub left_stick_y: i16,
+    pub right_stick_x: i16,
+    pub right_stick_y: i16,
+    pub left_trigger: u8,
+    pub right_trigger: u8,
+}
+
+/// HID driver manager
+pub struct HidDriver {
+    devices: BTreeMap<u32, HidDevice>,
+    next_device_id: u32,
+}
+
+impl HidDriver {
+    pub fn new() -> Self {
+        Self {
+            devices: BTreeMap::new(),
+            next_device_id: 1,
+        }
+    }
+
+    /// Register new HID device
+    pub fn register_device(&mut self, device: HidDevice) -> u32 {
+        let device_id = self.next_device_id;
+        self.next_device_id += 1;
+        self.devices.insert(device_id, device);
+        device_id
+    }
+
+    /// Unregister HID device
+    pub fn unregister_device(&mut self, device_id: u32) -> Result<(), HidError> {
+        self.devices.remove(&device_id)
+            .ok_or(HidError::DeviceNotFound)?;
+        Ok(())
+    }
+
+    /// Get device by ID
+    pub fn get_device(&self, device_id: u32) -> Option<&HidDevice> {
+        self.devices.get(&device_id)
+    }
+
+    /// Get mutable device by ID
+    pub fn get_device_mut(&mut self, device_id: u32) -> Option<&mut HidDevice> {
+        self.devices.get_mut(&device_id)
+    }
+
+    /// Process input from device
+    pub fn process_input(&mut self, device_id: u32, report: Vec<u8>) -> Result<HidEvent, HidError> {
+        let device = self.devices.get_mut(&device_id)
+            .ok_or(HidError::DeviceNotFound)?;
+        device.process_input_report(report)
+    }
+}
+
+/// HID error types
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum HidError {
-    NotConnected,
-    InvalidReportType,
-    PermissionDenied,
-    DeviceError,
+    DeviceNotFound,
+    InvalidProtocol,
+    InvalidReportLength,
+    InvalidDescriptor,
+    TransferFailed,
+    ParseError,
 }
 
-#[cfg(test_disabled)]
+/// USB HID scan codes (subset of common keys)
+pub mod scancodes {
+    pub const KEY_A: u8 = 0x04;
+    pub const KEY_B: u8 = 0x05;
+    pub const KEY_C: u8 = 0x06;
+    pub const KEY_D: u8 = 0x07;
+    pub const KEY_E: u8 = 0x08;
+    pub const KEY_F: u8 = 0x09;
+    pub const KEY_G: u8 = 0x0A;
+    pub const KEY_H: u8 = 0x0B;
+    pub const KEY_I: u8 = 0x0C;
+    pub const KEY_J: u8 = 0x0D;
+    pub const KEY_K: u8 = 0x0E;
+    pub const KEY_L: u8 = 0x0F;
+    pub const KEY_M: u8 = 0x10;
+    pub const KEY_N: u8 = 0x11;
+    pub const KEY_O: u8 = 0x12;
+    pub const KEY_P: u8 = 0x13;
+    pub const KEY_Q: u8 = 0x14;
+    pub const KEY_R: u8 = 0x15;
+    pub const KEY_S: u8 = 0x16;
+    pub const KEY_T: u8 = 0x17;
+    pub const KEY_U: u8 = 0x18;
+    pub const KEY_V: u8 = 0x19;
+    pub const KEY_W: u8 = 0x1A;
+    pub const KEY_X: u8 = 0x1B;
+    pub const KEY_Y: u8 = 0x1C;
+    pub const KEY_Z: u8 = 0x1D;
+    pub const KEY_1: u8 = 0x1E;
+    pub const KEY_2: u8 = 0x1F;
+    pub const KEY_3: u8 = 0x20;
+    pub const KEY_4: u8 = 0x21;
+    pub const KEY_5: u8 = 0x22;
+    pub const KEY_6: u8 = 0x23;
+    pub const KEY_7: u8 = 0x24;
+    pub const KEY_8: u8 = 0x25;
+    pub const KEY_9: u8 = 0x26;
+    pub const KEY_0: u8 = 0x27;
+    pub const KEY_ENTER: u8 = 0x28;
+    pub const KEY_ESC: u8 = 0x29;
+    pub const KEY_BACKSPACE: u8 = 0x2A;
+    pub const KEY_TAB: u8 = 0x2B;
+    pub const KEY_SPACE: u8 = 0x2C;
+}
+
+#[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn test_hid_creation() {
-        let hid = UsbHidDriver::new(0x1234, 0x5678);
-        assert_eq!(hid.vendor_id, 0x1234);
-        assert_eq!(hid.product_id, 0x5678);
-        assert!(!hid.connected);
-        assert_eq!(hid.repeat_delay_ms, 250);
+    fn test_keyboard_modifiers() {
+        let mods = KeyboardModifiers::from_byte(0x03); // Ctrl + Shift
+        assert!(mods.left_ctrl);
+        assert!(mods.left_shift);
+        assert!(!mods.left_alt);
     }
 
     #[test]
-    fn test_connect() {
-        let mut hid = UsbHidDriver::new(0x1234, 0x5678);
-        assert!(hid.connect().is_ok());
-        assert!(hid.connected);
+    fn test_mouse_report() {
+        let report = MouseReport {
+            buttons: 0x01,
+            x_movement: 10,
+            y_movement: -5,
+            wheel: 0,
+        };
+        assert!(report.left_button());
+        assert!(!report.right_button());
     }
 
     #[test]
-    fn test_disconnect() {
-        let mut hid = UsbHidDriver::new(0x1234, 0x5678);
-        hid.connect().unwrap();
-        hid.disconnect();
-        assert!(!hid.connected);
-    }
-
-    #[test]
-    fn test_nkro_and_locks() {
-        let mut hid = UsbHidDriver::new(0x1234, 0x5678);
-        hid.connect().unwrap();
-
-        // Caps Lock Toggle keycode (0x39)
-        let caps_event = HidKeyboardEvent {
-            keycode: 0x39,
-            pressed: true,
-            modifiers: 0,
-        };
-        hid.push_event(caps_event.clone());
-        assert!(hid.caps_lock_active);
-        assert_eq!(hid.active_held_keys, vec![0x39]);
-
-        // Key Release
-        let caps_release = HidKeyboardEvent {
-            keycode: 0x39,
-            pressed: false,
-            modifiers: 0,
-        };
-        hid.push_event(caps_release);
-        assert!(hid.caps_lock_active); // remains true (toggle)
-        assert!(hid.active_held_keys.is_empty());
-    }
-
-    #[test]
-    fn test_multi_layout_decoding() {
-        let event_z = HidKeyboardEvent {
-            keycode: 0x1D, // 'z' in US QWERTY
-            pressed: true,
-            modifiers: 0,
-        };
-
-        let us_char = HidKeyboard::decode_event_layout(&event_z, KeyboardLayout::UsQwerty).unwrap();
-        assert_eq!(us_char, 'z');
-
-        let de_char = HidKeyboard::decode_event_layout(&event_z, KeyboardLayout::DeQwertz).unwrap();
-        assert_eq!(de_char, 'y'); // 'z' becomes 'y' in QWERTZ
-
-        let event_q = HidKeyboardEvent {
-            keycode: 0x14, // 'q' in US QWERTY
-            pressed: true,
-            modifiers: 0,
-        };
-        let fr_char = HidKeyboard::decode_event_layout(&event_q, KeyboardLayout::FrAzerty).unwrap();
-        assert_eq!(fr_char, 'a'); // 'q' becomes 'a' in AZERTY
-    }
-
-    #[test]
-    fn test_typematic_auto_repeat() {
-        let mut hid = UsbHidDriver::new(0x1234, 0x5678);
-        hid.connect().unwrap();
-
-        let key_event = HidKeyboardEvent {
-            keycode: 0x04, // 'a'
-            pressed: true,
-            modifiers: 0,
-        };
-        hid.push_event(key_event);
-
-        // First tick maps initial timings
-        let t1 = hid.tick_repeat(10);
-        assert!(t1.is_none());
-
-        // Wait within delay threshold
-        let t2 = hid.tick_repeat(100);
-        assert!(t2.is_none());
-
-        // Cross delay threshold (delay = 250ms), tick_repeat triggers repeats
-        let t3 = hid.tick_repeat(300); // 300 - 10 = 290 > 250
-        assert!(t3.is_some());
-        assert_eq!(t3.unwrap().keycode, 0x04);
+    fn test_hid_driver() {
+        let mut driver = HidDriver::new();
+        let device = HidDevice::new(HidDeviceType::Keyboard, 0x1234, 0x5678);
+        let device_id = driver.register_device(device);
+        assert!(driver.get_device(device_id).is_some());
     }
 }

@@ -27,6 +27,7 @@ pub mod dtrace_compat;
 pub mod ebpf;
 pub mod ebpf_verification;
 pub mod ebpf_vm;
+pub mod ebpf_xdp;
 pub mod exports;
 pub mod futex;
 pub mod gap_closing;
@@ -98,6 +99,19 @@ pub use missing_linux_kernel_components::{
 };
 pub mod traits;
 pub mod vmm_paging;
+pub mod dma_engine;
+pub mod acpi_pm;
+
+pub use dma_engine::{
+    DmaController, DmaChannel, DmaDescriptor, DmaDirection, DmaWidth,
+    DmaBurst, DmaChannelState, DmaPool, DmaBuffer, DmaError, DmaCapabilities,
+};
+pub use acpi_pm::{
+    AcpiPowerManager, AcpiSleepState, AcpiPState, AcpiTState, AcpiDevicePowerState,
+    CpuGovernor, BatteryInfo, AcAdapterInfo, ThermalZone, CoolingDevice,
+    CoolingDeviceType, AcpiError,
+};
+
 
 pub use crate::kernel::linux_bsd_innovations::*;
 pub use crate::kernel::linux_bsd_innovations::{

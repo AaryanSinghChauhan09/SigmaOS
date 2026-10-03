@@ -87,6 +87,10 @@ impl CapabilityToken {
         self.bits |= bitmask;
     }
 
+    pub fn grant_permission(&mut self, permission: Permission) {
+        self.bits |= 1u64 << (permission as u64);
+    }
+
     pub fn contains(&self, bitmask: u64) -> bool {
         (self.bits & bitmask) == bitmask
     }
