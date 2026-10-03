@@ -1,10 +1,20 @@
 // Process Scheduler Enhancements
 // Inspired by Linux CFS, RT scheduler, and energy-aware scheduling
 
+extern crate alloc;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
+use core::cmp::Ordering as CmpOrdering;
+use core::sync::atomic::{AtomicU64, Ordering as AtomicOrdering};
+use core::time::Duration;
 use std::collections::BinaryHeap;
-use std::sync::atomic::{AtomicU32, AtomicU64, Ordering};
 
 /// Process priority
+/// 
+/// Priority values range from -20 (highest/realtime) to 19 (lowest/idle).
+/// Lower numeric values indicate higher scheduling priority.
+/// Linux-compatible priority system for fair scheduling.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Priority {
     pub value: i32, // -20 to 19 (lower is higher priority)
@@ -54,6 +64,12 @@ impl Priority {
 }
 
 /// Scheduler policy
+///
+/// Determines which scheduling algorithm to apply to a task:
+/// - Normal: Completely Fair Scheduler (CFS) with vruntime-based scheduling
+/// - Realtime: Fixed-priority preemptive scheduling for time-critical tasks
+/// - Idle: Only runs when no other tasks are runnable
+/// - Batch: CPU-intensive workloads with lower interactivity requirements
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SchedulerPolicy {
     Normal, // CFS
@@ -83,6 +99,10 @@ impl ProcessState {
 }
 
 /// Process task
+///
+/// Represents a schedulable task with CFS scheduling parameters.
+/// Tracks virtual runtime (vruntime) for fair CPU time distribution,
+/// execution statistics, and current scheduling state.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ProcessTask {
     pub pid: u64,
@@ -97,13 +117,22 @@ pub struct ProcessTask {
 }
 
 impl Ord for ProcessTask {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+    fn cmp(&self, other: &Self) -> CmpOrdering {
         // Lower vruntime has higher priority
         self.vruntime.cmp(&other.vruntime).reverse()
     }
 }
 
 /// CFS Scheduler implementation
+///
+/// Completely Fair Scheduler inspired by Linux CFS.
+/// Uses red-black tree (via BinaryHeap) to track runnable tasks ordered by vruntime.
+/// Each task receives CPU time proportional to its priority weight, ensuring
+/// fairness while allowing priority-based differentiation.
+///
+/// Key parameters:
+/// - min_granularity: Minimum time slice duration
+/// - latency: Target scheduling latency for all tasks
 pub struct CfsScheduler {
     runnable_tasks: BinaryHeap<ProcessTask>,
     current_task: Option<ProcessTask>,
@@ -120,12 +149,18 @@ impl CfsScheduler {
             min_granularity,
             latency,
             next_pid: AtomicU64::new(1),
+            task_count: 0,
         }
+    }
+
+    pub fn calculate_slice(&self, priority: Priority) -> u64 {
+        let weight = (20 - priority.value).max(1) as u64;
+        (self.latency * weight) / 20
     }
 
     /// Create a new process
     pub fn create_process(&mut self, priority: Priority, policy: SchedulerPolicy) -> ProcessTask {
-        let pid = self.next_pid.fetch_add(1, Ordering::SeqCst);
+        let pid = self.next_pid.fetch_add(1, AtomicOrdering::SeqCst);
 
         let task = ProcessTask {
             pid,
@@ -141,48 +176,28 @@ impl CfsScheduler {
 
         if policy == SchedulerPolicy::Normal {
             self.runnable_tasks.push(task.clone());
+            self.task_count += 1;
         }
 
         task
     }
 
-    pub fn pick_next_task(&mut self) -> Option<Task> {
-        if self.task_count > 0 {
-            let task = self.tasks[0].take();
-            self.tasks[0] = self.tasks[self.task_count - 1];
-            self.tasks[self.task_count - 1] = None;
-            self.task_count -= 1;
-            self.sort_tasks();
-            task
+    pub fn pick_next_task(&mut self) -> Option<ProcessTask> {
+        if let Some(current) = self.current_task.take() {
+            if current.state == ProcessState::Running {
+                let mut updated = current;
+                updated.state = ProcessState::Runnable;
+                self.runnable_tasks.push(updated);
+            }
+        }
+
+        if let Some(mut next) = self.runnable_tasks.pop() {
+            next.state = ProcessState::Running;
+            self.current_task = Some(next.clone());
+            Some(next)
         } else {
             None
         }
-    }
-
-    pub fn tick(&mut self) {
-        self.current_time += 1;
-        if self.task_count > 0 {
-            if let Some(ref mut task) = self.tasks[0] {
-                task.vruntime += 1;
-            }
-            self.sort_tasks();
-        }
-    }
-
-    pub fn schedule(&mut self) -> Option<Task> {
-        self.pick_next_task()
-    }
-
-    fn sort_tasks(&mut self) {
-        for i in 1..self.task_count {
-            let mut j = i;
-            while j > 0 && self.tasks[j - 1].unwrap().vruntime > self.tasks[j].unwrap().vruntime {
-                self.tasks.swap(j - 1, j);
-                j -= 1;
-            }
-        }
-
-        self.runnable_tasks.pop()
     }
 
     /// Put task to sleep
@@ -244,7 +259,7 @@ impl RtScheduler {
 
     /// Create a new RT process
     pub fn create_process(&mut self, priority: Priority) -> ProcessTask {
-        let pid = self.next_pid.fetch_add(1, Ordering::SeqCst);
+        let pid = self.next_pid.fetch_add(1, AtomicOrdering::SeqCst);
 
         let task = ProcessTask {
             pid,

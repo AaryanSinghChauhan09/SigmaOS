@@ -304,7 +304,7 @@ impl Controller for HugetlbController {
             let limit: u64 = value
                 .parse()
                 .map_err(|_| format!("Invalid limit value: {}", value))?;
-            
+
             self.set_limit(size, limit);
             Ok(())
         } else {

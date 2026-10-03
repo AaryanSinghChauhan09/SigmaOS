@@ -1,0 +1,1 @@
+# Keep build directory tracked in git so rustc -o build/ outputs succeed in CI

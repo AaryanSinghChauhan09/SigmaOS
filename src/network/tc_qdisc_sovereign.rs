@@ -77,7 +77,6 @@ impl TbfQdisc {
             dropped: 0,
             queue: Vec::new(),
             queue_limit,
-            refill_remainder: 0,
         }
     }
 
@@ -322,7 +321,7 @@ pub struct FqCodelQdisc {
     pub target_delay_ns: u64, // target queue latency (default 5ms)
     pub interval_ns: u64,     // CoDel interval (default 100ms)
     pub quantum: u32,         // FQ quantum in bytes
-    pub flows: Vec<Vec<Packet>>,
+    pub flows: Vec<VecDeque<Packet>>,
     pub flow_count: usize,
     pub drop_count: u64,
     pub ecn_marks: u64,

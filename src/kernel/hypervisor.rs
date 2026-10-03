@@ -22,7 +22,6 @@ use std::collections::BTreeMap;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
 
 /// CPU Hardware Virtualization Extensions
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

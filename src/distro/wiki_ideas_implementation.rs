@@ -10,7 +10,6 @@ extern crate alloc;
 
 use std::collections::BTreeMap;
 use std::format;
-use std::string::{String, ToString};
 use std::vec::Vec;
 
 /// 1. NixOS-Style Declarative System Configuration & Generation Manager

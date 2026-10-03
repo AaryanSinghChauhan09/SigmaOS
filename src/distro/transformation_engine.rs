@@ -1,5 +1,4 @@
 use std::format;
-use std::string::{String, ToString};
 use std::vec::Vec;
 // SigmaOS Sovereign Future-Ready Operating System Transformation Engine
 // Implements accessibility overlays, automation routines, forensic audit trails,

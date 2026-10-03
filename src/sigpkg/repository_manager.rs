@@ -7,7 +7,6 @@ use crate::klib::btreemap::BTreeMap;
 extern crate alloc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::format;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
@@ -19,7 +18,6 @@ use std::format;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
 
 use core::default::Default;
 use core::option::Option::{self, None, Some};
@@ -30,6 +28,7 @@ pub struct RepositoryGpgKey {
     pub key_id: String,
     pub owner: String,
     pub is_valid: bool,
+    pub fingerprint: String,
 }
 
 impl RepositoryGpgKey {
@@ -38,6 +37,7 @@ impl RepositoryGpgKey {
             key_id: key_id.to_string(),
             owner: owner.to_string(),
             is_valid: true,
+            fingerprint: key_id.to_string(),
         }
     }
 }
@@ -96,19 +96,6 @@ impl MirrorBenchmarkEngine {
 }
 
 /// Repository configuration (Debian sources.list inspiration)
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum OfficialArchiveSource {
-    Main,
-    Universe,
-    Multiverse,
-    Restricted,
-}
-
-#[derive(Debug, Clone)]
-pub struct RepositoryGpgKey {
-    pub key_id: String,
-    pub fingerprint: String,
-}
 
 pub struct Repository {
     pub name: String,

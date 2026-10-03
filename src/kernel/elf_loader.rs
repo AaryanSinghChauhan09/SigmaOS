@@ -22,7 +22,6 @@ use std::collections::BTreeMap;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
 
 /// ELF Relocation Types (x86_64)
 pub const R_X86_64_64: u32 = 1;

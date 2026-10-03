@@ -3,7 +3,6 @@
 // Debian dpkg-divert, Arch pacdiff, Gentoo eclass/SLOT, FreeBSD pkg audit VuXML, OpenBSD signify, Void xbps journal.
 
 use std::format;
-use std::string::{String, ToString};
 use std::vec::Vec;
 
 /// Debian dpkg-divert File Diversion Engine

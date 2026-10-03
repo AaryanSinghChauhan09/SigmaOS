@@ -26,7 +26,8 @@ pub fn mix_entropy(value: u64) {
 
 /// Fill `buf` with entropy bytes derived from the pool.
 pub fn get_entropy_bytes(buf: &mut [u8]) {
-    let mut state = ENTROPY_POOL.fetch_add(1, Ordering::AcqRel);
+    // Relaxed ordering: entropy mixing does not require synchronization
+    let mut state = ENTROPY_POOL.fetch_add(1, Ordering::Relaxed);
     for (i, byte) in buf.iter_mut().enumerate() {
         state = xorshift64(state ^ (i as u64).wrapping_mul(0x517C_C1B7_2722_0A95));
         *byte = (state >> 56) as u8;

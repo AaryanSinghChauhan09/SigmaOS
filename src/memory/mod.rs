@@ -13,11 +13,14 @@ pub mod allocator;
 pub mod cgroups;
 pub mod kswapd;
 pub mod low_level;
+pub mod page_cache;
 pub mod paging;
 pub mod quota;
 pub mod segmentation_paging;
+pub mod slab_allocator;
 pub mod sovereign_address_translation;
-pub mod huge_pages;
+#[path = "huge_pages.rs"]
+pub mod thp;
 pub mod tlb_associative;
 pub mod zone;
 pub use sovereign_address_translation::*;

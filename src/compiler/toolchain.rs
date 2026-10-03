@@ -308,6 +308,21 @@ impl ToolchainVersion {
     }
 }
 
+// ─── Submodules ─────────────────────────────────────────────────────────────
+
+pub mod adapter;
+pub mod bootstrap;
+pub mod capsule;
+pub mod codex;
+pub mod compiler;
+pub mod driver;
+pub mod executor;
+pub mod linker;
+pub mod optimizer;
+pub mod profiler;
+pub mod relocator;
+pub mod symbolizer;
+
 // ─── Tests ──────────────────────────────────────────────────────────────────
 
 #[cfg(test)]

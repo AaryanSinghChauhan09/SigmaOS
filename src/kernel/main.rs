@@ -29,7 +29,8 @@ pub fn start_kernel(
     EARLY_CPU_STATE.store(1, Ordering::SeqCst);
 
     // Stage 2: Physical Memory paging bootstrap
-    vmm.map_page(0x0, 0x0, false, true).map_err(|_| "Failed to map initial physical page")?;
+    vmm.map_page(0x0, 0x0, false, true)
+        .map_err(|_| "Failed to map initial physical page")?;
     allocator.initialize_memory(0x10000, 1024 * 1024);
     EARLY_CPU_STATE.store(2, Ordering::SeqCst);
 

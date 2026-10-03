@@ -66,6 +66,10 @@ pub struct SyscallResult {
     pub error: i32,
 }
 
+// Error constants
+pub const EINVAL: i32 = 22; // Invalid argument
+pub const EFAULT: i32 = 14; // Bad address
+
 impl SyscallResult {
     pub fn success(value: isize) -> Self {
         SyscallResult { value, error: 0 }
@@ -244,13 +248,44 @@ impl SyscallDispatcher {
         }
     }
 
+    /// Validate syscall arguments at security boundary
+    /// Prevents malformed arguments from reaching handlers
+    fn validate_args(&self, number: SyscallNumber, args: &SyscallArgs) -> Result<(), i32> {
+        let index = number as usize;
+        
+        // Check syscall number bounds
+        if index >= 256 {
+            return Err(EINVAL);
+        }
+
+        // Validate pointer alignment for memory operations
+        if matches!(number, SyscallNumber::Read | SyscallNumber::Write) {
+            if args.arg1 % 8 != 0 {
+                return Err(EINVAL); // Misaligned buffer pointer
+            }
+            // Prevent buffer overruns: limit size to 4MB
+            if args.arg2 > 4 * 1024 * 1024 {
+                return Err(EINVAL); // Buffer too large
+            }
+        }
+
+        Ok(())
+    }
+
     /// Dispatch syscall
+    /// Hot path: inlined dispatch with relaxed stats tracking
+    #[inline]
     pub unsafe fn dispatch(
         &self,
         number: SyscallNumber,
         args: &SyscallArgs,
         caller_capability: Capability,
     ) -> SyscallResult {
+        // Validate arguments at syscall boundary (security check)
+        if let Err(errno) = self.validate_args(number, args) {
+            return SyscallResult::error(errno);
+        }
+
         let index = number as usize;
 
         if index >= 256 {
@@ -267,8 +302,8 @@ impl SyscallDispatcher {
             return SyscallResult::error(-13); // EACCES
         }
 
-        // Increment call count
-        self.call_count[index].fetch_add(1, Ordering::SeqCst);
+        // Increment call count (relaxed ordering: statistics don't require synchronization)
+        self.call_count[index].fetch_add(1, Ordering::Relaxed);
 
         // Call handler
         (entry.handler)(args, caller_capability)
@@ -287,7 +322,7 @@ impl SyscallDispatcher {
     pub fn get_stats(&self, number: SyscallNumber) -> usize {
         let index = number as usize;
         if index < 256 {
-            self.call_count[index].load(Ordering::SeqCst)
+            self.call_count[index].load(Ordering::Relaxed)
         } else {
             0
         }

@@ -169,9 +169,46 @@ impl UnveilManager {
     }
 
     /// Validate whether `required` permission is granted for `path`.
+    ///
+    /// Security hardening applied:
+    /// - Rejects embedded null bytes (C-ABI truncation mitigation)
+    /// - Rejects URL-encoded traversal sequences (`%2e%2e`, `%2F`, `%5C`)
+    /// - Rejects `..` or `.` directory traversal segments
     pub fn validate_path(&self, path: &str, required: UnveilPermission) -> Result<(), SigmaError> {
         if self.restrictions.is_empty() {
             return Ok(()); // Permissive default
+        }
+
+        // Reject embedded null bytes to prevent C-ABI truncation attacks
+        if path.as_bytes().contains(&0u8) {
+            return Err(SigmaError::Security(SecurityError::AccessDenied));
+        }
+
+        // Reject URL-encoded traversal patterns
+        let bytes = path.as_bytes();
+        if bytes.windows(6).any(|w| {
+            w[0] == b'%'
+                && w[1] == b'2'
+                && (w[2] == b'e' || w[2] == b'E')
+                && w[3] == b'%'
+                && w[4] == b'2'
+                && (w[5] == b'e' || w[5] == b'E')
+        }) {
+            return Err(SigmaError::Security(SecurityError::AccessDenied));
+        }
+        if bytes.windows(3).any(|w| {
+            w[0] == b'%'
+                && ((w[1] == b'2' && (w[2] == b'f' || w[2] == b'F'))
+                    || (w[1] == b'5' && (w[2] == b'c' || w[2] == b'C')))
+        }) {
+            return Err(SigmaError::Security(SecurityError::AccessDenied));
+        }
+
+        // Reject `..` or `.` segments — directory traversal mitigation
+        for segment in path.split(|c| c == '/' || c == '\\') {
+            if segment == ".." || segment == "." {
+                return Err(SigmaError::Security(SecurityError::AccessDenied));
+            }
         }
 
         let mut best_match: Option<&UnveilRestriction> = None;
@@ -221,7 +258,7 @@ impl Default for UnveilManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -291,5 +328,34 @@ mod tests {
         assert!(manager.unveil_seal().is_ok());
         assert!(manager.locked);
         assert!(manager.unveil_seal().is_err()); // Double seal fails
+    }
+
+    #[test]
+    fn test_unveil_security_hardening() {
+        let mut manager = UnveilManager::new();
+        manager.unveil("/var/www", "r").unwrap();
+
+        // Valid path within unveiled directory
+        assert!(manager
+            .validate_path("/var/www/html/index.html", UnveilPermission::Read)
+            .is_ok());
+
+        // Reject directory traversal attempts outside unveiled path
+        assert!(manager
+            .validate_path("/var/www/../etc/passwd", UnveilPermission::Read)
+            .is_err());
+
+        // Reject embedded null byte injection
+        assert!(manager
+            .validate_path("/var/www/file.txt\0.jpg", UnveilPermission::Read)
+            .is_err());
+
+        // Reject URL-encoded traversal patterns
+        assert!(manager
+            .validate_path("/var/www/%2e%2e/etc/passwd", UnveilPermission::Read)
+            .is_err());
+        assert!(manager
+            .validate_path("/var/www/%2Fetc/passwd", UnveilPermission::Read)
+            .is_err());
     }
 }

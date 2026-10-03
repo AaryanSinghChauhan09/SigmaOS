@@ -2,14 +2,12 @@
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
-extern crate alloc;
-
-// Core working modules
-pub mod open_source_os_gap_closure;
+pub mod access;
 pub mod accessibility;
-pub mod ai;
-pub mod app;
-pub mod auth;
+pub mod audio;
+pub mod ipc;
+pub mod storage;
+pub mod system;
 pub mod automation;
 pub mod build;
 pub mod community;
@@ -39,7 +37,9 @@ pub mod observability;
 pub mod orchestration;
 pub mod package;
 pub use package::{
-    SovereignDistroPackageAdvancementsSuiteV10, UniversalForeignPackageFormat,
+    SovereignDistroPackageAdvancementsSuiteV10, SovereignDistroPackageAdvancementsSuiteV11,
+    SovereignDistroPackageAdvancementsSuiteV14, SovereignDistroPackageAdvancementsSuiteV18,
+    UniversalForeignPackageFormat, UniversalForeignPackageFormatConverter,
 };
 pub mod process;
 pub mod productivity;
@@ -67,8 +67,6 @@ pub mod hardware;
 pub mod installer;
 pub mod interrupt;
 pub mod ml;
-pub mod storage;
-pub mod system;
 pub mod thread;
 pub mod virtualization;
 pub use desktop::{
@@ -104,15 +102,19 @@ pub use linuxmint_inspirations::{
     Webapp, WebappManager, WelcomeStep, XAppDocumentReader, XAppImageViewer,
     XAppStatusIconBadgeManager, XAppTextEditor, XAppThemeEngine, XAppTrayBadge,
 };
-pub mod access;
 pub mod open_source_obsoletion;
 pub mod tools;
 pub use distro::additional_linux_bsd_components::*;
 pub use distro::sovereign_2050_distro_supremacy_engine::*;
 pub use distro::sovereign_2055_distro_supremacy_engine::*;
 pub use distro::sovereign_2060_distro_supremacy_engine::*;
+pub use distro::sovereign_2070_distro_supremacy_engine::*;
+pub use distro::SovereignMasterSubsystemDistroHarmonizer;
 pub use distro::sovereign_linux_bsd_master_synthesis::*;
 pub use distro::sovereign_media_and_distro_unimplemented_innovations::*;
+pub use distro::sovereign_linux_bsd_pinnacle_innovations_v14::*;
+pub use distro::sovereign_2075_distro_supremacy_engine::*;
+pub use distro::sovereign_universal_subsystem_interop::*;
 pub use kernel::tss_ring3_user_mode::*;
 pub use open_source_obsoletion::open_source_os_gap_closure::*;
 pub use tools::tech_media_extended_suite::*;
@@ -126,7 +128,6 @@ pub mod arch;
 pub mod compiler;
 pub mod userland;
 
-pub mod audio;
 pub mod audit;
 pub mod backup;
 pub mod bluetooth;
@@ -139,9 +140,6 @@ pub mod toolchain {
     pub mod codex;
 }
 pub mod scheduler;
-pub mod crypto {
-    pub mod vectorized_pqc;
-}
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
@@ -232,18 +230,13 @@ pub use driver::{
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
 };
-pub use governance::{
-    FoundationModel, FoundationMember, ReleaseType, RoadmapMilestone, TransparentRoadmap,
-    DemocraticProposal, DemocraticVoting,
-};
-// pub use ipc::{
-//     StandardStreamController, StandardStreamHandle, StreamBufferMode, StreamTeeSpliceRouter,
-//     STDERR_FILENO, STDIN_FILENO, STDOUT_FILENO,
-// };
 pub use kernel::{
-    BuddyAllocator, Channel, IpcError, IpcManager, Message, MemoryBlock, PAGE_SIZE,
-    Priority, Process, ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler,
-    VirtualCpu,
+    AiNativeRuntime, BuddyAllocator, Channel, EnergyAwareScheduler, FastPathIpc,
+    InterruptMechanism, IpcError, IpcManager,
+    MemoryBlock, Message, PAGE_SIZE, PolicyError, PolicyManager, PrivacyFirstSandbox, Priority, ProcessState,
+    ProtectionDomain, PrivilegeLevel, ResourceBroker, RoundRobinConfig, RoundRobinScheduler,
+    Scheduler, SchedulerError, SelfHealingKernel, SigmaFsPlusPlus, UniversalAbiTranslator,
+    UserDefinedKernelFunctions, Process, VirtualCpu,
     IoUringEngine, IoUringOpcode, SubmissionQueueEntry, CompletionQueueEntry,
     BoundedBufferProducerConsumer, SoftIrqType, BottomHalfKernelThread, BroadcastReceiver,
     AndroidBroadcastReceiverRegistry,
@@ -303,39 +296,43 @@ pub use shell::{
     SimpleShellSession as ShellRepl, ZshPromptFormatter,
 };
 pub use sigpkg::{
-    AptDebManifest, BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError,
-    RecipeManager, SatSolver, Transaction,
-};
-pub use unimplemented_tools::{
-    AdaptiveUxAgent, AiAnomalyFirewall, AiCodeAssistant, AiDependencyResolver,
-    AiDifficultyDirector, AiFileOrganizer, AiScheduler, AiSearchAssistant, AiTaskbar,
-    AppSandboxing, AudioEditor, CloudBackupUtility, CloudGaming, CodeProfiler, ControllerMapper,
-    CrossDeviceSync, CrossLanguageBuildTool, DeclarativeBuildSystem, DocumentScanner,
-    EmulatorManager, FlatpakSnapLayer, GameHubLauncher, GameModManager, GamePerformanceBooster,
-    GameRecorder, GamifiedTodo, GanttChartPlanner, GestureControl, GuiAppStore, IotDeviceManager,
-    MemoryLeakDetector, MeshNetworking, MindMapCreator, MultiMonitorManager, MusicLibraryManager,
-    NaturalLanguageShell, OfflinePackageInstaller, PackagePublishingHub, PdfEditor,
-    PluginMarketplace, PodcastRecorder, PrivacyDashboard, SecureContainer, SecureFileSharing,
-    SmartNotificationManager, StaticAnalyzer, SubtitleEditor, VoiceControl, VrArRuntime,
+    BuildSystem, ContentAddressedStore, CryptoVerifier, PackageDependencyResolver, RecipeError, RecipeManager,
+    SatSolver, Transaction, Version, MAX_RECIPE_DEPENDENCIES, AdapterError,
+    DebAdapter, RpmAdapter, PacmanAdapter,
 };
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
 };
 
-pub mod distro;
-pub mod distro_innovations;
-pub mod distro_inspirations;
-pub mod innovation;
-pub mod input;
-pub mod integration;
-pub mod iot;
-pub mod ipc;
-pub use ipc::{
-    AsyncIoRingEngine, CompletionQueueEntry, IoOpCode, KqueueAioFilter,
-    LinuxBsdUniversalIoSubsystemEngine, OpenBsdIoPledgeRights, PosixAioControlBlock,
-    SubmissionQueueEntry, IORING_SETUP_CQSIZE, IORING_SETUP_IOPOLL, IORING_SETUP_SQPOLL,
-    IORING_SETUP_SQ_AFF,
+pub use thread::{Thread, ThreadError, Mutex as ThreadMutex};
+
+pub use process::spawn::{
+    ProcessID, ProcessState as LibProcessState, ProcessError, Process, SimpleProcess, ProcessSpawner, SimpleProcessSpawner, ProcessWaiter, SimpleProcessWaiter, ProcessGroup, SimpleProcessGroup,
+    CLONE_NEWNS, CLONE_NEWNET, CLONE_NEWPID,
+};
+pub use process::activity_manager::{
+    ActivityManager, ActivityState, ProcessActivityRecord, RegisterSnapshot, AddressSpaceBinding,
+};
+pub use memory::segmentation_paging::{
+    AddressBindingMode, AddressType, AslrEntropyConfig, CpuRing, ExecutableAddressBinding,
+    RandomizedAddressSpace, SegmentDescriptor, SegmentSelector, SegmentationPagingEngine,
+    SpaceProtectionFlags, SystemControlRegisters,
+};
+
+pub use community::toolkit::{
+    ArticleCategory, CommunityHandbookCatalog, HandbookArticle, PackageRecipe,
+    RecipeSourceFormat, ReproduciblePackageRecipeManager, SecurityModelType,
+    SecurityProfileTemplateStore, SecurityTemplate,
+};
+
+pub use tools::{
+    AccessibilityFeature as LibAccessibilityFeature, ClusterNode as LibClusterNode, NodeState as LibNodeState,
+    SigmaAccess as LibSigmaAccess, SigmaCluster as LibSigmaCluster, SigmaDeploy as LibSigmaDeploy,
+    SigmaIdentity as LibSigmaIdentity, SigmaToolError as LibSigmaToolError, UserIdentity as LibUserIdentity,
+    SovereignDpkgEtcher, SovereignAptDuo, SovereignImeConvertCase, SovereignTableConverter,
+    SovereignWordCounter, SovereignTextFixer, SovereignImageToDataUri, SovereignKeyboardTester,
+    SovereignIsWebsiteDown,
 };
 pub mod iso;
 pub mod lang;
@@ -367,7 +364,6 @@ pub mod release;
 pub mod resource;
 pub mod robotics;
 pub mod rt;
-pub mod scheduler;
 pub mod scientific;
 pub mod secure;
 pub mod sensor;
@@ -384,7 +380,6 @@ pub mod theming;
 pub mod thermal;
 pub mod time;
 pub mod timer;
-pub mod toolchain;
 pub mod touchscreen;
 pub mod tpm;
 pub mod tracing;
@@ -397,3 +392,5 @@ pub mod virt;
 pub mod vm;
 pub mod wireless;
 pub mod workflow;
+
+pub mod io;

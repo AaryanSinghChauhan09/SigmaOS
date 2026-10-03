@@ -12,7 +12,6 @@
 
 use std::collections::BTreeMap;
 use std::format;
-use std::string::{String, ToString};
 use std::vec;
 use std::vec::Vec;
 
@@ -63,26 +62,49 @@ impl FedoraCryptoPoliciesEngine {
             FedoraCryptoPolicyLevel::Legacy => (
                 1024,
                 "TLSv1.0".to_string(),
-                vec!["AES-256-CBC".to_string(), "3DES".to_string(), "AES-128-GCM".to_string()],
-                vec!["diffie-hellman-group1-sha1".to_string(), "ecdh-sha2-nistp256".to_string()],
+                vec![
+                    "AES-256-CBC".to_string(),
+                    "3DES".to_string(),
+                    "AES-128-GCM".to_string(),
+                ],
+                vec![
+                    "diffie-hellman-group1-sha1".to_string(),
+                    "ecdh-sha2-nistp256".to_string(),
+                ],
             ),
             FedoraCryptoPolicyLevel::Default => (
                 2048,
                 "TLSv1.2".to_string(),
-                vec!["AES-256-GCM".to_string(), "ChaCha20-Poly1305".to_string(), "AES-128-GCM".to_string()],
-                vec!["ecdh-sha2-nistp256".to_string(), "curve25519-sha256".to_string()],
+                vec![
+                    "AES-256-GCM".to_string(),
+                    "ChaCha20-Poly1305".to_string(),
+                    "AES-128-GCM".to_string(),
+                ],
+                vec![
+                    "ecdh-sha2-nistp256".to_string(),
+                    "curve25519-sha256".to_string(),
+                ],
             ),
             FedoraCryptoPolicyLevel::Future | FedoraCryptoPolicyLevel::Fips => (
                 3072,
                 "TLSv1.3".to_string(),
                 vec!["AES-256-GCM".to_string(), "ChaCha20-Poly1305".to_string()],
-                vec!["curve25519-sha256".to_string(), "ecdh-sha2-nistp384".to_string()],
+                vec![
+                    "curve25519-sha256".to_string(),
+                    "ecdh-sha2-nistp384".to_string(),
+                ],
             ),
             FedoraCryptoPolicyLevel::Next => (
                 4096,
                 "TLSv1.3".to_string(),
-                vec!["AES-256-GCM".to_string(), "KYBER-1024-AES-256-GCM".to_string()],
-                vec!["kyber1024-curve25519".to_string(), "dilithium5-sha512".to_string()],
+                vec![
+                    "AES-256-GCM".to_string(),
+                    "KYBER-1024-AES-256-GCM".to_string(),
+                ],
+                vec![
+                    "kyber1024-curve25519".to_string(),
+                    "dilithium5-sha512".to_string(),
+                ],
             ),
         };
 
@@ -226,7 +248,9 @@ impl FedoraCoreOsIgnitionZincatiEngine {
                     if let Some(s) = rest.find('"') {
                         if let Some(e) = rest[s + 1..].find('"') {
                             let unit_name = &rest[s + 1..s + 1 + e];
-                            if unit_name.ends_with(".service") && !self.units.iter().any(|u| u.name == unit_name) {
+                            if unit_name.ends_with(".service")
+                                && !self.units.iter().any(|u| u.name == unit_name)
+                            {
                                 self.units.push(IgnitionSystemdUnitSpec {
                                     name: unit_name.to_string(),
                                     enabled: true,
@@ -277,7 +301,11 @@ impl FedoraCoreOsIgnitionZincatiEngine {
         }
 
         if health_check_passed {
-            self.active_partition_slot = if self.active_partition_slot == 'A' { 'B' } else { 'A' };
+            self.active_partition_slot = if self.active_partition_slot == 'A' {
+                'B'
+            } else {
+                'A'
+            };
             self.zincati_state = ZincatiUpdateState::Polling;
             self.total_successful_updates += 1;
             true
@@ -335,7 +363,13 @@ impl FedoraDnf5RpmOstreeEngine {
         }
     }
 
-    pub fn register_security_advisory(&mut self, adv_id: &str, cve: &str, severity: &str, pkg: &str) {
+    pub fn register_security_advisory(
+        &mut self,
+        adv_id: &str,
+        cve: &str,
+        severity: &str,
+        pkg: &str,
+    ) {
         self.advisories.push(Dnf5SecurityAdvisory {
             advisory_id: adv_id.to_string(),
             cve_id: cve.to_string(),
@@ -451,8 +485,15 @@ impl FedoraSelinuxTargetedEnforcementEngine {
         self.file_contexts.get(path)
     }
 
-    pub fn evaluate_access_perm(&mut self, scontext: &str, tcontext: &str, tclass: &str, perm: &str) -> bool {
-        let is_allowed = if scontext.contains("httpd_t") && tcontext.contains("httpd_sys_content_t") {
+    pub fn evaluate_access_perm(
+        &mut self,
+        scontext: &str,
+        tcontext: &str,
+        tclass: &str,
+        perm: &str,
+    ) -> bool {
+        let is_allowed = if scontext.contains("httpd_t") && tcontext.contains("httpd_sys_content_t")
+        {
             true
         } else if scontext.contains("unconfined_t") {
             true
@@ -599,7 +640,9 @@ impl FedoraMediaWriterEngine {
         if iso_name.is_empty() {
             return false;
         }
-        self.trusted_gpg_fingerprints.iter().any(|f| f == fingerprint)
+        self.trusted_gpg_fingerprints
+            .iter()
+            .any(|f| f == fingerprint)
     }
 
     pub fn flash_iso_to_device(
@@ -701,7 +744,11 @@ impl FedoraKojiBodhiEngine {
         Ok(update_id)
     }
 
-    pub fn vote_bodhi_karma(&mut self, update_id: &str, karma_delta: i32) -> Result<i32, &'static str> {
+    pub fn vote_bodhi_karma(
+        &mut self,
+        update_id: &str,
+        karma_delta: i32,
+    ) -> Result<i32, &'static str> {
         let update = self
             .bodhi_updates
             .get_mut(update_id)
@@ -735,7 +782,7 @@ pub struct DistGitLookasideFile {
 
 pub struct FedoraPagureDistGitEngine {
     pub repo_name: String, // e.g. "rpms/kernel"
-    pub branch: String,   // e.g. "f40"
+    pub branch: String,    // e.g. "f40"
     pub spec_file_content: String,
     pub lookaside_files: Vec<DistGitLookasideFile>,
 }
@@ -865,8 +912,11 @@ impl SovereignFedoraLinuxMasterSuite {
 
     pub fn synthesize_and_verify_all(&mut self) -> bool {
         // 1. Verify Crypto Policies
-        self.crypto_policies.apply_policy(FedoraCryptoPolicyLevel::Future);
-        let crypto_ok = self.crypto_policies.validate_cipher_compliance("AES-256-GCM", 3072);
+        self.crypto_policies
+            .apply_policy(FedoraCryptoPolicyLevel::Future);
+        let crypto_ok = self
+            .crypto_policies
+            .validate_cipher_compliance("AES-256-GCM", 3072);
 
         // 2. Verify CoreOS Ignition & Zincati
         let ign_res = self.coreos_ignition_zincati.parse_ignition_v3_json(
@@ -875,7 +925,12 @@ impl SovereignFedoraLinuxMasterSuite {
         let ign_ok = ign_res.is_ok();
 
         // 3. Verify DNF5 & RPM-OSTree
-        self.dnf5_ostree.register_security_advisory("FEDORA-2024-001", "CVE-2024-9999", "Critical", "libxml2");
+        self.dnf5_ostree.register_security_advisory(
+            "FEDORA-2024-001",
+            "CVE-2024-9999",
+            "Critical",
+            "libxml2",
+        );
         let dnf_ok = self.dnf5_ostree.dnf5_apply_security_updates() == 1;
 
         // 4. Verify SELinux Targeted
@@ -887,7 +942,8 @@ impl SovereignFedoraLinuxMasterSuite {
         );
 
         // 5. Verify Anaconda Kickstart
-        self.anaconda_ks.configure_luks_encryption("sys_root", "/dev/nvme0n1p2", "secret_pass");
+        self.anaconda_ks
+            .configure_luks_encryption("sys_root", "/dev/nvme0n1p2", "secret_pass");
         let ks_rendered = self.anaconda_ks.render_kickstart_file();
         let ana_ok = ks_rendered.contains("btrfs");
 
@@ -898,19 +954,31 @@ impl SovereignFedoraLinuxMasterSuite {
         );
 
         // 7. Verify Koji & Bodhi
-        let task_id = self.koji_bodhi.submit_koji_build("bash", "f40-updates-candidate");
+        let task_id = self
+            .koji_bodhi
+            .submit_koji_build("bash", "f40-updates-candidate");
         let update_id = self.koji_bodhi.submit_bodhi_update(task_id).unwrap();
         let bodhi_ok = self.koji_bodhi.vote_bodhi_karma(&update_id, 3).unwrap() == 3;
 
         // 8. Verify Pagure Dist-Git
-        self.pagure_distgit.update_spec_file("Name: kernel\nVersion: 6.8.0\n");
+        self.pagure_distgit
+            .update_spec_file("Name: kernel\nVersion: 6.8.0\n");
         let git_ok = self.pagure_distgit.validate_distgit_repo();
 
         // 9. Verify Greenboot Health Check
-        self.greenboot.register_check_script("01_network_check.sh", true);
+        self.greenboot
+            .register_check_script("01_network_check.sh", true);
         let gb_ok = self.greenboot.run_boot_health_checks();
 
-        crypto_ok && ign_ok && dnf_ok && selinux_ok && ana_ok && media_ok && bodhi_ok && git_ok && gb_ok
+        crypto_ok
+            && ign_ok
+            && dnf_ok
+            && selinux_ok
+            && ana_ok
+            && media_ok
+            && bodhi_ok
+            && git_ok
+            && gb_ok
     }
 }
 
@@ -960,7 +1028,12 @@ mod tests {
     #[test]
     fn test_fedora_dnf5_rpm_ostree_engine() {
         let mut dnf_ostree = FedoraDnf5RpmOstreeEngine::new();
-        dnf_ostree.register_security_advisory("FEDORA-2024-5555", "CVE-2024-1111", "Important", "openssl");
+        dnf_ostree.register_security_advisory(
+            "FEDORA-2024-5555",
+            "CVE-2024-1111",
+            "Important",
+            "openssl",
+        );
         let updated = dnf_ostree.dnf5_apply_security_updates();
         assert_eq!(updated, 1);
 
@@ -1036,7 +1109,12 @@ mod tests {
 
         let karma = kb.vote_bodhi_karma(&update_id, 3).unwrap();
         assert_eq!(karma, 3);
-        assert!(kb.bodhi_updates.get(&update_id).unwrap().is_pushed_to_stable);
+        assert!(
+            kb.bodhi_updates
+                .get(&update_id)
+                .unwrap()
+                .is_pushed_to_stable
+        );
     }
 
     #[test]

@@ -1,7 +1,7 @@
-use std::string::{String, ToString};
-use std::vec::Vec;
-
-use crate::klib::HashMap;
+extern crate alloc;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use std::collections::HashMap;
 
 /// Arch Linux inspired AUR-style user repos and minimal base
 pub struct ArchUserRepoManager {

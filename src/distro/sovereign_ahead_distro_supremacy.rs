@@ -22,7 +22,6 @@
 //    unbroken system dominance over legacy Linux & BSD distros.
 
 use std::collections::BTreeMap;
-use std::string::{String, ToString};
 use std::vec::Vec;
 
 // ============================================================================

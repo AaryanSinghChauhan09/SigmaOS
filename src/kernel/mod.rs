@@ -27,7 +27,9 @@ pub mod dtrace_compat;
 pub mod ebpf;
 pub mod ebpf_verification;
 pub mod ebpf_vm;
+pub mod ebpf_xdp;
 pub mod exports;
+pub mod futex;
 pub mod gap_closing;
 pub mod gap_filling;
 pub mod generation_manager;
@@ -48,6 +50,21 @@ pub use linux_parity::{
 pub mod memory;
 pub mod meta;
 pub mod module_loader;
+pub mod rump_modules;
+pub use rump_modules::{
+    KernelModule, ModuleState, ModulePriority, RumpModuleLoader,
+};
+pub mod kptr_restrict;
+pub use kptr_restrict::{
+    KptrRestrictLevel, SecurityMitigations, get_kptr_restrict, set_kptr_restrict,
+    should_hide_kptr, format_kptr, get_security_mitigations,
+};
+pub mod perf_events;
+pub use perf_events::{
+    PerfEventType, HardwareEvent, SoftwareEvent, CacheEvent,
+    PerfCounter, PerfEventGroup, SystemPerfCounters,
+    record_page_fault, record_context_switch, record_cache_miss,
+};
 pub mod module_loading_control;
 pub mod module_tools;
 pub mod namespaces;
@@ -62,12 +79,16 @@ pub mod performance;
 pub mod pipes;
 pub mod policy_mechanism;
 pub mod process;
+pub mod rcu;
 pub mod roundrobin;
 pub mod sched;
 pub mod scheduler;
 pub mod structures;
+pub mod timer_wheel;
 pub mod uts_namespace;
 pub mod virtual_cpu;
+pub mod wait_queue;
+pub mod workqueue;
 
 pub use missing_linux_kernel_components::{
     BpfRingBufferStreamEngine, EpollCtlOp, EpollEvent, KernelAuditRecord, KernelAuditRecordType,
@@ -78,6 +99,19 @@ pub use missing_linux_kernel_components::{
 };
 pub mod traits;
 pub mod vmm_paging;
+pub mod dma_engine;
+pub mod acpi_pm;
+
+pub use dma_engine::{
+    DmaController, DmaChannel, DmaDescriptor, DmaDirection, DmaWidth,
+    DmaBurst, DmaChannelState, DmaPool, DmaBuffer, DmaError, DmaCapabilities,
+};
+pub use acpi_pm::{
+    AcpiPowerManager, AcpiSleepState, AcpiPState, AcpiTState, AcpiDevicePowerState,
+    CpuGovernor, BatteryInfo, AcAdapterInfo, ThermalZone, CoolingDevice,
+    CoolingDeviceType, AcpiError,
+};
+
 
 pub use crate::kernel::linux_bsd_innovations::*;
 pub use crate::kernel::linux_bsd_innovations::{
@@ -90,7 +124,7 @@ pub use crate::kernel::linux_bsd_innovations::{
     GcdDispatchQueue, GcdPriority, GcdTask, GentooUseFlags, GeomClass, GeomProvider,
     Hammer2PfsSnapshot, HammerBlockTransaction, HammerHistoryFilesystem, HurdTranslator,
     HybridKernelManager, HybridTask, IntelClearLinuxStatelessEngine, InteractiveHybridScheduler,
-    KernelAccessController, KernelCapability, KernelFastPacketEngine, KernelModule, KmdfDriver,
+    KernelAccessController, KernelCapability, KernelFastPacketEngine, KmdfDriver,
     KmdfIoRequest, KmdfPnpState, KmdfPowerState, LandlockAccessRight, LandlockPathRule,
     LinuxDevlinkHealthMonitor, LinuxFutexEngine, LinuxLandlockLsmRuleEngine,
     MemoryCompactionSuperpagesAllocator, MicrokernelCore, MicrokernelTranslatorRegistry,
@@ -168,20 +202,23 @@ pub use sovereign_kernel_pr_gateway::*;
 pub mod low_level_hardware;
 pub use low_level_hardware::*;
 
-pub mod kptr_restrict;
 pub mod pidfd;
 pub use pidfd::{
     PidFd, PidFdCapabilities, PidfdProcDescManager, ProcDesc, ProcDescCapabilities, SubreaperEntry,
 };
 pub mod cfi;
+pub mod cfs_scheduler;
+pub mod cgroup_v2_controller;
+pub mod dma;
 pub mod interrupt;
+pub mod interrupt_controller;
 pub use cfi::{CfiEngine, CfiTarget, CfiViolation};
 pub use interrupt::{
     InterruptController, InterruptDescriptor, InterruptType, InterruptVector, IrqLine,
     IrqTriggerType,
 };
 pub use kptr_restrict::{
-    get_security_mitigations, DmesgRestrictLevel, KernelSecurityMitigations, KptrRestrictLevel,
+    DmesgRestrictLevel, KernelSecurityMitigations,
 };
 pub use scheduler::{
     CfsScheduler, Priority, ProcessState, ProcessTask, RtScheduler, SchedulerPolicy, ThermalState,
@@ -190,3 +227,9 @@ pub use scheduler::{
 pub mod procfs_linux;
 pub use procfs_linux::{ProcFs, ProcessInfo};
 pub use sysfs_manager::{Sysfs, SysfsAttribute, SysfsKobject};
+
+pub mod karl;
+
+pub mod retguard;
+
+pub mod stack_protect;

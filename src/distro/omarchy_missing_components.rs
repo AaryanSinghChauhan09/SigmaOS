@@ -7,7 +7,6 @@
 
 use std::collections::HashMap;
 use std::format;
-use std::string::String;
 use std::vec::Vec;
 
 /// Omarchy Terminal Fastfetch ASCII Art Banner & Hardware Info Summary

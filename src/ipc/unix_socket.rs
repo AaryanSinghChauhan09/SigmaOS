@@ -1,524 +1,418 @@
-#![allow(clippy::new_without_default)]
-#![allow(dead_code)]
-//! High-performance BSD & Linux inspired Unix Domain Sockets for SigmaOS
-//! Implements Stream and Datagram sockets, path-based binding, abstract namespaces,
-//! socketpair creation, and capability-scoped sandboxing constraints.
+//! # Unix Domain Sockets
+//!
+//! AF_UNIX socket implementation providing inter-process communication
+//! through filesystem paths. Inspired by Linux unix_sock.c and FreeBSD uipc_usrreq.c.
 
-use crate::ipc::ipc::{IPCCapability, IPCError};
-use std::collections::BTreeMap;
-use std::string::String;
-use std::vec::Vec;
+#![no_std]
 
-/// Sockets can be Stream (connection-oriented) or Datagram (connectionless)
-#[repr(C)]
+extern crate alloc;
+use alloc::collections::VecDeque;
+use alloc::string::String;
+use alloc::vec::Vec;
+use alloc::sync::Arc;
+use core::sync::atomic::{AtomicU32, AtomicBool, Ordering};
+
+/// Unix socket type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(u8)]
 pub enum UnixSocketType {
-    Stream = 0,
-    Datagram = 1,
+    Stream = 1,    // SOCK_STREAM - connection-oriented byte streams
+    Datagram = 2,  // SOCK_DGRAM - connectionless datagrams
+    SeqPacket = 5, // SOCK_SEQPACKET - connection-oriented packets
 }
 
-/// Sockets can be bound to a pathname, an abstract name (Linux-like), or unbound
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum UnixSocketAddress {
-    Unbound,
-    Path(String),
-    Abstract(String),
-}
-
-/// State of a connection-oriented Stream socket (inspired by TCP/Unix states)
-#[repr(C)]
+/// Unix socket state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(u8)]
 pub enum UnixSocketState {
-    Closed,
-    Unbound,
-    Bound,
-    Listening,
-    Connecting,
-    Connected,
+    Unbound = 0,
+    Bound = 1,
+    Listening = 2,
+    Connecting = 3,
+    Connected = 4,
+    Disconnecting = 5,
+    Disconnected = 6,
 }
 
-/// Represents a single Unix Domain Socket endpoint.
+/// Unix socket address
+#[derive(Debug, Clone)]
+pub enum UnixSocketAddr {
+    Unnamed,                      // Anonymous socket
+    Path(String),                 // Filesystem path
+    Abstract(Vec<u8>),            // Abstract namespace (Linux)
+}
+
+/// Message with ancillary data
+#[derive(Debug, Clone)]
+pub struct UnixMessage {
+    pub data: Vec<u8>,
+    pub control_data: Vec<u8>,     // Ancillary data (SCM_RIGHTS, SCM_CREDENTIALS)
+    pub flags: u32,
+}
+
+/// Unix domain socket control block
 pub struct UnixSocket {
-    pub id: usize,
-    pub socket_type: UnixSocketType,
-    pub address: UnixSocketAddress,
-    pub state: UnixSocketState,
-    pub peer_id: Option<usize>,
-    pub rx_buffer: Vec<u8>,
-    pub capability: IPCCapability,
-    // Tracks pending connection requests for a listening stream socket
-    pub pending_connections: Vec<usize>,
+    socket_type: UnixSocketType,
+    state: AtomicU32,
+    addr: Option<UnixSocketAddr>,
+    
+    // Connection state
+    peer: Option<Arc<UnixSocket>>,
+    backlog: VecDeque<Arc<UnixSocket>>,
+    max_backlog: usize,
+    
+    // Data buffers
+    send_buffer: VecDeque<UnixMessage>,
+    recv_buffer: VecDeque<UnixMessage>,
+    buffer_capacity: usize,
+    
+    // Flags
+    non_blocking: AtomicBool,
+    pass_cred: AtomicBool,
+    
+    // Credentials
+    uid: u32,
+    gid: u32,
+    pid: u32,
 }
 
 impl UnixSocket {
-    pub fn new(id: usize, socket_type: UnixSocketType, capability: IPCCapability) -> Self {
+    /// Create new Unix socket
+    pub fn new(socket_type: UnixSocketType) -> Self {
         Self {
-            id,
             socket_type,
-            address: UnixSocketAddress::Unbound,
-            state: UnixSocketState::Unbound,
-            peer_id: None,
-            rx_buffer: Vec::new(),
-            capability,
-            pending_connections: Vec::new(),
+            state: AtomicU32::new(UnixSocketState::Unbound as u32),
+            addr: None,
+            peer: None,
+            backlog: VecDeque::new(),
+            max_backlog: 128,
+            send_buffer: VecDeque::with_capacity(64),
+            recv_buffer: VecDeque::with_capacity(64),
+            buffer_capacity: 212992, // 208 KB default (from Linux)
+            non_blocking: AtomicBool::new(false),
+            pass_cred: AtomicBool::new(false),
+            uid: 0,
+            gid: 0,
+            pid: 0,
         }
     }
-
-    /// Bind a socket to an address
-    pub fn bind(&mut self, address: UnixSocketAddress) -> Result<(), IPCError> {
-        if !self.capability.allow_unix_sockets {
-            return Err(IPCError::PermissionDenied);
-        }
-        if self.state != UnixSocketState::Unbound {
-            return Err(IPCError::InvalidSize); // Already bound or connected
-        }
-        self.address = address;
-        self.state = UnixSocketState::Bound;
-        Ok(())
-    }
-
-    /// Listen for connections (Stream only)
-    pub fn listen(&mut self) -> Result<(), IPCError> {
-        if self.socket_type != UnixSocketType::Stream {
-            return Err(IPCError::NotConnected); // Only Stream can listen
-        }
-        if self.state != UnixSocketState::Bound {
-            return Err(IPCError::BufferEmpty); // Must be bound to listen
-        }
-        self.state = UnixSocketState::Listening;
-        Ok(())
-    }
-
-    /// Close the socket and clear buffers
-    pub fn close(&mut self) {
-        self.state = UnixSocketState::Closed;
-        self.peer_id = None;
-        self.rx_buffer.clear();
-        self.pending_connections.clear();
-    }
-}
-
-/// Dynamic manager for Unix Domain Sockets binding and connection routing
-pub struct UnixSocketManager {
-    pub sockets: BTreeMap<usize, UnixSocket>,
-    pub bindings: BTreeMap<String, usize>, // Path/Abstract address string -> Socket ID
-    pub next_id: usize,
-}
-
-impl UnixSocketManager {
-    pub fn new() -> Self {
-        Self {
-            sockets: BTreeMap::new(),
-            bindings: BTreeMap::new(),
-            next_id: 1,
-        }
-    }
-
-    /// Create a new socket
-    pub fn create_socket(
-        &mut self,
-        socket_type: UnixSocketType,
-        capability: IPCCapability,
-    ) -> usize {
-        let id = self.next_id;
-        self.next_id += 1;
-        let socket = UnixSocket::new(id, socket_type, capability);
-        self.sockets.insert(id, socket);
-        id
-    }
-
+    
     /// Bind socket to address
-    pub fn bind(&mut self, id: usize, address: UnixSocketAddress) -> Result<(), IPCError> {
-        let socket = self.sockets.get_mut(&id).ok_or(IPCError::NotConnected)?;
-        if !socket.capability.allow_unix_sockets {
-            return Err(IPCError::PermissionDenied);
+    pub fn bind(&mut self, addr: UnixSocketAddr) -> Result<(), UnixSocketError> {
+        let state = self.state.load(Ordering::Acquire);
+        if state != UnixSocketState::Unbound as u32 {
+            return Err(UnixSocketError::AlreadyBound);
         }
-
-        let address_str = match &address {
-            UnixSocketAddress::Path(p) => p.clone(),
-            UnixSocketAddress::Abstract(a) => a.clone(),
-            UnixSocketAddress::Unbound => return Err(IPCError::InvalidSize),
-        };
-
-        if self.bindings.contains_key(&address_str) {
-            return Err(IPCError::BufferFull); // Address already in use
-        }
-
-        socket.bind(address)?;
-        self.bindings.insert(address_str, id);
-        Ok(())
-    }
-
-    /// Connect socket to bound address (Stream only)
-    pub fn connect(
-        &mut self,
-        client_id: usize,
-        address: UnixSocketAddress,
-    ) -> Result<(), IPCError> {
-        let address_str = match &address {
-            UnixSocketAddress::Path(p) => p.clone(),
-            UnixSocketAddress::Abstract(a) => a.clone(),
-            UnixSocketAddress::Unbound => return Err(IPCError::InvalidSize),
-        };
-
-        let server_id = *self
-            .bindings
-            .get(&address_str)
-            .ok_or(IPCError::NotConnected)?;
-
-        let (client_capability, client_type) = {
-            let client_socket = self.sockets.get(&client_id).ok_or(IPCError::NotConnected)?;
-            if client_socket.state == UnixSocketState::Connected {
-                return Err(IPCError::InvalidSize);
-            }
-            (client_socket.capability, client_socket.socket_type)
-        };
-
-        if !client_capability.allow_unix_sockets {
-            return Err(IPCError::PermissionDenied);
-        }
-
-        if client_type != UnixSocketType::Stream {
-            return Err(IPCError::NotConnected);
-        }
-
-        let server_socket = self
-            .sockets
-            .get_mut(&server_id)
-            .ok_or(IPCError::NotConnected)?;
-        if server_socket.state != UnixSocketState::Listening {
-            return Err(IPCError::PermissionDenied);
-        }
-
-        server_socket.pending_connections.push(client_id);
-
-        let client_socket = self.sockets.get_mut(&client_id).unwrap();
-        client_socket.state = UnixSocketState::Connecting;
-        client_socket.peer_id = Some(server_id);
-
-        Ok(())
-    }
-
-    /// Accept incoming connection on listening socket (Stream only)
-    pub fn accept(&mut self, server_id: usize) -> Result<usize, IPCError> {
-        let server_socket = self
-            .sockets
-            .get_mut(&server_id)
-            .ok_or(IPCError::NotConnected)?;
-        if server_socket.state != UnixSocketState::Listening {
-            return Err(IPCError::PermissionDenied);
-        }
-
-        if server_socket.pending_connections.is_empty() {
-            return Err(IPCError::BufferEmpty);
-        }
-
-        let client_id = server_socket.pending_connections.remove(0);
-
-        let accepted_id = self.next_id;
-        self.next_id += 1;
-
-        let mut accepted_socket = UnixSocket::new(
-            accepted_id,
-            UnixSocketType::Stream,
-            server_socket.capability,
-        );
-        accepted_socket.state = UnixSocketState::Connected;
-        accepted_socket.peer_id = Some(client_id);
-        self.sockets.insert(accepted_id, accepted_socket);
-
-        let client_socket = self
-            .sockets
-            .get_mut(&client_id)
-            .ok_or(IPCError::NotConnected)?;
-        client_socket.state = UnixSocketState::Connected;
-        client_socket.peer_id = Some(accepted_id);
-
-        Ok(accepted_id)
-    }
-
-    /// Send data over socket
-    pub fn send(&mut self, sender_id: usize, data: &[u8]) -> Result<(), IPCError> {
-        let sender_socket = self.sockets.get(&sender_id).ok_or(IPCError::NotConnected)?;
-        if !sender_socket.capability.can_send {
-            return Err(IPCError::PermissionDenied);
-        }
-
-        match sender_socket.socket_type {
-            UnixSocketType::Stream => {
-                if sender_socket.state != UnixSocketState::Connected {
-                    return Err(IPCError::NotConnected);
+        
+        // Register address in namespace
+        match &addr {
+            UnixSocketAddr::Path(path) => {
+                // In production: check filesystem, create socket inode
+                if path.is_empty() || path.len() > 108 {
+                    return Err(UnixSocketError::InvalidAddress);
                 }
-                let peer_id = sender_socket.peer_id.ok_or(IPCError::NotConnected)?;
-                let peer_socket = self
-                    .sockets
-                    .get_mut(&peer_id)
-                    .ok_or(IPCError::NotConnected)?;
-                peer_socket.rx_buffer.extend_from_slice(data);
-                Ok(())
+            }
+            UnixSocketAddr::Abstract(name) => {
+                if name.len() > 107 {
+                    return Err(UnixSocketError::InvalidAddress);
+                }
+            }
+            UnixSocketAddr::Unnamed => {
+                return Err(UnixSocketError::InvalidAddress);
+            }
+        }
+        
+        self.addr = Some(addr);
+        self.state.store(UnixSocketState::Bound as u32, Ordering::Release);
+        Ok(())
+    }
+    
+    /// Listen for connections (SOCK_STREAM only)
+    pub fn listen(&mut self, backlog: usize) -> Result<(), UnixSocketError> {
+        if self.socket_type != UnixSocketType::Stream {
+            return Err(UnixSocketError::NotSupported);
+        }
+        
+        let state = self.state.load(Ordering::Acquire);
+        if state != UnixSocketState::Bound as u32 {
+            return Err(UnixSocketError::NotBound);
+        }
+        
+        self.max_backlog = backlog.min(4096); // Clamp to reasonable limit
+        self.state.store(UnixSocketState::Listening as u32, Ordering::Release);
+        Ok(())
+    }
+    
+    /// Accept incoming connection
+    pub fn accept(&mut self) -> Result<Arc<UnixSocket>, UnixSocketError> {
+        let state = self.state.load(Ordering::Acquire);
+        if state != UnixSocketState::Listening as u32 {
+            return Err(UnixSocketError::NotListening);
+        }
+        
+        // Pop connection from backlog
+        match self.backlog.pop_front() {
+            Some(peer) => {
+                peer.state.store(UnixSocketState::Connected as u32, Ordering::Release);
+                Ok(peer)
+            }
+            None => {
+                if self.non_blocking.load(Ordering::Acquire) {
+                    Err(UnixSocketError::WouldBlock)
+                } else {
+                    // In production: block on wait queue
+                    Err(UnixSocketError::WouldBlock)
+                }
+            }
+        }
+    }
+    
+    /// Connect to listening socket
+    pub fn connect(&mut self, addr: &UnixSocketAddr) -> Result<(), UnixSocketError> {
+        if self.socket_type != UnixSocketType::Stream {
+            return Err(UnixSocketError::NotSupported);
+        }
+        
+        let state = self.state.load(Ordering::Acquire);
+        if state == UnixSocketState::Connected as u32 {
+            return Err(UnixSocketError::AlreadyConnected);
+        }
+        
+        // In production: lookup addr in socket registry, add to backlog
+        self.state.store(UnixSocketState::Connecting as u32, Ordering::Release);
+        
+        // Simplified: immediately transition to connected
+        // Real implementation waits for accept()
+        self.state.store(UnixSocketState::Connected as u32, Ordering::Release);
+        Ok(())
+    }
+    
+    /// Send data
+    pub fn send(&mut self, data: &[u8], flags: u32) -> Result<usize, UnixSocketError> {
+        let state = self.state.load(Ordering::Acquire);
+        
+        match self.socket_type {
+            UnixSocketType::Stream | UnixSocketType::SeqPacket => {
+                if state != UnixSocketState::Connected as u32 {
+                    return Err(UnixSocketError::NotConnected);
+                }
             }
             UnixSocketType::Datagram => {
-                if sender_socket.peer_id.is_none() {
-                    return Err(IPCError::NotConnected);
+                if state == UnixSocketState::Unbound as u32 {
+                    return Err(UnixSocketError::NotBound);
                 }
-                let peer_id = sender_socket.peer_id.unwrap();
-                let peer_socket = self
-                    .sockets
-                    .get_mut(&peer_id)
-                    .ok_or(IPCError::NotConnected)?;
-
-                let mut packet = data.len().to_le_bytes().to_vec();
-                packet.extend_from_slice(data);
-                peer_socket.rx_buffer.extend(packet);
-                Ok(())
+            }
+        }
+        
+        // Check buffer capacity
+        let current_size: usize = self.send_buffer.iter()
+            .map(|msg| msg.data.len())
+            .sum();
+        
+        if current_size + data.len() > self.buffer_capacity {
+            if self.non_blocking.load(Ordering::Acquire) {
+                return Err(UnixSocketError::WouldBlock);
+            } else {
+                // In production: block on wait queue
+                return Err(UnixSocketError::WouldBlock);
+            }
+        }
+        
+        // Enqueue message
+        let msg = UnixMessage {
+            data: data.to_vec(),
+            control_data: Vec::new(),
+            flags,
+        };
+        
+        let len = msg.data.len();
+        self.send_buffer.push_back(msg);
+        
+        // In production: wake peer's receive wait queue
+        Ok(len)
+    }
+    
+    /// Send message with ancillary data (file descriptors, credentials)
+    pub fn sendmsg(&mut self, msg: UnixMessage) -> Result<usize, UnixSocketError> {
+        let state = self.state.load(Ordering::Acquire);
+        if state != UnixSocketState::Connected as u32 && self.socket_type != UnixSocketType::Datagram {
+            return Err(UnixSocketError::NotConnected);
+        }
+        
+        let len = msg.data.len();
+        self.send_buffer.push_back(msg);
+        Ok(len)
+    }
+    
+    /// Receive data
+    pub fn recv(&mut self, buf: &mut [u8], flags: u32) -> Result<usize, UnixSocketError> {
+        let state = self.state.load(Ordering::Acquire);
+        
+        if self.socket_type == UnixSocketType::Stream || self.socket_type == UnixSocketType::SeqPacket {
+            if state != UnixSocketState::Connected as u32 {
+                return Err(UnixSocketError::NotConnected);
+            }
+        }
+        
+        // Dequeue message
+        match self.recv_buffer.pop_front() {
+            Some(msg) => {
+                let copy_len = msg.data.len().min(buf.len());
+                buf[..copy_len].copy_from_slice(&msg.data[..copy_len]);
+                
+                // MSG_TRUNC: return actual message size even if truncated
+                if flags & 0x20 != 0 {
+                    Ok(msg.data.len())
+                } else {
+                    Ok(copy_len)
+                }
+            }
+            None => {
+                if self.non_blocking.load(Ordering::Acquire) {
+                    Err(UnixSocketError::WouldBlock)
+                } else {
+                    // In production: block on wait queue
+                    Err(UnixSocketError::WouldBlock)
+                }
             }
         }
     }
-
-    /// Send datagram to target address (Datagram only, connectionless)
-    pub fn send_to(
-        &mut self,
-        sender_id: usize,
-        data: &[u8],
-        target: UnixSocketAddress,
-    ) -> Result<(), IPCError> {
-        let sender_socket = self.sockets.get(&sender_id).ok_or(IPCError::NotConnected)?;
-        if sender_socket.socket_type != UnixSocketType::Datagram {
-            return Err(IPCError::NotConnected);
+    
+    /// Receive message with ancillary data
+    pub fn recvmsg(&mut self, buf: &mut [u8]) -> Result<(usize, Vec<u8>), UnixSocketError> {
+        match self.recv_buffer.pop_front() {
+            Some(msg) => {
+                let copy_len = msg.data.len().min(buf.len());
+                buf[..copy_len].copy_from_slice(&msg.data[..copy_len]);
+                Ok((copy_len, msg.control_data))
+            }
+            None => {
+                if self.non_blocking.load(Ordering::Acquire) {
+                    Err(UnixSocketError::WouldBlock)
+                } else {
+                    Err(UnixSocketError::WouldBlock)
+                }
+            }
         }
-        if !sender_socket.capability.can_send {
-            return Err(IPCError::PermissionDenied);
+    }
+    
+    /// Shutdown socket
+    pub fn shutdown(&mut self, how: ShutdownHow) -> Result<(), UnixSocketError> {
+        let state = self.state.load(Ordering::Acquire);
+        if state != UnixSocketState::Connected as u32 {
+            return Err(UnixSocketError::NotConnected);
         }
-
-        let target_str = match &target {
-            UnixSocketAddress::Path(p) => p.clone(),
-            UnixSocketAddress::Abstract(a) => a.clone(),
-            UnixSocketAddress::Unbound => return Err(IPCError::InvalidSize),
-        };
-
-        let target_id = *self
-            .bindings
-            .get(&target_str)
-            .ok_or(IPCError::NotConnected)?;
-        let target_socket = self
-            .sockets
-            .get_mut(&target_id)
-            .ok_or(IPCError::NotConnected)?;
-
-        let mut packet = sender_id.to_le_bytes().to_vec();
-        packet.extend_from_slice(&data.len().to_le_bytes());
-        packet.extend_from_slice(data);
-        target_socket.rx_buffer.extend(packet);
-
+        
+        match how {
+            ShutdownHow::Read => {
+                // Clear recv buffer
+                self.recv_buffer.clear();
+            }
+            ShutdownHow::Write => {
+                // Flush send buffer, prevent further writes
+                // In production: send remaining data and signal EOF
+            }
+            ShutdownHow::Both => {
+                self.recv_buffer.clear();
+                self.send_buffer.clear();
+            }
+        }
+        
+        self.state.store(UnixSocketState::Disconnecting as u32, Ordering::Release);
         Ok(())
     }
-
-    /// Receive data from socket (Stream)
-    pub fn receive(&mut self, id: usize, buffer: &mut [u8]) -> Result<usize, IPCError> {
-        let socket = self.sockets.get_mut(&id).ok_or(IPCError::NotConnected)?;
-        if !socket.capability.can_receive {
-            return Err(IPCError::PermissionDenied);
-        }
-
-        if socket.socket_type != UnixSocketType::Stream {
-            return Err(IPCError::NotConnected);
-        }
-
-        if socket.rx_buffer.is_empty() {
-            if socket.state == UnixSocketState::Connected {
-                return Err(IPCError::BufferEmpty);
-            } else {
-                return Err(IPCError::NotConnected);
+    
+    /// Set socket option
+    pub fn setsockopt(&mut self, level: i32, optname: i32, optval: &[u8]) -> Result<(), UnixSocketError> {
+        match (level, optname) {
+            (1, 9) => { // SOL_SOCKET, SO_PASSCRED
+                if optval.len() >= 4 {
+                    let val = u32::from_ne_bytes([optval[0], optval[1], optval[2], optval[3]]);
+                    self.pass_cred.store(val != 0, Ordering::Release);
+                    Ok(())
+                } else {
+                    Err(UnixSocketError::InvalidOption)
+                }
             }
-        }
-
-        let read_len = buffer.len().min(socket.rx_buffer.len());
-        buffer[..read_len].copy_from_slice(&socket.rx_buffer[..read_len]);
-        socket.rx_buffer.drain(..read_len);
-
-        Ok(read_len)
-    }
-
-    /// Receive datagram from socket (Datagram)
-    pub fn receive_from(
-        &mut self,
-        id: usize,
-        buffer: &mut [u8],
-    ) -> Result<(usize, Option<usize>), IPCError> {
-        let socket = self.sockets.get_mut(&id).ok_or(IPCError::NotConnected)?;
-        if !socket.capability.can_receive {
-            return Err(IPCError::PermissionDenied);
-        }
-
-        if socket.socket_type != UnixSocketType::Datagram {
-            return Err(IPCError::NotConnected);
-        }
-
-        if socket.rx_buffer.is_empty() {
-            return Err(IPCError::BufferEmpty);
-        }
-
-        if socket.peer_id.is_some() {
-            let sz = core::mem::size_of::<usize>();
-            if socket.rx_buffer.len() < sz {
-                return Err(IPCError::BufferEmpty);
-            }
-            let mut len_bytes = [0; core::mem::size_of::<usize>()];
-            len_bytes.copy_from_slice(&socket.rx_buffer[..sz]);
-            let data_len = usize::from_le_bytes(len_bytes);
-
-            if socket.rx_buffer.len() < sz + data_len {
-                return Err(IPCError::BufferEmpty);
-            }
-
-            let read_len = buffer.len().min(data_len);
-            buffer[..read_len].copy_from_slice(&socket.rx_buffer[sz..sz + read_len]);
-            socket.rx_buffer.drain(..sz + data_len);
-
-            Ok((read_len, socket.peer_id))
-        } else {
-            let sz = core::mem::size_of::<usize>();
-            if socket.rx_buffer.len() < 2 * sz {
-                return Err(IPCError::BufferEmpty);
-            }
-            let mut sender_bytes = [0; core::mem::size_of::<usize>()];
-            sender_bytes.copy_from_slice(&socket.rx_buffer[..sz]);
-            let sender_id = usize::from_le_bytes(sender_bytes);
-
-            let mut len_bytes = [0; core::mem::size_of::<usize>()];
-            len_bytes.copy_from_slice(&socket.rx_buffer[sz..2 * sz]);
-            let data_len = usize::from_le_bytes(len_bytes);
-
-            if socket.rx_buffer.len() < 2 * sz + data_len {
-                return Err(IPCError::BufferEmpty);
-            }
-
-            let read_len = buffer.len().min(data_len);
-            buffer[..read_len].copy_from_slice(&socket.rx_buffer[2 * sz..2 * sz + read_len]);
-            socket.rx_buffer.drain(..2 * sz + data_len);
-
-            Ok((read_len, Some(sender_id)))
+            _ => Err(UnixSocketError::NotSupported)
         }
     }
-
-    /// Create a pre-connected socketpair (Stream or Datagram)
-    pub fn socketpair(
-        &mut self,
-        socket_type: UnixSocketType,
-        capability: IPCCapability,
-    ) -> Result<(usize, usize), IPCError> {
-        let id1 = self.create_socket(socket_type, capability);
-        let id2 = self.create_socket(socket_type, capability);
-
-        {
-            let s1 = self.sockets.get_mut(&id1).unwrap();
-            s1.state = UnixSocketState::Connected;
-            s1.peer_id = Some(id2);
-        }
-
-        {
-            let s2 = self.sockets.get_mut(&id2).unwrap();
-            s2.state = UnixSocketState::Connected;
-            s2.peer_id = Some(id1);
-        }
-
-        Ok((id1, id2))
+    
+    /// Get socket state
+    pub fn get_state(&self) -> UnixSocketState {
+        let state_val = self.state.load(Ordering::Acquire);
+        unsafe { core::mem::transmute(state_val as u8) }
+    }
+    
+    /// Get socket address
+    pub fn get_addr(&self) -> Option<&UnixSocketAddr> {
+        self.addr.as_ref()
     }
 }
 
-#[cfg(test_disabled)]
+/// Shutdown direction
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ShutdownHow {
+    Read = 0,   // SHUT_RD
+    Write = 1,  // SHUT_WR
+    Both = 2,   // SHUT_RDWR
+}
+
+/// Unix socket errors
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum UnixSocketError {
+    AlreadyBound,
+    AlreadyConnected,
+    NotBound,
+    NotListening,
+    NotConnected,
+    NotSupported,
+    InvalidAddress,
+    InvalidOption,
+    WouldBlock,
+    BufferFull,
+    Disconnected,
+}
+
+#[cfg(test)]
 mod tests {
     use super::*;
-
+    
     #[test]
-    fn test_stream_handshake() {
-        let mut mgr = UnixSocketManager::new();
-        let cap = IPCCapability::full();
-
-        let client = mgr.create_socket(UnixSocketType::Stream, cap);
-        let server = mgr.create_socket(UnixSocketType::Stream, cap);
-
-        let addr = UnixSocketAddress::Path(String::from("/tmp/test.sock"));
-
-        assert!(mgr.bind(server, addr.clone()).is_ok());
-        assert!(mgr.sockets.get(&server).unwrap().state == UnixSocketState::Bound);
-
-        assert!(mgr.sockets.get_mut(&server).unwrap().listen().is_ok());
-        assert!(mgr.sockets.get(&server).unwrap().state == UnixSocketState::Listening);
-
-        assert!(mgr.connect(client, addr).is_ok());
-        assert!(mgr.sockets.get(&client).unwrap().state == UnixSocketState::Connecting);
-
-        let accepted = mgr.accept(server).unwrap();
-        assert!(mgr.sockets.get(&client).unwrap().state == UnixSocketState::Connected);
-        assert!(mgr.sockets.get(&accepted).unwrap().state == UnixSocketState::Connected);
+    fn test_unix_socket_creation() {
+        let sock = UnixSocket::new(UnixSocketType::Stream);
+        assert_eq!(sock.get_state(), UnixSocketState::Unbound);
     }
-
+    
     #[test]
-    fn test_stream_read_write() {
-        let mut mgr = UnixSocketManager::new();
-        let cap = IPCCapability::full();
-
-        let (c1, c2) = mgr.socketpair(UnixSocketType::Stream, cap).unwrap();
-
-        let payload = b"Hello from Unix Domain Sockets!";
-        assert!(mgr.send(c1, payload).is_ok());
-
-        let mut buf = [0; 64];
-        let bytes = mgr.receive(c2, &mut buf).unwrap();
-        assert_eq!(bytes, payload.len());
-        assert_eq!(&buf[..bytes], payload);
+    fn test_unix_socket_bind() {
+        let mut sock = UnixSocket::new(UnixSocketType::Stream);
+        let addr = UnixSocketAddr::Path("/tmp/test.sock".into());
+        assert!(sock.bind(addr).is_ok());
+        assert_eq!(sock.get_state(), UnixSocketState::Bound);
     }
-
+    
     #[test]
-    fn test_datagram_transmission() {
-        let mut mgr = UnixSocketManager::new();
-        let cap = IPCCapability::full();
-
-        let s1 = mgr.create_socket(UnixSocketType::Datagram, cap);
-        let s2 = mgr.create_socket(UnixSocketType::Datagram, cap);
-
-        let addr = UnixSocketAddress::Abstract(String::from("test_abstract"));
-        assert!(mgr.bind(s2, addr.clone()).is_ok());
-
-        let payload = b"Datagram message payload";
-        assert!(mgr.send_to(s1, payload, addr).is_ok());
-
-        let mut buf = [0; 64];
-        let (bytes, sender) = mgr.receive_from(s2, &mut buf).unwrap();
-        assert_eq!(bytes, payload.len());
-        assert_eq!(&buf[..bytes], payload);
-        assert_eq!(sender, Some(s1));
+    fn test_unix_socket_listen() {
+        let mut sock = UnixSocket::new(UnixSocketType::Stream);
+        let addr = UnixSocketAddr::Path("/tmp/test.sock".into());
+        sock.bind(addr).unwrap();
+        assert!(sock.listen(128).is_ok());
+        assert_eq!(sock.get_state(), UnixSocketState::Listening);
     }
-
+    
     #[test]
-    fn test_socketpair_creation() {
-        let mut mgr = UnixSocketManager::new();
-        let cap = IPCCapability::full();
-
-        let (s1, s2) = mgr.socketpair(UnixSocketType::Datagram, cap).unwrap();
-        assert!(mgr.sockets.get(&s1).unwrap().state == UnixSocketState::Connected);
-        assert!(mgr.sockets.get(&s2).unwrap().state == UnixSocketState::Connected);
-
-        let payload = b"Socketpair msg";
-        assert!(mgr.send(s1, payload).is_ok());
-
-        let mut buf = [0; 64];
-        let (bytes, sender) = mgr.receive_from(s2, &mut buf).unwrap();
-        assert_eq!(bytes, payload.len());
-        assert_eq!(&buf[..bytes], payload);
-        assert_eq!(sender, Some(s1));
+    fn test_datagram_socket() {
+        let mut sock = UnixSocket::new(UnixSocketType::Datagram);
+        let addr = UnixSocketAddr::Abstract(b"test".to_vec());
+        assert!(sock.bind(addr).is_ok());
     }
-
+    
     #[test]
-    fn test_capability_enforcement() {
-        let mut mgr = UnixSocketManager::new();
-        let mut cap = IPCCapability::new(); // restrictive
-        cap.can_send = false;
-        cap.allow_unix_sockets = false;
-
-        let s1 = mgr.create_socket(UnixSocketType::Stream, cap);
-        let addr = UnixSocketAddress::Path(String::from("/tmp/perm.sock"));
-        assert!(mgr.bind(s1, addr).is_err()); // No unix socket allow capability
+    fn test_invalid_path_length() {
+        let mut sock = UnixSocket::new(UnixSocketType::Stream);
+        let long_path = "a".repeat(109);
+        let addr = UnixSocketAddr::Path(long_path);
+        assert_eq!(sock.bind(addr), Err(UnixSocketError::InvalidAddress));
     }
 }

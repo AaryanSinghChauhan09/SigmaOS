@@ -12,7 +12,6 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use std::string::{String, ToString};
 use std::vec;
 use std::vec::Vec;
 
@@ -20,14 +19,14 @@ use std::vec::Vec;
 // Models advanced rolling-release, automatic hardware configuration,
 // kernel switching, and mirror-ranked transactional packaging.
 
-use std::collections::HashMap;
+use crate::klib::collections::HashMap;
 
 /// An Arch User Repository (AUR) package representation
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AurPackage {
-    pub name: String,
-    pub pkgbuild_url: String,
-    pub dependencies: Vec<String>,
+    pub name: crate::klib::SigmaString,
+    pub pkgbuild_url: crate::klib::SigmaString,
+    pub dependencies: crate::klib::Vec<crate::klib::SigmaString>,
 }
 
 /// A Flatpak sandboxed application representation

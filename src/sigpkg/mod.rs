@@ -1,4 +1,3 @@
-use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 // SigmaPkg - SigmaOS Package Manager
@@ -64,12 +63,6 @@ pub mod store;
 pub mod transaction;
 pub mod transaction_log;
 pub mod universal_adapter;
-pub use universal_adapter::{
-    DispatchedPmAction, UniversalDependencyMapper, UniversalDryRunSimulator,
-    UniversalPackageAdapter, UniversalPmCommandDispatcher, UniversalPmOperation,
-    UniversalScriptletConverter,
-};
-pub mod universal_engine;
 pub mod universal_oop_system;
 pub use universal_engine::{
     SovereignUniversalPackageManagerInteropEngine, SovereignUniversalPackageTranslationBridge,
@@ -102,6 +95,22 @@ pub use sovereign_distro_package_advancements_v6::*;
 #[path = "../package/sovereign_distro_package_advancements_v7.rs"]
 pub mod sovereign_distro_package_advancements_v7;
 pub use sovereign_distro_package_advancements_v7::*;
+
+#[path = "../package/sovereign_distro_package_advancements_v12.rs"]
+pub mod sovereign_distro_package_advancements_v12;
+pub use sovereign_distro_package_advancements_v12::*;
+
+#[path = "../package/sovereign_distro_package_advancements_v13.rs"]
+pub mod sovereign_distro_package_advancements_v13;
+pub use sovereign_distro_package_advancements_v13::*;
+
+#[path = "../package/sovereign_distro_package_advancements_v16.rs"]
+pub mod sovereign_distro_package_advancements_v16;
+pub use sovereign_distro_package_advancements_v16::*;
+
+#[path = "../package/sovereign_distro_package_advancements_v17.rs"]
+pub mod sovereign_distro_package_advancements_v17;
+pub use sovereign_distro_package_advancements_v17::*;
 
 #[path = "../package/bsd_linux_package_innovations.rs"]
 pub mod bsd_linux_package_innovations;
@@ -187,13 +196,7 @@ pub use portage::{EbuildSpec, PortageResolver, Slot, UseFlag};
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use resolver::SatSolver;
 pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};
-pub use store::{BsdPkgRepositoryMirror, ContentAddressedStore, GentooPortageUseFlagMask, NixOsHermeticCasStore};
-pub use transaction::Transaction;
-pub use universal_adapter::{
-    UniversalPackageAdapter,
-};
 pub use spec::{
-    CachyCpuDetector, CachyosPackageAdapter, CpuArchLevel, ManagerCapability, PackageCapability,
     PackageDependency, PackageError as SpecPackageError, PackageInfo,
     PackageManager as SpecPackageManager, PackageStats, PackageVersion, SimplePackage,
     SimplePackageManager, UniversalPackage, UniversalPackageType, UserDefinedPackageHook,
@@ -201,12 +204,13 @@ pub use spec::{
 pub use store::{
     BsdPkgRepositoryMirror, ContentAddressedStore, GentooPortageUseFlagMask, NixOsHermeticCasStore,
 };
-pub use svntogit_repro::{
+pub use store::{
     BuildArtifact, ConvertedGitCommit, ReproducibilityAttestationReport,
     ReproducibleBuildEnvironment, ReproduciblePackageBuilder, SovereignSvnToGitMigrator,
     SvnBranchType, SvnRevisionLog,
 };
 pub use transaction::Transaction;
+pub use universal_adapter::{AdapterError, DebAdapter, PacmanAdapter, RpmAdapter};
 pub use verifier::CryptoVerifier;
 
 /// Package version using SemVer

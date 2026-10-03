@@ -15,6 +15,7 @@
 
 #![allow(dead_code)]
 #![allow(unused_variables)]
+#![allow(non_camel_case_types)]
 
 #[cfg(feature = "standalone_test")]
 extern crate alloc;
@@ -28,8 +29,6 @@ use std::vec::Vec;
 
 #[cfg(feature = "standalone_test")]
 use alloc::collections::BTreeMap;
-#[cfg(feature = "standalone_test")]
-use alloc::format;
 #[cfg(feature = "standalone_test")]
 use alloc::string::{String, ToString};
 #[cfg(feature = "standalone_test")]

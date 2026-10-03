@@ -18,7 +18,6 @@ use alloc::vec::Vec;
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::BTreeMap;
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
 
 /// Task Real-Time Scheduling Class
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]

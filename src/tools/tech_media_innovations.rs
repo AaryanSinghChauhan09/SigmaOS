@@ -312,6 +312,14 @@ impl LinuxPressFeedEngine {
         portals.len()
     }
 
+    pub fn filter_by_min_timestamp(&self, min_timestamp: u64) -> Vec<TechMediaArticleFeed> {
+        self.articles
+            .iter()
+            .filter(|a| a.timestamp_epoch >= min_timestamp)
+            .cloned()
+            .collect()
+    }
+
     pub fn evaluate_distrowatch_rankings(&self) -> Vec<String> {
         let mut distros = Vec::new();
         for article in &self.articles {

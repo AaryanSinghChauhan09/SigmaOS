@@ -8,9 +8,7 @@ use alloc::string::String;
 use alloc::vec::Vec;
 
 #[cfg(test)]
-use std::string::String;
 #[cfg(test)]
-use std::vec::Vec;
 
 /// DistroWatch page-hit ranking and distribution release tracker engine.
 #[derive(Debug, Clone)]

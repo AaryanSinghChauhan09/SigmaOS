@@ -1,10 +1,22 @@
 //! Capability-based Security Framework (Capsicum-inspired)
 //! Process capability constraints and sandboxing
 //! Inspired by FreeBSD Capsicum with Linux seccomp enhancements
+//!
+//! # FreeBSD Capsicum Integration
+//! This module provides a Rust-native implementation of FreeBSD's Capsicum
+//! capability model, allowing fine-grained rights delegation for file descriptors
+//! and process-level sandboxing.
 
+#![cfg_attr(not(any(feature = "standalone_test", test)), no_std)]
+
+extern crate alloc;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+
+#[cfg(not(any(feature = "standalone_test", test)))]
+use crate::klib::collections::HashSet;
+#[cfg(any(feature = "standalone_test", test))]
 use std::collections::HashSet;
-use std::string::String;
-use std::vec::Vec;
 
 /// Capability rights (inspired by FreeBSD capsicum rights)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -171,6 +183,50 @@ impl CapabilitySandbox {
     /// Clear all capability entries
     pub fn clear_entries(&mut self) {
         self.entries.clear();
+    }
+
+    /// Enforce capability check for syscall operations
+    /// Returns Ok(()) if allowed, Err with errno if denied
+    pub fn enforce_syscall(&self, operation: &str, path: Option<&str>) -> Result<(), i32> {
+        const EACCES: i32 = 13; // Permission denied
+        const ECAPMODE: i32 = 94; // Not permitted in capability mode
+
+        // Map operation strings to capability rights
+        let required_right = match operation {
+            "read" => CapRight::CapRead,
+            "write" => CapRight::CapWrite,
+            "execute" => CapRight::CapExecute,
+            "fstat" => CapRight::CapFstat,
+            "ioctl" => CapRight::CapIoctl,
+            "connect" => CapRight::CapConnect,
+            "accept" => CapRight::CapAccept,
+            "bind" => CapRight::CapBind,
+            "fork" | "spawn" => CapRight::CapSpawn,
+            "kill" | "signal" => CapRight::CapSignal,
+            _ => return Err(EACCES), // Unknown operation
+        };
+
+        // Check capability
+        if let Some(resource_path) = path {
+            if self.check_access(resource_path, required_right) {
+                Ok(())
+            } else {
+                Err(if self.mode != CapMode::Unrestricted {
+                    ECAPMODE
+                } else {
+                    EACCES
+                })
+            }
+        } else {
+            // Global capability check (no specific path)
+            if self.global_rights.contains(&required_right)
+                || self.mode == CapMode::Unrestricted
+            {
+                Ok(())
+            } else {
+                Err(ECAPMODE)
+            }
+        }
     }
 }
 

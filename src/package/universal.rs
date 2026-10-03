@@ -2,18 +2,18 @@ extern crate alloc;
 
 use alloc::boxed::Box;
 // use alloc::collections::BTreeMap;
-use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
-#[cfg(not(feature = "standalone_test"))]
-pub use crate::package::manager::PackageState;
 
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
 
-// Zero-dependency architecture: Use klib primitives for no_std compatibility
+#[cfg(not(any(feature = "standalone_test", test)))]
+use crate::klib::collections::HashMap;
+#[cfg(any(feature = "standalone_test", test))]
 use std::collections::{HashMap, HashSet};
+#[cfg(any(feature = "standalone_test", test))]
 use std::sync::Arc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
@@ -137,12 +137,9 @@ impl UniversalPackageTranslator {
         } else {
             format!("sigpkg-{}-{}", prefix, manifest.original_name)
         };
-        let mut pkg = UnifiedPackage::new(
-            pkg_name,
-            manifest.version.clone(),
-        )
-        .with_format(PackageFormat::SigmaPkg)
-        .with_provides(manifest.original_name.clone());
+        let mut pkg = UnifiedPackage::new(pkg_name, manifest.version.clone())
+            .with_format(PackageFormat::SigmaPkg)
+            .with_provides(manifest.original_name.clone());
 
         for dep in manifest.raw_dependencies.iter() {
             let dep_str: &str = dep.as_str();
@@ -598,7 +595,10 @@ impl PackageFormat {
             Some(PackageFormat::Deb)
         } else if normalized == "superdeb" || normalized.ends_with(".superdeb") {
             Some(PackageFormat::Superdeb)
-        } else if normalized == "rpm" || normalized.ends_with(".rpm") || normalized.ends_with(".drpm") {
+        } else if normalized == "rpm"
+            || normalized.ends_with(".rpm")
+            || normalized.ends_with(".drpm")
+        {
             Some(PackageFormat::Rpm)
         } else if normalized.ends_with(".pkg.tar.zst")
             || normalized.ends_with(".pkg.tar.xz")
@@ -614,7 +614,10 @@ impl PackageFormat {
             Some(PackageFormat::Flatpak)
         } else if normalized == "appimage" || normalized.ends_with(".appimage") {
             Some(PackageFormat::AppImage)
-        } else if normalized == "sigpkg" || normalized.ends_with(".sigpkg") || normalized.ends_with(".sigma") {
+        } else if normalized == "sigpkg"
+            || normalized.ends_with(".sigpkg")
+            || normalized.ends_with(".sigma")
+        {
             Some(PackageFormat::SigmaPkg)
         } else if normalized == "air" || normalized.ends_with(".air") {
             Some(PackageFormat::Air)
@@ -632,13 +635,24 @@ impl PackageFormat {
             Some(PackageFormat::Apk)
         } else if normalized == "eopkg" || normalized.ends_with(".eopkg") {
             Some(PackageFormat::Eopkg)
-        } else if normalized == "nixpkg" || normalized.ends_with(".nixpkg") || normalized.ends_with(".nix") {
+        } else if normalized == "nixpkg"
+            || normalized.ends_with(".nixpkg")
+            || normalized.ends_with(".nix")
+        {
             Some(PackageFormat::Nixpkg)
-        } else if normalized == "ebuild" || normalized == "portage" || normalized.ends_with(".ebuild") || normalized.ends_with(".portage") {
+        } else if normalized == "ebuild"
+            || normalized == "portage"
+            || normalized.ends_with(".ebuild")
+            || normalized.ends_with(".portage")
+        {
             Some(PackageFormat::Ebuild)
         } else if normalized.ends_with(".openbsd.tgz") {
             Some(PackageFormat::OpenBsdPkg)
-        } else if normalized == "tgz" || normalized == "tar.gz" || normalized.ends_with(".tar.gz") || normalized.ends_with(".tgz") {
+        } else if normalized == "tgz"
+            || normalized == "tar.gz"
+            || normalized.ends_with(".tar.gz")
+            || normalized.ends_with(".tgz")
+        {
             Some(PackageFormat::TarGz)
         } else if normalized.ends_with(".txz")
             || normalized.ends_with(".tar.xz")
@@ -1284,6 +1298,20 @@ impl_generic_install_strategy!(CRanInstallStrategy);
 impl_generic_install_strategy!(BrewInstallStrategy);
 impl_generic_install_strategy!(WasmInstallStrategy);
 impl_generic_install_strategy!(OciInstallStrategy);
+impl_generic_install_strategy!(TazpkgInstallStrategy);
+impl_generic_install_strategy!(SingularitySifInstallStrategy);
+impl_generic_install_strategy!(StampedeSlpInstallStrategy);
+impl_generic_install_strategy!(WingetInstallStrategy);
+impl_generic_install_strategy!(ScoopInstallStrategy);
+impl_generic_install_strategy!(ChocoInstallStrategy);
+impl_generic_install_strategy!(PixiInstallStrategy);
+impl_generic_install_strategy!(NimbleInstallStrategy);
+impl_generic_install_strategy!(ZigPkgInstallStrategy);
+impl_generic_install_strategy!(SwiftPkgInstallStrategy);
+impl_generic_install_strategy!(DubPkgInstallStrategy);
+impl_generic_install_strategy!(OpamInstallStrategy);
+impl_generic_install_strategy!(ShardInstallStrategy);
+impl_generic_install_strategy!(PltPkgInstallStrategy);
 
 // ============================================================================
 // OOP Design Pattern: Adapter Pattern
@@ -1576,6 +1604,20 @@ impl_generic_metadata_adapter!(CRanMetadataAdapter, CRan);
 impl_generic_metadata_adapter!(BrewMetadataAdapter, Brew);
 impl_generic_metadata_adapter!(WasmMetadataAdapter, Wasm);
 impl_generic_metadata_adapter!(OciMetadataAdapter, Oci);
+impl_generic_metadata_adapter!(TazpkgMetadataAdapter, Tazpkg);
+impl_generic_metadata_adapter!(SingularitySifMetadataAdapter, SingularitySif);
+impl_generic_metadata_adapter!(StampedeSlpMetadataAdapter, StampedeSlp);
+impl_generic_metadata_adapter!(WingetMetadataAdapter, Winget);
+impl_generic_metadata_adapter!(ScoopMetadataAdapter, Scoop);
+impl_generic_metadata_adapter!(ChocoMetadataAdapter, Choco);
+impl_generic_metadata_adapter!(PixiMetadataAdapter, Pixi);
+impl_generic_metadata_adapter!(NimbleMetadataAdapter, Nimble);
+impl_generic_metadata_adapter!(ZigPkgMetadataAdapter, ZigPkg);
+impl_generic_metadata_adapter!(SwiftPkgMetadataAdapter, SwiftPkg);
+impl_generic_metadata_adapter!(DubPkgMetadataAdapter, DubPkg);
+impl_generic_metadata_adapter!(OpamMetadataAdapter, Opam);
+impl_generic_metadata_adapter!(ShardMetadataAdapter, Shard);
+impl_generic_metadata_adapter!(PltPkgMetadataAdapter, PltPkg);
 
 // ============================================================================
 // OOP Design Pattern: Decorator Pattern
@@ -1821,20 +1863,20 @@ impl PackageFactory {
             PackageFormat::Brew => Box::new(BrewInstallStrategy),
             PackageFormat::Wasm => Box::new(WasmInstallStrategy),
             PackageFormat::Oci => Box::new(OciInstallStrategy),
-            PackageFormat::Tazpkg
-            | PackageFormat::SingularitySif
-            | PackageFormat::StampedeSlp
-            | PackageFormat::Winget
-            | PackageFormat::Scoop
-            | PackageFormat::Choco
-            | PackageFormat::Pixi
-            | PackageFormat::Nimble
-            | PackageFormat::ZigPkg
-            | PackageFormat::SwiftPkg
-            | PackageFormat::DubPkg
-            | PackageFormat::Opam
-            | PackageFormat::Shard
-            | PackageFormat::PltPkg => Box::new(TarGzInstallStrategy),
+            PackageFormat::Tazpkg => Box::new(TazpkgInstallStrategy),
+            PackageFormat::SingularitySif => Box::new(SingularitySifInstallStrategy),
+            PackageFormat::StampedeSlp => Box::new(StampedeSlpInstallStrategy),
+            PackageFormat::Winget => Box::new(WingetInstallStrategy),
+            PackageFormat::Scoop => Box::new(ScoopInstallStrategy),
+            PackageFormat::Choco => Box::new(ChocoInstallStrategy),
+            PackageFormat::Pixi => Box::new(PixiInstallStrategy),
+            PackageFormat::Nimble => Box::new(NimbleInstallStrategy),
+            PackageFormat::ZigPkg => Box::new(ZigPkgInstallStrategy),
+            PackageFormat::SwiftPkg => Box::new(SwiftPkgInstallStrategy),
+            PackageFormat::DubPkg => Box::new(DubPkgInstallStrategy),
+            PackageFormat::Opam => Box::new(OpamInstallStrategy),
+            PackageFormat::Shard => Box::new(ShardInstallStrategy),
+            PackageFormat::PltPkg => Box::new(PltPkgInstallStrategy),
         }
     }
 
@@ -1929,20 +1971,20 @@ impl PackageFactory {
             PackageFormat::Brew => Box::new(BrewMetadataAdapter),
             PackageFormat::Wasm => Box::new(WasmMetadataAdapter),
             PackageFormat::Oci => Box::new(OciMetadataAdapter),
-            PackageFormat::Tazpkg
-            | PackageFormat::SingularitySif
-            | PackageFormat::StampedeSlp
-            | PackageFormat::Winget
-            | PackageFormat::Scoop
-            | PackageFormat::Choco
-            | PackageFormat::Pixi
-            | PackageFormat::Nimble
-            | PackageFormat::ZigPkg
-            | PackageFormat::SwiftPkg
-            | PackageFormat::DubPkg
-            | PackageFormat::Opam
-            | PackageFormat::Shard
-            | PackageFormat::PltPkg => Box::new(TarGzMetadataAdapter),
+            PackageFormat::Tazpkg => Box::new(TazpkgMetadataAdapter),
+            PackageFormat::SingularitySif => Box::new(SingularitySifMetadataAdapter),
+            PackageFormat::StampedeSlp => Box::new(StampedeSlpMetadataAdapter),
+            PackageFormat::Winget => Box::new(WingetMetadataAdapter),
+            PackageFormat::Scoop => Box::new(ScoopMetadataAdapter),
+            PackageFormat::Choco => Box::new(ChocoMetadataAdapter),
+            PackageFormat::Pixi => Box::new(PixiMetadataAdapter),
+            PackageFormat::Nimble => Box::new(NimbleMetadataAdapter),
+            PackageFormat::ZigPkg => Box::new(ZigPkgMetadataAdapter),
+            PackageFormat::SwiftPkg => Box::new(SwiftPkgMetadataAdapter),
+            PackageFormat::DubPkg => Box::new(DubPkgMetadataAdapter),
+            PackageFormat::Opam => Box::new(OpamMetadataAdapter),
+            PackageFormat::Shard => Box::new(ShardMetadataAdapter),
+            PackageFormat::PltPkg => Box::new(PltPkgMetadataAdapter),
         }
     }
 }
@@ -2042,7 +2084,7 @@ pub struct AptDebManifest {
     pub maintainer: String,
     pub depends: Vec<String>,
     pub description: String,
-    pub priority: String,
+    pub priority: PackagePriority,
 }
 
 /// Description of Arch Linux PKGBUILD Manifest (pacman parity)
@@ -3380,8 +3422,12 @@ mod tests {
 
         let deb_sigpkg = UniversalPackageTranslator::translate_apt_deb(&deb_manifest);
         assert_eq!(deb_sigpkg.name, "sigpkg-apt-deb-curl");
-        assert!(deb_sigpkg.dependencies.contains(&"sovereign-openssl".to_string()));
-        assert!(deb_sigpkg.dependencies.contains(&"sovereign-libc".to_string()));
+        assert!(deb_sigpkg
+            .dependencies
+            .contains(&"sovereign-openssl".to_string()));
+        assert!(deb_sigpkg
+            .dependencies
+            .contains(&"sovereign-libc".to_string()));
     }
 
     #[test]
@@ -3473,7 +3519,7 @@ mod tests {
                 v
             },
             description: "command line tool for transferring data with URLs".to_string(),
-            priority: "optional".to_string(),
+            priority: PackagePriority::Optional,
         };
 
         let _pkgbuild = PacmanPkgbuild {
@@ -3845,6 +3891,20 @@ mod tests {
             PackageFormat::Crux,
             PackageFormat::Drpm,
             PackageFormat::Stratum,
+            PackageFormat::Tazpkg,
+            PackageFormat::SingularitySif,
+            PackageFormat::StampedeSlp,
+            PackageFormat::Winget,
+            PackageFormat::Scoop,
+            PackageFormat::Choco,
+            PackageFormat::Pixi,
+            PackageFormat::Nimble,
+            PackageFormat::ZigPkg,
+            PackageFormat::SwiftPkg,
+            PackageFormat::DubPkg,
+            PackageFormat::Opam,
+            PackageFormat::Shard,
+            PackageFormat::PltPkg,
         ];
 
         for fmt in formats {

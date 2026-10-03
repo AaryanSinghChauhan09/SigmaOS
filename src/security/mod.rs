@@ -11,6 +11,7 @@ pub mod governance;
 pub mod hardware_privilege;
 pub mod pledge_unveil;
 pub mod pqc_enclave;
+pub mod selinux;
 pub mod sigma_pledge;
 pub mod sigma_unveil;
 pub mod vault;
@@ -178,3 +179,7 @@ pub use memory_protection::{
 pub use pledge_unveil::{
     PledgePromise as OpenBsdPledgePromise, PledgeSandbox, Sandbox, UnveilPermission, UnveilSandbox,
 };
+
+pub mod dm_crypt;
+
+pub mod tpm2;

@@ -5,7 +5,6 @@
 extern crate alloc;
 
 use alloc::collections::BTreeMap;
-use alloc::format;
 use alloc::string::{String, ToString};
 
 /// Roadmap & Wiki Development Phases (Phases 1-10)
@@ -69,53 +68,189 @@ impl SovereignLinuxBsdWikiMasterEngine {
         let timestamp = 20260928;
 
         // Phase 1
-        self.record_feature("CFS EEVDF Scheduler", WikiImplementationPhase::Phase1KernelSubsystems, "src/kernel/smp_multicore.rs", timestamp);
-        self.record_feature("io_uring Asynchronous I/O", WikiImplementationPhase::Phase1KernelSubsystems, "src/kernel/io_uring.rs", timestamp);
-        self.record_feature("eBPF & XDP Packet Processing", WikiImplementationPhase::Phase1KernelSubsystems, "src/open_source_os_gap_closure.rs", timestamp);
-        self.record_feature("FreeBSD Capsicum Capabilities", WikiImplementationPhase::Phase1KernelSubsystems, "src/compatibility/bsd.rs", timestamp);
-        self.record_feature("OpenBSD Pledge & Unveil Sandboxing", WikiImplementationPhase::Phase1KernelSubsystems, "src/compatibility/bsd.rs", timestamp);
+        self.record_feature(
+            "CFS EEVDF Scheduler",
+            WikiImplementationPhase::Phase1KernelSubsystems,
+            "src/kernel/smp_multicore.rs",
+            timestamp,
+        );
+        self.record_feature(
+            "io_uring Asynchronous I/O",
+            WikiImplementationPhase::Phase1KernelSubsystems,
+            "src/kernel/io_uring.rs",
+            timestamp,
+        );
+        self.record_feature(
+            "eBPF & XDP Packet Processing",
+            WikiImplementationPhase::Phase1KernelSubsystems,
+            "src/open_source_os_gap_closure.rs",
+            timestamp,
+        );
+        self.record_feature(
+            "FreeBSD Capsicum Capabilities",
+            WikiImplementationPhase::Phase1KernelSubsystems,
+            "src/compatibility/bsd.rs",
+            timestamp,
+        );
+        self.record_feature(
+            "OpenBSD Pledge & Unveil Sandboxing",
+            WikiImplementationPhase::Phase1KernelSubsystems,
+            "src/compatibility/bsd.rs",
+            timestamp,
+        );
 
         // Phase 2
-        self.record_feature("Transparent Huge Pages & Compaction", WikiImplementationPhase::Phase2MemoryManagement, "src/memory/tlb_associative.rs", timestamp);
-        self.record_feature("NUMA-Aware Memory Allocator", WikiImplementationPhase::Phase2MemoryManagement, "src/memory/segmentation_paging.rs", timestamp);
-        self.record_feature("W^X Memory Protection & ASLR", WikiImplementationPhase::Phase2MemoryManagement, "src/memory/segmentation_paging.rs", timestamp);
+        self.record_feature(
+            "Transparent Huge Pages & Compaction",
+            WikiImplementationPhase::Phase2MemoryManagement,
+            "src/memory/tlb_associative.rs",
+            timestamp,
+        );
+        self.record_feature(
+            "NUMA-Aware Memory Allocator",
+            WikiImplementationPhase::Phase2MemoryManagement,
+            "src/memory/segmentation_paging.rs",
+            timestamp,
+        );
+        self.record_feature(
+            "W^X Memory Protection & ASLR",
+            WikiImplementationPhase::Phase2MemoryManagement,
+            "src/memory/segmentation_paging.rs",
+            timestamp,
+        );
 
         // Phase 3
-        self.record_feature("XDP Zero-Copy Packet Engine", WikiImplementationPhase::Phase3NetworkingStack, "src/drivers/universal_hardware_support.rs", timestamp);
-        self.record_feature("WireGuard PQC VPN", WikiImplementationPhase::Phase3NetworkingStack, "src/open_source_obsoletion.rs", timestamp);
-        self.record_feature("CARP + PFSync Router Redundancy", WikiImplementationPhase::Phase3NetworkingStack, "src/compatibility/bsd.rs", timestamp);
+        self.record_feature(
+            "XDP Zero-Copy Packet Engine",
+            WikiImplementationPhase::Phase3NetworkingStack,
+            "src/drivers/universal_hardware_support.rs",
+            timestamp,
+        );
+        self.record_feature(
+            "WireGuard PQC VPN",
+            WikiImplementationPhase::Phase3NetworkingStack,
+            "src/open_source_obsoletion.rs",
+            timestamp,
+        );
+        self.record_feature(
+            "CARP + PFSync Router Redundancy",
+            WikiImplementationPhase::Phase3NetworkingStack,
+            "src/compatibility/bsd.rs",
+            timestamp,
+        );
 
         // Phase 4
-        self.record_feature("Btrfs/ZFS Transactional CoW & Snapshots", WikiImplementationPhase::Phase4FilesystemEnhancements, "src/filesystem/bsd_linux_innovations.rs", timestamp);
-        self.record_feature("OverlayFS & PipeFS Virtual Filesystems", WikiImplementationPhase::Phase4FilesystemEnhancements, "src/filesystem/overlayfs.rs", timestamp);
-        self.record_feature("fscrypt Transparent Directory Encryption", WikiImplementationPhase::Phase4FilesystemEnhancements, "src/filesystem/mod.rs", timestamp);
+        self.record_feature(
+            "Btrfs/ZFS Transactional CoW & Snapshots",
+            WikiImplementationPhase::Phase4FilesystemEnhancements,
+            "src/filesystem/bsd_linux_innovations.rs",
+            timestamp,
+        );
+        self.record_feature(
+            "OverlayFS & PipeFS Virtual Filesystems",
+            WikiImplementationPhase::Phase4FilesystemEnhancements,
+            "src/filesystem/overlayfs.rs",
+            timestamp,
+        );
+        self.record_feature(
+            "fscrypt Transparent Directory Encryption",
+            WikiImplementationPhase::Phase4FilesystemEnhancements,
+            "src/filesystem/mod.rs",
+            timestamp,
+        );
 
         // Phase 5
-        self.record_feature("Linux Security Modules (Landlock v5 LSM)", WikiImplementationPhase::Phase5SecurityHardening, "src/open_source_obsoletion.rs", timestamp);
-        self.record_feature("Post-Quantum Dilithium-5 Attestation", WikiImplementationPhase::Phase5SecurityHardening, "src/package/sovereign_distro_package_advancements_v8.rs", timestamp);
+        self.record_feature(
+            "Linux Security Modules (Landlock v5 LSM)",
+            WikiImplementationPhase::Phase5SecurityHardening,
+            "src/open_source_obsoletion.rs",
+            timestamp,
+        );
+        self.record_feature(
+            "Post-Quantum Dilithium-5 Attestation",
+            WikiImplementationPhase::Phase5SecurityHardening,
+            "src/package/sovereign_distro_package_advancements_v8.rs",
+            timestamp,
+        );
 
         // Phase 6
-        self.record_feature("Zenith Wayland Compositor Engine", WikiImplementationPhase::Phase6DesktopEnvironment, "src/desktop/zenith_compositor.rs", timestamp);
-        self.record_feature("PipeWire Audio Engine", WikiImplementationPhase::Phase6DesktopEnvironment, "src/open_source_obsoletion.rs", timestamp);
+        self.record_feature(
+            "Zenith Wayland Compositor Engine",
+            WikiImplementationPhase::Phase6DesktopEnvironment,
+            "src/desktop/zenith_compositor.rs",
+            timestamp,
+        );
+        self.record_feature(
+            "PipeWire Audio Engine",
+            WikiImplementationPhase::Phase6DesktopEnvironment,
+            "src/open_source_obsoletion.rs",
+            timestamp,
+        );
 
         // Phase 7
-        self.record_feature("NVIDIA DRM/KMS KMS Display Driver", WikiImplementationPhase::Phase7HardwareSupport, "src/driver/gpu_nvidia_nouveau.rs", timestamp);
-        self.record_feature("USB4 / Thunderbolt 4 / Wi-Fi 6E/7 Drivers", WikiImplementationPhase::Phase7HardwareSupport, "src/drivers/universal_hardware_support.rs", timestamp);
+        self.record_feature(
+            "NVIDIA DRM/KMS KMS Display Driver",
+            WikiImplementationPhase::Phase7HardwareSupport,
+            "src/driver/gpu_nvidia_nouveau.rs",
+            timestamp,
+        );
+        self.record_feature(
+            "USB4 / Thunderbolt 4 / Wi-Fi 6E/7 Drivers",
+            WikiImplementationPhase::Phase7HardwareSupport,
+            "src/drivers/universal_hardware_support.rs",
+            timestamp,
+        );
 
         // Phase 8
-        self.record_feature("SigmaPkg Universal PM & 31 Format PR Gateway", WikiImplementationPhase::Phase8PackageManagement, "src/package/sovereign_distro_package_advancements_v10.rs", timestamp);
-        self.record_feature("DPLL SAT Dependency Resolver", WikiImplementationPhase::Phase8PackageManagement, "src/package/sovereign_distro_package_advancements_v8.rs", timestamp);
+        self.record_feature(
+            "SigmaPkg Universal PM & 31 Format PR Gateway",
+            WikiImplementationPhase::Phase8PackageManagement,
+            "src/package/sovereign_distro_package_advancements_v10.rs",
+            timestamp,
+        );
+        self.record_feature(
+            "DPLL SAT Dependency Resolver",
+            WikiImplementationPhase::Phase8PackageManagement,
+            "src/package/sovereign_distro_package_advancements_v8.rs",
+            timestamp,
+        );
 
         // Phase 9
-        self.record_feature("Firecracker MicroVM & OCI Container Runtime", WikiImplementationPhase::Phase9Virtualization, "src/open_source_obsoletion.rs", timestamp);
-        self.record_feature("FreeBSD Jail & OpenBSD vmm Manager", WikiImplementationPhase::Phase9Virtualization, "src/compatibility/bsd.rs", timestamp);
+        self.record_feature(
+            "Firecracker MicroVM & OCI Container Runtime",
+            WikiImplementationPhase::Phase9Virtualization,
+            "src/open_source_obsoletion.rs",
+            timestamp,
+        );
+        self.record_feature(
+            "FreeBSD Jail & OpenBSD vmm Manager",
+            WikiImplementationPhase::Phase9Virtualization,
+            "src/compatibility/bsd.rs",
+            timestamp,
+        );
 
         // Phase 10
-        self.record_feature("Strace Syscall Tracer & DTrace Metrics", WikiImplementationPhase::Phase10DevelopmentTools, "src/open_source_obsoletion.rs", timestamp);
-        self.record_feature("Valgrind Memory Debugger", WikiImplementationPhase::Phase10DevelopmentTools, "src/open_source_obsoletion.rs", timestamp);
+        self.record_feature(
+            "Strace Syscall Tracer & DTrace Metrics",
+            WikiImplementationPhase::Phase10DevelopmentTools,
+            "src/open_source_obsoletion.rs",
+            timestamp,
+        );
+        self.record_feature(
+            "Valgrind Memory Debugger",
+            WikiImplementationPhase::Phase10DevelopmentTools,
+            "src/open_source_obsoletion.rs",
+            timestamp,
+        );
     }
 
-    fn record_feature(&mut self, name: &str, phase: WikiImplementationPhase, source: &str, timestamp: u64) {
+    fn record_feature(
+        &mut self,
+        name: &str,
+        phase: WikiImplementationPhase,
+        source: &str,
+        timestamp: u64,
+    ) {
         self.audit_records.insert(
             name.to_string(),
             WikiFeatureAuditRecord {
@@ -133,7 +268,11 @@ impl SovereignLinuxBsdWikiMasterEngine {
         if self.audit_records.is_empty() {
             return 0;
         }
-        let implemented = self.audit_records.values().filter(|r| r.is_fully_implemented).count();
+        let implemented = self
+            .audit_records
+            .values()
+            .filter(|r| r.is_fully_implemented)
+            .count();
         ((implemented * 100) / self.audit_records.len()) as u32
     }
 
@@ -145,7 +284,11 @@ impl SovereignLinuxBsdWikiMasterEngine {
         );
 
         for record in self.audit_records.values() {
-            let status = if record.is_fully_implemented { "✅ Completed" } else { "❌ Pending" };
+            let status = if record.is_fully_implemented {
+                "✅ Completed"
+            } else {
+                "❌ Pending"
+            };
             report.push_str(&format!(
                 "- **{}**: {} | Phase: {:?} | Module: `{}`\n",
                 record.feature_name, status, record.phase, record.source_module

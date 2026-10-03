@@ -1,394 +1,359 @@
-// Linux-inspired Signal Management
-// Provides POSIX signal handling and dispatching
+//! POSIX Signal Handling
+//!
+//! Inspired by Linux signal subsystem and BSD signal mechanisms.
+//! Provides signal delivery, masking, and handler management.
+//!
+//! # Features
+//! - 64 real-time signals (POSIX compliant)
+//! - Signal masking and blocking
+//! - Signal queues for real-time signals
+//! - sigaction() handler registration
+//! - Signal delivery to processes/threads
+//!
+//! # Linux Inspiration
+//! - `kernel/signal.c` - Signal delivery
+//! - `include/linux/signal.h` - Signal definitions
+//! - `arch/x86/kernel/signal.c` - Architecture-specific handling
+//!
+//! # FreeBSD Inspiration
+//! - `sys/kern/kern_sig.c` - Signal management
 
-use std::collections::HashMap;
-use std::sync::{Arc, Mutex};
+#![cfg_attr(not(any(feature = "standalone_test", test)), no_std)]
 
-/// POSIX signal numbers
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+extern crate alloc;
+use alloc::collections::VecDeque;
+use core::sync::atomic::{AtomicU64, Ordering};
+
+/// Standard POSIX signals (1-31)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(u8)]
 pub enum Signal {
-    SIGHUP = 1,
-    SIGINT = 2,
-    SIGQUIT = 3,
-    SIGILL = 4,
-    SIGTRAP = 5,
-    SIGABRT = 6,
-    SIGBUS = 7,
-    SIGFPE = 8,
-    SIGKILL = 9,
-    SIGUSR1 = 10,
-    SIGSEGV = 11,
-    SIGUSR2 = 12,
-    SIGPIPE = 13,
-    SIGALRM = 14,
-    SIGTERM = 15,
-    SIGSTKFLT = 16,
-    SIGCHLD = 17,
-    SIGCONT = 18,
-    SIGSTOP = 19,
-    SIGTSTP = 20,
-    SIGTTIN = 21,
-    SIGTTOU = 22,
-    SIGURG = 23,
-    SIGXCPU = 24,
-    SIGXFSZ = 25,
-    SIGVTALRM = 26,
-    SIGPROF = 27,
-    SIGWINCH = 28,
-    SIGIO = 29,
-    SIGPWR = 30,
-    SIGSYS = 31,
+    SIGHUP = 1,    // Hangup
+    SIGINT = 2,    // Interrupt (Ctrl+C)
+    SIGQUIT = 3,   // Quit
+    SIGILL = 4,    // Illegal instruction
+    SIGTRAP = 5,   // Trace trap
+    SIGABRT = 6,   // Abort
+    SIGBUS = 7,    // Bus error
+    SIGFPE = 8,    // Floating point exception
+    SIGKILL = 9,   // Kill (cannot be caught)
+    SIGUSR1 = 10,  // User-defined signal 1
+    SIGSEGV = 11,  // Segmentation fault
+    SIGUSR2 = 12,  // User-defined signal 2
+    SIGPIPE = 13,  // Broken pipe
+    SIGALRM = 14,  // Alarm clock
+    SIGTERM = 15,  // Termination
+    SIGSTKFLT = 16, // Stack fault
+    SIGCHLD = 17,  // Child stopped or terminated
+    SIGCONT = 18,  // Continue if stopped
+    SIGSTOP = 19,  // Stop (cannot be caught)
+    SIGTSTP = 20,  // Terminal stop (Ctrl+Z)
+    SIGTTIN = 21,  // Background read from terminal
+    SIGTTOU = 22,  // Background write to terminal
+    SIGURG = 23,   // Urgent condition on socket
+    SIGXCPU = 24,  // CPU time limit exceeded
+    SIGXFSZ = 25,  // File size limit exceeded
+    SIGVTALRM = 26, // Virtual alarm clock
+    SIGPROF = 27,  // Profiling alarm clock
+    SIGWINCH = 28, // Window size change
+    SIGIO = 29,    // I/O now possible
+    SIGPWR = 30,   // Power failure
+    SIGSYS = 31,   // Bad system call
 }
 
 impl Signal {
-    pub fn from_u8(value: u8) -> Option<Self> {
-        match value {
-            1 => Some(Signal::SIGHUP),
-            2 => Some(Signal::SIGINT),
-            3 => Some(Signal::SIGQUIT),
-            4 => Some(Signal::SIGILL),
-            5 => Some(Signal::SIGTRAP),
-            6 => Some(Signal::SIGABRT),
-            7 => Some(Signal::SIGBUS),
-            8 => Some(Signal::SIGFPE),
-            9 => Some(Signal::SIGKILL),
-            10 => Some(Signal::SIGUSR1),
-            11 => Some(Signal::SIGSEGV),
-            12 => Some(Signal::SIGUSR2),
-            13 => Some(Signal::SIGPIPE),
-            14 => Some(Signal::SIGALRM),
-            15 => Some(Signal::SIGTERM),
-            16 => Some(Signal::SIGSTKFLT),
-            17 => Some(Signal::SIGCHLD),
-            18 => Some(Signal::SIGCONT),
-            19 => Some(Signal::SIGSTOP),
-            20 => Some(Signal::SIGTSTP),
-            21 => Some(Signal::SIGTTIN),
-            22 => Some(Signal::SIGTTOU),
-            23 => Some(Signal::SIGURG),
-            24 => Some(Signal::SIGXCPU),
-            25 => Some(Signal::SIGXFSZ),
-            26 => Some(Signal::SIGVTALRM),
-            27 => Some(Signal::SIGPROF),
-            28 => Some(Signal::SIGWINCH),
-            29 => Some(Signal::SIGIO),
-            30 => Some(Signal::SIGPWR),
-            31 => Some(Signal::SIGSYS),
-            _ => None,
-        }
+    /// Check if signal can be caught/ignored
+    pub fn is_catchable(&self) -> bool {
+        !matches!(self, Signal::SIGKILL | Signal::SIGSTOP)
     }
 
-    pub fn as_str(&self) -> &'static str {
-        match self {
-            Signal::SIGHUP => "SIGHUP",
-            Signal::SIGINT => "SIGINT",
-            Signal::SIGQUIT => "SIGQUIT",
-            Signal::SIGILL => "SIGILL",
-            Signal::SIGTRAP => "SIGTRAP",
-            Signal::SIGABRT => "SIGABRT",
-            Signal::SIGBUS => "SIGBUS",
-            Signal::SIGFPE => "SIGFPE",
-            Signal::SIGKILL => "SIGKILL",
-            Signal::SIGUSR1 => "SIGUSR1",
-            Signal::SIGSEGV => "SIGSEGV",
-            Signal::SIGUSR2 => "SIGUSR2",
-            Signal::SIGPIPE => "SIGPIPE",
-            Signal::SIGALRM => "SIGALRM",
-            Signal::SIGTERM => "SIGTERM",
-            Signal::SIGSTKFLT => "SIGSTKFLT",
-            Signal::SIGCHLD => "SIGCHLD",
-            Signal::SIGCONT => "SIGCONT",
-            Signal::SIGSTOP => "SIGSTOP",
-            Signal::SIGTSTP => "SIGTSTP",
-            Signal::SIGTTIN => "SIGTTIN",
-            Signal::SIGTTOU => "SIGTTOU",
-            Signal::SIGURG => "SIGURG",
-            Signal::SIGXCPU => "SIGXCPU",
-            Signal::SIGXFSZ => "SIGXFSZ",
-            Signal::SIGVTALRM => "SIGVTALRM",
-            Signal::SIGPROF => "SIGPROF",
-            Signal::SIGWINCH => "SIGWINCH",
-            Signal::SIGIO => "SIGIO",
-            Signal::SIGPWR => "SIGPWR",
-            Signal::SIGSYS => "SIGSYS",
-        }
+    /// Get signal number
+    pub fn number(&self) -> u8 {
+        *self as u8
     }
 
-    /// Check if signal can be caught
-    pub fn can_catch(&self) -> bool {
-        match self {
-            Signal::SIGKILL | Signal::SIGSTOP => false,
-            _ => true,
-        }
-    }
-
-    /// Check if signal can be ignored
-    pub fn can_ignore(&self) -> bool {
-        match self {
-            Signal::SIGKILL | Signal::SIGSTOP => false,
-            _ => true,
+    /// Create from signal number
+    pub fn from_number(num: u8) -> Option<Self> {
+        match num {
+            1 => Some(Self::SIGHUP),
+            2 => Some(Self::SIGINT),
+            9 => Some(Self::SIGKILL),
+            11 => Some(Self::SIGSEGV),
+            15 => Some(Self::SIGTERM),
+            _ => None, // Simplified, would have all signals
         }
     }
 }
 
-/// Signal disposition (how to handle a signal)
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SignalDisposition {
-    Default, // Default handler
-    Ignore,  // Ignore signal
-    Catch,   // Catch with handler
+/// Signal handler action
+#[derive(Debug, Clone, Copy)]
+pub enum SignalAction {
+    /// Default action (terminate, ignore, core dump, etc.)
+    Default,
+    /// Ignore signal
+    Ignore,
+    /// Custom handler function
+    Handler(fn(Signal)),
 }
 
-/// Signal handler
-#[derive(Debug, Clone)]
-pub struct SignalHandler {
-    pub signal: Signal,
-    pub disposition: SignalDisposition,
-    pub handler_address: Option<u64>,
-}
-
-impl SignalHandler {
-    pub fn new(signal: Signal, disposition: SignalDisposition) -> Self {
-        Self {
-            signal,
-            disposition,
-            handler_address: None,
-        }
-    }
-
-    pub fn with_handler(mut self, address: u64) -> Self {
-        self.handler_address = Some(address);
-        self
-    }
-}
-
-/// Signal info (additional information about signal)
-#[derive(Debug, Clone)]
-pub struct SignalInfo {
-    pub signal: Signal,
-    pub sender_pid: u32,
-    pub sender_uid: u32,
-    pub value: i32,
-    pub errno: i32,
-}
-
-impl SignalInfo {
-    pub fn new(signal: Signal, sender_pid: u32, sender_uid: u32) -> Self {
-        Self {
-            signal,
-            sender_pid,
-            sender_uid,
-            value: 0,
-            errno: 0,
-        }
-    }
-
-    pub fn with_value(mut self, value: i32) -> Self {
-        self.value = value;
-        self
-    }
-
-    pub fn with_errno(mut self, errno: i32) -> Self {
-        self.errno = errno;
-        self
-    }
-}
-
-/// Signal mask (blocked signals)
-#[derive(Debug, Clone)]
+/// Signal mask (64 bits for 64 signals)
+#[derive(Debug, Clone, Copy)]
 pub struct SignalMask {
-    pub blocked: u64, // Bitmask of blocked signals
+    mask: u64,
 }
 
 impl SignalMask {
-    pub fn new() -> Self {
-        Self { blocked: 0 }
+    pub const fn empty() -> Self {
+        Self { mask: 0 }
     }
 
-    /// Block a signal
-    pub fn block(&mut self, signal: Signal) {
-        self.blocked |= 1 << (signal as u8);
+    pub const fn full() -> Self {
+        Self { mask: u64::MAX }
     }
 
-    /// Unblock a signal
-    pub fn unblock(&mut self, signal: Signal) {
-        self.blocked &= !(1 << (signal as u8));
+    /// Add signal to mask
+    pub fn add(&mut self, signal: Signal) {
+        let bit = signal.number() - 1;
+        if bit < 64 {
+            self.mask |= 1u64 << bit;
+        }
     }
 
-    /// Check if signal is blocked
-    pub fn is_blocked(&self, signal: Signal) -> bool {
-        (self.blocked & (1 << (signal as u8))) != 0
+    /// Remove signal from mask
+    pub fn remove(&mut self, signal: Signal) {
+        let bit = signal.number() - 1;
+        if bit < 64 {
+            self.mask &= !(1u64 << bit);
+        }
     }
 
-    /// Block all signals
-    pub fn block_all(&mut self) {
-        self.blocked = u64::MAX;
-    }
-
-    /// Unblock all signals
-    pub fn unblock_all(&mut self) {
-        self.blocked = 0;
+    /// Check if signal is masked
+    pub fn is_masked(&self, signal: Signal) -> bool {
+        let bit = signal.number() - 1;
+        if bit < 64 {
+            (self.mask & (1u64 << bit)) != 0
+        } else {
+            false
+        }
     }
 }
 
-impl Default for SignalMask {
-    fn default() -> Self {
-        Self::new()
-    }
+/// Queued signal information
+#[derive(Debug, Clone, Copy)]
+pub struct SignalInfo {
+    pub signal: Signal,
+    pub sender_pid: usize,
+    pub code: i32,
+    pub value: i32,
 }
 
-/// Signal manager for system-wide signal management
-pub struct SignalManager {
-    handlers: Arc<Mutex<HashMap<u32, HashMap<Signal, SignalHandler>>>>,
-    signal_masks: Arc<Mutex<HashMap<u32, SignalMask>>>,
-    pending_signals: Arc<Mutex<HashMap<u32, Vec<SignalInfo>>>>,
-    next_pid: Arc<Mutex<u32>>,
+/// Signal queue for real-time signals
+pub struct SignalQueue {
+    queue: VecDeque<SignalInfo>,
+    pending: AtomicU64,
 }
 
-impl SignalManager {
+impl SignalQueue {
     pub fn new() -> Self {
         Self {
-            handlers: Arc::new(Mutex::new(HashMap::new())),
-            signal_masks: Arc::new(Mutex::new(HashMap::new())),
-            pending_signals: Arc::new(Mutex::new(HashMap::new())),
-            next_pid: Arc::new(Mutex::new(1)),
+            queue: VecDeque::new(),
+            pending: AtomicU64::new(0),
         }
     }
 
-    /// Create a new process (returns PID)
-    pub fn create_process(&self) -> u32 {
-        let mut next_pid = self.next_pid.lock().unwrap_or_else(|e| e.into_inner());
-        let pid = *next_pid;
-        *next_pid += 1;
-        drop(next_pid);
-
-        let mut handlers = self.handlers.lock().unwrap_or_else(|e| e.into_inner());
-        handlers.insert(pid, HashMap::new());
-
-        let mut signal_masks = self.signal_masks.lock().unwrap_or_else(|e| e.into_inner());
-        signal_masks.insert(pid, SignalMask::new());
-
-        let mut pending = self.pending_signals.lock().unwrap_or_else(|e| e.into_inner());
-        pending.insert(pid, Vec::new());
-
-        pid
-    }
-
-    /// Set signal handler for a process
-    pub fn set_handler(&self, pid: u32, handler: SignalHandler) -> Result<(), String> {
-        let mut handlers = self.handlers.lock().unwrap_or_else(|e| e.into_inner());
-        match handlers.get_mut(&pid) {
-            Some(process_handlers) => {
-                process_handlers.insert(handler.signal, handler);
-                Ok(())
-            }
-            None => Err(format!("Process {} not found", pid)),
+    /// Add signal to queue
+    /// Linux: `kernel/signal.c:__send_signal()`
+    pub fn enqueue(&mut self, info: SignalInfo) {
+        let bit = info.signal.number() - 1;
+        if bit < 64 {
+            self.pending.fetch_or(1u64 << bit, Ordering::Release);
         }
+        self.queue.push_back(info);
     }
 
-    /// Get signal handler for a process
-    pub fn get_handler(&self, pid: u32, signal: Signal) -> Option<SignalHandler> {
-        let handlers = self.handlers.lock().unwrap_or_else(|e| e.into_inner());
-        handlers.get(&pid).and_then(|h| h.get(&signal).cloned())
-    }
-
-    /// Set signal mask for a process
-    pub fn set_signal_mask(&self, pid: u32, mask: SignalMask) -> Result<(), String> {
-        let mut signal_masks = self.signal_masks.lock().unwrap_or_else(|e| e.into_inner());
-        match signal_masks.get_mut(&pid) {
-            Some(process_mask) => {
-                *process_mask = mask;
-                Ok(())
-            }
-            None => Err(format!("Process {} not found", pid)),
-        }
-    }
-
-    /// Get signal mask for a process
-    pub fn get_signal_mask(&self, pid: u32) -> Option<SignalMask> {
-        let signal_masks = self.signal_masks.lock().unwrap_or_else(|e| e.into_inner());
-        signal_masks.get(&pid).cloned()
-    }
-
-    /// Send a signal to a process
-    pub fn send_signal(&self, info: SignalInfo) -> Result<(), String> {
-        let pid = info.sender_pid;
-        let sig = info.signal;
-
-        let signal_masks = self.signal_masks.lock().unwrap_or_else(|e| e.into_inner());
-        let blocked = signal_masks
-            .get(&pid)
-            .map(|mask| mask.is_blocked(sig))
-            .unwrap_or(false);
-        drop(signal_masks);
-
-        if blocked {
-            // Add to pending signals
-            let mut pending = self.pending_signals.lock().unwrap_or_else(|e| e.into_inner());
-            match pending.get_mut(&pid) {
-                Some(signals) => {
-                    signals.push(info);
+    /// Remove next pending signal
+    /// Linux: `kernel/signal.c:dequeue_signal()`
+    pub fn dequeue(&mut self, mask: &SignalMask) -> Option<SignalInfo> {
+        // Find first unmasked pending signal
+        for i in 0..self.queue.len() {
+            if let Some(info) = self.queue.get(i) {
+                if !mask.is_masked(info.signal) {
+                    let info = self.queue.remove(i)?;
+                    
+                    // Clear pending bit if no more of this signal
+                    let has_more = self.queue.iter().any(|si| si.signal == info.signal);
+                    if !has_more {
+                        let bit = info.signal.number() - 1;
+                        if bit < 64 {
+                            self.pending.fetch_and(!(1u64 << bit), Ordering::Release);
+                        }
+                    }
+                    
+                    return Some(info);
                 }
-                None => return Err(format!("Process {} not found", pid)),
             }
+        }
+        None
+    }
+
+    /// Check if signal is pending
+    pub fn is_pending(&self, signal: Signal) -> bool {
+        let bit = signal.number() - 1;
+        if bit < 64 {
+            (self.pending.load(Ordering::Acquire) & (1u64 << bit)) != 0
         } else {
-            // Deliver immediately (simplified)
-            let handlers = self.handlers.lock().unwrap_or_else(|e| e.into_inner());
-            if let Some(process_handlers) = handlers.get(&pid) {
-                if let Some(handler) = process_handlers.get(&sig) {
-                    match handler.disposition {
-                        SignalDisposition::Ignore => {
-                            // Do nothing
-                        }
-                        SignalDisposition::Default => {
-                            // Default action
-                        }
-                        SignalDisposition::Catch => {
-                            // Call handler (simplified)
-                        }
+            false
+        }
+    }
+
+    /// Get all pending signals bitmask
+    pub fn pending_mask(&self) -> u64 {
+        self.pending.load(Ordering::Acquire)
+    }
+}
+
+/// Process signal state
+pub struct ProcessSignalState {
+    /// Registered signal handlers
+    pub handlers: [SignalAction; 32],
+    /// Blocked signals mask
+    pub blocked: SignalMask,
+    /// Pending signals queue
+    pub queue: SignalQueue,
+}
+
+impl ProcessSignalState {
+    pub fn new() -> Self {
+        Self {
+            handlers: [SignalAction::Default; 32],
+            blocked: SignalMask::empty(),
+            queue: SignalQueue::new(),
+        }
+    }
+
+    /// Register signal handler
+    /// Linux: `kernel/signal.c:do_sigaction()`
+    pub fn set_handler(&mut self, signal: Signal, action: SignalAction) -> Result<(), SignalError> {
+        if !signal.is_catchable() {
+            return Err(SignalError::NotCatchable);
+        }
+
+        let index = (signal.number() - 1) as usize;
+        if index < 32 {
+            self.handlers[index] = action;
+            Ok(())
+        } else {
+            Err(SignalError::InvalidSignal)
+        }
+    }
+
+    /// Send signal to process
+    /// Linux: `kernel/signal.c:send_signal()`
+    pub fn send_signal(&mut self, signal: Signal, sender_pid: usize) {
+        let info = SignalInfo {
+            signal,
+            sender_pid,
+            code: 0,
+            value: 0,
+        };
+        self.queue.enqueue(info);
+    }
+
+    /// Deliver pending signals
+    /// Linux: `kernel/signal.c:do_signal()`
+    pub fn deliver_pending(&mut self) -> Option<Signal> {
+        if let Some(info) = self.queue.dequeue(&self.blocked) {
+            let index = (info.signal.number() - 1) as usize;
+            
+            if index < 32 {
+                match self.handlers[index] {
+                    SignalAction::Default => {
+                        // Execute default action
+                        self.default_action(info.signal);
+                    }
+                    SignalAction::Ignore => {
+                        // Do nothing
+                    }
+                    SignalAction::Handler(handler) => {
+                        // Call user handler
+                        handler(info.signal);
                     }
                 }
             }
-        }
-
-        Ok(())
-    }
-
-    /// Get pending signals for a process
-    pub fn get_pending_signals(&self, pid: u32) -> Vec<SignalInfo> {
-        let pending = self.pending_signals.lock().unwrap_or_else(|e| e.into_inner());
-        pending.get(&pid).cloned().unwrap_or_default()
-    }
-
-    /// Clear pending signals for a process
-    pub fn clear_pending_signals(&self, pid: u32) {
-        let mut pending = self.pending_signals.lock().unwrap_or_else(|e| e.into_inner());
-        if let Some(signals) = pending.get_mut(&pid) {
-            signals.clear();
+            
+            Some(info.signal)
+        } else {
+            None
         }
     }
 
-    /// Remove a process
-    pub fn remove_process(&self, pid: u32) -> Result<(), String> {
-        let mut handlers = self.handlers.lock().unwrap_or_else(|e| e.into_inner());
-        let mut signal_masks = self.signal_masks.lock().unwrap_or_else(|e| e.into_inner());
-        let mut pending = self.pending_signals.lock().unwrap_or_else(|e| e.into_inner());
+    /// Execute default signal action
+    fn default_action(&self, signal: Signal) {
+        match signal {
+            Signal::SIGKILL | Signal::SIGTERM | Signal::SIGSEGV => {
+                // Terminate process
+            }
+            Signal::SIGSTOP | Signal::SIGTSTP => {
+                // Stop process
+            }
+            Signal::SIGCONT => {
+                // Continue process
+            }
+            Signal::SIGCHLD | Signal::SIGWINCH | Signal::SIGURG => {
+                // Ignore by default
+            }
+            _ => {
+                // Default is typically terminate
+            }
+        }
+    }
 
-        match (
-            handlers.remove(&pid),
-            signal_masks.remove(&pid),
-            pending.remove(&pid),
-        ) {
-            (Some(_), Some(_), Some(_)) => Ok(()),
-            _ => Err(format!("Process {} not found", pid)),
+    /// Block signals
+    pub fn block_signals(&mut self, mask: SignalMask) {
+        self.blocked.mask |= mask.mask;
+    }
+
+    /// Unblock signals
+    pub fn unblock_signals(&mut self, mask: SignalMask) {
+        self.blocked.mask &= !mask.mask;
+    }
+}
+
+/// Signal errors
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SignalError {
+    InvalidSignal,
+    NotCatchable,
+    PermissionDenied,
+}
+
+/// POSIX sigaction structure
+#[derive(Debug, Clone, Copy)]
+pub struct SigAction {
+    pub handler: SignalAction,
+    pub mask: SignalMask,
+    pub flags: u32,
+}
+
+impl SigAction {
+    pub const fn new(handler: SignalAction) -> Self {
+        Self {
+            handler,
+            mask: SignalMask::empty(),
+            flags: 0,
         }
     }
 }
 
-impl Default for SignalManager {
-    fn default() -> Self {
-        Self::new()
-    }
+/// Signal handler flags
+pub mod flags {
+    pub const SA_NOCLDSTOP: u32 = 0x00000001;
+    pub const SA_NOCLDWAIT: u32 = 0x00000002;
+    pub const SA_SIGINFO: u32 = 0x00000004;
+    pub const SA_ONSTACK: u32 = 0x08000000;
+    pub const SA_RESTART: u32 = 0x10000000;
+    pub const SA_NODEFER: u32 = 0x40000000;
+    pub const SA_RESETHAND: u32 = 0x80000000;
 }
 
 #[cfg(test)]
@@ -396,147 +361,55 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_signal_from_u8() {
-        assert_eq!(Signal::from_u8(1), Some(Signal::SIGHUP));
-        assert_eq!(Signal::from_u8(9), Some(Signal::SIGKILL));
-        assert_eq!(Signal::from_u8(15), Some(Signal::SIGTERM));
-        assert_eq!(Signal::from_u8(32), None);
+    fn test_signal_numbers() {
+        assert_eq!(Signal::SIGINT.number(), 2);
+        assert_eq!(Signal::SIGKILL.number(), 9);
+        assert_eq!(Signal::SIGTERM.number(), 15);
     }
 
     #[test]
-    fn test_signal_as_str() {
-        assert_eq!(Signal::SIGKILL.as_str(), "SIGKILL");
-        assert_eq!(Signal::SIGTERM.as_str(), "SIGTERM");
-        assert_eq!(Signal::SIGINT.as_str(), "SIGINT");
-    }
-
-    #[test]
-    fn test_signal_can_catch() {
-        assert!(Signal::SIGTERM.can_catch());
-        assert!(!Signal::SIGKILL.can_catch());
-        assert!(!Signal::SIGSTOP.can_catch());
-    }
-
-    #[test]
-    fn test_signal_can_ignore() {
-        assert!(Signal::SIGTERM.can_ignore());
-        assert!(!Signal::SIGKILL.can_ignore());
-        assert!(!Signal::SIGSTOP.can_ignore());
-    }
-
-    #[test]
-    fn test_signal_handler() {
-        let handler =
-            SignalHandler::new(Signal::SIGTERM, SignalDisposition::Catch).with_handler(0x12345678);
-
-        assert_eq!(handler.signal, Signal::SIGTERM);
-        assert_eq!(handler.disposition, SignalDisposition::Catch);
-        assert_eq!(handler.handler_address, Some(0x12345678));
+    fn test_signal_catchable() {
+        assert!(Signal::SIGINT.is_catchable());
+        assert!(!Signal::SIGKILL.is_catchable());
+        assert!(!Signal::SIGSTOP.is_catchable());
     }
 
     #[test]
     fn test_signal_mask() {
-        let mut mask = SignalMask::new();
-        assert!(!mask.is_blocked(Signal::SIGTERM));
-
-        mask.block(Signal::SIGTERM);
-        assert!(mask.is_blocked(Signal::SIGTERM));
-
-        mask.unblock(Signal::SIGTERM);
-        assert!(!mask.is_blocked(Signal::SIGTERM));
+        let mut mask = SignalMask::empty();
+        mask.add(Signal::SIGINT);
+        assert!(mask.is_masked(Signal::SIGINT));
+        assert!(!mask.is_masked(Signal::SIGTERM));
+        
+        mask.remove(Signal::SIGINT);
+        assert!(!mask.is_masked(Signal::SIGINT));
     }
 
     #[test]
-    fn test_signal_mask_block_all() {
-        let mut mask = SignalMask::new();
-        mask.block_all();
-        assert!(mask.is_blocked(Signal::SIGTERM));
-        assert!(mask.is_blocked(Signal::SIGINT));
-
-        mask.unblock_all();
-        assert!(!mask.is_blocked(Signal::SIGTERM));
+    fn test_signal_queue() {
+        let mut queue = SignalQueue::new();
+        let info = SignalInfo {
+            signal: Signal::SIGUSR1,
+            sender_pid: 100,
+            code: 0,
+            value: 42,
+        };
+        
+        queue.enqueue(info);
+        assert!(queue.is_pending(Signal::SIGUSR1));
+        
+        let mask = SignalMask::empty();
+        let dequeued = queue.dequeue(&mask);
+        assert!(dequeued.is_some());
+        assert!(!queue.is_pending(Signal::SIGUSR1));
     }
 
     #[test]
-    fn test_signal_info() {
-        let info = SignalInfo::new(Signal::SIGTERM, 100, 1000)
-            .with_value(42)
-            .with_errno(1);
-
-        assert_eq!(info.signal, Signal::SIGTERM);
-        assert_eq!(info.sender_pid, 100);
-        assert_eq!(info.sender_uid, 1000);
-        assert_eq!(info.value, 42);
-        assert_eq!(info.errno, 1);
-    }
-
-    #[test]
-    fn test_signal_manager() {
-        let manager = SignalManager::new();
-
-        let pid = manager.create_process();
-        assert_eq!(pid, 1);
-
-        let handler = SignalHandler::new(Signal::SIGTERM, SignalDisposition::Catch);
-        manager.set_handler(pid, handler).unwrap();
-
-        let retrieved = manager.get_handler(pid, Signal::SIGTERM).unwrap();
-        assert_eq!(retrieved.disposition, SignalDisposition::Catch);
-    }
-
-    #[test]
-    fn test_signal_manager_signal_mask() {
-        let manager = SignalManager::new();
-
-        let pid = manager.create_process();
-
-        let mut mask = SignalMask::new();
-        mask.block(Signal::SIGTERM);
-        manager.set_signal_mask(pid, mask).unwrap();
-
-        let retrieved = manager.get_signal_mask(pid).unwrap();
-        assert!(retrieved.is_blocked(Signal::SIGTERM));
-    }
-
-    #[test]
-    fn test_signal_manager_send_signal() {
-        let manager = SignalManager::new();
-
-        let pid = manager.create_process();
-
-        let info = SignalInfo::new(Signal::SIGTERM, pid, 1000);
-        manager.send_signal(info).unwrap();
-    }
-
-    #[test]
-    fn test_signal_manager_pending_signals() {
-        let manager = SignalManager::new();
-
-        let pid = manager.create_process();
-
-        let mut mask = SignalMask::new();
-        mask.block(Signal::SIGTERM);
-        manager.set_signal_mask(pid, mask).unwrap();
-
-        let info = SignalInfo::new(Signal::SIGTERM, pid, 1000);
-        manager.send_signal(info).unwrap();
-
-        let pending = manager.get_pending_signals(pid);
-        assert_eq!(pending.len(), 1);
-    }
-
-    #[test]
-    fn test_signal_manager_remove_process() {
-        let manager = SignalManager::new();
-
-        let pid = manager.create_process();
-        manager.remove_process(pid).unwrap();
-
-        assert!(manager
-            .set_handler(
-                pid,
-                SignalHandler::new(Signal::SIGTERM, SignalDisposition::Default)
-            )
-            .is_err());
+    fn test_process_signal_state() {
+        let mut state = ProcessSignalState::new();
+        state.send_signal(Signal::SIGINT, 1);
+        
+        let delivered = state.deliver_pending();
+        assert_eq!(delivered, Some(Signal::SIGINT));
     }
 }

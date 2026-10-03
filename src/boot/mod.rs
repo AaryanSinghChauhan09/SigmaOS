@@ -1,5 +1,9 @@
-// SigmaOS Boot Module
-// Firmware, PCI scanning, and early system initialization
+#![no_std]
+
+//! Boot System (GRUB2/systemd-boot/refind Inspiration)
+//! Advanced boot manager with themes, secure boot, and boot environments
+
+extern crate alloc;
 
 pub mod boot_snapshot;
 pub mod bootloader;

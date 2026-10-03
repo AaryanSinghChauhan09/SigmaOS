@@ -2,7 +2,6 @@
 // Zero-dependency Rust implementation covering Chromium Ozone Wayland PWA launchers, Wofi/Rofi fuzzy finder keybindings, NVIDIA Early KMS module flags, and Fail-Closed Sudo Expiry guards.
 
 use crate::klib::vec::Vec;
-use std::string::String;
 
 /// Chromium Ozone Wayland PWA Spec
 #[derive(Debug, Clone)]

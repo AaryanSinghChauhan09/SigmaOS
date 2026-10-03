@@ -2,7 +2,6 @@
 // This module implements strategic OS capabilities inspired by Fedora Greenboot,
 // Zorin Exec Guard, Vanilla OS ABRoot OCI transactions, and Whonix Kloak input obfuscation.
 
-use std::string::{String, ToString};
 use std::vec::Vec;
 
 // ==========================================

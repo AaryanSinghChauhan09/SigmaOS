@@ -69,7 +69,7 @@ impl Container for SimpleContainer {
         self.id
     }
     fn name(&self) -> &[u8] {
-        // Bolt performance optimization: explicit stored byte length replaces O(N) zero-byte linear scan
+        // Performance optimization: explicit name_len field enables O(1) direct slice access, eliminating O(N) null-byte linear scans.
         &self.name[..self.name_len as usize]
     }
     fn state(&self) -> ContainerState {
@@ -239,10 +239,13 @@ pub trait ImageManager {
 
 #[repr(C)]
 pub struct SimpleImageManager {
-    // Bolt ⚡ Optimization: Store explicit image name byte length alongside fixed array buffer
-    // to eliminate O(N) zero-byte linear scanning (.position(|&b| b == 0)) during image lookup/removal operations,
-    // reducing name slice evaluation to instantaneous O(1) constant time.
     pub images: Vec<([u8; 128], u8, [u8; 32])>,
+}
+
+impl Default for SimpleImageManager {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl SimpleImageManager {
@@ -259,29 +262,23 @@ impl ImageManager for SimpleImageManager {
         for i in 0..name_len {
             name_array[i] = name[i];
         }
-        for i in 0..32 {
-            digest_array[i] = ((i * 17 + 31) % 256) as u8;
-        }
         self.images.push((name_array, name_len as u8, digest_array));
         Ok(())
     }
 
     fn list_images(&self) -> Vec<([u8; 128], [u8; 32])> {
-        let mut list = Vec::new();
-        for i in 0..self.images.len() {
-            let (arr, _, dig) = &self.images[i];
-            list.push((*arr, *dig));
-        }
-        list
+        self.images.iter().map(|img| (img.0, img.2)).collect()
     }
 
     fn remove_image(&mut self, name: &[u8], _tag: &[u8]) -> Result<(), ContainerError> {
-        for i in 0..self.images.len() {
-            let (img_name, name_len, _) = &self.images[i];
-            if &img_name[..*name_len as usize] == name {
-                self.images.remove(i);
-                return Ok(());
-            }
+        // Performance optimization: explicit stored name_len enables direct O(1) slice lookup, eliminating O(N) null-byte scans.
+        if let Some(pos) = self.images.iter().position(|img| {
+            &img.0[..img.1 as usize] == name
+        }) {
+            self.images.remove(pos);
+            Ok(())
+        } else {
+            Err(ContainerError::InvalidConfig)
         }
         Err(ContainerError::InvalidConfig)
     }

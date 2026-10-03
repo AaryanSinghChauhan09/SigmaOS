@@ -3,7 +3,6 @@
 // How-To Geek, The New Stack, MarkTechPost, and Windows Central.
 
 #[cfg(not(test))]
-use alloc::format;
 #[cfg(not(test))]
 use alloc::string::String;
 #[cfg(not(test))]
@@ -12,9 +11,7 @@ use alloc::vec::Vec;
 #[cfg(test)]
 use std::format;
 #[cfg(test)]
-use std::string::String;
 #[cfg(test)]
-use std::vec::Vec;
 
 /// TechCrunch Open-Source Project Health & Startup Ecosystem Metrics
 #[derive(Debug, Clone)]

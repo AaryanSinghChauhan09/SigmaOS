@@ -1,5 +1,4 @@
 use std::format;
-use std::string::{String, ToString};
 use std::vec::Vec;
 // SigmaOS BSD Parity Implementation
 // Implements OpenBSD/FreeBSD security features and system management

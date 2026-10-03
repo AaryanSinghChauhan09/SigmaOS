@@ -20,6 +20,7 @@ pub mod ipc;
 pub mod ipc_namespace;
 pub mod mechanism;
 pub mod message;
+pub mod pipe;
 pub mod signals;
 pub mod sovereign_async_procedure_call;
 pub mod std_streams;
@@ -74,3 +75,13 @@ pub use tech_media_std_streams_synthesis::{
 pub mod binder_ring_buffer;
 pub mod zircon_channels;
 pub mod plan9_9p2000;
+pub mod posix_mq;
+pub mod sysv_ipc;
+
+pub use posix_mq::{MessageQueue as PosixMessageQueue, MqAttr, MqError, MqRegistry};
+pub use sysv_ipc::{
+    IpcPerm, IpcError, ShmRegistry, ShmSegment, ShmidDs,
+    SemRegistry, SemSet, SemidDs, SemBuf,
+    MsgRegistry, MsgQueue as SysvMsgQueue, MsqidDs,
+    IPC_CREAT, IPC_EXCL, IPC_NOWAIT, IPC_PRIVATE,
+};

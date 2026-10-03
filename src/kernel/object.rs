@@ -1,12 +1,9 @@
+use crate::klib::collections::HashMap;
 // SigmaOS Windows/Linux/BSD-Inspired Advanced Object Manager (Obp)
 // Implements advanced Object Manager namespaces, symbolic link translation,
 // driver entry contexts, dynamic unloading, and Non-Paged Pool memory tracking.
 
-use crate::klib::collections::HashMap;
 use core::sync::atomic::{AtomicUsize, Ordering};
-use std::boxed::Box;
-use std::string::{String, ToString};
-use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ObjectError {

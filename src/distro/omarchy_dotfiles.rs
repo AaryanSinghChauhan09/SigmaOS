@@ -3,7 +3,6 @@
 //! session autostart scripts, event hook triggers, custom menu extensions, and config resets.
 
 use std::collections::BTreeMap;
-use std::string::{String, ToString};
 use std::vec::Vec;
 
 /// Omarchy event hooks fired during system lifecycle events

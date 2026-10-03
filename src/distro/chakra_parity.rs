@@ -1,4 +1,3 @@
-use std::string::String;
 use std::vec::Vec;
 // SigmaOS Chakra Linux Parity Implementation
 // Implements Akabei package bundling, Kapudan configuration, and Tribe installer

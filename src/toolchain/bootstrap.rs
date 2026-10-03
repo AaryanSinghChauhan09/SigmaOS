@@ -2,8 +2,6 @@
 // Designed for toolchain compiling, Stage 1/2 bootstrapping, and secure ports auditing
 
 use crate::klib::collections::HashMap;
-use std::string::{String, ToString};
-use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BootstrapStage {

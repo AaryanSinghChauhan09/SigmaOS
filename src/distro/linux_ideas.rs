@@ -5,7 +5,6 @@
 // Zero external library dependency - all native Rust implementations
 
 use crate::klib::Vec;
-use std::string::String;
 
 // ─── 1. ARCH LINUX: Pacman-style rolling dependency resolver ──────────────────
 /// Arch-inspired: topological sort for package dependency resolution with cycle detection

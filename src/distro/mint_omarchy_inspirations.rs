@@ -3,7 +3,6 @@
 // Combines Linux Mint user experience with Omarchy security innovations
 
 use std::collections::BTreeMap;
-use std::string::String;
 use std::vec::Vec;
 
 /// Mint-inspired update manager with automatic security updates

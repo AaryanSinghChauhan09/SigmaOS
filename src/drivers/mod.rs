@@ -1,10 +1,13 @@
 // SigmaOS Drivers Module
+pub mod acpi;
 pub mod ata_bus_controller;
+pub mod block_io;
 pub mod boot_init;
 pub mod dde;
 pub mod distro_device_expansion;
 pub mod even_more_devices;
 pub mod flipper_gpio_sensor;
+pub mod framebuffer;
 pub mod gpu;
 pub mod input;
 pub mod legacy_audio_ac97;
@@ -17,9 +20,11 @@ pub mod modern_usb;
 pub mod modern_usb_printer;
 pub mod modern_wifi;
 pub mod network;
+pub mod pci_bus;
 pub mod peripheral;
 pub mod printing;
 pub mod rtc;
+pub mod rtc_cmos;
 pub mod serial;
 pub mod sovereign_comprehensive_drivers;
 pub mod sovereign_driver_lifecycle;
@@ -29,17 +34,22 @@ pub mod storage;
 pub mod touch_jingos;
 pub mod usb_hid;
 pub mod vesa;
+pub mod usb_stack;
+pub mod ethernet;
+pub mod wifi_80211;
+pub mod nvme_driver;
+pub mod ahci_sata;
+pub mod usb_hid;
+pub mod usb_mass_storage;
+pub mod usb_audio;
+pub mod usb_video;
+pub mod audio_intel_hda;
+pub mod drm_kms;
 
-pub use printing::{CupsIppPrintSpooler, LpdSpooler, PpdDriverMatcher, PrintJob, PrintJobState};
-pub use sovereign_comprehensive_drivers::*;
-
-pub use ata_bus_controller::{
-    AhciNcqSlot, AtaBusControllerEngine, AtaBusType, AtaCommand, AtaDeviceIdentity,
-    AtapiPacketCdb12, AtapiPacketDispatcher, IdeBusMasterDmaEngine, IdeChannel, IdeDriveSelect,
-    IdePioTransferEngine, IdePrdEntry, AHCI_MAX_NCQ_TAGS, ATA_SECTOR_SIZE_BYTES, ATA_STATUS_BSY,
-    ATA_STATUS_DF, ATA_STATUS_DRDY, ATA_STATUS_DRQ, ATA_STATUS_ERR,
+pub use gpu::{
+    GpuCommand, GpuCommandBuffer, GpuDriver, GpuError, GpuPipeline,
+    GpuResetState, GpuShader, ShaderStage,
 };
-pub use gpu::{GpuCommand, GpuDriver, GpuError};
 pub use input::{InputDriver, InputEvent, InputType};
 pub use legacy_audio_ac97::LegacyAudioAc97;
 pub use legacy_keyboard::LegacyKeyboard;
@@ -81,19 +91,33 @@ pub use sovereign_usb_xhci::{
 pub use storage::{StorageCommand, StorageDriver, StorageError, StorageType};
 pub use usb_hid::{HidError, HidKeyboardEvent, HidReportType, UsbHidDriver};
 pub use vesa::{VesaDriver, VesaError, VesaModeInfo};
+pub use modern_audio_intel_hda::ModernAudioIntelHda;
+pub use modern_nvme::ModernNvmeDriver;
+pub use modern_wifi::ModernWifiDriver;
+pub use touch_jingos::TouchJingosDriver;
+pub mod ethernet;
+pub mod wifi_80211;
 
-pub use distro_device_expansion::*;
+pub use usb_stack::{
+    UsbDevice, UsbDeviceDescriptor, UsbSpeed, UsbDeviceState, UsbHostController,
+    UsbSetupPacket, UsbEnumerator, UsbError, UsbTransferType, UsbDirection,
+};
+pub use ethernet::{
+    EthernetFrame, EthernetHeader, MacAddr, EtherType, NetDevice, NetDevStats,
+    E1000Device, EthernetError,
+};
+pub use wifi_80211::{
+    WifiDriver, WifiMode, WifiSecurity, WifiBand, WifiChannel, WifiStandard,
+    ChannelWidth, BssInfo, StationInfo, ScanRequest, ConnectParams,
+    WifiCapabilities, WifiError, Dot11Header, FrameType,
+};
+pub use nvme_driver::{
+    NvmeController, NvmeQueuePair, NvmeSQEntry, NvmeCQEntry, NvmeNamespace,
+    NvmeAdminOpcode, NvmeIOOpcode, NvmeError,
+};
 
-pub mod universal_device_matrix;
-pub use universal_device_matrix::*;
-
-pub mod sovereign_hardware_roadmap;
-pub use sovereign_hardware_roadmap::{
-    SigmaDriverShard, ForeignDriverOrigin, CrossOsDriverAdapter, DeclarativeDriverProfileConfig,
-    SigmaHotplugOrchestrator, DriverSandboxDomain, SigmaSandboxedHardwareModule,
-    SigmaFirmwareBridge, SigmaFirmwareFreeDriver, SecurePeripheralIsolationGuard,
-    SigmaDriverLayeringSystem, ClusterDeviceResource, SigmaDeviceClusterPool,
-    SigmaProgrammableIoStack, TargetCpuArch, CrossArchDriverPortability,
-    DriverSovereigntyPolicy, SigmaHardwarePolicyEngine, SigmaCryptographicBootChain,
-    SigmaHardwareSovereigntyRoadmapEngine,
+pub mod nvme_driver;
+pub use nvme_driver::{
+    NvmeController, NvmeQueuePair, NvmeSQEntry, NvmeCQEntry, NvmeNamespace,
+    NvmeAdminOpcode, NvmeIOOpcode, NvmeError,
 };

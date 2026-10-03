@@ -5,7 +5,6 @@ use std::vec;
 // Fedora Silverblue OSTree, Illumos/Solaris Crossbow & NetBSD RUMP, Netplan & Cloud-Init, and openSUSE YaST2 & Snapper.
 
 use std::format;
-use std::string::String;
 use std::vec::Vec;
 
 // ============================================================================

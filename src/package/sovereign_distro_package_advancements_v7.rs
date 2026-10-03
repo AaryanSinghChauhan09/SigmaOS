@@ -18,16 +18,12 @@ extern crate alloc;
 #[cfg(not(feature = "standalone_test"))]
 use std::collections::BTreeMap;
 #[cfg(not(feature = "standalone_test"))]
-use std::format;
-#[cfg(not(feature = "standalone_test"))]
 use std::string::{String, ToString};
 #[cfg(not(feature = "standalone_test"))]
 use std::vec::Vec;
 
 #[cfg(feature = "standalone_test")]
 use alloc::collections::BTreeMap;
-#[cfg(feature = "standalone_test")]
-use alloc::format;
 #[cfg(feature = "standalone_test")]
 use alloc::string::{String, ToString};
 #[cfg(feature = "standalone_test")]
@@ -426,18 +422,93 @@ impl SovereignUniversalPackageManagerInteropOrchestrator {
     pub fn strip_package_extension(filename: &str) -> &str {
         let name = filename.trim();
         let suffixes = [
-            ".pkg.tar.zst", ".pkg.tar.xz", ".pkg.tar.gz", ".openbsd.tgz", ".flatpakref",
-            ".flatpakrepo", ".tar.gz", ".tar .gz", ".tar.xz", ".tar.bz2", ".superdeb",
-            ".appimage", ".slackbuild", ".flatpak", ".nixpkg", ".portage", ".ebuild",
-            ".bottle", ".eopkg", ".ports", ".pisi", ".snap", ".lzm",
-            ".pup", ".pet", ".aab", ".apk", ".air", ".ipa", ".hap", ".app", ".deb",
-            ".udeb", ".rpm", ".drpm", ".tgz", ".txz", ".xbps", ".pkg", ".tar", ".xz",
-            ".puk", ".sfs", ".hpkg", ".tcz", ".gobo", ".moss", ".guix", ".scm",
-            ".cachy", ".cachyos", ".crux", ".p5p", ".ips", ".nar", ".spack", ".conan",
-            ".whl", ".crate", ".gem", ".nupkg", ".vcpkg", ".msi", ".msix", ".appx",
-            ".apex", ".conda", ".helm", ".sysext", ".run", ".zpk", ".kmp", ".kmod",
-            ".jar", ".npm", ".phar", ".cpan", ".rock", ".hex", ".cabal", ".jl", ".rpkg",
-            ".brew", ".wasm", ".oci", ".sigpkg", ".sigma"
+            ".pkg.tar.zst",
+            ".pkg.tar.xz",
+            ".pkg.tar.gz",
+            ".openbsd.tgz",
+            ".flatpakref",
+            ".flatpakrepo",
+            ".tar.gz",
+            ".tar .gz",
+            ".tar.xz",
+            ".tar.bz2",
+            ".superdeb",
+            ".appimage",
+            ".slackbuild",
+            ".flatpak",
+            ".nixpkg",
+            ".portage",
+            ".ebuild",
+            ".bottle",
+            ".eopkg",
+            ".ports",
+            ".pisi",
+            ".snap",
+            ".lzm",
+            ".pup",
+            ".pet",
+            ".aab",
+            ".apk",
+            ".air",
+            ".ipa",
+            ".hap",
+            ".app",
+            ".deb",
+            ".udeb",
+            ".rpm",
+            ".drpm",
+            ".tgz",
+            ".txz",
+            ".xbps",
+            ".pkg",
+            ".tar",
+            ".xz",
+            ".puk",
+            ".sfs",
+            ".hpkg",
+            ".tcz",
+            ".gobo",
+            ".moss",
+            ".guix",
+            ".scm",
+            ".cachy",
+            ".cachyos",
+            ".crux",
+            ".p5p",
+            ".ips",
+            ".nar",
+            ".spack",
+            ".conan",
+            ".whl",
+            ".crate",
+            ".gem",
+            ".nupkg",
+            ".vcpkg",
+            ".msi",
+            ".msix",
+            ".appx",
+            ".apex",
+            ".conda",
+            ".helm",
+            ".sysext",
+            ".run",
+            ".zpk",
+            ".kmp",
+            ".kmod",
+            ".jar",
+            ".npm",
+            ".phar",
+            ".cpan",
+            ".rock",
+            ".hex",
+            ".cabal",
+            ".jl",
+            ".rpkg",
+            ".brew",
+            ".wasm",
+            ".oci",
+            ".sigpkg",
+            ".sigma",
         ];
 
         let lower = name.to_lowercase();

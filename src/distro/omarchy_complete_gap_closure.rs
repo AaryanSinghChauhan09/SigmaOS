@@ -2,7 +2,6 @@
 // Zero-dependency Rust implementation covering automated dotfile git sync, Hyprland bezier animation matrix, Neovim Treesitter/LSP Mason manager, and Kitty/Starship/Fastfetch theme presets.
 
 use crate::klib::vec::Vec;
-use std::string::String;
 
 /// Dotfile Git Sync Repository State
 #[derive(Debug, Clone)]

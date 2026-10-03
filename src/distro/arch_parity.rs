@@ -5,7 +5,6 @@
 use core::cell::Cell;
 use std::collections::BTreeMap;
 use std::format;
-use std::string::{String, ToString};
 use std::vec::Vec;
 
 /// PKGBUILD representation following Arch Linux standards
@@ -853,9 +852,24 @@ impl PacmanDatabaseEngine {
         Self {
             db_path: "/var/lib/pacman".to_string(),
             sync_repos: vec![
-                PacmanRepositoryMirror { name: "core".to_string(), url: "https://geo.mirror.pkgbuild.com/core/os/x86_64".to_string(), is_multilib: false, priority: 1 },
-                PacmanRepositoryMirror { name: "extra".to_string(), url: "https://geo.mirror.pkgbuild.com/extra/os/x86_64".to_string(), is_multilib: false, priority: 2 },
-                PacmanRepositoryMirror { name: "multilib".to_string(), url: "https://geo.mirror.pkgbuild.com/multilib/os/x86_64".to_string(), is_multilib: true, priority: 3 },
+                PacmanRepositoryMirror {
+                    name: "core".to_string(),
+                    url: "https://geo.mirror.pkgbuild.com/core/os/x86_64".to_string(),
+                    is_multilib: false,
+                    priority: 1,
+                },
+                PacmanRepositoryMirror {
+                    name: "extra".to_string(),
+                    url: "https://geo.mirror.pkgbuild.com/extra/os/x86_64".to_string(),
+                    is_multilib: false,
+                    priority: 2,
+                },
+                PacmanRepositoryMirror {
+                    name: "multilib".to_string(),
+                    url: "https://geo.mirror.pkgbuild.com/multilib/os/x86_64".to_string(),
+                    is_multilib: true,
+                    priority: 3,
+                },
             ],
             installed_packages: BTreeMap::new(),
         }
@@ -907,8 +921,22 @@ impl AurPackageClient {
 
     pub fn search_aur(&mut self, query: &str) -> Vec<AurPackage> {
         let matches = vec![
-            AurPackage { id: 101, name: format!("{}-git", query), version: "1.0.0.r1".to_string(), description: format!("AUR package for {}", query), num_votes: 120, popularity: 42 },
-            AurPackage { id: 102, name: format!("{}-bin", query), version: "1.0.0".to_string(), description: format!("Prebuilt binary for {}", query), num_votes: 85, popularity: 28 },
+            AurPackage {
+                id: 101,
+                name: format!("{}-git", query),
+                version: "1.0.0.r1".to_string(),
+                description: format!("AUR package for {}", query),
+                num_votes: 120,
+                popularity: 42,
+            },
+            AurPackage {
+                id: 102,
+                name: format!("{}-bin", query),
+                version: "1.0.0".to_string(),
+                description: format!("Prebuilt binary for {}", query),
+                num_votes: 85,
+                popularity: 28,
+            },
         ];
         self.cached_packages.extend(matches.clone());
         matches
@@ -929,10 +957,26 @@ impl GnuCoreutilsParitySuite {
     pub fn new() -> Self {
         Self {
             supported_commands: vec![
-                "ls".to_string(), "cat".to_string(), "grep".to_string(), "sort".to_string(), "find".to_string(),
-                "file".to_string(), "head".to_string(), "tail".to_string(), "cut".to_string(), "paste".to_string(),
-                "wc".to_string(), "tr".to_string(), "stat".to_string(), "df".to_string(), "du".to_string(),
-                "uptime".to_string(), "uniq".to_string(), "base64".to_string(), "md5sum".to_string(), "sha256sum".to_string(),
+                "ls".to_string(),
+                "cat".to_string(),
+                "grep".to_string(),
+                "sort".to_string(),
+                "find".to_string(),
+                "file".to_string(),
+                "head".to_string(),
+                "tail".to_string(),
+                "cut".to_string(),
+                "paste".to_string(),
+                "wc".to_string(),
+                "tr".to_string(),
+                "stat".to_string(),
+                "df".to_string(),
+                "du".to_string(),
+                "uptime".to_string(),
+                "uniq".to_string(),
+                "base64".to_string(),
+                "md5sum".to_string(),
+                "sha256sum".to_string(),
             ],
         }
     }
@@ -962,9 +1006,18 @@ impl ShellBuiltinsSuite {
     pub fn new() -> Self {
         Self {
             builtins: vec![
-                "cd".to_string(), "pwd".to_string(), "history".to_string(), "jobs".to_string(),
-                "fg".to_string(), "bg".to_string(), "export".to_string(), "unset".to_string(),
-                "alias".to_string(), "unalias".to_string(), "read".to_string(), "echo".to_string(),
+                "cd".to_string(),
+                "pwd".to_string(),
+                "history".to_string(),
+                "jobs".to_string(),
+                "fg".to_string(),
+                "bg".to_string(),
+                "export".to_string(),
+                "unset".to_string(),
+                "alias".to_string(),
+                "unalias".to_string(),
+                "read".to_string(),
+                "echo".to_string(),
             ],
         }
     }

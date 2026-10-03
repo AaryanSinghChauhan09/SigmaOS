@@ -13,9 +13,7 @@ use std::collections::BTreeMap;
 use std::collections::BTreeMap;
 
 #[cfg(target_os = "none")]
-use std::string::{String, ToString};
 #[cfg(not(target_os = "none"))]
-use std::string::{String, ToString};
 
 #[cfg(target_os = "none")]
 use std::vec::Vec;

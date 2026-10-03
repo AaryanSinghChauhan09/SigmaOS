@@ -158,10 +158,6 @@ impl WikiDataTransferEngine {
         engine
     }
 
-    pub fn total_synced_specs(&self) -> u32 {
-        self.total_synced_to_wiki
-    }
-
     fn seed_known_feature_md_files(&mut self) {
         self.feature_specs.insert(
             "UniversalPackageSystem".to_string(),
@@ -185,9 +181,11 @@ impl WikiDataTransferEngine {
             },
         );
 
-        self.register_spec_file("ROADMAP.md", "SigmaOS Master Development Roadmap", true);
         self.register_spec_file("UniversalPackageSystem", "Universal Package System", true);
         self.register_spec_file("Roadmap11Deployment", "Roadmap 11 Deployment", true);
+        self.register_spec_file("ROADMAP.md", "SigmaOS Master Development Roadmap", true);
+        self.register_spec_file("UniversalPackageSystem", "Universal Package System Spec", true);
+        self.register_spec_file("Roadmap11Deployment", "11-Roadmap Deployment Spec", true);
     }
 
     pub fn register_spec_file(&mut self, filename: &str, title: &str, fully_implemented: bool) {
@@ -214,6 +212,10 @@ impl WikiDataTransferEngine {
         }
 
         Err("Specification key not found")
+    }
+
+    pub fn total_synced_specs(&self) -> u32 {
+        self.total_synced_to_wiki
     }
 }
 
@@ -250,8 +252,7 @@ impl SovereignTaskAndWikiGovernanceSuite {
             return false;
         }
 
-        self.wiki_engine.transfer_implemented_data_to_wiki("UniversalPackageSystem").is_ok()
-            && self.wiki_engine.transfer_implemented_data_to_wiki("Roadmap11Deployment").is_ok()
+        self.wiki_engine.transfer_implemented_data_to_wiki("ROADMAP.md").is_ok()
     }
 }
 
@@ -287,7 +288,7 @@ mod tests {
             .transfer_implemented_data_to_wiki("ROADMAP.md")
             .unwrap();
         assert!(path.contains("wiki_repo/"));
-        assert_eq!(sync.total_synced_specs(), 1);
+        assert_eq!(sync.total_synced_to_wiki, 1);
 
         sync.register_spec_file("DRAFT.md", "Draft Feature", false);
         assert!(sync.transfer_implemented_data_to_wiki("DRAFT.md").is_err());

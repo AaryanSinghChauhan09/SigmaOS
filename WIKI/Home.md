@@ -43,6 +43,16 @@ Firmware → Bootloader → Kernel Init → Memory Manager → Scheduler →
 
 ---
 
+## 🗺️ Component Future Development Roadmaps
+
+- 🔬 [Kernel & Core Subsystems Roadmap](17-Roadmap-Kernel-and-Core-Subsystems.md)
+- 💾 [Filesystems & Storage Subsystems Roadmap](18-Roadmap-Filesystems-and-Storage.md)
+- 🌐 [Networking & Post-Quantum Security Roadmap](19-Roadmap-Networking-and-Security.md)
+- 🖥️ [Desktop GUI & Userland Tooling Roadmap](20-Roadmap-Desktop-GUI-and-Userland.md)
+- 📦 [Package Management & App Ecosystem Roadmap](21-Roadmap-Package-Management-and-App-Ecosystem.md)
+
+---
+
 ## 🏗️ Architecture
 
 ```
@@ -306,7 +316,7 @@ git push origin feature/your-feature
 
 | Document | Description |
 |----------|-------------|
-| [SOVEREIGN_OS_ULTRA_ENCYCLOPEDIA_V40.md](../docs/SOVEREIGN_OS_ABSOLUTE_OMNIPRESENT_SELF_SUFFICIENCY_ULTRA_ENCYCLOPEDIA_V40.md) | Absolute Omnipresent Self-Sufficiency Ultra Encyclopedia V40 |
+| [SOVEREIGN_OS_ULTRA_ENCYCLOPEDIA_V41.md](../docs/SOVEREIGN_OS_ABSOLUTE_OMNIPRESENT_SELF_SUFFICIENCY_ULTRA_ENCYCLOPEDIA_V41.md) | Absolute Omnipresent Self-Sufficiency Ultra Encyclopedia V41 |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Detailed system architecture guide |
 | [docs/PRODUCT_VISION.md](docs/PRODUCT_VISION.md) | Product vision and manifesto |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Master execution roadmap |

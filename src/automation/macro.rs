@@ -12,21 +12,14 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::format;
-
-// (no_std only applicable at crate root - removed)
-// #![no_main]  // crate-root only
+use std::boxed::Box;
+use std::vec::Vec;
 
 /// OOP-based Macro Recorder for SigmaOS
 /// Based on Ideas-999-Structured: Automation & Scripting Item 866
 /// Implements macro recording and playback
 
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type MacroID = usize;
 
@@ -38,12 +31,14 @@ pub trait Macro {
     fn id(&self) -> MacroID;
     fn name(&self) -> &[u8];
     fn actions(&self) -> u32;
+    fn record_action(&self);
 }
 
 #[repr(C)]
 pub struct SimpleMacro {
     pub id: MacroID,
     pub name: [u8; 64],
+    pub name_len: u8,
     pub actions: AtomicUsize,
 }
 
@@ -57,6 +52,7 @@ impl SimpleMacro {
         SimpleMacro {
             id,
             name: name_array,
+            name_len: name_len as u8,
             actions: AtomicUsize::new(0),
         }
     }
@@ -65,10 +61,13 @@ impl SimpleMacro {
 impl Macro for SimpleMacro {
     fn id(&self) -> MacroID { self.id }
     fn name(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
-        &self.name[..len]
+        // Bolt ⚡ Optimization: Store explicit name length on instantiation to eliminate
+        // O(N) zero-byte linear scanning (.position(|&b| b == 0)) on every macro name query,
+        // reducing slice retrieval to instantaneous O(1) constant time.
+        &self.name[..self.name_len as usize]
     }
     fn actions(&self) -> u32 { self.actions.load(Ordering::SeqCst) as u32 }
+    fn record_action(&self) { self.actions.fetch_add(1, Ordering::SeqCst); }
 }
 
 pub trait MacroRecorder {
@@ -98,8 +97,8 @@ impl SimpleMacroRecorder {
 impl MacroRecorder for SimpleMacroRecorder {
     fn start_recording(&mut self, name: &[u8]) -> Result<MacroID, MacroError> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
-        let macro = SimpleMacro::new(id, name);
-        self.macros.push(Some(Box::new(macro)));
+        let r#macro = SimpleMacro::new(id, name);
+        self.macros.push(Some(Box::new(r#macro)));
         self.recording.store(id, Ordering::SeqCst);
         Ok(id)
     }
@@ -113,11 +112,11 @@ impl MacroRecorder for SimpleMacroRecorder {
         }
     }
     
-    fn record_action(&mut self, _id: MacroID, _action: u32) -> Result<(), MacroError> {
+    fn record_action(&mut self, id: MacroID, _action: u32) -> Result<(), MacroError> {
         for macro_option in &mut self.macros {
-            if let Some(ref mut macro) = *macro_option {
-                if macro.id() == id {
-                    macro.actions.fetch_add(1, Ordering::SeqCst);
+            if let Some(ref mut r#macro) = *macro_option {
+                if r#macro.id() == id {
+                    r#macro.record_action();
                     return Ok(());
                 }
             }
@@ -159,72 +158,32 @@ impl MacroPlayer for SimpleMacroPlayer {
     fn is_playing(&self) -> bool { self.playing.load(Ordering::SeqCst) == 1 }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_simple_macro_cached_name_length() {
+        let m = SimpleMacro::new(1, b"record_keystrokes");
+        assert_eq!(m.id(), 1);
+        assert_eq!(m.name(), b"record_keystrokes");
+        assert_eq!(m.actions(), 0);
     }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+    #[test]
+    fn test_simple_macro_recorder_and_player() {
+        let mut recorder = SimpleMacroRecorder::new();
+        let macro_id = recorder.start_recording(b"play_macro").unwrap();
+        assert_eq!(macro_id, 1);
 
+        assert!(recorder.stop_recording(macro_id).is_ok());
 
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::Deref;
-        self.deref().iter()
-    }
-}
-
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
+        let mut player = SimpleMacroPlayer::new();
+        assert!(!player.is_playing());
+        player.play(macro_id).unwrap();
+        assert!(player.is_playing());
+        player.stop();
+        assert!(!player.is_playing());
     }
 }

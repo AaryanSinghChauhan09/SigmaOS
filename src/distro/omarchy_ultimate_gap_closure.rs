@@ -1,7 +1,6 @@
 // SigmaOS Omarchy Ultimate Gap Closure Engine
 // Inspired by Omarchy 1.1.0 and Omarchy Quattro: QuickShell QML/JSON status bar, Herdr multi-agent AI orchestrator, Factory Reset guardian with Btrfs/Snapper, and hardware quirk adapters (ASUS ROG, Framework 16, BE211 Wi-Fi 7).
 
-use std::string::String;
 use std::vec::Vec;
 
 /// QuickShell Status Bar Widget Type

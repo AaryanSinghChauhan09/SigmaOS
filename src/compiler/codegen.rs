@@ -3,7 +3,6 @@
 // Targets System V AMD64 ABI for self-hosting on SigmaOS.
 
 extern crate alloc;
-use alloc::format;
 use alloc::string::String;
 use alloc::vec::Vec;
 

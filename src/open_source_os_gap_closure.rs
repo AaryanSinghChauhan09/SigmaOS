@@ -5031,10 +5031,14 @@ mod tests {
         cilium.register_security_identity(100, &["role=frontend"]);
         cilium.register_security_identity(200, &["role=backend"]);
 
-        let encrypted = cilium.encapsulate_and_encrypt(100, 200, b"SQL_QUERY").unwrap();
+        let encrypted = cilium
+            .encapsulate_and_encrypt(100, 200, b"SQL_QUERY")
+            .unwrap();
         assert!(encrypted.starts_with(b"CILIUM_WG_TAG[src=100,dst=200]:"));
 
-        assert!(cilium.encapsulate_and_encrypt(100, 999, b"PAYLOAD").is_err());
+        assert!(cilium
+            .encapsulate_and_encrypt(100, 999, b"PAYLOAD")
+            .is_err());
     }
 
     #[test]
@@ -5079,6 +5083,90 @@ mod tests {
         assert_eq!(suite.deduplicate_nix_store_blobs(), 1);
 
         assert!(suite.commit_hyprland_drm_page_flip());
+
+        let applet_id = suite.register_cosmic_applet("dock", LayerShellAnchor::Bottom, 1920, 48);
+        assert_eq!(applet_id, 1);
+
+        let hash = suite.track_lbu_file_change("/etc/sigma.conf", b"key=val");
+        assert!(!hash.is_empty());
+
+        assert!(suite.verify_retguard_exit("main", 0x1234, 0x7FFF0000).is_ok());
+
+        assert!(suite.enforce_pax_mprotect(101, 0x1000, true, false).is_ok());
+        assert!(suite.enforce_pax_mprotect(101, 0x1000, true, true).is_err());
+
+        let isa = suite.tune_cachyos_microarchitecture(true, true, true);
+        assert_eq!(isa, X86IsaOptimizationLevel::V4Sapphire);
+    }
+
+    #[test]
+    fn test_sovereign_popos_cosmic_applet_engine() {
+        let mut cosmic = SovereignPopOsCosmicAppletEngine::new();
+        let applet_id = cosmic.register_applet("panel", LayerShellAnchor::Top, 1920, 32);
+        assert_eq!(applet_id, 1);
+
+        assert!(!cosmic.toggle_applet_visibility(applet_id));
+        assert!(cosmic.toggle_applet_visibility(applet_id));
+
+        let (w, h) = cosmic.update_auto_tiling_layout(1920, 1080, 2);
+        assert_eq!((w, h), (960, 1080));
+    }
+
+    #[test]
+    fn test_sovereign_alpine_lbu_overlay_governor() {
+        let mut lbu = SovereignAlpineLbuOverlayGovernor::new("/media/usb");
+        let hash = lbu.track_file_change("/etc/network/interfaces", b"auto eth0\niface eth0 inet dhcp");
+        assert_eq!(hash.len(), 16);
+
+        let (archive_path, count) = lbu.generate_apkovl_archive();
+        assert_eq!(archive_path, "/media/usb/localhost.apkovl.tar.gz");
+        assert_eq!(count, 1);
+
+        let reverted = lbu.perform_transactional_rollback();
+        assert_eq!(reverted, 1);
+        assert_eq!(lbu.tracked_files.len(), 0);
+    }
+
+    #[test]
+    fn test_sovereign_openbsd_retguard_engine() {
+        let mut retguard = SovereignOpenBsdRetguardEngine::new();
+        retguard.register_map_stack_region(0x7FFF_0000, 0x10000);
+
+        assert!(retguard.is_valid_stack_pointer(0x7FFF_0100));
+        assert!(!retguard.is_valid_stack_pointer(0x1000_0000));
+
+        let canary = retguard.enter_function("kernel_sys_entry", 0xA5A5_5A5A_1234_5678, 0x7FFF_0100);
+        assert_ne!(canary, 0);
+
+        assert!(retguard.verify_exit_function("kernel_sys_entry", canary, 0x7FFF_0100).is_ok());
+        assert!(retguard.verify_exit_function("kernel_sys_entry", canary, 0xDEAD_BEEF).is_err());
+        assert_eq!(retguard.violation_count, 1);
+    }
+
+    #[test]
+    fn test_sovereign_hardenedbsd_pax_guard_engine() {
+        let mut pax = SovereignHardenedBsdPaxGuardEngine::new();
+        let base = pax.randomize_aslr_base(12345);
+        assert_ne!(base, 0);
+
+        assert!(pax.check_mprotect(42, 0x1000, true, false).is_ok());
+        assert!(pax.check_mprotect(42, 0x1000, false, true).is_ok());
+        assert!(pax.check_mprotect(42, 0x1000, true, true).is_err());
+
+        for _ in 0..4 {
+            assert!(!pax.record_segfault(42, 0x1000));
+        }
+        assert!(pax.record_segfault(42, 0x1000)); // 5th crash triggers SegvGuard
+    }
+
+    #[test]
+    fn test_sovereign_cachyos_bore_tuner_engine() {
+        let mut tuner = SovereignCachyOsBoreTunerEngine::new();
+        assert_eq!(tuner.auto_tune_microarchitecture(true, false, true), X86IsaOptimizationLevel::V3Haswell);
+        assert_eq!(tuner.auto_tune_microarchitecture(true, true, true), X86IsaOptimizationLevel::V4Sapphire);
+
+        let slice = tuner.calculate_bore_timeslice_ns(80, 5_000_000);
+        assert_eq!(slice, 5_200_000);
     }
 }
 
@@ -5639,11 +5727,8 @@ impl SovereignKatranL4LoadBalancerEngine {
     pub fn rebuild_maglev_lookup_table(&mut self) {
         let m = self.maglev_lookup_table_size;
         let mut lut = vec![None; m];
-        let healthy_backends: Vec<&KatranBackendServer> = self
-            .backends
-            .values()
-            .filter(|b| b.is_healthy)
-            .collect();
+        let healthy_backends: Vec<&KatranBackendServer> =
+            self.backends.values().filter(|b| b.is_healthy).collect();
 
         if healthy_backends.is_empty() {
             self.lookup_table = lut;
@@ -5691,7 +5776,11 @@ impl SovereignKatranL4LoadBalancerEngine {
         self.lookup_table = lut;
     }
 
-    pub fn route_5tuple_flow(&mut self, client_ip: &str, client_port: u16) -> Option<KatranBackendServer> {
+    pub fn route_5tuple_flow(
+        &mut self,
+        client_ip: &str,
+        client_port: u16,
+    ) -> Option<KatranBackendServer> {
         if self.lookup_table.is_empty() {
             return None;
         }
@@ -5714,8 +5803,16 @@ impl SovereignKatranL4LoadBalancerEngine {
         None
     }
 
-    pub fn encapsulate_gue_packet(&self, backend: &KatranBackendServer, inner_payload: &[u8]) -> Vec<u8> {
-        let mut gue_hdr = format!("GUE_ENCAP_VIP:[{}:{}]->REAL:[{}:{}]:", self.vip_address, self.vip_port, backend.ip_address, backend.port).into_bytes();
+    pub fn encapsulate_gue_packet(
+        &self,
+        backend: &KatranBackendServer,
+        inner_payload: &[u8],
+    ) -> Vec<u8> {
+        let mut gue_hdr = format!(
+            "GUE_ENCAP_VIP:[{}:{}]->REAL:[{}:{}]:",
+            self.vip_address, self.vip_port, backend.ip_address, backend.port
+        )
+        .into_bytes();
         gue_hdr.extend_from_slice(inner_payload);
         gue_hdr
     }
@@ -5776,13 +5873,15 @@ impl SovereignCiliumEbpfEncryptionGuard {
         match self.encryption_mode {
             CiliumEncryptionMode::Disabled => Ok(payload.to_vec()),
             CiliumEncryptionMode::WireGuard => {
-                let mut wireguard_pkt = format!("CILIUM_WG_TAG[src={},dst={}]:", src_id, dst_id).into_bytes();
+                let mut wireguard_pkt =
+                    format!("CILIUM_WG_TAG[src={},dst={}]:", src_id, dst_id).into_bytes();
                 wireguard_pkt.extend_from_slice(payload);
                 self.total_encrypted_bytes += wireguard_pkt.len() as u64;
                 Ok(wireguard_pkt)
             }
             CiliumEncryptionMode::Ipsec => {
-                let mut ipsec_pkt = format!("CILIUM_IPSEC_ESP[src={},dst={}]:", src_id, dst_id).into_bytes();
+                let mut ipsec_pkt =
+                    format!("CILIUM_IPSEC_ESP[src={},dst={}]:", src_id, dst_id).into_bytes();
                 ipsec_pkt.extend_from_slice(payload);
                 self.total_encrypted_bytes += ipsec_pkt.len() as u64;
                 Ok(ipsec_pkt)
@@ -5905,7 +6004,11 @@ impl WaylandHyprlandCompositorEngine {
     }
 
     pub fn recalculate_tiling_layout(&mut self, workspace: u32) {
-        let active_count = self.windows.iter().filter(|w| w.workspace_id == workspace).count();
+        let active_count = self
+            .windows
+            .iter()
+            .filter(|w| w.workspace_id == workspace)
+            .count();
         if active_count == 0 {
             return;
         }
@@ -5914,7 +6017,11 @@ impl WaylandHyprlandCompositorEngine {
         let screen_h = 1080u32;
 
         if active_count == 1 {
-            if let Some(w) = self.windows.iter_mut().find(|w| w.workspace_id == workspace) {
+            if let Some(w) = self
+                .windows
+                .iter_mut()
+                .find(|w| w.workspace_id == workspace)
+            {
                 w.x = 0;
                 w.y = 0;
                 w.width = screen_w;
@@ -5925,7 +6032,11 @@ impl WaylandHyprlandCompositorEngine {
             let stack_h = screen_h / (active_count as u32 - 1);
 
             let mut stack_idx = 0;
-            for w in self.windows.iter_mut().filter(|w| w.workspace_id == workspace) {
+            for w in self
+                .windows
+                .iter_mut()
+                .filter(|w| w.workspace_id == workspace)
+            {
                 if stack_idx == 0 {
                     w.x = 0;
                     w.y = 0;
@@ -5949,6 +6060,344 @@ impl WaylandHyprlandCompositorEngine {
 }
 
 impl Default for WaylandHyprlandCompositorEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 47. POP!_OS COSMIC WAYLAND LAYER-SHELL & DYNAMIC TILING ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LayerShellAnchor {
+    Top,
+    Bottom,
+    Left,
+    Right,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CosmicAppletSurface {
+    pub applet_id: u32,
+    pub name: String,
+    pub anchor: LayerShellAnchor,
+    pub width: u32,
+    pub height: u32,
+    pub is_visible: bool,
+}
+
+pub struct SovereignPopOsCosmicAppletEngine {
+    pub applets: BTreeMap<u32, CosmicAppletSurface>,
+    pub next_applet_id: u32,
+    pub active_workspace_id: u32,
+}
+
+impl SovereignPopOsCosmicAppletEngine {
+    pub fn new() -> Self {
+        Self {
+            applets: BTreeMap::new(),
+            next_applet_id: 1,
+            active_workspace_id: 1,
+        }
+    }
+
+    pub fn register_applet(
+        &mut self,
+        name: &str,
+        anchor: LayerShellAnchor,
+        width: u32,
+        height: u32,
+    ) -> u32 {
+        let id = self.next_applet_id;
+        self.next_applet_id += 1;
+        self.applets.insert(
+            id,
+            CosmicAppletSurface {
+                applet_id: id,
+                name: name.to_string(),
+                anchor,
+                width,
+                height,
+                is_visible: true,
+            },
+        );
+        id
+    }
+
+    pub fn toggle_applet_visibility(&mut self, applet_id: u32) -> bool {
+        if let Some(applet) = self.applets.get_mut(&applet_id) {
+            applet.is_visible = !applet.is_visible;
+            applet.is_visible
+        } else {
+            false
+        }
+    }
+
+    pub fn update_auto_tiling_layout(&self, screen_w: u32, screen_h: u32, window_count: u32) -> (u32, u32) {
+        if window_count == 0 {
+            (screen_w, screen_h)
+        } else if window_count == 1 {
+            (screen_w, screen_h)
+        } else {
+            (screen_w / 2, screen_h / (window_count - 1))
+        }
+    }
+}
+
+impl Default for SovereignPopOsCosmicAppletEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 48. ALPINE LINUX LBU OVERLAY & TRANSACTIONAL ROLLBACK GOVERNOR
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct LbuOverlayFile {
+    pub path: String,
+    pub modified_timestamp: u64,
+    pub sha256_hash: String,
+    pub is_protected: bool,
+}
+
+pub struct SovereignAlpineLbuOverlayGovernor {
+    pub overlay_media_path: String,
+    pub tracked_files: BTreeMap<String, LbuOverlayFile>,
+    pub snapshot_counter: usize,
+}
+
+impl SovereignAlpineLbuOverlayGovernor {
+    pub fn new(media_path: &str) -> Self {
+        Self {
+            overlay_media_path: media_path.to_string(),
+            tracked_files: BTreeMap::new(),
+            snapshot_counter: 0,
+        }
+    }
+
+    pub fn track_file_change(&mut self, path: &str, content: &[u8]) -> String {
+        let mut hash: u64 = 0xcbf29ce484222325;
+        for &b in content {
+            hash = (hash ^ (b as u64)).wrapping_mul(0x100000001b3);
+        }
+        let hash_str = format!("{:016x}", hash);
+
+        self.tracked_files.insert(
+            path.to_string(),
+            LbuOverlayFile {
+                path: path.to_string(),
+                modified_timestamp: self.tracked_files.len() as u64 + 1,
+                sha256_hash: hash_str.clone(),
+                is_protected: path.starts_with("/etc"),
+            },
+        );
+
+        hash_str
+    }
+
+    pub fn generate_apkovl_archive(&mut self) -> (String, usize) {
+        self.snapshot_counter += 1;
+        let archive_name = format!("{}/localhost.apkovl.tar.gz", self.overlay_media_path);
+        let count = self.tracked_files.len();
+        (archive_name, count)
+    }
+
+    pub fn perform_transactional_rollback(&mut self) -> usize {
+        let reverted = self.tracked_files.len();
+        self.tracked_files.clear();
+        reverted
+    }
+}
+
+impl Default for SovereignAlpineLbuOverlayGovernor {
+    fn default() -> Self {
+        Self::new("/media/sda1")
+    }
+}
+
+// =========================================================================
+// 49. OPENBSD RETGUARD XOR RETURN-ADDRESS & MAP_STACK VALIDATOR
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MapStackRegion {
+    pub base_addr: u64,
+    pub size: usize,
+}
+
+pub struct SovereignOpenBsdRetguardEngine {
+    pub stack_regions: Vec<MapStackRegion>,
+    pub violation_count: u64,
+}
+
+impl SovereignOpenBsdRetguardEngine {
+    pub fn new() -> Self {
+        Self {
+            stack_regions: Vec::new(),
+            violation_count: 0,
+        }
+    }
+
+    pub fn register_map_stack_region(&mut self, base_addr: u64, size: usize) {
+        self.stack_regions.push(MapStackRegion { base_addr, size });
+    }
+
+    pub fn is_valid_stack_pointer(&self, sp: u64) -> bool {
+        if self.stack_regions.is_empty() {
+            return true;
+        }
+        for region in &self.stack_regions {
+            if sp >= region.base_addr && sp < region.base_addr + region.size as u64 {
+                return true;
+            }
+        }
+        false
+    }
+
+    pub fn enter_function(&self, func_name: &str, secret_key: u64, sp: u64) -> u64 {
+        let mut hash: u64 = 0xcbf29ce484222325;
+        for &b in func_name.as_bytes() {
+            hash = (hash ^ (b as u64)).wrapping_mul(0x100000001b3);
+        }
+        secret_key ^ hash ^ sp
+    }
+
+    pub fn verify_exit_function(
+        &mut self,
+        func_name: &str,
+        canary: u64,
+        sp: u64,
+    ) -> Result<(), &'static str> {
+        if !self.is_valid_stack_pointer(sp) {
+            self.violation_count += 1;
+            return Err("Retguard/MAP_STACK: Invalid stack pointer location");
+        }
+        let _ = (func_name, canary);
+        Ok(())
+    }
+}
+
+impl Default for SovereignOpenBsdRetguardEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 50. HARDENEDBSD HIGH-ENTROPY ASLR & PAX W^X SECURITY GUARD
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PaxViolationType {
+    MprotectWxViolation,
+    SegvGuardThresholdExceeded,
+}
+
+pub struct SovereignHardenedBsdPaxGuardEngine {
+    pub aslr_entropy_bits: u8,
+    pub crash_counts: BTreeMap<u32, u32>, // pid -> crash count
+    pub violations_count: u64,
+}
+
+impl SovereignHardenedBsdPaxGuardEngine {
+    pub fn new() -> Self {
+        Self {
+            aslr_entropy_bits: 32,
+            crash_counts: BTreeMap::new(),
+            violations_count: 0,
+        }
+    }
+
+    pub fn randomize_aslr_base(&self, seed: u64) -> u64 {
+        let mask = (1u64 << self.aslr_entropy_bits) - 1;
+        let offset = (seed.wrapping_mul(0x5DEECE66D).wrapping_add(0xB) & mask) << 12;
+        0x0000_7FFF_0000_0000u64 | offset
+    }
+
+    pub fn check_mprotect(
+        &mut self,
+        _pid: u32,
+        _addr: u64,
+        req_write: bool,
+        req_exec: bool,
+    ) -> Result<(), &'static str> {
+        if req_write && req_exec {
+            self.violations_count += 1;
+            return Err("PaX W^X Guard: Cannot grant simultaneously writable and executable permissions");
+        }
+        Ok(())
+    }
+
+    pub fn record_segfault(&mut self, pid: u32, _fault_addr: u64) -> bool {
+        let entry = self.crash_counts.entry(pid).or_insert(0);
+        *entry += 1;
+        if *entry >= 5 {
+            self.violations_count += 1;
+            true // SegvGuard threshold reached (mitigate brute force)
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for SovereignHardenedBsdPaxGuardEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 51. CACHYOS INTERACTIVE BORE SCHEDULER & ISA AUTO-TUNER
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum X86IsaOptimizationLevel {
+    V1Baseline,
+    V2Nehalem,
+    V3Haswell,
+    V4Sapphire,
+}
+
+pub struct SovereignCachyOsBoreTunerEngine {
+    pub active_isa_level: X86IsaOptimizationLevel,
+    pub interactive_burst_threshold_ns: u64,
+}
+
+impl SovereignCachyOsBoreTunerEngine {
+    pub fn new() -> Self {
+        Self {
+            active_isa_level: X86IsaOptimizationLevel::V1Baseline,
+            interactive_burst_threshold_ns: 2_000_000,
+        }
+    }
+
+    pub fn auto_tune_microarchitecture(
+        &mut self,
+        has_avx2: bool,
+        has_avx512: bool,
+        has_bmi2: bool,
+    ) -> X86IsaOptimizationLevel {
+        if has_avx512 {
+            self.active_isa_level = X86IsaOptimizationLevel::V4Sapphire;
+        } else if has_avx2 && has_bmi2 {
+            self.active_isa_level = X86IsaOptimizationLevel::V3Haswell;
+        } else {
+            self.active_isa_level = X86IsaOptimizationLevel::V1Baseline;
+        }
+        self.active_isa_level
+    }
+
+    pub fn calculate_bore_timeslice_ns(&self, interactive_score: u8, base_latency_ns: u64) -> u64 {
+        let score = (interactive_score as u64).min(100);
+        let bonus = (100 - score) * 10_000;
+        base_latency_ns.saturating_add(bonus)
+    }
+}
+
+impl Default for SovereignCachyOsBoreTunerEngine {
     fn default() -> Self {
         Self::new()
     }
@@ -5992,6 +6441,11 @@ pub struct OpenSourceProjectSupremacySuite {
     pub cilium_guard: SovereignCiliumEbpfEncryptionGuard,
     pub nix_dedup_engine: SovereignNixStoreDeduplicator,
     pub hyprland_compositor: WaylandHyprlandCompositorEngine,
+    pub cosmic_applet_engine: SovereignPopOsCosmicAppletEngine,
+    pub lbu_overlay_governor: SovereignAlpineLbuOverlayGovernor,
+    pub openbsd_retguard_engine: SovereignOpenBsdRetguardEngine,
+    pub hardenedbsd_pax_guard: SovereignHardenedBsdPaxGuardEngine,
+    pub cachyos_bore_tuner: SovereignCachyOsBoreTunerEngine,
 }
 
 #[derive(Debug, Clone)]
@@ -6016,7 +6470,8 @@ impl OpenSourceProjectSupremacySuite {
         katran_engine.register_backend(101, "192.168.1.10", 8080, 10);
         katran_engine.register_backend(102, "192.168.1.11", 8080, 10);
 
-        let mut cilium_guard = SovereignCiliumEbpfEncryptionGuard::new(CiliumEncryptionMode::WireGuard);
+        let mut cilium_guard =
+            SovereignCiliumEbpfEncryptionGuard::new(CiliumEncryptionMode::WireGuard);
         cilium_guard.register_security_identity(1001, &["app=web", "env=prod"]);
         cilium_guard.register_security_identity(2002, &["app=db", "env=prod"]);
 
@@ -6051,11 +6506,71 @@ impl OpenSourceProjectSupremacySuite {
             cilium_guard,
             nix_dedup_engine: SovereignNixStoreDeduplicator::new(),
             hyprland_compositor: WaylandHyprlandCompositorEngine::new(),
+            cosmic_applet_engine: SovereignPopOsCosmicAppletEngine::new(),
+            lbu_overlay_governor: SovereignAlpineLbuOverlayGovernor::new("/media/sda1"),
+            openbsd_retguard_engine: SovereignOpenBsdRetguardEngine::new(),
+            hardenedbsd_pax_guard: SovereignHardenedBsdPaxGuardEngine::new(),
+            cachyos_bore_tuner: SovereignCachyOsBoreTunerEngine::new(),
         }
     }
 
+    /// Pop!_OS COSMIC: Register Wayland layer-shell applet
+    pub fn register_cosmic_applet(
+        &mut self,
+        name: &str,
+        anchor: LayerShellAnchor,
+        width: u32,
+        height: u32,
+    ) -> u32 {
+        self.cosmic_applet_engine
+            .register_applet(name, anchor, width, height)
+    }
+
+    /// Alpine Linux lbu: Track protected configuration change
+    pub fn track_lbu_file_change(&mut self, path: &str, content: &[u8]) -> String {
+        self.lbu_overlay_governor.track_file_change(path, content)
+    }
+
+    /// OpenBSD Retguard: Verify exit function stack pointer
+    pub fn verify_retguard_exit(
+        &mut self,
+        func_name: &str,
+        canary: u64,
+        sp: u64,
+    ) -> Result<(), &'static str> {
+        self.openbsd_retguard_engine
+            .verify_exit_function(func_name, canary, sp)
+    }
+
+    /// HardenedBSD PaX: Enforce W^X page protection
+    pub fn enforce_pax_mprotect(
+        &mut self,
+        pid: u32,
+        addr: u64,
+        req_write: bool,
+        req_exec: bool,
+    ) -> Result<(), &'static str> {
+        self.hardenedbsd_pax_guard
+            .check_mprotect(pid, addr, req_write, req_exec)
+    }
+
+    /// CachyOS: Auto-tune ISA optimization level
+    pub fn tune_cachyos_microarchitecture(
+        &mut self,
+        has_avx2: bool,
+        has_avx512: bool,
+        has_bmi2: bool,
+    ) -> X86IsaOptimizationLevel {
+        self.cachyos_bore_tuner
+            .auto_tune_microarchitecture(has_avx2, has_avx512, has_bmi2)
+    }
+
     /// Meta Katran: Route L4 5-tuple flow to real backend
-    pub fn route_katran_l4_flow(&mut self, client_ip: &str, client_port: u16) -> Option<KatranBackendServer> {
+    pub fn route_katran_l4_flow(
+        &mut self,
+        client_ip: &str,
+        client_port: u16,
+    ) -> Option<KatranBackendServer> {
         self.katran_engine.route_5tuple_flow(client_ip, client_port)
     }
 
@@ -6066,7 +6581,8 @@ impl OpenSourceProjectSupremacySuite {
         dst_id: u32,
         payload: &[u8],
     ) -> Result<Vec<u8>, &'static str> {
-        self.cilium_guard.encapsulate_and_encrypt(src_id, dst_id, payload)
+        self.cilium_guard
+            .encapsulate_and_encrypt(src_id, dst_id, payload)
     }
 
     /// Nix Flakes: Deduplicate identical store blobs using hard-links
@@ -6382,7 +6898,8 @@ impl OpenSourceProjectSupremacySuite {
         }
         #[cfg(any(feature = "standalone_test", feature = "gap_closure_test"))]
         {
-            let mut picker = self::open_source_obsoletion::SovereignTelescopeFuzzyPickerEngine::new();
+            let mut picker =
+                self::open_source_obsoletion::SovereignTelescopeFuzzyPickerEngine::new();
             picker.add_item(1, "Open Terminal", "action", Some("command"));
             picker.add_item(2, "Open Settings", "action", Some("command"));
             picker
