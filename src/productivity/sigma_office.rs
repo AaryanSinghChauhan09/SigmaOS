@@ -2122,7 +2122,11 @@ impl SovereignWebPublisherEngine {
                     ));
                 }
                 WebLayoutBlock::Image { src_url, alt_text } => {
-                    html.push_str(&format!("<img src=\"{}\" alt=\"{}\" />", escape_html(src_url), escape_html(alt_text)));
+                    html.push_str(&format!(
+                        "<img src=\"{}\" alt=\"{}\" />",
+                        escape_html(src_url),
+                        escape_html(alt_text)
+                    ));
                 }
                 WebLayoutBlock::ColumnGrid { columns } => {
                     html.push_str("<div class=\"grid\">");
@@ -3972,7 +3976,10 @@ impl Default for SovereignDigitalContractSignatureEngine {
 /// Google Sheets Conditional Formatting & Data Validation Engine
 #[derive(Debug, Clone, PartialEq)]
 pub enum ConditionalFormatStyle {
-    Highlight { bg_color: String, text_color: String },
+    Highlight {
+        bg_color: String,
+        text_color: String,
+    },
     BoldText,
 }
 
@@ -4030,7 +4037,12 @@ impl SovereignConditionalFormattingDataValidationEngine {
     ) -> u32 {
         let id = self.next_rule_id;
         self.next_rule_id += 1;
-        self.format_rules.push(ConditionalFormatRule { rule_id: id, range, condition, style });
+        self.format_rules.push(ConditionalFormatRule {
+            rule_id: id,
+            range,
+            condition,
+            style,
+        });
         id
     }
 
@@ -4043,18 +4055,41 @@ impl SovereignConditionalFormattingDataValidationEngine {
     ) -> u32 {
         let id = self.next_rule_id;
         self.next_rule_id += 1;
-        self.validation_rules.push(DataValidationRule { rule_id: id, row, col, validation_type, error_message });
+        self.validation_rules.push(DataValidationRule {
+            rule_id: id,
+            row,
+            col,
+            validation_type,
+            error_message,
+        });
         id
     }
 
-    pub fn evaluate_cell_style(&self, row: usize, col: usize, val: &CellValue) -> Option<ConditionalFormatStyle> {
+    pub fn evaluate_cell_style(
+        &self,
+        row: usize,
+        col: usize,
+        val: &CellValue,
+    ) -> Option<ConditionalFormatStyle> {
         for rule in &self.format_rules {
-            if row >= rule.range.0 && row <= rule.range.2 && col >= rule.range.1 && col <= rule.range.3 {
+            if row >= rule.range.0
+                && row <= rule.range.2
+                && col >= rule.range.1
+                && col <= rule.range.3
+            {
                 let matches = match (rule.condition.clone(), val) {
-                    (FormatRuleCondition::GreaterThan(threshold), CellValue::Number(n)) => *n > threshold,
-                    (FormatRuleCondition::LessThan(threshold), CellValue::Number(n)) => *n < threshold,
-                    (FormatRuleCondition::Equals(threshold), CellValue::Number(n)) => (*n - threshold).abs() < 1e-6,
-                    (FormatRuleCondition::TextContains(sub), CellValue::Text(t)) => t.contains(&sub),
+                    (FormatRuleCondition::GreaterThan(threshold), CellValue::Number(n)) => {
+                        *n > threshold
+                    }
+                    (FormatRuleCondition::LessThan(threshold), CellValue::Number(n)) => {
+                        *n < threshold
+                    }
+                    (FormatRuleCondition::Equals(threshold), CellValue::Number(n)) => {
+                        (*n - threshold).abs() < 1e-6
+                    }
+                    (FormatRuleCondition::TextContains(sub), CellValue::Text(t)) => {
+                        t.contains(&sub)
+                    }
                     _ => false,
                 };
                 if matches {
@@ -4065,7 +4100,12 @@ impl SovereignConditionalFormattingDataValidationEngine {
         None
     }
 
-    pub fn validate_input(&self, row: usize, col: usize, val: &CellValue) -> core::result::Result<(), String> {
+    pub fn validate_input(
+        &self,
+        row: usize,
+        col: usize,
+        val: &CellValue,
+    ) -> core::result::Result<(), String> {
         for rule in &self.validation_rules {
             if rule.row == row && rule.col == col {
                 match (rule.validation_type.clone(), val) {
@@ -4107,7 +4147,9 @@ pub struct SovereignSmartDocumentTemplateEngine {
 
 impl SovereignSmartDocumentTemplateEngine {
     pub fn new() -> Self {
-        Self { templates: HashMap::new() }
+        Self {
+            templates: HashMap::new(),
+        }
     }
 
     pub fn register_template(&mut self, template_id: &str, title: &str, content_template: &str) {
@@ -4121,7 +4163,11 @@ impl SovereignSmartDocumentTemplateEngine {
         );
     }
 
-    pub fn render_template(&self, template_id: &str, vars: &HashMap<String, String>) -> Option<String> {
+    pub fn render_template(
+        &self,
+        template_id: &str,
+        vars: &HashMap<String, String>,
+    ) -> Option<String> {
         let tpl = self.templates.get(template_id)?;
         let mut rendered = tpl.content_template.clone();
         for (k, v) in vars {
@@ -4141,9 +4187,17 @@ impl Default for SovereignSmartDocumentTemplateEngine {
 /// Google Sites Landing Page & CMS Builder Engine
 #[derive(Debug, Clone)]
 pub enum CmsBlockType {
-    HeroBanner { title: String, subtitle: String },
-    TextSection { content: String },
-    CallToAction { button_text: String, target_url: String },
+    HeroBanner {
+        title: String,
+        subtitle: String,
+    },
+    TextSection {
+        content: String,
+    },
+    CallToAction {
+        button_text: String,
+        target_url: String,
+    },
 }
 
 #[derive(Debug, Clone)]
@@ -4162,7 +4216,10 @@ pub struct SovereignLandingPageCmsEngine {
 
 impl SovereignLandingPageCmsEngine {
     pub fn new() -> Self {
-        Self { pages: Vec::new(), next_page_id: 1 }
+        Self {
+            pages: Vec::new(),
+            next_page_id: 1,
+        }
     }
 
     pub fn create_page(&mut self, title: &str, slug: &str) -> u32 {
@@ -4198,11 +4255,15 @@ impl SovereignLandingPageCmsEngine {
                 CmsBlockType::HeroBanner { title, subtitle } => {
                     html.push_str(&format!(
                         "<header><h1>{}</h1><p>{}</p></header>",
-                        escape_html(title), escape_html(subtitle)
+                        escape_html(title),
+                        escape_html(subtitle)
                     ));
                 }
                 CmsBlockType::TextSection { content } => {
-                    html.push_str(&format!("<section><p>{}</p></section>", escape_html(content)));
+                    html.push_str(&format!(
+                        "<section><p>{}</p></section>",
+                        escape_html(content)
+                    ));
                 }
                 CmsBlockType::CallToAction {
                     button_text,
@@ -4210,7 +4271,8 @@ impl SovereignLandingPageCmsEngine {
                 } => {
                     html.push_str(&format!(
                         "<a href=\"{}\" class=\"btn\">{}</a>",
-                        escape_html(target_url), escape_html(button_text)
+                        escape_html(target_url),
+                        escape_html(button_text)
                     ));
                 }
             }
@@ -4263,12 +4325,20 @@ impl SovereignPowerBiDataModelingEngine {
         self.relationships.push(rel);
     }
 
-    pub fn evaluate_measure(&self, table_name: &str, col_name: &str, agg: MeasureAggFunc) -> Option<f64> {
+    pub fn evaluate_measure(
+        &self,
+        table_name: &str,
+        col_name: &str,
+        agg: MeasureAggFunc,
+    ) -> Option<f64> {
         let rows = self.tables.get(table_name)?;
         if rows.is_empty() {
             return Some(0.0);
         }
-        let values: Vec<f64> = rows.iter().filter_map(|r| r.get(col_name).copied()).collect();
+        let values: Vec<f64> = rows
+            .iter()
+            .filter_map(|r| r.get(col_name).copied())
+            .collect();
         if values.is_empty() {
             return Some(0.0);
         }
@@ -4313,7 +4383,10 @@ pub struct SovereignVivaCommunityHubEngine {
 
 impl SovereignVivaCommunityHubEngine {
     pub fn new() -> Self {
-        Self { posts: Vec::new(), next_post_id: 1 }
+        Self {
+            posts: Vec::new(),
+            next_post_id: 1,
+        }
     }
 
     pub fn post_announcement(
@@ -4465,7 +4538,10 @@ pub struct SovereignAgileSprintBoardEngine {
 
 impl SovereignAgileSprintBoardEngine {
     pub fn new() -> Self {
-        Self { items: Vec::new(), next_item_id: 1 }
+        Self {
+            items: Vec::new(),
+            next_item_id: 1,
+        }
     }
 
     pub fn add_item(&mut self, title: &str, points: u32) -> u32 {
@@ -4490,7 +4566,11 @@ impl SovereignAgileSprintBoardEngine {
     }
 
     pub fn calculate_completed_velocity(&self) -> u32 {
-        self.items.iter().filter(|i| i.status == ItemStatus::Done).map(|i| i.story_points).sum()
+        self.items
+            .iter()
+            .filter(|i| i.status == ItemStatus::Done)
+            .map(|i| i.story_points)
+            .sum()
     }
 }
 
@@ -4516,19 +4596,30 @@ pub struct SovereignTerritoryManagementEngine {
 
 impl SovereignTerritoryManagementEngine {
     pub fn new() -> Self {
-        Self { territories: Vec::new(), next_id: 1 }
+        Self {
+            territories: Vec::new(),
+            next_id: 1,
+        }
     }
 
     pub fn add_territory(&mut self, name: &str, zip_prefixes: Vec<String>, quota: f64) -> u32 {
         let id = self.next_id;
         self.next_id += 1;
-        self.territories.push(SalesTerritory { territory_id: id, name: name.to_string(), zip_prefixes, quota });
+        self.territories.push(SalesTerritory {
+            territory_id: id,
+            name: name.to_string(),
+            zip_prefixes,
+            quota,
+        });
         id
     }
 
     pub fn route_zip(&self, zip_code: &str) -> Option<u32> {
         for t in &self.territories {
-            if t.zip_prefixes.iter().any(|prefix| zip_code.starts_with(prefix)) {
+            if t.zip_prefixes
+                .iter()
+                .any(|prefix| zip_code.starts_with(prefix))
+            {
                 return Some(t.territory_id);
             }
         }
@@ -4565,19 +4656,28 @@ pub struct SovereignCustomerJourneyBuilderEngine {
 
 impl SovereignCustomerJourneyBuilderEngine {
     pub fn new() -> Self {
-        Self { journeys: Vec::new(), enrolled_contacts: HashMap::new(), next_id: 1 }
+        Self {
+            journeys: Vec::new(),
+            enrolled_contacts: HashMap::new(),
+            next_id: 1,
+        }
     }
 
     pub fn create_journey(&mut self, name: &str, steps: Vec<JourneyStep>) -> u32 {
         let id = self.next_id;
         self.next_id += 1;
-        self.journeys.push(CustomerJourney { journey_id: id, name: name.to_string(), steps });
+        self.journeys.push(CustomerJourney {
+            journey_id: id,
+            name: name.to_string(),
+            steps,
+        });
         id
     }
 
     pub fn enroll_contact(&mut self, email: &str, journey_id: u32) -> bool {
         if self.journeys.iter().any(|j| j.journey_id == journey_id) {
-            self.enrolled_contacts.insert(email.to_string(), (journey_id, 0));
+            self.enrolled_contacts
+                .insert(email.to_string(), (journey_id, 0));
             true
         } else {
             false
@@ -4619,18 +4719,29 @@ pub struct SovereignWorkCenterRoutingEngine {
 
 impl SovereignWorkCenterRoutingEngine {
     pub fn new() -> Self {
-        Self { work_centers: Vec::new(), next_id: 1 }
+        Self {
+            work_centers: Vec::new(),
+            next_id: 1,
+        }
     }
 
     pub fn add_work_center(&mut self, name: &str, hourly_cost: f64, setup_time_mins: f64) -> u32 {
         let id = self.next_id;
         self.next_id += 1;
-        self.work_centers.push(WorkCenter { center_id: id, name: name.to_string(), hourly_cost, setup_time_mins });
+        self.work_centers.push(WorkCenter {
+            center_id: id,
+            name: name.to_string(),
+            hourly_cost,
+            setup_time_mins,
+        });
         id
     }
 
     pub fn calculate_operation_cost(&self, center_id: u32, run_time_mins: f64) -> Option<f64> {
-        let center = self.work_centers.iter().find(|w| w.center_id == center_id)?;
+        let center = self
+            .work_centers
+            .iter()
+            .find(|w| w.center_id == center_id)?;
         let total_hours = (center.setup_time_mins + run_time_mins) / 60.0;
         Some(total_hours * center.hourly_cost)
     }
@@ -4657,7 +4768,10 @@ pub struct SovereignAutomatedCrmBotEngine {
 
 impl SovereignAutomatedCrmBotEngine {
     pub fn new() -> Self {
-        Self { intents: Vec::new(), next_id: 1 }
+        Self {
+            intents: Vec::new(),
+            next_id: 1,
+        }
     }
 
     pub fn add_intent(&mut self, keyword: &str, auto_reply: &str) -> u32 {
@@ -4853,7 +4967,13 @@ impl SovereignEnterpriseChatSpaceEngine {
         self.user_presences.insert(email.to_string(), status);
     }
 
-    pub fn create_space(&mut self, space_id: &str, space_name: &str, members: Vec<String>, is_dm: bool) {
+    pub fn create_space(
+        &mut self,
+        space_id: &str,
+        space_name: &str,
+        members: Vec<String>,
+        is_dm: bool,
+    ) {
         self.spaces.insert(
             space_id.to_string(),
             EnterpriseChatSpace {
@@ -4917,7 +5037,7 @@ pub struct CandidateApplicant {
     pub email: String,
     pub position_applied: String,
     pub stage: CandidateStage,
-    pub scorecard_rating: u32, // 1 to 5
+    pub scorecard_rating: u32,                     // 1 to 5
     pub onboarding_checklist: Vec<(String, bool)>, // (task_name, completed)
 }
 
@@ -4954,8 +5074,16 @@ impl SovereignHratsoOnboardingEngine {
         id
     }
 
-    pub fn advance_candidate_stage(&mut self, candidate_id: u32, new_stage: CandidateStage) -> bool {
-        if let Some(c) = self.candidates.iter_mut().find(|c| c.candidate_id == candidate_id) {
+    pub fn advance_candidate_stage(
+        &mut self,
+        candidate_id: u32,
+        new_stage: CandidateStage,
+    ) -> bool {
+        if let Some(c) = self
+            .candidates
+            .iter_mut()
+            .find(|c| c.candidate_id == candidate_id)
+        {
             c.stage = new_stage;
             true
         } else {
@@ -4964,7 +5092,11 @@ impl SovereignHratsoOnboardingEngine {
     }
 
     pub fn rate_candidate(&mut self, candidate_id: u32, rating: u32) -> bool {
-        if let Some(c) = self.candidates.iter_mut().find(|c| c.candidate_id == candidate_id) {
+        if let Some(c) = self
+            .candidates
+            .iter_mut()
+            .find(|c| c.candidate_id == candidate_id)
+        {
             c.scorecard_rating = rating.min(5);
             true
         } else {
@@ -4973,7 +5105,11 @@ impl SovereignHratsoOnboardingEngine {
     }
 
     pub fn complete_onboarding_task(&mut self, candidate_id: u32, task_index: usize) -> bool {
-        if let Some(c) = self.candidates.iter_mut().find(|c| c.candidate_id == candidate_id) {
+        if let Some(c) = self
+            .candidates
+            .iter_mut()
+            .find(|c| c.candidate_id == candidate_id)
+        {
             if let Some(item) = c.onboarding_checklist.get_mut(task_index) {
                 item.1 = true;
                 return true;
@@ -5029,7 +5165,13 @@ impl SovereignFieldServiceDispatchEngine {
         }
     }
 
-    pub fn register_technician(&mut self, tech_id: &str, name: &str, skills: Vec<String>, max_hours: f64) {
+    pub fn register_technician(
+        &mut self,
+        tech_id: &str,
+        name: &str,
+        skills: Vec<String>,
+        max_hours: f64,
+    ) {
         self.technicians.insert(
             tech_id.to_string(),
             TechnicianProfile {
@@ -5042,7 +5184,13 @@ impl SovereignFieldServiceDispatchEngine {
         );
     }
 
-    pub fn create_work_order(&mut self, customer: &str, skill: &str, priority: u32, est_hours: f64) -> u32 {
+    pub fn create_work_order(
+        &mut self,
+        customer: &str,
+        skill: &str,
+        priority: u32,
+        est_hours: f64,
+    ) -> u32 {
         let id = self.next_wo_id;
         self.next_wo_id += 1;
         self.work_orders.push(FieldServiceWorkOrder {
@@ -5058,7 +5206,11 @@ impl SovereignFieldServiceDispatchEngine {
     }
 
     pub fn auto_dispatch_work_order(&mut self, wo_id: u32) -> Option<String> {
-        let wo = self.work_orders.iter().find(|w| w.work_order_id == wo_id)?.clone();
+        let wo = self
+            .work_orders
+            .iter()
+            .find(|w| w.work_order_id == wo_id)?
+            .clone();
 
         let mut best_tech_id: Option<String> = None;
         for tech in self.technicians.values() {
@@ -5074,7 +5226,11 @@ impl SovereignFieldServiceDispatchEngine {
             if let Some(tech) = self.technicians.get_mut(&t_id) {
                 tech.assigned_hours += wo.estimated_hours;
             }
-            if let Some(w) = self.work_orders.iter_mut().find(|w| w.work_order_id == wo_id) {
+            if let Some(w) = self
+                .work_orders
+                .iter_mut()
+                .find(|w| w.work_order_id == wo_id)
+            {
                 w.assigned_technician = Some(t_id.clone());
             }
             Some(t_id)
@@ -5149,7 +5305,11 @@ impl SovereignBatchSerialTraceabilityEngine {
         );
     }
 
-    pub fn update_quality_status(&mut self, lot_number: &str, status: QualityControlStatus) -> bool {
+    pub fn update_quality_status(
+        &mut self,
+        lot_number: &str,
+        status: QualityControlStatus,
+    ) -> bool {
         if let Some(lot) = self.lot_records.get_mut(lot_number) {
             lot.quality_status = status;
             true
@@ -5159,7 +5319,9 @@ impl SovereignBatchSerialTraceabilityEngine {
     }
 
     pub fn trace_serial_number(&self, serial: &str) -> Option<&BatchLotTraceRecord> {
-        self.lot_records.values().find(|lot| lot.serial_numbers.contains(&serial.to_string()))
+        self.lot_records
+            .values()
+            .find(|lot| lot.serial_numbers.contains(&serial.to_string()))
     }
 }
 
@@ -5212,7 +5374,8 @@ impl SovereignContractLifecycleManagementEngine {
     }
 
     pub fn register_standard_clause(&mut self, key: &str, text: &str) {
-        self.clause_library.insert(key.to_string(), text.to_string());
+        self.clause_library
+            .insert(key.to_string(), text.to_string());
     }
 
     pub fn draft_contract(
@@ -5248,8 +5411,16 @@ impl SovereignContractLifecycleManagementEngine {
         id
     }
 
-    pub fn advance_contract_status(&mut self, contract_id: u32, status: ContractApprovalStatus) -> bool {
-        if let Some(c) = self.contracts.iter_mut().find(|c| c.contract_id == contract_id) {
+    pub fn advance_contract_status(
+        &mut self,
+        contract_id: u32,
+        status: ContractApprovalStatus,
+    ) -> bool {
+        if let Some(c) = self
+            .contracts
+            .iter_mut()
+            .find(|c| c.contract_id == contract_id)
+        {
             c.status = status;
             true
         } else {
@@ -5260,7 +5431,10 @@ impl SovereignContractLifecycleManagementEngine {
     pub fn find_expiring_contracts(&self, threshold_ts: u64) -> Vec<&ContractDocument> {
         self.contracts
             .iter()
-            .filter(|c| c.expiration_date_timestamp <= threshold_ts && c.status == ContractApprovalStatus::SignedAndActive)
+            .filter(|c| {
+                c.expiration_date_timestamp <= threshold_ts
+                    && c.status == ContractApprovalStatus::SignedAndActive
+            })
             .collect()
     }
 }
@@ -5318,14 +5492,22 @@ impl SovereignWorkspaceAddonExtensionEngine {
         }
     }
 
-    pub fn execute_addon_event(&self, addon_id: &str, event_name: &str, payload: &str) -> Option<String> {
+    pub fn execute_addon_event(
+        &self,
+        addon_id: &str,
+        event_name: &str,
+        payload: &str,
+    ) -> Option<String> {
         let addon = self.addons.get(addon_id)?;
         if !addon.enabled {
             return None;
         }
         Some(format!(
             "Executed Addon '{}' ({}) Event '{}' with payload length {}",
-            addon.name, addon.entrypoint_url, event_name, payload.len()
+            addon.name,
+            addon.entrypoint_url,
+            event_name,
+            payload.len()
         ))
     }
 }
@@ -5397,7 +5579,14 @@ impl SovereignEnterpriseIntranetPortalEngine {
         self.pages
             .iter()
             .filter(|p| p.published)
-            .map(|p| format!("Page #{}: {} ({} widgets)", p.page_id, p.title, p.widgets.len()))
+            .map(|p| {
+                format!(
+                    "Page #{}: {} ({} widgets)",
+                    p.page_id,
+                    p.title,
+                    p.widgets.len()
+                )
+            })
             .collect()
     }
 }
@@ -5452,7 +5641,13 @@ impl SovereignLowCodeBusinessProcessEngine {
         id
     }
 
-    pub fn add_field(&mut self, form_id: u32, name: &str, field_type: &str, required: bool) -> bool {
+    pub fn add_field(
+        &mut self,
+        form_id: u32,
+        name: &str,
+        field_type: &str,
+        required: bool,
+    ) -> bool {
         if let Some(form) = self.forms.get_mut(&form_id) {
             form.fields.push(LowCodeFormField {
                 name: name.to_string(),
@@ -5465,7 +5660,11 @@ impl SovereignLowCodeBusinessProcessEngine {
         }
     }
 
-    pub fn submit_record(&mut self, form_id: u32, record: HashMap<String, String>) -> core::result::Result<usize, &'static str> {
+    pub fn submit_record(
+        &mut self,
+        form_id: u32,
+        record: HashMap<String, String>,
+    ) -> core::result::Result<usize, &'static str> {
         let form = self.forms.get(&form_id).ok_or("Form not found")?;
         for field in &form.fields {
             if field.required && !record.contains_key(&field.name) {
@@ -5634,7 +5833,11 @@ impl SovereignEquipmentMaintenanceEngine {
         id
     }
 
-    pub fn create_work_order(&mut self, equipment_id: u32, request_type: MaintenanceRequestType) -> Option<u32> {
+    pub fn create_work_order(
+        &mut self,
+        equipment_id: u32,
+        request_type: MaintenanceRequestType,
+    ) -> Option<u32> {
         if !self.equipment.contains_key(&equipment_id) {
             return None;
         }
@@ -5752,7 +5955,13 @@ impl SovereignOmnichannelLiveChatEngine {
         }
     }
 
-    pub fn send_message(&mut self, session_id: u32, sender: &str, text: &str, timestamp: u64) -> bool {
+    pub fn send_message(
+        &mut self,
+        session_id: u32,
+        sender: &str,
+        text: &str,
+        timestamp: u64,
+    ) -> bool {
         if let Some(session) = self.sessions.get_mut(&session_id) {
             if session.closed {
                 return false;
@@ -5817,7 +6026,13 @@ impl SovereignLookerAdvancedVisualizationEngine {
                 "+" => val1 + val2,
                 "-" => val1 - val2,
                 "*" => val1 * val2,
-                "/" => if val2 != 0.0 { val1 / val2 } else { 0.0 },
+                "/" => {
+                    if val2 != 0.0 {
+                        val1 / val2
+                    } else {
+                        0.0
+                    }
+                }
                 _ => val1,
             }
         } else if parts.len() == 1 {
@@ -5838,6 +6053,363 @@ impl SovereignLookerAdvancedVisualizationEngine {
             .filter(|row| row.get(field).map(|v| v.as_str()) == Some(filter_value))
             .cloned()
             .collect()
+    }
+}
+
+/// Dynamic array and matrix formula engine inspired by Google Sheets & Excel (XLOOKUP, FILTER, UNIQUE, SORT, TRANSPOSE).
+#[derive(Debug, Clone, Default)]
+pub struct SovereignXlookupFilterUniqueFormulaEngine;
+
+impl SovereignXlookupFilterUniqueFormulaEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    /// Performs modern XLOOKUP with fallback default value.
+    pub fn xlookup(
+        &self,
+        lookup_value: &str,
+        lookup_array: &[String],
+        return_array: &[String],
+        if_not_found: &str,
+    ) -> String {
+        if let Some(idx) = lookup_array.iter().position(|item| item == lookup_value) {
+            return_array
+                .get(idx)
+                .cloned()
+                .unwrap_or_else(|| if_not_found.to_string())
+        } else {
+            if_not_found.to_string()
+        }
+    }
+
+    /// Returns the 0-indexed position of lookup_value in lookup_array (XMATCH).
+    pub fn xmatch(&self, lookup_value: &str, lookup_array: &[String]) -> Option<usize> {
+        lookup_array.iter().position(|item| item == lookup_value)
+    }
+
+    /// Filters array values based on matching boolean condition flags (FILTER).
+    pub fn filter(&self, values: &[String], condition_flags: &[bool]) -> Vec<String> {
+        values
+            .iter()
+            .zip(condition_flags.iter())
+            .filter_map(|(val, &flag)| if flag { Some(val.clone()) } else { None })
+            .collect()
+    }
+
+    /// Returns deduplicated distinct array values preserving insertion order (UNIQUE).
+    pub fn unique(&self, values: &[String]) -> Vec<String> {
+        let mut seen = std::collections::HashSet::new();
+        let mut result = Vec::new();
+        for val in values {
+            if seen.insert(val.clone()) {
+                result.push(val.clone());
+            }
+        }
+        result
+    }
+
+    /// Sorts a numeric array in ascending or descending order (SORT).
+    pub fn sort(&self, values: &[f64], ascending: bool) -> Vec<f64> {
+        let mut sorted = values.to_vec();
+        sorted.sort_by(|a, b| {
+            if ascending {
+                a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal)
+            } else {
+                b.partial_cmp(a).unwrap_or(std::cmp::Ordering::Equal)
+            }
+        });
+        sorted
+    }
+
+    /// Transposes a 2D matrix (rows into columns) (TRANSPOSE).
+    pub fn transpose(&self, matrix: &[Vec<String>]) -> Vec<Vec<String>> {
+        if matrix.is_empty() || matrix[0].is_empty() {
+            return Vec::new();
+        }
+        let rows = matrix.len();
+        let cols = matrix[0].len();
+        let mut transposed = vec![vec![String::new(); rows]; cols];
+        for r in 0..rows {
+            for c in 0..cols {
+                if c < matrix[r].len() {
+                    transposed[c][r] = matrix[r][c].clone();
+                }
+            }
+        }
+        transposed
+    }
+}
+
+/// CRM sales territory and pipeline optimization engine inspired by Salesforce & Bitrix24.
+#[derive(Debug, Clone, Default)]
+pub struct SovereignSalesTerritoryPipelineOptimizationEngine;
+
+impl SovereignSalesTerritoryPipelineOptimizationEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    /// Assigns sales territory based on region and deal size threshold.
+    pub fn assign_territory_by_region_and_size(&self, region: &str, deal_amount: f64) -> String {
+        let tier = if deal_amount >= 100000.0 {
+            "Enterprise"
+        } else if deal_amount >= 25000.0 {
+            "Mid-Market"
+        } else {
+            "SMB"
+        };
+        format!("{} - {}", tier, region)
+    }
+
+    /// Calculates weighted pipeline velocity: `(sum(deal_amount * win_probability) / avg_cycle_days)`.
+    pub fn calculate_weighted_pipeline_velocity(&self, deals: &[(f64, f64, u32)]) -> f64 {
+        if deals.is_empty() {
+            return 0.0;
+        }
+        let total_weighted_value: f64 = deals.iter().map(|(amt, prob, _)| amt * prob).sum();
+        let total_days: u32 = deals.iter().map(|(_, _, days)| *days).sum();
+        let avg_days = total_days as f64 / deals.len() as f64;
+
+        if avg_days > 0.0 {
+            total_weighted_value / avg_days
+        } else {
+            0.0
+        }
+    }
+
+    /// Predicts lead win probability score (0.0 to 100.0) based on engagement touchpoints and budget status.
+    pub fn predict_lead_win_score(
+        &self,
+        company_size: u32,
+        touchpoints: u32,
+        decision_maker_engaged: bool,
+        budget_approved: bool,
+    ) -> f64 {
+        let mut score = 10.0;
+        if company_size > 500 {
+            score += 20.0;
+        } else if company_size > 50 {
+            score += 10.0;
+        }
+
+        score += (touchpoints as f64 * 3.0).min(30.0);
+
+        if decision_maker_engaged {
+            score += 20.0;
+        }
+        if budget_approved {
+            score += 20.0;
+        }
+
+        score.min(100.0)
+    }
+}
+
+/// Business process workflow automation step definition inspired by Power Automate & Zoho Flow.
+#[derive(Debug, Clone)]
+pub struct AutomationWorkflowStep {
+    pub step_id: String,
+    pub action_type: String,
+    pub condition_key: Option<String>,
+    pub condition_value: Option<String>,
+    pub max_retries: u32,
+}
+
+/// Multi-step workflow orchestration engine inspired by Power Automate & Zoho Flow.
+#[derive(Debug, Clone, Default)]
+pub struct SovereignBusinessProcessAutomationOrchestrator {
+    pub steps: Vec<AutomationWorkflowStep>,
+}
+
+impl SovereignBusinessProcessAutomationOrchestrator {
+    pub fn new() -> Self {
+        Self { steps: Vec::new() }
+    }
+
+    /// Registers a new workflow step in sequence.
+    pub fn register_step(
+        &mut self,
+        step_id: &str,
+        action_type: &str,
+        condition_key: Option<&str>,
+        condition_value: Option<&str>,
+        max_retries: u32,
+    ) {
+        self.steps.push(AutomationWorkflowStep {
+            step_id: step_id.to_string(),
+            action_type: action_type.to_string(),
+            condition_key: condition_key.map(|s| s.to_string()),
+            condition_value: condition_value.map(|s| s.to_string()),
+            max_retries,
+        });
+    }
+
+    /// Executes the registered workflow steps against the provided execution context.
+    pub fn execute_workflow(&self, context: &mut HashMap<String, String>) -> Vec<String> {
+        let mut log = Vec::new();
+        for step in &self.steps {
+            // Check condition if present
+            if let (Some(key), Some(expected_val)) = (&step.condition_key, &step.condition_value) {
+                let actual = context.get(key).map(|s| s.as_str()).unwrap_or("");
+                if actual != expected_val {
+                    log.push(format!(
+                        "Step '{}' skipped: condition mismatch (expected '{}', got '{}')",
+                        step.step_id, expected_val, actual
+                    ));
+                    continue;
+                }
+            }
+
+            // Execute action
+            let retries = 0;
+            let mut success = false;
+            while retries <= step.max_retries {
+                // Simulate action execution and context update
+                context.insert(format!("{}_status", step.step_id), "completed".to_string());
+                success = true;
+                break;
+            }
+
+            if success {
+                log.push(format!(
+                    "Step '{}' ({}) executed successfully",
+                    step.step_id, step.action_type
+                ));
+            } else {
+                log.push(format!(
+                    "Step '{}' ({}) failed after {} retries",
+                    step.step_id, step.action_type, step.max_retries
+                ));
+            }
+        }
+        log
+    }
+}
+
+/// Multi-currency accounting and financial consolidation engine inspired by Odoo Accounting & Zoho Books.
+#[derive(Debug, Clone, Default)]
+pub struct SovereignMultiCurrencyLedgerConsolidationEngine {
+    pub exchange_rates: HashMap<(String, String), f64>,
+}
+
+impl SovereignMultiCurrencyLedgerConsolidationEngine {
+    pub fn new() -> Self {
+        Self {
+            exchange_rates: HashMap::new(),
+        }
+    }
+
+    /// Sets exchange rate from foreign currency to target base currency.
+    pub fn set_exchange_rate(&mut self, from_curr: &str, to_curr: &str, rate: f64) {
+        self.exchange_rates
+            .insert((from_curr.to_uppercase(), to_curr.to_uppercase()), rate);
+    }
+
+    /// Converts monetary amount between currencies using stored exchange rates.
+    pub fn convert(&self, amount: f64, from_curr: &str, to_curr: &str) -> f64 {
+        let from = from_curr.to_uppercase();
+        let to = to_curr.to_uppercase();
+        if from == to {
+            return amount;
+        }
+        if let Some(&rate) = self.exchange_rates.get(&(from, to)) {
+            amount * rate
+        } else {
+            amount
+        }
+    }
+
+    /// Calculates unrealized FX gain (+) or loss (-) based on booking rate vs current revaluation rate.
+    pub fn calculate_unrealized_fx_gain_loss(
+        &self,
+        amount_foreign: f64,
+        booking_rate: f64,
+        current_rate: f64,
+    ) -> f64 {
+        amount_foreign * (current_rate - booking_rate)
+    }
+
+    /// Consolidates multi-subsidiary trial balance ledgers into a single target base currency.
+    pub fn consolidate_trial_balance(
+        &self,
+        subsidiary_ledgers: &[HashMap<String, f64>],
+        subsidiary_currencies: &[&str],
+        target_currency: &str,
+    ) -> HashMap<String, f64> {
+        let mut consolidated = HashMap::new();
+        for (ledger, &curr) in subsidiary_ledgers.iter().zip(subsidiary_currencies.iter()) {
+            for (account_code, &balance) in ledger {
+                let converted = self.convert(balance, curr, target_currency);
+                *consolidated.entry(account_code.clone()).or_insert(0.0) += converted;
+            }
+        }
+        consolidated
+    }
+}
+
+/// Interactive BI dashboard slicer and gauge breakdown engine inspired by Google Looker Studio & Power BI.
+#[derive(Debug, Clone, Default)]
+pub struct SovereignInteractiveDashboardSlicerEngine;
+
+impl SovereignInteractiveDashboardSlicerEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    /// Filters a dashboard dataset using multi-field active slicer filter selections.
+    pub fn apply_multi_slicer_filter(
+        &self,
+        dataset: &[HashMap<String, String>],
+        active_slicers: &HashMap<String, Vec<String>>,
+    ) -> Vec<HashMap<String, String>> {
+        dataset
+            .iter()
+            .filter(|row| {
+                for (field, allowed_values) in active_slicers {
+                    if allowed_values.is_empty() {
+                        continue;
+                    }
+                    let row_val = row.get(field).map(|s| s.as_str()).unwrap_or("");
+                    if !allowed_values.iter().any(|val| val == row_val) {
+                        return false;
+                    }
+                }
+                true
+            })
+            .cloned()
+            .collect()
+    }
+
+    /// Computes percentage fulfillment toward a target for KPI gauge visuals (capped at 100%).
+    pub fn compute_kpi_gauge_percentage(&self, current_value: f64, target_value: f64) -> f64 {
+        if target_value <= 0.0 {
+            0.0
+        } else {
+            ((current_value / target_value) * 100.0).min(100.0).max(0.0)
+        }
+    }
+
+    /// Aggregates metric sums grouped by date/period string field for time-series charts.
+    pub fn aggregate_time_series(
+        &self,
+        dataset: &[HashMap<String, String>],
+        date_field: &str,
+        metric_field: &str,
+    ) -> HashMap<String, f64> {
+        let mut time_series = HashMap::new();
+        for row in dataset {
+            let period = row
+                .get(date_field)
+                .cloned()
+                .unwrap_or_else(|| "N/A".to_string());
+            let val: f64 = row
+                .get(metric_field)
+                .and_then(|s| s.parse().ok())
+                .unwrap_or(0.0);
+            *time_series.entry(period).or_insert(0.0) += val;
+        }
+        time_series
     }
 }
 
@@ -6582,28 +7154,45 @@ mod tests {
         let rule_id = cond_engine.add_conditional_rule(
             (0, 0, 10, 10),
             FormatRuleCondition::GreaterThan(100.0),
-            ConditionalFormatStyle::Highlight { bg_color: "green".to_string(), text_color: "white".to_string() },
+            ConditionalFormatStyle::Highlight {
+                bg_color: "green".to_string(),
+                text_color: "white".to_string(),
+            },
         );
         assert_eq!(rule_id, 1);
         let style = cond_engine.evaluate_cell_style(1, 1, &CellValue::Number(150.0));
         assert_eq!(
             style,
-            Some(ConditionalFormatStyle::Highlight { bg_color: "green".to_string(), text_color: "white".to_string() })
+            Some(ConditionalFormatStyle::Highlight {
+                bg_color: "green".to_string(),
+                text_color: "white".to_string()
+            })
         );
 
         let val_id = cond_engine.add_validation_rule(
             0,
             0,
-            ValidationRuleType::ListFromOptions(vec!["Approved".to_string(), "Pending".to_string()]),
+            ValidationRuleType::ListFromOptions(vec![
+                "Approved".to_string(),
+                "Pending".to_string(),
+            ]),
             "Must select Approved or Pending".to_string(),
         );
         assert_eq!(val_id, 2);
-        assert!(cond_engine.validate_input(0, 0, &CellValue::Text("Approved".to_string())).is_ok());
-        assert!(cond_engine.validate_input(0, 0, &CellValue::Text("Rejected".to_string())).is_err());
+        assert!(cond_engine
+            .validate_input(0, 0, &CellValue::Text("Approved".to_string()))
+            .is_ok());
+        assert!(cond_engine
+            .validate_input(0, 0, &CellValue::Text("Rejected".to_string()))
+            .is_err());
 
         // 2. Google Docs Smart Document Template Engine
         let mut tpl_engine = SovereignSmartDocumentTemplateEngine::new();
-        tpl_engine.register_template("welcome-email", "Welcome Email", "Hello {{name}}, welcome to {{company}}!");
+        tpl_engine.register_template(
+            "welcome-email",
+            "Welcome Email",
+            "Hello {{name}}, welcome to {{company}}!",
+        );
         let mut vars = HashMap::new();
         vars.insert("name".to_string(), "Alice".to_string());
         vars.insert("company".to_string(), "SigmaOS".to_string());
@@ -6614,7 +7203,13 @@ mod tests {
         let mut cms_engine = SovereignLandingPageCmsEngine::new();
         let p_id = cms_engine.create_page("Home Page", "home");
         assert_eq!(p_id, 1);
-        cms_engine.add_block(p_id, CmsBlockType::HeroBanner { title: "Welcome".to_string(), subtitle: "Sovereign Desktop".to_string() });
+        cms_engine.add_block(
+            p_id,
+            CmsBlockType::HeroBanner {
+                title: "Welcome".to_string(),
+                subtitle: "Sovereign Desktop".to_string(),
+            },
+        );
         let html = cms_engine.render_html(p_id).unwrap();
         assert!(html.contains("<h1>Welcome</h1>"));
 
@@ -6625,19 +7220,29 @@ mod tests {
         let mut row2 = HashMap::new();
         row2.insert("revenue".to_string(), 2000.0);
         bi_engine.add_table_data("Sales", vec![row1, row2]);
-        let total_rev = bi_engine.evaluate_measure("Sales", "revenue", MeasureAggFunc::Sum).unwrap();
+        let total_rev = bi_engine
+            .evaluate_measure("Sales", "revenue", MeasureAggFunc::Sum)
+            .unwrap();
         assert_eq!(total_rev, 3000.0);
 
         // 5. Microsoft Viva Engage Community Hub Engine
         let mut viva_engine = SovereignVivaCommunityHubEngine::new();
-        let post_id = viva_engine.post_announcement("General", "Alice", "Q3 Target Achieved!", "We reached 100% of our goal.", Some(PraiseBadge::Innovation));
+        let post_id = viva_engine.post_announcement(
+            "General",
+            "Alice",
+            "Q3 Target Achieved!",
+            "We reached 100% of our goal.",
+            Some(PraiseBadge::Innovation),
+        );
         assert_eq!(post_id, 1);
         assert!(viva_engine.upvote_post(post_id));
 
         // 6. Zoho Subscriptions Billing Engine
         let mut sub_engine = SovereignSubscriptionBillingEngine::new();
         sub_engine.register_plan("pro-monthly", "Pro Plan", 29.99);
-        let sub_id = sub_engine.subscribe("alice@sigmaos.org", "pro-monthly").unwrap();
+        let sub_id = sub_engine
+            .subscribe("alice@sigmaos.org", "pro-monthly")
+            .unwrap();
         assert_eq!(sub_id, 1);
         let charge = sub_engine.process_billing_charge(sub_id).unwrap();
         assert_eq!(charge, 29.99);
@@ -6652,17 +7257,24 @@ mod tests {
 
         // 8. Salesforce Sales Territory Management Engine
         let mut territory_engine = SovereignTerritoryManagementEngine::new();
-        let t_id = territory_engine.add_territory("US West", vec!["90".to_string(), "91".to_string(), "92".to_string()], 1000000.0);
+        let t_id = territory_engine.add_territory(
+            "US West",
+            vec!["90".to_string(), "91".to_string(), "92".to_string()],
+            1000000.0,
+        );
         assert_eq!(t_id, 1);
         assert_eq!(territory_engine.route_zip("90210"), Some(1));
 
         // 9. Salesforce Customer Journey Builder Engine
         let mut journey_engine = SovereignCustomerJourneyBuilderEngine::new();
-        let j_id = journey_engine.create_journey("Onboarding Journey", vec![
-            JourneyStep::TriggerEmail("welcome@sigmaos.org".to_string()),
-            JourneyStep::WaitDelayDays(3),
-            JourneyStep::ConditionCheck("is_active".to_string()),
-        ]);
+        let j_id = journey_engine.create_journey(
+            "Onboarding Journey",
+            vec![
+                JourneyStep::TriggerEmail("welcome@sigmaos.org".to_string()),
+                JourneyStep::WaitDelayDays(3),
+                JourneyStep::ConditionCheck("is_active".to_string()),
+            ],
+        );
         assert_eq!(j_id, 1);
         assert!(journey_engine.enroll_contact("user@domain.com", j_id));
         let step1 = journey_engine.advance_contact("user@domain.com");
@@ -6672,7 +7284,9 @@ mod tests {
         let mut routing_engine = SovereignWorkCenterRoutingEngine::new();
         let wc_id = routing_engine.add_work_center("CNC Machining", 120.0, 15.0);
         assert_eq!(wc_id, 1);
-        let cost = routing_engine.calculate_operation_cost(wc_id, 45.0).unwrap();
+        let cost = routing_engine
+            .calculate_operation_cost(wc_id, 45.0)
+            .unwrap();
         assert_eq!(cost, 120.0); // (15 + 45)/60 * 120 = 1 * 120 = 120.0
 
         // 11. Bitrix24 Automated Conversational CRM Chatbot Engine
@@ -6689,21 +7303,32 @@ mod tests {
         meet.join_meeting("alice@sigmaos.org", "Alice Lead");
         assert_eq!(meet.toggle_audio("alice@sigmaos.org"), Some(false)); // unmuted
         assert!(meet.toggle_raise_hand("alice@sigmaos.org"));
-        assert_eq!(meet.raised_hands_queue, vec!["alice@sigmaos.org".to_string()]);
-        let room_id = meet.create_breakout_room("Breakout 1", vec!["alice@sigmaos.org".to_string()]);
+        assert_eq!(
+            meet.raised_hands_queue,
+            vec!["alice@sigmaos.org".to_string()]
+        );
+        let room_id =
+            meet.create_breakout_room("Breakout 1", vec!["alice@sigmaos.org".to_string()]);
         assert_eq!(room_id, 1);
         assert!(meet.send_in_meeting_chat("alice@sigmaos.org", "Hello everyone"));
 
         // 2. Google Chat / Slack Enterprise Chat Spaces Engine
         let mut chat_spaces = SovereignEnterpriseChatSpaceEngine::new();
         chat_spaces.set_user_presence("bob@sigmaos.org", UserPresenceStatus::Online);
-        chat_spaces.create_space("space-dev", "Engineering", vec!["bob@sigmaos.org".to_string()], false);
-        let msg_id = chat_spaces.post_space_message("space-dev", "bob@sigmaos.org", "Build passing", None);
+        chat_spaces.create_space(
+            "space-dev",
+            "Engineering",
+            vec!["bob@sigmaos.org".to_string()],
+            false,
+        );
+        let msg_id =
+            chat_spaces.post_space_message("space-dev", "bob@sigmaos.org", "Build passing", None);
         assert_eq!(msg_id, Some(1));
 
         // 3. Zoho Recruit / Odoo HR ATS & Onboarding Engine
         let mut hr_ats = SovereignHratsoOnboardingEngine::new();
-        let cand_id = hr_ats.apply_candidate("Charlie Dev", "charlie@dev.com", "Rust Kernel Engineer");
+        let cand_id =
+            hr_ats.apply_candidate("Charlie Dev", "charlie@dev.com", "Rust Kernel Engineer");
         assert!(hr_ats.advance_candidate_stage(cand_id, CandidateStage::Interviewing));
         assert!(hr_ats.rate_candidate(cand_id, 5));
         assert!(hr_ats.complete_onboarding_task(cand_id, 0));
@@ -6711,15 +7336,29 @@ mod tests {
 
         // 4. Salesforce Field Service Dispatch Engine
         let mut field_dispatch = SovereignFieldServiceDispatchEngine::new();
-        field_dispatch.register_technician("tech-1", "Dave Tech", vec!["Fiber Repair".to_string()], 8.0);
+        field_dispatch.register_technician(
+            "tech-1",
+            "Dave Tech",
+            vec!["Fiber Repair".to_string()],
+            8.0,
+        );
         let wo_id = field_dispatch.create_work_order("Acme Telecom", "Fiber Repair", 1, 4.0);
         let assigned = field_dispatch.auto_dispatch_work_order(wo_id);
         assert_eq!(assigned, Some("tech-1".to_string()));
 
         // 5. Odoo / Zoho Inventory Batch & Serial Traceability Engine
         let mut batch_trace = SovereignBatchSerialTraceabilityEngine::new();
-        batch_trace.register_lot("LOT-2026-A", "RAM-32GB", 1000, 5000, 100, vec!["SN-001".to_string(), "SN-002".to_string()]);
-        assert!(batch_trace.update_quality_status("LOT-2026-A", QualityControlStatus::PassedQuality));
+        batch_trace.register_lot(
+            "LOT-2026-A",
+            "RAM-32GB",
+            1000,
+            5000,
+            100,
+            vec!["SN-001".to_string(), "SN-002".to_string()],
+        );
+        assert!(
+            batch_trace.update_quality_status("LOT-2026-A", QualityControlStatus::PassedQuality)
+        );
         let traced = batch_trace.trace_serial_number("SN-002");
         assert!(traced.is_some());
         assert_eq!(traced.unwrap().sku, "RAM-32GB");
@@ -6727,7 +7366,14 @@ mod tests {
         // 6. Bitrix24 / Salesforce Contract Lifecycle Management (CLM) Engine
         let mut clm = SovereignContractLifecycleManagementEngine::new();
         clm.register_standard_clause("IP_OWNERSHIP", "All IP belongs to Sovereign OS.");
-        let contract_id = clm.draft_contract("Enterprise Support", "GlobalCorp", 250000.0, 1000, 2000, vec!["IP_OWNERSHIP".to_string()]);
+        let contract_id = clm.draft_contract(
+            "Enterprise Support",
+            "GlobalCorp",
+            250000.0,
+            1000,
+            2000,
+            vec!["IP_OWNERSHIP".to_string()],
+        );
         assert!(clm.advance_contract_status(contract_id, ContractApprovalStatus::SignedAndActive));
         let expiring = clm.find_expiring_contracts(2500);
         assert_eq!(expiring.len(), 1);
@@ -6735,18 +7381,34 @@ mod tests {
 
         // 7. Google Workspace Marketplace / MS Office Add-ins Engine
         let mut addon_engine = SovereignWorkspaceAddonExtensionEngine::new();
-        addon_engine.register_addon("addon-crm", "CRM Helper", "sheets.readonly", "https://addon.sigmaos.org");
+        addon_engine.register_addon(
+            "addon-crm",
+            "CRM Helper",
+            "sheets.readonly",
+            "https://addon.sigmaos.org",
+        );
         assert!(addon_engine.addons.contains_key("addon-crm"));
         let exec_res = addon_engine.execute_addon_event("addon-crm", "onOpen", "payload_data");
         assert!(exec_res.unwrap().contains("Executed Addon 'CRM Helper'"));
         assert!(addon_engine.toggle_addon("addon-crm", false));
-        assert!(addon_engine.execute_addon_event("addon-crm", "onOpen", "payload_data").is_none());
+        assert!(addon_engine
+            .execute_addon_event("addon-crm", "onOpen", "payload_data")
+            .is_none());
 
         // 8. Microsoft SharePoint / Power Pages Enterprise Intranet Portal Engine
         let mut portal_engine = SovereignEnterpriseIntranetPortalEngine::new();
         let page_id = portal_engine.create_page("Engineering Portal");
-        portal_engine.add_widget(page_id, PortalWidget::Heading("Welcome Engineers".to_string()));
-        portal_engine.add_widget(page_id, PortalWidget::MetricCard { title: "Uptime".to_string(), value: "99.99%".to_string() });
+        portal_engine.add_widget(
+            page_id,
+            PortalWidget::Heading("Welcome Engineers".to_string()),
+        );
+        portal_engine.add_widget(
+            page_id,
+            PortalWidget::MetricCard {
+                title: "Uptime".to_string(),
+                value: "99.99%".to_string(),
+            },
+        );
         assert!(portal_engine.publish_page(page_id));
         let rendered = portal_engine.render_portal();
         assert_eq!(rendered.len(), 1);
@@ -6768,12 +7430,17 @@ mod tests {
         assert_eq!(order_id, 1);
         let order = qtc_engine.get_order(order_id).unwrap();
         assert_eq!(order.revenue_schedules.len(), 12);
-        assert_eq!(qtc_engine.calculate_recognized_revenue_up_to(order_id, 6), Some(6000.0));
+        assert_eq!(
+            qtc_engine.calculate_recognized_revenue_up_to(order_id, 6),
+            Some(6000.0)
+        );
 
         // 11. Odoo Total Productive Maintenance (TPM) Equipment Engine
         let mut tpm_engine = SovereignEquipmentMaintenanceEngine::new();
         let eq_id = tpm_engine.register_equipment("CNC Mill 01", 1000.0);
-        let wo_id = tpm_engine.create_work_order(eq_id, MaintenanceRequestType::Corrective).unwrap();
+        let wo_id = tpm_engine
+            .create_work_order(eq_id, MaintenanceRequestType::Corrective)
+            .unwrap();
         assert!(tpm_engine.complete_work_order(wo_id, 10.0));
         let (mtbf, mttr) = tpm_engine.calculate_mtbf_mttr(eq_id).unwrap();
         assert_eq!(mtbf, 1000.0);
@@ -6785,7 +7452,15 @@ mod tests {
         assert!(chat_engine.assign_agent(session_id, "agent_alice"));
         assert!(chat_engine.send_message(session_id, "visitor_99", "Need support", 1000));
         assert!(chat_engine.send_message(session_id, "agent_alice", "How can I help?", 1005));
-        assert_eq!(chat_engine.sessions.get(&session_id).unwrap().messages.len(), 2);
+        assert_eq!(
+            chat_engine
+                .sessions
+                .get(&session_id)
+                .unwrap()
+                .messages
+                .len(),
+            2
+        );
         assert!(chat_engine.close_session(session_id));
         assert!(!chat_engine.send_message(session_id, "visitor_99", "Hello?", 1010));
 
@@ -6795,7 +7470,10 @@ mod tests {
         let mut row_val = HashMap::new();
         row_val.insert("Revenue".to_string(), 100.0);
         row_val.insert("Cost".to_string(), 40.0);
-        assert_eq!(looker_adv.evaluate_calculated_field("Revenue - Cost", &row_val), 60.0);
+        assert_eq!(
+            looker_adv.evaluate_calculated_field("Revenue - Cost", &row_val),
+            60.0
+        );
 
         let mut row1 = HashMap::new();
         row1.insert("region".to_string(), "US".to_string());
@@ -6804,5 +7482,135 @@ mod tests {
         let dataset = vec![row1, row2];
         let filtered = looker_adv.apply_cross_filter(&dataset, "region", "US");
         assert_eq!(filtered.len(), 1);
+    }
+
+    #[test]
+    fn test_sovereign_suite_new_engines() {
+        // 1. SovereignXlookupFilterUniqueFormulaEngine
+        let array_engine = SovereignXlookupFilterUniqueFormulaEngine::new();
+        let lookup_keys = vec!["A101".to_string(), "B202".to_string(), "C303".to_string()];
+        let return_vals = vec![
+            "Widgets".to_string(),
+            "Gadgets".to_string(),
+            "Tools".to_string(),
+        ];
+        assert_eq!(
+            array_engine.xlookup("B202", &lookup_keys, &return_vals, "N/A"),
+            "Gadgets"
+        );
+        assert_eq!(
+            array_engine.xlookup("Z999", &lookup_keys, &return_vals, "N/A"),
+            "N/A"
+        );
+        assert_eq!(array_engine.xmatch("C303", &lookup_keys), Some(2));
+
+        let vals = vec![
+            "Apple".to_string(),
+            "Banana".to_string(),
+            "Apple".to_string(),
+            "Cherry".to_string(),
+        ];
+        let flags = vec![true, false, true, true];
+        assert_eq!(
+            array_engine.filter(&vals, &flags),
+            vec![
+                "Apple".to_string(),
+                "Apple".to_string(),
+                "Cherry".to_string()
+            ]
+        );
+        assert_eq!(
+            array_engine.unique(&vals),
+            vec![
+                "Apple".to_string(),
+                "Banana".to_string(),
+                "Cherry".to_string()
+            ]
+        );
+
+        let nums = vec![42.0, 10.0, 99.0, 5.0];
+        assert_eq!(array_engine.sort(&nums, true), vec![5.0, 10.0, 42.0, 99.0]);
+
+        let mat = vec![
+            vec!["1".to_string(), "2".to_string()],
+            vec!["3".to_string(), "4".to_string()],
+        ];
+        let transposed = array_engine.transpose(&mat);
+        assert_eq!(transposed[0], vec!["1".to_string(), "3".to_string()]);
+        assert_eq!(transposed[1], vec!["2".to_string(), "4".to_string()]);
+
+        // 2. SovereignSalesTerritoryPipelineOptimizationEngine
+        let sales_engine = SovereignSalesTerritoryPipelineOptimizationEngine::new();
+        assert_eq!(
+            sales_engine.assign_territory_by_region_and_size("NA", 150000.0),
+            "Enterprise - NA"
+        );
+        assert_eq!(
+            sales_engine.assign_territory_by_region_and_size("EMEA", 10000.0),
+            "SMB - EMEA"
+        );
+
+        let deals = vec![(100000.0, 0.8, 30), (50000.0, 0.5, 30)];
+        let velocity = sales_engine.calculate_weighted_pipeline_velocity(&deals);
+        assert_eq!(velocity, (80000.0 + 25000.0) / 30.0);
+
+        let win_score = sales_engine.predict_lead_win_score(1000, 10, true, true);
+        assert!(win_score >= 80.0);
+
+        // 3. SovereignBusinessProcessAutomationOrchestrator
+        let mut auto_orch = SovereignBusinessProcessAutomationOrchestrator::new();
+        auto_orch.register_step("step1", "send_email", Some("tier"), Some("Enterprise"), 2);
+        auto_orch.register_step("step2", "update_crm", None, None, 1);
+
+        let mut ctx = HashMap::new();
+        ctx.insert("tier".to_string(), "Enterprise".to_string());
+        let log = auto_orch.execute_workflow(&mut ctx);
+        assert_eq!(log.len(), 2);
+        assert_eq!(ctx.get("step1_status").unwrap(), "completed");
+
+        // 4. SovereignMultiCurrencyLedgerConsolidationEngine
+        let mut fx_engine = SovereignMultiCurrencyLedgerConsolidationEngine::new();
+        fx_engine.set_exchange_rate("EUR", "USD", 1.08);
+        assert_eq!(fx_engine.convert(100.0, "EUR", "USD"), 108.0);
+        assert!(
+            (fx_engine.calculate_unrealized_fx_gain_loss(1000.0, 1.05, 1.08) - 30.0).abs() < 1e-5
+        );
+
+        let mut ledger_us = HashMap::new();
+        ledger_us.insert("1000".to_string(), 500.0);
+        let mut ledger_eu = HashMap::new();
+        ledger_eu.insert("1000".to_string(), 100.0);
+
+        let consolidated =
+            fx_engine.consolidate_trial_balance(&[ledger_us, ledger_eu], &["USD", "EUR"], "USD");
+        assert_eq!(consolidated.get("1000").copied(), Some(608.0));
+
+        // 5. SovereignInteractiveDashboardSlicerEngine
+        let slicer_engine = SovereignInteractiveDashboardSlicerEngine::new();
+        let mut r1 = HashMap::new();
+        r1.insert("category".to_string(), "Hardware".to_string());
+        r1.insert("date".to_string(), "2026-01".to_string());
+        r1.insert("sales".to_string(), "500".to_string());
+
+        let mut r2 = HashMap::new();
+        r2.insert("category".to_string(), "Software".to_string());
+        r2.insert("date".to_string(), "2026-01".to_string());
+        r2.insert("sales".to_string(), "300".to_string());
+
+        let dataset = vec![r1, r2];
+        let mut active_slicers = HashMap::new();
+        active_slicers.insert("category".to_string(), vec!["Hardware".to_string()]);
+
+        let sliced = slicer_engine.apply_multi_slicer_filter(&dataset, &active_slicers);
+        assert_eq!(sliced.len(), 1);
+        assert_eq!(sliced[0].get("category").unwrap(), "Hardware");
+
+        assert_eq!(
+            slicer_engine.compute_kpi_gauge_percentage(75.0, 100.0),
+            75.0
+        );
+
+        let ts = slicer_engine.aggregate_time_series(&dataset, "date", "sales");
+        assert_eq!(ts.get("2026-01").copied(), Some(800.0));
     }
 }

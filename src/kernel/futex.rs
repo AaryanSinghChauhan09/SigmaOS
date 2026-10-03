@@ -289,8 +289,10 @@ impl FutexHashTable {
             Vec::new()
         };
 
-        let requeued_len = requeued.len();
+        let requeued_count = requeued.len();
+
         // Add requeued waiters to target queue
+        let requeued_count = requeued.len();
         if !requeued.is_empty() {
             let target_queue = self.get_or_create_queue(target_key);
             for waiter in requeued {
@@ -298,7 +300,7 @@ impl FutexHashTable {
             }
         }
 
-        Ok(woken + requeued_len)
+        Ok(woken + requeued_count)
     }
 
     /// Remove waiter (called on thread cancellation)

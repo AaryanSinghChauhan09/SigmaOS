@@ -1,4 +1,5 @@
-use std::vec::Vec;
+extern crate alloc;
+use alloc::vec::Vec;
 
 /// io_uring operation codes
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -115,7 +116,7 @@ impl IoUringEngine {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
