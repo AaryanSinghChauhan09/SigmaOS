@@ -642,22 +642,283 @@ export function initWindowFocus() {
   });
 }
 
+// =========================================================================
+// 6. Sovereign 60fps Compositor Runtime
+//    One requestAnimationFrame pipeline batches ALL per-frame DOM work
+//    (window dragging, ambient glow tracking, live telemetry) into a single
+//    write phase: no read/write interleaving, no layout thrash, one style
+//    write per element per frame. Pointer events only record intent; the
+//    frame applies it.
+// =========================================================================
+
+const PERF_STATE = {
+  rafScheduled: false,
+  frameDeltas: [],
+  lastFrameTs: 0,
+  lastFpsPaint: 0,
+  lastClockPaint: 0,
+  lastTelemetryPaint: 0,
+  cpu: 14,
+  memGB: 2.6,
+  drag: null,
+  glow: null,
+  telemetry: null,
+};
+
+function perfSetTspanIfChanged(el, text) {
+  if (el && el.textContent !== text) {
+    el.textContent = text;
+  }
+}
+
+function perfScheduleFrame() {
+  if (PERF_STATE.rafScheduled) return;
+  PERF_STATE.rafScheduled = true;
+  if (typeof requestAnimationFrame === "function") {
+    requestAnimationFrame(perfFrame);
+  }
+}
+
+function perfUpdateFps() {
+  const t = PERF_STATE.telemetry;
+  if (!t || !t.fpsEl || PERF_STATE.frameDeltas.length < 5) return;
+  const avg =
+    PERF_STATE.frameDeltas.reduce((a, b) => a + b, 0) / PERF_STATE.frameDeltas.length;
+  perfSetTspanIfChanged(t.fpsEl, avg > 0 ? (1000 / avg).toFixed(1) : "—");
+}
+
+function perfUpdateClock() {
+  const t = PERF_STATE.telemetry;
+  if (!t || (!t.dateEl && !t.timeEl)) return;
+  const now = new Date();
+  if (t.dateEl) {
+    perfSetTspanIfChanged(
+      t.dateEl,
+      now.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" }),
+    );
+  }
+  if (t.timeEl) {
+    perfSetTspanIfChanged(
+      t.timeEl,
+      now.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" }),
+    );
+  }
+}
+
+// Simulated vitals for the preview shell: bounded random walk keeps the
+// readouts plausible (and visibly alive) until a real kernel bridge exists.
+function perfUpdateTelemetrySim() {
+  const t = PERF_STATE.telemetry;
+  if (!t) return;
+  const clamp = (v, lo, hi) => Math.min(Math.max(v, lo), hi);
+  PERF_STATE.cpu = clamp(PERF_STATE.cpu + (Math.random() * 10 - 5), 2, 96);
+  PERF_STATE.memGB = clamp(PERF_STATE.memGB + (Math.random() * 0.3 - 0.15), 1.2, 7.8);
+  if (t.cpuEl) perfSetTspanIfChanged(t.cpuEl, `${Math.round(PERF_STATE.cpu)}%`);
+  if (t.memEl) perfSetTspanIfChanged(t.memEl, `${PERF_STATE.memGB.toFixed(1)} GB`);
+}
+
+function perfFrame(ts) {
+  PERF_STATE.rafScheduled = false;
+
+  // FPS accounting (spikes > 1s are visibility changes, not frames)
+  if (PERF_STATE.lastFrameTs) {
+    const dt = ts - PERF_STATE.lastFrameTs;
+    if (dt > 0 && dt < 1000) {
+      PERF_STATE.frameDeltas.push(dt);
+      if (PERF_STATE.frameDeltas.length > 90) PERF_STATE.frameDeltas.shift();
+    }
+  }
+  PERF_STATE.lastFrameTs = ts;
+
+  // Window drag: single batched style write; all geometry was cached at
+  // drag start, so the hot loop performs zero layout reads.
+  const drag = PERF_STATE.drag;
+  if (drag && drag.el) {
+    const x = Math.min(
+      Math.max(drag.baseX + (drag.pointerX - drag.startX), -drag.w + 140),
+      drag.parentW - 140,
+    );
+    const y = Math.min(Math.max(drag.baseY + (drag.pointerY - drag.startY), 0), drag.parentH - 60);
+    drag.el.style.left = `${Math.round(x)}px`;
+    drag.el.style.top = `${Math.round(y)}px`;
+  }
+
+  // Ambient glow: compositor-only transform (no layout, no paint)
+  if (PERF_STATE.glow && PERF_STATE.glow.dirty) {
+    PERF_STATE.glow.dirty = false;
+    PERF_STATE.glow.el.style.transform =
+      `translate3d(${PERF_STATE.glow.x}px, ${PERF_STATE.glow.y}px, 0) translate(-50%, -50%)`;
+  }
+
+  // Rate-limited telemetry paints driven by the same frame clock
+  if (ts - PERF_STATE.lastFpsPaint >= 500) {
+    PERF_STATE.lastFpsPaint = ts;
+    perfUpdateFps();
+  }
+  if (ts - PERF_STATE.lastClockPaint >= 1000) {
+    PERF_STATE.lastClockPaint = ts;
+    perfUpdateClock();
+  }
+  if (ts - PERF_STATE.lastTelemetryPaint >= 2000) {
+    PERF_STATE.lastTelemetryPaint = ts;
+    perfUpdateTelemetrySim();
+  }
+
+  // Continuous loop: the FPS meter measures the live desktop frame rate.
+  perfScheduleFrame();
+}
+
+/**
+ * GPU-smooth, pointer-captured window dragging.
+ * Windows advertise "Draggable Premium Windows" in the markup; this finally
+ * implements it: delta-based positioning (drift-free), geometry cached at
+ * drag start, one style write per frame, transitions suppressed mid-drag.
+ */
+export function initSmoothWindowDragging() {
+  if (typeof document === "undefined") return;
+  SovereignDomSelector.selectAll(".window").forEach((win) => {
+    const header = SovereignDomSelector.selectOne(".window-header", win);
+    if (!header || typeof header.setPointerCapture !== "function") return;
+    let activePointerId = null;
+
+    header.addEventListener("pointerdown", (event) => {
+      if (event.button !== 0) return;
+      if (SovereignDomSelector.matches(event.target, ".control-dot, .control-dot *")) return;
+      if (win.classList.contains("maximized")) return;
+
+      const rect = win.getBoundingClientRect();
+      const parent = win.offsetParent || document.body;
+      const parentRect = parent.getBoundingClientRect();
+
+      activePointerId = event.pointerId;
+      PERF_STATE.drag = {
+        el: win,
+        header,
+        pointerId: event.pointerId,
+        startX: event.clientX,
+        startY: event.clientY,
+        pointerX: event.clientX,
+        pointerY: event.clientY,
+        baseX: rect.left - parentRect.left,
+        baseY: rect.top - parentRect.top,
+        w: rect.width,
+        h: rect.height,
+        parentW: parentRect.width,
+        parentH: parentRect.height,
+      };
+      win.classList.add("dragging");
+      try {
+        header.setPointerCapture(event.pointerId);
+      } catch (e) {
+        /* pointer capture is best-effort */
+      }
+      event.preventDefault();
+    });
+
+    header.addEventListener("pointermove", (event) => {
+      if (activePointerId === null || event.pointerId !== activePointerId) return;
+      if (!PERF_STATE.drag) return;
+      PERF_STATE.drag.pointerX = event.clientX;
+      PERF_STATE.drag.pointerY = event.clientY;
+      perfScheduleFrame();
+    });
+
+    const endDrag = (event) => {
+      if (activePointerId === null) return;
+      if (PERF_STATE.drag && PERF_STATE.drag.el === win) {
+        PERF_STATE.drag = null;
+      }
+      activePointerId = null;
+      win.classList.remove("dragging");
+      try {
+        header.releasePointerCapture(event.pointerId);
+      } catch (e) {
+        /* already released */
+      }
+    };
+    header.addEventListener("pointerup", endDrag);
+    header.addEventListener("pointercancel", endDrag);
+    header.addEventListener("lostpointercapture", () => {
+      if (PERF_STATE.drag && PERF_STATE.drag.el === win) {
+        PERF_STATE.drag = null;
+      }
+      activePointerId = null;
+      win.classList.remove("dragging");
+    });
+
+    // Double-click the header to toggle maximize (common desktop convention)
+    header.addEventListener("dblclick", (event) => {
+      if (SovereignDomSelector.matches(event.target, ".control-dot, .control-dot *")) return;
+      if (typeof win.id === "string" && win.id) {
+        maximizeWindow(win.id);
+      }
+    });
+  });
+}
+
+/**
+ * Ambient mouse glow: the #mouse-glow element was dead markup — styled in
+ * CSS but never driven. It now follows the pointer via a rAF-batched
+ * translate3d (compositor-only, zero layout cost) and fades in/out.
+ */
+export function initAmbientMouseGlow() {
+  if (typeof document === "undefined" || typeof window === "undefined") return;
+  const glow = document.getElementById("mouse-glow");
+  if (!glow) return;
+  if (window.matchMedia && !window.matchMedia("(pointer: fine)").matches) return;
+
+  PERF_STATE.glow = {
+    el: glow,
+    x: Math.round(window.innerWidth / 2),
+    y: Math.round(window.innerHeight / 2),
+    dirty: true,
+  };
+
+  document.addEventListener(
+    "pointermove",
+    (event) => {
+      if (!PERF_STATE.glow) return;
+      PERF_STATE.glow.x = event.clientX;
+      PERF_STATE.glow.y = event.clientY;
+      PERF_STATE.glow.dirty = true;
+      if (!glow.classList.contains("warm")) {
+        glow.classList.add("warm");
+      }
+      perfScheduleFrame();
+    },
+    { passive: true },
+  );
+
+  document.addEventListener("pointerleave", () => glow.classList.remove("warm"));
+  document.addEventListener("mouseleave", () => glow.classList.remove("warm"));
+}
+
+/**
+ * Live top-bar telemetry: FPS (measured from the frame clock), CPU/MEM
+ * simulated vitals, and the wall clock. The markup shipped these readouts
+ * frozen at "0% / 0.0 GB / 60.0ms / 12:00" — this revives them.
+ */
+export function initLiveTelemetry() {
+  if (typeof document === "undefined") return;
+  PERF_STATE.telemetry = {
+    cpuEl: document.getElementById("telemetry-cpu"),
+    memEl: document.getElementById("telemetry-mem"),
+    fpsEl: document.getElementById("telemetry-fps"),
+    dateEl: document.getElementById("clock-date"),
+    timeEl: document.getElementById("clock-time"),
+  };
+  const t = PERF_STATE.telemetry;
+  if (!t.cpuEl && !t.memEl && !t.fpsEl && !t.dateEl && !t.timeEl) {
+    PERF_STATE.telemetry = null;
+    return;
+  }
+  perfUpdateClock();
+  perfScheduleFrame();
+}
+
 // Auto-initialize accessibility listeners when loaded in browser environments
 if (typeof window !== "undefined" && typeof document !== "undefined") {
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", () => {
-      initKeyboardNavigation();
-      initHighContrastSupport();
-      initTablistNavigation();
-      initToggleSwitches();
-      initCommandPalette();
-      initEscapeKeyDismissal();
-      initDockShortcutNavigation();
-      initMenuNavigation();
-      initContextMenu();
-      initWindowFocus();
-    });
-  } else {
+  const autoInit = () => {
     initKeyboardNavigation();
     initHighContrastSupport();
     initTablistNavigation();
@@ -668,6 +929,14 @@ if (typeof window !== "undefined" && typeof document !== "undefined") {
     initMenuNavigation();
     initContextMenu();
     initWindowFocus();
+    initSmoothWindowDragging();
+    initAmbientMouseGlow();
+    initLiveTelemetry();
+  };
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", autoInit);
+  } else {
+    autoInit();
   }
 }
 
