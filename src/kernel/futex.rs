@@ -289,6 +289,8 @@ impl FutexHashTable {
             Vec::new()
         };
 
+        let requeued_count = requeued.len();
+
         // Add requeued waiters to target queue
         let requeued_count = requeued.len();
         if !requeued.is_empty() {
