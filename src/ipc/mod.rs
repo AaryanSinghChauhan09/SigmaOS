@@ -15,6 +15,7 @@
 
 pub mod async_io;
 pub mod bus;
+pub mod futex;
 pub mod helenos_async;
 pub mod ipc;
 pub mod ipc_namespace;
@@ -22,6 +23,7 @@ pub mod mechanism;
 pub mod message;
 pub mod pipe;
 pub mod signals;
+pub mod socket;
 pub mod sovereign_async_procedure_call;
 pub mod std_streams;
 pub mod unix_socket;
@@ -84,4 +86,16 @@ pub use sysv_ipc::{
     SemRegistry, SemSet, SemidDs, SemBuf,
     MsgRegistry, MsgQueue as SysvMsgQueue, MsqidDs,
     IPC_CREAT, IPC_EXCL, IPC_NOWAIT, IPC_PRIVATE,
+};
+
+// Futex exports
+pub use futex::{
+    FutexBucket, FutexError, FutexHashTable, FutexKey, FutexOp, FutexWaiter,
+    RobustFutexList, RobustListEntry, futex_requeue, futex_wait, futex_wake,
+};
+
+// Pipe exports
+pub use pipe::{
+    KernelPipe, PipeError as KernelPipeError, PipeReader, PipeWriter,
+    pipe_pair, pipe_read, pipe_write,
 };
