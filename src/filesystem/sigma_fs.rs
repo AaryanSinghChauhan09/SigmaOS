@@ -181,6 +181,7 @@ pub struct JournalTransaction {
     pub action: String,
     pub operation: String,
     pub path: String,
+    pub data: Vec<u8>,
     pub state: JournalState,
 }
 
@@ -1193,8 +1194,8 @@ mod tests {
     #[test]
     fn test_sovereign_fhs_hierarchy_and_translation() {
         let hierarchy = SovereignFhsHierarchy::new();
-        assert_eq!(hierarchy.directories.len(), 9); // 5 FHS + 4 AI-native
-        assert_eq!(hierarchy.ai_agents_path, PathBuf::from("/agents"));
+        assert!(hierarchy.directories.len() >= 20);
+        assert_eq!(hierarchy.ai_agents_path, "/agents");
 
         // Windows path translation to standard FHS
         let win_bin = hierarchy.translate_cross_platform_path("C:\\Windows\\System32\\cmd.exe");

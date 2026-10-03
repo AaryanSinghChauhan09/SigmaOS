@@ -82,13 +82,13 @@ impl SlabCache {
     /// Linux: `mm/slub.c:slab_alloc()`
     pub fn allocate(&mut self) -> Option<NonNull<u8>> {
         // Try partial slabs first
-        if let Some(obj) = self.allocate_from_slab_list(&mut self.partial_slabs) {
+        if let Some(obj) = self.allocate_from_slab_list(true) {
             self.allocated_objects.fetch_add(1, Ordering::Relaxed);
             return Some(obj);
         }
 
         // Try empty slabs
-        if let Some(obj) = self.allocate_from_slab_list(&mut self.empty_slabs) {
+        if let Some(obj) = self.allocate_from_slab_list(false) {
             self.allocated_objects.fetch_add(1, Ordering::Relaxed);
             return Some(obj);
         }
@@ -99,13 +99,14 @@ impl SlabCache {
     }
 
     /// Allocate from specific slab list
-    fn allocate_from_slab_list(&mut self, list: &mut *mut Slab) -> Option<NonNull<u8>> {
-        if list.is_null() {
+    fn allocate_from_slab_list(&mut self, is_partial: bool) -> Option<NonNull<u8>> {
+        let list_ptr = if is_partial { self.partial_slabs } else { self.empty_slabs };
+        if list_ptr.is_null() {
             return None;
         }
 
         unsafe {
-            let slab = &mut **list;
+            let slab = &mut *list_ptr;
             
             if slab.free_list.is_null() {
                 return None;
@@ -119,7 +120,13 @@ impl SlabCache {
 
             // If slab is now full, move to full list
             if slab.free_count == 0 {
-                self.move_slab_to_full(list);
+                if is_partial {
+                    self.partial_slabs = slab.next;
+                } else {
+                    self.empty_slabs = slab.next;
+                }
+                slab.next = self.full_slabs;
+                self.full_slabs = list_ptr;
             }
 
             NonNull::new(obj as *mut u8)

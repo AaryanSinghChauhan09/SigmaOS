@@ -115,7 +115,7 @@ impl CachedPage {
     }
 
     /// Update last access time
-    pub fn touch(&self, time: u64) {
+    pub fn touch(&mut self, time: u64) {
         self.last_access.store(time, Ordering::Release);
         self.flags.referenced = true;
     }
@@ -185,8 +185,9 @@ impl PageCache {
     /// Look up page in cache
     pub fn lookup(&mut self, inode: u64, offset: u64) -> Option<&mut CachedPage> {
         let key = PageKey::new(inode, offset);
+        let now = self.now();
         if let Some(page) = self.pages.get_mut(&key) {
-            page.touch(self.now());
+            page.touch(now);
             self.hits.fetch_add(1, Ordering::Relaxed);
             Some(page)
         } else {
@@ -196,7 +197,7 @@ impl PageCache {
     }
 
     /// Add page to cache
-    pub fn insert(&mut self, page: CachedPage) -> Result<(), PageCacheError> {
+    pub fn insert(&mut self, mut page: CachedPage) -> Result<(), PageCacheError> {
         let key = PageKey::new(page.inode, page.offset);
 
         // Check if we need to evict
@@ -205,7 +206,8 @@ impl PageCache {
         }
 
         // Insert page
-        page.touch(self.now());
+        let now = self.now();
+        page.touch(now);
         if page.flags.dirty {
             self.dirty_pages.fetch_add(1, Ordering::Relaxed);
         }
@@ -238,7 +240,7 @@ impl PageCache {
             if let Some(mut page) = self.pages.remove(&entry.key) {
                 // Writeback dirty page before eviction
                 if page.flags.dirty {
-                    self.writeback_page(&mut page)?;
+                    Self::writeback_page_static(&mut page)?;
                     self.dirty_pages.fetch_sub(1, Ordering::Relaxed);
                 }
                 self.current_pages.fetch_sub(1, Ordering::Relaxed);
@@ -251,7 +253,7 @@ impl PageCache {
     }
 
     /// Write dirty page to storage
-    fn writeback_page(&mut self, page: &mut CachedPage) -> Result<(), PageCacheError> {
+    fn writeback_page_static(page: &mut CachedPage) -> Result<(), PageCacheError> {
         if !page.flags.dirty {
             return Ok(());
         }
@@ -262,6 +264,10 @@ impl PageCache {
         Ok(())
     }
 
+    fn writeback_page(&mut self, page: &mut CachedPage) -> Result<(), PageCacheError> {
+        Self::writeback_page_static(page)
+    }
+
     /// Flush all dirty pages
     pub fn flush(&mut self) -> Result<usize, PageCacheError> {
         let mut flushed = 0;
@@ -270,7 +276,7 @@ impl PageCache {
         for key in keys {
             if let Some(page) = self.pages.get_mut(&key) {
                 if page.flags.dirty {
-                    self.writeback_page(page)?;
+                    Self::writeback_page_static(page)?;
                     flushed += 1;
                 }
             }

@@ -40,7 +40,7 @@ use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
 #[cfg(not(feature = "standalone_test"))]
-use crate::package::universal::{PackageFormat, UnifiedPackage};
+use crate::package::universal::UnifiedPackage;
 
 #[cfg(feature = "standalone_test")]
 #[path = "universal.rs"]

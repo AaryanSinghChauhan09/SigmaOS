@@ -265,6 +265,32 @@ impl SovereignXhciUsb3Driver {
         self.doorbells[slot_id as usize] = target_endpoint_ctx as u32;
         Ok(())
     }
+
+    /// Create a new transfer ring
+    pub fn create_transfer_ring(&mut self, size: usize) -> Result<usize, &'static str> {
+        let ring = XhciTransferRing::new(size);
+        let idx = self.transfer_rings.len();
+        self.transfer_rings.push(ring);
+        Ok(idx)
+    }
+
+    /// Submit a TRB to a transfer ring
+    pub fn submit_transfer(&mut self, ring_idx: usize, trb: SovereignXhciTrb) -> Result<usize, &'static str> {
+        if let Some(ring) = self.transfer_rings.get_mut(ring_idx) {
+            ring.enqueue(trb)
+        } else {
+            Err("Invalid transfer ring index")
+        }
+    }
+
+    /// Get transfer ring enqueue and dequeue indices status
+    pub fn get_transfer_ring_status(&self, ring_idx: usize) -> Result<(usize, usize), &'static str> {
+        if let Some(ring) = self.transfer_rings.get(ring_idx) {
+            Ok((ring.enqueue_idx, ring.dequeue_idx))
+        } else {
+            Err("Invalid transfer ring index")
+        }
+    }
 }
 
 impl Default for SovereignXhciUsb3Driver {

@@ -39,7 +39,7 @@ pub mod uuid {
 use std::string::String;
 use std::vec::Vec;
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Clone)]
 pub struct SigmaString {
     data: String,
 }
