@@ -330,6 +330,9 @@ pub use sovereign_2070_distro_supremacy_engine::*;
 
 pub mod sovereign_2075_distro_supremacy_engine;
 pub use sovereign_2075_distro_supremacy_engine::*;
+
+pub mod sovereign_blackarch_gap_closure_engine;
+pub use sovereign_blackarch_gap_closure_engine::*;
 pub mod sovereign_2028_distro_supremacy_engine;
 pub use sovereign_2028_distro_supremacy_engine::{
     BpfSchedExtPolicy, DirectScanoutFrame, EbpfSchedTask, FineIbtCallsiteGuard, MicroVmSpawnSpec,

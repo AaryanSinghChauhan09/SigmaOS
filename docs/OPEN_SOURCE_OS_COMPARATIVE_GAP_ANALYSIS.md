@@ -30,7 +30,7 @@ While SigmaOS implements pure `#![no_std]` Rust abstractions and models for many
 | **Android (AOSP)** | Monolithic (Linux) | HAL / Treble / AIDL | C++ / Java / Rust | `.apk` / APEX | In-kernel Binder IPC driver with transaction ring buffers and Ashmem |
 | **TempleOS** | Single-Address-Space | Direct kernel access | HolyC JIT | Custom ISO | Ring 0 single-address-space non-preemptive JIT execution model |
 | **Minix 3** | Microkernel | Userland servers | C | `pkgsrc` | Reincarnation Server (RS) automatic driver failure recovery supervisor |
-| **SigmaOS (Current)** | Modular Monolithic | Bare-metal Rust modules | **100% Safe Rust (`#![no_std]`)** | `sigpkg` (.sigpkg) | **2075 Distro Supremacy Engine**: Full Haiku BFS live attribute queries, Plan 9 synthetic namespaces & rfork isolation, Systemd 600+ self-healing mesh, Bcachefs photonic storage, OpenBSD 25.0 FineIBT W^X PTE, FreeBSD 35.0 VNET PQC mesh, Wayland 6.0 64-bit HDR 3D LUTs |
+| **SigmaOS (Current)** | Modular Monolithic | Bare-metal Rust modules | **100% Safe Rust (`#![no_std]`)** | `sigpkg` (.sigpkg) | **Full BlackArch Linux Parity**: 45+ tool category metapackages (`blackarch-*`), `blackman` source compilation engine, `strap.sh` GPG keyring & PQC signature verification, live ISO build profiles, 2075 Distro Supremacy Engine |
 
 ---
 
