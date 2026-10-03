@@ -34,6 +34,8 @@ pub mod storage;
 pub mod touch_jingos;
 pub mod usb_hid;
 pub mod vesa;
+pub mod usb_stack;
+pub mod ethernet;
 
 pub use gpu::{
     GpuCommand, GpuCommandBuffer, GpuDriver, GpuError, GpuPipeline,
@@ -84,3 +86,11 @@ pub use modern_audio_intel_hda::ModernAudioIntelHda;
 pub use modern_nvme::ModernNvmeDriver;
 pub use modern_wifi::ModernWifiDriver;
 pub use touch_jingos::TouchJingosDriver;
+pub use usb_stack::{
+    UsbDevice, UsbDeviceDescriptor, UsbSpeed, UsbDeviceState, UsbHostController,
+    UsbSetupPacket, UsbEnumerator, UsbError, UsbTransferType, UsbDirection,
+};
+pub use ethernet::{
+    EthernetFrame, EthernetHeader, MacAddr, EtherType, NetDevice, NetDevStats,
+    E1000Device, EthernetError,
+};

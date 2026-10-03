@@ -14,6 +14,7 @@ pub mod smart_symlink;
 pub mod support;
 pub mod vfs;
 pub mod watch;
+pub mod ext4;
 
 pub use crate::filesystem::vfs::{FileType, FsError, Inode, VfsError, VirtualFilesystem};
 pub use smart_symlink::{LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule};
@@ -66,6 +67,10 @@ pub use sovereign_filesystem_hierarchy::{
     SyntheticProcSysfsProvider,
 };
 pub use watch::{EventQueue, ThreadSafeEventQueue, COALESCE_WINDOW_MS, RING_BUFFER_SIZE};
+pub use ext4::{
+    Ext4Filesystem, Ext4Superblock, Ext4Inode, Ext4Error, Ext4Stats,
+    Ext4ExtentHeader, Ext4Extent, Ext4GroupDesc,
+};
 
 pub type FileDescriptor = i32;
 pub type FilePermissions = u32;
