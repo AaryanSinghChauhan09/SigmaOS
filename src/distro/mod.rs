@@ -386,3 +386,6 @@ pub use sovereign_2075_distro_supremacy_engine::*;
 
 pub mod sovereign_universal_subsystem_interop;
 pub use sovereign_universal_subsystem_interop::*;
+
+pub mod sovereign_linux_bsd_ecosystem_advancements_v19;
+pub use sovereign_linux_bsd_ecosystem_advancements_v19::*;

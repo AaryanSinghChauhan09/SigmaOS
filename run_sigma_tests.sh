@@ -500,4 +500,11 @@ if [ -f "src/distro/sovereign_linux_bsd_pinnacle_innovations_v14.rs" ]; then
     ./build/test_pinnacle_v14
 fi
 
+if [ -f "src/distro/sovereign_linux_bsd_ecosystem_advancements_v19.rs" ]; then
+    echo "Running Sovereign Linux & BSD Ecosystem Advancements V19 test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_linux_bsd_ecosystem_advancements_v19.rs --edition=2021 -o build/test_advancements_v19
+    ./build/test_advancements_v19
+fi
+
 echo "All SigmaOS test suites completed."
