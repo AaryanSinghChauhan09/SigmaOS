@@ -3254,7 +3254,7 @@ mod subsystem_interop_tests {
             .harmonize_all_subsystems_across_all_distros()
             .unwrap();
         assert!(synced > 0);
-        assert_eq!(harmonizer.harmonized_distros_count, 34);
+        assert_eq!(harmonizer.harmonized_distros_count, 78);
         assert!(harmonizer.harmonized_subsystems_count >= 150);
 
         let res = harmonizer
@@ -3400,6 +3400,50 @@ impl SovereignMasterSubsystemDistroHarmonizer {
             DistroSubsystemMode::SmartOs,
             DistroSubsystemMode::SolarisSmartOS,
             DistroSubsystemMode::BedrockLinux,
+            DistroSubsystemMode::LinuxUbuntu,
+            DistroSubsystemMode::LinuxMint,
+            DistroSubsystemMode::LinuxPopOs,
+            DistroSubsystemMode::LinuxTails,
+            DistroSubsystemMode::LinuxKali,
+            DistroSubsystemMode::LinuxGaruda,
+            DistroSubsystemMode::LinuxEndeavour,
+            DistroSubsystemMode::LinuxManjaro,
+            DistroSubsystemMode::LinuxCachyOS,
+            DistroSubsystemMode::LinuxZorin,
+            DistroSubsystemMode::LinuxParrot,
+            DistroSubsystemMode::LinuxMageia,
+            DistroSubsystemMode::LinuxWhonix,
+            DistroSubsystemMode::LinuxAlma,
+            DistroSubsystemMode::LinuxRocky,
+            DistroSubsystemMode::LinuxDeepin,
+            DistroSubsystemMode::LinuxAsahi,
+            DistroSubsystemMode::LinuxNobara,
+            DistroSubsystemMode::LinuxChimera,
+            DistroSubsystemMode::LinuxKaOS,
+            DistroSubsystemMode::LinuxTinyCore,
+            DistroSubsystemMode::LinuxPuppy,
+            DistroSubsystemMode::LinuxPostmarket,
+            DistroSubsystemMode::LinuxOpenWrt,
+            DistroSubsystemMode::LinuxVanillaOS,
+            DistroSubsystemMode::LinuxPCLinuxOS,
+            DistroSubsystemMode::LinuxSlax,
+            DistroSubsystemMode::LinuxAntiX,
+            DistroSubsystemMode::LinuxGuix,
+            DistroSubsystemMode::MidnightBsd,
+            DistroSubsystemMode::GhostBsd,
+            DistroSubsystemMode::NomadBsd,
+            DistroSubsystemMode::HardenedBsd,
+            DistroSubsystemMode::OpenBsdHardened,
+            DistroSubsystemMode::SolarisOmniOS,
+            DistroSubsystemMode::NetBsdRump,
+            DistroSubsystemMode::LinuxSteamOS,
+            DistroSubsystemMode::LinuxOracle,
+            DistroSubsystemMode::LinuxRHEL,
+            DistroSubsystemMode::LinuxMX,
+            DistroSubsystemMode::LinuxQubes,
+            DistroSubsystemMode::LinuxTalos,
+            DistroSubsystemMode::LinuxEndless,
+            DistroSubsystemMode::LinuxAlpineExtended,
         ];
 
         let mut total_synced_subsystems = 0;
