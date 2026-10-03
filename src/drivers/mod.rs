@@ -41,6 +41,8 @@ pub mod nvme_driver;
 pub mod ahci_sata;
 pub mod usb_hid;
 pub mod usb_mass_storage;
+pub mod usb_audio;
+pub mod usb_video;
 pub mod audio_intel_hda;
 pub mod drm_kms;
 
