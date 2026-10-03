@@ -1,5 +1,5 @@
 # SigmaOS Feature Status — Machine-Readable Release Truth
-# Updated: 2026-09-24
+# Updated: 2026-10-03
 # Policy: No feature is "working" without an automated test or QEMU evidence.
 
 [arch.x86_64]
@@ -8,6 +8,41 @@ files = ["src/arch/x86_64/"]
 description = "CPU init, GDT, IDT, paging, interrupt stubs created"
 test_evidence = "Structural — needs QEMU boot validation"
 next_milestone = "Real hardware register writes via inline asm"
+
+[arch.aarch64]
+status = "partial"
+files = ["src/arch/aarch64/"]
+description = "Exception vectors, MMU (TTBR0/TTBR1), GICv3 driver, generic timer"
+test_evidence = "Compile-only — needs QEMU AArch64 boot validation"
+next_milestone = "QEMU virt machine boot to kernel_main"
+
+[arch.riscv64]
+status = "partial"
+files = ["src/arch/riscv64/"]
+description = "Trap handlers, Sv48 MMU, PLIC driver, SBI timer interface"
+test_evidence = "Compile-only — needs QEMU RISC-V boot validation"
+next_milestone = "QEMU virt machine boot to kernel_main"
+
+[arch.x86_64.context_switch]
+status = "working"
+files = ["src/arch/x86_64/context.rs"]
+description = "Naked asm push/pop all GPRs + FPU fxsave/fxrstor, System V AMD64 ABI"
+test_evidence = "Unit tests for context initialization"
+next_milestone = "Integration with EEVDF scheduler"
+
+[arch.x86_64.apic]
+status = "working"
+files = ["src/arch/x86_64/apic.rs"]
+description = "Local APIC init, EOI, periodic timer, IPI send via ICR"
+test_evidence = "Unit tests for register layout"
+next_milestone = "QEMU APIC calibration"
+
+[arch.x86_64.syscall]
+status = "working"
+files = ["src/arch/x86_64/syscall.rs"]
+description = "SYSCALL/SYSRET via MSR_LSTAR, MSR_STAR, MSR_SFMASK, swapgs"
+test_evidence = "Unit tests for MSR values"
+next_milestone = "Ring-3 userland syscall test"
 
 [syscall.abi]
 status = "partial"
@@ -132,3 +167,94 @@ status = "working"
 files = ["src/security/audit.rs"]
 description = "Security audit framework with finding tracking and severity"
 test_evidence = "Unit tests pass"
+
+[crypto.aes_gcm]
+status = "working"
+files = ["src/crypto/aes_gcm.rs"]
+description = "Pure-Rust AES-256-GCM with NIST test vectors, constant-time tag compare"
+test_evidence = "Unit tests with NIST SP 800-38D vectors"
+next_milestone = "AES-NI hardware acceleration"
+
+[crypto.ed25519]
+status = "working"
+files = ["src/crypto/ed25519.rs"]
+description = "Ed25519 sign/verify with Curve25519 field arithmetic, RFC 8032 vectors"
+test_evidence = "Unit tests with RFC 8032 test vectors"
+next_milestone = "Batch verification optimization"
+
+[crypto.sha2]
+status = "working"
+files = ["src/crypto/sha2.rs"]
+description = "SHA-256, SHA-512, HMAC-SHA256, PBKDF2-SHA256 with NIST vectors"
+test_evidence = "Unit tests with NIST vectors"
+next_milestone = "SHA-3/BLAKE3 for higher performance"
+
+[crypto.chacha20_poly1305]
+status = "working"
+files = ["src/crypto/chacha20_poly1305.rs"]
+description = "ChaCha20-Poly1305 AEAD with RFC 8439 test vectors"
+test_evidence = "Unit tests with RFC 8439 vectors"
+next_milestone = "ARM NEON acceleration"
+
+[scheduler.bore]
+status = "working"
+files = ["src/scheduler/bore.rs"]
+description = "BORE burst-scored scheduling with interactive task boosting"
+test_evidence = "Unit tests for burst scoring and priority"
+next_milestone = "Integration with EEVDF as hybrid scheduler"
+
+[scheduler.cfs]
+status = "working"
+files = ["src/scheduler/cfs.rs"]
+description = "CFS with vruntime, weight table, group scheduling stubs"
+test_evidence = "Unit tests for fairness"
+next_milestone = "Autogroup scheduling"
+
+[scheduler.realtime]
+status = "working"
+files = ["src/scheduler/realtime.rs"]
+description = "SCHED_FIFO + SCHED_RR with 100 priority levels, bitmap-based O(1) pick"
+test_evidence = "Unit tests for FIFO order and RR rotation"
+next_milestone = "Deadline scheduling (SCHED_DEADLINE)"
+
+[security.landlock_v4]
+status = "working"
+files = ["src/security/landlock_v4.rs"]
+description = "Landlock v4 with filesystem + network (TCP/UDP port) restrictions"
+test_evidence = "Unit tests for rule accumulation"
+next_milestone = "Kernel enforcement in VFS layer"
+
+[security.seccomp]
+status = "working"
+files = ["src/security/seccomp.rs"]
+description = "seccomp-BPF with allow/deny lists, strict mode"
+test_evidence = "Unit tests for BPF instruction generation"
+next_milestone = "Integration with syscall dispatch"
+
+[security.pledge]
+status = "working"
+files = ["src/security/pledge.rs"]
+description = "OpenBSD-compatible pledge(2) + unveil(2) promise model"
+test_evidence = "Unit tests for promise reduction"
+next_milestone = "Kernel enforcement at syscall boundary"
+
+[security.capsicum]
+status = "working"
+files = ["src/security/capsicum.rs"]
+description = "FreeBSD Capsicum capability mode with fd rights restriction"
+test_evidence = "Unit tests for capability rights"
+next_milestone = "Integration with VFS fd table"
+
+[security.mac]
+status = "working"
+files = ["src/security/mac.rs"]
+description = "MAC framework: MLS Bell-LaPadula + Type Enforcement"
+test_evidence = "Unit tests for MLS read/write rules"
+next_milestone = "LSM hook integration"
+
+[security.tpm]
+status = "partial"
+files = ["src/security/tpm.rs"]
+description = "TPM 2.0 CRB interface: PCR extend/read, seal/unseal, hardware RNG"
+test_evidence = "Unit tests with mock TPM responses"
+next_milestone = "Real TPM device driver integration"
