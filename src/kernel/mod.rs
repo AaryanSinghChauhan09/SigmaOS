@@ -98,6 +98,19 @@ pub use missing_linux_kernel_components::{
 };
 pub mod traits;
 pub mod vmm_paging;
+pub mod dma_engine;
+pub mod acpi_pm;
+
+pub use dma_engine::{
+    DmaController, DmaChannel, DmaDescriptor, DmaDirection, DmaWidth,
+    DmaBurst, DmaChannelState, DmaPool, DmaBuffer, DmaError, DmaCapabilities,
+};
+pub use acpi_pm::{
+    AcpiPowerManager, AcpiSleepState, AcpiPState, AcpiTState, AcpiDevicePowerState,
+    CpuGovernor, BatteryInfo, AcAdapterInfo, ThermalZone, CoolingDevice,
+    CoolingDeviceType, AcpiError,
+};
+
 
 pub use crate::kernel::linux_bsd_innovations::*;
 pub use crate::kernel::linux_bsd_innovations::{

@@ -86,6 +86,9 @@ pub use modern_audio_intel_hda::ModernAudioIntelHda;
 pub use modern_nvme::ModernNvmeDriver;
 pub use modern_wifi::ModernWifiDriver;
 pub use touch_jingos::TouchJingosDriver;
+pub mod ethernet;
+pub mod wifi_80211;
+
 pub use usb_stack::{
     UsbDevice, UsbDeviceDescriptor, UsbSpeed, UsbDeviceState, UsbHostController,
     UsbSetupPacket, UsbEnumerator, UsbError, UsbTransferType, UsbDirection,
@@ -93,4 +96,9 @@ pub use usb_stack::{
 pub use ethernet::{
     EthernetFrame, EthernetHeader, MacAddr, EtherType, NetDevice, NetDevStats,
     E1000Device, EthernetError,
+};
+pub use wifi_80211::{
+    WifiDriver, WifiMode, WifiSecurity, WifiBand, WifiChannel, WifiStandard,
+    ChannelWidth, BssInfo, StationInfo, ScanRequest, ConnectParams,
+    WifiCapabilities, WifiError, Dot11Header, FrameType,
 };
