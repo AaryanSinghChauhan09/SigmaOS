@@ -34,6 +34,17 @@ pub mod storage;
 pub mod touch_jingos;
 pub mod usb_hid;
 pub mod vesa;
+pub mod usb_stack;
+pub mod ethernet;
+pub mod wifi_80211;
+pub mod nvme_driver;
+pub mod ahci_sata;
+pub mod usb_hid;
+pub mod usb_mass_storage;
+pub mod usb_audio;
+pub mod usb_video;
+pub mod audio_intel_hda;
+pub mod drm_kms;
 
 pub use gpu::{
     GpuCommand, GpuCommandBuffer, GpuDriver, GpuError, GpuPipeline,
@@ -84,3 +95,29 @@ pub use modern_audio_intel_hda::ModernAudioIntelHda;
 pub use modern_nvme::ModernNvmeDriver;
 pub use modern_wifi::ModernWifiDriver;
 pub use touch_jingos::TouchJingosDriver;
+pub mod ethernet;
+pub mod wifi_80211;
+
+pub use usb_stack::{
+    UsbDevice, UsbDeviceDescriptor, UsbSpeed, UsbDeviceState, UsbHostController,
+    UsbSetupPacket, UsbEnumerator, UsbError, UsbTransferType, UsbDirection,
+};
+pub use ethernet::{
+    EthernetFrame, EthernetHeader, MacAddr, EtherType, NetDevice, NetDevStats,
+    E1000Device, EthernetError,
+};
+pub use wifi_80211::{
+    WifiDriver, WifiMode, WifiSecurity, WifiBand, WifiChannel, WifiStandard,
+    ChannelWidth, BssInfo, StationInfo, ScanRequest, ConnectParams,
+    WifiCapabilities, WifiError, Dot11Header, FrameType,
+};
+pub use nvme_driver::{
+    NvmeController, NvmeQueuePair, NvmeSQEntry, NvmeCQEntry, NvmeNamespace,
+    NvmeAdminOpcode, NvmeIOOpcode, NvmeError,
+};
+
+pub mod nvme_driver;
+pub use nvme_driver::{
+    NvmeController, NvmeQueuePair, NvmeSQEntry, NvmeCQEntry, NvmeNamespace,
+    NvmeAdminOpcode, NvmeIOOpcode, NvmeError,
+};

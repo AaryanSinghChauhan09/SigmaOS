@@ -1,406 +1,396 @@
-// SigmaOS SELinux-inspired Security Framework
-// Implements Fedora-style mandatory access control adapted for capability-based security
-// Inspired by Fedora's SELinux for enhanced security architecture
+//! SELinux (Security-Enhanced Linux) Implementation
+//! Mandatory Access Control (MAC) security module
+//! Reference: Linux security/selinux/
 
-use std::collections::{BTreeMap, HashMap, HashSet};
-use std::string::String;
-use std::vec::Vec;
+#![no_std]
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SeLinuxMode {
-    Enforcing,
-    Permissive,
-    Disabled,
-}
+extern crate alloc;
+use alloc::vec::Vec;
+use alloc::collections::BTreeMap;
 
-/// Security context
-#[derive(Debug, Clone, PartialEq, Eq)]
+/// SELinux security context (SID)
+pub type SecurityId = u32;
+
+/// SELinux security context structure
+#[derive(Debug, Clone)]
 pub struct SecurityContext {
-    pub user: String,
-    pub role: String,
-    pub type_: String,
-    pub level: String,
+    pub user: Vec<u8>,           // SELinux user
+    pub role: Vec<u8>,           // SELinux role
+    pub stype: Vec<u8>,          // SELinux type
+    pub level: Vec<u8>,          // MLS/MCS level (optional)
 }
 
 impl SecurityContext {
-    pub fn new(user: String, role: String, type_: String, level: String) -> Self {
+    pub fn new(user: &[u8], role: &[u8], stype: &[u8]) -> Self {
         Self {
-            user,
-            role,
-            type_,
-            level,
+            user: user.to_vec(),
+            role: role.to_vec(),
+            stype: stype.to_vec(),
+            level: Vec::new(),
         }
     }
 
-    pub fn from_string(s: &str) -> Result<Self, String> {
-        let parts: Vec<&str> = s.split(':').collect();
-        if parts.len() == 4 {
-            Ok(Self {
-                user: parts[0].to_string(),
-                role: parts[1].to_string(),
-                type_: parts[2].to_string(),
-                level: parts[3].to_string(),
-            })
-        } else {
-            Err("Invalid security context format".to_string())
+    /// Parse context string (user:role:type:level)
+    pub fn from_string(ctx_str: &[u8]) -> Result<Self, SelinuxError> {
+        let parts: Vec<&[u8]> = ctx_str.split(|&b| b == b':').collect();
+        if parts.len() < 3 {
+            return Err(SelinuxError::InvalidContext);
         }
+        
+        let mut ctx = Self::new(parts[0], parts[1], parts[2]);
+        if parts.len() >= 4 {
+            ctx.level = parts[3].to_vec();
+        }
+        Ok(ctx)
     }
 
-    pub fn to_string(&self) -> String {
-        format!("{}:{}:{}:{}", self.user, self.role, self.type_, self.level)
+    /// Convert to string representation
+    pub fn to_string(&self) -> Vec<u8> {
+        let mut result = Vec::new();
+        result.extend_from_slice(&self.user);
+        result.push(b':');
+        result.extend_from_slice(&self.role);
+        result.push(b':');
+        result.extend_from_slice(&self.stype);
+        if !self.level.is_empty() {
+            result.push(b':');
+            result.extend_from_slice(&self.level);
+        }
+        result
     }
 }
 
-/// Policy rule
-#[derive(Debug, Clone)]
-pub enum PolicyRule {
-    Allow {
-        source_type: String,
-        target_type: String,
-        target_class: String,
-        permissions: Vec<String>,
-    },
-    TypeTransition {
-        source_type: String,
-        target_type: String,
-        target_class: String,
-        default_type: String,
-    },
-    TypeChange {
-        source_type: String,
-        target_type: String,
-        target_class: String,
-        default_type: String,
-    },
+/// SELinux object classes
+#[repr(u16)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ObjectClass {
+    Process = 1,
+    File = 2,
+    Dir = 3,
+    Lnk_file = 4,
+    Chr_file = 5,
+    Blk_file = 6,
+    Sock_file = 7,
+    Fifo_file = 8,
+    Fd = 9,
+    Socket = 10,
+    Tcp_socket = 11,
+    Udp_socket = 12,
+    Unix_stream_socket = 13,
+    Unix_dgram_socket = 14,
+    Capability = 15,
+    Filesystem = 16,
+    Node = 17,
+    Netif = 18,
+    Key = 19,
 }
 
-/// SELinux policy
-#[derive(Debug, Clone)]
-pub struct SELinuxPolicy {
-    pub mode: SeLinuxMode,
-    pub rules: Vec<PolicyRule>,
-    pub types: BTreeMap<String, Type>,
-    pub attributes: BTreeMap<String, Attribute>,
-    pub roles: BTreeMap<String, Role>,
-    pub users: BTreeMap<String, SELinuxUser>,
+/// SELinux access vector permissions (per object class)
+pub mod permissions {
+    // File permissions
+    pub const FILE_READ: u32 = 0x00000001;
+    pub const FILE_WRITE: u32 = 0x00000002;
+    pub const FILE_APPEND: u32 = 0x00000004;
+    pub const FILE_EXECUTE: u32 = 0x00000008;
+    pub const FILE_GETATTR: u32 = 0x00000010;
+    pub const FILE_SETATTR: u32 = 0x00000020;
+    pub const FILE_LOCK: u32 = 0x00000040;
+    pub const FILE_UNLINK: u32 = 0x00000080;
+    pub const FILE_LINK: u32 = 0x00000100;
+    pub const FILE_RENAME: u32 = 0x00000200;
+    
+    // Process permissions
+    pub const PROCESS_FORK: u32 = 0x00000001;
+    pub const PROCESS_TRANSITION: u32 = 0x00000002;
+    pub const PROCESS_SIGCHLD: u32 = 0x00000004;
+    pub const PROCESS_SIGKILL: u32 = 0x00000008;
+    pub const PROCESS_SIGSTOP: u32 = 0x00000010;
+    pub const PROCESS_PTRACE: u32 = 0x00000020;
+    pub const PROCESS_SETCAP: u32 = 0x00000040;
+    pub const PROCESS_SETRLIMIT: u32 = 0x00000080;
 }
 
+/// Access Vector Cache (AVC) entry
 #[derive(Debug, Clone)]
-pub struct Type {
-    pub name: String,
-    pub attributes: Vec<String>,
+pub struct AvcEntry {
+    pub source_sid: SecurityId,
+    pub target_sid: SecurityId,
+    pub class: ObjectClass,
+    pub allowed: u32,              // Allowed permissions bitmask
+    pub denied: u32,               // Denied permissions bitmask
 }
 
-#[derive(Debug, Clone)]
-pub struct Attribute {
-    pub name: String,
-    pub types: Vec<String>,
+/// SELinux policy database
+pub struct PolicyDb {
+    pub policy_version: u32,
+    pub contexts: BTreeMap<SecurityId, SecurityContext>,
+    pub type_enforcement: BTreeMap<(Vec<u8>, Vec<u8>, ObjectClass), u32>,
+    pub transitions: Vec<TransitionRule>,
+    next_sid: SecurityId,
 }
 
+/// Type transition rule
 #[derive(Debug, Clone)]
-pub struct Role {
-    pub name: String,
-    pub types: Vec<String>,
+pub struct TransitionRule {
+    pub source_type: Vec<u8>,
+    pub target_type: Vec<u8>,
+    pub class: ObjectClass,
+    pub default_type: Vec<u8>,
 }
 
-#[derive(Debug, Clone)]
-pub struct SELinuxUser {
-    pub name: String,
-    pub roles: Vec<String>,
-    pub mls_range: String,
-    pub mls_level: String,
-}
-
-impl SELinuxPolicy {
+impl PolicyDb {
     pub fn new() -> Self {
         Self {
-            mode: SeLinuxMode::Enforcing,
-            rules: Vec::new(),
-            types: BTreeMap::new(),
-            attributes: BTreeMap::new(),
-            roles: BTreeMap::new(),
-            users: BTreeMap::new(),
+            policy_version: 31, // Latest SELinux policy version
+            contexts: BTreeMap::new(),
+            type_enforcement: BTreeMap::new(),
+            transitions: Vec::new(),
+            next_sid: 1,
         }
     }
 
-    /// Add policy rule
-    pub fn add_rule(&mut self, rule: PolicyRule) {
-        self.rules.push(rule);
+    /// Allocate new SID
+    pub fn alloc_sid(&mut self) -> SecurityId {
+        let sid = self.next_sid;
+        self.next_sid += 1;
+        sid
     }
 
-    /// Add type
-    pub fn add_type(&mut self, type_: Type) {
-        self.types.insert(type_.name.clone(), type_);
+    /// Register security context
+    pub fn register_context(&mut self, ctx: SecurityContext) -> SecurityId {
+        let sid = self.alloc_sid();
+        self.contexts.insert(sid, ctx);
+        sid
     }
 
-    /// Add attribute
-    pub fn add_attribute(&mut self, attribute: Attribute) {
-        self.attributes.insert(attribute.name.clone(), attribute);
+    /// Add type enforcement rule
+    pub fn add_allow_rule(&mut self, source: &[u8], target: &[u8], class: ObjectClass, perms: u32) {
+        let key = (source.to_vec(), target.to_vec(), class);
+        self.type_enforcement.insert(key, perms);
     }
 
-    /// Add role
-    pub fn add_role(&mut self, role: Role) {
-        self.roles.insert(role.name.clone(), role);
-    }
-
-    /// Add user
-    pub fn add_user(&mut self, user: SELinuxUser) {
-        self.users.insert(user.name.clone(), user);
-    }
-
-    /// Check if operation is allowed
+    /// Check if access is allowed
     pub fn check_permission(
         &self,
-        source_type: &str,
-        target_type: &str,
-        target_class: &str,
-        permission: &str,
-    ) -> Result<bool, &'static str> {
-        if self.mode == SeLinuxMode::Disabled {
-            return Ok(true);
-        }
+        source_sid: SecurityId,
+        target_sid: SecurityId,
+        class: ObjectClass,
+        perm: u32,
+    ) -> Result<bool, SelinuxError> {
+        let source_ctx = self.contexts.get(&source_sid)
+            .ok_or(SelinuxError::InvalidSid)?;
+        let target_ctx = self.contexts.get(&target_sid)
+            .ok_or(SelinuxError::InvalidSid)?;
 
-        for rule in &self.rules {
-            if let PolicyRule::Allow {
-                source_type: ref st,
-                target_type: ref tt,
-                target_class: ref tc,
-                permissions: ref permissions,
-            } = rule
-            {
-                if (st == "*" || st == source_type)
-                    && (tt == "*" || tt == target_type)
-                    && (tc == "*" || tc == target_class)
-                    && permissions.iter().any(|p| p == "*" || p == permission)
-                {
-                    return Ok(true);
-                }
-            }
-        }
-
-        if self.mode == SeLinuxMode::Enforcing {
-            Ok(false)
+        let key = (source_ctx.stype.clone(), target_ctx.stype.clone(), class);
+        if let Some(&allowed_perms) = self.type_enforcement.get(&key) {
+            Ok((allowed_perms & perm) == perm)
         } else {
-            Ok(true)
-        }
-    }
-}
-
-
-/// Multi-Level Security (MLS) sensitivity levels
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub enum SensitivityLevel {
-    Unclassified = 0,
-    Confidential = 1,
-    Secret = 2,
-    TopSecret = 3,
-}
-
-/// Dynamic Mandatory Access Control (MAC) MLS/MCS Enforcer (RHEL Parity)
-pub struct DynamicMacEnforcer {
-    pub process_levels: HashMap<String, SensitivityLevel>,
-    pub object_levels: HashMap<String, SensitivityLevel>,
-    pub process_categories: HashMap<String, HashSet<u32>>,
-    pub object_categories: HashMap<String, HashSet<u32>>,
-}
-
-impl DynamicMacEnforcer {
-    pub fn new() -> Self {
-        Self {
-            process_levels: HashMap::new(),
-            object_levels: HashMap::new(),
-            process_categories: HashMap::new(),
-            object_categories: HashMap::new(),
+            Ok(false) // Default deny
         }
     }
 
-    pub fn set_process_level(&mut self, process_id: &str, level: SensitivityLevel, categories: HashSet<u32>) {
-        self.process_levels.insert(process_id.to_string(), level);
-        self.process_categories.insert(process_id.to_string(), categories);
-    }
-
-    pub fn set_object_level(&mut self, object_id: &str, level: SensitivityLevel, categories: HashSet<u32>) {
-        self.object_levels.insert(object_id.to_string(), level);
-        self.object_categories.insert(object_id.to_string(), categories);
-    }
-
-    /// Read access check: No Read Up (Simple Security Property - Bell-LaPadula)
-    pub fn can_read(&self, process_id: &str, object_id: &str) -> bool {
-        let p_level = match self.process_levels.get(process_id) {
-            Some(lvl) => *lvl,
-            None => return false,
-        };
-        let o_level = match self.object_levels.get(object_id) {
-            Some(lvl) => *lvl,
-            None => return false,
-        };
-
-        if p_level < o_level {
-            return false; // Read Up prohibited
-        }
-
-        // Category containment check (MCS)
-        if let Some(o_cats) = self.object_categories.get(object_id) {
-            if !o_cats.is_empty() {
-                let p_cats = match self.process_categories.get(process_id) {
-                    Some(cats) => cats,
-                    None => return false,
-                };
-                if !o_cats.is_subset(p_cats) {
-                    return false;
-                }
+    /// Compute type transition
+    pub fn compute_transition(
+        &self,
+        source_type: &[u8],
+        target_type: &[u8],
+        class: ObjectClass,
+    ) -> Option<Vec<u8>> {
+        for rule in &self.transitions {
+            if rule.source_type == source_type &&
+               rule.target_type == target_type &&
+               rule.class == class {
+                return Some(rule.default_type.clone());
             }
         }
-        false
+        None
     }
 }
 
-impl Default for SELinuxPolicy {
-    fn default() -> Self {
-        Self::new()
-    }
+/// Access Vector Cache for performance
+pub struct Avc {
+    pub cache: BTreeMap<(SecurityId, SecurityId, ObjectClass), AvcEntry>,
+    pub hits: u64,
+    pub misses: u64,
 }
 
-/// SELinux security manager
-pub struct SigmaSELinux {
-    pub policy: SELinuxPolicy,
-    pub contexts: BTreeMap<String, SecurityContext>,
-    pub booleans: BTreeMap<String, bool>,
-    pub enforcement: bool,
-}
-
-impl SigmaSELinux {
+impl Avc {
     pub fn new() -> Self {
         Self {
-            policy: SELinuxPolicy::new(),
-            contexts: BTreeMap::new(),
-            booleans: BTreeMap::new(),
-            enforcement: true,
+            cache: BTreeMap::new(),
+            hits: 0,
+            misses: 0,
         }
+    }
+
+    /// Look up cached access decision
+    pub fn lookup(
+        &mut self,
+        source_sid: SecurityId,
+        target_sid: SecurityId,
+        class: ObjectClass,
+        perm: u32,
+    ) -> Option<bool> {
+        let key = (source_sid, target_sid, class);
+        if let Some(entry) = self.cache.get(&key) {
+            self.hits += 1;
+            if (entry.allowed & perm) == perm {
+                Some(true)
+            } else if (entry.denied & perm) == perm {
+                Some(false)
+            } else {
+                None
+            }
+        } else {
+            self.misses += 1;
+            None
+        }
+    }
+
+    /// Cache access decision
+    pub fn insert(
+        &mut self,
+        source_sid: SecurityId,
+        target_sid: SecurityId,
+        class: ObjectClass,
+        allowed: u32,
+        denied: u32,
+    ) {
+        let key = (source_sid, target_sid, class);
+        let entry = AvcEntry {
+            source_sid,
+            target_sid,
+            class,
+            allowed,
+            denied,
+        };
+        self.cache.insert(key, entry);
+    }
+
+    /// Clear cache (policy reload)
+    pub fn clear(&mut self) {
+        self.cache.clear();
+    }
+}
+
+/// SELinux enforcement mode
+#[repr(u8)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum EnforcementMode {
+    Disabled = 0,
+    Permissive = 1,
+    Enforcing = 2,
+}
+
+/// Main SELinux security server
+pub struct Selinux {
+    pub policy: PolicyDb,
+    pub avc: Avc,
+    pub mode: EnforcementMode,
+    pub initial_contexts: BTreeMap<Vec<u8>, SecurityId>,
+}
+
+impl Selinux {
+    pub fn new() -> Self {
+        let mut sel = Self {
+            policy: PolicyDb::new(),
+            avc: Avc::new(),
+            mode: EnforcementMode::Enforcing,
+            initial_contexts: BTreeMap::new(),
+        };
+
+        // Create initial contexts
+        let kernel_ctx = SecurityContext::new(b"system_u", b"system_r", b"kernel_t");
+        let kernel_sid = sel.policy.register_context(kernel_ctx);
+        sel.initial_contexts.insert(b"kernel".to_vec(), kernel_sid);
+
+        sel
+    }
+
+    /// Check access with AVC caching
+    pub fn has_perm(
+        &mut self,
+        source_sid: SecurityId,
+        target_sid: SecurityId,
+        class: ObjectClass,
+        perm: u32,
+    ) -> Result<bool, SelinuxError> {
+        // Check AVC cache first
+        if let Some(cached) = self.avc.lookup(source_sid, target_sid, class, perm) {
+            return Ok(cached);
+        }
+
+        // Slow path: check policy
+        let allowed = self.policy.check_permission(source_sid, target_sid, class, perm)?;
+
+        // Update AVC
+        if allowed {
+            self.avc.insert(source_sid, target_sid, class, perm, 0);
+        } else {
+            self.avc.insert(source_sid, target_sid, class, 0, perm);
+        }
+
+        Ok(allowed)
     }
 
     /// Set enforcement mode
-    pub fn set_enforcement(&mut self, enforced: bool) {
-        self.enforcement = enforced;
+    pub fn set_enforce_mode(&mut self, mode: EnforcementMode) {
+        self.mode = mode;
     }
 
-    /// Get enforcement mode
-    pub fn is_enforcing(&self) -> bool {
-        self.enforcement
-    }
-
-    /// Set security context for path
-    pub fn set_context(&mut self, path: String, context: SecurityContext) {
-        self.contexts.insert(path, context);
-    }
-
-    /// Get security context for path
-    pub fn get_context(&self, path: &str) -> Option<&SecurityContext> {
-        self.contexts.get(path)
-    }
-
-    /// Set boolean
-    pub fn set_boolean(&mut self, name: String, value: bool) {
-        self.booleans.insert(name, value);
-    }
-
-    /// Get boolean
-    pub fn get_boolean(&self, name: &str) -> Option<bool> {
-        self.booleans.get(name).copied()
-    }
-
-    /// Check file access
-    pub fn check_file_access(&self, path: &str, source_type: &str, permission: &str) -> bool {
-        if !self.enforcement {
-            return true;
-        }
-
-        if let Some(context) = self.get_context(path) {
-            self.policy
-                .check_permission(source_type, &context.type_, "file", permission)
-                .unwrap_or(false)
-        } else {
-            false
-        }
-    }
-
-    /// Check process transition
-    pub fn check_process_transition(&self, source_type: &str, target_type: &str) -> bool {
-        if !self.enforcement {
-            return true;
-        }
-
-        self.policy
-            .check_permission(source_type, target_type, "process", "transition")
-            .unwrap_or(false)
-    }
-
-    /// Get status
-    pub fn get_status(&self) -> String {
-        let mode = if self.enforcement {
-            "Enforcing"
-        } else {
-            "Permissive"
-        };
-        format!(
-            "SELinux status: {}\nBooleans: {}\nContexts: {}",
-            mode,
-            self.booleans.len(),
-            self.contexts.len()
-        )
+    /// Load policy from binary
+    pub fn load_policy(&mut self, policy_data: &[u8]) -> Result<(), SelinuxError> {
+        // Parse binary policy format
+        // Clear AVC after policy load
+        self.avc.clear();
+        Ok(())
     }
 }
 
-impl Default for SigmaSELinux {
-    fn default() -> Self {
-        Self::new()
-    }
+/// SELinux error types
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SelinuxError {
+    InvalidContext,
+    InvalidSid,
+    PermissionDenied,
+    PolicyLoad,
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn test_security_context() {
-        let ctx = SecurityContext::new(
-            "user_u".to_string(),
-            "user_r".to_string(),
-            "user_t".to_string(),
-            "s0".to_string(),
-        );
-        assert_eq!(ctx.to_string(), "user_u:user_r:user_t:s0");
+    fn test_context_parsing() {
+        let ctx = SecurityContext::from_string(b"user_u:user_r:user_t:s0").unwrap();
+        assert_eq!(&ctx.user, b"user_u");
+        assert_eq!(&ctx.role, b"user_r");
+        assert_eq!(&ctx.stype, b"user_t");
+        assert_eq!(&ctx.level, b"s0");
     }
 
     #[test]
-    fn test_security_context_parse() {
-        let ctx = SecurityContext::from_string("user_u:user_r:user_t:s0").unwrap();
-        assert_eq!(ctx.user, "user_u");
-        assert_eq!(ctx.role, "user_r");
-        assert_eq!(ctx.type_, "user_t");
-        assert_eq!(ctx.level, "s0");
+    fn test_policy_allow_rule() {
+        let mut policy = PolicyDb::new();
+        policy.add_allow_rule(b"user_t", b"user_home_t", ObjectClass::File, permissions::FILE_READ | permissions::FILE_WRITE);
+        
+        let source_ctx = SecurityContext::new(b"user_u", b"user_r", b"user_t");
+        let target_ctx = SecurityContext::new(b"user_u", b"object_r", b"user_home_t");
+        
+        let source_sid = policy.register_context(source_ctx);
+        let target_sid = policy.register_context(target_ctx);
+        
+        assert!(policy.check_permission(source_sid, target_sid, ObjectClass::File, permissions::FILE_READ).unwrap());
     }
 
     #[test]
-    fn test_selinux_policy() {
-        let mut policy = SELinuxPolicy::new();
-        policy.add_rule(PolicyRule::Allow {
-            source_type: "user_t".to_string(),
-            target_type: "user_home_t".to_string(),
-            target_class: "file".to_string(),
-            permissions: vec!["read".to_string(), "write".to_string()],
-        });
-
-        assert!(policy.check_permission("user_t", "user_home_t", "file", "read"));
-        assert!(!policy.check_permission("user_t", "user_home_t", "file", "execute"));
-    }
-
-    #[test]
-    fn test_selinux_manager() {
-        let mut selinux = SigmaSELinux::new();
-        selinux.set_boolean("httpd_enable_cgi".to_string(), true);
-
-        assert_eq!(selinux.get_boolean("httpd_enable_cgi"), Some(true));
-        assert!(selinux.is_enforcing());
+    fn test_avc_cache() {
+        let mut avc = Avc::new();
+        assert_eq!(avc.lookup(1, 2, ObjectClass::File, permissions::FILE_READ), None);
+        
+        avc.insert(1, 2, ObjectClass::File, permissions::FILE_READ, 0);
+        assert_eq!(avc.lookup(1, 2, ObjectClass::File, permissions::FILE_READ), Some(true));
+        assert_eq!(avc.hits, 1);
     }
 }

@@ -150,9 +150,9 @@ impl Framebuffer {
     /// Draw 8x8 ASCII character (simple bitmap font)
     pub fn draw_char(&mut self, x: u32, y: u32, ch: char, fg: u32, bg: u32) {
         let glyph = get_font_glyph(ch);
-        for row in 0..8 {
-            for col in 0..8 {
-                let bit = (glyph[row] >> (7 - col)) & 1;
+        for row in 0..8u32 {
+            for col in 0..8u32 {
+                let bit = (glyph[row as usize] >> (7 - col)) & 1;
                 let color = if bit == 1 { fg } else { bg };
                 unsafe {
                     self.draw_pixel(x + col, y + row, color);

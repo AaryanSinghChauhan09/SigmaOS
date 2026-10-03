@@ -12,6 +12,7 @@ use std::collections::HashMap;
 
 #[path = "memory/resource_allocator.rs"]
 pub mod resource_allocator;
+#[path = "memory/sigma_buddy.rs"]
 pub mod sigma_buddy;
 pub use resource_allocator::{
     ContainerResourceGovernor, DmaRingBuffer, DmaRingBufferAllocator, HardenedGuardPageAllocator,

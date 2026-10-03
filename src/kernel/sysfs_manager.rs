@@ -324,7 +324,7 @@ mod tests {
 
     #[test]
     fn test_sysfs_attribute_readonly() {
-        let attr = SysfsAttribute::new(String::from("test"), String::from("value"), false);
+        let mut attr = SysfsAttribute::new(String::from("test"), String::from("value"), false);
         assert!(!attr.write(String::from("new")));
         assert_eq!(attr.read(), "value");
     }

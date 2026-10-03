@@ -332,7 +332,6 @@ mod tests {
     #[test]
     fn test_ring_buffer() {
         let mut ring = ZeroCopyRingBuffer::new(8);
-        let ring = ZeroCopyRingBuffer::new(8);
 
         let buffer = ZeroCopyBuffer::new(vec![1, 2, 3]);
         let packet = ZeroCopyPacket::new(buffer, 0, 3);
@@ -348,7 +347,6 @@ mod tests {
     #[test]
     fn test_ring_buffer_full() {
         let mut ring = ZeroCopyRingBuffer::new(2);
-        let ring = ZeroCopyRingBuffer::new(2);
 
         let buffer1 = ZeroCopyBuffer::new(vec![1]);
         let packet1 = ZeroCopyPacket::new(buffer1, 0, 1);
