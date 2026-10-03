@@ -3182,7 +3182,8 @@ mod tests {
             UniversalShellCompatibilityEngine::detect_shebang_dialect(pdksh_script),
             ShellDialect::Pdksh
         );
-        let posix_pdksh = UniversalScriptTranspiler::transpile_to_posix_sh(pdksh_script, ShellDialect::Pdksh);
+        let posix_pdksh =
+            UniversalScriptTranspiler::transpile_to_posix_sh(pdksh_script, ShellDialect::Pdksh);
         assert!(posix_pdksh.contains("arr=\"val1 val2\""));
         assert!(posix_pdksh.contains("printf \"%s\\n\" hello_pdksh"));
 
@@ -3191,13 +3192,16 @@ mod tests {
             UniversalShellCompatibilityEngine::detect_shebang_dialect(lsh_script),
             ShellDialect::Lsh
         );
-        let posix_lsh = UniversalScriptTranspiler::transpile_to_posix_sh(lsh_script, ShellDialect::Lsh);
+        let posix_lsh =
+            UniversalScriptTranspiler::transpile_to_posix_sh(lsh_script, ShellDialect::Lsh);
         assert!(posix_lsh.contains("cd /tmp"));
         assert!(posix_lsh.contains("alias dir='ls -l'"));
         assert!(posix_lsh.contains("env"));
 
         let mut polyglot = SovereignUniversalPolyglotShellEngine::new();
-        let (dialect, transpiled, pipelines, warnings_count) = polyglot.transpile_and_run_polyglot_script(lsh_script).unwrap();
+        let (dialect, transpiled, pipelines, warnings_count) = polyglot
+            .transpile_and_run_polyglot_script(lsh_script)
+            .unwrap();
         assert_eq!(dialect, ShellDialect::Lsh);
         assert!(transpiled.contains("cd /tmp"));
         assert!(!pipelines.is_empty());

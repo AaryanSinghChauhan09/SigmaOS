@@ -22,7 +22,7 @@ pub enum FutexOp {
     /// Wake up to val waiters
     Wake = 1,
     /// Atomic compare and requeue
-    Cmp requeue = 4,
+    CmpRequeue = 4,
     /// Wake op (combined wake and modify)
     WakeOp = 5,
     /// Lock private futex
@@ -290,6 +290,7 @@ impl FutexHashTable {
         };
 
         // Add requeued waiters to target queue
+        let requeued_count = requeued.len();
         if !requeued.is_empty() {
             let target_queue = self.get_or_create_queue(target_key);
             for waiter in requeued {
@@ -297,7 +298,7 @@ impl FutexHashTable {
             }
         }
 
-        Ok(woken + requeued.len())
+        Ok(woken + requeued_count)
     }
 
     /// Remove waiter (called on thread cancellation)
@@ -363,9 +364,7 @@ impl FutexManager {
             FutexOp::Wait => {
                 // val = expected value, val3 = bitset
                 let bitset = if val3 == 0 { 0xFFFFFFFF } else { val3 };
-                self.hash_table
-                    .wait(key, val, val2, tid, bitset)
-                    .map(|_| 0)
+                self.hash_table.wait(key, val, val2, tid, bitset).map(|_| 0)
             }
             FutexOp::Wake => {
                 // val = max waiters to wake, val3 = bitset
@@ -374,9 +373,7 @@ impl FutexManager {
             }
             FutexOp::WaitBitset => {
                 // Same as WAIT but with explicit bitset
-                self.hash_table
-                    .wait(key, val, val2, tid, val3)
-                    .map(|_| 0)
+                self.hash_table.wait(key, val, val2, tid, val3).map(|_| 0)
             }
             FutexOp::WakeBitset => {
                 // Same as WAKE but with explicit bitset
@@ -449,10 +446,7 @@ mod tests {
         let key = FutexKey::new(100, 0x1000);
 
         // Wait on futex
-        manager
-            .hash_table
-            .wait(key, 42, 42, 1, 0xFFFFFFFF)
-            .unwrap();
+        manager.hash_table.wait(key, 42, 42, 1, 0xFFFFFFFF).unwrap();
         assert_eq!(manager.hash_table.active_waiters(), 1);
 
         // Wake futex

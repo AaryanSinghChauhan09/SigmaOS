@@ -28,7 +28,7 @@ use core::fmt;
 #[derive(Debug, Clone, Copy)]
 #[repr(C, packed)]
 pub struct Rsdp {
-    pub signature: [u8; 8],  // "RSD PTR "
+    pub signature: [u8; 8], // "RSD PTR "
     pub checksum: u8,
     pub oem_id: [u8; 6],
     pub revision: u8,
@@ -135,7 +135,7 @@ impl AcpiManager {
         // Search in EBDA (Extended BIOS Data Area): 0x80000 - 0x9FFFF
         // Search in BIOS ROM area: 0xE0000 - 0xFFFFF
         // Signature: "RSD PTR "
-        
+
         // For now, return placeholder
         // In real implementation, scan memory for RSDP signature
         Err(AcpiError::RsdpNotFound)

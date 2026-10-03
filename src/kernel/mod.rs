@@ -8,7 +8,6 @@ pub use sovereign_smp_xhci_apc_synthesis::*;
 pub mod architecture;
 pub mod atomic_extended;
 pub mod block_dev;
-pub mod process_monitor;
 pub mod bore;
 pub mod breakthrough;
 pub mod breakthroughs;
@@ -41,6 +40,7 @@ pub mod linux_absorb;
 pub mod linux_bsd_innovations;
 pub mod linux_parity;
 pub mod missing_linux_kernel_components;
+pub mod process_monitor;
 pub mod sysfs_manager;
 pub use linux_parity::{
     CmaRegion, KernelTimer, LinuxCmaAllocatorEngine, LinuxKernelTimerWheel,
@@ -50,19 +50,16 @@ pub mod memory;
 pub mod meta;
 pub mod module_loader;
 pub mod rump_modules;
-pub use rump_modules::{
-    KernelModule, ModuleState, ModulePriority, RumpModuleLoader,
-};
+pub use rump_modules::{KernelModule, ModulePriority, ModuleState, RumpModuleLoader};
 pub mod kptr_restrict;
 pub use kptr_restrict::{
-    KptrRestrictLevel, SecurityMitigations, get_kptr_restrict, set_kptr_restrict,
-    should_hide_kptr, format_kptr, get_security_mitigations,
+    format_kptr, get_kptr_restrict, get_security_mitigations, set_kptr_restrict, should_hide_kptr,
+    KptrRestrictLevel, SecurityMitigations,
 };
 pub mod perf_events;
 pub use perf_events::{
-    PerfEventType, HardwareEvent, SoftwareEvent, CacheEvent,
-    PerfCounter, PerfEventGroup, SystemPerfCounters,
-    record_page_fault, record_context_switch, record_cache_miss,
+    record_cache_miss, record_context_switch, record_page_fault, CacheEvent, HardwareEvent,
+    PerfCounter, PerfEventGroup, PerfEventType, SoftwareEvent, SystemPerfCounters,
 };
 pub mod module_loading_control;
 pub mod module_tools;
@@ -110,21 +107,20 @@ pub use crate::kernel::linux_bsd_innovations::{
     GcdDispatchQueue, GcdPriority, GcdTask, GentooUseFlags, GeomClass, GeomProvider,
     Hammer2PfsSnapshot, HammerBlockTransaction, HammerHistoryFilesystem, HurdTranslator,
     HybridKernelManager, HybridTask, IntelClearLinuxStatelessEngine, InteractiveHybridScheduler,
-    KernelAccessController, KernelCapability, KernelFastPacketEngine, KmdfDriver,
-    KmdfIoRequest, KmdfPnpState, KmdfPowerState, LandlockAccessRight, LandlockPathRule,
-    LinuxDevlinkHealthMonitor, LinuxFutexEngine, LinuxLandlockLsmRuleEngine,
-    MemoryCompactionSuperpagesAllocator, MicrokernelCore, MicrokernelTranslatorRegistry,
-    MultikernelMessage, MultikernelMessagePassing, NamespaceType, NanokernelHardwareBroker,
-    NanokernelIrq, NetBsdRumpKernel, NinePProtocolTranslator, NinePResource,
-    NixOsDeclarativeManager, NtExecutiveService, NullfsLayerNode, OpenBsdPledge,
-    OpenBsdUnveilEngine, OpenSuseSnapperEngine, PfFiveTuple, PfStateEntry, PhysicalFrameBlock,
-    ReactorEvent, ReactorRegistration, ResourceBinding, RumpComponent, SnapperSnapshot,
-    SoftIrqType, SovereignCgroupGovernor, SovereignEventReactor, SovereignNamespaceContainer,
-    SovereignSwapEngine, SovereignZone, SovereignZonesManager, SwapDeviceConfig, SwapPage,
-    UnveilPathRule, VnetNetworkStack, VoidLinuxRunitSupervisor, VoidRunitInit, VoidRunitService,
-    VoidRunitStage, XdpAction, ZramCompressedPage, CAP_MMAP_FLAG, CAP_READ_FLAG, CAP_SEEK_FLAG,
-    CAP_WRITE_FLAG, PLEDGE_CPATH, PLEDGE_DPATH, PLEDGE_EXEC, PLEDGE_INET, PLEDGE_RPATH,
-    PLEDGE_STDIO, PLEDGE_UNIX, PLEDGE_WPATH,
+    KernelAccessController, KernelCapability, KernelFastPacketEngine, KmdfDriver, KmdfIoRequest,
+    KmdfPnpState, KmdfPowerState, LandlockAccessRight, LandlockPathRule, LinuxDevlinkHealthMonitor,
+    LinuxFutexEngine, LinuxLandlockLsmRuleEngine, MemoryCompactionSuperpagesAllocator,
+    MicrokernelCore, MicrokernelTranslatorRegistry, MultikernelMessage, MultikernelMessagePassing,
+    NamespaceType, NanokernelHardwareBroker, NanokernelIrq, NetBsdRumpKernel,
+    NinePProtocolTranslator, NinePResource, NixOsDeclarativeManager, NtExecutiveService,
+    NullfsLayerNode, OpenBsdPledge, OpenBsdUnveilEngine, OpenSuseSnapperEngine, PfFiveTuple,
+    PfStateEntry, PhysicalFrameBlock, ReactorEvent, ReactorRegistration, ResourceBinding,
+    RumpComponent, SnapperSnapshot, SoftIrqType, SovereignCgroupGovernor, SovereignEventReactor,
+    SovereignNamespaceContainer, SovereignSwapEngine, SovereignZone, SovereignZonesManager,
+    SwapDeviceConfig, SwapPage, UnveilPathRule, VnetNetworkStack, VoidLinuxRunitSupervisor,
+    VoidRunitInit, VoidRunitService, VoidRunitStage, XdpAction, ZramCompressedPage, CAP_MMAP_FLAG,
+    CAP_READ_FLAG, CAP_SEEK_FLAG, CAP_WRITE_FLAG, PLEDGE_CPATH, PLEDGE_DPATH, PLEDGE_EXEC,
+    PLEDGE_INET, PLEDGE_RPATH, PLEDGE_STDIO, PLEDGE_UNIX, PLEDGE_WPATH,
 };
 #[allow(ambiguous_glob_reexports)]
 pub use architecture::*;
@@ -203,9 +199,7 @@ pub use interrupt::{
     InterruptController, InterruptDescriptor, InterruptType, InterruptVector, IrqLine,
     IrqTriggerType,
 };
-pub use kptr_restrict::{
-    DmesgRestrictLevel, KernelSecurityMitigations,
-};
+pub use kptr_restrict::{DmesgRestrictLevel, KernelSecurityMitigations};
 pub use scheduler::{
     CfsScheduler, Priority, ProcessState, ProcessTask, RtScheduler, SchedulerPolicy, ThermalState,
 };

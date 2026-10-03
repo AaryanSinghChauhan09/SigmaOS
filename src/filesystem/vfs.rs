@@ -327,7 +327,13 @@ impl VfsManager {
         }
     }
 
-    pub fn mount(&mut self, device: String, path: String, fs_type: String, flags: MountFlags) -> Result<(), VfsError> {
+    pub fn mount(
+        &mut self,
+        device: String,
+        path: String,
+        fs_type: String,
+        flags: MountFlags,
+    ) -> Result<(), VfsError> {
         let mount = MountPoint {
             device,
             mount_path: path,
@@ -343,9 +349,7 @@ impl VfsManager {
     }
 
     pub fn lookup(&self, path: &str) -> Result<&MountPoint, VfsError> {
-        self.mount_table
-            .find_mount(path)
-            .ok_or(VfsError::NotFound)
+        self.mount_table.find_mount(path).ok_or(VfsError::NotFound)
     }
 
     pub fn normalize_path(&self, path: &str) -> String {

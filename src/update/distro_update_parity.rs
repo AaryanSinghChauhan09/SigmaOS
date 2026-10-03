@@ -3,13 +3,12 @@
 // Inspired by Fedora Silverblue / rpm-ostree, ChromeOS dual-slot A/B updates, FreeBSD freebsd-update, Debian unattended-upgrades, Arch pacman rolling releases, Topgrade, Timeshift/Snapper, and fwupd / LVFS
 
 #[cfg(not(target_os = "none"))]
-use std::string::{String, ToString};
-#[cfg(not(target_os = "none"))]
-
 #[cfg(target_os = "none")]
 use alloc::string::{String, ToString};
 #[cfg(target_os = "none")]
 use alloc::vec::Vec;
+#[cfg(not(target_os = "none"))]
+use std::string::{String, ToString};
 
 // ============================================================================
 // 1. rpm-ostree / ChromeOS A/B Atomic Partition Updater
