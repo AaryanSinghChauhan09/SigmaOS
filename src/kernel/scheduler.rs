@@ -2,13 +2,13 @@
 // Inspired by Linux CFS, RT scheduler, and energy-aware scheduling
 
 extern crate alloc;
+use alloc::collections::BinaryHeap;
 use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
 use core::cmp::Ordering as CmpOrdering;
 use core::sync::atomic::{AtomicU64, Ordering as AtomicOrdering};
 use core::time::Duration;
-use std::collections::BinaryHeap;
 
 /// Process priority
 /// 

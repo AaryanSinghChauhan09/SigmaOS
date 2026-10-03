@@ -8,10 +8,24 @@
 //! - liburing: https://github.com/axboe/liburing
 //! - FreeBSD: kqueue/kevent as inspiration for event notification
 
+extern crate alloc;
+use alloc::vec;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicU32, AtomicU64, Ordering};
 
 /// Maximum entries in a single ring (must be power of two, max 32768).
 pub const IORING_MAX_ENTRIES: u32 = 4096;
+
+/// SQE flags for operation control
+pub const IOSQE_FIXED_FILE: u8 = 1 << 0;     // fd is index into fixed file table
+pub const IOSQE_IO_DRAIN: u8 = 1 << 1;       // execute after previous ops complete
+pub const IOSQE_IO_LINK: u8 = 1 << 2;        // link next SQE (chain operations)
+pub const IOSQE_IO_HARDLINK: u8 = 1 << 3;    // stronger link dependency
+pub const IOSQE_ASYNC: u8 = 1 << 4;          // force async execution
+
+/// CQE flags for completion status
+pub const IORING_CQE_F_BUFFER: u32 = 1 << 0;  // buffer ID included
+pub const IORING_CQE_F_MORE: u32 = 1 << 1;    // more completions coming (multi-shot)
 
 /// Submission Queue Entry opcodes (matches Linux io_uring opcodes)
 #[repr(u8)]
@@ -43,6 +57,22 @@ pub enum IoUringOp {
     Splice    = 25,
     ProvideBuffers = 31,
     RemoveBuffers = 32,
+    MultiPoll = 33,
+    TimeoutUpdate = 34,
+}
+
+/// Fixed buffer registration for zero-copy I/O
+#[derive(Debug, Clone)]
+pub struct FixedBuffer {
+    pub addr: u64,
+    pub len: u32,
+    pub index: u16,
+}
+
+impl FixedBuffer {
+    pub fn new(addr: u64, len: u32, index: u16) -> Self {
+        Self { addr, len, index }
+    }
 }
 
 /// Submission Queue Entry (SQE) — 64 bytes, matches Linux struct io_uring_sqe
@@ -92,6 +122,10 @@ pub struct IoUringRing {
     total_completions: AtomicU64,
     /// Ring size (number of entries)
     ring_size: u32,
+    /// Fixed buffer registry
+    fixed_buffers: Vec<FixedBuffer>,
+    /// Maximum registered buffers
+    max_fixed_buffers: u16,
 }
 
 impl IoUringRing {
@@ -107,7 +141,28 @@ impl IoUringRing {
             cq_tail: AtomicU32::new(0),
             total_completions: AtomicU64::new(0),
             ring_size: entries,
+            fixed_buffers: Vec::new(),
+            max_fixed_buffers: 256,
         }
+    }
+
+    /// Register fixed buffers for zero-copy I/O
+    pub fn register_buffers(&mut self, buffers: Vec<FixedBuffer>) -> Result<(), &'static str> {
+        if buffers.len() > self.max_fixed_buffers as usize {
+            return Err("Too many buffers to register");
+        }
+        self.fixed_buffers = buffers;
+        Ok(())
+    }
+
+    /// Get a registered fixed buffer by index
+    pub fn get_fixed_buffer(&self, index: u16) -> Option<&FixedBuffer> {
+        self.fixed_buffers.iter().find(|b| b.index == index)
+    }
+
+    /// Unregister all fixed buffers
+    pub fn unregister_buffers(&mut self) {
+        self.fixed_buffers.clear();
     }
 
     /// Submit an SQE to the ring. Returns the index of the submission.
@@ -123,21 +178,62 @@ impl IoUringRing {
         Some(idx as u32)
     }
 
-    /// Process pending submissions (kernel-side). Returns number processed.
+    /// Process pending submissions with link-chain support (kernel-side). Returns number processed.
     pub fn process_submissions(&mut self) -> u32 {
         let head = self.sq_head.load(Ordering::Acquire);
         let tail = self.sq_tail.load(Ordering::Acquire);
         let mut count = 0u32;
         let mut h = head;
+        let mut prev_failed = false;
+
         while h != tail {
             let sqe_idx = (h & (self.ring_size - 1)) as usize;
             let sqe = self.sqes[sqe_idx];
-            // Simulate completion: result = 0 (success) for NOP, otherwise bytes from len
+
+            // Check if this is a linked operation
+            let is_linked = (sqe.flags & IOSQE_IO_LINK) != 0;
+
+            // Skip if previous in link chain failed
+            if prev_failed && is_linked {
+                self.post_completion(sqe.user_data, -125, 0); // -ECANCELED
+                h = h.wrapping_add(1);
+                count += 1;
+                continue;
+            }
+
+            // Simulate completion
             let res = match sqe.opcode {
                 0 => 0, // NOP
+                4 | 5 => { // ReadFixed, WriteFixed
+                    // Validate fixed buffer index
+                    if self.get_fixed_buffer(sqe.buf_index_or_group).is_some() {
+                        sqe.len as i32
+                    } else {
+                        prev_failed = true;
+                        -22 // -EINVAL
+                    }
+                },
+                6 => 1, // PollAdd: return ready events
+                11 => 0, // Timeout
+                33 => { // MultiPoll
+                    // Multi-shot: set F_MORE flag
+                    self.post_completion(sqe.user_data, 1, IORING_CQE_F_MORE);
+                    h = h.wrapping_add(1);
+                    count += 1;
+                    continue;
+                },
+                31 => 0, // ProvideBuffers
                 _ => sqe.len as i32,
             };
+
             self.post_completion(sqe.user_data, res, 0);
+
+            if res < 0 && is_linked {
+                prev_failed = true;
+            } else {
+                prev_failed = false;
+            }
+
             h = h.wrapping_add(1);
             count += 1;
         }
@@ -219,5 +315,93 @@ mod tests {
         let cqe = ring.consume_completion().unwrap();
         assert_eq!(cqe.user_data, 100);
         assert_eq!(cqe.res, 1024); // simulated bytes written
+    }
+
+    #[test]
+    fn test_fixed_buffer_registration() {
+        let mut ring = IoUringRing::new(64);
+
+        let buffers = vec![
+            FixedBuffer::new(0x1000, 4096, 0),
+            FixedBuffer::new(0x2000, 8192, 1),
+        ];
+
+        assert!(ring.register_buffers(buffers).is_ok());
+        assert!(ring.get_fixed_buffer(0).is_some());
+        assert!(ring.get_fixed_buffer(1).is_some());
+        assert!(ring.get_fixed_buffer(2).is_none());
+
+        ring.unregister_buffers();
+        assert!(ring.get_fixed_buffer(0).is_none());
+    }
+
+    #[test]
+    fn test_link_chain_ops() {
+        let mut ring = IoUringRing::new(64);
+
+        // Submit two linked operations
+        let sqe1 = IoUringSqe {
+            opcode: IoUringOp::Nop as u8,
+            flags: IOSQE_IO_LINK,
+            user_data: 100,
+            ..Default::default()
+        };
+        let sqe2 = IoUringSqe {
+            opcode: IoUringOp::Nop as u8,
+            user_data: 101,
+            ..Default::default()
+        };
+
+        ring.submit(sqe1);
+        ring.submit(sqe2);
+        ring.process_submissions();
+
+        // Both should complete
+        let cqe1 = ring.consume_completion().unwrap();
+        assert_eq!(cqe1.user_data, 100);
+        let cqe2 = ring.consume_completion().unwrap();
+        assert_eq!(cqe2.user_data, 101);
+    }
+
+    #[test]
+    fn test_multi_shot_poll() {
+        let mut ring = IoUringRing::new(64);
+
+        let sqe = IoUringSqe {
+            opcode: 33, // MultiPoll
+            user_data: 200,
+            ..Default::default()
+        };
+
+        ring.submit(sqe);
+        ring.process_submissions();
+
+        let cqe = ring.consume_completion().unwrap();
+        assert_eq!(cqe.user_data, 200);
+        assert_eq!(cqe.flags & IORING_CQE_F_MORE, IORING_CQE_F_MORE);
+    }
+
+    #[test]
+    fn test_read_fixed_buffer() {
+        let mut ring = IoUringRing::new(64);
+
+        // Register fixed buffers first
+        ring.register_buffers(vec![FixedBuffer::new(0x1000, 4096, 0)]).unwrap();
+
+        let sqe = IoUringSqe {
+            opcode: IoUringOp::ReadFixed as u8,
+            fd: 3,
+            len: 512,
+            buf_index_or_group: 0,
+            user_data: 300,
+            ..Default::default()
+        };
+
+        ring.submit(sqe);
+        ring.process_submissions();
+
+        let cqe = ring.consume_completion().unwrap();
+        assert_eq!(cqe.user_data, 300);
+        assert_eq!(cqe.res, 512); // simulated successful read
     }
 }
