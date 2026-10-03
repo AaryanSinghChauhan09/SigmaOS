@@ -1298,6 +1298,20 @@ impl_generic_install_strategy!(CRanInstallStrategy);
 impl_generic_install_strategy!(BrewInstallStrategy);
 impl_generic_install_strategy!(WasmInstallStrategy);
 impl_generic_install_strategy!(OciInstallStrategy);
+impl_generic_install_strategy!(TazpkgInstallStrategy);
+impl_generic_install_strategy!(SingularitySifInstallStrategy);
+impl_generic_install_strategy!(StampedeSlpInstallStrategy);
+impl_generic_install_strategy!(WingetInstallStrategy);
+impl_generic_install_strategy!(ScoopInstallStrategy);
+impl_generic_install_strategy!(ChocoInstallStrategy);
+impl_generic_install_strategy!(PixiInstallStrategy);
+impl_generic_install_strategy!(NimbleInstallStrategy);
+impl_generic_install_strategy!(ZigPkgInstallStrategy);
+impl_generic_install_strategy!(SwiftPkgInstallStrategy);
+impl_generic_install_strategy!(DubPkgInstallStrategy);
+impl_generic_install_strategy!(OpamInstallStrategy);
+impl_generic_install_strategy!(ShardInstallStrategy);
+impl_generic_install_strategy!(PltPkgInstallStrategy);
 
 // ============================================================================
 // OOP Design Pattern: Adapter Pattern
@@ -1590,6 +1604,20 @@ impl_generic_metadata_adapter!(CRanMetadataAdapter, CRan);
 impl_generic_metadata_adapter!(BrewMetadataAdapter, Brew);
 impl_generic_metadata_adapter!(WasmMetadataAdapter, Wasm);
 impl_generic_metadata_adapter!(OciMetadataAdapter, Oci);
+impl_generic_metadata_adapter!(TazpkgMetadataAdapter, Tazpkg);
+impl_generic_metadata_adapter!(SingularitySifMetadataAdapter, SingularitySif);
+impl_generic_metadata_adapter!(StampedeSlpMetadataAdapter, StampedeSlp);
+impl_generic_metadata_adapter!(WingetMetadataAdapter, Winget);
+impl_generic_metadata_adapter!(ScoopMetadataAdapter, Scoop);
+impl_generic_metadata_adapter!(ChocoMetadataAdapter, Choco);
+impl_generic_metadata_adapter!(PixiMetadataAdapter, Pixi);
+impl_generic_metadata_adapter!(NimbleMetadataAdapter, Nimble);
+impl_generic_metadata_adapter!(ZigPkgMetadataAdapter, ZigPkg);
+impl_generic_metadata_adapter!(SwiftPkgMetadataAdapter, SwiftPkg);
+impl_generic_metadata_adapter!(DubPkgMetadataAdapter, DubPkg);
+impl_generic_metadata_adapter!(OpamMetadataAdapter, Opam);
+impl_generic_metadata_adapter!(ShardMetadataAdapter, Shard);
+impl_generic_metadata_adapter!(PltPkgMetadataAdapter, PltPkg);
 
 // ============================================================================
 // OOP Design Pattern: Decorator Pattern
@@ -1835,20 +1863,20 @@ impl PackageFactory {
             PackageFormat::Brew => Box::new(BrewInstallStrategy),
             PackageFormat::Wasm => Box::new(WasmInstallStrategy),
             PackageFormat::Oci => Box::new(OciInstallStrategy),
-            PackageFormat::Tazpkg
-            | PackageFormat::SingularitySif
-            | PackageFormat::StampedeSlp
-            | PackageFormat::Winget
-            | PackageFormat::Scoop
-            | PackageFormat::Choco
-            | PackageFormat::Pixi
-            | PackageFormat::Nimble
-            | PackageFormat::ZigPkg
-            | PackageFormat::SwiftPkg
-            | PackageFormat::DubPkg
-            | PackageFormat::Opam
-            | PackageFormat::Shard
-            | PackageFormat::PltPkg => Box::new(TarGzInstallStrategy),
+            PackageFormat::Tazpkg => Box::new(TazpkgInstallStrategy),
+            PackageFormat::SingularitySif => Box::new(SingularitySifInstallStrategy),
+            PackageFormat::StampedeSlp => Box::new(StampedeSlpInstallStrategy),
+            PackageFormat::Winget => Box::new(WingetInstallStrategy),
+            PackageFormat::Scoop => Box::new(ScoopInstallStrategy),
+            PackageFormat::Choco => Box::new(ChocoInstallStrategy),
+            PackageFormat::Pixi => Box::new(PixiInstallStrategy),
+            PackageFormat::Nimble => Box::new(NimbleInstallStrategy),
+            PackageFormat::ZigPkg => Box::new(ZigPkgInstallStrategy),
+            PackageFormat::SwiftPkg => Box::new(SwiftPkgInstallStrategy),
+            PackageFormat::DubPkg => Box::new(DubPkgInstallStrategy),
+            PackageFormat::Opam => Box::new(OpamInstallStrategy),
+            PackageFormat::Shard => Box::new(ShardInstallStrategy),
+            PackageFormat::PltPkg => Box::new(PltPkgInstallStrategy),
         }
     }
 
@@ -1943,20 +1971,20 @@ impl PackageFactory {
             PackageFormat::Brew => Box::new(BrewMetadataAdapter),
             PackageFormat::Wasm => Box::new(WasmMetadataAdapter),
             PackageFormat::Oci => Box::new(OciMetadataAdapter),
-            PackageFormat::Tazpkg
-            | PackageFormat::SingularitySif
-            | PackageFormat::StampedeSlp
-            | PackageFormat::Winget
-            | PackageFormat::Scoop
-            | PackageFormat::Choco
-            | PackageFormat::Pixi
-            | PackageFormat::Nimble
-            | PackageFormat::ZigPkg
-            | PackageFormat::SwiftPkg
-            | PackageFormat::DubPkg
-            | PackageFormat::Opam
-            | PackageFormat::Shard
-            | PackageFormat::PltPkg => Box::new(TarGzMetadataAdapter),
+            PackageFormat::Tazpkg => Box::new(TazpkgMetadataAdapter),
+            PackageFormat::SingularitySif => Box::new(SingularitySifMetadataAdapter),
+            PackageFormat::StampedeSlp => Box::new(StampedeSlpMetadataAdapter),
+            PackageFormat::Winget => Box::new(WingetMetadataAdapter),
+            PackageFormat::Scoop => Box::new(ScoopMetadataAdapter),
+            PackageFormat::Choco => Box::new(ChocoMetadataAdapter),
+            PackageFormat::Pixi => Box::new(PixiMetadataAdapter),
+            PackageFormat::Nimble => Box::new(NimbleMetadataAdapter),
+            PackageFormat::ZigPkg => Box::new(ZigPkgMetadataAdapter),
+            PackageFormat::SwiftPkg => Box::new(SwiftPkgMetadataAdapter),
+            PackageFormat::DubPkg => Box::new(DubPkgMetadataAdapter),
+            PackageFormat::Opam => Box::new(OpamMetadataAdapter),
+            PackageFormat::Shard => Box::new(ShardMetadataAdapter),
+            PackageFormat::PltPkg => Box::new(PltPkgMetadataAdapter),
         }
     }
 }
@@ -3863,6 +3891,20 @@ mod tests {
             PackageFormat::Crux,
             PackageFormat::Drpm,
             PackageFormat::Stratum,
+            PackageFormat::Tazpkg,
+            PackageFormat::SingularitySif,
+            PackageFormat::StampedeSlp,
+            PackageFormat::Winget,
+            PackageFormat::Scoop,
+            PackageFormat::Choco,
+            PackageFormat::Pixi,
+            PackageFormat::Nimble,
+            PackageFormat::ZigPkg,
+            PackageFormat::SwiftPkg,
+            PackageFormat::DubPkg,
+            PackageFormat::Opam,
+            PackageFormat::Shard,
+            PackageFormat::PltPkg,
         ];
 
         for fmt in formats {
