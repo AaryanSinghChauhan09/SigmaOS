@@ -10,7 +10,6 @@ use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
 
-#[cfg(not(feature = "standalone_test"))]
 #[path = "open_source_os_gap_closure.rs"]
 pub mod open_source_os_gap_closure;
 
@@ -3678,7 +3677,11 @@ impl SovereignOpenSourceObsoletionOrchestrator {
                 "orchestrator_node",
                 "10.200.0.1",
             ),
-            total_obsoleted_projects_count: 90,
+            syncthing_sync: SovereignSyncthingPeerSyncEngine::new("default_sync"),
+            keycloak_idp: SovereignKeycloakIdentityProvider::new("sovereign_realm"),
+            strace_tracer: SovereignStraceSyscallTracerEngine::new(),
+            glusterfs_store: SovereignGlusterFsDistributedEngine::new("sovereign_gluster_vol", 2),
+            total_obsoleted_projects_count: 94,
         }
     }
 
