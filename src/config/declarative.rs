@@ -1,6 +1,6 @@
-// Declarative Configuration System for SigmaOS
-// Declarative configuration per Wiki 03-Configuration.md
-// Provides NixOS-inspired declarative configuration management
+//! Declarative System Configuration Management inspired by NixOS and Guix
+//! Atomic upgrades, system generation tracking, configuration modules, and instant rollbacks.
+use std::vec;
 
 use std::string::{String, ToString};
 
@@ -114,9 +114,28 @@ pub struct SigmaOsConfig {
     pub system: SystemConfig,
     pub network: NetworkConfig,
     pub desktop: DesktopConfig,
+    pub generations: Vec<SystemGeneration>,
+    pub active_generation_id: u32,
     pub security: SecurityConfig,
     pub kernel: KernelConfig,
     pub performance: PerformanceConfig,
+}
+
+#[derive(Debug, Clone)]
+pub struct ConfigModule {
+    pub module_name: String,
+    pub enabled: bool,
+}
+
+pub enum ConfigState { Active, Inactive, Pending }
+
+#[derive(Debug, Clone)]
+pub struct SystemGeneration {
+    pub generation_id: u32,
+    pub created_at_timestamp: u64,
+    pub config_hash: [u8; 32],
+    pub modules: Vec<ConfigModule>,
+    pub state: ConfigState,
 }
 
 impl SigmaOsConfig {
@@ -128,75 +147,52 @@ impl SigmaOsConfig {
             security: SecurityConfig::default(),
             kernel: KernelConfig::default(),
             performance: PerformanceConfig::default(),
+            generations: Vec::new(),
+            active_generation_id: 0,
         }
     }
 
-    pub fn parse_config(config_str: &str) -> Self {
-        let mut config = SigmaOsConfig::new();
-        let mut current_section = String::new();
+    pub fn add_module_to_active(&mut self, module: ConfigModule) {
+        if let Some(gen) = self
+            .generations
+            .iter_mut()
+            .find(|g| g.generation_id == self.active_generation_id)
+        {
+            gen.modules.push(module);
+        }
+    }
 
-        for line in config_str.lines() {
-            let line = line.trim();
+    pub fn commit_atomic_generation(&mut self, timestamp: u64) -> u32 {
+        let new_id = self.generations.len() as u32 + 1;
 
-            // Handle section headers
-            if line.starts_with('[') && line.ends_with(']') {
-                current_section = line[1..line.len()-1].to_string();
-                continue;
+        let current_modules = self
+            .generations
+            .iter()
+            .find(|g| g.generation_id == self.active_generation_id)
+            .map(|g| g.modules.clone())
+            .unwrap_or_default();
+
+        let mut hash = [0u8; 32];
+        for (i, m) in current_modules.iter().enumerate() {
+            for &b in m.module_name.as_bytes() {
+                hash[i % 32] ^= b;
             }
+        }
+        cfg
+    }
 
-            // Handle key-value pairs
-            if let Some((key, value)) = line.split_once('=') {
-                let key = key.trim();
-                let value = value.trim().trim_matches('"');
-
-                match current_section.as_str() {
-                    "system" => {
-                        match key {
-                            "hostname" => config.system.hostname = String::from(value),
-                            "timezone" => config.system.timezone = String::from(value),
-                            "locale" => config.system.locale = String::from(value),
-                            _ => {}
-                        }
-                    }
-                    "network" => {
-                        match key {
-                            "hostname" => config.network.hostname = String::from(value),
-                            "dhcp" => config.network.dhcp = value == "true",
-                            _ => {}
-                        }
-                    }
-                    "desktop" => {
-                        match key {
-                            "compositor" => config.desktop.compositor = String::from(value),
-                            "theme" => config.desktop.theme = String::from(value),
-                            "animations" => config.desktop.animations = value == "true",
-                            _ => {}
-                        }
-                    }
-                    "security" => {
-                        match key {
-                            "sandboxing" => config.security.sandboxing = value == "true",
-                            "firewall" => config.security.firewall = value == "true",
-                            "encryption" => config.security.encryption = value == "true",
-                            _ => {}
-                        }
-                    }
-                    "kernel" => {
-                        match key {
-                            "log_level" => config.kernel.log_level = String::from(value),
-                            "security_mitigations" => config.kernel.security_mitigations = value == "true",
-                            "memory_management" => config.kernel.memory_management = String::from(value),
-                            _ => {}
-                        }
-                    }
-                    "performance" => {
-                        match key {
-                            "cpu_governor" => config.performance.cpu_governor = String::from(value),
-                            "iopriority" => config.performance.iopriority = String::from(value),
-                            _ => {}
-                        }
-                    }
-                    _ => {}
+    pub fn rollback(&mut self, target_generation_id: u32) -> Result<(), &'static str> {
+        if let Some(target) = self
+            .generations
+            .iter()
+            .find(|g| g.generation_id == target_generation_id)
+        {
+            let _ = target;
+            for g in &mut self.generations {
+                if g.generation_id == target_generation_id {
+                    g.state = ConfigState::Active;
+                } else if g.generation_id == self.active_generation_id {
+                    g.state = ConfigState::RolledBack;
                 }
             }
         }

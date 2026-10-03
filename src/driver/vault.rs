@@ -2,17 +2,17 @@ use std::format;
 // SigmaOS Driver Archive Vault (DriverArchiveVault)
 // Encrypts driver binaries for cold storage to prevent unauthorized driver injection and tamper attacks
 
-use std::collections::HashMap;
+use crate::klib::collections::HashMap;
 
 #[derive(Debug, Clone)]
 pub struct VaultEntry {
-    pub driver_name: String,
-    pub encrypted_payload: Vec<u8>,
-    pub hash_signature: String,
+    pub driver_name: crate::klib::SigmaString,
+    pub encrypted_payload: crate::klib::Vec<u8>,
+    pub hash_signature: crate::klib::SigmaString,
 }
 
 pub struct DriverArchiveVault {
-    pub archive: HashMap<String, VaultEntry>,
+    pub archive: HashMap<crate::klib::SigmaString, VaultEntry>,
     pub secret_key: u8,
 }
 
@@ -25,22 +25,20 @@ impl DriverArchiveVault {
     }
 
     pub fn store_driver(&mut self, name: &str, raw_binary: &[u8]) {
-        let encrypted: Vec<u8> =
-            raw_binary.iter().map(|b| b ^ self.secret_key).collect();
-        let sig = String::from(format!("SIGMA_{}_OK", name));
+        let encrypted: crate::klib::Vec<u8> = raw_binary.iter().map(|b| b ^ self.secret_key).collect();
+        let sig = crate::klib::SigmaString::from(format!("SIGMA_{}_OK", name));
 
         let entry = VaultEntry {
-            driver_name: String::from(name),
+            driver_name: crate::klib::SigmaString::from(name),
             encrypted_payload: encrypted,
             hash_signature: sig,
         };
-        self.archive
-            .insert(String::from(name), entry);
+        self.archive.insert(crate::klib::SigmaString::from(name), entry);
     }
 
-    pub fn retrieve_driver(&self, name: &str) -> Option<Vec<u8>> {
-        if let Some(entry) = self.archive.get(&String::from(name)) {
-            let decrypted: Vec<u8> = entry
+    pub fn retrieve_driver(&self, name: &str) -> Option<crate::klib::Vec<u8>> {
+        if let Some(entry) = self.archive.get(&crate::klib::SigmaString::from(name)) {
+            let decrypted: crate::klib::Vec<u8> = entry
                 .encrypted_payload
                 .iter()
                 .map(|b| b ^ self.secret_key)

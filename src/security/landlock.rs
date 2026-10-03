@@ -5,18 +5,14 @@
 extern crate alloc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::format;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
-use std::format;
-#[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
 
 /// Bitmask constants for Landlock Filesystem Access Rights
 pub const LANDLOCK_ACCESS_FS_EXECUTE: u64 = 1 << 0;
@@ -73,14 +69,51 @@ impl LandlockRuleset {
             return true;
         }
 
+        // Reject embedded null bytes to prevent C-ABI truncation attacks
+        if path.as_bytes().contains(&0u8) {
+            return false;
+        }
+
+        // Reject URL-encoded traversal patterns
+        let bytes = path.as_bytes();
+        if bytes.windows(6).any(|w| {
+            w[0] == b'%'
+                && w[1] == b'2'
+                && (w[2] == b'e' || w[2] == b'E')
+                && w[3] == b'%'
+                && w[4] == b'2'
+                && (w[5] == b'e' || w[5] == b'E')
+        }) {
+            return false;
+        }
+        if bytes.windows(3).any(|w| {
+            w[0] == b'%'
+                && ((w[1] == b'2' && (w[2] == b'f' || w[2] == b'F'))
+                    || (w[1] == b'5' && (w[2] == b'c' || w[2] == b'C')))
+        }) {
+            return false;
+        }
+
+        // Reject `..` or `.` segments — directory traversal mitigation
+        for segment in path.split(|c| c == '/' || c == '\\') {
+            if segment == ".." || segment == "." {
+                return false;
+            }
+        }
+
         // If the access right is not handled by this ruleset, allow it by default
         if (self.handled_access_fs & access) == 0 {
             return true;
         }
 
-        // Check matching path beneath rules
+        // Check matching path beneath rules with zero-allocation slice checking
         for rule in &self.path_beneath_rules {
-            if path == rule.parent_path || path.starts_with(&format!("{}/", rule.parent_path.trim_end_matches('/'))) {
+            let parent = rule.parent_path.trim_end_matches('/');
+            let is_match = path == rule.parent_path
+                || (path.starts_with(parent)
+                    && (parent.is_empty() || path[parent.len()..].starts_with('/')));
+
+            if is_match {
                 if (rule.allowed_access & access) == access {
                     return true;
                 }
@@ -166,28 +199,119 @@ mod tests {
     #[test]
     fn test_landlock_sandbox_enforcement() {
         let mut engine = LandlockEngine::new();
-        let handled = LANDLOCK_ACCESS_FS_READ_FILE | LANDLOCK_ACCESS_FS_WRITE_FILE | LANDLOCK_ACCESS_FS_EXECUTE;
+        let handled = LANDLOCK_ACCESS_FS_READ_FILE
+            | LANDLOCK_ACCESS_FS_WRITE_FILE
+            | LANDLOCK_ACCESS_FS_EXECUTE;
         let ruleset_id = engine.create_ruleset(handled);
 
         // Grant read + execute access under /usr and read + write under /tmp
-        assert!(engine.add_rule(ruleset_id, "/usr", LANDLOCK_ACCESS_FS_READ_FILE | LANDLOCK_ACCESS_FS_EXECUTE).is_ok());
-        assert!(engine.add_rule(ruleset_id, "/tmp", LANDLOCK_ACCESS_FS_READ_FILE | LANDLOCK_ACCESS_FS_WRITE_FILE).is_ok());
+        assert!(engine
+            .add_rule(
+                ruleset_id,
+                "/usr",
+                LANDLOCK_ACCESS_FS_READ_FILE | LANDLOCK_ACCESS_FS_EXECUTE
+            )
+            .is_ok());
+        assert!(engine
+            .add_rule(
+                ruleset_id,
+                "/tmp",
+                LANDLOCK_ACCESS_FS_READ_FILE | LANDLOCK_ACCESS_FS_WRITE_FILE
+            )
+            .is_ok());
 
         // Before restrict_self: access allowed everywhere
-        assert!(engine.validate_file_access(ruleset_id, "/etc/shadow", LANDLOCK_ACCESS_FS_READ_FILE));
+        assert!(engine.validate_file_access(
+            ruleset_id,
+            "/etc/shadow",
+            LANDLOCK_ACCESS_FS_READ_FILE
+        ));
 
         // Restrict process
         assert!(engine.restrict_self(ruleset_id).is_ok());
 
         // Cannot add rules after restriction
-        assert!(engine.add_rule(ruleset_id, "/home", LANDLOCK_ACCESS_FS_READ_FILE).is_err());
+        assert!(engine
+            .add_rule(ruleset_id, "/home", LANDLOCK_ACCESS_FS_READ_FILE)
+            .is_err());
 
         // Allowed accesses
-        assert!(engine.validate_file_access(ruleset_id, "/usr/bin/bash", LANDLOCK_ACCESS_FS_EXECUTE));
-        assert!(engine.validate_file_access(ruleset_id, "/tmp/log.txt", LANDLOCK_ACCESS_FS_WRITE_FILE));
+        assert!(engine.validate_file_access(
+            ruleset_id,
+            "/usr/bin/bash",
+            LANDLOCK_ACCESS_FS_EXECUTE
+        ));
+        assert!(engine.validate_file_access(
+            ruleset_id,
+            "/tmp/log.txt",
+            LANDLOCK_ACCESS_FS_WRITE_FILE
+        ));
 
         // Prohibited accesses
-        assert!(!engine.validate_file_access(ruleset_id, "/etc/shadow", LANDLOCK_ACCESS_FS_READ_FILE));
-        assert!(!engine.validate_file_access(ruleset_id, "/usr/bin/bash", LANDLOCK_ACCESS_FS_WRITE_FILE));
+        assert!(!engine.validate_file_access(
+            ruleset_id,
+            "/etc/shadow",
+            LANDLOCK_ACCESS_FS_READ_FILE
+        ));
+        assert!(!engine.validate_file_access(
+            ruleset_id,
+            "/usr/bin/bash",
+            LANDLOCK_ACCESS_FS_WRITE_FILE
+        ));
+    }
+
+    #[test]
+    fn test_landlock_input_validation_hardening() {
+        let mut engine = LandlockEngine::new();
+        let handled = LANDLOCK_ACCESS_FS_READ_FILE;
+        let ruleset_id = engine.create_ruleset(handled);
+
+        assert!(engine
+            .add_rule(ruleset_id, "/tmp", LANDLOCK_ACCESS_FS_READ_FILE)
+            .is_ok());
+        assert!(engine.restrict_self(ruleset_id).is_ok());
+
+        // Valid access within /tmp
+        assert!(engine.validate_file_access(
+            ruleset_id,
+            "/tmp/file.txt",
+            LANDLOCK_ACCESS_FS_READ_FILE
+        ));
+
+        // Rejection of directory traversal attempts (`..` and `.`)
+        assert!(!engine.validate_file_access(
+            ruleset_id,
+            "/tmp/../etc/passwd",
+            LANDLOCK_ACCESS_FS_READ_FILE
+        ));
+        assert!(!engine.validate_file_access(
+            ruleset_id,
+            "/tmp/./file.txt",
+            LANDLOCK_ACCESS_FS_READ_FILE
+        ));
+
+        // Rejection of embedded NUL byte truncation attacks
+        assert!(!engine.validate_file_access(
+            ruleset_id,
+            "/tmp/file.txt\0.jpg",
+            LANDLOCK_ACCESS_FS_READ_FILE
+        ));
+
+        // Rejection of URL-encoded traversal patterns
+        assert!(!engine.validate_file_access(
+            ruleset_id,
+            "/tmp/%2e%2e/etc/passwd",
+            LANDLOCK_ACCESS_FS_READ_FILE
+        ));
+        assert!(!engine.validate_file_access(
+            ruleset_id,
+            "/tmp/%2Fetc/passwd",
+            LANDLOCK_ACCESS_FS_READ_FILE
+        ));
+        assert!(!engine.validate_file_access(
+            ruleset_id,
+            "/tmp/%5Cetc/passwd",
+            LANDLOCK_ACCESS_FS_READ_FILE
+        ));
     }
 }

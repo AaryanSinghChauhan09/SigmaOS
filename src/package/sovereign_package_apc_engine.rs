@@ -17,16 +17,12 @@ extern crate alloc;
 #[cfg(not(feature = "standalone_test"))]
 use std::collections::BTreeMap;
 #[cfg(not(feature = "standalone_test"))]
-use std::format;
-#[cfg(not(feature = "standalone_test"))]
 use std::string::{String, ToString};
 #[cfg(not(feature = "standalone_test"))]
 use std::vec::Vec;
 
 #[cfg(feature = "standalone_test")]
 use alloc::collections::BTreeMap;
-#[cfg(feature = "standalone_test")]
-use alloc::format;
 #[cfg(feature = "standalone_test")]
 use alloc::string::{String, ToString};
 #[cfg(feature = "standalone_test")]
@@ -106,7 +102,11 @@ impl SovereignPackageApcEngine {
         for id in ids {
             if let Some(task) = self.pending_tasks.get_mut(&id) {
                 if task.is_cancelled {
-                    results.push((id, task.package_name.clone(), Err("Task cancelled by caller")));
+                    results.push((
+                        id,
+                        task.package_name.clone(),
+                        Err("Task cancelled by caller"),
+                    ));
                     continue;
                 }
                 if !task.is_completed {
@@ -166,7 +166,8 @@ impl PosixRealtimeSignalApcQueue {
         if self.signal_queue.is_empty() {
             return None;
         }
-        self.signal_queue.sort_by(|a, b| b.signal_num.cmp(&a.signal_num)); // Highest RT signal first
+        self.signal_queue
+            .sort_by(|a, b| b.signal_num.cmp(&a.signal_num)); // Highest RT signal first
         Some(self.signal_queue.remove(0))
     }
 }
@@ -218,11 +219,11 @@ impl IoUringAsyncPackageRing {
 
         for sqe in sqes {
             let res = match sqe.opcode {
-                1 => sqe.buffer_len as i32,  // Read success
-                2 => sqe.buffer_len as i32,  // Write success
-                3 => 0,                       // Poll ready
-                4 => 0,                       // Cancel success
-                _ => -22,                     // -EINVAL
+                1 => sqe.buffer_len as i32, // Read success
+                2 => sqe.buffer_len as i32, // Write success
+                3 => 0,                     // Poll ready
+                4 => 0,                     // Cancel success
+                _ => -22,                   // -EINVAL
             };
 
             self.completion_queue.push(IoUringPackageCqe {
@@ -273,8 +274,7 @@ impl CapsicumSandboxedScriptletApc {
     }
 
     pub fn grant_rights(&mut self, fd: i32, rights: &[CapsicumCapRights]) {
-        self.fd_capability_table
-            .insert(fd, rights.to_vec());
+        self.fd_capability_table.insert(fd, rights.to_vec());
     }
 
     pub fn validate_rights(&self, fd: i32, required: CapsicumCapRights) -> bool {
@@ -313,7 +313,10 @@ impl SovereignPackageApcOrchestratorSuite {
         }
     }
 
-    pub fn prepare_package_async_operations(&mut self, pkg: &mut UnifiedPackage) -> Result<u64, String> {
+    pub fn prepare_package_async_operations(
+        &mut self,
+        pkg: &mut UnifiedPackage,
+    ) -> Result<u64, String> {
         let task_id = self
             .apc_engine
             .dispatch_async_apc(&pkg.name, "ChecksumVerification");
@@ -327,8 +330,10 @@ impl SovereignPackageApcOrchestratorSuite {
             buffer_len: 4096,
         });
 
-        self.capsicum
-            .grant_rights(3, &[CapsicumCapRights::CapRead, CapsicumCapRights::CapEvent]);
+        self.capsicum.grant_rights(
+            3,
+            &[CapsicumCapRights::CapRead, CapsicumCapRights::CapEvent],
+        );
 
         pkg.properties
             .insert("async_apc_task_id".to_string(), task_id.to_string());
@@ -358,7 +363,7 @@ mod tests {
         let res = engine.poll_and_execute_apcs();
         assert_eq!(res.len(), 2);
         assert!(res[0].2.is_err()); // t1 cancelled
-        assert!(res[1].2.is_ok());  // t2 completed
+        assert!(res[1].2.is_ok()); // t2 completed
     }
 
     #[test]
@@ -393,7 +398,10 @@ mod tests {
     #[test]
     fn test_capsicum_rights() {
         let mut caps = CapsicumSandboxedScriptletApc::new();
-        caps.grant_rights(5, &[CapsicumCapRights::CapRead, CapsicumCapRights::CapWrite]);
+        caps.grant_rights(
+            5,
+            &[CapsicumCapRights::CapRead, CapsicumCapRights::CapWrite],
+        );
 
         assert!(caps.validate_rights(5, CapsicumCapRights::CapRead));
         assert!(!caps.validate_rights(5, CapsicumCapRights::CapEvent));

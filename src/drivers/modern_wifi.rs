@@ -2,8 +2,6 @@
 // Demonstrates how advanced modern wireless drivers implement the unified OOP architecture.
 // Enhanced with Linux/BSD-inspired wireless properties, security, scanning, and monitor mode support.
 
-
-
 use std::string::String;
 use std::string::ToString;
 use std::vec::Vec;
@@ -22,7 +20,10 @@ pub enum DeviceGeneration {
 pub enum PowerState {
     Off,
     On,
-}
+    FullOn,
+    Standby,
+    Sleep,
+    Unknown,}
 
 #[cfg(test_disabled)]
 pub trait PeripheralDevice {

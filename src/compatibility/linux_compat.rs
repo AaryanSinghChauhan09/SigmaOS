@@ -429,12 +429,7 @@ impl LinuxBpfLsmEngine {
         self.active_hooks.insert(hook, prog_name.to_string());
     }
 
-    pub fn enforce_lsm_check(
-        &mut self,
-        hook: LinuxBpfLsmHookType,
-        pid: u32,
-        target: &str,
-    ) -> bool {
+    pub fn enforce_lsm_check(&mut self, hook: LinuxBpfLsmHookType, pid: u32, target: &str) -> bool {
         let allowed = if let Some(prog) = self.active_hooks.get(&hook) {
             !target.contains("denied") && !prog.contains("block")
         } else {
@@ -571,9 +566,24 @@ pub struct LinuxCgroupV2PsiEngine {
 impl LinuxCgroupV2PsiEngine {
     pub fn new() -> Self {
         Self {
-            cpu_some: PsiMetrics { avg10: 0.5, avg60: 0.2, avg300: 0.1, total_us: 1200 },
-            memory_some: PsiMetrics { avg10: 0.0, avg60: 0.0, avg300: 0.0, total_us: 0 },
-            io_some: PsiMetrics { avg10: 1.2, avg60: 0.8, avg300: 0.4, total_us: 4500 },
+            cpu_some: PsiMetrics {
+                avg10: 0.5,
+                avg60: 0.2,
+                avg300: 0.1,
+                total_us: 1200,
+            },
+            memory_some: PsiMetrics {
+                avg10: 0.0,
+                avg60: 0.0,
+                avg300: 0.0,
+                total_us: 0,
+            },
+            io_some: PsiMetrics {
+                avg10: 1.2,
+                avg60: 0.8,
+                avg300: 0.4,
+                total_us: 4500,
+            },
         }
     }
 
@@ -731,9 +741,7 @@ pub struct LinuxNetfilterNftablesEngine {
 
 impl LinuxNetfilterNftablesEngine {
     pub fn new() -> Self {
-        Self {
-            rules: Vec::new(),
-        }
+        Self { rules: Vec::new() }
     }
 
     pub fn add_rule(&mut self, table: &str, chain: &str, action: &str) {
@@ -834,7 +842,6 @@ mod tests {
         assert_eq!(comp_bytes, 2048);
         assert_eq!(zram.total_compressed_bytes, 2048);
     }
-
 
     #[test]
     fn test_linux_compat_spec() {

@@ -3,8 +3,6 @@
 
 #[cfg(test_disabled)]
 use std::format;
-use std::string::String;
-use std::string::ToString;
 use std::vec::Vec;
 
 #[cfg(not(test))]

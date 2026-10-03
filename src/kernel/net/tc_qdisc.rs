@@ -17,7 +17,6 @@ use std::boxed::Box;
 use std::collections::VecDeque;
 use std::vec::Vec;
 
-
 /// A network packet in the qdisc layer (simplified)
 #[derive(Debug, Clone)]
 pub struct QPacket {

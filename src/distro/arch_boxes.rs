@@ -1,7 +1,5 @@
-
 use std::collections::BTreeMap;
 use std::format;
-use std::string::{String, ToString};
 use std::vec;
 use std::vec::Vec;
 
@@ -260,7 +258,9 @@ mod tests {
             &mock_raw,
         );
 
-        let json = engine.catalog.render_vagrant_metadata_json("archlinux/archlinux");
+        let json = engine
+            .catalog
+            .render_vagrant_metadata_json("archlinux/archlinux");
         assert!(json.contains("\"name\": \"archlinux/archlinux\""));
         assert!(json.contains("\"version\": \"2026.08.31\""));
     }

@@ -6,10 +6,10 @@ use std::vec;
 // Fedora's systemd-preset automated service activation controller,
 // and Fedora's Anaconda automated installation Kickstart parser.
 
-#[cfg(any(test, feature = "standalone_test"))]
-use std::collections::HashMap;
 #[cfg(all(not(test), not(feature = "standalone_test")))]
 use crate::klib::HashMap;
+#[cfg(any(test, feature = "standalone_test"))]
+use std::collections::HashMap;
 
 /// DnfPackageResolver mimics Fedora's DNF/RPM package resolver.
 /// It performs dependency checks, tracks repo metadata, and validates GPG package signatures.
@@ -911,6 +911,7 @@ pub struct StatusFpoIncident {
 /// logs incidents, calculates uptime SLA percentages, and generates status reports.
 pub struct FedoraStatusFpoEngine {
     pub service_states: HashMap<String, StatusFpoServiceHealth>,
+    pub service_statuses: HashMap<String, FedoraServiceStatusState>,
     pub incidents: Vec<StatusFpoIncident>,
     pub total_checks: u64,
     pub successful_checks: u64,
@@ -925,12 +926,27 @@ impl FedoraStatusFpoEngine {
         states.insert("MirrorManager".to_string(), StatusFpoServiceHealth::Good);
         states.insert("Pagure".to_string(), StatusFpoServiceHealth::Good);
 
+        let mut statuses = HashMap::new();
+        statuses.insert("koji".to_string(), FedoraServiceStatusState::Good);
+        statuses.insert("bodhi".to_string(), FedoraServiceStatusState::Good);
+        statuses.insert("copr".to_string(), FedoraServiceStatusState::Good);
+        statuses.insert("pagure".to_string(), FedoraServiceStatusState::Good);
+
         Self {
             service_states: states,
+            service_statuses: statuses,
             incidents: Vec::new(),
             total_checks: 100,
             successful_checks: 100,
         }
+    }
+
+    pub fn set_service_status(&mut self, service: &str, state: FedoraServiceStatusState) {
+        self.service_statuses.insert(service.to_string(), state);
+    }
+
+    pub fn query_service_health(&self, service: &str) -> FedoraServiceStatusState {
+        *self.service_statuses.get(service).unwrap_or(&FedoraServiceStatusState::Good)
     }
 
     pub fn set_service_health(&mut self, service_name: &str, health: StatusFpoServiceHealth) {
@@ -1707,13 +1723,20 @@ impl FedoraSilverblueRpmOstreeEngine {
         }
     }
 
-    pub fn rebase_stream(&mut self, new_stream: &str, target_commit: &str) -> Result<String, &'static str> {
+    pub fn rebase_stream(
+        &mut self,
+        new_stream: &str,
+        target_commit: &str,
+    ) -> Result<String, &'static str> {
         if new_stream.is_empty() || target_commit.is_empty() {
             return Err("Stream and target commit cannot be empty");
         }
         self.current_stream = new_stream.to_string();
         self.stage_upgrade(target_commit);
-        Ok(format!("Rebased to stream '{}' at commit '{}'", new_stream, target_commit))
+        Ok(format!(
+            "Rebased to stream '{}' at commit '{}'",
+            new_stream, target_commit
+        ))
     }
 
     pub fn overlay_layer_package(&mut self, pkg: &str) {
@@ -1850,14 +1873,16 @@ impl FedoraKeyringPamModule {
         // Security: Never use hardcoded credentials in production.
         // Authentication must be verified against a secure credential store (PAM, SSSD, etc.)
         // This implementation uses a constant-time comparison against the configured credential.
-        let expected = std::env::var("SIGMA_PAM_TEST_SECRET")
-            .unwrap_or_else(|_| String::new());
+        let expected = std::env::var("SIGMA_PAM_TEST_SECRET").unwrap_or_else(|_| String::new());
         // Constant-time comparison to prevent timing attacks
         let pass_bytes = pass.as_bytes();
         let expected_bytes = expected.as_bytes();
         let matches = if pass_bytes.len() == expected_bytes.len() && !expected.is_empty() {
-            pass_bytes.iter().zip(expected_bytes.iter())
-                .fold(0u8, |acc, (a, b)| acc | (a ^ b)) == 0
+            pass_bytes
+                .iter()
+                .zip(expected_bytes.iter())
+                .fold(0u8, |acc, (a, b)| acc | (a ^ b))
+                == 0
         } else {
             false
         };
@@ -2759,6 +2784,115 @@ pub struct TahrirUserAvatar {
     pub mime_type: String,
 }
 
+/// Fedora Planet Blog Article Entry
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FedoraPlanetPost {
+    pub post_id: String,
+    pub author_name: String,
+    pub title: String,
+    pub url: String,
+    pub published_epoch: u64,
+}
+
+/// Fedora "The New Hotness" Upstream Release Event
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AnityaUpstreamRelease {
+    pub project_name: String,
+    pub latest_version: String,
+    pub homepage: String,
+    pub is_triggering_scratch_build: bool,
+}
+
+/// Fedora rpmautospec RPM Spec Changelog & Version Generator
+pub struct FedoraRpmAutoSpecEngine {
+    pub git_commit_count: u32,
+    pub git_commit_messages: Vec<String>,
+}
+
+impl FedoraRpmAutoSpecEngine {
+    pub fn new(commit_count: u32) -> Self {
+        FedoraRpmAutoSpecEngine {
+            git_commit_count: commit_count,
+            git_commit_messages: Vec::new(),
+        }
+    }
+
+    pub fn add_commit_log(&mut self, msg: &str) {
+        self.git_commit_messages.push(msg.to_string());
+    }
+
+    pub fn generate_autorelease(&self, base_release: u32) -> String {
+        format!("{}.{}", base_release, self.git_commit_count)
+    }
+
+    pub fn generate_autochangelog(&self) -> String {
+        let mut changelog = String::from("%autochangelog\n");
+        for msg in &self.git_commit_messages {
+            changelog.push_str(&format!("- {}\n", msg));
+        }
+        changelog
+    }
+}
+
+/// Fedora Service Status Indicator
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FedoraServiceStatusState {
+    Good,
+    MinorOutage,
+    MajorOutage,
+}
+
+
+/// Fedora FASJSON (Fedora Account System REST API) User Record
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FasjsonUserRecord {
+    pub username: String,
+    pub human_name: String,
+    pub email: String,
+    pub group_memberships: Vec<String>,
+}
+
+/// Fedora FASJSON Client Engine
+pub struct FedoraFasjsonClientEngine {
+    pub user_db: HashMap<String, FasjsonUserRecord>,
+}
+
+impl FedoraFasjsonClientEngine {
+    pub fn new() -> Self {
+        FedoraFasjsonClientEngine { user_db: HashMap::new() }
+    }
+
+    pub fn register_user(&mut self, username: &str, human_name: &str, email: &str, groups: &[&str]) {
+        self.user_db.insert(
+            username.to_string(),
+            FasjsonUserRecord {
+                username: username.to_string(),
+                human_name: human_name.to_string(),
+                email: email.to_string(),
+                group_memberships: groups.iter().map(|g| g.to_string()).collect(),
+            },
+        );
+    }
+
+    pub fn get_user_info(&self, username: &str) -> Option<&FasjsonUserRecord> {
+        self.user_db.get(username)
+    }
+
+    pub fn is_user_in_group(&self, username: &str, group: &str) -> bool {
+        if let Some(user) = self.get_user_info(username) {
+            user.group_memberships.iter().any(|g| g == group)
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for FedoraFasjsonClientEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Fedora Tahrir User Identity, Avatar & OpenBadges API Engine
 /// Serves Libravatar-compatible avatar resolution and Fedora Badges OpenBadges v2/v3 assertions.
 pub struct FedoraTahrirIdentityApiEngine {
@@ -2784,7 +2918,13 @@ impl FedoraTahrirIdentityApiEngine {
         format!("{:016x}", hash)
     }
 
-    pub fn register_user_avatar(&mut self, user_id: &str, email: &str, avatar_data: &[u8], mime: &str) -> String {
+    pub fn register_user_avatar(
+        &mut self,
+        user_id: &str,
+        email: &str,
+        avatar_data: &[u8],
+        mime: &str,
+    ) -> String {
         let email_hash = Self::calculate_email_hash(email);
         self.user_avatars.retain(|a| a.user_id != user_id);
         self.user_avatars.push(TahrirUserAvatar {
@@ -2797,10 +2937,18 @@ impl FedoraTahrirIdentityApiEngine {
     }
 
     pub fn resolve_avatar_by_hash(&self, email_hash: &str) -> Option<&TahrirUserAvatar> {
-        self.user_avatars.iter().find(|a| a.email_sha256 == email_hash)
+        self.user_avatars
+            .iter()
+            .find(|a| a.email_sha256 == email_hash)
     }
 
-    pub fn issue_badge_assertion(&mut self, badge_id: &str, recipient_email: &str, issuer: &str, timestamp: u64) -> TahrirBadgeAssertion {
+    pub fn issue_badge_assertion(
+        &mut self,
+        badge_id: &str,
+        recipient_email: &str,
+        issuer: &str,
+        timestamp: u64,
+    ) -> TahrirBadgeAssertion {
         let recipient_hash = Self::calculate_email_hash(recipient_email);
         let digest = format!("{}:{}:{}:{}", badge_id, recipient_hash, issuer, timestamp);
         let assertion = TahrirBadgeAssertion {
@@ -2816,7 +2964,9 @@ impl FedoraTahrirIdentityApiEngine {
     }
 
     pub fn verify_badge_assertion(&self, assertion: &TahrirBadgeAssertion) -> bool {
-        self.issued_badges.iter().any(|b| b.assertion_digest == assertion.assertion_digest)
+        self.issued_badges
+            .iter()
+            .any(|b| b.assertion_digest == assertion.assertion_digest)
     }
 }
 
@@ -2852,8 +3002,10 @@ impl FedoraFmnMessagingEngine {
         let mut dispatched_count = 0;
 
         for rule in &self.filter_rules {
-            let pkg_match = rule.package_pattern == "*" || rule.package_pattern == event.package_name;
-            let topic_match = rule.topic_pattern == "*" || event.topic.contains(&rule.topic_pattern);
+            let pkg_match =
+                rule.package_pattern == "*" || rule.package_pattern == event.package_name;
+            let topic_match =
+                rule.topic_pattern == "*" || event.topic.contains(&rule.topic_pattern);
             let severity_match = event.severity >= rule.min_severity;
 
             if pkg_match && topic_match && severity_match {
@@ -2956,6 +3108,7 @@ pub struct UpstreamReleaseEvent {
 /// Tracks upstream project releases, compares version semantics, maps Anitya project IDs
 /// to Fedora RPM packages, and dispatches `org.fedoraproject.prod.hotness.update` fedmsg events.
 pub struct FedoraTheNewHotnessEngine {
+    pub monitored_projects: Vec<AnityaUpstreamRelease>,
     pub mappings: Vec<AnityaPackageMapping>,
     pub release_events: Vec<UpstreamReleaseEvent>,
     pub messaging_engine: FedoraMessagingEngine,
@@ -2964,9 +3117,29 @@ pub struct FedoraTheNewHotnessEngine {
 impl FedoraTheNewHotnessEngine {
     pub fn new() -> Self {
         Self {
+            monitored_projects: Vec::new(),
             mappings: Vec::new(),
             release_events: Vec::new(),
             messaging_engine: FedoraMessagingEngine::new(),
+        }
+    }
+
+    pub fn register_upstream_project(&mut self, name: &str, homepage: &str) {
+        self.monitored_projects.push(AnityaUpstreamRelease {
+            project_name: name.to_string(),
+            latest_version: "1.0.0".to_string(),
+            homepage: homepage.to_string(),
+            is_triggering_scratch_build: false,
+        });
+    }
+
+    pub fn process_upstream_release_event(&mut self, name: &str, new_version: &str) -> Result<String, &'static str> {
+        if let Some(project) = self.monitored_projects.iter_mut().find(|p| p.project_name == name) {
+            project.latest_version = new_version.to_string();
+            project.is_triggering_scratch_build = true;
+            Ok(format!("TheNewHotness: Triggered Koji scratch build for {} version {}", name, new_version))
+        } else {
+            Err("Project not found in Anitya release monitor")
         }
     }
 
@@ -3065,6 +3238,7 @@ pub struct PlanetUserFeed {
 /// Aggregates community developer blog posts, filters by FAS account or categories,
 /// sanitizes HTML content summaries, and emits fedmsg notifications for new articles.
 pub struct FedoraPlanetAggregationEngine {
+    pub posts: Vec<FedoraPlanetPost>,
     pub registered_feeds: Vec<PlanetUserFeed>,
     pub aggregated_entries: Vec<PlanetBlogFeedEntry>,
     pub messaging_engine: FedoraMessagingEngine,
@@ -3074,11 +3248,27 @@ pub struct FedoraPlanetAggregationEngine {
 impl FedoraPlanetAggregationEngine {
     pub fn new() -> Self {
         Self {
+            posts: Vec::new(),
             registered_feeds: Vec::new(),
             aggregated_entries: Vec::new(),
             messaging_engine: FedoraMessagingEngine::new(),
             entry_counter: 0,
         }
+    }
+
+    pub fn fetch_and_parse_feed(&mut self, author: &str, title: &str, url: &str, timestamp: u64) {
+        let post_id = format!("planet-{}", self.posts.len() + 1);
+        self.posts.push(FedoraPlanetPost {
+            post_id,
+            author_name: author.to_string(),
+            title: title.to_string(),
+            url: url.to_string(),
+            published_epoch: timestamp,
+        });
+    }
+
+    pub fn get_latest_posts(&self, limit: usize) -> Vec<&FedoraPlanetPost> {
+        self.posts.iter().take(limit).collect()
     }
 
     pub fn register_feed(&mut self, fas_account: &str, feed_url: &str) {
@@ -3719,7 +3909,10 @@ impl FedoraToolbxContainerEngine {
             if !c.running {
                 c.running = true;
             }
-            Ok(format!("Toolbx '{}' executed command: '{}'", c.name, command))
+            Ok(format!(
+                "Toolbx '{}' executed command: '{}'",
+                c.name, command
+            ))
         } else {
             Err("Toolbx container not found")
         }
@@ -3746,6 +3939,50 @@ impl Default for FedoraToolbxContainerEngine {
 // =========================================================================
 // Fedora DNF Staged Offline Update Engine (systemd-offline-update parity)
 // =========================================================================
+
+#[derive(Debug, Clone, Default)]
+pub struct FedoraOfflineUpdateEngine {
+    pub is_offline_update_pending: bool,
+    pub staged_packages: Vec<String>,
+    pub trigger_reboot_flag: bool,
+}
+
+impl FedoraOfflineUpdateEngine {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn stage_offline_packages(&mut self, packages: &[&str]) {
+        for p in packages {
+            self.staged_packages.push((*p).to_string());
+        }
+        self.is_offline_update_pending = !self.staged_packages.is_empty();
+    }
+
+    pub fn trigger_offline_update_on_reboot(&mut self) -> Result<usize, &'static str> {
+        self.trigger_reboot_flag = true;
+        Ok(self.staged_packages.len())
+    }
+
+    pub fn execute_pending_offline_update(&mut self) -> Result<(), &'static str> {
+        self.is_offline_update_pending = false;
+        self.trigger_reboot_flag = false;
+        self.staged_packages.clear();
+        Ok(())
+    }
+}
+
+
+
+impl FedoraOfflineUpdateEngine {
+    pub fn new() -> Self {
+        Self {
+            staged_packages: Vec::new(),
+            is_offline_update_pending: false,
+            trigger_reboot_flag: false,
+        }
+    }
+}
 
 // =========================================================================
 // Fedora MirrorManager 2 (mirrormanager2) System Engine
@@ -4060,8 +4297,6 @@ pub enum SystemRoleKind {
     Storage,
 }
 
-
-
 #[derive(Debug, Clone)]
 pub struct FedoraSystemRolesEngine {
     pub applied_roles: Vec<SystemRoleKind>,
@@ -4122,16 +4357,35 @@ pub struct FedoraMojiKeyEngine {
 
 impl FedoraMojiKeyEngine {
     pub fn new() -> Self {
-        let mut engine = Self { characters: Vec::new() };
-        engine.characters.push(CharacterEntry { glyph: "🚀".to_string(), name: "rocket".to_string(), category: "symbols".to_string() });
-        engine.characters.push(CharacterEntry { glyph: "🐧".to_string(), name: "penguin".to_string(), category: "animals".to_string() });
-        engine.characters.push(CharacterEntry { glyph: "🎩".to_string(), name: "fedora hat".to_string(), category: "clothing".to_string() });
+        let mut engine = Self {
+            characters: Vec::new(),
+        };
+        engine.characters.push(CharacterEntry {
+            glyph: "🚀".to_string(),
+            name: "rocket".to_string(),
+            category: "symbols".to_string(),
+        });
+        engine.characters.push(CharacterEntry {
+            glyph: "🐧".to_string(),
+            name: "penguin".to_string(),
+            category: "animals".to_string(),
+        });
+        engine.characters.push(CharacterEntry {
+            glyph: "🎩".to_string(),
+            name: "fedora hat".to_string(),
+            category: "clothing".to_string(),
+        });
         engine
     }
 
     pub fn search(&self, query: &str) -> Vec<&CharacterEntry> {
         let q = query.to_lowercase();
-        self.characters.iter().filter(|c| c.name.to_lowercase().contains(&q) || c.category.to_lowercase().contains(&q)).collect()
+        self.characters
+            .iter()
+            .filter(|c| {
+                c.name.to_lowercase().contains(&q) || c.category.to_lowercase().contains(&q)
+            })
+            .collect()
     }
 }
 
@@ -4151,7 +4405,9 @@ pub struct FedoraPaguEngine {
 
 impl FedoraPaguEngine {
     pub fn new() -> Self {
-        Self { accounts: Vec::new() }
+        Self {
+            accounts: Vec::new(),
+        }
     }
 
     pub fn provision_account(&mut self, username: &str, email: &str, groups: &[&str]) {
@@ -4164,7 +4420,10 @@ impl FedoraPaguEngine {
     }
 
     pub fn generate_oauth2_token(&self, username: &str) -> Option<String> {
-        self.accounts.iter().find(|a| a.username == username && a.is_active).map(|a| format!("pagu-oauth2-token-{}", a.username))
+        self.accounts
+            .iter()
+            .find(|a| a.username == username && a.is_active)
+            .map(|a| format!("pagu-oauth2-token-{}", a.username))
     }
 }
 
@@ -4185,13 +4444,21 @@ pub struct FedoraFedocalEngine {
 
 impl FedoraFedocalEngine {
     pub fn new() -> Self {
-        Self { meetings: Vec::new(), next_id: 1 }
+        Self {
+            meetings: Vec::new(),
+            next_id: 1,
+        }
     }
 
     pub fn schedule_meeting(&mut self, title: &str, room: &str, organizer: &str) -> usize {
         let id = self.next_id;
         self.next_id += 1;
-        self.meetings.push(FedocalMeeting { id, title: title.to_string(), room: room.to_string(), organizer: organizer.to_string() });
+        self.meetings.push(FedocalMeeting {
+            id,
+            title: title.to_string(),
+            room: room.to_string(),
+            organizer: organizer.to_string(),
+        });
         id
     }
 }
@@ -4213,13 +4480,21 @@ pub struct FedoraNuancierEngine {
 
 impl FedoraNuancierEngine {
     pub fn new() -> Self {
-        Self { submissions: Vec::new(), next_id: 1 }
+        Self {
+            submissions: Vec::new(),
+            next_id: 1,
+        }
     }
 
     pub fn submit_wallpaper(&mut self, title: &str, author: &str) -> usize {
         let id = self.next_id;
         self.next_id += 1;
-        self.submissions.push(WallpaperSubmission { id, title: title.to_string(), author: author.to_string(), votes: 0 });
+        self.submissions.push(WallpaperSubmission {
+            id,
+            title: title.to_string(),
+            author: author.to_string(),
+            votes: 0,
+        });
         id
     }
 
@@ -4247,11 +4522,16 @@ pub struct FedoraIrcotEngine {
 
 impl FedoraIrcotEngine {
     pub fn new() -> Self {
-        Self { channels: Vec::new() }
+        Self {
+            channels: Vec::new(),
+        }
     }
 
     pub fn join_channel(&mut self, name: &str, topic: &str) {
-        self.channels.push(IrcChannel { channel_name: name.to_string(), topic: topic.to_string() });
+        self.channels.push(IrcChannel {
+            channel_name: name.to_string(),
+            topic: topic.to_string(),
+        });
     }
 
     pub fn broadcast_message(&self, message: &str) -> usize {
@@ -4273,11 +4553,16 @@ pub struct FedoraElectionsEngine {
 
 impl FedoraElectionsEngine {
     pub fn new() -> Self {
-        Self { candidates: Vec::new() }
+        Self {
+            candidates: Vec::new(),
+        }
     }
 
     pub fn nominate_candidate(&mut self, username: &str) {
-        self.candidates.push(ElectionCandidate { username: username.to_string(), votes: 0 });
+        self.candidates.push(ElectionCandidate {
+            username: username.to_string(),
+            votes: 0,
+        });
     }
 
     pub fn cast_ballot(&mut self, username: &str) -> bool {
@@ -4319,14 +4604,21 @@ mod tests {
             "sovereign",
             false,
         );
-        assert_eq!(bodhi.updates.get("systemd-254.1-1.fc39").unwrap().update_id, "systemd-254.1-1.fc39");
+        assert_eq!(
+            bodhi.updates.get("systemd-254.1-1.fc39").unwrap().update_id,
+            "systemd-254.1-1.fc39"
+        );
     }
 
     #[test]
     fn test_fedora_ignition_engine() {
         let mut ignition = FedoraIgnitionEngine::new();
         ignition.add_file("/etc/motd", "Welcome to Sovereign SigmaOS\n", 0o644);
-        ignition.add_user("sovereign", &["ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI..."], &["wheel", "sudo"]);
+        ignition.add_user(
+            "sovereign",
+            &["ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI..."],
+            &["wheel", "sudo"],
+        );
 
         assert_eq!(ignition.files.len(), 1);
         assert_eq!(ignition.users.len(), 1);
@@ -4361,11 +4653,16 @@ mod tests {
     #[test]
     fn test_fedora_toolbx_container() {
         let mut toolbx = FedoraToolbxContainerEngine::new();
-        let container = toolbx.create_toolbx("fedora-toolbox-39", "registry.fedoraproject.org/fedora-toolbox:39");
+        let container = toolbx.create_toolbx(
+            "fedora-toolbox-39",
+            "registry.fedoraproject.org/fedora-toolbox:39",
+        );
         assert_eq!(container.name, "fedora-toolbox-39");
 
         assert!(toolbx.add_host_mount("fedora-toolbox-39", "/home/sovereign"));
-        let output = toolbx.run_command("fedora-toolbox-39", "dnf install -y gcc").unwrap();
+        let output = toolbx
+            .run_command("fedora-toolbox-39", "dnf install -y gcc")
+            .unwrap();
         assert!(output.contains("gcc"));
     }
 
@@ -4515,7 +4812,10 @@ mod tests_fedora_mojikey {
         // 2. Pagu
         let mut pagu = FedoraPaguEngine::new();
         pagu.provision_account("jules_dev", "jules@fedora.org", &["packagers", "sysadmin"]);
-        assert_eq!(pagu.generate_oauth2_token("jules_dev"), Some("pagu-oauth2-token-jules_dev".to_string()));
+        assert_eq!(
+            pagu.generate_oauth2_token("jules_dev"),
+            Some("pagu-oauth2-token-jules_dev".to_string())
+        );
 
         // 3. Fedocal
         let mut cal = FedoraFedocalEngine::new();
@@ -4539,5 +4839,4 @@ mod tests_fedora_mojikey {
         assert!(elections.cast_ballot("alice"));
         assert_eq!(elections.candidates[0].votes, 1);
     }
-
 }

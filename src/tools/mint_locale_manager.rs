@@ -67,6 +67,22 @@ pub enum LocaleSettingType {
     Telephone,
 }
 
+/// Fast zero-allocation case-insensitive ASCII substring search helper.
+#[inline]
+fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
+    let n_bytes = needle.as_bytes();
+    if n_bytes.is_empty() {
+        return true;
+    }
+    let h_bytes = haystack.as_bytes();
+    if h_bytes.len() < n_bytes.len() {
+        return false;
+    }
+    h_bytes
+        .windows(n_bytes.len())
+        .any(|w| w.eq_ignore_ascii_case(n_bytes))
+}
+
 impl LocaleSettingType {
     /// Get environment variable name for the setting
     pub fn env_var(&self) -> &'static str {
@@ -220,14 +236,20 @@ impl MintLocaleManager {
     }
 
     /// Search locales by language name
+    ///
+    /// Performance Optimization: Uses zero-allocation ASCII substring window matching
+    /// to avoid heap-allocating lowercased `String`s for every locale field during search filter evaluation.
     pub fn search_locales(&self, query: &str) -> Vec<&LocaleInfo> {
-        let query_lower = query.to_lowercase();
+        if query.is_empty() {
+            return self.locales.iter().collect();
+        }
+
         self.locales
             .iter()
             .filter(|l| {
-                l.language.to_lowercase().contains(&query_lower)
-                    || l.territory.to_lowercase().contains(&query_lower)
-                    || l.code.to_lowercase().contains(&query_lower)
+                contains_ignore_case(&l.language, query)
+                    || contains_ignore_case(&l.territory, query)
+                    || contains_ignore_case(&l.code, query)
             })
             .collect()
     }

@@ -1,5 +1,5 @@
-use std::path::{Path, PathBuf};
 use std::collections::HashMap;
+use std::path::{Path, PathBuf};
 
 #[derive(Debug, Clone)]
 pub struct FileManagerAction {
@@ -85,11 +85,15 @@ impl BulkRenamer {
     }
 
     pub fn rename_sequential(files: &[PathBuf], prefix: &str) -> Vec<PathBuf> {
-        files.iter().enumerate().map(|(i, p)| {
-            let parent = p.parent().unwrap_or(Path::new(""));
-            let ext = p.extension().and_then(|e| e.to_str()).unwrap_or("");
-            parent.join(format!("{}{}.{}", prefix, i+1, ext))
-        }).collect()
+        files
+            .iter()
+            .enumerate()
+            .map(|(i, p)| {
+                let parent = p.parent().unwrap_or(Path::new(""));
+                let ext = p.extension().and_then(|e| e.to_str()).unwrap_or("");
+                parent.join(format!("{}{}.{}", prefix, i + 1, ext))
+            })
+            .collect()
     }
 }
 
@@ -112,17 +116,23 @@ impl ImageConverter {
 
 pub struct PDFTools;
 impl PDFTools {
-    pub fn merge(_pdfs: &[&Path], _out: &Path) -> Result<(), String> { Ok(()) }
+    pub fn merge(_pdfs: &[&Path], _out: &Path) -> Result<(), String> {
+        Ok(())
+    }
 }
 
 pub struct HashVerifier;
 impl HashVerifier {
-    pub fn verify(_file: &Path, _hash: &str) -> Result<bool, String> { Ok(true) }
+    pub fn verify(_file: &Path, _hash: &str) -> Result<bool, String> {
+        Ok(true)
+    }
 }
 
 pub struct FileSharing;
 impl FileSharing {
-    pub fn discover_shares() -> Vec<String> { vec!["smb://local/share".to_string()] }
+    pub fn discover_shares() -> Vec<String> {
+        vec!["smb://local/share".to_string()]
+    }
 }
 
 #[cfg(test)]
@@ -161,8 +171,12 @@ mod tests {
             name: "Empty Document".to_string(),
             content: "".to_string(),
         });
-        assert!(fme.create_from_template("Empty Document", Path::new("new.txt")).is_ok());
-        assert!(fme.create_from_template("Unknown", Path::new("new.txt")).is_err());
+        assert!(fme
+            .create_from_template("Empty Document", Path::new("new.txt"))
+            .is_ok());
+        assert!(fme
+            .create_from_template("Unknown", Path::new("new.txt"))
+            .is_err());
     }
 
     #[test]
@@ -186,14 +200,18 @@ mod tests {
 
     #[test]
     fn test_archive_manager() {
-        assert!(ArchiveManager::create_archive(&[Path::new("a.txt")], Path::new("out.zip")).is_ok());
+        assert!(
+            ArchiveManager::create_archive(&[Path::new("a.txt")], Path::new("out.zip")).is_ok()
+        );
         assert!(ArchiveManager::extract_archive(Path::new("out.zip"), Path::new(".")).is_ok());
     }
 
     #[test]
     fn test_run_script() {
         let fme = FileManagerExtensions::new();
-        assert!(fme.run_nemo_script("compress.sh", &[Path::new("a.txt")]).is_ok());
+        assert!(fme
+            .run_nemo_script("compress.sh", &[Path::new("a.txt")])
+            .is_ok());
         assert!(fme.run_nemo_script("", &[Path::new("a.txt")]).is_err());
     }
 }

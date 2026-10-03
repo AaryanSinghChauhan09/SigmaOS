@@ -114,7 +114,9 @@ impl ZorinGridDesktopManager {
         match snap {
             ZorinSnapPosition::LeftHalf => (0, 0, screen_width / 2, screen_height),
             ZorinSnapPosition::RightHalf => (screen_width / 2, 0, screen_width / 2, screen_height),
-            ZorinSnapPosition::TopLeft | ZorinSnapPosition::TopLeftQuarter => (0, 0, screen_width / 2, screen_height / 2),
+            ZorinSnapPosition::TopLeft | ZorinSnapPosition::TopLeftQuarter => {
+                (0, 0, screen_width / 2, screen_height / 2)
+            }
             ZorinSnapPosition::TopRight | ZorinSnapPosition::TopRightQuarter => {
                 (screen_width / 2, 0, screen_width / 2, screen_height / 2)
             }
@@ -127,7 +129,9 @@ impl ZorinGridDesktopManager {
                 screen_width / 2,
                 screen_height / 2,
             ),
-            ZorinSnapPosition::Maximize | ZorinSnapPosition::Maximized => (0, 0, screen_width, screen_height),
+            ZorinSnapPosition::Maximize | ZorinSnapPosition::Maximized => {
+                (0, 0, screen_width, screen_height)
+            }
         }
     }
 }
@@ -869,7 +873,12 @@ mod zorin_feature_tests {
         let mut sound = ZorinSoundThemeManager::new();
         sound.enable_amplification_boost(true);
         sound.set_volume(120);
-        assert_eq!(sound.master_volume_percent.load(core::sync::atomic::Ordering::SeqCst), 120);
+        assert_eq!(
+            sound
+                .master_volume_percent
+                .load(core::sync::atomic::Ordering::SeqCst),
+            120
+        );
 
         let mut bar = ZorinIntellihideTaskbar::new();
         bar.update_window_overlap(true);

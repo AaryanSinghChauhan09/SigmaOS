@@ -102,3 +102,54 @@ cargo fmt
 ---
 
 *Generated for SigmaOS kernel component*
+
+---
+
+## BSD-Inspired Kernel Techniques
+
+### OpenBSD
+- **W^X** (implemented: `src/kernel/wx_pte_hardening.rs`): Every page is writable OR executable, never both. Enforced via PTE flags.
+- **pledge(2)** (implemented: `src/security/pledge_unveil.rs`): Restrict process to declared syscall promises.
+- **unveil(2)** (implemented: `src/security/pledge_unveil.rs`): Restrict filesystem visibility per path.
+- **KARL**: Kernel Address Layout Randomization — relink kernel on each boot.
+- **retguard**: Return address protection on every function call.
+
+### FreeBSD
+- **Capsicum** (implemented: `src/security/capsicum.rs`): Capability-based security, least-privilege sandboxing.
+- **VIMAGE** (implemented: `src/networking/sovereign_net.rs`): Virtualized network stack per jail/container.
+- **Netmap** (implemented: `src/net/zero_copy.rs`): Zero-copy packet I/O via memory-mapped rings.
+- **bhyve** (implemented: `src/virtualization/`): Type-2 hypervisor for running VMs.
+- **UTS Namespaces** (implemented: `src/syscall/uts_syscalls.rs`): Per-process hostname/domainname.
+
+### NetBSD
+- **pkgsrc** (implemented: `src/package/`): Cross-platform source package build system.
+- **rump kernels**: Userspace kernel driver testing framework.
+- **npf**: NetBSD Packet Filter, nftables-compatible ruleset.
+
+### Linux
+- **EEVDF Scheduler** (implemented: `src/kernel/scheduler.rs`): Earliest Eligible Virtual Deadline First.
+- **CFI** (implemented: `src/kernel/cfi.rs`): Control Flow Integrity for forward/backward edges.
+- **kptr_restrict** (implemented: `src/kernel/kptr_restrict.rs`): Prevent kernel address leaks.
+- **cgroup v2** (implemented: `src/resource/cgroup_v2.rs`): Unified resource controller hierarchy.
+- **eBPF/XDP**: Zero-copy packet processing hook — partially implemented.
+
+## AI Agent Maintenance Instructions
+
+When modifying kernel code:
+1. Run `cargo check 2>&1 | grep '^error' | wc -l` — must be 0 before commit
+2. Add tests in `#[cfg(test)]` blocks for every new public function
+3. Document syscall numbers matching Linux ABI (`src/syscall/`)
+4. Ensure W^X invariants are maintained in any memory mapping code
+5. Reference: https://www.kernel.org/doc/html/latest/
+6. No `unsafe` blocks without `// SAFETY:` comment explaining the invariant
+
+---
+## BSD/Linux-Inspired Techniques (Oct 2026 additions)
+- **W^X** (OpenBSD): `src/kernel/wx_pte_hardening.rs` — PageFlags struct with WRITE/EXECUTE/ACCESSED/NO_EXECUTE constants
+- **EEVDF Scheduler** (Linux 6.6+): `src/kernel/scheduler.rs` — CfsScheduler + RtScheduler
+- **CFI** (Linux): `src/kernel/cfi.rs` — forward-edge control flow integrity
+- **UTS Namespaces** (Linux): `src/syscall/uts_syscalls.rs` — per-process hostname/domainname
+- **POSIX compat stubs**: `src/syscall/posix_compat.rs` — prctl, madvise, pread64, pwrite64, sigaction
+## AI Agent Maintenance
+Before any kernel commit: `cargo check 2>&1 | grep '^error' | wc -l` must be 0.
+Every unsafe block needs `// SAFETY:` comment. Syscall numbers match Linux x86_64 ABI.

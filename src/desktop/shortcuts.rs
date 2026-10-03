@@ -347,9 +347,6 @@ impl KeyboardShortcutsManager {
         let app_count = self
             .get_shortcuts_by_category(ShortcutCategory::Application)
             .len();
-        let global_count = self.get_shortcuts_by_category(ShortcutCategory::Global).len();
-        let window_count = self.get_shortcuts_by_category(ShortcutCategory::WindowManagement).len();
-        let app_count = self.get_shortcuts_by_category(ShortcutCategory::Application).len();
 
         stats.push_str(&format!("Global shortcuts: {}\n", global_count));
         stats.push_str(&format!("Window shortcuts: {}\n", window_count));

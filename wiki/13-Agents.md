@@ -1,6 +1,21 @@
-# AI Agent Guidelines
+# AI Agent Guidelines & Operating Rules
 
-SigmaOS provides comprehensive guidelines for AI agents working on various components to enable autonomous development and continuous improvement.
+SigmaOS provides comprehensive guidelines for AI agents working on various components to enable autonomous development, continuous improvement, and multi-distro parity.
+
+## Primary Task Guidelines & Rules
+
+1. **Universal Multi-Distro PR Package Management**:
+   - Every foreign package format (.deb, .pkg.tar.zst, .rpm, .apk, .ebuild, .xbps, .pkg, .nix, .flatpak, .snap, .appimage, etc.) MUST be transpiled and handled natively by `sigma-pkg` in Pull Request (PR) format.
+   - Foreign dependencies MUST be mapped to canonical `sovereign-*` system package names (e.g. `glibc`/`musl` -> `sovereign-libc`, `openssl-devel`/`libssl-dev` -> `sovereign-openssl`).
+   - Every PR package import MUST generate SLSA Provenance v1.0 attestations, CycloneDX/SPDX SBOM metadata, and unified diff manifest summaries.
+
+2. **Zero-Dependency Bare-Metal Architecture**:
+   - Kernel and system code MUST be written in `#![no_std]` safe Rust with zero external third-party crate dependencies.
+   - All data structures and system abstractions MUST rely on custom `klib` primitives or `alloc::` primitives.
+
+3. **Multi-Distro Subsystem Parity**:
+   - SigmaOS absorbs innovations from Linux (CFS/EEVDF scheduler, io_uring, eBPF, cgroups v2, OverlayFS, PipeFS, Landlock) and BSD (FreeBSD Capsicum, Jails, GEOM, RCTL, OpenBSD pledge, unveil, PF, CARP, NetBSD Rump).
+   - Component improvements MUST maintain 100% test passing status across all standalone unit tests (`./run_sigma_tests.sh`).
 
 ## Tri-Agent Framework
 
@@ -52,10 +67,3 @@ These agent guidelines enable SigmaOS to continuously improve by:
 - Ensuring security and performance excellence
 
 For detailed agent guidelines, see the component-specific files in the [Agents/](../Agents/) folder.
-
-## AI Agent Maintenance Instructions
-
-- **Bolt ⚡**: Ensure documentation of any new zero-allocation optimizations or performance improvements are added concisely without marketing fluff.
-- **Palette 🎨**: Maintain Arch Linux wiki style: clear, factual, one page per topic, using appropriate markdown formatting and tables where necessary.
-- **Sentinel 🛡️**: Verify that no hardcoded credentials or unvetted cryptographic algorithms are documented as production-ready. Ensure security limitations are accurately stated.
-- **General**: Keep pages up-to-date with current repository capabilities. Remove redundant files when consolidating information.

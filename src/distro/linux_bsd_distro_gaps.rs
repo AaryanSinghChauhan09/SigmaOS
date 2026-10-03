@@ -2,7 +2,6 @@
 // SigmaOS Distro Gap Resolution Subsystem (Bootloader, USB HID, Wireless/Bluetooth, TCP/UDP Stack, Init Manager & Job Scheduler)
 // Parity extensions address infrastructure gaps compared to established Linux and BSD distributions
 
-use std::string::ToString;
 use std::vec;
 use std::vec::Vec;
 
@@ -198,7 +197,6 @@ impl Default for UsbHidKeyboardDriver {
         Self::new()
     }
 }
-
 
 // ============================================================================
 // 3. Wireless (802.11ax / WPA3-SAE) & Bluetooth (BlueZ) Stack
@@ -509,7 +507,6 @@ impl Default for CronJobScheduler {
     }
 }
 
-
 // ============================================================================
 // 8. Dynamic devfs & Device Symlink Manager Engine (udev / FreeBSD devfs / devd)
 // ============================================================================
@@ -518,6 +515,10 @@ impl Default for CronJobScheduler {
 pub enum DeviceNodeType {
     Block,
     Character,
+    CharacterDevice,
+    BlockDevice,
+    Fifo,
+    Socket,
 }
 
 #[derive(Debug, Clone)]
@@ -537,25 +538,25 @@ pub type DynamicDeviceNode = DeviceNodeEntry;
 #[derive(Debug)]
 pub struct SovereignDynamicDevfsEngine {
     pub nodes: Vec<DeviceNodeEntry>,
-    pub devices: Vec<DeviceNodeEntry>,
 }
 
 impl SovereignDynamicDevfsEngine {
     pub fn new() -> Self {
-        let mut devfs = Self {
-            nodes: Vec::new(),
-            devices: Vec::new(),
-        };
-
-        devfs.create_node("null", DeviceNodeType::Character, 1, 3, 0, 0, 0o666);
-        devfs.create_node("zero", DeviceNodeType::Character, 1, 5, 0, 0, 0o666);
-        devfs.create_node("sda", DeviceNodeType::Block, 8, 0, 0, 6, 0o660);
-
+        let mut devfs = Self { nodes: Vec::new() };
+        devfs.register_device_node("null", DeviceNodeType::Character, 1, 3);
+        devfs.register_device_node("zero", DeviceNodeType::Character, 1, 5);
+        devfs.register_device_node("sda", DeviceNodeType::Block, 8, 0);
         devfs
     }
 
-    pub fn register_device_node(&mut self, name: &str, node_type: DeviceNodeType, major: u32, minor: u32) {
-        let entry = DeviceNodeEntry {
+    pub fn register_device_node(
+        &mut self,
+        name: &str,
+        node_type: DeviceNodeType,
+        major: u32,
+        minor: u32,
+    ) {
+        self.nodes.push(DeviceNodeEntry {
             name: name.to_string(),
             node_type,
             major,
@@ -564,53 +565,22 @@ impl SovereignDynamicDevfsEngine {
             group_gid: 0,
             mode_octal: 0o660,
             symlink_paths: Vec::new(),
-        };
-        self.nodes.push(entry.clone());
-        self.devices.push(entry);
+        });
     }
 
-    pub fn create_node(
-        &mut self,
-        name: &str,
-        node_type: DeviceNodeType,
-        major: u32,
-        minor: u32,
-        owner_uid: u32,
-        group_gid: u32,
-        mode_octal: u16,
-    ) {
-        let entry = DeviceNodeEntry {
-            name: name.to_string(),
-            node_type,
-            major,
-            minor,
-            owner_uid,
-            group_gid,
-            mode_octal,
-            symlink_paths: Vec::new(),
-        };
-        self.nodes.push(entry.clone());
-        self.devices.push(entry);
-    }
-
-    pub fn add_uuid_symlink(&mut self, dev_name: &str, symlink: &str) -> bool {
-        let mut found = false;
-        if let Some(dev) = self.nodes.iter_mut().find(|d| d.name == dev_name) {
-            dev.symlink_paths.push(symlink.to_string());
-            found = true;
+    pub fn add_uuid_symlink(&mut self, target_node: &str, symlink_path: &str) -> bool {
+        if let Some(node) = self.nodes.iter_mut().find(|n| n.name == target_node) {
+            node.symlink_paths.push(symlink_path.to_string());
+            true
+        } else {
+            false
         }
-        if let Some(dev) = self.devices.iter_mut().find(|d| d.name == dev_name) {
-            dev.symlink_paths.push(symlink.to_string());
-            found = true;
-        }
-        found
     }
 
-    pub fn lookup_node(&self, name: &str) -> Option<&DeviceNodeEntry> {
-        self.devices
+    pub fn lookup_node(&self, path: &str) -> Option<&DeviceNodeEntry> {
+        self.nodes
             .iter()
-            .chain(self.nodes.iter())
-            .find(|d| d.name == name || d.symlink_paths.iter().any(|s| s == name))
+            .find(|n| n.name == path || n.symlink_paths.iter().any(|s| *s == path))
     }
 }
 
@@ -619,10 +589,6 @@ impl Default for SovereignDynamicDevfsEngine {
         Self::new()
     }
 }
-
-// ============================================================================
-// 9. Stateful NAT & Connection Tracking Engine (OpenBSD PF / Linux conntrack)
-// ============================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum NatType {
@@ -639,21 +605,20 @@ pub struct ConntrackTableEntry {
     pub dst_port: u16,
     pub translated_ip: [u8; 4],
     pub translated_port: u16,
-    pub nat_type: &'static str,
+    pub nat_type: NatType,
     pub packets_counter: u64,
 }
 
-#[derive(Debug)]
 pub struct SovereignStatefulNatEngine {
-    pub conntrack_table: Vec<ConntrackTableEntry>,
     pub public_ip: [u8; 4],
+    pub conntrack_table: Vec<ConntrackTableEntry>,
 }
 
 impl SovereignStatefulNatEngine {
     pub fn new(public_ip: [u8; 4]) -> Self {
         Self {
-            conntrack_table: Vec::new(),
             public_ip,
+            conntrack_table: Vec::new(),
         }
     }
 
@@ -663,8 +628,9 @@ impl SovereignStatefulNatEngine {
         dst_ip: [u8; 4],
         src_port: u16,
         dst_port: u16,
-        _protocol: u8,
+        protocol: u8,
     ) -> ([u8; 4], u16) {
+        let _ = protocol;
         if let Some(conn) = self.conntrack_table.iter_mut().find(|c| {
             c.original_src == internal_src
                 && c.src_port == src_port
@@ -680,52 +646,35 @@ impl SovereignStatefulNatEngine {
                 dst_port,
                 translated_ip: self.public_ip,
                 translated_port: src_port,
-                nat_type: "SNAT",
+                nat_type: NatType::Snat,
                 packets_counter: 1,
             });
         }
         (self.public_ip, src_port)
     }
-
-    pub fn lookup_conntrack(
-        &mut self,
-        translated_dst_ip: [u8; 4],
-        translated_dst_port: u16,
-    ) -> Option<([u8; 4], u16)> {
-        for entry in &mut self.conntrack_table {
-            if entry.translated_ip == translated_dst_ip
-                && entry.translated_port == translated_dst_port
-            {
-                entry.packets_counter += 1;
-                return Some((entry.original_src, entry.src_port));
-            }
-        }
-        None
-    }
 }
-
-// ============================================================================
-// 10. Structured Binary Journal Storage Engine (systemd-journald / syslogd)
-// ============================================================================
 
 #[derive(Debug, Clone)]
 pub struct JournaldLogRecord {
     pub timestamp_unix_epoch: u64,
     pub timestamp_epoch_ms: u64,
-    pub priority: u8, // 0=Emergency, 3=Error, 6=Info
+    pub priority: u8,
     pub unit_name: String,
     pub identifier: String,
     pub message: String,
 }
 
-#[derive(Debug)]
 pub struct SovereignJournaldBinaryStorageEngine {
     pub log_records: Vec<JournaldLogRecord>,
     pub max_logs_capacity: usize,
 }
 
 impl SovereignJournaldBinaryStorageEngine {
-    pub fn new(capacity: usize) -> Self {
+    pub fn new() -> Self {
+        Self::with_capacity(1000)
+    }
+
+    pub fn with_capacity(capacity: usize) -> Self {
         Self {
             log_records: Vec::new(),
             max_logs_capacity: capacity,
@@ -734,7 +683,7 @@ impl SovereignJournaldBinaryStorageEngine {
 
     pub fn log(&mut self, timestamp: u64, priority: u8, unit: &str, msg: &str) {
         if self.log_records.len() >= self.max_logs_capacity {
-            self.log_records.remove(0); // Journal rotation
+            self.log_records.remove(0);
         }
         self.log_records.push(JournaldLogRecord {
             timestamp_unix_epoch: timestamp,
@@ -751,17 +700,109 @@ impl SovereignJournaldBinaryStorageEngine {
     }
 
     pub fn query_unit(&self, unit: &str) -> Vec<&JournaldLogRecord> {
-        self.log_records.iter().filter(|l| l.unit_name == unit).collect()
+        self.log_records
+            .iter()
+            .filter(|l| l.unit_name == unit)
+            .collect()
     }
 
     pub fn query_priority(&self, min_priority: u8) -> Vec<&JournaldLogRecord> {
-        self.log_records.iter().filter(|l| l.priority <= min_priority).collect()
+        self.log_records
+            .iter()
+            .filter(|l| l.priority <= min_priority)
+            .collect()
     }
 }
 
 impl Default for SovereignJournaldBinaryStorageEngine {
     fn default() -> Self {
-        Self::new(1000)
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct DnsRecordEntry {
+    pub domain: String,
+    pub ip_address: [u8; 4],
+}
+
+pub struct SovereignDnsTlsResolverEngine {
+    pub primary_dns_ip: [u8; 4],
+    pub records: Vec<DnsRecordEntry>,
+}
+
+impl SovereignDnsTlsResolverEngine {
+    pub fn new(primary_dns_ip: [u8; 4]) -> Self {
+        let mut records = Vec::new();
+        records.push(DnsRecordEntry {
+            domain: "localhost".to_string(),
+            ip_address: [127, 0, 0, 1],
+        });
+        Self {
+            primary_dns_ip,
+            records,
+        }
+    }
+
+    pub fn resolve_domain(&self, domain: &str) -> Option<[u8; 4]> {
+        self.records
+            .iter()
+            .find(|r| r.domain == domain)
+            .map(|r| r.ip_address)
+    }
+}
+
+// ============================================================================
+// 8. Dynamic Device Hotplugging Engine (Linux udev / BSD devd Parity)
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DeviceEventAction {
+    Add,
+    Remove,
+    Change,
+}
+
+#[derive(Debug, Clone)]
+pub struct UeventDeviceNode {
+    pub subsystem: &'static str,
+    pub devname: &'static str,
+    pub sysfs_path: &'static str,
+    pub action: DeviceEventAction,
+    pub vendor_id: u16,
+    pub device_id: u16,
+}
+
+pub struct UdevDevdHotplugEngine {
+    pub active_devices: Vec<UeventDeviceNode>,
+    pub loaded_rules: Vec<&'static str>,
+    pub nodes: Vec<String>,
+    pub event_queue: Vec<String>,
+}
+
+impl UdevDevdHotplugEngine {
+    pub fn new() -> Self {
+        Self {
+            active_devices: Vec::new(),
+            loaded_rules: Vec::new(),
+            nodes: Vec::new(),
+            event_queue: Vec::new(),
+        }
+    }
+
+    pub fn handle_uevent(&mut self, event: UeventDeviceNode) -> bool {
+        let name = event.devname.to_string();
+        if !self.nodes.contains(&name) {
+            self.nodes.push(name);
+        }
+        self.active_devices.push(event);
+        true
+    }
+}
+
+impl Default for UdevDevdHotplugEngine {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -841,7 +882,8 @@ impl SovereignMasterDistroEcosystemEngine {
             DistroComponentSnapshot {
                 component: "Networking",
                 linux_bsd_status: "Full TCP/IP, firewall (iptables/pf)",
-                sigma_os_current_status: "NetworkTcpUdpStack, OpenBsdPfFirewallEngine, DoT, Stateful NAT",
+                sigma_os_current_status:
+                    "NetworkTcpUdpStack, OpenBsdPfFirewallEngine, DoT, Stateful NAT",
                 gap_closure_needed: "Expand routing & PQC WireGuard VPN stack",
                 readiness_score_percent: 100,
             },
@@ -869,14 +911,16 @@ impl SovereignMasterDistroEcosystemEngine {
             DistroComponentSnapshot {
                 component: "Security",
                 linux_bsd_status: "SELinux, AppArmor, Capsicum",
-                sigma_os_current_status: "Landlock v5, FreeBSD Capsicum, OpenBSD Pledge/Unveil, SELinux MLS/MCS",
+                sigma_os_current_status:
+                    "Landlock v5, FreeBSD Capsicum, OpenBSD Pledge/Unveil, SELinux MLS/MCS",
                 gap_closure_needed: "Add MAC + sandboxing",
                 readiness_score_percent: 100,
             },
             DistroComponentSnapshot {
                 component: "Virtualization",
                 linux_bsd_status: "KVM, bhyve",
-                sigma_os_current_status: "SovereignMicrovmHypervisorGateway & OpenBsdVmmBhyveBridge",
+                sigma_os_current_status:
+                    "SovereignMicrovmHypervisorGateway & OpenBsdVmmBhyveBridge",
                 gap_closure_needed: "Add microVM hypervisor integration",
                 readiness_score_percent: 100,
             },
@@ -1044,38 +1088,6 @@ impl Default for SovereignUniversalDistroGapResolver {
         Self::new()
     }
 }
-#[derive(Debug, Clone)]
-pub struct DnsRecordEntry {
-    pub domain: String,
-    pub ip: [u8; 4],
-    pub ttl: u32,
-}
-
-pub struct SovereignDnsTlsResolverEngine {
-    pub upstream_dns: [u8; 4],
-    pub records: Vec<DnsRecordEntry>,
-}
-
-impl SovereignDnsTlsResolverEngine {
-    pub fn new(upstream_dns: [u8; 4]) -> Self {
-        let mut records = Vec::new();
-        records.push(DnsRecordEntry {
-            domain: "localhost".to_string(),
-            ip: [127, 0, 0, 1],
-            ttl: 3600,
-        });
-        Self { upstream_dns, records }
-    }
-
-    pub fn resolve_domain(&mut self, domain: &str) -> Result<[u8; 4], &'static str> {
-        if let Some(r) = self.records.iter().find(|r| r.domain == domain) {
-            Ok(r.ip)
-        } else {
-            Ok([192, 168, 1, 1])
-        }
-    }
-}
-
 
 pub type DnsRecord = DnsRecordEntry;
 pub type JournalBinaryRecord = JournaldLogRecord;
@@ -1115,7 +1127,13 @@ impl BsdGeomTopologyController {
         }
     }
 
-    pub fn register_provider(&mut self, name: &str, class_kind: GeomClassKind, size_bytes: u64, sector_size: u32) {
+    pub fn register_provider(
+        &mut self,
+        name: &str,
+        class_kind: GeomClassKind,
+        size_bytes: u64,
+        sector_size: u32,
+    ) {
         self.providers.push(GeomProvider {
             name: String::from(name),
             class_kind,
@@ -1126,7 +1144,11 @@ impl BsdGeomTopologyController {
     }
 
     pub fn attach_consumer(&mut self, provider_name: &str) -> Result<(), &'static str> {
-        let provider = self.providers.iter_mut().find(|p| p.name == provider_name).ok_or("GEOM provider not found")?;
+        let provider = self
+            .providers
+            .iter_mut()
+            .find(|p| p.name == provider_name)
+            .ok_or("GEOM provider not found")?;
         provider.consumers_count += 1;
         Ok(())
     }
@@ -1167,7 +1189,12 @@ impl TunTapInterfaceEngine {
         }
     }
 
-    pub fn create_interface(&mut self, ifname: &str, mode: TunTapMode, owner_uid: u32) -> Result<String, &'static str> {
+    pub fn create_interface(
+        &mut self,
+        ifname: &str,
+        mode: TunTapMode,
+        owner_uid: u32,
+    ) -> Result<String, &'static str> {
         if self.interfaces.iter().any(|i| i.ifname == ifname) {
             return Err("Interface name already exists");
         }
@@ -1220,7 +1247,13 @@ impl CgroupsV2ControllerEngine {
         engine
     }
 
-    pub fn create_cgroup(&mut self, path: &str, memory_max_bytes: u64, cpu_weight: u32, pids_max: u32) -> Result<(), &'static str> {
+    pub fn create_cgroup(
+        &mut self,
+        path: &str,
+        memory_max_bytes: u64,
+        cpu_weight: u32,
+        pids_max: u32,
+    ) -> Result<(), &'static str> {
         if self.cgroups.iter().any(|c| c.path == path) {
             return Err("Cgroup path already exists");
         }
@@ -1235,7 +1268,11 @@ impl CgroupsV2ControllerEngine {
     }
 
     pub fn attach_pid(&mut self, path: &str, pid: u32) -> Result<(), &'static str> {
-        let cgroup = self.cgroups.iter_mut().find(|c| c.path == path).ok_or("Cgroup path not found")?;
+        let cgroup = self
+            .cgroups
+            .iter_mut()
+            .find(|c| c.path == path)
+            .ok_or("Cgroup path not found")?;
         if !cgroup.member_pids.contains(&pid) {
             cgroup.member_pids.push(pid);
         }
@@ -1385,10 +1422,8 @@ impl CapsicumRightsDelegationManager {
         if let Some(desc) = self.descriptors.iter_mut().find(|d| d.fd == fd) {
             desc.rights_mask &= rights_mask;
         } else {
-            self.descriptors.push(CapsicumDescriptorRights {
-                fd,
-                rights_mask,
-            });
+            self.descriptors
+                .push(CapsicumDescriptorRights { fd, rights_mask });
         }
     }
 
@@ -1625,7 +1660,11 @@ impl MulticoreSmpInterruptEngine {
             cores.push(SmpCpuCoreState {
                 core_id: id,
                 apic_id: id as u32,
-                state: if id == 0 { SmpCpuCoreStateKind::Active } else { SmpCpuCoreStateKind::Offline },
+                state: if id == 0 {
+                    SmpCpuCoreStateKind::Active
+                } else {
+                    SmpCpuCoreStateKind::Offline
+                },
                 affinity_mask: 1u64 << id,
                 irq_count: 0,
                 load_percentage: 0,
@@ -1650,12 +1689,17 @@ impl MulticoreSmpInterruptEngine {
     }
 
     /// Dispatches an Inter-Processor Interrupt (IPI) to target CPU core
-    pub fn dispatch_ipi(&mut self, target_core_id: usize, ipi_vector: u8) -> Result<(), &'static str> {
+    pub fn dispatch_ipi(
+        &mut self,
+        target_core_id: usize,
+        ipi_vector: u8,
+    ) -> Result<(), &'static str> {
         if target_core_id >= self.cores.len() {
             return Err("Invalid target core ID for IPI dispatch");
         }
         let target = &mut self.cores[target_core_id];
-        if target.state != SmpCpuCoreStateKind::Active && target.state != SmpCpuCoreStateKind::Idle {
+        if target.state != SmpCpuCoreStateKind::Active && target.state != SmpCpuCoreStateKind::Idle
+        {
             return Err("Target core is offline; cannot receive IPI");
         }
         target.irq_count += 1;
@@ -1666,8 +1710,12 @@ impl MulticoreSmpInterruptEngine {
     /// Balances IRQ load across active SMP cores
     pub fn balance_irq_load(&mut self, irq_id: u32) -> Option<usize> {
         let _ = irq_id;
-        let min_core = self.cores.iter_mut()
-            .filter(|c| c.state == SmpCpuCoreStateKind::Active || c.state == SmpCpuCoreStateKind::Idle)
+        let min_core = self
+            .cores
+            .iter_mut()
+            .filter(|c| {
+                c.state == SmpCpuCoreStateKind::Active || c.state == SmpCpuCoreStateKind::Idle
+            })
             .min_by_key(|c| c.irq_count);
 
         if let Some(core) = min_core {
@@ -1683,7 +1731,10 @@ impl MulticoreSmpInterruptEngine {
         let _ = virtual_address;
         let mut shot_down = 0;
         for core in self.cores.iter_mut() {
-            if core.core_id != sender_core_id && (core.state == SmpCpuCoreStateKind::Active || core.state == SmpCpuCoreStateKind::Idle) {
+            if core.core_id != sender_core_id
+                && (core.state == SmpCpuCoreStateKind::Active
+                    || core.state == SmpCpuCoreStateKind::Idle)
+            {
                 core.irq_count += 1; // IPI TLB shootdown interrupt
                 shot_down += 1;
             }
@@ -1859,17 +1910,23 @@ mod tests_gaps {
     #[test]
     fn test_tuntap_interface_engine() {
         let mut tuntap = TunTapInterfaceEngine::new();
-        let name = tuntap.create_interface("tap0", TunTapMode::Tap, 1000).unwrap();
+        let name = tuntap
+            .create_interface("tap0", TunTapMode::Tap, 1000)
+            .unwrap();
         assert_eq!(name, "tap0");
         assert_eq!(tuntap.interfaces.len(), 1);
-        assert!(tuntap.create_interface("tap0", TunTapMode::Tap, 1000).is_err());
+        assert!(tuntap
+            .create_interface("tap0", TunTapMode::Tap, 1000)
+            .is_err());
     }
 
     #[test]
     fn test_cgroups_v2_controller_engine() {
         let mut cgroups = CgroupsV2ControllerEngine::new();
         assert_eq!(cgroups.cgroups.len(), 1); // root cgroup
-        assert!(cgroups.create_cgroup("/system.slice", 1024 * 1024 * 512, 100, 1000).is_ok());
+        assert!(cgroups
+            .create_cgroup("/system.slice", 1024 * 1024 * 512, 100, 1000)
+            .is_ok());
         assert!(cgroups.attach_pid("/system.slice", 1234).is_ok());
         assert_eq!(cgroups.cgroups[1].member_pids, vec![1234]);
         assert!(cgroups.create_cgroup("/system.slice", 0, 0, 0).is_err());

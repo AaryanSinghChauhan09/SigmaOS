@@ -5,7 +5,6 @@ use std::vec;
 // Fedora Silverblue OSTree, Illumos/Solaris Crossbow & NetBSD RUMP, Netplan & Cloud-Init, and openSUSE YaST2 & Snapper.
 
 use std::format;
-use std::string::String;
 use std::vec::Vec;
 
 // ============================================================================
@@ -222,7 +221,11 @@ impl AlpineApkVolatileOverlayEngine {
         } else {
             self.lbu_commit()
         };
-        (hash, self.staged_packages.clone(), self.volatile_tmpfs_bytes)
+        (
+            hash,
+            self.staged_packages.clone(),
+            self.volatile_tmpfs_bytes,
+        )
     }
 
     pub fn rollback_tmpfs_snapshot(&mut self, snapshot: &(u64, Vec<String>, usize)) -> bool {

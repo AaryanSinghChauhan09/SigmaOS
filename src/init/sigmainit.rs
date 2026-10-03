@@ -1,12 +1,11 @@
 // SigmaInit - Modern Init System
 // Inspired by OpenRC, runit, s6 (systemd alternatives)
 
-
+use core::sync::atomic::{AtomicBool, AtomicU32, Ordering};
+use std::boxed::Box;
+use std::collections::BTreeMap;
 use std::string::String;
 use std::vec::Vec;
-use std::collections::BTreeMap;
-use std::boxed::Box;
-use core::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 
 /// Service restart policy
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -143,7 +142,6 @@ impl DependencyGraph {
     pub fn add_service(&mut self, name: &str, dependencies: Vec<String>) {
         self.services
             .insert(String::from(name), dependencies.clone());
-        self.services.insert(String::from(name), dependencies.clone());
 
         for dep in &dependencies {
             self.reverse_deps
@@ -392,7 +390,10 @@ impl SigmaInit {
         self.current_target = target;
 
         // Perform topological sort and start services in order
-        let order = self.supervisor.dependency_graph.topological_sort()
+        let order = self
+            .supervisor
+            .dependency_graph
+            .topological_sort()
             .map_err(|_| ServiceError::DependencyFailed)?;
 
         for service_name in order {
@@ -407,7 +408,10 @@ impl SigmaInit {
 
     pub fn shutdown(&mut self) -> Result<(), ServiceError> {
         // Stop services in reverse dependency order
-        let order = self.supervisor.dependency_graph.topological_sort()
+        let order = self
+            .supervisor
+            .dependency_graph
+            .topological_sort()
             .map_err(|_| ServiceError::DependencyFailed)?;
 
         for service_name in order.into_iter().rev() {
@@ -496,7 +500,6 @@ mod tests {
             "sshd",
             vec![String::from("network"), String::from("syslog")],
         );
-        graph.add_service("sshd", vec![String::from("network"), String::from("syslog")]);
 
         let order = graph.topological_sort().unwrap();
         assert!(order.len() == 3);
@@ -513,8 +516,6 @@ mod tests {
         let mut supervisor = Supervisor::new();
 
         let network = Service::new("network").with_command(vec![String::from("/bin/network")]);
-        let network = Service::new("network")
-            .with_command(vec![String::from("/bin/network")]);
 
         let sshd = Service::new("sshd")
             .with_command(vec![String::from("/bin/sshd")])
@@ -524,8 +525,14 @@ mod tests {
         supervisor.add_service(sshd);
 
         assert!(supervisor.start_service("sshd").is_ok());
-        assert_eq!(supervisor.get_service_state("network"), Some(ServiceState::Running));
-        assert_eq!(supervisor.get_service_state("sshd"), Some(ServiceState::Running));
+        assert_eq!(
+            supervisor.get_service_state("network"),
+            Some(ServiceState::Running)
+        );
+        assert_eq!(
+            supervisor.get_service_state("sshd"),
+            Some(ServiceState::Running)
+        );
     }
 
     #[test]
@@ -533,8 +540,6 @@ mod tests {
         let mut init = SigmaInit::new();
 
         let syslog = Service::new("syslog").with_command(vec![String::from("/bin/syslog")]);
-        let syslog = Service::new("syslog")
-            .with_command(vec![String::from("/bin/syslog")]);
 
         let network = Service::new("network")
             .with_command(vec![String::from("/bin/network")])
@@ -562,7 +567,10 @@ mod tests {
     #[test]
     fn test_rescue_mode_authentication_gate() {
         let mut init = SigmaInit::new();
-        assert_eq!(init.switch_target(SystemTarget::Rescue), Err(ServiceError::AuthenticationRequired));
+        assert_eq!(
+            init.switch_target(SystemTarget::Rescue),
+            Err(ServiceError::AuthenticationRequired)
+        );
 
         assert!(init.authenticate_rescue("secret_pass", "secret_pass"));
         assert!(init.switch_target(SystemTarget::Rescue).is_ok());
@@ -581,11 +589,17 @@ mod tests {
 
         // Boot into MultiUser
         assert!(init.switch_target(SystemTarget::MultiUser).is_ok());
-        assert_eq!(init.supervisor.get_service_state("syslog"), Some(ServiceState::Running));
+        assert_eq!(
+            init.supervisor.get_service_state("syslog"),
+            Some(ServiceState::Running)
+        );
 
         // Isolate Graphical target
         assert!(init.isolate_target(SystemTarget::Graphical).is_ok());
         assert_eq!(init.current_target, SystemTarget::Graphical);
-        assert_eq!(init.supervisor.get_service_state("display-manager"), Some(ServiceState::Running));
+        assert_eq!(
+            init.supervisor.get_service_state("display-manager"),
+            Some(ServiceState::Running)
+        );
     }
 }

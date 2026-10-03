@@ -102,3 +102,21 @@ cargo fmt
 ---
 
 *Generated for SigmaOS security component*
+
+---
+## Security Hardening Applied (Oct 2026)
+- Replaced all hardcoded crypto seeds/nonces with entropy-based values (`src/crypto/entropy.rs`)
+- Added XorShift64 PRNG fallback in `src/crypto/primitives.rs::random_bytes()`
+- Added `PrimitiveError` enum for proper crypto error propagation
+- Added bounds checks to all unsafe ptr::write paths in diagnostics/crash.rs
+- W^X PageFlags constants: WRITE, ACCESSED, NO_EXECUTE added to `src/kernel/wx_pte_hardening.rs`
+- Fixed OpenBsdPledge variant missing from DistroGuidelineStandard enum
+
+## Security Checklist for AI Agents
+Before committing any security code:
+- [ ] No hardcoded keys, nonces, IVs, or seeds — use `src/crypto/entropy.rs`
+- [ ] All `unsafe` blocks have `// SAFETY:` comments
+- [ ] Pointer operations have null/bounds checks
+- [ ] Errors propagated, not silenced with `let _ = ...`
+- [ ] No `unwrap()` in non-test code paths
+- [ ] Memory zeroed after use for sensitive data (keys, passwords)

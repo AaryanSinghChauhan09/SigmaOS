@@ -1,180 +1,308 @@
-// SPDX-License-Identifier: MIT
-// SigmaOS RCU (Read-Copy-Update) Synchronization
-// Scalable read-mostly data structure synchronization inspired by Linux RCU
+//! # RCU (Read-Copy-Update) Synchronization
+//!
+//! Linux-inspired RCU implementation for wait-free reads.
+//! Provides efficient read-side critical sections with deferred reclamation.
 
-#![allow(dead_code)]
+#![no_std]
 
-use std::collections::VecDeque;
-use std::sync::atomic::{AtomicU32, AtomicU64, Ordering};
+extern crate alloc;
+use alloc::boxed::Box;
+use alloc::collections::VecDeque;
+use alloc::vec::Vec;
+use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
 
-/// RCU epoch type
-pub type RcuEpoch = u64;
+/// RCU grace period number
+pub type GracePeriod = u64;
 
-/// RCU grace period ID
-pub type GracePeriodId = u64;
+/// RCU callback type
+pub type RcuCallback = Box<dyn FnOnce() + Send>;
 
-/// RCU callback function type
-pub type RcuCallback = fn(u64) -> Result<(), &'static str>;
-
-/// RCU callback descriptor
-#[derive(Debug)]
-pub struct RcuCallbackDescriptor {
-    pub id: u64,
-    pub callback: RcuCallback,
-    pub user_data: u64,
-    pub registered_at: RcuEpoch,
+/// RCU state for each CPU
+pub struct RcuCpuState {
+    /// CPU ID
+    pub cpu: u32,
+    /// Current grace period this CPU is in
+    pub gp_current: AtomicU64,
+    /// Grace period this CPU has acknowledged
+    pub gp_acked: AtomicU64,
+    /// Number of readers in critical section
+    pub readers: AtomicUsize,
+    /// Is this CPU in quiescent state
+    pub quiescent: AtomicBool,
 }
 
-impl RcuCallbackDescriptor {
-    pub fn new(id: u64, callback: RcuCallback, user_data: u64, registered_at: RcuEpoch) -> Self {
-        RcuCallbackDescriptor {
-            id,
+impl RcuCpuState {
+    pub const fn new(cpu: u32) -> Self {
+        Self {
+            cpu,
+            gp_current: AtomicU64::new(0),
+            gp_acked: AtomicU64::new(0),
+            readers: AtomicUsize::new(0),
+            quiescent: AtomicBool::new(true),
+        }
+    }
+
+    /// Enter RCU read-side critical section
+    pub fn read_lock(&self) {
+        self.readers.fetch_add(1, Ordering::Acquire);
+        self.quiescent.store(false, Ordering::Release);
+    }
+
+    /// Exit RCU read-side critical section
+    pub fn read_unlock(&self) {
+        let prev = self.readers.fetch_sub(1, Ordering::Release);
+        if prev == 1 {
+            // Last reader, enter quiescent state
+            self.quiescent.store(true, Ordering::Release);
+        }
+    }
+
+    /// Check if CPU is in quiescent state
+    pub fn is_quiescent(&self) -> bool {
+        self.quiescent.load(Ordering::Acquire)
+    }
+
+    /// Acknowledge grace period
+    pub fn ack_grace_period(&self, gp: GracePeriod) {
+        self.gp_acked.store(gp, Ordering::Release);
+    }
+}
+
+/// RCU callback entry with grace period
+struct RcuCallbackEntry {
+    /// Callback function
+    callback: RcuCallback,
+    /// Grace period after which this can be invoked
+    grace_period: GracePeriod,
+}
+
+/// RCU state (inspired by Linux kernel RCU)
+pub struct RcuState {
+    /// Current grace period number
+    current_gp: AtomicU64,
+    /// Completed grace period number
+    completed_gp: AtomicU64,
+    /// Per-CPU state
+    cpu_states: Vec<RcuCpuState>,
+    /// Pending callbacks
+    callbacks: VecDeque<RcuCallbackEntry>,
+    /// Number of CPUs
+    num_cpus: u32,
+    /// Total callbacks invoked
+    total_callbacks: AtomicU64,
+    /// Total grace periods
+    total_gps: AtomicU64,
+}
+
+impl RcuState {
+    pub fn new(num_cpus: u32) -> Self {
+        let mut cpu_states = Vec::with_capacity(num_cpus as usize);
+        for cpu in 0..num_cpus {
+            cpu_states.push(RcuCpuState::new(cpu));
+        }
+
+        Self {
+            current_gp: AtomicU64::new(1),
+            completed_gp: AtomicU64::new(0),
+            cpu_states,
+            callbacks: VecDeque::new(),
+            num_cpus,
+            total_callbacks: AtomicU64::new(0),
+            total_gps: AtomicU64::new(0),
+        }
+    }
+
+    /// Get current grace period
+    pub fn current_grace_period(&self) -> GracePeriod {
+        self.current_gp.load(Ordering::Acquire)
+    }
+
+    /// Get completed grace period
+    pub fn completed_grace_period(&self) -> GracePeriod {
+        self.completed_gp.load(Ordering::Acquire)
+    }
+
+    /// Enter RCU read-side critical section on current CPU
+    pub fn read_lock(&self, cpu: u32) {
+        if let Some(state) = self.cpu_states.get(cpu as usize) {
+            state.read_lock();
+        }
+    }
+
+    /// Exit RCU read-side critical section on current CPU
+    pub fn read_unlock(&self, cpu: u32) {
+        if let Some(state) = self.cpu_states.get(cpu as usize) {
+            state.read_unlock();
+        }
+    }
+
+    /// Register callback to be invoked after grace period
+    pub fn call_rcu(&mut self, callback: RcuCallback) {
+        let gp = self.current_grace_period();
+        self.callbacks.push_back(RcuCallbackEntry {
             callback,
-            user_data,
-            registered_at,
-        }
-    }
-}
-
-/// RCU state
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum RcuState {
-    /// RCU is idle
-    Idle,
-    /// RCU is in grace period
-    InGracePeriod,
-    /// RCU is processing callbacks
-    Processing,
-}
-
-/// RCU subsystem
-#[derive(Debug)]
-pub struct RcuSubsystem {
-    pub current_epoch: AtomicU64,
-    pub grace_period_start: AtomicU64,
-    pub state: AtomicU32, // RcuState as u32
-    pub pending_callbacks: VecDeque<RcuCallbackDescriptor>,
-    pub next_callback_id: AtomicU64,
-    pub readers_count: AtomicU32,
-    pub grace_period_id: AtomicU64,
-}
-
-impl RcuSubsystem {
-    pub fn new() -> Self {
-        RcuSubsystem {
-            current_epoch: AtomicU64::new(0),
-            grace_period_start: AtomicU64::new(0),
-            state: AtomicU32::new(RcuState::Idle as u32),
-            pending_callbacks: VecDeque::new(),
-            next_callback_id: AtomicU64::new(1),
-            readers_count: AtomicU32::new(0),
-            grace_period_id: AtomicU64::new(1),
-        }
+            grace_period: gp,
+        });
     }
 
-    /// Enter read-side critical section
-    pub fn read_lock(&self) -> RcuEpoch {
-        self.readers_count.fetch_add(1, Ordering::SeqCst);
-        self.current_epoch.load(Ordering::SeqCst)
+    /// Check if all CPUs have passed through quiescent state
+    fn all_cpus_quiescent(&self, gp: GracePeriod) -> bool {
+        self.cpu_states.iter().all(|state| {
+            state.is_quiescent() || state.gp_acked.load(Ordering::Acquire) >= gp
+        })
     }
 
-    /// Exit read-side critical section
-    pub fn read_unlock(&self, _epoch: RcuEpoch) {
-        self.readers_count.fetch_sub(1, Ordering::SeqCst);
-    }
+    /// Advance RCU state machine
+    pub fn advance(&mut self) {
+        let current = self.current_grace_period();
+        let completed = self.completed_grace_period();
 
-    /// Register a callback to be called after grace period
-    pub fn register_callback(&mut self, callback: RcuCallback, user_data: u64) -> u64 {
-        let id = self.next_callback_id.fetch_add(1, Ordering::SeqCst);
-        let epoch = self.current_epoch.load(Ordering::SeqCst);
+        // Check if current grace period is complete
+        if current > completed && self.all_cpus_quiescent(current) {
+            // Grace period completed
+            self.completed_gp.store(current, Ordering::Release);
+            self.total_gps.fetch_add(1, Ordering::Relaxed);
 
-        let desc = RcuCallbackDescriptor::new(id, callback, user_data, epoch);
-        self.pending_callbacks.push_back(desc);
-
-        id
-    }
-
-    /// Begin a grace period
-    pub fn synchronize_rcu(&mut self) -> GracePeriodId {
-        let gp_id = self.grace_period_id.fetch_add(1, Ordering::SeqCst);
-        let epoch = self.current_epoch.load(Ordering::SeqCst);
-
-        self.grace_period_start.store(epoch, Ordering::SeqCst);
-        self.state
-            .store(RcuState::InGracePeriod as u32, Ordering::SeqCst);
-
-        gp_id
-    }
-
-    /// Check if grace period has ended
-    pub fn grace_period_ended(&self) -> bool {
-        let readers = self.readers_count.load(Ordering::SeqCst);
-        let gp_start = self.grace_period_start.load(Ordering::SeqCst);
-        let current = self.current_epoch.load(Ordering::SeqCst);
-
-        readers == 0 && (current > gp_start)
-    }
-
-    /// Advance to next epoch
-    pub fn advance_epoch(&self) {
-        self.current_epoch.fetch_add(1, Ordering::SeqCst);
-    }
-
-    /// Process pending callbacks after grace period
-    pub fn process_callbacks(&mut self) -> Vec<u64> {
-        let mut processed = Vec::new();
-
-        if self.grace_period_ended() {
-            self.state
-                .store(RcuState::Processing as u32, Ordering::SeqCst);
-
-            while let Some(callback) = self.pending_callbacks.pop_front() {
-                let id = callback.id;
-                let user_data = callback.user_data;
-
-                if let Err(_) = (callback.callback)(user_data) {
-                    // Callback failed, but continue processing
-                }
-
-                processed.push(id);
+            // Notify all CPUs
+            for state in &self.cpu_states {
+                state.ack_grace_period(current);
             }
 
-            self.state.store(RcuState::Idle as u32, Ordering::SeqCst);
+            // Start new grace period
+            self.current_gp.fetch_add(1, Ordering::SeqCst);
         }
 
-        processed
+        // Invoke callbacks for completed grace periods
+        self.invoke_completed_callbacks();
     }
 
-    /// Get current state
-    pub fn get_state(&self) -> RcuState {
-        match self.state.load(Ordering::SeqCst) {
-            0 => RcuState::Idle,
-            1 => RcuState::InGracePeriod,
-            2 => RcuState::Processing,
-            _ => RcuState::Idle,
+    /// Invoke callbacks whose grace periods have completed
+    fn invoke_completed_callbacks(&mut self) {
+        let completed = self.completed_grace_period();
+        let mut to_invoke = Vec::new();
+
+        // Collect callbacks ready to invoke
+        while let Some(entry) = self.callbacks.front() {
+            if entry.grace_period <= completed {
+                to_invoke.push(self.callbacks.pop_front().unwrap());
+            } else {
+                break;
+            }
+        }
+
+        // Invoke callbacks
+        for entry in to_invoke {
+            (entry.callback)();
+            self.total_callbacks.fetch_add(1, Ordering::Relaxed);
         }
     }
 
-    /// Get current epoch
-    pub fn get_epoch(&self) -> RcuEpoch {
-        self.current_epoch.load(Ordering::SeqCst)
+    /// Synchronize RCU (wait for grace period)
+    pub fn synchronize(&mut self) {
+        let target_gp = self.current_grace_period();
+        while self.completed_grace_period() < target_gp {
+            self.advance();
+        }
     }
 
-    /// Get pending callback count
-    pub fn pending_callback_count(&self) -> usize {
-        self.pending_callbacks.len()
+    /// Force quiescent state on all CPUs
+    pub fn force_quiescent_state(&self) {
+        for state in &self.cpu_states {
+            if state.readers.load(Ordering::Acquire) == 0 {
+                state.quiescent.store(true, Ordering::Release);
+            }
+        }
     }
 
-    /// Get active reader count
-    pub fn active_reader_count(&self) -> u32 {
-        self.readers_count.load(Ordering::SeqCst)
+    /// Get RCU statistics
+    pub fn stats(&self) -> RcuStats {
+        RcuStats {
+            current_gp: self.current_grace_period(),
+            completed_gp: self.completed_grace_period(),
+            pending_callbacks: self.callbacks.len(),
+            total_callbacks: self.total_callbacks.load(Ordering::Relaxed),
+            total_gps: self.total_gps.load(Ordering::Relaxed),
+            num_cpus: self.num_cpus,
+        }
     }
 }
 
-impl Default for RcuSubsystem {
-    fn default() -> Self {
-        Self::new()
+/// RCU statistics
+#[derive(Debug, Clone, Copy)]
+pub struct RcuStats {
+    pub current_gp: GracePeriod,
+    pub completed_gp: GracePeriod,
+    pub pending_callbacks: usize,
+    pub total_callbacks: u64,
+    pub total_gps: u64,
+    pub num_cpus: u32,
+}
+
+/// RCU-protected pointer wrapper
+pub struct RcuPointer<T> {
+    ptr: AtomicUsize,
+    _phantom: core::marker::PhantomData<T>,
+}
+
+impl<T> RcuPointer<T> {
+    pub const fn new(ptr: *mut T) -> Self {
+        Self {
+            ptr: AtomicUsize::new(ptr as usize),
+            _phantom: core::marker::PhantomData,
+        }
     }
+
+    /// Load pointer (read-side)
+    pub fn load(&self) -> *mut T {
+        self.ptr.load(Ordering::Acquire) as *mut T
+    }
+
+    /// Store pointer (write-side, requires RCU synchronization)
+    pub fn store(&self, ptr: *mut T) {
+        self.ptr.store(ptr as usize, Ordering::Release);
+    }
+
+    /// Exchange pointer atomically
+    pub fn swap(&self, ptr: *mut T) -> *mut T {
+        self.ptr.swap(ptr as usize, Ordering::AcqRel) as *mut T
+    }
+}
+
+unsafe impl<T: Send> Send for RcuPointer<T> {}
+unsafe impl<T: Sync> Sync for RcuPointer<T> {}
+
+/// RCU read guard (RAII for read-side critical section)
+pub struct RcuReadGuard<'a> {
+    rcu: &'a RcuState,
+    cpu: u32,
+}
+
+impl<'a> RcuReadGuard<'a> {
+    pub fn new(rcu: &'a RcuState, cpu: u32) -> Self {
+        rcu.read_lock(cpu);
+        Self { rcu, cpu }
+    }
+}
+
+impl<'a> Drop for RcuReadGuard<'a> {
+    fn drop(&mut self) {
+        self.rcu.read_unlock(self.cpu);
+    }
+}
+
+/// Global RCU state
+static mut GLOBAL_RCU: Option<RcuState> = None;
+
+/// Initialize global RCU
+pub fn init_rcu(num_cpus: u32) {
+    unsafe {
+        GLOBAL_RCU = Some(RcuState::new(num_cpus));
+    }
+}
+
+/// Get global RCU state
+pub fn global_rcu() -> Option<&'static mut RcuState> {
+    unsafe { GLOBAL_RCU.as_mut() }
 }
 
 #[cfg(test)]
@@ -182,67 +310,66 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_rcu_read_lock_unlock() {
-        let rcu = RcuSubsystem::new();
+    fn test_rcu_cpu_state() {
+        let state = RcuCpuState::new(0);
+        assert!(state.is_quiescent());
 
-        let epoch = rcu.read_lock();
-        assert_eq!(rcu.active_reader_count(), 1);
+        state.read_lock();
+        assert!(!state.is_quiescent());
+        assert_eq!(state.readers.load(Ordering::Relaxed), 1);
 
-        rcu.read_unlock(epoch);
-        assert_eq!(rcu.active_reader_count(), 0);
+        state.read_unlock();
+        assert!(state.is_quiescent());
     }
 
     #[test]
-    fn test_rcu_callback_registration() {
-        let mut rcu = RcuSubsystem::new();
+    fn test_rcu_grace_period() {
+        let mut rcu = RcuState::new(4);
+        let gp1 = rcu.current_grace_period();
+        assert_eq!(gp1, 1);
 
-        let callback: RcuCallback = |_data| Ok(());
-        let id = rcu.register_callback(callback, 42);
+        // Mark all CPUs as quiescent
+        rcu.force_quiescent_state();
+        rcu.advance();
 
-        assert!(id > 0);
-        assert_eq!(rcu.pending_callback_count(), 1);
+        assert_eq!(rcu.completed_grace_period(), 1);
+        assert_eq!(rcu.current_grace_period(), 2);
+    }
+
+    #[test]
+    fn test_rcu_callback() {
+        let mut rcu = RcuState::new(2);
+        let mut invoked = false;
+        let callback = Box::new(|| {
+            // Callback would set invoked = true
+        });
+
+        rcu.call_rcu(callback);
+        assert_eq!(rcu.callbacks.len(), 1);
     }
 
     #[test]
     fn test_rcu_synchronize() {
-        let mut rcu = RcuSubsystem::new();
-
-        let gp_id = rcu.synchronize_rcu();
-        assert!(gp_id > 0);
-        assert_eq!(rcu.get_state(), RcuState::InGracePeriod);
+        let mut rcu = RcuState::new(2);
+        rcu.force_quiescent_state();
+        rcu.synchronize();
+        assert!(rcu.completed_grace_period() >= 1);
     }
 
     #[test]
-    fn test_rcu_grace_period_end() {
-        let mut rcu = RcuSubsystem::new();
+    fn test_rcu_pointer() {
+        let value = Box::into_raw(Box::new(42));
+        let ptr = RcuPointer::new(value);
+        assert_eq!(ptr.load(), value);
 
-        rcu.synchronize_rcu();
-        // No readers, so grace period should end immediately
-        assert!(rcu.grace_period_ended());
-    }
+        let new_value = Box::into_raw(Box::new(100));
+        let old = ptr.swap(new_value);
+        assert_eq!(old, value);
+        assert_eq!(ptr.load(), new_value);
 
-    #[test]
-    fn test_rcu_callback_processing() {
-        let mut rcu = RcuSubsystem::new();
-
-        let callback: RcuCallback = |_data| Ok(());
-        rcu.register_callback(callback, 42);
-
-        rcu.synchronize_rcu();
-        let processed = rcu.process_callbacks();
-
-        assert_eq!(processed.len(), 1);
-        assert_eq!(rcu.pending_callback_count(), 0);
-    }
-
-    #[test]
-    fn test_rcu_epoch_advancement() {
-        let rcu = RcuSubsystem::new();
-
-        let epoch1 = rcu.get_epoch();
-        rcu.advance_epoch();
-        let epoch2 = rcu.get_epoch();
-
-        assert!(epoch2 > epoch1);
+        // Cleanup
+        unsafe {
+            let _ = Box::from_raw(ptr.load());
+        }
     }
 }

@@ -121,7 +121,6 @@ mod tests {
         assert!(dispatcher
             .raise_signal(1, SovereignSignal::Terminate, true)
             .is_ok());
-        assert!(dispatcher.raise_signal(1, SovereignSignal::Terminate, true).is_ok());
         assert_eq!(dispatcher.pending_count(), 1);
 
         let signal = dispatcher.poll_signal(1);
@@ -138,10 +137,11 @@ mod tests {
         assert!(dispatcher
             .raise_signal(1, SovereignSignal::Terminate, false)
             .is_err());
-        assert!(dispatcher.raise_signal(1, SovereignSignal::Terminate, false).is_err());
 
         // Should succeed with capability
-        assert!(dispatcher.raise_signal(1, SovereignSignal::Terminate, true).is_ok());
+        assert!(dispatcher
+            .raise_signal(1, SovereignSignal::Terminate, true)
+            .is_ok());
     }
 
     #[test]
@@ -150,13 +150,17 @@ mod tests {
 
         // Fill the queue
         for i in 0..16 {
-            assert!(dispatcher.raise_signal(i, SovereignSignal::Interrupt, true).is_ok());
+            assert!(dispatcher
+                .raise_signal(i, SovereignSignal::Interrupt, true)
+                .is_ok());
         }
 
         assert!(dispatcher.is_full());
 
         // Should fail when queue is full
-        assert!(dispatcher.raise_signal(100, SovereignSignal::Terminate, true).is_err());
+        assert!(dispatcher
+            .raise_signal(100, SovereignSignal::Terminate, true)
+            .is_err());
     }
 
     #[test]
@@ -166,7 +170,6 @@ mod tests {
         dispatcher
             .raise_signal(1, SovereignSignal::Terminate, true)
             .unwrap();
-        dispatcher.raise_signal(1, SovereignSignal::Terminate, true).unwrap();
 
         // Process 2 should not receive signal meant for process 1
         assert!(dispatcher.poll_signal(2).is_none());
@@ -185,8 +188,6 @@ mod tests {
         dispatcher
             .raise_signal(1, SovereignSignal::Interrupt, true)
             .unwrap();
-        dispatcher.raise_signal(1, SovereignSignal::Terminate, true).unwrap();
-        dispatcher.raise_signal(1, SovereignSignal::Interrupt, true).unwrap();
 
         assert_eq!(dispatcher.pending_count(), 2);
         assert!(dispatcher.has_pending_for_pid(1));
@@ -202,8 +203,6 @@ mod tests {
         dispatcher
             .raise_signal(2, SovereignSignal::Interrupt, true)
             .unwrap();
-        dispatcher.raise_signal(1, SovereignSignal::Terminate, true).unwrap();
-        dispatcher.raise_signal(2, SovereignSignal::Interrupt, true).unwrap();
 
         assert_eq!(dispatcher.pending_count(), 2);
 

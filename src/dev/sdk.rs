@@ -13,20 +13,19 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::boxed::Box;
-use std::string::{String, ToString};
 use std::format;
+use std::string::{String, ToString};
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
+use core::mem;
 /// OOP-based Developer SDK for SigmaOS
 /// Implements SDK using OOP principles with traits and structs
 /// No dependency on external SDK frameworks
 /// Based on Roadmap Item 86: Developer SDK
-
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 /// API ID
 pub type APIID = usize;
@@ -111,7 +110,12 @@ pub struct SimpleAPI {
 }
 
 impl SimpleAPI {
-    pub fn new(id: APIID, name: &[u8], version: (u32, u32, u32), capability: APICapability) -> Self {
+    pub fn new(
+        id: APIID,
+        name: &[u8],
+        version: (u32, u32, u32),
+        capability: APICapability,
+    ) -> Self {
         let mut name_array = [0u8; 64];
         let name_len = name.len().min(63);
 
@@ -363,7 +367,11 @@ impl<T> CustomVec<T> {
     }
 
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
 
         if !new_data.is_null() {
@@ -386,7 +394,6 @@ extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
 }
-
 
 impl<T> core::ops::Deref for CustomVec<T> {
     type Target = [T];
@@ -418,7 +425,6 @@ impl<'a, T> IntoIterator for &'a CustomVec<T> {
         self.deref().iter()
     }
 }
-
 
 impl<'a, T> IntoIterator for &'a mut CustomVec<T> {
     type Item = &'a mut T;

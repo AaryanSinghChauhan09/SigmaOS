@@ -5,7 +5,6 @@
 // inspiration beyond the init system already modelled in compatibility/void_linux.rs.
 
 use crate::klib::HashMap;
-use std::string::{String, ToString};
 use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

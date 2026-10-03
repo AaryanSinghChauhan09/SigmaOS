@@ -1,13 +1,12 @@
+use core::sync::atomic::{AtomicUsize, Ordering};
 /// OOP-based Networking Stack (TCP/UDP) for SigmaOS
 /// Based on Roadmap Item: Networking Stack (TCP/UDP SYN-Complete)
 /// Implements TCP state machine, UDP, Reno/BBR congestion control, firewall, zero-copy
 /// Enhanced with Linux-grade BSD socket options, Netfilter/iptables, IP routing, Network Interfaces, and Epoll.
 // Advanced High-Fidelity TCP/UDP Networking Stack & BSD Sockets for SigmaOS
 // Inspired by Linux and FreeBSD socket layers, featuring stateful transitions and congestion control.
-
 use std::boxed::Box;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type SocketID = usize;
 pub type Port = u16;
@@ -15,8 +14,8 @@ pub type Port = u16;
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Protocol {
-    TCP = 0,
-    UDP = 1,
+    Tcp = 0,
+    Udp = 1,
 }
 
 /// Standard RFC-793 TCP States
@@ -187,16 +186,20 @@ impl TCPConnection for SimpleSocket {
             return Err(NetworkError::ConnectionFailed);
         }
 
-        self.remote_port.store(remote_port as usize, Ordering::SeqCst);
+        self.remote_port
+            .store(remote_port as usize, Ordering::SeqCst);
 
         // Transition: Closed -> SynSent -> Established
-        self.state.store(TCPState::SynSent as usize, Ordering::SeqCst);
-        self.state.store(TCPState::Established as usize, Ordering::SeqCst);
+        self.state
+            .store(TCPState::SynSent as usize, Ordering::SeqCst);
+        self.state
+            .store(TCPState::Established as usize, Ordering::SeqCst);
         Ok(())
     }
 
     fn listen(&mut self) -> Result<(), NetworkError> {
-        self.state.store(TCPState::Listen as usize, Ordering::SeqCst);
+        self.state
+            .store(TCPState::Listen as usize, Ordering::SeqCst);
         Ok(())
     }
 
@@ -226,7 +229,8 @@ impl TCPConnection for SimpleSocket {
     }
 
     fn close(&mut self) -> Result<(), NetworkError> {
-        self.state.store(TCPState::Closed as usize, Ordering::SeqCst);
+        self.state
+            .store(TCPState::Closed as usize, Ordering::SeqCst);
         Ok(())
     }
 
@@ -254,7 +258,8 @@ pub trait UDPSocket {
 
 impl UDPSocket for SimpleSocket {
     fn sendto(&mut self, data: &[u8], remote_port: Port) -> Result<usize, NetworkError> {
-        self.remote_port.store(remote_port as usize, Ordering::SeqCst);
+        self.remote_port
+            .store(remote_port as usize, Ordering::SeqCst);
         Ok(data.len())
     }
 
@@ -491,7 +496,8 @@ impl ZeroCopyNetwork {
 
 impl ZeroCopy for ZeroCopyNetwork {
     fn zero_copy_send(&mut self, data: &[u8]) -> Result<usize, NetworkError> {
-        self.dma_buffer.store(data.as_ptr() as usize, Ordering::SeqCst);
+        self.dma_buffer
+            .store(data.as_ptr() as usize, Ordering::SeqCst);
         Ok(data.len())
     }
 
@@ -695,7 +701,6 @@ impl Default for SimpleNetworkStack {
     }
 }
 
-
 impl NetworkStack for SimpleNetworkStack {
     fn create_socket(&mut self, protocol: Protocol, port: Port) -> Result<SocketID, NetworkError> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
@@ -705,7 +710,11 @@ impl NetworkStack for SimpleNetworkStack {
     }
 
     fn destroy_socket(&mut self, id: SocketID) -> Result<(), NetworkError> {
-        if let Some(pos) = self.sockets.iter().position(|s| s.as_ref().map_or(false, |s| s.id() == id)) {
+        if let Some(pos) = self
+            .sockets
+            .iter()
+            .position(|s| s.as_ref().map_or(false, |s| s.id() == id))
+        {
             self.sockets.remove(pos);
             Ok(())
         } else {
@@ -730,19 +739,95 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_tcp_state_machine() {
-        let mut socket = SimpleSocket::new(1, Protocol::TCP, 80);
-        assert_eq!(socket.get_state(), TCPState::Closed);
-
-        socket.listen().unwrap();
-        assert_eq!(socket.get_state(), TCPState::Listen);
-
-        socket.connect(443).unwrap();
+    fn test_tcp_socket_flow() {
+        let mut socket = SimpleSocket::new(1, Protocol::Tcp, 80);
+        assert_eq!(socket.id(), 1);
+        assert_eq!(socket.protocol(), Protocol::Tcp);
+        assert!(socket.listen().is_ok());
+        assert!(socket.connect(8080).is_ok());
         assert_eq!(socket.get_state(), TCPState::Established);
     }
 
     #[test]
-    fn test_firewall() {
+    fn test_socket_options() {
+        let socket = SimpleSocket::new(1, Protocol::Tcp, 80);
+        socket.set_opt(SocketOption::TcpNoDelay, 1).unwrap();
+        assert_eq!(socket.get_opt(SocketOption::TcpNoDelay).unwrap(), 1);
+
+        socket.set_opt(SocketOption::RcvBuf, 16384).unwrap();
+        assert_eq!(socket.get_opt(SocketOption::RcvBuf).unwrap(), 16384);
+    }
+
+    #[test]
+    fn test_udp_socket_flow() {
+        let mut socket = SimpleSocket::new(2, Protocol::Udp, 53);
+        assert_eq!(socket.id(), 2);
+        assert_eq!(socket.protocol(), Protocol::Udp);
+
+        let data = b"dnsreq";
+        assert_eq!(socket.sendto(data, 53).unwrap(), 6);
+
+        let mut buf = [0u8; 10];
+        let (len, rport) = socket.recvfrom(&mut buf).unwrap();
+        assert_eq!(len, 10);
+        assert_eq!(rport, 53);
+        assert_eq!(buf[0], 17);
+    }
+
+    #[test]
+    fn test_firewall_and_congestion() {
+        let mut firewall = SimpleFirewall::new();
+        assert!(!firewall.is_allowed(80));
+        firewall.allow_port(80);
+        assert!(firewall.is_allowed(80));
+        firewall.block_port(80);
+        assert!(!firewall.is_allowed(80));
+
+        let mut cc = RenoCongestionControl::new();
+        assert_eq!(cc.get_cwnd(), 10);
+        cc.update_cwnd(2);
+        assert_eq!(cc.get_cwnd(), 12);
+        cc.on_loss();
+        assert_eq!(cc.get_cwnd(), 1);
+    }
+
+    #[test]
+    fn test_tcp_state_machine_handshake() {
+        let mut socket = SimpleSocket::new(1, Protocol::Tcp, 443);
+        assert_eq!(socket.get_state(), TCPState::Closed);
+
+        socket.connect(55120).unwrap();
+        assert_eq!(socket.get_state(), TCPState::Established);
+
+        socket.close().unwrap();
+        assert_eq!(socket.get_state(), TCPState::Closed);
+    }
+
+    #[test]
+    fn test_reno_congestion_aimd() {
+        let mut reno = RenoCongestionControl::new();
+        assert_eq!(reno.get_cwnd(), 10);
+
+        reno.update_cwnd(2);
+        assert_eq!(reno.get_cwnd(), 12);
+
+        reno.on_loss();
+        assert_eq!(reno.get_cwnd(), 1);
+        assert_eq!(reno.ssthresh, 6);
+    }
+
+    #[test]
+    fn test_bbr_congestion_pacing() {
+        let mut bbr = BBRCongestionControl::new();
+        bbr.update_cwnd(0);
+        assert_eq!(bbr.get_cwnd(), 100);
+
+        bbr.on_loss();
+        assert_eq!(bbr.get_cwnd(), 80);
+    }
+
+    #[test]
+    fn test_firewall_allowed_ports() {
         let mut fw = SimpleFirewall::new();
         assert!(!fw.is_allowed(80));
 

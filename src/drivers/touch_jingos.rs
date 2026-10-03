@@ -27,7 +27,10 @@ pub enum DeviceGeneration {
 pub enum PowerState {
     Off,
     On,
-}
+    FullOn,
+    Standby,
+    Sleep,
+    Unknown,}
 
 #[cfg(test_disabled)]
 pub trait PeripheralDevice {

@@ -1,9 +1,9 @@
-use std::boxed::Box;
-use std::vec::Vec;
 /// OOP-based Device Manager for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 91
 /// Implements device detection, registration, and management
 use core::sync::atomic::{AtomicUsize, Ordering};
+use std::boxed::Box;
+use std::vec::Vec;
 
 pub type DeviceID = usize;
 
@@ -46,6 +46,8 @@ pub enum PowerState {
     D2, // Standby
     D3, // Sleep
     D4, // Off
+    FullOn,
+    Unknown,
 }
 
 #[repr(C)]

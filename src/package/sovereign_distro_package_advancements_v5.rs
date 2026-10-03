@@ -15,6 +15,7 @@
 
 #![allow(dead_code)]
 #![allow(unused_variables)]
+#![allow(non_camel_case_types)]
 
 #[cfg(feature = "standalone_test")]
 extern crate alloc;
@@ -28,8 +29,6 @@ use std::vec::Vec;
 
 #[cfg(feature = "standalone_test")]
 use alloc::collections::BTreeMap;
-#[cfg(feature = "standalone_test")]
-use alloc::format;
 #[cfg(feature = "standalone_test")]
 use alloc::string::{String, ToString};
 #[cfg(feature = "standalone_test")]
@@ -407,7 +406,9 @@ pub struct SovereignDistroPackageAdvancementsSuiteV5 {
 impl SovereignDistroPackageAdvancementsSuiteV5 {
     pub fn new() -> Self {
         Self {
-            microarch_tuner: SovereignDistroPackageMicroarchAutoTuner::new(TargetIsaTier::X86_64_V3),
+            microarch_tuner: SovereignDistroPackageMicroarchAutoTuner::new(
+                TargetIsaTier::X86_64_V3,
+            ),
             wot_signatures: SovereignWebOfTrustSignatureEngine::new(),
             soname_cleaner: SovereignSonameOrphanCleanerEngine::new(),
             cas_deduplicator: SovereignHermeticStoreCasDeduplicator::new(),
@@ -452,7 +453,9 @@ mod tests {
             0xFF,
         ];
 
-        let res = SovereignDeltaPackageReconstitutionEngine::reconstruct_package_archive(base, &delta).unwrap();
+        let res =
+            SovereignDeltaPackageReconstitutionEngine::reconstruct_package_archive(base, &delta)
+                .unwrap();
         assert_eq!(String::from_utf8(res).unwrap(), "BASE_PACKAGE_PATC");
     }
 
@@ -466,7 +469,9 @@ mod tests {
             is_revoked: false,
         });
 
-        let valid = engine.verify_signature("arch-master-1", "FINGERPRINT_ARCH_123 PGP SIGNATURE").unwrap();
+        let valid = engine
+            .verify_signature("arch-master-1", "FINGERPRINT_ARCH_123 PGP SIGNATURE")
+            .unwrap();
         assert!(valid);
     }
 

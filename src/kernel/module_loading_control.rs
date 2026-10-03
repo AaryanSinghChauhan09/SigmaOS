@@ -263,19 +263,13 @@ impl KernelModuleLoadingController {
     pub fn list_all_modules(&self) -> Vec<String> {
         self.modules
             .iter()
-            .map(|m| {
-                format!(
-                    "{} {} ({}, {})",
-                    m.name,
-                    m.version,
-                    if m.loaded { "loaded" } else { "not loaded" },
-                    if m.signature_verified {
-                        "signed"
-                    } else {
-                        "unsigned"
-                    }
-                )
-            })
+            .map(|m| format!(
+                "{} {} ({}, {})",
+                m.name,
+                m.version,
+                if m.loaded { "loaded" } else { "not loaded" },
+                if m.signature_verified { "signed" } else { "unsigned" }
+            ))
             .collect()
     }
 
@@ -283,14 +277,12 @@ impl KernelModuleLoadingController {
     pub fn list_rules(&self) -> Vec<String> {
         self.rules
             .iter()
-            .map(|r| {
-                format!(
-                    "{}: {} (signature required: {})",
-                    r.module_name,
-                    if r.allowed { "allowed" } else { "denied" },
-                    r.requires_signature
-                )
-            })
+            .map(|r| format!(
+                "{}: {} (signature required: {})",
+                r.module_name,
+                if r.allowed { "allowed" } else { "denied" },
+                r.requires_signature
+            ))
             .collect()
     }
 
@@ -304,14 +296,8 @@ impl KernelModuleLoadingController {
         ));
         stats.push_str(&format!(
             "Signature checking: {}\n",
-            if self.signature_checking_enabled {
-                "enabled"
-            } else {
-                "disabled"
-            }
+            if self.signature_checking_enabled { "enabled" } else { "disabled" }
         ));
-        stats.push_str(&format!("Loading policy: {}\n", self.loading_policy.as_str()));
-        stats.push_str(&format!("Signature checking: {}\n", if self.signature_checking_enabled { "enabled" } else { "disabled" }));
 
         let total_modules = self.modules.len();
         let loaded_modules = self.modules.iter().filter(|m| m.loaded).count();

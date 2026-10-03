@@ -1,5 +1,9 @@
-// SigmaOS Boot Module
-// Firmware, PCI scanning, and early system initialization
+#![no_std]
+
+//! Boot System (GRUB2/systemd-boot/refind Inspiration)
+//! Advanced boot manager with themes, secure boot, and boot environments
+
+extern crate alloc;
 
 pub mod boot_snapshot;
 pub mod bootloader;
@@ -19,11 +23,14 @@ pub mod uefi;
 pub mod verified;
 
 pub use sigma_bootloader::{
-    BootArch, BootMemoryMap, BootPlatform, FramebufferInfo, KernelCmdline, MemoryRegion,
-    MemoryType, SigmaBootInfo, SigmaBootManager, SigmaBootloaderEngine, LiveEnvironmentConfig,
+    BootArch, BootMemoryMap, BootPlatform, FramebufferInfo, KernelCmdline, LiveEnvironmentConfig,
+    MemoryRegion, MemoryType, SigmaBootInfo, SigmaBootManager, SigmaBootloaderEngine,
     SIGMA_BOOT_MAGIC,
 };
 
+pub use boot_snapshot::{
+    BootSnapshotConfig, BootSnapshotEngine, BootSnapshotItem, BootSnapshotStatus,
+};
 pub use firmware::{
     efi_attr, CpuMicrocodePatchEngine, EfiVariable, EfiVariableStore, EsrtEntry, EsrtFirmwareType,
     FirmwareCapsuleUpdateManager, IommuArchitecture, IommuFirmwareEngine, MicrocodeHeader,
@@ -37,9 +44,6 @@ pub use post::{PostDiagnostics, PostStatus, PostTest, TestType};
 pub use sigma_boot::{
     BootEntry, BootManager, BootStageDescriptor, BootTheme, HandoffProtocol,
     SovereignDistroBootStageHandoff, SovereignFastBootServicePipeline,
-};
-pub use boot_snapshot::{
-    BootSnapshotConfig, BootSnapshotEngine, BootSnapshotItem, BootSnapshotStatus,
 };
 pub use uefi::{
     AcpiParser, BootError, GopFramebuffer, GopSplashCanvas, MicrokernelProfile,

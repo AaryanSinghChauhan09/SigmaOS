@@ -2,7 +2,6 @@
 // Implements intuitive GUI system controls for firewall, VPN, capabilities, and telemetry
 // Inspired by Linux Mint and Clear Linux visual management paradigms
 
-use std::string::String;
 use std::vec::Vec;
 
 /// Firewall policy configuration

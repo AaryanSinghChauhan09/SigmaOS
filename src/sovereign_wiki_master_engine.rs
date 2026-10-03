@@ -6,9 +6,12 @@
 // 2. WikiSpecificationDataSyncer: Transpiles and syncs fully verified `.md` specifications directly to `wiki_repo/` and `wiki/` documentation pages.
 // 3. MasterWikiAndRoadmapVerificationSuite: Master coordinator unifying roadmap parity checks and wiki data syncing.
 
-use std::collections::BTreeMap;
-use std::string::{String, ToString};
-use std::vec::Vec;
+extern crate alloc;
+
+use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 
 // =========================================================================
 // 1. SOVEREIGN LINUX & BSD WIKI ROADMAP PARITY ENGINE
@@ -48,22 +51,102 @@ impl SovereignLinuxBsdWikiRoadmapParityEngine {
 
     fn seed_roadmap_ideas(&mut self) {
         let default_ideas = [
-            (1, "Intel HDA CORB/RIRB Verb DMA Engine", "src/drivers/sovereign_sound_hda_synthesis.rs", "Sound HDA Support"),
-            (2, "Realtek rtw88 WPA3-SAE Wi-Fi Driver", "src/drivers/sovereign_distro_driver_suite.rs", "Wi-Fi Driver"),
-            (3, "NetBSD NPF Stateful Bytecode Firewall", "src/distro/sovereign_linux_bsd_master_synthesis.rs", "NPF Firewall"),
-            (4, "OpenBSD Pledge & Unveil Kernel Sandbox", "src/distro/sovereign_linux_bsd_master_synthesis.rs", "Pledge/Unveil"),
-            (5, "Linux 6.12+ SchedExt eBPF CPU Scheduler", "src/distro/sovereign_linux_bsd_master_synthesis.rs", "SchedExt BPF"),
-            (6, "FreeBSD GEOM Gate Network Block Storage", "src/distro/sovereign_linux_bsd_master_synthesis.rs", "GEOM Gate"),
-            (7, "SMP Multi-Core Topology & IPI Scheduler", "src/kernel/sovereign_smp_xhci_apc_synthesis.rs", "SMP Multi-Core"),
-            (8, "USB 3.0/3.1 xHCI Host Controller Driver", "src/kernel/sovereign_smp_xhci_apc_synthesis.rs", "USB xHCI"),
-            (9, "Kernel & User Asynchronous Procedure Calls", "src/kernel/sovereign_smp_xhci_apc_synthesis.rs", "Async Procedure Calls"),
-            (10, "Sequential/Direct/Relative Access Time Metrics", "src/access/sovereign_access_matrix_expansion.rs", "Device Access Patterns"),
-            (11, "LDAP Directory Client & Server Binds", "src/access/sovereign_access_matrix_expansion.rs", "LDAP Protocol"),
-            (12, "Remote SFTP/NFS Mounting & RAT Governor", "src/access/sovereign_access_matrix_expansion.rs", "Remote Access Tool"),
-            (13, "Void Runit 3-Stage Init Supervisor Tree", "src/distro/sovereign_open_source_distro_synthesis.rs", "Void runit"),
-            (14, "Tails OS Amnesic Memory RAM Wiper", "src/distro/sovereign_media_and_distro_unimplemented_innovations.rs", "Tails Amnesic RAM"),
-            (15, "Nobara Linux GameMode Futex2 Sync", "src/distro/sovereign_media_and_distro_unimplemented_innovations.rs", "Nobara GameMode"),
-            (16, "Package PR Git Diff Patching & Staging", "src/package/sovereign_pr_package_gateway.rs", "Package PR Gateway"),
+            (
+                1,
+                "Intel HDA CORB/RIRB Verb DMA Engine",
+                "src/drivers/sovereign_sound_hda_synthesis.rs",
+                "Sound HDA Support",
+            ),
+            (
+                2,
+                "Realtek rtw88 WPA3-SAE Wi-Fi Driver",
+                "src/drivers/sovereign_distro_driver_suite.rs",
+                "Wi-Fi Driver",
+            ),
+            (
+                3,
+                "NetBSD NPF Stateful Bytecode Firewall",
+                "src/distro/sovereign_linux_bsd_master_synthesis.rs",
+                "NPF Firewall",
+            ),
+            (
+                4,
+                "OpenBSD Pledge & Unveil Kernel Sandbox",
+                "src/distro/sovereign_linux_bsd_master_synthesis.rs",
+                "Pledge/Unveil",
+            ),
+            (
+                5,
+                "Linux 6.12+ SchedExt eBPF CPU Scheduler",
+                "src/distro/sovereign_linux_bsd_master_synthesis.rs",
+                "SchedExt BPF",
+            ),
+            (
+                6,
+                "FreeBSD GEOM Gate Network Block Storage",
+                "src/distro/sovereign_linux_bsd_master_synthesis.rs",
+                "GEOM Gate",
+            ),
+            (
+                7,
+                "SMP Multi-Core Topology & IPI Scheduler",
+                "src/kernel/sovereign_smp_xhci_apc_synthesis.rs",
+                "SMP Multi-Core",
+            ),
+            (
+                8,
+                "USB 3.0/3.1 xHCI Host Controller Driver",
+                "src/kernel/sovereign_smp_xhci_apc_synthesis.rs",
+                "USB xHCI",
+            ),
+            (
+                9,
+                "Kernel & User Asynchronous Procedure Calls",
+                "src/kernel/sovereign_smp_xhci_apc_synthesis.rs",
+                "Async Procedure Calls",
+            ),
+            (
+                10,
+                "Sequential/Direct/Relative Access Time Metrics",
+                "src/access/sovereign_access_matrix_expansion.rs",
+                "Device Access Patterns",
+            ),
+            (
+                11,
+                "LDAP Directory Client & Server Binds",
+                "src/access/sovereign_access_matrix_expansion.rs",
+                "LDAP Protocol",
+            ),
+            (
+                12,
+                "Remote SFTP/NFS Mounting & RAT Governor",
+                "src/access/sovereign_access_matrix_expansion.rs",
+                "Remote Access Tool",
+            ),
+            (
+                13,
+                "Void Runit 3-Stage Init Supervisor Tree",
+                "src/distro/sovereign_open_source_distro_synthesis.rs",
+                "Void runit",
+            ),
+            (
+                14,
+                "Tails OS Amnesic Memory RAM Wiper",
+                "src/distro/sovereign_media_and_distro_unimplemented_innovations.rs",
+                "Tails Amnesic RAM",
+            ),
+            (
+                15,
+                "Nobara Linux GameMode Futex2 Sync",
+                "src/distro/sovereign_media_and_distro_unimplemented_innovations.rs",
+                "Nobara GameMode",
+            ),
+            (
+                16,
+                "Package PR Git Diff Patching & Staging",
+                "src/package/sovereign_pr_package_gateway.rs",
+                "Package PR Gateway",
+            ),
         ];
 
         for (id, title, module, _spec) in default_ideas {
@@ -81,7 +164,10 @@ impl SovereignLinuxBsdWikiRoadmapParityEngine {
     }
 
     pub fn implemented_ideas_count(&self) -> usize {
-        self.ideas.values().filter(|i| i.is_fully_implemented).count()
+        self.ideas
+            .values()
+            .filter(|i| i.is_fully_implemented)
+            .count()
     }
 
     pub fn verification_percentage(&self) -> f32 {
@@ -115,12 +201,20 @@ impl WikiSpecificationDataSyncer {
         }
     }
 
-    pub fn sync_verified_md_to_github_wiki(&mut self, md_filename: &str, wiki_page_title: &str) -> Result<String, &'static str> {
+    pub fn sync_verified_md_to_github_wiki(
+        &mut self,
+        md_filename: &str,
+        wiki_page_title: &str,
+    ) -> Result<String, &'static str> {
         if md_filename.is_empty() || wiki_page_title.is_empty() {
             return Err("WikiSync Error: Invalid filename or wiki page title");
         }
 
-        let destination_file = format!("{}{}.md", self.wiki_directory, wiki_page_title.replace(' ', "-"));
+        let destination_file = format!(
+            "{}{}.md",
+            self.wiki_directory,
+            wiki_page_title.replace(' ', "-")
+        );
         self.synced_wiki_pages.push(destination_file.clone());
         Ok(destination_file)
     }
@@ -189,7 +283,9 @@ mod tests {
     #[test]
     fn test_wiki_data_syncer() {
         let mut syncer = WikiSpecificationDataSyncer::new();
-        let path = syncer.sync_verified_md_to_github_wiki("ROADMAP.md", "SigmaOS Master Roadmap").unwrap();
+        let path = syncer
+            .sync_verified_md_to_github_wiki("ROADMAP.md", "SigmaOS Master Roadmap")
+            .unwrap();
         assert!(path.contains("wiki_repo/SigmaOS-Master-Roadmap.md"));
         assert_eq!(syncer.synced_wiki_pages.len(), 1);
     }
@@ -198,6 +294,8 @@ mod tests {
     fn test_master_wiki_suite() {
         let suite = MasterWikiAndRoadmapVerificationSuite::new();
         assert!(suite.health_check());
-        assert!(suite.summary_report().contains("Parity Verification: 100.0%"));
+        assert!(suite
+            .summary_report()
+            .contains("Parity Verification: 100.0%"));
     }
 }

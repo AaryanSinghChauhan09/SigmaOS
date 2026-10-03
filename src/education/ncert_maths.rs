@@ -78,58 +78,70 @@ impl NcertMathsFormulaRepository {
 
     fn populate_standard_ncert_chapters(&mut self) {
         // Class 10 Chapter 2: Polynomials
-        self.chapters.insert((10, 2), NcertChapterSpec {
-            class_grade: NcertClassGrade::Class10,
-            chapter_number: 2,
-            chapter_title: "Polynomials".to_string(),
-            domain: NcertMathsDomain::Algebra,
-            estimated_teaching_hours: 8,
-            key_formulas: vec![
-                "\\alpha + \\beta = -\\frac{b}{a}".to_string(),
-                "\\alpha \\beta = \\frac{c}{a}".to_string(),
-            ],
-        });
+        self.chapters.insert(
+            (10, 2),
+            NcertChapterSpec {
+                class_grade: NcertClassGrade::Class10,
+                chapter_number: 2,
+                chapter_title: "Polynomials".to_string(),
+                domain: NcertMathsDomain::Algebra,
+                estimated_teaching_hours: 8,
+                key_formulas: vec![
+                    "\\alpha + \\beta = -\\frac{b}{a}".to_string(),
+                    "\\alpha \\beta = \\frac{c}{a}".to_string(),
+                ],
+            },
+        );
 
         // Class 10 Chapter 8: Introduction to Trigonometry
-        self.chapters.insert((10, 8), NcertChapterSpec {
-            class_grade: NcertClassGrade::Class10,
-            chapter_number: 8,
-            chapter_title: "Introduction to Trigonometry".to_string(),
-            domain: NcertMathsDomain::Trigonometry,
-            estimated_teaching_hours: 10,
-            key_formulas: vec![
-                "\\sin^2 \\theta + \\cos^2 \\theta = 1".to_string(),
-                "1 + \\tan^2 \\theta = \\sec^2 \\theta".to_string(),
-                "1 + \\cot^2 \\theta = \\csc^2 \\theta".to_string(),
-            ],
-        });
+        self.chapters.insert(
+            (10, 8),
+            NcertChapterSpec {
+                class_grade: NcertClassGrade::Class10,
+                chapter_number: 8,
+                chapter_title: "Introduction to Trigonometry".to_string(),
+                domain: NcertMathsDomain::Trigonometry,
+                estimated_teaching_hours: 10,
+                key_formulas: vec![
+                    "\\sin^2 \\theta + \\cos^2 \\theta = 1".to_string(),
+                    "1 + \\tan^2 \\theta = \\sec^2 \\theta".to_string(),
+                    "1 + \\cot^2 \\theta = \\csc^2 \\theta".to_string(),
+                ],
+            },
+        );
 
         // Class 12 Chapter 3: Matrices
-        self.chapters.insert((12, 3), NcertChapterSpec {
-            class_grade: NcertClassGrade::Class12,
-            chapter_number: 3,
-            chapter_title: "Matrices".to_string(),
-            domain: NcertMathsDomain::MatricesAndDeterminants,
-            estimated_teaching_hours: 12,
-            key_formulas: vec![
-                "A \\cdot A^{-1} = I".to_string(),
-                "(AB)^T = B^T A^T".to_string(),
-            ],
-        });
+        self.chapters.insert(
+            (12, 3),
+            NcertChapterSpec {
+                class_grade: NcertClassGrade::Class12,
+                chapter_number: 3,
+                chapter_title: "Matrices".to_string(),
+                domain: NcertMathsDomain::MatricesAndDeterminants,
+                estimated_teaching_hours: 12,
+                key_formulas: vec![
+                    "A \\cdot A^{-1} = I".to_string(),
+                    "(AB)^T = B^T A^T".to_string(),
+                ],
+            },
+        );
 
         // Class 12 Chapter 7: Integrals
-        self.chapters.insert((12, 7), NcertChapterSpec {
-            class_grade: NcertClassGrade::Class12,
-            chapter_number: 7,
-            chapter_title: "Integrals".to_string(),
-            domain: NcertMathsDomain::Calculus,
-            estimated_teaching_hours: 20,
-            key_formulas: vec![
-                "\\int x^n dx = \\frac{x^{n+1}}{n+1} + C".to_string(),
-                "\\int e^x dx = e^x + C".to_string(),
-                "\\int \\frac{1}{x} dx = \\ln|x| + C".to_string(),
-            ],
-        });
+        self.chapters.insert(
+            (12, 7),
+            NcertChapterSpec {
+                class_grade: NcertClassGrade::Class12,
+                chapter_number: 7,
+                chapter_title: "Integrals".to_string(),
+                domain: NcertMathsDomain::Calculus,
+                estimated_teaching_hours: 20,
+                key_formulas: vec![
+                    "\\int x^n dx = \\frac{x^{n+1}}{n+1} + C".to_string(),
+                    "\\int e^x dx = e^x + C".to_string(),
+                    "\\int \\frac{1}{x} dx = \\ln|x| + C".to_string(),
+                ],
+            },
+        );
     }
 
     pub fn get_chapter(&self, grade: u8, chapter: u8) -> Option<&NcertChapterSpec> {
@@ -138,7 +150,10 @@ impl NcertMathsFormulaRepository {
 
     pub fn render_blackboard_latex(&self, grade: u8, chapter: u8) -> String {
         if let Some(spec) = self.get_chapter(grade, chapter) {
-            let mut latex = format!("\\section*{{Class {} Ch {}: {}}}\n\\begin{{align*}}\n", spec.class_grade as u8, spec.chapter_number, spec.chapter_title);
+            let mut latex = format!(
+                "\\section*{{Class {} Ch {}: {}}}\n\\begin{{align*}}\n",
+                spec.class_grade as u8, spec.chapter_number, spec.chapter_title
+            );
             for formula in &spec.key_formulas {
                 latex.push_str(&format!("  {} \\\\\n", formula));
             }
@@ -203,13 +218,19 @@ impl NcertLessonPlanGenerator {
             grade,
             learning_objectives: vec![
                 format!("Understand core NCERT concepts of {}", chapter_title),
-                format!("Apply algebraic/geometric properties to solve Class {} exercises", grade as u8),
+                format!(
+                    "Apply algebraic/geometric properties to solve Class {} exercises",
+                    grade as u8
+                ),
             ],
             steps: vec![
                 NcertLessonPlanStep {
                     phase: Phase5E::Engage,
                     duration_minutes: per_phase_dur,
-                    teacher_activity: format!("Present real-world problem introducing {}", chapter_title),
+                    teacher_activity: format!(
+                        "Present real-world problem introducing {}",
+                        chapter_title
+                    ),
                     student_activity: "Brainstorm and respond to teacher prompts".to_string(),
                     blackboard_teaching_aids: "Smart Board visual diagram".to_string(),
                 },
@@ -223,14 +244,16 @@ impl NcertLessonPlanGenerator {
                 NcertLessonPlanStep {
                     phase: Phase5E::Explain,
                     duration_minutes: per_phase_dur,
-                    teacher_activity: "Derive key NCERT formulas on the board step-by-step".to_string(),
+                    teacher_activity: "Derive key NCERT formulas on the board step-by-step"
+                        .to_string(),
                     student_activity: "Take notes and ask clarifying questions".to_string(),
                     blackboard_teaching_aids: "Formula derivation LaTeX proof".to_string(),
                 },
                 NcertLessonPlanStep {
                     phase: Phase5E::Elaborate,
                     duration_minutes: per_phase_dur,
-                    teacher_activity: "Assign higher-order thinking (HOTs) NCERT Exemplar problem".to_string(),
+                    teacher_activity: "Assign higher-order thinking (HOTs) NCERT Exemplar problem"
+                        .to_string(),
                     student_activity: "Solve complex application questions".to_string(),
                     blackboard_teaching_aids: "Step-by-step hint outline".to_string(),
                 },
@@ -363,15 +386,35 @@ impl NcertStepByStepSolutionSolver {
     pub fn solve_quadratic_equation(a: f64, b: f64, c: f64) -> StepByStepSolution {
         let disc = b * b - 4.0 * a * c;
         let mut derivation = Vec::new();
-        derivation.push(format!("Identify coefficients: a = {}, b = {}, c = {}", a, b, c));
-        derivation.push(format!("Calculate Discriminant D = b^2 - 4ac = ({})^2 - 4({})({}) = {}", b, a, c, disc));
+        derivation.push(format!(
+            "Identify coefficients: a = {}, b = {}, c = {}",
+            a, b, c
+        ));
+        derivation.push(format!(
+            "Calculate Discriminant D = b^2 - 4ac = ({})^2 - 4({})({}) = {}",
+            b, a, c, disc
+        ));
 
         let answer = if disc >= 0.0 {
             let r1 = (-b + disc.sqrt()) / (2.0 * a);
             let r2 = (-b - disc.sqrt()) / (2.0 * a);
-            derivation.push(format!("D >= 0, Real roots exist: x = (-b +- sqrt(D)) / 2a"));
-            derivation.push(format!("x1 = (-({}) + {}) / {} = {}", b, disc.sqrt(), 2.0 * a, r1));
-            derivation.push(format!("x2 = (-({}) - {}) / {} = {}", b, disc.sqrt(), 2.0 * a, r2));
+            derivation.push(format!(
+                "D >= 0, Real roots exist: x = (-b +- sqrt(D)) / 2a"
+            ));
+            derivation.push(format!(
+                "x1 = (-({}) + {}) / {} = {}",
+                b,
+                disc.sqrt(),
+                2.0 * a,
+                r1
+            ));
+            derivation.push(format!(
+                "x2 = (-({}) - {}) / {} = {}",
+                b,
+                disc.sqrt(),
+                2.0 * a,
+                r2
+            ));
             format!("Roots: x = {}, {}", r1, r2)
         } else {
             derivation.push("D < 0, No real roots exist (Complex conjugate roots)".to_string());
@@ -380,8 +423,15 @@ impl NcertStepByStepSolutionSolver {
 
         StepByStepSolution {
             problem_statement: format!("Solve {}x^2 + {}x + {} = 0", a, b, c),
-            given_data: vec![format!("a = {}", a), format!("b = {}", b), format!("c = {}", c)],
-            formulas_used: vec!["D = b^2 - 4ac".to_string(), "x = (-b +- \\sqrt{D}) / (2a)".to_string()],
+            given_data: vec![
+                format!("a = {}", a),
+                format!("b = {}", b),
+                format!("c = {}", c),
+            ],
+            formulas_used: vec![
+                "D = b^2 - 4ac".to_string(),
+                "x = (-b +- \\sqrt{D}) / (2a)".to_string(),
+            ],
             step_by_step_derivation: derivation,
             final_answer: answer,
         }
@@ -391,11 +441,24 @@ impl NcertStepByStepSolutionSolver {
         let det = a11 * a22 - a12 * a21;
         StepByStepSolution {
             problem_statement: format!("Calculate |[{}, {}; {}, {}]|", a11, a12, a21, a22),
-            given_data: vec![format!("Matrix A = [[{}, {}], [{}, {}]]", a11, a12, a21, a22)],
+            given_data: vec![format!(
+                "Matrix A = [[{}, {}], [{}, {}]]",
+                a11, a12, a21, a22
+            )],
             formulas_used: vec!["det(A) = a11*a22 - a12*a21".to_string()],
             step_by_step_derivation: vec![
-                format!("Multiply primary diagonal: {} * {} = {}", a11, a22, a11 * a22),
-                format!("Multiply secondary diagonal: {} * {} = {}", a12, a21, a12 * a21),
+                format!(
+                    "Multiply primary diagonal: {} * {} = {}",
+                    a11,
+                    a22,
+                    a11 * a22
+                ),
+                format!(
+                    "Multiply secondary diagonal: {} * {} = {}",
+                    a12,
+                    a21,
+                    a12 * a21
+                ),
                 format!("Subtract: {} - {} = {}", a11 * a22, a12 * a21, det),
             ],
             final_answer: format!("Determinant = {}", det),
@@ -411,9 +474,9 @@ impl NcertStepByStepSolutionSolver {
 pub struct StudentAssessmentEntry {
     pub student_roll_no: u32,
     pub student_name: String,
-    pub periodic_test_marks: f32, // Out of 10
+    pub periodic_test_marks: f32,       // Out of 10
     pub notebook_submission_marks: f32, // Out of 5
-    pub maths_lab_activity_marks: f32, // Out of 5
+    pub maths_lab_activity_marks: f32,  // Out of 5
 }
 
 pub struct NcertTeacherAnalyticsEngine {
@@ -432,9 +495,12 @@ impl NcertTeacherAnalyticsEngine {
     }
 
     pub fn calculate_internal_assessment_20_marks(&self, roll_no: u32) -> Option<f32> {
-        self.student_records.iter().find(|s| s.student_roll_no == roll_no).map(|s| {
-            s.periodic_test_marks + s.notebook_submission_marks + s.maths_lab_activity_marks
-        })
+        self.student_records
+            .iter()
+            .find(|s| s.student_roll_no == roll_no)
+            .map(|s| {
+                s.periodic_test_marks + s.notebook_submission_marks + s.maths_lab_activity_marks
+            })
     }
 
     pub fn compute_class_average_internal_marks(&self) -> f32 {
@@ -444,7 +510,9 @@ impl NcertTeacherAnalyticsEngine {
         let total: f32 = self
             .student_records
             .iter()
-            .map(|s| s.periodic_test_marks + s.notebook_submission_marks + s.maths_lab_activity_marks)
+            .map(|s| {
+                s.periodic_test_marks + s.notebook_submission_marks + s.maths_lab_activity_marks
+            })
             .sum();
         total / self.student_records.len() as f32
     }

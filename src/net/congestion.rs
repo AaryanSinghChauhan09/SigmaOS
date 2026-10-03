@@ -1,7 +1,7 @@
 // Congestion Control Algorithms
 // Inspired by Linux TCP congestion control (BBR, CUBIC, Reno, etc.)
 
-use std::sync::atomic::{AtomicU64, AtomicU32, Ordering};
+use std::sync::atomic::{AtomicU32, AtomicU64, Ordering};
 
 /// Congestion control algorithm type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -26,16 +26,16 @@ pub enum CongestionState {
 /// Congestion window
 #[derive(Debug, Clone)]
 pub struct CongestionWindow {
-    pub cwnd: u32,      // Congestion window (bytes)
-    pub ssthresh: u32,  // Slow start threshold
-    pub min_cwnd: u32,  // Minimum congestion window
-    pub max_cwnd: u32,  // Maximum congestion window
+    pub cwnd: u32,     // Congestion window (bytes)
+    pub ssthresh: u32, // Slow start threshold
+    pub min_cwnd: u32, // Minimum congestion window
+    pub max_cwnd: u32, // Maximum congestion window
 }
 
 impl CongestionWindow {
     pub fn new() -> Self {
         Self {
-            cwnd: 10 * 1460,  // Initial cwnd (10 MSS)
+            cwnd: 10 * 1460, // Initial cwnd (10 MSS)
             ssthresh: u32::MAX,
             min_cwnd: 2 * 1460,
             max_cwnd: u32::MAX,
@@ -91,7 +91,8 @@ impl RenoCongestionControl {
                     if self.cwnd.cwnd < self.cwnd.ssthresh {
                         self.cwnd.slow_start(acked_bytes);
                     } else {
-                        self.cwnd.increase(acked_bytes * acked_bytes / self.cwnd.cwnd);
+                        self.cwnd
+                            .increase(acked_bytes * acked_bytes / self.cwnd.cwnd);
                     }
                 }
                 CongestionState::Recovery => {
@@ -131,7 +132,7 @@ pub struct CubicCongestionControl {
     pub w_last_max: u32,
     pub epoch_start: u64,
     pub origin_point: u32,
-    pub c: f64,  // CUBIC parameter
+    pub c: f64, // CUBIC parameter
 }
 
 impl CubicCongestionControl {
@@ -148,7 +149,7 @@ impl CubicCongestionControl {
 
     /// Calculate CUBIC window
     fn cubic_cwnd(&self, time_since_epoch: u64) -> u32 {
-        let t = time_since_epoch as f64 / 1000.0;  // Convert to seconds
+        let t = time_since_epoch as f64 / 1000.0; // Convert to seconds
         let delta = (self.c * t.powi(3)).powf(1.0 / 3.0);
         (self.origin_point as f64 + delta) as u32
     }
@@ -224,7 +225,7 @@ impl BbrCongestionControl {
     pub fn update_pacing_rate(&mut self) {
         // BBR uses BDP * gain
         let bdp = (self.max_bw * self.min_rtt as u64) / 1000;
-        self.pacing_rate = bdp * 3 / 2;  // 1.5x gain
+        self.pacing_rate = bdp * 3 / 2; // 1.5x gain
     }
 
     /// On ACK received
@@ -234,7 +235,7 @@ impl BbrCongestionControl {
 
         // BBR adjusts cwnd based on BDP
         let bdp = (self.max_bw * self.min_rtt as u64) / 1000;
-        self.cwnd.cwnd = bdp as u32 * 2;  // 2x BDP
+        self.cwnd.cwnd = bdp as u32 * 2; // 2x BDP
     }
 
     /// Get current cwnd

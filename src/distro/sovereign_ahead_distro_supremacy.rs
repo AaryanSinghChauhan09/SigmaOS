@@ -21,10 +21,7 @@
 // 7. SovereignAheadOfDistrosSuite: Master coordinator orchestrating all 6 innovation engines to verify complete,
 //    unbroken system dominance over legacy Linux & BSD distros.
 
-
-
 use std::collections::BTreeMap;
-use std::string::{String, ToString};
 use std::vec::Vec;
 
 // ============================================================================
@@ -78,7 +75,13 @@ impl SovereignPredictiveSchedExtEngine {
         }
     }
 
-    pub fn register_task(&mut self, pid: usize, name: &str, initial_latency_us: u64, numa_node_id: u32) {
+    pub fn register_task(
+        &mut self,
+        pid: usize,
+        name: &str,
+        initial_latency_us: u64,
+        numa_node_id: u32,
+    ) {
         let task = PredictiveTaskDescriptor {
             pid,
             name: name.to_string(),
@@ -196,7 +199,8 @@ impl SovereignOmniCasStoreEngine {
     pub fn register_cas_blob(&mut self, package_name: &str, payload: &[u8]) -> String {
         let hash = Self::compute_fnv1a_hash(payload);
         self.cas_blobs.insert(hash.clone(), payload.to_vec());
-        self.merkle_roots.insert(package_name.to_string(), hash.clone());
+        self.merkle_roots
+            .insert(package_name.to_string(), hash.clone());
         hash
     }
 
@@ -211,12 +215,17 @@ impl SovereignOmniCasStoreEngine {
             .cloned()
             .ok_or("Package not registered in CAS store")?;
 
-        let mut new_payload = self.cas_blobs.get(&current_hash).cloned().unwrap_or_default();
+        let mut new_payload = self
+            .cas_blobs
+            .get(&current_hash)
+            .cloned()
+            .unwrap_or_default();
         new_payload.extend_from_slice(delta_payload);
 
         let new_hash = Self::compute_fnv1a_hash(&new_payload);
         self.cas_blobs.insert(new_hash.clone(), new_payload);
-        self.merkle_roots.insert(package_name.to_string(), new_hash.clone());
+        self.merkle_roots
+            .insert(package_name.to_string(), new_hash.clone());
 
         self.delta_patches.push(MicroDeltaPatch {
             target_package: package_name.to_string(),
@@ -313,23 +322,23 @@ impl SovereignCrossPlatformCapabilityEngine {
         for rule in &self.rules {
             if rule.allow_read {
                 landlock_flags |= 1 << 0; // FS_READ
-                capsicum_mask |= 1 << 0;  // CAP_READ
+                capsicum_mask |= 1 << 0; // CAP_READ
                 pledges.push("rpath");
             }
             if rule.allow_write {
                 landlock_flags |= 1 << 1; // FS_WRITE
-                capsicum_mask |= 1 << 1;  // CAP_WRITE
+                capsicum_mask |= 1 << 1; // CAP_WRITE
                 pledges.push("wpath");
                 pledges.push("cpath");
             }
             if rule.allow_execute {
                 landlock_flags |= 1 << 2; // FS_EXEC
-                capsicum_mask |= 1 << 2;  // CAP_EXEC
+                capsicum_mask |= 1 << 2; // CAP_EXEC
                 pledges.push("exec");
             }
             if rule.resource_identifier.starts_with("net:") {
                 landlock_flags |= 1 << 3; // NET_BIND / CONNECT
-                capsicum_mask |= 1 << 3;  // CAP_SOCK
+                capsicum_mask |= 1 << 3; // CAP_SOCK
                 pledges.push("inet");
             }
         }
@@ -411,7 +420,12 @@ impl SovereignResilientHammer2Engine {
         hash
     }
 
-    pub fn write_block_crdt(&mut self, block_id: u64, revision: u64, data: &[u8]) -> Result<u64, &'static str> {
+    pub fn write_block_crdt(
+        &mut self,
+        block_id: u64,
+        revision: u64,
+        data: &[u8],
+    ) -> Result<u64, &'static str> {
         if self.is_emergency_read_only {
             return Err("Storage engine locked in emergency read-only mode");
         }
@@ -558,9 +572,8 @@ impl SovereignXdpCarpMeshEngine {
     }
 
     pub fn process_xdp_packet(&mut self, src_ip: [u8; 4], dst_ip: [u8; 4], port: u16) -> u64 {
-        let conn_hash = u64::from(src_ip[3])
-            ^ (u64::from(dst_ip[3]) << 8)
-            ^ (u64::from(port) << 16);
+        let conn_hash =
+            u64::from(src_ip[3]) ^ (u64::from(dst_ip[3]) << 8) ^ (u64::from(port) << 16);
 
         self.zero_copy_packets_processed += 1;
 
@@ -613,7 +626,9 @@ pub struct SovereignAheadOfDistrosSuite {
 impl SovereignAheadOfDistrosSuite {
     pub fn new() -> Self {
         Self {
-            predictive_sched: SovereignPredictiveSchedExtEngine::new(PredictiveSchedPolicy::ScxBpfland),
+            predictive_sched: SovereignPredictiveSchedExtEngine::new(
+                PredictiveSchedPolicy::ScxBpfland,
+            ),
             omni_cas_store: SovereignOmniCasStoreEngine::new(),
             cross_capability: SovereignCrossPlatformCapabilityEngine::new(),
             hammer2_storage: SovereignResilientHammer2Engine::new(),
@@ -625,7 +640,11 @@ impl SovereignAheadOfDistrosSuite {
     pub fn verify_unbroken_distro_dominance(&mut self) -> bool {
         let sched_ok = self.predictive_sched.active_policy == PredictiveSchedPolicy::ScxBpfland;
         let cas_ok = self.omni_cas_store.active_generation >= 1;
-        let cap_ok = !self.cross_capability.multi_os_mask.openbsd_pledge_token.is_empty();
+        let cap_ok = !self
+            .cross_capability
+            .multi_os_mask
+            .openbsd_pledge_token
+            .is_empty();
         let storage_ok = !self.hammer2_storage.is_emergency_read_only;
         let microarch_ok = self.microarch_tuner.detected_tier == MicroarchTier::X86_64V4;
         let mesh_ok = self.xdp_carp_mesh.is_master;
@@ -668,7 +687,9 @@ mod tests {
         let h1 = cas.register_cas_blob("kernel-core", b"KERNEL_BINARY_V1");
         assert!(h1.starts_with("sha256_"));
 
-        let h2 = cas.apply_micro_delta_patch("kernel-core", b"_HOTFIX1").unwrap();
+        let h2 = cas
+            .apply_micro_delta_patch("kernel-core", b"_HOTFIX1")
+            .unwrap();
         assert_ne!(h1, h2);
         assert_eq!(cas.total_hot_swaps, 1);
 
@@ -709,7 +730,10 @@ mod tests {
     fn test_universal_microarch_engine() {
         let mut tuner = SovereignUniversalMicroarchEngine::new(MicroarchTier::X86_64V4);
         assert!(tuner.register_simd_target("avx512_memcpy", MicroarchTier::X86_64V4));
-        assert_eq!(tuner.execute_hot_path("avx512_memcpy"), Some(MicroarchTier::X86_64V4));
+        assert_eq!(
+            tuner.execute_hot_path("avx512_memcpy"),
+            Some(MicroarchTier::X86_64V4)
+        );
     }
 
     #[test]

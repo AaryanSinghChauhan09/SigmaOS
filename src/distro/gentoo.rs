@@ -1,5 +1,4 @@
 use std::format;
-use std::string::{String, ToString};
 use std::vec;
 use std::vec::Vec;
 // SigmaOS Source-Build Layer / USE Flag System (Gentoo/Portage Parity Shard)
@@ -9,8 +8,8 @@ use std::vec::Vec;
 // accept_keywords architecture evaluation, Manifest distfile digest verification,
 // OpenRC runlevel dependency supervision, and Catalyst stage compilation.
 
-use crate::klib::hashset::HashSet;
 use crate::klib::btreemap::BTreeMap;
+use crate::klib::hashset::HashSet;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Version {
     pub major: u64,
@@ -25,6 +24,340 @@ impl Version {
             minor,
             patch,
         }
+    }
+}
+
+// ============================================================================
+// 6. Gentoo `eselect` Module System Target Switcher Engine
+// ============================================================================
+
+/// `eselect` Module Categories
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum EselectModule {
+    Profile,
+    Kernel,
+    Rust,
+    Python,
+    JavaVm,
+}
+
+/// Active `eselect` Selection Record
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct EselectTarget {
+    pub number: usize,
+    pub name: String,
+    pub is_active: bool,
+}
+
+/// Gentoo `eselect` System Target Switcher
+pub struct GentooEselectManager {
+    pub modules: BTreeMap<String, Vec<EselectTarget>>,
+}
+
+impl GentooEselectManager {
+    pub fn new() -> Self {
+        let mut modules = BTreeMap::new();
+
+        modules.insert(
+            "profile".to_string(),
+            vec![
+                EselectTarget {
+                    number: 1,
+                    name: "default/linux/amd64/23.0 (stable)".to_string(),
+                    is_active: true,
+                },
+                EselectTarget {
+                    number: 2,
+                    name: "default/linux/amd64/23.0/desktop/gnome (stable)".to_string(),
+                    is_active: false,
+                },
+                EselectTarget {
+                    number: 3,
+                    name: "default/linux/amd64/23.0/hardened (stable)".to_string(),
+                    is_active: false,
+                },
+            ],
+        );
+
+        modules.insert(
+            "kernel".to_string(),
+            vec![
+                EselectTarget {
+                    number: 1,
+                    name: "linux-6.6.13-gentoo".to_string(),
+                    is_active: true,
+                },
+                EselectTarget {
+                    number: 2,
+                    name: "linux-6.8.0-gentoo".to_string(),
+                    is_active: false,
+                },
+            ],
+        );
+
+        modules.insert(
+            "rust".to_string(),
+            vec![
+                EselectTarget {
+                    number: 1,
+                    name: "rust-bin-1.75.0".to_string(),
+                    is_active: false,
+                },
+                EselectTarget {
+                    number: 2,
+                    name: "rust-1.76.0".to_string(),
+                    is_active: true,
+                },
+            ],
+        );
+
+        Self { modules }
+    }
+
+    /// List available targets for a given `eselect` module
+    pub fn list_targets(&self, module_name: &str) -> Option<&Vec<EselectTarget>> {
+        self.modules.get(module_name)
+    }
+
+    /// Set the active target for a given `eselect` module
+    pub fn set_target(
+        &mut self,
+        module_name: &str,
+        target_number: usize,
+    ) -> Result<String, &'static str> {
+        let targets = self
+            .modules
+            .get_mut(module_name)
+            .ok_or("Module not found")?;
+
+        let mut target_name = String::new();
+        let mut found = false;
+
+        for t in targets.iter_mut() {
+            if t.number == target_number {
+                t.is_active = true;
+                target_name = t.name.clone();
+                found = true;
+            } else {
+                t.is_active = false;
+            }
+        }
+
+        if found {
+            Ok(format!(
+                "Switched eselect module '{}' target to [{}]",
+                module_name, target_name
+            ))
+        } else {
+            Err("Target number out of range")
+        }
+    }
+}
+
+impl Default for GentooEselectManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 8. Gentoo Layman Third-Party Ebuild Overlay Repository Manager
+// ============================================================================
+
+/// Ebuild Overlay Repository Record (`layman` / `eselect repository`)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct LaymanOverlay {
+    pub name: String,
+    pub repository_url: String,
+    pub sync_type: String, // "git", "rsync", "tar"
+    pub priority: i32,
+    pub is_enabled: bool,
+    pub total_ebuilds: usize,
+}
+
+/// Gentoo Layman Overlay Repository Manager
+pub struct GentooLaymanOverlayManager {
+    pub overlays: BTreeMap<String, LaymanOverlay>,
+}
+
+impl GentooLaymanOverlayManager {
+    pub fn new() -> Self {
+        let mut manager = Self {
+            overlays: BTreeMap::new(),
+        };
+
+        manager.add_overlay("guru", "https://github.com/gentoo/guru.git", "git", 50);
+        manager.add_overlay("science", "https://github.com/gentoo/sci.git", "git", 30);
+        manager.add_overlay(
+            "steam-overlay",
+            "https://github.com/anyc/steam-overlay.git",
+            "git",
+            20,
+        );
+
+        manager
+    }
+
+    /// Add a third-party ebuild overlay repository
+    pub fn add_overlay(&mut self, name: &str, url: &str, sync_type: &str, priority: i32) {
+        self.overlays.insert(
+            name.to_string(),
+            LaymanOverlay {
+                name: name.to_string(),
+                repository_url: url.to_string(),
+                sync_type: sync_type.to_string(),
+                priority,
+                is_enabled: true,
+                total_ebuilds: 250,
+            },
+        );
+    }
+
+    /// Synchronize all enabled layman overlays (`layman -s ALL`)
+    pub fn sync_all_overlays(&mut self) -> usize {
+        let mut synced_count = 0;
+        for overlay in self.overlays.values_mut() {
+            if overlay.is_enabled {
+                overlay.total_ebuilds += 10; // Simulate newly synced ebuilds
+                synced_count += 1;
+            }
+        }
+        synced_count
+    }
+
+    /// List active overlays ordered by priority
+    pub fn list_active_overlays(&self) -> Vec<&LaymanOverlay> {
+        let mut list: Vec<&LaymanOverlay> =
+            self.overlays.values().filter(|o| o.is_enabled).collect();
+        list.sort_by(|a, b| b.priority.cmp(&a.priority));
+        list
+    }
+}
+
+impl Default for GentooLaymanOverlayManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 7. Gentoo `etc-update` & `dispatch-conf` Protected Config Merge Engine
+// ============================================================================
+
+/// Action choice for protected configuration file updates (`._cfg0000_*`)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ConfigMergeAction {
+    ReplaceWithNew,
+    KeepCurrent,
+    AutoMergeDiff,
+}
+
+/// Protected Configuration File Record
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ProtectedConfigUpdate {
+    pub target_file_path: String,
+    pub cfg_update_file_path: String,
+    pub current_content: String,
+    pub new_content: String,
+    pub is_merged: bool,
+}
+
+/// Gentoo `etc-update` / `dispatch-conf` 3-Way Config Merge Engine
+pub struct GentooEtcUpdateEngine {
+    pub pending_updates: Vec<ProtectedConfigUpdate>,
+}
+
+impl GentooEtcUpdateEngine {
+    pub fn new() -> Self {
+        Self {
+            pending_updates: Vec::new(),
+        }
+    }
+
+    /// Register a protected configuration file requiring update (`._cfg0000_*`)
+    pub fn register_pending_update(
+        &mut self,
+        target_path: &str,
+        cfg_path: &str,
+        current: &str,
+        new_cfg: &str,
+    ) {
+        self.pending_updates.push(ProtectedConfigUpdate {
+            target_file_path: target_path.to_string(),
+            cfg_update_file_path: cfg_path.to_string(),
+            current_content: current.to_string(),
+            new_content: new_cfg.to_string(),
+            is_merged: false,
+        });
+    }
+
+    /// Computes 3-way line diff summary between current configuration and new update
+    pub fn compute_config_diff(&self, target_path: &str) -> Option<String> {
+        let update = self
+            .pending_updates
+            .iter()
+            .find(|u| u.target_file_path == target_path)?;
+
+        let mut diff = String::new();
+        diff.push_str(&format!("--- {}\n", update.target_file_path));
+        diff.push_str(&format!("+++ {}\n", update.cfg_update_file_path));
+
+        let current_lines: Vec<&str> = update.current_content.lines().collect();
+        let new_lines: Vec<&str> = update.new_content.lines().collect();
+
+        for line in &current_lines {
+            if !new_lines.contains(line) {
+                diff.push_str(&format!("- {}\n", line));
+            }
+        }
+        for line in &new_lines {
+            if !current_lines.contains(line) {
+                diff.push_str(&format!("+ {}\n", line));
+            } else {
+                diff.push_str(&format!("  {}\n", line));
+            }
+        }
+
+        Some(diff)
+    }
+
+    /// Resolves pending configuration update based on selected action
+    pub fn resolve_update(
+        &mut self,
+        target_path: &str,
+        action: ConfigMergeAction,
+    ) -> Result<String, &'static str> {
+        let update = self
+            .pending_updates
+            .iter_mut()
+            .find(|u| u.target_file_path == target_path)
+            .ok_or("Config update not found")?;
+
+        let merged_content = match action {
+            ConfigMergeAction::ReplaceWithNew => update.new_content.clone(),
+            ConfigMergeAction::KeepCurrent => update.current_content.clone(),
+            ConfigMergeAction::AutoMergeDiff => {
+                let mut merged = update.current_content.clone();
+                for line in update.new_content.lines() {
+                    if !merged.contains(line) {
+                        merged.push('\n');
+                        merged.push_str(line);
+                    }
+                }
+                merged
+            }
+        };
+
+        update.current_content = merged_content.clone();
+        update.is_merged = true;
+
+        Ok(merged_content)
+    }
+}
+
+impl Default for GentooEtcUpdateEngine {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -718,7 +1051,7 @@ impl GentooCatalystStageBuilder {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -884,5 +1217,54 @@ mod tests {
         assert!(s1.contains("Stage 1"));
         assert!(s3.contains("stage3-x86_64-v3"));
         assert!(iso.contains("gentoo-live-x86_64-v3.iso"));
+    }
+
+    #[test]
+    fn test_gentoo_eselect_manager() {
+        let mut eselect = GentooEselectManager::new();
+        assert!(eselect.list_targets("profile").is_some());
+        let res = eselect.set_target("profile", 2);
+        assert!(res.is_ok());
+        let targets = eselect.list_targets("profile").unwrap();
+        assert!(targets[1].is_active);
+        assert!(!targets[0].is_active);
+    }
+
+    #[test]
+    fn test_gentoo_etc_update_engine() {
+        let mut etc_update = GentooEtcUpdateEngine::new();
+        etc_update.register_pending_update(
+            "/etc/portage/make.conf",
+            "/etc/portage/._cfg0000_make.conf",
+            "USE=\"ssl X\"\nCFLAGS=\"-O2\"",
+            "USE=\"ssl X wayland\"\nCFLAGS=\"-O3 -march=native\"",
+        );
+
+        let diff = etc_update.compute_config_diff("/etc/portage/make.conf");
+        assert!(diff.is_some());
+        assert!(diff.unwrap().contains("- USE=\"ssl X\""));
+
+        let merged =
+            etc_update.resolve_update("/etc/portage/make.conf", ConfigMergeAction::ReplaceWithNew);
+        assert!(merged.is_ok());
+        assert!(merged.unwrap().contains("wayland"));
+    }
+
+    #[test]
+    fn test_gentoo_layman_overlay_manager() {
+        let mut layman = GentooLaymanOverlayManager::new();
+        assert_eq!(layman.list_active_overlays().len(), 3);
+
+        layman.add_overlay(
+            "flatpak-overlay",
+            "https://github.com/gentoo/flatpak.git",
+            "git",
+            40,
+        );
+        let synced = layman.sync_all_overlays();
+        assert_eq!(synced, 4);
+
+        let active = layman.list_active_overlays();
+        assert_eq!(active[0].name, "guru"); // Priority 50
     }
 }

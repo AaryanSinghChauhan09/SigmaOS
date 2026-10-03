@@ -3,8 +3,7 @@
 // Implements capability-gated logging, memory auditing, and PQC attestation
 // Enhanced with real enforcement capabilities for Linux/BSD parity
 
-
-use core::sync::atomic::{AtomicU32, AtomicU64, AtomicBool, AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicBool, AtomicU32, AtomicU64, AtomicUsize, Ordering};
 
 /// Audit log entry types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -64,7 +63,8 @@ impl MemoryAuditShard {
         let violations = self.walk_page_tables();
 
         self.wwx_violations.store(violations, Ordering::SeqCst);
-        self.violations_detected.fetch_add(violations, Ordering::SeqCst);
+        self.violations_detected
+            .fetch_add(violations, Ordering::SeqCst);
         self.last_scan_time.store(current_time, Ordering::SeqCst);
 
         violations == 0
@@ -121,7 +121,10 @@ impl MemoryAuditShard {
     }
 
     pub fn get_violation_stats(&self) -> (u32, u32) {
-        (self.violations_detected.load(Ordering::SeqCst), self.wwx_violations.load(Ordering::SeqCst))
+        (
+            self.violations_detected.load(Ordering::SeqCst),
+            self.wwx_violations.load(Ordering::SeqCst),
+        )
     }
 }
 
@@ -185,7 +188,8 @@ impl SandboxAuditShard {
     pub fn set_process_pledges(&self, process_id: usize, _permissions: u64) {
         let bit = 1u64 << (process_id % 64);
         let current = self.process_pledge_table.load(Ordering::SeqCst);
-        self.process_pledge_table.store(current | bit, Ordering::SeqCst);
+        self.process_pledge_table
+            .store(current | bit, Ordering::SeqCst);
     }
 
     fn get_process_pledges(&self, process_id: usize) -> u64 {
@@ -225,7 +229,10 @@ impl SandboxAuditShard {
     }
 
     pub fn get_stats(&self) -> (u32, u32) {
-        (self.blocked_syscalls.load(Ordering::SeqCst), self.pledge_violations.load(Ordering::SeqCst))
+        (
+            self.blocked_syscalls.load(Ordering::SeqCst),
+            self.pledge_violations.load(Ordering::SeqCst),
+        )
     }
 }
 
@@ -294,7 +301,10 @@ impl CryptoAuditShard {
     }
 
     pub fn get_stats(&self) -> (u32, u32) {
-        (self.signed_entries.load(Ordering::SeqCst), self.signature_failures.load(Ordering::SeqCst))
+        (
+            self.signed_entries.load(Ordering::SeqCst),
+            self.signature_failures.load(Ordering::SeqCst),
+        )
     }
 }
 
@@ -335,7 +345,10 @@ impl AuditCollectorBus {
 
         let test_process_id = 1;
         let test_permissions = 0x7;
-        if !self.sandbox_shard.check_pledge_compliance(test_process_id, test_permissions) {
+        if !self
+            .sandbox_shard
+            .check_pledge_compliance(test_process_id, test_permissions)
+        {
             return false;
         }
 
@@ -351,7 +364,8 @@ impl AuditCollectorBus {
         }
 
         self.audit_cycles_run.fetch_add(1, Ordering::SeqCst);
-        self.last_cycle_time.store(self.get_current_time(), Ordering::SeqCst);
+        self.last_cycle_time
+            .store(self.get_current_time(), Ordering::SeqCst);
 
         true
     }

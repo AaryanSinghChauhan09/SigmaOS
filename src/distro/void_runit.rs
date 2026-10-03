@@ -5,11 +5,7 @@
  * health checking, and automatic restart policy governance.
  */
 
-
-
-
 use std::collections::BTreeMap;
-use std::string::String;
 use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
@@ -22,7 +18,6 @@ pub enum RunitStage {
 
 pub type ServiceState = RunitServiceStatus;
 
-
 /// Runit Service Status
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum RunitServiceStatus {
@@ -33,7 +28,6 @@ pub enum RunitServiceStatus {
     Stopping,
     Failed,
 }
-
 
 /// Runit Service Definition
 #[derive(Debug, Clone)]
@@ -146,16 +140,13 @@ impl RunitSupervisor {
         self.current_stage_num = 2;
 
         let mut started = Vec::new();
+
         let names: Vec<String> = self.services.keys().cloned().collect();
-        loop {
-            let mut progress = false;
-            for name in &names {
-                if !started.contains(name) && self.can_start_service(name, &started) {
-                    if let Some(s) = self.services.get_mut(name) {
-                        s.start();
-                        started.push(name.clone());
-                        progress = true;
-                    }
+        for name in names {
+            if self.can_start_service(&name, &started) {
+                if let Some(s) = self.services.get_mut(&name) {
+                    s.start();
+                    started.push(name.clone());
                 }
             }
             if !progress {
@@ -170,16 +161,13 @@ impl RunitSupervisor {
         self.current_stage_num = 3;
 
         let mut stopped = Vec::new();
+
         let names: Vec<String> = self.services.keys().cloned().collect();
-        loop {
-            let mut progress = false;
-            for name in &names {
-                if !stopped.contains(name) && self.can_stop_service(name, &stopped) {
-                    if let Some(s) = self.services.get_mut(name) {
-                        s.stop();
-                        stopped.push(name.clone());
-                        progress = true;
-                    }
+        for name in names {
+            if self.can_stop_service(&name, &stopped) {
+                if let Some(s) = self.services.get_mut(&name) {
+                    s.stop();
+                    stopped.push(name.clone());
                 }
             }
             if !progress {

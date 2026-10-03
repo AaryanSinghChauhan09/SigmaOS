@@ -1,11 +1,13 @@
 // SigmaOS Drivers Module
-pub mod serial;
-pub mod rtc;
+pub mod acpi;
+pub mod ata_bus_controller;
+pub mod block_io;
 pub mod boot_init;
 pub mod dde;
 pub mod distro_device_expansion;
 pub mod even_more_devices;
 pub mod flipper_gpio_sensor;
+pub mod framebuffer;
 pub mod gpu;
 pub mod input;
 pub mod legacy_audio_ac97;
@@ -18,38 +20,52 @@ pub mod modern_usb;
 pub mod modern_usb_printer;
 pub mod modern_wifi;
 pub mod network;
+pub mod pci_bus;
 pub mod peripheral;
-pub mod storage;
-pub mod touch_jingos;
 pub mod printing;
-pub mod usb_hid;
+pub mod rtc;
+pub mod rtc_cmos;
+pub mod serial;
+pub mod sovereign_comprehensive_drivers;
 pub mod sovereign_driver_lifecycle;
-pub mod vesa;
-pub mod ata_bus_controller;
 pub mod sovereign_hardware_expansion;
 pub mod sovereign_usb_xhci;
-pub mod sovereign_comprehensive_drivers;
+pub mod storage;
+pub mod touch_jingos;
+pub mod usb_hid;
+pub mod vesa;
+pub mod usb_stack;
+pub mod ethernet;
+pub mod wifi_80211;
+pub mod nvme_driver;
+pub mod ahci_sata;
+pub mod usb_hid;
+pub mod usb_mass_storage;
+pub mod usb_audio;
+pub mod usb_video;
+pub mod audio_intel_hda;
+pub mod drm_kms;
 
-pub use sovereign_comprehensive_drivers::*;
-pub use printing::{CupsIppPrintSpooler, LpdSpooler, PpdDriverMatcher, PrintJob, PrintJobState};
-
-pub use gpu::{GpuCommand, GpuDriver, GpuError};
+pub use gpu::{
+    GpuCommand, GpuCommandBuffer, GpuDriver, GpuError, GpuPipeline,
+    GpuResetState, GpuShader, ShaderStage,
+};
 pub use input::{InputDriver, InputEvent, InputType};
 pub use legacy_audio_ac97::LegacyAudioAc97;
 pub use legacy_keyboard::LegacyKeyboard;
 pub use legacy_parallel_printer::LegacyParallelPrinter;
+pub use linux_bsd_drivers::*;
 pub use linux_bsd_drivers::{
     AmdgpuDrmDriver, AmdgpuIpBlockType, AppleSiliconDartIommu, BroadcomBcmWifiDriver,
     BsdWgNetgraphHardwareDriver, DriverCapability, DrmAtomicKmsState, DrmConnectorType,
     DrmDisplayMode, EvdevEvent, EvdevEventType, EvdevInputDevice, FreeBsdDrmConnector,
-    IntelIgcEthernetDriver, IntelXeDrmDriver, LinuxIioImuSensorDriver, LinuxUrb,
-    LinuxUrbQueue, LsiMegaRaidHbaDriver, MultiTouchSlot, NetBsdRumpDriverHost,
-    NvidiaNouveauGpuDriver, OpenBsdDriverPledge, QualcommAdrenoMaliGpuDriver, RaidLevel,
-    RealtekR8169EthernetDriver, RpiBcmSocDriver, SdhciEmmcStorageDriver, SensorReadings,
-    SovereignDeviceManager, SovereignWirelessCardDriver, ThunderboltSecurityLevel,
-    ThunderboltUsb4Driver, Uac2AudioDriver, UrbTransferType, UvcCameraDriver,
-    VideoPixelFormat, VirtioGpu3dDriver, VirtioSoundDriver, WacomPrecisionTouchpadDriver,
-    WifiMode,
+    IntelIgcEthernetDriver, IntelXeDrmDriver, LinuxIioImuSensorDriver, LinuxUrb, LinuxUrbQueue,
+    LsiMegaRaidHbaDriver, MultiTouchSlot, NetBsdRumpDriverHost, NvidiaNouveauGpuDriver,
+    OpenBsdDriverPledge, QualcommAdrenoMaliGpuDriver, RaidLevel, RealtekR8169EthernetDriver,
+    RpiBcmSocDriver, SdhciEmmcStorageDriver, SensorReadings, SovereignDeviceManager,
+    SovereignWirelessCardDriver, ThunderboltSecurityLevel, ThunderboltUsb4Driver, Uac2AudioDriver,
+    UrbTransferType, UvcCameraDriver, VideoPixelFormat, VirtioGpu3dDriver, VirtioSoundDriver,
+    WacomPrecisionTouchpadDriver, WifiMode,
 };
 pub use modern_audio_intel_hda::*;
 pub use modern_nvme::*;
@@ -58,36 +74,50 @@ pub use modern_usb_printer::ModernUsbPrinterDriver;
 pub use modern_wifi::*;
 pub use network::{NetworkCommand, NetworkDriver, NetworkError, NetworkType};
 pub use peripheral::{DeviceGeneration, PeripheralDevice, PeripheralManager, PowerState};
-pub use storage::{StorageCommand, StorageDriver, StorageError, StorageType};
-pub use linux_bsd_drivers::*;
 pub use sovereign_driver_lifecycle::{
     ClusterAwarePeripheralManager, CommunityDriverRegistry, CrossOsDriverShim,
     DeclarativeDriverProfile, DeclarativeHardwareResolver, DriverShard, DriverShardManager,
-    FirmwareType, IoBusType, ProgrammableIoStack, SandboxedHardwareModule,
-    SignedDriverPackage, SovereignDriverLifecycleState, SovereignDriverManager,
-    SovereignModularDeviceSupportEngine, TargetOsOrigin, UniversalFirmwareBridge,
-};
-pub use usb_hid::{HidError, HidKeyboardEvent, HidReportType, UsbHidDriver};
-pub use vesa::{VesaDriver, VesaError, VesaModeInfo};
-pub use ata_bus_controller::{
-    AhciNcqSlot, AtaBusControllerEngine, AtaBusType, AtaCommand, AtaDeviceIdentity, AtapiPacketCdb12,
-    AtapiPacketDispatcher, IdeBusMasterDmaEngine, IdeChannel, IdeDriveSelect, IdePioTransferEngine, IdePrdEntry,
-    AHCI_MAX_NCQ_TAGS, ATA_SECTOR_SIZE_BYTES, ATA_STATUS_BSY, ATA_STATUS_DF, ATA_STATUS_DRQ, ATA_STATUS_DRDY,
-    ATA_STATUS_ERR,
+    FirmwareType, IoBusType, ProgrammableIoStack, SandboxedHardwareModule, SignedDriverPackage,
+    SovereignDriverLifecycleState, SovereignDriverManager, SovereignModularDeviceSupportEngine,
+    TargetOsOrigin, UniversalFirmwareBridge,
 };
 pub use sovereign_hardware_expansion::{
     ExpandedHardwareClass, HardwareDriverState, SovereignHardwareDriverExpansionEngine,
 };
 pub use sovereign_usb_xhci::{
-    SovereignXhciTrb, SovereignXhciTrbType, SovereignXhciUsb3Driver, UsbDeviceSlotContext, UsbEndpointSpeed,
-    XHCI_MAX_PORTS, XHCI_MAX_SLOTS, XHCI_TRB_RING_SIZE,
+    SovereignXhciTrb, SovereignXhciTrbType, SovereignXhciUsb3Driver, UsbDeviceSlotContext,
+    UsbEndpointSpeed, XHCI_MAX_PORTS, XHCI_MAX_SLOTS, XHCI_TRB_RING_SIZE,
+};
+pub use storage::{StorageCommand, StorageDriver, StorageError, StorageType};
+pub use usb_hid::{HidError, HidKeyboardEvent, HidReportType, UsbHidDriver};
+pub use vesa::{VesaDriver, VesaError, VesaModeInfo};
+pub use modern_audio_intel_hda::ModernAudioIntelHda;
+pub use modern_nvme::ModernNvmeDriver;
+pub use modern_wifi::ModernWifiDriver;
+pub use touch_jingos::TouchJingosDriver;
+pub mod ethernet;
+pub mod wifi_80211;
+
+pub use usb_stack::{
+    UsbDevice, UsbDeviceDescriptor, UsbSpeed, UsbDeviceState, UsbHostController,
+    UsbSetupPacket, UsbEnumerator, UsbError, UsbTransferType, UsbDirection,
+};
+pub use ethernet::{
+    EthernetFrame, EthernetHeader, MacAddr, EtherType, NetDevice, NetDevStats,
+    E1000Device, EthernetError,
+};
+pub use wifi_80211::{
+    WifiDriver, WifiMode, WifiSecurity, WifiBand, WifiChannel, WifiStandard,
+    ChannelWidth, BssInfo, StationInfo, ScanRequest, ConnectParams,
+    WifiCapabilities, WifiError, Dot11Header, FrameType,
+};
+pub use nvme_driver::{
+    NvmeController, NvmeQueuePair, NvmeSQEntry, NvmeCQEntry, NvmeNamespace,
+    NvmeAdminOpcode, NvmeIOOpcode, NvmeError,
 };
 
-pub use distro_device_expansion::*;
-
-pub mod sovereign_sound_hda_synthesis;
-pub use sovereign_sound_hda_synthesis::*;
-
-pub mod sovereign_distro_driver_suite;
-pub use sovereign_distro_driver_suite::*;
-pub mod rump_kernel;
+pub mod nvme_driver;
+pub use nvme_driver::{
+    NvmeController, NvmeQueuePair, NvmeSQEntry, NvmeCQEntry, NvmeNamespace,
+    NvmeAdminOpcode, NvmeIOOpcode, NvmeError,
+};

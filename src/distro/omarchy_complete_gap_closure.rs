@@ -1,7 +1,6 @@
 // SigmaOS Omarchy Complete Gap Closure Engine
 // Zero-dependency Rust implementation covering automated dotfile git sync, Hyprland bezier animation matrix, Neovim Treesitter/LSP Mason manager, and Kitty/Starship/Fastfetch theme presets.
 
-use std::string::String;
 use crate::klib::vec::Vec;
 
 /// Dotfile Git Sync Repository State
@@ -105,7 +104,9 @@ impl OmarchyNeovimTreesitterLspEngine {
     }
 
     pub fn is_lsp_available(&self, server: &str) -> bool {
-        self.installed_servers.iter().any(|s| s.server_name == server && s.is_installed)
+        self.installed_servers
+            .iter()
+            .any(|s| s.server_name == server && s.is_installed)
     }
 }
 
@@ -161,7 +162,9 @@ pub struct SovereignOmarchyCompleteGapClosureSuite {
 impl SovereignOmarchyCompleteGapClosureSuite {
     pub fn new() -> Self {
         Self {
-            dotfile_sync: OmarchyDotfileGitSyncEngine::new("https://github.com/omarchy/omarchy.git"),
+            dotfile_sync: OmarchyDotfileGitSyncEngine::new(
+                "https://github.com/omarchy/omarchy.git",
+            ),
             hypr_anim: OmarchyHyprlandAnimMatrixEngine::new(),
             neovim_lsp: OmarchyNeovimTreesitterLspEngine::new(),
             terminal_theme: OmarchyTerminalFastfetchThemeEngine::new(),

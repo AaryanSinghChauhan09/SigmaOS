@@ -2,16 +2,13 @@
 // Zero-dependency Rust #![no_std] / std implementation of automated system diagnostics & auto-repair.
 
 #[cfg(not(test))]
-use alloc::format;
 #[cfg(not(test))]
 use alloc::string::{String, ToString};
 #[cfg(not(test))]
 use alloc::vec::Vec;
 
 #[cfg(test)]
-use std::string::String;
 #[cfg(test)]
-use std::vec::Vec;
 
 /// Diagnostic Audit Status
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

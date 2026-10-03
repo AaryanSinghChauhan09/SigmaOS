@@ -1,12 +1,19 @@
 extern crate alloc;
 
 use alloc::boxed::Box;
+// use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
 
-// Zero-dependency architecture: Use klib primitives for no_std compatibility
+#[cfg(not(any(feature = "standalone_test", test)))]
+use crate::klib::collections::HashMap;
+#[cfg(any(feature = "standalone_test", test))]
 use std::collections::{HashMap, HashSet};
+#[cfg(any(feature = "standalone_test", test))]
 use std::sync::Arc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
@@ -68,6 +75,21 @@ pub mod node_distribution_dummy {
 #[cfg(any(feature = "standalone_test", test))]
 pub use node_distribution_dummy::*;
 
+/// Case-insensitive substring search without heap allocation for ASCII text.
+#[inline]
+fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
+    if haystack.is_ascii() && needle.is_ascii() {
+        needle.is_empty()
+            || (needle.len() <= haystack.len()
+                && haystack
+                    .as_bytes()
+                    .windows(needle.len())
+                    .any(|window| window.eq_ignore_ascii_case(needle.as_bytes())))
+    } else {
+        haystack.to_lowercase().contains(&needle.to_lowercase())
+    }
+}
+
 /// Foreign distro manifest
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ForeignDistroManifest {
@@ -85,35 +107,63 @@ pub struct ForeignDistroManifest {
 pub struct UniversalPackageTranslator;
 
 impl UniversalPackageTranslator {
-    pub fn translate_to_sigma_pkg(manifest: &ForeignDistroManifest) -> UnifiedPackage {
-        let mut pkg = UnifiedPackage::new(
-            format!("sigpkg-{}", manifest.original_name),
-            manifest.version.clone(),
-        )
-        .with_format(PackageFormat::SigmaPkg)
-        .with_provides(manifest.original_name.clone());
+    pub fn translate_apt_deb(manifest: &ForeignDistroManifest) -> UnifiedPackage {
+        Self::translate_base_manifest(manifest, "apt-deb")
+    }
+
+    pub fn translate_pacman_pkg(manifest: &ForeignDistroManifest) -> UnifiedPackage {
+        Self::translate_base_manifest(manifest, "pacman")
+    }
+
+    pub fn translate_dnf_rpm(manifest: &ForeignDistroManifest) -> UnifiedPackage {
+        Self::translate_base_manifest(manifest, "dnf-rpm")
+    }
+
+    pub fn translate_alpine_apk(manifest: &ForeignDistroManifest) -> UnifiedPackage {
+        Self::translate_base_manifest(manifest, "alpine-apk")
+    }
+
+    pub fn translate_void_xbps(manifest: &ForeignDistroManifest) -> UnifiedPackage {
+        Self::translate_base_manifest(manifest, "void-xbps")
+    }
+
+    pub fn translate_freebsd_pkg(manifest: &ForeignDistroManifest) -> UnifiedPackage {
+        Self::translate_base_manifest(manifest, "freebsd-pkg")
+    }
+
+    fn translate_base_manifest(manifest: &ForeignDistroManifest, prefix: &str) -> UnifiedPackage {
+        let pkg_name = if prefix.is_empty() {
+            format!("sigpkg-{}", manifest.original_name)
+        } else {
+            format!("sigpkg-{}-{}", prefix, manifest.original_name)
+        };
+        let mut pkg = UnifiedPackage::new(pkg_name, manifest.version.clone())
+            .with_format(PackageFormat::SigmaPkg)
+            .with_provides(manifest.original_name.clone());
 
         for dep in manifest.raw_dependencies.iter() {
             let dep_str: &str = dep.as_str();
             let translated_dep: &str = match dep_str {
                 "libssl-dev" | "openssl-devel" | "openssl" => "sovereign-openssl",
-                "libc6" => "sovereign-libc",
+                "libc6" | "glibc" | "musl" => "sovereign-libc",
                 other => debtor_to_sovereign_name(other),
             };
             pkg = pkg.with_dependency(translated_dep.to_string());
         }
 
         for prov in manifest.raw_provides.iter() {
-            let prov_str: String = prov.clone();
-            pkg = pkg.with_provides(prov_str);
+            pkg = pkg.with_provides(prov.clone());
         }
 
         for conf in manifest.raw_conflicts.iter() {
-            let conf_str: String = conf.clone();
-            pkg = pkg.with_conflict(conf_str);
+            pkg = pkg.with_conflict(conf.clone());
         }
 
         pkg
+    }
+
+    pub fn translate_to_sigma_pkg(manifest: &ForeignDistroManifest) -> UnifiedPackage {
+        Self::translate_base_manifest(manifest, "")
     }
 }
 
@@ -390,10 +440,9 @@ impl DistroRepoSyncEngine {
     }
 
     pub fn search_indexed_manifests(&self, query: &str) -> Vec<UnifiedPackage> {
-        let query_lower = query.to_lowercase();
         self.indexed_manifests
             .values()
-            .filter(|m| m.original_name.to_lowercase().contains(&query_lower))
+            .filter(|m| contains_ignore_case(&m.original_name, query))
             .map(UniversalPackageTranslator::translate_to_sigma_pkg)
             .collect()
     }
@@ -517,23 +566,23 @@ pub enum PackageFormat {
     Cabal,       // Haskell Cabal package (.cabal)
     JuliaPkg,    // Julia package (.jl)
     CRan,        // R CRAN package (.rpkg)
-    Brew,           // Homebrew formula (.brew)
-    Wasm,           // WebAssembly component (.wasm)
-    Oci,            // OCI container image (.oci)
-    Tazpkg,         // SliTaz Linux package (.tazpkg)
-    SingularitySif, // Singularity/Apptainer SIF container (.sif)
-    StampedeSlp,    // Stampede Linux package (.slp)
-    Winget,         // Windows Package Manager manifest (.winget)
-    Scoop,          // Windows Scoop manifest (.scoop)
-    Choco,          // Windows Chocolatey package (.choco)
-    Pixi,           // Conda/Pixi environment package (.pixi)
-    Nimble,         // Nim package manager spec (.nimble)
-    ZigPkg,         // Zig build package (.zig)
-    SwiftPkg,       // Swift Package Manager manifest (.swift)
-    DubPkg,         // D language Dub package (.dub)
-    Opam,           // OCaml OPAM package (.opam)
-    Shard,          // Crystal Shard package (.shard)
-    PltPkg,         // Racket PLT package (.plt)
+    Brew,        // Homebrew formula (.brew)
+    Wasm,        // WebAssembly component (.wasm)
+    Oci,         // OCI container image (.oci)
+    Tazpkg,
+    SingularitySif,
+    StampedeSlp,
+    Winget,
+    Scoop,
+    Choco,
+    Pixi,
+    Nimble,
+    ZigPkg,
+    SwiftPkg,
+    DubPkg,
+    Opam,
+    Shard,
+    PltPkg,
 }
 
 impl PackageFormat {
@@ -546,7 +595,10 @@ impl PackageFormat {
             Some(PackageFormat::Deb)
         } else if normalized == "superdeb" || normalized.ends_with(".superdeb") {
             Some(PackageFormat::Superdeb)
-        } else if normalized == "rpm" || normalized.ends_with(".rpm") || normalized.ends_with(".drpm") {
+        } else if normalized == "rpm"
+            || normalized.ends_with(".rpm")
+            || normalized.ends_with(".drpm")
+        {
             Some(PackageFormat::Rpm)
         } else if normalized.ends_with(".pkg.tar.zst")
             || normalized.ends_with(".pkg.tar.xz")
@@ -562,7 +614,10 @@ impl PackageFormat {
             Some(PackageFormat::Flatpak)
         } else if normalized == "appimage" || normalized.ends_with(".appimage") {
             Some(PackageFormat::AppImage)
-        } else if normalized == "sigpkg" || normalized.ends_with(".sigpkg") || normalized.ends_with(".sigma") {
+        } else if normalized == "sigpkg"
+            || normalized.ends_with(".sigpkg")
+            || normalized.ends_with(".sigma")
+        {
             Some(PackageFormat::SigmaPkg)
         } else if normalized == "air" || normalized.ends_with(".air") {
             Some(PackageFormat::Air)
@@ -580,15 +635,29 @@ impl PackageFormat {
             Some(PackageFormat::Apk)
         } else if normalized == "eopkg" || normalized.ends_with(".eopkg") {
             Some(PackageFormat::Eopkg)
-        } else if normalized == "nixpkg" || normalized.ends_with(".nixpkg") || normalized.ends_with(".nix") {
+        } else if normalized == "nixpkg"
+            || normalized.ends_with(".nixpkg")
+            || normalized.ends_with(".nix")
+        {
             Some(PackageFormat::Nixpkg)
-        } else if normalized == "ebuild" || normalized == "portage" || normalized.ends_with(".ebuild") || normalized.ends_with(".portage") {
+        } else if normalized == "ebuild"
+            || normalized == "portage"
+            || normalized.ends_with(".ebuild")
+            || normalized.ends_with(".portage")
+        {
             Some(PackageFormat::Ebuild)
         } else if normalized.ends_with(".openbsd.tgz") {
             Some(PackageFormat::OpenBsdPkg)
-        } else if normalized == "tgz" || normalized == "tar.gz" || normalized.ends_with(".tar.gz") || normalized.ends_with(".tgz") {
+        } else if normalized == "tgz"
+            || normalized == "tar.gz"
+            || normalized.ends_with(".tar.gz")
+            || normalized.ends_with(".tgz")
+        {
             Some(PackageFormat::TarGz)
-        } else if normalized == "xz" || normalized == "tar.xz" || normalized.ends_with(".txz") || normalized.ends_with(".tar.xz") || normalized.ends_with(".xz") {
+        } else if normalized.ends_with(".txz")
+            || normalized.ends_with(".tar.xz")
+            || normalized.ends_with(".xz")
+        {
             Some(PackageFormat::Xz)
         } else if normalized.ends_with(".xbps") {
             Some(PackageFormat::Xbps)
@@ -1229,6 +1298,20 @@ impl_generic_install_strategy!(CRanInstallStrategy);
 impl_generic_install_strategy!(BrewInstallStrategy);
 impl_generic_install_strategy!(WasmInstallStrategy);
 impl_generic_install_strategy!(OciInstallStrategy);
+impl_generic_install_strategy!(TazpkgInstallStrategy);
+impl_generic_install_strategy!(SingularitySifInstallStrategy);
+impl_generic_install_strategy!(StampedeSlpInstallStrategy);
+impl_generic_install_strategy!(WingetInstallStrategy);
+impl_generic_install_strategy!(ScoopInstallStrategy);
+impl_generic_install_strategy!(ChocoInstallStrategy);
+impl_generic_install_strategy!(PixiInstallStrategy);
+impl_generic_install_strategy!(NimbleInstallStrategy);
+impl_generic_install_strategy!(ZigPkgInstallStrategy);
+impl_generic_install_strategy!(SwiftPkgInstallStrategy);
+impl_generic_install_strategy!(DubPkgInstallStrategy);
+impl_generic_install_strategy!(OpamInstallStrategy);
+impl_generic_install_strategy!(ShardInstallStrategy);
+impl_generic_install_strategy!(PltPkgInstallStrategy);
 
 // ============================================================================
 // OOP Design Pattern: Adapter Pattern
@@ -1521,6 +1604,20 @@ impl_generic_metadata_adapter!(CRanMetadataAdapter, CRan);
 impl_generic_metadata_adapter!(BrewMetadataAdapter, Brew);
 impl_generic_metadata_adapter!(WasmMetadataAdapter, Wasm);
 impl_generic_metadata_adapter!(OciMetadataAdapter, Oci);
+impl_generic_metadata_adapter!(TazpkgMetadataAdapter, Tazpkg);
+impl_generic_metadata_adapter!(SingularitySifMetadataAdapter, SingularitySif);
+impl_generic_metadata_adapter!(StampedeSlpMetadataAdapter, StampedeSlp);
+impl_generic_metadata_adapter!(WingetMetadataAdapter, Winget);
+impl_generic_metadata_adapter!(ScoopMetadataAdapter, Scoop);
+impl_generic_metadata_adapter!(ChocoMetadataAdapter, Choco);
+impl_generic_metadata_adapter!(PixiMetadataAdapter, Pixi);
+impl_generic_metadata_adapter!(NimbleMetadataAdapter, Nimble);
+impl_generic_metadata_adapter!(ZigPkgMetadataAdapter, ZigPkg);
+impl_generic_metadata_adapter!(SwiftPkgMetadataAdapter, SwiftPkg);
+impl_generic_metadata_adapter!(DubPkgMetadataAdapter, DubPkg);
+impl_generic_metadata_adapter!(OpamMetadataAdapter, Opam);
+impl_generic_metadata_adapter!(ShardMetadataAdapter, Shard);
+impl_generic_metadata_adapter!(PltPkgMetadataAdapter, PltPkg);
 
 // ============================================================================
 // OOP Design Pattern: Decorator Pattern
@@ -1766,20 +1863,20 @@ impl PackageFactory {
             PackageFormat::Brew => Box::new(BrewInstallStrategy),
             PackageFormat::Wasm => Box::new(WasmInstallStrategy),
             PackageFormat::Oci => Box::new(OciInstallStrategy),
-            PackageFormat::Tazpkg
-            | PackageFormat::SingularitySif
-            | PackageFormat::StampedeSlp
-            | PackageFormat::Winget
-            | PackageFormat::Scoop
-            | PackageFormat::Choco
-            | PackageFormat::Pixi
-            | PackageFormat::Nimble
-            | PackageFormat::ZigPkg
-            | PackageFormat::SwiftPkg
-            | PackageFormat::DubPkg
-            | PackageFormat::Opam
-            | PackageFormat::Shard
-            | PackageFormat::PltPkg => Box::new(TarGzInstallStrategy),
+            PackageFormat::Tazpkg => Box::new(TazpkgInstallStrategy),
+            PackageFormat::SingularitySif => Box::new(SingularitySifInstallStrategy),
+            PackageFormat::StampedeSlp => Box::new(StampedeSlpInstallStrategy),
+            PackageFormat::Winget => Box::new(WingetInstallStrategy),
+            PackageFormat::Scoop => Box::new(ScoopInstallStrategy),
+            PackageFormat::Choco => Box::new(ChocoInstallStrategy),
+            PackageFormat::Pixi => Box::new(PixiInstallStrategy),
+            PackageFormat::Nimble => Box::new(NimbleInstallStrategy),
+            PackageFormat::ZigPkg => Box::new(ZigPkgInstallStrategy),
+            PackageFormat::SwiftPkg => Box::new(SwiftPkgInstallStrategy),
+            PackageFormat::DubPkg => Box::new(DubPkgInstallStrategy),
+            PackageFormat::Opam => Box::new(OpamInstallStrategy),
+            PackageFormat::Shard => Box::new(ShardInstallStrategy),
+            PackageFormat::PltPkg => Box::new(PltPkgInstallStrategy),
         }
     }
 
@@ -1874,20 +1971,20 @@ impl PackageFactory {
             PackageFormat::Brew => Box::new(BrewMetadataAdapter),
             PackageFormat::Wasm => Box::new(WasmMetadataAdapter),
             PackageFormat::Oci => Box::new(OciMetadataAdapter),
-            PackageFormat::Tazpkg
-            | PackageFormat::SingularitySif
-            | PackageFormat::StampedeSlp
-            | PackageFormat::Winget
-            | PackageFormat::Scoop
-            | PackageFormat::Choco
-            | PackageFormat::Pixi
-            | PackageFormat::Nimble
-            | PackageFormat::ZigPkg
-            | PackageFormat::SwiftPkg
-            | PackageFormat::DubPkg
-            | PackageFormat::Opam
-            | PackageFormat::Shard
-            | PackageFormat::PltPkg => Box::new(TarGzMetadataAdapter),
+            PackageFormat::Tazpkg => Box::new(TazpkgMetadataAdapter),
+            PackageFormat::SingularitySif => Box::new(SingularitySifMetadataAdapter),
+            PackageFormat::StampedeSlp => Box::new(StampedeSlpMetadataAdapter),
+            PackageFormat::Winget => Box::new(WingetMetadataAdapter),
+            PackageFormat::Scoop => Box::new(ScoopMetadataAdapter),
+            PackageFormat::Choco => Box::new(ChocoMetadataAdapter),
+            PackageFormat::Pixi => Box::new(PixiMetadataAdapter),
+            PackageFormat::Nimble => Box::new(NimbleMetadataAdapter),
+            PackageFormat::ZigPkg => Box::new(ZigPkgMetadataAdapter),
+            PackageFormat::SwiftPkg => Box::new(SwiftPkgMetadataAdapter),
+            PackageFormat::DubPkg => Box::new(DubPkgMetadataAdapter),
+            PackageFormat::Opam => Box::new(OpamMetadataAdapter),
+            PackageFormat::Shard => Box::new(ShardMetadataAdapter),
+            PackageFormat::PltPkg => Box::new(PltPkgMetadataAdapter),
         }
     }
 }
@@ -3311,6 +3408,26 @@ mod tests {
         assert_eq!(sigpkg.version, "0.9.5");
         assert_eq!(sigpkg.formats[0], PackageFormat::SigmaPkg);
         assert!(manager.get_package("sigpkg-neovim").is_some());
+
+        let deb_manifest = ForeignDistroManifest {
+            raw_format: PackageFormat::Deb,
+            original_name: "curl".to_string(),
+            version: "7.88.1".to_string(),
+            architecture: "amd64".to_string(),
+            raw_dependencies: vec!["libssl-dev".to_string(), "libc6".to_string()],
+            raw_provides: vec!["http-client".to_string()],
+            raw_conflicts: vec![],
+            maintainer: "Debian".to_string(),
+        };
+
+        let deb_sigpkg = UniversalPackageTranslator::translate_apt_deb(&deb_manifest);
+        assert_eq!(deb_sigpkg.name, "sigpkg-apt-deb-curl");
+        assert!(deb_sigpkg
+            .dependencies
+            .contains(&"sovereign-openssl".to_string()));
+        assert!(deb_sigpkg
+            .dependencies
+            .contains(&"sovereign-libc".to_string()));
     }
 
     #[test]
@@ -3774,6 +3891,20 @@ mod tests {
             PackageFormat::Crux,
             PackageFormat::Drpm,
             PackageFormat::Stratum,
+            PackageFormat::Tazpkg,
+            PackageFormat::SingularitySif,
+            PackageFormat::StampedeSlp,
+            PackageFormat::Winget,
+            PackageFormat::Scoop,
+            PackageFormat::Choco,
+            PackageFormat::Pixi,
+            PackageFormat::Nimble,
+            PackageFormat::ZigPkg,
+            PackageFormat::SwiftPkg,
+            PackageFormat::DubPkg,
+            PackageFormat::Opam,
+            PackageFormat::Shard,
+            PackageFormat::PltPkg,
         ];
 
         for fmt in formats {

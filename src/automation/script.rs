@@ -4,7 +4,6 @@ use alloc::boxed::Box;
 /// OOP-based Advanced Script Engine, Decompressor & File Monitor for SigmaOS
 /// Implements interactive scripting, dynamic script-like functions, positional arguments,
 /// script aliases, basic UPX-style binary unpacking, filesystem monitoring, and string descrambling.
-use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
@@ -478,7 +477,10 @@ mod tests {
         let mut api = SimpleScriptAPI::new();
         api.register_function(b"status", dummy_func);
         assert_eq!(api.call_function(b"status").unwrap(), b"ok");
-        assert_eq!(api.call_function(b"unknown").err(), Some(ScriptError::NotFound));
+        assert_eq!(
+            api.call_function(b"unknown").err(),
+            Some(ScriptError::NotFound)
+        );
     }
 
     #[test]

@@ -12,7 +12,6 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use std::string::{String, ToString};
 use std::vec;
 use std::vec::Vec;
 
@@ -20,14 +19,14 @@ use std::vec::Vec;
 // Models advanced rolling-release, automatic hardware configuration,
 // kernel switching, and mirror-ranked transactional packaging.
 
-use std::collections::HashMap;
+use crate::klib::collections::HashMap;
 
 /// An Arch User Repository (AUR) package representation
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AurPackage {
-    pub name: String,
-    pub pkgbuild_url: String,
-    pub dependencies: Vec<String>,
+    pub name: crate::klib::SigmaString,
+    pub pkgbuild_url: crate::klib::SigmaString,
+    pub dependencies: crate::klib::Vec<crate::klib::SigmaString>,
 }
 
 /// A Flatpak sandboxed application representation
@@ -646,8 +645,16 @@ impl ManjaroIsoArchitectEngine {
     }
 
     pub fn compile_iso_image(&self, de: &str) -> Result<String, &'static str> {
-        if let Some(prof) = self.active_profiles.iter().find(|p| p.desktop_environment == de) {
-            Ok(format!("manjaro-{}-{}-2026.04.iso", prof.desktop_environment.to_lowercase(), prof.kernel_variant))
+        if let Some(prof) = self
+            .active_profiles
+            .iter()
+            .find(|p| p.desktop_environment == de)
+        {
+            Ok(format!(
+                "manjaro-{}-{}-2026.04.iso",
+                prof.desktop_environment.to_lowercase(),
+                prof.kernel_variant
+            ))
         } else {
             Err("Manjaro ISO profile for requested DE not found")
         }

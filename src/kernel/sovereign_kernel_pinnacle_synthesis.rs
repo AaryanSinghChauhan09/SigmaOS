@@ -14,7 +14,6 @@
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::collections::BTreeMap;
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::format;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
@@ -27,7 +26,6 @@ use std::format;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
 
 // ============================================================================
 // 1. LINUX BPF_LSM SECURITY ENGINE

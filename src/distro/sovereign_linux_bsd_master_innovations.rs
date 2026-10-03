@@ -1,6 +1,5 @@
 use std::collections::BTreeMap;
 use std::format;
-use std::string::{String, ToString};
 use std::vec::Vec;
 
 /// Command Metadata Record parsed from binary header comments

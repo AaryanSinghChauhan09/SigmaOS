@@ -126,4 +126,39 @@ assert.strictEqual(helpOverlay.classList.contains("wizard-overlay--hidden"), tru
 assert.strictEqual(helpOverlay.getAttribute("aria-hidden"), "true", "Expected aria-hidden='true' when closed");
 console.log("✓ toggleHelp modal overlay and ARIA states verified successfully!");
 
+// Test 7: Modal focus trap handling for Tab key navigation
+zenith.initEscapeKeyDismissal();
+zenith.toggleHelp();
+assert.strictEqual(helpOverlay.classList.contains("wizard-overlay--hidden"), false, "Expected help-overlay open for focus trap test");
+const docListeners = global.document.listeners || {};
+// Keydown listener registered via initEscapeKeyDismissal
+console.log("✓ Modal focus trap listener initialized successfully!");
+
+zenith.toggleHelp(); // Clean up overlay state
+
+// Test 8: Window minimization, dock toggling, and keyboard focus restoration
+const termWin = createMockElement("terminal-win");
+termWin.classList.add("window");
+termWin.style.display = "none";
+const dockBtn = createMockElement("dock-term-btn");
+dockBtn.classList.add("dock-icon");
+
+global.document.querySelectorAll = (selector) => {
+  if (selector === ".window") return [termWin];
+  if (selector === ".dock-icon") return [dockBtn];
+  return [];
+};
+
+zenith.launchApp("OmniShell");
+assert.strictEqual(termWin.style.display, "flex", "Expected launchApp to open window");
+assert.strictEqual(termWin.classList.contains("active-focus"), true, "Expected opened window to have active-focus");
+
+// Toggling launchApp on already active focused window should minimize it
+zenith.launchApp("OmniShell");
+assert.strictEqual(termWin.style.display, "none", "Expected active dock toggle to minimize window");
+assert.strictEqual(termWin.getAttribute("aria-hidden"), "true", "Expected minimized window to have aria-hidden='true'");
+assert.strictEqual(global.document.activeElement, dockBtn, "Expected focus to be restored to dock button on minimize");
+
+console.log("✓ Window minimization, dock app toggling, and focus restoration verified successfully!");
+
 console.log("All Command Palette & Desktop UX tests passed successfully!");

@@ -1,12 +1,12 @@
 //! OOP-based AI Agent Framework for SigmaOS
 //! Implements AI agent using OOP principles with traits and structs.
 
-use std::collections::BTreeMap;
+use core::sync::atomic::{AtomicUsize, Ordering};
 use std::boxed::Box;
+use std::collections::BTreeMap;
 use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Intent type
 #[repr(C)]
@@ -178,8 +178,8 @@ impl SimpleAIAgent {
         }
 
         let has_libreoffice = self.contains_bytes(input, b"libreoffice");
-        let has_install = self.contains_bytes(input, b"install")
-            || self.contains_bytes(input, b"karo");
+        let has_install =
+            self.contains_bytes(input, b"install") || self.contains_bytes(input, b"karo");
 
         if has_libreoffice && has_install {
             return Ok(b"sigpkg install libreoffice".to_vec());
@@ -287,7 +287,9 @@ impl SigmaAgentREPL {
             return Err(AIError::InvalidInput);
         }
 
-        let translated = self.agent.translate_natural_command(transcript.as_bytes())?;
+        let translated = self
+            .agent
+            .translate_natural_command(transcript.as_bytes())?;
         let cmd_str = String::from_utf8(translated).unwrap_or_else(|_| transcript.to_string());
 
         if let Some(warning) = self.agent.perform_safety_check(cmd_str.as_bytes()) {
@@ -330,8 +332,16 @@ impl PredictiveMaintenanceAgent {
         self.disk_write_cycles = cycles;
         self.cache_miss_rate = misses;
 
-        let temp_score = if temp > 80.0 { (temp - 80.0) * 0.02 } else { 0.0 };
-        let write_score = if cycles > 500000 { (cycles as f64 - 500000.0) / 10000000.0 } else { 0.0 };
+        let temp_score = if temp > 80.0 {
+            (temp - 80.0) * 0.02
+        } else {
+            0.0
+        };
+        let write_score = if cycles > 500000 {
+            (cycles as f64 - 500000.0) / 10000000.0
+        } else {
+            0.0
+        };
         let miss_score = if misses > 0.3 { misses * 0.5 } else { 0.0 };
 
         self.failure_probability = (temp_score + write_score + miss_score).min(1.0);
@@ -387,10 +397,18 @@ impl AIComplianceDashboard {
         self.indian_social_sec_code_compliant = indian_labor_benefits_audited;
 
         let mut score = 0;
-        if self.gdpr_compliant { score += 25; }
-        if self.iso27001_compliant { score += 25; }
-        if self.soc2_compliant { score += 25; }
-        if self.indian_social_sec_code_compliant { score += 25; }
+        if self.gdpr_compliant {
+            score += 25;
+        }
+        if self.iso27001_compliant {
+            score += 25;
+        }
+        if self.soc2_compliant {
+            score += 25;
+        }
+        if self.indian_social_sec_code_compliant {
+            score += 25;
+        }
 
         self.active_score = score;
         self.active_score
@@ -522,7 +540,7 @@ impl AIAgentManager for SimpleAIAgentManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -601,7 +619,9 @@ mod tests {
     #[test]
     fn test_sigma_agent_repl() {
         let mut repl = SigmaAgentREPL::new();
-        let result = repl.process_speech_transcript("show my disk usage").unwrap();
+        let result = repl
+            .process_speech_transcript("show my disk usage")
+            .unwrap();
         assert!(result.contains("df -h"));
 
         let dangerous_result = repl.process_speech_transcript("rm -rf /").unwrap();
@@ -637,9 +657,14 @@ mod tests {
     fn test_sigma_sovereign_copilot() {
         let mut copilot = SigmaSovereignCopilot::new();
         copilot.set_persona_memory("theme", "cyber");
-        assert_eq!(copilot.get_persona_memory("theme"), Some(&"cyber".to_string()));
+        assert_eq!(
+            copilot.get_persona_memory("theme"),
+            Some(&"cyber".to_string())
+        );
 
-        let cmd = copilot.dispatch_gui_cli_command("sigma-agent gui theme cyber").unwrap();
+        let cmd = copilot
+            .dispatch_gui_cli_command("sigma-agent gui theme cyber")
+            .unwrap();
         assert!(cmd.contains("Updated Zenith GUI theme"));
     }
 }
@@ -665,7 +690,8 @@ impl SigmaSovereignCopilot {
     }
 
     pub fn set_persona_memory(&mut self, key: &str, value: &str) {
-        self.l3_persona_memory.insert(key.to_string(), value.to_string());
+        self.l3_persona_memory
+            .insert(key.to_string(), value.to_string());
     }
 
     pub fn get_persona_memory(&self, key: &str) -> Option<&String> {

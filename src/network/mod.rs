@@ -1,15 +1,20 @@
 // SigmaOS Network Stack Module
 pub mod device_discovery;
 pub mod discovery;
+pub mod ip;
 pub mod ring_buffer_stack;
+pub mod routing;
 pub mod security;
+pub mod socket;
 pub mod sovereign_remote_sharing;
 pub mod tcp;
 pub mod tcp_udp;
 pub mod wireless_manager;
 pub mod zenithnet;
-pub mod routing;
-pub mod socket;
+pub mod arp;
+pub mod icmp;
+pub mod tcp_complete;
+pub mod bluetooth;
 
 pub use device_discovery::{
     DeviceDiscoverySyncEngine, DeviceType, DiscoveredPeerDevice, DiscoveryProtocol,
@@ -36,21 +41,34 @@ pub use tcp::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
 pub use wireless_manager::{BluetoothDevice, WifiProfile, WifiSecurity, WirelessManager};
 
 // ZenithNet TCP/IP Stack
-pub use zenithnet::{
-    EthernetFrame, Ipv4Addr, Ipv4Header, IpProtocol, MacAddr, NetworkError, NetworkInterface,
-    PacketType, TcpHeader, TcpState as ZenithTcpState, UdpHeader, ZenithNet,
-};
 pub use routing::{ForwardingDecision, RouteEntry, RoutingEngine, RoutingTable};
 pub use socket::{
     AddressFamily, Socket, SocketAddr, SocketError, SocketOptions, SocketState, SocketTable,
     SocketType,
 };
+pub use zenithnet::{
+    EthernetFrame, IpProtocol, Ipv4Addr, Ipv4Header, MacAddr, NetworkError, NetworkInterface,
+    PacketType, TcpHeader, TcpState as ZenithTcpState, UdpHeader, ZenithNet,
+};
+pub use arp::{
+    ArpPacket, ArpOperation, ArpHardwareType, ArpCache, ArpCacheEntry,
+    ArpHandler, ArpStats, ArpError,
+};
+pub use icmp::{
+    IcmpPacket, IcmpHeader, IcmpType, IcmpHandler, IcmpStats,
+    IcmpUnreachableCode, IcmpTimeExceededCode, IcmpError,
+};
 
+#[path = "sovereign_async_io.rs"]
 pub mod zero_copy_networking;
-pub use zero_copy_networking::{ZeroCopySocket, UmemPool, XdpRing, IoCompletionQueue, IoCompletionEntry};
+pub use zero_copy_networking::{
+    IoCompletionEntry, IoCompletionQueue, SovereignZeroCopySocket, UmemPool, XdpAction, XdpRing,
+};
 
 pub mod tc_qdisc_sovereign;
-pub use tc_qdisc_sovereign::{TbfQdisc, PrioQdisc, HtbQdisc, HtbClass, FqCodelQdisc, Packet as QdiscPacket};
+pub use tc_qdisc_sovereign::{
+    FqCodelQdisc, HtbClass, HtbQdisc, Packet as QdiscPacket, PrioQdisc, TbfQdisc,
+};
 
 pub mod wireguard_sovereign;
 pub use wireguard_sovereign::{SovereignWireGuardTunnel, WgPeer, WgSessionState};
@@ -63,3 +81,5 @@ pub use virtual_switch::{
     BondingMode, FdbEntry, FlowAction, StpPortState, SwitchPort, SwitchPortMode,
     VirtualSwitchBridge, VirtualSwitchEngine,
 };
+
+pub mod quic;

@@ -3,7 +3,6 @@
 //! HKDF-SHA3-256 key derivation
 //! Integration with FDE, TLS, code signing
 
-
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[repr(C)]
@@ -70,9 +69,7 @@ impl PQCContext {
             return Err(PQCError::InvalidSignature);
         }
 
-        let mut signature = Dilithium5Signature {
-            data: [0u8; 2592],
-        };
+        let mut signature = Dilithium5Signature { data: [0u8; 2592] };
 
         // In real implementation, would use Dilithium-5 signing algorithm
         // This is a stub that generates deterministic signatures
@@ -86,7 +83,12 @@ impl PQCContext {
     }
 
     /// Verify Dilithium-5 signature
-    pub fn verify(&self, _message: &[u8], _signature: &Dilithium5Signature, public_key: &[u8]) -> Result<bool, PQCError> {
+    pub fn verify(
+        &self,
+        _message: &[u8],
+        _signature: &Dilithium5Signature,
+        public_key: &[u8],
+    ) -> Result<bool, PQCError> {
         if public_key.len() != 1312 {
             return Err(PQCError::InvalidPublicKey);
         }
@@ -99,13 +101,21 @@ impl PQCContext {
     }
 
     /// HKDF-SHA3-256 key derivation
-    pub fn derive_key(&self, ikm: &[u8], salt: Option<&[u8]>, info: &[u8], okm: &mut [u8]) -> Result<(), PQCError> {
-        if okm.is_empty() || ikm.is_empty() {
+    pub fn derive_key(
+        &self,
+        ikm: &[u8],
+        salt: Option<&[u8]>,
+        info: &[u8],
+        okm: &mut [u8],
+    ) -> Result<(), PQCError> {
+        if okm.is_empty() {
             return Err(PQCError::InvalidOutputLength);
         }
 
+        // In real implementation, would use SHA3-256 based HKDF
+        // This is a stub that generates deterministic keys
         let salt_bytes = if let Some(s) = salt {
-            if s.is_empty() { &self.hkdf.salt } else { s }
+            s
         } else {
             &self.hkdf.salt
         };
@@ -195,9 +205,7 @@ impl Dilithium5KeyPair {
 
 impl Dilithium5Signature {
     pub const fn new() -> Self {
-        Dilithium5Signature {
-            data: [0u8; 2592],
-        }
+        Dilithium5Signature { data: [0u8; 2592] }
     }
 
     pub fn as_bytes(&self) -> &[u8] {

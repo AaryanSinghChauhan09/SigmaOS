@@ -174,7 +174,8 @@ pub enum PowerState {
     D1Standby = 1,
     D2Sleep = 2,
     D3Off = 3,
-}
+    FullOn,
+    Unknown,}
 
 pub struct DeviceObject {
     pub driver_object_ptr: *const DriverObject,

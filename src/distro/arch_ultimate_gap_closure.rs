@@ -1,7 +1,6 @@
 // SigmaOS Arch Linux Ultimate Gap Closure Engine
 // Zero-dependency Rust implementation covering ALPM sync databases, AUR .SRCINFO parsing, mkinitcpio hooks, and archiso profile bootstrap.
 
-use std::string::String;
 use std::vec::Vec;
 
 /// ALPM Repository Sync Database Entry (.db.tar.gz spec)
@@ -37,7 +36,9 @@ impl ArchPacmanDatabaseSyncEngine {
             description: String::from("The Linux kernel and modules"),
             csize: 140_000_000,
             isize: 150_000_000,
-            sha256sum: String::from("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"),
+            sha256sum: String::from(
+                "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            ),
             pgp_signature: String::from("SIG_GPG_ARCH_OFFICIAL"),
             depends: Vec::new(),
             provides: Vec::new(),

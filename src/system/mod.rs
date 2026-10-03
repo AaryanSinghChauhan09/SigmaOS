@@ -12,14 +12,17 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+pub mod service_manager;
 
 // SigmaOS System Utilities Module
 // System-level utilities and tools
 
-pub mod declarative_state;
+pub mod abi;
+pub mod automation;
 pub mod cleanup;
 pub mod config;
 pub mod cron;
+pub mod declarative_state;
 pub mod defrag;
 pub mod duplicate;
 pub mod generation_manager;
@@ -34,18 +37,13 @@ pub mod snapshot_schedule;
 pub mod startup;
 pub mod state;
 pub mod syslog;
-pub mod automation;
 pub mod user;
-pub mod abi;
-pub mod service_manager;
 
 pub use abi::{
     AbiType, SovereignSyscallAbiCompatibilityEngine, SyscallAbiResult, SyscallRegisters64,
 };
 
-pub use automation::{
-    AutomationTask, AutomationTaskKind, SovereignAutomationEngine, TaskStatus,
-};
+pub use automation::{AutomationTask, AutomationTaskKind, SovereignAutomationEngine, TaskStatus};
 
 pub use cleanup::{
     CacheStrategy, CleanupError, CleanupStats, CleanupStrategy, LogFileStrategy,
@@ -94,8 +92,7 @@ pub use snapshot::{
     SnapshotMetadata, SnapshotResult, SnapshotStorage, SystemSnapshotManager,
 };
 pub use snapshot_schedule::{
-    CreatedSnapshotRecord, RetentionPolicy, ScheduledSnapshotEngine, SnapshotFrequency,
-    SnapshotJob,
+    CreatedSnapshotRecord, RetentionPolicy, ScheduledSnapshotEngine, SnapshotFrequency, SnapshotJob,
 };
 pub use startup::{
     DependencyBasedOptimizer, ProfileBasedOptimizer, ServicePriority, StartupAnalysis,
@@ -112,3 +109,7 @@ pub use service_manager::{
     SystemServiceState, SystemServiceType, SystemRestartPolicy,
     SystemServiceConfig, SystemService, SystemServiceManager,
 };
+
+pub mod atomic_upgrade;
+
+pub mod runit_supervisor;

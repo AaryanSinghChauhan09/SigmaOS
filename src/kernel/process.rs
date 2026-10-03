@@ -1,468 +1,446 @@
-#![allow(dead_code)]
-// SPDX-License-Identifier: MIT
-// SigmaOS Comprehensive Process Model
-// Includes POSIX threads, complete states, signals, ELF loading stubs, context switching,
-// and advanced blocked process states (BlockedWaiting, BlockedSuspended, WaitChannels).
+//! # Process Management Subsystem
+//!
+//! Core process control inspired by Linux task_struct and BSD proc structures.
+//! Implements process lifecycle, scheduling state, resource limits, and namespaces.
 
+#![no_std]
 
-use std::collections::{BTreeMap, VecDeque};
-use std::string::String;
-use std::vec::Vec;
-use core::sync::atomic::{AtomicU64, Ordering};
+extern crate alloc;
+use alloc::string::String;
+use alloc::vec::Vec;
+use core::sync::atomic::{AtomicU32, AtomicU64, Ordering};
 
-pub const PAGE_SIZE: usize = 4096;
+/// Process identifier (PID)
+pub type Pid = u32;
 
-// Use ProcessState from scheduler module
-pub use crate::kernel::scheduler::ProcessState;
+/// Thread group identifier (TGID - same as PID for main thread)
+pub type Tgid = u32;
 
+/// User identifier
+pub type Uid = u32;
+
+/// Group identifier
+pub type Gid = u32;
+
+/// Process state (inspired by Linux TASK_* states)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum BlockReason {
-    IoWait,
-    LockWait,
-    SignalWait,
-    TimerWait,
-    PageFaultWait,
-    ChannelWait,
+#[repr(u8)]
+pub enum ProcessState {
+    /// Process is running or ready to run
+    Running = 0,
+    /// Interruptible sleep (waiting for event)
+    Sleeping = 1,
+    /// Uninterruptible sleep (disk I/O wait)
+    Uninterruptible = 2,
+    /// Stopped by signal (SIGSTOP, SIGTTIN, etc.)
+    Stopped = 3,
+    /// Zombie - terminated but not yet reaped
+    Zombie = 4,
+    /// Dead - being removed
+    Dead = 5,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub struct ProcessId(pub u64);
-
-impl std::fmt::Display for ProcessId {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.0)
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub struct ThreadId(pub u64);
-
-#[repr(C)]
+/// Process credentials (inspired by Linux cred structure)
 #[derive(Debug, Clone, Copy)]
-pub struct TrapFrame {
-    pub rax: u64, pub rbx: u64, pub rcx: u64, pub rdx: u64,
-    pub rbp: u64, pub rsi: u64, pub rdi: u64, pub r8: u64,
-    pub r9: u64, pub r10: u64, pub r11: u64, pub r12: u64,
-    pub r13: u64, pub r14: u64, pub r15: u64,
-    pub rip: u64, pub cs: u64, pub rflags: u64, pub rsp: u64, pub ss: u64,
+pub struct ProcessCredentials {
+    /// Real user ID
+    pub uid: Uid,
+    /// Effective user ID
+    pub euid: Uid,
+    /// Saved set-user-ID
+    pub suid: Uid,
+    /// Filesystem user ID
+    pub fsuid: Uid,
+    /// Real group ID
+    pub gid: Gid,
+    /// Effective group ID
+    pub egid: Gid,
+    /// Saved set-group-ID
+    pub sgid: Gid,
+    /// Filesystem group ID
+    pub fsgid: Gid,
 }
 
-impl TrapFrame {
-    pub fn new() -> Self {
-        Self {
-            rax: 0, rbx: 0, rcx: 0, rdx: 0, rbp: 0, rsi: 0, rdi: 0,
-            r8: 0, r9: 0, r10: 0, r11: 0, r12: 0, r13: 0, r14: 0, r15: 0,
-            rip: 0, cs: 0x2B, rflags: 0x202, rsp: 0, ss: 0x23,
-        }
+impl ProcessCredentials {
+    pub const ROOT: Self = Self {
+        uid: 0,
+        euid: 0,
+        suid: 0,
+        fsuid: 0,
+        gid: 0,
+        egid: 0,
+        sgid: 0,
+        fsgid: 0,
+    };
+
+    pub const fn is_root(&self) -> bool {
+        self.euid == 0
+    }
+
+    pub const fn is_privileged(&self) -> bool {
+        self.euid == 0 || self.fsuid == 0
     }
 }
 
-impl Default for TrapFrame {
-    fn default() -> Self {
-        Self::new()
+/// Resource limits (inspired by Linux rlimit)
+#[derive(Debug, Clone, Copy)]
+pub struct ResourceLimit {
+    pub soft: u64,
+    pub hard: u64,
+}
+
+impl ResourceLimit {
+    pub const UNLIMITED: Self = Self {
+        soft: u64::MAX,
+        hard: u64::MAX,
+    };
+
+    pub const fn new(soft: u64, hard: u64) -> Self {
+        Self { soft, hard }
     }
 }
 
-pub struct Thread {
-    pub tid: ThreadId,
-    pub pid: ProcessId,
-    pub state: ProcessState,
-    pub kstack: usize,
-    pub context: TrapFrame,
-    pub fs_base: u64,
-    pub block_reason: Option<BlockReason>,
-    pub priority: u32,
-    pub inherited_priority: u32,
+/// Resource limit types
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(u8)]
+pub enum ResourceType {
+    /// CPU time in seconds
+    Cpu = 0,
+    /// Maximum file size
+    Fsize = 1,
+    /// Maximum data segment size
+    Data = 2,
+    /// Maximum stack size
+    Stack = 3,
+    /// Maximum core file size
+    Core = 4,
+    /// Maximum resident set size
+    Rss = 5,
+    /// Maximum number of processes
+    Nproc = 6,
+    /// Maximum number of open files
+    Nofile = 7,
+    /// Maximum locked memory
+    Memlock = 8,
+    /// Maximum address space
+    As = 9,
 }
 
-impl Thread {
-    pub fn new(tid: ThreadId, pid: ProcessId, kstack: usize) -> Self {
-        Self {
-            tid,
-            pid,
-            state: ProcessState::New,
-            kstack,
-            context: TrapFrame::new(),
-            fs_base: 0,
-            block_reason: None,
-            priority: 10,
-            inherited_priority: 10,
-        }
-    }
-}
-
+/// Process resource limits table
 #[derive(Debug, Clone)]
-pub struct SigAction {
-    pub handler: usize,
-    pub mask: u64,
-    pub flags: u64,
+pub struct ResourceLimits {
+    limits: [ResourceLimit; 10],
 }
 
+impl ResourceLimits {
+    pub fn default() -> Self {
+        Self {
+            limits: [
+                ResourceLimit::UNLIMITED,      // CPU
+                ResourceLimit::UNLIMITED,      // FSIZE
+                ResourceLimit::UNLIMITED,      // DATA
+                ResourceLimit::new(8 * 1024 * 1024, 64 * 1024 * 1024), // STACK (8MB soft, 64MB hard)
+                ResourceLimit::UNLIMITED,      // CORE
+                ResourceLimit::UNLIMITED,      // RSS
+                ResourceLimit::new(4096, 8192), // NPROC
+                ResourceLimit::new(1024, 4096), // NOFILE
+                ResourceLimit::new(64 * 1024, 64 * 1024), // MEMLOCK
+                ResourceLimit::UNLIMITED,      // AS
+            ],
+        }
+    }
+
+    pub fn get(&self, resource: ResourceType) -> ResourceLimit {
+        self.limits[resource as usize]
+    }
+
+    pub fn set(&mut self, resource: ResourceType, limit: ResourceLimit) {
+        self.limits[resource as usize] = limit;
+    }
+}
+
+/// Process priority and scheduling policy
+#[derive(Debug, Clone, Copy)]
+pub struct SchedulingInfo {
+    /// Static priority (nice value: -20 to 19)
+    pub static_priority: i32,
+    /// Real-time priority (0-99, 0 = not RT)
+    pub rt_priority: u32,
+    /// Scheduling policy
+    pub policy: SchedulingPolicy,
+}
+
+/// Scheduling policies (inspired by Linux SCHED_* constants)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(u8)]
+pub enum SchedulingPolicy {
+    /// Normal time-sharing policy
+    Normal = 0,
+    /// First-in, first-out real-time policy
+    Fifo = 1,
+    /// Round-robin real-time policy
+    RoundRobin = 2,
+    /// Batch scheduling (CPU-intensive)
+    Batch = 3,
+    /// Idle priority (only when nothing else to run)
+    Idle = 5,
+    /// Deadline scheduling
+    Deadline = 6,
+}
+
+/// CPU affinity mask (up to 64 CPUs)
+#[derive(Debug, Clone, Copy)]
+pub struct CpuAffinity {
+    mask: u64,
+}
+
+impl CpuAffinity {
+    pub const fn all() -> Self {
+        Self { mask: u64::MAX }
+    }
+
+    pub const fn none() -> Self {
+        Self { mask: 0 }
+    }
+
+    pub const fn single(cpu: u32) -> Self {
+        Self { mask: 1u64 << cpu }
+    }
+
+    pub fn set_cpu(&mut self, cpu: u32) {
+        self.mask |= 1u64 << cpu;
+    }
+
+    pub fn clear_cpu(&mut self, cpu: u32) {
+        self.mask &= !(1u64 << cpu);
+    }
+
+    pub const fn is_set(&self, cpu: u32) -> bool {
+        (self.mask & (1u64 << cpu)) != 0
+    }
+}
+
+/// Process namespace IDs (inspired by Linux namespaces)
+#[derive(Debug, Clone, Copy)]
+pub struct NamespaceIds {
+    pub mnt_ns: u64,  // Mount namespace
+    pub pid_ns: u64,  // PID namespace
+    pub net_ns: u64,  // Network namespace
+    pub ipc_ns: u64,  // IPC namespace
+    pub uts_ns: u64,  // UTS namespace (hostname)
+    pub user_ns: u64, // User namespace
+    pub cgroup_ns: u64, // Cgroup namespace
+}
+
+impl NamespaceIds {
+    pub const INIT: Self = Self {
+        mnt_ns: 1,
+        pid_ns: 1,
+        net_ns: 1,
+        ipc_ns: 1,
+        uts_ns: 1,
+        user_ns: 1,
+        cgroup_ns: 1,
+    };
+}
+
+/// Process statistics (inspired by Linux task_struct stats)
 #[derive(Debug)]
-pub struct Process {
-    pub pid: ProcessId,
-    pub ppid: ProcessId,
-    pub children: Vec<ProcessId>,
-    pub pgid: u64,
-    pub session_id: u64,
-    pub uid: u32,
-    pub gid: u32,
-
-    pub state: ProcessState,
-    pub page_table_phys: usize,
-
-    pub open_files: BTreeMap<u64, usize>,
-
-    // Signals
-    pub sig_pending: u64,
-    pub sig_mask: u64,
-    pub sig_actions: [SigAction; 64],
-
-    // Memory stats
-    pub brk: usize,
-    pub start_brk: usize,
-    pub mmap_base: usize,
-
-    pub exit_code: Option<i32>,
-    pub name: String,
-
-    pub cwd: String,
-    pub block_reason: Option<BlockReason>,
-    pub is_suspended: bool,
-    pub priority: crate::kernel::scheduler::Priority,
+pub struct ProcessStats {
+    pub utime: AtomicU64,      // User CPU time (nanoseconds)
+    pub stime: AtomicU64,      // System CPU time (nanoseconds)
+    pub voluntary_switches: AtomicU64, // Voluntary context switches
+    pub involuntary_switches: AtomicU64, // Involuntary context switches
+    pub minor_faults: AtomicU64, // Minor page faults
+    pub major_faults: AtomicU64, // Major page faults
+    pub rss_pages: AtomicU64,  // Resident set size in pages
 }
 
-static NEXT_PID: AtomicU64 = AtomicU64::new(1);
-static NEXT_TID: AtomicU64 = AtomicU64::new(1);
+impl ProcessStats {
+    pub const fn new() -> Self {
+        Self {
+            utime: AtomicU64::new(0),
+            stime: AtomicU64::new(0),
+            voluntary_switches: AtomicU64::new(0),
+            involuntary_switches: AtomicU64::new(0),
+            minor_faults: AtomicU64::new(0),
+            major_faults: AtomicU64::new(0),
+            rss_pages: AtomicU64::new(0),
+        }
+    }
+
+    pub fn add_user_time(&self, ns: u64) {
+        self.utime.fetch_add(ns, Ordering::Relaxed);
+    }
+
+    pub fn add_system_time(&self, ns: u64) {
+        self.stime.fetch_add(ns, Ordering::Relaxed);
+    }
+
+    pub fn inc_voluntary_switch(&self) {
+        self.voluntary_switches.fetch_add(1, Ordering::Relaxed);
+    }
+
+    pub fn inc_involuntary_switch(&self) {
+        self.involuntary_switches.fetch_add(1, Ordering::Relaxed);
+    }
+}
+
+/// Process control block (inspired by Linux task_struct and BSD proc)
+pub struct Process {
+    pub pid: Pid,
+    pub tgid: Tgid,
+    pub parent_pid: Pid,
+    pub state: ProcessState,
+    pub name: String,
+    pub credentials: ProcessCredentials,
+    pub limits: ResourceLimits,
+    pub scheduling: SchedulingInfo,
+    pub cpu_affinity: CpuAffinity,
+    pub namespaces: NamespaceIds,
+    pub stats: ProcessStats,
+    pub exit_code: Option<i32>,
+}
 
 impl Process {
-    pub fn new(page_table: usize, name: &str) -> Self {
+    pub fn new(pid: Pid, parent_pid: Pid, name: String) -> Self {
         Self {
-            pid: ProcessId(NEXT_PID.fetch_add(1, Ordering::SeqCst)),
-            ppid: ProcessId(0),
-            children: Vec::new(),
-            pgid: 0,
-            session_id: 0,
-            uid: 0,
-            gid: 0,
-            state: ProcessState::New,
-            page_table_phys: page_table,
-            open_files: BTreeMap::new(),
-            sig_pending: 0,
-            sig_mask: 0,
-            sig_actions: core::array::from_fn(|_| SigAction { handler: 0, mask: 0, flags: 0 }),
-            brk: 0x40000000,
-            start_brk: 0x40000000,
-            mmap_base: 0x700000000000,
+            pid,
+            tgid: pid, // Main thread has TGID = PID
+            parent_pid,
+            state: ProcessState::Running,
+            name,
+            credentials: ProcessCredentials::ROOT,
+            limits: ResourceLimits::default(),
+            scheduling: SchedulingInfo {
+                static_priority: 0, // Nice 0
+                rt_priority: 0,
+                policy: SchedulingPolicy::Normal,
+            },
+            cpu_affinity: CpuAffinity::all(),
+            namespaces: NamespaceIds::INIT,
+            stats: ProcessStats::new(),
             exit_code: None,
-            name: String::from(name),
-            cwd: String::from("/"),
-            block_reason: None,
-            is_suspended: false,
-            priority: crate::kernel::scheduler::Priority::Normal,
         }
     }
 
-    pub fn fork(&self, new_pt_phys: usize) -> Self {
-        let mut child = Process::new(new_pt_phys, &self.name);
-        child.ppid = self.pid;
-        child.pgid = self.pgid;
-        child.session_id = self.session_id;
-        child.uid = self.uid;
-        child.gid = self.gid;
-        child.open_files = self.open_files.clone();
-        child.sig_mask = self.sig_mask;
-        child.sig_actions = self.sig_actions.clone();
-        child.brk = self.brk;
-        child.start_brk = self.start_brk;
-        child.mmap_base = self.mmap_base;
-        child.cwd = self.cwd.clone();
-        child
+    pub fn set_state(&mut self, new_state: ProcessState) {
+        self.state = new_state;
     }
 
-    pub fn transition_to_blocked(&mut self, reason: BlockReason) {
-        self.state = ProcessState::BlockedWaiting;
-        self.block_reason = Some(reason);
+    pub fn is_alive(&self) -> bool {
+        !matches!(self.state, ProcessState::Zombie | ProcessState::Dead)
     }
 
-    pub fn suspend_blocked_process(&mut self) -> Result<(), &'static str> {
-        if self.state == ProcessState::Blocked || self.state == ProcessState::BlockedWaiting {
-            self.state = ProcessState::BlockedSuspended;
-            self.is_suspended = true;
-            Ok(())
-        } else {
-            Err("Process must be in blocked state to suspend")
-        }
-    }
-
-    pub fn resume_blocked_process(&mut self) -> Result<(), &'static str> {
-        if self.state == ProcessState::BlockedSuspended {
-            self.state = ProcessState::BlockedWaiting;
-            self.is_suspended = false;
-            Ok(())
-        } else {
-            Err("Process is not in blocked-suspended state")
-        }
+    pub fn terminate(&mut self, exit_code: i32) {
+        self.exit_code = Some(exit_code);
+        self.state = ProcessState::Zombie;
     }
 }
 
-// ELF Types for exec()
-#[repr(C)]
-#[derive(Debug)]
-pub struct Elf64Ehdr {
-    pub e_ident: [u8; 16],
-    pub e_type: u16,
-    pub e_machine: u16,
-    pub e_version: u32,
-    pub e_entry: u64,
-    pub e_phoff: u64,
-    pub e_shoff: u64,
-    pub e_flags: u32,
-    pub e_ehsize: u16,
-    pub e_phentsize: u16,
-    pub e_phnum: u16,
-    pub e_shentsize: u16,
-    pub e_shnum: u16,
-    pub e_shstrndx: u16,
+/// Process table manager
+pub struct ProcessTable {
+    next_pid: AtomicU32,
+    processes: Vec<Process>,
 }
 
-#[repr(C)]
-#[derive(Debug)]
-pub struct Elf64Phdr {
-    pub p_type: u32,
-    pub p_flags: u32,
-    pub p_offset: u64,
-    pub p_vaddr: u64,
-    pub p_paddr: u64,
-    pub p_filesz: u64,
-    pub p_memsz: u64,
-    pub p_align: u64,
-}
-
-pub const PT_LOAD: u32 = 1;
-
-pub struct ProcessManager {
-    processes: BTreeMap<ProcessId, Process>,
-    threads: BTreeMap<ThreadId, Thread>,
-    ready_queue: VecDeque<ThreadId>,
-    wait_queues: BTreeMap<ProcessId, VecDeque<ThreadId>>,
-    wait_channels: BTreeMap<u64, VecDeque<ThreadId>>,
-}
-
-impl ProcessManager {
-    pub fn new() -> Self {
+impl ProcessTable {
+    pub const fn new() -> Self {
         Self {
-            processes: BTreeMap::new(),
-            threads: BTreeMap::new(),
-            ready_queue: VecDeque::new(),
-            wait_queues: BTreeMap::new(),
-            wait_channels: BTreeMap::new(),
+            next_pid: AtomicU32::new(1),
+            processes: Vec::new(),
         }
     }
 
-    pub fn add_process(&mut self, p: Process) {
-        self.processes.insert(p.pid, p);
+    pub fn allocate_pid(&self) -> Pid {
+        self.next_pid.fetch_add(1, Ordering::SeqCst)
     }
 
-    pub fn add_thread(&mut self, mut t: Thread) {
-        t.state = ProcessState::Ready;
-        self.ready_queue.push_back(t.tid);
-        self.threads.insert(t.tid, t);
+    pub fn add_process(&mut self, process: Process) {
+        self.processes.push(process);
     }
 
-    pub fn get_process(&self, pid: ProcessId) -> Option<&Process> {
-        self.processes.get(&pid)
+    pub fn find_process(&self, pid: Pid) -> Option<&Process> {
+        self.processes.iter().find(|p| p.pid == pid)
     }
 
-    pub fn get_process_mut(&mut self, pid: ProcessId) -> Option<&mut Process> {
-        self.processes.get_mut(&pid)
+    pub fn find_process_mut(&mut self, pid: Pid) -> Option<&mut Process> {
+        self.processes.iter_mut().find(|p| p.pid == pid)
     }
 
-    pub fn send_signal(&mut self, pid: ProcessId, sig: u32) -> Result<(), &'static str> {
-        if let Some(p) = self.processes.get_mut(&pid) {
-            if sig < 64 {
-                p.sig_pending |= 1 << sig;
-                // Wake up thread if blocked
-                if p.state == ProcessState::Blocked || p.state == ProcessState::BlockedWaiting {
-                    p.state = ProcessState::Ready;
-                }
-                Ok(())
+    pub fn remove_process(&mut self, pid: Pid) -> Option<Process> {
+        if let Some(pos) = self.processes.iter().position(|p| p.pid == pid) {
+            Some(self.processes.remove(pos))
+        } else {
+            None
+        }
+    }
+
+    pub fn count_processes(&self) -> usize {
+        self.processes.len()
+    }
+
+    pub fn reap_zombies(&mut self) -> Vec<(Pid, i32)> {
+        let mut reaped = Vec::new();
+        self.processes.retain(|p| {
+            if p.state == ProcessState::Zombie {
+                reaped.push((p.pid, p.exit_code.unwrap_or(-1)));
+                false
             } else {
-                Err("Invalid signal")
+                true
             }
-        } else {
-            Err("Process not found")
-        }
-    }
-
-    pub fn block_thread_on_channel(&mut self, tid: ThreadId, wchan_id: u64, reason: BlockReason) -> Result<(), &'static str> {
-        let t = self.threads.get_mut(&tid).ok_or("Thread not found")?;
-        t.state = ProcessState::BlockedWaiting;
-        t.block_reason = Some(reason);
-
-        if let Some(p) = self.processes.get_mut(&t.pid) {
-            p.transition_to_blocked(reason);
-        }
-
-        self.wait_channels.entry(wchan_id).or_default().push_back(tid);
-        Ok(())
-    }
-
-    pub fn wakeup_channel(&mut self, wchan_id: u64) -> usize {
-        let mut awakened = 0;
-        if let Some(mut q) = self.wait_channels.remove(&wchan_id) {
-            while let Some(tid) = q.pop_front() {
-                if let Some(t) = self.threads.get_mut(&tid) {
-                    t.state = ProcessState::Ready;
-                    t.block_reason = None;
-                    self.ready_queue.push_back(tid);
-
-                    if let Some(p) = self.processes.get_mut(&t.pid) {
-                        p.state = ProcessState::Ready;
-                        p.block_reason = None;
-                    }
-                    awakened += 1;
-                }
-            }
-        }
-        awakened
-    }
-
-    pub fn waitpid(&mut self, ppid: ProcessId, pid: Option<ProcessId>, current_tid: ThreadId) -> Option<i32> {
-        let parent = self.processes.get(&ppid)?;
-        let children = parent.children.clone();
-
-        // Check for any zombie child
-        for &cpid in &children {
-            if let Some(child_pid) = pid {
-                if child_pid != cpid { continue; }
-            }
-            if let Some(child) = self.processes.get(&cpid) {
-                if child.state == ProcessState::Zombie {
-                    let code = child.exit_code.unwrap_or(0);
-                    self.cleanup_zombie(cpid);
-                    return Some(code);
-                }
-            }
-        }
-
-        // None are zombies, block the current thread
-        let q = self.wait_queues.entry(ppid).or_default();
-        q.push_back(current_tid);
-
-        if let Some(t) = self.threads.get_mut(&current_tid) {
-            t.state = ProcessState::BlockedWaiting;
-            t.block_reason = Some(BlockReason::ChannelWait);
-        }
-
-        None
-    }
-
-    fn cleanup_zombie(&mut self, pid: ProcessId) {
-        if let Some(p) = self.processes.remove(&pid) {
-            if let Some(parent) = self.processes.get_mut(&p.ppid) {
-                parent.children.retain(|&c| c != pid);
-            }
-        }
-        self.threads.retain(|_, t| t.pid != pid);
-    }
-
-    pub fn exit_process(&mut self, pid: ProcessId, code: i32) {
-        let children;
-        let ppid = if let Some(p) = self.processes.get_mut(&pid) {
-            p.state = ProcessState::Zombie;
-            p.exit_code = Some(code);
-            children = p.children.clone();
-            p.children.clear();
-            p.ppid
-        } else {
-            return;
-        };
-
-        for cpid in children {
-            if let Some(child) = self.processes.get_mut(&cpid) {
-                child.ppid = ProcessId(1);
-            }
-            if let Some(init) = self.processes.get_mut(&ProcessId(1)) {
-                init.children.push(cpid);
-            }
-        }
-
-        if let Some(q) = self.wait_queues.get_mut(&ppid) {
-            while let Some(tid) = q.pop_front() {
-                if let Some(t) = self.threads.get_mut(&tid) {
-                    t.state = ProcessState::Ready;
-                    self.ready_queue.push_back(tid);
-                }
-            }
-        }
-    }
-
-    pub fn exec(&mut self, pid: ProcessId, elf_data: &[u8]) -> Result<u64, &'static str> {
-        if elf_data.len() < core::mem::size_of::<Elf64Ehdr>() {
-            return Err("Invalid ELF header");
-        }
-
-        // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
-        let ehdr = unsafe { &*(elf_data.as_ptr() as *const Elf64Ehdr) };
-        if ehdr.e_ident[0..4] != [0x7F, b'E', b'L', b'F'] {
-            return Err("Not an ELF file");
-        }
-
-        if ehdr.e_type != 2 && ehdr.e_type != 3 {
-            return Err("Unsupported ELF type");
-        }
-
-        let p = self.processes.get_mut(&pid).ok_or("Process not found")?;
-
-        p.brk = 0x40000000;
-        p.start_brk = 0x40000000;
-        p.mmap_base = 0x700000000000;
-        p.sig_actions = core::array::from_fn(|_| SigAction {
-            handler: 0,
-            mask: 0,
-            flags: 0,
         });
-        p.sig_actions = core::array::from_fn(|_| SigAction { handler: 0, mask: 0, flags: 0 });
-
-        Ok(ehdr.e_entry)
+        reaped
     }
 }
 
-impl Default for ProcessManager {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn test_process_blocked_state_transitions() {
-        let mut pm = ProcessManager::new();
-        let mut proc = Process::new(0x1000, "worker_task");
-        let pid = proc.pid;
-        pm.add_process(proc);
+    fn test_process_creation() {
+        let proc = Process::new(1, 0, String::from("init"));
+        assert_eq!(proc.pid, 1);
+        assert_eq!(proc.parent_pid, 0);
+        assert_eq!(proc.state, ProcessState::Running);
+        assert!(proc.is_alive());
+    }
 
-        let thread = Thread::new(ThreadId(101), pid, 0x8000);
-        pm.add_thread(thread);
+    #[test]
+    fn test_process_termination() {
+        let mut proc = Process::new(2, 1, String::from("child"));
+        proc.terminate(0);
+        assert_eq!(proc.state, ProcessState::Zombie);
+        assert!(!proc.is_alive());
+        assert_eq!(proc.exit_code, Some(0));
+    }
 
-        // Block on I/O channel
-        assert!(pm.block_thread_on_channel(ThreadId(101), 0x55, BlockReason::IoWait).is_ok());
-        let p = pm.get_process(pid).unwrap();
-        assert_eq!(p.state, ProcessState::BlockedWaiting);
-        assert_eq!(p.block_reason, Some(BlockReason::IoWait));
+    #[test]
+    fn test_cpu_affinity() {
+        let mut affinity = CpuAffinity::none();
+        affinity.set_cpu(0);
+        affinity.set_cpu(2);
+        assert!(affinity.is_set(0));
+        assert!(!affinity.is_set(1));
+        assert!(affinity.is_set(2));
+    }
 
-        // Suspend blocked process
-        let p_mut = pm.get_process_mut(pid).unwrap();
-        assert!(p_mut.suspend_blocked_process().is_ok());
-        assert_eq!(p_mut.state, ProcessState::BlockedSuspended);
+    #[test]
+    fn test_process_table() {
+        let mut table = ProcessTable::new();
+        let pid = table.allocate_pid();
+        let proc = Process::new(pid, 0, String::from("test"));
+        table.add_process(proc);
+        assert_eq!(table.count_processes(), 1);
+        assert!(table.find_process(pid).is_some());
+    }
 
-        // Resume and wakeup
-        assert!(p_mut.resume_blocked_process().is_ok());
-        assert_eq!(pm.wakeup_channel(0x55), 1);
-        assert_eq!(pm.get_process(pid).unwrap().state, ProcessState::Ready);
+    #[test]
+    fn test_resource_limits() {
+        let limits = ResourceLimits::default();
+        let stack_limit = limits.get(ResourceType::Stack);
+        assert_eq!(stack_limit.soft, 8 * 1024 * 1024);
+        assert_eq!(stack_limit.hard, 64 * 1024 * 1024);
     }
 }

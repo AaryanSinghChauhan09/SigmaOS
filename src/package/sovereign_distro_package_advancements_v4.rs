@@ -22,16 +22,12 @@ extern crate alloc;
 #[cfg(not(feature = "standalone_test"))]
 use std::collections::BTreeMap;
 #[cfg(not(feature = "standalone_test"))]
-use std::format;
-#[cfg(not(feature = "standalone_test"))]
 use std::string::{String, ToString};
 #[cfg(not(feature = "standalone_test"))]
 use std::vec::Vec;
 
 #[cfg(feature = "standalone_test")]
 use alloc::collections::BTreeMap;
-#[cfg(feature = "standalone_test")]
-use alloc::format;
 #[cfg(feature = "standalone_test")]
 use alloc::string::{String, ToString};
 #[cfg(feature = "standalone_test")]
@@ -78,11 +74,7 @@ impl SovereignUniversalPkgCliRouter {
             return Err("CLI Router: Empty arguments");
         }
 
-        let pm_bin = args[0]
-            .split('/')
-            .last()
-            .unwrap_or(args[0])
-            .to_lowercase();
+        let pm_bin = args[0].split('/').last().unwrap_or(args[0]).to_lowercase();
         let rest = &args[1..];
 
         let mut op = CanonicalPmOp::QueryInfo;
@@ -96,7 +88,9 @@ impl SovereignUniversalPkgCliRouter {
                         "install" => op = CanonicalPmOp::Install,
                         "remove" | "purge" => op = CanonicalPmOp::Remove,
                         "update" => op = CanonicalPmOp::UpdateIndex,
-                        "upgrade" | "dist-upgrade" | "full-upgrade" => op = CanonicalPmOp::UpgradeAll,
+                        "upgrade" | "dist-upgrade" | "full-upgrade" => {
+                            op = CanonicalPmOp::UpgradeAll
+                        }
                         "search" => op = CanonicalPmOp::Search,
                         "show" | "info" => op = CanonicalPmOp::QueryInfo,
                         "clean" | "autoclean" => op = CanonicalPmOp::CleanCache,
@@ -392,10 +386,16 @@ impl SovereignUniversalSystemTriggerDispatcher {
         for tr in &self.pending_triggers {
             let cmd = match tr {
                 SystemTriggerKind::Ldconfig => "ldconfig -X",
-                SystemTriggerKind::UpdateDesktopDatabase => "update-desktop-database -q /usr/share/applications",
+                SystemTriggerKind::UpdateDesktopDatabase => {
+                    "update-desktop-database -q /usr/share/applications"
+                }
                 SystemTriggerKind::UpdateMimeDatabase => "update-mime-database /usr/share/mime",
-                SystemTriggerKind::GtkUpdateIconCache => "gtk-update-icon-cache -q -t -f /usr/share/icons/hicolor",
-                SystemTriggerKind::GlibCompileSchemas => "glib-compile-schemas /usr/share/glib-2.0/schemas",
+                SystemTriggerKind::GtkUpdateIconCache => {
+                    "gtk-update-icon-cache -q -t -f /usr/share/icons/hicolor"
+                }
+                SystemTriggerKind::GlibCompileSchemas => {
+                    "glib-compile-schemas /usr/share/glib-2.0/schemas"
+                }
                 SystemTriggerKind::Depmod => "depmod -a",
             };
             let log_entry = format!("Executed trigger [{:?}]: {}", tr, cmd);
@@ -448,7 +448,12 @@ impl SovereignUniversalSnapshotRollbackEngine {
         }
     }
 
-    pub fn create_snapshot(&mut self, backend: UniversalSnapshotBackend, label: &str, hash: &str) -> u32 {
+    pub fn create_snapshot(
+        &mut self,
+        backend: UniversalSnapshotBackend,
+        label: &str,
+        hash: &str,
+    ) -> u32 {
         let id = self.next_id;
         self.next_id += 1;
 
@@ -471,10 +476,17 @@ impl SovereignUniversalSnapshotRollbackEngine {
 
         match snap.backend {
             UniversalSnapshotBackend::ZfsBectl => Ok(format!("bectl activate {}", snap.label)),
-            UniversalSnapshotBackend::BtrfsSubvolume => Ok(format!("btrfs subvolume set-default {}", snap.label)),
+            UniversalSnapshotBackend::BtrfsSubvolume => {
+                Ok(format!("btrfs subvolume set-default {}", snap.label))
+            }
             UniversalSnapshotBackend::SnapperCow => Ok(format!("snapper rollback {}", snap.id)),
-            UniversalSnapshotBackend::OstreeCommit => Ok(format!("rpm-ostree rollback --commit={}", snap.package_manifest_hash)),
-            UniversalSnapshotBackend::NixGeneration => Ok(format!("nix-env --switch-generation {}", snap.id)),
+            UniversalSnapshotBackend::OstreeCommit => Ok(format!(
+                "rpm-ostree rollback --commit={}",
+                snap.package_manifest_hash
+            )),
+            UniversalSnapshotBackend::NixGeneration => {
+                Ok(format!("nix-env --switch-generation {}", snap.id))
+            }
         }
     }
 }
@@ -508,7 +520,11 @@ impl SovereignMultiDomainPackageAccessGovernor {
     }
 
     /// Evaluates anonymous vs. authenticated access for package repository mirrors
-    pub fn check_anonymous_access(&self, anonymous_allowed: bool, user_token: Option<&str>) -> bool {
+    pub fn check_anonymous_access(
+        &self,
+        anonymous_allowed: bool,
+        user_token: Option<&str>,
+    ) -> bool {
         anonymous_allowed || user_token.map_or(false, |t| !t.is_empty())
     }
 
@@ -527,7 +543,12 @@ impl SovereignMultiDomainPackageAccessGovernor {
     }
 
     /// Calculates effective access time (T_effective = h * T_cache + (1 - h) * T_storage)
-    pub fn calculate_effective_access_time_ms(&self, hit_ratio: f64, cache_ms: f64, storage_ms: f64) -> f64 {
+    pub fn calculate_effective_access_time_ms(
+        &self,
+        hit_ratio: f64,
+        cache_ms: f64,
+        storage_ms: f64,
+    ) -> f64 {
         let h = hit_ratio.clamp(0.0, 1.0);
         let eff = h * cache_ms + (1.0 - h) * storage_ms;
         (eff * 100.0).round() / 100.0
@@ -562,11 +583,16 @@ impl SovereignMultiDomainPackageAccessGovernor {
 
     /// Validates security access tokens (OAuth2/JWT/PQC claims)
     pub fn validate_security_access_token_claims(&self, token: &str, required_claim: &str) -> bool {
-        token.contains(required_claim) && (token.starts_with("bearer_") || token.starts_with("pqc_"))
+        token.contains(required_claim)
+            && (token.starts_with("bearer_") || token.starts_with("pqc_"))
     }
 
     /// Evaluates WPA3 Enterprise / 802.1X RADIUS wireless access point package policies
-    pub fn evaluate_wireless_access_point_policy(&self, ssid: &str, is_enterprise_8021x: bool) -> bool {
+    pub fn evaluate_wireless_access_point_policy(
+        &self,
+        ssid: &str,
+        is_enterprise_8021x: bool,
+    ) -> bool {
         !ssid.is_empty() && is_enterprise_8021x
     }
 }
@@ -642,7 +668,9 @@ impl SovereignUniversalPackageAdvancementsSuiteV4 {
         }
 
         // 3. Dispatch system triggers if installation operation
-        if action.operation == CanonicalPmOp::Install || action.operation == CanonicalPmOp::UpgradeAll {
+        if action.operation == CanonicalPmOp::Install
+            || action.operation == CanonicalPmOp::UpgradeAll
+        {
             self.triggers
                 .inspect_installed_files_and_queue_triggers(installed_files);
             self.triggers.dispatch_pending_triggers();
@@ -664,14 +692,20 @@ mod tests {
 
     #[test]
     fn test_cli_router() {
-        let action = SovereignUniversalPkgCliRouter::parse_cli_invocation(&["apt", "install", "curl", "wget"]).unwrap();
+        let action = SovereignUniversalPkgCliRouter::parse_cli_invocation(&[
+            "apt", "install", "curl", "wget",
+        ])
+        .unwrap();
         assert_eq!(action.operation, CanonicalPmOp::Install);
         assert_eq!(action.target_packages, vec!["curl", "wget"]);
 
-        let pac_action = SovereignUniversalPkgCliRouter::parse_cli_invocation(&["pacman", "-Syu"]).unwrap();
+        let pac_action =
+            SovereignUniversalPkgCliRouter::parse_cli_invocation(&["pacman", "-Syu"]).unwrap();
         assert_eq!(pac_action.operation, CanonicalPmOp::UpgradeAll);
 
-        let dnf_action = SovereignUniversalPkgCliRouter::parse_cli_invocation(&["dnf", "remove", "nano"]).unwrap();
+        let dnf_action =
+            SovereignUniversalPkgCliRouter::parse_cli_invocation(&["dnf", "remove", "nano"])
+                .unwrap();
         assert_eq!(dnf_action.operation, CanonicalPmOp::Remove);
     }
 
@@ -728,7 +762,8 @@ mod tests {
     #[test]
     fn test_snapshot_rollback() {
         let mut engine = SovereignUniversalSnapshotRollbackEngine::new();
-        let snap_id = engine.create_snapshot(UniversalSnapshotBackend::ZfsBectl, "snap_01", "hash123");
+        let snap_id =
+            engine.create_snapshot(UniversalSnapshotBackend::ZfsBectl, "snap_01", "hash123");
         let cmd = engine.rollback(snap_id).unwrap();
         assert_eq!(cmd, "bectl activate snap_01");
     }
@@ -737,17 +772,24 @@ mod tests {
     fn test_suite_v4_integration() {
         let mut suite = SovereignUniversalPackageAdvancementsSuiteV4::new();
         let mut pkg = UnifiedPackage::new("htop".to_string(), "3.3.0".to_string());
-        let files = vec!["/usr/lib/libhtop.so", "/usr/share/applications/htop.desktop"];
+        let files = vec![
+            "/usr/lib/libhtop.so",
+            "/usr/share/applications/htop.desktop",
+        ];
 
-        let snap_id = suite.process_package_installation(&mut pkg, &files).unwrap();
+        let snap_id = suite
+            .process_package_installation(&mut pkg, &files)
+            .unwrap();
         assert_eq!(snap_id, 1);
         assert!(pkg.installed);
 
-        let dispatched = suite.execute_universal_package_action(
-            &["pacman", "-S", "ripgrep"],
-            Some("pqc_token_123"),
-            &["/usr/bin/rg"],
-        ).unwrap();
+        let dispatched = suite
+            .execute_universal_package_action(
+                &["pacman", "-S", "ripgrep"],
+                Some("pqc_token_123"),
+                &["/usr/bin/rg"],
+            )
+            .unwrap();
 
         assert_eq!(dispatched.source_pm, "pacman");
         assert_eq!(dispatched.operation, CanonicalPmOp::Install);
@@ -774,7 +816,10 @@ mod tests {
 
         assert!(governor.evaluate_installer_process_migration(500, true));
 
-        assert_eq!(governor.get_device_access_pattern_advice(true), PackageIoAdviceMode::Sequential);
+        assert_eq!(
+            governor.get_device_access_pattern_advice(true),
+            PackageIoAdviceMode::Sequential
+        );
 
         assert!(governor.validate_remote_file_access("https://pkg.sigmaos.org/repo"));
         assert!(governor.validate_remote_file_access("p2p://cas_hash_123"));

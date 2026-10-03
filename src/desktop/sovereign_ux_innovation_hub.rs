@@ -5,7 +5,6 @@
 #![no_std]
 extern crate alloc;
 
-use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
@@ -54,11 +53,22 @@ impl ItsFossQuickShareAndBackupHud {
         });
     }
 
-    pub fn send_file(&mut self, peer_ip: &str, file_name: &str, file_size: u64) -> Result<String, &'static str> {
-        let peer = self.discovered_peers.iter().find(|p| p.ip_address == peer_ip);
+    pub fn send_file(
+        &mut self,
+        peer_ip: &str,
+        file_name: &str,
+        file_size: u64,
+    ) -> Result<String, &'static str> {
+        let peer = self
+            .discovered_peers
+            .iter()
+            .find(|p| p.ip_address == peer_ip);
         if let Some(p) = peer {
             self.active_transfer_count += 1;
-            Ok(format!("Initiated LocalSend transfer of '{}' ({} bytes) to {} ({})", file_name, file_size, p.device_name, p.ip_address))
+            Ok(format!(
+                "Initiated LocalSend transfer of '{}' ({} bytes) to {} ({})",
+                file_name, file_size, p.device_name, p.ip_address
+            ))
         } else {
             Err("Peer device not found on local network")
         }
@@ -79,7 +89,10 @@ impl ItsFossQuickShareAndBackupHud {
 
     pub fn restore_snapshot(&self, snapshot_id: &str) -> Result<String, &'static str> {
         if let Some(snap) = self.snapshots.iter().find(|s| s.snapshot_id == snapshot_id) {
-            Ok(format!("Restored system to snapshot '{}' ({})", snap.snapshot_id, snap.description))
+            Ok(format!(
+                "Restored system to snapshot '{}' ({})",
+                snap.snapshot_id, snap.description
+            ))
         } else {
             Err("Requested snapshot record not found")
         }
@@ -153,7 +166,13 @@ impl PopOsKdeTilingWorkspaceGridEngine {
         let g = self.gap_size_px;
         match self.current_mode {
             WindowTileLayoutMode::Grid => {
-                let cols = if count <= 1 { 1 } else if count <= 4 { 2 } else { 3 };
+                let cols = if count <= 1 {
+                    1
+                } else if count <= 4 {
+                    2
+                } else {
+                    3
+                };
                 let rows = (count as u32 + cols - 1) / cols;
                 let cell_w = (self.screen_width - (cols + 1) * g) / cols;
                 let cell_h = (self.screen_height - (rows + 1) * g) / rows;
@@ -235,8 +254,15 @@ impl WindowsCopilotAiAssistantSidebar {
         }
     }
 
-    pub fn process_user_prompt(&mut self, prompt: &str, active_app_context: &str) -> CopilotAiQueryResponse {
-        let resp_text = format!("Processed AI query for '{}' with context '{}'", prompt, active_app_context);
+    pub fn process_user_prompt(
+        &mut self,
+        prompt: &str,
+        active_app_context: &str,
+    ) -> CopilotAiQueryResponse {
+        let resp_text = format!(
+            "Processed AI query for '{}' with context '{}'",
+            prompt, active_app_context
+        );
         let mut actions = Vec::new();
         actions.push("Apply Code Fix".to_string());
         actions.push("Optimize Memory Usage".to_string());
@@ -277,12 +303,24 @@ impl CachyosGamescopeHandheldOverlay {
         }
     }
 
-    pub fn configure_handheld_profile(&mut self, game: &str, fps: u32, tdp: u32, fsr: bool) -> String {
+    pub fn configure_handheld_profile(
+        &mut self,
+        game: &str,
+        fps: u32,
+        tdp: u32,
+        fsr: bool,
+    ) -> String {
         self.active_game_title = game.to_string();
         self.fps_cap = fps;
         self.tdp_limit_watts = tdp;
         self.fsr_enabled = fsr;
-        format!("Gamescope Profile applied for '{}': {} FPS cap, {}W TDP limit, FSR {}", game, fps, tdp, if fsr { "ON" } else { "OFF" })
+        format!(
+            "Gamescope Profile applied for '{}': {} FPS cap, {}W TDP limit, FSR {}",
+            game,
+            fps,
+            tdp,
+            if fsr { "ON" } else { "OFF" }
+        )
     }
 }
 
@@ -331,8 +369,14 @@ impl PhoronixPerformanceBenchmarkWidget {
 
     pub fn render_summary_hud(&self) -> String {
         let (boot_adv, mem_adv) = self.calculate_advantage_multiplier();
-        format!("SigmaOS UX HUD | Boot: {}ms ({}x faster) | RSS: {}MB ({}x lighter) | FPS: {}",
-            self.metrics.boot_time_ms, boot_adv, self.metrics.memory_rss_mb, mem_adv, self.metrics.current_fps)
+        format!(
+            "SigmaOS UX HUD | Boot: {}ms ({}x faster) | RSS: {}MB ({}x lighter) | FPS: {}",
+            self.metrics.boot_time_ms,
+            boot_adv,
+            self.metrics.memory_rss_mb,
+            mem_adv,
+            self.metrics.current_fps
+        )
     }
 }
 
@@ -366,10 +410,16 @@ impl SovereignUxMasterEngine {
         let mut score = 80;
         score += 4;
         score += 4;
-        if self.copilot_sidebar.context_awareness_enabled { score += 4; }
-        if self.gamescope_overlay.fsr_enabled { score += 4; }
+        if self.copilot_sidebar.context_awareness_enabled {
+            score += 4;
+        }
+        if self.gamescope_overlay.fsr_enabled {
+            score += 4;
+        }
         let (boot_adv, _) = self.phoronix_hud.calculate_advantage_multiplier();
-        if boot_adv > 100 { score += 4; }
+        if boot_adv > 100 {
+            score += 4;
+        }
         score
     }
 }

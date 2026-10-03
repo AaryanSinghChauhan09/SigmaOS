@@ -234,7 +234,6 @@ impl DevelopmentTestingFramework {
             .iter()
             .map(|s| s.get_total_duration_ms())
             .sum();
-        let total_duration: u64 = self.test_suites.iter().map(|s| s.get_total_duration_ms()).sum();
 
         stats.push_str(&format!("Total test suites: {}\n", self.test_suites.len()));
         stats.push_str(&format!("Total tests: {}\n", total_tests));

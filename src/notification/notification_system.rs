@@ -13,19 +13,18 @@
 #![no_std]
 
 extern crate alloc;
+use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
-use alloc::format;
 use core::fmt;
 
 /// Notification priority levels
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum Priority {
-    Critical,  // System errors, security alerts
-    High,      // Important updates, warnings
-    Normal,    // Regular notifications
-    Low,       // Informational, tips
+    Critical, // System errors, security alerts
+    High,     // Important updates, warnings
+    Normal,   // Regular notifications
+    Low,      // Informational, tips
 }
 
 impl fmt::Display for Priority {
@@ -75,11 +74,11 @@ pub struct Notification {
     pub priority: Priority,
     pub urgency: Urgency,
     pub timestamp: u64,
-    pub timeout: Option<u32>,  // ms, None = no timeout
+    pub timeout: Option<u32>, // ms, None = no timeout
     pub actions: Vec<Action>,
     pub category: String,
     pub group_key: Option<String>,
-    pub progress: Option<u8>,  // 0-100
+    pub progress: Option<u8>, // 0-100
     pub dismissed: bool,
     pub read: bool,
 }
@@ -102,7 +101,7 @@ impl Notification {
             priority: Priority::Normal,
             urgency: Urgency::Normal,
             timestamp: Self::get_time(),
-            timeout: Some(5000),  // 5 seconds default
+            timeout: Some(5000), // 5 seconds default
             actions: Vec::new(),
             category: String::new(),
             group_key: None,
@@ -172,7 +171,7 @@ impl Notification {
 pub struct DndConfig {
     pub enabled: bool,
     pub allow_critical: bool,
-    pub schedule_start: Option<(u8, u8)>,  // (hour, minute)
+    pub schedule_start: Option<(u8, u8)>, // (hour, minute)
     pub schedule_end: Option<(u8, u8)>,
     pub allowed_apps: Vec<String>,
 }
@@ -192,7 +191,7 @@ impl Default for DndConfig {
 /// Notification system
 pub struct NotificationSystem {
     notifications: BTreeMap<u64, Notification>,
-    queue: Vec<u64>,  // Sorted by priority
+    queue: Vec<u64>, // Sorted by priority
     history: Vec<u64>,
     dnd_config: DndConfig,
     max_history: usize,
@@ -224,10 +223,6 @@ impl NotificationSystem {
         self.queue.push(id);
         self.sort_queue();
 
-        // Add to queue based on priority
-        self.queue.push(id);
-        self.sort_queue();
-
         // Store notification
         self.notifications.insert(id, notification);
 
@@ -250,7 +245,11 @@ impl NotificationSystem {
         }
 
         // Check allowed apps
-        if self.dnd_config.allowed_apps.contains(&notification.app_name) {
+        if self
+            .dnd_config
+            .allowed_apps
+            .contains(&notification.app_name)
+        {
             return false;
         }
 
@@ -280,14 +279,16 @@ impl NotificationSystem {
     }
 
     pub fn get_all_notifications(&self) -> Vec<Notification> {
-        self.queue.iter()
+        self.queue
+            .iter()
             .filter_map(|id| self.notifications.get(id))
             .cloned()
             .collect()
     }
 
     pub fn get_grouped_notifications(&self, group_key: &str) -> Vec<Notification> {
-        self.queue.iter()
+        self.queue
+            .iter()
             .filter_map(|id| {
                 self.notifications.get(id).and_then(|n| {
                     if n.group_key.as_deref() == Some(group_key) {
@@ -342,7 +343,8 @@ impl NotificationSystem {
     }
 
     pub fn get_history(&self) -> Vec<Notification> {
-        self.history.iter()
+        self.history
+            .iter()
             .filter_map(|id| self.notifications.get(id))
             .cloned()
             .collect()
@@ -351,12 +353,13 @@ impl NotificationSystem {
     pub fn search_history(&self, query: &str) -> Vec<Notification> {
         let query = query.to_lowercase();
 
-        self.history.iter()
+        self.history
+            .iter()
             .filter_map(|id| self.notifications.get(id))
             .filter(|n| {
-                n.summary.to_lowercase().contains(&query) ||
-                n.body.to_lowercase().contains(&query) ||
-                n.app_name.to_lowercase().contains(&query)
+                n.summary.to_lowercase().contains(&query)
+                    || n.body.to_lowercase().contains(&query)
+                    || n.app_name.to_lowercase().contains(&query)
             })
             .cloned()
             .collect()
@@ -393,7 +396,8 @@ impl NotificationSystem {
     }
 
     pub fn get_unread_count(&self) -> usize {
-        self.queue.iter()
+        self.queue
+            .iter()
             .filter_map(|id| self.notifications.get(id))
             .filter(|n| !n.read)
             .count()
@@ -414,7 +418,7 @@ pub mod presets {
         Notification::new(
             "System",
             "Update Available",
-            &format!("SigmaOS {} is ready to install", version)
+            &format!("SigmaOS {} is ready to install", version),
         )
         .with_priority(Priority::High)
         .with_icon("system-software-update")
@@ -424,23 +428,19 @@ pub mod presets {
     }
 
     pub fn security_alert(message: &str) -> Notification {
-        Notification::new(
-            "Security",
-            "Security Alert",
-            message
-        )
-        .with_priority(Priority::Critical)
-        .with_urgency(Urgency::Critical)
-        .with_icon("security-high")
-        .with_category("security.alert")
-        .persistent()
+        Notification::new("Security", "Security Alert", message)
+            .with_priority(Priority::Critical)
+            .with_urgency(Urgency::Critical)
+            .with_icon("security-high")
+            .with_category("security.alert")
+            .persistent()
     }
 
     pub fn download_complete(filename: &str) -> Notification {
         Notification::new(
             "Downloads",
             "Download Complete",
-            &format!("{} finished downloading", filename)
+            &format!("{} finished downloading", filename),
         )
         .with_priority(Priority::Low)
         .with_icon("folder-download")
@@ -453,7 +453,7 @@ pub mod presets {
         Notification::new(
             "Power",
             "Battery Low",
-            &format!("{}% battery remaining", percent)
+            &format!("{}% battery remaining", percent),
         )
         .with_priority(Priority::High)
         .with_icon("battery-caution")
@@ -461,15 +461,11 @@ pub mod presets {
     }
 
     pub fn network_connected(ssid: &str) -> Notification {
-        Notification::new(
-            "Network",
-            "Connected",
-            &format!("Connected to {}", ssid)
-        )
-        .with_priority(Priority::Low)
-        .with_icon("network-wireless")
-        .with_category("network.connected")
-        .with_timeout(3000)
+        Notification::new("Network", "Connected", &format!("Connected to {}", ssid))
+            .with_priority(Priority::Low)
+            .with_icon("network-wireless")
+            .with_category("network.connected")
+            .with_timeout(3000)
     }
 }
 
@@ -510,7 +506,8 @@ mod tests {
         let mut system = NotificationSystem::new();
 
         system.notify(Notification::new("App", "Low", "Body").with_priority(Priority::Low));
-        system.notify(Notification::new("App", "Critical", "Body").with_priority(Priority::Critical));
+        system
+            .notify(Notification::new("App", "Critical", "Body").with_priority(Priority::Critical));
         system.notify(Notification::new("App", "Normal", "Body").with_priority(Priority::Normal));
 
         let next = system.get_next_notification().unwrap();

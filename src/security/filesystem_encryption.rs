@@ -262,14 +262,18 @@ impl FilesystemEncryptionManager {
     pub fn get_statistics(&self) -> String {
         let mut stats = String::from("Filesystem Encryption Statistics:\n");
 
-        let encrypted_dirs = self.fscrypt_directories.iter()
+        let encrypted_dirs = self
+            .fscrypt_directories
+            .iter()
             .filter(|d| d.status == EncryptionStatus::Encrypted || d.status == EncryptionStatus::Locked)
             .count();
         let unlocked_dirs = self.fscrypt_directories.iter()
             .filter(|d| d.status == EncryptionStatus::Unlocked)
             .count();
 
-        let encrypted_devices = self.luks_devices.iter()
+        let encrypted_devices = self
+            .luks_devices
+            .iter()
             .filter(|d| d.status == EncryptionStatus::Encrypted || d.status == EncryptionStatus::Locked)
             .count();
         let unlocked_devices = self.luks_devices.iter()
@@ -288,10 +292,6 @@ impl FilesystemEncryptionManager {
             encrypted_devices,
             unlocked_devices
         ));
-        stats.push_str(&format!("Fscrypt directories: {} total, {} encrypted, {} unlocked\n",
-            self.fscrypt_directories.len(), encrypted_dirs, unlocked_dirs));
-        stats.push_str(&format!("LUKS devices: {} total, {} encrypted, {} unlocked\n",
-            self.luks_devices.len(), encrypted_devices, unlocked_devices));
 
         stats
     }

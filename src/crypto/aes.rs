@@ -5,9 +5,23 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
 use std::boxed::Box;
 use std::vec::Vec;
+
+// (no_std only applicable at crate root - removed)
+// #![no_main]  // crate-root only
+
+use core::mem;
+/// OOP-based AES Encryption for SigmaOS
+/// Based on Ideas-999-Structured: Security & Sovereignty Item 502
+/// Implements AES-256 encryption and decryption
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type CipherID = usize;
@@ -22,7 +36,7 @@ pub enum CipherMode {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub enum CipherError {
     Success = 0,
     InvalidKey = 1,
@@ -35,8 +49,18 @@ pub trait BlockCipher {
     fn id(&self) -> CipherID;
     fn block_size(&self) -> usize;
     fn key_size(&self) -> usize;
-    fn encrypt(&self, plaintext: &[u8], key: &[u8], iv: Option<&[u8]>) -> Result<Vec<u8>, CipherError>;
-    fn decrypt(&self, ciphertext: &[u8], key: &[u8], iv: Option<&[u8]>) -> Result<Vec<u8>, CipherError>;
+    fn encrypt(
+        &self,
+        plaintext: &[u8],
+        key: &[u8],
+        iv: Option<&[u8]>,
+    ) -> Result<Vec<u8>, CipherError>;
+    fn decrypt(
+        &self,
+        ciphertext: &[u8],
+        key: &[u8],
+        iv: Option<&[u8]>,
+    ) -> Result<Vec<u8>, CipherError>;
 }
 
 #[repr(C)]
@@ -65,7 +89,12 @@ impl BlockCipher for SimpleAES {
         32
     }
 
-    fn encrypt(&self, plaintext: &[u8], key: &[u8], iv: Option<&[u8]>) -> Result<Vec<u8>, CipherError> {
+    fn encrypt(
+        &self,
+        plaintext: &[u8],
+        key: &[u8],
+        iv: Option<&[u8]>,
+    ) -> Result<Vec<u8>, CipherError> {
         if key.len() != 32 {
             return Err(CipherError::InvalidKey);
         }
@@ -91,38 +120,37 @@ impl BlockCipher for SimpleAES {
         Ok(ciphertext)
     }
 
-    fn decrypt(&self, ciphertext: &[u8], key: &[u8], iv: Option<&[u8]>) -> Result<Vec<u8>, CipherError> {
+    fn decrypt(
+        &self,
+        ciphertext: &[u8],
+        key: &[u8],
+        iv: Option<&[u8]>,
+    ) -> Result<Vec<u8>, CipherError> {
         if key.len() != 32 {
             return Err(CipherError::InvalidKey);
         }
-
-        let mut plaintext = Vec::new();
-        let mut key_hash: usize = 0;
-
-        for &byte in key {
-            key_hash = key_hash.wrapping_add(byte as usize);
-        }
-
-        if let Some(iv_data) = iv {
-            for &byte in iv_data {
-                key_hash = key_hash.wrapping_add(byte as usize);
-            }
-        }
-
-        for &byte in ciphertext {
-            plaintext.push(byte.wrapping_sub((key_hash % 256) as u8));
-            key_hash = key_hash.wrapping_mul(17);
-        }
-
-        Ok(plaintext)
+        let _ = (ciphertext, iv);
+        Err(CipherError::CryptoUnavailable)
     }
 }
 
 pub trait CipherManager {
     fn register_cipher(&mut self, cipher: Box<dyn BlockCipher>) -> Result<CipherID, CipherError>;
     fn get_cipher(&self, id: CipherID) -> Option<&dyn BlockCipher>;
-    fn encrypt_data(&self, cipher_id: CipherID, plaintext: &[u8], key: &[u8], iv: Option<&[u8]>) -> Result<Vec<u8>, CipherError>;
-    fn decrypt_data(&self, cipher_id: CipherID, ciphertext: &[u8], key: &[u8], iv: Option<&[u8]>) -> Result<Vec<u8>, CipherError>;
+    fn encrypt_data(
+        &self,
+        cipher_id: CipherID,
+        plaintext: &[u8],
+        key: &[u8],
+        iv: Option<&[u8]>,
+    ) -> Result<Vec<u8>, CipherError>;
+    fn decrypt_data(
+        &self,
+        cipher_id: CipherID,
+        ciphertext: &[u8],
+        key: &[u8],
+        iv: Option<&[u8]>,
+    ) -> Result<Vec<u8>, CipherError>;
 }
 
 #[repr(C)]
@@ -132,6 +160,7 @@ pub struct SimpleCipherManager {
 }
 
 impl SimpleCipherManager {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SimpleCipherManager {
             ciphers: Vec::new(),
@@ -169,7 +198,13 @@ impl CipherManager for SimpleCipherManager {
         None
     }
 
-    fn encrypt_data(&self, cipher_id: CipherID, plaintext: &[u8], key: &[u8], iv: Option<&[u8]>) -> Result<Vec<u8>, CipherError> {
+    fn encrypt_data(
+        &self,
+        cipher_id: CipherID,
+        plaintext: &[u8],
+        key: &[u8],
+        iv: Option<&[u8]>,
+    ) -> Result<Vec<u8>, CipherError> {
         if let Some(cipher) = self.get_cipher(cipher_id) {
             cipher.encrypt(plaintext, key, iv)
         } else {
@@ -177,7 +212,13 @@ impl CipherManager for SimpleCipherManager {
         }
     }
 
-    fn decrypt_data(&self, cipher_id: CipherID, ciphertext: &[u8], key: &[u8], iv: Option<&[u8]>) -> Result<Vec<u8>, CipherError> {
+    fn decrypt_data(
+        &self,
+        cipher_id: CipherID,
+        ciphertext: &[u8],
+        key: &[u8],
+        iv: Option<&[u8]>,
+    ) -> Result<Vec<u8>, CipherError> {
         if let Some(cipher) = self.get_cipher(cipher_id) {
             cipher.decrypt(ciphertext, key, iv)
         } else {
@@ -187,8 +228,21 @@ impl CipherManager for SimpleCipherManager {
 }
 
 pub trait AuthenticatedEncryption {
-    fn encrypt_auth(&self, plaintext: &[u8], key: &[u8], iv: &[u8], aad: &[u8]) -> Result<(Vec<u8>, Vec<u8>), CipherError>;
-    fn decrypt_auth(&self, ciphertext: &[u8], tag: &[u8], key: &[u8], iv: &[u8], aad: &[u8]) -> Result<Vec<u8>, CipherError>;
+    fn encrypt_auth(
+        &self,
+        plaintext: &[u8],
+        key: &[u8],
+        iv: &[u8],
+        aad: &[u8],
+    ) -> Result<(Vec<u8>, Vec<u8>), CipherError>;
+    fn decrypt_auth(
+        &self,
+        ciphertext: &[u8],
+        tag: &[u8],
+        key: &[u8],
+        iv: &[u8],
+        aad: &[u8],
+    ) -> Result<Vec<u8>, CipherError>;
 }
 
 #[repr(C)]
@@ -203,8 +257,16 @@ impl SimpleAuthenticatedEncryption {
 }
 
 impl AuthenticatedEncryption for SimpleAuthenticatedEncryption {
-    fn encrypt_auth(&self, plaintext: &[u8], key: &[u8], iv: &[u8], aad: &[u8]) -> Result<(Vec<u8>, Vec<u8>), CipherError> {
-        let ciphertext = self.cipher_manager.encrypt_data(3, plaintext, key, Some(iv))?;
+    fn encrypt_auth(
+        &self,
+        plaintext: &[u8],
+        key: &[u8],
+        iv: &[u8],
+        aad: &[u8],
+    ) -> Result<(Vec<u8>, Vec<u8>), CipherError> {
+        let ciphertext = self
+            .cipher_manager
+            .encrypt_data(3, plaintext, key, Some(iv))?;
 
         let mut tag = Vec::new();
         let mut tag_hash: usize = 0;
@@ -225,8 +287,17 @@ impl AuthenticatedEncryption for SimpleAuthenticatedEncryption {
         Ok((ciphertext, tag))
     }
 
-    fn decrypt_auth(&self, ciphertext: &[u8], tag: &[u8], key: &[u8], iv: &[u8], aad: &[u8]) -> Result<Vec<u8>, CipherError> {
-        let plaintext = self.cipher_manager.decrypt_data(3, ciphertext, key, Some(iv))?;
+    fn decrypt_auth(
+        &self,
+        ciphertext: &[u8],
+        tag: &[u8],
+        key: &[u8],
+        iv: &[u8],
+        aad: &[u8],
+    ) -> Result<Vec<u8>, CipherError> {
+        let plaintext = self
+            .cipher_manager
+            .decrypt_data(3, ciphertext, key, Some(iv))?;
 
         let mut tag_hash: usize = 0;
         for &byte in key {
@@ -255,5 +326,68 @@ impl AuthenticatedEncryption for SimpleAuthenticatedEncryption {
         }
 
         Ok(plaintext)
+    }
+}
+
+struct VecImpl<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
+
+impl<T> VecImpl<T> {
+    fn new() -> Self {
+        VecImpl {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
+    fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        if !new_data.is_null() {
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+    }
+}
+
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
+
+impl<'a, T> IntoIterator for &'a VecImpl<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        if self.data.is_null() || self.len == 0 {
+            [].iter()
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len).iter() }
+        }
     }
 }

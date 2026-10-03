@@ -2,16 +2,13 @@
 // Zero-dependency Rust #![no_std] / std implementation of Linux & BSD inspired FHS translation & mapping.
 
 #[cfg(not(test))]
-use alloc::format;
 #[cfg(not(test))]
 use alloc::string::{String, ToString};
 #[cfg(not(test))]
 use alloc::vec::Vec;
 
 #[cfg(test)]
-use std::string::String;
 #[cfg(test)]
-use std::vec::Vec;
 
 /// FHS Directory Classification Category
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

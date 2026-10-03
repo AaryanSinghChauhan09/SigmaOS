@@ -3,11 +3,10 @@
 //! NetBSD (RUMP kernel userland driver virtualization), HardenedBSD (PaX & CFI security),
 //! Garuda / EndeavourOS (Auto-CPU-FREQ & zram performance tuning), and Debian (Multiarch & APT Pinning).
 
+use crate::klib::btreemap::BTreeMap;
 use std::format;
-use std::string::{String, ToString};
 use std::vec;
 use std::vec::Vec;
-use crate::klib::btreemap::BTreeMap;
 
 /// Solus Linux Inspired: Stateless Vendor Override & LMO Package Stream Engine
 #[derive(Debug, Clone)]
@@ -29,7 +28,11 @@ impl SolusEopkgBudgieEngine {
     }
 
     /// Resolves configuration path according to Solus Stateless System Architecture
-    pub fn resolve_stateless_config_path(&self, config_file: &str, user_has_custom: bool) -> String {
+    pub fn resolve_stateless_config_path(
+        &self,
+        config_file: &str,
+        user_has_custom: bool,
+    ) -> String {
         if user_has_custom {
             format!("{}/{}", self.user_override_path, config_file)
         } else {
@@ -48,7 +51,10 @@ impl SolusEopkgBudgieEngine {
     }
 
     /// Simulates Lazy Loading Object (LMO) package stream verification
-    pub fn verify_lmo_package_stream(&mut self, stream_bytes: &[u8]) -> Result<usize, &'static str> {
+    pub fn verify_lmo_package_stream(
+        &mut self,
+        stream_bytes: &[u8],
+    ) -> Result<usize, &'static str> {
         if stream_bytes.len() < 4 {
             return Err("Solus LMO: Package stream too small");
         }
@@ -87,7 +93,11 @@ impl NetBsdRumpUserlandEngine {
     }
 
     /// Spawns a sandboxed NetBSD RUMP userland driver instance
-    pub fn spawn_rump_driver(&mut self, name: &str, driver_type: RumpDriverType) -> Result<(), &'static str> {
+    pub fn spawn_rump_driver(
+        &mut self,
+        name: &str,
+        driver_type: RumpDriverType,
+    ) -> Result<(), &'static str> {
         if name.is_empty() {
             return Err("NetBSD RUMP: Invalid driver name");
         }
@@ -96,7 +106,11 @@ impl NetBsdRumpUserlandEngine {
     }
 
     /// Routes hypercall RPC to virtualized userland driver
-    pub fn dispatch_hypercall(&mut self, driver_name: &str, payload: &[u8]) -> Result<usize, &'static str> {
+    pub fn dispatch_hypercall(
+        &mut self,
+        driver_name: &str,
+        payload: &[u8],
+    ) -> Result<usize, &'static str> {
         if !self.active_drivers.contains_key(driver_name) {
             return Err("NetBSD RUMP: Target driver not active in userland");
         }
@@ -192,7 +206,11 @@ impl GarudaPerformanceTweakEngine {
     }
 
     /// Auto-switches CPU governor based on power source or gaming workload demand
-    pub fn set_governor_profile(&mut self, on_ac_power: bool, gaming_active: bool) -> CpuGovernorMode {
+    pub fn set_governor_profile(
+        &mut self,
+        on_ac_power: bool,
+        gaming_active: bool,
+    ) -> CpuGovernorMode {
         if gaming_active || on_ac_power {
             self.current_governor = CpuGovernorMode::Performance;
         } else {

@@ -24,11 +24,9 @@ use std::collections::BTreeMap;
 #[cfg(any(feature = "standalone_test", test))]
 use std::format;
 #[cfg(any(feature = "standalone_test", test))]
-use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec;
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
 
 // =========================================================================
 // 1. NETBSD VERIEXEC FILE EXECUTABLE SECURITY ENGINE
@@ -80,7 +78,11 @@ impl NetBsdVeriexecSecurityEngine {
         self.fingerprints.insert(path.to_string(), fp);
     }
 
-    pub fn evaluate_execution(&mut self, path: &str, actual_hash: &str) -> Result<bool, &'static str> {
+    pub fn evaluate_execution(
+        &mut self,
+        path: &str,
+        actual_hash: &str,
+    ) -> Result<bool, &'static str> {
         if self.mode == VeriexecMode::Off {
             return Ok(true);
         }
@@ -152,7 +154,14 @@ impl FreeBsdGgateNetworkBlockEngine {
         }
     }
 
-    pub fn create_device(&mut self, name: &str, host: &str, port: u16, sector_size: u32, size_bytes: u64) {
+    pub fn create_device(
+        &mut self,
+        name: &str,
+        host: &str,
+        port: u16,
+        sector_size: u32,
+        size_bytes: u64,
+    ) {
         let dev = GgateDeviceConfig {
             name: name.to_string(),
             remote_host: host.to_string(),
@@ -174,7 +183,12 @@ impl FreeBsdGgateNetworkBlockEngine {
         }
     }
 
-    pub fn dispatch_io_sector(&mut self, name: &str, lba: u64, sector_count: u32) -> Result<u64, &'static str> {
+    pub fn dispatch_io_sector(
+        &mut self,
+        name: &str,
+        lba: u64,
+        sector_count: u32,
+    ) -> Result<u64, &'static str> {
         if let Some(dev) = self.devices.get_mut(name) {
             if dev.state != GgateDeviceState::Connected {
                 return Err("GEOM Gate: Network block device disconnected");
@@ -238,7 +252,14 @@ impl OpenBsdAltqTrafficShaperEngine {
         }
     }
 
-    pub fn add_queue(&mut self, name: &str, kind: AltqQueueKind, bw_kbps: u32, priority: u8, burst_kb: u32) {
+    pub fn add_queue(
+        &mut self,
+        name: &str,
+        kind: AltqQueueKind,
+        bw_kbps: u32,
+        priority: u8,
+        burst_kb: u32,
+    ) {
         let q = AltqQueueConfig {
             name: name.to_string(),
             kind,
@@ -250,7 +271,11 @@ impl OpenBsdAltqTrafficShaperEngine {
         self.queues.insert(name.to_string(), q);
     }
 
-    pub fn shape_packet(&mut self, queue_name: &str, packet_size_bytes: usize) -> Result<bool, &'static str> {
+    pub fn shape_packet(
+        &mut self,
+        queue_name: &str,
+        packet_size_bytes: usize,
+    ) -> Result<bool, &'static str> {
         if let Some(q) = self.queues.get_mut(queue_name) {
             let pkt_kb = ((packet_size_bytes as u32) + 1023) / 1024;
             if q.current_tokens_kb >= pkt_kb {
@@ -344,7 +369,10 @@ impl LinuxUdp2RawTunnelEngine {
         fake_tcp_pkt
     }
 
-    pub fn decapsulate_fake_tcp_payload<'a>(&mut self, fake_tcp_packet: &'a [u8]) -> Result<&'a [u8], &'static str> {
+    pub fn decapsulate_fake_tcp_payload<'a>(
+        &mut self,
+        fake_tcp_packet: &'a [u8],
+    ) -> Result<&'a [u8], &'static str> {
         if fake_tcp_packet.len() < 20 {
             return Err("udp2raw: Packet too short for TCP header");
         }
@@ -502,16 +530,18 @@ impl SovereignLinuxBsdDistroGapsSynthesisSuite {
             .unwrap_or(false);
 
         // 2. GGATE
-        self.ggate_engine.create_device("ggate0", "10.0.0.1", 3080, 512, 1024 * 1024 * 1024);
+        self.ggate_engine
+            .create_device("ggate0", "10.0.0.1", 3080, 512, 1024 * 1024 * 1024);
         let _ = self.ggate_engine.connect_device("ggate0");
-        let ggate_ok = self
-            .ggate_engine
-            .dispatch_io_sector("ggate0", 0, 8)
-            .is_ok();
+        let ggate_ok = self.ggate_engine.dispatch_io_sector("ggate0", 0, 8).is_ok();
 
         // 3. ALTQ
-        self.altq_engine.add_queue("default_out", AltqQueueKind::Hfsc, 10000, 1, 64);
-        let altq_ok = self.altq_engine.shape_packet("default_out", 1400).unwrap_or(false);
+        self.altq_engine
+            .add_queue("default_out", AltqQueueKind::Hfsc, 10000, 1, 64);
+        let altq_ok = self
+            .altq_engine
+            .shape_packet("default_out", 1400)
+            .unwrap_or(false);
 
         // 4. udp2raw
         let enc = self.udp2raw_engine.encapsulate_udp_payload(b"PING");
@@ -522,7 +552,10 @@ impl SovereignLinuxBsdDistroGapsSynthesisSuite {
         let ext_id = self
             .bcachefs_engine
             .allocate_extent(StorageTier::SsdWarm, 4096, 2);
-        let bcachefs_ok = self.bcachefs_engine.scrub_extent_integrity(ext_id).unwrap_or(false);
+        let bcachefs_ok = self
+            .bcachefs_engine
+            .scrub_extent_integrity(ext_id)
+            .unwrap_or(false);
 
         veriexec_ok && ggate_ok && altq_ok && udp2raw_ok && bcachefs_ok
     }
@@ -592,7 +625,10 @@ mod tests {
 
         let changes = bcachefs.promote_demote_auto_tier();
         assert_eq!(changes, 1);
-        assert_eq!(bcachefs.extents.get(&id).unwrap().tier, StorageTier::SsdWarm);
+        assert_eq!(
+            bcachefs.extents.get(&id).unwrap().tier,
+            StorageTier::SsdWarm
+        );
     }
 
     #[test]

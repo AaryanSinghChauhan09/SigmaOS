@@ -1,78 +1,74 @@
-# AGENT.md - SigmaOS Future Development Roadmap for Missing Linux & BSD Components
+# AGENT.md - SigmaOS Future Development Roadmap & Agent Guidelines
 
-This document serves as the operational guide and technical specification for AI engineering agents working on closing all remaining component and subsystem gaps between **SigmaOS** and upstream **Linux** and **BSD** operating system distributions.
-
----
-
-## 🎯 Master Objective
-
-Achieve 100% feature, ABI, and operational parity with modern Linux (6.12+ LTS) and BSD (FreeBSD 14.1, OpenBSD 7.6, NetBSD 10.0, DragonFly BSD 6.4) ecosystems in **zero-dependency, safe Rust**.
+## System Overview & Architecture Principles
+SigmaOS is a sovereign, high-performance, `#![no_std]` capable operating system written in Rust.
+It incorporates best-in-class innovations and design patterns from major Linux distributions (Arch, Debian, Fedora, Alpine, Gentoo, Void, NixOS/Guix, Clear Linux) and BSD variants (FreeBSD, OpenBSD, NetBSD, DragonFly BSD) alongside macOS and mobile systems.
 
 ---
 
-## 🚀 Priority Roadmap for Missing Components
+## Instructions for Future AI & Human Engineers
 
-### Phase 1: Linux Kernel Subsystems & Hardening
+### 1. Zero-Dependency & `#![no_std]` First
+- Whenever implementing core OS modules (kernel, drivers, low-level memory, syscalls, process management), prefer `#![no_std]` zero-dependency implementations.
+- For userland and standalone test suites, use conditional compilation (`#[cfg(feature = "standalone_test")]` / `#[cfg(test)]`) to allow standard library harness compatibility where appropriate.
 
-1. **`sched_ext` (eBPF Extensible Scheduler)**
-   - *Target*: Parity with Linux 6.12+ `scx` scheduler frameworks (`scx_bpfland`, `scx_rusty`, `scx_lavd`).
-   - *Requirement*: Dynamic userland/eBPF CPU task scheduling policies for real-time and gaming workloads.
+### 2. Testing & Verification
+Before marking tasks as complete, always compile and run standalone unit test runners via `rustc`:
+```bash
+# Example unit test runner invocation pattern
+mkdir -p build
+rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/package/sovereign_distro_package_advancements_v9.rs -o build/test_v9 && ./build/test_v9
 
-2. **Landlock LSM v5 & BPF LSM**
-   - *Target*: Linux unprivileged filesystem sandboxing & eBPF LSM hook gates.
-   - *Requirement*: Path-based read/write/exec restriction rules enforced per thread.
+# Universal package CLI verification test
+rustc --test --edition=2021 --cfg 'feature="standalone_test"' tests/sigpkg_cli_verification_test.rs -o build/test_sigpkg_cli && ./build/test_sigpkg_cli
 
-3. **Bcachefs Advanced Tiered CoW Storage**
-   - *Target*: Parity with Bcachefs multode tiering, encryption, and inline compression.
-   - *Requirement*: Extent-based copy-on-write allocation with automatic SSD/NVMe caching tiers.
-
-4. **io_uring Asynchronous Ring Buffer Engine**
-   - *Target*: High-throughput zero-copy asynchronous I/O completion queues.
-   - *Requirement*: Fast submission (`SQ`) and completion (`CQ`) ring buffers for network and storage syscalls.
-
-5. **systemd 256+ Parity & Varlink IPC**
-   - *Target*: Modern `systemd-sysext`, `systemd-confext`, `homed`, and Varlink binary IPC transport.
-   - *Requirement*: Immutable system extension overlay mounts and PQC encrypted home directories.
+# Full system test runner
+./run_sigma_tests.sh
+```
 
 ---
 
-### Phase 2: BSD Subsystem Innovations
+## Future Development Roadmap: Missing Distro Components & Parity Targets
 
-1. **FreeBSD 14.1 VNET, Jails, Capsicum & GEOM**
-   - *Target*: Complete VNET virtual network stack per jail and Capsicum capability mode sandboxing.
-   - *Requirement*: Fine-grained file descriptor rights enforcement (`CAP_READ`, `CAP_WRITE`, `CAP_SEEK`).
+### Phase 1: Universal Package Manager (`Sigma-pkg` / `Universal PM`)
+- [x] Multi-format package manifest parsing and conversion (`.deb`, `.rpm`, `.pkg.tar.zst`, `.apk`, `.ebuild`, `.xbps`, `.pkg`, `.openbsd.tgz`, `.pkgsrc`, `.nix`, `.guix`, `.flatpak`, `.snap`, `.appimage`, `.eopkg`, `.ipk`).
+- [x] Multi-distro PM CLI command interop (`apt`, `pacman`, `dnf`, `apk`, `pkg`, `xbps-install`, `nix-env`) with dry-run/simulation flags.
+- [x] Maintainer scriptlet sandboxing (`postinst`, `%post`, `.POST-INSTALL`) with Landlock/pledge/unveil capabilities.
+- [x] Cross-distro repository index aggregation (APT `Packages`, Arch DB, Fedora `primary.xml`, Alpine `APKINDEX`, FreeBSD `+MANIFEST`).
+- [ ] P2P Content-Addressed Storage (CAS) package distribution network with Merkle-tree deduplication.
+- [ ] SAT-based Boolean dependency solver with virtual provides and slotting support for Portage ebuilds.
 
-2. **OpenBSD 7.6+ Pledge, Unveil, KARL & pf**
-   - *Target*: Process call promise restrictions (`pledge`), path visibility locks (`unveil`), Kernel Address Randomized Link (`KARL`), and stateful Packet Filter (`pf`).
-   - *Requirement*: Mandatory pledge/unveil sandboxing for all userland scriptlets and processes.
+### Phase 2: Kernel Core, SMP & Memory Management
+- [x] Multi-core SMP scheduling with IPI inter-processor interrupts, per-CPU runqueues, and task stealing.
+- [x] Formatted kernel logging (`kprintf!`, `printk!`, `pr_info!`, `pr_err!`) with ring buffer capture.
+- [x] TLB 4-way associative lookup with LRU eviction and ASID allocation.
+- [x] Ring 0-3 privilege isolation with SMEP/SMAP/W^X paging protections.
+- [ ] Real-time eBPF SchedExt (`scx_bpfland`) user-space scheduler integration.
+- [ ] Demand paging with copy-on-write page fault handlers and POSIX `madvise` hint optimizations.
 
-3. **NetBSD Rump Kernels & Anyware Drivers**
-   - *Target*: Modular hypercall-based userland kernel drivers for VFS, TCP/IP, and USB.
-   - *Requirement*: Microkernel-style isolated driver execution without host kernel panics.
+### Phase 3: Hardware Drivers & Subsystems
+- [x] Multi-hardware driver auto-probing (PCIe, USB, NVMe, VirtIO, e1000/r8169/igc Ethernet, DRM/KMS GPU).
+- [x] Wi-Fi 6E/7 `mac80211` wireless driver stack and AF_XDP zero-copy networking.
+- [x] Open-source NVIDIA GPU & DRM/KMS subsystem with GEM buffer management for Turing/Ampere/Blackwell architectures.
+- [ ] USB4 / Thunderbolt 4 hotplug tunneling bus manager.
+- [ ] NVMe 2.0 ZNS (Zoned Namespaces) storage controller driver.
 
-4. **DragonFly BSD HAMMER2 Multi-PFS & Block Deduplication**
-   - *Target*: Pseudo Filesystems (PFS), cluster replication, and Merkle tree block deduplication.
-   - *Requirement*: Zero-overhead snapshotting and multi-node cluster state synchronization.
+### Phase 4: Init Supervision & Container Isolation
+- [x] Linux cgroups v2 unified hierarchy (memory, cpu, pids, freeze) and POSIX process namespaces (`CLONE_NEWPID`, `CLONE_NEWNS`, `CLONE_NEWNET`).
+- [x] OpenBSD-style `pledge()` and `unveil()` capability sandboxing for process security.
+- [x] FreeBSD Jail and Capsicum capability rights governor.
+- [ ] Hermetic MicroVM execution sandbox (Firecracker & Qubes OS style isolation).
+- [ ] Zero-overhead systemd-free service supervisor (`runit`/`s6` parity).
 
----
+### Phase 5: Filesystem & Storage Mechanics
+- [x] Linux OverlayFS & PipeFS virtual filesystems.
+- [x] Directed Acyclic Graph (DAG) directory engine (`SovereignAcyclicGraphDirectoryEngine`) for content-addressed store paths.
+- [x] Btrfs/ZFS transactional copy-on-write (CoW) snapshots with atomic rollback.
+- [ ] Bcachefs multi-device tiered extent scrubbing and erasure coding.
+- [ ] OpenBSD FFS / FreeBSD Soft Updates metadata journaling.
 
-### Phase 3: Universal Package Management & Distro Absorption
-
-1. **SigmaPkg Universal Ingestion Engine (`src/package/`)**
-   - *Target*: Absorption of 29+ foreign package formats into native `SigmaPkg`.
-   - *Formats*: `.pkg.tar.zst` (Arch), `.deb` (Debian/Ubuntu), `.rpm` (Fedora/RHEL), `.apk` (Alpine), `.xbps` (Void), `.ebuild` (Gentoo), `.nix` (NixOS), `.pkg` (FreeBSD), `.flatpak`, `.snap`, `.appimage`, `.ipk` (OpenWrt), `.eopkg` (Solus), `.pet`/`.pup` (Puppy), `.txz` (Slackware), `.p5p` (Illumos).
-
-2. **DPLL SAT Dependency Resolver & Mirror Manager**
-   - *Target*: Exact multi-distro dependency graph resolution and `/etc/pacman.d/mirrorlist` speed benchmarking.
-   - *Requirement*: Direct translation of foreign package capability dependencies into canonical SigmaOS capabilities (`sovereign-libc`, `sovereign-openssl`, `sovereign-graphics`).
-
----
-
-## 🛠️ Verification & Testing Mandate
-
-Agents working on these components must ensure:
-1. All changes compile cleanly under `cargo check --lib`.
-2. Unit tests covering new data structures and methods are placed in the respective file under `#[cfg(test)]`.
-3. The master test suite `./run_sigma_tests.sh` executes with a **100% pass rate**.
-
----
+### Phase 6: Userland Shell & Desktop Environment
+- [x] Full positional argument binding, local scoping, function autoloading, and hooks in `SimpleShell` and `SovereignBashZshParityShell`.
+- [x] Starship-inspired prompt renderer, Atuin shell history recorder, and Fish/Zsh smart auto-completion.
+- [ ] Native Wayland Compositor engine (`wlroots`/`Hyprland` parity).
+- [ ] PipeWire SPA audio pipeline and low-latency Graph router.

@@ -142,6 +142,13 @@ if [ -f "src/toolchain/distro_compiler_innovations.rs" ]; then
     ./build/distro_compiler_test
 fi
 
+if [ -f "src/automation/macro.rs" ]; then
+    echo "Running Macro recorder and playback test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/automation/macro.rs -o build/macro_test
+    ./build/macro_test
+fi
+
 if [ -f "src/automation/sovereign_hotkeys_synthesis.rs" ]; then
     echo "Running Sovereign Global Hotkeys Synthesis test suite..."
     mkdir -p build
@@ -311,13 +318,6 @@ if [ -f "src/package/sovereign_distro_package_advancements_v6.rs" ]; then
     rustc --test src/package/sovereign_distro_package_advancements_v6.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v6_test
     ./build/sovereign_advancements_v6_test
 fi
-if [ -f "src/package/universal_pr_execution_engine.rs" ]; then
-    echo "Running Universal Package Manager PR Transpiler & Execution Engine test suite..."
-    mkdir -p build
-    rustc --test --edition=2021 src/package/universal_pr_execution_engine.rs --cfg 'feature="standalone_test"' -o build/test_pr_exec
-    ./build/test_pr_exec
-fi
-
 if [ -f "src/package/sovereign_distro_package_advancements_v7.rs" ]; then
     echo "Running Sovereign Universal Package Advancements Suite V7 test suite..."
     mkdir -p build
@@ -325,18 +325,39 @@ if [ -f "src/package/sovereign_distro_package_advancements_v7.rs" ]; then
     ./build/sovereign_advancements_v7_test
 fi
 
-if [ -f "src/package/sovereign_distro_package_advancements_v8.rs" ]; then
-    echo "Running Sovereign Distro Package Advancements Suite V8 test suite..."
+if [ -f "src/package/sovereign_distro_package_advancements_v12.rs" ]; then
+    echo "Running Sovereign Universal Package Advancements Suite V12 test suite..."
     mkdir -p build
-    rustc --test src/package/sovereign_distro_package_advancements_v8.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v8_test
-    ./build/sovereign_advancements_v8_test
+    rustc --test src/package/sovereign_distro_package_advancements_v12.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v12_test
+    ./build/sovereign_advancements_v12_test
 fi
 
-if [ -f "src/package/sovereign_distro_package_advancements_v9.rs" ]; then
-    echo "Running Sovereign Distro Package Advancements Suite V9 test suite..."
+if [ -f "src/package/sovereign_distro_package_advancements_v16.rs" ]; then
+    echo "Running Sovereign Universal Package Advancements Suite V16 test suite..."
     mkdir -p build
-    rustc --test src/package/sovereign_distro_package_advancements_v9.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v9_test
-    ./build/sovereign_advancements_v9_test
+    rustc --test src/package/sovereign_distro_package_advancements_v16.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v16_test
+    ./build/sovereign_advancements_v16_test
+fi
+
+if [ -f "src/package/sovereign_distro_package_advancements_v18.rs" ]; then
+    echo "Running Sovereign Universal Package Advancements Suite V18 test suite..."
+    mkdir -p build
+    rustc --test src/package/sovereign_distro_package_advancements_v18.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v18_test
+    ./build/sovereign_advancements_v18_test
+fi
+
+if [ -f "src/package/sovereign_universal_pm_pr_bridge.rs" ]; then
+    echo "Running Sovereign Universal PM PR Bridge Engine test suite..."
+    mkdir -p build
+    rustc --test src/package/sovereign_universal_pm_pr_bridge.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_universal_pm_pr_bridge_test
+    ./build/sovereign_universal_pm_pr_bridge_test
+fi
+
+if [ -f "src/package/sovereign_pr_package_gateway.rs" ]; then
+    echo "Running Sovereign PR Package Gateway Engine test suite..."
+    mkdir -p build
+    rustc --test src/package/sovereign_pr_package_gateway.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_pr_package_gateway_test
+    ./build/sovereign_pr_package_gateway_test
 fi
 
 if [ -f "src/package/sovereign_distro_package_master_suite.rs" ]; then
@@ -472,11 +493,11 @@ if [ -f "src/distro/sovereign_linux_bsd_ecosystem_pinnacle_suite.rs" ]; then
     ./build/test_ecosystem_pinnacle
 fi
 
-if [ -f "src/distro/sovereign_linux_bsd_ecosystem_leap_suite.rs" ]; then
-    echo "Running Sovereign Linux & BSD Ecosystem Leap Suite test suite..."
+if [ -f "src/distro/sovereign_linux_bsd_pinnacle_innovations_v14.rs" ]; then
+    echo "Running Sovereign Linux & BSD Pinnacle Innovations Suite V14 test suite..."
     mkdir -p build
-    rustc --test src/distro/sovereign_linux_bsd_ecosystem_leap_suite.rs --edition=2021 -o build/test_ecosystem_leap
-    ./build/test_ecosystem_leap
+    rustc --test src/distro/sovereign_linux_bsd_pinnacle_innovations_v14.rs --edition=2021 -o build/test_pinnacle_v14
+    ./build/test_pinnacle_v14
 fi
 
 echo "All SigmaOS test suites completed."

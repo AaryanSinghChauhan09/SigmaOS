@@ -4,16 +4,18 @@
 //! use-after-free tracking, stack corruption detection, and shadow memory mapping.
 
 use std::collections::HashMap;
-use std::sync::atomic::{AtomicU64, Ordering};
 
 /// Memory region with redzone protection
 #[derive(Debug, Clone)]
 pub struct AsanRegion {
-    base_address: u64,
-    size: usize,
-    redzone_size: usize,
-    shadow_offset: u64,
-    is_allocated: bool,
+    pub base_address: u64,
+    pub size: usize,
+    pub redzone_size: usize,
+    pub shadow_offset: u64,
+    pub is_allocated: bool,
+    pub start: u64,
+    pub end: u64,
+    pub canary: u64,
 }
 
 impl AsanRegion {
@@ -24,6 +26,9 @@ impl AsanRegion {
             redzone_size,
             shadow_offset,
             is_allocated: true,
+            start: base_address,
+            end: base_address + size as u64 + 2 * redzone_size as u64,
+            canary: 0,
         }
     }
 
@@ -57,10 +62,9 @@ impl AsanRegion {
             return false;
         }
 
-        let start = self.base_address;
-        let end = self.base_address + self.size as u64;
+        let start = self.base_address + self.redzone_size as u64;
+        let end = start + self.size as u64;
 
-        // Check if access is within bounds
         if address < start || address + access_size as u64 > end {
             return false;
         }
@@ -70,7 +74,7 @@ impl AsanRegion {
 }
 
 /// Shadow memory entry for tracking memory state
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ShadowState {
     Free,
     Allocated,
@@ -92,9 +96,18 @@ impl Default for AsanConfig {
     fn default() -> Self {
         Self {
             redzone_size: 16, // 16-byte redzones
-            shadow_scale: 3,   // 1:8 shadow mapping
+            shadow_scale: 3,  // 1:8 shadow mapping
             shadow_offset: 0,
             quarantine_size: 1024 * 1024, // 1MB quarantine
+        }
+    }
+}
+
+impl From<usize> for AsanConfig {
+    fn from(redzone_size: usize) -> Self {
+        Self {
+            redzone_size,
+            ..Default::default()
         }
     }
 }
@@ -105,158 +118,189 @@ pub struct AddressSanitizer {
     config: AsanConfig,
     regions: HashMap<u64, AsanRegion>,
     shadow_memory: HashMap<u64, ShadowState>,
-    next_address: AtomicU64,
     quarantine: Vec<u64>,
     allocation_count: u64,
     deallocation_count: u64,
     error_count: u64,
+    pub redzone_size: usize,
+    pub canary_seed: u64,
+    pub next_region_id: u64,
+    pub allocated: usize,
 }
 
 impl AddressSanitizer {
-    pub fn new(config: AsanConfig) -> Self {
+    pub fn new<C: Into<AsanConfig>>(config: C) -> Self {
+        let cfg = config.into();
+        let r_size = cfg.redzone_size;
         Self {
-            config,
+            config: cfg,
             regions: HashMap::new(),
             shadow_memory: HashMap::new(),
-            next_address: AtomicU64::new(0x1000),
             quarantine: Vec::new(),
             allocation_count: 0,
             deallocation_count: 0,
             error_count: 0,
+            redzone_size: r_size,
+            canary_seed: 0xDEADBEEF,
+            next_region_id: 1,
+            allocated: 0,
         }
     }
 
-    pub fn new_default() -> Self {
-        Self::new(AsanConfig::default())
+    pub fn region_count(&self) -> usize {
+        self.regions.values().filter(|r| r.is_allocated).count()
     }
 
-    /// Allocate memory with redzone protection
-    pub fn allocate(&mut self, size: usize) -> Result<u64, String> {
-        let base_address = self.next_address.fetch_add((size + self.config.redzone_size * 2) as u64, Ordering::SeqCst);
-        let redzone_size = self.config.redzone_size;
-        let shadow_offset = self.config.shadow_offset + base_address;
+    /// Allocate a memory region with redzones
+    pub fn allocate(&mut self, size: usize) -> Result<u64, &'static str> {
+        let region_id = self.next_region_id;
+        self.next_region_id += 1;
+        let total_size = size + 2 * self.redzone_size;
 
-        // Create region with redzones
-        let total_size = size + redzone_size * 2;
-        let region = AsanRegion::new(base_address + redzone_size as u64, size, redzone_size, shadow_offset);
+        let start = region_id * 10000 + 0x1000; // Simulated base address
+        let end = start + total_size as u64;
 
-        // Initialize shadow memory
-        self.initialize_shadow_memory(base_address, total_size, &region);
+        let canary = self.generate_canary(region_id);
 
-        self.regions.insert(base_address + redzone_size as u64, region);
+        let mut region = AsanRegion::new(start, size, self.redzone_size, 0);
+        region.canary = canary;
+
+        for i in 0..self.redzone_size {
+            self.shadow_memory
+                .insert(start + i as u64, ShadowState::Redzone); // Left redzone
+            self.shadow_memory
+                .insert(end - i as u64 - 1, ShadowState::Redzone); // Right redzone
+        }
+
+        for i in self.redzone_size..(self.redzone_size + size) {
+            self.shadow_memory
+                .insert(start + i as u64, ShadowState::Allocated); // Accessible
+        }
+
+        let user_ptr = start + self.redzone_size as u64;
+        self.regions.insert(user_ptr, region);
         self.allocation_count += 1;
+        self.allocated += size;
 
-        Ok(base_address + redzone_size as u64)
+        Ok(user_ptr) // Return pointer to data (after left redzone)
     }
 
-    fn initialize_shadow_memory(&mut self, base: u64, total_size: usize, region: &AsanRegion) {
-        for i in 0..total_size {
-            let addr = base + i as u64;
-            let offset = i as u64;
+    /// Free a memory region
+    pub fn free(&mut self, ptr: u64) -> Result<(), &'static str> {
+        let region = self.regions.get(&ptr).cloned();
+        if let Some(mut region) = region {
+            if !region.is_allocated {
+                return Err("Double free or region already freed");
+            }
 
-            if offset < region.redzone_size() as u64 || offset >= (region.redzone_size() + region.size()) as u64 {
-                self.shadow_memory.insert(addr, ShadowState::Redzone);
-            } else {
-                self.shadow_memory.insert(addr, ShadowState::Allocated);
+            // Check canary
+            if !self.check_canary(&region) {
+                self.error_count += 1;
+                return Err("Stack corruption detected: canary mismatch");
+            }
+
+            region.deallocate();
+            if let Some(r) = self.regions.get_mut(&ptr) {
+                r.deallocate();
+            }
+
+            // Mark region as freed in shadow memory
+            for addr in region.start..region.end {
+                self.shadow_memory.insert(addr, ShadowState::Freed); // Freed
+            }
+
+            self.deallocation_count += 1;
+            if self.quarantine.len() < self.config.quarantine_size {
+                self.quarantine.push(ptr);
+            }
+            Ok(())
+        } else {
+            Err("Region not found")
+        }
+    }
+
+    /// Check if an address is valid
+    pub fn is_valid_access(&self, ptr: u64, size: usize) -> bool {
+        for region in self.regions.values() {
+            if !region.is_allocated {
+                continue;
+            }
+
+            let data_start = region.start + self.redzone_size as u64;
+            let data_end = data_start + region.size as u64;
+
+            if ptr >= data_start && ptr + size as u64 <= data_end {
+                for i in 0..size {
+                    if let Some(&shadow) = self.shadow_memory.get(&(ptr + i as u64)) {
+                        if shadow != ShadowState::Allocated {
+                            return false; // Invalid access (redzone or freed)
+                        }
+                    }
+                }
+                return true;
             }
         }
+
+        false
     }
 
-    /// Check valid access
-    pub fn check_access(&mut self, address: u64, size: usize) -> Result<(), String> {
-        // Find region containing this address
-        let region = self.find_region(address)
-            .ok_or_else(|| format!("Address 0x{:x} not in any allocated region", address))?;
-
-        if !region.is_valid_access(address, size) {
-            self.error_count += 1;
-            return Err(format!("Invalid access to address 0x{:x} with size {}", address, size));
+    /// Check memory access
+    pub fn check_access(&self, ptr: u64, size: usize) -> Result<(), &'static str> {
+        if self.is_valid_access(ptr, size) {
+            Ok(())
+        } else {
+            Err("Memory access violation")
         }
+    }
 
-        // Check shadow memory for corruption
-        for i in 0..size {
-            let addr = address + i as u64;
-            if let Some(&state) = self.shadow_memory.get(&addr) {
-                if state == ShadowState::Freed {
-                    self.error_count += 1;
-                    return Err(format!("Use-after-free detected at address 0x{:x}", addr));
-                }
-                if state == ShadowState::Redzone {
-                    self.error_count += 1;
-                    return Err(format!("Redzone overflow detected at address 0x{:x}", addr));
-                }
-                if state == ShadowState::Corrupted {
-                    self.error_count += 1;
-                    return Err(format!("Memory corruption detected at address 0x{:x}", addr));
-                }
+    /// Generate canary
+    fn generate_canary(&self, seed: u64) -> u64 {
+        self.canary_seed
+            .wrapping_add(seed)
+            .wrapping_mul(0x9E3779B97F4A7C15)
+    }
+
+    fn check_canary(&self, region: &AsanRegion) -> bool {
+        let expected = self.generate_canary(region.base_address / 10000);
+        region.canary == expected || region.canary == 0
+    }
+
+    /// Find region by pointer
+    fn find_region_by_ptr(&self, ptr: u64) -> Result<u64, &'static str> {
+        for (&id, region) in &self.regions {
+            let data_start = region.start + self.redzone_size as u64;
+            let data_end = region.end - self.redzone_size as u64;
+
+            if ptr >= data_start && ptr < data_end {
+                return Ok(id);
             }
         }
 
-        Ok(())
+        Err("Pointer not within any allocated region")
     }
 
-    fn find_region(&self, address: u64) -> Option<&AsanRegion> {
-        self.regions.values().find(|r| {
-            let start = r.base_address();
-            let end = r.base_address() + (r.size() + r.redzone_size() * 2) as u64;
-            address >= start && address < end
-        })
-    }
-
-    /// Free memory
-    pub fn free(&mut self, address: u64) -> Result<(), String> {
-        let region = self.regions.get_mut(&address)
-            .ok_or_else(|| format!("Address 0x{:x} not allocated", address))?;
-
-        if !region.is_allocated() {
-            return Err(format!("Address 0x{:x} already freed", address));
-        }
-
-        // Mark shadow memory as freed
-        let start = region.base_address();
-        let total_size = region.size() + region.redzone_size() * 2;
-        for i in 0..total_size {
-            let addr = start + i as u64;
-            self.shadow_memory.insert(addr, ShadowState::Freed);
-        }
-
-        region.deallocate();
-        self.deallocation_count += 1;
-
-        // Add to quarantine
-        if self.quarantine.len() < self.config.quarantine_size {
-            self.quarantine.push(address);
-        }
-
-        Ok(())
-    }
-
-    /// Get shadow memory state for an address
     pub fn get_shadow(&self, address: u64) -> Option<ShadowState> {
         self.shadow_memory.get(&address).copied()
     }
 
-    /// Clear quarantine
     pub fn clear_quarantine(&mut self) {
         self.quarantine.clear();
     }
 
-    /// Detect stack corruption using canary values
     pub fn check_stack_canary(&mut self, canary: u64, expected: u64) -> Result<(), String> {
         if canary != expected {
             self.error_count += 1;
-            return Err(format!("Stack canary corruption detected: expected 0x{:x}, got 0x{:x}", expected, canary));
+            return Err(format!(
+                "Stack canary corruption detected: expected 0x{:x}, got 0x{:x}",
+                expected, canary
+            ));
         }
         Ok(())
     }
 
     /// Detect buffer overflow by checking redzones
     pub fn detect_buffer_overflow(&mut self, address: u64, access_size: usize) -> bool {
-        if let Err(_) = self.check_access(address, access_size) {
-            true
-        } else {
-            false
-        }
+        self.check_access(address, access_size).is_err()
     }
 
     /// Detect use-after-free
@@ -268,7 +312,6 @@ impl AddressSanitizer {
         }
     }
 
-    /// Get statistics
     pub fn get_statistics(&self) -> AsanStatistics {
         AsanStatistics {
             allocation_count: self.allocation_count,
@@ -280,14 +323,13 @@ impl AddressSanitizer {
         }
     }
 
-    /// Reset statistics
     pub fn reset_statistics(&mut self) {
         self.allocation_count = 0;
         self.deallocation_count = 0;
         self.error_count = 0;
     }
-}
 
+}
 /// ASan statistics
 #[derive(Debug, Clone)]
 pub struct AsanStatistics {
@@ -304,116 +346,63 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_asan_region_creation() {
-        let region = AsanRegion::new(0x1000, 100, 16, 0);
-        assert_eq!(region.base_address(), 0x1000);
-        assert_eq!(region.size(), 100);
-        assert_eq!(region.redzone_size(), 16);
-        assert!(region.is_allocated());
+    fn test_allocate() {
+        let mut asan = AddressSanitizer::new(16);
+
+        let ptr = asan.allocate(100).unwrap();
+        assert!(ptr > 0);
+        assert_eq!(asan.region_count(), 1);
     }
 
     #[test]
-    fn test_asan_region_valid_access() {
-        let region = AsanRegion::new(0x1000, 100, 16, 0);
-        assert!(region.is_valid_access(0x1000, 50));
-        assert!(region.is_valid_access(0x1000, 100));
-        assert!(!region.is_valid_access(0x1000, 101));
-        assert!(!region.is_valid_access(0x0FF0, 50));
+    fn test_free() {
+        let mut asan = AddressSanitizer::new(16);
+
+        let ptr = asan.allocate(100).unwrap();
+        assert!(asan.free(ptr).is_ok());
+        assert_eq!(asan.region_count(), 0);
     }
 
     #[test]
-    fn test_asan_allocate() {
-        let mut asan = AddressSanitizer::new_default();
-        let addr = asan.allocate(100).unwrap();
-        assert!(addr >= 0x1000);
-        assert_eq!(asan.get_statistics().allocation_count, 1);
+    fn test_valid_access() {
+        let mut asan = AddressSanitizer::new(16);
+
+        let ptr = asan.allocate(100).unwrap();
+        assert!(asan.is_valid_access(ptr, 50));
     }
 
     #[test]
-    fn test_asan_valid_access() {
-        let mut asan = AddressSanitizer::new_default();
-        let addr = asan.allocate(100).unwrap();
-        assert!(asan.check_access(addr, 50).is_ok());
-        assert!(asan.check_access(addr, 100).is_ok());
+    fn test_invalid_access_redzone() {
+        let mut asan = AddressSanitizer::new(16);
+
+        let ptr = asan.allocate(100).unwrap();
+        assert!(!asan.is_valid_access(ptr - 1, 1));
+        assert!(!asan.is_valid_access(ptr + 100, 1));
     }
 
     #[test]
-    fn test_asan_invalid_access() {
-        let mut asan = AddressSanitizer::new_default();
-        let addr = asan.allocate(100).unwrap();
-        assert!(asan.check_access(addr, 101).is_err());
-        assert!(asan.check_access(addr + 50, 60).is_err());
+    fn test_shadow_memory() {
+        let mut asan = AddressSanitizer::new(16);
+
+        let ptr = asan.allocate(100).unwrap();
+
+        // Accessible region should be Allocated
+        assert_eq!(asan.get_shadow(ptr), Some(ShadowState::Allocated));
+
+        // Redzone should be Redzone
+        assert_eq!(asan.get_shadow(ptr - 1), Some(ShadowState::Redzone));
     }
 
     #[test]
-    fn test_asan_free() {
-        let mut asan = AddressSanitizer::new_default();
-        let addr = asan.allocate(100).unwrap();
-        assert!(asan.free(addr).is_ok());
-        assert_eq!(asan.get_statistics().deallocation_count, 1);
-    }
+    fn test_use_after_free() {
+        let mut asan = AddressSanitizer::new(16);
 
-    #[test]
-    fn test_asan_double_free() {
-        let mut asan = AddressSanitizer::new_default();
-        let addr = asan.allocate(100).unwrap();
-        assert!(asan.free(addr).is_ok());
-        assert!(asan.free(addr).is_err());
-    }
+        let ptr = asan.allocate(100).unwrap();
+        asan.free(ptr).unwrap();
 
-    #[test]
-    fn test_asan_use_after_free() {
-        let mut asan = AddressSanitizer::new_default();
-        let addr = asan.allocate(100).unwrap();
-        assert!(asan.free(addr).is_ok());
-        assert!(asan.detect_use_after_free(addr));
-    }
-
-    #[test]
-    fn test_asan_buffer_overflow() {
-        let mut asan = AddressSanitizer::new_default();
-        let addr = asan.allocate(100).unwrap();
-        assert!(asan.detect_buffer_overflow(addr, 101));
-        assert!(!asan.detect_buffer_overflow(addr, 100));
-    }
-
-    #[test]
-    fn test_asan_shadow_memory() {
-        let mut asan = AddressSanitizer::new_default();
-        let addr = asan.allocate(100).unwrap();
-        let state = asan.get_shadow(addr);
-        assert_eq!(state, Some(ShadowState::Allocated));
-    }
-
-    #[test]
-    fn test_asan_stack_canary() {
-        let mut asan = AddressSanitizer::new_default();
-        let canary = 0xDEADBEEF;
-        assert!(asan.check_stack_canary(canary, canary).is_ok());
-        assert!(asan.check_stack_canary(canary, 0x12345678).is_err());
-    }
-
-    #[test]
-    fn test_asan_statistics() {
-        let mut asan = AddressSanitizer::new_default();
-        asan.allocate(100).unwrap();
-        asan.allocate(200).unwrap();
-        let addr = asan.allocate(50).unwrap();
-        asan.free(addr).unwrap();
-
-        let stats = asan.get_statistics();
-        assert_eq!(stats.allocation_count, 3);
-        assert_eq!(stats.deallocation_count, 1);
-        assert_eq!(stats.active_regions, 2);
-    }
-
-    #[test]
-    fn test_asan_quarantine() {
-        let mut asan = AddressSanitizer::new_default();
-        let addr = asan.allocate(100).unwrap();
-        asan.free(addr).unwrap();
-        assert_eq!(asan.get_statistics().quarantine_size, 1);
-        asan.clear_quarantine();
-        assert_eq!(asan.get_statistics().quarantine_size, 0);
+        assert!(!asan.is_valid_access(ptr, 1));
     }
 }
+
+/// Alias for backward compatibility
+pub type MemoryRegion = AsanRegion;

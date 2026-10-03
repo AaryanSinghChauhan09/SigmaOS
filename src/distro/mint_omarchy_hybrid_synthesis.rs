@@ -14,7 +14,6 @@
 extern crate alloc;
 
 use alloc::collections::BTreeMap;
-use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
@@ -99,7 +98,8 @@ impl MintHardwareDeviceDriverManager {
                     is_recommended: true,
                     is_installed: true,
                     is_active: true,
-                    description: "NVIDIA proprietary graphics driver (DKMS kernel modules)".to_string(),
+                    description: "NVIDIA proprietary graphics driver (DKMS kernel modules)"
+                        .to_string(),
                 },
                 DriverPackage {
                     package_name: "nouveau-mesa-nvk".to_string(),
@@ -120,17 +120,15 @@ impl MintHardwareDeviceDriverManager {
             vendor_name: "Broadcom / Intel".to_string(),
             model_name: "Wi-Fi 6E AX210 / BCM4360 802.11ac".to_string(),
             category: DeviceCategory::WirelessNetwork,
-            available_drivers: vec![
-                DriverPackage {
-                    package_name: "linux-firmware-iwlwifi".to_string(),
-                    version: "20240909".to_string(),
-                    license: DriverLicense::FirmwareOnly,
-                    is_recommended: true,
-                    is_installed: true,
-                    is_active: true,
-                    description: "Intel official wireless firmware package".to_string(),
-                },
-            ],
+            available_drivers: vec![DriverPackage {
+                package_name: "linux-firmware-iwlwifi".to_string(),
+                version: "20240909".to_string(),
+                license: DriverLicense::FirmwareOnly,
+                is_recommended: true,
+                is_installed: true,
+                is_active: true,
+                description: "Intel official wireless firmware package".to_string(),
+            }],
             selected_driver: Some("linux-firmware-iwlwifi".to_string()),
         };
 
@@ -140,17 +138,16 @@ impl MintHardwareDeviceDriverManager {
             vendor_name: "Intel / AMD Architecture".to_string(),
             model_name: "Processor Microcode Security Patch".to_string(),
             category: DeviceCategory::CpuMicrocode,
-            available_drivers: vec![
-                DriverPackage {
-                    package_name: "intel-microcode".to_string(),
-                    version: "20240813".to_string(),
-                    license: DriverLicense::Proprietary,
-                    is_recommended: true,
-                    is_installed: true,
-                    is_active: true,
-                    description: "Hardware vulnerability mitigations (Spectre, Meltdown, Downfall)".to_string(),
-                },
-            ],
+            available_drivers: vec![DriverPackage {
+                package_name: "intel-microcode".to_string(),
+                version: "20240813".to_string(),
+                license: DriverLicense::Proprietary,
+                is_recommended: true,
+                is_installed: true,
+                is_active: true,
+                description: "Hardware vulnerability mitigations (Spectre, Meltdown, Downfall)"
+                    .to_string(),
+            }],
             selected_driver: Some("intel-microcode".to_string()),
         };
 
@@ -161,9 +158,16 @@ impl MintHardwareDeviceDriverManager {
     }
 
     /// Select and activate a driver for a device
-    pub fn select_driver(&mut self, device_key: &str, driver_pkg: &str) -> Result<String, &'static str> {
+    pub fn select_driver(
+        &mut self,
+        device_key: &str,
+        driver_pkg: &str,
+    ) -> Result<String, &'static str> {
         let dev = self.devices.get_mut(device_key).ok_or("Device not found")?;
-        let exists = dev.available_drivers.iter().any(|d| d.package_name == driver_pkg);
+        let exists = dev
+            .available_drivers
+            .iter()
+            .any(|d| d.package_name == driver_pkg);
         if !exists {
             return Err("Requested driver package not compatible with device");
         }
@@ -177,7 +181,10 @@ impl MintHardwareDeviceDriverManager {
             }
         }
         dev.selected_driver = Some(driver_pkg.to_string());
-        Ok(format!("Driver '{}' successfully activated for {}", driver_pkg, dev.model_name))
+        Ok(format!(
+            "Driver '{}' successfully activated for {}",
+            driver_pkg, dev.model_name
+        ))
     }
 
     pub fn total_devices_count(&self) -> usize {
@@ -243,7 +250,9 @@ impl MintSystemReportHealthSentinel {
             self.reports.push(SystemReportEntry {
                 report_id: "timeshift_missing".to_string(),
                 title: "Set up the system restore point tool".to_string(),
-                description: "Timeshift snapshots protect against accidental breakages and bad updates.".to_string(),
+                description:
+                    "Timeshift snapshots protect against accidental breakages and bad updates."
+                        .to_string(),
                 severity: ReportSeverity::Warning,
                 auto_remediation_available: true,
                 is_resolved: false,
@@ -254,7 +263,9 @@ impl MintSystemReportHealthSentinel {
             self.reports.push(SystemReportEntry {
                 report_id: "codecs_missing".to_string(),
                 title: "Install multimedia codecs".to_string(),
-                description: "Install non-free codecs to play H.264/AAC/MP3 audio and video streams.".to_string(),
+                description:
+                    "Install non-free codecs to play H.264/AAC/MP3 audio and video streams."
+                        .to_string(),
                 severity: ReportSeverity::Info,
                 auto_remediation_available: true,
                 is_resolved: false,
@@ -265,7 +276,8 @@ impl MintSystemReportHealthSentinel {
             self.reports.push(SystemReportEntry {
                 report_id: "firewall_disabled".to_string(),
                 title: "Enable system firewall (UFW/nftables)".to_string(),
-                description: "Incoming connection filtering is recommended for public networks.".to_string(),
+                description: "Incoming connection filtering is recommended for public networks."
+                    .to_string(),
                 severity: ReportSeverity::Critical,
                 auto_remediation_available: true,
                 is_resolved: false,
@@ -275,7 +287,10 @@ impl MintSystemReportHealthSentinel {
         if crash_dumps_detected > 0 {
             self.reports.push(SystemReportEntry {
                 report_id: "crash_dumps_found".to_string(),
-                title: format!("{} system crash reports detected in /var/crash", crash_dumps_detected),
+                title: format!(
+                    "{} system crash reports detected in /var/crash",
+                    crash_dumps_detected
+                ),
                 description: "Automated stacktraces ready for debugging or submission.".to_string(),
                 severity: ReportSeverity::Warning,
                 auto_remediation_available: false,
@@ -283,7 +298,10 @@ impl MintSystemReportHealthSentinel {
             });
         }
 
-        self.last_audit_status = self.reports.iter().all(|r| r.severity != ReportSeverity::Critical);
+        self.last_audit_status = self
+            .reports
+            .iter()
+            .all(|r| r.severity != ReportSeverity::Critical);
         self.reports.len()
     }
 
@@ -370,7 +388,10 @@ impl MintWebAppManagerEngine {
             window_height: 800,
         };
         self.webapps.insert(app_id.to_string(), app);
-        format!("Desktop launcher for '{}' created with isolated sandbox profile", name)
+        format!(
+            "Desktop launcher for '{}' created with isolated sandbox profile",
+            name
+        )
     }
 
     pub fn generate_desktop_entry(&self, app_id: &str) -> Option<String> {
@@ -422,10 +443,22 @@ impl OmarchyWallustPaletteHarmonizer {
             border_active: "#89B4FA".to_string(),
             border_inactive: "#313244".to_string(),
             ansi_colors: [
-                "#45475A".to_string(), "#F38BA8".to_string(), "#A6E3A1".to_string(), "#F9E2AF".to_string(),
-                "#89B4FA".to_string(), "#F5C2E7".to_string(), "#94E2D5".to_string(), "#BAC2DE".to_string(),
-                "#585B70".to_string(), "#F38BA8".to_string(), "#A6E3A1".to_string(), "#F9E2AF".to_string(),
-                "#89B4FA".to_string(), "#F5C2E7".to_string(), "#94E2D5".to_string(), "#A6ADC8".to_string(),
+                "#45475A".to_string(),
+                "#F38BA8".to_string(),
+                "#A6E3A1".to_string(),
+                "#F9E2AF".to_string(),
+                "#89B4FA".to_string(),
+                "#F5C2E7".to_string(),
+                "#94E2D5".to_string(),
+                "#BAC2DE".to_string(),
+                "#585B70".to_string(),
+                "#F38BA8".to_string(),
+                "#A6E3A1".to_string(),
+                "#F9E2AF".to_string(),
+                "#89B4FA".to_string(),
+                "#F5C2E7".to_string(),
+                "#94E2D5".to_string(),
+                "#A6ADC8".to_string(),
             ],
         };
         Self {
@@ -498,16 +531,66 @@ impl OmarchyKeybindingCheatsheetHud {
         };
 
         // Omarchy Core Fast Keybindings
-        hud.register("Super + Return", "Launch Terminal (Alacritty)", "sigma-term", KeybindingCategory::ApplicationLauncher);
-        hud.register("Super + Space", "Open Walker / Rofi Fuzzy App Launcher", "walker", KeybindingCategory::ApplicationLauncher);
-        hud.register("Super + Q", "Close Active Window", "dispatch closewindow", KeybindingCategory::WindowManagement);
-        hud.register("Super + F", "Toggle Fullscreen", "dispatch fullscreen", KeybindingCategory::WindowManagement);
-        hud.register("Super + V", "Toggle Floating Window", "dispatch togglefloating", KeybindingCategory::WindowManagement);
-        hud.register("Super + H / J / K / L", "Vim-style Window Focus (Left/Down/Up/Right)", "dispatch movefocus", KeybindingCategory::Navigation);
-        hud.register("Super + 1..9", "Switch to Workspace 1..9", "workspace", KeybindingCategory::Navigation);
-        hud.register("Super + Shift + 1..9", "Move Window to Workspace 1..9", "movetoworkspace", KeybindingCategory::Navigation);
-        hud.register("Super + Shift + L", "Lock Screen (hyprlock)", "sigma-lock", KeybindingCategory::SystemPower);
-        hud.register("Super + Escape", "Toggle System Control HUD / Process Monitor", "btop-hud", KeybindingCategory::SystemPower);
+        hud.register(
+            "Super + Return",
+            "Launch Terminal (Alacritty)",
+            "sigma-term",
+            KeybindingCategory::ApplicationLauncher,
+        );
+        hud.register(
+            "Super + Space",
+            "Open Walker / Rofi Fuzzy App Launcher",
+            "walker",
+            KeybindingCategory::ApplicationLauncher,
+        );
+        hud.register(
+            "Super + Q",
+            "Close Active Window",
+            "dispatch closewindow",
+            KeybindingCategory::WindowManagement,
+        );
+        hud.register(
+            "Super + F",
+            "Toggle Fullscreen",
+            "dispatch fullscreen",
+            KeybindingCategory::WindowManagement,
+        );
+        hud.register(
+            "Super + V",
+            "Toggle Floating Window",
+            "dispatch togglefloating",
+            KeybindingCategory::WindowManagement,
+        );
+        hud.register(
+            "Super + H / J / K / L",
+            "Vim-style Window Focus (Left/Down/Up/Right)",
+            "dispatch movefocus",
+            KeybindingCategory::Navigation,
+        );
+        hud.register(
+            "Super + 1..9",
+            "Switch to Workspace 1..9",
+            "workspace",
+            KeybindingCategory::Navigation,
+        );
+        hud.register(
+            "Super + Shift + 1..9",
+            "Move Window to Workspace 1..9",
+            "movetoworkspace",
+            KeybindingCategory::Navigation,
+        );
+        hud.register(
+            "Super + Shift + L",
+            "Lock Screen (hyprlock)",
+            "sigma-lock",
+            KeybindingCategory::SystemPower,
+        );
+        hud.register(
+            "Super + Escape",
+            "Toggle System Control HUD / Process Monitor",
+            "btop-hud",
+            KeybindingCategory::SystemPower,
+        );
 
         hud
     }
@@ -574,9 +657,21 @@ impl OmarchyDotfileSyncEngine {
             auto_commit_on_change: true,
         };
 
-        engine.track_file("hypr/hyprland.conf", "~/.config/hypr/hyprland.conf", 0x11223344);
-        engine.track_file("waybar/config.jsonc", "~/.config/waybar/config.jsonc", 0x55667788);
-        engine.track_file("alacritty/alacritty.toml", "~/.config/alacritty/alacritty.toml", 0x99AABBCC);
+        engine.track_file(
+            "hypr/hyprland.conf",
+            "~/.config/hypr/hyprland.conf",
+            0x11223344,
+        );
+        engine.track_file(
+            "waybar/config.jsonc",
+            "~/.config/waybar/config.jsonc",
+            0x55667788,
+        );
+        engine.track_file(
+            "alacritty/alacritty.toml",
+            "~/.config/alacritty/alacritty.toml",
+            0x99AABBCC,
+        );
         engine.track_file("nvim/init.lua", "~/.config/nvim/init.lua", 0xDDEEFF00);
 
         engine
@@ -596,7 +691,11 @@ impl OmarchyDotfileSyncEngine {
 
     pub fn sync_all(&mut self) -> (usize, usize) {
         let total = self.tracked_files.len();
-        let synced = self.tracked_files.values().filter(|f| f.is_synchronized).count();
+        let synced = self
+            .tracked_files
+            .values()
+            .filter(|f| f.is_synchronized)
+            .count();
         (synced, total)
     }
 }
@@ -627,14 +726,20 @@ impl SovereignMintOmarchyUnifiedSuite {
             driver_manager: MintHardwareDeviceDriverManager::new(),
             health_sentinel: MintSystemReportHealthSentinel::new(),
             webapp_manager: MintWebAppManagerEngine::new(),
-            palette_harmonizer: OmarchyWallustPaletteHarmonizer::new("/usr/share/backgrounds/sigma_default.png"),
+            palette_harmonizer: OmarchyWallustPaletteHarmonizer::new(
+                "/usr/share/backgrounds/sigma_default.png",
+            ),
             keybinding_hud: OmarchyKeybindingCheatsheetHud::new(),
-            dotfile_sync: OmarchyDotfileSyncEngine::new("https://github.com/AaryanSinghChauhan09/dotfiles.git"),
+            dotfile_sync: OmarchyDotfileSyncEngine::new(
+                "https://github.com/AaryanSinghChauhan09/dotfiles.git",
+            ),
         }
     }
 
     pub fn run_preflight_diagnostics(&mut self) -> bool {
-        let reports_count = self.health_sentinel.run_system_health_audit(true, true, true, 0);
+        let reports_count = self
+            .health_sentinel
+            .run_system_health_audit(true, true, true, 0);
         let drivers_ok = self.driver_manager.total_devices_count() >= 3;
         let (synced, total) = self.dotfile_sync.sync_all();
 

@@ -1,5 +1,4 @@
 use std::format;
-use std::string::{String, ToString};
 use std::vec::Vec;
 // SigmaOS Tiny Core Linux Core Concepts Integration
 // Implements minimal footprint, frugal installs, RAM-copy booting, and .tcz loop-mount application extensions.

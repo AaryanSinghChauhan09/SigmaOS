@@ -2,7 +2,6 @@
 // This module implements strategic OS capabilities inspired by Fedora Greenboot,
 // Zorin Exec Guard, Vanilla OS ABRoot OCI transactions, and Whonix Kloak input obfuscation.
 
-use std::string::{String, ToString};
 use std::vec::Vec;
 
 // ==========================================
@@ -51,7 +50,11 @@ impl FedoraGreenbootHealthCheckEngine {
     }
 
     pub fn set_check_result(&mut self, subsystem_name: &str, passed: bool, message: &str) {
-        if let Some(check) = self.checks.iter_mut().find(|c| c.subsystem_name == subsystem_name) {
+        if let Some(check) = self
+            .checks
+            .iter_mut()
+            .find(|c| c.subsystem_name == subsystem_name)
+        {
             check.passed = passed;
             check.message = message.to_string();
         }
@@ -136,7 +139,10 @@ impl ZorinExecGuardSubsystem {
                 verification: BinaryVerificationResult::BlockedMalicious,
                 recommended_native_app: None,
                 recommended_pwa_url: None,
-                user_prompt_message: format!("Execution blocked: {} is recognized as unsafe.", binary_path),
+                user_prompt_message: format!(
+                    "Execution blocked: {} is recognized as unsafe.",
+                    binary_path
+                ),
             };
         }
 
@@ -154,8 +160,14 @@ impl ZorinExecGuardSubsystem {
 
         // Unverified binary - suggest verified alternatives
         let (native_alt, pwa_alt) = match known_category.unwrap_or("") {
-            "browser" => (Some("SigmaBrowser".to_string()), Some("https://web.sigmaos.org".to_string())),
-            "editor" => (Some("ZenithTextEditor".to_string()), Some("https://edit.sigmaos.org".to_string())),
+            "browser" => (
+                Some("SigmaBrowser".to_string()),
+                Some("https://web.sigmaos.org".to_string()),
+            ),
+            "editor" => (
+                Some("ZenithTextEditor".to_string()),
+                Some("https://edit.sigmaos.org".to_string()),
+            ),
             _ => (Some("SigmaPkgStore".to_string()), None),
         };
 
@@ -164,7 +176,10 @@ impl ZorinExecGuardSubsystem {
             verification: BinaryVerificationResult::UnverifiedExecutable,
             recommended_native_app: native_alt,
             recommended_pwa_url: pwa_alt,
-            user_prompt_message: format!("Warning: {} is an unverified executable. Verified alternatives are available.", binary_path),
+            user_prompt_message: format!(
+                "Warning: {} is an unverified executable. Verified alternatives are available.",
+                binary_path
+            ),
         }
     }
 }
@@ -317,7 +332,8 @@ impl WhonixKloakInputObfuscationEngine {
     ) -> ObfuscatedInputEvent {
         let obfuscated_timestamp_us = if self.is_enabled && self.jitter_interval_us > 0 {
             // Quantize timestamps to jitter boundaries to mask behavioral timing characteristics
-            ((raw_timestamp_us + self.jitter_interval_us - 1) / self.jitter_interval_us) * self.jitter_interval_us
+            ((raw_timestamp_us + self.jitter_interval_us - 1) / self.jitter_interval_us)
+                * self.jitter_interval_us
         } else {
             raw_timestamp_us
         };
@@ -368,10 +384,16 @@ mod tests {
         failing_engine.register_check("rootfs", true);
         failing_engine.set_check_result("rootfs", false, "I/O error");
 
-        assert_eq!(failing_engine.evaluate_boot_health(), BootHealthStatus::Critical);
+        assert_eq!(
+            failing_engine.evaluate_boot_health(),
+            BootHealthStatus::Critical
+        );
         assert!(!failing_engine.auto_rollback_triggered);
 
-        assert_eq!(failing_engine.evaluate_boot_health(), BootHealthStatus::Critical);
+        assert_eq!(
+            failing_engine.evaluate_boot_health(),
+            BootHealthStatus::Critical
+        );
         assert!(failing_engine.auto_rollback_triggered);
     }
 
@@ -391,13 +413,12 @@ mod tests {
         assert_eq!(rec1.verification, BinaryVerificationResult::VerifiedNative);
 
         // Blocked
-        let rec2 = exec_guard.inspect_binary_execution(
-            "/tmp/suspicious",
-            "MALWARE_HASH_123",
-            None,
-            None,
+        let rec2 =
+            exec_guard.inspect_binary_execution("/tmp/suspicious", "MALWARE_HASH_123", None, None);
+        assert_eq!(
+            rec2.verification,
+            BinaryVerificationResult::BlockedMalicious
         );
-        assert_eq!(rec2.verification, BinaryVerificationResult::BlockedMalicious);
 
         // Unverified with alternatives
         let rec3 = exec_guard.inspect_binary_execution(
@@ -406,9 +427,18 @@ mod tests {
             None,
             Some("browser"),
         );
-        assert_eq!(rec3.verification, BinaryVerificationResult::UnverifiedExecutable);
-        assert_eq!(rec3.recommended_native_app, Some("SigmaBrowser".to_string()));
-        assert_eq!(rec3.recommended_pwa_url, Some("https://web.sigmaos.org".to_string()));
+        assert_eq!(
+            rec3.verification,
+            BinaryVerificationResult::UnverifiedExecutable
+        );
+        assert_eq!(
+            rec3.recommended_native_app,
+            Some("SigmaBrowser".to_string())
+        );
+        assert_eq!(
+            rec3.recommended_pwa_url,
+            Some("https://web.sigmaos.org".to_string())
+        );
     }
 
     #[test]
@@ -422,7 +452,9 @@ mod tests {
         let target = abroot.begin_atomic_transaction().unwrap();
         assert_eq!(target, AbrootSlot::SlotB);
 
-        assert!(abroot.stage_oci_image_commit("v1.2.0", "sha256:abc", 0x12345).is_ok());
+        assert!(abroot
+            .stage_oci_image_commit("v1.2.0", "sha256:abc", 0x12345)
+            .is_ok());
         let new_slot = abroot.finalize_and_switch_active_slot().unwrap();
         assert_eq!(new_slot, AbrootSlot::SlotB);
         assert_eq!(abroot.active_slot, AbrootSlot::SlotB);

@@ -83,7 +83,11 @@ impl AtaBusControllerEngine {
     }
 
     /// Decode ATA IDENTIFY DEVICE 512-byte buffer
-    pub fn decode_identify_response(&mut self, drive_id: u8, raw_512b: &[u8; 512]) -> Result<AtaDeviceIdentity, &'static str> {
+    pub fn decode_identify_response(
+        &mut self,
+        drive_id: u8,
+        raw_512b: &[u8; 512],
+    ) -> Result<AtaDeviceIdentity, &'static str> {
         if raw_512b.len() < 512 {
             return Err("IDENTIFY response buffer too small");
         }
@@ -96,8 +100,12 @@ impl AtaBusControllerEngine {
                 if idx + 1 < raw_512b.len() {
                     let b1 = raw_512b[idx + 1];
                     let b2 = raw_512b[idx];
-                    if b1 >= 32 && b1 <= 126 { chars.push(b1 as char); }
-                    if b2 >= 32 && b2 <= 126 { chars.push(b2 as char); }
+                    if b1 >= 32 && b1 <= 126 {
+                        chars.push(b1 as char);
+                    }
+                    if b2 >= 32 && b2 <= 126 {
+                        chars.push(b2 as char);
+                    }
                 }
             }
             chars.into_iter().collect::<String>().trim().to_string()
@@ -119,20 +127,43 @@ impl AtaBusControllerEngine {
         let ncq_word = u16::from_le_bytes([raw_512b[76 * 2], raw_512b[76 * 2 + 1]]);
         let supports_ncq = (ncq_word & (1 << 8)) != 0;
 
-        let lba28_sectors = u32::from_le_bytes([raw_512b[60 * 2], raw_512b[60 * 2 + 1], raw_512b[61 * 2], raw_512b[61 * 2 + 1]]);
+        let lba28_sectors = u32::from_le_bytes([
+            raw_512b[60 * 2],
+            raw_512b[60 * 2 + 1],
+            raw_512b[61 * 2],
+            raw_512b[61 * 2 + 1],
+        ]);
         let lba48_sectors = if supports_lba48 {
             u64::from_le_bytes([
-                raw_512b[100 * 2], raw_512b[100 * 2 + 1], raw_512b[101 * 2], raw_512b[101 * 2 + 1],
-                raw_512b[102 * 2], raw_512b[102 * 2 + 1], raw_512b[103 * 2], raw_512b[103 * 2 + 1],
+                raw_512b[100 * 2],
+                raw_512b[100 * 2 + 1],
+                raw_512b[101 * 2],
+                raw_512b[101 * 2 + 1],
+                raw_512b[102 * 2],
+                raw_512b[102 * 2 + 1],
+                raw_512b[103 * 2],
+                raw_512b[103 * 2 + 1],
             ])
         } else {
             lba28_sectors as u64
         };
 
         let identity = AtaDeviceIdentity {
-            serial_number: if serial.is_empty() { "SIGMA-SATA-001".to_string() } else { serial },
-            firmware_revision: if firmware.is_empty() { "REV-1.0".to_string() } else { firmware },
-            model_number: if model.is_empty() { "SATA III SSD".to_string() } else { model },
+            serial_number: if serial.is_empty() {
+                "SIGMA-SATA-001".to_string()
+            } else {
+                serial
+            },
+            firmware_revision: if firmware.is_empty() {
+                "REV-1.0".to_string()
+            } else {
+                firmware
+            },
+            model_number: if model.is_empty() {
+                "SATA III SSD".to_string()
+            } else {
+                model
+            },
             total_lba28_sectors: lba28_sectors,
             total_lba48_sectors: lba48_sectors,
             is_atapi_packet_device: is_atapi,
@@ -145,7 +176,12 @@ impl AtaBusControllerEngine {
     }
 
     /// Issue AHCI NCQ Command (Read/Write FPDMA Queued)
-    pub fn issue_ncq_command(&mut self, lba: u64, sectors: u32, is_write: bool) -> Result<u8, &'static str> {
+    pub fn issue_ncq_command(
+        &mut self,
+        lba: u64,
+        sectors: u32,
+        is_write: bool,
+    ) -> Result<u8, &'static str> {
         if !self.is_hba_active {
             return Err("SATA AHCI HBA Controller offline");
         }
@@ -157,7 +193,11 @@ impl AtaBusControllerEngine {
             None => return Err("AHCI NCQ Command Queue full (32 tags active)"),
         };
 
-        let cmd = if is_write { AtaCommand::WriteFpdmaQueued } else { AtaCommand::ReadFpdmaQueued };
+        let cmd = if is_write {
+            AtaCommand::WriteFpdmaQueued
+        } else {
+            AtaCommand::ReadFpdmaQueued
+        };
 
         let slot = AhciNcqSlot {
             tag,
@@ -210,11 +250,11 @@ pub enum IdeDriveSelect {
 }
 
 /// PATA/IDE Status Register Bits (Linux libata / FreeBSD ata-pci specification)
-pub const ATA_STATUS_BSY: u8  = 0x80; // Busy
+pub const ATA_STATUS_BSY: u8 = 0x80; // Busy
 pub const ATA_STATUS_DRDY: u8 = 0x40; // Drive Ready
-pub const ATA_STATUS_DF: u8   = 0x20; // Drive Fault
-pub const ATA_STATUS_DRQ: u8  = 0x08; // Data Request Ready
-pub const ATA_STATUS_ERR: u8  = 0x01; // Error Occurred
+pub const ATA_STATUS_DF: u8 = 0x20; // Drive Fault
+pub const ATA_STATUS_DRQ: u8 = 0x08; // Data Request Ready
+pub const ATA_STATUS_ERR: u8 = 0x01; // Error Occurred
 
 /// PATA / IDE Programmed Input/Output (PIO) Transfer Engine
 #[derive(Debug, Clone)]
@@ -268,7 +308,12 @@ impl IdePioTransferEngine {
     }
 
     /// Execute PIO Sector Read (LBA28 or LBA48)
-    pub fn read_sectors_pio(&mut self, lba: u64, sector_count: u16, buffer: &mut [u8]) -> Result<usize, &'static str> {
+    pub fn read_sectors_pio(
+        &mut self,
+        lba: u64,
+        sector_count: u16,
+        buffer: &mut [u8],
+    ) -> Result<usize, &'static str> {
         if sector_count == 0 {
             return Err("Sector count cannot be 0");
         }
@@ -286,7 +331,12 @@ impl IdePioTransferEngine {
     }
 
     /// Execute PIO Sector Write (LBA28 or LBA48)
-    pub fn write_sectors_pio(&mut self, _lba: u64, sector_count: u16, data: &[u8]) -> Result<usize, &'static str> {
+    pub fn write_sectors_pio(
+        &mut self,
+        _lba: u64,
+        sector_count: u16,
+        data: &[u8],
+    ) -> Result<usize, &'static str> {
         if sector_count == 0 {
             return Err("Sector count cannot be 0");
         }
@@ -317,14 +367,20 @@ impl AtapiPacketCdb12 {
     pub fn new_inquiry() -> Self {
         let mut cdb = [0u8; 12];
         cdb[0] = 0x12; // INQUIRY opcode
-        cdb[4] = 36;   // Allocation length
-        Self { opcode: 0x12, cdb_bytes: cdb }
+        cdb[4] = 36; // Allocation length
+        Self {
+            opcode: 0x12,
+            cdb_bytes: cdb,
+        }
     }
 
     pub fn new_read_capacity() -> Self {
         let mut cdb = [0u8; 12];
         cdb[0] = 0x25; // READ CAPACITY opcode
-        Self { opcode: 0x25, cdb_bytes: cdb }
+        Self {
+            opcode: 0x25,
+            cdb_bytes: cdb,
+        }
     }
 
     pub fn new_read10(lba: u32, sector_count: u16) -> Self {
@@ -334,7 +390,10 @@ impl AtapiPacketCdb12 {
         cdb[2..6].copy_from_slice(&lba_bytes);
         let cnt_bytes = sector_count.to_be_bytes();
         cdb[7..9].copy_from_slice(&cnt_bytes);
-        Self { opcode: 0x28, cdb_bytes: cdb }
+        Self {
+            opcode: 0x28,
+            cdb_bytes: cdb,
+        }
     }
 }
 
@@ -358,7 +417,11 @@ impl AtapiPacketDispatcher {
     }
 
     /// Dispatch 12-byte ATAPI Packet Command
-    pub fn dispatch_packet(&mut self, cdb: &AtapiPacketCdb12, response_buffer: &mut [u8]) -> Result<usize, &'static str> {
+    pub fn dispatch_packet(
+        &mut self,
+        cdb: &AtapiPacketCdb12,
+        response_buffer: &mut [u8],
+    ) -> Result<usize, &'static str> {
         if !self.is_atapi_device_present {
             return Err("No ATAPI optical drive detected on ATA bus");
         }
@@ -384,7 +447,10 @@ impl AtapiPacketDispatcher {
                 if response_buffer.len() < 8 {
                     return Err("Buffer too small for ATAPI READ CAPACITY response");
                 }
-                let last_lba = self.total_cd_capacity_sectors.saturating_sub(1).to_be_bytes();
+                let last_lba = self
+                    .total_cd_capacity_sectors
+                    .saturating_sub(1)
+                    .to_be_bytes();
                 let block_len = self.sector_size_bytes.to_be_bytes();
                 response_buffer[0..4].copy_from_slice(&last_lba);
                 response_buffer[4..8].copy_from_slice(&block_len);
@@ -392,7 +458,8 @@ impl AtapiPacketDispatcher {
             }
             0x28 => {
                 // READ (10)
-                let requested_len = ((cdb.cdb_bytes[7] as usize) << 8) | (cdb.cdb_bytes[8] as usize);
+                let requested_len =
+                    ((cdb.cdb_bytes[7] as usize) << 8) | (cdb.cdb_bytes[8] as usize);
                 let total_bytes = requested_len * (self.sector_size_bytes as usize);
                 if response_buffer.len() < total_bytes {
                     return Err("Buffer too small for ATAPI READ (10) payload");
@@ -455,7 +522,17 @@ impl IdeBusMasterDmaEngine {
             return Err("Cannot start BMDMA: PRD Table is empty");
         }
         self.is_dma_active = true;
-        let transfer_size: u64 = self.prd_entries.iter().map(|e| if e.byte_count == 0 { 65536 } else { e.byte_count as u64 }).sum();
+        let transfer_size: u64 = self
+            .prd_entries
+            .iter()
+            .map(|e| {
+                if e.byte_count == 0 {
+                    65536
+                } else {
+                    e.byte_count as u64
+                }
+            })
+            .sum();
         self.total_dma_bytes_transferred += transfer_size;
         Ok(())
     }
@@ -535,7 +612,9 @@ mod tests {
 
         let read10_cdb = AtapiPacketCdb12::new_read10(0, 1);
         let mut cd_data_buf = [0u8; 2048];
-        let bytes_read10 = atapi.dispatch_packet(&read10_cdb, &mut cd_data_buf).unwrap();
+        let bytes_read10 = atapi
+            .dispatch_packet(&read10_cdb, &mut cd_data_buf)
+            .unwrap();
         assert_eq!(bytes_read10, 2048);
         assert_eq!(atapi.packets_dispatched_count, 3);
     }

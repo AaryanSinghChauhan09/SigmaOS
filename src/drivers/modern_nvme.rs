@@ -53,14 +53,17 @@ impl NvmeSubmissionQueue {
             head: 0,
             tail: 0,
             phase: true,
-            commands: vec![NvmeCmd {
-                opcode: 0,
-                nsid: 0,
-                prp1: 0,
-                prp2: 0,
-                cdw10: 0,
-                cdw11: 0,
-            }; size],
+            commands: vec![
+                NvmeCmd {
+                    opcode: 0,
+                    nsid: 0,
+                    prp1: 0,
+                    prp2: 0,
+                    cdw10: 0,
+                    cdw11: 0,
+                };
+                size
+            ],
         }
     }
 
@@ -158,8 +161,9 @@ impl Default for SmartTelemetry {
     }
 }
 
-#[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+/// Simulated AHCI SATA Command Header structure (HBA memory layout)
+#[repr(C, packed)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct AhciCommandHeader {
     pub opts: u16,
     pub prdtl: u16,
@@ -168,9 +172,11 @@ pub struct AhciCommandHeader {
     pub reserved: [u32; 4],
 }
 
-pub type AhciCommandHeaderV3 = AhciCommandHeader;
-
-
+impl AhciCommandHeader {
+    pub const fn new() -> Self {
+        Self { opts: 0, prdtl: 0, prdbc: 0, ctba: 0, reserved: [0; 4] }
+    }
+}
 
 /// Simulated AHCI Port MMIO Register Map
 pub struct AhciPort {
@@ -223,7 +229,10 @@ pub enum DeviceGeneration {
 pub enum PowerState {
     Off,
     On,
-}
+    FullOn,
+    Standby,
+    Sleep,
+    Unknown,}
 
 #[cfg(test)]
 pub trait PeripheralDevice {
@@ -383,11 +392,21 @@ impl ModernNvmeDriver {
     }
 
     /// Create I/O queue pair
-    pub fn create_io_queue(&mut self, sq_id: u16, cq_id: u16, interrupt_vector: u16) -> Result<(), &'static str> {
+    pub fn create_io_queue(
+        &mut self,
+        sq_id: u16,
+        cq_id: u16,
+        interrupt_vector: u16,
+    ) -> Result<(), &'static str> {
         if self.queue_pairs.len() >= 65535 {
             return Err("Maximum number of queues reached");
         }
-        let qp = NvmeQueuePair::new(sq_id, cq_id, self.max_queue_depth as usize, interrupt_vector);
+        let qp = NvmeQueuePair::new(
+            sq_id,
+            cq_id,
+            self.max_queue_depth as usize,
+            interrupt_vector,
+        );
         self.queue_pairs.push(qp);
         Ok(())
     }

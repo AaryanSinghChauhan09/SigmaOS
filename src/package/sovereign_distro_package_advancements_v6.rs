@@ -1,5 +1,18 @@
 // SPDX-License-Identifier: MIT
 // SigmaOS - Sovereign Distro Package Advancements Suite V6
+// Master Linux & BSD distro package parity features:
+// 1. Clear Linux & Gentoo Profile-Guided & Feedback-Driven Optimization Governor (`SovereignPgoFdoOptimizationGovernor`):
+//    PGO/FDO build flag injection (-fprofile-use, -fprofile-sample-use, LTO, BOLT post-link optimization)
+// 2. Alpine Linux & Arch Reproducible Build Auditor Engine (`SovereignReproducibleBuildAuditorEngine`):
+//    Bit-for-bit reproducible build auditor (SOURCE_DATE_EPOCH, build path stripping, ELF build-id verification)
+// 3. FreeBSD & NetBSD Linux ABI Translation & Foreign Binary Mapper (`SovereignBsdLinuxAbiTranslatorEngine`):
+//    Linux ABI translation layer, foreign syscall mapping, and Linux/BSD SONAME compat layer
+// 4. Debian APT & Fedora DNF Transactional Pre-Flight Validator Engine (`SovereignTransactionalPreflightValidatorEngine`):
+//    Pre-flight safety validation checking available disk space, package file collisions, SONAME library breaks, and kernel ABI readiness
+// 5. NixOS & GNU Guix Content-Addressed Store Garbage Collector (`SovereignCasGarbageCollectorEngine`):
+//    GC scanner identifying unreferenced store paths/NAR archives and reclaiming dead store space while preserving active GC roots
+// 6. Master Distro Package Advancements Suite V6 (`SovereignDistroPackageAdvancementsSuiteV6`):
+//    Master orchestrator unifying V6 advancements across all package operations
 
 #![allow(dead_code)]
 #![allow(unused_variables)]
@@ -13,13 +26,9 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::format;
 #[cfg(not(feature = "standalone_test"))]
 use std::string::{String, ToString};
-#[cfg(not(feature = "standalone_test"))]
-use std::vec::Vec;
 
 #[cfg(feature = "standalone_test")]
 use alloc::collections::{BTreeMap, BTreeSet};
-#[cfg(feature = "standalone_test")]
-use alloc::format;
 #[cfg(feature = "standalone_test")]
 use alloc::string::{String, ToString};
 #[cfg(feature = "standalone_test")]
@@ -34,6 +43,10 @@ pub mod universal;
 
 #[cfg(feature = "standalone_test")]
 pub use universal::{PackageError, PackageFormat, UnifiedPackage};
+
+// =========================================================================
+// 1. Profile-Guided & Feedback-Driven Optimization Governor
+// =========================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum OptimizationProfileMode {
@@ -110,6 +123,10 @@ impl Default for SovereignPgoFdoOptimizationGovernor {
     }
 }
 
+// =========================================================================
+// 2. Reproducible Build Auditor Engine
+// =========================================================================
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ReproducibleAuditReport {
     pub is_reproducible: bool,
@@ -150,6 +167,7 @@ impl SovereignReproducibleBuildAuditorEngine {
             ));
         }
 
+        // Scan binary for host path leakage (e.g., /home/builder or /tmp/build)
         let binary_str = String::from_utf8_lossy(binary_bytes);
         if binary_str.contains("/home/") || binary_str.contains("/tmp/build") {
             path_leak = true;
@@ -174,6 +192,10 @@ impl Default for SovereignReproducibleBuildAuditorEngine {
         Self::new(1700000000)
     }
 }
+
+// =========================================================================
+// 3. BSD Linux ABI Translation & Foreign Binary Mapper
+// =========================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ForeignAbiMappingSpec {
@@ -213,6 +235,10 @@ impl Default for SovereignBsdLinuxAbiTranslatorEngine {
         Self::new()
     }
 }
+
+// =========================================================================
+// 4. Transactional Pre-Flight Validator Engine
+// =========================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PreflightValidationResult {
@@ -296,6 +322,10 @@ impl SovereignTransactionalPreflightValidatorEngine {
     }
 }
 
+// =========================================================================
+// 5. Content-Addressed Store Garbage Collector
+// =========================================================================
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CasGcResult {
     pub scanned_objects: usize,
@@ -306,7 +336,7 @@ pub struct CasGcResult {
 
 pub struct SovereignCasGarbageCollectorEngine {
     pub gc_roots: BTreeSet<String>,
-    pub store_objects: BTreeMap<String, u64>,
+    pub store_objects: BTreeMap<String, u64>, // path -> size_bytes
 }
 
 impl SovereignCasGarbageCollectorEngine {
@@ -360,6 +390,10 @@ impl Default for SovereignCasGarbageCollectorEngine {
         Self::new()
     }
 }
+
+// =========================================================================
+// 6. Master Distro Package Advancements Suite V6
+// =========================================================================
 
 pub struct SovereignDistroPackageAdvancementsSuiteV6 {
     pub pgo_governor: SovereignPgoFdoOptimizationGovernor,

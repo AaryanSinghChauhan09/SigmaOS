@@ -3,19 +3,11 @@
 // W^X enforcement, stack protection, and memory security
 // Inspired by OpenBSD and Linux security mitigations
 
-use core::sync::atomic::Ordering;
-use core::sync::atomic::AtomicU64;
 #[cfg(feature = "standalone_test")]
-use std::vec::Vec;
+use alloc::vec::Vec;
+use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 
-/// Severity level for intrusion/audit events
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum IntrusionSeverity {
-    Low,
-    Medium,
-    High,
-    Critical,
-}
+use crate::security::Permission;
 
 /// Secure Memory Zeroization utility
 /// Overwrites memory containing sensitive keys, credentials, or capability data
@@ -90,7 +82,7 @@ impl MemoryProtectionState {
         current: MemoryPermission,
         requested: MemoryPermission,
     ) -> Result<MemoryPermission, &'static str> {
-        if self.check_wx_violation(current, requested) {
+        if self.check_wx_violation(current, requested.clone()) {
             Err("W^X violation: cannot add execute permission to writable memory")
         } else {
             Ok(requested)

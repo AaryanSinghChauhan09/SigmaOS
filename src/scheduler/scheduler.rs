@@ -1,11 +1,12 @@
+extern crate alloc;
+use alloc::boxed::Box;
+use alloc::vec::Vec;
 use core::default::Default;
 use core::option::Option::{self, None, Some};
 use core::result::Result::{self, Err, Ok};
+use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 /// OOP-based Scheduler for SigmaOS
 /// Implements process/thread scheduling using Linux & BSD inspired task states and workload classifications.
-use std::boxed::Box;
-use std::vec::Vec;
-use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 
 /// Schedulable trait (OOP interface)
 pub trait Schedulable {
@@ -543,7 +544,7 @@ impl Scheduler for PriorityScheduler {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

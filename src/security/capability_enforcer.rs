@@ -205,36 +205,39 @@ impl CapabilityEnforcer {
     }
 
     /// Check resource access
-    pub fn check_access(&self, context_id: u64, resource: ResourceType, permission: ResourcePermission) -> bool {
+    pub fn check_access(
+        &self,
+        context_id: u64,
+        resource: ResourceType,
+        permission: ResourcePermission,
+    ) -> bool {
         let context = self.contexts.get(&context_id);
 
         match context {
-            Some(ctx) => {
-                match (resource, permission) {
-                    (ResourceType::File, ResourcePermission::Read) => {
-                        ctx.check(LinuxCapability::DacReadSearch) || ctx.check(LinuxCapability::DacOverride)
-                    }
-                    (ResourceType::File, ResourcePermission::Write) => {
-                        ctx.check(LinuxCapability::DacOverride)
-                    }
-                    (ResourceType::File, ResourcePermission::Execute) => {
-                        ctx.check(LinuxCapability::DacOverride)
-                    }
-                    (ResourceType::Process, ResourcePermission::Delete) => {
-                        ctx.check(LinuxCapability::Kill)
-                    }
-                    (ResourceType::Network, ResourcePermission::Bind) => {
-                        ctx.check(LinuxCapability::NetBindService) || ctx.check(LinuxCapability::NetAdmin)
-                    }
-                    (ResourceType::Network, ResourcePermission::Connect) => {
-                        ctx.check(LinuxCapability::NetRaw) || ctx.check(LinuxCapability::NetAdmin)
-                    }
-                    (ResourceType::System, _) => {
-                        ctx.check(LinuxCapability::SysAdmin)
-                    }
-                    _ => false,
+            Some(ctx) => match (resource, permission) {
+                (ResourceType::File, ResourcePermission::Read) => {
+                    ctx.check(LinuxCapability::DacReadSearch)
+                        || ctx.check(LinuxCapability::DacOverride)
                 }
-            }
+                (ResourceType::File, ResourcePermission::Write) => {
+                    ctx.check(LinuxCapability::DacOverride)
+                }
+                (ResourceType::File, ResourcePermission::Execute) => {
+                    ctx.check(LinuxCapability::DacOverride)
+                }
+                (ResourceType::Process, ResourcePermission::Delete) => {
+                    ctx.check(LinuxCapability::Kill)
+                }
+                (ResourceType::Network, ResourcePermission::Bind) => {
+                    ctx.check(LinuxCapability::NetBindService)
+                        || ctx.check(LinuxCapability::NetAdmin)
+                }
+                (ResourceType::Network, ResourcePermission::Connect) => {
+                    ctx.check(LinuxCapability::NetRaw) || ctx.check(LinuxCapability::NetAdmin)
+                }
+                (ResourceType::System, _) => ctx.check(LinuxCapability::SysAdmin),
+                _ => false,
+            },
             None => false,
         }
     }
@@ -328,7 +331,6 @@ mod tests {
         enforcer
             .grant(ctx.id, LinuxCapability::DacOverride)
             .unwrap();
-        enforcer.grant(ctx.id, LinuxCapability::DacOverride).unwrap();
 
         assert!(enforcer.check_access(ctx.id, ResourceType::File, ResourcePermission::Write));
     }
@@ -351,7 +353,6 @@ mod tests {
         enforcer
             .grant(ctx.id, LinuxCapability::NetBindService)
             .unwrap();
-        enforcer.grant(ctx.id, LinuxCapability::NetBindService).unwrap();
 
         assert!(enforcer.check_access(ctx.id, ResourceType::Network, ResourcePermission::Bind));
     }

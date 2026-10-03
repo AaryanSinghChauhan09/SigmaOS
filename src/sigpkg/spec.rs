@@ -2,7 +2,13 @@
 /// Implements package management using OOP principles with traits and structs
 /// No dependency on external package managers
 /// Based on Roadmap Item 21: Implement sigpkg spec
-use std::boxed::Box;
+extern crate alloc;
+use alloc::boxed::Box;
+
+use core::mem;
+
+use core::ptr::{self, NonNull};
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Package version
 #[repr(C)]
@@ -73,7 +79,11 @@ impl PackageDependency {
         if self.name_len > 0 {
             &self.name[..self.name_len as usize]
         } else {
-            let len = self.name.iter().position(|&b| b == 0).unwrap_or(self.name.len());
+            let len = self
+                .name
+                .iter()
+                .position(|&b| b == 0)
+                .unwrap_or(self.name.len());
             &self.name[..len]
         }
     }
@@ -83,7 +93,11 @@ impl PackageDependency {
         if self.constraint_len > 0 {
             &self.version_constraint[..self.constraint_len as usize]
         } else {
-            let len = self.version_constraint.iter().position(|&b| b == 0).unwrap_or(self.version_constraint.len());
+            let len = self
+                .version_constraint
+                .iter()
+                .position(|&b| b == 0)
+                .unwrap_or(self.version_constraint.len());
             &self.version_constraint[..len]
         }
     }
@@ -214,7 +228,8 @@ impl SimplePackage {
     }
 
     pub fn add_dependency(&mut self, name: &[u8], version_constraint: &[u8]) {
-        self.dependencies.push(PackageDependency::new(name, version_constraint));
+        self.dependencies
+            .push(PackageDependency::new(name, version_constraint));
     }
 }
 

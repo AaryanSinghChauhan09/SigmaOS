@@ -1,6 +1,5 @@
 /// Repository Management System (Debian APT + Arch Pacman Inspiration)
 /// Manages package repositories, mirrors, and metadata
-
 use crate::klib::btreemap::BTreeMap;
 
 // Zero-dependency architecture: Use alloc:: primitives for no_std compatibility
@@ -8,7 +7,6 @@ use crate::klib::btreemap::BTreeMap;
 extern crate alloc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::format;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
@@ -20,18 +18,17 @@ use std::format;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
 
 use core::default::Default;
 use core::option::Option::{self, None, Some};
 use core::result::Result::{self, Err, Ok};
-
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RepositoryGpgKey {
     pub key_id: String,
     pub owner: String,
     pub is_valid: bool,
+    pub fingerprint: String,
 }
 
 impl RepositoryGpgKey {
@@ -40,6 +37,7 @@ impl RepositoryGpgKey {
             key_id: key_id.to_string(),
             owner: owner.to_string(),
             is_valid: true,
+            fingerprint: key_id.to_string(),
         }
     }
 }
@@ -69,7 +67,10 @@ impl PpaRepository {
     }
 
     pub fn to_sources_list_entry(&self) -> String {
-        format!("deb https://ppa.launchpadcontent.net/{}/{}/ubuntu main", self.owner, self.ppa_name)
+        format!(
+            "deb https://ppa.launchpadcontent.net/{}/{}/ubuntu main",
+            self.owner, self.ppa_name
+        )
     }
 }
 
@@ -95,7 +96,7 @@ impl MirrorBenchmarkEngine {
 }
 
 /// Repository configuration (Debian sources.list inspiration)
-#[derive(Debug, Clone)]
+
 pub struct Repository {
     pub name: String,
     pub url: String,

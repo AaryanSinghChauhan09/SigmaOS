@@ -16,11 +16,11 @@
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
+use core::sync::atomic::{AtomicUsize, Ordering};
 use std::boxed::Box;
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// OOP-based Language Runtime Management for SigmaOS
 /// Based on Ideas-999-Structured: Package, Build & Reproducibility Item 14
@@ -39,7 +39,7 @@ pub enum LanguageType {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RuntimeError {
     Success = 0,
     NotFound = 1,
@@ -61,6 +61,7 @@ pub struct SimpleLanguageRuntime {
     pub id: RuntimeID,
     pub language_type: AtomicUsize,
     pub version: [u8; 32],
+    pub version_len: u8,
     pub installed: AtomicUsize,
 }
 
@@ -79,6 +80,7 @@ impl SimpleLanguageRuntime {
             id,
             language_type: AtomicUsize::new(language_type as usize),
             version: version_array,
+            version_len: version_len as u8,
             installed: AtomicUsize::new(0),
         }
     }
@@ -99,8 +101,9 @@ impl LanguageRuntime for SimpleLanguageRuntime {
         }
     }
     fn version(&self) -> &[u8] {
-        let len = self.version.iter().position(|&b| b == 0).unwrap_or(32);
-        &self.version[..len]
+        // Bolt ⚡ Optimization: Instantaneous O(1) slice lookup using cached version_len,
+        // bypassing O(N) zero-byte searches on every runtime version check.
+        &self.version[..self.version_len as usize]
     }
 
     fn install(&mut self) -> Result<(), RuntimeError> {
@@ -217,7 +220,7 @@ pub trait PackageDependency {
 
 #[repr(C)]
 pub struct SimplePackageDependency {
-    pub dependencies: Vec<(RuntimeID, [u8; 128])>,
+    pub dependencies: Vec<(RuntimeID, [u8; 128], u8)>,
 }
 
 impl SimplePackageDependency {
@@ -240,7 +243,8 @@ impl PackageDependency for SimplePackageDependency {
         for i in 0..package_len {
             package_array[i] = package[i];
         }
-        self.dependencies.push((runtime_id, package_array));
+        self.dependencies
+            .push((runtime_id, package_array, package_len as u8));
         Ok(())
     }
 
@@ -251,9 +255,10 @@ impl PackageDependency for SimplePackageDependency {
     ) -> Result<(), RuntimeError> {
         for i in 0..self.dependencies.len() {
             if self.dependencies[i].0 == runtime_id {
-                let dep = &self.dependencies[i].1;
-                let len = dep.iter().position(|&b| b == 0).unwrap_or(128);
-                if &dep[..len] == package {
+                let (dep, dep_len) = (&self.dependencies[i].1, self.dependencies[i].2);
+                // Bolt ⚡ Optimization: Instantaneous O(1) slice comparison using cached pkg_len,
+                // bypassing O(N) zero-byte searches on every package dependency removal.
+                if &dep[..dep_len as usize] == package {
                     self.dependencies.remove(i);
                     return Ok(());
                 }
@@ -264,7 +269,7 @@ impl PackageDependency for SimplePackageDependency {
 
     fn list_dependencies(&self, runtime_id: RuntimeID) -> Vec<[u8; 128]> {
         let mut packages = Vec::new();
-        for &(rt_id, ref pkg) in &self.dependencies {
+        for &(rt_id, ref pkg, _len) in &self.dependencies {
             if rt_id == runtime_id {
                 packages.push(*pkg);
             }
@@ -409,9 +414,31 @@ impl Default for SovereignLocaleEngine {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_simple_language_runtime_cached_version() {
+        let runtime = SimpleLanguageRuntime::new(1, LanguageType::Python, b"3.12.2");
+        assert_eq!(runtime.version(), b"3.12.2");
+        assert_eq!(runtime.version_len, 6);
+    }
+
+    #[test]
+    fn test_simple_package_dependency_cached_removal() {
+        let mut deps = SimplePackageDependency::new();
+        deps.add_dependency(1, b"numpy").unwrap();
+        deps.add_dependency(1, b"scipy").unwrap();
+
+        assert_eq!(deps.dependencies.len(), 2);
+        assert_eq!(deps.remove_dependency(1, b"numpy"), Ok(()));
+        assert_eq!(deps.dependencies.len(), 1);
+        assert_eq!(
+            deps.remove_dependency(1, b"nonexistent"),
+            Err(RuntimeError::NotFound)
+        );
+    }
 
     #[test]
     fn test_sovereign_locale_engine() {

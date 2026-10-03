@@ -33,9 +33,7 @@ use alloc::vec::Vec;
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::BTreeMap;
 #[cfg(any(feature = "standalone_test", test))]
-use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
 
 // ============================================================================
 // Helper Utilities: FNV-1a Digest for no_std Cryptographic Fingerprinting
@@ -107,7 +105,9 @@ impl SovereignSystemd350AutonomousMeshEngine {
     pub fn activate_service(&mut self, service_name: &str, signature_bytes: &[u8]) -> bool {
         let sig_digest = fnv1a_2060_digest(signature_bytes);
         if let Some(service) = self.services.get_mut(service_name) {
-            if service.pqc_lattice_signature_fingerprint == sig_digest || !signature_bytes.is_empty() {
+            if service.pqc_lattice_signature_fingerprint == sig_digest
+                || !signature_bytes.is_empty()
+            {
                 service.is_active = true;
                 self.pqc_signature_verifications += 1;
                 true
@@ -448,21 +448,33 @@ impl Sovereign2060DistroSupremacyMasterSuite {
         let mut score = 50u32; // Base baseline score
 
         // 1. Systemd 350 Post-Quantum Lattice autonomous service engine (+10)
-        self.service_engine.register_autonomous_service("sigma-core-2060", "/usr/bin/sigma-core-2060", 0xFF);
-        if self.service_engine.activate_service("sigma-core-2060", b"sig_data_2060")
+        self.service_engine.register_autonomous_service(
+            "sigma-core-2060",
+            "/usr/bin/sigma-core-2060",
+            0xFF,
+        );
+        if self
+            .service_engine
+            .activate_service("sigma-core-2060", b"sig_data_2060")
             && self.service_engine.heal_service_failure("sigma-core-2060")
         {
             score += 10;
         }
 
         // 2. Linux 12.0 Bcachefs CXL 8.0 optical photonic mesh engine (+10)
-        self.bcachefs_mesh_engine.allocate_photonic_extent(1, "/var/db/mesh2060", StorageTier2060::OptaneNvmeGen12, 32 * 1024 * 1024);
+        self.bcachefs_mesh_engine.allocate_photonic_extent(
+            1,
+            "/var/db/mesh2060",
+            StorageTier2060::OptaneNvmeGen12,
+            32 * 1024 * 1024,
+        );
         if self.bcachefs_mesh_engine.promote_to_photonic_mesh(1) {
             score += 10;
         }
 
         // 3. OpenBSD 13.0 QuantumFineIBT CFI & unveil v20 guard (+10)
-        self.openbsd_guard.register_quantum_ibt_region("sys_kernel_hyper_2060", 0x8000, 0x18000);
+        self.openbsd_guard
+            .register_quantum_ibt_region("sys_kernel_hyper_2060", 0x8000, 0x18000);
         self.openbsd_guard.lock_unveil_v20_paths();
         if self.openbsd_guard.validate_instruction_pointer(0x9000) {
             score += 10;
@@ -481,7 +493,8 @@ impl Sovereign2060DistroSupremacyMasterSuite {
         }
 
         // 5. Wayland 3.0 zero-copy direct KMS display pipeline (+10)
-        self.wayland_display_engine.submit_zero_copy_frame(1, 204, 4800);
+        self.wayland_display_engine
+            .submit_zero_copy_frame(1, 204, 4800);
         if self.wayland_display_engine.direct_scanout_hits > 0 {
             score += 10;
         }
@@ -516,8 +529,14 @@ mod tests {
 
     #[test]
     fn test_bcachefs_photonic_mesh_engine_2060() {
-        let mut engine = SovereignLinux120BcachefsQuantumPhotonicMeshEngine::new(1024 * 1024 * 1024 * 1024);
-        engine.allocate_photonic_extent(100, "/data/mesh2060", StorageTier2060::UltraFastSsdCoW, 16384);
+        let mut engine =
+            SovereignLinux120BcachefsQuantumPhotonicMeshEngine::new(1024 * 1024 * 1024 * 1024);
+        engine.allocate_photonic_extent(
+            100,
+            "/data/mesh2060",
+            StorageTier2060::UltraFastSsdCoW,
+            16384,
+        );
         assert!(engine.promote_to_photonic_mesh(100));
         assert_eq!(engine.zstd_compaction_events, 1);
         assert!(engine.deduplicated_bytes > 0);
@@ -537,13 +556,7 @@ mod tests {
     #[test]
     fn test_freebsd220_quantum_vnet_xdp_mesh_engine() {
         let mut engine = SovereignFreeBsd220QuantumVnetXdpMeshEngine::new();
-        engine.spawn_quantum_vnet_jail(
-            5,
-            "quantum_jail_2060",
-            [10, 10, 0, 1],
-            [0; 16],
-            0xFF,
-        );
+        engine.spawn_quantum_vnet_jail(5, "quantum_jail_2060", [10, 10, 0, 1], [0; 16], 0xFF);
         assert!(engine.process_xdp_quantum_packet(5, 4096));
         assert_eq!(engine.zero_copy_packets_processed, 1);
         assert_eq!(engine.pqc_mesh_tunnels_established, 1);

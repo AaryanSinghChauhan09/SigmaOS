@@ -5,7 +5,6 @@
 #[cfg(not(test))]
 use alloc::vec::Vec;
 #[cfg(test)]
-use std::vec::Vec;
 
 // ============================================================================
 // 1. OpenBSD / FreeBSD PF (Packet Filter) Stateful Firewall

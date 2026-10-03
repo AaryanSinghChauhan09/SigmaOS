@@ -18,7 +18,6 @@ use alloc::vec::Vec;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
 
 // ============================================================================
 // 1. Linux BPF_MAP_TYPE_RINGBUF Event Ring Buffer Engine
@@ -216,7 +215,12 @@ impl UserfaultfdSubsystemEngine {
         }
     }
 
-    pub fn register_range(&mut self, start_addr: usize, len: usize, mode: UffdMode) -> Result<(), &'static str> {
+    pub fn register_range(
+        &mut self,
+        start_addr: usize,
+        len: usize,
+        mode: UffdMode,
+    ) -> Result<(), &'static str> {
         if len == 0 || start_addr % 4096 != 0 {
             return Err("Userfaultfd: Address and length must be page-aligned (4096)");
         }
@@ -248,7 +252,11 @@ impl UserfaultfdSubsystemEngine {
     }
 
     pub fn resolve_page_fault(&mut self, fault_addr: usize) -> bool {
-        if let Some(pos) = self.pending_faults.iter().position(|f| f.fault_addr == fault_addr) {
+        if let Some(pos) = self
+            .pending_faults
+            .iter()
+            .position(|f| f.fault_addr == fault_addr)
+        {
             self.pending_faults.remove(pos);
             true
         } else {
@@ -383,7 +391,9 @@ pub struct LinuxFanotifyEngine {
 
 impl LinuxFanotifyEngine {
     pub fn new() -> Self {
-        Self { watches: Vec::new() }
+        Self {
+            watches: Vec::new(),
+        }
     }
 
     pub fn add_mark(&mut self, path: &str) -> Result<(), &'static str> {
@@ -489,7 +499,9 @@ mod tests {
     #[test]
     fn test_userfaultfd_subsystem() {
         let mut uffd = UserfaultfdSubsystemEngine::new();
-        assert!(uffd.register_range(0x7fff_0000_0000, 8192, UffdMode::Missing).is_ok());
+        assert!(uffd
+            .register_range(0x7fff_0000_0000, 8192, UffdMode::Missing)
+            .is_ok());
 
         assert!(uffd.trigger_page_fault(0x7fff_0000_1000, UffdMode::Missing, 4201));
         assert!(!uffd.trigger_page_fault(0x1000, UffdMode::Missing, 4201)); // Unregistered address
@@ -669,7 +681,12 @@ impl LinuxKprobesTracepointEngine {
         }
     }
 
-    pub fn register_kprobe(&mut self, symbol: &str, offset: usize, is_retprobe: bool) -> Result<(), &'static str> {
+    pub fn register_kprobe(
+        &mut self,
+        symbol: &str,
+        offset: usize,
+        is_retprobe: bool,
+    ) -> Result<(), &'static str> {
         if symbol.is_empty() {
             return Err("Kprobes: Symbol name cannot be empty");
         }
@@ -733,7 +750,10 @@ mod extended_kernel_tests {
 
     #[test]
     fn test_memcg_v2_oom_killer() {
-        let mut oom = LinuxMemoryCgroupV2OomKillerEngine::new("/sys/fs/cgroup/user.slice", 1024 * 1024 * 1024);
+        let mut oom = LinuxMemoryCgroupV2OomKillerEngine::new(
+            "/sys/fs/cgroup/user.slice",
+            1024 * 1024 * 1024,
+        );
         oom.register_process(MemcgProcessEntry {
             pid: 100,
             oom_score_adj: -1000, // Unkillable
@@ -774,6 +794,13 @@ mod extended_kernel_tests {
 
         assert_eq!(seccomp.evaluate_syscall(1), SeccompAction::Allow);
         assert_eq!(seccomp.evaluate_syscall(2), SeccompAction::KillProcess);
+    }
+
+    #[test]
+    fn test_landlock_binder_zswap_overlay_memfd_engines() {
+        // Stub test - these components are not yet implemented
+        // TODO: Implement LinuxLandlockV5AccessEngine, LinuxBinderIpcEngine,
+        // LinuxZswapCompressedStorageEngine, LinuxOverlayfsMountEngine, LinuxMemfdSecretEngine
     }
 
     #[test]

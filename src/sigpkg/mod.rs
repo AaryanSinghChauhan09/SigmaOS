@@ -1,4 +1,3 @@
-use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 // SigmaPkg - SigmaOS Package Manager
@@ -51,10 +50,10 @@ pub mod sovereign_sigpkg;
 pub mod svntogit_repro;
 
 pub use sovereign_package_innovations::{
-    AlpmHook, AlpineApkCachePeerSyncEngine, AlternativeGroup, AlternativeProvider,
-    ApkPackageChunk, AptPackageCandidate, AptPinRule, ArchAlpmHookTransactionEngine,
-    BsdPkgDbStorageEngine, BsdPkgRecord, CachePeerNode, DebianAptPinningEngine,
-    FreeBsdPkgMessageNotifierEngine, GentooEbuildUseFlagSolver, NixFlakeHermeticCacheStore,
+    AlpineApkCachePeerSyncEngine, AlpmHook, AlternativeGroup, AlternativeProvider, ApkPackageChunk,
+    AptPackageCandidate, AptPinRule, ArchAlpmHookTransactionEngine, BsdPkgDbStorageEngine,
+    BsdPkgRecord, CachePeerNode, DebianAptPinningEngine, FreeBsdPkgMessageNotifierEngine,
+    GentooEbuildUseFlagSolver, NixFlakeHermeticCacheStore,
     OpenBsdPledgeUnveilSandboxScriptletEngine, OstreeDeploymentPin, OstreeLayer, PkgMessage,
     PkgMessageTrigger, PledgePromises, RpmOstreeLayeredImageGovernorEngine, UnveilPath,
     XbpsDebianAlternativesGovernorEngine,
@@ -64,12 +63,11 @@ pub mod store;
 pub mod transaction;
 pub mod transaction_log;
 pub mod universal_adapter;
-pub mod universal_engine;
 pub mod universal_oop_system;
-pub use universal_oop_system::*;
 pub use universal_engine::{
     SovereignUniversalPackageManagerInteropEngine, SovereignUniversalPackageTranslationBridge,
 };
+pub use universal_oop_system::*;
 pub mod verifier;
 pub mod zero_alloc_resolver;
 
@@ -98,13 +96,21 @@ pub use sovereign_distro_package_advancements_v6::*;
 pub mod sovereign_distro_package_advancements_v7;
 pub use sovereign_distro_package_advancements_v7::*;
 
-#[path = "../package/sovereign_distro_package_advancements_v8.rs"]
-pub mod sovereign_distro_package_advancements_v8;
-pub use sovereign_distro_package_advancements_v8::*;
+#[path = "../package/sovereign_distro_package_advancements_v12.rs"]
+pub mod sovereign_distro_package_advancements_v12;
+pub use sovereign_distro_package_advancements_v12::*;
 
-#[path = "../package/sovereign_distro_package_advancements_v9.rs"]
-pub mod sovereign_distro_package_advancements_v9;
-pub use sovereign_distro_package_advancements_v9::*;
+#[path = "../package/sovereign_distro_package_advancements_v13.rs"]
+pub mod sovereign_distro_package_advancements_v13;
+pub use sovereign_distro_package_advancements_v13::*;
+
+#[path = "../package/sovereign_distro_package_advancements_v16.rs"]
+pub mod sovereign_distro_package_advancements_v16;
+pub use sovereign_distro_package_advancements_v16::*;
+
+#[path = "../package/sovereign_distro_package_advancements_v17.rs"]
+pub mod sovereign_distro_package_advancements_v17;
+pub use sovereign_distro_package_advancements_v17::*;
 
 #[path = "../package/bsd_linux_package_innovations.rs"]
 pub mod bsd_linux_package_innovations;
@@ -127,26 +133,22 @@ pub use bsd_linux_package_innovations::{
     XbpsRestrictedNonFreeLicenseEngine, XbpsSonameAndOrphanEngine, ZypperPackageOffer,
     ZypperRepository,
 };
-pub use zero_alloc_resolver::{
-    PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES,
-};
-pub use universal_adapter::{
-    PackageFormatAdapter, UniversalPackageAdapter, PackagePriority,
-    AptDebManifest, PacmanPkgbuild, SnapcraftManifest, FlatpakManifest,
-    FreeBsdUclManifest, OpenBsdContentsManifest, NetBsdPkgsrcManifest,
-    ZypperSpecManifest, SlackwarePkgManifest,
-    RpmSpecManifest, AppImageContainer, MappedScriptletHook,
-    SigmaPkgHookType, UniversalDependencyMapper, UniversalDryRunResult,
-    UniversalDryRunSimulator, UniversalFormatConverter, UniversalScriptletConverter,
-    UniversalPmCommandDispatcher, UniversalPmOperation, DispatchedPmAction,
-    SigPkgUniversalBridgeEngine,
-};
 pub use sovereign_sigpkg::*;
+pub use universal_adapter::{
+    AppImageContainer, AptDebManifest, DispatchedPmAction, FlatpakManifest, FreeBsdUclManifest,
+    MappedScriptletHook, NetBsdPkgsrcManifest, OpenBsdContentsManifest, PackageFormatAdapter,
+    PackagePriority, PacmanPkgbuild, RpmSpecManifest, SigPkgUniversalBridgeEngine,
+    SigmaPkgHookType, SlackwarePkgManifest, SnapcraftManifest, UniversalDependencyMapper,
+    UniversalDryRunResult, UniversalDryRunSimulator, UniversalFormatConverter,
+    UniversalPackageAdapter, UniversalPmCommandDispatcher, UniversalPmOperation,
+    UniversalScriptletConverter, ZypperSpecManifest,
+};
+pub use zero_alloc_resolver::{PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES};
 
 pub use alpine_apk_engine::{AlpineCommunityRepo, ApkIndexParser, ApkPackage};
 pub use arch_compat::{
-    AlpmHookManager, AurRecipeCompiler, MakepkgBuilder, MkinitcpioBuilder,
-    PacmanDbAdapter, RollingSyncManager, SvnPackageMetadata, SvntogitMigrationEngine,
+    AlpmHookManager, AurRecipeCompiler, MakepkgBuilder, MkinitcpioBuilder, PacmanDbAdapter,
+    RollingSyncManager, SvnPackageMetadata, SvntogitMigrationEngine,
 };
 pub use arch_pacman_engine::{
     AURHelper, ArchBuildSystem, ArchPacmanPackage, DependencyTreeVisualizer, PacmanCacheCleaner,
@@ -195,7 +197,6 @@ pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use resolver::SatSolver;
 pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};
 pub use spec::{
-    CachyCpuDetector, CachyosPackageAdapter, CpuArchLevel, ManagerCapability, PackageCapability,
     PackageDependency, PackageError as SpecPackageError, PackageInfo,
     PackageManager as SpecPackageManager, PackageStats, PackageVersion, SimplePackage,
     SimplePackageManager, UniversalPackage, UniversalPackageType, UserDefinedPackageHook,
@@ -203,12 +204,13 @@ pub use spec::{
 pub use store::{
     BsdPkgRepositoryMirror, ContentAddressedStore, GentooPortageUseFlagMask, NixOsHermeticCasStore,
 };
-pub use svntogit_repro::{
+pub use store::{
     BuildArtifact, ConvertedGitCommit, ReproducibilityAttestationReport,
     ReproducibleBuildEnvironment, ReproduciblePackageBuilder, SovereignSvnToGitMigrator,
     SvnBranchType, SvnRevisionLog,
 };
 pub use transaction::Transaction;
+pub use universal_adapter::{AdapterError, DebAdapter, PacmanAdapter, RpmAdapter};
 pub use verifier::CryptoVerifier;
 
 /// Package version using SemVer

@@ -12,7 +12,6 @@
 
 use std::collections::BTreeMap;
 use std::format;
-use std::string::{String, ToString};
 use std::vec::Vec;
 
 // ============================================================================
@@ -131,9 +130,9 @@ impl Default for QubesOsDisposableAppVmEngine {
 /// runit Init Execution Stage
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RunitStage {
-    Stage1OneTimeBootSetup, // /etc/runit/1
-    Stage2ServiceSupervision,// /etc/runit/2
-    Stage3ShutdownHalt,     // /etc/runit/3
+    Stage1OneTimeBootSetup,   // /etc/runit/1
+    Stage2ServiceSupervision, // /etc/runit/2
+    Stage3ShutdownHalt,       // /etc/runit/3
 }
 
 /// runit Service State
@@ -291,7 +290,12 @@ impl HaikuAppServerBServerWindowEngine {
         wid
     }
 
-    pub fn post_bmessage(&mut self, window_id: u32, what: u32, payload: &str) -> Result<(), &'static str> {
+    pub fn post_bmessage(
+        &mut self,
+        window_id: u32,
+        what: u32,
+        payload: &str,
+    ) -> Result<(), &'static str> {
         if !self.windows.contains_key(&window_id) {
             return Err("AppServer: Target BWindow does not exist");
         }
@@ -522,30 +526,54 @@ impl SovereignLinuxBsdAdvancedSynthesisSuite {
 
     pub fn verify_advanced_synthesis(&mut self) -> bool {
         // 1. Qubes VM verification
-        let qid = self.qubes_engine.create_disposable_qube("fedora-dvm", 2048, "sys-firewall");
-        let q_alloc_ok = self.qubes_engine.allocate_qube_data_page(qid, b"SENSITIVE_DATA_PAGE").is_ok();
-        let q_scrub_ok = self.qubes_engine.destroy_and_scrub_qube(qid).map_or(false, |b| b == 19);
+        let qid = self
+            .qubes_engine
+            .create_disposable_qube("fedora-dvm", 2048, "sys-firewall");
+        let q_alloc_ok = self
+            .qubes_engine
+            .allocate_qube_data_page(qid, b"SENSITIVE_DATA_PAGE")
+            .is_ok();
+        let q_scrub_ok = self
+            .qubes_engine
+            .destroy_and_scrub_qube(qid)
+            .map_or(false, |b| b == 19);
 
         // 2. Void runit verification
         self.runit_engine.advance_to_stage2();
-        self.runit_engine.register_service("dhcpcd", "/usr/bin/dhcpcd");
+        self.runit_engine
+            .register_service("dhcpcd", "/usr/bin/dhcpcd");
         let r_start_ok = self.runit_engine.sv_start("dhcpcd").is_ok();
 
         // 3. Haiku AppServer verification
         let wid = self.haiku_engine.create_bwindow("Deskbar", 0, 0, 1920, 30);
-        let h_msg_ok = self.haiku_engine.post_bmessage(wid, 1002, "KEY_PRESS").is_ok();
+        let h_msg_ok = self
+            .haiku_engine
+            .post_bmessage(wid, 1002, "KEY_PRESS")
+            .is_ok();
         let h_proc_ok = self.haiku_engine.process_message_queue() == 1;
 
         // 4. Illumos SMF verification
-        self.smf_engine.import_manifest("svc:/system/db:default", "/usr/bin/db", &[], false);
-        let s_enable_ok = self.smf_engine.svcadm_enable("svc:/system/db:default").is_ok();
+        self.smf_engine
+            .import_manifest("svc:/system/db:default", "/usr/bin/db", &[], false);
+        let s_enable_ok = self
+            .smf_engine
+            .svcadm_enable("svc:/system/db:default")
+            .is_ok();
 
         // 5. Alpine LBU verification
         let archive_data = b"APKOVL_ARCHIVE_DATA_PAYLOAD";
         let commit = self.lbu_engine.lbu_commit_overlay(archive_data, 5);
-        let l_verify_ok = self.lbu_engine.verify_and_restore_apkovl(commit.commit_id, archive_data);
+        let l_verify_ok = self
+            .lbu_engine
+            .verify_and_restore_apkovl(commit.commit_id, archive_data);
 
-        q_alloc_ok && q_scrub_ok && r_start_ok && h_msg_ok && h_proc_ok && s_enable_ok && l_verify_ok
+        q_alloc_ok
+            && q_scrub_ok
+            && r_start_ok
+            && h_msg_ok
+            && h_proc_ok
+            && s_enable_ok
+            && l_verify_ok
     }
 }
 
@@ -603,8 +631,18 @@ mod tests {
     #[test]
     fn test_illumos_smf_dependency_graph_engine() {
         let mut smf = IllumosSmfDependencyGraphEngine::new();
-        smf.import_manifest("svc:/network/loopback:default", "/sbin/ifconfig lo0", &[], true);
-        smf.import_manifest("svc:/network/http:default", "/usr/sbin/httpd", &["svc:/network/loopback:default"], false);
+        smf.import_manifest(
+            "svc:/network/loopback:default",
+            "/sbin/ifconfig lo0",
+            &[],
+            true,
+        );
+        smf.import_manifest(
+            "svc:/network/http:default",
+            "/usr/sbin/httpd",
+            &["svc:/network/loopback:default"],
+            false,
+        );
 
         assert!(smf.svcadm_enable("svc:/network/http:default").is_err()); // Dependency offline
         assert!(smf.svcadm_enable("svc:/network/loopback:default").is_ok());

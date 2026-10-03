@@ -1,12 +1,9 @@
-
+use std::string::String;
+use std::string::ToString;
 /// Custom Syscall Dispatcher for SigmaOS
 /// Implements syscall handling without relying on Linux kernel syscalls
 /// Uses capability-based access control
-
-
 use std::vec::Vec;
-use std::string::String;
-use std::string::ToString;
 
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
@@ -69,19 +66,17 @@ pub struct SyscallResult {
     pub error: i32,
 }
 
+// Error constants
+pub const EINVAL: i32 = 22; // Invalid argument
+pub const EFAULT: i32 = 14; // Bad address
+
 impl SyscallResult {
     pub fn success(value: isize) -> Self {
-        SyscallResult {
-            value,
-            error: 0,
-        }
+        SyscallResult { value, error: 0 }
     }
 
     pub fn error(error: i32) -> Self {
-        SyscallResult {
-            value: -1,
-            error,
-        }
+        SyscallResult { value: -1, error }
     }
 }
 
@@ -154,20 +149,95 @@ impl SyscallDispatcher {
         };
 
         // Register syscall handlers
-        dispatcher.register_syscall(SyscallNumber::Read, handle_read, Capability { read: true, write: false, execute: false, network: false, ipc: false });
-        dispatcher.register_syscall(SyscallNumber::Write, handle_write, Capability { read: false, write: true, execute: false, network: false, ipc: false });
-        dispatcher.register_syscall(SyscallNumber::Open, handle_open, Capability { read: true, write: true, execute: false, network: false, ipc: false });
-        dispatcher.register_syscall(SyscallNumber::Close, handle_close, Capability { read: true, write: true, execute: false, network: false, ipc: false });
+        dispatcher.register_syscall(
+            SyscallNumber::Read,
+            handle_read,
+            Capability {
+                read: true,
+                write: false,
+                execute: false,
+                network: false,
+                ipc: false,
+            },
+        );
+        dispatcher.register_syscall(
+            SyscallNumber::Write,
+            handle_write,
+            Capability {
+                read: false,
+                write: true,
+                execute: false,
+                network: false,
+                ipc: false,
+            },
+        );
+        dispatcher.register_syscall(
+            SyscallNumber::Open,
+            handle_open,
+            Capability {
+                read: true,
+                write: true,
+                execute: false,
+                network: false,
+                ipc: false,
+            },
+        );
+        dispatcher.register_syscall(
+            SyscallNumber::Close,
+            handle_close,
+            Capability {
+                read: true,
+                write: true,
+                execute: false,
+                network: false,
+                ipc: false,
+            },
+        );
         dispatcher.register_syscall(SyscallNumber::Exit, handle_exit, Capability::full());
         dispatcher.register_syscall(SyscallNumber::Fork, handle_fork, Capability::full());
-        dispatcher.register_syscall(SyscallNumber::Execve, handle_execve, Capability { read: true, write: false, execute: true, network: false, ipc: false });
-        dispatcher.register_syscall(SyscallNumber::Socket, handle_socket, Capability { read: false, write: false, execute: false, network: true, ipc: false });
-        dispatcher.register_syscall(SyscallNumber::Connect, handle_connect, Capability { read: false, write: false, execute: false, network: true, ipc: false });
+        dispatcher.register_syscall(
+            SyscallNumber::Execve,
+            handle_execve,
+            Capability {
+                read: true,
+                write: false,
+                execute: true,
+                network: false,
+                ipc: false,
+            },
+        );
+        dispatcher.register_syscall(
+            SyscallNumber::Socket,
+            handle_socket,
+            Capability {
+                read: false,
+                write: false,
+                execute: false,
+                network: true,
+                ipc: false,
+            },
+        );
+        dispatcher.register_syscall(
+            SyscallNumber::Connect,
+            handle_connect,
+            Capability {
+                read: false,
+                write: false,
+                execute: false,
+                network: true,
+                ipc: false,
+            },
+        );
 
         dispatcher
     }
 
-    fn register_syscall(&mut self, number: SyscallNumber, handler: SyscallHandler, required_capability: Capability) {
+    fn register_syscall(
+        &mut self,
+        number: SyscallNumber,
+        handler: SyscallHandler,
+        required_capability: Capability,
+    ) {
         let index = number as usize;
         if index < 256 {
             self.syscall_table[index] = Some(SyscallEntry {
@@ -178,8 +248,44 @@ impl SyscallDispatcher {
         }
     }
 
+    /// Validate syscall arguments at security boundary
+    /// Prevents malformed arguments from reaching handlers
+    fn validate_args(&self, number: SyscallNumber, args: &SyscallArgs) -> Result<(), i32> {
+        let index = number as usize;
+        
+        // Check syscall number bounds
+        if index >= 256 {
+            return Err(EINVAL);
+        }
+
+        // Validate pointer alignment for memory operations
+        if matches!(number, SyscallNumber::Read | SyscallNumber::Write) {
+            if args.arg1 % 8 != 0 {
+                return Err(EINVAL); // Misaligned buffer pointer
+            }
+            // Prevent buffer overruns: limit size to 4MB
+            if args.arg2 > 4 * 1024 * 1024 {
+                return Err(EINVAL); // Buffer too large
+            }
+        }
+
+        Ok(())
+    }
+
     /// Dispatch syscall
-    pub unsafe fn dispatch(&self, number: SyscallNumber, args: &SyscallArgs, caller_capability: Capability) -> SyscallResult {
+    /// Hot path: inlined dispatch with relaxed stats tracking
+    #[inline]
+    pub unsafe fn dispatch(
+        &self,
+        number: SyscallNumber,
+        args: &SyscallArgs,
+        caller_capability: Capability,
+    ) -> SyscallResult {
+        // Validate arguments at syscall boundary (security check)
+        if let Err(errno) = self.validate_args(number, args) {
+            return SyscallResult::error(errno);
+        }
+
         let index = number as usize;
 
         if index >= 256 {
@@ -196,8 +302,8 @@ impl SyscallDispatcher {
             return SyscallResult::error(-13); // EACCES
         }
 
-        // Increment call count
-        self.call_count[index].fetch_add(1, Ordering::SeqCst);
+        // Increment call count (relaxed ordering: statistics don't require synchronization)
+        self.call_count[index].fetch_add(1, Ordering::Relaxed);
 
         // Call handler
         (entry.handler)(args, caller_capability)
@@ -205,18 +311,18 @@ impl SyscallDispatcher {
 
     /// Verifies that caller possesses all required capabilities (corrected security logic)
     fn check_capability(&self, required: &Capability, caller: Capability) -> bool {
-        (!required.read || caller.read) &&
-        (!required.write || caller.write) &&
-        (!required.execute || caller.execute) &&
-        (!required.network || caller.network) &&
-        (!required.ipc || caller.ipc)
+        (!required.read || caller.read)
+            && (!required.write || caller.write)
+            && (!required.execute || caller.execute)
+            && (!required.network || caller.network)
+            && (!required.ipc || caller.ipc)
     }
 
     /// Get syscall statistics
     pub fn get_stats(&self, number: SyscallNumber) -> usize {
         let index = number as usize;
         if index < 256 {
-            self.call_count[index].load(Ordering::SeqCst)
+            self.call_count[index].load(Ordering::Relaxed)
         } else {
             0
         }
@@ -315,7 +421,11 @@ pub unsafe fn init_syscall_dispatcher() {
 }
 
 /// Make a syscall
-pub unsafe fn syscall(number: SyscallNumber, args: &SyscallArgs, capability: Capability) -> SyscallResult {
+pub unsafe fn syscall(
+    number: SyscallNumber,
+    args: &SyscallArgs,
+    capability: Capability,
+) -> SyscallResult {
     if let Some(ref dispatcher) = GLOBAL_DISPATCHER {
         dispatcher.dispatch(number, args, capability)
     } else {
@@ -362,7 +472,11 @@ impl SovereignKqueue {
     }
 
     pub fn register_event(&mut self, event: KqueueEvent) {
-        if let Some(existing) = self.events.iter_mut().find(|e| e.ident == event.ident && e.filter == event.filter) {
+        if let Some(existing) = self
+            .events
+            .iter_mut()
+            .find(|e| e.ident == event.ident && e.filter == event.filter)
+        {
             existing.flags = event.flags;
             existing.data = event.data;
             existing.udata = event.udata;
@@ -398,23 +512,42 @@ impl SovereignPledgeManager {
     pub fn is_syscall_permitted(&self, number: SyscallNumber) -> bool {
         let promises = &self.active_promises;
 
-        if promises.contains("stdio") && matches!(number, SyscallNumber::Read | SyscallNumber::Write | SyscallNumber::Exit) {
+        if promises.contains("stdio")
+            && matches!(
+                number,
+                SyscallNumber::Read | SyscallNumber::Write | SyscallNumber::Exit
+            )
+        {
             return true;
         }
 
-        if promises.contains("rpath") && matches!(number, SyscallNumber::Open | SyscallNumber::Read | SyscallNumber::Stat) {
+        if promises.contains("rpath")
+            && matches!(
+                number,
+                SyscallNumber::Open | SyscallNumber::Read | SyscallNumber::Stat
+            )
+        {
             return true;
         }
 
-        if promises.contains("wpath") && matches!(number, SyscallNumber::Open | SyscallNumber::Write | SyscallNumber::Stat) {
+        if promises.contains("wpath")
+            && matches!(
+                number,
+                SyscallNumber::Open | SyscallNumber::Write | SyscallNumber::Stat
+            )
+        {
             return true;
         }
 
-        if promises.contains("proc") && matches!(number, SyscallNumber::Fork | SyscallNumber::Execve) {
+        if promises.contains("proc")
+            && matches!(number, SyscallNumber::Fork | SyscallNumber::Execve)
+        {
             return true;
         }
 
-        if promises.contains("inet") && matches!(number, SyscallNumber::Socket | SyscallNumber::Connect) {
+        if promises.contains("inet")
+            && matches!(number, SyscallNumber::Socket | SyscallNumber::Connect)
+        {
             return true;
         }
 
@@ -463,10 +596,10 @@ impl LinuxIoUringSyscallRing {
         let count = self.sq_entries.len();
         for sqe in self.sq_entries.drain(..) {
             let res = match sqe.opcode {
-                0 => sqe.len as i32,  // READ
-                1 => sqe.len as i32,  // WRITE
-                2 => 0,               // NOP
-                _ => -38,             // ENOSYS
+                0 => sqe.len as i32, // READ
+                1 => sqe.len as i32, // WRITE
+                2 => 0,              // NOP
+                _ => -38,            // ENOSYS
             };
             self.cq_entries.push(IoUringCqe {
                 user_data: sqe.user_data,
@@ -502,7 +635,9 @@ pub struct FreeBsdCapsicumRightsGovernor {
 
 impl FreeBsdCapsicumRightsGovernor {
     pub fn new() -> Self {
-        Self { fd_rights: Vec::new() }
+        Self {
+            fd_rights: Vec::new(),
+        }
     }
 
     pub fn set_rights(&mut self, fd: i32, rights_mask: u64) {
@@ -534,14 +669,17 @@ pub struct OpenBsdUnveilPathSandbox {
 
 impl OpenBsdUnveilPathSandbox {
     pub fn new() -> Self {
-        Self { permissions: Vec::new() }
+        Self {
+            permissions: Vec::new(),
+        }
     }
 
     pub fn unveil(&mut self, path: &str, permissions: &str) -> Result<(), &'static str> {
         if path.is_empty() {
             return Err("Unveil: Empty path");
         }
-        self.permissions.push((path.to_string(), permissions.to_string()));
+        self.permissions
+            .push((path.to_string(), permissions.to_string()));
         Ok(())
     }
 
@@ -589,7 +727,10 @@ impl LinuxSeccompBpfSyscallFilter {
     }
 
     pub fn add_rule(&mut self, syscall_num: usize, action: SeccompAction) {
-        self.rules.push(SeccompRule { syscall_num, action });
+        self.rules.push(SeccompRule {
+            syscall_num,
+            action,
+        });
     }
 
     pub fn evaluate_syscall(&self, syscall_num: usize) -> SeccompAction {

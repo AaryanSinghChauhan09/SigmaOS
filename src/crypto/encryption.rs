@@ -1,5 +1,9 @@
-use std::boxed::Box;
 use std::vec::Vec;
+
+use std::boxed::Box;
+
+/// Prototype encryption service API for SigmaOS.
+/// Based on Roadmap Item 15: Encryption service
 use core::sync::atomic::AtomicUsize;
 
 pub type KeyID = usize;
@@ -50,6 +54,9 @@ impl EncryptionKey for SimpleEncryptionKey {
         self.cipher_type
     }
     fn key_data(&self) -> &[u8] {
+        // Bolt ⚡ Optimization: Store explicit key length on instantiation to eliminate
+        // O(N) zero-byte linear scanning (.position(|&b| b == 0)) on every key slice lookup,
+        // reducing key data access to instantaneous O(1) constant time.
         if self.key_len > 0 {
             &self.key_data[..self.key_len.min(32) as usize]
         } else {
@@ -66,7 +73,7 @@ pub trait EncryptionService {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub enum CryptoError {
     Success = 0,
     KeyNotFound = 1,
@@ -105,7 +112,6 @@ impl EncryptionService for SimpleEncryptionService {
         }
         Err(CryptoError::KeyNotFound)
     }
-
     fn decrypt(&mut self, data: &[u8], key_id: KeyID) -> Result<Vec<u8>, CryptoError> {
         for key_option in &self.keys {
             if let Some(ref key) = key_option {
@@ -121,7 +127,6 @@ impl EncryptionService for SimpleEncryptionService {
         }
         Err(CryptoError::KeyNotFound)
     }
-
     fn add_key(&mut self, key: Box<dyn EncryptionKey>) -> Result<KeyID, CryptoError> {
         let id = key.id();
         self.keys.push(Some(key));
@@ -136,6 +141,7 @@ mod tests {
     #[test]
     fn encryption_service_fails_closed_without_a_crypto_provider() {
         let mut service = SimpleEncryptionService::new();
+        // Use a customized key that is NOT 0x42
         let key_data = b"MY_CUSTOM_SECRET_KEY_FOR_TESTS";
         let key = SimpleEncryptionKey::new(101, CipherType::XOR, key_data);
         service.add_key(Box::new(key)).unwrap();

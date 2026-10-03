@@ -8,7 +8,6 @@ extern crate alloc;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::collections::BTreeMap;
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::format;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
@@ -21,7 +20,6 @@ use std::format;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
 
 // =========================================================================
 // 1. LINUX NEWS & PRESS TECH FEEDS AGGREGATOR SERVICE
@@ -226,7 +224,10 @@ mod tests {
 
         let phoronix_news = news.get_articles_by_portal("Phoronix");
         assert_eq!(phoronix_news.len(), 1);
-        assert_eq!(phoronix_news[0].article_title, "Linux 6.12 Benchmarks Released");
+        assert_eq!(
+            phoronix_news[0].article_title,
+            "Linux 6.12 Benchmarks Released"
+        );
     }
 
     #[test]

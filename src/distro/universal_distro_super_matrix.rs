@@ -7,7 +7,6 @@
 // Enterprise, Privacy, Specialized, Container, and Rolling Linux Distributions.
 
 use std::collections::BTreeMap;
-use std::string::{String, ToString};
 use std::vec::Vec;
 
 /// Category of Linux/BSD Distribution Architecture

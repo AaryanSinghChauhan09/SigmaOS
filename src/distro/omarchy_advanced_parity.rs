@@ -5,7 +5,6 @@
 #![no_std]
 extern crate alloc;
 
-use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
@@ -44,7 +43,14 @@ impl Omarchy4HyprlandDynamicTilingManager {
         }
     }
 
-    pub fn add_window_rule(&mut self, class: &str, title: &str, workspace: u32, floating: bool, opacity: f32) {
+    pub fn add_window_rule(
+        &mut self,
+        class: &str,
+        title: &str,
+        workspace: u32,
+        floating: bool,
+        opacity: f32,
+    ) {
         self.window_rules.push(HyprlandWindowRule {
             class_pattern: class.to_string(),
             title_pattern: title.to_string(),
@@ -57,18 +63,33 @@ impl Omarchy4HyprlandDynamicTilingManager {
     pub fn generate_hyprland_conf(&self) -> String {
         let mut conf = String::new();
         conf.push_str("# Omarchy 4 Hyprland Configuration\n");
-        conf.push_str(&format!("general {{ layout = \"{}\" }}\n", match self.layout_algorithm {
-            HyprlandLayoutAlgorithm::Dwindle => "dwindle",
-            HyprlandLayoutAlgorithm::Master => "master",
-        }));
-        conf.push_str(&format!("bezier = omarchyCurve, {}\n", self.animation_bezier_curve));
-        conf.push_str(&format!("animation = windows, 1, {}, omarchyCurve\n", self.animation_speed_ms / 10));
+        conf.push_str(&format!(
+            "general {{ layout = \"{}\" }}\n",
+            match self.layout_algorithm {
+                HyprlandLayoutAlgorithm::Dwindle => "dwindle",
+                HyprlandLayoutAlgorithm::Master => "master",
+            }
+        ));
+        conf.push_str(&format!(
+            "bezier = omarchyCurve, {}\n",
+            self.animation_bezier_curve
+        ));
+        conf.push_str(&format!(
+            "animation = windows, 1, {}, omarchyCurve\n",
+            self.animation_speed_ms / 10
+        ));
 
         for rule in &self.window_rules {
             if rule.is_floating {
-                conf.push_str(&format!("windowrulev2 = float, class:^({})$\n", rule.class_pattern));
+                conf.push_str(&format!(
+                    "windowrulev2 = float, class:^({})$\n",
+                    rule.class_pattern
+                ));
             }
-            conf.push_str(&format!("windowrulev2 = workspace {}, class:^({})$\n", rule.target_workspace, rule.class_pattern));
+            conf.push_str(&format!(
+                "windowrulev2 = workspace {}, class:^({})$\n",
+                rule.target_workspace, rule.class_pattern
+            ));
         }
         conf
     }
@@ -121,7 +142,12 @@ impl OmarchyWaybarStatusAppletStudio {
 
     pub fn render_waybar_json(&self) -> String {
         let mut json = String::from("{\n  \"layer\": \"top\",\n  \"position\": \"top\",\n  \"height\": 32,\n  \"modules-left\": [\"hyprland/workspaces\"],\n  \"modules-center\": [\"clock\"],\n  \"modules-right\": [");
-        let enabled_mods: Vec<String> = self.modules.iter().filter(|m| m.is_enabled && m.name != "workspaces" && m.name != "clock").map(|m| format!("\"{}\"", m.name)).collect();
+        let enabled_mods: Vec<String> = self
+            .modules
+            .iter()
+            .filter(|m| m.is_enabled && m.name != "workspaces" && m.name != "clock")
+            .map(|m| format!("\"{}\"", m.name))
+            .collect();
         json.push_str(&enabled_mods.join(", "));
         json.push_str("]\n}");
         json
@@ -221,7 +247,10 @@ impl OmarchyOmakaseNeovimLspEngine {
         lua.push_str("local lspconfig = require('lspconfig')\n");
 
         for server in &self.installed_servers {
-            lua.push_str(&format!("lspconfig.{}.setup({{}})\n", server.name.replace("-", "_")));
+            lua.push_str(&format!(
+                "lspconfig.{}.setup({{}})\n",
+                server.name.replace("-", "_")
+            ));
         }
         lua
     }
@@ -292,11 +321,25 @@ impl OmarchyMasterParitySuite {
 
     pub fn evaluate_omarchy_parity_score(&self) -> u32 {
         let mut score = 80;
-        if !self.hyprland_manager.generate_hyprland_conf().is_empty() { score += 4; }
-        if !self.waybar_studio.render_waybar_json().is_empty() { score += 4; }
-        if !self.terminal_font_studio.generate_ghostty_config().is_empty() { score += 4; }
-        if self.neovim_lsp_engine.installed_servers.len() >= 4 { score += 4; }
-        if self.iso_bootstrap.installation_duration_sec < 60 { score += 4; }
+        if !self.hyprland_manager.generate_hyprland_conf().is_empty() {
+            score += 4;
+        }
+        if !self.waybar_studio.render_waybar_json().is_empty() {
+            score += 4;
+        }
+        if !self
+            .terminal_font_studio
+            .generate_ghostty_config()
+            .is_empty()
+        {
+            score += 4;
+        }
+        if self.neovim_lsp_engine.installed_servers.len() >= 4 {
+            score += 4;
+        }
+        if self.iso_bootstrap.installation_duration_sec < 60 {
+            score += 4;
+        }
         score
     }
 }

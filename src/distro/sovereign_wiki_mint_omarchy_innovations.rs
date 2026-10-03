@@ -15,7 +15,6 @@
 extern crate alloc;
 
 use alloc::collections::BTreeMap;
-use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
@@ -63,7 +62,8 @@ impl LinuxMintWarpinatorLanEngine {
 
     pub fn send_file_to_peer(&mut self, file_path: &str, peer_id: &str) -> bool {
         if self.peers.iter().any(|p| p.node_id == peer_id) {
-            self.transfer_queue.push(format!("{} -> {}", file_path, peer_id));
+            self.transfer_queue
+                .push(format!("{} -> {}", file_path, peer_id));
             true
         } else {
             false
@@ -171,7 +171,9 @@ impl LinuxMintTimeshiftSnapshotEngine {
     }
 
     pub fn rollback_snapshot(&self, id: &str) -> bool {
-        self.snapshots.iter().any(|s| s.snapshot_id == id && s.is_valid)
+        self.snapshots
+            .iter()
+            .any(|s| s.snapshot_id == id && s.is_valid)
     }
 }
 
@@ -228,7 +230,10 @@ impl OmarchyQuickShellZenithEngine {
         format!(
             "QuickShellZenith {{ widgets: [{}], accent: \"{}\" }}",
             self.qml_widgets.join(", "),
-            self.theme_palette.get("accent").cloned().unwrap_or_default()
+            self.theme_palette
+                .get("accent")
+                .cloned()
+                .unwrap_or_default()
         )
     }
 }
@@ -311,13 +316,21 @@ impl OmarchyWalkerFuzzyLauncher {
                 name: "Alacritty".to_string(),
                 exec_cmd: "alacritty".to_string(),
                 icon_name: "utilities-terminal".to_string(),
-                keywords: vec!["terminal".to_string(), "shell".to_string(), "cmd".to_string()],
+                keywords: vec![
+                    "terminal".to_string(),
+                    "shell".to_string(),
+                    "cmd".to_string(),
+                ],
             },
             WalkerAppEntry {
                 name: "Chromium".to_string(),
                 exec_cmd: "chromium --ozone-platform=wayland".to_string(),
                 icon_name: "chromium".to_string(),
-                keywords: vec!["browser".to_string(), "web".to_string(), "internet".to_string()],
+                keywords: vec![
+                    "browser".to_string(),
+                    "web".to_string(),
+                    "internet".to_string(),
+                ],
             },
             WalkerAppEntry {
                 name: "Neovim".to_string(),
@@ -327,7 +340,9 @@ impl OmarchyWalkerFuzzyLauncher {
             },
         ];
 
-        Self { index: default_apps }
+        Self {
+            index: default_apps,
+        }
     }
 
     pub fn fuzzy_search(&self, query: &str) -> Vec<WalkerAppEntry> {

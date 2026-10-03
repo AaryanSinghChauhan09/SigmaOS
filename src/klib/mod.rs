@@ -26,30 +26,7 @@ pub mod math;
 pub mod math_ops;
 pub mod merkle;
 pub mod net;
-pub mod path;
-pub mod process;
-pub mod rand;
-pub mod random;
-pub mod ring_buffer;
-pub mod ringbuf;
 pub mod rng;
-pub mod sigma_string_utils;
-pub mod sigmalib;
-pub mod slab;
-pub mod static_hashmap;
-pub mod store;
-pub mod string;
-pub mod string_ops;
-pub mod string_parser;
-pub mod time;
-pub mod time_impl;
-pub mod toml;
-pub mod utf8_utils;
-pub mod uuid;
-pub mod uvm;
-pub mod vec;
-pub mod vecdeque;
-pub mod zero_dependency_elimination;
 
 pub use arc::Arc;
 pub use collections::BTreeMap;
@@ -113,19 +90,32 @@ pub use collections::HashSet;
 
 pub use custom_string::SigmaString;
 
-/// SigmaOS kernel library prelude.
-pub mod prelude {
-    pub use super::BTreeMap;
+pub mod vec {
     pub use super::Vec;
+    pub type SigmaVec<T> = super::Vec<T>;
+}
+
+/// SigmaOS kernel library prelude.
+///
+/// Kernel modules can use `use crate::klib::prelude::*;` to get
+/// sovereign implementations of common types without stdlib imports.
+pub mod prelude {
+    // Collections
+    pub use super::BTreeMap;
     pub use super::HashMap;
     pub use super::HashSet;
+    pub use super::Vec;
+    // Linked structures
+    pub use super::HeapRingBuffer;
     pub use super::LinkedList;
     pub use super::RingBuffer;
-    pub use super::HeapRingBuffer;
+    // Utilities
     pub use super::Arc;
-    pub use super::Uuid;
     pub use super::SigmaString;
     pub use super::SlabCache;
+    pub use super::Uuid;
     pub use super::ZeroDependencyMasterHub;
     pub use super::ZeroDependencyPrimitiveHub;
 }
+
+pub mod path;

@@ -2,8 +2,8 @@
 // SigmaOS Post-Quantum Cryptography Module
 // Implements NIST PQC standards: Dilithium-5 (signing), Kyber-1024 (encryption)
 
-use std::vec::Vec;
 use core::sync::atomic::{AtomicU32, Ordering};
+use std::vec::Vec;
 
 // ============================================================================
 // NIST PQC Constants
@@ -25,8 +25,12 @@ pub const KYBER_SS_BYTES: usize = 32;
 pub const KYBER_MODE: u16 = 1024;
 
 // OID for post-quantum algorithms
-pub const OID_DILITHIUM5: &[u8] = &[0x06, 0x0B, 0x2B, 0x06, 0x01, 0x04, 0x01, 0xDE, 0x7D, 0x02, 0x04, 0x03];
-pub const OID_KYBER1024: &[u8] = &[0x06, 0x0C, 0x2B, 0x06, 0x01, 0x04, 0x01, 0xDE, 0x7D, 0x02, 0x05, 0x03];
+pub const OID_DILITHIUM5: &[u8] = &[
+    0x06, 0x0B, 0x2B, 0x06, 0x01, 0x04, 0x01, 0xDE, 0x7D, 0x02, 0x04, 0x03,
+];
+pub const OID_KYBER1024: &[u8] = &[
+    0x06, 0x0C, 0x2B, 0x06, 0x01, 0x04, 0x01, 0xDE, 0x7D, 0x02, 0x05, 0x03,
+];
 
 // ============================================================================
 // Cryptographic Constants
@@ -246,8 +250,15 @@ impl PostQuantumCryptoManager {
         &mut self,
         seed: &[u8; DILITHIUM_SEED_BYTES],
     ) -> Result<(DilithiumPublicKey, DilithiumSecretKey), &'static str> {
+        // In real implementation:
+        // 1. Use seed to expand with SHAKE256
+        // 2. Generate matrix A and vectors s1, s2
+        // 3. Compute public key from secret key
+        // 4. Perform rejection sampling if needed
+
         let secret_key = DilithiumSecretKey::new(seed);
 
+        // Generate public key from secret key
         let mut pk_data = vec![0u8; DILITHIUM_PK_BYTES];
         pk_data[0..DILITHIUM_SEED_BYTES].copy_from_slice(seed);
 
@@ -264,6 +275,12 @@ impl PostQuantumCryptoManager {
         &mut self,
         seed: &[u8; KYBER_SEED_BYTES],
     ) -> Result<(KyberPublicKey, KyberSecretKey), &'static str> {
+        // In real implementation:
+        // 1. Use seed with SHAKE256
+        // 2. Generate polynomial ring elements
+        // 3. Compute public key (A*s + e) mod q
+        // 4. Store secret key
+
         let mut sk_data = vec![0u8; KYBER_SK_BYTES];
         sk_data[0..KYBER_SEED_BYTES].copy_from_slice(seed);
 
@@ -274,7 +291,6 @@ impl PostQuantumCryptoManager {
 
         let public_key = KyberPublicKey::new(&pk_data)?;
 
-        self.kyber_keys.push((public_key.clone(), secret_key.clone()));
         self.kyber_keys
             .push((public_key.clone(), secret_key.clone()));
         self.key_count.fetch_add(1, Ordering::SeqCst);

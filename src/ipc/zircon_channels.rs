@@ -5,39 +5,39 @@
 use std::collections::{BTreeMap, VecDeque};
 use std::sync::{Arc, Mutex, atomic::{AtomicU32, AtomicU64, Ordering}};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+// ─────────────────────────────────────────────────────────────────────────────
+// Handle Rights (capability enforcement)
+// ─────────────────────────────────────────────────────────────────────────────
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Rights(pub u32);
-
 impl Rights {
-    pub const NONE: Self = Rights(0);
-    pub const DUPLICATE: Self = Rights(1 << 0);
-    pub const TRANSFER: Self = Rights(1 << 1);
-    pub const READ: Self = Rights(1 << 2);
-    pub const WRITE: Self = Rights(1 << 3);
-    pub const EXECUTE: Self = Rights(1 << 4);
-    pub const MAP: Self = Rights(1 << 5);
-    pub const GET_PROP: Self = Rights(1 << 6);
-    pub const SET_PROP: Self = Rights(1 << 7);
-    pub const ENUMERATE: Self = Rights(1 << 8);
-    pub const DESTROY: Self = Rights(1 << 9);
-    pub const SET_POLICY: Self = Rights(1 << 10);
-    pub const GET_CHILD: Self = Rights(1 << 11);
-    pub const SIGNAL: Self = Rights(1 << 12);
-    pub const WAIT: Self = Rights(1 << 13);
-    pub const INSPECT: Self = Rights(1 << 14);
-    pub const SAME_RIGHTS: Self = Rights(1 << 31);
-
-    pub fn contains(&self, other: Self) -> bool {
-        (self.0 & other.0) == other.0
-    }
+    pub const NONE: Rights = Rights(0);
+    pub const DUPLICATE: Rights = Rights(1);
+    pub const TRANSFER: Rights = Rights(1);
+    pub const READ: Rights = Rights(1);
+    pub const WRITE: Rights = Rights(1);
+    pub const EXECUTE: Rights = Rights(1);
+    pub const MAP: Rights = Rights(1);
+    pub const GET_PROP: Rights = Rights(1);
+    pub const SET_PROP: Rights = Rights(1);
+    pub const ENUMERATE: Rights = Rights(1);
+    pub const DESTROY: Rights = Rights(1);
+    pub const SET_POLICY: Rights = Rights(1);
+    pub const GET_CHILD: Rights = Rights(1);
+    pub const SIGNAL: Rights = Rights(1);
+    pub const WAIT: Rights = Rights(1);
+    pub const INSPECT: Rights = Rights(1);
+    pub const SAME_RIGHTS: Rights = Rights(1);
+    pub fn contains(self, other: Rights) -> bool { (self.0 & other.0) == other.0 }
+    pub fn bits(self) -> u32 { self.0 }
 }
+impl core::ops::BitOr for Rights { type Output = Self; fn bitor(self, r: Self) -> Self { Rights(self.0|r.0) } }
+impl core::ops::BitAnd for Rights { type Output = Self; fn bitand(self, r: Self) -> Self { Rights(self.0&r.0) } }
 
-impl core::ops::BitOr for Rights {
-    type Output = Self;
-    fn bitor(self, rhs: Self) -> Self {
-        Rights(self.0 | rhs.0)
-    }
-}
+// ─────────────────────────────────────────────────────────────────────────────
+// Kernel Object Types
+// ─────────────────────────────────────────────────────────────────────────────
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum KobjType {
@@ -47,66 +47,59 @@ pub enum KobjType {
     EventPair,
     Timer,
     Port,
-    Vmo,
+    Vmo,  // Virtual Memory Object
     Process,
     Thread,
     Job,
 }
 
 pub type ZxHandle = u32;
-pub type Koid = u64;
+pub type Koid = u64;  // Kernel Object ID
 
 static KOID_COUNTER: AtomicU64 = AtomicU64::new(1);
 fn new_koid() -> Koid { KOID_COUNTER.fetch_add(1, Ordering::SeqCst) }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+// ─────────────────────────────────────────────────────────────────────────────
+// Signals
+// ─────────────────────────────────────────────────────────────────────────────
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Signals(pub u32);
-
 impl Signals {
-    pub const NONE: Self = Signals(0);
-    pub const READABLE: Self = Signals(1 << 0);
-    pub const WRITABLE: Self = Signals(1 << 1);
-    pub const PEER_CLOSED: Self = Signals(1 << 2);
-    pub const SIGNALED: Self = Signals(1 << 3);
-    pub const FIFO_READABLE: Self = Signals(1 << 4);
-    pub const FIFO_WRITABLE: Self = Signals(1 << 5);
-    pub const HANDLE_CLOSED: Self = Signals(1 << 23);
-    pub const LAST_HANDLE: Self = Signals(1 << 24);
-
-    pub fn bits(&self) -> u32 {
-        self.0
-    }
-
-    pub fn contains(&self, other: Self) -> bool {
-        (self.0 & other.0) == other.0
-    }
-
-    pub fn from_bits_truncate(bits: u32) -> Self {
-        Signals(bits)
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.0 == 0
-    }
+    pub fn from_bits_truncate(bits: u32) -> Self { Signals(bits) }
+    pub const NONE: Signals = Signals(0);
+    pub const READABLE: Signals = Signals(1);
+    pub const WRITABLE: Signals = Signals(1);
+    pub const PEER_CLOSED: Signals = Signals(1);
+    pub const SIGNALED: Signals = Signals(1);
+    pub const FIFO_READABLE: Signals = Signals(1);
+    pub const FIFO_WRITABLE: Signals = Signals(1);
+    pub const HANDLE_CLOSED: Signals = Signals(1);
+    pub const LAST_HANDLE: Signals = Signals(1);
+    pub fn contains(self, other: Signals) -> bool { (self.0 & other.0) == other.0 }
+    pub fn bits(self) -> u32 { self.0 }
 }
+impl core::ops::BitOr for Signals { type Output = Self; fn bitor(self, r: Self) -> Self { Signals(self.0|r.0) } }
+impl core::ops::BitAnd for Signals { type Output = Self; fn bitand(self, r: Self) -> Self { Signals(self.0&r.0) } }
 
-impl core::ops::BitAnd for Signals {
-    type Output = Self;
-    fn bitand(self, rhs: Self) -> Self {
-        Signals(self.0 & rhs.0)
-    }
-}
+// ─────────────────────────────────────────────────────────────────────────────
+// Channel Message
+// ─────────────────────────────────────────────────────────────────────────────
 
 #[derive(Debug, Clone)]
 pub struct ZxMessage {
     pub bytes: Vec<u8>,
-    pub handles: Vec<ZxHandle>,
+    pub handles: Vec<ZxHandle>, // handle transfer
 }
 
 impl ZxMessage {
     pub fn new(bytes: Vec<u8>) -> Self { ZxMessage { bytes, handles: Vec::new() } }
     pub fn with_handles(bytes: Vec<u8>, handles: Vec<ZxHandle>) -> Self { ZxMessage { bytes, handles } }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Channel (bidirectional message-passing endpoint pair)
+// ─────────────────────────────────────────────────────────────────────────────
 
 #[derive(Debug)]
 pub struct ChannelEndpoint {
@@ -161,6 +154,7 @@ impl ChannelEndpoint {
     }
 }
 
+/// A channel pair: (local, peer) — like zx_channel_create()
 pub struct Channel {
     pub local: Arc<ChannelEndpoint>,
     pub peer: Arc<ChannelEndpoint>,
@@ -183,6 +177,10 @@ impl Channel {
     pub fn read(&self) -> Result<ZxMessage, ZxStatus> { self.local.read() }
     pub fn close(self) { self.local.close(); }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// FIFO (fixed-element ring buffer channel)
+// ─────────────────────────────────────────────────────────────────────────────
 
 pub struct ZxFifo {
     pub koid: Koid,
@@ -237,6 +235,10 @@ impl ZxFifo {
     pub fn available_read(&self) -> usize { self.buffer.lock().unwrap().len() }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Event / EventPair
+// ─────────────────────────────────────────────────────────────────────────────
+
 pub struct ZxEvent {
     pub koid: Koid,
     pub signals: AtomicU32,
@@ -259,6 +261,10 @@ impl ZxEvent {
         Signals::from_bits_truncate(self.signals.load(Ordering::Relaxed)) & mask
     }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ZxStatus error codes
+// ─────────────────────────────────────────────────────────────────────────────
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ZxStatus {
@@ -284,6 +290,10 @@ pub enum ZxStatus {
     Unavailable,
     AccessDenied,
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Handle Table (kernel-side mapping of ZxHandle → KernelObject)
+// ─────────────────────────────────────────────────────────────────────────────
 
 #[derive(Debug, Clone)]
 pub enum KernelObjectRef {
@@ -352,9 +362,11 @@ mod tests {
     #[test]
     fn test_channel_signals() {
         let (ch1, ch2) = Channel::create();
+        // Initially writable, not readable
         assert!(ch1.local.signals().contains(Signals::WRITABLE));
         assert!(!ch2.local.signals().contains(Signals::READABLE));
         ch1.write(ZxMessage::new(vec![1, 2, 3]));
+        // ch2 should now have READABLE
         assert!(ch2.local.signals().contains(Signals::READABLE));
     }
 
@@ -362,14 +374,16 @@ mod tests {
     fn test_channel_peer_closed() {
         let (ch1, ch2) = Channel::create();
         ch1.close();
+        // ch2 should see PEER_CLOSED
         assert!(ch2.local.signals().contains(Signals::PEER_CLOSED));
+        // Write to closed peer should fail
         assert_eq!(ch2.write(ZxMessage::new(vec![])), ZxStatus::PeerClosed);
     }
 
     #[test]
     fn test_fifo_write_read() {
         let fifo = ZxFifo::new(8, 4);
-        let data = [1u8, 2, 3, 4,   5, 6, 7, 8];
+        let data = [1u8, 2, 3, 4,   5, 6, 7, 8]; // 2 elements of 4 bytes
         let (status, written) = fifo.write(&data, 2);
         assert_eq!(status, ZxStatus::Ok);
         assert_eq!(written, 2);
@@ -409,7 +423,7 @@ mod tests {
         let mut table = ZxHandleTable::new();
         let entry = HandleEntry {
             kobj: KernelObjectRef::Channel(1),
-            rights: Rights::READ | Rights::WRITE,
+            rights: Rights::READ | Rights::WRITE, // no DUPLICATE
             koid: 1,
         };
         let h = table.insert(entry);

@@ -36,7 +36,7 @@ jobs:
           mkdir -p build
           rustc --edition=2021 --test src/security/comprehensive_access_control.rs -o build/test_access_control
           ./build/test_access_control
-          rustc --edition=2021 --test src/security/sovereign_permissions_matrix_engine.rs -o build/test_permissions_matrix
+          rustc --edition=2021 --test src/security/publication_permissions.rs -o build/test_permissions_matrix
           ./build/test_permissions_matrix
 
       - name: Run Portable Sandbox Verification

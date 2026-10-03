@@ -1,277 +1,423 @@
-// Linux-inspired futex (fast userspace mutex)
-// Userspace synchronization primitive for SigmaOS
+//! # Futex (Fast Userspace Mutex) Subsystem
+//!
+//! Linux-inspired futex implementation for efficient userspace synchronization.
+//! Provides wait/wake primitives for implementing mutexes, condition variables, and semaphores.
 
-use std::collections::BTreeMap;
-use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::Arc;
+#![no_std]
 
-/// Futex operation (Linux futex.h)
+extern crate alloc;
+use alloc::collections::BTreeMap;
+use alloc::vec::Vec;
+use core::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
+
+/// Maximum number of waiters per futex
+const MAX_WAITERS: usize = 1024;
+
+/// Futex operation types (inspired by Linux FUTEX_* constants)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum FutexOperation {
-    Wait,
-    Wake,
-    WakeBitset,
-    LockPi,
-    UnlockPi,
-    TryLockPi,
-    Requeue,
-    RequeuePriority,
+#[repr(u32)]
+pub enum FutexOp {
+    /// Wait if *futex == val
+    Wait = 0,
+    /// Wake up to val waiters
+    Wake = 1,
+    /// Atomic compare and requeue
+    CmpRequeue = 4,
+    /// Wake op (combined wake and modify)
+    WakeOp = 5,
+    /// Lock private futex
+    LockPi = 6,
+    /// Unlock private futex
+    UnlockPi = 7,
+    /// Trylock private futex
+    TrylockPi = 8,
+    /// Wait with bitset mask
+    WaitBitset = 9,
+    /// Wake with bitset mask
+    WakeBitset = 10,
 }
 
-/// Futex wait flags
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+/// Futex flags
+#[derive(Debug, Clone, Copy)]
 pub struct FutexFlags {
+    /// Private futex (process-local)
     pub private: bool,
+    /// Use realtime clock for timeout
     pub clock_realtime: bool,
 }
 
 impl FutexFlags {
-    pub fn new() -> Self {
-        FutexFlags {
-            private: false,
-            clock_realtime: false,
-        }
-    }
+    pub const PRIVATE: Self = Self {
+        private: true,
+        clock_realtime: false,
+    };
 
-    pub fn with_private(mut self) -> Self {
-        self.private = true;
-        self
-    }
-
-    pub fn with_clock_realtime(mut self) -> Self {
-        self.clock_realtime = true;
-        self
-    }
+    pub const SHARED: Self = Self {
+        private: false,
+        clock_realtime: false,
+    };
 }
 
-impl Default for FutexFlags {
-    fn default() -> Self {
-        Self::new()
-    }
+/// Futex error types
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FutexError {
+    /// Invalid argument
+    Invalid,
+    /// Timeout expired
+    Timeout,
+    /// Value mismatch (futex changed before wait)
+    Again,
+    /// Address fault
+    Fault,
+    /// Operation would block
+    WouldBlock,
+    /// Permission denied
+    PermissionDenied,
 }
 
-/// Futex waiter state
-#[derive(Debug)]
-pub struct FutexWaiter {
-    address: u64,
+/// Futex key for identifying unique futex locations
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub struct FutexKey {
+    /// Process ID (for private futexes)
     pid: u32,
-    #[allow(dead_code)]
-    flags: FutexFlags,
-    woken: AtomicBool,
+    /// Virtual address or shared memory offset
+    address: usize,
+}
+
+impl FutexKey {
+    pub const fn new(pid: u32, address: usize) -> Self {
+        Self { pid, address }
+    }
+
+    pub const fn shared(address: usize) -> Self {
+        Self { pid: 0, address }
+    }
+}
+
+/// Futex waiter entry
+#[derive(Debug, Clone)]
+pub struct FutexWaiter {
+    /// Thread ID waiting
+    pub tid: u32,
+    /// Bitset mask for selective wakeup
+    pub bitset: u32,
+    /// Requeue target (for FUTEX_CMP_REQUEUE)
+    pub requeue_key: Option<FutexKey>,
 }
 
 impl FutexWaiter {
-    pub fn new(address: u64, pid: u32, flags: FutexFlags) -> Self {
-        FutexWaiter {
-            address,
-            pid,
-            flags,
-            woken: AtomicBool::new(false),
+    pub const fn new(tid: u32) -> Self {
+        Self {
+            tid,
+            bitset: 0xFFFFFFFF, // All bits set by default
+            requeue_key: None,
         }
     }
 
-    pub fn wake(&self) -> bool {
-        !self.woken.swap(true, Ordering::SeqCst)
+    pub const fn with_bitset(tid: u32, bitset: u32) -> Self {
+        Self {
+            tid,
+            bitset,
+            requeue_key: None,
+        }
     }
 }
 
-/// Futex queue for an address
-#[derive(Debug, Clone)]
-struct FutexQueue {
-    address: u64,
-    waiters: Vec<Arc<FutexWaiter>>,
+/// Futex wait queue
+pub struct FutexQueue {
+    /// Waiters for this futex
+    waiters: Vec<FutexWaiter>,
+    /// Spinlock for queue access
+    lock: AtomicU32,
 }
 
 impl FutexQueue {
-    pub fn new(address: u64) -> Self {
-        FutexQueue {
-            address,
+    pub const fn new() -> Self {
+        Self {
             waiters: Vec::new(),
+            lock: AtomicU32::new(0),
         }
     }
 
-    pub fn add_waiter(&mut self, waiter: Arc<FutexWaiter>) {
+    /// Add waiter to queue
+    pub fn enqueue(&mut self, waiter: FutexWaiter) -> Result<(), FutexError> {
+        if self.waiters.len() >= MAX_WAITERS {
+            return Err(FutexError::WouldBlock);
+        }
         self.waiters.push(waiter);
+        Ok(())
     }
 
-    pub fn wake_one(&mut self) -> Option<Arc<FutexWaiter>> {
-        for waiter in &self.waiters {
-            if waiter.wake() {
-                return Some(waiter.clone());
+    /// Wake up to count waiters matching bitset
+    pub fn wake(&mut self, count: usize, bitset: u32) -> usize {
+        let mut woken = 0;
+        self.waiters.retain(|waiter| {
+            if woken < count && (waiter.bitset & bitset) != 0 {
+                woken += 1;
+                false // Remove from queue (woken)
+            } else {
+                true // Keep in queue
             }
-        }
-        None
-    }
-
-    pub fn wake_all(&mut self) -> Vec<Arc<FutexWaiter>> {
-        let mut woken = Vec::new();
-        for waiter in &self.waiters {
-            if waiter.wake() {
-                woken.push(waiter.clone());
-            }
-        }
+        });
         woken
     }
 
-    pub fn remove_woken(&mut self) {
-        self.waiters.retain(|w| !w.woken.load(Ordering::SeqCst));
-    }
-
-    pub fn waiter_count(&self) -> usize {
-        self.waiters.len()
-    }
-}
-
-/// Futex manager for the system
-pub struct FutexManager {
-    queues: BTreeMap<u64, FutexQueue>,
-}
-
-impl FutexManager {
-    pub fn new() -> Self {
-        FutexManager {
-            queues: BTreeMap::new(),
+    /// Remove specific waiter
+    pub fn remove_waiter(&mut self, tid: u32) -> bool {
+        if let Some(pos) = self.waiters.iter().position(|w| w.tid == tid) {
+            self.waiters.remove(pos);
+            true
+        } else {
+            false
         }
     }
 
-    /// Wait on a futex
+    /// Get number of waiters
+    pub fn len(&self) -> usize {
+        self.waiters.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.waiters.is_empty()
+    }
+
+    /// Requeue waiters to another futex
+    pub fn requeue(&mut self, count: usize, target_key: FutexKey) -> Vec<FutexWaiter> {
+        let mut requeued = Vec::new();
+        let mut remaining = Vec::new();
+
+        for (i, mut waiter) in self.waiters.drain(..).enumerate() {
+            if i < count {
+                waiter.requeue_key = Some(target_key);
+                requeued.push(waiter);
+            } else {
+                remaining.push(waiter);
+            }
+        }
+
+        self.waiters = remaining;
+        requeued
+    }
+}
+
+/// Global futex hash table (buckets for futex wait queues)
+pub struct FutexHashTable {
+    /// Hash buckets (using BTreeMap for now, real implementation would use hash table)
+    buckets: BTreeMap<FutexKey, FutexQueue>,
+    /// Number of active waiters
+    active_waiters: AtomicUsize,
+}
+
+impl FutexHashTable {
+    pub const fn new() -> Self {
+        Self {
+            buckets: BTreeMap::new(),
+            active_waiters: AtomicUsize::new(0),
+        }
+    }
+
+    /// Get or create queue for futex key
+    fn get_or_create_queue(&mut self, key: FutexKey) -> &mut FutexQueue {
+        self.buckets.entry(key).or_insert_with(FutexQueue::new)
+    }
+
+    /// FUTEX_WAIT operation
     pub fn wait(
         &mut self,
-        address: u64,
-        _expected_value: u32,
-        pid: u32,
-        flags: FutexFlags,
-    ) -> Result<(), String> {
-        // In a real implementation, this would check the actual memory value
-        // For now, we just add the waiter to the queue
+        key: FutexKey,
+        expected: u32,
+        current: u32,
+        tid: u32,
+        bitset: u32,
+    ) -> Result<(), FutexError> {
+        // Check if value matches expected
+        if current != expected {
+            return Err(FutexError::Again);
+        }
 
-        let queue = self
-            .queues
-            .entry(address)
-            .or_insert_with(|| FutexQueue::new(address));
-        let waiter = Arc::new(FutexWaiter::new(address, pid, flags));
-        queue.add_waiter(waiter);
+        let queue = self.get_or_create_queue(key);
+        let waiter = FutexWaiter::with_bitset(tid, bitset);
+        queue.enqueue(waiter)?;
+        self.active_waiters.fetch_add(1, Ordering::SeqCst);
 
         Ok(())
     }
 
-    /// Wake waiters on a futex
-    pub fn wake(&mut self, address: u64, max_waiters: usize) -> Result<usize, String> {
-        let queue = self
-            .queues
-            .get_mut(&address)
-            .ok_or_else(|| format!("No waiters on address: {}", address))?;
+    /// FUTEX_WAKE operation
+    pub fn wake(&mut self, key: FutexKey, count: usize, bitset: u32) -> usize {
+        if let Some(queue) = self.buckets.get_mut(&key) {
+            let woken = queue.wake(count, bitset);
+            self.active_waiters.fetch_sub(woken, Ordering::SeqCst);
 
-        let mut woken_count = 0;
-        for _ in 0..max_waiters {
-            if queue.wake_one().is_some() {
-                woken_count += 1;
-            } else {
-                break;
+            // Remove empty queues
+            if queue.is_empty() {
+                self.buckets.remove(&key);
             }
+
+            woken
+        } else {
+            0
         }
-
-        queue.remove_woken();
-
-        // Remove empty queue
-        if queue.waiter_count() == 0 {
-            self.queues.remove(&address);
-        }
-
-        Ok(woken_count)
     }
 
-    /// Wake all waiters on a futex
-    pub fn wake_all(&mut self, address: u64) -> Result<usize, String> {
-        let queue = self
-            .queues
-            .get_mut(&address)
-            .ok_or_else(|| format!("No waiters on address: {}", address))?;
-
-        let woken = queue.wake_all();
-        let woken_count = woken.len();
-
-        queue.remove_woken();
-
-        // Remove empty queue
-        if queue.waiter_count() == 0 {
-            self.queues.remove(&address);
-        }
-
-        Ok(woken_count)
-    }
-
-    /// Requeue waiters from one address to another
-    pub fn requeue(
+    /// FUTEX_CMP_REQUEUE operation
+    pub fn cmp_requeue(
         &mut self,
-        src_address: u64,
-        dst_address: u64,
-        max_waiters: usize,
-    ) -> Result<usize, String> {
-        // First, collect PIDs to requeue
-        let to_requeue_pids = {
-            let src_queue = self
-                .queues
-                .get(&src_address)
-                .ok_or_else(|| format!("No waiters on source address: {}", src_address))?;
+        key: FutexKey,
+        expected: u32,
+        current: u32,
+        wake_count: usize,
+        requeue_count: usize,
+        target_key: FutexKey,
+    ) -> Result<usize, FutexError> {
+        // Check if value matches expected
+        if current != expected {
+            return Err(FutexError::Again);
+        }
 
-            let mut pids = Vec::new();
-            let mut count = 0;
-
-            for waiter in &src_queue.waiters {
-                if count < max_waiters && !waiter.woken.load(Ordering::SeqCst) {
-                    pids.push(waiter.pid);
-                    count += 1;
-                }
-            }
-            pids
+        // Wake some waiters
+        let woken = if let Some(queue) = self.buckets.get_mut(&key) {
+            queue.wake(wake_count, 0xFFFFFFFF)
+        } else {
+            return Ok(0);
         };
 
-        let requeued_count = to_requeue_pids.len();
+        // Requeue remaining waiters
+        let requeued = if let Some(queue) = self.buckets.get_mut(&key) {
+            queue.requeue(requeue_count, target_key)
+        } else {
+            Vec::new()
+        };
 
-        // Remove from source
-        if let Some(src_queue) = self.queues.get_mut(&src_address) {
-            src_queue
-                .waiters
-                .retain(|w| !to_requeue_pids.contains(&w.pid));
+        let requeued_count = requeued.len();
 
-            // Clean up empty source queue
-            if src_queue.waiter_count() == 0 {
-                self.queues.remove(&src_address);
+        // Add requeued waiters to target queue
+        let requeued_count = requeued.len();
+        if !requeued.is_empty() {
+            let target_queue = self.get_or_create_queue(target_key);
+            for waiter in requeued {
+                let _ = target_queue.enqueue(waiter);
             }
         }
 
-        // Add to destination
-        let dst_queue = self
-            .queues
-            .entry(dst_address)
-            .or_insert_with(|| FutexQueue::new(dst_address));
-        for pid in to_requeue_pids {
-            let new_waiter = Arc::new(FutexWaiter::new(dst_address, pid, FutexFlags::new()));
-            dst_queue.add_waiter(new_waiter);
+        Ok(woken + requeued_count)
+    }
+
+    /// Remove waiter (called on thread cancellation)
+    pub fn remove_waiter(&mut self, key: FutexKey, tid: u32) -> bool {
+        if let Some(queue) = self.buckets.get_mut(&key) {
+            let removed = queue.remove_waiter(tid);
+            if removed {
+                self.active_waiters.fetch_sub(1, Ordering::SeqCst);
+                if queue.is_empty() {
+                    self.buckets.remove(&key);
+                }
+            }
+            removed
+        } else {
+            false
         }
-
-        Ok(requeued_count)
     }
 
-    /// Get waiter count for an address
-    pub fn waiter_count(&self, address: u64) -> usize {
-        self.queues
-            .get(&address)
-            .map(|q| q.waiter_count())
-            .unwrap_or(0)
+    /// Get number of active waiters
+    pub fn active_waiters(&self) -> usize {
+        self.active_waiters.load(Ordering::SeqCst)
     }
 
-    /// Get total queue count
+    /// Get number of queues
     pub fn queue_count(&self) -> usize {
-        self.queues.len()
+        self.buckets.len()
     }
 }
 
-impl Default for FutexManager {
-    fn default() -> Self {
-        Self::new()
+/// Futex manager (singleton for the system)
+pub struct FutexManager {
+    /// Global hash table
+    hash_table: FutexHashTable,
+}
+
+impl FutexManager {
+    pub const fn new() -> Self {
+        Self {
+            hash_table: FutexHashTable::new(),
+        }
     }
+
+    /// Execute futex operation
+    pub fn futex_op(
+        &mut self,
+        uaddr: usize,
+        op: FutexOp,
+        val: u32,
+        val2: u32,
+        uaddr2: usize,
+        val3: u32,
+        pid: u32,
+        tid: u32,
+        flags: FutexFlags,
+    ) -> Result<usize, FutexError> {
+        let key = if flags.private {
+            FutexKey::new(pid, uaddr)
+        } else {
+            FutexKey::shared(uaddr)
+        };
+
+        match op {
+            FutexOp::Wait => {
+                // val = expected value, val3 = bitset
+                let bitset = if val3 == 0 { 0xFFFFFFFF } else { val3 };
+                self.hash_table
+                    .wait(key, val, val2, tid, bitset)
+                    .map(|_| 0)
+            }
+            FutexOp::Wake => {
+                // val = max waiters to wake, val3 = bitset
+                let bitset = if val3 == 0 { 0xFFFFFFFF } else { val3 };
+                Ok(self.hash_table.wake(key, val as usize, bitset))
+            }
+            FutexOp::WaitBitset => {
+                // Same as WAIT but with explicit bitset
+                self.hash_table
+                    .wait(key, val, val2, tid, val3)
+                    .map(|_| 0)
+            }
+            FutexOp::WakeBitset => {
+                // Same as WAKE but with explicit bitset
+                Ok(self.hash_table.wake(key, val as usize, val3))
+            }
+            FutexOp::CmpRequeue => {
+                // val = wake_count, val2 = expected value, val3 = requeue_count
+                let target_key = if flags.private {
+                    FutexKey::new(pid, uaddr2)
+                } else {
+                    FutexKey::shared(uaddr2)
+                };
+                self.hash_table.cmp_requeue(
+                    key,
+                    val2,
+                    val, // Current value at uaddr
+                    val as usize,
+                    val3 as usize,
+                    target_key,
+                )
+            }
+            _ => Err(FutexError::Invalid),
+        }
+    }
+
+    pub fn stats(&self) -> FutexStats {
+        FutexStats {
+            active_waiters: self.hash_table.active_waiters(),
+            queue_count: self.hash_table.queue_count(),
+        }
+    }
+}
+
+/// Futex statistics
+#[derive(Debug, Clone, Copy)]
+pub struct FutexStats {
+    pub active_waiters: usize,
+    pub queue_count: usize,
 }
 
 #[cfg(test)]
@@ -279,117 +425,69 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_futex_flags_creation() {
-        let flags = FutexFlags::new();
-        assert!(!flags.private);
-        assert!(!flags.clock_realtime);
+    fn test_futex_key() {
+        let key1 = FutexKey::new(100, 0x1000);
+        let key2 = FutexKey::new(100, 0x1000);
+        let key3 = FutexKey::shared(0x1000);
+
+        assert_eq!(key1, key2);
+        assert_ne!(key1, key3);
     }
 
     #[test]
-    fn test_futex_flags_with_private() {
-        let flags = FutexFlags::new().with_private();
-        assert!(flags.private);
-    }
+    fn test_futex_queue() {
+        let mut queue = FutexQueue::new();
+        let waiter = FutexWaiter::new(1);
+        queue.enqueue(waiter).unwrap();
+        assert_eq!(queue.len(), 1);
 
-    #[test]
-    fn test_futex_flags_with_clock_realtime() {
-        let flags = FutexFlags::new().with_clock_realtime();
-        assert!(flags.clock_realtime);
-    }
-
-    #[test]
-    fn test_futex_waiter_creation() {
-        let waiter = FutexWaiter::new(0x1000, 1, FutexFlags::new());
-        assert_eq!(waiter.address, 0x1000);
-        assert_eq!(waiter.pid, 1);
-    }
-
-    #[test]
-    fn test_futex_waiter_wake() {
-        let waiter = FutexWaiter::new(0x1000, 1, FutexFlags::new());
-        assert!(waiter.wake());
-        assert!(!waiter.wake());
-    }
-
-    #[test]
-    fn test_futex_queue_creation() {
-        let queue = FutexQueue::new(0x1000);
-        assert_eq!(queue.address, 0x1000);
-        assert_eq!(queue.waiter_count(), 0);
-    }
-
-    #[test]
-    fn test_futex_queue_add_waiter() {
-        let mut queue = FutexQueue::new(0x1000);
-        let waiter = Arc::new(FutexWaiter::new(0x1000, 1, FutexFlags::new()));
-        queue.add_waiter(waiter);
-        assert_eq!(queue.waiter_count(), 1);
-    }
-
-    #[test]
-    fn test_futex_queue_wake_one() {
-        let mut queue = FutexQueue::new(0x1000);
-        let waiter = Arc::new(FutexWaiter::new(0x1000, 1, FutexFlags::new()));
-        queue.add_waiter(waiter.clone());
-
-        let woken = queue.wake_one();
-        assert!(woken.is_some());
-        assert_eq!(queue.waiter_count(), 1);
-    }
-
-    #[test]
-    fn test_futex_queue_wake_all() {
-        let mut queue = FutexQueue::new(0x1000);
-        let waiter1 = Arc::new(FutexWaiter::new(0x1000, 1, FutexFlags::new()));
-        let waiter2 = Arc::new(FutexWaiter::new(0x1000, 2, FutexFlags::new()));
-        queue.add_waiter(waiter1);
-        queue.add_waiter(waiter2);
-
-        let woken = queue.wake_all();
-        assert_eq!(woken.len(), 2);
-    }
-
-    #[test]
-    fn test_futex_manager_creation() {
-        let manager = FutexManager::new();
-        assert_eq!(manager.queue_count(), 0);
-    }
-
-    #[test]
-    fn test_futex_manager_wait() {
-        let mut manager = FutexManager::new();
-        assert!(manager.wait(0x1000, 42, 1, FutexFlags::new()).is_ok());
-        assert_eq!(manager.waiter_count(0x1000), 1);
-    }
-
-    #[test]
-    fn test_futex_manager_wake() {
-        let mut manager = FutexManager::new();
-        manager.wait(0x1000, 42, 1, FutexFlags::new()).unwrap();
-
-        let woken = manager.wake(0x1000, 1).unwrap();
+        let woken = queue.wake(1, 0xFFFFFFFF);
         assert_eq!(woken, 1);
+        assert_eq!(queue.len(), 0);
     }
 
     #[test]
-    fn test_futex_manager_wake_all() {
+    fn test_futex_wait_wake() {
         let mut manager = FutexManager::new();
-        manager.wait(0x1000, 42, 1, FutexFlags::new()).unwrap();
-        manager.wait(0x1000, 42, 2, FutexFlags::new()).unwrap();
+        let key = FutexKey::new(100, 0x1000);
 
-        let woken = manager.wake_all(0x1000).unwrap();
-        assert_eq!(woken, 2);
+        // Wait on futex
+        manager
+            .hash_table
+            .wait(key, 42, 42, 1, 0xFFFFFFFF)
+            .unwrap();
+        assert_eq!(manager.hash_table.active_waiters(), 1);
+
+        // Wake futex
+        let woken = manager.hash_table.wake(key, 1, 0xFFFFFFFF);
+        assert_eq!(woken, 1);
+        assert_eq!(manager.hash_table.active_waiters(), 0);
     }
 
     #[test]
-    fn test_futex_manager_requeue() {
-        let mut manager = FutexManager::new();
-        manager.wait(0x1000, 42, 1, FutexFlags::new()).unwrap();
-        manager.wait(0x1000, 42, 2, FutexFlags::new()).unwrap();
+    fn test_futex_bitset() {
+        let mut queue = FutexQueue::new();
+        queue.enqueue(FutexWaiter::with_bitset(1, 0x01)).unwrap();
+        queue.enqueue(FutexWaiter::with_bitset(2, 0x02)).unwrap();
+        queue.enqueue(FutexWaiter::with_bitset(3, 0x04)).unwrap();
 
-        let requeued = manager.requeue(0x1000, 0x2000, 1).unwrap();
-        assert_eq!(requeued, 1);
-        assert_eq!(manager.waiter_count(0x1000), 1);
-        assert_eq!(manager.waiter_count(0x2000), 1);
+        // Wake only waiters with bit 0x02 set
+        let woken = queue.wake(10, 0x02);
+        assert_eq!(woken, 1);
+        assert_eq!(queue.len(), 2);
+    }
+
+    #[test]
+    fn test_futex_requeue() {
+        let mut queue = FutexQueue::new();
+        for i in 0..5 {
+            queue.enqueue(FutexWaiter::new(i)).unwrap();
+        }
+
+        let target_key = FutexKey::new(100, 0x2000);
+        let requeued = queue.requeue(3, target_key);
+
+        assert_eq!(requeued.len(), 3);
+        assert_eq!(queue.len(), 2);
     }
 }

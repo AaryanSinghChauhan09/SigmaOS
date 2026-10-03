@@ -8,9 +8,7 @@ use alloc::string::String;
 use alloc::vec::Vec;
 
 #[cfg(test)]
-use std::string::String;
 #[cfg(test)]
-use std::vec::Vec;
 
 /// DistroWatch page-hit ranking and distribution release tracker engine.
 #[derive(Debug, Clone)]
@@ -259,6 +257,7 @@ impl Default for FrappeEnterpriseFrameworkEngine {
 pub struct ItsFossZeroDependencyToolingEngine {
     pub cli_tools_count: usize,
     pub terminal_customized: bool,
+    pub active_theme: String,
 }
 
 impl ItsFossZeroDependencyToolingEngine {
@@ -266,11 +265,22 @@ impl ItsFossZeroDependencyToolingEngine {
         Self {
             cli_tools_count: 18,
             terminal_customized: true,
+            active_theme: String::from("TokyoNight"),
+        }
+    }
+
+    pub fn configure_prompt_theme(&mut self, theme_name: &str) -> bool {
+        if theme_name.is_empty() {
+            false
+        } else {
+            self.active_theme = String::from(theme_name);
+            self.terminal_customized = true;
+            true
         }
     }
 
     pub fn verify_tooling(&self) -> bool {
-        self.cli_tools_count >= 10 && self.terminal_customized
+        self.cli_tools_count >= 10 && self.terminal_customized && !self.active_theme.is_empty()
     }
 }
 
@@ -536,8 +546,11 @@ mod tests {
 
     #[test]
     fn test_itsfoss_and_geeky_gadgets_engines() {
-        let itsfoss = ItsFossZeroDependencyToolingEngine::new();
+        let mut itsfoss = ItsFossZeroDependencyToolingEngine::new();
         assert!(itsfoss.verify_tooling());
+        assert!(itsfoss.configure_prompt_theme("CatppuccinMocha"));
+        assert_eq!(itsfoss.active_theme, "CatppuccinMocha");
+
         let geeky = GeekyGadgetsHardwareReviewEngine::new();
         assert!(geeky.audit_sbc_support());
     }

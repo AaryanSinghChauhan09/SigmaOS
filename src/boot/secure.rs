@@ -1,11 +1,10 @@
-
+use core::sync::atomic::{AtomicUsize, Ordering};
 /// OOP-based Secure Boot Validation for SigmaOS
 /// Implements secure boot using OOP principles with traits and structs
 /// No dependency on external security frameworks
 /// Based on Roadmap Item 10: Secure boot & firmware validation
 use std::boxed::Box;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Component ID
 pub type ComponentID = usize;
@@ -171,9 +170,23 @@ impl Tpm2Simulator {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod additional_secure_boot_tests {
     use super::*;
+
+    #[test]
+    fn test_simple_component_cached_lengths_o1() {
+        let name_bytes = b"kernel_v1.0";
+        let mut comp = SimpleComponent::new(1, name_bytes, ComponentType::Kernel, ComponentCapability::full());
+        assert_eq!(comp.name(), name_bytes);
+        assert_eq!(comp.name_len as usize, name_bytes.len());
+
+        // Test signature containing binary zero bytes (0x00)
+        let binary_signature = &[0x12, 0x00, 0xAB, 0x00, 0xCD, 0xEF];
+        comp.set_signature(binary_signature);
+        assert_eq!(comp.signature(), binary_signature);
+        assert_eq!(comp.sig_len as usize, binary_signature.len());
+    }
 
     #[test]
     fn test_unified_kernel_image_signing_and_hashing() {
@@ -242,8 +255,10 @@ impl ComponentCapability {
 pub struct SimpleComponent {
     pub id: ComponentID,
     pub name: [u8; 64],
+    pub name_len: u8,
     pub component_type: ComponentType,
     pub signature: [u8; 256],
+    pub sig_len: u16,
     pub hash: [u8; 64],
     pub status: AtomicUsize, // ValidationStatus as usize
     pub capability: ComponentCapability,
@@ -266,8 +281,10 @@ impl SimpleComponent {
         SimpleComponent {
             id,
             name: name_array,
+            name_len: name_len as u8,
             component_type,
             signature: [0; 256],
+            sig_len: 0,
             hash: [0; 64],
             status: AtomicUsize::new(ValidationStatus::Pending as usize),
             capability,
@@ -279,6 +296,7 @@ impl SimpleComponent {
         unsafe {
             core::ptr::copy_nonoverlapping(signature.as_ptr(), self.signature.as_mut_ptr(), len);
         }
+        self.sig_len = len as u16;
     }
 
     pub fn set_hash(&mut self, hash: &[u8]) {
@@ -309,8 +327,10 @@ impl Component for SimpleComponent {
     }
 
     fn name(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
-        &self.name[..len]
+        // Bolt ⚡ Optimization: Utilize precomputed name_len stored on initialization
+        // to eliminate O(N) zero-byte linear scanning (.position(|&b| b == 0)) on every component
+        // name query, reducing slice lookup to instantaneous O(1) constant time.
+        &self.name[..self.name_len as usize]
     }
 
     fn component_type(&self) -> ComponentType {
@@ -318,8 +338,10 @@ impl Component for SimpleComponent {
     }
 
     fn signature(&self) -> &[u8] {
-        let len = self.signature.iter().position(|&b| b == 0).unwrap_or(256);
-        &self.signature[..len]
+        // Bolt ⚡ Optimization: Utilize precomputed sig_len stored on set_signature
+        // to eliminate O(N) zero-byte linear scanning (.position(|&b| b == 0)) on every signature query,
+        // reducing slice lookup to O(1) constant time while preserving binary zero bytes in signatures.
+        &self.signature[..self.sig_len as usize]
     }
 
     fn validate(&mut self) -> Result<ValidationStatus, SecureBootError> {

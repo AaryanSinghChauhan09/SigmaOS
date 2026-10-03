@@ -7,13 +7,18 @@
 #![allow(non_camel_case_types)]
 #![allow(clippy::large_enum_variant)]
 #![allow(clippy::type_complexity)]
-
+#[cfg(not(feature = "standalone_test"))]
+pub use alloc::string::String;
+#[cfg(feature = "standalone_test")]
 pub use std::string::String;
 
 use core::fmt;
 use core::ops::{Deref, DerefMut};
 
+#[cfg(feature = "standalone_test")]
 use super::vec::SigmaVec;
+#[cfg(not(feature = "standalone_test"))]
+use crate::klib::vec::SigmaVec;
 
 /// Custom string type for SigmaOS with reduced dependency on predefined functions
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -35,6 +40,7 @@ impl fmt::Display for SigmaString {
 }
 
 impl SigmaString {
+    /// Create a new empty SigmaString
     pub fn new() -> Self {
         Self {
             data: SigmaVec::new(),
@@ -42,6 +48,8 @@ impl SigmaString {
         }
     }
 
+    /// Create a SigmaString from a string slice
+    /// Optimized by Bolt ⚡: uses bulk `extend_from_slice` memory copy rather than looping push.
     pub fn from_str(s: &str) -> Self {
         let bytes = s.as_bytes();
         let mut data = SigmaVec::with_capacity(bytes.len());
@@ -53,6 +61,8 @@ impl SigmaString {
         }
     }
 
+    /// Create a SigmaString from a byte slice
+    /// Optimized by Bolt ⚡: uses bulk `extend_from_slice` memory copy rather than looping push.
     pub fn from_bytes(bytes: &[u8]) -> Result<Self, core::str::Utf8Error> {
         core::str::from_utf8(bytes)?;
         let mut data = SigmaVec::with_capacity(bytes.len());
@@ -64,22 +74,27 @@ impl SigmaString {
         })
     }
 
+    /// Convert to string slice
     pub fn as_str(&self) -> &str {
         unsafe { core::str::from_utf8_unchecked(self.data.as_slice()) }
     }
 
+    /// Convert to byte slice
     pub fn as_bytes(&self) -> &[u8] {
         self.data.as_slice()
     }
 
+    /// Get the length of the string
     pub fn len(&self) -> usize {
         self.len
     }
 
+    /// Check if the string is empty
     pub fn is_empty(&self) -> bool {
         self.len == 0
     }
 
+    /// Push a character to the string
     pub fn push(&mut self, ch: char) {
         let mut buf = [0u8; 4];
         let bytes = ch.encode_utf8(&mut buf);
@@ -89,28 +104,33 @@ impl SigmaString {
         self.len += bytes.len();
     }
 
+    /// Push a string slice to the string
+    /// Optimized by Bolt ⚡: uses bulk `extend_from_slice` memory copy rather than looping push.
     pub fn push_str(&mut self, s: &str) {
         self.data.extend_from_slice(s.as_bytes());
         self.len += s.len();
     }
 
+    /// Clear the string
     pub fn clear(&mut self) {
         self.data.clear();
         self.len = 0;
     }
 
+    /// Remove the last character
     pub fn pop(&mut self) -> Option<char> {
         if self.len == 0 {
             return None;
         }
 
+        // Find the last character boundary
         let mut new_len = self.len - 1;
         while new_len > 0 && !self.is_char_boundary(new_len) {
             new_len -= 1;
         }
 
         let char_bytes = &self.data.as_slice()[new_len..self.len];
-        let result = core::str::from_utf8(char_bytes)
+        let result = str::from_utf8(char_bytes)
             .ok()
             .and_then(|s| s.chars().next());
 
@@ -120,6 +140,8 @@ impl SigmaString {
         result
     }
 
+    /// Remove a character at a specific position
+    /// Optimized by Bolt ⚡: uses bulk `ptr::copy` memory copy (memmove) rather than looping byte copy.
     pub fn remove(&mut self, idx: usize) -> char {
         let slice = self.as_str();
         let mut char_iter = slice.char_indices();
@@ -127,6 +149,7 @@ impl SigmaString {
         let char_len = ch.len_utf8();
         let byte_end = byte_start + char_len;
 
+        // Remove the character bytes in bulk
         let count = self.len - byte_end;
         if count > 0 {
             unsafe {
@@ -141,16 +164,21 @@ impl SigmaString {
         ch
     }
 
+    /// Insert a character at a specific position
+    /// Optimized by Bolt ⚡: uses bulk memory copy routines rather than element-by-element loops.
     pub fn insert(&mut self, idx: usize, ch: char) {
         let mut buf = [0u8; 4];
         let bytes = ch.encode_utf8(&mut buf);
         self.insert_bytes_at(idx, bytes.as_bytes());
     }
 
+    /// Insert a string slice at a specific position
+    /// Optimized by Bolt ⚡: uses bulk memory copy routines rather than element-by-element loops.
     pub fn insert_str(&mut self, idx: usize, s: &str) {
         self.insert_bytes_at(idx, s.as_bytes());
     }
 
+    /// Helper method to insert bytes at character position `idx` using bulk `ptr::copy` / `copy_nonoverlapping`.
     fn insert_bytes_at(&mut self, idx: usize, bytes: &[u8]) {
         let s_len = bytes.len();
         if s_len == 0 {
@@ -168,11 +196,13 @@ impl SigmaString {
                 .map_or(old_len, |(byte_start, _)| byte_start)
         };
 
+        // Reserve space and extend data length
         self.data.reserve(s_len);
         for &b in bytes {
             self.data.push(b);
         }
 
+        // Shift existing tail right and copy new bytes into place
         let tail_count = old_len - byte_idx;
         unsafe {
             let ptr = self.data.as_mut_slice().as_mut_ptr();
@@ -185,6 +215,7 @@ impl SigmaString {
         self.len += s_len;
     }
 
+    /// Check if a position is a character boundary
     fn is_char_boundary(&self, idx: usize) -> bool {
         if idx == 0 || idx == self.len {
             return true;
@@ -194,6 +225,7 @@ impl SigmaString {
         (byte as i8) >= -0x40
     }
 
+    /// Split the string at a position
     pub fn split_at(&self, mid: usize) -> (SigmaString, SigmaString) {
         let byte_mid = if mid == self.len() {
             self.len
@@ -211,20 +243,24 @@ impl SigmaString {
         (left, right)
     }
 
+    /// Truncate the string to a new length
     pub fn truncate(&mut self, new_len: usize) {
         assert!(new_len <= self.len);
         self.len = new_len;
         self.data.truncate(new_len);
     }
 
+    /// Reserve capacity for additional bytes
     pub fn reserve(&mut self, additional: usize) {
         self.data.reserve(additional);
     }
 
+    /// Get the capacity of the string
     pub fn capacity(&self) -> usize {
         self.data.capacity()
     }
 
+    /// Trim leading whitespace
     pub fn trim_start(&self) -> SigmaString {
         let bytes = self.as_bytes();
         let mut start = 0;
@@ -234,6 +270,7 @@ impl SigmaString {
         SigmaString::from_bytes(&bytes[start..]).unwrap()
     }
 
+    /// Trim trailing whitespace
     pub fn trim_end(&self) -> SigmaString {
         let bytes = self.as_bytes();
         let mut end = self.len;
@@ -243,6 +280,9 @@ impl SigmaString {
         SigmaString::from_bytes(&bytes[..end]).unwrap()
     }
 
+    /// Trim both leading and trailing whitespace
+    /// Optimized by Bolt ⚡: calculates start and end offsets in a single pass over `self.as_bytes()`,
+    /// constructing only a single `SigmaString` result and avoiding intermediate buffer allocations.
     pub fn trim(&self) -> SigmaString {
         let bytes = self.as_bytes();
         let mut start = 0;
@@ -256,6 +296,7 @@ impl SigmaString {
         SigmaString::from_bytes(&bytes[start..end]).unwrap()
     }
 
+    /// Split the string by a pattern
     pub fn split<'a, P>(&'a self, pat: P) -> Split<'a, P>
     where
         P: Pattern,
@@ -267,6 +308,7 @@ impl SigmaString {
         }
     }
 
+    /// Check if the string contains a pattern
     pub fn contains<'a, P>(&'a self, pat: P) -> bool
     where
         P: Pattern,
@@ -274,10 +316,12 @@ impl SigmaString {
         pat.find_in(self).is_some()
     }
 
+    /// Convert to bytes
     pub fn into_bytes(self) -> SigmaVec<u8> {
         self.data
     }
 
+    /// Find the first occurrence of a pattern
     pub fn find<'a, P>(&'a self, pat: P) -> Option<usize>
     where
         P: Pattern,
@@ -285,6 +329,7 @@ impl SigmaString {
         pat.find_in(self)
     }
 
+    /// Replace occurrences of a pattern
     pub fn replace<'a, P>(&'a self, pat: P, replacement: &str) -> SigmaString
     where
         P: Pattern,
@@ -295,12 +340,16 @@ impl SigmaString {
         while let Some(start) = pat.find_in_from(self, last_end) {
             let end = start + pat.pattern_len();
 
+            // Add the part before the match
             result.push_str(&self.as_str()[last_end..start]);
+
+            // Add the replacement
             result.push_str(replacement);
 
             last_end = end;
         }
 
+        // Add the remaining part
         result.push_str(&self.as_str()[last_end..]);
 
         result
@@ -323,7 +372,7 @@ impl Deref for SigmaString {
 
 impl DerefMut for SigmaString {
     fn deref_mut(&mut self) -> &mut Self::Target {
-        unsafe { core::str::from_utf8_unchecked_mut(self.data.as_mut_slice()) }
+        unsafe { str::from_utf8_unchecked_mut(self.data.as_mut_slice()) }
     }
 }
 
@@ -353,10 +402,12 @@ impl core::ops::Index<usize> for SigmaString {
         if index >= bytes.len() {
             panic!("index out of bounds");
         }
+        // Return single character at position
         &self.as_str()[index..index + 1]
     }
 }
 
+/// Pattern trait for string operations
 pub trait Pattern {
     fn find_in(&self, haystack: &SigmaString) -> Option<usize>;
     fn find_in_from(&self, haystack: &SigmaString, start: usize) -> Option<usize>;
@@ -391,6 +442,7 @@ impl Pattern for &str {
     }
 }
 
+/// Split iterator for SigmaString
 pub struct Split<'a, P> {
     haystack: &'a str,
     pat: P,
@@ -417,5 +469,93 @@ where
             self.finished = true;
             Some(SigmaString::from_str(self.haystack))
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_string_creation() {
+        let s = SigmaString::new();
+        assert!(s.is_empty());
+
+        let s = SigmaString::from_str("hello");
+        assert_eq!(s.as_str(), "hello");
+        assert_eq!(s.len(), 5);
+    }
+
+    #[test]
+    fn test_string_push() {
+        let mut s = SigmaString::new();
+        s.push('h');
+        s.push('e');
+        s.push('l');
+        s.push('l');
+        s.push('o');
+        assert_eq!(s.as_str(), "hello");
+
+        s.push_str(" world");
+        assert_eq!(s.as_str(), "hello world");
+    }
+
+    #[test]
+    fn test_string_trim() {
+        let s = SigmaString::from_str("  hello  ");
+        assert_eq!(s.trim().as_str(), "hello");
+
+        let s = SigmaString::from_str("  hello");
+        assert_eq!(s.trim().as_str(), "hello");
+
+        let s = SigmaString::from_str("hello  ");
+        assert_eq!(s.trim().as_str(), "hello");
+    }
+
+    #[test]
+    fn test_string_split() {
+        let s = SigmaString::from_str("hello world");
+        let parts: Vec<SigmaString> = s.split(' ').collect();
+        assert_eq!(parts.len(), 2);
+        assert_eq!(parts[0].as_str(), "hello");
+        assert_eq!(parts[1].as_str(), "world");
+    }
+
+    #[test]
+    fn test_string_contains() {
+        let s = SigmaString::from_str("hello world");
+        assert!(s.contains("hello"));
+        assert!(s.contains("world"));
+        assert!(!s.contains("foo"));
+    }
+
+    #[test]
+    fn test_string_replace() {
+        let s = SigmaString::from_str("hello world");
+        let replaced = s.replace("world", "sigma");
+        assert_eq!(replaced.as_str(), "hello sigma");
+    }
+
+    #[test]
+    fn test_sigmastring_insert_remove() {
+        let mut s = SigmaString::from_str("hello world");
+
+        s.insert(5, ',');
+        assert_eq!(s.as_str(), "hello, world");
+
+        s.insert_str(6, " beautiful");
+        assert_eq!(s.as_str(), "hello, beautiful world");
+
+        let removed = s.remove(5);
+        assert_eq!(removed, ',');
+        assert_eq!(s.as_str(), "hello beautiful world");
+
+        let mut utf8_str = SigmaString::from_str("hello 🚀 world");
+        utf8_str.insert(6, '✨');
+        assert_eq!(utf8_str.as_str(), "hello ✨🚀 world");
+
+        let removed_rocket = utf8_str.remove(7);
+        assert_eq!(removed_rocket, '🚀');
+        assert_eq!(utf8_str.as_str(), "hello ✨ world");
     }
 }

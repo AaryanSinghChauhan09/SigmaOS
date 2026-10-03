@@ -1,7 +1,6 @@
 // SigmaOS Omarchy Ultimate Gap Closure Engine
 // Inspired by Omarchy 1.1.0 and Omarchy Quattro: QuickShell QML/JSON status bar, Herdr multi-agent AI orchestrator, Factory Reset guardian with Btrfs/Snapper, and hardware quirk adapters (ASUS ROG, Framework 16, BE211 Wi-Fi 7).
 
-use std::string::String;
 use std::vec::Vec;
 
 /// QuickShell Status Bar Widget Type
@@ -222,8 +221,12 @@ impl SovereignOmarchyUltimateGapClosureSuite {
     }
 
     pub fn verify_suite(&mut self) -> bool {
-        self.herdr_ai.dispatch_coding_agent_task("ori-agent", "Optimize kernel scheduler");
-        !self.quickshell_bar.render_quickshell_config_json().is_empty()
+        self.herdr_ai
+            .dispatch_coding_agent_task("ori-agent", "Optimize kernel scheduler");
+        !self
+            .quickshell_bar
+            .render_quickshell_config_json()
+            .is_empty()
             && self.herdr_ai.get_completed_tasks_count() > 0
             && self.factory_reset_guardian.perform_safe_factory_reset()
             && self.hardware_adapter.verify_quattro_hardware_adapters()
