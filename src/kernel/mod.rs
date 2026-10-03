@@ -27,6 +27,7 @@ pub mod dtrace_compat;
 pub mod ebpf;
 pub mod ebpf_verification;
 pub mod ebpf_vm;
+pub mod ebpf_xdp;
 pub mod exports;
 pub mod futex;
 pub mod gap_closing;

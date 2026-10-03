@@ -36,6 +36,11 @@ pub mod usb_hid;
 pub mod vesa;
 pub mod usb_stack;
 pub mod ethernet;
+pub mod wifi_80211;
+pub mod nvme_driver;
+pub mod ahci_sata;
+pub mod usb_hid;
+pub mod usb_mass_storage;
 
 pub use gpu::{
     GpuCommand, GpuCommandBuffer, GpuDriver, GpuError, GpuPipeline,
