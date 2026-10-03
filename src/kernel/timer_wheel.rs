@@ -76,8 +76,10 @@ pub struct TimerBucket {
 }
 
 impl TimerBucket {
+    pub const EMPTY: Self = Self { head: None };
+
     pub const fn new() -> Self {
-        Self { head: None }
+        Self::EMPTY
     }
 
     /// Add timer to bucket
@@ -125,8 +127,9 @@ pub struct TimerWheelLevel {
 
 impl TimerWheelLevel {
     pub fn new(granularity: u64) -> Self {
+        const BUCKET: TimerBucket = TimerBucket::new();
         Self {
-            buckets: core::array::from_fn(|_| TimerBucket::new()),
+            buckets: [BUCKET; WHEEL_SIZE],
             granularity,
             index: 0,
         }
@@ -279,9 +282,35 @@ pub struct TimerManager {
 }
 
 impl TimerManager {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
+        const EMPTY_BUCKETS: [TimerBucket; WHEEL_SIZE] = [TimerBucket::EMPTY; WHEEL_SIZE];
         Self {
-            wheel: TimerWheel::new(),
+            wheel: TimerWheel {
+                current_tick: 0,
+                next_id: 1,
+                levels: [
+                    TimerWheelLevel {
+                        buckets: EMPTY_BUCKETS,
+                        granularity: 1,
+                        index: 0,
+                    },
+                    TimerWheelLevel {
+                        buckets: EMPTY_BUCKETS,
+                        granularity: 256,
+                        index: 0,
+                    },
+                    TimerWheelLevel {
+                        buckets: EMPTY_BUCKETS,
+                        granularity: 65536,
+                        index: 0,
+                    },
+                    TimerWheelLevel {
+                        buckets: EMPTY_BUCKETS,
+                        granularity: 16777216,
+                        index: 0,
+                    },
+                ],
+            },
         }
     }
 

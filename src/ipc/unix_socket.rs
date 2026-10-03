@@ -42,6 +42,11 @@ pub enum UnixSocketAddr {
     Abstract(Vec<u8>),            // Abstract namespace (Linux)
 }
 
+pub type UnixSocketAddress = UnixSocketAddr;
+
+#[derive(Debug, Default)]
+pub struct UnixSocketManager;
+
 /// Message with ancillary data
 #[derive(Debug, Clone)]
 pub struct UnixMessage {

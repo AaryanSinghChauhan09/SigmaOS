@@ -175,11 +175,17 @@ impl AhciPort {
     const NUM_COMMAND_SLOTS: usize = 32;
     
     pub fn new(port_num: u8, base_addr: usize) -> Self {
+        let mut command_list = alloc::vec::Vec::with_capacity(Self::NUM_COMMAND_SLOTS);
+        let mut command_tables = alloc::vec::Vec::with_capacity(Self::NUM_COMMAND_SLOTS);
+        for _ in 0..Self::NUM_COMMAND_SLOTS {
+            command_list.push(unsafe { core::mem::zeroed() });
+            command_tables.push(unsafe { core::mem::zeroed() });
+        }
         Self {
             port_num,
             base_addr,
-            command_list: alloc::vec![unsafe { core::mem::zeroed() }; Self::NUM_COMMAND_SLOTS],
-            command_tables: alloc::vec![unsafe { core::mem::zeroed() }; Self::NUM_COMMAND_SLOTS],
+            command_list,
+            command_tables,
             next_slot: AtomicU32::new(0),
         }
     }
@@ -316,9 +322,13 @@ pub struct AhciController {
 
 impl AhciController {
     pub fn new(abar: usize) -> Self {
+        let mut ports = alloc::vec::Vec::with_capacity(32);
+        for _ in 0..32 {
+            ports.push(None);
+        }
         Self {
             abar,
-            ports: alloc::vec![None; 32],
+            ports,
         }
     }
     

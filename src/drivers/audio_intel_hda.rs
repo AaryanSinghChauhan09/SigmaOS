@@ -169,18 +169,18 @@ pub struct StreamFormat {
 
 impl StreamFormat {
     pub fn encode(&self) -> u16 {
-        let base_rate = match self.sample_rate {
+        let base_rate: u16 = match self.sample_rate {
             48000 => 0x0,
             44100 => 0x4000,
             _ => 0x0,
         };
-        let mult = match self.sample_rate {
+        let mult: u16 = match self.sample_rate {
             48000 | 44100 => 0x0,
             96000 | 88200 => 0x1,
             192000 | 176400 => 0x3,
             _ => 0x0,
         };
-        let bits = match self.bits_per_sample {
+        let bits: u16 = match self.bits_per_sample {
             8 => 0x0,
             16 => 0x1,
             20 => 0x2,
@@ -188,9 +188,9 @@ impl StreamFormat {
             32 => 0x4,
             _ => 0x1,
         };
-        let chan = (self.channels - 1) & 0xF;
+        let chan = ((self.channels - 1) & 0xF) as u16;
         
-        (base_rate | (mult << 11) | (bits << 4) | chan) as u16
+        base_rate | (mult << 11) | (bits << 4) | chan
     }
 }
 

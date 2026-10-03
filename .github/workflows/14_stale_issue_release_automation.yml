@@ -16,7 +16,7 @@ jobs:
 
     steps:
       - name: Stale Issues & PRs Triage
-        uses: actions/stale@54d3d44d0185b2e353846cd4d642db740f95e5fa # v9.0.0
+        uses: actions/stale@v9
         with:
           stale-issue-message: 'This issue has been automatically marked as stale due to 30 days of inactivity. It will be closed if no further activity occurs.'
           stale-pr-message: 'This pull request has been automatically marked as stale due to 30 days of inactivity.'

@@ -2787,7 +2787,7 @@ impl DeviceManager {
         let descriptor = DeviceDescriptor::new(id, name, device_type, capability);
 
         let descriptor_ptr = unsafe {
-            let ptr = alloc(mem::size_of::<DeviceDescriptor>()) as *mut DeviceDescriptor;
+            let ptr = alloc(core::mem::size_of::<DeviceDescriptor>()) as *mut DeviceDescriptor;
             if ptr.is_null() {
                 return Err(DeviceError::IoError);
             }
@@ -2965,7 +2965,7 @@ impl<T> Vec<T> {
         } else {
             self.capacity * 2
         };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        let new_data = alloc(new_capacity * core::mem::size_of::<T>()) as *mut T;
 
         if !new_data.is_null() {
             for i in 0..self.len {

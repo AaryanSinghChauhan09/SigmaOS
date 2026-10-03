@@ -50,7 +50,7 @@ pub struct Mount {
 }
 
 /// Process configuration
-##[derive(Debug, Clone)]
+#[derive(Debug, Clone)]
 pub struct ProcessConfig {
     pub args: Vec<Vec<u8>>,       // Command and arguments
     pub env: Vec<Vec<u8>>,        // Environment variables

@@ -19,6 +19,12 @@ pub mod canonical;
 pub mod chakra;
 pub mod chimera_linux;
 pub mod clear_linux;
+pub mod community_foundation;
+pub mod cross_platform;
+pub mod cross_platform_kernel;
+pub mod fedora;
+pub mod fedora_domination;
+pub mod fedora_missing_components;
 pub mod zorin;
 
 pub use antix::{
@@ -288,3 +294,6 @@ pub use legacy_adapters::{
     LegacyPluginManager, NetworkBridge, StorageBridge, WorkloadOptimizer, WorkloadProfile,
     GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER, GLOBAL_WORKLOAD_OPTIMIZER,
 };
+
+// Re-export stub types
+pub use crate::stubs::compat_stubs::*;

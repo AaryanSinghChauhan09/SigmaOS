@@ -28,7 +28,6 @@ use std::format;
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec;
-#[cfg(any(feature = "standalone_test", test))]
 
 // ============================================================================
 // 1. Universal Package Formats & Normalized Manifests

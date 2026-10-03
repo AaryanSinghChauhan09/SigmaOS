@@ -62,7 +62,7 @@ impl SecurityContext {
 
 /// SELinux object classes
 #[repr(u16)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum ObjectClass {
     Process = 1,
     File = 2,
@@ -356,6 +356,10 @@ pub enum SelinuxError {
     PermissionDenied,
     PolicyLoad,
 }
+
+pub type SigmaSELinux = Selinux;
+pub type SELinuxPolicy = PolicyDb;
+pub type PolicyRule = TransitionRule;
 
 #[cfg(test)]
 mod tests {

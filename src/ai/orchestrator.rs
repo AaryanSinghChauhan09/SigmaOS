@@ -115,22 +115,6 @@ impl AIAgent for SimpleAIAgent {
     }
 }
 
-pub struct ModelResource {
-    pub name: String,
-    pub memory_required_mb: usize,
-    pub target: DeviceTarget,
-}
-
-impl ModelResource {
-    pub fn new(name: &str, memory_required_mb: usize, target: DeviceTarget) -> Self {
-        ModelResource {
-            name: name.to_string(),
-            memory_required_mb,
-            target,
-        }
-    }
-}
-
 pub trait AgentOrchestrator {
     fn register_agent(&mut self, agent: Box<dyn AIAgent>) -> Result<AgentID, AgentError>;
     fn dispatch_task(
@@ -255,7 +239,6 @@ impl LocalLlmOrchestrator {
 
         Ok(final_device)
     }
-}
 
     /// Evict model resources on shutdown/unload
     pub fn evict_model(&mut self, name: &[u8]) -> Result<(), OrchestratorError> {
@@ -290,13 +273,14 @@ pub trait TaskQueue {
 }
 
 pub struct SimpleTaskQueue {
-    pub tasks: Vec<(Vec<u8>, u8)>,
+    pub tasks: Vec<([u8; 256], u8)>,
 }
 
 impl SimpleTaskQueue {
     pub fn new() -> Self {
         SimpleTaskQueue { tasks: Vec::new() }
     }
+}
 
 impl Default for SimpleTaskQueue {
     fn default() -> Self {
@@ -312,7 +296,7 @@ impl TaskQueue for SimpleTaskQueue {
         self.tasks.push((task_array, priority));
     }
 
-    pub fn dequeue(&mut self) -> Option<Vec<u8>> {
+    fn dequeue(&mut self) -> Option<[u8; 256]> {
         if self.tasks.is_empty() {
             return None;
         }
@@ -329,7 +313,7 @@ impl TaskQueue for SimpleTaskQueue {
         Some(self.tasks.remove(highest_idx).0)
     }
 
-    pub fn size(&self) -> usize {
+    fn size(&self) -> usize {
         self.tasks.len()
     }
 }

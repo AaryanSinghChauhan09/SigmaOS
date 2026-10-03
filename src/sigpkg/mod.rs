@@ -63,6 +63,7 @@ pub mod store;
 pub mod transaction;
 pub mod transaction_log;
 pub mod universal_adapter;
+pub mod universal_engine;
 pub mod universal_oop_system;
 pub use universal_engine::{
     SovereignUniversalPackageManagerInteropEngine, SovereignUniversalPackageTranslationBridge,
@@ -204,13 +205,14 @@ pub use spec::{
 pub use store::{
     BsdPkgRepositoryMirror, ContentAddressedStore, GentooPortageUseFlagMask, NixOsHermeticCasStore,
 };
-pub use store::{
+pub use svntogit_repro::{
     BuildArtifact, ConvertedGitCommit, ReproducibilityAttestationReport,
     ReproducibleBuildEnvironment, ReproduciblePackageBuilder, SovereignSvnToGitMigrator,
     SvnBranchType, SvnRevisionLog,
 };
 pub use transaction::Transaction;
-pub use universal_adapter::{AdapterError, DebAdapter, PacmanAdapter, RpmAdapter};
+pub use universal_adapter::AdapterError;
+pub use universal_oop_system::{DebAdapter, PacmanAdapter, RpmAdapter};
 pub use verifier::CryptoVerifier;
 
 /// Package version using SemVer
@@ -364,3 +366,6 @@ mod tests {
         assert!(v1 < v2);
     }
 }
+
+// Re-export package stubs
+pub use crate::stubs::package_stubs::*;

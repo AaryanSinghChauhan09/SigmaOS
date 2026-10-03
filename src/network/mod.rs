@@ -37,15 +37,17 @@ pub use sovereign_remote_sharing::{
     SovereignRsyncEngine, SovereignSambaEngine, SovereignScpEngine, SovereignSshEngine,
     SshCertificate, SshMatchRule, SshMultiplexControlMaster,
 };
-pub use tcp::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
+// tcp_complete has TcpConnection; tcp module has TcpSocket, TcpError, TcpSegment, TcpState
+pub use tcp::{TcpError, TcpSegment, TcpState};
+pub use tcp_complete::{TcpConnection};
 pub use wireless_manager::{BluetoothDevice, WifiProfile, WifiSecurity, WirelessManager};
 
 // ZenithNet TCP/IP Stack
 pub use routing::{ForwardingDecision, RouteEntry, RoutingEngine, RoutingTable};
 pub use socket::{
-    AddressFamily, Socket, SocketAddr, SocketError, SocketOptions, SocketState, SocketTable,
-    SocketType,
+    Socket, SocketError, SocketState, SocketType,
 };
+// AddressFamily, SocketOptions, SocketTable, SocketAddr come from network_stubs::* below
 pub use zenithnet::{
     EthernetFrame, IpProtocol, Ipv4Addr, Ipv4Header, MacAddr, NetworkError, NetworkInterface,
     PacketType, TcpHeader, TcpState as ZenithTcpState, UdpHeader, ZenithNet,
@@ -61,9 +63,7 @@ pub use icmp::{
 
 #[path = "sovereign_async_io.rs"]
 pub mod zero_copy_networking;
-pub use zero_copy_networking::{
-    IoCompletionEntry, IoCompletionQueue, SovereignZeroCopySocket, UmemPool, XdpAction, XdpRing,
-};
+// IoCompletionEntry, IoCompletionQueue, XdpAction etc. come from network_stubs::* below
 
 pub mod tc_qdisc_sovereign;
 pub use tc_qdisc_sovereign::{
@@ -83,3 +83,6 @@ pub use virtual_switch::{
 };
 
 pub mod quic;
+
+// Re-export network stubs
+pub use crate::stubs::network_stubs::*;

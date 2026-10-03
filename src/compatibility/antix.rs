@@ -33,6 +33,9 @@ pub struct MicroService {
     pub state: MicroServiceState,
 }
 
+pub type AntiXServiceState = MicroServiceState;
+pub type AntiXService = MicroService;
+
 impl MicroService {
     pub fn new(name: &str, init_type: AntiXInitSystem) -> Self {
         MicroService {

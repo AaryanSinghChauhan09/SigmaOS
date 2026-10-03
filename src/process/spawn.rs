@@ -253,6 +253,33 @@ impl ProcessWaiter for SimpleProcessWaiter {
     }
 }
 
+pub trait ProcessGroup {
+    fn pgid(&self) -> ProcessID;
+    fn members(&self) -> &[ProcessID];
+}
+
+#[derive(Debug, Clone)]
+pub struct SimpleProcessGroup {
+    pub pgid: ProcessID,
+    pub members: alloc::vec::Vec<ProcessID>,
+}
+
+impl SimpleProcessGroup {
+    pub fn new(pgid: ProcessID) -> Self {
+        Self { pgid, members: alloc::vec::Vec::new() }
+    }
+    pub fn add(&mut self, pid: ProcessID) {
+        if !self.members.contains(&pid) {
+            self.members.push(pid);
+        }
+    }
+}
+
+impl ProcessGroup for SimpleProcessGroup {
+    fn pgid(&self) -> ProcessID { self.pgid }
+    fn members(&self) -> &[ProcessID] { &self.members }
+}
+
 #[cfg(test_disabled)]
 mod tests {
     use super::*;

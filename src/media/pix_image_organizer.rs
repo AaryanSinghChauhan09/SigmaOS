@@ -106,6 +106,17 @@ impl PixCollection {
     }
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct PixCatalog {
+    pub collections: Vec<PixCollection>,
+}
+
+impl PixCatalog {
+    pub fn new() -> Self {
+        Self { collections: Vec::new() }
+    }
+}
+
 // =========================================================================
 // 3. Non-Destructive Image Editing (Crop, Rotate, Color Curves, Filters)
 // =========================================================================

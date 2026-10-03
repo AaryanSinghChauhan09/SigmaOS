@@ -7,6 +7,8 @@ use std::collections::BTreeMap;
 use std::format;
 use std::vec::Vec;
 
+pub use crate::stubs::distro_stubs::{Constraint, VersionOp};
+
 /// PKGBUILD representation following Arch Linux standards
 #[derive(Debug, Clone)]
 pub struct PkgBuild {
@@ -748,8 +750,8 @@ pub struct ResolutionPlan {
 }
 
 pub struct DependencyResolverEngine {
-    pub registered_packages: BTreeMap<String, PkgBuild>,
-    pub constraints: Vec<Constraint>,
+    pub profiles: Vec<ArchChrootProfile>,
+    pub is_cleanroom_active: bool,
 }
 
 impl DependencyResolverEngine {
@@ -783,7 +785,8 @@ impl DependencyResolverEngine {
 
 #[derive(Debug, Clone)]
 pub struct ArchPkgctlEngine {
-    pub active_repos: Vec<String>,
+    pub registered_packages: BTreeMap<String, PkgBuild>,
+    pub constraints: Vec<Constraint>,
     pub repo_name: String,
 }
 
@@ -792,6 +795,7 @@ impl ArchPkgctlEngine {
         Self {
             registered_packages: BTreeMap::new(),
             constraints: Vec::new(),
+            repo_name: repo_name.to_string(),
         }
     }
 
@@ -875,12 +879,12 @@ impl PacmanDatabaseEngine {
         }
     }
 
-    pub fn search(&self, query: &str) -> Vec<&WikiArticle> {
+    pub fn search(&self, query: &str) -> Vec<&PkgBuild> {
         let q = query.to_lowercase();
-        self.articles
-            .iter()
-            .filter(|a| {
-                a.title.to_lowercase().contains(&q) || a.content.to_lowercase().contains(&q)
+        self.installed_packages
+            .values()
+            .filter(|p| {
+                p.pkgname.to_lowercase().contains(&q) || p.pkgdesc.to_lowercase().contains(&q)
             })
             .collect()
     }

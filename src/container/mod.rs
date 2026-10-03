@@ -9,7 +9,8 @@ pub use distro_sandbox::{
     SeccompAction, SeccompPolicy,
 };
 pub use oci_runtime::ContainerError;
-pub use runtime::{
-    Container, ContainerID, ContainerInfo, ContainerRuntime, ContainerState, RuntimeCapability,
-    RuntimeStats, SimpleContainer, SimpleContainerRuntime,
-};
+pub use runtime::{Container, ContainerState, ContainerRuntime};
+
+// Re-export stub types for missing implementations
+pub use crate::stubs::container_runtime::*;
+

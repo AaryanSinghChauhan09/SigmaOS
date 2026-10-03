@@ -14,7 +14,6 @@ use alloc::vec::Vec;
 use std::format;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
-#[cfg(any(feature = "standalone_test", test))]
 
 pub const EROFS_SUPER_MAGIC: u32 = 0xE0F5E1E2;
 pub const EROFS_SUPER_OFFSET: usize = 1024;

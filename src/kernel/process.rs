@@ -12,6 +12,7 @@ use core::sync::atomic::{AtomicU32, AtomicU64, Ordering};
 
 /// Process identifier (PID)
 pub type Pid = u32;
+pub type ProcessId = Pid;
 
 /// Thread group identifier (TGID - same as PID for main thread)
 pub type Tgid = u32;
@@ -287,6 +288,7 @@ impl ProcessStats {
 }
 
 /// Process control block (inspired by Linux task_struct and BSD proc)
+#[derive(Debug)]
 pub struct Process {
     pub pid: Pid,
     pub tgid: Tgid,
@@ -339,6 +341,7 @@ impl Process {
 }
 
 /// Process table manager
+#[derive(Debug)]
 pub struct ProcessTable {
     next_pid: AtomicU32,
     processes: Vec<Process>,
@@ -444,3 +447,157 @@ mod tests {
         assert_eq!(stack_limit.hard, 64 * 1024 * 1024);
     }
 }
+
+
+// ========================================
+// Advanced IPC and Process Management Types (Stubs for Phase 1)
+// ========================================
+
+/// Advanced IPC Hub for inter-process communication
+#[derive(Debug, Clone)]
+pub struct AdvancedIpcHub {
+    pub channels: alloc::vec::Vec<u64>,
+}
+
+/// BSD rusage structure for resource usage statistics
+#[derive(Debug, Clone, Copy)]
+pub struct BsdRusage {
+    pub utime_sec: u64,
+    pub utime_usec: u64,
+    pub stime_sec: u64,
+    pub stime_usec: u64,
+    pub maxrss: u64,
+}
+
+/// Cancellation type for process operations
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CancellationType {
+    Deferred,
+    Asynchronous,
+    Disabled,
+}
+
+/// Core dump metadata
+#[derive(Debug, Clone)]
+pub struct CoreDumpMetadata {
+    pub pid: Pid,
+    pub timestamp: u64,
+    pub signal: u32,
+}
+
+/// Event file descriptor for signaling
+#[derive(Debug, Clone, Copy)]
+pub struct EventFd {
+    pub fd: u32,
+    pub counter: u64,
+}
+
+/// Job control lifecycle engine
+#[derive(Debug)]
+pub struct JobControlLifecycleEngine {
+    pub jobs: alloc::vec::Vec<ProcessJobEntry>,
+}
+
+/// Job state enum
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum JobState {
+    Running,
+    Stopped,
+    Background,
+    Foreground,
+}
+
+/// POSIX message for message queues
+#[derive(Debug, Clone)]
+pub struct PosixMessage {
+    pub data: alloc::vec::Vec<u8>,
+    pub priority: u32,
+}
+
+/// POSIX message queue
+#[derive(Debug)]
+pub struct PosixMessageQueue {
+    pub messages: alloc::vec::Vec<PosixMessage>,
+    pub max_messages: usize,
+}
+
+/// Process cancellation state
+#[derive(Debug, Clone, Copy)]
+pub struct ProcessCancelState {
+    pub cancellation_type: CancellationType,
+    pub enabled: bool,
+}
+
+/// Process cancellation and termination manager
+#[derive(Debug)]
+pub struct ProcessCancellationAndTerminationManager {
+    pub cancel_states: alloc::vec::Vec<(Pid, ProcessCancelState)>,
+}
+
+/// Process control error
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ProcessControlError {
+    ProcessNotFound,
+    PermissionDenied,
+    InvalidOperation,
+}
+
+/// Process job entry
+#[derive(Debug, Clone)]
+pub struct ProcessJobEntry {
+    pub pid: Pid,
+    pub state: JobState,
+    pub command: alloc::vec::Vec<u8>,
+}
+
+/// Process VM read/write engine
+#[derive(Debug)]
+pub struct ProcessVmReadWriteEngine {
+    pub pid: Pid,
+}
+
+/// Process waiter and rusage collector
+#[derive(Debug)]
+pub struct ProcessWaiterAndRusageCollector {
+    pub wait_queue: alloc::vec::Vec<Pid>,
+}
+
+/// Signal queue payload
+#[derive(Debug, Clone, Copy)]
+pub struct SigQueuePayload {
+    pub signal: u32,
+    pub value: i32,
+}
+
+/// Sovereign process (extended process structure)
+pub type SovereignProcess = Process;
+
+/// Sovereign process manager
+#[derive(Debug)]
+pub struct SovereignProcessManager {
+    pub process_table: ProcessTable,
+}
+
+/// Sovereign process state
+pub type SovereignProcessState = ProcessState;
+
+/// Wait status for process waiting
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum WaitStatus {
+    Exited(i32),
+    Signaled(u32),
+    Stopped(u32),
+    Continued,
+}
+
+/// Zero-copy IPC channel
+#[derive(Debug)]
+pub struct ZeroCopyIpcChannel {
+    pub buffer_addr: u64,
+    pub buffer_size: usize,
+}
+
+/// Wait options constants
+pub const WCONTINUED: u32 = 0x08;
+pub const WNOHANG: u32 = 0x01;
+pub const WUNTRACED: u32 = 0x02;

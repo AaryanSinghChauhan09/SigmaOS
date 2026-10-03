@@ -71,6 +71,18 @@ pub struct InterruptDescriptor {
     pub count: AtomicU64,
 }
 
+impl Clone for InterruptDescriptor {
+    fn clone(&self) -> Self {
+        Self {
+            vector: self.vector,
+            irq_line: self.irq_line,
+            handler: self.handler,
+            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
+            count: AtomicU64::new(self.count.load(Ordering::Relaxed)),
+        }
+    }
+}
+
 impl InterruptDescriptor {
     pub fn new(vector: u8) -> Self {
         Self {

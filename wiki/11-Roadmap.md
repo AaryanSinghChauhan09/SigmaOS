@@ -179,16 +179,7 @@ SigmaOS development and maintenance are executed by 18 composite AI specialist a
 
 ---
 
-## SECTION 9: AI AGENT COMPONENT ROADMAP SPECIFICATIONS
-
-To guide autonomous development by **Bolt ⚡**, **Palette 🎨**, and **Sentinel 🛡️**, dedicated AI Agent roadmaps are maintained in the wiki:
-
-- [AI Agent Roadmap: CachyOS & Linux/BSD Distro Parity](22-AI-Agent-Roadmap-CachyOS-and-Distro-Parity.md)
-- [AI Agent Roadmap: Kernel, Security, & Universal Packaging](23-AI-Agent-Roadmap-Kernel-Security-and-Packaging.md)
-
----
-
-## SECTION 10: ENGINEERING STATUS
+## SECTION 9: ENGINEERING STATUS
 
 The following are verification requirements, not current completion claims. Check the latest CI runs and `COMPLETION_STATUS.md` before reporting repository health. Focused or standalone tests cover only their selected targets and do not prove complete OS functionality or a global 100% pass rate. Compiler warnings and prototype-only components remain; record actual findings rather than reporting zero by default. Keep `wiki/`, `WIKI/`, and the GitHub Wiki aligned, and verify the sync result after edits.
 

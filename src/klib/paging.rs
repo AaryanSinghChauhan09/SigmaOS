@@ -24,6 +24,37 @@ impl PageSize {
     }
 }
 
+#[derive(Debug)]
+pub struct SimplePageTableEntry {
+    pub present: AtomicUsize,
+    pub writable: AtomicUsize,
+    pub user_accessible: AtomicUsize,
+    pub physical_addr: AtomicUsize,
+    pub accessed: AtomicUsize,
+    pub dirty: AtomicUsize,
+    pub cow: AtomicUsize,
+}
+
+impl SimplePageTableEntry {
+    pub fn new() -> Self {
+        Self {
+            present: AtomicUsize::new(0),
+            writable: AtomicUsize::new(0),
+            user_accessible: AtomicUsize::new(0),
+            physical_addr: AtomicUsize::new(0),
+            accessed: AtomicUsize::new(0),
+            dirty: AtomicUsize::new(0),
+            cow: AtomicUsize::new(0),
+        }
+    }
+}
+
+impl Default for SimplePageTableEntry {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Clone for SimplePageTableEntry {
     fn clone(&self) -> Self {
         Self {
@@ -55,5 +86,3 @@ pub enum PageFaultError {
     PermissionDenied = 2,
     InvalidAddress = 3,
 }
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]

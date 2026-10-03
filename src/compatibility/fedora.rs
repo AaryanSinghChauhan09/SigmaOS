@@ -3974,16 +3974,6 @@ impl FedoraOfflineUpdateEngine {
 
 
 
-impl FedoraOfflineUpdateEngine {
-    pub fn new() -> Self {
-        Self {
-            staged_packages: Vec::new(),
-            is_offline_update_pending: false,
-            trigger_reboot_flag: false,
-        }
-    }
-}
-
 // =========================================================================
 // Fedora MirrorManager 2 (mirrormanager2) System Engine
 // =========================================================================

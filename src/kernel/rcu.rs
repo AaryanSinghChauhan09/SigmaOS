@@ -9,7 +9,7 @@ extern crate alloc;
 use alloc::boxed::Box;
 use alloc::collections::VecDeque;
 use alloc::vec::Vec;
-use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicBool, AtomicPtr, AtomicU64, AtomicUsize, Ordering};
 
 /// RCU grace period number
 pub type GracePeriod = u64;
@@ -240,38 +240,31 @@ pub struct RcuStats {
 
 /// RCU-protected pointer wrapper
 pub struct RcuPointer<T> {
-    ptr: AtomicUsize,
+    ptr: AtomicPtr<T>,
     _phantom: core::marker::PhantomData<T>,
 }
 
 impl<T> RcuPointer<T> {
-    pub fn new(ptr: *mut T) -> Self {
+    pub const fn new(ptr: *mut T) -> Self {
         Self {
-            ptr: AtomicUsize::new(ptr as usize),
-            _phantom: core::marker::PhantomData,
-        }
-    }
-
-    pub const fn null() -> Self {
-        Self {
-            ptr: AtomicUsize::new(0),
+            ptr: AtomicPtr::new(ptr),
             _phantom: core::marker::PhantomData,
         }
     }
 
     /// Load pointer (read-side)
     pub fn load(&self) -> *mut T {
-        self.ptr.load(Ordering::Acquire) as *mut T
+        self.ptr.load(Ordering::Acquire)
     }
 
     /// Store pointer (write-side, requires RCU synchronization)
     pub fn store(&self, ptr: *mut T) {
-        self.ptr.store(ptr as usize, Ordering::Release);
+        self.ptr.store(ptr, Ordering::Release);
     }
 
     /// Exchange pointer atomically
     pub fn swap(&self, ptr: *mut T) -> *mut T {
-        self.ptr.swap(ptr as usize, Ordering::AcqRel) as *mut T
+        self.ptr.swap(ptr, Ordering::AcqRel)
     }
 }
 

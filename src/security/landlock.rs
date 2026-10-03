@@ -12,7 +12,6 @@ use alloc::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
-#[cfg(any(feature = "standalone_test", test))]
 
 /// Bitmask constants for Landlock Filesystem Access Rights
 pub const LANDLOCK_ACCESS_FS_EXECUTE: u64 = 1 << 0;

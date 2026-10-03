@@ -24,10 +24,20 @@ pub mod cpufreq;
 pub mod device;
 pub mod driver;
 pub mod dtrace_compat;
-pub mod ebpf;
+pub mod ebpf;  // Now resolves to ebpf/ directory
+pub mod ebpf_legacy;  // Old flat ebpf.rs file retained for backward compat
 pub mod ebpf_verification;
 pub mod ebpf_vm;
 pub mod ebpf_xdp;
+
+// Re-export new eBPF CO-RE types
+pub use ebpf::{
+    BpfInsn, BpfOpcode, BpfVerifier, VerifiedProg, VerifyError,
+    JitCompiler, JitCode, JitError,
+    BpfRingBuf, RingBufError,
+    BpfArrayMap, BpfHashMap, BpfMap, BpfMapTable, BpfMapType, MapError,
+    EbpfInstruction, RegType, RegState, X86Register,
+};
 pub mod exports;
 pub mod futex;
 pub mod gap_closing;
@@ -79,6 +89,12 @@ pub mod performance;
 pub mod pipes;
 pub mod policy_mechanism;
 pub mod process;
+pub mod unix_socket;
+
+// Re-export process types
+pub use process::*;
+pub use unix_socket::*;
+
 pub mod rcu;
 pub mod roundrobin;
 pub mod sched;
@@ -89,6 +105,10 @@ pub mod uts_namespace;
 pub mod virtual_cpu;
 pub mod wait_queue;
 pub mod workqueue;
+
+// Re-export kernel innovation stubs
+pub use crate::stubs::kernel_stubs::*;
+pub use crate::stubs::security_stubs::*;
 
 pub use missing_linux_kernel_components::{
     BpfRingBufferStreamEngine, EpollCtlOp, EpollEvent, KernelAuditRecord, KernelAuditRecordType,
@@ -118,7 +138,7 @@ pub use crate::kernel::linux_bsd_innovations::{
     AlpineHardenedEnv, AndroidBinderIpc, AndroidBroadcastReceiverRegistry, ArchUserRepoManager,
     BinderNode, BottomHalfKernelThread, BoundedBufferProducerConsumer, BroadcastReceiver,
     BsdPfStateTable, CapabilityDerivationTree, CarpSecurityRouter, CgroupResourceLimits, CowBlock,
-    CowStorageEngine, CpuIsaMicroarch, DevlinkHealthReporter, DynamicLkmLoader, EbpfInstruction,
+    CowStorageEngine, CpuIsaMicroarch, DevlinkHealthReporter, DynamicLkmLoader,
     EbpfRuntime, ExokernelHardwareMultiplexer, FastPacketFrame, FreeBsdCapsicumEngine,
     FreeBsdGeomTopology, FreeBsdJail, FreeBsdVfsNullfs, FreeBsdVnetManager, FutexOp, FutexWaiter,
     GcdDispatchQueue, GcdPriority, GcdTask, GentooUseFlags, GeomClass, GeomProvider,
@@ -223,6 +243,9 @@ pub use kptr_restrict::{
 pub use scheduler::{
     CfsScheduler, Priority, ProcessState, ProcessTask, RtScheduler, SchedulerPolicy, ThermalState,
 };
+pub use sched::scheduler::Scheduler;
+pub use roundrobin::SchedulerError;
+pub type VirtualCpu = virtual_cpu::SovereignVirtualCPU;
 
 pub mod procfs_linux;
 pub use procfs_linux::{ProcFs, ProcessInfo};

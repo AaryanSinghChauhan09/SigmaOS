@@ -55,6 +55,9 @@ pub struct SecurityMitigations {
     pub unprivileged_bpf_disabled: bool,
 }
 
+pub type DmesgRestrictLevel = KptrRestrictLevel;
+pub type KernelSecurityMitigations = SecurityMitigations;
+
 impl SecurityMitigations {
     pub fn current() -> Self {
         Self {

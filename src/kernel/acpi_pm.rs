@@ -96,11 +96,21 @@ pub struct ThermalZone {
 }
 
 /// Cooling device
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct CoolingDevice {
     pub device_type: CoolingDeviceType,
     pub max_state: u32,
     pub current_state: AtomicU32,
+}
+
+impl Clone for CoolingDevice {
+    fn clone(&self) -> Self {
+        Self {
+            device_type: self.device_type,
+            max_state: self.max_state,
+            current_state: AtomicU32::new(self.current_state.load(Ordering::Relaxed)),
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

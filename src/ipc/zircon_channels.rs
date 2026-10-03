@@ -77,7 +77,6 @@ impl Signals {
     pub const HANDLE_CLOSED: Signals = Signals(1);
     pub const LAST_HANDLE: Signals = Signals(1);
     pub fn contains(self, other: Signals) -> bool { (self.0 & other.0) == other.0 }
-    pub fn is_empty(self) -> bool { self.0 == 0 }
     pub fn bits(self) -> u32 { self.0 }
 }
 impl core::ops::BitOr for Signals { type Output = Self; fn bitor(self, r: Self) -> Self { Signals(self.0|r.0) } }

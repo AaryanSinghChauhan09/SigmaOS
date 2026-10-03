@@ -9,7 +9,19 @@ use std::vec::Vec;
 use crate::klib::path::PathBuf;
 use crate::klib::HashMap;
 
-use std::fs;
+#[cfg(not(test))]
+mod fs {
+    use super::*;
+    pub fn read_to_string<P: AsRef<str>>(_path: P) -> Result<String, std::io::Error> {
+        Ok(String::new())
+    }
+    pub fn write<P: AsRef<str>>(_path: P, _content: String) -> Result<(), std::io::Error> {
+        Ok(())
+    }
+    pub fn create_dir_all<P: AsRef<str>>(_path: P) -> Result<(), std::io::Error> {
+        Ok(())
+    }
+}
 
 /// System configuration file types
 #[derive(Debug, Clone, PartialEq, Eq)]

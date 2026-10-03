@@ -93,8 +93,7 @@ impl MemoryProtectionManager {
         let random = (timestamp as u64) & mask;
 
         // Align to page boundary
-        let align = config.page_alignment.max(1);
-        (random + align) & !(align - 1)
+        (random + config.page_alignment) & !(config.page_alignment - 1)
     }
 
     /// Apply ASLR to an address

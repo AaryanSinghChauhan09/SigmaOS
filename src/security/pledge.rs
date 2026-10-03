@@ -296,7 +296,7 @@ impl Default for PledgeManager {
 
 /// Common pledge promises
 pub mod promises {
-    use super::capability::Permission;
+    use crate::security::capability::Permission;
     use super::PledgePromise;
 
     /// Stdio promise - basic I/O only

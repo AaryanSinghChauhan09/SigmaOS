@@ -5,7 +5,8 @@
 use alloc::format;
 use alloc::string::{String, ToString};
 use crate::klib;
-use alloc::collections::HashMap;
+use crate::klib::HashMap;
+use crate::klib::string::SigmaString;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Version {
@@ -93,7 +94,7 @@ impl AurRecipeCompiler {
     pub fn compile_pkgbuild(&self, pkgbuild_content: &str) -> Result<Package, &'static str> {
         let mut pkgname = "";
         let mut pkgver = "1.0.0";
-        let mut depends = std::vec::Vec::new();
+        let mut depends = crate::klib::vec::Vec::new();
 
         for line in pkgbuild_content.lines() {
             let line = line.trim();
@@ -108,8 +109,9 @@ impl AurRecipeCompiler {
                     .trim_matches(')')
                     .trim_matches('"');
                 for d in dep_str.split_whitespace() {
+                    let cleaned = d.replace('\'', "").replace('"', "");
                     depends.push(Dependency {
-                        name: d.replace('\'', "").replace('"', "").into(),
+                        name: SigmaString::from(cleaned.as_str()),
                         version_constraint: VersionConstraint::Any,
                     });
                 }
@@ -248,7 +250,7 @@ impl PacmanDbAdapter {
             SigmaString::from(name),
             parsed_ver,
             SigmaString::from(desc),
-            std::vec::Vec::<Dependency>::new(),
+            crate::klib::vec::Vec::<Dependency>::new(),
             SigmaString::from("sha256_imported_legacy_hash_value"),
         ))
     }
@@ -322,7 +324,7 @@ impl AlpmHookManager {
         let mut triggered_cmds = std::vec::Vec::new();
         for hook in &self.hooks {
             if hook.when == when {
-                let pattern = hook.target_pattern.trim_end_matches('*');
+                let pattern = hook.target_pattern.as_str().trim_end_matches('*');
                 if hook.target_pattern.is_empty() || changed_file.contains(pattern) {
                     triggered_cmds.push(hook.exec_cmd.clone());
                 }
@@ -549,14 +551,7 @@ impl MkinitcpioBuilder {
         hooks.push(SigmaString::from("block"));
         hooks.push(SigmaString::from("filesystems"));
         Self {
-            hooks: crate::klib::vec![
-                crate::klib::string::SigmaString::from("base"),
-                crate::klib::string::SigmaString::from("udev"),
-                crate::klib::string::SigmaString::from("autodetect"),
-                crate::klib::string::SigmaString::from("modconf"),
-                crate::klib::string::SigmaString::from("block"),
-                crate::klib::string::SigmaString::from("filesystems"),
-            ],
+            hooks,
             compression: crate::klib::string::SigmaString::from("zstd"),
         }
     }
@@ -735,9 +730,26 @@ impl MakepkgBuilder {
 }
 // --- Arch Linux svntogit Repository Migration Engine ---
 #[derive(Debug, Clone)]
-pub struct SvntoGitEngine {
+pub struct SvnPackageMetadata {
+    pub pkgname: String,
+    pub repo: String,
+    pub arch: String,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct SvntogitMigrationEngine {
     pub migrated_packages: std::collections::HashMap<String, SvnPackageMetadata>,
 }
+
+impl SvntogitMigrationEngine {
+    pub fn new() -> Self {
+        Self {
+            migrated_packages: std::collections::HashMap::new(),
+        }
+    }
+}
+
+pub type SvntoGitEngine = SvntogitMigrationEngine;
 
 #[cfg(test)]
 mod tests {

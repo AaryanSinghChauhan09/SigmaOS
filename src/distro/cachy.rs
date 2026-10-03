@@ -1,16 +1,14 @@
 // SigmaOS CachyOS Compatibility & Performance Suite (CachyOS Parity)
-// Implements x86-64-v3/v4 Microarchitecture detection, BORE CPU Scheduler Governor, CachyOS Kernel Variant Selector,
-// Ananicy Process Rules, UKSM Deduplication, Gamescope/Proton Latency Governor, and Kernel Sysctl Tuning.
+// Implements x86-64-v3/v4 Microarchitecture detection, BORE CPU Scheduler Governor, and CachyOS Kernel Variant Selector.
 
 #[cfg(test_disabled)]
 use std::format;
-use std::string::String;
 use std::vec::Vec;
 
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::collections::BTreeMap as HashMap;
+#[cfg(not(test))]
+use crate::klib::HashMap;
 
-#[cfg(any(feature = "standalone_test", test))]
+#[cfg(test)]
 use std::collections::HashMap;
 
 /// x86-64 Microarchitecture Level (CachyOS / Arch Linux parity)
@@ -240,198 +238,6 @@ impl CachyOsChWDHardwareEngine {
     }
 }
 
-/// Ananicy-cpp process priority rule
-#[derive(Debug, Clone)]
-pub struct AnanicyRule {
-    pub name: String,
-    pub nice: i8,
-    pub ioclass: u8, // 1: Realtime, 2: BestEffort, 3: Idle
-    pub ionice: u8,  // 0..7
-    pub sched_policy: String,
-}
-
-/// CachyOS Ananicy-cpp Rule Engine for Auto-Nicing & Process Scheduling
-pub struct CachyOsAnanicyPriorityEngine {
-    pub rules: Vec<AnanicyRule>,
-    pub default_nice: i8,
-}
-
-impl CachyOsAnanicyPriorityEngine {
-    pub fn new() -> Self {
-        let mut engine = Self {
-            rules: Vec::new(),
-            default_nice: 0,
-        };
-        engine.load_cachyos_defaults();
-        engine
-    }
-
-    pub fn load_cachyos_defaults(&mut self) {
-        self.rules.push(AnanicyRule {
-            name: String::from("gamescope"),
-            nice: -15,
-            ioclass: 1,
-            ionice: 0,
-            sched_policy: String::from("SCHED_FIFO"),
-        });
-        self.rules.push(AnanicyRule {
-            name: String::from("steam"),
-            nice: -5,
-            ioclass: 2,
-            ionice: 1,
-            sched_policy: String::from("SCHED_OTHER"),
-        });
-        self.rules.push(AnanicyRule {
-            name: String::from("obs"),
-            nice: -8,
-            ioclass: 2,
-            ionice: 0,
-            sched_policy: String::from("SCHED_OTHER"),
-        });
-    }
-
-    pub fn evaluate_process(&self, process_name: &str) -> Option<AnanicyRule> {
-        for rule in &self.rules {
-            if rule.name == process_name {
-                return Some(rule.clone());
-            }
-        }
-        None
-    }
-}
-
-impl Default for CachyOsAnanicyPriorityEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Ultra-fast Kernel Samepage Merging (UKSM) Memory Deduplication Governor
-pub struct CachyOsUksmMemoryDeduplicationEngine {
-    pub pages_scanned: u64,
-    pub pages_shared: u64,
-    pub cpu_use_limit_pct: u8,
-    pub sleep_millisecs: u32,
-    pub is_enabled: bool,
-}
-
-impl CachyOsUksmMemoryDeduplicationEngine {
-    pub fn new() -> Self {
-        Self {
-            pages_scanned: 0,
-            pages_shared: 0,
-            cpu_use_limit_pct: 20,
-            sleep_millisecs: 20,
-            is_enabled: true,
-        }
-    }
-
-    pub fn run_deduplication_cycle(&mut self, candidate_pages: u64) -> u64 {
-        if !self.is_enabled {
-            return 0;
-        }
-        self.pages_scanned += candidate_pages;
-        let merged = candidate_pages / 4; // Simulated 25% page merging ratio
-        self.pages_shared += merged;
-        merged
-    }
-}
-
-impl Default for CachyOsUksmMemoryDeduplicationEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// CachyOS Gamescope & Proton Game Latency Governor
-pub struct CachyOsGamescopeProtonEngine {
-    pub gamescope_fps_limit: u32,
-    pub fsr_enabled: bool,
-    pub low_latency_mode: bool,
-    pub proton_wine_sync: String, // esync, fsync, ntsync
-}
-
-impl CachyOsGamescopeProtonEngine {
-    pub fn new() -> Self {
-        Self {
-            gamescope_fps_limit: 144,
-            fsr_enabled: true,
-            low_latency_mode: true,
-            proton_wine_sync: String::from("ntsync"),
-        }
-    }
-
-    pub fn configure_game_overlay(&mut self, fps: u32, fsr: bool, sync_type: &str) {
-        self.gamescope_fps_limit = fps;
-        self.fsr_enabled = fsr;
-        self.proton_wine_sync = String::from(sync_type);
-    }
-}
-
-impl Default for CachyOsGamescopeProtonEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// CachyOS Kernel Sysctl Manager Engine
-pub struct CachyOsKernelManagerEngine {
-    pub sysctl_settings: HashMap<String, String>,
-}
-
-impl CachyOsKernelManagerEngine {
-    pub fn new() -> Self {
-        let mut settings = HashMap::new();
-        settings.insert(String::from("vm.max_map_count"), String::from("1048576"));
-        settings.insert(String::from("vm.swappiness"), String::from("10"));
-        settings.insert(String::from("vm.vfs_cache_pressure"), String::from("50"));
-        settings.insert(
-            String::from("kernel.sched_cfs_bandwidth_slice_us"),
-            String::from("3000"),
-        );
-        Self {
-            sysctl_settings: settings,
-        }
-    }
-
-    pub fn get_sysctl(&self, key: &str) -> Option<&String> {
-        self.sysctl_settings.get(key)
-    }
-}
-
-impl Default for CachyOsKernelManagerEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// CachyOS Master System Suite
-pub struct CachyOsMasterSystemSuite {
-    pub repo: CachyPackageRepo,
-    pub bore_scheduler: BoreSchedulerGovernor,
-    pub auto_freq: CachyOsAutoFreqEngine,
-    pub chwd: CachyOsChWDHardwareEngine,
-    pub ananicy: CachyOsAnanicyPriorityEngine,
-    pub uksm: CachyOsUksmMemoryDeduplicationEngine,
-    pub gamescope: CachyOsGamescopeProtonEngine,
-    pub kernel_mgr: CachyOsKernelManagerEngine,
-}
-
-impl CachyOsMasterSystemSuite {
-    pub fn new(caps: CpuCapabilities) -> Self {
-        Self {
-            repo: CachyPackageRepo::new(caps),
-            bore_scheduler: BoreSchedulerGovernor::new(),
-            auto_freq: CachyOsAutoFreqEngine::new(),
-            chwd: CachyOsChWDHardwareEngine::new(caps),
-            ananicy: CachyOsAnanicyPriorityEngine::new(),
-            uksm: CachyOsUksmMemoryDeduplicationEngine::new(),
-            gamescope: CachyOsGamescopeProtonEngine::new(),
-            kernel_mgr: CachyOsKernelManagerEngine::new(),
-        }
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -493,31 +299,5 @@ mod tests {
 
         let driver = chwd.auto_configure_chwd_drivers(true);
         assert_eq!(driver, "chwd-nvidia-v3-dkms");
-    }
-
-    #[test]
-    fn test_cachyos_advancements_suite() {
-        let caps = CpuCapabilities::new_x86_64_v3_capable();
-        let suite = CachyOsMasterSystemSuite::new(caps);
-
-        // Ananicy check
-        let rule = suite.ananicy.evaluate_process("gamescope").unwrap();
-        assert_eq!(rule.nice, -15);
-        assert_eq!(rule.sched_policy, "SCHED_FIFO");
-
-        // UKSM check
-        let mut uksm = suite.uksm;
-        let merged = uksm.run_deduplication_cycle(100);
-        assert_eq!(merged, 25);
-
-        // Gamescope check
-        assert_eq!(suite.gamescope.gamescope_fps_limit, 144);
-        assert_eq!(suite.gamescope.proton_wine_sync, "ntsync");
-
-        // Kernel mgr check
-        assert_eq!(
-            suite.kernel_mgr.get_sysctl("vm.max_map_count").unwrap(),
-            "1048576"
-        );
     }
 }

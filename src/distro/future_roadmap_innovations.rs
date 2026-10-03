@@ -17,11 +17,11 @@ use alloc::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::format;
-#[cfg(any(feature = "standalone_test", test))]
-#[cfg(any(feature = "standalone_test", test))]
+
 // ============================================================================
 // 1. Shards Application Marketplace Engine
 // ============================================================================
+
 #[derive(Debug, Clone)]
 pub struct ShardAppManifest {
     pub app_id: String,

@@ -35,9 +35,8 @@ use alloc::vec::Vec;
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::BTreeMap;
 #[cfg(any(feature = "standalone_test", test))]
-#[cfg(any(feature = "standalone_test", test))]
 use std::vec;
-#[cfg(any(feature = "standalone_test", test))]
+
 // ============================================================================
 // 1. SovereignSchedExtBoreV2Governor
 // ============================================================================

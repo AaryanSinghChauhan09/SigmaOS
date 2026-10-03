@@ -13,6 +13,7 @@ use core::mem::size_of;
 
 /// Ext4 superblock structure (first 1024 bytes)
 #[repr(C, packed)]
+#[derive(Debug, Clone, Copy)]
 pub struct Ext4Superblock {
     pub s_inodes_count: u32,          // Total inode count
     pub s_blocks_count_lo: u32,       // Total block count (low 32 bits)
@@ -119,6 +120,7 @@ const EXT4_SUPER_MAGIC: u16 = 0xEF53;
 
 /// Ext4 inode structure
 #[repr(C, packed)]
+#[derive(Debug, Clone, Copy)]
 pub struct Ext4Inode {
     pub i_mode: u16,           // File mode
     pub i_uid: u16,            // Owner UID (low 16 bits)
@@ -182,6 +184,7 @@ pub struct Ext4ExtentIdx {
 
 /// Block group descriptor
 #[repr(C, packed)]
+#[derive(Debug, Clone, Copy)]
 pub struct Ext4GroupDesc {
     pub bg_block_bitmap_lo: u32,      // Block bitmap block (low)
     pub bg_inode_bitmap_lo: u32,      // Inode bitmap block (low)
@@ -327,7 +330,7 @@ impl Ext4Filesystem {
         
         // Parse extent tree
         let header = unsafe {
-            &*(inode.i_block.as_ptr() as *const Ext4ExtentHeader)
+            core::ptr::read_unaligned(core::ptr::addr_of!(inode.i_block) as *const Ext4ExtentHeader)
         };
         
         if header.eh_magic != 0xF30A {
@@ -337,12 +340,12 @@ impl Ext4Filesystem {
         if header.eh_depth == 0 {
             // Leaf node - extents directly in inode
             let extents_ptr = unsafe {
-                (inode.i_block.as_ptr() as *const u8).add(size_of::<Ext4ExtentHeader>())
+                (core::ptr::addr_of!(inode.i_block) as *const u8).add(core::mem::size_of::<Ext4ExtentHeader>())
             };
             
             for i in 0..header.eh_entries {
                 let extent = unsafe {
-                    &*((extents_ptr as *const Ext4Extent).add(i as usize))
+                    core::ptr::read_unaligned((extents_ptr as *const Ext4Extent).add(i as usize))
                 };
                 
                 let start_block = extent.ee_block;

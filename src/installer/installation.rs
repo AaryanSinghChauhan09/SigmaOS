@@ -336,8 +336,8 @@ mod tests {
         assert_eq!(Architecture::from_str("x86_64"), Architecture::X86_64);
         assert_eq!(Architecture::from_str("arm64"), Architecture::ARM64);
         assert_eq!(Architecture::from_str("x86"), Architecture::X86);
-        assert_eq!(Architecture::X86_64.is_64bit(), true);
-        assert_eq!(Architecture::X86.is_64bit(), false);
+        assert_eq!(Architecture::is_64bit(Architecture::X86_64), true);
+        assert_eq!(Architecture::is_64bit(Architecture::X86), false);
     }
 
     #[test]
@@ -389,6 +389,9 @@ mod tests {
 
     #[test]
     fn test_installation_config_with_vm_type() {
+        let config =
+            InstallationConfig::new(InstallationMethod::VirtualMachine, Architecture::X86_64)
+                .with_vm_type(VmType::QEMU);
         let config = InstallationConfig::new(
             InstallationMethod::VirtualMachine,
             Architecture::X86_64,
@@ -401,6 +404,9 @@ mod tests {
 
     #[test]
     fn test_installation_config_with_memory() {
+        let config =
+            InstallationConfig::new(InstallationMethod::VirtualMachine, Architecture::X86_64)
+                .with_memory(8192);
         let config = InstallationConfig::new(
             InstallationMethod::VirtualMachine,
             Architecture::X86_64,
@@ -411,6 +417,9 @@ mod tests {
 
     #[test]
     fn test_generate_qemu_command() {
+        let config =
+            InstallationConfig::new(InstallationMethod::VirtualMachine, Architecture::X86_64)
+                .with_vm_type(VmType::QEMU);
         let config = InstallationConfig::new(
             InstallationMethod::VirtualMachine,
             Architecture::X86_64,
@@ -437,6 +446,9 @@ mod tests {
         let config = InstallationConfig::default();
         assert!(config.validate().is_ok());
 
+        let invalid_config =
+            InstallationConfig::new(InstallationMethod::BareMetal, Architecture::X86_64)
+                .with_memory(512);
         let invalid_config = InstallationConfig::new(
             InstallationMethod::BareMetal,
             Architecture::X86_64,

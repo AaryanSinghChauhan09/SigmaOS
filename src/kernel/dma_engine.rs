@@ -234,7 +234,7 @@ impl DmaController {
     
     /// Get channel by ID
     pub fn get_channel(&self, id: u32) -> Option<Arc<DmaChannel>> {
-        if id as usize < self.channels.len() {
+        if (id as usize) < self.channels.len() {
             Some(Arc::clone(&self.channels[id as usize]))
         } else {
             None

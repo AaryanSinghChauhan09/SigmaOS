@@ -68,6 +68,18 @@ pub struct MemoryController {
     pub swap_max: u64,
 }
 
+impl Clone for MemoryController {
+    fn clone(&self) -> Self {
+        Self {
+            max: self.max,
+            low: self.low,
+            high: self.high,
+            current: AtomicU64::new(self.current.load(Ordering::Relaxed)),
+            swap_max: self.swap_max,
+        }
+    }
+}
+
 impl MemoryController {
     pub const UNLIMITED: Self = Self {
         max: u64::MAX,
@@ -127,6 +139,15 @@ pub struct PidsController {
     pub max: u64,
     /// Current number of processes
     pub current: AtomicUsize,
+}
+
+impl Clone for PidsController {
+    fn clone(&self) -> Self {
+        Self {
+            max: self.max,
+            current: AtomicUsize::new(self.current.load(Ordering::Relaxed)),
+        }
+    }
 }
 
 impl PidsController {

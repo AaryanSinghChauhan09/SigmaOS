@@ -14,6 +14,7 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
 pub mod bpf_syscalls;
+pub mod capsicum_syscalls;
 pub mod dispatch;
 pub mod dispatcher;
 pub mod inotify_syscalls;

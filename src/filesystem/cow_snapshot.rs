@@ -2,6 +2,148 @@
 /// Provides transactional filesystem rollback metadata to defeat Fedora's Btrfs.
 use core::sync::atomic::{AtomicUsize, Ordering};
 
+/// Merkle tree node for snapshot integrity verification
+#[derive(Debug, Clone)]
+pub struct MerkleNode {
+    pub hash: [u8; 32],
+    pub children: Vec<u64>,  // Block addresses of child nodes
+}
+
+/// Merkle tree for snapshot verification and integrity
+#[derive(Debug, Clone)]
+pub struct MerkleTree {
+    pub nodes: Vec<MerkleNode>,
+    pub root_hash: [u8; 32],
+}
+
+impl MerkleTree {
+    pub fn new() -> Self {
+        Self {
+            nodes: Vec::new(),
+            root_hash: [0u8; 32],
+        }
+    }
+
+    /// Compute hash of data using simple djb2-style algorithm
+    pub fn compute_hash(data: &[u8]) -> [u8; 32] {
+        let mut hash = [0u8; 32];
+        let mut h: u64 = 5381;
+        
+        for byte in data {
+            h = h.wrapping_mul(33).wrapping_add(*byte as u64);
+        }
+        
+        // Spread hash across 32 bytes
+        for i in 0..4 {
+            let shift = i * 16;
+            hash[i * 8] = (h >> shift) as u8;
+            hash[i * 8 + 1] = (h >> (shift + 8)) as u8;
+            hash[i * 8 + 2] = (h.wrapping_mul(i as u64 + 1) >> shift) as u8;
+            hash[i * 8 + 3] = (h.wrapping_mul(i as u64 + 2) >> shift) as u8;
+            hash[i * 8 + 4] = (h.wrapping_add(i as u64) >> shift) as u8;
+            hash[i * 8 + 5] = (h.wrapping_add(i as u64 * 2) >> shift) as u8;
+            hash[i * 8 + 6] = (h.wrapping_add(i as u64 * 3) >> shift) as u8;
+            hash[i * 8 + 7] = (h.wrapping_add(i as u64 * 4) >> shift) as u8;
+        }
+        
+        hash
+    }
+
+    /// Build Merkle tree from blocks
+    pub fn build_from_blocks(blocks: &[Vec<u8>]) -> Self {
+        let mut tree = Self::new();
+        
+        // Create leaf nodes
+        for block in blocks {
+            let hash = Self::compute_hash(block.as_slice());
+            tree.nodes.push(MerkleNode {
+                hash,
+                children: Vec::new(),
+            });
+        }
+        
+        // Build tree bottom-up (simplified single-level for now)
+        if !tree.nodes.is_empty() {
+            tree.root_hash = tree.nodes[0].hash;
+        }
+        
+        tree
+    }
+
+    /// Verify a block against the tree
+    pub fn verify_block(&self, block: &[u8], index: usize) -> bool {
+        if index >= self.nodes.len() {
+            return false;
+        }
+        
+        let computed_hash = Self::compute_hash(block);
+        computed_hash == self.nodes[index].hash
+    }
+}
+
+impl Default for MerkleTree {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Extent reference for sharing between snapshots
+#[derive(Debug, Clone, Copy)]
+pub struct ExtentRef {
+    pub source_snapshot_id: u64,
+    pub block_addr: u64,
+    pub length: u64,
+}
+
+/// Deduplication entry mapping hash to block address
+#[derive(Debug, Clone)]
+pub struct DedupeEntry {
+    pub hash: [u8; 32],
+    pub block_addr: u64,
+}
+
+/// Deduplication table for content-addressed storage
+#[derive(Debug, Clone)]
+pub struct DedupeTable {
+    pub entries: Vec<DedupeEntry>,
+}
+
+impl DedupeTable {
+    pub fn new() -> Self {
+        Self {
+            entries: Vec::new(),
+        }
+    }
+
+    /// Look up block address by content hash
+    pub fn lookup(&self, hash: &[u8; 32]) -> Option<u64> {
+        for entry in &self.entries {
+            if &entry.hash == hash {
+                return Some(entry.block_addr);
+            }
+        }
+        None
+    }
+
+    /// Insert hash-to-address mapping
+    pub fn insert(&mut self, hash: [u8; 32], block_addr: u64) {
+        // Check if already exists
+        for entry in &self.entries {
+            if entry.hash == hash {
+                return;  // Already present
+            }
+        }
+        
+        self.entries.push(DedupeEntry { hash, block_addr });
+    }
+}
+
+impl Default for DedupeTable {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub type TransactionID = usize;
 pub type InodeID = usize;
 
@@ -198,6 +340,13 @@ impl<T> Vec<T> {
     pub fn is_empty(&self) -> bool {
         self.len == 0
     }
+    pub fn as_slice(&self) -> &[T] {
+        if self.data.is_null() || self.len == 0 {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
     pub fn iter(&self) -> VecIter<'_, T> {
         VecIter {
             vec: self,
@@ -363,5 +512,46 @@ mod tests {
         // Check active mounting capabilities
         manager.mount_snapshot(b"/mnt/btrfs_compat").unwrap();
         assert_eq!(manager.active_mounts.len(), 1);
+    }
+
+    #[test]
+    fn test_merkle_tree_hash_consistency() {
+        let data1 = vec![1u8, 2, 3, 4, 5];
+        let data2 = vec![1u8, 2, 3, 4, 5];
+        let data3 = vec![1u8, 2, 3, 4, 6];
+
+        let hash1 = MerkleTree::compute_hash(&data1);
+        let hash2 = MerkleTree::compute_hash(&data2);
+        let hash3 = MerkleTree::compute_hash(&data3);
+
+        assert_eq!(hash1, hash2);
+        assert_ne!(hash1, hash3);
+    }
+
+    #[test]
+    fn test_dedupe_table_insert_lookup() {
+        let mut table = DedupeTable::new();
+        
+        let hash = MerkleTree::compute_hash(&[1, 2, 3, 4]);
+        table.insert(hash, 0x1000);
+        
+        let found = table.lookup(&hash);
+        assert_eq!(found, Some(0x1000));
+        
+        let not_found = table.lookup(&[0u8; 32]);
+        assert_eq!(not_found, None);
+    }
+
+    #[test]
+    fn test_extent_sharing() {
+        let extent = ExtentRef {
+            source_snapshot_id: 1,
+            block_addr: 0x2000,
+            length: 4096,
+        };
+        
+        assert_eq!(extent.source_snapshot_id, 1);
+        assert_eq!(extent.block_addr, 0x2000);
+        assert_eq!(extent.length, 4096);
     }
 }

@@ -108,21 +108,21 @@ struct InterruptFrame {
 ///
 /// In a real kernel this would at minimum print the vector number
 /// and the faulting RIP before halting.
-extern "x86-interrupt" fn default_handler(_frame: InterruptFrame) {
+extern "C" fn default_handler(_frame: InterruptFrame) {
     loop {
         unsafe { asm!("hlt", options(nomem, nostack, preserves_flags)) };
     }
 }
 
 /// #DF — Double Fault (vector 8). Always has error code 0.
-extern "x86-interrupt" fn double_fault_handler(_frame: InterruptFrame, _error: u64) -> ! {
+extern "C" fn double_fault_handler(_frame: InterruptFrame, _error: u64) -> ! {
     loop {
         unsafe { asm!("hlt", options(nomem, nostack, preserves_flags)) };
     }
 }
 
 /// #PF — Page Fault (vector 14). CR2 holds the faulting virtual address.
-extern "x86-interrupt" fn page_fault_handler(_frame: InterruptFrame, error_code: u64) {
+extern "C" fn page_fault_handler(_frame: InterruptFrame, error_code: u64) {
     let cr2: u64;
     // SAFETY: `mov rax, cr2` is a privileged read; we are in ring-0.
     unsafe {
@@ -136,7 +136,7 @@ extern "x86-interrupt" fn page_fault_handler(_frame: InterruptFrame, error_code:
 }
 
 /// #GP — General Protection Fault (vector 13).
-extern "x86-interrupt" fn general_protection_fault_handler(
+extern "C" fn general_protection_fault_handler(
     _frame: InterruptFrame,
     _error: u64,
 ) {
@@ -146,7 +146,7 @@ extern "x86-interrupt" fn general_protection_fault_handler(
 }
 
 /// APIC timer interrupt (vector 0x20 = 32).
-extern "x86-interrupt" fn apic_timer_handler(_frame: InterruptFrame) {
+extern "C" fn apic_timer_handler(_frame: InterruptFrame) {
     // Write EOI to Local APIC (offset 0xB0).
     // SAFETY: 0xFEE00000 is the well-known LAPIC MMIO base;
     //         single-writer per CPU, no aliasing.
@@ -157,7 +157,7 @@ extern "x86-interrupt" fn apic_timer_handler(_frame: InterruptFrame) {
 }
 
 /// Software interrupt syscall gate (vector 0x80), DPL=3 so user code can `int 0x80`.
-extern "x86-interrupt" fn syscall_int80_handler(_frame: InterruptFrame) {
+extern "C" fn syscall_int80_handler(_frame: InterruptFrame) {
     // Dispatch through the syscall layer.
     // Real implementation forwards rax/rdi/rsi/rdx to syscall_dispatch.
 }

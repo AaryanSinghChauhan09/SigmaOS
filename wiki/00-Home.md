@@ -27,7 +27,6 @@ SigmaOS is designed to eliminate operating system fragmentation, bloat, and lega
 - [Roadmap: Networking & Post-Quantum Security](19-Roadmap-Networking-and-Security.md)
 - [Roadmap: Desktop GUI & Userland Tooling](20-Roadmap-Desktop-GUI-and-Userland.md)
 - [Roadmap: Package Management & App Ecosystem](21-Roadmap-Package-Management-and-App-Ecosystem.md)
-- [Roadmap: Arch Linux Parity & AI Agent Directives](22-Arch-Linux-Parity-And-AI-Agent-Roadmap.md)
 
 ## Documentation Structure
 

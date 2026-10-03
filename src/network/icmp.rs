@@ -72,7 +72,7 @@ pub enum IcmpRedirectCode {
 
 /// ICMP header (8 bytes minimum)
 #[repr(C, packed)]
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct IcmpHeader {
     pub icmp_type: u8,
     pub code: u8,
@@ -325,7 +325,7 @@ impl IcmpHandler {
 }
 
 /// ICMP statistics
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Default)]
 pub struct IcmpStats {
     pub echo_requests: AtomicU64,
     pub echo_replies: AtomicU64,
@@ -333,6 +333,19 @@ pub struct IcmpStats {
     pub dest_unreachable: AtomicU64,
     pub time_exceeded: AtomicU64,
     pub unknown_type: AtomicU64,
+}
+
+impl Clone for IcmpStats {
+    fn clone(&self) -> Self {
+        Self {
+            echo_requests: AtomicU64::new(self.echo_requests.load(core::sync::atomic::Ordering::Relaxed)),
+            echo_replies: AtomicU64::new(self.echo_replies.load(core::sync::atomic::Ordering::Relaxed)),
+            echo_replies_recv: AtomicU64::new(self.echo_replies_recv.load(core::sync::atomic::Ordering::Relaxed)),
+            dest_unreachable: AtomicU64::new(self.dest_unreachable.load(core::sync::atomic::Ordering::Relaxed)),
+            time_exceeded: AtomicU64::new(self.time_exceeded.load(core::sync::atomic::Ordering::Relaxed)),
+            unknown_type: AtomicU64::new(self.unknown_type.load(core::sync::atomic::Ordering::Relaxed)),
+        }
+    }
 }
 
 /// ICMP errors

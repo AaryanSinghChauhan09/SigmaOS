@@ -17,7 +17,7 @@ pub const PAGE_SIZE: usize = 4096;
 pub const MAX_CACHE_PAGES: usize = 262144; // 1GB with 4KB pages
 
 /// Page flags (inspired by Linux page flags)
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct PageFlags {
     /// Page is dirty (needs writeback)
     pub dirty: bool,
@@ -26,31 +26,27 @@ pub struct PageFlags {
     /// Page is uptodate (valid data)
     pub uptodate: bool,
     /// Page is referenced (for LRU)
-    pub referenced: AtomicBool,
+    pub referenced: bool,
     /// Page is under writeback
     pub writeback: bool,
 }
 
 impl PageFlags {
-    pub fn clean() -> Self {
-        Self {
-            dirty: false,
-            locked: false,
-            uptodate: true,
-            referenced: AtomicBool::new(false),
-            writeback: false,
-        }
-    }
+    pub const CLEAN: Self = Self {
+        dirty: false,
+        locked: false,
+        uptodate: true,
+        referenced: false,
+        writeback: false,
+    };
 
-    pub fn dirty() -> Self {
-        Self {
-            dirty: true,
-            locked: false,
-            uptodate: true,
-            referenced: AtomicBool::new(true),
-            writeback: false,
-        }
-    }
+    pub const DIRTY: Self = Self {
+        dirty: true,
+        locked: false,
+        uptodate: true,
+        referenced: true,
+        writeback: false,
+    };
 }
 
 /// Cached page entry
@@ -73,7 +69,7 @@ impl CachedPage {
     pub fn new(inode: u64, offset: u64) -> Self {
         Self {
             data: alloc::vec![0u8; PAGE_SIZE],
-            flags: PageFlags::clean(),
+            flags: PageFlags::CLEAN,
             refcount: AtomicUsize::new(0),
             last_access: AtomicU64::new(0),
             inode,
@@ -84,7 +80,7 @@ impl CachedPage {
     pub fn with_data(inode: u64, offset: u64, data: Vec<u8>) -> Self {
         Self {
             data,
-            flags: PageFlags::clean(),
+            flags: PageFlags::CLEAN,
             refcount: AtomicUsize::new(0),
             last_access: AtomicU64::new(0),
             inode,
@@ -119,9 +115,9 @@ impl CachedPage {
     }
 
     /// Update last access time
-    pub fn touch(&self, time: u64) {
+    pub fn touch(&mut self, time: u64) {
         self.last_access.store(time, Ordering::Release);
-        self.flags.referenced.store(true, Ordering::Release);
+        self.flags.referenced = true;
     }
 }
 
@@ -201,7 +197,7 @@ impl PageCache {
     }
 
     /// Add page to cache
-    pub fn insert(&mut self, page: CachedPage) -> Result<(), PageCacheError> {
+    pub fn insert(&mut self, mut page: CachedPage) -> Result<(), PageCacheError> {
         let key = PageKey::new(page.inode, page.offset);
 
         // Check if we need to evict
@@ -209,8 +205,8 @@ impl PageCache {
             self.evict_one()?;
         }
 
-        // Insert page
         let now = self.now();
+        // Insert page
         page.touch(now);
         if page.flags.dirty {
             self.dirty_pages.fetch_add(1, Ordering::Relaxed);

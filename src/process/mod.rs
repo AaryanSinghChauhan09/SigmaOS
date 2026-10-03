@@ -11,8 +11,6 @@ pub mod scheduler;
 pub mod sovereign_process_engine;
 pub mod spawn;
 
-pub use advanced_process_control::*;
-
 pub use pidfd_procdesc_subreaper::{
     ProcessDescriptorRights, ProcessFileDescriptor, SovereignPidfdProcdescEngine,
     SubreaperProcessEntry,
@@ -21,4 +19,16 @@ pub use pidfd_procdesc_subreaper::{
 pub use activity_manager::{
     ActivityManager, AddressSpaceBinding, ApplicationPerformanceProfile,
     ProcessPledgePromises, ProcessResourceLimits, PsiMetrics,
+};
+
+pub use advanced_process_control::{
+    AdvancedIpcHub, BsdRusage, CancellationType, CoreDumpMetadata, EventFd,
+    JobControlLifecycleEngine, JobState, PosixMessage, PosixMessageQueue, ProcessCancelState,
+    ProcessCancellationAndTerminationManager, ProcessControlError, ProcessJobEntry,
+    ProcessVmReadWriteEngine, ProcessWaiterAndRusageCollector, SigQueuePayload,
+    WaitStatus, WCONTINUED, WNOHANG, WUNTRACED,
+};
+
+pub use sovereign_process_engine::{
+    SovereignProcess, SovereignProcessManager, SovereignProcessState, ZeroCopyIpcChannel,
 };

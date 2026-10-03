@@ -272,7 +272,7 @@ impl LinuxPamAuthenticationEngine {
             std::env::var("SIGMA_PAM_TEST_HASH").unwrap_or_else(|_| String::from("__UNSET__"));
         // Only allow auth if the env var is set and matches; never hardcode passwords
         let is_valid =
-            !expected_hash.is_empty() && expected_hash != "__UNSET__" && password == expected_hash;
+            !expected_hash.is_empty() && expected_hash != "__UNSET__" && auth_token == expected_hash;
         self.authenticated_sessions
             .insert(username.to_string(), is_valid);
         Ok(is_valid)

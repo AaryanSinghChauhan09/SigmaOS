@@ -238,7 +238,7 @@ impl PciBus {
     /// Linux: `drivers/pci/probe.c:pci_scan_root_bus()`
     /// FreeBSD: `sys/dev/pci/pci.c:pci_add_children()`
     pub fn scan_all(&mut self) {
-        for bus in 0..256 {
+        for bus in 0..=255 {
             for device in 0..32 {
                 let address = PciAddress::new(bus, device, 0);
                 
@@ -386,5 +386,127 @@ mod tests {
         
         assert_eq!(dev.class_name(), "Display Controller");
         assert!(dev.is_gpu());
+    }
+}
+
+// ── Missing PCI types required by lib.rs re-exports ──────────────────────────
+
+/// PCI BAR (Base Address Register) info
+#[derive(Debug, Clone, Copy)]
+pub struct PciBarInfo {
+    pub index: u8,
+    pub bar_type: PciBarType,
+    pub base: u64,
+    pub size: u64,
+}
+
+/// PCI BAR type
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PciBarType {
+    Memory32,
+    Memory64,
+    Io,
+}
+
+/// PCI bus manager — discovers and manages PCI devices
+#[derive(Debug, Default)]
+pub struct PciBusManager {
+    pub devices: alloc::vec::Vec<PciDevice>,
+}
+
+impl PciBusManager {
+    pub fn new() -> Self { Self::default() }
+    pub fn enumerate(&mut self) { /* stub */ }
+    pub fn find_device(&self, vendor: u16, device: u16) -> Option<&PciDevice> {
+        self.devices.iter().find(|d| d.vendor_id == vendor && d.device_id == device)
+    }
+}
+
+/// PCI device node (enriched view for driver matching)
+#[derive(Debug, Clone)]
+pub struct PciDeviceNode {
+    pub address: PciAddress,
+    pub vendor_id: u16,
+    pub device_id: u16,
+    pub class_code: u8,
+    pub subclass: u8,
+}
+
+/// PCI driver match rule
+#[derive(Debug, Clone)]
+pub struct PciDriverMatchRule {
+    pub vendor_id: u16,
+    pub device_id: u16,
+    pub class_code: Option<u8>,
+}
+
+/// Trait for raw PCI hardware access
+pub trait PciHardwareAccess {
+    fn config_read_u32(&self, addr: PciAddress, offset: u8) -> u32;
+    fn config_write_u32(&mut self, addr: PciAddress, offset: u8, val: u32);
+}
+
+/// PCI header type
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PciHeaderType {
+    Normal,
+    Bridge,
+    CardBus,
+}
+
+/// PCI interrupt routing mode
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PciInterruptMode {
+    Legacy,
+    Msi,
+    MsiX,
+}
+
+/// PCIe Advanced Error Reporting log entry
+#[derive(Debug, Clone)]
+pub struct PcieAerLog {
+    pub severity: PcieAerSeverity,
+    pub message: alloc::string::String,
+}
+
+/// PCIe AER error severity
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PcieAerSeverity {
+    Correctable,
+    NonFatalUncorrectable,
+    FatalUncorrectable,
+}
+
+/// PCIe Active State Power Management state
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PcieAspmState {
+    Disabled,
+    L0s,
+    L1,
+    L0sL1,
+}
+
+/// Simulated PCI hardware access for testing
+#[derive(Debug, Default)]
+pub struct SimulatedPciHardwareAccess {
+    config_space: alloc::vec::Vec<u8>,
+}
+
+impl SimulatedPciHardwareAccess {
+    pub fn new() -> Self { Self { config_space: alloc::vec![0u8; 256] } }
+}
+
+impl PciHardwareAccess for SimulatedPciHardwareAccess {
+    fn config_read_u32(&self, _addr: PciAddress, offset: u8) -> u32 {
+        let off = offset as usize;
+        if off + 4 <= self.config_space.len() {
+            u32::from_le_bytes(self.config_space[off..off+4].try_into().unwrap_or([0;4]))
+        } else { 0 }
+    }
+    fn config_write_u32(&mut self, _addr: PciAddress, offset: u8, val: u32) {
+        let off = offset as usize;
+        if off + 4 <= self.config_space.len() {
+            self.config_space[off..off+4].copy_from_slice(&val.to_le_bytes());
+        }
     }
 }

@@ -17,7 +17,6 @@ use alloc::vec::Vec;
 use std::collections::BTreeMap;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
-#[cfg(any(feature = "standalone_test", test))]
 
 // =========================================================================
 // 1. ZSWAP TRANSPARENT PAGE COMPRESSION ENGINE (INFLIGHT MEMORY POOL)

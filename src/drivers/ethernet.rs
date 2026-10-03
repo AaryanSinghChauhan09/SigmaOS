@@ -48,7 +48,7 @@ pub enum EtherType {
 
 /// Ethernet frame header (14 bytes)
 #[repr(C, packed)]
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct EthernetHeader {
     pub dst_mac: [u8; 6],
     pub src_mac: [u8; 6],

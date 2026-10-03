@@ -19,6 +19,8 @@ pub mod tmpfs;
 pub mod btrfs;
 pub mod zfs;
 pub mod zfs_arc;
+pub mod btrfs_snapshots;
+pub mod snapshot_manager;
 
 pub use crate::filesystem::vfs::{FileType, FsError, Inode, VfsError, VirtualFilesystem};
 pub use smart_symlink::{LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule};
@@ -39,7 +41,7 @@ pub use archive::{
     ArchiveEntry, ArchiveError, ArchiveFormat, ArchiveHandler, ArchiveManager, ArchiveResult,
     CompressionLevel, TarArchiveHandler, ZipArchiveHandler,
 };
-pub use cow_snapshot::{CowSnapshot, CowSnapshotManager, FileTransaction, SnapshotState};
+pub use cow_snapshot::{CowSnapshot, CowSnapshotManager, FileTransaction, SnapshotState, MerkleTree, DedupeTable, ExtentRef, MerkleNode, DedupeEntry};
 pub use defragmenter::{ClusterState, DefragStats, DiskDefragmenter, FragmentedFile};
 pub use disk_usage::{
     AnalysisMode, AnalysisStrategy, DeepAnalysisStrategy, DirectorySizeInfo, DiskUsageAnalyzer,
@@ -85,6 +87,8 @@ pub use zfs::{
     VdevType, VdevState, PoolState, DatasetType,
 };
 pub use zfs_arc::{ArcConfig, ArcEntry, ArcStats, ZfsArc};
+pub use btrfs_snapshots::{BtrfsExtentTree, BtrfsSnapshotEngine, BtrfsSubvolume, ExtentItem, BtrfsSnapshotError, ExtentFlags, ExtentDiff, DiffKind};
+pub use snapshot_manager::{RetentionPolicy, SnapshotBackend, SnapshotManager, SnapshotManagerError, SnapshotRecord, SnapshotSchedule};
 
 pub type FileDescriptor = i32;
 pub type FilePermissions = u32;

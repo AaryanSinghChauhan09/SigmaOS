@@ -2,6 +2,15 @@
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
+extern crate alloc;
+
+// Temporary stubs for missing implementations
+pub mod stubs;
+
+pub mod ai;
+pub mod compositor;
+pub mod graphics;
+
 pub mod access;
 pub mod accessibility;
 pub mod audio;
@@ -38,8 +47,8 @@ pub mod orchestration;
 pub mod package;
 pub use package::{
     SovereignDistroPackageAdvancementsSuiteV10, SovereignDistroPackageAdvancementsSuiteV11,
-    SovereignDistroPackageAdvancementsSuiteV14, SovereignDistroPackageAdvancementsSuiteV18,
-    UniversalForeignPackageFormat, UniversalForeignPackageFormatConverter,
+    SovereignDistroPackageAdvancementsSuiteV14, UniversalForeignPackageFormat,
+    UniversalForeignPackageFormatConverter,
 };
 pub mod process;
 pub mod productivity;
@@ -114,7 +123,6 @@ pub use distro::sovereign_linux_bsd_master_synthesis::*;
 pub use distro::sovereign_media_and_distro_unimplemented_innovations::*;
 pub use distro::sovereign_linux_bsd_pinnacle_innovations_v14::*;
 pub use distro::sovereign_2075_distro_supremacy_engine::*;
-pub use distro::sovereign_universal_subsystem_interop::*;
 pub use kernel::tss_ring3_user_mode::*;
 pub use open_source_obsoletion::open_source_os_gap_closure::*;
 pub use tools::tech_media_extended_suite::*;
@@ -208,12 +216,12 @@ pub use distro::{
     UpdateChannel, UpdateError, VirtioFsZeroCopyBridge, VoidRunitManager, VoidRunitSupervisor,
     WikiPage, Win32Gdi, WindowsRegistry, Yast2ControlCenter, YastSetting,
 };
-pub use driver::pci_bus::{
+pub use drivers::pci_bus::{
     PciAddress, PciBarInfo, PciBarType, PciBusManager, PciDeviceNode, PciDriverMatchRule,
     PciHardwareAccess, PciHeaderType, PciInterruptMode, PcieAerLog, PcieAerSeverity, PcieAspmState,
     SimulatedPciHardwareAccess,
 };
-pub use driver::{
+pub use drivers::{
     AudioDspStream, AudioSampleFormat, Bluetooth54LeAudioDriver, BusType, DriverCapability,
     DriverIsolationRingGuard, DrmAtomicKmsState, DrmConnectorType, DrmDisplayMode, EvdevEvent,
     EvdevEventType, EvdevInputDevice, FreeBsdDrmConnector, GpioDirection, GpioState,
@@ -308,7 +316,7 @@ pub use virtualization::{
 pub use thread::{Thread, ThreadError, Mutex as ThreadMutex};
 
 pub use process::spawn::{
-    ProcessID, ProcessState as LibProcessState, ProcessError, Process, SimpleProcess, ProcessSpawner, SimpleProcessSpawner, ProcessWaiter, SimpleProcessWaiter, ProcessGroup, SimpleProcessGroup,
+    ProcessID, ProcessState as LibProcessState, ProcessError, Process as SpawnProcess, SimpleProcess, ProcessSpawner, SimpleProcessSpawner, ProcessWaiter, SimpleProcessWaiter, ProcessGroup, SimpleProcessGroup,
     CLONE_NEWNS, CLONE_NEWNET, CLONE_NEWPID,
 };
 pub use process::activity_manager::{

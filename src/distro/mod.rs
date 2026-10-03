@@ -384,5 +384,6 @@ pub use sovereign_linux_bsd_pinnacle_innovations_v14::*;
 pub mod sovereign_2075_distro_supremacy_engine;
 pub use sovereign_2075_distro_supremacy_engine::*;
 
-pub mod sovereign_universal_subsystem_interop;
-pub use sovereign_universal_subsystem_interop::*;
+// Re-export stub types
+pub use crate::stubs::distro_stubs::*;
+pub use crate::stubs::large_distro_stubs::*;

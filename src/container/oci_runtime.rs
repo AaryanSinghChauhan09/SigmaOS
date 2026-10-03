@@ -267,7 +267,11 @@ impl ImageManager for SimpleImageManager {
     }
 
     fn list_images(&self) -> Vec<([u8; 128], [u8; 32])> {
-        self.images.iter().map(|img| (img.0, img.2)).collect()
+        let mut result = Vec::new();
+        for img in self.images.iter() {
+            result.push((img.0, img.2));
+        }
+        result
     }
 
     fn remove_image(&mut self, name: &[u8], _tag: &[u8]) -> Result<(), ContainerError> {
@@ -276,9 +280,10 @@ impl ImageManager for SimpleImageManager {
             &img.0[..img.1 as usize] == name
         }) {
             self.images.remove(pos);
-            return Ok(());
+            Ok(())
+        } else {
+            Err(ContainerError::InvalidConfig)
         }
-        Err(ContainerError::InvalidConfig)
     }
 }
 
@@ -412,16 +417,6 @@ impl<T> core::ops::DerefMut for Vec<T> {
         } else {
             unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
         }
-    }
-}
-
-impl<T> core::iter::FromIterator<T> for Vec<T> {
-    fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
-        let mut vec = Self::new();
-        for item in iter {
-            vec.push(item);
-        }
-        vec
     }
 }
 

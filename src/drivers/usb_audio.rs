@@ -12,7 +12,6 @@ use alloc::vec::Vec;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum UacClassCode {
     Audio = 0x01,
-    AudioControl = 0x01,
     AudioStreaming = 0x02,
     MidiStreaming = 0x03,
 }

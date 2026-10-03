@@ -3,6 +3,8 @@ use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use std::collections::HashMap;
 
+pub use crate::stubs::kernel_stubs::*;
+
 /// Arch Linux inspired AUR-style user repos and minimal base
 pub struct ArchUserRepoManager {
     packages: HashMap<String, String>,
@@ -703,6 +705,15 @@ pub struct CgroupResourceLimitsV1 {
     pub io_weight: u32,
 }
 
+#[derive(Debug, Clone)]
+pub struct CgroupGroup {
+    pub path: String,
+    pub limits: Option<CgroupResourceLimits>,
+    pub pids: Vec<u64>,
+    pub cpu_used_us: u64,
+    pub memory_allocated_bytes: u64,
+}
+
 pub struct SovereignCgroupGovernorV1 {
     pub groups: HashMap<String, CgroupGroup>,
 }
@@ -749,7 +760,7 @@ impl SovereignCgroupGovernorV1 {
 
     pub fn attach_pid(&mut self, path: &str, pid: u32) -> Result<(), &'static str> {
         let group = self.groups.get_mut(path).ok_or("Group not found")?;
-        group.pids.push(pid);
+        group.pids.push(pid as u64);
         Ok(())
     }
 

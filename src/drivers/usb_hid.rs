@@ -8,6 +8,9 @@ extern crate alloc;
 use alloc::vec::Vec;
 use alloc::collections::BTreeMap;
 
+// Re-export USB HID stubs
+pub use crate::stubs::usb_hid_stubs::*;
+
 /// HID Class descriptor types
 #[repr(u8)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

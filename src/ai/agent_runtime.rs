@@ -458,7 +458,7 @@ impl SovereignAgentRuntime {
             task_type: "crash_analysis".into(),
             analysis: format!(
                 "Process {} crashed with signal {}. Backtrace analysis in progress.",
-                crash_dump.process_id.0, crash_dump.signal
+                crash_dump.process_id, crash_dump.signal
             ),
             recommendations: vec![
                 "Check for null pointer dereference".into(),

@@ -1,4 +1,5 @@
 // SigmaOS Drivers Module
+pub mod advanced_types;
 pub mod acpi;
 pub mod ata_bus_controller;
 pub mod block_io;
@@ -39,7 +40,6 @@ pub mod ethernet;
 pub mod wifi_80211;
 pub mod nvme_driver;
 pub mod ahci_sata;
-pub mod usb_hid;
 pub mod usb_mass_storage;
 pub mod usb_audio;
 pub mod usb_video;
@@ -65,7 +65,7 @@ pub use linux_bsd_drivers::{
     RpiBcmSocDriver, SdhciEmmcStorageDriver, SensorReadings, SovereignDeviceManager,
     SovereignWirelessCardDriver, ThunderboltSecurityLevel, ThunderboltUsb4Driver, Uac2AudioDriver,
     UrbTransferType, UvcCameraDriver, VideoPixelFormat, VirtioGpu3dDriver, VirtioSoundDriver,
-    WacomPrecisionTouchpadDriver, WifiMode,
+    WacomPrecisionTouchpadDriver,
 };
 pub use modern_audio_intel_hda::*;
 pub use modern_nvme::*;
@@ -95,8 +95,6 @@ pub use modern_audio_intel_hda::ModernAudioIntelHda;
 pub use modern_nvme::ModernNvmeDriver;
 pub use modern_wifi::ModernWifiDriver;
 pub use touch_jingos::TouchJingosDriver;
-pub mod ethernet;
-pub mod wifi_80211;
 
 pub use usb_stack::{
     UsbDevice, UsbDeviceDescriptor, UsbSpeed, UsbDeviceState, UsbHostController,
@@ -116,8 +114,5 @@ pub use nvme_driver::{
     NvmeAdminOpcode, NvmeIOOpcode, NvmeError,
 };
 
-pub mod nvme_driver;
-pub use nvme_driver::{
-    NvmeController, NvmeQueuePair, NvmeSQEntry, NvmeCQEntry, NvmeNamespace,
-    NvmeAdminOpcode, NvmeIOOpcode, NvmeError,
-};
+// Re-export advanced driver types
+pub use advanced_types::*;

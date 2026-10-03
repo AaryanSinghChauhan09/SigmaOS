@@ -8,7 +8,7 @@
 extern crate alloc;
 use alloc::collections::VecDeque;
 use alloc::vec::Vec;
-use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicU32, AtomicU64, AtomicUsize, Ordering};
 
 /// Block size (512 bytes - standard sector size)
 pub const BLOCK_SIZE: usize = 512;

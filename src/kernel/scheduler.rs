@@ -123,6 +123,12 @@ impl Ord for ProcessTask {
     }
 }
 
+impl PartialOrd for ProcessTask {
+    fn partial_cmp(&self, other: &Self) -> Option<CmpOrdering> {
+        Some(self.cmp(other))
+    }
+}
+
 /// CFS Scheduler implementation
 ///
 /// Completely Fair Scheduler inspired by Linux CFS.

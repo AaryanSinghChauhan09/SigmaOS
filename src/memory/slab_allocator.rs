@@ -100,12 +100,12 @@ impl SlabCache {
 
     /// Allocate from specific slab list
     fn allocate_from_slab_list(list: &mut *mut Slab, full_slabs: &mut *mut Slab) -> Option<NonNull<u8>> {
-        if list.is_null() || unsafe { (*list).is_null() } {
+        if list.is_null() {
             return None;
         }
 
         unsafe {
-            let slab = &mut *list_ptr;
+            let slab = &mut **list;
             
             if slab.free_list.is_null() {
                 return None;
@@ -149,7 +149,7 @@ impl SlabCache {
 
     /// Move slab from one list to another
     unsafe fn move_slab_to_full(from: &mut *mut Slab, full_slabs: &mut *mut Slab) {
-        if from.is_null() || (*from).is_null() {
+        if from.is_null() {
             return;
         }
 

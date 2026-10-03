@@ -304,14 +304,15 @@ impl PamacPackageManager {
     pub fn build_and_install_aur(&mut self, pkg: AurPackage) -> Result<(), &'static str> {
         // First resolve dependencies in user-space
         for dep in &pkg.dependencies {
-            let dep_str = dep.to_string();
-            if !self.installed_packages.contains_key(&dep_str)
-                && !self.installed_aur_packages.contains_key(&dep_str)
+            let dep_str: &str = dep.as_str();
+            if !self.installed_packages.contains_key(dep_str)
+                && !self.installed_aur_packages.contains_key(dep_str)
             {
                 return Err("Missing required AUR build dependency.");
             }
         }
-        self.installed_aur_packages.insert(pkg.name.to_string(), pkg);
+        let pkg_name = pkg.name.as_str().to_string();
+        self.installed_aur_packages.insert(pkg_name, pkg);
         Ok(())
     }
 

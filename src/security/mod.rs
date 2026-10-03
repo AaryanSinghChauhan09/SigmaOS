@@ -6,6 +6,7 @@ pub use address_sanitizer::{AddressSanitizer, MemoryRegion};
 pub mod audit;
 pub mod bsd_hardening;
 pub mod capability;
+pub mod cap_rights;
 pub mod capsicum;
 pub mod governance;
 pub mod hardware_privilege;
@@ -55,12 +56,14 @@ pub mod root_improvement;
 pub mod rules;
 pub mod scanner;
 pub mod secrets;
-pub mod selinux;
 pub mod selinux_advanced;
 pub mod unveil;
 pub mod vulnerability;
 pub use landlock::{LandlockEngine, LandlockPathBeneathAttr, LandlockRuleset};
 pub mod landlock_sovereign;
+
+pub mod system_audit;
+pub mod filesystem_encryption;
 
 pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
 pub use system_audit::{
@@ -172,7 +175,21 @@ pub mod phase_audit;
 
 pub use hardware_privilege::*;
 
-pub use capsicum::{CapEntry, CapMode, CapRight, CapabilitySandbox};
+pub use capsicum::{
+    CapEntry, CapMode, CapRight, CapabilitySandbox,
+    ProcessCapState, CapabilityMode, CapError, FdRightsEntry,
+    ProcDescTable, ProcessDescriptor, log_cap_violation,
+};
+pub use cap_rights::{
+    CapRightsMask, CAP_READ, CAP_WRITE, CAP_SEEK, CAP_PREAD, CAP_PWRITE,
+    CAP_FSTAT, CAP_FSTATAT, CAP_FCNTL, CAP_FCHDIR, CAP_FCHFLAGS, CAP_FCHMOD,
+    CAP_FCHOWN, CAP_FLOCK, CAP_FSYNC, CAP_FTRUNCATE, CAP_MMAP, CAP_MMAP_R,
+    CAP_MMAP_W, CAP_MMAP_X, CAP_MMAP_RW, CAP_MMAP_RX, CAP_MMAP_WX, CAP_MMAP_RWX,
+    CAP_CREATE, CAP_DELETE, CAP_UNLINK, CAP_MKDIR, CAP_RMDIR, CAP_LOOKUP,
+    CAP_ACCEPT, CAP_BIND, CAP_CONNECT, CAP_LISTEN, CAP_RECV, CAP_SEND,
+    CAP_IOCTL, CAP_EVENT, CAP_PDWAIT, CAP_PDKILL, CAP_PDGETPID, CAP_ALL,
+    CAP_READ_RIGHTS, CAP_WRITE_RIGHTS, CAP_NETWORK_RIGHTS,
+};
 pub use memory_protection::{
     AslrConfig, MemoryProtectionManager, MemoryProtectionMode, StackCanaryConfig,
 };

@@ -10,7 +10,6 @@ use alloc::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
-#[cfg(any(feature = "standalone_test", test))]
 
 /// Represents a literal variable in SAT CNF (boolean form)
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
