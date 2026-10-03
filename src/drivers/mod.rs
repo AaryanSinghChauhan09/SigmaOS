@@ -102,3 +102,13 @@ pub use wifi_80211::{
     ChannelWidth, BssInfo, StationInfo, ScanRequest, ConnectParams,
     WifiCapabilities, WifiError, Dot11Header, FrameType,
 };
+pub use nvme_driver::{
+    NvmeController, NvmeQueuePair, NvmeSQEntry, NvmeCQEntry, NvmeNamespace,
+    NvmeAdminOpcode, NvmeIOOpcode, NvmeError,
+};
+
+pub mod nvme_driver;
+pub use nvme_driver::{
+    NvmeController, NvmeQueuePair, NvmeSQEntry, NvmeCQEntry, NvmeNamespace,
+    NvmeAdminOpcode, NvmeIOOpcode, NvmeError,
+};
