@@ -7,10 +7,10 @@ use std::format;
 use std::string::String;
 use std::vec::Vec;
 
-#[cfg(not(test))]
-use crate::klib::HashMap;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::collections::BTreeMap as HashMap;
 
-#[cfg(test)]
+#[cfg(any(feature = "standalone_test", test))]
 use std::collections::HashMap;
 
 /// x86-64 Microarchitecture Level (CachyOS / Arch Linux parity)
