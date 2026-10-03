@@ -36,40 +36,50 @@ impl CpuFreqCore {
     }
 
     /// Linux cpufreq-style dynamic frequency scaling calculation.
-    /// Maps CPU load/utilization metric to target frequency based on the active governor.
+    /// Maps CPU utilization to a requested target; hardware changes belong to a
+    /// platform frequency-scaling driver.
     pub fn scale_frequency(&self, cpu_utilization: usize) -> usize {
         let utilization = cpu_utilization.min(100);
+        // Keep calculations ordered even if public configuration fields were
+        // initialized with reversed limits.
+        let min_frequency = self.min_frequency_mhz.min(self.max_frequency_mhz);
+        let max_frequency = self.min_frequency_mhz.max(self.max_frequency_mhz);
+        let range = max_frequency - min_frequency;
 
         let target = match self.active_governor {
-            CpuGovernor::Performance => self.max_frequency_mhz,
-            CpuGovernor::Powersave => self.min_frequency_mhz,
+            CpuGovernor::Performance => max_frequency,
+            CpuGovernor::Powersave => min_frequency,
             CpuGovernor::Ondemand => {
                 if utilization > 80 {
-                    self.max_frequency_mhz // Jump directly to max on spike
+                    max_frequency // Jump directly to max on spike
                 } else {
                     // Decays gradually relative to load
-                    let range = self.max_frequency_mhz - self.min_frequency_mhz;
-                    self.min_frequency_mhz + (range * utilization / 100)
+                    min_frequency + ((range as u128 * utilization as u128 / 100) as usize)
                 }
             }
             CpuGovernor::Conservative => {
-                let current = self.current_frequency_mhz.load(Ordering::SeqCst);
+                let current = self
+                    .current_frequency_mhz
+                    .load(Ordering::SeqCst)
+                    .clamp(min_frequency, max_frequency);
+                let step = (range / 10).max(1);
                 if utilization > 60 {
                     // Step up gradually by 10%
-                    let step = (self.max_frequency_mhz - self.min_frequency_mhz) / 10;
-                    (current + step).min(self.max_frequency_mhz)
+                    current.saturating_add(step).min(max_frequency)
                 } else if utilization < 20 {
                     // Step down gradually by 10%
-                    let step = (self.max_frequency_mhz - self.min_frequency_mhz) / 10;
-                    current.saturating_sub(step).max(self.min_frequency_mhz)
+                    current.saturating_sub(step).max(min_frequency)
                 } else {
                     current
                 }
             }
             CpuGovernor::Schedutil => {
                 // Schedutil: Frequency = 1.25 * MaxFrequency * (Utilization / 100)
-                let calculated = (self.max_frequency_mhz * utilization * 125) / 10000;
-                calculated.clamp(self.min_frequency_mhz, self.max_frequency_mhz)
+                let calculated = (max_frequency as u128)
+                    .saturating_mul(utilization as u128)
+                    .saturating_mul(125)
+                    / 10_000;
+                calculated.clamp(min_frequency as u128, max_frequency as u128) as usize
             }
         };
 
