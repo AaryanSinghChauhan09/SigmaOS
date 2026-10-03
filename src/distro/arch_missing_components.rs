@@ -30,11 +30,9 @@ use std::format;
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec;
 #[cfg(any(feature = "standalone_test", test))]
-
 // =========================================================================
 // 1. MAKEPKG PKGBUILD PACKAGE BUILDER ENGINE (makepkg)
 // =========================================================================
-
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PkgbuildSpec {
     pub pkgname: String,
