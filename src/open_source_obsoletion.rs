@@ -3899,6 +3899,11 @@ pub struct SovereignOpenSourceObsoletionOrchestrator {
     pub uutils_coreutils: SovereignUutilsCoreutilsEngine,
     pub freebsd_jail_rctl: SovereignFreeBsdJailRctlEngine,
     pub nix_flake_lock: SovereignNixFlakeLockEngine,
+    pub cosmic_applets: open_source_os_gap_closure::SovereignPopOsCosmicAppletEngine,
+    pub alpine_lbu: open_source_os_gap_closure::SovereignAlpineLbuOverlayGovernor,
+    pub openbsd_retguard: open_source_os_gap_closure::SovereignOpenBsdRetguardEngine,
+    pub hardenedbsd_pax: open_source_os_gap_closure::SovereignHardenedBsdPaxGuardEngine,
+    pub cachyos_bore: open_source_os_gap_closure::SovereignCachyOsBoreTunerEngine,
     pub total_obsoleted_projects_count: u32,
 }
 
@@ -4011,7 +4016,12 @@ impl SovereignOpenSourceObsoletionOrchestrator {
             uutils_coreutils: SovereignUutilsCoreutilsEngine::new(),
             freebsd_jail_rctl: SovereignFreeBsdJailRctlEngine::new(),
             nix_flake_lock: SovereignNixFlakeLockEngine::new(),
-            total_obsoleted_projects_count: 98,
+            cosmic_applets: open_source_os_gap_closure::SovereignPopOsCosmicAppletEngine::new(),
+            alpine_lbu: open_source_os_gap_closure::SovereignAlpineLbuOverlayGovernor::new("/media/sda1"),
+            openbsd_retguard: open_source_os_gap_closure::SovereignOpenBsdRetguardEngine::new(),
+            hardenedbsd_pax: open_source_os_gap_closure::SovereignHardenedBsdPaxGuardEngine::new(),
+            cachyos_bore: open_source_os_gap_closure::SovereignCachyOsBoreTunerEngine::new(),
+            total_obsoleted_projects_count: 103,
         }
     }
 
@@ -4169,6 +4179,13 @@ impl SovereignOpenSourceObsoletionOrchestrator {
             "e0a1b2c3d4e5f6",
         );
         assert!(self.nix_flake_lock.verify_flake_lockfile());
+
+        self.cosmic_applets.register_applet("top_bar", open_source_os_gap_closure::LayerShellAnchor::Top, 1920, 32);
+        self.alpine_lbu.track_file_change("/etc/hostname", b"sigmaos");
+        let retguard_canary = self.openbsd_retguard.enter_function("boot", 0x1234, 0x7FFF0000);
+        let _ = self.openbsd_retguard.verify_exit_function("boot", retguard_canary, 0x7FFF0000);
+        let _ = self.hardenedbsd_pax.check_mprotect(1, 0x1000, true, false);
+        self.cachyos_bore.auto_tune_microarchitecture(true, true, true);
 
         Ok(format!(
             "Sovereign Stack Active: {} legacy open-source projects obsoleted",
@@ -7563,8 +7580,8 @@ mod tests {
     fn test_sovereign_orchestrator_bootstrap() {
         let mut orchestrator = SovereignOpenSourceObsoletionOrchestrator::new();
         let status = orchestrator.bootstrap_sovereign_stack().unwrap();
-        assert!(status.contains("98 legacy open-source projects obsoleted"));
-        assert_eq!(orchestrator.total_obsoleted_projects_count, 98);
+        assert!(status.contains("103 legacy open-source projects obsoleted"));
+        assert_eq!(orchestrator.total_obsoleted_projects_count, 103);
         assert_eq!(orchestrator.serenity_async.processed_count, 0);
         assert_eq!(orchestrator.serenity_async.task_queue.len(), 1);
         assert_eq!(orchestrator.qubes_isolation.domains.len(), 1);
