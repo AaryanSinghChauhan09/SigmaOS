@@ -115,7 +115,7 @@ impl CachedPage {
     }
 
     /// Update last access time
-    pub fn touch(&mut self, time: u64) {
+    pub fn touch(&self, time: u64) {
         self.last_access.store(time, Ordering::Release);
         self.flags.referenced = true;
     }
@@ -185,9 +185,8 @@ impl PageCache {
     /// Look up page in cache
     pub fn lookup(&mut self, inode: u64, offset: u64) -> Option<&mut CachedPage> {
         let key = PageKey::new(inode, offset);
-        let time = self.now();
         if let Some(page) = self.pages.get_mut(&key) {
-            page.touch(time);
+            page.touch(self.now());
             self.hits.fetch_add(1, Ordering::Relaxed);
             Some(page)
         } else {
@@ -197,7 +196,7 @@ impl PageCache {
     }
 
     /// Add page to cache
-    pub fn insert(&mut self, mut page: CachedPage) -> Result<(), PageCacheError> {
+    pub fn insert(&mut self, page: CachedPage) -> Result<(), PageCacheError> {
         let key = PageKey::new(page.inode, page.offset);
 
         // Check if we need to evict
@@ -206,8 +205,7 @@ impl PageCache {
         }
 
         // Insert page
-        let time = self.now();
-        page.touch(time);
+        page.touch(self.now());
         if page.flags.dirty {
             self.dirty_pages.fetch_add(1, Ordering::Relaxed);
         }
@@ -216,7 +214,7 @@ impl PageCache {
         self.current_pages.fetch_add(1, Ordering::Relaxed);
         self.lru.push(LruEntry {
             key,
-            last_access: time,
+            last_access: self.now(),
         });
 
         Ok(())
@@ -253,7 +251,7 @@ impl PageCache {
     }
 
     /// Write dirty page to storage
-    fn writeback_page_static(page: &mut CachedPage) -> Result<(), PageCacheError> {
+    fn writeback_page(&mut self, page: &mut CachedPage) -> Result<(), PageCacheError> {
         if !page.flags.dirty {
             return Ok(());
         }
@@ -264,18 +262,17 @@ impl PageCache {
         Ok(())
     }
 
-    fn writeback_page(&mut self, page: &mut CachedPage) -> Result<(), PageCacheError> {
-        Self::writeback_page_static(page)
-    }
-
     /// Flush all dirty pages
     pub fn flush(&mut self) -> Result<usize, PageCacheError> {
         let mut flushed = 0;
+        let keys: Vec<PageKey> = self.pages.keys().copied().collect();
 
-        for page in self.pages.values_mut() {
-            if page.flags.dirty {
-                Self::writeback_page_static(page)?;
-                flushed += 1;
+        for key in keys {
+            if let Some(page) = self.pages.get_mut(&key) {
+                if page.flags.dirty {
+                    self.writeback_page(page)?;
+                    flushed += 1;
+                }
             }
         }
 

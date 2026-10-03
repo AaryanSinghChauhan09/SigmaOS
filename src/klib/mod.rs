@@ -26,7 +26,11 @@ pub mod math;
 pub mod math_ops;
 pub mod merkle;
 pub mod net;
+pub mod ring_buffer;
 pub mod rng;
+pub mod slab;
+pub mod uuid;
+pub mod zero_dependency_elimination;
 
 pub use arc::Arc;
 pub use collections::BTreeMap;

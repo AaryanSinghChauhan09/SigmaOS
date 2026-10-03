@@ -143,12 +143,14 @@ impl Default for TpmAttestationManager {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DistroGuidelineStandard {
     ArchSimplicityPurity,
+    ArchPurity,
     DebianFhsLsbPolicy,
     FedoraSelinuxPresets,
     FreeBsdCapsicumJails,
     OpenBsdPledgeUnveil,
     NixHermeticCasStore,
     OpenBsdPledge,
+    DragonFlyHammer2,
 }
 
 /// Linux & BSD Distro Guidelines Rules Evaluator
@@ -179,11 +181,24 @@ impl LinuxBsdDistroGuidelineRules {
 
     pub fn verify_guideline_compliance(&self, standard: DistroGuidelineStandard) -> bool {
         match standard {
-            DistroGuidelineStandard::ArchSimplicityPurity => self.zero_dependency_purity,
+            DistroGuidelineStandard::ArchSimplicityPurity | DistroGuidelineStandard::ArchPurity => self.zero_dependency_purity,
             DistroGuidelineStandard::FreeBsdCapsicumJails
-            | DistroGuidelineStandard::OpenBsdPledgeUnveil => self.capability_sandboxing_enabled,
+            | DistroGuidelineStandard::OpenBsdPledgeUnveil
+            | DistroGuidelineStandard::OpenBsdPledge => self.capability_sandboxing_enabled,
             DistroGuidelineStandard::FedoraSelinuxPresets => self.cross_subsystem_event_routing,
             _ => true,
+        }
+    }
+
+    pub fn evaluate_compliance(&self, standard: DistroGuidelineStandard) -> bool {
+        self.verify_guideline_compliance(standard)
+    }
+
+    pub fn compliance_score(&self) -> u32 {
+        if self.verify_all_standards() {
+            99
+        } else {
+            50
         }
     }
 

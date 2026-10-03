@@ -217,7 +217,7 @@ impl PciBus {
         // Read all BARs
         let mut bars = [0u64; 6];
         for i in 0..6 {
-            bars[i] = Self::read_bar(address, i as u8);
+            bars[i] = Self::read_bar(address, i);
         }
 
         let device = PciDevice {

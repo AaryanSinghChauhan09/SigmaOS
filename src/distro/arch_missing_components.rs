@@ -9,27 +9,30 @@
 // 7. pkgctl Devtools Package Repo Management Engine
 // 8. pacman File Collision & Conflict Resolution Engine
 
-#[cfg(not(any(feature = "standalone_test", test)))]
+#[cfg(feature = "standalone_test")]
 extern crate alloc;
 
-#[cfg(not(any(feature = "standalone_test", test)))]
+#[cfg(feature = "standalone_test")]
 use alloc::collections::BTreeMap;
-#[cfg(not(any(feature = "standalone_test", test)))]
-#[cfg(not(any(feature = "standalone_test", test)))]
+#[cfg(feature = "standalone_test")]
+use alloc::format;
+#[cfg(feature = "standalone_test")]
 use alloc::string::{String, ToString};
-#[cfg(not(any(feature = "standalone_test", test)))]
+#[cfg(feature = "standalone_test")]
 use alloc::vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
+#[cfg(feature = "standalone_test")]
 use alloc::vec::Vec;
 
-#[cfg(any(feature = "standalone_test", test))]
+#[cfg(not(feature = "standalone_test"))]
 use std::collections::BTreeMap;
-#[cfg(any(feature = "standalone_test", test))]
+#[cfg(not(feature = "standalone_test"))]
 use std::format;
-#[cfg(any(feature = "standalone_test", test))]
-#[cfg(any(feature = "standalone_test", test))]
+#[cfg(not(feature = "standalone_test"))]
+use std::string::{String, ToString};
+#[cfg(not(feature = "standalone_test"))]
 use std::vec;
-#[cfg(any(feature = "standalone_test", test))]
+#[cfg(not(feature = "standalone_test"))]
+use std::vec::Vec;
 
 // =========================================================================
 // 1. MAKEPKG PKGBUILD PACKAGE BUILDER ENGINE (makepkg)

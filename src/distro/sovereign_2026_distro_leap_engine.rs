@@ -19,25 +19,26 @@
 //    auto-tuning and Alpine APK v3 PQC package signature verifier.
 // 6. Sovereign2026DistroSuperiorityMasterEngine: Master coordinator computing the Distro Superiority Index.
 
-#[cfg(not(any(feature = "standalone_test", test)))]
+#[cfg(feature = "standalone_test")]
 extern crate alloc;
 
-#[cfg(not(any(feature = "standalone_test", test)))]
+#[cfg(feature = "standalone_test")]
 use alloc::collections::BTreeMap;
-#[cfg(not(any(feature = "standalone_test", test)))]
-#[cfg(not(any(feature = "standalone_test", test)))]
+#[cfg(feature = "standalone_test")]
 use alloc::string::{String, ToString};
-#[cfg(not(any(feature = "standalone_test", test)))]
+#[cfg(feature = "standalone_test")]
 use alloc::vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
+#[cfg(feature = "standalone_test")]
 use alloc::vec::Vec;
 
-#[cfg(any(feature = "standalone_test", test))]
+#[cfg(not(feature = "standalone_test"))]
 use std::collections::BTreeMap;
-#[cfg(any(feature = "standalone_test", test))]
-#[cfg(any(feature = "standalone_test", test))]
+#[cfg(not(feature = "standalone_test"))]
+use std::string::{String, ToString};
+#[cfg(not(feature = "standalone_test"))]
 use std::vec;
-#[cfg(any(feature = "standalone_test", test))]
+#[cfg(not(feature = "standalone_test"))]
+use std::vec::Vec;
 
 // ============================================================================
 // 1. SovereignSchedExtBoreV2Governor

@@ -9,24 +9,30 @@
 // - Linux udp2raw (Fake-TCP Tunnel Engine for Anti-Middlebox UDP Encapsulation)
 // - Linux 6.12+ Bcachefs (Multi-Tier CoW Storage Engine with NVMe/SSD/HDD Promotion)
 
-#[cfg(not(any(feature = "standalone_test", test)))]
+#[cfg(feature = "standalone_test")]
 extern crate alloc;
 
-#[cfg(not(any(feature = "standalone_test", test)))]
+#[cfg(feature = "standalone_test")]
 use alloc::collections::BTreeMap;
-#[cfg(not(any(feature = "standalone_test", test)))]
+#[cfg(feature = "standalone_test")]
+use alloc::format;
+#[cfg(feature = "standalone_test")]
 use alloc::string::{String, ToString};
-#[cfg(not(any(feature = "standalone_test", test)))]
+#[cfg(feature = "standalone_test")]
+use alloc::vec;
+#[cfg(feature = "standalone_test")]
 use alloc::vec::Vec;
 
-#[cfg(any(feature = "standalone_test", test))]
+#[cfg(not(feature = "standalone_test"))]
 use std::collections::BTreeMap;
-#[cfg(any(feature = "standalone_test", test))]
+#[cfg(not(feature = "standalone_test"))]
 use std::format;
-#[cfg(any(feature = "standalone_test", test))]
-#[cfg(any(feature = "standalone_test", test))]
+#[cfg(not(feature = "standalone_test"))]
+use std::string::{String, ToString};
+#[cfg(not(feature = "standalone_test"))]
 use std::vec;
-#[cfg(any(feature = "standalone_test", test))]
+#[cfg(not(feature = "standalone_test"))]
+use std::vec::Vec;
 
 // =========================================================================
 // 1. NETBSD VERIEXEC FILE EXECUTABLE SECURITY ENGINE

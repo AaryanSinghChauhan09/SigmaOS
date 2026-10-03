@@ -6,19 +6,22 @@
 // 4. Network-Native Session Serialization & Migration Engine
 // 5. Temporal Point-in-Time Filesystem State Snapshotting
 
-#[cfg(not(any(feature = "standalone_test", test)))]
+#[cfg(feature = "standalone_test")]
 extern crate alloc;
 
-#[cfg(not(any(feature = "standalone_test", test)))]
-#[cfg(not(any(feature = "standalone_test", test)))]
+#[cfg(feature = "standalone_test")]
+use alloc::format;
+#[cfg(feature = "standalone_test")]
 use alloc::string::{String, ToString};
-#[cfg(not(any(feature = "standalone_test", test)))]
+#[cfg(feature = "standalone_test")]
 use alloc::vec::Vec;
 
-#[cfg(any(feature = "standalone_test", test))]
+#[cfg(not(feature = "standalone_test"))]
 use std::format;
-#[cfg(any(feature = "standalone_test", test))]
-#[cfg(any(feature = "standalone_test", test))]
+#[cfg(not(feature = "standalone_test"))]
+use std::string::{String, ToString};
+#[cfg(not(feature = "standalone_test"))]
+use std::vec::Vec;
 
 // ============================================================================
 // 1. Shards Application Marketplace Engine

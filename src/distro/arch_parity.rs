@@ -740,6 +740,22 @@ pub struct ArchChrootProfile {
     pub chroot_dir: String,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum VersionOp {
+    Equal,
+    Greater,
+    GreaterEqual,
+    Less,
+    LessEqual,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Constraint {
+    pub name: String,
+    pub op: Option<VersionOp>,
+    pub version: Option<String>,
+}
+
 #[derive(Debug, Clone)]
 pub struct ResolutionPlan {
     pub to_install: Vec<PkgBuild>,
@@ -754,29 +770,33 @@ pub struct DependencyResolverEngine {
 
 impl DependencyResolverEngine {
     pub fn new() -> Self {
-        let mut engine = Self {
-            profiles: Vec::new(),
-            is_cleanroom_active: true,
-        };
-        engine.profiles.push(ArchChrootProfile {
-            target: "extra-x86_64-build".to_string(),
-            chroot_dir: "/var/lib/archbuild/extra-x86_64".to_string(),
-        });
-        engine.profiles.push(ArchChrootProfile {
-            target: "multilib-build".to_string(),
-            chroot_dir: "/var/lib/archbuild/multilib".to_string(),
-        });
-        engine
+        Self {
+            registered_packages: BTreeMap::new(),
+            constraints: Vec::new(),
+        }
     }
 
-    pub fn build_in_chroot(&self, target: &str, pkg_name: &str) -> Result<String, &'static str> {
-        if let Some(prof) = self.profiles.iter().find(|p| p.target == target) {
-            Ok(format!(
-                "arch-nspawn {}/root pacman -Syu && build {}",
-                prof.chroot_dir, pkg_name
-            ))
+    pub fn register_package(&mut self, pkg: PkgBuild) {
+        self.registered_packages.insert(pkg.pkgname.clone(), pkg);
+    }
+
+    pub fn resolve(&self, target_pkg: &str) -> Result<ResolutionPlan, &'static str> {
+        if let Some(pkg) = self.registered_packages.get(target_pkg) {
+            let mut plan = ResolutionPlan {
+                to_install: Vec::new(),
+                to_remove: Vec::new(),
+                to_upgrade: Vec::new(),
+            };
+            plan.to_install.push(pkg.clone());
+
+            for dep in &pkg.depends {
+                if let Some(dep_pkg) = self.registered_packages.get(dep) {
+                    plan.to_install.push(dep_pkg.clone());
+                }
+            }
+            Ok(plan)
         } else {
-            Err("ArchCdevtoolsEngine: Unknown build target profile")
+            Err("PacmanResolver: Target package not found in repository database")
         }
     }
 }

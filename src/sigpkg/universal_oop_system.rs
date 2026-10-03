@@ -28,6 +28,9 @@ use std::vec::Vec;
 #[cfg(not(feature = "standalone_test"))]
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 
+#[cfg(all(test, not(feature = "standalone_test")))]
+pub use crate::sigpkg::Version;
+
 #[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Version {

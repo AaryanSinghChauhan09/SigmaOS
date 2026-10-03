@@ -13,18 +13,14 @@ extern crate alloc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::format;
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::string::{String, ToString};
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use std::string::{String, ToString};
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::format;
 #[cfg(any(feature = "standalone_test", test))]
-use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
 
 use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
 

@@ -5,22 +5,26 @@
 // 3. Stacer System Optimizer & Cleaner
 // 4. Ventoy Multi-Boot Live USB Partition Layout & ISO Menu Manager
 
-#[cfg(not(any(feature = "standalone_test", test)))]
+#[cfg(feature = "standalone_test")]
 extern crate alloc;
 
-#[cfg(not(any(feature = "standalone_test", test)))]
-#[cfg(not(any(feature = "standalone_test", test)))]
+#[cfg(feature = "standalone_test")]
+use alloc::format;
+#[cfg(feature = "standalone_test")]
 use alloc::string::{String, ToString};
-#[cfg(not(any(feature = "standalone_test", test)))]
+#[cfg(feature = "standalone_test")]
 use alloc::vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
+#[cfg(feature = "standalone_test")]
 use alloc::vec::Vec;
 
-#[cfg(any(feature = "standalone_test", test))]
+#[cfg(not(feature = "standalone_test"))]
 use std::format;
-#[cfg(any(feature = "standalone_test", test))]
+#[cfg(not(feature = "standalone_test"))]
 use std::string::{String, ToString};
-#[cfg(any(feature = "standalone_test", test))]
+#[cfg(not(feature = "standalone_test"))]
+use std::vec;
+#[cfg(not(feature = "standalone_test"))]
+use std::vec::Vec;
 
 // ============================================================================
 // 1. Timeshift System Backup & Snapshot Restore Engine

@@ -81,20 +81,16 @@ impl SlabCache {
     /// Allocate object from cache
     /// Linux: `mm/slub.c:slab_alloc()`
     pub fn allocate(&mut self) -> Option<NonNull<u8>> {
-        let partial_ptr = &mut self.partial_slabs as *mut *mut Slab;
-        unsafe {
-            if let Some(obj) = self.allocate_from_slab_list_ptr(partial_ptr) {
-                self.allocated_objects.fetch_add(1, Ordering::Relaxed);
-                return Some(obj);
-            }
+        // Try partial slabs first
+        if let Some(obj) = self.allocate_from_slab_list(&mut self.partial_slabs) {
+            self.allocated_objects.fetch_add(1, Ordering::Relaxed);
+            return Some(obj);
         }
 
-        let empty_ptr = &mut self.empty_slabs as *mut *mut Slab;
-        unsafe {
-            if let Some(obj) = self.allocate_from_slab_list_ptr(empty_ptr) {
-                self.allocated_objects.fetch_add(1, Ordering::Relaxed);
-                return Some(obj);
-            }
+        // Try empty slabs
+        if let Some(obj) = self.allocate_from_slab_list(&mut self.empty_slabs) {
+            self.allocated_objects.fetch_add(1, Ordering::Relaxed);
+            return Some(obj);
         }
 
         // Need to allocate new slab
@@ -102,42 +98,32 @@ impl SlabCache {
         None
     }
 
-    /// Allocate from specific slab list pointer
-    unsafe fn allocate_from_slab_list_ptr(&mut self, list_ptr: *mut *mut Slab) -> Option<NonNull<u8>> {
-        if list_ptr.is_null() || (*list_ptr).is_null() {
+    /// Allocate from specific slab list
+    fn allocate_from_slab_list(&mut self, list: &mut *mut Slab) -> Option<NonNull<u8>> {
+        if list.is_null() {
             return None;
         }
 
-        let slab = &mut **list_ptr;
+        unsafe {
+            let slab = &mut **list;
 
-        if slab.free_list.is_null() {
-            return None;
+            if slab.free_list.is_null() {
+                return None;
+            }
+
+            // Pop from free list
+            let obj = slab.free_list;
+            let free_obj = &*obj;
+            slab.free_list = free_obj.next;
+            slab.free_count -= 1;
+
+            // If slab is now full, move to full list
+            if slab.free_count == 0 {
+                self.move_slab_to_full(list);
+            }
+
+            NonNull::new(obj as *mut u8)
         }
-
-        // Pop from free list
-        let obj = slab.free_list;
-        let free_obj = &*obj;
-        slab.free_list = free_obj.next;
-        slab.free_count -= 1;
-
-        // If slab is now full, move to full list
-        if slab.free_count == 0 {
-            self.move_slab_to_full_ptr(list_ptr);
-        }
-
-        NonNull::new(obj as *mut u8)
-    }
-
-    /// Move slab from one list to another via pointer
-    unsafe fn move_slab_to_full_ptr(&mut self, from_ptr: *mut *mut Slab) {
-        if from_ptr.is_null() || (*from_ptr).is_null() {
-            return;
-        }
-
-        let slab = *from_ptr;
-        *from_ptr = (*slab).next;
-        (*slab).next = self.full_slabs;
-        self.full_slabs = slab;
     }
 
     /// Free object back to cache

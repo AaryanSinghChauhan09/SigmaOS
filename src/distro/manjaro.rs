@@ -24,9 +24,9 @@ use crate::klib::collections::HashMap;
 /// An Arch User Repository (AUR) package representation
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AurPackage {
-    pub name: crate::klib::SigmaString,
-    pub pkgbuild_url: crate::klib::SigmaString,
-    pub dependencies: crate::klib::Vec<crate::klib::SigmaString>,
+    pub name: String,
+    pub pkgbuild_url: String,
+    pub dependencies: Vec<String>,
 }
 
 /// A Flatpak sandboxed application representation
@@ -310,7 +310,7 @@ impl PamacPackageManager {
                 return Err("Missing required AUR build dependency.");
             }
         }
-        self.installed_aur_packages.insert(pkg.name.to_string(), pkg);
+        self.installed_aur_packages.insert(pkg.name.clone(), pkg);
         Ok(())
     }
 

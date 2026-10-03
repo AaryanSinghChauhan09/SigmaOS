@@ -313,6 +313,10 @@ impl PathResolver {
     }
 }
 
+pub type VirtualFilesystem = VfsManager;
+pub type FsError = VfsError;
+pub type Inode = InodeMetadata;
+
 /// Global VFS state manager
 pub struct VfsManager {
     mount_table: MountTable,
