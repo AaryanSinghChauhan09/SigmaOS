@@ -63,7 +63,6 @@ impl IrqLine {
 }
 
 /// Interrupt descriptor
-#[derive(Clone)]
 pub struct InterruptDescriptor {
     pub vector: u8,
     pub irq_line: Option<IrqLine>,

@@ -536,7 +536,7 @@ mod tests {
 
     #[test]
     fn test_fd_table() {
-        let table = LinuxFdTable::new();
+        let mut table = LinuxFdTable::new();
         let path = "/tmp/test".to_string();
         let flags = LinuxOpenFlags::from_u32(0x02);
 
@@ -550,7 +550,7 @@ mod tests {
 
     #[test]
     fn test_process_table() {
-        let table = LinuxProcessTable::new();
+        let mut table = LinuxProcessTable::new();
         let pid = table.create(0, "test".to_string());
 
         assert_eq!(pid, 1);
@@ -562,7 +562,6 @@ mod tests {
     #[test]
     fn test_syscall_dispatcher() {
         let mut dispatcher = LinuxSyscallDispatcher::new();
-        let dispatcher = LinuxSyscallDispatcher::new();
 
         // Test getpid
         let pid = dispatcher
@@ -588,7 +587,6 @@ mod tests {
     #[test]
     fn test_syscall_count() {
         let mut dispatcher = LinuxSyscallDispatcher::new();
-        let dispatcher = LinuxSyscallDispatcher::new();
 
         dispatcher
             .dispatch(LinuxSyscallNumber::Getpid as u64, &[])
