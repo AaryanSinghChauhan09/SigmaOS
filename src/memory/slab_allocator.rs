@@ -105,7 +105,7 @@ impl SlabCache {
         }
 
         unsafe {
-            let slab = &mut **list;
+            let slab = &mut *list_ptr;
             
             if slab.free_list.is_null() {
                 return None;

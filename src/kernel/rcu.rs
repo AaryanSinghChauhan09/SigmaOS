@@ -252,6 +252,13 @@ impl<T> RcuPointer<T> {
         }
     }
 
+    pub const fn null() -> Self {
+        Self {
+            ptr: AtomicUsize::new(0),
+            _phantom: core::marker::PhantomData,
+        }
+    }
+
     /// Load pointer (read-side)
     pub fn load(&self) -> *mut T {
         self.ptr.load(Ordering::Acquire) as *mut T

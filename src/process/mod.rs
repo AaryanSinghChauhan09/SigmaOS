@@ -11,6 +11,8 @@ pub mod scheduler;
 pub mod sovereign_process_engine;
 pub mod spawn;
 
+pub use advanced_process_control::*;
+
 pub use pidfd_procdesc_subreaper::{
     ProcessDescriptorRights, ProcessFileDescriptor, SovereignPidfdProcdescEngine,
     SubreaperProcessEntry,

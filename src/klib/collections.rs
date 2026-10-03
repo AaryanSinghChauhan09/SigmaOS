@@ -13,6 +13,16 @@ pub struct HashSet<T> {
     inner: alloc::collections::BTreeSet<T>,
 }
 
+impl<T: Ord> core::iter::FromIterator<T> for HashSet<T> {
+    fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
+        let mut set = Self::new();
+        for item in iter {
+            set.insert(item);
+        }
+        set
+    }
+}
+
 impl<T: Ord> HashSet<T> {
     pub fn new() -> Self {
         Self {
