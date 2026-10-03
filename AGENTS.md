@@ -34,6 +34,8 @@ SigmaOS employs a three-agent autonomous continuous development framework where 
   - Run test suite (`cargo check --lib`, `./run_sigma_tests.sh`, `pytest tests/`) before submitting PRs
   - Add concise comments explaining performance optimizations
   - Measure and document expected performance impact (latency reduction, memory saving, cycle efficiency)
+  - Implement BORE burst-scored scheduling improvements where applicable
+  - Support ARM64 and RISC-V architecture targets alongside x86_64
 - **Ask First**:
   - Adding any external crate or dependency
   - Making major architectural changes
@@ -88,6 +90,7 @@ SigmaOS employs a three-agent autonomous continuous development framework where 
   - Validate and sanitize all userland inputs at system call boundaries
   - Use constant-time cryptography and memory zeroization
   - Keep fixes focused and under 50 lines
+  - Apply Landlock v4, pledge, and Capsicum restrictions at all process trust boundaries
 - **Ask First**:
   - Modifying authentication, capabilities, or access control models
 - **Never Do**:
@@ -97,6 +100,98 @@ SigmaOS employs a three-agent autonomous continuous development framework where 
 **Philosophy**: Security is foundational. Defense in depth: validate at every boundary. Fail safely and zeroize sensitive memory immediately.
 
 **Journaling Rules (`.jules/sentinel.md`)**: Record critical security learnings, vulnerability patterns, and mitigation strategies.
+
+---
+
+## ⚡ Antigravity (Claude Sonnet) — The Comprehensive Architecture Agent
+
+**Core Mission**: Implement complete system-wide improvements across all 12 SigmaOS shards simultaneously, maintaining architectural coherence and ensuring Linux/BSD parity.
+
+**Operational Boundaries**:
+- **Always Do**:
+  - Implement real, functional code with working unit tests
+  - Follow #![no_std] zero-dependency architecture
+  - Commit directly to main branch via GitHub API
+  - Read existing files before modifying them (preserve SHA)
+  - Update FEATURE_STATUS.toml when implementing new features
+  - Add proper safety documentation for all unsafe code
+  - Use constant-time operations for all cryptographic code
+- **Performance Standards**:
+  - All new scheduler code must improve latency over previous implementation
+  - All new crypto code must use verified NIST test vectors
+  - Architecture code must be validated against hardware specs
+- **Security Standards**:
+  - Zero hardcoded secrets or cryptographic values
+  - All pointers validated before dereference
+  - Buffer overflow prevention via bounds checking
+  - Denial of service prevention via resource limits
+  - Input sanitization at all trust boundaries
+  - Constant-time comparisons for all secret data
+
+**Priority Order** (in case of conflict):
+1. Security (prevent vulnerabilities)
+2. Stability (prevent crashes)
+3. Performance (improve speed)
+4. Feature parity (Linux/BSD features)
+5. Documentation (wiki updates)
+
+---
+
+## Architecture-Specific Development Rules
+
+### x86_64
+- Always use `core::arch::x86_64` intrinsics, not libc
+- Inline asm must save/restore all caller-saved registers
+- APIC access: always MMIO via volatile pointer, never cached
+- CR3 writes require TLB flush (invlpg or mov cr3, cr3)
+- Syscall entry MUST save ALL GPRs before calling Rust
+- MSR writes require CPU feature check (CPUID first)
+
+### AArch64
+- Exception vectors must be 2KiB-aligned (VBAR_EL1 constraint)
+- Cache maintenance: always use `dsb sy; isb` after TLB ops
+- GIC access through memory-mapped distributor registers
+- Syscall via `svc #0`, number in x8 (Linux EABI64 compatible)
+- TTBR0_EL1 writes require `dsb ish; isb` barrier
+
+### RISC-V 64
+- Use `ecall` for SBI calls (hart-level firmware)
+- Trap vector (mtvec) must be 4-byte aligned
+- SATP write requires `sfence.vma` and `fence.i`
+- All CSR operations must be atomic where possible
+- Memory ordering: RISC-V is weakly ordered, use fence instructions
+
+## Linux/BSD Parity Mandate
+
+Every SigmaOS component must match or exceed the capability of its Linux/BSD counterpart:
+
+| SigmaOS Component | Linux Equivalent | BSD Equivalent |
+|-------------------|-----------------|----------------|
+| EEVDF scheduler | Linux 6.6 EEVDF | FreeBSD ULE |
+| BORE scheduler | Linux BORE patch | N/A |
+| CFS scheduler | Linux CFS | N/A |
+| Landlock v4 | Linux Landlock | FreeBSD Capsicum |
+| pledge() | N/A | OpenBSD pledge |
+| Capsicum | N/A | FreeBSD Capsicum |
+| AES-256-GCM | kernel crypto | OpenBSD crypto |
+| Ed25519 | kernel crypto | OpenSSH |
+| io_uring | Linux io_uring | FreeBSD kqueue |
+| eBPF | Linux eBPF | N/A |
+| cgroups v2 | Linux cgroups | FreeBSD RCTL |
+| OverlayFS | Linux OverlayFS | FreeBSD UnionFS |
+| ZFS ARC | OpenZFS ARC | FreeBSD ZFS |
+| virtio | Linux virtio | FreeBSD virtio |
+
+## Workflow for AI Agents
+
+1. **Before ANY modification**: Read the file with get_file_contents to get current SHA
+2. **For new files**: Use create_or_update_file WITHOUT sha field
+3. **For updates**: Use create_or_update_file WITH sha field from step 1
+4. **After implementation**: Update FEATURE_STATUS.toml status from 'partial' to 'working'
+5. **After all tests pass**: Update WHAT_IS_WORKING_AND_NOT_WORKING.md
+6. **For completed subsystems**: Transfer .md files to GitHub Wiki
+
+---
 
 ## Universal Agent Guidelines
 
