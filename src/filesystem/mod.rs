@@ -18,6 +18,7 @@ pub mod ext4;
 pub mod tmpfs;
 pub mod btrfs;
 pub mod zfs;
+pub mod zfs_arc;
 
 pub use crate::filesystem::vfs::{FileType, FsError, Inode, VfsError, VirtualFilesystem};
 pub use smart_symlink::{LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule};
@@ -83,6 +84,7 @@ pub use zfs::{
     ZfsPool, ZfsVdev, ZfsDataset, ZfsError, ZfsScrubStats,
     VdevType, VdevState, PoolState, DatasetType,
 };
+pub use zfs_arc::{ArcConfig, ArcEntry, ArcStats, ZfsArc};
 
 pub type FileDescriptor = i32;
 pub type FilePermissions = u32;
