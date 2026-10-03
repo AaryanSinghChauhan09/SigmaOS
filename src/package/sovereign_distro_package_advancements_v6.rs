@@ -28,12 +28,8 @@ use std::format;
 use std::string::{String, ToString};
 #[cfg(not(feature = "standalone_test"))]
 
-#[cfg(not(feature = "standalone_test"))]
-use crate::package::PackageFormat;
-
 #[cfg(feature = "standalone_test")]
 use alloc::collections::{BTreeMap, BTreeSet};
-#[cfg(feature = "standalone_test")]
 #[cfg(feature = "standalone_test")]
 use alloc::string::{String, ToString};
 #[cfg(feature = "standalone_test")]
