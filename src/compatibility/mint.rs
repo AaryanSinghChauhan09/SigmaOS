@@ -182,12 +182,6 @@ impl MintInstallManager {
     }
 
     pub fn search_packages(&self, query: &str) -> Vec<&SoftwarePackage> {
-        self.packages
-            .iter()
-            .filter(|p| {
-                p.name.to_lowercase().contains(&query.to_lowercase())
-                    || p.description.to_lowercase().contains(&query.to_lowercase())
-            })
         self.packages.iter()
             .filter(|p| p.name.to_lowercase().contains(&query.to_lowercase())
                 || p.description.to_lowercase().contains(&query.to_lowercase()))

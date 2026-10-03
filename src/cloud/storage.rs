@@ -300,7 +300,6 @@ impl CloudProvider for SimpleCloudProvider {
     fn is_connected(&self) -> bool {
         self.connected.load(Ordering::SeqCst) == 1
     }
-    fn is_connected(&self) -> bool { self.connected.load(Ordering::SeqCst) == 1 }
 }
 
 struct CustomVec<T> { data: *mut T, len: usize, capacity: usize }

@@ -11,16 +11,13 @@ pub mod filesystem_encryption;
 pub mod governance;
 pub mod hardware_privilege;
 pub mod pqc_enclave;
-pub mod governance;
 pub mod audit;
 pub mod system_audit;
-pub mod filesystem_encryption;
 pub mod bsd_hardening;
 pub mod sigma_pledge;
 pub mod sigma_unveil;
 pub mod vault;
 pub mod vpn;
-pub mod capsicum;
 pub mod capsicum_wrapper;
 pub mod pledge_unveil;
 
@@ -31,9 +28,6 @@ pub mod syscall_filter;
 pub mod defensive_audit;
 pub mod hardening;
 pub mod kernel_hardening;
-pub mod seccomp;
-pub mod seccomp_ebpf;
-pub mod syscall_filter;
 pub mod user_namespace;
 
 pub mod bridge;
@@ -186,15 +180,6 @@ pub mod phase_audit;
 pub use hardware_privilege::*;
 
 pub use capsicum::{CapEntry, CapMode, CapRight, CapabilitySandbox};
-pub use memory_protection::{
-    AslrConfig, MemoryProtectionManager, MemoryProtectionMode, StackCanaryConfig,
-};
-pub use pledge_unveil::{
-    PledgePromise as OpenBsdPledgePromise, PledgeSandbox, Sandbox, UnveilPermission, UnveilSandbox,
-};
-pub use capsicum::{
-    CapRight, CapMode, CapEntry, CapabilitySandbox,
-};
 pub use capsicum_wrapper::{
     CapsicumManager as CapsicumWrapperManager, CapRights, CapsicumFdEntry, CapSandboxMode,
     CapsicumStatistics,

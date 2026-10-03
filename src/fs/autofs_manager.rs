@@ -343,7 +343,6 @@ mod tests {
             String::from("ext4"),
         )
         .with_option(String::from("noatime"));
-        ).with_option(String::from("noatime"));
 
         assert!(trigger.options.contains(&String::from("noatime")));
     }

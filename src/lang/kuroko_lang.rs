@@ -509,8 +509,6 @@ impl KurokoCompiler {
 
     fn is_at_end(&self) -> bool {
         self.current >= self.tokens.len() || self.tokens[self.current].token_type == TokenType::EOF
-        self.current >= self.tokens.len() ||
-        self.tokens[self.current].token_type == TokenType::EOF
     }
 
     fn advance(&mut self) -> &Token {
@@ -595,10 +593,6 @@ impl KurokoCompiler {
         self.current_code = func_index;
 
         // Compile function body
-        while !self.check(TokenType::EOF)
-            && !self.check(TokenType::Def)
-            && self.previous().token_type != TokenType::Newline
-        {
         while !self.check(TokenType::EOF) &&
               !self.check(TokenType::Def) &&
               self.previous().token_type != TokenType::Newline {
@@ -806,10 +800,6 @@ impl KurokoCompiler {
 
     fn compile_factor(&mut self) -> Result<(), KurokoError> {
         self.compile_unary()?;
-        while self.match_token(TokenType::Multiply)
-            || self.match_token(TokenType::Divide)
-            || self.match_token(TokenType::Modulo)
-        {
         while self.match_token(TokenType::Multiply) || self.match_token(TokenType::Divide) ||
               self.match_token(TokenType::Modulo) {
             let operator = self.previous().token_type;

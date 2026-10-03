@@ -261,21 +261,6 @@ impl KernelModuleLoadingController {
 
     /// List all modules
     pub fn list_all_modules(&self) -> Vec<String> {
-        self.modules
-            .iter()
-            .map(|m| {
-                format!(
-                    "{} {} ({}, {})",
-                    m.name,
-                    m.version,
-                    if m.loaded { "loaded" } else { "not loaded" },
-                    if m.signature_verified {
-                        "signed"
-                    } else {
-                        "unsigned"
-                    }
-                )
-            })
         self.modules.iter()
             .map(|m| format!("{} {} ({}, {})",
                 m.name,
@@ -288,16 +273,6 @@ impl KernelModuleLoadingController {
 
     /// List rules
     pub fn list_rules(&self) -> Vec<String> {
-        self.rules
-            .iter()
-            .map(|r| {
-                format!(
-                    "{}: {} (signature required: {})",
-                    r.module_name,
-                    if r.allowed { "allowed" } else { "denied" },
-                    r.requires_signature
-                )
-            })
         self.rules.iter()
             .map(|r| format!("{}: {} (signature required: {})",
                 r.module_name,

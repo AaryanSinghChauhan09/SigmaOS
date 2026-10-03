@@ -385,3 +385,9 @@ pub use sovereign_linux_bsd_ecosystem_pinnacle_suite::*;
 
 pub mod sovereign_linux_bsd_ecosystem_leap_suite;
 pub use sovereign_linux_bsd_ecosystem_leap_suite::*;
+
+pub mod sovereign_github_wiki_complete_deployment;
+pub use sovereign_github_wiki_complete_deployment::*;
+
+pub mod sovereign_linux_bsd_distro_next_gen_innovations;
+pub use sovereign_linux_bsd_distro_next_gen_innovations::*;

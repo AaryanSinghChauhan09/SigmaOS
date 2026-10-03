@@ -260,16 +260,6 @@ impl CgroupV2Manager {
     }
 
     /// Add memory controller to cgroup
-    pub fn add_memory_controller(
-        &mut self,
-        cgroup_name: &str,
-        limit: u64,
-        swap_limit: u64,
-    ) -> Result<(), &'static str> {
-        let cgroup = self
-            .cgroups
-            .get_mut(cgroup_name)
-            .ok_or("Cgroup not found")?;
     pub fn add_memory_controller(&mut self, cgroup_name: &str, limit: u64, swap_limit: u64) -> Result<(), &'static str> {
         let cgroup = self.cgroups.get_mut(cgroup_name).ok_or("Cgroup not found")?;
 
@@ -285,16 +275,6 @@ impl CgroupV2Manager {
     }
 
     /// Add CPU controller to cgroup
-    pub fn add_cpu_controller(
-        &mut self,
-        cgroup_name: &str,
-        shares: u64,
-        max: Option<u64>,
-    ) -> Result<(), &'static str> {
-        let cgroup = self
-            .cgroups
-            .get_mut(cgroup_name)
-            .ok_or("Cgroup not found")?;
     pub fn add_cpu_controller(&mut self, cgroup_name: &str, shares: u64, max: Option<u64>) -> Result<(), &'static str> {
         let cgroup = self.cgroups.get_mut(cgroup_name).ok_or("Cgroup not found")?;
 

@@ -8,10 +8,6 @@ use std::string::String;
 /// Implements reproducible cross builds for multiple architectures
 
 use std::vec::Vec;
-use std::boxed::Box;
-use std::format;
-use std::string::String;
-use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 
 pub type ToolchainID = usize;

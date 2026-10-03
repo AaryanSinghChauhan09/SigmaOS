@@ -57,14 +57,6 @@ fn hash_password(plaintext: &str) -> String {
 }
 
 impl SafeInstaller {
-    pub fn new(
-        hostname: &str,
-        username: &str,
-        _password: &str,
-        password: &str,
-        target: DiskTarget,
-        dry_run: bool,
-    ) -> Self {
     pub fn new(hostname: &str, username: &str, password: &str, target: DiskTarget, dry_run: bool) -> Self {
         Self {
             config: InstallerConfig {
@@ -119,19 +111,6 @@ impl SafeInstaller {
     }
 
     pub fn create_user(&mut self) -> Result<(), &'static str> {
-        if self.config.password_hash.is_empty() {
-            return Err("Password hash cannot be empty");
-        }
-        if self.config.dry_run {
-            self.log.push(format!(
-                "[DRY-RUN] Would create user {}",
-                self.config.username
-            ));
-        } else {
-            return Err("Secure password hashing provider unavailable");
-            self.log
-                .push(format!("Created user {}", self.config.username));
-        }
         if self.config.password_hash.is_empty() { return Err("Password hash cannot be empty"); }
         if self.config.dry_run { self.log.push(format!("[DRY-RUN] Would create user {}", self.config.username)); }
         else { self.log.push(format!("Created user {}", self.config.username)); }

@@ -253,23 +253,14 @@ impl SovereignNetmapVimageRelaydEngine {
 }
 
 impl Default for SovereignNetmapVimageRelaydEngine {
-#![no_std]
-#![allow(dead_code)]
-#![allow(unused_variables)]
+    fn default() -> Self {
+        Self::new()
+    }
+}
+// 4. Master Coordinator Suite (`SovereignGitHubWikiCompleteDeploymentMasterSuite`).
 
-//! Sovereign GitHub Wiki Complete Deployment Module
-//!
-//! Implements remaining specifications from `wiki/11-Roadmap.md`:
-//! 1. Process Subsystem: PIDFD, Capsicum Procdesc & Subreaper Re-parenting (`SovereignPidfdProcdescSubreaperEngine`).
-//! 2. Filesystem Subsystem: Transparent `fscrypt` Directory Policy & Kernel `autofs` Mount Triggers (`SovereignFscryptAutofsEngine`).
-//! 3. Hardened Security Mitigations: `kptr_restrict`, `dmesg_restrict`, BSD sysctl hardening & Forward-Edge CFI (`SovereignHardenedSecurityCfiEngine`).
-//! 4. Master Coordinator Suite (`SovereignGitHubWikiCompleteDeploymentMasterSuite`).
-
-extern crate alloc;
 
 use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 
 // ============================================================================
 // 1. PIDFD, PROCDESC & SUBREAPER RE-PARENTING PROCESS ENGINE
@@ -563,6 +554,11 @@ impl SovereignPerfDtraceStraceEngine {
 }
 
 impl Default for SovereignPerfDtraceStraceEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // 2. FSCRYPT ENCRYPTION & KERNEL AUTOFS MOUNT ENGINE
 // ============================================================================
 
@@ -683,18 +679,13 @@ impl Default for SovereignFscryptAutofsEngine {
 }
 
 // ============================================================================
-// 7. SovereignGitHubWikiCompleteDeploymentMasterSuite
-// ============================================================================
 
-/// Master Coordinator Suite Unifying All GitHub Wiki Deployment Engines
-#[derive(Debug)]
-pub struct SovereignGitHubWikiCompleteDeploymentMasterSuite {
-    pub eevdf_scheduler: SovereignEevdfCfsSchedulerEngine,
-    pub lockdown_ima_guard: SovereignKernelLockdownImaEvmEngine,
-    pub netmap_vimage: SovereignNetmapVimageRelaydEngine,
-    pub transport_engine: SovereignQuicWireguardBbrEngine,
-    pub virt_podman: SovereignVmmBhyvePodmanEngine,
-    pub tracing_engine: SovereignPerfDtraceStraceEngine,
+impl Default for SovereignGitHubWikiCompleteDeploymentMasterSuite {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // 3. HARDENED KERNEL SECURITY MITIGATIONS & CFI ENGINE
 // ============================================================================
 
@@ -790,11 +781,20 @@ pub struct SovereignGitHubWikiCompleteDeploymentMasterSuite {
     pub pidfd_procdesc_engine: SovereignPidfdProcdescSubreaperEngine,
     pub fscrypt_autofs_engine: SovereignFscryptAutofsEngine,
     pub hardened_cfi_engine: SovereignHardenedSecurityCfiEngine,
+    pub eevdf_scheduler: SovereignEevdfCfsSchedulerEngine,
+    pub lockdown_ima_guard: SovereignKernelLockdownImaEvmEngine,
+    pub netmap_vimage: SovereignNetmapVimageRelaydEngine,
+    pub transport_engine: SovereignQuicWireguardBbrEngine,
+    pub virt_podman: SovereignVmmBhyvePodmanEngine,
+    pub tracing_engine: SovereignPerfDtraceStraceEngine,
 }
 
 impl SovereignGitHubWikiCompleteDeploymentMasterSuite {
     pub fn new() -> Self {
         Self {
+            pidfd_procdesc_engine: SovereignPidfdProcdescSubreaperEngine::new(),
+            fscrypt_autofs_engine: SovereignFscryptAutofsEngine::new(),
+            hardened_cfi_engine: SovereignHardenedSecurityCfiEngine::new(),
             eevdf_scheduler: SovereignEevdfCfsSchedulerEngine::new(8),
             lockdown_ima_guard: SovereignKernelLockdownImaEvmEngine::new(KernelLockdownLevel::Integrity),
             netmap_vimage: SovereignNetmapVimageRelaydEngine::new(),
@@ -845,10 +845,6 @@ impl SovereignGitHubWikiCompleteDeploymentMasterSuite {
         }
 
         score.min(100)
-            pidfd_procdesc_engine: SovereignPidfdProcdescSubreaperEngine::new(),
-            fscrypt_autofs_engine: SovereignFscryptAutofsEngine::new(),
-            hardened_cfi_engine: SovereignHardenedSecurityCfiEngine::new(),
-        }
     }
 
     pub fn verify_wiki_roadmap_fulfillment(&mut self) -> bool {
@@ -871,12 +867,6 @@ impl SovereignGitHubWikiCompleteDeploymentMasterSuite {
         // 3. CFI Hardening check
         self.hardened_cfi_engine.register_cfi_target(0xFFFFFFFF80001000, 0xABC123);
         self.hardened_cfi_engine.validate_indirect_call(0xFFFFFFFF80001000, 0xABC123)
-    }
-}
-
-impl Default for SovereignGitHubWikiCompleteDeploymentMasterSuite {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -944,10 +934,6 @@ mod tests {
     }
 
     #[test]
-    fn test_wiki_complete_deployment_master_suite() {
-        let mut master = SovereignGitHubWikiCompleteDeploymentMasterSuite::new();
-        let score = master.compute_wiki_complete_deployment_index();
-        assert_eq!(score, 100);
     fn test_pidfd_procdesc_subreaper_engine() {
         let mut engine = SovereignPidfdProcdescSubreaperEngine::new();
 

@@ -9,27 +9,42 @@ use std::sync::{Arc, Mutex, atomic::{AtomicU32, AtomicU64, Ordering}};
 // Handle Rights (capability enforcement)
 // ─────────────────────────────────────────────────────────────────────────────
 
-bitflags::bitflags! {
-    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub struct Rights: u32 {
-        const NONE       = 0;
-        const DUPLICATE  = 1 << 0;
-        const TRANSFER   = 1 << 1;
-        const READ       = 1 << 2;
-        const WRITE      = 1 << 3;
-        const EXECUTE    = 1 << 4;
-        const MAP        = 1 << 5;
-        const GET_PROP   = 1 << 6;
-        const SET_PROP   = 1 << 7;
-        const ENUMERATE  = 1 << 8;
-        const DESTROY    = 1 << 9;
-        const SET_POLICY = 1 << 10;
-        const GET_CHILD  = 1 << 11;
-        const SIGNAL     = 1 << 12;
-        const WAIT       = 1 << 13;
-        const INSPECT    = 1 << 14;
-        const SAME_RIGHTS = 1 << 31;
-    }
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Rights(pub u32);
+
+impl Rights {
+    pub const NONE: Self = Self(0);
+    pub const DUPLICATE: Self = Self(1 << 0);
+    pub const TRANSFER: Self = Self(1 << 1);
+    pub const READ: Self = Self(1 << 2);
+    pub const WRITE: Self = Self(1 << 3);
+    pub const EXECUTE: Self = Self(1 << 4);
+    pub const MAP: Self = Self(1 << 5);
+    pub const GET_PROP: Self = Self(1 << 6);
+    pub const SET_PROP: Self = Self(1 << 7);
+    pub const ENUMERATE: Self = Self(1 << 8);
+    pub const DESTROY: Self = Self(1 << 9);
+    pub const SET_POLICY: Self = Self(1 << 10);
+    pub const GET_CHILD: Self = Self(1 << 11);
+    pub const SIGNAL: Self = Self(1 << 12);
+    pub const WAIT: Self = Self(1 << 13);
+    pub const INSPECT: Self = Self(1 << 14);
+    pub const SAME_RIGHTS: Self = Self(1 << 31);
+
+    pub fn empty() -> Self { Self(0) }
+    pub fn contains(&self, other: Self) -> bool { (self.0 & other.0) == other.0 }
+    pub fn bits(&self) -> u32 { self.0 }
+    pub fn from_bits_truncate(bits: u32) -> Self { Self(bits) }
+}
+
+impl core::ops::BitOr for Rights {
+    type Output = Self;
+    fn bitor(self, rhs: Self) -> Self { Self(self.0 | rhs.0) }
+}
+
+impl core::ops::BitAnd for Rights {
+    type Output = Self;
+    fn bitand(self, rhs: Self) -> Self { Self(self.0 & rhs.0) }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -60,19 +75,38 @@ fn new_koid() -> Koid { KOID_COUNTER.fetch_add(1, Ordering::SeqCst) }
 // Signals
 // ─────────────────────────────────────────────────────────────────────────────
 
-bitflags::bitflags! {
-    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub struct Signals: u32 {
-        const NONE             = 0;
-        const READABLE         = 1 << 0;  // ZX_CHANNEL_READABLE
-        const WRITABLE         = 1 << 1;  // ZX_CHANNEL_WRITABLE
-        const PEER_CLOSED      = 1 << 2;  // ZX_CHANNEL_PEER_CLOSED
-        const SIGNALED         = 1 << 3;  // ZX_EVENT_SIGNALED
-        const FIFO_READABLE    = 1 << 4;
-        const FIFO_WRITABLE    = 1 << 5;
-        const HANDLE_CLOSED    = 1 << 23; // ZX_SIGNAL_HANDLE_CLOSED
-        const LAST_HANDLE      = 1 << 24;
-    }
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Signals(pub u32);
+
+impl Signals {
+    pub fn from_bits_truncate(bits: u32) -> Self { Self(bits) }
+    pub const NONE: Self = Self(0);
+    pub const READABLE: Self = Self(1 << 0);
+    pub const WRITABLE: Self = Self(1 << 1);
+    pub const PEER_CLOSED: Self = Self(1 << 2);
+    pub const SIGNALED: Self = Self(1 << 3);
+    pub const FIFO_READABLE: Self = Self(1 << 4);
+    pub const FIFO_WRITABLE: Self = Self(1 << 5);
+    pub const HANDLE_CLOSED: Self = Self(1 << 23);
+    pub const LAST_HANDLE: Self = Self(1 << 24);
+
+    pub fn empty() -> Self { Self(0) }
+    pub fn contains(&self, other: Self) -> bool { (self.0 & other.0) == other.0 }
+    pub fn bits(&self) -> u32 { self.0 }
+}
+
+impl core::ops::BitOr for Signals {
+    type Output = Self;
+    fn bitor(self, rhs: Self) -> Self { Self(self.0 | rhs.0) }
+}
+
+impl core::ops::BitOrAssign for Signals {
+    fn bitor_assign(&mut self, rhs: Self) { self.0 |= rhs.0; }
+}
+
+impl core::ops::BitAnd for Signals {
+    type Output = Self;
+    fn bitand(self, rhs: Self) -> Self { Self(self.0 & rhs.0) }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

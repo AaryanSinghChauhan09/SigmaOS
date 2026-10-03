@@ -118,13 +118,9 @@ impl TechMediaPortalIntelligenceFeed {
     }
 
     pub fn total_portals_count(&self) -> usize {
-// SPDX-License-Identifier: MIT
-// SigmaOS - Sovereign Linux & BSD Distro, Tech Media, and Wiki Unimplemented Ideas Engine
-// (`src/distro/sovereign_linux_bsd_media_wiki_unimplemented_ideas_engine.rs`)
-
-use std::collections::BTreeMap;
-use std::string::{String, ToString};
-use std::vec::Vec;
+        self.portals.len()
+    }
+}
 
 #[derive(Debug, Clone)]
 pub struct DistroFeatureParityRecord {
@@ -676,6 +672,11 @@ impl SigmaOsGithubWikiAndMdRoadmapFulfillmentSuite {
 }
 
 impl Default for SigmaOsGithubWikiAndMdRoadmapFulfillmentSuite {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Default for SovereignTechMediaPortalIntelligenceSubengine {
     fn default() -> Self {
         Self::new()
@@ -697,6 +698,9 @@ impl SovereignLinuxBsdMediaWikiUnimplementedIdeasMasterSuite {
             media_feed: TechMediaPortalIntelligenceFeed::new(),
             distro_suite: LinuxBsdDistroUnimplementedIdeasSuite::new(),
             wiki_roadmap_suite: SigmaOsGithubWikiAndMdRoadmapFulfillmentSuite::new(),
+            distros_subengine: SovereignLinuxBsdDistroParitySubengine::new(),
+            media_subengine: SovereignTechMediaPortalIntelligenceSubengine::new(),
+            is_active: true,
         }
     }
 
@@ -714,10 +718,6 @@ impl SovereignLinuxBsdMediaWikiUnimplementedIdeasMasterSuite {
             self.media_feed.ingested_hashes.len(),
             self.wiki_roadmap_suite.cas_store.generations.len(),
         )
-            distros_subengine: SovereignLinuxBsdDistroParitySubengine::new(),
-            media_subengine: SovereignTechMediaPortalIntelligenceSubengine::new(),
-            is_active: true,
-        }
     }
 
     pub fn verify_full_parity_and_coverage(&self) -> bool {
@@ -785,6 +785,9 @@ mod tests {
         assert_eq!(gen2, 2);
         assert!(suite.cas_store.rollback_to_generation(1).is_ok());
         assert_eq!(suite.cas_store.current_active_generation, 1);
+    }
+
+    #[test]
     fn test_sovereign_linux_bsd_media_wiki_unimplemented_ideas_master_suite() {
         let suite = SovereignLinuxBsdMediaWikiUnimplementedIdeasMasterSuite::new();
         assert!(suite.verify_full_parity_and_coverage());

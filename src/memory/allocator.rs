@@ -106,14 +106,6 @@ impl BuddyAllocator {
     }
 
     /// Split block to required order
-    fn split_block(
-        &mut self,
-        current_order: usize,
-        required_order: usize,
-    ) -> Result<MemoryBlock, &'static str> {
-        let mut block = self.free_lists[current_order]
-            .pop()
-            .ok_or("Block not found")?;
     fn split_block(&mut self, current_order: usize, required_order: usize) -> Result<MemoryBlock, &'static str> {
         let mut block = self.free_lists[current_order].pop().ok_or("Block not found")?;
 
@@ -145,9 +137,6 @@ impl BuddyAllocator {
 
     /// Merge block with its buddy
     fn merge_buddy(&mut self, block: MemoryBlock) {
-        let block_size = (self.min_block_size as u64) << block.order;
-        let relative_start = block.start.saturating_sub(self.base_address);
-        let buddy_address = self.base_address + (relative_start ^ block_size);
         let buddy_address = block.start ^ (1 << block.order);
 
         // Find buddy in free list

@@ -27,7 +27,6 @@ use core::mem;
 /// Implements AES-256 encryption and decryption
 
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type CipherID = usize;
 
@@ -36,7 +35,7 @@ pub type CipherID = usize;
 pub enum CipherMode { ECB = 0, CBC = 1, GCM = 2, CTR = 3 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CipherError {
     Success = 0,
     InvalidKey = 1,
@@ -44,7 +43,6 @@ pub enum CipherError {
     EncryptionFailed = 3,
     CryptoUnavailable = 4,
 }
-pub enum CipherError { Success = 0, InvalidKey = 1, InvalidIV = 2, EncryptionFailed = 3 }
 
 pub trait BlockCipher {
     fn id(&self) -> CipherID;
@@ -74,20 +72,6 @@ impl BlockCipher for SimpleAES {
     fn block_size(&self) -> usize { 16 }
     fn key_size(&self) -> usize { 32 }
 
-    fn encrypt(
-        &self,
-        plaintext: &[u8],
-    }
-
-    fn encrypt(
-        &self,
-        plaintext: &[u8],
-        key: &[u8],
-        iv: Option<&[u8]>,
-    ) -> Result<Vec<u8>, CipherError> {
-
-
-
     fn encrypt(&self, plaintext: &[u8], key: &[u8], iv: Option<&[u8]>) -> Result<Vec<u8>, CipherError> {
         if key.len() != 32 {
             return Err(CipherError::InvalidKey);
@@ -112,14 +96,6 @@ impl BlockCipher for SimpleAES {
         }
 
         Ok(ciphertext)
-    }
-
-    fn decrypt(&self, ciphertext: &[u8], key: &[u8], iv: Option<&[u8]>) -> Result<Vec<u8>, CipherError> {
-        if key.len() != 32 {
-            return Err(CipherError::InvalidKey);
-        }
-        let _ = (plaintext, iv);
-        Err(CipherError::CryptoUnavailable)
     }
 
     fn decrypt(

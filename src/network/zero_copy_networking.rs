@@ -31,12 +31,8 @@ use std::vec::Vec;
 /// A fixed-size memory chunk descriptor in the UMEM pool.
 #[derive(Debug, Clone)]
 pub struct UmemChunk {
-    pub addr: u64, // offset within UMEM region
-    pub len: u32,  // maximum payload length after headroom
-    pub len: u32,  // actual data length
-    pub addr: u64,   // offset within UMEM region
-    pub len: u32,    // actual data length
-    pub len: u32,  // actual data length
+    pub addr: u64,
+    pub len: u32,
     pub headroom: u16,
     pub in_use: bool,
 }
@@ -45,15 +41,10 @@ impl UmemChunk {
     pub fn new(addr: u64, max_len: u32) -> Self {
         UmemChunk {
             addr,
-            len: max_len.saturating_sub(headroom as u32),
-            headroom,
-        UmemChunk {
-            addr,
             len: max_len,
             headroom: 256,
             in_use: false,
         }
-        UmemChunk { addr, len: max_len, headroom: 256, in_use: false }
     }
 }
 
@@ -110,9 +101,6 @@ impl UmemPool {
         }
         let used = self.total_chunks.saturating_sub(self.free_count) as u64;
         ((used * 100) / self.total_chunks as u64) as u32
-        if self.total_chunks == 0 { return 0; }
-        let used = self.total_chunks - self.free_count;
-        (used * 100) / self.total_chunks
     }
 }
 
@@ -158,32 +146,12 @@ impl XdpRing {
     }
 
     pub fn dequeue(&mut self) -> Option<PacketRingDescriptor> {
-        if self.producer == self.consumer {
-            return None;
-        }
         if self.entries.is_empty() {
             return None;
         }
         self.consumer = self.consumer.wrapping_add(1);
         self.packets_processed = self.packets_processed.saturating_add(1);
-        Some(descriptor)
-        if self.entries.is_empty() {
-            return None;
-        }
-        if self.producer == self.consumer { return None; }
-        if self.entries.is_empty() { return None; }
-        self.consumer = self.consumer.wrapping_add(1);
-        self.packets_processed = self.packets_processed.saturating_add(1);
-        // Drain from front (FIFO)
-        if !self.entries.is_empty() {
-            Some(self.entries.remove(0))
-        } else { None }
-        // Drain from front (FIFO)
-        if !self.entries.is_empty() {
-            Some(self.entries.remove(0))
-        } else {
-            None
-        }
+        Some(self.entries.remove(0))
     }
 
     pub fn available(&self) -> usize {
@@ -234,25 +202,17 @@ impl IoCompletionQueue {
         if self.entries.len() >= self.capacity {
             return false;
         }
-        self.entries.push_back(IoCompletionEntry {
         self.entries.push(IoCompletionEntry {
             user_data,
             result,
             flags: 0,
         });
-        if self.entries.len() >= self.capacity { return false; }
-        self.entries.push(IoCompletionEntry { user_data, result, flags: 0 });
         self.tail = self.tail.wrapping_add(1);
         self.total_completed = self.total_completed.saturating_add(1);
         true
     }
 
     pub fn consume(&mut self) -> Option<IoCompletionEntry> {
-        let entry = self.entries.pop_front()?;
-        if self.entries.is_empty() {
-            return None;
-        }
-        if self.entries.is_empty() { return None; }
         if self.entries.is_empty() {
             return None;
         }
@@ -339,24 +299,13 @@ impl SovereignZeroCopySocket {
     pub fn tx_packet(&mut self, chunk_idx: usize, len: u32) -> bool {
         let desc = PacketRingDescriptor {
             chunk_idx,
-            data_offset: chunk.headroom as u32,
-        let desc = PacketRingDescriptor {
-            chunk_idx,
             data_offset: 256,
             data_len: len,
             flags: 0,
         };
-        let desc = PacketRingDescriptor { chunk_idx, data_offset: 256, data_len: len, flags: 0 };
         if self.tx_ring.enqueue(desc) {
             self.tx_packets = self.tx_packets.saturating_add(1);
-            self.tx_bytes   = self.tx_bytes.saturating_add(len as u64);
-            // Post completion immediately (simulate NIC DMA done)
-            // Capacity was checked above; with exclusive `&mut self` access
-            // no producer can race this post.
-            self.cq.post_completion(chunk_idx as u64, len as i32)
-            self.cq.post_completion(chunk_idx as u64, len as i32);
-            true
-        } else { false }
+            self.tx_bytes = self.tx_bytes.saturating_add(len as u64);
             self.cq.post_completion(chunk_idx as u64, len as i32);
             true
         } else {

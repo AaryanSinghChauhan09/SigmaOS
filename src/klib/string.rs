@@ -15,10 +15,7 @@ pub use std::string::String;
 use core::fmt;
 use core::ops::{Deref, DerefMut};
 
-#[cfg(not(feature = "standalone_test"))]
-use crate::klib::vec::SigmaVec;
-#[cfg(feature = "standalone_test")]
-use super::vec::SigmaVec;
+use std::vec::Vec as SigmaVec;
 
 /// Custom string type for SigmaOS with reduced dependency on predefined functions
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]

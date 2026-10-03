@@ -7,10 +7,6 @@ use std::format;
 /// Provides PAM authentication, Iptables/Ufw firewalling, Cron Daemons, Sudo,
 /// Tmux Session multiplexing, Swap memory space, and Kernel Dmesg ring logging.
 use core::sync::atomic::{AtomicUsize, Ordering};
-use std::format;
-use std::string::String;
-use std::string::ToString;
-use std::vec::Vec;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

@@ -77,25 +77,6 @@ impl TbfQdisc {
     pub fn tick(&mut self, now_ns: u64) {
         if now_ns <= self.last_refill_tick { return; }
         let elapsed = now_ns - self.last_refill_tick;
-        if self.rate_bps > 0 {
-            const NANOS_PER_SECOND: u128 = 1_000_000_000;
-            let accrued =
-                (elapsed as u128) * (self.rate_bps as u128) + self.refill_remainder as u128;
-            let new_tokens = accrued / NANOS_PER_SECOND;
-            let available = self.tokens.min(self.burst_bytes) as u128 + new_tokens;
-            if available >= self.burst_bytes as u128 {
-                self.tokens = self.burst_bytes;
-                self.refill_remainder = 0;
-            } else {
-                self.tokens = available as u64;
-                self.refill_remainder = (accrued % NANOS_PER_SECOND) as u64;
-            }
-        }
-        let new_tokens = if self.ns_per_byte > 0 {
-            elapsed / self.ns_per_byte
-        } else {
-            0
-        };
         let new_tokens = if self.ns_per_byte > 0 { elapsed / self.ns_per_byte } else { 0 };
         self.tokens = (self.tokens + new_tokens).min(self.burst_bytes);
         self.last_refill_tick = now_ns;
@@ -114,11 +95,6 @@ impl TbfQdisc {
 
     /// Dequeue if tokens allow.
     pub fn dequeue(&mut self) -> Option<Packet> {
-        let pkt_len = self.queue.front()?.len as u64;
-        if self.queue.is_empty() {
-            return None;
-        }
-        if self.queue.is_empty() { return None; }
         if self.queue.is_empty() {
             return None;
         }
@@ -136,9 +112,6 @@ impl TbfQdisc {
         }
         let used = self.burst_bytes.saturating_sub(self.tokens) as u128;
         ((used * 100) / self.burst_bytes as u128) as u32
-        if self.burst_bytes == 0 { return 0; }
-        let used = self.burst_bytes - self.tokens;
-        ((used * 100) / self.burst_bytes) as u32
     }
 }
 
@@ -213,9 +186,6 @@ impl HtbClass {
             tokens: burst,
             ctokens: ceil_bps / 8,
             prio,
-            queue: VecDeque::new(),
-            queue: Vec::new(),
-            enqueued: 0, dequeued: 0, lended: 0, dropped: 0,
             queue: Vec::new(),
             enqueued: 0,
             dequeued: 0,
@@ -243,11 +213,6 @@ impl HtbClass {
     }
 
     pub fn try_dequeue(&mut self) -> Option<Packet> {
-        let len = self.queue.front()?.len as u64;
-        if self.queue.is_empty() {
-            return None;
-        }
-        if self.queue.is_empty() { return None; }
         if self.queue.is_empty() {
             return None;
         }
@@ -324,10 +289,6 @@ impl HtbQdisc {
 // ─── FQ-CoDel (Fair Queuing Controlled Delay) — simplified ───────────────────
 
 pub struct FqCodelQdisc {
-    pub target_delay_ns: u64, // target queue latency (default 5ms)
-    pub interval_ns: u64,     // CoDel interval (default 100ms)
-    pub quantum: u32,         // FQ quantum in bytes
-    pub flows: Vec<VecDeque<Packet>>,
     pub target_delay_ns: u64,  // target queue latency (default 5ms)
     pub interval_ns: u64,      // CoDel interval (default 100ms)
     pub quantum: u32,          // FQ quantum in bytes
@@ -357,11 +318,6 @@ impl FqCodelQdisc {
         if self.flow_count == 0 {
             return false;
         }
-        let flow_idx = (pkt.flow_id as usize) % flow_count;
-        if self.flow_count == 0 {
-            return false;
-        }
-        if self.flow_count == 0 { return false; }
         let flow_idx = (pkt.flow_id as usize) % self.flow_count;
         // CoDel: if sojourn time > target, mark/drop
         // (simplified: if flow queue is deep, mark ECN)
@@ -381,13 +337,6 @@ impl FqCodelQdisc {
         if self.flow_count == 0 {
             return None;
         }
-        let start = self.round_robin_idx % flow_count;
-        for i in 0..flow_count {
-            let idx = (start + i) % flow_count;
-        if self.flow_count == 0 {
-            return None;
-        }
-        if self.flow_count == 0 { return None; }
         let start = self.round_robin_idx;
         for i in 0..self.flow_count {
             let idx = (start + i) % self.flow_count;

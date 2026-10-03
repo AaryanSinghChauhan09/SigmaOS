@@ -182,12 +182,6 @@ impl LinuxBsdDistroGuidelineRules {
     pub fn verify_guideline_compliance(&self, standard: DistroGuidelineStandard) -> bool {
         match standard {
             DistroGuidelineStandard::ArchSimplicityPurity => self.zero_dependency_purity,
-            DistroGuidelineStandard::FreeBsdCapsicumJails
-            | DistroGuidelineStandard::OpenBsdPledgeUnveil
-            | DistroGuidelineStandard::OpenBsdPledge => self.capability_sandboxing_enabled,
-            DistroGuidelineStandard::ArchSimplicityPurity => self.zero_dependency_purity,
-            DistroGuidelineStandard::FreeBsdCapsicumJails
-            | DistroGuidelineStandard::OpenBsdPledgeUnveil => self.capability_sandboxing_enabled,
             DistroGuidelineStandard::FreeBsdCapsicumJails | DistroGuidelineStandard::OpenBsdPledgeUnveil => {
                 self.capability_sandboxing_enabled
             }

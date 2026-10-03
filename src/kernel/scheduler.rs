@@ -95,7 +95,7 @@ pub struct ProcessTask {
 }
 
 impl ProcessTask {
-    pub fn new(pid: u64, _name: String, priority: Priority) -> Self {
+    pub fn new(pid: u64, priority: Priority) -> Self {
         Self {
             pid,
             priority,
@@ -108,37 +108,9 @@ impl ProcessTask {
             slice: 10000,
         }
     }
-}
 
-impl ProcessTask {
-    pub fn new(pid: u64, priority: Priority) -> Self {
-        Self {
-            pid,
-            priority,
-            policy: SchedulerPolicy::Normal,
-            state: ProcessState::Runnable,
-            vruntime: 0,
-            exec_start: 0,
-            exec_duration: 0,
-            cpu_time: 0,
-            slice: 10,
-        }
-    }
-}
-
-impl ProcessTask {
-    pub fn new(pid: u64, priority: Priority) -> Self {
-        Self {
-            pid,
-            priority,
-            policy: SchedulerPolicy::Normal,
-            state: ProcessState::Runnable,
-            vruntime: 0,
-            exec_start: 0,
-            exec_duration: 0,
-            cpu_time: 0,
-            slice: 10,
-        }
+    pub fn with_name(pid: u64, _name: String, priority: Priority) -> Self {
+        Self::new(pid, priority)
     }
 }
 
@@ -152,22 +124,6 @@ impl Ord for ProcessTask {
 impl PartialOrd for ProcessTask {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
         Some(self.cmp(other))
-    }
-}
-
-impl ProcessTask {
-    pub fn new(pid: u64, priority: Priority) -> Self {
-        Self {
-            pid,
-            priority,
-            policy: SchedulerPolicy::Normal,
-            state: ProcessState::Ready,
-            vruntime: 0,
-            exec_start: 0,
-            exec_duration: 0,
-            cpu_time: 0,
-            slice: 10,
-        }
     }
 }
 

@@ -67,7 +67,7 @@ pub trait EncryptionService {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CryptoError {
     Success = 0,
     KeyNotFound = 1,
@@ -75,7 +75,6 @@ pub enum CryptoError {
     InvalidKey = 3,
     CryptoUnavailable = 4,
 }
-pub enum CryptoError { Success = 0, KeyNotFound = 1, EncryptionFailed = 2, InvalidKey = 3 }
 
 pub struct SimpleEncryptionService {
     keys: Vec<Option<Box<dyn EncryptionKey>>>,
