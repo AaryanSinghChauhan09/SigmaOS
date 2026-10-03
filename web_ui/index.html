@@ -448,28 +448,66 @@
 
             const progressBarOuter = document.getElementById('progress-bar-outer');
             let logIndex = 0;
-            const interval = setInterval(() => {
-                if (logIndex < logs.length) {
-                    const currentLog = logs[logIndex];
-                    if (progress < currentLog.prg) {
-                        progress = currentLog.prg;
-                        progressBar.style.width = `${progress}%`;
-                        progressPct.textContent = `${progress}%`;
-                        progressStatus.textContent = currentLog.msg;
-                        if (progressBarOuter) {
-                            progressBarOuter.setAttribute('aria-valuenow', progress);
-                            progressBarOuter.setAttribute('aria-valuetext', `${progress}%`);
-                        }
-                        appendLog(currentLog.msg, currentLog.class);
-                        logIndex++;
+
+            // 60fps smooth progress: requestAnimationFrame with smoothstep
+            // easing between milestones. The old 600ms setInterval snapped
+            // the bar in big jumps; this eases continuously, writes the
+            // width once per frame, and only touches text/ARIA when the
+            // rounded value actually changes. rAF also auto-pauses when the
+            // tab is hidden, so the simulation never burns CPU off-screen.
+            const SLICE_MS = 900;
+            let startTime = null;
+            let lastRounded = -1;
+            let finished = false;
+
+            const tick = (ts) => {
+                if (startTime === null) startTime = ts;
+                const elapsed = ts - startTime;
+
+                // Emit each milestone log once its slice completes
+                while (logIndex < logs.length && elapsed >= (logIndex + 1) * SLICE_MS) {
+                    const entry = logs[logIndex];
+                    progressStatus.textContent = entry.msg;
+                    appendLog(entry.msg, entry.class);
+                    logIndex++;
+                }
+
+                // Ease the bar from the previous milestone toward the next
+                const base = logIndex > 0 ? logs[logIndex - 1].prg : 0;
+                const target = logIndex < logs.length ? logs[logIndex].prg : 100;
+                const sliceStart = logIndex * SLICE_MS;
+                const t = Math.min(Math.max((elapsed - sliceStart) / SLICE_MS, 0), 1);
+                const eased = t * t * (3 - 2 * t); // smoothstep
+                progress = base + (target - base) * eased;
+
+                progressBar.style.width = `${progress.toFixed(1)}%`;
+
+                const rounded = Math.round(progress);
+                if (rounded !== lastRounded) {
+                    lastRounded = rounded;
+                    progressPct.textContent = `${rounded}%`;
+                    if (progressBarOuter) {
+                        progressBarOuter.setAttribute('aria-valuenow', rounded);
+                        progressBarOuter.setAttribute('aria-valuetext', `${rounded}%`);
                     }
-                } else {
-                    clearInterval(interval);
+                }
+
+                if (logIndex >= logs.length && !finished) {
+                    finished = true;
+                    progressBar.style.width = '100%';
+                    progressPct.textContent = '100%';
+                    if (progressBarOuter) {
+                        progressBarOuter.setAttribute('aria-valuenow', 100);
+                        progressBarOuter.setAttribute('aria-valuetext', '100%');
+                    }
                     setTimeout(() => {
                         nextStep();
                     }, 1000);
+                    return; // stop the frame loop
                 }
-            }, 600);
+                requestAnimationFrame(tick);
+            };
+            requestAnimationFrame(tick);
         }
     </script>
 </body>
