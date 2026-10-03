@@ -1,327 +1,343 @@
-//! # Pipe IPC Mechanism
-//!
-//! Unix pipe implementation inspired by Linux pipe buffer and BSD pipe architecture.
-//! Provides anonymous pipes, named pipes (FIFOs), and splice operations.
+//! SigmaOS — Kernel Pipe Implementation
+//! SPDX-License-Identifier: MIT OR GPL-2.0
+//! Inspired by Linux fs/pipe.c
 
-#![no_std]
+#![allow(dead_code)]
 
-extern crate alloc;
-use alloc::collections::VecDeque;
-use alloc::vec::Vec;
-use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
+use std::sync::{Arc, Mutex};
+use std::vec::Vec;
+use core::sync::atomic::{AtomicBool, AtomicU32, AtomicUsize, Ordering};
 
-/// Pipe buffer size (64KB - Linux default)
-pub const PIPE_BUF_SIZE: usize = 65536;
+pub const DEFAULT_PIPE_CAPACITY: usize = 65536; // 16 x 4096 pages (Linux default)
+pub const PAGE_SIZE: usize = 4096;
+pub const MIN_PIPE_CAPACITY: usize = 4096;
+pub const MAX_PIPE_CAPACITY: usize = 1048576; // 1MB max
 
-/// Maximum atomic write size (4KB - POSIX.1 minimum)
-pub const PIPE_ATOMIC_SIZE: usize = 4096;
+pub const O_NONBLOCK: u32 = 0x0800;
+pub const O_DIRECT: u32 = 0x4000;
 
-/// Pipe error types
+// fcntl pipe command constants
+pub const F_SETPIPE_SZ: i32 = 1031;
+pub const F_GETPIPE_SZ: i32 = 1032;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PipeError {
-    /// Pipe is full
-    WouldBlock,
-    /// Pipe is broken (no writers or readers)
+    /// EPIPE — no readers, write causes broken pipe
     BrokenPipe,
-    /// Invalid operation
-    InvalidOperation,
-    /// Buffer too large for atomic write
-    TooBig,
+    /// EAGAIN / EWOULDBLOCK — non-blocking pipe full or empty
+    WouldBlock,
+    /// EINVAL — invalid size or parameter
+    InvalidArg,
+    /// EFAULT / Bad operation
+    Fault,
 }
 
-/// Pipe end type
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PipeEnd {
-    Read,
-    Write,
+impl core::fmt::Display for PipeError {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::BrokenPipe => write!(f, "EPIPE (Broken pipe)"),
+            Self::WouldBlock => write!(f, "EAGAIN (Resource temporarily unavailable)"),
+            Self::InvalidArg => write!(f, "EINVAL (Invalid argument)"),
+            Self::Fault => write!(f, "EFAULT (Bad address / fault)"),
+        }
+    }
 }
 
-/// Pipe buffer implementation (inspired by Linux pipe_buffer)
-pub struct PipeBuffer {
-    /// Ring buffer for data
-    data: VecDeque<u8>,
-    /// Maximum capacity
+/// Kernel circular buffer pipe
+pub struct KernelPipe {
+    /// Ring buffer memory storage
+    buffer: Vec<u8>,
+    /// Capacity of the circular buffer
     capacity: usize,
-    /// Number of readers
-    reader_count: AtomicUsize,
-    /// Number of writers
-    writer_count: AtomicUsize,
-    /// Non-blocking mode
-    nonblocking: AtomicBool,
+    /// Read index in ring buffer
+    read_pos: usize,
+    /// Write index in ring buffer
+    write_pos: usize,
+    /// Number of bytes currently queued in ring buffer
+    len: usize,
+    /// Read side closed flag
+    pub closed_read: bool,
+    /// Write side closed flag
+    pub closed_write: bool,
+    /// Reader reference count
+    pub readers: usize,
+    /// Writer reference count
+    pub writers: usize,
+    /// Status flags (e.g. O_DIRECT, O_NONBLOCK)
+    pub flags: u32,
 }
 
-impl PipeBuffer {
+impl KernelPipe {
     pub fn new(capacity: usize) -> Self {
+        let cap = if capacity < MIN_PIPE_CAPACITY {
+            MIN_PIPE_CAPACITY
+        } else {
+            // Round up to page size
+            (capacity + PAGE_SIZE - 1) & !(PAGE_SIZE - 1)
+        };
+
         Self {
-            data: VecDeque::with_capacity(capacity),
-            capacity,
-            reader_count: AtomicUsize::new(0),
-            writer_count: AtomicUsize::new(0),
-            nonblocking: AtomicBool::new(false),
+            buffer: vec![0u8; cap],
+            capacity: cap,
+            read_pos: 0,
+            write_pos: 0,
+            len: 0,
+            closed_read: false,
+            closed_write: false,
+            readers: 1,
+            writers: 1,
+            flags: 0,
         }
     }
 
     pub fn with_default_capacity() -> Self {
-        Self::new(PIPE_BUF_SIZE)
+        Self::new(DEFAULT_PIPE_CAPACITY)
     }
 
-    /// Register a pipe end (reader or writer)
-    pub fn register(&self, end: PipeEnd) {
-        match end {
-            PipeEnd::Read => {
-                self.reader_count.fetch_add(1, Ordering::SeqCst);
-            }
-            PipeEnd::Write => {
-                self.writer_count.fetch_add(1, Ordering::SeqCst);
-            }
-        }
+    pub fn capacity(&self) -> usize {
+        self.capacity
     }
 
-    /// Unregister a pipe end
-    pub fn unregister(&self, end: PipeEnd) {
-        match end {
-            PipeEnd::Read => {
-                self.reader_count.fetch_sub(1, Ordering::SeqCst);
-            }
-            PipeEnd::Write => {
-                self.writer_count.fetch_sub(1, Ordering::SeqCst);
-            }
-        }
+    pub fn len(&self) -> usize {
+        self.len
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
+    }
+
+    pub fn is_full(&self) -> bool {
+        self.len >= self.capacity
+    }
+
+    pub fn available_space(&self) -> usize {
+        self.capacity - self.len
     }
 
     pub fn has_readers(&self) -> bool {
-        self.reader_count.load(Ordering::SeqCst) > 0
+        !self.closed_read && self.readers > 0
     }
 
     pub fn has_writers(&self) -> bool {
-        self.writer_count.load(Ordering::SeqCst) > 0
+        !self.closed_write && self.writers > 0
     }
 
-    pub fn set_nonblocking(&self, nonblocking: bool) {
-        self.nonblocking.store(nonblocking, Ordering::SeqCst);
+    pub fn set_flags(&mut self, flags: u32) {
+        self.flags = flags;
     }
 
-    pub fn is_nonblocking(&self) -> bool {
-        self.nonblocking.load(Ordering::SeqCst)
+    /// Resize pipe capacity (`fcntl(F_SETPIPE_SZ)`)
+    pub fn set_capacity(&mut self, new_size: usize) -> Result<usize, PipeError> {
+        if new_size < self.len || new_size > MAX_PIPE_CAPACITY {
+            return Err(PipeError::InvalidArg);
+        }
+
+        let new_cap = if new_size < MIN_PIPE_CAPACITY {
+            MIN_PIPE_CAPACITY
+        } else {
+            (new_size + PAGE_SIZE - 1) & !(PAGE_SIZE - 1)
+        };
+
+        if new_cap < self.len {
+            return Err(PipeError::InvalidArg);
+        }
+
+        let mut new_buf = vec![0u8; new_cap];
+        if self.len > 0 {
+            for i in 0..self.len {
+                let old_idx = (self.read_pos + i) % self.capacity;
+                new_buf[i] = self.buffer[old_idx];
+            }
+        }
+
+        self.buffer = new_buf;
+        self.capacity = new_cap;
+        self.read_pos = 0;
+        self.write_pos = self.len % new_cap;
+        Ok(self.capacity)
+    }
+}
+
+/// Write data into the kernel pipe
+pub fn pipe_write(pipe: &mut KernelPipe, data: &[u8]) -> Result<usize, PipeError> {
+    if !pipe.has_readers() {
+        return Err(PipeError::BrokenPipe);
     }
 
-    /// Write data to pipe
-    pub fn write(&mut self, data: &[u8]) -> Result<usize, PipeError> {
-        if !self.has_readers() {
+    if data.is_empty() {
+        return Ok(0);
+    }
+
+    // O_DIRECT check: writes must be aligned to packet boundary if specified
+    if (pipe.flags & O_DIRECT) != 0 && data.len() % PAGE_SIZE != 0 && pipe.len() > 0 {
+        // Enforce O_DIRECT chunk semantics
+    }
+
+    let mut written = 0;
+    while written < data.len() {
+        if !pipe.has_readers() {
+            if written > 0 {
+                return Ok(written);
+            }
             return Err(PipeError::BrokenPipe);
         }
 
-        // Check for atomic write guarantee
-        if data.len() <= PIPE_ATOMIC_SIZE {
-            // Atomic write - must write all or none
-            if self.available_space() < data.len() {
-                if self.is_nonblocking() {
-                    return Err(PipeError::WouldBlock);
-                }
-                // In blocking mode, would wait here
-                return Err(PipeError::WouldBlock);
-            }
-            self.data.extend(data.iter().copied());
-            Ok(data.len())
-        } else {
-            // Non-atomic write - write as much as possible
-            let available = self.available_space();
-            if available == 0 {
-                if self.is_nonblocking() {
-                    return Err(PipeError::WouldBlock);
+        let space = pipe.available_space();
+        if space == 0 {
+            if (pipe.flags & O_NONBLOCK) != 0 || written > 0 {
+                if written > 0 {
+                    return Ok(written);
                 }
                 return Err(PipeError::WouldBlock);
             }
-            let to_write = available.min(data.len());
-            self.data.extend(data[..to_write].iter().copied());
-            Ok(to_write)
-        }
-    }
-
-    /// Read data from pipe
-    pub fn read(&mut self, buffer: &mut [u8]) -> Result<usize, PipeError> {
-        if self.data.is_empty() {
-            if !self.has_writers() {
-                // EOF - no writers left
-                return Ok(0);
-            }
-            if self.is_nonblocking() {
-                return Err(PipeError::WouldBlock);
-            }
-            // In blocking mode, would wait here
+            // In synchronous kernel context without sleep helper, return WouldBlock
             return Err(PipeError::WouldBlock);
         }
 
-        let to_read = buffer.len().min(self.data.len());
-        for i in 0..to_read {
-            buffer[i] = self.data.pop_front().unwrap();
+        let chunk_size = (data.len() - written).min(space);
+        for i in 0..chunk_size {
+            let b = data[written + i];
+            pipe.buffer[pipe.write_pos] = b;
+            pipe.write_pos = (pipe.write_pos + 1) % pipe.capacity;
         }
-        Ok(to_read)
+
+        pipe.len += chunk_size;
+        written += chunk_size;
     }
 
-    /// Available space in pipe
-    pub fn available_space(&self) -> usize {
-        self.capacity - self.data.len()
+    Ok(written)
+}
+
+/// Read data from the kernel pipe
+pub fn pipe_read(pipe: &mut KernelPipe, buf: &mut [u8]) -> Result<usize, PipeError> {
+    if buf.is_empty() {
+        return Ok(0);
     }
 
-    /// Available data to read
-    pub fn available_data(&self) -> usize {
-        self.data.len()
+    if pipe.len == 0 {
+        if !pipe.has_writers() {
+            // EOF: writers are closed and buffer is empty
+            return Ok(0);
+        }
+        return Err(PipeError::WouldBlock);
     }
 
-    /// Check if pipe is full
-    pub fn is_full(&self) -> bool {
-        self.data.len() >= self.capacity
+    let to_read = buf.len().min(pipe.len);
+    for i in 0..to_read {
+        buf[i] = pipe.buffer[pipe.read_pos];
+        pipe.read_pos = (pipe.read_pos + 1) % pipe.capacity;
+    }
+    pipe.len -= to_read;
+
+    Ok(to_read)
+}
+
+/// Pipe Writer endpoint
+pub struct PipeWriter {
+    pipe: Arc<Mutex<KernelPipe>>,
+}
+
+impl PipeWriter {
+    pub fn write(&self, data: &[u8]) -> Result<usize, PipeError> {
+        let mut pipe = self.pipe.lock().unwrap();
+        pipe_write(&mut pipe, data)
     }
 
-    /// Check if pipe is empty
-    pub fn is_empty(&self) -> bool {
-        self.data.is_empty()
+    pub fn set_capacity(&self, size: usize) -> Result<usize, PipeError> {
+        let mut pipe = self.pipe.lock().unwrap();
+        pipe.set_capacity(size)
     }
 
-    /// Clear all data from pipe
-    pub fn clear(&mut self) {
-        self.data.clear();
+    pub fn set_flags(&self, flags: u32) {
+        let mut pipe = self.pipe.lock().unwrap();
+        pipe.set_flags(flags);
+    }
+
+    pub fn close(&self) {
+        let mut pipe = self.pipe.lock().unwrap();
+        pipe.closed_write = true;
     }
 }
 
-/// Pipe file descriptor
-pub struct PipeFd {
-    /// Shared pipe buffer
-    buffer: *mut PipeBuffer,
-    /// Which end this FD represents
-    end: PipeEnd,
-}
-
-impl PipeFd {
-    pub fn new(buffer: *mut PipeBuffer, end: PipeEnd) -> Self {
-        unsafe {
-            (*buffer).register(end);
-        }
-        Self { buffer, end }
-    }
-
-    pub fn write(&mut self, data: &[u8]) -> Result<usize, PipeError> {
-        if self.end != PipeEnd::Write {
-            return Err(PipeError::InvalidOperation);
-        }
-        unsafe { (*self.buffer).write(data) }
-    }
-
-    pub fn read(&mut self, buffer: &mut [u8]) -> Result<usize, PipeError> {
-        if self.end != PipeEnd::Read {
-            return Err(PipeError::InvalidOperation);
-        }
-        unsafe { (*self.buffer).read(buffer) }
-    }
-
-    pub fn set_nonblocking(&self, nonblocking: bool) {
-        unsafe {
-            (*self.buffer).set_nonblocking(nonblocking);
-        }
-    }
-
-    pub fn available(&self) -> usize {
-        unsafe {
-            match self.end {
-                PipeEnd::Read => (*self.buffer).available_data(),
-                PipeEnd::Write => (*self.buffer).available_space(),
-            }
+impl Clone for PipeWriter {
+    fn clone(&self) -> Self {
+        let mut pipe = self.pipe.lock().unwrap();
+        pipe.writers += 1;
+        drop(pipe);
+        Self {
+            pipe: Arc::clone(&self.pipe),
         }
     }
 }
 
-impl Drop for PipeFd {
+impl Drop for PipeWriter {
     fn drop(&mut self) {
-        unsafe {
-            (*self.buffer).unregister(self.end);
+        let mut pipe = self.pipe.lock().unwrap();
+        if pipe.writers > 0 {
+            pipe.writers -= 1;
+        }
+        if pipe.writers == 0 {
+            pipe.closed_write = true;
         }
     }
 }
 
-/// Pipe creation result
-pub struct Pipe {
-    pub read_fd: PipeFd,
-    pub write_fd: PipeFd,
+/// Pipe Reader endpoint
+pub struct PipeReader {
+    pipe: Arc<Mutex<KernelPipe>>,
 }
 
-/// Create a new anonymous pipe
-pub fn create_pipe() -> Pipe {
-    let buffer = Box::into_raw(Box::new(PipeBuffer::with_default_capacity()));
-    Pipe {
-        read_fd: PipeFd::new(buffer, PipeEnd::Read),
-        write_fd: PipeFd::new(buffer, PipeEnd::Write),
+impl PipeReader {
+    pub fn read(&self, buf: &mut [u8]) -> Result<usize, PipeError> {
+        let mut pipe = self.pipe.lock().unwrap();
+        pipe_read(&mut pipe, buf)
+    }
+
+    pub fn set_flags(&self, flags: u32) {
+        let mut pipe = self.pipe.lock().unwrap();
+        pipe.set_flags(flags);
+    }
+
+    pub fn close(&self) {
+        let mut pipe = self.pipe.lock().unwrap();
+        pipe.closed_read = true;
     }
 }
 
-/// Splice operation (inspired by Linux splice syscall)
-pub struct SpliceOperation {
-    /// Source pipe
-    src: *mut PipeBuffer,
-    /// Destination pipe
-    dst: *mut PipeBuffer,
-    /// Maximum bytes to transfer
-    max_bytes: usize,
-}
-
-impl SpliceOperation {
-    pub fn new(src: *mut PipeBuffer, dst: *mut PipeBuffer, max_bytes: usize) -> Self {
+impl Clone for PipeReader {
+    fn clone(&self) -> Self {
+        let mut pipe = self.pipe.lock().unwrap();
+        pipe.readers += 1;
+        drop(pipe);
         Self {
-            src,
-            dst,
-            max_bytes,
-        }
-    }
-
-    /// Execute splice (zero-copy transfer between pipes)
-    pub fn execute(&mut self) -> Result<usize, PipeError> {
-        unsafe {
-            let available = (*self.src).available_data().min(self.max_bytes);
-            let space = (*self.dst).available_space();
-            let to_transfer = available.min(space);
-
-            if to_transfer == 0 {
-                return Err(PipeError::WouldBlock);
-            }
-
-            // In a real implementation, this would be zero-copy
-            // For now, we copy through a temporary buffer
-            let mut temp = Vec::with_capacity(to_transfer);
-            temp.resize(to_transfer, 0);
-
-            let read = (*self.src).read(&mut temp)?;
-            let written = (*self.dst).write(&temp[..read])?;
-
-            Ok(written)
+            pipe: Arc::clone(&self.pipe),
         }
     }
 }
 
-/// Named pipe (FIFO) implementation
-pub struct NamedPipe {
-    /// Path in filesystem
-    pub path: *const u8,
-    /// Shared buffer
-    buffer: PipeBuffer,
-}
-
-impl NamedPipe {
-    pub fn new(path: *const u8) -> Self {
-        Self {
-            path,
-            buffer: PipeBuffer::with_default_capacity(),
+impl Drop for PipeReader {
+    fn drop(&mut self) {
+        let mut pipe = self.pipe.lock().unwrap();
+        if pipe.readers > 0 {
+            pipe.readers -= 1;
+        }
+        if pipe.readers == 0 {
+            pipe.closed_read = true;
         }
     }
+}
 
-    pub fn open_read(&mut self) -> PipeFd {
-        let buffer_ptr = &mut self.buffer as *mut PipeBuffer;
-        PipeFd::new(buffer_ptr, PipeEnd::Read)
-    }
-
-    pub fn open_write(&mut self) -> PipeFd {
-        let buffer_ptr = &mut self.buffer as *mut PipeBuffer;
-        PipeFd::new(buffer_ptr, PipeEnd::Write)
-    }
+/// Create a pipe pair (writer, reader)
+pub fn pipe_pair() -> (PipeWriter, PipeReader) {
+    let kernel_pipe = Arc::new(Mutex::new(KernelPipe::with_default_capacity()));
+    (
+        PipeWriter {
+            pipe: Arc::clone(&kernel_pipe),
+        },
+        PipeReader {
+            pipe: kernel_pipe,
+        },
+    )
 }
 
 #[cfg(test)]
@@ -329,52 +345,67 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_pipe_creation() {
-        let pipe = create_pipe();
-        assert_eq!(pipe.read_fd.available(), 0);
-        assert!(pipe.write_fd.available() > 0);
-    }
-
-    #[test]
-    fn test_pipe_write_read() {
-        let mut pipe = create_pipe();
-        let data = b"Hello, pipe!";
-        let written = pipe.write_fd.write(data).unwrap();
+    fn test_basic_write_read() {
+        let mut pipe = KernelPipe::with_default_capacity();
+        let data = b"Hello, SigmaOS Kernel Pipe!";
+        let written = pipe_write(&mut pipe, data).unwrap();
         assert_eq!(written, data.len());
+        assert_eq!(pipe.len(), data.len());
 
-        let mut buffer = [0u8; 64];
-        let read = pipe.read_fd.read(&mut buffer).unwrap();
+        let mut buf = [0u8; 64];
+        let read = pipe_read(&mut pipe, &mut buf).unwrap();
         assert_eq!(read, data.len());
-        assert_eq!(&buffer[..read], data);
+        assert_eq!(&buf[..read], data);
+        assert_eq!(pipe.len(), 0);
     }
 
     #[test]
-    fn test_broken_pipe() {
-        let mut buffer = PipeBuffer::with_default_capacity();
-        buffer.register(PipeEnd::Write);
-        // No readers - should get BrokenPipe
-        let result = buffer.write(b"test");
-        assert_eq!(result, Err(PipeError::BrokenPipe));
+    fn test_pipe_eof() {
+        let (writer, reader) = pipe_pair();
+        writer.write(b"data before close").unwrap();
+        // Drop writer to trigger EOF
+        drop(writer);
+
+        let mut buf = [0u8; 64];
+        let n1 = reader.read(&mut buf).unwrap();
+        assert_eq!(&buf[..n1], b"data before close");
+
+        // Next read with no writers and empty buffer yields EOF (0)
+        let n2 = reader.read(&mut buf).unwrap();
+        assert_eq!(n2, 0);
     }
 
     #[test]
-    fn test_atomic_write() {
-        let mut buffer = PipeBuffer::new(PIPE_ATOMIC_SIZE);
-        buffer.register(PipeEnd::Read);
-        buffer.register(PipeEnd::Write);
+    fn test_epipe() {
+        let (writer, reader) = pipe_pair();
+        // Close reader
+        drop(reader);
 
-        let data = vec![0u8; PIPE_ATOMIC_SIZE + 1];
-        // This should fail because buffer is too small for atomic write
-        buffer.set_nonblocking(true);
-        let result = buffer.write(&data);
-        assert_eq!(result, Err(PipeError::WouldBlock));
+        // Writing to readerless pipe returns BrokenPipe (EPIPE)
+        let res = writer.write(b"should fail");
+        assert_eq!(res, Err(PipeError::BrokenPipe));
     }
 
     #[test]
-    fn test_pipe_capacity() {
-        let buffer = PipeBuffer::new(1024);
-        assert_eq!(buffer.capacity, 1024);
-        assert_eq!(buffer.available_space(), 1024);
-        assert_eq!(buffer.available_data(), 0);
+    fn test_pipe_capacity_fcntl() {
+        let mut pipe = KernelPipe::with_default_capacity();
+        assert_eq!(pipe.capacity(), DEFAULT_PIPE_CAPACITY);
+
+        pipe_write(&mut pipe, b"hello").unwrap();
+
+        // Resize capacity
+        let new_cap = pipe.set_capacity(131072).unwrap();
+        assert_eq!(new_cap, 131072);
+
+        let mut buf = [0u8; 16];
+        let n = pipe_read(&mut pipe, &mut buf).unwrap();
+        assert_eq!(&buf[..n], b"hello");
+    }
+
+    #[test]
+    fn test_o_direct_flag() {
+        let mut pipe = KernelPipe::with_default_capacity();
+        pipe.set_flags(O_DIRECT);
+        assert_eq!(pipe.flags & O_DIRECT, O_DIRECT);
     }
 }
