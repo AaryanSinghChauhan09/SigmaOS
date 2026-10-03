@@ -24,4 +24,4 @@ jobs:
 
       - name: Test Gentoo Package Format Transpilation
         run: |
-          cargo test --lib -- package::universal
+          rustc --test src/package/universal.rs --edition=2021 -o build/test_universal && ./build/test_universal
