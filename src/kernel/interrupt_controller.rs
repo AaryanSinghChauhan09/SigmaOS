@@ -251,13 +251,13 @@ impl InterruptController {
     /// Linux: `kernel/irq/handle.c:handle_irq()`
     pub fn handle_interrupt(&self, vector: u8) {
         let index = (vector - IRQ_VECTOR_BASE) as usize;
-        
+
         if index >= self.descriptors.len() {
             return;
         }
 
         let desc = &self.descriptors[index];
-        
+
         if !desc.enabled.load(Ordering::Acquire) {
             return;
         }
@@ -278,7 +278,7 @@ impl InterruptController {
     pub fn get_stats(&self, irq_line: IrqLine) -> Option<u64> {
         let vector = IRQ_VECTOR_BASE + irq_line.0;
         let index = (vector - IRQ_VECTOR_BASE) as usize;
-        
+
         self.descriptors.get(index).map(|d| d.get_count())
     }
 
@@ -337,10 +337,7 @@ pub fn init_interrupts() {
 }
 
 /// Register interrupt handler (global interface)
-pub fn register_irq_handler(
-    irq_line: IrqLine,
-    handler: InterruptHandler,
-) -> Result<u8, IrqError> {
+pub fn register_irq_handler(irq_line: IrqLine, handler: InterruptHandler) -> Result<u8, IrqError> {
     unsafe {
         INTERRUPT_CONTROLLER
             .as_mut()
@@ -383,7 +380,7 @@ mod tests {
         let desc = InterruptDescriptor::new(0x20);
         assert_eq!(desc.vector, 0x20);
         assert_eq!(desc.get_count(), 0);
-        
+
         desc.increment_count();
         assert_eq!(desc.get_count(), 1);
     }

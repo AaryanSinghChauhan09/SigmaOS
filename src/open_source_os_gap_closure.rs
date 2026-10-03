@@ -5090,7 +5090,9 @@ mod tests {
         let hash = suite.track_lbu_file_change("/etc/sigma.conf", b"key=val");
         assert!(!hash.is_empty());
 
-        assert!(suite.verify_retguard_exit("main", 0x1234, 0x7FFF0000).is_ok());
+        assert!(suite
+            .verify_retguard_exit("main", 0x1234, 0x7FFF0000)
+            .is_ok());
 
         assert!(suite.enforce_pax_mprotect(101, 0x1000, true, false).is_ok());
         assert!(suite.enforce_pax_mprotect(101, 0x1000, true, true).is_err());
@@ -5115,7 +5117,10 @@ mod tests {
     #[test]
     fn test_sovereign_alpine_lbu_overlay_governor() {
         let mut lbu = SovereignAlpineLbuOverlayGovernor::new("/media/usb");
-        let hash = lbu.track_file_change("/etc/network/interfaces", b"auto eth0\niface eth0 inet dhcp");
+        let hash = lbu.track_file_change(
+            "/etc/network/interfaces",
+            b"auto eth0\niface eth0 inet dhcp",
+        );
         assert_eq!(hash.len(), 16);
 
         let (archive_path, count) = lbu.generate_apkovl_archive();
@@ -5135,11 +5140,16 @@ mod tests {
         assert!(retguard.is_valid_stack_pointer(0x7FFF_0100));
         assert!(!retguard.is_valid_stack_pointer(0x1000_0000));
 
-        let canary = retguard.enter_function("kernel_sys_entry", 0xA5A5_5A5A_1234_5678, 0x7FFF_0100);
+        let canary =
+            retguard.enter_function("kernel_sys_entry", 0xA5A5_5A5A_1234_5678, 0x7FFF_0100);
         assert_ne!(canary, 0);
 
-        assert!(retguard.verify_exit_function("kernel_sys_entry", canary, 0x7FFF_0100).is_ok());
-        assert!(retguard.verify_exit_function("kernel_sys_entry", canary, 0xDEAD_BEEF).is_err());
+        assert!(retguard
+            .verify_exit_function("kernel_sys_entry", canary, 0x7FFF_0100)
+            .is_ok());
+        assert!(retguard
+            .verify_exit_function("kernel_sys_entry", canary, 0xDEAD_BEEF)
+            .is_err());
         assert_eq!(retguard.violation_count, 1);
     }
 
@@ -5162,8 +5172,14 @@ mod tests {
     #[test]
     fn test_sovereign_cachyos_bore_tuner_engine() {
         let mut tuner = SovereignCachyOsBoreTunerEngine::new();
-        assert_eq!(tuner.auto_tune_microarchitecture(true, false, true), X86IsaOptimizationLevel::V3Haswell);
-        assert_eq!(tuner.auto_tune_microarchitecture(true, true, true), X86IsaOptimizationLevel::V4Sapphire);
+        assert_eq!(
+            tuner.auto_tune_microarchitecture(true, false, true),
+            X86IsaOptimizationLevel::V3Haswell
+        );
+        assert_eq!(
+            tuner.auto_tune_microarchitecture(true, true, true),
+            X86IsaOptimizationLevel::V4Sapphire
+        );
 
         let slice = tuner.calculate_bore_timeslice_ns(80, 5_000_000);
         assert_eq!(slice, 5_200_000);
@@ -6134,7 +6150,12 @@ impl SovereignPopOsCosmicAppletEngine {
         }
     }
 
-    pub fn update_auto_tiling_layout(&self, screen_w: u32, screen_h: u32, window_count: u32) -> (u32, u32) {
+    pub fn update_auto_tiling_layout(
+        &self,
+        screen_w: u32,
+        screen_h: u32,
+        window_count: u32,
+    ) -> (u32, u32) {
         if window_count == 0 {
             (screen_w, screen_h)
         } else if window_count == 1 {
@@ -6326,7 +6347,9 @@ impl SovereignHardenedBsdPaxGuardEngine {
     ) -> Result<(), &'static str> {
         if req_write && req_exec {
             self.violations_count += 1;
-            return Err("PaX W^X Guard: Cannot grant simultaneously writable and executable permissions");
+            return Err(
+                "PaX W^X Guard: Cannot grant simultaneously writable and executable permissions",
+            );
         }
         Ok(())
     }

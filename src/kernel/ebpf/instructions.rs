@@ -24,18 +24,18 @@ pub enum EbpfOpClass {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u8)]
 pub enum EbpfSrc {
-    Imm = 0x00,  // Immediate value
-    Reg = 0x08,  // Register
+    Imm = 0x00, // Immediate value
+    Reg = 0x08, // Register
 }
 
 /// Memory access size (bits 3-4 for LD/ST)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u8)]
 pub enum EbpfSize {
-    W = 0x00,   // 32-bit
-    H = 0x08,   // 16-bit
-    B = 0x10,   // 8-bit
-    Dw = 0x18,  // 64-bit
+    W = 0x00,  // 32-bit
+    H = 0x08,  // 16-bit
+    B = 0x10,  // 8-bit
+    Dw = 0x18, // 64-bit
 }
 
 /// Raw eBPF instruction (Linux struct bpf_insn compatible)
@@ -43,8 +43,8 @@ pub enum EbpfSize {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct BpfInsn {
     pub opcode: u8,
-    pub dst_reg: u8,  // bits 0-3: dst register, bits 4-7: src register
-    pub src_reg: u8,  // (packed as single byte in Linux, split here for clarity)
+    pub dst_reg: u8, // bits 0-3: dst register, bits 4-7: src register
+    pub src_reg: u8, // (packed as single byte in Linux, split here for clarity)
     pub off: i16,
     pub imm: i32,
 }
@@ -78,7 +78,7 @@ pub enum BpfOpcode {
     MOV64_REG,
     ARSH64_IMM,
     ARSH64_REG,
-    
+
     // ALU32 operations (class 0x04)
     ADD32_IMM,
     ADD32_REG,
@@ -86,14 +86,14 @@ pub enum BpfOpcode {
     SUB32_REG,
     MOV32_IMM,
     MOV32_REG,
-    
+
     // Load operations
     LD_DW_IMM,
     LDX_MEM_B,
     LDX_MEM_H,
     LDX_MEM_W,
     LDX_MEM_DW,
-    
+
     // Store operations
     STX_MEM_B,
     STX_MEM_H,
@@ -103,7 +103,7 @@ pub enum BpfOpcode {
     ST_MEM_H,
     ST_MEM_W,
     ST_MEM_DW,
-    
+
     // Jump operations (class 0x05)
     JA,
     JEQ_IMM,
@@ -122,7 +122,7 @@ pub enum BpfOpcode {
     JSGT_REG,
     JSLT_IMM,
     JSLT_REG,
-    
+
     // Special operations
     CALL,
     EXIT,
@@ -167,10 +167,10 @@ pub const BPF_OP_EXIT: u8 = 0x90;
 pub const BPF_SRC_IMM: u8 = 0x00;
 pub const BPF_SRC_REG: u8 = 0x08;
 
-pub const BPF_SIZE_W: u8 = 0x00;   // 32-bit
-pub const BPF_SIZE_H: u8 = 0x08;   // 16-bit
-pub const BPF_SIZE_B: u8 = 0x10;   // 8-bit
-pub const BPF_SIZE_DW: u8 = 0x18;  // 64-bit
+pub const BPF_SIZE_W: u8 = 0x00; // 32-bit
+pub const BPF_SIZE_H: u8 = 0x08; // 16-bit
+pub const BPF_SIZE_B: u8 = 0x10; // 8-bit
+pub const BPF_SIZE_DW: u8 = 0x18; // 64-bit
 
 pub const BPF_MODE_MEM: u8 = 0x60;
 pub const BPF_MODE_IMM: u8 = 0x00;
@@ -191,78 +191,78 @@ impl BpfInsn {
             imm,
         }
     }
-    
+
     /// Create an ALU64 immediate instruction
     pub fn alu64_imm(op: u8, dst: u8, imm: i32) -> Self {
         Self::new(BPF_CLASS_ALU64 | op | BPF_SRC_IMM, dst, 0, 0, imm)
     }
-    
+
     /// Create an ALU64 register instruction
     pub fn alu64_reg(op: u8, dst: u8, src: u8) -> Self {
         Self::new(BPF_CLASS_ALU64 | op | BPF_SRC_REG, dst, src, 0, 0)
     }
-    
+
     /// Create a jump immediate instruction
     pub fn jmp_imm(op: u8, dst: u8, imm: i32, off: i16) -> Self {
         Self::new(BPF_CLASS_JMP | op | BPF_SRC_IMM, dst, 0, off, imm)
     }
-    
+
     /// Create a jump register instruction
     pub fn jmp_reg(op: u8, dst: u8, src: u8, off: i16) -> Self {
         Self::new(BPF_CLASS_JMP | op | BPF_SRC_REG, dst, src, off, 0)
     }
-    
+
     /// Create a load from memory instruction
     pub fn ldx_mem(size: u8, dst: u8, src: u8, off: i16) -> Self {
         Self::new(BPF_CLASS_LDX | BPF_MODE_MEM | size, dst, src, off, 0)
     }
-    
+
     /// Create a store to memory instruction
     pub fn stx_mem(size: u8, dst: u8, src: u8, off: i16) -> Self {
         Self::new(BPF_CLASS_STX | BPF_MODE_MEM | size, dst, src, off, 0)
     }
-    
+
     /// Create a call instruction
     pub fn call(func_id: i32) -> Self {
         Self::new(BPF_CLASS_JMP | BPF_OP_CALL, 0, 0, 0, func_id)
     }
-    
+
     /// Create an exit instruction
     pub fn exit_insn() -> Self {
         Self::new(BPF_CLASS_JMP | BPF_OP_EXIT, 0, 0, 0, 0)
     }
-    
+
     /// Extract instruction class (bits 0-2)
     pub fn get_class(&self) -> u8 {
         self.opcode & 0x07
     }
-    
+
     /// Extract operation code (bits 4-7)
     pub fn get_op(&self) -> u8 {
         self.opcode & 0xf0
     }
-    
+
     /// Extract source type (bit 3)
     pub fn get_src(&self) -> u8 {
         self.opcode & 0x08
     }
-    
+
     /// Check if this is an ALU64 instruction
     pub fn is_alu64(&self) -> bool {
         self.get_class() == BPF_CLASS_ALU64
     }
-    
+
     /// Check if this is a jump instruction
     pub fn is_jump(&self) -> bool {
         let class = self.get_class();
         class == BPF_CLASS_JMP || class == BPF_CLASS_JMP32
     }
-    
+
     /// Check if this is a call instruction
     pub fn is_call(&self) -> bool {
         self.get_class() == BPF_CLASS_JMP && self.get_op() == BPF_OP_CALL
     }
-    
+
     /// Check if this is an exit instruction
     pub fn is_exit(&self) -> bool {
         self.get_class() == BPF_CLASS_JMP && self.get_op() == BPF_OP_EXIT
@@ -272,11 +272,11 @@ impl BpfInsn {
 /// Disassemble a BPF instruction to human-readable string
 pub fn disassemble(insn: &BpfInsn) -> String {
     use alloc::format;
-    
+
     let class = insn.get_class();
     let op = insn.get_op();
     let src = insn.get_src();
-    
+
     match class {
         BPF_CLASS_ALU64 | BPF_CLASS_ALU => {
             let is_64 = class == BPF_CLASS_ALU64;
@@ -297,30 +297,49 @@ pub fn disassemble(insn: &BpfInsn) -> String {
                 BPF_OP_ARSH => "arsh",
                 _ => "unknown",
             };
-            
+
             if src == BPF_SRC_IMM {
                 format!("{}{} r{}, {}", op_name, suffix, insn.dst_reg, insn.imm)
             } else {
                 format!("{}{} r{}, r{}", op_name, suffix, insn.dst_reg, insn.src_reg)
             }
         }
-        BPF_CLASS_JMP | BPF_CLASS_JMP32 => {
-            match op {
-                BPF_OP_JA => format!("ja {}", insn.off),
-                BPF_OP_CALL => format!("call {}", insn.imm),
-                BPF_OP_EXIT => format!("exit"),
-                BPF_OP_JEQ => format!("jeq r{}, {}, {}", insn.dst_reg, 
-                    if src == BPF_SRC_IMM { format!("{}", insn.imm) } else { format!("r{}", insn.src_reg) }, 
-                    insn.off),
-                BPF_OP_JNE => format!("jne r{}, {}, {}", insn.dst_reg,
-                    if src == BPF_SRC_IMM { format!("{}", insn.imm) } else { format!("r{}", insn.src_reg) },
-                    insn.off),
-                BPF_OP_JGT => format!("jgt r{}, {}, {}", insn.dst_reg,
-                    if src == BPF_SRC_IMM { format!("{}", insn.imm) } else { format!("r{}", insn.src_reg) },
-                    insn.off),
-                _ => format!("jmp_unknown 0x{:02x}", op),
-            }
-        }
+        BPF_CLASS_JMP | BPF_CLASS_JMP32 => match op {
+            BPF_OP_JA => format!("ja {}", insn.off),
+            BPF_OP_CALL => format!("call {}", insn.imm),
+            BPF_OP_EXIT => format!("exit"),
+            BPF_OP_JEQ => format!(
+                "jeq r{}, {}, {}",
+                insn.dst_reg,
+                if src == BPF_SRC_IMM {
+                    format!("{}", insn.imm)
+                } else {
+                    format!("r{}", insn.src_reg)
+                },
+                insn.off
+            ),
+            BPF_OP_JNE => format!(
+                "jne r{}, {}, {}",
+                insn.dst_reg,
+                if src == BPF_SRC_IMM {
+                    format!("{}", insn.imm)
+                } else {
+                    format!("r{}", insn.src_reg)
+                },
+                insn.off
+            ),
+            BPF_OP_JGT => format!(
+                "jgt r{}, {}, {}",
+                insn.dst_reg,
+                if src == BPF_SRC_IMM {
+                    format!("{}", insn.imm)
+                } else {
+                    format!("r{}", insn.src_reg)
+                },
+                insn.off
+            ),
+            _ => format!("jmp_unknown 0x{:02x}", op),
+        },
         BPF_CLASS_LDX => {
             let size = match insn.opcode & 0x18 {
                 BPF_SIZE_B => "b",
@@ -329,7 +348,10 @@ pub fn disassemble(insn: &BpfInsn) -> String {
                 BPF_SIZE_DW => "dw",
                 _ => "?",
             };
-            format!("ldx{} r{}, [r{}+{}]", size, insn.dst_reg, insn.src_reg, insn.off)
+            format!(
+                "ldx{} r{}, [r{}+{}]",
+                size, insn.dst_reg, insn.src_reg, insn.off
+            )
         }
         BPF_CLASS_STX => {
             let size = match insn.opcode & 0x18 {
@@ -339,7 +361,10 @@ pub fn disassemble(insn: &BpfInsn) -> String {
                 BPF_SIZE_DW => "dw",
                 _ => "?",
             };
-            format!("stx{} [r{}+{}], r{}", size, insn.dst_reg, insn.off, insn.src_reg)
+            format!(
+                "stx{} [r{}+{}], r{}",
+                size, insn.dst_reg, insn.off, insn.src_reg
+            )
         }
         _ => format!("unknown 0x{:02x}", insn.opcode),
     }
@@ -348,7 +373,7 @@ pub fn disassemble(insn: &BpfInsn) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_instruction_creation() {
         let insn = BpfInsn::new(0x07, 0, 1, 0, 42);
@@ -357,7 +382,7 @@ mod tests {
         assert_eq!(insn.src_reg, 1);
         assert_eq!(insn.imm, 42);
     }
-    
+
     #[test]
     fn test_alu64_imm() {
         let insn = BpfInsn::alu64_imm(BPF_OP_ADD, 1, 100);
@@ -366,21 +391,21 @@ mod tests {
         assert_eq!(insn.dst_reg, 1);
         assert_eq!(insn.imm, 100);
     }
-    
+
     #[test]
     fn test_exit_instruction() {
         let insn = BpfInsn::exit_insn();
         assert!(insn.is_exit());
         assert!(insn.is_jump());
     }
-    
+
     #[test]
     fn test_call_instruction() {
         let insn = BpfInsn::call(5);
         assert!(insn.is_call());
         assert_eq!(insn.imm, 5);
     }
-    
+
     #[test]
     fn test_disassemble_alu() {
         let insn = BpfInsn::alu64_imm(BPF_OP_ADD, 0, 42);
@@ -389,20 +414,20 @@ mod tests {
         assert!(dis.contains("r0"));
         assert!(dis.contains("42"));
     }
-    
+
     #[test]
     fn test_disassemble_exit() {
         let insn = BpfInsn::exit_insn();
         let dis = disassemble(&insn);
         assert_eq!(dis, "exit");
     }
-    
+
     #[test]
     fn test_instruction_predicates() {
         let mov = BpfInsn::alu64_imm(BPF_OP_MOV, 0, 10);
         assert!(mov.is_alu64());
         assert!(!mov.is_jump());
-        
+
         let jmp = BpfInsn::jmp_imm(BPF_OP_JEQ, 0, 0, 5);
         assert!(jmp.is_jump());
         assert!(!jmp.is_alu64());

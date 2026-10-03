@@ -22,7 +22,7 @@ pub struct SnapshotRecord {
     pub id: u64,
     pub name: String,
     pub backend: SnapshotBackend,
-    pub created_at: u64,      // Unix timestamp
+    pub created_at: u64, // Unix timestamp
     pub size_bytes: u64,
     pub is_bootable: bool,
 }
@@ -40,11 +40,11 @@ pub struct RetentionPolicy {
 impl Default for RetentionPolicy {
     fn default() -> Self {
         Self {
-            keep_hourly: 24,    // Keep 24 hourly snapshots
-            keep_daily: 7,      // Keep 7 daily snapshots
-            keep_weekly: 4,     // Keep 4 weekly snapshots
-            keep_monthly: 6,    // Keep 6 monthly snapshots
-            max_total: 50,      // Maximum total snapshots
+            keep_hourly: 24, // Keep 24 hourly snapshots
+            keep_daily: 7,   // Keep 7 daily snapshots
+            keep_weekly: 4,  // Keep 4 weekly snapshots
+            keep_monthly: 6, // Keep 6 monthly snapshots
+            max_total: 50,   // Maximum total snapshots
         }
     }
 }
@@ -99,7 +99,7 @@ impl SnapshotManager {
             id,
             name,
             backend,
-            created_at: 0,  // In real impl: get current timestamp
+            created_at: 0, // In real impl: get current timestamp
             size_bytes,
             is_bootable: false,
         };
@@ -126,10 +126,7 @@ impl SnapshotManager {
         // If total exceeds max_total, delete oldest non-bootable
         if self.records.len() > self.policy.max_total as usize {
             let excess = self.records.len() - self.policy.max_total as usize;
-            let mut non_bootable: Vec<_> = self.records
-                .iter()
-                .filter(|r| !r.is_bootable)
-                .collect();
+            let mut non_bootable: Vec<_> = self.records.iter().filter(|r| !r.is_bootable).collect();
             non_bootable.sort_by_key(|r| r.created_at);
 
             for record in non_bootable.iter().take(excess) {
@@ -140,7 +137,7 @@ impl SnapshotManager {
         // Apply time-based retention (simplified - in real impl would bin by time period)
         let mut sorted = self.records.clone();
         sorted.sort_by_key(|r| r.created_at);
-        sorted.reverse();  // Newest first
+        sorted.reverse(); // Newest first
 
         let one_hour = 3600u64;
         let one_day = 86400u64;
@@ -154,7 +151,7 @@ impl SnapshotManager {
 
         for record in &sorted {
             if record.is_bootable {
-                continue;  // Never auto-delete bootable snapshots
+                continue; // Never auto-delete bootable snapshots
             }
 
             let age = current_time.saturating_sub(record.created_at);
@@ -180,16 +177,14 @@ impl SnapshotManager {
 
     /// Get all bootable snapshot entries (for bootloader integration)
     pub fn get_bootable_entries(&self) -> Vec<&SnapshotRecord> {
-        self.records
-            .iter()
-            .filter(|r| r.is_bootable)
-            .collect()
+        self.records.iter().filter(|r| r.is_bootable).collect()
     }
 
     /// Rollback to a specific snapshot
     pub fn rollback(&mut self, id: u64) -> Result<(), SnapshotManagerError> {
         // Verify snapshot exists
-        let _snapshot = self.records
+        let _snapshot = self
+            .records
             .iter()
             .find(|r| r.id == id)
             .ok_or(SnapshotManagerError::SnapshotNotFound)?;
@@ -250,22 +245,16 @@ mod tests {
     #[test]
     fn test_register_and_list() {
         let mut manager = SnapshotManager::new(RetentionPolicy::default());
-        
-        let id1 = manager.register_snapshot(
-            String::from("snap1"),
-            SnapshotBackend::Btrfs,
-            1024 * 1024,
-        );
-        let id2 = manager.register_snapshot(
-            String::from("snap2"),
-            SnapshotBackend::Zfs,
-            2048 * 1024,
-        );
+
+        let id1 =
+            manager.register_snapshot(String::from("snap1"), SnapshotBackend::Btrfs, 1024 * 1024);
+        let id2 =
+            manager.register_snapshot(String::from("snap2"), SnapshotBackend::Zfs, 2048 * 1024);
 
         assert_eq!(id1, 1);
         assert_eq!(id2, 2);
         assert_eq!(manager.records.len(), 2);
-        
+
         let snap1 = manager.get_snapshot(id1).unwrap();
         assert_eq!(snap1.backend, SnapshotBackend::Btrfs);
     }
@@ -280,14 +269,14 @@ mod tests {
             max_total: 10,
         };
         let mut manager = SnapshotManager::new(policy);
-        
+
         // Create snapshots with timestamps
         for i in 0..5 {
             let mut record = SnapshotRecord {
                 id: i + 1,
                 name: String::from("snap"),
                 backend: SnapshotBackend::Btrfs,
-                created_at: 1000000 + (i * 3600),  // Hourly snapshots
+                created_at: 1000000 + (i * 3600), // Hourly snapshots
                 size_bytes: 1024,
                 is_bootable: false,
             };
@@ -296,7 +285,7 @@ mod tests {
 
         let current_time = 1000000 + (10 * 3600);
         let to_delete = manager.apply_retention_policy(current_time);
-        
+
         // Should delete some old snapshots
         assert!(!to_delete.is_empty());
     }
@@ -304,15 +293,15 @@ mod tests {
     #[test]
     fn test_mark_bootable() {
         let mut manager = SnapshotManager::new(RetentionPolicy::default());
-        
+
         let id = manager.register_snapshot(
             String::from("system_snap"),
             SnapshotBackend::Btrfs,
             1024 * 1024,
         );
-        
+
         manager.mark_bootable(id).unwrap();
-        
+
         let bootable = manager.get_bootable_entries();
         assert_eq!(bootable.len(), 1);
         assert_eq!(bootable[0].id, id);
@@ -321,7 +310,7 @@ mod tests {
     #[test]
     fn test_rollback_notfound() {
         let mut manager = SnapshotManager::new(RetentionPolicy::default());
-        
+
         let result = manager.rollback(999);
         assert_eq!(result, Err(SnapshotManagerError::SnapshotNotFound));
     }

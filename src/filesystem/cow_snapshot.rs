@@ -6,7 +6,7 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 #[derive(Debug, Clone)]
 pub struct MerkleNode {
     pub hash: [u8; 32],
-    pub children: Vec<u64>,  // Block addresses of child nodes
+    pub children: Vec<u64>, // Block addresses of child nodes
 }
 
 /// Merkle tree for snapshot verification and integrity
@@ -28,11 +28,11 @@ impl MerkleTree {
     pub fn compute_hash(data: &[u8]) -> [u8; 32] {
         let mut hash = [0u8; 32];
         let mut h: u64 = 5381;
-        
+
         for byte in data {
             h = h.wrapping_mul(33).wrapping_add(*byte as u64);
         }
-        
+
         // Spread hash across 32 bytes
         for i in 0..4 {
             let shift = i * 16;
@@ -45,14 +45,14 @@ impl MerkleTree {
             hash[i * 8 + 6] = (h.wrapping_add(i as u64 * 3) >> shift) as u8;
             hash[i * 8 + 7] = (h.wrapping_add(i as u64 * 4) >> shift) as u8;
         }
-        
+
         hash
     }
 
     /// Build Merkle tree from blocks
     pub fn build_from_blocks(blocks: &[Vec<u8>]) -> Self {
         let mut tree = Self::new();
-        
+
         // Create leaf nodes
         for block in blocks {
             let hash = Self::compute_hash(block.as_slice());
@@ -61,12 +61,12 @@ impl MerkleTree {
                 children: Vec::new(),
             });
         }
-        
+
         // Build tree bottom-up (simplified single-level for now)
         if !tree.nodes.is_empty() {
             tree.root_hash = tree.nodes[0].hash;
         }
-        
+
         tree
     }
 
@@ -75,7 +75,7 @@ impl MerkleTree {
         if index >= self.nodes.len() {
             return false;
         }
-        
+
         let computed_hash = Self::compute_hash(block);
         computed_hash == self.nodes[index].hash
     }
@@ -130,10 +130,10 @@ impl DedupeTable {
         // Check if already exists
         for entry in &self.entries {
             if entry.hash == hash {
-                return;  // Already present
+                return; // Already present
             }
         }
-        
+
         self.entries.push(DedupeEntry { hash, block_addr });
     }
 }
@@ -531,13 +531,13 @@ mod tests {
     #[test]
     fn test_dedupe_table_insert_lookup() {
         let mut table = DedupeTable::new();
-        
+
         let hash = MerkleTree::compute_hash(&[1, 2, 3, 4]);
         table.insert(hash, 0x1000);
-        
+
         let found = table.lookup(&hash);
         assert_eq!(found, Some(0x1000));
-        
+
         let not_found = table.lookup(&[0u8; 32]);
         assert_eq!(not_found, None);
     }
@@ -549,7 +549,7 @@ mod tests {
             block_addr: 0x2000,
             length: 4096,
         };
-        
+
         assert_eq!(extent.source_snapshot_id, 1);
         assert_eq!(extent.block_addr, 0x2000);
         assert_eq!(extent.length, 4096);

@@ -207,12 +207,20 @@ pub struct AdaptationSanitizationResultV17 {
 }
 
 pub trait UpstreamChangeFilterV17 {
-    fn filter(&self, change: &UpstreamPackageChangeV17, result: &mut AdaptationSanitizationResultV17);
+    fn filter(
+        &self,
+        change: &UpstreamPackageChangeV17,
+        result: &mut AdaptationSanitizationResultV17,
+    );
 }
 
 pub struct SecurityAdvisoryFilterV17;
 impl UpstreamChangeFilterV17 for SecurityAdvisoryFilterV17 {
-    fn filter(&self, change: &UpstreamPackageChangeV17, result: &mut AdaptationSanitizationResultV17) {
+    fn filter(
+        &self,
+        change: &UpstreamPackageChangeV17,
+        result: &mut AdaptationSanitizationResultV17,
+    ) {
         if !change.security_advisory_cve.is_empty() {
             result.warnings.push(format!(
                 "Security advisories detected for {}: {:?}",
@@ -224,11 +232,18 @@ impl UpstreamChangeFilterV17 for SecurityAdvisoryFilterV17 {
 
 pub struct DangerousScriptletFilterV17;
 impl UpstreamChangeFilterV17 for DangerousScriptletFilterV17 {
-    fn filter(&self, change: &UpstreamPackageChangeV17, result: &mut AdaptationSanitizationResultV17) {
+    fn filter(
+        &self,
+        change: &UpstreamPackageChangeV17,
+        result: &mut AdaptationSanitizationResultV17,
+    ) {
         if let Some(script) = &change.maintainer_scriptlet {
             if script.contains("rm -rf /") || script.contains(":(){ :|:& };:") {
                 result.is_allowed = false;
-                result.warnings.push(format!("Dangerous scriptlet blocked in {}", change.package_name));
+                result.warnings.push(format!(
+                    "Dangerous scriptlet blocked in {}",
+                    change.package_name
+                ));
             }
         }
     }
@@ -313,7 +328,10 @@ impl UpstreamPackageAdaptationTemplateV17 {
         // Step 1: Sanitize scriptlets and security
         let sanitization = sanitizer.sanitize(change);
         if !sanitization.is_allowed {
-            return Err(format!("Package change rejected due to security policy: {:?}", sanitization.warnings));
+            return Err(format!(
+                "Package change rejected due to security policy: {:?}",
+                sanitization.warnings
+            ));
         }
 
         // Step 2: Extract canonical dependencies using Strategy
@@ -435,7 +453,11 @@ impl SovereignUniversalPackagingAlternativeEngineV17 {
             "Fedora".to_string(),
             DistroParityScoreV17 {
                 distro_name: "Fedora".to_string(),
-                formats_supported: vec![PackageFormat::Rpm, PackageFormat::Yum, PackageFormat::Drpm],
+                formats_supported: vec![
+                    PackageFormat::Rpm,
+                    PackageFormat::Yum,
+                    PackageFormat::Drpm,
+                ],
                 adaptation_fidelity_percent: 100,
                 is_drop_in_alternative: true,
             },
@@ -471,7 +493,9 @@ impl SovereignUniversalPackagingAlternativeEngineV17 {
             },
         );
 
-        Self { parity_scores: scores }
+        Self {
+            parity_scores: scores,
+        }
     }
 
     pub fn total_supported_distros(&self) -> usize {
@@ -565,10 +589,15 @@ mod tests {
             timestamp_epoch: 1700000100,
         };
 
-        let adapted = UpstreamPackageAdaptationTemplateV17::adapt_and_transpile(&strategy, &sanitizer, &change).unwrap();
+        let adapted = UpstreamPackageAdaptationTemplateV17::adapt_and_transpile(
+            &strategy, &sanitizer, &change,
+        )
+        .unwrap();
         assert_eq!(adapted.name, "sigpkg-curl");
         assert_eq!(adapted.version, "8.6.0");
-        assert!(adapted.dependencies.contains(&"sovereign-openssl".to_string()));
+        assert!(adapted
+            .dependencies
+            .contains(&"sovereign-openssl".to_string()));
         assert!(adapted.dependencies.contains(&"sovereign-libc".to_string()));
     }
 
@@ -590,7 +619,10 @@ mod tests {
 
         let result = sanitizer.sanitize(&malicious_change);
         assert!(!result.is_allowed);
-        assert!(result.warnings.iter().any(|w| w.contains("Dangerous scriptlet")));
+        assert!(result
+            .warnings
+            .iter()
+            .any(|w| w.contains("Dangerous scriptlet")));
     }
 
     #[test]
@@ -603,7 +635,11 @@ mod tests {
 
         let mut pkg = UnifiedPackage::new("test-app".to_string(), "1.0.0".to_string());
         udf.inject_microarch_optimization(&mut pkg);
-        assert!(pkg.properties.get("build_cflags").unwrap().contains("-march=x86-64-v3"));
+        assert!(pkg
+            .properties
+            .get("build_cflags")
+            .unwrap()
+            .contains("-march=x86-64-v3"));
     }
 
     #[test]

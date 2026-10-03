@@ -9,12 +9,12 @@ use alloc::vec::Vec;
 
 // ─── BPF Constants ───────────────────────────────────────────────────────────
 /// BPF instruction classes
-pub const BPF_LD:  u16 = 0x00;
+pub const BPF_LD: u16 = 0x00;
 pub const BPF_RET: u16 = 0x06;
 pub const BPF_JMP: u16 = 0x05;
 
 /// BPF load sizes
-pub const BPF_W:   u16 = 0x00; // word
+pub const BPF_W: u16 = 0x00; // word
 
 /// BPF addressing modes
 pub const BPF_ABS: u16 = 0x20;
@@ -23,13 +23,13 @@ pub const BPF_ABS: u16 = 0x20;
 pub const BPF_JEQ: u16 = 0x10;
 
 /// BPF return constants (seccomp actions encoded in k)
-pub const SECCOMP_RET_ALLOW:       u32 = 0x7fff_0000;
+pub const SECCOMP_RET_ALLOW: u32 = 0x7fff_0000;
 pub const SECCOMP_RET_KILL_THREAD: u32 = 0x0000_0000;
 pub const SECCOMP_RET_KILL_PROCESS: u32 = 0x8000_0000;
-pub const SECCOMP_RET_TRAP:        u32 = 0x0003_0000;
-pub const SECCOMP_RET_LOG:         u32 = 0x7ffc_0000;
-pub const SECCOMP_RET_TRACE:       u32 = 0x7ff0_0000;
-pub const SECCOMP_RET_ERRNO_MASK:  u32 = 0x0005_0000;
+pub const SECCOMP_RET_TRAP: u32 = 0x0003_0000;
+pub const SECCOMP_RET_LOG: u32 = 0x7ffc_0000;
+pub const SECCOMP_RET_TRACE: u32 = 0x7ff0_0000;
+pub const SECCOMP_RET_ERRNO_MASK: u32 = 0x0005_0000;
 
 /// Byte offset of syscall number in `seccomp_data` struct.
 pub const SECCOMP_DATA_NR_OFFSET: u32 = 0;
@@ -57,13 +57,13 @@ impl SeccompAction {
     /// Convert the action to the BPF `k` value used in a RET instruction.
     pub fn to_bpf_k(self) -> u32 {
         match self {
-            SeccompAction::Allow       => SECCOMP_RET_ALLOW,
-            SeccompAction::Kill        => SECCOMP_RET_KILL_THREAD,
+            SeccompAction::Allow => SECCOMP_RET_ALLOW,
+            SeccompAction::Kill => SECCOMP_RET_KILL_THREAD,
             SeccompAction::KillProcess => SECCOMP_RET_KILL_PROCESS,
-            SeccompAction::Trap        => SECCOMP_RET_TRAP,
-            SeccompAction::Trace       => SECCOMP_RET_TRACE,
-            SeccompAction::Log         => SECCOMP_RET_LOG,
-            SeccompAction::Errno(e)    => SECCOMP_RET_ERRNO_MASK | (e as u32 & 0xffff),
+            SeccompAction::Trap => SECCOMP_RET_TRAP,
+            SeccompAction::Trace => SECCOMP_RET_TRACE,
+            SeccompAction::Log => SECCOMP_RET_LOG,
+            SeccompAction::Errno(e) => SECCOMP_RET_ERRNO_MASK | (e as u32 & 0xffff),
         }
     }
 }
@@ -114,7 +114,10 @@ pub struct SeccompFilter {
 
 impl SeccompFilter {
     pub fn new(default_action: SeccompAction) -> Self {
-        Self { instructions: Vec::new(), default_action }
+        Self {
+            instructions: Vec::new(),
+            default_action,
+        }
     }
 
     /// Append a single instruction.
@@ -190,10 +193,10 @@ pub fn filter_deny_list(syscalls: &[u32]) -> SeccompFilter {
 /// Mirrors `prctl(PR_SET_SECCOMP, SECCOMP_MODE_STRICT)` semantics.
 pub fn filter_strict_mode() -> SeccompFilter {
     // x86-64 syscall numbers
-    const SYS_READ:         u32 = 0;
-    const SYS_WRITE:        u32 = 1;
+    const SYS_READ: u32 = 0;
+    const SYS_WRITE: u32 = 1;
     const SYS_RT_SIGRETURN: u32 = 15;
-    const SYS_EXIT:         u32 = 60;
+    const SYS_EXIT: u32 = 60;
     filter_allow_list(&[SYS_READ, SYS_WRITE, SYS_RT_SIGRETURN, SYS_EXIT])
 }
 
@@ -277,11 +280,17 @@ mod tests {
     fn test_action_to_bpf_k() {
         assert_eq!(SeccompAction::Allow.to_bpf_k(), SECCOMP_RET_ALLOW);
         assert_eq!(SeccompAction::Kill.to_bpf_k(), SECCOMP_RET_KILL_THREAD);
-        assert_eq!(SeccompAction::KillProcess.to_bpf_k(), SECCOMP_RET_KILL_PROCESS);
+        assert_eq!(
+            SeccompAction::KillProcess.to_bpf_k(),
+            SECCOMP_RET_KILL_PROCESS
+        );
         assert_eq!(SeccompAction::Trap.to_bpf_k(), SECCOMP_RET_TRAP);
         assert_eq!(SeccompAction::Log.to_bpf_k(), SECCOMP_RET_LOG);
         // ERRNO(13) = SECCOMP_RET_ERRNO_MASK | 13
-        assert_eq!(SeccompAction::Errno(13).to_bpf_k(), SECCOMP_RET_ERRNO_MASK | 13);
+        assert_eq!(
+            SeccompAction::Errno(13).to_bpf_k(),
+            SECCOMP_RET_ERRNO_MASK | 13
+        );
     }
 
     #[test]

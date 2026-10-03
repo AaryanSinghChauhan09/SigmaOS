@@ -5,30 +5,30 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::vec::Vec;
 use alloc::collections::BTreeMap;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicU64, Ordering};
 
 /// ZFS on-disk label structure
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct ZfsLabel {
-    pub blank: [u8; 8192],        // Blank for boot blocks
-    pub boot_header: [u8; 8192],  // Boot header
-    pub nvlist: [u8; 114688],     // Configuration nvlist
-    pub uberblock: [u8; 131072],  // Uberblock array
+    pub blank: [u8; 8192],       // Blank for boot blocks
+    pub boot_header: [u8; 8192], // Boot header
+    pub nvlist: [u8; 114688],    // Configuration nvlist
+    pub uberblock: [u8; 131072], // Uberblock array
 }
 
 /// ZFS Uberblock (transaction group pointer)
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct ZfsUberblock {
-    pub magic: u64,               // ZFS_UBERBLOCK_MAGIC
-    pub version: u64,             // Software version
-    pub txg: u64,                 // Transaction group number
-    pub guid_sum: u64,            // Checksum of pool GUID
-    pub timestamp: u64,           // Timestamp
-    pub rootbp: ZfsBlockPtr,      // Root block pointer (DMU objset)
+    pub magic: u64,          // ZFS_UBERBLOCK_MAGIC
+    pub version: u64,        // Software version
+    pub txg: u64,            // Transaction group number
+    pub guid_sum: u64,       // Checksum of pool GUID
+    pub timestamp: u64,      // Timestamp
+    pub rootbp: ZfsBlockPtr, // Root block pointer (DMU objset)
 }
 
 impl ZfsUberblock {
@@ -39,22 +39,22 @@ impl ZfsUberblock {
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct ZfsBlockPtr {
-    pub dva: [ZfsDva; 3],         // Data Virtual Addresses (up to 3 copies)
-    pub props: u64,               // Properties (compression, type, level)
+    pub dva: [ZfsDva; 3], // Data Virtual Addresses (up to 3 copies)
+    pub props: u64,       // Properties (compression, type, level)
     pub pad: [u64; 2],
-    pub phys_birth: u64,          // Physical birth txg
-    pub birth: u64,               // Logical birth txg
-    pub fill: u64,                // Fill count
-    pub checksum: [u64; 4],       // 256-bit checksum (SHA256 or Fletcher4)
+    pub phys_birth: u64,    // Physical birth txg
+    pub birth: u64,         // Logical birth txg
+    pub fill: u64,          // Fill count
+    pub checksum: [u64; 4], // 256-bit checksum (SHA256 or Fletcher4)
 }
 
 /// ZFS Data Virtual Address (dva_t)
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct ZfsDva {
-    pub vdev: u64,                // Virtual device ID (bits 32-63)
-    pub offset: u64,              // Offset in vdev (bits 0-62), allocated bit (63)
-    pub asize: u64,               // Allocated size
+    pub vdev: u64,   // Virtual device ID (bits 32-63)
+    pub offset: u64, // Offset in vdev (bits 0-62), allocated bit (63)
+    pub asize: u64,  // Allocated size
 }
 
 impl ZfsDva {
@@ -81,34 +81,34 @@ pub struct ZfsObjset {
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct ZfsDnode {
-    pub dn_type: u8,              // DMU object type
-    pub dn_indblkshift: u8,       // Indirect block shift
-    pub dn_nlevels: u8,           // Number of levels
-    pub dn_nblkptr: u8,           // Number of block pointers
-    pub dn_bonustype: u8,         // Bonus buffer type
-    pub dn_checksum: u8,          // Checksum type
-    pub dn_compress: u8,          // Compression type
-    pub dn_flags: u8,             // Dnode flags
-    pub dn_datablkszsec: u16,     // Data block size in 512-byte sectors
-    pub dn_bonuslen: u16,         // Bonus buffer length
+    pub dn_type: u8,          // DMU object type
+    pub dn_indblkshift: u8,   // Indirect block shift
+    pub dn_nlevels: u8,       // Number of levels
+    pub dn_nblkptr: u8,       // Number of block pointers
+    pub dn_bonustype: u8,     // Bonus buffer type
+    pub dn_checksum: u8,      // Checksum type
+    pub dn_compress: u8,      // Compression type
+    pub dn_flags: u8,         // Dnode flags
+    pub dn_datablkszsec: u16, // Data block size in 512-byte sectors
+    pub dn_bonuslen: u16,     // Bonus buffer length
     pub dn_pad: [u8; 4],
-    pub dn_maxblkid: u64,         // Maximum block ID
-    pub dn_secphys: u64,          // Physical blocks used
+    pub dn_maxblkid: u64, // Maximum block ID
+    pub dn_secphys: u64,  // Physical blocks used
     pub dn_pad2: [u64; 4],
     pub dn_blkptr: [ZfsBlockPtr; 3], // Block pointers
-    pub dn_bonus: [u8; 320],      // Bonus buffer
-    pub dn_spill: ZfsBlockPtr,    // Spill block pointer
+    pub dn_bonus: [u8; 320],         // Bonus buffer
+    pub dn_spill: ZfsBlockPtr,       // Spill block pointer
 }
 
 /// ZFS Intent Log header (zil_header_t)
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct ZfsZilHeader {
-    pub zh_claim_txg: u64,        // Txg in which log blocks were claimed
-    pub zh_replay_seq: u64,       // Highest replayed sequence number
-    pub zh_log: ZfsBlockPtr,      // Log chain block pointer
-    pub zh_claim_seq: u64,        // Highest claimed sequence number
-    pub zh_flags: u64,            // ZIL flags
+    pub zh_claim_txg: u64,   // Txg in which log blocks were claimed
+    pub zh_replay_seq: u64,  // Highest replayed sequence number
+    pub zh_log: ZfsBlockPtr, // Log chain block pointer
+    pub zh_claim_seq: u64,   // Highest claimed sequence number
+    pub zh_flags: u64,       // ZIL flags
 }
 
 /// ZFS DMU object types
@@ -183,7 +183,7 @@ pub struct ZfsPool {
     pub state: PoolState,
     pub vdevs: Vec<ZfsVdev>,
     pub root_objset: Option<ZfsObjset>,
-    pub txg: AtomicU64,           // Current transaction group
+    pub txg: AtomicU64, // Current transaction group
 }
 
 /// ZFS Virtual Device (vdev)
@@ -191,11 +191,11 @@ pub struct ZfsVdev {
     pub id: u64,
     pub guid: u64,
     pub vdev_type: VdevType,
-    pub asize: u64,               // Allocated size
-    pub psize: u64,               // Physical size
-    pub ashift: u8,               // Block size shift (9 = 512 bytes)
+    pub asize: u64, // Allocated size
+    pub psize: u64, // Physical size
+    pub ashift: u8, // Block size shift (9 = 512 bytes)
     pub state: VdevState,
-    pub children: Vec<ZfsVdev>,   // For mirror/raidz
+    pub children: Vec<ZfsVdev>, // For mirror/raidz
 }
 
 /// Virtual device types
@@ -239,7 +239,7 @@ impl ZfsPool {
         Self {
             name: name.to_vec(),
             guid,
-            version: 5000,        // OpenZFS version
+            version: 5000, // OpenZFS version
             state: PoolState::Active,
             vdevs: Vec::new(),
             root_objset: None,

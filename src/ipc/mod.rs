@@ -75,27 +75,25 @@ pub use tech_media_std_streams_synthesis::{
     ZeroCopySpliceTeeStreamEngine,
 };
 pub mod binder_ring_buffer;
-pub mod zircon_channels;
 pub mod plan9_9p2000;
 pub mod posix_mq;
 pub mod sysv_ipc;
+pub mod zircon_channels;
 
 pub use posix_mq::{MessageQueue as PosixMessageQueue, MqAttr, MqError, MqRegistry};
 pub use sysv_ipc::{
-    IpcPerm, IpcError, ShmRegistry, ShmSegment, ShmidDs,
-    SemRegistry, SemSet, SemidDs, SemBuf,
-    MsgRegistry, MsgQueue as SysvMsgQueue, MsqidDs,
-    IPC_CREAT, IPC_EXCL, IPC_NOWAIT, IPC_PRIVATE,
+    IpcError, IpcPerm, MsgQueue as SysvMsgQueue, MsgRegistry, MsqidDs, SemBuf, SemRegistry, SemSet,
+    SemidDs, ShmRegistry, ShmSegment, ShmidDs, IPC_CREAT, IPC_EXCL, IPC_NOWAIT, IPC_PRIVATE,
 };
 
 // Futex exports
 pub use futex::{
-    FutexBucket, FutexError, FutexHashTable, FutexKey, FutexOp, FutexWaiter,
-    RobustFutexList, RobustListEntry, futex_requeue, futex_wait, futex_wake,
+    futex_requeue, futex_wait, futex_wake, FutexBucket, FutexError, FutexHashTable, FutexKey,
+    FutexOp, FutexWaiter, RobustFutexList, RobustListEntry,
 };
 
 // Pipe exports
 pub use pipe::{
-    KernelPipe, PipeError as KernelPipeError, PipeReader, PipeWriter,
-    pipe_pair, pipe_read, pipe_write,
+    pipe_pair, pipe_read, pipe_write, KernelPipe, PipeError as KernelPipeError, PipeReader,
+    PipeWriter,
 };

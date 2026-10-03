@@ -8,8 +8,8 @@ use std::vec::Vec;
 /// Encryption type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EncryptionType {
-    Fscrypt,  // Directory-level encryption
-    Luks,     // Block device encryption
+    Fscrypt, // Directory-level encryption
+    Luks,    // Block device encryption
 }
 
 impl EncryptionType {
@@ -151,7 +151,11 @@ impl FilesystemEncryptionManager {
     }
 
     /// Encrypt directory with fscrypt
-    pub fn encrypt_directory(&mut self, path: String, algorithm: EncryptionAlgorithm) -> Result<(), String> {
+    pub fn encrypt_directory(
+        &mut self,
+        path: String,
+        algorithm: EncryptionAlgorithm,
+    ) -> Result<(), String> {
         if self.fscrypt_directories.iter().any(|d| d.path == path) {
             return Err(format!("Directory {} already managed", path));
         }
@@ -165,7 +169,9 @@ impl FilesystemEncryptionManager {
 
     /// Lock fscrypt directory
     pub fn lock_directory(&mut self, path: &str) -> Result<(), String> {
-        let directory = self.fscrypt_directories.iter_mut()
+        let directory = self
+            .fscrypt_directories
+            .iter_mut()
             .find(|d| d.path == path)
             .ok_or_else(|| format!("Directory {} not found", path))?;
 
@@ -179,11 +185,15 @@ impl FilesystemEncryptionManager {
 
     /// Unlock fscrypt directory
     pub fn unlock_directory(&mut self, path: &str, key_descriptor: String) -> Result<(), String> {
-        let directory = self.fscrypt_directories.iter_mut()
+        let directory = self
+            .fscrypt_directories
+            .iter_mut()
             .find(|d| d.path == path)
             .ok_or_else(|| format!("Directory {} not found", path))?;
 
-        if directory.status != EncryptionStatus::Encrypted && directory.status != EncryptionStatus::Locked {
+        if directory.status != EncryptionStatus::Encrypted
+            && directory.status != EncryptionStatus::Locked
+        {
             return Err(format!("Directory {} is not encrypted or locked", path));
         }
 
@@ -193,8 +203,17 @@ impl FilesystemEncryptionManager {
     }
 
     /// Format LUKS device
-    pub fn format_luks_device(&mut self, device_path: String, mapper_name: String, algorithm: EncryptionAlgorithm) -> Result<(), String> {
-        if self.luks_devices.iter().any(|d| d.device_path == device_path) {
+    pub fn format_luks_device(
+        &mut self,
+        device_path: String,
+        mapper_name: String,
+        algorithm: EncryptionAlgorithm,
+    ) -> Result<(), String> {
+        if self
+            .luks_devices
+            .iter()
+            .any(|d| d.device_path == device_path)
+        {
             return Err(format!("Device {} already managed", device_path));
         }
 
@@ -207,11 +226,14 @@ impl FilesystemEncryptionManager {
 
     /// Open LUKS device
     pub fn open_luks_device(&mut self, device_path: &str, key_slot: u32) -> Result<(), String> {
-        let device = self.luks_devices.iter_mut()
+        let device = self
+            .luks_devices
+            .iter_mut()
             .find(|d| d.device_path == device_path)
             .ok_or_else(|| format!("Device {} not found", device_path))?;
 
-        if device.status != EncryptionStatus::Encrypted && device.status != EncryptionStatus::Locked {
+        if device.status != EncryptionStatus::Encrypted && device.status != EncryptionStatus::Locked
+        {
             return Err(format!("Device {} is not encrypted or locked", device_path));
         }
 
@@ -222,7 +244,9 @@ impl FilesystemEncryptionManager {
 
     /// Close LUKS device
     pub fn close_luks_device(&mut self, device_path: &str) -> Result<(), String> {
-        let device = self.luks_devices.iter_mut()
+        let device = self
+            .luks_devices
+            .iter_mut()
             .find(|d| d.device_path == device_path)
             .ok_or_else(|| format!("Device {} not found", device_path))?;
 
@@ -241,20 +265,39 @@ impl FilesystemEncryptionManager {
 
     /// Get LUKS device
     pub fn get_luks_device(&self, device_path: &str) -> Option<&LuksDevice> {
-        self.luks_devices.iter().find(|d| d.device_path == device_path)
+        self.luks_devices
+            .iter()
+            .find(|d| d.device_path == device_path)
     }
 
     /// List fscrypt directories
     pub fn list_directories(&self) -> Vec<String> {
-        self.fscrypt_directories.iter()
-            .map(|d| format!("{} ({}, {})", d.path, d.status.as_str(), d.algorithm.as_str()))
+        self.fscrypt_directories
+            .iter()
+            .map(|d| {
+                format!(
+                    "{} ({}, {})",
+                    d.path,
+                    d.status.as_str(),
+                    d.algorithm.as_str()
+                )
+            })
             .collect()
     }
 
     /// List LUKS devices
     pub fn list_luks_devices(&self) -> Vec<String> {
-        self.luks_devices.iter()
-            .map(|d| format!("{} -> {} ({}, {})", d.device_path, d.mapper_name, d.status.as_str(), d.algorithm.as_str()))
+        self.luks_devices
+            .iter()
+            .map(|d| {
+                format!(
+                    "{} -> {} ({}, {})",
+                    d.device_path,
+                    d.mapper_name,
+                    d.status.as_str(),
+                    d.algorithm.as_str()
+                )
+            })
             .collect()
     }
 
@@ -265,18 +308,26 @@ impl FilesystemEncryptionManager {
         let encrypted_dirs = self
             .fscrypt_directories
             .iter()
-            .filter(|d| d.status == EncryptionStatus::Encrypted || d.status == EncryptionStatus::Locked)
+            .filter(|d| {
+                d.status == EncryptionStatus::Encrypted || d.status == EncryptionStatus::Locked
+            })
             .count();
-        let unlocked_dirs = self.fscrypt_directories.iter()
+        let unlocked_dirs = self
+            .fscrypt_directories
+            .iter()
             .filter(|d| d.status == EncryptionStatus::Unlocked)
             .count();
 
         let encrypted_devices = self
             .luks_devices
             .iter()
-            .filter(|d| d.status == EncryptionStatus::Encrypted || d.status == EncryptionStatus::Locked)
+            .filter(|d| {
+                d.status == EncryptionStatus::Encrypted || d.status == EncryptionStatus::Locked
+            })
             .count();
-        let unlocked_devices = self.luks_devices.iter()
+        let unlocked_devices = self
+            .luks_devices
+            .iter()
             .filter(|d| d.status == EncryptionStatus::Unlocked)
             .count();
 
@@ -298,14 +349,22 @@ impl FilesystemEncryptionManager {
 
     /// Check if path is encrypted
     pub fn is_directory_encrypted(&self, path: &str) -> bool {
-        self.fscrypt_directories.iter()
-            .any(|d| d.path == path && (d.status == EncryptionStatus::Encrypted || d.status == EncryptionStatus::Locked || d.status == EncryptionStatus::Unlocked))
+        self.fscrypt_directories.iter().any(|d| {
+            d.path == path
+                && (d.status == EncryptionStatus::Encrypted
+                    || d.status == EncryptionStatus::Locked
+                    || d.status == EncryptionStatus::Unlocked)
+        })
     }
 
     /// Check if device is encrypted
     pub fn is_device_encrypted(&self, device_path: &str) -> bool {
-        self.luks_devices.iter()
-            .any(|d| d.device_path == device_path && (d.status == EncryptionStatus::Encrypted || d.status == EncryptionStatus::Locked || d.status == EncryptionStatus::Unlocked))
+        self.luks_devices.iter().any(|d| {
+            d.device_path == device_path
+                && (d.status == EncryptionStatus::Encrypted
+                    || d.status == EncryptionStatus::Locked
+                    || d.status == EncryptionStatus::Unlocked)
+        })
     }
 }
 
@@ -322,7 +381,10 @@ mod tests {
     #[test]
     fn test_encryption_algorithm_as_str() {
         assert_eq!(EncryptionAlgorithm::Aes256Xts.as_str(), "aes-256-xts");
-        assert_eq!(EncryptionAlgorithm::Chacha20Poly1305.as_str(), "chacha20-poly1305");
+        assert_eq!(
+            EncryptionAlgorithm::Chacha20Poly1305.as_str(),
+            "chacha20-poly1305"
+        );
     }
 
     #[test]
@@ -368,49 +430,94 @@ mod tests {
     #[test]
     fn test_filesystem_encryption_manager_encrypt_directory() {
         let mut manager = FilesystemEncryptionManager::new();
-        assert!(manager.encrypt_directory(String::from("/home/user/sensitive"), EncryptionAlgorithm::Aes256Xts).is_ok());
+        assert!(manager
+            .encrypt_directory(
+                String::from("/home/user/sensitive"),
+                EncryptionAlgorithm::Aes256Xts
+            )
+            .is_ok());
         assert_eq!(manager.fscrypt_directories.len(), 1);
     }
 
     #[test]
     fn test_filesystem_encryption_manager_encrypt_duplicate_directory() {
         let mut manager = FilesystemEncryptionManager::new();
-        manager.encrypt_directory(String::from("/home/user/sensitive"), EncryptionAlgorithm::Aes256Xts).unwrap();
-        assert!(manager.encrypt_directory(String::from("/home/user/sensitive"), EncryptionAlgorithm::Aes256Xts).is_err());
+        manager
+            .encrypt_directory(
+                String::from("/home/user/sensitive"),
+                EncryptionAlgorithm::Aes256Xts,
+            )
+            .unwrap();
+        assert!(manager
+            .encrypt_directory(
+                String::from("/home/user/sensitive"),
+                EncryptionAlgorithm::Aes256Xts
+            )
+            .is_err());
     }
 
     #[test]
     fn test_filesystem_encryption_manager_lock_directory() {
         let mut manager = FilesystemEncryptionManager::new();
-        manager.encrypt_directory(String::from("/home/user/sensitive"), EncryptionAlgorithm::Aes256Xts).unwrap();
+        manager
+            .encrypt_directory(
+                String::from("/home/user/sensitive"),
+                EncryptionAlgorithm::Aes256Xts,
+            )
+            .unwrap();
         assert!(manager.lock_directory("/home/user/sensitive").is_err()); // Not unlocked
     }
 
     #[test]
     fn test_filesystem_encryption_manager_unlock_directory() {
         let mut manager = FilesystemEncryptionManager::new();
-        manager.encrypt_directory(String::from("/home/user/sensitive"), EncryptionAlgorithm::Aes256Xts).unwrap();
-        assert!(manager.unlock_directory("/home/user/sensitive", String::from("key1")).is_ok());
+        manager
+            .encrypt_directory(
+                String::from("/home/user/sensitive"),
+                EncryptionAlgorithm::Aes256Xts,
+            )
+            .unwrap();
+        assert!(manager
+            .unlock_directory("/home/user/sensitive", String::from("key1"))
+            .is_ok());
     }
 
     #[test]
     fn test_filesystem_encryption_manager_format_luks_device() {
         let mut manager = FilesystemEncryptionManager::new();
-        assert!(manager.format_luks_device(String::from("/dev/sda1"), String::from("cryptdata"), EncryptionAlgorithm::Aes256Xts).is_ok());
+        assert!(manager
+            .format_luks_device(
+                String::from("/dev/sda1"),
+                String::from("cryptdata"),
+                EncryptionAlgorithm::Aes256Xts
+            )
+            .is_ok());
         assert_eq!(manager.luks_devices.len(), 1);
     }
 
     #[test]
     fn test_filesystem_encryption_manager_open_luks_device() {
         let mut manager = FilesystemEncryptionManager::new();
-        manager.format_luks_device(String::from("/dev/sda1"), String::from("cryptdata"), EncryptionAlgorithm::Aes256Xts).unwrap();
+        manager
+            .format_luks_device(
+                String::from("/dev/sda1"),
+                String::from("cryptdata"),
+                EncryptionAlgorithm::Aes256Xts,
+            )
+            .unwrap();
         assert!(manager.open_luks_device("/dev/sda1", 0).is_ok());
     }
 
     #[test]
     fn test_filesystem_encryption_manager_close_luks_device() {
         let mut manager = FilesystemEncryptionManager::new();
-        manager.format_luks_device(String::from("/dev/sda1"), String::from("cryptdata"), EncryptionAlgorithm::Aes256Xts).unwrap();
+        manager
+            .format_luks_device(
+                String::from("/dev/sda1"),
+                String::from("cryptdata"),
+                EncryptionAlgorithm::Aes256Xts,
+            )
+            .unwrap();
         manager.open_luks_device("/dev/sda1", 0).unwrap();
         assert!(manager.close_luks_device("/dev/sda1").is_ok());
     }
@@ -418,7 +525,12 @@ mod tests {
     #[test]
     fn test_filesystem_encryption_manager_list_directories() {
         let mut manager = FilesystemEncryptionManager::new();
-        manager.encrypt_directory(String::from("/home/user/sensitive"), EncryptionAlgorithm::Aes256Xts).unwrap();
+        manager
+            .encrypt_directory(
+                String::from("/home/user/sensitive"),
+                EncryptionAlgorithm::Aes256Xts,
+            )
+            .unwrap();
         let dirs = manager.list_directories();
         assert_eq!(dirs.len(), 1);
     }
@@ -426,7 +538,13 @@ mod tests {
     #[test]
     fn test_filesystem_encryption_manager_list_luks_devices() {
         let mut manager = FilesystemEncryptionManager::new();
-        manager.format_luks_device(String::from("/dev/sda1"), String::from("cryptdata"), EncryptionAlgorithm::Aes256Xts).unwrap();
+        manager
+            .format_luks_device(
+                String::from("/dev/sda1"),
+                String::from("cryptdata"),
+                EncryptionAlgorithm::Aes256Xts,
+            )
+            .unwrap();
         let devices = manager.list_luks_devices();
         assert_eq!(devices.len(), 1);
     }
@@ -434,7 +552,12 @@ mod tests {
     #[test]
     fn test_filesystem_encryption_manager_get_statistics() {
         let mut manager = FilesystemEncryptionManager::new();
-        manager.encrypt_directory(String::from("/home/user/sensitive"), EncryptionAlgorithm::Aes256Xts).unwrap();
+        manager
+            .encrypt_directory(
+                String::from("/home/user/sensitive"),
+                EncryptionAlgorithm::Aes256Xts,
+            )
+            .unwrap();
         let stats = manager.get_statistics();
         assert!(stats.contains("Fscrypt directories: 1"));
     }
@@ -442,14 +565,25 @@ mod tests {
     #[test]
     fn test_filesystem_encryption_manager_is_directory_encrypted() {
         let mut manager = FilesystemEncryptionManager::new();
-        manager.encrypt_directory(String::from("/home/user/sensitive"), EncryptionAlgorithm::Aes256Xts).unwrap();
+        manager
+            .encrypt_directory(
+                String::from("/home/user/sensitive"),
+                EncryptionAlgorithm::Aes256Xts,
+            )
+            .unwrap();
         assert!(manager.is_directory_encrypted("/home/user/sensitive"));
     }
 
     #[test]
     fn test_filesystem_encryption_manager_is_device_encrypted() {
         let mut manager = FilesystemEncryptionManager::new();
-        manager.format_luks_device(String::from("/dev/sda1"), String::from("cryptdata"), EncryptionAlgorithm::Aes256Xts).unwrap();
+        manager
+            .format_luks_device(
+                String::from("/dev/sda1"),
+                String::from("cryptdata"),
+                EncryptionAlgorithm::Aes256Xts,
+            )
+            .unwrap();
         assert!(manager.is_device_encrypted("/dev/sda1"));
     }
 }

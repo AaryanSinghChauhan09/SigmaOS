@@ -7,8 +7,8 @@
 
 #![allow(dead_code)]
 
-use std::vec::Vec;
 use std::string::String;
+use std::vec::Vec;
 
 // ── Error type ────────────────────────────────────────────────────────────────
 
@@ -53,10 +53,18 @@ impl MmapProt {
     pub const WRITE: u32 = 2;
     pub const EXEC: u32 = 4;
 
-    pub fn none() -> Self { Self(Self::NONE) }
-    pub fn readable(&self) -> bool { self.0 & Self::READ != 0 }
-    pub fn writable(&self) -> bool { self.0 & Self::WRITE != 0 }
-    pub fn executable(&self) -> bool { self.0 & Self::EXEC != 0 }
+    pub fn none() -> Self {
+        Self(Self::NONE)
+    }
+    pub fn readable(&self) -> bool {
+        self.0 & Self::READ != 0
+    }
+    pub fn writable(&self) -> bool {
+        self.0 & Self::WRITE != 0
+    }
+    pub fn executable(&self) -> bool {
+        self.0 & Self::EXEC != 0
+    }
 }
 
 // ── MmapFlags ─────────────────────────────────────────────────────────────────
@@ -74,13 +82,27 @@ impl MmapFlags {
     pub const LOCKED: u32 = 0x2000;
     pub const GROWSDOWN: u32 = 0x0100;
 
-    pub fn shared(&self) -> bool { self.0 & Self::SHARED != 0 }
-    pub fn private(&self) -> bool { self.0 & Self::PRIVATE != 0 }
-    pub fn fixed(&self) -> bool { self.0 & Self::FIXED != 0 }
-    pub fn anonymous(&self) -> bool { self.0 & Self::ANONYMOUS != 0 }
-    pub fn populate(&self) -> bool { self.0 & Self::POPULATE != 0 }
-    pub fn locked(&self) -> bool { self.0 & Self::LOCKED != 0 }
-    pub fn growsdown(&self) -> bool { self.0 & Self::GROWSDOWN != 0 }
+    pub fn shared(&self) -> bool {
+        self.0 & Self::SHARED != 0
+    }
+    pub fn private(&self) -> bool {
+        self.0 & Self::PRIVATE != 0
+    }
+    pub fn fixed(&self) -> bool {
+        self.0 & Self::FIXED != 0
+    }
+    pub fn anonymous(&self) -> bool {
+        self.0 & Self::ANONYMOUS != 0
+    }
+    pub fn populate(&self) -> bool {
+        self.0 & Self::POPULATE != 0
+    }
+    pub fn locked(&self) -> bool {
+        self.0 & Self::LOCKED != 0
+    }
+    pub fn growsdown(&self) -> bool {
+        self.0 & Self::GROWSDOWN != 0
+    }
 }
 
 // ── Backing storage ───────────────────────────────────────────────────────────
@@ -173,7 +195,9 @@ impl MmapAddressSpace {
                 return Some(candidate);
             }
             // Skip past conflicting VMA
-            let conflicting = self.vmas.iter()
+            let conflicting = self
+                .vmas
+                .iter()
                 .filter(|v| v.overlaps(candidate, len))
                 .max_by_key(|v| v.end())
                 .unwrap();
@@ -250,7 +274,11 @@ pub fn do_mmap(
         do_munmap(addr_space, hint_addr, len)?;
         hint_addr
     } else {
-        let base = if hint_addr != 0 { hint_addr } else { addr_space.mmap_hint };
+        let base = if hint_addr != 0 {
+            hint_addr
+        } else {
+            addr_space.mmap_hint
+        };
         // Temporarily adjust hint
         let old_hint = addr_space.mmap_hint;
         addr_space.mmap_hint = (base + PAGE_SIZE - 1) & !(PAGE_SIZE - 1);
@@ -270,7 +298,13 @@ pub fn do_mmap(
         }
     };
 
-    let vma = MemoryMap { addr, len, prot, flags, backing };
+    let vma = MemoryMap {
+        addr,
+        len,
+        prot,
+        flags,
+        backing,
+    };
     addr_space.insert_vma(vma);
 
     // Advance hint for next allocation
@@ -339,7 +373,9 @@ pub fn do_mprotect(
     let end = addr + len as u64;
 
     // Collect VMAs that overlap with [addr, end)
-    let overlapping: Vec<MemoryMap> = addr_space.vmas.iter()
+    let overlapping: Vec<MemoryMap> = addr_space
+        .vmas
+        .iter()
         .filter(|v| v.overlaps(addr, len))
         .cloned()
         .collect();
@@ -395,7 +431,10 @@ pub fn do_mprotect(
 
 /// Find the VMA covering `addr`, if any.
 pub fn find_vma(addr_space: &MmapAddressSpace, addr: u64) -> Option<&MemoryMap> {
-    addr_space.vmas.iter().find(|v| v.addr <= addr && addr < v.end())
+    addr_space
+        .vmas
+        .iter()
+        .find(|v| v.addr <= addr && addr < v.end())
 }
 
 /// Return list of all VMAs (for debugging)
@@ -409,8 +448,12 @@ pub fn list_vmas(addr_space: &MmapAddressSpace) -> &[MemoryMap] {
 mod tests {
     use super::*;
 
-    fn anon_flags() -> MmapFlags { MmapFlags(MmapFlags::PRIVATE | MmapFlags::ANONYMOUS) }
-    fn rw_prot() -> MmapProt { MmapProt(MmapProt::READ | MmapProt::WRITE) }
+    fn anon_flags() -> MmapFlags {
+        MmapFlags(MmapFlags::PRIVATE | MmapFlags::ANONYMOUS)
+    }
+    fn rw_prot() -> MmapProt {
+        MmapProt(MmapProt::READ | MmapProt::WRITE)
+    }
 
     #[test]
     fn test_anon_mmap_basic() {
@@ -486,7 +529,15 @@ mod tests {
         );
         // No SHARED/PRIVATE flag
         assert_eq!(
-            do_mmap(&mut as_, 0, 4096, rw_prot(), MmapFlags(MmapFlags::ANONYMOUS), -1, 0),
+            do_mmap(
+                &mut as_,
+                0,
+                4096,
+                rw_prot(),
+                MmapFlags(MmapFlags::ANONYMOUS),
+                -1,
+                0
+            ),
             Err(MmapError::InvalidArgs)
         );
     }

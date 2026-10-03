@@ -98,7 +98,11 @@ impl AtomicUpgradeManager {
 
     /// Apply an upgrade — creates a new generation atomically.
     /// If anything fails, the system remains on the current generation.
-    pub fn apply_upgrade(&mut self, description: &str, new_kernel: &str) -> Result<u32, &'static str> {
+    pub fn apply_upgrade(
+        &mut self,
+        description: &str,
+        new_kernel: &str,
+    ) -> Result<u32, &'static str> {
         if self.upgrade_state != UpgradeState::Idle {
             return Err("Upgrade already in progress");
         }
@@ -128,9 +132,13 @@ impl AtomicUpgradeManager {
         let target = match target_id {
             Some(id) => id,
             None => {
-                let current = self.generations.get(&self.active_generation)
+                let current = self
+                    .generations
+                    .get(&self.active_generation)
                     .ok_or("Active generation not found")?;
-                current.previous_generation.ok_or("No previous generation to roll back to")?
+                current
+                    .previous_generation
+                    .ok_or("No previous generation to roll back to")?
             }
         };
         if !self.generations.contains_key(&target) {
@@ -164,7 +172,9 @@ impl AtomicUpgradeManager {
 
     /// Remove old generations beyond max_generations, keeping at least 2.
     fn gc_generations(&mut self) {
-        if self.generations.len() <= self.max_generations { return; }
+        if self.generations.len() <= self.max_generations {
+            return;
+        }
         let mut ids: Vec<u32> = self.generations.keys().copied().collect();
         ids.sort();
         let to_remove = ids.len().saturating_sub(self.max_generations);

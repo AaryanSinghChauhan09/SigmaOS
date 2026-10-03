@@ -946,7 +946,10 @@ impl FedoraStatusFpoEngine {
     }
 
     pub fn query_service_health(&self, service: &str) -> FedoraServiceStatusState {
-        *self.service_statuses.get(service).unwrap_or(&FedoraServiceStatusState::Good)
+        *self
+            .service_statuses
+            .get(service)
+            .unwrap_or(&FedoraServiceStatusState::Good)
     }
 
     pub fn set_service_health(&mut self, service_name: &str, health: StatusFpoServiceHealth) {
@@ -2842,7 +2845,6 @@ pub enum FedoraServiceStatusState {
     MajorOutage,
 }
 
-
 /// Fedora FASJSON (Fedora Account System REST API) User Record
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FasjsonUserRecord {
@@ -2859,10 +2861,18 @@ pub struct FedoraFasjsonClientEngine {
 
 impl FedoraFasjsonClientEngine {
     pub fn new() -> Self {
-        FedoraFasjsonClientEngine { user_db: HashMap::new() }
+        FedoraFasjsonClientEngine {
+            user_db: HashMap::new(),
+        }
     }
 
-    pub fn register_user(&mut self, username: &str, human_name: &str, email: &str, groups: &[&str]) {
+    pub fn register_user(
+        &mut self,
+        username: &str,
+        human_name: &str,
+        email: &str,
+        groups: &[&str],
+    ) {
         self.user_db.insert(
             username.to_string(),
             FasjsonUserRecord {
@@ -3133,11 +3143,22 @@ impl FedoraTheNewHotnessEngine {
         });
     }
 
-    pub fn process_upstream_release_event(&mut self, name: &str, new_version: &str) -> Result<String, &'static str> {
-        if let Some(project) = self.monitored_projects.iter_mut().find(|p| p.project_name == name) {
+    pub fn process_upstream_release_event(
+        &mut self,
+        name: &str,
+        new_version: &str,
+    ) -> Result<String, &'static str> {
+        if let Some(project) = self
+            .monitored_projects
+            .iter_mut()
+            .find(|p| p.project_name == name)
+        {
             project.latest_version = new_version.to_string();
             project.is_triggering_scratch_build = true;
-            Ok(format!("TheNewHotness: Triggered Koji scratch build for {} version {}", name, new_version))
+            Ok(format!(
+                "TheNewHotness: Triggered Koji scratch build for {} version {}",
+                name, new_version
+            ))
         } else {
             Err("Project not found in Anitya release monitor")
         }
@@ -3971,8 +3992,6 @@ impl FedoraOfflineUpdateEngine {
         Ok(())
     }
 }
-
-
 
 // =========================================================================
 // Fedora MirrorManager 2 (mirrormanager2) System Engine

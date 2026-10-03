@@ -199,7 +199,11 @@ impl WorkQueue {
             name,
             pending: VecDeque::new(),
             high_priority: VecDeque::new(),
-            max_active: if max_active == 0 { usize::MAX } else { max_active },
+            max_active: if max_active == 0 {
+                usize::MAX
+            } else {
+                max_active
+            },
             workers,
             next_id: AtomicU64::new(1),
             total_submitted: AtomicU64::new(0),
@@ -244,7 +248,11 @@ impl WorkQueue {
     /// Get next work item to execute
     fn dequeue_work(&mut self, current_tick: u64) -> Option<Box<WorkItem>> {
         // Check high priority queue first
-        if let Some(pos) = self.high_priority.iter().position(|w| w.is_ready(current_tick)) {
+        if let Some(pos) = self
+            .high_priority
+            .iter()
+            .position(|w| w.is_ready(current_tick))
+        {
             return self.high_priority.remove(pos);
         }
 
@@ -297,7 +305,11 @@ impl WorkQueue {
             high_priority: self.high_priority.len(),
             total_submitted: self.total_submitted.load(Ordering::Relaxed),
             total_completed: self.total_completed.load(Ordering::Relaxed),
-            active_workers: self.workers.iter().filter(|w| w.active.load(Ordering::Relaxed)).count(),
+            active_workers: self
+                .workers
+                .iter()
+                .filter(|w| w.active.load(Ordering::Relaxed))
+                .count(),
             total_workers: self.workers.len(),
         }
     }
@@ -344,12 +356,14 @@ impl WorkQueueManager {
 
     /// Schedule work on high priority workqueue
     pub fn schedule_work_highpri(&mut self, func: WorkFn) -> u64 {
-        self.system_highpri_wq.queue_work(func, WorkFlags::HIGH_PRIORITY)
+        self.system_highpri_wq
+            .queue_work(func, WorkFlags::HIGH_PRIORITY)
     }
 
     /// Schedule delayed work
     pub fn schedule_delayed_work(&mut self, func: WorkFn, delay_ticks: u64) -> u64 {
-        self.system_wq.queue_delayed_work(func, delay_ticks, WorkFlags::DEFAULT)
+        self.system_wq
+            .queue_delayed_work(func, delay_ticks, WorkFlags::DEFAULT)
     }
 
     /// Process all workqueues

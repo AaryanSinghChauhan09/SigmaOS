@@ -60,12 +60,12 @@ pub enum UvcVsDescSubtype {
 pub struct UvcVcHeader {
     pub length: u8,
     pub descriptor_type: u8,
-    pub descriptor_subtype: u8,    // VC_HEADER
-    pub bcd_uvc: u16,              // UVC version
+    pub descriptor_subtype: u8, // VC_HEADER
+    pub bcd_uvc: u16,           // UVC version
     pub total_length: u16,
-    pub clock_frequency: u32,      // Device clock frequency in Hz
-    pub in_collection: u8,         // Number of streaming interfaces
-    // Interface numbers follow
+    pub clock_frequency: u32, // Device clock frequency in Hz
+    pub in_collection: u8,    // Number of streaming interfaces
+                              // Interface numbers follow
 }
 
 /// Input Terminal descriptor (Camera)
@@ -74,9 +74,9 @@ pub struct UvcVcHeader {
 pub struct UvcCameraTerminal {
     pub length: u8,
     pub descriptor_type: u8,
-    pub descriptor_subtype: u8,    // INPUT_TERMINAL
+    pub descriptor_subtype: u8, // INPUT_TERMINAL
     pub terminal_id: u8,
-    pub terminal_type: u16,        // ITT_CAMERA
+    pub terminal_type: u16, // ITT_CAMERA
     pub assoc_terminal: u8,
     pub i_terminal: u8,
     pub objective_focal_length_min: u16,
@@ -92,7 +92,7 @@ pub struct UvcCameraTerminal {
 pub struct UvcProcessingUnit {
     pub length: u8,
     pub descriptor_type: u8,
-    pub descriptor_subtype: u8,    // PROCESSING_UNIT
+    pub descriptor_subtype: u8, // PROCESSING_UNIT
     pub unit_id: u8,
     pub source_id: u8,
     pub max_multiplier: u16,
@@ -108,10 +108,10 @@ pub struct UvcProcessingUnit {
 pub struct UvcFormatUncompressed {
     pub length: u8,
     pub descriptor_type: u8,
-    pub descriptor_subtype: u8,    // FORMAT_UNCOMPRESSED
+    pub descriptor_subtype: u8, // FORMAT_UNCOMPRESSED
     pub format_index: u8,
     pub num_frame_descriptors: u8,
-    pub guid_format: [u8; 16],     // GUID (e.g., YUY2, NV12)
+    pub guid_format: [u8; 16], // GUID (e.g., YUY2, NV12)
     pub bits_per_pixel: u8,
     pub default_frame_index: u8,
     pub aspect_ratio_x: u8,
@@ -126,7 +126,7 @@ pub struct UvcFormatUncompressed {
 pub struct UvcFrameUncompressed {
     pub length: u8,
     pub descriptor_type: u8,
-    pub descriptor_subtype: u8,    // FRAME_UNCOMPRESSED
+    pub descriptor_subtype: u8, // FRAME_UNCOMPRESSED
     pub frame_index: u8,
     pub capabilities: u8,
     pub width: u16,
@@ -135,8 +135,8 @@ pub struct UvcFrameUncompressed {
     pub max_bit_rate: u32,
     pub max_video_frame_buffer_size: u32,
     pub default_frame_interval: u32, // 100ns units
-    pub frame_interval_type: u8,   // 0 = continuous, n = discrete
-    // Frame intervals follow
+    pub frame_interval_type: u8,     // 0 = continuous, n = discrete
+                                     // Frame intervals follow
 }
 
 /// MJPEG Format descriptor
@@ -145,7 +145,7 @@ pub struct UvcFrameUncompressed {
 pub struct UvcFormatMjpeg {
     pub length: u8,
     pub descriptor_type: u8,
-    pub descriptor_subtype: u8,    // FORMAT_MJPEG
+    pub descriptor_subtype: u8, // FORMAT_MJPEG
     pub format_index: u8,
     pub num_frame_descriptors: u8,
     pub flags: u8,
@@ -161,7 +161,10 @@ pub mod pixel_formats {
     pub const YUY2: [u8; 16] = *b"YUY2\x00\x00\x10\x00\x80\x00\x00\xaa\x00\x38\x9b\x71";
     pub const NV12: [u8; 16] = *b"NV12\x00\x00\x10\x00\x80\x00\x00\xaa\x00\x38\x9b\x71";
     pub const UYVY: [u8; 16] = *b"UYVY\x00\x00\x10\x00\x80\x00\x00\xaa\x00\x38\x9b\x71";
-    pub const RGB3: [u8; 16] = [0x7d, 0xeb, 0x36, 0xe4, 0x4f, 0x52, 0xce, 0x11, 0x9f, 0x53, 0x00, 0x20, 0xaf, 0x0b, 0xa7, 0x70];
+    pub const RGB3: [u8; 16] = [
+        0x7d, 0xeb, 0x36, 0xe4, 0x4f, 0x52, 0xce, 0x11, 0x9f, 0x53, 0x00, 0x20, 0xaf, 0x0b, 0xa7,
+        0x70,
+    ];
 }
 
 /// Video frame format
@@ -201,7 +204,9 @@ pub struct UvcFrameDesc {
 
 impl UvcFrameDesc {
     pub fn fps_from_interval(interval: u32) -> u32 {
-        if interval == 0 { return 0; }
+        if interval == 0 {
+            return 0;
+        }
         10_000_000 / interval
     }
 }
@@ -221,12 +226,12 @@ pub struct UvcStreamingControl {
     pub hint: u16,
     pub format_index: u8,
     pub frame_index: u8,
-    pub frame_interval: u32,       // 100ns units
+    pub frame_interval: u32, // 100ns units
     pub key_frame_rate: u16,
     pub p_frame_rate: u16,
     pub comp_quality: u16,
     pub comp_window_size: u16,
-    pub delay: u16,                // ms
+    pub delay: u16, // ms
     pub max_video_frame_size: u32,
     pub max_payload_transfer_size: u32,
 }
@@ -237,7 +242,7 @@ impl UvcStreamingControl {
             hint: 0,
             format_index: 1,
             frame_index: 1,
-            frame_interval: 333333,  // 30 fps
+            frame_interval: 333333, // 30 fps
             key_frame_rate: 0,
             p_frame_rate: 0,
             comp_quality: 0,

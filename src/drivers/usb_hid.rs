@@ -5,8 +5,8 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::vec::Vec;
 use alloc::collections::BTreeMap;
+use alloc::vec::Vec;
 
 // Re-export USB HID stubs
 pub use crate::stubs::usb_hid_stubs::*;
@@ -47,7 +47,7 @@ pub enum HidReportType {
 pub struct HidDescriptor {
     pub length: u8,
     pub descriptor_type: u8,
-    pub bcd_hid: u16,                 // HID version (BCD)
+    pub bcd_hid: u16, // HID version (BCD)
     pub country_code: u8,
     pub num_descriptors: u8,
     pub report_desc_type: u8,
@@ -124,14 +124,30 @@ impl KeyboardModifiers {
 
     pub fn to_byte(&self) -> u8 {
         let mut byte = 0u8;
-        if self.left_ctrl { byte |= 0x01; }
-        if self.left_shift { byte |= 0x02; }
-        if self.left_alt { byte |= 0x04; }
-        if self.left_gui { byte |= 0x08; }
-        if self.right_ctrl { byte |= 0x10; }
-        if self.right_shift { byte |= 0x20; }
-        if self.right_alt { byte |= 0x40; }
-        if self.right_gui { byte |= 0x80; }
+        if self.left_ctrl {
+            byte |= 0x01;
+        }
+        if self.left_shift {
+            byte |= 0x02;
+        }
+        if self.left_alt {
+            byte |= 0x04;
+        }
+        if self.left_gui {
+            byte |= 0x08;
+        }
+        if self.right_ctrl {
+            byte |= 0x10;
+        }
+        if self.right_shift {
+            byte |= 0x20;
+        }
+        if self.right_alt {
+            byte |= 0x40;
+        }
+        if self.right_gui {
+            byte |= 0x80;
+        }
         byte
     }
 }
@@ -140,9 +156,9 @@ impl KeyboardModifiers {
 #[repr(C, packed)]
 #[derive(Debug, Clone, Copy)]
 pub struct KeyboardReport {
-    pub modifiers: u8,               // Modifier keys bitfield
-    pub reserved: u8,                // Reserved (always 0)
-    pub keycodes: [u8; 6],          // Up to 6 simultaneous keys
+    pub modifiers: u8,     // Modifier keys bitfield
+    pub reserved: u8,      // Reserved (always 0)
+    pub keycodes: [u8; 6], // Up to 6 simultaneous keys
 }
 
 impl KeyboardReport {
@@ -163,10 +179,10 @@ impl KeyboardReport {
 #[repr(C, packed)]
 #[derive(Debug, Clone, Copy)]
 pub struct MouseReport {
-    pub buttons: u8,                 // Button states (bits 0-2)
-    pub x_movement: i8,              // Relative X movement
-    pub y_movement: i8,              // Relative Y movement
-    pub wheel: i8,                   // Wheel movement (optional)
+    pub buttons: u8,    // Button states (bits 0-2)
+    pub x_movement: i8, // Relative X movement
+    pub y_movement: i8, // Relative Y movement
+    pub wheel: i8,      // Wheel movement (optional)
 }
 
 impl MouseReport {
@@ -211,8 +227,8 @@ pub struct HidDevice {
     pub product_id: u16,
     pub report_descriptor: Vec<u8>,
     pub input_reports: Vec<Vec<u8>>,
-    pub protocol: u8,                // 0 = boot protocol, 1 = report protocol
-    pub idle_rate: u8,               // Idle rate in 4ms units
+    pub protocol: u8,  // 0 = boot protocol, 1 = report protocol
+    pub idle_rate: u8, // Idle rate in 4ms units
 }
 
 impl HidDevice {
@@ -260,14 +276,13 @@ impl HidDevice {
                     Ok(HidEvent::Keyboard(KeyboardEvent {
                         modifiers: KeyboardModifiers::from_byte(report[0]),
                         keycodes: [
-                            report[2], report[3], report[4],
-                            report[5], report[6], report[7],
+                            report[2], report[3], report[4], report[5], report[6], report[7],
                         ],
                     }))
                 } else {
                     Err(HidError::InvalidReportLength)
                 }
-            },
+            }
             HidDeviceType::Mouse => {
                 if report.len() >= 3 {
                     Ok(HidEvent::Mouse(MouseEvent {
@@ -279,7 +294,7 @@ impl HidDevice {
                 } else {
                     Err(HidError::InvalidReportLength)
                 }
-            },
+            }
             _ => Ok(HidEvent::Generic(report)),
         }
     }
@@ -343,7 +358,8 @@ impl HidDriver {
 
     /// Unregister HID device
     pub fn unregister_device(&mut self, device_id: u32) -> Result<(), HidError> {
-        self.devices.remove(&device_id)
+        self.devices
+            .remove(&device_id)
             .ok_or(HidError::DeviceNotFound)?;
         Ok(())
     }
@@ -360,7 +376,9 @@ impl HidDriver {
 
     /// Process input from device
     pub fn process_input(&mut self, device_id: u32, report: Vec<u8>) -> Result<HidEvent, HidError> {
-        let device = self.devices.get_mut(&device_id)
+        let device = self
+            .devices
+            .get_mut(&device_id)
             .ok_or(HidError::DeviceNotFound)?;
         device.process_input_report(report)
     }

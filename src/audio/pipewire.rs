@@ -39,7 +39,6 @@ pub struct AudioLink {
     pub dest_port: u32,
 }
 
-
 /// Audio node type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum NodeType {

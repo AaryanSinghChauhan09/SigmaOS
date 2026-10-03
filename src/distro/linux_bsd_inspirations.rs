@@ -619,9 +619,7 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxPuppy => supervisor == ServiceSupervisorType::Sysvinit,
             DistroSubsystemMode::SolarisIllumos
             | DistroSubsystemMode::SolarisOmniOS
-            | DistroSubsystemMode::SolarisOpenIndiana => {
-                supervisor == ServiceSupervisorType::Smf
-            }
+            | DistroSubsystemMode::SolarisOpenIndiana => supervisor == ServiceSupervisorType::Smf,
             DistroSubsystemMode::SmartOs
             | DistroSubsystemMode::SolarisSmartOS
             | DistroSubsystemMode::NetBsdRump => supervisor == ServiceSupervisorType::Rcd,
@@ -670,7 +668,9 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxVoid => format!("{}.xbps", input_pkg),
             DistroSubsystemMode::LinuxNix => format!("{}.nix", input_pkg),
             DistroSubsystemMode::LinuxGuix => format!("{}.scm", input_pkg),
-            DistroSubsystemMode::LinuxGentoo | DistroSubsystemMode::LinuxFuntoo => format!("{}.ebuild", input_pkg),
+            DistroSubsystemMode::LinuxGentoo | DistroSubsystemMode::LinuxFuntoo => {
+                format!("{}.ebuild", input_pkg)
+            }
             DistroSubsystemMode::LinuxFedora
             | DistroSubsystemMode::LinuxOpenSuse
             | DistroSubsystemMode::LinuxMageia
@@ -784,7 +784,9 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxVoid => format!("{}.xbps", action),
             DistroSubsystemMode::LinuxNix => format!("{}.nix", action),
             DistroSubsystemMode::LinuxGuix => format!("{}.scm", action),
-            DistroSubsystemMode::LinuxGentoo | DistroSubsystemMode::LinuxFuntoo => format!("{}.ebuild", action),
+            DistroSubsystemMode::LinuxGentoo | DistroSubsystemMode::LinuxFuntoo => {
+                format!("{}.ebuild", action)
+            }
             DistroSubsystemMode::LinuxFedora
             | DistroSubsystemMode::LinuxOpenSuse
             | DistroSubsystemMode::LinuxMageia

@@ -12,8 +12,8 @@
 #![allow(dead_code)]
 
 use std::collections::{HashMap, HashSet};
-use std::vec::Vec;
 use std::string::{String, ToString};
+use std::vec::Vec;
 
 // ── Errors ────────────────────────────────────────────────────────────────────
 
@@ -125,7 +125,8 @@ impl FsLayer {
         } else {
             format!("{}/", dir)
         };
-        self.files.keys()
+        self.files
+            .keys()
             .filter(|p| {
                 let rel = p.strip_prefix(&prefix).unwrap_or("");
                 !rel.is_empty() && !rel.contains('/')
@@ -237,8 +238,17 @@ pub fn overlay_open_read(ofs: &OverlayFs, path: &str) -> Result<FileHandle, Over
         let idx = entry.lower_index.unwrap();
         ofs.lowers[idx].read(path).cloned().unwrap_or_default()
     };
-    let layer = if entry.in_upper { FileLayer::Upper } else { FileLayer::Lower(entry.lower_index.unwrap()) };
-    Ok(FileHandle { path: path.to_string(), writable: false, layer, content })
+    let layer = if entry.in_upper {
+        FileLayer::Upper
+    } else {
+        FileLayer::Lower(entry.lower_index.unwrap())
+    };
+    Ok(FileHandle {
+        path: path.to_string(),
+        writable: false,
+        layer,
+        content,
+    })
 }
 
 /// Copy-up: copy a file from its lower layer into the upper layer.
@@ -401,9 +411,18 @@ mod tests {
         overlay_unlink(&mut ofs, "/etc/hosts").unwrap();
 
         let entries = overlay_readdir(&ofs, "/etc");
-        assert!(entries.contains(&"/etc/resolv.conf".to_string()), "upper file missing");
-        assert!(entries.contains(&"/etc/config".to_string()), "lower file missing");
-        assert!(!entries.contains(&"/etc/hosts".to_string()), "whiteout not respected");
+        assert!(
+            entries.contains(&"/etc/resolv.conf".to_string()),
+            "upper file missing"
+        );
+        assert!(
+            entries.contains(&"/etc/config".to_string()),
+            "lower file missing"
+        );
+        assert!(
+            !entries.contains(&"/etc/hosts".to_string()),
+            "whiteout not respected"
+        );
     }
 
     #[test]
@@ -418,7 +437,10 @@ mod tests {
     #[test]
     fn test_not_found() {
         let ofs = make_overlay();
-        assert_eq!(overlay_open_read(&ofs, "/does/not/exist"), Err(OverlayError::NotFound));
+        assert_eq!(
+            overlay_open_read(&ofs, "/does/not/exist"),
+            Err(OverlayError::NotFound)
+        );
     }
 
     #[test]

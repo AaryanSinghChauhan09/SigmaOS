@@ -137,16 +137,16 @@ impl ResourceLimits {
     pub fn default() -> Self {
         Self {
             limits: [
-                ResourceLimit::UNLIMITED,      // CPU
-                ResourceLimit::UNLIMITED,      // FSIZE
-                ResourceLimit::UNLIMITED,      // DATA
+                ResourceLimit::UNLIMITED,                              // CPU
+                ResourceLimit::UNLIMITED,                              // FSIZE
+                ResourceLimit::UNLIMITED,                              // DATA
                 ResourceLimit::new(8 * 1024 * 1024, 64 * 1024 * 1024), // STACK (8MB soft, 64MB hard)
-                ResourceLimit::UNLIMITED,      // CORE
-                ResourceLimit::UNLIMITED,      // RSS
-                ResourceLimit::new(4096, 8192), // NPROC
-                ResourceLimit::new(1024, 4096), // NOFILE
-                ResourceLimit::new(64 * 1024, 64 * 1024), // MEMLOCK
-                ResourceLimit::UNLIMITED,      // AS
+                ResourceLimit::UNLIMITED,                              // CORE
+                ResourceLimit::UNLIMITED,                              // RSS
+                ResourceLimit::new(4096, 8192),                        // NPROC
+                ResourceLimit::new(1024, 4096),                        // NOFILE
+                ResourceLimit::new(64 * 1024, 64 * 1024),              // MEMLOCK
+                ResourceLimit::UNLIMITED,                              // AS
             ],
         }
     }
@@ -224,12 +224,12 @@ impl CpuAffinity {
 /// Process namespace IDs (inspired by Linux namespaces)
 #[derive(Debug, Clone, Copy)]
 pub struct NamespaceIds {
-    pub mnt_ns: u64,  // Mount namespace
-    pub pid_ns: u64,  // PID namespace
-    pub net_ns: u64,  // Network namespace
-    pub ipc_ns: u64,  // IPC namespace
-    pub uts_ns: u64,  // UTS namespace (hostname)
-    pub user_ns: u64, // User namespace
+    pub mnt_ns: u64,    // Mount namespace
+    pub pid_ns: u64,    // PID namespace
+    pub net_ns: u64,    // Network namespace
+    pub ipc_ns: u64,    // IPC namespace
+    pub uts_ns: u64,    // UTS namespace (hostname)
+    pub user_ns: u64,   // User namespace
     pub cgroup_ns: u64, // Cgroup namespace
 }
 
@@ -248,13 +248,13 @@ impl NamespaceIds {
 /// Process statistics (inspired by Linux task_struct stats)
 #[derive(Debug)]
 pub struct ProcessStats {
-    pub utime: AtomicU64,      // User CPU time (nanoseconds)
-    pub stime: AtomicU64,      // System CPU time (nanoseconds)
-    pub voluntary_switches: AtomicU64, // Voluntary context switches
+    pub utime: AtomicU64,                // User CPU time (nanoseconds)
+    pub stime: AtomicU64,                // System CPU time (nanoseconds)
+    pub voluntary_switches: AtomicU64,   // Voluntary context switches
     pub involuntary_switches: AtomicU64, // Involuntary context switches
-    pub minor_faults: AtomicU64, // Minor page faults
-    pub major_faults: AtomicU64, // Major page faults
-    pub rss_pages: AtomicU64,  // Resident set size in pages
+    pub minor_faults: AtomicU64,         // Minor page faults
+    pub major_faults: AtomicU64,         // Major page faults
+    pub rss_pages: AtomicU64,            // Resident set size in pages
 }
 
 impl ProcessStats {
@@ -447,7 +447,6 @@ mod tests {
         assert_eq!(stack_limit.hard, 64 * 1024 * 1024);
     }
 }
-
 
 // ========================================
 // Advanced IPC and Process Management Types (Stubs for Phase 1)

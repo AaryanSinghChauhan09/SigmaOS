@@ -12,7 +12,7 @@ use crate::crypto::entropy;
 /// TPM 2.0 PCR bank algorithm
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TpmHashAlg {
-    Sha1   = 0x0004,
+    Sha1 = 0x0004,
     Sha256 = 0x000B,
     Sha384 = 0x000C,
     Sha512 = 0x000D,
@@ -40,7 +40,11 @@ pub struct TpmPcr {
 
 impl TpmPcr {
     pub fn new(index: u8, alg: TpmHashAlg) -> Self {
-        Self { index, alg, value: vec![0u8; alg.digest_size()] }
+        Self {
+            index,
+            alg,
+            value: vec![0u8; alg.digest_size()],
+        }
     }
 
     /// Extend the PCR: PCR = H(PCR || data). Simulated with XorShift mixing.
@@ -127,16 +131,29 @@ impl Tpm2Device {
         entropy::get_entropy_bytes(&mut ak_pub);
         let pcrs = (0..24).map(|i| TpmPcr::new(i, alg)).collect();
         Self {
-            pcrs, hash_alg: alg, available: true,
-            ek_public: ek, ak_private: ak_priv, ak_public: ak_pub,
-            loaded_keys: 0, pcr_extends: 0, seals: 0, unseals: 0, quotes: 0,
+            pcrs,
+            hash_alg: alg,
+            available: true,
+            ek_public: ek,
+            ak_private: ak_priv,
+            ak_public: ak_pub,
+            loaded_keys: 0,
+            pcr_extends: 0,
+            seals: 0,
+            unseals: 0,
+            quotes: 0,
         }
     }
 
     /// Extend a PCR with measurement data.
     pub fn pcr_extend(&mut self, pcr_index: u8, data: &[u8]) -> Result<(), &'static str> {
-        if !self.available { return Err("TPM not available"); }
-        let pcr = self.pcrs.get_mut(pcr_index as usize).ok_or("Invalid PCR index")?;
+        if !self.available {
+            return Err("TPM not available");
+        }
+        let pcr = self
+            .pcrs
+            .get_mut(pcr_index as usize)
+            .ok_or("Invalid PCR index")?;
         pcr.extend(data);
         self.pcr_extends += 1;
         Ok(())
@@ -144,14 +161,21 @@ impl Tpm2Device {
 
     /// Read the current value of a PCR.
     pub fn pcr_read(&self, pcr_index: u8) -> Result<&[u8], &'static str> {
-        if !self.available { return Err("TPM not available"); }
-        self.pcrs.get(pcr_index as usize).map(|p| p.value.as_slice()).ok_or("Invalid PCR index")
+        if !self.available {
+            return Err("TPM not available");
+        }
+        self.pcrs
+            .get(pcr_index as usize)
+            .map(|p| p.value.as_slice())
+            .ok_or("Invalid PCR index")
     }
 
     /// Seal data to a set of PCR values (TPM2_Seal).
     /// The sealed blob can only be unsealed when those PCRs have the same values.
     pub fn seal(&mut self, data: &[u8], pcr_mask: u32) -> Result<TpmSealedKey, &'static str> {
-        if !self.available { return Err("TPM not available"); }
+        if !self.available {
+            return Err("TPM not available");
+        }
         // Snapshot current PCR values for the policy digest
         let mut pcr_digest = Vec::new();
         for i in 0..24u8 {
@@ -165,12 +189,19 @@ impl Tpm2Device {
             *b ^= self.ek_public[i % 32];
         }
         self.seals += 1;
-        Ok(TpmSealedKey { data: sealed_data, pcr_mask, pcr_digest, unsealed: false })
+        Ok(TpmSealedKey {
+            data: sealed_data,
+            pcr_mask,
+            pcr_digest,
+            unsealed: false,
+        })
     }
 
     /// Unseal data (TPM2_Unseal) — only succeeds if PCRs match the policy.
     pub fn unseal(&mut self, blob: &mut TpmSealedKey) -> Result<Vec<u8>, &'static str> {
-        if !self.available { return Err("TPM not available"); }
+        if !self.available {
+            return Err("TPM not available");
+        }
         // Verify PCR policy
         let mut current_digest = Vec::new();
         for i in 0..24u8 {
@@ -193,7 +224,9 @@ impl Tpm2Device {
 
     /// Generate an attestation quote (TPM2_Quote) for a set of PCRs.
     pub fn quote(&mut self, pcr_mask: u32, nonce: &[u8]) -> Result<TpmQuote, &'static str> {
-        if !self.available { return Err("TPM not available"); }
+        if !self.available {
+            return Err("TPM not available");
+        }
         let mut pcr_values = Vec::new();
         let mut hash_input = nonce.to_vec();
         for i in 0..24u8 {

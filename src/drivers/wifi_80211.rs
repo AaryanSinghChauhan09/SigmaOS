@@ -6,9 +6,9 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::vec::Vec;
-use alloc::string::String;
 use alloc::collections::BTreeMap;
+use alloc::string::String;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicU32, AtomicU64, Ordering};
 
 /// IEEE 802.11 frame types
@@ -42,13 +42,13 @@ pub enum ManagementSubtype {
 #[repr(C, packed)]
 #[derive(Clone, Copy)]
 pub struct Dot11Header {
-    pub frame_control: u16,    // Frame control field
-    pub duration: u16,         // Duration/ID
-    pub addr1: [u8; 6],        // Address 1 (receiver)
-    pub addr2: [u8; 6],        // Address 2 (transmitter)
-    pub addr3: [u8; 6],        // Address 3 (BSSID or destination)
-    pub seq_ctrl: u16,         // Sequence control
-    // addr4 present in WDS mode
+    pub frame_control: u16, // Frame control field
+    pub duration: u16,      // Duration/ID
+    pub addr1: [u8; 6],     // Address 1 (receiver)
+    pub addr2: [u8; 6],     // Address 2 (transmitter)
+    pub addr3: [u8; 6],     // Address 3 (BSSID or destination)
+    pub seq_ctrl: u16,      // Sequence control
+                            // addr4 present in WDS mode
 }
 
 impl Dot11Header {
@@ -56,20 +56,20 @@ impl Dot11Header {
         let fc = u16::from_le(self.frame_control);
         unsafe { core::mem::transmute(((fc >> 2) & 0x03) as u8) }
     }
-    
+
     pub fn get_subtype(&self) -> u8 {
         let fc = u16::from_le(self.frame_control);
         ((fc >> 4) & 0x0F) as u8
     }
-    
+
     pub fn is_to_ds(&self) -> bool {
         u16::from_le(self.frame_control) & 0x0100 != 0
     }
-    
+
     pub fn is_from_ds(&self) -> bool {
         u16::from_le(self.frame_control) & 0x0200 != 0
     }
-    
+
     pub fn is_protected(&self) -> bool {
         u16::from_le(self.frame_control) & 0x4000 != 0
     }
@@ -79,7 +79,7 @@ impl Dot11Header {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u8)]
 pub enum WifiMode {
-    Infrastructure = 0,  // Station mode (client)
+    Infrastructure = 0, // Station mode (client)
     AdHoc = 1,          // IBSS (ad-hoc network)
     AP = 2,             // Access Point
     Monitor = 3,        // Monitor mode (promiscuous)
@@ -103,38 +103,38 @@ pub enum WifiSecurity {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u8)]
 pub enum WifiBand {
-    Band2_4GHz = 0,  // 2.4 GHz (2412-2484 MHz)
-    Band5GHz = 1,    // 5 GHz (5170-5835 MHz)
-    Band6GHz = 2,    // 6 GHz (5945-7125 MHz) - 802.11ax/be
+    Band2_4GHz = 0, // 2.4 GHz (2412-2484 MHz)
+    Band5GHz = 1,   // 5 GHz (5170-5835 MHz)
+    Band6GHz = 2,   // 6 GHz (5945-7125 MHz) - 802.11ax/be
 }
 
 /// Wi-Fi channel bandwidth
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u8)]
 pub enum ChannelWidth {
-    MHz20 = 0,   // 20 MHz
-    MHz40 = 1,   // 40 MHz (802.11n)
-    MHz80 = 2,   // 80 MHz (802.11ac)
-    MHz160 = 3,  // 160 MHz (802.11ac/ax)
-    MHz320 = 4,  // 320 MHz (802.11be)
+    MHz20 = 0,  // 20 MHz
+    MHz40 = 1,  // 40 MHz (802.11n)
+    MHz80 = 2,  // 80 MHz (802.11ac)
+    MHz160 = 3, // 160 MHz (802.11ac/ax)
+    MHz320 = 4, // 320 MHz (802.11be)
 }
 
 /// Wi-Fi PHY standards
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u8)]
 pub enum WifiStandard {
-    Legacy = 0,    // 802.11a/b/g
-    N = 1,         // 802.11n (Wi-Fi 4)
-    AC = 2,        // 802.11ac (Wi-Fi 5)
-    AX = 3,        // 802.11ax (Wi-Fi 6/6E)
-    BE = 4,        // 802.11be (Wi-Fi 7)
+    Legacy = 0, // 802.11a/b/g
+    N = 1,      // 802.11n (Wi-Fi 4)
+    AC = 2,     // 802.11ac (Wi-Fi 5)
+    AX = 3,     // 802.11ax (Wi-Fi 6/6E)
+    BE = 4,     // 802.11be (Wi-Fi 7)
 }
 
 /// Wi-Fi channel configuration
 #[derive(Debug, Clone, Copy)]
 pub struct WifiChannel {
     pub number: u8,
-    pub frequency: u16,      // MHz
+    pub frequency: u16, // MHz
     pub band: WifiBand,
     pub width: ChannelWidth,
 }
@@ -157,7 +157,7 @@ impl WifiChannel {
             None
         }
     }
-    
+
     /// Get 5 GHz channel
     pub fn channel_5ghz(num: u8) -> Option<Self> {
         if num >= 36 && num <= 177 {
@@ -177,12 +177,12 @@ impl WifiChannel {
 /// BSS (Basic Service Set) information
 #[derive(Debug, Clone)]
 pub struct BssInfo {
-    pub bssid: [u8; 6],           // MAC address of AP
-    pub ssid: String,              // Network name
+    pub bssid: [u8; 6], // MAC address of AP
+    pub ssid: String,   // Network name
     pub channel: WifiChannel,
     pub security: WifiSecurity,
-    pub signal_strength: i8,       // dBm
-    pub beacon_interval: u16,      // TUs (1024 μs)
+    pub signal_strength: i8,  // dBm
+    pub beacon_interval: u16, // TUs (1024 μs)
     pub capability: u16,
 }
 
@@ -191,9 +191,9 @@ pub struct BssInfo {
 pub struct StationInfo {
     pub mac_addr: [u8; 6],
     pub connected: bool,
-    pub signal: i8,               // dBm
-    pub tx_rate: u32,             // Mbps
-    pub rx_rate: u32,             // Mbps
+    pub signal: i8,   // dBm
+    pub tx_rate: u32, // Mbps
+    pub rx_rate: u32, // Mbps
     pub tx_packets: u64,
     pub rx_packets: u64,
     pub tx_bytes: u64,
@@ -205,9 +205,9 @@ pub struct StationInfo {
 /// Wi-Fi scan request
 #[derive(Debug, Clone)]
 pub struct ScanRequest {
-    pub ssid: Option<String>,     // Specific SSID or broadcast
+    pub ssid: Option<String>, // Specific SSID or broadcast
     pub channels: Vec<WifiChannel>,
-    pub passive: bool,            // Passive vs active scan
+    pub passive: bool, // Passive vs active scan
 }
 
 /// Wi-Fi connection parameters
@@ -223,10 +223,10 @@ pub struct ConnectParams {
 /// Rate control algorithms
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RateControlAlgo {
-    Minstrel,        // Linux default
-    MinstrelHT,      // HT/VHT extension
-    PID,             // Proportional-Integral-Derivative
-    AMRR,            // Adaptive Multi Rate Retry (BSD)
+    Minstrel,   // Linux default
+    MinstrelHT, // HT/VHT extension
+    PID,        // Proportional-Integral-Derivative
+    AMRR,       // Adaptive Multi Rate Retry (BSD)
 }
 
 /// Wi-Fi device capabilities
@@ -234,7 +234,7 @@ pub enum RateControlAlgo {
 pub struct WifiCapabilities {
     pub standards: Vec<WifiStandard>,
     pub bands: Vec<WifiBand>,
-    pub max_tx_power: i8,         // dBm
+    pub max_tx_power: i8, // dBm
     pub supports_monitor: bool,
     pub supports_ap: bool,
     pub supports_mesh: bool,
@@ -309,17 +309,17 @@ pub trait WifiDriver {
 /// Wi-Fi rate information
 #[derive(Debug, Clone, Copy)]
 pub struct WifiRate {
-    pub bitrate: u32,      // Kbps
+    pub bitrate: u32, // Kbps
     pub mcs_index: Option<u8>,
-    pub nss: u8,           // Number of spatial streams
-    pub gi: u8,            // Guard interval (0=long, 1=short)
+    pub nss: u8, // Number of spatial streams
+    pub gi: u8,  // Guard interval (0=long, 1=short)
 }
 
 /// Wi-Fi transmit parameters
 #[derive(Debug, Clone, Copy)]
 pub struct TxParams {
     pub rate: WifiRate,
-    pub power: i8,         // dBm
+    pub power: i8, // dBm
     pub retry_limit: u8,
     pub use_rts: bool,
     pub use_cts: bool,
@@ -342,8 +342,8 @@ pub enum WifiError {
 
 /// WPA2/WPA3 key management
 pub struct WpaKeyManagement {
-    pub ptk: [u8; 64],  // Pairwise Transient Key
-    pub gtk: [u8; 32],  // Group Temporal Key
+    pub ptk: [u8; 64], // Pairwise Transient Key
+    pub gtk: [u8; 32], // Group Temporal Key
 }
 
 impl WpaKeyManagement {
@@ -353,9 +353,16 @@ impl WpaKeyManagement {
             gtk: [0u8; 32],
         }
     }
-    
+
     /// Derive PTK from PMK and nonces (simplified)
-    pub fn derive_ptk(&mut self, pmk: &[u8; 32], aa: &[u8; 6], sa: &[u8; 6], anonce: &[u8; 32], snonce: &[u8; 32]) {
+    pub fn derive_ptk(
+        &mut self,
+        pmk: &[u8; 32],
+        aa: &[u8; 6],
+        sa: &[u8; 6],
+        anonce: &[u8; 32],
+        snonce: &[u8; 32],
+    ) {
         // In production: use PRF-512 for actual key derivation
         // This is a placeholder
         for i in 0..32 {
@@ -367,30 +374,30 @@ impl WpaKeyManagement {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_wifi_channel_2_4ghz() {
         let ch1 = WifiChannel::channel_2_4ghz(1).unwrap();
         assert_eq!(ch1.frequency, 2412);
         assert_eq!(ch1.band, WifiBand::Band2_4GHz);
-        
+
         let ch11 = WifiChannel::channel_2_4ghz(11).unwrap();
         assert_eq!(ch11.frequency, 2462);
-        
+
         let ch14 = WifiChannel::channel_2_4ghz(14).unwrap();
         assert_eq!(ch14.frequency, 2484);
     }
-    
+
     #[test]
     fn test_wifi_channel_5ghz() {
         let ch36 = WifiChannel::channel_5ghz(36).unwrap();
         assert_eq!(ch36.frequency, 5180);
         assert_eq!(ch36.band, WifiBand::Band5GHz);
-        
+
         let ch165 = WifiChannel::channel_5ghz(165).unwrap();
         assert_eq!(ch165.frequency, 5825);
     }
-    
+
     #[test]
     fn test_dot11_header() {
         let mut header = Dot11Header {
@@ -401,7 +408,7 @@ mod tests {
             addr3: [0x11; 6],
             seq_ctrl: 0,
         };
-        
+
         assert_eq!(header.get_type(), FrameType::Data);
     }
 }

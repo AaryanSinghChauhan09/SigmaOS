@@ -82,13 +82,17 @@ impl SlabCache {
     /// Linux: `mm/slub.c:slab_alloc()`
     pub fn allocate(&mut self) -> Option<NonNull<u8>> {
         // Try partial slabs first
-        if let Some(obj) = Self::allocate_from_slab_list(&mut self.partial_slabs, &mut self.full_slabs) {
+        if let Some(obj) =
+            Self::allocate_from_slab_list(&mut self.partial_slabs, &mut self.full_slabs)
+        {
             self.allocated_objects.fetch_add(1, Ordering::Relaxed);
             return Some(obj);
         }
 
         // Try empty slabs
-        if let Some(obj) = Self::allocate_from_slab_list(&mut self.empty_slabs, &mut self.full_slabs) {
+        if let Some(obj) =
+            Self::allocate_from_slab_list(&mut self.empty_slabs, &mut self.full_slabs)
+        {
             self.allocated_objects.fetch_add(1, Ordering::Relaxed);
             return Some(obj);
         }
@@ -99,14 +103,17 @@ impl SlabCache {
     }
 
     /// Allocate from specific slab list
-    fn allocate_from_slab_list(list: &mut *mut Slab, full_slabs: &mut *mut Slab) -> Option<NonNull<u8>> {
+    fn allocate_from_slab_list(
+        list: &mut *mut Slab,
+        full_slabs: &mut *mut Slab,
+    ) -> Option<NonNull<u8>> {
         if list.is_null() {
             return None;
         }
 
         unsafe {
             let slab = &mut **list;
-            
+
             if slab.free_list.is_null() {
                 return None;
             }
@@ -131,10 +138,10 @@ impl SlabCache {
     pub fn deallocate(&mut self, ptr: NonNull<u8>) {
         // Find which slab this object belongs to
         // In real implementation, would use page metadata
-        
+
         unsafe {
             let free_obj = ptr.as_ptr() as *mut FreeObject;
-            
+
             // For now, add to first partial slab
             if !self.partial_slabs.is_null() {
                 let slab = &mut *self.partial_slabs;
@@ -189,7 +196,7 @@ impl SlabAllocator {
     /// Create new slab allocator
     pub fn new() -> Self {
         let mut caches = Vec::new();
-        
+
         for (i, &size) in SLAB_SIZES.iter().enumerate() {
             caches.push(SlabCache::new(size, OBJECTS_PER_SLAB[i]));
         }
@@ -211,7 +218,7 @@ impl SlabAllocator {
     /// Linux: `mm/slab_common.c:kmalloc()`
     pub fn allocate(&mut self, layout: Layout) -> Option<NonNull<u8>> {
         let size = layout.size();
-        
+
         if let Some(cache) = self.find_cache(size) {
             cache.allocate()
         } else {
@@ -224,7 +231,7 @@ impl SlabAllocator {
     /// Linux: `mm/slab_common.c:kfree()`
     pub fn deallocate(&mut self, ptr: NonNull<u8>, layout: Layout) {
         let size = layout.size();
-        
+
         if let Some(cache) = self.find_cache(size) {
             cache.deallocate(ptr);
         }

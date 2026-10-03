@@ -950,7 +950,10 @@ impl FedoraRpmostreeAtomicEngine {
 
     pub fn layer_package(&mut self, pkg_name: &str) -> String {
         self.layered_packages.push(pkg_name.to_string());
-        format!("Staged package layer '{}' for next boot deployment", pkg_name)
+        format!(
+            "Staged package layer '{}' for next boot deployment",
+            pkg_name
+        )
     }
 
     pub fn rollback_deployment(&mut self) -> Result<String, &'static str> {

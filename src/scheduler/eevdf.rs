@@ -26,14 +26,10 @@ use core::sync::atomic::{AtomicU64, Ordering};
 /// Lower nice = higher weight = more CPU time
 /// Linux CFS nice-to-weight table (kernel/sched/core.c)
 pub static NICE_TO_WEIGHT: [u32; 40] = [
-    /* -20 */ 88761, 71755, 56483, 46273, 36291,
-    /* -15 */ 29154, 23254, 18705, 14949, 11916,
-    /* -10 */ 9548, 7620, 6100, 4904, 3906,
-    /*  -5 */ 3121, 2501, 1991, 1586, 1277,
-    /*   0 */ 1024, 820, 655, 526, 423,
-    /*   5 */ 335, 272, 215, 172, 137,
-    /*  10 */ 110, 87, 70, 56, 45,
-    /*  15 */ 36, 29, 23, 18, 15,
+    /* -20 */ 88761, 71755, 56483, 46273, 36291, /* -15 */ 29154, 23254, 18705, 14949,
+    11916, /* -10 */ 9548, 7620, 6100, 4904, 3906, /*  -5 */ 3121, 2501, 1991, 1586,
+    1277, /*   0 */ 1024, 820, 655, 526, 423, /*   5 */ 335, 272, 215, 172, 137,
+    /*  10 */ 110, 87, 70, 56, 45, /*  15 */ 36, 29, 23, 18, 15,
 ];
 
 /// Convert nice value (-20 to +19) to weight
@@ -63,17 +59,17 @@ pub enum TaskState {
 #[derive(Debug, Clone)]
 pub struct EevdfTask {
     pub pid: u64,
-    pub vruntime: u64,           // Virtual runtime (nanoseconds)
-    pub deadline: u64,           // Virtual deadline
-    pub weight: u32,             // Nice-to-weight mapped value
-    pub slice: u64,              // Time slice per period (ns)
-    pub lag: i64,                // Service debt (positive = owed CPU time)
-    pub eligible_at: u64,        // Earliest eligible vruntime
-    pub latency_nice: i8,        // Latency sensitivity (-20 to +19)
+    pub vruntime: u64,    // Virtual runtime (nanoseconds)
+    pub deadline: u64,    // Virtual deadline
+    pub weight: u32,      // Nice-to-weight mapped value
+    pub slice: u64,       // Time slice per period (ns)
+    pub lag: i64,         // Service debt (positive = owed CPU time)
+    pub eligible_at: u64, // Earliest eligible vruntime
+    pub latency_nice: i8, // Latency sensitivity (-20 to +19)
     pub state: TaskState,
     pub compute_unit: Option<ComputeUnit>,
-    pub cpu_affinity: u64,       // CPU affinity bitmask
-    pub numa_node: u32,          // NUMA node preference
+    pub cpu_affinity: u64,             // CPU affinity bitmask
+    pub numa_node: u32,                // NUMA node preference
     pub boosted_priority: Option<u32>, // Priority inheritance boost
 }
 
@@ -164,7 +160,8 @@ impl EevdfRunqueue {
     /// Pick earliest eligible virtual deadline
     pub fn pick_eevdf(&mut self, min_vruntime: u64) -> Option<EevdfTask> {
         // Among eligible tasks, pick the one with earliest virtual deadline
-        let eligible_idx = self.tasks
+        let eligible_idx = self
+            .tasks
             .iter()
             .position(|t| t.is_eligible(min_vruntime))?;
         Some(self.tasks.remove(eligible_idx))
@@ -223,8 +220,8 @@ pub struct EevdfScheduler {
     running_tasks: BTreeMap<u64, EevdfTask>,
     current_time: u64,
     compute_units: Vec<ComputeUnit>,
-    sched_latency_ns: u64,    // Target scheduling latency (6ms)
-    min_granularity_ns: u64,  // Minimum time slice (0.75ms)
+    sched_latency_ns: u64,   // Target scheduling latency (6ms)
+    min_granularity_ns: u64, // Minimum time slice (0.75ms)
 }
 
 impl EevdfScheduler {
@@ -234,8 +231,8 @@ impl EevdfScheduler {
             running_tasks: BTreeMap::new(),
             current_time: 0,
             compute_units: Vec::new(),
-            sched_latency_ns: 6_000_000,   // 6ms
-            min_granularity_ns: 750_000,    // 0.75ms
+            sched_latency_ns: 6_000_000, // 6ms
+            min_granularity_ns: 750_000, // 0.75ms
         }
     }
 
@@ -253,7 +250,9 @@ impl EevdfScheduler {
     /// Calculate time slice for task
     pub fn calculate_slice(&self, task: &EevdfTask) -> u64 {
         let nr_running = (self.ready_queue.len() + self.running_tasks.len()).max(1);
-        let period = self.sched_latency_ns.max(self.min_granularity_ns * nr_running as u64);
+        let period = self
+            .sched_latency_ns
+            .max(self.min_granularity_ns * nr_running as u64);
         (period * task.weight as u64) / (nr_running as u64 * 1024)
     }
 
@@ -261,7 +260,7 @@ impl EevdfScheduler {
     pub fn schedule(&mut self) -> Option<u64> {
         self.ready_queue.update_min_vruntime();
         let min_vruntime = self.ready_queue.min_vruntime();
-        
+
         let mut task = self.ready_queue.pick_eevdf(min_vruntime)?;
         task.state = TaskState::Running;
 
@@ -284,7 +283,8 @@ impl EevdfScheduler {
 
     /// Get available compute unit
     fn get_available_unit(&self) -> Option<ComputeUnit> {
-        let used_units: Vec<ComputeUnit> = self.running_tasks
+        let used_units: Vec<ComputeUnit> = self
+            .running_tasks
             .values()
             .filter_map(|t| t.compute_unit)
             .collect();
@@ -475,7 +475,7 @@ mod tests {
         let mut task = EevdfTask::new(1, 100, 0);
         task.vruntime = 50;
         task.lag = 10;
-        
+
         // Task is eligible if vruntime - lag <= min_vruntime
         assert!(task.is_eligible(60)); // 50 - 10 = 40 <= 60
         assert!(!task.is_eligible(30)); // 50 - 10 = 40 > 30
@@ -485,11 +485,11 @@ mod tests {
     fn test_priority_inheritance() {
         let mut task = EevdfTask::new(1, 100, 5);
         let orig_weight = task.weight;
-        
+
         task.boost_priority(2048);
         assert_eq!(task.weight, 2048);
         assert_eq!(task.boosted_priority, Some(orig_weight));
-        
+
         task.restore_priority();
         assert_eq!(task.weight, orig_weight);
         assert_eq!(task.boosted_priority, None);
@@ -499,7 +499,7 @@ mod tests {
     fn test_calc_delta_fair() {
         let delta = calc_delta_fair(1000, 1024, 0);
         assert_eq!(delta, 1000); // Nice 0: no scaling
-        
+
         let delta_high = calc_delta_fair(1000, 2048, 0);
         assert!(delta_high < 1000); // Higher weight = slower vruntime growth
     }
@@ -508,15 +508,15 @@ mod tests {
     fn test_eevdf_scheduler() {
         let mut scheduler = EevdfScheduler::new();
         scheduler.add_compute_unit(ComputeUnit::CpuCore(0));
-        
+
         let task1 = EevdfTask::new(1, 100, 1);
         let task2 = EevdfTask::new(2, 50, 1); // Earlier deadline
-        
+
         scheduler.add_task(task1);
         scheduler.add_task(task2);
-        
+
         assert_eq!(scheduler.ready_count(), 2);
-        
+
         let scheduled = scheduler.schedule();
         assert_eq!(scheduled, Some(2)); // Task with earliest deadline
     }
@@ -524,30 +524,30 @@ mod tests {
     #[test]
     fn test_weight_based_time_slice() {
         let scheduler = EevdfScheduler::new();
-        
+
         let task_high = EevdfTask::new(1, 100, 0); // Nice 0
         let task_low = EevdfTask::new(2, 100, 10); // Nice 10
-        
+
         let slice_high = scheduler.calculate_slice(&task_high);
         let slice_low = scheduler.calculate_slice(&task_low);
-        
+
         assert!(slice_high >= slice_low); // Higher weight = more CPU time
     }
 
     #[test]
     fn test_min_vruntime_monotonic() {
         let mut scheduler = EevdfScheduler::new();
-        
+
         let task1 = EevdfTask::new(1, 50, 1);
         let task2 = EevdfTask::new(2, 100, 1);
-        
+
         scheduler.add_task(task1);
         scheduler.add_task(task2);
-        
+
         let vruntime_before = scheduler.ready_queue.min_vruntime();
         scheduler.update_min_vruntime();
         let vruntime_after = scheduler.ready_queue.min_vruntime();
-        
+
         assert!(vruntime_after >= vruntime_before); // Never decreases
     }
 
@@ -555,18 +555,18 @@ mod tests {
     fn test_eligible_task_ordering() {
         let mut scheduler = EevdfScheduler::new();
         scheduler.add_compute_unit(ComputeUnit::CpuCore(0));
-        
+
         let mut task1 = EevdfTask::new(1, 200, 1);
         task1.vruntime = 50;
         task1.lag = -10; // Not owed CPU time
-        
+
         let mut task2 = EevdfTask::new(2, 100, 1); // Earlier deadline
         task2.vruntime = 20;
         task2.lag = 10; // Owed CPU time
-        
+
         scheduler.add_task(task1);
         scheduler.add_task(task2);
-        
+
         let scheduled = scheduler.schedule();
         assert_eq!(scheduled, Some(2)); // Eligible with earlier deadline
     }
@@ -582,10 +582,10 @@ mod tests {
     #[test]
     fn test_service_start_stop() {
         let mut service = Service::new("test".to_string());
-        
+
         service.start().unwrap();
         assert_eq!(service.state, ServiceState::Running);
-        
+
         service.stop().unwrap();
         assert_eq!(service.state, ServiceState::Stopped);
     }
@@ -593,11 +593,11 @@ mod tests {
     #[test]
     fn test_service_restart() {
         let mut service = Service::new("test".to_string());
-        
+
         service.start().unwrap();
         service.crash();
         assert_eq!(service.state, ServiceState::Crashed);
-        
+
         service.restart().unwrap();
         assert_eq!(service.state, ServiceState::Running);
         assert_eq!(service.restart_count, 1);
@@ -606,25 +606,31 @@ mod tests {
     #[test]
     fn test_sinit_supervisor() {
         let mut supervisor = SInitSupervisor::new();
-        
+
         let service = Service::new("web".to_string());
         supervisor.add_service(service);
-        
+
         supervisor.start_service("web").unwrap();
-        assert_eq!(supervisor.get_service_state("web"), Some(ServiceState::Running));
+        assert_eq!(
+            supervisor.get_service_state("web"),
+            Some(ServiceState::Running)
+        );
     }
 
     #[test]
     fn test_supervision_restart() {
         let mut supervisor = SInitSupervisor::new();
-        
+
         let mut service = Service::new("database".to_string());
         service.start().unwrap();
         service.crash();
         supervisor.add_service(service);
-        
+
         let restarted = supervisor.supervise();
         assert_eq!(restarted.len(), 1);
-        assert_eq!(supervisor.get_service_state("database"), Some(ServiceState::Running));
+        assert_eq!(
+            supervisor.get_service_state("database"),
+            Some(ServiceState::Running)
+        );
     }
 }

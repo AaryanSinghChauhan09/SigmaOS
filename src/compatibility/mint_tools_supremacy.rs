@@ -99,7 +99,11 @@ impl SovereignMintStickEngine {
         table: PartitionTableType,
         volume_label: &str,
     ) -> Result<String, &'static str> {
-        let drive = self.drives.iter_mut().find(|d| d.device_node == device_node).ok_or("Drive not found")?;
+        let drive = self
+            .drives
+            .iter_mut()
+            .find(|d| d.device_node == device_node)
+            .ok_or("Drive not found")?;
         if drive.is_mounted {
             return Err("Drive must be unmounted before formatting");
         }
@@ -118,7 +122,11 @@ impl SovereignMintStickEngine {
         device_node: &str,
         image_size: u64,
     ) -> Result<(), &'static str> {
-        let drive = self.drives.iter().find(|d| d.device_node == device_node).ok_or("Target drive not found")?;
+        let drive = self
+            .drives
+            .iter()
+            .find(|d| d.device_node == device_node)
+            .ok_or("Target drive not found")?;
         if drive.size_bytes < image_size {
             return Err("Target device capacity is smaller than ISO image");
         }
@@ -137,7 +145,8 @@ impl SovereignMintStickEngine {
     /// Step simulation for writing chunks with direct I/O
     pub fn step_write_chunk(&mut self, chunk_size: u64) -> bool {
         if let Some(ref mut progress) = self.active_progress {
-            progress.written_bytes = (progress.written_bytes + chunk_size).min(progress.total_bytes);
+            progress.written_bytes =
+                (progress.written_bytes + chunk_size).min(progress.total_bytes);
             if progress.written_bytes >= progress.total_bytes {
                 progress.is_complete = true;
                 progress.verified = true;
@@ -281,14 +290,21 @@ impl SovereignMintReportEngine {
     }
 
     /// Run full system diagnostics scan
-    pub fn scan_system(&mut self, is_uefi_secure_boot: bool, microcode_version: u32, is_swap_present: bool) {
+    pub fn scan_system(
+        &mut self,
+        is_uefi_secure_boot: bool,
+        microcode_version: u32,
+        is_swap_present: bool,
+    ) {
         self.findings.clear();
 
         if !is_uefi_secure_boot {
             self.findings.push(DiagnosticFinding {
                 id: "sec-001".to_string(),
                 title: "UEFI Secure Boot Disabled".to_string(),
-                description: "Firmware Secure Boot is inactive. Hardware boot integrity cannot be attested.".to_string(),
+                description:
+                    "Firmware Secure Boot is inactive. Hardware boot integrity cannot be attested."
+                        .to_string(),
                 severity: ReportSeverity::Warning,
                 fix_action_cmd: Some("sigbootctl --enable-secure-boot".to_string()),
             });
@@ -308,7 +324,9 @@ impl SovereignMintReportEngine {
             self.findings.push(DiagnosticFinding {
                 id: "mem-003".to_string(),
                 title: "No Swap Space Detected".to_string(),
-                description: "ZRAM swap or swap partition is missing. System may suffer sudden OOM kills.".to_string(),
+                description:
+                    "ZRAM swap or swap partition is missing. System may suffer sudden OOM kills."
+                        .to_string(),
                 severity: ReportSeverity::Warning,
                 fix_action_cmd: Some("sigzram --enable 4G".to_string()),
             });
@@ -385,7 +403,11 @@ impl SovereignNemoActionsEngine {
         engine.register_action(NemoAction {
             name: "extract_archive".to_string(),
             label: "Extract Here".to_string(),
-            mime_types: vec!["application/zip".to_string(), "application/x-tar".to_string(), "application/x-zstd".to_string()],
+            mime_types: vec![
+                "application/zip".to_string(),
+                "application/x-tar".to_string(),
+                "application/x-zstd".to_string(),
+            ],
             target: ActionTarget::SingleFile,
             command: "sigarchive --extract %f".to_string(),
             icon: "archive-extract".to_string(),
@@ -448,7 +470,9 @@ impl SovereignXAppsManager {
     pub fn set_gpu_profile(&mut self, profile: GpuProfile) -> &'static str {
         self.active_gpu_profile = profile;
         match profile {
-            GpuProfile::IntegratedPowerSave => "Switched to iGPU Power-Save Mode (dGPU Powered Down)",
+            GpuProfile::IntegratedPowerSave => {
+                "Switched to iGPU Power-Save Mode (dGPU Powered Down)"
+            }
             GpuProfile::DedicatedHighPerformance => "Switched to dGPU High-Performance Mode",
             GpuProfile::DynamicOnDemand => "Switched to On-Demand Prime Render Offload Mode",
         }
@@ -480,10 +504,17 @@ mod tests {
         let mut stick = SovereignMintStickEngine::new();
         stick.add_drive("/dev/sdb", "SanDisk", "Ultra Fit", 32_000_000_000);
 
-        let fmt_res = stick.format_drive("/dev/sdb", FormatterFilesystem::Btrfs, PartitionTableType::Gpt, "SIGMA_USB");
+        let fmt_res = stick.format_drive(
+            "/dev/sdb",
+            FormatterFilesystem::Btrfs,
+            PartitionTableType::Gpt,
+            "SIGMA_USB",
+        );
         assert!(fmt_res.is_ok());
 
-        assert!(stick.write_image("/home/iso/sigmaos.iso", "/dev/sdb", 4_000_000_000).is_ok());
+        assert!(stick
+            .write_image("/home/iso/sigmaos.iso", "/dev/sdb", 4_000_000_000)
+            .is_ok());
         assert!(!stick.step_write_chunk(2_000_000_000));
         assert!(stick.step_write_chunk(2_000_000_000));
         assert_eq!(stick.total_burns_completed.load(Ordering::Relaxed), 1);
@@ -512,7 +543,11 @@ mod tests {
         assert_eq!(report.findings.len(), 3);
         assert!(report.health_score() <= 65);
 
-        report.ingest_crash("test_daemon", 11, vec!["0x7fff0000: crash_func()".to_string()]);
+        report.ingest_crash(
+            "test_daemon",
+            11,
+            vec!["0x7fff0000: crash_func()".to_string()],
+        );
         assert_eq!(report.crash_traces.len(), 1);
     }
 

@@ -27,26 +27,26 @@ use core::arch::asm;
 #[derive(Clone, Copy)]
 #[repr(C, packed)]
 pub struct IdtEntry {
-    offset_low:  u16,
-    selector:    u16,
-    ist:         u8,   // bits [2:0] = IST index; bits [7:3] = 0
-    type_attr:   u8,   // P | DPL[1:0] | 0 | gate_type[3:0]
-    offset_mid:  u16,
+    offset_low: u16,
+    selector: u16,
+    ist: u8,       // bits [2:0] = IST index; bits [7:3] = 0
+    type_attr: u8, // P | DPL[1:0] | 0 | gate_type[3:0]
+    offset_mid: u16,
     offset_high: u32,
-    reserved:    u32,
+    reserved: u32,
 }
 
 impl IdtEntry {
     /// Creates a cleared (not-present) IDT entry.
     pub const fn missing() -> Self {
         Self {
-            offset_low:  0,
-            selector:    0,
-            ist:         0,
-            type_attr:   0,
-            offset_mid:  0,
+            offset_low: 0,
+            selector: 0,
+            ist: 0,
+            type_attr: 0,
+            offset_mid: 0,
             offset_high: 0,
-            reserved:    0,
+            reserved: 0,
         }
     }
 
@@ -63,13 +63,13 @@ impl IdtEntry {
         // 0xEE = 1110_1110b  →  P=1 | DPL=3 | 0 | type=0xE (user-callable)
         let type_attr = 0x8E | ((dpl & 0x3) << 5);
         Self {
-            offset_low:  (handler & 0xFFFF) as u16,
+            offset_low: (handler & 0xFFFF) as u16,
             selector,
-            ist:         ist & 0x7,
+            ist: ist & 0x7,
             type_attr,
-            offset_mid:  ((handler >> 16) & 0xFFFF) as u16,
+            offset_mid: ((handler >> 16) & 0xFFFF) as u16,
             offset_high: ((handler >> 32) & 0xFFFF_FFFF) as u32,
-            reserved:    0,
+            reserved: 0,
         }
     }
 }
@@ -88,8 +88,8 @@ static mut IDT: Idt = Idt([IdtEntry::missing(); 256]);
 
 #[repr(C, packed)]
 struct Idtr {
-    limit: u16,   // size of IDT in bytes minus 1
-    base:  u64,   // linear address of IDT
+    limit: u16, // size of IDT in bytes minus 1
+    base: u64,  // linear address of IDT
 }
 
 // ─── Default / Panic Handlers ───────────────────────────────────────────────
@@ -97,11 +97,11 @@ struct Idtr {
 /// Minimal handler frame pushed by CPU (without error code).
 #[repr(C)]
 struct InterruptFrame {
-    rip:    u64,
-    cs:     u64,
+    rip: u64,
+    cs: u64,
     rflags: u64,
-    rsp:    u64,
-    ss:     u64,
+    rsp: u64,
+    ss: u64,
 }
 
 /// Default catch-all ISR — halts the machine.
@@ -136,10 +136,7 @@ extern "C" fn page_fault_handler(_frame: InterruptFrame, error_code: u64) {
 }
 
 /// #GP — General Protection Fault (vector 13).
-extern "C" fn general_protection_fault_handler(
-    _frame: InterruptFrame,
-    _error: u64,
-) {
+extern "C" fn general_protection_fault_handler(_frame: InterruptFrame, _error: u64) {
     loop {
         unsafe { asm!("hlt", options(nomem, nostack, preserves_flags)) };
     }
@@ -194,26 +191,26 @@ pub fn init() {
     let idt = unsafe { &mut IDT.0 };
 
     // ── CPU Exception Handlers ──────────────────────────────────────────
-    set_handler!(idt,  0, default_handler,                   KERNEL_CS, 0, 0); // #DE Divide Error
-    set_handler!(idt,  1, default_handler,                   KERNEL_CS, 0, 0); // #DB Debug
-    set_handler!(idt,  2, default_handler,                   KERNEL_CS, 0, 0); // #NMI
-    set_handler!(idt,  3, default_handler,                   KERNEL_CS, 0, 3); // #BP Breakpoint (DPL=3)
-    set_handler!(idt,  4, default_handler,                   KERNEL_CS, 0, 0); // #OF Overflow
-    set_handler!(idt,  5, default_handler,                   KERNEL_CS, 0, 0); // #BR Bound Range
-    set_handler!(idt,  6, default_handler,                   KERNEL_CS, 0, 0); // #UD Invalid Opcode
-    set_handler!(idt,  7, default_handler,                   KERNEL_CS, 0, 0); // #NM Device Not Available
-    set_handler_with_err!(idt,  8, double_fault_handler,     KERNEL_CS, 0, 0); // #DF Double Fault
-    // 9: reserved (legacy coprocessor segment overrun)
+    set_handler!(idt, 0, default_handler, KERNEL_CS, 0, 0); // #DE Divide Error
+    set_handler!(idt, 1, default_handler, KERNEL_CS, 0, 0); // #DB Debug
+    set_handler!(idt, 2, default_handler, KERNEL_CS, 0, 0); // #NMI
+    set_handler!(idt, 3, default_handler, KERNEL_CS, 0, 3); // #BP Breakpoint (DPL=3)
+    set_handler!(idt, 4, default_handler, KERNEL_CS, 0, 0); // #OF Overflow
+    set_handler!(idt, 5, default_handler, KERNEL_CS, 0, 0); // #BR Bound Range
+    set_handler!(idt, 6, default_handler, KERNEL_CS, 0, 0); // #UD Invalid Opcode
+    set_handler!(idt, 7, default_handler, KERNEL_CS, 0, 0); // #NM Device Not Available
+    set_handler_with_err!(idt, 8, double_fault_handler, KERNEL_CS, 0, 0); // #DF Double Fault
+                                                                          // 9: reserved (legacy coprocessor segment overrun)
     set_handler_with_err!(idt, 10, general_protection_fault_handler, KERNEL_CS, 0, 0); // #TS Invalid TSS
     set_handler_with_err!(idt, 11, general_protection_fault_handler, KERNEL_CS, 0, 0); // #NP Seg Not Present
     set_handler_with_err!(idt, 12, general_protection_fault_handler, KERNEL_CS, 0, 0); // #SS Stack Fault
     set_handler_with_err!(idt, 13, general_protection_fault_handler, KERNEL_CS, 0, 0); // #GP
-    set_handler_with_err!(idt, 14, page_fault_handler,      KERNEL_CS, 0, 0); // #PF Page Fault
-    // 15: reserved
-    set_handler!(idt, 16, default_handler,                   KERNEL_CS, 0, 0); // #MF x87 FPU Error
+    set_handler_with_err!(idt, 14, page_fault_handler, KERNEL_CS, 0, 0); // #PF Page Fault
+                                                                         // 15: reserved
+    set_handler!(idt, 16, default_handler, KERNEL_CS, 0, 0); // #MF x87 FPU Error
     set_handler_with_err!(idt, 17, general_protection_fault_handler, KERNEL_CS, 0, 0); // #AC Alignment Check
-    set_handler!(idt, 18, default_handler,                   KERNEL_CS, 0, 0); // #MC Machine Check
-    set_handler!(idt, 19, default_handler,                   KERNEL_CS, 0, 0); // #XM SIMD FP Exception
+    set_handler!(idt, 18, default_handler, KERNEL_CS, 0, 0); // #MC Machine Check
+    set_handler!(idt, 19, default_handler, KERNEL_CS, 0, 0); // #XM SIMD FP Exception
 
     // Fill vectors 20–31 (reserved by Intel) with the default handler.
     for v in 20..32usize {
@@ -266,8 +263,8 @@ mod tests {
     #[test]
     fn idt_entry_missing_is_zero() {
         let e = IdtEntry::missing();
-        assert_eq!(e.offset_low,  0);
-        assert_eq!(e.type_attr,   0);
+        assert_eq!(e.offset_low, 0);
+        assert_eq!(e.type_attr, 0);
         assert_eq!(e.offset_high, 0);
     }
 
@@ -276,14 +273,14 @@ mod tests {
         let handler: u64 = 0xDEAD_BEEF_1234_5678;
         let entry = IdtEntry::new(handler, 0x08, 0, 0);
         // offset_low = bits 15:0
-        assert_eq!(entry.offset_low,  0x5678);
+        assert_eq!(entry.offset_low, 0x5678);
         // offset_mid = bits 31:16
-        assert_eq!(entry.offset_mid,  0x1234);
+        assert_eq!(entry.offset_mid, 0x1234);
         // offset_high = bits 63:32
         assert_eq!(entry.offset_high, 0xDEAD_BEEF);
         // type_attr: P=1, DPL=0, type=0xE  =>  0x8E
-        assert_eq!(entry.type_attr,   0x8E);
-        assert_eq!(entry.selector,    0x08);
+        assert_eq!(entry.type_attr, 0x8E);
+        assert_eq!(entry.selector, 0x08);
     }
 
     #[test]

@@ -5,25 +5,25 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::vec::Vec;
 use alloc::collections::BTreeMap;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicU64, Ordering};
 
 /// eBPF instruction format (inspired by Linux struct bpf_insn)
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct EbpfInsn {
-    pub opcode: u8,       // Instruction opcode
-    pub dst_reg: u8,      // Destination register (0-10)
-    pub src_reg: u8,      // Source register (0-10)
-    pub off: i16,         // Signed offset
-    pub imm: i32,         // Immediate value
+    pub opcode: u8,  // Instruction opcode
+    pub dst_reg: u8, // Destination register (0-10)
+    pub src_reg: u8, // Source register (0-10)
+    pub off: i16,    // Signed offset
+    pub imm: i32,    // Immediate value
 }
 
 /// eBPF register set (11 registers: R0-R10)
 #[derive(Debug, Clone)]
 pub struct EbpfRegisters {
-    pub r: [u64; 11],     // R0-R10 (R10 = frame pointer)
+    pub r: [u64; 11], // R0-R10 (R10 = frame pointer)
 }
 
 impl EbpfRegisters {
@@ -41,7 +41,7 @@ pub enum EbpfProgType {
     SchedCls = 3,
     SchedAct = 4,
     Tracepoint = 5,
-    Xdp = 6,              // XDP packet processing
+    Xdp = 6, // XDP packet processing
     PerfEvent = 7,
     CgroupSkb = 8,
     CgroupSock = 9,
@@ -55,11 +55,11 @@ pub enum EbpfProgType {
 #[repr(u32)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum XdpAction {
-    Aborted = 0,          // Drop with trace
-    Drop = 1,             // Drop packet
-    Pass = 2,             // Pass to network stack
-    Tx = 3,               // Transmit from same interface
-    Redirect = 4,         // Redirect to another interface
+    Aborted = 0,  // Drop with trace
+    Drop = 1,     // Drop packet
+    Pass = 2,     // Pass to network stack
+    Tx = 3,       // Transmit from same interface
+    Redirect = 4, // Redirect to another interface
 }
 
 /// eBPF map types (inspired by Linux enum bpf_map_type)
@@ -115,8 +115,7 @@ impl EbpfMap {
 
     /// Delete element from map
     pub fn delete(&mut self, key: &[u8]) -> Result<(), EbpfError> {
-        self.data.remove(key)
-            .ok_or(EbpfError::KeyNotFound)?;
+        self.data.remove(key).ok_or(EbpfError::KeyNotFound)?;
         Ok(())
     }
 }
@@ -127,7 +126,7 @@ pub struct EbpfProgram {
     pub instructions: Vec<EbpfInsn>,
     pub verified: bool,
     pub jit_compiled: bool,
-    pub maps: Vec<u32>,              // Map file descriptors
+    pub maps: Vec<u32>, // Map file descriptors
 }
 
 impl EbpfProgram {
@@ -177,17 +176,17 @@ impl EbpfProgram {
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct XdpMd {
-    pub data: u64,              // Packet data start pointer
-    pub data_end: u64,          // Packet data end pointer
-    pub data_meta: u64,         // Metadata area
-    pub ingress_ifindex: u32,   // Ingress interface index
-    pub rx_queue_index: u32,    // RX queue index
+    pub data: u64,            // Packet data start pointer
+    pub data_end: u64,        // Packet data end pointer
+    pub data_meta: u64,       // Metadata area
+    pub ingress_ifindex: u32, // Ingress interface index
+    pub rx_queue_index: u32,  // RX queue index
 }
 
 /// eBPF virtual machine (interpreter)
 pub struct EbpfVm {
     regs: EbpfRegisters,
-    stack: [u8; 512],           // eBPF stack (512 bytes)
+    stack: [u8; 512], // eBPF stack (512 bytes)
     maps: BTreeMap<u32, EbpfMap>,
     programs: BTreeMap<u32, EbpfProgram>,
     next_fd: AtomicU64,
@@ -220,7 +219,9 @@ impl EbpfVm {
 
     /// Run eBPF program in interpreter mode
     pub fn run(&mut self, prog_fd: u32, ctx: &XdpMd) -> Result<XdpAction, EbpfError> {
-        let prog = self.programs.get(&prog_fd)
+        let prog = self
+            .programs
+            .get(&prog_fd)
             .ok_or(EbpfError::InvalidProgram)?;
 
         if !prog.verified {
@@ -234,7 +235,7 @@ impl EbpfVm {
         let mut pc = 0usize;
         while pc < prog.instructions.len() {
             let insn = &prog.instructions[pc];
-            
+
             match insn.opcode {
                 // ALU operations
                 0x04 => self.regs.r[insn.dst_reg as usize] += insn.imm as u64, // ADD_IMM
@@ -245,22 +246,23 @@ impl EbpfVm {
                 0x44 => self.regs.r[insn.dst_reg as usize] |= insn.imm as u64, // OR_IMM
                 0x64 => self.regs.r[insn.dst_reg as usize] <<= insn.imm,       // LSH_IMM
                 0x74 => self.regs.r[insn.dst_reg as usize] >>= insn.imm,       // RSH_IMM
-                
+
                 // Load/Store operations
                 0x18 => {
                     // LD_IMM64 (double-wide instruction)
                     self.regs.r[insn.dst_reg as usize] = insn.imm as u64;
                     pc += 1; // Skip next instruction (upper 32 bits)
-                },
-                
+                }
+
                 // Jump operations
                 0x05 => pc = (pc as i32 + insn.off as i32) as usize, // JA (unconditional jump)
-                0x15 => { // JEQ_IMM
+                0x15 => {
+                    // JEQ_IMM
                     if self.regs.r[insn.dst_reg as usize] == insn.imm as u64 {
                         pc = (pc as i32 + insn.off as i32) as usize;
                     }
-                },
-                
+                }
+
                 // Exit
                 0x95 => {
                     // Return value in R0
@@ -273,11 +275,11 @@ impl EbpfVm {
                         4 => XdpAction::Redirect,
                         _ => XdpAction::Aborted,
                     });
-                },
-                
+                }
+
                 _ => return Err(EbpfError::InvalidOpcode),
             }
-            
+
             pc += 1;
         }
 
@@ -286,7 +288,9 @@ impl EbpfVm {
 
     /// Attach XDP program to network interface
     pub fn attach_xdp(&mut self, prog_fd: u32, ifindex: u32) -> Result<(), EbpfError> {
-        let prog = self.programs.get(&prog_fd)
+        let prog = self
+            .programs
+            .get(&prog_fd)
             .ok_or(EbpfError::InvalidProgram)?;
 
         if prog.prog_type != EbpfProgType::Xdp {
@@ -349,8 +353,20 @@ mod tests {
     #[test]
     fn test_ebpf_program_verify() {
         let instructions = vec![
-            EbpfInsn { opcode: 0x18, dst_reg: 0, src_reg: 0, off: 0, imm: 2 }, // Load 2 into R0
-            EbpfInsn { opcode: 0x95, dst_reg: 0, src_reg: 0, off: 0, imm: 0 }, // Exit
+            EbpfInsn {
+                opcode: 0x18,
+                dst_reg: 0,
+                src_reg: 0,
+                off: 0,
+                imm: 2,
+            }, // Load 2 into R0
+            EbpfInsn {
+                opcode: 0x95,
+                dst_reg: 0,
+                src_reg: 0,
+                off: 0,
+                imm: 0,
+            }, // Exit
         ];
         let mut prog = EbpfProgram::new(EbpfProgType::Xdp, instructions);
         assert!(prog.verify().is_ok());

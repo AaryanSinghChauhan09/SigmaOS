@@ -1,6 +1,9 @@
 // SigmaOS Network Stack Module
+pub mod arp;
+pub mod bluetooth;
 pub mod device_discovery;
 pub mod discovery;
+pub mod icmp;
 pub mod ip;
 pub mod ring_buffer_stack;
 pub mod routing;
@@ -8,13 +11,10 @@ pub mod security;
 pub mod socket;
 pub mod sovereign_remote_sharing;
 pub mod tcp;
+pub mod tcp_complete;
 pub mod tcp_udp;
 pub mod wireless_manager;
 pub mod zenithnet;
-pub mod arp;
-pub mod icmp;
-pub mod tcp_complete;
-pub mod bluetooth;
 
 pub use device_discovery::{
     DeviceDiscoverySyncEngine, DeviceType, DiscoveredPeerDevice, DiscoveryProtocol,
@@ -39,26 +39,24 @@ pub use sovereign_remote_sharing::{
 };
 // tcp_complete has TcpConnection; tcp module has TcpSocket, TcpError, TcpSegment, TcpState
 pub use tcp::{TcpError, TcpSegment, TcpState};
-pub use tcp_complete::{TcpConnection};
+pub use tcp_complete::TcpConnection;
 pub use wireless_manager::{BluetoothDevice, WifiProfile, WifiSecurity, WirelessManager};
 
 // ZenithNet TCP/IP Stack
 pub use routing::{ForwardingDecision, RouteEntry, RoutingEngine, RoutingTable};
-pub use socket::{
-    Socket, SocketError, SocketState, SocketType,
-};
+pub use socket::{Socket, SocketError, SocketState, SocketType};
 // AddressFamily, SocketOptions, SocketTable, SocketAddr come from network_stubs::* below
+pub use arp::{
+    ArpCache, ArpCacheEntry, ArpError, ArpHandler, ArpHardwareType, ArpOperation, ArpPacket,
+    ArpStats,
+};
+pub use icmp::{
+    IcmpError, IcmpHandler, IcmpHeader, IcmpPacket, IcmpStats, IcmpTimeExceededCode, IcmpType,
+    IcmpUnreachableCode,
+};
 pub use zenithnet::{
     EthernetFrame, IpProtocol, Ipv4Addr, Ipv4Header, MacAddr, NetworkError, NetworkInterface,
     PacketType, TcpHeader, TcpState as ZenithTcpState, UdpHeader, ZenithNet,
-};
-pub use arp::{
-    ArpPacket, ArpOperation, ArpHardwareType, ArpCache, ArpCacheEntry,
-    ArpHandler, ArpStats, ArpError,
-};
-pub use icmp::{
-    IcmpPacket, IcmpHeader, IcmpType, IcmpHandler, IcmpStats,
-    IcmpUnreachableCode, IcmpTimeExceededCode, IcmpError,
 };
 
 #[path = "sovereign_async_io.rs"]

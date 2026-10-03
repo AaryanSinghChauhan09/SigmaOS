@@ -6,20 +6,20 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::vec::Vec;
-use alloc::string::String;
 use alloc::collections::VecDeque;
+use alloc::string::String;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicU32, AtomicU8, Ordering};
 
 /// USB speeds
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u8)]
 pub enum UsbSpeed {
-    Low = 0,      // 1.5 Mbps (USB 1.0)
-    Full = 1,     // 12 Mbps (USB 1.1)
-    High = 2,     // 480 Mbps (USB 2.0)
-    Super = 3,    // 5 Gbps (USB 3.0)
-    SuperPlus = 4, // 10 Gbps (USB 3.1)
+    Low = 0,         // 1.5 Mbps (USB 1.0)
+    Full = 1,        // 12 Mbps (USB 1.1)
+    High = 2,        // 480 Mbps (USB 2.0)
+    Super = 3,       // 5 Gbps (USB 3.0)
+    SuperPlus = 4,   // 10 Gbps (USB 3.1)
     SuperPlus20 = 5, // 20 Gbps (USB 3.2)
 }
 
@@ -95,20 +95,20 @@ pub enum UsbDescriptorType {
 #[repr(C, packed)]
 #[derive(Clone, Copy)]
 pub struct UsbDeviceDescriptor {
-    pub b_length: u8,              // 18
-    pub b_descriptor_type: u8,     // DEVICE (1)
-    pub bcd_usb: u16,              // USB spec release (0x0200 = USB 2.0)
-    pub b_device_class: u8,        // Device class code
-    pub b_device_sub_class: u8,    // Device subclass code
-    pub b_device_protocol: u8,     // Device protocol code
-    pub b_max_packet_size0: u8,    // Max packet size for endpoint 0
-    pub id_vendor: u16,            // Vendor ID
-    pub id_product: u16,           // Product ID
-    pub bcd_device: u16,           // Device release number
-    pub i_manufacturer: u8,        // Manufacturer string index
-    pub i_product: u8,             // Product string index
-    pub i_serial_number: u8,       // Serial number string index
-    pub b_num_configurations: u8,  // Number of configurations
+    pub b_length: u8,             // 18
+    pub b_descriptor_type: u8,    // DEVICE (1)
+    pub bcd_usb: u16,             // USB spec release (0x0200 = USB 2.0)
+    pub b_device_class: u8,       // Device class code
+    pub b_device_sub_class: u8,   // Device subclass code
+    pub b_device_protocol: u8,    // Device protocol code
+    pub b_max_packet_size0: u8,   // Max packet size for endpoint 0
+    pub id_vendor: u16,           // Vendor ID
+    pub id_product: u16,          // Product ID
+    pub bcd_device: u16,          // Device release number
+    pub i_manufacturer: u8,       // Manufacturer string index
+    pub i_product: u8,            // Product string index
+    pub i_serial_number: u8,      // Serial number string index
+    pub b_num_configurations: u8, // Number of configurations
 }
 
 /// USB configuration descriptor
@@ -144,12 +144,12 @@ pub struct UsbInterfaceDescriptor {
 #[repr(C, packed)]
 #[derive(Clone, Copy)]
 pub struct UsbEndpointDescriptor {
-    pub b_length: u8,              // 7
-    pub b_descriptor_type: u8,     // ENDPOINT (5)
-    pub b_endpoint_address: u8,    // Endpoint address (bit 7: direction)
-    pub bm_attributes: u8,         // Transfer type and sync type
-    pub w_max_packet_size: u16,    // Maximum packet size
-    pub b_interval: u8,            // Polling interval for interrupt/isochronous
+    pub b_length: u8,           // 7
+    pub b_descriptor_type: u8,  // ENDPOINT (5)
+    pub b_endpoint_address: u8, // Endpoint address (bit 7: direction)
+    pub bm_attributes: u8,      // Transfer type and sync type
+    pub w_max_packet_size: u16, // Maximum packet size
+    pub b_interval: u8,         // Polling interval for interrupt/isochronous
 }
 
 /// USB endpoint direction
@@ -188,9 +188,7 @@ impl UsbEndpoint {
             } else {
                 UsbDirection::Out
             },
-            transfer_type: unsafe {
-                core::mem::transmute(desc.bm_attributes & 0x03)
-            },
+            transfer_type: unsafe { core::mem::transmute(desc.bm_attributes & 0x03) },
             max_packet_size: desc.w_max_packet_size & 0x7FF,
             interval: desc.b_interval,
         }
@@ -222,16 +220,17 @@ impl UsbDevice {
             hub_address: 0,
         }
     }
-    
+
     pub fn set_address(&self, addr: u8) {
         self.address.store(addr, Ordering::Release);
-        self.state.store(UsbDeviceState::Address as u8, Ordering::Release);
+        self.state
+            .store(UsbDeviceState::Address as u8, Ordering::Release);
     }
-    
+
     pub fn get_address(&self) -> u8 {
         self.address.load(Ordering::Acquire)
     }
-    
+
     pub fn get_state(&self) -> UsbDeviceState {
         let state_val = self.state.load(Ordering::Acquire);
         unsafe { core::mem::transmute(state_val) }
@@ -242,24 +241,46 @@ impl UsbDevice {
 pub trait UsbHostController {
     fn reset_port(&mut self, port: u8) -> Result<(), UsbError>;
     fn get_port_speed(&self, port: u8) -> Result<UsbSpeed, UsbError>;
-    fn control_transfer(&mut self, device: &UsbDevice, setup: &UsbSetupPacket, data: Option<&mut [u8]>) -> Result<usize, UsbError>;
-    fn bulk_transfer(&mut self, device: &UsbDevice, endpoint: u8, data: &mut [u8], direction: UsbDirection) -> Result<usize, UsbError>;
-    fn interrupt_transfer(&mut self, device: &UsbDevice, endpoint: u8, data: &mut [u8], direction: UsbDirection) -> Result<usize, UsbError>;
+    fn control_transfer(
+        &mut self,
+        device: &UsbDevice,
+        setup: &UsbSetupPacket,
+        data: Option<&mut [u8]>,
+    ) -> Result<usize, UsbError>;
+    fn bulk_transfer(
+        &mut self,
+        device: &UsbDevice,
+        endpoint: u8,
+        data: &mut [u8],
+        direction: UsbDirection,
+    ) -> Result<usize, UsbError>;
+    fn interrupt_transfer(
+        &mut self,
+        device: &UsbDevice,
+        endpoint: u8,
+        data: &mut [u8],
+        direction: UsbDirection,
+    ) -> Result<usize, UsbError>;
 }
 
 /// USB setup packet (control transfers)
 #[repr(C, packed)]
 #[derive(Clone, Copy)]
 pub struct UsbSetupPacket {
-    pub bm_request_type: u8,  // Request type (D7: direction, D6-5: type, D4-0: recipient)
-    pub b_request: u8,        // Request code
-    pub w_value: u16,         // Value (varies by request)
-    pub w_index: u16,         // Index (interface, endpoint, etc.)
-    pub w_length: u16,        // Data transfer length
+    pub bm_request_type: u8, // Request type (D7: direction, D6-5: type, D4-0: recipient)
+    pub b_request: u8,       // Request code
+    pub w_value: u16,        // Value (varies by request)
+    pub w_index: u16,        // Index (interface, endpoint, etc.)
+    pub w_length: u16,       // Data transfer length
 }
 
 impl UsbSetupPacket {
-    pub fn get_descriptor(desc_type: UsbDescriptorType, desc_index: u8, lang_id: u16, length: u16) -> Self {
+    pub fn get_descriptor(
+        desc_type: UsbDescriptorType,
+        desc_index: u8,
+        lang_id: u16,
+        length: u16,
+    ) -> Self {
         Self {
             bm_request_type: 0x80, // Device to host, standard, device
             b_request: UsbStandardRequest::GetDescriptor as u8,
@@ -268,7 +289,7 @@ impl UsbSetupPacket {
             w_length: length,
         }
     }
-    
+
     pub fn set_address(address: u8) -> Self {
         Self {
             bm_request_type: 0x00, // Host to device, standard, device
@@ -278,7 +299,7 @@ impl UsbSetupPacket {
             w_length: 0,
         }
     }
-    
+
     pub fn set_configuration(config: u8) -> Self {
         Self {
             bm_request_type: 0x00,
@@ -302,49 +323,40 @@ impl UsbEnumerator {
     ) -> Result<UsbDevice, UsbError> {
         // Reset port
         hc.reset_port(port)?;
-        
+
         // Determine speed
         let speed = hc.get_port_speed(port)?;
-        
+
         // Create device at default address 0
         let mut device = UsbDevice::new(speed, port);
-        
+
         // Get initial 8 bytes of device descriptor to determine max packet size
         let mut desc_buf = [0u8; 18];
-        let setup = UsbSetupPacket::get_descriptor(
-            UsbDescriptorType::Device,
-            0,
-            0,
-            8,
-        );
-        
+        let setup = UsbSetupPacket::get_descriptor(UsbDescriptorType::Device, 0, 0, 8);
+
         hc.control_transfer(&device, &setup, Some(&mut desc_buf[..8]))?;
-        
+
         // Set new address
         let setup_addr = UsbSetupPacket::set_address(next_address);
         hc.control_transfer(&device, &setup_addr, None)?;
         device.set_address(next_address);
-        
+
         // Get full device descriptor
-        let setup_full = UsbSetupPacket::get_descriptor(
-            UsbDescriptorType::Device,
-            0,
-            0,
-            18,
-        );
-        
+        let setup_full = UsbSetupPacket::get_descriptor(UsbDescriptorType::Device, 0, 0, 18);
+
         hc.control_transfer(&device, &setup_full, Some(&mut desc_buf))?;
-        
-        device.descriptor = unsafe {
-            core::ptr::read_unaligned(desc_buf.as_ptr() as *const UsbDeviceDescriptor)
-        };
-        
+
+        device.descriptor =
+            unsafe { core::ptr::read_unaligned(desc_buf.as_ptr() as *const UsbDeviceDescriptor) };
+
         // Set configuration 1
         let setup_config = UsbSetupPacket::set_configuration(1);
         hc.control_transfer(&device, &setup_config, None)?;
         device.configuration = 1;
-        device.state.store(UsbDeviceState::Configured as u8, Ordering::Release);
-        
+        device
+            .state
+            .store(UsbDeviceState::Configured as u8, Ordering::Release);
+
         Ok(device)
     }
 }
@@ -393,7 +405,7 @@ pub enum UsbError {
 mod tests {
     use super::*;
     use core::mem::size_of;
-    
+
     #[test]
     fn test_usb_descriptor_sizes() {
         assert_eq!(size_of::<UsbDeviceDescriptor>(), 18);
@@ -402,7 +414,7 @@ mod tests {
         assert_eq!(size_of::<UsbEndpointDescriptor>(), 7);
         assert_eq!(size_of::<UsbSetupPacket>(), 8);
     }
-    
+
     #[test]
     fn test_usb_device_creation() {
         let device = UsbDevice::new(UsbSpeed::High, 1);
@@ -410,7 +422,7 @@ mod tests {
         assert_eq!(device.speed, UsbSpeed::High);
         assert_eq!(device.port, 1);
     }
-    
+
     #[test]
     fn test_setup_packet_construction() {
         let setup = UsbSetupPacket::set_address(5);
@@ -418,7 +430,7 @@ mod tests {
         assert_eq!(setup.b_request, 5);
         assert_eq!(setup.w_value, 5);
     }
-    
+
     #[test]
     fn test_endpoint_parsing() {
         let desc = UsbEndpointDescriptor {
@@ -429,7 +441,7 @@ mod tests {
             w_max_packet_size: 512,
             b_interval: 0,
         };
-        
+
         let ep = UsbEndpoint::from_descriptor(&desc);
         assert_eq!(ep.address, 1);
         assert_eq!(ep.direction, UsbDirection::In);

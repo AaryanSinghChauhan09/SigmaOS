@@ -266,7 +266,10 @@ pub struct SimpleProcessGroup {
 
 impl SimpleProcessGroup {
     pub fn new(pgid: ProcessID) -> Self {
-        Self { pgid, members: alloc::vec::Vec::new() }
+        Self {
+            pgid,
+            members: alloc::vec::Vec::new(),
+        }
     }
     pub fn add(&mut self, pid: ProcessID) {
         if !self.members.contains(&pid) {
@@ -276,8 +279,12 @@ impl SimpleProcessGroup {
 }
 
 impl ProcessGroup for SimpleProcessGroup {
-    fn pgid(&self) -> ProcessID { self.pgid }
-    fn members(&self) -> &[ProcessID] { &self.members }
+    fn pgid(&self) -> ProcessID {
+        self.pgid
+    }
+    fn members(&self) -> &[ProcessID] {
+        &self.members
+    }
 }
 
 #[cfg(test_disabled)]

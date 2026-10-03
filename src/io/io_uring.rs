@@ -17,44 +17,44 @@ use core::sync::atomic::{AtomicU32, AtomicU64, Ordering};
 pub const IORING_MAX_ENTRIES: u32 = 4096;
 
 /// SQE flags for operation control
-pub const IOSQE_FIXED_FILE: u8 = 1 << 0;     // fd is index into fixed file table
-pub const IOSQE_IO_DRAIN: u8 = 1 << 1;       // execute after previous ops complete
-pub const IOSQE_IO_LINK: u8 = 1 << 2;        // link next SQE (chain operations)
-pub const IOSQE_IO_HARDLINK: u8 = 1 << 3;    // stronger link dependency
-pub const IOSQE_ASYNC: u8 = 1 << 4;          // force async execution
+pub const IOSQE_FIXED_FILE: u8 = 1 << 0; // fd is index into fixed file table
+pub const IOSQE_IO_DRAIN: u8 = 1 << 1; // execute after previous ops complete
+pub const IOSQE_IO_LINK: u8 = 1 << 2; // link next SQE (chain operations)
+pub const IOSQE_IO_HARDLINK: u8 = 1 << 3; // stronger link dependency
+pub const IOSQE_ASYNC: u8 = 1 << 4; // force async execution
 
 /// CQE flags for completion status
-pub const IORING_CQE_F_BUFFER: u32 = 1 << 0;  // buffer ID included
-pub const IORING_CQE_F_MORE: u32 = 1 << 1;    // more completions coming (multi-shot)
+pub const IORING_CQE_F_BUFFER: u32 = 1 << 0; // buffer ID included
+pub const IORING_CQE_F_MORE: u32 = 1 << 1; // more completions coming (multi-shot)
 
 /// Submission Queue Entry opcodes (matches Linux io_uring opcodes)
 #[repr(u8)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum IoUringOp {
-    Nop       = 0,
-    Readv     = 1,
-    Writev    = 2,
-    FSync     = 3,
+    Nop = 0,
+    Readv = 1,
+    Writev = 2,
+    FSync = 3,
     ReadFixed = 4,
     WriteFixed = 5,
-    PollAdd   = 6,
+    PollAdd = 6,
     PollRemove = 7,
     SyncFileRange = 8,
-    SendMsg   = 9,
-    RecvMsg   = 10,
-    Timeout   = 11,
+    SendMsg = 9,
+    RecvMsg = 10,
+    Timeout = 11,
     TimeoutRemove = 12,
-    Accept    = 13,
+    Accept = 13,
     AsyncCancel = 14,
     LinkTimeout = 15,
-    Connect   = 16,
+    Connect = 16,
     Fallocate = 17,
-    OpenAt    = 18,
-    Close     = 19,
-    Read      = 22,
-    Write     = 23,
-    Statx     = 24,
-    Splice    = 25,
+    OpenAt = 18,
+    Close = 19,
+    Read = 22,
+    Write = 23,
+    Statx = 24,
+    Splice = 25,
     ProvideBuffers = 31,
     RemoveBuffers = 32,
     MultiPoll = 33,
@@ -83,11 +83,11 @@ pub struct IoUringSqe {
     pub flags: u8,
     pub ioprio: u16,
     pub fd: i32,
-    pub off_or_addr2: u64,  // file offset or address
+    pub off_or_addr2: u64,          // file offset or address
     pub addr_or_splice_off_in: u64, // buffer pointer
-    pub len: u32,           // buffer length
-    pub op_flags: u32,      // opcode-specific flags
-    pub user_data: u64,     // caller-defined identifier
+    pub len: u32,                   // buffer length
+    pub op_flags: u32,              // opcode-specific flags
+    pub user_data: u64,             // caller-defined identifier
     pub buf_index_or_group: u16,
     pub personality: u16,
     pub splice_fd_in_or_file_index: i32,
@@ -99,9 +99,9 @@ pub struct IoUringSqe {
 #[repr(C, align(16))]
 #[derive(Debug, Clone, Copy, Default)]
 pub struct IoUringCqe {
-    pub user_data: u64,   // matches SQE user_data
-    pub res: i32,         // result: bytes transferred or negative errno
-    pub flags: u32,       // CQE flags
+    pub user_data: u64, // matches SQE user_data
+    pub res: i32,       // result: bytes transferred or negative errno
+    pub flags: u32,     // CQE flags
 }
 
 /// Shared ring state (kernel-side)
@@ -204,7 +204,8 @@ impl IoUringRing {
             // Simulate completion
             let res = match sqe.opcode {
                 0 => 0, // NOP
-                4 | 5 => { // ReadFixed, WriteFixed
+                4 | 5 => {
+                    // ReadFixed, WriteFixed
                     // Validate fixed buffer index
                     if self.get_fixed_buffer(sqe.buf_index_or_group).is_some() {
                         sqe.len as i32
@@ -212,16 +213,17 @@ impl IoUringRing {
                         prev_failed = true;
                         -22 // -EINVAL
                     }
-                },
-                6 => 1, // PollAdd: return ready events
+                }
+                6 => 1,  // PollAdd: return ready events
                 11 => 0, // Timeout
-                33 => { // MultiPoll
+                33 => {
+                    // MultiPoll
                     // Multi-shot: set F_MORE flag
                     self.post_completion(sqe.user_data, 1, IORING_CQE_F_MORE);
                     h = h.wrapping_add(1);
                     count += 1;
                     continue;
-                },
+                }
                 31 => 0, // ProvideBuffers
                 _ => sqe.len as i32,
             };
@@ -245,7 +247,11 @@ impl IoUringRing {
     fn post_completion(&mut self, user_data: u64, res: i32, flags: u32) {
         let tail = self.cq_tail.load(Ordering::Acquire);
         let idx = (tail & (self.ring_size * 2 - 1)) as usize;
-        self.cqes[idx] = IoUringCqe { user_data, res, flags };
+        self.cqes[idx] = IoUringCqe {
+            user_data,
+            res,
+            flags,
+        };
         self.cq_tail.fetch_add(1, Ordering::Release);
         self.total_completions.fetch_add(1, Ordering::Relaxed);
     }
@@ -254,7 +260,9 @@ impl IoUringRing {
     pub fn consume_completion(&mut self) -> Option<IoUringCqe> {
         let head = self.cq_head.load(Ordering::Acquire);
         let tail = self.cq_tail.load(Ordering::Acquire);
-        if head == tail { return None; }
+        if head == tail {
+            return None;
+        }
         let idx = (head & (self.ring_size * 2 - 1)) as usize;
         let cqe = self.cqes[idx];
         self.cq_head.fetch_add(1, Ordering::Release);
@@ -268,7 +276,9 @@ impl IoUringRing {
 
     /// Number of pending submissions awaiting processing.
     pub fn pending_submissions(&self) -> u32 {
-        self.sq_tail.load(Ordering::Relaxed).wrapping_sub(self.sq_head.load(Ordering::Relaxed))
+        self.sq_tail
+            .load(Ordering::Relaxed)
+            .wrapping_sub(self.sq_head.load(Ordering::Relaxed))
     }
 }
 
@@ -279,7 +289,11 @@ mod tests {
     #[test]
     fn test_nop_roundtrip() {
         let mut ring = IoUringRing::new(64);
-        let sqe = IoUringSqe { opcode: IoUringOp::Nop as u8, user_data: 42, ..Default::default() };
+        let sqe = IoUringSqe {
+            opcode: IoUringOp::Nop as u8,
+            user_data: 42,
+            ..Default::default()
+        };
         assert!(ring.submit(sqe).is_some());
         assert_eq!(ring.pending_submissions(), 1);
         let processed = ring.process_submissions();
@@ -293,10 +307,18 @@ mod tests {
     fn test_ring_full() {
         let mut ring = IoUringRing::new(4);
         for i in 0..4 {
-            let sqe = IoUringSqe { opcode: IoUringOp::Nop as u8, user_data: i, ..Default::default() };
+            let sqe = IoUringSqe {
+                opcode: IoUringOp::Nop as u8,
+                user_data: i,
+                ..Default::default()
+            };
             assert!(ring.submit(sqe).is_some());
         }
-        let sqe = IoUringSqe { opcode: IoUringOp::Nop as u8, user_data: 99, ..Default::default() };
+        let sqe = IoUringSqe {
+            opcode: IoUringOp::Nop as u8,
+            user_data: 99,
+            ..Default::default()
+        };
         assert!(ring.submit(sqe).is_none(), "ring should be full");
     }
 
@@ -386,7 +408,8 @@ mod tests {
         let mut ring = IoUringRing::new(64);
 
         // Register fixed buffers first
-        ring.register_buffers(vec![FixedBuffer::new(0x1000, 4096, 0)]).unwrap();
+        ring.register_buffers(vec![FixedBuffer::new(0x1000, 4096, 0)])
+            .unwrap();
 
         let sqe = IoUringSqe {
             opcode: IoUringOp::ReadFixed as u8,

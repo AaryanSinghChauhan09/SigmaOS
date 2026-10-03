@@ -119,7 +119,8 @@ impl Framebuffer {
             PixelFormat::Rgb888 => {
                 ptr::write_volatile(pixel_ptr, (color & 0xFF) as u8); // R
                 ptr::write_volatile(pixel_ptr.add(1), ((color >> 8) & 0xFF) as u8); // G
-                ptr::write_volatile(pixel_ptr.add(2), ((color >> 16) & 0xFF) as u8); // B
+                ptr::write_volatile(pixel_ptr.add(2), ((color >> 16) & 0xFF) as u8);
+                // B
             }
             PixelFormat::Rgb565 => {
                 let r5 = ((color >> 19) & 0x1F) as u16;
@@ -244,7 +245,9 @@ impl FbConsole {
                     self.cursor_x = 0;
                     self.cursor_y += 8;
                     if self.cursor_y + 8 > self.fb.info.height {
-                        unsafe { self.fb.scroll_up(); }
+                        unsafe {
+                            self.fb.scroll_up();
+                        }
                         self.cursor_y -= 8;
                     }
                 }
@@ -252,13 +255,21 @@ impl FbConsole {
                     self.cursor_x = 0;
                 }
                 _ => {
-                    self.fb.draw_char(self.cursor_x, self.cursor_y, ch, self.fg_color, self.bg_color);
+                    self.fb.draw_char(
+                        self.cursor_x,
+                        self.cursor_y,
+                        ch,
+                        self.fg_color,
+                        self.bg_color,
+                    );
                     self.cursor_x += 8;
                     if self.cursor_x + 8 > self.fb.info.width {
                         self.cursor_x = 0;
                         self.cursor_y += 8;
                         if self.cursor_y + 8 > self.fb.info.height {
-                            unsafe { self.fb.scroll_up(); }
+                            unsafe {
+                                self.fb.scroll_up();
+                            }
                             self.cursor_y -= 8;
                         }
                     }
@@ -314,7 +325,7 @@ mod tests {
             stride: 1920 * 4,
             format: PixelFormat::Bgra8888,
         };
-        
+
         assert_eq!(info.width, 1920);
         assert_eq!(info.height, 1080);
     }

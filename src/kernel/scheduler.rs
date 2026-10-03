@@ -11,7 +11,7 @@ use core::sync::atomic::{AtomicU64, Ordering as AtomicOrdering};
 use core::time::Duration;
 
 /// Process priority
-/// 
+///
 /// Priority values range from -20 (highest/realtime) to 19 (lowest/idle).
 /// Lower numeric values indicate higher scheduling priority.
 /// Linux-compatible priority system for fair scheduling.
@@ -145,7 +145,8 @@ pub struct CfsScheduler {
     min_granularity: u64,
     latency: u64,
     next_pid: AtomicU64,
-    pub task_count: usize,}
+    pub task_count: usize,
+}
 
 impl CfsScheduler {
     pub fn new(min_granularity: u64, latency: u64) -> Self {

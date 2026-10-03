@@ -6,52 +6,103 @@
 //   painting model, window manager integration
 
 use std::collections::HashMap;
-use std::sync::{Arc, Mutex, atomic::{AtomicU32, AtomicU64, Ordering}};
+use std::sync::{
+    atomic::{AtomicU32, AtomicU64, Ordering},
+    Arc, Mutex,
+};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // LibGUI Core: Widget System
 // ─────────────────────────────────────────────────────────────────────────────
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct Rect { pub x: i32, pub y: i32, pub w: i32, pub h: i32 }
+pub struct Rect {
+    pub x: i32,
+    pub y: i32,
+    pub w: i32,
+    pub h: i32,
+}
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct Point { pub x: i32, pub y: i32 }
+pub struct Point {
+    pub x: i32,
+    pub y: i32,
+}
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct Size { pub w: i32, pub h: i32 }
+pub struct Size {
+    pub w: i32,
+    pub h: i32,
+}
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct Color { pub r: u8, pub g: u8, pub b: u8, pub a: u8 }
+pub struct Color {
+    pub r: u8,
+    pub g: u8,
+    pub b: u8,
+    pub a: u8,
+}
 
 impl Color {
-    pub const WHITE: Color = Color { r: 255, g: 255, b: 255, a: 255 };
-    pub const BLACK: Color = Color { r: 0, g: 0, b: 0, a: 255 };
-    pub const TRANSPARENT: Color = Color { r: 0, g: 0, b: 0, a: 0 };
-    pub const CINNAMON: Color = Color { r: 75, g: 39, b: 0, a: 255 };
-    pub fn new(r: u8, g: u8, b: u8) -> Self { Color { r, g, b, a: 255 } }
-    pub fn with_alpha(mut self, a: u8) -> Self { self.a = a; self }
+    pub const WHITE: Color = Color {
+        r: 255,
+        g: 255,
+        b: 255,
+        a: 255,
+    };
+    pub const BLACK: Color = Color {
+        r: 0,
+        g: 0,
+        b: 0,
+        a: 255,
+    };
+    pub const TRANSPARENT: Color = Color {
+        r: 0,
+        g: 0,
+        b: 0,
+        a: 0,
+    };
+    pub const CINNAMON: Color = Color {
+        r: 75,
+        g: 39,
+        b: 0,
+        a: 255,
+    };
+    pub fn new(r: u8, g: u8, b: u8) -> Self {
+        Color { r, g, b, a: 255 }
+    }
+    pub fn with_alpha(mut self, a: u8) -> Self {
+        self.a = a;
+        self
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum LayoutKind { None, Vertical, Horizontal, Grid { cols: u32 } }
+pub enum LayoutKind {
+    None,
+    Vertical,
+    Horizontal,
+    Grid { cols: u32 },
+}
 
 #[derive(Debug, Clone)]
 pub enum Event {
-    MousePress   { button: u8, x: i32, y: i32 },
+    MousePress { button: u8, x: i32, y: i32 },
     MouseRelease { button: u8, x: i32, y: i32 },
-    MouseMove    { x: i32, y: i32 },
-    KeyPress     { keycode: u32, modifiers: u32 },
-    KeyRelease   { keycode: u32 },
-    Paint        { rect: Rect },
-    Resize       { size: Size },
+    MouseMove { x: i32, y: i32 },
+    KeyPress { keycode: u32, modifiers: u32 },
+    KeyRelease { keycode: u32 },
+    Paint { rect: Rect },
+    Resize { size: Size },
     Close,
     Focus,
     Blur,
-    Timer        { id: u32 },
-    Custom       { name: String, data: Vec<u8> },
+    Timer { id: u32 },
+    Custom { name: String, data: Vec<u8> },
 }
 
 pub type WidgetId = u32;
 static WIDGET_ID_COUNTER: AtomicU32 = AtomicU32::new(1);
-fn new_widget_id() -> WidgetId { WIDGET_ID_COUNTER.fetch_add(1, Ordering::SeqCst) }
+fn new_widget_id() -> WidgetId {
+    WIDGET_ID_COUNTER.fetch_add(1, Ordering::SeqCst)
+}
 
 /// Core widget trait (SerenityOS LibGUI-style)
 pub trait Widget: Send + Sync {
@@ -61,9 +112,15 @@ pub trait Widget: Send + Sync {
     fn preferred_size(&self) -> Size;
     fn handle_event(&mut self, event: &Event) -> bool;
     fn paint(&self, canvas: &mut Canvas);
-    fn children(&self) -> &[WidgetId] { &[] }
-    fn is_enabled(&self) -> bool { true }
-    fn is_visible(&self) -> bool { true }
+    fn children(&self) -> &[WidgetId] {
+        &[]
+    }
+    fn is_enabled(&self) -> bool {
+        true
+    }
+    fn is_visible(&self) -> bool {
+        true
+    }
     fn widget_type(&self) -> &'static str;
 }
 
@@ -76,20 +133,55 @@ pub struct Canvas {
 
 #[derive(Debug, Clone)]
 pub enum DrawCommand {
-    FillRect { rect: Rect, color: Color },
-    DrawText { x: i32, y: i32, text: String, color: Color },
-    DrawLine { x1: i32, y1: i32, x2: i32, y2: i32, color: Color },
-    DrawRect { rect: Rect, color: Color },
-    DrawBitmap { rect: Rect, data_ref: String },
+    FillRect {
+        rect: Rect,
+        color: Color,
+    },
+    DrawText {
+        x: i32,
+        y: i32,
+        text: String,
+        color: Color,
+    },
+    DrawLine {
+        x1: i32,
+        y1: i32,
+        x2: i32,
+        y2: i32,
+        color: Color,
+    },
+    DrawRect {
+        rect: Rect,
+        color: Color,
+    },
+    DrawBitmap {
+        rect: Rect,
+        data_ref: String,
+    },
 }
 
 impl Canvas {
-    pub fn new(w: u32, h: u32) -> Self { Canvas { width: w, height: h, commands: Vec::new() } }
-    pub fn fill_rect(&mut self, rect: Rect, color: Color) { self.commands.push(DrawCommand::FillRect { rect, color }); }
-    pub fn draw_text(&mut self, x: i32, y: i32, text: &str, color: Color) {
-        self.commands.push(DrawCommand::DrawText { x, y, text: text.into(), color });
+    pub fn new(w: u32, h: u32) -> Self {
+        Canvas {
+            width: w,
+            height: h,
+            commands: Vec::new(),
+        }
     }
-    pub fn draw_rect(&mut self, rect: Rect, color: Color) { self.commands.push(DrawCommand::DrawRect { rect, color }); }
+    pub fn fill_rect(&mut self, rect: Rect, color: Color) {
+        self.commands.push(DrawCommand::FillRect { rect, color });
+    }
+    pub fn draw_text(&mut self, x: i32, y: i32, text: &str, color: Color) {
+        self.commands.push(DrawCommand::DrawText {
+            x,
+            y,
+            text: text.into(),
+            color,
+        });
+    }
+    pub fn draw_rect(&mut self, rect: Rect, color: Color) {
+        self.commands.push(DrawCommand::DrawRect { rect, color });
+    }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -97,88 +189,196 @@ impl Canvas {
 // ─────────────────────────────────────────────────────────────────────────────
 
 pub struct Label {
-    id: WidgetId, rect: Rect, pub text: String, pub color: Color, pub bg: Color,
+    id: WidgetId,
+    rect: Rect,
+    pub text: String,
+    pub color: Color,
+    pub bg: Color,
 }
 impl Label {
     pub fn new(text: &str) -> Self {
-        Label { id: new_widget_id(), rect: Rect { x:0, y:0, w:100, h:24 }, text: text.into(),
-                color: Color::BLACK, bg: Color::TRANSPARENT }
+        Label {
+            id: new_widget_id(),
+            rect: Rect {
+                x: 0,
+                y: 0,
+                w: 100,
+                h: 24,
+            },
+            text: text.into(),
+            color: Color::BLACK,
+            bg: Color::TRANSPARENT,
+        }
     }
 }
 impl Widget for Label {
-    fn id(&self) -> WidgetId { self.id }
-    fn rect(&self) -> Rect { self.rect }
-    fn set_rect(&mut self, r: Rect) { self.rect = r; }
-    fn preferred_size(&self) -> Size { Size { w: (self.text.len() as i32) * 8, h: 20 } }
-    fn handle_event(&mut self, _: &Event) -> bool { false }
+    fn id(&self) -> WidgetId {
+        self.id
+    }
+    fn rect(&self) -> Rect {
+        self.rect
+    }
+    fn set_rect(&mut self, r: Rect) {
+        self.rect = r;
+    }
+    fn preferred_size(&self) -> Size {
+        Size {
+            w: (self.text.len() as i32) * 8,
+            h: 20,
+        }
+    }
+    fn handle_event(&mut self, _: &Event) -> bool {
+        false
+    }
     fn paint(&self, c: &mut Canvas) {
         c.fill_rect(self.rect, self.bg);
         c.draw_text(self.rect.x + 4, self.rect.y + 4, &self.text, self.color);
     }
-    fn widget_type(&self) -> &'static str { "Label" }
+    fn widget_type(&self) -> &'static str {
+        "Label"
+    }
 }
 
 pub struct Button {
-    id: WidgetId, rect: Rect, pub text: String,
-    pub pressed: bool, pub click_count: u32,
+    id: WidgetId,
+    rect: Rect,
+    pub text: String,
+    pub pressed: bool,
+    pub click_count: u32,
 }
 impl Button {
     pub fn new(text: &str) -> Self {
-        Button { id: new_widget_id(), rect: Rect { x:0, y:0, w:100, h:32 },
-                 text: text.into(), pressed: false, click_count: 0 }
+        Button {
+            id: new_widget_id(),
+            rect: Rect {
+                x: 0,
+                y: 0,
+                w: 100,
+                h: 32,
+            },
+            text: text.into(),
+            pressed: false,
+            click_count: 0,
+        }
     }
 }
 impl Widget for Button {
-    fn id(&self) -> WidgetId { self.id }
-    fn rect(&self) -> Rect { self.rect }
-    fn set_rect(&mut self, r: Rect) { self.rect = r; }
-    fn preferred_size(&self) -> Size { Size { w: (self.text.len() as i32 + 4) * 8, h: 32 } }
+    fn id(&self) -> WidgetId {
+        self.id
+    }
+    fn rect(&self) -> Rect {
+        self.rect
+    }
+    fn set_rect(&mut self, r: Rect) {
+        self.rect = r;
+    }
+    fn preferred_size(&self) -> Size {
+        Size {
+            w: (self.text.len() as i32 + 4) * 8,
+            h: 32,
+        }
+    }
     fn handle_event(&mut self, ev: &Event) -> bool {
         match ev {
-            Event::MousePress { .. } => { self.pressed = true; true }
-            Event::MouseRelease { .. } => { self.pressed = false; self.click_count += 1; true }
+            Event::MousePress { .. } => {
+                self.pressed = true;
+                true
+            }
+            Event::MouseRelease { .. } => {
+                self.pressed = false;
+                self.click_count += 1;
+                true
+            }
             _ => false,
         }
     }
     fn paint(&self, c: &mut Canvas) {
-        let bg = if self.pressed { Color::new(100, 100, 100) } else { Color::new(200, 200, 200) };
+        let bg = if self.pressed {
+            Color::new(100, 100, 100)
+        } else {
+            Color::new(200, 200, 200)
+        };
         c.fill_rect(self.rect, bg);
         c.draw_rect(self.rect, Color::BLACK);
         c.draw_text(self.rect.x + 8, self.rect.y + 8, &self.text, Color::BLACK);
     }
-    fn widget_type(&self) -> &'static str { "Button" }
+    fn widget_type(&self) -> &'static str {
+        "Button"
+    }
 }
 
 pub struct TextInput {
-    id: WidgetId, rect: Rect, pub text: String, pub placeholder: String, pub focused: bool,
+    id: WidgetId,
+    rect: Rect,
+    pub text: String,
+    pub placeholder: String,
+    pub focused: bool,
 }
 impl TextInput {
     pub fn new(placeholder: &str) -> Self {
-        TextInput { id: new_widget_id(), rect: Rect { x:0, y:0, w:200, h:28 },
-                    text: String::new(), placeholder: placeholder.into(), focused: false }
+        TextInput {
+            id: new_widget_id(),
+            rect: Rect {
+                x: 0,
+                y: 0,
+                w: 200,
+                h: 28,
+            },
+            text: String::new(),
+            placeholder: placeholder.into(),
+            focused: false,
+        }
     }
 }
 impl Widget for TextInput {
-    fn id(&self) -> WidgetId { self.id }
-    fn rect(&self) -> Rect { self.rect }
-    fn set_rect(&mut self, r: Rect) { self.rect = r; }
-    fn preferred_size(&self) -> Size { Size { w: 200, h: 28 } }
+    fn id(&self) -> WidgetId {
+        self.id
+    }
+    fn rect(&self) -> Rect {
+        self.rect
+    }
+    fn set_rect(&mut self, r: Rect) {
+        self.rect = r;
+    }
+    fn preferred_size(&self) -> Size {
+        Size { w: 200, h: 28 }
+    }
     fn handle_event(&mut self, ev: &Event) -> bool {
         match ev {
-            Event::Focus => { self.focused = true; true }
-            Event::Blur  => { self.focused = false; true }
+            Event::Focus => {
+                self.focused = true;
+                true
+            }
+            Event::Blur => {
+                self.focused = false;
+                true
+            }
             _ => false,
         }
     }
     fn paint(&self, c: &mut Canvas) {
-        let border = if self.focused { Color::new(0, 120, 215) } else { Color::new(150, 150, 150) };
+        let border = if self.focused {
+            Color::new(0, 120, 215)
+        } else {
+            Color::new(150, 150, 150)
+        };
         c.fill_rect(self.rect, Color::WHITE);
         c.draw_rect(self.rect, border);
-        let display = if self.text.is_empty() { &self.placeholder } else { &self.text };
-        let color = if self.text.is_empty() { Color::new(150, 150, 150) } else { Color::BLACK };
+        let display = if self.text.is_empty() {
+            &self.placeholder
+        } else {
+            &self.text
+        };
+        let color = if self.text.is_empty() {
+            Color::new(150, 150, 150)
+        } else {
+            Color::BLACK
+        };
         c.draw_text(self.rect.x + 4, self.rect.y + 6, display, color);
     }
-    fn widget_type(&self) -> &'static str { "TextInput" }
+    fn widget_type(&self) -> &'static str {
+        "TextInput"
+    }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -202,7 +402,12 @@ impl Window {
         Window {
             id: WINDOW_ID.fetch_add(1, Ordering::SeqCst),
             title: title.into(),
-            rect: Rect { x: 100, y: 100, w, h },
+            rect: Rect {
+                x: 100,
+                y: 100,
+                w,
+                h,
+            },
             widgets: Vec::new(),
             layout: LayoutKind::Vertical,
             background: Color::new(240, 240, 240),
@@ -210,16 +415,28 @@ impl Window {
         }
     }
 
-    pub fn add_widget(&mut self, w: Box<dyn Widget>) { self.widgets.push(w); }
+    pub fn add_widget(&mut self, w: Box<dyn Widget>) {
+        self.widgets.push(w);
+    }
 
     pub fn paint_all(&self) -> Canvas {
         let mut canvas = Canvas::new(self.rect.w as u32, self.rect.h as u32);
         canvas.fill_rect(self.rect, self.background);
         // Title bar
-        canvas.fill_rect(Rect { x: 0, y: 0, w: self.rect.w, h: 28 }, Color::CINNAMON);
+        canvas.fill_rect(
+            Rect {
+                x: 0,
+                y: 0,
+                w: self.rect.w,
+                h: 28,
+            },
+            Color::CINNAMON,
+        );
         canvas.draw_text(8, 6, &self.title, Color::WHITE);
         for widget in &self.widgets {
-            if widget.is_visible() { widget.paint(&mut canvas); }
+            if widget.is_visible() {
+                widget.paint(&mut canvas);
+            }
         }
         canvas
     }
@@ -235,7 +452,9 @@ impl Window {
         handled
     }
 
-    pub fn widget_count(&self) -> usize { self.widgets.len() }
+    pub fn widget_count(&self) -> usize {
+        self.widgets.len()
+    }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -259,15 +478,24 @@ pub struct CinnamonPanel {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum PanelPosition { Bottom, Top }
+pub enum PanelPosition {
+    Bottom,
+    Top,
+}
 
 impl CinnamonPanel {
     pub fn new(pos: PanelPosition) -> Self {
         CinnamonPanel {
             height: 40,
             position: pos,
-            applets: vec!["menu".into(), "window-list".into(), "grouped-window-list".into(),
-                          "systray".into(), "calendar".into(), "power".into()],
+            applets: vec![
+                "menu".into(),
+                "window-list".into(),
+                "grouped-window-list".into(),
+                "systray".into(),
+                "calendar".into(),
+                "power".into(),
+            ],
             tray_icons: Vec::new(),
             clock_format: "%H:%M:%S".into(),
         }
@@ -275,7 +503,10 @@ impl CinnamonPanel {
 
     pub fn add_tray_icon(&mut self, app: &str, tooltip: &str, icon: &str) {
         self.tray_icons.push(TrayIcon {
-            app_name: app.into(), tooltip: tooltip.into(), icon_path: icon.into(), visible: true,
+            app_name: app.into(),
+            tooltip: tooltip.into(),
+            icon_path: icon.into(),
+            visible: true,
         });
     }
 
@@ -295,25 +526,57 @@ pub trait Desklet: Send + Sync {
     fn on_click(&mut self) {}
 }
 
-pub struct ClockDesklet { pub time_str: String }
+pub struct ClockDesklet {
+    pub time_str: String,
+}
 impl Desklet for ClockDesklet {
-    fn name(&self) -> &str { "clock-desklet" }
-    fn update(&mut self) { self.time_str = "14:36:21".into(); }
-    fn render(&self) -> String { format!("🕒 {}", self.time_str) }
+    fn name(&self) -> &str {
+        "clock-desklet"
+    }
+    fn update(&mut self) {
+        self.time_str = "14:36:21".into();
+    }
+    fn render(&self) -> String {
+        format!("🕒 {}", self.time_str)
+    }
 }
 
-pub struct WeatherDesklet { pub location: String, pub temp_c: f32, pub condition: String }
+pub struct WeatherDesklet {
+    pub location: String,
+    pub temp_c: f32,
+    pub condition: String,
+}
 impl Desklet for WeatherDesklet {
-    fn name(&self) -> &str { "weather-desklet" }
-    fn update(&mut self) { self.temp_c = 28.5; self.condition = "Partly Cloudy".into(); }
-    fn render(&self) -> String { format!("🌤 {} — {}°C, {}", self.location, self.temp_c, self.condition) }
+    fn name(&self) -> &str {
+        "weather-desklet"
+    }
+    fn update(&mut self) {
+        self.temp_c = 28.5;
+        self.condition = "Partly Cloudy".into();
+    }
+    fn render(&self) -> String {
+        format!(
+            "🌤 {} — {}°C, {}",
+            self.location, self.temp_c, self.condition
+        )
+    }
 }
 
-pub struct SystemMonitorDesklet { pub cpu_pct: f32, pub ram_pct: f32 }
+pub struct SystemMonitorDesklet {
+    pub cpu_pct: f32,
+    pub ram_pct: f32,
+}
 impl Desklet for SystemMonitorDesklet {
-    fn name(&self) -> &str { "sysmon-desklet" }
-    fn update(&mut self) { self.cpu_pct = 23.4; self.ram_pct = 54.2; }
-    fn render(&self) -> String { format!("CPU: {:.1}%  RAM: {:.1}%", self.cpu_pct, self.ram_pct) }
+    fn name(&self) -> &str {
+        "sysmon-desklet"
+    }
+    fn update(&mut self) {
+        self.cpu_pct = 23.4;
+        self.ram_pct = 54.2;
+    }
+    fn render(&self) -> String {
+        format!("CPU: {:.1}%  RAM: {:.1}%", self.cpu_pct, self.ram_pct)
+    }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -337,18 +600,33 @@ pub struct WarpTransfer {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum WarpState { Pending, Transferring, Complete, Failed, Declined }
+pub enum WarpState {
+    Pending,
+    Transferring,
+    Complete,
+    Failed,
+    Declined,
+}
 
 static WARP_ID: AtomicU64 = AtomicU64::new(1);
 
 impl Warpinator {
-    pub fn new(hostname: &str) -> Self { Warpinator { hostname: hostname.into(), transfers: Vec::new() } }
+    pub fn new(hostname: &str) -> Self {
+        Warpinator {
+            hostname: hostname.into(),
+            transfers: Vec::new(),
+        }
+    }
 
     pub fn send_file(&mut self, peer: &str, filename: &str, size: u64) -> u64 {
         let id = WARP_ID.fetch_add(1, Ordering::SeqCst);
         self.transfers.push(WarpTransfer {
-            id, peer_hostname: peer.into(), file_name: filename.into(),
-            size_bytes: size, transferred_bytes: 0, state: WarpState::Pending,
+            id,
+            peer_hostname: peer.into(),
+            file_name: filename.into(),
+            size_bytes: size,
+            transferred_bytes: 0,
+            state: WarpState::Pending,
         });
         id
     }
@@ -356,13 +634,19 @@ impl Warpinator {
     pub fn update_progress(&mut self, id: u64, bytes: u64) {
         if let Some(t) = self.transfers.iter_mut().find(|t| t.id == id) {
             t.transferred_bytes = bytes;
-            if bytes >= t.size_bytes { t.state = WarpState::Complete; }
-            else { t.state = WarpState::Transferring; }
+            if bytes >= t.size_bytes {
+                t.state = WarpState::Complete;
+            } else {
+                t.state = WarpState::Transferring;
+            }
         }
     }
 
     pub fn active_transfers(&self) -> Vec<&WarpTransfer> {
-        self.transfers.iter().filter(|t| t.state == WarpState::Transferring).collect()
+        self.transfers
+            .iter()
+            .filter(|t| t.state == WarpState::Transferring)
+            .collect()
     }
 }
 
@@ -377,7 +661,11 @@ pub struct TimeshiftSnapshot {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum SnapshotKind { Rsync, Btrfs, Zfs }
+pub enum SnapshotKind {
+    Rsync,
+    Btrfs,
+    Zfs,
+}
 
 pub struct Timeshift {
     pub snapshots: Vec<TimeshiftSnapshot>,
@@ -396,26 +684,43 @@ pub struct AutoSchedule {
 
 impl AutoSchedule {
     pub fn default_schedule() -> Self {
-        AutoSchedule { monthly: 2, weekly: 3, daily: 5, hourly: 6, boot: 5 }
+        AutoSchedule {
+            monthly: 2,
+            weekly: 3,
+            daily: 5,
+            hourly: 6,
+            boot: 5,
+        }
     }
 }
 
 impl Timeshift {
     pub fn new(device: &str) -> Self {
-        Timeshift { snapshots: Vec::new(), target_device: device.into(), auto_schedule: AutoSchedule::default_schedule() }
+        Timeshift {
+            snapshots: Vec::new(),
+            target_device: device.into(),
+            auto_schedule: AutoSchedule::default_schedule(),
+        }
     }
 
     pub fn create_snapshot(&mut self, comment: &str, kind: SnapshotKind) -> String {
         let id = format!("{:016x}", self.snapshots.len() + 1);
         self.snapshots.push(TimeshiftSnapshot {
-            id: id.clone(), created_ns: 0, size_bytes: 1_500_000_000,
-            snapshot_type: kind, comment: comment.into(),
+            id: id.clone(),
+            created_ns: 0,
+            size_bytes: 1_500_000_000,
+            snapshot_type: kind,
+            comment: comment.into(),
         });
         id
     }
 
     pub fn restore(&self, id: &str) -> Result<(), &'static str> {
-        if self.snapshots.iter().any(|s| s.id == id) { Ok(()) } else { Err("Snapshot not found") }
+        if self.snapshots.iter().any(|s| s.id == id) {
+            Ok(())
+        } else {
+            Err("Snapshot not found")
+        }
     }
 
     pub fn delete(&mut self, id: &str) -> bool {
@@ -441,7 +746,13 @@ pub struct IptvChannel {
 }
 
 impl HypnotixPlayer {
-    pub fn new() -> Self { HypnotixPlayer { playlist_url: String::new(), channels: Vec::new(), current_channel: None } }
+    pub fn new() -> Self {
+        HypnotixPlayer {
+            playlist_url: String::new(),
+            channels: Vec::new(),
+            current_channel: None,
+        }
+    }
 
     pub fn load_m3u(&mut self, content: &str) -> usize {
         let mut count = 0;
@@ -449,9 +760,21 @@ impl HypnotixPlayer {
         let mut i = 0;
         while i < lines.len() {
             if lines[i].starts_with("#EXTINF") {
-                let name = lines[i].split(',').last().unwrap_or("Channel").trim().to_string();
-                if i + 1 < lines.len() && (lines[i+1].starts_with("http") || lines[i+1].starts_with("rtmp")) {
-                    self.channels.push(IptvChannel { name, url: lines[i+1].into(), group: "General".into(), logo_url: None });
+                let name = lines[i]
+                    .split(',')
+                    .last()
+                    .unwrap_or("Channel")
+                    .trim()
+                    .to_string();
+                if i + 1 < lines.len()
+                    && (lines[i + 1].starts_with("http") || lines[i + 1].starts_with("rtmp"))
+                {
+                    self.channels.push(IptvChannel {
+                        name,
+                        url: lines[i + 1].into(),
+                        group: "General".into(),
+                        logo_url: None,
+                    });
                     count += 1;
                     i += 2;
                     continue;
@@ -463,7 +786,12 @@ impl HypnotixPlayer {
     }
 
     pub fn tune(&mut self, index: usize) -> Option<&IptvChannel> {
-        if index < self.channels.len() { self.current_channel = Some(index); self.channels.get(index) } else { None }
+        if index < self.channels.len() {
+            self.current_channel = Some(index);
+            self.channels.get(index)
+        } else {
+            None
+        }
     }
 }
 
@@ -484,15 +812,29 @@ pub struct StickyNote {
 static NOTE_ID: AtomicU32 = AtomicU32::new(1);
 
 impl StickyNotes {
-    pub fn new() -> Self { StickyNotes { notes: Vec::new() } }
+    pub fn new() -> Self {
+        StickyNotes { notes: Vec::new() }
+    }
     pub fn add(&mut self, content: &str, color: Color) -> u32 {
         let id = NOTE_ID.fetch_add(1, Ordering::SeqCst);
-        self.notes.push(StickyNote { id, content: content.into(), color, x: 0, y: 0 });
+        self.notes.push(StickyNote {
+            id,
+            content: content.into(),
+            color,
+            x: 0,
+            y: 0,
+        });
         id
     }
-    pub fn delete(&mut self, id: u32) { self.notes.retain(|n| n.id != id); }
+    pub fn delete(&mut self, id: u32) {
+        self.notes.retain(|n| n.id != id);
+    }
     pub fn edit(&mut self, id: u32, content: &str) -> bool {
-        self.notes.iter_mut().find(|n| n.id == id).map(|n| n.content = content.into()).is_some()
+        self.notes
+            .iter_mut()
+            .find(|n| n.id == id)
+            .map(|n| n.content = content.into())
+            .is_some()
     }
 }
 
@@ -511,9 +853,17 @@ mod tests {
     #[test]
     fn test_libgui_button_click() {
         let mut btn = Button::new("Click Me");
-        btn.handle_event(&Event::MousePress { button: 1, x: 50, y: 16 });
+        btn.handle_event(&Event::MousePress {
+            button: 1,
+            x: 50,
+            y: 16,
+        });
         assert!(btn.pressed);
-        btn.handle_event(&Event::MouseRelease { button: 1, x: 50, y: 16 });
+        btn.handle_event(&Event::MouseRelease {
+            button: 1,
+            x: 50,
+            y: 16,
+        });
         assert!(!btn.pressed);
         assert_eq!(btn.click_count, 1);
     }
@@ -536,7 +886,11 @@ mod tests {
         assert!(!canvas.commands.is_empty());
         assert_eq!(win.widget_count(), 2);
         // Dispatch click
-        win.dispatch_event(&Event::MousePress { button: 1, x: 200, y: 200 });
+        win.dispatch_event(&Event::MousePress {
+            button: 1,
+            x: 200,
+            y: 200,
+        });
     }
 
     #[test]
@@ -551,11 +905,17 @@ mod tests {
 
     #[test]
     fn test_desklets() {
-        let mut clock = ClockDesklet { time_str: String::new() };
+        let mut clock = ClockDesklet {
+            time_str: String::new(),
+        };
         clock.update();
         assert!(clock.render().contains("14:36:21"));
 
-        let mut weather = WeatherDesklet { location: "Mumbai".into(), temp_c: 0.0, condition: String::new() };
+        let mut weather = WeatherDesklet {
+            location: "Mumbai".into(),
+            temp_c: 0.0,
+            condition: String::new(),
+        };
         weather.update();
         assert!(weather.render().contains("Mumbai"));
     }

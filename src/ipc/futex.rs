@@ -90,16 +90,28 @@ pub struct FutexKey {
 
 impl FutexKey {
     pub fn new(mm: u64, address: u64, private: bool) -> Self {
-        Self { mm, address, private }
+        Self {
+            mm,
+            address,
+            private,
+        }
     }
 
     /// For shared futexes the mm is zeroed so different processes can share
     pub fn shared(address: u64) -> Self {
-        Self { mm: 0, address, private: false }
+        Self {
+            mm: 0,
+            address,
+            private: false,
+        }
     }
 
     pub fn private(mm: u64, address: u64) -> Self {
-        Self { mm, address, private: true }
+        Self {
+            mm,
+            address,
+            private: true,
+        }
     }
 }
 
@@ -150,7 +162,9 @@ pub struct FutexBucket {
 
 impl FutexBucket {
     pub fn new() -> Self {
-        Self { waiters: HashMap::new() }
+        Self {
+            waiters: HashMap::new(),
+        }
     }
 
     /// Add a waiter for the given key
@@ -235,8 +249,7 @@ impl FutexHashTable {
     /// Hash a FutexKey to a bucket index
     pub fn hash(&self, key: &FutexKey) -> usize {
         // Simple multiplicative hash of address + mm
-        let h = key.address
-            .wrapping_mul(0x9e37_79b9_7f4a_7c15)
+        let h = key.address.wrapping_mul(0x9e37_79b9_7f4a_7c15)
             ^ key.mm.wrapping_mul(0x6c62_272e_07bb_0142);
         (h as usize) & (FUTEX_HASH_BUCKETS - 1)
     }
@@ -292,12 +305,7 @@ pub fn futex_wait(
 ///
 /// Wakes up to `count` waiters on `addr` (matching `bitset`).
 /// Returns the number of tasks actually woken.
-pub fn futex_wake(
-    table: &FutexHashTable,
-    key: &FutexKey,
-    count: u32,
-    bitset: u32,
-) -> u32 {
+pub fn futex_wake(table: &FutexHashTable, key: &FutexKey, count: u32, bitset: u32) -> u32 {
     let bucket = table.bucket(key);
     let mut b = bucket.lock().unwrap();
     b.wake(key, count, bitset)
@@ -324,7 +332,8 @@ pub fn futex_requeue(
         let bucket = table.bucket(from_key);
         let mut b = bucket.lock().unwrap();
         let mut dest_tmp = FutexBucket::new();
-        let (woken, requeued) = b.requeue(from_key, to_key, wake_count, requeue_count, &mut dest_tmp);
+        let (woken, requeued) =
+            b.requeue(from_key, to_key, wake_count, requeue_count, &mut dest_tmp);
         // Merge dest_tmp back into the same bucket
         for (k, mut v) in dest_tmp.waiters {
             b.waiters.entry(k).or_default().append(&mut v);
@@ -333,9 +342,15 @@ pub fn futex_requeue(
     } else {
         // Different buckets
         let (lo, hi) = if from_idx < to_idx {
-            (Arc::clone(&table.buckets[from_idx]), Arc::clone(&table.buckets[to_idx]))
+            (
+                Arc::clone(&table.buckets[from_idx]),
+                Arc::clone(&table.buckets[to_idx]),
+            )
         } else {
-            (Arc::clone(&table.buckets[to_idx]), Arc::clone(&table.buckets[from_idx]))
+            (
+                Arc::clone(&table.buckets[to_idx]),
+                Arc::clone(&table.buckets[from_idx]),
+            )
         };
         let (mut lo_g, mut hi_g) = (lo.lock().unwrap(), hi.lock().unwrap());
         let (from_g, to_g) = if from_idx < to_idx {
@@ -374,7 +389,8 @@ impl RobustFutexList {
 
     /// Deregister a lock release
     pub fn deregister(&mut self, lock_addr: u64, task_id: u64) {
-        self.entries.retain(|e| !(e.lock_addr == lock_addr && e.task_id == task_id));
+        self.entries
+            .retain(|e| !(e.lock_addr == lock_addr && e.task_id == task_id));
     }
 
     /// Handle process exit: mark all owned futexes with FUTEX_OWNER_DIED (bit 30)

@@ -248,9 +248,7 @@ impl CapabilitySandbox {
             }
         } else {
             // Global capability check (no specific path)
-            if self.global_rights.contains(&required_right)
-                || self.mode == CapMode::Unrestricted
-            {
+            if self.global_rights.contains(&required_right) || self.mode == CapMode::Unrestricted {
                 Ok(())
             } else {
                 Err(ECAPMODE)
@@ -467,7 +465,10 @@ pub enum CapError {
     /// Operation not permitted in capability mode
     CapModeViolation,
     /// Insufficient rights for operation
-    InsufficientRights { required: u64, actual: CapRightsMask },
+    InsufficientRights {
+        required: u64,
+        actual: CapRightsMask,
+    },
     /// File descriptor not found in rights table
     FdNotFound,
     /// Ioctl command not allowed
@@ -538,7 +539,9 @@ pub fn log_cap_violation(fd: i32, right: u64, pid: u32) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::security::cap_rights::{CAP_READ, CAP_WRITE, CAP_SEEK, CAP_FSTAT, CAP_PDKILL, CAP_PDWAIT};
+    use crate::security::cap_rights::{
+        CAP_FSTAT, CAP_PDKILL, CAP_PDWAIT, CAP_READ, CAP_SEEK, CAP_WRITE,
+    };
 
     // ─── Legacy tests ─────────────────────────────────────────────────────────────
 
@@ -622,10 +625,10 @@ mod tests {
     fn test_enter_capability_mode() {
         let mut state = ProcessCapState::new();
         assert!(!state.is_cap_mode());
-        
+
         state.cap_enter().unwrap();
         assert!(state.is_cap_mode());
-        
+
         // Should be idempotent
         state.cap_enter().unwrap();
         assert!(state.is_cap_mode());
@@ -635,9 +638,12 @@ mod tests {
     fn test_capability_mode_denies_namespace_access() {
         let mut state = ProcessCapState::new();
         assert!(state.check_namespace_access().is_ok());
-        
+
         state.cap_enter().unwrap();
-        assert_eq!(state.check_namespace_access(), Err(CapError::CapModeViolation));
+        assert_eq!(
+            state.check_namespace_access(),
+            Err(CapError::CapModeViolation)
+        );
     }
 
     #[test]
@@ -645,14 +651,17 @@ mod tests {
         let mut state = ProcessCapState::new();
         let initial_rights = CapRightsMask::new(CAP_READ | CAP_SEEK);
         state.limit_fd_rights(3, initial_rights).unwrap();
-        
+
         // Narrowing should succeed
         let narrower_rights = CapRightsMask::new(CAP_READ);
         assert!(state.limit_fd_rights(3, narrower_rights).is_ok());
-        
+
         // Expanding should fail
         let wider_rights = CapRightsMask::new(CAP_READ | CAP_WRITE | CAP_SEEK);
-        assert_eq!(state.limit_fd_rights(3, wider_rights), Err(CapError::RightsExpansionDenied));
+        assert_eq!(
+            state.limit_fd_rights(3, wider_rights),
+            Err(CapError::RightsExpansionDenied)
+        );
     }
 
     #[test]
@@ -660,10 +669,10 @@ mod tests {
         let mut state = ProcessCapState::new();
         let rights = CapRightsMask::new(CAP_READ | CAP_WRITE);
         state.limit_fd_rights(3, rights).unwrap();
-        
+
         // Dup to new FD
         state.inherit_rights_on_dup(3, 4).unwrap();
-        
+
         // New FD should have same rights
         assert_eq!(state.get_fd_rights(4), Some(&rights));
     }
@@ -673,7 +682,7 @@ mod tests {
         let mut state = ProcessCapState::new();
         let rights = CapRightsMask::new(CAP_READ | CAP_WRITE);
         state.limit_fd_rights(3, rights).unwrap();
-        
+
         assert!(state.check_fd_right(3, CAP_READ).is_ok());
         assert!(state.check_fd_right(3, CAP_WRITE).is_ok());
     }
@@ -683,9 +692,9 @@ mod tests {
         let mut state = ProcessCapState::new();
         let rights = CapRightsMask::new(CAP_READ);
         state.limit_fd_rights(3, rights).unwrap();
-        
+
         assert!(state.check_fd_right(3, CAP_READ).is_ok());
-        
+
         let result = state.check_fd_right(3, CAP_WRITE);
         match result {
             Err(CapError::InsufficientRights { required, .. }) => {
@@ -707,7 +716,10 @@ mod tests {
         let mut state = ProcessCapState::new();
         state.cap_enter().unwrap();
         // In capability mode, FD not in table should be denied
-        assert_eq!(state.check_fd_right(999, CAP_READ), Err(CapError::FdNotFound));
+        assert_eq!(
+            state.check_fd_right(999, CAP_READ),
+            Err(CapError::FdNotFound)
+        );
     }
 
     #[test]
@@ -715,10 +727,10 @@ mod tests {
         let mut state = ProcessCapState::new();
         let rights = CapRightsMask::new(CAP_READ);
         state.limit_fd_rights(3, rights).unwrap();
-        
+
         // Limit ioctl commands
         state.limit_ioctls(3, vec![0x5401, 0x5402]).unwrap();
-        
+
         assert!(state.check_ioctl(3, 0x5401).is_ok());
         assert!(state.check_ioctl(3, 0x5402).is_ok());
         assert_eq!(state.check_ioctl(3, 0x5403), Err(CapError::IoctlNotAllowed));
@@ -729,10 +741,10 @@ mod tests {
         let mut state = ProcessCapState::new();
         let rights = CapRightsMask::new(CAP_READ);
         state.limit_fd_rights(3, rights).unwrap();
-        
+
         // Limit fcntl commands (bit mask)
         state.limit_fcntls(3, 0b00000011).unwrap(); // Only cmd 0 and 1 allowed
-        
+
         assert!(state.check_fcntl(3, 0).is_ok());
         assert!(state.check_fcntl(3, 1).is_ok());
         assert_eq!(state.check_fcntl(3, 2), Err(CapError::FcntlNotAllowed));
@@ -741,13 +753,13 @@ mod tests {
     #[test]
     fn test_process_descriptor_table() {
         let mut table = ProcDescTable::new();
-        
+
         let pd = ProcessDescriptor::new(1234, 5, CapRightsMask::new(CAP_PDKILL | CAP_PDWAIT));
         table.add(pd.clone());
-        
+
         assert!(table.lookup_by_fd(5).is_some());
         assert_eq!(table.lookup_by_fd(5).unwrap().pid, 1234);
-        
+
         table.remove(5);
         assert!(table.lookup_by_fd(5).is_none());
     }
@@ -757,11 +769,11 @@ mod tests {
         let mut state = ProcessCapState::new();
         let rights = CapRightsMask::new(CAP_READ | CAP_FSTAT);
         state.limit_fd_rights(7, rights).unwrap();
-        
+
         let retrieved = state.get_fd_rights(7);
         assert!(retrieved.is_some());
         assert_eq!(retrieved.unwrap(), &rights);
-        
+
         assert!(state.get_fd_rights(999).is_none());
     }
 }

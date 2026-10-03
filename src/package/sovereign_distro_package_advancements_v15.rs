@@ -43,10 +43,10 @@ use std::vec::Vec;
 /// MicroVM & Container Isolation Level for High-Risk Package Scriptlets & Binaries
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum MicroVmIsolationLevel {
-    Level0HostDirect,              // Direct host execution with pledge/unveil restrictions
+    Level0HostDirect, // Direct host execution with pledge/unveil restrictions
     Level1LandlockCapsicumSandbox, // Landlock v25 + Capsicum rights restriction
-    Level2FirecrackerMicroVm,      // Firecracker / KVM MicroVM container sandbox
-    Level3QubesAppVmIsolation,     // Qubes OS style Xen/KVM hypervisor isolated VM
+    Level2FirecrackerMicroVm, // Firecracker / KVM MicroVM container sandbox
+    Level3QubesAppVmIsolation, // Qubes OS style Xen/KVM hypervisor isolated VM
 }
 
 impl MicroVmIsolationLevel {
@@ -92,7 +92,9 @@ impl SovereignMicroVMAndContainerPackageIsolatorEngine {
         }
 
         let blocked_calls = match isolation_level {
-            MicroVmIsolationLevel::Level0HostDirect => vec![String::from("reboot"), String::from("kexec_load")],
+            MicroVmIsolationLevel::Level0HostDirect => {
+                vec![String::from("reboot"), String::from("kexec_load")]
+            }
             MicroVmIsolationLevel::Level1LandlockCapsicumSandbox => vec![
                 String::from("mknod"),
                 String::from("ptrace"),
@@ -186,7 +188,9 @@ impl SovereignPqcSigstoreWebOfTrustAttestationGovernor {
             PqcSignatureScheme::Ed25519Signify
         };
 
-        let slsa_level = if attestation_payload.contains("hermetic") || attestation_payload.contains("reproducible") {
+        let slsa_level = if attestation_payload.contains("hermetic")
+            || attestation_payload.contains("reproducible")
+        {
             SlsaAttestationLevel::SlsaLevel4HermeticReproducible
         } else if attestation_payload.contains("hardened") {
             SlsaAttestationLevel::SlsaLevel3HardenedBuild
@@ -462,7 +466,8 @@ impl SovereignDistroPackageAdvancementsSuiteV15 {
             attestation_governor: SovereignPqcSigstoreWebOfTrustAttestationGovernor::new(),
             delta_p2p_distributor: SovereignDeltaP2pCasPackageDistributionEngine::new(),
             abi_solver: SovereignCrossDistroAbiSonameDependencyGraphSolver::new(),
-            boot_rollback_governor: SovereignAtomicBectlSnapperBootEnvironmentRollbackGovernor::new(),
+            boot_rollback_governor: SovereignAtomicBectlSnapperBootEnvironmentRollbackGovernor::new(
+            ),
         }
     }
 }
@@ -499,7 +504,9 @@ mod tests {
         );
         assert_eq!(report.exit_code, 0);
         assert!(report.sandbox_verified);
-        assert!(report.blocked_sys_calls.contains(&String::from("raw_socket")));
+        assert!(report
+            .blocked_sys_calls
+            .contains(&String::from("raw_socket")));
     }
 
     #[test]
@@ -534,7 +541,11 @@ mod tests {
         assert!(reconstituted.starts_with(b"BASE_RPM_HEADER"));
         assert!(reconstituted.ends_with(b"_DRPM_"));
 
-        let peers = delta_engine.broadcast_cas_chunk_p2p("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855").unwrap();
+        let peers = delta_engine
+            .broadcast_cas_chunk_p2p(
+                "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            )
+            .unwrap();
         assert!(peers >= 4);
     }
 
@@ -554,7 +565,9 @@ mod tests {
 
         assert_eq!(res.package_name, "openssl");
         assert!(res.symbol_abi_compatible);
-        assert!(res.resolved_sonames.contains(&String::from("libcrypto.so.3")));
+        assert!(res
+            .resolved_sonames
+            .contains(&String::from("libcrypto.so.3")));
     }
 
     #[test]
@@ -566,7 +579,10 @@ mod tests {
             .unwrap();
 
         assert_eq!(snap_id, 5001);
-        assert_eq!(rollback.snapshots.get(&snap_id).unwrap().label, "pre-upgrade-6.8.0");
+        assert_eq!(
+            rollback.snapshots.get(&snap_id).unwrap().label,
+            "pre-upgrade-6.8.0"
+        );
 
         let rolled_back = rollback.rollback_boot_environment(snap_id).unwrap();
         assert_eq!(rolled_back.snapshot_id, snap_id);
@@ -577,7 +593,15 @@ mod tests {
     fn test_master_suite_v15() {
         let suite = SovereignDistroPackageAdvancementsSuiteV15::new();
         assert_eq!(
-            suite.isolator.execute_isolated_scriptlet("test", "echo ok", MicroVmIsolationLevel::Level0HostDirect).unwrap().exit_code,
+            suite
+                .isolator
+                .execute_isolated_scriptlet(
+                    "test",
+                    "echo ok",
+                    MicroVmIsolationLevel::Level0HostDirect
+                )
+                .unwrap()
+                .exit_code,
             0
         );
     }

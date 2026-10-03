@@ -14,12 +14,12 @@ pub mod page_fault;
 pub mod virtual_memory;
 
 pub use mmap::{
-    MmapAddressSpace, MmapBacking, MmapError, MmapFlags, MmapProt,
-    do_mmap, do_mprotect, do_munmap, find_vma, list_vmas,
+    do_mmap, do_mprotect, do_munmap, find_vma, list_vmas, MmapAddressSpace, MmapBacking, MmapError,
+    MmapFlags, MmapProt,
 };
 pub use page_fault::{
-    FrameAllocator, PageFaultFlags, PageFaultResult, PageTable, PhysPage,
-    VirtualMemoryArea, VmaBacking, VmaFlags, handle_page_fault,
+    handle_page_fault, FrameAllocator, PageFaultFlags, PageFaultResult, PageTable, PhysPage,
+    VirtualMemoryArea, VmaBacking, VmaFlags,
 };
 
 /// Error type for the Mm module

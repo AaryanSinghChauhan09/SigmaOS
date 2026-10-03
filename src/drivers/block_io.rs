@@ -390,7 +390,13 @@ mod tests {
         queue
             .submit(BlockIoRequest::new(0, BioOp::Read, 8, 8, BioFlags::DEFAULT))
             .unwrap();
-        let result = queue.submit(BlockIoRequest::new(0, BioOp::Read, 16, 8, BioFlags::DEFAULT));
+        let result = queue.submit(BlockIoRequest::new(
+            0,
+            BioOp::Read,
+            16,
+            8,
+            BioFlags::DEFAULT,
+        ));
         assert_eq!(result, Err(BlockIoError::QueueFull));
     }
 
@@ -399,7 +405,13 @@ mod tests {
         let mut queue = BlockRequestQueue::new("test", 16, IoScheduler::Deadline);
         // Add write first
         queue
-            .submit(BlockIoRequest::new(0, BioOp::Write, 0, 8, BioFlags::DEFAULT))
+            .submit(BlockIoRequest::new(
+                0,
+                BioOp::Write,
+                0,
+                8,
+                BioFlags::DEFAULT,
+            ))
             .unwrap();
         // Add read second
         queue

@@ -1,6 +1,6 @@
 // SigmaOS Virtualization Module
-pub mod kvm_vcpu;
 pub mod kvm;
+pub mod kvm_vcpu;
 pub mod oci_pod;
 pub mod orchestration;
 pub mod rancher;

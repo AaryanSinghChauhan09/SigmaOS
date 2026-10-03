@@ -67,7 +67,8 @@ impl SovereignOmarchyGamingGovernor {
     pub fn engage_gaming_mode(&mut self, target_pid: u32) -> Result<String, &'static str> {
         self.active_profile.elevated_process_pid = Some(target_pid);
         self.is_gaming_mode_active.store(true, Ordering::SeqCst);
-        self.total_gaming_sessions_launched.fetch_add(1, Ordering::Relaxed);
+        self.total_gaming_sessions_launched
+            .fetch_add(1, Ordering::Relaxed);
 
         Ok(format!(
             "Gaming Mode ENGAGED: PID {} elevated to RT priority. USB Polling: {}Hz, Governor: {:?}, VRR: Active.",
@@ -80,7 +81,10 @@ impl SovereignOmarchyGamingGovernor {
         self.active_profile.elevated_process_pid = None;
         self.is_gaming_mode_active.store(false, Ordering::SeqCst);
 
-        Ok("Gaming Mode DISENGAGED: System restored to standard schedutil/powersave balance.".to_string())
+        Ok(
+            "Gaming Mode DISENGAGED: System restored to standard schedutil/powersave balance."
+                .to_string(),
+        )
     }
 }
 
@@ -150,7 +154,12 @@ impl SovereignOmarchyHudEngine {
 
         format!(
             "FPS: {} | FrameTime: {:.2}ms | CPU: {}% | GPU: {}% | VRAM: {}MB | Temp: {}°C",
-            fps, frametime_ms, last_sample.cpu_usage_pct, last_sample.gpu_usage_pct, last_sample.vram_used_mb, last_sample.temp_celsius
+            fps,
+            frametime_ms,
+            last_sample.cpu_usage_pct,
+            last_sample.gpu_usage_pct,
+            last_sample.vram_used_mb,
+            last_sample.temp_celsius
         )
     }
 }
@@ -232,7 +241,10 @@ impl SovereignOmarchyDeveloperStacks {
 
     /// Provision and activate a developer toolchain stack
     pub fn provision_stack(&mut self, stack_name: &str) -> Result<String, &'static str> {
-        let toolchain = self.toolchains.get_mut(stack_name).ok_or("Unknown developer stack")?;
+        let toolchain = self
+            .toolchains
+            .get_mut(stack_name)
+            .ok_or("Unknown developer stack")?;
         toolchain.is_installed = true;
         Ok(format!(
             "Toolchain '{}' (version: {}) successfully provisioned to {}",

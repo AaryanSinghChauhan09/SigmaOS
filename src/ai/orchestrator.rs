@@ -153,14 +153,22 @@ impl AgentOrchestrator for SimpleAgentOrchestrator {
         Ok(id)
     }
 
-    fn dispatch_task(&mut self, task: &[u8], agent_id: Option<AgentID>) -> Result<Vec<u8>, AgentError> {
+    fn dispatch_task(
+        &mut self,
+        task: &[u8],
+        agent_id: Option<AgentID>,
+    ) -> Result<Vec<u8>, AgentError> {
         if let Some(target_id) = agent_id {
             if let Some(agent) = self.agents.iter_mut().find(|a| a.id() == target_id) {
                 agent.execute(task)
             } else {
                 Err(AgentError::NotFound)
             }
-        } else if let Some(agent) = self.agents.iter_mut().find(|a| a.state() == AgentState::Idle) {
+        } else if let Some(agent) = self
+            .agents
+            .iter_mut()
+            .find(|a| a.state() == AgentState::Idle)
+        {
             agent.execute(task)
         } else {
             Err(AgentError::NotFound)
@@ -168,7 +176,10 @@ impl AgentOrchestrator for SimpleAgentOrchestrator {
     }
 
     fn get_agent(&self, id: AgentID) -> Option<&dyn AIAgent> {
-        self.agents.iter().find(|a| a.id() == id).map(|a| a.as_ref())
+        self.agents
+            .iter()
+            .find(|a| a.id() == id)
+            .map(|a| a.as_ref())
     }
 
     fn list_agents(&self) -> Vec<AgentID> {
