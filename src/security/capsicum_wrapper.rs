@@ -4,11 +4,26 @@
 //! rights and process capability restrictions.
 
 use std::collections::HashMap;
+use std::ops::{BitOr, BitOrAssign};
 use std::sync::atomic::{AtomicU32, Ordering};
 
 /// Capsicum capability rights
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct CapRights(u64);
+
+impl BitOr for CapRights {
+    type Output = Self;
+
+    fn bitor(self, rhs: Self) -> Self::Output {
+        CapRights(self.0 | rhs.0)
+    }
+}
+
+impl BitOrAssign for CapRights {
+    fn bitor_assign(&mut self, rhs: Self) {
+        self.0 |= rhs.0;
+    }
+}
 
 impl CapRights {
     pub const READ: CapRights = CapRights(0x00000001);

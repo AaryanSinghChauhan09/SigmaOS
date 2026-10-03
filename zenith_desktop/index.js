@@ -11,12 +11,15 @@
  */
 export class SovereignDomSelector {
   static selectOne(selector, root = typeof document !== "undefined" ? document : null) {
-    if (!root || typeof root.querySelector !== "function") return null;
-    try {
-      return root.querySelector(selector);
-    } catch (e) {
-      return null;
+    if (!root) return null;
+    if (typeof root.querySelector === "function") {
+      try {
+        const res = root.querySelector(selector);
+        if (res) return res;
+      } catch (e) {}
     }
+    const all = this.selectAll(selector, root);
+    return all.length > 0 ? all[0] : null;
   }
 
   static selectAll(selector, root = typeof document !== "undefined" ? document : null) {
@@ -782,12 +785,41 @@ const APP_WIN_MAP = {
 
 let topZIndex = 100;
 
+export function restoreFocusAfterWindowClose(closedWin) {
+  if (typeof document === "undefined") return;
+  const windows = SovereignDomSelector.selectAll(".window").filter(
+    (w) => w !== closedWin && w.style.display !== "none" && w.getAttribute("aria-hidden") !== "true"
+  );
+  if (windows.length > 0) {
+    windows.sort((a, b) => (Number(b.style.zIndex) || 0) - (Number(a.style.zIndex) || 0));
+    const topWin = windows[0];
+    topWin.classList.add("active-focus");
+    const focusable = SovereignDomSelector.selectOne('input, button, [tabindex="0"]', topWin);
+    if (focusable && typeof focusable.focus === "function") {
+      focusable.focus();
+      return;
+    }
+  }
+  const dockBtn = SovereignDomSelector.selectOne('.dock-icon');
+  if (dockBtn && typeof dockBtn.focus === "function") {
+    dockBtn.focus();
+  }
+}
+
 export function closeWindow(winId) {
   const win = typeof winId === "string" ? document.getElementById(winId) : winId;
   if (!win) return;
+  const wasFocused = win.classList.contains("active-focus") || (typeof document !== "undefined" && document.activeElement && win.contains && win.contains(document.activeElement));
   win.style.display = "none";
   win.setAttribute("aria-hidden", "true");
   win.classList.remove("active-focus");
+  if (wasFocused) {
+    restoreFocusAfterWindowClose(win);
+  }
+}
+
+export function minimizeWindow(winId) {
+  closeWindow(winId);
 }
 
 export function maximizeWindow(winId) {
@@ -808,6 +840,13 @@ export function launchApp(appName) {
   if (!win) return;
 
   const isHidden = win.style.display === "none" || (typeof getComputedStyle === "function" && getComputedStyle(win).display === "none");
+  const isActiveFocus = win.classList.contains("active-focus");
+
+  if (!isHidden && isActiveFocus) {
+    minimizeWindow(win);
+    return;
+  }
+
   if (isHidden) {
     win.style.display = "flex";
     win.setAttribute("aria-hidden", "false");
@@ -828,13 +867,13 @@ export function launchApp(appName) {
 
 if (typeof window !== "undefined") {
   window.closeWindow = closeWindow;
+  window.minimizeWindow = minimizeWindow;
   window.maximizeWindow = maximizeWindow;
   window.launchApp = launchApp;
   window.toggleHelp = toggleHelp;
   window.renderCommandResults = renderCommandResults;
   window.initCommandPalette = initCommandPalette;
   window.initWindowFocus = initWindowFocus;
-  window.toggleHelp = toggleHelp;
 }
 
 // Minimal dummy index file to export initialization and basic attributes

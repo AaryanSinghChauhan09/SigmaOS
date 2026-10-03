@@ -11,6 +11,10 @@ pub mod tcp;
 pub mod tcp_udp;
 pub mod wireless_manager;
 pub mod zenithnet;
+pub mod arp;
+pub mod icmp;
+pub mod tcp_complete;
+pub mod bluetooth;
 
 pub use device_discovery::{
     DeviceDiscoverySyncEngine, DeviceType, DiscoveredPeerDevice, DiscoveryProtocol,
@@ -45,6 +49,14 @@ pub use socket::{
 pub use zenithnet::{
     EthernetFrame, IpProtocol, Ipv4Addr, Ipv4Header, MacAddr, NetworkError, NetworkInterface,
     PacketType, TcpHeader, TcpState as ZenithTcpState, UdpHeader, ZenithNet,
+};
+pub use arp::{
+    ArpPacket, ArpOperation, ArpHardwareType, ArpCache, ArpCacheEntry,
+    ArpHandler, ArpStats, ArpError,
+};
+pub use icmp::{
+    IcmpPacket, IcmpHeader, IcmpType, IcmpHandler, IcmpStats,
+    IcmpUnreachableCode, IcmpTimeExceededCode, IcmpError,
 };
 
 #[path = "sovereign_async_io.rs"]

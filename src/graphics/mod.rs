@@ -1,5 +1,6 @@
 pub mod gaming_layer;
 pub use gaming_layer::*;
+pub mod vulkan_api;
 
 // Core Graphics and Composition Modules for SigmaOS
 pub mod advanced_accel;
