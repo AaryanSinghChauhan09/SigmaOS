@@ -34,18 +34,6 @@ pub fn secure_zeroize<T: Copy + Default>(slice: &mut [T]) {
     }
 }
 
-/// Memory protection flags
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum MemoryPermission {
-    None,
-    Read,
-    Write,
-    Execute,
-    ReadWrite,
-    ReadExecute,
-    ReadWriteExecute,
-}
-
 /// Memory protection state
 #[derive(Debug, Clone)]
 pub struct MemoryProtectionState {

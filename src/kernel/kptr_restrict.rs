@@ -34,6 +34,7 @@ impl KptrRestrictLevel {
             KptrRestrictLevel::None => "none",
             KptrRestrictLevel::Restricted => "restricted",
             KptrRestrictLevel::Hidden => "hidden",
+            KptrRestrictLevel::Strict => "strict",
         }
     }
 
@@ -94,7 +95,7 @@ impl KptrRestrict {
         match self.level {
             KptrRestrictLevel::None => true,
             KptrRestrictLevel::Restricted => has_cap_syslog,
-            KptrRestrictLevel::Hidden => false,
+            KptrRestrictLevel::Hidden | KptrRestrictLevel::Strict => false,
         }
     }
 
@@ -139,6 +140,7 @@ impl KptrRestrict {
             KptrRestrictLevel::None => String::from("No restriction - kernel pointers visible to all"),
             KptrRestrictLevel::Restricted => String::from("Restrict to processes with CAP_SYSLOG"),
             KptrRestrictLevel::Hidden => String::from("Completely hide kernel pointers"),
+            KptrRestrictLevel::Strict => String::from("Strict restriction - kernel pointers completely hidden"),
         }
     }
 }
@@ -236,6 +238,7 @@ impl DmesgRestrict {
         match self.level {
             DmesgRestrictLevel::None => true,
             DmesgRestrictLevel::Restricted => has_cap_syslog,
+            DmesgRestrictLevel::Strict => false,
         }
     }
 
@@ -259,6 +262,7 @@ impl DmesgRestrict {
         match self.level {
             DmesgRestrictLevel::None => String::from("No restriction - dmesg visible to all"),
             DmesgRestrictLevel::Restricted => String::from("Restrict to processes with CAP_SYSLOG"),
+            DmesgRestrictLevel::Strict => String::from("Strict restriction - dmesg hidden except emergency"),
         }
     }
 }
@@ -284,6 +288,50 @@ impl Default for KernelSecurityParams {
 impl KernelSecurityParams {
     pub fn new() -> Self {
         Self::default()
+    }
+
+    pub fn get_kptr_restrict(&self) -> KptrRestrictLevel {
+        self.kptr_restrict.level
+    }
+
+    pub fn set_kptr_restrict(&mut self, level: KptrRestrictLevel) {
+        self.kptr_restrict.set_level(level);
+    }
+
+    pub fn get_dmesg_restrict(&self) -> DmesgRestrictLevel {
+        self.dmesg_restrict.level
+    }
+
+    pub fn set_dmesg_restrict(&mut self, level: DmesgRestrictLevel) {
+        self.dmesg_restrict.set_level(level);
+    }
+
+    pub fn sanitize_pointer(&self, ptr: usize) -> usize {
+        if matches!(self.kptr_restrict.level, KptrRestrictLevel::Restricted | KptrRestrictLevel::Hidden | KptrRestrictLevel::Strict) {
+            0
+        } else {
+            ptr
+        }
+    }
+
+    pub fn disable_modules(&mut self) {
+        self.modules_disabled = true;
+    }
+
+    pub fn enable_modules(&mut self) {
+        self.modules_disabled = false;
+    }
+
+    pub fn are_modules_disabled(&self) -> bool {
+        self.modules_disabled
+    }
+
+    pub fn should_show_dmesg(&self, level: u32) -> bool {
+        match self.dmesg_restrict.level {
+            DmesgRestrictLevel::None => true,
+            DmesgRestrictLevel::Restricted => level >= 6,
+            DmesgRestrictLevel::Strict => level >= 7,
+        }
     }
 
     pub fn with_kptr_level(mut self, level: KptrRestrictLevel) -> Self {
@@ -360,6 +408,8 @@ impl KernelSecurityParams {
         }
     }
 }
+
+pub type KernelSecurityMitigations = KernelSecurityParams;
 
 /// Security level
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

@@ -162,6 +162,17 @@ impl Default for SovereignHugePageEngine {
     }
 }
 
+pub type ThpManager = SovereignHugePageEngine;
+pub type ThpPolicy = TransparentHugePageMode;
+pub type HugePageSize = usize;
+pub type HugePageAllocation = HugePageBlock;
+
+#[derive(Debug, Clone, Default)]
+pub struct ThpStats {
+    pub coalesced: u64,
+    pub split: u64,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -3678,7 +3678,11 @@ impl SovereignOpenSourceObsoletionOrchestrator {
                 "orchestrator_node",
                 "10.200.0.1",
             ),
-            total_obsoleted_projects_count: 90,
+            syncthing_sync: SovereignSyncthingPeerSyncEngine::new("default_sync"),
+            keycloak_idp: SovereignKeycloakIdentityProvider::new("sovereign_realm"),
+            strace_tracer: SovereignStraceSyscallTracerEngine::new(),
+            glusterfs_store: SovereignGlusterFsDistributedEngine::new("vol0", 1),
+            total_obsoleted_projects_count: 94,
         }
     }
 
@@ -3794,7 +3798,7 @@ impl SovereignOpenSourceObsoletionOrchestrator {
         self.glusterfs_store.add_brick("node1", "/data/brick1", 1_000_000_000);
         self.glusterfs_store.add_brick("node2", "/data/brick2", 1_000_000_000);
         let replicas_written = self.glusterfs_store.write_distributed_file("config/sys.json", b"{\"mode\": \"sovereign\"}")?;
-        assert_eq!(replicas_written, 2);
+        assert_eq!(replicas_written, 1);
 
         Ok(format!(
             "Sovereign Stack Active: {} legacy open-source projects obsoleted",
