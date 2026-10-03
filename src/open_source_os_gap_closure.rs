@@ -23,8 +23,7 @@
 
 // (no_std only applicable at crate root - removed)
 
-#[cfg(test)]
-mod open_source_obsoletion {
+pub mod open_source_obsoletion {
     pub struct SovereignStarshipPromptEngine {
         pub dir: String,
     }
