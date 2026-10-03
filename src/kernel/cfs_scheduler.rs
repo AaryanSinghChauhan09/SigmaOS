@@ -34,12 +34,12 @@ const MIN_GRANULARITY_NS: u64 = 750_000; // 0.75ms minimum granularity
 const NICE_WEIGHTS: [u32; 40] = [
     88761, 71755, 56483, 46273, 36291, // -20 to -16
     29154, 23254, 18705, 14949, 11916, // -15 to -11
-    9548, 7620, 6100, 4904, 3906,      // -10 to -6
-    3121, 2501, 1991, 1586, 1277,      // -5 to -1
-    1024, 820, 655, 526, 423,          // 0 to 4
-    335, 272, 215, 172, 137,           // 5 to 9
-    110, 87, 70, 56, 45,               // 10 to 14
-    36, 29, 23, 18, 15,                // 15 to 19
+    9548, 7620, 6100, 4904, 3906, // -10 to -6
+    3121, 2501, 1991, 1586, 1277, // -5 to -1
+    1024, 820, 655, 526, 423, // 0 to 4
+    335, 272, 215, 172, 137, // 5 to 9
+    110, 87, 70, 56, 45, // 10 to 14
+    36, 29, 23, 18, 15, // 15 to 19
 ];
 
 /// Convert nice value to weight
@@ -109,14 +109,22 @@ impl PartialOrd for SchedEntity {
 
 impl Ord for SchedEntity {
     fn cmp(&self, other: &Self) -> Ordering {
-        // Order by vruntime (lower is higher priority)
-        self.vruntime.cmp(&other.vruntime)
+        // Primary order: vruntime (lower = higher priority).
+        // Tie-break on task id so distinct tasks with identical vruntime
+        // remain distinct set members (new tasks are placed at min_vruntime,
+        // so ties are the common case, not the exception).
+        self.vruntime
+            .cmp(&other.vruntime)
+            .then_with(|| self.id.cmp(&other.id))
     }
 }
 
 impl PartialEq for SchedEntity {
     fn eq(&self, other: &Self) -> bool {
-        self.id == other.id
+        // Consistent with Ord: identity is (vruntime, id). The old id-only
+        // equality disagreed with the ordering contract, which BTreeSet
+        // requires to be strictly consistent (Ord == Equal <=> Eq).
+        self.vruntime == other.vruntime && self.id == other.id
     }
 }
 
@@ -124,8 +132,15 @@ impl Eq for SchedEntity {}
 
 /// Per-CPU run queue
 pub struct CfsRunQueue {
-    /// Red-black tree of runnable tasks (ordered by vruntime)
-    tasks: BTreeMap<u64, SchedEntity>,
+    /// Runnable tasks ordered by (vruntime, id) — red-black tree semantics
+    /// via BTreeMap. Keying on the composite (vruntime, id) fixes a task-loss
+    /// bug: the old vruntime-only key made two tasks sharing one vruntime
+    /// overwrite each other, silently dropping one from the queue (new
+    /// tasks are placed at min_vruntime, so ties are the common case).
+    tasks: BTreeMap<(u64, usize), SchedEntity>,
+    /// Secondary index: task id -> vruntime, enabling O(log n) dequeue by id
+    /// instead of a full O(n) scan over the tree.
+    id_index: BTreeMap<usize, u64>,
     /// Minimum vruntime (for new task placement)
     min_vruntime: u64,
     /// Number of runnable tasks
@@ -140,6 +155,7 @@ impl CfsRunQueue {
     pub fn new() -> Self {
         Self {
             tasks: BTreeMap::new(),
+            id_index: BTreeMap::new(),
             min_vruntime: 0,
             nr_running: 0,
             load_weight: 0,
@@ -157,51 +173,42 @@ impl CfsRunQueue {
 
         self.load_weight += task.weight as u64;
         self.nr_running += 1;
-        
-        // Insert into red-black tree (BTreeMap maintains order)
-        self.tasks.insert(task.vruntime, task);
+
+        // Insert into red-black tree keyed by (vruntime, id)
+        self.id_index.insert(task.id, task.vruntime);
+        self.tasks.insert((task.vruntime, task.id), task);
     }
 
     /// Remove task from run queue
     /// Linux: `kernel/sched/fair.c:dequeue_entity()`
+    /// O(log n) via the id -> vruntime secondary index.
     pub fn dequeue(&mut self, task_id: usize) -> Option<SchedEntity> {
-        let mut found = None;
-        
-        for (&vruntime, task) in &self.tasks {
-            if task.id == task_id {
-                found = Some(vruntime);
-                break;
-            }
-        }
-
-        if let Some(vruntime) = found {
-            let task = self.tasks.remove(&vruntime)?;
-            self.load_weight -= task.weight as u64;
-            self.nr_running -= 1;
-            Some(task)
-        } else {
-            None
-        }
+        let vruntime = self.id_index.remove(&task_id)?;
+        let task = self.tasks.remove(&(vruntime, task_id))?;
+        self.load_weight -= task.weight as u64;
+        self.nr_running -= 1;
+        Some(task)
     }
 
     /// Pick next task to run
     /// Linux: `kernel/sched/fair.c:pick_next_entity()`
     pub fn pick_next(&mut self) -> Option<SchedEntity> {
         // Get task with minimum vruntime (leftmost in tree)
-        if let Some((&vruntime, _)) = self.tasks.iter().next() {
-            self.tasks.remove(&vruntime)
-        } else {
-            None
-        }
+        let first_key = *self.tasks.keys().next()?;
+        let task = self.tasks.remove(&first_key)?;
+        self.id_index.remove(&task.id);
+        self.nr_running -= 1;
+        self.load_weight -= task.weight as u64;
+        Some(task)
     }
 
     /// Update min_vruntime
     /// Linux: `kernel/sched/fair.c:update_min_vruntime()`
     pub fn update_min_vruntime(&mut self) {
-        if let Some((&vruntime, _)) = self.tasks.iter().next() {
+        if let Some(&(vruntime, _)) = self.tasks.keys().next() {
             self.min_vruntime = self.min_vruntime.max(vruntime);
         }
-        
+
         if let Some(ref current) = self.current {
             self.min_vruntime = self.min_vruntime.max(current.vruntime);
         }
@@ -215,8 +222,9 @@ impl CfsRunQueue {
         }
 
         // Time slice = target_latency * (task_weight / total_weight)
-        let slice = (SCHED_LATENCY_NS as u128 * task.weight as u128 / self.load_weight as u128) as u64;
-        
+        let slice =
+            (SCHED_LATENCY_NS as u128 * task.weight as u128 / self.load_weight as u128) as u64;
+
         // Ensure minimum granularity
         slice.max(MIN_GRANULARITY_NS)
     }
@@ -285,7 +293,7 @@ impl CfsScheduler {
         }
 
         let rq = &mut self.run_queues[cpu];
-        
+
         // Put current task back if it's still runnable
         if let Some(mut current) = rq.current.take() {
             if current.state == TaskState::Runnable {
@@ -297,7 +305,7 @@ impl CfsScheduler {
         let next = rq.pick_next()?;
         rq.current = Some(next.clone());
         rq.update_min_vruntime();
-        
+
         Some(next)
     }
 
@@ -392,10 +400,10 @@ mod tests {
     fn test_runqueue_operations() {
         let mut rq = CfsRunQueue::new();
         let task = SchedEntity::new(1, 0);
-        
+
         rq.enqueue(task);
         assert_eq!(rq.nr_running, 1);
-        
+
         let picked = rq.pick_next();
         assert!(picked.is_some());
         assert_eq!(rq.nr_running, 0);
@@ -405,5 +413,47 @@ mod tests {
     fn test_scheduler_creation() {
         let sched = CfsScheduler::new(4);
         assert_eq!(sched.run_queues.len(), 4);
+    }
+
+    /// Regression: two tasks entering the queue with identical vruntime
+    /// (the common case — new tasks are placed at min_vruntime) must both
+    /// remain runnable. The old vruntime-keyed BTreeMap silently dropped
+    /// one of them.
+    #[test]
+    fn test_equal_vruntime_no_task_loss() {
+        let mut rq = CfsRunQueue::new();
+        let t1 = SchedEntity::new(1, 0);
+        let t2 = SchedEntity::new(2, 0);
+        rq.enqueue(t1);
+        rq.enqueue(t2);
+        assert_eq!(rq.nr_running, 2, "both equal-vruntime tasks must survive");
+
+        let first = rq.pick_next().expect("first task");
+        let second = rq.pick_next().expect("second task must not be lost");
+        assert_ne!(first.id, second.id);
+        assert_eq!(rq.nr_running, 0);
+    }
+
+    /// Dequeue-by-id must be O(log n) via the secondary index and must
+    /// remove exactly the requested task, not any other equal-vruntime one.
+    #[test]
+    fn test_dequeue_by_id_removes_requested_task() {
+        let mut rq = CfsRunQueue::new();
+        for id in 1..=8 {
+            rq.enqueue(SchedEntity::new(id, 0));
+        }
+        assert_eq!(rq.nr_running, 8);
+
+        let removed = rq.dequeue(5).expect("task 5 must dequeue");
+        assert_eq!(removed.id, 5);
+        assert_eq!(rq.nr_running, 7);
+
+        // All other tasks still schedulable.
+        let mut ids = vec![];
+        while let Some(t) = rq.pick_next() {
+            ids.push(t.id);
+        }
+        assert_eq!(ids.len(), 7);
+        assert!(!ids.contains(&5));
     }
 }
