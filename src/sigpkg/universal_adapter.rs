@@ -14,8 +14,13 @@ pub use crate::sigpkg::Version;
 /// Translates containerized permissions (Plugs, Plugs/Slots, Finish-args) directly into SigmaOS Capability Gate Permissions.
 use crate::sigpkg::{Dependency, Package, VersionConstraint};
 
+// Standalone-test bridge: in the mock harness (tests/test_universal_adapter.rs)
+// the OOP system is exposed both at the crate root and re-exported through
+// `sigpkg`; in the full crate it lives at `crate::sigpkg::universal_oop_system`.
+// The old path (`crate::universal_oop_system`) existed nowhere and broke
+// --all-features builds (E0432).
 #[cfg(feature = "standalone_test")]
-pub use crate::universal_oop_system;
+pub use crate::sigpkg::universal_oop_system;
 
 /// Description of Arch Linux PKGBUILD Manifest (pacman parity)
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -1869,6 +1874,25 @@ impl SigPkgUniversalBridgeEngine {
         }
     }
 
+    /// The metadata `version` field is typed by the sigpkg SemVer struct in
+    /// full-crate builds, but by universal_oop_system's own Version under the
+    /// standalone_test lane (see the cfg split in universal_oop_system.rs).
+    /// Routing through this helper keeps both lanes — and the mock harness,
+    /// where sigpkg re-exports the OOP types — type-checking identically.
+    #[cfg(not(feature = "standalone_test"))]
+    fn metadata_version(major: u64, minor: u64, patch: u64) -> crate::sigpkg::Version {
+        crate::sigpkg::Version::new(major, minor, patch)
+    }
+
+    #[cfg(feature = "standalone_test")]
+    fn metadata_version(
+        major: u64,
+        minor: u64,
+        patch: u64,
+    ) -> crate::sigpkg::universal_oop_system::Version {
+        crate::sigpkg::universal_oop_system::Version::new(major, minor, patch)
+    }
+
     /// Converts a foreign package manifest and registers it into the Universal Package Manager
     pub fn absorb_and_register(
         &mut self,
@@ -1879,7 +1903,7 @@ impl SigPkgUniversalBridgeEngine {
         let standard_pkg = crate::sigpkg::universal_oop_system::StandardPackage {
             metadata: crate::sigpkg::universal_oop_system::PackageMetadata {
                 name: native_pkg.name.clone(),
-                version: crate::sigpkg::Version::new(
+                version: Self::metadata_version(
                     native_pkg.version.major,
                     native_pkg.version.minor,
                     native_pkg.version.patch,

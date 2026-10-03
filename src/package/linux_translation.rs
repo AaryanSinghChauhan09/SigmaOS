@@ -35,6 +35,12 @@ impl SimpleDriver {
 #[path = "universal.rs"]
 pub mod universal;
 
+// PackageFormat for the standalone_test build lane: resolved from the
+// sibling universal.rs module included above (this file is also compiled
+// standalone as its own crate root, where crate::package does not exist).
+#[cfg(feature = "standalone_test")]
+use universal::PackageFormat;
+
 #[cfg(feature = "standalone_test")]
 use core::sync::atomic::{AtomicBool, Ordering};
 #[cfg(feature = "standalone_test")]

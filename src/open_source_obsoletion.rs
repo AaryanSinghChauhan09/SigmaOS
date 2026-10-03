@@ -10,7 +10,10 @@ use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
 
-#[cfg(not(feature = "standalone_test"))]
+// The gap-closure subsystem is fully self-contained (zero `crate::` imports),
+// so it is always compiled as a submodule — under `standalone_test` full-crate
+// builds the previous cfg gate removed the module while this file and lib.rs
+// still referenced it (E0432 unresolved imports under --all-features).
 #[path = "open_source_os_gap_closure.rs"]
 pub mod open_source_os_gap_closure;
 
