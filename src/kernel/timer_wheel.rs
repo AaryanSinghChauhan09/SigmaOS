@@ -125,9 +125,8 @@ pub struct TimerWheelLevel {
 
 impl TimerWheelLevel {
     pub fn new(granularity: u64) -> Self {
-        const BUCKET: TimerBucket = TimerBucket::new();
         Self {
-            buckets: [BUCKET; WHEEL_SIZE],
+            buckets: core::array::from_fn(|_| TimerBucket::new()),
             granularity,
             index: 0,
         }
@@ -280,34 +279,9 @@ pub struct TimerManager {
 }
 
 impl TimerManager {
-    pub const fn new() -> Self {
+    pub fn new() -> Self {
         Self {
-            wheel: TimerWheel {
-                current_tick: 0,
-                next_id: 1,
-                levels: [
-                    TimerWheelLevel {
-                        buckets: [TimerBucket { head: None }; WHEEL_SIZE],
-                        granularity: 1,
-                        index: 0,
-                    },
-                    TimerWheelLevel {
-                        buckets: [TimerBucket { head: None }; WHEEL_SIZE],
-                        granularity: 256,
-                        index: 0,
-                    },
-                    TimerWheelLevel {
-                        buckets: [TimerBucket { head: None }; WHEEL_SIZE],
-                        granularity: 65536,
-                        index: 0,
-                    },
-                    TimerWheelLevel {
-                        buckets: [TimerBucket { head: None }; WHEEL_SIZE],
-                        granularity: 16777216,
-                        index: 0,
-                    },
-                ],
-            },
+            wheel: TimerWheel::new(),
         }
     }
 

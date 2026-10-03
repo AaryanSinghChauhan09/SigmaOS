@@ -156,7 +156,7 @@ impl Framebuffer {
                 let bit = (glyph[row] >> (7 - col)) & 1;
                 let color = if bit == 1 { fg } else { bg };
                 unsafe {
-                    self.draw_pixel(x + col, y + row, color);
+                    self.draw_pixel(x + col as u32, y + row as u32, color);
                 }
             }
         }

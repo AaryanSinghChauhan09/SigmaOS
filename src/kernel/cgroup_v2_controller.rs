@@ -54,7 +54,7 @@ impl CpuController {
 }
 
 /// Memory controller configuration
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug)]
 pub struct MemoryController {
     /// Memory limit (bytes, 0 = unlimited)
     pub max: u64,
@@ -121,7 +121,7 @@ impl IoController {
 }
 
 /// PIDs controller configuration
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug)]
 pub struct PidsController {
     /// Maximum number of processes (0 = unlimited)
     pub max: u64,
