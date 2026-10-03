@@ -597,7 +597,6 @@ impl IntelHdaCodecVerbEngine {
 
 #[cfg(test)]
 mod low_level_hw_expansion_tests {
-    use super::*;
 
     #[test]
     fn test_pcie_bar_mmio_region() {

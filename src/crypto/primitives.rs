@@ -81,19 +81,12 @@ impl SHA256 {
     }
 
     pub fn finalize(mut self) -> SHA256Hash {
-        // Append padding
         let bit_len = self.total_len.wrapping_mul(8);
-        let bit_len = self.total_len * 8;
         let padding = [
             0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        let bit_len = self.total_len * 8;
-        let padding = [
-            0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0,
         ];
 
         let mut offset = 0;
@@ -372,9 +365,6 @@ pub fn sha256_hash(data: &[u8]) -> SHA256Hash {
     hasher.finalize()
 }
 
-/// Secure randomness is unavailable until a real entropy provider is wired in.
-pub fn random_bytes(_buf: &mut [u8]) -> Result<(), PrimitiveError> {
-    Err(PrimitiveError::ProviderNotIntegrated)
 /// Generate random bytes with enhanced entropy collection
 pub fn random_bytes(buf: &mut [u8]) {
     static mut RNG: Option<XorshiftRNG> = None;

@@ -246,8 +246,6 @@ impl NotificationSystem {
 
         // Always allow critical if configured
         if self.dnd_config.allow_critical && notification.priority == Priority::Critical {
-        if self.dnd_config.allow_critical &&
-           notification.priority == Priority::Critical {
             return false;
         }
 
@@ -353,8 +351,6 @@ impl NotificationSystem {
     pub fn search_history(&self, query: &str) -> Vec<Notification> {
         let query = query.to_lowercase();
 
-        self.history
-            .iter()
         self.history.iter()
             .filter_map(|id| self.notifications.get(id))
             .filter(|n| {
@@ -479,7 +475,6 @@ pub mod presets {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_notification_creation() {

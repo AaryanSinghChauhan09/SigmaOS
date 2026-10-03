@@ -404,7 +404,6 @@ impl ServiceManager {
 
 #[cfg(test_disabled)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_config_manager() {

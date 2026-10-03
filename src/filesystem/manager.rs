@@ -865,7 +865,6 @@ mod tests {
         assert_eq!(renames.len(), 2);
         assert_eq!(renames[0].1, "doc_v1.txt");
     }
-    use super::*;
 
     #[test]
     fn test_file_item() {
@@ -940,7 +939,6 @@ mod tests {
 
 #[cfg(test)]
 mod open_source_file_manager_tests {
-    use super::*;
 
     #[test]
     fn test_dual_pane_manager_mode() {
@@ -1141,7 +1139,6 @@ impl Default for OpenSourceFileManagerEnhancementEngine {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_opensource_file_manager_enhancements() {

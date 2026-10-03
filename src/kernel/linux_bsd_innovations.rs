@@ -4760,7 +4760,6 @@ impl GentooUseFlags {
 
 #[cfg(test)]
 mod tests_extra_2 {
-    use super::*;
 
     #[test]
     fn test_bsd_pf_state_table() {

@@ -15,13 +15,9 @@ use std::string::{String, ToString};
 use std::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
-use std::collections::BTreeMap;
 #[cfg(any(feature = "standalone_test", test))]
-use std::format;
 #[cfg(any(feature = "standalone_test", test))]
-use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
 
 /// ============================================================================
 /// 1. MintUpdate - Update Manager
@@ -182,12 +178,6 @@ impl MintInstallManager {
     }
 
     pub fn search_packages(&self, query: &str) -> Vec<&SoftwarePackage> {
-        self.packages
-            .iter()
-            .filter(|p| {
-                p.name.to_lowercase().contains(&query.to_lowercase())
-                    || p.description.to_lowercase().contains(&query.to_lowercase())
-            })
         self.packages.iter()
             .filter(|p| p.name.to_lowercase().contains(&query.to_lowercase())
                 || p.description.to_lowercase().contains(&query.to_lowercase()))

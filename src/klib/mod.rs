@@ -123,7 +123,6 @@ pub mod vec {
 pub mod prelude {
     // Collections
     pub use super::BTreeMap;
-    pub use super::Vec;
     pub use super::HashMap;
     pub use super::HashSet;
     // Linked structures

@@ -522,7 +522,6 @@ impl Default for PluginMarketplace {
 
 #[cfg(test_disabled)]
 mod marketplace_tests {
-    use super::*;
 
     #[test]
     fn test_plugin_marketplace_search_and_install() {

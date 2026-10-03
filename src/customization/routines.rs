@@ -22,7 +22,6 @@ use std::vec::Vec;
 use crate::klib::HashMap;
 
 #[cfg(not(feature = "standalone_test"))]
-use crate::klib::HashMap;
 
 /// Automation trigger type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

@@ -14,7 +14,6 @@ use std::string::{String, ToString};
 use std::vec::Vec;
 
 #[cfg(feature = "standalone_test")]
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 // =========================================================================
 // 1. DEBUGGER WINDOWS MANAGEMENT

@@ -2660,7 +2660,6 @@ mod inspiration_leap_tests {
 
 #[cfg(test)]
 mod subsystem_interop_tests {
-    use super::*;
 
     #[test]
     fn test_cross_distro_subsystem_all_verify_matrix() {
@@ -2934,7 +2933,6 @@ impl Default for SovereignLandlockLsm {
 
 #[cfg(test)]
 mod cross_subsystem_tests {
-    use super::*;
 
     #[test]
     fn auth_bridge_fails_closed_without_a_credential_provider() {
@@ -6341,7 +6339,6 @@ impl Default for SovereignDragonflyNpotEngine {
 
 #[cfg(test_disabled)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_sovereign_universal_distro_bridge_functionality() {

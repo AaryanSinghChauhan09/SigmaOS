@@ -5407,7 +5407,6 @@ impl LinuxXdpExpressDataPathShaper {
 
 #[cfg(test)]
 mod new_unimplemented_tools_tests {
-    use super::*;
 
     #[test]
     fn test_bsd_capsicum_rights_sandboxing_engine() {

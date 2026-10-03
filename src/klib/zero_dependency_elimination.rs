@@ -11,11 +11,8 @@ use std::string::String;
 use std::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
-use std::format;
 #[cfg(any(feature = "standalone_test", test))]
-use std::string::String;
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
 
 // ============================================================
 // § 1. C++ RUNTIME DEPENDENCY ELIMINATION

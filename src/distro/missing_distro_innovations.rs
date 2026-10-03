@@ -2140,7 +2140,6 @@ impl UbuntuAppArmorEngine {
 
 #[cfg(test_disabled)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_clear_linux_stateless() {

@@ -222,7 +222,6 @@ mod tests {
 
 #[cfg(test_disabled)]
 mod tests_disabled {
-    use super::*;
 
     #[test]
     fn test_terminal_profile() {

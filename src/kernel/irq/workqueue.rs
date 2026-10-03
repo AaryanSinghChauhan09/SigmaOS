@@ -19,7 +19,6 @@
 use crate::klib::VecDeque;
 
 #[cfg(not(test))]
-use crate::klib::VecDeque;
 
 use std::string::String;
 use std::string::ToString;

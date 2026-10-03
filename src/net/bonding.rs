@@ -302,7 +302,6 @@ impl NetworkBondingManager {
         for slave in &bond.slaves {
             status.push_str(&format!(
                 "  - {}: {} ({} Mbps){}\n",
-            status.push_str(&format!("  - {}: {} ({} Mbps){}\n",
                 slave.name,
                 slave.status.as_str(),
                 slave.link_speed_mbps,

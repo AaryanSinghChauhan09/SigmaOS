@@ -249,7 +249,6 @@ impl DevelopmentTestingFramework {
             for suite in &self.test_suites {
                 stats.push_str(&format!(
                     "  {}: {}/{} passed ({}ms)\n",
-                stats.push_str(&format!("  {}: {}/{} passed ({}ms)\n",
                     suite.name,
                     suite.get_passed_count(),
                     suite.tests.len(),

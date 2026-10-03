@@ -9,20 +9,16 @@ use std::vec::Vec;
 #[cfg(target_os = "none")]
 use std::collections::BTreeMap;
 #[cfg(not(target_os = "none"))]
-use std::collections::BTreeMap;
 
 #[cfg(target_os = "none")]
 use std::format;
 #[cfg(not(target_os = "none"))]
-use std::format;
 
 #[cfg(target_os = "none")]
 use std::string::{String, ToString};
 #[cfg(not(target_os = "none"))]
-use std::string::{String, ToString};
 
 #[cfg(target_os = "none")]
-use std::vec::Vec;
 
 #[cfg(not(test))]
 use crate::distro::fedora_pagure_exporter::FedoraPagureExporterEngine;

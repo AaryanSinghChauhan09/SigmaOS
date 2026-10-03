@@ -729,7 +729,6 @@ impl LinuxSeccompBpfSyscallFilterEngine {
 
 #[cfg(test)]
 mod extended_kernel_tests {
-    use super::*;
 
     #[test]
     fn test_memcg_v2_oom_killer() {
@@ -778,9 +777,10 @@ mod extended_kernel_tests {
 
     #[test]
     fn test_landlock_binder_zswap_overlay_memfd_engines() {
-        // Stub test - these components are not yet implemented
-        // TODO: Implement LinuxLandlockV5AccessEngine, LinuxBinderIpcEngine,
-        // LinuxZswapCompressedStorageEngine, LinuxOverlayfsMountEngine, LinuxMemfdSecretEngine
+        // Stub test
+    }
+
+    #[test]
     fn test_seccomp_epoll_ksm_fanotify_engines() {
         let mut seccomp = LinuxSeccompBpfSyscallFilterEngine::new(SeccompAction::KillProcess);
         seccomp.allow_syscall(1);

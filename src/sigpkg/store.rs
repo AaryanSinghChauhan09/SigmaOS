@@ -291,7 +291,6 @@ impl NixOsHermeticCasStore {
 
 #[cfg(test_disabled)]
 mod distro_pkg_tests {
-    use super::*;
 
     #[test]
     fn test_bsd_pkg_repo_mirror() {

@@ -65,8 +65,6 @@ impl CfiEngine {
     }
 
     /// Validate an indirect call
-    pub fn validate_indirect_call(&mut self, from_address: u64, to_address: u64) -> Result<(), CfiViolation> {
-        if let Some(target) = self.registered_targets.get(&to_address) {
     pub fn validate_indirect_call(
         &mut self,
         from_address: u64,

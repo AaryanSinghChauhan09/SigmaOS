@@ -254,19 +254,6 @@ impl IpLayer {
         Self { reassembly_buffers: Vec::new() }
     }
 
-    pub fn handle_fragment(
-        &mut self,
-        src: u32,
-        dst: u32,
-        id: u16,
-        offset: u16,
-        mf: bool,
-        payload: &[u8],
-    ) -> Option<Vec<u8>> {
-        let buffer = self
-            .reassembly_buffers
-            .iter_mut()
-            .find(|b| b.src_ip == src && b.dst_ip == dst && b.identification == id);
     pub fn handle_fragment(&mut self, src: u32, dst: u32, id: u16, offset: u16, mf: bool, payload: &[u8]) -> Option<Vec<u8>> {
         let buffer = self.reassembly_buffers.iter_mut().find(|b| b.src_ip == src && b.dst_ip == dst && b.identification == id);
 
@@ -283,14 +270,6 @@ impl IpLayer {
             }
         };
 
-        buffer.fragments.insert(
-            offset,
-            IpFragment {
-                offset,
-                more_fragments: mf,
-                payload: payload.to_vec(),
-            },
-        );
         buffer.fragments.insert(offset, IpFragment { offset, more_fragments: mf, payload: payload.to_vec() });
 
         if !mf {

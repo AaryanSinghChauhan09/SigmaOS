@@ -106,14 +106,6 @@ impl BuddyAllocator {
     }
 
     /// Split block to required order
-    fn split_block(
-        &mut self,
-        current_order: usize,
-        required_order: usize,
-    ) -> Result<MemoryBlock, &'static str> {
-        let mut block = self.free_lists[current_order]
-            .pop()
-            .ok_or("Block not found")?;
     fn split_block(&mut self, current_order: usize, required_order: usize) -> Result<MemoryBlock, &'static str> {
         let mut block = self.free_lists[current_order].pop().ok_or("Block not found")?;
 

@@ -205,19 +205,6 @@ impl AegisVaultEncryptionCompressionEngine {
             dilithium_signature[i] = auth_tag[i % 16] ^ ((i * 17) as u8);
         }
 
-        Ok(AegisEncryptedContainer {
-            magic: [b'A', b'E', b'G', b'S'],
-            version: 1,
-            salt,
-            nonce,
-            compressed_len: compressed.len() as u64,
-            uncompressed_len: raw_data.len() as u64,
-            kyber_ciphertext,
-            auth_tag,
-            encrypted_payload,
-            dilithium_signature,
-        })
-    }
 
         if unique_special_code.is_empty() {
             return Err(AegisVaultError::InvalidUniqueCode);
@@ -268,19 +255,6 @@ impl AegisVaultEncryptionCompressionEngine {
             dilithium_signature[i] = auth_tag[i % 16] ^ ((i * 17) as u8);
         }
 
-        Ok(AegisEncryptedContainer {
-            magic: [b'A', b'E', b'G', b'S'],
-            version: 1,
-            salt,
-            nonce,
-            compressed_len: compressed.len() as u64,
-            uncompressed_len: raw_data.len() as u64,
-            kyber_ciphertext,
-            auth_tag,
-            encrypted_payload,
-            dilithium_signature,
-        })
-    }
 
         if unique_special_code.is_empty() {
             return Err(AegisVaultError::InvalidUniqueCode);

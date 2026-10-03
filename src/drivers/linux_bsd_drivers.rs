@@ -1886,7 +1886,6 @@ impl SocketCanDriver {
 
 #[cfg(test)]
 mod tests_linux_bsd_drivers {
-    use super::*;
 
     #[test]
     fn test_nouveau_apple_ans2_adreno_usb_midi_geli_rump_be200_drivers() {

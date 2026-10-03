@@ -17,13 +17,9 @@ use std::string::{String, ToString};
 use std::vec::Vec;
 
 #[cfg(feature = "standalone_test")]
-use std::collections::BTreeMap;
 #[cfg(feature = "standalone_test")]
-use std::format;
 #[cfg(feature = "standalone_test")]
-use std::string::{String, ToString};
 #[cfg(feature = "standalone_test")]
-use std::vec::Vec;
 
 // =========================================================================
 // 1. Sovereign OpenBSD Signify PQC & Pledge/Unveil Scriptlet Engine

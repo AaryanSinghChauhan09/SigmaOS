@@ -8,7 +8,6 @@ use std::format;
 #[cfg(test_disabled)]
 use crate::klib::HashMap;
 #[cfg(not(test))]
-use crate::klib::HashMap;
 
 /// Hardware architectures supported by SigmaOS
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

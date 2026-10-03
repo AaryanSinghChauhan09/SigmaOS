@@ -22,9 +22,7 @@ use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
 #[cfg(not(any(feature = "standalone_test", test)))]
-use std::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
-use std::vec::Vec;
 
 // ─── Packet descriptor ────────────────────────────────────────────────────────
 
@@ -136,9 +134,6 @@ impl TbfQdisc {
         }
         let used = self.burst_bytes.saturating_sub(self.tokens) as u128;
         ((used * 100) / self.burst_bytes as u128) as u32
-        if self.burst_bytes == 0 { return 0; }
-        let used = self.burst_bytes - self.tokens;
-        ((used * 100) / self.burst_bytes) as u32
     }
 }
 
@@ -381,13 +376,6 @@ impl FqCodelQdisc {
         if self.flow_count == 0 {
             return None;
         }
-        let start = self.round_robin_idx % flow_count;
-        for i in 0..flow_count {
-            let idx = (start + i) % flow_count;
-        if self.flow_count == 0 {
-            return None;
-        }
-        if self.flow_count == 0 { return None; }
         let start = self.round_robin_idx;
         for i in 0..self.flow_count {
             let idx = (start + i) % self.flow_count;

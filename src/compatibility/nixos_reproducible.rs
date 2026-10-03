@@ -15,20 +15,15 @@ use std::vec;
 use std::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
-use std::boxed::Box;
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::HashMap;
 #[cfg(any(feature = "standalone_test", test))]
-use std::format;
 #[cfg(any(feature = "standalone_test", test))]
 use std::path::{Path, PathBuf};
 #[cfg(any(feature = "standalone_test", test))]
-use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec;
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
 use crate::klib::path::{Path, PathBuf};
@@ -234,7 +229,6 @@ impl NixLikeStore {
         source: &Path,
         target: &Path,
     ) -> Result<(), Box<dyn std::error::Error>> {
-        use std::process::Command;
 
         Err("fs not available")?;
 

@@ -888,7 +888,6 @@ impl Default for OmarchyHyprlandDwindleTilingEngine {
 
 #[cfg(test)]
 mod omarchy_gap_closure_tests {
-    use super::*;
 
     #[test]
     fn test_omarchy_hyprland_compositor_config_engine() {

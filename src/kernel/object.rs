@@ -683,7 +683,6 @@ impl Default for NtObjectManager {
 
 #[cfg(test_disabled)]
 mod tests_extended {
-    use super::*;
 
     #[test]
     fn test_nt_object_manager_directories_and_symlinks() {

@@ -3915,7 +3915,6 @@ impl SovereignNebulaMeshVpnEngine {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_desktop_system_health_and_repo_helpers() {

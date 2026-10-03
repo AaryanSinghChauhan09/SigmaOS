@@ -4502,7 +4502,6 @@ mod tests {
 
 #[cfg(test)]
 mod tests_fedora_mojikey {
-    use super::*;
 
     #[test]
     fn test_fedora_mojikey_pagu_fedocal_nuancier_ircot_elections() {

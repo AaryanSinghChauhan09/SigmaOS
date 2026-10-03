@@ -32,11 +32,8 @@ use core::mem;
 use core::ops::{Deref, DerefMut};
 
 #[cfg(target_os = "none")]
-use core::sync::atomic::{AtomicUsize, Ordering};
 #[cfg(target_os = "none")]
-use core::mem;
 #[cfg(target_os = "none")]
-use core::ops::{Deref, DerefMut};
 
 pub type FileID = usize;
 

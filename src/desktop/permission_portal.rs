@@ -212,7 +212,6 @@ mod tests {
 
 #[cfg(test)]
 mod more_tests {
-    use super::*;
 
     #[test]
     fn test_geolocation() {

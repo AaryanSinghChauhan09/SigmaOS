@@ -657,7 +657,6 @@ impl Default for AurHelper {
 
 #[cfg(test_disabled)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_arch_build_system_zst() {

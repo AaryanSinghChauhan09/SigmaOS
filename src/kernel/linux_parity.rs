@@ -1350,7 +1350,6 @@ impl LinuxEventfdEngine {
 
 #[cfg(test_disabled)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_kernel_io_uring_ring_buffer() {

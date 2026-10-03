@@ -376,7 +376,6 @@ impl PosixPathResolver {
         let mut current = self.current_dir;
 
         for component in path.components() {
-            use std::path::Component;
             match component {
                 Component::RootDir => current = self.root_dir,
                 Component::CurDir => continue,
@@ -400,7 +399,6 @@ impl PosixPathResolver {
         let mut result = PathBuf::new();
 
         for component in path.components() {
-            use std::path::Component;
             match component {
                 Component::RootDir => result.push("/"),
                 Component::CurDir => continue,

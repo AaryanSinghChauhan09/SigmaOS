@@ -1605,7 +1605,6 @@ impl SovereignIoUring {
 
 #[cfg(test_disabled)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_absorption_engine() {

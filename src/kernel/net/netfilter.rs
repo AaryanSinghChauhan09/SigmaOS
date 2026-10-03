@@ -21,9 +21,7 @@ use std::vec::Vec;
 
 // Test environment compatibility: Use std for testing only
 #[cfg(any(feature = "standalone_test", test))]
-use std::string::String;
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 

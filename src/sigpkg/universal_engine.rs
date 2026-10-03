@@ -2896,7 +2896,6 @@ impl Default for SovereignUniversalPackageManagerInteropEngine {
 
 #[cfg(test)]
 mod universal_interop_tests {
-    use super::*;
 
     #[test]
     fn test_universal_package_translation_bridge() {

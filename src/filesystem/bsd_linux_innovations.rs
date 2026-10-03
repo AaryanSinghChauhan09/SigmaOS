@@ -416,7 +416,6 @@ impl Default for SovereignFhsHierarchyEngine {
 
 #[cfg(test_disabled)]
 mod fhs_tests {
-    use super::*;
 
     #[test]
     fn test_fhs_hierarchy_resolution() {
@@ -507,7 +506,6 @@ impl Default for GoboLinuxPathResolver {
 
 #[cfg(test_disabled)]
 mod gobo_tests {
-    use super::*;
 
     #[test]
     fn test_gobolinux_path_resolver() {

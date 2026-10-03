@@ -22,11 +22,9 @@ use std::vec::Vec;
 
 use core::mem;
 use core::sync::atomic::{AtomicUsize, Ordering};
-use std::boxed::Box;
 /// OOP-based File Manager for SigmaOS
 /// Based on Ideas-999-Structured: User Experience & Desktop Item 766
 /// Implements file browser and management
-use std::vec::Vec;
 
 pub type FileID = usize;
 

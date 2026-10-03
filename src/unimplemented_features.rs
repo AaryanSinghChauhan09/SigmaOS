@@ -2194,7 +2194,6 @@ impl LinuxLtsUpstreamAdapter {
 
 #[cfg(test)]
 mod linux_lts_upstream_tests {
-    use super::*;
 
     #[test]
     fn test_linux_lts_version_and_eevdf_scheduler() {
@@ -3521,7 +3520,6 @@ impl Default for NineToFiveMacAppleEcosystemEngine {
 
 #[cfg(test)]
 mod extra_unimplemented_tests {
-    use super::*;
 
     #[test]
     fn test_section_6_4_jbd2_ledger() {
@@ -4234,7 +4232,6 @@ impl AndroidAuthorityPoliceEcosystemEngine {
 
 #[cfg(test)]
 mod new_unimplemented_tests {
-    use super::*;
 
     #[test]
     fn test_tech_media_intelligence_aggregator_engine() {

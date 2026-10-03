@@ -24,7 +24,6 @@ use core::mem;
 /// Implements CSPRNG with entropy collection
 
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 
 pub type RNGID = usize;
@@ -104,7 +103,6 @@ impl RandomGenerator for SimpleRandomGenerator {
     fn id(&self) -> RNGID { self.id }
 
     fn next_byte(&mut self) -> Result<u8, RNGError> {
-        Err(RNGError::InsufficientEntropy)
         let counter = self.counter.fetch_add(1, Ordering::SeqCst);
         let mut state = self.state.load(Ordering::SeqCst);
 
@@ -279,7 +277,6 @@ impl HardwareRng {
 
     /// Tries to harvest secure entropy directly from the physical hardware RNG instruction (RDRAND)
     pub fn get_hardware_u64(&mut self) -> Option<u64> {
-        None
         let mut value: u64 = 0;
         let success: u8;
 
@@ -409,59 +406,6 @@ impl<T> VecImpl<T> {
     }
 }
 
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-
-struct VecImpl<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
-struct VecImpl<T> { data: *mut T, len: usize, capacity: usize }
-
-impl<T> VecImpl<T> {
-    fn new() -> Self { VecImpl { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-
-#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

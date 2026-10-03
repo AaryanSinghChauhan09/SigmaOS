@@ -7,7 +7,6 @@ use std::vec::Vec;
 #[cfg(target_os = "none")]
 use crate::klib::HashMap;
 #[cfg(not(target_os = "none"))]
-use crate::klib::HashMap;
 
 pub struct SovereignSelfHealingKernel {
     pub integrity_hashes: HashMap<String, String>, // file paths -> baseline hashes

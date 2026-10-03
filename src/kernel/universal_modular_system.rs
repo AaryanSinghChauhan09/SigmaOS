@@ -882,7 +882,6 @@ mod step1_tests {
 
 #[cfg(test)]
 mod step2_tests {
-    use super::*;
 
     #[test]
     fn test_process_control_and_futexes() {
@@ -948,7 +947,6 @@ mod step2_tests {
 
 #[cfg(test)]
 mod step3_tests {
-    use super::*;
 
     #[test]
     fn test_peripheral_access_manager() {

@@ -139,6 +139,9 @@ impl SovereignMicrovmHermeticPackageSandboxEngine {
 impl Default for SovereignMicrovmHermeticPackageSandboxEngine {
     fn default() -> Self {
         Self::new(SandboxIsolationLevel::LandlockContainer)
+    }
+}
+
 // 1. Universal SAT Dependency Resolver
 // =========================================================================
 
@@ -386,11 +389,9 @@ impl SovereignAiOptimizedMirrorRankingGovernor {
 }
 
 impl Default for SovereignAiOptimizedMirrorRankingGovernor {
-    Dilithium5Pqc,
-    GpgRsa,
-    OpenBsdSignify,
-    AlpineApkEd25519,
-    CosignOidc,
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -512,6 +513,11 @@ impl SovereignAtomicBootEnvironmentPackageSnapshotEngine {
 }
 
 impl Default for SovereignAtomicBootEnvironmentPackageSnapshotEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // 3. Universal Delta Package Engine
 // =========================================================================
 
@@ -635,6 +641,10 @@ impl SovereignCrossDistroSonameAbiVerifierEngine {
             is_abi_compatible: is_compat,
             missing_libraries: missing,
             orphaned_libraries: Vec::new(),
+        }
+    }
+}
+
 // 5. Universal PM CLI Interop Engine
 // =========================================================================
 
@@ -890,6 +900,9 @@ mod tests {
             Some("true")
         );
         assert!(pkg.properties.contains_key("v8_sandbox_ram_mb"));
+    }
+
+    #[test]
     fn test_sat_dependency_resolver() {
         let mut sat = SovereignUniversalSatDependencyResolver::new();
         sat.register_clause(SatPackageClause {

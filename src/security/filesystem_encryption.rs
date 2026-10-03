@@ -183,9 +183,6 @@ impl FilesystemEncryptionManager {
             .find(|d| d.path == path)
             .ok_or_else(|| format!("Directory {} not found", path))?;
 
-        if directory.status != EncryptionStatus::Encrypted
-            && directory.status != EncryptionStatus::Locked
-        {
         if directory.status != EncryptionStatus::Encrypted && directory.status != EncryptionStatus::Locked {
             return Err(format!("Directory {} is not encrypted or locked", path));
         }
@@ -214,8 +211,6 @@ impl FilesystemEncryptionManager {
             .find(|d| d.device_path == device_path)
             .ok_or_else(|| format!("Device {} not found", device_path))?;
 
-        if device.status != EncryptionStatus::Encrypted && device.status != EncryptionStatus::Locked
-        {
         if device.status != EncryptionStatus::Encrypted && device.status != EncryptionStatus::Locked {
             return Err(format!("Device {} is not encrypted or locked", device_path));
         }
@@ -267,12 +262,6 @@ impl FilesystemEncryptionManager {
     pub fn get_statistics(&self) -> String {
         let mut stats = String::from("Filesystem Encryption Statistics:\n");
 
-        let encrypted_dirs = self
-            .fscrypt_directories
-            .iter()
-            .filter(|d| {
-                d.status == EncryptionStatus::Encrypted || d.status == EncryptionStatus::Locked
-            })
         let encrypted_dirs = self.fscrypt_directories.iter()
             .filter(|d| d.status == EncryptionStatus::Encrypted || d.status == EncryptionStatus::Locked)
             .count();
@@ -280,12 +269,6 @@ impl FilesystemEncryptionManager {
             .filter(|d| d.status == EncryptionStatus::Unlocked)
             .count();
 
-        let encrypted_devices = self
-            .luks_devices
-            .iter()
-            .filter(|d| {
-                d.status == EncryptionStatus::Encrypted || d.status == EncryptionStatus::Locked
-            })
         let encrypted_devices = self.luks_devices.iter()
             .filter(|d| d.status == EncryptionStatus::Encrypted || d.status == EncryptionStatus::Locked)
             .count();

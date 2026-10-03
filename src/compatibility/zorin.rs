@@ -807,7 +807,6 @@ impl Default for ZorinTaskbarCustomizer {
 
 #[cfg(test)]
 mod zorin_feature_tests {
-    use super::*;
 
     #[test]
     fn test_zorin_grid_tiling_sound_and_taskbar() {

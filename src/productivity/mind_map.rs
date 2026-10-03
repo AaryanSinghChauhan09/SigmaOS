@@ -505,7 +505,6 @@ SigmaOS Architecture
 
 #[cfg(test)]
 mod mindmap_parser_tests {
-    use super::*;
 
     #[test]
     fn test_indented_text_mindmap_parser() {

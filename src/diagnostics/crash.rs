@@ -31,26 +31,16 @@ use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[cfg(test_disabled)]
-use core::mem;
 #[cfg(test_disabled)]
-use core::ops::{Deref, DerefMut};
 #[cfg(test_disabled)]
-use core::ptr::{self, NonNull};
 #[cfg(test_disabled)]
-use core::sync::atomic::{AtomicUsize, Ordering};
 #[cfg(not(test))]
-use core::mem;
 #[cfg(not(test))]
-use core::ops::{Deref, DerefMut};
 
 #[cfg(test_disabled)]
-use core::ptr::{self, NonNull};
 #[cfg(test_disabled)]
-use core::sync::atomic::{AtomicUsize, Ordering};
 #[cfg(test_disabled)]
-use core::mem;
 #[cfg(test_disabled)]
-use core::ops::{Deref, DerefMut};
 
 /// Report ID
 pub type ReportID = usize;

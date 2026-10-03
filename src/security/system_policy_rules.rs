@@ -14,9 +14,7 @@ use std::vec::Vec;
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::HashMap;
 #[cfg(any(feature = "standalone_test", test))]
-use std::string::String;
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
 
 /// PolicyKit Action Authorization Result
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

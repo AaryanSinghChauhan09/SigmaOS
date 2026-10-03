@@ -1992,7 +1992,6 @@ impl SovereignSigmaShRepl {
 
 #[cfg(test)]
 mod advanced_shell_tests {
-    use super::*;
 
     struct MockEnv {
         keys: StdVec<String>,

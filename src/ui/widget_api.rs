@@ -499,7 +499,6 @@ pub mod widgets {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use super::widgets::*;
 
     #[test]

@@ -57,14 +57,6 @@ fn hash_password(plaintext: &str) -> String {
 }
 
 impl SafeInstaller {
-    pub fn new(
-        hostname: &str,
-        username: &str,
-        _password: &str,
-        password: &str,
-        target: DiskTarget,
-        dry_run: bool,
-    ) -> Self {
     pub fn new(hostname: &str, username: &str, password: &str, target: DiskTarget, dry_run: bool) -> Self {
         Self {
             config: InstallerConfig {

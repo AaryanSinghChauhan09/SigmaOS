@@ -31,17 +31,6 @@ pub const CLONE_NEWUTS: u32 = 0x04000000;
 /// - -1 (EINVAL) on invalid arguments
 /// - -EFAULT on bad pointer
 /// - -EPERM on permission denied
-pub fn sys_sethostname(
-    namespace_id: u64,
-    hostname_ptr: *const u8,
-    len: usize,
-) -> i32 {
-/// - -EFAULT on a null pointer (non-null pointer validity is the caller's safety obligation)
-///
-/// # Safety
-/// `hostname_ptr` must be readable for `len` bytes for the duration of this call.
-/// A syscall entry point must validate/copy user memory before calling this helper;
-/// checking for null does not validate an arbitrary user pointer.
 pub unsafe fn sys_sethostname(namespace_id: u64, hostname_ptr: *const u8, len: usize) -> i32 {
     // Validate hostname length (max 255 bytes)
     if len > 255 {
@@ -91,17 +80,6 @@ pub unsafe fn sys_sethostname(namespace_id: u64, hostname_ptr: *const u8, len: u
 /// - 0 on success
 /// - -1 (EINVAL) on invalid arguments
 /// - -EFAULT on bad pointer
-pub fn sys_gethostname(
-    namespace_id: u64,
-    hostname_ptr: *mut u8,
-    len: usize,
-) -> i32 {
-/// - -EFAULT on a null pointer (non-null pointer validity is the caller's safety obligation)
-///
-/// # Safety
-/// `hostname_ptr` must be writable for `len` bytes for the duration of this call.
-/// A syscall entry point must validate/copy user memory before calling this helper;
-/// checking for null does not validate an arbitrary user pointer.
 pub unsafe fn sys_gethostname(namespace_id: u64, hostname_ptr: *mut u8, len: usize) -> i32 {
     if len == 0 {
         return -22; // EINVAL
@@ -143,16 +121,6 @@ pub unsafe fn sys_gethostname(namespace_id: u64, hostname_ptr: *mut u8, len: usi
 /// - namespace_id: ID of the namespace to modify
 /// - domainname_ptr: Pointer to domainname string
 /// - len: Length of domainname (max 255)
-pub fn sys_setdomainname(
-    namespace_id: u64,
-    domainname_ptr: *const u8,
-    len: usize,
-) -> i32 {
-///
-/// # Safety
-/// `domainname_ptr` must be readable for `len` bytes for the duration of this call.
-/// A syscall entry point must validate/copy user memory before calling this helper;
-/// checking for null does not validate an arbitrary user pointer.
 pub unsafe fn sys_setdomainname(namespace_id: u64, domainname_ptr: *const u8, len: usize) -> i32 {
     if len > 255 {
         return -22; // EINVAL
@@ -188,16 +156,6 @@ pub unsafe fn sys_setdomainname(namespace_id: u64, domainname_ptr: *const u8, le
 }
 
 /// sys_getdomainname(2) - Get domainname from current UTS namespace
-pub fn sys_getdomainname(
-    namespace_id: u64,
-    domainname_ptr: *mut u8,
-    len: usize,
-) -> i32 {
-///
-/// # Safety
-/// `domainname_ptr` must be writable for `len` bytes for the duration of this call.
-/// A syscall entry point must validate/copy user memory before calling this helper;
-/// checking for null does not validate an arbitrary user pointer.
 pub unsafe fn sys_getdomainname(namespace_id: u64, domainname_ptr: *mut u8, len: usize) -> i32 {
     if len == 0 {
         return -22; // EINVAL

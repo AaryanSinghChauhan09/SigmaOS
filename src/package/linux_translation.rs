@@ -39,7 +39,6 @@ use core::sync::atomic::{AtomicBool, Ordering};
 #[cfg(feature = "standalone_test")]
 use std::collections::BTreeMap;
 #[cfg(not(feature = "standalone_test"))]
-use std::collections::BTreeMap;
 use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;

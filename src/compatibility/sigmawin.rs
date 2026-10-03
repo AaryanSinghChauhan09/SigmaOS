@@ -569,7 +569,6 @@ impl WindowsPowerShellShimEngine {
 
 #[cfg(test)]
 mod windows_extended_tests {
-    use super::*;
 
     #[test]
     fn test_win32_pe_header_parser() {

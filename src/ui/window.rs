@@ -25,8 +25,6 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 /// OOP-based Window Manager for SigmaOS
 /// Based on Ideas-999-Structured: User Experience & Desktop Item 686
 /// Implements window creation, management, and composition
-use std::boxed::Box;
-use std::vec::Vec;
 
 pub type WindowID = usize;
 

@@ -88,15 +88,6 @@ impl HelenMessage {
         }
     }
 
-    pub fn with_args(
-        method: u64,
-        arg1: u64,
-        arg2: u64,
-        arg3: u64,
-        arg4: u64,
-        call_id: CallId,
-        phone_id: PhoneId,
-    ) -> Self {
     pub fn with_args(method: u64, arg1: u64, arg2: u64, arg3: u64, arg4: u64,
                      call_id: CallId, phone_id: PhoneId) -> Self {
         HelenMessage {
@@ -329,11 +320,6 @@ impl HelenIpcManager {
     }
 
     /// Connect phone to answerbox (establish connection)
-    pub fn connect_phone_to_answerbox(
-        &mut self,
-        phone_id: PhoneId,
-        answerbox_id: AnswerboxId,
-    ) -> Result<(), HelenIpcError> {
     pub fn connect_phone_to_answerbox(&mut self, phone_id: PhoneId, answerbox_id: AnswerboxId)
         -> Result<(), HelenIpcError> {
 
@@ -351,14 +337,6 @@ impl HelenIpcManager {
     }
 
     /// Send asynchronous message over phone to answerbox
-    pub fn send_async(
-        &mut self,
-        phone_id: PhoneId,
-        mut message: HelenMessage,
-    ) -> Result<(), HelenIpcError> {
-        let phone = self
-            .phones
-            .get(&phone_id)
     pub fn send_async(&mut self, phone_id: PhoneId, mut message: HelenMessage)
         -> Result<(), HelenIpcError> {
 
@@ -396,15 +374,6 @@ impl HelenIpcManager {
     }
 
     /// Forward message to another answerbox (HelenOS CONNECT_ME_TO mechanism)
-    pub fn forward_message(
-        &mut self,
-        message: HelenMessage,
-        from_phone: PhoneId,
-        to_answerbox: AnswerboxId,
-    ) -> Result<(), HelenIpcError> {
-        let answerbox = self
-            .answerboxes
-            .get(&to_answerbox)
     pub fn forward_message(&mut self, message: HelenMessage, from_phone: PhoneId, to_answerbox: AnswerboxId)
         -> Result<(), HelenIpcError> {
 
@@ -443,15 +412,6 @@ impl HelenIpcManager {
     }
 
     /// Answer a dispatched message
-    pub fn answer_message(
-        &mut self,
-        answerbox_id: AnswerboxId,
-        call_id: CallId,
-        return_value: u64,
-    ) -> Result<(), HelenIpcError> {
-        let answerbox = self
-            .answerboxes
-            .get_mut(&answerbox_id)
     pub fn answer_message(&mut self, answerbox_id: AnswerboxId, call_id: CallId,
                           return_value: u64) -> Result<(), HelenIpcError> {
 
@@ -493,12 +453,6 @@ impl HelenIpcManager {
     }
 
     /// Register IRQ notification (HelenOS ipc_irq_register)
-    pub fn register_irq(
-        &mut self,
-        irq: IrqNumber,
-        answerbox_id: AnswerboxId,
-        top_half: Option<Box<dyn TopHalfHandler>>,
-    ) -> Result<(), HelenIpcError> {
     pub fn register_irq(&mut self, irq: IrqNumber, answerbox_id: AnswerboxId,
                        top_half: Option<Box<dyn TopHalfHandler>>)
         -> Result<(), HelenIpcError> {
@@ -649,9 +603,11 @@ impl HelenIpcManager {
         }
 
         // Answer all unanswered messages with error
-        if let Some(answerbox) = self.answerboxes.values_mut().find(|a| a.task_id == task_id) {
-            let messages_to_answer: Vec<_> = answerbox.dispatched_queue.drain(..).collect();
-            drop(answerbox);
+        let messages_to_answer: Vec<_> = if let Some(answerbox) = self.answerboxes.values_mut().find(|a| a.task_id == task_id) {
+            answerbox.dispatched_queue.drain(..).collect()
+        } else {
+            Vec::new()
+        };
 
         for mut msg in messages_to_answer {
             msg.method = 0xFFFFFFFFFFFFFFFE; // Error code
@@ -659,22 +615,8 @@ impl HelenIpcManager {
                 if let Some(origin_answerbox_id) = phone.connected_answerbox {
                     if let Some(origin_answerbox) = self.answerboxes.get_mut(&origin_answerbox_id) {
                         origin_answerbox.answer_queue.push(msg);
-            for mut msg in messages_to_answer {
-                msg.method = 0xFFFFFFFFFFFFFFFE; // Error code
-                if let Some(phone) = self.phones.get(&msg.phone_id) {
-                    if let Some(origin_answerbox_id) = phone.connected_answerbox {
-                        if let Some(origin_answerbox) =
-                            self.answerboxes.get_mut(&origin_answerbox_id)
-                        {
-                        if let Some(origin_answerbox) = self.answerboxes.get_mut(&origin_answerbox_id) {
-                            origin_answerbox.answer_queue.push(msg);
-                        }
                     }
                 }
-            }
-
-            if let Some(answerbox) = self.answerboxes.values_mut().find(|a| a.task_id == task_id) {
-                answerbox.dispatched_queue.clear();
             }
         }
     }
@@ -852,12 +794,6 @@ impl HelenAsyncSystem {
     }
 
     /// Send async message using fibril framework
-    pub fn send_async_with_fibril(
-        &mut self,
-        phone_id: PhoneId,
-        message: HelenMessage,
-        from_fibril_id: usize,
-    ) -> Result<(), HelenIpcError> {
     pub fn send_async_with_fibril(&mut self, phone_id: PhoneId, message: HelenMessage,
                                   from_fibril_id: usize) -> Result<(), HelenIpcError> {
         // Try to send async

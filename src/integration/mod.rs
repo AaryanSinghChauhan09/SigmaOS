@@ -51,11 +51,6 @@ impl SigmaIntegration {
     }
 
     /// Execute Kuroko code with terminal integration
-    pub fn execute_kuroko_with_terminal(
-        &mut self,
-        code: &str,
-        _tab_id: usize,
-    ) -> Result<String, IntegrationError> {
     pub fn execute_kuroko_with_terminal(&mut self, code: &str, _tab_id: usize)
         -> Result<String, IntegrationError> {
 
@@ -64,9 +59,6 @@ impl SigmaIntegration {
         let code_object = compiler.compile(code)
             .map_err(|e| IntegrationError::LanguageError(e))?;
 
-        let result = self
-            .kuroko_vm
-            .interpret(code_object)
         let result = self.kuroko_vm.interpret(code_object)
             .map_err(|e| IntegrationError::LanguageError(e))?;
 
@@ -76,17 +68,6 @@ impl SigmaIntegration {
     }
 
     /// Send async message from terminal to another task
-    pub fn send_terminal_message(
-        &mut self,
-        from_tab_id: usize,
-        to_phone_id: usize,
-        message: &str,
-    ) -> Result<(), IntegrationError> {
-        let call_id = self
-            .async_system
-            .ipc_manager
-            .next_call_id
-            .fetch_add(1, core::sync::atomic::Ordering::SeqCst);
     pub fn send_terminal_message(&mut self, from_tab_id: usize, to_phone_id: usize,
                                   message: &str) -> Result<(), IntegrationError> {
 
@@ -106,14 +87,6 @@ impl SigmaIntegration {
     }
 
     /// Handle interrupt notification and update terminal
-    pub fn handle_interrupt_for_terminal(
-        &mut self,
-        irq: u32,
-        _tab_id: usize,
-    ) -> Result<(), IntegrationError> {
-        self.async_system
-            .ipc_manager
-            .handle_interrupt(irq)
     pub fn handle_interrupt_for_terminal(&mut self, irq: u32, _tab_id: usize)
         -> Result<(), IntegrationError> {
 
@@ -133,11 +106,6 @@ impl SigmaIntegration {
     }
 
     /// Run Kuroko script with async IPC capabilities
-    pub fn run_async_kuroko_script(
-        &mut self,
-        script: &str,
-        _task_id: usize,
-    ) -> Result<KurokoValue, IntegrationError> {
     pub fn run_async_kuroko_script(&mut self, script: &str, _task_id: usize)
         -> Result<KurokoValue, IntegrationError> {
 
@@ -147,8 +115,6 @@ impl SigmaIntegration {
         let code_object = compiler.compile(script)
             .map_err(|e| IntegrationError::LanguageError(e))?;
 
-        self.kuroko_vm
-            .interpret(code_object)
         self.kuroko_vm.interpret(code_object)
             .map_err(|e| IntegrationError::LanguageError(e))
     }
