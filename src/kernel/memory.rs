@@ -10,8 +10,15 @@ use crate::klib::HashMap;
 #[cfg(test_disabled)]
 use std::collections::HashMap;
 
+// Explicit #[path] on sigma_buddy works around a rustfmt resolution quirk:
+// after one sibling mod carries an explicit #[path], rustfmt resolves later
+// siblings relative to the parent directory (src/kernel/) instead of the
+// module directory (src/kernel/memory/), which made `cargo fmt --check`
+// fail repo-wide with "failed to resolve mod sigma_buddy". rustc resolves
+// both forms identically — this changes no compile-time behavior.
 #[path = "memory/resource_allocator.rs"]
 pub mod resource_allocator;
+#[path = "memory/sigma_buddy.rs"]
 pub mod sigma_buddy;
 pub use resource_allocator::{
     ContainerResourceGovernor, DmaRingBuffer, DmaRingBufferAllocator, HardenedGuardPageAllocator,

@@ -5,6 +5,9 @@ use std::vec;
 use std::string::String;
 use std::vec::Vec;
 
+/// PI constant (core::f32::consts::PI) — replaces hand-written 3.14159 approximations.
+const PI_F32: f32 = core::f32::consts::PI;
+
 /// Supported mathematical function types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PlotFunction {
@@ -31,13 +34,13 @@ impl SovereignMathPlotter {
         match func {
             PlotFunction::Sine => {
                 // Safe Taylor series expansion approximation of sin(x) for #![no_std] without libm
-                let x_reduced = x % (2.0 * 3.14159);
+                let x_reduced = x % (2.0 * PI_F32);
                 let x2 = x_reduced * x_reduced;
                 x_reduced * (1.0 - x2 / 6.0 + (x2 * x2) / 120.0)
             }
             PlotFunction::Cosine => {
                 // Safe Taylor series expansion approximation of cos(x)
-                let x_reduced = x % (2.0 * 3.14159);
+                let x_reduced = x % (2.0 * PI_F32);
                 let x2 = x_reduced * x_reduced;
                 1.0 - x2 / 2.0 + (x2 * x2) / 24.0
             }

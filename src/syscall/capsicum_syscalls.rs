@@ -20,8 +20,8 @@
 extern crate alloc;
 use alloc::vec::Vec;
 
-use crate::security::capsicum::{ProcessCapState, CapError};
 use crate::security::cap_rights::CapRightsMask;
+use crate::security::capsicum::{CapError, ProcessCapState};
 
 /// Capsicum syscall error codes
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -57,12 +57,12 @@ impl From<CapsicumSyscallError> for i32 {
     fn from(err: CapsicumSyscallError) -> Self {
         match err {
             CapsicumSyscallError::CapModeViolation => 94, // ECAPMODE
-            CapsicumSyscallError::FdNotFound => 9,       // EBADF
+            CapsicumSyscallError::FdNotFound => 9,        // EBADF
             CapsicumSyscallError::InvalidArgument => 22,  // EINVAL
             CapsicumSyscallError::PermissionDenied => 13, // EACCES
             CapsicumSyscallError::AlreadyInCapMode => 0,  // Not an error, idempotent
             CapsicumSyscallError::RightsExpansionDenied => 93, // ENOTCAPABLE
-            CapsicumSyscallError::Efault => 14,          // EFAULT
+            CapsicumSyscallError::Efault => 14,           // EFAULT
         }
     }
 }
@@ -92,17 +92,21 @@ pub fn sys_cap_enter(state: &mut ProcessCapState) -> Result<(), CapsicumSyscallE
 /// # Returns
 /// - Ok(()) on success
 /// - Err(CapsicumSyscallError::Efault) if pointer is null
-pub fn sys_cap_getmode(state: &ProcessCapState, mode_out: *mut u32) -> Result<(), CapsicumSyscallError> {
+#[allow(clippy::not_unsafe_ptr_arg_deref)] // syscall emulation: models the kernel ABI, pointer validity is the caller's contract (as in Linux)
+pub fn sys_cap_getmode(
+    state: &ProcessCapState,
+    mode_out: *mut u32,
+) -> Result<(), CapsicumSyscallError> {
     if mode_out.is_null() {
         return Err(CapsicumSyscallError::Efault);
     }
-    
+
     let mode_value = if state.is_cap_mode() { 1 } else { 0 };
-    
+
     unsafe {
         *mode_out = mode_value;
     }
-    
+
     Ok(())
 }
 
@@ -140,6 +144,7 @@ pub fn sys_cap_rights_limit(
 /// # Returns
 /// - Ok(()) on success
 /// - Err(CapsicumSyscallError) on failure
+#[allow(clippy::not_unsafe_ptr_arg_deref)] // syscall emulation: models the kernel ABI, pointer validity is the caller's contract (as in Linux)
 pub fn sys_cap_rights_get(
     state: &ProcessCapState,
     fd: i32,
@@ -148,7 +153,7 @@ pub fn sys_cap_rights_get(
     if rights_out.is_null() {
         return Err(CapsicumSyscallError::Efault);
     }
-    
+
     if let Some(rights) = state.get_fd_rights(fd) {
         unsafe {
             *rights_out = rights.raw();
@@ -172,6 +177,7 @@ pub fn sys_cap_rights_get(
 /// # Returns
 /// - Ok(()) on success
 /// - Err(CapsicumSyscallError) on failure
+#[allow(clippy::not_unsafe_ptr_arg_deref)] // syscall emulation: models the kernel ABI, pointer validity is the caller's contract (as in Linux)
 pub fn sys_cap_ioctls_limit(
     state: &mut ProcessCapState,
     fd: i32,
@@ -181,15 +187,13 @@ pub fn sys_cap_ioctls_limit(
     if cmds.is_null() && ncmds > 0 {
         return Err(CapsicumSyscallError::Efault);
     }
-    
+
     let cmd_vec = if ncmds > 0 {
-        unsafe {
-            core::slice::from_raw_parts(cmds, ncmds).to_vec()
-        }
+        unsafe { core::slice::from_raw_parts(cmds, ncmds).to_vec() }
     } else {
         Vec::new()
     };
-    
+
     state.limit_ioctls(fd, cmd_vec).map_err(|e| e.into())
 }
 
@@ -226,6 +230,7 @@ pub fn sys_cap_fcntls_limit(
 /// # Returns
 /// - Ok(child_pid) on success (0 in child, child PID in parent)
 /// - Err(CapsicumSyscallError) on failure
+#[allow(clippy::not_unsafe_ptr_arg_deref)] // syscall emulation: models the kernel ABI, pointer validity is the caller's contract (as in Linux)
 pub fn sys_pdfork(
     _state: &mut ProcessCapState,
     fdp: *mut i32,
@@ -234,15 +239,15 @@ pub fn sys_pdfork(
     if fdp.is_null() {
         return Err(CapsicumSyscallError::Efault);
     }
-    
+
     // Stub implementation: assign synthetic FD and return synthetic child PID
     let pd_fd = 100; // Synthetic process descriptor FD
     let child_pid = 1234; // Synthetic child PID
-    
+
     unsafe {
         *fdp = pd_fd;
     }
-    
+
     Ok(child_pid)
 }
 
@@ -265,7 +270,7 @@ pub fn sys_pdkill(
 ) -> Result<(), CapsicumSyscallError> {
     // Validate that FD exists and has CAP_PDKILL
     use crate::security::cap_rights::CAP_PDKILL;
-    
+
     state.check_fd_right(fd, CAP_PDKILL).map_err(|e| e.into())
 }
 
@@ -282,6 +287,7 @@ pub fn sys_pdkill(
 /// # Returns
 /// - Ok(pid) on success (returns waited process PID)
 /// - Err(CapsicumSyscallError) on failure
+#[allow(clippy::not_unsafe_ptr_arg_deref)] // syscall emulation: models the kernel ABI, pointer validity is the caller's contract (as in Linux)
 pub fn sys_pdwait4(
     state: &ProcessCapState,
     fd: i32,
@@ -290,26 +296,26 @@ pub fn sys_pdwait4(
 ) -> Result<i32, CapsicumSyscallError> {
     // Validate that FD exists and has CAP_PDWAIT
     use crate::security::cap_rights::CAP_PDWAIT;
-    
+
     state.check_fd_right(fd, CAP_PDWAIT).map_err(|e| {
         let err: CapsicumSyscallError = e.into();
         err
     })?;
-    
+
     // Stub: write synthetic exit status
     if !status.is_null() {
         unsafe {
             *status = 0; // Exit status 0 (success)
         }
     }
-    
+
     Ok(1234) // Synthetic PID
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::security::cap_rights::{CAP_READ, CAP_WRITE, CAP_PDKILL, CAP_PDWAIT};
+    use crate::security::cap_rights::{CAP_PDKILL, CAP_PDWAIT, CAP_READ, CAP_WRITE};
 
     #[test]
     fn test_cap_enter_succeeds() {
@@ -329,10 +335,10 @@ mod tests {
     fn test_cap_getmode_returns_correct_state() {
         let mut state = ProcessCapState::new();
         let mut mode: u32 = 99;
-        
+
         sys_cap_getmode(&state, &mut mode).unwrap();
         assert_eq!(mode, 0);
-        
+
         state.cap_enter().unwrap();
         sys_cap_getmode(&state, &mut mode).unwrap();
         assert_eq!(mode, 1);
@@ -350,12 +356,12 @@ mod tests {
     #[test]
     fn test_cap_rights_limit_restricts_fd() {
         let mut state = ProcessCapState::new();
-        
+
         sys_cap_rights_limit(&mut state, 3, CAP_READ | CAP_WRITE).unwrap();
-        
+
         // Should succeed with subset
         assert!(sys_cap_rights_limit(&mut state, 3, CAP_READ).is_ok());
-        
+
         // Should fail when expanding
         let result = sys_cap_rights_limit(&mut state, 3, CAP_READ | CAP_WRITE);
         assert_eq!(result, Err(CapsicumSyscallError::RightsExpansionDenied));
@@ -366,7 +372,7 @@ mod tests {
         let mut state = ProcessCapState::new();
         let rights = CAP_READ | CAP_WRITE;
         sys_cap_rights_limit(&mut state, 5, rights).unwrap();
-        
+
         let mut retrieved: u64 = 0;
         sys_cap_rights_get(&state, 5, &mut retrieved).unwrap();
         assert_eq!(retrieved, rights);
@@ -376,7 +382,7 @@ mod tests {
     fn test_cap_rights_get_fd_not_found() {
         let state = ProcessCapState::new();
         let mut retrieved: u64 = 0;
-        
+
         assert_eq!(
             sys_cap_rights_get(&state, 999, &mut retrieved),
             Err(CapsicumSyscallError::FdNotFound)
@@ -387,7 +393,7 @@ mod tests {
     fn test_cap_ioctls_limit() {
         let mut state = ProcessCapState::new();
         sys_cap_rights_limit(&mut state, 3, CAP_READ).unwrap();
-        
+
         let cmds: Vec<u64> = vec![0x5401, 0x5402];
         assert!(sys_cap_ioctls_limit(&mut state, 3, cmds.as_ptr(), cmds.len()).is_ok());
     }
@@ -396,7 +402,7 @@ mod tests {
     fn test_cap_fcntls_limit() {
         let mut state = ProcessCapState::new();
         sys_cap_rights_limit(&mut state, 3, CAP_READ).unwrap();
-        
+
         assert!(sys_cap_fcntls_limit(&mut state, 3, 0b0011).is_ok());
     }
 
@@ -404,7 +410,7 @@ mod tests {
     fn test_pdfork_stub() {
         let mut state = ProcessCapState::new();
         let mut pd_fd: i32 = -1;
-        
+
         let child_pid = sys_pdfork(&mut state, &mut pd_fd, 0).unwrap();
         assert_eq!(child_pid, 1234); // Synthetic PID
         assert_eq!(pd_fd, 100); // Synthetic FD
@@ -415,7 +421,7 @@ mod tests {
         let mut state = ProcessCapState::new();
         let rights = CapRightsMask::new(CAP_PDKILL);
         state.limit_fd_rights(100, rights).unwrap();
-        
+
         assert!(sys_pdkill(&state, 100, 15).is_ok());
     }
 
@@ -424,7 +430,7 @@ mod tests {
         let mut state = ProcessCapState::new();
         let rights = CapRightsMask::new(CAP_READ); // No CAP_PDKILL
         state.limit_fd_rights(100, rights).unwrap();
-        
+
         assert!(sys_pdkill(&state, 100, 15).is_err());
     }
 
@@ -433,7 +439,7 @@ mod tests {
         let mut state = ProcessCapState::new();
         let rights = CapRightsMask::new(CAP_PDWAIT);
         state.limit_fd_rights(100, rights).unwrap();
-        
+
         let mut status: i32 = -1;
         let pid = sys_pdwait4(&state, 100, &mut status, 0).unwrap();
         assert_eq!(pid, 1234);
@@ -445,7 +451,7 @@ mod tests {
         let mut state = ProcessCapState::new();
         let rights = CapRightsMask::new(CAP_READ); // No CAP_PDWAIT
         state.limit_fd_rights(100, rights).unwrap();
-        
+
         let mut status: i32 = -1;
         assert!(sys_pdwait4(&state, 100, &mut status, 0).is_err());
     }
