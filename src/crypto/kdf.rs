@@ -1,19 +1,16 @@
 use std::boxed::Box;
 use std::vec::Vec;
-
-use core::mem;
-/// OOP-based Key Derivation Function for SigmaOS
-/// Based on Ideas-999-Structured: Security & Sovereignty Item 502
-/// Implements HKDF and PBKDF2 key derivation
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type KDFID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum KDFAlgorithm { HKDF_SHA256 = 0, HKDF_SHA512 = 1, PBKDF2 = 2 }
+pub enum KDFAlgorithm {
+    HKDF_SHA256 = 0,
+    HKDF_SHA512 = 1,
+    PBKDF2 = 2,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -22,7 +19,6 @@ pub enum KDFError {
     InvalidKey = 1,
     InvalidLength = 2,
 }
-pub enum KDFError { Success = 0, InvalidKey = 1, InvalidLength = 2 }
 
 pub trait KeyDerivation {
     fn id(&self) -> KDFID;
@@ -46,7 +42,9 @@ impl SimpleKeyDerivation {
 }
 
 impl KeyDerivation for SimpleKeyDerivation {
-    fn id(&self) -> KDFID { self.id }
+    fn id(&self) -> KDFID {
+        self.id
+    }
     fn algorithm(&self) -> KDFAlgorithm {
         let raw = self.algorithm.load(Ordering::SeqCst);
         match raw {
@@ -56,26 +54,7 @@ impl KeyDerivation for SimpleKeyDerivation {
         }
     }
 
-    fn derive(
-        &self,
-        key: &[u8],
-        salt: &[u8],
-        info: &[u8],
-        length: usize,
-    ) -> Result<Vec<u8>, KDFError> {
-        Err(KDFError::ProviderUnavailable)
-        key: &[u8],
-        salt: &[u8],
-        info: &[u8],
-        length: usize,
-    ) -> Result<Vec<u8>, KDFError> {
     fn derive(&self, key: &[u8], salt: &[u8], info: &[u8], length: usize) -> Result<Vec<u8>, KDFError> {
-        let mut derived = Vec::new();
-        let mut hash: usize = 0;
-
-        for &byte in key { hash = hash.wrapping_add(byte as usize); }
-        for &byte in salt { hash = hash.wrapping_add(byte as usize); }
-        for &byte in info { hash = hash.wrapping_add(byte as usize); }
         let mut derived = Vec::new();
         let mut hash: usize = 0;
 
@@ -160,7 +139,6 @@ impl SimplePasswordHashing {
     }
 }
 
-// TODO: Replace with proper configuration-based key derivation management
 const KDF_DEFAULT_INFO: &[u8] = b"password";
 
 impl PasswordHashing for SimplePasswordHashing {
@@ -183,67 +161,4 @@ impl PasswordHashing for SimplePasswordHashing {
 
         Ok(true)
     }
-}
-
-struct VecImpl<T> { data: *mut T, len: usize, capacity: usize }
-
-impl<T> VecImpl<T> {
-    fn new() -> Self { VecImpl { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-struct VecImpl<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
-
-impl<T> VecImpl<T> {
-    fn new() -> Self {
-        VecImpl {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
 }

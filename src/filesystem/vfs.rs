@@ -967,17 +967,31 @@ mod tests {
     #[test]
     fn test_seek_operations() {
         let mut vfs = VirtualFileSystem::new();
-        let fd = vfs.open("/test.txt", 0, 0o644).unwrap();
+        let fd = vfs.open("/test.txt", 0, 0o644).unwrap() as u64;
 
         // SEEK_SET
-        let pos = vfs.seek(fd, 100, 0).unwrap();
+        let pos = vfs.lseek(fd, 100, 0).unwrap();
         assert_eq!(pos, 100);
 
         // SEEK_CUR
-        let pos = vfs.seek(fd, 50, 1).unwrap();
+        let pos = vfs.lseek(fd, 50, 1).unwrap();
         assert_eq!(pos, 150);
+    }
 
-        // Write should fail with bad_token and read_token, but succeed with write_token or all_token
+    #[test]
+    fn test_vfs_gated_file_ops() {
+        let mut vfs = VirtualFileSystem::new();
+        let id = vfs.create_file(FileType::Regular, 1000).unwrap();
+        let fd = vfs.open_file(id, O_RDWR).unwrap();
+
+        let mut read_token = CapabilityToken::new();
+        read_token.grant_permission(Permission::FileRead);
+
+        let mut write_token = CapabilityToken::new();
+        write_token.grant_permission(Permission::FileWrite);
+
+        let bad_token = CapabilityToken::new();
+
         assert_eq!(
             vfs.write_file_gated(fd, b"gated", &bad_token),
             Err(FsError::PermissionDenied)
@@ -988,19 +1002,16 @@ mod tests {
         );
         assert!(vfs.write_file_gated(fd, b"gated", &write_token).is_ok());
 
-        // Re-open file to reset offset to 0 for reading
-        let read_fd = vfs.open_file(id, 0).unwrap();
-
-        // Read should fail with bad_token and write_token, but succeed with read_token or all_token
+        let mut buf = [0u8; 16];
         assert_eq!(
-            vfs.read_file_gated(read_fd, &mut buf, &bad_token),
+            vfs.read_file_gated(fd, &mut buf, &bad_token),
             Err(FsError::PermissionDenied)
         );
         assert_eq!(
-            vfs.read_file_gated(read_fd, &mut buf, &write_token),
+            vfs.read_file_gated(fd, &mut buf, &write_token),
             Err(FsError::PermissionDenied)
         );
-        assert_eq!(vfs.read_file_gated(read_fd, &mut buf, &read_token), Ok(5));
+        assert_eq!(vfs.read_file_gated(fd, &mut buf, &read_token), Ok(5));
     }
 
     #[test]
@@ -1068,10 +1079,11 @@ mod tests {
     fn test_posix_uid_gid_dac_permissions() {
         let mut vfs = VirtualFilesystem::new();
         // Mode 0o750: owner rwx, group r-x, other ---
-        let file_id = vfs.create_file("secure.txt", 0o750, 0).unwrap();
+        let file_id = vfs.create_file(FileType::Regular, 1000).unwrap();
         if let Some(inode) = vfs.inodes.get_mut(&file_id) {
             inode.owner = 1000;
             inode.group = 1000;
+            inode.mode = FileMode::new(0o750);
         }
 
         let fd = vfs.open_file(file_id, O_RDWR).unwrap();

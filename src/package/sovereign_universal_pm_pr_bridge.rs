@@ -59,21 +59,14 @@ pub enum UniversalDistroPackageFormat {
     FlatpakApp,
     SnapApp,
     AppImage,
-    SolusEopkg,
     OpenWrtIpk,
     SlackwareSlackbuild,
     HomebrewBottle,
     WindowsMsiAppx,
-    GuixScheme,
     SerpentStone,
-    SlackwareTxz,
-    ZypperSpec,
-    SolusEopkg,
-    OpenWrtIpk,
     YoctoOpkg,
     SolarisIps,
     SwupdBundle,
-    HomebrewBottle,
     AndroidAab,
     MacOsApp,
     OciContainer,
@@ -107,21 +100,14 @@ impl UniversalDistroPackageFormat {
             Self::FlatpakApp => "flatpak (.flatpakref)",
             Self::SnapApp => "snap (.snap)",
             Self::AppImage => "appimage (.AppImage)",
-            Self::SolusEopkg => "eopkg (.eopkg)",
-            Self::OpenWrtIpk => "opkg (.ipk)",
-            Self::SlackwareSlackbuild => "slackware (SlackBuild / .txz)",
-            Self::HomebrewBottle => "homebrew (.bottle.tar.gz)",
-            Self::WindowsMsiAppx => "winget (.msi / .appx)",
-            Self::GuixScheme => "guix (.scm / derivation)",
-            Self::SerpentStone => "moss (.stone)",
-            Self::SlackwareTxz => "slackware (.txz / SlackBuild)",
-            Self::ZypperSpec => "zypper (.rpm / .spec)",
-            Self::SolusEopkg => "eopkg (pspec.xml / .eopkg)",
             Self::OpenWrtIpk => "opkg / ipk (control / .ipk)",
+            Self::SlackwareSlackbuild => "slackware (SlackBuild / .txz)",
+            Self::HomebrewBottle => "homebrew (.bottle.tar.gz / Formula)",
+            Self::WindowsMsiAppx => "winget (.msi / .appx)",
+            Self::SerpentStone => "moss (.stone)",
             Self::YoctoOpkg => "yocto (.opkg)",
             Self::SolarisIps => "solaris ips (.p5p / manifest)",
             Self::SwupdBundle => "swupd (bundle / manifest)",
-            Self::HomebrewBottle => "homebrew (.bottle.tar.gz / Formula)",
             Self::AndroidAab => "android (.aab / .apk)",
             Self::MacOsApp => "macos (.app / .dmg)",
             Self::OciContainer => "oci (container image tarball)",
@@ -290,7 +276,8 @@ impl LinuxBsdPackageFormatConverterEngine {
                         }
                     }
                 }
-                UniversalDistroPackageFormat::BsdPkg => {
+                UniversalDistroPackageFormat::FreeBsdPkg
+                | UniversalDistroPackageFormat::OpenBsdPkg => {
                     if trimmed.starts_with("name:") {
                         name = trimmed["name:".len()..].trim().trim_matches('"').to_string();
                     } else if trimmed.starts_with("version:") {
@@ -319,7 +306,8 @@ impl LinuxBsdPackageFormatConverterEngine {
             declared_dependencies: dependencies,
             provides_capabilities: capabilities,
             sandbox_level: match format {
-                UniversalDistroPackageFormat::BsdPkg => 3, // Full Capsicum
+                UniversalDistroPackageFormat::FreeBsdPkg
+                | UniversalDistroPackageFormat::OpenBsdPkg => 3,
                 UniversalDistroPackageFormat::FlatpakApp | UniversalDistroPackageFormat::SnapApp => 2, // Landlock+Seccomp
                 _ => 2,
             },
@@ -510,7 +498,7 @@ impl UniversalCliCommandBridge {
                 Some(UniversalCliTranslation {
                     source_pm: "pkg",
                     package_name: pkg.to_string(),
-                    target_format: UniversalDistroPackageFormat::BsdPkg,
+                    target_format: UniversalDistroPackageFormat::FreeBsdPkg,
                     generated_manifest: format!("name: {}\nversion: 1.0.0\ndeps: {{ libc: {{ origin: \"devel/libc\" }} }}", pkg),
                     inferred_dependencies: vec!["libc".to_string()],
                 })
@@ -728,7 +716,7 @@ impl SovereignUniversalPmPrBridgeEngine {
             "apk" => UniversalDistroPackageFormat::AlpineApk,
             "xbps-install" | "xbps" => UniversalDistroPackageFormat::VoidXbps,
             "emerge" => UniversalDistroPackageFormat::GentooEbuild,
-            "pkg" => UniversalDistroPackageFormat::BsdPkg,
+            "pkg" => UniversalDistroPackageFormat::FreeBsdPkg,
             "nix" | "nix-env" => UniversalDistroPackageFormat::NixFlake,
             "flatpak" => UniversalDistroPackageFormat::FlatpakApp,
             "snap" => UniversalDistroPackageFormat::SnapApp,
@@ -915,7 +903,7 @@ mod tests {
             ("apk add bash", UniversalDistroPackageFormat::AlpineApk, "bash"),
             ("xbps-install -S git", UniversalDistroPackageFormat::VoidXbps, "git"),
             ("emerge --ask gcc", UniversalDistroPackageFormat::GentooEbuild, "gcc"),
-            ("pkg install vim", UniversalDistroPackageFormat::BsdPkg, "vim"),
+            ("pkg install vim", UniversalDistroPackageFormat::FreeBsdPkg, "vim"),
             ("nix profile install nixpkgs#ripgrep", UniversalDistroPackageFormat::NixFlake, "nixpkgs#ripgrep"),
         ];
 

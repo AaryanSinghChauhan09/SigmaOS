@@ -47,6 +47,7 @@ pub mod toml;
 pub mod utf8_utils;
 pub mod uuid;
 pub mod uvm;
+pub mod vec;
 pub mod vecdeque;
 pub mod zero_dependency_elimination;
 
@@ -112,25 +113,15 @@ pub use collections::HashSet;
 
 pub use custom_string::SigmaString;
 
-pub mod vec {
-    pub use super::Vec;
-}
-
 /// SigmaOS kernel library prelude.
-///
-/// Kernel modules can use `use crate::klib::prelude::*;` to get
-/// sovereign implementations of common types without stdlib imports.
 pub mod prelude {
-    // Collections
     pub use super::BTreeMap;
     pub use super::Vec;
     pub use super::HashMap;
     pub use super::HashSet;
-    // Linked structures
     pub use super::LinkedList;
     pub use super::RingBuffer;
     pub use super::HeapRingBuffer;
-    // Utilities
     pub use super::Arc;
     pub use super::Uuid;
     pub use super::SigmaString;

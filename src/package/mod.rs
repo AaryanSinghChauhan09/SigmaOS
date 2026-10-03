@@ -5,13 +5,6 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
 
 // SigmaOS Package Module
 pub mod alpine_apk;
@@ -77,8 +70,6 @@ pub mod sovereign_distro_package_advancements_v7;
 pub use sovereign_distro_package_advancements_v7::*;
 pub mod sovereign_distro_package_advancements_v8;
 pub use sovereign_distro_package_advancements_v8::*;
-pub mod sovereign_universal_pm_pr_bridge;
-pub use sovereign_universal_pm_pr_bridge::*;
 
 pub use alpine_apk::{ApkPackage, ApkPackageManager, ApkRepository, ApkWorld};
 pub use arch_aur::{AURPackage, BuildError, SigmaAUR, PKGBUILD};
@@ -152,8 +143,7 @@ pub use cleanup::{
     PackageCleanupManager,
 };
 pub use store::{
-    SigmaSoftwareStore, SoftwareRegistryEntry, /* StoreApp, StoreError, */ // store module not available
-     GLOBAL_SOFTWARE_STORE,
+    SigmaSoftwareStore, SoftwareRegistryEntry, GLOBAL_SOFTWARE_STORE,
 };
 pub use universal::{
     AptDebManifest, ConflictResolution, DependencyResolver, FreeBsdVuXmlPoudriereAuditAdapter,

@@ -10,10 +10,6 @@ use std::string::String;
 use std::string::ToString;
 use std::vec::Vec;
 
-// ==========================================
-// 1. Linux Standard Base (LSB) & /etc/os-release
-// ==========================================
-
 #[derive(Debug, Clone)]
 pub struct LsbReleaseInfo {
     pub distro_id: String,
@@ -26,7 +22,6 @@ pub struct LsbReleaseInfo {
 pub struct LsbReleaseGovernor;
 
 impl LsbReleaseGovernor {
-    /// Parses standard Linux `/etc/os-release` file content
     pub fn parse_os_release(content: &str) -> LsbReleaseInfo {
         let mut distro_id = String::from("sigmaos");
         let mut description = String::from("SigmaOS Linux Universal Parity Edition");
@@ -67,10 +62,6 @@ impl LsbReleaseGovernor {
         }
     }
 }
-
-// ==========================================
-// 2. SysVinit Runlevels & Systemd Target Parity
-// ==========================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LinuxRunlevel {
@@ -129,24 +120,19 @@ impl Default for LinuxRunlevelGovernor {
     }
 }
 
-// ==========================================
-// 3. /etc/fstab Mount Entry Engine
-// ==========================================
-
 #[derive(Debug, Clone)]
 pub struct FstabEntry {
-    pub spec: String,        // UUID=xxx or /dev/sda1
-    pub file: String,        // Mount point e.g. /home or /
-    pub vfstype: String,     // ext4, btrfs, xfs, vfat
-    pub mntops: Vec<String>, // rw, noatime, errors=remount-ro
-    pub freq: u32,           // dump order
-    pub passno: u32,         // fsck order
+    pub spec: String,
+    pub file: String,
+    pub vfstype: String,
+    pub mntops: Vec<String>,
+    pub freq: u32,
+    pub passno: u32,
 }
 
 pub struct LinuxFstabEngine;
 
 impl LinuxFstabEngine {
-    /// Parses `/etc/fstab` configuration file
     pub fn parse_fstab(content: &str) -> Vec<FstabEntry> {
         let mut entries = Vec::new();
 
@@ -189,14 +175,10 @@ impl LinuxFstabEngine {
     }
 }
 
-// ==========================================
-// 4. Dynamic Shared Library Symbol Loader (ld.so)
-// ==========================================
-
 #[derive(Debug, Clone)]
 pub struct SharedLibrary {
     pub soname: String,
-    pub symbols: HashMap<String, u64>, // Symbol Name -> Address
+    pub symbols: HashMap<String, u64>,
 }
 
 pub struct LinuxLdSoLoader {
@@ -237,10 +219,6 @@ impl Default for LinuxLdSoLoader {
     }
 }
 
-// ==========================================
-// 5. Linux Pluggable Authentication Modules (PAM) Engine
-// ==========================================
-
 pub struct LinuxPamAuthenticationEngine {
     pub active_service: String,
     pub pam_modules: Vec<String>,
@@ -266,28 +244,13 @@ impl LinuxPamAuthenticationEngine {
             return Err("PAM Authentication Error: Username empty");
         }
 
-        let _ = password;
-        // Simulate pam_unix.so credential check
-        // NOTE: Production authentication must use /etc/shadow with bcrypt/argon2
-        // and must NOT use hardcoded credentials. This is a PAM simulation stub.
         let expected_hash = std::env::var("SIGMA_PAM_TEST_HASH")
             .unwrap_or_else(|_| String::from("__UNSET__"));
-        // Only allow auth if the env var is set and matches; never hardcode passwords
-        let is_valid = !expected_hash.is_empty()
-            && expected_hash != "__UNSET__"
-            && password == expected_hash;
-        // Simulate pam_unix.so credential check
-        // NOTE: Production authentication must use /etc/shadow with bcrypt/argon2
-        // and must NOT use hardcoded credentials. This is a PAM simulation stub.
-        let expected_hash =
-            std::env::var("SIGMA_PAM_TEST_HASH").unwrap_or_else(|_| String::from("__UNSET__"));
-        // Only allow auth if the env var is set and matches; never hardcode passwords
-        let is_valid =
-            !expected_hash.is_empty() && expected_hash != "__UNSET__" && password == expected_hash;
-        // Only allow auth if the env var is set and matches; never hardcode credentials
+
         let is_valid = !expected_hash.is_empty()
             && expected_hash != "__UNSET__"
             && auth_token == expected_hash;
+
         self.authenticated_sessions
             .insert(username.to_string(), is_valid);
         Ok(is_valid)
@@ -297,10 +260,6 @@ impl LinuxPamAuthenticationEngine {
         self.authenticated_sessions.remove(username);
     }
 }
-
-// ==========================================
-// 6. Linux Sysctl Governor (/etc/sysctl.conf)
-// ==========================================
 
 pub struct LinuxSysctlGovernor {
     pub sysctl_params: HashMap<String, String>,
@@ -345,10 +304,6 @@ impl Default for LinuxSysctlGovernor {
         Self::new()
     }
 }
-
-// ==========================================
-// 7. Linux Udev Rules Engine (/etc/udev/rules.d/)
-// ==========================================
 
 #[derive(Debug, Clone)]
 pub struct UdevRule {
@@ -430,10 +385,6 @@ impl Default for LinuxUdevRulesEngine {
     }
 }
 
-// ==========================================
-// 8. Linux Modules Load Engine (/etc/modules-load.d/)
-// ==========================================
-
 pub struct LinuxModulesLoadEngine {
     pub modules_to_load: Vec<String>,
 }
@@ -464,16 +415,12 @@ impl Default for LinuxModulesLoadEngine {
     }
 }
 
-// ==========================================
-// 9. Linux Systemd Tmpfiles Engine (/etc/tmpfiles.d/)
-// ==========================================
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TmpfileItemType {
-    CreateDirectory, // 'd'
-    CreateFile,      // 'f'
-    CreateSymlink,   // 'L'
-    CleanupDirectory,// 'e'
+    CreateDirectory,
+    CreateFile,
+    CreateSymlink,
+    CleanupDirectory,
 }
 
 #[derive(Debug, Clone)]
@@ -535,10 +482,6 @@ impl Default for LinuxSystemdTmpfilesEngine {
     }
 }
 
-// ==========================================
-// 10. Linux Swap & Zram Manager Engine (swapon/swapoff Parity)
-// ==========================================
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SwapKind {
     Partition,
@@ -599,10 +542,6 @@ impl Default for LinuxSwapfileManagerEngine {
     }
 }
 
-// ==========================================
-// 11. Linux Core Dump Filter Engine (/proc/sys/kernel/core_pattern Parity)
-// ==========================================
-
 pub struct LinuxCoreDumpFilterEngine {
     pub core_pattern: String,
     pub max_core_size_bytes: u64,
@@ -612,7 +551,7 @@ impl LinuxCoreDumpFilterEngine {
     pub fn new() -> Self {
         Self {
             core_pattern: String::from("/var/lib/systemd/coredump/core.%e.%p.%t"),
-            max_core_size_bytes: 1024 * 1024 * 512, // 512 MB
+            max_core_size_bytes: 1024 * 1024 * 512,
         }
     }
 
@@ -630,12 +569,9 @@ impl Default for LinuxCoreDumpFilterEngine {
     }
 }
 
-// ==========================================
-// 12. Integration Tests
-// ==========================================
-
+#[cfg(test)]
 mod tests {
-
+    use super::*;
 
     #[test]
     fn test_lsb_os_release_parser() {
@@ -695,11 +631,8 @@ UUID=AAAA-BBBB           /boot/efi       vfat    umask=0077        0       2
         assert_eq!(pam.active_service, "sshd");
         assert!(pam.pam_modules.contains(&"pam_unix.so".to_string()));
 
-        // Authentication test: env-driven credential check
-        // When SIGMA_PAM_TEST_HASH is set, authentication succeeds with matching value
         let test_hash = std::env::var("SIGMA_PAM_TEST_HASH").unwrap_or_default();
         let ok = if test_hash.is_empty() {
-            // Without env var, authentication correctly fails
             let unauth_val = format!("{}_{}", "any", "value");
             let result = pam.authenticate("sovereign_user", &unauth_val).unwrap();
             assert!(!result, "PAM should deny without env var set");
@@ -707,7 +640,7 @@ UUID=AAAA-BBBB           /boot/efi       vfat    umask=0077        0       2
         } else {
             pam.authenticate("sovereign_user", &test_hash).unwrap()
         };
-        let _ = ok; // result depends on env configuration
+        let _ = ok;
 
         pam.close_session("sovereign_user");
         assert!(pam.authenticated_sessions.get("sovereign_user").is_none());

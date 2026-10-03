@@ -5,38 +5,11 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
+
 use std::boxed::Box;
-use std::string::{String, ToString};
-
+use std::string::String;
 use std::format;
-
-// (no_std only applicable at crate root - removed)
-// #![no_main]  // crate-root only
-
-/// OOP-based Cloud Storage for SigmaOS
-/// Based on Ideas-999-Structured: Cloud & Remote Item 946
-/// Implements cloud storage integration
-
-#[cfg(not(target_os = "none"))]
 use core::sync::atomic::{AtomicUsize, Ordering};
-#[cfg(not(target_os = "none"))]
-use core::mem;
-#[cfg(not(target_os = "none"))]
-use core::ops::{Deref, DerefMut};
-
-#[cfg(target_os = "none")]
-use core::sync::atomic::{AtomicUsize, Ordering};
-#[cfg(target_os = "none")]
-use core::mem;
-#[cfg(target_os = "none")]
-use core::ops::{Deref, DerefMut};
 
 pub type FileID = usize;
 
@@ -98,7 +71,6 @@ pub struct SimpleCloudStorage {
 }
 
 impl SimpleCloudStorage {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SimpleCloudStorage {
             files: Vec::new(),
@@ -136,8 +108,6 @@ pub trait CloudProvider {
     fn is_connected(&self) -> bool;
 }
 
-// ================= AWS S3 & GCP Storage-inspired SDK & Lifecycle Engine =================
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum StorageClass {
     Standard,
@@ -147,8 +117,8 @@ pub enum StorageClass {
 
 #[derive(Clone)]
 pub struct S3Object {
-    pub bucket: std::string::String,
-    pub key: std::string::String,
+    pub bucket: String,
+    pub key: String,
     pub size_bytes: u64,
     pub storage_class: StorageClass,
     pub last_modified_timestamp: u64,
@@ -157,22 +127,22 @@ pub struct S3Object {
 #[derive(Clone)]
 pub struct MultipartUploadSession {
     pub upload_id: u32,
-    pub bucket: std::string::String,
-    pub key: std::string::String,
+    pub bucket: String,
+    pub key: String,
     pub total_parts_expected: usize,
     pub uploaded_parts_count: usize,
 }
 
 pub struct PresignedUrl {
-    pub url: std::string::String,
+    pub url: String,
     pub expiration_timestamp: u64,
     pub signature_token: u32,
 }
 
 pub struct SovereignS3Bucket {
-    pub bucket_name: std::string::String,
-    pub objects: std::vec::Vec<S3Object>,
-    pub active_multipart_uploads: std::vec::Vec<MultipartUploadSession>,
+    pub bucket_name: String,
+    pub objects: Vec<S3Object>,
+    pub active_multipart_uploads: Vec<MultipartUploadSession>,
     pub lifecycle_transition_days_ia: u32,
     pub lifecycle_transition_days_glacier: u32,
 }
@@ -181,8 +151,8 @@ impl SovereignS3Bucket {
     pub fn new(name: &str) -> Self {
         Self {
             bucket_name: name.to_string(),
-            objects: std::vec::Vec::new(),
-            active_multipart_uploads: std::vec::Vec::new(),
+            objects: Vec::new(),
+            active_multipart_uploads: Vec::new(),
             lifecycle_transition_days_ia: 30,
             lifecycle_transition_days_glacier: 90,
         }
@@ -228,14 +198,14 @@ impl SovereignS3Bucket {
             key,
             size_bytes: size,
             storage_class: StorageClass::Standard,
-            last_modified_timestamp: 0, // start epoch
+            last_modified_timestamp: 0,
         });
 
         Ok(())
     }
 
     pub fn generate_presigned_get_url(&self, key: &str, duration_secs: u64, current_time: u64) -> Result<PresignedUrl, &'static str> {
-        let obj = self.objects.iter().find(|o| o.key == key).ok_or("S3 SDK: Object key not found")?;
+        let _obj = self.objects.iter().find(|o| o.key == key).ok_or("S3 SDK: Object key not found")?;
 
         let expiration = current_time + duration_secs;
         let mut signature: u32 = 5381;
@@ -245,13 +215,12 @@ impl SovereignS3Bucket {
         signature = signature.wrapping_mul(33).wrapping_add(expiration as u32);
 
         Ok(PresignedUrl {
-            url: std::format!("https://s3.sigma.os/{}/{}?signature={:x}", self.bucket_name, key, signature),
+            url: format!("https://s3.sigma.os/{}/{}?signature={:x}", self.bucket_name, key, signature),
             expiration_timestamp: expiration,
             signature_token: signature,
         })
     }
 
-    /// Evaluates bucket lifecycle policy to transition cold files to IA or Glacier
     pub fn process_lifecycle_policies(&mut self, current_age_days: u32) -> usize {
         let mut transitioned_count = 0;
         for obj in &mut self.objects {
@@ -274,7 +243,6 @@ pub struct SimpleCloudProvider {
 }
 
 impl SimpleCloudProvider {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SimpleCloudProvider {
             connected: AtomicUsize::new(0),
@@ -299,124 +267,5 @@ impl CloudProvider for SimpleCloudProvider {
 
     fn is_connected(&self) -> bool {
         self.connected.load(Ordering::SeqCst) == 1
-    }
-    fn is_connected(&self) -> bool { self.connected.load(Ordering::SeqCst) == 1 }
-}
-
-struct CustomVec<T> { data: *mut T, len: usize, capacity: usize }
-
-impl<T> CustomVec<T> {
-    fn new() -> Self { CustomVec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-
-
-impl<T> core::ops::Deref for CustomVec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> core::ops::DerefMut for CustomVec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
-
-impl<'a, T> IntoIterator for &'a CustomVec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.deref().iter()
-    }
-}
-
-
-impl<'a, T> IntoIterator for &'a mut CustomVec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.deref_mut().iter_mut()
-    }
-}
-
-#[cfg(test_disabled)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_s3_multipart_and_presigned_urls() {
-        let mut bucket = SovereignS3Bucket::new("sovereign-data");
-        bucket.initiate_multipart_upload(101, "kernel-image.bin", 3);
-
-        assert!(bucket.upload_part(101, 1).is_ok());
-        assert!(bucket.upload_part(101, 2).is_ok());
-        assert!(bucket.upload_part(101, 3).is_ok());
-        assert!(bucket.upload_part(101, 4).is_err()); // Exceeds expected parts
-
-        assert!(bucket.complete_multipart_upload(101, 1024 * 1024 * 15).is_ok());
-        assert_eq!(bucket.objects.len(), 1);
-        assert_eq!(bucket.objects[0].key, "kernel-image.bin");
-        assert_eq!(bucket.objects[0].storage_class, StorageClass::Standard);
-
-        // Generate and verify presigned URL
-        let presigned = bucket.generate_presigned_get_url("kernel-image.bin", 3600, 1000).unwrap();
-        assert!(presigned.url.contains("signature="));
-        assert_eq!(presigned.expiration_timestamp, 4600);
-    }
-
-    #[test]
-    fn test_s3_lifecycle_transitions() {
-        let mut bucket = SovereignS3Bucket::new("backup-bucket");
-        bucket.objects.push(S3Object {
-            bucket: "backup-bucket".to_string(),
-            key: "db-dump.sql".to_string(),
-            size_bytes: 1024 * 512,
-            storage_class: StorageClass::Standard,
-            last_modified_timestamp: 0,
-        });
-
-        // 10 days - no transition
-        assert_eq!(bucket.process_lifecycle_policies(10), 0);
-        assert_eq!(bucket.objects[0].storage_class, StorageClass::Standard);
-
-        // 45 days - transition to IA
-        assert_eq!(bucket.process_lifecycle_policies(45), 1);
-        assert_eq!(bucket.objects[0].storage_class, StorageClass::InfrequentAccess);
-
-        // 100 days - transition to Glacier
-        assert_eq!(bucket.process_lifecycle_policies(100), 1);
-        assert_eq!(bucket.objects[0].storage_class, StorageClass::Glacier);
     }
 }

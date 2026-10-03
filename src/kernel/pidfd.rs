@@ -152,7 +152,6 @@ impl PidfdProcDescManager {
     pub fn pdfork(&mut self, parent_pid: u64, capabilities: ProcDescCapabilities) -> Result<(u64, ProcDesc), &'static str> {
         let pid = self.next_pid.fetch_add(1, Ordering::SeqCst);
 
-        let procdesc = ProcDesc { pid, capabilities };
         let procdesc = ProcDesc {
             pid,
             capabilities,
@@ -243,7 +242,6 @@ impl PidfdProcDescManager {
             .entry(subreaper_pid)
             .or_insert_with(Vec::new)
             .push(orphan_pid);
-        self.process_tree.entry(subreaper_pid).or_insert_with(Vec::new).push(orphan_pid);
 
         Ok(subreaper_pid)
     }
@@ -276,7 +274,6 @@ mod tests {
     #[test]
     fn test_pidfd_open() {
         let mut manager = PidfdProcDescManager::new();
-        let manager = PidfdProcDescManager::new();
 
         let pidfd = manager.pidfd_open(1, 0x01).unwrap();
         assert_eq!(pidfd.pid, 1);
@@ -287,7 +284,6 @@ mod tests {
     #[test]
     fn test_pidfd_send_signal() {
         let mut manager = PidfdProcDescManager::new();
-        let manager = PidfdProcDescManager::new();
 
         let pidfd = manager.pidfd_open(1, 0x01).unwrap();
         assert!(manager.pidfd_send_signal(pidfd.fd, 9).is_ok());
@@ -296,7 +292,6 @@ mod tests {
     #[test]
     fn test_pidfd_restricted() {
         let mut manager = PidfdProcDescManager::new();
-        let manager = PidfdProcDescManager::new();
 
         let pidfd = manager.pidfd_open(1, 0x00).unwrap();
         assert!(!pidfd.capabilities.can_send_signal);

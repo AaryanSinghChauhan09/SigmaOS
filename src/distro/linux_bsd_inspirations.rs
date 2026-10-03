@@ -3036,6 +3036,11 @@ mod cross_subsystem_tests {
             DistroSubsystemMode::LinuxDietPi,
             DistroSubsystemMode::LinuxRegolith,
             DistroSubsystemMode::LinuxOpenMandriva,
+            DistroSubsystemMode::LinuxUbuntuServer,
+            DistroSubsystemMode::LinuxPopOsCosmic,
+            DistroSubsystemMode::FreeBsdHardened,
+            DistroSubsystemMode::DragonFlyHammer2,
+            DistroSubsystemMode::SolarisSmartOS,
         ];
 
         for m in modes {

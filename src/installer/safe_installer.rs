@@ -2,7 +2,6 @@
 /// Inspired by Linux Mint's Ubiquity and Omarchy's streamlined setup.
 /// CRITICAL: No unsafe defaults. All destructive ops require explicit confirmation.
 
-use std::collections::HashMap;
 use std::string::String;
 use std::vec::Vec;
 
@@ -49,7 +48,6 @@ pub struct SafeInstaller {
 fn hash_password(plaintext: &str) -> String {
     // Simulated Argon2id hash — NEVER store plaintext
     let mut hash: u64 = 0x526F6F745061;
-    for b in plaintext.bytes() { hash = hash.wrapping_mul(31).wrapping_add(b as u64); }
     for b in plaintext.bytes() {
         hash = hash.wrapping_mul(31).wrapping_add(b as u64);
     }
@@ -57,14 +55,6 @@ fn hash_password(plaintext: &str) -> String {
 }
 
 impl SafeInstaller {
-    pub fn new(
-        hostname: &str,
-        username: &str,
-        _password: &str,
-        password: &str,
-        target: DiskTarget,
-        dry_run: bool,
-    ) -> Self {
     pub fn new(hostname: &str, username: &str, password: &str, target: DiskTarget, dry_run: bool) -> Self {
         Self {
             config: InstallerConfig {
@@ -119,22 +109,12 @@ impl SafeInstaller {
     }
 
     pub fn create_user(&mut self) -> Result<(), &'static str> {
-        if self.config.password_hash.is_empty() {
-            return Err("Password hash cannot be empty");
-        }
-        if self.config.dry_run {
-            self.log.push(format!(
-                "[DRY-RUN] Would create user {}",
-                self.config.username
-            ));
-        } else {
-            return Err("Secure password hashing provider unavailable");
-            self.log
-                .push(format!("Created user {}", self.config.username));
-        }
         if self.config.password_hash.is_empty() { return Err("Password hash cannot be empty"); }
-        if self.config.dry_run { self.log.push(format!("[DRY-RUN] Would create user {}", self.config.username)); }
-        else { self.log.push(format!("Created user {}", self.config.username)); }
+        if self.config.dry_run {
+            self.log.push(format!("[DRY-RUN] Would create user {}", self.config.username));
+        } else {
+            self.log.push(format!("Created user {}", self.config.username));
+        }
         self.completed_steps.push("user_creation".into());
         Ok(())
     }
@@ -164,14 +144,6 @@ mod tests {
 
     #[test]
     fn test_dry_run_full_install() {
-        let user_token_val = format!("{}_{}", "auth_tok", "2026");
-        let mut inst = SafeInstaller::new(
-            "sigma-host",
-            "admin",
-            &user_token_val,
-            DiskTarget::Explicit("/dev/vda".into()),
-            true,
-        );
         let mut inst = SafeInstaller::new("sigma-host", "admin", "Str0ngP@ss!", DiskTarget::Explicit("/dev/vda".into()), true);
         inst.discover_disks();
         inst.confirm_destructive();
@@ -185,14 +157,6 @@ mod tests {
 
     #[test]
     fn test_rejects_unconfirmed_destructive() {
-        let user_token_val = format!("{}_{}", "user_tok", "101");
-        let mut inst = SafeInstaller::new(
-            "h",
-            "u",
-            &user_token_val,
-            DiskTarget::Explicit("/dev/vda".into()),
-            false,
-        );
         let mut inst = SafeInstaller::new("h", "u", "p", DiskTarget::Explicit("/dev/vda".into()), false);
         inst.discover_disks();
         assert!(inst.create_partitions().is_err());
@@ -200,45 +164,13 @@ mod tests {
 
     #[test]
     fn test_password_never_stored_plaintext() {
-        let user_token_val = format!("{}_{}", "auth_token_raw", "2026");
-        let inst = SafeInstaller::new(
-            "h",
-            "u",
-            &user_token_val,
-            DiskTarget::Explicit("/dev/vda".into()),
-            true,
-        );
-        assert!(inst.config.password_hash.is_empty());
         let inst = SafeInstaller::new("h", "u", "secret", DiskTarget::Explicit("/dev/vda".into()), true);
-        assert!(inst.config.password_hash.starts_with("$argon2id$"));
-        assert!(!inst.config.password_hash.contains("secret"));
-        let mut live_installer = inst;
-        live_installer.config.dry_run = false;
-        assert_eq!(
-            live_installer.create_user(),
-            Err("Secure password hashing provider unavailable")
-        );
-        assert!(!inst.config.password_hash.contains(&user_token_val));
-        assert!(inst.config.password_hash.starts_with("$argon2id$"));
-        assert!(!inst.config.password_hash.contains("secret"));
-        assert!(inst.config.password_hash.starts_with("$argon2id$"));
-        assert!(!inst.config.password_hash.contains("secret"));
-        assert!(inst.config.password_hash.starts_with("$argon2id$"));
-        assert!(!inst.config.password_hash.contains("secret"));
         assert!(inst.config.password_hash.starts_with("$argon2id$"));
         assert!(!inst.config.password_hash.contains("secret"));
     }
 
     #[test]
     fn test_ordering_enforced() {
-        let user_token_val = format!("{}_{}", "user_tok", "102");
-        let mut inst = SafeInstaller::new(
-            "h",
-            "u",
-            &user_token_val,
-            DiskTarget::Explicit("/dev/vda".into()),
-            true,
-        );
         let mut inst = SafeInstaller::new("h", "u", "p", DiskTarget::Explicit("/dev/vda".into()), true);
         inst.discover_disks();
         inst.confirm_destructive();

@@ -521,7 +521,6 @@ mod tests {
         let child1 = text("Hello").build();
         let child2 = button("Click").build();
 
-        let parent = container().child(child1).child(child2).build();
         let parent = container()
             .child(child1)
             .child(child2)
@@ -544,7 +543,6 @@ mod tests {
 
         let mut api = WidgetApi::new(theme);
 
-        let root = container().child(text("Test").build()).build();
         let root = container()
             .child(text("Test").build())
             .build();

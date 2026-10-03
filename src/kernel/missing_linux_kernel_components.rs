@@ -777,10 +777,6 @@ mod extended_kernel_tests {
     }
 
     #[test]
-    fn test_landlock_binder_zswap_overlay_memfd_engines() {
-        // Stub test - these components are not yet implemented
-        // TODO: Implement LinuxLandlockV5AccessEngine, LinuxBinderIpcEngine,
-        // LinuxZswapCompressedStorageEngine, LinuxOverlayfsMountEngine, LinuxMemfdSecretEngine
     fn test_seccomp_epoll_ksm_fanotify_engines() {
         let mut seccomp = LinuxSeccompBpfSyscallFilterEngine::new(SeccompAction::KillProcess);
         seccomp.allow_syscall(1);

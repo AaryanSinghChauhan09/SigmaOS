@@ -653,6 +653,7 @@ impl Default for FedoraAnacondaKickstartEngine {
 pub struct FedoraSssdFreeIpaEngine {
     pub realm: String,
     pub enrolled_hosts: Vec<String>,
+    pub is_joined: bool,
 }
 
 impl FedoraSssdFreeIpaEngine {
@@ -660,7 +661,15 @@ impl FedoraSssdFreeIpaEngine {
         Self {
             realm: String::new(),
             enrolled_hosts: Vec::new(),
+            is_joined: false,
         }
+    }
+
+    pub fn join_realm(&mut self, realm: &str, host: &str) -> Result<(), &'static str> {
+        self.realm = realm.to_string();
+        self.enrolled_hosts.push(host.to_string());
+        self.is_joined = true;
+        Ok(())
     }
 }
 

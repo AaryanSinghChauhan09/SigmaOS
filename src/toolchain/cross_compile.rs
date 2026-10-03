@@ -1,18 +1,8 @@
-
-use core::sync::atomic::{AtomicUsize, Ordering};
 use std::boxed::Box;
 use std::format;
 use std::string::String;
-/// OOP-based Cross-compile Toolchain for SigmaOS
-/// Based on Ideas-999-Structured: Package, Build & Reproducibility Item 9
-/// Implements reproducible cross builds for multiple architectures
-
 use std::vec::Vec;
-use std::boxed::Box;
-use std::format;
-use std::string::String;
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type ToolchainID = usize;
 
@@ -44,7 +34,6 @@ pub enum BuildSystemType {
     Meson = 4,
 }
 
-/// CMake-compatible script generator for cross-compiling C/C++/Rust polyglot targets
 pub struct CMakeGenerator;
 
 impl CMakeGenerator {
@@ -68,7 +57,6 @@ impl CMakeGenerator {
     }
 }
 
-/// Polyglot Cross Build Tool Orchestrator for Rust, Zig, Nim, C, and C++ targets
 pub struct PolyglotCrossBuildTool {
     pub target_arch: Architecture,
     pub build_system: BuildSystemType,
@@ -90,8 +78,7 @@ impl PolyglotCrossBuildTool {
         }
 
         let mut output_binary = Vec::new();
-        // Simulate ELF header emission for target architecture
-        output_binary.extend_from_slice(b"\x7FELF\x02\x01\x01\x00"); // 64-bit ELF magic
+        output_binary.extend_from_slice(b"\x7FELF\x02\x01\x01\x00");
         output_binary.extend_from_slice(source_code);
 
         Ok(output_binary)
@@ -108,7 +95,6 @@ impl PolyglotCrossBuildTool {
     }
 }
 
-/// Meson-compatible build file generator for cross-compiling targets
 pub struct MesonGenerator;
 
 impl MesonGenerator {
@@ -141,7 +127,6 @@ pub struct SimpleToolchain {
     pub target_arch: AtomicUsize,
     pub name: [u8; 64],
     pub version: [u8; 32],
-    // O(1) length cache: stores exact slice byte lengths to avoid O(N) zero-byte linear scans (.position(|&b| b == 0))
     pub name_len: u8,
     pub version_len: u8,
 }
@@ -169,7 +154,7 @@ impl SimpleToolchain {
 
 impl Toolchain for SimpleToolchain {
     fn id(&self) -> ToolchainID { self.id }
-    fn target_arch(&self) -> Architecture { {
+    fn target_arch(&self) -> Architecture {
         let raw = self.target_arch.load(Ordering::SeqCst) as u32;
         match raw {
             1 => Architecture::ARM64,
@@ -177,13 +162,11 @@ impl Toolchain for SimpleToolchain {
             3 => Architecture::PPC64,
             _ => Architecture::X86_64,
         }
-    } }
+    }
     fn name(&self) -> &[u8] {
-        // O(1) constant-time slice lookup using cached name_len
         &self.name[..self.name_len as usize]
     }
     fn version(&self) -> &[u8] {
-        // O(1) constant-time slice lookup using cached version_len
         &self.version[..self.version_len as usize]
     }
 
@@ -399,7 +382,6 @@ impl ReproducibleBuild for SimpleReproducibleBuild {
         true
     }
 
-    /// Scrub environment variables to remove user/host-leaking information
     fn scrub_environment(&self, raw_env: &mut [u8]) -> usize {
         let mut temp = [0u8; 1024];
         let mut read_idx = 0;
@@ -481,7 +463,6 @@ impl ReproducibleBuild for SimpleReproducibleBuild {
         copy_len
     }
 
-    /// Map actual absolute build paths to deterministic canonical paths
     fn map_paths(&self, raw_paths: &mut [u8], actual_prefix: &[u8], canon_prefix: &[u8]) -> usize {
         if actual_prefix.is_empty() {
             return raw_paths.len();
@@ -515,7 +496,6 @@ impl ReproducibleBuild for SimpleReproducibleBuild {
         copy_len
     }
 
-    /// Normalize tar archive headers (permissions, owners, timestamps to SOURCE_DATE_EPOCH) and recalculate checksums
     fn stabilize_archive_metadata(&self, archive_data: &mut [u8], timestamp: u64) -> usize {
         let len = archive_data.len();
         if len < 512 {
@@ -530,19 +510,16 @@ impl ReproducibleBuild for SimpleReproducibleBuild {
             };
 
             if is_header {
-                // UID = "0000000\0"
                 for i in 0..7 {
                     archive_data[offset + 108 + i] = b'0';
                 }
                 archive_data[offset + 115] = 0;
 
-                // GID = "0000000\0"
                 for i in 0..7 {
                     archive_data[offset + 116 + i] = b'0';
                 }
                 archive_data[offset + 123] = 0;
 
-                // Mode = "0000644\0"
                 archive_data[offset + 100] = b'0';
                 archive_data[offset + 101] = b'0';
                 archive_data[offset + 102] = b'0';
@@ -552,7 +529,6 @@ impl ReproducibleBuild for SimpleReproducibleBuild {
                 archive_data[offset + 106] = b'4';
                 archive_data[offset + 107] = 0;
 
-                // Mtime format in octal (11 octal digits + space/null)
                 let mut octal = [b'0'; 11];
                 let mut val = timestamp;
                 for i in (0..11).rev() {
@@ -564,18 +540,15 @@ impl ReproducibleBuild for SimpleReproducibleBuild {
                 }
                 archive_data[offset + 147] = b' ';
 
-                // Clear checksum field with spaces to recalculate
                 for i in 0..8 {
                     archive_data[offset + 148 + i] = b' ';
                 }
 
-                // Sum all 512 bytes
                 let mut sum = 0u32;
                 for i in 0..512 {
                     sum += archive_data[offset + i] as u32;
                 }
 
-                // Format sum as a 6-digit octal string + null + space
                 let mut sum_octal = [b'0'; 6];
                 let mut temp_sum = sum;
                 for i in (0..6).rev() {
@@ -595,7 +568,6 @@ impl ReproducibleBuild for SimpleReproducibleBuild {
         len
     }
 
-    /// Detailed diffoscope-style byte diagnostic audit of reproducibility discrepancies
     fn audit_reproducibility(&self, binary1: &[u8], binary2: &[u8], out_report: &mut [u8]) -> usize {
         let mut idx = 0;
 
@@ -703,8 +675,6 @@ impl ReproducibleBuild for SimpleReproducibleBuild {
     }
 }
 
-
-#[cfg(test_disabled)]
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -757,21 +727,17 @@ mod tests {
     #[test]
     fn test_stabilize_archive_metadata() {
         let mut archive = [0u8; 512];
-        // Write the tar magic "ustar"
         archive[257..262].copy_from_slice(b"ustar");
 
         let builder = SimpleReproducibleBuild::new();
-        // 1718900000 = 14635052440 in octal
         let len = builder.stabilize_archive_metadata(&mut archive, 1718900000);
         assert_eq!(len, 512);
 
-        // Verify metadata fields normalized
         assert_eq!(&archive[108..116], b"0000000\0");
         assert_eq!(&archive[116..124], b"0000000\0");
         assert_eq!(&archive[100..108], b"0000644\0");
         assert_eq!(&archive[136..148], b"14635052440 ");
 
-        // Checksum field should not be empty spaces (recalculated sum should be written)
         assert_ne!(&archive[148..154], b"      ");
     }
 
@@ -785,18 +751,15 @@ mod tests {
 
         let mut report = [0u8; 1024];
 
-        // 1. Identical match
         let len1 = builder.audit_reproducibility(bin1, bin2, &mut report);
         let report_str1 = String::from_utf8(report[..len1].to_vec()).unwrap();
         assert!(report_str1.contains("Status: 100% REPRODUCIBLE"));
         assert!(report_str1.contains("No discrepancies detected. Bit-identical match."));
 
-        // 2. Size mismatch
         let len2 = builder.audit_reproducibility(bin1, bin4, &mut report);
         let report_str2 = String::from_utf8(report[..len2].to_vec()).unwrap();
         assert!(report_str2.contains("Status: NON-REPRODUCIBLE (Size Mismatch)"));
 
-        // 3. Content mismatch
         let len3 = builder.audit_reproducibility(bin1, bin3, &mut report);
         let report_str3 = String::from_utf8(report[..len3].to_vec()).unwrap();
         assert!(report_str3.contains("Status: NON-REPRODUCIBLE"));

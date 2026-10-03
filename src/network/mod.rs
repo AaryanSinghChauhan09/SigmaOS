@@ -47,7 +47,7 @@ pub use socket::{
 };
 
 pub mod zero_copy_networking;
-pub use zero_copy_networking::{SovereignZeroCopySocket, UmemPool, XdpRing, XdpAction, IoCompletionQueue, IoCompletionEntry};
+pub use zero_copy_networking::{ZeroCopySocket, UmemPool, XdpRing, IoCompletionQueue, IoCompletionEntry};
 
 pub mod tc_qdisc_sovereign;
 pub use tc_qdisc_sovereign::{TbfQdisc, PrioQdisc, HtbQdisc, HtbClass, FqCodelQdisc, Packet as QdiscPacket};

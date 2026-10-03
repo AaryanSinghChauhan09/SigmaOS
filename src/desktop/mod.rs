@@ -2,21 +2,19 @@ pub mod mobile_variant;
 pub use mobile_variant::*;
 pub mod tiling;
 pub use tiling::{
-    TilingWindowManager, TiledWindow, Workspace as TilingWorkspace, TilingLayout,
-    TilingStatistics,
-    TilingWindowGeometry,
+    TiledWindow, TilingLayout, TilingStatistics, TilingWindow, TilingWindowGeometry,
+    TilingWindowManager, WindowArea, Workspace as TilingWorkspace,
 };
-pub use tiling::{TilingLayout, TilingWindow, TilingWindowManager, WindowArea, Workspace};
 pub mod onboarding;
 pub mod shortcuts;
 
 pub use onboarding::{
-    Language, Region, OnboardingStep, DesktopTheme, PrivacySettings,
-    OnboardingConfig, OnboardingWizard,
+    DesktopTheme, Language, OnboardingConfig, OnboardingStep, OnboardingWizard, PrivacySettings,
+    Region,
 };
 pub use shortcuts::{
-    KeyModifier, KeyAction, KeyboardShortcut, ShortcutCategory, ShortcutConfig,
-    KeyboardShortcutsManager,
+    KeyAction, KeyModifier, KeyboardShortcut, KeyboardShortcutsManager, ShortcutCategory,
+    ShortcutConfig,
 };
 
 // SigmaOS Desktop Module
@@ -37,12 +35,6 @@ pub mod weather_panel;
 
 pub use wayland_protocol::*;
 pub use sovereign_ux_innovation_hub::*;
-
-pub use crate::desktop::sovereign_navigation_engine::*;
-
-
-
-pub use sovereign_navigation_engine::*;
 
 pub use sovereign_navigation_engine::*;
 
@@ -86,14 +78,8 @@ pub use zenith_compositor::{
 };
 
 pub use zenith_config::{
-    CompositorBackend, CompositorConfig, InputConfig, AppearanceConfig, ZenithConfig,
-    OutputScale, Theme, MouseAcceleration,
-};
-
-pub use crate::desktop::sovereign_navigation_engine::{
-    AppCategory, GnomePopLauncherNav, HudActionResult, KrunnerRofiCommandHud, LauncherAppItem,
-    NavDirection, RangerDolphinSpatialFileNav, SovereignUniversalNavigationEngine,
-    SystemControlNode, TilingWindowManagerNav, WindowNode, YastBsdConfigControlTreeNav,
+    AppearanceConfig, CompositorBackend, CompositorConfig, InputConfig, MouseAcceleration,
+    OutputScale, Theme, ZenithConfig,
 };
 
 pub use weather_panel::{

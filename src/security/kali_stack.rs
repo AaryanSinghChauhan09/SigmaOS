@@ -1,16 +1,8 @@
-
 use std::vec::Vec;
 use std::string::String;
 use std::string::ToString;
 use std::format;
-/// Sovereign Kali Linux-Grade System Security and Administration Suite for SigmaOS
-/// Provides PAM authentication, Iptables/Ufw firewalling, Cron Daemons, Sudo,
-/// Tmux Session multiplexing, Swap memory space, and Kernel Dmesg ring logging.
 use core::sync::atomic::{AtomicUsize, Ordering};
-use std::format;
-use std::string::String;
-use std::string::ToString;
-use std::vec::Vec;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -23,7 +15,6 @@ pub enum KaliError {
     SwapFailed = 5,
 }
 
-/// Pluggable Authentication Module (PAM)
 pub struct PluggableAuthenticationModule {
     pub failed_attempts: AtomicUsize,
     pub hashed_password: [u8; 16],
@@ -37,7 +28,6 @@ impl PluggableAuthenticationModule {
         }
     }
 
-    /// Authenticate a user input password block
     pub fn authenticate(&self, password_hash: &[u8; 16]) -> Result<(), KaliError> {
         if self.failed_attempts.load(Ordering::SeqCst) >= 3 {
             return Err(KaliError::AuthFailed);
@@ -55,10 +45,9 @@ impl PluggableAuthenticationModule {
     }
 }
 
-/// Iptables and UFW-inspired Netfilter Firewall Chain Rule
 pub struct FirewallRule {
     pub is_input: bool,
-    pub protocol: [u8; 4], // b"tcp" or b"udp"
+    pub protocol: [u8; 4],
     pub port: u16,
     pub accept: bool,
 }
@@ -76,9 +65,7 @@ impl IptablesFirewall {
         self.rules.push(Some(rule));
     }
 
-    /// Evaluate a packet against the rule chain (Netfilter)
     pub fn evaluate_packet(&self, is_input: bool, protocol: &[u8], port: u16) -> bool {
-        // Defaults to ACCEPT
         let mut decision = true;
 
         for i in 0..self.rules.len() {
@@ -96,9 +83,8 @@ impl IptablesFirewall {
     }
 }
 
-/// Cron job crontab schedule
 pub struct CronJob {
-    pub minute_cron: u8, // 0-59 mark or 0xFF for asterisk '*'
+    pub minute_cron: u8,
     pub command: [u8; 64],
 }
 
@@ -118,7 +104,6 @@ impl CronDaemon {
     pub fn register_job(&mut self, minute: u8, command: &[u8]) {
         let mut cmd_arr = [0u8; 64];
         let len = command.len().min(63);
-        // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
         unsafe {
             core::ptr::copy_nonoverlapping(command.as_ptr(), cmd_arr.as_mut_ptr(), len);
         }
@@ -128,7 +113,6 @@ impl CronDaemon {
         }));
     }
 
-    /// Simulate cron tick iteration
     pub fn tick_minute(&self, current_minute: u8) -> usize {
         let mut executed = 0;
         for i in 0..self.jobs.len() {
@@ -143,7 +127,6 @@ impl CronDaemon {
     }
 }
 
-/// Privilege Escalation (Sudo)
 pub struct SudoPrivilegeEscalation {
     pub pam: PluggableAuthenticationModule,
 }
@@ -155,16 +138,14 @@ impl SudoPrivilegeEscalation {
         }
     }
 
-    /// Elevate a process's permission context to root
     pub fn escalate_to_root(&self, input_hash: &[u8; 16]) -> Result<u32, KaliError> {
         self.pam
             .authenticate(input_hash)
             .map_err(|_| KaliError::PrivilegeEscalationDenied)?;
-        Ok(0) // Root UID = 0
+        Ok(0)
     }
 }
 
-/// Tmux-inspired terminal pane session multiplexer
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct TmuxPane {
     pub id: usize,
@@ -182,7 +163,6 @@ impl TmuxMultiplexer {
     pub fn new(name: &[u8]) -> Self {
         let mut name_arr = [0u8; 32];
         let len = name.len().min(31);
-        // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
         unsafe {
             core::ptr::copy_nonoverlapping(name.as_ptr(), name_arr.as_mut_ptr(), len);
         }
@@ -197,17 +177,14 @@ impl TmuxMultiplexer {
         self.panes.push(Some(TmuxPane { id, width, height }));
     }
 
-    /// Detach current tmux multiplexer session (tmux detach-client equivalent)
     pub fn detach_session(&mut self) {
         self.is_attached = false;
     }
 
-    /// Attach a terminal to the session (tmux attach-session equivalent)
     pub fn attach_session(&mut self) {
         self.is_attached = true;
     }
 
-    /// Swap two terminal pane layouts dynamically (tmux swap-pane equivalent)
     pub fn swap_panes(&mut self, pane_a_idx: usize, pane_b_idx: usize) -> Result<(), KaliError> {
         if pane_a_idx >= self.panes.len() || pane_b_idx >= self.panes.len() {
             return Err(KaliError::SwapFailed);
@@ -221,7 +198,6 @@ impl TmuxMultiplexer {
     }
 }
 
-/// Swap Memory Space allocation manager
 pub struct SwapSpaceManager {
     pub total_swap_blocks: usize,
     pub used_swap_blocks: AtomicUsize,
@@ -235,7 +211,6 @@ impl SwapSpaceManager {
         }
     }
 
-    /// Page out memory into swap storage (swap space swap-out)
     pub fn swap_out_page(&self, count: usize) -> Result<(), KaliError> {
         let current = self.used_swap_blocks.load(Ordering::SeqCst);
         if current + count > self.total_swap_blocks {
@@ -247,7 +222,6 @@ impl SwapSpaceManager {
     }
 }
 
-/// Kernel circular logging ring buffer (dmesg log equivalent)
 pub struct DmesgLog {
     pub buffer: [u8; 512],
     pub write_idx: AtomicUsize,
@@ -265,8 +239,6 @@ impl DmesgLog {
         let len = message.len().min(512);
         let start = self.write_idx.fetch_add(len, Ordering::SeqCst) % 512;
 
-        // Safe mock mapping in circular ring
-        // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
         unsafe {
             let buffer_ptr = (&raw const self.buffer) as *mut u8;
             for i in 0..len {
@@ -277,11 +249,6 @@ impl DmesgLog {
     }
 }
 
-// ==========================================
-// KALI LINUX SECURITY AUDITING & DEFENSIVE ANALYZER SUITE
-// ==========================================
-
-/// Metasploit payload detector & signature inspector
 pub struct KaliMetasploitPayloadFilter {
     pub known_nop_sled_bytes: u8,
     pub max_nop_threshold: usize,
@@ -291,13 +258,12 @@ pub struct KaliMetasploitPayloadFilter {
 impl KaliMetasploitPayloadFilter {
     pub fn new() -> Self {
         Self {
-            known_nop_sled_bytes: 0x90, // x86 NOP instruction byte
+            known_nop_sled_bytes: 0x90,
             max_nop_threshold: 8,
             detected_threats_count: AtomicUsize::new(0),
         }
     }
 
-    /// Inspects memory buffer for NOP sleds or shellcode entry signatures
     pub fn inspect_payload(&self, buffer: &[u8]) -> bool {
         let mut consecutive_nops = 0;
         for &byte in buffer {
@@ -305,7 +271,7 @@ impl KaliMetasploitPayloadFilter {
                 consecutive_nops += 1;
                 if consecutive_nops >= self.max_nop_threshold {
                     self.detected_threats_count.fetch_add(1, Ordering::SeqCst);
-                    return true; // NOP sled threat detected!
+                    return true;
                 }
             } else {
                 consecutive_nops = 0;
@@ -321,7 +287,6 @@ impl Default for KaliMetasploitPayloadFilter {
     }
 }
 
-/// Wireshark-inspired PCAP packet header and anomaly analyzer
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct PcapPacketHeader {
     pub timestamp_sec: u32,
@@ -349,7 +314,7 @@ impl KaliWiresharkPacketAnalyzer {
             || header.captured_length > header.original_length
         {
             self.malformed_packets.fetch_add(1, Ordering::SeqCst);
-            return false; // Malformed PCAP packet header
+            return false;
         }
         true
     }
@@ -361,7 +326,6 @@ impl Default for KaliWiresharkPacketAnalyzer {
     }
 }
 
-/// Airgeddon-inspired Wi-Fi 802.11 frame auditor & deauth flood detector
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum WifiFrameType {
     Beacon,
@@ -391,7 +355,7 @@ impl KaliAirgeddonWifiAudit {
                 let current = self.consecutive_deauths.fetch_add(1, Ordering::SeqCst) + 1;
                 if current >= self.deauth_flood_threshold {
                     self.attack_alert = true;
-                    return true; // Deauth flood attack detected!
+                    return true;
                 }
             }
             _ => {
@@ -402,30 +366,6 @@ impl KaliAirgeddonWifiAudit {
     }
 }
 
-#[cfg(not(target_os = "none"))]
-unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::Layout;
-    if let Ok(layout) = Layout::from_size_align(size, 8) {
-        std::alloc::alloc(layout)
-    } else {
-        core::ptr::null_mut()
-    }
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
-}
-
-#[cfg(target_os = "none")]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-
-
-
-/// Kali Undercover Desktop Disguise Mode Switcher
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum UndercoverDisguiseTheme {
     #[default]
@@ -455,9 +395,6 @@ impl KaliUndercoverThemeMode {
     }
 }
 
-
-
-/// Kali Sqlmap SQL Injection Vulnerability Auditor
 #[derive(Debug, Clone, Default)]
 pub struct KaliSqlmapInjectionAuditor {
     pub detected_vulnerabilities: Vec<String>,
@@ -479,9 +416,6 @@ impl KaliSqlmapInjectionAuditor {
     }
 }
 
-
-
-/// Kali John The Ripper Hash Cracker & Password Audit Engine
 #[derive(Debug, Clone, Default)]
 pub struct KaliJohnTheRipperCracker {
     pub wordlist: Vec<String>,
@@ -501,8 +435,9 @@ impl KaliJohnTheRipperCracker {
     }
 }
 
-
+#[cfg(test)]
 mod tests {
+    use super::*;
 
     #[test]
     fn test_kali_john_the_ripper_cracker() {
@@ -511,7 +446,6 @@ mod tests {
         assert_eq!(cracker.crack_simple_hash("unknown_secret"), None);
     }
 
-
     #[test]
     fn test_kali_sqlmap_injection_auditor() {
         let mut auditor = KaliSqlmapInjectionAuditor::new();
@@ -519,7 +453,6 @@ mod tests {
         assert!(auditor.audit_url("https://example.com/item", "1 UNION SELECT 1,2,3"));
         assert_eq!(auditor.detected_vulnerabilities.len(), 1);
     }
-
 
     #[test]
     fn test_kali_undercover_theme_mode() {
@@ -534,18 +467,14 @@ mod tests {
         assert_eq!(reset, UndercoverDisguiseTheme::DefaultKali);
     }
 
-
-
     #[test]
     fn test_pam_and_sudo_escalations() {
         let root_pash_hash = [0x77u8; 16];
         let sudo = SudoPrivilegeEscalation::new(&root_pash_hash);
 
-        // Escalation with correct hash
         let uid = sudo.escalate_to_root(&root_pash_hash).unwrap();
-        assert_eq!(uid, 0); // root
+        assert_eq!(uid, 0);
 
-        // Escalation with incorrect hash
         let bad_hash = [0xFFu8; 16];
         assert_eq!(
             sudo.escalate_to_root(&bad_hash).unwrap_err() as usize,
@@ -560,13 +489,10 @@ mod tests {
             is_input: true,
             protocol: *b"tcp ",
             port: 22,
-            accept: false, // Drop ssh connections
+            accept: false,
         });
 
-        // Input ssh connection should be blocked
         assert!(!firewall.evaluate_packet(true, b"tcp", 22));
-
-        // Unmatched connections default to accept (true)
         assert!(firewall.evaluate_packet(true, b"tcp", 80));
     }
 
@@ -574,10 +500,10 @@ mod tests {
     fn test_cron_jobs() {
         let mut cron = CronDaemon::new();
         cron.register_job(15, b"backup_db");
-        cron.register_job(0xFF, b"heartbeat"); // asterisk job, matches any minute
+        cron.register_job(0xFF, b"heartbeat");
 
-        assert_eq!(cron.tick_minute(15), 2); // both match
-        assert_eq!(cron.tick_minute(30), 1); // only heartbeat matches
+        assert_eq!(cron.tick_minute(15), 2);
+        assert_eq!(cron.tick_minute(30), 1);
         assert_eq!(cron.total_executions.load(Ordering::SeqCst), 3);
     }
 
@@ -587,14 +513,12 @@ mod tests {
         tmux.split_window(1, 100, 50);
         assert_eq!(tmux.panes.len(), 1);
 
-        // Test attaching/detaching client terminal
         assert!(tmux.is_attached);
         tmux.detach_session();
         assert!(!tmux.is_attached);
         tmux.attach_session();
         assert!(tmux.is_attached);
 
-        // Test swapping active panes
         tmux.split_window(2, 200, 100);
         assert!(tmux.swap_panes(0, 1).is_ok());
         assert_eq!(tmux.panes[0].unwrap().id, 2);
@@ -642,7 +566,7 @@ mod tests {
 
         let invalid_hdr = PcapPacketHeader {
             timestamp_sec: 1000,
-            captured_length: 64, // mismatches payload length 32
+            captured_length: 64,
             original_length: 32,
         };
         assert!(!analyzer.analyze_packet(&invalid_hdr, &payload));
@@ -654,7 +578,7 @@ mod tests {
         assert!(!wifi_audit.audit_wifi_frame(WifiFrameType::Beacon));
         assert!(!wifi_audit.audit_wifi_frame(WifiFrameType::Deauthentication));
         assert!(!wifi_audit.audit_wifi_frame(WifiFrameType::Deauthentication));
-        assert!(wifi_audit.audit_wifi_frame(WifiFrameType::Deauthentication)); // 3rd consecutive deauth triggers alert
+        assert!(wifi_audit.audit_wifi_frame(WifiFrameType::Deauthentication));
         assert!(wifi_audit.attack_alert);
     }
 }

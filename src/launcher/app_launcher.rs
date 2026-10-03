@@ -1,25 +1,14 @@
 // src/launcher/app_launcher.rs
 // AI-powered app launcher for SigmaOS
 // Superior to Omarchy's basic launchers
-//
-// Features:
-// - Fuzzy search
-// - AI-powered suggestions
-// - Command palette
-// - Recent apps
-// - Keyboard shortcuts
-// - Plugin system
 
 #![no_std]
 
 extern crate alloc;
 use alloc::collections::BTreeMap;
-use alloc::string::String;
-use alloc::vec;
-use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
+use alloc::vec;
 use alloc::format;
 use core::fmt;
 
@@ -92,33 +81,28 @@ impl AppEntry {
     }
 
     fn generate_id(name: &str) -> String {
-        // Simple ID generation from name
         name.to_lowercase().replace(" ", "-")
     }
 
     pub fn matches_query(&self, query: &str) -> bool {
         let query = query.to_lowercase();
 
-        // Check name
-        if contains_ignore_case(&self.name, query) {
+        if contains_ignore_case(&self.name, &query) {
             return true;
         }
 
-        // Check description
-        if contains_ignore_case(&self.description, query) {
+        if contains_ignore_case(&self.description, &query) {
             return true;
         }
 
-        // Check keywords
         for keyword in &self.keywords {
-            if contains_ignore_case(keyword, query) {
+            if contains_ignore_case(keyword, &query) {
                 return true;
             }
         }
 
-        // Check categories
         for category in &self.categories {
-            if contains_ignore_case(category, query) {
+            if contains_ignore_case(category, &query) {
                 return true;
             }
         }
@@ -127,49 +111,34 @@ impl AppEntry {
     }
 
     pub fn fuzzy_score(&self, query: &str) -> i32 {
-        if eq_ignore_case(&self.name, query) {
-            return 1000; // Exact match
-        }
-
-        if starts_with_ignore_case(&self.name, query) {
-            return 900; // Prefix match
-        }
-
-        if contains_ignore_case(&self.name, query) {
-        let query = query.to_lowercase();
+        let q = query.to_lowercase();
         let name = self.name.to_lowercase();
 
-        if name == query {
-            return 1000;  // Exact match
+        if name == q {
+            return 1000;
         }
 
-        if name.starts_with(&query) {
-            return 900;  // Prefix match
+        if name.starts_with(&q) {
+            return 900;
         }
 
-        if name.contains(&query) {
-            return 800;  // Substring match
+        if name.contains(&q) {
+            return 800;
         }
 
-        // Check word boundaries
-        for word in self.name.split_whitespace() {
-            if starts_with_ignore_case(word, query) {
-        let words: Vec<&str> = name.split_whitespace().collect();
-        for word in words {
-            if word.starts_with(&query) {
-                return 700;  // Word start match
+        for word in name.split_whitespace() {
+            if word.starts_with(&q) {
+                return 700;
             }
         }
 
-        // Keyword match
         for keyword in &self.keywords {
-            if contains_ignore_case(keyword, query) {
+            if keyword.to_lowercase().contains(&q) {
                 return 600;
             }
         }
 
-        0 // No match
-        0  // No match
+        0
     }
 }
 
@@ -253,7 +222,6 @@ impl AppLauncher {
     pub fn search(&self, query: &str) -> Vec<SearchResult> {
         let mut results = Vec::new();
 
-        // Search apps
         for app in self.apps.values() {
             let score = app.fuzzy_score(query);
             if score > 0 {
@@ -273,7 +241,6 @@ impl AppLauncher {
             }
         }
 
-        // Sort by score (descending)
         results.sort_by(|a, b| b.score.cmp(&a.score));
 
         results
@@ -306,7 +273,6 @@ impl AppLauncher {
     pub fn get_suggested_apps(&self) -> Vec<AppEntry> {
         let mut suggested = Vec::new();
 
-        // Get most frequently used apps
         let mut sorted_apps: Vec<&AppEntry> = self.apps.values().collect();
         sorted_apps.sort_by(|a, b| b.use_count.cmp(&a.use_count));
 
@@ -320,11 +286,9 @@ impl AppLauncher {
     pub fn launch_app(&mut self, id: &str) -> Result<(), LauncherError> {
         let app = self.apps.get_mut(id).ok_or(LauncherError::AppNotFound)?;
 
-        // Update stats
         app.use_count += 1;
         app.last_used = Self::get_time();
 
-        // Update recent apps
         self.recent_apps.retain(|app_id| app_id != id);
         self.recent_apps.insert(0, id.into());
 
@@ -332,7 +296,6 @@ impl AppLauncher {
             self.recent_apps.truncate(self.max_recent);
         }
 
-        // In real implementation, would spawn process
         Ok(())
     }
 
@@ -360,15 +323,12 @@ impl AppLauncher {
 
     pub fn search_commands(&self, query: &str) -> Vec<Command> {
         let mut results = Vec::new();
+        let q = query.to_lowercase();
 
         for command in &self.commands {
-            if contains_ignore_case(&command.name, query)
-                || contains_ignore_case(&command.description, query)
-            if command.name.to_lowercase().contains(&query)
-                || command.description.to_lowercase().contains(&query)
+            if command.name.to_lowercase().contains(&q)
+                || command.description.to_lowercase().contains(&q)
             {
-            if command.name.to_lowercase().contains(&query) ||
-               command.description.to_lowercase().contains(&query) {
                 results.push(command.clone());
             }
         }
@@ -377,7 +337,6 @@ impl AppLauncher {
     }
 
     fn get_time() -> u64 {
-        // In real implementation, would get actual timestamp
         0
     }
 }
@@ -388,7 +347,6 @@ impl Default for AppLauncher {
     }
 }
 
-/// Launcher errors
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum LauncherError {
     AppNotFound,
@@ -406,11 +364,9 @@ impl fmt::Display for LauncherError {
     }
 }
 
-/// Initialize default apps
 pub fn init_default_apps() -> AppLauncher {
     let mut launcher = AppLauncher::new();
 
-    // Register default apps
     let mut browser = AppEntry::new("Sigma Browser", "/usr/bin/sigma-browser");
     browser.description = "Privacy-focused web browser".into();
     browser.categories = vec!["Internet".into(), "WebBrowser".into()];
@@ -444,7 +400,6 @@ pub fn init_default_apps() -> AppLauncher {
     settings.keywords = vec!["preferences".into(), "config".into(), "control".into()];
     launcher.register_app(settings);
 
-    // Register default commands
     launcher.register_command(Command {
         id: "screenshot".into(),
         name: "Take Screenshot".into(),
@@ -490,9 +445,9 @@ mod tests {
     fn test_fuzzy_search() {
         let app = AppEntry::new("Firefox Browser", "/usr/bin/firefox");
 
-        assert_eq!(app.fuzzy_score("firefox browser"), 1000);  // Exact
-        assert_eq!(app.fuzzy_score("firefox"), 900);  // Prefix
-        assert!(app.fuzzy_score("fox") > 0);  // Fuzzy
+        assert_eq!(app.fuzzy_score("firefox browser"), 1000);
+        assert_eq!(app.fuzzy_score("firefox"), 900);
+        assert!(app.fuzzy_score("fox") > 0);
     }
 
     #[test]
@@ -501,11 +456,6 @@ mod tests {
 
         assert!(app.matches_query("ÜB"));
         assert_eq!(app.fuzzy_score("ÜBER TERMINAL"), 1000);
-    }
-
-        assert_eq!(app.fuzzy_score("firefox browser"), 1000);  // Exact
-        assert_eq!(app.fuzzy_score("firefox"), 900);  // Prefix
-        assert!(app.fuzzy_score("fox") > 0);  // Fuzzy
     }
 
     #[test]
@@ -535,7 +485,7 @@ mod tests {
 
         let recent = launcher.get_recent_apps();
         assert_eq!(recent.len(), 2);
-        assert_eq!(recent[0].name, "App 2");  // Most recent first
+        assert_eq!(recent[0].name, "App 2");
     }
 
     #[test]

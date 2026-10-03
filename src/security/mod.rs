@@ -1,5 +1,4 @@
 // SigmaOS Security Subsystem
-pub mod memory_protection;
 pub mod address_sanitizer;
 pub mod capability_enforcer;
 pub use address_sanitizer::{
@@ -10,30 +9,24 @@ pub mod capsicum;
 pub mod filesystem_encryption;
 pub mod governance;
 pub mod hardware_privilege;
+pub mod memory_protection;
 pub mod pqc_enclave;
-pub mod governance;
 pub mod audit;
 pub mod system_audit;
-pub mod filesystem_encryption;
 pub mod bsd_hardening;
 pub mod sigma_pledge;
 pub mod sigma_unveil;
 pub mod vault;
 pub mod vpn;
-pub mod capsicum;
 pub mod capsicum_wrapper;
 pub mod pledge_unveil;
 
-// SigmaOS Security Subsystem
 pub mod seccomp;
 pub mod seccomp_ebpf;
 pub mod syscall_filter;
 pub mod defensive_audit;
 pub mod hardening;
 pub mod kernel_hardening;
-pub mod seccomp;
-pub mod seccomp_ebpf;
-pub mod syscall_filter;
 pub mod user_namespace;
 
 pub mod bridge;
@@ -179,7 +172,6 @@ pub use crate::security::vulnerability::{
 };
 pub use crate::security::vulnerability::{SimpleVulnerability, SimpleVulnerabilityScanner};
 
-// ─── Capability Monitor (pledge + unveil + Capsicum) ─────────────────────────
 pub mod capability_monitor;
 pub mod phase_audit;
 
@@ -192,12 +184,7 @@ pub use memory_protection::{
 pub use pledge_unveil::{
     PledgePromise as OpenBsdPledgePromise, PledgeSandbox, Sandbox, UnveilPermission, UnveilSandbox,
 };
-pub use capsicum::{
-    CapRight, CapMode, CapEntry, CapabilitySandbox,
-};
 pub use capsicum_wrapper::{
     CapsicumManager as CapsicumWrapperManager, CapRights, CapsicumFdEntry, CapSandboxMode,
     CapsicumStatistics,
 };
-pub use memory_protection::{MemoryProtectionManager, MemoryProtectionMode, AslrConfig, StackCanaryConfig};
-pub use pledge_unveil::{PledgePromise as OpenBsdPledgePromise, PledgeSandbox, UnveilPermission, UnveilSandbox, Sandbox};

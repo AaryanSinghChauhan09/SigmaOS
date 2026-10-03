@@ -56,9 +56,6 @@ impl SigmaIntegration {
         code: &str,
         _tab_id: usize,
     ) -> Result<String, IntegrationError> {
-    pub fn execute_kuroko_with_terminal(&mut self, code: &str, _tab_id: usize)
-        -> Result<String, IntegrationError> {
-
         // Compile and execute Kuroko code
         let mut compiler = crate::lang::kuroko_lang::KurokoCompiler::new();
         let code_object = compiler.compile(code)
@@ -67,7 +64,6 @@ impl SigmaIntegration {
         let result = self
             .kuroko_vm
             .interpret(code_object)
-        let result = self.kuroko_vm.interpret(code_object)
             .map_err(|e| IntegrationError::LanguageError(e))?;
 
         // Terminal output temporarily disabled
@@ -87,12 +83,6 @@ impl SigmaIntegration {
             .ipc_manager
             .next_call_id
             .fetch_add(1, core::sync::atomic::Ordering::SeqCst);
-    pub fn send_terminal_message(&mut self, from_tab_id: usize, to_phone_id: usize,
-                                  message: &str) -> Result<(), IntegrationError> {
-
-        let call_id = self.async_system.ipc_manager.next_call_id.fetch_add(
-            1, core::sync::atomic::Ordering::SeqCst
-        );
 
         let ipc_message = HelenMessage::new(100, call_id, from_tab_id);
 
@@ -114,10 +104,6 @@ impl SigmaIntegration {
         self.async_system
             .ipc_manager
             .handle_interrupt(irq)
-    pub fn handle_interrupt_for_terminal(&mut self, irq: u32, _tab_id: usize)
-        -> Result<(), IntegrationError> {
-
-        self.async_system.ipc_manager.handle_interrupt(irq)
             .map_err(|e| IntegrationError::IpcError(e))?;
 
         // Terminal update temporarily disabled
@@ -138,9 +124,6 @@ impl SigmaIntegration {
         script: &str,
         _task_id: usize,
     ) -> Result<KurokoValue, IntegrationError> {
-    pub fn run_async_kuroko_script(&mut self, script: &str, _task_id: usize)
-        -> Result<KurokoValue, IntegrationError> {
-
         // This would involve registering async functions in Kuroko
         // For now, just execute normally
         let mut compiler = crate::lang::kuroko_lang::KurokoCompiler::new();
@@ -149,7 +132,6 @@ impl SigmaIntegration {
 
         self.kuroko_vm
             .interpret(code_object)
-        self.kuroko_vm.interpret(code_object)
             .map_err(|e| IntegrationError::LanguageError(e))
     }
 }

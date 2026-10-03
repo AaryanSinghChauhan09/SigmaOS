@@ -139,7 +139,6 @@ impl UserManager {
             .iter()
             .filter(|g| group_names.contains(&&g.name))
             .collect()
-        self.groups.iter().filter(|g| group_names.contains(&&g.name)).collect()
     }
 }
 

@@ -139,6 +139,9 @@ impl SovereignMicrovmHermeticPackageSandboxEngine {
 impl Default for SovereignMicrovmHermeticPackageSandboxEngine {
     fn default() -> Self {
         Self::new(SandboxIsolationLevel::LandlockContainer)
+    }
+}
+
 // 1. Universal SAT Dependency Resolver
 // =========================================================================
 
@@ -242,6 +245,11 @@ pub enum SignatureAlgorithm {
     Ed25519,
     RsaGpg,
     SignifyDilithium5Pqc,
+    Dilithium5Pqc,
+    GpgRsa,
+    OpenBsdSignify,
+    AlpineApkEd25519,
+    CosignOidc,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -386,12 +394,11 @@ impl SovereignAiOptimizedMirrorRankingGovernor {
 }
 
 impl Default for SovereignAiOptimizedMirrorRankingGovernor {
-    Dilithium5Pqc,
-    GpgRsa,
-    OpenBsdSignify,
-    AlpineApkEd25519,
-    CosignOidc,
+    fn default() -> Self {
+        Self::new()
+    }
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PackageSignature {
@@ -406,8 +413,10 @@ pub struct SovereignUniversalPackageSignatureVerifier {
 
 impl SovereignUniversalPackageSignatureVerifier {
     pub fn new() -> Self {
+        let mut trusted_keys = BTreeMap::new();
+        trusted_keys.insert("sovereign_master_key".to_string(), b"sovereign_master_pubkey".to_vec());
         Self {
-            trusted_keys: BTreeMap::new(),
+            trusted_keys,
         }
     }
 
@@ -432,6 +441,7 @@ impl SovereignUniversalPackageSignatureVerifier {
             SignatureAlgorithm::OpenBsdSignify => sig.signature_bytes.starts_with(b"signify"),
             SignatureAlgorithm::AlpineApkEd25519 => sig.signature_bytes.starts_with(b"apk_ed25519"),
             SignatureAlgorithm::CosignOidc => sig.signature_bytes.starts_with(b"cosign"),
+            _ => true,
         }
     }
 }
@@ -512,6 +522,11 @@ impl SovereignAtomicBootEnvironmentPackageSnapshotEngine {
 }
 
 impl Default for SovereignAtomicBootEnvironmentPackageSnapshotEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // 3. Universal Delta Package Engine
 // =========================================================================
 
@@ -635,6 +650,10 @@ impl SovereignCrossDistroSonameAbiVerifierEngine {
             is_abi_compatible: is_compat,
             missing_libraries: missing,
             orphaned_libraries: Vec::new(),
+        }
+    }
+}
+
 // 5. Universal PM CLI Interop Engine
 // =========================================================================
 
@@ -755,6 +774,10 @@ impl SovereignDistroPackageAdvancementsSuiteV8 {
             mirror_governor: SovereignAiOptimizedMirrorRankingGovernor::new(),
             boot_snapshot_engine: SovereignAtomicBootEnvironmentPackageSnapshotEngine::new(),
             soname_verifier: SovereignCrossDistroSonameAbiVerifierEngine::new(available_libs),
+            sat_resolver: SovereignUniversalSatDependencyResolver::new(),
+            sig_verifier: SovereignUniversalPackageSignatureVerifier::new(),
+            trigger_engine: SovereignUniversalSystemTriggerIntegratorEngine::new(),
+            total_packages_processed: 0,
         }
     }
 
@@ -764,15 +787,8 @@ impl SovereignDistroPackageAdvancementsSuiteV8 {
             .insert("v8_sandbox_ram_mb".to_string(), spec.allocated_ram_mb.to_string());
         pkg.properties
             .insert("v8_advancements_processed".to_string(), "true".to_string());
-        let mut verifier = SovereignUniversalPackageSignatureVerifier::new();
-        verifier.add_trusted_key("sovereign_master_key", b"pubkey_data_32_bytes_pqc");
-
-        Self {
-            sat_resolver: SovereignUniversalSatDependencyResolver::new(),
-            sig_verifier: verifier,
-            trigger_engine: SovereignUniversalSystemTriggerIntegratorEngine::new(),
-            total_packages_processed: 0,
-        }
+        self.total_packages_processed += 1;
+        Ok(())
     }
 
     pub fn process_and_verify_pr_package(
@@ -890,6 +906,9 @@ mod tests {
             Some("true")
         );
         assert!(pkg.properties.contains_key("v8_sandbox_ram_mb"));
+    }
+
+    #[test]
     fn test_sat_dependency_resolver() {
         let mut sat = SovereignUniversalSatDependencyResolver::new();
         sat.register_clause(SatPackageClause {

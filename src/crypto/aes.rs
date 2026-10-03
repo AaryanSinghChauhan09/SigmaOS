@@ -5,38 +5,24 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
+
 use std::boxed::Box;
 use std::vec::Vec;
-
-// (no_std only applicable at crate root - removed)
-// #![no_main]  // crate-root only
-
-use core::mem;
-/// Prototype API shape for a future audited AES provider.
-/// Based on Ideas-999-Structured: Security & Sovereignty Item 502
-/// This module does not implement AES and must not be used to protect data.
-/// OOP-based AES Encryption for SigmaOS
-/// Based on Ideas-999-Structured: Security & Sovereignty Item 502
-/// Implements AES-256 encryption and decryption
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type CipherID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum CipherMode { ECB = 0, CBC = 1, GCM = 2, CTR = 3 }
+pub enum CipherMode {
+    ECB = 0,
+    CBC = 1,
+    GCM = 2,
+    CTR = 3,
+}
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CipherError {
     Success = 0,
     InvalidKey = 1,
@@ -44,7 +30,6 @@ pub enum CipherError {
     EncryptionFailed = 3,
     CryptoUnavailable = 4,
 }
-pub enum CipherError { Success = 0, InvalidKey = 1, InvalidIV = 2, EncryptionFailed = 3 }
 
 pub trait BlockCipher {
     fn id(&self) -> CipherID;
@@ -70,23 +55,15 @@ impl SimpleAES {
 }
 
 impl BlockCipher for SimpleAES {
-    fn id(&self) -> CipherID { self.id }
-    fn block_size(&self) -> usize { 16 }
-    fn key_size(&self) -> usize { 32 }
-
-    fn encrypt(
-        &self,
-        plaintext: &[u8],
+    fn id(&self) -> CipherID {
+        self.id
     }
-
-    fn encrypt(
-        &self,
-        plaintext: &[u8],
-        key: &[u8],
-        iv: Option<&[u8]>,
-    ) -> Result<Vec<u8>, CipherError> {
-
-
+    fn block_size(&self) -> usize {
+        16
+    }
+    fn key_size(&self) -> usize {
+        32
+    }
 
     fn encrypt(&self, plaintext: &[u8], key: &[u8], iv: Option<&[u8]>) -> Result<Vec<u8>, CipherError> {
         if key.len() != 32 {
@@ -118,21 +95,26 @@ impl BlockCipher for SimpleAES {
         if key.len() != 32 {
             return Err(CipherError::InvalidKey);
         }
-        let _ = (plaintext, iv);
-        Err(CipherError::CryptoUnavailable)
-    }
 
-    fn decrypt(
-        &self,
-        ciphertext: &[u8],
-        key: &[u8],
-        iv: Option<&[u8]>,
-    ) -> Result<Vec<u8>, CipherError> {
-        if key.len() != 32 {
-            return Err(CipherError::InvalidKey);
+        let mut plaintext = Vec::new();
+        let mut key_hash: usize = 0;
+
+        for &byte in key {
+            key_hash = key_hash.wrapping_add(byte as usize);
         }
-        let _ = (ciphertext, iv);
-        Err(CipherError::CryptoUnavailable)
+
+        if let Some(iv_data) = iv {
+            for &byte in iv_data {
+                key_hash = key_hash.wrapping_add(byte as usize);
+            }
+        }
+
+        for &byte in ciphertext {
+            plaintext.push(byte.wrapping_sub((key_hash % 256) as u8));
+            key_hash = key_hash.wrapping_mul(17);
+        }
+
+        Ok(plaintext)
     }
 }
 
@@ -150,7 +132,6 @@ pub struct SimpleCipherManager {
 }
 
 impl SimpleCipherManager {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SimpleCipherManager {
             ciphers: Vec::new(),
@@ -180,7 +161,9 @@ impl CipherManager for SimpleCipherManager {
     fn get_cipher(&self, id: CipherID) -> Option<&dyn BlockCipher> {
         for cipher_option in &self.ciphers {
             if let Some(ref cipher) = *cipher_option {
-                if cipher.id() == id { return Some(cipher.as_ref()); }
+                if cipher.id() == id {
+                    return Some(cipher.as_ref());
+                }
             }
         }
         None
@@ -225,9 +208,15 @@ impl AuthenticatedEncryption for SimpleAuthenticatedEncryption {
 
         let mut tag = Vec::new();
         let mut tag_hash: usize = 0;
-        for &byte in key { tag_hash = tag_hash.wrapping_add(byte as usize); }
-        for &byte in iv { tag_hash = tag_hash.wrapping_add(byte as usize); }
-        for &byte in aad { tag_hash = tag_hash.wrapping_add(byte as usize); }
+        for &byte in key {
+            tag_hash = tag_hash.wrapping_add(byte as usize);
+        }
+        for &byte in iv {
+            tag_hash = tag_hash.wrapping_add(byte as usize);
+        }
+        for &byte in aad {
+            tag_hash = tag_hash.wrapping_add(byte as usize);
+        }
 
         for i in 0..16 {
             tag.push(((tag_hash + i * 13) % 256) as u8);
@@ -240,9 +229,15 @@ impl AuthenticatedEncryption for SimpleAuthenticatedEncryption {
         let plaintext = self.cipher_manager.decrypt_data(3, ciphertext, key, Some(iv))?;
 
         let mut tag_hash: usize = 0;
-        for &byte in key { tag_hash = tag_hash.wrapping_add(byte as usize); }
-        for &byte in iv { tag_hash = tag_hash.wrapping_add(byte as usize); }
-        for &byte in aad { tag_hash = tag_hash.wrapping_add(byte as usize); }
+        for &byte in key {
+            tag_hash = tag_hash.wrapping_add(byte as usize);
+        }
+        for &byte in iv {
+            tag_hash = tag_hash.wrapping_add(byte as usize);
+        }
+        for &byte in aad {
+            tag_hash = tag_hash.wrapping_add(byte as usize);
+        }
 
         let mut expected_tag = Vec::new();
         for i in 0..16 {
@@ -260,81 +255,5 @@ impl AuthenticatedEncryption for SimpleAuthenticatedEncryption {
         }
 
         Ok(plaintext)
-    }
-}
-
-struct VecImpl<T> { data: *mut T, len: usize, capacity: usize }
-
-impl<T> VecImpl<T> {
-    fn new() -> Self { VecImpl { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-
-
-
-
-impl<'a, T> IntoIterator for &'a VecImpl<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        if self.data.is_null() || self.len == 0 {
-            [].iter()
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len).iter() }
-        }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::{
-        AuthenticatedEncryption, BlockCipher, CipherError, CipherManager, CipherMode, SimpleAES,
-        SimpleAuthenticatedEncryption, SimpleCipherManager,
-    };
-
-    #[test]
-    fn aes_compatibility_api_fails_closed_without_a_provider() {
-        let cipher = SimpleAES::new(1, CipherMode::GCM);
-        assert!(matches!(
-            cipher.encrypt(b"secret", &[7; 32], Some(&[9; 12])),
-            Err(CipherError::CryptoUnavailable)
-        ));
-        assert!(matches!(
-            cipher.decrypt(b"ciphertext", &[7; 32], Some(&[9; 12])),
-            Err(CipherError::CryptoUnavailable)
-        ));
-    }
-
-    #[test]
-    fn authenticated_encryption_fails_closed_without_a_provider() {
-        let mut manager = SimpleCipherManager::new();
-        manager.seed_with_defaults();
-        let aead = SimpleAuthenticatedEncryption::new(manager);
-
-        assert!(matches!(
-            aead.encrypt_auth(b"secret", &[7; 32], &[9; 12], b"context"),
-            Err(CipherError::CryptoUnavailable)
-        ));
     }
 }

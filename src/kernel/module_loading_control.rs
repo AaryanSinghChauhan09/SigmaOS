@@ -276,13 +276,6 @@ impl KernelModuleLoadingController {
                     }
                 )
             })
-        self.modules.iter()
-            .map(|m| format!("{} {} ({}, {})",
-                m.name,
-                m.version,
-                if m.loaded { "loaded" } else { "not loaded" },
-                if m.signature_verified { "signed" } else { "unsigned" }
-            ))
             .collect()
     }
 
@@ -298,12 +291,6 @@ impl KernelModuleLoadingController {
                     r.requires_signature
                 )
             })
-        self.rules.iter()
-            .map(|r| format!("{}: {} (signature required: {})",
-                r.module_name,
-                if r.allowed { "allowed" } else { "denied" },
-                r.requires_signature
-            ))
             .collect()
     }
 

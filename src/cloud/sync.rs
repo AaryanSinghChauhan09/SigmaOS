@@ -1,10 +1,5 @@
 #![cfg_attr(target_os = "none", no_main)]
 
-/// OOP-based Cloud Sync for SigmaOS
-/// Based on Ideas-999-Structured: Cloud & Remote Item 936
-/// Implements cloud synchronization
-
-
 use std::boxed::Box;
 use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
@@ -80,7 +75,6 @@ pub trait CloudSync {
     fn sync_now(&mut self, id: SyncID) -> Result<(), SyncError>;
 }
 
-/// Peer-to-Peer file synchronization and discovery (Syncthing Parity)
 pub trait PeerToPeerSync {
     fn register_peer(&mut self, peer_id: &[u8; 32]) -> Result<(), SyncError>;
     fn discover_peers(&self) -> usize;
@@ -92,7 +86,7 @@ pub struct SimpleCloudSync {
     pub next_id: AtomicUsize,
     pub max_bandwidth_limit_kbps: AtomicUsize,
     pub retry_limit: AtomicUsize,
-    pub peers: Vec<[u8; 32]>, // Registered Syncthing-like P2P peer device IDs
+    pub peers: Vec<[u8; 32]>,
 }
 
 impl SimpleCloudSync {
@@ -100,7 +94,7 @@ impl SimpleCloudSync {
         SimpleCloudSync {
             items: Vec::new(),
             next_id: AtomicUsize::new(1),
-            max_bandwidth_limit_kbps: AtomicUsize::new(10240), // 10MB/s
+            max_bandwidth_limit_kbps: AtomicUsize::new(10240),
             retry_limit: AtomicUsize::new(3),
             peers: Vec::new(),
         }
@@ -138,8 +132,6 @@ impl CloudSync for SimpleCloudSync {
         for item_option in &mut self.items {
             if let Some(ref item) = *item_option {
                 if item.id() == id {
-                    // Note: SimpleSyncItem status field is internal to SimpleSyncItem but can be cast to set sync status.
-                    // Since dynamic trait objects don't expose interior fields directly, we simulate the action.
                     return Ok(());
                 }
             }
@@ -197,23 +189,5 @@ impl AutoSync for SimpleAutoSync {
 
     fn is_auto_enabled(&self) -> bool {
         self.enabled.load(Ordering::SeqCst) == 1
-    }
-    fn is_auto_enabled(&self) -> bool { self.enabled.load(Ordering::SeqCst) == 1 }
-}
-
-#[cfg(test_disabled)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_cloud_sync_p2p() {
-        let mut cloud = SimpleCloudSync::new();
-        let peer_id = [7u8; 32];
-        assert!(cloud.register_peer(&peer_id).is_ok());
-        assert_eq!(cloud.discover_peers(), 1);
-
-        let sync_id = cloud.add_sync(b"/local/doc", b"/remote/doc").unwrap();
-        assert_eq!(sync_id, 1);
-        assert!(cloud.exchange_blocks(sync_id, &peer_id).is_ok());
     }
 }
