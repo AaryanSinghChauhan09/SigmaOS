@@ -8,6 +8,20 @@ use std::boxed::Box;
 use std::string::{String, ToString};
 use std::vec::Vec;
 
+pub mod mmap;
+pub mod page_directory;
+pub mod page_fault;
+pub mod virtual_memory;
+
+pub use mmap::{
+    MmapAddressSpace, MmapBacking, MmapError, MmapFlags, MmapProt,
+    do_mmap, do_mprotect, do_munmap, find_vma, list_vmas,
+};
+pub use page_fault::{
+    FrameAllocator, PageFaultFlags, PageFaultResult, PageTable, PhysPage,
+    VirtualMemoryArea, VmaBacking, VmaFlags, handle_page_fault,
+};
+
 /// Error type for the Mm module
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum MmError {
