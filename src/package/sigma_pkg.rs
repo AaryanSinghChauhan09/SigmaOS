@@ -94,16 +94,8 @@ impl UniversalPackageImporter {
             Some(UniversalPackageFormat::DebianDeb)
         } else if filename.ends_with(".pkg.tar.zst") || filename.ends_with(".pkg.tar.xz") {
             Some(UniversalPackageFormat::ArchPacman)
-        } else if filename.ends_with(".rpm") || filename.ends_with(".spec") {
+        } else if filename.ends_with(".rpm") {
             Some(UniversalPackageFormat::FedoraRpm)
-        } else if filename.ends_with(".recipe") {
-            Some(UniversalPackageFormat::HaikuHpkg)
-        } else if filename.ends_with(".whl") || filename.ends_with(".wheel") {
-            Some(UniversalPackageFormat::MacOsBottle) // Python Wheel runtime
-        } else if filename.ends_with(".gem") {
-            Some(UniversalPackageFormat::MacOsBottle) // Ruby Gem runtime
-        } else if filename.ends_with(".crate") {
-            Some(UniversalPackageFormat::ConanCpp) // Cargo Crate runtime
         } else if filename.ends_with(".apk") && !filename.contains("android") {
             Some(UniversalPackageFormat::AlpineApk)
         } else if filename.ends_with(".ebuild") {
@@ -396,49 +388,15 @@ impl UniversalPackageImporter {
                     let key = trimmed[..pos].trim();
                     let val = trimmed[pos + 1..].trim();
                     match key {
-                        "Name" | "Name:" => name = val.to_string(),
-                        "Version" | "Version:" => version = val.to_string(),
-                        "Summary" | "Description" | "Requires-Dist" => {
-                            if key == "Summary" || key == "Description" {
-                                description = val.to_string();
-                            } else if key == "Requires-Dist" {
-                                let dep_name = val.split_whitespace().next().unwrap_or(val);
-                                raw_deps.push(dep_name.to_string());
-                            }
-                        }
-                        "Requires" | "BuildRequires" => {
+                        "Name" => name = val.to_string(),
+                        "Version" => version = val.to_string(),
+                        "Summary" | "Description" => description = val.to_string(),
+                        "Requires" => {
                             for dep in val.split(',') {
-                                let clean = dep.trim().split_whitespace().next().unwrap_or(dep.trim());
-                                if !clean.is_empty() {
-                                    raw_deps.push(clean.to_string());
-                                }
+                                raw_deps.push(dep.trim().to_string());
                             }
                         }
                         _ => {}
-                    }
-                }
-            }
-        } else if text.contains("SUMMARY=") || text.contains("REQUIRES=") || filename.ends_with(".recipe") {
-            for line in text.lines() {
-                let trimmed = line.trim();
-                if trimmed.starts_with("SUMMARY=") {
-                    description = trimmed["SUMMARY=".len()..]
-                        .trim_matches(|c| c == '"' || c == '\'')
-                        .to_string();
-                } else if trimmed.starts_with("REQUIRES=") || trimmed.starts_with("REQUIRES=\"") {
-                    let val = trimmed.split('=').last().unwrap_or(trimmed).trim_matches(|c| c == '"' || c == '\'');
-                    for dep in val.split_whitespace() {
-                        raw_deps.push(dep.to_string());
-                    }
-                } else if trimmed.starts_with("PORTNAME=") || trimmed.starts_with("PRGNAM=") {
-                    name = trimmed.split('=').last().unwrap_or(trimmed).trim_matches(|c| c == '"' || c == '\'').to_string();
-                } else if trimmed.starts_with("PORTVERSION=") || trimmed.starts_with("VERSION=") {
-                    version = trimmed.split('=').last().unwrap_or(trimmed).trim_matches(|c| c == '"' || c == '\'').to_string();
-                } else if trimmed.starts_with("RUN_DEPENDS=") || trimmed.starts_with("BUILD_DEPENDS=") {
-                    let val = trimmed.split('=').last().unwrap_or(trimmed).trim_matches(|c| c == '"' || c == '\'');
-                    for dep in val.split_whitespace() {
-                        let clean = dep.split(':').next().unwrap_or(dep);
-                        raw_deps.push(clean.to_string());
                     }
                 }
             }
@@ -589,10 +547,6 @@ impl UniversalPackageImporter {
                     || dep_lower.contains("crypto")
                     || dep_lower.contains("gnutls")
                     || dep_lower.contains("mbedtls")
-                    || dep_lower == "security/openssl"
-                    || dep_lower == "dev-libs/openssl"
-                    || dep_lower == "openssl-devel"
-                    || dep_lower == "libssl-dev"
                 {
                     "sovereign-openssl".to_string()
                 } else if dep_lower.contains("libc")
@@ -604,9 +558,6 @@ impl UniversalPackageImporter {
                     || dep_lower.contains("bedrock-core")
                     || dep_lower.contains("haiku-libroot")
                     || dep_lower.contains("pkgsrc-core")
-                    || dep_lower == "libc6"
-                    || dep_lower == "musl-dev"
-                    || dep_lower == "libroot"
                 {
                     "sovereign-libc".to_string()
                 } else if dep_lower.contains("zlib")
@@ -615,8 +566,6 @@ impl UniversalPackageImporter {
                     || dep_lower.contains("xz")
                     || dep_lower.contains("bzip2")
                     || dep_lower.contains("brotli")
-                    || dep_lower == "libz"
-                    || dep_lower == "zlib1g-dev"
                 {
                     "sovereign-compression".to_string()
                 } else if dep_lower.contains("python")
@@ -626,7 +575,6 @@ impl UniversalPackageImporter {
                     || dep_lower.contains("golang")
                     || dep_lower.contains("rust")
                     || dep_lower.contains("java")
-                    || dep_lower.contains("python3-dev")
                 {
                     "sovereign-runtime".to_string()
                 } else if dep_lower == "bash"
@@ -1230,10 +1178,6 @@ pub enum SandboxActionType {
     SymlinkBinary,
     UpdateIconCache,
     RegisterSystemdUnit,
-    UpdateDynamicLinker,
-    KernelModuleDepmap,
-    SysctlConfiguration,
-    TmpfilesRegistration,
     BlockedDangerousCommand,
 }
 
@@ -1276,18 +1220,8 @@ impl UniversalScriptletSandbox {
                 actions.push(SandboxActionType::UpdateIconCache);
             } else if trimmed.contains("systemctl enable")
                 || trimmed.contains("systemctl daemon-reload")
-                || trimmed.contains("rc-update")
-                || trimmed.contains("rcctl")
             {
                 actions.push(SandboxActionType::RegisterSystemdUnit);
-            } else if trimmed.contains("ldconfig") {
-                actions.push(SandboxActionType::UpdateDynamicLinker);
-            } else if trimmed.contains("depmod") {
-                actions.push(SandboxActionType::KernelModuleDepmap);
-            } else if trimmed.contains("sysctl") {
-                actions.push(SandboxActionType::SysctlConfiguration);
-            } else if trimmed.contains("systemd-tmpfiles") || trimmed.contains("tmpfiles.d") {
-                actions.push(SandboxActionType::TmpfilesRegistration);
             }
         }
 
@@ -2015,7 +1949,6 @@ impl SigmaPkg {
                     || *arg == "get"
                     || *arg == "b"
                     || *arg == "build"
-                    || *arg == "bundle-add"
                 {
                     action = "install";
                 } else if *arg == "-S" {
@@ -2051,7 +1984,6 @@ impl SigmaPkg {
                     || *arg == "erase"
                     || *arg == "uninstall"
                     || *arg == "deselect"
-                    || *arg == "bundle-remove"
                 {
                     action = "remove";
                 } else if *arg == "update"
@@ -2367,17 +2299,6 @@ mod tests {
         assert!(dangerous_result
             .actions_permitted
             .contains(&SandboxActionType::BlockedDangerousCommand));
-
-        let sys_script = "#!/bin/sh\nldconfig\ndepmod -a\nsysctl -p\n";
-        let sys_res = UniversalScriptletSandbox::transpile_and_sandbox(
-            UniversalPackageFormat::DebianDeb,
-            "postinst",
-            sys_script,
-        );
-        assert!(sys_res.safe_execution);
-        assert!(sys_res.actions_permitted.contains(&SandboxActionType::UpdateDynamicLinker));
-        assert!(sys_res.actions_permitted.contains(&SandboxActionType::KernelModuleDepmap));
-        assert!(sys_res.actions_permitted.contains(&SandboxActionType::SysctlConfiguration));
     }
 
     #[test]
