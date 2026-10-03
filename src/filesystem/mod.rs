@@ -17,6 +17,7 @@ pub mod watch;
 pub mod ext4;
 pub mod tmpfs;
 pub mod btrfs;
+pub mod zfs;
 
 pub use crate::filesystem::vfs::{FileType, FsError, Inode, VfsError, VirtualFilesystem};
 pub use smart_symlink::{LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule};
@@ -77,6 +78,10 @@ pub use tmpfs::{TmpfsFilesystem, TmpfsInode, TmpfsError};
 pub use btrfs::{
     BtrfsFilesystem, BtrfsSuperblock, BtrfsError, BtrfsSnapshot,
     BtrfsStats, BtrfsCompression, BtrfsRaidLevel,
+};
+pub use zfs::{
+    ZfsPool, ZfsVdev, ZfsDataset, ZfsError, ZfsScrubStats,
+    VdevType, VdevState, PoolState, DatasetType,
 };
 
 pub type FileDescriptor = i32;
