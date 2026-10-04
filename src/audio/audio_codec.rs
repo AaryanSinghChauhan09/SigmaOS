@@ -13,9 +13,8 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-// Audio Systems - Basic Audio Codec Support
-// Supports FLAC, MP3, and other common audio formats
-// Enhanced with Linux/BSD-inspired clock-sync, dynamic VBR control, PLC, and VorbisComment parsing.
+// Audio systems: validated integer PCM WAV import/export plus audio timing and metadata models.
+// FLAC, MP3, and Vorbis signatures are recognized but their decoders are not implemented.
 
 // (no_std only applicable at crate root - removed)
 
@@ -266,14 +265,24 @@ impl AudioCodec {
         }
 
         // WAV signature: RIFF....WAVE
-        if data[0] == 0x52 && data[1] == 0x49 && data[2] == 0x46 && data[3] == 0x46 {
+        if data.len() >= 4
+            && data[0] == 0x52
+            && data[1] == 0x49
+            && data[2] == 0x46
+            && data[3] == 0x46
+        {
             if data.len() >= 12 && &data[8..12] == b"WAVE" {
                 return AudioFormat::Wav;
             }
         }
 
         // OGG signature: OggS
-        if data[0] == 0x4F && data[1] == 0x67 && data[2] == 0x67 && data[3] == 0x53 {
+        if data.len() >= 4
+            && data[0] == 0x4F
+            && data[1] == 0x67
+            && data[2] == 0x67
+            && data[3] == 0x53
+        {
             return AudioFormat::OggVorbis;
         }
 
@@ -551,6 +560,12 @@ mod tests {
             AudioCodec::detect_format(&ogg_signature),
             AudioFormat::OggVorbis
         );
+    }
+
+    #[test]
+    fn short_riff_and_ogg_prefixes_are_safe_unknown_formats() {
+        assert_eq!(AudioCodec::detect_format(b"RIF"), AudioFormat::Unknown);
+        assert_eq!(AudioCodec::detect_format(b"Ogg"), AudioFormat::Unknown);
     }
 
     #[test]

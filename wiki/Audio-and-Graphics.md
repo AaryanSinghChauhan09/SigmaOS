@@ -11,7 +11,7 @@ This page inventories proposed and implemented multimedia components. The listed
 - Peak normalization now scales both below-full-scale and over-full-scale finite samples to a requested peak from 0.0 through 1.0, preserving relative sample/channel balance. Non-finite input and invalid target peaks are rejected without modifying samples.
 - Fade-out reaches zero at its final sample, including a one-sample fade.
 - Regression tests: `cargo test --lib audio::editor::tests -- --nocapture`.
-- WAV round-trip, metadata, 8/16/24/32-bit conversion, malformed input, and unsupported-codec regression tests: `rustc --edition=2021 --test src/audio/audio_codec.rs -o /tmp/sigmaos_audio_codec_tests && /tmp/sigmaos_audio_codec_tests` (14 passed). The corresponding Cargo crate test is still pending because crate compilation did not complete in this environment.
+- WAV round-trip, metadata, 8/16/24/32-bit conversion, malformed input, short-signature safety, and unsupported-codec regression tests: `rustc --edition=2021 --test src/audio/audio_codec.rs -o /tmp/sigmaos_audio_codec_tests && /tmp/sigmaos_audio_codec_tests` (15 passed). The corresponding Cargo crate test is still pending because crate compilation did not complete in this environment.
 
 ### Implemented library behavior: raster allocation and bounds checks
 
