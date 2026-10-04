@@ -62,6 +62,7 @@ SigmaOS is an operating-system development project with kernel, storage, network
 | 47 | [Mint & Omarchy Launch Supremacy](Mint-and-Omarchy-Launch-Supremacy) | Kernel regression watchdog, locale IME, Cinnamon applet sandbox, Omarchy declarative rules & launch certification |
 | 48 | [Mint & Omarchy Hardware & Audio Supremacy](Mint-and-Omarchy-Hardware-and-Audio-Supremacy) | Driver manager with MOK enrollment, 1.33ms studio audio DSP, handheld TDP optimizer & fuzzy launcher |
 | 49 | [Mint & Omarchy Pinnacle Ecosystem](Mint-and-Omarchy-Pinnacle-Ecosystem) | Backup & software migration engine, Proton prefix manager, biometric screen locker & 1:1 kinetic gestures |
+| 50 | [Mint & Omarchy Apex Mastery](Mint-and-Omarchy-Apex-Mastery) | Blur-free fractional scaling, sub-5ms content indexing, zero-polling IPC event bus & 10-foot gamepad navigation |
 
 ## Component Future-Development Roadmaps
 
