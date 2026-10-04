@@ -72,6 +72,13 @@ if [ -f "src/desktop/mint_update_manager.rs" ]; then
     ./build/mint_update_manager_test
 fi
 
+if [ -f "src/desktop/onboarding_wizard.rs" ]; then
+    echo "Running first-run onboarding policy and unavailable-action test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/desktop/onboarding_wizard.rs -o build/onboarding_wizard_test
+    ./build/onboarding_wizard_test
+fi
+
 if [ -f "src/distro/linux_bsd_inspirations.rs" ]; then
     echo "Running Linux & BSD distro inspirations & subsystem bridge test suite..."
     mkdir -p build

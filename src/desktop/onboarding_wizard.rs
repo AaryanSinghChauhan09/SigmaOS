@@ -23,12 +23,12 @@ pub struct DriverRecommendation {
 pub struct CodecInstaller;
 
 impl CodecInstaller {
-    pub fn is_installed() -> bool {
-        false
+    pub fn is_installed() -> Result<bool, &'static str> {
+        Err("Codec package query backend is unavailable")
     }
 
-    pub fn install_nonfree_codecs() -> Result<(), String> {
-        Ok(())
+    pub fn install_nonfree_codecs() -> Result<(), &'static str> {
+        Err("Codec package installation backend is unavailable")
     }
 }
 
@@ -42,8 +42,8 @@ pub enum ThemeVariant {
 pub struct ThemeSelector;
 
 impl ThemeSelector {
-    pub fn apply_theme(_variant: ThemeVariant, _accent_color: &str) {
-        // apply theme settings
+    pub fn apply_theme(_variant: ThemeVariant, _accent_color: &str) -> Result<(), &'static str> {
+        Err("Desktop theme settings backend is unavailable")
     }
 }
 
@@ -57,8 +57,8 @@ pub enum DesktopLayoutVariant {
 pub struct LayoutSelector;
 
 impl LayoutSelector {
-    pub fn apply_layout(_variant: DesktopLayoutVariant) {
-        // apply layout settings
+    pub fn apply_layout(_variant: DesktopLayoutVariant) -> Result<(), &'static str> {
+        Err("Desktop layout settings backend is unavailable")
     }
 }
 
@@ -73,7 +73,7 @@ impl Default for PrivacySettings {
     fn default() -> Self {
         PrivacySettings {
             telemetry_opt_in: false,
-            crash_reporting: true,
+            crash_reporting: false,
             location_services: false,
         }
     }
@@ -114,8 +114,8 @@ impl AppSuggestions {
 pub struct OmarchyDevSetup;
 
 impl OmarchyDevSetup {
-    pub fn install_tools() -> Result<(), String> {
-        Ok(())
+    pub fn install_tools() -> Result<(), &'static str> {
+        Err("Developer tool package backend is unavailable")
     }
 }
 
@@ -124,7 +124,7 @@ pub struct SummaryReport {
     pub theme: ThemeVariant,
     pub layout: DesktopLayoutVariant,
     pub privacy: PrivacySettings,
-    pub codecs_installed: bool,
+    pub codecs_requested: bool,
 }
 
 pub struct OnboardingWizard {
@@ -162,6 +162,22 @@ impl OnboardingWizard {
         };
     }
 
+    pub fn previous_step(&mut self) {
+        self.current_step = match self.current_step {
+            WizardStep::Welcome => WizardStep::Welcome,
+            WizardStep::SystemSnapshot => WizardStep::Welcome,
+            WizardStep::DriverCheck => WizardStep::SystemSnapshot,
+            WizardStep::MultimediaCodecs => WizardStep::DriverCheck,
+            WizardStep::Firewall => WizardStep::MultimediaCodecs,
+            WizardStep::UpdateManager => WizardStep::Firewall,
+            WizardStep::AppTheme => WizardStep::UpdateManager,
+            WizardStep::DesktopLayout => WizardStep::AppTheme,
+            WizardStep::Accounts => WizardStep::DesktopLayout,
+            WizardStep::Privacy => WizardStep::Accounts,
+            WizardStep::Finish => WizardStep::Privacy,
+        };
+    }
+
     pub fn set_theme(&mut self, theme: ThemeVariant) {
         self.theme = theme;
     }
@@ -174,12 +190,16 @@ impl OnboardingWizard {
         self.privacy = privacy;
     }
 
+    pub fn request_codecs(&mut self, requested: bool) {
+        self.codecs_requested = requested;
+    }
+
     pub fn generate_summary(&self) -> SummaryReport {
         SummaryReport {
             theme: self.theme.clone(),
             layout: self.layout.clone(),
             privacy: self.privacy.clone(),
-            codecs_installed: self.codecs_requested,
+            codecs_requested: self.codecs_requested,
         }
     }
 
@@ -189,7 +209,6 @@ impl OnboardingWizard {
 }
 
 #[cfg(test)]
-#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -197,8 +216,15 @@ mod tests {
     fn test_wizard_navigation() {
         let mut wizard = OnboardingWizard::new();
         assert_eq!(*wizard.get_current_step(), WizardStep::Welcome);
+        wizard.previous_step();
+        assert_eq!(*wizard.get_current_step(), WizardStep::Welcome);
         wizard.next_step();
         assert_eq!(*wizard.get_current_step(), WizardStep::SystemSnapshot);
+        wizard.previous_step();
+        assert_eq!(*wizard.get_current_step(), WizardStep::Welcome);
+        wizard.next_step();
+        wizard.next_step();
+        assert_eq!(*wizard.get_current_step(), WizardStep::DriverCheck);
     }
 
     #[test]
@@ -222,17 +248,24 @@ mod tests {
     fn test_privacy_defaults() {
         let p = PrivacySettings::default();
         assert!(!p.telemetry_opt_in);
-        assert!(p.crash_reporting);
+        assert!(!p.crash_reporting);
+        assert!(!p.location_services);
     }
 
     #[test]
-    fn test_codec_installer() {
-        assert!(!CodecInstaller::is_installed());
-        assert!(CodecInstaller::install_nonfree_codecs().is_ok());
+    fn test_unavailable_onboarding_actions_fail_closed() {
+        assert!(CodecInstaller::is_installed().is_err());
+        assert!(CodecInstaller::install_nonfree_codecs().is_err());
+        assert!(ThemeSelector::apply_theme(ThemeVariant::Dark, "blue").is_err());
+        assert!(LayoutSelector::apply_layout(DesktopLayoutVariant::Tiling).is_err());
+        assert!(OmarchyDevSetup::install_tools().is_err());
     }
 
     #[test]
-    fn test_dev_setup() {
-        assert!(OmarchyDevSetup::install_tools().is_ok());
+    fn test_summary_reports_request_without_claiming_installation() {
+        let mut wizard = OnboardingWizard::new();
+        wizard.request_codecs(true);
+        assert!(wizard.generate_summary().codecs_requested);
+        assert!(CodecInstaller::install_nonfree_codecs().is_err());
     }
 }
