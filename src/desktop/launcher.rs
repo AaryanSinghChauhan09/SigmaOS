@@ -221,10 +221,16 @@ impl CommandPalette {
     pub fn query(&self, input: &str) -> Vec<SearchResultItem> {
         let trimmed = input.trim();
         if trimmed.is_empty() {
-            // Return top frequent apps if no query
-            return self
-                .apps
-                .iter()
+            // Surface common apps first, with a stable name tie-break for predictable keyboard navigation.
+            let mut frequent_apps: Vec<&LauncherEntry> = self.apps.iter().collect();
+            frequent_apps.sort_by(|left, right| {
+                right
+                    .launch_count
+                    .cmp(&left.launch_count)
+                    .then_with(|| left.name.cmp(&right.name))
+            });
+            return frequent_apps
+                .into_iter()
                 .take(8)
                 .map(|app| SearchResultItem {
                     title: app.name.clone(),
@@ -232,7 +238,7 @@ impl CommandPalette {
                     icon: app.icon.clone(),
                     action_payload: app.exec_path.clone(),
                     mode: LauncherMode::Application,
-                    score: 100 + app.launch_count as i32,
+                    score: 100 + app.launch_count.min((i32::MAX - 100) as u32) as i32,
                 })
                 .collect();
         }
@@ -320,7 +326,7 @@ impl CommandPalette {
         // 5. Application search
         for app in &self.apps {
             let name_lower = app.name.to_lowercase();
-            let mut score = -1;
+            let mut score: i32 = -1;
 
             if name_lower == q_lower {
                 score = 1000;
@@ -337,7 +343,9 @@ impl CommandPalette {
             }
 
             if score > 0 {
-                score += (app.launch_count as i32) * 5;
+                score = score.saturating_add(
+                    (app.launch_count.min(i32::MAX as u32) as i32).saturating_mul(5),
+                );
                 results.push(SearchResultItem {
                     title: app.name.clone(),
                     subtitle: app.category.clone(),
@@ -482,6 +490,46 @@ mod tests {
         let app_results = palette.query("term");
         assert_eq!(app_results.len(), 1);
         assert_eq!(app_results[0].title, "Terminal");
+    }
+
+    #[test]
+    fn empty_query_ranks_frequent_apps_and_limits_results() {
+        let mut palette = CommandPalette::new();
+        for index in (0..10).rev() {
+            palette.register(LauncherEntry {
+                name: format!("App {index:02}"),
+                exec_path: format!("/apps/{index}"),
+                icon: "app".into(),
+                category: "Test".into(),
+                keywords: Vec::new(),
+                launch_count: if index == 9 { u32::MAX } else { index },
+            });
+        }
+
+        let results = palette.query("  ");
+        assert_eq!(results.len(), 8);
+        assert_eq!(results[0].title, "App 09");
+        assert_eq!(results[0].score, i32::MAX);
+        assert_eq!(results[1].title, "App 08");
+        assert_eq!(results[7].title, "App 02");
+    }
+
+    #[test]
+    fn empty_query_breaks_usage_ties_by_name() {
+        let mut palette = CommandPalette::new();
+        for name in ["Zulu", "Alpha"] {
+            palette.register(LauncherEntry {
+                name: name.into(),
+                exec_path: format!("/apps/{name}"),
+                icon: "app".into(),
+                category: "Test".into(),
+                keywords: Vec::new(),
+                launch_count: 3,
+            });
+        }
+        let results = palette.query("");
+        assert_eq!(results[0].title, "Alpha");
+        assert_eq!(results[1].title, "Zulu");
     }
 
     #[test]

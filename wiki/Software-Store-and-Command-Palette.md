@@ -6,9 +6,9 @@
 
 Install, remove, and batch-install methods fail clearly when no transactional backend exists, and leave installed state unchanged. Delta-size estimation returns unavailable without measured package-diff data.
 
-`src/desktop/launcher.rs` implements an in-memory keyboard-palette query model. It ranks app/window/action/clipboard matches and evaluates basic arithmetic. It does not execute commands, launch apps, switch compositor windows, or connect to a system clipboard service. Clipboard data remains in memory only; callers can clear history explicitly.
+`src/desktop/launcher.rs` implements an in-memory keyboard-palette query model. An empty query ranks the eight most-used applications first, breaking equal-use ties by name for predictable keyboard navigation; non-empty queries rank app/window/action/clipboard matches and basic arithmetic. It does not execute commands, launch apps, switch compositor windows, or connect to a system clipboard service. Clipboard data remains in memory only; callers can clear history explicitly.
 
-The launcher regression suite covers UTF-8-safe previews, stable unique history IDs through eviction and clearing, zero-capacity behavior, multi-mode query behavior, and calculator behavior:
+The launcher regression suite covers UTF-8-safe previews, stable unique history IDs through eviction and clearing, zero-capacity behavior, usage-ranked empty queries, result limits, stable tie ordering, multi-mode query behavior, and calculator behavior:
 
 ```sh
 rustc --edition=2021 --test src/desktop/launcher.rs -o /tmp/sigmaos_launcher_tests

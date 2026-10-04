@@ -150,7 +150,7 @@ next_milestone = "Real framebuffer rendering"
 status = "prototype"
 files = ["src/desktop/launcher.rs"]
 description = "In-memory keyboard palette query model with app, window, action, calculator, and clipboard results"
-test_evidence = "Standalone rustc test harness: 6 passed; no compositor, app-launch, command-execution, or clipboard-service integration"
+test_evidence = "Standalone rustc test harness: 8 passed; no compositor, app-launch, command-execution, or clipboard-service integration"
 next_milestone = "Connect query results to real app-launch and compositor services with explicit error handling"
 
 [desktop.notification]
