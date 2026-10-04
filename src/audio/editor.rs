@@ -210,26 +210,35 @@ impl AudioEffect for NoiseGateEffect {
 pub struct AudioEditor;
 
 impl AudioEditor {
-    /// Peak Amplitude Normalization (Normalizes peak volume exactly to 1.0 / 0dB)
+    /// Normalize finite samples to a target peak in the inclusive range 0..=1.
+    /// Returns false without changing the track for an invalid target or sample.
+    /// Stereo data is treated as one interleaved stream, preserving channel balance.
+    pub fn normalize_to_peak(track: &mut AudioTrack, target_peak: f32) -> bool {
+        if !target_peak.is_finite() || !(0.0..=1.0).contains(&target_peak) {
+            return false;
+        }
+        if track.samples.iter().any(|sample| !sample.is_finite()) {
+            return false;
+        }
+
+        let peak = track
+            .samples
+            .iter()
+            .fold(0.0f32, |peak, sample| peak.max(sample.abs()));
+        if peak == 0.0 || track.samples.is_empty() {
+            return true;
+        }
+
+        let scale = target_peak / peak;
+        for sample in &mut track.samples {
+            *sample *= scale;
+        }
+        true
+    }
+
+    /// Peak normalize to full scale (1.0). Invalid samples leave the track unchanged.
     pub fn normalize(track: &mut AudioTrack) {
-        if track.samples.is_empty() {
-            return;
-        }
-
-        let mut peak: f32 = 0.0;
-        for i in 0..track.samples.len() {
-            let val = track.samples[i].abs();
-            if val > peak {
-                peak = val;
-            }
-        }
-
-        if peak > 0.0 && peak < 1.0 {
-            let scale_factor = 1.0 / peak;
-            for i in 0..track.samples.len() {
-                track.samples[i] *= scale_factor;
-            }
-        }
+        let _ = Self::normalize_to_peak(track, 1.0);
     }
 
     /// Appplies a linear Fade-In volume ramp at the beginning of a track
@@ -250,7 +259,11 @@ impl AudioEditor {
         let limit = duration_samples.min(len);
         let start_idx = len - limit;
         for i in 0..limit {
-            let factor = 1.0 - ((i as f32) / (limit as f32));
+            let factor = if limit <= 1 {
+                0.0
+            } else {
+                1.0 - ((i as f32) / ((limit - 1) as f32))
+            };
             track.samples[start_idx + i] *= factor;
         }
     }
@@ -299,7 +312,6 @@ impl AudioEditor {
     }
 }
 
-#[cfg(test)]
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -363,6 +375,33 @@ mod tests {
         // Fade in (dur 1 sample: index 0 scaled to 0.0)
         AudioEditor::fade_in(&mut track, 1);
         assert_eq!(track.samples[0], 0.0);
+    }
+
+    #[test]
+    fn normalize_reduces_over_full_scale_and_supports_headroom() {
+        let mut track = AudioTrack::new(1, "hot").with_samples(&[2.0, -1.0]);
+        assert!(AudioEditor::normalize_to_peak(&mut track, 0.891_250_9));
+        assert!((track.samples[0] - 0.891_250_9).abs() < 1e-6);
+        assert!((track.samples[1] + 0.445_625_45).abs() < 1e-6);
+    }
+
+    #[test]
+    fn normalize_rejects_non_finite_input_without_mutating_track() {
+        let mut track = AudioTrack::new(1, "invalid").with_samples(&[0.5, f32::NAN]);
+        assert!(!AudioEditor::normalize_to_peak(&mut track, 1.0));
+        assert_eq!(track.samples[0], 0.5);
+        assert!(track.samples[1].is_nan());
+    }
+
+    #[test]
+    fn fade_out_reaches_silence_and_handles_one_sample() {
+        let mut track = AudioTrack::new(1, "fade").with_samples(&[1.0, 1.0, 1.0]);
+        AudioEditor::fade_out(&mut track, 3);
+        assert_eq!(track.samples, vec![1.0, 0.5, 0.0]);
+
+        let mut one = AudioTrack::new(2, "one").with_samples(&[0.7]);
+        AudioEditor::fade_out(&mut one, 1);
+        assert_eq!(one.samples, vec![0.0]);
     }
 
     #[test]

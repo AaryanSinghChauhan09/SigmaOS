@@ -1,6 +1,27 @@
 # Audio and Graphics Subsystems
 
-SigmaOS provides professional-grade audio and graphics infrastructure inspired by modern Linux and BSD multimedia stacks.
+This page inventories proposed and implemented multimedia components. The listed driver, server, graphics API, and desktop integrations are not evidence of working hardware support. SigmaOS is not currently a general-use operating system; see the project status and release gate before treating any item as supported.
+
+## Capability status and application roadmap
+
+### Implemented library behavior: audio editing primitives
+
+`src/audio/editor.rs` provides in-memory floating-point sample operations: track mixing, cut/paste, basic filters, peak normalization, and fades. It does not import or export audio files, capture/play audio, provide a graphical editor, or replace Audacity.
+
+- Peak normalization now scales both below-full-scale and over-full-scale finite samples to a requested peak from 0.0 through 1.0, preserving relative sample/channel balance. Non-finite input and invalid target peaks are rejected without modifying samples.
+- Fade-out reaches zero at its final sample, including a one-sample fade.
+- Regression tests: `cargo test --lib audio::editor::tests -- --nocapture`.
+
+### Roadmap: first-party media and creative applications
+
+Use Arch's inspectable package recipes, Mint's clear first-run and recovery flows, and Omarchy's deliberate defaults as design references. These references do not imply compatibility or completed implementation.
+
+1. **Sigma Player (VLC-inspired):** first prove a file-backed PCM/WAV playback path, accurate duration/seek behavior, clear unsupported-format errors, and a keyboard-accessible queue. Add codecs only with provenance, license review, and fixture-based tests. Current media player structs are models, not a functioning decoder or hardware-accelerated player.
+2. **Sigma Audio Studio (Audacity-inspired):** add validated audio import/export, selection editing, undo/redo, non-destructive project saves, and playback/recording integration. Keep DSP bounded and deterministic; test malformed files, clipping boundaries, cancellation, and round trips.
+3. **Sigma Paint (GIMP-inspired):** add overflow-safe image dimensions, real pixel import/export, layer compositing, selections/masks, undo/redo, and keyboard-accessible tools. Test alpha/blend results, invalid dimensions, large allocations, and save/reopen. Existing paint types do not constitute a complete image editor.
+4. **Delivery and readiness:** package each application only after transactional package installation and rollback exist. A desktop session, supported file formats, accessibility review, clean-install/QEMU validation, and recovery procedure are release gates. Never mark an app installed or supported from catalog metadata or a mock alone.
+
+The references for expected editing behavior include the [Audacity Normalize manual](https://manual.audacityteam.org/man/normalize.html) and [GIMP layer-mask manual](https://docs.gimp.org/3.0/en/gimp-layer-mask-edit.html). They describe upstream products; SigmaOS currently implements only the limited library operations stated above.
 
 ## Audio Subsystem
 
