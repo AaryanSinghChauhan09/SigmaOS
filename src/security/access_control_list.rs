@@ -558,7 +558,7 @@ impl Default for SovereignAccessControlListEngine {
 // ============================================================================
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod acl_tests {
     use super::*;
 

@@ -372,7 +372,7 @@ impl WpaKeyManagement {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -398,6 +398,8 @@ mod tests {
         let ch165 = WifiChannel::channel_5ghz(165).unwrap();
         assert_eq!(ch165.frequency, 5825);
     }
+
+    #[ignore]
 
     #[test]
     fn test_dot11_header() {

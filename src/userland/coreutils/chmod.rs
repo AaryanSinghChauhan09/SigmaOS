@@ -72,7 +72,7 @@ fn change_permissions_recursive(path: &Path, mode: u32) -> Result<(), String> {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
     use std::fs::File;

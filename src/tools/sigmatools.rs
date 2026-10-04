@@ -616,7 +616,7 @@ impl Default for SigmaMonitor {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -1276,7 +1276,7 @@ impl SovereignPasswordGenerator {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod replicated_tests {
     use super::*;
 

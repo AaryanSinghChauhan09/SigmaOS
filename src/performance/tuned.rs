@@ -92,7 +92,7 @@ impl Default for PerformanceTuner {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

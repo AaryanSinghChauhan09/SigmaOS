@@ -169,7 +169,7 @@ impl Default for SovereignBareMetalHypervisor {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

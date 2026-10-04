@@ -6726,7 +6726,7 @@ impl Default for SovereignK9sClusterManagerEngine {
 // =========================================================================
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

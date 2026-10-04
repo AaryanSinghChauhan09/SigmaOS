@@ -268,7 +268,7 @@ pub enum LimitationType {
     ForeclosureOfMortgage,
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

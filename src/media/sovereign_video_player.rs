@@ -809,7 +809,7 @@ impl Default for NtpClient {
 // TESTS
 // =========================================================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

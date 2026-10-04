@@ -267,7 +267,7 @@ unsafe fn free(_ptr: *mut u8) {
     // In standard shims, we can just let OS reclaim heap on test exit or perform simple dummy dealloc
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

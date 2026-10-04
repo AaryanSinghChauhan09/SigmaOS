@@ -303,7 +303,7 @@ fn sys_bpf_prog_test(_attr: *const u8, _attr_size: u32) -> Result<u32, BpfError>
     Ok(0)
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

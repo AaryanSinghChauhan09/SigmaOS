@@ -701,7 +701,7 @@ impl OmarchyLiveIsoBootstrapEngine {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod omarchy_tests {
     use super::*;
 

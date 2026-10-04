@@ -236,7 +236,7 @@ impl Default for ShmManager {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

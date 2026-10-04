@@ -341,7 +341,7 @@ impl Default for SovereignOmarchyThemeUnlockSuite {
 // ============================================================================
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

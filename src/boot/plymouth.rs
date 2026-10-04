@@ -97,7 +97,7 @@ impl Default for GtkPlymouthBootsplashEngine {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

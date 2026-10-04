@@ -537,7 +537,7 @@ pub fn log_cap_violation(fd: i32, right: u64, pid: u32) {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
     use crate::security::cap_rights::{

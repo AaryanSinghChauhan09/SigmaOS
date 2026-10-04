@@ -313,7 +313,7 @@ impl Default for ResourceMonitor {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

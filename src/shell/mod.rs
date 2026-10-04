@@ -93,7 +93,7 @@ impl Drop for SigmaShell {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

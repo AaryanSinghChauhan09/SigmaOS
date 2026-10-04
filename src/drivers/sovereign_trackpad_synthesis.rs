@@ -416,7 +416,7 @@ impl Default for SovereignTrackpadSubsystemSuite {
 // ============================================================================
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

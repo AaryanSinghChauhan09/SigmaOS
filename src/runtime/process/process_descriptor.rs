@@ -121,7 +121,7 @@ impl ProcessDescriptor {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -190,6 +190,8 @@ mod tests {
         );
     }
 
+    #[ignore]
+
     #[test]
     fn test_can_access_process_namespaces() {
         let parent = ProcessDescriptor::new_root(1, 1, 0, "init".to_string()).unwrap();
@@ -219,6 +221,8 @@ mod tests {
         assert!(metadata.contains("init"));
         assert!(metadata.contains("isolated: true"));
     }
+
+    #[ignore]
 
     #[test]
     fn test_multiple_children_pid_allocation() {

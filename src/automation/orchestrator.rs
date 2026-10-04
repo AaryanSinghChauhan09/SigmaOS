@@ -513,7 +513,7 @@ pub enum OptimizationError {
     ModelNotTrained,
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

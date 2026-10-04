@@ -367,7 +367,7 @@ impl Default for AuthManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

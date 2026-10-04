@@ -983,7 +983,7 @@ impl Default for CoasAdminSuite {
 // Unit Tests for Distro Clean-Room Overtake
 // ==========================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

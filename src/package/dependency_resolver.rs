@@ -261,7 +261,7 @@ impl Default for PackageDependencyResolver {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

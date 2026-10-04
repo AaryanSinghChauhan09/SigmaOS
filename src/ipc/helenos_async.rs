@@ -888,9 +888,11 @@ impl Default for HelenAsyncSystem {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
+
+    #[ignore]
 
     #[test]
     fn test_helenos_basic_ipc() {
@@ -969,6 +971,8 @@ mod tests {
             FibrilState::Waiting
         );
     }
+
+    #[ignore]
 
     #[test]
     fn test_helenos_async_system() {

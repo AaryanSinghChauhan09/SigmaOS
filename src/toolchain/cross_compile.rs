@@ -832,9 +832,7 @@ impl ReproducibleBuild for SimpleReproducibleBuild {
     }
 }
 
-#[cfg(test_disabled)]
 #[cfg(test)]
-#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

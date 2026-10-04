@@ -273,7 +273,7 @@ impl Default for SovereignArchivalAndDbSuite {
 // ============================================================================
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

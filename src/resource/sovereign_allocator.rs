@@ -172,7 +172,7 @@ impl Default for SovereignMultiResourceAllocator {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

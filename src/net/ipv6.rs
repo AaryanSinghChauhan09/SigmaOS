@@ -639,7 +639,7 @@ impl Default for Ipv6Stack {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

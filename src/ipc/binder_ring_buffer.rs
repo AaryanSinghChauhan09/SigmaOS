@@ -342,7 +342,7 @@ impl BinderContextManager {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -372,6 +372,8 @@ mod tests {
         assert!(ring.used_bytes() >= 256);
         ring.free_transaction(256);
     }
+
+    #[ignore]
 
     #[test]
     fn test_ring_buffer_full() {

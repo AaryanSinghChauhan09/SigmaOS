@@ -354,7 +354,7 @@ pub fn dma_sync_buffer(buffer: &DmaBuffer, sync_point: DmaSyncPoint) {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -277,7 +277,7 @@ impl Default for PowerStateManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

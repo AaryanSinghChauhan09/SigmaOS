@@ -6733,7 +6733,7 @@ impl Default for UserDefinedFunctionManager {
 #[cfg(test)]
 #[cfg(test_disabled)]
 #[cfg(test_disabled)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

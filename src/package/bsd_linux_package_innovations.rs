@@ -3896,7 +3896,7 @@ impl Default for PortagePackageLicenseGovernorEngine {
 mod universal_package;
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

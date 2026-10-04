@@ -285,7 +285,7 @@ impl Default for SignalFdManager {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

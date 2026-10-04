@@ -437,7 +437,7 @@ impl LinuxBsdKernelGapClosurePullRequestEngine {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod kernel_pr_gap_closure_tests {
     use super::*;
 
@@ -3993,7 +3993,7 @@ impl SovereignNebulaMeshVpnEngine {
 // =========================================================================
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

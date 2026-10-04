@@ -176,7 +176,7 @@ impl Default for SigmaFsCasEngine {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

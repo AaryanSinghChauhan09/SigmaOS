@@ -1754,7 +1754,7 @@ impl Default for MulticoreSmpInterruptEngine {
 // ============================================================================
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests_gaps {
     use super::*;
 

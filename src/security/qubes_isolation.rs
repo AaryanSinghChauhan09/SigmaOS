@@ -672,7 +672,7 @@ impl Default for QubesZeroTrustParitySuite {
 #[cfg(test_disabled)]
 #[cfg(test_disabled)]
 #[cfg(test_disabled)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -72,7 +72,7 @@ impl Default for SigmaMasterCli {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

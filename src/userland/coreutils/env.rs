@@ -30,7 +30,7 @@ pub fn run(set_vars: &[(&str, &str)], ignore_environment: bool) -> Result<String
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

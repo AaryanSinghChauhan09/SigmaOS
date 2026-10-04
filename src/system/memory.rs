@@ -502,7 +502,7 @@ impl UseAfterFreeQuarantine {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -734,7 +734,7 @@ impl Default for SovereignFiftyPercentRamRuleEngine {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests_50_percent_ram {
     use super::*;
 

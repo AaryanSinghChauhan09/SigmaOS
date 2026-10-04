@@ -343,7 +343,7 @@ impl Default for ZfsManager {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -365,7 +365,7 @@ pub fn disable_irq(irq_line: IrqLine) {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

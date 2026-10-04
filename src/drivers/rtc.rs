@@ -608,7 +608,7 @@ pub fn binary_to_bcd(bin: u8) -> u8 {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

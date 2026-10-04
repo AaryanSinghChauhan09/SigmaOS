@@ -85,7 +85,7 @@ impl Default for Uuid {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

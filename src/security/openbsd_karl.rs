@@ -111,7 +111,7 @@ impl KarlKernelRelinker {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

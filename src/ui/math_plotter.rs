@@ -113,7 +113,7 @@ impl Default for SovereignMathPlotter {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

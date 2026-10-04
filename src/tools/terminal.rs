@@ -203,7 +203,7 @@ impl Default for SovereignTerminalEnhancementEngine {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -221,7 +221,7 @@ mod tests {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests_disabled {
     use super::*;
 

@@ -83,7 +83,7 @@ pub fn process_reader<R: Read>(reader: &mut R, opts: &CutOptions) -> Result<Stri
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
     use std::io::Cursor;

@@ -154,7 +154,7 @@ impl FlatpakPermissionAuditor {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -228,7 +228,7 @@ mod tests {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod more_tests {
     use super::*;
 

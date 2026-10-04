@@ -432,7 +432,7 @@ impl Default for ArchPacmanConflictResolverEngine {
 // =========================================================================
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

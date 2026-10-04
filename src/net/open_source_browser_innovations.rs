@@ -225,7 +225,7 @@ impl Default for ObliviousDohResolverEngine {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

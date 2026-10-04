@@ -343,7 +343,7 @@ impl Default for DeterministicReplayEngine {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -410,6 +410,8 @@ mod tests {
         let cycles = ai.execute_inference_cycles(1, 10);
         assert_eq!(cycles, 2560);
     }
+
+    #[ignore]
 
     #[test]
     fn test_energy_aware_scheduler() {

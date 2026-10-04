@@ -223,7 +223,7 @@ impl ThermalThrottling for SimpleThermalThrottling {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

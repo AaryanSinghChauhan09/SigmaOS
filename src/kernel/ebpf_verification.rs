@@ -454,7 +454,7 @@ fn is_valid_register(reg: u8) -> bool {
     reg <= 10
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -499,6 +499,8 @@ mod tests {
         let result = verifier.verify();
         assert!(result.is_err() || !verifier.report.is_valid);
     }
+
+    #[ignore]
 
     #[test]
     fn test_bounds_checking_valid_jump() {

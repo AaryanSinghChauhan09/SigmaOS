@@ -601,7 +601,7 @@ impl Default for UbuntuDesktopIntegration {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

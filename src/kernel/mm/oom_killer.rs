@@ -88,7 +88,7 @@ impl Default for OomKiller {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
     use crate::kernel::scheduler::Priority;

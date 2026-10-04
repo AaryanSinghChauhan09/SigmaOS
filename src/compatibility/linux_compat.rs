@@ -798,6 +798,7 @@ impl LinuxZramSwapEngine {
     }
 }
 
+#[cfg(test)]
 #[cfg(test_disabled)]
 mod tests {
     #[test]

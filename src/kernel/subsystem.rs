@@ -720,7 +720,7 @@ pub enum RegistryError {
 // Tests
 // ============================================================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
     use std::vec;
@@ -976,7 +976,7 @@ impl PackageRecipeParser {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod extra_tests {
     use super::*;
 

@@ -164,7 +164,7 @@ impl Default for SovereignFoundationManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

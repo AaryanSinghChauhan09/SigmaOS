@@ -201,7 +201,7 @@ impl Default for ParrotForensicsSandbox {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

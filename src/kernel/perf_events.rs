@@ -272,7 +272,7 @@ pub fn record_cache_miss(counters: &SystemPerfCounters) {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

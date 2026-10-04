@@ -278,6 +278,7 @@ impl Default for SovereignXhciUsb3Driver {
 // =========================================================================
 
 #[cfg(test)]
+#[cfg(test)]
 #[cfg(test_disabled)]
 mod tests {
     use super::*;

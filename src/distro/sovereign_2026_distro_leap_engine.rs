@@ -494,7 +494,7 @@ impl Default for Sovereign2026DistroSuperiorityMasterEngine {
 // ============================================================================
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

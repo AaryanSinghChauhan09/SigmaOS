@@ -370,7 +370,7 @@ pub fn handle_page_fault(
 // ── Unit tests ────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

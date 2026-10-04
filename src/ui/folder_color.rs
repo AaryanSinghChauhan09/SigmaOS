@@ -141,7 +141,7 @@ impl Default for FolderColorSwitcherEngine {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

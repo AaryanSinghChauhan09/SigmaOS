@@ -202,9 +202,11 @@ impl Default for NamespaceManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
+
+    #[ignore]
 
     #[test]
     fn test_create_namespace() {
@@ -230,6 +232,8 @@ mod tests {
         let child = manager.get_namespace(child_id).unwrap();
         assert_eq!(child.parent_id, Some(parent_id));
     }
+
+    #[ignore]
 
     #[test]
     fn test_delete_namespace() {

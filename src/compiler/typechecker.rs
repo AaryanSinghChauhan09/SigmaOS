@@ -788,7 +788,7 @@ impl TypeChecker {
 // ─── Tests ──────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
     use crate::compiler::lexer::Lexer;

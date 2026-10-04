@@ -35,7 +35,7 @@ pub use maps::{
 pub use instructions::BpfInsn as EbpfInstruction;
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod integration_tests {
     use super::*;
 

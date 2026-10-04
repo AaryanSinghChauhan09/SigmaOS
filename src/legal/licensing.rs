@@ -157,7 +157,7 @@ impl Default for LegalComplianceRegistry {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

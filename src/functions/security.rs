@@ -360,7 +360,7 @@ impl Default for SSHKeyManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

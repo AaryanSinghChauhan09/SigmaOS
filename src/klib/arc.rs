@@ -116,7 +116,7 @@ impl<T: ?Sized> AsRef<T> for Arc<T> {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

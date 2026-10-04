@@ -632,7 +632,7 @@ impl Default for SovereignDistroPackageMatrixSuite {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -130,7 +130,7 @@ impl Default for PagingController {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

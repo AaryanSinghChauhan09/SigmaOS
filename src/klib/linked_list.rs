@@ -275,7 +275,7 @@ impl<T> Drop for SList<T> {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

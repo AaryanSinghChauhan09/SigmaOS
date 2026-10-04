@@ -118,7 +118,7 @@ impl Default for SovereignHardenedSecurityMitigationsEngine {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

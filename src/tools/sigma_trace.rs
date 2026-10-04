@@ -332,7 +332,7 @@ pub fn trace_syscall(
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

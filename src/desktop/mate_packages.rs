@@ -336,7 +336,7 @@ impl BetsyPackageBundleExporter {
 
 // ─── Module Unit Tests ────────────────────────────────────────────────────────
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

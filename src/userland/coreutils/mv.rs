@@ -20,7 +20,7 @@ pub fn run(src: &str, dst: &str) -> Result<(), String> {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
     use std::fs::File;

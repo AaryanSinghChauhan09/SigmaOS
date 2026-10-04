@@ -395,7 +395,7 @@ impl Default for XfsFilesystem {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

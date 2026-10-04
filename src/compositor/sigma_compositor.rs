@@ -715,7 +715,7 @@ impl SigmaCompositor {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -314,7 +314,7 @@ impl Default for ApiDocBuilder {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

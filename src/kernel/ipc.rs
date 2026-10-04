@@ -518,7 +518,7 @@ pub enum IpcError {
     BrokenPipe, // Linux EPIPE / SIGPIPE parity
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -81,7 +81,7 @@ impl Clone for KeventSyscall {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

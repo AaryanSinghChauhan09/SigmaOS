@@ -505,7 +505,7 @@ pub fn init_kernel_threads(mgr: &mut KthreadManager) {
 // ============================================================
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

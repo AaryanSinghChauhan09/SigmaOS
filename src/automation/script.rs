@@ -459,7 +459,7 @@ impl Default for ScriptArgumentRouter {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

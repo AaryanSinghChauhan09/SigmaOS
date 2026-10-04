@@ -526,7 +526,7 @@ impl WgPqcTunnel {
 // ─── Tests ────────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod wireguard_pqc_tests {
     use super::*;
 

@@ -511,7 +511,7 @@ pub struct AnomalyStatistics {
     pub learning_mode: bool,
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -953,6 +953,7 @@ impl Default for OmarchyBarIndicatorsConfig {
 #[cfg(test)]
 #[cfg(test_disabled)]
 #[cfg(test_disabled)]
+#[cfg(test)]
 #[cfg(test_disabled)]
 mod tests {
     use super::*;
@@ -1136,6 +1137,7 @@ impl Default for OmarchyHyprlandDwindleTilingEngine {
     }
 }
 
+#[cfg(test)]
 #[cfg(test)]
 #[cfg(test_disabled)]
 mod omarchy_gap_closure_tests {

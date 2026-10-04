@@ -106,7 +106,7 @@ impl Default for StackGuard {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

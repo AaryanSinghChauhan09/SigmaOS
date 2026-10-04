@@ -2294,7 +2294,7 @@ impl PeripheralDevice for NvmePCIeHostControllerDriver {
 // =========================================================================
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
     #[cfg(not(all(test, not(feature = "sigmaos_lib"))))]

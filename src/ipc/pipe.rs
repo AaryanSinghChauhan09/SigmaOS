@@ -339,7 +339,7 @@ pub fn pipe_pair() -> (PipeWriter, PipeReader) {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

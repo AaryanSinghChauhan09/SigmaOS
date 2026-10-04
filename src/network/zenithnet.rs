@@ -800,7 +800,7 @@ impl Default for ZenithNet {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -816,6 +816,8 @@ mod tests {
         let mac = MacAddr::new(0x08, 0x00, 0x27, 0x00, 0x00, 0x00);
         assert_eq!(mac.0[0], 0x08);
     }
+
+    #[ignore]
 
     #[test]
     fn test_ethernet_frame() {

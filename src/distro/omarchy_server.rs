@@ -283,7 +283,7 @@ impl Default for OmarchyServerPackagesSpec {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod omarchy_server_tests {
     use super::*;
 

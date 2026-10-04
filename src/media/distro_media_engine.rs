@@ -327,7 +327,7 @@ impl Default for LinuxBsdDistroMediaSuite {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

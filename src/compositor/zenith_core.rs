@@ -966,7 +966,7 @@ impl ZenithCompositor {
 // ─── Tests ────────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod zenith_tests {
     use super::*;
 

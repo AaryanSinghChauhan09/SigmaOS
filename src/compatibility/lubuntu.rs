@@ -922,6 +922,7 @@ impl Default for LubuntuLxqtAppearanceEngine {
     }
 }
 
+#[cfg(test)]
 #[cfg(test_disabled)]
 mod tests {
 

@@ -234,7 +234,7 @@ pub fn ceil(x: f64) -> i32 {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

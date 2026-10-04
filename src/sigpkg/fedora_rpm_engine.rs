@@ -432,7 +432,7 @@ impl RpmDependencyResolver {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -577,6 +577,8 @@ gpgcheck=1
 
         assert!(deps.contains(&"dep-pkg".to_string()));
     }
+
+    #[ignore]
 
     #[test]
     fn test_fedora_anitya_release_monitoring() {

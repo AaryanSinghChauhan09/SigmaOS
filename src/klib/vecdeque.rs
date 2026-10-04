@@ -164,7 +164,7 @@ impl<'a, T> Iterator for VecDequeIter<'a, T> {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

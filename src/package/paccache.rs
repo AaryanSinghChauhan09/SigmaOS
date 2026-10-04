@@ -179,7 +179,7 @@ impl Default for PaccacheEngine {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

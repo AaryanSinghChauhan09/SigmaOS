@@ -238,7 +238,7 @@ impl Default for SovereignAsyncIoEngine {
 // ============================================================================
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod async_io_tests {
     use super::*;
 

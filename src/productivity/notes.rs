@@ -463,7 +463,7 @@ pub enum NoteError {
     InvalidFormat(String),
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -420,7 +420,7 @@ impl Default for AudioCodec {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

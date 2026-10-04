@@ -275,7 +275,7 @@ pub fn reboot() -> Result<(), AcpiError> {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

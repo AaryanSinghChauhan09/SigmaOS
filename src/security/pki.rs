@@ -244,7 +244,7 @@ pub type PkiError = PKIError;
 pub use PKIManager as PkiManager;
 pub struct CertificateAuthority;
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -276,7 +276,7 @@ pub enum StringError {
     InvalidUtf8,
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

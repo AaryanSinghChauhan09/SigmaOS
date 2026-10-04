@@ -158,7 +158,7 @@ impl SovereignApm {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

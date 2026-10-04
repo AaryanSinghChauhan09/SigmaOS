@@ -418,7 +418,7 @@ impl Default for SovereignBrowser {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

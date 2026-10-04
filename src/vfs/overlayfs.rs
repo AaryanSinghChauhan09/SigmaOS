@@ -364,6 +364,7 @@ pub fn overlay_mount(upper: &str, lower: &str, work: &str) -> OverlayFs {
 // ── Unit tests ────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
+#[cfg(test)]
 #[cfg(test_disabled)]
 mod tests {
     use super::*;

@@ -452,7 +452,7 @@ impl Default for MinimalPosixSyscallMatrix {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

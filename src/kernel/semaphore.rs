@@ -259,7 +259,7 @@ impl Default for SemaphoreManager {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

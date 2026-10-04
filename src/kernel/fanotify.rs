@@ -214,7 +214,7 @@ impl Default for FanotifyManager {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

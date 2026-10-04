@@ -794,7 +794,7 @@ impl NixOsPureStoreDerivationEngine {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -168,7 +168,7 @@ impl<T, const N: usize> MpscRingBuf<T, N> {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

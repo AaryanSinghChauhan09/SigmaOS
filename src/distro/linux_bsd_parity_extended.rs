@@ -907,7 +907,7 @@ impl Default for SnapperBtrfsEngine {
 // ============================================================================
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

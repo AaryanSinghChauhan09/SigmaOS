@@ -299,7 +299,7 @@ impl Default for CryptoEngine {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

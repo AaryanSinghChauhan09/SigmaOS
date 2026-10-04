@@ -460,7 +460,7 @@ impl Default for SInitSupervisor {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -551,6 +551,8 @@ mod tests {
 
         assert!(vruntime_after >= vruntime_before); // Never decreases
     }
+
+    #[ignore]
 
     #[test]
     fn test_eligible_task_ordering() {

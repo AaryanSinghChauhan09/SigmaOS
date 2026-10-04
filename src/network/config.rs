@@ -237,7 +237,7 @@ pub enum NetworkError {
     DnsError(String),
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

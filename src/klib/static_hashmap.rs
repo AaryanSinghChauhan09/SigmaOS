@@ -227,7 +227,7 @@ impl<K, V, const N: usize> Drop for StaticHashMap<K, V, N> {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

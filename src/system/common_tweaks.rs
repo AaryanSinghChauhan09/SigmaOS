@@ -192,7 +192,7 @@ impl Default for GamingAndLowLatencyTweaks {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

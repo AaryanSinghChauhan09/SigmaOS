@@ -155,7 +155,7 @@ impl Default for RepositoryConfigManager {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -228,7 +228,7 @@ mod tests {
     #[test]
     fn test_repository_priority() {
         let mut manager = RepositoryConfigManager::new();
-        let custom = RepoConfig::new(
+        let mut custom = RepoConfig::new(
             String::from("custom"),
             String::from("https://custom.repo.org"),
         );

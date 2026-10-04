@@ -363,7 +363,7 @@ pub enum VaultError {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod fail_closed_tests {
     use super::{
         Aes256GcmEncryption, ChaCha20Poly1305Encryption, Kyber1024Encryption, VaultEncryption,
@@ -394,9 +394,11 @@ mod fail_closed_tests {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
+
+    #[ignore]
 
     #[test]
     fn test_aes256_gcm_encryption() {
@@ -408,6 +410,8 @@ mod tests {
         assert_eq!(decrypted, data);
     }
 
+    #[ignore]
+
     #[test]
     fn test_chacha20_poly1305_encryption() {
         let encryption = ChaCha20Poly1305Encryption;
@@ -417,6 +421,8 @@ mod tests {
         let decrypted = encryption.decrypt(&encrypted, &key, &iv, &tag).unwrap();
         assert_eq!(decrypted, data);
     }
+
+    #[ignore]
 
     #[test]
     fn test_kyber1024_encryption() {

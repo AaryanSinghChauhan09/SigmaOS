@@ -108,7 +108,7 @@ impl Default for SovereignXfceDesktopEngine {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

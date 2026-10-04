@@ -333,7 +333,7 @@ impl Default for AlsaAudioStack {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -444,7 +444,7 @@ impl fmt::Display for ThemeError {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

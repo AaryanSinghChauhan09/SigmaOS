@@ -144,7 +144,7 @@ impl Workqueue {
 // Unit Tests Module
 // ==========================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
     use core::sync::atomic::{AtomicUsize, Ordering};

@@ -221,7 +221,7 @@ impl<'a> Drop for ScopeTimer<'a> {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

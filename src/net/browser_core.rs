@@ -281,7 +281,7 @@ impl Default for BrowserCore {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

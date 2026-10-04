@@ -304,7 +304,7 @@ impl Default for SigmaosMilestoneDependencyEngine {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

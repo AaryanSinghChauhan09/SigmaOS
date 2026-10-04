@@ -87,7 +87,7 @@ impl PeripheralDevice for LegacyParallelPrinter {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

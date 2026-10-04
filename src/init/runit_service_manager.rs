@@ -568,7 +568,7 @@ impl Default for RunitServiceManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -519,7 +519,7 @@ impl LinuxCmaAllocatorEngine {
 // ============================================================================
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod linux_kernel_primitives_tests {
     use super::*;
 
@@ -1353,7 +1353,7 @@ impl LinuxEventfdEngine {
 // Tests
 // ============================================================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

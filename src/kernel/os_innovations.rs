@@ -273,7 +273,7 @@ impl Plan9GpuDevice {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

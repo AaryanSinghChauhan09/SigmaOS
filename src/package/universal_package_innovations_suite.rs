@@ -902,7 +902,7 @@ impl Default for FedoraDnfGpgKeyRotationEngine {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

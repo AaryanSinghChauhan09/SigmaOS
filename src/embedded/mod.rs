@@ -491,7 +491,7 @@ pub fn get_global_embedded_subsystem() -> &'static EmbeddedSubsystem {
     GLOBAL_EMBEDDED_SUBSYSTEM.get_or_init(|| EmbeddedSubsystem::new())
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -347,7 +347,7 @@ impl Default for SovereignPseudoRegisterManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

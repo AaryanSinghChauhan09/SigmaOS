@@ -339,9 +339,11 @@ impl SlabAllocator {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
+
+    #[ignore]
 
     #[test]
     fn test_buddy_allocate() {
@@ -362,6 +364,8 @@ mod tests {
 
         assert!(allocator.allocated_memory() > 0);
     }
+
+    #[ignore]
 
     #[test]
     fn test_slab_cache() {

@@ -167,7 +167,7 @@ impl Default for SovereignSystemPolicyRuleEngine {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

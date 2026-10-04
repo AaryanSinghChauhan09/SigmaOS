@@ -257,7 +257,7 @@ impl Default for RollingReleaseManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

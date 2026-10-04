@@ -354,7 +354,7 @@ pub struct AppStatistics {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -422,7 +422,7 @@ mod tests {
     #[test]
     fn test_app_manager_install() {
         let mut manager = AppManager::new();
-        let app = Application::new(
+        let mut app = Application::new(
             "test".to_string(),
             "Test App".to_string(),
             "1.0.0".to_string(),

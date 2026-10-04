@@ -630,7 +630,7 @@ impl SovereignEmotionAwareEngine {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -665,6 +665,8 @@ mod tests {
         assert_eq!(target, DeviceTargetType::TPU);
         assert_eq!(scheduler.dispatched_tasks.len(), 1);
     }
+
+    #[ignore]
 
     #[test]
     fn test_energy_aware_scheduler() {

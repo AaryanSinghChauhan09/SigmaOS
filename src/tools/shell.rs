@@ -331,7 +331,7 @@ impl Default for SigmaShell {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -643,7 +643,7 @@ impl Default for StartupOptimizer {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -456,7 +456,7 @@ pub fn init_default_apps() -> AppLauncher {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

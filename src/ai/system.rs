@@ -461,7 +461,7 @@ impl Default for AiServiceManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

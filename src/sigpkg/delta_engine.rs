@@ -331,7 +331,7 @@ impl SigmaDeltaEngine {
 // ─── Tests ────────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod delta_tests {
     use super::*;
 

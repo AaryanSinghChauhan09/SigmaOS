@@ -89,7 +89,7 @@ impl TPM for SimpleTPM {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

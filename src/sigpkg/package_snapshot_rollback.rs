@@ -188,7 +188,7 @@ impl Default for SovereignPackageSnapshotRollbackEngine {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

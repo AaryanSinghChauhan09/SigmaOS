@@ -218,7 +218,7 @@ impl AutoSync for SimpleAutoSync {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -223,7 +223,7 @@ impl Default for ProcessSecurityState {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

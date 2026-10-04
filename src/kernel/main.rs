@@ -86,7 +86,7 @@ fn panic(_info: &core::panic::PanicInfo) -> ! {
     loop {}
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
     use sigmaos::compatibility::ServiceStatus;

@@ -373,7 +373,7 @@ impl Default for PageCache {
     } // 4MB default (1024 × 4K pages)
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

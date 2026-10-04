@@ -794,6 +794,7 @@ impl Default for FileTagManager {
 }
 
 #[cfg(test)]
+#[cfg(test)]
 #[cfg(test_disabled)]
 mod open_source_file_manager_tests_2 {
     use super::*;
@@ -849,6 +850,7 @@ mod open_source_file_manager_tests_2 {
     }
 }
 
+#[cfg(test)]
 #[cfg(test_disabled)]
 mod tests {
     #[test]
@@ -948,6 +950,7 @@ mod tests {
     }
 }
 
+#[cfg(test)]
 #[cfg(test)]
 #[cfg(test_disabled)]
 mod open_source_file_manager_tests {
@@ -1151,6 +1154,7 @@ impl Default for OpenSourceFileManagerEnhancementEngine {
     }
 }
 
+#[cfg(test)]
 #[cfg(test)]
 #[cfg(test_disabled)]
 mod tests {

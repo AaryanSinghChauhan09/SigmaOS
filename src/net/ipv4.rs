@@ -69,7 +69,7 @@ impl Ipv4Header {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

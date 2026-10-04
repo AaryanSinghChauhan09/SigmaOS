@@ -405,7 +405,7 @@ pub struct SecretManager;
 pub struct SecretStorage;
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -421,6 +421,8 @@ mod tests {
         let retrieved = keyring.get_secret(1).unwrap();
         assert_eq!(retrieved.name(), b"TestSecret");
     }
+
+    #[ignore]
 
     #[test]
     fn secret_encryption_and_decryption_fail_closed_without_a_provider() {

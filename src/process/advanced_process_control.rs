@@ -727,7 +727,7 @@ impl Default for AdvancedIpcHub {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

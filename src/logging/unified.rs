@@ -1054,7 +1054,7 @@ fn get_current_time() -> u64 {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

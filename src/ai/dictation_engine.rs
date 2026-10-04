@@ -86,7 +86,7 @@ impl Default for SovereignDictationEngine {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

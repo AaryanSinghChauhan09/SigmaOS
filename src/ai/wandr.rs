@@ -256,7 +256,7 @@ pub struct WandrEvaluationReport {
     pub report_summary: String,
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

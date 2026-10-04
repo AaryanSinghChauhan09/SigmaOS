@@ -3198,7 +3198,7 @@ impl Default for SovereignUniversalDistroPackageMasterGateway {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

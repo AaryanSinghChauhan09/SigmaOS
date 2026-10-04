@@ -178,7 +178,7 @@ pub fn hash_password_placeholder(password: &str, salt: &[u8; 16]) -> [u8; 32] {
     hash
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

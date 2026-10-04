@@ -364,7 +364,7 @@ pub fn unix_socket_close(ns: &mut UnixNamespace, sock: &mut UnixSocket) {
 // ── Unit tests ────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

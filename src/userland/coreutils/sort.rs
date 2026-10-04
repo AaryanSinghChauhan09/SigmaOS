@@ -65,7 +65,7 @@ fn read_lines<R: Read>(reader: &mut R, lines: &mut Vec<String>) -> Result<(), St
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
     use std::io::Cursor;

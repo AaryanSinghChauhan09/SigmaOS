@@ -313,7 +313,7 @@ pub fn sys_pdwait4(
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
     use crate::security::cap_rights::{CAP_PDKILL, CAP_PDWAIT, CAP_READ, CAP_WRITE};

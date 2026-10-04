@@ -278,7 +278,7 @@ pub struct CapsicumStatistics {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

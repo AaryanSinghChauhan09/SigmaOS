@@ -211,7 +211,7 @@ impl Default for SecureFreeDetector {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

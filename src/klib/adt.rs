@@ -292,7 +292,7 @@ impl<T: Ord + Clone> Default for SovereignPriorityQueue<T> {
 // 4. Unit Tests
 // =========================================================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

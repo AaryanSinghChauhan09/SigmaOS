@@ -1430,7 +1430,7 @@ impl Default for SovereignDistroDominanceSuite {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

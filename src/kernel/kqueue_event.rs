@@ -436,7 +436,7 @@ impl Clone for KqueueManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

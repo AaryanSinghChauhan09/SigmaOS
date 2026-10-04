@@ -312,7 +312,7 @@ impl Default for AlpcManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

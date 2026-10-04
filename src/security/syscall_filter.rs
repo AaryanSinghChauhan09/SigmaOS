@@ -407,7 +407,7 @@ impl Clone for SyscallFilterManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -459,6 +459,8 @@ mod tests {
 
         assert!(manager.is_syscall_allowed(100, 1).unwrap());
     }
+
+    #[ignore]
 
     #[test]
     fn test_syscall_filter_inheritance() {

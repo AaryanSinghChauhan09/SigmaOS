@@ -277,7 +277,7 @@ macro_rules! create_slab_cache {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -172,7 +172,7 @@ impl Default for ProcfsManager {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

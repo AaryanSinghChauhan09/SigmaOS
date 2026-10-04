@@ -275,6 +275,7 @@ pub enum MqError {
 }
 
 #[cfg(test)]
+#[cfg(test)]
 #[cfg(test_disabled)]
 mod tests {
     use super::*;

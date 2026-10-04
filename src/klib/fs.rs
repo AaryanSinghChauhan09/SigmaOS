@@ -611,7 +611,7 @@ unsafe fn syscall_closedir(fd: RawFd) -> i32 {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

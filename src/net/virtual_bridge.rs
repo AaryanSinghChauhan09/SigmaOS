@@ -243,7 +243,7 @@ impl Default for VirtualBridgeDevice {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

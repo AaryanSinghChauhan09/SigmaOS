@@ -3923,7 +3923,7 @@ impl Default for ClearLinuxStatelessEngine {
 // UNIT TESTS
 // =========================================================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -5413,7 +5413,7 @@ impl LinuxXdpExpressDataPathShaper {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod new_unimplemented_tools_tests {
     use super::*;
 

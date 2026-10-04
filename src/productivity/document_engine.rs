@@ -227,7 +227,7 @@ impl Default for DocumentEngine {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

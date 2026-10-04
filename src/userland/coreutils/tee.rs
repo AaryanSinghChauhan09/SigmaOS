@@ -52,7 +52,7 @@ pub fn run(file_paths: &[String], opts: TeeOptions) -> Result<String, String> {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

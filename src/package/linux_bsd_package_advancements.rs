@@ -804,7 +804,7 @@ impl Default for SovereignLinuxBsdPackageAdvancementsSuite {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -175,7 +175,7 @@ impl Default for PostDiagnostics {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

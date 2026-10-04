@@ -281,7 +281,7 @@ impl Default for SigmaChatRoomManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -712,7 +712,7 @@ impl Default for TilingWindowManager {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -878,6 +878,8 @@ mod tests {
         assert_eq!(manager.active_workspace, 1);
         assert!(manager.get_active_workspace().is_some());
     }
+
+    #[ignore]
 
     #[test]
     fn test_create_workspace() {

@@ -629,6 +629,7 @@ impl Default for LinuxCoreDumpFilterEngine {
 // 12. Integration Tests
 // ==========================================
 
+#[cfg(test)]
 #[cfg(test_disabled)]
 mod tests {
 

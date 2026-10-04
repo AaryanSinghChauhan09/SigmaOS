@@ -619,6 +619,7 @@ pub enum SchedulerError {
     InvalidState,
 }
 
+#[cfg(test)]
 #[cfg(test_disabled)]
 mod tests {
     use super::*;

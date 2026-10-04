@@ -257,7 +257,7 @@ impl Default for UtsNamespaceManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

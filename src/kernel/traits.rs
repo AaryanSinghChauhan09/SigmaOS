@@ -157,7 +157,7 @@ pub trait Scheduler {
     fn metadata(&self) -> &SchedulerMetadata;
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

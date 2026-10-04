@@ -442,7 +442,7 @@ impl SchemeHandler for TimeScheme {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

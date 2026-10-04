@@ -788,7 +788,7 @@ impl Default for SovereignKernelSubsystemOrchestrator {
 // =========================================================================
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod step1_tests {
     use super::*;
 
@@ -882,7 +882,7 @@ mod step1_tests {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod step2_tests {
     use super::*;
 
@@ -949,7 +949,7 @@ mod step2_tests {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod step3_tests {
     use super::*;
 

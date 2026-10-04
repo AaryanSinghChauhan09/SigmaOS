@@ -446,7 +446,7 @@ pub fn proc_version() -> String {
 // ─── Tests ────────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod version_tests {
     use super::*;
 

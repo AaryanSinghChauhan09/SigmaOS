@@ -1397,7 +1397,7 @@ impl SovereignMultiChunkPackageDownloader {
 // UNIT TESTS FOR ALL SUB-COMPONENTS
 // =========================================================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

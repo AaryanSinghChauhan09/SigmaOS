@@ -608,7 +608,7 @@ impl Default for SovereignPackageAccessMasterSuite {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

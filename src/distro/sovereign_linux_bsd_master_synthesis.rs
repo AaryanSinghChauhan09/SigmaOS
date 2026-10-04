@@ -606,7 +606,7 @@ impl Default for SovereignLinuxBsdMasterSynthesisSuite {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

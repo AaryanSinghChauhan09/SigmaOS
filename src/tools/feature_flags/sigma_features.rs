@@ -456,7 +456,7 @@ pub fn calculate_flag_hash(name: &str) -> u64 {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

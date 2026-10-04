@@ -96,7 +96,7 @@ impl PeripheralDevice for AdLibSynthDriver {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
     use crate::drivers::peripheral::{DeviceGeneration, PeripheralManager, PowerState};

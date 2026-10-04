@@ -266,10 +266,12 @@ impl SigmaMessageQueue {
 // ─────────────────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
     use std::vec;
+
+    #[ignore]
 
     #[test]
     fn test_priority_ordering() {

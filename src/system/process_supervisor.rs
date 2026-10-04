@@ -251,7 +251,7 @@ pub enum SupervisorError {
     MonitorError(String),
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

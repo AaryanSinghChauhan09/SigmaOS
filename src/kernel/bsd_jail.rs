@@ -239,7 +239,7 @@ impl Default for BsdJailManager {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
     use std::net::Ipv4Addr;

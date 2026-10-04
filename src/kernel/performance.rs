@@ -368,7 +368,7 @@ impl SimdOptimizer for SovereignSimdOptimizer {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

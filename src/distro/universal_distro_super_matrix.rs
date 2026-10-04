@@ -263,7 +263,7 @@ impl Default for UniversalDistroSuperMatrix {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -149,7 +149,7 @@ impl Default for SlabAllocator {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

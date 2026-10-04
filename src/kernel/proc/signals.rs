@@ -290,7 +290,7 @@ impl Default for SignalManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
     use crate::kernel::proc::process_lifecycle::mock_scheduler::{Priority, Process};

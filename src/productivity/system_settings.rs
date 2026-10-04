@@ -144,7 +144,7 @@ impl Default for UnifiedSettingsManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

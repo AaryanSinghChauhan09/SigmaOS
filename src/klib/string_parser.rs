@@ -149,7 +149,7 @@ pub fn replace_string(s: &str, from: &str, to: &str) -> String {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

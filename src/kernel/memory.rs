@@ -609,7 +609,7 @@ impl Ne2000DmaBuffer {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

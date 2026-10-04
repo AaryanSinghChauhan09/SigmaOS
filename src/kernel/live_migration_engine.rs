@@ -505,7 +505,7 @@ impl LiveMigrationEngine {
 // ─── Tests ────────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod migration_tests {
     use super::*;
 

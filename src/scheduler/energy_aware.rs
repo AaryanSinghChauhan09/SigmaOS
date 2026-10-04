@@ -174,7 +174,7 @@ impl EnergyAwareScheduler {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -242,7 +242,7 @@ mod tests {
 
     #[test]
     fn test_scheduler_stats() {
-        let eas = EnergyAwareScheduler::new();
+        let mut eas = EnergyAwareScheduler::new();
         eas.queue_task_prediction(1, 10000, 1.5);
 
         let (pool_size, freq, thermal, temp) = eas.get_stats();

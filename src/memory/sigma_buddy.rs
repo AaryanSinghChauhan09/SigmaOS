@@ -479,7 +479,7 @@ impl Default for SigmaBuddyAllocator {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

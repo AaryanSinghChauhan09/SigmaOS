@@ -303,7 +303,7 @@ impl Default for DataCommerceDlpEngine {
 // UNIT TESTS
 // =========================================================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

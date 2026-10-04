@@ -531,7 +531,7 @@ impl NatTable {
 // ── Unit Tests ───────────────────────────────────────────────────────────────
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
     use std::net::Ipv4Addr;

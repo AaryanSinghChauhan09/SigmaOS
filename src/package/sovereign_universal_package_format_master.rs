@@ -1551,7 +1551,7 @@ impl Default for SovereignUniversalPackageFormatMasterEngine {
 // ============================================================================
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod master_package_tests {
     use super::*;
 

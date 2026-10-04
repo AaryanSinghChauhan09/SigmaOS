@@ -493,7 +493,7 @@ impl Default for SovereignApproximationProxyFirewallSuite {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

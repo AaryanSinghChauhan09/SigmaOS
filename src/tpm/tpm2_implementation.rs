@@ -527,7 +527,7 @@ impl Default for Tpm2 {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

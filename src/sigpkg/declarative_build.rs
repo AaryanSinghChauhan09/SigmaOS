@@ -595,7 +595,7 @@ impl SigmaPkgReproducibilityPipeline {
 // 9. Tests Module
 // ==========================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

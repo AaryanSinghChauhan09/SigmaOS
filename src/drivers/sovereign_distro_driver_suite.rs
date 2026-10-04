@@ -431,7 +431,7 @@ impl Default for SovereignUniversalDistroDriverSuite {
 // =========================================================================
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

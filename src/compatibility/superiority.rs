@@ -469,7 +469,7 @@ impl Default for ShardIgnitor {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

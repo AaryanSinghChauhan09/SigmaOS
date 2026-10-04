@@ -412,7 +412,7 @@ impl Default for SigmaClockManager {
 // ============================================================
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
     use std::sync::atomic::{AtomicU64, Ordering};

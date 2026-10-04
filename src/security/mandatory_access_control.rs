@@ -538,7 +538,7 @@ impl Default for SovereignMacLsmHookRegistry {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod mac_hook_tests {
     use super::*;
 

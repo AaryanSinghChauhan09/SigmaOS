@@ -244,7 +244,7 @@ impl Default for SovereignMirrorSelector {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

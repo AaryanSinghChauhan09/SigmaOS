@@ -483,7 +483,7 @@ impl Default for ArchKeyringEngine {
 // ============================================================================
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod arch_suite_tests {
     use super::*;
 
@@ -672,7 +672,7 @@ impl Default for AurHelper {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

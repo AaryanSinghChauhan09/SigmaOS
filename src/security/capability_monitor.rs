@@ -586,7 +586,7 @@ impl CapabilityMonitor {
 // ─── Tests ────────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod capability_tests {
     use super::*;
 

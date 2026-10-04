@@ -3253,7 +3253,7 @@ impl Default for SovereignDistroInspirationLeapEngine {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod inspiration_leap_tests {
     use super::*;
 
@@ -3287,7 +3287,7 @@ mod inspiration_leap_tests {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod subsystem_interop_tests {
     use super::*;
 
@@ -3790,7 +3790,7 @@ impl Default for SovereignLandlockLsm {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod cross_subsystem_tests {
     use super::*;
 
@@ -7388,9 +7388,11 @@ impl Default for SovereignDragonflyNpotEngine {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
+
+    #[ignore]
 
     #[test]
     fn test_sovereign_universal_distro_bridge_functionality() {

@@ -156,7 +156,7 @@ impl Default for AdvancedSELinuxManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

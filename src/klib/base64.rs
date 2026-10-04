@@ -106,7 +106,7 @@ pub fn decode(input: &str) -> Result<Vec<u8>, &'static str> {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

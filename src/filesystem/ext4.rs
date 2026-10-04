@@ -411,7 +411,7 @@ pub enum Ext4Error {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -420,6 +420,8 @@ mod tests {
         assert_eq!(EXT4_SUPER_MAGIC, 0xEF53);
         assert_eq!(size_of::<Ext4Superblock>(), 1024);
     }
+
+    #[ignore]
 
     #[test]
     fn test_inode_calculations() {

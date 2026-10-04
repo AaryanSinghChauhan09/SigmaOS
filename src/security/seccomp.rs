@@ -229,7 +229,7 @@ pub fn seccomp_load(filter: &SeccompFilter) -> Result<(), SeccompError> {
 
 // ─── Unit Tests ───────────────────────────────────────────────────────────────
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

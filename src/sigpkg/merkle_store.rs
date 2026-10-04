@@ -379,7 +379,7 @@ impl SovereignMerkleStore {
 // ─── Tests ────────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod merkle_tests {
     use super::*;
 

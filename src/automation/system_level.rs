@@ -855,7 +855,7 @@ impl Default for DistroInspiredAutomationEngine {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -1170,7 +1170,7 @@ pub struct OpenBsdAmdGpuKmsEngine;
 pub struct OpenBsdUvideoWebcamEngine;
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

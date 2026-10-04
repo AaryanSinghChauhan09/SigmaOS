@@ -84,7 +84,7 @@ impl Default for BusyBoxAppletDispatcher {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

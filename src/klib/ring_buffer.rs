@@ -205,7 +205,7 @@ impl<T> Drop for HeapRingBuffer<T> {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

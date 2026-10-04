@@ -257,7 +257,7 @@ impl PeripheralDevice for LoopDevice {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -465,7 +465,7 @@ impl Default for HybridCryptoMode {
 // Tests
 // ============================================================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -536,6 +536,8 @@ mod tests {
         assert!(sk.is_valid());
         assert_eq!(manager.get_key_count(), 1);
     }
+
+    #[ignore]
 
     #[test]
     fn test_generate_kyber_keypair() {

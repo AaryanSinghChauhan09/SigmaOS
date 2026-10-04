@@ -270,7 +270,7 @@ pub fn get_mac_vfs_mut() -> Option<&'static mut MacVfsIntegration> {
     unsafe { GLOBAL_MAC_VFS.as_mut() }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

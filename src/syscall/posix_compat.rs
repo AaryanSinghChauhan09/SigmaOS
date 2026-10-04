@@ -94,7 +94,7 @@ pub fn sys_exit_group(status: i32) -> ! {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

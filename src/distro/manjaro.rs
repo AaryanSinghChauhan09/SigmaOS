@@ -670,7 +670,7 @@ impl Default for ManjaroIsoArchitectEngine {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

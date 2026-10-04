@@ -287,7 +287,7 @@ impl ProcessGroup for SimpleProcessGroup {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

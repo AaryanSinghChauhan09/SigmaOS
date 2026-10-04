@@ -92,7 +92,7 @@ fn read_reader_lines<R: Read>(reader: &mut R) -> Result<Vec<String>, String> {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

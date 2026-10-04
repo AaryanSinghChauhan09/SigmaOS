@@ -302,7 +302,7 @@ impl Default for PcSpeaker {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

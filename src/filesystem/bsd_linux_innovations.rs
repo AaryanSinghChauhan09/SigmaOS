@@ -262,7 +262,7 @@ impl LinuxProcSysfsEmulator {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -414,7 +414,7 @@ impl Default for SovereignFhsHierarchyEngine {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod fhs_tests {
     use super::*;
 
@@ -505,7 +505,7 @@ impl Default for GoboLinuxPathResolver {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod gobo_tests {
     use super::*;
 

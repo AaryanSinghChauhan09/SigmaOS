@@ -304,7 +304,7 @@ impl Clone for ThreadSafeEventQueue {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
     use std::path::PathBuf;

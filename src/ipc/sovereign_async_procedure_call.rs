@@ -343,7 +343,7 @@ impl Default for SovereignAsyncProcedureCallEngine {
 // ============================================================================
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod apc_tests {
     use super::*;
 

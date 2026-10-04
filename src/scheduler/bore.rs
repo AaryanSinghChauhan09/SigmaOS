@@ -297,7 +297,7 @@ pub fn bore_advance_clock(rq: &mut BoreRunQueue, delta_ns: u64) {
 // ──────────────────────────────────────────────────────────
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -396,7 +396,7 @@ pub enum TorrentError {
     NetworkError(String),
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

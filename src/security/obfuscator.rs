@@ -88,7 +88,7 @@ impl Default for SovereignThreatDetector {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

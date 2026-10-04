@@ -296,7 +296,7 @@ pub fn parse_dpkg_status(text: &str) -> Vec<DpkgStatusEntry> {
     entries
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
     use std::format;

@@ -294,9 +294,11 @@ impl Default for AegisVaultEncryptionCompressionEngine {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
+
+    #[ignore]
 
     #[test]
     fn test_aegis_vault_encryption_compression_success() {

@@ -133,7 +133,7 @@ impl Default for Decompressor {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

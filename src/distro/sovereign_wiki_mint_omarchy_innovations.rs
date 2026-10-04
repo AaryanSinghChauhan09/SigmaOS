@@ -420,7 +420,7 @@ impl Default for SigmaOsWiki100IdeasMasterEngine {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

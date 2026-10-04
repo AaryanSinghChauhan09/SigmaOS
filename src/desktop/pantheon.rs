@@ -298,7 +298,7 @@ impl Default for AppCenter {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

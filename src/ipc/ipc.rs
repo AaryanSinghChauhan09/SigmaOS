@@ -957,7 +957,7 @@ impl<'a, T> IntoIterator for &'a mut CustomIpcVec<T> {
 // Tests
 // =========================================================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

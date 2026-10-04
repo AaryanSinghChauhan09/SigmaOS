@@ -370,7 +370,7 @@ impl Default for SystemInfo {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -251,7 +251,7 @@ impl Default for Sysfs {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

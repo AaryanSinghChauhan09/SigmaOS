@@ -500,6 +500,7 @@ impl KaliJohnTheRipperCracker {
     }
 }
 
+#[cfg(test)]
 #[cfg(test_disabled)]
 mod tests {
 

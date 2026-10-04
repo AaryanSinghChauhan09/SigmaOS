@@ -422,7 +422,7 @@ impl PciDriver for AhciPciDriver {
 // ============================================================================
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

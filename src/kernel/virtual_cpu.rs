@@ -512,7 +512,7 @@ impl Default for SovereignVirtualCPU {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

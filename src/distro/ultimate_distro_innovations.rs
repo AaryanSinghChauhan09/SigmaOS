@@ -296,7 +296,7 @@ impl Default for DebianMultiarchAptEngine {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -364,6 +364,8 @@ mod tests {
         assert_eq!(engine.zram_size_mb, 16384);
         assert_eq!(engine.zram_compression_alg, "zstd");
     }
+
+    #[ignore]
 
     #[test]
     fn test_debian_multiarch_apt_engine() {

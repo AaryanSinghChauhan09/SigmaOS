@@ -107,7 +107,7 @@ impl PeripheralDevice for LegacyAudioAc97 {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

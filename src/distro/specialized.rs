@@ -737,7 +737,7 @@ impl Default for DebianPreseedEngine {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

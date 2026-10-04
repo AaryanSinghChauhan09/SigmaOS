@@ -175,7 +175,7 @@ impl Default for ExceptionMonitor {
 // 5. Unit Tests
 // ==========================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

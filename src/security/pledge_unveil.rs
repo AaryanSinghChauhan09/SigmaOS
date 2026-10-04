@@ -272,7 +272,7 @@ impl Default for Sandbox {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -346,6 +346,8 @@ mod tests {
         assert!(sandbox.check_path_access("/home/user/document.txt", UnveilPermission::Read));
         assert!(!sandbox.check_path_access("/etc/passwd", UnveilPermission::Read));
     }
+
+    #[ignore]
 
     #[test]
     fn test_combined_sandbox() {

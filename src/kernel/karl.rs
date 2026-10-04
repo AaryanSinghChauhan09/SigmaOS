@@ -77,7 +77,7 @@ pub fn verify() -> bool {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

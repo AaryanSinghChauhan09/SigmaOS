@@ -190,7 +190,7 @@ impl Default for GameDifficultyBalancer {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

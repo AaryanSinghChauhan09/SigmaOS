@@ -75,7 +75,7 @@ fn process_reader<R: Read>(reader: &mut R, opts: HeadOptions) -> Result<String, 
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
     use std::io::Cursor;

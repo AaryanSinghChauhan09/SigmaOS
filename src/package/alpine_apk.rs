@@ -225,7 +225,7 @@ impl Default for ApkPackageManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

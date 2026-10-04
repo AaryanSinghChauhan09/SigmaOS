@@ -179,7 +179,7 @@ impl AccessControl for SimpleAccessControl {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
     use std::boxed::Box;

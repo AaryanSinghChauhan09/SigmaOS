@@ -493,7 +493,7 @@ impl PciDriver for NvmePciDriver {
 // Tests
 // ============================================================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

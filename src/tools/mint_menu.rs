@@ -293,7 +293,7 @@ impl Default for MintMenu {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

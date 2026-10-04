@@ -146,7 +146,7 @@ impl Default for ThermalZone {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

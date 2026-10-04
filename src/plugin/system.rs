@@ -403,7 +403,7 @@ impl PluginManager for SimplePluginManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -520,7 +520,7 @@ impl Default for PluginMarketplace {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod marketplace_tests {
     use super::*;
 

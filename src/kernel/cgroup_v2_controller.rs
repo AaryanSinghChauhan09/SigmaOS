@@ -393,7 +393,7 @@ pub enum CgroupError {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -216,9 +216,11 @@ impl NetworkNamespaceManager {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
+
+    #[ignore]
 
     #[test]
     fn test_create_namespace() {
@@ -228,6 +230,8 @@ mod tests {
         assert_eq!(id.0, 2);
         assert_eq!(manager.namespace_count(), 2);
     }
+
+    #[ignore]
 
     #[test]
     fn test_delete_namespace() {

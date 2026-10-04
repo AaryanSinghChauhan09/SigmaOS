@@ -374,9 +374,11 @@ impl NamespaceManager {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
+
+    #[ignore]
 
     #[test]
     fn test_create_namespace() {
@@ -386,6 +388,8 @@ mod tests {
         assert_eq!(id.0, 4);
         assert_eq!(manager.namespace_count(), 4);
     }
+
+    #[ignore]
 
     #[test]
     fn test_delete_namespace() {

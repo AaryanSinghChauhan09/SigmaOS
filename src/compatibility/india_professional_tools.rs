@@ -712,7 +712,7 @@ impl Default for MedicalCouncilDoctorPrescriptionGenerator {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -79,7 +79,7 @@ impl Default for SovereignQuicConnection {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -165,7 +165,7 @@ impl PciDriver for RealtekRtl8169PciDriver {
 // ============================================================================
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

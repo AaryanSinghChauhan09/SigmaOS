@@ -232,7 +232,7 @@ impl SyscallAuditor for SimpleSyscallAuditor {
 use std::boxed::Box;
 use std::vec::Vec;
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

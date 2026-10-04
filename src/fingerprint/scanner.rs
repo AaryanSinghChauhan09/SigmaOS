@@ -259,7 +259,7 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

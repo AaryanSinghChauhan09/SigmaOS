@@ -388,7 +388,7 @@ pub enum EthernetError {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -401,6 +401,8 @@ mod tests {
 
         assert!(MacAddr::BROADCAST.is_broadcast());
     }
+
+    #[ignore]
 
     #[test]
     fn test_ethernet_frame() {

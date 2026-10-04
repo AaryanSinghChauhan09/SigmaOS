@@ -230,7 +230,7 @@ impl<T> TypedSlabCache<T> {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

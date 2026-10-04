@@ -146,7 +146,7 @@ impl Default for UserProcess {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

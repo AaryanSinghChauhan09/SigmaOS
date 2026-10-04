@@ -285,7 +285,7 @@ impl VgaHardwareTextDisplay {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -614,7 +614,7 @@ impl IntelHdaCodecVerbEngine {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod low_level_hw_expansion_tests {
     use super::*;
 

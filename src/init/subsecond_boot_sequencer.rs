@@ -601,7 +601,7 @@ impl SigmaBootSequencer {
 // ─── Tests ────────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod boot_sequencer_tests {
     use super::*;
 

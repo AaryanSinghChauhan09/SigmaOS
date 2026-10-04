@@ -445,7 +445,7 @@ pub fn list_vmas(addr_space: &MmapAddressSpace) -> &[MemoryMap] {
 // ── Unit tests ────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

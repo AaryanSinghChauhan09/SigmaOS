@@ -141,7 +141,7 @@ impl Default for TransactionLog {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
     use crate::sigpkg::{Package, Version};

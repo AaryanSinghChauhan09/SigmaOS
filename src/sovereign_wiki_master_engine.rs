@@ -269,7 +269,7 @@ impl Default for MasterWikiAndRoadmapVerificationSuite {
 // =========================================================================
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

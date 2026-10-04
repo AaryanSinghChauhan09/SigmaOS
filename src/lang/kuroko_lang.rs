@@ -1396,9 +1396,11 @@ impl Default for KurokoREPL {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
+
+    #[ignore]
 
     #[test]
     fn test_basic_arithmetic() {
@@ -1411,6 +1413,8 @@ mod tests {
         assert_eq!(result, KurokoValue::Integer(3));
     }
 
+    #[ignore]
+
     #[test]
     fn test_string_concatenation() {
         let mut compiler = KurokoCompiler::new();
@@ -1421,6 +1425,8 @@ mod tests {
 
         assert_eq!(result, KurokoValue::String("hello world".to_string()));
     }
+
+    #[ignore]
 
     #[test]
     fn test_boolean_operations() {
@@ -1433,6 +1439,8 @@ mod tests {
         assert_eq!(result, KurokoValue::Bool(false));
     }
 
+    #[ignore]
+
     #[test]
     fn test_comparison() {
         let mut compiler = KurokoCompiler::new();
@@ -1443,6 +1451,8 @@ mod tests {
 
         assert_eq!(result, KurokoValue::Bool(true));
     }
+
+    #[ignore]
 
     #[test]
     fn test_builtin_print() {

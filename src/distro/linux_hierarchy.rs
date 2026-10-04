@@ -270,7 +270,7 @@ impl Default for LinuxHierarchyArchitectureGovernor {
 // =========================================================================
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

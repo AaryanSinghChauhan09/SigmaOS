@@ -402,7 +402,7 @@ pub enum UsbError {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
     use core::mem::size_of;
@@ -429,7 +429,7 @@ mod tests {
         let setup = UsbSetupPacket::set_address(5);
         assert_eq!(setup.bm_request_type, 0x00);
         assert_eq!(setup.b_request, 5);
-        assert_eq!(setup.w_value, 5);
+        assert_eq!({setup.w_value}, 5);
     }
 
     #[test]

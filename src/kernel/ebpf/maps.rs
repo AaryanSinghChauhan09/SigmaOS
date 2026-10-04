@@ -253,7 +253,7 @@ pub fn next_map_id() -> u64 {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

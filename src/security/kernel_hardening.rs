@@ -705,7 +705,7 @@ impl Default for SovereignRing3UserModeTssEngine {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests_tss {
     use super::*;
 

@@ -180,7 +180,7 @@ impl FileTransfer for SimpleFileTransfer {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

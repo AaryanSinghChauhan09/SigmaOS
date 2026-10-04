@@ -405,7 +405,7 @@ impl Clone for InotifyManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

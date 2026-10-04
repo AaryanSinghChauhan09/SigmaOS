@@ -306,7 +306,7 @@ pub fn global_rcu() -> Option<&'static mut RcuState> {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

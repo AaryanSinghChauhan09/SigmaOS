@@ -306,7 +306,7 @@ impl KernelModuleManager {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -400,7 +400,7 @@ mod tests {
 
     #[test]
     fn test_kernel_module_manager() {
-        let manager = KernelModuleManager::new(String::from("test_module"));
+        let mut manager = KernelModuleManager::new(String::from("test_module"));
         let code = manager.create_module();
         assert!(code.contains("test_module"));
     }

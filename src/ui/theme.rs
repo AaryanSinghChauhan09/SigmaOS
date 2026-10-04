@@ -441,7 +441,7 @@ impl Default for SovereignThemeEngine {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

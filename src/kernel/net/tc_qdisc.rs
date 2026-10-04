@@ -286,7 +286,7 @@ impl QDisc for Tbf {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

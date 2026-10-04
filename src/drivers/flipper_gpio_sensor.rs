@@ -85,7 +85,7 @@ impl PeripheralDevice for FlipperGpioSensor {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

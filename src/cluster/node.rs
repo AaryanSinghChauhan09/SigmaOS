@@ -514,7 +514,7 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
 #[cfg(not(target_os = "none"))]
 pub type Box<T> = std_std::boxed::Box<T>;
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

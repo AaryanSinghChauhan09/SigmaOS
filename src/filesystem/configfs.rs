@@ -151,7 +151,7 @@ impl Default for SovereignConfigFS {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

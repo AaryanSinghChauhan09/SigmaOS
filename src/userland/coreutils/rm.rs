@@ -57,7 +57,7 @@ fn remove_directory(path: &Path, force: bool) -> Result<(), String> {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
     use std::fs::File;

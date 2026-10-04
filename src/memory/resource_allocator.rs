@@ -354,7 +354,7 @@ impl Default for SigmaResourceAllocatorHub {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -102,7 +102,7 @@ impl Default for SigmaOSMobileRuntimeEngine {
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

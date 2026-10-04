@@ -363,7 +363,7 @@ pub enum VesaError {
     InitializationFailed,
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

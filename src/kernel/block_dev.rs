@@ -325,7 +325,7 @@ impl Default for BlockDeviceManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -1081,6 +1081,7 @@ impl Default for ArchParityMatrixEngine {
 }
 
 #[cfg(test)]
+#[cfg(test)]
 #[cfg(test_disabled)]
 mod tests {
 

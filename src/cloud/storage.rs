@@ -427,7 +427,7 @@ impl<'a, T> IntoIterator for &'a mut CustomVec<T> {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

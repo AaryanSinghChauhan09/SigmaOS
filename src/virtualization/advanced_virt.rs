@@ -91,7 +91,7 @@ impl Default for VirtualizationManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

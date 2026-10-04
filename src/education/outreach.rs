@@ -121,7 +121,7 @@ impl Default for EducationOutreachManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

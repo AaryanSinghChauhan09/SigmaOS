@@ -457,7 +457,7 @@ pub struct JailInfo {
     pub process_count: usize,
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -742,7 +742,7 @@ impl Default for SigmaRescue {
 // UNIT TESTS
 // ============================================================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
