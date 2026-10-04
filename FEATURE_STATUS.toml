@@ -1,5 +1,5 @@
 # SigmaOS Feature Inventory — Development Status (Not a Release Support Matrix)
-# Updated: 2026-10-03
+# Updated: 2026-10-04
 # Scope: Entries track implementation or module-level test evidence, not general OS readiness.
 # A passing unit test does not establish kernel/runtime integration, bootability, or hardware support.
 # Values such as "working" are legacy component statuses; use docs/PROJECT_STATUS.md and
@@ -74,6 +74,13 @@ files = ["src/userspace/shell.rs"]
 description = "Command parser with echo, pwd, ls builtins"
 test_evidence = "Manual — needs process execution"
 next_milestone = "Pipeline, redirection, job control"
+
+[tools.system_information]
+status = "partial"
+files = ["src/tools/mint_system_report.rs", "src/tools/mod.rs"]
+description = "Hosted, read-only Linux system report with plain text, JSON, and Markdown exports; no SigmaOS runtime or GUI integration"
+test_evidence = "Module tests for report formatting, parsing, and escaping; no boot-target or hardware validation"
+next_milestone = "Add a provider-backed accessible UI after a supported SigmaOS session exists"
 
 [drivers.virtio_blk]
 status = "partial"

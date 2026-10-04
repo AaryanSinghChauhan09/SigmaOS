@@ -1,6 +1,10 @@
 // SigmaOS Tools Module - Real implementations of system utilities
+pub mod mint_system_report;
 pub mod omarchy_command_palette;
 pub mod system_monitor;
+pub use mint_system_report::{
+    MintSystemReport, SystemInfoCategory, SystemInfoItem, SystemInformationReport,
+};
 
 pub mod data_tools;
 pub mod display_manager;
