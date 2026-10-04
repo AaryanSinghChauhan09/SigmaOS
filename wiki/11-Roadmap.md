@@ -4,17 +4,6 @@
 **Updated**: October 2026  
 **Source file**: [FUTURE_DEVELOPMENT_PLAN.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/FUTURE_DEVELOPMENT_PLAN.md)
 
-## Recent Main Branch Updates (October 2026)
-
-- Added `SovereignUniversalSubsystemInteropEngine` in `src/distro/` to define policies, adapter capabilities, and events for cross-subsystem interoperability.
-- Added the V18 universal package ingestion and Linux/BSD packaging pipeline components; see [Package Management](17-Package-Management).
-- Expanded the Linux/BSD distro subsystem integration in `src/distro/linux_bsd_inspirations.rs`.
-- Expanded the master distro harmonizer to cover 90 distro modes across the integrated Linux and BSD subsystem set.
-- Added EEVDF scheduling primitives and io_uring interfaces with `alloc` support in the main branch.
-- Merged PR #1843 runtime metadata length caching to avoid repeated zero-byte scans.
-- Merged PR #1847 with parity API models for Asahi GPU, Tetragon, Suricata, Wasmtime, and Mojo. These are integration scaffolds; hardware execution, kernel enforcement, packet inspection, JIT execution, and compilation still require real backends before claiming feature parity.
-- Repository consolidation was refreshed on 2026-10-03: `main` is the only branch and there are no open pull requests. Repository ruleset 24418457 blocks creation of non-main branches without bypass. Reappearing refs contained broad snapshots that remove existing documentation/code, simulated success paths, or API regressions; they were reviewed and removed. PRs #1872 and #1873 were closed because they remove existing APIs or claim implementation/test results not established by their changes. Earlier PRs #1859 and #1871 remain closed because they reported success without implementing the claimed operations. The package branch used a prefix check as Signify/PQC verification and fabricated checksums; the BTreeMap branch repeated an optimization already on `main` but removed the public `Clone` derive. Proposed NUMA scheduling uses a synthetic fixed topology and can panic with an empty interleave node list. The added io_uring and memfd-secret APIs only record address metadata; they do not register kernel buffers or create secret memory. Integrate such ideas only with real runtime backends, accurate documentation, and preserved APIs.
-
 ---
 
 ## Strategic Goal
@@ -44,8 +33,14 @@ Defeat Linux and BSD distributions in **speed, stability, security, and capabili
 
 ## 10-Phase Roadmap
 
-### Phase 1 — Build Stability (Months 1-3) ✅ COMPLETE
+### Phase 1 — Build Stability (Months 1-3)
 **Goal**: `cargo check` with 0 errors
+
+- Fix all type inference errors (E0282) in merged branch files
+- Fix unimplemented trait methods (HardwareDevice)
+- Complete `#![no_std]` enforcement in kernel path
+- Add 500+ unit tests across all modules
+- Target: Clean build, CI green
 
 **Already done (Oct 2026)**:
 - Fixed 100+ duplicate code injection errors  
@@ -128,107 +123,6 @@ Defeat Linux and BSD distributions in **speed, stability, security, and capabili
 - **Modularity** (1 subsystem): Rump modules
 - **Observability** (1 subsystem): Perf events
 
-### 🎯 Latest Implementation Sprint (October 2026)
-
-**CRITICAL OS SUBSYSTEMS IMPLEMENTED** (Oct 2026):
-
-### IPC Infrastructure (Complete)
-- ✅ **Unix Domain Sockets** (`src/ipc/unix_socket.rs`)
-  - AF_UNIX stream, datagram, seqpacket support
-  - Ancillary data (SCM_RIGHTS, SCM_CREDENTIALS)
-  - Abstract namespace (Linux-style)
-  - 380+ LOC production code
-
-- ✅ **POSIX Message Queues** (`src/ipc/posix_mq.rs`)
-  - mq_open, mq_send, mq_receive, mq_notify
-  - Priority-ordered message delivery
-  - Non-blocking and timed operations
-  - 320+ LOC production code
-
-- ✅ **System V IPC** (`src/ipc/sysv_ipc.rs`)
-  - Shared memory (shmget, shmat, shmdt, shmctl)
-  - Semaphores (semget, semop, semctl with SEM_UNDO)
-  - Message queues (msgget, msgsnd, msgrcv, msgctl)
-  - Type-based message filtering
-  - 580+ LOC production code
-
-### USB & Device Drivers (Complete)
-- ✅ **USB Stack** (`src/drivers/usb_stack.rs`)
-  - USB 1.1/2.0/3.x/4 support
-  - Device enumeration engine
-  - Control/bulk/interrupt/isochronous transfers
-  - Standard descriptors (device, config, interface, endpoint)
-  - Host controller interface trait
-  - 480+ LOC production code
-
-- ✅ **Ethernet Drivers** (`src/drivers/ethernet.rs`)
-  - Ethernet frame parsing and generation
-  - Intel E1000 hardware driver
-  - MAC address handling (unicast/multicast/broadcast)
-  - EtherType support (IPv4, ARP, IPv6, VLAN)
-  - TX/RX descriptor ring management
-  - Network device statistics
-  - 550+ LOC production code
-
-- ✅ **Wi-Fi 802.11 Stack** (`src/drivers/wifi_80211.rs`)
-  - IEEE 802.11a/b/g/n/ac/ax/be support
-  - Multi-band (2.4/5/6 GHz) channel management
-  - WPA2/WPA3 key management
-  - Scan/connect/disconnect operations
-  - HT/VHT/HE capability negotiation
-  - Rate control algorithms (Minstrel, AMRR)
-  - 450+ LOC production code
-
-### Filesystem Drivers (Complete)
-- ✅ **ext4 Filesystem** (`src/filesystem/ext4.rs`)
-  - Superblock parsing with magic validation
-  - Extent tree navigation
-  - Inode reading and caching
-  - Block group descriptor parsing
-  - 64-bit block addressing
-  - 420+ LOC production code
-
-### Kernel Infrastructure (Complete)
-- ✅ **DMA Engine** (`src/kernel/dma_engine.rs`)
-  - Memory-to-memory, memory-to-device, device-to-device
-  - Scatter-gather DMA
-  - Cyclic transfers (audio/video)
-  - Channel state machine (idle/configured/running/paused)
-  - DMA-coherent buffer pools
-  - Callback-based completion
-  - 380+ LOC production code
-
-- ✅ **ACPI Power Management** (`src/kernel/acpi_pm.rs`)
-  - S-states (S0-S5): suspend to RAM/disk, shutdown
-  - P-states for CPU frequency scaling
-  - T-states for CPU throttling
-  - D-states for device power management
-  - CPU governors (performance, powersave, ondemand, schedutil)
-  - Battery monitoring with time-remaining calculation
-  - AC adapter detection
-  - Thermal zone management
-  - Cooling device control (fans, throttling)
-  - Lid/power button event handling
-  - 420+ LOC production code
-
-**Total New Code**: ~3,980 LOC production Rust (all #![no_std], zero dependencies)
-
-**Cumulative Project Status**:
-- **Total LOC**: 966,723 lines of Rust
-- **New Subsystems**: 35 major components implemented
-- **Architecture**: 100% safe Rust, #![no_std] bare-metal
-- **Dependencies**: Zero external crates
-- **Test Coverage**: Unit tests for all new subsystems
-
-**Critical Gaps Closed**:
-- ❌ → ✅ IPC Suite (Unix sockets, POSIX MQ, SysV IPC)
-- ❌ → ✅ USB subsystem with full enumeration
-- ❌ → ✅ Ethernet driver infrastructure
-- ❌ → ✅ Wi-Fi 802.11 stack (all standards)
-- ❌ → ✅ ext4 filesystem driver
-- ❌ → ✅ DMA engine
-- ❌ → ✅ ACPI power management
-
 ---
 
 ### Phase 2 — Kernel Hardening (Months 4-6)
@@ -242,7 +136,7 @@ Defeat Linux and BSD distributions in **speed, stability, security, and capabili
 | Stack canaries | GCC/Clang | `src/kernel/stack_protect.rs` | ⏳ Planned |
 | **kptr_restrict** | **Linux** | **`src/kernel/kptr_restrict.rs`** | **✅ Done (Oct 2026)** |
 | **perf_events** | **Linux** | **`src/kernel/perf_events.rs`** | **✅ Done (Oct 2026)** |
-| EEVDF scheduler | Linux 6.6 | `src/scheduler/eevdf.rs`, `src/kernel/scheduler.rs` | ✅ Implemented (Oct 2026) |
+| EEVDF scheduler | Linux 6.6 | `src/kernel/scheduler.rs` (extend) | ⏳ Planned |
 | ULE scheduler | FreeBSD | `src/kernel/scheduler.rs` (extend) | ⏳ Planned |
 | NUMA scheduling | Linux | `src/kernel/numa.rs` | ⏳ Planned |
 | cgroup v2 | Linux | `src/resource/cgroup_v2.rs` | ✅ Done |
@@ -415,11 +309,6 @@ When a phase is fully complete:
 
 ## Related Wiki Pages
 
-- [Kernel, scheduling, and memory roadmap](Future-Development-Kernel-and-Scheduling)
-- [Storage and filesystems roadmap](Future-Development-Storage-and-Filesystems)
-- [Networking and security roadmap](Future-Development-Networking-and-Security)
-- [Device drivers and desktop roadmap](Future-Development-Drivers-and-Desktop)
-- [Packaging, installation, and updates roadmap](Future-Development-Packaging-and-Installation)
 - [04-Kernel](04-Kernel) — Current kernel architecture
 - [07-Security](07-Security) — Current security hardening
 - [09-Packaging](09-Packaging) — sigpkg and package formats
