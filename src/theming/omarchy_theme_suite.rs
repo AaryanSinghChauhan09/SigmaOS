@@ -2,6 +2,7 @@
 
 extern crate alloc;
 
+use alloc::format;
 use alloc::string::String;
 use alloc::vec::Vec;
 use alloc::string::ToString;
@@ -9,6 +10,25 @@ use alloc::string::ToString;
 pub struct ThemePalette {
     pub name: String,
     pub is_sigma_exclusive: bool,
+    /// Accent color as CSS hex, inspired by Omarchy's semantic accent palette.
+    pub accent: String,
+    /// Background color as CSS hex.
+    pub background: String,
+    /// Foreground/text color as CSS hex.
+    pub foreground: String,
+}
+
+impl ThemePalette {
+    /// Create a new palette with Omarchy-style semantic colors.
+    pub fn new(name: &str, accent: &str, background: &str, foreground: &str) -> Self {
+        Self {
+            name: name.to_string(),
+            is_sigma_exclusive: name.starts_with("sigma-"),
+            accent: accent.to_string(),
+            background: background.to_string(),
+            foreground: foreground.to_string(),
+        }
+    }
 }
 
 pub struct OmarchyThemeSuite {
@@ -27,18 +47,33 @@ impl OmarchyThemeSuite {
         ];
         
         for t in omarchy_themes.iter() {
-            themes.push(ThemePalette { name: t.to_string(), is_sigma_exclusive: false });
+            themes.push(ThemePalette::new(t, "#7aa2f7", "#1a1b26", "#c0caf5"));
         }
-        
+
         let sigma_themes = [
-            "sigma-dark", "sigma-neon", "sigma-sovereign", "sigma-crystal", 
+            "sigma-dark", "sigma-neon", "sigma-sovereign", "sigma-crystal",
             "sigma-obsidian", "sigma-aurora", "sigma-eclipse", "sigma-ultraviolet"
         ];
-        
+
         for t in sigma_themes.iter() {
-            themes.push(ThemePalette { name: t.to_string(), is_sigma_exclusive: true });
+            themes.push(ThemePalette::new(t, "#00e5ff", "#0b0f14", "#e6edf3"));
         }
-        
+
+        // Linux Mint (Cinnamon) inspired pack: mint-y accent, cinnamon menus.
+        let mint_themes = [
+            "mint-y-dark", "mint-y-light", "mint-y-blue-dark", "mint-y-ocean"
+        ];
+
+        for t in mint_themes.iter() {
+            let palette = match *t {
+                "mint-y-light" => ThemePalette::new(t, "#86be43", "#ffffff", "#2e3436"),
+                "mint-y-blue-dark" => ThemePalette::new(t, "#6495ed", "#2c3e50", "#ecf0f1"),
+                "mint-y-ocean" => ThemePalette::new(t, "#17a2b8", "#103c48", "#e8f6f3"),
+                _ => ThemePalette::new(t, "#86be43", "#222222", "#eeeeec"),
+            };
+            themes.push(palette);
+        }
+
         Self { available_themes: themes }
     }
 }
@@ -57,27 +92,48 @@ impl SovereignThemeEngine {
     }
     
     pub fn export_colors_css(&self) -> String {
-        String::from(":root { --bg: #000; }")
+        match &self.current_theme {
+            Some(t) => {
+                let mut out = String::from(":root {\n");
+                out.push_str(&format!("  --background: {};\n", t.background));
+                out.push_str(&format!("  --foreground: {};\n", t.foreground));
+                out.push_str(&format!("  --accent: {};\n", t.accent));
+                out.push_str("}\n");
+                out
+            }
+            None => String::from(":root { --background: #000; --foreground: #fff; --accent: #7aa2f7; }\n"),
+        }
     }
-    
+
     pub fn export_colors_gtk(&self) -> String {
-        String::from("@define-color bg #000;")
+        match &self.current_theme {
+            Some(t) => format!(
+                "@define-color background {};\n@define-color foreground {};\n@define-color accent {};\n",
+                t.background, t.foreground, t.accent
+            ),
+            None => String::from("@define-color background #000000;\n@define-color foreground #ffffff;\n@define-color accent #7aa2f7;\n"),
+        }
     }
-    
+
     pub fn export_colors_hyprland(&self) -> String {
-        String::from("$bg = 0xff000000")
+        match &self.current_theme {
+            Some(t) => format!(
+                "$background = 0xff{}\n$foreground = 0xff{}\n$accent = 0xff{}\n",
+                &t.background[1..], &t.foreground[1..], &t.accent[1..]
+            ),
+            None => String::from("$background = 0xff000000\n$foreground = 0xffffffff\n$accent = 0xff7aa2f7\n"),
+        }
     }
 }
 
 #[cfg(test)]
-#[cfg(test_disabled)]
 mod tests {
     use super::*;
     
     #[test]
     fn test_omarchy_theme_suite_initialization() {
         let suite = OmarchyThemeSuite::new();
-        assert_eq!(suite.available_themes.len(), 22 + 8);
+        assert_eq!(suite.available_themes.len(), 22 + 8 + 4);
         
         let exclusive_count = suite.available_themes.iter().filter(|t| t.is_sigma_exclusive).count();
         assert_eq!(exclusive_count, 8);
@@ -86,12 +142,16 @@ mod tests {
     #[test]
     fn test_sovereign_theme_engine() {
         let mut engine = SovereignThemeEngine::new();
-        engine.hot_reload(ThemePalette { name: String::from("sigma-dark"), is_sigma_exclusive: true });
+        engine.hot_reload(ThemePalette::new("sigma-dark", "#00e5ff", "#0b0f14", "#e6edf3"));
         assert!(engine.current_theme.is_some());
         assert_eq!(engine.current_theme.as_ref().unwrap().name, "sigma-dark");
-        
-        assert_eq!(engine.export_colors_css(), ":root { --bg: #000; }");
-        assert_eq!(engine.export_colors_gtk(), "@define-color bg #000;");
-        assert_eq!(engine.export_colors_hyprland(), "$bg = 0xff000000");
+
+        let css = engine.export_colors_css();
+        assert!(css.contains("--accent: #00e5ff;"));
+        assert!(css.contains("--background: #0b0f14;"));
+        let gtk = engine.export_colors_gtk();
+        assert!(gtk.contains("@define-color accent #00e5ff;"));
+        let hypr = engine.export_colors_hyprland();
+        assert!(hypr.contains("$accent = 0xff00e5ff"));
     }
 }
