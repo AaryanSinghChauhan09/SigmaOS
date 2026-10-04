@@ -390,6 +390,9 @@ pub use sovereign_mint_omarchy_supremacy_suite::*;
 pub mod omarchy_gaming_performance_suite;
 pub use omarchy_gaming_performance_suite::*;
 
+pub mod mint_omarchy_launch_supremacy;
+pub use mint_omarchy_launch_supremacy::*;
+
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;
 pub use crate::stubs::large_distro_stubs::*;
