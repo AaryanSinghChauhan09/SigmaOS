@@ -64,6 +64,7 @@ SigmaOS is an operating-system development project with kernel, storage, network
 | 49 | [Mint & Omarchy Pinnacle Ecosystem](Mint-and-Omarchy-Pinnacle-Ecosystem) | Backup & software migration engine, Proton prefix manager, biometric screen locker & 1:1 kinetic gestures |
 | 50 | [Mint & Omarchy Apex Mastery](Mint-and-Omarchy-Apex-Mastery) | Blur-free fractional scaling, sub-5ms content indexing, zero-polling IPC event bus & 10-foot gamepad navigation |
 | 51 | [Mint & Omarchy Zenith Mastery](Mint-and-Omarchy-Zenith-Mastery) | FreeDesktop StatusNotifier tray engine, 65ms IPTV media streaming, 240Hz spring physics & WCAG AAA palette generator |
+| 52 | [Software Store and Command Palette](Software-Store-and-Command-Palette) | Mint-inspired app store, permission auditing, zstd delta downloads & multi-mode command palette |
 
 ## Component Future-Development Roadmaps
 
