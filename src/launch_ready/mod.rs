@@ -12,8 +12,8 @@
 extern crate alloc;
 
 use alloc::vec::Vec;
-use std::string::{String, ToString};
 use std::format;
+use std::string::{String, ToString};
 
 use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
 

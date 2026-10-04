@@ -54,12 +54,12 @@ pub struct UacFormatTypeI {
     pub length: u8,
     pub descriptor_type: u8,
     pub descriptor_subtype: u8,
-    pub format_type: u8,           // 0x01 = Type I
+    pub format_type: u8, // 0x01 = Type I
     pub num_channels: u8,
-    pub subframe_size: u8,         // Bytes per audio subframe
-    pub bit_resolution: u8,        // Bits per sample
-    pub sample_freq_type: u8,      // 0 = continuous, n = discrete
-    // Sample frequencies follow
+    pub subframe_size: u8,  // Bytes per audio subframe
+    pub bit_resolution: u8, // Bits per sample
+    pub sample_freq_type: u8, // 0 = continuous, n = discrete
+                            // Sample frequencies follow
 }
 
 /// Audio Terminal types
@@ -70,7 +70,7 @@ pub enum UacTerminalType {
     UsbUndefined = 0x0100,
     UsbStreaming = 0x0101,
     UsbVendor = 0x01FF,
-    
+
     // Input Terminal types
     InputUndefined = 0x0200,
     Microphone = 0x0201,
@@ -78,7 +78,7 @@ pub enum UacTerminalType {
     PersonalMicrophone = 0x0203,
     OmniMicrophone = 0x0204,
     MicrophoneArray = 0x0205,
-    
+
     // Output Terminal types
     OutputUndefined = 0x0300,
     Speaker = 0x0301,
@@ -110,11 +110,11 @@ pub enum UacFeatureControl {
 pub struct UacAcHeader {
     pub length: u8,
     pub descriptor_type: u8,
-    pub descriptor_subtype: u8,    // AC_HEADER
-    pub bcd_adc: u16,              // Audio Device Class version
+    pub descriptor_subtype: u8, // AC_HEADER
+    pub bcd_adc: u16,           // Audio Device Class version
     pub total_length: u16,
-    pub in_collection: u8,         // Number of streaming interfaces
-    // Interface numbers follow
+    pub in_collection: u8, // Number of streaming interfaces
+                           // Interface numbers follow
 }
 
 /// Input Terminal descriptor
@@ -123,12 +123,12 @@ pub struct UacAcHeader {
 pub struct UacInputTerminal {
     pub length: u8,
     pub descriptor_type: u8,
-    pub descriptor_subtype: u8,    // INPUT_TERMINAL
+    pub descriptor_subtype: u8, // INPUT_TERMINAL
     pub terminal_id: u8,
-    pub terminal_type: u16,        // Terminal type code
+    pub terminal_type: u16, // Terminal type code
     pub assoc_terminal: u8,
     pub num_channels: u8,
-    pub channel_config: u16,       // Spatial locations
+    pub channel_config: u16, // Spatial locations
     pub channel_names: u8,
     pub terminal_name: u8,
 }
@@ -139,7 +139,7 @@ pub struct UacInputTerminal {
 pub struct UacOutputTerminal {
     pub length: u8,
     pub descriptor_type: u8,
-    pub descriptor_subtype: u8,    // OUTPUT_TERMINAL
+    pub descriptor_subtype: u8, // OUTPUT_TERMINAL
     pub terminal_id: u8,
     pub terminal_type: u16,
     pub assoc_terminal: u8,
@@ -153,11 +153,11 @@ pub struct UacOutputTerminal {
 pub struct UacFeatureUnit {
     pub length: u8,
     pub descriptor_type: u8,
-    pub descriptor_subtype: u8,    // FEATURE_UNIT
+    pub descriptor_subtype: u8, // FEATURE_UNIT
     pub unit_id: u8,
     pub source_id: u8,
-    pub control_size: u8,          // Bytes per channel control
-    // Controls follow (variable length)
+    pub control_size: u8, // Bytes per channel control
+                          // Controls follow (variable length)
 }
 
 /// Audio Streaming Interface descriptor
@@ -166,10 +166,10 @@ pub struct UacFeatureUnit {
 pub struct UacAsGeneral {
     pub length: u8,
     pub descriptor_type: u8,
-    pub descriptor_subtype: u8,    // AS_GENERAL
+    pub descriptor_subtype: u8, // AS_GENERAL
     pub terminal_link: u8,
-    pub delay: u8,                 // Interface delay in frames
-    pub format_tag: u16,           // Audio data format
+    pub delay: u8,       // Interface delay in frames
+    pub format_tag: u16, // Audio data format
 }
 
 /// Audio data format codes

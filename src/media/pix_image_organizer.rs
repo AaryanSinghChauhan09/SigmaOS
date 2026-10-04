@@ -94,15 +94,24 @@ impl PixCollection {
     }
 
     pub fn filter_by_min_rating(&self, min_stars: u8) -> Vec<&PixImageMetadata> {
-        self.images.iter().filter(|img| img.rating_stars >= min_stars).collect()
+        self.images
+            .iter()
+            .filter(|img| img.rating_stars >= min_stars)
+            .collect()
     }
 
     pub fn filter_by_keyword(&self, keyword: &str) -> Vec<&PixImageMetadata> {
-        self.images.iter().filter(|img| img.keywords.iter().any(|k| k == keyword)).collect()
+        self.images
+            .iter()
+            .filter(|img| img.keywords.iter().any(|k| k == keyword))
+            .collect()
     }
 
     pub fn filter_by_format(&self, format: ImageFormat) -> Vec<&PixImageMetadata> {
-        self.images.iter().filter(|img| img.format == format).collect()
+        self.images
+            .iter()
+            .filter(|img| img.format == format)
+            .collect()
     }
 }
 
@@ -113,7 +122,9 @@ pub struct PixCatalog {
 
 impl PixCatalog {
     pub fn new() -> Self {
-        Self { collections: Vec::new() }
+        Self {
+            collections: Vec::new(),
+        }
     }
 }
 
@@ -170,7 +181,9 @@ impl PixImageEditor {
     }
 
     pub fn apply_crop(&mut self, rect: CropRect) -> Result<(), &'static str> {
-        if rect.x + rect.width > self.target_metadata.width || rect.y + rect.height > self.target_metadata.height {
+        if rect.x + rect.width > self.target_metadata.width
+            || rect.y + rect.height > self.target_metadata.height
+        {
             return Err("Crop rect exceeds image dimensions");
         }
         self.params.crop = Some(rect);
@@ -182,7 +195,10 @@ impl PixImageEditor {
     pub fn apply_rotation(&mut self, degrees: i32) {
         self.params.rotate_angle_deg = (self.params.rotate_angle_deg + degrees) % 360;
         if degrees == 90 || degrees == 270 {
-            core::mem::swap(&mut self.target_metadata.width, &mut self.target_metadata.height);
+            core::mem::swap(
+                &mut self.target_metadata.width,
+                &mut self.target_metadata.height,
+            );
         }
     }
 
@@ -222,10 +238,7 @@ impl PixBatchRenameEngine {
 pub struct PixBatchConverterEngine;
 
 impl PixBatchConverterEngine {
-    pub fn convert_format(
-        images: &mut [PixImageMetadata],
-        target_format: ImageFormat,
-    ) -> usize {
+    pub fn convert_format(images: &mut [PixImageMetadata], target_format: ImageFormat) -> usize {
         let mut count = 0;
         for img in images.iter_mut() {
             if img.format != target_format {
@@ -281,7 +294,11 @@ pub struct PixSlideshowEngine {
 }
 
 impl PixSlideshowEngine {
-    pub fn new(collection: PixCollection, transition: SlideshowTransition, duration_sec: u32) -> Self {
+    pub fn new(
+        collection: PixCollection,
+        transition: SlideshowTransition,
+        duration_sec: u32,
+    ) -> Self {
         Self {
             collection,
             transition,
@@ -341,12 +358,22 @@ mod tests {
 
     #[test]
     fn test_pix_metadata_and_collections() {
-        let mut img1 = PixImageMetadata::new("/home/user/Pictures/photo1.jpg", ImageFormat::Jpeg, 1920, 1080);
+        let mut img1 = PixImageMetadata::new(
+            "/home/user/Pictures/photo1.jpg",
+            ImageFormat::Jpeg,
+            1920,
+            1080,
+        );
         img1.set_rating(5);
         img1.add_keyword("nature");
         img1.add_keyword("mountains");
 
-        let mut img2 = PixImageMetadata::new("/home/user/Pictures/photo2.png", ImageFormat::Png, 3840, 2160);
+        let mut img2 = PixImageMetadata::new(
+            "/home/user/Pictures/photo2.png",
+            ImageFormat::Png,
+            3840,
+            2160,
+        );
         img2.set_rating(3);
         img2.add_keyword("portrait");
 
@@ -362,10 +389,20 @@ mod tests {
 
     #[test]
     fn test_pix_image_editor_crop_and_rotate() {
-        let img = PixImageMetadata::new("/home/user/Pictures/sample.jpg", ImageFormat::Jpeg, 1920, 1080);
+        let img = PixImageMetadata::new(
+            "/home/user/Pictures/sample.jpg",
+            ImageFormat::Jpeg,
+            1920,
+            1080,
+        );
         let mut editor = PixImageEditor::new(img);
 
-        let crop = CropRect { x: 100, y: 100, width: 800, height: 600 };
+        let crop = CropRect {
+            x: 100,
+            y: 100,
+            width: 800,
+            height: 600,
+        };
         assert!(editor.apply_crop(crop).is_ok());
         assert_eq!(editor.target_metadata.width, 800);
         assert_eq!(editor.target_metadata.height, 600);
@@ -389,7 +426,11 @@ mod tests {
         assert_eq!(converted, 2);
         assert_eq!(images[0].format, ImageFormat::WebP);
 
-        let watermark = WatermarkSpec { text: "© SigmaOS".to_string(), opacity_percent: 50, font_size: 24 };
+        let watermark = WatermarkSpec {
+            text: "© SigmaOS".to_string(),
+            opacity_percent: 50,
+            font_size: 24,
+        };
         let stamped = PixBatchWatermarkEngine::apply_watermark(&images, &watermark);
         assert_eq!(stamped.len(), 2);
         assert!(stamped[0].contains("© SigmaOS"));
@@ -402,7 +443,8 @@ mod tests {
         img.set_rating(4);
         collection.add_image(img);
 
-        let mut slideshow = PixSlideshowEngine::new(collection.clone(), SlideshowTransition::Fade, 5);
+        let mut slideshow =
+            PixSlideshowEngine::new(collection.clone(), SlideshowTransition::Fade, 5);
         slideshow.start();
         assert!(slideshow.is_playing);
 

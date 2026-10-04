@@ -9,9 +9,9 @@ extern crate alloc;
 
 use alloc::boxed::Box;
 use std::collections::BTreeMap;
-#[cfg(test)]
-use std::collections::HashMap;
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
+// HashMap is used unconditionally by ArchWikiKnowledgeBaseEngine below; the
+// old test/standalone gated imports left `cargo check --features standalone_test`
+// without any HashMap in scope (E0425).
 use std::collections::HashMap;
 
 // ==================================================================// 6.1 POLYMORPHIC UNIVERSAL PERIPHERAL BLUEPRINT (OOP PARADIGM)

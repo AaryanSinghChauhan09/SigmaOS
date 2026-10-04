@@ -41,38 +41,38 @@ use std::vec::Vec;
 /// Foreign Distribution Package Format Kind (32+ Linux & BSD Distros Supported)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum UniversalMultiDistroFormatV14 {
-    DebianAptDeb,          // .deb / Debian, Ubuntu, Mint, Pop!_OS, Deepin
-    ArchPacmanZst,         // .pkg.tar.zst / Arch, Manjaro, CachyOS, EndeavourOS
-    ArchPkgTarXz,          // .pkg.tar.xz / Arch legacy
-    FedoraDnfRpm,          // .rpm / Fedora, RHEL, CentOS, Rocky, Alma, openSUSE
-    AlpineApk,             // .apk / Alpine Linux, postmarketOS
-    VoidXbps,              // .xbps / Void Linux
-    GentooEbuild,          // .ebuild / Gentoo Portage
-    FreeBsdPkg,            // .pkg / FreeBSD pkg
-    FreeBsdPorts,          // .ports / FreeBSD ports tree
-    OpenBsdSignifyPkg,     // .pkg / OpenBSD signify signed package
-    NetBsdPkgsrc,          // .tgz / NetBSD pkgsrc
-    NixFlakePkg,           // .nix / NixOS, Nix CAS
-    GuixSchemePkg,         // .scm / GNU Guix
-    FlatpakDesktop,        // .flatpak / Flatpak application
-    CanonicalSnap,         // .snap / Canonical Snap container
-    AppImagePortable,      // .appimage / AppImage portable container
-    SolusEopkg,            // .eopkg / Solus eopkg
-    PardusPisi,            // .pisi / Pardus, Solus PiSi
-    HomebrewBottle,        // .bottle / Homebrew macOS & Linux
-    OpenWrtIpk,            // .ipk / OpenWrt, Entware
-    SlaxLzm,               // .lzm / Slax Linux SquashFS module
-    PuppyPup,              // .pup / Puppy Linux package
-    PuppyPet,              // .pet / Puppy Linux PET archive
-    MacOsAppBundle,        // .app / macOS application bundle
-    AppleIpa,              // .ipa / iOS application bundle
-    AndroidApk,            // .apk / Android APK
-    AndroidAab,            // .aab / Android App Bundle
-    HarmonyHap,            // .hap / HarmonyOS OpenHarmony ability
-    AdobeAir,              // .air / Adobe AIR runtime
-    TarGzArchive,          // .tar.gz / Generic gzipped tarball
-    XzArchive,             // .xz / Generic XZ compressed archive
-    SigmaNativeSigpkg,     // .sigpkg / SigmaOS native post-quantum package
+    DebianAptDeb,      // .deb / Debian, Ubuntu, Mint, Pop!_OS, Deepin
+    ArchPacmanZst,     // .pkg.tar.zst / Arch, Manjaro, CachyOS, EndeavourOS
+    ArchPkgTarXz,      // .pkg.tar.xz / Arch legacy
+    FedoraDnfRpm,      // .rpm / Fedora, RHEL, CentOS, Rocky, Alma, openSUSE
+    AlpineApk,         // .apk / Alpine Linux, postmarketOS
+    VoidXbps,          // .xbps / Void Linux
+    GentooEbuild,      // .ebuild / Gentoo Portage
+    FreeBsdPkg,        // .pkg / FreeBSD pkg
+    FreeBsdPorts,      // .ports / FreeBSD ports tree
+    OpenBsdSignifyPkg, // .pkg / OpenBSD signify signed package
+    NetBsdPkgsrc,      // .tgz / NetBSD pkgsrc
+    NixFlakePkg,       // .nix / NixOS, Nix CAS
+    GuixSchemePkg,     // .scm / GNU Guix
+    FlatpakDesktop,    // .flatpak / Flatpak application
+    CanonicalSnap,     // .snap / Canonical Snap container
+    AppImagePortable,  // .appimage / AppImage portable container
+    SolusEopkg,        // .eopkg / Solus eopkg
+    PardusPisi,        // .pisi / Pardus, Solus PiSi
+    HomebrewBottle,    // .bottle / Homebrew macOS & Linux
+    OpenWrtIpk,        // .ipk / OpenWrt, Entware
+    SlaxLzm,           // .lzm / Slax Linux SquashFS module
+    PuppyPup,          // .pup / Puppy Linux package
+    PuppyPet,          // .pet / Puppy Linux PET archive
+    MacOsAppBundle,    // .app / macOS application bundle
+    AppleIpa,          // .ipa / iOS application bundle
+    AndroidApk,        // .apk / Android APK
+    AndroidAab,        // .aab / Android App Bundle
+    HarmonyHap,        // .hap / HarmonyOS OpenHarmony ability
+    AdobeAir,          // .air / Adobe AIR runtime
+    TarGzArchive,      // .tar.gz / Generic gzipped tarball
+    XzArchive,         // .xz / Generic XZ compressed archive
+    SigmaNativeSigpkg, // .sigpkg / SigmaOS native post-quantum package
 }
 
 impl UniversalMultiDistroFormatV14 {
@@ -226,7 +226,9 @@ impl UniversalMultiDistroFormatV14 {
                 "Desktop Container Ecosystem"
             }
             Self::SolusEopkg | Self::PardusPisi => "Solus / Pardus Ecosystem",
-            Self::HomebrewBottle | Self::MacOsAppBundle | Self::AppleIpa => "Apple / macOS Ecosystem",
+            Self::HomebrewBottle | Self::MacOsAppBundle | Self::AppleIpa => {
+                "Apple / macOS Ecosystem"
+            }
             Self::OpenWrtIpk => "OpenWrt Embedded Ecosystem",
             Self::SlaxLzm | Self::PuppyPup | Self::PuppyPet => "Lightweight / Live Ecosystem",
             Self::AndroidApk | Self::AndroidAab | Self::HarmonyHap => "Mobile Runtime Ecosystem",
@@ -334,12 +336,27 @@ impl UniversalPmCommandDispatcherV14 {
 
         if args.len() > 1 {
             let sub_cmd = args[1];
-            if sub_cmd == "update" || sub_cmd == "-Sy" || sub_cmd == "checkupdate" || sub_cmd == "refresh" {
+            if sub_cmd == "update"
+                || sub_cmd == "-Sy"
+                || sub_cmd == "checkupdate"
+                || sub_cmd == "refresh"
+            {
                 command_kind = String::from("sync-repo");
                 is_update_sync = true;
-            } else if sub_cmd == "remove" || sub_cmd == "purge" || sub_cmd == "-R" || sub_cmd == "-Rns" || sub_cmd == "del" || sub_cmd == "erase" || sub_cmd == "uninstall" {
+            } else if sub_cmd == "remove"
+                || sub_cmd == "purge"
+                || sub_cmd == "-R"
+                || sub_cmd == "-Rns"
+                || sub_cmd == "del"
+                || sub_cmd == "erase"
+                || sub_cmd == "uninstall"
+            {
                 command_kind = String::from("remove");
-            } else if sub_cmd == "search" || sub_cmd == "-Ss" || sub_cmd == "query" || sub_cmd == "-Q" {
+            } else if sub_cmd == "search"
+                || sub_cmd == "-Ss"
+                || sub_cmd == "query"
+                || sub_cmd == "-Q"
+            {
                 command_kind = String::from("search");
             } else {
                 command_kind = format!("{}-{}", cli_tool, sub_cmd);
@@ -413,9 +430,9 @@ impl UniversalSatDependencySolverV14 {
 
             // Look up direct node or search for virtual provider
             let matched_node = self.package_db.get(&current_pkg).or_else(|| {
-                self.package_db.values().find(|n| {
-                    n.provides_virtual.iter().any(|v| v == &current_pkg)
-                })
+                self.package_db
+                    .values()
+                    .find(|n| n.provides_virtual.iter().any(|v| v == &current_pkg))
             });
 
             if let Some(node) = matched_node {
@@ -498,7 +515,11 @@ impl SovereignUniversalPrPackageGatewayV14 {
             {
                 let parts: Vec<&str> = line_trim.splitn(2, |c| c == ':' || c == '=').collect();
                 if parts.len() == 2 {
-                    pkg_name = parts[1].trim().trim_matches('\'').trim_matches('"').to_string();
+                    pkg_name = parts[1]
+                        .trim()
+                        .trim_matches('\'')
+                        .trim_matches('"')
+                        .to_string();
                 }
             } else if line_trim.starts_with("Version:")
                 || line_trim.starts_with("pkgver=")
@@ -507,7 +528,11 @@ impl SovereignUniversalPrPackageGatewayV14 {
             {
                 let parts: Vec<&str> = line_trim.splitn(2, |c| c == ':' || c == '=').collect();
                 if parts.len() == 2 {
-                    pkg_ver = parts[1].trim().trim_matches('\'').trim_matches('"').to_string();
+                    pkg_ver = parts[1]
+                        .trim()
+                        .trim_matches('\'')
+                        .trim_matches('"')
+                        .to_string();
                 }
             } else if line_trim.starts_with("Depends:")
                 || line_trim.starts_with("depends=")
@@ -706,9 +731,7 @@ mod tests {
         assert!(apt_action.is_dry_run);
         assert_eq!(apt_action.target_packages.len(), 1);
 
-        let pacman_action = dispatcher
-            .dispatch_cli_command(&["pacman", "-Sy"])
-            .unwrap();
+        let pacman_action = dispatcher.dispatch_cli_command(&["pacman", "-Sy"]).unwrap();
         assert_eq!(pacman_action.source_cli, "pacman");
         assert!(pacman_action.is_update_sync);
     }

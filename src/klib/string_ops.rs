@@ -1,5 +1,10 @@
 /// Custom string operations without std
 
+// These primitives intentionally model the C/POSIX string ABI (raw pointers,
+// NUL-terminated semantics). Pointer validity is the caller's contract, exactly
+// as with libc; the clippy recommendation to mark them `unsafe fn` is deliberately
+// waived to keep the kernel-ABI surface ergonomic.
+#[allow(clippy::not_unsafe_ptr_arg_deref)]
 pub fn custom_strlen(s: *const u8) -> usize {
     let mut len = 0;
     unsafe {
@@ -10,6 +15,7 @@ pub fn custom_strlen(s: *const u8) -> usize {
     len
 }
 
+#[allow(clippy::not_unsafe_ptr_arg_deref)] // libc-ABI primitive, see note above
 pub fn custom_strcmp(s1: *const u8, s2: *const u8) -> i32 {
     let mut i = 0;
     unsafe {
@@ -27,6 +33,7 @@ pub fn custom_strcmp(s1: *const u8, s2: *const u8) -> i32 {
     }
 }
 
+#[allow(clippy::not_unsafe_ptr_arg_deref)] // libc-ABI primitive, see note above
 pub fn custom_strncpy_secure(dest: *mut u8, src: *const u8) -> *mut u8 {
     let mut i = 0;
     unsafe {
@@ -44,6 +51,7 @@ pub fn custom_strncpy_secure(dest: *mut u8, src: *const u8) -> *mut u8 {
 
 /// ⚡ Bolt: Optimized bulk memory copy using `core::ptr::copy_nonoverlapping`
 /// Avoids element-by-element byte loops and leverages target SIMD / fast memcpy CPU instructions.
+#[allow(clippy::not_unsafe_ptr_arg_deref)] // libc-ABI primitive, see note above
 pub fn custom_memcpy(dest: *mut u8, src: *const u8, n: usize) -> *mut u8 {
     unsafe {
         core::ptr::copy_nonoverlapping(src, dest, n);
@@ -53,6 +61,7 @@ pub fn custom_memcpy(dest: *mut u8, src: *const u8, n: usize) -> *mut u8 {
 
 /// ⚡ Bolt: Optimized memset using `core::ptr::write_bytes`
 /// Replaces manual byte loops with bulk SIMD / memset intrinsics.
+#[allow(clippy::not_unsafe_ptr_arg_deref)] // libc-ABI primitive, see note above
 pub fn custom_memset(dest: *mut u8, c: u8, n: usize) -> *mut u8 {
     unsafe {
         core::ptr::write_bytes(dest, c, n);

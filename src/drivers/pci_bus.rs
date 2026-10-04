@@ -52,7 +52,11 @@ pub struct PciAddress {
 
 impl PciAddress {
     pub const fn new(bus: u8, device: u8, function: u8) -> Self {
-        Self { bus, device, function }
+        Self {
+            bus,
+            device,
+            function,
+        }
     }
 
     /// Encode address for configuration space access
@@ -61,7 +65,7 @@ impl PciAddress {
         let device = self.device as u32;
         let function = self.function as u32;
         let offset = (offset & 0xFC) as u32;
-        
+
         0x80000000 | (bus << 16) | (device << 11) | (function << 8) | offset
     }
 }
@@ -177,7 +181,7 @@ impl PciBus {
     fn read_bar(address: PciAddress, bar_index: u8) -> u64 {
         let offset = PCI_BAR0 + (bar_index * 4);
         let bar = Self::config_read_u32(address, offset);
-        
+
         if bar == 0 {
             return 0;
         }
@@ -186,7 +190,7 @@ impl PciBus {
         if (bar & 0x01) == 0 {
             // Memory space
             let is_64bit = (bar & 0x06) == 0x04;
-            
+
             if is_64bit && bar_index < 5 {
                 // 64-bit BAR spans two registers
                 let high = Self::config_read_u32(address, offset + 4);
@@ -241,7 +245,7 @@ impl PciBus {
         for bus in 0..=255 {
             for device in 0..32 {
                 let address = PciAddress::new(bus, device, 0);
-                
+
                 if !Self::device_exists(address) {
                     continue;
                 }
@@ -383,7 +387,7 @@ mod tests {
             bars: [0; 6],
             interrupt_line: 0,
         };
-        
+
         assert_eq!(dev.class_name(), "Display Controller");
         assert!(dev.is_gpu());
     }
@@ -415,10 +419,15 @@ pub struct PciBusManager {
 }
 
 impl PciBusManager {
-    pub fn new() -> Self { Self::default() }
-    pub fn enumerate(&mut self) { /* stub */ }
+    pub fn new() -> Self {
+        Self::default()
+    }
+    pub fn enumerate(&mut self) { /* stub */
+    }
     pub fn find_device(&self, vendor: u16, device: u16) -> Option<&PciDevice> {
-        self.devices.iter().find(|d| d.vendor_id == vendor && d.device_id == device)
+        self.devices
+            .iter()
+            .find(|d| d.vendor_id == vendor && d.device_id == device)
     }
 }
 
@@ -493,20 +502,26 @@ pub struct SimulatedPciHardwareAccess {
 }
 
 impl SimulatedPciHardwareAccess {
-    pub fn new() -> Self { Self { config_space: alloc::vec![0u8; 256] } }
+    pub fn new() -> Self {
+        Self {
+            config_space: alloc::vec![0u8; 256],
+        }
+    }
 }
 
 impl PciHardwareAccess for SimulatedPciHardwareAccess {
     fn config_read_u32(&self, _addr: PciAddress, offset: u8) -> u32 {
         let off = offset as usize;
         if off + 4 <= self.config_space.len() {
-            u32::from_le_bytes(self.config_space[off..off+4].try_into().unwrap_or([0;4]))
-        } else { 0 }
+            u32::from_le_bytes(self.config_space[off..off + 4].try_into().unwrap_or([0; 4]))
+        } else {
+            0
+        }
     }
     fn config_write_u32(&mut self, _addr: PciAddress, offset: u8, val: u32) {
         let off = offset as usize;
         if off + 4 <= self.config_space.len() {
-            self.config_space[off..off+4].copy_from_slice(&val.to_le_bytes());
+            self.config_space[off..off + 4].copy_from_slice(&val.to_le_bytes());
         }
     }
 }

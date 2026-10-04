@@ -25,7 +25,8 @@ impl DriverArchiveVault {
     }
 
     pub fn store_driver(&mut self, name: &str, raw_binary: &[u8]) {
-        let encrypted: crate::klib::Vec<u8> = raw_binary.iter().map(|b| b ^ self.secret_key).collect();
+        let encrypted: crate::klib::Vec<u8> =
+            raw_binary.iter().map(|b| b ^ self.secret_key).collect();
         let sig = crate::klib::SigmaString::from(format!("SIGMA_{}_OK", name));
 
         let entry = VaultEntry {
@@ -33,7 +34,8 @@ impl DriverArchiveVault {
             encrypted_payload: encrypted,
             hash_signature: sig,
         };
-        self.archive.insert(crate::klib::SigmaString::from(name), entry);
+        self.archive
+            .insert(crate::klib::SigmaString::from(name), entry);
     }
 
     pub fn retrieve_driver(&self, name: &str) -> Option<crate::klib::Vec<u8>> {

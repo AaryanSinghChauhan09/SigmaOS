@@ -5,8 +5,8 @@ pub mod memory_protection;
 pub use address_sanitizer::{AddressSanitizer, MemoryRegion};
 pub mod audit;
 pub mod bsd_hardening;
-pub mod capability;
 pub mod cap_rights;
+pub mod capability;
 pub mod capsicum;
 pub mod governance;
 pub mod hardware_privilege;
@@ -28,8 +28,8 @@ pub mod syscall_filter;
 pub mod user_namespace;
 
 pub mod bridge;
-pub mod capability_token;
 pub mod capability_based_security;
+pub mod capability_token;
 pub mod cleaner;
 pub mod clipboard;
 pub mod deobfuscation;
@@ -62,18 +62,10 @@ pub mod vulnerability;
 pub use landlock::{LandlockEngine, LandlockPathBeneathAttr, LandlockRuleset};
 pub mod landlock_sovereign;
 
-pub mod system_audit;
 pub mod filesystem_encryption;
+pub mod system_audit;
 
 pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
-pub use system_audit::{
-    AuditEventType as SystemAuditEventType, AuditEvent as SystemAuditEvent, AuditRule, AuditAction, AuditConfig,
-    SystemAuditManager,
-};
-pub use filesystem_encryption::{
-    EncryptionType as FsEncryptionType, EncryptionAlgorithm as FsEncryptionAlgorithm, EncryptionStatus as FsEncryptionStatus, FscryptDirectory, LuksDevice,
-    FilesystemEncryptionManager,
-};
 pub use bsd_hardening::{
     AslrEngine, BsdHardeningSuite, CapsicumCapability, CapsicumManager, MemoryPermission,
     PaxMprotect, PledgeManager as BsdPledgeManager, PledgePromise as BsdPledgePromise,
@@ -95,6 +87,10 @@ pub use clipboard::{
     SecureClipboardManager, SecurityLevel as ClipboardSecurityLevel, XorEncryption,
 };
 pub use defensive_audit::*;
+pub use filesystem_encryption::{
+    EncryptionAlgorithm as FsEncryptionAlgorithm, EncryptionStatus as FsEncryptionStatus,
+    EncryptionType as FsEncryptionType, FilesystemEncryptionManager, FscryptDirectory, LuksDevice,
+};
 pub use forensics::*;
 pub use hardening::{MemoryProtectionState, RelroState, SecurityHardeningConfig, StackCanary};
 pub use intrusion::{
@@ -113,6 +109,10 @@ pub use kernel_hardening::{
     PagePermissions, PledgePromise as KernelPledgePromise, PrivilegeRing,
     RetpolineKptiMitigationEngine, SmepSmapEnforcer, SovereignKaslrEngine,
     SovereignRing3UserModeTssEngine, SyscallCategory, TaskStateSegment64,
+};
+pub use system_audit::{
+    AuditAction, AuditConfig, AuditEvent as SystemAuditEvent,
+    AuditEventType as SystemAuditEventType, AuditRule, SystemAuditManager,
 };
 
 pub use crate::security::vulnerability::{
@@ -175,20 +175,18 @@ pub mod phase_audit;
 
 pub use hardware_privilege::*;
 
-pub use capsicum::{
-    CapEntry, CapMode, CapRight, CapabilitySandbox,
-    ProcessCapState, CapabilityMode, CapError, FdRightsEntry,
-    ProcDescTable, ProcessDescriptor, log_cap_violation,
-};
 pub use cap_rights::{
-    CapRightsMask, CAP_READ, CAP_WRITE, CAP_SEEK, CAP_PREAD, CAP_PWRITE,
-    CAP_FSTAT, CAP_FSTATAT, CAP_FCNTL, CAP_FCHDIR, CAP_FCHFLAGS, CAP_FCHMOD,
-    CAP_FCHOWN, CAP_FLOCK, CAP_FSYNC, CAP_FTRUNCATE, CAP_MMAP, CAP_MMAP_R,
-    CAP_MMAP_W, CAP_MMAP_X, CAP_MMAP_RW, CAP_MMAP_RX, CAP_MMAP_WX, CAP_MMAP_RWX,
-    CAP_CREATE, CAP_DELETE, CAP_UNLINK, CAP_MKDIR, CAP_RMDIR, CAP_LOOKUP,
-    CAP_ACCEPT, CAP_BIND, CAP_CONNECT, CAP_LISTEN, CAP_RECV, CAP_SEND,
-    CAP_IOCTL, CAP_EVENT, CAP_PDWAIT, CAP_PDKILL, CAP_PDGETPID, CAP_ALL,
-    CAP_READ_RIGHTS, CAP_WRITE_RIGHTS, CAP_NETWORK_RIGHTS,
+    CapRightsMask, CAP_ACCEPT, CAP_ALL, CAP_BIND, CAP_CONNECT, CAP_CREATE, CAP_DELETE, CAP_EVENT,
+    CAP_FCHDIR, CAP_FCHFLAGS, CAP_FCHMOD, CAP_FCHOWN, CAP_FCNTL, CAP_FLOCK, CAP_FSTAT, CAP_FSTATAT,
+    CAP_FSYNC, CAP_FTRUNCATE, CAP_IOCTL, CAP_LISTEN, CAP_LOOKUP, CAP_MKDIR, CAP_MMAP, CAP_MMAP_R,
+    CAP_MMAP_RW, CAP_MMAP_RWX, CAP_MMAP_RX, CAP_MMAP_W, CAP_MMAP_WX, CAP_MMAP_X,
+    CAP_NETWORK_RIGHTS, CAP_PDGETPID, CAP_PDKILL, CAP_PDWAIT, CAP_PREAD, CAP_PWRITE, CAP_READ,
+    CAP_READ_RIGHTS, CAP_RECV, CAP_RMDIR, CAP_SEEK, CAP_SEND, CAP_UNLINK, CAP_WRITE,
+    CAP_WRITE_RIGHTS,
+};
+pub use capsicum::{
+    log_cap_violation, CapEntry, CapError, CapMode, CapRight, CapabilityMode, CapabilitySandbox,
+    FdRightsEntry, ProcDescTable, ProcessCapState, ProcessDescriptor,
 };
 pub use memory_protection::{
     AslrConfig, MemoryProtectionManager, MemoryProtectionMode, StackCanaryConfig,

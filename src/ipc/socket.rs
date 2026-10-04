@@ -9,9 +9,9 @@
 #![allow(dead_code)]
 
 use std::collections::{HashMap, VecDeque};
+use std::string::String;
 use std::sync::{Arc, Mutex};
 use std::vec::Vec;
-use std::string::String;
 
 // ── Errors ────────────────────────────────────────────────────────────────────
 
@@ -148,7 +148,10 @@ impl UnixNamespace {
 
     /// Push an incoming connection to the listener's backlog
     pub fn push_connection(&mut self, listener_id: u64, conn: UnixSocket) {
-        self.listen_queues.entry(listener_id).or_default().push_back(conn);
+        self.listen_queues
+            .entry(listener_id)
+            .or_default()
+            .push_back(conn);
     }
 
     /// Pop the next pending connection
@@ -225,10 +228,7 @@ impl UnixSocket {
 // ── Public API functions ──────────────────────────────────────────────────────
 
 /// Create a new Unix domain socket
-pub fn unix_socket_create(
-    ns: &mut UnixNamespace,
-    sock_type: UnixSocketType,
-) -> UnixSocket {
+pub fn unix_socket_create(ns: &mut UnixNamespace, sock_type: UnixSocketType) -> UnixSocket {
     let id = ns.alloc_id();
     UnixSocket::new(id, sock_type)
 }
@@ -249,13 +249,8 @@ pub fn unix_socket_bind(
 }
 
 /// Mark a SOCK_STREAM socket as listening for connections
-pub fn unix_socket_listen(
-    sock: &mut UnixSocket,
-    backlog: usize,
-) -> Result<(), SocketError> {
-    if sock.socket_type != UnixSocketType::Stream
-        && sock.socket_type != UnixSocketType::Seqpacket
-    {
+pub fn unix_socket_listen(sock: &mut UnixSocket, backlog: usize) -> Result<(), SocketError> {
+    if sock.socket_type != UnixSocketType::Stream && sock.socket_type != UnixSocketType::Seqpacket {
         return Err(SocketError::OpNotSupported);
     }
     if sock.state != SocketState::Bound {
@@ -331,10 +326,7 @@ pub fn unix_socket_send(
 }
 
 /// Receive data from the socket's receive buffer.
-pub fn unix_socket_recv(
-    sock: &mut UnixSocket,
-    buf: &mut [u8],
-) -> Result<usize, SocketError> {
+pub fn unix_socket_recv(sock: &mut UnixSocket, buf: &mut [u8]) -> Result<usize, SocketError> {
     let msg = sock.dequeue().ok_or(SocketError::WouldBlock)?;
     let n = msg.data.len().min(buf.len());
     buf[..n].copy_from_slice(&msg.data[..n]);
@@ -362,10 +354,7 @@ pub fn unix_socket_pair(
 }
 
 /// Close and remove a bound socket from the namespace
-pub fn unix_socket_close(
-    ns: &mut UnixNamespace,
-    sock: &mut UnixSocket,
-) {
+pub fn unix_socket_close(ns: &mut UnixNamespace, sock: &mut UnixSocket) {
     if let Some(ref path) = sock.path {
         ns.unbind(path);
     }
@@ -445,7 +434,11 @@ mod tests {
     fn test_scm_credentials() {
         let mut ns = UnixNamespace::new();
         let (mut a, mut b) = unix_socket_pair(&mut ns, UnixSocketType::Stream);
-        let creds = CmsgData::Credentials(ScmCredentials { pid: 100, uid: 1000, gid: 1000 });
+        let creds = CmsgData::Credentials(ScmCredentials {
+            pid: 100,
+            uid: 1000,
+            gid: 1000,
+        });
         unix_socket_send(&a, &mut b, b"auth", Some(creds)).unwrap();
         let msg = b.dequeue().unwrap();
         if let Some(CmsgData::Credentials(c)) = msg.cmsg {

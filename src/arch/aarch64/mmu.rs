@@ -14,9 +14,8 @@ pub const MAIR_ATTR_DEVICE_NGNRNE: u64 = 0x00; // Device-nGnRnE
 pub const MAIR_ATTR_NORMAL_NC: u64 = 0x44; // Normal non-cacheable
 
 /// MAIR_EL1 encoding: attr0=Normal, attr1=Device, attr2=Normal-NC
-pub const MAIR_EL1_VALUE: u64 = MAIR_ATTR_NORMAL
-    | (MAIR_ATTR_DEVICE_NGNRNE << 8)
-    | (MAIR_ATTR_NORMAL_NC << 16);
+pub const MAIR_EL1_VALUE: u64 =
+    MAIR_ATTR_NORMAL | (MAIR_ATTR_DEVICE_NGNRNE << 8) | (MAIR_ATTR_NORMAL_NC << 16);
 
 /// AttrIndx values that index into MAIR_EL1
 pub const ATTRIDX_NORMAL: u64 = 0;
@@ -103,14 +102,7 @@ impl ArmPageFlags {
 
     /// Device (MMIO) page — non-cached, non-buffered
     pub fn device() -> Self {
-        Self(
-            Self::VALID
-                | Self::PAGE
-                | Self::AF
-                | Self::UXN
-                | Self::PXN
-                | (ATTRIDX_DEVICE << 2),
-        )
+        Self(Self::VALID | Self::PAGE | Self::AF | Self::UXN | Self::PXN | (ATTRIDX_DEVICE << 2))
     }
 }
 
@@ -391,6 +383,10 @@ mod tests {
     #[test]
     fn test_kernel_rw_flags_af_set() {
         let flags = ArmPageFlags::kernel_rw();
-        assert_ne!(flags.0 & ArmPageFlags::AF, 0, "AF must be set to avoid fault");
+        assert_ne!(
+            flags.0 & ArmPageFlags::AF,
+            0,
+            "AF must be set to avoid fault"
+        );
     }
 }

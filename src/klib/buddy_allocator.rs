@@ -87,8 +87,12 @@ impl BuddyAllocator for SimpleBuddyAllocator {
         }
 
         for current_order in order..=self.max_order.load(Ordering::SeqCst) {
-            if !self.free_lists[current_order].is_empty() {
-                let block_id = self.free_lists[current_order].remove(0);
+            if let Some(block_id) = self.free_lists[current_order].pop() {
+                // Free lists are unordered pools: the buddy of a block is
+                // computed via XOR on the block id, so which end we take a
+                // free block from is irrelevant to correctness. pop() is
+                // O(1) where remove(0) was O(n) — a linear memcpy of the
+                // whole list on every allocation.
 
                 if current_order > order {
                     let new_order = current_order - 1;
@@ -104,11 +108,14 @@ impl BuddyAllocator for SimpleBuddyAllocator {
                         parent.free.store(0, Ordering::SeqCst);
                     }
 
-                    while left_id >= self.blocks.len() {
-                        self.blocks.push(None);
-                    }
-                    while right_id >= self.blocks.len() {
-                        self.blocks.push(None);
+                    // Grow the block table in a single reserved batch
+                    // instead of two unbounded push loops (one reserve +
+                    // contiguous appends, no incremental reallocations).
+                    if self.blocks.len() <= right_id {
+                        self.blocks.reserve(right_id + 1 - self.blocks.len());
+                        while self.blocks.len() <= right_id {
+                            self.blocks.push(None);
+                        }
                     }
 
                     self.blocks[left_id] = Some(left_block);
@@ -206,7 +213,9 @@ impl MemoryPool for SimpleBuddyAllocator {
         let mut used = 0;
         for block_option in &self.blocks {
             if let Some(ref block) = *block_option {
-                if block.free.load(Ordering::SeqCst) == 0 {
+                // Statistical query: Relaxed loads avoid needless memory
+                // fences on every block in the table.
+                if block.free.load(Ordering::Relaxed) == 0 {
                     used += 1;
                 }
             }

@@ -319,7 +319,8 @@ impl PageCache {
 
     /// Get cache statistics
     pub fn stats(&self) -> PageCacheStats {
-        let total_requests = self.hits.load(Ordering::Relaxed) + self.misses.load(Ordering::Relaxed);
+        let total_requests =
+            self.hits.load(Ordering::Relaxed) + self.misses.load(Ordering::Relaxed);
         let hit_rate = if total_requests > 0 {
             (self.hits.load(Ordering::Relaxed) as f64 / total_requests as f64) * 100.0
         } else {

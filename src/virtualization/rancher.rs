@@ -1,4 +1,3 @@
-
 use std::string::{String, ToString};
 // SigmaOS Daemonless Container & Micro-VM Orchestration Subsystem (S-RANCHER)
 // Absorbs and obsoletes Rancher OS, k3os, Bottlerocket, and containerd

@@ -1,8 +1,8 @@
 //! Capsicum Capability Rights Bitmask
-//! 
+//!
 //! Implements FreeBSD-style per-FD capability rights as a 64-bit bitmask.
 //! Each bit represents a specific right (read, write, execute, etc.).
-//! 
+//!
 //! # References
 //! - FreeBSD sys/sys/capsicum.h
 //! - FreeBSD sys/kern/kern_capmode.c
@@ -82,7 +82,8 @@ pub const CAP_ALL: u64 = 0xFFFFFFFFFFFFFFFF;
 /// Predefined capability sets
 pub const CAP_READ_RIGHTS: u64 = CAP_READ | CAP_SEEK | CAP_FSTAT | CAP_PREAD;
 pub const CAP_WRITE_RIGHTS: u64 = CAP_WRITE | CAP_FTRUNCATE | CAP_FSYNC | CAP_PWRITE;
-pub const CAP_NETWORK_RIGHTS: u64 = CAP_CONNECT | CAP_SEND | CAP_RECV | CAP_ACCEPT | CAP_BIND | CAP_LISTEN;
+pub const CAP_NETWORK_RIGHTS: u64 =
+    CAP_CONNECT | CAP_SEND | CAP_RECV | CAP_ACCEPT | CAP_BIND | CAP_LISTEN;
 
 /// Capability rights bitmask wrapping a 64-bit integer
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

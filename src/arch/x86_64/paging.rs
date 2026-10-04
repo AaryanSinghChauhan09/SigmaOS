@@ -18,35 +18,45 @@ use core::sync::atomic::{AtomicU64, Ordering};
 pub struct PageFlags(u64);
 
 impl PageFlags {
-    pub const PRESENT:    Self = Self(1 << 0);  // P
-    pub const WRITABLE:   Self = Self(1 << 1);  // R/W
-    pub const USER:       Self = Self(1 << 2);  // U/S
-    pub const WRITE_THRU: Self = Self(1 << 3);  // PWT
-    pub const NO_CACHE:   Self = Self(1 << 4);  // PCD
-    pub const ACCESSED:   Self = Self(1 << 5);  // A
-    pub const DIRTY:      Self = Self(1 << 6);  // D
-    pub const HUGE:       Self = Self(1 << 7);  // PS — 2 MiB / 1 GiB page
-    pub const GLOBAL:     Self = Self(1 << 8);  // G
-    pub const NO_EXEC:    Self = Self(1 << 63); // XD / NX
-    pub const EMPTY:      Self = Self(0);
+    pub const PRESENT: Self = Self(1 << 0); // P
+    pub const WRITABLE: Self = Self(1 << 1); // R/W
+    pub const USER: Self = Self(1 << 2); // U/S
+    pub const WRITE_THRU: Self = Self(1 << 3); // PWT
+    pub const NO_CACHE: Self = Self(1 << 4); // PCD
+    pub const ACCESSED: Self = Self(1 << 5); // A
+    pub const DIRTY: Self = Self(1 << 6); // D
+    pub const HUGE: Self = Self(1 << 7); // PS — 2 MiB / 1 GiB page
+    pub const GLOBAL: Self = Self(1 << 8); // G
+    pub const NO_EXEC: Self = Self(1 << 63); // XD / NX
+    pub const EMPTY: Self = Self(0);
 
     #[inline(always)]
-    pub const fn bits(self) -> u64 { self.0 }
+    pub const fn bits(self) -> u64 {
+        self.0
+    }
 
     #[inline(always)]
-    pub const fn or(self, other: Self) -> Self { Self(self.0 | other.0) }
+    pub const fn or(self, other: Self) -> Self {
+        Self(self.0 | other.0)
+    }
 
     #[inline(always)]
-    pub const fn contains(self, flag: Self) -> bool { (self.0 & flag.0) == flag.0 }
+    pub const fn contains(self, flag: Self) -> bool {
+        (self.0 & flag.0) == flag.0
+    }
 }
 
 impl core::ops::BitOr for PageFlags {
     type Output = Self;
-    fn bitor(self, rhs: Self) -> Self { Self(self.0 | rhs.0) }
+    fn bitor(self, rhs: Self) -> Self {
+        Self(self.0 | rhs.0)
+    }
 }
 
 impl core::ops::BitOrAssign for PageFlags {
-    fn bitor_assign(&mut self, rhs: Self) { self.0 |= rhs.0; }
+    fn bitor_assign(&mut self, rhs: Self) {
+        self.0 |= rhs.0;
+    }
 }
 
 // ─── Page Table Entry ────────────────────────────────────────────────────────
@@ -59,7 +69,9 @@ impl core::ops::BitOrAssign for PageFlags {
 pub struct PageTableEntry(u64);
 
 impl PageTableEntry {
-    pub const fn unused() -> Self { Self(0) }
+    pub const fn unused() -> Self {
+        Self(0)
+    }
 
     /// Constructs an entry pointing to `phys_frame` (4 KiB-aligned) with `flags`.
     ///
@@ -82,12 +94,30 @@ impl PageTableEntry {
         Self::new(phys_2m, flags | PageFlags::HUGE)
     }
 
-    #[inline(always)] pub fn is_present(self) -> bool   { self.0 & PageFlags::PRESENT.bits() != 0 }
-    #[inline(always)] pub fn is_huge(self)    -> bool   { self.0 & PageFlags::HUGE.bits() != 0 }
-    #[inline(always)] pub fn is_writable(self) -> bool  { self.0 & PageFlags::WRITABLE.bits() != 0 }
-    #[inline(always)] pub fn frame(self)      -> u64    { self.0 & 0x000F_FFFF_FFFF_F000 }
-    #[inline(always)] pub fn flags(self)      -> PageFlags { PageFlags(self.0 & !(0x000F_FFFF_FFFF_F000u64)) }
-    #[inline(always)] pub fn raw(self)        -> u64    { self.0 }
+    #[inline(always)]
+    pub fn is_present(self) -> bool {
+        self.0 & PageFlags::PRESENT.bits() != 0
+    }
+    #[inline(always)]
+    pub fn is_huge(self) -> bool {
+        self.0 & PageFlags::HUGE.bits() != 0
+    }
+    #[inline(always)]
+    pub fn is_writable(self) -> bool {
+        self.0 & PageFlags::WRITABLE.bits() != 0
+    }
+    #[inline(always)]
+    pub fn frame(self) -> u64 {
+        self.0 & 0x000F_FFFF_FFFF_F000
+    }
+    #[inline(always)]
+    pub fn flags(self) -> PageFlags {
+        PageFlags(self.0 & !(0x000F_FFFF_FFFF_F000u64))
+    }
+    #[inline(always)]
+    pub fn raw(self) -> u64 {
+        self.0
+    }
 }
 
 // ─── Page Table Structures ───────────────────────────────────────────────────
@@ -100,7 +130,9 @@ pub struct PageTable {
 
 impl PageTable {
     pub const fn empty() -> Self {
-        Self { entries: [PageTableEntry::unused(); 512] }
+        Self {
+            entries: [PageTableEntry::unused(); 512],
+        }
     }
 
     /// Index into the table.  Bounds-checked via Rust's slice indexing.
@@ -124,9 +156,9 @@ impl PageTable {
 //
 // Total: ~24 KiB of BSS.  No PT level needed for huge pages.
 
-static mut PML4:   PageTable = PageTable::empty();
-static mut PDPT:   PageTable = PageTable::empty();
-static mut PD:     [PageTable; 4] = [
+static mut PML4: PageTable = PageTable::empty();
+static mut PDPT: PageTable = PageTable::empty();
+static mut PD: [PageTable; 4] = [
     PageTable::empty(),
     PageTable::empty(),
     PageTable::empty(),
@@ -180,16 +212,24 @@ pub unsafe fn flush_tlb_page(virt: u64) {
 
 /// Extract the PML4 index from a 64-bit canonical virtual address (bits 47:39).
 #[inline(always)]
-const fn pml4_index(virt: u64) -> usize { ((virt >> 39) & 0x1FF) as usize }
+const fn pml4_index(virt: u64) -> usize {
+    ((virt >> 39) & 0x1FF) as usize
+}
 /// Extract the PDPT index (bits 38:30).
 #[inline(always)]
-const fn pdpt_index(virt: u64) -> usize { ((virt >> 30) & 0x1FF) as usize }
+const fn pdpt_index(virt: u64) -> usize {
+    ((virt >> 30) & 0x1FF) as usize
+}
 /// Extract the PD index (bits 29:21).
 #[inline(always)]
-const fn pd_index(virt: u64) -> usize   { ((virt >> 21) & 0x1FF) as usize }
+const fn pd_index(virt: u64) -> usize {
+    ((virt >> 21) & 0x1FF) as usize
+}
 /// Extract the PT index (bits 20:12).
 #[inline(always)]
-const fn pt_index(virt: u64) -> usize   { ((virt >> 12) & 0x1FF) as usize }
+const fn pt_index(virt: u64) -> usize {
+    ((virt >> 12) & 0x1FF) as usize
+}
 
 // ─── map_page ────────────────────────────────────────────────────────────────
 
@@ -213,10 +253,7 @@ pub unsafe fn map_page(phys: u64, virt: u64, flags: PageFlags) {
         let pdpt_phys = &PDPT as *const PageTable as u64;
         pml4.set_entry(
             p4i,
-            PageTableEntry::new(
-                pdpt_phys,
-                PageFlags::PRESENT | PageFlags::WRITABLE,
-            ),
+            PageTableEntry::new(pdpt_phys, PageFlags::PRESENT | PageFlags::WRITABLE),
         );
     }
 
@@ -228,10 +265,7 @@ pub unsafe fn map_page(phys: u64, virt: u64, flags: PageFlags) {
         let pd_phys = &PD[0] as *const PageTable as u64;
         pdpt.set_entry(
             p3i,
-            PageTableEntry::new(
-                pd_phys,
-                PageFlags::PRESENT | PageFlags::WRITABLE,
-            ),
+            PageTableEntry::new(pd_phys, PageFlags::PRESENT | PageFlags::WRITABLE),
         );
     }
 
@@ -338,7 +372,7 @@ mod tests {
         let virt: u64 = 0x0000_0000_0020_0000;
         assert_eq!(pml4_index(virt), 0);
         assert_eq!(pdpt_index(virt), 0);
-        assert_eq!(pd_index(virt), 1);   // second 2 MiB page
+        assert_eq!(pd_index(virt), 1); // second 2 MiB page
         assert_eq!(pt_index(virt), 0);
     }
 

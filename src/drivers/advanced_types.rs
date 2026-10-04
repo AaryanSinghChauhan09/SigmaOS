@@ -228,10 +228,10 @@ pub struct WifiMloLink {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum WifiProtocolMode {
     Legacy,
-    Ht,      // 802.11n
-    Vht,     // 802.11ac
-    He,      // 802.11ax (WiFi 6)
-    Eht,     // 802.11be (WiFi 7)
+    Ht,  // 802.11n
+    Vht, // 802.11ac
+    He,  // 802.11ax (WiFi 6)
+    Eht, // 802.11be (WiFi 7)
 }
 
 /// Zero-copy packet driver engine

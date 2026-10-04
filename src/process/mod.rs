@@ -17,16 +17,16 @@ pub use pidfd_procdesc_subreaper::{
 };
 
 pub use activity_manager::{
-    ActivityManager, AddressSpaceBinding, ApplicationPerformanceProfile,
-    ProcessPledgePromises, ProcessResourceLimits, PsiMetrics,
+    ActivityManager, AddressSpaceBinding, ApplicationPerformanceProfile, ProcessPledgePromises,
+    ProcessResourceLimits, PsiMetrics,
 };
 
 pub use advanced_process_control::{
     AdvancedIpcHub, BsdRusage, CancellationType, CoreDumpMetadata, EventFd,
     JobControlLifecycleEngine, JobState, PosixMessage, PosixMessageQueue, ProcessCancelState,
     ProcessCancellationAndTerminationManager, ProcessControlError, ProcessJobEntry,
-    ProcessVmReadWriteEngine, ProcessWaiterAndRusageCollector, SigQueuePayload,
-    WaitStatus, WCONTINUED, WNOHANG, WUNTRACED,
+    ProcessVmReadWriteEngine, ProcessWaiterAndRusageCollector, SigQueuePayload, WaitStatus,
+    WCONTINUED, WNOHANG, WUNTRACED,
 };
 
 pub use sovereign_process_engine::{

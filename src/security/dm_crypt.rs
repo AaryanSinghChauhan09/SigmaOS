@@ -25,7 +25,7 @@ pub enum LuksCipher {
 impl LuksCipher {
     pub fn key_size_bytes(&self) -> usize {
         match self {
-            Self::Aes256Xts => 64,  // 2×256-bit for XTS
+            Self::Aes256Xts => 64, // 2×256-bit for XTS
             Self::Aes256Gcm => 32,
             Self::ChaCha20Poly1305 => 32,
         }
@@ -157,16 +157,24 @@ impl DmCryptDevice {
     /// Close the device (zero the key material from memory).
     pub fn close(&mut self) {
         // Zero key material — critical for security
-        for b in self.key.iter_mut() { *b = 0; }
+        for b in self.key.iter_mut() {
+            *b = 0;
+        }
         self.key.clear();
         self.is_open = false;
     }
 
     /// Encrypt and write a sector (XTS-style simulation).
     pub fn write_sector(&mut self, sector_idx: u64, plaintext: &[u8]) -> Result<(), &'static str> {
-        if !self.is_open { return Err("Device not open"); }
-        if sector_idx >= self.num_sectors { return Err("Sector out of range"); }
-        if plaintext.len() != self.sector_size as usize { return Err("Wrong sector size"); }
+        if !self.is_open {
+            return Err("Device not open");
+        }
+        if sector_idx >= self.num_sectors {
+            return Err("Sector out of range");
+        }
+        if plaintext.len() != self.sector_size as usize {
+            return Err("Wrong sector size");
+        }
         let mut ciphertext = plaintext.to_vec();
         // Simulation: XOR with key + sector index tweak (real XTS uses AES-256)
         let tweak = sector_idx.to_le_bytes();
@@ -179,8 +187,12 @@ impl DmCryptDevice {
 
     /// Decrypt and read a sector.
     pub fn read_sector(&self, sector_idx: u64) -> Result<Vec<u8>, &'static str> {
-        if !self.is_open { return Err("Device not open"); }
-        if sector_idx >= self.num_sectors { return Err("Sector out of range"); }
+        if !self.is_open {
+            return Err("Device not open");
+        }
+        if sector_idx >= self.num_sectors {
+            return Err("Sector out of range");
+        }
         let ciphertext = &self.sectors[sector_idx as usize];
         let mut plaintext = ciphertext.clone();
         let tweak = sector_idx.to_le_bytes();
@@ -219,7 +231,10 @@ mod tests {
         plaintext[511] = 0xFF;
         dev.write_sector(0, &plaintext).unwrap();
         let decrypted = dev.read_sector(0).unwrap();
-        assert_eq!(decrypted, plaintext, "decrypted must match original plaintext");
+        assert_eq!(
+            decrypted, plaintext,
+            "decrypted must match original plaintext"
+        );
     }
 
     #[test]
@@ -235,7 +250,8 @@ mod tests {
 
     #[test]
     fn test_close_zeroes_key() {
-        let mut dev = DmCryptDevice::format(LuksCipher::ChaCha20Poly1305, LuksKdf::Pbkdf2Sha512, 4, 512);
+        let mut dev =
+            DmCryptDevice::format(LuksCipher::ChaCha20Poly1305, LuksKdf::Pbkdf2Sha512, 4, 512);
         dev.open(b"pw").unwrap();
         assert!(!dev.key.is_empty());
         dev.close();

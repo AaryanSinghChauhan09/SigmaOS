@@ -2322,7 +2322,7 @@ impl VectorDraftEngine {
         for shape in &self.shapes {
             match shape.shape_type {
                 "Line" => perimeter += shape.size,
-                "Circle" => perimeter += 2.0 * 3.14159 * shape.size,
+                "Circle" => perimeter += 2.0 * core::f32::consts::PI * shape.size,
                 "Rect" => perimeter += 4.0 * shape.size,
                 _ => {}
             }

@@ -205,8 +205,8 @@ impl SovereignCachyosUltimateGapClosureSuite {
         self.microarch_opt.set_microarch_level(MicroarchLevel::V4);
         self.kernel_tuner.enable_gamemode();
 
-        burst >= 0
-            && matched
+        // `burst` is u64: the previous `burst >= 0` check was a tautology.
+        matched
             && self.microarch_opt.current_level == MicroarchLevel::V4
             && self.kernel_tuner.gamemode_profile_active
     }

@@ -12,18 +12,18 @@ use alloc::vec::Vec;
 /// Extent flags indicating extent type and sharing status
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ExtentFlags {
-    Data,           // Regular data extent
-    Tree,           // Metadata tree extent
-    SharedData,     // Shared data extent (multiple references)
-    SharedTree,     // Shared tree extent
+    Data,       // Regular data extent
+    Tree,       // Metadata tree extent
+    SharedData, // Shared data extent (multiple references)
+    SharedTree, // Shared tree extent
 }
 
 /// Btrfs extent item in the extent tree
 #[derive(Debug, Clone, Copy)]
 pub struct ExtentItem {
-    pub bytenr: u64,        // Logical byte number (address)
-    pub length: u64,        // Extent length in bytes
-    pub ref_count: u32,     // Reference count (CoW sharing)
+    pub bytenr: u64,    // Logical byte number (address)
+    pub length: u64,    // Extent length in bytes
+    pub ref_count: u32, // Reference count (CoW sharing)
     pub flags: ExtentFlags,
 }
 
@@ -51,7 +51,7 @@ impl BtrfsExtentTree {
                 return;
             }
         }
-        
+
         // Create new extent
         self.items.push(ExtentItem {
             bytenr,
@@ -67,10 +67,10 @@ impl BtrfsExtentTree {
             if self.items[i].bytenr == bytenr {
                 if self.items[i].ref_count > 1 {
                     self.items[i].ref_count -= 1;
-                    return false;  // Still referenced
+                    return false; // Still referenced
                 } else {
                     self.items.remove(i);
-                    return true;   // Orphaned, can be freed
+                    return true; // Orphaned, can be freed
                 }
             }
         }
@@ -97,7 +97,7 @@ pub struct BtrfsSubvolume {
     pub root_bytenr: u64,
     pub parent_id: u64,
     pub read_only: bool,
-    pub snapshot_of: Option<u64>,  // If snapshot, points to source subvolume
+    pub snapshot_of: Option<u64>, // If snapshot, points to source subvolume
 }
 
 /// Btrfs snapshot error types
@@ -120,9 +120,9 @@ pub struct ExtentDiff {
 /// Difference type for incremental snapshots
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DiffKind {
-    Added,      // New extent in target snapshot
-    Removed,    // Extent removed in target snapshot
-    Modified,   // Extent exists in both but modified
+    Added,    // New extent in target snapshot
+    Removed,  // Extent removed in target snapshot
+    Modified, // Extent exists in both but modified
 }
 
 /// Btrfs snapshot management engine
@@ -143,7 +143,7 @@ impl BtrfsSnapshotEngine {
     }
 
     /// Create a snapshot of a subvolume
-    /// 
+    ///
     /// # Arguments
     /// * `source_id` - Source subvolume ID to snapshot
     /// * `name` - Name for the new snapshot
@@ -155,11 +155,12 @@ impl BtrfsSnapshotEngine {
         read_only: bool,
     ) -> Result<u64, BtrfsSnapshotError> {
         // Find source subvolume
-        let source = self.subvolumes
+        let source = self
+            .subvolumes
             .iter()
             .find(|sv| sv.id == source_id)
             .ok_or(BtrfsSnapshotError::SubvolumeNotFound)?;
-        
+
         // Check if snapshot with name already exists
         if self.subvolumes.iter().any(|sv| sv.name == name) {
             return Err(BtrfsSnapshotError::SnapshotExists);
@@ -172,7 +173,7 @@ impl BtrfsSnapshotEngine {
         let snapshot = BtrfsSubvolume {
             id: snapshot_id,
             name,
-            root_bytenr: source.root_bytenr,  // Initially shares root
+            root_bytenr: source.root_bytenr, // Initially shares root
             parent_id: source_id,
             read_only,
             snapshot_of: Some(source_id),
@@ -180,7 +181,8 @@ impl BtrfsSnapshotEngine {
 
         // Increment reference counts on all extents (CoW sharing)
         // In real implementation, would walk the tree and increment refs
-        self.extent_tree.add_ref(source.root_bytenr, 4096, ExtentFlags::Tree);
+        self.extent_tree
+            .add_ref(source.root_bytenr, 4096, ExtentFlags::Tree);
 
         self.subvolumes.push(snapshot);
         Ok(snapshot_id)
@@ -189,7 +191,8 @@ impl BtrfsSnapshotEngine {
     /// Delete a snapshot
     pub fn delete_snapshot(&mut self, id: u64) -> Result<(), BtrfsSnapshotError> {
         // Find snapshot index
-        let index = self.subvolumes
+        let index = self
+            .subvolumes
             .iter()
             .position(|sv| sv.id == id)
             .ok_or(BtrfsSnapshotError::SubvolumeNotFound)?;
@@ -256,7 +259,7 @@ mod tests {
     #[test]
     fn test_create_read_only_snapshot() {
         let mut engine = BtrfsSnapshotEngine::new();
-        
+
         // Create root subvolume
         let root = BtrfsSubvolume {
             id: 1,
@@ -270,9 +273,11 @@ mod tests {
         engine.next_id = 2;
 
         // Create read-only snapshot
-        let snap_id = engine.create_snapshot(1, String::from("snap1"), true).unwrap();
+        let snap_id = engine
+            .create_snapshot(1, String::from("snap1"), true)
+            .unwrap();
         assert_eq!(snap_id, 2);
-        
+
         let snapshot = engine.get_subvolume(snap_id).unwrap();
         assert!(snapshot.read_only);
         assert_eq!(snapshot.snapshot_of, Some(1));
@@ -281,7 +286,7 @@ mod tests {
     #[test]
     fn test_create_writable_snapshot() {
         let mut engine = BtrfsSnapshotEngine::new();
-        
+
         // Create source
         let root = BtrfsSubvolume {
             id: 1,
@@ -295,8 +300,10 @@ mod tests {
         engine.next_id = 2;
 
         // Create writable snapshot
-        let snap_id = engine.create_snapshot(1, String::from("writable_snap"), false).unwrap();
-        
+        let snap_id = engine
+            .create_snapshot(1, String::from("writable_snap"), false)
+            .unwrap();
+
         let snapshot = engine.get_subvolume(snap_id).unwrap();
         assert!(!snapshot.read_only);
     }
@@ -304,30 +311,30 @@ mod tests {
     #[test]
     fn test_snapshot_reference_counting() {
         let mut engine = BtrfsSnapshotEngine::new();
-        
+
         // Add extent
         engine.extent_tree.add_ref(0x1000, 4096, ExtentFlags::Data);
         assert_eq!(engine.extent_tree.items[0].ref_count, 1);
-        
+
         // Add another reference (snapshot shares extent)
         engine.extent_tree.add_ref(0x1000, 4096, ExtentFlags::Data);
         assert_eq!(engine.extent_tree.items[0].ref_count, 2);
-        
+
         // Drop reference
         let orphaned = engine.extent_tree.drop_ref(0x1000);
-        assert!(!orphaned);  // Still one reference
+        assert!(!orphaned); // Still one reference
         assert_eq!(engine.extent_tree.items[0].ref_count, 1);
-        
+
         // Drop last reference
         let orphaned = engine.extent_tree.drop_ref(0x1000);
-        assert!(orphaned);   // Now orphaned
+        assert!(orphaned); // Now orphaned
         assert_eq!(engine.extent_tree.items.len(), 0);
     }
 
     #[test]
     fn test_snapshot_deletion_orphan_cleanup() {
         let mut engine = BtrfsSnapshotEngine::new();
-        
+
         // Create subvolume
         let root = BtrfsSubvolume {
             id: 1,
@@ -342,7 +349,9 @@ mod tests {
         engine.extent_tree.add_ref(0x1000, 4096, ExtentFlags::Tree);
 
         // Create snapshot (increments ref count)
-        let snap_id = engine.create_snapshot(1, String::from("snap"), true).unwrap();
+        let snap_id = engine
+            .create_snapshot(1, String::from("snap"), true)
+            .unwrap();
         assert_eq!(engine.extent_tree.items[0].ref_count, 2);
 
         // Delete snapshot (decrements ref count)
@@ -353,7 +362,7 @@ mod tests {
     #[test]
     fn test_incremental_diff() {
         let mut engine = BtrfsSnapshotEngine::new();
-        
+
         // Create two subvolumes
         let sv1 = BtrfsSubvolume {
             id: 1,
@@ -373,7 +382,7 @@ mod tests {
         };
         engine.subvolumes.push(sv1);
         engine.subvolumes.push(sv2);
-        
+
         // Add some extents
         engine.extent_tree.add_ref(0x1000, 4096, ExtentFlags::Data);
         engine.extent_tree.add_ref(0x2000, 8192, ExtentFlags::Data);

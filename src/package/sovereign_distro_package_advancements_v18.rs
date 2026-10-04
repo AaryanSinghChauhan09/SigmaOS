@@ -84,7 +84,11 @@ impl UniversalMultiFormatPackageIngestionEngineV18 {
 
         let clean_name = filename.split('/').last().unwrap_or(filename);
         let base_name = if let Some(last_dot) = clean_name.rfind('.') {
-            if clean_name.ends_with(".tar.gz") || clean_name.ends_with(".tar.xz") || clean_name.ends_with(".pkg.tar.xz") || clean_name.ends_with(".pkg.tar.zst") {
+            if clean_name.ends_with(".tar.gz")
+                || clean_name.ends_with(".tar.xz")
+                || clean_name.ends_with(".pkg.tar.xz")
+                || clean_name.ends_with(".pkg.tar.zst")
+            {
                 if let Some(first_ext) = clean_name.find(".tar") {
                     &clean_name[..first_ext]
                 } else {
@@ -107,7 +111,10 @@ impl UniversalMultiFormatPackageIngestionEngineV18 {
                 deps.push("sovereign-libc".to_string());
                 provides.push("debian-runtime".to_string());
             }
-            PackageFormat::Rpm | PackageFormat::Drpm | PackageFormat::Yum | PackageFormat::Zypper => {
+            PackageFormat::Rpm
+            | PackageFormat::Drpm
+            | PackageFormat::Yum
+            | PackageFormat::Zypper => {
                 deps.push("sovereign-libc".to_string());
                 provides.push("redhat-runtime".to_string());
             }
@@ -127,7 +134,10 @@ impl UniversalMultiFormatPackageIngestionEngineV18 {
                 deps.push("sovereign-libc".to_string());
                 provides.push("bsd-runtime".to_string());
             }
-            PackageFormat::Flatpak | PackageFormat::FlatpakRef | PackageFormat::Snap | PackageFormat::AppImage => {
+            PackageFormat::Flatpak
+            | PackageFormat::FlatpakRef
+            | PackageFormat::Snap
+            | PackageFormat::AppImage => {
                 provides.push("container-app".to_string());
             }
             _ => {
@@ -148,7 +158,8 @@ impl UniversalMultiFormatPackageIngestionEngineV18 {
             payload_hash: hash_val,
         };
 
-        self.ingested_history.insert(base_name.to_string(), manifest.clone());
+        self.ingested_history
+            .insert(base_name.to_string(), manifest.clone());
         Ok(manifest)
     }
 }
@@ -184,7 +195,9 @@ impl LinuxBsdDistroPackagingPipelineBridgeV18 {
         remap.insert("glibc".to_string(), "sovereign-libc".to_string());
         remap.insert("musl".to_string(), "sovereign-libc".to_string());
 
-        Self { dependency_remap_rules: remap }
+        Self {
+            dependency_remap_rules: remap,
+        }
     }
 
     /// Maps foreign dependency names to canonical sovereign dependency names
@@ -338,7 +351,9 @@ impl SovereignDistroPackageAdvancementsSuiteV18 {
         payload: &[u8],
     ) -> Result<UnifiedPackage, String> {
         let manifest = self.ingestion_engine.ingest_package(filename, payload)?;
-        let _sandbox = self.pipeline_bridge.generate_scriptlet_sandbox(manifest.detected_format);
+        let _sandbox = self
+            .pipeline_bridge
+            .generate_scriptlet_sandbox(manifest.detected_format);
         let sigpkg = self.execution_engine.transpile_to_sigpkg(&manifest);
 
         self.execution_engine.install(&sigpkg.name);
@@ -399,7 +414,11 @@ mod tests {
 
         for (filename, expected_fmt) in test_cases {
             let manifest = engine.ingest_package(filename, b"DATA_PAYLOAD").unwrap();
-            assert_eq!(manifest.detected_format, expected_fmt, "Failed for filename: {}", filename);
+            assert_eq!(
+                manifest.detected_format, expected_fmt,
+                "Failed for filename: {}",
+                filename
+            );
             assert!(!manifest.payload_hash.is_empty());
         }
     }
@@ -410,7 +429,10 @@ mod tests {
 
         assert_eq!(bridge.remap_dependency("libssl-dev"), "sovereign-openssl");
         assert_eq!(bridge.remap_dependency("libc6"), "sovereign-libc");
-        assert_eq!(bridge.remap_dependency("custom-lib"), "sovereign-custom-lib");
+        assert_eq!(
+            bridge.remap_dependency("custom-lib"),
+            "sovereign-custom-lib"
+        );
 
         let sandbox = bridge.generate_scriptlet_sandbox(PackageFormat::Flatpak);
         assert!(sandbox.pledge_promises.contains("inet"));
@@ -423,13 +445,21 @@ mod tests {
 
         let cp1 = suite.execution_engine.create_checkpoint();
 
-        let sigpkg = suite.process_and_install_foreign_package("ripgrep-14.1.0.deb", b"DEB_CONTENT").unwrap();
+        let sigpkg = suite
+            .process_and_install_foreign_package("ripgrep-14.1.0.deb", b"DEB_CONTENT")
+            .unwrap();
         assert_eq!(sigpkg.name, "sigpkg-ripgrep-14.1.0");
         assert_eq!(sigpkg.formats[0], PackageFormat::SigmaPkg);
-        assert!(suite.execution_engine.installed_packages.contains(&"sigpkg-ripgrep-14.1.0".to_string()));
+        assert!(suite
+            .execution_engine
+            .installed_packages
+            .contains(&"sigpkg-ripgrep-14.1.0".to_string()));
 
         // Rollback
         suite.execution_engine.rollback_to_checkpoint(cp1).unwrap();
-        assert!(!suite.execution_engine.installed_packages.contains(&"sigpkg-ripgrep-14.1.0".to_string()));
+        assert!(!suite
+            .execution_engine
+            .installed_packages
+            .contains(&"sigpkg-ripgrep-14.1.0".to_string()));
     }
 }

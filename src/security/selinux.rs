@@ -5,8 +5,8 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::vec::Vec;
 use alloc::collections::BTreeMap;
+use alloc::vec::Vec;
 
 /// SELinux security context (SID)
 pub type SecurityId = u32;
@@ -14,10 +14,10 @@ pub type SecurityId = u32;
 /// SELinux security context structure
 #[derive(Debug, Clone)]
 pub struct SecurityContext {
-    pub user: Vec<u8>,           // SELinux user
-    pub role: Vec<u8>,           // SELinux role
-    pub stype: Vec<u8>,          // SELinux type
-    pub level: Vec<u8>,          // MLS/MCS level (optional)
+    pub user: Vec<u8>,  // SELinux user
+    pub role: Vec<u8>,  // SELinux role
+    pub stype: Vec<u8>, // SELinux type
+    pub level: Vec<u8>, // MLS/MCS level (optional)
 }
 
 impl SecurityContext {
@@ -36,7 +36,7 @@ impl SecurityContext {
         if parts.len() < 3 {
             return Err(SelinuxError::InvalidContext);
         }
-        
+
         let mut ctx = Self::new(parts[0], parts[1], parts[2]);
         if parts.len() >= 4 {
             ctx.level = parts[3].to_vec();
@@ -98,7 +98,7 @@ pub mod permissions {
     pub const FILE_UNLINK: u32 = 0x00000080;
     pub const FILE_LINK: u32 = 0x00000100;
     pub const FILE_RENAME: u32 = 0x00000200;
-    
+
     // Process permissions
     pub const PROCESS_FORK: u32 = 0x00000001;
     pub const PROCESS_TRANSITION: u32 = 0x00000002;
@@ -116,8 +116,8 @@ pub struct AvcEntry {
     pub source_sid: SecurityId,
     pub target_sid: SecurityId,
     pub class: ObjectClass,
-    pub allowed: u32,              // Allowed permissions bitmask
-    pub denied: u32,               // Denied permissions bitmask
+    pub allowed: u32, // Allowed permissions bitmask
+    pub denied: u32,  // Denied permissions bitmask
 }
 
 /// SELinux policy database
@@ -177,9 +177,13 @@ impl PolicyDb {
         class: ObjectClass,
         perm: u32,
     ) -> Result<bool, SelinuxError> {
-        let source_ctx = self.contexts.get(&source_sid)
+        let source_ctx = self
+            .contexts
+            .get(&source_sid)
             .ok_or(SelinuxError::InvalidSid)?;
-        let target_ctx = self.contexts.get(&target_sid)
+        let target_ctx = self
+            .contexts
+            .get(&target_sid)
             .ok_or(SelinuxError::InvalidSid)?;
 
         let key = (source_ctx.stype.clone(), target_ctx.stype.clone(), class);
@@ -198,9 +202,10 @@ impl PolicyDb {
         class: ObjectClass,
     ) -> Option<Vec<u8>> {
         for rule in &self.transitions {
-            if rule.source_type == source_type &&
-               rule.target_type == target_type &&
-               rule.class == class {
+            if rule.source_type == source_type
+                && rule.target_type == target_type
+                && rule.class == class
+            {
                 return Some(rule.default_type.clone());
             }
         }
@@ -322,7 +327,9 @@ impl Selinux {
         }
 
         // Slow path: check policy
-        let allowed = self.policy.check_permission(source_sid, target_sid, class, perm)?;
+        let allowed = self
+            .policy
+            .check_permission(source_sid, target_sid, class, perm)?;
 
         // Update AVC
         if allowed {
@@ -377,24 +384,42 @@ mod tests {
     #[test]
     fn test_policy_allow_rule() {
         let mut policy = PolicyDb::new();
-        policy.add_allow_rule(b"user_t", b"user_home_t", ObjectClass::File, permissions::FILE_READ | permissions::FILE_WRITE);
-        
+        policy.add_allow_rule(
+            b"user_t",
+            b"user_home_t",
+            ObjectClass::File,
+            permissions::FILE_READ | permissions::FILE_WRITE,
+        );
+
         let source_ctx = SecurityContext::new(b"user_u", b"user_r", b"user_t");
         let target_ctx = SecurityContext::new(b"user_u", b"object_r", b"user_home_t");
-        
+
         let source_sid = policy.register_context(source_ctx);
         let target_sid = policy.register_context(target_ctx);
-        
-        assert!(policy.check_permission(source_sid, target_sid, ObjectClass::File, permissions::FILE_READ).unwrap());
+
+        assert!(policy
+            .check_permission(
+                source_sid,
+                target_sid,
+                ObjectClass::File,
+                permissions::FILE_READ
+            )
+            .unwrap());
     }
 
     #[test]
     fn test_avc_cache() {
         let mut avc = Avc::new();
-        assert_eq!(avc.lookup(1, 2, ObjectClass::File, permissions::FILE_READ), None);
-        
+        assert_eq!(
+            avc.lookup(1, 2, ObjectClass::File, permissions::FILE_READ),
+            None
+        );
+
         avc.insert(1, 2, ObjectClass::File, permissions::FILE_READ, 0);
-        assert_eq!(avc.lookup(1, 2, ObjectClass::File, permissions::FILE_READ), Some(true));
+        assert_eq!(
+            avc.lookup(1, 2, ObjectClass::File, permissions::FILE_READ),
+            Some(true)
+        );
         assert_eq!(avc.hits, 1);
     }
 }

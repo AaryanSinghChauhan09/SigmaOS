@@ -66,7 +66,11 @@ impl SovereignUniversalScriptletSandboxPolicyGovernor {
     }
 
     /// Translates maintainer scriptlet permissions into OpenBSD pledge/unveil, FreeBSD Capsicum, and Linux Landlock/Seccomp
-    pub fn generate_policy(&self, format: PackageFormat, _scriptlet_type: &str) -> ScriptletSandboxPolicyV16 {
+    pub fn generate_policy(
+        &self,
+        format: PackageFormat,
+        _scriptlet_type: &str,
+    ) -> ScriptletSandboxPolicyV16 {
         let mut pledge = String::from("stdio rpath wpath cpath proc exec");
         let mut unveil_paths = vec![
             String::from("/usr"),
@@ -219,7 +223,12 @@ impl SovereignUniversalDeltaPatchAndDeduplicationEngine {
     }
 
     /// Registers a path into the Content-Addressed Store with zero-copy deduplication
-    pub fn register_cas_object(&mut self, store_path: &str, content_hash: &str, size_bytes: u64) -> bool {
+    pub fn register_cas_object(
+        &mut self,
+        store_path: &str,
+        content_hash: &str,
+        size_bytes: u64,
+    ) -> bool {
         if let Some(existing) = self.cas_objects.get_mut(content_hash) {
             existing.reference_count += 1;
             self.deduplicated_bytes_total += size_bytes;
@@ -360,8 +369,12 @@ impl SovereignUniversalPackageFormatMasterEngineV16 {
         filename: &str,
         raw_payload: &[u8],
     ) -> Result<TranspiledSigmaPkgManifestV16, String> {
-        let format = PackageFormat::from_filename(filename)
-            .ok_or_else(|| format!("Unsupported package format extension for file: {}", filename))?;
+        let format = PackageFormat::from_filename(filename).ok_or_else(|| {
+            format!(
+                "Unsupported package format extension for file: {}",
+                filename
+            )
+        })?;
 
         let clean_name = filename.split('/').last().unwrap_or(filename);
         let pkg_name = if let Some(idx) = clean_name.rfind('.') {
@@ -475,7 +488,12 @@ mod tests {
         let mut governor = SovereignUniversalMultiBackendRollbackGovernor::new();
 
         let pkgs = vec![String::from("nginx"), String::from("curl")];
-        let snap_id = governor.create_snapshot(BootEnvBackendV16::ZfsBectl, "pre-upgrade", pkgs.clone(), 1700000000);
+        let snap_id = governor.create_snapshot(
+            BootEnvBackendV16::ZfsBectl,
+            "pre-upgrade",
+            pkgs.clone(),
+            1700000000,
+        );
 
         assert_eq!(snap_id, 1001);
 
@@ -487,12 +505,16 @@ mod tests {
     fn test_master_engine_ingest_foreign_package() {
         let mut engine = SovereignUniversalPackageFormatMasterEngineV16::new();
 
-        let manifest = engine.ingest_foreign_package("ripgrep-14.1.0.deb", b"DEB_BINARY_CONTENT").unwrap();
+        let manifest = engine
+            .ingest_foreign_package("ripgrep-14.1.0.deb", b"DEB_BINARY_CONTENT")
+            .unwrap();
         assert_eq!(manifest.name, "ripgrep-14.1.0");
         assert_eq!(manifest.source_format, PackageFormat::Deb);
         assert!(manifest.sandbox_policy.is_isolated);
 
-        let manifest2 = engine.ingest_foreign_package("app.winget", b"WINGET_MANIFEST").unwrap();
+        let manifest2 = engine
+            .ingest_foreign_package("app.winget", b"WINGET_MANIFEST")
+            .unwrap();
         assert_eq!(manifest2.source_format, PackageFormat::Winget);
     }
 }

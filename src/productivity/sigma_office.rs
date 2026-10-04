@@ -6261,15 +6261,12 @@ impl SovereignBusinessProcessAutomationOrchestrator {
                 }
             }
 
-            // Execute action
-            let retries = 0;
-            let mut success = false;
-            while retries <= step.max_retries {
-                // Simulate action execution and context update
-                context.insert(format!("{}_status", step.step_id), "completed".to_string());
-                success = true;
-                break;
-            }
+            // Execute action — single-pass simulation: the executor marks the
+            // step completed on the first attempt (retry accounting is not
+            // modeled; the previous `while retries <= max { ...; break; }`
+            // always ran exactly once and tripped clippy::never_loop).
+            context.insert(format!("{}_status", step.step_id), "completed".to_string());
+            let success = true;
 
             if success {
                 log.push(format!(

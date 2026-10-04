@@ -5,8 +5,8 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::vec::Vec;
 use alloc::collections::BTreeMap;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicU32, Ordering};
 
 /// DRM device types
@@ -31,14 +31,14 @@ pub enum DrmConnectorType {
     SVideo = 6,
     Lvds = 7,
     Component = 8,
-    Dp = 10,              // DisplayPort
-    Hdmi = 11,            // HDMI Type A
-    HdmiB = 12,           // HDMI Type B
+    Dp = 10,    // DisplayPort
+    Hdmi = 11,  // HDMI Type A
+    HdmiB = 12, // HDMI Type B
     Tv = 13,
-    Edp = 14,             // Embedded DisplayPort
+    Edp = 14, // Embedded DisplayPort
     Virtual = 15,
-    Dsi = 16,             // DSI (Mobile)
-    Dpi = 17,             // DPI (Mobile)
+    Dsi = 16, // DSI (Mobile)
+    Dpi = 17, // DPI (Mobile)
     Writeback = 18,
     Spi = 19,
     UsbC = 20,
@@ -59,28 +59,28 @@ pub struct DrmModeFlags {
     pub interlace: bool,
     pub doublescan: bool,
     pub csync: bool,
-    pub pvsync: bool,       // Positive vsync
-    pub nvsync: bool,       // Negative vsync
-    pub phsync: bool,       // Positive hsync
-    pub nhsync: bool,       // Negative hsync
+    pub pvsync: bool, // Positive vsync
+    pub nvsync: bool, // Negative vsync
+    pub phsync: bool, // Positive hsync
+    pub nhsync: bool, // Negative hsync
 }
 
 /// Display mode timing information
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct DrmModeInfo {
-    pub clock: u32,            // Pixel clock in kHz
-    pub hdisplay: u16,         // Horizontal display size
-    pub hsync_start: u16,      // Horizontal sync start
-    pub hsync_end: u16,        // Horizontal sync end
-    pub htotal: u16,           // Horizontal total size
-    pub vdisplay: u16,         // Vertical display size
-    pub vsync_start: u16,      // Vertical sync start
-    pub vsync_end: u16,        // Vertical sync end
-    pub vtotal: u16,           // Vertical total size
-    pub vrefresh: u16,         // Refresh rate in Hz
-    pub flags: u32,            // Mode flags
-    pub name: [u8; 32],        // Mode name
+    pub clock: u32,       // Pixel clock in kHz
+    pub hdisplay: u16,    // Horizontal display size
+    pub hsync_start: u16, // Horizontal sync start
+    pub hsync_end: u16,   // Horizontal sync end
+    pub htotal: u16,      // Horizontal total size
+    pub vdisplay: u16,    // Vertical display size
+    pub vsync_start: u16, // Vertical sync start
+    pub vsync_end: u16,   // Vertical sync end
+    pub vtotal: u16,      // Vertical total size
+    pub vrefresh: u16,    // Refresh rate in Hz
+    pub flags: u32,       // Mode flags
+    pub name: [u8; 32],   // Mode name
 }
 
 impl DrmModeInfo {
@@ -97,7 +97,7 @@ impl DrmModeInfo {
             vsync_end: 1089,
             vtotal: 1125,
             vrefresh: 60,
-            flags: 0x5,        // +hsync +vsync
+            flags: 0x5, // +hsync +vsync
             name: *b"1920x1080\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0",
         }
     }
@@ -125,13 +125,13 @@ impl DrmModeInfo {
 #[repr(u32)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DrmPixelFormat {
-    Rgb565 = 0x36314752,       // 'RG16'
-    Rgb888 = 0x34324752,       // 'RG24'
-    Xrgb8888 = 0x34325258,     // 'XR24'
-    Argb8888 = 0x34325241,     // 'AR24'
-    Bgr565 = 0x36314742,       // 'BG16'
-    Xbgr8888 = 0x34324258,     // 'XB24'
-    Abgr8888 = 0x34324241,     // 'AB24'
+    Rgb565 = 0x36314752,   // 'RG16'
+    Rgb888 = 0x34324752,   // 'RG24'
+    Xrgb8888 = 0x34325258, // 'XR24'
+    Argb8888 = 0x34325241, // 'AR24'
+    Bgr565 = 0x36314742,   // 'BG16'
+    Xbgr8888 = 0x34324258, // 'XB24'
+    Abgr8888 = 0x34324241, // 'AB24'
 }
 
 impl DrmPixelFormat {
@@ -139,8 +139,10 @@ impl DrmPixelFormat {
         match self {
             DrmPixelFormat::Rgb565 | DrmPixelFormat::Bgr565 => 2,
             DrmPixelFormat::Rgb888 => 3,
-            DrmPixelFormat::Xrgb8888 | DrmPixelFormat::Argb8888 |
-            DrmPixelFormat::Xbgr8888 | DrmPixelFormat::Abgr8888 => 4,
+            DrmPixelFormat::Xrgb8888
+            | DrmPixelFormat::Argb8888
+            | DrmPixelFormat::Xbgr8888
+            | DrmPixelFormat::Abgr8888 => 4,
         }
     }
 }
@@ -151,21 +153,21 @@ pub struct DrmFramebuffer {
     pub fb_id: u32,
     pub width: u32,
     pub height: u32,
-    pub pitch: u32,            // Bytes per scanline
+    pub pitch: u32, // Bytes per scanline
     pub format: DrmPixelFormat,
-    pub modifier: u64,         // Format modifier (tiling, compression)
-    pub gem_handle: u32,       // GEM buffer object handle
+    pub modifier: u64,   // Format modifier (tiling, compression)
+    pub gem_handle: u32, // GEM buffer object handle
 }
 
 /// DRM CRTC (Cathode Ray Tube Controller - display controller)
 pub struct DrmCrtc {
     pub crtc_id: u32,
-    pub pipe: u32,             // Hardware pipe index
+    pub pipe: u32, // Hardware pipe index
     pub enabled: bool,
     pub mode: Option<DrmModeInfo>,
-    pub fb_id: Option<u32>,    // Current framebuffer
-    pub x: i32,                // Panning offset X
-    pub y: i32,                // Panning offset Y
+    pub fb_id: Option<u32>, // Current framebuffer
+    pub x: i32,             // Panning offset X
+    pub y: i32,             // Panning offset Y
 }
 
 impl DrmCrtc {
@@ -201,8 +203,8 @@ impl DrmCrtc {
 pub struct DrmEncoder {
     pub encoder_id: u32,
     pub encoder_type: u32,
-    pub possible_crtcs: u32,   // Bitmask of compatible CRTCs
-    pub possible_clones: u32,  // Bitmask of clone-able encoders
+    pub possible_crtcs: u32,  // Bitmask of compatible CRTCs
+    pub possible_clones: u32, // Bitmask of clone-able encoders
 }
 
 /// DRM Connector (physical display output)
@@ -233,11 +235,11 @@ impl DrmConnector {
     pub fn detect(&mut self) -> Result<DrmConnectorStatus, DrmError> {
         // In real implementation: probe hardware and read EDID
         self.status = DrmConnectorStatus::Connected;
-        
+
         // Add standard modes
         self.modes.push(DrmModeInfo::mode_1080p_60());
         self.modes.push(DrmModeInfo::mode_720p_60());
-        
+
         Ok(self.status)
     }
 }
@@ -256,7 +258,7 @@ pub enum DrmDpmsMode {
 pub struct DrmGemObject {
     pub handle: u32,
     pub size: u64,
-    pub phys_addr: u64,        // Physical address (or GPU address)
+    pub phys_addr: u64, // Physical address (or GPU address)
     pub flags: u32,
     pub refcount: AtomicU32,
 }
@@ -356,7 +358,7 @@ impl DrmDevice {
 
         let fb_id = self.alloc_id();
         let pitch = width * format.bytes_per_pixel();
-        
+
         let fb = DrmFramebuffer {
             fb_id,
             width,
@@ -378,7 +380,9 @@ impl DrmDevice {
         fb_id: u32,
         mode: DrmModeInfo,
     ) -> Result<(), DrmError> {
-        let crtc = self.crtcs.iter_mut()
+        let crtc = self
+            .crtcs
+            .iter_mut()
             .find(|c| c.crtc_id == crtc_id)
             .ok_or(DrmError::InvalidCrtc)?;
 
@@ -387,14 +391,16 @@ impl DrmDevice {
         }
 
         crtc.set_mode(mode, fb_id)?;
-        
+
         // In real implementation: program hardware registers
         Ok(())
     }
 
     /// Page flip (atomic buffer swap)
     pub fn page_flip(&mut self, crtc_id: u32, fb_id: u32) -> Result<(), DrmError> {
-        let crtc = self.crtcs.iter_mut()
+        let crtc = self
+            .crtcs
+            .iter_mut()
             .find(|c| c.crtc_id == crtc_id)
             .ok_or(DrmError::InvalidCrtc)?;
 
@@ -403,14 +409,16 @@ impl DrmDevice {
         }
 
         crtc.fb_id = Some(fb_id);
-        
+
         // In real implementation: wait for vblank and flip
         Ok(())
     }
 
     /// Get connector by ID
     pub fn get_connector(&self, connector_id: u32) -> Option<&DrmConnector> {
-        self.connectors.iter().find(|c| c.connector_id == connector_id)
+        self.connectors
+            .iter()
+            .find(|c| c.connector_id == connector_id)
     }
 }
 

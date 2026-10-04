@@ -1520,3 +1520,23 @@ body.high-contrast-active .keyboard-focus {
 .test-suites-form { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
 .test-suite-option { display: flex; align-items: center; gap: 8px; font-size: 0.9em; cursor: pointer; }
 .test-result-console { font-size: 0.85em; margin-top: 8px; font-family: monospace; color: #00ffff; }
+
+/* ==========================================================================
+   Sovereign 60fps Compositor Runtime (smooth drag pipeline + ambient glow)
+   ========================================================================== */
+.window.dragging {
+    transition: none !important; /* kill 0.3s transition lag while dragging */
+    will-change: left, top;
+    cursor: grabbing;
+}
+.window-header {
+    touch-action: none; /* pointer capture without touch scrolling */
+    user-select: none;
+    -webkit-user-select: none;
+}
+#mouse-glow {
+    will-change: transform; /* compositor-only updates, zero layout cost */
+}
+#mouse-glow.warm {
+    opacity: 1;
+}

@@ -241,25 +241,25 @@ impl WaitEvent {
         let entry = WaitQueueEntry::new(tid, flags);
         self.queue.add(entry);
 
-        // Simulate wait loop (in real kernel, would schedule out)
-        loop {
-            if let Some(e) = self.queue.entries.iter().find(|e| e.tid == tid) {
-                if e.is_woken() {
-                    self.queue.remove(tid);
-                    return WaitState::Woken;
-                }
-
-                // Re-check condition
-                if condition() {
-                    e.wake();
-                    self.queue.remove(tid);
-                    return WaitState::Woken;
-                }
-
-                // In real kernel, would yield CPU here
+        // Single-pass simulation of the kernel wait loop: a real kernel would
+        // schedule out and re-evaluate on wake events; the hosted model checks
+        // the waiter state once and reports the result. (The previous
+        // `loop { ...; break; }` shape tripped clippy::never_loop while
+        // adding no iteration semantics.)
+        if let Some(e) = self.queue.entries.iter().find(|e| e.tid == tid) {
+            if e.is_woken() {
+                self.queue.remove(tid);
+                return WaitState::Woken;
             }
 
-            break;
+            // Re-check condition
+            if condition() {
+                e.wake();
+                self.queue.remove(tid);
+                return WaitState::Woken;
+            }
+
+            // In real kernel, would yield CPU here
         }
 
         WaitState::Waiting

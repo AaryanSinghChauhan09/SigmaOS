@@ -95,7 +95,14 @@ impl SovereignWarpinatorEngine {
     }
 
     /// Discover or register a peer on the local subnet (mDNS / DNS-SD simulation)
-    pub fn register_peer(&mut self, peer_id: &str, hostname: &str, ip: [u8; 4], port: u16, pin: u32) {
+    pub fn register_peer(
+        &mut self,
+        peer_id: &str,
+        hostname: &str,
+        ip: [u8; 4],
+        port: u16,
+        pin: u32,
+    ) {
         self.peers.insert(
             peer_id.to_string(),
             WarpinatorPeer {
@@ -110,7 +117,11 @@ impl SovereignWarpinatorEngine {
     }
 
     /// Authenticate a peer with a one-time PIN code
-    pub fn authenticate_peer(&mut self, peer_id: &str, entered_pin: u32) -> Result<bool, &'static str> {
+    pub fn authenticate_peer(
+        &mut self,
+        peer_id: &str,
+        entered_pin: u32,
+    ) -> Result<bool, &'static str> {
         if let Some(peer) = self.peers.get_mut(peer_id) {
             if peer.pin_code == entered_pin {
                 peer.is_trusted = true;
@@ -158,13 +169,18 @@ impl SovereignWarpinatorEngine {
 
     /// Progressively stream chunk bytes over the transfer channel
     pub fn stream_chunk(&mut self, session_id: u64, chunk_len: u64) -> Result<bool, &'static str> {
-        let session = self.sessions.get_mut(&session_id).ok_or("Session not found")?;
+        let session = self
+            .sessions
+            .get_mut(&session_id)
+            .ok_or("Session not found")?;
         if session.status != TransferStatus::Transferring {
             return Err("Session not in transferring state");
         }
 
-        session.transferred_bytes = (session.transferred_bytes + chunk_len).min(session.total_bytes);
-        self.total_bytes_transferred.fetch_add(chunk_len, Ordering::Relaxed);
+        session.transferred_bytes =
+            (session.transferred_bytes + chunk_len).min(session.total_bytes);
+        self.total_bytes_transferred
+            .fetch_add(chunk_len, Ordering::Relaxed);
 
         if session.transferred_bytes >= session.total_bytes {
             session.status = TransferStatus::Completed;
@@ -251,7 +267,10 @@ impl SovereignTimeshiftEngine {
 
     /// Execute atomic instant rollback to a selected snapshot
     pub fn rollback_to_snapshot(&mut self, snapshot_id: u64) -> Result<String, &'static str> {
-        let snap = self.snapshots.get(&snapshot_id).ok_or("Snapshot does not exist")?;
+        let snap = self
+            .snapshots
+            .get(&snapshot_id)
+            .ok_or("Snapshot does not exist")?;
         self.rollback_count.fetch_add(1, Ordering::SeqCst);
         Ok(format!(
             "Atomic rollback successfully staged to snapshot {} (path: {})",
@@ -445,9 +464,20 @@ impl SovereignOmarchyProvisioner {
     /// Fast 60-second workstation bootstrap simulator
     pub fn bootstrap_workstation(&mut self) -> usize {
         let tools = [
-            "neovim", "ghostty", "tmux", "zsh", "starship",
-            "git", "ripgrep", "fzf", "bat", "eza",
-            "btop", "zenith-compositor", "waybar", "swaylock",
+            "neovim",
+            "ghostty",
+            "tmux",
+            "zsh",
+            "starship",
+            "git",
+            "ripgrep",
+            "fzf",
+            "bat",
+            "eza",
+            "btop",
+            "zenith-compositor",
+            "waybar",
+            "swaylock",
         ];
         for t in &tools {
             if !self.installed_packages.contains(&t.to_string()) {
@@ -569,15 +599,20 @@ mod tests {
         let done2 = warpinator.stream_chunk(session_id, 600).unwrap();
         assert!(done2);
 
-        assert_eq!(warpinator.total_bytes_transferred.load(Ordering::Relaxed), 1000);
+        assert_eq!(
+            warpinator.total_bytes_transferred.load(Ordering::Relaxed),
+            1000
+        );
         assert_eq!(warpinator.transfers_completed.load(Ordering::Relaxed), 1);
     }
 
     #[test]
     fn test_timeshift_rollback_and_bootloader() {
         let mut timeshift = SovereignTimeshiftEngine::new(SnapshotBackend::BtrfsSubvolume);
-        let id1 = timeshift.create_pre_upgrade_snapshot("v0.1.0-stable", "Baseline stable snapshot");
-        let id2 = timeshift.create_pre_upgrade_snapshot("v0.2.0-rc1", "Before kernel module updates");
+        let id1 =
+            timeshift.create_pre_upgrade_snapshot("v0.1.0-stable", "Baseline stable snapshot");
+        let id2 =
+            timeshift.create_pre_upgrade_snapshot("v0.2.0-rc1", "Before kernel module updates");
 
         assert_eq!(id1, 1);
         assert_eq!(id2, 2);

@@ -12,37 +12,37 @@ use core::sync::atomic::{AtomicU32, Ordering};
 #[repr(u8)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MscSubclass {
-    Rbc = 0x01,              // Reduced Block Commands
-    Atapi = 0x02,            // CD/DVD (ATAPI/MMC-5)
-    Qic157 = 0x03,           // Tape (QIC-157)
-    Ufi = 0x04,              // Floppy (UFI)
-    Sff8070i = 0x05,         // Floppy (SFF-8070i)
-    ScsiTransparent = 0x06,  // SCSI transparent command set
-    Lsdfs = 0x07,            // LSD FS
-    Ieee1667 = 0x08,         // IEEE 1667
+    Rbc = 0x01,             // Reduced Block Commands
+    Atapi = 0x02,           // CD/DVD (ATAPI/MMC-5)
+    Qic157 = 0x03,          // Tape (QIC-157)
+    Ufi = 0x04,             // Floppy (UFI)
+    Sff8070i = 0x05,        // Floppy (SFF-8070i)
+    ScsiTransparent = 0x06, // SCSI transparent command set
+    Lsdfs = 0x07,           // LSD FS
+    Ieee1667 = 0x08,        // IEEE 1667
 }
 
 /// USB Mass Storage protocol codes
 #[repr(u8)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MscProtocol {
-    Cbi = 0x00,              // Control/Bulk/Interrupt
-    CbiNoInt = 0x01,         // Control/Bulk without interrupt
-    BulkOnly = 0x50,         // Bulk-Only Transport (most common)
-    Uas = 0x62,              // USB Attached SCSI
+    Cbi = 0x00,      // Control/Bulk/Interrupt
+    CbiNoInt = 0x01, // Control/Bulk without interrupt
+    BulkOnly = 0x50, // Bulk-Only Transport (most common)
+    Uas = 0x62,      // USB Attached SCSI
 }
 
 /// Command Block Wrapper (CBW) for Bulk-Only Transport
 #[repr(C, packed)]
 #[derive(Debug, Clone, Copy)]
 pub struct CommandBlockWrapper {
-    pub signature: u32,           // 0x43425355 "USBC"
-    pub tag: u32,                 // Command tag
+    pub signature: u32,            // 0x43425355 "USBC"
+    pub tag: u32,                  // Command tag
     pub data_transfer_length: u32, // Expected data transfer length
-    pub flags: u8,                // Bit 7: direction (0=OUT, 1=IN)
-    pub lun: u8,                  // Logical Unit Number (bits 0-3)
-    pub cb_length: u8,            // Command block length (1-16)
-    pub command_block: [u8; 16],  // Command block (SCSI CDB)
+    pub flags: u8,                 // Bit 7: direction (0=OUT, 1=IN)
+    pub lun: u8,                   // Logical Unit Number (bits 0-3)
+    pub cb_length: u8,             // Command block length (1-16)
+    pub command_block: [u8; 16],   // Command block (SCSI CDB)
 }
 
 impl CommandBlockWrapper {
@@ -69,10 +69,10 @@ impl CommandBlockWrapper {
 #[repr(C, packed)]
 #[derive(Debug, Clone, Copy)]
 pub struct CommandStatusWrapper {
-    pub signature: u32,           // 0x53425355 "USBS"
-    pub tag: u32,                 // Command tag (matches CBW)
-    pub data_residue: u32,        // Difference in data transferred
-    pub status: u8,               // Command status
+    pub signature: u32,    // 0x53425355 "USBS"
+    pub tag: u32,          // Command tag (matches CBW)
+    pub data_residue: u32, // Difference in data transferred
+    pub status: u8,        // Command status
 }
 
 impl CommandStatusWrapper {
@@ -125,11 +125,11 @@ pub enum ScsiOpcode {
 #[repr(C, packed)]
 #[derive(Debug, Clone, Copy)]
 pub struct ScsiInquiryData {
-    pub peripheral: u8,           // Peripheral device type
-    pub removable: u8,            // Removable media bit
-    pub version: u8,              // SCSI version
-    pub response_format: u8,      // Response data format
-    pub additional_length: u8,    // Additional length
+    pub peripheral: u8,        // Peripheral device type
+    pub removable: u8,         // Removable media bit
+    pub version: u8,           // SCSI version
+    pub response_format: u8,   // Response data format
+    pub additional_length: u8, // Additional length
     pub flags1: u8,
     pub flags2: u8,
     pub flags3: u8,
@@ -142,8 +142,8 @@ pub struct ScsiInquiryData {
 #[repr(C, packed)]
 #[derive(Debug, Clone, Copy)]
 pub struct ScsiReadCapacity10Data {
-    pub last_lba: u32,            // Last logical block address (big-endian)
-    pub block_size: u32,          // Block size in bytes (big-endian)
+    pub last_lba: u32,   // Last logical block address (big-endian)
+    pub block_size: u32, // Block size in bytes (big-endian)
 }
 
 impl ScsiReadCapacity10Data {
@@ -166,7 +166,7 @@ pub struct MscDevice {
     pub protocol: MscProtocol,
     pub vendor_id: u16,
     pub product_id: u16,
-    pub max_lun: u8,              // Maximum Logical Unit Number
+    pub max_lun: u8, // Maximum Logical Unit Number
     pub tag_counter: AtomicU32,
     pub block_size: u32,
     pub total_blocks: u64,
@@ -174,7 +174,12 @@ pub struct MscDevice {
 }
 
 impl MscDevice {
-    pub fn new(subclass: MscSubclass, protocol: MscProtocol, vendor_id: u16, product_id: u16) -> Self {
+    pub fn new(
+        subclass: MscSubclass,
+        protocol: MscProtocol,
+        vendor_id: u16,
+        product_id: u16,
+    ) -> Self {
         Self {
             subclass,
             protocol,
@@ -197,11 +202,11 @@ impl MscDevice {
     pub fn build_inquiry_cdb(&self) -> Vec<u8> {
         vec![
             ScsiOpcode::Inquiry as u8,
-            0x00,                     // Reserved/flags
-            0x00,                     // Page code
-            0x00,                     // Reserved
-            36,                       // Allocation length
-            0x00,                     // Control
+            0x00, // Reserved/flags
+            0x00, // Page code
+            0x00, // Reserved
+            36,   // Allocation length
+            0x00, // Control
         ]
     }
 
@@ -209,7 +214,11 @@ impl MscDevice {
     pub fn build_test_unit_ready_cdb(&self) -> Vec<u8> {
         vec![
             ScsiOpcode::TestUnitReady as u8,
-            0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
         ]
     }
 
@@ -217,11 +226,15 @@ impl MscDevice {
     pub fn build_read_capacity10_cdb(&self) -> Vec<u8> {
         vec![
             ScsiOpcode::ReadCapacity10 as u8,
-            0x00,                     // Reserved/LUN
-            0x00, 0x00, 0x00, 0x00,  // LBA (0 = report last LBA)
-            0x00, 0x00,              // Reserved
-            0x00,                     // PMI (0)
-            0x00,                     // Control
+            0x00, // Reserved/LUN
+            0x00,
+            0x00,
+            0x00,
+            0x00, // LBA (0 = report last LBA)
+            0x00,
+            0x00, // Reserved
+            0x00, // PMI (0)
+            0x00, // Control
         ]
     }
 
@@ -229,15 +242,15 @@ impl MscDevice {
     pub fn build_read10_cdb(&self, lba: u32, num_blocks: u16) -> Vec<u8> {
         vec![
             ScsiOpcode::Read10 as u8,
-            0x00,                     // Flags
-            (lba >> 24) as u8,        // LBA (big-endian)
+            0x00,              // Flags
+            (lba >> 24) as u8, // LBA (big-endian)
             (lba >> 16) as u8,
             (lba >> 8) as u8,
             lba as u8,
-            0x00,                     // Group number
-            (num_blocks >> 8) as u8,  // Transfer length (big-endian)
+            0x00,                    // Group number
+            (num_blocks >> 8) as u8, // Transfer length (big-endian)
             num_blocks as u8,
-            0x00,                     // Control
+            0x00, // Control
         ]
     }
 
@@ -245,22 +258,27 @@ impl MscDevice {
     pub fn build_write10_cdb(&self, lba: u32, num_blocks: u16) -> Vec<u8> {
         vec![
             ScsiOpcode::Write10 as u8,
-            0x00,                     // Flags
-            (lba >> 24) as u8,        // LBA (big-endian)
+            0x00,              // Flags
+            (lba >> 24) as u8, // LBA (big-endian)
             (lba >> 16) as u8,
             (lba >> 8) as u8,
             lba as u8,
-            0x00,                     // Group number
-            (num_blocks >> 8) as u8,  // Transfer length (big-endian)
+            0x00,                    // Group number
+            (num_blocks >> 8) as u8, // Transfer length (big-endian)
             num_blocks as u8,
-            0x00,                     // Control
+            0x00, // Control
         ]
     }
 
     /// Execute SCSI command via Bulk-Only Transport
-    pub fn execute_command(&self, cdb: &[u8], data_direction_in: bool, data_length: u32) -> Result<Vec<u8>, MscError> {
+    pub fn execute_command(
+        &self,
+        cdb: &[u8],
+        data_direction_in: bool,
+        data_length: u32,
+    ) -> Result<Vec<u8>, MscError> {
         let tag = self.next_tag();
-        
+
         // Build and send CBW
         let cbw = CommandBlockWrapper::new(tag, data_length, data_direction_in, 0, cdb);
         // In real implementation: send CBW via USB bulk OUT endpoint
@@ -306,10 +324,10 @@ impl MscDevice {
 
         let cdb = self.build_read10_cdb(lba as u32, count as u16);
         let data = self.execute_command(&cdb, true, count * self.block_size)?;
-        
+
         let bytes_read = data.len();
         buffer[..bytes_read].copy_from_slice(&data);
-        
+
         Ok(bytes_read)
     }
 
@@ -321,7 +339,7 @@ impl MscDevice {
 
         let cdb = self.build_write10_cdb(lba as u32, count as u16);
         self.execute_command(&cdb, false, count * self.block_size)?;
-        
+
         Ok(count as usize * self.block_size as usize)
     }
 
@@ -334,7 +352,7 @@ impl MscDevice {
         // Read capacity
         let cdb = self.build_read_capacity10_cdb();
         let data = self.execute_command(&cdb, true, 8)?;
-        
+
         if data.len() >= 8 {
             let capacity = unsafe { *(data.as_ptr() as *const ScsiReadCapacity10Data) };
             self.total_blocks = (capacity.get_last_lba() as u64) + 1;

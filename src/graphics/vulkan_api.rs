@@ -5,8 +5,8 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::vec::Vec;
 use alloc::collections::BTreeMap;
+use alloc::vec::Vec;
 
 /// Vulkan API version
 pub const VK_API_VERSION_1_3: u32 = (1 << 22) | (3 << 12);
@@ -116,7 +116,7 @@ pub struct VkPhysicalDeviceSparseProperties {
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct VkQueueFamilyProperties {
-    pub queue_flags: u32,        // VK_QUEUE_*_BIT
+    pub queue_flags: u32, // VK_QUEUE_*_BIT
     pub queue_count: u32,
     pub timestamp_valid_bits: u32,
     pub min_image_transfer_granularity: VkExtent3D,
@@ -292,7 +292,12 @@ impl VulkanDevice {
     }
 
     /// Create image
-    pub fn create_image(&mut self, width: u32, height: u32, format: VkFormat) -> Result<VkImage, VkResult> {
+    pub fn create_image(
+        &mut self,
+        width: u32,
+        height: u32,
+        format: VkFormat,
+    ) -> Result<VkImage, VkResult> {
         let image_handle = self.images.len() as u64 + 1;
         let image = VulkanImage {
             handle: image_handle,

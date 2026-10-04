@@ -37,7 +37,9 @@ impl Systemd600AutonomousPqcSelfHealingMeshOrchestrator {
     }
 
     pub fn orchestrate_quantum_mesh(&self) -> bool {
-        self.active_services_count > 0 && self.self_healing_active && self.sub_zeptosecond_restart_latency_zs <= 10
+        self.active_services_count > 0
+            && self.self_healing_active
+            && self.sub_zeptosecond_restart_latency_zs <= 10
     }
 }
 
@@ -132,7 +134,9 @@ impl FreeBsd350QuantumVnetXdpMeshEngine {
     }
 
     pub fn process_zero_copy_packets(&self) -> bool {
-        self.ebpf_xdp_sub_picosecond_offload && self.active_vnet_micro_jails > 0 && self.capsicum_fd_rights_enforced
+        self.ebpf_xdp_sub_picosecond_offload
+            && self.active_vnet_micro_jails > 0
+            && self.capsicum_fd_rights_enforced
     }
 }
 
@@ -162,7 +166,9 @@ impl Wayland600ZeroCopyDisplayEngine {
     }
 
     pub fn render_quantum_frame(&self) -> bool {
-        self.lut_color_depth_bits >= 64 && self.quantum_neural_hdr_active && self.per_surface_3d_lut_enabled
+        self.lut_color_depth_bits >= 64
+            && self.quantum_neural_hdr_active
+            && self.per_surface_3d_lut_enabled
     }
 }
 
@@ -188,8 +194,13 @@ impl HaikuBfsDatabaseQueryEngine {
         // Pre-populate sample attribute index
         let mut file_attrs = BTreeMap::new();
         file_attrs.insert(String::from("BEOS:TYPE"), String::from("text/plain"));
-        file_attrs.insert(String::from("META:AUTHOR"), String::from("SigmaOS Master Developer"));
-        engine.attribute_indices.insert(String::from("/system/kernel.rs"), file_attrs);
+        file_attrs.insert(
+            String::from("META:AUTHOR"),
+            String::from("SigmaOS Master Developer"),
+        );
+        engine
+            .attribute_indices
+            .insert(String::from("/system/kernel.rs"), file_attrs);
         engine
     }
 
@@ -226,13 +237,18 @@ impl Plan9SyntheticNamespaceRforkEngine {
             mounted_namespaces: BTreeMap::new(),
             rfork_flags_mask: 0x0001 | 0x0002 | 0x0004, // RFNAMEG | RFENVG | RFFDG
         };
-        engine.mounted_namespaces.insert(String::from("/net"), String::from("9p://network_service"));
-        engine.mounted_namespaces.insert(String::from("/dev"), String::from("9p://device_service"));
+        engine
+            .mounted_namespaces
+            .insert(String::from("/net"), String::from("9p://network_service"));
+        engine
+            .mounted_namespaces
+            .insert(String::from("/dev"), String::from("9p://device_service"));
         engine
     }
 
     pub fn rfork_mount_namespace(&mut self, mount_point: &str, service_uri: &str) -> bool {
-        self.mounted_namespaces.insert(String::from(mount_point), String::from(service_uri));
+        self.mounted_namespaces
+            .insert(String::from(mount_point), String::from(service_uri));
         true
     }
 }
@@ -285,10 +301,17 @@ impl Sovereign2075DistroSupremacyMasterSuite {
         if self.display_engine.render_quantum_frame() {
             score += 15;
         }
-        if !self.haiku_bfs_query.query_attribute("BEOS:TYPE", "text/plain").is_empty() {
+        if !self
+            .haiku_bfs_query
+            .query_attribute("BEOS:TYPE", "text/plain")
+            .is_empty()
+        {
             score += 15;
         }
-        if self.plan9_namespace.rfork_mount_namespace("/proc", "9p://proc_service") {
+        if self
+            .plan9_namespace
+            .rfork_mount_namespace("/proc", "9p://proc_service")
+        {
             score += 10;
         }
         score
@@ -350,7 +373,10 @@ mod tests {
     fn test_plan9_synthetic_namespace_engine() {
         let mut engine = Plan9SyntheticNamespaceRforkEngine::new();
         assert!(engine.rfork_mount_namespace("/proc", "9p://proc_service"));
-        assert_eq!(engine.mounted_namespaces.get("/proc").unwrap(), "9p://proc_service");
+        assert_eq!(
+            engine.mounted_namespaces.get("/proc").unwrap(),
+            "9p://proc_service"
+        );
     }
 
     #[test]

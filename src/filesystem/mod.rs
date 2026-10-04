@@ -1,9 +1,12 @@
 // SigmaOS Filesystem Module
 pub mod archive;
 pub mod bsd_linux_innovations;
+pub mod btrfs;
+pub mod btrfs_snapshots;
 pub mod cow_snapshot;
 pub mod defragmenter;
 pub mod disk_usage;
+pub mod ext4;
 pub mod ext4_mount;
 pub mod ext4_ntfs_security;
 pub mod file_monitor;
@@ -11,16 +14,13 @@ pub mod manager;
 pub mod mount_namespace;
 pub mod sigma_fs;
 pub mod smart_symlink;
+pub mod snapshot_manager;
 pub mod support;
+pub mod tmpfs;
 pub mod vfs;
 pub mod watch;
-pub mod ext4;
-pub mod tmpfs;
-pub mod btrfs;
 pub mod zfs;
 pub mod zfs_arc;
-pub mod btrfs_snapshots;
-pub mod snapshot_manager;
 
 pub use crate::filesystem::vfs::{FileType, FsError, Inode, VfsError, VirtualFilesystem};
 pub use smart_symlink::{LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule};
@@ -41,7 +41,10 @@ pub use archive::{
     ArchiveEntry, ArchiveError, ArchiveFormat, ArchiveHandler, ArchiveManager, ArchiveResult,
     CompressionLevel, TarArchiveHandler, ZipArchiveHandler,
 };
-pub use cow_snapshot::{CowSnapshot, CowSnapshotManager, FileTransaction, SnapshotState, MerkleTree, DedupeTable, ExtentRef, MerkleNode, DedupeEntry};
+pub use cow_snapshot::{
+    CowSnapshot, CowSnapshotManager, DedupeEntry, DedupeTable, ExtentRef, FileTransaction,
+    MerkleNode, MerkleTree, SnapshotState,
+};
 pub use defragmenter::{ClusterState, DefragStats, DiskDefragmenter, FragmentedFile};
 pub use disk_usage::{
     AnalysisMode, AnalysisStrategy, DeepAnalysisStrategy, DirectorySizeInfo, DiskUsageAnalyzer,
@@ -64,31 +67,37 @@ pub use file_monitor::{
 };
 pub mod fscrypt_autofs;
 pub mod sovereign_filesystem_hierarchy;
+pub use btrfs::{
+    BtrfsCompression, BtrfsError, BtrfsFilesystem, BtrfsRaidLevel, BtrfsSnapshot, BtrfsStats,
+    BtrfsSuperblock,
+};
+pub use btrfs_snapshots::{
+    BtrfsExtentTree, BtrfsSnapshotEngine, BtrfsSnapshotError, BtrfsSubvolume, DiffKind, ExtentDiff,
+    ExtentFlags, ExtentItem,
+};
+pub use ext4::{
+    Ext4Error, Ext4Extent, Ext4ExtentHeader, Ext4Filesystem, Ext4GroupDesc, Ext4Inode, Ext4Stats,
+    Ext4Superblock,
+};
 pub use fscrypt_autofs::{
     AutofsMountTrigger, FscryptInodeRecord, FscryptPolicy, SovereignFscryptAutofsEngine,
+};
+pub use snapshot_manager::{
+    RetentionPolicy, SnapshotBackend, SnapshotManager, SnapshotManagerError, SnapshotRecord,
+    SnapshotSchedule,
 };
 pub use sovereign_filesystem_hierarchy::{
     EphemeralTmpfsMountGovernor, SovereignAtomicGenerationRootfsGuard,
     SovereignCanonicalFhsResolver, SovereignMultiDistroFhsHierarchyEngine,
     SyntheticProcSysfsProvider,
 };
+pub use tmpfs::{TmpfsError, TmpfsFilesystem, TmpfsInode};
 pub use watch::{EventQueue, ThreadSafeEventQueue, COALESCE_WINDOW_MS, RING_BUFFER_SIZE};
-pub use ext4::{
-    Ext4Filesystem, Ext4Superblock, Ext4Inode, Ext4Error, Ext4Stats,
-    Ext4ExtentHeader, Ext4Extent, Ext4GroupDesc,
-};
-pub use tmpfs::{TmpfsFilesystem, TmpfsInode, TmpfsError};
-pub use btrfs::{
-    BtrfsFilesystem, BtrfsSuperblock, BtrfsError, BtrfsSnapshot,
-    BtrfsStats, BtrfsCompression, BtrfsRaidLevel,
-};
 pub use zfs::{
-    ZfsPool, ZfsVdev, ZfsDataset, ZfsError, ZfsScrubStats,
-    VdevType, VdevState, PoolState, DatasetType,
+    DatasetType, PoolState, VdevState, VdevType, ZfsDataset, ZfsError, ZfsPool, ZfsScrubStats,
+    ZfsVdev,
 };
 pub use zfs_arc::{ArcConfig, ArcEntry, ArcStats, ZfsArc};
-pub use btrfs_snapshots::{BtrfsExtentTree, BtrfsSnapshotEngine, BtrfsSubvolume, ExtentItem, BtrfsSnapshotError, ExtentFlags, ExtentDiff, DiffKind};
-pub use snapshot_manager::{RetentionPolicy, SnapshotBackend, SnapshotManager, SnapshotManagerError, SnapshotRecord, SnapshotSchedule};
 
 pub type FileDescriptor = i32;
 pub type FilePermissions = u32;

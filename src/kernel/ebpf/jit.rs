@@ -4,14 +4,14 @@
 #![no_std]
 extern crate alloc;
 
-use alloc::vec::Vec;
 use super::instructions::{BpfInsn, BpfOpcode};
-use super::instructions::{BPF_CLASS_ALU64, BPF_CLASS_ALU, BPF_CLASS_JMP, BPF_OP_EXIT};
-use super::instructions::{BPF_OP_MOV, BPF_OP_ADD, BPF_OP_SUB, BPF_OP_MUL, BPF_OP_DIV};
-use super::instructions::{BPF_OP_OR, BPF_OP_AND, BPF_OP_XOR, BPF_OP_LSH, BPF_OP_RSH};
-use super::instructions::{BPF_SRC_IMM, BPF_SRC_REG, BPF_OP_JA, BPF_OP_JEQ, BPF_OP_JNE};
-use super::instructions::{BPF_OP_JGT, BPF_OP_JGE, BPF_OP_JLT, BPF_OP_JLE, BPF_OP_CALL};
+use super::instructions::{BPF_CLASS_ALU, BPF_CLASS_ALU64, BPF_CLASS_JMP, BPF_OP_EXIT};
+use super::instructions::{BPF_OP_ADD, BPF_OP_DIV, BPF_OP_MOV, BPF_OP_MUL, BPF_OP_SUB};
+use super::instructions::{BPF_OP_AND, BPF_OP_LSH, BPF_OP_OR, BPF_OP_RSH, BPF_OP_XOR};
+use super::instructions::{BPF_OP_CALL, BPF_OP_JGE, BPF_OP_JGT, BPF_OP_JLE, BPF_OP_JLT};
+use super::instructions::{BPF_OP_JA, BPF_OP_JEQ, BPF_OP_JNE, BPF_SRC_IMM, BPF_SRC_REG};
 use super::verifier::VerifiedProg;
+use alloc::vec::Vec;
 
 /// x86_64 register encoding
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -37,17 +37,17 @@ pub enum X86Register {
 
 /// eBPF R0-R10 to x86_64 register mapping (Linux-compatible)
 pub const X86_REG_MAP: [X86Register; 11] = [
-    X86Register::Rax,  // R0 (return value)
-    X86Register::Rdi,  // R1 (arg1)
-    X86Register::Rsi,  // R2 (arg2)
-    X86Register::Rdx,  // R3 (arg3)
-    X86Register::Rcx,  // R4 (arg4)
-    X86Register::R8,   // R5 (arg5)
-    X86Register::Rbx,  // R6 (callee-saved)
-    X86Register::R13,  // R7 (callee-saved)
-    X86Register::R14,  // R8 (callee-saved)
-    X86Register::R15,  // R9 (callee-saved)
-    X86Register::Rbp,  // R10 (frame pointer, read-only)
+    X86Register::Rax, // R0 (return value)
+    X86Register::Rdi, // R1 (arg1)
+    X86Register::Rsi, // R2 (arg2)
+    X86Register::Rdx, // R3 (arg3)
+    X86Register::Rcx, // R4 (arg4)
+    X86Register::R8,  // R5 (arg5)
+    X86Register::Rbx, // R6 (callee-saved)
+    X86Register::R13, // R7 (callee-saved)
+    X86Register::R14, // R8 (callee-saved)
+    X86Register::R15, // R9 (callee-saved)
+    X86Register::Rbp, // R10 (frame pointer, read-only)
 ];
 
 /// JIT compilation errors
@@ -69,11 +69,11 @@ impl JitCode {
     pub fn len(&self) -> usize {
         self.code.len()
     }
-    
+
     pub fn is_empty(&self) -> bool {
         self.code.is_empty()
     }
-    
+
     pub fn as_bytes(&self) -> &[u8] {
         &self.code
     }
@@ -82,7 +82,7 @@ impl JitCode {
 /// eBPF to x86_64 JIT compiler
 pub struct JitCompiler {
     code_buffer: Vec<u8>,
-    pc_map: Vec<usize>,  // Maps eBPF PC to x86 offset
+    pc_map: Vec<usize>, // Maps eBPF PC to x86 offset
 }
 
 impl JitCompiler {
@@ -92,40 +92,40 @@ impl JitCompiler {
             pc_map: Vec::new(),
         }
     }
-    
+
     /// Compile verified eBPF program to native x86_64
     pub fn compile(&mut self, prog: &VerifiedProg) -> Result<JitCode, JitError> {
         self.code_buffer.clear();
         self.pc_map = alloc::vec![0; prog.insns.len()];
-        
+
         // Emit prologue
         self.emit_prologue(prog.stack_depth);
-        
+
         // Compile each instruction
         for (pc, insn) in prog.insns.iter().enumerate() {
             self.pc_map[pc] = self.code_buffer.len();
             self.compile_instruction(insn)?;
         }
-        
+
         // Emit epilogue (if not already emitted by EXIT)
         // self.emit_epilogue();
-        
+
         Ok(JitCode {
             code: self.code_buffer.clone(),
             entry_offset: 0,
         })
     }
-    
+
     /// Emit function prologue
     fn emit_prologue(&mut self, stack_depth: u32) {
         // push rbp
         self.emit_u8(0x55);
-        
+
         // mov rbp, rsp
         self.emit_u8(0x48);
         self.emit_u8(0x89);
         self.emit_u8(0xe5);
-        
+
         // push callee-saved registers
         // push rbx
         self.emit_u8(0x53);
@@ -138,7 +138,7 @@ impl JitCompiler {
         // push r15
         self.emit_u8(0x41);
         self.emit_u8(0x57);
-        
+
         // sub rsp, stack_depth (align to 16 bytes)
         if stack_depth > 0 {
             let aligned_depth = ((stack_depth + 15) / 16) * 16;
@@ -149,14 +149,14 @@ impl JitCompiler {
             self.emit_u32(aligned_depth);
         }
     }
-    
+
     /// Emit function epilogue
     fn emit_epilogue(&mut self) {
         // mov rsp, rbp (or just add rsp, stack_depth if we tracked it)
         self.emit_u8(0x48);
         self.emit_u8(0x89);
         self.emit_u8(0xec);
-        
+
         // pop r15
         self.emit_u8(0x41);
         self.emit_u8(0x5f);
@@ -168,25 +168,25 @@ impl JitCompiler {
         self.emit_u8(0x5d);
         // pop rbx
         self.emit_u8(0x5b);
-        
+
         // pop rbp
         self.emit_u8(0x5d);
-        
+
         // ret
         self.emit_u8(0xc3);
     }
-    
+
     /// Compile a single eBPF instruction
     fn compile_instruction(&mut self, insn: &BpfInsn) -> Result<(), JitError> {
         let class = insn.get_class();
         let op = insn.get_op();
         let src = insn.get_src();
-        
+
         match class {
             BPF_CLASS_ALU64 | BPF_CLASS_ALU => {
                 let dst_reg = self.map_reg(insn.dst_reg);
                 let is_64 = class == BPF_CLASS_ALU64;
-                
+
                 match op {
                     BPF_OP_MOV => {
                         if src == BPF_SRC_IMM {
@@ -262,10 +262,10 @@ impl JitCompiler {
             }
             _ => return Err(JitError::UnsupportedInstruction(class)),
         }
-        
+
         Ok(())
     }
-    
+
     /// Map eBPF register to x86_64 register
     fn map_reg(&self, ebpf_reg: u8) -> X86Register {
         if ebpf_reg < 11 {
@@ -274,7 +274,7 @@ impl JitCompiler {
             X86Register::Rax // Fallback
         }
     }
-    
+
     /// Emit MOV reg, imm
     fn emit_mov_reg_imm(&mut self, dst: X86Register, imm: i64, is_64: bool) {
         if is_64 {
@@ -283,59 +283,66 @@ impl JitCompiler {
         } else if (dst as u8) >= 8 {
             self.emit_u8(0x41);
         }
-        
+
         // mov reg, imm32 (sign-extended to 64 bits)
         self.emit_u8(0xc7);
         self.emit_u8(0xc0 | ((dst as u8) & 7));
         self.emit_u32(imm as i32 as u32);
     }
-    
+
     /// Emit MOV dst, src
     fn emit_mov_reg_reg(&mut self, dst: X86Register, src: X86Register, is_64: bool) {
         if is_64 {
             // REX.W + REX.R + REX.B
-            let rex = 0x48 
-                | (if (dst as u8) >= 8 { 1 } else { 0 }) 
+            let rex = 0x48
+                | (if (dst as u8) >= 8 { 1 } else { 0 })
                 | (if (src as u8) >= 8 { 4 } else { 0 });
             self.emit_u8(rex);
         }
-        
+
         // mov dst, src
         self.emit_u8(0x89);
         let modrm = 0xc0 | (((src as u8) & 7) << 3) | ((dst as u8) & 7);
         self.emit_u8(modrm);
     }
-    
+
     /// Emit ALU operation: dst = dst op imm
-    fn emit_alu_reg_imm(&mut self, dst: X86Register, imm: i32, opcode: u8, reg_ext: u8, is_64: bool) {
+    fn emit_alu_reg_imm(
+        &mut self,
+        dst: X86Register,
+        imm: i32,
+        opcode: u8,
+        reg_ext: u8,
+        is_64: bool,
+    ) {
         if is_64 {
             self.emit_u8(0x48 | if (dst as u8) >= 8 { 1 } else { 0 });
         }
-        
+
         self.emit_u8(opcode);
         self.emit_u8(0xc0 | (reg_ext << 3) | ((dst as u8) & 7));
         self.emit_u32(imm as u32);
     }
-    
+
     /// Emit ALU operation: dst = dst op src
     fn emit_alu_reg_reg(&mut self, dst: X86Register, src: X86Register, opcode: u8, is_64: bool) {
         if is_64 {
-            let rex = 0x48 
+            let rex = 0x48
                 | (if (dst as u8) >= 8 { 1 } else { 0 })
                 | (if (src as u8) >= 8 { 4 } else { 0 });
             self.emit_u8(rex);
         }
-        
+
         self.emit_u8(opcode);
         let modrm = 0xc0 | (((src as u8) & 7) << 3) | ((dst as u8) & 7);
         self.emit_u8(modrm);
     }
-    
+
     /// Emit a single byte
     fn emit_u8(&mut self, byte: u8) {
         self.code_buffer.push(byte);
     }
-    
+
     /// Emit a 32-bit immediate
     fn emit_u32(&mut self, val: u32) {
         self.code_buffer.extend_from_slice(&val.to_le_bytes());
@@ -352,44 +359,39 @@ impl Default for JitCompiler {
 mod tests {
     use super::*;
     use crate::kernel::ebpf::verifier::BpfVerifier;
-    
+
     #[test]
     fn test_jit_compile_simple() {
-        let prog = vec![
-            BpfInsn::alu64_imm(BPF_OP_MOV, 0, 42),
-            BpfInsn::exit_insn(),
-        ];
-        
+        let prog = vec![BpfInsn::alu64_imm(BPF_OP_MOV, 0, 42), BpfInsn::exit_insn()];
+
         let verifier = BpfVerifier::new(prog);
         let verified = verifier.verify().unwrap();
-        
+
         let mut compiler = JitCompiler::new();
         let code = compiler.compile(&verified).unwrap();
-        
+
         assert!(!code.is_empty());
         assert!(code.len() > 10); // Should have prologue + instructions + epilogue
     }
-    
+
     #[test]
     fn test_jit_prologue_emitted() {
-        let prog = vec![
-            BpfInsn::exit_insn(),
-        ];
-        
+        let prog = vec![BpfInsn::exit_insn()];
+
         let verifier = BpfVerifier::new(prog);
         let verified = verifier.verify().unwrap();
-        
+
         let mut compiler = JitCompiler::new();
         let code = compiler.compile(&verified).unwrap();
-        
+
         // Check for push rbp (0x55)
         assert_eq!(code.as_bytes()[0], 0x55);
     }
-    
+
     #[test]
     fn test_register_mapping() {
         let compiler = JitCompiler::new();
-        
+
         assert_eq!(compiler.map_reg(0), X86Register::Rax);
         assert_eq!(compiler.map_reg(1), X86Register::Rdi);
         assert_eq!(compiler.map_reg(10), X86Register::Rbp);

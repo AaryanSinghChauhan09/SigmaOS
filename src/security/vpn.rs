@@ -641,7 +641,11 @@ impl PiaVpnManager {
         }
 
         self.state = ConnectionState::Connecting;
-        let region = self.active_region.as_ref().ok_or_else(|| VpnError::ConfigurationError("No active region".to_string()))?.clone();
+        let region = self
+            .active_region
+            .as_ref()
+            .ok_or_else(|| VpnError::ConfigurationError("No active region".to_string()))?
+            .clone();
 
         if self.port_forwarding.enabled {
             let _ = self

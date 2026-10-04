@@ -5,8 +5,8 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::vec::Vec;
 use alloc::collections::BTreeMap;
+use alloc::vec::Vec;
 
 /// Container ID type
 pub type ContainerId = Vec<u8>;
@@ -36,25 +36,25 @@ pub struct ContainerConfig {
 /// Root filesystem configuration
 #[derive(Debug, Clone)]
 pub struct ContainerRoot {
-    pub path: Vec<u8>,            // Path to rootfs
+    pub path: Vec<u8>, // Path to rootfs
     pub readonly: bool,
 }
 
 /// Mount configuration
 #[derive(Debug, Clone)]
 pub struct Mount {
-    pub destination: Vec<u8>,     // Mount point in container
-    pub source: Vec<u8>,          // Source path on host
-    pub mount_type: Vec<u8>,      // Mount type (bind, tmpfs, etc.)
-    pub options: Vec<Vec<u8>>,    // Mount options
+    pub destination: Vec<u8>,  // Mount point in container
+    pub source: Vec<u8>,       // Source path on host
+    pub mount_type: Vec<u8>,   // Mount type (bind, tmpfs, etc.)
+    pub options: Vec<Vec<u8>>, // Mount options
 }
 
 /// Process configuration
 #[derive(Debug, Clone)]
 pub struct ProcessConfig {
-    pub args: Vec<Vec<u8>>,       // Command and arguments
-    pub env: Vec<Vec<u8>>,        // Environment variables
-    pub cwd: Vec<u8>,             // Working directory
+    pub args: Vec<Vec<u8>>, // Command and arguments
+    pub env: Vec<Vec<u8>>,  // Environment variables
+    pub cwd: Vec<u8>,       // Working directory
     pub user: User,
     pub capabilities: Option<Capabilities>,
     pub rlimits: Vec<Rlimit>,
@@ -85,7 +85,7 @@ pub struct LinuxConfig {
 #[derive(Debug, Clone, Copy)]
 pub struct Namespace {
     pub ns_type: NamespaceType,
-    pub path: Option<u64>,        // Path to existing namespace (if joining)
+    pub path: Option<u64>, // Path to existing namespace (if joining)
 }
 
 #[repr(u32)]
@@ -103,13 +103,13 @@ pub enum NamespaceType {
 impl NamespaceType {
     pub fn to_clone_flag(&self) -> u64 {
         match self {
-            NamespaceType::Pid => 0x20000000,      // CLONE_NEWPID
-            NamespaceType::Network => 0x40000000,  // CLONE_NEWNET
-            NamespaceType::Mount => 0x00020000,    // CLONE_NEWNS
-            NamespaceType::Ipc => 0x08000000,      // CLONE_NEWIPC
-            NamespaceType::Uts => 0x04000000,      // CLONE_NEWUTS
-            NamespaceType::User => 0x10000000,     // CLONE_NEWUSER
-            NamespaceType::Cgroup => 0x02000000,   // CLONE_NEWCGROUP
+            NamespaceType::Pid => 0x20000000,     // CLONE_NEWPID
+            NamespaceType::Network => 0x40000000, // CLONE_NEWNET
+            NamespaceType::Mount => 0x00020000,   // CLONE_NEWNS
+            NamespaceType::Ipc => 0x08000000,     // CLONE_NEWIPC
+            NamespaceType::Uts => 0x04000000,     // CLONE_NEWUTS
+            NamespaceType::User => 0x10000000,    // CLONE_NEWUSER
+            NamespaceType::Cgroup => 0x02000000,  // CLONE_NEWCGROUP
         }
     }
 }
@@ -214,7 +214,7 @@ pub struct Container {
     pub id: ContainerId,
     pub config: ContainerConfig,
     pub state: ContainerState,
-    pub pid: Option<u32>,         // Container init process PID
+    pub pid: Option<u32>, // Container init process PID
     pub created_at: u64,
     pub started_at: Option<u64>,
 }
@@ -235,17 +235,17 @@ impl Container {
     pub fn create(&mut self) -> Result<(), ContainerError> {
         // 1. Create namespaces
         self.setup_namespaces()?;
-        
+
         // 2. Setup cgroups
         if let Some(linux) = &self.config.linux {
             if let Some(cgroups) = &linux.cgroups {
                 self.setup_cgroups(cgroups)?;
             }
         }
-        
+
         // 3. Prepare rootfs
         self.setup_rootfs()?;
-        
+
         self.state = ContainerState::Created;
         Ok(())
     }
@@ -260,7 +260,7 @@ impl Container {
         // In real implementation: use clone() with namespace flags
         let child_pid = 1; // Placeholder
         self.pid = Some(child_pid);
-        
+
         self.state = ContainerState::Running;
         self.started_at = Some(0); // Would use system time
         Ok(())
@@ -354,17 +354,18 @@ impl ContainerRuntime {
     pub fn run(&mut self, config: ContainerConfig) -> Result<ContainerId, ContainerError> {
         let id = config.id.clone();
         let mut container = Container::new(config);
-        
+
         container.create()?;
         container.start()?;
-        
+
         self.containers.insert(id.clone(), container);
         Ok(id)
     }
 
     /// List all containers
     pub fn list(&self) -> Vec<(ContainerId, ContainerState)> {
-        self.containers.iter()
+        self.containers
+            .iter()
             .map(|(id, c)| (id.clone(), c.state))
             .collect()
     }
@@ -376,9 +377,11 @@ impl ContainerRuntime {
 
     /// Kill container
     pub fn kill(&mut self, id: &[u8], signal: u32) -> Result<(), ContainerError> {
-        let container = self.containers.get_mut(id)
+        let container = self
+            .containers
+            .get_mut(id)
             .ok_or(ContainerError::NotFound)?;
-        
+
         if let Some(pid) = container.pid {
             // Send signal to container process
         }
@@ -415,7 +418,12 @@ mod tests {
                 args: vec![b"/bin/sh".to_vec()],
                 env: Vec::new(),
                 cwd: b"/".to_vec(),
-                user: User { uid: 0, gid: 0, additional_gids: [0; 8], gid_count: 0 },
+                user: User {
+                    uid: 0,
+                    gid: 0,
+                    additional_gids: [0; 8],
+                    gid_count: 0,
+                },
                 capabilities: None,
                 rlimits: Vec::new(),
                 no_new_privileges: false,

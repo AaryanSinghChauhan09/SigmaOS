@@ -5,8 +5,8 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::vec::Vec;
 use alloc::collections::BTreeMap;
+use alloc::vec::Vec;
 
 /// VM identifier
 pub type VmId = u32;
@@ -37,7 +37,7 @@ pub struct VcpuRun {
     pub request_interrupt_window: u8,
     pub immediate_exit: u8,
     pub padding: [u8; 6],
-    
+
     // Exit-specific data (union in C)
     pub exit_data: VmExitData,
 }
@@ -53,8 +53,8 @@ pub struct VmExitData {
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct IoExit {
-    pub direction: u8,        // 0=in, 1=out
-    pub size: u8,             // 1, 2, 4, 8 bytes
+    pub direction: u8, // 0=in, 1=out
+    pub size: u8,      // 1, 2, 4, 8 bytes
     pub port: u16,
     pub count: u32,
     pub data_offset: u64,
@@ -145,13 +145,13 @@ pub struct MemoryRegion {
     pub flags: u32,
     pub guest_phys_addr: u64,
     pub memory_size: u64,
-    pub userspace_addr: u64,    // Host virtual address
+    pub userspace_addr: u64, // Host virtual address
 }
 
 /// IRQ routing entry
 #[derive(Debug, Clone, Copy)]
 pub struct IrqRoute {
-    pub gsi: u32,               // Global System Interrupt
+    pub gsi: u32, // Global System Interrupt
     pub irq_type: IrqType,
     pub chip: u32,
     pub pin: u32,
@@ -265,7 +265,7 @@ impl Vm {
         for existing in &self.memory_regions {
             let existing_end = existing.guest_phys_addr + existing.memory_size;
             let new_end = region.guest_phys_addr + region.memory_size;
-            
+
             if (region.guest_phys_addr < existing_end) && (new_end > existing.guest_phys_addr) {
                 return Err(KvmError::MemoryOverlap);
             }
@@ -325,7 +325,7 @@ impl Kvm {
     pub fn create_vm(&mut self) -> VmId {
         let vm_id = self.next_vm_id;
         self.next_vm_id += 1;
-        
+
         let vm = Vm::new(vm_id);
         self.vms.insert(vm_id, vm);
         vm_id
@@ -338,8 +338,7 @@ impl Kvm {
 
     /// Destroy VM
     pub fn destroy_vm(&mut self, vm_id: VmId) -> Result<(), KvmError> {
-        self.vms.remove(&vm_id)
-            .ok_or(KvmError::VmNotFound)?;
+        self.vms.remove(&vm_id).ok_or(KvmError::VmNotFound)?;
         Ok(())
     }
 }

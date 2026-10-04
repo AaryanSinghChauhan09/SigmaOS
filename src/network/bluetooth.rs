@@ -5,8 +5,8 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::vec::Vec;
 use alloc::collections::BTreeMap;
+use alloc::vec::Vec;
 
 /// Bluetooth Device Address (BD_ADDR) - 48-bit unique address
 #[repr(C)]
@@ -53,7 +53,7 @@ pub enum HciOgf {
 #[repr(C, packed)]
 #[derive(Debug, Clone, Copy)]
 pub struct HciCommand {
-    pub opcode: u16,              // OGF (6 bits) | OCF (10 bits)
+    pub opcode: u16, // OGF (6 bits) | OCF (10 bits)
     pub param_len: u8,
     // Parameters follow
 }
@@ -99,7 +99,7 @@ pub struct HciEvent {
 #[repr(C, packed)]
 #[derive(Debug, Clone, Copy)]
 pub struct HciAclHeader {
-    pub handle: u16,              // Connection handle (12 bits) | PB flag (2) | BC flag (2)
+    pub handle: u16, // Connection handle (12 bits) | PB flag (2) | BC flag (2)
     pub data_len: u16,
 }
 
@@ -107,8 +107,8 @@ pub struct HciAclHeader {
 #[repr(C, packed)]
 #[derive(Debug, Clone, Copy)]
 pub struct L2capHeader {
-    pub length: u16,              // PDU length (excluding header)
-    pub cid: u16,                 // Channel ID
+    pub length: u16, // PDU length (excluding header)
+    pub cid: u16,    // Channel ID
 }
 
 /// L2CAP Channel IDs
@@ -116,13 +116,13 @@ pub struct L2capHeader {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum L2capCid {
     Null = 0x0000,
-    SignalingBr = 0x0001,         // BR/EDR signaling
-    ConnectionlessBr = 0x0002,    // BR/EDR connectionless
-    AmpManagerBr = 0x0003,        // AMP Manager
-    AttBle = 0x0004,              // BLE ATT
-    SignalingLe = 0x0005,         // BLE signaling
-    SmBle = 0x0006,               // BLE Security Manager
-    // Dynamic channels: 0x0040-0xFFFF
+    SignalingBr = 0x0001,      // BR/EDR signaling
+    ConnectionlessBr = 0x0002, // BR/EDR connectionless
+    AmpManagerBr = 0x0003,     // AMP Manager
+    AttBle = 0x0004,           // BLE ATT
+    SignalingLe = 0x0005,      // BLE signaling
+    SmBle = 0x0006,            // BLE Security Manager
+                               // Dynamic channels: 0x0040-0xFFFF
 }
 
 /// L2CAP Signaling command codes
@@ -161,11 +161,11 @@ pub enum SdpDataType {
 #[repr(u8)]
 #[derive(Debug, Clone, Copy)]
 pub enum RfcommFrameType {
-    Sabm = 0x2F,                  // Set Asynchronous Balanced Mode
-    Ua = 0x63,                    // Unnumbered Acknowledgement
-    Dm = 0x0F,                    // Disconnected Mode
-    Disc = 0x43,                  // Disconnect
-    Uih = 0xEF,                   // Unnumbered Info with Header check
+    Sabm = 0x2F, // Set Asynchronous Balanced Mode
+    Ua = 0x63,   // Unnumbered Acknowledgement
+    Dm = 0x0F,   // Disconnected Mode
+    Disc = 0x43, // Disconnect
+    Uih = 0xEF,  // Unnumbered Info with Header check
 }
 
 /// ATT (Attribute Protocol) opcodes for BLE GATT
@@ -246,14 +246,30 @@ impl GattCharProperties {
 
     pub fn to_byte(&self) -> u8 {
         let mut byte = 0u8;
-        if self.broadcast { byte |= 0x01; }
-        if self.read { byte |= 0x02; }
-        if self.write_without_response { byte |= 0x04; }
-        if self.write { byte |= 0x08; }
-        if self.notify { byte |= 0x10; }
-        if self.indicate { byte |= 0x20; }
-        if self.auth_signed_writes { byte |= 0x40; }
-        if self.extended_props { byte |= 0x80; }
+        if self.broadcast {
+            byte |= 0x01;
+        }
+        if self.read {
+            byte |= 0x02;
+        }
+        if self.write_without_response {
+            byte |= 0x04;
+        }
+        if self.write {
+            byte |= 0x08;
+        }
+        if self.notify {
+            byte |= 0x10;
+        }
+        if self.indicate {
+            byte |= 0x20;
+        }
+        if self.auth_signed_writes {
+            byte |= 0x40;
+        }
+        if self.extended_props {
+            byte |= 0x80;
+        }
         byte
     }
 }
@@ -290,11 +306,11 @@ pub struct GattCharacteristic {
 pub struct BluetoothDevice {
     pub addr: BdAddr,
     pub name: Vec<u8>,
-    pub device_class: u32,        // Class of Device (CoD)
+    pub device_class: u32, // Class of Device (CoD)
     pub connected: bool,
     pub paired: bool,
     pub link_key: Option<[u8; 16]>,
-    pub rssi: i8,                 // Signal strength
+    pub rssi: i8, // Signal strength
     pub services: Vec<GattService>,
 }
 
@@ -318,7 +334,7 @@ pub struct BluetoothController {
     pub local_addr: BdAddr,
     pub local_name: Vec<u8>,
     pub devices: BTreeMap<BdAddr, BluetoothDevice>,
-    pub connections: Vec<u16>,    // Active connection handles
+    pub connections: Vec<u16>, // Active connection handles
 }
 
 impl BluetoothController {

@@ -1,4 +1,3 @@
-
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
@@ -296,8 +295,15 @@ impl Default for PledgeManager {
 
 /// Common pledge promises
 pub mod promises {
-    use crate::security::capability::Permission;
     use super::PledgePromise;
+    // PledgePromise is defined in terms of the pledge-local capability module
+    // under standalone_test, and in terms of crate::security::capability
+    // otherwise — mirror the parent file's cfg split so the Permission types
+    // line up in both modes (E0308 mismatch under --all-features before).
+    #[cfg(feature = "standalone_test")]
+    use super::capability::Permission;
+    #[cfg(not(feature = "standalone_test"))]
+    use crate::security::capability::Permission;
 
     /// Stdio promise - basic I/O only
     pub fn stdio() -> PledgePromise {

@@ -177,7 +177,12 @@ mod additional_secure_boot_tests {
     #[test]
     fn test_simple_component_cached_lengths_o1() {
         let name_bytes = b"kernel_v1.0";
-        let mut comp = SimpleComponent::new(1, name_bytes, ComponentType::Kernel, ComponentCapability::full());
+        let mut comp = SimpleComponent::new(
+            1,
+            name_bytes,
+            ComponentType::Kernel,
+            ComponentCapability::full(),
+        );
         assert_eq!(comp.name(), name_bytes);
         assert_eq!(comp.name_len as usize, name_bytes.len());
 

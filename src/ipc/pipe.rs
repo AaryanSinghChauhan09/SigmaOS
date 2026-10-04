@@ -4,9 +4,9 @@
 
 #![allow(dead_code)]
 
+use core::sync::atomic::{AtomicBool, AtomicU32, AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex};
 use std::vec::Vec;
-use core::sync::atomic::{AtomicBool, AtomicU32, AtomicUsize, Ordering};
 
 pub const DEFAULT_PIPE_CAPACITY: usize = 65536; // 16 x 4096 pages (Linux default)
 pub const PAGE_SIZE: usize = 4096;
@@ -334,9 +334,7 @@ pub fn pipe_pair() -> (PipeWriter, PipeReader) {
         PipeWriter {
             pipe: Arc::clone(&kernel_pipe),
         },
-        PipeReader {
-            pipe: kernel_pipe,
-        },
+        PipeReader { pipe: kernel_pipe },
     )
 }
 

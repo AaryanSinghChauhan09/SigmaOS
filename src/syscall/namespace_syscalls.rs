@@ -430,6 +430,7 @@ impl ProcessNamespaceContext {
 ///
 /// - On success: PID of child process
 /// - On error: Negative error code (Linux convention)
+#[allow(clippy::not_unsafe_ptr_arg_deref)] // syscall emulation: models the kernel ABI, pointer validity is the caller's contract (as in Linux)
 pub fn sys_clone(
     flags: u32,
     child_stack: *mut u8,

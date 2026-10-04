@@ -11,8 +11,8 @@
 #![allow(dead_code)]
 
 use std::collections::HashMap;
-use std::vec::Vec;
 use std::string::String;
+use std::vec::Vec;
 
 // ── PageFaultFlags ─────────────────────────────────────────────────────────────
 
@@ -34,12 +34,24 @@ impl PageFaultFlags {
     /// Bit 5: Protection-key violation
     pub const PKEY: u64 = 1 << 5;
 
-    pub fn present(&self) -> bool { self.0 & Self::PRESENT != 0 }
-    pub fn write(&self) -> bool { self.0 & Self::WRITE != 0 }
-    pub fn user(&self) -> bool { self.0 & Self::USER != 0 }
-    pub fn reserved(&self) -> bool { self.0 & Self::RESERVED != 0 }
-    pub fn exec(&self) -> bool { self.0 & Self::EXEC != 0 }
-    pub fn pkey(&self) -> bool { self.0 & Self::PKEY != 0 }
+    pub fn present(&self) -> bool {
+        self.0 & Self::PRESENT != 0
+    }
+    pub fn write(&self) -> bool {
+        self.0 & Self::WRITE != 0
+    }
+    pub fn user(&self) -> bool {
+        self.0 & Self::USER != 0
+    }
+    pub fn reserved(&self) -> bool {
+        self.0 & Self::RESERVED != 0
+    }
+    pub fn exec(&self) -> bool {
+        self.0 & Self::EXEC != 0
+    }
+    pub fn pkey(&self) -> bool {
+        self.0 & Self::PKEY != 0
+    }
 }
 
 impl core::fmt::Display for PageFaultFlags {
@@ -71,10 +83,18 @@ impl VmaFlags {
     pub const SHARED: u32 = 1 << 3;
     pub const GROWSDOWN: u32 = 1 << 4;
 
-    pub fn readable(&self) -> bool { self.0 & Self::READ != 0 }
-    pub fn writable(&self) -> bool { self.0 & Self::WRITE != 0 }
-    pub fn executable(&self) -> bool { self.0 & Self::EXEC != 0 }
-    pub fn shared(&self) -> bool { self.0 & Self::SHARED != 0 }
+    pub fn readable(&self) -> bool {
+        self.0 & Self::READ != 0
+    }
+    pub fn writable(&self) -> bool {
+        self.0 & Self::WRITE != 0
+    }
+    pub fn executable(&self) -> bool {
+        self.0 & Self::EXEC != 0
+    }
+    pub fn shared(&self) -> bool {
+        self.0 & Self::SHARED != 0
+    }
 }
 
 // ── VirtualMemoryArea ─────────────────────────────────────────────────────────
@@ -127,12 +147,18 @@ impl PhysPage {
     pub const PAGE_SIZE: usize = 4096;
 
     pub fn new(pfn: u64) -> Self {
-        Self { pfn, data: vec![0u8; Self::PAGE_SIZE] }
+        Self {
+            pfn,
+            data: vec![0u8; Self::PAGE_SIZE],
+        }
     }
 
     /// Make a copy (for CoW)
     pub fn copy(&self, new_pfn: u64) -> Self {
-        Self { pfn: new_pfn, data: self.data.clone() }
+        Self {
+            pfn: new_pfn,
+            data: self.data.clone(),
+        }
     }
 }
 
@@ -145,7 +171,10 @@ pub struct FrameAllocator {
 
 impl FrameAllocator {
     pub fn new(total_pages: u64) -> Self {
-        Self { next_pfn: 1, free_pages: total_pages }
+        Self {
+            next_pfn: 1,
+            free_pages: total_pages,
+        }
     }
 
     pub fn alloc_page(&mut self) -> Option<PhysPage> {

@@ -5,8 +5,8 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::vec::Vec;
 use alloc::collections::BTreeMap;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicU32, Ordering};
 
 /// Wayland object ID type
@@ -25,7 +25,7 @@ pub struct WlMessage {
 pub enum WlArgument {
     Int(i32),
     Uint(u32),
-    Fixed(i32),              // Fixed-point 24.8
+    Fixed(i32), // Fixed-point 24.8
     String(Vec<u8>),
     Object(ObjectId),
     NewId(ObjectId),
@@ -245,11 +245,29 @@ pub struct SeatCapabilities {
 /// Pointer (mouse) events
 #[derive(Debug, Clone, Copy)]
 pub enum PointerEvent {
-    Enter { surface: ObjectId, x: f64, y: f64 },
-    Leave { surface: ObjectId },
-    Motion { x: f64, y: f64, time: u32 },
-    Button { button: u32, state: ButtonState, time: u32 },
-    Axis { axis: AxisType, value: f64, time: u32 },
+    Enter {
+        surface: ObjectId,
+        x: f64,
+        y: f64,
+    },
+    Leave {
+        surface: ObjectId,
+    },
+    Motion {
+        x: f64,
+        y: f64,
+        time: u32,
+    },
+    Button {
+        button: u32,
+        state: ButtonState,
+        time: u32,
+    },
+    Axis {
+        axis: AxisType,
+        value: f64,
+        time: u32,
+    },
 }
 
 #[repr(u32)]
@@ -269,11 +287,29 @@ pub enum AxisType {
 /// Keyboard events
 #[derive(Debug, Clone, Copy)]
 pub enum KeyboardEvent {
-    Keymap { format: u32, fd: i32, size: u32 },
-    Enter { surface: ObjectId, keys: u32 },
-    Leave { surface: ObjectId },
-    Key { key: u32, state: KeyState, time: u32 },
-    Modifiers { mods_depressed: u32, mods_latched: u32, mods_locked: u32, group: u32 },
+    Keymap {
+        format: u32,
+        fd: i32,
+        size: u32,
+    },
+    Enter {
+        surface: ObjectId,
+        keys: u32,
+    },
+    Leave {
+        surface: ObjectId,
+    },
+    Key {
+        key: u32,
+        state: KeyState,
+        time: u32,
+    },
+    Modifiers {
+        mods_depressed: u32,
+        mods_latched: u32,
+        mods_locked: u32,
+        group: u32,
+    },
 }
 
 #[repr(u32)]
@@ -288,8 +324,8 @@ pub struct WlOutput {
     pub id: ObjectId,
     pub x: i32,
     pub y: i32,
-    pub physical_width: i32,      // mm
-    pub physical_height: i32,     // mm
+    pub physical_width: i32,  // mm
+    pub physical_height: i32, // mm
     pub subpixel: Subpixel,
     pub make: Vec<u8>,
     pub model: Vec<u8>,
@@ -314,8 +350,8 @@ pub enum Subpixel {
 pub struct OutputMode {
     pub width: i32,
     pub height: i32,
-    pub refresh: i32,             // mHz
-    pub flags: u32,               // current, preferred
+    pub refresh: i32, // mHz
+    pub flags: u32,   // current, preferred
 }
 
 /// Wayland compositor state

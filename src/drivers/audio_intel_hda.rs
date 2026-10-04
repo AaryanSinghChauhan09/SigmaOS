@@ -5,67 +5,67 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::vec::Vec;
 use alloc::collections::BTreeMap;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicU32, Ordering};
 
 /// HDA PCI registers (memory-mapped I/O)
 #[repr(C)]
 #[derive(Debug)]
 pub struct HdaRegisters {
-    pub gcap: u16,                // Global Capabilities
-    pub vmin: u8,                 // Minor Version
-    pub vmaj: u8,                 // Major Version
-    pub outpay: u16,              // Output Payload Capability
-    pub inpay: u16,               // Input Payload Capability
-    pub gctl: u32,                // Global Control
-    pub wakeen: u16,              // Wake Enable
-    pub statests: u16,            // State Change Status
-    pub gsts: u16,                // Global Status
+    pub gcap: u16,     // Global Capabilities
+    pub vmin: u8,      // Minor Version
+    pub vmaj: u8,      // Major Version
+    pub outpay: u16,   // Output Payload Capability
+    pub inpay: u16,    // Input Payload Capability
+    pub gctl: u32,     // Global Control
+    pub wakeen: u16,   // Wake Enable
+    pub statests: u16, // State Change Status
+    pub gsts: u16,     // Global Status
     pub _reserved1: u16,
-    pub outstrmpay: u16,          // Output Stream Payload Capability
-    pub instrmpay: u16,           // Input Stream Payload Capability
+    pub outstrmpay: u16, // Output Stream Payload Capability
+    pub instrmpay: u16,  // Input Stream Payload Capability
     pub _reserved2: u32,
-    pub intctl: u32,              // Interrupt Control
-    pub intsts: u32,              // Interrupt Status
+    pub intctl: u32, // Interrupt Control
+    pub intsts: u32, // Interrupt Status
     pub _reserved3: [u32; 2],
-    pub walclk: u32,              // Wall Clock Counter
+    pub walclk: u32, // Wall Clock Counter
     pub _reserved4: u32,
-    pub ssync: u32,               // Stream Synchronization
+    pub ssync: u32, // Stream Synchronization
     pub _reserved5: u32,
-    pub corblbase: u32,           // CORB Lower Base Address
-    pub corbubase: u32,           // CORB Upper Base Address
-    pub corbwp: u16,              // CORB Write Pointer
-    pub corbrp: u16,              // CORB Read Pointer
-    pub corbctl: u8,              // CORB Control
-    pub corbsts: u8,              // CORB Status
-    pub corbsize: u8,             // CORB Size
+    pub corblbase: u32, // CORB Lower Base Address
+    pub corbubase: u32, // CORB Upper Base Address
+    pub corbwp: u16,    // CORB Write Pointer
+    pub corbrp: u16,    // CORB Read Pointer
+    pub corbctl: u8,    // CORB Control
+    pub corbsts: u8,    // CORB Status
+    pub corbsize: u8,   // CORB Size
     pub _reserved6: u8,
-    pub rirblbase: u32,           // RIRB Lower Base Address
-    pub rirbubase: u32,           // RIRB Upper Base Address
-    pub rirbwp: u16,              // RIRB Write Pointer
-    pub rintcnt: u16,             // Response Interrupt Count
-    pub rirbctl: u8,              // RIRB Control
-    pub rirbsts: u8,              // RIRB Status
-    pub rirbsize: u8,             // RIRB Size
+    pub rirblbase: u32, // RIRB Lower Base Address
+    pub rirbubase: u32, // RIRB Upper Base Address
+    pub rirbwp: u16,    // RIRB Write Pointer
+    pub rintcnt: u16,   // Response Interrupt Count
+    pub rirbctl: u8,    // RIRB Control
+    pub rirbsts: u8,    // RIRB Status
+    pub rirbsize: u8,   // RIRB Size
     pub _reserved7: u8,
 }
 
 /// HDA Verb (command sent to codec)
 #[derive(Debug, Clone, Copy)]
 pub struct HdaVerb {
-    pub codec_addr: u8,           // Codec address (0-14)
-    pub node_id: u8,              // Node ID
-    pub verb: u16,                // Verb ID
-    pub payload: u8,              // Payload/parameter
+    pub codec_addr: u8, // Codec address (0-14)
+    pub node_id: u8,    // Node ID
+    pub verb: u16,      // Verb ID
+    pub payload: u8,    // Payload/parameter
 }
 
 impl HdaVerb {
     pub fn to_u32(&self) -> u32 {
-        ((self.codec_addr as u32) << 28) |
-        ((self.node_id as u32) << 20) |
-        ((self.verb as u32) << 8) |
-        (self.payload as u32)
+        ((self.codec_addr as u32) << 28)
+            | ((self.node_id as u32) << 20)
+            | ((self.verb as u32) << 8)
+            | (self.payload as u32)
     }
 
     pub fn from_u32(val: u32) -> Self {
@@ -81,8 +81,8 @@ impl HdaVerb {
 /// HDA Response (from codec)
 #[derive(Debug, Clone, Copy)]
 pub struct HdaResponse {
-    pub data: u32,                // Response data
-    pub extended: u32,            // Extended response (codec addr + unsolicited)
+    pub data: u32,     // Response data
+    pub extended: u32, // Extended response (codec addr + unsolicited)
 }
 
 impl HdaResponse {
@@ -162,9 +162,9 @@ impl PinConfig {
 /// Audio stream format (sample rate, bit depth, channels)
 #[derive(Debug, Clone, Copy)]
 pub struct StreamFormat {
-    pub sample_rate: u32,         // Hz (8000, 11025, 16000, 22050, 32000, 44100, 48000, 96000, 192000)
-    pub bits_per_sample: u8,      // 8, 16, 20, 24, 32
-    pub channels: u8,             // 1-16
+    pub sample_rate: u32, // Hz (8000, 11025, 16000, 22050, 32000, 44100, 48000, 96000, 192000)
+    pub bits_per_sample: u8, // 8, 16, 20, 24, 32
+    pub channels: u8,     // 1-16
 }
 
 impl StreamFormat {
@@ -189,7 +189,7 @@ impl StreamFormat {
             _ => 0x1,
         };
         let chan = ((self.channels - 1) & 0xF) as u16;
-        
+
         base_rate | (mult << 11) | (bits << 4) | chan
     }
 }
@@ -249,10 +249,10 @@ impl HdaCodec {
             payload: 0x04,
         };
         let response = driver.send_verb(verb)?;
-        
+
         let start_node = ((response.data >> 16) & 0xFF) as u8;
         let num_nodes = (response.data & 0xFF) as u8;
-        
+
         for i in 0..num_nodes {
             self.function_group_nodes.push(start_node + i);
         }
@@ -265,10 +265,10 @@ impl HdaCodec {
 pub struct HdaDriver {
     pub regs: *mut HdaRegisters,
     pub codecs: Vec<HdaCodec>,
-    pub corb: Vec<u32>,               // Command Outbound Ring Buffer
-    pub rirb: Vec<u64>,               // Response Inbound Ring Buffer
-    pub corb_wp: AtomicU32,           // CORB write pointer
-    pub rirb_rp: AtomicU32,           // RIRB read pointer
+    pub corb: Vec<u32>,     // Command Outbound Ring Buffer
+    pub rirb: Vec<u64>,     // Response Inbound Ring Buffer
+    pub corb_wp: AtomicU32, // CORB write pointer
+    pub rirb_rp: AtomicU32, // RIRB read pointer
 }
 
 impl HdaDriver {
@@ -284,13 +284,14 @@ impl HdaDriver {
     }
 
     /// Initialize HDA controller
+    #[allow(clippy::while_immutable_condition)] // MMIO polling: the register changes in hardware, not in this loop body
     pub fn init(&mut self) -> Result<(), HdaError> {
         unsafe {
             // Reset controller (GCTL.CRST = 0, then 1)
             (*self.regs).gctl &= !0x01;
             // Wait for reset
             while ((*self.regs).gctl & 0x01) != 0 {}
-            
+
             (*self.regs).gctl |= 0x01;
             // Wait for ready
             while ((*self.regs).gctl & 0x01) == 0 {}
@@ -313,32 +314,33 @@ impl HdaDriver {
     }
 
     /// Initialize CORB (Command Outbound Ring Buffer) and RIRB (Response Inbound)
+    #[allow(clippy::while_immutable_condition)] // MMIO polling: the register changes in hardware, not in this loop body
     fn init_corb_rirb(&mut self) -> Result<(), HdaError> {
         unsafe {
             // Set CORB size to 256 entries
             (*self.regs).corbsize = 0x02;
-            
+
             // Set CORB base address (would be DMA-allocated physical address)
             let corb_phys = self.corb.as_ptr() as u64;
             (*self.regs).corblbase = (corb_phys & 0xFFFFFFFF) as u32;
             (*self.regs).corbubase = ((corb_phys >> 32) & 0xFFFFFFFF) as u32;
-            
+
             // Reset CORB read pointer
             (*self.regs).corbrp = 0x8000; // Set reset bit
             while ((*self.regs).corbrp & 0x8000) != 0 {}
             (*self.regs).corbrp = 0;
-            
+
             // Set RIRB size to 256 entries
             (*self.regs).rirbsize = 0x02;
-            
+
             // Set RIRB base address
             let rirb_phys = self.rirb.as_ptr() as u64;
             (*self.regs).rirblbase = (rirb_phys & 0xFFFFFFFF) as u32;
             (*self.regs).rirbubase = ((rirb_phys >> 32) & 0xFFFFFFFF) as u32;
-            
+
             // Reset RIRB write pointer
             (*self.regs).rirbwp = 0x8000;
-            
+
             // Enable CORB and RIRB
             (*self.regs).corbctl = 0x02; // Enable CORB DMA
             (*self.regs).rirbctl = 0x02; // Enable RIRB DMA
@@ -351,35 +353,35 @@ impl HdaDriver {
     pub fn send_verb(&mut self, verb: HdaVerb) -> Result<HdaResponse, HdaError> {
         let wp = self.corb_wp.load(Ordering::SeqCst);
         let next_wp = (wp + 1) % 256;
-        
+
         // Write verb to CORB
         self.corb[next_wp as usize] = verb.to_u32();
-        
+
         unsafe {
             // Update hardware write pointer
             (*self.regs).corbwp = next_wp as u16;
         }
-        
+
         self.corb_wp.store(next_wp, Ordering::SeqCst);
-        
+
         // Wait for response in RIRB
         let mut timeout = 1000;
         loop {
             let hw_wp = unsafe { (*self.regs).rirbwp } as u32;
             let rp = self.rirb_rp.load(Ordering::SeqCst);
-            
+
             if hw_wp != rp {
                 let next_rp = (rp + 1) % 256;
                 let response_raw = self.rirb[next_rp as usize];
-                
+
                 self.rirb_rp.store(next_rp, Ordering::SeqCst);
-                
+
                 return Ok(HdaResponse {
                     data: (response_raw & 0xFFFFFFFF) as u32,
                     extended: ((response_raw >> 32) & 0xFFFFFFFF) as u32,
                 });
             }
-            
+
             timeout -= 1;
             if timeout == 0 {
                 return Err(HdaError::Timeout);
@@ -388,7 +390,11 @@ impl HdaDriver {
     }
 
     /// Set stream format
-    pub fn set_stream_format(&mut self, stream_id: u8, format: StreamFormat) -> Result<(), HdaError> {
+    pub fn set_stream_format(
+        &mut self,
+        stream_id: u8,
+        format: StreamFormat,
+    ) -> Result<(), HdaError> {
         // In real implementation: write to stream descriptor format register
         Ok(())
     }

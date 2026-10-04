@@ -263,7 +263,7 @@ fn dispatch_syscall(frame: *mut TrapFrame) {
     // Safety: caller guarantees frame is valid and non-null.
     let _syscall_nr = unsafe { (*frame).x[17] }; // a7
     let _arg0 = unsafe { (*frame).x[10] }; // a0
-    // Future: index into syscall table.
+                                           // Future: index into syscall table.
 }
 
 #[inline]

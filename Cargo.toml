@@ -73,10 +73,27 @@ unexpected_cfgs = { level = "warn", check-cfg = [
     'cfg(feature, values("cache-lru", "cache-lfu", "cache-arc", "jemalloc", "mimalloc", "scheduler-eevdf", "scheduler-bore", "lock-free", "mutex", "rwlock", "io-sequential", "io-random", "io-mmap"))'
 ] }
 
+# ---------------------------------------------------------------------------
+# Build performance profiles
+#
+# SigmaOS is a ~1M-LOC zero-dependency crate, so build time is dominated by the
+# workspace itself. These profiles are tuned for that reality:
+#   * dev          : opt-level 1 + line-tables-only debug info -> dramatically
+#                    faster linking & test runs with negligible compile cost.
+#   * release      : maximum performance (fat LTO, 1 CGU) for final artifacts.
+#   * release-fast : thin LTO + 16 CGUs -> ~90% of release perf at a fraction
+#                    of the compile time, for daily benchmarking workflows.
+# ---------------------------------------------------------------------------
 [profile.dev]
-opt-level = 0
-debug = true
+opt-level = 1
+debug = "line-tables-only"
+incremental = true
 panic = "abort"
+
+# Tests inherit dev; keep assertions but shed full DWARF for faster linking.
+[profile.test]
+opt-level = 1
+debug = "line-tables-only"
 
 [profile.release]
 opt-level = 3
@@ -84,6 +101,24 @@ debug = false
 lto = true
 codegen-units = 1
 panic = "abort"
+strip = "debuginfo"
+
+# Fast iteration profile: `cargo build --profile release-fast`
+[profile.release-fast]
+inherits = "release"
+opt-level = 3
+lto = "thin"
+codegen-units = 16
+debug = "line-tables-only"
+strip = "debuginfo"
+
+# Benchmarks run with thin LTO so numbers stay representative without the
+# full release-build cost.
+[profile.bench]
+inherits = "release"
+lto = "thin"
+codegen-units = 16
+strip = "none"
 
 [[bin]]
 name = "sigma_kernel"

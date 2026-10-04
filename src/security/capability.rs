@@ -242,7 +242,7 @@ impl LinuxCapabilitySet {
             self.permitted = self.bounding;
             self.effective = self.permitted;
         } else {
-            self.permitted = (self.inheritable & self.inheritable) | self.ambient;
+            self.permitted = self.inheritable | self.ambient; // (X & X) == X: simplified identical expression
             self.permitted &= self.bounding;
             self.effective = self.permitted;
         }

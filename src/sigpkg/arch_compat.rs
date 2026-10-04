@@ -2,11 +2,11 @@
 // SigmaOS Arch Linux Compatibility & Parity Subsystem (sigpkg-arch)
 // Natively compiles PKGBUILD recipes, emulates Pacman database states, manages rolling release upgrades,
 // parses ALPM hooks, builds initramfs with mkinitcpio, packages with makepkg, and executes ALPM transactions.
+use crate::klib;
+use crate::klib::string::SigmaString;
+use crate::klib::HashMap;
 use alloc::format;
 use alloc::string::{String, ToString};
-use crate::klib;
-use crate::klib::HashMap;
-use crate::klib::string::SigmaString;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Version {

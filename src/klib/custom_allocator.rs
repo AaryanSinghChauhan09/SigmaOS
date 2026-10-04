@@ -376,8 +376,11 @@ pub unsafe fn free(ptr: *mut u8, size: usize) {
 // ============================================================================
 
 /// Called by the Rust runtime when allocation fails (requires nightly/alloc_error_handler).
+/// Only meaningful on true kernel targets: hosted std builds already provide the
+/// runtime OOM handler, and the attribute is unstable — compiling it on a hosted
+/// target with the feature enabled broke --all-features builds (E0658).
 #[allow(unexpected_cfgs)]
-#[cfg(feature = "custom_alloc_error_handler")]
+#[cfg(all(feature = "custom_alloc_error_handler", target_os = "none"))]
 #[alloc_error_handler]
 fn sigma_oom(layout: Layout) -> ! {
     // In a real kernel this would trigger a kernel panic with diagnostics.

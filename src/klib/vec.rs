@@ -82,6 +82,25 @@ impl<T> Vec<T> {
         }
     }
 
+    /// Resizes the vector to `new_len`, appending clones of `value` when
+    /// growing and dropping the tail when shrinking.
+    /// Matches the semantics of std::Vec::resize (requires T: Clone).
+    pub fn resize(&mut self, new_len: usize, value: T)
+    where
+        T: Clone,
+    {
+        if new_len < self.len {
+            self.truncate(new_len);
+            return;
+        }
+        // Grow in one reserve + push pass instead of N grow probes.
+        let additional = new_len - self.len;
+        self.reserve(additional);
+        for _ in 0..additional {
+            self.push(value.clone());
+        }
+    }
+
     pub fn len(&self) -> usize {
         self.len
     }

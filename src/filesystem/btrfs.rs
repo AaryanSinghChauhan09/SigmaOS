@@ -5,81 +5,81 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::vec::Vec;
 use alloc::collections::BTreeMap;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicU64, Ordering};
 
 /// Btrfs superblock structure (inspired by Linux btrfs_super_block)
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct BtrfsSuperblock {
-    pub magic: [u8; 8],                    // BTRFS magic "_BHRfS_M"
-    pub generation: u64,                   // Transaction generation
-    pub root_tree: u64,                    // Root tree objectid
-    pub chunk_tree: u64,                   // Chunk tree objectid
-    pub log_tree: u64,                     // Log tree objectid
-    pub total_bytes: u64,                  // Total device size
-    pub bytes_used: u64,                   // Bytes used
-    pub num_devices: u64,                  // Number of devices
-    pub nodesize: u32,                     // B-tree node size
-    pub sectorsize: u32,                   // Sector size
-    pub stripesize: u32,                   // Stripe size
-    pub flags: u64,                        // Filesystem flags
+    pub magic: [u8; 8],   // BTRFS magic "_BHRfS_M"
+    pub generation: u64,  // Transaction generation
+    pub root_tree: u64,   // Root tree objectid
+    pub chunk_tree: u64,  // Chunk tree objectid
+    pub log_tree: u64,    // Log tree objectid
+    pub total_bytes: u64, // Total device size
+    pub bytes_used: u64,  // Bytes used
+    pub num_devices: u64, // Number of devices
+    pub nodesize: u32,    // B-tree node size
+    pub sectorsize: u32,  // Sector size
+    pub stripesize: u32,  // Stripe size
+    pub flags: u64,       // Filesystem flags
 }
 
 /// Btrfs B-tree node header
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct BtrfsHeader {
-    pub checksum: [u8; 32],               // SHA256 checksum
-    pub fsid: [u8; 16],                   // Filesystem UUID
-    pub bytenr: u64,                      // Logical address
-    pub flags: u64,                       // Node flags
-    pub chunk_tree_uuid: [u8; 16],        // Chunk tree UUID
-    pub generation: u64,                  // Generation number
-    pub owner: u64,                       // Tree owner
-    pub nritems: u32,                     // Number of items
-    pub level: u8,                        // Tree level
+    pub checksum: [u8; 32],        // SHA256 checksum
+    pub fsid: [u8; 16],            // Filesystem UUID
+    pub bytenr: u64,               // Logical address
+    pub flags: u64,                // Node flags
+    pub chunk_tree_uuid: [u8; 16], // Chunk tree UUID
+    pub generation: u64,           // Generation number
+    pub owner: u64,                // Tree owner
+    pub nritems: u32,              // Number of items
+    pub level: u8,                 // Tree level
 }
 
 /// Btrfs disk key structure
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct BtrfsKey {
-    pub objectid: u64,                    // Object ID
-    pub key_type: u8,                     // Key type
-    pub offset: u64,                      // Offset
+    pub objectid: u64, // Object ID
+    pub key_type: u8,  // Key type
+    pub offset: u64,   // Offset
 }
 
 /// Btrfs item in B-tree leaf node
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct BtrfsItem {
-    pub key: BtrfsKey,                    // Disk key
-    pub offset: u32,                      // Data offset in node
-    pub size: u32,                        // Data size
+    pub key: BtrfsKey, // Disk key
+    pub offset: u32,   // Data offset in node
+    pub size: u32,     // Data size
 }
 
 /// Btrfs inode item (file metadata)
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct BtrfsInodeItem {
-    pub generation: u64,                  // Generation number
-    pub transid: u64,                     // Transaction ID
-    pub size: u64,                        // File size
-    pub nbytes: u64,                      // Number of bytes used
-    pub block_group: u64,                 // Block group
-    pub nlink: u32,                       // Hard link count
-    pub uid: u32,                         // User ID
-    pub gid: u32,                         // Group ID
-    pub mode: u32,                        // File mode
-    pub rdev: u64,                        // Device ID
-    pub flags: u64,                       // Inode flags
-    pub sequence: u64,                    // Modification sequence
-    pub atime: BtrfsTimespec,             // Access time
-    pub ctime: BtrfsTimespec,             // Change time
-    pub mtime: BtrfsTimespec,             // Modification time
-    pub otime: BtrfsTimespec,             // Creation time
+    pub generation: u64,      // Generation number
+    pub transid: u64,         // Transaction ID
+    pub size: u64,            // File size
+    pub nbytes: u64,          // Number of bytes used
+    pub block_group: u64,     // Block group
+    pub nlink: u32,           // Hard link count
+    pub uid: u32,             // User ID
+    pub gid: u32,             // Group ID
+    pub mode: u32,            // File mode
+    pub rdev: u64,            // Device ID
+    pub flags: u64,           // Inode flags
+    pub sequence: u64,        // Modification sequence
+    pub atime: BtrfsTimespec, // Access time
+    pub ctime: BtrfsTimespec, // Change time
+    pub mtime: BtrfsTimespec, // Modification time
+    pub otime: BtrfsTimespec, // Creation time
 }
 
 #[repr(C)]
@@ -93,15 +93,15 @@ pub struct BtrfsTimespec {
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct BtrfsFileExtentItem {
-    pub generation: u64,                  // Generation
-    pub ram_bytes: u64,                   // RAM representation size
-    pub compression: u8,                  // Compression type
-    pub encryption: u8,                   // Encryption type
-    pub extent_type: u8,                  // Inline or regular
-    pub disk_bytenr: u64,                 // Disk logical address
-    pub disk_num_bytes: u64,              // Disk extent size
-    pub offset: u64,                      // Offset into extent
-    pub num_bytes: u64,                   // Number of bytes
+    pub generation: u64,     // Generation
+    pub ram_bytes: u64,      // RAM representation size
+    pub compression: u8,     // Compression type
+    pub encryption: u8,      // Encryption type
+    pub extent_type: u8,     // Inline or regular
+    pub disk_bytenr: u64,    // Disk logical address
+    pub disk_num_bytes: u64, // Disk extent size
+    pub offset: u64,         // Offset into extent
+    pub num_bytes: u64,      // Number of bytes
 }
 
 /// Btrfs snapshot structure
@@ -164,16 +164,17 @@ impl BtrfsFilesystem {
             root_offset: 0, // Would be allocated from chunk tree
             name: name.to_vec(),
         };
-        
+
         self.snapshots.insert(snapshot_id, snapshot);
         self.transaction_log.push(snapshot_id);
-        
+
         Ok(snapshot_id)
     }
 
     /// Delete snapshot
     pub fn delete_snapshot(&mut self, snapshot_id: u64) -> Result<(), BtrfsError> {
-        self.snapshots.remove(&snapshot_id)
+        self.snapshots
+            .remove(&snapshot_id)
             .ok_or(BtrfsError::SnapshotNotFound)?;
         Ok(())
     }
@@ -190,13 +191,23 @@ impl BtrfsFilesystem {
     }
 
     /// Read file extent with CoW
-    pub fn read_extent(&self, extent: &BtrfsFileExtentItem, offset: u64, buffer: &mut [u8]) -> Result<usize, BtrfsError> {
+    pub fn read_extent(
+        &self,
+        extent: &BtrfsFileExtentItem,
+        offset: u64,
+        buffer: &mut [u8],
+    ) -> Result<usize, BtrfsError> {
         // In real implementation: read from disk with CoW redirect
         Ok(buffer.len())
     }
 
     /// Write file extent with CoW (allocate new extent)
-    pub fn write_extent(&mut self, extent: &mut BtrfsFileExtentItem, offset: u64, data: &[u8]) -> Result<(), BtrfsError> {
+    pub fn write_extent(
+        &mut self,
+        extent: &mut BtrfsFileExtentItem,
+        offset: u64,
+        data: &[u8],
+    ) -> Result<(), BtrfsError> {
         // CoW: allocate new extent instead of overwriting
         let new_generation = self.generation.load(Ordering::SeqCst);
         extent.generation = new_generation;
