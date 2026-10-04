@@ -1,5 +1,7 @@
 # Software Store and Command Palette
 
+**Capability state: Prototype.** Catalog and launcher models are not integrated software installation or desktop action services. See the [shared status vocabulary](14-Future-Development.md#work-status-vocabulary).
+
 ## Current capability
 
 `src/desktop/mint_software_store.rs` is a catalog/search and permission-model prototype inspired by Linux Mint Software Manager. Its seeded listings are illustrative and deliberately mark versions, sizes, ratings, and developer verification as unknown or unavailable. The component does not fetch repository metadata, verify package signatures, download packages, install/remove files, or enforce sandbox permissions.

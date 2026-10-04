@@ -1,6 +1,6 @@
 # Installation Status
 
-**Status: not ready for general installation.** SigmaOS does not currently publish a verified install image and complete installation/recovery procedure. The repository contains installer and ISO-building code, but source presence is not evidence that an image boots, installs safely, or can recover after interruption.
+**Capability state: Proposed; installation is not supported.** SigmaOS does not currently publish a verified install image and complete installation/recovery procedure. The repository contains installer and ISO-building code, but source presence is not evidence that an image boots, installs safely, or can recover after interruption. See the [shared status vocabulary](14-Future-Development.md#work-status-vocabulary).
 
 ## Do not install to a physical disk
 
@@ -16,4 +16,4 @@ Do not use the current development ISO builder as installation media or write it
 
 ## Developer setup
 
-To build and test the source, use [Getting Started](02-Getting-Started.md). To contribute installer work, read the [Installer component notes](Installer.md), add failure-path tests, and update this page only when the end-to-end checks above pass.
+This is the single canonical installation page. To build and test the source, use [Getting Started](02-Getting-Started.md). Add installer failure-path tests and update this page only when the end-to-end checks above pass.

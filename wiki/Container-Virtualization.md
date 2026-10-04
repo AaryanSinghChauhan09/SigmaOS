@@ -1,130 +1,20 @@
-# Container Virtualization
+# Containers and Virtualization
 
-## Overview and Purpose
-This page documents the SigmaOS components: container, virtualization, virt, vm. These components form a crucial part of the SigmaOS ecosystem, providing robust, high-performance, and secure foundations.
+**Capability state: Proposed.** No container runtime, hypervisor, or isolation boundary is verified. Status terms are defined in the [shared vocabulary](14-Future-Development.md#work-status-vocabulary).
 
-SigmaOS aims to build a comprehensive system that matches and exceeds standard distributions, offering deep integration and modern APIs.
+## Current capability
 
-## Key Structs/Engines Implemented
-The architecture is designed around several core structures:
-- `EngineManager`: Coordinates the lifecycle of the components.
-- `ComponentState`: Tracks internal state and transitions.
-- `DataBus`: For high-speed data transfer.
+Names such as namespaces, cgroups, OCI, KVM, bhyve, and containers in the source or plans do not establish enforced isolation. There is no supported container execution or virtual machine path.
 
-```c
-struct SigmaComponent {
-    uint32_t id;
-    char name[64];
-    void (*init)(void);
-    void (*teardown)(void);
-};
-```
+## Design references
 
-## Comparison to Linux Mint / Omarchy Equivalent
-While Linux Mint and Omarchy provide traditional monolithic integrations, SigmaOS offers a modular, hyper-optimized approach.
-- **Performance:** 20-30% less overhead.
-- **Security:** Integrated pledge and unveil mechanics.
-- **Modularity:** Hot-swappable components without rebooting.
+Linux namespaces/cgroups, FreeBSD jails/bhyve, OpenBSD pledge/unveil, and Redox capabilities offer distinct isolation approaches. Select a threat model and enforceable primitives before exposing a runtime interface.
 
-## API Reference
+## Roadmap
 
-### Initialization
-```c
-int container_init(struct SigmaComponent* comp);
-```
-Initializes the subsystem. Returns 0 on success.
+1. Establish process, memory, filesystem, and capability boundaries in the kernel.
+2. Define an isolation test that demonstrates a process cannot access prohibited resources.
+3. Add resource limits with exhaustion tests and deterministic cleanup.
+4. Consider OCI compatibility or a hypervisor only after a usable base system and security review exist.
 
-### Configuration
-```c
-int container_set_config(const char* key, const char* value);
-```
-Updates configuration dynamically.
-
-### Teardown
-```c
-void container_shutdown(void);
-```
-Safely shuts down the subsystem, freeing resources.
-
-## Usage Examples
-
-### Basic Usage
-```python
-import sigma_container
-
-engine = sigma_container.Engine()
-engine.start()
-print("Engine started successfully!")
-```
-
-### Advanced Configuration
-```python
-engine.configure({"cache_size": 1024, "mode": "async"})
-```
-
-## Testing Information
-Unit tests are located in `/tests/container_tests/`.
-Run tests via the build system:
-```bash
-make test COMPONENT=container
-```
-Integration testing requires the full SigmaOS QA harness.
-
-## Additional Notes
-- Ensure kernel modules are loaded before initializing this component.
-- Review security logs via `journalctl -u sigma_container`.
-- Further documentation can be found in the source files.
-- Remember to check memory constraints on embedded targets.
-
-
-- Additional context line 0 for Container Virtualization
-- Additional context line 1 for Container Virtualization
-- Additional context line 2 for Container Virtualization
-- Additional context line 3 for Container Virtualization
-- Additional context line 4 for Container Virtualization
-- Additional context line 5 for Container Virtualization
-- Additional context line 6 for Container Virtualization
-- Additional context line 7 for Container Virtualization
-- Additional context line 8 for Container Virtualization
-- Additional context line 9 for Container Virtualization
-- Additional context line 10 for Container Virtualization
-- Additional context line 11 for Container Virtualization
-- Additional context line 12 for Container Virtualization
-- Additional context line 13 for Container Virtualization
-- Additional context line 14 for Container Virtualization
-- Additional context line 15 for Container Virtualization
-- Additional context line 16 for Container Virtualization
-- Additional context line 17 for Container Virtualization
-- Additional context line 18 for Container Virtualization
-- Additional context line 19 for Container Virtualization
-- Additional context line 20 for Container Virtualization
-- Additional context line 21 for Container Virtualization
-- Additional context line 22 for Container Virtualization
-- Additional context line 23 for Container Virtualization
-- Additional context line 24 for Container Virtualization
-- Additional context line 25 for Container Virtualization
-- Additional context line 26 for Container Virtualization
-- Additional context line 27 for Container Virtualization
-- Additional context line 28 for Container Virtualization
-- Additional context line 29 for Container Virtualization
-- Additional context line 30 for Container Virtualization
-- Additional context line 31 for Container Virtualization
-- Additional context line 32 for Container Virtualization
-- Additional context line 33 for Container Virtualization
-- Additional context line 34 for Container Virtualization
-- Additional context line 35 for Container Virtualization
-- Additional context line 36 for Container Virtualization
-- Additional context line 37 for Container Virtualization
-- Additional context line 38 for Container Virtualization
-- Additional context line 39 for Container Virtualization
-
-## Reference projects and future roadmap
-
-Study Linux KVM, namespaces, cgroups and seccomp; FreeBSD bhyve and jails; OpenBSD vmm; and NetBSD rump kernels. Virtual machines, containers, OCI parsing, and resource-control data models are separate capabilities.
-
-1. Specify guest memory ownership, CPU feature checks, device/interrupt models, exits, and teardown before claiming VM execution.
-2. Map every container isolation rule to syscall, filesystem, network, and device enforcement paths.
-3. Enforce resource limits and cleanup on normal exit, crash, and partial startup.
-4. Reject unsupported image directives and isolation policies rather than silently accepting them.
-
-**Completion evidence:** a documented guest workload runs on a named target; container tests prove access restrictions and resource limits; teardown and startup-failure paths release resources.
+**Completion evidence:** adversarial integration tests demonstrate enforced boundaries, resource accounting, teardown, and failure cleanup on the supported configuration.

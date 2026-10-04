@@ -75,4 +75,4 @@ The **Mint & Omarchy Hardware & Audio Supremacy Suite** ([`src/distro/mint_omarc
 > - Source: `src/distro/mint_omarchy_hardware_and_audio_supremacy.rs`
 > - When new hardware vendor/product IDs are mapped, update the device scan table.
 > - Ensure audio quantum sizes are benchmarked against 48kHz and 96kHz stream configurations.
-> - Maintain links with [Audio-and-Graphics](Audio-and-Graphics.md), [Drivers](Drivers.md), and [Power-Management](Power-Management.md).
+> - Maintain links with [Audio-and-Graphics](Audio-and-Graphics.md), [Hardware-Drivers](Hardware-Drivers.md), and [Power-Management](Power-Management.md).

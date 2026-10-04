@@ -2,6 +2,8 @@
 
 Each core OS component page is the canonical home for implementation status, reference-project comparisons, validation, and that component's future roadmap. A listed source module is not proof of a working runtime feature.
 
+Use the shared [work status vocabulary](./14-Future-Development.md#work-status-vocabulary) on component pages: Proposed, Prototype, Integrated, and Supported. Keep older imported plans in the repository archive; they are historical source documents and do not override a component page's measured status.
+
 ## Core components
 
 - [Boot and installation](./01-Installation.md)
@@ -18,6 +20,10 @@ Each core OS component page is the canonical home for implementation status, ref
 - [IPC and syscalls](./IPC-and-Syscalls.md)
 - [Init and services](./Init-and-Services.md)
 - [Virtualization and containers](./Container-Virtualization.md)
+- [Audio and graphics](./Audio-and-Graphics.md)
+- [Software Store and Command Palette](./Software-Store-and-Command-Palette.md)
+- [Diagnostics and crash reporting](./Diagnostics-and-Crash-Reporting.md)
+- [Compositor](./Compositor.md)
 
 ## Development and operation
 

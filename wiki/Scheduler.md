@@ -1,5 +1,7 @@
 # CPU Scheduler
 
+**Capability state: Prototype.** The scheduler model is not verified on a booted kernel. Status terms are defined in the [shared vocabulary](14-Future-Development.md#work-status-vocabulary).
+
 This page is the canonical scheduler component reference. It tracks the current code, comparison sources, validation, and future work together. A policy implementation in a module does not establish that the booted kernel uses it.
 
 ## Current implementation
