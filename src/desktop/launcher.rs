@@ -138,6 +138,36 @@ impl CommandPalette {
             "alacritty --class scratchpad",
             "utilities-terminal",
         );
+        self.register_action(
+            ":gaming",
+            "Activate Gaming Governor & Boost GPU TDP",
+            "sigma-gaming enable",
+            "applications-games",
+        );
+        self.register_action(
+            ":powersave",
+            "Switch to Battery Powersave Governor",
+            "sigma-power powersave",
+            "battery-good",
+        );
+        self.register_action(
+            ":snapshot",
+            "Create Instant Timeshift Btrfs Snapshot",
+            "sigma-timeshift create",
+            "system-software-update",
+        );
+        self.register_action(
+            ":backup",
+            "Export Software Manifest & Backup",
+            "sigma-backup export",
+            "document-save",
+        );
+        self.register_action(
+            ":matrix",
+            "Verify Distro Launch Superiority Matrix",
+            "sigma-launch-check",
+            "security-high",
+        );
     }
 
     /// Register an application entry
