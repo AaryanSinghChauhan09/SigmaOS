@@ -12,13 +12,19 @@ This page inventories proposed and implemented multimedia components. The listed
 - Fade-out reaches zero at its final sample, including a one-sample fade.
 - Regression tests: `cargo test --lib audio::editor::tests -- --nocapture`.
 
+### Implemented library behavior: raster allocation and bounds checks
+
+`src/graphics/paint.rs` now offers `RasterLayer::try_new` for fallible allocation, rejects zero or unrepresentable dimensions, reports allocation failure, and uses checked pixel counts before blur and PPM/QOI export buffer validation. The compatibility constructor `RasterLayer::new` remains infallible and panics on invalid or unallocatable sizes; callers handling file/user input should use `try_new`. Layer-mask and selection constructors still need equivalent fallible APIs.
+
+- Regression tests: `cargo test --lib graphics::paint::tests -- --nocapture` (added; execution did not complete in this environment).
+
 ### Roadmap: first-party media and creative applications
 
 Use Arch's inspectable package recipes, Mint's clear first-run and recovery flows, and Omarchy's deliberate defaults as design references. These references do not imply compatibility or completed implementation.
 
 1. **Sigma Player (VLC-inspired):** first prove a file-backed PCM/WAV playback path, accurate duration/seek behavior, clear unsupported-format errors, and a keyboard-accessible queue. Add codecs only with provenance, license review, and fixture-based tests. Current media player structs are models, not a functioning decoder or hardware-accelerated player.
 2. **Sigma Audio Studio (Audacity-inspired):** add validated audio import/export, selection editing, undo/redo, non-destructive project saves, and playback/recording integration. Keep DSP bounded and deterministic; test malformed files, clipping boundaries, cancellation, and round trips.
-3. **Sigma Paint (GIMP-inspired):** add overflow-safe image dimensions, real pixel import/export, layer compositing, selections/masks, undo/redo, and keyboard-accessible tools. Test alpha/blend results, invalid dimensions, large allocations, and save/reopen. Existing paint types do not constitute a complete image editor.
+3. **Sigma Paint (GIMP-inspired):** build on the current fallible raster-layer allocation and checked filter/export dimensions by adding real pixel import/export, layer compositing, selections/masks, undo/redo, and keyboard-accessible tools. Test alpha/blend results, invalid dimensions, allocation failures, and save/reopen. Existing paint types do not constitute a complete image editor.
 4. **Delivery and readiness:** package each application only after transactional package installation and rollback exist. A desktop session, supported file formats, accessibility review, clean-install/QEMU validation, and recovery procedure are release gates. Never mark an app installed or supported from catalog metadata or a mock alone.
 
 The references for expected editing behavior include the [Audacity Normalize manual](https://manual.audacityteam.org/man/normalize.html) and [GIMP layer-mask manual](https://docs.gimp.org/3.0/en/gimp-layer-mask-edit.html). They describe upstream products; SigmaOS currently implements only the limited library operations stated above.

@@ -12,6 +12,18 @@ pub enum PhotoError {
     LayerOutOfBounds = 2,
     NotSupported = 3,
     ProcessingFailed = 4,
+    AllocationFailed = 5,
+}
+
+fn checked_pixel_count(width: u32, height: u32) -> Result<usize, PhotoError> {
+    if width == 0 || height == 0 {
+        return Err(PhotoError::InvalidDimensions);
+    }
+    let count = (width as u64)
+        .checked_mul(height as u64)
+        .and_then(|count| usize::try_from(count).ok())
+        .ok_or(PhotoError::InvalidDimensions)?;
+    Ok(count)
 }
 
 /// Color representation
@@ -71,19 +83,25 @@ pub struct RasterLayer {
 
 impl RasterLayer {
     pub fn new(name: String, width: u32, height: u32) -> Self {
-        let size = (width * height) as usize;
+        Self::try_new(name, width, height).expect("invalid or unallocatable raster dimensions")
+    }
+
+    /// Fallible constructor for image dimensions supplied by files or users.
+    pub fn try_new(name: String, width: u32, height: u32) -> Result<Self, PhotoError> {
+        let size = checked_pixel_count(width, height)?;
         let mut pixels = Vec::new();
-        for _ in 0..size {
-            pixels.push(ColorRgba::new(0, 0, 0, 0));
-        }
-        RasterLayer {
+        pixels
+            .try_reserve_exact(size)
+            .map_err(|_| PhotoError::AllocationFailed)?;
+        pixels.resize(size, ColorRgba::new(0, 0, 0, 0));
+        Ok(RasterLayer {
             name,
             width,
             height,
             opacity: 1.0,
             blend_mode: BlendMode::Normal,
             pixels,
-        }
+        })
     }
 }
 
@@ -126,7 +144,7 @@ impl ImageFilter for GaussianBlurFilter {
         height: u32,
         pixels: &mut [ColorRgba],
     ) -> Result<(), PhotoError> {
-        if width == 0 || height == 0 || pixels.len() != (width * height) as usize {
+        if checked_pixel_count(width, height).map_or(true, |count| pixels.len() != count) {
             return Err(PhotoError::InvalidDimensions);
         }
 
@@ -657,7 +675,7 @@ pub struct SigmaImageExporter;
 impl SigmaImageExporter {
     /// Exports canvas pixel buffer as Netpbm Portable Pixmap (PPM ASCII P3) image format
     pub fn export_ppm(width: u32, height: u32, pixels: &[ColorRgba]) -> Result<String, PhotoError> {
-        if width == 0 || height == 0 || pixels.len() != (width * height) as usize {
+        if checked_pixel_count(width, height).map_or(true, |count| pixels.len() != count) {
             return Err(PhotoError::InvalidDimensions);
         }
 
@@ -675,7 +693,7 @@ impl SigmaImageExporter {
         height: u32,
         pixels: &[ColorRgba],
     ) -> Result<Vec<u8>, PhotoError> {
-        if width == 0 || height == 0 || pixels.len() != (width * height) as usize {
+        if checked_pixel_count(width, height).map_or(true, |count| pixels.len() != count) {
             return Err(PhotoError::InvalidDimensions);
         }
 
@@ -711,6 +729,31 @@ mod tests {
         let layer = RasterLayer::new("Background".to_string(), 10, 10);
         assert_eq!(layer.name(), "Background");
         assert_eq!(layer.get_pixels().len(), 100);
+    }
+
+    #[test]
+    fn fallible_raster_creation_rejects_invalid_or_unallocatable_sizes() {
+        assert!(matches!(
+            RasterLayer::try_new("empty".to_string(), 0, 4),
+            Err(PhotoError::InvalidDimensions)
+        ));
+        assert!(matches!(
+            RasterLayer::try_new("too-large".to_string(), u32::MAX, u32::MAX),
+            Err(PhotoError::AllocationFailed) | Err(PhotoError::InvalidDimensions)
+        ));
+    }
+
+    #[test]
+    fn image_filter_and_export_validate_dimensions_without_wrapping() {
+        let mut pixels = [ColorRgba::new(1, 2, 3, 255)];
+        assert_eq!(
+            GaussianBlurFilter::new(1).apply_filter(u32::MAX, 2, &mut pixels),
+            Err(PhotoError::InvalidDimensions)
+        );
+        assert_eq!(
+            SigmaImageExporter::export_ppm(u32::MAX, 2, &pixels),
+            Err(PhotoError::InvalidDimensions)
+        );
     }
 
     #[test]
