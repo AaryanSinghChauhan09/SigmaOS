@@ -193,6 +193,31 @@ theme = "sigma-light"
 
 ---
 
+## WebApp Manager (`SovereignWebAppManager`)
+
+### Purpose
+Isolated desktop web applications from URLs — superior to Linux Mint's `webapp-manager`.
+
+### Features
+- Spawns isolated browser profiles with isolated cookies, local storage, and caches
+- Suppresses browser navigation bars and tabs for native app look-and-feel
+- Generates desktop entries and application drawer shortcuts
+- Pre-configured profiles: YouTube Music, Discord, GitHub Enterprise
+
+---
+
+## Keyboard Shortcut Remapper (`SovereignKeyboardShortcutRemapper`)
+
+### Purpose
+System-wide hotkey management and hardware modifier remapping.
+
+### Features
+- Native CapsLock-to-Control swap for developers
+- Custom hotkey actions (e.g. Super+Enter for `sigma-term`, Super+B for `sigma-browser`)
+- Gaming mode suppression: automatically suppresses desktop hotkeys during fullscreen games
+
+---
+
 ## Comparison: Mint Tools vs SigmaOS Equivalents
 
 | Feature | Linux Mint | **SigmaOS** |
@@ -203,6 +228,8 @@ theme = "sigma-light"
 | Report AI analysis | ❌ | ✅ |
 | Nemo batch actions | ✅ limited | ✅ full |
 | XApps HiDPI | ✅ | ✅ native |
+| WebApp isolation | ✅ | ✅ sandbox profile |
+| Keyboard gaming suppression | ❌ | ✅ |
 | Report health score | ❌ | ✅ 0–100 |
 
 ---

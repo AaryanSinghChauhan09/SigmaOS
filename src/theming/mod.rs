@@ -9,3 +9,4 @@ pub use theme_engine::{
     Animations, Borders, Color, ColorScheme, Shadow, Shadows, Spacing, Theme, ThemeEngine,
     ThemeError, Typography,
 };
+pub mod omarchy_theme_suite; pub use omarchy_theme_suite::*;

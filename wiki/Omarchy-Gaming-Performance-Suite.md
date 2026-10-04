@@ -11,6 +11,8 @@ Omarchy (`github.com/omacom/omarchy`) pioneered a gaming-first Arch Linux config
 1. **SovereignOmarchyGamingGovernor** — automatic performance mode on game launch
 2. **SovereignOmarchyHudEngine** — in-game overlay with zero overhead when hidden
 3. **SovereignOmarchyDeveloperStacks** — one-command dev environment provisioning
+4. **SovereignOmarchyVrrPacingController** — adaptive VRR/FreeSync/G-Sync frame pacing engine
+5. **SovereignSteamShaderPrecacheManager** — intelligent shader cache validation and pre-compilation
 
 ---
 
@@ -125,6 +127,61 @@ sigma-devstack update all
 
 ---
 
+## VRR Adaptive Frame Pacing (`SovereignOmarchyVrrPacingController`)
+
+### What It Does
+- Detects display VRR range (min/max Hz) from EDID via DRM
+- Monitors real-time frame deltas and adjusts present timing to avoid tearing at VRR boundaries
+- Implements `VrrStrategy`: `Adaptive`, `Fixed(hz)`, `CapToRefresh`, `LatencyFavor`
+- Emits `VrrEvent` telemetry: `FrameDropped`, `PaceAdjusted`, `RangeEnforced`
+- Interfaces with `SovereignCompositor` for direct scanout scheduling
+
+### Configuration
+```toml
+[gaming.vrr]
+strategy = "adaptive"        # or "fixed", "cap_to_refresh", "latency_favor"
+min_hz = 48
+max_hz = 165
+allow_freesync = true
+allow_gsync = true
+frame_drop_warn_threshold_ms = 5
+```
+
+### How It Beats the Competition
+| | Omarchy | Linux Mint | **SigmaOS** |
+|--|---------|-----------|-------------|
+| VRR detection | ❌ | ❌ | ✅ EDID |
+| Pacing algorithm | ❌ | ❌ | ✅ Rust, typed |
+| FreeSync support | ✅ partial | ❌ | ✅ full |
+| G-Sync compat | ✅ partial | ❌ | ✅ full |
+
+---
+
+## Shader Cache Manager (`SovereignSteamShaderPrecacheManager`)
+
+### What It Does
+- Scans `~/.local/share/Steam/steamapps/shadercache/` for all game shader blobs
+- Validates each cache entry against current driver version (avoids stale shaders after Mesa/NVIDIA update)
+- Invalidates caches that were compiled with an older driver (prevents stutters on first run)
+- Optionally triggers pre-compilation via `glslc` / RADV shader pre-warm before game launch
+- Reports cache hit ratio, total size, and per-game last-compile timestamps
+
+### Commands
+```bash
+sigma-shader status          # show cache health for all games
+sigma-shader validate 440    # validate cache for Steam AppID 440
+sigma-shader precache 440    # pre-warm shaders for AppID 440
+sigma-shader purge --stale   # remove all stale (driver-outdated) entries
+```
+
+### Implementation
+- Driver version fingerprint: reads `/proc/driver/nvidia/version` or Mesa `GL_VERSION`
+- Per-game metadata stored in `~/.config/sigma/shader_meta/`
+- Runs as a low-priority background daemon (`nice 19`, `ionice idle`)
+- Integrates with `SovereignOmarchyGamingGovernor`: auto-precache on governor activation
+
+---
+
 ## Comparison with Omarchy Gaming Setup
 
 | Feature | Omarchy (Arch) | **SigmaOS** |
@@ -137,6 +194,8 @@ sigma-devstack update all
 | Dev stacks | ✅ ansible/bash | ✅ Rust, extensible |
 | Auto restore | ❌ | ✅ |
 | Wayland compositor bypass | ✅ hyprland | ✅ SigmaCompositor |
+| VRR / FreeSync frame pacing | ❌ | ✅ adaptive pacing |
+| Shader cache validation | ❌ | ✅ driver-aware invalidation |
 
 ---
 

@@ -500,4 +500,25 @@ if [ -f "src/distro/sovereign_linux_bsd_pinnacle_innovations_v14.rs" ]; then
     ./build/test_pinnacle_v14
 fi
 
+if [ -f "src/compatibility/omarchy_supreme_engine.rs" ]; then
+    echo "Running Sovereign Omarchy Supreme Engine test suite..."
+    mkdir -p build
+    rustc --test src/compatibility/omarchy_supreme_engine.rs --edition=2021 -o build/test_omarchy
+    ./build/test_omarchy
+fi
+
+if [ -f "src/compatibility/linuxmint_xapp_supreme_engine.rs" ]; then
+    echo "Running Sovereign LinuxMint XApp Supreme Engine test suite..."
+    mkdir -p build
+    rustc --test src/compatibility/linuxmint_xapp_supreme_engine.rs --edition=2021 -o build/test_linuxmint
+    ./build/test_linuxmint
+fi
+
+if [ -f "src/theming/omarchy_theme_suite.rs" ]; then
+    echo "Running Sovereign Omarchy Theme Suite test suite..."
+    mkdir -p build
+    rustc --test src/theming/omarchy_theme_suite.rs --edition=2021 -o build/test_theming
+    ./build/test_theming
+fi
+
 echo "All SigmaOS test suites completed."
