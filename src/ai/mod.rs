@@ -69,3 +69,6 @@ pub use marktechpost_kdnuggets_data_science::{
     InfoWorldEnterpriseAiDeploymentEngine, KdnuggetsAutoMlPipelineEngine,
     MarkTechPostVectorIndexEngine, SovereignAiDataSciencePipelineSuite,
 };
+
+pub mod omarchy_multi_agent_provider;
+pub use omarchy_multi_agent_provider::*;

@@ -101,3 +101,6 @@ pub mod cinnamon_xapp_libgui;
 pub mod display_manager;
 pub mod file_manager_extensions;
 pub mod system_tray;
+pub mod sovereign_bulky_batch_renamer; pub use sovereign_bulky_batch_renamer::*;
+pub mod omarchy_disktree_inspector; pub use omarchy_disktree_inspector::*;
+pub mod omarchy_chord_rebind_engine; pub use omarchy_chord_rebind_engine::*;

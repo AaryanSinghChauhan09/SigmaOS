@@ -50,3 +50,6 @@ pub use sovereign_video_player::{
 pub use sovereign_video_editor::{
     AscCdl, EditorError, SovereignVideoEditor, TimelineClip, VideoTrack,
 };
+
+pub mod sovereign_hypnotix_stream_engine;
+pub use sovereign_hypnotix_stream_engine::*;

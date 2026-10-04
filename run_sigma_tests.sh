@@ -528,4 +528,39 @@ if [ -f "src/compatibility/sovereign_apex_mint_omarchy_supremacy.rs" ]; then
     ./build/test_apex
 fi
 
+if [ -f "src/media/sovereign_hypnotix_stream_engine.rs" ]; then
+    echo "Running Sovereign Hypnotix Stream Engine test suite..."
+    mkdir -p build
+    rustc --test src/media/sovereign_hypnotix_stream_engine.rs --edition=2021 -o build/test_hypnotix
+    ./build/test_hypnotix
+fi
+
+if [ -f "src/desktop/sovereign_bulky_batch_renamer.rs" ]; then
+    echo "Running Sovereign Bulky Batch Renamer test suite..."
+    mkdir -p build
+    rustc --test src/desktop/sovereign_bulky_batch_renamer.rs --edition=2021 -o build/test_bulky
+    ./build/test_bulky
+fi
+
+if [ -f "src/desktop/omarchy_disktree_inspector.rs" ]; then
+    echo "Running Sovereign DiskTree Inspector test suite..."
+    mkdir -p build
+    rustc --test src/desktop/omarchy_disktree_inspector.rs --edition=2021 -o build/test_disktree
+    ./build/test_disktree
+fi
+
+if [ -f "src/desktop/omarchy_chord_rebind_engine.rs" ]; then
+    echo "Running Sovereign Chord Rebind Engine test suite..."
+    mkdir -p build
+    rustc --test src/desktop/omarchy_chord_rebind_engine.rs --edition=2021 -o build/test_chord
+    ./build/test_chord
+fi
+
+if [ -f "src/ai/omarchy_multi_agent_provider.rs" ]; then
+    echo "Running Sovereign Multi-Agent Provider test suite..."
+    mkdir -p build
+    rustc --test src/ai/omarchy_multi_agent_provider.rs --edition=2021 -o build/test_multi_agent
+    ./build/test_multi_agent
+fi
+
 echo "All SigmaOS test suites completed."

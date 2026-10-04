@@ -31,3 +31,8 @@ Welcome to the SigmaOS Wiki! Here are the core components:
 - [Zig-Vulkan-GPU-Acceleration](./Zig-Vulkan-GPU-Acceleration.md)
 - [Nim-P2P-Mesh-and-Tooling](./Nim-P2P-Mesh-and-Tooling.md)
 - [Sovereign-Apex-Supremacy-Matrix](./Sovereign-Apex-Supremacy-Matrix.md)
+- [Hypnotix-Streaming-Media](./Hypnotix-Streaming-Media.md)
+- [Bulky-Parallel-Batch-Renamer](./Bulky-Parallel-Batch-Renamer.md)
+- [DiskTree-and-Storage-Analysis](./DiskTree-and-Storage-Analysis.md)
+- [Modal-Keybindings-and-Chord-Rebind](./Modal-Keybindings-and-Chord-Rebind.md)
+- [Multi-Agent-Provider-Orchestration](./Multi-Agent-Provider-Orchestration.md)
