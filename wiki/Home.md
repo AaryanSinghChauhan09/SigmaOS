@@ -1,49 +1,31 @@
 # SigmaOS Wiki
 
-Welcome to the SigmaOS Wiki! Here are the core components:
+Each core OS component page is the canonical home for implementation status, reference-project comparisons, validation, and that component's future roadmap. A listed source module is not proof of a working runtime feature.
 
-- [Kernel-Core](./Kernel-Core.md)
-- [Memory-Management](./Memory-Management.md)
-- [Security-and-Hardening](./Security-and-Hardening.md)
-- [Desktop-Environment](./Desktop-Environment.md)
-- [Package-Management](./Package-Management.md)
-- [Networking-Stack](./Networking-Stack.md)
-- [Filesystem-VFS](./Filesystem-VFS.md)
-- [Hardware-Drivers](./Hardware-Drivers.md)
-- [Init-and-Services](./Init-and-Services.md)
-- [IPC-and-Syscalls](./IPC-and-Syscalls.md)
-- [Container-Virtualization](./Container-Virtualization.md)
-- [AI-and-ML-Engine](./AI-and-ML-Engine.md)
-- [Shell-and-Userspace](./Shell-and-Userspace.md)
-- [Accessibility-and-UX](./Accessibility-and-UX.md)
-- [Omarchy-Parity](./Omarchy-Parity.md)
-- [LinuxMint-Parity](./LinuxMint-Parity.md)
-- [Toolchain-and-Dev](./Toolchain-and-Dev.md)
-- [Monitoring-Observability](./Monitoring-Observability.md)
-- [Crypto-and-TPM](./Crypto-and-TPM.md)
-- [Backup-and-Recovery](./Backup-and-Recovery.md)
-- [Cloud-and-Cluster](./Cloud-and-Cluster.md)
-- [IoT-and-Embedded](./IoT-and-Embedded.md)
-- [Performance-Benchmarks](./Performance-Benchmarks.md)
+## Core components
+
+- [Boot and installation](./01-Installation.md)
+- [Kernel](./04-Kernel.md)
+- [Memory management](./Memory-Management.md)
+- [Scheduler](./Scheduler.md)
+- [Filesystems and VFS](./05-Filesystems.md)
+- [Networking](./06-Networking.md)
+- [Security](./07-Security.md)
+- [Desktop](./08-Desktop.md)
+- [Packaging and updates](./09-Packaging.md)
+- [Drivers](./Hardware-Drivers.md)
+- [IPC and syscalls](./IPC-and-Syscalls.md)
+- [Init and services](./Init-and-Services.md)
+- [Virtualization and containers](./Container-Virtualization.md)
+
+## Development and operation
+
+- [Getting started](./02-Getting-Started.md)
 - [Testing](./Testing.md)
-- [Theming-Guide](./Theming-Guide.md)
-- [Installer-Guide](./Installer-Guide.md)
-- [Low-Level-Languages-and-FFI](./Low-Level-Languages-and-FFI.md)
-- [Zig-Vulkan-GPU-Acceleration](./Zig-Vulkan-GPU-Acceleration.md)
-- [Nim-P2P-Mesh-and-Tooling](./Nim-P2P-Mesh-and-Tooling.md)
-- [Sovereign-Apex-Supremacy-Matrix](./Sovereign-Apex-Supremacy-Matrix.md)
-- [Hypnotix-Streaming-Media](./Hypnotix-Streaming-Media.md)
-- [Bulky-Parallel-Batch-Renamer](./Bulky-Parallel-Batch-Renamer.md)
-- [DiskTree-and-Storage-Analysis](./DiskTree-and-Storage-Analysis.md)
-- [Modal-Keybindings-and-Chord-Rebind](./Modal-Keybindings-and-Chord-Rebind.md)
-- [Multi-Agent-Provider-Orchestration](./Multi-Agent-Provider-Orchestration.md)
-- [Xreader-Document-Reader](./Xreader-Document-Reader.md)
-- [Xed-Code-Editor](./Xed-Code-Editor.md)
-- [Autosave-Capture-Engine](./Autosave-Capture-Engine.md)
-- [Atreyu-System-Plugin](./Atreyu-System-Plugin.md)
-- [Browser-Theme-Sync](./Browser-Theme-Sync.md)
-- [HiDPI-Scale-Engine](./HiDPI-Scale-Engine.md)
-- [Docker-Rootless-Engine](./Docker-Rootless-Engine.md)
-- [Cloud-Agent-Environment](./Cloud-Agent-Environment.md)
-- [Grok-AI-Panel-Agent](./Grok-AI-Panel-Agent.md)
-- [Font-Builder](./Font-Builder.md)
+- [Contributing](./12-Contributing.md)
+- [Architecture decisions](./15-Architecture-Decisions.md)
+- [Project roadmap](./11-Roadmap.md)
+
+## Reference projects
+
+Study Linux, Arch Linux, Omarchy, Linux Mint, Redox OS, xv6, and BSD systems as design references. Adaptations and validation criteria belong on the relevant component page; do not present reference-project capabilities as SigmaOS capabilities.

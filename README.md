@@ -318,6 +318,8 @@ git push origin feature/your-feature
 
 ## 🏆 Inspiration & References
 
+See [Inspiration and Reference Projects](docs/INSPIRATION_AND_REFERENCE_PROJECTS.md) for concrete adaptation guidance, validation criteria, and a prioritized improvement agenda. These projects are design references; their feature names alone do not establish SigmaOS parity.
+
 SigmaOS draws inspiration from these outstanding projects:
 
 | Project | Inspiration |
@@ -407,4 +409,3 @@ Each phase incorporates best practices from:
 For detailed information, see [FUTURE_DEVELOPMENT_PLAN.md](FUTURE_DEVELOPMENT_PLAN.md).
 
 ---
-

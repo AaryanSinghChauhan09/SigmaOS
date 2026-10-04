@@ -96,7 +96,10 @@ impl EevdfTask {
 
     /// Check if task is eligible to run
     pub fn is_eligible(&self, min_vruntime: u64) -> bool {
-        self.state == TaskState::Ready && (self.vruntime - self.lag as u64) <= min_vruntime
+        // Keep the signed lag signed: casting a negative lag to u64 wraps and
+        // can make a task with service debt appear eligible.
+        self.state == TaskState::Ready
+            && (self.vruntime as i128 - self.lag as i128) <= min_vruntime as i128
     }
 
     /// Boost priority for priority inheritance
@@ -483,6 +486,25 @@ mod tests {
     }
 
     #[test]
+    fn negative_lag_requires_a_later_virtual_time_to_be_eligible() {
+        let mut task = EevdfTask::new(1, 100, 0);
+        task.vruntime = 50;
+        task.lag = -10;
+
+        assert!(!task.is_eligible(59)); // 50 - (-10) = 60
+        assert!(task.is_eligible(60));
+    }
+
+    #[test]
+    fn eligibility_rejects_non_ready_tasks_even_with_positive_lag() {
+        let mut task = EevdfTask::new(1, 100, 0);
+        task.lag = 10;
+        task.state = TaskState::Blocked;
+
+        assert!(!task.is_eligible(100));
+    }
+
+    #[test]
     fn test_priority_inheritance() {
         let mut task = EevdfTask::new(1, 100, 5);
         let orig_weight = task.weight;
@@ -551,8 +573,6 @@ mod tests {
 
         assert!(vruntime_after >= vruntime_before); // Never decreases
     }
-
-    #[ignore]
 
     #[test]
     fn test_eligible_task_ordering() {

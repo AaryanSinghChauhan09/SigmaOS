@@ -1,160 +1,47 @@
-# Scheduler
+# CPU Scheduler
 
-SigmaOS implements a multi-policy process scheduler written entirely in Rust. It combines a CFS-equivalent completely fair scheduler, a real-time FIFO/RR scheduler, an AI-augmented predictive tier, and a Deadline scheduler — all running in O(log n) time with per-CPU run queues and full NUMA awareness.
+This page is the canonical scheduler component reference. It tracks the current code, comparison sources, validation, and future work together. A policy implementation in a module does not establish that the booted kernel uses it.
 
----
+## Current implementation
 
-## Architecture Overview
+The EEVDF model is in [`src/scheduler/eevdf.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/scheduler/eevdf.rs) and is exported by [`src/scheduler/mod.rs`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/src/scheduler/mod.rs). It contains a task/run-queue model, nice-to-weight table, virtual-runtime accounting, deadline selection, and a test-only service supervisor retained for compatibility.
 
-```
- ┌─────────────────────────────────────────────────────┐
- │                   Task Wakeup / Enqueue              │
- └─────────────────────┬───────────────────────────────┘
-                       │
-          ┌────────────▼──────────────┐
-          │     Scheduler Core        │
-          │   (src/kernel/scheduler)  │
-          │                           │
-          │  ┌──────────┐  ┌───────┐  │
-          │  │ RT Queue │  │ CFS   │  │
-          │  │ FIFO/RR  │  │ RB-   │  │
-          │  │ Priority │  │ Tree  │  │
-          │  └────┬─────┘  └───┬───┘  │
-          │       │            │       │
-          │  ┌────▼────────────▼────┐  │
-          │  │   pick_next_task()   │  │
-          │  └──────────┬───────────┘  │
-          └─────────────┼──────────────┘
-                        │
-          ┌─────────────▼──────────────┐
-          │    Per-CPU Run Queue        │
-          │  load balance │ migration   │
-          └────────────────────────────┘
+The run queue is a `Vec` sorted by virtual deadline, so enqueue is O(n log n) and selection is O(n) in the current code. The model must not be described as per-CPU, SMP-integrated, O(log n), or production-ready without corresponding implementation and runtime evidence. Confirm the kernel dispatch path before asserting that EEVDF is the active policy.
+
+Eligibility is `Ready && (vruntime - lag) <= min_vruntime`, evaluated with signed arithmetic. Positive lag means service is owed; negative lag means service debt. Regression tests cover negative lag and non-ready tasks.
+
+## Design references
+
+| Project | Design to study | SigmaOS application |
+|---|---|---|
+| [Linux EEVDF scheduler](https://docs.kernel.org/scheduler/sched-eevdf.html) | Eligibility and virtual deadlines, fair service, preemption | Validate lag accounting and deadline ordering against a small reference model. |
+| [FreeBSD ULE](https://man.freebsd.org/cgi/man.cgi?query=sched_ule) | CPU topology and affinity-aware scheduling | Defer migration policy until CPU discovery and per-CPU queue ownership are explicit. |
+| [xv6 RISC-V](https://github.com/mit-pdos/xv6-riscv) | Small, auditable process state transitions and locking | Keep transition rules testable and document lock ownership before adding concurrency. |
+| [Redox OS](https://doc.redox-os.org/book/) | Rust interfaces and isolation boundaries | Keep scheduler policy separate from architecture-specific context switching. |
+
+## Validation
+
+Run focused scheduler tests with:
+
+```sh
+cargo test --lib scheduler::eevdf::tests
 ```
 
----
+This validates the library model only. It does not prove boot-time integration, preemption, context switching, multicore safety, or real-time guarantees. Those require kernel-level tests and emulator/hardware traces.
 
-## Scheduling Policies
+## Future development roadmap
 
-| Policy | Description | Use Case |
-|--------|-------------|---------|
-| `SCHED_NORMAL` | CFS — weight-based fair share | Default for all processes |
-| `SCHED_FIFO` | RT — run until preempted or blocks | Hard real-time tasks |
-| `SCHED_RR` | RT — time-sliced FIFO | Soft real-time tasks |
-| `SCHED_DEADLINE` | EDF — earliest deadline first | Media, audio pipelines |
-| `SCHED_IDLE` | Lowest priority, background only | `nice 19` equivalent |
-| `SCHED_AI` | AI-predictive tier (SigmaOS exclusive) | Proactive prefetch |
+1. **Correctness and invariants:** test signed lag boundaries, equal deadlines, blocked/running tasks, wakeup placement, and arithmetic saturation. Define units and overflow behavior for time and virtual runtime.
+2. **Selection structure:** benchmark realistic runnable counts. Replace the vector with a suitable ordered structure only after measurements; preserve deterministic deadline and tie-breaking behavior.
+3. **Kernel integration:** document and test the call path from timer interrupt/preemption through policy selection and architecture context switch. Remove mock/synthetic scheduling success paths from any production claim.
+4. **Concurrency and SMP:** specify per-CPU ownership, locking, task migration, CPU affinity validation, and starvation bounds. Add race/stress tests before enabling multiple CPUs.
+5. **Policy comparison:** compare against Linux EEVDF and xv6 round-robin on the same workloads. Publish hardware/emulator, configuration, workload, baseline, and repeated measurements.
+6. **Observability:** add bounded counters for queue wait, dispatches, preemptions, and migration only when the runtime path can report them accurately.
 
----
+## Completion criteria
 
-## CFS Scheduler (`src/kernel/scheduler.rs`)
-
-- **Virtual runtime** (`vruntime`): tracks CPU time weighted by `nice` value
-- **Red-black tree**: O(log n) pick-next (leftmost node)
-- **Min-granularity**: 1 ms (prevents starvation)
-- **Target latency**: 6 ms for 1 process, scales with load
-- **Priority range**: `nice -20` (highest) to `nice 19` (lowest)
-
-### CFS Formula
-```
-weight = NICE_TO_WEIGHT[nice + 20]   // lookup table
-vruntime += real_delta * (NICE0_WEIGHT / weight)
-```
-
-### Load Balancing
-- Periodic load balance every 4 ms
-- NUMA-aware: prefer local node tasks
-- Migration threshold: 25% imbalance before moving tasks
-- Work stealing from overloaded CPUs
-
----
-
-## Real-Time Scheduler (`src/rt/`)
-
-- Priority range: 1 (lowest RT) to 99 (highest RT)
-- `SCHED_FIFO`: runs until it blocks or yields
-- `SCHED_RR`: time slice = 100 ms (configurable)
-- RT throttling: RT tasks limited to 95% CPU by default (`rt_period=1s, rt_runtime=0.95s`)
-
----
-
-## Deadline Scheduler
-
-Based on GRUB (Greedy Reclamation of Unused Bandwidth):
-- Per-task: `runtime`, `deadline`, `period`
-- EDF ordering on active deadline queue
-- CBS (Constant Bandwidth Server) for isolation
-- Example: audio thread `runtime=5ms, deadline=20ms, period=20ms`
-
----
-
-## AI-Predictive Scheduler (SigmaOS Exclusive)
-
-Unique feature not in Linux, Omarchy, or Mint:
-
-1. **Workload profiler**: records `(task, cpu_time, wait_time, wakeup_pattern)` tuples
-2. **Pattern classifier**: ML model identifies periodic vs bursty vs interactive tasks
-3. **Proactive wakeup**: wakes tasks 1–2 ms before predicted next event
-4. **Cache pre-warm**: migrates task to CPU whose L2/L3 already has its working set
-
----
-
-## Timer Wheel (`src/kernel/timer_wheel.rs`)
-
-Hierarchical timing wheel for kernel timers:
-- 5-level wheel: 256 slots × 5 = ~3.4 years range at 1ms resolution
-- O(1) add/remove for timers in the near future
-- `HRTIMER_NOHZ`: tickless operation (no unnecessary wakeups)
-
----
-
-## Process Priority (`src/kernel/process.rs`)
-
-```rust
-pub struct Priority {
-    pub value: i32,   // -20 (highest) to 19 (lowest)
-}
-
-impl Priority {
-    pub const HIGH:    Priority = Priority { value: -10 };
-    pub const NORMAL:  Priority = Priority { value:   0 };
-    pub const LOW:     Priority = Priority { value:  10 };
-    pub const IDLE:    Priority = Priority { value:  19 };
-}
-```
-
----
-
-## Comparison vs Linux / Omarchy / Mint Schedulers
-
-| Feature | Linux | Omarchy | Mint | **SigmaOS** |
-|---------|-------|---------|------|-------------|
-| CFS | ✅ | ✅ | ✅ | ✅ Rust |
-| RT FIFO/RR | ✅ | ✅ | ✅ | ✅ |
-| SCHED_DEADLINE | ✅ | ✅ | ✅ | ✅ |
-| AI-predictive | ❌ | ❌ | ❌ | ✅ |
-| NUMA-aware LB | ✅ | ✅ | ✅ | ✅ |
-| Tickless (NOHZ) | ✅ | ✅ | ✅ | ✅ |
-
----
-
-## Source Files
-
-| File | Description |
-|------|-------------|
-| `src/kernel/scheduler.rs` | CFS + RT scheduler core |
-| `src/kernel/timer_wheel.rs` | Hierarchical timer wheel |
-| `src/kernel/process.rs` | Process struct and Priority |
-| `src/scheduler/` | Scheduler module directory |
-| `src/rt/` | Real-time scheduler |
-| `src/performance/smart_optimizer.rs` | AI scheduling integration |
-
----
-
-## AI Agent Maintenance Instructions
-
-> **For AI agents maintaining this page:**
-> - Source: `src/kernel/scheduler.rs`, `src/scheduler/`, `src/rt/`
-> - Update latency/granularity values when tuning constants change
-> - Document new scheduling policies as they are added
-> - Keep AI-predictive section current with `src/performance/smart_optimizer.rs`
+- Unit and property tests cover eligibility, state transitions, accounting boundaries, and ordering.
+- Kernel integration tests demonstrate timer-driven preemption and context restoration on the documented target.
+- SMP claims have multi-CPU stress results and defined lock/ownership rules.
+- Performance claims are reproducible and compare the same workload and configuration.
+- Status in the README and capability matrix matches verified behavior.
