@@ -10,7 +10,9 @@ The following checks passed on 2026-10-04:
 |---|---|---|
 | `cargo check --lib` | Passed | The hosted library target compiles. It does not build a bootable kernel image. |
 | `cargo test --lib` | 6,349 passed; 66 ignored | The library's in-process unit tests pass. Ignored tests did not run. |
+| Focused auth tests | 2 passed | The default account environment has no built-in root credential and login requires a verifier. This does not provide an OS login service. |
 | `./run_sigma_tests.sh` | Passed | The repository's standalone test runner completed. Some test sources emitted compiler warnings. |
+| Bare-metal kernel build | Blocked | `cargo build --bin sigma_kernel --features microkernel --target x86_64-unknown-none` hits `std` dependency errors and extensive `no_std` import/macro failures across the crate. |
 | QEMU boot | Not run | `qemu-system-x86_64` was unavailable in the environment. |
 
 Test outcomes describe the tested code and configuration, not general hardware support or release readiness.
