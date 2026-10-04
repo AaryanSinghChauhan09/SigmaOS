@@ -251,3 +251,14 @@ gamepad get-axis 1 LeftStickX
 - **Palette 🎨**: Maintain Arch Linux wiki style: clear, factual, one page per topic, using appropriate markdown formatting and tables where necessary.
 - **Sentinel 🛡️**: Verify that no hardcoded credentials or unvetted cryptographic algorithms are documented as production-ready. Ensure security limitations are accurately stated.
 - **General**: Keep pages up-to-date with current repository capabilities. Remove redundant files when consolidating information.
+
+## Reference projects and future roadmap
+
+Use Omarchy for coherent keyboard workflows and practical customization, Linux Mint for approachable onboarding and familiar system tools, and Arch Linux for transparent configuration and documentation. These are UX references, not evidence that the corresponding SigmaOS workflow is complete.
+
+1. Define a first-session path for display/input setup, networking, launching an app, software installation, help, and recovery.
+2. Make core flows usable by keyboard with visible focus, accessible labels, and clear error recovery.
+3. Connect settings and panels to discovered hardware and real system capabilities; show unsupported operations clearly.
+4. Test clean installation and upgrade flows with a new user profile and publish reproducible screenshots or test steps.
+
+**Completion evidence:** a clean-install walkthrough completes without editing internal files; keyboard navigation and failure recovery are verified for each core workflow.

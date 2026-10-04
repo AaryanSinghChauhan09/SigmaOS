@@ -117,3 +117,14 @@ Integration testing requires the full SigmaOS QA harness.
 - Additional context line 37 for Hardware Drivers
 - Additional context line 38 for Hardware Drivers
 - Additional context line 39 for Hardware Drivers
+
+## Reference projects and future roadmap
+
+Study Linux DRM/KMS and driver lifecycle, FreeBSD device events, NetBSD portable/rump testing, and Arch Linux's explicit hardware/firmware guidance.
+
+1. Maintain a support matrix of device IDs, architectures, tested operations, firmware, and limitations.
+2. Define probe, init, reset, suspend, resume, removal, and cleanup states.
+3. Validate DMA address width, alignment, mapping lifetime, and ownership before enabling bus mastering.
+4. Keep a framebuffer fallback while accelerated display paths are developed; failed modesets must restore the previous state.
+
+**Completion evidence:** each hardware claim names the device or emulator and tested operations; failure paths release resources safely; desktop controls reflect discovered hardware.

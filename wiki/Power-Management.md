@@ -195,3 +195,15 @@ ThermalZone: GPU_ZONE
 > - Update power consumption table with new measured values
 > - Document new ACPI S-states when hardware support expands
 > - Keep sigma-ai governor description current with ML model changes
+
+## Reference projects and future roadmap
+
+Study Linux cpufreq and runtime power management, FreeBSD powerd/ACPI policy, OpenBSD conservative device defaults, and NetBSD's machine-independent timecounter.
+
+1. Separate monotonic time, wall-clock time, deadlines, and calendar conversion; specify precision, wraparound, and fallback behavior.
+2. Discover and validate clock sources and timers, reporting drift and source loss.
+3. Model power transitions with preconditions, device ordering, timeout, rollback, and visible failure status.
+4. Read thermal and battery values only from validated hardware providers; define units, update intervals, and stale-data behavior.
+5. Implement suspend/resume only after device quiescence and state recovery are tested.
+
+**Completion evidence:** named targets pass timer bounds and wraparound checks; unsupported transitions fail safely; telemetry and requested hardware settings are distinguished from measured values.

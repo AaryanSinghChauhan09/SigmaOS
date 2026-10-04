@@ -117,3 +117,14 @@ Integration testing requires the full SigmaOS QA harness.
 - Additional context line 37 for Container Virtualization
 - Additional context line 38 for Container Virtualization
 - Additional context line 39 for Container Virtualization
+
+## Reference projects and future roadmap
+
+Study Linux KVM, namespaces, cgroups and seccomp; FreeBSD bhyve and jails; OpenBSD vmm; and NetBSD rump kernels. Virtual machines, containers, OCI parsing, and resource-control data models are separate capabilities.
+
+1. Specify guest memory ownership, CPU feature checks, device/interrupt models, exits, and teardown before claiming VM execution.
+2. Map every container isolation rule to syscall, filesystem, network, and device enforcement paths.
+3. Enforce resource limits and cleanup on normal exit, crash, and partial startup.
+4. Reject unsupported image directives and isolation policies rather than silently accepting them.
+
+**Completion evidence:** a documented guest workload runs on a named target; container tests prove access restrictions and resource limits; teardown and startup-failure paths release resources.

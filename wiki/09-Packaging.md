@@ -334,3 +334,15 @@ The implementation has been thoroughly verified across all test suites:
 - **Palette 🎨**: Maintain Arch Linux wiki style: clear, factual, one page per topic, using appropriate markdown formatting and tables where necessary.
 - **Sentinel 🛡️**: Verify that no hardcoded credentials or unvetted cryptographic algorithms are documented as production-ready. Ensure security limitations are accurately stated.
 - **General**: Keep pages up-to-date with current repository capabilities. Remove redundant files when consolidating information.
+
+## Reference projects and future roadmap
+
+Study NixOS generations for rollback, Debian package metadata and transactions, Arch Linux build recipes, Gentoo profiles, and FreeBSD signed catalogs and isolated port builds. Parsing a format or producing a manifest does not establish safe installation or signature verification.
+
+1. Define and validate a canonical manifest with target, dependencies, payload entries, permissions, and provenance.
+2. Use an audited signature provider; fail closed when verification or entropy is unavailable.
+3. Make dependency resolution deterministic and report conflicts and cycles.
+4. Sandbox build and maintainer actions with explicit filesystem, process, and network permissions.
+5. Stage installs as transactions and verify rollback after interruption; build a recoverable installer path.
+
+**Completion evidence:** invalid signatures or manifests stop installation; injected failure leaves the prior system usable; reproducibility and installer recovery are tested and documented.

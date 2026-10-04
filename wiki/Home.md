@@ -14,6 +14,7 @@ Each core OS component page is the canonical home for implementation status, ref
 - [Desktop](./08-Desktop.md)
 - [Packaging and updates](./09-Packaging.md)
 - [Drivers](./Hardware-Drivers.md)
+- [Power and time](./Power-Management.md)
 - [IPC and syscalls](./IPC-and-Syscalls.md)
 - [Init and services](./Init-and-Services.md)
 - [Virtualization and containers](./Container-Virtualization.md)
@@ -28,4 +29,4 @@ Each core OS component page is the canonical home for implementation status, ref
 
 ## Reference projects
 
-Study Linux, Arch Linux, Omarchy, Linux Mint, Redox OS, xv6, and BSD systems as design references. Adaptations and validation criteria belong on the relevant component page; do not present reference-project capabilities as SigmaOS capabilities.
+See [Inspiration and Reference Projects](./Inspiration-and-References.md). Adaptations and validation criteria belong on the relevant component page; do not present reference-project capabilities as SigmaOS capabilities.

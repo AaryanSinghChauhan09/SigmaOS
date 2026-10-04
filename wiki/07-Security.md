@@ -458,3 +458,15 @@ Before committing any security-related code:
 2. Security module changes require updating this wiki page
 3. Refer to OpenBSD `pledge(2)` and `unveil(2)` man pages for inspiration
 4. FreeBSD Capsicum reference: https://man.freebsd.org/cgi/man.cgi?query=capsicum
+
+## Reference projects and future roadmap
+
+Compare Linux Landlock, seccomp and LSM boundaries with OpenBSD pledge/unveil and FreeBSD Capsicum. Select narrow, auditable policy interfaces and connect every policy to the operation it is meant to restrict.
+
+1. Map threat boundaries and enforcement call sites for syscalls, filesystem access, IPC, devices, and network operations.
+2. Make unsupported security providers fail closed; remove simulated-success behavior from security-critical paths.
+3. Test allow and deny cases at the actual enforcement boundary, including invalid handles and malformed policy.
+4. Keep key/nonce generation tied to an integrated entropy provider and document cryptographic providers and limitations.
+5. Add fuzzing and fault-injection for policy parsing and privilege transitions.
+
+**Completion evidence:** policy denial is verified through runtime tests; provider failures cannot report success; security claims name the enforcement path and threat model.

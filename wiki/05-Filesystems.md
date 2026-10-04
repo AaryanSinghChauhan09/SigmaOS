@@ -306,3 +306,15 @@ btree count
 - **Palette 🎨**: Maintain Arch Linux wiki style: clear, factual, one page per topic, using appropriate markdown formatting and tables where necessary.
 - **Sentinel 🛡️**: Verify that no hardcoded credentials or unvetted cryptographic algorithms are documented as production-ready. Ensure security limitations are accurately stated.
 - **General**: Keep pages up-to-date with current repository capabilities. Remove redundant files when consolidating information.
+
+## Reference projects and future roadmap
+
+Study Linux ext4/JBD2 and VFS, Btrfs copy-on-write and recovery, FreeBSD GEOM/ZFS, NetBSD filesystem boundaries, and Alpine's small recovery environment. The presence of a filesystem module or an API in this page is not evidence of working on-disk support; verify each format against its implementation and boot/runtime path.
+
+1. Specify VFS path, mount, permissions, error, and concurrency semantics.
+2. Define on-disk invariants, write ordering, replay limits, and corruption handling for one supported filesystem.
+3. Complete one snapshot and rollback path with interruption and recovery tests.
+4. Validate storage device capacity, sector size, alignment, DMA limits, and removal behavior.
+5. Add offline integrity checks and bound all cache accounting, including oversized entries.
+
+**Completion evidence:** interrupted-write tests recover to a documented state; invalid or truncated metadata fails safely; recovery works without network access; supported formats and tested devices are named explicitly.

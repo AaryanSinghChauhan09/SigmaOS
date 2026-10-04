@@ -163,3 +163,15 @@ sigif bond0 status
 - **Palette 🎨**: Maintain Arch Linux wiki style: clear, factual, one page per topic, using appropriate markdown formatting and tables where necessary.
 - **Sentinel 🛡️**: Verify that no hardcoded credentials or unvetted cryptographic algorithms are documented as production-ready. Ensure security limitations are accurately stated.
 - **General**: Keep pages up-to-date with current repository capabilities. Remove redundant files when consolidating information.
+
+## Reference projects and future roadmap
+
+Study Linux's packet path, namespaces, nftables and WireGuard; OpenBSD PF and conservative policy defaults; FreeBSD VNET/Capsicum; and NetBSD NPF/rump testing. Configuration structures and protocol names do not establish that traffic is processed or filtered by these mechanisms.
+
+1. Trace ingress through parsing, routing, policy, sockets, and egress; identify actual enforcement hooks.
+2. Separate firewall rule storage from packet-path enforcement and define rule precedence.
+3. Specify network namespace ownership, teardown, and capability inheritance.
+4. Fuzz protocol and policy parsers with bounded input and resource use.
+5. Integrate cryptography only through an audited provider with explicit entropy and key handling.
+
+**Completion evidence:** deny rules are shown to block traffic at runtime; invalid packets and policies fail safely; isolation is tested at each enforcement boundary; provider and tested device/emulator are documented.

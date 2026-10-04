@@ -117,3 +117,14 @@ Integration testing requires the full SigmaOS QA harness.
 - Additional context line 37 for Init and Services
 - Additional context line 38 for Init and Services
 - Additional context line 39 for Init and Services
+
+## Reference projects and future roadmap
+
+Study systemd dependency/readiness semantics, OpenRC's explicit runlevels, runit/s6 supervision, and FreeBSD startup scripts. Keep definitions bounded, deterministic, and recoverable.
+
+1. Specify the boot-to-init handoff and behavior when init is missing or invalid.
+2. Define service dependencies, readiness, restart limits, timeouts, logging, and ordered shutdown.
+3. Validate the service graph before starting services; reject cycles and unsupported directives.
+4. Add a recovery mode that works when normal configuration is corrupt.
+
+**Completion evidence:** a boot test exercises kernel-to-init handoff; runtime tests cover start, readiness, crash/restart limits, shutdown, invalid graphs, and recovery.

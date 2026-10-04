@@ -117,3 +117,14 @@ Integration testing requires the full SigmaOS QA harness.
 - Additional context line 37 for IPC and Syscalls
 - Additional context line 38 for IPC and Syscalls
 - Additional context line 39 for IPC and Syscalls
+
+## Reference projects and future roadmap
+
+Study Linux pipes, Unix sockets, eventfd and pidfd; FreeBSD kqueue and capability passing; OpenBSD pledge/unveil; and Redox/Fuchsia message and handle boundaries.
+
+1. Specify endpoint identity, handle ownership, inheritance, close behavior, peer exit, cancellation, and error codes.
+2. Choose a bounded set of primitives and define message sizes, queue limits, blocking, and backpressure.
+3. Enforce permissions at endpoint creation, open, transfer, and shared-memory mapping.
+4. Test malformed messages, invalid handles, full queues, cancellation, and peer exit across separate processes.
+
+**Completion evidence:** process-to-process communication works end to end through documented runtime interfaces and denied operations are rejected at enforcement boundaries.
