@@ -1,68 +1,37 @@
-# SigmaOS Wiki & Master Absorption Architecture
+# SigmaOS Project Overview
 
-> **✅ Merge & Cleanup Complete — 2026-10-01:** All 13 feature branches and 6 PRs (#1793–#1798) merged into `main`. All 13 stale branches deleted. Only `main` remains. Final commit: `41bebf3cd5`.  
-> See: [Merge & Cleanup Summary — October 2026](17-Merge-Summary-Oct-2026)
+SigmaOS is an operating-system project. Its repository contains kernel, memory, filesystem, networking, security, driver, desktop, installer, and package-management code. The presence of a module, API, or roadmap entry does not by itself establish runtime support.
 
-SigmaOS is an autonomous, from-scratch, zero-dependency, zero-trust bare-metal operating system built exclusively using modern low-level systems programming paradigms (Rust `#![no_std]`, Zig, and Nim).
+## Project goals
 
-## Executive Mission & Tri-Agent Framework
+- Build a system with clear subsystem boundaries and explicit resource ownership.
+- Evaluate useful designs from Linux distributions and BSD systems, then adapt them to SigmaOS's architecture rather than claiming direct parity.
+- Make reliability, security, performance, accessibility, and recoverability reviewable through source, documented behavior, and repeatable validation.
+- Keep security-critical functions unavailable when a required audited provider is not integrated.
 
-SigmaOS operates under a continuous, multi-agent development model led by three autonomous agents:
-- **Bolt** ⚡ (Performance & Speed Specialist): Focused on sub-50 line zero-allocation performance optimizations, lock-free data structures, and cycle efficiency.
-- **Palette** 🎨 (UX & Accessibility Specialist): Focused on WCAG 2.1 AAA accessible controls, Zenith Desktop visual polish, keyboard navigation, and responsive micro-interactions.
-- **Sentinel** 🛡️ (Security & Hardening Specialist): Focused on kernel sandboxing, capability enforcement, input sanitization, and post-quantum cryptographic verifiers.
+## Linux and BSD design references
 
-## 500+ GitHub Repositories Absorption Architecture
+| Area | Designs to study |
+|---|---|
+| Kernel and scheduling | Linux scheduling and cgroups; FreeBSD ULE and cpusets; NetBSD modular kernel interfaces |
+| Storage | Linux journaling and copy-on-write filesystems; FreeBSD GEOM and ZFS; NetBSD VFS boundaries |
+| Networking and security | Linux namespaces and nftables; OpenBSD PF, pledge, and unveil; FreeBSD jails and Capsicum; NetBSD NPF |
+| Packaging and updates | NixOS generations; Debian package transactions; Arch build recipes; Gentoo profiles; FreeBSD pkg and Poudriere |
+| Desktop and devices | Linux DRM/KMS; FreeBSD device lifecycle; Pop!_OS COSMIC workspace design |
 
-SigmaOS systematically extracts functions, features, architectural models, design patterns, UI/UX guidelines, and core algorithms from over 500 top-tier open-source GitHub repositories across 20 system domains:
-1. Core Linux Kernel & Variants (`torvalds/linux`, `gregkh/linux`, `raspberrypi/linux`, `analogdevicesinc/linux`)
-2. Mainstream & Alternative Linux Distros (`nixpkgs`, `void-packages`, `clearlinux`, `aports`, `PKGBUILDS`, `gentoo`)
-3. Lightweight & Mobile OS (`TinyCore`, `woof-CE`, `dietpi`, `pmaports`, `lfs`, `chimera`)
-4. Server & Immutable Cloud OS (`talos`, `kairos`, `flatcar`, `fedora-coreos`, `bottlerocket`)
-5. System Utilities & Core Tools (`systemd`, `busybox`, `util-linux`, `coreutils`, `iputils`, `procps`)
-6. Package Managers & Build Systems (`pacman`, `rpm`, `dpkg`, `flatpak`, `snapd`, `spack`)
-7. Security, Crypto & VPN (`wireguard`, `openvpn`, `openssh`, `gnupg`, `selinux`, `clamav`)
-8. Filesystems & Storage Systems (`zfs`, `btrfs-progs`, `xfsprogs`, `f2fs-tools`, `bcachefs`, `ceph`)
-9. Desktop Shells & Window Managers (`gnome-shell`, `plasma-desktop`, `xfce4-panel`, `sway`, `i3`, `awesome`)
-10. Container Runtimes & Orchestration (`docker-ce`, `containerd`, `runc`, `podman`, `kubernetes`)
-11. Virtualization & Hypervisors (`qemu`, `kvm`, `xen`, `proxmox-ve`, `firecracker`)
-12. Init Systems & Supervisors (`openrc`, `runit`, `s6`, `monit`, `supervisor`)
-13. Networking & DNS (`bind9`, `dnsmasq`, `unbound`, `frr`, `openvswitch`)
-14. Monitoring & Telemetry (`htop`, `atop`, `glances`, `prometheus`, `grafana`, `vector`)
-15. Modern Shells & Terminals (`fish`, `nushell`, `zsh`, `bash`, `alacritty`, `kitty`)
-16. HPC & Scientific Tools (`slurm`, `openmpi`, `petsc`, `hdf5`, `gromacs`)
-17. Backup & Recovery Systems (`borg`, `restic`, `timeshift`, `rsync`, `clonezilla`)
-18. Embedded & IoT Systems (`poky`, `openwrt`, `buildroot`, `balena-os`, `tizen`)
-19. Real-Time & Alternative Kernels (`seL4`, `genode`, `haiku`, `plan9`, `rumpkernel`)
-20. Advanced Tracing & Debugging (`bcc`, `bpftrace`, `strace`, `gdb`, `valgrind`, `perf`)
+These are inspiration sources for design review. They are not a feature-support list.
 
-## Master Specification Files
+## Component documentation
 
-- [Tri-Agent & 500 Repos Master Plan](../docs/SIGMAOS_500_REPOS_TRI_AGENT_ABSORPTION_MASTER_PLAN.md)
-- [Improvement Plan & Technical Audit](../ImprovementPlan.md)
+- [Kernel](04-Kernel)
+- [Filesystems](05-Filesystems)
+- [Networking](06-Networking)
+- [Security](07-Security)
+- [Desktop](08-Desktop)
+- [Packaging](09-Packaging)
+- [Future development overview](14-Future-Development)
+- [Component roadmap index](Home#component-future-development-roadmaps)
 
-## Documentation Structure
+## Maintenance
 
-This wiki is organized in Arch Linux style with one page per topic:
-
-- [Installation](01-Installation.md)
-- [Getting Started](02-Getting-Started.md)
-- [Configuration](03-Configuration.md)
-- [Kernel](04-Kernel.md)
-- [Filesystems](05-Filesystems.md)
-- [Networking](06-Networking.md)
-- [Security](07-Security.md)
-- [Desktop](08-Desktop.md)
-- [Packaging](09-Packaging.md)
-- [Development](10-Development.md)
-- [Roadmap](11-Roadmap.md)
-- [Architecture Decisions](15-Architecture-Decisions.md)
-- [Self-Sufficiency Encyclopedia](16-Self-Sufficiency-Encyclopedia.md)
-- [Merge Summary — October 2026](17-Merge-Summary-Oct-2026)
-
-## AI Agent Maintenance Instructions
-
-- **Bolt ⚡**: Ensure documentation of any new zero-allocation optimizations or performance improvements are added concisely without marketing fluff.
-- **Palette 🎨**: Maintain Arch Linux wiki style: clear, factual, one page per topic, using appropriate markdown formatting and tables where necessary.
-- **Sentinel 🛡️**: Verify that no hardcoded credentials or unvetted cryptographic algorithms are documented as production-ready. Ensure security limitations are accurately stated.
-- **General**: Keep pages up-to-date with current repository capabilities. Remove redundant files when consolidating information.
+Keep this page as a concise project overview. Link detailed behavior to source files and component pages. Move implementation details to their topic pages, label proposals as proposals, and remove unverified performance, test, hardware-support, or parity claims.

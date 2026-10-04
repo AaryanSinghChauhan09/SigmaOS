@@ -34,7 +34,7 @@ Boot from USB and follow the graphical installer.
 
 ### 2. Virtual Machine Installation
 
-#### QEMU
+### QEMU
 
 ```bash
 qemu-system-x86_64 \
@@ -47,7 +47,7 @@ qemu-system-x86_64 \
   -display gtk
 ```
 
-#### VirtualBox
+### VirtualBox
 
 Create a new VM with:
 - OS Type: Linux, Other 64-bit

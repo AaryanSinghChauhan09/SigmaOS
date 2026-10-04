@@ -1,6 +1,6 @@
 # Package Management
 
-SigmaOS provides a universal package management subsystem (`sigpkg`) that natively supports all major Linux and BSD package formats through a unified foreign-PM translation layer and a suite of advancement modules (V3–V10).
+SigmaOS provides a universal package management subsystem (`sigpkg`) that natively supports Linux and BSD package formats through a unified foreign-PM translation layer and advancement modules V3–V18.
 
 ## Overview
 
@@ -8,7 +8,7 @@ The package management stack consists of:
 
 - **sigpkg** — The native SigmaOS package manager (`src/sigpkg/`)
 - **Universal PM Layer** — Translates foreign package manager commands to sigpkg operations
-- **Advancement Suites V3–V10** — Iterative feature additions per version cohort
+- **Advancement Suites V3–V18** — Iterative feature additions per version cohort
 - **BsdPkg / OpenBsdPorts support** — Full BSD package format support added in the Oct 2026 session
 
 ## sigpkg CLI
@@ -154,6 +154,10 @@ let mut suite = SovereignDistroPackageAdvancementsSuiteV10::new();
 let format = suite.autodetect_format("pkgname=nginx\npkgver=1.25.3\n");
 // format == UniversalForeignPackageFormat::ArchPacman
 ```
+
+### V18 — Multi-format ingestion and transactional packaging
+
+The V18 suite (`src/package/sovereign_distro_package_advancements_v18.rs`) adds package manifest ingestion across Linux, BSD, and other supported archive formats. Its components include `UniversalMultiFormatPackageIngestionEngineV18`, a Linux/BSD packaging pipeline bridge with configurable scriptlet sandboxing, and a package transpilation and execution engine with transactional checkpoints. The suite is exposed through `SovereignDistroPackageAdvancementsSuiteV18`.
 
 ## BSD Package Support (BsdPkg)
 

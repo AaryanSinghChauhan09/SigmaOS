@@ -69,6 +69,20 @@ Revoke capabilities:
 sigcaps revoke process-name read:/etc/config
 ```
 
+## Landlock Path Rules
+
+The Landlock ruleset path check in `src/security/landlock.rs` rejects embedded NUL bytes, encoded traversal separators, and `.` or `..` path segments before checking rules. Matching uses slices without allocating a formatted path for each rule. These checks apply when the ruleset is enforced; an unenforced ruleset permits access.
+
+## Unsafe Pointer and Provider Boundaries
+
+The hostname and domain-name helpers in `src/syscall/uts_syscalls.rs` are `unsafe` because null checks cannot validate arbitrary caller pointers. A syscall entry point must validate or copy user memory before calling them; callers must guarantee the pointer is readable or writable for the supplied length.
+
+The wireless access model in `src/access/sovereign_access_matrix_expansion.rs` returns no scan results and reports the connection provider unavailable until a real wireless provider confirms those operations. It validates SSID and passphrase bounds and does not report simulated connection success.
+
+## CI Supply-Chain Controls
+
+The distro and security workflows pin third-party GitHub Actions to immutable commit SHAs. Workflows that only need repository checkout use read-only `contents` permissions.
+
 ## Filesystem Encryption
 
 ### fscrypt
