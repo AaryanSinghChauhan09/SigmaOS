@@ -79,6 +79,13 @@ if [ -f "src/desktop/onboarding_wizard.rs" ]; then
     ./build/onboarding_wizard_test
 fi
 
+if [ -f "src/desktop/mint_backup_tool.rs" ]; then
+    echo "Running Mint-inspired backup manifest and fail-closed archive test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/desktop/mint_backup_tool.rs -o build/mint_backup_tool_test
+    ./build/mint_backup_tool_test
+fi
+
 if [ -f "src/distro/linux_bsd_inspirations.rs" ]; then
     echo "Running Linux & BSD distro inspirations & subsystem bridge test suite..."
     mkdir -p build
