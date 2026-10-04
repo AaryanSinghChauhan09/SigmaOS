@@ -1,10 +1,9 @@
 //! SigmaOS Linux Mint-Inspired Update Manager (`mintUpdate` counterpart)
 //!
-//! Features inspired by Linux Mint's Update Manager:
-//! - 5-tier safety level policy (`Certified`, `Tested`, `Safe`, `Untested`, `Dangerous`)
-//! - Automated Timeshift / Btrfs snapshot trigger before any update transaction
-//! - Fastest mirror benchmarking and latency sorting
-//! - Safe Linux / SigmaOS kernel lifecycle and rollback guard
+//! In-memory update policy model inspired by Linux Mint's Update Manager.
+//!
+//! This module has no repository, signature, snapshot, or package transaction
+//! backend. It therefore must not invent updates or report an update as applied.
 
 #![allow(dead_code)]
 
@@ -68,47 +67,22 @@ pub struct MintUpdateManager {
 
 impl MintUpdateManager {
     pub fn new() -> Self {
-        let mut manager = Self {
+        Self {
             available_updates: Vec::new(),
             mirrors: Vec::new(),
             max_allowed_tier: UpdateSafetyTier::Tier3Safe,
             auto_create_snapshot_before_update: true,
             last_snapshot_id: None,
-            active_mirror_url: String::from("https://fastest.repo.sigmaos.local/packages"),
-        };
-        manager.register_default_mirrors();
-        manager
+            active_mirror_url: String::new(),
+        }
     }
 
-    fn register_default_mirrors(&mut self) {
-        self.mirrors.push(MirrorNode {
-            name: "Primary Global CDN (Cloudflare)".into(),
-            url: "https://cdn.repo.sigmaos.org".into(),
-            country_code: "US".into(),
-            latency_ms: 18,
-            bandwidth_mbps: 1000,
-            is_active: true,
-        });
-        self.mirrors.push(MirrorNode {
-            name: "European Mirror (Frankfurt)".into(),
-            url: "https://de.repo.sigmaos.org".into(),
-            country_code: "DE".into(),
-            latency_ms: 42,
-            bandwidth_mbps: 500,
-            is_active: false,
-        });
-        self.mirrors.push(MirrorNode {
-            name: "Asia-Pacific Mirror (Tokyo)".into(),
-            url: "https://jp.repo.sigmaos.org".into(),
-            country_code: "JP".into(),
-            latency_ms: 65,
-            bandwidth_mbps: 500,
-            is_active: false,
-        });
-    }
-
-    /// Select fastest mirror based on latency benchmark
-    pub fn benchmark_and_select_fastest_mirror(&mut self) -> String {
+    /// Select the lowest-latency candidate supplied by a real measurement layer.
+    /// This method does not probe the network itself.
+    pub fn select_fastest_measured_mirror(&mut self) -> Result<String, &'static str> {
+        if self.mirrors.is_empty() {
+            return Err("No measured repository mirrors are available");
+        }
         self.mirrors.sort_by_key(|m| m.latency_ms);
         for m in &mut self.mirrors {
             m.is_active = false;
@@ -116,53 +90,17 @@ impl MintUpdateManager {
         if let Some(fastest) = self.mirrors.first_mut() {
             fastest.is_active = true;
             self.active_mirror_url = fastest.url.clone();
-            fastest.name.clone()
+            Ok(fastest.name.clone())
         } else {
-            "default".into()
+            Err("No measured repository mirrors are available")
         }
     }
 
-    /// Populate available updates with safety classification
+    /// Refresh candidates from a repository. No repository backend is wired yet,
+    /// so stale candidates are cleared and no update is advertised as available.
     pub fn refresh_updates(&mut self) -> usize {
         self.available_updates.clear();
-
-        self.available_updates.push(SystemUpdateItem {
-            package_name: "sigma_kernel".into(),
-            current_version: "0.1.0".into(),
-            new_version: "0.1.1".into(),
-            tier: UpdateSafetyTier::Tier5Dangerous,
-            category: UpdateCategory::Kernel,
-            size_bytes: 14_500_000,
-            cve_ids: vec!["CVE-2026-44101".into()],
-            requires_reboot: true,
-            is_selected: true,
-        });
-
-        self.available_updates.push(SystemUpdateItem {
-            package_name: "openssl-pqc".into(),
-            current_version: "3.2.0".into(),
-            new_version: "3.2.1".into(),
-            tier: UpdateSafetyTier::Tier1Certified,
-            category: UpdateCategory::SecurityVulnerability,
-            size_bytes: 3_800_000,
-            cve_ids: vec!["CVE-2026-3199".into()],
-            requires_reboot: false,
-            is_selected: true,
-        });
-
-        self.available_updates.push(SystemUpdateItem {
-            package_name: "zenith_compositor".into(),
-            current_version: "1.2.0".into(),
-            new_version: "1.2.1".into(),
-            tier: UpdateSafetyTier::Tier2Tested,
-            category: UpdateCategory::DesktopEnvironment,
-            size_bytes: 4_200_000,
-            cve_ids: Vec::new(),
-            requires_reboot: false,
-            is_selected: true,
-        });
-
-        self.available_updates.len()
+        0
     }
 
     /// Filter updates by safety policy
@@ -177,29 +115,10 @@ impl MintUpdateManager {
             .collect()
     }
 
-    /// Perform atomic update with Timeshift pre-update snapshot safeguard
+    /// Apply selected updates once a transactional package and snapshot backend
+    /// exists. Currently this operation always fails without mutating state.
     pub fn apply_eligible_updates(&mut self) -> Result<(usize, u64, String), &'static str> {
-        let eligible = self.get_eligible_updates();
-        if eligible.is_empty() {
-            return Err("No eligible updates to apply under current safety policy");
-        }
-
-        let total_count = eligible.len();
-        let total_bytes: u64 = eligible.iter().map(|u| u.size_bytes).sum();
-
-        // 1. Create Pre-Update Timeshift Snapshot
-        let snap_id = if self.auto_create_snapshot_before_update {
-            let id = format!("timeshift_pre_update_{}", 1727260800);
-            self.last_snapshot_id = Some(id.clone());
-            id
-        } else {
-            "none".into()
-        };
-
-        // 2. Clear applied updates
-        self.available_updates.retain(|u| !u.is_selected);
-
-        Ok((total_count, total_bytes, snap_id))
+        Err("Update repository, snapshot, and transaction backends are unavailable")
     }
 }
 
@@ -210,39 +129,129 @@ impl Default for MintUpdateManager {
 }
 
 #[cfg(test)]
-#[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn test_mint_update_fastest_mirror() {
+    fn test_mirror_selection_requires_configured_candidates() {
         let mut mgr = MintUpdateManager::new();
-        let fastest_name = mgr.benchmark_and_select_fastest_mirror();
-        assert!(fastest_name.contains("Cloudflare"));
-        assert_eq!(mgr.active_mirror_url, "https://cdn.repo.sigmaos.org");
+        assert!(mgr.select_fastest_measured_mirror().is_err());
+        assert!(mgr.active_mirror_url.is_empty());
     }
 
     #[test]
-    fn test_mint_update_safety_tiers() {
+    fn test_mirror_selection_uses_supplied_latency_and_resets_active_flag() {
         let mut mgr = MintUpdateManager::new();
-        mgr.refresh_updates();
+        mgr.mirrors = vec![
+            MirrorNode {
+                name: "slow".into(),
+                url: "https://slow.example.invalid".into(),
+                country_code: "XX".into(),
+                latency_ms: 70,
+                bandwidth_mbps: 10,
+                is_active: true,
+            },
+            MirrorNode {
+                name: "fast".into(),
+                url: "https://fast.example.invalid".into(),
+                country_code: "XX".into(),
+                latency_ms: 20,
+                bandwidth_mbps: 10,
+                is_active: false,
+            },
+        ];
+
+        assert_eq!(mgr.select_fastest_measured_mirror(), Ok("fast".into()));
+        assert_eq!(mgr.active_mirror_url, "https://fast.example.invalid");
+        assert_eq!(
+            mgr.mirrors.iter().filter(|mirror| mirror.is_active).count(),
+            1
+        );
+    }
+
+    #[test]
+    fn test_refresh_does_not_invent_repository_updates() {
+        let mut mgr = MintUpdateManager::new();
+        mgr.available_updates.push(SystemUpdateItem {
+            package_name: "stale-entry".into(),
+            current_version: "1".into(),
+            new_version: "2".into(),
+            tier: UpdateSafetyTier::Tier1Certified,
+            category: UpdateCategory::Application,
+            size_bytes: 1,
+            cve_ids: Vec::new(),
+            requires_reboot: false,
+            is_selected: true,
+        });
+        assert_eq!(mgr.refresh_updates(), 0);
+        assert!(mgr.available_updates.is_empty());
+    }
+
+    #[test]
+    fn test_update_application_fails_without_mutating_candidates_or_snapshot() {
+        let mut mgr = MintUpdateManager::new();
+        mgr.available_updates.push(SystemUpdateItem {
+            package_name: "candidate".into(),
+            current_version: "1".into(),
+            new_version: "2".into(),
+            tier: UpdateSafetyTier::Tier1Certified,
+            category: UpdateCategory::Application,
+            size_bytes: 1,
+            cve_ids: Vec::new(),
+            requires_reboot: false,
+            is_selected: true,
+        });
+        let before = mgr.available_updates.len();
+        assert!(mgr.apply_eligible_updates().is_err());
+        assert_eq!(mgr.available_updates.len(), before);
+        assert!(mgr.last_snapshot_id.is_none());
+    }
+
+    #[test]
+    fn test_safety_policy_filters_supplied_update_metadata() {
+        let mut mgr = MintUpdateManager::new();
         mgr.max_allowed_tier = UpdateSafetyTier::Tier2Tested;
+        mgr.available_updates = vec![
+            SystemUpdateItem {
+                package_name: "kernel".into(),
+                current_version: "1".into(),
+                new_version: "2".into(),
+                tier: UpdateSafetyTier::Tier5Dangerous,
+                category: UpdateCategory::Kernel,
+                size_bytes: 1,
+                cve_ids: Vec::new(),
+                requires_reboot: true,
+                is_selected: true,
+            },
+            SystemUpdateItem {
+                package_name: "security-fix".into(),
+                current_version: "1".into(),
+                new_version: "2".into(),
+                tier: UpdateSafetyTier::Tier5Dangerous,
+                category: UpdateCategory::SecurityVulnerability,
+                size_bytes: 1,
+                cve_ids: Vec::new(),
+                requires_reboot: false,
+                is_selected: true,
+            },
+            SystemUpdateItem {
+                package_name: "app".into(),
+                current_version: "1".into(),
+                new_version: "2".into(),
+                tier: UpdateSafetyTier::Tier2Tested,
+                category: UpdateCategory::Application,
+                size_bytes: 1,
+                cve_ids: Vec::new(),
+                requires_reboot: false,
+                is_selected: true,
+            },
+        ];
 
-        let eligible = mgr.get_eligible_updates();
-        // Kernel is Tier 5, but openssl is Tier 1 (Security) and zenith is Tier 2
-        assert!(eligible.iter().any(|u| u.package_name == "openssl-pqc"));
-        assert!(eligible
+        let eligible: Vec<_> = mgr
+            .get_eligible_updates()
             .iter()
-            .any(|u| u.package_name == "zenith_compositor"));
-    }
-
-    #[test]
-    fn test_mint_update_atomic_apply() {
-        let mut mgr = MintUpdateManager::new();
-        mgr.refresh_updates();
-        let (count, bytes, snap_id) = mgr.apply_eligible_updates().unwrap();
-        assert!(count >= 2);
-        assert!(bytes > 0);
-        assert!(snap_id.contains("timeshift_pre_update"));
+            .map(|update| update.package_name.as_str())
+            .collect();
+        assert_eq!(eligible, vec!["security-fix", "app"]);
     }
 }

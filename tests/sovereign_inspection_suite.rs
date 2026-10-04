@@ -25,9 +25,6 @@ mod transaction;
 #[path = "../src/virt/mod.rs"]
 mod virt;
 
-#[path = "../src/fs/btrfs.rs"]
-mod btrfs;
-
 #[path = "../src/security/securelevels.rs"]
 mod securelevels;
 
@@ -37,7 +34,6 @@ mod jails;
 #[path = "../src/kernel/classic_os.rs"]
 mod classic_os;
 
-use btrfs::*;
 use classic_os::*;
 use jails::*;
 use pci_scanner::*;
@@ -114,16 +110,15 @@ fn test_inspection_qemu_kvm_virt_enhancements() {
 }
 
 #[test]
-fn test_inspection_btrfs_subvolume_send_receive() {
-    let mut fs = BtrfsFilesystem::new();
-    let sub_id = fs.create_subvolume("home".to_string(), None).unwrap();
-    assert!(sub_id >= 1);
+fn test_inspection_btrfs_snapshot_metadata() {
+    let mut fs = sigmaos::filesystem::btrfs::BtrfsFilesystem::new();
+    let snapshot_id = fs.create_snapshot(5, b"home-before-update").unwrap();
 
-    let stream = fs.send_subvolume(sub_id).unwrap();
-    assert!(!stream.is_empty());
+    assert!(snapshot_id >= 1);
+    assert_eq!(fs.get_stats().num_snapshots, 1);
 
-    let rec_id = fs.receive_subvolume(&stream).unwrap();
-    assert!(rec_id >= 1);
+    fs.delete_snapshot(snapshot_id).unwrap();
+    assert_eq!(fs.get_stats().num_snapshots, 0);
 }
 
 #[test]

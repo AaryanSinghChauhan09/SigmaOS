@@ -2,7 +2,7 @@
 // Keyboard shortcuts per Wiki 08-Desktop.md
 // Provides global shortcuts and window management shortcuts
 
-use std::string::{String, ToString};
+use std::string::String;
 use std::vec::Vec;
 
 /// Key modifier
@@ -29,6 +29,7 @@ impl KeyModifier {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum KeyAction {
     OpenLauncher,
+    ShowShortcutHelp,
     OpenTerminal,
     OpenFileManager,
     OpenWebBrowser,
@@ -46,6 +47,7 @@ impl KeyAction {
     pub fn as_str(&self) -> &str {
         match self {
             KeyAction::OpenLauncher => "open_launcher",
+            KeyAction::ShowShortcutHelp => "show_shortcut_help",
             KeyAction::OpenTerminal => "open_terminal",
             KeyAction::OpenFileManager => "open_file_manager",
             KeyAction::OpenWebBrowser => "open_web_browser",
@@ -71,7 +73,12 @@ pub struct KeyboardShortcut {
 }
 
 impl KeyboardShortcut {
-    pub fn new(modifiers: Vec<KeyModifier>, key: String, action: KeyAction, description: String) -> Self {
+    pub fn new(
+        modifiers: Vec<KeyModifier>,
+        key: String,
+        action: KeyAction,
+        description: String,
+    ) -> Self {
         KeyboardShortcut {
             modifiers,
             key,
@@ -91,7 +98,7 @@ impl KeyboardShortcut {
     }
 
     pub fn matches(&self, modifiers: &[KeyModifier], key: &str) -> bool {
-        if self.key != key {
+        if !self.key.eq_ignore_ascii_case(key) {
             return false;
         }
 
@@ -101,6 +108,12 @@ impl KeyboardShortcut {
 
         for modifier in modifiers {
             if !self.modifiers.contains(modifier) {
+                return false;
+            }
+        }
+
+        for modifier in &self.modifiers {
+            if !modifiers.contains(modifier) {
                 return false;
             }
         }
@@ -176,9 +189,16 @@ impl KeyboardShortcutsManager {
         // Global shortcuts
         self.add_shortcut(KeyboardShortcut::new(
             vec![KeyModifier::Super],
-            String::from(""),
+            String::from("Space"),
             KeyAction::OpenLauncher,
             String::from("Open application launcher"),
+        ));
+
+        self.add_shortcut(KeyboardShortcut::new(
+            vec![KeyModifier::Super],
+            String::from("K"),
+            KeyAction::ShowShortcutHelp,
+            String::from("Show and search keyboard shortcuts"),
         ));
 
         self.add_shortcut(KeyboardShortcut::new(
@@ -266,35 +286,60 @@ impl KeyboardShortcutsManager {
 
     pub fn get_shortcuts_by_category(&self, category: ShortcutCategory) -> Vec<KeyboardShortcut> {
         match category {
-            ShortcutCategory::Global => {
-                self.shortcuts.iter()
-                    .filter(|s| matches!(s.action,
-                        KeyAction::OpenLauncher | KeyAction::OpenTerminal | KeyAction::OpenFileManager |
-                        KeyAction::OpenWebBrowser | KeyAction::ShowDesktop | KeyAction::LockScreen |
-                        KeyAction::Screenshot | KeyAction::ScreenRecording | KeyAction::ToggleTheme
-                    ))
-                    .cloned()
-                    .collect()
-            }
-            ShortcutCategory::WindowManagement => {
-                self.shortcuts.iter()
-                    .filter(|s| matches!(s.action,
+            ShortcutCategory::Global => self
+                .shortcuts
+                .iter()
+                .filter(|s| {
+                    matches!(
+                        s.action,
+                        KeyAction::OpenLauncher
+                            | KeyAction::ShowShortcutHelp
+                            | KeyAction::OpenTerminal
+                            | KeyAction::OpenFileManager
+                            | KeyAction::OpenWebBrowser
+                            | KeyAction::ShowDesktop
+                            | KeyAction::LockScreen
+                            | KeyAction::Screenshot
+                            | KeyAction::ScreenRecording
+                            | KeyAction::ToggleTheme
+                    )
+                })
+                .cloned()
+                .collect(),
+            ShortcutCategory::WindowManagement => self
+                .shortcuts
+                .iter()
+                .filter(|s| {
+                    matches!(
+                        s.action,
                         KeyAction::MaximizeWindow | KeyAction::TileWindow | KeyAction::CloseWindow
-                    ))
-                    .cloned()
-                    .collect()
-            }
-            ShortcutCategory::Application => {
-                self.shortcuts.iter()
-                    .filter(|s| !matches!(s.action,
-                        KeyAction::OpenLauncher | KeyAction::OpenTerminal | KeyAction::OpenFileManager |
-                        KeyAction::OpenWebBrowser | KeyAction::ShowDesktop | KeyAction::LockScreen |
-                        KeyAction::Screenshot | KeyAction::ScreenRecording | KeyAction::ToggleTheme |
-                        KeyAction::MaximizeWindow | KeyAction::TileWindow | KeyAction::CloseWindow
-                    ))
-                    .cloned()
-                    .collect()
-            }
+                    )
+                })
+                .cloned()
+                .collect(),
+            ShortcutCategory::Application => self
+                .shortcuts
+                .iter()
+                .filter(|s| {
+                    !matches!(
+                        s.action,
+                        KeyAction::OpenLauncher
+                            | KeyAction::ShowShortcutHelp
+                            | KeyAction::OpenTerminal
+                            | KeyAction::OpenFileManager
+                            | KeyAction::OpenWebBrowser
+                            | KeyAction::ShowDesktop
+                            | KeyAction::LockScreen
+                            | KeyAction::Screenshot
+                            | KeyAction::ScreenRecording
+                            | KeyAction::ToggleTheme
+                            | KeyAction::MaximizeWindow
+                            | KeyAction::TileWindow
+                            | KeyAction::CloseWindow
+                    )
+                })
+                .cloned()
+                .collect(),
         }
     }
 
@@ -313,22 +358,61 @@ impl KeyboardShortcutsManager {
     }
 
     pub fn list_all_shortcuts(&self) -> Vec<String> {
-        self.shortcuts.iter()
-            .map(|s| format!("{} - {} ({})", s.get_key_combination(), s.action.as_str(), s.description))
+        self.shortcuts
+            .iter()
+            .map(|s| {
+                format!(
+                    "{} - {} ({})",
+                    s.get_key_combination(),
+                    s.action.as_str(),
+                    s.description
+                )
+            })
+            .collect()
+    }
+
+    /// Find shortcuts by key, action name, or visible description.
+    pub fn search_shortcuts(&self, query: &str) -> Vec<&KeyboardShortcut> {
+        let query = query.trim().to_lowercase();
+        self.shortcuts
+            .iter()
+            .filter(|shortcut| {
+                query.is_empty()
+                    || shortcut
+                        .get_key_combination()
+                        .to_lowercase()
+                        .contains(&query)
+                    || shortcut.action.as_str().contains(&query)
+                    || shortcut.description.to_lowercase().contains(&query)
+            })
             .collect()
     }
 
     pub fn list_global_shortcuts(&self) -> Vec<String> {
         self.get_shortcuts_by_category(ShortcutCategory::Global)
             .iter()
-            .map(|s| format!("{} - {} ({})", s.get_key_combination(), s.action.as_str(), s.description))
+            .map(|s| {
+                format!(
+                    "{} - {} ({})",
+                    s.get_key_combination(),
+                    s.action.as_str(),
+                    s.description
+                )
+            })
             .collect()
     }
 
     pub fn list_window_shortcuts(&self) -> Vec<String> {
         self.get_shortcuts_by_category(ShortcutCategory::WindowManagement)
             .iter()
-            .map(|s| format!("{} - {} ({})", s.get_key_combination(), s.action.as_str(), s.description))
+            .map(|s| {
+                format!(
+                    "{} - {} ({})",
+                    s.get_key_combination(),
+                    s.action.as_str(),
+                    s.description
+                )
+            })
             .collect()
     }
 
@@ -361,7 +445,6 @@ impl KeyboardShortcutsManager {
     }
 }
 
-#[cfg(test)]
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -412,8 +495,23 @@ mod tests {
         );
 
         assert!(shortcut.matches(&[KeyModifier::Super], "T"));
+        assert!(shortcut.matches(&[KeyModifier::Super], "t"));
         assert!(!shortcut.matches(&[KeyModifier::Alt], "T"));
         assert!(!shortcut.matches(&[KeyModifier::Super], "E"));
+    }
+
+    #[test]
+    fn test_shortcut_matching_uses_exact_modifier_set() {
+        let shortcut = KeyboardShortcut::new(
+            vec![KeyModifier::Super, KeyModifier::Shift],
+            String::from("S"),
+            KeyAction::Screenshot,
+            String::from("Screenshot"),
+        );
+
+        assert!(shortcut.matches(&[KeyModifier::Shift, KeyModifier::Super], "s"));
+        assert!(!shortcut.matches(&[KeyModifier::Super, KeyModifier::Super], "S"));
+        assert!(!shortcut.matches(&[KeyModifier::Super], "S"));
     }
 
     #[test]
@@ -440,6 +538,29 @@ mod tests {
         let mut manager = KeyboardShortcutsManager::new();
         manager.add_default_shortcuts();
         assert!(manager.shortcuts.len() > 0);
+    }
+
+    #[test]
+    fn test_defaults_include_launcher_and_shortcut_help() {
+        let mut manager = KeyboardShortcutsManager::new();
+        manager.add_default_shortcuts();
+
+        assert_eq!(
+            manager.handle_key_press(vec![KeyModifier::Super], String::from("Space")),
+            Some(KeyAction::OpenLauncher)
+        );
+        assert_eq!(
+            manager.handle_key_press(vec![KeyModifier::Super], String::from("K")),
+            Some(KeyAction::ShowShortcutHelp)
+        );
+        assert!(manager
+            .search_shortcuts(" shortcut ")
+            .iter()
+            .any(|shortcut| shortcut.action == KeyAction::ShowShortcutHelp));
+        assert!(manager
+            .get_shortcuts_by_category(ShortcutCategory::Application)
+            .iter()
+            .all(|shortcut| shortcut.action != KeyAction::ShowShortcutHelp));
     }
 
     #[test]

@@ -85,6 +85,11 @@ pub use crate::desktop::sovereign_navigation_engine::{
 pub use weather_panel::{WeatherCondition, WeatherData, WeatherForecast, WeatherPanel};
 pub mod compositor;
 pub mod launcher;
+pub mod shortcuts;
+pub use shortcuts::{
+    KeyAction, KeyModifier, KeyboardShortcut, KeyboardShortcutsManager, ShortcutCategory,
+    ShortcutConfig,
+};
 pub mod mint_backup_tool;
 pub mod mint_software_store;
 pub mod mint_update_manager;

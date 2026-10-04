@@ -51,6 +51,41 @@ if [ -f "src/memory/kswapd.rs" ]; then
     ./build/kswapd_test
 fi
 
+if [ -f "src/filesystem/btrfs.rs" ]; then
+    echo "Running Btrfs metadata and fail-closed backend test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/filesystem/btrfs.rs -o build/btrfs_test
+    ./build/btrfs_test
+fi
+
+if [ -f "src/desktop/shortcuts.rs" ]; then
+    echo "Running keyboard shortcut discovery and matching test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/desktop/shortcuts.rs -o build/shortcuts_test
+    ./build/shortcuts_test
+fi
+
+if [ -f "src/desktop/mint_update_manager.rs" ]; then
+    echo "Running Mint-inspired update policy and fail-closed backend test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/desktop/mint_update_manager.rs -o build/mint_update_manager_test
+    ./build/mint_update_manager_test
+fi
+
+if [ -f "src/desktop/onboarding_wizard.rs" ]; then
+    echo "Running first-run onboarding policy and unavailable-action test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/desktop/onboarding_wizard.rs -o build/onboarding_wizard_test
+    ./build/onboarding_wizard_test
+fi
+
+if [ -f "src/desktop/mint_backup_tool.rs" ]; then
+    echo "Running Mint-inspired backup manifest and fail-closed archive test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/desktop/mint_backup_tool.rs -o build/mint_backup_tool_test
+    ./build/mint_backup_tool_test
+fi
+
 if [ -f "src/distro/linux_bsd_inspirations.rs" ]; then
     echo "Running Linux & BSD distro inspirations & subsystem bridge test suite..."
     mkdir -p build
