@@ -189,7 +189,7 @@ impl EevdfRunqueue {
 
 /// Calculate delta fair: scale real time by task weight
 /// delta_fair = delta_ns * NICE_0_WEIGHT / weight
-pub fn calc_delta_fair(delta_ns: u64, weight: u32, inv_weight: u32) -> u64 {
+pub fn calc_delta_fair(delta_ns: u64, weight: u32, _inv_weight: u32) -> u64 {
     const NICE_0_LOAD: u32 = 1024;
     if weight == NICE_0_LOAD {
         return delta_ns;

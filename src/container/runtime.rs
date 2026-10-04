@@ -267,12 +267,12 @@ impl Container {
     }
 
     /// Stop container
-    pub fn stop(&mut self, timeout_sec: u32) -> Result<(), ContainerError> {
+    pub fn stop(&mut self, _timeout_sec: u32) -> Result<(), ContainerError> {
         if self.state != ContainerState::Running {
             return Ok(());
         }
 
-        if let Some(pid) = self.pid {
+        if let Some(_pid) = self.pid {
             // Send SIGTERM, wait for timeout, then SIGKILL
             // In real implementation: kill process group
         }
@@ -315,14 +315,14 @@ impl Container {
 
     fn setup_namespaces(&self) -> Result<(), ContainerError> {
         if let Some(linux) = &self.config.linux {
-            for ns in &linux.namespaces {
+            for _ns in &linux.namespaces {
                 // In real implementation: unshare() or setns()
             }
         }
         Ok(())
     }
 
-    fn setup_cgroups(&self, cgroups: &CgroupConfig) -> Result<(), ContainerError> {
+    fn setup_cgroups(&self, _cgroups: &CgroupConfig) -> Result<(), ContainerError> {
         // Create cgroup hierarchy
         // Set resource limits
         Ok(())
@@ -376,13 +376,13 @@ impl ContainerRuntime {
     }
 
     /// Kill container
-    pub fn kill(&mut self, id: &[u8], signal: u32) -> Result<(), ContainerError> {
+    pub fn kill(&mut self, id: &[u8], _signal: u32) -> Result<(), ContainerError> {
         let container = self
             .containers
             .get_mut(id)
             .ok_or(ContainerError::NotFound)?;
 
-        if let Some(pid) = container.pid {
+        if let Some(_pid) = container.pid {
             // Send signal to container process
         }
         Ok(())

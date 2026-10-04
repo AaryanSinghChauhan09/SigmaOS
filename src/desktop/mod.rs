@@ -3,6 +3,10 @@ pub mod zenith_config;
 pub use mobile_variant::*;
 pub mod tiling;
 pub use tiling::{TilingLayout, TilingWindow, TilingWindowManager, WindowArea, Workspace};
+pub mod applications;
+pub use applications::{
+    AppManager as PackageManager, Application as DesktopApplication, DesktopAppCategory, AppStatus, AppStatistics,
+};
 
 // SigmaOS Desktop Module
 pub mod mate_betsy;
@@ -107,3 +111,4 @@ pub mod omarchy_chord_rebind_engine; pub use omarchy_chord_rebind_engine::*;
 pub mod sovereign_xed_code_editor; pub use sovereign_xed_code_editor::*;
 pub mod omarchy_autosave_capture_engine; pub use omarchy_autosave_capture_engine::*;
 pub mod omarchy_browser_theme_sync; pub use omarchy_browser_theme_sync::*;
+pub mod omarchy_hidpi_scale_engine; pub use omarchy_hidpi_scale_engine::*;

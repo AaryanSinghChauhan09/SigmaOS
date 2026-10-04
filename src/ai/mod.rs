@@ -72,3 +72,9 @@ pub use marktechpost_kdnuggets_data_science::{
 
 pub mod omarchy_multi_agent_provider;
 pub use omarchy_multi_agent_provider::*;
+
+pub mod omarchy_cloud_agent_environment;
+pub use omarchy_cloud_agent_environment::*;
+
+pub mod omarchy_grok_panel_agent;
+pub use omarchy_grok_panel_agent::*;

@@ -187,7 +187,7 @@ impl EthDev {
     }
 
     /// Receive burst of packets
-    pub fn rx_burst(&self, queue_id: u16, pkts: &mut [MbufPtr]) -> u16 {
+    pub fn rx_burst(&self, queue_id: u16, _pkts: &mut [MbufPtr]) -> u16 {
         if !self.started || queue_id >= self.rx_queues.len() as u16 {
             return 0;
         }

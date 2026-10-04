@@ -294,6 +294,7 @@ pub use shell::{
     ContextualCompleter, HistoryExpansionEngine, JobControlManager, ParameterExpansionEngine,
     PipelineExecutor, ShellCommand, ShellPledgeUnveilGuard, ShellSyntaxHighlighter,
     SimpleShellSession as ShellRepl, ZshPromptFormatter,
+    ShellManager as ShellProfileManager, ShellProfile, ShellType, ShellStatistics,
 };
 pub use sigpkg::{
     AdapterError, BuildSystem, ContentAddressedStore, CryptoVerifier, DebAdapter,

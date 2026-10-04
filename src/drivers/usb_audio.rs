@@ -251,25 +251,25 @@ impl UacDevice {
     }
 
     /// Get volume for a feature unit
-    pub fn get_volume(&self, unit_id: u8, channel: u8) -> Result<i16, UacError> {
+    pub fn get_volume(&self, _unit_id: u8, _channel: u8) -> Result<i16, UacError> {
         // Send GET_CUR request for Volume control
         Ok(0)
     }
 
     /// Set mute state
-    pub fn set_mute(&mut self, unit_id: u8, channel: u8, mute: bool) -> Result<(), UacError> {
+    pub fn set_mute(&mut self, _unit_id: u8, _channel: u8, _mute: bool) -> Result<(), UacError> {
         // Send SET_CUR request for Mute control
         Ok(())
     }
 
     /// Select sample rate for streaming interface
-    pub fn set_sample_rate(&mut self, interface: u8, rate: u32) -> Result<(), UacError> {
+    pub fn set_sample_rate(&mut self, _interface: u8, _rate: u32) -> Result<(), UacError> {
         // Send SET_CUR request for Sampling Frequency control
         Ok(())
     }
 
     /// Start audio streaming
-    pub fn start_stream(&mut self, interface: u8, alt_setting: u8) -> Result<(), UacError> {
+    pub fn start_stream(&mut self, _interface: u8, _alt_setting: u8) -> Result<(), UacError> {
         // Set alternate interface
         // Configure isochronous endpoint
         // Start data transfer
@@ -277,7 +277,7 @@ impl UacDevice {
     }
 
     /// Stop audio streaming
-    pub fn stop_stream(&mut self, interface: u8) -> Result<(), UacError> {
+    pub fn stop_stream(&mut self, _interface: u8) -> Result<(), UacError> {
         // Set alternate interface 0 (zero bandwidth)
         // Stop data transfer
         Ok(())

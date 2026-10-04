@@ -13,11 +13,15 @@ pub mod sovereign_shell_parity;
 pub mod tech_media_shell_innovations;
 pub mod terminal_emulator;
 pub mod zsh_bash_parity;
+pub mod manager;
 
 pub use self::command::{ShellCommand, SimpleShellSession};
 pub use self::repl::ShellRepl;
 pub use self::sigma_sh::*;
 pub use self::zsh_bash_parity::*;
+pub use manager::{
+    ShellManager, ShellProfile, ShellType, ShellStatistics,
+};
 
 // Optional FFI bindings to Nim SigmaShell with native Rust fallback
 #[cfg(feature = "nim_ffi")]

@@ -146,7 +146,7 @@ pub fn allow_syscall(nr: u32) -> BpfInstruction {
 
 /// Emit instructions that check if syscall number == `nr` and, if so, return
 /// errno `errno`. Falls through otherwise.
-pub fn deny_syscall(nr: u32, errno: i32) -> BpfInstruction {
+pub fn deny_syscall(nr: u32, _errno: i32) -> BpfInstruction {
     BpfInstruction::jeq(nr, 0, 1)
 }
 

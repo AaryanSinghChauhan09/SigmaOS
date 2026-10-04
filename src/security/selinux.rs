@@ -347,7 +347,7 @@ impl Selinux {
     }
 
     /// Load policy from binary
-    pub fn load_policy(&mut self, policy_data: &[u8]) -> Result<(), SelinuxError> {
+    pub fn load_policy(&mut self, _policy_data: &[u8]) -> Result<(), SelinuxError> {
         // Parse binary policy format
         // Clear AVC after policy load
         self.avc.clear();

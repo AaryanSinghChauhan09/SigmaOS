@@ -116,3 +116,6 @@ pub mod runit_supervisor;
 
 pub mod omarchy_atreyu_system_plugin;
 pub use omarchy_atreyu_system_plugin::*;
+
+pub mod omarchy_docker_rootless_engine;
+pub use omarchy_docker_rootless_engine::*;

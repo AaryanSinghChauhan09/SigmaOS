@@ -203,7 +203,7 @@ impl XdgToplevel {
     }
 
     /// Configure toplevel (send size and state to client)
-    pub fn configure(&self, width: i32, height: i32, states: &[u32]) -> WlMessage {
+    pub fn configure(&self, width: i32, height: i32, _states: &[u32]) -> WlMessage {
         WlMessage {
             object_id: self.id,
             opcode: 0, // configure
@@ -402,7 +402,7 @@ impl WlCompositor {
     }
 
     /// Process input event
-    pub fn process_pointer_event(&self, event: PointerEvent) -> Vec<WlMessage> {
+    pub fn process_pointer_event(&self, _event: PointerEvent) -> Vec<WlMessage> {
         let messages = Vec::new();
         // Dispatch event to appropriate surface
         // Generate Wayland protocol messages

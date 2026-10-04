@@ -277,7 +277,7 @@ impl UvcDevice {
     }
 
     /// Parse video streaming descriptors
-    pub fn parse_streaming_descriptors(&mut self, descriptors: &[u8]) -> Result<(), UvcError> {
+    pub fn parse_streaming_descriptors(&mut self, _descriptors: &[u8]) -> Result<(), UvcError> {
         // Parse VS interface descriptors
         // Extract formats and frames
         Ok(())
@@ -327,7 +327,7 @@ impl UvcDevice {
     }
 
     /// Set camera control (brightness, contrast, etc.)
-    pub fn set_control(&mut self, control: UvcControl, value: i16) -> Result<(), UvcError> {
+    pub fn set_control(&mut self, _control: UvcControl, _value: i16) -> Result<(), UvcError> {
         // Send SET_CUR request to Processing Unit
         Ok(())
     }

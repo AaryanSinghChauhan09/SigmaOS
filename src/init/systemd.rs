@@ -173,7 +173,7 @@ impl Unit {
 
         match self.unit_type {
             UnitType::Service => {
-                if let Some(service) = &self.service {
+                if let Some(_service) = &self.service {
                     // Execute service start command
                     // In real implementation: fork/exec with proper environment
                     self.pid = Some(1); // Placeholder PID
@@ -198,7 +198,7 @@ impl Unit {
 
         self.state = UnitState::Deactivating;
 
-        if let Some(pid) = self.pid {
+        if let Some(_pid) = self.pid {
             // Send SIGTERM, wait, then SIGKILL if needed
             // In real implementation: signal handling with timeout
         }

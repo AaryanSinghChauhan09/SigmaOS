@@ -276,7 +276,7 @@ impl Vm {
     }
 
     /// Inject IRQ into VM
-    pub fn irq_line(&mut self, irq: u32, level: bool) -> Result<(), KvmError> {
+    pub fn irq_line(&mut self, _irq: u32, _level: bool) -> Result<(), KvmError> {
         // Set IRQ line state
         // In real implementation: trigger VCPU interrupt
         Ok(())

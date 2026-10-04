@@ -41,3 +41,8 @@ Welcome to the SigmaOS Wiki! Here are the core components:
 - [Autosave-Capture-Engine](./Autosave-Capture-Engine.md)
 - [Atreyu-System-Plugin](./Atreyu-System-Plugin.md)
 - [Browser-Theme-Sync](./Browser-Theme-Sync.md)
+- [HiDPI-Scale-Engine](./HiDPI-Scale-Engine.md)
+- [Docker-Rootless-Engine](./Docker-Rootless-Engine.md)
+- [Cloud-Agent-Environment](./Cloud-Agent-Environment.md)
+- [Grok-AI-Panel-Agent](./Grok-AI-Panel-Agent.md)
+- [Font-Builder](./Font-Builder.md)
