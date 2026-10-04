@@ -1,12 +1,12 @@
-# Shell and Userspace
+# Tracing and Observability
 
 > **Status:** In Progress
 > **Language:** Rust
-> **Source:** [`src/shell/`](https://github.com/AaryanSinghChauhan09/SigmaOS/tree/main/src/shell/)
+> **Source:** [`src/tracing/`](https://github.com/AaryanSinghChauhan09/SigmaOS/tree/main/src/tracing/)
 
 ## Overview
 
-Core component for Shell and Userspace in SigmaOS.
+Core component for Tracing and Observability in SigmaOS.
 
 ## Architecture
 
@@ -39,13 +39,13 @@ See [03-Configuration](03-Configuration.md)
 
 ```bash
 # Example
-cargo test --lib -- shell::tests
+cargo test --lib -- tracing::tests
 ```
 
 ## Testing
 
 ```bash
-cargo test --lib -- shell
+cargo test --lib -- tracing
 ```
 
 ## Roadmap

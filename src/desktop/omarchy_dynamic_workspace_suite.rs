@@ -1,11 +1,7 @@
-// SigmaOS — Omarchy Linux Dynamic Workspace & Hardware Productivity Suite
+// SigmaOS Omarchy-inspired workspace and control models.
 //
-// Native implementations of Omarchy Linux's signature keyboard-first workflow:
-// 1. Scratchpad Manager: Modal drop-down terminal, AI companion & system HUD
-// 2. Audio & MPRIS Controller: Per-app stream routing, volume limits & media HUD
-// 3. Capture & Instant OCR: Screen region clipping with optical character recognition
-// 4. Power & Battery Governor: AC/Battery dynamic switching & 80% longevity limiter
-// 5. Tiling Layout Engine: Dwindle Fibonacci bisection & Master-Stack layouts
+// These models are not connected to a verified desktop session. Device state
+// starts unknown and operations fail when their real runtime backend is absent.
 
 extern crate alloc;
 
@@ -88,9 +84,26 @@ impl OmarchyScratchpadManager {
         );
     }
 
-    /// Toggle visibility of a scratchpad by name
-    pub fn toggle_scratchpad(&mut self, name: &str) -> ScratchpadVisibility {
+    /// Associate a scratchpad with a window created by a window manager.
+    pub fn bind_window(&mut self, name: &str, window_id: Option<u64>) -> Result<(), &'static str> {
+        let scratchpad = self.scratchpads.get_mut(name).ok_or("Unknown scratchpad")?;
+        scratchpad.window_id = window_id;
+        if window_id.is_none() {
+            scratchpad.visibility = ScratchpadVisibility::Hidden;
+            if self.active_scratchpad.as_deref() == Some(name) {
+                self.active_scratchpad = None;
+            }
+        }
+        Ok(())
+    }
+
+    /// Request a visibility toggle only for a window known to the compositor.
+    /// This updates the model; a display backend must still apply the request.
+    pub fn toggle_scratchpad(&mut self, name: &str) -> Result<ScratchpadVisibility, &'static str> {
         if let Some(sp) = self.scratchpads.get_mut(name) {
+            if sp.window_id.is_none() {
+                return Err("Scratchpad window backend is unavailable");
+            }
             match sp.visibility {
                 ScratchpadVisibility::Hidden | ScratchpadVisibility::SlidingOut => {
                     sp.visibility = ScratchpadVisibility::Visible;
@@ -103,9 +116,9 @@ impl OmarchyScratchpadManager {
                     }
                 }
             }
-            sp.visibility
+            Ok(sp.visibility)
         } else {
-            ScratchpadVisibility::Hidden
+            Err("Unknown scratchpad")
         }
     }
 }
@@ -152,41 +165,22 @@ pub struct OmarchyAudioMediaController {
 impl OmarchyAudioMediaController {
     pub fn new() -> Self {
         Self {
-            sinks: vec![
-                AudioSink {
-                    name: String::from("alsa_output.pci-0000_00_1f.3.analog-stereo"),
-                    description: String::from("Built-in Analog Audio"),
-                    volume_percent: 65,
-                    is_muted: false,
-                    is_default: true,
-                },
-                AudioSink {
-                    name: String::from("bluez_output.WH-1000XM4.a2dp-sink"),
-                    description: String::from("Sony WH-1000XM4 Bluetooth"),
-                    volume_percent: 80,
-                    is_muted: false,
-                    is_default: false,
-                },
-            ],
-            playback_status: PlaybackStatus::Playing,
-            current_track: Some(MediaTrackMetadata {
-                title: String::from("Resonance"),
-                artist: String::from("HOME"),
-                album: String::from("Odyssey"),
-                length_seconds: 212,
-                current_position_seconds: 48,
-            }),
+            // Empty until an audio/MPRIS backend supplies observed devices.
+            sinks: Vec::new(),
+            playback_status: PlaybackStatus::Stopped,
+            current_track: None,
         }
     }
 
-    /// Set volume on default sink with safety cap
-    pub fn set_volume(&mut self, percent: u32) -> u32 {
+    /// Update the in-memory device projection. A real service adapter must
+    /// apply and confirm the change before calling this method.
+    pub fn set_volume(&mut self, percent: u32) -> Result<u32, &'static str> {
         let capped = percent.min(100); // 100% ear protection cap
         if let Some(sink) = self.sinks.iter_mut().find(|s| s.is_default) {
             sink.volume_percent = capped;
-            capped
+            Ok(capped)
         } else {
-            0
+            Err("No audio output backend is available")
         }
     }
 
@@ -203,13 +197,16 @@ impl OmarchyAudioMediaController {
         }
     }
 
-    /// Toggle media playback
-    pub fn toggle_playback(&mut self) -> PlaybackStatus {
+    /// Update the playback projection only when a real track is present.
+    pub fn toggle_playback(&mut self) -> Result<PlaybackStatus, &'static str> {
+        if self.current_track.is_none() {
+            return Err("No media player backend is available");
+        }
         self.playback_status = match self.playback_status {
             PlaybackStatus::Playing => PlaybackStatus::Paused,
             PlaybackStatus::Paused | PlaybackStatus::Stopped => PlaybackStatus::Playing,
         };
-        self.playback_status
+        Ok(self.playback_status)
     }
 }
 
@@ -234,25 +231,19 @@ impl OmarchyCaptureOcrEngine {
         Self
     }
 
-    /// Take screenshot of region and return raw pixel buffer
+    /// Capture a region only when a real compositor capture backend exists.
     pub fn capture_region(&self, rect: ScreenRectangle) -> Result<Vec<u8>, &'static str> {
         if rect.width == 0 || rect.height == 0 {
             return Err("Invalid selection geometry: zero area");
         }
-        let total_pixels = (rect.width as usize) * (rect.height as usize);
-        // RGBA mock framebuffer capture
-        let buffer = vec![0xFF; total_pixels * 4];
-        Ok(buffer)
+        let _ = rect;
+        Err("Screen capture backend is unavailable")
     }
 
-    /// Perform OCR on image region, returning recognized text
+    /// OCR requires a captured image and an integrated OCR provider.
     pub fn extract_text_from_region(&self, rect: ScreenRectangle) -> Result<String, &'static str> {
         let _ = self.capture_region(rect)?;
-        // Simulated OCR engine: returns recognized text for screen region
-        Ok(format!(
-            "SigmaOS sovereign terminal output at ({},{}) [{}x{}]",
-            rect.x, rect.y, rect.width, rect.height
-        ))
+        Err("OCR backend is unavailable")
     }
 }
 
@@ -277,9 +268,9 @@ pub enum PowerSource {
 
 /// Dynamic power profile governor & lithium battery longevity limiter
 pub struct OmarchyPowerGovernor {
-    pub current_source: PowerSource,
-    pub battery_charge_percent: u8,
-    pub current_profile: PowerProfile,
+    pub current_source: Option<PowerSource>,
+    pub battery_charge_percent: Option<u8>,
+    pub current_profile: Option<PowerProfile>,
     pub charge_threshold_limit_percent: u8, // e.g. 80% to protect battery health
     pub is_threshold_active: bool,
 }
@@ -287,20 +278,20 @@ pub struct OmarchyPowerGovernor {
 impl OmarchyPowerGovernor {
     pub fn new() -> Self {
         Self {
-            current_source: PowerSource::AcMains,
-            battery_charge_percent: 85,
-            current_profile: PowerProfile::Performance,
+            current_source: None,
+            battery_charge_percent: None,
+            current_profile: None,
             charge_threshold_limit_percent: 80,
-            is_threshold_active: true,
+            is_threshold_active: false,
         }
     }
 
     /// Notify governor of power source change (e.g. unplugging charger)
     pub fn handle_power_event(&mut self, source: PowerSource, battery_level: u8) -> PowerProfile {
-        self.current_source = source;
-        self.battery_charge_percent = battery_level;
+        self.current_source = Some(source);
+        self.battery_charge_percent = Some(battery_level.min(100));
 
-        self.current_profile = match source {
+        let profile = match source {
             PowerSource::AcMains => PowerProfile::Performance,
             PowerSource::BatteryDischarge => {
                 if battery_level <= 20 {
@@ -310,15 +301,19 @@ impl OmarchyPowerGovernor {
                 }
             }
         };
+        self.current_profile = Some(profile);
 
-        self.current_profile
+        profile
     }
 
     /// Check if battery charging should be cut off by hardware ACPI controller
     pub fn should_stop_charging(&self) -> bool {
         self.is_threshold_active
-            && self.current_source == PowerSource::AcMains
-            && self.battery_charge_percent >= self.charge_threshold_limit_percent
+            && self.current_source == Some(PowerSource::AcMains)
+            && self
+                .battery_charge_percent
+                .map(|level| level >= self.charge_threshold_limit_percent)
+                .unwrap_or(false)
     }
 }
 
@@ -370,8 +365,9 @@ impl OmarchyTilingLayoutEngine {
             return Vec::new();
         }
 
-        let usable_w = self.screen_width.saturating_sub(self.gap_outer * 2);
-        let usable_h = self.screen_height.saturating_sub(self.gap_outer * 2);
+        let outer_gaps = self.gap_outer.saturating_mul(2);
+        let usable_w = self.screen_width.saturating_sub(outer_gaps);
+        let usable_h = self.screen_height.saturating_sub(outer_gaps);
 
         // Single window: fills usable area
         if window_count == 1 {
@@ -386,12 +382,17 @@ impl OmarchyTilingLayoutEngine {
         match self.algorithm {
             TilingAlgorithm::MasterStack => {
                 let mut geoms = Vec::with_capacity(window_count);
-                let master_w = ((usable_w as f32 * self.master_ratio) as u32)
+                let ratio = if self.master_ratio.is_finite() {
+                    self.master_ratio.clamp(0.1, 0.9)
+                } else {
+                    0.55
+                };
+                let master_w = ((usable_w as f32 * ratio) as u32)
                     .saturating_sub(self.gap_inner / 2);
                 let stack_w = usable_w
                     .saturating_sub(master_w)
                     .saturating_sub(self.gap_inner);
-                let stack_count = (window_count - 1) as u32;
+                let stack_count = u32::try_from(window_count - 1).unwrap_or(u32::MAX);
 
                 // 1. Master Window
                 geoms.push(LayoutGeometry {
@@ -402,12 +403,19 @@ impl OmarchyTilingLayoutEngine {
                 });
 
                 // 2. Stack Windows
-                let total_gaps = (stack_count - 1) * self.gap_inner;
+                let total_gaps = stack_count
+                    .saturating_sub(1)
+                    .saturating_mul(self.gap_inner);
                 let each_h = usable_h.saturating_sub(total_gaps) / stack_count;
-                let stack_x = self.gap_outer + master_w + self.gap_inner;
+                let stack_x = self
+                    .gap_outer
+                    .saturating_add(master_w)
+                    .saturating_add(self.gap_inner);
 
                 for i in 0..stack_count {
-                    let stack_y = self.gap_outer + i * (each_h + self.gap_inner);
+                    let stack_y = self.gap_outer.saturating_add(
+                        i.saturating_mul(each_h.saturating_add(self.gap_inner)),
+                    );
                     geoms.push(LayoutGeometry {
                         x: stack_x,
                         y: stack_y,
@@ -446,7 +454,7 @@ impl OmarchyTilingLayoutEngine {
                             width: half_w,
                             height: cur_h,
                         });
-                        cur_x += half_w + self.gap_inner;
+                        cur_x = cur_x.saturating_add(half_w.saturating_add(self.gap_inner));
                         cur_w = cur_w.saturating_sub(half_w + self.gap_inner);
                     } else {
                         // Split vertically (top / bottom)
@@ -457,7 +465,7 @@ impl OmarchyTilingLayoutEngine {
                             width: cur_w,
                             height: half_h,
                         });
-                        cur_y += half_h + self.gap_inner;
+                        cur_y = cur_y.saturating_add(half_h.saturating_add(self.gap_inner));
                         cur_h = cur_h.saturating_sub(half_h + self.gap_inner);
                     }
                 }
@@ -506,32 +514,74 @@ mod tests {
         let mut sp_mgr = OmarchyScratchpadManager::new();
         assert_eq!(sp_mgr.active_scratchpad, None);
 
+        assert_eq!(
+            sp_mgr.toggle_scratchpad("terminal"),
+            Err("Scratchpad window backend is unavailable")
+        );
+        sp_mgr.bind_window("terminal", Some(7)).unwrap();
+
         let vis = sp_mgr.toggle_scratchpad("terminal");
-        assert_eq!(vis, ScratchpadVisibility::Visible);
+        assert_eq!(vis, Ok(ScratchpadVisibility::Visible));
         assert_eq!(sp_mgr.active_scratchpad.as_deref(), Some("terminal"));
 
         let vis2 = sp_mgr.toggle_scratchpad("terminal");
-        assert_eq!(vis2, ScratchpadVisibility::Hidden);
+        assert_eq!(vis2, Ok(ScratchpadVisibility::Hidden));
         assert_eq!(sp_mgr.active_scratchpad, None);
     }
 
     #[test]
     fn test_audio_and_mpris() {
         let mut audio = OmarchyAudioMediaController::new();
-        let vol = audio.set_volume(75);
-        assert_eq!(vol, 75);
+        assert!(audio.set_volume(75).is_err());
+        assert!(audio.toggle_playback().is_err());
 
-        let status = audio.toggle_playback();
-        assert_eq!(status, PlaybackStatus::Paused);
+        audio.sinks.push(AudioSink {
+            name: "test-output".into(),
+            description: "Test output supplied by fixture".into(),
+            volume_percent: 40,
+            is_muted: false,
+            is_default: true,
+        });
+        audio.current_track = Some(MediaTrackMetadata {
+            title: "Test track".into(),
+            artist: "Test artist".into(),
+            album: "Fixture".into(),
+            length_seconds: 10,
+            current_position_seconds: 0,
+        });
+        assert_eq!(audio.set_volume(75), Ok(75));
 
-        let switched = audio.switch_default_sink("bluez_output.WH-1000XM4.a2dp-sink");
+        let status = audio.toggle_playback().unwrap();
+        assert_eq!(status, PlaybackStatus::Playing);
+
+        let switched = audio.switch_default_sink("test-output");
         assert!(switched);
+    }
+
+    #[test]
+    fn capture_fails_closed_without_a_display_backend() {
+        let capture = OmarchyCaptureOcrEngine::new();
+        let rect = ScreenRectangle {
+            x: 0,
+            y: 0,
+            width: 10,
+            height: 10,
+        };
+        assert_eq!(
+            capture.capture_region(rect),
+            Err("Screen capture backend is unavailable")
+        );
+        assert_eq!(
+            capture.extract_text_from_region(rect),
+            Err("Screen capture backend is unavailable")
+        );
     }
 
     #[test]
     fn test_power_governor() {
         let mut gov = OmarchyPowerGovernor::new();
-        assert_eq!(gov.current_profile, PowerProfile::Performance);
+        assert_eq!(gov.current_profile, None);
+        assert!(!gov.should_stop_charging());
 
         // Unplug AC on battery at 85%
         let prof = gov.handle_power_event(PowerSource::BatteryDischarge, 85);
@@ -543,6 +593,8 @@ mod tests {
 
         // Plugged in at 85% -> should stop charging because limit is 80%
         let _ = gov.handle_power_event(PowerSource::AcMains, 85);
+        assert_eq!(gov.current_profile, Some(PowerProfile::Performance));
+        gov.is_threshold_active = true; // Test fixture represents a supporting ACPI backend.
         assert!(gov.should_stop_charging());
     }
 

@@ -25,6 +25,7 @@
 
 #![allow(dead_code)]
 
+use crate::desktop::shortcuts::{KeyAction, KeyModifier, KeyboardShortcutsManager};
 use std::collections::BTreeMap;
 use std::format;
 use std::string::{String, ToString};
@@ -457,6 +458,15 @@ pub enum WlKeyEvent {
     },
 }
 
+/// Key symbol and modifiers after translation by a layout-aware input backend.
+/// Raw Wayland/Linux keycodes must not be treated as character values.
+#[derive(Debug, Clone)]
+pub struct TranslatedKeyEvent {
+    pub key: String,
+    pub modifiers: Vec<KeyModifier>,
+    pub pressed: bool,
+}
+
 // ─── Zenith Compositor ────────────────────────────────────────────────────────
 
 /// Zenith compositor statistics
@@ -519,6 +529,9 @@ pub struct ZenithCompositor {
     id_alloc: WlIdAllocator,
     /// Currently focused surface (for keyboard events)
     pub keyboard_focus: Option<WlObjectId>,
+    /// Default shortcut registry. A real input backend must first translate
+    /// raw keycodes with the active keyboard layout before dispatching them.
+    pub keyboard_shortcuts: KeyboardShortcutsManager,
     /// Currently pointer-entered surface
     pub pointer_focus: Option<WlObjectId>,
     /// Compositor statistics
@@ -542,12 +555,15 @@ pub struct ZenithCompositor {
 impl ZenithCompositor {
     /// Create a new Zenith compositor instance
     pub fn new() -> Self {
+        let mut keyboard_shortcuts = KeyboardShortcutsManager::new();
+        keyboard_shortcuts.add_default_shortcuts();
         ZenithCompositor {
             surfaces: BTreeMap::new(),
             buffers: BTreeMap::new(),
             outputs: BTreeMap::new(),
             id_alloc: WlIdAllocator::new(),
             keyboard_focus: None,
+            keyboard_shortcuts,
             pointer_focus: None,
             stats: ZenithStats::default(),
             frame_time_ms: 0,
@@ -717,9 +733,24 @@ impl ZenithCompositor {
     }
 
     /// Dispatch a keyboard event to the focused surface
-    pub fn dispatch_key_event(&mut self, _event: WlKeyEvent) -> Option<WlObjectId> {
+    pub fn dispatch_key_event(&mut self, event: WlKeyEvent) -> Option<WlObjectId> {
         self.stats.key_events += 1;
+        // This protocol-facing method receives raw keycodes. Global shortcut
+        // matching happens only after a keyboard layout translates the event.
+        let _ = event;
         self.keyboard_focus
+    }
+
+    /// Match a layout-translated key press against the discoverable shortcut
+    /// registry. The returned action must be handled by a runtime service;
+    /// returning it here does not claim that a GUI action has run.
+    pub fn dispatch_translated_shortcut(&mut self, event: TranslatedKeyEvent) -> Option<KeyAction> {
+        self.stats.key_events += 1;
+        if !event.pressed {
+            return None;
+        }
+        self.keyboard_shortcuts
+            .handle_key_press(event.modifiers, event.key)
     }
 
     /// Set keyboard focus to a specific surface
@@ -984,6 +1015,35 @@ mod zenith_tests {
         assert!(comp.surfaces.contains_key(&id));
         assert_eq!(comp.surfaces[&id].client_pid, 1234);
         assert_eq!(comp.stats.surfaces_created, 1);
+    }
+
+    #[test]
+    fn translated_global_shortcuts_route_to_registered_actions() {
+        let mut compositor = setup();
+        let action = compositor.dispatch_translated_shortcut(TranslatedKeyEvent {
+            key: "Space".into(),
+            modifiers: vec![KeyModifier::Super],
+            pressed: true,
+        });
+        assert_eq!(action, Some(KeyAction::OpenLauncher));
+
+        let release = compositor.dispatch_translated_shortcut(TranslatedKeyEvent {
+            key: "Space".into(),
+            modifiers: vec![KeyModifier::Super],
+            pressed: false,
+        });
+        assert_eq!(release, None);
+    }
+
+    #[test]
+    fn translated_shortcut_matching_requires_exact_modifiers() {
+        let mut compositor = setup();
+        let action = compositor.dispatch_translated_shortcut(TranslatedKeyEvent {
+            key: "K".into(),
+            modifiers: vec![KeyModifier::Super, KeyModifier::Shift],
+            pressed: true,
+        });
+        assert_eq!(action, None);
     }
 
     #[test]

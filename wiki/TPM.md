@@ -1,12 +1,12 @@
-# Shell and Userspace
+# TPM
 
 > **Status:** In Progress
 > **Language:** Rust
-> **Source:** [`src/shell/`](https://github.com/AaryanSinghChauhan09/SigmaOS/tree/main/src/shell/)
+> **Source:** [`src/tpm/`](https://github.com/AaryanSinghChauhan09/SigmaOS/tree/main/src/tpm/)
 
 ## Overview
 
-Core component for Shell and Userspace in SigmaOS.
+Core component for TPM in SigmaOS.
 
 ## Architecture
 
@@ -39,13 +39,13 @@ See [03-Configuration](03-Configuration.md)
 
 ```bash
 # Example
-cargo test --lib -- shell::tests
+cargo test --lib -- tpm::tests
 ```
 
 ## Testing
 
 ```bash
-cargo test --lib -- shell
+cargo test --lib -- tpm
 ```
 
 ## Roadmap

@@ -140,23 +140,39 @@ description = "Snapshot-based recovery with auto-rollback detection"
 test_evidence = "Unit tests pass"
 
 [desktop.compositor]
-status = "working"
+status = "prototype"
 files = ["src/desktop/compositor.rs"]
-description = "Window compositor with tiling, workspaces, keyboard-first focus cycling"
-test_evidence = "Unit tests pass"
-next_milestone = "Real framebuffer rendering"
+description = "In-memory window/layout model; no verified compositor-to-display or session path"
+test_evidence = "Model unit tests pass; no QEMU graphical session or hardware validation"
+next_milestone = "Boot a real session and connect surfaces to a display backend"
 
 [desktop.launcher]
-status = "working"
+status = "prototype"
 files = ["src/desktop/launcher.rs"]
-description = "Omarchy-inspired command palette with fuzzy search"
-test_evidence = "Unit tests pass"
+description = "Search model with typed, unavailable-by-default service actions; no installed-app discovery or runtime UI"
+test_evidence = "Standalone model tests; no application launch or desktop-session validation"
+next_milestone = "Connect the catalog to installed applications and typed service handlers"
+
+[desktop.keyboard_shortcuts]
+status = "partial"
+files = ["src/desktop/shortcuts.rs", "src/compositor/zenith_core.rs"]
+description = "Shortcut manager is exported and accepts layout-translated events; raw keymap translation and action UI are not integrated"
+test_evidence = "Standalone shortcut tests and compositor model tests; no running input/display session"
+next_milestone = "Integrate keyboard-layout translation and validate shortcut actions in QEMU"
+
+[desktop.omarchy_workflows]
+status = "prototype"
+files = ["src/desktop/omarchy_dynamic_workspace_suite.rs"]
+description = "Pure layout/model code; device, capture, OCR, power, and scratchpad backends are unavailable unless explicitly supplied"
+test_evidence = "Standalone model tests, including unavailable backend behavior"
+next_milestone = "Integrate workspace layout with the live window manager after the graphical session gate"
 
 [desktop.notification]
-status = "working"
+status = "prototype"
 files = ["src/desktop/notification.rs"]
-description = "Notification daemon with urgency levels and DND mode"
-test_evidence = "Unit tests pass"
+description = "Notification policy/data model; no verified service or graphical notification surface"
+test_evidence = "Module tests only; no user-session integration"
+next_milestone = "Connect notifications to the session and test delivery, dismissal, and persistence"
 
 [package.signing]
 status = "working"

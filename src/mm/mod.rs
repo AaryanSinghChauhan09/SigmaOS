@@ -182,3 +182,4 @@ mod tests {
         assert!(manager.get(0).is_some());
     }
 }
+pub mod sigma_allocator;

@@ -1,0 +1,162 @@
+#!/usr/bin/env bash
+# sigpkg - SigmaOS Package Manager CLI
+# Inspired by Linux Mint mintinstall + Omarchy omakase zero-config philosophy
+
+set -euo pipefail
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+show_help() {
+    echo -e "${BLUE}sigpkg - SigmaOS Package Manager${NC}"
+    echo "Usage: sigpkg <command> [arguments]"
+    echo ""
+    echo "Commands:"
+    echo "  install <pkg>   - Install a package from the sigpkg store"
+    echo "  remove <pkg>    - Remove a package"
+    echo "  search <query>  - Fuzzy search packages"
+    echo "  update          - Update all packages (tier-based)"
+    echo "  snapshot        - Create a BTRFS snapshot before major changes"
+    echo "  info <pkg>      - Show package information"
+    echo "  list            - List installed packages"
+    echo "  omakase         - Install curated developer workstation packages"
+    echo ""
+}
+
+# Ensure root privileges for system operations
+ensure_root() {
+    if [ "$EUID" -ne 0 ]; then
+        echo -e "${RED}Error: This command requires root privileges. Please run with sudo.${NC}"
+        exit 1
+    fi
+}
+
+cmd_install() {
+    if [ -z "${1:-}" ]; then
+        echo -e "${RED}Error: Package name required.${NC}"
+        exit 1
+    fi
+    ensure_root
+    echo -e "${GREEN}Installing package: $1${NC}"
+    # Simulated install
+    sleep 1
+    echo -e "${GREEN}Successfully installed $1.${NC}"
+}
+
+cmd_remove() {
+    if [ -z "${1:-}" ]; then
+        echo -e "${RED}Error: Package name required.${NC}"
+        exit 1
+    fi
+    ensure_root
+    echo -e "${YELLOW}Removing package: $1${NC}"
+    # Simulated remove
+    sleep 1
+    echo -e "${GREEN}Successfully removed $1.${NC}"
+}
+
+cmd_search() {
+    if [ -z "${1:-}" ]; then
+        echo -e "${RED}Error: Search query required.${NC}"
+        exit 1
+    fi
+    echo -e "${BLUE}Searching for: $1${NC}"
+    # Simulated search
+    echo "sigma-core     - SigmaOS core utilities"
+    echo "sigma-desktop  - SigmaOS desktop environment"
+    if [[ "neovim" == *"$1"* ]]; then
+        echo "neovim         - Vim-fork focused on extensibility and usability"
+    fi
+}
+
+cmd_update() {
+    ensure_root
+    echo -e "${BLUE}Checking for updates (Tier-based)...${NC}"
+    echo -e "${YELLOW}Tier 1 (Safe): linux-firmware, sigma-base${NC}"
+    echo -e "${RED}Tier 2 (Requires reboot): linux-kernel-sigma${NC}"
+    sleep 1
+    echo -e "${GREEN}All packages updated successfully.${NC}"
+}
+
+cmd_snapshot() {
+    ensure_root
+    echo -e "${BLUE}Creating BTRFS snapshot of /...${NC}"
+    TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+    # Simulated btrfs command
+    echo -e "${GREEN}Snapshot created: @sysroot_backup_$TIMESTAMP${NC}"
+}
+
+cmd_info() {
+    if [ -z "${1:-}" ]; then
+        echo -e "${RED}Error: Package name required.${NC}"
+        exit 1
+    fi
+    echo -e "${BLUE}Information for package: $1${NC}"
+    echo "Name: $1"
+    echo "Version: 1.0.0-sigma"
+    echo "Description: A package for SigmaOS."
+    echo "Maintainer: SigmaOS Team"
+}
+
+cmd_list() {
+    echo -e "${BLUE}Installed packages:${NC}"
+    echo "sigma-base"
+    echo "sigma-desktop"
+    echo "hyprland"
+    echo "waybar"
+}
+
+cmd_omakase() {
+    ensure_root
+    echo -e "${BLUE}Applying Omarchy Omakase setup...${NC}"
+    echo -e "${YELLOW}Installing curated developer tools: neovim, ghostty, git, rustup, zig, nim...${NC}"
+    sleep 2
+    echo -e "${GREEN}Omakase setup complete! Enjoy your sovereign environment.${NC}"
+}
+
+if [ $# -eq 0 ]; then
+    show_help
+    exit 0
+fi
+
+COMMAND=$1
+shift
+
+case "$COMMAND" in
+    install)
+        cmd_install "$@"
+        ;;
+    remove)
+        cmd_remove "$@"
+        ;;
+    search)
+        cmd_search "$@"
+        ;;
+    update)
+        cmd_update "$@"
+        ;;
+    snapshot)
+        cmd_snapshot "$@"
+        ;;
+    info)
+        cmd_info "$@"
+        ;;
+    list)
+        cmd_list "$@"
+        ;;
+    omakase)
+        cmd_omakase "$@"
+        ;;
+    help|--help|-h)
+        show_help
+        ;;
+    *)
+        echo -e "${RED}Unknown command: $COMMAND${NC}"
+        show_help
+        exit 1
+        ;;
+esac

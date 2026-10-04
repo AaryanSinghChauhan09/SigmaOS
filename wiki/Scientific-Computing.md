@@ -1,12 +1,12 @@
-# Shell and Userspace
+# Scientific Computing
 
 > **Status:** In Progress
 > **Language:** Rust
-> **Source:** [`src/shell/`](https://github.com/AaryanSinghChauhan09/SigmaOS/tree/main/src/shell/)
+> **Source:** [`src/scientific/`](https://github.com/AaryanSinghChauhan09/SigmaOS/tree/main/src/scientific/)
 
 ## Overview
 
-Core component for Shell and Userspace in SigmaOS.
+Core component for Scientific Computing in SigmaOS.
 
 ## Architecture
 
@@ -39,13 +39,13 @@ See [03-Configuration](03-Configuration.md)
 
 ```bash
 # Example
-cargo test --lib -- shell::tests
+cargo test --lib -- scientific::tests
 ```
 
 ## Testing
 
 ```bash
-cargo test --lib -- shell
+cargo test --lib -- scientific
 ```
 
 ## Roadmap

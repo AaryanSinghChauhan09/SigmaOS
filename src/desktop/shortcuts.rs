@@ -163,6 +163,15 @@ pub struct KeyboardShortcutsManager {
     pub config: ShortcutConfig,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ShortcutRegistrationError {
+    EmptyKey,
+    InvalidKey,
+    DuplicateModifier,
+    ChordAlreadyAssigned,
+    ActionNotRegistered,
+}
+
 impl Default for KeyboardShortcutsManager {
     fn default() -> Self {
         KeyboardShortcutsManager {
@@ -183,6 +192,59 @@ impl KeyboardShortcutsManager {
 
     pub fn add_shortcut(&mut self, shortcut: KeyboardShortcut) {
         self.shortcuts.push(shortcut);
+    }
+
+    /// Register a user or backend supplied shortcut after validating the key
+    /// and rejecting ambiguous chords.
+    pub fn try_add_shortcut(
+        &mut self,
+        shortcut: KeyboardShortcut,
+    ) -> Result<(), ShortcutRegistrationError> {
+        validate_shortcut(&shortcut)?;
+        if self.shortcuts.iter().any(|existing| {
+            existing.matches(&shortcut.modifiers, &shortcut.key)
+                || shortcut.matches(&existing.modifiers, &existing.key)
+        }) {
+            return Err(ShortcutRegistrationError::ChordAlreadyAssigned);
+        }
+        self.shortcuts.push(shortcut);
+        Ok(())
+    }
+
+    /// Change the chord for a known action while preserving the old binding
+    /// if validation fails.
+    pub fn rebind_shortcut(
+        &mut self,
+        action: KeyAction,
+        modifiers: Vec<KeyModifier>,
+        key: String,
+    ) -> Result<(), ShortcutRegistrationError> {
+        let index = self
+            .shortcuts
+            .iter()
+            .position(|shortcut| shortcut.action == action)
+            .ok_or(ShortcutRegistrationError::ActionNotRegistered)?;
+        let replacement = KeyboardShortcut::new(
+            modifiers,
+            key,
+            action,
+            self.shortcuts[index].description.clone(),
+        );
+        validate_shortcut(&replacement)?;
+        if self
+            .shortcuts
+            .iter()
+            .enumerate()
+            .any(|(other_index, existing)| {
+                other_index != index
+                    && (existing.matches(&replacement.modifiers, &replacement.key)
+                        || replacement.matches(&existing.modifiers, &existing.key))
+            })
+        {
+            return Err(ShortcutRegistrationError::ChordAlreadyAssigned);
+        }
+        self.shortcuts[index] = replacement;
+        Ok(())
     }
 
     pub fn add_default_shortcuts(&mut self) {
@@ -445,6 +507,22 @@ impl KeyboardShortcutsManager {
     }
 }
 
+fn validate_shortcut(shortcut: &KeyboardShortcut) -> Result<(), ShortcutRegistrationError> {
+    let key = shortcut.key.trim();
+    if key.is_empty() {
+        return Err(ShortcutRegistrationError::EmptyKey);
+    }
+    if key.chars().any(char::is_control) {
+        return Err(ShortcutRegistrationError::InvalidKey);
+    }
+    for (index, modifier) in shortcut.modifiers.iter().enumerate() {
+        if shortcut.modifiers[..index].contains(modifier) {
+            return Err(ShortcutRegistrationError::DuplicateModifier);
+        }
+    }
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -561,6 +639,71 @@ mod tests {
             .get_shortcuts_by_category(ShortcutCategory::Application)
             .iter()
             .all(|shortcut| shortcut.action != KeyAction::ShowShortcutHelp));
+    }
+
+    #[test]
+    fn user_shortcut_registration_rejects_conflicting_or_invalid_chords() {
+        let mut manager = KeyboardShortcutsManager::new();
+        manager.add_default_shortcuts();
+        let conflicting = KeyboardShortcut::new(
+            vec![KeyModifier::Super],
+            "Space".into(),
+            KeyAction::OpenTerminal,
+            "Conflicting binding".into(),
+        );
+        assert_eq!(
+            manager.try_add_shortcut(conflicting),
+            Err(ShortcutRegistrationError::ChordAlreadyAssigned)
+        );
+
+        let invalid = KeyboardShortcut::new(
+            vec![KeyModifier::Super, KeyModifier::Super],
+            "x".into(),
+            KeyAction::OpenTerminal,
+            "Duplicate modifier".into(),
+        );
+        assert_eq!(
+            manager.try_add_shortcut(invalid),
+            Err(ShortcutRegistrationError::DuplicateModifier)
+        );
+    }
+
+    #[test]
+    fn rebind_is_atomic_and_keeps_default_when_new_chord_conflicts() {
+        let mut manager = KeyboardShortcutsManager::new();
+        manager.add_default_shortcuts();
+        let original = manager
+            .get_shortcut(KeyAction::OpenTerminal)
+            .unwrap()
+            .get_key_combination();
+
+        assert_eq!(
+            manager.rebind_shortcut(
+                KeyAction::OpenTerminal,
+                vec![KeyModifier::Super],
+                "K".into(),
+            ),
+            Err(ShortcutRegistrationError::ChordAlreadyAssigned)
+        );
+        assert_eq!(
+            manager
+                .get_shortcut(KeyAction::OpenTerminal)
+                .unwrap()
+                .get_key_combination(),
+            original
+        );
+
+        manager
+            .rebind_shortcut(
+                KeyAction::OpenTerminal,
+                vec![KeyModifier::Super, KeyModifier::Alt],
+                "Return".into(),
+            )
+            .unwrap();
+        assert_eq!(
+            manager.handle_key_press(vec![KeyModifier::Super, KeyModifier::Alt], "Return".into()),
+            Some(KeyAction::OpenTerminal)
+        );
     }
 
     #[test]

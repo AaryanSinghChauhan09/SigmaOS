@@ -1,4 +1,5 @@
 // SigmaOS Tools Module - Real implementations of system utilities
+pub mod omarchy_command_palette;
 pub mod system_monitor;
 
 pub mod data_tools;

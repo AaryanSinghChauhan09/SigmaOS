@@ -2,6 +2,7 @@
 /// Inspired by Omarchy's keyboard-first tiling and Mint Cinnamon's window management.
 use std::string::String;
 use std::vec::Vec;
+use super::omarchy_dynamic_workspace_suite::{OmarchyTilingLayoutEngine, TilingAlgorithm};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum CompositorBackend {
@@ -123,8 +124,33 @@ impl Compositor {
         }
     }
 
+    /// Apply the Omarchy-inspired layout calculator to active in-memory
+    /// windows. This updates the compositor model; it does not render a frame.
+    pub fn tile_windows_with_algorithm(&mut self, algorithm: TilingAlgorithm) {
+        let indices: Vec<usize> = self
+            .windows
+            .iter()
+            .enumerate()
+            .filter(|(_, window)| window.workspace == self.active_workspace && window.visible)
+            .map(|(index, _)| index)
+            .collect();
+        let mut engine = OmarchyTilingLayoutEngine::new(self.screen_width, self.screen_height);
+        engine.algorithm = algorithm;
+        let geometries = engine.calculate_layout(indices.len());
+        for (index, geometry) in indices.into_iter().zip(geometries) {
+            let window = &mut self.windows[index];
+            window.x = i32::try_from(geometry.x).unwrap_or(i32::MAX);
+            window.y = i32::try_from(geometry.y).unwrap_or(i32::MAX);
+            window.width = geometry.width;
+            window.height = geometry.height;
+        }
+    }
+
     pub fn switch_workspace(&mut self, ws: u32) {
         self.active_workspace = ws;
+        for window in &mut self.windows {
+            window.visible = window.workspace == ws;
+        }
     }
 
     pub fn move_window_to_workspace(&mut self, window_id: u32, ws: u32) {
@@ -179,7 +205,19 @@ mod tests {
         c.move_window_to_workspace(id, 1);
         c.switch_workspace(1);
         let frame = c.render_frame();
-        assert!(frame.is_empty() || frame.contains(&id));
+        assert_eq!(frame, vec![id]);
+    }
+
+    #[test]
+    fn test_omarchy_master_stack_layout_applies_to_active_windows() {
+        let mut c = Compositor::new(CompositorBackend::Framebuffer, 1600, 900);
+        c.create_window("Editor", 0, 0, 300, 200);
+        c.create_window("Terminal", 0, 0, 300, 200);
+        c.create_window("Browser", 0, 0, 300, 200);
+        c.tile_windows_with_algorithm(TilingAlgorithm::MasterStack);
+        assert!(c.windows[0].width > c.windows[1].width);
+        assert_eq!(c.windows[1].x, c.windows[2].x);
+        assert!(c.windows[1].y < c.windows[2].y);
     }
 
     #[test]

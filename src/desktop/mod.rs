@@ -88,7 +88,7 @@ pub mod launcher;
 pub mod shortcuts;
 pub use shortcuts::{
     KeyAction, KeyModifier, KeyboardShortcut, KeyboardShortcutsManager, ShortcutCategory,
-    ShortcutConfig,
+    ShortcutConfig, ShortcutRegistrationError,
 };
 pub mod mint_backup_tool;
 pub mod mint_software_store;
@@ -118,3 +118,11 @@ pub mod sovereign_xed_code_editor; pub use sovereign_xed_code_editor::*;
 pub mod omarchy_autosave_capture_engine; pub use omarchy_autosave_capture_engine::*;
 pub mod omarchy_browser_theme_sync; pub use omarchy_browser_theme_sync::*;
 pub mod omarchy_hidpi_scale_engine; pub use omarchy_hidpi_scale_engine::*;
+pub mod sigma_quickshell;
+pub use sigma_quickshell::{
+    SigmaQuickshell, ShellWidget, LayerSurface, Anchors, WidgetContent,
+    PanelContent, PanelItem, StatusBarModule, StatusBarContent,
+    LauncherContent, AppEntry, HyprlandEvent, ReactiveCell,
+    NotificationContent, NotificationUrgency,
+};
+pub mod sigma_ghostty; pub use sigma_ghostty::{SigmaGhostty, GhosttyConfig, TermGrid, TermCell, TermColor, CellAttrs, VtParser, VtAction, CursorStyle};

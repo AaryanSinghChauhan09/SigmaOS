@@ -25,6 +25,7 @@ pub mod driver;
 pub mod dtrace_compat;
 pub mod ebpf; // Now resolves to ebpf/ directory
 pub mod ebpf_legacy; // Old flat ebpf.rs file retained for backward compat
+pub mod ebpf_sigma; // Enhanced eBPF framework (BpfProgram, BpfMap, Verifier, JIT)
 pub mod ebpf_verification;
 pub mod ebpf_vm;
 pub mod ebpf_xdp;

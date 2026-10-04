@@ -1,12 +1,12 @@
-# Shell and Userspace
+# Touchscreen Support
 
 > **Status:** In Progress
 > **Language:** Rust
-> **Source:** [`src/shell/`](https://github.com/AaryanSinghChauhan09/SigmaOS/tree/main/src/shell/)
+> **Source:** [`src/touchscreen/`](https://github.com/AaryanSinghChauhan09/SigmaOS/tree/main/src/touchscreen/)
 
 ## Overview
 
-Core component for Shell and Userspace in SigmaOS.
+Core component for Touchscreen Support in SigmaOS.
 
 ## Architecture
 
@@ -39,13 +39,13 @@ See [03-Configuration](03-Configuration.md)
 
 ```bash
 # Example
-cargo test --lib -- shell::tests
+cargo test --lib -- touchscreen::tests
 ```
 
 ## Testing
 
 ```bash
-cargo test --lib -- shell
+cargo test --lib -- touchscreen
 ```
 
 ## Roadmap

@@ -21,13 +21,76 @@ pub enum LauncherMode {
     WindowSwitcher,
 }
 
-/// System action executable from the command palette
+/// Built-in action identifiers. These are dispatched to an OS service; they
+/// are never interpreted as shell text.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum SystemActionKind {
+    LockScreen,
+    Restart,
+    PowerOff,
+    Suspend,
+    Screenshot,
+    ReloadTheme,
+    OpenTerminal,
+    GamingProfile,
+    PowerSaveProfile,
+    CreateSnapshot,
+    ExportBackup,
+    SystemInformation,
+}
+
+impl SystemActionKind {
+    pub const fn id(self) -> &'static str {
+        match self {
+            Self::LockScreen => "lock-screen",
+            Self::Restart => "restart",
+            Self::PowerOff => "power-off",
+            Self::Suspend => "suspend",
+            Self::Screenshot => "screenshot",
+            Self::ReloadTheme => "reload-theme",
+            Self::OpenTerminal => "open-terminal",
+            Self::GamingProfile => "gaming-profile",
+            Self::PowerSaveProfile => "power-save-profile",
+            Self::CreateSnapshot => "create-snapshot",
+            Self::ExportBackup => "export-backup",
+            Self::SystemInformation => "system-information",
+        }
+    }
+
+    pub const fn requires_confirmation(self) -> bool {
+        matches!(self, Self::Restart | Self::PowerOff)
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct SystemAction {
+    pub kind: SystemActionKind,
     pub trigger: String,
     pub description: String,
-    pub command: String,
     pub icon: String,
+    /// Becomes true only after an actual service reports support.
+    pub available: bool,
+}
+
+/// Platform backends must dispatch typed actions, never shell strings.
+pub trait SystemActionHandler {
+    fn is_available(&self, action: SystemActionKind) -> bool;
+    fn execute(&mut self, action: SystemActionKind) -> Result<(), String>;
+}
+
+/// Applications are launched through a process service, never through shell
+/// interpolation of catalog strings.
+pub trait ApplicationLaunchHandler {
+    fn is_installed(&self, executable: &str) -> bool;
+    fn launch(&mut self, executable: &str) -> Result<(), String>;
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum SystemActionError {
+    UnknownAction,
+    Unavailable,
+    ConfirmationRequired,
+    Backend(String),
 }
 
 /// Open window entry for window switching
@@ -57,6 +120,8 @@ pub struct LauncherEntry {
     pub category: String,
     pub keywords: Vec<String>,
     pub launch_count: u32,
+    /// True only when verified installed-application inventory confirms it.
+    pub is_installed: bool,
 }
 
 /// Search result item returned to the UI
@@ -68,6 +133,8 @@ pub struct SearchResultItem {
     pub action_payload: String,
     pub mode: LauncherMode,
     pub score: i32,
+    pub enabled: bool,
+    pub requires_confirmation: bool,
 }
 
 /// Enhanced Command Palette & Universal Launcher
@@ -77,6 +144,8 @@ pub struct CommandPalette {
     pub open_windows: Vec<WindowEntry>,
     pub clipboard_history: VecDeque<ClipboardSnippet>,
     pub max_clipboard_entries: usize,
+    pub clipboard_history_enabled: bool,
+    next_clipboard_id: u64,
     pub is_open: bool,
 }
 
@@ -88,6 +157,8 @@ impl CommandPalette {
             open_windows: Vec::new(),
             clipboard_history: VecDeque::new(),
             max_clipboard_entries: 50,
+            clipboard_history_enabled: false,
+            next_clipboard_id: 1,
             is_open: false,
         };
         palette.register_default_system_actions();
@@ -97,76 +168,76 @@ impl CommandPalette {
     /// Register default Omarchy-style system power and desktop commands
     fn register_default_system_actions(&mut self) {
         self.register_action(
+            SystemActionKind::LockScreen,
             ":lock",
-            "Lock Screen (hyprlock / sigma-lock)",
-            "sigma-lock",
+            "Lock the session when a supported lock service is available",
             "system-lock-screen",
         );
         self.register_action(
+            SystemActionKind::Restart,
             ":reboot",
-            "Restart the Operating System",
-            "systemctl reboot",
+            "Restart the system (requires confirmation and a supported power service)",
             "system-reboot",
         );
         self.register_action(
+            SystemActionKind::PowerOff,
             ":poweroff",
-            "Shut Down the Computer",
-            "systemctl poweroff",
+            "Shut down the system (requires confirmation and a supported power service)",
             "system-shutdown",
         );
         self.register_action(
+            SystemActionKind::Suspend,
             ":suspend",
-            "Suspend to RAM (Sleep)",
-            "systemctl suspend",
+            "Suspend the system when a supported power service is available",
             "system-suspend",
         );
         self.register_action(
+            SystemActionKind::Screenshot,
             ":screenshot",
-            "Capture Screen or Selection",
-            "grim -g $(slurp)",
+            "Capture the screen when a supported capture service is available",
             "camera-photo",
         );
         self.register_action(
+            SystemActionKind::ReloadTheme,
             ":reload-theme",
-            "Hot-reload Dynamic Wallpaper Theme",
-            "wallust run",
+            "Reload the theme when a supported settings service is available",
             "preferences-desktop-theme",
         );
         self.register_action(
+            SystemActionKind::OpenTerminal,
             ":terminal",
-            "Spawn Scratchpad Terminal",
-            "alacritty --class scratchpad",
+            "Open a terminal when an installed terminal is available",
             "utilities-terminal",
         );
         self.register_action(
+            SystemActionKind::GamingProfile,
             ":gaming",
-            "Activate Gaming Governor & Boost GPU TDP",
-            "sigma-gaming enable",
+            "Request a gaming power profile when supported",
             "applications-games",
         );
         self.register_action(
+            SystemActionKind::PowerSaveProfile,
             ":powersave",
-            "Switch to Battery Powersave Governor",
-            "sigma-power powersave",
+            "Request a power-saving profile when supported",
             "battery-good",
         );
         self.register_action(
+            SystemActionKind::CreateSnapshot,
             ":snapshot",
-            "Create Instant Timeshift Btrfs Snapshot",
-            "sigma-timeshift create",
+            "Create a restore snapshot when a supported storage service is available",
             "system-software-update",
         );
         self.register_action(
+            SystemActionKind::ExportBackup,
             ":backup",
-            "Export Software Manifest & Backup",
-            "sigma-backup export",
+            "Export a backup when a supported backup service is available",
             "document-save",
         );
         self.register_action(
-            ":matrix",
-            "Verify Distro Launch Superiority Matrix",
-            "sigma-launch-check",
-            "security-high",
+            SystemActionKind::SystemInformation,
+            ":system-info",
+            "Show system information when a supported report service is available",
+            "computer",
         );
     }
 
@@ -176,13 +247,70 @@ impl CommandPalette {
     }
 
     /// Register a system action
-    pub fn register_action(&mut self, trigger: &str, desc: &str, cmd: &str, icon: &str) {
+    pub fn register_action(
+        &mut self,
+        kind: SystemActionKind,
+        trigger: &str,
+        desc: &str,
+        icon: &str,
+    ) {
         self.system_actions.push(SystemAction {
+            kind,
             trigger: trigger.to_string(),
             description: desc.to_string(),
-            command: cmd.to_string(),
             icon: icon.to_string(),
+            available: false,
         });
+    }
+
+    pub fn set_system_action_available(&mut self, kind: SystemActionKind, available: bool) {
+        if let Some(action) = self
+            .system_actions
+            .iter_mut()
+            .find(|action| action.kind == kind)
+        {
+            action.available = available;
+        }
+    }
+
+    /// Execute only through an explicit service handler. The handler must
+    /// independently report availability before it can receive the action.
+    pub fn execute_system_action<H: SystemActionHandler>(
+        &self,
+        kind: SystemActionKind,
+        confirmed: bool,
+        handler: &mut H,
+    ) -> Result<(), SystemActionError> {
+        let action = self
+            .system_actions
+            .iter()
+            .find(|action| action.kind == kind)
+            .ok_or(SystemActionError::UnknownAction)?;
+        if !action.available || !handler.is_available(kind) {
+            return Err(SystemActionError::Unavailable);
+        }
+        if kind.requires_confirmation() && !confirmed {
+            return Err(SystemActionError::ConfirmationRequired);
+        }
+        handler.execute(kind).map_err(SystemActionError::Backend)
+    }
+
+    pub fn launch_application<H: ApplicationLaunchHandler>(
+        &self,
+        executable: &str,
+        handler: &mut H,
+    ) -> Result<(), SystemActionError> {
+        let app = self
+            .apps
+            .iter()
+            .find(|app| app.exec_path == executable)
+            .ok_or(SystemActionError::UnknownAction)?;
+        if !app.is_installed || !handler.is_installed(&app.exec_path) {
+            return Err(SystemActionError::Unavailable);
+        }
+        handler
+            .launch(&app.exec_path)
+            .map_err(SystemActionError::Backend)
     }
 
     /// Update running window list from compositor
@@ -192,13 +320,20 @@ impl CommandPalette {
 
     /// Push text to clipboard history
     pub fn push_clipboard(&mut self, content: &str, timestamp: u64) {
-        if content.trim().is_empty() {
+        if !self.clipboard_history_enabled
+            || self.max_clipboard_entries == 0
+            || content.trim().is_empty()
+        {
             return;
         }
-        if self.clipboard_history.len() >= self.max_clipboard_entries {
+        while self.clipboard_history.len() >= self.max_clipboard_entries {
             self.clipboard_history.pop_back();
         }
-        let snippet_id = self.clipboard_history.len() as u64 + 1;
+        let snippet_id = self.next_clipboard_id;
+        let Some(next_id) = self.next_clipboard_id.checked_add(1) else {
+            return;
+        };
+        self.next_clipboard_id = next_id;
         self.clipboard_history.push_front(ClipboardSnippet {
             snippet_id,
             content: content.to_string(),
@@ -206,14 +341,33 @@ impl CommandPalette {
         });
     }
 
+    pub fn clear_clipboard_history(&mut self) {
+        self.clipboard_history.clear();
+    }
+
+    /// Clipboard history is opt-in because snippets can contain private text.
+    /// Disabling it also clears previously collected data.
+    pub fn set_clipboard_history_enabled(&mut self, enabled: bool) {
+        self.clipboard_history_enabled = enabled;
+        if !enabled {
+            self.clear_clipboard_history();
+        }
+    }
+
     /// Unified fuzzy search across all active modes
     pub fn query(&self, input: &str) -> Vec<SearchResultItem> {
         let trimmed = input.trim();
         if trimmed.is_empty() {
             // Return top frequent apps if no query
-            return self
-                .apps
-                .iter()
+            let mut apps: Vec<&LauncherEntry> = self.apps.iter().collect();
+            apps.sort_by(|left, right| {
+                right
+                    .launch_count
+                    .cmp(&left.launch_count)
+                    .then_with(|| left.name.cmp(&right.name))
+            });
+            return apps
+                .into_iter()
                 .take(8)
                 .map(|app| SearchResultItem {
                     title: app.name.clone(),
@@ -221,7 +375,9 @@ impl CommandPalette {
                     icon: app.icon.clone(),
                     action_payload: app.exec_path.clone(),
                     mode: LauncherMode::Application,
-                    score: 100 + app.launch_count as i32,
+                    score: 100_i32.saturating_add(app.launch_count.min(i32::MAX as u32) as i32),
+                    enabled: app.is_installed,
+                    requires_confirmation: false,
                 })
                 .collect();
         }
@@ -242,6 +398,8 @@ impl CommandPalette {
                     action_payload: format!("{}", val),
                     mode: LauncherMode::Calculator,
                     score: 10_000, // Top priority
+                    enabled: true,
+                    requires_confirmation: false,
                 });
             }
         }
@@ -257,9 +415,11 @@ impl CommandPalette {
                         title: act.trigger.clone(),
                         subtitle: act.description.clone(),
                         icon: act.icon.clone(),
-                        action_payload: act.command.clone(),
+                        action_payload: act.kind.id().to_string(),
                         mode: LauncherMode::SystemAction,
                         score: 5_000,
+                        enabled: act.available,
+                        requires_confirmation: act.kind.requires_confirmation(),
                     });
                 }
             }
@@ -281,6 +441,8 @@ impl CommandPalette {
                     action_payload: format!("focus:{}", win.window_id),
                     mode: LauncherMode::WindowSwitcher,
                     score: 2_000,
+                    enabled: true,
+                    requires_confirmation: false,
                 });
             }
         }
@@ -293,11 +455,7 @@ impl CommandPalette {
                 .to_lowercase();
             for snippet in &self.clipboard_history {
                 if snippet.content.to_lowercase().contains(&cb_q) {
-                    let preview = if snippet.content.len() > 60 {
-                        format!("{}...", &snippet.content[..60])
-                    } else {
-                        snippet.content.clone()
-                    };
+                    let preview = clipboard_preview(&snippet.content, 60);
                     results.push(SearchResultItem {
                         title: preview,
                         subtitle: "Paste from Clipboard History".to_string(),
@@ -305,6 +463,8 @@ impl CommandPalette {
                         action_payload: snippet.content.clone(),
                         mode: LauncherMode::Clipboard,
                         score: 1_500,
+                        enabled: true,
+                        requires_confirmation: false,
                     });
                 }
             }
@@ -313,7 +473,7 @@ impl CommandPalette {
         // 5. Application search
         for app in &self.apps {
             let name_lower = app.name.to_lowercase();
-            let mut score = -1;
+            let mut score: i32 = -1;
 
             if name_lower == q_lower {
                 score = 1000;
@@ -330,7 +490,9 @@ impl CommandPalette {
             }
 
             if score > 0 {
-                score += (app.launch_count as i32) * 5;
+                score = score.saturating_add(
+                    (app.launch_count.min(i32::MAX as u32) as i32).saturating_mul(5),
+                );
                 results.push(SearchResultItem {
                     title: app.name.clone(),
                     subtitle: app.category.clone(),
@@ -338,6 +500,8 @@ impl CommandPalette {
                     action_payload: app.exec_path.clone(),
                     mode: LauncherMode::Application,
                     score,
+                    enabled: app.is_installed,
+                    requires_confirmation: false,
                 });
             }
         }
@@ -412,6 +576,17 @@ impl CommandPalette {
     }
 }
 
+fn clipboard_preview(content: &str, max_bytes: usize) -> String {
+    if content.len() <= max_bytes {
+        return content.to_string();
+    }
+    let mut end = max_bytes.min(content.len());
+    while !content.is_char_boundary(end) {
+        end -= 1;
+    }
+    format!("{}…", &content[..end])
+}
+
 impl Default for CommandPalette {
     fn default() -> Self {
         Self::new()
@@ -422,6 +597,38 @@ impl Default for CommandPalette {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    struct TestActionHandler {
+        available: bool,
+        calls: Vec<SystemActionKind>,
+    }
+
+    impl SystemActionHandler for TestActionHandler {
+        fn is_available(&self, _action: SystemActionKind) -> bool {
+            self.available
+        }
+
+        fn execute(&mut self, action: SystemActionKind) -> Result<(), String> {
+            self.calls.push(action);
+            Ok(())
+        }
+    }
+
+    struct TestApplicationHandler {
+        installed: bool,
+        launches: Vec<String>,
+    }
+
+    impl ApplicationLaunchHandler for TestApplicationHandler {
+        fn is_installed(&self, _executable: &str) -> bool {
+            self.installed
+        }
+
+        fn launch(&mut self, executable: &str) -> Result<(), String> {
+            self.launches.push(executable.to_string());
+            Ok(())
+        }
+    }
 
     #[test]
     fn test_calculator_evaluation() {
@@ -442,6 +649,7 @@ mod tests {
             category: "System".into(),
             keywords: vec!["console".into(), "shell".into()],
             launch_count: 5,
+            is_installed: true,
         });
 
         // Test math expression
@@ -464,6 +672,7 @@ mod tests {
     #[test]
     fn test_window_switcher_and_clipboard() {
         let mut palette = CommandPalette::new();
+        palette.set_clipboard_history_enabled(true);
         palette.sync_open_windows(vec![WindowEntry {
             window_id: 101,
             title: "Firefox — GitHub".into(),
@@ -483,5 +692,119 @@ mod tests {
         let cb_results = palette.query("cb SigmaOS");
         assert_eq!(cb_results.len(), 1);
         assert_eq!(cb_results[0].mode, LauncherMode::Clipboard);
+    }
+
+    #[test]
+    fn system_actions_are_typed_unavailable_and_require_confirmation() {
+        let mut palette = CommandPalette::new();
+        let results = palette.query(":poweroff");
+        assert_eq!(results.len(), 1);
+        assert_eq!(results[0].action_payload, "power-off");
+        assert!(!results[0].enabled);
+        assert!(results[0].requires_confirmation);
+
+        let mut handler = TestActionHandler {
+            available: true,
+            calls: Vec::new(),
+        };
+        assert_eq!(
+            palette.execute_system_action(SystemActionKind::PowerOff, true, &mut handler),
+            Err(SystemActionError::Unavailable)
+        );
+        palette.set_system_action_available(SystemActionKind::PowerOff, true);
+        assert_eq!(
+            palette.execute_system_action(SystemActionKind::PowerOff, false, &mut handler),
+            Err(SystemActionError::ConfirmationRequired)
+        );
+        assert!(handler.calls.is_empty());
+        assert_eq!(
+            palette.execute_system_action(SystemActionKind::PowerOff, true, &mut handler),
+            Ok(())
+        );
+        assert_eq!(handler.calls, vec![SystemActionKind::PowerOff]);
+    }
+
+    #[test]
+    fn clipboard_ids_stay_unique_after_eviction_and_clear() {
+        let mut palette = CommandPalette::new();
+        palette.set_clipboard_history_enabled(true);
+        palette.max_clipboard_entries = 1;
+        palette.push_clipboard("first", 1);
+        palette.push_clipboard("second", 2);
+        let second_id = palette.clipboard_history.front().unwrap().snippet_id;
+        palette.clear_clipboard_history();
+        palette.push_clipboard("third", 3);
+        assert!(palette.clipboard_history.front().unwrap().snippet_id > second_id);
+
+        palette.max_clipboard_entries = 0;
+        palette.push_clipboard("ignored", 4);
+        assert_eq!(palette.clipboard_history.len(), 1);
+    }
+
+    #[test]
+    fn clipboard_preview_respects_utf8_boundaries() {
+        let preview = clipboard_preview("ééé", 3);
+        assert_eq!(preview, "é…");
+    }
+
+    #[test]
+    fn empty_query_orders_frequent_apps_with_stable_ties() {
+        let mut palette = CommandPalette::new();
+        for (name, launches) in [("Zulu", 3), ("Alpha", 3), ("Often", 9)] {
+            palette.register(LauncherEntry {
+                name: name.into(),
+                exec_path: format!("/apps/{name}"),
+                icon: "app".into(),
+                category: "Test".into(),
+                keywords: Vec::new(),
+                launch_count: launches,
+                is_installed: true,
+            });
+        }
+        let results = palette.query("");
+        let names: Vec<&str> = results.iter().map(|item| item.title.as_str()).collect();
+        assert_eq!(names, vec!["Often", "Alpha", "Zulu"]);
+    }
+
+    #[test]
+    fn app_launch_uses_verified_inventory_and_process_backend() {
+        let mut palette = CommandPalette::new();
+        palette.register(LauncherEntry {
+            name: "Editor".into(),
+            exec_path: "/apps/editor".into(),
+            icon: "editor".into(),
+            category: "Development".into(),
+            keywords: Vec::new(),
+            launch_count: 0,
+            is_installed: false,
+        });
+        let mut backend = TestApplicationHandler {
+            installed: true,
+            launches: Vec::new(),
+        };
+        assert_eq!(
+            palette.launch_application("/apps/editor", &mut backend),
+            Err(SystemActionError::Unavailable)
+        );
+        assert!(backend.launches.is_empty());
+
+        palette.apps[0].is_installed = true;
+        assert_eq!(
+            palette.launch_application("/apps/editor", &mut backend),
+            Ok(())
+        );
+        assert_eq!(backend.launches, vec!["/apps/editor"]);
+    }
+
+    #[test]
+    fn clipboard_history_is_opt_in_and_disable_clears_private_text() {
+        let mut palette = CommandPalette::new();
+        palette.push_clipboard("secret", 1);
+        assert!(palette.clipboard_history.is_empty());
+        palette.set_clipboard_history_enabled(true);
+        palette.push_clipboard("secret", 2);
+        assert_eq!(palette.clipboard_history.len(), 1);
+        palette.set_clipboard_history_enabled(false);
+        assert!(palette.clipboard_history.is_empty());
     }
 }

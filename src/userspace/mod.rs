@@ -170,3 +170,4 @@ mod tests {
 }
 pub mod init;
 pub mod shell;
+pub mod sigma_init;

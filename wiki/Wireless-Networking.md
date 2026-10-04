@@ -1,12 +1,12 @@
-# Shell and Userspace
+# Wireless Networking
 
 > **Status:** In Progress
 > **Language:** Rust
-> **Source:** [`src/shell/`](https://github.com/AaryanSinghChauhan09/SigmaOS/tree/main/src/shell/)
+> **Source:** [`src/wireless/`](https://github.com/AaryanSinghChauhan09/SigmaOS/tree/main/src/wireless/)
 
 ## Overview
 
-Core component for Shell and Userspace in SigmaOS.
+Core component for Wireless Networking in SigmaOS.
 
 ## Architecture
 
@@ -39,13 +39,13 @@ See [03-Configuration](03-Configuration.md)
 
 ```bash
 # Example
-cargo test --lib -- shell::tests
+cargo test --lib -- wireless::tests
 ```
 
 ## Testing
 
 ```bash
-cargo test --lib -- shell
+cargo test --lib -- wireless
 ```
 
 ## Roadmap

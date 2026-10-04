@@ -1,43 +1,108 @@
-# SigmaOS Project Overview
+# SigmaOS Wiki Home
 
-SigmaOS is an operating-system project. Its repository contains kernel, memory, filesystem, networking, security, driver, desktop, installer, and package-management code. The presence of a module, API, or roadmap entry does not by itself establish runtime support.
+## Table of Contents
 
-## Project goals
-
-- Build a system with clear subsystem boundaries and explicit resource ownership.
-- Evaluate useful designs from Linux distributions and BSD systems, then adapt them to SigmaOS's architecture rather than claiming direct parity.
-- Make reliability, security, performance, accessibility, and recoverability reviewable through source, documented behavior, and repeatable validation.
-- Keep security-critical functions unavailable when a required audited provider is not integrated.
-
-## Linux and BSD design references
-
-| Area | Designs to study |
-|---|---|
-| Kernel and scheduling | Linux scheduler and cgroup design; xv6's compact process/trap model; Redox's Rust interfaces |
-| Storage | Linux journaling and VFS; Btrfs copy-on-write/recovery; FreeBSD GEOM/ZFS boundaries |
-| Networking and security | Linux namespaces/nftables; OpenBSD PF/pledge/unveil; FreeBSD jails/Capsicum |
-| Packaging and updates | Arch's transparent package recipes; NixOS generations; Debian transactions; FreeBSD signed catalogs |
-| Desktop and devices | Omarchy's keyboard workflow; Mint's onboarding/recovery; Linux DRM/KMS and hardware discovery |
-| Documentation | ArchWiki's task-oriented pages, prerequisites, procedures, and troubleshooting |
-
-These are inspiration sources for design review. They are not a feature-support list.
-
-See [Inspiration and Reference Projects](Inspiration-and-References.md) for adaptation guidance. Keep behavior and future work on the owning component page, supported by source links and reproducible checks.
-
-See the [Arch, Mint, and Omarchy development plan](Repository-docs-LINUX-MINT-OMARCHY-INSPIRED-DEVELOPMENT-PLAN) for gated milestones; it is a proposal, not a support statement.
-
-## Component documentation
-
-- [Kernel](04-Kernel)
-- [Filesystems](05-Filesystems)
-- [Networking](06-Networking)
-- [Security](07-Security)
-- [Desktop](08-Desktop)
-- [Packaging](09-Packaging)
-- [Future development overview](14-Future-Development)
-- [Component roadmap index](Home#component-future-development-roadmaps)
-- [Repository Markdown archive](17-Repository-Documents)
-
-## Maintenance
-
-Keep this page as a concise project overview. Link detailed behavior to source files and component pages. Move implementation details to their topic pages, label proposals as proposals, and remove unverified performance, test, hardware-support, or parity claims.
+- [01-Installation](01-Installation.md)
+- [02-Getting-Started](02-Getting-Started.md)
+- [03-Configuration](03-Configuration.md)
+- [04-Kernel](04-Kernel.md)
+- [05-Filesystems](05-Filesystems.md)
+- [06-Networking](06-Networking.md)
+- [07-Security](07-Security.md)
+- [08-Desktop](08-Desktop.md)
+- [09-Packaging](09-Packaging.md)
+- [10-Development](10-Development.md)
+- [11-Roadmap](11-Roadmap.md)
+- [12-Contributing](12-Contributing.md)
+- [13-Agents](13-Agents.md)
+- [14-Future-Development](14-Future-Development.md)
+- [15-Architecture-Decisions](15-Architecture-Decisions.md)
+- [16-Self-Sufficiency-Encyclopedia](16-Self-Sufficiency-Encyclopedia.md)
+- [17-Repository-Documents](17-Repository-Documents.md)
+- [AI-and-Agent-Runtime](AI-and-Agent-Runtime.md)
+- [AI-and-ML-Engine](AI-and-ML-Engine.md)
+- [Accessibility-and-UX](Accessibility-and-UX.md)
+- [Atreyu-System-Plugin](Atreyu-System-Plugin.md)
+- [Audio-and-Graphics](Audio-and-Graphics.md)
+- [Audio](Audio.md)
+- [Autosave-Capture-Engine](Autosave-Capture-Engine.md)
+- [Backup-and-Recovery](Backup-and-Recovery.md)
+- [Bluetooth](Bluetooth.md)
+- [Boot](Boot.md)
+- [Browser-Theme-Sync](Browser-Theme-Sync.md)
+- [Bulky-Parallel-Batch-Renamer](Bulky-Parallel-Batch-Renamer.md)
+- [Cloud-Agent-Environment](Cloud-Agent-Environment.md)
+- [Cloud-and-Cluster](Cloud-and-Cluster.md)
+- [Compatibility-Layers](Compatibility-Layers.md)
+- [Compositor](Compositor.md)
+- [Container-Runtime](Container-Runtime.md)
+- [Container-Virtualization](Container-Virtualization.md)
+- [Crypto-and-TPM](Crypto-and-TPM.md)
+- [Diagnostics-and-Crash-Reporting](Diagnostics-and-Crash-Reporting.md)
+- [DiskTree-and-Storage-Analysis](DiskTree-and-Storage-Analysis.md)
+- [Docker-Rootless-Engine](Docker-Rootless-Engine.md)
+- [Drivers](Drivers.md)
+- [Filesystem-VFS](Filesystem-VFS.md)
+- [Font-Builder](Font-Builder.md)
+- [GPU-and-Graphics](GPU-and-Graphics.md)
+- [Grok-AI-Panel-Agent](Grok-AI-Panel-Agent.md)
+- [Hardware-Drivers](Hardware-Drivers.md)
+- [HiDPI-Scale-Engine](HiDPI-Scale-Engine.md)
+- [Home](Home.md)
+- [Hypnotix-Streaming-Media](Hypnotix-Streaming-Media.md)
+- [IPC-and-Syscalls](IPC-and-Syscalls.md)
+- [IPC](IPC.md)
+- [Init-and-Services](Init-and-Services.md)
+- [Inspiration-and-References](Inspiration-and-References.md)
+- [Installer-Guide](Installer-Guide.md)
+- [Installer](Installer.md)
+- [IoT-and-Embedded](IoT-and-Embedded.md)
+- [Launcher](Launcher.md)
+- [LinuxMint-Parity](LinuxMint-Parity.md)
+- [Low-Level-Languages-and-FFI](Low-Level-Languages-and-FFI.md)
+- [Memory-Management](Memory-Management.md)
+- [Mint-Tools-Supremacy](Mint-Tools-Supremacy.md)
+- [Mint-and-Omarchy-Apex-Mastery](Mint-and-Omarchy-Apex-Mastery.md)
+- [Mint-and-Omarchy-Hardware-and-Audio-Supremacy](Mint-and-Omarchy-Hardware-and-Audio-Supremacy.md)
+- [Mint-and-Omarchy-Launch-Supremacy](Mint-and-Omarchy-Launch-Supremacy.md)
+- [Mint-and-Omarchy-Pinnacle-Ecosystem](Mint-and-Omarchy-Pinnacle-Ecosystem.md)
+- [Mint-and-Omarchy-Supremacy](Mint-and-Omarchy-Supremacy.md)
+- [Mint-and-Omarchy-Zenith-Mastery](Mint-and-Omarchy-Zenith-Mastery.md)
+- [Modal-Keybindings-and-Chord-Rebind](Modal-Keybindings-and-Chord-Rebind.md)
+- [Monitoring-Observability](Monitoring-Observability.md)
+- [Multi-Agent-Provider-Orchestration](Multi-Agent-Provider-Orchestration.md)
+- [Networking](Networking.md)
+- [Nim-P2P-Mesh-and-Tooling](Nim-P2P-Mesh-and-Tooling.md)
+- [Omarchy-Gaming-Performance-Suite](Omarchy-Gaming-Performance-Suite.md)
+- [Omarchy-Parity](Omarchy-Parity.md)
+- [Orchestration](Orchestration.md)
+- [Package-Manager](Package-Manager.md)
+- [Performance-Benchmarks](Performance-Benchmarks.md)
+- [Performance](Performance.md)
+- [Power-Management](Power-Management.md)
+- [Print-Support](Print-Support.md)
+- [Robotics-and-Embedded](Robotics-and-Embedded.md)
+- [Runtime](Runtime.md)
+- [Scheduler](Scheduler.md)
+- [Scientific-Computing](Scientific-Computing.md)
+- [Sensors](Sensors.md)
+- [Shell-and-Userspace](Shell-and-Userspace.md)
+- [Smartcard-and-Security](Smartcard-and-Security.md)
+- [Software-Store-and-Command-Palette](Software-Store-and-Command-Palette.md)
+- [Sovereign-Apex-Supremacy-Matrix](Sovereign-Apex-Supremacy-Matrix.md)
+- [Storage](Storage.md)
+- [System-Management](System-Management.md)
+- [TPM](TPM.md)
+- [Testing](Testing.md)
+- [Theming-Guide](Theming-Guide.md)
+- [Theming-and-Customization](Theming-and-Customization.md)
+- [Thermal-Management](Thermal-Management.md)
+- [Toolchain-and-Dev](Toolchain-and-Dev.md)
+- [Touchscreen-Support](Touchscreen-Support.md)
+- [Tracing-and-Observability](Tracing-and-Observability.md)
+- [USB-Devices](USB-Devices.md)
+- [Virtualization-and-Containers](Virtualization-and-Containers.md)
+- [Wireless-Networking](Wireless-Networking.md)
+- [Xed-Code-Editor](Xed-Code-Editor.md)
+- [Xreader-Document-Reader](Xreader-Document-Reader.md)
+- [Zig-Vulkan-GPU-Acceleration](Zig-Vulkan-GPU-Acceleration.md)

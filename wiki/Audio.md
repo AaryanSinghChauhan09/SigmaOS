@@ -1,12 +1,12 @@
-# Shell and Userspace
+# Audio
 
 > **Status:** In Progress
 > **Language:** Rust
-> **Source:** [`src/shell/`](https://github.com/AaryanSinghChauhan09/SigmaOS/tree/main/src/shell/)
+> **Source:** [`src/audio/`](https://github.com/AaryanSinghChauhan09/SigmaOS/tree/main/src/audio/)
 
 ## Overview
 
-Core component for Shell and Userspace in SigmaOS.
+Core component for Audio in SigmaOS.
 
 ## Architecture
 
@@ -39,13 +39,13 @@ See [03-Configuration](03-Configuration.md)
 
 ```bash
 # Example
-cargo test --lib -- shell::tests
+cargo test --lib -- audio::tests
 ```
 
 ## Testing
 
 ```bash
-cargo test --lib -- shell
+cargo test --lib -- audio
 ```
 
 ## Roadmap
