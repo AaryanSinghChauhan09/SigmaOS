@@ -1,142 +1,46 @@
 # Getting Started
 
-This guide covers first-time configuration and basic usage of SigmaOS.
+This guide is for building and exploring the SigmaOS source. It does not describe a supported desktop installation: the full boot-to-user-session path has not yet been validated.
 
-## First Boot
+## Prerequisites
 
-On first boot, you will be greeted by the Zenith desktop environment with the onboarding wizard.
+- A Rust toolchain matching [`rust-toolchain.toml`](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/rust-toolchain.toml).
+- Git and a working C toolchain for repository scripts that compile native test fixtures.
+- Optional: Python 3 for Python-based test utilities.
 
-### Onboarding Wizard
+## Check out and build
 
-The onboarding wizard will guide you through:
-
-1. **Language and Region Selection**
-2. **Network Configuration**
-3. **User Account Setup**
-4. **Desktop Theme Selection**
-5. **Privacy Settings**
-
-## Basic Configuration
-
-### System Settings
-
-Access system settings via the Zenith Control Center:
-
-```bash
-# Launch control center
-sigma-control-center
+```sh
+git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
+cd SigmaOS
+cargo check --lib
 ```
 
-### Terminal Access
+Expected result: Cargo reports a successful library check. This checks the hosted Rust library; it does not build or boot the bare-metal operating system.
 
-Open the Sigma Shell:
+## Run tests
 
-```bash
-# Terminal shortcut: Super+T
-sigma-shell
+Start with the affected module:
+
+```sh
+cargo test --lib <module_or_test_filter>
 ```
 
-### Package Management
+For a broader check:
 
-Update the system:
-
-```bash
-sigpkg update
-sigpkg upgrade
+```sh
+cargo test --lib
+./run_sigma_tests.sh
 ```
 
-Install packages:
+Record the exact commands and outcomes. A unit test for a model does not prove that the feature is connected to the kernel or works on hardware. See [Testing](Testing.md) for the validation ladder.
 
-```bash
-sigpkg install package-name
-```
+## Find the owning component
 
-Remove packages:
+Start at [Home](Home.md) and open the component page before making changes. The component page records source paths, design references, current evidence, limitations, and the future roadmap.
 
-```bash
-sigpkg remove package-name
-```
+## Troubleshooting
 
-## Desktop Environment
-
-### Zenith Compositor
-
-Zenith is SigmaOS's native compositor providing:
-
-- Direct hardware GPU rendering
-- Zero-copy framebuffers
-- Low-latency input handling
-- Multi-monitor support
-
-### Shortcuts
-
-- **Super**: Open application launcher
-- **Super+T**: Open terminal
-- **Super+D**: Show desktop
-- **Super+Shift+S**: Screenshot
-- **Super+L**: Lock screen
-
-## System Services
-
-View running services:
-
-```bash
-sigma-systemctl list
-```
-
-Enable/disable services:
-
-```bash
-sigma-systemctl enable service-name
-sigma-systemctl disable service-name
-```
-
-## Filesystem
-
-SigmaOS uses a custom filesystem layout compatible with Linux FHS:
-
-- `/` - Root filesystem
-- `/home` - User home directories
-- `/usr` - System software
-- `/etc` - Configuration files
-- `/var` - Variable data
-- `/tmp` - Temporary files
-
-## Security
-
-### Pledge/Unveil Sandbox
-
-SigmaOS uses pledge/unveil for process sandboxing:
-
-```bash
-# Run application with sandbox
-pledge unveil /path/to/app
-```
-
-### Capability-based Security
-
-Process capabilities restrict access to resources:
-
-```bash
-# Grant specific capabilities
-sigcaps grant process-name read:/etc/config
-```
-
-## Getting Help
-
-- **Manual Pages**: `man command-name`
-- **Wiki**: https://github.com/AaryanSinghChauhan09/SigmaOS/wiki
-- **Issue Tracker**: https://github.com/AaryanSinghChauhan09/SigmaOS/issues
-
-## Next Steps
-
-- [Configuration](03-Configuration.md) - Advanced system configuration
-- [Kernel](04-Kernel.md) - Kernel subsystems and modules
-- [Filesystems](05-Filesystems.md) - Storage and filesystem options
-
-## AI Agent Maintenance Instructions
-
-- **Bolt ⚡**: Ensure documentation of any new zero-allocation optimizations or performance improvements are added concisely without marketing fluff.
-- **Palette 🎨**: Maintain Arch Linux wiki style: clear, factual, one page per topic, using appropriate markdown formatting and tables where necessary.
-- **Sentinel 🛡️**: Verify that no hardcoded credentials or unvetted cryptographic algorithms are documented as production-ready. Ensure security limitations are accurately stated.
-- **General**: Keep pages up-to-date with current repository capabilities. Remove redundant files when consolidating information.
+- **`cargo check` fails:** keep the complete compiler output and report the first actionable error with the Rust toolchain version.
+- **A test fails:** rerun its exact filter and check whether the failure is deterministic before changing unrelated code.
+- **You need a bootable image:** the current ISO and QEMU path is not a supported installation workflow; see [Installation status](01-Installation.md).

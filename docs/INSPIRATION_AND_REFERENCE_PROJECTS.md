@@ -13,7 +13,8 @@ Borrow a design principle when it fits SigmaOS's goals; do not copy a project's 
 | [Linux kernel](https://www.kernel.org/doc/html/latest/) | Stable subsystem boundaries, explicit interfaces, mature device and filesystem abstractions, and broad hardware enablement | `src/mm/`, `src/scheduler/`, `src/vfs/`, `src/fs/`, `src/drivers/`, `src/net/` | Prioritize coherent end-to-end paths over feature-name parity. Add tests for boundary behavior and run representative hardware or QEMU workloads. |
 | [Omarchy](https://github.com/omacom/omarchy) | Opinionated desktop defaults, discoverable keyboard workflows, coherent theming, and practical install/update flows | `src/desktop/`, installer and update components, user documentation | Keep defaults usable and customization discoverable. Validate with a clean install, keyboard-only navigation, theme change, and recovery from a failed update. |
 | [os-tutorial](https://github.com/cfenollosa/os-tutorial) | Small, staged examples make boot, interrupts, memory, and user/kernel transitions understandable | `src/boot/`, interrupt handling, syscall entry, architecture docs | Add minimal runnable examples and explain invariants alongside production code. Verify each stage boots under the documented emulator configuration. |
-| [Linux Mint](https://github.com/linuxmint) | Reduce friction through approachable setup, familiar system tools, sensible defaults, and clear help | installer, settings, software management, backup/recovery, onboarding | Test common tasks with a new user profile and document failures in plain language. Avoid assuming that naming a Mint-inspired tool means its workflow is complete. |
+| [Linux Mint](https://github.com/linuxmint) | Reduce friction through approachable setup, update guidance, familiar tools, and documented recovery | installer, settings, software management, backup/recovery, onboarding | Test common tasks with a new user profile and document failures in plain language. Avoid assuming that naming a Mint-inspired tool means its workflow is complete. |
+| [Arch Linux and ArchWiki](https://wiki.archlinux.org/title/General_recommendations) | Transparent configuration, task-oriented reference pages, explicit prerequisites, and troubleshooting | contributor workflow, system configuration, component documentation | Prefer concise procedures with expected results and recovery steps. Link component status to code and tests instead of broad parity claims. |
 | [Redox OS](https://www.redox-os.org/) | Rust-first system design, explicit separation of services, and resource-oriented interfaces | process/service boundaries, IPC, VFS, driver isolation, Rust safety | Evaluate which services can be isolated without undermining SigmaOS's current kernel design. Prototype one boundary and measure fault containment and IPC cost before expanding it. |
 | [xv6 (RISC-V)](https://github.com/mit-pdos/xv6-riscv) | A compact reference for reasoning about processes, traps, paging, files, and locking | syscall/process lifecycle, virtual memory, filesystem, SMP synchronization | Use xv6 as a review and teaching reference. Port concepts, not code blindly; document changed invariants and test concurrency and failure paths. |
 
@@ -80,7 +81,9 @@ For work inspired by another project, include:
 ## Primary references
 
 - Linux kernel documentation: <https://www.kernel.org/doc/html/latest/>
-- Omarchy source and documentation: <https://github.com/omacom/omarchy>
+- ArchWiki style and contribution guidance: <https://wiki.archlinux.org/title/Help:Style> and <https://wiki.archlinux.org/title/ArchWiki:Contributing>
+- Linux Mint installation, user, troubleshooting, and developer documentation: <https://linuxmint.com/documentation.php>
+- Omarchy CLI manual and source: <https://omarchy.org/manual/omarchy-cli/> and <https://github.com/omacom/omarchy>
 - os-tutorial source: <https://github.com/cfenollosa/os-tutorial>
 - Linux Mint projects: <https://github.com/linuxmint>
 - Redox OS book and source: <https://doc.redox-os.org/book/> and <https://gitlab.redox-os.org/redox-os/redox>

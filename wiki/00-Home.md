@@ -13,13 +13,16 @@ SigmaOS is an operating-system project. Its repository contains kernel, memory, 
 
 | Area | Designs to study |
 |---|---|
-| Kernel and scheduling | Linux scheduling and cgroups; FreeBSD ULE and cpusets; NetBSD modular kernel interfaces |
-| Storage | Linux journaling and copy-on-write filesystems; FreeBSD GEOM and ZFS; NetBSD VFS boundaries |
-| Networking and security | Linux namespaces and nftables; OpenBSD PF, pledge, and unveil; FreeBSD jails and Capsicum; NetBSD NPF |
-| Packaging and updates | NixOS generations; Debian package transactions; Arch build recipes; Gentoo profiles; FreeBSD pkg and Poudriere |
-| Desktop and devices | Linux DRM/KMS; FreeBSD device lifecycle; Pop!_OS COSMIC workspace design |
+| Kernel and scheduling | Linux scheduler and cgroup design; xv6's compact process/trap model; Redox's Rust interfaces |
+| Storage | Linux journaling and VFS; Btrfs copy-on-write/recovery; FreeBSD GEOM/ZFS boundaries |
+| Networking and security | Linux namespaces/nftables; OpenBSD PF/pledge/unveil; FreeBSD jails/Capsicum |
+| Packaging and updates | Arch's transparent package recipes; NixOS generations; Debian transactions; FreeBSD signed catalogs |
+| Desktop and devices | Omarchy's keyboard workflow; Mint's onboarding/recovery; Linux DRM/KMS and hardware discovery |
+| Documentation | ArchWiki's task-oriented pages, prerequisites, procedures, and troubleshooting |
 
 These are inspiration sources for design review. They are not a feature-support list.
+
+See [Inspiration and Reference Projects](Inspiration-and-References.md) for adaptation guidance. Keep behavior and future work on the owning component page, supported by source links and reproducible checks.
 
 ## Component documentation
 

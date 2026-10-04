@@ -1,6 +1,9 @@
-# SigmaOS Feature Status — Machine-Readable Release Truth
+# SigmaOS Feature Inventory — Development Status (Not a Release Support Matrix)
 # Updated: 2026-10-03
-# Policy: No feature is "working" without an automated test or QEMU evidence.
+# Scope: Entries track implementation or module-level test evidence, not general OS readiness.
+# A passing unit test does not establish kernel/runtime integration, bootability, or hardware support.
+# Values such as "working" are legacy component statuses; use docs/PROJECT_STATUS.md and
+# the owning wiki page for integration, release blockers, tested configuration, and limitations.
 
 [arch.x86_64]
 status = "partial"

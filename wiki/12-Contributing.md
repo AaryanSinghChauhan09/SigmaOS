@@ -1,49 +1,16 @@
-# 🤝 Contributing to SigmaOS: Guidelines for Human Contributors & AI Agents
+# Contributing
 
-Thank you for contributing to **SigmaOS**! This document provides development guidelines, code quality standards, and contribution workflows inspired by Linux kernel maintainers and BSD distribution standards.
+See the repository's canonical [Contribution Guide](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/CONTRIBUTING.md) for implementation standards, local checks, and the pull-request checklist.
 
----
+## Wiki editing style
 
-## 📜 Rules for Contributors
+Use the [ArchWiki style guide](https://wiki.archlinux.org/title/Help:Style) and [contributor guide](https://wiki.archlinux.org/title/ArchWiki:Contributing) as models for concise, task-oriented documentation and reviewable changes. Make pages easy to scan, state prerequisites, give ordered steps, show expected outcomes, and include troubleshooting. Keep one canonical page for each component and place its current status, reference-project comparison, validation evidence, limitations, and future roadmap together.
 
-### 1. **Zero External Dependencies Policy**
-- SigmaOS strictly adheres to a **zero-dependency `#![no_std]`** design philosophy across kernel, hardware abstractions, and system services.
-- **Do NOT add third-party crates** to `Cargo.toml`.
-- All abstractions must use core Rust or `alloc::` primitives (`alloc::vec::Vec`, `alloc::string::String`, `alloc::format`).
+For each user-facing workflow, draw on [Linux Mint's user and troubleshooting documentation](https://linuxmint.com/documentation.php) and [Omarchy's CLI and keyboard workflow](https://omarchy.org/manual/omarchy-cli/). Adapt those ideas to verified SigmaOS behavior; do not document planned interfaces as available commands.
 
-### 2. **Code Quality, Safety & Testing**
-- **Safe Rust First:** Avoid `unsafe` blocks unless interfacing directly with MMIO registers, CPU instructions, or FFI. Always document `// SAFETY:` invariants for any `unsafe` usage.
-- **No Panics:** Avoid `unwrap()`, `expect()`, or panicking logic in production paths. Gracefully return `Option` or `Result`.
-- **Mandatory Unit Testing:** Every new feature, bug fix, or security enhancement must include comprehensive unit tests (`#[cfg(test)] mod tests`).
-- **Full Verification:** All changes must pass `./run_sigma_tests.sh` and standalone test compilation (`rustc --edition=2021 --test <file_path>`).
+## Before publishing a component claim
 
-### 3. **Security & Sandboxing Standards**
-- Implement security controls following defense-in-depth principles: OpenBSD `pledge`/`unveil`, Linux Landlock v5, FreeBSD Capsicum descriptors, and SELinux MAC.
-- All network packets, input parameters, and package manifests must undergo strict validation against path traversal, octal differential, and CLI option injection attacks.
-
-### 4. **Branch Naming & Commit Workflow**
-- Branch names should follow descriptive prefixes (`feat/`, `fix/`, `docs/`, `security/`, `perf/`, `jules-`).
-- Keep commits atomic, well-tested, and accompanied by clear commit messages adhering to standard git conventions (50-char subject, blank line, body).
-
-### 3. **Linux & BSD Distribution Engineering Guidelines**
-- **Cross-Distro Interoperability**: Components taking inspiration from Linux and BSD distributions (Arch ALPM, Debian sbuild, Fedora DNF, Gentoo Portage, CachyOS BORE, FreeBSD Ports/Capsicum, OpenBSD Pledge/Unveil, NixOS Flakes/CAS) must maintain clean interfaces and support cross-subsystem event routing.
-- **Security Sandboxing**: Application modules must declare sandboxing bounds using OpenBSD `pledge()`/`unveil()`, Linux Landlock v5, FreeBSD Capsicum capabilities, or Fedora SELinux MLS/MCS rules.
-
-### 4. **Testing, Autonomous Verification & Pre-Commit Protocols**
-- **Standalone Module Testing**: Modified files must be verified using standalone unit test compilation:
-  ```bash
-  rustc --edition=2021 --test <file_path> -o build/test_bin && ./build/test_bin
-  ```
-- **Master Test Runner Execution**: Before submitting any pull request or finalizing AI agent turns, execute `./run_sigma_tests.sh` to verify all test stages pass cleanly.
-- **AI Agent Pre-Commit Protocol**: AI agents must execute `pre_commit_instructions`, verify test binaries, obtain code review confirmation (`request_code_review`), record learnings (`initiate_memory_recording`), and submit via `submit`.
-
-### 5. **Code Review & Quality Assurance**
-- Every pull request requires double maintainer review.
-- PR commit messages must follow standard conventions: short subject line (50 chars max), blank line, and descriptive body outlining changes and testing results.
-
-## AI Agent Maintenance Instructions
-
-- **Bolt ⚡**: Ensure documentation of any new zero-allocation optimizations or performance improvements are added concisely without marketing fluff.
-- **Palette 🎨**: Maintain Arch Linux wiki style: clear, factual, one page per topic, using appropriate markdown formatting and tables where necessary.
-- **Sentinel 🛡️**: Verify that no hardcoded credentials or unvetted cryptographic algorithms are documented as production-ready. Ensure security limitations are accurately stated.
-- **General**: Keep pages up-to-date with current repository capabilities. Remove redundant files when consolidating information.
+1. Link the source implementation and the runtime entry point.
+2. State whether the feature is proposed, prototype, integrated, or supported.
+3. Include the exact test or hardware/emulator check that supports the status.
+4. Record limitations and the next roadmap milestone on the owning component page.
