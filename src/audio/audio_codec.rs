@@ -285,96 +285,193 @@ impl AudioCodec {
         let format = Self::detect_format(data);
 
         match format {
-            AudioFormat::Flac => self.decode_flac(data),
-            AudioFormat::Mp3 => self.decode_mp3(data),
             AudioFormat::Wav => self.decode_wav(data),
-            AudioFormat::OggVorbis => self.decode_ogg(data),
+            AudioFormat::Flac | AudioFormat::Mp3 | AudioFormat::OggVorbis => {
+                Err("Codec is recognized but decoding is not implemented")
+            }
             _ => Err("Unsupported audio format"),
         }
     }
 
-    /// Decode FLAC audio (simplified implementation)
-    fn decode_flac(&self, _data: &[u8]) -> Result<DecodedAudio, &'static str> {
-        let metadata = AudioMetadata {
-            format: AudioFormat::Flac,
-            sample_rate: AudioSampleRate::Hz44100,
-            channels: AudioChannels::Stereo,
-            bits_per_sample: 16,
-            duration_seconds: 180.0,
-            bitrate: 1000,
-        };
+    /// Decode integer PCM WAV (8/16/24/32-bit, one to eight channels).
+    /// Floating-point, compressed, extensible, RF64, and malformed WAV files are rejected.
+    fn decode_wav(&self, data: &[u8]) -> Result<DecodedAudio, &'static str> {
+        if data.len() < 12 || &data[..4] != b"RIFF" || &data[8..12] != b"WAVE" {
+            return Err("Invalid RIFF/WAVE header");
+        }
+        let riff_size = u32::from_le_bytes(data[4..8].try_into().unwrap()) as usize;
+        let riff_end = riff_size
+            .checked_add(8)
+            .filter(|end| *end >= 12 && *end <= data.len())
+            .ok_or("RIFF size exceeds file bounds")?;
 
-        let sample_count = (metadata.duration_seconds * 44100.0) as usize * 2;
-        let mut samples = Vec::with_capacity(sample_count);
+        let mut offset = 12usize;
+        let mut format_chunk: Option<(u16, u16, u32, u32, u16, u16)> = None;
+        let mut data_chunk: Option<(usize, usize)> = None;
+        while offset < riff_end {
+            let header_end = offset.checked_add(8).ok_or("WAV chunk offset overflow")?;
+            if header_end > riff_end {
+                return Err("Truncated WAV chunk header");
+            }
+            let chunk_id = &data[offset..offset + 4];
+            let chunk_size =
+                u32::from_le_bytes(data[offset + 4..header_end].try_into().unwrap()) as usize;
+            let chunk_start = header_end;
+            let chunk_end = chunk_start
+                .checked_add(chunk_size)
+                .filter(|end| *end <= riff_end)
+                .ok_or("WAV chunk exceeds RIFF bounds")?;
 
-        for _ in 0..sample_count {
-            samples.push(0);
+            if chunk_id == b"fmt " {
+                if format_chunk.is_some() || chunk_size < 16 {
+                    return Err("Invalid or duplicate WAV format chunk");
+                }
+                format_chunk = Some((
+                    u16::from_le_bytes(data[chunk_start..chunk_start + 2].try_into().unwrap()),
+                    u16::from_le_bytes(data[chunk_start + 2..chunk_start + 4].try_into().unwrap()),
+                    u32::from_le_bytes(data[chunk_start + 4..chunk_start + 8].try_into().unwrap()),
+                    u32::from_le_bytes(data[chunk_start + 8..chunk_start + 12].try_into().unwrap()),
+                    u16::from_le_bytes(
+                        data[chunk_start + 12..chunk_start + 14].try_into().unwrap(),
+                    ),
+                    u16::from_le_bytes(
+                        data[chunk_start + 14..chunk_start + 16].try_into().unwrap(),
+                    ),
+                ));
+            } else if chunk_id == b"data" {
+                if data_chunk.replace((chunk_start, chunk_end)).is_some() {
+                    return Err("Multiple WAV data chunks are unsupported");
+                }
+            }
+
+            let padded_end = chunk_end
+                .checked_add(chunk_size & 1)
+                .filter(|end| *end <= riff_end)
+                .ok_or("Missing WAV chunk padding byte")?;
+            offset = padded_end;
         }
 
-        Ok(DecodedAudio { metadata, samples })
+        let (encoding, channels, sample_rate, byte_rate, block_align, bits) =
+            format_chunk.ok_or("Missing WAV format chunk")?;
+        if encoding != 1 {
+            return Err("Only integer PCM WAV is supported");
+        }
+        if channels == 0 || channels > 8 || sample_rate == 0 {
+            return Err("Unsupported WAV channel count or sample rate");
+        }
+        if !matches!(bits, 8 | 16 | 24 | 32) {
+            return Err("Unsupported PCM bit depth");
+        }
+        let expected_align = channels
+            .checked_mul(bits / 8)
+            .ok_or("WAV block alignment overflow")?;
+        let expected_byte_rate = sample_rate
+            .checked_mul(block_align as u32)
+            .ok_or("WAV byte rate overflow")?;
+        if block_align != expected_align || byte_rate != expected_byte_rate {
+            return Err("Inconsistent WAV byte rate or block alignment");
+        }
+
+        let (sample_start, sample_end) = data_chunk.ok_or("Missing WAV data chunk")?;
+        let pcm = &data[sample_start..sample_end];
+        if pcm.len() % block_align as usize != 0 {
+            return Err("WAV data ends in a partial sample frame");
+        }
+        let sample_count = pcm.len() / (bits as usize / 8);
+        let mut samples = Vec::new();
+        samples
+            .try_reserve_exact(sample_count)
+            .map_err(|_| "WAV sample allocation failed")?;
+        for bytes in pcm.chunks_exact(bits as usize / 8) {
+            let sample = match bits {
+                8 => ((bytes[0] as i32 - 128) << 8) as i16,
+                16 => i16::from_le_bytes([bytes[0], bytes[1]]),
+                24 => {
+                    let value =
+                        (bytes[0] as i32) | ((bytes[1] as i32) << 8) | ((bytes[2] as i32) << 16);
+                    ((value << 8) >> 16) as i16
+                }
+                32 => (i32::from_le_bytes(bytes.try_into().unwrap()) >> 16) as i16,
+                _ => unreachable!(),
+            };
+            samples.push(sample);
+        }
+
+        let channel_info = match channels {
+            1 => AudioChannels::Mono,
+            2 => AudioChannels::Stereo,
+            6 => AudioChannels::Surround5_1,
+            8 => AudioChannels::Surround7_1,
+            count => AudioChannels::Custom(count as u8),
+        };
+        let rate_info = match sample_rate {
+            8000 => AudioSampleRate::Hz8000,
+            11025 => AudioSampleRate::Hz11025,
+            16000 => AudioSampleRate::Hz16000,
+            22050 => AudioSampleRate::Hz22050,
+            44100 => AudioSampleRate::Hz44100,
+            48000 => AudioSampleRate::Hz48000,
+            96000 => AudioSampleRate::Hz96000,
+            rate => AudioSampleRate::Custom(rate),
+        };
+        let frames = pcm.len() / block_align as usize;
+        Ok(DecodedAudio {
+            metadata: AudioMetadata {
+                format: AudioFormat::Wav,
+                sample_rate: rate_info,
+                channels: channel_info,
+                bits_per_sample: 16,
+                duration_seconds: frames as f32 / sample_rate as f32,
+                bitrate: byte_rate.saturating_mul(8) / 1000,
+            },
+            samples,
+        })
     }
 
-    /// Decode MP3 audio (simplified implementation)
-    fn decode_mp3(&self, _data: &[u8]) -> Result<DecodedAudio, &'static str> {
-        let metadata = AudioMetadata {
-            format: AudioFormat::Mp3,
-            sample_rate: AudioSampleRate::Hz44100,
-            channels: AudioChannels::Stereo,
-            bits_per_sample: 16,
-            duration_seconds: 180.0,
-            bitrate: 320,
-        };
-
-        let sample_count = (metadata.duration_seconds * 44100.0) as usize * 2;
-        let mut samples = Vec::with_capacity(sample_count);
-
-        for _ in 0..sample_count {
-            samples.push(0);
+    /// Encode interleaved signed 16-bit PCM samples as a canonical RIFF/WAVE file.
+    pub fn encode_wav_pcm16(
+        sample_rate: u32,
+        channels: u16,
+        samples: &[i16],
+    ) -> Result<Vec<u8>, &'static str> {
+        if sample_rate == 0 || channels == 0 || channels > 8 {
+            return Err("Unsupported WAV channel count or sample rate");
         }
-
-        Ok(DecodedAudio { metadata, samples })
-    }
-
-    /// Decode WAV audio (simplified implementation)
-    fn decode_wav(&self, _data: &[u8]) -> Result<DecodedAudio, &'static str> {
-        let metadata = AudioMetadata {
-            format: AudioFormat::Wav,
-            sample_rate: AudioSampleRate::Hz44100,
-            channels: AudioChannels::Stereo,
-            bits_per_sample: 16,
-            duration_seconds: 180.0,
-            bitrate: 1411,
-        };
-
-        let sample_count = (metadata.duration_seconds * 44100.0) as usize * 2;
-        let mut samples = Vec::with_capacity(sample_count);
-
-        for _ in 0..sample_count {
-            samples.push(0);
+        if samples.len() % channels as usize != 0 {
+            return Err("PCM sample count is not a whole number of frames");
         }
-
-        Ok(DecodedAudio { metadata, samples })
-    }
-
-    /// Decode OGG Vorbis audio (simplified implementation)
-    fn decode_ogg(&self, _data: &[u8]) -> Result<DecodedAudio, &'static str> {
-        let metadata = AudioMetadata {
-            format: AudioFormat::OggVorbis,
-            sample_rate: AudioSampleRate::Hz44100,
-            channels: AudioChannels::Stereo,
-            bits_per_sample: 16,
-            duration_seconds: 180.0,
-            bitrate: 256,
-        };
-
-        let sample_count = (metadata.duration_seconds * 44100.0) as usize * 2;
-        let mut samples = Vec::with_capacity(sample_count);
-
-        for _ in 0..sample_count {
-            samples.push(0);
+        let data_size = samples
+            .len()
+            .checked_mul(2)
+            .filter(|size| *size <= u32::MAX as usize - 36)
+            .ok_or("WAV output exceeds RIFF size limit")?;
+        let byte_rate = sample_rate
+            .checked_mul(channels as u32 * 2)
+            .ok_or("WAV byte rate overflow")?;
+        let block_align = channels * 2;
+        let output_size = data_size
+            .checked_add(44)
+            .ok_or("WAV output size overflow")?;
+        let mut output = Vec::new();
+        output
+            .try_reserve_exact(output_size)
+            .map_err(|_| "WAV output allocation failed")?;
+        output.extend_from_slice(b"RIFF");
+        output.extend_from_slice(&((36 + data_size) as u32).to_le_bytes());
+        output.extend_from_slice(b"WAVEfmt ");
+        output.extend_from_slice(&16u32.to_le_bytes());
+        output.extend_from_slice(&1u16.to_le_bytes());
+        output.extend_from_slice(&channels.to_le_bytes());
+        output.extend_from_slice(&sample_rate.to_le_bytes());
+        output.extend_from_slice(&byte_rate.to_le_bytes());
+        output.extend_from_slice(&block_align.to_le_bytes());
+        output.extend_from_slice(&16u16.to_le_bytes());
+        output.extend_from_slice(b"data");
+        output.extend_from_slice(&(data_size as u32).to_le_bytes());
+        for sample in samples {
+            output.extend_from_slice(&sample.to_le_bytes());
         }
-
-        Ok(DecodedAudio { metadata, samples })
+        Ok(output)
     }
 
     /// Convert sample rate (simplified resampling)
@@ -457,26 +554,107 @@ mod tests {
     }
 
     #[test]
-    fn test_audio_decode() {
+    fn pcm_wav_round_trip_preserves_samples_and_metadata() {
         let codec = AudioCodec::new();
-        let flac_data = [0x66, 0x4C, 0x61, 0x43];
+        let expected = [-32768, -1, 0, 1, 32767];
+        let wav = AudioCodec::encode_wav_pcm16(44100, 1, &expected).unwrap();
+        let audio = codec.decode(&wav).unwrap();
+        assert_eq!(audio.metadata.format, AudioFormat::Wav);
+        assert_eq!(audio.metadata.sample_rate, AudioSampleRate::Hz44100);
+        assert_eq!(audio.metadata.channels, AudioChannels::Mono);
+        assert_eq!(audio.metadata.bits_per_sample, 16);
+        assert_eq!(audio.samples, expected);
+        assert!((audio.metadata.duration_seconds - 5.0 / 44100.0).abs() < 1e-7);
+    }
 
-        let result = codec.decode(&flac_data);
-        assert!(result.is_ok());
+    #[test]
+    fn wav_decoder_converts_supported_integer_depths_to_signed_16_bit() {
+        fn fixture(bits: u16, pcm: &[u8]) -> Vec<u8> {
+            let bytes_per_sample = bits / 8;
+            let byte_rate = 8000u32 * bytes_per_sample as u32;
+            let data_size = pcm.len() as u32;
+            let mut wav = Vec::new();
+            wav.extend_from_slice(b"RIFF");
+            wav.extend_from_slice(&(36 + data_size + (data_size & 1)).to_le_bytes());
+            wav.extend_from_slice(b"WAVEfmt ");
+            wav.extend_from_slice(&16u32.to_le_bytes());
+            wav.extend_from_slice(&1u16.to_le_bytes());
+            wav.extend_from_slice(&1u16.to_le_bytes());
+            wav.extend_from_slice(&8000u32.to_le_bytes());
+            wav.extend_from_slice(&byte_rate.to_le_bytes());
+            wav.extend_from_slice(&bytes_per_sample.to_le_bytes());
+            wav.extend_from_slice(&bits.to_le_bytes());
+            wav.extend_from_slice(b"data");
+            wav.extend_from_slice(&data_size.to_le_bytes());
+            wav.extend_from_slice(pcm);
+            if data_size & 1 == 1 {
+                wav.push(0);
+            }
+            wav
+        }
 
-        let audio = result.unwrap();
-        assert_eq!(audio.metadata.format, AudioFormat::Flac);
+        let codec = AudioCodec::new();
+        let eight_bit = codec.decode(&fixture(8, &[0, 128, 255])).unwrap();
+        assert_eq!(eight_bit.samples, [-32768, 0, 32512]);
+
+        let twenty_four_bit = codec
+            .decode(&fixture(24, &[0, 0, 128, 255, 255, 127]))
+            .unwrap();
+        assert_eq!(twenty_four_bit.samples, [-32768, 32767]);
+
+        let thirty_two_bit = codec
+            .decode(&fixture(32, &[0, 0, 0, 128, 255, 255, 255, 127]))
+            .unwrap();
+        assert_eq!(thirty_two_bit.samples, [-32768, 32767]);
     }
 
     #[test]
     fn test_audio_resample() {
         let codec = AudioCodec::new();
-        let flac_data = [0x66, 0x4C, 0x61, 0x43];
-
-        let audio = codec.decode(&flac_data).unwrap();
+        let wav = AudioCodec::encode_wav_pcm16(44100, 2, &[1, -1, 2, -2]).unwrap();
+        let audio = codec.decode(&wav).unwrap();
         let resampled = AudioCodec::resample(&audio, AudioSampleRate::Hz48000);
 
         assert_eq!(resampled.metadata.sample_rate, AudioSampleRate::Hz48000);
+    }
+
+    #[test]
+    fn wav_decoder_rejects_truncated_and_non_pcm_files() {
+        let codec = AudioCodec::new();
+        let wav = AudioCodec::encode_wav_pcm16(48000, 2, &[1, 2]).unwrap();
+        assert!(codec.decode(&wav[..wav.len() - 1]).is_err());
+
+        let mut compressed = wav;
+        compressed[20] = 3;
+        assert!(matches!(
+            codec.decode(&compressed),
+            Err("Only integer PCM WAV is supported")
+        ));
+    }
+
+    #[test]
+    fn wav_encoder_rejects_incomplete_channel_frames() {
+        assert_eq!(
+            AudioCodec::encode_wav_pcm16(44100, 2, &[100]),
+            Err("PCM sample count is not a whole number of frames")
+        );
+        assert_eq!(
+            AudioCodec::encode_wav_pcm16(0, 1, &[100]),
+            Err("Unsupported WAV channel count or sample rate")
+        );
+    }
+
+    #[test]
+    fn recognized_compressed_formats_do_not_return_synthetic_silence() {
+        let codec = AudioCodec::new();
+        assert!(matches!(
+            codec.decode(b"fLaC"),
+            Err("Codec is recognized but decoding is not implemented")
+        ));
+        assert!(matches!(
+            codec.decode(b"ID3"),
+            Err("Codec is recognized but decoding is not implemented")
+        ));
     }
 
     #[test]

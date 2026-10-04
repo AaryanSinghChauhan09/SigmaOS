@@ -6,11 +6,12 @@ This page inventories proposed and implemented multimedia components. The listed
 
 ### Implemented library behavior: audio editing primitives
 
-`src/audio/editor.rs` provides in-memory floating-point sample operations: track mixing, cut/paste, basic filters, peak normalization, and fades. It does not import or export audio files, capture/play audio, provide a graphical editor, or replace Audacity.
+`src/audio/editor.rs` provides in-memory floating-point sample operations: track mixing, cut/paste, basic filters, peak normalization, and fades. `src/audio/audio_codec.rs` now decodes integer PCM RIFF/WAVE data (8/16/24/32-bit, 1–8 channels) to interleaved signed 16-bit samples and encodes signed 16-bit PCM as RIFF/WAVE bytes. It rejects malformed and unsupported WAV variants. FLAC, MP3, and Vorbis signatures may be recognized, but decoding those codecs returns an explicit unsupported error. There is no filesystem adapter, playback/capture integration, or graphical editor; SigmaOS does not yet replace Audacity.
 
 - Peak normalization now scales both below-full-scale and over-full-scale finite samples to a requested peak from 0.0 through 1.0, preserving relative sample/channel balance. Non-finite input and invalid target peaks are rejected without modifying samples.
 - Fade-out reaches zero at its final sample, including a one-sample fade.
 - Regression tests: `cargo test --lib audio::editor::tests -- --nocapture`.
+- WAV round-trip, metadata, 8/16/24/32-bit conversion, malformed input, and unsupported-codec regression tests: `rustc --edition=2021 --test src/audio/audio_codec.rs -o /tmp/sigmaos_audio_codec_tests && /tmp/sigmaos_audio_codec_tests` (14 passed). The corresponding Cargo crate test is still pending because crate compilation did not complete in this environment.
 
 ### Implemented library behavior: raster allocation and bounds checks
 
