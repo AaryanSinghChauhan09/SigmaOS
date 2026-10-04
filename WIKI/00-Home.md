@@ -1,45 +1,37 @@
-# SigmaOS
+# SigmaOS Project Overview
 
-SigmaOS is an autonomous, from-scratch, zero-dependency, zero-trust bare-metal operating system built exclusively using modern low-level systems programming languages (Rust `#![no_std]`, Zig, and Nim).
+SigmaOS is an operating-system project. Its repository contains kernel, memory, filesystem, networking, security, driver, desktop, installer, and package-management code. The presence of a module, API, or roadmap entry does not by itself establish runtime support.
 
-## Overview
+## Project goals
 
-SigmaOS is designed to eliminate operating system fragmentation, bloat, and legacy technical debt by absorbing the finest architectural innovations from all existing operating systems and distributions (Ubuntu, Fedora, Arch, NixOS, Debian, Gentoo, Void, Alpine, FreeBSD, OpenBSD, NetBSD, macOS, and Windows) into a single, unified, principle-driven bare-metal platform.
+- Build a system with clear subsystem boundaries and explicit resource ownership.
+- Evaluate useful designs from Linux distributions and BSD systems, then adapt them to SigmaOS's architecture rather than claiming direct parity.
+- Make reliability, security, performance, accessibility, and recoverability reviewable through source, documented behavior, and repeatable validation.
+- Keep security-critical functions unavailable when a required audited provider is not integrated.
 
-## Key Features
+## Linux and BSD design references
 
-- **Zero-Dependency**: No external package managers, third-party libraries, or predefined wrappers
-- **Modern Languages**: Core OS implemented in Rust, Zig, and Nim for systems programming
-- **Hardware Support**: From 1980s ISA/IDE/VGA to 2026+ CXL 3.0/PCIe Gen7/NVMe/xHCI
-- **Security**: Capability-based sandboxing, kernel mitigations, post-quantum cryptography
-- **Performance**: Lock-free structures, zero-copy buffers, sub-80ns context switching
-- **Zenith Desktop**: Direct bare-metal rendering without X11/Wayland overhead
-- **SigmaPkg**: Universal package manager supporting 29+ Linux/BSD package formats
+| Area | Designs to study |
+|---|---|
+| Kernel and scheduling | Linux scheduling and cgroups; FreeBSD ULE and cpusets; NetBSD modular kernel interfaces |
+| Storage | Linux journaling and copy-on-write filesystems; FreeBSD GEOM and ZFS; NetBSD VFS boundaries |
+| Networking and security | Linux namespaces and nftables; OpenBSD PF, pledge, and unveil; FreeBSD jails and Capsicum; NetBSD NPF |
+| Packaging and updates | NixOS generations; Debian package transactions; Arch build recipes; Gentoo profiles; FreeBSD pkg and Poudriere |
+| Desktop and devices | Linux DRM/KMS; FreeBSD device lifecycle; Pop!_OS COSMIC workspace design |
 
-## Master Specification Files
+These are inspiration sources for design review. They are not a feature-support list.
 
-- [Sovereign OS Absolute Omnipresent Self-Sufficiency Ultra Encyclopedia V41](15-Sovereign-OS-Self-Sufficiency-Encyclopedia-V41.md)
+## Component documentation
 
-## Component Future Development Roadmaps
+- [Kernel](04-Kernel)
+- [Filesystems](05-Filesystems)
+- [Networking](06-Networking)
+- [Security](07-Security)
+- [Desktop](08-Desktop)
+- [Packaging](09-Packaging)
+- [Future development overview](14-Future-Development)
+- [Component roadmap index](Home#component-future-development-roadmaps)
 
-- [Roadmap: Kernel & Core Subsystems](17-Roadmap-Kernel-and-Core-Subsystems.md)
-- [Roadmap: Filesystems & Storage Subsystems](18-Roadmap-Filesystems-and-Storage.md)
-- [Roadmap: Networking & Post-Quantum Security](19-Roadmap-Networking-and-Security.md)
-- [Roadmap: Desktop GUI & Userland Tooling](20-Roadmap-Desktop-GUI-and-Userland.md)
-- [Roadmap: Package Management & App Ecosystem](21-Roadmap-Package-Management-and-App-Ecosystem.md)
+## Maintenance
 
-## Documentation Structure
-
-This wiki is organized in Arch Linux style with one page per topic:
-
-- [Installation](01-Installation.md)
-- [Getting Started](02-Getting-Started.md)
-- [Configuration](03-Configuration.md)
-- [Kernel](04-Kernel.md)
-- [Filesystems](05-Filesystems.md)
-- [Networking](06-Networking.md)
-- [Security](07-Security.md)
-- [Desktop](08-Desktop.md)
-- [Packaging](09-Packaging.md)
-- [Development](10-Development.md)
-- [Roadmap](11-Roadmap.md)
+Keep this page as a concise project overview. Link detailed behavior to source files and component pages. Move implementation details to their topic pages, label proposals as proposals, and remove unverified performance, test, hardware-support, or parity claims.
