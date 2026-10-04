@@ -1,21 +1,6 @@
-# AI Agent Guidelines & Operating Rules
+# AI Agent Guidelines
 
-SigmaOS provides comprehensive guidelines for AI agents working on various components to enable autonomous development, continuous improvement, and multi-distro parity.
-
-## Primary Task Guidelines & Rules
-
-1. **Universal Multi-Distro PR Package Management**:
-   - Every foreign package format (.deb, .pkg.tar.zst, .rpm, .apk, .ebuild, .xbps, .pkg, .nix, .flatpak, .snap, .appimage, etc.) MUST be transpiled and handled natively by `sigma-pkg` in Pull Request (PR) format.
-   - Foreign dependencies MUST be mapped to canonical `sovereign-*` system package names (e.g. `glibc`/`musl` -> `sovereign-libc`, `openssl-devel`/`libssl-dev` -> `sovereign-openssl`).
-   - Every PR package import MUST generate SLSA Provenance v1.0 attestations, CycloneDX/SPDX SBOM metadata, and unified diff manifest summaries.
-
-2. **Zero-Dependency Bare-Metal Architecture**:
-   - Kernel and system code MUST be written in `#![no_std]` safe Rust with zero external third-party crate dependencies.
-   - All data structures and system abstractions MUST rely on custom `klib` primitives or `alloc::` primitives.
-
-3. **Multi-Distro Subsystem Parity**:
-   - SigmaOS absorbs innovations from Linux (CFS/EEVDF scheduler, io_uring, eBPF, cgroups v2, OverlayFS, PipeFS, Landlock) and BSD (FreeBSD Capsicum, Jails, GEOM, RCTL, OpenBSD pledge, unveil, PF, CARP, NetBSD Rump).
-   - Component improvements MUST maintain 100% test passing status across all standalone unit tests (`./run_sigma_tests.sh`).
+SigmaOS provides comprehensive guidelines for AI agents working on various components to enable autonomous development and continuous improvement.
 
 ## Tri-Agent Framework
 
@@ -67,3 +52,91 @@ These agent guidelines enable SigmaOS to continuously improve by:
 - Ensuring security and performance excellence
 
 For detailed agent guidelines, see the component-specific files in the [Agents/](../Agents/) folder.
+
+## AI Agent Maintenance Instructions
+
+### 🚫 CRITICAL RULE: No Session-Specific Wiki Pages
+
+**AI agents MUST NOT create session-specific documentation pages** such as:
+- ❌ "Merge Summary Oct 2026"
+- ❌ "New Components Oct 2026"  
+- ❌ "Session Summary [Date]"
+- ❌ "Components Added [Date]"
+- ❌ Any date-stamped session logs
+
+**Instead, AI agents MUST:**
+- ✅ **Update the strategic roadmap** (`11-Roadmap.md`) with competitive analysis
+- ✅ **Update component status** in permanent pages (04-Kernel.md, 07-Security.md, etc.)
+- ✅ **Maintain the future development plan** with Linux/BSD/competitor inspiration
+- ✅ **Document architecture decisions** in `15-Architecture-Decisions.md`
+- ✅ **Keep one wiki page per topic** - merge redundant information
+
+### Why This Rule Exists
+Session-specific pages create noise, become outdated immediately, and don't provide strategic value. Users need **current capability documentation** and **forward-looking roadmaps**, not historical session logs.
+
+### Correct Documentation Pattern
+```
+❌ BAD:  Create "23-October-2026-Repository-Sync.md"
+✅ GOOD: Update "11-Roadmap.md" with newly implemented features and next priorities
+
+❌ BAD:  Create "24-Component-Improvements-Oct-2026.md"  
+✅ GOOD: Update "07-Security.md" with new security features and their status
+
+❌ BAD:  Document every PR merge in a new wiki page
+✅ GOOD: Update the relevant component page when features are completed
+```
+
+### Strategic Documentation Priorities
+1. **Current Capabilities** - What works now (component pages)
+2. **Architecture Rationale** - Why design decisions were made
+3. **Competitive Analysis** - How SigmaOS compares to Linux/BSD/*OS
+4. **Future Roadmap** - What's planned based on competitor analysis
+5. **Development Guidelines** - How to contribute effectively
+
+### Maintenance Responsibilities by Agent
+
+- **Bolt ⚡**: Ensure documentation of any new zero-allocation optimizations or performance improvements are added concisely without marketing fluff. Update performance metrics in component pages, not session summaries.
+- **Palette 🎨**: Maintain Arch Linux wiki style: clear, factual, one page per topic, using appropriate markdown formatting and tables where necessary. Update UX/accessibility status in desktop pages.
+- **Sentinel 🛡️**: Verify that no hardcoded credentials or unvetted cryptographic algorithms are documented as production-ready. Ensure security limitations are accurately stated. Update security feature status in `07-Security.md`.
+- **General**: Keep pages up-to-date with current repository capabilities. Remove redundant files when consolidating information. **Delete any session-specific pages created before this rule.**
+
+---
+
+## Oct 2026 Agent Guideline Updates
+
+### New Build Rules (mandatory)
+- `cargo check 2>&1 | grep '^error' | wc -l` → must be **0** before every commit
+- No `std::` imports in `no_std` modules — use `alloc::` instead
+- No external crate dependencies — implement everything from scratch
+- Only ONE branch: **main**. Delete feature branches immediately after merging.
+
+### Architecture Targets (all must compile)
+- x86_64 bare-metal (primary)
+- AArch64 / ARM64 (secondary)
+- RISC-V 64-bit (tertiary)
+
+### New Module References
+| Module | Purpose |
+|--------|---------|
+| `src/crypto/entropy.rs` | XorShift64 entropy pool (RDRAND-ready) |
+| `src/syscall/posix_compat.rs` | POSIX compatibility stubs |
+| `src/kernel/wx_pte_hardening.rs` | W^X memory enforcement |
+| `src/security/pledge_unveil.rs` | OpenBSD pledge/unveil |
+| `src/security/capsicum.rs` | FreeBSD Capsicum capabilities |
+
+### Distro Inspiration Matrix
+| Source OS | Concept | SigmaOS Implementation |
+|-----------|---------|----------------------|
+| OpenBSD | W^X, pledge, unveil | `src/kernel/wx_pte_hardening.rs`, `src/security/pledge_unveil.rs` |
+| FreeBSD | Capsicum, VIMAGE, Netmap | `src/security/capsicum.rs`, `src/networking/sovereign_net.rs` |
+| Linux | EEVDF, CFI, cgroup v2 | `src/kernel/scheduler.rs`, `src/kernel/cfi.rs`, `src/resource/cgroup_v2.rs` |
+| NetBSD | pkgsrc | `src/package/` |
+| NixOS | Declarative config | `src/config/` |
+
+---
+
+## Maintenance Instructions for AI Agents
+
+1. After adding new modules, update this table
+2. Keep one wiki page per topic — merge duplicates
+3. When `.md` roadmap files are fully implemented, move them here and delete originals

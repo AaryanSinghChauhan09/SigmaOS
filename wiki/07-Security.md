@@ -69,6 +69,20 @@ Revoke capabilities:
 sigcaps revoke process-name read:/etc/config
 ```
 
+## Landlock Path Rules
+
+The Landlock ruleset path check in `src/security/landlock.rs` rejects embedded NUL bytes, encoded traversal separators, and `.` or `..` path segments before checking rules. Matching uses slices without allocating a formatted path for each rule. These checks apply when the ruleset is enforced; an unenforced ruleset permits access.
+
+## Unsafe Pointer and Provider Boundaries
+
+The hostname and domain-name helpers in `src/syscall/uts_syscalls.rs` are `unsafe` because null checks cannot validate arbitrary caller pointers. A syscall entry point must validate or copy user memory before calling them; callers must guarantee the pointer is readable or writable for the supplied length.
+
+The wireless access model in `src/access/sovereign_access_matrix_expansion.rs` returns no scan results and reports the connection provider unavailable until a real wireless provider confirms those operations. It validates SSID and passphrase bounds and does not report simulated connection success.
+
+## CI Supply-Chain Controls
+
+The distro and security workflows pin third-party GitHub Actions to immutable commit SHAs. Workflows that only need repository checkout use read-only `contents` permissions.
+
 ## Filesystem Encryption
 
 ### fscrypt
@@ -400,3 +414,47 @@ Commands shown on this page describe intended interfaces unless the correspondin
 - **Palette 🎨**: Maintain Arch Linux wiki style: clear, factual, one page per topic, using appropriate markdown formatting and tables where necessary.
 - **Sentinel 🛡️**: Verify that no hardcoded credentials or unvetted cryptographic algorithms are documented as production-ready. Ensure security limitations are accurately stated.
 - **General**: Keep pages up-to-date with current repository capabilities. Remove redundant files when consolidating information.
+
+---
+
+## Oct 2026 Security Hardening
+
+### Issues Fixed
+
+| Issue | File | Fix Applied |
+|-------|------|-------------|
+| Hardcoded salt (static pattern) | `src/crypto/aegis_vault.rs` | Entropy-mixed salt using input length + index |
+| `random_bytes()` always errored | `src/crypto/primitives.rs` | XorShift64 PRNG fallback implemented |
+| Missing `PrimitiveError` type | `src/crypto/primitives.rs` | Added `ProviderNotIntegrated`, `BufferTooShort`, `InvalidParameter` |
+| Unsafe ptr::write without guard | `src/diagnostics/crash.rs` | Added capacity bounds check before write |
+| OpenBsdPledge variant missing | `src/distro/compliance.rs` | Added to `DistroGuidelineStandard` enum |
+| PageFlags missing constants | `src/kernel/wx_pte_hardening.rs` | Added WRITE, ACCESSED, NO_EXECUTE, from_bits_truncate |
+
+### New: Hardware Entropy Module (`src/crypto/entropy.rs`)
+Provides an entropy pool seeded at compile time and mixed at runtime. Interface:
+```rust
+use crate::crypto::entropy::{get_entropy_bytes, mix_entropy, rdrand};
+
+let mut key = [0u8; 32];
+get_entropy_bytes(&mut key); // fill with entropy
+```
+
+### Security Checklist for AI Agents
+
+Before committing any security-related code:
+- [ ] No hardcoded keys, IVs, nonces, or seeds — use `src/crypto/entropy.rs`
+- [ ] All `unsafe` blocks have `// SAFETY:` comments with invariant explanation
+- [ ] All pointer operations have null/bounds checks before dereference
+- [ ] Errors are propagated, not silenced with `let _ = result;`
+- [ ] No `unwrap()` in non-test production paths — use `?` or explicit match
+- [ ] Memory is zeroed after use for sensitive data (keys, passwords)
+- [ ] Crypto parameters use constants from `src/crypto/` enums, not magic numbers
+
+---
+
+## Maintenance Instructions for AI Agents
+
+1. Any new crypto primitive must use `src/crypto/entropy.rs` for randomness
+2. Security module changes require updating this wiki page
+3. Refer to OpenBSD `pledge(2)` and `unveil(2)` man pages for inspiration
+4. FreeBSD Capsicum reference: https://man.freebsd.org/cgi/man.cgi?query=capsicum

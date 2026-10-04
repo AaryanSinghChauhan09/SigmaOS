@@ -1,16 +1,17 @@
 # Kernel
 
-SigmaOS kernel is a microkernel-inspired design with modular subsystems.
+SigmaOS kernel is a microkernel-inspired design with modular subsystems, implementing W^X memory hardening, EEVDF/CFS scheduling, UTS namespace isolation, Control Flow Integrity (CFI), and kernel pointer restriction (kptr_restrict).
 
 ## Kernel Architecture
 
 ### Core Components
 
-- **Task Scheduler**: CPU scheduling with multiple algorithms (CFS, RT, IDLE)
-- **Memory Management**: Buddy allocator, slab allocator, transparent huge pages
-- **IPC**: Inter-process communication with shared memory and message queues
+- **Task Scheduler**: CPU scheduling with EEVDF (Earliest Eligible Virtual Deadline First) and CFS fallback, RT, and IDLE policies
+- **Memory Management**: Buddy allocator, slab allocator, transparent huge pages, W^X enforcement
+- **IPC**: Inter-process communication with shared memory, message queues, and HelenOS-inspired async IPC
 - **VFS**: Virtual filesystem layer with pluggable filesystem drivers
-- **Security**: Capability-based security, pledge/unveil sandboxing
+- **Security**: Capability-based security (Capsicum-inspired), pledge/unveil sandboxing, CFI forward-edge validation
+- **Namespaces**: UTS, PID, mount, network, user, and IPC namespace isolation
 - **Drivers**: Hardware abstraction layer for device drivers
 
 ## Kernel Modules
@@ -144,7 +145,9 @@ autofs set-timeout /mnt/data 300
 
 ## Security Mitigations
 
-### Kernel Pointer Restriction
+See dedicated sections above for [W^X Memory Hardening](#wx-memory-hardening), [CFI](#control-flow-integrity-cfi), and [kptr_restrict](#kernel-pointer-restriction-kptr_restrict).
+
+### Kernel Pointer Restriction (Quick Reference)
 
 Restrict kernel pointer exposure:
 
@@ -281,9 +284,26 @@ sysfs list /kernel
 
 ## Process Scheduler
 
+### EEVDF Scheduler
+
+SigmaOS implements EEVDF (Earliest Eligible Virtual Deadline First), the scheduler introduced in Linux 6.6 as the primary replacement for CFS. EEVDF provides better latency and fairness guarantees by tracking per-task virtual deadlines.
+
+Key properties:
+- **Eligibility**: A task is eligible when its virtual start time ≤ current virtual time
+- **Virtual Deadline**: `vdeadline = vstart + (slice / weight)`
+- **Lag tracking**: Unused service credit is tracked as lag to prevent starvation
+
+```bash
+# View current scheduler policy for a process
+cat /proc/<pid>/sched
+
+# Set SCHED_DEADLINE policy (EEVDF-backed)
+chrt --deadline --sched-runtime 5000000 --sched-deadline 10000000 --sched-period 10000000 -p <pid>
+```
+
 ### CFS Scheduler
 
-Linux CFS-inspired Completely Fair Scheduler:
+Linux CFS-inspired Completely Fair Scheduler (fallback for non-deadline tasks):
 
 ```bash
 # Create process
@@ -304,9 +324,13 @@ scheduler wake 1
 
 ### Scheduler Types
 
-- **CFS**: vruntime-based fair scheduling
-- **RT**: Priority-based real-time scheduling
-- **Energy-Aware**: Thermal-aware with frequency scaling
+| Policy | Description | Use Case |
+|--------|-------------|----------|
+| `SCHED_EEVDF` | Virtual deadline earliest-eligible | Default; latency-sensitive tasks |
+| `SCHED_CFS` | vruntime-based fair scheduling | CPU-bound background tasks |
+| `SCHED_RT` | Priority-based real-time scheduling | Interrupt handlers, audio |
+| `SCHED_IDLE` | Lowest priority idle tasks | Maintenance background work |
+| `SCHED_DEADLINE` | CBS/EDF hard real-time | Deterministic timing requirements |
 
 ### Energy-Aware Scheduling
 
@@ -319,6 +343,116 @@ scheduler frequency
 
 # Get thermal state
 scheduler thermal
+```
+
+## W^X Memory Hardening
+
+W^X (Write XOR Execute) ensures no memory page is simultaneously writable and executable. This mitigates JIT-spray and code-injection attacks.
+
+### Enforcement
+
+- All memory mappings default to either writable (`PROT_WRITE`) or executable (`PROT_EXEC`), never both
+- Kernel enforces W^X at page-table level on all user and kernel mappings
+- JIT compilers must use a write-then-mprotect pattern: allocate RW, write code, mprotect to RX before execution
+
+```bash
+# Verify W^X enforcement is active
+sysctl kernel.wx_enforce
+
+# Example: check process memory map for WX pages (should be empty)
+cat /proc/<pid>/maps | awk '$2 ~ /wx/ {print "WARNING: WX page:", $0}'
+```
+
+### Configuration
+
+```bash
+# Enable strict W^X (blocks mmap(PROT_WRITE|PROT_EXEC))
+sysctl kernel.wx_strict=1
+
+# Log W^X violations without blocking (audit mode)
+sysctl kernel.wx_strict=0
+sysctl kernel.wx_audit=1
+```
+
+## UTS Namespaces
+
+UTS (Unix Time-sharing System) namespaces isolate `hostname` and `domainname` per container or process group, enabling container isolation without affecting the host.
+
+```bash
+# Create new UTS namespace
+unshare --uts /bin/bash
+
+# Set hostname inside namespace
+hostname container-hostname
+
+# Verify isolation
+hostname  # shows container-hostname
+# (host hostname is unchanged)
+```
+
+### Namespace Hierarchy
+
+SigmaOS supports the full Linux namespace suite:
+
+| Namespace | Flag | Isolates |
+|-----------|------|----------|
+| UTS | `CLONE_NEWUTS` | Hostname, NIS domain name |
+| PID | `CLONE_NEWPID` | Process IDs |
+| Mount | `CLONE_NEWNS` | Filesystem mount points |
+| Network | `CLONE_NEWNET` | Network interfaces, routing |
+| User | `CLONE_NEWUSER` | UID/GID mappings |
+| IPC | `CLONE_NEWIPC` | SysV IPC, POSIX MQ |
+| Cgroup | `CLONE_NEWCGROUP` | Cgroup root |
+
+## Control Flow Integrity (CFI)
+
+CFI prevents control-flow hijacking by validating indirect call targets against a compile-time allowlist of valid function addresses.
+
+### Forward-Edge CFI
+
+Forward-edge CFI validates all indirect function calls (`call *rax`, vtable dispatches):
+
+```bash
+# Register valid CFI target (function pointer allowlisting)
+cfi register 0x1000 function_name
+
+# Validate indirect call — returns true if target is allowlisted
+cfi validate 0x2000 0x1000
+
+# View CFI violations log
+cfi violations
+
+# Clear violations
+cfi reset
+```
+
+### CFI Build Requirements
+
+Kernel and drivers compiled with `-fsanitize=cfi -flto` (LLVM CFI). Requires:
+- LTO (Link-Time Optimization) for cross-module type graph
+- `-fvisibility=hidden` to prevent CFI bypass via exported symbols
+
+## Kernel Pointer Restriction (kptr_restrict)
+
+`kptr_restrict` controls whether kernel addresses are exposed to unprivileged users via `/proc/kallsyms`, `dmesg`, and similar interfaces.
+
+| Level | Behavior |
+|-------|----------|
+| `0` | No restriction — all pointers visible (debug only) |
+| `1` | Pointers hidden from non-CAP_SYSLOG processes |
+| `2` | All kernel pointers replaced with `0` for all users |
+
+```bash
+# Recommended hardened setting
+sysctl kernel.kptr_restrict=2
+
+# Also restrict dmesg to privileged users
+sysctl kernel.dmesg_restrict=1
+
+# Persist across reboots
+echo "kernel.kptr_restrict=2" >> /etc/sysctl.d/99-hardening.conf
+echo "kernel.dmesg_restrict=1" >> /etc/sysctl.d/99-hardening.conf
+sysctl --system
 ```
 
 ## Interrupt Handling
@@ -412,3 +546,41 @@ cfi violations
 - **Palette 🎨**: Maintain Arch Linux wiki style: clear, factual, one page per topic, using appropriate markdown formatting and tables where necessary.
 - **Sentinel 🛡️**: Verify that no hardcoded credentials or unvetted cryptographic algorithms are documented as production-ready. Ensure security limitations are accurately stated.
 - **General**: Keep pages up-to-date with current repository capabilities. Remove redundant files when consolidating information.
+
+---
+
+## Oct 2026 Additions
+
+### W^X Memory Hardening (`src/kernel/wx_pte_hardening.rs`)
+Inspired by OpenBSD KARL (Kernel Address Layout Randomization). Every memory page is either writable OR executable — never both.
+
+| Flag Constant | Value | Description |
+|--------------|-------|-------------|
+| `PageFlags::PRESENT` | bit 0 | PTE present bit |
+| `PageFlags::WRITE` | bit 1 | Page writable |
+| `PageFlags::USER` | bit 2 | User-accessible |
+| `PageFlags::ACCESSED` | bit 5 | Recently accessed |
+| `PageFlags::NO_EXECUTE` | bit 63 | NX bit — not executable |
+
+Enforcement: when mapping pages, `WRITE` and `EXECUTE` bits are mutually exclusive. Any violation triggers a CFI violation record.
+
+### POSIX Compatibility Stubs (`src/syscall/posix_compat.rs`)
+New POSIX syscall stubs for application compatibility:
+- `sys_prctl` — PR_SET_NAME, PR_GET_DUMPABLE, PR_SET_SECCOMP
+- `sys_madvise` — MADV_NORMAL, MADV_RANDOM, MADV_DONTNEED, MADV_FREE
+- `sys_pread64` / `sys_pwrite64` — positional file I/O
+- `sys_sigaction` / `sys_sigprocmask` — signal handling
+- `sys_getpid` / `sys_getppid` / `sys_exit_group`
+
+### Hardware Entropy (`src/crypto/entropy.rs`)
+XorShift64-based entropy pool with RDRAND-ready interface. Mix external entropy via `mix_entropy(value: u64)`. Get random bytes via `get_entropy_bytes(buf: &mut [u8])`.
+
+---
+
+## Maintenance Instructions for AI Agents
+
+1. Run `cargo check 2>&1 | grep '^error' | wc -l` → 0 before any commit
+2. All `unsafe` blocks require `// SAFETY:` comments
+3. Syscall numbers must match Linux x86_64 ABI
+4. W^X invariants must be preserved in any new memory-mapping code
+5. When adding scheduler policies, implement for both CfsScheduler and RtScheduler

@@ -473,3 +473,9 @@ Display Hardware
 **Last Updated:** October 2, 2026  
 **Maintainers:** SigmaOS Graphics/Audio Team  
 **License:** MPL-2.0 (same as SigmaOS kernel)
+
+## AI Agent Maintenance Instructions
+- Language constraints: Strictly Rust (`#![no_std]`), Zig, or Nim only. No C/C++ or Python dependencies.
+- Prioritize memory safety, zero-allocation patterns, lock-free primitives, and kernel stability.
+- Verify that `cargo check --lib` passes cleanly after any modification.
+- Maintain comprehensive unit and property tests.

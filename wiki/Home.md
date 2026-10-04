@@ -34,6 +34,31 @@ SigmaOS is an operating-system development project with kernel, storage, network
 | 19 | [USB Devices](USB-Devices) | USB stack, xHCI, HID, and Audio Class drivers |
 | 20 | [System Management](System-Management) | System management, power, thermal, diagnostics |
 | 21 | [Linux Mint & Omarchy Ecosystem](Mint-and-Omarchy-Supremacy) | Warpinator P2P transfer, Timeshift snapshots, Omarchy provisioner, Web2App sandboxing |
+| 22 | [IPC](IPC) | Inter-Process Communication: pipes, sockets, futex, shared memory |
+| 23 | [Memory Management](Memory-Management) | Buddy allocator, slab, page cache, page fault handler, CoW |
+| 24 | [AI and Agent Runtime](AI-and-Agent-Runtime) | On-device AI, crash analysis, predictive I/O, NL shell |
+| 25 | [Compositor](Compositor) | Wayland compositor, tiling WM, input routing, direct scanout |
+| 26 | [Installer](Installer) | Guided installer: LUKS2, Btrfs, TPM2, TUI/GUI/headless |
+| 27 | [Init and Services](Init-and-Services) | PID 1, service graph, socket activation, AI failure recovery |
+| 28 | [Container Runtime](Container-Runtime) | OCI runtime, rootless containers, cgroup v2, seccomp |
+| 29 | [Scheduler](Scheduler) | CFS, RT, Deadline, AI-predictive scheduler, timer wheel |
+| 30 | [Package Management](Package-Management) | sigma-pkg, .spkg format, SAT resolver, Arch/Flatpak compat |
+| 31 | [Compatibility Layers](Compatibility-Layers) | Arch, Debian, Fedora, Mint, Omarchy compatibility engines |
+| 32 | [Drivers](Drivers) | NVMe, AHCI, HDA, USB, PCI, Framebuffer, Bluetooth, Wi-Fi |
+| 33 | [Boot](Boot) | SigmaEFI bootloader, Secure Boot, TPM2, measured boot |
+| 34 | [Performance](Performance) | Smart optimizer, io_uring, BBR3, XDP, benchmarks |
+| 35 | [Omarchy Gaming Performance Suite](Omarchy-Gaming-Performance-Suite) | Gaming governor, HUD telemetry, developer stacks |
+| 36 | [Mint Tools Supremacy](Mint-Tools-Supremacy) | MintStick, Bulky, MintReport, Nemo Actions, XApps |
+| 37 | [Power Management](Power-Management) | ACPI, battery, thermal, suspend/hibernate, sigma-ai governor |
+| 38 | [Shell and Userspace](Shell-and-Userspace) | sigma-sh, coreutils, terminal emulator, session manager |
+| 39 | [GPU and Graphics](GPU-and-Graphics) | DRM/KMS, Vulkan, OpenGL, HDR, VRR, multi-monitor |
+| 40 | [Storage](Storage) | SigmaFS, Btrfs, ext4, NVMe, RAID, snapshots, io_uring |
+| 41 | [Theming and Customization](Theming-and-Customization) | TOML theme system, AI accent gen, dotfile versioning |
+| 42 | [Diagnostics and Crash Reporting](Diagnostics-and-Crash-Reporting) | kdump, AI crash analysis, watchdog, tracing, logs |
+| 43 | [Filesystems (detailed)](Filesystems) | Detailed filesystem reference |
+| 44 | [Networking (detailed)](Networking) | Detailed networking reference |
+| 45 | [Security and Hardening](Security-and-Hardening) | Detailed security reference |
+| 46 | [Virtualization and Containers](Virtualization-and-Containers) | Detailed virtualization reference |
 
 ## Component Future-Development Roadmaps
 
