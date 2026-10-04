@@ -1,43 +1,29 @@
 #!/usr/bin/env python3
-"""
-SigmaOS QEMU Smoke Test Harness (Phase 1 Baseline)
-Simulates QEMU boot validation, verifying kernel handoff and serial heartbeat.
-"""
+"""Fail closed when no real, validated SigmaOS boot image is available."""
 
+from pathlib import Path
+import shutil
 import sys
-import os
-import time
 
-def run_smoke_test():
-    print("=== SigmaOS QEMU Boot Smoke Test Harness ===")
-    
-    # 1. Verify build environment & artifacts
-    iso_path = "build/sigmaos-desktop-preview.iso"
-    print(f"Checking for ISO image artifact at '{iso_path}'...")
-    if not os.path.exists(iso_path):
-        os.makedirs("build", exist_ok=True)
-        with open(iso_path, "wb") as f:
-            f.write(b"SIGMAOS_BOOT_STUB_IMAGE\x00\x00")
-        print("Generated simulated ISO stub for automated test validation.")
-    
-    # 2. Simulate QEMU launch and serial port banner capture
-    print("Simulating QEMU boot execution with parameters: -m 2048 -enable-kvm -serial stdio")
-    time.sleep(0.5)
-    
-    expected_banners = [
-        "[BOOT] SigmaOS Sub-Second Boot Sequencer Initialized",
-        "[INIT] Kernel Memory Management Subsystems (Buddy/Slab) Online",
-        "[SEC]  Capability Monitor (Pledge / Unveil / Capsicum) Engaged",
-        "[GPU]  Zenith Wayland Compositor Core Ready",
-        "[DESK] Omarchy QuickShell Desktop Preview Online"
-    ]
-    
-    for banner in expected_banners:
-        print(banner)
-        time.sleep(0.1)
-        
-    print("\nSUCCESS: Simulated QEMU smoke test passed with 0 crashes, 0 timeouts.")
-    return 0
+
+def main() -> int:
+    image = Path("build/sigmaos-desktop-preview.iso")
+    qemu = shutil.which("qemu-system-x86_64")
+    if qemu is None:
+        print("QEMU boot test unavailable: qemu-system-x86_64 is not installed.", file=sys.stderr)
+        return 2
+    if not image.is_file() or image.stat().st_size == 0:
+        print(f"QEMU boot test unavailable: no non-empty image at {image}.", file=sys.stderr)
+        return 2
+    with image.open("rb") as stream:
+        stream.seek(32769)
+        if stream.read(5) != b"CD001":
+            print(f"Invalid ISO9660 image: {image} has no ISO9660 volume descriptor.", file=sys.stderr)
+            return 1
+    print("Image is a non-empty ISO9660 file, but SigmaOS has no verified boot-ready marker.", file=sys.stderr)
+    print("This check cannot report a successful OS boot until the kernel emits a runtime-ready marker.", file=sys.stderr)
+    return 2
+
 
 if __name__ == "__main__":
-    sys.exit(run_smoke_test())
+    raise SystemExit(main())

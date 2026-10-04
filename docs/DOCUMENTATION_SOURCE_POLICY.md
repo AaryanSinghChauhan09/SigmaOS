@@ -5,6 +5,7 @@
 - `docs/` is the source of truth for repository engineering policies, project status, architecture decisions, and cross-component plans.
 - The GitHub Wiki is the user-facing reference for component behavior and procedures. Each OS component has one canonical page containing current status, design references, validation evidence, limitations, and its future roadmap.
 - `wiki/` is the checked-in mirror of the GitHub Wiki. `SigmaOS.wiki/` is the local Git checkout used to publish wiki commits. There is no automatic sync between these locations.
+- Every tracked repository Markdown file is also represented in the Wiki. Non-Wiki source documents are imported as `Repository-*` reference pages with a link to their original path; [17-Repository-Documents](../wiki/17-Repository-Documents.md) provides the full inventory. Imported pages preserve source material, while canonical component pages remain the maintained source for current OS behavior and roadmaps.
 
 ## Editing and publication
 

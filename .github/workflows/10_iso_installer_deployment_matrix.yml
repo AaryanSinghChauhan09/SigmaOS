@@ -13,6 +13,8 @@ permissions:
 jobs:
   iso-deployment-matrix:
     name: ISO Build & Deployment Matrix (${{ matrix.target_profile }})
+    # Publish and test ISO profiles only after a real boot/install path is validated.
+    if: ${{ vars.SIGMAOS_BOOT_VALIDATED == 'true' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -37,13 +39,10 @@ jobs:
         run: |
           echo "Building ISO target profile: ${{ matrix.target_profile }}"
           chmod +x ./scripts/build_iso.sh
-          ./scripts/build_iso.sh || true
+          ./scripts/build_iso.sh
 
       - name: Verify ISO Artifact Integrity
         run: |
           mkdir -p build
-          if [ ! -f build/sigmaos-desktop-preview.iso ]; then
-            echo "Creating dummy ISO container for profile matrix verification..."
-            touch build/sigmaos-${{ matrix.target_profile }}.iso
-          fi
-          ls -lh build/*.iso
+          test -s build/sigmaos-desktop-preview.iso
+          file build/sigmaos-desktop-preview.iso

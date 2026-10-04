@@ -74,12 +74,11 @@ iso:
 
 # 9. Run QEMU smoke test
 run:
-	@echo "==> Launching SigmaOS Desktop Preview in QEMU..."
-	@if command -v qemu-system-x86_64 >/dev/null 2>&1; then \
-	        echo "QEMU found. Use: qemu-system-x86_64 -m 2048 -enable-kvm -cdrom build/sigmaos-desktop-preview.iso"; \
-	else \
-	        echo "qemu-system-x86_64 not found in environment PATH"; \
-	fi
+	@set -eu; image=build/sigmaos-desktop-preview.iso; \
+	if [ ! -s "$$image" ]; then echo "No non-empty SigmaOS ISO at $$image. 'make iso' is currently blocked until a real bare-metal image and initramfs are available." >&2; exit 1; fi; \
+	if ! python3 -c 'import sys; f=open(sys.argv[1], "rb"); f.seek(32769); sys.exit(0 if f.read(5) == b"CD001" else 1)' "$$image"; then echo "Invalid ISO: missing ISO9660 volume descriptor." >&2; exit 1; fi; \
+	if ! command -v qemu-system-x86_64 >/dev/null 2>&1; then echo "qemu-system-x86_64 not found in PATH" >&2; exit 1; fi; \
+	exec qemu-system-x86_64 -m 2048 -cdrom "$$image" -serial stdio -no-reboot
 
 help:
 	@echo "SigmaOS Unified Build & Test Interface"
@@ -90,6 +89,6 @@ help:
 	@echo "  make bench       - Benchmarks on thin-LTO release-fast profile"
 	@echo "  make fmt         - Verify formatting style (strict)"
 	@echo "  make fmt-fix     - Auto-apply rustfmt across workspace"
-	@echo "  make iso         - Assemble bootable ISO image"
-	@echo "  make run         - Run QEMU virtual machine preview"
+	@echo "  make iso         - Attempt image build (currently blocked; see docs/PROJECT_STATUS.md)"
+	@echo "  make run         - Boot a built ISO in QEMU (requires a validated image)"
 	@echo "  make clean       - Remove build artifacts"

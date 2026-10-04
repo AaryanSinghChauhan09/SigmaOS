@@ -13,6 +13,8 @@ permissions:
 jobs:
   qemu-boot-test:
     name: QEMU Boot Smoke Test
+    # Enable only after the release image produces a verifiable runtime-ready marker.
+    if: ${{ vars.SIGMAOS_BOOT_VALIDATED == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
