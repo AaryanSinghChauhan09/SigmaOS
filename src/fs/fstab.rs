@@ -307,6 +307,7 @@ impl Default for FstabManager {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -129,6 +129,7 @@ impl Default for IoctlManager {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

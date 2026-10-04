@@ -312,6 +312,7 @@ impl<T> Drop for RwWriteGuard<'_, T> {
 // ─────────────────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

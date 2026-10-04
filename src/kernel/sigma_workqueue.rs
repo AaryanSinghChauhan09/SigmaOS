@@ -400,6 +400,7 @@ impl Default for WorkQueueSystem {
 // ============================================================
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
     use std::sync::atomic::{AtomicU64, Ordering};

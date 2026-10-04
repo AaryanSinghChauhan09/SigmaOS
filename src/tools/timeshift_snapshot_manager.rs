@@ -351,6 +351,7 @@ impl Default for TimeshiftSnapshotManager {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

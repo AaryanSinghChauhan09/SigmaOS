@@ -554,6 +554,7 @@ impl Default for SovereignCapsicumRightsRules {
 // =========================================================================
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

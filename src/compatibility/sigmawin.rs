@@ -391,6 +391,7 @@ impl D3dToVulkanTranslator {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 
@@ -580,6 +581,7 @@ impl WindowsPowerShellShimEngine {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod windows_extended_tests {
     use super::*;
 

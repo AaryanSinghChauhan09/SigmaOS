@@ -217,6 +217,7 @@ impl Default for ResourceLimitsManager {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

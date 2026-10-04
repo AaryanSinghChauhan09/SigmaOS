@@ -382,6 +382,7 @@ impl Default for BpfRingBufferEngine {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

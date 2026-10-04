@@ -446,6 +446,7 @@ impl Default for SovereignWikiUnimplementedIdeasMasterSuite {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

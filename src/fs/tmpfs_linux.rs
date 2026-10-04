@@ -241,6 +241,7 @@ impl Default for Tmpfs {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

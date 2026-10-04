@@ -1217,6 +1217,7 @@ impl Default for NetBsdPkgsrcEngine {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

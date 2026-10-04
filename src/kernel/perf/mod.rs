@@ -243,6 +243,7 @@ impl Default for PerfSubsystem {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

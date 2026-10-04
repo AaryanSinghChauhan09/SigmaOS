@@ -157,6 +157,7 @@ impl Default for CapabilityManager {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

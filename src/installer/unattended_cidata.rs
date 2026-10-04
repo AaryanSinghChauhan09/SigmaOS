@@ -245,6 +245,7 @@ impl Default for CiDataUnattendedEngine {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

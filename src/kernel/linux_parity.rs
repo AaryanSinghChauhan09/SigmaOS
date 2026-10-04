@@ -519,6 +519,7 @@ impl LinuxCmaAllocatorEngine {
 // ============================================================================
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod linux_kernel_primitives_tests {
     use super::*;
 

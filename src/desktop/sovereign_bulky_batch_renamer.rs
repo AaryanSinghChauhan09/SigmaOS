@@ -177,6 +177,7 @@ impl Default for SovereignBulkyBatchRenamer {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

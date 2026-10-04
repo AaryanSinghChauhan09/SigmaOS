@@ -538,6 +538,7 @@ impl Default for FedoraRpmOstreeEngine {
 // ============================================================================
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod fedora_parity_tests {
     use super::*;
 

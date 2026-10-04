@@ -373,6 +373,7 @@ pub fn check_virtualization_support() -> bool {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

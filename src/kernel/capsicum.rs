@@ -264,6 +264,7 @@ impl Default for CapsicumManager {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

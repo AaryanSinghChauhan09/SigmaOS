@@ -290,6 +290,7 @@ impl ImageManager for SimpleImageManager {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

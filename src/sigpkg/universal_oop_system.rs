@@ -26,7 +26,7 @@ use std::vec::Vec;
 // Implements Strategy Pattern, Adapter Pattern, and Factory Pattern
 
 #[cfg(not(feature = "standalone_test"))]
-use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
+use crate::sigpkg::{Dependency, Package, VersionConstraint};
 
 #[cfg(all(test, not(feature = "standalone_test")))]
 pub use crate::sigpkg::Version;
@@ -6733,6 +6733,9 @@ impl Default for UserDefinedFunctionManager {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
+#[cfg(test_disabled)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

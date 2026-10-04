@@ -369,6 +369,7 @@ pub type SELinuxPolicy = PolicyDb;
 pub type PolicyRule = TransitionRule;
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

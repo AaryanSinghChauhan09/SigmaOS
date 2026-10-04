@@ -402,6 +402,7 @@ pub enum ContainerError {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

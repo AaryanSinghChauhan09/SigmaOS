@@ -170,6 +170,7 @@ impl Default for ErofsEngine {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

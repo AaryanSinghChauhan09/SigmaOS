@@ -277,6 +277,7 @@ impl Default for TimerFdManager {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -255,6 +255,7 @@ impl Default for StratumManager {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

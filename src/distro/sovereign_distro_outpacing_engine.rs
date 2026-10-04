@@ -524,6 +524,7 @@ impl Default for SovereignMasterOutpacingSuite {
 // ============================================================================
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

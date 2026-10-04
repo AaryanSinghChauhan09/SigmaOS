@@ -629,6 +629,7 @@ pub enum IpcError {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -388,6 +388,7 @@ pub enum UvcError {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

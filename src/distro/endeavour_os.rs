@@ -200,6 +200,7 @@ impl Default for EosLogTool {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

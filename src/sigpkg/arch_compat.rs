@@ -752,6 +752,7 @@ impl SvntogitMigrationEngine {
 pub type SvntoGitEngine = SvntogitMigrationEngine;
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

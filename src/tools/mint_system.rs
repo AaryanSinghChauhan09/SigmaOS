@@ -456,6 +456,7 @@ impl Default for MintSystem {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

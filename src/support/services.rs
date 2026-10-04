@@ -3,7 +3,7 @@
 // FIPS/CIS Compliance Scanners, Automated Remediation Playbooks, and System Drift Detectors.
 
 use core::sync::atomic::{AtomicBool, Ordering};
-#[cfg(test_disabled)]
+#[cfg(test)]
 use std::string::String;
 use std::string::ToString;
 use std::vec::Vec;

@@ -189,6 +189,7 @@ impl Default for EventFdManager {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

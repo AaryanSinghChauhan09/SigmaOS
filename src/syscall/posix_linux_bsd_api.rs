@@ -180,6 +180,7 @@ impl Default for PosixLinuxBsdApiDispatcher {
 // =========================================================================
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

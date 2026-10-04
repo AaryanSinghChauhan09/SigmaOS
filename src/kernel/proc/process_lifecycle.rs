@@ -2,7 +2,7 @@
 // Absorbs Linux fork/exec/exit/waitpid, copy-on-write namespaces, BSD rlimits, Windows Priority Classes, and Orphan Re-parenting.
 
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 
 
 use std::string::String;
@@ -55,7 +55,7 @@ pub(crate) mod mock_scheduler {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 pub use mock_scheduler::{Priority, Process, ProcessState};
 
 #[cfg(not(test))]

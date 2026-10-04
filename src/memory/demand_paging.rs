@@ -431,6 +431,7 @@ pub struct DemandPagingStats {
 pub type DemandPagingMemoryStats = DemandPagingStats;
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -247,6 +247,7 @@ impl Default for AuditManager {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

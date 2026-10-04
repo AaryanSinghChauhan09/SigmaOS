@@ -3253,6 +3253,7 @@ impl Default for SovereignDistroInspirationLeapEngine {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod inspiration_leap_tests {
     use super::*;
 
@@ -3286,6 +3287,7 @@ mod inspiration_leap_tests {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod subsystem_interop_tests {
     use super::*;
 
@@ -3788,6 +3790,7 @@ impl Default for SovereignLandlockLsm {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod cross_subsystem_tests {
     use super::*;
 

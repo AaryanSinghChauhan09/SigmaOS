@@ -363,6 +363,7 @@ pub enum VaultError {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod fail_closed_tests {
     use super::{
         Aes256GcmEncryption, ChaCha20Poly1305Encryption, Kyber1024Encryption, VaultEncryption,

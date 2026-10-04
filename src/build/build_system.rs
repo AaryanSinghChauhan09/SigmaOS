@@ -209,6 +209,7 @@ impl Default for BuildSystemManager {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

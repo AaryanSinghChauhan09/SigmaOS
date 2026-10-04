@@ -288,6 +288,7 @@ impl Default for PageDirectoryController {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

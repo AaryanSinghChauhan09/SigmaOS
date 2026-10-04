@@ -21,7 +21,7 @@ use std::vec::Vec;
 // SigmaOS Startup Optimizer
 // OOP-based startup process optimization with dependency analysis
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 use std::collections::BTreeMap;
 
 // Instant not in no_std

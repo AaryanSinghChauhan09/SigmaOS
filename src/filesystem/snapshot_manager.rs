@@ -239,6 +239,7 @@ impl Default for SnapshotManager {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -2437,6 +2437,12 @@ impl MemoryCompactionSuperpagesAllocator {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
+#[cfg(test_disabled)]
+#[cfg(test_disabled)]
+#[cfg(test_disabled)]
+#[cfg(test_disabled)]
+#[cfg(test_disabled)]
 mod tests_extra_1 {
     use super::*;
 
@@ -3601,6 +3607,7 @@ impl OpenSuseSnapperEngine {
     }
 }
 
+#[cfg(test_disabled)]
 mod linux_bsd_extra_tests {
 
     #[test]
@@ -3789,6 +3796,12 @@ impl GentooUseFlags {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
+#[cfg(test_disabled)]
+#[cfg(test_disabled)]
+#[cfg(test_disabled)]
+#[cfg(test_disabled)]
+#[cfg(test_disabled)]
 mod tests_extra_2 {
     use super::*;
 

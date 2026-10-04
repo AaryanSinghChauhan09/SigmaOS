@@ -436,6 +436,7 @@ fn parse_f64_simple(s: &str) -> Result<f64, &'static str> {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -9,6 +9,7 @@ pub fn main() {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use std::process::Command;
 

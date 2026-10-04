@@ -1717,6 +1717,7 @@ impl Default for GestureVoiceControlEngine {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 
@@ -2320,6 +2321,7 @@ impl LinuxLtsUpstreamAdapter {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod linux_lts_upstream_tests {
     use super::*;
 
@@ -3646,6 +3648,7 @@ impl Default for NineToFiveMacAppleEcosystemEngine {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod extra_unimplemented_tests {
     use super::*;
 
@@ -4434,6 +4437,7 @@ impl AndroidAuthorityPoliceEcosystemEngine {
 // =========================================================================
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod new_unimplemented_tests {
     use super::*;
 

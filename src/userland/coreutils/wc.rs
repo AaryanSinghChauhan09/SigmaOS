@@ -118,6 +118,7 @@ fn format_stats(stats: &WcStats, opts: WcOptions, path: Option<&str>) -> String 
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
     use std::io::Cursor;

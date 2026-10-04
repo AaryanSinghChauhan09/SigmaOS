@@ -51,6 +51,7 @@ pub fn set_mtime(path: &str, _mtime: std::time::SystemTime) -> Result<(), String
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

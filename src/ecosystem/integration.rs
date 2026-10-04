@@ -5,7 +5,7 @@ use std::vec::Vec;
 // Mobile/embedded presence matrices, enterprise partnerships, hardware/software certification pipelines,
 // zero-setup dev environments, IDE debugger support, Docker compatibility layers, and Kubernetes bootstrap configurations.
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 use crate::klib::HashMap;
 #[cfg(not(test))]
 use crate::klib::HashMap;

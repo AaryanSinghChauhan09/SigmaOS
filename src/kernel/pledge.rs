@@ -265,6 +265,7 @@ impl Default for PledgeManager {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

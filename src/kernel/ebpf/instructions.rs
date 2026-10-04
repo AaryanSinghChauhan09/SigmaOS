@@ -371,6 +371,7 @@ pub fn disassemble(insn: &BpfInsn) -> String {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

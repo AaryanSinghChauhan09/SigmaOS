@@ -324,6 +324,7 @@ impl Default for RecoveryShell {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

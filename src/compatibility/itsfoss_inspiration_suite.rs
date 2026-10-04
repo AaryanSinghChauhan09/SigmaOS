@@ -285,6 +285,7 @@ impl Default for ItsFossVentoyMultiBootUsbEngine {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

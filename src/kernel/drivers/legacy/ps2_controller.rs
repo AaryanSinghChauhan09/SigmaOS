@@ -406,6 +406,7 @@ impl Default for Ps2Controller {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

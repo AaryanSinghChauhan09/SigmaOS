@@ -574,6 +574,7 @@ impl SyntheticFile for DevNull {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

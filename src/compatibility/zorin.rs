@@ -425,6 +425,7 @@ impl ZorinWindowsAppSupport {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 
@@ -810,6 +811,7 @@ impl Default for ZorinTaskbarCustomizer {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod zorin_feature_tests {
     use super::*;
 

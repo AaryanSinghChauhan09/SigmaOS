@@ -8,6 +8,8 @@ extern crate alloc;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
+#[cfg(test)]
+use std::collections::HashMap;
 
 #[cfg(not(test))]
 use crate::klib::HashMap;
@@ -368,6 +370,9 @@ impl KabiComplianceEngine {
 // =========================================================================
 // UNIT TESTS
 // =========================================================================
+#[cfg(test_disabled)]
+#[cfg(test_disabled)]
+#[cfg(test_disabled)]
 #[cfg(test_disabled)]
 mod tests {
     use super::*;

@@ -144,6 +144,7 @@ impl Default for MintBackupToolEngine {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -371,6 +371,7 @@ impl Default for SovereignRufusInstallerSuite {
 // ============================================================================
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

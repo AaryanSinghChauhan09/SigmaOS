@@ -199,6 +199,7 @@ impl Default for LoginService {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

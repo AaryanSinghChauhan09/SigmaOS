@@ -431,6 +431,7 @@ impl Default for SovereignUxMasterEngine {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

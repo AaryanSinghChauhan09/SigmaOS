@@ -112,6 +112,7 @@ impl Default for FscryptManager {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

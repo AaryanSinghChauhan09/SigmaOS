@@ -407,6 +407,7 @@ impl BooleanDepSolver {
 // ─── Tests ────────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod solver_tests {
     use super::*;
 

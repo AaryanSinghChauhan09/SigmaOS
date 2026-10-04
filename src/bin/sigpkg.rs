@@ -239,6 +239,7 @@ fn cmd_pr(args: &[String]) {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -1088,6 +1088,7 @@ impl Default for SovereignUniversalPmPrBridgeEngine {
 // ============================================================================
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

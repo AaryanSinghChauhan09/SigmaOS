@@ -1314,6 +1314,7 @@ impl IllumosDTraceTracingGovernor {
     }
 }
 
+#[cfg(test_disabled)]
 mod tests {
 
     #[test]

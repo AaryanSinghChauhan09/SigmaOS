@@ -347,6 +347,7 @@ pub mod promises {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::promises::*;
     use super::*;

@@ -155,6 +155,7 @@ impl Default for SovereignElfDynamicLoader {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

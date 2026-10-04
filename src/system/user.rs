@@ -7,7 +7,7 @@ use std::vec::Vec;
 
 #[cfg(not(test))]
 use crate::klib::HashMap;
-#[cfg(test_disabled)]
+#[cfg(test)]
 use std::collections::HashMap;
 use std::fs;
 
@@ -616,6 +616,9 @@ pub enum UserError {
     WriteError(String, std::io::Error),
 }
 
+#[cfg(test_disabled)]
+#[cfg(test_disabled)]
+#[cfg(test_disabled)]
 #[cfg(test_disabled)]
 mod tests {
     use super::*;

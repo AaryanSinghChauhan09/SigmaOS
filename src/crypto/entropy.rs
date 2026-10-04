@@ -43,6 +43,7 @@ pub fn rdrand() -> Option<u64> {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

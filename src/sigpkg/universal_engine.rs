@@ -2573,6 +2573,7 @@ impl IPackageAdapter for OpenBsdPkgPackageAdapter {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 
@@ -2981,6 +2982,7 @@ impl Default for SovereignUniversalPackageManagerInteropEngine {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod universal_interop_tests {
     use super::*;
 

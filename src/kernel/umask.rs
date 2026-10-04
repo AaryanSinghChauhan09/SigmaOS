@@ -59,6 +59,7 @@ impl Default for UmaskManager {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

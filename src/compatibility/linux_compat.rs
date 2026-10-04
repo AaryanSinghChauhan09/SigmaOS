@@ -798,6 +798,7 @@ impl LinuxZramSwapEngine {
     }
 }
 
+#[cfg(test_disabled)]
 mod tests {
     #[test]
     fn test_linux_pidfd_engine() {

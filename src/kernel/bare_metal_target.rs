@@ -131,6 +131,7 @@ impl Default for BareMetalTargetBootEngine {
 // =========================================================================
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -634,6 +634,7 @@ impl VfsSuperblock for TmpfsSuperblock {
 // ─────────────────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

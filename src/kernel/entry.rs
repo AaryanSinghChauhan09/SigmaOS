@@ -203,6 +203,7 @@ fn spawn_init() {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

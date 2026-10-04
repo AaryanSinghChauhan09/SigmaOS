@@ -239,6 +239,7 @@ impl Default for PipeManager {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

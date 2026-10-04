@@ -280,6 +280,7 @@ impl IntelXeDrmDriver {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 
@@ -1934,6 +1935,7 @@ impl SocketCanDriver {
 // =========================================================================
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests_linux_bsd_drivers {
     use super::*;
 

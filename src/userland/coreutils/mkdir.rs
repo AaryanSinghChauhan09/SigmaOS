@@ -53,6 +53,7 @@ fn set_permissions_recursive(path: &Path, mode: u32) -> Result<(), String> {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

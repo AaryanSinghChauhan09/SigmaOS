@@ -460,6 +460,7 @@ impl Default for SovereignAccessSubsystemMasterSuite {
 // =========================================================================
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

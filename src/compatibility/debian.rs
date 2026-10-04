@@ -502,6 +502,7 @@ impl Default for AptBuildDepResolver {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

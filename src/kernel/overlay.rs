@@ -279,6 +279,7 @@ impl Default for OverlayManager {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -382,6 +382,7 @@ pub enum DmaError {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

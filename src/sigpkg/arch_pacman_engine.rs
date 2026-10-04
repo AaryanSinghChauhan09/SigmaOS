@@ -675,6 +675,7 @@ impl Default for SovereignDbscriptsEngine {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

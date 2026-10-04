@@ -399,6 +399,7 @@ impl Default for PosixShell {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

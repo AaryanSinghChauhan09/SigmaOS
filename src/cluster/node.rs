@@ -5,7 +5,7 @@ use core::mem;
 /// Implements dynamic multi-node pod scheduling, virtual overlay networks (CNI Shards),
 /// Raft-style distributed consensus, and active CARP-inspired failover routing.
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[cfg(test_disabled)]

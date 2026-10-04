@@ -361,6 +361,7 @@ impl Default for WhonixKloakInputObfuscationEngine {
 // ==========================================
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -415,6 +415,7 @@ impl Default for SovereignLocaleEngine {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

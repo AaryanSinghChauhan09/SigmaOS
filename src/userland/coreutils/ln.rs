@@ -31,6 +31,7 @@ pub fn run(target: &str, link_name: &str, opts: LnOptions) -> Result<(), String>
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

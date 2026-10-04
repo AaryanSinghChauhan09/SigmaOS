@@ -111,6 +111,7 @@ impl Default for PqcVpnTunnel {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

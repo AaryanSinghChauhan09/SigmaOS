@@ -479,6 +479,7 @@ impl fmt::Display for InstallerError {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

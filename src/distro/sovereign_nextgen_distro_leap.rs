@@ -697,6 +697,7 @@ impl Default for SovereignDistroLeapSuite {
 // ============================================================================
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

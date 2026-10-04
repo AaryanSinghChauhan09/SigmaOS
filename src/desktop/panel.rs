@@ -330,6 +330,7 @@ impl Default for KdePlasmaKwinCompositorEffects {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

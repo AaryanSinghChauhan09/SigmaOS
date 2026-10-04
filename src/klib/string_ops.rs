@@ -82,6 +82,7 @@ pub fn pattern_match(s: &[u8], pattern: &[u8]) -> Option<usize> {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

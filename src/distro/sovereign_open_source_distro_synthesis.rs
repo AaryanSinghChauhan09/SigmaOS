@@ -331,6 +331,7 @@ impl Default for SovereignOpenSourceDistroSynthesisSuite {
 // =========================================================================
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

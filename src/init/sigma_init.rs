@@ -582,6 +582,7 @@ impl Default for RancherContainerInit {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

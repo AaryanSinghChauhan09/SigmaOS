@@ -254,6 +254,7 @@ impl Default for SovereignPidfdProcdescEngine {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

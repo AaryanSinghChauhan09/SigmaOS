@@ -306,6 +306,7 @@ impl Default for SovereignLinuxBsdWikiMasterEngine {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

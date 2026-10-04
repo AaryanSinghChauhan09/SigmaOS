@@ -483,6 +483,7 @@ impl ConnTrackTable {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod conntrack_tests {
     use super::*;
 

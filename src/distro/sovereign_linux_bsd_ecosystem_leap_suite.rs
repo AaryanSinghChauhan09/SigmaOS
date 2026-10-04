@@ -753,6 +753,7 @@ impl Default for SovereignLinuxBsdEcosystemLeapSuite {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

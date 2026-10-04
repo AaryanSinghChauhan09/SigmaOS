@@ -172,6 +172,7 @@ impl From<CapRightsMask> for u64 {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

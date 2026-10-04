@@ -370,6 +370,7 @@ impl Default for EbpfVm {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

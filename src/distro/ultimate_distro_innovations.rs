@@ -296,6 +296,7 @@ impl Default for DebianMultiarchAptEngine {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

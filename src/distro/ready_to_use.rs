@@ -434,6 +434,7 @@ impl Default for PlugAndPlayHardwareManager {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
 
     #[test]

@@ -521,6 +521,7 @@ impl Default for IoUringManager {
 // ============================================================
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

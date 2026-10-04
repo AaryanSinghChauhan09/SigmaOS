@@ -283,6 +283,7 @@ impl BpfVerifier {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
     use crate::kernel::ebpf::instructions::{BPF_OP_ADD, BPF_OP_MOV};

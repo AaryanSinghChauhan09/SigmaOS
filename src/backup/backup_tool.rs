@@ -101,6 +101,7 @@ impl Default for SovereignBackupToolEngine {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

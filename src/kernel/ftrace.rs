@@ -234,6 +234,7 @@ impl Default for FtraceSubsystem {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

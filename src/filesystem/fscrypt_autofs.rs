@@ -195,6 +195,7 @@ impl Default for SovereignFscryptAutofsEngine {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

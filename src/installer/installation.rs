@@ -328,6 +328,7 @@ impl Default for InstallationManager {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

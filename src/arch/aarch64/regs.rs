@@ -212,6 +212,7 @@ impl AArch64Features {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

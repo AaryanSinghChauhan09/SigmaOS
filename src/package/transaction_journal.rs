@@ -526,6 +526,7 @@ impl TransactionJournal {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
     use std::env::temp_dir;

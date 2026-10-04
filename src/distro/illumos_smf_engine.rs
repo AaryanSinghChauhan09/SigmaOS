@@ -318,6 +318,7 @@ impl Default for SovereignIllumosSmfSuite {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

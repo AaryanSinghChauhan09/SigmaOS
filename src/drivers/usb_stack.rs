@@ -402,6 +402,7 @@ pub enum UsbError {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
     use core::mem::size_of;

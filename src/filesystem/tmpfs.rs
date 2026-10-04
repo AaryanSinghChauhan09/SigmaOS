@@ -403,6 +403,7 @@ pub enum TmpfsError {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

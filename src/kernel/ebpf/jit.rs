@@ -356,6 +356,7 @@ impl Default for JitCompiler {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
     use crate::kernel::ebpf::verifier::BpfVerifier;

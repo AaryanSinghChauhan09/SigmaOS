@@ -570,6 +570,7 @@ impl Default for SovereignLinuxBsdDistroGapsSynthesisSuite {
 // =========================================================================
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

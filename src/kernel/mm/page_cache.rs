@@ -20,7 +20,7 @@
 use crate::klib::btreemap::BTreeMap;
 use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 use std::collections::BTreeMap;
 
 use std::vec::Vec;

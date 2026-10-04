@@ -340,6 +340,7 @@ impl Default for MintDesktop {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

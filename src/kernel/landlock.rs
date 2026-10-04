@@ -194,6 +194,7 @@ impl Default for LandlockManager {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

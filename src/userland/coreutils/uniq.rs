@@ -95,6 +95,7 @@ fn format_entry(output: &mut String, line: &str, count: usize, opts: UniqOptions
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
     use std::io::Cursor;

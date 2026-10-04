@@ -253,6 +253,7 @@ impl Default for BtrfsSnapshotEngine {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

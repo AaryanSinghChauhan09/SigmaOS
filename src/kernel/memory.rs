@@ -6,8 +6,9 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 use std::string::String;
 use std::vec::Vec;
 
+#[cfg(not(test))]
 use crate::klib::HashMap;
-#[cfg(test_disabled)]
+#[cfg(test)]
 use std::collections::HashMap;
 
 // Explicit #[path] on sigma_buddy works around a rustfmt resolution quirk:

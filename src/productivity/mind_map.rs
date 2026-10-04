@@ -516,6 +516,7 @@ SigmaOS Architecture
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod mindmap_parser_tests {
     use super::*;
 

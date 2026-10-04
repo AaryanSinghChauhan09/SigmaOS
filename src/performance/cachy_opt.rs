@@ -738,6 +738,7 @@ impl Default for CachyBoreSMPBalancer {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

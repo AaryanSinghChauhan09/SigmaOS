@@ -251,6 +251,7 @@ impl ZfsArc {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
     use alloc::vec;

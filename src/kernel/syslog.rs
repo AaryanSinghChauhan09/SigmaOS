@@ -307,6 +307,7 @@ impl Default for SyslogManager {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

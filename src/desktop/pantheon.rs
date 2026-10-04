@@ -2,7 +2,7 @@
 // Implements Gala Window Manager, Wingpanel Status Bar, Plank Dock, Slingshot Launcher, AppCenter, and Greeter.
 
 use core::sync::atomic::{AtomicBool, Ordering};
-#[cfg(test_disabled)]
+#[cfg(test)]
 use std::string::String;
 use std::string::ToString;
 use std::vec::Vec;

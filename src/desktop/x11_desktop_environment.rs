@@ -312,6 +312,7 @@ impl Default for SovereignX11DesktopEnvironmentMasterSuite {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

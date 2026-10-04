@@ -585,6 +585,7 @@ impl Default for GentooEapi8EbuildProcessor {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

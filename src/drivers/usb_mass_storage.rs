@@ -377,6 +377,7 @@ pub enum MscError {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

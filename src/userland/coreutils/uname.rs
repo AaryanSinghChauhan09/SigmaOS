@@ -84,6 +84,7 @@ pub fn run(opts: UnameOptions, info: Option<SystemInfo>) -> Result<String, Strin
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

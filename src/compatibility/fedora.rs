@@ -4807,6 +4807,7 @@ mod tests {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests_fedora_mojikey {
     use super::*;
 

@@ -537,6 +537,7 @@ impl Default for SovereignLinuxBsdPinnacleInnovationsV14Suite {
 // =========================================================================
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

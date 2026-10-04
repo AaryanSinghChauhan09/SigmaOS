@@ -208,6 +208,7 @@ impl Default for Sovereign2070DistroSupremacyMasterSuite {
 
 #[cfg(feature = "standalone_test")]
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

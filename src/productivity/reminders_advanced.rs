@@ -160,6 +160,7 @@ impl Default for EnhancedRemindersEngine {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -29,7 +29,7 @@ use crate::distro::fedora_pagure_exporter::FedoraPagureExporterEngine;
 #[path = "fedora_pagure_exporter.rs"]
 mod fedora_pagure_exporter;
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 use fedora_pagure_exporter::FedoraPagureExporterEngine;
 
 // ============================================================================

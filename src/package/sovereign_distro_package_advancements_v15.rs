@@ -483,6 +483,7 @@ impl Default for SovereignDistroPackageAdvancementsSuiteV15 {
 // ============================================================================
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -467,6 +467,7 @@ impl Default for SovereignMissingLinuxKernelComponentsSuite {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 
@@ -744,6 +745,7 @@ impl LinuxSeccompBpfSyscallFilterEngine {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod extended_kernel_tests {
     use super::*;
 

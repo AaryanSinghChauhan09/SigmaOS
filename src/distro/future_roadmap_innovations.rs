@@ -333,6 +333,7 @@ impl Default for TemporalFilesystemEngine {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

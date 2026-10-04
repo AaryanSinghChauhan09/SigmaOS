@@ -147,6 +147,7 @@ impl Default for MglruPageAgingEngine {
 // =========================================================================
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

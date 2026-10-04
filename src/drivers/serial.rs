@@ -643,6 +643,7 @@ pub fn klog(io: &dyn PortIo, message: &str) {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

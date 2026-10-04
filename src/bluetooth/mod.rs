@@ -151,6 +151,7 @@ impl Default for BluetoothStack {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

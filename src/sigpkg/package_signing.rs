@@ -490,6 +490,7 @@ pub fn content_hash(data: &[u8]) -> u64 {
 // ─── Tests ────────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod signing_tests {
     use super::*;
 

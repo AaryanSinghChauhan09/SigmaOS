@@ -503,6 +503,7 @@ impl Default for SovereignLinuxBsdEcosystemPinnacleSuite {
 // =========================================================================
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

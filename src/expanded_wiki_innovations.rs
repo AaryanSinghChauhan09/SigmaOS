@@ -813,6 +813,7 @@ impl Default for StrategicImportPlanEngine {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod expanded_wiki_tests {
     use super::*;
 

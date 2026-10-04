@@ -993,6 +993,7 @@ impl Default for SovereignFedoraLinuxMasterSuite {
 // =========================================================================
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

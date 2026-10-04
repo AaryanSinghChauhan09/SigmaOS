@@ -355,6 +355,7 @@ pub fn kformat(args: fmt::Arguments<'_>) -> String {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

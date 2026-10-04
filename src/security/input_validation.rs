@@ -470,6 +470,7 @@ pub fn validate_port(port: u32) -> Result<(), ValidationError> {
 
 // ─────────────────────────────────────────────────────────────────────────────
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

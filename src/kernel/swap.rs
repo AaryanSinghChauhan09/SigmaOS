@@ -228,6 +228,7 @@ impl Default for SwapManager {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

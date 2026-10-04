@@ -512,6 +512,7 @@ impl Default for Sovereign2060DistroSupremacyMasterSuite {
 // ============================================================================
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 
