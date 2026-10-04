@@ -1,13 +1,16 @@
-//! Linux Mint System Reporting Tool
+//! Read-only host system information report, inspired by Linux Mint System Information.
 //!
-//! This module implements a system reporting tool inspired by Linux Mint's
-//! system information reporting capabilities, which collects and displays
-//! detailed system information for troubleshooting and diagnostics.
+//! This is a hosted inspection utility, not kernel telemetry. It reports only
+//! facts available from the host's Linux procfs and os-release files. Missing
+//! sources are recorded as unavailable instead of being filled with examples.
 
 #![allow(dead_code)]
 
 use std::format;
+use std::fs;
+use std::path::Path;
 use std::string::{String, ToString};
+use std::time::{SystemTime, UNIX_EPOCH};
 use std::vec::Vec;
 
 /// System information category
@@ -66,13 +69,21 @@ impl MintSystemReport {
     pub fn new() -> Self {
         Self {
             info_items: Vec::new(),
-            timestamp: 0,
-            title: "SigmaOS System Report".to_string(),
+            timestamp: unix_timestamp(),
+            title: "SigmaOS System Information Report".to_string(),
         }
     }
 
     /// Add an information item
     pub fn add_info_item(&mut self, item: SystemInfoItem) {
+        if let Some(existing) = self
+            .info_items
+            .iter_mut()
+            .find(|existing| existing.category == item.category && existing.name == item.name)
+        {
+            *existing = item;
+            return;
+        }
         self.info_items.push(item);
     }
 
@@ -135,8 +146,14 @@ impl MintSystemReport {
                 json.push_str(",\n");
             }
             json.push_str("    {\n");
-            json.push_str(&format!("      \"name\": \"{}\",\n", item.name));
-            json.push_str(&format!("      \"value\": \"{}\",\n", item.value));
+            json.push_str(&format!(
+                "      \"name\": \"{}\",\n",
+                escape_json(&item.name)
+            ));
+            json.push_str(&format!(
+                "      \"value\": \"{}\",\n",
+                escape_json(&item.value)
+            ));
             json.push_str(&format!("      \"category\": \"{:?}\"\n", item.category));
             json.push_str("    }");
         }
@@ -172,7 +189,11 @@ impl MintSystemReport {
             md.push_str("|------|-------|\n");
 
             for item in self.get_items_by_category(category) {
-                md.push_str(&format!("| {} | {} |\n", item.name, item.value));
+                md.push_str(&format!(
+                    "| {} | {} |\n",
+                    escape_markdown_table_cell(&item.name),
+                    escape_markdown_table_cell(&item.value)
+                ));
             }
 
             md.push_str("\n");
@@ -181,64 +202,117 @@ impl MintSystemReport {
         md
     }
 
-    /// Collect general system information
+    /// Collect host OS release and architecture facts when those sources exist.
     pub fn collect_general_info(&mut self) {
-        // In a real implementation, this would collect actual system info
         self.add_info_item(SystemInfoItem {
-            name: "OS Name".to_string(),
-            value: "SigmaOS".to_string(),
+            name: "Report scope".to_string(),
+            value: "Hosted Linux inspection; this is not SigmaOS kernel telemetry".to_string(),
+            category: SystemInfoCategory::General,
+        });
+        self.add_info_item(SystemInfoItem {
+            name: "Host architecture".to_string(),
+            value: std::env::consts::ARCH.to_string(),
             category: SystemInfoCategory::General,
         });
 
-        self.add_info_item(SystemInfoItem {
-            name: "OS Version".to_string(),
-            value: "1.0.0".to_string(),
-            category: SystemInfoCategory::General,
-        });
+        let os_release = Path::new("/etc/os-release");
+        match fs::read_to_string(os_release) {
+            Ok(contents) => {
+                let fields = parse_os_release(&contents);
+                if let Some(name) = fields.get("PRETTY_NAME").or_else(|| fields.get("NAME")) {
+                    self.add_info_item(SystemInfoItem {
+                        name: "Host operating system".to_string(),
+                        value: name.clone(),
+                        category: SystemInfoCategory::General,
+                    });
+                }
+                if let Some(version) = fields.get("VERSION_ID") {
+                    self.add_info_item(SystemInfoItem {
+                        name: "Host OS version".to_string(),
+                        value: version.clone(),
+                        category: SystemInfoCategory::General,
+                    });
+                }
+            }
+            Err(error) => self.add_collection_warning("/etc/os-release", &error.to_string()),
+        }
 
-        self.add_info_item(SystemInfoItem {
-            name: "Architecture".to_string(),
-            value: "x86_64".to_string(),
-            category: SystemInfoCategory::General,
-        });
+        match fs::read_to_string("/proc/sys/kernel/osrelease") {
+            Ok(version) => self.add_info_item(SystemInfoItem {
+                name: "Host kernel release".to_string(),
+                value: version.trim().to_string(),
+                category: SystemInfoCategory::Kernel,
+            }),
+            Err(error) => {
+                self.add_collection_warning("/proc/sys/kernel/osrelease", &error.to_string())
+            }
+        }
     }
 
-    /// Collect CPU information
+    /// Collect CPU model and logical processor count from Linux procfs.
     pub fn collect_cpu_info(&mut self) {
-        self.add_info_item(SystemInfoItem {
-            name: "CPU Model".to_string(),
-            value: "Unknown CPU".to_string(),
-            category: SystemInfoCategory::Cpu,
-        });
-
-        self.add_info_item(SystemInfoItem {
-            name: "CPU Cores".to_string(),
-            value: "4".to_string(),
-            category: SystemInfoCategory::Cpu,
-        });
+        match fs::read_to_string("/proc/cpuinfo") {
+            Ok(contents) => {
+                if let Some(model) = parse_cpu_model(&contents) {
+                    self.add_info_item(SystemInfoItem {
+                        name: "CPU model".to_string(),
+                        value: model,
+                        category: SystemInfoCategory::Cpu,
+                    });
+                }
+                let processors = contents
+                    .lines()
+                    .filter(|line| {
+                        line.starts_with("processor\t") || line.starts_with("processor :")
+                    })
+                    .count();
+                if processors > 0 {
+                    self.add_info_item(SystemInfoItem {
+                        name: "Logical processors".to_string(),
+                        value: processors.to_string(),
+                        category: SystemInfoCategory::Cpu,
+                    });
+                }
+            }
+            Err(error) => self.add_collection_warning("/proc/cpuinfo", &error.to_string()),
+        }
     }
 
-    /// Collect memory information
+    /// Collect total and available memory from Linux procfs.
     pub fn collect_memory_info(&mut self) {
-        self.add_info_item(SystemInfoItem {
-            name: "Total Memory".to_string(),
-            value: "8 GB".to_string(),
-            category: SystemInfoCategory::Memory,
-        });
-
-        self.add_info_item(SystemInfoItem {
-            name: "Available Memory".to_string(),
-            value: "4 GB".to_string(),
-            category: SystemInfoCategory::Memory,
-        });
+        match fs::read_to_string("/proc/meminfo") {
+            Ok(contents) => {
+                for (source_key, label) in [
+                    ("MemTotal:", "Total memory"),
+                    ("MemAvailable:", "Available memory"),
+                ] {
+                    if let Some(value) = parse_meminfo_kib(&contents, source_key) {
+                        self.add_info_item(SystemInfoItem {
+                            name: label.to_string(),
+                            value: format_kib(value),
+                            category: SystemInfoCategory::Memory,
+                        });
+                    }
+                }
+            }
+            Err(error) => self.add_collection_warning("/proc/meminfo", &error.to_string()),
+        }
     }
 
-    /// Collect all system information
+    /// Collect all available host facts without inventing values.
     pub fn collect_all_info(&mut self) {
+        self.timestamp = unix_timestamp();
         self.collect_general_info();
         self.collect_cpu_info();
         self.collect_memory_info();
-        // Additional collectors would be called here
+    }
+
+    fn add_collection_warning(&mut self, source: &str, reason: &str) {
+        self.add_info_item(SystemInfoItem {
+            name: format!("Unavailable source: {source}"),
+            value: reason.to_string(),
+            category: SystemInfoCategory::General,
+        });
     }
 
     /// Search information items
@@ -252,6 +326,91 @@ impl MintSystemReport {
             })
             .collect()
     }
+}
+
+/// Backwards-compatible name for consumers that used the old tool type.
+pub type SystemInformationReport = MintSystemReport;
+
+fn unix_timestamp() -> u64 {
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map(|duration| duration.as_secs())
+        .unwrap_or(0)
+}
+
+fn parse_os_release(contents: &str) -> std::collections::BTreeMap<String, String> {
+    contents
+        .lines()
+        .filter_map(|line| {
+            let (key, value) = line.split_once('=')?;
+            let key = key.trim();
+            if key.is_empty()
+                || !key
+                    .bytes()
+                    .all(|b| b.is_ascii_uppercase() || b.is_ascii_digit() || b == b'_')
+            {
+                return None;
+            }
+            let value = value.trim();
+            let value = if value.len() >= 2
+                && ((value.starts_with('"') && value.ends_with('"'))
+                    || (value.starts_with('\'') && value.ends_with('\'')))
+            {
+                &value[1..value.len() - 1]
+            } else {
+                value
+            };
+            Some((key.to_string(), value.to_string()))
+        })
+        .collect()
+}
+
+fn parse_cpu_model(contents: &str) -> Option<String> {
+    contents.lines().find_map(|line| {
+        let (key, value) = line.split_once(':')?;
+        matches!(key.trim(), "model name" | "Hardware")
+            .then(|| value.trim().to_string())
+            .filter(|value| !value.is_empty())
+    })
+}
+
+fn parse_meminfo_kib(contents: &str, key: &str) -> Option<u64> {
+    contents.lines().find_map(|line| {
+        let (field, value) = line.split_once(':')?;
+        if field.trim() != key.trim_end_matches(':') {
+            return None;
+        }
+        value.split_whitespace().next()?.parse().ok()
+    })
+}
+
+fn format_kib(kib: u64) -> String {
+    let tenths = kib.saturating_mul(10) / 1_048_576;
+    format!("{}.{:01} GiB", tenths / 10, tenths % 10)
+}
+
+fn escape_json(value: &str) -> String {
+    let mut escaped = String::with_capacity(value.len());
+    for character in value.chars() {
+        match character {
+            '"' => escaped.push_str("\\\""),
+            '\\' => escaped.push_str("\\\\"),
+            '\n' => escaped.push_str("\\n"),
+            '\r' => escaped.push_str("\\r"),
+            '\t' => escaped.push_str("\\t"),
+            character if character.is_control() => escaped.push(' '),
+            character => escaped.push(character),
+        }
+    }
+    escaped
+}
+
+fn escape_markdown_table_cell(value: &str) -> String {
+    value
+        .replace('\\', "\\\\")
+        .replace('|', "\\|")
+        .replace('\n', " ")
+        .replace('\r', " ")
 }
 
 impl Default for MintSystemReport {
@@ -316,7 +475,7 @@ mod tests {
         });
 
         let text = report.generate_text_report();
-        assert!(text.contains("SigmaOS System Report"));
+        assert!(text.contains("SigmaOS System Information Report"));
         assert!(text.contains("Test: Value"));
     }
 
@@ -325,8 +484,47 @@ mod tests {
         let mut report = MintSystemReport::new();
         report.collect_general_info();
 
-        assert!(report.get_item_by_name("OS Name").is_some());
-        assert!(report.get_item_by_name("OS Version").is_some());
+        assert!(report.get_item_by_name("Report scope").is_some());
+        assert_eq!(
+            report.get_item_by_name("Host architecture").unwrap().value,
+            std::env::consts::ARCH
+        );
+    }
+
+    #[test]
+    fn parsers_read_reported_values_without_fabricating_defaults() {
+        let release = parse_os_release("NAME=\"Example OS\"\nVERSION_ID=1.2\ninvalid line\n");
+        assert_eq!(release.get("NAME").map(String::as_str), Some("Example OS"));
+        assert_eq!(release.get("VERSION_ID").map(String::as_str), Some("1.2"));
+        assert_eq!(
+            parse_cpu_model("processor : 0\nmodel name : Example CPU\n").as_deref(),
+            Some("Example CPU")
+        );
+        assert_eq!(
+            parse_meminfo_kib("MemTotal: 2048 kB\n", "MemTotal:"),
+            Some(2048)
+        );
+        assert_eq!(
+            parse_meminfo_kib("MemTotal: unavailable\n", "MemTotal:"),
+            None
+        );
+    }
+
+    #[test]
+    fn report_exports_escape_untrusted_text() {
+        let mut report = MintSystemReport::new();
+        report.add_info_item(SystemInfoItem {
+            name: "driver|name".to_string(),
+            value: "line one\n\"quoted\"".to_string(),
+            category: SystemInfoCategory::Graphics,
+        });
+
+        let json = report.generate_json_report();
+        assert!(json.contains("driver|name"));
+        assert!(json.contains("line one\\n\\\"quoted\\\""));
+        let markdown = report.generate_markdown_report();
+        assert!(markdown.contains("driver\\|name"));
+        assert!(markdown.contains("line one \"quoted\""));
     }
 
     #[test]

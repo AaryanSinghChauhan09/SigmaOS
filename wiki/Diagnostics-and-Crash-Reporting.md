@@ -1,240 +1,44 @@
-# Diagnostics and Crash Reporting
+# System Information and Diagnostics
 
-SigmaOS implements a comprehensive diagnostics and crash reporting subsystem in Rust. It captures kernel panics, process crashes, hardware faults, and system anomalies — then feeds them to the AI crash analyzer for automatic root-cause analysis and fix suggestions.
+**Capability state: Partial.** SigmaOS has a hosted, read-only system information collector inspired by Linux Mint's System Information and System Reports tools. It can format a report from available host facts. It is not a SigmaOS desktop app, kernel telemetry service, crash collector, or support bundle, and it does not imply SigmaOS is bootable.
 
----
+## Current capability
 
-## Architecture Overview
+`src/tools/mint_system_report.rs` provides `MintSystemReport` (also exported as `SystemInformationReport`) and the `tools::mint_system_report` module. It collects the host architecture, Linux distribution release fields, kernel release, CPU model and logical processor count, and total/available memory when the corresponding Linux sources are readable. Missing sources appear as collection warnings; the collector does not fill gaps with sample values.
 
-```
- Crash / Fault Event
-       │
- ┌─────▼────────────────────────────────────────────┐
- │          Crash Capture Layer (src/crash/)          │
- │  Kernel Oops │ Process SIGSEGV │ Watchdog timeout  │
- └─────────────────────┬────────────────────────────┘
-                       │
- ┌─────────────────────▼────────────────────────────┐
- │          Crash Dump Writer                        │
- │  ELF core dump │ Kernel minidump │ Structured log │
- └─────────────────────┬────────────────────────────┘
-                       │
- ┌─────────────────────▼────────────────────────────┐
- │          AI Crash Analyzer (src/ai/)              │
- │  Root cause inference │ CVE correlation            │
- │  Fix suggestion │ Regression detection             │
- └─────────────────────┬────────────────────────────┘
-                       │
- ┌─────────────────────▼────────────────────────────┐
- │          Reporting                                │
- │  Local log │ Notification │ Optional telemetry    │
- └────────────────────────────────────────────────  ┘
+Report formats are plain text, JSON, and Markdown. JSON strings and Markdown table cells are escaped. Collection is local and read-only. By default, it omits hostname, usernames, network addresses, serial numbers, logs, and file contents. The report labels its scope as hosted Linux inspection, not SigmaOS kernel telemetry.
+
+This is narrower than Linux Mint's integrated System Information/System Reports experience: there is no graphical viewer, device/driver inventory, crash report capture, or bug-report upload flow. No telemetry is sent.
+
+## Design references
+
+- **Linux Mint:** present system facts and troubleshooting information in a discoverable, understandable report.
+- **SigmaOS:** gather only observed values, show missing sources, keep reports local, and make sensitive-data collection explicit.
+
+References are design guidance, not evidence of feature parity.
+
+## Validation
+
+Run the module tests:
+
+```sh
+rustc --edition=2021 --test src/tools/mint_system_report.rs -o /tmp/sigmaos-system-report-tests
+/tmp/sigmaos-system-report-tests
 ```
 
----
+The tests cover report formatting, parsers, search, duplicate updates, and escaping. They do not establish a graphical session, SigmaOS kernel integration, or physical-device support.
 
-## Crash Types Handled
+## Roadmap
 
-| Crash Type | Source | Action |
-|-----------|--------|--------|
-| Kernel panic | `src/crash/` | Save kdump, reboot |
-| Kernel oops | Trap handler | Log + continue |
-| Process SIGSEGV | Signal delivery | Core dump + AI analysis |
-| Process SIGABRT | libc abort | Core dump + stack trace |
-| Hardware MCE | Machine Check Exception | Log + offline CPU core |
-| Watchdog timeout | Kernel watchdog | Log + restart service |
-| OOM kill | Memory pressure | Log victim + freed memory |
-| Driver crash | Driver watchdog | Reload driver, log |
+1. Add an accessible graphical System Information view backed by a documented provider interface.
+2. Add device/driver details only from enumerated runtime sources, with unavailable and untested states visible.
+3. Add local crash-report discovery only after SigmaOS has a real crash store; require preview and explicit export before sharing.
+4. Exercise collectors on supported boot targets and test absent, malformed, and permission-denied sources.
 
----
+**Completion evidence:** a user can open the report in a supported SigmaOS session, inspect source and collection status, export a privacy-reviewed report locally, and reproduce the facts on named tested hardware.
 
-## Kernel Crash Dump (kdump)
+## Related pages
 
-### Configuration
-```toml
-[kdump]
-enabled = true
-crashkernel = "256M"         # Reserved RAM for crash kernel
-dump_path = "/var/crash/"
-compression = "lz4"
-max_dumps = 5                # Rotate oldest
-```
-
-### Capture Process
-1. Primary kernel panics
-2. NMI triggers secondary crash kernel (pre-loaded at boot)
-3. Crash kernel captures RAM snapshot via `/dev/mem`
-4. Writes ELF vmcore to `/var/crash/YYYY-MM-DD-HH:MM/`
-5. AI analyzer reads vmcore immediately after write
-
-### Analyzing a Dump
-```bash
-sigma-crash analyze /var/crash/2025-10-04/vmcore
-```
-Output:
-```
-╔══════════════════════════════════════════════╗
-║  SigmaOS Crash Analysis Report               ║
-╠══════════════════════════════════════════════╣
-║  Crash type: NULL pointer dereference        ║
-║  Function:   sigma_net_rx_handler+0x2a4      ║
-║  Module:     sigma-ethernet                  ║
-║  Likely cause: RCU read lock not held        ║
-║  Similar CVE: CVE-2024-12345 (fixed in 1.1)  ║
-║  Suggested fix: Update sigma-ethernet driver  ║
-╚══════════════════════════════════════════════╝
-```
-
----
-
-## Process Crash Reporting
-
-### Core Dump
-- ELF format with all thread backtraces
-- Saved to `~/crashes/<process>-<pid>-<timestamp>.core`
-- Symbolicated automatically using DWARF debug info
-
-### GUI Notification
-When a graphical app crashes:
-```
-⚠ Application Crashed: sigma-browser
-  The app stopped unexpectedly.
-  [View Details]  [Report]  [Dismiss]
-```
-
-Clicking "View Details" shows:
-- Backtrace
-- Last 100 log lines
-- AI-suggested fix
-- Link to relevant wiki page
-
-### Automatic Restart Policy
-```toml
-[crash.policy]
-max_restarts = 3
-restart_window_sec = 60
-action_after_max = "notify"   # notify | disable | ai-recover
-```
-
----
-
-## System Health Watchdog
-
-### Hardware Watchdog
-- Kicks NMI watchdog every 30s
-- If kernel hangs (no kick), triggers panic + kdump
-
-### Service Watchdog
-- sigma-init monitors all service PIDs
-- Missing heartbeat → restart with exponential backoff
-
-### AI Anomaly Watchdog
-- Continuously monitors CPU/RAM/IO/net metrics
-- Detects anomalies (e.g., runaway process, memory leak)
-- Proactively alerts before crash occurs
-
----
-
-## Kernel Tracing (`src/tracing/`)
-
-### Ftrace Equivalent
-```bash
-# Trace function calls in the kernel
-sigma-trace function --filter "sigma_fs_*" --duration 5s
-
-# Trace scheduler events
-sigma-trace sched --pid 1234 --duration 10s
-
-# Live trace output
-sigma-trace live --events page_fault,irq_handler
-```
-
-### eBPF-Style Probes
-```bash
-# Attach probe to kernel function
-sigma-probe attach sigma_net_rx_handler --on-entry "log args"
-
-# Attach probe to userspace function
-sigma-probe attach --pid 1234 --function main
-```
-
----
-
-## Logging System
-
-### Log Levels
-| Level | Value | Use |
-|-------|-------|-----|
-| Emergency | 0 | System unusable |
-| Alert | 1 | Immediate action required |
-| Critical | 2 | Critical conditions |
-| Error | 3 | Error conditions |
-| Warning | 4 | Warning conditions |
-| Notice | 5 | Normal but significant |
-| Info | 6 | Informational |
-| Debug | 7 | Debug messages |
-
-### Log Storage
-- Structured JSON logs: `/var/log/sigma/kernel.jsonl`
-- Per-service logs: `/var/log/sigma/<service>.log`
-- Log rotation: 7 days retention, max 500 MB per service
-- Queryable: `sigma-log query --level error --since 1h`
-
----
-
-## Diagnostics CLI
-
-```bash
-# Full system diagnostic report
-sigma-diag report
-
-# Check specific subsystem
-sigma-diag check storage
-sigma-diag check network
-sigma-diag check memory
-
-# Live performance view
-sigma-diag live
-
-# Export diagnostics bundle (for support)
-sigma-diag bundle --output ~/sigma-diagnostics.tar.zst
-```
-
----
-
-## Privacy: Crash Telemetry
-
-All crash reports are **opt-in**:
-```toml
-[telemetry]
-enabled = false              # off by default
-include_core_dump = false    # never send full core dumps
-anonymize = true             # strip usernames, paths
-endpoint = "https://telemetry.sigmaos.org/v1/crash"
-```
-
-If enabled:
-- Only sends: crash type, function name, module, SigmaOS version
-- No personal data, no file contents, no passwords
-
----
-
-## Source Files
-
-| File | Description |
-|------|-------------|
-| `src/crash/` | Crash capture and dump |
-| `src/ai/crash_analyzer.rs` | AI-powered root cause analysis |
-| `src/tracing/` | Kernel trace and probes |
-| `src/logging/` | Structured log system |
-| `src/diagnostics/` | Diagnostic report tools |
-
----
-
-## AI Agent Maintenance Instructions
-
-> **For AI agents maintaining this page:**
-> - Source: `src/crash/`, `src/ai/crash_analyzer.rs`, `src/diagnostics/`
-> - Update crash type table when new fault handlers are added
-> - Keep AI analysis example output current
-> - Add new `sigma-diag check` subcommands as they are implemented
+- [Desktop and UX](08-Desktop.md)
+- [Security](07-Security.md)
+- [Testing](Testing.md)
