@@ -51,7 +51,7 @@ pub use fedora_missing_components::{
     Dnf5Advisory, FedoraAnacondaKickstartEngine, FedoraDnf5PackageEngine, FedoraMockChrootBuilder,
     FedoraSssdFreeIpaEngine, KickstartPartition, MockChrootConfig,
 };
-// pub mod freebsd_jails;
+pub mod freebsd_jails;
 pub mod freedos;
 pub mod gap_closure;
 pub mod garuda_zen;
@@ -318,3 +318,5 @@ pub mod templeos;
 pub mod universal_app_interface;
 pub mod void_linux;
 pub mod wasm_sandbox;
+pub mod sssd;
+pub mod ubuntu_apt;

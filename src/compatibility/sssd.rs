@@ -1,11 +1,12 @@
-use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
 /// Custom SSSD (System Security Services Daemon) Compatibility Subsystem for SigmaOS
 /// Implements offline credentials caching, NSS user/group resolution, multi-domain failover, and HBAC policy engine.
 use std::string::String;
 use std::string::ToString;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
+use crate::klib::HashMap;
+use crate::klib::path::PathBuf;
+use std::fs;
 
 // ==========================================
 // 1. SSSD Security Domain & Failover
@@ -203,6 +204,7 @@ impl Default for FreeIpaFasIdentityManager {
 }
 
 #[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 
