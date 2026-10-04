@@ -65,6 +65,13 @@ if [ -f "src/desktop/shortcuts.rs" ]; then
     ./build/shortcuts_test
 fi
 
+if [ -f "src/desktop/mint_update_manager.rs" ]; then
+    echo "Running Mint-inspired update policy and fail-closed backend test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/desktop/mint_update_manager.rs -o build/mint_update_manager_test
+    ./build/mint_update_manager_test
+fi
+
 if [ -f "src/distro/linux_bsd_inspirations.rs" ]; then
     echo "Running Linux & BSD distro inspirations & subsystem bridge test suite..."
     mkdir -p build
