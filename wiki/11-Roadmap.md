@@ -415,14 +415,16 @@ When a phase is fully complete:
 
 ## Related Wiki Pages
 
-- [Kernel, scheduling, and memory roadmap](Future-Development-Kernel-and-Scheduling)
-- [Storage and filesystems roadmap](Future-Development-Storage-and-Filesystems)
-- [Networking and security roadmap](Future-Development-Networking-and-Security)
-- [Device drivers and desktop roadmap](Future-Development-Drivers-and-Desktop)
-- [Packaging, installation, and updates roadmap](Future-Development-Packaging-and-Installation)
-- [04-Kernel](04-Kernel) — Current kernel architecture
-- [07-Security](07-Security) — Current security hardening
-- [09-Packaging](09-Packaging) — sigpkg and package formats
-- [13-Agents](13-Agents) — AI agent framework
-- [19-Package-Management](19-Package-Management) — Comprehensive packaging guide
-- [20-Branches-Merged-Oct2026](20-Branches-Merged-Oct2026) — Branch consolidation history
+- [Kernel](04-Kernel.md) — architecture and kernel roadmap
+- [Memory management](Memory-Management.md)
+- [Scheduler](Scheduler.md)
+- [Filesystems and VFS](05-Filesystems.md)
+- [Networking](06-Networking.md)
+- [Security](07-Security.md)
+- [Drivers](Hardware-Drivers.md)
+- [Desktop](08-Desktop.md)
+- [Packaging and updates](09-Packaging.md)
+- [Init and services](Init-and-Services.md)
+- [IPC and syscalls](IPC-and-Syscalls.md)
+- [Virtualization and containers](Container-Virtualization.md)
+- [Power and time](Power-Management.md)

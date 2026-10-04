@@ -17,15 +17,13 @@ Develop SigmaOS into a competitive operating system by improving reliability, se
 
 ## Component roadmaps
 
-- [Kernel, scheduling, and memory](Future-Development-Kernel-and-Scheduling)
-- [Storage and filesystems](Future-Development-Storage-and-Filesystems)
-- [Networking and security](Future-Development-Networking-and-Security)
-- [Device drivers and desktop](Future-Development-Drivers-and-Desktop)
-- [Packaging, installation, and updates](Future-Development-Packaging-and-Installation)
-- [Init and service supervision](Future-Development-Init-and-Services)
-- [IPC and userspace interfaces](Future-Development-IPC-and-Userspace)
-- [Virtualization and containers](Future-Development-Virtualization-and-Containers)
-- [Power and timekeeping](Future-Development-Power-and-Time)
+Roadmaps live with their owning component so implementation status, reference comparisons, validation, and future work stay together:
+
+- [Kernel](04-Kernel.md), [memory management](Memory-Management.md), [scheduler](Scheduler.md)
+- [Filesystems and VFS](05-Filesystems.md), [networking](06-Networking.md), [security](07-Security.md)
+- [Drivers](Hardware-Drivers.md), [desktop](08-Desktop.md), [packaging and updates](09-Packaging.md)
+- [Init and services](Init-and-Services.md), [IPC and syscalls](IPC-and-Syscalls.md)
+- [Virtualization and containers](Container-Virtualization.md), [power and time](Power-Management.md)
 
 ## Work status vocabulary
 
