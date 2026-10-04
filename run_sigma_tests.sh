@@ -58,6 +58,13 @@ if [ -f "src/filesystem/btrfs.rs" ]; then
     ./build/btrfs_test
 fi
 
+if [ -f "src/desktop/shortcuts.rs" ]; then
+    echo "Running keyboard shortcut discovery and matching test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/desktop/shortcuts.rs -o build/shortcuts_test
+    ./build/shortcuts_test
+fi
+
 if [ -f "src/distro/linux_bsd_inspirations.rs" ]; then
     echo "Running Linux & BSD distro inspirations & subsystem bridge test suite..."
     mkdir -p build
