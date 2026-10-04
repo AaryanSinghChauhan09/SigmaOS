@@ -38,6 +38,19 @@ Use these terms consistently in wiki pages and release notes:
 
 Do not label a feature supported based only on a type, API, example, or standalone model.
 
+## Canonical component page format
+
+Keep one canonical Wiki page for each OS component. Each component page should use this order so readers can compare status and evidence consistently:
+
+1. **Capability state:** one shared vocabulary term, plus a brief user-visible limitation.
+2. **Current capability:** verified behavior with source links; distinguish library models from runtime integration.
+3. **Design references:** specific Linux/BSD projects and the design lesson being evaluated.
+4. **Validation:** exact command, target/configuration, result, and checks that remain unrun.
+5. **Roadmap:** ordered work that depends on the current implementation.
+6. **Completion evidence:** observable checks required before advancing the capability state.
+
+Put overlapping material on the owning component page and link to it from overview pages. Imported repository plans in the archive preserve their source text; they do not supersede the current status on a canonical component page.
+
 ## Development cycle
 
 1. Describe the current behavior and link the relevant source files.
