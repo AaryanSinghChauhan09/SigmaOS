@@ -1,7 +1,7 @@
 # Theming Guide
 
 ## Overview and Purpose
-This page documents the SigmaOS components: theming, all 22 Omarchy themes + 8 SigmaOS exclusive themes. These components form a crucial part of the SigmaOS ecosystem, providing robust, high-performance, and secure foundations.
+This page documents the SigmaOS components: theming, all 22 Omarchy themes + 8 SigmaOS exclusive themes + 4 Linux Mint "mint-y" themes (mint-y-dark, mint-y-light, mint-y-blue-dark, mint-y-ocean). These components form a crucial part of the SigmaOS ecosystem, providing robust, high-performance, and secure foundations.
 
 SigmaOS aims to build a comprehensive system that matches and exceeds standard distributions, offering deep integration and modern APIs.
 
@@ -117,3 +117,13 @@ Integration testing requires the full SigmaOS QA harness.
 - Additional context line 37 for Theming Guide
 - Additional context line 38 for Theming Guide
 - Additional context line 39 for Theming Guide
+## Linux Mint & Omarchy Theme Pack (2026-10 update)
+- `ThemePalette` now carries semantic `accent`, `background`, and `foreground` colors.
+- `OmarchyThemeSuite` includes 4 new Mint-Y themes: `mint-y-dark`, `mint-y-light`, `mint-y-blue-dark`, `mint-y-ocean`.
+- `SovereignThemeEngine::export_colors_css`, `export_colors_gtk`, and `export_colors_hyprland` render the active palette's real values.
+- Linux Mint Cinnamon defaults + Omarchy-style top bar have become constructors `CinnamonPanel::with_cinnamon_defaults()` and `CinnamonPanel::with_omarchy_bar()` in `src/desktop/mint_desktop.rs`.
+
+### AI Agent Maintenance
+- Keep the Omarchy theme names in sync with the upstream Omarchy project's color presets.
+- When adding palette entries, extend `ThemePalette::new` call sites and the mint-y match arm.
+- Run `cargo test --lib theming` and `cargo test --lib mint_desktop` before committing.

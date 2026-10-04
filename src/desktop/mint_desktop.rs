@@ -104,6 +104,53 @@ impl CinnamonPanel {
     }
 
     /// Add an applet to the panel
+    /// Create a panel pre-populated with the Linux Mint Cinnamon default
+    /// applet set (menu, window list, tray, clock, volume, network, battery),
+    /// inspired by the out-of-box Cinnamon layout.
+    pub fn with_cinnamon_defaults() -> Self {
+        let mut panel = Self::new("main-panel".to_string(), CinnamonPanelPosition::Bottom);
+        let defaults = [
+            ("menu", PanelAppletType::Menu),
+            ("task-switcher", PanelAppletType::TaskSwitcher),
+            ("system-tray", PanelAppletType::SystemTray),
+            ("clock", PanelAppletType::Clock),
+            ("volume", PanelAppletType::Volume),
+            ("network", PanelAppletType::Network),
+            ("battery", PanelAppletType::Battery),
+        ];
+        for (idx, (id, applet_type)) in defaults.iter().enumerate() {
+            panel.add_applet(PanelApplet {
+                applet_type: applet_type.clone(),
+                id: id.to_string(),
+                enabled: true,
+                position: idx as u32,
+                config: BTreeMap::new(),
+            });
+        }
+        panel
+    }
+
+    /// Create an Omarchy-style minimal top bar: clock on the right with
+    /// network/volume indicators only - zero visual clutter, à la Hyprland bar.
+    pub fn with_omarchy_bar() -> Self {
+        let mut panel = Self::new("omarchy-bar".to_string(), CinnamonPanelPosition::Top);
+        let items = [
+            ("network", PanelAppletType::Network),
+            ("volume", PanelAppletType::Volume),
+            ("clock", PanelAppletType::Clock),
+        ];
+        for (idx, (id, applet_type)) in items.iter().enumerate() {
+            panel.add_applet(PanelApplet {
+                applet_type: applet_type.clone(),
+                id: id.to_string(),
+                enabled: true,
+                position: idx as u32,
+                config: BTreeMap::new(),
+            });
+        }
+        panel
+    }
+
     pub fn add_applet(&mut self, applet: PanelApplet) {
         self.applets.push(applet);
     }
@@ -448,6 +495,19 @@ impl Default for CinnamonDesktopManager {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_cinnamon_defaults_and_omarchy_bar() {
+        let panel = CinnamonPanel::with_cinnamon_defaults();
+        assert_eq!(panel.applets.len(), 7);
+        assert_eq!(panel.applets[0].id, "menu");
+        assert_eq!(panel.position, CinnamonPanelPosition::Bottom);
+
+        let bar = CinnamonPanel::with_omarchy_bar();
+        assert_eq!(bar.applets.len(), 3);
+        assert_eq!(bar.position, CinnamonPanelPosition::Top);
+        assert!(bar.get_applet("clock").is_some());
+    }
 
     #[test]
     fn test_panel_creation() {
