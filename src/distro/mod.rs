@@ -396,6 +396,9 @@ pub use mint_omarchy_launch_supremacy::*;
 pub mod mint_omarchy_hardware_and_audio_supremacy;
 pub use mint_omarchy_hardware_and_audio_supremacy::*;
 
+pub mod sovereign_mint_omarchy_pinnacle_ecosystem;
+pub use sovereign_mint_omarchy_pinnacle_ecosystem::*;
+
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;
 pub use crate::stubs::large_distro_stubs::*;
