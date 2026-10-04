@@ -137,7 +137,7 @@ impl MintSystemReport {
         let mut json = String::new();
 
         json.push_str("{\n");
-        json.push_str(&format!("  \"title\": \"{}\",\n", self.title));
+        json.push_str(&format!("  \"title\": \"{}\",\n", escape_json(&self.title)));
         json.push_str(&format!("  \"timestamp\": {},\n", self.timestamp));
         json.push_str("  \"items\": [\n");
 
@@ -169,7 +169,7 @@ impl MintSystemReport {
         let mut md = String::new();
 
         md.push_str("# ");
-        md.push_str(&self.title);
+        md.push_str(&escape_markdown_table_cell(&self.title));
         md.push_str("\n\n");
 
         // Group by category
@@ -406,11 +406,21 @@ fn escape_json(value: &str) -> String {
 }
 
 fn escape_markdown_table_cell(value: &str) -> String {
-    value
-        .replace('\\', "\\\\")
-        .replace('|', "\\|")
-        .replace('\n', " ")
-        .replace('\r', " ")
+    let mut escaped = String::with_capacity(value.len());
+    for character in value.chars() {
+        match character {
+            '\\' | '|' | '[' | ']' | '(' | ')' | '*' | '_' | '`' | '#' => {
+                escaped.push('\\');
+                escaped.push(character);
+            }
+            '<' => escaped.push_str("&lt;"),
+            '>' => escaped.push_str("&gt;"),
+            '\n' | '\r' => escaped.push(' '),
+            character if character.is_control() => escaped.push(' '),
+            character => escaped.push(character),
+        }
+    }
+    escaped
 }
 
 impl Default for MintSystemReport {
@@ -513,6 +523,7 @@ mod tests {
     #[test]
     fn report_exports_escape_untrusted_text() {
         let mut report = MintSystemReport::new();
+        report.title = "Report\n| [link](target)".to_string();
         report.add_info_item(SystemInfoItem {
             name: "driver|name".to_string(),
             value: "line one\n\"quoted\"".to_string(),
@@ -520,9 +531,11 @@ mod tests {
         });
 
         let json = report.generate_json_report();
+        assert!(json.contains("Report\\n| [link](target)"));
         assert!(json.contains("driver|name"));
         assert!(json.contains("line one\\n\\\"quoted\\\""));
         let markdown = report.generate_markdown_report();
+        assert!(markdown.contains("Report \\| \\[link\\]\\(target\\)"));
         assert!(markdown.contains("driver\\|name"));
         assert!(markdown.contains("line one \"quoted\""));
     }
