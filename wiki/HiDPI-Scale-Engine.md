@@ -84,6 +84,6 @@ rustc --test src/desktop/omarchy_hidpi_scale_engine.rs \
 
 ## Related Components
 
-- [Desktop Environment](Desktop-Environment.md) — Hyprland integration
+- [Desktop](08-Desktop.md) — Hyprland integration
 - [Omarchy Parity](Omarchy-Parity.md) — full feature comparison
 - [Browser Theme Sync](Browser-Theme-Sync.md) — Wayland DPI-aware theme sync

@@ -87,4 +87,4 @@ rustc --test src/system/omarchy_atreyu_system_plugin.rs \
 
 - [Init and Services](Init-and-Services.md) — daemon integration
 - [Monitoring and Observability](Monitoring-Observability.md) — telemetry export
-- [Kernel Core](Kernel-Core.md) — sysfs interface
+- [Kernel](04-Kernel.md) — sysfs interface

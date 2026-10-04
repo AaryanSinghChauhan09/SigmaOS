@@ -104,5 +104,5 @@ rustc --test src/desktop/omarchy_browser_theme_sync.rs \
 ## Related Components
 
 - [Theming Guide](Theming-Guide.md) — Sigma theme color palettes
-- [Desktop Environment](Desktop-Environment.md) — Hyprland integration
+- [Desktop](08-Desktop.md) — Hyprland integration
 - [Omarchy Parity](Omarchy-Parity.md) — full feature comparison

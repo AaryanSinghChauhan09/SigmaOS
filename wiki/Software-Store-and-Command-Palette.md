@@ -61,4 +61,4 @@ The **Software Store and Command Palette** subsystems ([`src/desktop/mint_softwa
 > - Source: `src/desktop/mint_software_store.rs`, `src/desktop/launcher.rs`
 > - When new system action shortcuts are added to `CommandPalette`, register them in the system action table.
 > - Ensure sandbox permission audit weights remain aligned with ISO 27001 and CIS Linux benchmarks.
-> - Cross-reference with [Package-Management](Package-Management.md) and [Compositor](Compositor.md).
+> - Cross-reference with [Packaging](09-Packaging.md) and [Compositor](Compositor.md).

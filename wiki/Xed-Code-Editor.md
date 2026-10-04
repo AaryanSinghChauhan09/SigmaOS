@@ -88,4 +88,4 @@ rustc --test src/desktop/sovereign_xed_code_editor.rs \
 
 - [Xreader Document Reader](Xreader-Document-Reader.md) — shares Zig rope buffer
 - [Autosave Capture Engine](Autosave-Capture-Engine.md) — crash recovery integration
-- [Desktop Environment](Desktop-Environment.md) — theming integration
+- [Desktop](08-Desktop.md) — theming integration

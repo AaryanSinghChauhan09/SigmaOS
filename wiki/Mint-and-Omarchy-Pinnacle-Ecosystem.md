@@ -73,4 +73,4 @@ Direct integration for Proton and Wine prefixes:
 > - Source: `src/distro/sovereign_mint_omarchy_pinnacle_ecosystem.rs`
 > - When new Proton runner versions or upscaling technologies (e.g. FSR 4) are added, update the gaming configuration table.
 > - Ensure biometric authentication timeout and security policies conform to ISO 27001 standards.
-> - Cross-reference with [Omarchy-Gaming-Performance-Suite](Omarchy-Gaming-Performance-Suite.md) and [Security-and-Hardening](Security-and-Hardening.md).
+> - Cross-reference with [Omarchy-Gaming-Performance-Suite](Omarchy-Gaming-Performance-Suite.md) and [Security](07-Security.md).

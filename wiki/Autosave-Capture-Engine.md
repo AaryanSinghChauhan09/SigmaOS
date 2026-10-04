@@ -77,4 +77,4 @@ rustc --test src/desktop/omarchy_autosave_capture_engine.rs \
 
 - [Xed Code Editor](Xed-Code-Editor.md) — session recovery integration
 - [Modal Keybindings and Chord Rebind](Modal-Keybindings-and-Chord-Rebind.md) — shortcut binding
-- [Desktop Environment](Desktop-Environment.md) — Wayland/Hyprland integration
+- [Desktop](08-Desktop.md) — Wayland/Hyprland integration

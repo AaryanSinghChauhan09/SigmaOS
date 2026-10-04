@@ -7,7 +7,7 @@
 ## Recent Main Branch Updates (October 2026)
 
 - Added `SovereignUniversalSubsystemInteropEngine` in `src/distro/` to define policies, adapter capabilities, and events for cross-subsystem interoperability.
-- Added the V18 universal package ingestion and Linux/BSD packaging pipeline components; see [Package Management](17-Package-Management).
+- Package-management status and roadmap: see [Packaging](09-Packaging.md).
 - Expanded the Linux/BSD distro subsystem integration in `src/distro/linux_bsd_inspirations.rs`.
 - Expanded the master distro harmonizer to cover 90 distro modes across the integrated Linux and BSD subsystem set.
 - Added EEVDF scheduling primitives and io_uring interfaces with `alloc` support in the main branch.

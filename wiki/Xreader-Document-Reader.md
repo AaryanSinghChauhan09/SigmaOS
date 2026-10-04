@@ -91,4 +91,4 @@ rustc --test src/media/sovereign_document_reader.rs \
 
 - [Xed Code Editor](Xed-Code-Editor.md) — shares the Zig rope buffer
 - [Low-Level Languages and FFI](Low-Level-Languages-and-FFI.md) — Zig/Nim integration details
-- [Desktop Environment](Desktop-Environment.md) — theming integration
+- [Desktop](08-Desktop.md) — theming integration

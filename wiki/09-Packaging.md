@@ -1,6 +1,6 @@
 # Packaging
 
-SigmaPkg is SigmaOS's universal package manager for Linux and BSD package formats. The V18 package advancement suite adds multi-format manifest ingestion, a Linux/BSD packaging bridge, and transactional checkpoints; see [Package Management](17-Package-Management) for the subsystem details.
+SigmaPkg is SigmaOS's package-management component. This page is the canonical home for packaging, installation, updates, reference comparisons, verification status, and its future roadmap. Format ingestion or a transaction model does not establish safe end-to-end package installation.
 
 ## Package Management
 

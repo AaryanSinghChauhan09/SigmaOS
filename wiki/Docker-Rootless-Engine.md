@@ -95,4 +95,4 @@ rustc --test src/system/omarchy_docker_rootless_engine.rs \
 
 - [Container Virtualization](Container-Virtualization.md) — OCI/Podman architecture
 - [Init and Services](Init-and-Services.md) — systemd user unit integration
-- [Security and Hardening](Security-and-Hardening.md) — privilege isolation
+- [Security](07-Security.md) — privilege isolation

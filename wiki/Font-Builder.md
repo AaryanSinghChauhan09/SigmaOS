@@ -92,6 +92,6 @@ echo "Total variants: ", builder.totalVariantCount()
 
 ## Related Components
 
-- [Desktop Environment](Desktop-Environment.md) — GTK / Hyprland font config
+- [Desktop](08-Desktop.md) — GTK / Hyprland font config
 - [Theming Guide](Theming-Guide.md) — font choices per theme
 - [Low-Level Languages and FFI](Low-Level-Languages-and-FFI.md) — Nim build system
