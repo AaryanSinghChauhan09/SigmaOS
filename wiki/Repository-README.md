@@ -148,7 +148,7 @@ Follow [CONTRIBUTING.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/ma
 
 | Document | Description |
 |----------|-------------|
-| [docs/PRODUCT_VISION.md](docs/PRODUCT_VISION.md) | Product vision and manifesto |
+| [docs/PRODUCT_VISION.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/PRODUCT_VISION.md) | Product vision and manifesto |
 | [docs/PROJECT_STATUS.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/docs/PROJECT_STATUS.md) | Verified checks, release blockers, and next milestones |
 | [FEATURE_STATUS.toml](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/FEATURE_STATUS.toml) | Component capability inventory |
 | [FUTURE-DEVELOPMENT-ROADMAP.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/FUTURE-DEVELOPMENT-ROADMAP.md) | Development roadmap |
