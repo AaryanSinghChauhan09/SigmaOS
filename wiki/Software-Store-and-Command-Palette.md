@@ -2,29 +2,38 @@
 
 ## Current capability
 
-`src/desktop/mint_software_store.rs` is a catalog/search and permission-model prototype inspired by Linux Mint Software Manager. Its three seeded listings are illustrative examples: versions, sizes, ratings, and verification are deliberately marked unknown or unavailable. The component does not fetch repository metadata, verify signatures, download packages, install/remove files, or launch applications.
+`src/desktop/mint_software_store.rs` is a catalog/search and permission-model prototype inspired by Linux Mint Software Manager. Its seeded listings are illustrative and deliberately mark versions, sizes, ratings, and developer verification as unknown or unavailable. The component does not fetch repository metadata, verify package signatures, download packages, install/remove files, or enforce sandbox permissions.
 
-Install, remove, and batch-install methods now return an explicit unavailable-backend error and leave installed state unchanged. Delta-size estimation also reports unavailable until it has measured package-diff data. Permission auditing and hardening modify only the in-memory catalog model; they do not configure a real sandbox.
+Install, remove, and batch-install methods fail clearly when no transactional backend exists, and leave installed state unchanged. Delta-size estimation returns unavailable without measured package-diff data.
 
-Tests in the source cover catalog search, fail-closed install/remove behavior, unchanged state after a failed batch operation, and model-only permission operations. Run with:
+`src/desktop/launcher.rs` implements an in-memory keyboard-palette query model. It ranks app/window/action/clipboard matches and evaluates basic arithmetic. It does not execute commands, launch apps, switch compositor windows, or connect to a system clipboard service. Clipboard data remains in memory only; callers can clear history explicitly.
+
+The launcher regression suite covers UTF-8-safe previews, stable unique history IDs through eviction and clearing, zero-capacity behavior, multi-mode query behavior, and calculator behavior:
 
 ```sh
-cargo test --lib desktop::mint_software_store::tests -- --nocapture
+rustc --edition=2021 --test src/desktop/launcher.rs -o /tmp/sigmaos_launcher_tests
+/tmp/sigmaos_launcher_tests
+```
+
+The software-store module tests can be run independently with:
+
+```sh
+rustc --edition=2021 --test src/desktop/mint_software_store.rs -o /tmp/sigmaos_store_tests
+/tmp/sigmaos_store_tests
 ```
 
 ## Design references
 
-- **Arch Linux:** keep package build recipes, source, dependencies, and signing metadata inspectable. SigmaOS must not present a package as installable without a verified recipe and repository artifact.
-- **Linux Mint:** make search, install impact, permission choices, update status, and recovery understandable in the UI. Human-readable catalog presentation is not evidence that installation works.
-- **Omarchy:** expose keyboard-first application discovery and documented commands. Keep palette actions limited to operations that are wired to real system services.
+- **Arch Linux:** keep package recipes, dependencies, provenance, and system changes inspectable. Never show catalog metadata as proof a package is installed or trusted.
+- **Linux Mint:** make onboarding, permissions, update impact, and recovery understandable. Present unknown metadata honestly and provide a clear way to remove sensitive clipboard history.
+- **Omarchy:** make keyboard-first application discovery and documented commands easy to reach. Bind palette results to real service APIs before making an action executable.
 
 ## Roadmap
 
-1. Define a signed repository format, reproducible package recipe, provenance fields, and explicit supported architecture/repository policy.
-2. Implement a transactional backend with signature and dependency validation, staged writes, cancellation, rollback, and durable installed-state reconciliation.
-3. Connect the UI to that backend; show unknown metadata as unknown and permission changes before install.
-4. Implement updates and rollback, including interrupted-transaction recovery and offline repair.
-5. Add package fixture tests for corrupt signatures, missing dependencies, interrupted writes, and rollback; then test clean installs and updates on disposable QEMU disks.
-6. Add an Omarchy-inspired keyboard command palette only after application launching and system actions have working service APIs and failure reporting.
+1. Define signed repository metadata, reproducible package recipes, architecture policy, and provenance.
+2. Build a transactional package backend with signature/dependency verification, staged writes, cancellation, rollback, and installed-state reconciliation.
+3. Wire the command palette to app launch, compositor window focus, clipboard, and privileged system-action APIs. Do not pass shell command strings to a shell.
+4. Add user-visible permission review, clipboard retention controls, accessibility review, keyboard-only workflows, and actionable error reporting.
+5. Validate clean install, package update/removal rollback, offline recovery, and desktop first-login on the supported QEMU target before claiming desktop readiness.
 
-No package manager, application installation, sandbox enforcement, or command palette integration is currently supported. Gate each capability on its implementation and end-to-end evidence, following the project-wide release plan.
+Package installation, sandbox enforcement, clipboard-service integration, command execution, and a usable graphical desktop are not currently supported. Treat Linux and BSD distributions as design references, and promote each capability only after runtime wiring and relevant test evidence exist.

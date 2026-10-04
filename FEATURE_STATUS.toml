@@ -1,5 +1,5 @@
 # SigmaOS Feature Inventory — Development Status (Not a Release Support Matrix)
-# Updated: 2026-10-03
+# Updated: 2026-10-04
 # Scope: Entries track implementation or module-level test evidence, not general OS readiness.
 # A passing unit test does not establish kernel/runtime integration, bootability, or hardware support.
 # Values such as "working" are legacy component statuses; use docs/PROJECT_STATUS.md and
@@ -147,10 +147,11 @@ test_evidence = "Unit tests pass"
 next_milestone = "Real framebuffer rendering"
 
 [desktop.launcher]
-status = "working"
+status = "prototype"
 files = ["src/desktop/launcher.rs"]
-description = "Omarchy-inspired command palette with fuzzy search"
-test_evidence = "Unit tests pass"
+description = "In-memory keyboard palette query model with app, window, action, calculator, and clipboard results"
+test_evidence = "Standalone rustc test harness: 6 passed; no compositor, app-launch, command-execution, or clipboard-service integration"
+next_milestone = "Connect query results to real app-launch and compositor services with explicit error handling"
 
 [desktop.notification]
 status = "working"

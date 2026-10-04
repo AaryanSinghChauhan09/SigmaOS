@@ -1,9 +1,9 @@
 //! SigmaOS Command Palette & Universal Launcher (Phase 4 / Omarchy Enhanced)
 //!
-//! Inspired by Omarchy's keyboard-first Walker / Rofi unified launcher:
-//! - Multi-mode search: Applications, Inline Calculator, System Actions, Clipboard History, Window Switcher
-//! - Fuzzy scoring algorithm with priority weighting
-//! - Zero-allocation friendly parsing and fast lookup
+//! Inspired by Omarchy's keyboard-first launcher workflow:
+//! - In-memory query modes for apps, calculator, actions, clipboard, and windows
+//! - Prefix/substring ranking with launch-count weighting
+//! - Results are models; runtime action dispatch is not implemented here
 
 #![allow(dead_code)]
 
@@ -77,6 +77,7 @@ pub struct CommandPalette {
     pub open_windows: Vec<WindowEntry>,
     pub clipboard_history: VecDeque<ClipboardSnippet>,
     pub max_clipboard_entries: usize,
+    next_clipboard_id: u64,
     pub is_open: bool,
 }
 
@@ -88,6 +89,7 @@ impl CommandPalette {
             open_windows: Vec::new(),
             clipboard_history: VecDeque::new(),
             max_clipboard_entries: 50,
+            next_clipboard_id: 1,
             is_open: false,
         };
         palette.register_default_system_actions();
@@ -192,18 +194,27 @@ impl CommandPalette {
 
     /// Push text to clipboard history
     pub fn push_clipboard(&mut self, content: &str, timestamp: u64) {
-        if content.trim().is_empty() {
+        if content.trim().is_empty() || self.max_clipboard_entries == 0 {
             return;
         }
+        let Some(next_id) = self.next_clipboard_id.checked_add(1) else {
+            return;
+        };
         if self.clipboard_history.len() >= self.max_clipboard_entries {
             self.clipboard_history.pop_back();
         }
-        let snippet_id = self.clipboard_history.len() as u64 + 1;
+        let snippet_id = self.next_clipboard_id;
+        self.next_clipboard_id = next_id;
         self.clipboard_history.push_front(ClipboardSnippet {
             snippet_id,
             content: content.to_string(),
             timestamp,
         });
+    }
+
+    /// Clear sensitive clipboard history while leaving the monotonic ID sequence intact.
+    pub fn clear_clipboard_history(&mut self) {
+        self.clipboard_history.clear();
     }
 
     /// Unified fuzzy search across all active modes
@@ -293,11 +304,7 @@ impl CommandPalette {
                 .to_lowercase();
             for snippet in &self.clipboard_history {
                 if snippet.content.to_lowercase().contains(&cb_q) {
-                    let preview = if snippet.content.len() > 60 {
-                        format!("{}...", &snippet.content[..60])
-                    } else {
-                        snippet.content.clone()
-                    };
+                    let preview = Self::clipboard_preview(&snippet.content, 60);
                     results.push(SearchResultItem {
                         title: preview,
                         subtitle: "Paste from Clipboard History".to_string(),
@@ -345,6 +352,22 @@ impl CommandPalette {
         // Sort descending by score
         results.sort_by(|a, b| b.score.cmp(&a.score));
         results
+    }
+
+    fn clipboard_preview(content: &str, max_bytes: usize) -> String {
+        let mut boundary = 0;
+        for (index, character) in content.char_indices() {
+            let end = index + character.len_utf8();
+            if end > max_bytes {
+                break;
+            }
+            boundary = end;
+        }
+        if boundary < content.len() {
+            format!("{}...", &content[..boundary])
+        } else {
+            content.to_string()
+        }
     }
 
     /// Legacy fuzzy search compatibility wrapper
@@ -483,5 +506,42 @@ mod tests {
         let cb_results = palette.query("cb SigmaOS");
         assert_eq!(cb_results.len(), 1);
         assert_eq!(cb_results[0].mode, LauncherMode::Clipboard);
+    }
+
+    #[test]
+    fn clipboard_previews_preserve_utf8_boundaries() {
+        let mut palette = CommandPalette::new();
+        let content = "é".repeat(40);
+        palette.push_clipboard(&content, 1);
+        let results = palette.query("cb é");
+        assert_eq!(results.len(), 1);
+        assert_eq!(results[0].title, format!("{}...", "é".repeat(30)));
+    }
+
+    #[test]
+    fn clipboard_history_ids_stay_unique_after_eviction_and_clear() {
+        let mut palette = CommandPalette::new();
+        palette.max_clipboard_entries = 2;
+        palette.push_clipboard("first", 1);
+        palette.push_clipboard("second", 2);
+        palette.push_clipboard("third", 3);
+        let ids: Vec<u64> = palette
+            .clipboard_history
+            .iter()
+            .map(|entry| entry.snippet_id)
+            .collect();
+        assert_eq!(ids, [3, 2]);
+
+        palette.clear_clipboard_history();
+        palette.push_clipboard("after clear", 4);
+        assert_eq!(palette.clipboard_history[0].snippet_id, 4);
+    }
+
+    #[test]
+    fn zero_capacity_disables_clipboard_history() {
+        let mut palette = CommandPalette::new();
+        palette.max_clipboard_entries = 0;
+        palette.push_clipboard("private text", 1);
+        assert!(palette.clipboard_history.is_empty());
     }
 }

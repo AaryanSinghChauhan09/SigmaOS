@@ -1,5 +1,7 @@
 # Desktop
 
+> **Status:** This page describes a proposed desktop interface, not a supported SigmaOS desktop. There is no verified boot-to-graphical-session path. The snippets and shortcuts below are design targets and must not be treated as working commands until wired to tested services.
+
 SigmaOS features the Zenith desktop environment for a modern, performant user experience.
 
 ## Zenith Compositor
