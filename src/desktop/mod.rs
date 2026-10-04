@@ -104,3 +104,6 @@ pub mod system_tray;
 pub mod sovereign_bulky_batch_renamer; pub use sovereign_bulky_batch_renamer::*;
 pub mod omarchy_disktree_inspector; pub use omarchy_disktree_inspector::*;
 pub mod omarchy_chord_rebind_engine; pub use omarchy_chord_rebind_engine::*;
+pub mod sovereign_xed_code_editor; pub use sovereign_xed_code_editor::*;
+pub mod omarchy_autosave_capture_engine; pub use omarchy_autosave_capture_engine::*;
+pub mod omarchy_browser_theme_sync; pub use omarchy_browser_theme_sync::*;

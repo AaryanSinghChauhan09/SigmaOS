@@ -53,3 +53,6 @@ pub use sovereign_video_editor::{
 
 pub mod sovereign_hypnotix_stream_engine;
 pub use sovereign_hypnotix_stream_engine::*;
+
+pub mod sovereign_document_reader;
+pub use sovereign_document_reader::*;

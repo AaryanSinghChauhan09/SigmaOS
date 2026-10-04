@@ -113,3 +113,6 @@ pub use user::{Group, ShadowEntry, SudoPolicyEngine, SudoersRule, User, UserErro
 pub mod atomic_upgrade;
 
 pub mod runit_supervisor;
+
+pub mod omarchy_atreyu_system_plugin;
+pub use omarchy_atreyu_system_plugin::*;

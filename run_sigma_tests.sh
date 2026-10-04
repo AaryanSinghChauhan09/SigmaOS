@@ -563,4 +563,39 @@ if [ -f "src/ai/omarchy_multi_agent_provider.rs" ]; then
     ./build/test_multi_agent
 fi
 
+if [ -f "src/media/sovereign_document_reader.rs" ]; then
+    echo "Running Sovereign Document Reader test suite..."
+    mkdir -p build
+    rustc --test src/media/sovereign_document_reader.rs --edition=2021 -o build/test_doc_reader
+    ./build/test_doc_reader
+fi
+
+if [ -f "src/desktop/sovereign_xed_code_editor.rs" ]; then
+    echo "Running Sovereign Xed Code Editor test suite..."
+    mkdir -p build
+    rustc --test src/desktop/sovereign_xed_code_editor.rs --edition=2021 -o build/test_xed
+    ./build/test_xed
+fi
+
+if [ -f "src/desktop/omarchy_autosave_capture_engine.rs" ]; then
+    echo "Running Sovereign Autosave Capture Engine test suite..."
+    mkdir -p build
+    rustc --test src/desktop/omarchy_autosave_capture_engine.rs --edition=2021 -o build/test_capture
+    ./build/test_capture
+fi
+
+if [ -f "src/system/omarchy_atreyu_system_plugin.rs" ]; then
+    echo "Running Sovereign Atreyu System Plugin test suite..."
+    mkdir -p build
+    rustc --test src/system/omarchy_atreyu_system_plugin.rs --edition=2021 -o build/test_atreyu
+    ./build/test_atreyu
+fi
+
+if [ -f "src/desktop/omarchy_browser_theme_sync.rs" ]; then
+    echo "Running Sovereign Browser Theme Sync test suite..."
+    mkdir -p build
+    rustc --test src/desktop/omarchy_browser_theme_sync.rs --edition=2021 -o build/test_browser_sync
+    ./build/test_browser_sync
+fi
+
 echo "All SigmaOS test suites completed."

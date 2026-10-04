@@ -36,3 +36,8 @@ Welcome to the SigmaOS Wiki! Here are the core components:
 - [DiskTree-and-Storage-Analysis](./DiskTree-and-Storage-Analysis.md)
 - [Modal-Keybindings-and-Chord-Rebind](./Modal-Keybindings-and-Chord-Rebind.md)
 - [Multi-Agent-Provider-Orchestration](./Multi-Agent-Provider-Orchestration.md)
+- [Xreader-Document-Reader](./Xreader-Document-Reader.md)
+- [Xed-Code-Editor](./Xed-Code-Editor.md)
+- [Autosave-Capture-Engine](./Autosave-Capture-Engine.md)
+- [Atreyu-System-Plugin](./Atreyu-System-Plugin.md)
+- [Browser-Theme-Sync](./Browser-Theme-Sync.md)
