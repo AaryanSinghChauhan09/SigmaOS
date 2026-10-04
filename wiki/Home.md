@@ -27,3 +27,7 @@ Welcome to the SigmaOS Wiki! Here are the core components:
 - [Performance-Benchmarks](./Performance-Benchmarks.md)
 - [Theming-Guide](./Theming-Guide.md)
 - [Installer-Guide](./Installer-Guide.md)
+- [Low-Level-Languages-and-FFI](./Low-Level-Languages-and-FFI.md)
+- [Zig-Vulkan-GPU-Acceleration](./Zig-Vulkan-GPU-Acceleration.md)
+- [Nim-P2P-Mesh-and-Tooling](./Nim-P2P-Mesh-and-Tooling.md)
+- [Sovereign-Apex-Supremacy-Matrix](./Sovereign-Apex-Supremacy-Matrix.md)

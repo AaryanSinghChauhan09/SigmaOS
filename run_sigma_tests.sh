@@ -521,4 +521,11 @@ if [ -f "src/theming/omarchy_theme_suite.rs" ]; then
     ./build/test_theming
 fi
 
+if [ -f "src/compatibility/sovereign_apex_mint_omarchy_supremacy.rs" ]; then
+    echo "Running Sovereign Apex Mint & Omarchy Supremacy test suite..."
+    mkdir -p build
+    rustc --test src/compatibility/sovereign_apex_mint_omarchy_supremacy.rs --edition=2021 -o build/test_apex
+    ./build/test_apex
+fi
+
 echo "All SigmaOS test suites completed."

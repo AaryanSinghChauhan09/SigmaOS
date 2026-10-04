@@ -300,3 +300,4 @@ pub use mint_tools_supremacy::*;
 pub use crate::stubs::compat_stubs::*;
 pub mod omarchy_supreme_engine; pub use omarchy_supreme_engine::*;
 pub mod linuxmint_xapp_supreme_engine; pub use linuxmint_xapp_supreme_engine::*;
+pub mod sovereign_apex_mint_omarchy_supremacy; pub use sovereign_apex_mint_omarchy_supremacy::*;
