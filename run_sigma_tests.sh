@@ -51,6 +51,13 @@ if [ -f "src/memory/kswapd.rs" ]; then
     ./build/kswapd_test
 fi
 
+if [ -f "src/filesystem/btrfs.rs" ]; then
+    echo "Running Btrfs metadata and fail-closed backend test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/filesystem/btrfs.rs -o build/btrfs_test
+    ./build/btrfs_test
+fi
+
 if [ -f "src/distro/linux_bsd_inspirations.rs" ]; then
     echo "Running Linux & BSD distro inspirations & subsystem bridge test suite..."
     mkdir -p build

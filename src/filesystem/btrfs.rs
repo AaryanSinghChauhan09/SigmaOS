@@ -1,5 +1,8 @@
-//! Btrfs (B-tree Filesystem) - Copy-on-Write Filesystem
-//! Inspired by Linux Btrfs with snapshots, compression, and RAID support
+//! Btrfs metadata prototype inspired by the Linux Btrfs filesystem.
+//!
+//! Snapshot and transaction metadata is held in memory. This module is not a
+//! mountable disk filesystem: block-device operations return `Unsupported`
+//! until a real I/O backend is connected and validated.
 //! Reference: Linux fs/btrfs/ subsystem
 
 #![no_std]
@@ -114,7 +117,7 @@ pub struct BtrfsSnapshot {
     pub name: Vec<u8>,
 }
 
-/// Main Btrfs filesystem driver
+/// In-memory Btrfs metadata model; not a block-device filesystem driver.
 pub struct BtrfsFilesystem {
     superblock: BtrfsSuperblock,
     generation: AtomicU64,
@@ -146,15 +149,13 @@ impl BtrfsFilesystem {
         }
     }
 
-    /// Mount Btrfs filesystem from device
-    pub fn mount(&mut self, device: u64) -> Result<(), BtrfsError> {
-        // Read superblock from device
-        // In real implementation: read from block device
-        self.superblock.num_devices = 1;
-        Ok(())
+    /// Mount from a block device; returns `Unsupported` without a backend.
+    pub fn mount(&mut self, _device: u64) -> Result<(), BtrfsError> {
+        // Mounting requires a block-device backend, which is not connected yet.
+        Err(BtrfsError::Unsupported)
     }
 
-    /// Create new snapshot (Copy-on-Write)
+    /// Record in-memory snapshot metadata (no on-disk CoW is performed).
     pub fn create_snapshot(&mut self, source_root: u64, name: &[u8]) -> Result<u64, BtrfsError> {
         let snapshot_id = self.generation.fetch_add(1, Ordering::SeqCst);
         let snapshot = BtrfsSnapshot {
@@ -190,43 +191,36 @@ impl BtrfsFilesystem {
         Ok(())
     }
 
-    /// Read file extent with CoW
+    /// Read an extent; returns `Unsupported` until block I/O is implemented.
     pub fn read_extent(
         &self,
-        extent: &BtrfsFileExtentItem,
-        offset: u64,
-        buffer: &mut [u8],
+        _extent: &BtrfsFileExtentItem,
+        _offset: u64,
+        _buffer: &mut [u8],
     ) -> Result<usize, BtrfsError> {
-        // In real implementation: read from disk with CoW redirect
-        Ok(buffer.len())
+        // Returning success without reading bytes would make callers trust stale data.
+        Err(BtrfsError::Unsupported)
     }
 
-    /// Write file extent with CoW (allocate new extent)
+    /// Write an extent; returns `Unsupported` until allocation and block I/O exist.
     pub fn write_extent(
         &mut self,
-        extent: &mut BtrfsFileExtentItem,
-        offset: u64,
-        data: &[u8],
+        _extent: &mut BtrfsFileExtentItem,
+        _offset: u64,
+        _data: &[u8],
     ) -> Result<(), BtrfsError> {
-        // CoW: allocate new extent instead of overwriting
-        let new_generation = self.generation.load(Ordering::SeqCst);
-        extent.generation = new_generation;
-        // In real implementation: allocate from chunk tree and write data
-        Ok(())
+        // Do not advance metadata when no extent allocation or device write occurred.
+        Err(BtrfsError::Unsupported)
     }
 
-    /// Balance filesystem (redistribute chunks)
+    /// Balance chunks; returns `Unsupported` until storage operations are implemented.
     pub fn balance(&mut self) -> Result<(), BtrfsError> {
-        // Inspired by Linux btrfs balance operation
-        // Redistribute data across devices for RAID
-        Ok(())
+        Err(BtrfsError::Unsupported)
     }
 
-    /// Scrub filesystem (verify checksums)
+    /// Scrub extents; returns `Unsupported` until storage and checksum verification exist.
     pub fn scrub(&self) -> Result<u64, BtrfsError> {
-        // Verify SHA256 checksums on all blocks
-        let errors_found = 0u64;
-        Ok(errors_found)
+        Err(BtrfsError::Unsupported)
     }
 
     /// Get filesystem statistics
@@ -261,6 +255,7 @@ pub enum BtrfsError {
     IoError,
     NoSpace,
     CorruptedMetadata,
+    Unsupported,
 }
 
 /// Compression type enumeration
@@ -311,5 +306,36 @@ mod tests {
         let trans1 = fs.begin_transaction();
         let trans2 = fs.begin_transaction();
         assert!(trans2 > trans1);
+    }
+
+    #[test]
+    fn test_unwired_device_operations_fail_closed_without_mutation() {
+        let mut fs = BtrfsFilesystem::new();
+        let mut extent = BtrfsFileExtentItem {
+            generation: 7,
+            ram_bytes: 4,
+            compression: BtrfsCompression::None as u8,
+            encryption: 0,
+            extent_type: 0,
+            disk_bytenr: 0,
+            disk_num_bytes: 4,
+            offset: 0,
+            num_bytes: 4,
+        };
+        let mut buffer = [0u8; 4];
+
+        assert_eq!(fs.mount(1), Err(BtrfsError::Unsupported));
+        assert_eq!(
+            fs.read_extent(&extent, 0, &mut buffer),
+            Err(BtrfsError::Unsupported)
+        );
+        assert_eq!(
+            fs.write_extent(&mut extent, 0, b"data"),
+            Err(BtrfsError::Unsupported)
+        );
+        assert_eq!(fs.balance(), Err(BtrfsError::Unsupported));
+        assert_eq!(fs.scrub(), Err(BtrfsError::Unsupported));
+        assert_eq!(extent.generation, 7);
+        assert_eq!(fs.get_stats().generation, 1);
     }
 }
