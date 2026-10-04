@@ -24,6 +24,8 @@ These are inspiration sources for design review. They are not a feature-support 
 
 See [Inspiration and Reference Projects](Inspiration-and-References.md) for adaptation guidance. Keep behavior and future work on the owning component page, supported by source links and reproducible checks.
 
+See the [Arch, Mint, and Omarchy development plan](Repository-docs-LINUX-MINT-OMARCHY-INSPIRED-DEVELOPMENT-PLAN) for gated milestones; it is a proposal, not a support statement.
+
 ## Component documentation
 
 - [Kernel](04-Kernel)

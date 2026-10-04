@@ -31,3 +31,5 @@ Each core OS component page is the canonical home for implementation status, ref
 ## Reference projects
 
 See [Inspiration and Reference Projects](./Inspiration-and-References.md). Adaptations and validation criteria belong on the relevant component page; do not present reference-project capabilities as SigmaOS capabilities.
+
+See the [Arch, Mint, and Omarchy development plan](./Repository-docs-LINUX-MINT-OMARCHY-INSPIRED-DEVELOPMENT-PLAN.md) for gated milestones; it is a proposal, not a support statement.
