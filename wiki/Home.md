@@ -60,6 +60,7 @@ SigmaOS is an operating-system development project with kernel, storage, network
 | 45 | [Security and Hardening](Security-and-Hardening) | Detailed security reference |
 | 46 | [Virtualization and Containers](Virtualization-and-Containers) | Detailed virtualization reference |
 | 47 | [Mint & Omarchy Launch Supremacy](Mint-and-Omarchy-Launch-Supremacy) | Kernel regression watchdog, locale IME, Cinnamon applet sandbox, Omarchy declarative rules & launch certification |
+| 48 | [Mint & Omarchy Hardware & Audio Supremacy](Mint-and-Omarchy-Hardware-and-Audio-Supremacy) | Driver manager with MOK enrollment, 1.33ms studio audio DSP, handheld TDP optimizer & fuzzy launcher |
 
 ## Component Future-Development Roadmaps
 
