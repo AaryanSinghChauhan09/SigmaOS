@@ -93,7 +93,7 @@ impl MintSoftwareStoreEngine {
                 summary: "Fast, private, and secure web browsing".into(),
                 description: "The free and open-source web browser developed by Mozilla.".into(),
                 category: "Internet".into(),
-                version: "130.0".into(),
+                version: "unknown".into(),
                 format: PackageFormat::FlatpakFlathub,
                 permissions: SandboxPermissions {
                     network_access: true,
@@ -104,16 +104,14 @@ impl MintSoftwareStoreEngine {
                     audio_pipewire_playback: true,
                     camera_microphone_access: true,
                 },
-                download_size_bytes: 85_000_000,
-                installed_size_bytes: 240_000_000,
-                rating_score: 4.8,
-                total_reviews_count: 12450,
-                is_verified_developer: true,
-                is_installed: true,
+                download_size_bytes: 0,
+                installed_size_bytes: 0,
+                rating_score: 0.0,
+                total_reviews_count: 0,
+                is_verified_developer: false,
+                is_installed: false,
             },
         );
-        self.installed_apps.push("org.mozilla.firefox".into());
-
         self.catalog.insert(
             "org.gimp.GIMP".into(),
             StoreAppListing {
@@ -123,7 +121,7 @@ impl MintSoftwareStoreEngine {
                 description: "GNU Image Manipulation Program for photo retouching and authoring."
                     .into(),
                 category: "Graphics".into(),
-                version: "3.0.0-RC1".into(),
+                version: "unknown".into(),
                 format: PackageFormat::FlatpakFlathub,
                 permissions: SandboxPermissions {
                     network_access: false,
@@ -134,11 +132,11 @@ impl MintSoftwareStoreEngine {
                     audio_pipewire_playback: false,
                     camera_microphone_access: false,
                 },
-                download_size_bytes: 140_000_000,
-                installed_size_bytes: 380_000_000,
-                rating_score: 4.6,
-                total_reviews_count: 8320,
-                is_verified_developer: true,
+                download_size_bytes: 0,
+                installed_size_bytes: 0,
+                rating_score: 0.0,
+                total_reviews_count: 0,
+                is_verified_developer: false,
                 is_installed: false,
             },
         );
@@ -153,7 +151,7 @@ impl MintSoftwareStoreEngine {
                     "Lightweight but powerful source code editor with built-in Git and debugging."
                         .into(),
                 category: "Development".into(),
-                version: "1.93.0".into(),
+                version: "unknown".into(),
                 format: PackageFormat::NativeSigpkg,
                 permissions: SandboxPermissions {
                     network_access: true,
@@ -164,11 +162,11 @@ impl MintSoftwareStoreEngine {
                     audio_pipewire_playback: false,
                     camera_microphone_access: false,
                 },
-                download_size_bytes: 98_000_000,
-                installed_size_bytes: 310_000_000,
-                rating_score: 4.9,
-                total_reviews_count: 34100,
-                is_verified_developer: true,
+                download_size_bytes: 0,
+                installed_size_bytes: 0,
+                rating_score: 0.0,
+                total_reviews_count: 0,
+                is_verified_developer: false,
                 is_installed: false,
             },
         );
@@ -187,35 +185,30 @@ impl MintSoftwareStoreEngine {
             .collect()
     }
 
-    /// Install an application from the store
+    /// Install only when a transactional package backend is available.
+    /// Catalog metadata alone must never be reported as an installed package.
     pub fn install_app(&mut self, app_id: &str) -> Result<String, &'static str> {
         let app = self
             .catalog
-            .get_mut(app_id)
+            .get(app_id)
             .ok_or("Application ID not found in store")?;
         if app.is_installed {
             return Err("Application is already installed");
         }
-        app.is_installed = true;
-        self.installed_apps.push(app_id.to_string());
-        Ok(format!(
-            "Successfully installed '{}' via {:?}",
-            app.name, app.format
-        ))
+        Err("Package installation backend is unavailable")
     }
 
-    /// Uninstall an application
+    /// Uninstall only when a transactional package backend is available.
     pub fn uninstall_app(&mut self, app_id: &str) -> Result<String, &'static str> {
-        let app = self
+        if !self
             .catalog
-            .get_mut(app_id)
-            .ok_or("Application ID not found in store")?;
-        if !app.is_installed {
+            .get(app_id)
+            .ok_or("Application ID not found in store")?
+            .is_installed
+        {
             return Err("Application is not installed");
         }
-        app.is_installed = false;
-        self.installed_apps.retain(|id| id != app_id);
-        Ok(format!("Successfully uninstalled '{}'", app.name))
+        Err("Package removal backend is unavailable")
     }
 
     /// Audit security and calculate safety score (0 - 100)
@@ -237,16 +230,18 @@ impl MintSoftwareStoreEngine {
         Ok(score.max(10) as u32)
     }
 
-    /// Estimate delta download size using zstd compression chunks
+    /// Return a measured delta size when package-diff metadata is available.
     pub fn estimate_delta_download_bytes(&self, app_id: &str) -> Result<u64, &'static str> {
-        let app = self.catalog.get(app_id).ok_or("Application ID not found")?;
-        // Typical zstd delta achieves ~75% reduction on package updates
-        Ok((app.download_size_bytes * 25) / 100)
+        self.catalog.get(app_id).ok_or("Application ID not found")?;
+        Err("Measured package delta metadata is unavailable")
     }
 
     /// Create hardened sandbox permissions by revoking high-risk privileges
     pub fn harden_permissions(&mut self, app_id: &str) -> Result<SandboxPermissions, &'static str> {
-        let app = self.catalog.get_mut(app_id).ok_or("Application ID not found")?;
+        let app = self
+            .catalog
+            .get_mut(app_id)
+            .ok_or("Application ID not found")?;
         app.permissions.full_filesystem_access = false;
         if app.category != "Communications" {
             app.permissions.camera_microphone_access = false;
@@ -254,20 +249,25 @@ impl MintSoftwareStoreEngine {
         Ok(app.permissions.clone())
     }
 
-    /// Atomic batch installation of multiple applications
+    /// Install a batch only through a transactional package backend.
     pub fn batch_install(&mut self, app_ids: &[&str]) -> Result<usize, &'static str> {
         for id in app_ids {
             if !self.catalog.contains_key(*id) {
                 return Err("One or more apps in batch not found");
             }
         }
-        let mut count = 0;
-        for id in app_ids {
-            if self.install_app(id).is_ok() {
-                count += 1;
+        for (index, id) in app_ids.iter().enumerate() {
+            if self.catalog[*id].is_installed {
+                return Err("One or more apps in batch is already installed");
+            }
+            if app_ids[..index].contains(id) {
+                return Err("Duplicate application in install batch");
             }
         }
-        Ok(count)
+        if app_ids.is_empty() {
+            return Ok(0);
+        }
+        Err("Transactional package installation backend is unavailable")
     }
 }
 
@@ -278,24 +278,39 @@ impl Default for MintSoftwareStoreEngine {
 }
 
 #[cfg(test)]
-#[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn test_store_search_and_install() {
+    fn test_store_search_and_install_fails_closed_without_backend() {
         let mut store = MintSoftwareStoreEngine::new();
         let search_results = store.search("graphics");
         assert_eq!(search_results.len(), 1);
         assert_eq!(search_results[0].name, "GIMP Image Editor");
 
-        let res = store.install_app("org.gimp.GIMP");
-        assert!(res.is_ok());
-        assert!(store.installed_apps.contains(&"org.gimp.GIMP".to_string()));
-
-        let uninst = store.uninstall_app("org.gimp.GIMP");
-        assert!(uninst.is_ok());
+        assert_eq!(
+            store.install_app("org.gimp.GIMP"),
+            Err("Package installation backend is unavailable")
+        );
+        assert_eq!(
+            store.uninstall_app("org.mozilla.firefox"),
+            Err("Application is not installed")
+        );
+        assert!(store.installed_apps.is_empty());
+        assert!(!store.catalog["org.gimp.GIMP"].is_installed);
         assert!(!store.installed_apps.contains(&"org.gimp.GIMP".to_string()));
+    }
+
+    #[test]
+    fn failed_batch_install_leaves_catalog_and_installed_state_unchanged() {
+        let mut store = MintSoftwareStoreEngine::new();
+        let result = store.batch_install(&["org.gimp.GIMP", "com.visualstudio.code"]);
+        assert_eq!(
+            result,
+            Err("Transactional package installation backend is unavailable")
+        );
+        assert!(store.installed_apps.is_empty());
+        assert!(store.catalog.values().all(|app| !app.is_installed));
     }
 
     #[test]
@@ -312,13 +327,18 @@ mod tests {
         let score = store.audit_app_security("com.visualstudio.code").unwrap();
         assert!(score < 100);
 
-        let delta = store.estimate_delta_download_bytes("org.mozilla.firefox").unwrap();
-        assert!(delta < 85_000_000);
+        assert_eq!(
+            store.estimate_delta_download_bytes("org.mozilla.firefox"),
+            Err("Measured package delta metadata is unavailable")
+        );
 
         let hardened = store.harden_permissions("com.visualstudio.code").unwrap();
         assert!(!hardened.full_filesystem_access);
 
         let batch_res = store.batch_install(&["org.gimp.GIMP"]);
-        assert_eq!(batch_res.unwrap(), 1);
+        assert_eq!(
+            batch_res,
+            Err("Transactional package installation backend is unavailable")
+        );
     }
 }
