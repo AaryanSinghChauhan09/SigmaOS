@@ -251,6 +251,126 @@ impl SovereignOmarchyDeveloperStacks {
 }
 
 // ============================================================================
+// 4. Sovereign Omarchy VRR Pacing Controller
+// ============================================================================
+
+/// Variable refresh rate pacing mode
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum VrrPacingState {
+    HighPerformanceAdaptive, // e.g. 240Hz / 360Hz
+    DesktopIdleConservative, // e.g. 60Hz
+    VideoSyncTargeted(u32),  // e.g. 24Hz, 48Hz, 60Hz
+}
+
+/// Sovereign VRR Pacing Controller
+#[derive(Debug)]
+pub struct SovereignOmarchyVrrPacingController {
+    current_state: VrrPacingState,
+    max_hz: u32,
+    min_hz: u32,
+    is_fullscreen_game: AtomicBool,
+}
+
+impl SovereignOmarchyVrrPacingController {
+    pub fn new(max_refresh_hz: u32) -> Self {
+        Self {
+            current_state: VrrPacingState::DesktopIdleConservative,
+            max_hz: max_refresh_hz,
+            min_hz: 48, // standard FreeSync/G-Sync LFC floor
+            is_fullscreen_game: AtomicBool::new(false),
+        }
+    }
+
+    pub fn on_window_focus_change(&mut self, is_game: bool) -> u32 {
+        self.is_fullscreen_game.store(is_game, Ordering::SeqCst);
+        if is_game {
+            self.current_state = VrrPacingState::HighPerformanceAdaptive;
+            self.max_hz
+        } else {
+            self.current_state = VrrPacingState::DesktopIdleConservative;
+            60
+        }
+    }
+
+    pub fn current_refresh_rate(&self) -> u32 {
+        match self.current_state {
+            VrrPacingState::HighPerformanceAdaptive => self.max_hz,
+            VrrPacingState::DesktopIdleConservative => 60,
+            VrrPacingState::VideoSyncTargeted(hz) => hz,
+        }
+    }
+}
+
+// ============================================================================
+// 5. Sovereign Steam & Vulkan Shader Precache Manager
+// ============================================================================
+
+/// Shader cache entry record
+#[derive(Debug, Clone)]
+pub struct ShaderCacheEntry {
+    pub app_id: u32,
+    pub title: String,
+    pub cache_size_bytes: u64,
+    pub driver_uuid: String,
+    pub is_valid: bool,
+}
+
+/// Sovereign Shader Precache Manager
+#[derive(Debug)]
+pub struct SovereignSteamShaderPrecacheManager {
+    caches: BTreeMap<u32, ShaderCacheEntry>,
+    current_driver_uuid: String,
+}
+
+impl SovereignSteamShaderPrecacheManager {
+    pub fn new(driver_uuid: &str) -> Self {
+        let mut mgr = Self {
+            caches: BTreeMap::new(),
+            current_driver_uuid: driver_uuid.to_string(),
+        };
+        mgr.init_stock_caches();
+        mgr
+    }
+
+    fn init_stock_caches(&mut self) {
+        let sample = [
+            (1091500, "Cyberpunk 2077", 450_000_000),
+            (1245620, "Elden Ring", 280_000_000),
+            (730, "Counter-Strike 2", 190_000_000),
+        ];
+
+        for (id, title, size) in sample {
+            self.caches.insert(
+                id,
+                ShaderCacheEntry {
+                    app_id: id,
+                    title: title.to_string(),
+                    cache_size_bytes: size,
+                    driver_uuid: self.current_driver_uuid.clone(),
+                    is_valid: true,
+                },
+            );
+        }
+    }
+
+    pub fn on_driver_update(&mut self, new_driver_uuid: &str) -> usize {
+        self.current_driver_uuid = new_driver_uuid.to_string();
+        let mut invalidated = 0;
+        for cache in self.caches.values_mut() {
+            if cache.driver_uuid != self.current_driver_uuid {
+                cache.is_valid = false;
+                invalidated += 1;
+            }
+        }
+        invalidated
+    }
+
+    pub fn total_cache_bytes(&self) -> u64 {
+        self.caches.values().map(|c| c.cache_size_bytes).sum()
+    }
+}
+
+// ============================================================================
 // Unit Tests
 // ============================================================================
 
@@ -300,5 +420,28 @@ mod tests {
         let active = dev.list_active_stacks();
         assert!(active.contains(&"rust"));
         assert!(active.contains(&"zig"));
+    }
+
+    #[test]
+    fn test_vrr_pacing_controller() {
+        let mut vrr = SovereignOmarchyVrrPacingController::new(240);
+        assert_eq!(vrr.current_refresh_rate(), 60);
+
+        let gaming_hz = vrr.on_window_focus_change(true);
+        assert_eq!(gaming_hz, 240);
+        assert_eq!(vrr.current_refresh_rate(), 240);
+
+        let desktop_hz = vrr.on_window_focus_change(false);
+        assert_eq!(desktop_hz, 60);
+        assert_eq!(vrr.current_refresh_rate(), 60);
+    }
+
+    #[test]
+    fn test_shader_precache_manager() {
+        let mut shader_mgr = SovereignSteamShaderPrecacheManager::new("nvidia-560.35.03");
+        assert_eq!(shader_mgr.total_cache_bytes(), 920_000_000);
+
+        let invalidated = shader_mgr.on_driver_update("nvidia-565.57.01");
+        assert_eq!(invalidated, 3);
     }
 }

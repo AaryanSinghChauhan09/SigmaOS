@@ -468,6 +468,175 @@ impl SovereignXAppsManager {
 }
 
 // ============================================================================
+// 6. Sovereign WebApp Manager (Linux Mint webapp-manager Superior)
+// ============================================================================
+
+/// Isolation profile for desktop web applications
+#[derive(Debug, Clone)]
+pub struct WebAppProfile {
+    pub app_id: String,
+    pub name: String,
+    pub target_url: String,
+    pub icon_name: String,
+    pub profile_data_dir: String,
+    pub isolate_cookies: bool,
+    pub suppress_navigation_bar: bool,
+    pub custom_user_agent: Option<String>,
+}
+
+/// Sovereign WebApp Manager
+#[derive(Debug)]
+pub struct SovereignWebAppManager {
+    apps: BTreeMap<String, WebAppProfile>,
+    total_launches: AtomicU64,
+}
+
+impl SovereignWebAppManager {
+    pub fn new() -> Self {
+        let mut mgr = Self {
+            apps: BTreeMap::new(),
+            total_launches: AtomicU64::new(0),
+        };
+        mgr.init_stock_apps();
+        mgr
+    }
+
+    fn init_stock_apps(&mut self) {
+        let sample = [
+            ("web-youtube-music", "YouTube Music", "https://music.youtube.com", "multimedia-audio-player"),
+            ("web-discord", "Discord", "https://discord.com/app", "chat-message"),
+            ("web-github", "GitHub Enterprise", "https://github.com", "code-fork"),
+        ];
+
+        for (id, name, url, icon) in sample {
+            self.apps.insert(
+                id.to_string(),
+                WebAppProfile {
+                    app_id: id.to_string(),
+                    name: name.to_string(),
+                    target_url: url.to_string(),
+                    icon_name: icon.to_string(),
+                    profile_data_dir: format!("/home/user/.local/share/sigma-webapps/{}", id),
+                    isolate_cookies: true,
+                    suppress_navigation_bar: true,
+                    custom_user_agent: None,
+                },
+            );
+        }
+    }
+
+    pub fn register_app(&mut self, profile: WebAppProfile) {
+        self.apps.insert(profile.app_id.clone(), profile);
+    }
+
+    pub fn remove_app(&mut self, app_id: &str) -> bool {
+        self.apps.remove(app_id).is_some()
+    }
+
+    pub fn launch_app(&self, app_id: &str) -> Result<String, &'static str> {
+        if let Some(app) = self.apps.get(app_id) {
+            self.total_launches.fetch_add(1, Ordering::Relaxed);
+            Ok(format!("Spawned isolated webapp '{}' -> {}", app.name, app.target_url))
+        } else {
+            Err("WebApp ID not found")
+        }
+    }
+
+    pub fn total_apps(&self) -> usize {
+        self.apps.len()
+    }
+}
+
+// ============================================================================
+// 7. Sovereign Keyboard Shortcut Remapper (Linux Mint Keyboard Superior)
+// ============================================================================
+
+/// Key modifier flags
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct KeyModifiers {
+    pub ctrl: bool,
+    pub alt: bool,
+    pub shift: bool,
+    pub super_key: bool,
+}
+
+/// Remapped hotkey action
+#[derive(Debug, Clone)]
+pub struct CustomShortcutAction {
+    pub shortcut_id: String,
+    pub keycode: u32,
+    pub modifiers: KeyModifiers,
+    pub command: String,
+    pub is_enabled: bool,
+}
+
+/// Sovereign Keyboard Remapper Engine
+#[derive(Debug)]
+pub struct SovereignKeyboardShortcutRemapper {
+    shortcuts: BTreeMap<String, CustomShortcutAction>,
+    caps_lock_as_ctrl: AtomicBool,
+    gaming_mode_suppression: AtomicBool,
+}
+
+impl SovereignKeyboardShortcutRemapper {
+    pub fn new() -> Self {
+        let mut remapper = Self {
+            shortcuts: BTreeMap::new(),
+            caps_lock_as_ctrl: AtomicBool::new(true), // Default power-user swap
+            gaming_mode_suppression: AtomicBool::new(false),
+        };
+        remapper.register_stock_shortcuts();
+        remapper
+    }
+
+    fn register_stock_shortcuts(&mut self) {
+        let stock = [
+            ("launch-term", 36, true, false, false, true, "sigma-term"), // Super+Enter
+            ("launch-browser", 48, false, false, false, true, "sigma-browser"), // Super+B
+            ("lock-session", 38, true, true, false, false, "sigma-lock"), // Ctrl+Alt+L
+        ];
+
+        for (id, code, ctrl, alt, shift, sup, cmd) in stock {
+            self.shortcuts.insert(
+                id.to_string(),
+                CustomShortcutAction {
+                    shortcut_id: id.to_string(),
+                    keycode: code,
+                    modifiers: KeyModifiers { ctrl, alt, shift, super_key: sup },
+                    command: cmd.to_string(),
+                    is_enabled: true,
+                },
+            );
+        }
+    }
+
+    pub fn set_caps_as_ctrl(&self, enable: bool) {
+        self.caps_lock_as_ctrl.store(enable, Ordering::SeqCst);
+    }
+
+    pub fn is_caps_as_ctrl(&self) -> bool {
+        self.caps_lock_as_ctrl.load(Ordering::Relaxed)
+    }
+
+    pub fn set_gaming_suppression(&self, suppress: bool) {
+        self.gaming_mode_suppression.store(suppress, Ordering::SeqCst);
+    }
+
+    pub fn evaluate_shortcut(&self, keycode: u32, mods: KeyModifiers) -> Option<&str> {
+        if self.gaming_mode_suppression.load(Ordering::Relaxed) {
+            return None; // Suppress desktop hotkeys during full-screen gaming
+        }
+
+        for action in self.shortcuts.values() {
+            if action.is_enabled && action.keycode == keycode && action.modifiers == mods {
+                return Some(&action.command);
+            }
+        }
+        None
+    }
+}
+
+// ============================================================================
 // Unit Tests
 // ============================================================================
 
@@ -539,5 +708,27 @@ mod tests {
 
         xapps.register_tray_icon("warpinator-tray");
         assert_eq!(xapps.status_tray_icons.len(), 1);
+    }
+
+    #[test]
+    fn test_webapp_manager() {
+        let mut mgr = SovereignWebAppManager::new();
+        assert_eq!(mgr.total_apps(), 3);
+        let launch_res = mgr.launch_app("web-youtube-music");
+        assert!(launch_res.is_ok());
+        assert!(launch_res.unwrap().contains("YouTube Music"));
+    }
+
+    #[test]
+    fn test_keyboard_remapper() {
+        let remapper = SovereignKeyboardShortcutRemapper::new();
+        assert!(remapper.is_caps_as_ctrl());
+
+        let mods = KeyModifiers { ctrl: true, alt: false, shift: false, super_key: true };
+        let cmd = remapper.evaluate_shortcut(36, mods);
+        assert_eq!(cmd, Some("sigma-term"));
+
+        remapper.set_gaming_suppression(true);
+        assert!(remapper.evaluate_shortcut(36, mods).is_none());
     }
 }
