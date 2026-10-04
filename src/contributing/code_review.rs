@@ -232,6 +232,9 @@ impl CodeReviewManager {
         title: String,
         author: String,
     ) -> PullRequestReview {
+        if let Some(existing) = self.pull_requests.iter().find(|p| p.pr_number == pr_number) {
+            return existing.clone();
+        }
         let pr = PullRequestReview::new(pr_number, title, author);
         self.pull_requests.push(pr.clone());
         pr
@@ -532,8 +535,6 @@ mod tests {
         assert_eq!(manager.pull_requests.len(), 0);
     }
 
-    #[ignore]
-
     #[test]
     fn test_code_review_manager_create_pr() {
         let mut manager = CodeReviewManager::new();
@@ -594,8 +595,6 @@ mod tests {
         assert_eq!(pr.comments[0].status, ReviewStatus::ChangesRequested);
     }
 
-    #[ignore]
-
     #[test]
     fn test_code_review_manager_list_prs() {
         let mut manager = CodeReviewManager::new();
@@ -616,8 +615,6 @@ mod tests {
         let approved = manager.list_approved_prs();
         assert_eq!(approved.len(), 1);
     }
-
-    #[ignore]
 
     #[test]
     fn test_code_review_manager_list_pending_prs() {

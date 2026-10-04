@@ -25,6 +25,7 @@ Welcome to the SigmaOS Wiki! Here are the core components:
 - [Cloud-and-Cluster](./Cloud-and-Cluster.md)
 - [IoT-and-Embedded](./IoT-and-Embedded.md)
 - [Performance-Benchmarks](./Performance-Benchmarks.md)
+- [Testing](./Testing.md)
 - [Theming-Guide](./Theming-Guide.md)
 - [Installer-Guide](./Installer-Guide.md)
 - [Low-Level-Languages-and-FFI](./Low-Level-Languages-and-FFI.md)
