@@ -423,26 +423,35 @@ Commands shown on this page describe intended interfaces unless the correspondin
 
 | Issue | File | Fix Applied |
 |-------|------|-------------|
-| Hardcoded salt (static pattern) | `src/crypto/aegis_vault.rs` | Entropy-mixed salt using input length + index |
-| `random_bytes()` always errored | `src/crypto/primitives.rs` | XorShift64 PRNG fallback implemented |
+| Vault salt generation | `src/crypto/aegis_vault.rs` | Current salt is deterministic and not cryptographically random; vault encryption is not production-ready |
+| Cryptographic randomness unavailable | `src/crypto/entropy.rs`, `src/crypto/primitives.rs` | XorShift-backed paths are prototypes and are not safe for secrets |
 | Missing `PrimitiveError` type | `src/crypto/primitives.rs` | Added `ProviderNotIntegrated`, `BufferTooShort`, `InvalidParameter` |
 | Unsafe ptr::write without guard | `src/diagnostics/crash.rs` | Added capacity bounds check before write |
 | OpenBsdPledge variant missing | `src/distro/compliance.rs` | Added to `DistroGuidelineStandard` enum |
 | PageFlags missing constants | `src/kernel/wx_pte_hardening.rs` | Added WRITE, ACCESSED, NO_EXECUTE, from_bits_truncate |
 
-### New: Hardware Entropy Module (`src/crypto/entropy.rs`)
-Provides an entropy pool seeded at compile time and mixed at runtime. Interface:
-```rust
-use crate::crypto::entropy::{get_entropy_bytes, mix_entropy, rdrand};
+### Entropy provider status
 
-let mut key = [0u8; 32];
-get_entropy_bytes(&mut key); // fill with entropy
-```
+`src/crypto/entropy.rs` currently uses a compile-time-seeded XorShift state.
+`src/crypto/primitives.rs` also contains XorShift-backed random-byte paths.
+These are deterministic, non-cryptographic placeholders and must not supply
+password salts, encryption keys, nonces, tokens, or stack guards. Several
+prototype consumers still call these APIs; treat those security features as
+unavailable until a vetted cryptographic random provider is integrated and
+their callers propagate provider failures.
+
+### Login provider status
+
+`src/distro/ready_to_use.rs` no longer provisions a built-in `root` account or
+accepts a password by comparing it directly with the stored hash field. Login
+fails closed by default. Its injected `PasswordVerifier` interface is an
+integration seam, not a production password-hashing implementation; no
+general-use SigmaOS login service is available yet.
 
 ### Security Checklist for AI Agents
 
 Before committing any security-related code:
-- [ ] No hardcoded keys, IVs, nonces, or seeds — use `src/crypto/entropy.rs`
+- [ ] Do not use the current XorShift-backed entropy APIs for security-sensitive values
 - [ ] All `unsafe` blocks have `// SAFETY:` comments with invariant explanation
 - [ ] All pointer operations have null/bounds checks before dereference
 - [ ] Errors are propagated, not silenced with `let _ = result;`
@@ -454,7 +463,7 @@ Before committing any security-related code:
 
 ## Maintenance Instructions for AI Agents
 
-1. Any new crypto primitive must use `src/crypto/entropy.rs` for randomness
+1. Any security-sensitive random value must come from an integrated, reviewed CSPRNG; fail closed while that provider is unavailable
 2. Security module changes require updating this wiki page
 3. Refer to OpenBSD `pledge(2)` and `unveil(2)` man pages for inspiration
 4. FreeBSD Capsicum reference: https://man.freebsd.org/cgi/man.cgi?query=capsicum

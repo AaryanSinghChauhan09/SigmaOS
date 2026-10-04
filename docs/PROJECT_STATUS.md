@@ -21,6 +21,7 @@ Test outcomes describe the tested code and configuration, not general hardware s
 - The ISO build scripts previously emitted empty or simulated artifacts when prerequisites failed. They now fail without writing an image until a real kernel, initramfs, bootloader configuration, and validation path exist.
 - The QEMU smoke-test helpers previously simulated a successful run. They now reject missing/invalid images and do not report success without a runtime-ready signal.
 - The current ISO/installer and recovery workflow has not been validated on disposable virtual disks and supported hardware.
+- Credential verification and cryptographically secure randomness are not integrated. XorShift-backed random-byte paths remain in security prototype code, so encryption, VPN, TPM, and stack-canary features that consume them are not suitable for production use.
 - Hardware compatibility needs a device-by-device test record; source modules are not a support matrix.
 - Desktop and package-management workflows need validation from a clean installation, including error handling and recovery.
 

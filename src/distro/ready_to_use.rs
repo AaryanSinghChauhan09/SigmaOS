@@ -250,6 +250,17 @@ pub struct UserAccount {
     pub password_hash: String,
 }
 
+/// Password verification must be supplied by a vetted credential backend.
+/// Implementations must verify a password against an encoded password hash;
+/// they must not compare the password directly with the stored hash string.
+pub trait PasswordVerifier {
+    fn verify_password(
+        &self,
+        encoded_password_hash: &str,
+        password_attempt: &str,
+    ) -> Result<bool, &'static str>;
+}
+
 /// User interactive session environment
 #[derive(Debug, Clone)]
 pub struct SessionEnvironment {
@@ -266,20 +277,9 @@ pub struct InteractiveUserEnvironment {
 
 impl InteractiveUserEnvironment {
     pub fn new() -> Self {
-        let mut accounts = HashMap::new();
-        accounts.insert(
-            String::from("root"),
-            UserAccount {
-                username: String::from("root"),
-                uid: 0,
-                gid: 0,
-                home_dir: String::from("/root"),
-                shell: String::from("/bin/sigmash"),
-                password_hash: String::from("root_hash"),
-            },
-        );
         Self {
-            accounts,
+            // Never provision an account with a built-in or placeholder secret.
+            accounts: HashMap::new(),
             active_session: None,
         }
     }
@@ -290,32 +290,44 @@ impl InteractiveUserEnvironment {
 
     pub fn authenticate_and_login(
         &mut self,
+        _username: &str,
+        _password_attempt: &str,
+    ) -> Result<String, &'static str> {
+        Err("Authentication unavailable: no password verifier is configured")
+    }
+
+    /// Authenticate using a configured password-hash verifier. The default
+    /// login method deliberately remains unavailable until a vetted verifier
+    /// is wired into the system's credential store.
+    pub fn authenticate_and_login_with<V: PasswordVerifier>(
+        &mut self,
         username: &str,
         password_attempt: &str,
+        verifier: &V,
     ) -> Result<String, &'static str> {
-        if let Some(account) = self.accounts.get(username) {
-            if account.password_hash == password_attempt {
-                let mut env_vars = HashMap::new();
-                env_vars.insert(String::from("USER"), account.username.clone());
-                env_vars.insert(String::from("HOME"), account.home_dir.clone());
-                env_vars.insert(String::from("SHELL"), account.shell.clone());
-                env_vars.insert(
-                    String::from("PATH"),
-                    String::from("/bin:/sbin:/usr/bin:/usr/sbin"),
-                );
-
-                self.active_session = Some(SessionEnvironment {
-                    username: account.username.clone(),
-                    env_vars,
-                    active: true,
-                });
-                Ok(account.home_dir.clone())
-            } else {
-                Err("Authentication failed: invalid password")
-            }
-        } else {
-            Err("Authentication failed: user not found")
+        let account = self
+            .accounts
+            .get(username)
+            .ok_or("Authentication failed: user not found")?;
+        if !verifier.verify_password(&account.password_hash, password_attempt)? {
+            return Err("Authentication failed: invalid password");
         }
+
+        let home_dir = account.home_dir.clone();
+        let mut env_vars = HashMap::new();
+        env_vars.insert(String::from("USER"), account.username.clone());
+        env_vars.insert(String::from("HOME"), home_dir.clone());
+        env_vars.insert(String::from("SHELL"), account.shell.clone());
+        env_vars.insert(
+            String::from("PATH"),
+            String::from("/bin:/sbin:/usr/bin:/usr/sbin"),
+        );
+        self.active_session = Some(SessionEnvironment {
+            username: account.username.clone(),
+            env_vars,
+            active: true,
+        });
+        Ok(home_dir)
     }
 
     pub fn generate_motd_banner(&self) -> String {
@@ -470,13 +482,7 @@ mod tests {
     fn test_user_environment() {
         let mut env = InteractiveUserEnvironment::new();
         let res = env.authenticate_and_login("root", "root_hash");
-        assert!(res.is_ok());
-        assert_eq!(res.unwrap(), "/root");
-
-        let motd = env.generate_motd_banner();
-        assert!(motd.contains("root"));
-
-        env.logout();
+        assert!(res.is_err());
         assert!(env.active_session.is_none());
     }
 
@@ -512,6 +518,72 @@ mod tests {
         let matrix = DesktopProductionPriorityMatrix::new();
         assert_eq!(matrix.components.len(), 16);
         assert_eq!(matrix.compute_total_critical_effort_weeks(), 14);
+    }
+}
+
+#[cfg(test)]
+mod authentication_tests {
+    use super::{InteractiveUserEnvironment, UserAccount};
+
+    struct PrefixVerifier;
+
+    impl super::PasswordVerifier for PrefixVerifier {
+        fn verify_password(
+            &self,
+            encoded_password_hash: &str,
+            password_attempt: &str,
+        ) -> Result<bool, &'static str> {
+            Ok(encoded_password_hash == format!("test-only:{password_attempt}"))
+        }
+    }
+
+    fn account() -> UserAccount {
+        UserAccount {
+            username: String::from("tester"),
+            uid: 1000,
+            gid: 1000,
+            home_dir: String::from("/home/tester"),
+            shell: String::from("/bin/sigmash"),
+            password_hash: String::from("test-only:correct-password"),
+        }
+    }
+
+    #[test]
+    fn default_environment_has_no_built_in_root_or_password() {
+        let mut environment = InteractiveUserEnvironment::new();
+
+        assert!(environment.accounts.is_empty());
+        assert!(environment
+            .authenticate_and_login("root", "root_hash")
+            .is_err());
+        assert!(environment.active_session.is_none());
+    }
+
+    #[test]
+    fn login_requires_and_uses_an_injected_verifier() {
+        let mut environment = InteractiveUserEnvironment::new();
+        environment.add_account(account());
+
+        assert!(environment
+            .authenticate_and_login("tester", "correct-password")
+            .is_err());
+        assert_eq!(
+            environment.authenticate_and_login_with("tester", "wrong-password", &PrefixVerifier),
+            Err("Authentication failed: invalid password")
+        );
+        assert!(environment.active_session.is_none());
+
+        assert_eq!(
+            environment.authenticate_and_login_with("tester", "correct-password", &PrefixVerifier),
+            Ok(String::from("/home/tester"))
+        );
+        assert_eq!(
+            environment
+                .active_session
+                .as_ref()
+                .map(|session| session.username.as_str()),
+            Some("tester")
+        );
     }
 }
 
