@@ -140,6 +140,7 @@ pub mod audit;
 pub mod backup;
 pub mod bluetooth;
 pub mod boot;
+pub mod input;
 pub mod printing;
 pub use boot::*;
 pub mod toolchain {
