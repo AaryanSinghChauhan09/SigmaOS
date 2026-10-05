@@ -102,6 +102,11 @@ pub use a11y_manager::{
     A11yProfile, A11yCursorSize, A11yManagerStatistics, DesktopA11yManager,
     HighContrastMode, KeyboardRepeat, ScreenReaderMode, TextScaling,
 };
+pub mod notification_sound_manager;
+pub use notification_sound_manager::{
+    NotificationSoundManager, NotificationSoundStatistics, NotificationSoundType,
+    SoundConfig, SoundEvent,
+};
 
 // SigmaOS Desktop Module
 pub mod mate_betsy;
