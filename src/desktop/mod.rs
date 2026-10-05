@@ -7,6 +7,10 @@ pub mod applications;
 pub use applications::{
     AppManager as PackageManager, Application as DesktopApplication, DesktopAppCategory, AppStatus, AppStatistics,
 };
+pub mod display_manager;
+pub use display_manager::{
+    DesktopSession, DisplayConfig, DisplayManager, DisplayStatistics, SessionType, UserSession,
+};
 
 // SigmaOS Desktop Module
 pub mod mate_betsy;
@@ -108,7 +112,6 @@ pub use font_manager::*;
 pub use onboarding_wizard::*;
 pub use permission_portal::*;
 pub mod cinnamon_xapp_libgui;
-pub mod display_manager;
 pub mod file_manager_extensions;
 pub mod system_tray;
 pub mod sovereign_bulky_batch_renamer; pub use sovereign_bulky_batch_renamer::*;

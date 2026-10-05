@@ -1,238 +1,384 @@
+//! Display Manager
+//!
+//! Display and login session management inspired by Linux Mint's MDM and
+//! Omarchy's login system, supporting user authentication, session selection,
+//! and display server management.
+
 use std::collections::HashMap;
 
-#[derive(Debug, Clone, PartialEq)]
+/// Session type
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SessionType {
-    Wayland,
     X11,
-    TTY,
+    Wayland,
+    Tty,
 }
 
-#[derive(Debug, Clone, PartialEq)]
-pub enum DesktopEnvironment {
-    Zenith,
-    Cinnamon,
-    Gnome,
-    Kde,
-    Custom(String),
+impl SessionType {
+    pub fn from_str(s: &str) -> Option<Self> {
+        match s.to_lowercase().as_str() {
+            "x11" | "xorg" => Some(SessionType::X11),
+            "wayland" => Some(SessionType::Wayland),
+            "tty" => Some(SessionType::Tty),
+            _ => None,
+        }
+    }
+
+    pub fn as_str(&self) -> &str {
+        match self {
+            SessionType::X11 => "X11",
+            SessionType::Wayland => "Wayland",
+            SessionType::Tty => "TTY",
+        }
+    }
 }
 
-#[derive(Debug, Clone, PartialEq)]
-pub struct LoginSession {
+/// Desktop session
+#[derive(Debug, Clone)]
+pub struct DesktopSession {
+    pub name: String,
+    pub command: String,
     pub session_type: SessionType,
-    pub desktop: DesktopEnvironment,
+    pub is_default: bool,
 }
 
+impl DesktopSession {
+    pub fn new(name: String, command: String, session_type: SessionType) -> Self {
+        Self {
+            name,
+            command,
+            session_type,
+            is_default: false,
+        }
+    }
+
+    pub fn set_default(&mut self, default: bool) {
+        self.is_default = default;
+    }
+}
+
+/// User session
 #[derive(Debug, Clone)]
-pub struct GreeterTheme {
-    pub wallpaper: String,
-    pub logo: String,
-    pub panel_color: String,
-    pub font: String,
-}
-
-#[derive(Debug, Clone)]
-pub struct AccessibilityOptions {
-    pub high_contrast: bool,
-    pub screen_reader: bool,
-    pub on_screen_keyboard: bool,
-}
-
-#[derive(Debug, Clone, PartialEq)]
-pub enum AuthenticationResult {
-    Success { session_token: String },
-    Failure(String),
-}
-
-pub struct UserProfile {
+pub struct UserSession {
     pub username: String,
-    pub avatar_path: Option<String>,
-    pub is_guest: bool,
-    pub auto_login: bool,
+    pub session: String,
+    pub display: String,
+    pub start_time: u64,
+    pub is_active: bool,
 }
 
+impl UserSession {
+    pub fn new(username: String, session: String, display: String) -> Self {
+        let start_time = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_secs();
+
+        Self {
+            username,
+            session,
+            display,
+            start_time,
+            is_active: true,
+        }
+    }
+
+    pub fn set_active(&mut self, active: bool) {
+        self.is_active = active;
+    }
+}
+
+/// Display manager configuration
+#[derive(Debug, Clone)]
+pub struct DisplayConfig {
+    pub auto_login_enabled: bool,
+    pub auto_login_user: Option<String>,
+    pub default_session: String,
+    pub allow_guest_login: bool,
+    pub remember_last_session: bool,
+    pub hide_users: bool,
+}
+
+impl Default for DisplayConfig {
+    fn default() -> Self {
+        Self {
+            auto_login_enabled: false,
+            auto_login_user: None,
+            default_session: "SigmaOS".to_string(),
+            allow_guest_login: false,
+            remember_last_session: true,
+            hide_users: false,
+        }
+    }
+}
+
+/// Display manager
+#[derive(Debug)]
 pub struct DisplayManager {
-    users: HashMap<String, UserProfile>,
-    theme: GreeterTheme,
-    accessibility: AccessibilityOptions,
-    session_history: HashMap<String, LoginSession>,
-    multi_monitor_layout: Vec<MonitorConfig>,
-}
-
-pub struct MonitorConfig {
-    pub id: u32,
-    pub resolution: (u32, u32),
-    pub is_primary: bool,
+    sessions: HashMap<String, DesktopSession>,
+    active_sessions: Vec<UserSession>,
+    config: DisplayConfig,
+    current_display: u32,
 }
 
 impl DisplayManager {
-    pub fn new(theme: GreeterTheme) -> Self {
-        Self {
-            users: HashMap::new(),
-            theme,
-            accessibility: AccessibilityOptions {
-                high_contrast: false,
-                screen_reader: false,
-                on_screen_keyboard: false,
-            },
-            session_history: HashMap::new(),
-            multi_monitor_layout: Vec::new(),
+    pub fn new() -> Self {
+        let mut manager = Self {
+            sessions: HashMap::new(),
+            active_sessions: Vec::new(),
+            config: DisplayConfig::default(),
+            current_display: 0,
+        };
+
+        manager.add_default_sessions();
+        manager
+    }
+
+    /// Add default desktop sessions
+    fn add_default_sessions(&mut self) {
+        let sigma_session = DesktopSession::new(
+            "SigmaOS".to_string(),
+            "/usr/bin/sigma-session".to_string(),
+            SessionType::Wayland,
+        );
+        let mut sigma_session = sigma_session;
+        sigma_session.set_default(true);
+        self.sessions.insert("SigmaOS".to_string(), sigma_session);
+
+        let x11_session = DesktopSession::new(
+            "SigmaOS (X11)".to_string(),
+            "/usr/bin/sigma-session-x11".to_string(),
+            SessionType::X11,
+        );
+        self.sessions.insert("SigmaOS (X11)".to_string(), x11_session);
+
+        let tty_session = DesktopSession::new(
+            "TTY".to_string(),
+            "/bin/login".to_string(),
+            SessionType::Tty,
+        );
+        self.sessions.insert("TTY".to_string(), tty_session);
+    }
+
+    /// Add a desktop session
+    pub fn add_session(&mut self, session: DesktopSession) {
+        self.sessions.insert(session.name.clone(), session);
+    }
+
+    /// Get a session
+    pub fn get_session(&self, name: &str) -> Option<&DesktopSession> {
+        self.sessions.get(name)
+    }
+
+    /// List all sessions
+    pub fn list_sessions(&self) -> Vec<&DesktopSession> {
+        self.sessions.values().collect()
+    }
+
+    /// Get default session
+    pub fn get_default_session(&self) -> Option<&DesktopSession> {
+        self.sessions.values()
+            .find(|s| s.is_default)
+            .or_else(|| self.sessions.get(&self.config.default_session))
+    }
+
+    /// Set default session
+    pub fn set_default_session(&mut self, name: &str) {
+        // Remove default flag from all sessions
+        for session in self.sessions.values_mut() {
+            session.set_default(false);
+        }
+
+        // Set default flag on specified session
+        if let Some(session) = self.sessions.get_mut(name) {
+            session.set_default(true);
+            self.config.default_session = name.to_string();
         }
     }
 
-    pub fn add_user(&mut self, profile: UserProfile) {
-        self.users.insert(profile.username.clone(), profile);
+    /// Get configuration
+    pub fn get_config(&self) -> &DisplayConfig {
+        &self.config
     }
 
-    pub fn toggle_accessibility(
-        &mut self,
-        high_contrast: Option<bool>,
-        screen_reader: Option<bool>,
-        on_screen_keyboard: Option<bool>,
-    ) {
-        if let Some(hc) = high_contrast {
-            self.accessibility.high_contrast = hc;
-        }
-        if let Some(sr) = screen_reader {
-            self.accessibility.screen_reader = sr;
-        }
-        if let Some(osk) = on_screen_keyboard {
-            self.accessibility.on_screen_keyboard = osk;
-        }
+    /// Set configuration
+    pub fn set_config(&mut self, config: DisplayConfig) {
+        self.config = config;
     }
 
-    pub fn set_monitors(&mut self, monitors: Vec<MonitorConfig>) {
-        self.multi_monitor_layout = monitors;
+    /// Enable auto-login
+    pub fn enable_auto_login(&mut self, username: String) {
+        self.config.auto_login_enabled = true;
+        self.config.auto_login_user = Some(username);
     }
 
-    pub fn authenticate(&mut self, username: &str, password_hash: &str) -> AuthenticationResult {
-        if let Some(user) = self.users.get(username) {
-            if user.is_guest || password_hash == "valid_hash" {
-                AuthenticationResult::Success {
-                    session_token: format!("token_{}", username),
-                }
-            } else {
-                AuthenticationResult::Failure("Invalid credentials".to_string())
-            }
-        } else {
-            AuthenticationResult::Failure("User not found".to_string())
+    /// Disable auto-login
+    pub fn disable_auto_login(&mut self) {
+        self.config.auto_login_enabled = false;
+        self.config.auto_login_user = None;
+    }
+
+    /// Start a user session
+    pub fn start_session(&mut self, username: String, session_name: String) -> Result<String, String> {
+        if !self.sessions.contains_key(&session_name) {
+            return Err(format!("Session {} not found", session_name));
         }
+
+        let display = format!(":{}", self.current_display);
+        self.current_display += 1;
+
+        let user_session = UserSession::new(username, session_name, display);
+        let display = user_session.display.clone();
+        self.active_sessions.push(user_session);
+
+        Ok(display)
     }
 
-    pub fn start_session(
-        &mut self,
-        username: &str,
-        session: LoginSession,
-    ) -> Result<String, String> {
-        if !self.users.contains_key(username) {
-            return Err("Unknown user".to_string());
+    /// Get active sessions
+    pub fn get_active_sessions(&self) -> Vec<&UserSession> {
+        self.active_sessions.iter().collect()
+    }
+
+    /// Get session for user
+    pub fn get_user_session(&self, username: &str) -> Option<&UserSession> {
+        self.active_sessions.iter()
+            .find(|s| s.username == username)
+    }
+
+    /// End a session
+    pub fn end_session(&mut self, display: &str) -> Result<(), String> {
+        let pos = self.active_sessions.iter()
+            .position(|s| s.display == display)
+            .ok_or_else(|| format!("Session {} not found", display))?;
+
+        self.active_sessions.remove(pos);
+        Ok(())
+    }
+
+    /// Switch session
+    pub fn switch_session(&mut self, display: &str) -> Result<(), String> {
+        let session = self.active_sessions.iter()
+            .find(|s| s.display == display)
+            .ok_or_else(|| format!("Session {} not found", display))?;
+
+        // Deactivate all sessions
+        for s in self.active_sessions.iter_mut() {
+            s.set_active(false);
         }
-        self.session_history
-            .insert(username.to_string(), session.clone());
-        Ok(format!(
-            "Started {:?} session for {}",
-            session.desktop, username
-        ))
+
+        // Activate specified session
+        if let Some(active) = self.active_sessions.iter_mut()
+            .find(|s| s.display == display) {
+            active.set_active(true);
+        }
+
+        Ok(())
     }
 
-    pub fn get_last_session(&self, username: &str) -> Option<&LoginSession> {
-        self.session_history.get(username)
+    /// Get next available display number
+    pub fn get_next_display(&self) -> String {
+        format!(":{}", self.current_display)
+    }
+
+    /// Get statistics
+    pub fn get_statistics(&self) -> DisplayStatistics {
+        DisplayStatistics {
+            total_sessions: self.sessions.len(),
+            active_sessions: self.active_sessions.len(),
+            default_session: self.config.default_session.clone(),
+            auto_login_enabled: self.config.auto_login_enabled,
+            current_display: self.current_display,
+        }
     }
 }
 
-#[cfg(test)]
+impl Default for DisplayManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Display statistics
+#[derive(Debug, Clone)]
+pub struct DisplayStatistics {
+    pub total_sessions: usize,
+    pub active_sessions: usize,
+    pub default_session: String,
+    pub auto_login_enabled: bool,
+    pub current_display: u32,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    fn default_theme() -> GreeterTheme {
-        GreeterTheme {
-            wallpaper: "/usr/share/backgrounds/default.jpg".to_string(),
-            logo: "/usr/share/icons/logo.png".to_string(),
-            panel_color: "#000000".to_string(),
-            font: "Ubuntu 11".to_string(),
-        }
+    #[test]
+    fn test_session_type_from_str() {
+        assert_eq!(SessionType::from_str("x11"), Some(SessionType::X11));
+        assert_eq!(SessionType::from_str("wayland"), Some(SessionType::Wayland));
     }
 
     #[test]
-    fn test_add_user() {
-        let mut dm = DisplayManager::new(default_theme());
-        dm.add_user(UserProfile {
-            username: "alice".to_string(),
-            avatar_path: Some("/home/alice/.face".to_string()),
-            is_guest: false,
-            auto_login: false,
-        });
-        assert!(dm.users.contains_key("alice"));
+    fn test_desktop_session_creation() {
+        let session = DesktopSession::new(
+            "Test".to_string(),
+            "/usr/bin/test".to_string(),
+            SessionType::Wayland,
+        );
+        assert_eq!(session.name, "Test");
     }
 
     #[test]
-    fn test_guest_auth() {
-        let mut dm = DisplayManager::new(default_theme());
-        dm.add_user(UserProfile {
-            username: "guest".to_string(),
-            avatar_path: None,
-            is_guest: true,
-            auto_login: false,
-        });
-        let auth = dm.authenticate("guest", "");
-        assert!(matches!(auth, AuthenticationResult::Success { .. }));
+    fn test_display_manager_creation() {
+        let manager = DisplayManager::new();
+        assert!(manager.list_sessions().len() >= 3);
     }
 
     #[test]
-    fn test_invalid_auth() {
-        let mut dm = DisplayManager::new(default_theme());
-        dm.add_user(UserProfile {
-            username: "alice".to_string(),
-            avatar_path: None,
-            is_guest: false,
-            auto_login: false,
-        });
-        let auth = dm.authenticate("alice", "wrong_hash");
-        assert!(matches!(auth, AuthenticationResult::Failure(_)));
+    fn test_add_session() {
+        let mut manager = DisplayManager::new();
+        let session = DesktopSession::new(
+            "Custom".to_string(),
+            "/usr/bin/custom".to_string(),
+            SessionType::X11,
+        );
+        manager.add_session(session);
+        assert!(manager.get_session("Custom").is_some());
     }
 
     #[test]
-    fn test_session_history() {
-        let mut dm = DisplayManager::new(default_theme());
-        dm.add_user(UserProfile {
-            username: "alice".to_string(),
-            avatar_path: None,
-            is_guest: false,
-            auto_login: false,
-        });
-        let session = LoginSession {
-            session_type: SessionType::Wayland,
-            desktop: DesktopEnvironment::Zenith,
-        };
-        dm.start_session("alice", session.clone()).unwrap();
-        assert_eq!(dm.get_last_session("alice"), Some(&session));
+    fn test_set_default_session() {
+        let mut manager = DisplayManager::new();
+        manager.set_default_session("TTY");
+        assert_eq!(manager.get_config().default_session, "TTY");
     }
 
     #[test]
-    fn test_accessibility_toggle() {
-        let mut dm = DisplayManager::new(default_theme());
-        dm.toggle_accessibility(Some(true), None, Some(true));
-        assert!(dm.accessibility.high_contrast);
-        assert!(!dm.accessibility.screen_reader);
-        assert!(dm.accessibility.on_screen_keyboard);
+    fn test_auto_login() {
+        let mut manager = DisplayManager::new();
+        manager.enable_auto_login("user".to_string());
+        assert!(manager.get_config().auto_login_enabled);
+        assert_eq!(manager.get_config().auto_login_user, Some("user".to_string()));
     }
 
     #[test]
-    fn test_monitor_layout() {
-        let mut dm = DisplayManager::new(default_theme());
-        dm.set_monitors(vec![
-            MonitorConfig {
-                id: 1,
-                resolution: (1920, 1080),
-                is_primary: true,
-            },
-            MonitorConfig {
-                id: 2,
-                resolution: (1920, 1080),
-                is_primary: false,
-            },
-        ]);
-        assert_eq!(dm.multi_monitor_layout.len(), 2);
-        assert!(dm.multi_monitor_layout[0].is_primary);
+    fn test_start_session() {
+        let mut manager = DisplayManager::new();
+        let display = manager.start_session("user".to_string(), "SigmaOS".to_string()).unwrap();
+        assert_eq!(display, ":0");
+    }
+
+    #[test]
+    fn test_end_session() {
+        let mut manager = DisplayManager::new();
+        let display = manager.start_session("user".to_string(), "SigmaOS".to_string()).unwrap();
+        assert!(manager.end_session(&display).is_ok());
+    }
+
+    #[test]
+    fn test_statistics() {
+        let manager = DisplayManager::new();
+        let stats = manager.get_statistics();
+        assert!(stats.total_sessions >= 3);
     }
 }
