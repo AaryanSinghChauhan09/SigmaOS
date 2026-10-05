@@ -21,6 +21,14 @@ pub use notification_manager::{
     DesktopNotification, DesktopNotificationManager, DesktopNotificationStatistics,
     DesktopNotificationUrgency,
 };
+pub mod clipboard_manager;
+pub use clipboard_manager::{
+    ClipboardItem, ClipboardItemType, ClipboardHistoryManager, ClipboardHistoryStatistics,
+};
+pub mod search_manager;
+pub use search_manager::{
+    SearchManager, SearchQuery, SearchResult, SearchResultType, SearchStatistics,
+};
 
 // SigmaOS Desktop Module
 pub mod mate_betsy;
