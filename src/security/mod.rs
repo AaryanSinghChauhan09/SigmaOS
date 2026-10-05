@@ -1,8 +1,12 @@
 // SigmaOS Security Subsystem
 pub mod address_sanitizer;
 pub mod capability_enforcer;
+pub mod firewall_manager;
 pub mod memory_protection;
 pub use address_sanitizer::{AddressSanitizer, MemoryRegion};
+pub use firewall_manager::{
+    FirewallAction, NetworkFirewallManager, NetworkFirewallRule, NetworkFirewallStatistics, NetworkFirewallZone, Protocol,
+};
 pub mod audit;
 pub mod bsd_hardening;
 pub mod cap_rights;
