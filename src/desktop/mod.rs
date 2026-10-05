@@ -159,6 +159,11 @@ pub use network_manager::{
     DesktopNetworkManager, NetworkManagerStatistics, NetworkConnection, NetConnectionType,
     NetConnectionStatus, SecurityType,
 };
+pub mod desktop_bluetooth_manager;
+pub use desktop_bluetooth_manager::{
+    DesktopBluetoothManager, DesktopBluetoothManagerStatistics, DesktopBluetoothDevice,
+    DesktopBluetoothDeviceType, DesktopBluetoothDeviceStatus,
+};
 
 // SigmaOS Desktop Module
 pub mod mate_betsy;
