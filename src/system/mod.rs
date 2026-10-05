@@ -119,3 +119,4 @@ pub use omarchy_atreyu_system_plugin::*;
 
 pub mod omarchy_docker_rootless_engine;
 pub use omarchy_docker_rootless_engine::*;
+pub mod gamemode_daemon;

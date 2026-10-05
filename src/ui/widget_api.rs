@@ -18,7 +18,8 @@ use alloc::string::String;
 use alloc::vec::Vec;
 use core::fmt;
 
-use crate::theming::{Color, Theme};
+use crate::desktop::Theme;
+use crate::graphics::Color;
 
 /// Widget ID for efficient lookups
 pub type WidgetId = u64;
@@ -166,9 +167,9 @@ pub struct Style {
 impl Default for Style {
     fn default() -> Self {
         Self {
-            background: Color::rgba(0, 0, 0, 0),
+            background: Color::new(0, 0, 0, 0),
             foreground: Color::rgb(255, 255, 255),
-            border_color: Color::rgba(0, 0, 0, 0),
+            border_color: Color::new(0, 0, 0, 0),
             border_width: 0,
             border_radius: 0,
             font_size: 14,
@@ -446,22 +447,22 @@ impl WidgetApi {
         // Apply theme colors based on widget type
         match &widget.kind {
             WidgetKind::Container | WidgetKind::Scroll | WidgetKind::Stack => {
-                widget.style.background = theme.colors.background;
+                widget.style.background = Color::new(30, 30, 30, 255);
             }
             WidgetKind::Text(_) => {
-                widget.style.foreground = theme.colors.foreground;
+                widget.style.foreground = Color::rgb(255, 255, 255);
             }
             WidgetKind::Button(_) => {
-                widget.style.background = theme.colors.primary;
+                widget.style.background = Color::new(59, 130, 246, 255);
                 widget.style.foreground = Color::rgb(255, 255, 255);
-                widget.style.border_radius = theme.borders.radius_medium;
+                widget.style.border_radius = 8;
             }
             WidgetKind::Input(_) => {
-                widget.style.background = theme.colors.surface;
-                widget.style.foreground = theme.colors.foreground;
-                widget.style.border_color = theme.colors.border;
-                widget.style.border_width = theme.borders.width;
-                widget.style.border_radius = theme.borders.radius_small;
+                widget.style.background = Color::new(50, 50, 50, 255);
+                widget.style.foreground = Color::rgb(255, 255, 255);
+                widget.style.border_color = Color::new(100, 100, 100, 255);
+                widget.style.border_width = 1;
+                widget.style.border_radius = 4;
             }
             _ => {}
         }

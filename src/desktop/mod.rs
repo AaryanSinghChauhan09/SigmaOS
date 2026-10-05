@@ -126,3 +126,4 @@ pub use sigma_quickshell::{
     NotificationContent, NotificationUrgency,
 };
 pub mod sigma_ghostty; pub use sigma_ghostty::{SigmaGhostty, GhosttyConfig, TermGrid, TermCell, TermColor, CellAttrs, VtParser, VtAction, CursorStyle};
+pub mod webapp_manager; pub use webapp_manager::*;

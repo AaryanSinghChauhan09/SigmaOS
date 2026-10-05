@@ -17,3 +17,4 @@ pub use pipewire::{AudioGraph, AudioLink, AudioNode, GraphState, NodeType};
 pub use podcast::{
     AudioClip, AudioMasteringEffect, AudioTrack, PodcastEpisode, PodcastFeed, PodcastRecorder,
 };
+pub mod sigma_audio_router;
