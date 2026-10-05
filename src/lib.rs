@@ -50,6 +50,10 @@ pub use package::{
     SovereignDistroPackageAdvancementsSuiteV14, UniversalForeignPackageFormat,
     UniversalForeignPackageFormatConverter,
 };
+pub mod pacman;
+pub use pacman::*;
+pub mod systemd;
+pub use systemd::*;
 pub mod process;
 pub mod productivity;
 pub use productivity::*;
