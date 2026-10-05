@@ -89,6 +89,10 @@ pub mod quick_settings_manager;
 pub use quick_settings_manager::{
     DesktopQuickSetting, DesktopQuickSettingsManager, DesktopQuickSettingsStatistics, DesktopQuickSettingType,
 };
+pub mod screen_lock_manager;
+pub use screen_lock_manager::{
+    LockStatus, ScreenLockConfig, ScreenLockManager, ScreenLockStatistics, LockScreenType,
+};
 
 // SigmaOS Desktop Module
 pub mod mate_betsy;
