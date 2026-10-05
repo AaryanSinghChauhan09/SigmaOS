@@ -149,6 +149,11 @@ pub use login_manager::{
     DesktopLoginManager, LoginManagerStatistics, LoginUserSession, LoginDesktopEnvironment,
     LoginSessionType,
 };
+pub mod print_manager;
+pub use print_manager::{
+    DesktopPrintManager, PrintManagerStatistics, Printer, PrintJob, PrinterStatus,
+    PrintJobStatus,
+};
 
 // SigmaOS Desktop Module
 pub mod mate_betsy;
