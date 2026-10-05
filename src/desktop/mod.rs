@@ -61,6 +61,10 @@ pub mod icon_manager;
 pub use icon_manager::{
     DesktopDesktopIcon, DesktopIconManager, GridAlignment, DesktopIconStatistics, DesktopIconType,
 };
+pub mod taskbar_manager;
+pub use taskbar_manager::{
+    DesktopTaskbarItem, DesktopTaskbarItemType, DesktopTaskbarManager, DesktopTaskbarPosition, DesktopTaskbarStatistics,
+};
 
 // SigmaOS Desktop Module
 pub mod mate_betsy;
