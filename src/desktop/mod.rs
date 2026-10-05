@@ -45,6 +45,10 @@ pub mod brightness_manager;
 pub use brightness_manager::{
     AdaptiveBrightnessMode, BrightnessDevice, BrightnessManager, BrightnessStatistics, BrightnessType,
 };
+pub mod session_manager;
+pub use session_manager::{
+    DesktopSessionManager, DesktopSessionStatistics, DesktopSessionStatus, DesktopSessionType, DesktopUserSession,
+};
 
 // SigmaOS Desktop Module
 pub mod mate_betsy;
