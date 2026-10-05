@@ -29,6 +29,10 @@ pub mod search_manager;
 pub use search_manager::{
     SearchManager, SearchQuery, SearchResult, SearchResultType, SearchStatistics,
 };
+pub mod application_launcher;
+pub use application_launcher::{
+    ApplicationLauncher, LauncherApp, LauncherCategory, LauncherStatistics,
+};
 
 // SigmaOS Desktop Module
 pub mod mate_betsy;
