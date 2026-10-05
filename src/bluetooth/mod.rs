@@ -4,6 +4,7 @@
 // Zero-dependency implementation - no external libraries required
 
 pub mod adapter;
+pub mod bluetooth_manager;
 
 use core::fmt;
 use std::string::String;
@@ -11,6 +12,10 @@ use std::vec::Vec;
 
 pub mod gatt;
 pub use gatt::{GattCharacteristic, GattClient, GattDevice, GattService};
+pub use bluetooth_manager::{
+    BluetoothAdapter, BLEDevice, BluetoothDeviceStatus, BluetoothDeviceType,
+    BluetoothDeviceManager, BluetoothStatistics,
+};
 
 /// Error type for the Bluetooth module
 #[derive(Debug, Clone, PartialEq, Eq)]
