@@ -93,6 +93,10 @@ pub mod screen_lock_manager;
 pub use screen_lock_manager::{
     LockStatus, ScreenLockConfig, ScreenLockManager, ScreenLockStatistics, LockScreenType,
 };
+pub mod screenshot_manager;
+pub use screenshot_manager::{
+    DesktopScreenshot, DesktopScreenshotFormat, DesktopScreenshotManager, DesktopScreenshotMode, DesktopScreenshotStatistics,
+};
 
 // SigmaOS Desktop Module
 pub mod mate_betsy;
