@@ -65,6 +65,10 @@ pub mod taskbar_manager;
 pub use taskbar_manager::{
     DesktopTaskbarItem, DesktopTaskbarItemType, DesktopTaskbarManager, DesktopTaskbarPosition, DesktopTaskbarStatistics,
 };
+pub mod menu_manager;
+pub use menu_manager::{
+    MenuEntry, MenuEntryType, MenuManager, MenuStatistics,
+};
 
 // SigmaOS Desktop Module
 pub mod mate_betsy;
