@@ -13,6 +13,8 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 pub mod service_manager;
+pub mod update_manager;
+pub mod system_manager;
 
 // SigmaOS System Utilities Module
 // System-level utilities and tools
@@ -109,6 +111,13 @@ pub use state::{
 };
 pub use syslog::{LogAction, LogEntry, LogFacility, LogLevel, LogRule, SyslogError, SyslogManager};
 pub use user::{Group, ShadowEntry, SudoPolicyEngine, SudoersRule, User, UserError, UserManager};
+pub use update_manager::{
+    UpdateCategory, UpdateConfig, UpdateLevel, UpdateManager, UpdatePackage, UpdateStatistics,
+};
+pub use system_manager::{
+    CpuInfo, DiskInfo, MemoryInfo, NetworkInfo, SystemHealth, SystemInfo, SystemManager,
+    SystemSummary,
+};
 
 pub mod atomic_upgrade;
 
