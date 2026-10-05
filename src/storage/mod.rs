@@ -21,6 +21,7 @@ pub mod block;
 pub mod geom;
 pub mod nosql_engine;
 pub mod search;
+pub mod snapshot_manager;
 pub mod sovereign_disk_manager;
 pub mod sql_engine;
 pub mod volume;
@@ -31,5 +32,9 @@ pub use geom::{
 };
 pub use sql_engine::{
     Column, QueryResult, SqlEngine, SqlType, SqlValue, Table, Transaction, TransactionState,
+};
+pub use snapshot_manager::{
+    RetentionPolicy, SnapshotManager, SnapshotMetadata, SnapshotStatistics, SnapshotStatus,
+    SnapshotType,
 };
 pub mod mintstick_flasher;
