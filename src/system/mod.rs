@@ -13,6 +13,7 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 pub mod service_manager;
+pub mod scheduler_manager;
 pub mod system_monitor;
 pub mod task_manager;
 pub mod update_manager;
@@ -139,6 +140,9 @@ pub use system_monitor::{
 };
 pub use task_manager::{
     TaskProcessEntry, TaskProcessState, ProcessTaskManager, ProcessTaskStatistics,
+};
+pub use scheduler_manager::{
+    ScheduleFrequency, ScheduleStatus, ScheduledTask, SchedulerManager, SchedulerStatistics,
 };
 
 pub mod atomic_upgrade;
