@@ -154,6 +154,11 @@ pub use print_manager::{
     DesktopPrintManager, PrintManagerStatistics, Printer, PrintJob, PrinterStatus,
     PrintJobStatus,
 };
+pub mod network_manager;
+pub use network_manager::{
+    DesktopNetworkManager, NetworkManagerStatistics, NetworkConnection, NetConnectionType,
+    NetConnectionStatus, SecurityType,
+};
 
 // SigmaOS Desktop Module
 pub mod mate_betsy;
