@@ -169,6 +169,11 @@ pub use time_manager::{
     DesktopTimeManager, TimeManagerStatistics, DesktopTimezone, DesktopNTPServer,
     TimeFormat, DateFormat,
 };
+pub mod sound_theme_manager;
+pub use sound_theme_manager::{
+    DesktopSoundThemeManager, DesktopSoundThemeManagerStatistics, DesktopSoundTheme,
+    SoundEventType,
+};
 
 // SigmaOS Desktop Module
 pub mod mate_betsy;
