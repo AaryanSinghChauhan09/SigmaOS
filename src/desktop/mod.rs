@@ -129,6 +129,21 @@ pub mod color_scheme_manager;
 pub use color_scheme_manager::{
     DesktopColorSchemeManager, ColorSchemeStatistics, ColorScheme, ColorSchemeType,
 };
+pub mod power_manager;
+pub use power_manager::{
+    DesktopPowerManager, PowerManagerStatistics, BatteryDevice, PowerAction, PowerProfile,
+    BatteryStatus,
+};
+pub mod touchpad_manager;
+pub use touchpad_manager::{
+    DesktopTouchpadManager, TouchpadManagerStatistics, TouchpadDevice, TouchpadConfiguration,
+    TapToClickMode, NaturalScrolling, TwoFingerScrolling, EdgeScrolling, PalmDetection,
+};
+pub mod keyboard_manager;
+pub use keyboard_manager::{
+    DesktopKeyboardManager, KeyboardManagerStatistics, KeyboardDevice, KeyboardConfiguration,
+    KeyboardLayout, RepeatMode,
+};
 
 // SigmaOS Desktop Module
 pub mod mate_betsy;
