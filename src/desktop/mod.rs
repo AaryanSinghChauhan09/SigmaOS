@@ -112,6 +112,10 @@ pub use display_resolution_manager::{
     Display, DisplayMode, DisplayResolutionManager, DisplayResolutionStatistics,
     RefreshRate, Resolution,
 };
+pub mod input_method_manager;
+pub use input_method_manager::{
+    DesktopInputMethodManager, InputMethodManagerStatistics, InputMethodEngine, InputMethodType,
+};
 
 // SigmaOS Desktop Module
 pub mod mate_betsy;
