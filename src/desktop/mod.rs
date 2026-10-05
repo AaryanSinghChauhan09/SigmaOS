@@ -69,6 +69,10 @@ pub mod menu_manager;
 pub use menu_manager::{
     MenuEntry, MenuEntryType, MenuManager, MenuStatistics,
 };
+pub mod widget_manager;
+pub use widget_manager::{
+    DesktopWidget, DesktopWidgetManager, DesktopWidgetPosition, DesktopWidgetStatistics, DesktopWidgetType,
+};
 
 // SigmaOS Desktop Module
 pub mod mate_betsy;
