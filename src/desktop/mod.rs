@@ -107,6 +107,11 @@ pub use notification_sound_manager::{
     NotificationSoundManager, NotificationSoundStatistics, NotificationSoundType,
     SoundConfig, SoundEvent,
 };
+pub mod display_resolution_manager;
+pub use display_resolution_manager::{
+    Display, DisplayMode, DisplayResolutionManager, DisplayResolutionStatistics,
+    RefreshRate, Resolution,
+};
 
 // SigmaOS Desktop Module
 pub mod mate_betsy;
