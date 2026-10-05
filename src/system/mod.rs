@@ -16,6 +16,8 @@ pub mod service_manager;
 pub mod update_manager;
 pub mod system_manager;
 pub mod power_manager;
+pub mod user_manager;
+pub mod boot_manager;
 
 // SigmaOS System Utilities Module
 // System-level utilities and tools
@@ -123,6 +125,8 @@ pub use power_manager::{
     BatteryInfo, PowerBatteryStatus, PowerConfig, PowerManager, PowerProfile, PowerSource,
     PowerStatistics, SleepAction,
 };
+pub use user_manager::{UserAccount, UserManager as AccountManager, UserStatistics, UserType};
+pub use boot_manager::{StartupEntry, BootManager, StartupStatistics, StartupType};
 
 pub mod atomic_upgrade;
 
