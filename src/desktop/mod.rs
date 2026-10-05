@@ -41,6 +41,10 @@ pub mod sound_manager;
 pub use sound_manager::{
     DesktopAudioDevice, DesktopAudioDeviceStatus, DesktopAudioDeviceType, DesktopSoundApplication, DesktopSoundManager, DesktopSoundProfile, DesktopSoundStatistics,
 };
+pub mod brightness_manager;
+pub use brightness_manager::{
+    AdaptiveBrightnessMode, BrightnessDevice, BrightnessManager, BrightnessStatistics, BrightnessType,
+};
 
 // SigmaOS Desktop Module
 pub mod mate_betsy;
