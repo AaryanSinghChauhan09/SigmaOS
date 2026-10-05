@@ -57,6 +57,10 @@ pub mod de_manager;
 pub use de_manager::{
     DEConfig, DEManager, DEStatistics, DesktopDESessionType, DesktopEnvironment,
 };
+pub mod icon_manager;
+pub use icon_manager::{
+    DesktopDesktopIcon, DesktopIconManager, GridAlignment, DesktopIconStatistics, DesktopIconType,
+};
 
 // SigmaOS Desktop Module
 pub mod mate_betsy;
