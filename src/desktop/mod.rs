@@ -33,6 +33,10 @@ pub mod application_launcher;
 pub use application_launcher::{
     ApplicationLauncher, LauncherApp, LauncherCategory, LauncherStatistics,
 };
+pub mod screen_saver_manager;
+pub use screen_saver_manager::{
+    DesktopLockOnSleep, DesktopScreenSaverManager, DesktopScreenSaverMode, DesktopScreenSaverStatistics,
+};
 
 // SigmaOS Desktop Module
 pub mod mate_betsy;
