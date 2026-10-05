@@ -164,6 +164,11 @@ pub use desktop_bluetooth_manager::{
     DesktopBluetoothManager, DesktopBluetoothManagerStatistics, DesktopBluetoothDevice,
     DesktopBluetoothDeviceType, DesktopBluetoothDeviceStatus,
 };
+pub mod time_manager;
+pub use time_manager::{
+    DesktopTimeManager, TimeManagerStatistics, DesktopTimezone, DesktopNTPServer,
+    TimeFormat, DateFormat,
+};
 
 // SigmaOS Desktop Module
 pub mod mate_betsy;
