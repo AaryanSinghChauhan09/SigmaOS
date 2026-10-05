@@ -116,6 +116,11 @@ pub mod input_method_manager;
 pub use input_method_manager::{
     DesktopInputMethodManager, InputMethodManagerStatistics, InputMethodEngine, InputMethodType,
 };
+pub mod screen_orientation_manager;
+pub use screen_orientation_manager::{
+    DesktopScreenOrientationManager, ScreenOrientationConfig, ScreenOrientationStatistics,
+    ScreenOrientation, OrientationPolicy,
+};
 
 // SigmaOS Desktop Module
 pub mod mate_betsy;
@@ -207,13 +212,11 @@ pub mod notification;
 pub mod omarchy_dynamic_workspace_suite;
 pub use omarchy_dynamic_workspace_suite::*;
 pub mod dev_workspace;
-pub mod font_manager;
 pub mod localization;
 pub mod network_sharing;
 pub mod onboarding_wizard;
 pub mod permission_portal;
 
-pub use font_manager::*;
 pub use onboarding_wizard::*;
 pub use permission_portal::*;
 pub mod cinnamon_xapp_libgui;

@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Desktop Input Method Manager provides comprehensive input method management inspired by Linux Mint's input method framework and Omarchy's IME utilities. It supports multiple input method engines, language layouts, and input method type selection.
+The Desktop Input Method Manager provides comprehensive input method management inspired by Linux Mint's input method framework and Omarchy's IME utilities. It supports multiple input method frameworks, language layouts, and keyboard configuration.
 
 ## Features
 
@@ -134,14 +134,13 @@ When maintaining the Input Method Manager:
 1. **IME Integration**: Integrate with actual IME backends (IBus, Fcitx, etc.)
 2. **Layout Detection**: Detect available keyboard layouts from system
 3. **Hotkey Switching**: Implement hotkey-based engine switching
-3. **Per-Application Settings**: Add per-application input method configuration
-4. **Candidate Window**: Implement candidate window integration
-5. **Composition**: Implement text composition handling
-6. **Dictionary Support**: Add dictionary management for IME
-7. **Auto-switch**: Implement auto-switch based on application focus
-8. **Engine Reload**: Support dynamic engine reloading
-9. **Configuration Import/Export**: Add configuration import/export
-10. **Fallback Engine**: Implement fallback engine for unsupported languages
+4. **Per-Application Settings**: Add per-application input method configuration
+5. **Candidate Window**: Implement candidate window integration
+6. **Composition**: Implement text composition handling
+7. **Dictionary Support**: Add dictionary management for IME
+8. **Auto-switch**: Implement auto-switch based on application focus
+9. **Engine Reload**: Support dynamic engine reloading
+10. **Configuration Import/Export**: Add configuration import/export
 
 ## Testing
 
