@@ -14,6 +14,7 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 pub mod service_manager;
 pub mod system_monitor;
+pub mod task_manager;
 pub mod update_manager;
 pub mod system_manager;
 pub mod power_manager;
@@ -135,6 +136,9 @@ pub use settings_manager::{
 pub use system_monitor::{
     CpuCore, DiskPartition, RamMemoryInfo, NetworkInterface,
     SystemMonitor, SystemMonitorStatistics,
+};
+pub use task_manager::{
+    TaskProcessEntry, TaskProcessState, ProcessTaskManager, ProcessTaskStatistics,
 };
 
 pub mod atomic_upgrade;
