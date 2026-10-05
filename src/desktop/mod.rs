@@ -49,6 +49,10 @@ pub mod session_manager;
 pub use session_manager::{
     DesktopSessionManager, DesktopSessionStatistics, DesktopSessionStatus, DesktopSessionType, DesktopUserSession,
 };
+pub mod wallpaper_manager;
+pub use wallpaper_manager::{
+    WallpaperManager, WallpaperMode, WallpaperProfile, WallpaperSource, WallpaperStatistics,
+};
 
 // SigmaOS Desktop Module
 pub mod mate_betsy;
