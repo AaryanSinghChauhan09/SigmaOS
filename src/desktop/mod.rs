@@ -174,6 +174,11 @@ pub use sound_theme_manager::{
     DesktopSoundThemeManager, DesktopSoundThemeManagerStatistics, DesktopSoundTheme,
     SoundEventType,
 };
+pub mod cursor_manager;
+pub use cursor_manager::{
+    DesktopCursorManager, DesktopCursorManagerStatistics, DesktopCursorTheme,
+    DesktopCursorSize, DesktopCursorType,
+};
 
 // SigmaOS Desktop Module
 pub mod mate_betsy;
