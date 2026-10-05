@@ -1,10 +1,10 @@
-// SigmaOS Desktop DesktopScreenshot Manager
+// SigmaOS Desktop Screenshot Manager
 // Inspired by Linux Mint's screenshot tool and Omarchy's screenshot utilities
 
 use std::collections::HashMap;
 use std::path::PathBuf;
 
-/// DesktopScreenshot mode
+/// Screenshot mode
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DesktopScreenshotMode {
     FullScreen,
@@ -24,7 +24,7 @@ impl DesktopScreenshotMode {
     }
 }
 
-/// DesktopScreenshot format
+/// Screenshot format
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DesktopScreenshotFormat {
     PNG,
@@ -97,7 +97,7 @@ impl DesktopScreenshot {
     }
 }
 
-/// DesktopScreenshot Manager
+/// DesktopScreenshotManager
 pub struct DesktopScreenshotManager {
     screenshots: HashMap<String, DesktopScreenshot>,
     default_format: DesktopScreenshotFormat,
@@ -108,7 +108,7 @@ pub struct DesktopScreenshotManager {
 
 impl DesktopScreenshotManager {
     pub fn new() -> Self {
-        let save_directory = PathBuf::from("/home/user/Pictures/DesktopScreenshots");
+        let save_directory = PathBuf::from("/home/user/Pictures/Screenshots");
 
         let mut manager = DesktopScreenshotManager {
             screenshots: HashMap::new(),
@@ -140,7 +140,7 @@ impl DesktopScreenshotManager {
             .unwrap()
             .as_secs();
 
-        let filename = format!("DesktopScreenshot_{}.{}", timestamp, self.default_format.extension());
+        let filename = format!("Screenshot_{}.{}", timestamp, self.default_format.extension());
         let path = self.save_directory.join(&filename);
 
         let screenshot = DesktopScreenshot::new(
@@ -222,7 +222,7 @@ impl Default for DesktopScreenshotManager {
     }
 }
 
-/// DesktopScreenshot statistics
+/// DesktopScreenshotStatistics
 #[derive(Debug, Clone, Copy)]
 pub struct DesktopScreenshotStatistics {
     pub total_screenshots: usize,
