@@ -11,6 +11,11 @@ pub mod display_manager;
 pub use display_manager::{
     DesktopSession, DisplayConfig, DisplayManager, DisplayStatistics, SessionType, UserSession,
 };
+pub mod desktop_file_manager;
+pub use desktop_file_manager::{
+    FileInfo, DesktopFileExplorer, DesktopFileExplorerConfig, DesktopFileExplorerStatistics,
+    FileType, DesktopSortOrder, DesktopViewMode,
+};
 
 // SigmaOS Desktop Module
 pub mod mate_betsy;
