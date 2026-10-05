@@ -13,6 +13,7 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 pub mod service_manager;
+pub mod system_monitor;
 pub mod update_manager;
 pub mod system_manager;
 pub mod power_manager;
@@ -130,6 +131,10 @@ pub use user_manager::{UserAccount, UserManager as AccountManager, UserStatistic
 pub use boot_manager::{StartupEntry, BootManager, StartupStatistics, StartupType};
 pub use settings_manager::{
     SettingCategory, SettingEntry, SettingValue, SettingsManager, SettingsStatistics,
+};
+pub use system_monitor::{
+    CpuCore, DiskPartition, RamMemoryInfo, NetworkInterface,
+    SystemMonitor, SystemMonitorStatistics,
 };
 
 pub mod atomic_upgrade;
