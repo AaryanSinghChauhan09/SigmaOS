@@ -73,6 +73,10 @@ pub mod widget_manager;
 pub use widget_manager::{
     DesktopWidget, DesktopWidgetManager, DesktopWidgetPosition, DesktopWidgetStatistics, DesktopWidgetType,
 };
+pub mod layout_manager;
+pub use layout_manager::{
+    DesktopLayoutManager, DesktopLayoutStatistics, DesktopLayoutType, WorkspaceLayout,
+};
 
 // SigmaOS Desktop Module
 pub mod mate_betsy;
