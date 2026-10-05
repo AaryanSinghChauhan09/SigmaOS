@@ -37,6 +37,10 @@ pub mod screen_saver_manager;
 pub use screen_saver_manager::{
     DesktopLockOnSleep, DesktopScreenSaverManager, DesktopScreenSaverMode, DesktopScreenSaverStatistics,
 };
+pub mod sound_manager;
+pub use sound_manager::{
+    DesktopAudioDevice, DesktopAudioDeviceStatus, DesktopAudioDeviceType, DesktopSoundApplication, DesktopSoundManager, DesktopSoundProfile, DesktopSoundStatistics,
+};
 
 // SigmaOS Desktop Module
 pub mod mate_betsy;
