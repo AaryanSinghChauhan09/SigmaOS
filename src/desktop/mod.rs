@@ -77,6 +77,10 @@ pub mod layout_manager;
 pub use layout_manager::{
     DesktopLayoutManager, DesktopLayoutStatistics, DesktopLayoutType, WorkspaceLayout,
 };
+pub mod notification_area_manager;
+pub use notification_area_manager::{
+    NotificationAreaManager, NotificationAreaStatistics, TrayNotificationItem, TrayNotificationItemType,
+};
 
 // SigmaOS Desktop Module
 pub mod mate_betsy;
