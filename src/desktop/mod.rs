@@ -16,6 +16,11 @@ pub use desktop_file_manager::{
     FileInfo, DesktopFileExplorer, DesktopFileExplorerConfig, DesktopFileExplorerStatistics,
     FileType, DesktopSortOrder, DesktopViewMode,
 };
+pub mod notification_manager;
+pub use notification_manager::{
+    DesktopNotification, DesktopNotificationManager, DesktopNotificationStatistics,
+    DesktopNotificationUrgency,
+};
 
 // SigmaOS Desktop Module
 pub mod mate_betsy;
