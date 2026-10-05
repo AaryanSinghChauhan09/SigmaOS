@@ -179,6 +179,11 @@ pub use cursor_manager::{
     DesktopCursorManager, DesktopCursorManagerStatistics, DesktopCursorTheme,
     DesktopCursorSize, DesktopCursorType,
 };
+pub mod font_manager;
+pub use font_manager::{
+    DesktopFontManager, FontManagerStatistics, FontFamily, FontStyle,
+    FontWeight, FontSlant, FontWidth, FontUsageType,
+};
 
 // SigmaOS Desktop Module
 pub mod mate_betsy;
