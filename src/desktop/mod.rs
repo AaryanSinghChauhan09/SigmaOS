@@ -21,10 +21,6 @@ pub use notification_manager::{
     DesktopNotification, DesktopNotificationManager, DesktopNotificationStatistics,
     DesktopNotificationUrgency,
 };
-pub mod clipboard_manager;
-pub use clipboard_manager::{
-    ClipboardItem, ClipboardItemType, ClipboardHistoryManager, ClipboardHistoryStatistics,
-};
 pub mod search_manager;
 pub use search_manager::{
     SearchManager, SearchQuery, SearchResult, SearchResultType, SearchStatistics,
@@ -96,6 +92,10 @@ pub use screen_lock_manager::{
 pub mod screenshot_manager;
 pub use screenshot_manager::{
     DesktopScreenshot, DesktopScreenshotFormat, DesktopScreenshotManager, DesktopScreenshotMode, DesktopScreenshotStatistics,
+};
+pub mod recent_files_manager;
+pub use recent_files_manager::{
+    RecentFileEntry, RecentFilesManager, RecentFilesStatistics, RecentFileType,
 };
 
 // SigmaOS Desktop Module
