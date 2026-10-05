@@ -144,6 +144,11 @@ pub use keyboard_manager::{
     DesktopKeyboardManager, KeyboardManagerStatistics, KeyboardDevice, KeyboardConfiguration,
     KeyboardLayout, RepeatMode,
 };
+pub mod login_manager;
+pub use login_manager::{
+    DesktopLoginManager, LoginManagerStatistics, LoginUserSession, LoginDesktopEnvironment,
+    LoginSessionType,
+};
 
 // SigmaOS Desktop Module
 pub mod mate_betsy;
