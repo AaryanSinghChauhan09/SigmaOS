@@ -97,6 +97,11 @@ pub mod recent_files_manager;
 pub use recent_files_manager::{
     RecentFileEntry, RecentFilesManager, RecentFilesStatistics, RecentFileType,
 };
+pub mod a11y_manager;
+pub use a11y_manager::{
+    A11yProfile, A11yCursorSize, A11yManagerStatistics, DesktopA11yManager,
+    HighContrastMode, KeyboardRepeat, ScreenReaderMode, TextScaling,
+};
 
 // SigmaOS Desktop Module
 pub mod mate_betsy;
