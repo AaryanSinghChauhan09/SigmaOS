@@ -184,6 +184,11 @@ pub use font_manager::{
     DesktopFontManager, FontManagerStatistics, FontFamily, FontStyle,
     FontWeight, FontSlant, FontWidth, FontUsageType,
 };
+pub mod display_settings_manager;
+pub use display_settings_manager::{
+    DesktopDisplaySettingsManager, DesktopDisplaySettingsManagerStatistics, DesktopDisplay,
+    DesktopDisplayMode, DesktopRefreshRate, DesktopResolution,
+};
 
 // SigmaOS Desktop Module
 pub mod mate_betsy;
