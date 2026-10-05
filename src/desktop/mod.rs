@@ -85,6 +85,10 @@ pub mod workspace_manager;
 pub use workspace_manager::{
     DesktopWorkspace, DesktopWorkspaceManager, DesktopWorkspaceStatistics, DesktopWorkspaceType,
 };
+pub mod quick_settings_manager;
+pub use quick_settings_manager::{
+    DesktopQuickSetting, DesktopQuickSettingsManager, DesktopQuickSettingsStatistics, DesktopQuickSettingType,
+};
 
 // SigmaOS Desktop Module
 pub mod mate_betsy;
