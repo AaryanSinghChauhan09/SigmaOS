@@ -121,6 +121,14 @@ pub use screen_orientation_manager::{
     DesktopScreenOrientationManager, ScreenOrientationConfig, ScreenOrientationStatistics,
     ScreenOrientation, OrientationPolicy,
 };
+pub mod theme_manager;
+pub use theme_manager::{
+    DesktopThemeManager, DesktopThemeStatistics, DesktopTheme, DesktopThemeType,
+};
+pub mod color_scheme_manager;
+pub use color_scheme_manager::{
+    DesktopColorSchemeManager, ColorSchemeStatistics, ColorScheme, ColorSchemeType,
+};
 
 // SigmaOS Desktop Module
 pub mod mate_betsy;
