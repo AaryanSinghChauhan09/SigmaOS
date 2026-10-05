@@ -3,9 +3,13 @@ pub mod address_sanitizer;
 pub mod capability_enforcer;
 pub mod firewall_manager;
 pub mod memory_protection;
+pub mod privacy_manager;
 pub use address_sanitizer::{AddressSanitizer, MemoryRegion};
 pub use firewall_manager::{
     FirewallAction, NetworkFirewallManager, NetworkFirewallRule, NetworkFirewallStatistics, NetworkFirewallZone, Protocol,
+};
+pub use privacy_manager::{
+    PrivacyLevel, PrivacyManager, PrivacySetting, PrivacyStatistics,
 };
 pub mod audit;
 pub mod bsd_hardening;
