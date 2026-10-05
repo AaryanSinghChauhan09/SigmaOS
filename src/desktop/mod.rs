@@ -53,6 +53,10 @@ pub mod wallpaper_manager;
 pub use wallpaper_manager::{
     WallpaperManager, WallpaperMode, WallpaperProfile, WallpaperSource, WallpaperStatistics,
 };
+pub mod de_manager;
+pub use de_manager::{
+    DEConfig, DEManager, DEStatistics, DesktopDESessionType, DesktopEnvironment,
+};
 
 // SigmaOS Desktop Module
 pub mod mate_betsy;
