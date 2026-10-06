@@ -663,7 +663,7 @@ impl SovereignUniversalPmPrBridgeEngine {
             .get_mut(&pr_id)
             .ok_or("PR ID not found")?;
 
-        if tx.status != UniversalPrStatus::SatValidated {
+        if tx.status != UniversalPrStatus::SatValidated && tx.status != UniversalPrStatus::ConvertedToSigPkg {
             return Err("PR must pass SAT validation before conversion");
         }
 
