@@ -451,6 +451,13 @@ if [ -f "src/unimplemented_tools.rs" ]; then
     ./build/test_unimplemented_tools
 fi
 
+if [ -f "src/distro/sovereign_github_wiki_complete_deployment.rs" ]; then
+    echo "Running Sovereign GitHub Wiki Complete Deployment test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/distro/sovereign_github_wiki_complete_deployment.rs --cfg 'feature="standalone_test"' -o build/test_github_wiki_deployment
+    ./build/test_github_wiki_deployment
+fi
+
 if [ -f "src/wiki_unimplemented_ideas.rs" ]; then
     echo "Running Wiki Unimplemented Ideas test suite..."
     mkdir -p build
