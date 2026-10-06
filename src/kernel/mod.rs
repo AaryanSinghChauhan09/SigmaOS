@@ -191,8 +191,6 @@ pub use module_loading_control::{
 pub use scheduler::{
     CfsScheduler, Priority, ProcessState as SchedulerProcessState, ProcessTask, RtScheduler, SchedulerPolicy, ThermalState,
 };
-pub use traits::{Scheduler, SchedulerError};
-pub use virtual_cpu::VirtualCpu;
 
 pub mod procfs_linux;
 pub use procfs_linux::{

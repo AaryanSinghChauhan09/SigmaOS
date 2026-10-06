@@ -130,6 +130,7 @@ pub mod visual_dashboard;
 pub mod void_runit;
 pub mod wiki_ideas_implementation;
 pub mod sovereign_linux_bsd_ecosystem_advancements_v22;
+pub mod sovereign_linux_bsd_ecosystem_advancements_v24;
 pub mod sovereign_architecture_development_decision_plan;
 pub use sovereign_linux_bsd_wiki_master_engine::*;
 
@@ -390,9 +391,6 @@ pub use sovereign_github_wiki_complete_deployment::*;
 
 pub mod sovereign_linux_bsd_pinnacle_innovations_v14;
 pub use sovereign_linux_bsd_pinnacle_innovations_v14::*;
-
-pub mod sovereign_linux_bsd_ecosystem_advancements_v24;
-pub use sovereign_linux_bsd_ecosystem_advancements_v24::*;
 
 pub mod sovereign_2075_distro_supremacy_engine;
 pub use sovereign_2075_distro_supremacy_engine::*;
