@@ -396,6 +396,7 @@ impl SovereignWikiDistroIdeasDeploymentSuite {
             hyprland_compositor: SigmaOsWaylandHyprlandCompositorEngine::new(),
             ebpf_lsm_governor: SigmaOsEbpfLsmSecurityGovernor::new(),
             pqc_vpn_engine: SigmaOsZeroCopyPqcVpnEngine::new("wg_pqc0"),
+            roadmap_engine: SovereignKernelPhaseEngine::new(),
         }
     }
 
