@@ -11,7 +11,9 @@ use alloc::vec::Vec;
 #[cfg(test)]
 use std::format;
 #[cfg(test)]
+use std::string::String;
 #[cfg(test)]
+use std::vec::Vec;
 
 /// TechCrunch Open-Source Project Health & Startup Ecosystem Metrics
 #[derive(Debug, Clone)]
