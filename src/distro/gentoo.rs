@@ -8,8 +8,25 @@ use std::vec::Vec;
 // accept_keywords architecture evaluation, Manifest distfile digest verification,
 // OpenRC runlevel dependency supervision, and Catalyst stage compilation.
 
+#[cfg(not(any(feature = "standalone_test", test)))]
 use crate::klib::btreemap::BTreeMap;
+#[cfg(not(any(feature = "standalone_test", test)))]
 use crate::klib::hashset::HashSet;
+
+#[cfg(any(feature = "standalone_test", test))]
+use std::collections::{BTreeMap, HashSet};
+
+#[cfg(any(feature = "standalone_test", test))]
+pub trait BTreeMapGetStrExt<V> {
+    fn get_str(&self, key: &str) -> Option<&V>;
+}
+
+#[cfg(any(feature = "standalone_test", test))]
+impl<V> BTreeMapGetStrExt<V> for BTreeMap<String, V> {
+    fn get_str(&self, key: &str) -> Option<&V> {
+        self.get(key)
+    }
+}
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Version {
     pub major: u64,

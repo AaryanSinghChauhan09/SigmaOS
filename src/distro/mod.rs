@@ -376,6 +376,10 @@ pub mod community_ecosystem;
 pub use community_ecosystem::*;
 
 pub mod additional_linux_bsd_components;
+pub mod tech_media_distro_innovations;
+pub use tech_media_distro_innovations::*;
+pub mod tech_media_extended_innovations;
+pub use tech_media_extended_innovations::*;
 
 pub mod sovereign_2050_distro_supremacy_engine;
 
