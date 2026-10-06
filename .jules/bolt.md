@@ -39,3 +39,7 @@
 ## 2026-08-21 - Length-Cached Byte Arrays Across Container and AI Orchestration Subsystems
 **Learning:** Container and AI resource representations using fixed-size byte buffers (`[u8; 32]`, `[u8; 64]`, `[u8; 128]`) default to linear null-byte search scans (`position(|&b| b == 0)`) during string slice queries. Initializing an explicit `name_len: u8` / `image_len: u8` field during struct construction converts slice creation to an instantaneous $O(1)$ length slice `&buf[..len as usize]`, eliminating repeated scanning bottlenecks in high-frequency container lookup and model eviction loops.
 **Action:** When defining fixed-size byte array records in high-frequency runtime subsystems, always include explicit `len` fields to enforce $O(1)$ slice retrieval.
+
+## 2026-10-04 - Instantaneous O(1) Slice Retrieval for Desktop File Manager Entries
+**Learning:** In desktop file management and directory search components (`SimpleFileEntry` in `src/desktop/filemanager.rs`), retrieving entry names via `.position(|&b| b == 0)` triggered an $O(N)$ linear scan up to 256 bytes per entry on every search iteration or directory list query. Storing an explicit `name_len: u16` upon entry instantiation converts name retrieval into an instantaneous $O(1)$ slice operation `&self.name[..self.name_len as usize]`, eliminating CPU overhead during high-frequency file searches and bulk directory listings.
+**Action:** Always store explicit byte buffer lengths (`name_len: u16`) on file entry records to ensure $O(1)$ constant-time slice access.
