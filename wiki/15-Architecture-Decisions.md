@@ -15,6 +15,10 @@
 - **Context:** Modern hardware requires efficient multi-core processing, async I/O, and low-latency IPC.
 - **Decision:** Integrate LAPIC/IPI/MADT SMP, io_uring, kqueue, cgroups v2, OverlayFS, and PQC VPN firewall into the core kernel architecture.
 
+## Architecture Development Decision Plan (PR Submission Format)
+For the full Supreme Performance Architecture Development Decision Plan taking inspiration from Linux & BSD distributions, see:
+- **[18-Architecture-Performance-Development-Decision-Plan-PR.md](18-Architecture-Performance-Development-Decision-Plan-PR.md)** (Contains ADR-004 through ADR-010, Subsystem Performance Comparison Matrix, and PR Verification Checklist).
+
 
 ## AI Agent Maintenance Instructions
 
