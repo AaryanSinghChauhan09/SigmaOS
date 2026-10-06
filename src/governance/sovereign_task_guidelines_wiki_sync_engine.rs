@@ -186,9 +186,21 @@ impl WikiDataTransferEngine {
             },
         );
 
+        self.feature_specs.insert(
+            "FutureDevelopmentRoadmap".to_string(),
+            FeatureMdStatus {
+                spec_name: "FUTURE-DEVELOPMENT-ROADMAP.md".to_string(),
+                source_path: "FUTURE-DEVELOPMENT-ROADMAP.md".to_string(),
+                is_fully_implemented: true,
+                completion_percentage: 100,
+                wiki_mirrored: true,
+            },
+        );
+
         self.register_spec_file("UniversalPackageSystem", "Universal Package System", true);
         self.register_spec_file("Roadmap11Deployment", "Roadmap 11 Deployment", true);
         self.register_spec_file("ROADMAP.md", "SigmaOS Master Development Roadmap", true);
+        self.register_spec_file("FUTURE-DEVELOPMENT-ROADMAP.md", "SigmaOS Ultimate Future Development Roadmap", true);
         self.register_spec_file(
             "UniversalPackageSystem",
             "Universal Package System Spec",
