@@ -82,6 +82,8 @@ pub struct RegisterSet {
     pub rsp: u64, // Stack Pointer
 }
 
+pub type VirtualCpu = SovereignVirtualCPU;
+
 /// Sovereign Virtual CPU managing execution state, privilege boundaries, and simulated physical memory
 pub struct SovereignVirtualCPU {
     pub mode: CpuMode,

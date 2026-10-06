@@ -5,6 +5,8 @@ pub mod capability_enforcer;
 pub use address_sanitizer::{
     AddressSanitizer, AsanRegion, AsanConfig, AsanStatistics, ShadowState,
 };
+pub mod cap_rights;
+pub use cap_rights::CapRightsMask;
 pub mod capability;
 pub mod capsicum;
 pub mod filesystem_encryption;

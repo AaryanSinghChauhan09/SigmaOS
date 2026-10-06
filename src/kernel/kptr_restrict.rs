@@ -58,6 +58,12 @@ pub struct SecurityMitigations {
 pub type DmesgRestrictLevel = KptrRestrictLevel;
 pub type KernelSecurityMitigations = SecurityMitigations;
 
+// Subsystem type aliases for backward compatibility across kernel imports
+pub type KptrRestrict = KptrRestrictLevel;
+pub type DmesgRestrict = DmesgRestrictLevel;
+pub type KernelSecurityParams = SecurityMitigations;
+pub type SecurityLevel = KptrRestrictLevel;
+
 impl SecurityMitigations {
     pub fn current() -> Self {
         Self {

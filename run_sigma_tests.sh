@@ -535,6 +535,13 @@ if [ -f "src/distro/sovereign_linux_bsd_ecosystem_pinnacle_suite.rs" ]; then
     ./build/test_ecosystem_pinnacle
 fi
 
+if [ -f "src/distro/sovereign_linux_bsd_ecosystem_advancements_v25.rs" ]; then
+    echo "Running Sovereign Linux & BSD Ecosystem Advancements Suite V25 test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_linux_bsd_ecosystem_advancements_v25.rs --edition=2021 -o build/test_advancements_v25
+    ./build/test_advancements_v25
+fi
+
 if [ -f "src/distro/sovereign_linux_bsd_pinnacle_innovations_v14.rs" ]; then
     echo "Running Sovereign Linux & BSD Pinnacle Innovations Suite V14 test suite..."
     mkdir -p build
