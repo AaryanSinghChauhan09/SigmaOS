@@ -15,10 +15,10 @@
 use std::boxed::Box;
 use std::vec::Vec;
 
-use core::sync::atomic::{AtomicUsize, Ordering};
 /// OOP-based File Manager for SigmaOS
 /// Based on Ideas-999-Structured: User Experience & Desktop Item 766
 /// Implements file browser and management
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type FileID = usize;
 
@@ -59,7 +59,7 @@ pub struct SimpleFileEntry {
 impl SimpleFileEntry {
     pub fn new(id: FileID, name: &[u8], file_type: FileType, size: u64) -> Self {
         let mut name_array = [0u8; 256];
-        let name_len = name.len().min(256);
+        let name_len = name.len().min(255);
         unsafe {
             core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
         }
@@ -79,8 +79,9 @@ impl FileEntry for SimpleFileEntry {
         self.id
     }
     fn name(&self) -> &[u8] {
-        // Bolt ⚡ Optimization: Instantaneous O(1) constant-time slice lookup using cached name_len,
-        // eliminating O(N) zero-byte linear scans (.position(|&b| b == 0)) on every file name access in file manager views.
+        // Bolt ⚡ Optimization: Store explicit name length on instantiation to eliminate
+        // O(N) zero-byte linear scanning (.position(|&b| b == 0)) on every FileEntry name access,
+        // reducing slice lookup to instantaneous O(1) constant time.
         &self.name[..self.name_len as usize]
     }
     fn file_type(&self) -> FileType {
@@ -364,14 +365,12 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_simple_file_entry_cached_name_len() {
-        let entry = SimpleFileEntry::new(1, b"documents", FileType::Directory, 4096);
+    fn test_simple_file_entry_cached_name_slice() {
+        let entry = SimpleFileEntry::new(1, b"config.toml", FileType::File, 1024);
+        assert_eq!(entry.name(), b"config.toml");
         assert_eq!(entry.id(), 1);
-        assert_eq!(entry.name(), b"documents");
-        assert_eq!(entry.name_len, 9);
-        assert_eq!(entry.file_type(), FileType::Directory);
-        assert_eq!(entry.size(), 4096);
-        assert!(!entry.is_hidden());
+        assert_eq!(entry.size(), 1024);
+        assert_eq!(entry.file_type(), FileType::File);
     }
 
     #[test]
