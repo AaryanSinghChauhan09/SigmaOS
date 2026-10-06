@@ -132,6 +132,28 @@ impl ShortcutCategory {
     }
 }
 
+/// Shortcut registration error
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ShortcutRegistrationError {
+    AlreadyExists,
+    InvalidKey,
+    InvalidModifier,
+    Disabled,
+    Conflict(String),
+}
+
+impl ShortcutRegistrationError {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::AlreadyExists => "shortcut_already_exists",
+            Self::InvalidKey => "invalid_key",
+            Self::InvalidModifier => "invalid_modifier",
+            Self::Disabled => "shortcuts_disabled",
+            Self::Conflict(_) => "shortcut_conflict",
+        }
+    }
+}
+
 /// Shortcut configuration
 #[derive(Debug, Clone)]
 pub struct ShortcutConfig {

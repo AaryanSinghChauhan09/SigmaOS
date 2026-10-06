@@ -26,6 +26,10 @@ impl ModuleSignatureState {
     }
 }
 
+// Type aliases for kernel module loading control
+pub type ModuleLoadingPolicy = ModuleLoadPolicy;
+pub type ModuleLoadingRule = ModuleRule;
+
 /// Module loading policy
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ModuleLoadPolicy {
