@@ -130,6 +130,8 @@ pub use distro::sovereign_2075_distro_supremacy_engine::*;
 pub use distro::sovereign_2080_distro_supremacy_engine::*;
 pub use distro::sovereign_linux_bsd_master_synthesis::*;
 pub use distro::sovereign_linux_bsd_pinnacle_innovations_v14::*;
+pub use distro::sovereign_linux_bsd_ecosystem_advancements_v22::*;
+pub use distro::sovereign_architecture_development_decision_plan::*;
 pub use distro::sovereign_media_and_distro_unimplemented_innovations::*;
 pub use distro::SovereignMasterSubsystemDistroHarmonizer;
 pub use kernel::tss_ring3_user_mode::*;
