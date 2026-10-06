@@ -370,6 +370,7 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::GhostBsd
             | DistroSubsystemMode::OpenBsdHardened
             | DistroSubsystemMode::OpenBsdUnveilHardened
+            | DistroSubsystemMode::OpenBsdKarled
             | DistroSubsystemMode::NomadBsd => ServiceSupervisorType::OpenRC,
 
             DistroSubsystemMode::LinuxAlpine
@@ -441,7 +442,9 @@ impl SovereignUniversalDistroBridge {
                 | DistroSubsystemMode::LinuxCentOSStream
                 | DistroSubsystemMode::LinuxNobara
                 | DistroSubsystemMode::LinuxBazzite
-                | DistroSubsystemMode::LinuxOpenMandriva,
+                | DistroSubsystemMode::LinuxOpenMandriva
+                | DistroSubsystemMode::LinuxRedHatEnterprise
+                | DistroSubsystemMode::LinuxCentOSStream,
                 "/var/lib/pkg",
             ) => "/var/lib/rpm".to_string(),
             (
@@ -618,6 +621,7 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::GhostBsd
             | DistroSubsystemMode::OpenBsdHardened
             | DistroSubsystemMode::OpenBsdUnveilHardened
+            | DistroSubsystemMode::OpenBsdKarled
             | DistroSubsystemMode::NomadBsd => supervisor == ServiceSupervisorType::OpenRC,
 
             DistroSubsystemMode::LinuxAlpine
@@ -715,6 +719,8 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxEuroLinux
             | DistroSubsystemMode::LinuxAnolis
             | DistroSubsystemMode::LinuxBazzite
+            | DistroSubsystemMode::LinuxRedHatEnterprise
+            | DistroSubsystemMode::LinuxCentOSStream
             | DistroSubsystemMode::LinuxOpenMandriva => {
                 format!("{}.rpm", input_pkg)
             }
@@ -837,6 +843,8 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxEuroLinux
             | DistroSubsystemMode::LinuxAnolis
             | DistroSubsystemMode::LinuxBazzite
+            | DistroSubsystemMode::LinuxRedHatEnterprise
+            | DistroSubsystemMode::LinuxCentOSStream
             | DistroSubsystemMode::LinuxOpenMandriva => format!("{}.rpm", action),
             DistroSubsystemMode::LinuxPuppy => format!("{}.pet", action),
             DistroSubsystemMode::LinuxSolus | DistroSubsystemMode::LinuxSerpentOS => {
@@ -897,6 +905,7 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::FreeBsdHardened
             | DistroSubsystemMode::FreeBsdHardenedPqc
             | DistroSubsystemMode::FreeBsdCapsicumHardened
+            | DistroSubsystemMode::FreeBsdBhyveVirtualization
             | DistroSubsystemMode::DragonFlyBsd
             | DistroSubsystemMode::DragonFlyHammer2
             | DistroSubsystemMode::DragonFlyBsdHammer2Pfs
@@ -911,6 +920,7 @@ impl SovereignUniversalDistroBridge {
             }
             DistroSubsystemMode::OpenBsd
             | DistroSubsystemMode::OpenBsdUnveilHardened
+            | DistroSubsystemMode::OpenBsdKarled
             | DistroSubsystemMode::NetBsd
             | DistroSubsystemMode::OpenBsdHardened
             | DistroSubsystemMode::NetBsdRump => {
@@ -3327,6 +3337,53 @@ mod inspiration_leap_tests {
 #[cfg(test)]
 mod subsystem_interop_tests {
     use super::*;
+
+    #[test]
+    fn test_new_distro_subsystem_modes_verification() {
+        let modes = [
+            DistroSubsystemMode::LinuxRedHatEnterprise,
+            DistroSubsystemMode::LinuxCentOSStream,
+            DistroSubsystemMode::LinuxGentooHardened,
+            DistroSubsystemMode::FreeBsdBhyveVirtualization,
+            DistroSubsystemMode::OpenBsdKarled,
+        ];
+
+        let mut bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxArch);
+        for &mode in &modes {
+            bridge.set_subsystem_mode(mode);
+            assert!(bridge.verify_all_subsystems_compatibility_matrix());
+            let (supervisor, pkg_spec, vfs_etc, compatible) = bridge.get_distro_capability_matrix();
+            assert!(compatible);
+            assert!(!pkg_spec.is_empty());
+            assert!(!vfs_etc.is_empty());
+
+            match mode {
+                DistroSubsystemMode::LinuxRedHatEnterprise | DistroSubsystemMode::LinuxCentOSStream => {
+                    assert_eq!(supervisor, ServiceSupervisorType::Systemd);
+                    assert!(pkg_spec.ends_with(".rpm"));
+                    assert_eq!(vfs_etc, "/etc");
+                    assert_eq!(bridge.translate_vfs_path("/var/lib/pkg"), "/var/lib/rpm");
+                }
+                DistroSubsystemMode::LinuxGentooHardened => {
+                    assert_eq!(supervisor, ServiceSupervisorType::OpenRC);
+                    assert!(pkg_spec.ends_with(".ebuild"));
+                }
+                DistroSubsystemMode::FreeBsdBhyveVirtualization => {
+                    assert_eq!(supervisor, ServiceSupervisorType::OpenRC);
+                    assert!(pkg_spec.ends_with(".pkg"));
+                    assert_eq!(vfs_etc, "/usr/local/etc");
+                    assert_eq!(bridge.translate_vfs_path("/var/lib/pkg"), "/var/db/pkg");
+                }
+                DistroSubsystemMode::OpenBsdKarled => {
+                    assert_eq!(supervisor, ServiceSupervisorType::OpenRC);
+                    assert!(pkg_spec.ends_with(".tgz"));
+                    assert_eq!(vfs_etc, "/usr/local/etc");
+                    assert_eq!(bridge.translate_vfs_path("/var/lib/pkg"), "/var/db/pkg");
+                }
+                _ => {}
+            }
+        }
+    }
 
     #[test]
     fn test_cross_distro_subsystem_all_verify_matrix() {
