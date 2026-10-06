@@ -410,6 +410,9 @@ pub use sovereign_mint_omarchy_apex_mastery::*;
 pub mod sovereign_mint_omarchy_zenith_mastery;
 pub use sovereign_mint_omarchy_zenith_mastery::*;
 
+pub mod tech_media_publication_innovations;
+pub use tech_media_publication_innovations::*;
+
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;
 pub use crate::stubs::large_distro_stubs::*;
