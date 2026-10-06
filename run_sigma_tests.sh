@@ -93,6 +93,13 @@ if [ -f "src/distro/linux_bsd_inspirations.rs" ]; then
     ./build/distro_inspirations_test
 fi
 
+if [ -f "src/distro/sovereign_netbsd_parity_engine.rs" ]; then
+    echo "Running Sovereign NetBSD Parity Engine test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_netbsd_parity_engine.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_sovereign_netbsd_parity
+    ./build/test_sovereign_netbsd_parity
+fi
+
 if [ -f "src/distro/distro_inspiration_synthesis.rs" ]; then
     echo "Running Linux & BSD distro inspiration synthesis test suite..."
     mkdir -p build

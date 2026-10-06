@@ -411,6 +411,9 @@ pub use omarchy_gap_closure_advancements_v25::*;
 pub mod sovereign_2075_distro_supremacy_engine;
 pub use sovereign_2075_distro_supremacy_engine::*;
 
+pub mod sovereign_netbsd_parity_engine;
+pub use sovereign_netbsd_parity_engine::*;
+
 pub mod sovereign_mint_omarchy_supremacy_suite;
 pub use sovereign_mint_omarchy_supremacy_suite::*;
 
