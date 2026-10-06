@@ -405,6 +405,9 @@ pub use sovereign_mint_omarchy_apex_mastery::*;
 pub mod sovereign_mint_omarchy_zenith_mastery;
 pub use sovereign_mint_omarchy_zenith_mastery::*;
 
+pub mod sovereign_linux_bsd_ecosystem_advancements_v22;
+pub use sovereign_linux_bsd_ecosystem_advancements_v22::*;
+
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;
 pub use crate::stubs::large_distro_stubs::*;

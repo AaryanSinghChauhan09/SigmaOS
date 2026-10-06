@@ -598,4 +598,11 @@ if [ -f "src/desktop/omarchy_browser_theme_sync.rs" ]; then
     ./build/test_browser_sync
 fi
 
+if [ -f "src/distro/sovereign_linux_bsd_ecosystem_advancements_v22.rs" ]; then
+    echo "Running Sovereign Linux & BSD Ecosystem Advancements V22 & PR Gateway test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_linux_bsd_ecosystem_advancements_v22.rs --edition=2021 -o build/test_advancements_v22
+    ./build/test_advancements_v22
+fi
+
 echo "All SigmaOS test suites completed."

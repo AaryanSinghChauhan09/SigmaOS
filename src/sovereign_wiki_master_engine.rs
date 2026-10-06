@@ -10,7 +10,6 @@ extern crate alloc;
 
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
-use alloc::vec;
 use alloc::vec::Vec;
 
 // =========================================================================
@@ -147,6 +146,12 @@ impl SovereignLinuxBsdWikiRoadmapParityEngine {
                 "src/package/sovereign_pr_package_gateway.rs",
                 "Package PR Gateway",
             ),
+            (
+                17,
+                "Sovereign Linux & BSD Ecosystem Advancements V22 & PR Gateway",
+                "src/distro/sovereign_linux_bsd_ecosystem_advancements_v22.rs",
+                "V22 Distro PR Gateway",
+            ),
         ];
 
         for (id, title, module, _spec) in default_ideas {
@@ -276,8 +281,8 @@ mod tests {
     #[test]
     fn test_wiki_roadmap_parity_engine() {
         let engine = SovereignLinuxBsdWikiRoadmapParityEngine::new();
-        assert_eq!(engine.total_ideas_count, 16);
-        assert_eq!(engine.implemented_ideas_count(), 16);
+        assert_eq!(engine.total_ideas_count, 17);
+        assert_eq!(engine.implemented_ideas_count(), 17);
         assert_eq!(engine.verification_percentage(), 100.0);
     }
 
