@@ -6410,6 +6410,396 @@ impl SovereignInteractiveDashboardSlicerEngine {
     }
 }
 
+// ---------------------------------------------------------------------------
+// 1. Google Docs Citation & Bibliography Engine
+// ---------------------------------------------------------------------------
+
+/// Citation style format for Google Docs academic referencing.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum CitationStyle {
+    APA,
+    MLA,
+    Chicago,
+    IEEE,
+}
+
+/// A citation item representing a book, article, or online resource.
+#[derive(Debug, Clone)]
+pub struct CitationItem {
+    pub id: String,
+    pub title: String,
+    pub author: String,
+    pub year: u32,
+    pub publisher: Option<String>,
+    pub url_or_doi: Option<String>,
+}
+
+/// Sovereign Academic Citation & Bibliography Engine inspired by Google Docs.
+#[derive(Debug, Clone, Default)]
+pub struct SovereignAcademicCitationEngine {
+    citations: Vec<CitationItem>,
+}
+
+impl SovereignAcademicCitationEngine {
+    pub fn new() -> Self {
+        Self {
+            citations: Vec::new(),
+        }
+    }
+
+    /// Registers a citation item in the document bibliography database.
+    pub fn add_citation(&mut self, item: CitationItem) {
+        self.citations.retain(|c| c.id != item.id);
+        self.citations.push(item);
+    }
+
+    /// Formats an in-text citation marker based on the chosen style.
+    pub fn format_in_text_citation(&self, id: &str, style: CitationStyle) -> Option<String> {
+        let item = self.citations.iter().find(|c| c.id == id)?;
+        let last_name = item
+            .author
+            .split_whitespace()
+            .last()
+            .unwrap_or(&item.author);
+
+        let marker = match style {
+            CitationStyle::APA => format!("({}, {})", last_name, item.year),
+            CitationStyle::MLA => format!("({})", last_name),
+            CitationStyle::Chicago => format!("({}, {})", last_name, item.year),
+            CitationStyle::IEEE => {
+                let idx = self.citations.iter().position(|c| c.id == id).unwrap_or(0) + 1;
+                format!("[{}]", idx)
+            }
+        };
+        Some(marker)
+    }
+
+    /// Generates a sorted and formatted bibliography string list for the entire document.
+    pub fn generate_formatted_bibliography(&self, style: CitationStyle) -> Vec<String> {
+        let mut sorted = self.citations.clone();
+        sorted.sort_by(|a, b| a.author.cmp(&b.author));
+
+        sorted
+            .into_iter()
+            .enumerate()
+            .map(|(i, item)| match style {
+                CitationStyle::APA => {
+                    let pub_str = item
+                        .publisher
+                        .map(|p| format!(" {}.", p))
+                        .unwrap_or_default();
+                    format!(
+                        "{}. ({}). {}.{}",
+                        item.author, item.year, item.title, pub_str
+                    )
+                }
+                CitationStyle::MLA => {
+                    let pub_str = item
+                        .publisher
+                        .map(|p| format!(" {},", p))
+                        .unwrap_or_default();
+                    format!(
+                        "{}. \"{}\".{} {}.",
+                        item.author, item.title, pub_str, item.year
+                    )
+                }
+                CitationStyle::Chicago => {
+                    let pub_str = item
+                        .publisher
+                        .map(|p| format!(" {}:", p))
+                        .unwrap_or_default();
+                    format!(
+                        "{}. {}.{} {}.",
+                        item.author, item.title, pub_str, item.year
+                    )
+                }
+                CitationStyle::IEEE => {
+                    let pub_str = item
+                        .publisher
+                        .map(|p| format!(" {},", p))
+                        .unwrap_or_default();
+                    format!(
+                        "[{}] {}. \"{}\".{} {}.",
+                        i + 1,
+                        item.author,
+                        item.title,
+                        pub_str,
+                        item.year
+                    )
+                }
+            })
+            .collect()
+    }
+}
+
+// ---------------------------------------------------------------------------
+// 2. Google Looker Studio Data Storytelling & Narrative Engine
+// ---------------------------------------------------------------------------
+
+/// Step in an interactive data story.
+#[derive(Debug, Clone)]
+pub struct DataStoryStep {
+    pub step_index: usize,
+    pub title: String,
+    pub description: String,
+    pub highlight_filter: HashMap<String, String>,
+}
+
+/// Sovereign Data Storytelling Engine inspired by Google Looker Studio and Tableau.
+#[derive(Debug, Clone, Default)]
+pub struct SovereignDataStorytellingEngine {
+    steps: Vec<DataStoryStep>,
+}
+
+impl SovereignDataStorytellingEngine {
+    pub fn new() -> Self {
+        Self { steps: Vec::new() }
+    }
+
+    /// Adds a step to the interactive data presentation story.
+    pub fn add_story_step(&mut self, step: DataStoryStep) {
+        self.steps.push(step);
+    }
+
+    /// Retrieves a specific story step by index.
+    pub fn get_step(&self, index: usize) -> Option<&DataStoryStep> {
+        self.steps.iter().find(|s| s.step_index == index)
+    }
+
+    /// Automatically generates an executive summary narrative based on metric growth trend.
+    pub fn generate_narrative_summary(&self, metric_name: &str, old_val: f64, new_val: f64) -> String {
+        let diff = new_val - old_val;
+        let pct = if old_val != 0.0 {
+            (diff / old_val) * 100.0
+        } else if new_val > 0.0 {
+            100.0
+        } else {
+            0.0
+        };
+
+        if pct > 10.0 {
+            format!(
+                "Significant positive momentum in {}: increased by {:.1}% (+{:.2}).",
+                metric_name, pct, diff
+            )
+        } else if pct < -10.0 {
+            format!(
+                "Decline detected in {}: dropped by {:.1}% ({:.2}). Action required.",
+                metric_name, pct.abs(), diff
+            )
+        } else {
+            format!(
+                "Stable performance in {}: minor variation of {:.1}%.",
+                metric_name, pct
+            )
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// 3. Salesforce / Zoho Customer Churn Prediction & Retention Engine
+// ---------------------------------------------------------------------------
+
+/// Customer churn risk level classification.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ChurnRiskLevel {
+    Low,
+    Medium,
+    High,
+    Critical,
+}
+
+/// Customer engagement indicators for churn calculation.
+#[derive(Debug, Clone)]
+pub struct CustomerMetrics {
+    pub customer_id: String,
+    pub days_since_last_login: u32,
+    pub open_support_tickets: u32,
+    pub active_contract_months: u32,
+    pub monthly_active_users: u32,
+}
+
+/// Sovereign Customer Churn Prediction & Retention Engine inspired by Salesforce and Zoho CRM.
+#[derive(Debug, Clone, Default)]
+pub struct SovereignChurnPredictionRetentionEngine;
+
+impl SovereignChurnPredictionRetentionEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    /// Calculates customer health score from 0 (worst) to 100 (best).
+    pub fn calculate_health_score(&self, metrics: &CustomerMetrics) -> f64 {
+        let mut score = 100.0;
+
+        // Deduct for inactivity
+        if metrics.days_since_last_login > 30 {
+            score -= 40.0;
+        } else if metrics.days_since_last_login > 14 {
+            score -= 20.0;
+        }
+
+        // Deduct for high open support tickets
+        score -= (metrics.open_support_tickets as f64 * 5.0).min(30.0);
+
+        // Boost for contract longevity
+        if metrics.active_contract_months >= 12 {
+            score += 10.0;
+        }
+
+        // Boost for high active users
+        if metrics.monthly_active_users >= 10 {
+            score += 10.0;
+        }
+
+        score.min(100.0).max(0.0)
+    }
+
+    /// Predicts churn risk level based on health score.
+    pub fn predict_churn_risk(&self, metrics: &CustomerMetrics) -> ChurnRiskLevel {
+        let health = self.calculate_health_score(metrics);
+        if health >= 80.0 {
+            ChurnRiskLevel::Low
+        } else if health >= 50.0 {
+            ChurnRiskLevel::Medium
+        } else if health > 30.0 {
+            ChurnRiskLevel::High
+        } else {
+            ChurnRiskLevel::Critical
+        }
+    }
+
+    /// Recommends automated retention actions based on churn risk.
+    pub fn recommend_retention_workflow(&self, risk: ChurnRiskLevel) -> &'static str {
+        match risk {
+            ChurnRiskLevel::Low => "Nurture sequence: monthly newsletter and product update features",
+            ChurnRiskLevel::Medium => "Check-in email from Customer Success Representative",
+            ChurnRiskLevel::High => "Schedule executive phone review & offer usage training webinar",
+            ChurnRiskLevel::Critical => "Immediate priority escalation to Account Director & 20% renewal discount offer",
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// 4. Bitrix24 / Odoo Omnichannel Communication Gateway
+// ---------------------------------------------------------------------------
+
+/// Omnichannel communication channels.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum CommunicationChannel {
+    Email,
+    SMS,
+    WhatsApp,
+    LiveChat,
+    Voice,
+}
+
+/// Unified message object across omnichannel feeds.
+#[derive(Debug, Clone)]
+pub struct OmnichannelMessage {
+    pub message_id: String,
+    pub customer_id: String,
+    pub channel: CommunicationChannel,
+    pub sender: String,
+    pub content: String,
+    pub timestamp: u64,
+    pub priority: u8, // 1 (lowest) to 5 (highest)
+}
+
+/// Sovereign Omnichannel Communication Gateway inspired by Bitrix24 and Odoo.
+#[derive(Debug, Clone, Default)]
+pub struct SovereignOmnichannelCommunicationGateway {
+    inbox: Vec<OmnichannelMessage>,
+}
+
+impl SovereignOmnichannelCommunicationGateway {
+    pub fn new() -> Self {
+        Self { inbox: Vec::new() }
+    }
+
+    /// Ingests an incoming omnichannel message.
+    pub fn receive_message(&mut self, msg: OmnichannelMessage) {
+        self.inbox.push(msg);
+    }
+
+    /// Retrieves unified timeline of messages for a specific customer across all channels.
+    pub fn get_customer_timeline(&self, customer_id: &str) -> Vec<OmnichannelMessage> {
+        let mut timeline: Vec<_> = self
+            .inbox
+            .iter()
+            .filter(|m| m.customer_id == customer_id)
+            .cloned()
+            .collect();
+        timeline.sort_by_key(|m| m.timestamp);
+        timeline
+    }
+
+    /// Returns high-priority unhandled messages sorted by priority descending.
+    pub fn get_priority_queue(&self, min_priority: u8) -> Vec<OmnichannelMessage> {
+        let mut queue: Vec<_> = self
+            .inbox
+            .iter()
+            .filter(|m| m.priority >= min_priority)
+            .cloned()
+            .collect();
+        queue.sort_by(|a, b| b.priority.cmp(&a.priority));
+        queue
+    }
+}
+
+// ---------------------------------------------------------------------------
+// 5. Microsoft / Zoho Financial Valuation & Cash Flow Forecasting Engine
+// ---------------------------------------------------------------------------
+
+/// Sovereign Financial Valuation & Cash Flow Forecasting Engine inspired by Microsoft Excel & Zoho Books.
+#[derive(Debug, Clone, Default)]
+pub struct SovereignFinancialValuationEngine;
+
+impl SovereignFinancialValuationEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    /// Computes Discounted Cash Flow (DCF) Valuation.
+    /// `projected_cash_flows`: annual free cash flow predictions.
+    /// `wacc`: Weighted Average Cost of Capital (e.g., 0.10 for 10%).
+    /// `terminal_growth_rate`: perpetual growth rate (e.g., 0.02 for 2%).
+    pub fn calculate_dcf_valuation(
+        &self,
+        projected_cash_flows: &[f64],
+        wacc: f64,
+        terminal_growth_rate: f64,
+    ) -> f64 {
+        if wacc <= terminal_growth_rate || projected_cash_flows.is_empty() {
+            return 0.0;
+        }
+
+        let mut npv = 0.0;
+        for (t, &cf) in projected_cash_flows.iter().enumerate() {
+            let period = (t + 1) as f64;
+            npv += cf / (1.0 + wacc).powf(period);
+        }
+
+        // Terminal value
+        let last_cf = *projected_cash_flows.last().unwrap();
+        let terminal_value = (last_cf * (1.0 + terminal_growth_rate)) / (wacc - terminal_growth_rate);
+        let discounted_terminal_value = terminal_value / (1.0 + wacc).powf(projected_cash_flows.len() as f64);
+
+        npv + discounted_terminal_value
+    }
+
+    /// Generates multi-period cash flow forecast given initial cash flow and constant growth rate.
+    pub fn forecast_cash_flows(&self, initial_cf: f64, annual_growth_rate: f64, periods: usize) -> Vec<f64> {
+        let mut forecast = Vec::with_capacity(periods);
+        let mut current = initial_cf;
+        for _ in 0..periods {
+            current *= 1.0 + annual_growth_rate;
+            forecast.push(current);
+        }
+        forecast
+    }
+}
+
 // Placeholder types for compilation
 mod sigma_types {
     pub type Result<T> = core::result::Result<T, &'static str>;
@@ -7610,5 +8000,98 @@ mod tests {
 
         let ts = slicer_engine.aggregate_time_series(&dataset, "date", "sales");
         assert_eq!(ts.get("2026-01").copied(), Some(800.0));
+
+        // 6. SovereignAcademicCitationEngine
+        let mut citation_engine = SovereignAcademicCitationEngine::new();
+        citation_engine.add_citation(CitationItem {
+            id: "ref1".to_string(),
+            title: "SigmaOS Architecture".to_string(),
+            author: "Alan Turing".to_string(),
+            year: 2026,
+            publisher: Some("Sovereign Press".to_string()),
+            url_or_doi: Some("doi:10.1000/sigma123".to_string()),
+        });
+        assert_eq!(
+            citation_engine.format_in_text_citation("ref1", CitationStyle::APA),
+            Some("(Turing, 2026)".to_string())
+        );
+        assert_eq!(
+            citation_engine.format_in_text_citation("ref1", CitationStyle::IEEE),
+            Some("[1]".to_string())
+        );
+        let bib = citation_engine.generate_formatted_bibliography(CitationStyle::APA);
+        assert_eq!(bib.len(), 1);
+        assert!(bib[0].contains("Alan Turing. (2026). SigmaOS Architecture. Sovereign Press."));
+
+        // 7. SovereignDataStorytellingEngine
+        let mut story_engine = SovereignDataStorytellingEngine::new();
+        story_engine.add_story_step(DataStoryStep {
+            step_index: 1,
+            title: "Q1 Revenue Surge".to_string(),
+            description: "High adoption in enterprise segment".to_string(),
+            highlight_filter: HashMap::new(),
+        });
+        assert_eq!(story_engine.get_step(1).unwrap().title, "Q1 Revenue Surge");
+        let narrative = story_engine.generate_narrative_summary("ARR", 100.0, 125.0);
+        assert!(narrative.contains("Significant positive momentum in ARR"));
+
+        // 8. SovereignChurnPredictionRetentionEngine
+        let churn_engine = SovereignChurnPredictionRetentionEngine::new();
+        let healthy_customer = CustomerMetrics {
+            customer_id: "c1".to_string(),
+            days_since_last_login: 2,
+            open_support_tickets: 0,
+            active_contract_months: 18,
+            monthly_active_users: 25,
+        };
+        assert_eq!(churn_engine.predict_churn_risk(&healthy_customer), ChurnRiskLevel::Low);
+
+        let critical_customer = CustomerMetrics {
+            customer_id: "c2".to_string(),
+            days_since_last_login: 45,
+            open_support_tickets: 8,
+            active_contract_months: 2,
+            monthly_active_users: 1,
+        };
+        assert_eq!(churn_engine.predict_churn_risk(&critical_customer), ChurnRiskLevel::Critical);
+
+        // 9. SovereignOmnichannelCommunicationGateway
+        let mut comms_gateway = SovereignOmnichannelCommunicationGateway::new();
+        comms_gateway.receive_message(OmnichannelMessage {
+            message_id: "m1".to_string(),
+            customer_id: "cust99".to_string(),
+            channel: CommunicationChannel::WhatsApp,
+            sender: "+15550199".to_string(),
+            content: "Need help with API key integration".to_string(),
+            timestamp: 100,
+            priority: 4,
+        });
+        comms_gateway.receive_message(OmnichannelMessage {
+            message_id: "m2".to_string(),
+            customer_id: "cust99".to_string(),
+            channel: CommunicationChannel::Email,
+            sender: "cust99@example.com".to_string(),
+            content: "Followup on API key".to_string(),
+            timestamp: 105,
+            priority: 2,
+        });
+
+        let timeline = comms_gateway.get_customer_timeline("cust99");
+        assert_eq!(timeline.len(), 2);
+        assert_eq!(timeline[0].message_id, "m1");
+
+        let high_prio = comms_gateway.get_priority_queue(3);
+        assert_eq!(high_prio.len(), 1);
+        assert_eq!(high_prio[0].message_id, "m1");
+
+        // 10. SovereignFinancialValuationEngine
+        let val_engine = SovereignFinancialValuationEngine::new();
+        let cash_flows = vec![100000.0, 120000.0, 140000.0];
+        let dcf = val_engine.calculate_dcf_valuation(&cash_flows, 0.10, 0.02);
+        assert!(dcf > 1000000.0);
+
+        let forecasted = val_engine.forecast_cash_flows(100.0, 0.10, 3);
+        assert_eq!(forecasted.len(), 3);
+        assert!((forecasted[0] - 110.0).abs() < 1e-5);
     }
 }
