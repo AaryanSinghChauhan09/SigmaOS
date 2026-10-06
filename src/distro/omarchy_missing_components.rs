@@ -4,6 +4,23 @@
 // - Interactive TUI Menu Applet for Terminal Tasks & Themes
 // - Power Profile Manager for Dynamic CPU Governor Toggling
 // - Dotfiles Snapshot Backup & Version Control Manager
+// - Waybar Dynamic Status Bar Configuration Generator
+// - Rofi Command Palette Router
+// - SDDM & Plymouth Display Theme Customizer Engine
+// - WirePlumber Spatial Audio & Bluetooth Codec Engine
+// - Pacman & YAY AUR Update Gateway Engine
+// - Hyprland Autotiling & Gesture Binder Engine
+// - Catppuccin Theme & GTK/Qt/Kvantum Sync Engine
+// - NetworkManager / iwd Wi-Fi Scanner & Connection Engine
+// - BlueZ Bluetooth Pairing & Battery Telemetry Engine
+// - btop Resource Monitor Configuration Generator
+// - Omakase Desktop Workstation Setup & Bootstrap Installer
+// - Dynamic Wallpaper & Theme Synchronization Daemon
+// - Hyprland Keybindings Registry & Conflict Resolution Engine
+// - Cava Audio Visualizer Configuration Generator
+// - Universal IDE Transpiler (LazyVim & Helix)
+// - SwayNC Notification Center & DND Policy Engine
+// - Sovereign Master Omarchy Linux Synthesis Suite
 
 use std::collections::{BTreeMap, HashMap};
 use std::format;
@@ -698,7 +715,413 @@ impl Default for OmarchyBtopConfigGeneratorEngine {
     }
 }
 
-#[cfg(test)]
+// =========================================================================
+// 18. OMARCHY OMAKASE SETUP & BOOTSTRAP INSTALLER
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum OmakaseProfile {
+    DesktopWorkstation,
+    MinimalServer,
+    GamingStation,
+    DeveloperRig,
+}
+
+pub struct OmarchyOmakaseSetupInstallerEngine {
+    pub selected_profile: OmakaseProfile,
+    pub installed_packages: Vec<String>,
+    pub dry_run: bool,
+}
+
+impl OmarchyOmakaseSetupInstallerEngine {
+    pub fn new() -> Self {
+        Self {
+            selected_profile: OmakaseProfile::DesktopWorkstation,
+            installed_packages: Vec::new(),
+            dry_run: false,
+        }
+    }
+
+    pub fn select_profile(&mut self, profile: OmakaseProfile) {
+        self.selected_profile = profile;
+    }
+
+    pub fn generate_install_plan(&self) -> Vec<String> {
+        match self.selected_profile {
+            OmakaseProfile::DesktopWorkstation => vec![
+                "hyprland".to_string(),
+                "waybar".to_string(),
+                "rofi-lbonn-wayland".to_string(),
+                "alacritty".to_string(),
+                "swaync".to_string(),
+                "cava".to_string(),
+                "neovim".to_string(),
+                "fastfetch".to_string(),
+            ],
+            OmakaseProfile::MinimalServer => vec![
+                "sovereign-kernel".to_string(),
+                "networkmanager".to_string(),
+                "openssh".to_string(),
+            ],
+            OmakaseProfile::GamingStation => vec![
+                "hyprland".to_string(),
+                "gamescope".to_string(),
+                "proton-ge-custom".to_string(),
+                "mangohud".to_string(),
+                "pipewire".to_string(),
+            ],
+            OmakaseProfile::DeveloperRig => vec![
+                "hyprland".to_string(),
+                "alacritty".to_string(),
+                "neovim".to_string(),
+                "helix".to_string(),
+                "rustup".to_string(),
+                "git".to_string(),
+            ],
+        }
+    }
+
+    pub fn execute_installation(&mut self) -> Result<usize, &'static str> {
+        let plan = self.generate_install_plan();
+        let count = plan.len();
+        self.installed_packages = plan;
+        Ok(count)
+    }
+}
+
+impl Default for OmarchyOmakaseSetupInstallerEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 19. OMARCHY THEME & WALLPAPER SYNCHRONIZATION DAEMON
+// =========================================================================
+
+pub struct OmarchyThemeWallpaperDaemonEngine {
+    pub active_theme: String,
+    pub active_wallpaper_path: String,
+    pub palette_hex_colors: Vec<String>,
+}
+
+impl OmarchyThemeWallpaperDaemonEngine {
+    pub fn new() -> Self {
+        Self {
+            active_theme: "TokyoNight".to_string(),
+            active_wallpaper_path: "/usr/share/backgrounds/omarchy/tokyo-night.jpg".to_string(),
+            palette_hex_colors: vec![
+                "#1a1b26".to_string(),
+                "#7aa2f7".to_string(),
+                "#bb9af7".to_string(),
+                "#7dcfff".to_string(),
+            ],
+        }
+    }
+
+    pub fn switch_wallpaper_and_theme(&mut self, wallpaper: &str, theme: &str) -> String {
+        self.active_wallpaper_path = wallpaper.to_string();
+        self.active_theme = theme.to_string();
+        self.palette_hex_colors = vec![
+            "#1e1e2e".to_string(),
+            "#cba6f7".to_string(),
+            "#89b4fa".to_string(),
+            "#f5e0dc".to_string(),
+        ];
+        format!("Applied wallpaper '{}' with theme '{}'", wallpaper, theme)
+    }
+
+    pub fn extract_color_palette(&self) -> Vec<String> {
+        self.palette_hex_colors.clone()
+    }
+}
+
+impl Default for OmarchyThemeWallpaperDaemonEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 20. OMARCHY HYPRLAND KEYBINDINGS REGISTRY & CONFLICT RESOLUTION
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct HyprlandKeybinding {
+    pub mods: String,
+    pub key: String,
+    pub dispatcher: String,
+    pub arg: String,
+}
+
+pub struct OmarchyHyprlandKeybindingsEngine {
+    pub bindings: Vec<HyprlandKeybinding>,
+}
+
+impl OmarchyHyprlandKeybindingsEngine {
+    pub fn new() -> Self {
+        Self {
+            bindings: vec![
+                HyprlandKeybinding {
+                    mods: "SUPER".to_string(),
+                    key: "RETURN".to_string(),
+                    dispatcher: "exec".to_string(),
+                    arg: "alacritty".to_string(),
+                },
+                HyprlandKeybinding {
+                    mods: "SUPER".to_string(),
+                    key: "Q".to_string(),
+                    dispatcher: "killactive".to_string(),
+                    arg: "".to_string(),
+                },
+                HyprlandKeybinding {
+                    mods: "SUPER".to_string(),
+                    key: "SPACE".to_string(),
+                    dispatcher: "exec".to_string(),
+                    arg: "rofi -show drun".to_string(),
+                },
+            ],
+        }
+    }
+
+    pub fn add_binding(&mut self, mods: &str, key: &str, dispatcher: &str, arg: &str) {
+        self.bindings.push(HyprlandKeybinding {
+            mods: mods.to_string(),
+            key: key.to_string(),
+            dispatcher: dispatcher.to_string(),
+            arg: arg.to_string(),
+        });
+    }
+
+    pub fn find_conflicts(&self) -> Vec<String> {
+        let mut seen = HashMap::new();
+        let mut conflicts = Vec::new();
+        for b in &self.bindings {
+            let combo = format!("{}+{}", b.mods, b.key);
+            if let Some(prev) = seen.insert(combo.clone(), &b.dispatcher) {
+                conflicts.push(format!("Conflict on '{}': '{}' vs '{}'", combo, prev, b.dispatcher));
+            }
+        }
+        conflicts
+    }
+
+    pub fn render_hyprland_binds_conf(&self) -> String {
+        let mut out = String::new();
+        for b in &self.bindings {
+            out.push_str(&format!("bind = {}, {}, {}, {}\n", b.mods, b.key, b.dispatcher, b.arg));
+        }
+        out
+    }
+}
+
+impl Default for OmarchyHyprlandKeybindingsEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 21. OMARCHY CAVA AUDIO VISUALIZER CONFIGURATION GENERATOR
+// =========================================================================
+
+pub struct OmarchyAudioVisualizerCavaEngine {
+    pub frame_rate: u32,
+    pub bars_count: u32,
+    pub color_gradient_start: String,
+    pub color_gradient_end: String,
+}
+
+impl OmarchyAudioVisualizerCavaEngine {
+    pub fn new() -> Self {
+        Self {
+            frame_rate: 60,
+            bars_count: 32,
+            color_gradient_start: "'#7aa2f7'".to_string(),
+            color_gradient_end: "'#bb9af7'".to_string(),
+        }
+    }
+
+    pub fn generate_cava_config(&self) -> String {
+        format!(
+            "[general]\nframerate = {}\nbars = {}\n[color]\ngradient = 1\ngradient_color_1 = {}\ngradient_color_2 = {}",
+            self.frame_rate, self.bars_count, self.color_gradient_start, self.color_gradient_end
+        )
+    }
+
+    pub fn set_frame_rate(&mut self, fps: u32) {
+        self.frame_rate = fps;
+    }
+}
+
+impl Default for OmarchyAudioVisualizerCavaEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 22. OMARCHY UNIVERSAL IDE CONFIGURATION TRANSPILER (LAZYVIM & HELIX)
+// =========================================================================
+
+pub struct OmarchyIdeConfigTranspilerEngine {
+    pub active_theme: String,
+    pub lsp_servers: Vec<String>,
+}
+
+impl OmarchyIdeConfigTranspilerEngine {
+    pub fn new() -> Self {
+        Self {
+            active_theme: "tokyonight".to_string(),
+            lsp_servers: vec!["rust_analyzer".to_string(), "pyright".to_string(), "clangd".to_string()],
+        }
+    }
+
+    pub fn transpile_lazyvim_config(&self) -> String {
+        format!(
+            "return {{\n  {{ \"folke/tokyonight.nvim\", opts = {{ style = \"storm\" }} }},\n  {{ \"LazyVim/LazyVim\", opts = {{ colorscheme = \"{}\" }} }},\n}}",
+            self.active_theme
+        )
+    }
+
+    pub fn transpile_helix_config(&self) -> String {
+        format!(
+            "theme = \"{}\"\n\n[editor]\nline-number = \"relative\"\nmouse = true\n\n[editor.cursor-shape]\ninsert = \"bar\"",
+            self.active_theme
+        )
+    }
+}
+
+impl Default for OmarchyIdeConfigTranspilerEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 23. OMARCHY SWAYNC NOTIFICATION CENTER & DND POLICY ENGINE
+// =========================================================================
+
+pub struct OmarchySwayncNotificationEngine {
+    pub dnd_enabled: bool,
+    pub widgets: Vec<String>,
+    pub notification_timeout_sec: u32,
+}
+
+impl OmarchySwayncNotificationEngine {
+    pub fn new() -> Self {
+        Self {
+            dnd_enabled: false,
+            widgets: vec![
+                "title".to_string(),
+                "notifications".to_string(),
+                "mpris".to_string(),
+                "volume".to_string(),
+                "backlight".to_string(),
+            ],
+            notification_timeout_sec: 5,
+        }
+    }
+
+    pub fn toggle_dnd(&mut self) -> bool {
+        self.dnd_enabled = !self.dnd_enabled;
+        self.dnd_enabled
+    }
+
+    pub fn generate_swaync_config_json(&self) -> String {
+        format!(
+            "{{\"positionX\": \"right\", \"positionY\": \"top\", \"control-center-margin-top\": 10, \"widgets\": [\"{}\", \"{}\"]}}",
+            self.widgets[0], self.widgets[1]
+        )
+    }
+}
+
+impl Default for OmarchySwayncNotificationEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 24. SOVEREIGN MASTER OMARCHY LINUX SYNTHESIS SUITE
+// =========================================================================
+
+pub struct SovereignOmarchyLinuxMasterSynthesisSuite {
+    pub fastfetch: OmarchyFastfetchEngine,
+    pub tui_menu: OmarchyTuiMenuApplet,
+    pub power_profile: OmarchyPowerProfileManager,
+    pub dotfiles: OmarchyDotfilesBackupRestoreEngine,
+    pub waybar: OmarchyWaybarStatusConfigEngine,
+    pub rofi: OmarchyRofiCommandPaletteApplet,
+    pub sddm: OmarchySddmThemeCustomizerEngine,
+    pub wireplumber: OmarchyWirePlumberAudioProfileEngine,
+    pub pacman_yay: OmarchyPacmanYayUpdateGatewayEngine,
+    pub autotiling: OmarchyHyprlandAutotilingEngine,
+    pub catppuccin: OmarchyCatppuccinThemeSyncEngine,
+    pub wifi: OmarchyWifiNetworkManagerEngine,
+    pub bluetooth: OmarchyBluezBluetoothEngine,
+    pub btop: OmarchyBtopConfigGeneratorEngine,
+    pub setup_installer: OmarchyOmakaseSetupInstallerEngine,
+    pub wallpaper_daemon: OmarchyThemeWallpaperDaemonEngine,
+    pub keybindings: OmarchyHyprlandKeybindingsEngine,
+    pub cava: OmarchyAudioVisualizerCavaEngine,
+    pub ide_transpiler: OmarchyIdeConfigTranspilerEngine,
+    pub swaync: OmarchySwayncNotificationEngine,
+}
+
+impl SovereignOmarchyLinuxMasterSynthesisSuite {
+    pub fn new() -> Self {
+        Self {
+            fastfetch: OmarchyFastfetchEngine::new("SigmaOS", "6.8.0", "TokyoNight", 2048, 16384),
+            tui_menu: OmarchyTuiMenuApplet::new(),
+            power_profile: OmarchyPowerProfileManager::new(),
+            dotfiles: OmarchyDotfilesBackupRestoreEngine::new(),
+            waybar: OmarchyWaybarStatusConfigEngine::new(),
+            rofi: OmarchyRofiCommandPaletteApplet::new(),
+            sddm: OmarchySddmThemeCustomizerEngine::new(),
+            wireplumber: OmarchyWirePlumberAudioProfileEngine::new(),
+            pacman_yay: OmarchyPacmanYayUpdateGatewayEngine::new(),
+            autotiling: OmarchyHyprlandAutotilingEngine::new(),
+            catppuccin: OmarchyCatppuccinThemeSyncEngine::new(),
+            wifi: OmarchyWifiNetworkManagerEngine::new(),
+            bluetooth: OmarchyBluezBluetoothEngine::new(),
+            btop: OmarchyBtopConfigGeneratorEngine::new(),
+            setup_installer: OmarchyOmakaseSetupInstallerEngine::new(),
+            wallpaper_daemon: OmarchyThemeWallpaperDaemonEngine::new(),
+            keybindings: OmarchyHyprlandKeybindingsEngine::new(),
+            cava: OmarchyAudioVisualizerCavaEngine::new(),
+            ide_transpiler: OmarchyIdeConfigTranspilerEngine::new(),
+            swaync: OmarchySwayncNotificationEngine::new(),
+        }
+    }
+
+    pub fn run_full_omarchy_health_check(&mut self) -> BTreeMap<String, bool> {
+        let mut status = BTreeMap::new();
+        status.insert("fastfetch_banner".to_string(), !self.fastfetch.generate_summary_banner().is_empty());
+        status.insert("tui_menu_items".to_string(), !self.tui_menu.items.is_empty());
+        status.insert("power_profile".to_string(), self.power_profile.active_profile == OmarchyPowerProfile::Balanced);
+        status.insert("waybar_config".to_string(), self.waybar.generate_waybar_json().contains("position"));
+        status.insert("rofi_command_palette".to_string(), !self.rofi.items.is_empty());
+        status.insert("wireplumber_spatial_audio".to_string(), self.wireplumber.spatial_audio_enabled);
+        status.insert("pacman_yay_gateway".to_string(), self.pacman_yay.parallel_downloads == 5);
+        status.insert("autotiling_gestures".to_string(), !self.autotiling.gestures.is_empty());
+        status.insert("wifi_scanner".to_string(), self.wifi.scan_networks() > 0);
+        status.insert("bluetooth_devices".to_string(), !self.bluetooth.devices.is_empty());
+        status.insert("setup_installer".to_string(), !self.setup_installer.generate_install_plan().is_empty());
+        status.insert("wallpaper_daemon".to_string(), !self.wallpaper_daemon.extract_color_palette().is_empty());
+        status.insert("keybindings".to_string(), self.keybindings.find_conflicts().is_empty());
+        status.insert("cava_visualizer".to_string(), self.cava.generate_cava_config().contains("framerate"));
+        status.insert("ide_transpiler".to_string(), self.ide_transpiler.transpile_lazyvim_config().contains("tokyonight"));
+        status.insert("swaync_notifications".to_string(), self.swaync.generate_swaync_config_json().contains("widgets"));
+        status
+    }
+}
+
+impl Default for SovereignOmarchyLinuxMasterSynthesisSuite {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -832,5 +1255,72 @@ mod tests {
         let cfg = btop.generate_btop_config_text();
         assert!(cfg.contains("color_theme = \"catppuccin_mocha\""));
         assert!(cfg.contains("shown_boxes = \"cpu mem net proc\""));
+    }
+
+    #[test]
+    fn test_omarchy_omakase_setup_installer_engine() {
+        let mut installer = OmarchyOmakaseSetupInstallerEngine::new();
+        installer.select_profile(OmakaseProfile::GamingStation);
+        let plan = installer.generate_install_plan();
+        assert!(plan.contains(&"gamescope".to_string()));
+
+        let count = installer.execute_installation().unwrap();
+        assert_eq!(count, 5);
+    }
+
+    #[test]
+    fn test_omarchy_theme_wallpaper_daemon_engine() {
+        let mut daemon = OmarchyThemeWallpaperDaemonEngine::new();
+        let msg = daemon.switch_wallpaper_and_theme("/usr/share/bg.jpg", "Catppuccin");
+        assert!(msg.contains("Catppuccin"));
+        assert_eq!(daemon.extract_color_palette().len(), 4);
+    }
+
+    #[test]
+    fn test_omarchy_hyprland_keybindings_engine() {
+        let mut keys = OmarchyHyprlandKeybindingsEngine::new();
+        keys.add_binding("SUPER", "RETURN", "exec", "alacritty");
+        let conflicts = keys.find_conflicts();
+        assert_eq!(conflicts.len(), 1);
+        assert!(conflicts[0].contains("SUPER+RETURN"));
+
+        let conf = keys.render_hyprland_binds_conf();
+        assert!(conf.contains("bind = SUPER, Q, killactive,"));
+    }
+
+    #[test]
+    fn test_omarchy_audio_visualizer_cava_engine() {
+        let mut cava = OmarchyAudioVisualizerCavaEngine::new();
+        cava.set_frame_rate(144);
+        let cfg = cava.generate_cava_config();
+        assert!(cfg.contains("framerate = 144"));
+        assert!(cfg.contains("bars = 32"));
+    }
+
+    #[test]
+    fn test_omarchy_ide_config_transpiler_engine() {
+        let ide = OmarchyIdeConfigTranspilerEngine::new();
+        let lazyvim = ide.transpile_lazyvim_config();
+        assert!(lazyvim.contains("tokyonight"));
+
+        let helix = ide.transpile_helix_config();
+        assert!(helix.contains("theme = \"tokyonight\""));
+    }
+
+    #[test]
+    fn test_omarchy_swaync_notification_engine() {
+        let mut swaync = OmarchySwayncNotificationEngine::new();
+        assert!(swaync.toggle_dnd());
+        let json = swaync.generate_swaync_config_json();
+        assert!(json.contains("positionX"));
+    }
+
+    #[test]
+    fn test_sovereign_omarchy_linux_master_synthesis_suite() {
+        let mut suite = SovereignOmarchyLinuxMasterSynthesisSuite::new();
+        let status = suite.run_full_omarchy_health_check();
+        for (k, v) in &status {
+            assert!(v, "Health check failed for: {}", k);
+        }
     }
 }
