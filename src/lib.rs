@@ -151,6 +151,7 @@ pub use distro::sovereign_2075_distro_supremacy_engine::*;
 pub use distro::sovereign_2080_distro_supremacy_engine::*;
 pub use distro::sovereign_linux_bsd_master_synthesis::*;
 pub use distro::sovereign_linux_bsd_pinnacle_innovations_v14::*;
+pub use distro::sovereign_open_source_os_gap_closure_pr::*;
 pub use distro::sovereign_linux_bsd_media_wiki_unimplemented_ideas_engine::*;
 pub use distro::sovereign_media_and_distro_unimplemented_innovations::*;
 pub use distro::tech_media_publication_innovations::*;

@@ -542,6 +542,13 @@ if [ -f "src/distro/sovereign_linux_bsd_ecosystem_pinnacle_suite.rs" ]; then
     ./build/test_ecosystem_pinnacle
 fi
 
+if [ -f "src/distro/sovereign_open_source_os_gap_closure_pr.rs" ]; then
+    echo "Running Sovereign Open Source OS Gap Closure PR test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_open_source_os_gap_closure_pr.rs --edition=2021 -o build/test_os_gap_closure_pr
+    ./build/test_os_gap_closure_pr
+fi
+
 if [ -f "src/distro/sovereign_linux_bsd_pinnacle_innovations_v14.rs" ]; then
     echo "Running Sovereign Linux & BSD Pinnacle Innovations Suite V14 test suite..."
     mkdir -p build
