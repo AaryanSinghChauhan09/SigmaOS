@@ -144,6 +144,9 @@ main() {
     echo "=== Initiating SigmaOS OOP Wiki Sync Utility ==="
 
     local wiki_dir="WIKI"
+    if [ ! -d "$wiki_dir" ] && [ -d "wiki" ]; then
+        wiki_dir="wiki"
+    fi
     local target_dir="wiki_repo"
 
     # Instantiate central WikiSyncEngine object
@@ -151,7 +154,7 @@ main() {
     WikiSyncEngine_new engine "$wiki_dir" "$target_dir"
     WikiSyncEngine_initialize_env "$engine"
 
-    # Scan WIKI directory (if it exists) and dynamically construct WikiPage objects
+    # Scan wiki directory (if it exists) and dynamically construct WikiPage objects
     if [ -d "$wiki_dir" ]; then
         for filepath in "$wiki_dir"/*.md; do
             if [ -f "$filepath" ]; then
@@ -165,20 +168,6 @@ main() {
     # Perform full batch sync
     WikiSyncEngine_run_sync "$engine"
 
-    # Also synchronize to 'wiki' directory
-    local engine_wiki
-    WikiSyncEngine_new engine_wiki "$wiki_dir" "wiki"
-    WikiSyncEngine_initialize_env "$engine_wiki"
-    if [ -d "$wiki_dir" ]; then
-        for filepath in "$wiki_dir"/*.md; do
-            if [ -f "$filepath" ]; then
-                local page
-                WikiPage_new page "$filepath"
-                WikiSyncEngine_add_page "$engine_wiki" "$page"
-            fi
-        done
-    fi
-    WikiSyncEngine_run_sync "$engine_wiki"
 
     echo "=== Wiki Synchronization Complete! ==="
 }
