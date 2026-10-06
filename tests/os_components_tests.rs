@@ -16,8 +16,8 @@ pub mod distro;
 mod geom;
 #[path = "../src/ipc/pipes.rs"]
 mod pipes;
-#[path = "../src/security/unveil.rs"]
-mod unveil;
+#[path = "../src/compatibility/cachy_os.rs"]
+mod cachy_os;
 #[path = "../src/security/unveil.rs"]
 mod unveil;
 #[path = "../src/graphics/video_editor.rs"]
@@ -146,9 +146,6 @@ use statutory_compliance::{
     ComplianceRuleStatus, DisputeAuditRollbackEngine, PenaltyBreachNotifier, StatutoryFramework,
     StatutoryGovernanceLayer, StatutoryGovernanceRule,
 };
-use statutory_compliance::{
-    DisputeAuditRollbackEngine, PenaltyBreachNotifier, StatutoryGovernanceLayer,
-};
 use system_user::UserManager as TestUserManager;
 use task_scheduler::{
     Priority, PriorityScheduler, Scheduler, Task, TaskCapability, TaskWorkloadType,
@@ -157,47 +154,19 @@ use unveil::{UnveilManager, UnveilPermission};
 use video_editor::{ExportFormat, ExportProfile, VideoClip, VideoTimeline, VideoTrack};
 
 use access_control::{NtfsAce, NtfsDacl, PosixAclTable, SecurityIdentifier};
-use alpc::{alpc_flags, AlpcFacility, AlpcManager, AlpcMessage};
-use audio_editor::{AudioEffect, AudioTrack, MultiTrackSession, SpectralNoiseSuppressionEffect};
-use bitmap_pmm::{
-    BitmapPhysicalMemoryManager, SelfReferentialPagingEngine as SelfRefPagingEngine,
-    SyscallTableRouter,
-};
-use cachy_os::{AnanicyManager, BoreSchedulerGovernor, SchedPolicy};
-use chimera_linux::{
-    ApkPackageMetadata, ApkPackageStore, BsdUserlandCompat, DinitService, DinitServiceManager,
-};
 use community_toolkit::{
-    CommunityHandbookCatalog, HybridFirewallTemplateStore, ReproduciblePackageRecipeManager,
-    SecurityProfileTemplateStore, VirtualizationBlueprintStore,
+    HybridFirewallTemplateStore, VirtualizationBlueprintStore,
 };
 use debian_compat::{AptRepositorySync, DebianAlternativesSystem, DebianChannel};
 use elf_relocation::{ElfRelaEntry, ElfRelocator, ElfSymbol, R_X86_64_GLOB_DAT, R_X86_64_RELATIVE};
 use endeavour_os::{AurPackageSpec, PacmanMirror, ReflectorMirrorManager, YayParuHelper};
 use epoll::{EpollEvent, EpollInstance, EpollOp, EPOLLET, EPOLLIN};
-use fedora_compat::DnfPackageResolver;
+use fedora_compat::{DnfPackageResolver, SeLinuxContext, SeLinuxEngine};
 use geom::{BioRequest, GeomProvider, GeomTopology};
 use low_level_memory::{
     posix_syscall_nr, CopyOnWriteForkEngine, FastSyscallDispatcher, MinimalPosixSyscallMatrix,
     RecursivePageTableEngine, SlabObjectType, TrapRegisterFrame, TwoTierMemoryAllocator,
 };
-use task_scheduler::{
-    Priority, PriorityScheduler, Scheduler, Task, TaskCapability, TaskWorkloadType,
-};
-
-use audio_editor::{AudioEffect, AudioTrack, MultiTrackSession, SpectralNoiseSuppressionEffect};
-use cachy_os::{AnanicyManager, BoreSchedulerGovernor, SchedPolicy};
-use chimera_linux::{
-    ApkPackageMetadata, ApkPackageStore, BsdUserlandCompat, DinitService, DinitServiceManager,
-};
-use debian_compat::{AptRepositorySync, DebianAlternativesSystem, DebianChannel};
-use endeavour_os::{AurPackageSpec, PacmanMirror, ReflectorMirrorManager, YayParuHelper};
-use fedora_compat::{DnfPackageResolver, SeLinuxContext, SeLinuxEngine};
-use geom::{BioRequest, GeomProvider, GeomTopology};
-use pipes::Pipe;
-use sigmatools::*;
-use unveil::{UnveilManager, UnveilPermission};
-use video_editor::{ExportFormat, ExportProfile, VideoClip, VideoTimeline, VideoTrack};
 
 use sigma_fs_extended::{Blake3BlockDeduplicationEngine, PfsType, PseudoFilesystemNamespace};
 
@@ -205,26 +174,12 @@ use segmentation_paging::{
     AddressBindingMode, AslrEntropyConfig, RandomizedAddressSpace, SegmentDescriptor,
 };
 
-use process_activity_manager::{
-    ActivityManager, ActivityState, RegisterSnapshot as ProcRegisterSnapshot,
-};
 use segmentation_paging::{
     AddressBindingMode, AslrEntropyConfig, CpuRing as SegCpuPrivilegeMode,
     ExecutableAddressBinding, RandomizedAddressSpace, SegmentDescriptor, SegmentSelector,
     SegmentationPagingEngine, SpaceProtectionFlags,
 };
-use sigma_fs_extended::{Blake3BlockDeduplicationEngine, PfsType, PseudoFilesystemNamespace};
-use sigmatools::*;
-use statutory_compliance::{
-    ComplianceRuleStatus, DisputeAuditRollbackEngine, PenaltyBreachNotifier, StatutoryFramework,
-    StatutoryGovernanceLayer, StatutoryGovernanceRule,
-};
 use system_user::UserManager;
-use task_scheduler::{
-    Priority, PriorityScheduler, Scheduler, Task, TaskCapability, TaskWorkloadType,
-};
-use unveil::{UnveilManager, UnveilPermission};
-use video_editor::{ExportFormat, ExportProfile, VideoClip, VideoTimeline, VideoTrack};
 
 #[test]
 fn test_segmentation_paging_and_aslr() {

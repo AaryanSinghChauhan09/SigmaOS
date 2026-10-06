@@ -439,8 +439,7 @@ mod tests {
         let mut manager = DesktopThemeManager::new();
 
         // Try to remove current GTK theme (should fail)
-        let current = manager.get_current_gtk_theme().unwrap();
-        let current_id = current.id.clone();
+        let current_id = manager.get_current_gtk_theme().unwrap().id.clone();
         let result = manager.remove_theme(&current_id);
         assert!(!result);
     }

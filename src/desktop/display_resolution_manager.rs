@@ -319,38 +319,29 @@ mod tests {
     #[test]
     fn test_set_display_enabled() {
         let mut manager = DisplayResolutionManager::new();
-        let displays = manager.get_displays();
-        if let Some(display) = displays.first() {
-            let display_id = display.id.clone();
-            assert!(manager.set_display_enabled(&display_id, false));
-            assert!(!manager.get_display(&display_id).unwrap().is_enabled);
-        }
+        let display_id = manager.get_displays().first().map(|d| d.id.clone()).unwrap();
+        assert!(manager.set_display_enabled(&display_id, false));
+        assert!(!manager.get_display(&display_id).unwrap().is_enabled);
     }
 
     #[test]
     fn test_set_display_position() {
         let mut manager = DisplayResolutionManager::new();
-        let displays = manager.get_displays();
-        if let Some(display) = displays.first() {
-            let display_id = display.id.clone();
-            assert!(manager.set_display_position(&display_id, 100, 100));
-            assert_eq!(manager.get_display(&display_id).unwrap().position, (100, 100));
-        }
+        let display_id = manager.get_displays().first().map(|d| d.id.clone()).unwrap();
+        assert!(manager.set_display_position(&display_id, 100, 100));
+        assert_eq!(manager.get_display(&display_id).unwrap().position, (100, 100));
     }
 
     #[test]
     fn test_add_display_mode() {
         let mut manager = DisplayResolutionManager::new();
-        let displays = manager.get_displays();
-        if let Some(display) = displays.first() {
-            let display_id = display.id.clone();
-            let mode = DisplayMode::new(
-                "test_mode".to_string(),
-                Resolution::new(1280, 720),
-                RefreshRate::new(60),
-            );
-            assert!(manager.add_display_mode(&display_id, mode));
-        }
+        let display_id = manager.get_displays().first().map(|d| d.id.clone()).unwrap();
+        let mode = DisplayMode::new(
+            "test_mode".to_string(),
+            Resolution::new(1280, 720),
+            RefreshRate::new(60),
+        );
+        assert!(manager.add_display_mode(&display_id, mode));
     }
 
     #[test]

@@ -74,10 +74,7 @@ pub use congestion::{
     CongestionControlManager, CongestionControlType, CongestionState, CongestionWindow,
     CubicCongestionControl,
 };
-pub use namespace::{
-    FirewallAction as SimpleFirewallAction, FirewallRule as SimpleFirewallRule, InterfaceAddress,
-    InterfaceState, NetworkRoute,
-};
+pub use namespace::{InterfaceAddress, InterfaceState, NetworkRoute};
 pub use network_config::{ConfigMethod, InterfaceConfig, InterfaceType, NetworkConfigManager};
 pub use packet_filter::{Packet, PacketFilter, PfAction, PfProtocol, PfRule};
 pub use zero_copy::{

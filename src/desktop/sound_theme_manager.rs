@@ -275,8 +275,7 @@ mod tests {
         let mut manager = DesktopSoundThemeManager::new();
 
         // Try to remove current theme (should fail)
-        let current = manager.get_current_theme().unwrap();
-        let current_id = current.id.clone();
+        let current_id = manager.get_current_theme().unwrap().id.clone();
         let result = manager.remove_theme(&current_id);
         assert!(!result);
     }

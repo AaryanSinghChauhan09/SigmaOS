@@ -395,8 +395,7 @@ mod tests {
         let mut manager = DesktopTimeManager::new();
 
         // Try to remove current timezone (should fail)
-        let current = manager.get_current_timezone().unwrap();
-        let current_id = current.id.clone();
+        let current_id = manager.get_current_timezone().unwrap().id.clone();
         let result = manager.remove_timezone(&current_id);
         assert!(!result);
     }

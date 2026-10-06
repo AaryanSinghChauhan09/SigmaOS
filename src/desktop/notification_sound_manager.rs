@@ -307,23 +307,17 @@ mod tests {
     #[test]
     fn test_set_sound_volume() {
         let mut manager = NotificationSoundManager::new();
-        let sounds = manager.get_sounds();
-        if let Some(sound) = sounds.first() {
-            let sound_id = sound.id.clone();
-            assert!(manager.set_sound_volume(&sound_id, 75));
-            assert_eq!(manager.get_sound(&sound_id).unwrap().volume, 75);
-        }
+        let sound_id = manager.get_sounds().first().map(|s| s.id.clone()).unwrap();
+        assert!(manager.set_sound_volume(&sound_id, 75));
+        assert_eq!(manager.get_sound(&sound_id).unwrap().volume, 75);
     }
 
     #[test]
     fn test_set_sound_enabled() {
         let mut manager = NotificationSoundManager::new();
-        let sounds = manager.get_sounds();
-        if let Some(sound) = sounds.first() {
-            let sound_id = sound.id.clone();
-            assert!(manager.set_sound_enabled(&sound_id, false));
-            assert!(!manager.get_sound(&sound_id).unwrap().enabled);
-        }
+        let sound_id = manager.get_sounds().first().map(|s| s.id.clone()).unwrap();
+        assert!(manager.set_sound_enabled(&sound_id, false));
+        assert!(!manager.get_sound(&sound_id).unwrap().enabled);
     }
 
     #[test]

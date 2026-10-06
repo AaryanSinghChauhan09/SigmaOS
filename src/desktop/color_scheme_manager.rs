@@ -384,8 +384,7 @@ mod tests {
         let mut manager = DesktopColorSchemeManager::new();
 
         // Try to remove current scheme (should fail)
-        let current = manager.get_current_scheme().unwrap();
-        let current_id = current.id.clone();
+        let current_id = manager.get_current_scheme().unwrap().id.clone();
         let result = manager.remove_scheme(&current_id);
         assert!(!result);
     }
