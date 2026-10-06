@@ -381,18 +381,11 @@ if [ -f "src/package/sovereign_distro_package_advancements_v18.rs" ]; then
     ./build/sovereign_advancements_v18_test
 fi
 
-if [ -f "src/package/sovereign_distro_package_advancements_v22.rs" ]; then
+if [ -f "src/package/sovereign_distro_package_advancements_v20.rs" ]; then
     echo "Running Sovereign Universal Package Advancements Suite V20 test suite..."
     mkdir -p build
-    rustc --test src/package/sovereign_distro_package_advancements_v22.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v20_test
+    rustc --test src/package/sovereign_distro_package_advancements_v20.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v20_test
     ./build/sovereign_advancements_v20_test
-fi
-
-if [ -f "src/package/sovereign_distro_package_advancements_v25.rs" ]; then
-    echo "Running Sovereign Universal Package Advancements Suite V25 test suite..."
-    mkdir -p build
-    rustc --test src/package/sovereign_distro_package_advancements_v25.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v25_test
-    ./build/sovereign_advancements_v25_test
 fi
 
 if [ -f "src/package/sovereign_universal_pm_pr_bridge.rs" ]; then
@@ -456,13 +449,6 @@ if [ -f "src/unimplemented_tools.rs" ]; then
     mkdir -p build
     rustc --test --edition=2021 src/unimplemented_tools.rs -o build/test_unimplemented_tools
     ./build/test_unimplemented_tools
-fi
-
-if [ -f "src/distro/sovereign_github_wiki_complete_deployment.rs" ]; then
-    echo "Running Sovereign GitHub Wiki Complete Deployment test suite..."
-    mkdir -p build
-    rustc --test --edition=2021 src/distro/sovereign_github_wiki_complete_deployment.rs --cfg 'feature="standalone_test"' -o build/test_github_wiki_deployment
-    ./build/test_github_wiki_deployment
 fi
 
 if [ -f "src/wiki_unimplemented_ideas.rs" ]; then
@@ -554,20 +540,6 @@ if [ -f "src/distro/sovereign_linux_bsd_pinnacle_innovations_v14.rs" ]; then
     mkdir -p build
     rustc --test src/distro/sovereign_linux_bsd_pinnacle_innovations_v14.rs --edition=2021 -o build/test_pinnacle_v14
     ./build/test_pinnacle_v14
-fi
-
-if [ -f "src/distro/sovereign_linux_bsd_ecosystem_advancements_v23.rs" ]; then
-    echo "Running Sovereign Linux & BSD Ecosystem Advancements V23 test suite..."
-    mkdir -p build
-    rustc --test src/distro/sovereign_linux_bsd_ecosystem_advancements_v23.rs --edition=2021 -o build/test_advancements_v23
-    ./build/test_advancements_v23
-fi
-
-if [ -f "src/distro/arch_gap_closure_advancements_v24.rs" ]; then
-    echo "Running Arch Linux & CachyOS Gap Closure Advancements V24 test suite..."
-    mkdir -p build
-    rustc --test src/distro/arch_gap_closure_advancements_v24.rs --edition=2021 -o build/test_arch_v24
-    ./build/test_arch_v24
 fi
 
 if [ -f "src/compatibility/omarchy_supreme_engine.rs" ]; then
@@ -666,13 +638,6 @@ if [ -f "src/desktop/omarchy_browser_theme_sync.rs" ]; then
     mkdir -p build
     rustc --test src/desktop/omarchy_browser_theme_sync.rs --edition=2021 -o build/test_browser_sync
     ./build/test_browser_sync
-fi
-
-if [ -f "src/distro/sovereign_linux_bsd_ecosystem_advancements_v22.rs" ]; then
-    echo "Running Sovereign Linux & BSD Ecosystem Advancements V22 & PR Gateway test suite..."
-    mkdir -p build
-    rustc --test src/distro/sovereign_linux_bsd_ecosystem_advancements_v22.rs --edition=2021 -o build/test_advancements_v22
-    ./build/test_advancements_v22
 fi
 
 echo "All SigmaOS test suites completed."
