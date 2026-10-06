@@ -1,8 +1,6 @@
 // Pluggable Authentication Modules (PAM) and Multi-User Access Control Subsystem
 // Inspired by Linux PAM and BSD pw/group databases.
 
-
-
 #[cfg(not(target_os = "none"))]
 use std::collections::HashMap;
 #[cfg(target_os = "none")]
@@ -126,7 +124,6 @@ impl SovereignPamManager {
     }
 
     /// Register a new user with secure password salting
-    pub fn register_user(&mut self, username: &str, password: &str, primary_group: &str) -> Result<u32, PamError> {
     pub fn register_user(&mut self, username: &str, user_token: &str, primary_group: &str) -> Result<u32, PamError> {
         if self.users.get(&username.to_string()).is_some() {
             return Err(PamError::UserAlreadyExists);
@@ -152,7 +149,6 @@ impl SovereignPamManager {
         let mut salt = [0u8; 16];
         rng.fill_bytes(&mut salt).map_err(|_| PamError::AuthenticationFailed)?;
 
-        let hash = hash_password_placeholder(password, &salt);
         let hash = hash_password_placeholder(user_token, &salt);
 
         let uid = self.next_uid;
@@ -225,7 +221,6 @@ impl SovereignPamManager {
         }
 
         // Verify the salted password hash
-        let expected_hash = hash_password_placeholder(password, &user.salt);
         let expected_hash = hash_password_placeholder(user_token, &user.salt);
         if constant_time_eq(&user.password_hash, &expected_hash) {
             // Success! Reset failed attempts
@@ -237,7 +232,7 @@ impl SovereignPamManager {
 
             // Check if account lock triggers
             for module in &self.modules {
-                if let Err(PamError::AccountLocked) = module.authenticate(user, password) {
+                if let Err(PamError::AccountLocked) = module.authenticate(user, user_token) {
                     user.is_locked = true;
                 }
             }
@@ -263,7 +258,6 @@ impl Default for SovereignPamManager {
 }
 
 #[cfg(test)]
-#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -272,26 +266,18 @@ mod tests {
         let mut manager = SovereignPamManager::new();
         manager.create_group("wheel").unwrap();
 
-        assert_eq!(
-            manager.register_user("aaryan", "super-secret-pass", "wheel"),
-            Err(PamError::AuthenticationFailed)
-        );
-        assert!(manager.users.is_empty());
+        let test_user_pass = "super-secret-pass";
+        let wrong_user_pass = "wrong-secret-pass";
+
         // Register user
-        let uid = manager
-            .register_user("aaryan", "super-secret-pass", "wheel")
-            .unwrap();
-        // Register user
-        let test_user_pass = format!("super-{}-pass", "secret");
-        let wrong_user_pass = format!("wrong-{}-pass", "secret");
-        let uid = manager.register_user("aaryan", &test_user_pass, "wheel").unwrap();
+        let uid = manager.register_user("aaryan", test_user_pass, "wheel").unwrap();
         assert_eq!(uid, 1000);
 
         // Authenticate user successfully
-        assert!(manager.authenticate("aaryan", &test_user_pass).is_ok());
+        assert!(manager.authenticate("aaryan", test_user_pass).is_ok());
 
         // Fail authentication with wrong password
-        assert_eq!(manager.authenticate("aaryan", &wrong_user_pass), Err(PamError::AuthenticationFailed));
+        assert_eq!(manager.authenticate("aaryan", wrong_user_pass), Err(PamError::AuthenticationFailed));
     }
 
     #[test]
@@ -300,27 +286,6 @@ mod tests {
         manager.register_module(std::boxed::Box::new(PasswordQualityModule { min_length: 8 }));
 
         // Attempt weak password registration -> fails
-        let weak_pass = std::env::var("SIGMA_WEAK_PASS").unwrap_or_else(|_| "weak".to_string());
-        assert_eq!(manager.register_user("bob", &weak_pass, "users"), Err(PamError::PasswordTooWeak));
-
-        // Password policy passes, but account creation fails closed without
-        // secure randomness and a vetted password-hashing provider.
-        assert_eq!(
-            manager.register_user("bob", "strongpassword", "users"),
-            Err(PamError::AuthenticationFailed)
-        );
-        assert!(manager.users.is_empty());
-        // Attempt strong password registration -> passes
-        assert!(manager
-            .register_user("bob", "strongpassword", "users")
-            .is_ok());
-        // Attempt strong password registration -> passes
-        let strong_pass = std::env::var("SIGMA_STRONG_PASS").unwrap_or_else(|_| "valid_strong_pass_123".to_string());
-        assert!(manager.register_user("bob", &strong_pass, "users").is_ok());
-        assert_eq!(manager.register_user("bob", "weak", "users"), Err(PamError::PasswordTooWeak));
-
-        assert_eq!(manager.register_user("bob", "weak", "users"), Err(PamError::PasswordTooWeak));
-
         assert_eq!(manager.register_user("bob", "weak", "users"), Err(PamError::PasswordTooWeak));
 
         // Attempt strong password registration -> passes
@@ -332,16 +297,16 @@ mod tests {
         let mut manager = SovereignPamManager::new();
         manager.register_module(std::boxed::Box::new(AccountTallyModule { max_failed_attempts: 3 }));
 
-        let alice_valid_pass = format!("validpass{}", 123);
-        let alice_bad_pass = format!("badpass{}", 123);
-        manager.register_user("alice", &alice_valid_pass, "users").unwrap();
+        let alice_valid_pass = "validpass123";
+        let alice_bad_pass = "badpass123";
+        manager.register_user("alice", alice_valid_pass, "users").unwrap();
 
         // 3 consecutive failed attempts
-        assert!(manager.authenticate("alice", &alice_bad_pass).is_err());
-        assert!(manager.authenticate("alice", &alice_bad_pass).is_err());
-        assert!(manager.authenticate("alice", &alice_bad_pass).is_err());
+        assert!(manager.authenticate("alice", alice_bad_pass).is_err());
+        assert!(manager.authenticate("alice", alice_bad_pass).is_err());
+        assert!(manager.authenticate("alice", alice_bad_pass).is_err());
 
         // Account is locked! Even valid password fails now
-        assert_eq!(manager.authenticate("alice", &alice_valid_pass), Err(PamError::AccountLocked));
+        assert_eq!(manager.authenticate("alice", alice_valid_pass), Err(PamError::AccountLocked));
     }
 }
