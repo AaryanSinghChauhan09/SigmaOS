@@ -1,12 +1,13 @@
 # MASTER AI AGENT ALGORITHM DIAGNOSTICS & FIX GUIDE: WHAT'S WORKING & WHAT'S NOT WORKING
 
-This diagnostic guide lists code areas, known gaps, root causes, and explicit algorithms for future work. Its feature inventory is historical and is not proof of production readiness, bare-metal kernel integration, Linux/BSD parity, or exhaustive test coverage. Always check current implementation code and `COMPLETION_STATUS.md` before making claims about runtime behavior.
+This diagnostic guide lists code areas, known gaps, root causes, explicit algorithms for future work, and the full inventory of GitHub Workflows powering deployment, security, CI/CD, automation, and GitHub Pages. Its feature inventory is historical and is not proof of production readiness, bare-metal kernel integration, Linux/BSD parity, or exhaustive test coverage. Always check current implementation code and `COMPLETION_STATUS.md` before making claims about runtime behavior.
 
 ---
 
 ## TABLE OF CONTENTS
 1. [EXECUTIVE SUMMARY & OPERATIONAL ARCHITECTURE](#1-executive-summary--operational-architecture)
-2. [DETAILED DIAGNOSTICS BY SYSTEM SHARD (1-12)](#2-detailed-diagnostics-by-system-shard-1-12)
+2. [GITHUB WORKFLOWS MATRIX (CI/CD, SECURITY, AUTOMATION, PAGES & DEPLOYMENT)](#2-github-workflows-matrix-cicd-security-automation-pages--deployment)
+3. [DETAILED DIAGNOSTICS BY SYSTEM SHARD (1-12)](#3-detailed-diagnostics-by-system-shard-1-12)
    - [Shard 1: Kernel Core & Task Scheduling](#shard-1-kernel-core--task-scheduling)
    - [Shard 2: Memory Management & MMU](#shard-2-memory-management--mmu)
    - [Shard 3: Filesystems, Storage & Encryption](#shard-3-filesystems-storage--encryption)
@@ -19,16 +20,16 @@ This diagnostic guide lists code areas, known gaps, root causes, and explicit al
    - [Shard 10: Hardware HAL, Buses & Firmware](#shard-10-hardware-hal-buses--firmware)
    - [Shard 11: Hypervisors, MicroVMs & Containers](#shard-11-hypervisors-microvms--containers)
    - [Shard 12: Self-Sufficiency AI Engine & Dev Tools](#shard-12-self-sufficiency-ai-engine--dev-tools)
-3. [WHAT IS NOT WORKING & PARITY GAPS](#3-what-is-not-working--parity-gaps)
-4. [ROOT CAUSES: WHY ERRORS AND GAPS EXIST](#4-root-causes-why-errors-and-gaps-exist)
-5. [EXACT FIX ALGORITHMS FOR AI AGENTS (HOW TO FIX IT)](#5-exact-fix-algorithms-for-ai-agents-how-to-fix-it)
+4. [WHAT IS NOT WORKING & PARITY GAPS](#4-what-is-not-working--parity-gaps)
+5. [ROOT CAUSES: WHY ERRORS AND GAPS EXIST](#5-root-causes-why-errors-and-gaps-exist)
+6. [EXACT FIX ALGORITHMS FOR AI AGENTS (HOW TO FIX IT)](#6-exact-fix-algorithms-for-ai-agents-how-to-fix-it)
    - [Algorithm A: Workspace Crate Compilation Resolution Protocol](#algorithm-a-workspace-crate-compilation-resolution-protocol)
    - [Algorithm B: Lock-Free CAS Allocator Concurrency Protocol](#algorithm-b-lock-free-cas-allocator-concurrency-protocol)
    - [Algorithm C: `no_std` / `alloc` Kernel Unification Protocol](#algorithm-c-no_std--alloc-kernel-unification-protocol)
    - [Algorithm D: Subsystem Parity Gap Closure Protocol](#algorithm-d-subsystem-parity-gap-closure-protocol)
    - [Algorithm E: Cross-Distro Subsystem State Synchronization Protocol](#algorithm-e-cross-distro-subsystem-state-synchronization-protocol)
-6. [COMPILER ERROR REMEDIATION MATRIX (E0004 - E0689)](#6-compiler-error-remediation-matrix-e0004---e0689)
-7. [VERIFICATION & QA SUITE EXECUTION PROTOCOL](#7-verification--qa-suite-execution-protocol)
+7. [COMPILER ERROR REMEDIATION MATRIX (E0004 - E0689)](#7-compiler-error-remediation-matrix-e0004---e0689)
+8. [VERIFICATION & QA SUITE EXECUTION PROTOCOL](#8-verification--qa-suite-execution-protocol)
 
 ---
 
@@ -53,7 +54,50 @@ SigmaOS is a Safe-Rust operating system architecture combining kernel, userland,
 
 ---
 
-## 2. DETAILED DIAGNOSTICS BY SYSTEM SHARD (1-12)
+## 2. GITHUB WORKFLOWS MATRIX (CI/CD, SECURITY, AUTOMATION, PAGES & DEPLOYMENT)
+
+SigmaOS features 34+ dedicated GitHub Actions workflows inspired by major Linux distributions (Arch, Debian, Fedora, Alpine, Gentoo, Void, NixOS, Chimera, Omarchy, Linux Mint) and BSD systems (FreeBSD, OpenBSD, NetBSD, DragonFly BSD):
+
+| Workflow Name | Purpose & Distribution Inspiration | Location |
+| :--- | :--- | :--- |
+| `10_iso_installer_deployment_matrix.yml` | Multi-arch ISO build & Calamares installer matrix (x86_64, aarch64, riscv64, loongarch64). | `.github/workflows/` |
+| `11_pqc_crypto_attestation_security.yml` | Post-Quantum Cryptography (Dilithium5/Falcon-1024) attestation & key verification. | `.github/workflows/` |
+| `12_pages_wiki_docs_publisher.yml` | Automated GitHub Pages deployment for documentation and wiki mirrors. | `.github/workflows/` |
+| `13_autofuzz_syzkaller_fuzzing_suite.yml` | Syzkaller & LibFuzzer automated kernel syscall fuzzing suite. | `.github/workflows/` |
+| `14_stale_issue_release_automation.yml` | Automated issue triage, stale branch cleanup, and release drafting. | `.github/workflows/` |
+| `15_nix_guix_reproducible_builds.yml` | Nix/Guix bit-for-bit reproducible build validation & store verification. | `.github/workflows/` |
+| `16_bsd_abi_kernel_smoke_matrix.yml` | BSD Syscall ABI matrix verification (FreeBSD, OpenBSD, NetBSD, DragonFly BSD). | `.github/workflows/` |
+| `alpine-musl-apk-security-ci.yml` | Alpine Linux musl libc & APK package manager security verification. | `.github/workflows/` |
+| `arch-aur-pkgbuild-ci.yml` | Arch Linux ALPM/pacman & AUR PKGBUILD compatibility checks. | `.github/workflows/` |
+| `codeql-security-slsa-ci.yml` | CodeQL SAST static analysis & SLSA Level 3 supply-chain attestation. | `.github/workflows/` |
+| `debian-sbuild-reproducible-ci.yml` | Debian `dpkg`/`sbuild` reproducible build verification. | `.github/workflows/` |
+| `distro_package_pr_validation.yml` | Foreign Linux/BSD package manager PR translation & SAT solver validation. | `.github/workflows/` |
+| `documentation-checks.yml` | Link checking, SHA-256 wiki mirror parity, and documentation rule enforcement. | `.github/workflows/` |
+| `dragonfly-hammer2-pfs-ci.yml` | DragonFly BSD HAMMER2 PFS encryption & multi-master replication CI. | `.github/workflows/` |
+| `fedora-crypto-policies-rpm-ostree-ci.yml` | Fedora Silverblue `rpm-ostree` atomic deployment & system crypto policy testing. | `.github/workflows/` |
+| `freebsd-jail-zfs-bootenv-ci.yml` | FreeBSD Jail container isolation & ZFS boot environment snapshot tests. | `.github/workflows/` |
+| `gentoo-portage-ebuild-ci.yml` | Gentoo Portage USE flag dependency resolution & ebuild verification. | `.github/workflows/` |
+| `github-pages-wiki-deploy.yml` | Continuous deployment of repo wiki to GitHub Pages web server. | `.github/workflows/` |
+| `kernel_bsd_security_fuzzing.yml` | Kernel memory allocator & BSD pledge/unveil capability fuzzing. | `.github/workflows/` |
+| `multiarch_qemu_release.yml` | Automated multi-architecture QEMU boot test & release artifact generation. | `.github/workflows/` |
+| `netbsd-rump-kernel-ci.yml` | NetBSD Rump Kernel modular component virtual driver tests. | `.github/workflows/` |
+| `nixos-flake-store-gc-ci.yml` | NixOS declarative flake evaluation & content-addressed store GC tests. | `.github/workflows/` |
+| `openbsd-pf-pledge-security-ci.yml` | OpenBSD `pf` firewall rule parsing & `pledge`/`unveil` privilege verification. | `.github/workflows/` |
+| `pages_automation_deployment.yml` | GitHub Pages artifact bundle generation & deployment pipeline. | `.github/workflows/` |
+| `pr_fast_checks.yml` | Fast Pull Request checks: syntax formatting, `cargo check --lib`, unit tests. | `.github/workflows/` |
+| `qemu-boot-smoke-test.yml` | QEMU virtual machine headless boot smoke tests across target architectures. | `.github/workflows/` |
+| `reproducible-sbom-cosign.yml` | SPDX Software Bill of Materials (SBOM) generation & Cosign signature signing. | `.github/workflows/` |
+| `sast-fuzzing-semgrep.yml` | Semgrep static code analysis & Rust fuzzing verification. | `.github/workflows/` |
+| `security-audit.yml` | Cargo audit for dependency vulnerability scanning and unsafe block inspection. | `.github/workflows/` |
+| `security.yml` | Comprehensive system security, privilege drop, and sandbox policy auditing. | `.github/workflows/` |
+| `sigma_multiarch_ci.yml` | Multi-architecture compilation CI across x86_64, aarch64, riscv64, loongarch64. | `.github/workflows/` |
+| `slsa-provenance-cosign-deployment.yml` | SLSA provenance generation and Cosign public key deployment. | `.github/workflows/` |
+| `ubuntu-apparmor-snapd-ci.yml` | Ubuntu AppArmor LSM profiles & snapd sandbox confinement tests. | `.github/workflows/` |
+| `void-xbps-src-binary-ci.yml` | Void Linux XBPS binary package creation & runit init service checks. | `.github/workflows/` |
+
+---
+
+## 3. DETAILED DIAGNOSTICS BY SYSTEM SHARD (1-12)
 
 ### Shard 1: Kernel Core & Task Scheduling
 * **Working Components**:
@@ -172,15 +216,16 @@ SigmaOS is a Safe-Rust operating system architecture combining kernel, userland,
 
 ---
 
-## 3. WHAT IS NOT WORKING & PARITY GAPS
+## 4. WHAT IS NOT WORKING & PARITY GAPS
 
 1. **Bare-Metal Register Setup**: Low-level CPU control registers (`CR0`, `CR3`, `CR4`, `MSRs`) require bootloader assembly entrypoints.
 2. **Proprietary Firmware Blobs**: Firmware files (NVIDIA GSP, Broadcom Wi-Fi) rely on open-source fallback shims.
 3. **Hardware Vector Hooks**: Physical APIC/IOAPIC interrupt routing is stubbed in userland simulation mode.
+4. **Bare-Metal Target Compilation**: Target compilation `cargo build --bin sigma_kernel --features microkernel --target x86_64-unknown-none` hits `std` dependency boundaries.
 
 ---
 
-## 4. ROOT CAUSES: WHY ERRORS AND GAPS EXIST
+## 5. ROOT CAUSES: WHY ERRORS AND GAPS EXIST
 
 1. **Isolated Subsystem Prototyping**: Subsystems were authored with file-scoped unit tests (`rustc --test`), which allow isolated compilation without revealing cross-module namespace collisions in `src/lib.rs`.
 2. **Multi-Distro Namespace Overlap**: Supporting 73 Linux/BSD distro modes led to duplicate struct names for identical OS concepts across modules.
@@ -188,7 +233,7 @@ SigmaOS is a Safe-Rust operating system architecture combining kernel, userland,
 
 ---
 
-## 5. EXACT FIX ALGORITHMS FOR AI AGENTS (HOW TO FIX IT)
+## 6. EXACT FIX ALGORITHMS FOR AI AGENTS (HOW TO FIX IT)
 
 AI Agents repairing or extending SigmaOS code MUST follow these exact algorithms:
 
@@ -283,7 +328,7 @@ STEP 4: Verify via `test_linux_bsd_interoperability_gateway_matrix_and_sync`.
 
 ---
 
-## 6. COMPILER ERROR REMEDIATION MATRIX (E0004 - E0689)
+## 7. COMPILER ERROR REMEDIATION MATRIX (E0004 - E0689)
 
 | Error Code | Root Cause | Exact AI Agent Resolution Algorithm |
 | :--- | :--- | :--- |
@@ -299,7 +344,7 @@ STEP 4: Verify via `test_linux_bsd_interoperability_gateway_matrix_and_sync`.
 
 ---
 
-## 7. VERIFICATION & QA SUITE EXECUTION PROTOCOL
+## 8. VERIFICATION & QA SUITE EXECUTION PROTOCOL
 
 Before completing work, AI Agents **MUST** execute the following verification procedure:
 
@@ -317,7 +362,6 @@ Before completing work, AI Agents **MUST** execute the following verification pr
    ```bash
    cp WHAT_IS_WORKING_AND_NOT_WORKING.md docs/WHAT_IS_WORKING_AND_NOT_WORKING.md
    cp WHAT_IS_WORKING_AND_NOT_WORKING.md wiki/WHAT_IS_WORKING_AND_NOT_WORKING.md
-   cp WHAT_IS_WORKING_AND_NOT_WORKING.md WIKI/WHAT_IS_WORKING_AND_NOT_WORKING.md
    ```
 
 4. **Complete Pre-Commit Verification**:
