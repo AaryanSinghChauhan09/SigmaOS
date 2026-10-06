@@ -318,6 +318,22 @@ mod tests {
         let brew = dispatcher.dispatch_command("brew install wget").unwrap();
         assert_eq!(brew.source_pm, "brew");
         assert_eq!(brew.operation, UniversalPmOperation::Install);
+
+        let alpine = dispatcher.dispatch_command("alpine add musl").unwrap();
+        assert_eq!(alpine.source_pm, "alpine");
+        assert_eq!(alpine.operation, UniversalPmOperation::Install);
+
+        let gentoo = dispatcher.dispatch_command("gentoo install portage").unwrap();
+        assert_eq!(gentoo.source_pm, "gentoo");
+        assert_eq!(gentoo.operation, UniversalPmOperation::Install);
+
+        let opensuse = dispatcher.dispatch_command("opensuse in vlc").unwrap();
+        assert_eq!(opensuse.source_pm, "opensuse");
+        assert_eq!(opensuse.operation, UniversalPmOperation::Install);
+
+        let nixos = dispatcher.dispatch_command("nixos install firefox").unwrap();
+        assert_eq!(nixos.source_pm, "nixos");
+        assert_eq!(nixos.operation, UniversalPmOperation::Install);
     }
 
     #[test]

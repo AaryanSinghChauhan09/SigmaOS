@@ -2316,6 +2316,124 @@ impl Default for CosmopolitanApeHeaderEngine {
 }
 
 // =========================================================================
+// 22b. ILLUMOS / SOLARIS ZONES CONTAINER & IPS PACKAGE PR GATEWAY ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct SolarisIpsPackagePrSubmission {
+    pub pr_id: u64,
+    pub package_fmri: String, // pkg://solaris/web/server@1.0,5.11
+    pub zone_brand: String,   // ipkg / lx / native
+    pub p5p_manifest_data: String,
+    pub is_merged: bool,
+}
+
+pub struct IllumosZonesSolarisIpsPrGatewayEngine {
+    pub pr_counter: u64,
+    pub submissions: BTreeMap<u64, SolarisIpsPackagePrSubmission>,
+}
+
+impl IllumosZonesSolarisIpsPrGatewayEngine {
+    pub fn new() -> Self {
+        Self {
+            pr_counter: 500,
+            submissions: BTreeMap::new(),
+        }
+    }
+
+    pub fn submit_ips_package_pr(&mut self, fmri: &str, zone_brand: &str, manifest: &str) -> u64 {
+        let id = self.pr_counter;
+        self.pr_counter += 1;
+        self.submissions.insert(
+            id,
+            SolarisIpsPackagePrSubmission {
+                pr_id: id,
+                package_fmri: fmri.to_string(),
+                zone_brand: zone_brand.to_string(),
+                p5p_manifest_data: manifest.to_string(),
+                is_merged: false,
+            },
+        );
+        id
+    }
+
+    pub fn validate_and_merge_pr(&mut self, pr_id: u64) -> Result<bool, &'static str> {
+        if let Some(pr) = self.submissions.get_mut(&pr_id) {
+            pr.is_merged = true;
+            Ok(true)
+        } else {
+            Err("SOLARIS_IPS_PR: PR ID not found")
+        }
+    }
+}
+
+impl Default for IllumosZonesSolarisIpsPrGatewayEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 22c. FREEBSD BHYVE & LINUX KVM MICRO-VM VIRTUALIZATION PR ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct MicroVmVirtualizationPrRecord {
+    pub vm_id: u64,
+    pub vm_name: String,
+    pub memory_mb: u32,
+    pub vcpu_count: u16,
+    pub hypervisor_type: String, // bhyve / kvm
+    pub is_running: bool,
+}
+
+pub struct FreeBsdBhyveKvmVirtualizationPrEngine {
+    pub vm_counter: u64,
+    pub vms: BTreeMap<u64, MicroVmVirtualizationPrRecord>,
+}
+
+impl FreeBsdBhyveKvmVirtualizationPrEngine {
+    pub fn new() -> Self {
+        Self {
+            vm_counter: 1,
+            vms: BTreeMap::new(),
+        }
+    }
+
+    pub fn create_micro_vm_pr(&mut self, name: &str, mem_mb: u32, vcpus: u16, hyp: &str) -> u64 {
+        let id = self.vm_counter;
+        self.vm_counter += 1;
+        self.vms.insert(
+            id,
+            MicroVmVirtualizationPrRecord {
+                vm_id: id,
+                vm_name: name.to_string(),
+                memory_mb: mem_mb,
+                vcpu_count: vcpus,
+                hypervisor_type: hyp.to_string(),
+                is_running: false,
+            },
+        );
+        id
+    }
+
+    pub fn start_vm_pr(&mut self, vm_id: u64) -> Result<bool, &'static str> {
+        if let Some(vm) = self.vms.get_mut(&vm_id) {
+            vm.is_running = true;
+            Ok(true)
+        } else {
+            Err("BHYVE_KVM_PR: Micro-VM ID not found")
+        }
+    }
+}
+
+impl Default for FreeBsdBhyveKvmVirtualizationPrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
 // 24. SERENITYOS (LibGUI EventLoop & Window Manager Protocol)
 // =========================================================================
 
@@ -4303,6 +4421,22 @@ mod tests {
         assert_eq!(freedos.tsr_blocks.len(), 1);
         let res = freedos.dispatch_int21h(0x31).unwrap();
         assert!(res.contains("TSR"));
+    }
+
+    #[test]
+    fn test_illumos_solaris_ips_pr_gateway_engine() {
+        let mut gateway = IllumosZonesSolarisIpsPrGatewayEngine::new();
+        let pr_id = gateway.submit_ips_package_pr("pkg://solaris/web/nginx@1.24", "lx", "set name=pkg.fmri value=pkg://solaris/web/nginx");
+        assert_eq!(pr_id, 500);
+        assert!(gateway.validate_and_merge_pr(pr_id).unwrap());
+    }
+
+    #[test]
+    fn test_freebsd_bhyve_kvm_virtualization_pr_engine() {
+        let mut vmm = FreeBsdBhyveKvmVirtualizationPrEngine::new();
+        let vm_id = vmm.create_micro_vm_pr("sigma-alpine-guest", 2048, 2, "bhyve");
+        assert_eq!(vm_id, 1);
+        assert!(vmm.start_vm_pr(vm_id).unwrap());
     }
 
     #[test]
