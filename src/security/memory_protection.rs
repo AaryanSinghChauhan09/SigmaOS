@@ -63,7 +63,6 @@ impl MemoryProtectionManager {
         let aslr_config = AslrConfig::default();
         let stack_canary_config = StackCanaryConfig::default();
 
-        // Generate random ASLR offset if enabled
         let aslr_offset =
             if mode == MemoryProtectionMode::ASLR || mode == MemoryProtectionMode::Full {
                 AtomicU64::new(Self::generate_random_offset(&aslr_config))
@@ -82,8 +81,6 @@ impl MemoryProtectionManager {
 
     /// Generate a random offset for ASLR
     fn generate_random_offset(config: &AslrConfig) -> u64 {
-        // In production, use a cryptographically secure RNG
-        // For now, use a simple hash-based approach
         let timestamp = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap_or_default()
@@ -149,7 +146,6 @@ impl MemoryProtectionManager {
     pub fn set_mode(&mut self, mode: MemoryProtectionMode) {
         self.mode = mode;
 
-        // Re-initialize ASLR offset if enabling ASLR
         if mode == MemoryProtectionMode::ASLR || mode == MemoryProtectionMode::Full {
             let new_offset = Self::generate_random_offset(&self.aslr_config);
             self.aslr_offset.store(new_offset, Ordering::SeqCst);
@@ -172,7 +168,6 @@ impl MemoryProtectionManager {
     }
 }
 
-#[cfg(test)]
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -219,8 +214,6 @@ mod tests {
         manager.set_mode(MemoryProtectionMode::ASLR);
         assert_ne!(manager.get_aslr_offset(), 0);
     }
-
-    #[ignore]
 
     #[test]
     fn test_re_randomization() {

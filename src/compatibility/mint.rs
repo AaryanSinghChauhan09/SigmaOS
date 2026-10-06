@@ -121,6 +121,12 @@ impl MintUpdateManager {
     }
 }
 
+impl Default for MintUpdateManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// ============================================================================
 /// 2. MintInstall - Software Manager
 /// ============================================================================
@@ -211,6 +217,12 @@ impl MintInstallManager {
     }
 }
 
+impl Default for MintInstallManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// ============================================================================
 /// 3. Cinnamon-inspired Desktop Features
 /// ============================================================================
@@ -282,6 +294,12 @@ impl CinnamonDesktopManager {
     }
 }
 
+impl Default for CinnamonDesktopManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// ============================================================================
 /// 4. XApp Cross-Desktop Integration
 /// ============================================================================
@@ -328,6 +346,12 @@ impl XAppPreferences {
             self.font_size,
             self.animations_enabled
         )
+    }
+}
+
+impl Default for XAppPreferences {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -381,6 +405,12 @@ impl MintSystemConfig {
             self.timeshift_enabled,
             self.firewall_enabled
         )
+    }
+}
+
+impl Default for MintSystemConfig {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -466,7 +496,7 @@ mod tests {
             old_version: "5.15.0".to_string(),
             new_version: "5.15.1".to_string(),
             level: UpdateLevel::Security,
-            size: 10 * 1024 * 1024, // 10MB
+            size: 10 * 1024 * 1024,
             description: "Critical security fix".to_string(),
         };
 

@@ -14,9 +14,10 @@
 
 extern crate alloc;
 use alloc::collections::BTreeMap;
-use alloc::string::String;
-use alloc::vec;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use alloc::vec;
+use alloc::format;
 use core::fmt;
 
 /// Case-insensitive equality without allocation for ASCII text.
@@ -93,30 +94,26 @@ impl AppEntry {
     }
 
     pub fn matches_query(&self, query: &str) -> bool {
-        // Bolt ⚡ Optimization: Utilize zero-allocation ASCII case-insensitive search
-        // helpers (`contains_ignore_case`) instead of calling `.to_lowercase()`
-        // which allocates temporary heap Strings on every application entry query check.
-
         // Check name
-        if contains_ignore_case(&self.name, &query) {
+        if contains_ignore_case(&self.name, query) {
             return true;
         }
 
         // Check description
-        if contains_ignore_case(&self.description, &query) {
+        if contains_ignore_case(&self.description, query) {
             return true;
         }
 
         // Check keywords
         for keyword in &self.keywords {
-            if contains_ignore_case(keyword, &query) {
+            if contains_ignore_case(keyword, query) {
                 return true;
             }
         }
 
         // Check categories
         for category in &self.categories {
-            if contains_ignore_case(category, &query) {
+            if contains_ignore_case(category, query) {
                 return true;
             }
         }
@@ -125,9 +122,6 @@ impl AppEntry {
     }
 
     pub fn fuzzy_score(&self, query: &str) -> i32 {
-        // Bolt ⚡ Optimization: Zero-allocation ASCII comparison on hot path.
-        // Avoid calling `.to_lowercase()` on `self.name` and `query` repeatedly.
-
         if eq_ignore_case(&self.name, query) {
             return 1000; // Exact match
         }
@@ -141,8 +135,7 @@ impl AppEntry {
         }
 
         // Check word boundaries
-        let words = self.name.split_whitespace();
-        for word in words {
+        for word in self.name.split_whitespace() {
             if starts_with_ignore_case(word, query) {
                 return 700; // Word start match
             }
@@ -150,7 +143,7 @@ impl AppEntry {
 
         // Keyword match
         for keyword in &self.keywords {
-            if contains_ignore_case(keyword, &query) {
+            if contains_ignore_case(keyword, query) {
                 return 600;
             }
         }
@@ -347,7 +340,6 @@ impl AppLauncher {
     pub fn search_commands(&self, query: &str) -> Vec<Command> {
         let mut results = Vec::new();
 
-        // Bolt ⚡ Optimization: Zero-allocation ASCII substring matching for command palette searches.
         for command in &self.commands {
             if contains_ignore_case(&command.name, query)
                 || contains_ignore_case(&command.description, query)
@@ -360,7 +352,6 @@ impl AppLauncher {
     }
 
     fn get_time() -> u64 {
-        // In real implementation, would get actual timestamp
         0
     }
 }
@@ -456,7 +447,6 @@ pub fn init_default_apps() -> AppLauncher {
 }
 
 #[cfg(test)]
-#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -477,6 +467,14 @@ mod tests {
         assert_eq!(app.fuzzy_score("firefox browser"), 1000); // Exact
         assert_eq!(app.fuzzy_score("firefox"), 900); // Prefix
         assert!(app.fuzzy_score("fox") > 0); // Fuzzy
+    }
+
+    #[test]
+    fn search_preserves_unicode_case_insensitive_behavior() {
+        let app = AppEntry::new("Über Terminal", "/usr/bin/terminal");
+
+        assert!(app.matches_query("ÜB"));
+        assert_eq!(app.fuzzy_score("ÜBER TERMINAL"), 1000);
     }
 
     #[test]

@@ -5,20 +5,13 @@ pub mod browser;
 pub mod browser_innovations_suite;
 pub use browser_innovations_suite::*;
 pub mod distro_media_engine;
-pub mod pix_image_organizer;
 pub mod sovereign_screen_recorder;
 pub mod sovereign_video_editor;
 pub mod sovereign_video_player;
 
-pub use pix_image_organizer::{
-    CropRect, ImageFormat, PixBatchConverterEngine, PixBatchRenameEngine, PixBatchWatermarkEngine,
-    PixCatalog, PixCollection, PixImageEditParams, PixImageEditor, PixImageMetadata,
-    PixSlideshowEngine, PixWebAlbumGenerator, SlideshowTransition, WatermarkSpec,
-};
-
 pub use distro_media_engine::{
-    AudioSinkBackend, FfmpegHwEncoderBackend, FfmpegZeroCopyEncoder, GStreamerPulseAudioPipeline,
-    GstHardwareDecoder, LinuxBsdDistroMediaSuite, MpvAudioTrack, MpvFreeBsdSndioEngine,
+    AudioSinkBackend, FfmpegHwEncoderBackend, FfmpegZeroCopyEncoder, GstHardwareDecoder,
+    GStreamerPulseAudioPipeline, LinuxBsdDistroMediaSuite, MpvAudioTrack, MpvFreeBsdSndioEngine,
     SubtitleTrackEntry, VlcSubtitleManager,
 };
 
@@ -27,19 +20,24 @@ pub use sovereign_screen_recorder::{
 };
 
 pub use browser::{
-    ArcBoostScript, ArcBrowserBoostEngine, BraveAdblockEngine, BraveShieldsEngine,
-    BrowserContainerType, BrowserProcess, BrowserProcessType, BrowserTabInstance,
+    ArcBoostDomainStylingEngine, ArcBoostScript, ArcBrowserBoostEngine, BraveAdblockEngine,
+    BraveScriptletInjectionEngine, BraveShieldsEngine, BrowserContainerType, BrowserProcess,
+    BrowserProcessType, BrowserTabInstance, ChromiumBlinkCssFlexLayoutEngine,
     ChromiumBlinkLayoutEngine, ChromiumIpcChannelEngine, ChromiumIpcMessage,
-    DeclarativeNetRequestEngine, DnrActionType, DohEchEncryptionEngine, DuckAssistPrivacyEngine,
-    FirefoxContainerJarManager, FirefoxGeckoViewLayoutEngine, FloorpWorkspacesSplitViewEngine,
-    GlobalPrivacyControl, LadybirdLibWebCssParserEngine,
-    LibreWolfStrictFingerprintingProtectionEngine, MullvadPrivacyIsolationEngine, OnionCircuitNode,
-    OrionWebExtensionCompatibilityEngine, QuantumWebRenderEngine, ResistFingerprintingEngine,
-    SearchEngineType, SearchSwitcher, SecureStorageContainer, SigmaWebBrowser,
-    SovereignBrowserEngine, TabMemoryOptimizer, TelemetryAndTrackerStripper, TorCircuitManager,
-    TorOnionRoutingTunnelEngine, TorSecurityLevel, TrackerTrustGrade, UBlockOriginFilterEngine,
+    ChromiumPartitionAllocSlotGuardEngine, DeclarativeNetRequestEngine, DnrActionType,
+    DohEchEncryptionEngine, DuckAssistPrivacyEngine, DuckDuckGoAiAssistSummarizerEngine,
+    FirefoxContainerJarManager, FirefoxContentSecurityPolicyEngine, FirefoxGeckoFlexboxLayoutEngine,
+    FirefoxGeckoViewLayoutEngine, FirefoxTotalCookieProtectionEngine, FloorpSplitViewManagerEngine,
+    FloorpWorkspacesSplitViewEngine, GlobalPrivacyControl, LadybirdLibWebCss3ParserEngine,
+    LadybirdLibWebCssParserEngine, LibreWolfStrictFingerprintingProtectionEngine,
+    LibreWolfWebRtcProtectionEngine, MullvadODohRelayEngine, MullvadPrivacyIsolationEngine,
+    OnionCircuitNode, OrionWebExtensionCompatibilityEngine, QuantumWebRenderEngine,
+    ResistFingerprintingEngine, SearchEngineType, SearchSwitcher, SecureStorageContainer,
+    SigmaWebBrowser, SovereignBrowserEngine, TabMemoryOptimizer, TelemetryAndTrackerStripper,
+    TorCircuitManager, TorObfs4PacketFramingEngine, TorOnionRoutingTunnelEngine, TorSecurityLevel,
+    TrackerTrustGrade, UBlockOriginFilterEngine, UngoogledChromiumHostIpProtectionEngine,
     UngoogledChromiumPrivacyHardeningEngine, VivaldiSpatialNavigationEngine,
-    ZenWorkspaceTreeEngine,
+    VivaldiSpatialVectorNavEngine, ZenWorkspaceTreeEngine,
 };
 
 pub use sovereign_video_player::{
@@ -50,9 +48,3 @@ pub use sovereign_video_player::{
 pub use sovereign_video_editor::{
     AscCdl, EditorError, SovereignVideoEditor, TimelineClip, VideoTrack,
 };
-
-pub mod sovereign_hypnotix_stream_engine;
-pub use sovereign_hypnotix_stream_engine::*;
-
-pub mod sovereign_document_reader;
-pub use sovereign_document_reader::*;

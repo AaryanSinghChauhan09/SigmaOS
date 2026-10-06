@@ -2,11 +2,12 @@
 // SigmaOS Arch Linux Compatibility & Parity Subsystem (sigpkg-arch)
 // Natively compiles PKGBUILD recipes, emulates Pacman database states, manages rolling release upgrades,
 // parses ALPM hooks, builds initramfs with mkinitcpio, packages with makepkg, and executes ALPM transactions.
-use crate::klib;
-use crate::klib::string::SigmaString;
-use crate::klib::HashMap;
-use alloc::format;
-use alloc::string::{String, ToString};
+
+use std::collections::HashMap;
+use std::format;
+use std::string::{String, ToString};
+
+pub type SigmaString = String;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Version {
@@ -46,26 +47,26 @@ pub enum VersionConstraint {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Dependency {
-    pub name: crate::klib::string::SigmaString,
+    pub name: SigmaString,
     pub version_constraint: VersionConstraint,
 }
 
 #[derive(Debug, Clone)]
 pub struct Package {
-    pub name: crate::klib::string::SigmaString,
+    pub name: SigmaString,
     pub version: Version,
-    pub description: crate::klib::string::SigmaString,
-    pub dependencies: crate::klib::vec::Vec<Dependency>,
-    pub checksum: crate::klib::string::SigmaString,
+    pub description: SigmaString,
+    pub dependencies: std::vec::Vec<Dependency>,
+    pub checksum: SigmaString,
 }
 
 impl Package {
     pub fn new(
-        name: crate::klib::string::SigmaString,
+        name: SigmaString,
         version: Version,
-        description: crate::klib::string::SigmaString,
-        dependencies: crate::klib::vec::Vec<Dependency>,
-        checksum: crate::klib::string::SigmaString,
+        description: SigmaString,
+        dependencies: std::vec::Vec<Dependency>,
+        checksum: SigmaString,
     ) -> Self {
         Self {
             name,
@@ -94,7 +95,7 @@ impl AurRecipeCompiler {
     pub fn compile_pkgbuild(&self, pkgbuild_content: &str) -> Result<Package, &'static str> {
         let mut pkgname = "";
         let mut pkgver = "1.0.0";
-        let mut depends = crate::klib::vec::Vec::new();
+        let mut depends = std::vec::Vec::new();
 
         for line in pkgbuild_content.lines() {
             let line = line.trim();
@@ -109,9 +110,8 @@ impl AurRecipeCompiler {
                     .trim_matches(')')
                     .trim_matches('"');
                 for d in dep_str.split_whitespace() {
-                    let cleaned = d.replace('\'', "").replace('"', "");
                     depends.push(Dependency {
-                        name: SigmaString::from(cleaned.as_str()),
+                        name: d.replace('\'', "").replace('"', "").into(),
                         version_constraint: VersionConstraint::Any,
                     });
                 }
@@ -144,16 +144,16 @@ impl Default for AurRecipeCompiler {
 /// Debian-style sbuild build dependency recipe descriptor
 #[derive(Debug, Clone)]
 pub struct DebianSbuildPackage {
-    pub name: crate::klib::string::SigmaString,
+    pub name: SigmaString,
     pub version: Version,
-    pub build_depends: crate::klib::vec::Vec<crate::klib::string::SigmaString>,
+    pub build_depends: std::vec::Vec<SigmaString>,
 }
 
 /// Rolling Release System Synchronizer
 #[derive(Debug, Clone)]
 pub struct RollingSyncManager {
-    pub installed_packages: HashMap<crate::klib::string::SigmaString, Version>,
-    pub remote_repository: HashMap<crate::klib::string::SigmaString, Version>,
+    pub installed_packages: HashMap<SigmaString, Version>,
+    pub remote_repository: HashMap<SigmaString, Version>,
 }
 
 impl RollingSyncManager {
@@ -166,18 +166,16 @@ impl RollingSyncManager {
 
     pub fn register_installed(&mut self, name: &str, version: Version) {
         self.installed_packages
-            .insert(crate::klib::string::SigmaString::from(name), version);
+            .insert(SigmaString::from(name), version);
     }
 
     pub fn register_remote(&mut self, name: &str, version: Version) {
         self.remote_repository
-            .insert(crate::klib::string::SigmaString::from(name), version);
+            .insert(SigmaString::from(name), version);
     }
 
     /// Checks for available package updates in the rolling release stream
-    pub fn list_pending_rolling_updates(
-        &self,
-    ) -> Vec<(crate::klib::string::SigmaString, Version, Version)> {
+    pub fn list_pending_rolling_updates(&self) -> Vec<(SigmaString, Version, Version)> {
         let mut updates = Vec::new();
         for (pkg_name, installed_ver) in &self.installed_packages {
             if let Some(remote_ver) = self.remote_repository.get(pkg_name) {
@@ -250,7 +248,7 @@ impl PacmanDbAdapter {
             SigmaString::from(name),
             parsed_ver,
             SigmaString::from(desc),
-            crate::klib::vec::Vec::<Dependency>::new(),
+            std::vec::Vec::<Dependency>::new(),
             SigmaString::from("sha256_imported_legacy_hash_value"),
         ))
     }
@@ -266,22 +264,20 @@ pub enum HookWhen {
 
 #[derive(Debug, Clone)]
 pub struct AlpmHook {
-    pub name: crate::klib::string::SigmaString,
+    pub name: SigmaString,
     pub when: HookWhen,
-    pub target_pattern: crate::klib::string::SigmaString,
-    pub exec_cmd: crate::klib::string::SigmaString,
+    pub target_pattern: SigmaString,
+    pub exec_cmd: SigmaString,
 }
 
 #[derive(Debug, Clone)]
 pub struct AlpmHookManager {
-    pub hooks: crate::klib::vec::Vec<AlpmHook>,
+    pub hooks: Vec<AlpmHook>,
 }
 
 impl AlpmHookManager {
     pub fn new() -> Self {
-        Self {
-            hooks: crate::klib::vec::Vec::new(),
-        }
+        Self { hooks: Vec::new() }
     }
 
     pub fn add_hook(&mut self, hook: AlpmHook) {
@@ -324,7 +320,7 @@ impl AlpmHookManager {
         let mut triggered_cmds = std::vec::Vec::new();
         for hook in &self.hooks {
             if hook.when == when {
-                let pattern = hook.target_pattern.as_str().trim_end_matches('*');
+                let pattern = hook.target_pattern.trim_end_matches('*');
                 if hook.target_pattern.is_empty() || changed_file.contains(pattern) {
                     triggered_cmds.push(hook.exec_cmd.clone());
                 }
@@ -537,8 +533,8 @@ impl AlpmConflictSolver {
 
 #[derive(Debug, Clone)]
 pub struct MkinitcpioBuilder {
-    pub hooks: crate::klib::vec::Vec<crate::klib::string::SigmaString>,
-    pub compression: crate::klib::string::SigmaString,
+    pub hooks: std::vec::Vec<SigmaString>,
+    pub compression: SigmaString,
 }
 
 impl MkinitcpioBuilder {
@@ -552,19 +548,19 @@ impl MkinitcpioBuilder {
         hooks.push(SigmaString::from("filesystems"));
         Self {
             hooks,
-            compression: crate::klib::string::SigmaString::from("zstd"),
+            compression: SigmaString::from("zstd"),
         }
     }
 
     pub fn add_hook(&mut self, hook_name: &str) {
-        let hook_string = crate::klib::string::SigmaString::from(hook_name);
+        let hook_string = SigmaString::from(hook_name);
         if !self.hooks.contains(&hook_string) {
             self.hooks.push(hook_string);
         }
     }
 
-    pub fn build_initramfs_image(&self, kernel_version: &str) -> crate::klib::vec::Vec<u8> {
-        let mut image_header = crate::klib::string::SigmaString::from(format!(
+    pub fn build_initramfs_image(&self, kernel_version: &str) -> Vec<u8> {
+        let mut image_header = SigmaString::from(format!(
             "MKINITCPIO_IMAGE_HEADER v1.0 | Kernel: {} | Hooks: {:?} | Compression: {}\n",
             kernel_version, self.hooks, self.compression
         ))
@@ -680,19 +676,19 @@ impl SAbsSimdCompiler {
 
 #[derive(Debug, Clone)]
 pub struct MakepkgBuilder {
-    pub pkgname: crate::klib::string::SigmaString,
-    pub pkgver: crate::klib::string::SigmaString,
-    pub arch: crate::klib::string::SigmaString,
-    pub expected_sha256: crate::klib::string::SigmaString,
+    pub pkgname: SigmaString,
+    pub pkgver: SigmaString,
+    pub arch: SigmaString,
+    pub expected_sha256: SigmaString,
 }
 
 impl MakepkgBuilder {
     pub fn new(pkgname: &str, pkgver: &str, arch: &str, expected_sha256: &str) -> Self {
         Self {
-            pkgname: crate::klib::string::SigmaString::from(pkgname),
-            pkgver: crate::klib::string::SigmaString::from(pkgver),
-            arch: crate::klib::string::SigmaString::from(arch),
-            expected_sha256: crate::klib::string::SigmaString::from(expected_sha256),
+            pkgname: SigmaString::from(pkgname),
+            pkgver: SigmaString::from(pkgver),
+            arch: SigmaString::from(arch),
+            expected_sha256: SigmaString::from(expected_sha256),
         }
     }
 
@@ -701,24 +697,23 @@ impl MakepkgBuilder {
         for &b in source_data {
             checksum = checksum.wrapping_mul(31).wrapping_add(b as u64);
         }
-        let computed = crate::klib::string::SigmaString::from(format!("{:016x}", checksum));
-        computed == self.expected_sha256
-            || self.expected_sha256 == crate::klib::string::SigmaString::from("SKIP")
+        let computed = SigmaString::from(format!("{:016x}", checksum));
+        computed == self.expected_sha256 || self.expected_sha256 == SigmaString::from("SKIP")
     }
 
     pub fn build_package_archive(
         &self,
         source_data: &[u8],
-    ) -> Result<(crate::klib::string::SigmaString, crate::klib::vec::Vec<u8>), &'static str> {
+    ) -> Result<(SigmaString, Vec<u8>), &'static str> {
         if !self.verify_source_integrity(source_data) {
             return Err("makepkg: Source integrity verification failed (SHA256 mismatch)");
         }
 
-        let archive_name = crate::klib::string::SigmaString::from(format!(
+        let archive_name = SigmaString::from(format!(
             "{}-{}-{}.pkg.tar.zst",
             self.pkgname, self.pkgver, self.arch
         ));
-        let mut archive_content = crate::klib::string::SigmaString::from(format!(
+        let mut archive_content = SigmaString::from(format!(
             "ARCH_PKG_TAR_ZST_MAGIC | Name: {} | Ver: {} | Arch: {}\n",
             self.pkgname, self.pkgver, self.arch
         ))
@@ -728,32 +723,56 @@ impl MakepkgBuilder {
         Ok((archive_name, archive_content.to_vec()))
     }
 }
+
 // --- Arch Linux svntogit Repository Migration Engine ---
+
 #[derive(Debug, Clone)]
 pub struct SvnPackageMetadata {
     pub pkgname: String,
-    pub repo: String,
-    pub arch: String,
+    pub repo: String, // e.g. "core", "extra", "community"
+    pub svn_revision: u64,
+    pub has_pkgbuild: bool,
 }
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Default)]
 pub struct SvntogitMigrationEngine {
-    pub migrated_packages: std::collections::HashMap<String, SvnPackageMetadata>,
+    pub migrated_packages: std::collections::BTreeMap<String, SvnPackageMetadata>,
 }
 
 impl SvntogitMigrationEngine {
     pub fn new() -> Self {
         Self {
-            migrated_packages: std::collections::HashMap::new(),
+            migrated_packages: std::collections::BTreeMap::new(),
         }
+    }
+
+    pub fn migrate_svn_repo_layout(
+        &mut self,
+        pkgname: &str,
+        repo: &str,
+        svn_revision: u64,
+        pkgbuild_content: &str,
+    ) -> Result<String, &'static str> {
+        if pkgbuild_content.is_empty() {
+            return Err("svntogit: Cannot migrate empty PKGBUILD");
+        }
+
+        let metadata = SvnPackageMetadata {
+            pkgname: pkgname.to_string(),
+            repo: repo.to_string(),
+            svn_revision,
+            has_pkgbuild: true,
+        };
+
+        self.migrated_packages.insert(pkgname.to_string(), metadata);
+        Ok(format!(
+            "Migrated Arch SVN pkg '{}' (r{}) into Git branch 'packages/{}'",
+            pkgname, svn_revision, pkgname
+        ))
     }
 }
 
-pub type SvntoGitEngine = SvntogitMigrationEngine;
-
 #[cfg(test)]
-#[cfg(test)]
-#[cfg(test_disabled)]
 mod tests {
     use super::*;
 
@@ -923,8 +942,7 @@ mod tests {
         let builder = MakepkgBuilder::new("ripgrep", "13.0.0", "x86_64", "SKIP");
         let source_bytes = b"cargo build --release";
 
-        let (pkg_file, pkg_data): (SigmaString, AllocVec<u8>) =
-            builder.build_package_archive(source_bytes).unwrap();
+        let (pkg_file, pkg_data) = builder.build_package_archive(source_bytes).unwrap();
         assert_eq!(pkg_file.as_str(), "ripgrep-13.0.0-x86_64.pkg.tar.zst");
         assert!(pkg_data.len() > source_bytes.len());
     }

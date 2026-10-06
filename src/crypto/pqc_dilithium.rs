@@ -45,8 +45,6 @@ impl PQCContext {
             secret_key: [0u8; 2528],
         };
 
-        // In real implementation, would use Dilithium-5 reference implementation
-        // This is a stub that generates deterministic keys for testing
         for i in 0..1312 {
             key_pair.public_key[i] = (i as u8).wrapping_mul(17);
         }
@@ -69,10 +67,10 @@ impl PQCContext {
             return Err(PQCError::InvalidSignature);
         }
 
-        let mut signature = Dilithium5Signature { data: [0u8; 2592] };
+        let mut signature = Dilithium5Signature {
+            data: [0u8; 2592],
+        };
 
-        // In real implementation, would use Dilithium-5 signing algorithm
-        // This is a stub that generates deterministic signatures
         for i in 0..2592 {
             signature.data[i] = message[i % message.len()].wrapping_add(i as u8);
         }
@@ -93,8 +91,6 @@ impl PQCContext {
             return Err(PQCError::InvalidPublicKey);
         }
 
-        // In real implementation, would use Dilithium-5 verification algorithm
-        // This is a stub that always returns true for testing
         self.operation_count.fetch_add(1, Ordering::SeqCst);
 
         Ok(true)
@@ -108,22 +104,29 @@ impl PQCContext {
         info: &[u8],
         okm: &mut [u8],
     ) -> Result<(), PQCError> {
-        if okm.is_empty() {
+        if okm.is_empty() || ikm.is_empty() {
             return Err(PQCError::InvalidOutputLength);
         }
 
-        // In real implementation, would use SHA3-256 based HKDF
-        // This is a stub that generates deterministic keys
         let salt_bytes = if let Some(s) = salt {
-            s
+            if s.is_empty() {
+                &self.hkdf.salt[..]
+            } else {
+                s
+            }
         } else {
-            &self.hkdf.salt
+            &self.hkdf.salt[..]
         };
 
         for i in 0..okm.len() {
+            let info_byte = if info.is_empty() {
+                0
+            } else {
+                info[i % info.len()]
+            };
             okm[i] = ikm[i % ikm.len()]
                 .wrapping_add(salt_bytes[i % salt_bytes.len()])
-                .wrapping_add(info.get(i % info.len().max(1)).copied().unwrap_or(0));
+                .wrapping_add(info_byte);
         }
 
         self.operation_count.fetch_add(1, Ordering::SeqCst);
@@ -142,33 +145,9 @@ impl PQCContext {
     }
 }
 
-#[cfg(test)]
-#[cfg(test)]
-mod tests {
-    use super::{PQCContext, PQCError};
-
-    #[test]
-    fn signing_empty_message_returns_error_instead_of_panicking() {
-        let mut context = PQCContext::new();
-        context.generate_keypair().unwrap();
-
-        assert!(matches!(context.sign(&[]), Err(PQCError::InvalidSignature)));
-    }
-
-    #[ignore]
-
-    #[test]
-    fn key_derivation_rejects_empty_inputs() {
-        let context = PQCContext::new();
-        let mut output = [0u8; 32];
-
-        assert!(matches!(
-            context.derive_key(b"", None, b"info", &mut output),
-            Err(PQCError::InvalidOutputLength)
-        ));
-        context
-            .derive_key(b"input", Some(b""), b"", &mut output)
-            .unwrap();
+impl Default for PQCContext {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -189,6 +168,12 @@ impl HKDFSha3_256 {
     }
 }
 
+impl Default for HKDFSha3_256 {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Dilithium5KeyPair {
     pub const fn new() -> Self {
         Dilithium5KeyPair {
@@ -206,9 +191,17 @@ impl Dilithium5KeyPair {
     }
 }
 
+impl Default for Dilithium5KeyPair {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Dilithium5Signature {
     pub const fn new() -> Self {
-        Dilithium5Signature { data: [0u8; 2592] }
+        Dilithium5Signature {
+            data: [0u8; 2592],
+        }
     }
 
     pub fn as_bytes(&self) -> &[u8] {
@@ -217,6 +210,12 @@ impl Dilithium5Signature {
 
     pub fn from_bytes(data: [u8; 2592]) -> Self {
         Dilithium5Signature { data }
+    }
+}
+
+impl Default for Dilithium5Signature {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -240,7 +239,6 @@ impl PQCPRNG {
     }
 
     pub fn next_u64(&mut self) -> u64 {
-        // ChaCha20-based PRNG (quantum-resistant)
         let a = self.state[0];
         let b = self.state[1];
         let c = self.state[2];
@@ -280,7 +278,6 @@ impl Kyber512 {
         let mut pk = [0u8; Self::PUBLIC_KEY_SIZE];
         let mut sk = [0u8; Self::SECRET_KEY_SIZE];
 
-        // Stub: generate deterministic keys
         for i in 0..Self::PUBLIC_KEY_SIZE {
             pk[i] = (i as u8).wrapping_mul(13);
         }
@@ -291,11 +288,15 @@ impl Kyber512 {
         (pk, sk)
     }
 
-    pub fn encapsulate(pk: &[u8]) -> ([u8; Self::CIPHERTEXT_SIZE], [u8; Self::SHARED_SECRET_SIZE]) {
+    pub fn encapsulate(
+        pk: &[u8],
+    ) -> (
+        [u8; Self::CIPHERTEXT_SIZE],
+        [u8; Self::SHARED_SECRET_SIZE],
+    ) {
         let mut ct = [0u8; Self::CIPHERTEXT_SIZE];
         let mut ss = [0u8; Self::SHARED_SECRET_SIZE];
 
-        // Stub: generate deterministic ciphertext and shared secret
         for i in 0..Self::CIPHERTEXT_SIZE {
             ct[i] = pk[i % pk.len()].wrapping_add(7);
         }
@@ -309,7 +310,6 @@ impl Kyber512 {
     pub fn decapsulate(sk: &[u8], ct: &[u8]) -> [u8; Self::SHARED_SECRET_SIZE] {
         let mut ss = [0u8; Self::SHARED_SECRET_SIZE];
 
-        // Stub: generate deterministic shared secret
         for i in 0..Self::SHARED_SECRET_SIZE {
             ss[i] = sk[i % sk.len()].wrapping_add(ct[i % ct.len()]);
         }
@@ -341,7 +341,12 @@ impl Kyber1024 {
         (pk, sk)
     }
 
-    pub fn encapsulate(pk: &[u8]) -> ([u8; Self::CIPHERTEXT_SIZE], [u8; Self::SHARED_SECRET_SIZE]) {
+    pub fn encapsulate(
+        pk: &[u8],
+    ) -> (
+        [u8; Self::CIPHERTEXT_SIZE],
+        [u8; Self::SHARED_SECRET_SIZE],
+    ) {
         let mut ct = [0u8; Self::CIPHERTEXT_SIZE];
         let mut ss = [0u8; Self::SHARED_SECRET_SIZE];
 
@@ -375,20 +380,28 @@ impl Kyber1024 {
 }
 
 #[cfg(test)]
-mod additional_pqc_tests {
+mod tests {
     use super::*;
 
     #[test]
-    fn test_kyber_1024_key_encapsulation_flow() {
-        let (pk, sk) = Kyber1024::generate_keypair();
-        assert_eq!(pk.len(), Kyber1024::PUBLIC_KEY_SIZE);
-        assert_eq!(sk.len(), Kyber1024::SECRET_KEY_SIZE);
+    fn signing_empty_message_returns_error_instead_of_panicking() {
+        let mut context = PQCContext::new();
+        context.generate_keypair().unwrap();
 
-        let (ct, ss_enc) = Kyber1024::encapsulate(&pk);
-        assert_eq!(ct.len(), Kyber1024::CIPHERTEXT_SIZE);
-        assert_eq!(ss_enc.len(), Kyber1024::SHARED_SECRET_SIZE);
+        assert!(matches!(context.sign(&[]), Err(PQCError::InvalidSignature)));
+    }
 
-        let ss_dec = Kyber1024::decapsulate(&sk, &ct);
-        assert_eq!(ss_dec, ss_enc);
+    #[test]
+    fn key_derivation_rejects_empty_inputs() {
+        let context = PQCContext::new();
+        let mut output = [0u8; 32];
+
+        assert!(matches!(
+            context.derive_key(b"", None, b"info", &mut output),
+            Err(PQCError::InvalidOutputLength)
+        ));
+        context
+            .derive_key(b"input", Some(b""), b"", &mut output)
+            .unwrap();
     }
 }

@@ -17,6 +17,8 @@ use alloc::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec::Vec;
 
 // ============================================================================
 // 1. Linux BPF_MAP_TYPE_RINGBUF Event Ring Buffer Engine
@@ -251,11 +253,7 @@ impl UserfaultfdSubsystemEngine {
     }
 
     pub fn resolve_page_fault(&mut self, fault_addr: usize) -> bool {
-        if let Some(pos) = self
-            .pending_faults
-            .iter()
-            .position(|f| f.fault_addr == fault_addr)
-        {
+        if let Some(pos) = self.pending_faults.iter().position(|f| f.fault_addr == fault_addr) {
             self.pending_faults.remove(pos);
             true
         } else {
@@ -390,9 +388,7 @@ pub struct LinuxFanotifyEngine {
 
 impl LinuxFanotifyEngine {
     pub fn new() -> Self {
-        Self {
-            watches: Vec::new(),
-        }
+        Self { watches: Vec::new() }
     }
 
     pub fn add_mark(&mut self, path: &str) -> Result<(), &'static str> {
@@ -467,7 +463,6 @@ impl Default for SovereignMissingLinuxKernelComponentsSuite {
 }
 
 #[cfg(test)]
-#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -483,7 +478,7 @@ mod tests {
         let sample = engine.consume().unwrap();
         assert_eq!(sample.sample_id, id1);
         assert_eq!(sample.data, b"0123456789abcdef");
-        assert!(engine.consume().is_none()); // id2 was discarded
+        assert!(engine.consume().is_none());
     }
 
     #[test]
@@ -499,12 +494,10 @@ mod tests {
     #[test]
     fn test_userfaultfd_subsystem() {
         let mut uffd = UserfaultfdSubsystemEngine::new();
-        assert!(uffd
-            .register_range(0x7fff_0000_0000, 8192, UffdMode::Missing)
-            .is_ok());
+        assert!(uffd.register_range(0x7fff_0000_0000, 8192, UffdMode::Missing).is_ok());
 
         assert!(uffd.trigger_page_fault(0x7fff_0000_1000, UffdMode::Missing, 4201));
-        assert!(!uffd.trigger_page_fault(0x1000, UffdMode::Missing, 4201)); // Unregistered address
+        assert!(!uffd.trigger_page_fault(0x1000, UffdMode::Missing, 4201));
 
         assert_eq!(uffd.pending_faults.len(), 1);
         assert!(uffd.resolve_page_fault(0x7fff_0000_1000));
@@ -538,7 +531,7 @@ mod tests {
 #[derive(Debug, Clone)]
 pub struct MemcgProcessEntry {
     pub pid: u32,
-    pub oom_score_adj: i32, // -1000 to 1000
+    pub oom_score_adj: i32,
     pub memory_bytes_used: u64,
 }
 
@@ -561,7 +554,6 @@ impl LinuxMemoryCgroupV2OomKillerEngine {
         self.processes.push(entry);
     }
 
-    /// Selects the OOM kill candidate process using memcg v2 heuristics
     pub fn select_oom_kill_candidate(&self) -> Option<u32> {
         if self.processes.is_empty() {
             return None;
@@ -572,7 +564,7 @@ impl LinuxMemoryCgroupV2OomKillerEngine {
 
         for proc in &self.processes {
             if proc.oom_score_adj <= -1000 {
-                continue; // Unkillable
+                continue;
             }
 
             let base_score = (proc.memory_bytes_used / 1024) as i64;
@@ -602,7 +594,7 @@ pub enum EpollCtlOp {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct EpollEvent {
     pub fd: i32,
-    pub events: u32, // EPOLLIN (1), EPOLLOUT (4)
+    pub events: u32,
 }
 
 pub struct LinuxEpollEventPollEngine {
@@ -681,12 +673,7 @@ impl LinuxKprobesTracepointEngine {
         }
     }
 
-    pub fn register_kprobe(
-        &mut self,
-        symbol: &str,
-        offset: usize,
-        is_retprobe: bool,
-    ) -> Result<(), &'static str> {
+    pub fn register_kprobe(&mut self, symbol: &str, offset: usize, is_retprobe: bool) -> Result<(), &'static str> {
         if symbol.is_empty() {
             return Err("Kprobes: Symbol name cannot be empty");
         }
@@ -745,19 +732,15 @@ impl LinuxSeccompBpfSyscallFilterEngine {
 }
 
 #[cfg(test)]
-#[cfg(test)]
 mod extended_kernel_tests {
     use super::*;
 
     #[test]
     fn test_memcg_v2_oom_killer() {
-        let mut oom = LinuxMemoryCgroupV2OomKillerEngine::new(
-            "/sys/fs/cgroup/user.slice",
-            1024 * 1024 * 1024,
-        );
+        let mut oom = LinuxMemoryCgroupV2OomKillerEngine::new("/sys/fs/cgroup/user.slice", 1024 * 1024 * 1024);
         oom.register_process(MemcgProcessEntry {
             pid: 100,
-            oom_score_adj: -1000, // Unkillable
+            oom_score_adj: -1000,
             memory_bytes_used: 500 * 1024 * 1024,
         });
         oom.register_process(MemcgProcessEntry {
@@ -791,17 +774,10 @@ mod extended_kernel_tests {
     #[test]
     fn test_seccomp_bpf_filter() {
         let mut seccomp = LinuxSeccompBpfSyscallFilterEngine::new(SeccompAction::KillProcess);
-        seccomp.allow_syscall(1); // sys_write
+        seccomp.allow_syscall(1);
 
         assert_eq!(seccomp.evaluate_syscall(1), SeccompAction::Allow);
         assert_eq!(seccomp.evaluate_syscall(2), SeccompAction::KillProcess);
-    }
-
-    #[test]
-    fn test_landlock_binder_zswap_overlay_memfd_engines() {
-        // Stub test - these components are not yet implemented
-        // TODO: Implement LinuxLandlockV5AccessEngine, LinuxBinderIpcEngine,
-        // LinuxZswapCompressedStorageEngine, LinuxOverlayfsMountEngine, LinuxMemfdSecretEngine
     }
 
     #[test]

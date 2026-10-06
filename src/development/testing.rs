@@ -108,24 +108,15 @@ impl TestSuite {
     }
 
     pub fn get_passed_count(&self) -> usize {
-        self.tests
-            .iter()
-            .filter(|t| t.status == TestStatus::Passed)
-            .count()
+        self.tests.iter().filter(|t| t.status == TestStatus::Passed).count()
     }
 
     pub fn get_failed_count(&self) -> usize {
-        self.tests
-            .iter()
-            .filter(|t| t.status == TestStatus::Failed)
-            .count()
+        self.tests.iter().filter(|t| t.status == TestStatus::Failed).count()
     }
 
     pub fn get_skipped_count(&self) -> usize {
-        self.tests
-            .iter()
-            .filter(|t| t.status == TestStatus::Skipped)
-            .count()
+        self.tests.iter().filter(|t| t.status == TestStatus::Skipped).count()
     }
 
     pub fn get_total_duration_ms(&self) -> u64 {
@@ -252,10 +243,14 @@ impl DevelopmentTestingFramework {
         stats.push_str(&format!("Passed: {}\n", passed));
         stats.push_str(&format!("Failed: {}\n", failed));
         stats.push_str(&format!("Skipped: {}\n", skipped));
-        stats.push_str(&format!(
-            "Success rate: {:.1}%\n",
-            (passed as f64 / total_tests as f64) * 100.0
-        ));
+        if total_tests > 0 {
+            stats.push_str(&format!(
+                "Success rate: {:.1}%\n",
+                (passed as f64 / total_tests as f64) * 100.0
+            ));
+        } else {
+            stats.push_str("Success rate: 0.0%\n");
+        }
         stats.push_str(&format!("Total duration: {}ms\n", total_duration));
 
         if self.config.verbose {
@@ -338,7 +333,6 @@ impl DevelopmentTestingFramework {
     }
 }
 
-#[cfg(test)]
 #[cfg(test)]
 mod tests {
     use super::*;

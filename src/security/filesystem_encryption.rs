@@ -209,11 +209,7 @@ impl FilesystemEncryptionManager {
         mapper_name: String,
         algorithm: EncryptionAlgorithm,
     ) -> Result<(), String> {
-        if self
-            .luks_devices
-            .iter()
-            .any(|d| d.device_path == device_path)
-        {
+        if self.luks_devices.iter().any(|d| d.device_path == device_path) {
             return Err(format!("Device {} already managed", device_path));
         }
 
@@ -232,7 +228,8 @@ impl FilesystemEncryptionManager {
             .find(|d| d.device_path == device_path)
             .ok_or_else(|| format!("Device {} not found", device_path))?;
 
-        if device.status != EncryptionStatus::Encrypted && device.status != EncryptionStatus::Locked
+        if device.status != EncryptionStatus::Encrypted
+            && device.status != EncryptionStatus::Locked
         {
             return Err(format!("Device {} is not encrypted or locked", device_path));
         }
@@ -265,23 +262,14 @@ impl FilesystemEncryptionManager {
 
     /// Get LUKS device
     pub fn get_luks_device(&self, device_path: &str) -> Option<&LuksDevice> {
-        self.luks_devices
-            .iter()
-            .find(|d| d.device_path == device_path)
+        self.luks_devices.iter().find(|d| d.device_path == device_path)
     }
 
     /// List fscrypt directories
     pub fn list_directories(&self) -> Vec<String> {
         self.fscrypt_directories
             .iter()
-            .map(|d| {
-                format!(
-                    "{} ({}, {})",
-                    d.path,
-                    d.status.as_str(),
-                    d.algorithm.as_str()
-                )
-            })
+            .map(|d| format!("{} ({}, {})", d.path, d.status.as_str(), d.algorithm.as_str()))
             .collect()
     }
 
@@ -312,6 +300,7 @@ impl FilesystemEncryptionManager {
                 d.status == EncryptionStatus::Encrypted || d.status == EncryptionStatus::Locked
             })
             .count();
+
         let unlocked_dirs = self
             .fscrypt_directories
             .iter()
@@ -325,6 +314,7 @@ impl FilesystemEncryptionManager {
                 d.status == EncryptionStatus::Encrypted || d.status == EncryptionStatus::Locked
             })
             .count();
+
         let unlocked_devices = self
             .luks_devices
             .iter()
@@ -368,7 +358,6 @@ impl FilesystemEncryptionManager {
     }
 }
 
-#[cfg(test)]
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -466,7 +455,7 @@ mod tests {
                 EncryptionAlgorithm::Aes256Xts,
             )
             .unwrap();
-        assert!(manager.lock_directory("/home/user/sensitive").is_err()); // Not unlocked
+        assert!(manager.lock_directory("/home/user/sensitive").is_err());
     }
 
     #[test]

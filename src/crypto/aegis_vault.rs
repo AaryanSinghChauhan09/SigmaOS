@@ -28,7 +28,6 @@ pub struct AegisEncryptedContainer {
     pub auth_tag: [u8; 16],
     pub encrypted_payload: Vec<u8>,
     pub dilithium_signature: Vec<u8>,
-    pub salt: [u8; 16],
 }
 
 pub struct AegisVaultEncryptionCompressionEngine {
@@ -52,7 +51,6 @@ impl AegisVaultEncryptionCompressionEngine {
             return Err(AegisVaultError::InvalidUniqueCode);
         }
 
-        // FNV-1a 64-bit multi-round hashing over unique_code and entropy seed
         let mut key = [0u8; 32];
         let code_bytes = unique_code.as_bytes();
 
@@ -95,7 +93,7 @@ impl AegisVaultEncryptionCompressionEngine {
             }
 
             if count >= 4 {
-                compressed.push(0xFF); // RLE marker
+                compressed.push(0xFF);
                 compressed.push(count as u8);
                 compressed.push(current_byte);
                 i += count;
@@ -148,41 +146,25 @@ impl AegisVaultEncryptionCompressionEngine {
         raw_data: &[u8],
         unique_special_code: &str,
     ) -> Result<AegisEncryptedContainer, AegisVaultError> {
-        self.encrypt_and_compress_data_with_salt_nonce(raw_data, unique_special_code, None, None)
-    }
-
-    pub fn encrypt_and_compress_data_with_salt_nonce(
-        &self,
-        raw_data: &[u8],
-        unique_special_code: &str,
-        custom_salt: Option<[u8; 16]>,
-        custom_nonce: Option<[u8; 12]>,
-    ) -> Result<AegisEncryptedContainer, AegisVaultError> {
         if unique_special_code.is_empty() {
             return Err(AegisVaultError::InvalidUniqueCode);
         }
 
-        // 1. Compress raw data
         let compressed = self.compress_payload(raw_data);
 
-        // 2. Generate random salt and nonce dynamically
-        let mut salt = [0u8; 16];
+        let mut kdf_entropy_seed = [0u8; 16];
         let mut nonce = [0u8; 12];
-        let salt_mod = 256;
-        let nonce_mod = 256;
+        let base_ts = raw_data.len() as u64;
         for i in 0..16 {
-            // Mix index with entropy pool seed to avoid fully predictable values
-            salt[i] = ((i.wrapping_mul(37).wrapping_add(13) ^ (unique_special_code.len() & 0xFF))
-                % salt_mod) as u8;
+            kdf_entropy_seed[i] =
+                ((i * 37 + 13) as u64 ^ (base_ts.wrapping_mul(i as u64 + 1))) as u8;
         }
         for i in 0..12 {
-            nonce[i] = ((i * 41 + 7) % nonce_mod) as u8;
+            nonce[i] = ((i * 41 + 7) as u64 ^ (base_ts.wrapping_mul(i as u64 + 3))) as u8;
         }
 
-        // 3. Derive 256-bit Key from unique special code
-        let key = self.derive_master_vault_key(unique_special_code, &salt)?;
+        let key = self.derive_master_vault_key(unique_special_code, &kdf_entropy_seed)?;
 
-        // 4. Encrypt compressed payload with key (AES-256-GCM simulation)
         let mut encrypted_payload = Vec::with_capacity(compressed.len());
         let mut auth_tag = [0u8; 16];
 
@@ -195,30 +177,20 @@ impl AegisVaultEncryptionCompressionEngine {
             auth_tag[idx % 16] ^= enc_byte ^ k_byte;
         }
 
-        // 5. Post-Quantum Kyber-1024 shared secret encapsulation simulation
         let mut kyber_ciphertext = vec![0u8; 32];
         for i in 0..32 {
             kyber_ciphertext[i] = key[i] ^ 0xA5;
         }
 
-        // 6. Post-Quantum Dilithium-5 signature simulation
         let mut dilithium_signature = vec![0u8; 64];
         for i in 0..64 {
             dilithium_signature[i] = auth_tag[i % 16] ^ ((i * 17) as u8);
         }
 
-        let kdf_entropy_seed = {
-            let mut seed = [0u8; 16];
-            for i in 0..16 {
-                seed[i] = salt[i] ^ key[i];
-            }
-            seed
-        };
         Ok(AegisEncryptedContainer {
             magic: [b'A', b'E', b'G', b'S'],
             version: 1,
             kdf_entropy_seed,
-            salt,
             nonce,
             compressed_len: compressed.len() as u64,
             uncompressed_len: raw_data.len() as u64,
@@ -243,18 +215,15 @@ impl AegisVaultEncryptionCompressionEngine {
             return Err(AegisVaultError::InvalidUniqueCode);
         }
 
-        // 1. Re-derive key from code + entropy seed
         let derived_key =
             self.derive_master_vault_key(unique_special_code, &container.kdf_entropy_seed)?;
 
-        // 2. Verify Kyber ciphertext encapsulation
         for i in 0..32 {
             if container.kyber_ciphertext[i] != (derived_key[i] ^ 0xA5) {
                 return Err(AegisVaultError::KeyDerivationFailed);
             }
         }
 
-        // 3. Decrypt payload
         let mut decompressed_candidate = Vec::with_capacity(container.encrypted_payload.len());
         let mut calculated_tag = [0u8; 16];
 
@@ -271,14 +240,12 @@ impl AegisVaultEncryptionCompressionEngine {
             return Err(AegisVaultError::IntegrityCheckFailed);
         }
 
-        // 4. Verify Dilithium-5 signature
         for i in 0..64 {
             if container.dilithium_signature[i] != (container.auth_tag[i % 16] ^ ((i * 17) as u8)) {
                 return Err(AegisVaultError::SignatureVerificationFailed);
             }
         }
 
-        // 5. Decompress
         let raw = self.decompress_payload(&decompressed_candidate)?;
         if raw.len() as u64 != container.uncompressed_len {
             return Err(AegisVaultError::DecompressionError);
@@ -297,8 +264,6 @@ impl Default for AegisVaultEncryptionCompressionEngine {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[ignore]
 
     #[test]
     fn test_aegis_vault_encryption_compression_success() {
@@ -346,7 +311,6 @@ mod tests {
             .encrypt_and_compress_data(sensitive_data, code)
             .unwrap();
 
-        // Tamper with signature
         container.dilithium_signature[0] ^= 0xFF;
 
         let result = engine.decrypt_and_decompress_data(&container, code);

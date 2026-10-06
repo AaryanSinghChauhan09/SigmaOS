@@ -1,519 +1,320 @@
-// Kernel Module Loading Control for SigmaOS
-// Kernel module loading control per Wiki 07-Security.md
-// Provides control over kernel module loading for security
+// Kernel Module Loading Control Subsystem for SigmaOS
+// Kernel module control per Wiki 04-Kernel.md
+// Provides kernel module loading, signing, and security policy enforcement
 
+use std::collections::HashMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
 
-/// Module loading state
+/// Module signature state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ModuleLoadingState {
-    Enabled,
-    Disabled,
-    Restricted,
+pub enum ModuleSignatureState {
+    Valid,
+    Invalid,
+    Unsigned,
+    UnknownKey,
 }
 
-impl ModuleLoadingState {
+impl ModuleSignatureState {
     pub fn as_str(&self) -> &str {
         match self {
-            ModuleLoadingState::Enabled => "enabled",
-            ModuleLoadingState::Disabled => "disabled",
-            ModuleLoadingState::Restricted => "restricted",
-        }
-    }
-
-    pub fn from_str(s: &str) -> Option<Self> {
-        match s {
-            "enabled" => Some(ModuleLoadingState::Enabled),
-            "disabled" => Some(ModuleLoadingState::Disabled),
-            "restricted" => Some(ModuleLoadingState::Restricted),
-            _ => None,
+            ModuleSignatureState::Valid => "valid",
+            ModuleSignatureState::Invalid => "invalid",
+            ModuleSignatureState::Unsigned => "unsigned",
+            ModuleSignatureState::UnknownKey => "unknown_key",
         }
     }
 }
 
 /// Module loading policy
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ModuleLoadingPolicy {
+pub enum ModuleLoadPolicy {
     AllowAll,
-    AllowSigned,
-    AllowWhitelist,
-    DenyAll,
+    SignedOnly,
+    SignedAndVerified,
+    Disabled,
 }
 
-impl ModuleLoadingPolicy {
+impl ModuleLoadPolicy {
     pub fn as_str(&self) -> &str {
         match self {
-            ModuleLoadingPolicy::AllowAll => "allow_all",
-            ModuleLoadingPolicy::AllowSigned => "allow_signed",
-            ModuleLoadingPolicy::AllowWhitelist => "allow_whitelist",
-            ModuleLoadingPolicy::DenyAll => "deny_all",
+            ModuleLoadPolicy::AllowAll => "allow_all",
+            ModuleLoadPolicy::SignedOnly => "signed_only",
+            ModuleLoadPolicy::SignedAndVerified => "signed_and_verified",
+            ModuleLoadPolicy::Disabled => "disabled",
         }
     }
 }
 
 /// Kernel module info
 #[derive(Debug, Clone)]
-pub struct KernelModule {
+pub struct KernelModuleInfo {
     pub name: String,
     pub version: String,
+    pub author: String,
+    pub description: String,
+    pub license: String,
+    pub dependencies: Vec<String>,
+    pub signature_state: ModuleSignatureState,
     pub loaded: bool,
-    pub signature_verified: bool,
-    pub load_time: Option<u64>,
+    pub ref_count: u32,
+    pub address: usize,
+    pub size: usize,
 }
 
-impl KernelModule {
+impl KernelModuleInfo {
     pub fn new(name: String, version: String) -> Self {
-        KernelModule {
+        KernelModuleInfo {
             name,
             version,
+            author: String::new(),
+            description: String::new(),
+            license: String::from("GPL"),
+            dependencies: Vec::new(),
+            signature_state: ModuleSignatureState::Unsigned,
             loaded: false,
-            signature_verified: false,
-            load_time: None,
+            ref_count: 0,
+            address: 0,
+            size: 0,
         }
     }
 
-    pub fn set_loaded(&mut self, loaded: bool) {
-        self.loaded = loaded;
+    pub fn with_author(mut self, author: String) -> Self {
+        self.author = author;
+        self
     }
 
-    pub fn set_signature_verified(&mut self, verified: bool) {
-        self.signature_verified = verified;
+    pub fn with_description(mut self, description: String) -> Self {
+        self.description = description;
+        self
     }
 
-    pub fn set_load_time(&mut self, time: u64) {
-        self.load_time = Some(time);
+    pub fn with_license(mut self, license: String) -> Self {
+        self.license = license;
+        self
+    }
+
+    pub fn with_dependencies(mut self, dependencies: Vec<String>) -> Self {
+        self.dependencies = dependencies;
+        self
+    }
+
+    pub fn with_signature(mut self, signature_state: ModuleSignatureState) -> Self {
+        self.signature_state = signature_state;
+        self
     }
 }
 
 /// Module loading rule
 #[derive(Debug, Clone)]
-pub struct ModuleLoadingRule {
+pub struct ModuleRule {
     pub module_name: String,
     pub allowed: bool,
-    pub requires_signature: bool,
-    pub description: String,
+    pub reason: String,
 }
 
-impl ModuleLoadingRule {
-    pub fn new(
-        module_name: String,
-        allowed: bool,
-        requires_signature: bool,
-        description: String,
-    ) -> Self {
-        ModuleLoadingRule {
+impl ModuleRule {
+    pub fn allow(module_name: String, reason: String) -> Self {
+        ModuleRule {
             module_name,
-            allowed,
-            requires_signature,
-            description,
+            allowed: true,
+            reason,
+        }
+    }
+
+    pub fn deny(module_name: String, reason: String) -> Self {
+        ModuleRule {
+            module_name,
+            allowed: false,
+            reason,
         }
     }
 }
 
 /// Kernel module loading controller
 #[derive(Debug, Clone)]
-pub struct KernelModuleLoadingController {
-    pub loading_state: ModuleLoadingState,
-    pub loading_policy: ModuleLoadingPolicy,
-    pub modules: Vec<KernelModule>,
-    pub rules: Vec<ModuleLoadingRule>,
-    pub signature_checking_enabled: bool,
+pub struct ModuleLoadingController {
+    pub policy: ModuleLoadPolicy,
+    pub modules: HashMap<String, KernelModuleInfo>,
+    pub rules: HashMap<String, ModuleRule>,
+    pub trusted_keys: Vec<String>,
+    pub locked: bool,
 }
 
-impl Default for KernelModuleLoadingController {
+impl Default for ModuleLoadingController {
     fn default() -> Self {
-        KernelModuleLoadingController {
-            loading_state: ModuleLoadingState::Enabled,
-            loading_policy: ModuleLoadingPolicy::AllowAll,
-            modules: Vec::new(),
-            rules: Vec::new(),
-            signature_checking_enabled: false,
+        ModuleLoadingController {
+            policy: ModuleLoadPolicy::SignedAndVerified,
+            modules: HashMap::new(),
+            rules: HashMap::new(),
+            trusted_keys: Vec::new(),
+            locked: false,
         }
     }
 }
 
-impl KernelModuleLoadingController {
+impl ModuleLoadingController {
     pub fn new() -> Self {
         Self::default()
     }
 
-    /// Set module loading state
-    pub fn set_loading_state(&mut self, state: ModuleLoadingState) {
-        self.loading_state = state;
+    pub fn set_policy(&mut self, policy: ModuleLoadPolicy) -> Result<(), &'static str> {
+        if self.locked {
+            return Err("Module loading policy is locked");
+        }
+        self.policy = policy;
+        Ok(())
     }
 
-    /// Set module loading policy
-    pub fn set_loading_policy(&mut self, policy: ModuleLoadingPolicy) {
-        self.loading_policy = policy;
+    pub fn lock_policy(&mut self) {
+        self.locked = true;
     }
 
-    /// Enable/disable signature checking
-    pub fn set_signature_checking(&mut self, enabled: bool) {
-        self.signature_checking_enabled = enabled;
+    pub fn add_rule(&mut self, rule: ModuleRule) -> Result<(), &'static str> {
+        if self.locked {
+            return Err("Module loading policy is locked");
+        }
+        self.rules.insert(rule.module_name.clone(), rule);
+        Ok(())
     }
 
-    /// Enable module loading
-    pub fn enable_module_loading(&mut self) {
-        self.loading_state = ModuleLoadingState::Enabled;
-    }
-
-    /// Disable module loading
-    pub fn disable_module_loading(&mut self) {
-        self.loading_state = ModuleLoadingState::Disabled;
-    }
-
-    /// Add module loading rule
-    pub fn add_rule(&mut self, rule: ModuleLoadingRule) {
-        self.rules.push(rule);
-    }
-
-    /// Remove module loading rule
-    pub fn remove_rule(&mut self, module_name: &str) -> bool {
-        if let Some(pos) = self.rules.iter().position(|r| r.module_name == module_name) {
-            self.rules.remove(pos);
-            true
-        } else {
-            false
+    pub fn add_trusted_key(&mut self, key_id: String) {
+        if !self.trusted_keys.contains(&key_id) {
+            self.trusted_keys.push(key_id);
         }
     }
 
-    /// Get rule for module
-    pub fn get_rule(&self, module_name: &str) -> Option<&ModuleLoadingRule> {
-        self.rules.iter().find(|r| r.module_name == module_name)
+    pub fn register_module(&mut self, module: KernelModuleInfo) -> Result<(), &'static str> {
+        if self.modules.contains_key(&module.name) {
+            return Err("Module already registered");
+        }
+        self.modules.insert(module.name.clone(), module);
+        Ok(())
     }
 
-    /// Check if module can be loaded
-    pub fn can_load_module(
-        &self,
-        module_name: &str,
-        signature_verified: bool,
-    ) -> Result<bool, String> {
-        if self.loading_state == ModuleLoadingState::Disabled {
-            return Err(String::from("Module loading is disabled"));
+    pub fn is_module_allowed(&self, name: &str) -> (bool, String) {
+        if self.policy == ModuleLoadPolicy::Disabled {
+            return (false, String::from("Module loading is disabled"));
         }
 
-        match self.loading_policy {
-            ModuleLoadingPolicy::DenyAll => {
-                return Err(String::from("Module loading policy denies all modules"));
-            }
-            ModuleLoadingPolicy::AllowSigned => {
-                if !signature_verified {
-                    return Err(String::from("Module signature verification required"));
-                }
-            }
-            ModuleLoadingPolicy::AllowWhitelist => {
-                if let Some(rule) = self.get_rule(module_name) {
-                    if !rule.allowed {
-                        return Err(format!("Module {} is not whitelisted", module_name));
+        if let Some(rule) = self.rules.get(name) {
+            return (rule.allowed, rule.reason.clone());
+        }
+
+        if let Some(module) = self.modules.get(name) {
+            match self.policy {
+                ModuleLoadPolicy::AllowAll => (true, String::from("Policy allows all modules")),
+                ModuleLoadPolicy::SignedOnly => match module.signature_state {
+                    ModuleSignatureState::Valid | ModuleSignatureState::UnknownKey => {
+                        (true, String::from("Module is signed"))
                     }
-                    if rule.requires_signature && !signature_verified {
-                        return Err(format!(
-                            "Module {} requires signature verification",
-                            module_name
-                        ));
-                    }
-                } else {
-                    return Err(format!("Module {} is not in whitelist", module_name));
-                }
+                    _ => (false, String::from("Module is not signed")),
+                },
+                ModuleLoadPolicy::SignedAndVerified => match module.signature_state {
+                    ModuleSignatureState::Valid => (true, String::from("Module signature is valid")),
+                    _ => (false, String::from("Module signature is not valid")),
+                },
+                ModuleLoadPolicy::Disabled => (false, String::from("Module loading is disabled")),
             }
-            ModuleLoadingPolicy::AllowAll => {
-                // Allow all modules
-            }
-        }
-
-        Ok(true)
-    }
-
-    /// Register module
-    pub fn register_module(&mut self, module: KernelModule) {
-        self.modules.push(module);
-    }
-
-    /// Load module
-    pub fn load_module(
-        &mut self,
-        module_name: &str,
-        signature_verified: bool,
-    ) -> Result<(), String> {
-        self.can_load_module(module_name, signature_verified)?;
-
-        if let Some(module) = self.modules.iter_mut().find(|m| m.name == module_name) {
-            module.set_loaded(true);
-            module.set_signature_verified(signature_verified);
-            module.set_load_time(0); // Would be actual timestamp
-            Ok(())
         } else {
-            Err(format!("Module {} not found", module_name))
+            (false, String::from("Module not found"))
         }
     }
 
-    /// Unload module
-    pub fn unload_module(&mut self, module_name: &str) -> Result<(), String> {
-        if let Some(module) = self.modules.iter_mut().find(|m| m.name == module_name) {
+    pub fn load_module(&mut self, name: &str) -> Result<String, String> {
+        let (allowed, reason) = self.is_module_allowed(name);
+        if !allowed {
+            return Err(format!("Cannot load module {}: {}", name, reason));
+        }
+
+        if let Some(module) = self.modules.get_mut(name) {
+            if module.loaded {
+                module.ref_count += 1;
+                Ok(format!("Module {} ref count increased to {}", name, module.ref_count))
+            } else {
+                module.loaded = true;
+                module.ref_count = 1;
+                Ok(format!("Module {} loaded successfully", name))
+            }
+        } else {
+            Err(format!("Module {} not found", name))
+        }
+    }
+
+    pub fn unload_module(&mut self, name: &str) -> Result<String, String> {
+        if let Some(module) = self.modules.get_mut(name) {
             if !module.loaded {
-                return Err(format!("Module {} is not loaded", module_name));
+                return Err(format!("Module {} is not loaded", name));
             }
-            module.set_loaded(false);
-            module.load_time = None;
-            Ok(())
+
+            if module.ref_count > 1 {
+                module.ref_count -= 1;
+                Ok(format!("Module {} ref count decreased to {}", name, module.ref_count))
+            } else {
+                module.loaded = false;
+                module.ref_count = 0;
+                Ok(format!("Module {} unloaded successfully", name))
+            }
         } else {
-            Err(format!("Module {} not found", module_name))
+            Err(format!("Module {} not found", name))
         }
     }
 
-    /// Get module
-    pub fn get_module(&self, module_name: &str) -> Option<&KernelModule> {
-        self.modules.iter().find(|m| m.name == module_name)
+    pub fn get_module_info(&self, name: &str) -> Option<&KernelModuleInfo> {
+        self.modules.get(name)
     }
 
-    /// List loaded modules
     pub fn list_loaded_modules(&self) -> Vec<String> {
         self.modules
-            .iter()
+            .values()
             .filter(|m| m.loaded)
-            .map(|m| {
-                format!(
-                    "{} {} ({})",
-                    m.name,
-                    m.version,
-                    if m.signature_verified {
-                        "signed"
-                    } else {
-                        "unsigned"
-                    }
-                )
-            })
+            .map(|m| format!("{} (v{}) - ref: {}", m.name, m.version, m.ref_count))
             .collect()
     }
 
-    /// List all modules
     pub fn list_all_modules(&self) -> Vec<String> {
         self.modules
-            .iter()
+            .values()
             .map(|m| {
                 format!(
-                    "{} {} ({}, {})",
+                    "{} (v{}) [{}] - {}",
                     m.name,
                     m.version,
-                    if m.loaded { "loaded" } else { "not loaded" },
-                    if m.signature_verified {
-                        "signed"
-                    } else {
-                        "unsigned"
-                    }
+                    if m.loaded { "loaded" } else { "unloaded" },
+                    m.signature_state.as_str()
                 )
             })
             .collect()
     }
 
-    /// List rules
-    pub fn list_rules(&self) -> Vec<String> {
-        self.rules
-            .iter()
-            .map(|r| {
-                format!(
-                    "{}: {} (signature required: {})",
-                    r.module_name,
-                    if r.allowed { "allowed" } else { "denied" },
-                    r.requires_signature
-                )
-            })
-            .collect()
-    }
-
-    /// Get statistics
     pub fn get_statistics(&self) -> String {
-        let mut stats = String::from("Kernel Module Loading Statistics:\n");
-        stats.push_str(&format!("Loading state: {}\n", self.loading_state.as_str()));
-        stats.push_str(&format!(
-            "Loading policy: {}\n",
-            self.loading_policy.as_str()
-        ));
-        stats.push_str(&format!(
-            "Signature checking: {}\n",
-            if self.signature_checking_enabled {
-                "enabled"
-            } else {
-                "disabled"
-            }
-        ));
+        let total = self.modules.len();
+        let loaded = self.modules.values().filter(|m| m.loaded).count();
+        let valid_sig = self
+            .modules
+            .values()
+            .filter(|m| m.signature_state == ModuleSignatureState::Valid)
+            .count();
 
-        let total_modules = self.modules.len();
-        let loaded_modules = self.modules.iter().filter(|m| m.loaded).count();
-        let signed_modules = self.modules.iter().filter(|m| m.signature_verified).count();
-
-        stats.push_str(&format!("Total modules: {}\n", total_modules));
-        stats.push_str(&format!("Loaded modules: {}\n", loaded_modules));
-        stats.push_str(&format!("Signed modules: {}\n", signed_modules));
-        stats.push_str(&format!("Rules: {}\n", self.rules.len()));
-
-        stats
-    }
-
-    /// Check if module loading is enabled
-    pub fn is_loading_enabled(&self) -> bool {
-        self.loading_state == ModuleLoadingState::Enabled
-    }
-
-    /// Check if module loading is disabled
-    pub fn is_loading_disabled(&self) -> bool {
-        self.loading_state == ModuleLoadingState::Disabled
+        format!(
+            "Module Loading Controller Stats:\nTotal registered: {}\nLoaded: {}\nValid signature: {}\nPolicy: {}\nLocked: {}",
+            total, loaded, valid_sig, self.policy.as_str(), self.locked
+        )
     }
 }
 
-#[cfg(test)]
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn test_module_loading_state_as_str() {
-        assert_eq!(ModuleLoadingState::Enabled.as_str(), "enabled");
-        assert_eq!(ModuleLoadingState::Disabled.as_str(), "disabled");
-    }
+    fn test_module_loading_controller() {
+        let mut controller = ModuleLoadingController::new();
+        let module = KernelModuleInfo::new(String::from("test_mod"), String::from("1.0.0"))
+            .with_signature(ModuleSignatureState::Valid);
 
-    #[test]
-    fn test_module_loading_state_from_str() {
-        assert_eq!(
-            ModuleLoadingState::from_str("enabled"),
-            Some(ModuleLoadingState::Enabled)
-        );
-        assert_eq!(ModuleLoadingState::from_str("invalid"), None);
-    }
-
-    #[test]
-    fn test_module_loading_policy_as_str() {
-        assert_eq!(ModuleLoadingPolicy::AllowAll.as_str(), "allow_all");
-        assert_eq!(ModuleLoadingPolicy::DenyAll.as_str(), "deny_all");
-    }
-
-    #[test]
-    fn test_kernel_module_creation() {
-        let module = KernelModule::new(String::from("test_module"), String::from("1.0.0"));
-        assert_eq!(module.name, "test_module");
-        assert!(!module.loaded);
-    }
-
-    #[test]
-    fn test_kernel_module_set_loaded() {
-        let mut module = KernelModule::new(String::from("test_module"), String::from("1.0.0"));
-        module.set_loaded(true);
-        assert!(module.loaded);
-    }
-
-    #[test]
-    fn test_module_loading_rule_creation() {
-        let rule = ModuleLoadingRule::new(
-            String::from("test_module"),
-            true,
-            false,
-            String::from("Test module rule"),
-        );
-        assert_eq!(rule.module_name, "test_module");
-        assert!(rule.allowed);
-    }
-
-    #[test]
-    fn test_kernel_module_loading_controller_creation() {
-        let controller = KernelModuleLoadingController::new();
-        assert_eq!(controller.loading_state, ModuleLoadingState::Enabled);
-        assert_eq!(controller.loading_policy, ModuleLoadingPolicy::AllowAll);
-    }
-
-    #[test]
-    fn test_kernel_module_loading_controller_set_loading_state() {
-        let mut controller = KernelModuleLoadingController::new();
-        controller.set_loading_state(ModuleLoadingState::Disabled);
-        assert_eq!(controller.loading_state, ModuleLoadingState::Disabled);
-    }
-
-    #[test]
-    fn test_kernel_module_loading_controller_enable_module_loading() {
-        let mut controller = KernelModuleLoadingController::new();
-        controller.disable_module_loading();
-        controller.enable_module_loading();
-        assert_eq!(controller.loading_state, ModuleLoadingState::Enabled);
-    }
-
-    #[test]
-    fn test_kernel_module_loading_controller_disable_module_loading() {
-        let mut controller = KernelModuleLoadingController::new();
-        controller.disable_module_loading();
-        assert_eq!(controller.loading_state, ModuleLoadingState::Disabled);
-    }
-
-    #[test]
-    fn test_kernel_module_loading_controller_can_load_module_disabled() {
-        let mut controller = KernelModuleLoadingController::new();
-        controller.disable_module_loading();
-        assert!(controller.can_load_module("test", true).is_err());
-    }
-
-    #[test]
-    fn test_kernel_module_loading_controller_can_load_module_deny_all() {
-        let mut controller = KernelModuleLoadingController::new();
-        controller.set_loading_policy(ModuleLoadingPolicy::DenyAll);
-        assert!(controller.can_load_module("test", true).is_err());
-    }
-
-    #[test]
-    fn test_kernel_module_loading_controller_can_load_module_allow_signed() {
-        let mut controller = KernelModuleLoadingController::new();
-        controller.set_loading_policy(ModuleLoadingPolicy::AllowSigned);
-        assert!(controller.can_load_module("test", false).is_err());
-        assert!(controller.can_load_module("test", true).is_ok());
-    }
-
-    #[test]
-    fn test_kernel_module_loading_controller_register_module() {
-        let mut controller = KernelModuleLoadingController::new();
-        controller.register_module(KernelModule::new(String::from("test"), String::from("1.0")));
-        assert_eq!(controller.modules.len(), 1);
-    }
-
-    #[test]
-    fn test_kernel_module_loading_controller_load_module() {
-        let mut controller = KernelModuleLoadingController::new();
-        controller.register_module(KernelModule::new(String::from("test"), String::from("1.0")));
-        assert!(controller.load_module("test", true).is_ok());
-    }
-
-    #[test]
-    fn test_kernel_module_loading_controller_unload_module() {
-        let mut controller = KernelModuleLoadingController::new();
-        controller.register_module(KernelModule::new(String::from("test"), String::from("1.0")));
-        controller.load_module("test", true).unwrap();
-        assert!(controller.unload_module("test").is_ok());
-    }
-
-    #[test]
-    fn test_kernel_module_loading_controller_list_loaded_modules() {
-        let mut controller = KernelModuleLoadingController::new();
-        controller.register_module(KernelModule::new(String::from("test"), String::from("1.0")));
-        controller.load_module("test", true).unwrap();
-        let loaded = controller.list_loaded_modules();
-        assert_eq!(loaded.len(), 1);
-    }
-
-    #[test]
-    fn test_kernel_module_loading_controller_get_statistics() {
-        let mut controller = KernelModuleLoadingController::new();
-        controller.register_module(KernelModule::new(String::from("test"), String::from("1.0")));
-        let stats = controller.get_statistics();
-        assert!(stats.contains("Total modules: 1"));
-    }
-
-    #[test]
-    fn test_kernel_module_loading_controller_is_loading_enabled() {
-        let controller = KernelModuleLoadingController::new();
-        assert!(controller.is_loading_enabled());
-    }
-
-    #[test]
-    fn test_kernel_module_loading_controller_is_loading_disabled() {
-        let mut controller = KernelModuleLoadingController::new();
-        controller.disable_module_loading();
-        assert!(controller.is_loading_disabled());
+        assert!(controller.register_module(module).is_ok());
+        assert!(controller.load_module("test_mod").is_ok());
+        assert_eq!(controller.list_loaded_modules().len(), 1);
     }
 }
