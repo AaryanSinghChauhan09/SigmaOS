@@ -7062,6 +7062,112 @@ impl SovereignOdooInventorySupplyChainMrpEngine {
     }
 }
 
+// ---------------------------------------------------------------------------
+// 11. Google Workspace / MS 365 AI Document Summarizer Engine
+// ---------------------------------------------------------------------------
+
+/// Sovereign AI Document Summarizer Engine inspired by Google Duet AI & Copilot.
+#[derive(Debug, Clone, Default)]
+pub struct SovereignAiDocumentSummarizerEngine;
+
+impl SovereignAiDocumentSummarizerEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    /// Extracts key bullet points and executive summary from document text.
+    pub fn generate_executive_summary(&self, document_text: &str, max_bullets: usize) -> Vec<String> {
+        let sentences: Vec<_> = document_text
+            .split(&['.', '!', '?'][..])
+            .map(|s| s.trim())
+            .filter(|s| !s.is_empty())
+            .collect();
+
+        sentences
+            .into_iter()
+            .take(max_bullets)
+            .map(|s| format!("• {}", s))
+            .collect()
+    }
+}
+
+// ---------------------------------------------------------------------------
+// 12. Salesforce / Zoho Enterprise Knowledge Graph Engine
+// ---------------------------------------------------------------------------
+
+/// Node entity types in the Enterprise Knowledge Graph.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum KnowledgeGraphNodeType {
+    Document,
+    Lead,
+    Deal,
+    Project,
+    Contact,
+}
+
+/// A node in the Enterprise Knowledge Graph.
+#[derive(Debug, Clone)]
+pub struct KnowledgeGraphNode {
+    pub node_id: String,
+    pub label: String,
+    pub kind: KnowledgeGraphNodeType,
+}
+
+/// An edge relationship in the Enterprise Knowledge Graph.
+#[derive(Debug, Clone)]
+pub struct KnowledgeGraphEdge {
+    pub source_id: String,
+    pub target_id: String,
+    pub relationship: String,
+}
+
+/// Sovereign Enterprise Knowledge Graph Engine inspired by Salesforce & Zoho CRM.
+#[derive(Debug, Clone, Default)]
+pub struct SovereignEnterpriseKnowledgeGraphEngine {
+    nodes: Vec<KnowledgeGraphNode>,
+    edges: Vec<KnowledgeGraphEdge>,
+}
+
+impl SovereignEnterpriseKnowledgeGraphEngine {
+    pub fn new() -> Self {
+        Self {
+            nodes: Vec::new(),
+            edges: Vec::new(),
+        }
+    }
+
+    /// Adds an entity node to the knowledge graph.
+    pub fn add_node(&mut self, node: KnowledgeGraphNode) {
+        self.nodes.retain(|n| n.node_id != node.node_id);
+        self.nodes.push(node);
+    }
+
+    /// Adds a relationship edge between two nodes.
+    pub fn add_edge(&mut self, source_id: &str, target_id: &str, relationship: &str) {
+        self.edges.push(KnowledgeGraphEdge {
+            source_id: source_id.to_string(),
+            target_id: target_id.to_string(),
+            relationship: relationship.to_string(),
+        });
+    }
+
+    /// Finds all directly linked target nodes for a given entity node ID.
+    pub fn find_linked_entities(&self, node_id: &str) -> Vec<(String, String)> {
+        self.edges
+            .iter()
+            .filter(|e| e.source_id == node_id)
+            .filter_map(|e| {
+                let target_label = self
+                    .nodes
+                    .iter()
+                    .find(|n| n.node_id == e.target_id)
+                    .map(|n| n.label.as_str())
+                    .unwrap_or("Unknown");
+                Some((target_label.to_string(), e.relationship.clone()))
+            })
+            .collect()
+    }
+}
 
 // Placeholder types for compilation
 mod sigma_types {
@@ -8426,5 +8532,30 @@ mod tests {
         let html = cms_engine.render_html(page_id).unwrap();
         assert!(html.contains("<h1>Welcome to SigmaOS Workstation</h1>"));
         assert!(html.contains("Empowering sovereign productivity."));
+
+        // 18. SovereignAiDocumentSummarizerEngine
+        let summarizer = SovereignAiDocumentSummarizerEngine::new();
+        let summary = summarizer.generate_executive_summary("SigmaOS is an operating system. It provides sovereign productivity. Designed for enterprise agility.", 2);
+        assert_eq!(summary.len(), 2);
+        assert_eq!(summary[0], "• SigmaOS is an operating system");
+
+        // 19. SovereignEnterpriseKnowledgeGraphEngine
+        let mut graph_engine = SovereignEnterpriseKnowledgeGraphEngine::new();
+        graph_engine.add_node(KnowledgeGraphNode {
+            node_id: "doc_101".to_string(),
+            label: "SaaS Agreement".to_string(),
+            kind: KnowledgeGraphNodeType::Document,
+        });
+        graph_engine.add_node(KnowledgeGraphNode {
+            node_id: "deal_202".to_string(),
+            label: "Acme Corp Deal".to_string(),
+            kind: KnowledgeGraphNodeType::Deal,
+        });
+        graph_engine.add_edge("deal_202", "doc_101", "associated_document");
+
+        let linked = graph_engine.find_linked_entities("deal_202");
+        assert_eq!(linked.len(), 1);
+        assert_eq!(linked[0].0, "SaaS Agreement");
+        assert_eq!(linked[0].1, "associated_document");
     }
 }
