@@ -73,6 +73,8 @@ pub mod verifier;
 pub mod zero_alloc_resolver;
 
 pub use crate::package::sovereign_distro_package_matrix::*;
+pub use crate::package::sovereign_pr_package_gateway::SovereignUniversalPrGatewayEngine;
+pub use crate::package::sovereign_universal_pm_pr_bridge::SovereignUniversalPmPrBridgeEngine;
 
 #[path = "../package/sovereign_distro_package_advancements_v3.rs"]
 pub mod sovereign_distro_package_advancements_v3;
