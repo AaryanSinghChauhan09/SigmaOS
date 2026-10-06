@@ -6509,8 +6509,8 @@ impl SovereignAcademicCitationEngine {
                         .map(|p| format!(" {}:", p))
                         .unwrap_or_default();
                     format!(
-                        "{}. {}.{} {}, {}.",
-                        item.author, item.title, pub_str, item.year, item.year
+                        "{}. {}.{} {}.",
+                        item.author, item.title, pub_str, item.year
                     )
                 }
                 CitationStyle::IEEE => {
@@ -6571,6 +6571,8 @@ impl SovereignDataStorytellingEngine {
         let diff = new_val - old_val;
         let pct = if old_val != 0.0 {
             (diff / old_val) * 100.0
+        } else if new_val > 0.0 {
+            100.0
         } else {
             0.0
         };
