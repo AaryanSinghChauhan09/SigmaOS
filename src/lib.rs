@@ -48,6 +48,7 @@ pub mod package;
 pub use package::{
     SovereignDistroPackageAdvancementsSuiteV10, SovereignDistroPackageAdvancementsSuiteV11,
     SovereignDistroPackageAdvancementsSuiteV14, SovereignDistroPackageAdvancementsSuiteV19,
+    SovereignDistroPackageAdvancementsSuiteV25,
     UniversalForeignPackageFormat, UniversalForeignPackageFormatConverter,
 };
 pub mod pacman;
