@@ -30,6 +30,7 @@ These are inspiration sources for design review. They are not a feature-support 
 - [Desktop](08-Desktop)
 - [Packaging](09-Packaging)
 - [Future development overview](14-Future-Development)
+- [Autonomous AI SysAdmin & Agent Orchestration](25-Roadmap-Autonomous-AI-SysAdmin-and-Agent-Orchestration)
 - [Component roadmap index](Home#component-future-development-roadmaps)
 
 ## Maintenance

@@ -46,3 +46,4 @@ Welcome to the SigmaOS Wiki! Here are the core components:
 - [Cloud-Agent-Environment](./Cloud-Agent-Environment.md)
 - [Grok-AI-Panel-Agent](./Grok-AI-Panel-Agent.md)
 - [Font-Builder](./Font-Builder.md)
+- [Autonomous AI SysAdmin & Agent Orchestration](./25-Roadmap-Autonomous-AI-SysAdmin-and-Agent-Orchestration.md)

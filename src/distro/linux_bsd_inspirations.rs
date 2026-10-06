@@ -126,6 +126,11 @@ pub enum DistroSubsystemMode {
     LinuxArchHurd,
     FreeBsdCapsicumHardened,
     DragonFlyBsdHammer2Pfs,
+    LinuxRedHatEnterprise,
+    LinuxCentOSStream,
+    LinuxGentooHardened,
+    FreeBsdBhyveVirtualization,
+    OpenBsdKarled,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -181,13 +186,17 @@ impl LinuxBsdPamAuthEngine {
             | DistroSubsystemMode::FreeBsdHardenedPqc
             | DistroSubsystemMode::OpenBsdUnveilHardened
             | DistroSubsystemMode::FreeBsdCapsicumHardened
-            | DistroSubsystemMode::DragonFlyBsdHammer2Pfs => AuthMechanism::BsdAuth,
+            | DistroSubsystemMode::DragonFlyBsdHammer2Pfs
+            | DistroSubsystemMode::FreeBsdBhyveVirtualization
+            | DistroSubsystemMode::OpenBsdKarled => AuthMechanism::BsdAuth,
 
             DistroSubsystemMode::LinuxArch
             | DistroSubsystemMode::LinuxFedora
             | DistroSubsystemMode::LinuxUbuntu
             | DistroSubsystemMode::LinuxFedoraSilverblue
-            | DistroSubsystemMode::LinuxBazzite => AuthMechanism::SystemdHomed,
+            | DistroSubsystemMode::LinuxBazzite
+            | DistroSubsystemMode::LinuxRedHatEnterprise
+            | DistroSubsystemMode::LinuxCentOSStream => AuthMechanism::SystemdHomed,
 
             _ => AuthMechanism::LinuxPam,
         };
@@ -338,14 +347,18 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxPopOsCosmic
             | DistroSubsystemMode::LinuxParch
             | DistroSubsystemMode::LinuxArchHurd
+            | DistroSubsystemMode::LinuxRedHatEnterprise
+            | DistroSubsystemMode::LinuxCentOSStream
             | DistroSubsystemMode::BedrockLinux => ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo
+            | DistroSubsystemMode::LinuxGentooHardened
             | DistroSubsystemMode::LinuxFuntoo
             | DistroSubsystemMode::FreeBsd
             | DistroSubsystemMode::FreeBsdHardened
             | DistroSubsystemMode::FreeBsdHardenedPqc
             | DistroSubsystemMode::FreeBsdCapsicumHardened
+            | DistroSubsystemMode::FreeBsdBhyveVirtualization
             | DistroSubsystemMode::OpenBsd
             | DistroSubsystemMode::NetBsd
             | DistroSubsystemMode::DragonFlyBsd
@@ -356,6 +369,7 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::GhostBsd
             | DistroSubsystemMode::OpenBsdHardened
             | DistroSubsystemMode::OpenBsdUnveilHardened
+            | DistroSubsystemMode::OpenBsdKarled
             | DistroSubsystemMode::NomadBsd => ServiceSupervisorType::OpenRC,
 
             DistroSubsystemMode::LinuxAlpine
@@ -425,7 +439,9 @@ impl SovereignUniversalDistroBridge {
                 | DistroSubsystemMode::LinuxRHEL
                 | DistroSubsystemMode::LinuxNobara
                 | DistroSubsystemMode::LinuxBazzite
-                | DistroSubsystemMode::LinuxOpenMandriva,
+                | DistroSubsystemMode::LinuxOpenMandriva
+                | DistroSubsystemMode::LinuxRedHatEnterprise
+                | DistroSubsystemMode::LinuxCentOSStream,
                 "/var/lib/pkg",
             ) => "/var/lib/rpm".to_string(),
             (
@@ -455,8 +471,10 @@ impl SovereignUniversalDistroBridge {
                 | DistroSubsystemMode::FreeBsdHardened
                 | DistroSubsystemMode::FreeBsdHardenedPqc
                 | DistroSubsystemMode::FreeBsdCapsicumHardened
+                | DistroSubsystemMode::FreeBsdBhyveVirtualization
                 | DistroSubsystemMode::OpenBsd
                 | DistroSubsystemMode::OpenBsdUnveilHardened
+                | DistroSubsystemMode::OpenBsdKarled
                 | DistroSubsystemMode::NetBsd
                 | DistroSubsystemMode::DragonFlyBsd
                 | DistroSubsystemMode::DragonFlyHammer2
@@ -473,8 +491,10 @@ impl SovereignUniversalDistroBridge {
                 | DistroSubsystemMode::FreeBsdHardened
                 | DistroSubsystemMode::FreeBsdHardenedPqc
                 | DistroSubsystemMode::FreeBsdCapsicumHardened
+                | DistroSubsystemMode::FreeBsdBhyveVirtualization
                 | DistroSubsystemMode::OpenBsd
                 | DistroSubsystemMode::OpenBsdUnveilHardened
+                | DistroSubsystemMode::OpenBsdKarled
                 | DistroSubsystemMode::NetBsd
                 | DistroSubsystemMode::DragonFlyBsd
                 | DistroSubsystemMode::DragonFlyHammer2
@@ -575,14 +595,18 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxPopOsCosmic
             | DistroSubsystemMode::LinuxParch
             | DistroSubsystemMode::LinuxArchHurd
+            | DistroSubsystemMode::LinuxRedHatEnterprise
+            | DistroSubsystemMode::LinuxCentOSStream
             | DistroSubsystemMode::LinuxSteamOS => supervisor == ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo
+            | DistroSubsystemMode::LinuxGentooHardened
             | DistroSubsystemMode::LinuxFuntoo
             | DistroSubsystemMode::FreeBsd
             | DistroSubsystemMode::FreeBsdHardened
             | DistroSubsystemMode::FreeBsdHardenedPqc
             | DistroSubsystemMode::FreeBsdCapsicumHardened
+            | DistroSubsystemMode::FreeBsdBhyveVirtualization
             | DistroSubsystemMode::OpenBsd
             | DistroSubsystemMode::NetBsd
             | DistroSubsystemMode::DragonFlyBsd
@@ -593,6 +617,7 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::GhostBsd
             | DistroSubsystemMode::OpenBsdHardened
             | DistroSubsystemMode::OpenBsdUnveilHardened
+            | DistroSubsystemMode::OpenBsdKarled
             | DistroSubsystemMode::NomadBsd => supervisor == ServiceSupervisorType::OpenRC,
 
             DistroSubsystemMode::LinuxAlpine
@@ -668,7 +693,9 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxVoid => format!("{}.xbps", input_pkg),
             DistroSubsystemMode::LinuxNix => format!("{}.nix", input_pkg),
             DistroSubsystemMode::LinuxGuix => format!("{}.scm", input_pkg),
-            DistroSubsystemMode::LinuxGentoo | DistroSubsystemMode::LinuxFuntoo => {
+            DistroSubsystemMode::LinuxGentoo
+            | DistroSubsystemMode::LinuxGentooHardened
+            | DistroSubsystemMode::LinuxFuntoo => {
                 format!("{}.ebuild", input_pkg)
             }
             DistroSubsystemMode::LinuxFedora
@@ -686,6 +713,8 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxEuroLinux
             | DistroSubsystemMode::LinuxAnolis
             | DistroSubsystemMode::LinuxBazzite
+            | DistroSubsystemMode::LinuxRedHatEnterprise
+            | DistroSubsystemMode::LinuxCentOSStream
             | DistroSubsystemMode::LinuxOpenMandriva => {
                 format!("{}.rpm", input_pkg)
             }
@@ -704,6 +733,7 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::FreeBsdHardened
             | DistroSubsystemMode::FreeBsdHardenedPqc
             | DistroSubsystemMode::FreeBsdCapsicumHardened
+            | DistroSubsystemMode::FreeBsdBhyveVirtualization
             | DistroSubsystemMode::DragonFlyBsd
             | DistroSubsystemMode::DragonFlyHammer2
             | DistroSubsystemMode::DragonFlyBsdHammer2Pfs
@@ -717,6 +747,7 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::NetBsd
             | DistroSubsystemMode::OpenBsdHardened
             | DistroSubsystemMode::OpenBsdUnveilHardened
+            | DistroSubsystemMode::OpenBsdKarled
             | DistroSubsystemMode::NetBsdRump
             | DistroSubsystemMode::SmartOs
             | DistroSubsystemMode::SolarisSmartOS => {
@@ -784,7 +815,9 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxVoid => format!("{}.xbps", action),
             DistroSubsystemMode::LinuxNix => format!("{}.nix", action),
             DistroSubsystemMode::LinuxGuix => format!("{}.scm", action),
-            DistroSubsystemMode::LinuxGentoo | DistroSubsystemMode::LinuxFuntoo => {
+            DistroSubsystemMode::LinuxGentoo
+            | DistroSubsystemMode::LinuxGentooHardened
+            | DistroSubsystemMode::LinuxFuntoo => {
                 format!("{}.ebuild", action)
             }
             DistroSubsystemMode::LinuxFedora
@@ -802,6 +835,8 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxEuroLinux
             | DistroSubsystemMode::LinuxAnolis
             | DistroSubsystemMode::LinuxBazzite
+            | DistroSubsystemMode::LinuxRedHatEnterprise
+            | DistroSubsystemMode::LinuxCentOSStream
             | DistroSubsystemMode::LinuxOpenMandriva => format!("{}.rpm", action),
             DistroSubsystemMode::LinuxPuppy => format!("{}.pet", action),
             DistroSubsystemMode::LinuxSolus | DistroSubsystemMode::LinuxSerpentOS => {
@@ -815,6 +850,7 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::FreeBsdHardened
             | DistroSubsystemMode::FreeBsdHardenedPqc
             | DistroSubsystemMode::FreeBsdCapsicumHardened
+            | DistroSubsystemMode::FreeBsdBhyveVirtualization
             | DistroSubsystemMode::DragonFlyBsd
             | DistroSubsystemMode::DragonFlyHammer2
             | DistroSubsystemMode::DragonFlyBsdHammer2Pfs
@@ -828,6 +864,7 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::NetBsd
             | DistroSubsystemMode::OpenBsdHardened
             | DistroSubsystemMode::OpenBsdUnveilHardened
+            | DistroSubsystemMode::OpenBsdKarled
             | DistroSubsystemMode::NetBsdRump
             | DistroSubsystemMode::SmartOs
             | DistroSubsystemMode::SolarisSmartOS => format!("{}.tgz", action),
@@ -860,6 +897,7 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::FreeBsdHardened
             | DistroSubsystemMode::FreeBsdHardenedPqc
             | DistroSubsystemMode::FreeBsdCapsicumHardened
+            | DistroSubsystemMode::FreeBsdBhyveVirtualization
             | DistroSubsystemMode::DragonFlyBsd
             | DistroSubsystemMode::DragonFlyHammer2
             | DistroSubsystemMode::DragonFlyBsdHammer2Pfs
@@ -874,6 +912,7 @@ impl SovereignUniversalDistroBridge {
             }
             DistroSubsystemMode::OpenBsd
             | DistroSubsystemMode::OpenBsdUnveilHardened
+            | DistroSubsystemMode::OpenBsdKarled
             | DistroSubsystemMode::NetBsd
             | DistroSubsystemMode::OpenBsdHardened
             | DistroSubsystemMode::NetBsdRump => {
@@ -3292,6 +3331,53 @@ mod subsystem_interop_tests {
     use super::*;
 
     #[test]
+    fn test_new_distro_subsystem_modes_verification() {
+        let modes = [
+            DistroSubsystemMode::LinuxRedHatEnterprise,
+            DistroSubsystemMode::LinuxCentOSStream,
+            DistroSubsystemMode::LinuxGentooHardened,
+            DistroSubsystemMode::FreeBsdBhyveVirtualization,
+            DistroSubsystemMode::OpenBsdKarled,
+        ];
+
+        let mut bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxArch);
+        for &mode in &modes {
+            bridge.set_subsystem_mode(mode);
+            assert!(bridge.verify_all_subsystems_compatibility_matrix());
+            let (supervisor, pkg_spec, vfs_etc, compatible) = bridge.get_distro_capability_matrix();
+            assert!(compatible);
+            assert!(!pkg_spec.is_empty());
+            assert!(!vfs_etc.is_empty());
+
+            match mode {
+                DistroSubsystemMode::LinuxRedHatEnterprise | DistroSubsystemMode::LinuxCentOSStream => {
+                    assert_eq!(supervisor, ServiceSupervisorType::Systemd);
+                    assert!(pkg_spec.ends_with(".rpm"));
+                    assert_eq!(vfs_etc, "/etc");
+                    assert_eq!(bridge.translate_vfs_path("/var/lib/pkg"), "/var/lib/rpm");
+                }
+                DistroSubsystemMode::LinuxGentooHardened => {
+                    assert_eq!(supervisor, ServiceSupervisorType::OpenRC);
+                    assert!(pkg_spec.ends_with(".ebuild"));
+                }
+                DistroSubsystemMode::FreeBsdBhyveVirtualization => {
+                    assert_eq!(supervisor, ServiceSupervisorType::OpenRC);
+                    assert!(pkg_spec.ends_with(".pkg"));
+                    assert_eq!(vfs_etc, "/usr/local/etc");
+                    assert_eq!(bridge.translate_vfs_path("/var/lib/pkg"), "/var/db/pkg");
+                }
+                DistroSubsystemMode::OpenBsdKarled => {
+                    assert_eq!(supervisor, ServiceSupervisorType::OpenRC);
+                    assert!(pkg_spec.ends_with(".tgz"));
+                    assert_eq!(vfs_etc, "/usr/local/etc");
+                    assert_eq!(bridge.translate_vfs_path("/var/lib/pkg"), "/var/db/pkg");
+                }
+                _ => {}
+            }
+        }
+    }
+
+    #[test]
     fn test_cross_distro_subsystem_all_verify_matrix() {
         let mut bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxArch);
         assert!(bridge.verify_all_subsystems_compatibility_matrix());
@@ -3344,7 +3430,7 @@ mod subsystem_interop_tests {
             .harmonize_all_subsystems_across_all_distros()
             .unwrap();
         assert!(synced > 0);
-        assert_eq!(harmonizer.harmonized_distros_count, 90);
+        assert_eq!(harmonizer.harmonized_distros_count, 95);
         assert!(harmonizer.harmonized_subsystems_count >= 150);
 
         let res = harmonizer
@@ -3546,6 +3632,11 @@ impl SovereignMasterSubsystemDistroHarmonizer {
             DistroSubsystemMode::LinuxTalos,
             DistroSubsystemMode::LinuxEndless,
             DistroSubsystemMode::LinuxAlpineExtended,
+            DistroSubsystemMode::LinuxRedHatEnterprise,
+            DistroSubsystemMode::LinuxCentOSStream,
+            DistroSubsystemMode::LinuxGentooHardened,
+            DistroSubsystemMode::FreeBsdBhyveVirtualization,
+            DistroSubsystemMode::OpenBsdKarled,
         ];
 
         let mut total_synced_subsystems = 0;
