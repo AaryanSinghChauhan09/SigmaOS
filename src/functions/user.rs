@@ -2,8 +2,6 @@
 //! User manager, password manager, and authentication manager
 use std::format;
 
-
-
 use std::vec::Vec;
 use std::string::{String, ToString};
 
@@ -139,7 +137,6 @@ impl UserManager {
             .iter()
             .filter(|g| group_names.contains(&&g.name))
             .collect()
-        self.groups.iter().filter(|g| group_names.contains(&&g.name)).collect()
     }
 }
 
@@ -209,12 +206,12 @@ impl PasswordHash {
         }
     }
 
-    pub fn hash_password(&mut self, password: &str) -> Result<(), UserError> {
+    pub fn hash_password(&mut self, _password: &str) -> Result<(), UserError> {
         // Hash password with salt
         Ok(())
     }
 
-    pub fn verify(&self, password: &str) -> Result<bool, UserError> {
+    pub fn verify(&self, _password: &str) -> Result<bool, UserError> {
         // Verify password against hash
         Ok(true)
     }
@@ -253,12 +250,12 @@ impl PasswordManager {
         }
     }
 
-    pub fn lock_account(&mut self, username: &str) -> Result<(), UserError> {
+    pub fn lock_account(&mut self, _username: &str) -> Result<(), UserError> {
         // Lock user account
         Ok(())
     }
 
-    pub fn unlock_account(&mut self, username: &str) -> Result<(), UserError> {
+    pub fn unlock_account(&mut self, _username: &str) -> Result<(), UserError> {
         // Unlock user account
         Ok(())
     }
@@ -368,7 +365,7 @@ impl Default for AuthManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

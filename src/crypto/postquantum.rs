@@ -12,32 +12,21 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+
+use core::sync::atomic::{AtomicUsize, Ordering};
 use std::vec::Vec;
-
-// (no_std only applicable at crate root - removed)
-// #![no_main]  // crate-root only
-
-use core::mem;
-/// OOP-based Post-Quantum Crypto Integration for SigmaOS
-/// Based on Roadmap Item: Post-Quantum Crypto Integration
-/// Implements HKDF-SHA3-256 key derivation and PQC/Dilithium-5 signatures
-use core::sync::atomic::{AtomicUsize, Ordering};
-
-use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type KeyID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[derive(Debug, Clone, Copy)]
 pub enum CryptoError {
     Success = 0,
     InvalidKey = 1,
     DerivationFailed = 2,
     SignFailed = 3,
+    ProviderUnavailable = 4,
 }
-pub enum CryptoError { Success = 0, InvalidKey = 1, DerivationFailed = 2, SignFailed = 3 }
 
 pub trait KeyDerivation {
     fn derive_key(&self, secret: &[u8], salt: &[u8], info: &[u8]) -> Result<Vec<u8>, CryptoError>;
@@ -50,16 +39,16 @@ pub struct SimpleKeyDerivation {
 }
 
 impl SimpleKeyDerivation {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        SimpleKeyDerivation
         SimpleKeyDerivation {
             rounds: AtomicUsize::new(1000),
         }
-        SimpleKeyDerivation { rounds: AtomicUsize::new(1000) }
-        SimpleKeyDerivation {
-            rounds: AtomicUsize::new(1000),
-        }
+    }
+}
+
+impl Default for SimpleKeyDerivation {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -67,6 +56,7 @@ impl KeyDerivation for SimpleKeyDerivation {
     fn derive_key(&self, secret: &[u8], salt: &[u8], info: &[u8]) -> Result<Vec<u8>, CryptoError> {
         self.hkdf_sha3_256(secret, salt, info)
     }
+
     fn hkdf_sha3_256(&self, ikm: &[u8], salt: &[u8], info: &[u8]) -> Result<Vec<u8>, CryptoError> {
         let mut key = Vec::new();
         let rounds = self.rounds.load(Ordering::SeqCst);
@@ -102,16 +92,16 @@ pub struct Dilithium5Signature {
 }
 
 impl Dilithium5Signature {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        Dilithium5Signature
         Dilithium5Signature {
             key_id: AtomicUsize::new(0),
         }
-        Dilithium5Signature { key_id: AtomicUsize::new(0) }
-        Dilithium5Signature {
-            key_id: AtomicUsize::new(0),
-        }
+    }
+}
+
+impl Default for Dilithium5Signature {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -131,18 +121,13 @@ impl PostQuantumSignature for Dilithium5Signature {
         }
         Ok(signature)
     }
+
     fn verify(
         &self,
         message: &[u8],
         signature: &[u8],
         public_key: &[u8],
     ) -> Result<bool, CryptoError> {
-        Err(CryptoError::ProviderUnavailable)
-        message: &[u8],
-        signature: &[u8],
-        public_key: &[u8],
-    ) -> Result<bool, CryptoError> {
-    fn verify(&self, message: &[u8], signature: &[u8], public_key: &[u8]) -> Result<bool, CryptoError> {
         if signature.len() < message.len() {
             return Ok(false);
         }
@@ -160,6 +145,7 @@ impl PostQuantumSignature for Dilithium5Signature {
         }
         Ok(valid)
     }
+
     fn generate_keypair(&mut self) -> Result<(Vec<u8>, Vec<u8>), CryptoError> {
         let id = self.key_id.fetch_add(1, Ordering::SeqCst);
         let mut private_key = Vec::new();
@@ -185,9 +171,16 @@ pub struct SimpleSecureBootSigning {
 }
 
 impl SimpleSecureBootSigning {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        SimpleSecureBootSigning { signature: Dilithium5Signature::new() }
+        SimpleSecureBootSigning {
+            signature: Dilithium5Signature::new(),
+        }
+    }
+}
+
+impl Default for SimpleSecureBootSigning {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -195,6 +188,7 @@ impl SecureBootSigning for SimpleSecureBootSigning {
     fn sign_bootloader(&self, bootloader: &[u8], key: &[u8]) -> Result<Vec<u8>, CryptoError> {
         self.signature.sign(bootloader, key)
     }
+
     fn verify_bootloader(&self, bootloader: &[u8], signature: &[u8], key: &[u8]) -> Result<bool, CryptoError> {
         self.signature.verify(bootloader, signature, key)
     }
@@ -211,9 +205,16 @@ pub struct SimpleFDE {
 }
 
 impl SimpleFDE {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        SimpleFDE { derivation: SimpleKeyDerivation::new() }
+        SimpleFDE {
+            derivation: SimpleKeyDerivation::new(),
+        }
+    }
+}
+
+impl Default for SimpleFDE {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -230,6 +231,7 @@ impl FullDiskEncryption for SimpleFDE {
         }
         Ok(encrypted)
     }
+
     fn decrypt_volume(&self, data: &[u8], key: &[u8]) -> Result<Vec<u8>, CryptoError> {
         let mut decrypted = Vec::new();
         for (i, &d) in data.iter().enumerate() {
@@ -241,131 +243,5 @@ impl FullDiskEncryption for SimpleFDE {
             decrypted.push(d.wrapping_div(3).wrapping_sub(key_byte));
         }
         Ok(decrypted)
-    }
-}
-
-struct VecImpl<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
-
-impl<T> VecImpl<T> {
-    fn new() -> Self {
-        VecImpl {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    fn is_empty(&self) -> bool {
-        self.len == 0
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-
-impl<'a, T> IntoIterator for &'a VecImpl<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        if self.data.is_null() || self.len == 0 {
-            [].iter()
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len).iter() }
-        }
-    }
-}
-        let mut encrypted = Vec::new();
-        for (i, &d) in data.iter().enumerate() {
-            let key_byte = if i < key.len() { key[i] } else { key[i % key.len()] };
-            encrypted.push(d.wrapping_add(key_byte).wrapping_mul(3));
-        }
-        Ok(encrypted)
-    }
-    fn decrypt_volume(&self, data: &[u8], key: &[u8]) -> Result<Vec<u8>, CryptoError> {
-        let mut decrypted = Vec::new();
-        for (i, &d) in data.iter().enumerate() {
-            let key_byte = if i < key.len() { key[i] } else { key[i % key.len()] };
-            decrypted.push(d.wrapping_div(3).wrapping_sub(key_byte));
-        }
-        Ok(decrypted)
-    }
-}
-
-struct VecImpl<T> { data: *mut T, len: usize, capacity: usize }
-
-impl<T> VecImpl<T> {
-    fn new() -> Self { VecImpl { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    fn is_empty(&self) -> bool { self.len == 0 }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-
-
-
-
-impl<'a, T> IntoIterator for &'a VecImpl<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        if self.data.is_null() || self.len == 0 {
-            [].iter()
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len).iter() }
-        }
     }
 }

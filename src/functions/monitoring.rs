@@ -1,11 +1,9 @@
 //! System Monitoring Functions (systemd-journalctl/htop Inspiration)
 //! System log viewer, system monitor, and system information tools
+
 use std::format;
-
-
-
-use std::vec::Vec;
 use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Log priority
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -93,6 +91,12 @@ impl LogFilter {
     }
 }
 
+impl Default for LogFilter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Journal viewer
 pub struct JournalViewer {
     pub entries: Vec<JournalEntry>,
@@ -121,7 +125,10 @@ impl JournalViewer {
         let mut filtered = self.entries.iter().collect::<Vec<_>>();
 
         for filter in &self.filters {
-            filtered = filtered.iter().filter(|e| filter.matches(e)).cloned().collect();
+            filtered = filtered
+                .into_iter()
+                .filter(|e| filter.matches(e))
+                .collect();
         }
 
         filtered
@@ -149,32 +156,31 @@ impl JournalViewer {
             output.push_str(&format!(
                 "{} {} {}: {}\n",
                 entry.timestamp, entry.priority as u8, entry.service, entry.message
-            output.push_str(&format!("{} {} {}: {}\n",
-                entry.timestamp,
-                entry.priority as u8,
-                entry.service,
-                entry.message
             ));
         }
         Ok(output)
     }
 
     fn export_json(&self) -> Result<String, JournalError> {
-        Ok("{}".to_string()) // Simplified JSON export
+        Ok("{}".to_string())
     }
 
     fn export_csv(&self) -> Result<String, JournalError> {
         let mut output = String::new();
         output.push_str("timestamp,priority,service,message\n");
         for entry in &self.entries {
-            output.push_str(&format!("{},{},{},{}\n",
-                entry.timestamp,
-                entry.priority as u8,
-                entry.service,
-                entry.message
+            output.push_str(&format!(
+                "{},{},{},{}\n",
+                entry.timestamp, entry.priority as u8, entry.service, entry.message
             ));
         }
         Ok(output)
+    }
+}
+
+impl Default for JournalViewer {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -268,7 +274,6 @@ impl SystemMonitor {
     }
 
     pub fn update(&mut self) {
-        // Update system statistics
         self.cpu_usage.user = 25.0;
         self.cpu_usage.system = 10.0;
         self.cpu_usage.idle = 65.0;
@@ -280,11 +285,13 @@ impl SystemMonitor {
     }
 
     pub fn sort_processes_by_cpu(&mut self) {
-        self.process_list.sort_by(|a, b| b.cpu_usage.partial_cmp(&a.cpu_usage).unwrap());
+        self.process_list
+            .sort_by(|a, b| b.cpu_usage.partial_cmp(&a.cpu_usage).unwrap());
     }
 
     pub fn sort_processes_by_memory(&mut self) {
-        self.process_list.sort_by(|a, b| b.memory_usage.cmp(&a.memory_usage));
+        self.process_list
+            .sort_by(|a, b| b.memory_usage.cmp(&a.memory_usage));
     }
 
     pub fn get_monitor_stats(&self) -> MonitorStats {
@@ -373,7 +380,7 @@ impl Default for SystemInfo {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -385,7 +392,7 @@ mod tests {
 
     #[test]
     fn test_log_filter() {
-        let filter = LogFilter::new();
+        let mut filter = LogFilter::new();
         filter.set_priority_min(LogPriority::Warning);
         let entry = JournalEntry::new(LogPriority::Error, "test", "msg");
         assert!(filter.matches(&entry));

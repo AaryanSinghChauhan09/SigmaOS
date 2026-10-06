@@ -216,7 +216,12 @@ impl UserfaultfdSubsystemEngine {
         }
     }
 
-    pub fn register_range(&mut self, start_addr: usize, len: usize, mode: UffdMode) -> Result<(), &'static str> {
+    pub fn register_range(
+        &mut self,
+        start_addr: usize,
+        len: usize,
+        mode: UffdMode,
+    ) -> Result<(), &'static str> {
         if len == 0 || start_addr % 4096 != 0 {
             return Err("Userfaultfd: Address and length must be page-aligned (4096)");
         }
@@ -473,7 +478,7 @@ mod tests {
         let sample = engine.consume().unwrap();
         assert_eq!(sample.sample_id, id1);
         assert_eq!(sample.data, b"0123456789abcdef");
-        assert!(engine.consume().is_none()); // id2 was discarded
+        assert!(engine.consume().is_none());
     }
 
     #[test]
@@ -492,7 +497,7 @@ mod tests {
         assert!(uffd.register_range(0x7fff_0000_0000, 8192, UffdMode::Missing).is_ok());
 
         assert!(uffd.trigger_page_fault(0x7fff_0000_1000, UffdMode::Missing, 4201));
-        assert!(!uffd.trigger_page_fault(0x1000, UffdMode::Missing, 4201)); // Unregistered address
+        assert!(!uffd.trigger_page_fault(0x1000, UffdMode::Missing, 4201));
 
         assert_eq!(uffd.pending_faults.len(), 1);
         assert!(uffd.resolve_page_fault(0x7fff_0000_1000));
@@ -526,7 +531,7 @@ mod tests {
 #[derive(Debug, Clone)]
 pub struct MemcgProcessEntry {
     pub pid: u32,
-    pub oom_score_adj: i32, // -1000 to 1000
+    pub oom_score_adj: i32,
     pub memory_bytes_used: u64,
 }
 
@@ -549,7 +554,6 @@ impl LinuxMemoryCgroupV2OomKillerEngine {
         self.processes.push(entry);
     }
 
-    /// Selects the OOM kill candidate process using memcg v2 heuristics
     pub fn select_oom_kill_candidate(&self) -> Option<u32> {
         if self.processes.is_empty() {
             return None;
@@ -560,7 +564,7 @@ impl LinuxMemoryCgroupV2OomKillerEngine {
 
         for proc in &self.processes {
             if proc.oom_score_adj <= -1000 {
-                continue; // Unkillable
+                continue;
             }
 
             let base_score = (proc.memory_bytes_used / 1024) as i64;
@@ -590,7 +594,7 @@ pub enum EpollCtlOp {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct EpollEvent {
     pub fd: i32,
-    pub events: u32, // EPOLLIN (1), EPOLLOUT (4)
+    pub events: u32,
 }
 
 pub struct LinuxEpollEventPollEngine {
@@ -736,7 +740,7 @@ mod extended_kernel_tests {
         let mut oom = LinuxMemoryCgroupV2OomKillerEngine::new("/sys/fs/cgroup/user.slice", 1024 * 1024 * 1024);
         oom.register_process(MemcgProcessEntry {
             pid: 100,
-            oom_score_adj: -1000, // Unkillable
+            oom_score_adj: -1000,
             memory_bytes_used: 500 * 1024 * 1024,
         });
         oom.register_process(MemcgProcessEntry {
@@ -770,17 +774,13 @@ mod extended_kernel_tests {
     #[test]
     fn test_seccomp_bpf_filter() {
         let mut seccomp = LinuxSeccompBpfSyscallFilterEngine::new(SeccompAction::KillProcess);
-        seccomp.allow_syscall(1); // sys_write
+        seccomp.allow_syscall(1);
 
         assert_eq!(seccomp.evaluate_syscall(1), SeccompAction::Allow);
         assert_eq!(seccomp.evaluate_syscall(2), SeccompAction::KillProcess);
     }
 
     #[test]
-    fn test_landlock_binder_zswap_overlay_memfd_engines() {
-        // Stub test - these components are not yet implemented
-        // TODO: Implement LinuxLandlockV5AccessEngine, LinuxBinderIpcEngine,
-        // LinuxZswapCompressedStorageEngine, LinuxOverlayfsMountEngine, LinuxMemfdSecretEngine
     fn test_seccomp_epoll_ksm_fanotify_engines() {
         let mut seccomp = LinuxSeccompBpfSyscallFilterEngine::new(SeccompAction::KillProcess);
         seccomp.allow_syscall(1);

@@ -2,7 +2,7 @@
 // Inspired by Linux CFS, RT scheduler, and energy-aware scheduling
 
 use std::collections::BinaryHeap;
-use std::sync::atomic::{AtomicU64, AtomicU32, Ordering};
+use std::sync::atomic::{AtomicU64, Ordering};
 
 /// Process priority
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -29,7 +29,6 @@ impl Priority {
         Self { value: 19 }
     }
 
-    // Common priority levels for compatibility
     pub fn realtime() -> Self {
         Self { value: -20 }
     }
@@ -75,9 +74,7 @@ pub enum ProcessState {
 }
 
 impl ProcessState {
-    // Compatibility aliases
     pub const Ready: Self = ProcessState::Runnable;
-    pub const Blocked: Self = ProcessState::Sleeping;
 }
 
 /// Process task
@@ -108,26 +105,8 @@ impl ProcessTask {
             slice: 10000,
         }
     }
-}
 
-impl ProcessTask {
-    pub fn new(pid: u64, priority: Priority) -> Self {
-        Self {
-            pid,
-            priority,
-            policy: SchedulerPolicy::Normal,
-            state: ProcessState::Runnable,
-            vruntime: 0,
-            exec_start: 0,
-            exec_duration: 0,
-            cpu_time: 0,
-            slice: 10,
-        }
-    }
-}
-
-impl ProcessTask {
-    pub fn new(pid: u64, priority: Priority) -> Self {
+    pub fn new_simple(pid: u64, priority: Priority) -> Self {
         Self {
             pid,
             priority,
@@ -144,7 +123,6 @@ impl ProcessTask {
 
 impl Ord for ProcessTask {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        // Lower vruntime has higher priority
         self.vruntime.cmp(&other.vruntime).reverse()
     }
 }
@@ -152,22 +130,6 @@ impl Ord for ProcessTask {
 impl PartialOrd for ProcessTask {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
         Some(self.cmp(other))
-    }
-}
-
-impl ProcessTask {
-    pub fn new(pid: u64, priority: Priority) -> Self {
-        Self {
-            pid,
-            priority,
-            policy: SchedulerPolicy::Normal,
-            state: ProcessState::Ready,
-            vruntime: 0,
-            exec_start: 0,
-            exec_duration: 0,
-            cpu_time: 0,
-            slice: 10,
-        }
     }
 }
 
@@ -191,7 +153,6 @@ impl CfsScheduler {
         }
     }
 
-    /// Create a new process
     pub fn create_process(&mut self, priority: Priority, policy: SchedulerPolicy) -> ProcessTask {
         let pid = self.next_pid.fetch_add(1, Ordering::SeqCst);
 
@@ -214,18 +175,14 @@ impl CfsScheduler {
         task
     }
 
-    /// Calculate time slice based on priority
     fn calculate_slice(&self, priority: Priority) -> u64 {
-        // Higher priority (lower value) gets larger slice
         let base_slice = self.latency / 10;
         let factor = (19 - (priority.value + 20)) as u64;
         base_slice * (factor + 1)
     }
 
-    /// Pick next task to run
     pub fn pick_next_task(&mut self) -> Option<ProcessTask> {
         if let Some(current) = self.current_task.take() {
-            // Put current task back if still runnable
             if current.state == ProcessState::Running {
                 let mut updated = current;
                 updated.state = ProcessState::Runnable;
@@ -236,7 +193,6 @@ impl CfsScheduler {
         self.runnable_tasks.pop()
     }
 
-    /// Put task to sleep
     pub fn put_task_to_sleep(&mut self, pid: u64) -> Result<(), &'static str> {
         if let Some(ref current) = self.current_task {
             if current.pid == pid {
@@ -249,13 +205,10 @@ impl CfsScheduler {
         Err("Task not found")
     }
 
-    /// Wake up task
-    pub fn wake_up_task(&mut self, pid: u64) -> Result<(), &'static str> {
-        // In a real implementation, would find sleeping task and move to runnable
+    pub fn wake_up_task(&mut self, _pid: u64) -> Result<(), &'static str> {
         Ok(())
     }
 
-    /// Update task vruntime
     pub fn update_vruntime(&mut self, pid: u64, delta: u64) {
         if let Some(ref mut current) = self.current_task {
             if current.pid == pid {
@@ -266,12 +219,10 @@ impl CfsScheduler {
         }
     }
 
-    /// Get runnable task count
     pub fn runnable_count(&self) -> usize {
         self.runnable_tasks.len()
     }
 
-    /// Get current task
     pub fn current_task(&self) -> Option<&ProcessTask> {
         self.current_task.as_ref()
     }
@@ -293,7 +244,6 @@ impl RtScheduler {
         }
     }
 
-    /// Create a new RT process
     pub fn create_process(&mut self, priority: Priority) -> ProcessTask {
         let pid = self.next_pid.fetch_add(1, Ordering::SeqCst);
 
@@ -306,18 +256,14 @@ impl RtScheduler {
             exec_start: 0,
             exec_duration: 0,
             cpu_time: 0,
-            slice: 10000, // Fixed slice for RT
+            slice: 10000,
         };
 
         self.runnable_tasks.push(task.clone());
         task
     }
 
-    /// Pick next RT task (highest priority first)
     pub fn pick_next_task(&mut self) -> Option<ProcessTask> {
-        // Sort by priority (lower value = higher priority)
-        self.runnable_tasks
-            .sort_by(|a, b| a.priority.cmp(&b.priority));
         self.runnable_tasks.sort_by(|a, b| a.priority.cmp(&b.priority));
 
         if let Some(current) = self.current_task.take() {
@@ -331,9 +277,14 @@ impl RtScheduler {
         self.runnable_tasks.pop()
     }
 
-    /// Get runnable task count
     pub fn runnable_count(&self) -> usize {
         self.runnable_tasks.len()
+    }
+}
+
+impl Default for RtScheduler {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -355,38 +306,33 @@ pub enum ThermalState {
 impl EnergyAwareScheduler {
     pub fn new() -> Self {
         Self {
-            cfs: CfsScheduler::new(1000000, 20000000), // 1ms min granularity, 20ms latency
-            cpu_frequency: 2400, // 2.4 GHz default
+            cfs: CfsScheduler::new(1000000, 20000000),
+            cpu_frequency: 2400,
             thermal_state: ThermalState::Normal,
-            energy_budget: 10000, // 10 J default
+            energy_budget: 10000,
         }
     }
 
-    /// Create a process
     pub fn create_process(&mut self, priority: Priority, policy: SchedulerPolicy) -> ProcessTask {
         self.cfs.create_process(priority, policy)
     }
 
-    /// Pick next task with energy awareness
     pub fn pick_next_task(&mut self) -> Option<ProcessTask> {
         match self.thermal_state {
             ThermalState::Normal => {
                 self.cfs.pick_next_task()
             }
             ThermalState::Throttling => {
-                // Reduce frequency and pick lower priority tasks
                 self.cpu_frequency = 1200;
                 self.cfs.pick_next_task()
             }
             ThermalState::Critical => {
-                // Only pick idle tasks
                 self.cpu_frequency = 800;
-                None // In real implementation, would pick only idle tasks
+                None
             }
         }
     }
 
-    /// Update thermal state
     pub fn update_thermal_state(&mut self, temperature: u32) {
         self.thermal_state = if temperature > 90 {
             ThermalState::Critical
@@ -397,19 +343,22 @@ impl EnergyAwareScheduler {
         };
     }
 
-    /// Get current CPU frequency
     pub fn cpu_frequency(&self) -> u32 {
         self.cpu_frequency
     }
 
-    /// Get thermal state
     pub fn thermal_state(&self) -> ThermalState {
         self.thermal_state
     }
 
-    /// Get runnable count
     pub fn runnable_count(&self) -> usize {
         self.cfs.runnable_count()
+    }
+}
+
+impl Default for EnergyAwareScheduler {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

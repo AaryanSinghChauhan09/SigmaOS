@@ -262,26 +262,6 @@ impl AutoFsManager {
     }
 
     pub fn get_stats(&self) -> AutoFsStats {
-        let mounted = self
-            .entries
-            .iter()
-            .filter(|e| e.state == AutoFsState::Mounted)
-            .count();
-        let idle = self
-            .entries
-            .iter()
-            .filter(|e| e.state == AutoFsState::Idle)
-            .count();
-        let triggered = self
-            .entries
-            .iter()
-            .filter(|e| e.state == AutoFsState::Triggered)
-            .count();
-        let failed = self
-            .entries
-            .iter()
-            .filter(|e| e.state == AutoFsState::Failed)
-            .count();
         let mounted = self.entries.iter().filter(|e| e.state == AutoFsState::Mounted).count();
         let idle = self.entries.iter().filter(|e| e.state == AutoFsState::Idle).count();
         let triggered = self.entries.iter().filter(|e| e.state == AutoFsState::Triggered).count();
@@ -343,7 +323,6 @@ mod tests {
             String::from("ext4"),
         )
         .with_option(String::from("noatime"));
-        ).with_option(String::from("noatime"));
 
         assert!(trigger.options.contains(&String::from("noatime")));
     }
@@ -426,9 +405,9 @@ mod tests {
 
         entry.mount();
         entry.update_access(1000);
-        assert!(!entry.is_idle(1200)); // 200 seconds ago
+        assert!(!entry.is_idle(1200));
 
-        assert!(entry.is_idle(2000)); // 1000 seconds ago (over 300 timeout)
+        assert!(entry.is_idle(2000));
     }
 
     #[test]
@@ -586,7 +565,6 @@ mod tests {
         );
         manager.mount("/mnt/data");
 
-        // Simulate idle timeout
         let unmounted = manager.cleanup_idle(10000);
         assert_eq!(unmounted.len(), 1);
         assert_eq!(manager.entries.first().unwrap().state, AutoFsState::Idle);

@@ -20,6 +20,8 @@ pub enum AgentPersonaRule {
     PaletteDesignSystem,
     BoltPerformanceOptimization,
     PullRequestPackagingStandard,
+    LinuxBsdParityStandard,
+    ContinuousWikiSyncRule,
 }
 
 #[derive(Debug, Clone)]
@@ -88,6 +90,28 @@ impl TaskGuidelinesAndRulesGovernor {
                 persona: AgentPersonaRule::PullRequestPackagingStandard,
                 is_mandatory: true,
                 description: "Deliver all changes in structured Pull Request format with standalone unit tests.".to_string(),
+            },
+        );
+
+        self.rules.insert(
+            5,
+            TaskGuidelineCheck {
+                rule_id: 5,
+                name: "Linux & BSD Ecosystem Parity Standard".to_string(),
+                persona: AgentPersonaRule::LinuxBsdParityStandard,
+                is_mandatory: true,
+                description: "Absorb and parity features from Linux 6.12+, FreeBSD 14, OpenBSD 7.6, and NixOS.".to_string(),
+            },
+        );
+
+        self.rules.insert(
+            6,
+            TaskGuidelineCheck {
+                rule_id: 6,
+                name: "Continuous Wiki Synchronization".to_string(),
+                persona: AgentPersonaRule::ContinuousWikiSyncRule,
+                is_mandatory: true,
+                description: "Transfer fully implemented .md specifications directly into the GitHub Wiki targets.".to_string(),
             },
         );
     }
@@ -162,6 +186,16 @@ impl WikiDataTransferEngine {
                 synced_to_wiki_repo: false,
             },
         );
+
+        self.specifications.insert(
+            "FUTURE-DEVELOPMENT-ROADMAP.md".to_string(),
+            MdSpecificationItem {
+                spec_filename: "FUTURE-DEVELOPMENT-ROADMAP.md".to_string(),
+                title: "Future Development Master Roadmap & Distro Crusher Specification".to_string(),
+                is_fully_implemented: true,
+                synced_to_wiki_repo: false,
+            },
+        );
     }
 
     pub fn register_spec_file(&mut self, filename: &str, title: &str, fully_implemented: bool) {
@@ -220,7 +254,7 @@ impl SovereignTaskAndWikiGovernanceSuite {
     }
 
     pub fn health_check(&self) -> bool {
-        self.task_governor.rules.len() >= 4
+        self.task_governor.rules.len() >= 6
     }
 
     pub fn summary_report(&self) -> String {
@@ -254,6 +288,8 @@ mod tests {
         assert!(gov.evaluate_task_compliance(1).unwrap()); // Sentinel
         assert!(gov.evaluate_task_compliance(3).unwrap()); // Bolt
         assert!(gov.evaluate_task_compliance(4).unwrap()); // PR Format
+        assert!(gov.evaluate_task_compliance(5).unwrap()); // Linux/BSD Parity
+        assert!(gov.evaluate_task_compliance(6).unwrap()); // Wiki Sync
 
         assert!(gov.is_all_mandatory_rules_passed());
     }

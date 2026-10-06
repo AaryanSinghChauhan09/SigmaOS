@@ -25,14 +25,10 @@
 //! - Async/await support for OS operations
 use std::format;
 
-
 use std::vec::Vec;
 use std::boxed::Box;
 use std::string::{String, ToString};
 use std::collections::BTreeMap;
-use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
-use core::ptr::NonNull;
 
 /// Kuroko-style value types (dynamic typing)
 #[repr(C)]
@@ -346,20 +342,16 @@ impl KurokoCompiler {
     }
 
     pub fn compile(&mut self, source: &str) -> Result<CodeObject, KurokoError> {
-        // Tokenize
         self.tokens = self.tokenize(source)?;
 
-        // Create main module code object
         let main_code = CodeObject::new("__main__");
         self.code_objects.push(main_code);
         self.current_code = 0;
 
-        // Parse and compile
         while !self.is_at_end() {
             self.compile_declaration()?;
         }
 
-        // Emit return nil at end
         self.emit_opcode(Opcode::LoadNil, 0);
         self.emit_opcode(Opcode::Return, 0);
 
@@ -376,7 +368,6 @@ impl KurokoCompiler {
                 ' ' | '\t' | '\r' => {
                     chars.next();
                 }
-                ' ' | '\t' | '\r' => { chars.next(); }
                 '\n' => {
                     tokens.push(Token::new(TokenType::Newline, "\n", line));
                     line += 1;
@@ -449,7 +440,7 @@ impl KurokoCompiler {
                     let mut number = String::new();
                     let mut is_float = false;
                     while let Some(&ch) = chars.peek() {
-                        if ch.is_digit(10) || ch == '.' {
+                        if ch.is_ascii_digit() || ch == '.' {
                             if ch == '.' { is_float = true; }
                             number.push(ch);
                             chars.next();
@@ -509,8 +500,6 @@ impl KurokoCompiler {
 
     fn is_at_end(&self) -> bool {
         self.current >= self.tokens.len() || self.tokens[self.current].token_type == TokenType::EOF
-        self.current >= self.tokens.len() ||
-        self.tokens[self.current].token_type == TokenType::EOF
     }
 
     fn advance(&mut self) -> &Token {
@@ -570,7 +559,6 @@ impl KurokoCompiler {
 
         self.consume(TokenType::LeftParen, "Expect '(' after function name")?;
 
-        // Parameters
         let mut parameters = Vec::new();
         if !self.check(TokenType::RightParen) {
             loop {
@@ -584,39 +572,27 @@ impl KurokoCompiler {
         self.consume(TokenType::RightParen, "Expect ')' after parameters")?;
         self.consume(TokenType::Newline, "Expect newline after function definition")?;
 
-        // Create new code object for function
         let mut func_code = CodeObject::new(&name_lexeme);
         func_code.parameters = parameters;
         let func_index = self.code_objects.len();
         self.code_objects.push(func_code);
 
-        // Save current code and switch to function
         let saved_code = self.current_code;
         self.current_code = func_index;
 
-        // Compile function body
-        while !self.check(TokenType::EOF)
-            && !self.check(TokenType::Def)
-            && self.previous().token_type != TokenType::Newline
-        {
-        while !self.check(TokenType::EOF) &&
-              !self.check(TokenType::Def) &&
-              self.previous().token_type != TokenType::Newline {
+        while !self.check(TokenType::EOF) && !self.check(TokenType::Def) {
             self.compile_statement()?;
         }
 
-        // Emit return
         self.emit_opcode(Opcode::LoadNil, 0);
         self.emit_opcode(Opcode::Return, 0);
 
-        // Restore current code
         self.current_code = saved_code;
 
-        // Emit function constant and store
         let func_value = KurokoValue::Function(func_index);
         let const_index = self.add_constant(func_value);
         self.emit_opcode(Opcode::LoadInteger, const_index as i64);
-        self.emit_opcode(Opcode::StoreGlobal, 0); // Store in global scope
+        self.emit_opcode(Opcode::StoreGlobal, 0);
 
         Ok(())
     }
@@ -647,23 +623,18 @@ impl KurokoCompiler {
         self.consume(TokenType::RightParen, "Expect ')' after condition")?;
         self.consume(TokenType::Newline, "Expect newline after if")?;
 
-        // Emit jump if false
         let jump_index = self.current_bytecode_len();
         self.emit_opcode(Opcode::JumpIfFalse, 0);
 
-        // Compile then branch
         while !self.check(TokenType::Else) && !self.check(TokenType::EOF) {
             self.compile_statement()?;
         }
 
-        // Emit jump over else branch
         let else_jump = self.current_bytecode_len();
         self.emit_opcode(Opcode::Jump, 0);
 
-        // Patch jump if false
         self.patch_jump(jump_index);
 
-        // Compile else branch if present
         if self.match_token(TokenType::Else) {
             self.consume(TokenType::Newline, "Expect newline after else")?;
             while !self.check(TokenType::EOF) {
@@ -671,7 +642,6 @@ impl KurokoCompiler {
             }
         }
 
-        // Patch else jump
         self.patch_jump(else_jump);
 
         Ok(())
@@ -686,19 +656,15 @@ impl KurokoCompiler {
         self.consume(TokenType::RightParen, "Expect ')' after condition")?;
         self.consume(TokenType::Newline, "Expect newline after while")?;
 
-        // Emit jump if false
         let jump_index = self.current_bytecode_len();
         self.emit_opcode(Opcode::JumpIfFalse, 0);
 
-        // Compile loop body
         while !self.check(TokenType::EOF) && !self.check(TokenType::Break) {
             self.compile_statement()?;
         }
 
-        // Emit loop back
         self.emit_opcode(Opcode::Jump, loop_start as i64);
 
-        // Patch jump if false
         self.patch_jump(jump_index);
 
         self.loop_depth -= 1;
@@ -728,7 +694,6 @@ impl KurokoCompiler {
     }
 
     fn compile_assignment(&mut self) -> Result<(), KurokoError> {
-        // For simplicity, just compile as expression for now
         self.compile_or()
     }
 
@@ -806,10 +771,6 @@ impl KurokoCompiler {
 
     fn compile_factor(&mut self) -> Result<(), KurokoError> {
         self.compile_unary()?;
-        while self.match_token(TokenType::Multiply)
-            || self.match_token(TokenType::Divide)
-            || self.match_token(TokenType::Modulo)
-        {
         while self.match_token(TokenType::Multiply) || self.match_token(TokenType::Divide) ||
               self.match_token(TokenType::Modulo) {
             let operator = self.previous().token_type;
@@ -831,7 +792,7 @@ impl KurokoCompiler {
             self.compile_unary()?;
 
             match operator {
-                TokenType::Minus => { self.emit_opcode(Opcode::Subtract, 0); Ok(()) }, // Negate
+                TokenType::Minus => { self.emit_opcode(Opcode::Subtract, 0); Ok(()) },
                 TokenType::Not => { self.emit_opcode(Opcode::Not, 0); Ok(()) },
                 _ => Ok(()),
             }
@@ -863,9 +824,7 @@ impl KurokoCompiler {
             self.compile_expression()?;
             self.consume(TokenType::RightParen, "Expect ')' after expression")?;
         } else if self.match_token(TokenType::Identifier) {
-            let name = self.previous().lexeme.clone();
-            // For now, just load as global
-            self.emit_opcode(Opcode::LoadGlobal, 0); // Simplified
+            self.emit_opcode(Opcode::LoadGlobal, 0);
         } else {
             return Err(KurokoError::SyntaxError);
         }
@@ -939,7 +898,6 @@ impl KurokoVM {
             builtin_functions: BTreeMap::new(),
         };
 
-        // Register builtin functions
         vm.register_builtins();
         vm
     }
@@ -970,14 +928,6 @@ impl KurokoVM {
 
     fn run(&mut self) -> Result<KurokoValue, KurokoError> {
         loop {
-            let frame = self
-                .current_frame
-                .last_mut()
-                .ok_or(KurokoError::RuntimeError)?;
-            let code = self
-                .code_objects
-                .get(frame.code_index)
-                .ok_or(KurokoError::RuntimeError)?;
             let frame = self.current_frame.last_mut().ok_or(KurokoError::RuntimeError)?;
             let code = self.code_objects.get(frame.code_index).ok_or(KurokoError::RuntimeError)?;
 
@@ -1163,7 +1113,6 @@ impl KurokoVM {
                 fn_ptr(self, args)
             }
             KurokoValue::Function(code_index) => {
-                // Execute user-defined function
                 let frame = VMFrame {
                     code_index,
                     ip: 0,
@@ -1206,7 +1155,6 @@ impl Default for KurokoVM {
     }
 }
 
-// Builtin functions
 fn builtin_print(vm: &mut KurokoVM, args: Vec<KurokoValue>) -> Result<KurokoValue, KurokoError> {
     for arg in &args {
         print!("{}", vm.value_to_string(arg));
@@ -1219,9 +1167,6 @@ fn builtin_input(vm: &mut KurokoVM, args: Vec<KurokoValue>) -> Result<KurokoValu
     if !args.is_empty() {
         print!("{}", vm.value_to_string(&args[0]));
     }
-
-    // In a real implementation, this would read from stdin
-    // For now, return a mock input
     Ok(KurokoValue::String("user_input".to_string()))
 }
 
@@ -1278,8 +1223,7 @@ impl KurokoREPL {
 
         loop {
             print!(">>> ");
-            // In real implementation, read from stdin
-            let input = "print(42)"; // Mock input
+            let input = "print(42)";
 
             if input.trim() == "exit" {
                 break;
@@ -1299,7 +1243,7 @@ impl Default for KurokoREPL {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

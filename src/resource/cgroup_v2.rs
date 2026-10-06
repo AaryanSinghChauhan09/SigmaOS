@@ -2,7 +2,7 @@
 // Inspired by Linux cgroup v2 for unified resource management
 
 use std::collections::HashMap;
-use std::sync::atomic::{AtomicU64, AtomicU32, Ordering};
+use std::sync::atomic::AtomicU64;
 
 /// Cgroup controller type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -234,7 +234,7 @@ impl CgroupV2Manager {
 
     /// Delete a cgroup
     pub fn delete_cgroup(&mut self, name: &str) -> Result<(), &'static str> {
-        if name == &self.root_cgroup {
+        if name == self.root_cgroup {
             return Err("Cannot delete root cgroup");
         }
 
@@ -260,16 +260,6 @@ impl CgroupV2Manager {
     }
 
     /// Add memory controller to cgroup
-    pub fn add_memory_controller(
-        &mut self,
-        cgroup_name: &str,
-        limit: u64,
-        swap_limit: u64,
-    ) -> Result<(), &'static str> {
-        let cgroup = self
-            .cgroups
-            .get_mut(cgroup_name)
-            .ok_or("Cgroup not found")?;
     pub fn add_memory_controller(&mut self, cgroup_name: &str, limit: u64, swap_limit: u64) -> Result<(), &'static str> {
         let cgroup = self.cgroups.get_mut(cgroup_name).ok_or("Cgroup not found")?;
 
@@ -285,16 +275,6 @@ impl CgroupV2Manager {
     }
 
     /// Add CPU controller to cgroup
-    pub fn add_cpu_controller(
-        &mut self,
-        cgroup_name: &str,
-        shares: u64,
-        max: Option<u64>,
-    ) -> Result<(), &'static str> {
-        let cgroup = self
-            .cgroups
-            .get_mut(cgroup_name)
-            .ok_or("Cgroup not found")?;
     pub fn add_cpu_controller(&mut self, cgroup_name: &str, shares: u64, max: Option<u64>) -> Result<(), &'static str> {
         let cgroup = self.cgroups.get_mut(cgroup_name).ok_or("Cgroup not found")?;
 
@@ -311,10 +291,6 @@ impl CgroupV2Manager {
 
     /// Add PIDs controller to cgroup
     pub fn add_pids_controller(&mut self, cgroup_name: &str, max: u64) -> Result<(), &'static str> {
-        let cgroup = self
-            .cgroups
-            .get_mut(cgroup_name)
-            .ok_or("Cgroup not found")?;
         let cgroup = self.cgroups.get_mut(cgroup_name).ok_or("Cgroup not found")?;
 
         let pids_controller = PidsController {
@@ -328,10 +304,6 @@ impl CgroupV2Manager {
 
     /// Move process to cgroup
     pub fn move_process(&mut self, cgroup_name: &str, pid: u64) -> Result<(), &'static str> {
-        let cgroup = self
-            .cgroups
-            .get_mut(cgroup_name)
-            .ok_or("Cgroup not found")?;
         let cgroup = self.cgroups.get_mut(cgroup_name).ok_or("Cgroup not found")?;
 
         cgroup.add_process(pid);
@@ -349,6 +321,12 @@ impl CgroupV2Manager {
     }
 }
 
+impl Default for CgroupV2Manager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -357,9 +335,6 @@ mod tests {
     fn test_create_cgroup() {
         let mut manager = CgroupV2Manager::new();
 
-        assert!(manager
-            .create_cgroup("/test".to_string(), Some("/".to_string()))
-            .is_ok());
         assert!(manager.create_cgroup("/test".to_string(), Some("/".to_string())).is_ok());
         assert_eq!(manager.cgroup_count(), 2);
     }
@@ -368,9 +343,6 @@ mod tests {
     fn test_delete_cgroup() {
         let mut manager = CgroupV2Manager::new();
 
-        manager
-            .create_cgroup("/test".to_string(), Some("/".to_string()))
-            .unwrap();
         manager.create_cgroup("/test".to_string(), Some("/".to_string())).unwrap();
         assert!(manager.delete_cgroup("/test").is_ok());
         assert_eq!(manager.cgroup_count(), 1);
@@ -387,12 +359,6 @@ mod tests {
     fn test_add_memory_controller() {
         let mut manager = CgroupV2Manager::new();
 
-        manager
-            .create_cgroup("/test".to_string(), Some("/".to_string()))
-            .unwrap();
-        assert!(manager
-            .add_memory_controller("/test", 1024 * 1024 * 1024, 512 * 1024 * 1024)
-            .is_ok());
         manager.create_cgroup("/test".to_string(), Some("/".to_string())).unwrap();
         assert!(manager.add_memory_controller("/test", 1024 * 1024 * 1024, 512 * 1024 * 1024).is_ok());
     }
@@ -401,12 +367,6 @@ mod tests {
     fn test_add_cpu_controller() {
         let mut manager = CgroupV2Manager::new();
 
-        manager
-            .create_cgroup("/test".to_string(), Some("/".to_string()))
-            .unwrap();
-        assert!(manager
-            .add_cpu_controller("/test", 1024, Some(500000))
-            .is_ok());
         manager.create_cgroup("/test".to_string(), Some("/".to_string())).unwrap();
         assert!(manager.add_cpu_controller("/test", 1024, Some(500000)).is_ok());
     }
@@ -415,9 +375,6 @@ mod tests {
     fn test_add_pids_controller() {
         let mut manager = CgroupV2Manager::new();
 
-        manager
-            .create_cgroup("/test".to_string(), Some("/".to_string()))
-            .unwrap();
         manager.create_cgroup("/test".to_string(), Some("/".to_string())).unwrap();
         assert!(manager.add_pids_controller("/test", 100).is_ok());
     }
@@ -426,9 +383,6 @@ mod tests {
     fn test_move_process() {
         let mut manager = CgroupV2Manager::new();
 
-        manager
-            .create_cgroup("/test".to_string(), Some("/".to_string()))
-            .unwrap();
         manager.create_cgroup("/test".to_string(), Some("/".to_string())).unwrap();
         assert!(manager.move_process("/test", 1234).is_ok());
 
@@ -440,9 +394,6 @@ mod tests {
     fn test_enable_disable() {
         let mut manager = CgroupV2Manager::new();
 
-        manager
-            .create_cgroup("/test".to_string(), Some("/".to_string()))
-            .unwrap();
         manager.create_cgroup("/test".to_string(), Some("/".to_string())).unwrap();
 
         let cgroup = manager.get_cgroup_mut("/test").unwrap();

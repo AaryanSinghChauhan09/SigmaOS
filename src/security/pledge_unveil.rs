@@ -72,7 +72,7 @@ impl PledgeSandbox {
 
     pub fn pledge(&mut self, promises_str: &str) -> bool {
         if self.promised() {
-            return false; // Already pledged
+            return false;
         }
 
         let mut new_promises = Vec::new();
@@ -97,7 +97,7 @@ impl PledgeSandbox {
 
     pub fn check_promise(&self, promise: PledgePromise) -> bool {
         if !self.pledged {
-            return true; // Not pledged yet, allow everything
+            return true;
         }
         self.has_promise(promise)
     }
@@ -174,20 +174,22 @@ impl UnveilSandbox {
 
     pub fn check_path_access(&self, path: &str, permission: UnveilPermission) -> bool {
         if !self.unveiled {
-            return true; // Not unveiled yet, allow everything
+            return true;
         }
 
-        // Check exact path match
         if let Some(perm) = self.paths.get(path) {
             return match permission {
-                UnveilPermission::Read => *perm == UnveilPermission::Read || *perm == UnveilPermission::ReadWrite,
-                UnveilPermission::Write => *perm == UnveilPermission::Write || *perm == UnveilPermission::ReadWrite,
+                UnveilPermission::Read => {
+                    *perm == UnveilPermission::Read || *perm == UnveilPermission::ReadWrite
+                }
+                UnveilPermission::Write => {
+                    *perm == UnveilPermission::Write || *perm == UnveilPermission::ReadWrite
+                }
                 UnveilPermission::Execute => *perm == UnveilPermission::Execute,
                 UnveilPermission::ReadWrite => *perm == UnveilPermission::ReadWrite,
             };
         }
 
-        // Use the most specific component boundary match; `/tmp-old` is not under `/tmp`.
         if let Some((_, perm)) = self
             .paths
             .iter()
@@ -208,25 +210,8 @@ impl UnveilSandbox {
                 UnveilPermission::Execute => *perm == UnveilPermission::Execute,
                 UnveilPermission::ReadWrite => *perm == UnveilPermission::ReadWrite,
             };
-        // Check parent path match
-        for (unveiled_path, perm) in &self.paths {
-            if path.starts_with(unveiled_path) {
-                return match permission {
-                    UnveilPermission::Read => {
-                        *perm == UnveilPermission::Read || *perm == UnveilPermission::ReadWrite
-                    }
-                    UnveilPermission::Write => {
-                        *perm == UnveilPermission::Write || *perm == UnveilPermission::ReadWrite
-                    }
-                    UnveilPermission::Read => *perm == UnveilPermission::Read || *perm == UnveilPermission::ReadWrite,
-                    UnveilPermission::Write => *perm == UnveilPermission::Write || *perm == UnveilPermission::ReadWrite,
-                    UnveilPermission::Execute => *perm == UnveilPermission::Execute,
-                    UnveilPermission::ReadWrite => *perm == UnveilPermission::ReadWrite,
-                };
-            }
         }
 
-        // Default deny if unveiled and no match
         !self.default_deny
     }
 }
@@ -260,13 +245,16 @@ impl Sandbox {
         self.unveil.unveil(path, permissions)
     }
 
-    pub fn check_operation(&self, promise: PledgePromise, path: Option<&str>, permission: Option<UnveilPermission>) -> bool {
-        // Check pledge promise
+    pub fn check_operation(
+        &self,
+        promise: PledgePromise,
+        path: Option<&str>,
+        permission: Option<UnveilPermission>,
+    ) -> bool {
         if !self.pledge.check_promise(promise) {
             return false;
         }
 
-        // Check unveil path access if path provided
         if let Some(p) = path {
             if let Some(perm) = permission {
                 if !self.unveil.check_path_access(p, perm) {
@@ -367,8 +355,16 @@ mod tests {
         sandbox.unveil("/tmp", "r");
 
         assert!(sandbox.check_operation(PledgePromise::Stdio, None, None));
-        assert!(sandbox.check_operation(PledgePromise::Rpath, Some("/tmp"), Some(UnveilPermission::Read)));
+        assert!(sandbox.check_operation(
+            PledgePromise::Rpath,
+            Some("/tmp"),
+            Some(UnveilPermission::Read)
+        ));
         assert!(!sandbox.check_operation(PledgePromise::Wpath, None, None));
-        assert!(!sandbox.check_operation(PledgePromise::Rpath, Some("/etc"), Some(UnveilPermission::Read)));
+        assert!(!sandbox.check_operation(
+            PledgePromise::Rpath,
+            Some("/etc"),
+            Some(UnveilPermission::Read)
+        ));
     }
 }
