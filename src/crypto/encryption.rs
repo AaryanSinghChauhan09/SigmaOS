@@ -1,12 +1,10 @@
 use std::vec::Vec;
-
 use std::boxed::Box;
+use core::sync::atomic::AtomicUsize;
 
 /// Prototype encryption service API for SigmaOS.
 /// Based on Roadmap Item 15: Encryption service
 /// The former XOR-based transform was not encryption; operations now fail closed.
-
-use core::sync::atomic::AtomicUsize;
 
 pub type KeyID = usize;
 
@@ -48,9 +46,6 @@ impl EncryptionKey for SimpleEncryptionKey {
     fn id(&self) -> KeyID { self.id }
     fn cipher_type(&self) -> CipherType { self.cipher_type }
     fn key_data(&self) -> &[u8] {
-        // Bolt ⚡ Optimization: Store explicit key length on instantiation to eliminate
-        // O(N) zero-byte linear scanning (.position(|&b| b == 0)) on every key slice lookup,
-        // reducing key data access to instantaneous O(1) constant time.
         if self.key_len > 0 {
             &self.key_data[..self.key_len.min(32) as usize]
         } else {
@@ -67,7 +62,7 @@ pub trait EncryptionService {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CryptoError {
     Success = 0,
     KeyNotFound = 1,
@@ -75,7 +70,6 @@ pub enum CryptoError {
     InvalidKey = 3,
     CryptoUnavailable = 4,
 }
-pub enum CryptoError { Success = 0, KeyNotFound = 1, EncryptionFailed = 2, InvalidKey = 3 }
 
 pub struct SimpleEncryptionService {
     keys: Vec<Option<Box<dyn EncryptionKey>>>,
@@ -84,6 +78,12 @@ pub struct SimpleEncryptionService {
 
 impl SimpleEncryptionService {
     pub fn new() -> Self { SimpleEncryptionService { keys: Vec::new(), next_id: AtomicUsize::new(1) } }
+}
+
+impl Default for SimpleEncryptionService {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl EncryptionService for SimpleEncryptionService {
@@ -131,7 +131,6 @@ mod tests {
     #[test]
     fn encryption_service_fails_closed_without_a_crypto_provider() {
         let mut service = SimpleEncryptionService::new();
-        // Use a customized key that is NOT 0x42
         let key_data = b"MY_CUSTOM_SECRET_KEY_FOR_TESTS";
         let key = SimpleEncryptionKey::new(101, CipherType::XOR, key_data);
         service.add_key(Box::new(key)).unwrap();

@@ -1,17 +1,16 @@
 //! Prototype secret-manager API only. This module has no audited encryption
 //! provider and must not be used as secure secret storage.
 
+use core::sync::atomic::{AtomicBool, Ordering};
 use std::boxed::Box;
 use std::vec::Vec;
-
-use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
 /// Secret ID
 pub type SecretID = usize;
 
 /// Secret type
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SecretType {
     Password = 0,
     APIKey = 1,
@@ -98,6 +97,12 @@ impl SecretCapability {
     }
 }
 
+impl Default for SecretCapability {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Simple secret (OOP: Concrete secret class)
 #[repr(C)]
 pub struct SimpleSecret {
@@ -121,7 +126,6 @@ impl SimpleSecret {
         let mut name_array = [0u8; 64];
         let name_len = name.len().min(63);
 
-        // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
         unsafe {
             core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
         }
@@ -140,7 +144,6 @@ impl SimpleSecret {
 
     pub fn set_data(&mut self, data: &[u8]) {
         let len = data.len().min(511);
-        // SAFETY: raw pointer is non-null and valid for the lifetime of the enclosing struct.
         unsafe {
             core::ptr::copy_nonoverlapping(data.as_ptr(), self.data.as_mut_ptr(), len);
         }
@@ -162,7 +165,6 @@ impl Secret for SimpleSecret {
     }
 
     fn name(&self) -> &[u8] {
-        // O(1) slice lookup using cached name_len, avoiding O(N) zero-byte linear scan (.position(|&b| b == 0))
         &self.name[..self.name_len as usize]
     }
 
@@ -180,16 +182,6 @@ impl Secret for SimpleSecret {
         }
 
         Err(SecretError::CryptoUnavailable)
-        for (b, &k) in self.data[..self.data_len]
-            .iter_mut()
-            .zip(key.iter().cycle())
-        {
-        for (b, &k) in self.data[..self.data_len].iter_mut().zip(key.iter().cycle()) {
-            *b ^= k;
-        }
-
-        self.is_encrypted.store(true, Ordering::SeqCst);
-        Ok(())
     }
 
     fn decrypt(&mut self, key: &[u8]) -> Result<(), SecretError> {
@@ -206,16 +198,6 @@ impl Secret for SimpleSecret {
         }
 
         Err(SecretError::CryptoUnavailable)
-        for (b, &k) in self.data[..self.data_len]
-            .iter_mut()
-            .zip(key.iter().cycle())
-        {
-        for (b, &k) in self.data[..self.data_len].iter_mut().zip(key.iter().cycle()) {
-            *b ^= k;
-        }
-
-        self.is_encrypted.store(false, Ordering::SeqCst);
-        Ok(())
     }
 
     fn info(&self) -> SecretInfo {
@@ -231,17 +213,11 @@ impl Secret for SimpleSecret {
 
 /// Keyring trait (OOP interface)
 pub trait Keyring {
-    /// Add secret
     fn add_secret(&mut self, secret: Box<dyn Secret>) -> Result<SecretID, SecretError>;
-    /// Remove secret
     fn remove_secret(&mut self, id: SecretID) -> Result<(), SecretError>;
-    /// Get secret
     fn get_secret(&self, id: SecretID) -> Option<&dyn Secret>;
-    /// Get secret mutable
     fn get_secret_mut(&mut self, id: SecretID) -> Option<&mut Box<dyn Secret>>;
-    /// List secrets
     fn list_secrets(&self) -> Vec<SecretID>;
-    /// Get keyring statistics
     fn stats(&self) -> KeyringStats;
 }
 
@@ -264,11 +240,15 @@ impl KeyringStats {
     }
 }
 
+impl Default for KeyringStats {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Simple keyring (OOP: Concrete keyring class)
 pub struct SimpleKeyring {
     secrets: Vec<Option<Box<dyn Secret>>>,
-    next_id: AtomicUsize,
-    stats: KeyringStats,
     capability: KeyringCapability,
 }
 
@@ -299,12 +279,16 @@ impl KeyringCapability {
     }
 }
 
+impl Default for KeyringCapability {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl SimpleKeyring {
     pub fn new(capability: KeyringCapability) -> Self {
         SimpleKeyring {
             secrets: Vec::new(),
-            next_id: AtomicUsize::new(1),
-            stats: KeyringStats::new(),
             capability,
         }
     }
@@ -317,10 +301,7 @@ impl Keyring for SimpleKeyring {
         }
 
         let id = secret.id();
-        let secret_type = secret.secret_type();
         self.secrets.push(Some(secret));
-        self.stats.total_secrets += 1;
-        self.stats.by_type[secret_type as usize] += 1;
         Ok(id)
     }
 
@@ -330,13 +311,11 @@ impl Keyring for SimpleKeyring {
         }
 
         let mut index = None;
-        let mut secret_type = SecretType::Password;
 
         for i in 0..self.secrets.len() {
             if let Some(Some(ref secret)) = self.secrets.get(i) {
                 if secret.id() == id {
                     index = Some(i);
-                    secret_type = secret.secret_type();
                     break;
                 }
             }
@@ -346,8 +325,6 @@ impl Keyring for SimpleKeyring {
             if let Some(slot) = self.secrets.get_mut(i) {
                 *slot = None;
             }
-            self.stats.total_secrets -= 1;
-            self.stats.by_type[secret_type as usize] -= 1;
             Ok(())
         } else {
             Err(SecretError::NotFound)
@@ -387,11 +364,12 @@ impl Keyring for SimpleKeyring {
     }
 
     fn stats(&self) -> KeyringStats {
-        let mut stats = self.stats;
-        stats.encrypted_secrets = 0;
+        let mut stats = KeyringStats::new();
 
         for i in 0..self.secrets.len() {
             if let Some(Some(ref secret)) = self.secrets.get(i) {
+                stats.total_secrets += 1;
+                stats.by_type[secret.secret_type() as usize] += 1;
                 if secret.info().is_encrypted {
                     stats.encrypted_secrets += 1;
                 }

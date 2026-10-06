@@ -162,7 +162,6 @@ impl Notification {
     }
 
     fn get_time() -> u64 {
-        // In real implementation, would get actual timestamp
         0
     }
 }
@@ -224,10 +223,6 @@ impl NotificationSystem {
         self.queue.push(id);
         self.sort_queue();
 
-        // Add to queue based on priority
-        self.queue.push(id);
-        self.sort_queue();
-
         // Store notification
         self.notifications.insert(id, notification);
 
@@ -246,8 +241,6 @@ impl NotificationSystem {
 
         // Always allow critical if configured
         if self.dnd_config.allow_critical && notification.priority == Priority::Critical {
-        if self.dnd_config.allow_critical &&
-           notification.priority == Priority::Critical {
             return false;
         }
 
@@ -353,8 +346,6 @@ impl NotificationSystem {
     pub fn search_history(&self, query: &str) -> Vec<Notification> {
         let query = query.to_lowercase();
 
-        self.history
-            .iter()
         self.history.iter()
             .filter_map(|id| self.notifications.get(id))
             .filter(|n| {
@@ -529,7 +520,6 @@ mod tests {
         let notif = Notification::new("App", "Test", "Body");
         system.notify(notif);
 
-        // Should be in history but not queue
         assert_eq!(system.get_queue_count(), 0);
         assert_eq!(system.get_history().len(), 1);
     }

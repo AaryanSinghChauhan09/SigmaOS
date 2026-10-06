@@ -65,19 +65,14 @@ impl CfiEngine {
     }
 
     /// Validate an indirect call
-    pub fn validate_indirect_call(&mut self, from_address: u64, to_address: u64) -> Result<(), CfiViolation> {
-        if let Some(target) = self.registered_targets.get(&to_address) {
     pub fn validate_indirect_call(
         &mut self,
         from_address: u64,
         to_address: u64,
     ) -> Result<(), CfiViolation> {
-        if let Some(_target) = self.registered_targets.get(&to_address) {
-            // In a real implementation, we would compute the actual signature
-            // For simulation, we accept valid targets
+        if self.registered_targets.contains_key(&to_address) {
             Ok(())
         } else {
-            // CFI violation - target not registered
             let violation = CfiViolation {
                 from_address,
                 to_address,

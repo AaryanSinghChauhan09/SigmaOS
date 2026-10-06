@@ -3,10 +3,8 @@
 // (`src/package/sovereign_universal_pm_pr_bridge.rs`)
 //
 // Zero-dependency, `#![no_std]` compliant Rust engine bridging multi-distro Linux & BSD
-// package formats (Apt .deb, Pacman .pkg.tar.zst / PKGBUILD, Dnf .rpm, Alpine .apk, Void .xbps,
-// Gentoo .ebuild, FreeBSD .pkg, OpenBSD pkg, NetBSD pkgsrc, Nix Flakes, Guix Scheme, Zypper .rpm,
-// Slackware .txz, Haiku .hpkg, Opkg, Flatpak, Snap, AppImage) into `sigma-pkg` through automated
-// Pull Request submission workflows, SAT dependency resolution, and PQC verification.
+// package formats into `sigma-pkg` through automated Pull Request submission workflows,
+// SAT dependency resolution, and PQC verification.
 
 #[cfg(not(any(feature = "standalone_test", test)))]
 extern crate alloc;
@@ -49,6 +47,7 @@ pub enum UniversalDistroPackageFormat {
     FreeBsdPkg,
     OpenBsdPkg,
     NetBsdPkgsrc,
+    BsdPkg,
     NixFlake,
     GuixScheme,
     ZypperSpec,
@@ -59,21 +58,14 @@ pub enum UniversalDistroPackageFormat {
     FlatpakApp,
     SnapApp,
     AppImage,
-    SolusEopkg,
     OpenWrtIpk,
     SlackwareSlackbuild,
     HomebrewBottle,
     WindowsMsiAppx,
-    GuixScheme,
     SerpentStone,
-    SlackwareTxz,
-    ZypperSpec,
-    SolusEopkg,
-    OpenWrtIpk,
     YoctoOpkg,
     SolarisIps,
     SwupdBundle,
-    HomebrewBottle,
     AndroidAab,
     MacOsApp,
     OciContainer,
@@ -97,6 +89,7 @@ impl UniversalDistroPackageFormat {
             Self::FreeBsdPkg => "freebsd-pkg (.pkg / ports)",
             Self::OpenBsdPkg => "openbsd-pkg (.pkg / ports)",
             Self::NetBsdPkgsrc => "netbsd-pkgsrc (pkgsrc)",
+            Self::BsdPkg => "bsd-pkg (.pkg)",
             Self::NixFlake => "nix (flake / derivation)",
             Self::GuixScheme => "guix (scheme / nar)",
             Self::ZypperSpec => "zypper (.rpm / spec)",
@@ -107,21 +100,14 @@ impl UniversalDistroPackageFormat {
             Self::FlatpakApp => "flatpak (.flatpakref)",
             Self::SnapApp => "snap (.snap)",
             Self::AppImage => "appimage (.AppImage)",
-            Self::SolusEopkg => "eopkg (.eopkg)",
             Self::OpenWrtIpk => "opkg (.ipk)",
             Self::SlackwareSlackbuild => "slackware (SlackBuild / .txz)",
-            Self::HomebrewBottle => "homebrew (.bottle.tar.gz)",
+            Self::HomebrewBottle => "homebrew (.bottle.tar.gz / Formula)",
             Self::WindowsMsiAppx => "winget (.msi / .appx)",
-            Self::GuixScheme => "guix (.scm / derivation)",
             Self::SerpentStone => "moss (.stone)",
-            Self::SlackwareTxz => "slackware (.txz / SlackBuild)",
-            Self::ZypperSpec => "zypper (.rpm / .spec)",
-            Self::SolusEopkg => "eopkg (pspec.xml / .eopkg)",
-            Self::OpenWrtIpk => "opkg / ipk (control / .ipk)",
             Self::YoctoOpkg => "yocto (.opkg)",
             Self::SolarisIps => "solaris ips (.p5p / manifest)",
             Self::SwupdBundle => "swupd (bundle / manifest)",
-            Self::HomebrewBottle => "homebrew (.bottle.tar.gz / Formula)",
             Self::AndroidAab => "android (.aab / .apk)",
             Self::MacOsApp => "macos (.app / .dmg)",
             Self::OciContainer => "oci (container image tarball)",
@@ -290,7 +276,7 @@ impl LinuxBsdPackageFormatConverterEngine {
                         }
                     }
                 }
-                UniversalDistroPackageFormat::BsdPkg => {
+                UniversalDistroPackageFormat::BsdPkg | UniversalDistroPackageFormat::FreeBsdPkg | UniversalDistroPackageFormat::OpenBsdPkg => {
                     if trimmed.starts_with("name:") {
                         name = trimmed["name:".len()..].trim().trim_matches('"').to_string();
                     } else if trimmed.starts_with("version:") {
@@ -319,7 +305,7 @@ impl LinuxBsdPackageFormatConverterEngine {
             declared_dependencies: dependencies,
             provides_capabilities: capabilities,
             sandbox_level: match format {
-                UniversalDistroPackageFormat::BsdPkg => 3, // Full Capsicum
+                UniversalDistroPackageFormat::BsdPkg | UniversalDistroPackageFormat::FreeBsdPkg | UniversalDistroPackageFormat::OpenBsdPkg => 3, // Full Capsicum
                 UniversalDistroPackageFormat::FlatpakApp | UniversalDistroPackageFormat::SnapApp => 2, // Landlock+Seccomp
                 _ => 2,
             },
@@ -595,7 +581,8 @@ impl SovereignUniversalPmPrBridgeEngine {
             provides_capabilities: vec![name.to_string()],
             sandbox_level: match format {
                 UniversalDistroPackageFormat::FreeBsdPkg
-                | UniversalDistroPackageFormat::OpenBsdPkg => 3,
+                | UniversalDistroPackageFormat::OpenBsdPkg
+                | UniversalDistroPackageFormat::BsdPkg => 3,
                 UniversalDistroPackageFormat::FlatpakApp
                 | UniversalDistroPackageFormat::SnapApp
                 | UniversalDistroPackageFormat::AppImage => 2,

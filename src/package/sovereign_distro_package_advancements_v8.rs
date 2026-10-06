@@ -139,6 +139,9 @@ impl SovereignMicrovmHermeticPackageSandboxEngine {
 impl Default for SovereignMicrovmHermeticPackageSandboxEngine {
     fn default() -> Self {
         Self::new(SandboxIsolationLevel::LandlockContainer)
+    }
+}
+
 // 1. Universal SAT Dependency Resolver
 // =========================================================================
 
@@ -242,6 +245,11 @@ pub enum SignatureAlgorithm {
     Ed25519,
     RsaGpg,
     SignifyDilithium5Pqc,
+    Dilithium5Pqc,
+    GpgRsa,
+    OpenBsdSignify,
+    AlpineApkEd25519,
+    CosignOidc,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -386,11 +394,9 @@ impl SovereignAiOptimizedMirrorRankingGovernor {
 }
 
 impl Default for SovereignAiOptimizedMirrorRankingGovernor {
-    Dilithium5Pqc,
-    GpgRsa,
-    OpenBsdSignify,
-    AlpineApkEd25519,
-    CosignOidc,
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -427,10 +433,16 @@ impl SovereignUniversalPackageSignatureVerifier {
 
         // Verification logic per algorithm
         match sig.algorithm {
-            SignatureAlgorithm::Dilithium5Pqc => sig.signature_bytes.starts_with(b"pqc_dilithium5"),
-            SignatureAlgorithm::GpgRsa => sig.signature_bytes.starts_with(b"gpg_rsa"),
+            SignatureAlgorithm::Dilithium5Pqc | SignatureAlgorithm::SignifyDilithium5Pqc => {
+                sig.signature_bytes.starts_with(b"pqc_dilithium5")
+            }
+            SignatureAlgorithm::GpgRsa | SignatureAlgorithm::RsaGpg => {
+                sig.signature_bytes.starts_with(b"gpg_rsa")
+            }
             SignatureAlgorithm::OpenBsdSignify => sig.signature_bytes.starts_with(b"signify"),
-            SignatureAlgorithm::AlpineApkEd25519 => sig.signature_bytes.starts_with(b"apk_ed25519"),
+            SignatureAlgorithm::AlpineApkEd25519 | SignatureAlgorithm::Ed25519 => {
+                sig.signature_bytes.starts_with(b"apk_ed25519") || sig.signature_bytes.starts_with(b"ed25519")
+            }
             SignatureAlgorithm::CosignOidc => sig.signature_bytes.starts_with(b"cosign"),
         }
     }
@@ -512,6 +524,11 @@ impl SovereignAtomicBootEnvironmentPackageSnapshotEngine {
 }
 
 impl Default for SovereignAtomicBootEnvironmentPackageSnapshotEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // 3. Universal Delta Package Engine
 // =========================================================================
 
@@ -635,6 +652,10 @@ impl SovereignCrossDistroSonameAbiVerifierEngine {
             is_abi_compatible: is_compat,
             missing_libraries: missing,
             orphaned_libraries: Vec::new(),
+        }
+    }
+}
+
 // 5. Universal PM CLI Interop Engine
 // =========================================================================
 
@@ -747,6 +768,9 @@ impl SovereignDistroPackageAdvancementsSuiteV8 {
         available_libs.insert("libssl.so.3".to_string());
         available_libs.insert("libcrypto.so.3".to_string());
 
+        let mut sig_verifier = SovereignUniversalPackageSignatureVerifier::new();
+        sig_verifier.add_trusted_key("sovereign_master_key", b"pubkey_data_32_bytes_pqc");
+
         Self {
             sandbox_engine: SovereignMicrovmHermeticPackageSandboxEngine::new(
                 SandboxIsolationLevel::LandlockContainer,
@@ -755,6 +779,10 @@ impl SovereignDistroPackageAdvancementsSuiteV8 {
             mirror_governor: SovereignAiOptimizedMirrorRankingGovernor::new(),
             boot_snapshot_engine: SovereignAtomicBootEnvironmentPackageSnapshotEngine::new(),
             soname_verifier: SovereignCrossDistroSonameAbiVerifierEngine::new(available_libs),
+            sat_resolver: SovereignUniversalSatDependencyResolver::new(),
+            sig_verifier,
+            trigger_engine: SovereignUniversalSystemTriggerIntegratorEngine::new(),
+            total_packages_processed: 0,
         }
     }
 
@@ -764,15 +792,7 @@ impl SovereignDistroPackageAdvancementsSuiteV8 {
             .insert("v8_sandbox_ram_mb".to_string(), spec.allocated_ram_mb.to_string());
         pkg.properties
             .insert("v8_advancements_processed".to_string(), "true".to_string());
-        let mut verifier = SovereignUniversalPackageSignatureVerifier::new();
-        verifier.add_trusted_key("sovereign_master_key", b"pubkey_data_32_bytes_pqc");
-
-        Self {
-            sat_resolver: SovereignUniversalSatDependencyResolver::new(),
-            sig_verifier: verifier,
-            trigger_engine: SovereignUniversalSystemTriggerIntegratorEngine::new(),
-            total_packages_processed: 0,
-        }
+        Ok(())
     }
 
     pub fn process_and_verify_pr_package(
@@ -890,6 +910,9 @@ mod tests {
             Some("true")
         );
         assert!(pkg.properties.contains_key("v8_sandbox_ram_mb"));
+    }
+
+    #[test]
     fn test_sat_dependency_resolver() {
         let mut sat = SovereignUniversalSatDependencyResolver::new();
         sat.register_clause(SatPackageClause {

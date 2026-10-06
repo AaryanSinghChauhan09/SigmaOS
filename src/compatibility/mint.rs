@@ -72,13 +72,15 @@ impl MintUpdateManager {
     }
 
     pub fn get_security_updates(&self) -> Vec<&UpdatePackage> {
-        self.available_updates.iter()
+        self.available_updates
+            .iter()
             .filter(|u| u.level == UpdateLevel::Security)
             .collect()
     }
 
     pub fn get_recommended_updates(&self) -> Vec<&UpdatePackage> {
-        self.available_updates.iter()
+        self.available_updates
+            .iter()
             .filter(|u| u.level == UpdateLevel::Recommended)
             .collect()
     }
@@ -110,8 +112,18 @@ impl MintUpdateManager {
             recommended_count,
             self.flatpak_updates.len(),
             total_size / (1024 * 1024),
-            if self.auto_update_enabled { "Enabled" } else { "Disabled" }
+            if self.auto_update_enabled {
+                "Enabled"
+            } else {
+                "Disabled"
+            }
         )
+    }
+}
+
+impl Default for MintUpdateManager {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -188,21 +200,26 @@ impl MintInstallManager {
                 p.name.to_lowercase().contains(&query.to_lowercase())
                     || p.description.to_lowercase().contains(&query.to_lowercase())
             })
-        self.packages.iter()
-            .filter(|p| p.name.to_lowercase().contains(&query.to_lowercase())
-                || p.description.to_lowercase().contains(&query.to_lowercase()))
             .collect()
     }
 
     pub fn get_category_packages(&self, category: &str) -> Vec<&SoftwarePackage> {
-        self.packages.iter()
+        self.packages
+            .iter()
             .filter(|p| p.category == category)
             .collect()
     }
 
     pub fn get_flatpak_match(&self, apt_package: &str) -> Option<&SoftwarePackage> {
-        self.packages.iter()
+        self.packages
+            .iter()
             .find(|p| p.source == PackageSource::Flatpak && p.name == apt_package)
+    }
+}
+
+impl Default for MintInstallManager {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -277,6 +294,12 @@ impl CinnamonDesktopManager {
     }
 }
 
+impl Default for CinnamonDesktopManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// ============================================================================
 /// 4. XApp Cross-Desktop Integration
 /// ============================================================================
@@ -323,6 +346,12 @@ impl XAppPreferences {
             self.font_size,
             self.animations_enabled
         )
+    }
+}
+
+impl Default for XAppPreferences {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -376,6 +405,12 @@ impl MintSystemConfig {
             self.timeshift_enabled,
             self.firewall_enabled
         )
+    }
+}
+
+impl Default for MintSystemConfig {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -457,7 +492,7 @@ mod tests {
             old_version: "5.15.0".to_string(),
             new_version: "5.15.1".to_string(),
             level: UpdateLevel::Security,
-            size: 10 * 1024 * 1024, // 10MB
+            size: 10 * 1024 * 1024,
             description: "Critical security fix".to_string(),
         };
 
