@@ -1,7 +1,11 @@
 // SigmaOS Omarchy Complete Gap Closure Engine
 // Zero-dependency Rust implementation covering automated dotfile git sync, Hyprland bezier animation matrix, Neovim Treesitter/LSP Mason manager, and Kitty/Starship/Fastfetch theme presets.
 
+#[cfg(not(any(feature = "standalone_test", test)))]
 use crate::klib::vec::Vec;
+
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec::Vec;
 
 /// Dotfile Git Sync Repository State
 #[derive(Debug, Clone)]
@@ -67,6 +71,17 @@ impl OmarchyHyprlandAnimMatrixEngine {
 impl Default for OmarchyHyprlandAnimMatrixEngine {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_omarchy_complete_gap_closure_suite() {
+        let mut suite = SovereignOmarchyCompleteGapClosureSuite::new();
+        assert!(suite.verify_suite());
     }
 }
 
