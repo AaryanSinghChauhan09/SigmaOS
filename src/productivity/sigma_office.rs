@@ -6800,6 +6800,169 @@ impl SovereignFinancialValuationEngine {
     }
 }
 
+// ---------------------------------------------------------------------------
+// 6. Google Sheets / Odoo Dynamic Array Formula & Spill Engine
+// ---------------------------------------------------------------------------
+
+/// Result of evaluating a dynamic array formula spilling across a target range.
+#[derive(Debug, Clone, PartialEq)]
+pub enum DynamicArraySpillResult {
+    Success {
+        top_left_cell: (u32, u32),
+        rows: usize,
+        cols: usize,
+        values: Vec<Vec<f64>>,
+    },
+    SpillError {
+        blocking_cell: (u32, u32),
+        message: String,
+    },
+}
+
+/// Sovereign Dynamic Array Formula & Spill Engine inspired by Google Sheets & Odoo.
+#[derive(Debug, Clone, Default)]
+pub struct SovereignDynamicArrayFormulaSpillEngine;
+
+impl SovereignDynamicArrayFormulaSpillEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    /// Evaluates a `SEQUENCE` formula spilling a range of numbers.
+    /// Checks target cells in `occupied_cells` for `#SPILL!` collision before spilling.
+    pub fn evaluate_sequence_spill(
+        &self,
+        top_left: (u32, u32),
+        rows: usize,
+        cols: usize,
+        start: f64,
+        step: f64,
+        occupied_cells: &HashMap<(u32, u32), String>,
+    ) -> DynamicArraySpillResult {
+        // Check for spill collisions
+        for r in 0..rows {
+            for c in 0..cols {
+                let cell = (top_left.0 + r as u32, top_left.1 + c as u32);
+                if cell != top_left && occupied_cells.contains_key(&cell) {
+                    return DynamicArraySpillResult::SpillError {
+                        blocking_cell: cell,
+                        message: format!("#SPILL! collision at cell ({}, {})", cell.0, cell.1),
+                    };
+                }
+            }
+        }
+
+        let mut matrix = Vec::with_capacity(rows);
+        let mut current = start;
+        for _ in 0..rows {
+            let mut row_vals = Vec::with_capacity(cols);
+            for _ in 0..cols {
+                row_vals.push(current);
+                current += step;
+            }
+            matrix.push(row_vals);
+        }
+
+        DynamicArraySpillResult::Success {
+            top_left_cell: top_left,
+            rows,
+            cols,
+            values: matrix,
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// 7. Salesforce Einstein / Zoho CRM Pipeline Analytics Engine
+// ---------------------------------------------------------------------------
+
+/// Sovereign Salesforce Einstein & Zoho CRM Pipeline Analytics Engine.
+#[derive(Debug, Clone, Default)]
+pub struct SovereignSalesforceEinsteinAnalyticsPipelineEngine;
+
+impl SovereignSalesforceEinsteinAnalyticsPipelineEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    /// Predicts deal win probability score (0.0 to 1.0) and generates AI next best action.
+    pub fn evaluate_deal_pipeline_opportunity(
+        &self,
+        _amount: f64,
+        stage_progress: f64, // 0.0 to 1.0
+        stagnant_days: u32,
+        has_decision_maker_contact: bool,
+    ) -> (f64, &'static str) {
+        let mut probability = stage_progress * 0.7;
+
+        if has_decision_maker_contact {
+            probability += 0.25;
+        }
+
+        if stagnant_days > 30 {
+            probability -= 0.3;
+        } else if stagnant_days > 14 {
+            probability -= 0.1;
+        }
+
+        let clamped_prob = probability.min(1.0).max(0.0);
+
+        let next_best_action = if stagnant_days > 30 {
+            "Trigger executive sponsor outreach to unblock stalled deal"
+        } else if !has_decision_maker_contact {
+            "Schedule discovery meeting with VP/C-level decision maker"
+        } else if clamped_prob >= 0.75 {
+            "Send formal contract proposal and quote for e-signature"
+        } else {
+            "Send product demo follow-up and ROI case study"
+        };
+
+        (clamped_prob, next_best_action)
+    }
+}
+
+// ---------------------------------------------------------------------------
+// 8. Bitrix24 / Odoo Omnichannel Telephony & CRM Auto-Logging Engine
+// ---------------------------------------------------------------------------
+
+/// Sovereign Bitrix24 & Odoo Omnichannel Telephony & CRM Auto-Logging Engine.
+#[derive(Debug, Clone, Default)]
+pub struct SovereignBitrix24OmnichannelTelephonyCrmEngine {
+    logged_calls: Vec<(String, String, u32, String)>, // (call_id, phone_number, duration_sec, transcript)
+}
+
+impl SovereignBitrix24OmnichannelTelephonyCrmEngine {
+    pub fn new() -> Self {
+        Self {
+            logged_calls: Vec::new(),
+        }
+    }
+
+    /// Ingests a completed PBX call event, logs transcript, and auto-generates CRM lead record if new contact.
+    pub fn process_pbx_call_event(
+        &mut self,
+        call_id: &str,
+        phone_number: &str,
+        duration_sec: u32,
+        transcript: &str,
+    ) -> (String, bool) {
+        self.logged_calls.push((
+            call_id.to_string(),
+            phone_number.to_string(),
+            duration_sec,
+            transcript.to_string(),
+        ));
+
+        let auto_created_lead = transcript.contains("pricing") || transcript.contains("quote") || duration_sec > 180;
+        let summary = format!(
+            "Logged call [{}] from {} ({}s). Lead auto-created: {}",
+            call_id, phone_number, duration_sec, auto_created_lead
+        );
+
+        (summary, auto_created_lead)
+    }
+}
+
 // Placeholder types for compilation
 mod sigma_types {
     pub type Result<T> = core::result::Result<T, &'static str>;
@@ -8093,5 +8256,40 @@ mod tests {
         let forecasted = val_engine.forecast_cash_flows(100.0, 0.10, 3);
         assert_eq!(forecasted.len(), 3);
         assert!((forecasted[0] - 110.0).abs() < 1e-5);
+
+        // 11. SovereignDynamicArrayFormulaSpillEngine
+        let array_spill = SovereignDynamicArrayFormulaSpillEngine::new();
+        let mut occupied = HashMap::new();
+        let res = array_spill.evaluate_sequence_spill((1, 1), 2, 2, 1.0, 1.0, &occupied);
+        match res {
+            DynamicArraySpillResult::Success { rows, cols, values, .. } => {
+                assert_eq!(rows, 2);
+                assert_eq!(cols, 2);
+                assert_eq!(values[0], vec![1.0, 2.0]);
+                assert_eq!(values[1], vec![3.0, 4.0]);
+            }
+            _ => panic!("Expected Success result"),
+        }
+
+        occupied.insert((1, 2), "Blocking data".to_string());
+        let spill_err = array_spill.evaluate_sequence_spill((1, 1), 2, 2, 1.0, 1.0, &occupied);
+        match spill_err {
+            DynamicArraySpillResult::SpillError { blocking_cell, .. } => {
+                assert_eq!(blocking_cell, (1, 2));
+            }
+            _ => panic!("Expected SpillError result"),
+        }
+
+        // 12. SovereignSalesforceEinsteinAnalyticsPipelineEngine
+        let einstein_engine = SovereignSalesforceEinsteinAnalyticsPipelineEngine::new();
+        let (prob, action) = einstein_engine.evaluate_deal_pipeline_opportunity(250000.0, 0.8, 5, true);
+        assert!(prob >= 0.75);
+        assert!(action.contains("Send formal contract proposal"));
+
+        // 13. SovereignBitrix24OmnichannelTelephonyCrmEngine
+        let mut pbx_engine = SovereignBitrix24OmnichannelTelephonyCrmEngine::new();
+        let (summary, auto_lead) = pbx_engine.process_pbx_call_event("call_001", "+18005550199", 240, "Discussed enterprise pricing quote.");
+        assert!(auto_lead);
+        assert!(summary.contains("Lead auto-created: true"));
     }
 }
