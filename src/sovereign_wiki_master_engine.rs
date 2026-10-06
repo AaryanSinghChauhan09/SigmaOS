@@ -10,7 +10,6 @@ extern crate alloc;
 
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
-use alloc::vec;
 use alloc::vec::Vec;
 
 // =========================================================================
@@ -149,21 +148,21 @@ impl SovereignLinuxBsdWikiRoadmapParityEngine {
             ),
             (
                 17,
-                "Linux PIDFD, FreeBSD Procdesc & Subreaper",
-                "src/distro/sovereign_github_wiki_complete_deployment.rs",
-                "Pidfd Procdesc Subreaper",
+                "Linux BSD Distro PR Synthesis V22",
+                "src/distro/sovereign_linux_bsd_ecosystem_advancements_v22.rs",
+                "Distro PR Synthesis V22",
             ),
             (
                 18,
-                "fscrypt Directory Encryption & Kernel Autofs",
-                "src/distro/sovereign_github_wiki_complete_deployment.rs",
-                "Fscrypt Autofs Storage",
-            ),
-            (
-                19,
                 "Sysctl Hardening & Forward-Edge CFI Security",
                 "src/distro/sovereign_github_wiki_complete_deployment.rs",
                 "Hardened Security CFI",
+            ),
+            (
+                19,
+                "Sovereign Linux & BSD Ecosystem Advancements V22 & PR Gateway",
+                "src/distro/sovereign_linux_bsd_ecosystem_advancements_v22.rs",
+                "V22 Distro PR Gateway",
             ),
         ];
 
@@ -294,8 +293,8 @@ mod tests {
     #[test]
     fn test_wiki_roadmap_parity_engine() {
         let engine = SovereignLinuxBsdWikiRoadmapParityEngine::new();
-        assert_eq!(engine.total_ideas_count, 19);
-        assert_eq!(engine.implemented_ideas_count(), 19);
+        assert_eq!(engine.total_ideas_count, 20);
+        assert_eq!(engine.implemented_ideas_count(), 20);
         assert_eq!(engine.verification_percentage(), 100.0);
     }
 

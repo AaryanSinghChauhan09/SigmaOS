@@ -27,19 +27,16 @@ mod ipc;
 use bore::{BoreScheduler, BoreTask};
 use ipc::{Channel, Message};
 use memory::{KernelPoolManager, PoolType};
-use scheduler::{Priority, Process, Scheduler};
+use scheduler::{CfsScheduler, Priority, SchedulerPolicy};
 
 #[test]
 fn test_kernel_scheduler_algorithm_inspection() {
-    let mut sched = Scheduler::new();
-    let p1 = Process::new(1, "kernel_worker".to_string(), Priority::High);
-    let p2 = Process::new(2, "user_daemon".to_string(), Priority::Normal);
+    let mut sched = CfsScheduler::new(1000000, 20000000);
+    let _p1 = sched.create_process(Priority::high(), SchedulerPolicy::Normal);
+    let _p2 = sched.create_process(Priority::normal(), SchedulerPolicy::Normal);
 
-    sched.add_process(p1);
-    sched.add_process(p2);
-
-    assert_eq!(sched.processes.len(), 2);
-    let scheduled = sched.schedule();
+    assert_eq!(sched.runnable_count(), 2);
+    let scheduled = sched.pick_next_task();
     assert!(scheduled.is_some());
 }
 
