@@ -196,12 +196,13 @@ impl SearchManager {
 
     /// Search files
     fn search_files(&self, query: &str) -> Vec<SearchResult> {
-        let query_lower = query.to_lowercase();
+        // Bolt Optimization: Zero-allocation case-insensitive substring matching.
+        // Avoids allocating heap String instances via `to_lowercase()` for title, description, and path on every searched file entry.
         self.indexed_files.values()
             .filter(|r| {
-                r.title.to_lowercase().contains(&query_lower) ||
-                r.description.to_lowercase().contains(&query_lower) ||
-                r.path.to_lowercase().contains(&query_lower)
+                contains_ignore_case(&r.title, query) ||
+                contains_ignore_case(&r.description, query) ||
+                contains_ignore_case(&r.path, query)
             })
             .cloned()
             .collect()
@@ -209,11 +210,12 @@ impl SearchManager {
 
     /// Search applications
     fn search_applications(&self, query: &str) -> Vec<SearchResult> {
-        let query_lower = query.to_lowercase();
+        // Bolt Optimization: Zero-allocation case-insensitive substring matching.
+        // Avoids allocating heap String instances via `to_lowercase()` for title and description on every searched app entry.
         self.indexed_apps.values()
             .filter(|r| {
-                r.title.to_lowercase().contains(&query_lower) ||
-                r.description.to_lowercase().contains(&query_lower)
+                contains_ignore_case(&r.title, query) ||
+                contains_ignore_case(&r.description, query)
             })
             .cloned()
             .collect()
@@ -221,11 +223,12 @@ impl SearchManager {
 
     /// Search settings
     fn search_settings(&self, query: &str) -> Vec<SearchResult> {
-        let query_lower = query.to_lowercase();
+        // Bolt Optimization: Zero-allocation case-insensitive substring matching.
+        // Avoids allocating heap String instances via `to_lowercase()` for title and description on every searched setting entry.
         self.indexed_settings.values()
             .filter(|r| {
-                r.title.to_lowercase().contains(&query_lower) ||
-                r.description.to_lowercase().contains(&query_lower)
+                contains_ignore_case(&r.title, query) ||
+                contains_ignore_case(&r.description, query)
             })
             .cloned()
             .collect()
@@ -233,11 +236,12 @@ impl SearchManager {
 
     /// Search commands
     fn search_commands(&self, query: &str) -> Vec<SearchResult> {
-        let query_lower = query.to_lowercase();
+        // Bolt Optimization: Zero-allocation case-insensitive substring matching.
+        // Avoids allocating heap String instances via `to_lowercase()` for title and description on every searched command entry.
         self.indexed_commands.values()
             .filter(|r| {
-                r.title.to_lowercase().contains(&query_lower) ||
-                r.description.to_lowercase().contains(&query_lower)
+                contains_ignore_case(&r.title, query) ||
+                contains_ignore_case(&r.description, query)
             })
             .cloned()
             .collect()
@@ -334,6 +338,27 @@ pub struct SearchStatistics {
     pub indexed_apps: usize,
     pub indexed_settings: usize,
     pub indexed_commands: usize,
+}
+
+/// Zero-allocation case-insensitive substring search helper.
+/// Checks whether `haystack` contains `needle`, ignoring ASCII case, without allocating heap Strings.
+fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
+    if needle.is_empty() {
+        return true;
+    }
+    if haystack.len() < needle.len() {
+        return false;
+    }
+    if haystack.is_ascii() && needle.is_ascii() {
+        let needle_bytes = needle.as_bytes();
+        haystack.as_bytes().windows(needle_bytes.len()).any(|window| {
+            window.iter().zip(needle_bytes.iter()).all(|(&b1, &b2)| {
+                b1.to_ascii_lowercase() == b2.to_ascii_lowercase()
+            })
+        })
+    } else {
+        haystack.to_lowercase().contains(&needle.to_lowercase())
+    }
 }
 
 #[cfg(test)]
