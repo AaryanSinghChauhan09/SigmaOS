@@ -395,6 +395,12 @@ pub use sovereign_linux_bsd_ecosystem_advancements_v23::*;
 pub mod arch_gap_closure_advancements_v24;
 pub use arch_gap_closure_advancements_v24::*;
 
+pub mod sovereign_2080_distro_supremacy_engine;
+pub use sovereign_2080_distro_supremacy_engine::*;
+
+pub mod sovereign_wiki_ideas_pr_deployment_engine;
+pub use sovereign_wiki_ideas_pr_deployment_engine::*;
+
 pub mod sovereign_mint_omarchy_supremacy_suite;
 pub use sovereign_mint_omarchy_supremacy_suite::*;
 
