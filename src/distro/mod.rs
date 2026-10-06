@@ -129,6 +129,8 @@ pub mod stable_components;
 pub mod visual_dashboard;
 pub mod void_runit;
 pub mod wiki_ideas_implementation;
+pub mod sovereign_linux_bsd_ecosystem_advancements_v22;
+pub mod sovereign_architecture_development_decision_plan;
 pub use sovereign_linux_bsd_wiki_master_engine::*;
 
 pub use clear_linux::{

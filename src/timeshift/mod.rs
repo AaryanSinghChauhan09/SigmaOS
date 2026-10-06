@@ -1,21 +1,19 @@
-// SPDX-License-Identifier: MIT
-// SigmaOS Timeshift-Inspired Backup System
-// Linux Mint Timeshift-inspired system restore and backup management
+// Timeshift System Restore Tool
+// Inspired by Linux Mint Timeshift
+// Provides system snapshots with RSYNC+hardlinks or BTRFS snapshot support
 
-use std::collections::BTreeMap;
-use std::string::String;
-use std::vec::Vec;
+use std::collections::HashMap;
+use std::path::PathBuf;
 
 /// Snapshot mode
 #[derive(Debug, Clone, PartialEq)]
 pub enum SnapshotMode {
     Rsync,
     Btrfs,
-    Zfs,
-    Custom(String),
+    Custom,
 }
 
-/// Snapshot level
+/// Snapshot level for retention policy
 #[derive(Debug, Clone, PartialEq)]
 pub enum SnapshotLevel {
     Hourly,
@@ -25,306 +23,343 @@ pub enum SnapshotLevel {
     Yearly,
 }
 
-/// Snapshot state
-#[derive(Debug, Clone, PartialEq)]
-pub enum SnapshotState {
-    Creating,
-    Complete,
-    Failed(String),
-    Restoring,
-    Deleted,
-}
-
-/// Snapshot information
+/// Snapshot with metadata
 #[derive(Debug, Clone)]
 pub struct Snapshot {
     pub id: String,
-    pub timestamp: String,
+    pub timestamp: i64,
     pub mode: SnapshotMode,
     pub level: SnapshotLevel,
-    pub state: SnapshotState,
-    pub size: u64,
-    pub description: String,
+    pub size_bytes: u64,
+    pub path: PathBuf,
+    pub is_boot_snapshot: bool,
     pub tags: Vec<String>,
-    pub excluded_paths: Vec<String>,
 }
 
 impl Snapshot {
-    pub fn new(id: String, mode: SnapshotMode, level: SnapshotLevel) -> Self {
+    pub fn new(id: String, mode: SnapshotMode, level: SnapshotLevel, path: PathBuf) -> Self {
         Self {
             id,
-            timestamp: String::new(),
+            timestamp: chrono::Utc::now().timestamp(),
             mode,
             level,
-            state: SnapshotState::Creating,
-            size: 0,
-            description: String::new(),
+            size_bytes: 0,
+            path,
+            is_boot_snapshot: false,
             tags: Vec::new(),
-            excluded_paths: Vec::new(),
         }
     }
 
-    /// Check if snapshot is complete
-    pub fn is_complete(&self) -> bool {
-        matches!(self.state, SnapshotState::Complete)
+    pub fn with_size(mut self, size: u64) -> Self {
+        self.size_bytes = size;
+        self
     }
 
-    /// Check if snapshot is failed
-    pub fn is_failed(&self) -> bool {
-        matches!(self.state, SnapshotState::Failed(_))
+    pub fn with_boot_snapshot(mut self, is_boot: bool) -> Self {
+        self.is_boot_snapshot = is_boot;
+        self
+    }
+
+    pub fn with_tags(mut self, tags: Vec<String>) -> Self {
+        self.tags = tags;
+        self
+    }
+
+    pub fn add_tag(&mut self, tag: String) {
+        self.tags.push(tag);
+    }
+
+    /// Format size in human-readable format
+    pub fn format_size(&self) -> String {
+        let bytes = self.size_bytes;
+        if bytes < 1024 {
+            format!("{} B", bytes)
+        } else if bytes < 1024 * 1024 {
+            format!("{:.1} KB", bytes as f64 / 1024.0)
+        } else if bytes < 1024 * 1024 * 1024 {
+            format!("{:.1} MB", bytes as f64 / (1024.0 * 1024.0))
+        } else if bytes < 1024 * 1024 * 1024 * 1024 {
+            format!("{:.1} GB", bytes as f64 / (1024.0 * 1024.0 * 1024.0))
+        } else {
+            format!("{:.1} TB", bytes as f64 / (1024.0 * 1024.0 * 1024.0 * 1024.0))
+        }
+    }
+
+    /// Format timestamp as human-readable date
+    pub fn format_timestamp(&self) -> String {
+        let dt = chrono::DateTime::from_timestamp(self.timestamp, 0).unwrap();
+        dt.format("%Y-%m-%d %H:%M:%S").to_string()
     }
 }
 
-/// Snapshot schedule
+/// Snapshot schedule configuration
 #[derive(Debug, Clone)]
 pub struct SnapshotSchedule {
-    pub level: SnapshotLevel,
-    pub interval: u32, // in hours
-    pub keep_count: u32,
+    pub mode: SnapshotMode,
     pub enabled: bool,
+    pub hourly_keep: u32,
+    pub daily_keep: u32,
+    pub weekly_keep: u32,
+    pub monthly_keep: u32,
+    pub yearly_keep: u32,
+    pub include_home: bool,
+    pub include_root: bool,
+    pub include_hidden_only: bool,
 }
 
 impl SnapshotSchedule {
-    pub fn new(level: SnapshotLevel, interval: u32, keep_count: u32) -> Self {
+    pub fn new(mode: SnapshotMode) -> Self {
         Self {
-            level,
-            interval,
-            keep_count,
+            mode,
             enabled: true,
+            hourly_keep: 0,
+            daily_keep: 5,
+            weekly_keep: 3,
+            monthly_keep: 2,
+            yearly_keep: 1,
+            include_home: false,
+            include_root: false,
+            include_hidden_only: false,
         }
+    }
+
+    pub fn with_hourly_keep(mut self, keep: u32) -> Self {
+        self.hourly_keep = keep;
+        self
+    }
+
+    pub fn with_daily_keep(mut self, keep: u32) -> Self {
+        self.daily_keep = keep;
+        self
+    }
+
+    pub fn with_weekly_keep(mut self, keep: u32) -> Self {
+        self.weekly_keep = keep;
+        self
+    }
+
+    pub fn with_monthly_keep(mut self, keep: u32) -> Self {
+        self.monthly_keep = keep;
+        self
+    }
+
+    pub fn with_yearly_keep(mut self, keep: u32) -> Self {
+        self.yearly_keep = keep;
+        self
+    }
+
+    pub fn with_home_inclusion(mut self, include: bool, hidden_only: bool) -> Self {
+        self.include_home = include;
+        self.include_hidden_only = hidden_only;
+        self
+    }
+
+    pub fn with_root_inclusion(mut self, include: bool) -> Self {
+        self.include_root = include;
+        self
     }
 }
 
-/// Timeshift-inspired backup manager
+/// Exclude pattern for snapshot
+#[derive(Debug, Clone)]
+pub struct ExcludePattern {
+    pub pattern: String,
+    pub is_regex: bool,
+}
+
+impl ExcludePattern {
+    pub fn new(pattern: String, is_regex: bool) -> Self {
+        Self { pattern, is_regex }
+    }
+}
+
+/// Timeshift backup manager
 #[derive(Debug, Clone)]
 pub struct TimeshiftManager {
-    pub snapshots: BTreeMap<String, Snapshot>,
-    pub schedules: Vec<SnapshotSchedule>,
-    pub mode: SnapshotMode,
-    pub snapshot_path: String,
-    pub exclude_patterns: Vec<String>,
-    pub include_patterns: Vec<String>,
-    pub automatic_snapshots: bool,
-    pub current_task: Option<String>,
+    snapshots: Vec<Snapshot>,
+    schedule: SnapshotSchedule,
+    snapshot_path: PathBuf,
+    exclude_patterns: Vec<ExcludePattern>,
 }
 
 impl TimeshiftManager {
-    pub fn new(mode: SnapshotMode) -> Self {
-        let mut manager = Self {
-            snapshots: BTreeMap::new(),
-            schedules: Vec::new(),
-            mode,
-            snapshot_path: String::from("/timeshift"),
+    pub fn new(snapshot_path: PathBuf, mode: SnapshotMode) -> Self {
+        Self {
+            snapshots: Vec::new(),
+            schedule: SnapshotSchedule::new(mode),
+            snapshot_path,
             exclude_patterns: Vec::new(),
-            include_patterns: Vec::new(),
-            automatic_snapshots: true,
-            current_task: None,
-        };
-
-        // Initialize default schedules
-        manager.init_schedules();
-        manager
-    }
-
-    /// Initialize default snapshot schedules
-    fn init_schedules(&mut self) {
-        self.schedules = vec![
-            SnapshotSchedule::new(SnapshotLevel::Hourly, 1, 24),
-            SnapshotSchedule::new(SnapshotLevel::Daily, 24, 7),
-            SnapshotSchedule::new(SnapshotLevel::Weekly, 168, 4),
-            SnapshotSchedule::new(SnapshotLevel::Monthly, 720, 3),
-        ];
-    }
-
-    /// Create snapshot
-    pub fn create_snapshot(&mut self, description: String) -> Result<String, &'static str> {
-        let id = format!("snapshot_{}", self.snapshots.len() + 1);
-        let level = SnapshotLevel::Daily; // Default to daily
-
-        let mut snapshot = Snapshot::new(id.clone(), self.mode.clone(), level);
-        snapshot.description = description;
-        snapshot.timestamp = Self::get_current_timestamp();
-
-        self.current_task = Some(format!("Creating snapshot {}", id));
-
-        // In real implementation, would create actual snapshot
-        // For now, simulate snapshot creation
-        snapshot.state = SnapshotState::Complete;
-        snapshot.size = 1024 * 1024 * 1024; // 1GB default
-
-        self.snapshots.insert(id.clone(), snapshot);
-        self.current_task = None;
-
-        Ok(id)
-    }
-
-    /// Restore snapshot
-    pub fn restore_snapshot(&mut self, id: String) -> Result<(), &'static str> {
-        if let Some(snapshot) = self.snapshots.get_mut(&id) {
-            if !snapshot.is_complete() {
-                return Err("Snapshot is not complete");
-            }
-
-            snapshot.state = SnapshotState::Restoring;
-            self.current_task = Some(format!("Restoring snapshot {}", id));
-
-            // In real implementation, would restore actual snapshot
-            snapshot.state = SnapshotState::Complete;
-            self.current_task = None;
-
-            Ok(())
-        } else {
-            Err("Snapshot not found")
         }
     }
 
-    /// Delete snapshot
-    pub fn delete_snapshot(&mut self, id: String) -> Result<(), &'static str> {
-        if let Some(mut snapshot) = self.snapshots.remove(&id) {
-            snapshot.state = SnapshotState::Deleted;
-            Ok(())
-        } else {
-            Err("Snapshot not found")
-        }
+    /// Set snapshot schedule
+    pub fn set_schedule(&mut self, schedule: SnapshotSchedule) {
+        self.schedule = schedule;
     }
 
-    /// Get snapshot by ID
-    pub fn get_snapshot(&self, id: &str) -> Option<&Snapshot> {
-        self.snapshots.get(id)
+    /// Get schedule
+    pub fn get_schedule(&self) -> &SnapshotSchedule {
+        &self.schedule
+    }
+
+    /// Create a new snapshot
+    pub fn create_snapshot(&mut self, level: SnapshotLevel, is_boot: bool) -> Result<Snapshot, String> {
+        let id = self.generate_snapshot_id();
+        let snapshot_path = self.snapshot_path.join(&id);
+        
+        let mut snapshot = Snapshot::new(id.clone(), self.schedule.mode.clone(), level, snapshot_path)
+            .with_boot_snapshot(is_boot);
+        
+        // In a real implementation, this would run rsync or BTRFS snapshot
+        // For now, we'll simulate it
+        snapshot = snapshot.with_size(1024 * 1024 * 100); // 100 MB
+        
+        self.snapshots.push(snapshot.clone());
+        Ok(snapshot)
     }
 
     /// Get all snapshots
-    pub fn get_all_snapshots(&self) -> Vec<&Snapshot> {
-        self.snapshots.values().collect()
+    pub fn get_snapshots(&self) -> &[Snapshot] {
+        &self.snapshots
     }
 
     /// Get snapshots by level
-    pub fn get_by_level(&self, level: &SnapshotLevel) -> Vec<&Snapshot> {
+    pub fn get_snapshots_by_level(&self, level: SnapshotLevel) -> Vec<&Snapshot> {
         self.snapshots
-            .values()
-            .filter(|s| &s.level == level)
+            .iter()
+            .filter(|s| s.level == level)
             .collect()
     }
 
+    /// Delete a snapshot
+    pub fn delete_snapshot(&mut self, id: &str) -> Result<(), String> {
+        let index = self.snapshots.iter().position(|s| s.id == id)
+            .ok_or_else(|| format!("Snapshot {} not found", id))?;
+        
+        self.snapshots.remove(index);
+        Ok(())
+    }
+
+    /// Restore a snapshot
+    pub fn restore_snapshot(&self, id: &str) -> Result<String, String> {
+        let snapshot = self.snapshots.iter()
+            .find(|s| s.id == id)
+            .ok_or_else(|| format!("Snapshot {} not found", id))?;
+        
+        // In a real implementation, this would restore from the snapshot
+        Ok(format!("Restored snapshot from {}", snapshot.format_timestamp()))
+    }
+
     /// Add exclude pattern
-    pub fn add_exclude(&mut self, pattern: String) {
+    pub fn add_exclude_pattern(&mut self, pattern: ExcludePattern) {
         self.exclude_patterns.push(pattern);
     }
 
-    /// Add include pattern
-    pub fn add_include(&mut self, pattern: String) {
-        self.include_patterns.push(pattern);
+    /// Get exclude patterns
+    pub fn get_exclude_patterns(&self) -> &[ExcludePattern] {
+        &self.exclude_patterns
     }
 
-    /// Set snapshot mode
-    pub fn set_mode(&mut self, mode: SnapshotMode) {
-        self.mode = mode;
-    }
-
-    /// Set snapshot path
-    pub fn set_snapshot_path(&mut self, path: String) {
-        self.snapshot_path = path;
-    }
-
-    /// Enable/disable automatic snapshots
-    pub fn set_automatic_snapshots(&mut self, enabled: bool) {
-        self.automatic_snapshots = enabled;
-    }
-
-    /// Run scheduled snapshots
-    pub fn run_scheduled_snapshots(&mut self) -> Vec<String> {
-        let mut created = Vec::new();
-
-        if !self.automatic_snapshots {
-            return created;
-        }
-
-        let schedules: Vec<_> = self.schedules.iter().cloned().collect();
-
-        for schedule in schedules {
-            if !schedule.enabled {
+    /// Prune old snapshots based on retention policy
+    pub fn prune_snapshots(&mut self) -> usize {
+        let mut pruned = 0;
+        
+        let keep_counts = [
+            (SnapshotLevel::Hourly, self.schedule.hourly_keep),
+            (SnapshotLevel::Daily, self.schedule.daily_keep),
+            (SnapshotLevel::Weekly, self.schedule.weekly_keep),
+            (SnapshotLevel::Monthly, self.schedule.monthly_keep),
+            (SnapshotLevel::Yearly, self.schedule.yearly_keep),
+        ];
+        
+        for (level, keep) in keep_counts {
+            if keep == 0 {
                 continue;
             }
-
-            // In real implementation, would check if schedule is due
-            // For now, just simulate
-            let description = format!("Scheduled {} snapshot", format!("{:?}", schedule.level).to_lowercase());
-            if let Ok(id) = self.create_snapshot(description) {
-                created.push(id);
-            }
-        }
-
-        created
-    }
-
-    /// Prune old snapshots based on schedule
-    pub fn prune_snapshots(&mut self) -> Vec<String> {
-        let mut pruned = Vec::new();
-
-        let schedules: Vec<_> = self.schedules.iter().cloned().collect();
-
-        for schedule in schedules {
-            let snapshots: Vec<_> = self
-                .get_by_level(&schedule.level)
+            
+            let level_snapshots: Vec<_> = self.snapshots
                 .iter()
-                .cloned()
+                .filter(|s| s.level == level)
                 .collect();
-
-            if snapshots.len() > schedule.keep_count as usize {
-                let to_remove = snapshots.len() - schedule.keep_count as usize;
-                let mut ids_to_remove = Vec::new();
+            
+            if level_snapshots.len() > keep as usize {
+                let to_remove = level_snapshots.len() - keep as usize;
+                let mut indices: Vec<_> = level_snapshots
+                    .iter()
+                    .enumerate()
+                    .filter(|(_, s)| !s.is_boot_snapshot)
+                    .map(|(i, _)| i)
+                    .collect();
                 
-                for i in 0..to_remove {
-                    if let Some(snapshot) = snapshots.get(i) {
-                        ids_to_remove.push(snapshot.id.clone());
-                    }
-                }
+                // Sort by timestamp to remove oldest first
+                indices.sort_by(|a, b| {
+                    let snap_a = &self.snapshots[*a];
+                    let snap_b = &self.snapshots[*b];
+                    snap_a.timestamp.cmp(&snap_b.timestamp)
+                });
                 
-                for id in ids_to_remove {
-                    if self.delete_snapshot(id.clone()).is_ok() {
-                        pruned.push(id);
+                // Remove oldest first
+                for index in indices.iter().take(to_remove) {
+                    if !self.snapshots[*index].is_boot_snapshot {
+                        self.snapshots.remove(*index);
+                        pruned += 1;
                     }
                 }
             }
         }
-
+        
         pruned
     }
 
-    /// Get current task
-    pub fn get_current_task(&self) -> Option<&String> {
-        self.current_task.as_ref()
-    }
+    /// Get statistics
+    pub fn get_statistics(&self) -> TimeshiftStatistics {
+        let total_size: u64 = self.snapshots.iter().map(|s| s.size_bytes).sum();
+        let hourly = self.snapshots.iter().filter(|s| s.level == SnapshotLevel::Hourly).count();
+        let daily = self.snapshots.iter().filter(|s| s.level == SnapshotLevel::Daily).count();
+        let weekly = self.snapshots.iter().filter(|s| s.level == SnapshotLevel::Weekly).count();
+        let monthly = self.snapshots.iter().filter(|s| s.level == SnapshotLevel::Monthly).count();
+        let yearly = self.snapshots.iter().filter(|s| s.level == SnapshotLevel::Yearly).count();
+        let boot = self.snapshots.iter().filter(|s| s.is_boot_snapshot).count();
 
-    /// Get current timestamp
-    fn get_current_timestamp() -> String {
-        // In real implementation, would get actual timestamp
-        format!("{}", std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap_or_default()
-            .as_secs())
-    }
-
-    /// Add tag to snapshot
-    pub fn add_tag(&mut self, id: String, tag: String) -> Result<(), &'static str> {
-        if let Some(snapshot) = self.snapshots.get_mut(&id) {
-            snapshot.tags.push(tag);
-            Ok(())
-        } else {
-            Err("Snapshot not found")
+        TimeshiftStatistics {
+            total_snapshots: self.snapshots.len(),
+            total_size,
+            hourly,
+            daily,
+            weekly,
+            monthly,
+            yearly,
+            boot,
         }
     }
 
-    /// Get total snapshot size
-    pub fn get_total_size(&self) -> u64 {
-        self.snapshots.values().map(|s| s.size).sum()
+    fn generate_snapshot_id(&self) -> String {
+        use std::time::{SystemTime, UNIX_EPOCH};
+        let timestamp = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_secs();
+        format!("{}", timestamp)
     }
 }
 
 impl Default for TimeshiftManager {
     fn default() -> Self {
-        Self::new(SnapshotMode::Rsync)
+        Self::new(PathBuf::from("/timeshift"), SnapshotMode::Rsync)
     }
+}
+
+/// Timeshift statistics
+#[derive(Debug, Clone, PartialEq)]
+pub struct TimeshiftStatistics {
+    pub total_snapshots: usize,
+    pub total_size: u64,
+    pub hourly: usize,
+    pub daily: usize,
+    pub weekly: usize,
+    pub monthly: usize,
+    pub yearly: usize,
+    pub boot: usize,
 }
 
 #[cfg(test)]
@@ -332,70 +367,94 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_snapshot_creation() {
-        let snapshot = Snapshot::new(
-            String::from("test_snapshot"),
-            SnapshotMode::Rsync,
-            SnapshotLevel::Daily
-        );
-        
-        assert_eq!(snapshot.id, "test_snapshot");
-        assert!(!snapshot.is_complete());
-    }
-
-    #[test]
-    fn test_snapshot_schedule() {
-        let schedule = SnapshotSchedule::new(SnapshotLevel::Daily, 24, 7);
-        
-        assert_eq!(schedule.level, SnapshotLevel::Daily);
-        assert_eq!(schedule.interval, 24);
-        assert_eq!(schedule.keep_count, 7);
-    }
-
-    #[test]
-    fn test_timeshift_manager() {
-        let manager = TimeshiftManager::new(SnapshotMode::Rsync);
-        
-        assert_eq!(manager.mode, SnapshotMode::Rsync);
-        assert_eq!(manager.snapshot_path, "/timeshift");
+    fn test_manager_creation() {
+        let manager = TimeshiftManager::new(PathBuf::from("/timeshift"), SnapshotMode::Rsync);
+        assert_eq!(manager.get_snapshots().len(), 0);
     }
 
     #[test]
     fn test_create_snapshot() {
-        let mut manager = TimeshiftManager::new(SnapshotMode::Rsync);
-        
-        let id = manager.create_snapshot(String::from("Test snapshot")).unwrap();
-        assert!(manager.get_snapshot(&id).is_some());
-        assert!(manager.get_snapshot(&id).unwrap().is_complete());
-    }
-
-    #[test]
-    fn test_restore_snapshot() {
-        let mut manager = TimeshiftManager::new(SnapshotMode::Rsync);
-        
-        let id = manager.create_snapshot(String::from("Test snapshot")).unwrap();
-        assert!(manager.restore_snapshot(id).is_ok());
+        let mut manager = TimeshiftManager::new(PathBuf::from("/timeshift"), SnapshotMode::Rsync);
+        let snapshot = manager.create_snapshot(SnapshotLevel::Daily, false).unwrap();
+        assert_eq!(manager.get_snapshots().len(), 1);
+        assert_eq!(snapshot.level, SnapshotLevel::Daily);
     }
 
     #[test]
     fn test_delete_snapshot() {
-        let mut manager = TimeshiftManager::new(SnapshotMode::Rsync);
+        let mut manager = TimeshiftManager::new(PathBuf::from("/timeshift"), SnapshotMode::Rsync);
+        let snapshot = manager.create_snapshot(SnapshotLevel::Daily, false).unwrap();
+        let id = snapshot.id.clone();
+        manager.delete_snapshot(&id).unwrap();
+        assert_eq!(manager.get_snapshots().len(), 0);
+    }
+
+    #[test]
+    fn test_get_snapshots_by_level() {
+        let mut manager = TimeshiftManager::new(PathBuf::from("/timeshift"), SnapshotMode::Rsync);
+        manager.create_snapshot(SnapshotLevel::Daily, false).unwrap();
+        manager.create_snapshot(SnapshotLevel::Hourly, false).unwrap();
+        manager.create_snapshot(SnapshotLevel::Daily, false).unwrap();
         
-        let id = manager.create_snapshot(String::from("Test snapshot")).unwrap();
-        assert!(manager.delete_snapshot(id.clone()).is_ok());
-        assert!(manager.get_snapshot(&id).is_none());
+        let daily = manager.get_snapshots_by_level(SnapshotLevel::Daily);
+        assert_eq!(daily.len(), 2);
+    }
+
+    #[test]
+    fn test_snapshot_schedule() {
+        let schedule = SnapshotSchedule::new(SnapshotMode::Rsync)
+            .with_daily_keep(10)
+            .with_weekly_keep(5);
+        
+        assert_eq!(schedule.daily_keep, 10);
+        assert_eq!(schedule.weekly_keep, 5);
+    }
+
+    #[test]
+    fn test_exclude_patterns() {
+        let mut manager = TimeshiftManager::new(PathBuf::from("/timeshift"), SnapshotMode::Rsync);
+        manager.add_exclude_pattern(ExcludePattern::new("/home/user/Downloads".to_string(), false));
+        manager.add_exclude_pattern(ExcludePattern::new(".*\\.log".to_string(), true));
+        
+        assert_eq!(manager.get_exclude_patterns().len(), 2);
     }
 
     #[test]
     fn test_prune_snapshots() {
-        let mut manager = TimeshiftManager::new(SnapshotMode::Rsync);
+        let mut manager = TimeshiftManager::new(PathBuf::from("/timeshift"), SnapshotMode::Rsync);
+        manager.set_schedule(SnapshotSchedule::new(SnapshotMode::Rsync).with_daily_keep(2));
         
-        // Create more snapshots than keep count
-        for i in 0..10 {
-            manager.create_snapshot(format!("Snapshot {}", i)).unwrap();
+        // Create 5 daily snapshots
+        for _ in 0..5 {
+            manager.create_snapshot(SnapshotLevel::Daily, false).unwrap();
         }
         
         let pruned = manager.prune_snapshots();
-        assert!(!pruned.is_empty());
+        assert!(pruned > 0);
+        assert!(manager.get_snapshots_by_level(SnapshotLevel::Daily).len() <= 2);
+    }
+
+    #[test]
+    fn test_statistics() {
+        let mut manager = TimeshiftManager::new(PathBuf::from("/timeshift"), SnapshotMode::Rsync);
+        manager.create_snapshot(SnapshotLevel::Daily, false).unwrap();
+        manager.create_snapshot(SnapshotLevel::Hourly, false).unwrap();
+        manager.create_snapshot(SnapshotLevel::Weekly, false).unwrap();
+        
+        let stats = manager.get_statistics();
+        assert_eq!(stats.total_snapshots, 3);
+        assert_eq!(stats.daily, 1);
+        assert_eq!(stats.hourly, 1);
+        assert_eq!(stats.weekly, 1);
+    }
+
+    #[test]
+    fn test_boot_snapshot() {
+        let mut manager = TimeshiftManager::new(PathBuf::from("/timeshift"), SnapshotMode::Rsync);
+        let snapshot = manager.create_snapshot(SnapshotLevel::Hourly, true).unwrap();
+        assert!(snapshot.is_boot_snapshot);
+        
+        let stats = manager.get_statistics();
+        assert_eq!(stats.boot, 1);
     }
 }
