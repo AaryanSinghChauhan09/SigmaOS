@@ -52,8 +52,6 @@ pub mod arch_gap_closure;
 pub use arch_gap_closure::*;
 pub mod arch_ultimate_gap_closure;
 pub use arch_ultimate_gap_closure::*;
-pub mod arch_linux_pinnacle_gap_closure;
-pub use arch_linux_pinnacle_gap_closure::*;
 // SigmaOS Distro/Ecosystem Maturity Module
 pub mod arch;
 pub use arch::*;
@@ -329,8 +327,6 @@ pub use linux_bsd_pinnacle_synthesis::{
 
 pub mod sovereign_2070_distro_supremacy_engine;
 pub use sovereign_2070_distro_supremacy_engine::*;
-pub mod sovereign_2080_distro_supremacy_engine;
-pub use sovereign_2080_distro_supremacy_engine::*;
 pub mod sovereign_2028_distro_supremacy_engine;
 pub use sovereign_2028_distro_supremacy_engine::{
     BpfSchedExtPolicy, DirectScanoutFrame, EbpfSchedTask, FineIbtCallsiteGuard, MicroVmSpawnSpec,
@@ -371,10 +367,6 @@ pub mod community_ecosystem;
 pub use community_ecosystem::*;
 
 pub mod additional_linux_bsd_components;
-pub mod tech_media_distro_innovations;
-pub use tech_media_distro_innovations::*;
-pub mod tech_media_extended_innovations;
-pub use tech_media_extended_innovations::*;
 
 pub mod sovereign_2050_distro_supremacy_engine;
 
@@ -385,22 +377,12 @@ pub mod sovereign_2060_distro_supremacy_engine;
 pub mod sovereign_linux_bsd_master_synthesis;
 
 pub mod sovereign_media_and_distro_unimplemented_innovations;
-pub use sovereign_media_and_distro_unimplemented_innovations::*;
-
-pub mod sovereign_linux_bsd_media_wiki_unimplemented_ideas_engine;
-pub use sovereign_linux_bsd_media_wiki_unimplemented_ideas_engine::*;
-
-pub mod sovereign_github_wiki_complete_deployment;
-pub use sovereign_github_wiki_complete_deployment::*;
 
 pub mod sovereign_linux_bsd_pinnacle_innovations_v14;
 pub use sovereign_linux_bsd_pinnacle_innovations_v14::*;
 
 pub mod sovereign_2075_distro_supremacy_engine;
 pub use sovereign_2075_distro_supremacy_engine::*;
-
-pub mod sovereign_netbsd_parity_engine;
-pub use sovereign_netbsd_parity_engine::*;
 
 pub mod sovereign_mint_omarchy_supremacy_suite;
 pub use sovereign_mint_omarchy_supremacy_suite::*;
@@ -426,8 +408,8 @@ pub use sovereign_mint_omarchy_zenith_mastery::*;
 pub mod tech_media_publication_innovations;
 pub use tech_media_publication_innovations::*;
 
-pub mod sovereign_open_source_os_gap_closure_pr;
-pub use sovereign_open_source_os_gap_closure_pr::*;
+pub mod omarchy_omakase_ultimate_parity;
+pub use omarchy_omakase_ultimate_parity::*;
 
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;
