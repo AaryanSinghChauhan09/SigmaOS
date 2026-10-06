@@ -19,6 +19,7 @@
 - [15-Architecture-Decisions](15-Architecture-Decisions.md)
 - [16-Self-Sufficiency-Encyclopedia](16-Self-Sufficiency-Encyclopedia.md)
 - [17-Repository-Documents](17-Repository-Documents.md)
+- [23-Supreme-Performance-Architecture-Development-Decision-Plan](23-Supreme-Performance-Architecture-Development-Decision-Plan.md)
 - [AI-and-Agent-Runtime](AI-and-Agent-Runtime.md)
 - [AI-and-ML-Engine](AI-and-ML-Engine.md)
 - [Accessibility-and-UX](Accessibility-and-UX.md)

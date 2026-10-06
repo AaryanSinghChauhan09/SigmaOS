@@ -25,6 +25,7 @@ Each core OS component page is the canonical home for implementation status, ref
 - [Testing](./Testing.md)
 - [Contributing](./12-Contributing.md)
 - [Architecture decisions](./15-Architecture-Decisions.md)
+- [Supreme Performance Architecture Development Decision Plan (ADDP)](./23-Supreme-Performance-Architecture-Development-Decision-Plan.md)
 - [Project roadmap](./11-Roadmap.md)
 - [Repository Markdown archive](./17-Repository-Documents.md)
 
