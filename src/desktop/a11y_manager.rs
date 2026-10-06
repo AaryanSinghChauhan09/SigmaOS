@@ -405,28 +405,22 @@ mod tests {
     #[test]
     fn test_update_profile_screen_reader() {
         let mut manager = DesktopA11yManager::new();
-        let profiles = manager.get_profiles();
-        if let Some(profile) = profiles.first() {
-            assert!(manager.update_profile_screen_reader(&profile.id, ScreenReaderMode::On));
-        }
+        let profile_id = manager.get_profiles().first().map(|p| p.id.clone()).unwrap();
+        assert!(manager.update_profile_screen_reader(&profile_id, ScreenReaderMode::On));
     }
 
     #[test]
     fn test_update_profile_high_contrast() {
         let mut manager = DesktopA11yManager::new();
-        let profiles = manager.get_profiles();
-        if let Some(profile) = profiles.first() {
-            assert!(manager.update_profile_high_contrast(&profile.id, HighContrastMode::On));
-        }
+        let profile_id = manager.get_profiles().first().map(|p| p.id.clone()).unwrap();
+        assert!(manager.update_profile_high_contrast(&profile_id, HighContrastMode::On));
     }
 
     #[test]
     fn test_update_profile_sticky_keys() {
         let mut manager = DesktopA11yManager::new();
-        let profiles = manager.get_profiles();
-        if let Some(profile) = profiles.first() {
-            assert!(manager.update_profile_sticky_keys(&profile.id, true));
-        }
+        let profile_id = manager.get_profiles().first().map(|p| p.id.clone()).unwrap();
+        assert!(manager.update_profile_sticky_keys(&profile_id, true));
     }
 
     #[test]

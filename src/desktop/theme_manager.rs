@@ -439,8 +439,8 @@ mod tests {
         let mut manager = DesktopThemeManager::new();
 
         // Try to remove current GTK theme (should fail)
-        let current = manager.get_current_gtk_theme().unwrap();
-        let result = manager.remove_theme(&current.id);
+        let current_id = manager.get_current_gtk_theme().unwrap().id.clone();
+        let result = manager.remove_theme(&current_id);
         assert!(!result);
     }
 
@@ -450,11 +450,11 @@ mod tests {
         let gtk_themes = manager.get_themes_by_type(DesktopThemeType::Gtk);
 
         if gtk_themes.len() > 1 {
-            let new_theme = &gtk_themes[1];
-            assert!(manager.set_gtk_theme(&new_theme.id));
+            let new_theme_id = gtk_themes[1].id.clone();
+            assert!(manager.set_gtk_theme(&new_theme_id));
             assert_eq!(
                 manager.get_current_gtk_theme().unwrap().id,
-                new_theme.id
+                new_theme_id
             );
         }
     }

@@ -4,7 +4,7 @@
 //! including message queues, semaphores, and shared memory isolation.
 
 use sigmaos::ipc::{IpcNamespace, IpcObjectType, MessageQueueId, SemaphoreId, SharedMemoryId};
-use sigmaos::kernel::namespaces::KernelNamespaceType;
+use sigmaos::kernel::namespaces::{KernelNamespace, KernelNamespaceType};
 
 #[test]
 fn test_ipc_namespace_creation() {
