@@ -317,7 +317,8 @@ mod tests {
 
         // Try to remove current theme (should fail)
         let current = manager.get_current_theme().unwrap();
-        let result = manager.remove_theme(&current.id);
+        let current_id = current.id.clone();
+        let result = manager.remove_theme(&current_id);
         assert!(!result);
     }
 

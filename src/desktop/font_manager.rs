@@ -421,7 +421,8 @@ mod tests {
 
         // Try to remove default font (should fail)
         let default = manager.get_default_font().unwrap();
-        let result = manager.remove_family(&default.name);
+        let default_name = default.name.clone();
+        let result = manager.remove_family(&default_name);
         assert!(!result);
     }
 

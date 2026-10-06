@@ -309,8 +309,9 @@ mod tests {
         let mut manager = NotificationSoundManager::new();
         let sounds = manager.get_sounds();
         if let Some(sound) = sounds.first() {
-            assert!(manager.set_sound_volume(&sound.id, 75));
-            assert_eq!(manager.get_sound(&sound.id).unwrap().volume, 75);
+            let sound_id = sound.id.clone();
+            assert!(manager.set_sound_volume(&sound_id, 75));
+            assert_eq!(manager.get_sound(&sound_id).unwrap().volume, 75);
         }
     }
 
@@ -319,8 +320,9 @@ mod tests {
         let mut manager = NotificationSoundManager::new();
         let sounds = manager.get_sounds();
         if let Some(sound) = sounds.first() {
-            assert!(manager.set_sound_enabled(&sound.id, false));
-            assert!(!manager.get_sound(&sound.id).unwrap().enabled);
+            let sound_id = sound.id.clone();
+            assert!(manager.set_sound_enabled(&sound_id, false));
+            assert!(!manager.get_sound(&sound_id).unwrap().enabled);
         }
     }
 

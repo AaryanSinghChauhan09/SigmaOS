@@ -321,8 +321,9 @@ mod tests {
         let mut manager = DisplayResolutionManager::new();
         let displays = manager.get_displays();
         if let Some(display) = displays.first() {
-            assert!(manager.set_display_enabled(&display.id, false));
-            assert!(!manager.get_display(&display.id).unwrap().is_enabled);
+            let display_id = display.id.clone();
+            assert!(manager.set_display_enabled(&display_id, false));
+            assert!(!manager.get_display(&display_id).unwrap().is_enabled);
         }
     }
 
@@ -331,8 +332,9 @@ mod tests {
         let mut manager = DisplayResolutionManager::new();
         let displays = manager.get_displays();
         if let Some(display) = displays.first() {
-            assert!(manager.set_display_position(&display.id, 100, 100));
-            assert_eq!(manager.get_display(&display.id).unwrap().position, (100, 100));
+            let display_id = display.id.clone();
+            assert!(manager.set_display_position(&display_id, 100, 100));
+            assert_eq!(manager.get_display(&display_id).unwrap().position, (100, 100));
         }
     }
 
@@ -341,12 +343,13 @@ mod tests {
         let mut manager = DisplayResolutionManager::new();
         let displays = manager.get_displays();
         if let Some(display) = displays.first() {
+            let display_id = display.id.clone();
             let mode = DisplayMode::new(
                 "test_mode".to_string(),
                 Resolution::new(1280, 720),
                 RefreshRate::new(60),
             );
-            assert!(manager.add_display_mode(&display.id, mode));
+            assert!(manager.add_display_mode(&display_id, mode));
         }
     }
 

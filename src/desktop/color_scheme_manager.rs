@@ -385,7 +385,8 @@ mod tests {
 
         // Try to remove current scheme (should fail)
         let current = manager.get_current_scheme().unwrap();
-        let result = manager.remove_scheme(&current.id);
+        let current_id = current.id.clone();
+        let result = manager.remove_scheme(&current_id);
         assert!(!result);
     }
 
@@ -395,11 +396,11 @@ mod tests {
         let schemes = manager.get_schemes();
 
         if schemes.len() > 1 {
-            let new_scheme = &schemes[1];
-            assert!(manager.set_current_scheme(&new_scheme.id));
+            let new_scheme_id = schemes[1].id.clone();
+            assert!(manager.set_current_scheme(&new_scheme_id));
             assert_eq!(
                 manager.get_current_scheme().unwrap().id,
-                new_scheme.id
+                new_scheme_id
             );
         }
     }

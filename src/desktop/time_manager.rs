@@ -396,7 +396,8 @@ mod tests {
 
         // Try to remove current timezone (should fail)
         let current = manager.get_current_timezone().unwrap();
-        let result = manager.remove_timezone(&current.id);
+        let current_id = current.id.clone();
+        let result = manager.remove_timezone(&current_id);
         assert!(!result);
     }
 
@@ -406,11 +407,11 @@ mod tests {
         let timezones = manager.get_timezones();
 
         if timezones.len() > 1 {
-            let new_timezone = &timezones[1];
-            assert!(manager.set_current_timezone(&new_timezone.id));
+            let new_timezone_id = timezones[1].id.clone();
+            assert!(manager.set_current_timezone(&new_timezone_id));
             assert_eq!(
                 manager.get_current_timezone().unwrap().id,
-                new_timezone.id
+                new_timezone_id
             );
         }
     }
@@ -452,11 +453,11 @@ mod tests {
         let ntp_servers = manager.get_ntp_servers();
 
         if ntp_servers.len() > 1 {
-            let new_server = &ntp_servers[1];
-            assert!(manager.set_active_ntp_server(&new_server.id));
+            let new_server_id = ntp_servers[1].id.clone();
+            assert!(manager.set_active_ntp_server(&new_server_id));
 
             let active = manager.get_active_ntp_server().unwrap();
-            assert_eq!(active.id, new_server.id);
+            assert_eq!(active.id, new_server_id);
             assert!(active.active);
         }
     }

@@ -295,7 +295,6 @@ impl Default for PledgeManager {
 
 /// Common pledge promises
 pub mod promises {
-    use super::Permission;
     use super::PledgePromise;
     // PledgePromise is defined in terms of the pledge-local capability module
     // under standalone_test, and in terms of crate::security::capability

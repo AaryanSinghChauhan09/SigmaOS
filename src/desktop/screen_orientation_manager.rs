@@ -221,8 +221,9 @@ mod tests {
         let mut manager = DesktopScreenOrientationManager::new();
         let configs = manager.get_configs();
         if let Some(config) = configs.first() {
-            assert!(manager.set_config_orientation(&config.id, ScreenOrientation::PortraitLeft));
-            assert_eq!(manager.get_config(&config.id).unwrap().orientation, ScreenOrientation::PortraitLeft);
+            let config_id = config.id.clone();
+            assert!(manager.set_config_orientation(&config_id, ScreenOrientation::PortraitLeft));
+            assert_eq!(manager.get_config(&config_id).unwrap().orientation, ScreenOrientation::PortraitLeft);
         }
     }
 
@@ -231,8 +232,9 @@ mod tests {
         let mut manager = DesktopScreenOrientationManager::new();
         let configs = manager.get_configs();
         if let Some(config) = configs.first() {
-            assert!(manager.set_config_policy(&config.id, OrientationPolicy::Auto));
-            assert_eq!(manager.get_config(&config.id).unwrap().policy, OrientationPolicy::Auto);
+            let config_id = config.id.clone();
+            assert!(manager.set_config_policy(&config_id, OrientationPolicy::Auto));
+            assert_eq!(manager.get_config(&config_id).unwrap().policy, OrientationPolicy::Auto);
         }
     }
 

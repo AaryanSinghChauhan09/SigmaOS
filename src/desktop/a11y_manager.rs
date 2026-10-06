@@ -407,7 +407,8 @@ mod tests {
         let mut manager = DesktopA11yManager::new();
         let profiles = manager.get_profiles();
         if let Some(profile) = profiles.first() {
-            assert!(manager.update_profile_screen_reader(&profile.id, ScreenReaderMode::On));
+            let profile_id = profile.id.clone();
+            assert!(manager.update_profile_screen_reader(&profile_id, ScreenReaderMode::On));
         }
     }
 
@@ -416,7 +417,8 @@ mod tests {
         let mut manager = DesktopA11yManager::new();
         let profiles = manager.get_profiles();
         if let Some(profile) = profiles.first() {
-            assert!(manager.update_profile_high_contrast(&profile.id, HighContrastMode::On));
+            let profile_id = profile.id.clone();
+            assert!(manager.update_profile_high_contrast(&profile_id, HighContrastMode::On));
         }
     }
 
@@ -425,7 +427,8 @@ mod tests {
         let mut manager = DesktopA11yManager::new();
         let profiles = manager.get_profiles();
         if let Some(profile) = profiles.first() {
-            assert!(manager.update_profile_sticky_keys(&profile.id, true));
+            let profile_id = profile.id.clone();
+            assert!(manager.update_profile_sticky_keys(&profile_id, true));
         }
     }
 
