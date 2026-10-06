@@ -690,6 +690,366 @@ impl Default for FedoraSssdFreeIpaEngine {
     }
 }
 
+// =========================================================================
+// 8. FEDORA FIREWALLD DYNAMIC ZONE-BASED FIREWALL ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum FirewalldZoneKind {
+    Drop,
+    Work,
+    Home,
+    Public,
+    Trusted,
+    Dmz,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FirewalldZone {
+    pub name: String,
+    pub kind: FirewalldZoneKind,
+    pub allowed_ports: Vec<u16>,
+    pub allowed_services: Vec<String>,
+    pub is_default: bool,
+}
+
+pub struct FedoraFirewalldZoneEngine {
+    pub zones: BTreeMap<String, FirewalldZone>,
+    pub default_zone: String,
+}
+
+impl FedoraFirewalldZoneEngine {
+    pub fn new() -> Self {
+        let mut zones = BTreeMap::new();
+        zones.insert(
+            "public".to_string(),
+            FirewalldZone {
+                name: "public".to_string(),
+                kind: FirewalldZoneKind::Public,
+                allowed_ports: vec![22, 80, 443],
+                allowed_services: vec!["ssh".to_string(), "dhcpv6-client".to_string()],
+                is_default: true,
+            },
+        );
+        zones.insert(
+            "work".to_string(),
+            FirewalldZone {
+                name: "work".to_string(),
+                kind: FirewalldZoneKind::Work,
+                allowed_ports: vec![22, 80, 443, 8080],
+                allowed_services: vec!["ssh".to_string(), "ipp-client".to_string()],
+                is_default: false,
+            },
+        );
+
+        Self {
+            zones,
+            default_zone: "public".to_string(),
+        }
+    }
+
+    pub fn allow_port(&mut self, zone_name: &str, port: u16) -> Result<(), &'static str> {
+        if let Some(zone) = self.zones.get_mut(zone_name) {
+            if !zone.allowed_ports.contains(&port) {
+                zone.allowed_ports.push(port);
+            }
+            Ok(())
+        } else {
+            Err("firewalld: Zone not found")
+        }
+    }
+
+    pub fn allow_service(&mut self, zone_name: &str, service: &str) -> Result<(), &'static str> {
+        if let Some(zone) = self.zones.get_mut(zone_name) {
+            if !zone.allowed_services.contains(&service.to_string()) {
+                zone.allowed_services.push(service.to_string());
+            }
+            Ok(())
+        } else {
+            Err("firewalld: Zone not found")
+        }
+    }
+
+    pub fn is_port_permitted(&self, zone_name: &str, port: u16) -> bool {
+        if let Some(zone) = self.zones.get(zone_name) {
+            zone.allowed_ports.contains(&port)
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for FedoraFirewalldZoneEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 9. FEDORA FLATPAK OSTREE REPOSITORY SERVER ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FlatpakOstreeCommit {
+    pub commit_hash: String,
+    pub app_id: String,
+    pub branch: String,
+    pub arch: String,
+    pub timestamp_sec: u64,
+}
+
+pub struct FedoraFlatpakOstreeRepoServerEngine {
+    pub repo_name: String,
+    pub commits: Vec<FlatpakOstreeCommit>,
+    pub summary_index: BTreeMap<String, String>, // app_id -> latest commit_hash
+}
+
+impl FedoraFlatpakOstreeRepoServerEngine {
+    pub fn new(repo_name: &str) -> Self {
+        Self {
+            repo_name: repo_name.to_string(),
+            commits: Vec::new(),
+            summary_index: BTreeMap::new(),
+        }
+    }
+
+    pub fn publish_app_commit(
+        &mut self,
+        app_id: &str,
+        branch: &str,
+        arch: &str,
+        timestamp: u64,
+    ) -> String {
+        let commit_hash = format!("sha256_{:x}_{:x}", app_id.len() * 37, timestamp);
+        let commit = FlatpakOstreeCommit {
+            commit_hash: commit_hash.clone(),
+            app_id: app_id.to_string(),
+            branch: branch.to_string(),
+            arch: arch.to_string(),
+            timestamp_sec: timestamp,
+        };
+
+        self.commits.push(commit);
+        self.summary_index
+            .insert(app_id.to_string(), commit_hash.clone());
+        commit_hash
+    }
+
+    pub fn get_latest_commit(&self, app_id: &str) -> Option<String> {
+        self.summary_index.get(app_id).cloned()
+    }
+}
+
+impl Default for FedoraFlatpakOstreeRepoServerEngine {
+    fn default() -> Self {
+        Self::new("fedora-flatpaks")
+    }
+}
+
+// =========================================================================
+// 10. FEDORA PIPEWIRE WIREPLUMBER SESSION MANAGER ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct WirePlumberEndpoint {
+    pub endpoint_id: u32,
+    pub name: String,
+    pub media_class: String, // "Audio/Sink", "Audio/Source"
+    pub priority: u32,
+    pub is_default: bool,
+}
+
+pub struct FedoraPipeWireWirePlumberEngine {
+    pub endpoints: BTreeMap<u32, WirePlumberEndpoint>,
+    pub active_default_sink_id: Option<u32>,
+    pub lua_policy_rules: Vec<String>,
+}
+
+impl FedoraPipeWireWirePlumberEngine {
+    pub fn new() -> Self {
+        Self {
+            endpoints: BTreeMap::new(),
+            active_default_sink_id: None,
+            lua_policy_rules: vec![
+                "alsa_monitor.enable = true".to_string(),
+                "bluez_monitor.enable = true".to_string(),
+            ],
+        }
+    }
+
+    pub fn register_endpoint(&mut self, id: u32, name: &str, media_class: &str, priority: u32) {
+        let ep = WirePlumberEndpoint {
+            endpoint_id: id,
+            name: name.to_string(),
+            media_class: media_class.to_string(),
+            priority,
+            is_default: false,
+        };
+
+        self.endpoints.insert(id, ep);
+        if media_class == "Audio/Sink" {
+            self.auto_switch_default_sink();
+        }
+    }
+
+    pub fn auto_switch_default_sink(&mut self) {
+        let highest_prio_sink = self
+            .endpoints
+            .values()
+            .filter(|ep| ep.media_class == "Audio/Sink")
+            .max_by_key(|ep| ep.priority)
+            .map(|ep| ep.endpoint_id);
+
+        if let Some(id) = highest_prio_sink {
+            for ep in self.endpoints.values_mut() {
+                if ep.media_class == "Audio/Sink" {
+                    ep.is_default = ep.endpoint_id == id;
+                }
+            }
+            self.active_default_sink_id = Some(id);
+        }
+    }
+}
+
+impl Default for FedoraPipeWireWirePlumberEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 11. FEDORA SELINUX POLICY & AVC AUDIT ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SelinuxAvcDenialLog {
+    pub pid: u32,
+    pub scontext: String,
+    pub tcontext: String,
+    pub tclass: String,
+    pub permission: String,
+}
+
+pub struct FedoraSelinuxPolicyAuditEngine {
+    pub is_enforcing: bool,
+    pub booleans: BTreeMap<String, bool>,
+    pub avc_denials: Vec<SelinuxAvcDenialLog>,
+    pub file_contexts: BTreeMap<String, String>, // path_prefix -> selinux_type
+}
+
+impl FedoraSelinuxPolicyAuditEngine {
+    pub fn new() -> Self {
+        let mut booleans = BTreeMap::new();
+        booleans.insert("httpd_can_network_connect".to_string(), false);
+        booleans.insert("container_manage_dns".to_string(), true);
+
+        let mut fcon = BTreeMap::new();
+        fcon.insert("/var/www/html".to_string(), "httpd_sys_content_t".to_string());
+        fcon.insert("/etc/shadow".to_string(), "shadow_t".to_string());
+
+        Self {
+            is_enforcing: true,
+            booleans,
+            avc_denials: Vec::new(),
+            file_contexts: fcon,
+        }
+    }
+
+    pub fn setsebool(&mut self, name: &str, state: bool) -> Result<(), &'static str> {
+        if let Some(val) = self.booleans.get_mut(name) {
+            *val = state;
+            Ok(())
+        } else {
+            Err("SELinux: Boolean not found")
+        }
+    }
+
+    pub fn log_avc_denial(&mut self, pid: u32, scontext: &str, tcontext: &str, tclass: &str, perm: &str) {
+        self.avc_denials.push(SelinuxAvcDenialLog {
+            pid,
+            scontext: scontext.to_string(),
+            tcontext: tcontext.to_string(),
+            tclass: tclass.to_string(),
+            permission: perm.to_string(),
+        });
+    }
+
+    pub fn audit2allow_suggest_rule(&self) -> Vec<String> {
+        self.avc_denials
+            .iter()
+            .map(|d| format!("allow {} {}:{} {};", d.scontext, d.tcontext, d.tclass, d.permission))
+            .collect()
+    }
+
+    pub fn restorecon(&self, path: &str) -> Option<String> {
+        for (prefix, ftype) in &self.file_contexts {
+            if path.starts_with(prefix) {
+                return Some(ftype.clone());
+            }
+        }
+        None
+    }
+}
+
+impl Default for FedoraSelinuxPolicyAuditEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 12. FEDORA SYSTEMD-RESOLVED SPLIT-DNS ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SystemdResolvedLink {
+    pub ifname: String,
+    pub dns_servers: Vec<String>,
+    pub routing_domains: Vec<String>,
+    pub dns_over_tls: bool,
+}
+
+pub struct FedoraSystemdResolvedEngine {
+    pub links: BTreeMap<String, SystemdResolvedLink>,
+    pub global_dns: Vec<String>,
+}
+
+impl FedoraSystemdResolvedEngine {
+    pub fn new() -> Self {
+        Self {
+            links: BTreeMap::new(),
+            global_dns: vec!["1.1.1.1".to_string(), "8.8.8.8".to_string()],
+        }
+    }
+
+    pub fn configure_link_dns(&mut self, ifname: &str, dns: &[&str], domains: &[&str], dot: bool) {
+        self.links.insert(
+            ifname.to_string(),
+            SystemdResolvedLink {
+                ifname: ifname.to_string(),
+                dns_servers: dns.iter().map(|s| s.to_string()).collect(),
+                routing_domains: domains.iter().map(|s| s.to_string()).collect(),
+                dns_over_tls: dot,
+            },
+        );
+    }
+
+    pub fn resolve_domain_route(&self, domain: &str) -> Vec<String> {
+        for link in self.links.values() {
+            if link.routing_domains.iter().any(|d| domain.ends_with(d) || d == "~.") {
+                return link.dns_servers.clone();
+            }
+        }
+        self.global_dns.clone()
+    }
+}
+
+impl Default for FedoraSystemdResolvedEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub struct SovereignFedoraEcosystemSuite {
     pub koji: FedoraKojiBuildSystemEngine,
     pub bodhi: FedoraBodhiUpdateEngine,
@@ -703,6 +1063,11 @@ pub struct SovereignFedoraEcosystemSuite {
     pub containers: FedoraContainerStackEngine,
     pub greenwave: FedoraGreenwaveDecisionEngine,
     pub waiverdb: FedoraWaiverDbEngine,
+    pub firewalld: FedoraFirewalldZoneEngine,
+    pub flatpak_ostree: FedoraFlatpakOstreeRepoServerEngine,
+    pub wireplumber: FedoraPipeWireWirePlumberEngine,
+    pub selinux: FedoraSelinuxPolicyAuditEngine,
+    pub resolved: FedoraSystemdResolvedEngine,
 }
 
 impl SovereignFedoraEcosystemSuite {
@@ -720,6 +1085,11 @@ impl SovereignFedoraEcosystemSuite {
             containers: FedoraContainerStackEngine::new(),
             greenwave: FedoraGreenwaveDecisionEngine::new(),
             waiverdb: FedoraWaiverDbEngine::new(),
+            firewalld: FedoraFirewalldZoneEngine::new(),
+            flatpak_ostree: FedoraFlatpakOstreeRepoServerEngine::new("fedora-flatpaks"),
+            wireplumber: FedoraPipeWireWirePlumberEngine::new(),
+            selinux: FedoraSelinuxPolicyAuditEngine::new(),
+            resolved: FedoraSystemdResolvedEngine::new(),
         }
     }
 
@@ -809,6 +1179,65 @@ mod tests {
         let res = engine.layer_package("htop");
         assert!(res.contains("htop"));
         assert_eq!(engine.layered_packages, vec!["htop".to_string()]);
+    }
+
+    #[test]
+    fn test_fedora_firewalld_zone_engine() {
+        let mut fw = FedoraFirewalldZoneEngine::new();
+        assert!(fw.is_port_permitted("public", 80));
+        assert!(!fw.is_port_permitted("public", 9090));
+
+        fw.allow_port("public", 9090).unwrap();
+        assert!(fw.is_port_permitted("public", 9090));
+
+        fw.allow_service("work", "cockpit").unwrap();
+        assert!(fw.zones["work"].allowed_services.contains(&"cockpit".to_string()));
+    }
+
+    #[test]
+    fn test_fedora_flatpak_ostree_repo_server_engine() {
+        let mut flatpak = FedoraFlatpakOstreeRepoServerEngine::new("fedora-apps");
+        let hash1 = flatpak.publish_app_commit("org.gnome.Nautilus", "stable", "x86_64", 1700000000);
+        assert!(!hash1.is_empty());
+        assert_eq!(flatpak.get_latest_commit("org.gnome.Nautilus"), Some(hash1));
+    }
+
+    #[test]
+    fn test_fedora_pipewire_wireplumber_engine() {
+        let mut wp = FedoraPipeWireWirePlumberEngine::new();
+        wp.register_endpoint(1, "Speakers", "Audio/Sink", 50);
+        assert_eq!(wp.active_default_sink_id, Some(1));
+
+        wp.register_endpoint(2, "Headphones", "Audio/Sink", 100);
+        assert_eq!(wp.active_default_sink_id, Some(2));
+        assert!(wp.endpoints[&2].is_default);
+        assert!(!wp.endpoints[&1].is_default);
+    }
+
+    #[test]
+    fn test_fedora_selinux_policy_audit_engine() {
+        let mut selinux = FedoraSelinuxPolicyAuditEngine::new();
+        assert!(selinux.setsebool("httpd_can_network_connect", true).is_ok());
+
+        selinux.log_avc_denial(101, "httpd_t", "var_log_t", "file", "write");
+        let rules = selinux.audit2allow_suggest_rule();
+        assert_eq!(rules.len(), 1);
+        assert!(rules[0].contains("allow httpd_t var_log_t:file write;"));
+
+        let ftype = selinux.restorecon("/var/www/html/index.html");
+        assert_eq!(ftype, Some("httpd_sys_content_t".to_string()));
+    }
+
+    #[test]
+    fn test_fedora_systemd_resolved_engine() {
+        let mut resolved = FedoraSystemdResolvedEngine::new();
+        resolved.configure_link_dns("eth0", &["10.0.0.1"], &["corp.internal"], true);
+
+        let servers = resolved.resolve_domain_route("service.corp.internal");
+        assert_eq!(servers, vec!["10.0.0.1".to_string()]);
+
+        let default_servers = resolved.resolve_domain_route("google.com");
+        assert_eq!(default_servers, vec!["1.1.1.1".to_string(), "8.8.8.8".to_string()]);
     }
 }
 
