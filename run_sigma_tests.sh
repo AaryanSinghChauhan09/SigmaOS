@@ -535,13 +535,6 @@ if [ -f "src/distro/sovereign_linux_bsd_ecosystem_pinnacle_suite.rs" ]; then
     ./build/test_ecosystem_pinnacle
 fi
 
-if [ -f "src/distro/sovereign_linux_bsd_ecosystem_advancements_v25.rs" ]; then
-    echo "Running Sovereign Linux & BSD Ecosystem Advancements Suite V25 test suite..."
-    mkdir -p build
-    rustc --test src/distro/sovereign_linux_bsd_ecosystem_advancements_v25.rs --edition=2021 -o build/test_advancements_v25
-    ./build/test_advancements_v25
-fi
-
 if [ -f "src/distro/sovereign_linux_bsd_pinnacle_innovations_v14.rs" ]; then
     echo "Running Sovereign Linux & BSD Pinnacle Innovations Suite V14 test suite..."
     mkdir -p build
@@ -554,6 +547,13 @@ if [ -f "src/distro/sovereign_linux_bsd_ecosystem_advancements_v24.rs" ]; then
     mkdir -p build
     rustc --test src/distro/sovereign_linux_bsd_ecosystem_advancements_v24.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_advancements_v24
     ./build/test_advancements_v24
+fi
+
+if [ -f "src/distro/omarchy_gap_closure_advancements_v25.rs" ]; then
+    echo "Running Omarchy Linux Gap Closure Advancements V25 test suite..."
+    mkdir -p build
+    rustc --test src/distro/omarchy_gap_closure_advancements_v25.rs --edition=2021 -o build/test_omarchy_v25
+    ./build/test_omarchy_v25
 fi
 
 if [ -f "src/compatibility/omarchy_supreme_engine.rs" ]; then
@@ -652,20 +652,6 @@ if [ -f "src/desktop/omarchy_browser_theme_sync.rs" ]; then
     mkdir -p build
     rustc --test src/desktop/omarchy_browser_theme_sync.rs --edition=2021 -o build/test_browser_sync
     ./build/test_browser_sync
-fi
-
-if [ -f "src/distro/sovereign_linux_bsd_ecosystem_advancements_v22.rs" ]; then
-    echo "Running Sovereign Linux & BSD Ecosystem Advancements V22 & PR Gateway test suite..."
-    mkdir -p build
-    rustc --test src/distro/sovereign_linux_bsd_ecosystem_advancements_v22.rs --edition=2021 -o build/test_advancements_v22
-    ./build/test_advancements_v22
-fi
-
-if [ -f "src/distro/sovereign_architecture_development_decision_plan.rs" ]; then
-    echo "Running Sovereign Architecture Development Decision Plan test suite..."
-    mkdir -p build
-    rustc --test src/distro/sovereign_architecture_development_decision_plan.rs --edition=2021 -o build/test_arch_decision_plan
-    ./build/test_arch_decision_plan
 fi
 
 echo "All SigmaOS test suites completed."

@@ -400,6 +400,12 @@ pub use sovereign_github_wiki_complete_deployment::*;
 pub mod sovereign_linux_bsd_pinnacle_innovations_v14;
 pub use sovereign_linux_bsd_pinnacle_innovations_v14::*;
 
+pub mod sovereign_linux_bsd_ecosystem_advancements_v24;
+pub use sovereign_linux_bsd_ecosystem_advancements_v24::*;
+
+pub mod omarchy_gap_closure_advancements_v25;
+pub use omarchy_gap_closure_advancements_v25::*;
+
 pub mod sovereign_2075_distro_supremacy_engine;
 pub use sovereign_2075_distro_supremacy_engine::*;
 
