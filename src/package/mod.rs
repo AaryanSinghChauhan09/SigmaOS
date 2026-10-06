@@ -98,8 +98,12 @@ pub mod sovereign_distro_package_advancements_v17;
 pub use sovereign_distro_package_advancements_v17::*;
 pub mod sovereign_distro_package_advancements_v18;
 pub use sovereign_distro_package_advancements_v18::*;
+pub mod sovereign_distro_package_advancements_v19;
+pub use sovereign_distro_package_advancements_v19::*;
 pub mod sovereign_distro_package_advancements_v22;
 pub use sovereign_distro_package_advancements_v22::*;
+pub mod sovereign_distro_package_advancements_v25;
+pub use sovereign_distro_package_advancements_v25::*;
 pub mod sovereign_universal_multi_distro_pm_gateway;
 pub use sovereign_universal_multi_distro_pm_gateway::*;
 
