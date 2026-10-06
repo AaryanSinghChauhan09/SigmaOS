@@ -18,8 +18,10 @@ pub mod alpine_apk;
 pub mod apm;
 pub mod arch_aur;
 pub mod aur_integration;
+pub mod aptkit;
 pub mod bsd_linux_package_innovations;
 pub mod cache;
+pub mod captain;
 pub mod checkupdates;
 pub mod cleanup;
 pub mod debian;
@@ -101,6 +103,8 @@ pub mod sovereign_distro_package_advancements_v20;
 pub use sovereign_distro_package_advancements_v20::*;
 pub mod sovereign_universal_multi_distro_pm_gateway;
 pub use sovereign_universal_multi_distro_pm_gateway::*;
+pub use aptkit::*;
+pub use captain::*;
 
 pub use crate::sigpkg::{
     SovereignUniversalPackageManagerInteropEngine, SovereignUniversalPackageTranslationBridge,
