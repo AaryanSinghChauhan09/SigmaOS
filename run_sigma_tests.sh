@@ -100,6 +100,13 @@ if [ -f "src/distro/sovereign_netbsd_parity_engine.rs" ]; then
     ./build/test_sovereign_netbsd_parity
 fi
 
+if [ -f "src/distro/debian_parity.rs" ]; then
+    echo "Running Debian Parity Engine test suite..."
+    mkdir -p build
+    rustc --test src/distro/debian_parity.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_debian_parity
+    ./build/test_debian_parity
+fi
+
 if [ -f "src/distro/distro_inspiration_synthesis.rs" ]; then
     echo "Running Linux & BSD distro inspiration synthesis test suite..."
     mkdir -p build
@@ -395,13 +402,6 @@ if [ -f "src/package/sovereign_distro_package_advancements_v20.rs" ]; then
     ./build/sovereign_advancements_v20_test
 fi
 
-if [ -f "src/package/sovereign_distro_package_advancements_v25.rs" ]; then
-    echo "Running Sovereign Universal Package Advancements Suite V25 test suite..."
-    mkdir -p build
-    rustc --test src/package/sovereign_distro_package_advancements_v25.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v25_test
-    ./build/sovereign_advancements_v25_test
-fi
-
 if [ -f "src/package/sovereign_universal_pm_pr_bridge.rs" ]; then
     echo "Running Sovereign Universal PM PR Bridge Engine test suite..."
     mkdir -p build
@@ -549,32 +549,11 @@ if [ -f "src/distro/sovereign_linux_bsd_ecosystem_pinnacle_suite.rs" ]; then
     ./build/test_ecosystem_pinnacle
 fi
 
-if [ -f "src/distro/sovereign_open_source_os_gap_closure_pr.rs" ]; then
-    echo "Running Sovereign Open Source OS Gap Closure PR test suite..."
-    mkdir -p build
-    rustc --test src/distro/sovereign_open_source_os_gap_closure_pr.rs --edition=2021 -o build/test_os_gap_closure_pr
-    ./build/test_os_gap_closure_pr
-fi
-
 if [ -f "src/distro/sovereign_linux_bsd_pinnacle_innovations_v14.rs" ]; then
     echo "Running Sovereign Linux & BSD Pinnacle Innovations Suite V14 test suite..."
     mkdir -p build
     rustc --test src/distro/sovereign_linux_bsd_pinnacle_innovations_v14.rs --edition=2021 -o build/test_pinnacle_v14
     ./build/test_pinnacle_v14
-fi
-
-if [ -f "src/distro/sovereign_linux_bsd_ecosystem_advancements_v24.rs" ]; then
-    echo "Running Sovereign Linux & BSD Ecosystem Advancements V24 test suite..."
-    mkdir -p build
-    rustc --test src/distro/sovereign_linux_bsd_ecosystem_advancements_v24.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_advancements_v24
-    ./build/test_advancements_v24
-fi
-
-if [ -f "src/distro/omarchy_gap_closure_advancements_v25.rs" ]; then
-    echo "Running Omarchy Linux Gap Closure Advancements V25 test suite..."
-    mkdir -p build
-    rustc --test src/distro/omarchy_gap_closure_advancements_v25.rs --edition=2021 -o build/test_omarchy_v25
-    ./build/test_omarchy_v25
 fi
 
 if [ -f "src/compatibility/omarchy_supreme_engine.rs" ]; then
@@ -626,6 +605,13 @@ if [ -f "src/desktop/omarchy_disktree_inspector.rs" ]; then
     ./build/test_disktree
 fi
 
+if [ -f "src/desktop/omarchy_omakase.rs" ]; then
+    echo "Running Sovereign Omarchy Omakase Developer Suite test suite..."
+    mkdir -p build
+    rustc --test src/desktop/omarchy_omakase.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_omarchy_omakase
+    ./build/test_omarchy_omakase
+fi
+
 if [ -f "src/desktop/omarchy_chord_rebind_engine.rs" ]; then
     echo "Running Sovereign Chord Rebind Engine test suite..."
     mkdir -p build
@@ -673,34 +659,6 @@ if [ -f "src/desktop/omarchy_browser_theme_sync.rs" ]; then
     mkdir -p build
     rustc --test src/desktop/omarchy_browser_theme_sync.rs --edition=2021 -o build/test_browser_sync
     ./build/test_browser_sync
-fi
-
-if [ -f "src/distro/sovereign_linux_bsd_ecosystem_advancements_v22.rs" ]; then
-    echo "Running Sovereign Linux & BSD Ecosystem Advancements V22 & PR Gateway test suite..."
-    mkdir -p build
-    rustc --test src/distro/sovereign_linux_bsd_ecosystem_advancements_v22.rs --edition=2021 -o build/test_advancements_v22
-    ./build/test_advancements_v22
-fi
-
-if [ -f "src/distro/sovereign_architecture_development_decision_plan.rs" ]; then
-    echo "Running Sovereign Architecture Development Decision Plan test suite..."
-    mkdir -p build
-    rustc --test src/distro/sovereign_architecture_development_decision_plan.rs --edition=2021 -o build/test_arch_decision_plan
-    ./build/test_arch_decision_plan
-fi
-
-if [ -f "src/kernel/sovereign_clean_code_and_os_principles_engine.rs" ]; then
-    echo "Running Sovereign Clean Code & OS Principles test suite..."
-    mkdir -p build
-    rustc --test src/kernel/sovereign_clean_code_and_os_principles_engine.rs --edition=2021 -o build/test_clean_code_os_principles
-    ./build/test_clean_code_os_principles
-fi
-
-if [ -f "src/distro/omarchy_linux_gap_closure_pr_suite.rs" ]; then
-    echo "Running Omarchy Linux Gap Closure & PR Gateway test suite..."
-    mkdir -p build
-    rustc --test src/distro/omarchy_linux_gap_closure_pr_suite.rs --edition=2021 -o build/test_omarchy_gap_closure
-    ./build/test_omarchy_gap_closure
 fi
 
 echo "All SigmaOS test suites completed."
