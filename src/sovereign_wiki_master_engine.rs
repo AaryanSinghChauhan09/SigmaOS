@@ -148,15 +148,9 @@ impl SovereignLinuxBsdWikiRoadmapParityEngine {
             ),
             (
                 17,
-                "Sovereign Linux & BSD Ecosystem Advancements V22 & PR Gateway",
-                "src/distro/sovereign_linux_bsd_ecosystem_advancements_v22.rs",
-                "V22 Distro PR Gateway",
-            ),
-            (
-                18,
-                "Architecture Development Decision Plan (Supreme Performance)",
-                "src/distro/sovereign_architecture_development_decision_plan.rs",
-                "Arch Decision Plan",
+                "Supreme Performance Architecture Decision Plan PR",
+                "wiki/18-Architecture-Performance-Development-Decision-Plan-PR.md",
+                "Architecture Decision Plan PR",
             ),
         ];
 
@@ -287,8 +281,8 @@ mod tests {
     #[test]
     fn test_wiki_roadmap_parity_engine() {
         let engine = SovereignLinuxBsdWikiRoadmapParityEngine::new();
-        assert_eq!(engine.total_ideas_count, 18);
-        assert_eq!(engine.implemented_ideas_count(), 18);
+        assert_eq!(engine.total_ideas_count, 17);
+        assert_eq!(engine.implemented_ideas_count(), 17);
         assert_eq!(engine.verification_percentage(), 100.0);
     }
 
