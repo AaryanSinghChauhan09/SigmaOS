@@ -17,7 +17,11 @@ use std::vec::Vec;
 #[path = "open_source_os_gap_closure.rs"]
 pub mod open_source_os_gap_closure;
 
+#[path = "open_source_os_pinnacle_gap_closure.rs"]
+pub mod open_source_os_pinnacle_gap_closure;
+
 use open_source_os_gap_closure::OpenSourceProjectSupremacySuite;
+pub use open_source_os_pinnacle_gap_closure::*;
 
 // =========================================================================
 // 1. SOVEREIGN VCS ENGINE (Superseding Git, GitHub CLI, Mercurial)
