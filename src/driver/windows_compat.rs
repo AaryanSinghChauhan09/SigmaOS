@@ -411,13 +411,16 @@ impl PeDriverLoader {
             return Err("Invalid MZ DOS signature");
         }
 
+        if dos_header.e_lfanew < 0 {
+            return Err("Invalid negative PE header offset");
+        }
         let pe_offset = dos_header.e_lfanew as usize;
-        if pe_offset
-            + 4
-            + core::mem::size_of::<ImageFileHeader>()
-            + core::mem::size_of::<ImageOptionalHeader64>()
-            > binary.len()
-        {
+        let pe_min_len = pe_offset
+            .checked_add(4)
+            .and_then(|v| v.checked_add(core::mem::size_of::<ImageFileHeader>()))
+            .and_then(|v| v.checked_add(core::mem::size_of::<ImageOptionalHeader64>()));
+
+        if pe_min_len.map_or(true, |len| len > binary.len()) {
             return Err("PE offset bounds overflow");
         }
 

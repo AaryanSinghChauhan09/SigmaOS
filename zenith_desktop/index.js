@@ -353,10 +353,10 @@ export function toggleHelp() {
       steps.style.gap = "8px";
 
       const shortcuts = [
-        { kbd: "Alt + Space", text: " Toggle Command Palette" },
-        { kbd: "Alt + F / T / O / S / M / D", text: " Launch Apps" },
-        { kbd: "F1 / ?", text: " Toggle Help Matrix" },
-        { kbd: "Escape", text: " Dismiss active dialogs & menus" },
+        { key: "Alt + Space", desc: " Toggle Command Palette" },
+        { key: "Alt + F / T / O / S / M / D", desc: " Launch Apps" },
+        { key: "F1 / ?", desc: " Toggle Help Matrix" },
+        { key: "Escape", desc: " Dismiss active dialogs & menus" },
       ];
 
       shortcuts.forEach((sc) => {
@@ -365,12 +365,11 @@ export function toggleHelp() {
         kbd.style.background = "rgba(255,255,255,0.1)";
         kbd.style.padding = "2px 6px";
         kbd.style.borderRadius = "4px";
-        kbd.textContent = sc.kbd;
+        kbd.textContent = sc.key;
         item.appendChild(kbd);
-        item.appendChild(document.createTextNode(sc.text));
+        item.appendChild(document.createTextNode(sc.desc));
         steps.appendChild(item);
       });
-
       card.appendChild(steps);
 
       const closeBtn = document.createElement("button");
