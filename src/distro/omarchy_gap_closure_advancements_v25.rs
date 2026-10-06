@@ -264,6 +264,24 @@ impl OmarchyWallustPaletteEngine {
     pub fn sync_theme_to_target(&mut self, target: &str) {
         self.synced_targets.insert(target.to_string());
     }
+
+    pub fn export_foot_terminal_config(&self) -> String {
+        format!(
+            "[colors]\nbackground={}\nforeground={}\naccent={}\n",
+            self.current_palette.background.trim_start_matches('#'),
+            self.current_palette.foreground.trim_start_matches('#'),
+            self.current_palette.color_accent.trim_start_matches('#')
+        )
+    }
+
+    pub fn export_waybar_style_css(&self) -> String {
+        format!(
+            "@define-color bg {};\n@define-color fg {};\n@define-color accent {};\n",
+            self.current_palette.background,
+            self.current_palette.foreground,
+            self.current_palette.color_accent
+        )
+    }
 }
 
 impl Default for OmarchyWallustPaletteEngine {
