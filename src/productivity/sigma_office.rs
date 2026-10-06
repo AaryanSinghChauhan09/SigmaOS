@@ -7062,6 +7062,7 @@ impl SovereignOdooInventorySupplyChainMrpEngine {
     }
 }
 
+
 // Placeholder types for compilation
 mod sigma_types {
     pub type Result<T> = core::result::Result<T, &'static str>;
@@ -8405,5 +8406,25 @@ mod tests {
         let (reorder, qty) = mrp_engine.evaluate_reorder_trigger(50.0, 10.0, 5.0, 20.0, 200.0);
         assert!(reorder);
         assert_eq!(qty, 150.0);
+
+        // 16. SovereignSmartDocumentTemplateEngine
+        let mut template_engine = SovereignSmartDocumentTemplateEngine::new();
+        template_engine.register_template("tpl1", "Service Agreement", "Agreement for {{client_name}}: Total {{total_amount}}");
+        let mut ctx = HashMap::new();
+        ctx.insert("client_name".to_string(), "Acme Corp".to_string());
+        ctx.insert("total_amount".to_string(), "$50,000".to_string());
+        let instantiated = template_engine.render_template("tpl1", &ctx).unwrap();
+        assert_eq!(instantiated, "Agreement for Acme Corp: Total $50,000");
+
+        // 17. SovereignLandingPageCmsEngine
+        let mut cms_engine = SovereignLandingPageCmsEngine::new();
+        let page_id = cms_engine.create_page("Home", "home");
+        assert!(cms_engine.add_block(page_id, CmsBlockType::HeroBanner {
+            title: "Welcome to SigmaOS Workstation".to_string(),
+            subtitle: "Empowering sovereign productivity.".to_string(),
+        }));
+        let html = cms_engine.render_html(page_id).unwrap();
+        assert!(html.contains("<h1>Welcome to SigmaOS Workstation</h1>"));
+        assert!(html.contains("Empowering sovereign productivity."));
     }
 }
