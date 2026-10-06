@@ -139,6 +139,8 @@ pub use paging::{PageTable, PageTableEntry, PageTableFlags, VirtualMemoryManager
 pub use roundrobin::{
     RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRobinSchedulerError,
 };
+pub use traits::{Scheduler, SchedulerError};
+pub use virtual_cpu::{SovereignVirtualCPU as VirtualCpu};
 pub use vmm_paging::{PageTableManager, VirtualMemoryManager};
 pub use uts_namespace::{UtsNamespaceManager, NamespaceId};
 pub use kqueue_event::{Kqueue, KqueueManager, Kevent, FilterType, FilterFlags, Interest};
@@ -176,7 +178,7 @@ pub use interrupt::{InterruptController, InterruptVector, InterruptType, Interru
 pub use cfi::{CfiEngine, CfiTarget, CfiViolation};
 pub use kptr_restrict::{
     KptrRestrictLevel, DmesgRestrictLevel,
-    KptrRestrict, DmesgRestrict, KernelSecurityParams, SecurityLevel,
+    SecurityMitigations as KernelSecurityParams,
 };
 pub use process::*;
 pub use process_monitor::{
@@ -184,7 +186,7 @@ pub use process_monitor::{
     ProcessMonitor,
 };
 pub use module_loading_control::{
-    ModuleLoadingController, ModuleLoadingPolicy, KernelModuleInfo, ModuleLoadingRule,
+    ModuleLoadingController, ModuleLoadPolicy as ModuleLoadingPolicy, KernelModuleInfo, ModuleRule as ModuleLoadingRule,
 };
 pub use scheduler::{
     CfsScheduler, Priority, ProcessState as SchedulerProcessState, ProcessTask, RtScheduler, SchedulerPolicy, ThermalState,

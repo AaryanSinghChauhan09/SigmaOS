@@ -18,6 +18,7 @@ pub mod sigma_pledge;
 pub mod sigma_unveil;
 pub mod vault;
 pub mod vpn;
+pub mod cap_rights;
 pub mod capsicum_wrapper;
 pub mod pledge_unveil;
 

@@ -542,6 +542,20 @@ if [ -f "src/distro/sovereign_linux_bsd_pinnacle_innovations_v14.rs" ]; then
     ./build/test_pinnacle_v14
 fi
 
+if [ -f "src/distro/sovereign_linux_bsd_ecosystem_advancements_v24.rs" ]; then
+    echo "Running Sovereign Linux & BSD Ecosystem Advancements V24 test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_linux_bsd_ecosystem_advancements_v24.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_advancements_v24
+    ./build/test_advancements_v24
+fi
+
+if [ -f "src/distro/omarchy_gap_closure_advancements_v25.rs" ]; then
+    echo "Running Omarchy Linux Gap Closure Advancements V25 test suite..."
+    mkdir -p build
+    rustc --test src/distro/omarchy_gap_closure_advancements_v25.rs --edition=2021 -o build/test_omarchy_v25
+    ./build/test_omarchy_v25
+fi
+
 if [ -f "src/compatibility/omarchy_supreme_engine.rs" ]; then
     echo "Running Sovereign Omarchy Supreme Engine test suite..."
     mkdir -p build
