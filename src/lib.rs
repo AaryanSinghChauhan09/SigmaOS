@@ -47,9 +47,8 @@ pub mod orchestration;
 pub mod package;
 pub use package::{
     SovereignDistroPackageAdvancementsSuiteV10, SovereignDistroPackageAdvancementsSuiteV11,
-    SovereignDistroPackageAdvancementsSuiteV14, SovereignDistroPackageAdvancementsSuiteV19,
-    SovereignDistroPackageAdvancementsSuiteV25,
-    UniversalForeignPackageFormat, UniversalForeignPackageFormatConverter,
+    SovereignDistroPackageAdvancementsSuiteV14, UniversalForeignPackageFormat,
+    UniversalForeignPackageFormatConverter,
 };
 pub mod pacman;
 pub use pacman::*;
@@ -59,30 +58,6 @@ pub mod cinnamon;
 pub use cinnamon::*;
 pub mod quickshell;
 pub use quickshell::*;
-pub mod nemo;
-pub use nemo::*;
-pub mod zig_memory;
-pub use zig_memory::*;
-pub mod xed;
-pub use xed::*;
-pub mod nim_system;
-pub use nim_system::*;
-pub mod mintinstall;
-pub use mintinstall::*;
-pub mod omarchy_plugin;
-pub use omarchy_plugin::*;
-pub mod timeshift;
-pub use timeshift::*;
-pub mod omarchy_bar;
-pub use omarchy_bar::*;
-pub mod mintupdate;
-pub use mintupdate::*;
-pub mod omarchy_overlay;
-pub use omarchy_overlay::*;
-pub mod mintstick;
-pub use mintstick::*;
-pub mod wallpaper_palette;
-pub use wallpaper_palette::*;
 pub mod process;
 pub mod productivity;
 pub use productivity::*;
@@ -153,15 +128,9 @@ pub use distro::sovereign_2060_distro_supremacy_engine::*;
 pub use distro::sovereign_2070_distro_supremacy_engine::*;
 pub use distro::sovereign_2075_distro_supremacy_engine::*;
 pub use distro::sovereign_2080_distro_supremacy_engine::*;
-pub use distro::sovereign_wiki_ideas_pr_deployment_engine::*;
 pub use distro::sovereign_linux_bsd_master_synthesis::*;
 pub use distro::sovereign_linux_bsd_pinnacle_innovations_v14::*;
-pub use distro::sovereign_github_wiki_complete_deployment::*;
-pub use distro::sovereign_linux_bsd_media_wiki_unimplemented_ideas_engine::*;
-pub use distro::sovereign_linux_bsd_ecosystem_advancements_v22::*;
 pub use distro::sovereign_media_and_distro_unimplemented_innovations::*;
-pub use distro::sovereign_wiki_ideas_pr_deployment_engine::*;
-pub use distro::tech_media_publication_innovations::*;
 pub use distro::SovereignMasterSubsystemDistroHarmonizer;
 pub use kernel::tss_ring3_user_mode::*;
 pub use open_source_obsoletion::open_source_os_gap_closure::*;
@@ -180,17 +149,9 @@ pub mod audit;
 pub mod backup;
 pub mod bluetooth;
 pub mod boot;
-pub mod boot_config;
-pub mod desklet_manager;
 pub mod input;
 pub mod printing;
-pub mod quickshell_plugin;
-pub mod system_info;
 pub use boot::*;
-pub use boot_config::*;
-pub use desklet_manager::*;
-pub use quickshell_plugin::*;
-pub use system_info::*;
 pub mod toolchain {
     pub mod adapter;
     pub mod bootstrap;
