@@ -22,6 +22,7 @@ pub mod quantization;
 pub mod qwenpaw;
 pub mod sai;
 pub mod sigma_data;
+pub use sigma_data::*;
 pub mod sigma_logic;
 pub mod system;
 pub mod tensor_memory;
