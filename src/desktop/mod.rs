@@ -270,7 +270,7 @@ pub mod launcher;
 pub mod shortcuts;
 pub use shortcuts::{
     KeyAction, KeyModifier, KeyboardShortcut, KeyboardShortcutsManager, ShortcutCategory,
-    ShortcutConfig, ShortcutRegistrationError,
+    ShortcutConfig,
 };
 pub mod mint_backup_tool;
 pub mod mint_software_store;
