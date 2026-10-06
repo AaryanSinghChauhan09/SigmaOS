@@ -93,6 +93,20 @@ if [ -f "src/distro/linux_bsd_inspirations.rs" ]; then
     ./build/distro_inspirations_test
 fi
 
+if [ -f "src/distro/sovereign_netbsd_parity_engine.rs" ]; then
+    echo "Running Sovereign NetBSD Parity Engine test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_netbsd_parity_engine.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_sovereign_netbsd_parity
+    ./build/test_sovereign_netbsd_parity
+fi
+
+if [ -f "src/distro/debian_parity.rs" ]; then
+    echo "Running Debian Parity Engine test suite..."
+    mkdir -p build
+    rustc --test src/distro/debian_parity.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_debian_parity
+    ./build/test_debian_parity
+fi
+
 if [ -f "src/distro/distro_inspiration_synthesis.rs" ]; then
     echo "Running Linux & BSD distro inspiration synthesis test suite..."
     mkdir -p build
@@ -379,6 +393,13 @@ if [ -f "src/package/sovereign_distro_package_advancements_v18.rs" ]; then
     mkdir -p build
     rustc --test src/package/sovereign_distro_package_advancements_v18.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v18_test
     ./build/sovereign_advancements_v18_test
+fi
+
+if [ -f "src/package/sovereign_distro_package_advancements_v20.rs" ]; then
+    echo "Running Sovereign Universal Package Advancements Suite V20 test suite..."
+    mkdir -p build
+    rustc --test src/package/sovereign_distro_package_advancements_v20.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v20_test
+    ./build/sovereign_advancements_v20_test
 fi
 
 if [ -f "src/package/sovereign_universal_pm_pr_bridge.rs" ]; then
