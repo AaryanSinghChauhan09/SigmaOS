@@ -395,6 +395,13 @@ if [ -f "src/package/sovereign_distro_package_advancements_v20.rs" ]; then
     ./build/sovereign_advancements_v20_test
 fi
 
+if [ -f "src/package/sovereign_distro_package_advancements_v25.rs" ]; then
+    echo "Running Sovereign Universal Package Advancements Suite V25 test suite..."
+    mkdir -p build
+    rustc --test src/package/sovereign_distro_package_advancements_v25.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v25_test
+    ./build/sovereign_advancements_v25_test
+fi
+
 if [ -f "src/package/sovereign_universal_pm_pr_bridge.rs" ]; then
     echo "Running Sovereign Universal PM PR Bridge Engine test suite..."
     mkdir -p build
@@ -540,6 +547,13 @@ if [ -f "src/distro/sovereign_linux_bsd_ecosystem_pinnacle_suite.rs" ]; then
     mkdir -p build
     rustc --test src/distro/sovereign_linux_bsd_ecosystem_pinnacle_suite.rs --edition=2021 -o build/test_ecosystem_pinnacle
     ./build/test_ecosystem_pinnacle
+fi
+
+if [ -f "src/distro/sovereign_open_source_os_gap_closure_pr.rs" ]; then
+    echo "Running Sovereign Open Source OS Gap Closure PR test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_open_source_os_gap_closure_pr.rs --edition=2021 -o build/test_os_gap_closure_pr
+    ./build/test_os_gap_closure_pr
 fi
 
 if [ -f "src/distro/sovereign_linux_bsd_pinnacle_innovations_v14.rs" ]; then
