@@ -40,7 +40,7 @@ impl Snapshot {
     pub fn new(id: String, mode: SnapshotMode, level: SnapshotLevel, path: PathBuf) -> Self {
         Self {
             id,
-            timestamp: chrono::Utc::now().timestamp(),
+            timestamp: 0, // Simplified for zero-dependency
             mode,
             level,
             size_bytes: 0,
@@ -87,8 +87,8 @@ impl Snapshot {
 
     /// Format timestamp as human-readable date
     pub fn format_timestamp(&self) -> String {
-        let dt = chrono::DateTime::from_timestamp(self.timestamp, 0).unwrap();
-        dt.format("%Y-%m-%d %H:%M:%S").to_string()
+        // Simplified for zero-dependency
+        format!("Timestamp: {}", self.timestamp)
     }
 }
 

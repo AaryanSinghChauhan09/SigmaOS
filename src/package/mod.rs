@@ -91,6 +91,8 @@ pub mod sovereign_distro_package_advancements_v14;
 pub use sovereign_distro_package_advancements_v14::*;
 pub mod sovereign_distro_package_advancements_v15;
 pub use sovereign_distro_package_advancements_v15::*;
+pub mod sovereign_distro_package_advancements_v19;
+pub use sovereign_distro_package_advancements_v19::*;
 pub mod sovereign_distro_package_advancements_v16;
 pub use sovereign_distro_package_advancements_v16::*;
 pub mod sovereign_distro_package_advancements_v17;

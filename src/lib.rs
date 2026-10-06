@@ -434,4 +434,23 @@ pub mod vm;
 pub mod wireless;
 pub mod workflow;
 
+pub mod bar_widgets;
+pub mod desklet_manager;
+pub mod quickshell_plugin;
+pub mod cli_router;
+pub mod usb_formatter;
+pub mod qr_capture;
+pub mod warpinator;
+pub mod nightlight;
+pub mod nemo_actions;
+pub use bar_widgets::*;
+pub use desklet_manager::*;
+pub use quickshell_plugin::*;
+pub use cli_router::*;
+pub use usb_formatter::*;
+pub use qr_capture::*;
+pub use warpinator::*;
+pub use nightlight::*;
+pub use nemo_actions::*;
+
 pub mod io;
