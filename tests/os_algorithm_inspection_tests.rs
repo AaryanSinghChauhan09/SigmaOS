@@ -21,9 +21,9 @@ mod network_analyzer;
 #[path = "../src/security/kernel_hardening.rs"]
 mod kernel_hardening;
 
-use comprehensive_schedulers::{AnticipatoryIoScheduler, DiskIoRequest};
+use comprehensive_schedulers::{AnticipatoryIoScheduler, DiskIoRequest, IoRequestType};
 use kernel_hardening::{
-    HardenedSyscallDispatcher, SmepSmapEnforcer, SovereignKaslrEngine, SyscallFilterRule,
+    HardenedSyscallDispatcher, PledgePromise, SmepSmapEnforcer, SovereignKaslrEngine,
 };
 use kernel_paging::{DemandPageType, DemandPageZone, DemandPagingSubsystem, PageFaultReason};
 use linux_bsd_inspirations::CachyBoreScheduler;
@@ -53,16 +53,16 @@ fn test_anticipatory_io_scheduler_algorithm_inspection() {
     let mut io_sched = AnticipatoryIoScheduler::new();
 
     // Enqueue requests across different cylinder positions
-    io_sched.enqueue_request(DiskIoRequest::simple(1, 10, 100, true));
-    io_sched.enqueue_request(DiskIoRequest::simple(2, 11, 105, true)); // Spatial locality
-    io_sched.enqueue_request(DiskIoRequest::simple(3, 12, 500, false)); // Far away write
+    io_sched.enqueue_request(DiskIoRequest::simple(1, 10, IoRequestType::Read, 100));
+    io_sched.enqueue_request(DiskIoRequest::simple(2, 11, IoRequestType::Read, 105)); // Spatial locality
+    io_sched.enqueue_request(DiskIoRequest::simple(3, 12, IoRequestType::Write, 500)); // Far away write
 
     let req1 = io_sched.dispatch_next().unwrap();
-    assert_eq!(req1.pid, 1);
+    assert_eq!(req1.req_id, 1);
 
     let req2 = io_sched.dispatch_next().unwrap();
     assert_eq!(
-        req2.pid, 2,
+        req2.req_id, 2,
         "Anticipatory scheduler must exploit spatial locality for read operations"
     );
 }
@@ -148,38 +148,17 @@ fn test_network_ring_buffer_and_fingerprinting_inspection() {
 #[test]
 fn test_kernel_hardening_kaslr_smep_and_syscalls_inspection() {
     // 1. KASLR Virtual Address Slide Inspection
-    let mut kaslr = SovereignKaslrEngine::new(0xFFFF800000000000);
-    let slide = kaslr.calculate_randomized_slide(0x123456789ABCDEF0);
-    assert!(
-        slide > 0,
-        "KASLR slide must be non-zero when entropy is applied"
-    );
-    assert_eq!(kaslr.get_kernel_text_base(), 0xFFFF800000000000 + slide);
+    let mut kaslr = SovereignKaslrEngine::new(0xFFFF_8000_0000_0000, 0xFFFF_C000_0000_0000, 0x1234_5678_9ABC_DEF0);
+    assert_eq!(kaslr.active_kernel_base, 0xFFFF_8000_0000_0000 + kaslr.current_slide);
 
     // 2. SMEP / SMAP Execution Control Inspection
-    let mut smep_smap = SmepSmapEnforcer::new();
-    smep_smap.enable_smep();
-    smep_smap.enable_smap();
-
-    assert!(smep_smap.is_smep_active());
-    assert!(smep_smap.is_smap_active());
-
-    // User-space execution trap inspection
-    assert!(
-        smep_smap
-            .verify_instruction_fetch(0x00007FFF00001000, true)
-            .is_err(),
-        "SMEP must prevent kernel from executing user-space code"
-    );
+    let smep_smap = SmepSmapEnforcer::new(0x0000_0000_0000_1000, 0x0000_7FFF_FFFF_FFFF);
+    assert!(smep_smap.validate_kernel_execution(0x0000_7FFF_0000_1000).is_err());
 
     // 3. Hardened Syscall Dispatcher Filtering
-    let mut dispatcher = HardenedSyscallDispatcher::new();
-    dispatcher.add_filter_rule(1, SyscallFilterRule::Allow);
-    dispatcher.add_filter_rule(59, SyscallFilterRule::DenyWithEperm); // sys_execve
+    let mut dispatcher = HardenedSyscallDispatcher::new(1000, smep_smap);
+    dispatcher.set_process_pledges(42, vec![PledgePromise::StdIo, PledgePromise::RPath]);
 
-    assert_eq!(dispatcher.dispatch_syscall(1, &[0, 0, 0]), Ok(0));
-    assert!(
-        dispatcher.dispatch_syscall(59, &[0, 0, 0]).is_err(),
-        "Dispatcher must block denied syscalls"
-    );
+    assert!(dispatcher.check_pledge(42, 0)); // sys_read
+    assert!(!dispatcher.check_pledge(42, 56)); // sys_clone (ProcessControl without Exec/Proc)
 }

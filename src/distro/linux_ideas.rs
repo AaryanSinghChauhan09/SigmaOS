@@ -502,8 +502,8 @@ impl YastConfigStore {
             out.push_str(k.as_str());
             out.push_str(" = ");
             match v {
-                ConfigValue::Bool(b) => out.push_str(if *b { "true" } else { "false" }),
-                ConfigValue::Int(i) => {
+                ConfigValue::Bool(ref b) => out.push_str(if *b { "true" } else { "false" }),
+                ConfigValue::Int(ref i) => {
                     let s = format_int(*i);
                     out.push_str(&s);
                 }

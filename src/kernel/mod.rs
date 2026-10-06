@@ -246,3 +246,6 @@ pub mod karl;
 pub mod retguard;
 
 pub mod stack_protect;
+
+pub mod sovereign_clean_code_and_os_principles_engine;
+pub use sovereign_clean_code_and_os_principles_engine::*;
