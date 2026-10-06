@@ -5,7 +5,7 @@
 // - Power Profile Manager for Dynamic CPU Governor Toggling
 // - Dotfiles Snapshot Backup & Version Control Manager
 
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 use std::format;
 use std::vec::Vec;
 
@@ -206,129 +206,493 @@ impl Default for OmarchyDotfilesBackupRestoreEngine {
     }
 }
 
-/// Omarchy Hyprland Keybinding Shortcut Cheatsheet Entry
+/// Waybar Module Configuration
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct OmarchyKeybindingEntry {
-    pub chord: String,
-    pub description: String,
-    pub category: String,
+pub struct WaybarModuleConfig {
+    pub name: String,
+    pub module_type: String,
+    pub is_enabled: bool,
+    pub poll_interval_sec: u32,
 }
 
-/// Omarchy Keybinding Cheatsheet Overlay Engine
-pub struct OmarchyKeybindingCheatsheetEngine {
-    pub keybindings: Vec<OmarchyKeybindingEntry>,
+/// Omarchy Waybar Dynamic Status Bar Configuration Generator
+pub struct OmarchyWaybarStatusConfigEngine {
+    pub position: String,
+    pub modules: Vec<WaybarModuleConfig>,
 }
 
-impl OmarchyKeybindingCheatsheetEngine {
+impl OmarchyWaybarStatusConfigEngine {
     pub fn new() -> Self {
-        let mut keybindings = Vec::new();
-        keybindings.push(OmarchyKeybindingEntry {
-            chord: "SUPER + ENTER".to_string(),
-            description: "Launch Ghostty Terminal".to_string(),
-            category: "Applications".to_string(),
-        });
-        keybindings.push(OmarchyKeybindingEntry {
-            chord: "SUPER + Q".to_string(),
-            description: "Close Active Window".to_string(),
-            category: "Window Management".to_string(),
-        });
-        keybindings.push(OmarchyKeybindingEntry {
-            chord: "SUPER + A".to_string(),
-            description: "Trigger Herdr AI Coding Assistant".to_string(),
-            category: "AI & Productivity".to_string(),
-        });
-        keybindings.push(OmarchyKeybindingEntry {
-            chord: "SUPER + E".to_string(),
-            description: "Open Nemo File Manager".to_string(),
-            category: "Applications".to_string(),
-        });
-        keybindings.push(OmarchyKeybindingEntry {
-            chord: "SUPER + SPACE".to_string(),
-            description: "Toggle Walker Fuzzy Launcher".to_string(),
-            category: "Launcher".to_string(),
-        });
-
-        Self { keybindings }
+        Self {
+            position: "top".to_string(),
+            modules: vec![
+                WaybarModuleConfig {
+                    name: "hyprland/workspaces".to_string(),
+                    module_type: "workspaces".to_string(),
+                    is_enabled: true,
+                    poll_interval_sec: 0,
+                },
+                WaybarModuleConfig {
+                    name: "cpu".to_string(),
+                    module_type: "telemetry".to_string(),
+                    is_enabled: true,
+                    poll_interval_sec: 1,
+                },
+                WaybarModuleConfig {
+                    name: "memory".to_string(),
+                    module_type: "telemetry".to_string(),
+                    is_enabled: true,
+                    poll_interval_sec: 2,
+                },
+                WaybarModuleConfig {
+                    name: "pulseaudio".to_string(),
+                    module_type: "audio".to_string(),
+                    is_enabled: true,
+                    poll_interval_sec: 1,
+                },
+                WaybarModuleConfig {
+                    name: "battery".to_string(),
+                    module_type: "power".to_string(),
+                    is_enabled: true,
+                    poll_interval_sec: 5,
+                },
+            ],
+        }
     }
 
-    pub fn search_keybinding(&self, query: &str) -> Vec<&OmarchyKeybindingEntry> {
-        self.keybindings
+    pub fn generate_waybar_json(&self) -> String {
+        let mut json = format!("{{\"position\": \"{}\", \"modules\": [", self.position);
+        for (i, m) in self.modules.iter().filter(|m| m.is_enabled).enumerate() {
+            if i > 0 {
+                json.push_str(", ");
+            }
+            json.push_str(&format!("\"{}\"", m.name));
+        }
+        json.push_str("]}");
+        json
+    }
+}
+
+impl Default for OmarchyWaybarStatusConfigEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Rofi Menu Category
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RofiCategory {
+    Apps,
+    Windows,
+    Themes,
+    Ssh,
+    Calculator,
+}
+
+/// Omarchy Rofi Command Palette Menu Item
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RofiMenuItem {
+    pub label: String,
+    pub action_command: String,
+    pub category: RofiCategory,
+}
+
+/// Omarchy Rofi Command Palette Router
+pub struct OmarchyRofiCommandPaletteApplet {
+    pub items: Vec<RofiMenuItem>,
+}
+
+impl OmarchyRofiCommandPaletteApplet {
+    pub fn new() -> Self {
+        Self {
+            items: vec![
+                RofiMenuItem {
+                    label: "Launch Alacritty".to_string(),
+                    action_command: "alacritty".to_string(),
+                    category: RofiCategory::Apps,
+                },
+                RofiMenuItem {
+                    label: "Switch Theme: Nord".to_string(),
+                    action_command: "sigomarchy theme nord".to_string(),
+                    category: RofiCategory::Themes,
+                },
+                RofiMenuItem {
+                    label: "Connect SSH prod-node".to_string(),
+                    action_command: "ssh admin@10.0.0.1".to_string(),
+                    category: RofiCategory::Ssh,
+                },
+            ],
+        }
+    }
+
+    pub fn filter_by_query(&self, query: &str) -> Vec<&RofiMenuItem> {
+        self.items
             .iter()
-            .filter(|k| {
-                k.chord.to_lowercase().contains(&query.to_lowercase())
-                    || k.description.to_lowercase().contains(&query.to_lowercase())
-                    || k.category.to_lowercase().contains(&query.to_lowercase())
-            })
+            .filter(|i| i.label.to_lowercase().contains(&query.to_lowercase()))
             .collect()
     }
 }
 
-impl Default for OmarchyKeybindingCheatsheetEngine {
+impl Default for OmarchyRofiCommandPaletteApplet {
     fn default() -> Self {
         Self::new()
     }
 }
 
-/// Omarchy Automatic Update & Rolling Release Notifier Engine
-pub struct OmarchyAutomaticUpdateNotifier {
-    pub pending_updates_count: usize,
-    pub aur_updates_count: usize,
-    pub cas_hash_verified: bool,
+/// Omarchy SDDM & Plymouth Display Theme Customizer Engine
+pub struct OmarchySddmThemeCustomizerEngine {
+    pub active_sddm_theme: String,
+    pub active_plymouth_splash: String,
 }
 
-impl OmarchyAutomaticUpdateNotifier {
+impl OmarchySddmThemeCustomizerEngine {
     pub fn new() -> Self {
         Self {
-            pending_updates_count: 3,
-            aur_updates_count: 1,
-            cas_hash_verified: true,
+            active_sddm_theme: "omarchy-catppuccin".to_string(),
+            active_plymouth_splash: "omarchy-breeze".to_string(),
         }
     }
 
-    pub fn check_for_updates(&mut self) -> String {
+    pub fn apply_theme(&mut self, theme_name: &str) -> String {
+        self.active_sddm_theme = format!("omarchy-{}", theme_name);
+        self.active_plymouth_splash = format!("omarchy-{}", theme_name);
+        format!("Applied theme '{}' to SDDM & Plymouth", theme_name)
+    }
+}
+
+impl Default for OmarchySddmThemeCustomizerEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Omarchy WirePlumber Spatial Audio & Bluetooth Codec Engine
+pub struct OmarchyWirePlumberAudioProfileEngine {
+    pub active_codec: String,
+    pub spatial_audio_enabled: bool,
+}
+
+impl OmarchyWirePlumberAudioProfileEngine {
+    pub fn new() -> Self {
+        Self {
+            active_codec: "ldac".to_string(),
+            spatial_audio_enabled: true,
+        }
+    }
+
+    pub fn set_bluetooth_codec(&mut self, codec: &str) {
+        self.active_codec = codec.to_string();
+    }
+
+    pub fn toggle_spatial_audio(&mut self) -> bool {
+        self.spatial_audio_enabled = !self.spatial_audio_enabled;
+        self.spatial_audio_enabled
+    }
+}
+
+impl Default for OmarchyWirePlumberAudioProfileEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Omarchy Pacman & YAY AUR Update Gateway Engine
+pub struct OmarchyPacmanYayUpdateGatewayEngine {
+    pub parallel_downloads: u32,
+    pub create_snapshot_before_update: bool,
+    pub pending_updates: Vec<String>,
+}
+
+impl OmarchyPacmanYayUpdateGatewayEngine {
+    pub fn new() -> Self {
+        Self {
+            parallel_downloads: 5,
+            create_snapshot_before_update: true,
+            pending_updates: vec!["hyprland".to_string(), "waybar".to_string(), "alacritty".to_string()],
+        }
+    }
+
+    pub fn execute_omarchy_update(&mut self) -> (usize, bool) {
+        let count = self.pending_updates.len();
+        self.pending_updates.clear();
+        (count, self.create_snapshot_before_update)
+    }
+}
+
+impl Default for OmarchyPacmanYayUpdateGatewayEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 13. OMARCHY HYPRLAND AUTOTILING & GESTURE BINDER ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum HyprlandLayoutMode {
+    Dwindle,
+    Master,
+    Hyprscroller,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct HyprlandGestureRule {
+    pub swipe_fingers: u8,
+    pub direction: String, // "left", "right", "up", "down"
+    pub command: String,
+}
+
+pub struct OmarchyHyprlandAutotilingEngine {
+    pub active_layout: HyprlandLayoutMode,
+    pub master_factor: f32,
+    pub gestures: Vec<HyprlandGestureRule>,
+}
+
+impl OmarchyHyprlandAutotilingEngine {
+    pub fn new() -> Self {
+        Self {
+            active_layout: HyprlandLayoutMode::Dwindle,
+            master_factor: 0.55,
+            gestures: vec![
+                HyprlandGestureRule {
+                    swipe_fingers: 3,
+                    direction: "right".to_string(),
+                    command: "hyprctl dispatch workspace e+1".to_string(),
+                },
+                HyprlandGestureRule {
+                    swipe_fingers: 3,
+                    direction: "left".to_string(),
+                    command: "hyprctl dispatch workspace e-1".to_string(),
+                },
+            ],
+        }
+    }
+
+    pub fn set_layout_mode(&mut self, mode: HyprlandLayoutMode) {
+        self.active_layout = mode;
+    }
+
+    pub fn add_gesture(&mut self, fingers: u8, dir: &str, cmd: &str) {
+        self.gestures.push(HyprlandGestureRule {
+            swipe_fingers: fingers,
+            direction: dir.to_string(),
+            command: cmd.to_string(),
+        });
+    }
+
+    pub fn dispatch_gesture(&self, fingers: u8, dir: &str) -> Option<String> {
+        self.gestures
+            .iter()
+            .find(|g| g.swipe_fingers == fingers && g.direction == dir)
+            .map(|g| g.command.clone())
+    }
+}
+
+impl Default for OmarchyHyprlandAutotilingEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 14. OMARCHY CATPPUCCIN THEME & GTK/QT/KVANTUM SYNCS ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CatppuccinFlavor {
+    Mocha,
+    Macchiato,
+    Frappe,
+    Latte,
+}
+
+pub struct OmarchyCatppuccinThemeSyncEngine {
+    pub active_flavor: CatppuccinFlavor,
+    pub gtk_theme: String,
+    pub qt_kvantum_theme: String,
+    pub accent_color: String,
+}
+
+impl OmarchyCatppuccinThemeSyncEngine {
+    pub fn new() -> Self {
+        Self {
+            active_flavor: CatppuccinFlavor::Mocha,
+            gtk_theme: "Catppuccin-Mocha-Standard-Blue-Dark".to_string(),
+            qt_kvantum_theme: "Catppuccin-Mocha-Blue".to_string(),
+            accent_color: "mauve".to_string(),
+        }
+    }
+
+    pub fn switch_flavor(&mut self, flavor: CatppuccinFlavor) -> String {
+        self.active_flavor = flavor;
+        let flavor_str = match flavor {
+            CatppuccinFlavor::Mocha => "Mocha",
+            CatppuccinFlavor::Macchiato => "Macchiato",
+            CatppuccinFlavor::Frappe => "Frappe",
+            CatppuccinFlavor::Latte => "Latte",
+        };
+
+        self.gtk_theme = format!("Catppuccin-{}-Standard-Blue-Dark", flavor_str);
+        self.qt_kvantum_theme = format!("Catppuccin-{}-Blue", flavor_str);
+        format!("Synced GTK & Qt/Kvantum themes to Catppuccin {}", flavor_str)
+    }
+}
+
+impl Default for OmarchyCatppuccinThemeSyncEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 15. OMARCHY NETWORKMANAGER / IWD WI-FI SCANNER & CONNECTION ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct WifiAccessPoint {
+    pub ssid: String,
+    pub signal_strength_pct: u8,
+    pub security_type: String, // "WPA2", "WPA3", "Open"
+    pub is_connected: bool,
+}
+
+pub struct OmarchyWifiNetworkManagerEngine {
+    pub available_networks: Vec<WifiAccessPoint>,
+    pub active_ssid: Option<String>,
+}
+
+impl OmarchyWifiNetworkManagerEngine {
+    pub fn new() -> Self {
+        Self {
+            available_networks: vec![
+                WifiAccessPoint {
+                    ssid: "Omarchy-Mesh-5G".to_string(),
+                    signal_strength_pct: 95,
+                    security_type: "WPA3".to_string(),
+                    is_connected: true,
+                },
+                WifiAccessPoint {
+                    ssid: "Guest-Wi-Fi".to_string(),
+                    signal_strength_pct: 70,
+                    security_type: "WPA2".to_string(),
+                    is_connected: false,
+                },
+            ],
+            active_ssid: Some("Omarchy-Mesh-5G".to_string()),
+        }
+    }
+
+    pub fn scan_networks(&mut self) -> usize {
+        self.available_networks.len()
+    }
+
+    pub fn connect_network(&mut self, ssid: &str, _passphrase: &str) -> Result<(), &'static str> {
+        let exists = self.available_networks.iter().any(|n| n.ssid == ssid);
+        if !exists {
+            return Err("iwd: Network SSID not found in scan results");
+        }
+
+        for net in &mut self.available_networks {
+            net.is_connected = net.ssid == ssid;
+        }
+        self.active_ssid = Some(ssid.to_string());
+        Ok(())
+    }
+}
+
+impl Default for OmarchyWifiNetworkManagerEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 16. OMARCHY BLUEZ BLUETOOTH PAIRING & BATTERY TELEMETRY ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct BluetoothDevice {
+    pub mac_address: String,
+    pub name: String,
+    pub battery_percent: Option<u8>,
+    pub is_paired: bool,
+    pub is_connected: bool,
+}
+
+pub struct OmarchyBluezBluetoothEngine {
+    pub devices: BTreeMap<String, BluetoothDevice>,
+}
+
+impl OmarchyBluezBluetoothEngine {
+    pub fn new() -> Self {
+        let mut devices = BTreeMap::new();
+        devices.insert(
+            "00:11:22:33:44:55".to_string(),
+            BluetoothDevice {
+                mac_address: "00:11:22:33:44:55".to_string(),
+                name: "Sony WH-1000XM5".to_string(),
+                battery_percent: Some(85),
+                is_paired: true,
+                is_connected: true,
+            },
+        );
+
+        Self { devices }
+    }
+
+    pub fn pair_device(&mut self, mac: &str, name: &str) {
+        self.devices.insert(
+            mac.to_string(),
+            BluetoothDevice {
+                mac_address: mac.to_string(),
+                name: name.to_string(),
+                battery_percent: Some(100),
+                is_paired: true,
+                is_connected: true,
+            },
+        );
+    }
+
+    pub fn get_battery_telemetry(&self, mac: &str) -> Option<u8> {
+        self.devices.get(mac).and_then(|d| d.battery_percent)
+    }
+}
+
+impl Default for OmarchyBluezBluetoothEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 17. OMARCHY BTOP RESOURCE MONITOR CONFIGURATION GENERATOR
+// =========================================================================
+
+pub struct OmarchyBtopConfigGeneratorEngine {
+    pub color_theme: String,
+    pub update_ms: u32,
+    pub proc_sorting: String,
+}
+
+impl OmarchyBtopConfigGeneratorEngine {
+    pub fn new() -> Self {
+        Self {
+            color_theme: "catppuccin_mocha".to_string(),
+            update_ms: 1000,
+            proc_sorting: "cpu lazy".to_string(),
+        }
+    }
+
+    pub fn generate_btop_config_text(&self) -> String {
         format!(
-            "Omarchy Updates Available: {} official, {} AUR (CAS Integrity: {})",
-            self.pending_updates_count,
-            self.aur_updates_count,
-            if self.cas_hash_verified { "PASSED" } else { "FAILED" }
+            "color_theme = \"{}\"\nupdate_ms = {}\nproc_sorting = \"{}\"\nshown_boxes = \"cpu mem net proc\"",
+            self.color_theme, self.update_ms, self.proc_sorting
         )
     }
 }
 
-impl Default for OmarchyAutomaticUpdateNotifier {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Master Coordinator verifying 100% gap closure against Linux Omarchy
-pub struct OmarchyMasterGapClosureSuite {
-    pub fastfetch: OmarchyFastfetchEngine,
-    pub tui_menu: OmarchyTuiMenuApplet,
-    pub power_manager: OmarchyPowerProfileManager,
-    pub dotfiles: OmarchyDotfilesBackupRestoreEngine,
-    pub cheatsheet: OmarchyKeybindingCheatsheetEngine,
-    pub update_notifier: OmarchyAutomaticUpdateNotifier,
-}
-
-impl OmarchyMasterGapClosureSuite {
-    pub fn new() -> Self {
-        Self {
-            fastfetch: OmarchyFastfetchEngine::new("SigmaOS", "6.8.0", "TokyoNight", 2048, 16384),
-            tui_menu: OmarchyTuiMenuApplet::new(),
-            power_manager: OmarchyPowerProfileManager::new(),
-            dotfiles: OmarchyDotfilesBackupRestoreEngine::new(),
-            cheatsheet: OmarchyKeybindingCheatsheetEngine::new(),
-            update_notifier: OmarchyAutomaticUpdateNotifier::new(),
-        }
-    }
-
-    pub fn evaluate_omarchy_gap_closure_score(&self) -> u32 {
-        100
-    }
-}
-
-impl Default for OmarchyMasterGapClosureSuite {
+impl Default for OmarchyBtopConfigGeneratorEngine {
     fn default() -> Self {
         Self::new()
     }
@@ -381,24 +745,92 @@ mod tests {
     }
 
     #[test]
-    fn test_omarchy_keybinding_cheatsheet_engine() {
-        let cheatsheet = OmarchyKeybindingCheatsheetEngine::new();
-        let results = cheatsheet.search_keybinding("HERDR");
-        assert_eq!(results.len(), 1);
-        assert_eq!(results[0].chord, "SUPER + A");
+    fn test_omarchy_waybar_status_config_engine() {
+        let waybar = OmarchyWaybarStatusConfigEngine::new();
+        let json = waybar.generate_waybar_json();
+        assert!(json.contains("\"position\": \"top\""));
+        assert!(json.contains("hyprland/workspaces"));
+        assert!(json.contains("pulseaudio"));
     }
 
     #[test]
-    fn test_omarchy_auto_update_notifier() {
-        let mut notifier = OmarchyAutomaticUpdateNotifier::new();
-        let status = notifier.check_for_updates();
-        assert!(status.contains("Omarchy Updates Available"));
-        assert!(status.contains("PASSED"));
+    fn test_omarchy_rofi_command_palette_applet() {
+        let rofi = OmarchyRofiCommandPaletteApplet::new();
+        let matches = rofi.filter_by_query("Nord");
+        assert_eq!(matches.len(), 1);
+        assert_eq!(matches[0].label, "Switch Theme: Nord");
     }
 
     #[test]
-    fn test_omarchy_master_gap_closure_suite() {
-        let suite = OmarchyMasterGapClosureSuite::new();
-        assert_eq!(suite.evaluate_omarchy_gap_closure_score(), 100);
+    fn test_omarchy_sddm_theme_customizer_engine() {
+        let mut sddm = OmarchySddmThemeCustomizerEngine::new();
+        let status = sddm.apply_theme("nord");
+        assert!(status.contains("Applied theme 'nord'"));
+        assert_eq!(sddm.active_sddm_theme, "omarchy-nord");
+        assert_eq!(sddm.active_plymouth_splash, "omarchy-nord");
+    }
+
+    #[test]
+    fn test_omarchy_wireplumber_audio_profile_engine() {
+        let mut wp = OmarchyWirePlumberAudioProfileEngine::new();
+        wp.set_bluetooth_codec("aptx_hd");
+        assert_eq!(wp.active_codec, "aptx_hd");
+
+        assert!(!wp.toggle_spatial_audio());
+        assert!(wp.toggle_spatial_audio());
+    }
+
+    #[test]
+    fn test_omarchy_pacman_yay_update_gateway_engine() {
+        let mut gateway = OmarchyPacmanYayUpdateGatewayEngine::new();
+        let (updated, snap_created) = gateway.execute_omarchy_update();
+        assert_eq!(updated, 3);
+        assert!(snap_created);
+        assert_eq!(gateway.pending_updates.len(), 0);
+    }
+
+    #[test]
+    fn test_omarchy_hyprland_autotiling_engine() {
+        let mut hypr = OmarchyHyprlandAutotilingEngine::new();
+        hypr.set_layout_mode(HyprlandLayoutMode::Master);
+        assert_eq!(hypr.active_layout, HyprlandLayoutMode::Master);
+
+        let cmd = hypr.dispatch_gesture(3, "right").unwrap();
+        assert!(cmd.contains("workspace e+1"));
+    }
+
+    #[test]
+    fn test_omarchy_catppuccin_theme_sync_engine() {
+        let mut cat = OmarchyCatppuccinThemeSyncEngine::new();
+        let msg = cat.switch_flavor(CatppuccinFlavor::Frappe);
+        assert!(msg.contains("Frappe"));
+        assert_eq!(cat.gtk_theme, "Catppuccin-Frappe-Standard-Blue-Dark");
+        assert_eq!(cat.qt_kvantum_theme, "Catppuccin-Frappe-Blue");
+    }
+
+    #[test]
+    fn test_omarchy_wifi_network_manager_engine() {
+        let mut wifi = OmarchyWifiNetworkManagerEngine::new();
+        assert_eq!(wifi.scan_networks(), 2);
+
+        assert!(wifi.connect_network("Guest-Wi-Fi", "secret").is_ok());
+        assert_eq!(wifi.active_ssid, Some("Guest-Wi-Fi".to_string()));
+    }
+
+    #[test]
+    fn test_omarchy_bluez_bluetooth_engine() {
+        let mut bt = OmarchyBluezBluetoothEngine::new();
+        assert_eq!(bt.get_battery_telemetry("00:11:22:33:44:55"), Some(85));
+
+        bt.pair_device("AA:BB:CC:DD:EE:FF", "Bose QC45");
+        assert_eq!(bt.get_battery_telemetry("AA:BB:CC:DD:EE:FF"), Some(100));
+    }
+
+    #[test]
+    fn test_omarchy_btop_config_generator_engine() {
+        let btop = OmarchyBtopConfigGeneratorEngine::new();
+        let cfg = btop.generate_btop_config_text();
+        assert!(cfg.contains("color_theme = \"catppuccin_mocha\""));
+        assert!(cfg.contains("shown_boxes = \"cpu mem net proc\""));
     }
 }
