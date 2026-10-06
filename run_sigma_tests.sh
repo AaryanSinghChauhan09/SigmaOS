@@ -605,6 +605,13 @@ if [ -f "src/desktop/omarchy_disktree_inspector.rs" ]; then
     ./build/test_disktree
 fi
 
+if [ -f "src/desktop/omarchy_omakase.rs" ]; then
+    echo "Running Sovereign Omarchy Omakase Developer Suite test suite..."
+    mkdir -p build
+    rustc --test src/desktop/omarchy_omakase.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_omarchy_omakase
+    ./build/test_omarchy_omakase
+fi
+
 if [ -f "src/desktop/omarchy_chord_rebind_engine.rs" ]; then
     echo "Running Sovereign Chord Rebind Engine test suite..."
     mkdir -p build

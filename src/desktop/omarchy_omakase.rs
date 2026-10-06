@@ -109,6 +109,170 @@ impl Default for OmarchyHyprlandScrollLayoutEngine {
     }
 }
 
+// =========================================================================
+// OMARCHY TERMINAL, NEOVIM, TMUX & ROFI/WOFI ENGINES
+// =========================================================================
+
+pub struct OmarchyAlacrittyKittyTerminalEngine {
+    pub font_family: String,
+    pub font_size: f32,
+    pub opacity: f32,
+    pub color_theme: String,
+}
+
+impl OmarchyAlacrittyKittyTerminalEngine {
+    pub fn new() -> Self {
+        Self {
+            font_family: "JetBrainsMono Nerd Font".to_string(),
+            font_size: 11.5,
+            opacity: 0.92,
+            color_theme: "TokyoNight".to_string(),
+        }
+    }
+
+    pub fn generate_alacritty_toml(&self) -> String {
+        format!(
+            "[font]\nnormal = {{ family = \"{}\", style = \"Regular\" }}\nsize = {:.1}\n\n[window]\nopacity = {:.2}\n\n# Theme: {}\n",
+            self.font_family, self.font_size, self.opacity, self.color_theme
+        )
+    }
+
+    pub fn generate_kitty_conf(&self) -> String {
+        format!(
+            "font_family {}\nfont_size {:.1}\nbackground_opacity {:.2}\n# Kitty Theme: {}\n",
+            self.font_family, self.font_size, self.opacity, self.color_theme
+        )
+    }
+}
+
+impl Default for OmarchyAlacrittyKittyTerminalEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct OmarchyNeovimLuaPresetEngine {
+    pub leader_key: String,
+    pub lsp_servers: Vec<String>,
+    pub theme: String,
+}
+
+impl OmarchyNeovimLuaPresetEngine {
+    pub fn new() -> Self {
+        Self {
+            leader_key: "space".to_string(),
+            lsp_servers: vec![
+                "rust_analyzer".to_string(),
+                "gopls".to_string(),
+                "pyright".to_string(),
+                "clangd".to_string(),
+            ],
+            theme: "tokyonight".to_string(),
+        }
+    }
+
+    pub fn generate_init_lua(&self) -> String {
+        let lsp_list = self.lsp_servers.join("', '");
+        format!(
+            "-- Omarchy Neovim Omakase Preset init.lua\nvim.g.mapleader = \"{}\"\nrequire('lazy').setup({{\n  {{ 'folke/tokyonight.nvim', config = function() vim.cmd.colorscheme('{}') end }},\n  {{ 'neovim/nvim-lspconfig', config = function() local lsp = require('lspconfig'); for _, s in ipairs({{ '{}' }}) do lsp[s].setup({{}}) end end }},\n}})\n",
+            self.leader_key, self.theme, lsp_list
+        )
+    }
+}
+
+impl Default for OmarchyNeovimLuaPresetEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct OmarchyTmuxSessionManagerEngine {
+    pub session_prefix: String,
+    pub active_sessions: Vec<String>,
+}
+
+impl OmarchyTmuxSessionManagerEngine {
+    pub fn new() -> Self {
+        Self {
+            session_prefix: "C-a".to_string(),
+            active_sessions: vec!["dev".to_string(), "ops".to_string()],
+        }
+    }
+
+    pub fn generate_tmux_conf(&self) -> String {
+        format!(
+            "set -g prefix {}\nunbind C-b\nbind {} send-prefix\nset -g status-style bg=default,fg=white\n",
+            self.session_prefix, self.session_prefix
+        )
+    }
+}
+
+impl Default for OmarchyTmuxSessionManagerEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct OmarchyRofiWofiLauncherEngine {
+    pub theme_name: String,
+    pub prompt_text: String,
+}
+
+impl OmarchyRofiWofiLauncherEngine {
+    pub fn new() -> Self {
+        Self {
+            theme_name: "tokyonight".to_string(),
+            prompt_text: "Search Apps".to_string(),
+        }
+    }
+
+    pub fn generate_wofi_style_css(&self) -> String {
+        format!(
+            "/* Omarchy Wofi Style: {} */\nwindow {{\n    margin: 0px;\n    border: 2px solid #7aa2f7;\n    background-color: #1a1b26;\n}}\n#input {{\n    margin: 5px;\n    border: none;\n    color: #c0caf5;\n}}\n",
+            self.theme_name
+        )
+    }
+}
+
+impl Default for OmarchyRofiWofiLauncherEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct SovereignOmarchyCompleteDeveloperEnvironmentEngine {
+    pub terminal: OmarchyAlacrittyKittyTerminalEngine,
+    pub nvim: OmarchyNeovimLuaPresetEngine,
+    pub tmux: OmarchyTmuxSessionManagerEngine,
+    pub launcher: OmarchyRofiWofiLauncherEngine,
+}
+
+impl SovereignOmarchyCompleteDeveloperEnvironmentEngine {
+    pub fn new() -> Self {
+        Self {
+            terminal: OmarchyAlacrittyKittyTerminalEngine::new(),
+            nvim: OmarchyNeovimLuaPresetEngine::new(),
+            tmux: OmarchyTmuxSessionManagerEngine::new(),
+            launcher: OmarchyRofiWofiLauncherEngine::new(),
+        }
+    }
+
+    pub fn verify_complete_developer_environment(&self) -> bool {
+        let term_ok = self.terminal.generate_alacritty_toml().contains("JetBrainsMono");
+        let nvim_ok = self.nvim.generate_init_lua().contains("rust_analyzer");
+        let tmux_ok = self.tmux.generate_tmux_conf().contains("prefix C-a");
+        let wofi_ok = self.launcher.generate_wofi_style_css().contains("tokyonight");
+
+        term_ok && nvim_ok && tmux_ok && wofi_ok
+    }
+}
+
+impl Default for SovereignOmarchyCompleteDeveloperEnvironmentEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub struct OmarchyLazyGitConfigurationEngine {
     pub theme_name: String,
     pub keybinding_preset: String,
@@ -556,5 +720,24 @@ mod tests {
         let cid = pwa.launch_pwa_sandbox("GitHub", "https://github.com");
         assert_eq!(cid, "PWA_CONTAINER_1");
         assert_eq!(pwa.instances.len(), 1);
+    }
+
+    #[test]
+    fn test_omarchy_developer_environment_engines() {
+        let term = OmarchyAlacrittyKittyTerminalEngine::new();
+        assert!(term.generate_alacritty_toml().contains("JetBrainsMono"));
+        assert!(term.generate_kitty_conf().contains("font_family"));
+
+        let nvim = OmarchyNeovimLuaPresetEngine::new();
+        assert!(nvim.generate_init_lua().contains("folke/tokyonight.nvim"));
+
+        let tmux = OmarchyTmuxSessionManagerEngine::new();
+        assert!(tmux.generate_tmux_conf().contains("prefix C-a"));
+
+        let launcher = OmarchyRofiWofiLauncherEngine::new();
+        assert!(launcher.generate_wofi_style_css().contains("tokyonight"));
+
+        let dev_env = SovereignOmarchyCompleteDeveloperEnvironmentEngine::new();
+        assert!(dev_env.verify_complete_developer_environment());
     }
 }
