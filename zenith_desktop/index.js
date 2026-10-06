@@ -331,19 +331,58 @@ export function toggleHelp() {
     overlay.setAttribute("aria-label", "Sovereign Desktop Help Matrix");
     overlay.setAttribute("aria-modal", "true");
     if (!overlay.firstElementChild) {
-      overlay.innerHTML = `
-        <div class="wizard-card" role="document">
-          <h2>❓ Help Matrix</h2>
-          <p style="color: var(--text-muted); margin-bottom: 15px; font-size: 0.9rem;">Essential Sovereign Desktop Keyboard Shortcuts</p>
-          <div class="wizard-steps" style="text-align: left; font-size: 0.85rem; gap: 8px;">
-            <div><kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">Alt + Space</kbd> Toggle Command Palette</div>
-            <div><kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">Alt + F / T / O / S / M / D</kbd> Launch Apps</div>
-            <div><kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">F1 / ?</kbd> Toggle Help Matrix</div>
-            <div><kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">Escape</kbd> Dismiss active dialogs & menus</div>
-          </div>
-          <button type="button" class="wizard-btn" id="help-close-btn" style="margin-top: 20px;" onclick="toggleHelp()" aria-label="Close Help Matrix">Close</button>
-        </div>
-      `;
+      const card = document.createElement("div");
+      card.className = "wizard-card";
+      card.setAttribute("role", "document");
+
+      const h2 = document.createElement("h2");
+      h2.textContent = "❓ Help Matrix";
+      card.appendChild(h2);
+
+      const p = document.createElement("p");
+      p.style.color = "var(--text-muted)";
+      p.style.marginBottom = "15px";
+      p.style.fontSize = "0.9rem";
+      p.textContent = "Essential Sovereign Desktop Keyboard Shortcuts";
+      card.appendChild(p);
+
+      const steps = document.createElement("div");
+      steps.className = "wizard-steps";
+      steps.style.textAlign = "left";
+      steps.style.fontSize = "0.85rem";
+      steps.style.gap = "8px";
+
+      const shortcuts = [
+        { key: "Alt + Space", desc: " Toggle Command Palette" },
+        { key: "Alt + F / T / O / S / M / D", desc: " Launch Apps" },
+        { key: "F1 / ?", desc: " Toggle Help Matrix" },
+        { key: "Escape", desc: " Dismiss active dialogs & menus" },
+      ];
+
+      shortcuts.forEach((sc) => {
+        const item = document.createElement("div");
+        const kbd = document.createElement("kbd");
+        kbd.style.background = "rgba(255,255,255,0.1)";
+        kbd.style.padding = "2px 6px";
+        kbd.style.borderRadius = "4px";
+        kbd.textContent = sc.key;
+        item.appendChild(kbd);
+        item.appendChild(document.createTextNode(sc.desc));
+        steps.appendChild(item);
+      });
+      card.appendChild(steps);
+
+      const closeBtn = document.createElement("button");
+      closeBtn.type = "button";
+      closeBtn.className = "wizard-btn";
+      closeBtn.id = "help-close-btn";
+      closeBtn.style.marginTop = "20px";
+      closeBtn.setAttribute("aria-label", "Close Help Matrix");
+      closeBtn.textContent = "Close";
+      closeBtn.addEventListener("click", () => toggleHelp());
+      card.appendChild(closeBtn);
+
+      overlay.appendChild(card);
     }
     overlay.classList.remove("wizard-overlay--hidden");
     overlay.setAttribute("aria-hidden", "false");
