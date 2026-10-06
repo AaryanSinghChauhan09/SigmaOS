@@ -301,6 +301,110 @@ impl SigmaOsZeroCopyPqcVpnEngine {
 }
 
 // ============================================================================
+// 4b. Ingress/Egress Packet Routing, Firewall Precedence & Namespace Isolation
+// Specified in wiki/06-Networking.md (Reference projects and future roadmap)
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PacketDirection {
+    Ingress,
+    Egress,
+}
+
+#[derive(Debug, Clone)]
+pub struct PacketFrame {
+    pub src_ip: [u8; 4],
+    pub dst_ip: [u8; 4],
+    pub port: u16,
+    pub payload_len: usize,
+}
+
+pub struct SovereignNetworkIngressEgressPipelineEngine {
+    pub ingress_packets_count: usize,
+    pub egress_packets_count: usize,
+    pub interface_name: String,
+}
+
+impl SovereignNetworkIngressEgressPipelineEngine {
+    pub fn new(iface: &str) -> Self {
+        Self {
+            ingress_packets_count: 0,
+            egress_packets_count: 0,
+            interface_name: iface.to_string(),
+        }
+    }
+
+    pub fn process_frame(&mut self, dir: PacketDirection, frame: &PacketFrame) -> bool {
+        match dir {
+            PacketDirection::Ingress => {
+                self.ingress_packets_count += 1;
+                frame.payload_len > 0
+            }
+            PacketDirection::Egress => {
+                self.egress_packets_count += 1;
+                frame.payload_len > 0
+            }
+        }
+    }
+}
+
+pub struct SovereignFirewallStatefulPrecedenceEngine {
+    pub blocked_ports: Vec<u16>,
+    pub active_state_connections: usize,
+}
+
+impl SovereignFirewallStatefulPrecedenceEngine {
+    pub fn new() -> Self {
+        Self {
+            blocked_ports: Vec::new(),
+            active_state_connections: 0,
+        }
+    }
+
+    pub fn block_port(&mut self, port: u16) {
+        if !self.blocked_ports.contains(&port) {
+            self.blocked_ports.push(port);
+        }
+    }
+
+    pub fn evaluate_precedence(&mut self, port: u16) -> bool {
+        if self.blocked_ports.contains(&port) {
+            false // Deny rule takes precedence
+        } else {
+            self.active_state_connections += 1;
+            true // Allow
+        }
+    }
+}
+
+pub struct SovereignNetworkNamespaceIsolationEngine {
+    pub namespace_id: u32,
+    pub interfaces: Vec<String>,
+    pub is_active: bool,
+}
+
+impl SovereignNetworkNamespaceIsolationEngine {
+    pub fn new(ns_id: u32) -> Self {
+        Self {
+            namespace_id: ns_id,
+            interfaces: Vec::new(),
+            is_active: true,
+        }
+    }
+
+    pub fn attach_interface(&mut self, iface: &str) {
+        self.interfaces.push(iface.to_string());
+    }
+
+    pub fn teardown_namespace(&mut self) -> usize {
+        self.is_active = false;
+        let count = self.interfaces.len();
+        self.interfaces.clear();
+        count
+    }
+}
+
+// ============================================================================
 // Sovereign Wiki Distro Ideas Deployment Master Suite
 // ============================================================================
 
@@ -480,6 +584,30 @@ mod tests {
 
         let tx = vpn.transmit_zero_copy_packet(1, 1024).unwrap();
         assert_eq!(tx, 1024);
+    }
+
+    #[test]
+    fn test_networking_wiki_roadmap_engines() {
+        let mut pipeline = SovereignNetworkIngressEgressPipelineEngine::new("eth0");
+        let frame = PacketFrame {
+            src_ip: [192, 168, 1, 10],
+            dst_ip: [192, 168, 1, 1],
+            port: 80,
+            payload_len: 128,
+        };
+
+        assert!(pipeline.process_frame(PacketDirection::Ingress, &frame));
+        assert_eq!(pipeline.ingress_packets_count, 1);
+
+        let mut fw = SovereignFirewallStatefulPrecedenceEngine::new();
+        fw.block_port(23);
+        assert!(!fw.evaluate_precedence(23)); // Blocked
+        assert!(fw.evaluate_precedence(80)); // Stateful pass
+
+        let mut ns = SovereignNetworkNamespaceIsolationEngine::new(100);
+        ns.attach_interface("veth0");
+        assert_eq!(ns.teardown_namespace(), 1);
+        assert!(!ns.is_active);
     }
 
     #[test]
