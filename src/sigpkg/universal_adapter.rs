@@ -2024,21 +2024,26 @@ impl UniversalDependencyMapper {
         match clean {
             "libssl-dev" | "libssl3" | "openssl-devel" | "openssl-dev" | "security/openssl"
             | "dev-libs/openssl" | "libgnutls-dev" | "gnutls-devel" | "mbedtls-devel"
-            | "libmbedtls-dev" => "openssl".to_string(),
+            | "libmbedtls-dev" | "libgcrypt-dev" | "libgcrypt-devel" => "openssl".to_string(),
             "libc6" | "glibc" | "musl" | "musl-dev" | "devel/glibc" | "sys-libs/glibc" | "libc"
             | "freebsd-runtime" | "openbsd-sys" | "dragonfly-runtime" | "bedrock-core"
-            | "haiku-libroot" | "pkgsrc-core" => "libc".to_string(),
+            | "haiku-libroot" | "pkgsrc-core" | "bionic-libc" => "libc".to_string(),
             "zlib1g-dev" | "zlib-devel" | "zlib-dev" | "devel/zlib" | "sys-libs/zlib" => {
                 "zlib".to_string()
             }
             "libm" | "libpthread" | "libdl" | "librt" | "libutil" => "libc".to_string(),
             "bzip2" | "libbz2-dev" | "bzip2-devel" | "brotli" | "libbrotli-dev" | "lzo"
-            | "liblzo2-dev" => "compression".to_string(),
+            | "liblzo2-dev" | "lz4" | "liblz4-dev" | "liblz4-devel" => "compression".to_string(),
             "python" | "python3" | "python3-dev" | "python3-devel" | "python3-base"
             | "python-core" | "dev-lang/python" | "lang/python" => "python".to_string(),
+            "perl" | "perl-base" | "dev-lang/perl" | "lang/perl" => "perl".to_string(),
+            "ruby" | "ruby-devel" | "dev-lang/ruby" => "ruby".to_string(),
+            "node" | "nodejs" | "nodejs-devel" => "nodejs".to_string(),
             "curl" | "libcurl" | "libcurl4" | "libcurl-devel" | "libcurl-dev" | "ftp/curl"
             | "net-misc/curl" => "curl".to_string(),
             "bash" | "bash-completion" | "shells/bash" | "app-shells/bash" => "bash".to_string(),
+            "zsh" | "shells/zsh" | "app-shells/zsh" => "zsh".to_string(),
+            "fish" | "shells/fish" | "app-shells/fish" => "fish".to_string(),
             "libx11"
             | "libx11-dev"
             | "libx11-devel"
@@ -2070,6 +2075,7 @@ impl UniversalDependencyMapper {
             "qt6" | "qt6-base" | "qt6-base-devel" => "qt6".to_string(),
             "llvm" | "llvm-dev" | "llvm-devel" | "sys-devel/llvm" => "llvm".to_string(),
             "gcc" | "gcc-c++" | "sys-devel/gcc" => "gcc".to_string(),
+            "clang" | "sys-devel/clang" => "clang".to_string(),
             "libffi" | "libffi-dev" | "libffi-devel" | "dev-libs/libffi" => "libffi".to_string(),
             "glib" | "glib2" | "glib2-devel" | "libglib2.0-dev" | "dev-libs/glib" => {
                 "glib".to_string()
@@ -2157,21 +2163,21 @@ impl UniversalScriptletConverter {
         content: &str,
     ) -> Option<MappedScriptletHook> {
         let hook_type = match format {
-            PackageFormat::Apt => match script_name {
+            PackageFormat::Apt | PackageFormat::Deb | PackageFormat::Superdeb => match script_name {
                 "preinst" => Some(SigmaPkgHookType::PreInstall),
                 "postinst" => Some(SigmaPkgHookType::PostInstall),
                 "prerm" => Some(SigmaPkgHookType::PreRemove),
                 "postrm" => Some(SigmaPkgHookType::PostRemove),
                 _ => None,
             },
-            PackageFormat::Yum => match script_name {
-                "%pre" => Some(SigmaPkgHookType::PreInstall),
-                "%post" | "%posttrans" => Some(SigmaPkgHookType::PostInstall),
-                "%preun" => Some(SigmaPkgHookType::PreRemove),
-                "%postun" => Some(SigmaPkgHookType::PostRemove),
+            PackageFormat::Yum | PackageFormat::Rpm | PackageFormat::Zypper | PackageFormat::Pisi | PackageFormat::Drpm => match script_name {
+                "%pre" | "pre" | "preInstall" => Some(SigmaPkgHookType::PreInstall),
+                "%post" | "%posttrans" | "post" | "postInstall" => Some(SigmaPkgHookType::PostInstall),
+                "%preun" | "preun" | "preRemove" => Some(SigmaPkgHookType::PreRemove),
+                "%postun" | "postun" | "postRemove" => Some(SigmaPkgHookType::PostRemove),
                 _ => None,
             },
-            PackageFormat::Pkg | PackageFormat::Ports => match script_name {
+            PackageFormat::Pkg | PackageFormat::Ports | PackageFormat::OpenBsdPkg | PackageFormat::Pkgsrc => match script_name {
                 "+POST_INSTALL" | "+INSTALL" | "pkg-post-install" | "post-install" => {
                     Some(SigmaPkgHookType::PostInstall)
                 }
@@ -2185,30 +2191,38 @@ impl UniversalScriptletConverter {
                 _ => None,
             },
             PackageFormat::Pacman => match script_name {
-                "pre_install" => Some(SigmaPkgHookType::PreInstall),
-                "post_install" => Some(SigmaPkgHookType::PostInstall),
+                "pre_install" | "pre_upgrade" => Some(SigmaPkgHookType::PreInstall),
+                "post_install" | "post_upgrade" => Some(SigmaPkgHookType::PostInstall),
                 "pre_remove" => Some(SigmaPkgHookType::PreRemove),
                 "post_remove" => Some(SigmaPkgHookType::PostRemove),
                 _ => None,
             },
-            PackageFormat::Apk | PackageFormat::Xbps => match script_name {
-                "pre-install" => Some(SigmaPkgHookType::PreInstall),
-                "post-install" => Some(SigmaPkgHookType::PostInstall),
-                "pre-deinstall" | "pre-remove" => Some(SigmaPkgHookType::PreRemove),
-                "post-deinstall" | "post-remove" => Some(SigmaPkgHookType::PostRemove),
+            PackageFormat::Apk | PackageFormat::Xbps | PackageFormat::Eopkg | PackageFormat::Moss => match script_name {
+                "pre-install" | "pre-install.sh" => Some(SigmaPkgHookType::PreInstall),
+                "post-install" | "post-install.sh" | "postInstall" => Some(SigmaPkgHookType::PostInstall),
+                "pre-deinstall" | "pre-remove" | "preRemove" => Some(SigmaPkgHookType::PreRemove),
+                "post-deinstall" | "post-remove" | "postRemove" => Some(SigmaPkgHookType::PostRemove),
                 _ => None,
             },
-            PackageFormat::Portage => match script_name {
+            PackageFormat::Portage | PackageFormat::Ebuild => match script_name {
                 "pkg_preinst" | "pre_install" => Some(SigmaPkgHookType::PreInstall),
                 "pkg_postinst" | "post_install" => Some(SigmaPkgHookType::PostInstall),
                 "pkg_prerm" | "pre_remove" => Some(SigmaPkgHookType::PreRemove),
                 "pkg_postrm" | "post_remove" => Some(SigmaPkgHookType::PostRemove),
                 _ => None,
             },
-            PackageFormat::Nix | PackageFormat::Guix => match script_name {
-                "preInstall" => Some(SigmaPkgHookType::PreInstall),
-                "postInstall" => Some(SigmaPkgHookType::PostInstall),
-                "preUnpack" | "preBuild" => Some(SigmaPkgHookType::PreInstall),
+            PackageFormat::Nix | PackageFormat::Guix | PackageFormat::GuixNar => match script_name {
+                "preInstall" | "preUnpack" | "preBuild" => Some(SigmaPkgHookType::PreInstall),
+                "postInstall" | "postBuild" => Some(SigmaPkgHookType::PostInstall),
+                _ => None,
+            },
+            PackageFormat::SlackBuild | PackageFormat::Txz => match script_name {
+                "doinst.sh" | "install" | "post-install" => Some(SigmaPkgHookType::PostInstall),
+                _ => None,
+            },
+            PackageFormat::Snap | PackageFormat::Flatpak | PackageFormat::Hpkg => match script_name {
+                "install" | "post-install" | "configure" | "post-refresh" => Some(SigmaPkgHookType::PostInstall),
+                "remove" | "pre-remove" => Some(SigmaPkgHookType::PreRemove),
                 _ => None,
             },
             _ => None,
@@ -2701,6 +2715,10 @@ pub enum UniversalPackageTriggerType {
     MimeDatabase,
     FontsIndex,
     IconThemeCache,
+    MandbUpdate,
+    InfoIndex,
+    DepmodKmod,
+    FontconfigCache,
 }
 
 #[derive(Debug, Clone)]
@@ -2727,6 +2745,10 @@ impl UniversalPackageTriggerEngine {
                 UniversalPackageTriggerType::MimeDatabase,
                 UniversalPackageTriggerType::FontsIndex,
                 UniversalPackageTriggerType::IconThemeCache,
+                UniversalPackageTriggerType::MandbUpdate,
+                UniversalPackageTriggerType::InfoIndex,
+                UniversalPackageTriggerType::DepmodKmod,
+                UniversalPackageTriggerType::FontconfigCache,
             ],
             execution_log: Vec::new(),
         }
@@ -2747,6 +2769,15 @@ impl UniversalPackageTriggerEngine {
             .iter()
             .any(|f| f.contains("/mime/packages/"));
         let has_icon_files = installed_files.iter().any(|f| f.contains("/icons/"));
+        let has_man_pages = installed_files
+            .iter()
+            .any(|f| f.contains("/man/") || f.ends_with(".1") || f.ends_with(".1.gz"));
+        let has_font_files = installed_files
+            .iter()
+            .any(|f| f.contains("/fonts/") || f.ends_with(".ttf") || f.ends_with(".otf"));
+        let has_kmods = installed_files
+            .iter()
+            .any(|f| f.contains("/modules/") || f.ends_with(".ko") || f.ends_with(".ko.xz"));
 
         if has_shared_libs {
             let res = TriggerExecutionResult {
@@ -2792,6 +2823,36 @@ impl UniversalPackageTriggerEngine {
             let res = TriggerExecutionResult {
                 trigger_type: UniversalPackageTriggerType::IconThemeCache,
                 target_dir: "/usr/share/icons/hicolor".to_string(),
+                executed_successfully: true,
+            };
+            self.execution_log.push(res.clone());
+            results.push(res);
+        }
+
+        if has_man_pages {
+            let res = TriggerExecutionResult {
+                trigger_type: UniversalPackageTriggerType::MandbUpdate,
+                target_dir: "/usr/share/man".to_string(),
+                executed_successfully: true,
+            };
+            self.execution_log.push(res.clone());
+            results.push(res);
+        }
+
+        if has_font_files {
+            let res = TriggerExecutionResult {
+                trigger_type: UniversalPackageTriggerType::FontconfigCache,
+                target_dir: "/usr/share/fonts".to_string(),
+                executed_successfully: true,
+            };
+            self.execution_log.push(res.clone());
+            results.push(res);
+        }
+
+        if has_kmods {
+            let res = TriggerExecutionResult {
+                trigger_type: UniversalPackageTriggerType::DepmodKmod,
+                target_dir: "/lib/modules".to_string(),
                 executed_successfully: true,
             };
             self.execution_log.push(res.clone());
