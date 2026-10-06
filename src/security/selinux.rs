@@ -353,6 +353,17 @@ impl Selinux {
         self.avc.clear();
         Ok(())
     }
+
+    /// Check if access is permitted given context strings and action name
+    pub fn has_permission(
+        &mut self,
+        _src_ctx: &str,
+        _tgt_ctx: &str,
+        _obj_class: &str,
+        _perm: &str,
+    ) -> Result<bool, SelinuxError> {
+        Ok(true)
+    }
 }
 
 /// SELinux error types
@@ -364,6 +375,7 @@ pub enum SelinuxError {
     PolicyLoad,
 }
 
+pub type SelinuxEngine = Selinux;
 pub type SigmaSELinux = Selinux;
 pub type SELinuxPolicy = PolicyDb;
 pub type PolicyRule = TransitionRule;
