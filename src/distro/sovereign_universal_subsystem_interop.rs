@@ -20,6 +20,14 @@ pub enum UniversalSubsystemCategory {
     HardwarePower,
     ContainerVirt,
     ObservabilityDiagnostics,
+    MemoryAllocation,
+    IpcCommunication,
+    GraphicsDisplay,
+    InputDevice,
+    AutomationToolchain,
+    CryptoSecurity,
+    InternationalizationI18n,
+    AiWorkflowAgent,
 }
 
 impl UniversalSubsystemCategory {
@@ -36,6 +44,14 @@ impl UniversalSubsystemCategory {
             Self::HardwarePower => "HardwarePower",
             Self::ContainerVirt => "ContainerVirt",
             Self::ObservabilityDiagnostics => "ObservabilityDiagnostics",
+            Self::MemoryAllocation => "MemoryAllocation",
+            Self::IpcCommunication => "IpcCommunication",
+            Self::GraphicsDisplay => "GraphicsDisplay",
+            Self::InputDevice => "InputDevice",
+            Self::AutomationToolchain => "AutomationToolchain",
+            Self::CryptoSecurity => "CryptoSecurity",
+            Self::InternationalizationI18n => "InternationalizationI18n",
+            Self::AiWorkflowAgent => "AiWorkflowAgent",
         }
     }
 }
@@ -257,6 +273,94 @@ impl SovereignUniversalSubsystemInteropEngine {
                 8,
             ),
         );
+
+        self.register_subsystem(
+            "memory",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::MemoryAllocation,
+                true,
+                true,
+                &["slab_buddy", "ksm_damon", "karl_wx", "zswap_zram"],
+                9,
+            ),
+        );
+
+        self.register_subsystem(
+            "ipc",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::IpcCommunication,
+                true,
+                true,
+                &["zero_copy_ring", "capsicum_rights_passing", "dbus_varlink"],
+                7,
+            ),
+        );
+
+        self.register_subsystem(
+            "graphics",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::GraphicsDisplay,
+                true,
+                true,
+                &["drm_kms_atomic", "vulkan_radv_anv", "mesa_zink"],
+                8,
+            ),
+        );
+
+        self.register_subsystem(
+            "input",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::InputDevice,
+                true,
+                true,
+                &["evdev_libinput", "wayland_seat_chords", "touchpad_gestures"],
+                6,
+            ),
+        );
+
+        self.register_subsystem(
+            "toolchain",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::AutomationToolchain,
+                true,
+                true,
+                &["makepkg_cdevtools", "portage_ebuild_eapi8", "nix_guix_hermetic"],
+                12,
+            ),
+        );
+
+        self.register_subsystem(
+            "crypto",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::CryptoSecurity,
+                true,
+                true,
+                &["pqc_kyber_dilithium", "luks2_geli", "tpm2_attestation"],
+                10,
+            ),
+        );
+
+        self.register_subsystem(
+            "i18n",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::InternationalizationI18n,
+                true,
+                true,
+                &["ibus_fcitx5_ime", "icu_locales", "gettext_translations"],
+                5,
+            ),
+        );
+
+        self.register_subsystem(
+            "ai",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::AiWorkflowAgent,
+                true,
+                true,
+                &["herdr_pair_programmer", "tdl_multi_pane", "ebpf_sched_ai_governor"],
+                6,
+            ),
+        );
     }
 
     /// Establish default cross-subsystem translation and isolation policies.
@@ -298,6 +402,22 @@ impl SovereignUniversalSubsystemInteropEngine {
             UniversalSubsystemCategory::HardwarePower,
             UniversalSubsystemCategory::AudioSound,
             "Adjust PipeWire buffer latency during AC disconnect or low-power state transition",
+            false,
+        ));
+
+        self.add_interop_policy(SubsystemInteropPolicy::new(
+            "policy_mem_sec",
+            UniversalSubsystemCategory::MemoryAllocation,
+            UniversalSubsystemCategory::SecuritySandboxing,
+            "Enforce KARL W^X memory page permissions and KSM deduplication bounds",
+            true,
+        ));
+
+        self.add_interop_policy(SubsystemInteropPolicy::new(
+            "policy_ai_sched",
+            UniversalSubsystemCategory::AiWorkflowAgent,
+            UniversalSubsystemCategory::KernelScheduling,
+            "Tune EEVDF/BORE v2 CPU timeslices dynamically based on Herdr AI agent workload prediction",
             false,
         ));
     }
@@ -420,10 +540,52 @@ mod tests {
     fn test_subsystem_interop_engine_initialization() {
         let engine = SovereignUniversalSubsystemInteropEngine::new();
         assert_eq!(engine.active_distro_mode, "LinuxArch");
-        assert!(engine.subsystem_adapters.len() >= 11);
-        assert!(engine.interop_policies.len() >= 5);
+        assert!(engine.subsystem_adapters.len() >= 19);
+        assert!(engine.interop_policies.len() >= 7);
         assert!(engine.verify_all_subsystems_interoperability());
         assert_eq!(engine.evaluate_system_wide_harmony_score(), 100);
+
+        // Verify newly registered subsystem categories
+        assert!(engine.subsystem_adapters.contains_key("memory"));
+        assert!(engine.subsystem_adapters.contains_key("ipc"));
+        assert!(engine.subsystem_adapters.contains_key("graphics"));
+        assert!(engine.subsystem_adapters.contains_key("input"));
+        assert!(engine.subsystem_adapters.contains_key("toolchain"));
+        assert!(engine.subsystem_adapters.contains_key("crypto"));
+        assert!(engine.subsystem_adapters.contains_key("i18n"));
+        assert!(engine.subsystem_adapters.contains_key("ai"));
+    }
+
+    #[test]
+    fn test_new_category_policy_translations() {
+        let engine = SovereignUniversalSubsystemInteropEngine::new();
+
+        let mem_policy = engine
+            .translate_policy(
+                UniversalSubsystemCategory::MemoryAllocation,
+                UniversalSubsystemCategory::SecuritySandboxing,
+            )
+            .expect("Memory allocation security policy should exist");
+        assert_eq!(mem_policy.policy_id, "policy_mem_sec");
+        assert!(mem_policy.enforce_strict_isolation);
+
+        let ai_policy = engine
+            .translate_policy(
+                UniversalSubsystemCategory::AiWorkflowAgent,
+                UniversalSubsystemCategory::KernelScheduling,
+            )
+            .expect("AI workflow scheduling policy should exist");
+        assert_eq!(ai_policy.policy_id, "policy_ai_sched");
+        assert!(!ai_policy.enforce_strict_isolation);
+
+        assert_eq!(UniversalSubsystemCategory::MemoryAllocation.as_str(), "MemoryAllocation");
+        assert_eq!(UniversalSubsystemCategory::IpcCommunication.as_str(), "IpcCommunication");
+        assert_eq!(UniversalSubsystemCategory::GraphicsDisplay.as_str(), "GraphicsDisplay");
+        assert_eq!(UniversalSubsystemCategory::InputDevice.as_str(), "InputDevice");
+        assert_eq!(UniversalSubsystemCategory::AutomationToolchain.as_str(), "AutomationToolchain");
+        assert_eq!(UniversalSubsystemCategory::CryptoSecurity.as_str(), "CryptoSecurity");
+        assert_eq!(UniversalSubsystemCategory::InternationalizationI18n.as_str(), "InternationalizationI18n");
+        assert_eq!(UniversalSubsystemCategory::AiWorkflowAgent.as_str(), "AiWorkflowAgent");
     }
 
     #[test]

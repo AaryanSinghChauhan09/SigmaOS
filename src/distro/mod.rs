@@ -125,6 +125,8 @@ pub mod power_network_tools;
 pub mod ready_to_use;
 pub mod sovereign_linux_bsd_wiki_master_engine;
 pub mod sovereign_system_innovations;
+pub mod sovereign_universal_subsystem_interop;
+pub use sovereign_universal_subsystem_interop::*;
 pub mod stable_components;
 pub mod visual_dashboard;
 pub mod void_runit;
