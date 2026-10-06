@@ -327,6 +327,8 @@ pub use linux_bsd_pinnacle_synthesis::{
 
 pub mod sovereign_2070_distro_supremacy_engine;
 pub use sovereign_2070_distro_supremacy_engine::*;
+pub mod sovereign_2080_distro_supremacy_engine;
+pub use sovereign_2080_distro_supremacy_engine::*;
 pub mod sovereign_2028_distro_supremacy_engine;
 pub use sovereign_2028_distro_supremacy_engine::{
     BpfSchedExtPolicy, DirectScanoutFrame, EbpfSchedTask, FineIbtCallsiteGuard, MicroVmSpawnSpec,
@@ -378,13 +380,14 @@ pub mod sovereign_linux_bsd_master_synthesis;
 
 pub mod sovereign_media_and_distro_unimplemented_innovations;
 
+pub mod sovereign_linux_bsd_media_wiki_unimplemented_ideas_engine;
+pub use sovereign_linux_bsd_media_wiki_unimplemented_ideas_engine::*;
+
 pub mod sovereign_linux_bsd_pinnacle_innovations_v14;
 pub use sovereign_linux_bsd_pinnacle_innovations_v14::*;
 
 pub mod sovereign_2075_distro_supremacy_engine;
 pub use sovereign_2075_distro_supremacy_engine::*;
-pub mod sovereign_2080_distro_supremacy_engine;
-pub use sovereign_2080_distro_supremacy_engine::*;
 
 pub mod sovereign_mint_omarchy_supremacy_suite;
 pub use sovereign_mint_omarchy_supremacy_suite::*;
@@ -410,8 +413,8 @@ pub use sovereign_mint_omarchy_zenith_mastery::*;
 pub mod tech_media_publication_innovations;
 pub use tech_media_publication_innovations::*;
 
-pub mod omarchy_omakase_ultimate_parity;
-pub use omarchy_omakase_ultimate_parity::*;
+pub mod sovereign_open_source_os_gap_closure_pr;
+pub use sovereign_open_source_os_gap_closure_pr::*;
 
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;
