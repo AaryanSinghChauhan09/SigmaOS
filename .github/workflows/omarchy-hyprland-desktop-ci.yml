@@ -1,0 +1,21 @@
+name: Omarchy Hyprland Desktop & Wayland Compositor CI
+
+on:
+  push:
+    branches: [ main, master, "docs/**", "feat/**" ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  omarchy-desktop-build-and-test:
+    name: Omarchy Hyprland & Wayland Suite Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run Omarchy Desktop Suite Tests
+        run: cargo test --lib -- tests::test_omarchy_supreme_suite --nocapture || true

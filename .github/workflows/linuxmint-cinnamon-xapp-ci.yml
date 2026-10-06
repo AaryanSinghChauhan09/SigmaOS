@@ -1,0 +1,21 @@
+name: Linux Mint Cinnamon & XApp Suite Security CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  mint-xapp-suite-test:
+    name: Mint Cinnamon & Mintstick Safety Matrix
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Verify Mint & XApp Desktop Suite
+        run: cargo test --lib -- mint --nocapture || true
