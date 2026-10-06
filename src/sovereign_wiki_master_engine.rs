@@ -154,18 +154,30 @@ impl SovereignLinuxBsdWikiRoadmapParityEngine {
             ),
             (
                 18,
+                "Linux PIDFD, FreeBSD Procdesc & Subreaper",
+                "src/distro/sovereign_github_wiki_complete_deployment.rs",
+                "Pidfd Procdesc Subreaper",
+            ),
+            (
+                19,
+                "fscrypt Directory Encryption & Kernel Autofs",
+                "src/distro/sovereign_github_wiki_complete_deployment.rs",
+                "Fscrypt Autofs Storage",
+            ),
+            (
+                20,
                 "Sysctl Hardening & Forward-Edge CFI Security",
                 "src/distro/sovereign_github_wiki_complete_deployment.rs",
                 "Hardened Security CFI",
             ),
             (
-                19,
+                21,
                 "Sovereign Linux & BSD Ecosystem Advancements V22 & PR Gateway",
                 "src/distro/sovereign_linux_bsd_ecosystem_advancements_v22.rs",
                 "V22 Distro PR Gateway",
             ),
             (
-                20,
+                22,
                 "Supreme Performance Architecture Decision Plan PR",
                 "wiki/18-Architecture-Performance-Development-Decision-Plan-PR.md",
                 "Architecture Decision Plan PR",
@@ -299,8 +311,8 @@ mod tests {
     #[test]
     fn test_wiki_roadmap_parity_engine() {
         let engine = SovereignLinuxBsdWikiRoadmapParityEngine::new();
-        assert_eq!(engine.total_ideas_count, 20);
-        assert_eq!(engine.implemented_ideas_count(), 20);
+        assert_eq!(engine.total_ideas_count, 22);
+        assert_eq!(engine.implemented_ideas_count(), 22);
         assert_eq!(engine.verification_percentage(), 100.0);
     }
 
