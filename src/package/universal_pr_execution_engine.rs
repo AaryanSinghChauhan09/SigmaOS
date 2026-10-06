@@ -64,6 +64,42 @@ impl AptDebianPrTranspiler {
     }
 }
 
+/// 3b. Fedora Silverblue / Kinoite rpm-ostree & Flatpak PR Transpiler
+pub struct FedoraFlatpakRpmOstreePrTranspiler;
+impl FedoraFlatpakRpmOstreePrTranspiler {
+    pub fn transpile(name: &str, version: &str, _manifest_data: &str, deps: &[&str]) -> TranspiledSigpkgPayload {
+        let mapped_deps = deps.iter().map(|d| format!("sigma-ostree-{}", d)).collect();
+        TranspiledSigpkgPayload {
+            sigpkg_id: format!("fcos-{}-{}", name, version),
+            name: name.to_string(),
+            version: version.to_string(),
+            source_format: PullRequestPackageFormat::FlatpakApp,
+            mapped_dependencies: mapped_deps,
+            sandbox_profile: "bubblewrap-flatpak-portal".to_string(),
+            pqc_signature_valid: true,
+            target_channel: RepoStagingChannel::Testing,
+        }
+    }
+}
+
+/// 3c. Fedora COPR / Koji Build Task & Bodhi Update Gate PR Transpiler
+pub struct FedoraCoprKojiPrTranspiler;
+impl FedoraCoprKojiPrTranspiler {
+    pub fn transpile(name: &str, version: &str, _spec_data: &str, deps: &[&str]) -> TranspiledSigpkgPayload {
+        let mapped_deps = deps.iter().map(|d| format!("sigma-koji-{}", d)).collect();
+        TranspiledSigpkgPayload {
+            sigpkg_id: format!("koji-{}-{}", name, version),
+            name: name.to_string(),
+            version: version.to_string(),
+            source_format: PullRequestPackageFormat::FedoraRpm,
+            mapped_dependencies: mapped_deps,
+            sandbox_profile: "selinux-mls-greenwave".to_string(),
+            pqc_signature_valid: true,
+            target_channel: RepoStagingChannel::Stable,
+        }
+    }
+}
+
 /// 2. Arch Linux Pacman / PKGBUILD PR Transpiler
 pub struct PacmanArchPrTranspiler;
 impl PacmanArchPrTranspiler {
@@ -291,6 +327,12 @@ mod tests {
 
         let rpm = DnfFedoraPrTranspiler::transpile("htop", "3.3.0", "Name: htop", &["ncurses"]);
         assert_eq!(rpm.source_format, PullRequestPackageFormat::FedoraRpm);
+
+        let ostree = FedoraFlatpakRpmOstreePrTranspiler::transpile("org.fedoraproject.Media", "1.0", "app-id", &[]);
+        assert_eq!(ostree.sandbox_profile, "bubblewrap-flatpak-portal");
+
+        let koji = FedoraCoprKojiPrTranspiler::transpile("kernel", "6.8.0", "Name: kernel", &["gcc"]);
+        assert_eq!(koji.sandbox_profile, "selinux-mls-greenwave");
 
         let apk = ApkAlpinePrTranspiler::transpile("musl", "1.2.4", "P:musl", &[]);
         assert_eq!(apk.source_format, PullRequestPackageFormat::AlpineApk);
