@@ -11,6 +11,7 @@ pub use crate::distro::tech_media_distro_innovations::{
     SovereignTechMediaDistroInnovationsSuite, TechPowerUpGpuTelemetryEngine,
 };
 pub use crate::distro::tech_media_extended_innovations::*;
+pub use crate::distro::tech_media_publication_innovations::*;
 pub use crate::hardware::tech_powerup_hardware_monitors::{
     HardwareBustersPsuRailMonitorEngine, PcWorldBatteryHealthControllerEngine,
     SovereignTechPowerUpHardwareMonitorsSuite, TechPowerUpGpuProfilerEngine,
