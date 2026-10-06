@@ -1,0 +1,3 @@
+## 2025-05-18 - Environment variable lookup hoisting & in-place update in shell sessions
+**Learning:** In fixed-size array environment stores (such as `([u8; 64], [u8; 128])` tuples in `SimpleShellSession`), searching keys with inline `.position(|&b| b == 0)` causes $O(K \times N)$ linear scan overhead per query across $N$ environment entries. Furthermore, appending keys on `set_environment` without updating existing entries leads to unbounded accumulation of duplicate keys over long shell sessions.
+**Action:** Always hoist target key length calculation outside of the search loop in `get_environment` using `starts_with` and `.get(key_len).map_or(true, |&b| b == 0)` boundary checking, and always perform in-place updates in `set_environment` when matching existing keys.
