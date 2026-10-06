@@ -22,6 +22,7 @@ Roadmaps live with their owning component so implementation status, reference co
 - [Kernel](04-Kernel.md), [memory management](Memory-Management.md), [scheduler](Scheduler.md)
 - [Filesystems and VFS](05-Filesystems.md), [networking](06-Networking.md), [security](07-Security.md)
 - [Drivers](Hardware-Drivers.md), [desktop](08-Desktop.md), [packaging and updates](09-Packaging.md)
+- [Enterprise Productivity Suite Roadmap](18-Enterprise-Productivity-Suite-Roadmap.md), [Pull Request Gateway Workflows](19-Pull-Request-Gateway-Workflows.md)
 - [Init and services](Init-and-Services.md), [IPC and syscalls](IPC-and-Syscalls.md)
 - [Virtualization and containers](Container-Virtualization.md), [power and time](Power-Management.md)
 
