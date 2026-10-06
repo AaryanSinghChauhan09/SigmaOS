@@ -5,7 +5,7 @@
 // - Power Profile Manager for Dynamic CPU Governor Toggling
 // - Dotfiles Snapshot Backup & Version Control Manager
 
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 use std::format;
 use std::vec::Vec;
 
@@ -425,6 +425,279 @@ impl Default for OmarchyPacmanYayUpdateGatewayEngine {
     }
 }
 
+// =========================================================================
+// 13. OMARCHY HYPRLAND AUTOTILING & GESTURE BINDER ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum HyprlandLayoutMode {
+    Dwindle,
+    Master,
+    Hyprscroller,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct HyprlandGestureRule {
+    pub swipe_fingers: u8,
+    pub direction: String, // "left", "right", "up", "down"
+    pub command: String,
+}
+
+pub struct OmarchyHyprlandAutotilingEngine {
+    pub active_layout: HyprlandLayoutMode,
+    pub master_factor: f32,
+    pub gestures: Vec<HyprlandGestureRule>,
+}
+
+impl OmarchyHyprlandAutotilingEngine {
+    pub fn new() -> Self {
+        Self {
+            active_layout: HyprlandLayoutMode::Dwindle,
+            master_factor: 0.55,
+            gestures: vec![
+                HyprlandGestureRule {
+                    swipe_fingers: 3,
+                    direction: "right".to_string(),
+                    command: "hyprctl dispatch workspace e+1".to_string(),
+                },
+                HyprlandGestureRule {
+                    swipe_fingers: 3,
+                    direction: "left".to_string(),
+                    command: "hyprctl dispatch workspace e-1".to_string(),
+                },
+            ],
+        }
+    }
+
+    pub fn set_layout_mode(&mut self, mode: HyprlandLayoutMode) {
+        self.active_layout = mode;
+    }
+
+    pub fn add_gesture(&mut self, fingers: u8, dir: &str, cmd: &str) {
+        self.gestures.push(HyprlandGestureRule {
+            swipe_fingers: fingers,
+            direction: dir.to_string(),
+            command: cmd.to_string(),
+        });
+    }
+
+    pub fn dispatch_gesture(&self, fingers: u8, dir: &str) -> Option<String> {
+        self.gestures
+            .iter()
+            .find(|g| g.swipe_fingers == fingers && g.direction == dir)
+            .map(|g| g.command.clone())
+    }
+}
+
+impl Default for OmarchyHyprlandAutotilingEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 14. OMARCHY CATPPUCCIN THEME & GTK/QT/KVANTUM SYNCS ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CatppuccinFlavor {
+    Mocha,
+    Macchiato,
+    Frappe,
+    Latte,
+}
+
+pub struct OmarchyCatppuccinThemeSyncEngine {
+    pub active_flavor: CatppuccinFlavor,
+    pub gtk_theme: String,
+    pub qt_kvantum_theme: String,
+    pub accent_color: String,
+}
+
+impl OmarchyCatppuccinThemeSyncEngine {
+    pub fn new() -> Self {
+        Self {
+            active_flavor: CatppuccinFlavor::Mocha,
+            gtk_theme: "Catppuccin-Mocha-Standard-Blue-Dark".to_string(),
+            qt_kvantum_theme: "Catppuccin-Mocha-Blue".to_string(),
+            accent_color: "mauve".to_string(),
+        }
+    }
+
+    pub fn switch_flavor(&mut self, flavor: CatppuccinFlavor) -> String {
+        self.active_flavor = flavor;
+        let flavor_str = match flavor {
+            CatppuccinFlavor::Mocha => "Mocha",
+            CatppuccinFlavor::Macchiato => "Macchiato",
+            CatppuccinFlavor::Frappe => "Frappe",
+            CatppuccinFlavor::Latte => "Latte",
+        };
+
+        self.gtk_theme = format!("Catppuccin-{}-Standard-Blue-Dark", flavor_str);
+        self.qt_kvantum_theme = format!("Catppuccin-{}-Blue", flavor_str);
+        format!("Synced GTK & Qt/Kvantum themes to Catppuccin {}", flavor_str)
+    }
+}
+
+impl Default for OmarchyCatppuccinThemeSyncEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 15. OMARCHY NETWORKMANAGER / IWD WI-FI SCANNER & CONNECTION ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct WifiAccessPoint {
+    pub ssid: String,
+    pub signal_strength_pct: u8,
+    pub security_type: String, // "WPA2", "WPA3", "Open"
+    pub is_connected: bool,
+}
+
+pub struct OmarchyWifiNetworkManagerEngine {
+    pub available_networks: Vec<WifiAccessPoint>,
+    pub active_ssid: Option<String>,
+}
+
+impl OmarchyWifiNetworkManagerEngine {
+    pub fn new() -> Self {
+        Self {
+            available_networks: vec![
+                WifiAccessPoint {
+                    ssid: "Omarchy-Mesh-5G".to_string(),
+                    signal_strength_pct: 95,
+                    security_type: "WPA3".to_string(),
+                    is_connected: true,
+                },
+                WifiAccessPoint {
+                    ssid: "Guest-Wi-Fi".to_string(),
+                    signal_strength_pct: 70,
+                    security_type: "WPA2".to_string(),
+                    is_connected: false,
+                },
+            ],
+            active_ssid: Some("Omarchy-Mesh-5G".to_string()),
+        }
+    }
+
+    pub fn scan_networks(&mut self) -> usize {
+        self.available_networks.len()
+    }
+
+    pub fn connect_network(&mut self, ssid: &str, _passphrase: &str) -> Result<(), &'static str> {
+        let exists = self.available_networks.iter().any(|n| n.ssid == ssid);
+        if !exists {
+            return Err("iwd: Network SSID not found in scan results");
+        }
+
+        for net in &mut self.available_networks {
+            net.is_connected = net.ssid == ssid;
+        }
+        self.active_ssid = Some(ssid.to_string());
+        Ok(())
+    }
+}
+
+impl Default for OmarchyWifiNetworkManagerEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 16. OMARCHY BLUEZ BLUETOOTH PAIRING & BATTERY TELEMETRY ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct BluetoothDevice {
+    pub mac_address: String,
+    pub name: String,
+    pub battery_percent: Option<u8>,
+    pub is_paired: bool,
+    pub is_connected: bool,
+}
+
+pub struct OmarchyBluezBluetoothEngine {
+    pub devices: BTreeMap<String, BluetoothDevice>,
+}
+
+impl OmarchyBluezBluetoothEngine {
+    pub fn new() -> Self {
+        let mut devices = BTreeMap::new();
+        devices.insert(
+            "00:11:22:33:44:55".to_string(),
+            BluetoothDevice {
+                mac_address: "00:11:22:33:44:55".to_string(),
+                name: "Sony WH-1000XM5".to_string(),
+                battery_percent: Some(85),
+                is_paired: true,
+                is_connected: true,
+            },
+        );
+
+        Self { devices }
+    }
+
+    pub fn pair_device(&mut self, mac: &str, name: &str) {
+        self.devices.insert(
+            mac.to_string(),
+            BluetoothDevice {
+                mac_address: mac.to_string(),
+                name: name.to_string(),
+                battery_percent: Some(100),
+                is_paired: true,
+                is_connected: true,
+            },
+        );
+    }
+
+    pub fn get_battery_telemetry(&self, mac: &str) -> Option<u8> {
+        self.devices.get(mac).and_then(|d| d.battery_percent)
+    }
+}
+
+impl Default for OmarchyBluezBluetoothEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 17. OMARCHY BTOP RESOURCE MONITOR CONFIGURATION GENERATOR
+// =========================================================================
+
+pub struct OmarchyBtopConfigGeneratorEngine {
+    pub color_theme: String,
+    pub update_ms: u32,
+    pub proc_sorting: String,
+}
+
+impl OmarchyBtopConfigGeneratorEngine {
+    pub fn new() -> Self {
+        Self {
+            color_theme: "catppuccin_mocha".to_string(),
+            update_ms: 1000,
+            proc_sorting: "cpu lazy".to_string(),
+        }
+    }
+
+    pub fn generate_btop_config_text(&self) -> String {
+        format!(
+            "color_theme = \"{}\"\nupdate_ms = {}\nproc_sorting = \"{}\"\nshown_boxes = \"cpu mem net proc\"",
+            self.color_theme, self.update_ms, self.proc_sorting
+        )
+    }
+}
+
+impl Default for OmarchyBtopConfigGeneratorEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 #[cfg(test)]
 mod tests {
@@ -514,5 +787,50 @@ mod tests {
         assert_eq!(updated, 3);
         assert!(snap_created);
         assert_eq!(gateway.pending_updates.len(), 0);
+    }
+
+    #[test]
+    fn test_omarchy_hyprland_autotiling_engine() {
+        let mut hypr = OmarchyHyprlandAutotilingEngine::new();
+        hypr.set_layout_mode(HyprlandLayoutMode::Master);
+        assert_eq!(hypr.active_layout, HyprlandLayoutMode::Master);
+
+        let cmd = hypr.dispatch_gesture(3, "right").unwrap();
+        assert!(cmd.contains("workspace e+1"));
+    }
+
+    #[test]
+    fn test_omarchy_catppuccin_theme_sync_engine() {
+        let mut cat = OmarchyCatppuccinThemeSyncEngine::new();
+        let msg = cat.switch_flavor(CatppuccinFlavor::Frappe);
+        assert!(msg.contains("Frappe"));
+        assert_eq!(cat.gtk_theme, "Catppuccin-Frappe-Standard-Blue-Dark");
+        assert_eq!(cat.qt_kvantum_theme, "Catppuccin-Frappe-Blue");
+    }
+
+    #[test]
+    fn test_omarchy_wifi_network_manager_engine() {
+        let mut wifi = OmarchyWifiNetworkManagerEngine::new();
+        assert_eq!(wifi.scan_networks(), 2);
+
+        assert!(wifi.connect_network("Guest-Wi-Fi", "secret").is_ok());
+        assert_eq!(wifi.active_ssid, Some("Guest-Wi-Fi".to_string()));
+    }
+
+    #[test]
+    fn test_omarchy_bluez_bluetooth_engine() {
+        let mut bt = OmarchyBluezBluetoothEngine::new();
+        assert_eq!(bt.get_battery_telemetry("00:11:22:33:44:55"), Some(85));
+
+        bt.pair_device("AA:BB:CC:DD:EE:FF", "Bose QC45");
+        assert_eq!(bt.get_battery_telemetry("AA:BB:CC:DD:EE:FF"), Some(100));
+    }
+
+    #[test]
+    fn test_omarchy_btop_config_generator_engine() {
+        let btop = OmarchyBtopConfigGeneratorEngine::new();
+        let cfg = btop.generate_btop_config_text();
+        assert!(cfg.contains("color_theme = \"catppuccin_mocha\""));
+        assert!(cfg.contains("shown_boxes = \"cpu mem net proc\""));
     }
 }
