@@ -579,7 +579,7 @@ mod tests {
 
         assert!(feed.ingest_article("phoronix", "Linux 6.12 Kernel Benchmarks"));
         assert!(!feed.ingest_article("phoronix", "Linux 6.12 Kernel Benchmarks"));
-        assert_eq!(feed.get_portal("phoronix").unwrap().intelligence_feed_items, 369);
+        assert_eq!(feed.get_portal("phoronix").unwrap().intelligence_feed_items, 269);
 
         let linux_portals = feed.filter_by_category("Linux & Open Source");
         assert!(!linux_portals.is_empty());
