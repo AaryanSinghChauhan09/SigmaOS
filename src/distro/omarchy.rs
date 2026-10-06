@@ -627,7 +627,7 @@ pub use omarchy_inspiration::{
 
 #[path = "."]
 pub mod distro {
-    pub use crate::distro::omarchy_inspiration;
+    pub use super::omarchy_inspiration;
 }
 
 /// Omarchy Liveboot ISO & Automated Installer Engine
