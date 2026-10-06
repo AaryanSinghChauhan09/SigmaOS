@@ -13,20 +13,12 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::boxed::Box;
-use std::format;
-use std::string::{String, ToString};
 use std::vec::Vec;
 
-// (no_std only applicable at crate root - removed)
-// #![no_main]  // crate-root only
-
-use core::mem;
 use core::sync::atomic::{AtomicUsize, Ordering};
-use std::boxed::Box;
 /// OOP-based File Manager for SigmaOS
 /// Based on Ideas-999-Structured: User Experience & Desktop Item 766
 /// Implements file browser and management
-use std::vec::Vec;
 
 pub type FileID = usize;
 
@@ -58,6 +50,7 @@ pub trait FileEntry {
 pub struct SimpleFileEntry {
     pub id: FileID,
     pub name: [u8; 256],
+    pub name_len: u16,
     pub file_type: AtomicUsize,
     pub size: AtomicUsize,
     pub hidden: AtomicUsize,
@@ -66,13 +59,14 @@ pub struct SimpleFileEntry {
 impl SimpleFileEntry {
     pub fn new(id: FileID, name: &[u8], file_type: FileType, size: u64) -> Self {
         let mut name_array = [0u8; 256];
-        let name_len = name.len().min(255);
+        let name_len = name.len().min(256);
         unsafe {
             core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
         }
         SimpleFileEntry {
             id,
             name: name_array,
+            name_len: name_len as u16,
             file_type: AtomicUsize::new(file_type as usize),
             size: AtomicUsize::new(size as usize),
             hidden: AtomicUsize::new(0),
@@ -85,8 +79,9 @@ impl FileEntry for SimpleFileEntry {
         self.id
     }
     fn name(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(256);
-        &self.name[..len]
+        // Bolt ⚡ Optimization: Instantaneous O(1) constant-time slice lookup using cached name_len,
+        // eliminating O(N) zero-byte linear scans (.position(|&b| b == 0)) on every file name access in file manager views.
+        &self.name[..self.name_len as usize]
     }
     fn file_type(&self) -> FileType {
         match self.file_type.load(Ordering::SeqCst) {
@@ -367,6 +362,17 @@ impl FileSearch for SimpleFileSearch {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_simple_file_entry_cached_name_len() {
+        let entry = SimpleFileEntry::new(1, b"documents", FileType::Directory, 4096);
+        assert_eq!(entry.id(), 1);
+        assert_eq!(entry.name(), b"documents");
+        assert_eq!(entry.name_len, 9);
+        assert_eq!(entry.file_type(), FileType::Directory);
+        assert_eq!(entry.size(), 4096);
+        assert!(!entry.is_hidden());
+    }
 
     #[test]
     fn test_dual_pane_view() {
