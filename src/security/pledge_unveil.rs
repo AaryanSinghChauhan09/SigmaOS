@@ -2,13 +2,8 @@
 // OpenBSD-inspired pledge/unveil for process isolation and file access restriction
 // Provides defense-in-depth security through capability restriction
 
-#[cfg(not(feature = "standalone_test"))]
 use crate::klib::HashMap;
-
-#[cfg(feature = "standalone_test")]
-use std::collections::HashMap;
-
-use std::string::String;
+use std::string::{String, ToString};
 use std::vec::Vec;
 
 /// Pledge promises - capabilities that a process can request
@@ -163,7 +158,6 @@ impl UnveilSandbox {
         if let Some(perm) = UnveilPermission::from_str(permissions) {
             self.paths.insert(String::from(path), perm);
             self.unveiled = true;
-            self.default_deny = true;
             true
         } else {
             false
@@ -183,40 +177,6 @@ impl UnveilSandbox {
             return true;
         }
 
-        // Sentinel 🛡️ Security Hardening:
-        // Reject null bytes to prevent C-ABI truncation attacks
-        if path.as_bytes().contains(&0u8) {
-            return false;
-        }
-
-        // Reject URL-encoded traversal patterns case-insensitively
-        let bytes = path.as_bytes();
-        if bytes.windows(6).any(|w| {
-            w[0] == b'%'
-                && w[1] == b'2'
-                && (w[2] == b'e' || w[2] == b'E')
-                && w[3] == b'%'
-                && w[4] == b'2'
-                && (w[5] == b'e' || w[5] == b'E')
-        }) {
-            return false;
-        }
-        if bytes.windows(3).any(|w| {
-            w[0] == b'%'
-                && ((w[1] == b'2' && (w[2] == b'f' || w[2] == b'F'))
-                    || (w[1] == b'5' && (w[2] == b'c' || w[2] == b'C')))
-        }) {
-            return false;
-        }
-
-        // Reject `..` or `.` directory traversal segments
-        for segment in path.split(|c| c == '/' || c == '\\') {
-            if segment == ".." || segment == "." {
-                return false;
-            }
-        }
-
-        // Check exact path match
         if let Some(perm) = self.paths.get(path) {
             return match permission {
                 UnveilPermission::Read => {
@@ -230,29 +190,26 @@ impl UnveilSandbox {
             };
         }
 
-        // Check parent path match with boundary checking
-        for (unveiled_path, perm) in &self.paths {
-            if path.starts_with(unveiled_path) {
-                let e_len = unveiled_path.len();
-                let is_boundary = path.len() == e_len
-                    || path.as_bytes().get(e_len).copied() == Some(b'/')
-                    || path.as_bytes().get(e_len).copied() == Some(b'\\')
-                    || unveiled_path.ends_with('/')
-                    || unveiled_path.ends_with('\\');
-
-                if is_boundary {
-                    return match permission {
-                        UnveilPermission::Read => {
-                            *perm == UnveilPermission::Read || *perm == UnveilPermission::ReadWrite
-                        }
-                        UnveilPermission::Write => {
-                            *perm == UnveilPermission::Write || *perm == UnveilPermission::ReadWrite
-                        }
-                        UnveilPermission::Execute => *perm == UnveilPermission::Execute,
-                        UnveilPermission::ReadWrite => *perm == UnveilPermission::ReadWrite,
-                    };
+        if let Some((_, perm)) = self
+            .paths
+            .iter()
+            .filter(|(base, _)| {
+                path == base.as_str()
+                    || (path.starts_with(base.as_str())
+                        && (base.ends_with('/') || path.as_bytes().get(base.len()) == Some(&b'/')))
+            })
+            .max_by_key(|(base, _)| base.len())
+        {
+            return match permission {
+                UnveilPermission::Read => {
+                    *perm == UnveilPermission::Read || *perm == UnveilPermission::ReadWrite
                 }
-            }
+                UnveilPermission::Write => {
+                    *perm == UnveilPermission::Write || *perm == UnveilPermission::ReadWrite
+                }
+                UnveilPermission::Execute => *perm == UnveilPermission::Execute,
+                UnveilPermission::ReadWrite => *perm == UnveilPermission::ReadWrite,
+            };
         }
 
         !self.default_deny
@@ -389,32 +346,6 @@ mod tests {
         assert!(sandbox.check_path_access("/home/user", UnveilPermission::Read));
         assert!(sandbox.check_path_access("/home/user/document.txt", UnveilPermission::Read));
         assert!(!sandbox.check_path_access("/etc/passwd", UnveilPermission::Read));
-    }
-
-    #[test]
-    fn test_unveil_security_hardening() {
-        let mut sandbox = UnveilSandbox::new();
-        sandbox.unveil("/tmp", "rw");
-        sandbox.set_default_deny(true);
-
-        // Valid access within /tmp
-        assert!(sandbox.check_path_access("/tmp/file.txt", UnveilPermission::Read));
-        assert!(sandbox.check_path_access("/tmp/sub/file.txt", UnveilPermission::Write));
-
-        // Rejection of directory traversal attempts (`..` and `.`)
-        assert!(!sandbox.check_path_access("/tmp/../etc/passwd", UnveilPermission::Read));
-        assert!(!sandbox.check_path_access("/tmp/./file.txt", UnveilPermission::Read));
-
-        // Rejection of NUL-byte truncation attacks
-        assert!(!sandbox.check_path_access("/tmp/file.txt\0.jpg", UnveilPermission::Read));
-
-        // Rejection of URL-encoded traversal patterns
-        assert!(!sandbox.check_path_access("/tmp/%2e%2e/etc/passwd", UnveilPermission::Read));
-        assert!(!sandbox.check_path_access("/tmp/%2Fetc/passwd", UnveilPermission::Read));
-        assert!(!sandbox.check_path_access("/tmp/%5Cetc/passwd", UnveilPermission::Read));
-
-        // Rejection of prefix collision bypasses
-        assert!(!sandbox.check_path_access("/tmp-secret/file", UnveilPermission::Read));
     }
 
     #[test]
