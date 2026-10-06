@@ -5071,6 +5071,29 @@ mod tests {
     }
 
     #[test]
+    fn test_open_source_project_supremacy_suite_gap_closure_helpers() {
+        let suite = OpenSourceProjectSupremacySuite::new();
+
+        let trace_val = suite.trace_dtrace_probe("syscall", "sys_open", 42.0);
+        assert_eq!(trace_val, 42.0);
+
+        let handle = suite.create_nt_executive_object("DeviceObject", "\\Device\\Volume0");
+        assert_eq!(handle, 1);
+
+        let bytecode_len = suite.compile_holyc_jit("RenderScene", "U0 Main() {}");
+        assert!(bytecode_len > 0);
+
+        let res = suite.dispatch_freedos_int21h(0x09).unwrap();
+        assert!(res.contains("Display String"));
+
+        let tid = suite.spawn_contiki_protothread();
+        assert_eq!(tid, 1);
+
+        let stub = suite.build_cosmopolitan_ape_stub(b"bin_data");
+        assert!(stub.starts_with(b"MZqFpD="));
+    }
+
+    #[test]
     fn test_open_source_project_supremacy_suite_new_engines() {
         let mut suite = OpenSourceProjectSupremacySuite::new();
 
@@ -6955,6 +6978,49 @@ impl OpenSourceProjectSupremacySuite {
                 btop.active_snapshot.memory_used_mb,
             )
         }
+    }
+
+    /// Illumos DTrace Dynamic Tracing Helper
+    pub fn trace_dtrace_probe(&self, provider: &str, name: &str, val: f64) -> f64 {
+        let mut dtrace = DTraceDynamicTracingEngine::new();
+        dtrace.register_probe(provider, "kernel", "func", name);
+        dtrace.enable_probe(provider, name);
+        dtrace.fire_probe(provider, name, Some(val));
+        if let Some(agg) = dtrace.aggregations.first() {
+            agg.compute()
+        } else {
+            0.0
+        }
+    }
+
+    /// ReactOS / Windows NT Executive Object Manager Helper
+    pub fn create_nt_executive_object(&self, obj_type: &str, obj_name: &str) -> u32 {
+        let mut nt = NtExecutiveObjectManagerEngine::new();
+        nt.ob_create_object(obj_type, obj_name)
+    }
+
+    /// TempleOS HolyC JIT Execution Helper
+    pub fn compile_holyc_jit(&self, symbol: &str, code: &str) -> usize {
+        let mut holyc = TempleOsHolyCCompilerEngine::new();
+        holyc.compile_holyc_jit(symbol, code).unwrap_or(0)
+    }
+
+    /// FreeDOS TSR Interrupt Dispatch Helper
+    pub fn dispatch_freedos_int21h(&self, subfunction: u8) -> Result<String, &'static str> {
+        let freedos = FreeDosInterruptVectorEngine::new();
+        freedos.dispatch_int21h(subfunction)
+    }
+
+    /// Contiki-OS / RIOT OS Protothread Helper
+    pub fn spawn_contiki_protothread(&self) -> u32 {
+        let mut contiki = ContikiProtothreadEngine::new();
+        contiki.spawn_protothread()
+    }
+
+    /// Cosmopolitan APE Multi-Format Binary Stub Helper
+    pub fn build_cosmopolitan_ape_stub(&self, payload: &[u8]) -> Vec<u8> {
+        let ape = CosmopolitanApeHeaderEngine::new();
+        ape.build_ape_stub(payload)
     }
 }
 
