@@ -7,8 +7,6 @@ use std::fs;
 use std::path::Path;
 use std::process::exit;
 
-use sigmaos::package::pull_request_workflow::PullRequestPackageFormat;
-use sigmaos::package::sovereign_pr_package_gateway::SovereignUniversalPrGatewayEngine;
 use sigmaos::sigpkg::repository_manager::{Repository, RepositoryManager};
 use sigmaos::sigpkg::universal_adapter::{
     SigPkgUniversalBridgeEngine, UniversalPackageTriggerEngine, UniversalSandboxCapabilityMatrix,
