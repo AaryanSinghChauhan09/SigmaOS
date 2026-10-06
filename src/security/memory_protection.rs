@@ -26,7 +26,7 @@ impl Default for AslrConfig {
         Self {
             enabled: true,
             randomization_bits: 16, // 16-bit randomization by default
-            page_alignment: 4096, // 4KB page alignment
+            page_alignment: 4096,   // 4KB page alignment
         }
     }
 }
@@ -44,7 +44,7 @@ impl Default for StackCanaryConfig {
         Self {
             enabled: true,
             canary_value: 0xDEADBEEFCAFEBABE, // Default canary value
-            check_interval: 1000, // Check every 1000 operations
+            check_interval: 1000,             // Check every 1000 operations
         }
     }
 }
@@ -63,12 +63,12 @@ impl MemoryProtectionManager {
         let aslr_config = AslrConfig::default();
         let stack_canary_config = StackCanaryConfig::default();
 
-        // Generate random ASLR offset if enabled
-        let aslr_offset = if mode == MemoryProtectionMode::ASLR || mode == MemoryProtectionMode::Full {
-            AtomicU64::new(Self::generate_random_offset(&aslr_config))
-        } else {
-            AtomicU64::new(0)
-        };
+        let aslr_offset =
+            if mode == MemoryProtectionMode::ASLR || mode == MemoryProtectionMode::Full {
+                AtomicU64::new(Self::generate_random_offset(&aslr_config))
+            } else {
+                AtomicU64::new(0)
+            };
 
         Self {
             mode,
@@ -81,19 +81,11 @@ impl MemoryProtectionManager {
 
     /// Generate a random offset for ASLR
     fn generate_random_offset(config: &AslrConfig) -> u64 {
-        // In production, use a cryptographically secure RNG
-        // For now, use a simple hash-based approach
         let timestamp = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap_or_default()
             .as_nanos();
 
-        let mask = (1u64 << config.randomization_bits) - 1;
-        let random = (timestamp as u64) & mask;
-
-        // Align to a power-of-two boundary; saturating the configurable input
-        // above avoids zero-alignment underflow and invalid shifts.
-        random & !(alignment - 1)
         let mask = (1u64 << config.randomization_bits) - 1;
         let random = (timestamp as u64) & mask;
 
@@ -113,8 +105,13 @@ impl MemoryProtectionManager {
 
     /// Generate a stack canary for a stack frame
     pub fn generate_stack_canary(&mut self, stack_pointer: usize) -> u64 {
-        if self.mode == MemoryProtectionMode::StackCanaries || self.mode == MemoryProtectionMode::Full {
-            let canary = self.stack_canary_config.canary_value.wrapping_add(stack_pointer as u64);
+        if self.mode == MemoryProtectionMode::StackCanaries
+            || self.mode == MemoryProtectionMode::Full
+        {
+            let canary = self
+                .stack_canary_config
+                .canary_value
+                .wrapping_add(stack_pointer as u64);
             self.stack_canary_map.insert(stack_pointer, canary);
             canary
         } else {
@@ -124,7 +121,9 @@ impl MemoryProtectionManager {
 
     /// Verify stack canary for a stack frame
     pub fn verify_stack_canary(&self, stack_pointer: usize, canary: u64) -> bool {
-        if self.mode == MemoryProtectionMode::StackCanaries || self.mode == MemoryProtectionMode::Full {
+        if self.mode == MemoryProtectionMode::StackCanaries
+            || self.mode == MemoryProtectionMode::Full
+        {
             if let Some(&expected) = self.stack_canary_map.get(&stack_pointer) {
                 expected == canary
             } else {
@@ -147,7 +146,6 @@ impl MemoryProtectionManager {
     pub fn set_mode(&mut self, mode: MemoryProtectionMode) {
         self.mode = mode;
 
-        // Re-initialize ASLR offset if enabling ASLR
         if mode == MemoryProtectionMode::ASLR || mode == MemoryProtectionMode::Full {
             let new_offset = Self::generate_random_offset(&self.aslr_config);
             self.aslr_offset.store(new_offset, Ordering::SeqCst);

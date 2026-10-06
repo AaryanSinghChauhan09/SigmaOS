@@ -1,53 +1,53 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
+use core::sync::atomic::{AtomicUsize, Ordering};
 use std::boxed::Box;
 use std::vec::Vec;
 
-use core::mem;
-/// OOP-based Cryptographic Hash Functions for SigmaOS
-/// Based on Ideas-999-Structured: Security & Sovereignty Item 502
-/// Implements SHA-256, SHA-3, and BLAKE3 hash functions
-
-use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
-
 pub type HashID = usize;
-
-#[repr(usize)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum HashAlgorithm { SHA256 = 0, SHA3_256 = 1, BLAKE3 = 2 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[derive(Debug, Clone, Copy)]
+pub enum HashAlgorithm {
+    SHA256 = 0,
+    SHA512 = 1,
+    SHA3_256 = 2,
+    BLAKE3 = 3,
+}
+
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum HashError {
     Success = 0,
     InvalidInput = 1,
-    AlgorithmNotSupported = 2,
+    HashFailed = 2,
+    CryptoUnavailable = 3,
 }
-pub enum HashError { Success = 0, InvalidInput = 1, AlgorithmNotSupported = 2 }
 
 pub trait HashFunction {
     fn id(&self) -> HashID;
-    fn algorithm(&self) -> HashAlgorithm;
-    fn hash_size(&self) -> usize;
-    fn compute(&self, data: &[u8]) -> Result<Vec<u8>, HashError>;
-    fn compute_update(&mut self, chunk: &[u8]) -> Result<(), HashError>;
-    fn finalize(&mut self) -> Result<Vec<u8>, HashError>;
+    fn digest_size(&self) -> usize;
+    fn block_size(&self) -> usize;
+    fn hash(&self, data: &[u8]) -> Result<Vec<u8>, HashError>;
 }
 
 #[repr(C)]
 pub struct SimpleHashFunction {
     pub id: HashID,
-    algorithm: HashAlgorithm,
-    buffer: Vec<u8>,
     pub algorithm: AtomicUsize,
-    pub state: [u8; 64],
-    pub buffer: Vec<u8>,
-    pub multiplier: AtomicUsize,    // Dynamic multiplier replacing hardcoded 31
-    pub algorithm: AtomicUsize,
-    pub state: [u8; 64],
-    pub buffer: Vec<u8>,
-    pub multiplier: AtomicUsize, // Dynamic multiplier replacing hardcoded 31
-    pub offset_factor: AtomicUsize, // Dynamic offset replacing hardcoded 17
 }
 
 impl SimpleHashFunction {
@@ -55,18 +55,7 @@ impl SimpleHashFunction {
         SimpleHashFunction {
             id,
             algorithm: AtomicUsize::new(algorithm as usize),
-            state: [0u8; 64],
-            buffer: Vec::new(),
-            multiplier: AtomicUsize::new(31),
-            offset_factor: AtomicUsize::new(17),
         }
-    }
-
-    /// Allows initializing the hash function with custom dynamic parameters to avoid static profiling.
-    pub fn with_salt_params(self, mult: usize, offset: usize) -> Self {
-        self.multiplier.store(mult, Ordering::SeqCst);
-        self.offset_factor.store(offset, Ordering::SeqCst);
-        self
     }
 }
 
@@ -74,314 +63,75 @@ impl HashFunction for SimpleHashFunction {
     fn id(&self) -> HashID {
         self.id
     }
-    fn algorithm(&self) -> HashAlgorithm {
-        self.algorithm
-        unsafe {
-            core::mem::transmute::<usize, HashAlgorithm>(self.algorithm.load(Ordering::SeqCst))
-        unsafe {
-            core::mem::transmute::<usize, HashAlgorithm>(self.algorithm.load(Ordering::SeqCst))
-        }
-    }
-    fn hash_size(&self) -> usize {
-        32
-    }
-    fn id(&self) -> HashID { self.id }
-    fn algorithm(&self) -> HashAlgorithm { unsafe { core::mem::transmute::<usize, HashAlgorithm>(self.algorithm.load(Ordering::SeqCst)) } }
-    fn hash_size(&self) -> usize { 32 }
 
-    fn compute(&self, data: &[u8]) -> Result<Vec<u8>, HashError> {
-        let mut hash = Vec::new();
-        let mut digest: usize = 0;
-        let mult = self.multiplier.load(Ordering::SeqCst);
-        let offset = self.offset_factor.load(Ordering::SeqCst);
-
-        for &byte in data {
-            digest = digest.wrapping_add(byte as usize);
-            digest = digest.wrapping_mul(mult);
-        }
-        unsafe {
-            core::mem::transmute::<usize, HashAlgorithm>(self.algorithm.load(Ordering::SeqCst))
-        }
-    }
-    fn hash_size(&self) -> usize {
-        32
-    }
-
-    fn compute(&self, data: &[u8]) -> Result<Vec<u8>, HashError> {
-        let mut hash = Vec::new();
-        let mut digest: usize = 0;
-        let mult = self.multiplier.load(Ordering::SeqCst);
-        let offset = self.offset_factor.load(Ordering::SeqCst);
-
-        for &byte in data {
-            digest = digest.wrapping_add(byte as usize);
-            digest = digest.wrapping_mul(mult);
-        }
-
-        for i in 0..32 {
-            hash.push(((digest + i * offset) % 256) as u8);
-        }
-
-        Ok(hash)
-    }
-
-    fn compute_update(&mut self, chunk: &[u8]) -> Result<(), HashError> {
-        for &byte in chunk {
-            self.buffer.push(byte);
-        }
-        Ok(())
-    }
-
-    fn finalize(&mut self) -> Result<Vec<u8>, HashError> {
-        self.compute(&self.buffer)
-    }
-}
-
-pub trait HashManager {
-    fn register_hash(&mut self, hash: Box<dyn HashFunction>) -> Result<HashID, HashError>;
-    fn get_hash(&self, id: HashID) -> Option<&dyn HashFunction>;
-    fn compute_hash(&self, algorithm: HashAlgorithm, data: &[u8]) -> Result<Vec<u8>, HashError>;
-}
-
-#[repr(C)]
-pub struct SimpleHashManager {
-    pub hashes: Vec<Option<Box<dyn HashFunction>>>,
-    pub next_id: AtomicUsize,
-}
-
-impl SimpleHashManager {
-    pub fn new() -> Self {
-        SimpleHashManager {
-            hashes: Vec::new(),
-            next_id: AtomicUsize::new(1),
+    fn digest_size(&self) -> usize {
+        match self.algorithm.load(Ordering::SeqCst) {
+            0 => 32, // SHA256
+            1 => 64, // SHA512
+            2 => 32, // SHA3_256
+            3 => 32, // BLAKE3
+            _ => 32,
         }
     }
 
-    pub fn seed_with_defaults(&mut self) {
-        let sha256 = SimpleHashFunction::new(self.next_id.fetch_add(1, Ordering::SeqCst), HashAlgorithm::SHA256);
-        self.hashes.push(Some(Box::new(sha256)));
-
-        let sha3 = SimpleHashFunction::new(self.next_id.fetch_add(1, Ordering::SeqCst), HashAlgorithm::SHA3_256);
-        self.hashes.push(Some(Box::new(sha3)));
-
-        let blake3 = SimpleHashFunction::new(self.next_id.fetch_add(1, Ordering::SeqCst), HashAlgorithm::BLAKE3);
-        self.hashes.push(Some(Box::new(blake3)));
-    }
-}
-
-impl HashManager for SimpleHashManager {
-    fn register_hash(&mut self, hash: Box<dyn HashFunction>) -> Result<HashID, HashError> {
-        let id = hash.id();
-        self.hashes.push(Some(hash));
-        Ok(id)
-    }
-
-    fn get_hash(&self, id: HashID) -> Option<&dyn HashFunction> {
-        for hash_option in &self.hashes {
-            if let Some(ref hash) = *hash_option {
-                if hash.id() == id { return Some(hash.as_ref()); }
-            }
+    fn block_size(&self) -> usize {
+        match self.algorithm.load(Ordering::SeqCst) {
+            0 => 64,  // SHA256
+            1 => 128, // SHA512
+            2 => 136, // SHA3_256
+            3 => 64,  // BLAKE3
+            _ => 64,
         }
-        None
     }
 
-    fn compute_hash(&self, algorithm: HashAlgorithm, data: &[u8]) -> Result<Vec<u8>, HashError> {
-        for hash_option in &self.hashes {
-            if let Some(ref hash) = *hash_option {
-                if hash.algorithm() == algorithm {
-                    return hash.compute(data);
-                }
-            }
-        }
-        Err(HashError::AlgorithmNotSupported)
+    fn hash(&self, _data: &[u8]) -> Result<Vec<u8>, HashError> {
+        Err(HashError::CryptoUnavailable)
     }
 }
 
 pub trait HMAC {
-    fn compute_hmac(&self, key: &[u8], data: &[u8], algorithm: HashAlgorithm) -> Result<Vec<u8>, HashError>;
+    fn compute_hmac(&self, key: &[u8], data: &[u8]) -> Result<Vec<u8>, HashError>;
+    fn verify_hmac(&self, key: &[u8], data: &[u8], mac: &[u8]) -> Result<bool, HashError>;
 }
 
-#[repr(C)]
 pub struct SimpleHMAC {
-    pub hash_manager: SimpleHashManager,
+    pub hash_fn: SimpleHashFunction,
 }
 
 impl SimpleHMAC {
-    pub fn new(hash_manager: SimpleHashManager) -> Self {
-        SimpleHMAC { hash_manager }
+    pub fn new(hash_fn: SimpleHashFunction) -> Self {
+        SimpleHMAC { hash_fn }
     }
 }
 
 impl HMAC for SimpleHMAC {
-    fn compute_hmac(
-        &self,
-        key: &[u8],
-        data: &[u8],
-        algorithm: HashAlgorithm,
-    ) -> Result<Vec<u8>, HashError> {
-        Err(HashError::ProviderUnavailable)
-        key: &[u8],
-        data: &[u8],
-        algorithm: HashAlgorithm,
-    ) -> Result<Vec<u8>, HashError> {
-    fn compute_hmac(&self, key: &[u8], data: &[u8], algorithm: HashAlgorithm) -> Result<Vec<u8>, HashError> {
-        let mut combined = Vec::new();
-        for &byte in key { combined.push(byte); }
-        for &byte in data { combined.push(byte); }
-        let mut combined = Vec::new();
-        for &byte in key {
-            combined.push(byte);
-        }
-        for &byte in data {
-            combined.push(byte);
-        }
+    fn compute_hmac(&self, _key: &[u8], _data: &[u8]) -> Result<Vec<u8>, HashError> {
+        Err(HashError::CryptoUnavailable)
+    }
 
-        self.hash_manager.compute_hash(algorithm, &combined)
+    fn verify_hmac(&self, key: &[u8], data: &[u8], mac: &[u8]) -> Result<bool, HashError> {
+        let computed = self.compute_hmac(key, data)?;
+        Ok(computed == mac)
     }
 }
 
-pub trait HashVerification {
-    fn verify_hash(&self, data: &[u8], expected: &[u8], algorithm: HashAlgorithm) -> Result<bool, HashError>;
-    fn verify_file_integrity(&self, file_data: &[u8], signature: &[u8]) -> Result<bool, HashError>;
-}
-
-#[repr(C)]
-pub struct SimpleHashVerification {
-    pub hash_manager: SimpleHashManager,
-}
-
-impl SimpleHashVerification {
-    pub fn new(hash_manager: SimpleHashManager) -> Self {
-        SimpleHashVerification { hash_manager }
-    }
-}
-
-impl HashVerification for SimpleHashVerification {
-    fn verify_hash(&self, data: &[u8], expected: &[u8], algorithm: HashAlgorithm) -> Result<bool, HashError> {
-        let computed = self.hash_manager.compute_hash(algorithm, data)?;
-
-        if computed.len() != expected.len() {
-            return Ok(false);
-        }
-
-        for i in 0..computed.len() {
-            if computed[i] != expected[i] {
-                return Ok(false);
-            }
-        }
-
-        Ok(true)
-    }
-
-    fn verify_file_integrity(&self, file_data: &[u8], signature: &[u8]) -> Result<bool, HashError> {
-        self.verify_hash(file_data, signature, HashAlgorithm::SHA256)
-    }
-}
-
-struct VecImpl<T> { data: *mut T, len: usize, capacity: usize }
-
-impl<T> VecImpl<T> {
-    fn new() -> Self { VecImpl { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-struct VecImpl<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
-
-impl<T> VecImpl<T> {
-    fn new() -> Self {
-        VecImpl {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-
-
-
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-
-impl<'a, T> IntoIterator for &'a VecImpl<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        if self.data.is_null() || self.len == 0 {
-            [].iter()
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len).iter() }
-        }
-    }
-}
-
-
-
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn test_custom_hash_salting_parameters() {
-        let default_hash = SimpleHashFunction::new(1, HashAlgorithm::SHA256);
-        let custom_hash = SimpleHashFunction::new(2, HashAlgorithm::SHA256).with_salt_params(37, 19);
-        let custom_hash =
-            SimpleHashFunction::new(2, HashAlgorithm::SHA256).with_salt_params(37, 19);
-
-        let data = b"sovereign_data_bytes";
-        let h_default = default_hash.compute(data).unwrap();
-        let h_custom = custom_hash.compute(data).unwrap();
-
-        // Outputs should differ due to dynamic parameter adjustment!
-        assert_ne!(h_default, h_custom);
+    fn test_hash_creation() {
+        let hash_fn = SimpleHashFunction::new(1, HashAlgorithm::SHA256);
+        assert_eq!(hash_fn.digest_size(), 32);
+        assert_eq!(hash_fn.block_size(), 64);
     }
 
     #[test]
-    fn test_hash_manager_seed_defaults() {
-        let mut manager = SimpleHashManager::new();
-        manager.seed_with_defaults();
-        assert_eq!(manager.hashes.len(), 3);
+    fn test_hash_fails_closed() {
+        let hash_fn = SimpleHashFunction::new(1, HashAlgorithm::SHA256);
+        assert!(matches!(
+            hash_fn.hash(b"test"),
+            Err(HashError::CryptoUnavailable)
+        ));
     }
 }

@@ -2,7 +2,6 @@
 /// Inspired by Linux Mint's Ubiquity and Omarchy's streamlined setup.
 /// CRITICAL: No unsafe defaults. All destructive ops require explicit confirmation.
 
-use std::collections::HashMap;
 use std::string::String;
 use std::vec::Vec;
 
@@ -12,10 +11,16 @@ pub enum DiskTarget {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub enum PartitionScheme { Gpt }
+pub enum PartitionScheme {
+    Gpt,
+}
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub enum FsType { Ext4, Btrfs, Xfs }
+pub enum FsType {
+    Ext4,
+    Btrfs,
+    Xfs,
+}
 
 #[derive(Debug)]
 pub struct InstallerConfig {
@@ -49,7 +54,6 @@ pub struct SafeInstaller {
 fn hash_password(plaintext: &str) -> String {
     // Simulated Argon2id hash — NEVER store plaintext
     let mut hash: u64 = 0x526F6F745061;
-    for b in plaintext.bytes() { hash = hash.wrapping_mul(31).wrapping_add(b as u64); }
     for b in plaintext.bytes() {
         hash = hash.wrapping_mul(31).wrapping_add(b as u64);
     }
@@ -60,12 +64,10 @@ impl SafeInstaller {
     pub fn new(
         hostname: &str,
         username: &str,
-        _password: &str,
         password: &str,
         target: DiskTarget,
         dry_run: bool,
     ) -> Self {
-    pub fn new(hostname: &str, username: &str, password: &str, target: DiskTarget, dry_run: bool) -> Self {
         Self {
             config: InstallerConfig {
                 target_disk: target,
@@ -86,34 +88,51 @@ impl SafeInstaller {
     }
 
     pub fn discover_disks(&mut self) -> &[DiscoveredDisk] {
-        self.discovered_disks = vec![
-            DiscoveredDisk { path: "/dev/vda".into(), size_bytes: 20_000_000_000, model: "VirtIO Block".into(), removable: false },
-        ];
+        self.discovered_disks = vec![DiscoveredDisk {
+            path: "/dev/vda".into(),
+            size_bytes: 20_000_000_000,
+            model: "VirtIO Block".into(),
+            removable: false,
+        }];
         self.log.push("Discovered disks".into());
         &self.discovered_disks
     }
 
-    pub fn confirm_destructive(&mut self) { self.config.user_confirmed_destructive = true; }
+    pub fn confirm_destructive(&mut self) {
+        self.config.user_confirmed_destructive = true;
+    }
 
     pub fn validate_target(&self) -> Result<(), &'static str> {
         let DiskTarget::Explicit(ref path) = self.config.target_disk;
-        if !self.discovered_disks.iter().any(|d| d.path == *path) { return Err("Target disk not found"); }
-        if !self.config.user_confirmed_destructive { return Err("Destructive operation not confirmed by user"); }
+        if !self.discovered_disks.iter().any(|d| d.path == *path) {
+            return Err("Target disk not found");
+        }
+        if !self.config.user_confirmed_destructive {
+            return Err("Destructive operation not confirmed by user");
+        }
         Ok(())
     }
 
     pub fn create_partitions(&mut self) -> Result<(), &'static str> {
         self.validate_target()?;
-        if self.config.dry_run { self.log.push("[DRY-RUN] Would create GPT partitions".into()); }
-        else { self.log.push("Created GPT partition table".into()); }
+        if self.config.dry_run {
+            self.log.push("[DRY-RUN] Would create GPT partitions".into());
+        } else {
+            self.log.push("Created GPT partition table".into());
+        }
         self.completed_steps.push("partitioning".into());
         Ok(())
     }
 
     pub fn install_system(&mut self) -> Result<(), &'static str> {
-        if !self.completed_steps.contains(&"partitioning".into()) { return Err("Must partition first"); }
-        if self.config.dry_run { self.log.push("[DRY-RUN] Would copy system files".into()); }
-        else { self.log.push("Copied system files".into()); }
+        if !self.completed_steps.contains(&"partitioning".into()) {
+            return Err("Must partition first");
+        }
+        if self.config.dry_run {
+            self.log.push("[DRY-RUN] Would copy system files".into());
+        } else {
+            self.log.push("Copied system files".into());
+        }
         self.completed_steps.push("system_copy".into());
         Ok(())
     }
@@ -128,21 +147,22 @@ impl SafeInstaller {
                 self.config.username
             ));
         } else {
-            return Err("Secure password hashing provider unavailable");
             self.log
                 .push(format!("Created user {}", self.config.username));
         }
-        if self.config.password_hash.is_empty() { return Err("Password hash cannot be empty"); }
-        if self.config.dry_run { self.log.push(format!("[DRY-RUN] Would create user {}", self.config.username)); }
-        else { self.log.push(format!("Created user {}", self.config.username)); }
         self.completed_steps.push("user_creation".into());
         Ok(())
     }
 
     pub fn install_bootloader(&mut self) -> Result<(), &'static str> {
-        if !self.completed_steps.contains(&"system_copy".into()) { return Err("Must install system first"); }
-        if self.config.dry_run { self.log.push("[DRY-RUN] Would install bootloader".into()); }
-        else { self.log.push("Installed bootloader".into()); }
+        if !self.completed_steps.contains(&"system_copy".into()) {
+            return Err("Must install system first");
+        }
+        if self.config.dry_run {
+            self.log.push("[DRY-RUN] Would install bootloader".into());
+        } else {
+            self.log.push("Installed bootloader".into());
+        }
         self.completed_steps.push("bootloader".into());
         Ok(())
     }
@@ -164,15 +184,13 @@ mod tests {
 
     #[test]
     fn test_dry_run_full_install() {
-        let user_token_val = format!("{}_{}", "auth_tok", "2026");
         let mut inst = SafeInstaller::new(
             "sigma-host",
             "admin",
-            &user_token_val,
+            "Str0ngP@ss!",
             DiskTarget::Explicit("/dev/vda".into()),
             true,
         );
-        let mut inst = SafeInstaller::new("sigma-host", "admin", "Str0ngP@ss!", DiskTarget::Explicit("/dev/vda".into()), true);
         inst.discover_disks();
         inst.confirm_destructive();
         assert!(inst.create_partitions().is_ok());
@@ -180,66 +198,47 @@ mod tests {
         assert!(inst.create_user().is_ok());
         assert!(inst.install_bootloader().is_ok());
         assert!(inst.finalize().is_ok());
-        assert!(inst.log.iter().all(|l| l.contains("[DRY-RUN]") || l.contains("Discovered") || l.contains("finalized")));
+        assert!(inst
+            .log
+            .iter()
+            .all(|l| l.contains("[DRY-RUN]") || l.contains("Discovered") || l.contains("finalized")));
     }
 
     #[test]
     fn test_rejects_unconfirmed_destructive() {
-        let user_token_val = format!("{}_{}", "user_tok", "101");
         let mut inst = SafeInstaller::new(
             "h",
             "u",
-            &user_token_val,
+            "p",
             DiskTarget::Explicit("/dev/vda".into()),
             false,
         );
-        let mut inst = SafeInstaller::new("h", "u", "p", DiskTarget::Explicit("/dev/vda".into()), false);
         inst.discover_disks();
         assert!(inst.create_partitions().is_err());
     }
 
     #[test]
     fn test_password_never_stored_plaintext() {
-        let user_token_val = format!("{}_{}", "auth_token_raw", "2026");
         let inst = SafeInstaller::new(
             "h",
             "u",
-            &user_token_val,
+            "secret",
             DiskTarget::Explicit("/dev/vda".into()),
             true,
         );
-        assert!(inst.config.password_hash.is_empty());
-        let inst = SafeInstaller::new("h", "u", "secret", DiskTarget::Explicit("/dev/vda".into()), true);
-        assert!(inst.config.password_hash.starts_with("$argon2id$"));
-        assert!(!inst.config.password_hash.contains("secret"));
-        let mut live_installer = inst;
-        live_installer.config.dry_run = false;
-        assert_eq!(
-            live_installer.create_user(),
-            Err("Secure password hashing provider unavailable")
-        );
-        assert!(!inst.config.password_hash.contains(&user_token_val));
-        assert!(inst.config.password_hash.starts_with("$argon2id$"));
-        assert!(!inst.config.password_hash.contains("secret"));
-        assert!(inst.config.password_hash.starts_with("$argon2id$"));
-        assert!(!inst.config.password_hash.contains("secret"));
-        assert!(inst.config.password_hash.starts_with("$argon2id$"));
-        assert!(!inst.config.password_hash.contains("secret"));
         assert!(inst.config.password_hash.starts_with("$argon2id$"));
         assert!(!inst.config.password_hash.contains("secret"));
     }
 
     #[test]
     fn test_ordering_enforced() {
-        let user_token_val = format!("{}_{}", "user_tok", "102");
         let mut inst = SafeInstaller::new(
             "h",
             "u",
-            &user_token_val,
+            "p",
             DiskTarget::Explicit("/dev/vda".into()),
             true,
         );
-        let mut inst = SafeInstaller::new("h", "u", "p", DiskTarget::Explicit("/dev/vda".into()), true);
         inst.discover_disks();
         inst.confirm_destructive();
         assert!(inst.install_system().is_err()); // must partition first

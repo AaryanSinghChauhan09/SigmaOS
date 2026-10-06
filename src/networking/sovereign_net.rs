@@ -1,9 +1,9 @@
-use std::vec::Vec;
-use std::collections::{BTreeMap, VecDeque};
-use std::string::String;
-use std::rc::Rc;
 use core::cell::RefCell;
 use core::cmp;
+use std::collections::{BTreeMap, VecDeque};
+use std::rc::Rc;
+use std::string::String;
+use std::vec::Vec;
 
 // -----------------------------------------------------------------------------
 // TCP State Machine and Control Block
@@ -21,13 +21,13 @@ pub enum TcpState {
     CloseWait,
     Closing,
     LastAck,
-    TimeWait
+    TimeWait,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CongestionControlAlgo {
     Reno,
-    Cubic
+    Cubic,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -108,90 +108,89 @@ impl TcpControlBlock {
             rttvar: 0,
             tx_buffer: VecDeque::new(),
             rx_buffer: VecDeque::new(),
-            options: TcpOptions { mss: 1460, window_scaling: 7, timestamps: true, sack: true, ts_val: 0, ts_ecr: 0 },
+            options: TcpOptions {
+                mss: 1460,
+                window_scaling: 7,
+                timestamps: true,
+                sack: true,
+                ts_val: 0,
+                ts_ecr: 0,
+            },
         }
     }
 
-    pub fn handle_incoming(&mut self, seq: u32, ack: u32, flags: u8, window: u16, payload: &[u8]) {
+    pub fn handle_incoming(&mut self, seq: u32, ack: u32, flags: u8, _window: u16, payload: &[u8]) {
         // Implement TCP state transitions based on RFC 793
         let syn = (flags & 0x02) != 0;
         let ack_flag = (flags & 0x10) != 0;
         let fin = (flags & 0x01) != 0;
-        let rst = (flags & 0x04) != 0;
 
         match self.state {
             TcpState::Closed => {
-                // Closed state handling
                 if syn {
                     self.state = TcpState::SynReceived;
                     self.rcv_nxt = seq + 1;
                     self.irs = seq;
-                    // Send SYN-ACK
                 }
-            },
+            }
             TcpState::Listen => {
                 if syn {
                     self.state = TcpState::SynReceived;
                     self.rcv_nxt = seq + 1;
                     self.irs = seq;
                 }
-            },
+            }
             TcpState::SynSent => {
                 if syn && ack_flag {
                     self.state = TcpState::Established;
                     self.rcv_nxt = seq + 1;
                     self.snd_una = ack;
-                    // Send ACK
                 } else if syn {
                     self.state = TcpState::SynReceived;
                     self.rcv_nxt = seq + 1;
-                    // Send SYN-ACK
                 }
-            },
+            }
             TcpState::SynReceived => {
                 if ack_flag && ack == self.snd_nxt {
                     self.state = TcpState::Established;
                 }
-            },
+            }
             TcpState::Established => {
                 if ack_flag {
                     if ack > self.snd_una && ack <= self.snd_nxt {
                         self.snd_una = ack;
                         self.dup_acks = 0;
-                        // Congestion avoidance
                         if self.cwnd < self.ssthresh {
-                            self.cwnd += self.options.mss as u32; // Slow start
+                            self.cwnd += self.options.mss as u32;
                         } else {
-                            self.cwnd += (self.options.mss as u32 * self.options.mss as u32) / self.cwnd; // Congestion avoidance
+                            self.cwnd +=
+                                (self.options.mss as u32 * self.options.mss as u32) / self.cwnd;
                         }
                     } else if ack == self.snd_una {
                         self.dup_acks += 1;
                         if self.dup_acks == 3 {
-                            // Fast retransmit
                             self.ssthresh = core::cmp::max(self.cwnd / 2, 2 * self.options.mss as u32);
                             self.cwnd = self.ssthresh + 3 * self.options.mss as u32;
                         }
                     }
                 }
 
-                if payload.len() > 0 {
+                if !payload.is_empty() {
                     if seq == self.rcv_nxt {
                         self.rx_buffer.extend(payload.iter());
                         self.rcv_nxt += payload.len() as u32;
-                        // Send ACK
-                    } else {
-                        // Handle out of order or SACK
                     }
                 }
 
                 if fin {
                     self.state = TcpState::CloseWait;
                     self.rcv_nxt += 1;
-                    // Send ACK
                 }
-            },
+            }
             TcpState::FinWait1 => {
-                if ack_flag { self.state = TcpState::FinWait2; }
+                if ack_flag {
+                    self.state = TcpState::FinWait2;
+                }
                 if fin {
                     if self.state == TcpState::FinWait2 {
                         self.state = TcpState::TimeWait;
@@ -199,29 +198,24 @@ impl TcpControlBlock {
                         self.state = TcpState::Closing;
                     }
                 }
-            },
+            }
             TcpState::FinWait2 => {
                 if fin {
                     self.state = TcpState::TimeWait;
-                    // Start TimeWait timer
                 }
-            },
-            TcpState::CloseWait => {
-                // Application should call close()
-            },
+            }
+            TcpState::CloseWait => {}
             TcpState::Closing => {
                 if ack_flag {
                     self.state = TcpState::TimeWait;
                 }
-            },
+            }
             TcpState::LastAck => {
                 if ack_flag {
                     self.state = TcpState::Closed;
                 }
-            },
-            TcpState::TimeWait => {
-                // Wait for 2*MSL then transition to Closed
             }
+            TcpState::TimeWait => {}
         }
     }
 }
@@ -251,7 +245,9 @@ pub struct IpLayer {
 
 impl IpLayer {
     pub fn new() -> Self {
-        Self { reassembly_buffers: Vec::new() }
+        Self {
+            reassembly_buffers: Vec::new(),
+        }
     }
 
     pub fn handle_fragment(
@@ -263,18 +259,18 @@ impl IpLayer {
         mf: bool,
         payload: &[u8],
     ) -> Option<Vec<u8>> {
-        let buffer = self
+        let buffer_idx = self
             .reassembly_buffers
-            .iter_mut()
-            .find(|b| b.src_ip == src && b.dst_ip == dst && b.identification == id);
-    pub fn handle_fragment(&mut self, src: u32, dst: u32, id: u16, offset: u16, mf: bool, payload: &[u8]) -> Option<Vec<u8>> {
-        let buffer = self.reassembly_buffers.iter_mut().find(|b| b.src_ip == src && b.dst_ip == dst && b.identification == id);
+            .iter()
+            .position(|b| b.src_ip == src && b.dst_ip == dst && b.identification == id);
 
-        let buffer = match buffer {
-            Some(b) => b,
+        let buffer = match buffer_idx {
+            Some(idx) => &mut self.reassembly_buffers[idx],
             None => {
                 self.reassembly_buffers.push(IpReassemblyBuffer {
-                    src_ip: src, dst_ip: dst, identification: id,
+                    src_ip: src,
+                    dst_ip: dst,
+                    identification: id,
                     fragments: BTreeMap::new(),
                     total_length: None,
                     timer: 60,
@@ -291,18 +287,18 @@ impl IpLayer {
                 payload: payload.to_vec(),
             },
         );
-        buffer.fragments.insert(offset, IpFragment { offset, more_fragments: mf, payload: payload.to_vec() });
 
         if !mf {
             buffer.total_length = Some(offset + payload.len() as u16);
         }
 
-        // Check if fully reassembled
         let mut current_offset = 0;
         let mut fully_reassembled = false;
 
         for (off, frag) in &buffer.fragments {
-            if *off != current_offset { break; }
+            if *off != current_offset {
+                break;
+            }
             current_offset += frag.payload.len() as u16;
             if !frag.more_fragments {
                 fully_reassembled = true;
@@ -314,12 +310,18 @@ impl IpLayer {
             for (_, frag) in &buffer.fragments {
                 complete_payload.extend(&frag.payload);
             }
-            // Remove buffer
-            self.reassembly_buffers.retain(|b| !(b.src_ip == src && b.dst_ip == dst && b.identification == id));
+            self.reassembly_buffers
+                .retain(|b| !(b.src_ip == src && b.dst_ip == dst && b.identification == id));
             return Some(complete_payload);
         }
 
         None
+    }
+}
+
+impl Default for IpLayer {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -383,6 +385,19 @@ impl NetworkStack {
     }
 
     pub fn update_arp(&mut self, ip: u32, mac: [u8; 6]) {
-        self.arp_cache.insert(ip, ArpEntry { ip, mac, expiry: 0xFFFFFFFF });
+        self.arp_cache.insert(
+            ip,
+            ArpEntry {
+                ip,
+                mac,
+                expiry: 0xFFFFFFFF,
+            },
+        );
+    }
+}
+
+impl Default for NetworkStack {
+    fn default() -> Self {
+        Self::new()
     }
 }

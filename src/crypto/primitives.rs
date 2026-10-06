@@ -13,9 +13,10 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-// (no_std only applicable at crate root - removed)
-// #![no_main]  // crate-root only
-
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PrimitiveError {
+    ProviderNotIntegrated,
+}
 
 /// SHA-256 hash
 #[repr(C)]
@@ -24,15 +25,18 @@ pub struct SHA256Hash {
 }
 
 impl SHA256Hash {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        SHA256Hash {
-            data: [0; 32],
-        }
+        SHA256Hash { data: [0; 32] }
     }
 
     pub fn as_bytes(&self) -> &[u8; 32] {
         &self.data
+    }
+}
+
+impl Default for SHA256Hash {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -45,12 +49,11 @@ pub struct SHA256 {
 }
 
 impl SHA256 {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SHA256 {
             state: [
-                0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
-                0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19,
+                0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab,
+                0x5be0cd19,
             ],
             buffer: [0; 64],
             buffer_len: 0,
@@ -65,14 +68,13 @@ impl SHA256 {
             let space = 64 - self.buffer_len;
 
             if remaining >= space {
-                // Fill buffer and process
                 self.buffer[self.buffer_len..64].copy_from_slice(&data[offset..offset + space]);
                 self.process_block();
                 self.buffer_len = 0;
                 offset += space;
             } else {
-                // Copy remaining to buffer
-                self.buffer[self.buffer_len..self.buffer_len + remaining].copy_from_slice(&data[offset..]);
+                self.buffer[self.buffer_len..self.buffer_len + remaining]
+                    .copy_from_slice(&data[offset..]);
                 self.buffer_len += remaining;
                 offset += remaining;
             }
@@ -81,14 +83,6 @@ impl SHA256 {
     }
 
     pub fn finalize(mut self) -> SHA256Hash {
-        // Append padding
-        let bit_len = self.total_len.wrapping_mul(8);
-        let bit_len = self.total_len * 8;
-        let padding = [
-            0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         let bit_len = self.total_len * 8;
         let padding = [
             0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -108,7 +102,6 @@ impl SHA256 {
             self.buffer_len = 0;
         }
 
-        // Append length
         let len_bytes = bit_len.to_be_bytes();
         for i in 0..8 {
             self.buffer[56 + i] = len_bytes[i];
@@ -116,7 +109,6 @@ impl SHA256 {
 
         self.process_block();
 
-        // Convert state to hash
         let mut hash = SHA256Hash::new();
         for i in 0..8 {
             let bytes = self.state[i].to_be_bytes();
@@ -129,7 +121,6 @@ impl SHA256 {
     fn process_block(&mut self) {
         let mut w = [0u32; 64];
 
-        // Prepare message schedule
         for i in 0..16 {
             w[i] = u32::from_be_bytes([
                 self.buffer[i * 4],
@@ -142,10 +133,12 @@ impl SHA256 {
         for i in 16..64 {
             let s0 = sigma1(w[i - 2]);
             let s1 = sigma0(w[i - 15]);
-            w[i] = w[i - 16].wrapping_add(s0).wrapping_add(w[i - 7]).wrapping_add(s1);
+            w[i] = w[i - 16]
+                .wrapping_add(s0)
+                .wrapping_add(w[i - 7])
+                .wrapping_add(s1);
         }
 
-        // Initialize working variables
         let mut a = self.state[0];
         let mut b = self.state[1];
         let mut c = self.state[2];
@@ -155,9 +148,9 @@ impl SHA256 {
         let mut g = self.state[6];
         let mut h = self.state[7];
 
-        // Compression function
         for i in 0..64 {
-            let t1 = h.wrapping_add(big_sigma1(e))
+            let t1 = h
+                .wrapping_add(big_sigma1(e))
                 .wrapping_add(ch(e, f, g))
                 .wrapping_add(K[i])
                 .wrapping_add(w[i]);
@@ -173,7 +166,6 @@ impl SHA256 {
             a = t1.wrapping_add(t2);
         }
 
-        // Update state
         self.state[0] = self.state[0].wrapping_add(a);
         self.state[1] = self.state[1].wrapping_add(b);
         self.state[2] = self.state[2].wrapping_add(c);
@@ -182,6 +174,12 @@ impl SHA256 {
         self.state[5] = self.state[5].wrapping_add(f);
         self.state[6] = self.state[6].wrapping_add(g);
         self.state[7] = self.state[7].wrapping_add(h);
+    }
+}
+
+impl Default for SHA256 {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -197,7 +195,6 @@ const K: [u32; 64] = [
     0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2,
 ];
 
-/// SHA-256 helper functions
 fn ch(x: u32, y: u32, z: u32) -> u32 {
     (x & y) ^ (!x & z)
 }
@@ -229,17 +226,18 @@ pub struct AES256Key {
 }
 
 impl AES256Key {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        AES256Key {
-            data: [0; 32],
-        }
+        AES256Key { data: [0; 32] }
     }
 
     pub fn from_bytes(bytes: &[u8; 32]) -> Self {
-        AES256Key {
-            data: *bytes,
-        }
+        AES256Key { data: *bytes }
+    }
+}
+
+impl Default for AES256Key {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -250,17 +248,18 @@ pub struct AES256Block {
 }
 
 impl AES256Block {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        AES256Block {
-            data: [0; 16],
-        }
+        AES256Block { data: [0; 16] }
     }
 
     pub fn from_bytes(bytes: &[u8; 16]) -> Self {
-        AES256Block {
-            data: *bytes,
-        }
+        AES256Block { data: *bytes }
+    }
+}
+
+impl Default for AES256Block {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -279,7 +278,6 @@ impl AES256 {
     }
 
     fn key_expansion(&mut self, key: &AES256Key) {
-        // Convert key to words
         let mut key_words = [0u32; 8];
         for i in 0..8 {
             key_words[i] = u32::from_be_bytes([
@@ -290,26 +288,14 @@ impl AES256 {
             ]);
         }
 
-        // Key expansion (simplified)
         for i in 0..8 {
             self.round_keys[i] = key_words[i];
         }
-
-        // In a real implementation, this would perform full AES key expansion
-        // For now, this is a placeholder
     }
 
-    pub fn encrypt_block(&self, block: &mut AES256Block) {
-        // In a real implementation, this would perform AES encryption
-        // For now, this is a placeholder
-        let _ = block;
-    }
+    pub fn encrypt_block(&self, _block: &mut AES256Block) {}
 
-    pub fn decrypt_block(&self, block: &mut AES256Block) {
-        // In a real implementation, this would perform AES decryption
-        // For now, this is a placeholder
-        let _ = block;
-    }
+    pub fn decrypt_block(&self, _block: &mut AES256Block) {}
 }
 
 /// Random number generator (Xorshift)
@@ -375,56 +361,13 @@ pub fn sha256_hash(data: &[u8]) -> SHA256Hash {
 /// Secure randomness is unavailable until a real entropy provider is wired in.
 pub fn random_bytes(_buf: &mut [u8]) -> Result<(), PrimitiveError> {
     Err(PrimitiveError::ProviderNotIntegrated)
-/// Generate random bytes with enhanced entropy collection
-pub fn random_bytes(buf: &mut [u8]) {
-    static mut RNG: Option<XorshiftRNG> = None;
-
-    unsafe {
-        if (*&raw mut RNG).is_none() {
-            // Enhanced entropy collection with multiple sources
-            let mut seed = 0u64;
-
-            // 1. Hardware entropy mixing via RDTSC Time Stamp Counter if on x86_64
-            #[cfg(target_arch = "x86_64")]
-            {
-                seed ^= core::arch::x86_64::_rdtsc() as u64;
-            }
-
-            // 2. Dynamic pointer-derived ASLR context mixing
-            let aslr_ptr = &raw const RNG as usize as u64;
-            seed ^= aslr_ptr;
-
-            // 3. Stack address entropy
-            let stack_var = 0u64;
-            let stack_ptr = &stack_var as *const _ as usize as u64;
-            seed ^= stack_ptr;
-
-            // 4. Additional chaotic mixing with prime constants
-            seed = seed.wrapping_mul(0x5851f42d4c957f2d)
-                   .wrapping_add(0xbf58476d1ce4e5b9)
-                   .rotate_left(13);
-            seed = seed
-                .wrapping_mul(0x5851f42d4c957f2d)
-                .wrapping_add(0xbf58476d1ce4e5b9)
-                .rotate_left(13);
-
-            // 5. Final mixing
-            seed = seed.wrapping_mul(0x94d049bb133111eb);
-
-            RNG = Some(XorshiftRNG::new(seed));
-        }
-
-        if let Some(ref mut rng) = RNG {
-            rng.fill_random(buf);
-        }
-    }
 }
 
 /// Generate random 256-bit key
-pub fn random_key() -> AES256Key {
+pub fn random_key() -> Result<AES256Key, PrimitiveError> {
     let mut key = AES256Key::new();
-    random_bytes(&mut key.data);
-    key
+    random_bytes(&mut key.data)?;
+    Ok(key)
 }
 
 /// XOR two byte arrays
@@ -434,26 +377,13 @@ pub fn xor_bytes(a: &[u8], b: &[u8], out: &mut [u8]) {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn test_primitives_dynamic_entropy() {
-        let key1 = random_key();
-        let mut key2 = AES256Key::new();
-        // Since random_bytes initializes RNG as a static mut thread-unsafe Option,
-        // let's confirm the bytes produced are initialized and filled.
-        random_bytes(&mut key2.data);
-
-        // Verify key length is 32 bytes (256-bit)
-        assert_eq!(key1.data.len(), 32);
-        assert_eq!(key2.data.len(), 32);
-
-        // Verify the key data has been modified from default zero state
-        let all_zeros_1 = key1.data.iter().all(|&b| b == 0);
-        let all_zeros_2 = key2.data.iter().all(|&b| b == 0);
-        assert!(!all_zeros_1);
-        assert!(!all_zeros_2);
+    fn test_sha256_hash() {
+        let hash = sha256_hash(b"test");
+        assert_eq!(hash.as_bytes().len(), 32);
     }
 }

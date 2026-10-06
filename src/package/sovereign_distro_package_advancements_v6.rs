@@ -29,9 +29,6 @@ use std::string::{String, ToString};
 #[cfg(not(feature = "standalone_test"))]
 use std::vec::Vec;
 
-#[cfg(not(feature = "standalone_test"))]
-use crate::package::PackageFormat;
-
 #[cfg(feature = "standalone_test")]
 use alloc::collections::{BTreeMap, BTreeSet};
 #[cfg(feature = "standalone_test")]
@@ -174,7 +171,6 @@ impl SovereignReproducibleBuildAuditorEngine {
             ));
         }
 
-        // Scan binary for host path leakage (e.g., /home/builder or /tmp/build)
         let binary_str = String::from_utf8_lossy(binary_bytes);
         if binary_str.contains("/home/") || binary_str.contains("/tmp/build") {
             path_leak = true;
@@ -343,7 +339,7 @@ pub struct CasGcResult {
 
 pub struct SovereignCasGarbageCollectorEngine {
     pub gc_roots: BTreeSet<String>,
-    pub store_objects: BTreeMap<String, u64>, // path -> size_bytes
+    pub store_objects: BTreeMap<String, u64>,
 }
 
 impl SovereignCasGarbageCollectorEngine {
