@@ -1,7 +1,7 @@
 #![allow(unused_imports)]
 // SigmaOS Linux Mint Compatibility Subsystem
 // Zero-dependency implementations of Linux Mint's core tooling
-// Inspired by mintupdate, mintinstall, Cinnamon, and xapps
+// Inspired by mintupdate, mintinstall, Cinnamon, xapps, mintstick, warpinator, hypnotix, and mintreport
 
 extern crate alloc;
 
@@ -415,7 +415,273 @@ impl Default for MintSystemConfig {
 }
 
 /// ============================================================================
-/// 6. Linux Mint Integration Engine
+/// 6. MintStick - USB Image Writer & Formatter Engine
+/// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum UsbTargetFormat {
+    Fat32,
+    Ntfs,
+    Ext4,
+    ExFat,
+}
+
+#[derive(Debug, Clone)]
+pub struct MintStickUsbDevice {
+    pub dev_path: String,
+    pub vendor: String,
+    pub capacity_bytes: u64,
+    pub is_read_only: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct MintStickUsbWriterEngine {
+    pub connected_drives: Vec<MintStickUsbDevice>,
+    pub verify_checksum: bool,
+}
+
+impl MintStickUsbWriterEngine {
+    pub fn new() -> Self {
+        Self {
+            connected_drives: Vec::new(),
+            verify_checksum: true,
+        }
+    }
+
+    pub fn register_drive(&mut self, dev_path: &str, vendor: &str, capacity_bytes: u64) {
+        self.connected_drives.push(MintStickUsbDevice {
+            dev_path: dev_path.to_string(),
+            vendor: vendor.to_string(),
+            capacity_bytes,
+            is_read_only: false,
+        });
+    }
+
+    pub fn format_drive(&mut self, dev_path: &str, format_type: UsbTargetFormat, label: &str) -> Result<String, &'static str> {
+        let drive = self.connected_drives.iter().find(|d| d.dev_path == dev_path)
+            .ok_or("USB drive not found")?;
+
+        if drive.is_read_only {
+            return Err("USB drive is read-only");
+        }
+
+        Ok(std::format!(
+            "Formatted {} ({}) to {:?} with label '{}'",
+            drive.dev_path, drive.vendor, format_type, label
+        ))
+    }
+
+    pub fn write_iso_image(&mut self, dev_path: &str, iso_path: &str) -> Result<String, &'static str> {
+        let drive = self.connected_drives.iter().find(|d| d.dev_path == dev_path)
+            .ok_or("Target USB drive not found")?;
+
+        if drive.is_read_only {
+            return Err("Cannot write ISO to read-only drive");
+        }
+
+        Ok(std::format!(
+            "Flashed ISO '{}' to drive {} ({}) successfully",
+            iso_path, drive.dev_path, drive.vendor
+        ))
+    }
+}
+
+impl Default for MintStickUsbWriterEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// ============================================================================
+/// 7. Warpinator - LAN File Sharing Engine
+/// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct WarpinatorPeer {
+    pub name: String,
+    pub ip_address: String,
+    pub port: u16,
+    pub is_trusted: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct WarpinatorTransferRequest {
+    pub request_id: u64,
+    pub sender_name: String,
+    pub file_name: String,
+    pub file_size_bytes: u64,
+    pub is_accepted: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct WarpinatorLanFileSharingEngine {
+    pub discovered_peers: Vec<WarpinatorPeer>,
+    pub pending_requests: Vec<WarpinatorTransferRequest>,
+    pub group_code: String,
+}
+
+impl WarpinatorLanFileSharingEngine {
+    pub fn new(group_code: &str) -> Self {
+        Self {
+            discovered_peers: Vec::new(),
+            pending_requests: Vec::new(),
+            group_code: group_code.to_string(),
+        }
+    }
+
+    pub fn add_peer(&mut self, name: &str, ip_address: &str, port: u16) {
+        self.discovered_peers.push(WarpinatorPeer {
+            name: name.to_string(),
+            ip_address: ip_address.to_string(),
+            port,
+            is_trusted: true,
+        });
+    }
+
+    pub fn send_file_request(&mut self, peer_name: &str, file_name: &str, file_size_bytes: u64) -> Result<u64, &'static str> {
+        let _peer = self.discovered_peers.iter().find(|p| p.name == peer_name)
+            .ok_or("Warpinator peer not found on LAN")?;
+
+        let request_id = (self.pending_requests.len() + 1) as u64;
+        self.pending_requests.push(WarpinatorTransferRequest {
+            request_id,
+            sender_name: "SigmaOS-Local".to_string(),
+            file_name: file_name.to_string(),
+            file_size_bytes,
+            is_accepted: false,
+        });
+
+        Ok(request_id)
+    }
+
+    pub fn accept_request(&mut self, request_id: u64) -> Result<(), &'static str> {
+        let req = self.pending_requests.iter_mut().find(|r| r.request_id == request_id)
+            .ok_or("Transfer request not found")?;
+        req.is_accepted = true;
+        Ok(())
+    }
+}
+
+impl Default for WarpinatorLanFileSharingEngine {
+    fn default() -> Self {
+        Self::new("SigmaOS-Warpinator-Group")
+    }
+}
+
+/// ============================================================================
+/// 8. Hypnotix - IPTV Streaming Engine
+/// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct HypnotixChannel {
+    pub id: String,
+    pub name: String,
+    pub category: String,
+    pub stream_url: String,
+    pub logo_url: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct HypnotixIptvStreamingEngine {
+    pub providers: Vec<String>,
+    pub channels: Vec<HypnotixChannel>,
+    pub current_channel: Option<String>,
+}
+
+impl HypnotixIptvStreamingEngine {
+    pub fn new() -> Self {
+        Self {
+            providers: Vec::new(),
+            channels: Vec::new(),
+            current_channel: None,
+        }
+    }
+
+    pub fn add_provider(&mut self, provider_name: &str) {
+        self.providers.push(provider_name.to_string());
+    }
+
+    pub fn add_channel(&mut self, id: &str, name: &str, category: &str, stream_url: &str) {
+        self.channels.push(HypnotixChannel {
+            id: id.to_string(),
+            name: name.to_string(),
+            category: category.to_string(),
+            stream_url: stream_url.to_string(),
+            logo_url: String::new(),
+        });
+    }
+
+    pub fn play_channel(&mut self, id: &str) -> Result<String, &'static str> {
+        let ch = self.channels.iter().find(|c| c.id == id)
+            .ok_or("Hypnotix channel not found")?;
+        self.current_channel = Some(id.to_string());
+        Ok(std::format!("Streaming '{}' from {}", ch.name, ch.stream_url))
+    }
+}
+
+impl Default for HypnotixIptvStreamingEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// ============================================================================
+/// 9. MintReport - System Diagnostic & Error Reporter
+/// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct MintReportIssue {
+    pub id: u32,
+    pub title: String,
+    pub category: String,
+    pub is_resolved: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct MintReportSystemDiagnosticEngine {
+    pub detected_issues: Vec<MintReportIssue>,
+    pub system_information_summary: String,
+}
+
+impl MintReportSystemDiagnosticEngine {
+    pub fn new() -> Self {
+        Self {
+            detected_issues: Vec::new(),
+            system_information_summary: String::from("SigmaOS Linux Mint System Info: OK"),
+        }
+    }
+
+    pub fn report_issue(&mut self, id: u32, title: &str, category: &str) {
+        self.detected_issues.push(MintReportIssue {
+            id,
+            title: title.to_string(),
+            category: category.to_string(),
+            is_resolved: false,
+        });
+    }
+
+    pub fn resolve_issue(&mut self, id: u32) -> bool {
+        if let Some(issue) = self.detected_issues.iter_mut().find(|i| i.id == id) {
+            issue.is_resolved = true;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn unresolved_issues_count(&self) -> usize {
+        self.detected_issues.iter().filter(|i| !i.is_resolved).count()
+    }
+}
+
+impl Default for MintReportSystemDiagnosticEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// ============================================================================
+/// 10. Linux Mint Integration Engine
 /// ============================================================================
 
 #[derive(Debug, Clone)]
@@ -425,6 +691,10 @@ pub struct LinuxMintIntegrationEngine {
     pub desktop_manager: CinnamonDesktopManager,
     pub xapp_preferences: XAppPreferences,
     pub system_config: MintSystemConfig,
+    pub usb_writer: MintStickUsbWriterEngine,
+    pub warpinator: WarpinatorLanFileSharingEngine,
+    pub hypnotix: HypnotixIptvStreamingEngine,
+    pub mint_report: MintReportSystemDiagnosticEngine,
 }
 
 impl LinuxMintIntegrationEngine {
@@ -435,6 +705,10 @@ impl LinuxMintIntegrationEngine {
             desktop_manager: CinnamonDesktopManager::new(),
             xapp_preferences: XAppPreferences::new(),
             system_config: MintSystemConfig::new(),
+            usb_writer: MintStickUsbWriterEngine::new(),
+            warpinator: WarpinatorLanFileSharingEngine::new("SigmaOS-Warpinator"),
+            hypnotix: HypnotixIptvStreamingEngine::new(),
+            mint_report: MintReportSystemDiagnosticEngine::new(),
         }
     }
 
@@ -465,11 +739,19 @@ impl LinuxMintIntegrationEngine {
              {}\n\
              Installed Packages: {}\n\
              Panels: {}\n\
+             USB Drives: {}\n\
+             Warpinator Peers: {}\n\
+             Hypnotix Channels: {}\n\
+             Unresolved System Reports: {}\n\
              {}\n\
              {}",
             self.update_manager.generate_update_summary(),
             self.software_manager.installed_packages.len(),
             self.desktop_manager.get_panel_count(),
+            self.usb_writer.connected_drives.len(),
+            self.warpinator.discovered_peers.len(),
+            self.hypnotix.channels.len(),
+            self.mint_report.unresolved_issues_count(),
             self.xapp_preferences.apply_to_environment(),
             self.system_config.generate_system_config()
         )
@@ -547,6 +829,41 @@ mod tests {
 
         assert!(prefs.dark_mode);
         assert_eq!(prefs.accent_color, "#ff6b6b");
+    }
+
+    #[test]
+    fn test_mintstick_usb_writer() {
+        let mut writer = MintStickUsbWriterEngine::new();
+        writer.register_drive("/dev/sdb", "SanDisk", 32000000000);
+        let res = writer.write_iso_image("/dev/sdb", "/home/iso/linuxmint.iso");
+        assert!(res.is_ok());
+        assert!(res.unwrap().contains("linuxmint.iso"));
+    }
+
+    #[test]
+    fn test_warpinator_lan_sharing() {
+        let mut warp = WarpinatorLanFileSharingEngine::new("Group1");
+        warp.add_peer("Laptop", "192.168.1.50", 42000);
+        let req_id = warp.send_file_request("Laptop", "doc.pdf", 1024).unwrap();
+        assert!(warp.accept_request(req_id).is_ok());
+    }
+
+    #[test]
+    fn test_hypnotix_iptv() {
+        let mut iptv = HypnotixIptvStreamingEngine::new();
+        iptv.add_channel("ch1", "News", "General", "http://stream.m3u8");
+        let res = iptv.play_channel("ch1");
+        assert!(res.is_ok());
+        assert!(res.unwrap().contains("News"));
+    }
+
+    #[test]
+    fn test_mint_report() {
+        let mut report = MintReportSystemDiagnosticEngine::new();
+        report.report_issue(1, "Missing Language Pack", "Localization");
+        assert_eq!(report.unresolved_issues_count(), 1);
+        assert!(report.resolve_issue(1));
+        assert_eq!(report.unresolved_issues_count(), 0);
     }
 
     #[test]

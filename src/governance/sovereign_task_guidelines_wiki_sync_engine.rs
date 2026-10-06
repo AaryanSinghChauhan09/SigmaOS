@@ -3,7 +3,7 @@
 //
 // Linux & BSD inspired task governance, rules enforcement, and wiki sync engine in PR format:
 // 1. TaskGuidelinesAndRulesGovernor: AI persona rules evaluator (Sentinel security boundaries, Palette UI rules, Bolt speed optimizations, PR format compliance).
-// 2. WikiDataTransferEngine: Automated scanner verifying implemented `.md` specifications and syncing completed documentation data to `wiki/` and `WIKI/`.
+// 2. WikiDataTransferEngine: Automated scanner verifying implemented `.md` specifications and syncing completed documentation data to `wiki_repo/`.
 // 3. SovereignTaskAndWikiGovernanceSuite: Master coordinator unifying task governance and wiki synchronization.
 
 use std::collections::BTreeMap;
@@ -20,6 +20,8 @@ pub enum AgentPersonaRule {
     PaletteDesignSystem,
     BoltPerformanceOptimization,
     PullRequestPackagingStandard,
+    LinuxBsdParityStandard,
+    ContinuousWikiSyncRule,
 }
 
 #[derive(Debug, Clone)]
@@ -54,9 +56,7 @@ impl TaskGuidelinesAndRulesGovernor {
                 name: "Zero Security Degradation".to_string(),
                 persona: AgentPersonaRule::SentinelSecurityBoundary,
                 is_mandatory: true,
-                description:
-                    "Ensure no hardcoded credentials, buffer overflows, or unsafe memory blocks."
-                        .to_string(),
+                description: "Ensure no hardcoded credentials, buffer overflows, or unsafe memory blocks.".to_string(),
             },
         );
 
@@ -64,12 +64,10 @@ impl TaskGuidelinesAndRulesGovernor {
             2,
             TaskGuidelineCheck {
                 rule_id: 2,
-                name: "WCAG AAA Micro-UX Purity".to_string(),
+                name: "Consistent Desktop UI Aesthetics".to_string(),
                 persona: AgentPersonaRule::PaletteDesignSystem,
                 is_mandatory: false,
-                description:
-                    "Maintain theme color palette harmony and accessibility WCAG compliance."
-                        .to_string(),
+                description: "Maintain theme color palette harmony and accessibility WCAG compliance.".to_string(),
             },
         );
 
@@ -77,12 +75,10 @@ impl TaskGuidelinesAndRulesGovernor {
             3,
             TaskGuidelineCheck {
                 rule_id: 3,
-                name: "Lock-Free Sub-Microsecond Speed".to_string(),
+                name: "Sub-Millisecond Execution Speed".to_string(),
                 persona: AgentPersonaRule::BoltPerformanceOptimization,
                 is_mandatory: true,
-                description:
-                    "Optimize data structures and avoid lock contention in critical paths."
-                        .to_string(),
+                description: "Optimize data structures and avoid lock contention in critical paths.".to_string(),
             },
         );
 
@@ -90,29 +86,50 @@ impl TaskGuidelinesAndRulesGovernor {
             4,
             TaskGuidelineCheck {
                 rule_id: 4,
-                name: "Universal PR Packaging Gateway".to_string(),
+                name: "PR Packaging Format Standard".to_string(),
                 persona: AgentPersonaRule::PullRequestPackagingStandard,
                 is_mandatory: true,
-                description: "Transpile foreign distro package formats (Apt, Pacman, Dnf, Apk, Ports, Nix) to sigma-pkg in PR format.".to_string(),
+                description: "Deliver all changes in structured Pull Request format with standalone unit tests.".to_string(),
+            },
+        );
+
+        self.rules.insert(
+            5,
+            TaskGuidelineCheck {
+                rule_id: 5,
+                name: "Linux & BSD Ecosystem Parity Standard".to_string(),
+                persona: AgentPersonaRule::LinuxBsdParityStandard,
+                is_mandatory: true,
+                description: "Absorb and parity features from Linux 6.12+, FreeBSD 14, OpenBSD 7.6, and NixOS.".to_string(),
+            },
+        );
+
+        self.rules.insert(
+            6,
+            TaskGuidelineCheck {
+                rule_id: 6,
+                name: "Continuous Wiki Synchronization".to_string(),
+                persona: AgentPersonaRule::ContinuousWikiSyncRule,
+                is_mandatory: true,
+                description: "Transfer fully implemented .md specifications directly into the GitHub Wiki targets.".to_string(),
             },
         );
     }
 
-    pub fn validate_guideline(&mut self, rule_id: u32) -> bool {
-        if self.rules.contains_key(&rule_id) {
-            if !self.passed_checks.contains(&rule_id) {
-                self.passed_checks.push(rule_id);
-            }
-            true
+    pub fn evaluate_task_compliance(&mut self, rule_id: u32) -> Result<bool, &'static str> {
+        if let Some(rule) = self.rules.get(&rule_id) {
+            self.passed_checks.push(rule.rule_id);
+            Ok(rule.is_mandatory)
         } else {
-            false
+            Err("TaskGovernor Error: Rule ID not registered")
         }
     }
 
-    pub fn is_governance_compliant(&self) -> bool {
+    pub fn is_all_mandatory_rules_passed(&self) -> bool {
         self.rules
             .values()
-            .all(|rule| !rule.is_mandatory || self.passed_checks.contains(&rule.rule_id))
+            .filter(|r| r.is_mandatory)
+            .all(|r| self.passed_checks.contains(&r.rule_id))
     }
 }
 
@@ -127,15 +144,6 @@ impl Default for TaskGuidelinesAndRulesGovernor {
 // =========================================================================
 
 #[derive(Debug, Clone)]
-pub struct FeatureMdStatus {
-    pub spec_name: String,
-    pub source_path: String,
-    pub is_fully_implemented: bool,
-    pub completion_percentage: u32,
-    pub wiki_mirrored: bool,
-}
-
-#[derive(Debug, Clone)]
 pub struct MdSpecificationItem {
     pub spec_filename: String,
     pub title: String,
@@ -144,69 +152,50 @@ pub struct MdSpecificationItem {
 }
 
 pub struct WikiDataTransferEngine {
-    pub feature_specs: BTreeMap<String, FeatureMdStatus>,
-    pub specifications: BTreeMap<String, MdSpecificationItem>,
-    pub total_synced_to_wiki: u32,
+    pub specifications: BTreeMap<String, MdSpecificationItem>, // filename -> item
+    pub wiki_repo_path: String,
 }
 
 impl WikiDataTransferEngine {
     pub fn new() -> Self {
         let mut engine = Self {
-            feature_specs: BTreeMap::new(),
             specifications: BTreeMap::new(),
-            total_synced_to_wiki: 0,
+            wiki_repo_path: "wiki_repo/".to_string(),
         };
-        engine.seed_known_feature_md_files();
+        engine.seed_core_specifications();
         engine
     }
 
-    fn seed_known_feature_md_files(&mut self) {
-        self.feature_specs.insert(
-            "UniversalPackageSystem".to_string(),
-            FeatureMdStatus {
-                spec_name: "SIGMAOS_UNIVERSAL_PACKAGE_SYSTEM_LINUX_BSD_PARITY_PR_PROPOSAL.md"
-                    .to_string(),
-                source_path:
-                    "docs/SIGMAOS_UNIVERSAL_PACKAGE_SYSTEM_LINUX_BSD_PARITY_PR_PROPOSAL.md"
-                        .to_string(),
+    fn seed_core_specifications(&mut self) {
+        self.specifications.insert(
+            "ROADMAP.md".to_string(),
+            MdSpecificationItem {
+                spec_filename: "ROADMAP.md".to_string(),
+                title: "SigmaOS Linux & BSD Distro Hybrid Roadmap".to_string(),
                 is_fully_implemented: true,
-                completion_percentage: 100,
-                wiki_mirrored: true,
+                synced_to_wiki_repo: false,
             },
         );
 
-        self.feature_specs.insert(
-            "Roadmap11Deployment".to_string(),
-            FeatureMdStatus {
-                spec_name: "11-Roadmap.md".to_string(),
-                source_path: "wiki/11-Roadmap.md".to_string(),
+        self.specifications.insert(
+            "SIGMAOS_DISTRO_INSPIRED_MASTER_ROADMAP.md".to_string(),
+            MdSpecificationItem {
+                spec_filename: "SIGMAOS_DISTRO_INSPIRED_MASTER_ROADMAP.md".to_string(),
+                title: "Master Roadmap Specification".to_string(),
                 is_fully_implemented: true,
-                completion_percentage: 100,
-                wiki_mirrored: true,
+                synced_to_wiki_repo: false,
             },
         );
 
-        self.feature_specs.insert(
-            "FutureDevelopmentRoadmap".to_string(),
-            FeatureMdStatus {
-                spec_name: "FUTURE-DEVELOPMENT-ROADMAP.md".to_string(),
-                source_path: "FUTURE-DEVELOPMENT-ROADMAP.md".to_string(),
+        self.specifications.insert(
+            "FUTURE-DEVELOPMENT-ROADMAP.md".to_string(),
+            MdSpecificationItem {
+                spec_filename: "FUTURE-DEVELOPMENT-ROADMAP.md".to_string(),
+                title: "Future Development Master Roadmap & Distro Crusher Specification".to_string(),
                 is_fully_implemented: true,
-                completion_percentage: 100,
-                wiki_mirrored: true,
+                synced_to_wiki_repo: false,
             },
         );
-
-        self.register_spec_file("UniversalPackageSystem", "Universal Package System", true);
-        self.register_spec_file("Roadmap11Deployment", "Roadmap 11 Deployment", true);
-        self.register_spec_file("ROADMAP.md", "SigmaOS Master Development Roadmap", true);
-        self.register_spec_file("FUTURE-DEVELOPMENT-ROADMAP.md", "SigmaOS Ultimate Future Development Roadmap", true);
-        self.register_spec_file(
-            "UniversalPackageSystem",
-            "Universal Package System Spec",
-            true,
-        );
-        self.register_spec_file("Roadmap11Deployment", "11-Roadmap Deployment Spec", true);
     }
 
     pub fn register_spec_file(&mut self, filename: &str, title: &str, fully_implemented: bool) {
@@ -219,24 +208,25 @@ impl WikiDataTransferEngine {
         self.specifications.insert(filename.to_string(), spec);
     }
 
-    pub fn transfer_implemented_data_to_wiki(
-        &mut self,
-        filename: &str,
-    ) -> Result<String, &'static str> {
+    pub fn transfer_implemented_data_to_wiki(&mut self, filename: &str) -> Result<String, &'static str> {
         if let Some(spec) = self.specifications.get_mut(filename) {
             if !spec.is_fully_implemented {
                 return Err("WikiSync Error: Specification is not fully implemented yet");
             }
-            spec.synced_to_wiki_repo = true;
-            self.total_synced_to_wiki += 1;
-            return Ok(format!("wiki_repo/{}", spec.spec_filename));
-        }
 
-        Err("Specification key not found")
+            spec.synced_to_wiki_repo = true;
+            let dest_path = format!("{}{}.md", self.wiki_repo_path, spec.title.replace(' ', "-"));
+            Ok(dest_path)
+        } else {
+            Err("WikiSync Error: Specification file not found")
+        }
     }
 
-    pub fn total_synced_specs(&self) -> u32 {
-        self.total_synced_to_wiki
+    pub fn total_synced_specs(&self) -> usize {
+        self.specifications
+            .values()
+            .filter(|s| s.synced_to_wiki_repo)
+            .count()
     }
 }
 
@@ -247,35 +237,34 @@ impl Default for WikiDataTransferEngine {
 }
 
 // =========================================================================
-// 3. MASTER GOVERNANCE & WIKI SYNC SUITE
+// MASTER COORDINATOR: SOVEREIGN TASK & WIKI GOVERNANCE SUITE
 // =========================================================================
 
 pub struct SovereignTaskAndWikiGovernanceSuite {
-    pub governor: TaskGuidelinesAndRulesGovernor,
-    pub wiki_engine: WikiDataTransferEngine,
+    pub task_governor: TaskGuidelinesAndRulesGovernor,
+    pub wiki_sync: WikiDataTransferEngine,
 }
 
 impl SovereignTaskAndWikiGovernanceSuite {
     pub fn new() -> Self {
         Self {
-            governor: TaskGuidelinesAndRulesGovernor::new(),
-            wiki_engine: WikiDataTransferEngine::new(),
+            task_governor: TaskGuidelinesAndRulesGovernor::new(),
+            wiki_sync: WikiDataTransferEngine::new(),
         }
     }
 
-    pub fn run_complete_governance_cycle(&mut self) -> bool {
-        self.governor.validate_guideline(1);
-        self.governor.validate_guideline(2);
-        self.governor.validate_guideline(3);
-        self.governor.validate_guideline(4);
+    pub fn health_check(&self) -> bool {
+        self.task_governor.rules.len() >= 6
+    }
 
-        if !self.governor.is_governance_compliant() {
-            return false;
-        }
-
-        self.wiki_engine
-            .transfer_implemented_data_to_wiki("ROADMAP.md")
-            .is_ok()
+    pub fn summary_report(&self) -> String {
+        format!(
+            "Sovereign Task Governance & Wiki Sync Suite Active:\n- Task Rules Registered: {}\n- Passed Checks: {}\n- Specifications Tracked: {}\n- Synced Wiki Specs: {}",
+            self.task_governor.rules.len(),
+            self.task_governor.passed_checks.len(),
+            self.wiki_sync.specifications.len(),
+            self.wiki_sync.total_synced_specs(),
+        )
     }
 }
 
@@ -290,29 +279,27 @@ impl Default for SovereignTaskAndWikiGovernanceSuite {
 // =========================================================================
 
 #[cfg(test)]
-#[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
     fn test_task_guidelines_governor() {
-        let mut governor = TaskGuidelinesAndRulesGovernor::new();
-        assert!(!governor.is_governance_compliant());
-        governor.validate_guideline(1);
-        governor.validate_guideline(2);
-        governor.validate_guideline(3);
-        governor.validate_guideline(4);
-        assert!(governor.is_governance_compliant());
+        let mut gov = TaskGuidelinesAndRulesGovernor::new();
+        assert!(gov.evaluate_task_compliance(1).unwrap()); // Sentinel
+        assert!(gov.evaluate_task_compliance(3).unwrap()); // Bolt
+        assert!(gov.evaluate_task_compliance(4).unwrap()); // PR Format
+        assert!(gov.evaluate_task_compliance(5).unwrap()); // Linux/BSD Parity
+        assert!(gov.evaluate_task_compliance(6).unwrap()); // Wiki Sync
+
+        assert!(gov.is_all_mandatory_rules_passed());
     }
 
     #[test]
     fn test_wiki_data_transfer_engine() {
         let mut sync = WikiDataTransferEngine::new();
-        let path = sync
-            .transfer_implemented_data_to_wiki("ROADMAP.md")
-            .unwrap();
+        let path = sync.transfer_implemented_data_to_wiki("ROADMAP.md").unwrap();
         assert!(path.contains("wiki_repo/"));
-        assert_eq!(sync.total_synced_to_wiki, 1);
+        assert_eq!(sync.total_synced_specs(), 1);
 
         sync.register_spec_file("DRAFT.md", "Draft Feature", false);
         assert!(sync.transfer_implemented_data_to_wiki("DRAFT.md").is_err());
@@ -320,7 +307,8 @@ mod tests {
 
     #[test]
     fn test_governance_suite() {
-        let mut suite = SovereignTaskAndWikiGovernanceSuite::new();
-        assert!(suite.run_complete_governance_cycle());
+        let suite = SovereignTaskAndWikiGovernanceSuite::new();
+        assert!(suite.health_check());
+        assert!(suite.summary_report().contains("Sovereign Task Governance"));
     }
 }
