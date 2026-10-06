@@ -1,6 +1,7 @@
 // Debian Linux Distro Compatibility Subsystem
 // Formats, parsers, and registry models matching Debian systems (dpkg, apt, .deb)
 
+use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
 
@@ -296,6 +297,242 @@ pub fn parse_dpkg_status(text: &str) -> Vec<DpkgStatusEntry> {
     entries
 }
 
+// =========================================================================
+// 1. DEBIAN update-alternatives MASTER SYMLINK PRIORITY ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AlternativeChoice {
+    pub path: String,
+    pub priority: i32,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AlternativeGroup {
+    pub name: String,
+    pub master_link: String,
+    pub choices: Vec<AlternativeChoice>,
+    pub selected_path: Option<String>,
+    pub is_auto: bool,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct DebianUpdateAlternativesEngine {
+    pub groups: BTreeMap<String, AlternativeGroup>,
+}
+
+impl DebianUpdateAlternativesEngine {
+    pub fn new() -> Self {
+        Self {
+            groups: BTreeMap::new(),
+        }
+    }
+
+    pub fn install_alternative(
+        &mut self,
+        name: &str,
+        master_link: &str,
+        path: &str,
+        priority: i32,
+    ) {
+        let choice = AlternativeChoice {
+            path: path.to_string(),
+            priority,
+        };
+
+        let entry = self.groups.entry(name.to_string()).or_insert_with(|| AlternativeGroup {
+            name: name.to_string(),
+            master_link: master_link.to_string(),
+            choices: Vec::new(),
+            selected_path: None,
+            is_auto: true,
+        });
+
+        if !entry.choices.iter().any(|c| c.path == path) {
+            entry.choices.push(choice);
+        }
+
+        if entry.is_auto {
+            self.recalculate_auto_selection(name);
+        }
+    }
+
+    pub fn recalculate_auto_selection(&mut self, name: &str) {
+        if let Some(group) = self.groups.get_mut(name) {
+            if group.is_auto {
+                group.selected_path = group
+                    .choices
+                    .iter()
+                    .max_by_key(|c| c.priority)
+                    .map(|c| c.path.clone());
+            }
+        }
+    }
+
+    pub fn set_manual_selection(&mut self, name: &str, path: &str) -> Result<(), &'static str> {
+        let group = self
+            .groups
+            .get_mut(name)
+            .ok_or("update-alternatives: Group not found")?;
+
+        if !group.choices.iter().any(|c| c.path == path) {
+            return Err("update-alternatives: Path not registered in group choices");
+        }
+
+        group.selected_path = Some(path.to_string());
+        group.is_auto = false;
+        Ok(())
+    }
+
+    pub fn auto_select(&mut self, name: &str) -> Result<(), &'static str> {
+        let group = self
+            .groups
+            .get_mut(name)
+            .ok_or("update-alternatives: Group not found")?;
+
+        group.is_auto = true;
+        self.recalculate_auto_selection(name);
+        Ok(())
+    }
+
+    pub fn get_active_path(&self, name: &str) -> Option<String> {
+        self.groups.get(name).and_then(|g| g.selected_path.clone())
+    }
+}
+
+// =========================================================================
+// 2. DEBIAN apt-mark PACKAGE MARK STATUS MANAGER
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PackageMarkStatus {
+    Auto,
+    Manual,
+    Hold,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct DebianAptMarkEngine {
+    pub marks: BTreeMap<String, PackageMarkStatus>,
+}
+
+impl DebianAptMarkEngine {
+    pub fn new() -> Self {
+        Self {
+            marks: BTreeMap::new(),
+        }
+    }
+
+    pub fn mark_package(&mut self, pkg: &str, status: PackageMarkStatus) {
+        self.marks.insert(pkg.to_string(), status);
+    }
+
+    pub fn get_mark_status(&self, pkg: &str) -> PackageMarkStatus {
+        self.marks
+            .get(pkg)
+            .copied()
+            .unwrap_or(PackageMarkStatus::Manual)
+    }
+
+    pub fn is_held(&self, pkg: &str) -> bool {
+        self.get_mark_status(pkg) == PackageMarkStatus::Hold
+    }
+}
+
+// =========================================================================
+// 3. DEBIAN dpkg-trigger DEFERRED PACKAGE HOOK QUEUE
+// =========================================================================
+
+#[derive(Debug, Clone, Default)]
+pub struct DpkgTrigger {
+    pub name: String,
+    pub interested_packages: Vec<String>,
+    pub is_activated: bool,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct DebianDpkgTriggerEngine {
+    pub registered_triggers: BTreeMap<String, DpkgTrigger>,
+}
+
+impl DebianDpkgTriggerEngine {
+    pub fn new() -> Self {
+        Self {
+            registered_triggers: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_trigger_interest(&mut self, trigger_name: &str, pkg_name: &str) {
+        let trigger = self
+            .registered_triggers
+            .entry(trigger_name.to_string())
+            .or_insert_with(|| DpkgTrigger {
+                name: trigger_name.to_string(),
+                interested_packages: Vec::new(),
+                is_activated: false,
+            });
+
+        if !trigger.interested_packages.contains(&pkg_name.to_string()) {
+            trigger.interested_packages.push(pkg_name.to_string());
+        }
+    }
+
+    pub fn activate_trigger(&mut self, trigger_name: &str) -> usize {
+        if let Some(trigger) = self.registered_triggers.get_mut(trigger_name) {
+            trigger.is_activated = true;
+            trigger.interested_packages.len()
+        } else {
+            0
+        }
+    }
+
+    pub fn flush_pending_triggers(&mut self) -> Vec<(String, String)> {
+        let mut notifications = Vec::new();
+        for trigger in self.registered_triggers.values_mut() {
+            if trigger.is_activated {
+                for pkg in &trigger.interested_packages {
+                    notifications.push((pkg.clone(), trigger.name.clone()));
+                }
+                trigger.is_activated = false;
+            }
+        }
+        notifications
+    }
+}
+
+// =========================================================================
+// 4. DEBIAN MULTI-ARCH ARCHITECTURE PATH RESOLVER
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MultiarchTriplet {
+    X86_64LinuxGnu,
+    AArch64LinuxGnu,
+    RiscV64LinuxGnu,
+    I386LinuxGnu,
+}
+
+pub struct DebianMultiarchPathResolver;
+
+impl DebianMultiarchPathResolver {
+    pub fn resolve_triplet_str(triplet: MultiarchTriplet) -> &'static str {
+        match triplet {
+            MultiarchTriplet::X86_64LinuxGnu => "x86_64-linux-gnu",
+            MultiarchTriplet::AArch64LinuxGnu => "aarch64-linux-gnu",
+            MultiarchTriplet::RiscV64LinuxGnu => "riscv64-linux-gnu",
+            MultiarchTriplet::I386LinuxGnu => "i386-linux-gnu",
+        }
+    }
+
+    pub fn resolve_lib_dir(triplet: MultiarchTriplet) -> String {
+        format!("/usr/lib/{}", Self::resolve_triplet_str(triplet))
+    }
+
+    pub fn resolve_include_dir(triplet: MultiarchTriplet) -> String {
+        format!("/usr/include/{}", Self::resolve_triplet_str(triplet))
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -435,5 +672,69 @@ mod tests {
         assert_eq!(entries[1].status, "install ok installed");
         assert_eq!(entries[1].installed_size, 8500);
         assert_eq!(entries[1].version, "1.21.21");
+    }
+
+    #[test]
+    fn test_debian_update_alternatives_engine() {
+        let mut alts = DebianUpdateAlternativesEngine::new();
+        alts.install_alternative("editor", "/usr/bin/editor", "/usr/bin/vim.basic", 50);
+        alts.install_alternative("editor", "/usr/bin/editor", "/usr/bin/nano", 40);
+
+        // Highest priority (50) auto-selected
+        assert_eq!(alts.get_active_path("editor"), Some("/usr/bin/vim.basic".to_string()));
+
+        // Install higher priority choice (100)
+        alts.install_alternative("editor", "/usr/bin/editor", "/usr/bin/neovim", 100);
+        assert_eq!(alts.get_active_path("editor"), Some("/usr/bin/neovim".to_string()));
+
+        // Manual override
+        assert!(alts.set_manual_selection("editor", "/usr/bin/nano").is_ok());
+        assert_eq!(alts.get_active_path("editor"), Some("/usr/bin/nano".to_string()));
+
+        // Return to auto mode
+        assert!(alts.auto_select("editor").is_ok());
+        assert_eq!(alts.get_active_path("editor"), Some("/usr/bin/neovim".to_string()));
+    }
+
+    #[test]
+    fn test_debian_apt_mark_engine() {
+        let mut mark = DebianAptMarkEngine::new();
+        assert_eq!(mark.get_mark_status("curl"), PackageMarkStatus::Manual);
+
+        mark.mark_package("libssl3", PackageMarkStatus::Auto);
+        mark.mark_package("kernel-hold", PackageMarkStatus::Hold);
+
+        assert_eq!(mark.get_mark_status("libssl3"), PackageMarkStatus::Auto);
+        assert!(mark.is_held("kernel-hold"));
+        assert!(!mark.is_held("libssl3"));
+    }
+
+    #[test]
+    fn test_debian_dpkg_trigger_engine() {
+        let mut triggers = DebianDpkgTriggerEngine::new();
+        triggers.register_trigger_interest("ldconfig", "libc6");
+        triggers.register_trigger_interest("ldconfig", "libssl3");
+
+        assert_eq!(triggers.activate_trigger("ldconfig"), 2);
+
+        let pending = triggers.flush_pending_triggers();
+        assert_eq!(pending.len(), 2);
+        assert_eq!(pending[0], ("libc6".to_string(), "ldconfig".to_string()));
+        assert_eq!(pending[1], ("libssl3".to_string(), "ldconfig".to_string()));
+
+        // After flushing, queue is cleared
+        assert!(triggers.flush_pending_triggers().is_empty());
+    }
+
+    #[test]
+    fn test_debian_multiarch_path_resolver() {
+        assert_eq!(
+            DebianMultiarchPathResolver::resolve_lib_dir(MultiarchTriplet::X86_64LinuxGnu),
+            "/usr/lib/x86_64-linux-gnu"
+        );
+        assert_eq!(
+            DebianMultiarchPathResolver::resolve_include_dir(MultiarchTriplet::AArch64LinuxGnu),
+            "/usr/include/aarch64-linux-gnu"
+        );
     }
 }

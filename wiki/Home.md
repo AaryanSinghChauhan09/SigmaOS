@@ -46,3 +46,6 @@ Welcome to the SigmaOS Wiki! Here are the core components:
 - [Cloud-Agent-Environment](./Cloud-Agent-Environment.md)
 - [Grok-AI-Panel-Agent](./Grok-AI-Panel-Agent.md)
 - [Font-Builder](./Font-Builder.md)
+- [Autonomous AI SysAdmin & Agent Orchestration](./25-Roadmap-Autonomous-AI-SysAdmin-and-Agent-Orchestration.md)
+- [Arch Linux Parity & Pacman ALPM Ecosystem](./26-Roadmap-Arch-Linux-Parity-and-Pacman-ALPM-Ecosystem.md)
+- [Debian Parity & APT Ecosystem](./27-Roadmap-Debian-Parity-and-APT-Ecosystem.md)
