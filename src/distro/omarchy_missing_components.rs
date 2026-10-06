@@ -206,6 +206,225 @@ impl Default for OmarchyDotfilesBackupRestoreEngine {
     }
 }
 
+/// Waybar Module Configuration
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct WaybarModuleConfig {
+    pub name: String,
+    pub module_type: String,
+    pub is_enabled: bool,
+    pub poll_interval_sec: u32,
+}
+
+/// Omarchy Waybar Dynamic Status Bar Configuration Generator
+pub struct OmarchyWaybarStatusConfigEngine {
+    pub position: String,
+    pub modules: Vec<WaybarModuleConfig>,
+}
+
+impl OmarchyWaybarStatusConfigEngine {
+    pub fn new() -> Self {
+        Self {
+            position: "top".to_string(),
+            modules: vec![
+                WaybarModuleConfig {
+                    name: "hyprland/workspaces".to_string(),
+                    module_type: "workspaces".to_string(),
+                    is_enabled: true,
+                    poll_interval_sec: 0,
+                },
+                WaybarModuleConfig {
+                    name: "cpu".to_string(),
+                    module_type: "telemetry".to_string(),
+                    is_enabled: true,
+                    poll_interval_sec: 1,
+                },
+                WaybarModuleConfig {
+                    name: "memory".to_string(),
+                    module_type: "telemetry".to_string(),
+                    is_enabled: true,
+                    poll_interval_sec: 2,
+                },
+                WaybarModuleConfig {
+                    name: "pulseaudio".to_string(),
+                    module_type: "audio".to_string(),
+                    is_enabled: true,
+                    poll_interval_sec: 1,
+                },
+                WaybarModuleConfig {
+                    name: "battery".to_string(),
+                    module_type: "power".to_string(),
+                    is_enabled: true,
+                    poll_interval_sec: 5,
+                },
+            ],
+        }
+    }
+
+    pub fn generate_waybar_json(&self) -> String {
+        let mut json = format!("{{\"position\": \"{}\", \"modules\": [", self.position);
+        for (i, m) in self.modules.iter().filter(|m| m.is_enabled).enumerate() {
+            if i > 0 {
+                json.push_str(", ");
+            }
+            json.push_str(&format!("\"{}\"", m.name));
+        }
+        json.push_str("]}");
+        json
+    }
+}
+
+impl Default for OmarchyWaybarStatusConfigEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Rofi Menu Category
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RofiCategory {
+    Apps,
+    Windows,
+    Themes,
+    Ssh,
+    Calculator,
+}
+
+/// Omarchy Rofi Command Palette Menu Item
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RofiMenuItem {
+    pub label: String,
+    pub action_command: String,
+    pub category: RofiCategory,
+}
+
+/// Omarchy Rofi Command Palette Router
+pub struct OmarchyRofiCommandPaletteApplet {
+    pub items: Vec<RofiMenuItem>,
+}
+
+impl OmarchyRofiCommandPaletteApplet {
+    pub fn new() -> Self {
+        Self {
+            items: vec![
+                RofiMenuItem {
+                    label: "Launch Alacritty".to_string(),
+                    action_command: "alacritty".to_string(),
+                    category: RofiCategory::Apps,
+                },
+                RofiMenuItem {
+                    label: "Switch Theme: Nord".to_string(),
+                    action_command: "sigomarchy theme nord".to_string(),
+                    category: RofiCategory::Themes,
+                },
+                RofiMenuItem {
+                    label: "Connect SSH prod-node".to_string(),
+                    action_command: "ssh admin@10.0.0.1".to_string(),
+                    category: RofiCategory::Ssh,
+                },
+            ],
+        }
+    }
+
+    pub fn filter_by_query(&self, query: &str) -> Vec<&RofiMenuItem> {
+        self.items
+            .iter()
+            .filter(|i| i.label.to_lowercase().contains(&query.to_lowercase()))
+            .collect()
+    }
+}
+
+impl Default for OmarchyRofiCommandPaletteApplet {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Omarchy SDDM & Plymouth Display Theme Customizer Engine
+pub struct OmarchySddmThemeCustomizerEngine {
+    pub active_sddm_theme: String,
+    pub active_plymouth_splash: String,
+}
+
+impl OmarchySddmThemeCustomizerEngine {
+    pub fn new() -> Self {
+        Self {
+            active_sddm_theme: "omarchy-catppuccin".to_string(),
+            active_plymouth_splash: "omarchy-breeze".to_string(),
+        }
+    }
+
+    pub fn apply_theme(&mut self, theme_name: &str) -> String {
+        self.active_sddm_theme = format!("omarchy-{}", theme_name);
+        self.active_plymouth_splash = format!("omarchy-{}", theme_name);
+        format!("Applied theme '{}' to SDDM & Plymouth", theme_name)
+    }
+}
+
+impl Default for OmarchySddmThemeCustomizerEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Omarchy WirePlumber Spatial Audio & Bluetooth Codec Engine
+pub struct OmarchyWirePlumberAudioProfileEngine {
+    pub active_codec: String,
+    pub spatial_audio_enabled: bool,
+}
+
+impl OmarchyWirePlumberAudioProfileEngine {
+    pub fn new() -> Self {
+        Self {
+            active_codec: "ldac".to_string(),
+            spatial_audio_enabled: true,
+        }
+    }
+
+    pub fn set_bluetooth_codec(&mut self, codec: &str) {
+        self.active_codec = codec.to_string();
+    }
+
+    pub fn toggle_spatial_audio(&mut self) -> bool {
+        self.spatial_audio_enabled = !self.spatial_audio_enabled;
+        self.spatial_audio_enabled
+    }
+}
+
+impl Default for OmarchyWirePlumberAudioProfileEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Omarchy Pacman & YAY AUR Update Gateway Engine
+pub struct OmarchyPacmanYayUpdateGatewayEngine {
+    pub parallel_downloads: u32,
+    pub create_snapshot_before_update: bool,
+    pub pending_updates: Vec<String>,
+}
+
+impl OmarchyPacmanYayUpdateGatewayEngine {
+    pub fn new() -> Self {
+        Self {
+            parallel_downloads: 5,
+            create_snapshot_before_update: true,
+            pending_updates: vec!["hyprland".to_string(), "waybar".to_string(), "alacritty".to_string()],
+        }
+    }
+
+    pub fn execute_omarchy_update(&mut self) -> (usize, bool) {
+        let count = self.pending_updates.len();
+        self.pending_updates.clear();
+        (count, self.create_snapshot_before_update)
+    }
+}
+
+impl Default for OmarchyPacmanYayUpdateGatewayEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 #[cfg(test)]
 mod tests {
@@ -250,5 +469,50 @@ mod tests {
         assert_eq!(snap_id, 1);
         assert_eq!(dotfiles.backups.len(), 1);
         assert_eq!(dotfiles.backups[0].dotfiles_count, 2);
+    }
+
+    #[test]
+    fn test_omarchy_waybar_status_config_engine() {
+        let waybar = OmarchyWaybarStatusConfigEngine::new();
+        let json = waybar.generate_waybar_json();
+        assert!(json.contains("\"position\": \"top\""));
+        assert!(json.contains("hyprland/workspaces"));
+        assert!(json.contains("pulseaudio"));
+    }
+
+    #[test]
+    fn test_omarchy_rofi_command_palette_applet() {
+        let rofi = OmarchyRofiCommandPaletteApplet::new();
+        let matches = rofi.filter_by_query("Nord");
+        assert_eq!(matches.len(), 1);
+        assert_eq!(matches[0].label, "Switch Theme: Nord");
+    }
+
+    #[test]
+    fn test_omarchy_sddm_theme_customizer_engine() {
+        let mut sddm = OmarchySddmThemeCustomizerEngine::new();
+        let status = sddm.apply_theme("nord");
+        assert!(status.contains("Applied theme 'nord'"));
+        assert_eq!(sddm.active_sddm_theme, "omarchy-nord");
+        assert_eq!(sddm.active_plymouth_splash, "omarchy-nord");
+    }
+
+    #[test]
+    fn test_omarchy_wireplumber_audio_profile_engine() {
+        let mut wp = OmarchyWirePlumberAudioProfileEngine::new();
+        wp.set_bluetooth_codec("aptx_hd");
+        assert_eq!(wp.active_codec, "aptx_hd");
+
+        assert!(!wp.toggle_spatial_audio());
+        assert!(wp.toggle_spatial_audio());
+    }
+
+    #[test]
+    fn test_omarchy_pacman_yay_update_gateway_engine() {
+        let mut gateway = OmarchyPacmanYayUpdateGatewayEngine::new();
+        let (updated, snap_created) = gateway.execute_omarchy_update();
+        assert_eq!(updated, 3);
+        assert!(snap_created);
+        assert_eq!(gateway.pending_updates.len(), 0);
     }
 }
