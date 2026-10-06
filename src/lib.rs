@@ -47,7 +47,7 @@ pub mod orchestration;
 pub mod package;
 pub use package::{
     SovereignDistroPackageAdvancementsSuiteV10, SovereignDistroPackageAdvancementsSuiteV11,
-    SovereignDistroPackageAdvancementsSuiteV14, SovereignDistroPackageAdvancementsSuiteV19,
+    SovereignDistroPackageAdvancementsSuiteV14,
     UniversalForeignPackageFormat, UniversalForeignPackageFormatConverter,
 };
 pub mod process;
@@ -249,9 +249,9 @@ pub use kernel::{
     KernelFastPacketEngine, LandlockAccessRight, LandlockPathRule, MemoryBlock,
     MemoryCompactionSuperpagesAllocator, Message, PhysicalFrameBlock, PolicyError, PolicyManager,
     Priority, PrivacyFirstSandbox, PrivilegeLevel, Process, ProcessState, ProtectionDomain,
-    ResourceBroker, RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError,
+    ResourceBroker, RoundRobinConfig, RoundRobinScheduler,
     SelfHealingKernel, SigmaFsPlusPlus, SoftIrqType, SovereignCgroupGovernor, SubmissionQueueEntry,
-    UniversalAbiTranslator, UserDefinedKernelFunctions, VirtualCpu, XdpAction, PAGE_SIZE,
+    UniversalAbiTranslator, UserDefinedKernelFunctions, XdpAction, PAGE_SIZE,
 };
 pub use network::{
     compute_checksum as compute_net_checksum, IPv4Address, NetworkPacket, PacketRingBuffer,
