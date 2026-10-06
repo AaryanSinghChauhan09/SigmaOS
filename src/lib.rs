@@ -178,9 +178,13 @@ pub mod audit;
 pub mod backup;
 pub mod bluetooth;
 pub mod boot;
+pub mod boot_config;
 pub mod input;
 pub mod printing;
+pub mod system_info;
 pub use boot::*;
+pub use boot_config::*;
+pub use system_info::*;
 pub mod toolchain {
     pub mod adapter;
     pub mod bootstrap;
