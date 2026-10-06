@@ -1,6 +1,10 @@
 pub mod mobile_variant;
 pub mod zenith_config;
 pub use mobile_variant::*;
+pub mod pipewire_audio;
+pub use pipewire_audio::*;
+pub mod theme_picker;
+pub use theme_picker::*;
 pub mod tiling;
 pub use tiling::{TilingLayout, TilingWindow, TilingWindowManager, WindowArea, Workspace};
 pub mod applications;
