@@ -18,8 +18,8 @@ use alloc::string::String;
 use alloc::vec::Vec;
 use core::fmt;
 
-use crate::desktop::Theme;
 use crate::graphics::Color;
+use crate::theming::Theme;
 
 /// Widget ID for efficient lookups
 pub type WidgetId = u64;

@@ -388,7 +388,7 @@ mod tests {
 
     #[test]
     fn test_statistics() {
-        let manager = DesktopNotificationManager::new();
+        let mut manager = DesktopNotificationManager::new();
         manager.send(
             "TestApp".to_string(),
             "Test".to_string(),

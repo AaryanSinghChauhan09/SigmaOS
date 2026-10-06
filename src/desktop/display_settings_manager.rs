@@ -317,8 +317,8 @@ mod tests {
         let mut manager = DesktopDisplaySettingsManager::new();
 
         // Try to remove primary display (should fail)
-        let primary = manager.get_primary_display().unwrap();
-        let result = manager.remove_display(&primary.id);
+        let primary_id = manager.get_primary_display().unwrap().id.clone();
+        let result = manager.remove_display(&primary_id);
         assert!(!result);
     }
 

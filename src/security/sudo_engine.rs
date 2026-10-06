@@ -88,6 +88,18 @@ impl SovereignSudoEngine {
         target_user: &str,
         command: &str,
     ) -> SudoAuthResult {
+        // Security Hardening: Reject inputs containing embedded NUL bytes (C-ABI truncation mitigation)
+        // or ASCII control characters (CWE-150 / CWE-117 command & log injection mitigation).
+        if user.as_bytes().contains(&0)
+            || target_user.as_bytes().contains(&0)
+            || command.as_bytes().contains(&0)
+            || user.bytes().any(|b| b < 32 || b == 127)
+            || target_user.bytes().any(|b| b < 32 || b == 127)
+            || command.bytes().any(|b| b < 32 || b == 127)
+        {
+            return SudoAuthResult::PermissionDenied;
+        }
+
         for rule in &self.rules {
             let entity_match = if rule.entity.starts_with('%') || rule.entity.starts_with(':') {
                 let group_name = &rule.entity[1..];
@@ -185,5 +197,34 @@ mod tests {
         assert!(!clean_env.contains(&String::from("BASH_ENV")));
         assert!(!clean_env.contains(&String::from("LC_CUSTOM")));
         assert!(!clean_env.contains(&String::from("LC_BAD-NAME")));
+    }
+
+    #[test]
+    fn test_sudo_engine_null_byte_and_control_char_rejection() {
+        let engine = SovereignSudoEngine::new();
+
+        // NUL byte injection in user, target_user, or command must be denied
+        assert_eq!(
+            engine.authorize("jules\0evil", &["wheel"], "root", "/usr/bin/reboot"),
+            SudoAuthResult::PermissionDenied
+        );
+        assert_eq!(
+            engine.authorize("jules", &["wheel"], "root\0admin", "/usr/bin/reboot"),
+            SudoAuthResult::PermissionDenied
+        );
+        assert_eq!(
+            engine.authorize("jules", &["wheel"], "root", "/usr/bin/reboot\0--force"),
+            SudoAuthResult::PermissionDenied
+        );
+
+        // Control character injection in user or command must be denied
+        assert_eq!(
+            engine.authorize("jules\nadmin", &["wheel"], "root", "/usr/bin/reboot"),
+            SudoAuthResult::PermissionDenied
+        );
+        assert_eq!(
+            engine.authorize("jules", &["wheel"], "root", "/usr/bin/reboot\r\n"),
+            SudoAuthResult::PermissionDenied
+        );
     }
 }

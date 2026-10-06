@@ -31,7 +31,8 @@ pub use tcp_ip_implementation::{
 };
 
 pub use network_namespace::{
-    NetworkInterface, NetworkNamespace, NetworkNamespaceId, Route as NamespaceRoute, VirtualBridge,
+    FirewallAction, FirewallRule, NetworkInterface, NetworkNamespace, NetworkNamespaceId,
+    NetworkNamespaceManager, Route as NamespaceRoute, VirtualBridge,
 };
 
 pub use network_syscalls::{
@@ -73,7 +74,7 @@ pub use congestion::{
     CongestionControlManager, CongestionControlType, CongestionState, CongestionWindow,
     CubicCongestionControl,
 };
-pub use namespace::{FirewallAction, FirewallRule, InterfaceAddress, InterfaceState, NetworkRoute};
+pub use namespace::{InterfaceAddress, InterfaceState, NetworkRoute};
 pub use network_config::{ConfigMethod, InterfaceConfig, InterfaceType, NetworkConfigManager};
 pub use packet_filter::{Packet, PacketFilter, PfAction, PfProtocol, PfRule};
 pub use zero_copy::{

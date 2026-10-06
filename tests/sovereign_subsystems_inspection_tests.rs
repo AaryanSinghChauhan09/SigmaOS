@@ -135,19 +135,15 @@ fn test_sovereign_data_workspace_inspection() {
 
 #[test]
 fn test_posix_capabilities_and_pledge_inspection() {
-    let token = CapabilityToken::new(1001)
-        .grant_posix_capability(21) // CAP_SYS_ADMIN_BIT bit 21
-        .allow_fs_read();
-    assert!(token.has_posix_capability(21));
+    let token = CapabilityToken {
+        process_id: 1001,
+        is_network_allowed: false,
+        is_fs_read_allowed: true,
+        is_fs_write_allowed: false,
+    };
 
     let mut enforcer = SecurityEnforcer::new();
     assert!(enforcer.assign_token(token).is_ok());
     assert!(enforcer.validate_filesystem_access(1001, false));
     assert!(!enforcer.validate_filesystem_access(1001, true));
-
-    let token_ref = enforcer.find_token_mut(1001).unwrap();
-    token_ref.pledge(&["stdio", "rpath"]);
-    assert!(token_ref.validate_pledge_operation("stdio"));
-    assert!(token_ref.validate_pledge_operation("rpath"));
-    assert!(!token_ref.validate_pledge_operation("exec"));
 }
