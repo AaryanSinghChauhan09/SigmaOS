@@ -56,6 +56,10 @@ pub mod arch_gap_closure;
 pub use arch_gap_closure::*;
 pub mod arch_ultimate_gap_closure;
 pub use arch_ultimate_gap_closure::*;
+pub mod arch_linux_pinnacle_gap_closure;
+pub use arch_linux_pinnacle_gap_closure::*;
+pub mod omarchy_linux_pinnacle_gap_closure;
+pub use omarchy_linux_pinnacle_gap_closure::*;
 // SigmaOS Distro/Ecosystem Maturity Module
 pub mod arch;
 pub use arch::*;
