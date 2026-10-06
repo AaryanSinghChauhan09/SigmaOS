@@ -327,6 +327,8 @@ pub use linux_bsd_pinnacle_synthesis::{
 
 pub mod sovereign_2070_distro_supremacy_engine;
 pub use sovereign_2070_distro_supremacy_engine::*;
+pub mod sovereign_2080_distro_supremacy_engine;
+pub use sovereign_2080_distro_supremacy_engine::*;
 pub mod sovereign_2028_distro_supremacy_engine;
 pub use sovereign_2028_distro_supremacy_engine::{
     BpfSchedExtPolicy, DirectScanoutFrame, EbpfSchedTask, FineIbtCallsiteGuard, MicroVmSpawnSpec,
