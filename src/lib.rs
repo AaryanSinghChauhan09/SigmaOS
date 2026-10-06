@@ -180,11 +180,15 @@ pub mod backup;
 pub mod bluetooth;
 pub mod boot;
 pub mod boot_config;
+pub mod desklet_manager;
 pub mod input;
 pub mod printing;
+pub mod quickshell_plugin;
 pub mod system_info;
 pub use boot::*;
 pub use boot_config::*;
+pub use desklet_manager::*;
+pub use quickshell_plugin::*;
 pub use system_info::*;
 pub mod toolchain {
     pub mod adapter;
