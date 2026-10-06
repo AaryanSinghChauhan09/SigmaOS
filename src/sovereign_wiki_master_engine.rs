@@ -164,6 +164,12 @@ impl SovereignLinuxBsdWikiRoadmapParityEngine {
                 "src/kernel/sovereign_clean_code_and_os_principles_engine.rs",
                 "Clean Code & OS Principles",
             ),
+            (
+                20,
+                "Omarchy Linux Gap Closure & PR Gateway Suite",
+                "src/distro/omarchy_linux_gap_closure_pr_suite.rs",
+                "Omarchy Linux Gap Closure",
+            ),
         ];
 
         for (id, title, module, _spec) in default_ideas {
@@ -293,8 +299,8 @@ mod tests {
     #[test]
     fn test_wiki_roadmap_parity_engine() {
         let engine = SovereignLinuxBsdWikiRoadmapParityEngine::new();
-        assert_eq!(engine.total_ideas_count, 19);
-        assert_eq!(engine.implemented_ideas_count(), 19);
+        assert_eq!(engine.total_ideas_count, 20);
+        assert_eq!(engine.implemented_ideas_count(), 20);
         assert_eq!(engine.verification_percentage(), 100.0);
     }
 

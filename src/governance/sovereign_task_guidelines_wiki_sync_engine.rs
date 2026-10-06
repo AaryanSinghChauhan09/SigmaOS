@@ -219,6 +219,17 @@ impl WikiDataTransferEngine {
             },
         );
 
+        self.feature_specs.insert(
+            "OmarchyLinuxGapClosurePrSuite".to_string(),
+            FeatureMdStatus {
+                spec_name: "09-Omarchy-Linux-Gap-Closure-PR-Suite.md".to_string(),
+                source_path: "wiki_repo/09-Omarchy-Linux-Gap-Closure-PR-Suite.md".to_string(),
+                is_fully_implemented: true,
+                completion_percentage: 100,
+                wiki_mirrored: true,
+            },
+        );
+
         self.register_spec_file("UniversalPackageSystem", "Universal Package System", true);
         self.register_spec_file("Roadmap11Deployment", "Roadmap 11 Deployment", true);
         self.register_spec_file("ROADMAP.md", "SigmaOS Master Development Roadmap", true);
@@ -241,6 +252,11 @@ impl WikiDataTransferEngine {
         self.register_spec_file(
             "08-Sovereign-Clean-Code-And-OS-Principles-Engine.md",
             "Sovereign Clean Code & OS Principles Engine Spec",
+            true,
+        );
+        self.register_spec_file(
+            "09-Omarchy-Linux-Gap-Closure-PR-Suite.md",
+            "Omarchy Linux Gap Closure PR Suite Spec",
             true,
         );
     }

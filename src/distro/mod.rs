@@ -411,6 +411,9 @@ pub use sovereign_linux_bsd_ecosystem_advancements_v22::*;
 pub mod sovereign_architecture_development_decision_plan;
 pub use sovereign_architecture_development_decision_plan::*;
 
+pub mod omarchy_linux_gap_closure_pr_suite;
+pub use omarchy_linux_gap_closure_pr_suite::*;
+
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;
 pub use crate::stubs::large_distro_stubs::*;

@@ -619,4 +619,11 @@ if [ -f "src/kernel/sovereign_clean_code_and_os_principles_engine.rs" ]; then
     ./build/test_clean_code_os_principles
 fi
 
+if [ -f "src/distro/omarchy_linux_gap_closure_pr_suite.rs" ]; then
+    echo "Running Omarchy Linux Gap Closure & PR Gateway test suite..."
+    mkdir -p build
+    rustc --test src/distro/omarchy_linux_gap_closure_pr_suite.rs --edition=2021 -o build/test_omarchy_gap_closure
+    ./build/test_omarchy_gap_closure
+fi
+
 echo "All SigmaOS test suites completed."
