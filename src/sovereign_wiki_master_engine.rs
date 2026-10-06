@@ -164,6 +164,12 @@ impl SovereignLinuxBsdWikiRoadmapParityEngine {
                 "src/distro/sovereign_linux_bsd_ecosystem_advancements_v22.rs",
                 "V22 Distro PR Gateway",
             ),
+            (
+                20,
+                "Supreme Performance Architecture Decision Plan PR",
+                "wiki/18-Architecture-Performance-Development-Decision-Plan-PR.md",
+                "Architecture Decision Plan PR",
+            ),
         ];
 
         for (id, title, module, _spec) in default_ideas {
