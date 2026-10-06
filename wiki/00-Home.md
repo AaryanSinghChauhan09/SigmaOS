@@ -17,6 +17,7 @@
 - [13-Agents](13-Agents.md)
 - [14-Future-Development](14-Future-Development.md)
 - [15-Architecture-Decisions](15-Architecture-Decisions.md)
+- [18-Architecture-Performance-Development-Decision-Plan-PR](18-Architecture-Performance-Development-Decision-Plan-PR.md)
 - [16-Self-Sufficiency-Encyclopedia](16-Self-Sufficiency-Encyclopedia.md)
 - [17-Repository-Documents](17-Repository-Documents.md)
 - [AI-and-Agent-Runtime](AI-and-Agent-Runtime.md)
