@@ -133,13 +133,17 @@ pub enum DistroSubsystemMode {
     OpenBsdKarled,
     FreeBsd14_1,
     FreeBsd15,
+    FreeBsd14_2,
     OpenBsd76,
     OpenBsd77,
+    OpenBsd78,
     NetBsd10,
     DragonFlyBsd64,
     LinuxVanillaOSV3,
     LinuxNixOS2405,
     LinuxGentooEapi8,
+    LinuxRocky9,
+    LinuxAlma9,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -200,8 +204,10 @@ impl LinuxBsdPamAuthEngine {
             | DistroSubsystemMode::OpenBsdKarled
             | DistroSubsystemMode::FreeBsd14_1
             | DistroSubsystemMode::FreeBsd15
+            | DistroSubsystemMode::FreeBsd14_2
             | DistroSubsystemMode::OpenBsd76
             | DistroSubsystemMode::OpenBsd77
+            | DistroSubsystemMode::OpenBsd78
             | DistroSubsystemMode::NetBsd10
             | DistroSubsystemMode::DragonFlyBsd64 => AuthMechanism::BsdAuth,
 
@@ -211,7 +217,9 @@ impl LinuxBsdPamAuthEngine {
             | DistroSubsystemMode::LinuxFedoraSilverblue
             | DistroSubsystemMode::LinuxBazzite
             | DistroSubsystemMode::LinuxRedHatEnterprise
-            | DistroSubsystemMode::LinuxCentOSStream => AuthMechanism::SystemdHomed,
+            | DistroSubsystemMode::LinuxCentOSStream
+            | DistroSubsystemMode::LinuxRocky9
+            | DistroSubsystemMode::LinuxAlma9 => AuthMechanism::SystemdHomed,
 
             _ => AuthMechanism::LinuxPam,
         };
@@ -365,7 +373,9 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::BedrockLinux
             | DistroSubsystemMode::LinuxRedHatEnterprise
             | DistroSubsystemMode::LinuxCentOSStream
-            | DistroSubsystemMode::LinuxVanillaOSV3 => ServiceSupervisorType::Systemd,
+            | DistroSubsystemMode::LinuxVanillaOSV3
+            | DistroSubsystemMode::LinuxRocky9
+            | DistroSubsystemMode::LinuxAlma9 => ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo
             | DistroSubsystemMode::LinuxGentooHardened
@@ -378,10 +388,12 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::FreeBsdBhyveVirtualization
             | DistroSubsystemMode::FreeBsd14_1
             | DistroSubsystemMode::FreeBsd15
+            | DistroSubsystemMode::FreeBsd14_2
             | DistroSubsystemMode::OpenBsd
             | DistroSubsystemMode::OpenBsdKarled
             | DistroSubsystemMode::OpenBsd76
             | DistroSubsystemMode::OpenBsd77
+            | DistroSubsystemMode::OpenBsd78
             | DistroSubsystemMode::NetBsd
             | DistroSubsystemMode::NetBsd10
             | DistroSubsystemMode::DragonFlyBsd
@@ -543,8 +555,6 @@ impl SovereignUniversalDistroBridge {
                 | DistroSubsystemMode::GhostBsd
                 | DistroSubsystemMode::NomadBsd
                 | DistroSubsystemMode::OpenBsdHardened
-                | DistroSubsystemMode::OpenBsd76
-                | DistroSubsystemMode::OpenBsd77
                 | DistroSubsystemMode::SmartOs
                 | DistroSubsystemMode::SolarisSmartOS
                 | DistroSubsystemMode::SolarisOpenIndiana,
@@ -641,7 +651,9 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxArchHurd
             | DistroSubsystemMode::LinuxSteamOS
             | DistroSubsystemMode::LinuxRedHatEnterprise
-            | DistroSubsystemMode::LinuxCentOSStream => supervisor == ServiceSupervisorType::Systemd,
+            | DistroSubsystemMode::LinuxCentOSStream
+            | DistroSubsystemMode::LinuxRocky9
+            | DistroSubsystemMode::LinuxAlma9 => supervisor == ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo
             | DistroSubsystemMode::LinuxGentooHardened
@@ -654,10 +666,12 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::FreeBsdBhyveVirtualization
             | DistroSubsystemMode::FreeBsd14_1
             | DistroSubsystemMode::FreeBsd15
+            | DistroSubsystemMode::FreeBsd14_2
             | DistroSubsystemMode::OpenBsd
             | DistroSubsystemMode::OpenBsdKarled
             | DistroSubsystemMode::OpenBsd76
             | DistroSubsystemMode::OpenBsd77
+            | DistroSubsystemMode::OpenBsd78
             | DistroSubsystemMode::NetBsd
             | DistroSubsystemMode::NetBsd10
             | DistroSubsystemMode::DragonFlyBsd
@@ -757,6 +771,8 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxMageia
             | DistroSubsystemMode::LinuxAlma
             | DistroSubsystemMode::LinuxRocky
+            | DistroSubsystemMode::LinuxRocky9
+            | DistroSubsystemMode::LinuxAlma9
             | DistroSubsystemMode::LinuxOracle
             | DistroSubsystemMode::LinuxRHEL
             | DistroSubsystemMode::LinuxRedHatEnterprise
@@ -769,8 +785,6 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxEuroLinux
             | DistroSubsystemMode::LinuxAnolis
             | DistroSubsystemMode::LinuxBazzite
-            | DistroSubsystemMode::LinuxRedHatEnterprise
-            | DistroSubsystemMode::LinuxCentOSStream
             | DistroSubsystemMode::LinuxOpenMandriva => {
                 format!("{}.rpm", input_pkg)
             }
@@ -792,6 +806,7 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::FreeBsdBhyveVirtualization
             | DistroSubsystemMode::FreeBsd14_1
             | DistroSubsystemMode::FreeBsd15
+            | DistroSubsystemMode::FreeBsd14_2
             | DistroSubsystemMode::DragonFlyBsd
             | DistroSubsystemMode::DragonFlyHammer2
             | DistroSubsystemMode::DragonFlyBsdHammer2Pfs
@@ -809,6 +824,7 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::OpenBsdKarled
             | DistroSubsystemMode::OpenBsd76
             | DistroSubsystemMode::OpenBsd77
+            | DistroSubsystemMode::OpenBsd78
             | DistroSubsystemMode::NetBsd10
             | DistroSubsystemMode::NetBsdRump
             | DistroSubsystemMode::SmartOs
@@ -889,6 +905,8 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxMageia
             | DistroSubsystemMode::LinuxAlma
             | DistroSubsystemMode::LinuxRocky
+            | DistroSubsystemMode::LinuxRocky9
+            | DistroSubsystemMode::LinuxAlma9
             | DistroSubsystemMode::LinuxOracle
             | DistroSubsystemMode::LinuxRHEL
             | DistroSubsystemMode::LinuxRedHatEnterprise
@@ -901,8 +919,6 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxEuroLinux
             | DistroSubsystemMode::LinuxAnolis
             | DistroSubsystemMode::LinuxBazzite
-            | DistroSubsystemMode::LinuxRedHatEnterprise
-            | DistroSubsystemMode::LinuxCentOSStream
             | DistroSubsystemMode::LinuxOpenMandriva => format!("{}.rpm", action),
             DistroSubsystemMode::LinuxPuppy => format!("{}.pet", action),
             DistroSubsystemMode::LinuxSolus | DistroSubsystemMode::LinuxSerpentOS => {
@@ -919,6 +935,7 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::FreeBsdBhyveVirtualization
             | DistroSubsystemMode::FreeBsd14_1
             | DistroSubsystemMode::FreeBsd15
+            | DistroSubsystemMode::FreeBsd14_2
             | DistroSubsystemMode::DragonFlyBsd
             | DistroSubsystemMode::DragonFlyHammer2
             | DistroSubsystemMode::DragonFlyBsdHammer2Pfs
@@ -936,6 +953,7 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::OpenBsdKarled
             | DistroSubsystemMode::OpenBsd76
             | DistroSubsystemMode::OpenBsd77
+            | DistroSubsystemMode::OpenBsd78
             | DistroSubsystemMode::NetBsd10
             | DistroSubsystemMode::NetBsdRump
             | DistroSubsystemMode::SmartOs
@@ -990,6 +1008,7 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::OpenBsdKarled
             | DistroSubsystemMode::OpenBsd76
             | DistroSubsystemMode::OpenBsd77
+            | DistroSubsystemMode::OpenBsd78
             | DistroSubsystemMode::NetBsd
             | DistroSubsystemMode::NetBsd10
             | DistroSubsystemMode::OpenBsdHardened
@@ -3421,13 +3440,17 @@ mod subsystem_interop_tests {
             DistroSubsystemMode::OpenBsdKarled,
             DistroSubsystemMode::FreeBsd14_1,
             DistroSubsystemMode::FreeBsd15,
+            DistroSubsystemMode::FreeBsd14_2,
             DistroSubsystemMode::OpenBsd76,
             DistroSubsystemMode::OpenBsd77,
+            DistroSubsystemMode::OpenBsd78,
             DistroSubsystemMode::NetBsd10,
             DistroSubsystemMode::DragonFlyBsd64,
             DistroSubsystemMode::LinuxVanillaOSV3,
             DistroSubsystemMode::LinuxNixOS2405,
             DistroSubsystemMode::LinuxGentooEapi8,
+            DistroSubsystemMode::LinuxRocky9,
+            DistroSubsystemMode::LinuxAlma9,
         ];
 
         let mut bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxArch);
@@ -3520,7 +3543,7 @@ mod subsystem_interop_tests {
             .harmonize_all_subsystems_across_all_distros()
             .unwrap();
         assert!(synced > 0);
-        assert_eq!(harmonizer.harmonized_distros_count, 104);
+        assert_eq!(harmonizer.harmonized_distros_count, 108);
         assert!(harmonizer.harmonized_subsystems_count >= 150);
 
         let res = harmonizer
@@ -3729,13 +3752,17 @@ impl SovereignMasterSubsystemDistroHarmonizer {
             DistroSubsystemMode::OpenBsdKarled,
             DistroSubsystemMode::FreeBsd14_1,
             DistroSubsystemMode::FreeBsd15,
+            DistroSubsystemMode::FreeBsd14_2,
             DistroSubsystemMode::OpenBsd76,
             DistroSubsystemMode::OpenBsd77,
+            DistroSubsystemMode::OpenBsd78,
             DistroSubsystemMode::NetBsd10,
             DistroSubsystemMode::DragonFlyBsd64,
             DistroSubsystemMode::LinuxVanillaOSV3,
             DistroSubsystemMode::LinuxNixOS2405,
             DistroSubsystemMode::LinuxGentooEapi8,
+            DistroSubsystemMode::LinuxRocky9,
+            DistroSubsystemMode::LinuxAlma9,
         ];
 
         let mut total_synced_subsystems = 0;
@@ -4107,13 +4134,17 @@ mod cross_subsystem_tests {
             DistroSubsystemMode::OpenBsdKarled,
             DistroSubsystemMode::FreeBsd14_1,
             DistroSubsystemMode::FreeBsd15,
+            DistroSubsystemMode::FreeBsd14_2,
             DistroSubsystemMode::OpenBsd76,
             DistroSubsystemMode::OpenBsd77,
+            DistroSubsystemMode::OpenBsd78,
             DistroSubsystemMode::NetBsd10,
             DistroSubsystemMode::DragonFlyBsd64,
             DistroSubsystemMode::LinuxVanillaOSV3,
             DistroSubsystemMode::LinuxNixOS2405,
             DistroSubsystemMode::LinuxGentooEapi8,
+            DistroSubsystemMode::LinuxRocky9,
+            DistroSubsystemMode::LinuxAlma9,
         ];
 
         for m in modes {
@@ -4277,6 +4308,34 @@ mod cross_subsystem_tests {
         assert_eq!(bhyve_bridge.translate_package_specifier("app"), "app.pkg");
         assert_eq!(
             bhyve_bridge.get_supervisor_type(),
+            ServiceSupervisorType::OpenRC
+        );
+
+        let rocky9_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxRocky9);
+        assert_eq!(rocky9_bridge.translate_package_specifier("app"), "app.rpm");
+        assert_eq!(
+            rocky9_bridge.get_supervisor_type(),
+            ServiceSupervisorType::Systemd
+        );
+
+        let alma9_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxAlma9);
+        assert_eq!(alma9_bridge.translate_package_specifier("app"), "app.rpm");
+        assert_eq!(
+            alma9_bridge.get_supervisor_type(),
+            ServiceSupervisorType::Systemd
+        );
+
+        let freebsd14_2_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::FreeBsd14_2);
+        assert_eq!(freebsd14_2_bridge.translate_package_specifier("app"), "app.pkg");
+        assert_eq!(
+            freebsd14_2_bridge.get_supervisor_type(),
+            ServiceSupervisorType::OpenRC
+        );
+
+        let openbsd78_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::OpenBsd78);
+        assert_eq!(openbsd78_bridge.translate_package_specifier("app"), "app.tgz");
+        assert_eq!(
+            openbsd78_bridge.get_supervisor_type(),
             ServiceSupervisorType::OpenRC
         );
     }
@@ -9193,12 +9252,14 @@ impl SovereignMultiArchSyscallTranslator {
             | DistroSubsystemMode::FreeBsdBhyveVirtualization
             | DistroSubsystemMode::FreeBsd14_1
             | DistroSubsystemMode::FreeBsd15
+            | DistroSubsystemMode::FreeBsd14_2
             | DistroSubsystemMode::OpenBsd
             | DistroSubsystemMode::OpenBsdHardened
             | DistroSubsystemMode::OpenBsdUnveilHardened
             | DistroSubsystemMode::OpenBsdKarled
             | DistroSubsystemMode::OpenBsd76
             | DistroSubsystemMode::OpenBsd77
+            | DistroSubsystemMode::OpenBsd78
             | DistroSubsystemMode::NetBsd
             | DistroSubsystemMode::NetBsd10
             | DistroSubsystemMode::DragonFlyBsd
