@@ -14,6 +14,8 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
 pub mod elf_loader;
+pub mod musl_dynamic_relocator;
 pub mod relocation;
 
+pub use musl_dynamic_relocator::*;
 pub use relocation::*;

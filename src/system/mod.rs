@@ -43,7 +43,10 @@ pub mod sandbox;
 pub mod shredder;
 pub mod snapshot;
 pub mod snapshot_schedule;
+pub mod sovereign_init_supervisor;
 pub mod startup;
+
+pub use sovereign_init_supervisor::*;
 pub mod state;
 pub mod syslog;
 pub mod user;

@@ -12,4 +12,7 @@ pub use sigma_compositor::{
 };
 
 // ─── Zenith Wayland Compositor Core ──────────────────────────────────────────
+pub mod wayland_surface_engine;
 pub mod zenith_core;
+
+pub use wayland_surface_engine::*;

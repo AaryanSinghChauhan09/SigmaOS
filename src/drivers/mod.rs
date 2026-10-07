@@ -38,6 +38,8 @@ pub mod sovereign_driver_lifecycle;
 pub mod sovereign_hardware_expansion;
 pub mod sovereign_usb_xhci;
 pub mod storage;
+pub mod storage_ahci_nvme_engine;
+pub use storage_ahci_nvme_engine::*;
 pub mod touch_jingos;
 pub mod usb_audio;
 pub mod usb_hid;
