@@ -200,6 +200,27 @@ impl Default for ItsFossSystemCleanerEngine {
 // 3. GNOME SOFTWARE / DISCOVER GUI APP CENTER ENGINE (ItsFossGuiSoftwareCenterEngine)
 // =========================================================================
 
+/// Zero-allocation case-insensitive substring search helper.
+/// Checks whether `haystack` contains `needle`, ignoring ASCII case, without allocating heap Strings.
+fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
+    if needle.is_empty() {
+        return true;
+    }
+    if haystack.len() < needle.len() {
+        return false;
+    }
+    if haystack.is_ascii() && needle.is_ascii() {
+        let needle_bytes = needle.as_bytes();
+        haystack.as_bytes().windows(needle_bytes.len()).any(|window| {
+            window.iter().zip(needle_bytes.iter()).all(|(&b1, &b2)| {
+                b1.to_ascii_lowercase() == b2.to_ascii_lowercase()
+            })
+        })
+    } else {
+        haystack.to_lowercase().contains(&needle.to_lowercase())
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct SoftwareCatalogEntry {
     pub name: String,
@@ -251,11 +272,12 @@ impl ItsFossGuiSoftwareCenterEngine {
     }
 
     pub fn search_catalog(&self, query: &str) -> Vec<SoftwareCatalogEntry> {
-        let q = query.to_lowercase();
+        // Bolt Optimization: Zero-allocation case-insensitive substring search helper avoids
+        // allocating heap String instances via `to_lowercase()` for catalog item names and descriptions.
         self.catalog
             .iter()
             .filter(|e| {
-                e.name.to_lowercase().contains(&q) || e.description.to_lowercase().contains(&q)
+                contains_ignore_case(&e.name, query) || contains_ignore_case(&e.description, query)
             })
             .cloned()
             .collect()
@@ -539,6 +561,10 @@ mod tests {
         let mut center = ItsFossGuiSoftwareCenterEngine::new();
         let results = center.search_catalog("GIMP");
         assert_eq!(results.len(), 1);
+
+        // Case-insensitive zero-allocation query verification
+        assert_eq!(center.search_catalog("gimp").len(), 1);
+        assert_eq!(center.search_catalog("CODE").len(), 1);
 
         let install_res = center.one_click_install("org.gimp.GIMP");
         assert!(install_res.is_ok());
