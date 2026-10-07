@@ -674,6 +674,7 @@ export function initWindowFocus() {
       win.style.zIndex = topZIndex;
       windows.forEach((w) => w.classList.remove("active-focus"));
       win.classList.add("active-focus");
+      updateDockAppStates();
     };
 
     win.addEventListener("mousedown", raiseWindow);
@@ -971,6 +972,7 @@ if (typeof window !== "undefined" && typeof document !== "undefined") {
     initSmoothWindowDragging();
     initAmbientMouseGlow();
     initLiveTelemetry();
+    updateDockAppStates();
   };
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", autoInit);
@@ -1093,6 +1095,32 @@ const APP_WIN_MAP = {
 
 let topZIndex = 100;
 
+/**
+ * Synchronizes dock icon launcher buttons with aria-pressed="true|false" and visual indicators (.app-open, .app-active)
+ * based on whether corresponding application windows are currently open and focused.
+ */
+export function updateDockAppStates() {
+  if (typeof document === "undefined") return;
+  const dockIcons = SovereignDomSelector.selectAll(".dock-icon");
+  dockIcons.forEach((btn) => {
+    const hint = (btn.getAttribute("data-tooltip") || btn.getAttribute("aria-label") || "").toLowerCase();
+    let matchedWin = null;
+    for (const [appName, winId] of Object.entries(APP_WIN_MAP)) {
+      if (hint.includes(appName)) {
+        matchedWin = document.getElementById(winId);
+        if (matchedWin) break;
+      }
+    }
+    if (matchedWin) {
+      const isOpen = matchedWin.style.display !== "none" && matchedWin.getAttribute("aria-hidden") !== "true";
+      const isActive = isOpen && matchedWin.classList.contains("active-focus");
+      btn.setAttribute("aria-pressed", isOpen ? "true" : "false");
+      btn.classList.toggle("app-open", isOpen);
+      btn.classList.toggle("app-active", isActive);
+    }
+  });
+}
+
 export function restoreFocusAfterWindowClose(closedWin) {
   if (typeof document === "undefined") return;
   const windows = SovereignDomSelector.selectAll(".window").filter(
@@ -1124,6 +1152,7 @@ export function closeWindow(winId) {
   if (wasFocused) {
     restoreFocusAfterWindowClose(win);
   }
+  updateDockAppStates();
 }
 
 export function minimizeWindow(winId) {
@@ -1171,6 +1200,7 @@ export function launchApp(appName) {
   if (focusable && typeof focusable.focus === "function") {
     focusable.focus();
   }
+  updateDockAppStates();
 }
 
 if (typeof window !== "undefined") {
@@ -1182,6 +1212,7 @@ if (typeof window !== "undefined") {
   window.renderCommandResults = renderCommandResults;
   window.initCommandPalette = initCommandPalette;
   window.initWindowFocus = initWindowFocus;
+  window.updateDockAppStates = updateDockAppStates;
 }
 
 // Minimal dummy index file to export initialization and basic attributes
