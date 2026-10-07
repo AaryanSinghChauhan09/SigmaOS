@@ -19,7 +19,9 @@ function createMockElement(id, tag = "div") {
       _classes: new Set(),
       add(c) { this._classes.add(c); },
       remove(c) { this._classes.delete(c); },
-      toggle(c) {
+      toggle(c, force) {
+        if (force === true) { this._classes.add(c); return true; }
+        if (force === false) { this._classes.delete(c); return false; }
         if (this._classes.has(c)) { this._classes.delete(c); return false; }
         this._classes.add(c); return true;
       },
