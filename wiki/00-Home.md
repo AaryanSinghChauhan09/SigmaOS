@@ -1,7 +1,7 @@
 # Welcome to the SigmaOS Sovereign OS Wiki
 
 ## Core Documentation & Self-Sufficiency Encyclopedia
-- [Sovereign OS Absolute Omnipresent Self-Sufficiency Ultra Encyclopedia V44](15-Sovereign-OS-Self-Sufficiency-Encyclopedia-V44.md)
+- [Sovereign OS Absolute Omnipresent Self-Sufficiency Ultra Encyclopedia V45](15-Sovereign-OS-Self-Sufficiency-Encyclopedia-V45.md)
 - [Self-Sufficiency Encyclopedia Master Index](16-Self-Sufficiency-Encyclopedia.md)
 
 ## System Overview
