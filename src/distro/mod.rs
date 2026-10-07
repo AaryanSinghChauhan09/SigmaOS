@@ -368,6 +368,9 @@ pub use community_ecosystem::*;
 
 pub mod additional_linux_bsd_components;
 
+pub mod sovereign_thousands_distro_components;
+pub use sovereign_thousands_distro_components::*;
+
 pub mod sovereign_2050_distro_supremacy_engine;
 
 pub mod sovereign_2055_distro_supremacy_engine;
