@@ -114,7 +114,7 @@ impl DesktopTimeManager {
             date_format: DateFormat::ISO,
             auto_sync: true,
             sync_interval_minutes: 60,
-            counter: 0,
+            counter: 1000,
         };
 
         // Add default timezones

@@ -127,7 +127,7 @@ impl DesktopPowerManager {
             battery_critical_action: PowerAction::Suspend,
             auto_suspend_timeout: 30,
             screen_off_timeout: 10,
-            counter: 0,
+            counter: 1000,
         };
 
         // Add default battery

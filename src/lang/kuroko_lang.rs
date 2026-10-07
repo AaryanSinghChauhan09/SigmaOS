@@ -343,16 +343,22 @@ impl KurokoCompiler {
 
     pub fn compile(&mut self, source: &str) -> Result<CodeObject, KurokoError> {
         self.tokens = self.tokenize(source)?;
+        self.current = 0;
+        self.code_objects.clear();
 
         let main_code = CodeObject::new("__main__");
         self.code_objects.push(main_code);
         self.current_code = 0;
 
+        // Keep the most recent top-level expression as the module result.
+        self.emit_opcode(Opcode::LoadNil, 0);
         while !self.is_at_end() {
+            if self.match_token(TokenType::Newline) {
+                continue;
+            }
             self.compile_declaration()?;
         }
 
-        self.emit_opcode(Opcode::LoadNil, 0);
         self.emit_opcode(Opcode::Return, 0);
 
         Ok(self.code_objects[0].clone())
@@ -684,7 +690,13 @@ impl KurokoCompiler {
 
     fn compile_expression_statement(&mut self) -> Result<(), KurokoError> {
         self.compile_expression()?;
-        self.consume(TokenType::Newline, "Expect newline after expression")?;
+        if !self.match_token(TokenType::Newline) && !self.is_at_end() {
+            return Err(KurokoError::SyntaxError);
+        }
+        if self.current_code == 0 {
+            // Replace the previous module result with this expression's value.
+            self.emit_opcode(Opcode::Swap, 0);
+        }
         self.emit_opcode(Opcode::Pop, 0);
         Ok(())
     }
@@ -694,12 +706,25 @@ impl KurokoCompiler {
     }
 
     fn compile_assignment(&mut self) -> Result<(), KurokoError> {
-        self.compile_or()
+        if self.check(TokenType::Identifier)
+            && self.tokens.get(self.current + 1).map(|t| t.token_type) == Some(TokenType::Assign)
+        {
+            let name = self.advance().lexeme.clone();
+            self.advance(); // '='
+            self.compile_assignment()?;
+            self.emit_opcode(Opcode::Dup, 0);
+            let name_index = self.add_constant(KurokoValue::String(name));
+            self.emit_opcode(Opcode::StoreGlobal, name_index as i64);
+        } else {
+            self.compile_or()?;
+        }
+        Ok(())
     }
 
     fn compile_or(&mut self) -> Result<(), KurokoError> {
         self.compile_and()?;
         while self.match_token(TokenType::Or) {
+            self.emit_opcode(Opcode::Dup, 0);
             let jump_index = self.current_bytecode_len();
             self.emit_opcode(Opcode::JumpIfTrue, 0);
             self.emit_opcode(Opcode::Pop, 0);
@@ -712,6 +737,7 @@ impl KurokoCompiler {
     fn compile_and(&mut self) -> Result<(), KurokoError> {
         self.compile_equality()?;
         while self.match_token(TokenType::And) {
+            self.emit_opcode(Opcode::Dup, 0);
             let jump_index = self.current_bytecode_len();
             self.emit_opcode(Opcode::JumpIfFalse, 0);
             self.emit_opcode(Opcode::Pop, 0);
@@ -824,7 +850,9 @@ impl KurokoCompiler {
             self.compile_expression()?;
             self.consume(TokenType::RightParen, "Expect ')' after expression")?;
         } else if self.match_token(TokenType::Identifier) {
-            self.emit_opcode(Opcode::LoadGlobal, 0);
+            let name = self.previous().lexeme.clone();
+            let name_index = self.add_constant(KurokoValue::String(name));
+            self.emit_opcode(Opcode::LoadGlobal, name_index as i64);
         } else {
             return Err(KurokoError::SyntaxError);
         }
@@ -956,7 +984,34 @@ impl KurokoVM {
                         self.stack.push(KurokoValue::String(val.clone()));
                     }
                 }
+                Opcode::LoadGlobal => {
+                    let name = match code.constants.get(instruction.operand as usize) {
+                        Some(KurokoValue::String(name)) => name,
+                        _ => return Err(KurokoError::RuntimeError),
+                    };
+                    let value = self.globals.get(name).cloned()
+                        .or_else(|| self.builtin_functions.get(name).copied().map(KurokoValue::BuiltinFunction))
+                        .ok_or(KurokoError::NameError)?;
+                    self.stack.push(value);
+                }
+                Opcode::StoreGlobal => {
+                    let name = match code.constants.get(instruction.operand as usize) {
+                        Some(KurokoValue::String(name)) => name.clone(),
+                        _ => return Err(KurokoError::RuntimeError),
+                    };
+                    let value = self.stack.pop().ok_or(KurokoError::StackUnderflow)?;
+                    self.globals.insert(name, value);
+                }
                 Opcode::Pop => { self.stack.pop(); }
+                Opcode::Dup => {
+                    let value = self.stack.last().ok_or(KurokoError::StackUnderflow)?.clone();
+                    self.stack.push(value);
+                }
+                Opcode::Swap => {
+                    if self.stack.len() < 2 { return Err(KurokoError::StackUnderflow); }
+                    let last = self.stack.len() - 1;
+                    self.stack.swap(last - 1, last);
+                }
                 Opcode::Add => {
                     let b = self.stack.pop().ok_or(KurokoError::StackUnderflow)?;
                     let a = self.stack.pop().ok_or(KurokoError::StackUnderflow)?;

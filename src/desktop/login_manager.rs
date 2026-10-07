@@ -105,7 +105,7 @@ impl DesktopLoginManager {
             autologin_user: None,
             autologin_enabled: false,
             guest_session_enabled: true,
-            counter: 0,
+            counter: 1000,
         };
 
         // Add default desktop environments

@@ -145,7 +145,7 @@ impl DesktopNetworkManager {
         let mut manager = Self {
             connections: HashMap::new(),
             active_connection: None,
-            counter: 0,
+            counter: 1000,
         };
 
         // Add default connections

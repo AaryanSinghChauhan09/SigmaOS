@@ -1,7 +1,7 @@
 // Process Scheduler Enhancements
 // Inspired by Linux CFS, RT scheduler, and energy-aware scheduling
 
-use std::collections::BinaryHeap;
+use std::collections::{BinaryHeap, HashMap};
 use std::sync::atomic::{AtomicU64, Ordering};
 
 /// Process priority
@@ -137,6 +137,7 @@ impl PartialOrd for ProcessTask {
 pub struct CfsScheduler {
     runnable_tasks: BinaryHeap<ProcessTask>,
     current_task: Option<ProcessTask>,
+    sleeping_tasks: HashMap<u64, ProcessTask>,
     min_granularity: u64,
     latency: u64,
     next_pid: AtomicU64,
@@ -147,6 +148,7 @@ impl CfsScheduler {
         Self {
             runnable_tasks: BinaryHeap::new(),
             current_task: None,
+            sleeping_tasks: HashMap::new(),
             min_granularity,
             latency,
             next_pid: AtomicU64::new(1),
@@ -176,21 +178,27 @@ impl CfsScheduler {
     }
 
     fn calculate_slice(&self, priority: Priority) -> u64 {
-        let base_slice = self.latency / 10;
-        let factor = (19 - (priority.value + 20)) as u64;
-        base_slice * (factor + 1)
+        // Nice values range from -20 (largest slice) to 19 (smallest slice).
+        // Keep the arithmetic signed until after clamping; casting a negative
+        // factor to u64 used to overflow for normal and low priorities.
+        let weight = (20 - priority.value.clamp(-20, 19)) as u64;
+        (self.latency / 10)
+            .saturating_mul(weight)
+            .max(self.min_granularity)
     }
 
     pub fn pick_next_task(&mut self) -> Option<ProcessTask> {
-        if let Some(current) = self.current_task.take() {
+        if let Some(mut current) = self.current_task.take() {
             if current.state == ProcessState::Running {
-                let mut updated = current;
-                updated.state = ProcessState::Runnable;
-                self.runnable_tasks.push(updated);
+                current.state = ProcessState::Runnable;
+                self.runnable_tasks.push(current);
             }
         }
 
-        self.runnable_tasks.pop()
+        let mut next = self.runnable_tasks.pop()?;
+        next.state = ProcessState::Running;
+        self.current_task = Some(next.clone());
+        Some(next)
     }
 
     pub fn put_task_to_sleep(&mut self, pid: u64) -> Result<(), &'static str> {
@@ -212,9 +220,9 @@ impl CfsScheduler {
     pub fn update_vruntime(&mut self, pid: u64, delta: u64) {
         if let Some(ref mut current) = self.current_task {
             if current.pid == pid {
-                current.vruntime += delta;
-                current.cpu_time += delta;
-                current.exec_duration += delta;
+                current.vruntime = current.vruntime.saturating_add(delta);
+                current.cpu_time = current.cpu_time.saturating_add(delta);
+                current.exec_duration = current.exec_duration.saturating_add(delta);
             }
         }
     }
@@ -318,18 +326,11 @@ impl EnergyAwareScheduler {
     }
 
     pub fn pick_next_task(&mut self) -> Option<ProcessTask> {
-        match self.thermal_state {
-            ThermalState::Normal => {
-                self.cfs.pick_next_task()
-            }
-            ThermalState::Throttling => {
-                self.cpu_frequency = 1200;
-                self.cfs.pick_next_task()
-            }
-            ThermalState::Critical => {
-                self.cpu_frequency = 800;
-                None
-            }
+        // Stop dispatching under critical heat without discarding queued work.
+        if self.thermal_state == ThermalState::Critical {
+            None
+        } else {
+            self.cfs.pick_next_task()
         }
     }
 
@@ -340,6 +341,11 @@ impl EnergyAwareScheduler {
             ThermalState::Throttling
         } else {
             ThermalState::Normal
+        };
+        self.cpu_frequency = match self.thermal_state {
+            ThermalState::Normal => 2400,
+            ThermalState::Throttling => 1200,
+            ThermalState::Critical => 800,
         };
     }
 
@@ -395,6 +401,23 @@ mod tests {
     }
 
     #[test]
+    fn test_cfs_priority_slices_and_runtime_order() {
+        let mut scheduler = CfsScheduler::new(1_000_000, 20_000_000);
+        let high = scheduler.create_process(Priority::high(), SchedulerPolicy::Normal);
+        let normal = scheduler.create_process(Priority::normal(), SchedulerPolicy::Normal);
+        let low = scheduler.create_process(Priority::low(), SchedulerPolicy::Normal);
+        assert!(high.slice > normal.slice && normal.slice > low.slice);
+        assert!(low.slice >= 1_000_000);
+
+        let first = scheduler.pick_next_task().unwrap();
+        scheduler.update_vruntime(first.pid, 10);
+        assert_eq!(scheduler.current_task().unwrap().vruntime, 10);
+        let next = scheduler.pick_next_task().unwrap();
+        assert_ne!(next.pid, first.pid);
+        assert_eq!(scheduler.runnable_count(), 2);
+    }
+
+    #[test]
     fn test_rt_scheduler() {
         let mut scheduler = RtScheduler::new();
 
@@ -415,9 +438,16 @@ mod tests {
     #[test]
     fn test_thermal_critical() {
         let mut scheduler = EnergyAwareScheduler::new();
+        let task = scheduler.create_process(Priority::normal(), SchedulerPolicy::Normal);
 
         scheduler.update_thermal_state(95);
         assert_eq!(scheduler.thermal_state(), ThermalState::Critical);
         assert_eq!(scheduler.cpu_frequency(), 800);
+        assert!(scheduler.pick_next_task().is_none());
+        assert_eq!(scheduler.runnable_count(), 1);
+
+        scheduler.update_thermal_state(70);
+        assert_eq!(scheduler.cpu_frequency(), 2400);
+        assert_eq!(scheduler.pick_next_task().unwrap().pid, task.pid);
     }
 }

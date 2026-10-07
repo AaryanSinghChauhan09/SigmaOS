@@ -18,6 +18,7 @@ use alloc::vec::Vec;
 use alloc::collections::BTreeMap;
 use alloc::format;
 use core::fmt;
+use core::sync::atomic::{AtomicU64, Ordering};
 
 /// Notification priority levels
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -86,12 +87,8 @@ pub struct Notification {
 
 impl Notification {
     pub fn new(app_name: &str, summary: &str, body: &str) -> Self {
-        static mut NEXT_ID: u64 = 1;
-        let id = unsafe {
-            let id = NEXT_ID;
-            NEXT_ID += 1;
-            id
-        };
+        static NEXT_ID: AtomicU64 = AtomicU64::new(1);
+        let id = NEXT_ID.fetch_add(1, Ordering::Relaxed);
 
         Self {
             id,
@@ -219,12 +216,10 @@ impl NotificationSystem {
             return id;
         }
 
-        // Add to queue based on priority
+        // Store before sorting so the new entry participates in priority ordering.
+        self.notifications.insert(id, notification);
         self.queue.push(id);
         self.sort_queue();
-
-        // Store notification
-        self.notifications.insert(id, notification);
 
         // Trim history if needed
         if self.history.len() >= self.max_history {
@@ -258,7 +253,7 @@ impl NotificationSystem {
             let notif_b = self.notifications.get(b);
 
             match (notif_a, notif_b) {
-                (Some(a), Some(b)) => b.priority.cmp(&a.priority),
+                (Some(a), Some(b)) => a.priority.cmp(&b.priority),
                 _ => core::cmp::Ordering::Equal,
             }
         });
@@ -508,8 +503,20 @@ mod tests {
         system.notify(Notification::new("App", "Critical", "Body").with_priority(Priority::Critical));
         system.notify(Notification::new("App", "Normal", "Body").with_priority(Priority::Normal));
 
-        let next = system.get_next_notification().unwrap();
-        assert_eq!(next.summary, "Critical");
+        let summaries: Vec<String> = (0..3)
+            .map(|_| system.get_next_notification().unwrap().summary)
+            .collect();
+        assert_eq!(summaries, ["Critical", "Normal", "Low"]);
+    }
+
+    #[test]
+    fn test_equal_priority_keeps_arrival_order() {
+        let mut system = NotificationSystem::new();
+        system.notify(Notification::new("App", "First", "Body"));
+        system.notify(Notification::new("App", "Second", "Body"));
+
+        assert_eq!(system.get_next_notification().unwrap().summary, "First");
+        assert_eq!(system.get_next_notification().unwrap().summary, "Second");
     }
 
     #[test]

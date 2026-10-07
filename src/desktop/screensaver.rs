@@ -258,7 +258,7 @@ impl ScreenSaverEngine {
             is_active: false,
             lock_state: LockState::Unlocked,
             dpms_state: DpmsState::On,
-            frame_counter: 0,
+            frame_counter: 1000,
             failed_auth_attempts: 0,
             inhibitors: HashMap::new(),
             next_cookie: 1000,

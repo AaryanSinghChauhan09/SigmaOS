@@ -180,7 +180,7 @@ impl DesktopFontManager {
             title_font: None,
             heading_font: None,
             font_size: 12,
-            counter: 0,
+            counter: 1000,
         };
 
         // Add default fonts

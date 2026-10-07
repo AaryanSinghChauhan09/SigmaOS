@@ -354,7 +354,7 @@ mod tests {
         let manager = DEManager::new();
         assert_eq!(manager.get_configs().len(), 6);
         assert!(manager.get_default_de().is_some());
-        assert_eq!(manager.get_installed_des().len(), 4);
+        assert_eq!(manager.get_installed_des().len(), 5);
     }
 
     #[test]
@@ -395,14 +395,14 @@ mod tests {
     fn test_mark_installed() {
         let mut manager = DEManager::new();
         assert!(manager.mark_installed("gnome-x11"));
-        assert_eq!(manager.get_installed_des().len(), 5);
+        assert_eq!(manager.get_installed_des().len(), 6);
     }
 
     #[test]
     fn test_mark_uninstalled() {
         let mut manager = DEManager::new();
         assert!(manager.mark_uninstalled("gnome-wayland"));
-        assert_eq!(manager.get_installed_des().len(), 3);
+        assert_eq!(manager.get_installed_des().len(), 4);
     }
 
     #[test]
@@ -416,7 +416,7 @@ mod tests {
     fn test_get_configs_by_session_type() {
         let manager = DEManager::new();
         let wayland_configs = manager.get_configs_by_session_type(DesktopDESessionType::Wayland);
-        assert_eq!(wayland_configs.len(), 2);
+        assert_eq!(wayland_configs.len(), 3);
     }
 
     #[test]
@@ -424,6 +424,6 @@ mod tests {
         let manager = DEManager::new();
         let stats = manager.get_statistics();
         assert_eq!(stats.total_configs, 6);
-        assert_eq!(stats.installed_count, 4);
+        assert_eq!(stats.installed_count, 5);
     }
 }

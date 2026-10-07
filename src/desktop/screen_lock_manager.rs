@@ -181,6 +181,11 @@ impl ScreenLockManager {
         self.failed_attempts = 0;
     }
 
+    /// Record a failed unlock attempt without claiming credential validation.
+    pub fn record_failed_attempt(&mut self) {
+        self.failed_attempts = self.failed_attempts.saturating_add(1);
+    }
+
     pub fn is_max_attempts_reached(&self) -> bool {
         self.failed_attempts >= self.max_attempts
     }
@@ -261,7 +266,7 @@ mod tests {
     fn test_failed_attempts() {
         let mut manager = ScreenLockManager::new();
         manager.lock();
-        manager.unlock("wrong"); // Will fail in production
+        manager.record_failed_attempt();
         assert!(manager.get_failed_attempts() > 0);
     }
 
@@ -269,7 +274,7 @@ mod tests {
     fn test_reset_failed_attempts() {
         let mut manager = ScreenLockManager::new();
         manager.lock();
-        manager.unlock("wrong");
+        manager.record_failed_attempt();
         manager.reset_failed_attempts();
         assert_eq!(manager.get_failed_attempts(), 0);
     }

@@ -147,7 +147,7 @@ impl DesktopKeyboardManager {
             configurations: HashMap::new(),
             layouts: HashMap::new(),
             current_layout: None,
-            counter: 0,
+            counter: 1000,
         };
 
         // Add default layouts

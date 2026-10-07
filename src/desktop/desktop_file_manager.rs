@@ -201,14 +201,16 @@ impl DesktopFileExplorer {
     pub fn new() -> Self {
         let home = PathBuf::from("/home/user");
 
-        Self {
+        let mut explorer = Self {
             current_path: home.clone(),
             files: Vec::new(),
             history: vec![home],
             history_index: 0,
             config: DesktopFileExplorerConfig::default(),
             bookmarks: HashMap::new(),
-        }
+        };
+        explorer.load_files();
+        explorer
     }
 
     /// Get current path

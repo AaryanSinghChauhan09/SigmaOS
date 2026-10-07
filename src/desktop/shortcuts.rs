@@ -208,6 +208,15 @@ impl KeyboardShortcutsManager {
             String::from("Open application launcher"),
         ));
 
+        // Provide a keyboard-driven launcher chord as well: modifier-only
+        // shortcuts cannot always be dispatched as a key press by compositors.
+        self.add_shortcut(KeyboardShortcut::new(
+            vec![KeyModifier::Super],
+            String::from("Space"),
+            KeyAction::OpenLauncher,
+            String::from("Open application launcher"),
+        ));
+
         self.add_shortcut(KeyboardShortcut::new(
             vec![KeyModifier::Super],
             String::from("T"),

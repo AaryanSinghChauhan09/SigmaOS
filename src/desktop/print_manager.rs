@@ -165,7 +165,7 @@ impl DesktopPrintManager {
             printers: HashMap::new(),
             print_jobs: HashMap::new(),
             default_printer: None,
-            counter: 0,
+            counter: 1000,
         };
 
         // Add default printer

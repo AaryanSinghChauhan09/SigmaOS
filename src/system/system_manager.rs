@@ -343,11 +343,17 @@ impl SystemManager {
 
     /// Update system health based on resource usage
     fn update_health(&mut self) {
-        let cpu_load = self.cpu_info.usage_percent / 100.0;
-        let mem_load = self.memory_info.usage_percent() / 100.0;
-        let avg_load = (cpu_load + mem_load) / 2.0;
-
-        self.health = SystemHealth::from_load(avg_load);
+        // CPU and memory report percentages, not the load averages accepted by
+        // SystemHealth::from_load. A single saturated resource is enough to
+        // degrade the system, even when the other resource is idle.
+        let usage = self.cpu_info.usage_percent.max(self.memory_info.usage_percent());
+        self.health = if usage >= 90.0 {
+            SystemHealth::Critical
+        } else if usage >= 70.0 {
+            SystemHealth::Warning
+        } else {
+            SystemHealth::Healthy
+        };
     }
 
     /// Get system summary
@@ -439,8 +445,19 @@ mod tests {
     #[test]
     fn test_system_health_update() {
         let mut manager = SystemManager::new();
-        manager.update_cpu_usage(150.0);
+        manager.update_cpu_usage(75.0);
+        assert_eq!(manager.get_health(), SystemHealth::Warning);
+
+        manager.update_cpu_usage(150.0); // Clamped to 100%.
+        assert_eq!(manager.get_cpu_info().usage_percent, 100.0);
         assert_eq!(manager.get_health(), SystemHealth::Critical);
+
+        manager.update_cpu_usage(0.0);
+        assert_eq!(manager.get_health(), SystemHealth::Healthy);
+        manager.update_memory_usage(8 * 1024 * 1024 * 1024);
+        assert_eq!(manager.get_health(), SystemHealth::Critical);
+        manager.update_memory_usage(0);
+        assert_eq!(manager.get_health(), SystemHealth::Healthy);
     }
 
     #[test]

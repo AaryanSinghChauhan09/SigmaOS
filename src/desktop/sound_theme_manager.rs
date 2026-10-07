@@ -93,7 +93,7 @@ impl DesktopSoundThemeManager {
             themes: HashMap::new(),
             current_theme: None,
             volume: 100,
-            counter: 0,
+            counter: 1000,
         };
 
         // Add default theme

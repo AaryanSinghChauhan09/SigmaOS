@@ -97,7 +97,7 @@ impl DesktopColorSchemeManager {
         let mut manager = Self {
             schemes: HashMap::new(),
             current_scheme: None,
-            counter: 0,
+            counter: 1000,
         };
 
         // Add default schemes

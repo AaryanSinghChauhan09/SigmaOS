@@ -192,15 +192,16 @@ impl CapsicumManager {
         self.entries.get_mut(&fd)
     }
 
-    /// Check if file descriptor has required rights
+    /// Check rights. Untracked descriptors are only permitted outside capability
+    /// mode; an explicitly registered descriptor always retains its limits and
+    /// revocation, even when the process is otherwise unrestricted.
     pub fn check_rights(&self, fd: i32, required: CapRights) -> bool {
-        if self.mode == CapSandboxMode::Unrestricted {
-            return true;
+        if fd < 0 {
+            return false;
         }
-
         match self.get_entry(fd) {
             Some(entry) => entry.check_rights(required),
-            None => false,
+            None => self.mode == CapSandboxMode::Unrestricted,
         }
     }
 
@@ -220,8 +221,11 @@ impl CapsicumManager {
     pub fn revoke_fd(&mut self, fd: i32) -> Result<(), String> {
         match self.get_entry_mut(fd) {
             Some(entry) => {
+                let was_valid = entry.is_valid;
                 entry.revoke();
-                self.revoke_count += 1;
+                if was_valid {
+                    self.revoke_count += 1;
+                }
                 Ok(())
             }
             None => Err(format!("File descriptor {} not found", fd)),
@@ -231,9 +235,11 @@ impl CapsicumManager {
     /// Revoke all file descriptors
     pub fn revoke_all(&mut self) {
         for entry in self.entries.values_mut() {
-            entry.revoke();
+            if entry.is_valid {
+                entry.revoke();
+                self.revoke_count += 1;
+            }
         }
-        self.revoke_count += self.entries.len() as u32;
     }
 
     /// Remove file descriptor entry
@@ -285,7 +291,6 @@ pub struct CapsicumStatistics {
     pub revoke_count: u32,
 }
 
-#[cfg(test)]
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -379,11 +384,15 @@ mod tests {
     #[test]
     fn test_capsicum_check_rights_unrestricted() {
         let mut manager = CapsicumManager::new();
-        let rights = CapRights::READ;
-        let fd = manager.create_entry(rights);
+        let fd = manager.create_entry(CapRights::READ);
 
-        // In unrestricted mode, all rights are granted
-        assert!(manager.check_rights(fd, CapRights::EXECUTE));
+        // An unrestricted process may use untracked FDs, but explicit FD
+        // capabilities cannot silently be bypassed.
+        assert!(manager.check_rights(100, CapRights::EXECUTE));
+        assert!(!manager.check_rights(fd, CapRights::EXECUTE));
+        assert!(!manager.check_rights(-1, CapRights::READ));
+        manager.set_mode(CapSandboxMode::Restricted);
+        assert!(!manager.check_rights(100, CapRights::EXECUTE));
     }
 
     #[test]
@@ -407,6 +416,8 @@ mod tests {
 
         assert!(manager.revoke_fd(fd).is_ok());
         assert!(!manager.check_rights(fd, CapRights::READ));
+        assert!(manager.revoke_fd(fd).is_ok());
+        assert_eq!(manager.get_statistics().revoke_count, 1);
     }
 
     #[test]
@@ -419,6 +430,8 @@ mod tests {
         manager.revoke_all();
         assert!(!manager.check_rights(fd1, CapRights::READ));
         assert!(!manager.check_rights(fd2, CapRights::READ));
+        manager.revoke_all();
+        assert_eq!(manager.get_statistics().revoke_count, 2);
     }
 
     #[test]

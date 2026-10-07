@@ -2,6 +2,7 @@
 // Implements ASLR (Address Space Layout Randomization) and stack canaries
 
 use std::collections::HashMap;
+use std::io::Read;
 use std::sync::atomic::{AtomicU64, Ordering};
 
 /// Memory protection modes
@@ -79,18 +80,34 @@ impl MemoryProtectionManager {
         }
     }
 
-    /// Generate a random offset for ASLR
+    /// Number of nonzero aligned offsets available under the configured range.
+    fn aslr_pages(config: &AslrConfig) -> u64 {
+        let alignment = config.page_alignment.max(1);
+        let range = 1u128 << config.randomization_bits.min(64);
+        (range / u128::from(alignment))
+            .max(1)
+            .min(u128::from(u64::MAX / alignment)) as u64
+    }
+
+    /// Generate a random, nonzero page-aligned offset for ASLR.
     fn generate_random_offset(config: &AslrConfig) -> u64 {
-        let timestamp = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap_or_default()
-            .as_nanos();
-
-        let mask = (1u64 << config.randomization_bits) - 1;
-        let random = (timestamp as u64) & mask;
-
-        // Align to page boundary
-        (random + config.page_alignment) & !(config.page_alignment - 1)
+        let mut bytes = [0u8; 8];
+        let random = if std::fs::File::open("/dev/urandom")
+            .and_then(|mut source| source.read_exact(&mut bytes))
+            .is_ok()
+        {
+            u64::from_ne_bytes(bytes)
+        } else {
+            // Best-effort fallback when the OS entropy source is unavailable.
+            static NONCE: AtomicU64 = AtomicU64::new(0);
+            let timestamp = std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap_or_default()
+                .as_nanos() as u64;
+            timestamp ^ NONCE.fetch_add(0x9e3779b97f4a7c15, Ordering::Relaxed)
+        };
+        let alignment = config.page_alignment.max(1);
+        (random % Self::aslr_pages(config) + 1) * alignment
     }
 
     /// Apply ASLR to an address
@@ -137,7 +154,14 @@ impl MemoryProtectionManager {
     /// Update ASLR offset (for dynamic re-randomization)
     pub fn re_randomize_aslr(&mut self) {
         if self.mode == MemoryProtectionMode::ASLR || self.mode == MemoryProtectionMode::Full {
-            let new_offset = Self::generate_random_offset(&self.aslr_config);
+            let previous = self.aslr_offset.load(Ordering::SeqCst);
+            let mut new_offset = Self::generate_random_offset(&self.aslr_config);
+            let pages = Self::aslr_pages(&self.aslr_config);
+            if new_offset == previous && pages > 1 {
+                // A collision must not make an explicit re-randomization a no-op.
+                let alignment = self.aslr_config.page_alignment.max(1);
+                new_offset = ((previous / alignment) % pages + 1) * alignment;
+            }
             self.aslr_offset.store(new_offset, Ordering::SeqCst);
         }
     }
@@ -218,9 +242,27 @@ mod tests {
     #[test]
     fn test_re_randomization() {
         let mut manager = MemoryProtectionManager::new(MemoryProtectionMode::ASLR);
-        let initial_offset = manager.get_aslr_offset();
-        manager.re_randomize_aslr();
-        let new_offset = manager.get_aslr_offset();
-        assert_ne!(initial_offset, new_offset);
+        let mut previous = manager.get_aslr_offset();
+        for _ in 0..32 {
+            manager.re_randomize_aslr();
+            let next = manager.get_aslr_offset();
+            assert_ne!(previous, next);
+            assert_eq!(next % manager.aslr_config.page_alignment, 0);
+            previous = next;
+        }
+    }
+
+    #[test]
+    fn test_aslr_config_range_and_collision() {
+        let mut manager = MemoryProtectionManager::new(MemoryProtectionMode::ASLR);
+        manager.aslr_config.randomization_bits = 13; // Two 4K offsets
+        manager.aslr_offset.store(4096, Ordering::SeqCst);
+        for _ in 0..16 {
+            let old = manager.get_aslr_offset();
+            manager.re_randomize_aslr();
+            assert_eq!(manager.get_aslr_offset(), if old == 4096 { 8192 } else { 4096 });
+        }
+        manager.aslr_config.randomization_bits = 64; // No overflowing shifts
+        assert_ne!(MemoryProtectionManager::generate_random_offset(&manager.aslr_config), 0);
     }
 }

@@ -107,7 +107,7 @@ impl DesktopBluetoothManager {
             adapter_name: "Default Adapter".to_string(),
             discoverable: false,
             scanning: false,
-            counter: 0,
+            counter: 1000,
         };
 
         // Add default devices

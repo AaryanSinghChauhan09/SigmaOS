@@ -89,7 +89,7 @@ impl DesktopVolumeManager {
             default_input: None,
             system_volume: 100,
             system_muted: false,
-            counter: 0,
+            counter: 1000,
         };
 
         // Add default devices

@@ -424,29 +424,33 @@ impl HelenIpcManager {
         call_id: CallId,
         return_value: u64,
     ) -> Result<(), HelenIpcError> {
-        let answerbox = self.answerboxes.get_mut(&answerbox_id)
-            .ok_or(HelenIpcError::AnswerboxNotFound)?;
+        // Resolve the caller before consuming the dispatched message. The
+        // phone's connected_answerbox is the *server*, not the caller's box.
+        let message = self.answerboxes.get(&answerbox_id)
+            .ok_or(HelenIpcError::AnswerboxNotFound)?
+            .dispatched_queue.iter()
+            .find(|m| m.call_id == call_id)
+            .copied()
+            .ok_or(HelenIpcError::BufferEmpty)?;
+        let caller_task = self.phones.get(&message.phone_id)
+            .ok_or(HelenIpcError::NotConnected)?.task_id;
+        let origin_answerbox_id = self.answerboxes.values()
+            .find(|box_| box_.task_id == caller_task)
+            .map(|box_| box_.id)
+            .ok_or(HelenIpcError::NotConnected)?;
 
-        // Find message in dispatched queue
-        let msg_index = answerbox.dispatched_queue.iter()
+        let receiver = self.answerboxes.get_mut(&answerbox_id)
+            .ok_or(HelenIpcError::AnswerboxNotFound)?;
+        let msg_index = receiver.dispatched_queue.iter()
             .position(|m| m.call_id == call_id)
             .ok_or(HelenIpcError::BufferEmpty)?;
-
-        let mut message = answerbox.dispatched_queue.remove(msg_index);
-        message.method = return_value; // Method becomes return value on answer
-
-        // Find originating phone and add to its answer queue
-        if let Some(phone) = self.phones.get(&message.phone_id) {
-            if let Some(origin_answerbox_id) = phone.connected_answerbox {
-                if let Some(origin_answerbox) = self.answerboxes.get_mut(&origin_answerbox_id) {
-                    origin_answerbox.answer_queue.push(message);
-                    origin_answerbox.decrement_async();
-                    return Ok(());
-                }
-            }
-        }
-
-        Err(HelenIpcError::NotConnected)
+        let mut message = receiver.dispatched_queue.remove(msg_index);
+        receiver.decrement_async(); // The receiver's outstanding slot is now free.
+        message.method = return_value;
+        self.answerboxes.get_mut(&origin_answerbox_id)
+            .expect("origin answerbox was checked above")
+            .answer_queue.push(message);
+        Ok(())
     }
 
     /// Receive answer from answer queue
@@ -770,6 +774,9 @@ impl HelenAsyncSystem {
     pub fn initialize_task(&mut self, task_id: usize) -> (AnswerboxId, PhoneId) {
         let answerbox_id = self.ipc_manager.create_answerbox(task_id, 64);
         let phone_id = self.ipc_manager.create_phone(task_id);
+        // The task's own phone supports local async dispatch out of the box.
+        self.ipc_manager.connect_phone_to_answerbox(phone_id, answerbox_id)
+            .expect("new phone and answerbox must exist");
 
         self.fibril_manager.get_manager_fibril(answerbox_id);
 
@@ -794,11 +801,13 @@ impl HelenAsyncSystem {
 
     pub fn process_messages(&mut self, answerbox_id: AnswerboxId) -> Result<Vec<HelenMessage>, HelenIpcError> {
         let mut messages = Vec::new();
-
-        while let Ok(message) = self.ipc_manager.dispatch_message(answerbox_id) {
-            messages.push(message);
+        loop {
+            match self.ipc_manager.dispatch_message(answerbox_id) {
+                Ok(message) => messages.push(message),
+                Err(HelenIpcError::BufferEmpty) => break,
+                Err(error) => return Err(error),
+            }
         }
-
         Ok(messages)
     }
 }
@@ -837,6 +846,24 @@ mod tests {
 
         let answer = ipc_manager.receive_answer(task1_answerbox).unwrap();
         assert_eq!(answer.method, 200);
+    }
+
+    #[test]
+    fn test_reply_releases_receiver_capacity_and_keeps_caller_identity() {
+        let mut ipc = HelenIpcManager::new();
+        let caller = ipc.create_answerbox(1, 1);
+        let receiver = ipc.create_answerbox(2, 1);
+        let phone = ipc.create_phone(1);
+        ipc.connect_phone_to_answerbox(phone, receiver).unwrap();
+
+        ipc.send_async(phone, HelenMessage::new(10, 0, 0)).unwrap();
+        assert_eq!(ipc.send_async(phone, HelenMessage::new(11, 0, 0)), Err(HelenIpcError::BufferFull));
+        let request = ipc.dispatch_message(receiver).unwrap();
+        ipc.answer_message(receiver, request.call_id, 42).unwrap();
+        assert_eq!(ipc.answerboxes[&receiver].current_async_count.load(Ordering::SeqCst), 0);
+        assert_eq!(ipc.receive_answer(caller).unwrap().method, 42);
+        assert_eq!(ipc.receive_answer(receiver), Err(HelenIpcError::BufferEmpty));
+        ipc.send_async(phone, HelenMessage::new(11, 0, 0)).unwrap();
     }
 
     #[test]

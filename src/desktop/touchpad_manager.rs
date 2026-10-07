@@ -208,7 +208,7 @@ impl DesktopTouchpadManager {
         let mut manager = Self {
             devices: HashMap::new(),
             configurations: HashMap::new(),
-            counter: 0,
+            counter: 1000,
         };
 
         // Add default touchpad

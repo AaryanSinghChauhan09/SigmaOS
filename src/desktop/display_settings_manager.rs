@@ -106,7 +106,7 @@ impl DesktopDisplaySettingsManager {
             displays: HashMap::new(),
             primary_display: None,
             mode: DesktopDisplayMode::Extend,
-            counter: 0,
+            counter: 1000,
         };
 
         // Add default display

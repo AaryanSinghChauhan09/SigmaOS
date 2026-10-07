@@ -116,7 +116,7 @@ impl DesktopCursorManager {
             cursor_size: DesktopCursorSize::Medium,
             cursor_speed: 50,
             default_cursor: DesktopCursorType::Default,
-            counter: 0,
+            counter: 1000,
         };
 
         // Add default theme

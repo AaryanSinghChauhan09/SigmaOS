@@ -247,7 +247,8 @@ mod tests {
         let before = manager.get_idle_time();
         manager.update_activity();
         let after = manager.get_idle_time();
-        assert!(after < before);
+        assert!(after <= before);
+        assert_eq!(after, 0);
     }
 
     #[test]

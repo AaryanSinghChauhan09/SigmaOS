@@ -1027,6 +1027,13 @@ mod zenith_tests {
         });
         assert_eq!(action, Some(KeyAction::OpenLauncher));
 
+        let terminal = compositor.dispatch_translated_shortcut(TranslatedKeyEvent {
+            key: "T".into(),
+            modifiers: vec![KeyModifier::Super],
+            pressed: true,
+        });
+        assert_eq!(terminal, Some(KeyAction::OpenTerminal));
+
         let release = compositor.dispatch_translated_shortcut(TranslatedKeyEvent {
             key: "Space".into(),
             modifiers: vec![KeyModifier::Super],

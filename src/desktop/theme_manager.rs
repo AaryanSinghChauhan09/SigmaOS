@@ -91,7 +91,7 @@ impl DesktopThemeManager {
             current_cursor_theme: None,
             current_sound_theme: None,
             current_window_theme: None,
-            counter: 0,
+            counter: 1000,
         };
 
         // Add default themes
