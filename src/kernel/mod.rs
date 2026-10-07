@@ -166,6 +166,12 @@ pub mod live_migration_engine;
 pub mod sovereign_kernel_pr_gateway;
 pub use sovereign_kernel_pr_gateway::*;
 
+pub mod sovereign_clean_code_and_os_principles_engine;
+pub use sovereign_clean_code_and_os_principles_engine::{
+    SovereignCleanCodeAndOsPrinciplesEngine, SolidDesignValidator, CleanCodeMetricsEvaluator,
+    ResourceAllocationGraph,
+};
+
 pub mod low_level_hardware;
 pub use low_level_hardware::*;
 

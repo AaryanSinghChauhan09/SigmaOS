@@ -313,6 +313,9 @@ impl WikiDataTransferEngine {
         self.register_spec_file(
             "23-Supreme-Performance-Architecture-Development-Decision-Plan.md",
             "ADDP Supreme Performance",
+            true,
+        );
+        self.register_spec_file(
             "06-Sovereign-Linux-BSD-Ecosystem-Advancements-V22.md",
             "Sovereign Linux & BSD Ecosystem Advancements V22 Spec",
             true,
