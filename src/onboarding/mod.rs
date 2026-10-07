@@ -5,6 +5,9 @@
 
 extern crate alloc;
 
+pub mod first_run_migration_wizard;
+pub use first_run_migration_wizard::*;
+
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 

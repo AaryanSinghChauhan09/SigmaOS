@@ -829,9 +829,21 @@ if [ -f "scripts/sovereign_mint_omarchy_v33_vanguard_test.sh" ]; then
     ./scripts/sovereign_mint_omarchy_v33_vanguard_test.sh
 fi
 
+if [ -f "src/onboarding/first_run_migration_wizard.rs" ]; then
+    echo "Running First-Run Migration Wizard test suite..."
+    mkdir -p build
+    rustc --test src/onboarding/first_run_migration_wizard.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_migration_wizard
+    ./build/test_migration_wizard
+fi
+
 if [ -f "scripts/sovereign_mint_omarchy_v34_pantheon_test.sh" ]; then
     echo "Running Sovereign Mint & Omarchy V34 Pantheon Benchmark Suite..."
     ./scripts/sovereign_mint_omarchy_v34_pantheon_test.sh
+fi
+
+if [ -f "scripts/sovereign_migration_first_benchmarks.sh" ]; then
+    echo "Running Sovereign Migration-First Desktop Benchmark Suite..."
+    ./scripts/sovereign_migration_first_benchmarks.sh
 fi
 
 echo "All SigmaOS test suites completed."
