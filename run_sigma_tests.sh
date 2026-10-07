@@ -802,6 +802,13 @@ if [ -f "src/distro/sovereign_mint_omarchy_v33_apex_vanguard.rs" ]; then
     ./build/test_apex_vanguard_v33
 fi
 
+if [ -f "src/distro/sovereign_mint_omarchy_v34_apex_pantheon.rs" ]; then
+    echo "Running Sovereign Linux Mint & Omarchy Apex Pantheon Suite V34 test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_mint_omarchy_v34_apex_pantheon.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_apex_pantheon_v34
+    ./build/test_apex_pantheon_v34
+fi
+
 if [ -f "scripts/sovereign_mint_omarchy_supremacy_test.sh" ]; then
     echo "Running Sovereign Mint & Omarchy Supremacy Benchmark Suite..."
     ./scripts/sovereign_mint_omarchy_supremacy_test.sh
@@ -820,6 +827,11 @@ fi
 if [ -f "scripts/sovereign_mint_omarchy_v33_vanguard_test.sh" ]; then
     echo "Running Sovereign Mint & Omarchy V33 Vanguard Benchmark Suite..."
     ./scripts/sovereign_mint_omarchy_v33_vanguard_test.sh
+fi
+
+if [ -f "scripts/sovereign_mint_omarchy_v34_pantheon_test.sh" ]; then
+    echo "Running Sovereign Mint & Omarchy V34 Pantheon Benchmark Suite..."
+    ./scripts/sovereign_mint_omarchy_v34_pantheon_test.sh
 fi
 
 echo "All SigmaOS test suites completed."
