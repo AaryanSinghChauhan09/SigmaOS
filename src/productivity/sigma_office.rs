@@ -21,9 +21,9 @@ use std::{
 };
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-use crate::klib::HashMap;
+use crate::klib::{HashMap, HashSet};
 #[cfg(any(feature = "standalone_test", test))]
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use sigma_types::{CapabilityToken, Result};
 
@@ -7169,6 +7169,318 @@ impl SovereignEnterpriseKnowledgeGraphEngine {
     }
 }
 
+// ---------------------------------------------------------------------------
+// 13. Google Docs Paginated Layout Engine
+// ---------------------------------------------------------------------------
+
+/// Sovereign Google Docs Paginated Layout Engine supporting page geometry, margin bounds, and header/footer placement.
+#[derive(Debug, Clone)]
+pub struct SovereignGoogleDocsPaginatedLayoutEngine {
+    pub page_width_pt: f64,
+    pub page_height_pt: f64,
+    pub margin_pt: f64,
+}
+
+impl SovereignGoogleDocsPaginatedLayoutEngine {
+    pub fn new(width_pt: f64, height_pt: f64, margin_pt: f64) -> Self {
+        Self {
+            page_width_pt: width_pt,
+            page_height_pt: height_pt,
+            margin_pt: margin_pt,
+        }
+    }
+
+    /// Calculates total printable height per page excluding margins and header/footer areas.
+    pub fn printable_height(&self, header_height: f64, footer_height: f64) -> f64 {
+        (self.page_height_pt - (2.0 * self.margin_pt) - header_height - footer_height).max(0.0)
+    }
+
+    /// Estimates total page count for a given text length in characters (assuming average ~3000 chars per page).
+    pub fn estimate_page_count(&self, text_length: usize) -> usize {
+        if text_length == 0 {
+            1
+        } else {
+            (text_length + 2999) / 3000
+        }
+    }
+}
+
+impl Default for SovereignGoogleDocsPaginatedLayoutEngine {
+    fn default() -> Self {
+        Self::new(612.0, 792.0, 72.0) // Standard US Letter with 1-inch margins
+    }
+}
+
+// ---------------------------------------------------------------------------
+// 14. Google Sheets Formula Dependency Tree Engine
+// ---------------------------------------------------------------------------
+
+/// Sovereign Google Sheets Formula Dependency Tree Engine supporting DAG cell formula dependencies and circular reference detection.
+#[derive(Debug, Clone, Default)]
+pub struct SovereignGoogleSheetsFormulaDependencyTreeEngine {
+    dependencies: HashMap<String, Vec<String>>,
+}
+
+impl SovereignGoogleSheetsFormulaDependencyTreeEngine {
+    pub fn new() -> Self {
+        Self {
+            dependencies: HashMap::new(),
+        }
+    }
+
+    /// Registers dependencies for a target cell (e.g., "A1" depends on ["B1", "C1"]).
+    pub fn register_dependency(&mut self, target_cell: &str, depends_on: Vec<String>) {
+        self.dependencies.insert(target_cell.to_string(), depends_on);
+    }
+
+    /// Checks if adding a dependency from `target_cell` to `source_cell` introduces a circular reference cycle.
+    pub fn has_circular_dependency(&self, start_cell: &str, current_cell: &str, visited: &mut HashSet<String>) -> bool {
+        if start_cell == current_cell && !visited.is_empty() {
+            return true;
+        }
+        if !visited.insert(current_cell.to_string()) {
+            return false;
+        }
+
+        if let Some(deps) = self.dependencies.get(current_cell) {
+            for dep in deps {
+                if self.has_circular_dependency(start_cell, dep, visited) {
+                    return true;
+                }
+            }
+        }
+        false
+    }
+}
+
+// ---------------------------------------------------------------------------
+// 15. Google Slides Master Template Engine
+// ---------------------------------------------------------------------------
+
+/// Placeholder layout kinds for slides.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum SlidePlaceholderKind {
+    Title,
+    Subtitle,
+    Body,
+    Header,
+    Footer,
+}
+
+/// Slide master template element.
+#[derive(Debug, Clone)]
+pub struct SlideMasterPlaceholder {
+    pub kind: SlidePlaceholderKind,
+    pub default_text: String,
+    pub font_size_pt: f32,
+}
+
+/// Sovereign Google Slides Master Template Engine inspired by Google Slides & MS PowerPoint master slides.
+#[derive(Debug, Clone)]
+pub struct SovereignGoogleSlidesMasterTemplateEngine {
+    pub theme_name: String,
+    pub placeholders: Vec<SlideMasterPlaceholder>,
+}
+
+impl SovereignGoogleSlidesMasterTemplateEngine {
+    pub fn new(theme_name: &str) -> Self {
+        Self {
+            theme_name: theme_name.to_string(),
+            placeholders: vec![
+                SlideMasterPlaceholder {
+                    kind: SlidePlaceholderKind::Title,
+                    default_text: "Click to add title".to_string(),
+                    font_size_pt: 40.0,
+                },
+                SlideMasterPlaceholder {
+                    kind: SlidePlaceholderKind::Subtitle,
+                    default_text: "Click to add subtitle".to_string(),
+                    font_size_pt: 24.0,
+                },
+            ],
+        }
+    }
+
+    /// Adds a placeholder element to the slide master layout.
+    pub fn add_placeholder(&mut self, kind: SlidePlaceholderKind, default_text: &str, font_size_pt: f32) {
+        self.placeholders.push(SlideMasterPlaceholder {
+            kind,
+            default_text: default_text.to_string(),
+            font_size_pt,
+        });
+    }
+}
+
+// ---------------------------------------------------------------------------
+// 16. Zoho Analytics Cohort Analysis Engine
+// ---------------------------------------------------------------------------
+
+/// Sovereign Zoho Analytics Cohort Analysis Engine for customer cohort retention calculations.
+#[derive(Debug, Clone, Default)]
+pub struct SovereignZohoAnalyticsCohortAnalysisEngine;
+
+impl SovereignZohoAnalyticsCohortAnalysisEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    /// Calculates retention percentages across cohort periods given initial cohort count and active counts per period.
+    pub fn calculate_retention_rates(&self, initial_count: usize, active_counts: &[usize]) -> Vec<f64> {
+        if initial_count == 0 {
+            return vec![0.0; active_counts.len()];
+        }
+        active_counts
+            .iter()
+            .map(|&count| (count as f64 / initial_count as f64) * 100.0)
+            .collect()
+    }
+}
+
+// ---------------------------------------------------------------------------
+// 17. Microsoft 365 Coauthoring Lock Engine
+// ---------------------------------------------------------------------------
+
+/// Lock status for real-time document co-authoring regions.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CoauthoringLock {
+    pub region_id: String,
+    pub user_id: String,
+    pub lock_timestamp: u64,
+}
+
+/// Sovereign Microsoft 365 Coauthoring Lock Engine for real-time paragraph and cell section locking.
+#[derive(Debug, Clone, Default)]
+pub struct SovereignMicrosoft365CoauthoringLockEngine {
+    locks: HashMap<String, CoauthoringLock>,
+}
+
+impl SovereignMicrosoft365CoauthoringLockEngine {
+    pub fn new() -> Self {
+        Self {
+            locks: HashMap::new(),
+        }
+    }
+
+    /// Attempts to acquire a lock on a document region (e.g. paragraph ID or cell range) for a specific user.
+    pub fn acquire_lock(&mut self, region_id: &str, user_id: &str, timestamp: u64) -> bool {
+        if let Some(existing) = self.locks.get(region_id) {
+            if existing.user_id != user_id {
+                return false; // Region locked by another user
+            }
+        }
+        self.locks.insert(
+            region_id.to_string(),
+            CoauthoringLock {
+                region_id: region_id.to_string(),
+                user_id: user_id.to_string(),
+                lock_timestamp: timestamp,
+            },
+        );
+        true
+    }
+
+    /// Releases a previously acquired lock on a region.
+    pub fn release_lock(&mut self, region_id: &str, user_id: &str) -> bool {
+        if let Some(existing) = self.locks.get(region_id) {
+            if existing.user_id == user_id {
+                self.locks.remove(region_id);
+                return true;
+            }
+        }
+        false
+    }
+}
+
+// ---------------------------------------------------------------------------
+// 18. Salesforce Territory Quota Forecast Engine
+// ---------------------------------------------------------------------------
+
+/// Sovereign Salesforce Territory Quota Forecast Engine for quota allocation and attainment forecasting.
+#[derive(Debug, Clone, Default)]
+pub struct SovereignSalesforceTerritoryQuotaForecastEngine;
+
+impl SovereignSalesforceTerritoryQuotaForecastEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    /// Evaluates territory quarterly quota attainment percentage and calculates forecast gap.
+    pub fn evaluate_quota_attainment(&self, target_quota: f64, closed_revenue: f64, weighted_pipeline: f64) -> (f64, f64, bool) {
+        let projected_total = closed_revenue + weighted_pipeline;
+        let attainment_percent = if target_quota > 0.0 {
+            (projected_total / target_quota) * 100.0
+        } else {
+            0.0
+        };
+        let gap = (target_quota - projected_total).max(0.0);
+        let on_track = projected_total >= target_quota;
+        (attainment_percent, gap, on_track)
+    }
+}
+
+// ---------------------------------------------------------------------------
+// 19. Odoo Double-Entry Ledger Engine
+// ---------------------------------------------------------------------------
+
+/// Journal entry transaction line in double-entry bookkeeping.
+#[derive(Debug, Clone)]
+pub struct DoubleEntryLine {
+    pub account_code: String,
+    pub debit: f64,
+    pub credit: f64,
+}
+
+/// Sovereign Odoo Double-Entry Ledger Engine for journal entry validation and trial balance verification.
+#[derive(Debug, Clone, Default)]
+pub struct SovereignOdooDoubleEntryLedgerEngine;
+
+impl SovereignOdooDoubleEntryLedgerEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    /// Verifies if a journal entry obeys double-entry accounting principle (Total Debit == Total Credit).
+    pub fn validate_journal_entry(&self, lines: &[DoubleEntryLine]) -> bool {
+        let total_debit: f64 = lines.iter().map(|l| l.debit).sum();
+        let total_credit: f64 = lines.iter().map(|l| l.credit).sum();
+        (total_debit - total_credit).abs() < 1e-4
+    }
+}
+
+// ---------------------------------------------------------------------------
+// 20. Bitrix24 Task Kanban Automation Engine
+// ---------------------------------------------------------------------------
+
+/// Kanban stage progression levels.
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+pub enum KanbanStage {
+    Backlog,
+    InAnalysis,
+    InProgress,
+    InReview,
+    Completed,
+}
+
+/// Sovereign Bitrix24 Task Kanban Automation Engine for task stage workflow progression and automated actions.
+#[derive(Debug, Clone, Default)]
+pub struct SovereignBitrix24TaskKanbanAutomationEngine;
+
+impl SovereignBitrix24TaskKanbanAutomationEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    /// Evaluates auto-actions when a task transitions to a new Kanban stage.
+    pub fn evaluate_stage_transition(&self, task_id: &str, _from: KanbanStage, to: KanbanStage) -> String {
+        match to {
+            KanbanStage::InProgress => format!("Task '{}': Started execution & timer activated", task_id),
+            KanbanStage::InReview => format!("Task '{}': Code review requested & assigned to QA lead", task_id),
+            KanbanStage::Completed => format!("Task '{}': Task marked complete & client notified", task_id),
+            _ => format!("Task '{}': Stage updated to {:?}", task_id, to),
+        }
+    }
+}
+
 // Placeholder types for compilation
 mod sigma_types {
     pub type Result<T> = core::result::Result<T, &'static str>;
@@ -8557,5 +8869,60 @@ mod tests {
         assert_eq!(linked.len(), 1);
         assert_eq!(linked[0].0, "SaaS Agreement");
         assert_eq!(linked[0].1, "associated_document");
+
+        // 20. SovereignGoogleDocsPaginatedLayoutEngine
+        let docs_layout = SovereignGoogleDocsPaginatedLayoutEngine::default();
+        let printable = docs_layout.printable_height(36.0, 36.0);
+        assert_eq!(printable, 576.0);
+        assert_eq!(docs_layout.estimate_page_count(7500), 3);
+
+        // 21. SovereignGoogleSheetsFormulaDependencyTreeEngine
+        let mut sheets_dag = SovereignGoogleSheetsFormulaDependencyTreeEngine::new();
+        sheets_dag.register_dependency("A1", vec!["B1".to_string(), "C1".to_string()]);
+        sheets_dag.register_dependency("B1", vec!["D1".to_string()]);
+        let mut visited = HashSet::new();
+        assert!(!sheets_dag.has_circular_dependency("A1", "A1", &mut visited));
+
+        sheets_dag.register_dependency("D1", vec!["A1".to_string()]);
+        let mut visited2 = HashSet::new();
+        assert!(sheets_dag.has_circular_dependency("A1", "A1", &mut visited2));
+
+        // 22. SovereignGoogleSlidesMasterTemplateEngine
+        let mut slides_master = SovereignGoogleSlidesMasterTemplateEngine::new("Sovereign Enterprise");
+        assert_eq!(slides_master.placeholders.len(), 2);
+        slides_master.add_placeholder(SlidePlaceholderKind::Body, "Content placeholder", 18.0);
+        assert_eq!(slides_master.placeholders.len(), 3);
+
+        // 23. SovereignZohoAnalyticsCohortAnalysisEngine
+        let zoho_cohort = SovereignZohoAnalyticsCohortAnalysisEngine::new();
+        let ret_rates = zoho_cohort.calculate_retention_rates(100, &[100, 80, 65, 50]);
+        assert_eq!(ret_rates, vec![100.0, 80.0, 65.0, 50.0]);
+
+        // 24. SovereignMicrosoft365CoauthoringLockEngine
+        let mut m365_lock = SovereignMicrosoft365CoauthoringLockEngine::new();
+        assert!(m365_lock.acquire_lock("para_1", "user_alice", 1000));
+        assert!(!m365_lock.acquire_lock("para_1", "user_bob", 1005));
+        assert!(m365_lock.release_lock("para_1", "user_alice"));
+        assert!(m365_lock.acquire_lock("para_1", "user_bob", 1010));
+
+        // 25. SovereignSalesforceTerritoryQuotaForecastEngine
+        let sf_forecast = SovereignSalesforceTerritoryQuotaForecastEngine::new();
+        let (att_pct, gap, on_track) = sf_forecast.evaluate_quota_attainment(1000000.0, 600000.0, 500000.0);
+        assert!((att_pct - 110.0).abs() < 1e-5);
+        assert_eq!(gap, 0.0);
+        assert!(on_track);
+
+        // 26. SovereignOdooDoubleEntryLedgerEngine
+        let odoo_ledger = SovereignOdooDoubleEntryLedgerEngine::new();
+        let lines = vec![
+            DoubleEntryLine { account_code: "1000".to_string(), debit: 500.0, credit: 0.0 },
+            DoubleEntryLine { account_code: "4000".to_string(), debit: 0.0, credit: 500.0 },
+        ];
+        assert!(odoo_ledger.validate_journal_entry(&lines));
+
+        // 27. SovereignBitrix24TaskKanbanAutomationEngine
+        let bitrix_kanban = SovereignBitrix24TaskKanbanAutomationEngine::new();
+        let act = bitrix_kanban.evaluate_stage_transition("TASK-99", KanbanStage::Backlog, KanbanStage::InProgress);
+        assert!(act.contains("Started execution"));
     }
 }
