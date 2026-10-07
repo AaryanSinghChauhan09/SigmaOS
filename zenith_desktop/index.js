@@ -427,6 +427,10 @@ export function initCommandPalette() {
   const cmdPalette = document.getElementById("cmd-palette");
   if (!cmdInput || !cmdPalette) return;
 
+  if (!cmdInput.hasAttribute("aria-haspopup")) {
+    cmdInput.setAttribute("aria-haspopup", "listbox");
+  }
+
   cmdInput.addEventListener("input", (e) => {
     activeCommandIndex = 0;
     renderCommandResults(e.target.value);

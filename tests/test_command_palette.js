@@ -34,6 +34,7 @@ function createMockElement(id, tag = "div") {
     blur() { if (activeElement === el) activeElement = null; },
     setAttribute(k, v) { this.attributes[k] = v; },
     getAttribute(k) { return this.attributes[k]; },
+    hasAttribute(k) { return k in this.attributes; },
     removeAttribute(k) { delete this.attributes[k]; },
     appendChild(child) { this.children.push(child); },
     addEventListener(event, fn) {
@@ -86,7 +87,18 @@ console.log(`✓ Nonexistent query returned empty list: ${noResults.length}`);
 assert.strictEqual(noResults.length, 0, "Expected 0 matching commands");
 assert.strictEqual(cmdInputEl.getAttribute("aria-activedescendant"), undefined, "Expected aria-activedescendant to be removed when no results");
 
-// Test 4: closeCommandPalette resets aria-expanded
+// Test 4: closeCommandPalette resets aria-expanded and initCommandPalette sets aria-haspopup
+zenith.initCommandPalette();
+assert.strictEqual(cmdInputEl.getAttribute("aria-haspopup"), "listbox", "Expected aria-haspopup='listbox' on cmdInput");
+
+zenith.renderCommandResults("");
+// Simulate ArrowDown key press on input to verify active option traversal and aria-activedescendant update
+cmdInputEl.dispatchEvent({ type: "keydown", key: "ArrowDown", preventDefault: () => {} });
+assert.strictEqual(cmdInputEl.getAttribute("aria-activedescendant"), "cmd-option-1", "Expected aria-activedescendant to update to 'cmd-option-1' on ArrowDown");
+
+cmdInputEl.dispatchEvent({ type: "keydown", key: "ArrowUp", preventDefault: () => {} });
+assert.strictEqual(cmdInputEl.getAttribute("aria-activedescendant"), "cmd-option-0", "Expected aria-activedescendant to update to 'cmd-option-0' on ArrowUp");
+
 zenith.closeCommandPalette();
 assert.strictEqual(cmdInputEl.getAttribute("aria-expanded"), "false", "Expected aria-expanded to be 'false' on close");
 
