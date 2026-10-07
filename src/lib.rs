@@ -140,6 +140,7 @@ pub use distro::sovereign_universal_subsystem_interop::*;
 pub use distro::sovereign_linux_bsd_ecosystem_advancements_v28::*;
 pub use distro::sovereign_linux_bsd_ecosystem_advancements_v29::*;
 pub use distro::sovereign_mint_omarchy_apex_dominance_v30::*;
+pub use distro::sovereign_mint_omarchy_innovations_v31::*;
 pub use distro::sovereign_media_and_distro_unimplemented_innovations::*;
 pub use distro::omarchy_omakase_ultimate_parity::*;
 pub use distro::tech_media_publication_innovations::*;

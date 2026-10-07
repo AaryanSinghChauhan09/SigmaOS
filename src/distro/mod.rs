@@ -438,6 +438,9 @@ pub use sovereign_linux_bsd_ecosystem_advancements_v29::*;
 pub mod sovereign_mint_omarchy_apex_dominance_v30;
 pub use sovereign_mint_omarchy_apex_dominance_v30::*;
 
+pub mod sovereign_mint_omarchy_innovations_v31;
+pub use sovereign_mint_omarchy_innovations_v31::*;
+
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;
 pub use crate::stubs::large_distro_stubs::*;
