@@ -91,4 +91,12 @@ pub use sigma_office::{
     TicketPriority, TicketStatus, TypographyRenderer, VersionHistoryManager, VidScene,
     WebLayoutBlock, WhiteboardElement, WhiteboardElementType, WorkflowAction, WorkflowRule,
     WorkflowTrigger, WorkgroupChannelMessage, WorkgroupTask,
+    AgentStatus, CalculatedFieldOp, CallQueueStrategy, DeskTicket, DiscountTier,
+    DocSnapshot, KeepNote, LeadSignal, LoopBlockType, LoopComponentBlock, OdooBomTreeNode, PivotCalculatedField,
+    QueryJoinType, SlideAnimation, SlideTransitionType, SlaPriority, SovereignBitrix24OmnichannelCallQueueRouterEngine,
+    SovereignGoogleDocsVersionHistoryEngine, SovereignGoogleKeepLabelTagEngine, SovereignGoogleSheetsPivotTableCalculatedFieldEngine,
+    SovereignGoogleSlidesTransitionAnimationEngine, SovereignMicrosoftAccessLowCodeQueryEngine, SovereignMicrosoftExcelWhatIfDataEngine,
+    SovereignMicrosoftLoopWorkspaceBlockEngine, SovereignOdooMrpBillOfMaterialsTreeEngine, SovereignSalesforceCpqQuoteDiscountEngine,
+    SovereignSalesforceEinsteinLeadScoringAiEngine, SovereignZohoBooksMultiTaxGroupEngine, SovereignZohoDeskTicketSlaEscalationEngine,
+    TableJoin, TaxRule,
 };
