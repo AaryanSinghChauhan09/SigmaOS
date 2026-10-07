@@ -709,6 +709,8 @@ if command -v node >/dev/null 2>&1; then
     node tests/test_installer_preview.js
 else
     echo "Skipping desktop UI tests (Node.js is not installed)."
+fi
+
 if [ -f "src/distro/sovereign_linux_bsd_ecosystem_advancements_v22.rs" ]; then
     echo "Running Sovereign Linux & BSD Ecosystem Advancements V22 & PR Gateway test suite..."
     mkdir -p build
