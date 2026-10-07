@@ -43,7 +43,9 @@ pub mod integrity;
 pub mod intrusion;
 pub mod libgksu;
 pub mod mac;
+pub mod crypto_utils;
 pub mod openbsd_karl;
+pub mod pam;
 pub mod password;
 pub mod pledge;
 pub use deobfuscation::ArithmeticSubstitutionDeobfuscator;
@@ -128,6 +130,10 @@ pub use parrot_kali::{
     GLOBAL_FORENSIC, GLOBAL_SANDBOX,
 };
 pub use parrot::ParrotSecurityFingerprintEngine;
+pub use pam::{
+    AccountTallyModule, PamError, PamGroup, PamModule, PamUser, PasswordQualityModule,
+    SovereignPamManager,
+};
 pub use password::{
     BiometricAuth, BiometricResult, BiometricType, FaceIdAuth, FingerprintAuth, PasswordCategory,
     PasswordEntry, PasswordError, PasswordManager, PasswordManagerResult,
