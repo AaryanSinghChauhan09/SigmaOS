@@ -413,6 +413,17 @@ pub use tech_media_publication_innovations::*;
 
 pub mod omarchy_omakase_ultimate_parity;
 pub use omarchy_omakase_ultimate_parity::*;
+pub mod sovereign_linux_bsd_ecosystem_advancements_v22;
+pub use sovereign_linux_bsd_ecosystem_advancements_v22::*;
+
+pub mod sovereign_architecture_development_decision_plan;
+pub use sovereign_architecture_development_decision_plan::*;
+
+pub mod omarchy_linux_gap_closure_pr_suite;
+pub use omarchy_linux_gap_closure_pr_suite::*;
+
+pub mod sovereign_open_source_os_gap_closure_v27;
+pub use sovereign_open_source_os_gap_closure_v27::*;
 
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;

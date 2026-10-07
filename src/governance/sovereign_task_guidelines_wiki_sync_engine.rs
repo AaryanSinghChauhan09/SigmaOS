@@ -12,10 +12,8 @@ use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
 
-// =========================================================================
-// 1. TASK GUIDELINES & RULES GOVERNOR
-// =========================================================================
-
+// ==================================================================// 1. TASK GUIDELINES & RULES GOVERNOR
+// ==================================================================
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AgentPersonaRule {
     SentinelSecurityBoundary,
@@ -124,10 +122,8 @@ impl Default for TaskGuidelinesAndRulesGovernor {
     }
 }
 
-// =========================================================================
-// 2. SUPREME PERFORMANCE ARCHITECTURE DEVELOPMENT DECISION PLAN (ADDP) ENGINE
-// =========================================================================
-
+// ==================================================================// 2. SUPREME PERFORMANCE ARCHITECTURE DEVELOPMENT DECISION PLAN (ADDP) ENGINE
+// ==================================================================
 #[derive(Debug, Clone)]
 pub struct AddpPerformanceMetric {
     pub metric_name: String,
@@ -188,10 +184,8 @@ impl AddpWikiPrProposalGenerator {
     }
 }
 
-// =========================================================================
-// 3. WIKI DATA TRANSFER ENGINE
-// =========================================================================
-
+// ==================================================================// 3. WIKI DATA TRANSFER ENGINE
+// ==================================================================
 #[derive(Debug, Clone)]
 pub struct FeatureMdStatus {
     pub spec_name: String,
@@ -252,6 +246,61 @@ impl WikiDataTransferEngine {
             },
         );
 
+        self.feature_specs.insert(
+            "SovereignLinuxBsdEcosystemAdvancementsV22".to_string(),
+            FeatureMdStatus {
+                spec_name: "06-Sovereign-Linux-BSD-Ecosystem-Advancements-V22.md".to_string(),
+                source_path: "wiki_repo/06-Sovereign-Linux-BSD-Ecosystem-Advancements-V22.md".to_string(),
+                is_fully_implemented: true,
+                completion_percentage: 100,
+                wiki_mirrored: true,
+            },
+        );
+
+        self.feature_specs.insert(
+            "ArchitectureDevelopmentDecisionPlan".to_string(),
+            FeatureMdStatus {
+                spec_name: "07-Architecture-Development-Decision-Plan-Supreme-Performance.md".to_string(),
+                source_path: "wiki_repo/07-Architecture-Development-Decision-Plan-Supreme-Performance.md".to_string(),
+                is_fully_implemented: true,
+                completion_percentage: 100,
+                wiki_mirrored: true,
+            },
+        );
+
+        self.feature_specs.insert(
+            "CleanCodeAndOsPrinciples".to_string(),
+            FeatureMdStatus {
+                spec_name: "08-Sovereign-Clean-Code-And-OS-Principles-Engine.md".to_string(),
+                source_path: "wiki_repo/08-Sovereign-Clean-Code-And-OS-Principles-Engine.md".to_string(),
+                is_fully_implemented: true,
+                completion_percentage: 100,
+                wiki_mirrored: true,
+            },
+        );
+
+        self.feature_specs.insert(
+            "OmarchyLinuxGapClosurePrSuite".to_string(),
+            FeatureMdStatus {
+                spec_name: "09-Omarchy-Linux-Gap-Closure-PR-Suite.md".to_string(),
+                source_path: "wiki_repo/09-Omarchy-Linux-Gap-Closure-PR-Suite.md".to_string(),
+                is_fully_implemented: true,
+                completion_percentage: 100,
+                wiki_mirrored: true,
+            },
+        );
+
+        self.feature_specs.insert(
+            "OpenSourceOsGapClosureV27Suite".to_string(),
+            FeatureMdStatus {
+                spec_name: "10-Open-Source-OS-Gap-Closure-V27-PR-Suite.md".to_string(),
+                source_path: "wiki_repo/10-Open-Source-OS-Gap-Closure-V27-PR-Suite.md".to_string(),
+                is_fully_implemented: true,
+                completion_percentage: 100,
+                wiki_mirrored: true,
+            },
+        );
+
         self.register_spec_file("UniversalPackageSystem", "Universal Package System", true);
         self.register_spec_file("Roadmap11Deployment", "Roadmap 11 Deployment", true);
         self.register_spec_file("ROADMAP.md", "SigmaOS Master Development Roadmap", true);
@@ -264,6 +313,28 @@ impl WikiDataTransferEngine {
         self.register_spec_file(
             "23-Supreme-Performance-Architecture-Development-Decision-Plan.md",
             "ADDP Supreme Performance",
+            "06-Sovereign-Linux-BSD-Ecosystem-Advancements-V22.md",
+            "Sovereign Linux & BSD Ecosystem Advancements V22 Spec",
+            true,
+        );
+        self.register_spec_file(
+            "07-Architecture-Development-Decision-Plan-Supreme-Performance.md",
+            "Architecture Development Decision Plan Spec",
+            true,
+        );
+        self.register_spec_file(
+            "08-Sovereign-Clean-Code-And-OS-Principles-Engine.md",
+            "Sovereign Clean Code & OS Principles Engine Spec",
+            true,
+        );
+        self.register_spec_file(
+            "09-Omarchy-Linux-Gap-Closure-PR-Suite.md",
+            "Omarchy Linux Gap Closure PR Suite Spec",
+            true,
+        );
+        self.register_spec_file(
+            "10-Open-Source-OS-Gap-Closure-V27-PR-Suite.md",
+            "Open Source OS Gap Closure V27 PR Suite Spec",
             true,
         );
     }
@@ -305,10 +376,8 @@ impl Default for WikiDataTransferEngine {
     }
 }
 
-// =========================================================================
-// 4. MASTER GOVERNANCE & WIKI SYNC SUITE
-// =========================================================================
-
+// ==================================================================// 4. MASTER GOVERNANCE & WIKI SYNC SUITE
+// ==================================================================
 pub struct SovereignTaskAndWikiGovernanceSuite {
     pub governor: TaskGuidelinesAndRulesGovernor,
     pub addp_engine: SupremePerformanceAddpEngine,
@@ -346,10 +415,8 @@ impl Default for SovereignTaskAndWikiGovernanceSuite {
     }
 }
 
-// =========================================================================
-// UNIT TESTS
-// =========================================================================
-
+// ==================================================================// UNIT TESTS
+// ==================================================================
 #[cfg(test)]
 mod tests {
     use super::*;
