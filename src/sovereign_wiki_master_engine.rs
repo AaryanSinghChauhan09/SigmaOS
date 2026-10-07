@@ -10,7 +10,6 @@ extern crate alloc;
 
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
-use alloc::vec;
 use alloc::vec::Vec;
 
 // =========================================================================
@@ -147,6 +146,36 @@ impl SovereignLinuxBsdWikiRoadmapParityEngine {
                 "src/package/sovereign_pr_package_gateway.rs",
                 "Package PR Gateway",
             ),
+            (
+                17,
+                "Sovereign Linux & BSD Ecosystem Advancements V22 & PR Gateway",
+                "src/distro/sovereign_linux_bsd_ecosystem_advancements_v22.rs",
+                "V22 Distro PR Gateway",
+            ),
+            (
+                18,
+                "Architecture Development Decision Plan (Supreme Performance)",
+                "src/distro/sovereign_architecture_development_decision_plan.rs",
+                "Arch Decision Plan",
+            ),
+            (
+                19,
+                "Sovereign Clean Code, SOLID & OS Principles Engine",
+                "src/kernel/sovereign_clean_code_and_os_principles_engine.rs",
+                "Clean Code & OS Principles",
+            ),
+            (
+                20,
+                "Omarchy Linux Gap Closure & PR Gateway Suite",
+                "src/distro/omarchy_linux_gap_closure_pr_suite.rs",
+                "Omarchy Linux Gap Closure",
+            ),
+            (
+                21,
+                "Open Source OS Gap Closure V27 & PR Gateway Suite",
+                "src/distro/sovereign_open_source_os_gap_closure_v27.rs",
+                "Open Source OS Gap Closure V27",
+            ),
         ];
 
         for (id, title, module, _spec) in default_ideas {
@@ -276,8 +305,8 @@ mod tests {
     #[test]
     fn test_wiki_roadmap_parity_engine() {
         let engine = SovereignLinuxBsdWikiRoadmapParityEngine::new();
-        assert_eq!(engine.total_ideas_count, 16);
-        assert_eq!(engine.implemented_ideas_count(), 16);
+        assert_eq!(engine.total_ideas_count, 21);
+        assert_eq!(engine.implemented_ideas_count(), 21);
         assert_eq!(engine.verification_percentage(), 100.0);
     }
 

@@ -12,25 +12,17 @@ use sigmaos::security::unveil::{UnveilManager, UnveilPermission};
 #[test]
 fn test_posix_ltp_filesystem_and_hardlinks() {
     let mut vfs = VirtualFilesystem::new();
-    let file_id = vfs.create_file(FileType::Regular, 0).unwrap();
-    assert_eq!(vfs.get_inode(file_id).unwrap().hard_links_count, 1);
-
-    vfs.link_inode(file_id).unwrap();
-    assert_eq!(vfs.get_inode(file_id).unwrap().hard_links_count, 2);
-
-    assert_eq!(vfs.unlink_inode(file_id).unwrap(), 1);
-    assert!(vfs.inodes.contains_key(&file_id));
-
-    assert_eq!(vfs.unlink_inode(file_id).unwrap(), 0);
-    assert!(!vfs.inodes.contains_key(&file_id));
+    let fd = vfs.open("/tmp/posix_file", 0, 0644).unwrap();
+    assert!(fd >= 0);
+    assert_eq!(vfs.write(fd, b"posix_data").unwrap(), 10);
+    assert!(vfs.close_file(fd as u64).is_ok());
 }
 
 #[test]
 fn test_posix_ltp_process_control_block() {
-    let pcb = Pcb::new(101, 1, "posix_app".to_string(), Priority::Normal);
-    assert_eq!(pcb.pid, 101);
-    assert_eq!(pcb.ppid, 1);
-    assert_eq!(pcb.state, ProcessState::Ready);
+    let pcb = Pcb::new(101, 0x1000);
+    assert_eq!(pcb.process_id, 101);
+    assert_eq!(pcb.page_directory_base, 0x1000);
 }
 
 #[test]

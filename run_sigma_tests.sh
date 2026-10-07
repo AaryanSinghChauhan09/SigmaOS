@@ -598,4 +598,39 @@ if [ -f "src/desktop/omarchy_browser_theme_sync.rs" ]; then
     ./build/test_browser_sync
 fi
 
+if [ -f "src/distro/sovereign_linux_bsd_ecosystem_advancements_v22.rs" ]; then
+    echo "Running Sovereign Linux & BSD Ecosystem Advancements V22 & PR Gateway test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_linux_bsd_ecosystem_advancements_v22.rs --edition=2021 -o build/test_advancements_v22
+    ./build/test_advancements_v22
+fi
+
+if [ -f "src/distro/sovereign_architecture_development_decision_plan.rs" ]; then
+    echo "Running Sovereign Architecture Development Decision Plan test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_architecture_development_decision_plan.rs --edition=2021 -o build/test_arch_decision_plan
+    ./build/test_arch_decision_plan
+fi
+
+if [ -f "src/kernel/sovereign_clean_code_and_os_principles_engine.rs" ]; then
+    echo "Running Sovereign Clean Code & OS Principles test suite..."
+    mkdir -p build
+    rustc --test src/kernel/sovereign_clean_code_and_os_principles_engine.rs --edition=2021 -o build/test_clean_code_os_principles
+    ./build/test_clean_code_os_principles
+fi
+
+if [ -f "src/distro/omarchy_linux_gap_closure_pr_suite.rs" ]; then
+    echo "Running Omarchy Linux Gap Closure & PR Gateway test suite..."
+    mkdir -p build
+    rustc --test src/distro/omarchy_linux_gap_closure_pr_suite.rs --edition=2021 -o build/test_omarchy_gap_closure
+    ./build/test_omarchy_gap_closure
+fi
+
+if [ -f "src/distro/sovereign_open_source_os_gap_closure_v27.rs" ]; then
+    echo "Running Open Source OS Gap Closure V27 test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_open_source_os_gap_closure_v27.rs --edition=2021 -o build/test_open_source_v27
+    ./build/test_open_source_v27
+fi
+
 echo "All SigmaOS test suites completed."

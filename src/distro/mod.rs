@@ -405,6 +405,18 @@ pub use sovereign_mint_omarchy_apex_mastery::*;
 pub mod sovereign_mint_omarchy_zenith_mastery;
 pub use sovereign_mint_omarchy_zenith_mastery::*;
 
+pub mod sovereign_linux_bsd_ecosystem_advancements_v22;
+pub use sovereign_linux_bsd_ecosystem_advancements_v22::*;
+
+pub mod sovereign_architecture_development_decision_plan;
+pub use sovereign_architecture_development_decision_plan::*;
+
+pub mod omarchy_linux_gap_closure_pr_suite;
+pub use omarchy_linux_gap_closure_pr_suite::*;
+
+pub mod sovereign_open_source_os_gap_closure_v27;
+pub use sovereign_open_source_os_gap_closure_v27::*;
+
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;
 pub use crate::stubs::large_distro_stubs::*;
