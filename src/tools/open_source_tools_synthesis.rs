@@ -170,6 +170,23 @@ pub struct RofiCommandHudEngine {
     pub apps: Vec<LauncherAppEntry>,
 }
 
+/// Zero-allocation case-insensitive substring search helper for ASCII strings.
+/// Avoids heap allocations from `.to_lowercase()` when scanning through collections.
+fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
+    if needle.is_empty() {
+        return true;
+    }
+    if needle.len() > haystack.len() {
+        return false;
+    }
+    haystack.as_bytes().windows(needle.len()).any(|window| {
+        window
+            .iter()
+            .zip(needle.as_bytes().iter())
+            .all(|(&h, &n)| h.eq_ignore_ascii_case(&n))
+    })
+}
+
 impl RofiCommandHudEngine {
     pub fn new() -> Self {
         let apps = vec![
@@ -197,12 +214,11 @@ impl RofiCommandHudEngine {
     }
 
     pub fn fuzzy_search(&self, query: &str) -> Vec<LauncherAppEntry> {
-        let query_lower = query.to_lowercase();
         self.apps
             .iter()
             .filter(|app| {
-                app.name.to_lowercase().contains(&query_lower)
-                    || app.category.to_lowercase().contains(&query_lower)
+                contains_ignore_case(&app.name, query)
+                    || contains_ignore_case(&app.category, query)
             })
             .cloned()
             .collect()
@@ -391,10 +407,9 @@ impl ZoxideFastCdEngine {
     }
 
     pub fn query_best_match(&self, keyword: &str) -> Option<String> {
-        let kw = keyword.to_lowercase();
         self.db
             .iter()
-            .filter(|e| e.path.to_lowercase().contains(&kw))
+            .filter(|e| contains_ignore_case(&e.path, keyword))
             .max_by(|a, b| {
                 a.frecency_score
                     .partial_cmp(&b.frecency_score)
