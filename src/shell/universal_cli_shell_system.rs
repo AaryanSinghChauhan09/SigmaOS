@@ -41,6 +41,11 @@ pub enum ShellSystemFormat {
     Xonsh,
     Oil,
     PowerShell,
+    Yash,
+    Es,
+    Bsh,
+    MinixSh,
+    Psh,
 }
 
 impl ShellSystemFormat {
@@ -59,6 +64,11 @@ impl ShellSystemFormat {
             Self::Xonsh => "Xonsh Python Shell",
             Self::Oil => "Oils-for-Unix (Osh/Ysh)",
             Self::PowerShell => "PowerShell Core (Pwsh)",
+            Self::Yash => "Yash POSIX Shell",
+            Self::Es => "Extensible Shell (Es)",
+            Self::Bsh => "Bourne Shell (Bsh)",
+            Self::MinixSh => "Minix Shell",
+            Self::Psh => "Perl Shell (Psh)",
         }
     }
 
@@ -77,6 +87,11 @@ impl ShellSystemFormat {
             Self::Xonsh => ".xonshrc",
             Self::Oil => ".yshrc",
             Self::PowerShell => "Microsoft.PowerShell_profile.ps1",
+            Self::Yash => ".yashrc",
+            Self::Es => ".esrc",
+            Self::Bsh => ".profile",
+            Self::MinixSh => ".profile",
+            Self::Psh => ".pshrc",
         }
     }
 
@@ -95,6 +110,11 @@ impl ShellSystemFormat {
             Self::Xonsh => "#!/usr/bin/env xonsh",
             Self::Oil => "#!/usr/bin/env ysh",
             Self::PowerShell => "#!/usr/bin/env pwsh",
+            Self::Yash => "#!/bin/yash",
+            Self::Es => "#!/bin/es",
+            Self::Bsh => "#!/bin/bsh",
+            Self::MinixSh => "#!/bin/minixsh",
+            Self::Psh => "#!/usr/bin/env psh",
         }
     }
 }
@@ -142,6 +162,16 @@ impl UniversalShellScriptTranspiler {
                     return ShellSystemFormat::Ksh;
                 } else if line.contains("dash") || line.contains("ash") {
                     return ShellSystemFormat::Dash;
+                } else if line.contains("yash") {
+                    return ShellSystemFormat::Yash;
+                } else if line.contains("es") {
+                    return ShellSystemFormat::Es;
+                } else if line.contains("bsh") {
+                    return ShellSystemFormat::Bsh;
+                } else if line.contains("minix") {
+                    return ShellSystemFormat::MinixSh;
+                } else if line.contains("psh") {
+                    return ShellSystemFormat::Psh;
                 } else if line.contains("rc") {
                     return ShellSystemFormat::Rc;
                 } else if line.contains("nu") {
@@ -228,7 +258,13 @@ impl UniversalShellScriptTranspiler {
                 ShellSystemFormat::Xonsh => Self::transpile_xonsh_line(line, &mut exported_vars),
                 ShellSystemFormat::Oil => Self::transpile_oil_line(line, &mut exported_vars),
                 ShellSystemFormat::Zsh => Self::transpile_zsh_line(line, &mut exported_vars),
-                ShellSystemFormat::Bash | ShellSystemFormat::Dash => {
+                ShellSystemFormat::Bash
+                | ShellSystemFormat::Dash
+                | ShellSystemFormat::Yash
+                | ShellSystemFormat::Es
+                | ShellSystemFormat::Bsh
+                | ShellSystemFormat::MinixSh
+                | ShellSystemFormat::Psh => {
                     Self::transpile_bash_posix_line(line, &mut exported_vars)
                 }
             };
@@ -957,6 +993,52 @@ impl Default for SovereignUniversalCliShellSystemEngine {
 }
 
 // =========================================================================
+// 6. UNIVERSAL SH CROSS-DIALECT EXECUTION ENGINE
+// =========================================================================
+
+pub struct UniversalShCrossDialectEngine {
+    pub default_sh_path: String,
+    pub strict_posix_mode: bool,
+    pub exported_environment: BTreeMap<String, String>,
+}
+
+impl UniversalShCrossDialectEngine {
+    pub fn new() -> Self {
+        let mut exported = BTreeMap::new();
+        exported.insert("SHELL".to_string(), "/bin/sh".to_string());
+        exported.insert("PATH".to_string(), "/usr/bin:/bin:/usr/local/bin".to_string());
+        Self {
+            default_sh_path: String::from("/bin/sh"),
+            strict_posix_mode: true,
+            exported_environment: exported,
+        }
+    }
+
+    /// Transpiles any foreign shell script into POSIX /bin/sh syntax and returns an execution plan
+    pub fn run_universal_sh_script(
+        &mut self,
+        script_code: &str,
+    ) -> Result<UniversalExecutableScriptPlan, &'static str> {
+        let plan = UniversalShellScriptTranspiler::transpile_script(script_code);
+        for (k, v) in &plan.exported_variables {
+            self.exported_environment.insert(k.clone(), v.clone());
+        }
+        Ok(plan)
+    }
+
+    /// Converts foreign CLI commands across GNU, BSD, POSIX, and PowerShell into canonical /bin/sh flags
+    pub fn convert_to_posix_command(&self, line: &str) -> TranslatedCliOptionCommand {
+        UniversalCliOptionTranslator::translate_command(line)
+    }
+}
+
+impl Default for UniversalShCrossDialectEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
 // UNIT TESTS
 // =========================================================================
 
@@ -1090,5 +1172,19 @@ mod tests {
 
         let prompt = engine.render_prompt();
         assert_eq!(prompt, "sovereign@sigmaos:~# ");
+    }
+
+    #[test]
+    fn test_universal_sh_cross_dialect_engine() {
+        let mut engine = UniversalShCrossDialectEngine::new();
+        let es_script = "#!/bin/es\nexport PORT=9090\nfn-start = {\n  echo starting server\n}";
+        let plan = engine.run_universal_sh_script(es_script).unwrap();
+
+        assert_eq!(plan.target_format, ShellSystemFormat::Es);
+        assert_eq!(engine.exported_environment.get("PORT"), Some(&"9090".to_string()));
+
+        let translated = engine.convert_to_posix_command("ps aux");
+        assert_eq!(translated.canonical_command, "ps");
+        assert_eq!(translated.translated_args, vec!["-e", "-f"]);
     }
 }

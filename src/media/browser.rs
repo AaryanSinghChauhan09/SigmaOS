@@ -3002,6 +3002,11 @@ mod tests {
             audit.get("mullvad_tab_proxy"),
             Some(&"direct://".to_string())
         );
+
+        let report = suite.generate_open_source_browser_audit_report("https://example.com/index.html");
+        assert!(report.contains("Sovereign SigmaWeb Open-Source Browser Suite Audit Report"));
+        assert!(report.contains("thorium_simd_speedup_nodes"));
+        assert!(report.contains("orion_webext_polyfill"));
     }
 }
 
@@ -3126,6 +3131,32 @@ impl SovereignOpenSourceBrowserSuiteEngine {
             (!duck_summary.is_empty()).to_string(),
         );
 
+        let thorium_speedup = self.browser.thorium_perf.simd_dom_traversal_speedup(100);
+        results.insert("thorium_simd_speedup_nodes".to_string(), thorium_speedup.to_string());
+
+        let ladybird_spec = self
+            .browser
+            .ladybird_css3
+            .parse_selector_specificity("#main .content p");
+        results.insert(
+            "ladybird_css3_specificity".to_string(),
+            format!("({},{},{})", ladybird_spec.0, ladybird_spec.1, ladybird_spec.2),
+        );
+
+        let orion_poly = self.browser.orion_ext_compat.polyfill_browser_action("storage");
+        results.insert("orion_webext_polyfill".to_string(), orion_poly);
+
         results
+    }
+
+    /// Renders a formatted human-readable summary of the open-source web browser audit
+    pub fn generate_open_source_browser_audit_report(&mut self, target_url: &str) -> String {
+        let audit = self.run_comprehensive_browser_suite_audit(target_url);
+        let mut report = String::from("Sovereign SigmaWeb Open-Source Browser Suite Audit Report:\n");
+        report.push_str("===============================================================\n");
+        for (k, v) in audit {
+            report.push_str(&format!("{:<35} : {}\n", k, v));
+        }
+        report
     }
 }
