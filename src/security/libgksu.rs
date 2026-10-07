@@ -89,6 +89,42 @@ impl GksuExecutionRequest {
     }
 }
 
+fn is_dangerous_environment_variable(key: &str, val: &str) -> bool {
+    // 1. Reject embedded NUL bytes or ASCII control characters
+    if key.as_bytes().contains(&0)
+        || val.as_bytes().contains(&0)
+        || key.bytes().any(|b| b < 32 || b == 127)
+        || val.bytes().any(|b| b < 32 || b == 127)
+    {
+        return true;
+    }
+
+    // 2. Reject dynamic loader, interpreter, shell, and system path injection keys
+    let k = key.to_uppercase();
+    k.starts_with("LD_")
+        || k.starts_with("DYLD_")
+        || k.starts_with("PYTHON")
+        || k.starts_with("PERL")
+        || k.starts_with("RUBY")
+        || k.starts_with("BASH_FUNC_")
+        || matches!(
+            k.as_str(),
+            "NODE_OPTIONS"
+                | "IFS"
+                | "BASH_ENV"
+                | "ENV"
+                | "SHELLOPTS"
+                | "BASHOPTS"
+                | "GCONV_PATH"
+                | "HOSTALIASES"
+                | "LOCALDOMAIN"
+                | "RESOLV_HOST_CONF"
+                | "RES_OPTIONS"
+                | "GETCONF_DIR"
+                | "TMPDIR"
+        )
+}
+
 /// Security Guard for memory zeroization and environment sanitization
 #[derive(Debug)]
 pub struct GksuSecurityGuard {
@@ -117,13 +153,7 @@ impl GksuSecurityGuard {
     ) -> Vec<(String, String)> {
         let mut clean_env = Vec::new();
         for (k, v) in input_env {
-            // Dangerous variables stripped automatically
-            if k == "LD_PRELOAD"
-                || k == "LD_LIBRARY_PATH"
-                || k == "PYTHONPATH"
-                || k == "RUBYLIB"
-                || k == "PERL5LIB"
-            {
+            if is_dangerous_environment_variable(k, v) {
                 continue;
             }
 
@@ -541,16 +571,60 @@ mod tests {
         let raw_env = vec![
             ("PATH".to_string(), "/usr/bin:/bin".to_string()),
             ("LD_PRELOAD".to_string(), "/tmp/malicious.so".to_string()),
+            ("LD_AUDIT".to_string(), "/tmp/audit.so".to_string()),
+            ("DYLD_INSERT_LIBRARIES".to_string(), "/tmp/mac.dylib".to_string()),
             ("PYTHONPATH".to_string(), "/tmp/hack".to_string()),
+            ("NODE_OPTIONS".to_string(), "--require /tmp/evil.js".to_string()),
+            ("PERL5LIB".to_string(), "/tmp/perl".to_string()),
+            ("RUBYOPT".to_string(), "-r /tmp/ruby".to_string()),
+            ("IFS".to_string(), " \t\n".to_string()),
+            ("BASH_ENV".to_string(), "/tmp/exploit.sh".to_string()),
+            ("BASH_FUNC_eval%%".to_string(), "() { echo evil; }".to_string()),
+            ("GCONV_PATH".to_string(), "/tmp/gconv".to_string()),
+            ("HOSTALIASES".to_string(), "/tmp/hosts".to_string()),
+            ("INJECTED\0VAR".to_string(), "value".to_string()),
+            ("SAFE_NAME".to_string(), "value\0injected".to_string()),
+            ("NEWLINE_KEY\n".to_string(), "value".to_string()),
             ("LANG".to_string(), "en_US.UTF-8".to_string()),
         ];
 
-        let allowed = vec!["PATH".to_string(), "LANG".to_string()];
+        // Include dangerous keys in allowed to ensure they are strictly rejected
+        let allowed = vec![
+            "PATH".to_string(),
+            "LANG".to_string(),
+            "LD_PRELOAD".to_string(),
+            "LD_AUDIT".to_string(),
+            "DYLD_INSERT_LIBRARIES".to_string(),
+            "NODE_OPTIONS".to_string(),
+            "IFS".to_string(),
+            "BASH_ENV".to_string(),
+            "GCONV_PATH".to_string(),
+            "INJECTED\0VAR".to_string(),
+            "SAFE_NAME".to_string(),
+            "NEWLINE_KEY\n".to_string(),
+        ];
         let clean = GksuSecurityGuard::sanitize_environment(&raw_env, &allowed);
 
         assert_eq!(clean.len(), 2);
+        assert!(clean.iter().any(|(k, _)| k == "PATH"));
+        assert!(clean.iter().any(|(k, _)| k == "LANG"));
+
+        // Verify all dangerous, injected, or control char variables are stripped
         assert!(!clean.iter().any(|(k, _)| k == "LD_PRELOAD"));
+        assert!(!clean.iter().any(|(k, _)| k == "LD_AUDIT"));
+        assert!(!clean.iter().any(|(k, _)| k == "DYLD_INSERT_LIBRARIES"));
         assert!(!clean.iter().any(|(k, _)| k == "PYTHONPATH"));
+        assert!(!clean.iter().any(|(k, _)| k == "NODE_OPTIONS"));
+        assert!(!clean.iter().any(|(k, _)| k == "PERL5LIB"));
+        assert!(!clean.iter().any(|(k, _)| k == "RUBYOPT"));
+        assert!(!clean.iter().any(|(k, _)| k == "IFS"));
+        assert!(!clean.iter().any(|(k, _)| k == "BASH_ENV"));
+        assert!(!clean.iter().any(|(k, _)| k == "BASH_FUNC_eval%%"));
+        assert!(!clean.iter().any(|(k, _)| k == "GCONV_PATH"));
+        assert!(!clean.iter().any(|(k, _)| k == "HOSTALIASES"));
+        assert!(!clean.iter().any(|(k, _)| k.contains('\0')));
+        assert!(!clean.iter().any(|(_, v)| v.contains('\0')));
+        assert!(!clean.iter().any(|(k, _)| k.contains('\n')));
     }
 
     #[test]
