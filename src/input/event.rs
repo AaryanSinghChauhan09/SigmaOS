@@ -63,7 +63,7 @@ pub enum InputCode {
 
 /// Input event value
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct InputValue(i32);
+pub struct InputValue(pub i32);
 
 /// Linux input_event struct layout (equivalent to struct input_event from linux/input.h)
 #[derive(Debug, Clone)]

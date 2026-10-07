@@ -432,6 +432,12 @@ pub use sovereign_universal_subsystem_interop::*;
 pub mod sovereign_linux_bsd_ecosystem_advancements_v28;
 pub use sovereign_linux_bsd_ecosystem_advancements_v28::*;
 
+pub mod sovereign_linux_bsd_ecosystem_advancements_v29;
+pub use sovereign_linux_bsd_ecosystem_advancements_v29::*;
+
+pub mod sovereign_mint_omarchy_apex_dominance_v30;
+pub use sovereign_mint_omarchy_apex_dominance_v30::*;
+
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;
 pub use crate::stubs::large_distro_stubs::*;
