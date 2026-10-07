@@ -54,6 +54,7 @@ global.document = {
     const el = createMockElement(`anon_${Math.random()}`, tag);
     return el;
   },
+  createTextNode: (text) => ({ textContent: text }),
   getElementById: (id) => mockElements[id] || createMockElement(id),
   querySelectorAll: () => []
 };

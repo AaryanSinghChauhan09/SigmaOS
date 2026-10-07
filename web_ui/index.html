@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Σ SigmaOS Calamares-Style Graphical Installer</title>
+    <title>Σ SigmaOS Installation Preview</title>
     <link rel="stylesheet" href="styles/style.css">
 </head>
 <body>
@@ -13,20 +13,20 @@
         <header class="installer-header">
             <div class="logo">Σ</div>
             <div class="title-area">
-                <h1>SigmaOS Sovereign Installer</h1>
-                <p class="subtitle">Calamares-Style Graphical Installation Wizard with Dual-Boot Support</p>
+                <h1>SigmaOS Installation Preview</h1>
+                <p class="subtitle">Explore setup choices safely. This demo cannot detect disks or install an operating system.</p>
             </div>
         </header>
 
         <!-- Stepper Indicator -->
-        <div class="stepper" role="navigation" aria-label="Installation Steps">
+        <div class="stepper" role="navigation" aria-label="Preview steps">
             <div class="step active" id="step-ind-1" aria-current="step">
                 <span class="step-num">1</span>
                 <span class="step-label">Welcome</span>
             </div>
             <div class="step" id="step-ind-2">
                 <span class="step-num">2</span>
-                <span class="step-label">Target Disk</span>
+                <span class="step-label">Example Disk</span>
             </div>
             <div class="step" id="step-ind-3">
                 <span class="step-num">3</span>
@@ -38,11 +38,11 @@
             </div>
             <div class="step" id="step-ind-5">
                 <span class="step-num">5</span>
-                <span class="step-label">Install</span>
+                <span class="step-label">Review</span>
             </div>
             <div class="step" id="step-ind-6">
                 <span class="step-num">6</span>
-                <span class="step-label">Ready</span>
+                <span class="step-label">Preview complete</span>
             </div>
         </div>
 
@@ -51,20 +51,20 @@
             <!-- Step 1: Welcome -->
             <section class="panel active" id="panel-1" aria-labelledby="step-1-title">
                 <h2 id="step-1-title" tabindex="-1">Welcome to the Future of Computing</h2>
-                <p class="panel-desc">You are about to install SigmaOS — a sovereign, AI-native operating system built for post-quantum security and bare-metal performance.</p>
+                <p class="panel-desc">This is a design preview, not a working installer. No devices are detected, no changes are made, and a bootable SigmaOS image is not yet available.</p>
 
                 <div class="feature-grid">
                     <div class="feature-card">
-                        <h3>🛡️ Post-Quantum Security</h3>
-                        <p>Fully secured with Kyber-1024 key encapsulation and Dilithium-5 signatures.</p>
+                        <h3>🛡️ Security goals</h3>
+                        <p>Explore planned security features; this preview does not configure encryption or keys.</p>
                     </div>
                     <div class="feature-card">
-                        <h3>⚡ Bare-Metal Speed</h3>
-                        <p>Zero-dependency, capability-gated microkernel bypassing heavy POSIX layers.</p>
+                        <h3>⚡ System design</h3>
+                        <p>See proposed storage and release-channel choices without making system changes.</p>
                     </div>
                     <div class="feature-card">
-                        <h3>⚙️ Local Intelligence</h3>
-                        <p>Embedded S-AI optimization daemon routing workloads natively on physical cores.</p>
+                        <h3>⚙️ Guided review</h3>
+                        <p>Review the consequences of each proposed layout before an actual installer is built.</p>
                     </div>
                 </div>
 
@@ -73,69 +73,55 @@
                     <label class="checkbox-container" for="accept-license">
                         <input type="checkbox" id="accept-license" aria-required="true" aria-describedby="license-error">
                         <span class="checkmark"></span>
-                        I accept the Sovereign Digital Autonomy Agreement and Licensing Terms.
+                        I understand this is a preview only and cannot install SigmaOS.
                     </label>
                     <div id="license-error" role="alert" style="display: none; color: var(--danger); font-size: 0.78rem; margin-top: 8px; font-weight: 500;">
-                        ⚠️ Please accept the licensing terms and sovereign autonomy agreement to proceed.
+                        Please acknowledge that this is only a preview to proceed.
                     </div>
                 </div>
             </section>
 
             <!-- Step 2: Disk Selection -->
             <section class="panel" id="panel-2" aria-labelledby="step-2-title">
-                <h2 id="step-2-title" tabindex="-1">Select Target Storage Device</h2>
-                <p class="panel-desc">Choose the physical disk drive to use for SigmaOS installation.</p>
+                <h2 id="step-2-title" tabindex="-1">Choose an Example Disk</h2>
+                <p class="panel-desc">These are fictional scenarios, not detected devices. No real disk will be accessed.</p>
 
-                <div class="disk-list" role="radiogroup" aria-label="Select Target Disk">
-                    <div class="disk-card active" onclick="selectDisk(this, 'sda')" onkeydown="handleCardKeydown(event, this)" role="radio" aria-checked="true" tabindex="0">
+                <div class="disk-list" role="radiogroup" aria-label="Example disk scenario">
+                    <div class="disk-card" onclick="selectDisk(this, 'sample-ssd')" onkeydown="handleCardKeydown(event, this)" role="radio" aria-checked="false" tabindex="0">
                         <div class="disk-icon">💾</div>
                         <div class="disk-info">
-                            <span class="disk-name">/dev/sda - Sovereign Primary NVMe SSD</span>
-                            <span class="disk-meta">Size: 512 GB | Detected OS: Windows 11 Pro, Debian Linux 12</span>
+                            <span class="disk-name">Example internal SSD (512 GB)</span>
+                            <span class="disk-meta">Fictional scenario; existing partitions unknown</span>
                         </div>
                     </div>
-                    <div class="disk-card" onclick="selectDisk(this, 'sdb')" onkeydown="handleCardKeydown(event, this)" role="radio" aria-checked="false" tabindex="0">
+                    <div class="disk-card" onclick="selectDisk(this, 'sample-usb')" onkeydown="handleCardKeydown(event, this)" role="radio" aria-checked="false" tabindex="0">
                         <div class="disk-icon">💾</div>
                         <div class="disk-info">
-                            <span class="disk-name">/dev/sdb - Auxiliary Block Storage</span>
-                            <span class="disk-meta">Size: 1 TB | Interface: USB4 / Thunderbolt</span>
-                        </div>
-                    </div>
-                    <div class="disk-card" onclick="selectDisk(this, 'vdisk')" onkeydown="handleCardKeydown(event, this)" role="radio" aria-checked="false" tabindex="0">
-                        <div class="disk-icon">🖥️</div>
-                        <div class="disk-info">
-                            <span class="disk-name">/dev/vdisk - Sandboxed Virtual VM Drive</span>
-                            <span class="disk-meta">Size: 64 GB | Interface: VirtIO Storage Ring</span>
+                            <span class="disk-name">Example external disk (1 TB)</span>
+                            <span class="disk-meta">Fictional scenario; existing partitions unknown</span>
                         </div>
                     </div>
                 </div>
+                <p id="disk-error" role="alert" style="display: none; color: var(--danger);">Choose an example disk to continue.</p>
             </section>
 
             <!-- Step 3: Calamares-Style Partitioning & Dual-Boot Mode -->
             <section class="panel" id="panel-3" aria-labelledby="step-3-title">
-                <h2 id="step-3-title" tabindex="-1">Installation Type & Partition Layout</h2>
-                <p class="panel-desc">Select how you want to partition the storage drive. Dual-boot mode allows running SigmaOS alongside your current OS.</p>
+                <h2 id="step-3-title" tabindex="-1">Explore Partitioning Options</h2>
+                <p class="panel-desc">Illustrative choices only. No partitions are detected or changed, and dual-boot compatibility has not been verified.</p>
 
                 <div class="mode-list" role="radiogroup" aria-label="Partitioning Mode">
                     <!-- Option 1: Install Alongside (Dual-Boot) -->
-                    <div class="mode-card active" id="mode-card-dual" onclick="selectInstallMode(this, 'dual')" onkeydown="handleCardKeydown(event, this)" role="radio" aria-checked="true" tabindex="0">
+                    <div class="mode-card" id="mode-card-dual" onclick="selectInstallMode(this, 'dual')" onkeydown="handleCardKeydown(event, this)" role="radio" aria-checked="false" tabindex="0">
                         <div class="mode-header">
                             <span class="mode-icon">🔀</span>
                             <div class="mode-title">
                                 <strong>Install Alongside Existing OS (Dual-Boot Mode)</strong>
-                                <span class="mode-sub">Safely shrinks <span id="detected-os-label">Windows 11 / Debian Linux</span> partition and installs SigmaOS in new space.</span>
+                                <span class="mode-sub">Would require verified free space, backups and safe partition resizing; not available in this preview.</span>
                             </div>
                         </div>
                         <div class="partition-preview-box">
-                            <div class="partition-title">Proposed Partition Split Preview:</div>
-                            <div class="partition-bar-outer">
-                                <div class="partition-bar-segment os-existing" style="width: 50%;">
-                                    <span>Existing OS (256 GB)</span>
-                                </div>
-                                <div class="partition-bar-segment os-sigma" style="width: 50%;">
-                                    <span>Σ SigmaOS (256 GB)</span>
-                                </div>
-                            </div>
+                            <div class="partition-title">No partition layout can be calculated without a real disk and validated installer backend.</div>
                         </div>
                     </div>
 
@@ -145,7 +131,7 @@
                             <span class="mode-icon">🗑️</span>
                             <div class="mode-title">
                                 <strong>Erase Entire Disk (Clean SovereignFS Install)</strong>
-                                <span class="mode-sub">Deletes all data on /dev/<span class="selected-disk-name">sda</span> and formats entire drive for SigmaOS.</span>
+                                <span class="mode-sub">On a real disk this would permanently destroy all existing data. Preview only: nothing is erased.</span>
                             </div>
                         </div>
                     </div>
@@ -156,17 +142,18 @@
                             <span class="mode-icon">⚙️</span>
                             <div class="mode-title">
                                 <strong>Manual / Custom Partitioning</strong>
-                                <span class="mode-sub">Manually create, resize, or assign mount points for custom drive layouts.</span>
+                                <span class="mode-sub">Would require manual partition planning; no partition editor is available in this preview.</span>
                             </div>
                         </div>
                     </div>
                 </div>
+                <p id="mode-error" role="alert" style="display: none; color: var(--danger);">Choose a partitioning scenario to continue.</p>
             </section>
 
             <!-- Step 4: Settings -->
             <section class="panel" id="panel-4" aria-labelledby="step-4-title">
-                <h2 id="step-4-title" tabindex="-1">System Settings & Release Channels</h2>
-                <p class="panel-desc">Configure your locale, host parameters, and select your rolling system release stream.</p>
+                <h2 id="step-4-title" tabindex="-1">Example System Settings</h2>
+                <p class="panel-desc">Try the proposed settings; none of these values are applied to your computer.</p>
 
                 <div class="form-grid">
                     <div class="form-group">
@@ -207,53 +194,34 @@
                 </div>
             </section>
 
-            <!-- Step 5: Interactive Progress -->
+            <!-- Step 5: Review (no installation backend is connected) -->
             <section class="panel" id="panel-5" aria-labelledby="step-5-title">
-                <h2 id="step-5-title" tabindex="-1">Extracting Base Image & Packaging Shards</h2>
-                <p class="panel-desc">Please wait while the automated installer formats partitions and extracts the base system image.</p>
-
-                <div class="progress-container">
-                    <div class="progress-bar-outer" id="progress-bar-outer" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-valuetext="0%" aria-describedby="progress-status">
-                        <div class="progress-bar-inner" id="installation-progress" style="width: 0%;"></div>
-                    </div>
-                    <div class="progress-text">
-                        <span id="progress-status">Formatting SovereignFS partitions...</span>
-                        <span id="progress-percentage">0%</span>
-                    </div>
+                <h2 id="step-5-title" tabindex="-1">Review Your Preview</h2>
+                <p class="panel-desc">No installation will run. In a real installer, you must back up your data and verify the target disk before making any changes.</p>
+                <div class="summary-box">
+                    <h3>Example choices</h3>
+                    <ul>
+                        <li><strong>Disk scenario:</strong> <span id="review-device"></span></li>
+                        <li><strong>Partitioning scenario:</strong> <span id="review-mode"></span></li>
+                        <li><strong>Hostname:</strong> <span id="review-hostname"></span></li>
+                    </ul>
+                    <p id="review-warning" role="status"></p>
                 </div>
-
-                <div class="terminal-log" role="log" aria-live="polite">
-                    <div class="terminal-header">
-                        <span class="dot red"></span>
-                        <span class="dot yellow"></span>
-                        <span class="dot green"></span>
-                        <span class="terminal-title">sigma-install-logs</span>
-                    </div>
-                    <div class="terminal-body" id="log-console">
-                        <div class="log-line text-blue">[install] Initializing Calamares GUI installation pipeline...</div>
-                    </div>
-                </div>
+                <label class="checkbox-container" for="confirm-preview">
+                    <input type="checkbox" id="confirm-preview" aria-describedby="review-warning confirm-error">
+                    <span class="checkmark"></span>
+                    I understand this is a preview; no disk changes or installation will occur.
+                </label>
+                <p id="confirm-error" role="alert" style="display: none; color: var(--danger);">Acknowledge the review before finishing the preview.</p>
             </section>
 
-            <!-- Step 6: Ready -->
+            <!-- Step 6: Preview complete -->
             <section class="panel" id="panel-6" aria-labelledby="step-6-title">
                 <div class="success-screen">
                     <div class="success-icon">✓</div>
-                    <h2 id="step-6-title" tabindex="-1">Lattice Integration Complete!</h2>
-                    <p class="panel-desc">SigmaOS has been successfully written to disk, and dual-boot bootloader chainloading entries are configured in sigma-boot.</p>
-
-                    <div class="summary-box">
-                        <h3>Installation Summary</h3>
-                        <ul>
-                            <li><strong>Device:</strong> <span id="summary-device">/dev/sda</span></li>
-                            <li><strong>Installation Mode:</strong> <span id="summary-mode">Dual-Boot (Install Alongside)</span></li>
-                            <li><strong>Filesystem:</strong> SovereignFS (Lattice-Optimized)</li>
-                            <li><strong>Bootloader:</strong> sigma-boot UEFI Chainloader</li>
-                            <li><strong>System Identity:</strong> Kyber-1024 Generated (/etc/sigma/identity.pub)</li>
-                        </ul>
-                    </div>
-
-                    <p class="reboot-note">Remove the installation media and reboot the node to enter the Zenith desktop environment.</p>
+                    <h2 id="step-6-title" tabindex="-1">Preview Complete</h2>
+                    <p class="panel-desc">You explored an example configuration. No disk was detected or modified, no OS was installed, and no bootloader or keys were created.</p>
+                    <p class="reboot-note">A verified bootable image and installation backend are required before SigmaOS can be installed. Do not reboot expecting an installed system.</p>
                 </div>
             </section>
         </div>
@@ -269,8 +237,10 @@
     <script>
         let currentStep = 1;
         const totalSteps = 6;
-        let selectedDiskId = 'sda';
-        let selectedInstallMode = 'dual';
+        let selectedDiskId = null;
+        let selectedInstallMode = null;
+        const exampleDisks = { 'sample-ssd': 'Example internal SSD (512 GB)', 'sample-usb': 'Example external disk (1 TB)' };
+        const exampleModes = { dual: 'Install alongside (requires verified resizing)', clean: 'Erase entire disk (would destroy all data)', custom: 'Manual partitioning (not available)' };
 
         function handleCardKeydown(event, element) {
             if (event.key === 'Enter' || event.key === ' ') {
@@ -298,21 +268,40 @@
             document.querySelectorAll('.disk-card').forEach(card => {
                 card.classList.remove('active');
                 card.setAttribute('aria-checked', 'false');
+                card.tabIndex = -1;
             });
             element.classList.add('active');
             element.setAttribute('aria-checked', 'true');
+            element.tabIndex = 0;
             selectedDiskId = diskId;
-            document.querySelectorAll('.selected-disk-name').forEach(el => el.textContent = diskId);
+            document.getElementById('disk-error').style.display = 'none';
+            document.getElementById('confirm-preview').checked = false;
         }
 
         function selectInstallMode(element, mode) {
             document.querySelectorAll('.mode-card').forEach(card => {
                 card.classList.remove('active');
                 card.setAttribute('aria-checked', 'false');
+                card.tabIndex = -1;
             });
             element.classList.add('active');
             element.setAttribute('aria-checked', 'true');
+            element.tabIndex = 0;
             selectedInstallMode = mode;
+            document.getElementById('mode-error').style.display = 'none';
+            document.getElementById('confirm-preview').checked = false;
+        }
+
+        function updateReview() {
+            document.getElementById('review-device').textContent = exampleDisks[selectedDiskId];
+            document.getElementById('review-mode').textContent = exampleModes[selectedInstallMode];
+            document.getElementById('review-hostname').textContent = document.getElementById('hostname-input').value.trim();
+            document.getElementById('review-warning').textContent = selectedInstallMode === 'clean'
+                ? 'WARNING: A real erase operation would permanently delete all data on the selected disk. This preview does nothing.'
+                : selectedInstallMode === 'dual'
+                    ? 'A real dual-boot installation requires verified partition detection and backup; this preview cannot guarantee data safety.'
+                    : 'A real custom installation requires a partition editor and validated storage backend; this preview does nothing.';
+            document.getElementById('confirm-preview').checked = false;
         }
 
         function updateStepIndicators() {
@@ -337,12 +326,13 @@
 
         function updateNextButtonState() {
             const btnNext = document.getElementById('btn-next');
-            if (currentStep === 4) {
-                btnNext.textContent = 'Install';
-                btnNext.setAttribute('aria-label', 'Start System Installation');
+            if (currentStep === 5) {
+                btnNext.textContent = 'Finish preview';
+                btnNext.setAttribute('aria-label', 'Finish preview without installing');
             } else if (currentStep === totalSteps) {
-                btnNext.textContent = 'Reboot';
-                btnNext.setAttribute('aria-label', 'Reboot Node into Zenith Desktop');
+                btnNext.textContent = 'Done';
+                btnNext.setAttribute('aria-label', 'Preview complete');
+                btnNext.disabled = true;
             } else {
                 btnNext.textContent = 'Next';
                 btnNext.setAttribute('aria-label', 'Continue to Next Step');
@@ -379,6 +369,16 @@
                 licenseCb.removeAttribute('aria-invalid');
             }
 
+            if (currentStep === 2 && !selectedDiskId) {
+                document.getElementById('disk-error').style.display = 'block';
+                document.querySelector('.disk-card').focus();
+                return;
+            }
+            if (currentStep === 3 && !selectedInstallMode) {
+                document.getElementById('mode-error').style.display = 'block';
+                document.querySelector('.mode-card').focus();
+                return;
+            }
             if (currentStep === 4) {
                 const hostnameInput = document.getElementById('hostname-input');
                 const hostnameErr = document.getElementById('hostname-error');
@@ -392,6 +392,18 @@
                 }
                 if (hostnameErr) hostnameErr.style.display = 'none';
                 if (hostnameInput) hostnameInput.removeAttribute('aria-invalid');
+                updateReview();
+            }
+            if (currentStep === 5) {
+                const confirmation = document.getElementById('confirm-preview');
+                if (!confirmation.checked) {
+                    document.getElementById('confirm-error').style.display = 'block';
+                    confirmation.setAttribute('aria-invalid', 'true');
+                    confirmation.focus();
+                    return;
+                }
+                document.getElementById('confirm-error').style.display = 'none';
+                confirmation.removeAttribute('aria-invalid');
             }
 
             if (currentStep < totalSteps) {
@@ -403,112 +415,12 @@
 
                 document.getElementById('btn-back').disabled = false;
 
-                if (currentStep === 5) {
-                    document.getElementById('btn-next').disabled = true;
-                    document.getElementById('btn-back').disabled = true;
-                    startInstallationSimulation();
-                } else if (currentStep === totalSteps) {
-                    document.getElementById('btn-next').onclick = () => alert('Rebooting node... Entering Zenith.');
+                if (currentStep === totalSteps) {
                     document.getElementById('btn-back').disabled = true;
                 }
             }
         }
 
-        function appendLog(text, className = '') {
-            const consoleEl = document.getElementById('log-console');
-            const line = document.createElement('div');
-            line.className = `log-line ${className}`;
-            line.textContent = text;
-            consoleEl.appendChild(line);
-            consoleEl.scrollTop = consoleEl.scrollHeight;
-        }
-
-        function startInstallationSimulation() {
-            let progress = 0;
-            const progressBar = document.getElementById('installation-progress');
-            const progressPct = document.getElementById('progress-percentage');
-            const progressStatus = document.getElementById('progress-status');
-
-            document.getElementById('summary-device').textContent = `/dev/${selectedDiskId}`;
-            const modeText = selectedInstallMode === 'dual' ? 'Dual-Boot (Install Alongside)' : (selectedInstallMode === 'clean' ? 'Erase Entire Disk' : 'Custom Partitioning');
-            document.getElementById('summary-mode').textContent = modeText;
-
-            const logs = [
-                { prg: 5, msg: "Quering hardware buses... Detected CPU topology matching x86_64 standard.", class: "text-blue" },
-                { prg: 12, msg: "Probing existing partitions... Detected Windows 11 Pro and Debian Linux 12.", class: "text-yellow" },
-                { prg: 20, msg: selectedInstallMode === 'dual' ? "Resizing target partition SAFELY to create 256GB SovereignFS slice..." : "Formatting entire target drive in SovereignFS layout...", class: "text-blue" },
-                { prg: 30, msg: "Initializing CoW multi-layered SovereignFS partition root.", class: "" },
-                { prg: 40, msg: "Connecting to sovereign mirror... Handshaking with Kyber-1024 certificates.", class: "text-blue" },
-                { prg: 52, msg: "Streaming base architecture payload (387 MB image target)...", class: "" },
-                { prg: 65, msg: "Validating download hashes against Dilithium-5 digital signature.", class: "text-green" },
-                { prg: 78, msg: "Configuring sigma-boot UEFI chainloader entries for detected operating systems.", class: "text-yellow" },
-                { prg: 90, msg: "Generating machine cryptographic post-quantum keypair... Registered on mesh.", class: "text-blue" },
-                { prg: 100, msg: "✅ Installation completed successfully! Dual-boot boot records linked.", class: "text-green" }
-            ];
-
-            const progressBarOuter = document.getElementById('progress-bar-outer');
-            let logIndex = 0;
-
-            // 60fps smooth progress: requestAnimationFrame with smoothstep
-            // easing between milestones. The old 600ms setInterval snapped
-            // the bar in big jumps; this eases continuously, writes the
-            // width once per frame, and only touches text/ARIA when the
-            // rounded value actually changes. rAF also auto-pauses when the
-            // tab is hidden, so the simulation never burns CPU off-screen.
-            const SLICE_MS = 900;
-            let startTime = null;
-            let lastRounded = -1;
-            let finished = false;
-
-            const tick = (ts) => {
-                if (startTime === null) startTime = ts;
-                const elapsed = ts - startTime;
-
-                // Emit each milestone log once its slice completes
-                while (logIndex < logs.length && elapsed >= (logIndex + 1) * SLICE_MS) {
-                    const entry = logs[logIndex];
-                    progressStatus.textContent = entry.msg;
-                    appendLog(entry.msg, entry.class);
-                    logIndex++;
-                }
-
-                // Ease the bar from the previous milestone toward the next
-                const base = logIndex > 0 ? logs[logIndex - 1].prg : 0;
-                const target = logIndex < logs.length ? logs[logIndex].prg : 100;
-                const sliceStart = logIndex * SLICE_MS;
-                const t = Math.min(Math.max((elapsed - sliceStart) / SLICE_MS, 0), 1);
-                const eased = t * t * (3 - 2 * t); // smoothstep
-                progress = base + (target - base) * eased;
-
-                progressBar.style.width = `${progress.toFixed(1)}%`;
-
-                const rounded = Math.round(progress);
-                if (rounded !== lastRounded) {
-                    lastRounded = rounded;
-                    progressPct.textContent = `${rounded}%`;
-                    if (progressBarOuter) {
-                        progressBarOuter.setAttribute('aria-valuenow', rounded);
-                        progressBarOuter.setAttribute('aria-valuetext', `${rounded}%`);
-                    }
-                }
-
-                if (logIndex >= logs.length && !finished) {
-                    finished = true;
-                    progressBar.style.width = '100%';
-                    progressPct.textContent = '100%';
-                    if (progressBarOuter) {
-                        progressBarOuter.setAttribute('aria-valuenow', 100);
-                        progressBarOuter.setAttribute('aria-valuetext', '100%');
-                    }
-                    setTimeout(() => {
-                        nextStep();
-                    }, 1000);
-                    return; // stop the frame loop
-                }
-                requestAnimationFrame(tick);
-            };
-            requestAnimationFrame(tick);
-        }
     </script>
 </body>
 </html>

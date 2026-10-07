@@ -120,14 +120,17 @@ pub struct Ipv4Header {
 
 impl Ipv4Header {
     pub fn parse(data: &[u8]) -> Option<Self> {
-        if data.len() < 20 {
+        if data.len() < 20 || data[0] >> 4 != 4 {
             return None;
         }
         let ihl = (data[0] & 0x0F) as usize * 4;
-        if data.len() < ihl {
+        if ihl < 20 || data.len() < ihl {
             return None;
         }
-        let total_len = ((data[2] as u16) << 8) | (data[3] as u16);
+        let total_len = u16::from_be_bytes([data[2], data[3]]);
+        if (total_len as usize) < ihl || (total_len as usize) > data.len() {
+            return None;
+        }
         let ttl = data[8];
         let protocol = data[9];
         let mut src_addr = [0u8; 4];
@@ -181,46 +184,43 @@ impl XdpPacket {
         EthernetHeader::parse(&self.data)
     }
 
-    /// Parse IPv4 header (assumes Ethernet II frame)
+    /// Parse IPv4 header from an untagged Ethernet II IPv4 frame
     pub fn ipv4_header(&self) -> Option<Ipv4Header> {
-        if self.data.len() < 34 {
+        if !self.eth_header()?.is_ipv4() {
             return None;
         }
         Ipv4Header::parse(&self.data[14..])
     }
 
-    /// Returns TCP/UDP source port (bytes 34-35 of Ethernet+IPv4+TCP/UDP frame)
-    pub fn src_port(&self) -> Option<u16> {
-        if self.data.len() < 36 {
-            return None;
-        }
+    // Ports must be inside the IPv4 total length, not just Ethernet padding.
+    // Later fragments carry payload bytes in place of the transport header.
+    fn transport_ports(&self) -> Option<(u16, u16)> {
         let ip = self.ipv4_header()?;
         if ip.protocol != 6 && ip.protocol != 17 {
             return None;
         }
-        let ihl = ((self.data[14] & 0x0F) as usize) * 4;
-        let port_off = 14 + ihl;
-        if self.data.len() < port_off + 2 {
+        let fragment = u16::from_be_bytes([self.data[20], self.data[21]]);
+        if fragment & 0x1FFF != 0 {
             return None;
         }
-        Some(((self.data[port_off] as u16) << 8) | (self.data[port_off + 1] as u16))
+        let ihl = ((self.data[14] & 0x0F) as usize) * 4;
+        if (ip.total_len as usize) < ihl + 4 {
+            return None;
+        }
+        let port_off = 14 + ihl;
+        let src = u16::from_be_bytes([self.data[port_off], self.data[port_off + 1]]);
+        let dst = u16::from_be_bytes([self.data[port_off + 2], self.data[port_off + 3]]);
+        Some((src, dst))
     }
 
-    /// Returns TCP/UDP destination port
+    /// Returns TCP/UDP source port from a first IPv4 fragment
+    pub fn src_port(&self) -> Option<u16> {
+        self.transport_ports().map(|(src, _)| src)
+    }
+
+    /// Returns TCP/UDP destination port from a first IPv4 fragment
     pub fn dst_port(&self) -> Option<u16> {
-        if self.data.len() < 38 {
-            return None;
-        }
-        let ip = self.ipv4_header()?;
-        if ip.protocol != 6 && ip.protocol != 17 {
-            return None;
-        }
-        let ihl = ((self.data[14] & 0x0F) as usize) * 4;
-        let port_off = 14 + ihl + 2;
-        if self.data.len() < port_off + 2 {
-            return None;
-        }
-        Some(((self.data[port_off] as u16) << 8) | (self.data[port_off + 1] as u16))
+        self.transport_ports().map(|(_, dst)| dst)
     }
 }
 
@@ -546,6 +546,132 @@ mod xdp_tests {
         let pkt = build_test_packet([1, 2, 3, 4], [5, 6, 7, 8], 54321, 8080);
         assert_eq!(pkt.src_port(), Some(54321));
         assert_eq!(pkt.dst_port(), Some(8080));
+    }
+
+    #[test]
+    fn test_ipv4_validation_and_transport_port_bounds() {
+        // Each case starts with a valid Ethernet/IPv4/UDP frame. The last two
+        // booleans indicate whether packet-level IPv4 and port parsing succeed.
+        let cases: &[(&str, fn(&mut Vec<u8>), bool, bool)] = &[
+            ("valid UDP", |_| {}, true, true),
+            ("valid TCP", |d| d[23] = 6, true, true),
+            ("not a transport protocol", |d| d[23] = 1, true, false),
+            (
+                "ARP EtherType",
+                |d| d[12..14].copy_from_slice(&[0x08, 0x06]),
+                false,
+                false,
+            ),
+            (
+                "IPv6 EtherType",
+                |d| d[12..14].copy_from_slice(&[0x86, 0xdd]),
+                false,
+                false,
+            ),
+            (
+                "VLAN EtherType",
+                |d| d[12..14].copy_from_slice(&[0x81, 0x00]),
+                false,
+                false,
+            ),
+            ("short Ethernet header", |d| d.truncate(13), false, false),
+            ("short IPv4 header", |d| d.truncate(33), false, false),
+            ("wrong IP version", |d| d[14] = 0x65, false, false),
+            ("IHL below minimum", |d| d[14] = 0x44, false, false),
+            ("IHL exceeds frame", |d| d[14] = 0x4f, false, false),
+            (
+                "total length below IHL",
+                |d| d[16..18].copy_from_slice(&19u16.to_be_bytes()),
+                false,
+                false,
+            ),
+            (
+                "options exceed total length",
+                |d| {
+                    d[14] = 0x46;
+                    d[16..18].copy_from_slice(&20u16.to_be_bytes());
+                },
+                false,
+                false,
+            ),
+            (
+                "total length exceeds frame",
+                |d| d[16..18].copy_from_slice(&43u16.to_be_bytes()),
+                false,
+                false,
+            ),
+            (
+                "frame truncated below total length",
+                |d| d.truncate(41),
+                false,
+                false,
+            ),
+            (
+                "valid IP options",
+                |d| {
+                    d[14] = 0x46;
+                    d[16..18].copy_from_slice(&32u16.to_be_bytes());
+                    d.splice(34..34, [0, 0, 0, 0]);
+                },
+                true,
+                true,
+            ),
+            (
+                "IP payload is only padding",
+                |d| d[16..18].copy_from_slice(&20u16.to_be_bytes()),
+                true,
+                false,
+            ),
+            (
+                "partial port pair in padding",
+                |d| d[16..18].copy_from_slice(&22u16.to_be_bytes()),
+                true,
+                false,
+            ),
+            (
+                "four real port bytes",
+                |d| d[16..18].copy_from_slice(&24u16.to_be_bytes()),
+                true,
+                true,
+            ),
+            ("non-first fragment", |d| d[21] = 1, true, false),
+            (
+                "non-first fragment with MF",
+                |d| {
+                    d[20] = 0x20;
+                    d[21] = 1;
+                },
+                true,
+                false,
+            ),
+            ("first fragment with MF", |d| d[20] = 0x20, true, true),
+            ("don't fragment flag", |d| d[20] = 0x40, true, true),
+        ];
+        for &(name, modify, has_ip, has_ports) in cases {
+            let mut pkt = build_test_packet([1, 2, 3, 4], [5, 6, 7, 8], 54321, 8080);
+            modify(&mut pkt.data);
+            assert_eq!(pkt.ipv4_header().is_some(), has_ip, "{name}: IPv4");
+            assert_eq!(
+                pkt.src_port(),
+                has_ports.then_some(54321),
+                "{name}: source port"
+            );
+            assert_eq!(
+                pkt.dst_port(),
+                has_ports.then_some(8080),
+                "{name}: destination port"
+            );
+            assert_eq!(
+                XdpFilterRule::block_src_ip(1, [1, 2, 3, 4]).matches(&pkt),
+                has_ip,
+                "{name}: IP rule"
+            );
+            assert_eq!(
+                XdpFilterRule::allow_dst_port(1, 8080).matches(&pkt),
+                has_ports,
+                "{name}: port rule"
+            );
+        }
     }
 
     #[test]

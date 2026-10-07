@@ -668,4 +668,19 @@ if [ -f "src/desktop/omarchy_browser_theme_sync.rs" ]; then
     ./build/test_browser_sync
 fi
 
+if [ -f "src/kernel/xdp_engine_sovereign.rs" ]; then
+    echo "Running XDP packet parsing and filter tests..."
+    mkdir -p build
+    rustc --test --edition=2021 src/kernel/xdp_engine_sovereign.rs -o build/xdp_engine_test
+    ./build/xdp_engine_test
+fi
+
+if command -v node >/dev/null 2>&1; then
+    echo "Running desktop and installation preview UI tests..."
+    node tests/test_command_palette.js
+    node tests/test_installer_preview.js
+else
+    echo "Skipping desktop UI tests (Node.js is not installed)."
+fi
+
 echo "All SigmaOS test suites completed."
