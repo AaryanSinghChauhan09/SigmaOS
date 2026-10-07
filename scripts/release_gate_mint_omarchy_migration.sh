@@ -23,7 +23,7 @@ FAILED_GATES=0
 echo -n "[GATE 1/5] Validating Migration Success Rate... "
 MIGRATION_RATE=100.0
 THRESHOLD_MIGRATION=98.0
-if (( $(echo "$MIGRATION_RATE >= $THRESHOLD_MIGRATION" | bc -l) )); then
+if awk -v a="$MIGRATION_RATE" -v b="$THRESHOLD_MIGRATION" 'BEGIN {exit !(a >= b)}'; then
     echo "PASSED (${MIGRATION_RATE}% >= ${THRESHOLD_MIGRATION}%)"
 else
     echo "FAILED (${MIGRATION_RATE}% < ${THRESHOLD_MIGRATION}%)"
@@ -34,7 +34,7 @@ fi
 echo -n "[GATE 2/5] Validating Boot-to-Desktop Speed... "
 BOOT_TIME_SEC=1.8
 MAX_BOOT_SEC=3.0
-if (( $(echo "$BOOT_TIME_SEC <= $MAX_BOOT_SEC" | bc -l) )); then
+if awk -v a="$BOOT_TIME_SEC" -v b="$MAX_BOOT_SEC" 'BEGIN {exit !(a <= b)}'; then
     echo "PASSED (${BOOT_TIME_SEC}s <= ${MAX_BOOT_SEC}s)"
 else
     echo "FAILED (${BOOT_TIME_SEC}s > ${MAX_BOOT_SEC}s)"
@@ -56,7 +56,7 @@ fi
 echo -n "[GATE 4/5] Validating Cold Launch Latency... "
 LAUNCH_LATENCY_MS=0.4
 MAX_LAUNCH_MS=10.0
-if (( $(echo "$LAUNCH_LATENCY_MS <= $MAX_LAUNCH_MS" | bc -l) )); then
+if awk -v a="$LAUNCH_LATENCY_MS" -v b="$MAX_LAUNCH_MS" 'BEGIN {exit !(a <= b)}'; then
     echo "PASSED (${LAUNCH_LATENCY_MS}ms <= ${MAX_LAUNCH_MS}ms)"
 else
     echo "FAILED (${LAUNCH_LATENCY_MS}ms > ${MAX_LAUNCH_MS}ms)"
