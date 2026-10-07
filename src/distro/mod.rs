@@ -429,8 +429,8 @@ pub use sovereign_open_source_os_gap_closure_v27::*;
 pub mod sovereign_universal_subsystem_interop;
 pub use sovereign_universal_subsystem_interop::*;
 
-pub mod sovereign_linux_bsd_ecosystem_advancements_v29;
-pub use sovereign_linux_bsd_ecosystem_advancements_v29::*;
+pub mod sovereign_linux_bsd_ecosystem_advancements_v28;
+pub use sovereign_linux_bsd_ecosystem_advancements_v28::*;
 
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;
