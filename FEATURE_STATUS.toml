@@ -284,3 +284,17 @@ files = ["src/security/tpm.rs"]
 description = "TPM 2.0 CRB interface: PCR extend/read, seal/unseal, hardware RNG"
 test_evidence = "Unit tests with mock TPM responses"
 next_milestone = "Real TPM device driver integration"
+
+[input.basic]
+status = "prototype"
+files = ["src/input/mod.rs", "src/input/event.rs"]
+description = "Linux input event (evdev) interface for reading input from keyboards, mice, and other devices"
+test_evidence = "Unit tests for event reader and code parsing; no hardware validation"
+next_milestone = "QEMU input device integration and event loop connection"
+
+[power.management]
+status = "prototype"
+files = ["src/power/management.rs", "src/power/battery.rs", "src/power/advanced.rs"]
+description = "Power management inspired by Linux ACPI and BSD powerd: CPU frequency scaling, battery monitoring, power profiles, and thermal management"
+test_evidence = "Unit tests for power profile switching; no hardware validation or ACPI integration"
+next_milestone = "ACPI table parsing and QEMU power state integration"

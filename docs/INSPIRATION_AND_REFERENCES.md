@@ -5,7 +5,7 @@ concrete components in this repository — not just ideas.
 
 | Project | Inspiration | SigmaOS components |
 |---|---|---|
-| Linux Kernel | Kernel architecture, VFS, scheduler design, driver model | `src/kernel/scheduler.rs` (CFS/EEVDF model), `src/vfs/`, `src/drivers/`, `src/filesystem/btrfs.rs` (fail-closed metadata model) |
+| Linux Kernel | Kernel architecture, VFS, scheduler design, driver model, input subsystem | `src/kernel/scheduler.rs` (CFS/EEVDF model), `src/vfs/`, `src/drivers/`, `src/filesystem/btrfs.rs` (fail-closed metadata model), `src/input/` (Linux input event / evdev interface) |
 | Omarchy | Desktop experience, modular installer, theme system | `zenith_desktop/` (dock ARIA states, command palette), `web_ui/index.html` (installation preview flow), `src/theming/omarchy_theme_suite.rs`, `src/desktop/launcher.rs` (keyboard-first launcher), `src/desktop/screenshot_capture.rs` |
 | os-tutorial | Bootloader patterns, interrupt handling, educational approach | `src/arch/x86_64/` (GDT/IDT/paging stubs), `tools/sigma_bootloader_compat.rs`, `scripts/build_iso.sh` (fails closed until boot is validated) |
 | Linux Mint | User experience, polish, documentation standards | `src/desktop/software_manager.rs` (mintinstall-inspired), `src/mintinstall/`, `src/mintupdate/`, `src/desktop/mint_backup_tool.rs`, `src/desktop/mint_update_manager.rs`, `src/tools/mint_system_report.rs` (honest host inspection), `docs/INSPIRATION_AND_REFERENCES.md` (this file) |

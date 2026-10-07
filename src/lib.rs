@@ -25,6 +25,7 @@ pub mod dashboard;
 pub mod desktop;
 pub mod development;
 pub mod device;
+pub mod input;
 pub mod distro;
 pub mod ipc;
 pub mod storage;
@@ -158,7 +159,6 @@ pub mod audit;
 pub mod backup;
 pub mod bluetooth;
 pub mod boot;
-pub mod input;
 pub mod printing;
 pub use boot::*;
 pub mod toolchain {
