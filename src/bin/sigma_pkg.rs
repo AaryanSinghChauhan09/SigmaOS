@@ -361,6 +361,10 @@ mod tests {
         assert_eq!(format_flag_for_source_pm("pkgman"), Some("--haiku"));
         assert_eq!(format_flag_for_source_pm("slapt-get"), Some("--slackware"));
         assert_eq!(format_flag_for_source_pm("pisi"), Some("--eopkg"));
+        assert_eq!(format_flag_for_source_pm("spack"), Some("--spack"));
+        assert_eq!(format_flag_for_source_pm("conan"), Some("--conan"));
+        assert_eq!(format_flag_for_source_pm("flatpak"), Some("--flatpak"));
+        assert_eq!(format_flag_for_source_pm("snap"), Some("--snap"));
     }
 
     #[test]
@@ -754,11 +758,16 @@ fn cmd_install(args: &[String]) {
                         .map(|f| format!("{:?}", f))
                 })
                 .unwrap_or_else(|| "Sovereign".to_string());
+            let default_dep = dep_mapper.to_canonical_name("libc6");
+            let dependencies = vec![sigmaos::sigpkg::Dependency {
+                name: default_dep,
+                version_constraint: VersionConstraint::Any,
+            }];
             let pkg = Package::new(
                 canonical_name.clone(),
                 Version::parse("1.0.0").unwrap(),
                 format!("Universal [{}] package {}", fmt_desc, canonical_name),
-                Vec::new(),
+                dependencies,
                 format!("placeholder-checksum-{}", target),
             );
             (pkg, Vec::new())
