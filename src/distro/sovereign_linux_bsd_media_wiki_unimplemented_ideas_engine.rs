@@ -105,6 +105,80 @@ impl TechMediaPortalIntelligenceFeed {
         }
     }
 
+    pub fn ingest_media_ideas(&mut self, url: &str, article_title: &str) -> bool {
+        let portal_key = if url.contains("9to5google.com") {
+            "9to5google"
+        } else if url.contains("9to5linux.com") {
+            "9to5linux"
+        } else if url.contains("9to5mac.com") {
+            "9to5mac"
+        } else if url.contains("androidauthority.com") {
+            "androidauthority"
+        } else if url.contains("androidpolice.com") {
+            "androidpolice"
+        } else if url.contains("appuals.com") {
+            "appuals"
+        } else if url.contains("distrowatch.com") {
+            "distrowatch"
+        } else if url.contains("frappe.io") {
+            "frappe"
+        } else if url.contains("geeky-gadgets.com") {
+            "geekygadgets"
+        } else if url.contains("hwbusters.com") {
+            "hwbusters"
+        } else if url.contains("howtogeek.com") {
+            "howtogeek"
+        } else if url.contains("infoworld.com") {
+            "infoworld"
+        } else if url.contains("itsfoss.com") {
+            "itsfoss"
+        } else if url.contains("itdaily.com") {
+            "itdaily"
+        } else if url.contains("kdnuggets.com") {
+            "kdnuggets"
+        } else if url.contains("linux.com") {
+            "linuxdotcom"
+        } else if url.contains("linux.org") {
+            "linuxorg"
+        } else if url.contains("linuxfoundation.org") {
+            "linuxfoundation"
+        } else if url.contains("linuxteck.com") {
+            "linuxteck"
+        } else if url.contains("makeuseof.com") {
+            "makeuseof"
+        } else if url.contains("marktechpost.com") {
+            "marktechpost"
+        } else if url.contains("opensourceforu.com") {
+            "opensourceforu"
+        } else if url.contains("pcmag.com") {
+            "pcmag"
+        } else if url.contains("pcworld.com") {
+            "pcworld"
+        } else if url.contains("phoronix.com") {
+            "phoronix"
+        } else if url.contains("techcrunch.com") {
+            "techcrunch"
+        } else if url.contains("techpowerup.com") {
+            "techpowerup"
+        } else if url.contains("techspot.com") {
+            "techspot"
+        } else if url.contains("thenewstack.io") {
+            "thenewstack"
+        } else if url.contains("windowscentral.com") {
+            "windowscentral"
+        } else if url.contains("windowslatest.com") {
+            "windowslatest"
+        } else if url.contains("xda-developers.com") {
+            "xdadevelopers"
+        } else if url.contains("zdnet.com") {
+            "zdnet"
+        } else {
+            return false;
+        };
+
+        self.ingest_article(portal_key, article_title)
+    }
+
     pub fn get_portal(&self, key: &str) -> Option<&TechMediaPortalRecord> {
         self.portals.get(key)
     }
@@ -583,6 +657,55 @@ mod tests {
 
         let linux_portals = feed.filter_by_category("Linux & Open Source");
         assert!(!linux_portals.is_empty());
+    }
+
+    #[test]
+    fn test_ingest_media_ideas_all_33_urls() {
+        let mut feed = TechMediaPortalIntelligenceFeed::new();
+        let urls_and_titles = [
+            ("https://9to5google.com/tech", "Google Pixel 9 AI Tensor Benchmarks"),
+            ("https://9to5linux.com/article", "Linux 6.12 Kernel Released with Sched_ext"),
+            ("https://9to5mac.com/news", "Apple M4 Mac Mini SMC Thermal Profile"),
+            ("https://www.androidauthority.com/news", "Android 15 ART GC Improvements"),
+            ("https://www.androidpolice.com/features", "Mainline Modular Updates in Android 15"),
+            ("https://appuals.com/guides", "System Diagnostic Repair Routines"),
+            ("https://distrowatch.com/weekly", "DistroWatch Weekly BSD & Linux Rankings"),
+            ("https://frappe.io/framework", "Frappe Low-Code Schema Migration Engine"),
+            ("https://www.geeky-gadgets.com/hardware", "Raspberry Pi 5 PCIe Expansion"),
+            ("https://hwbusters.com/psu", "ATX 3.1 PSU Transient Power Benchmarks"),
+            ("https://www.howtogeek.com/explainers", "Dual-Booting Linux & Windows Guide"),
+            ("https://www.infoworld.com/architecture", "Enterprise Cloud Microservice Consensus"),
+            ("https://itsfoss.com/apps", "Top FOSS Linux Desktop Applications"),
+            ("https://www.itdaily.com/enterprise", "Zero Trust Architecture Guide"),
+            ("https://www.kdnuggets.com/ai", "KDnuggets Vector Database Benchmark"),
+            ("https://www.linux.com/news", "Linux Kernel LTS Release Notes"),
+            ("https://www.linux.org/forum", "Linux Shell Diagnostic Tutorials"),
+            ("https://www.linuxfoundation.org/standards", "OpenSSF Supply Chain Security"),
+            ("https://www.linuxteck.com/devops", "Hardened Nginx SysAdmin Playbook"),
+            ("https://www.makeuseof.com/linux", "Customizing Desktop Environments"),
+            ("https://www.marktechpost.com/ai", "Mixture of Experts LLM Quantization"),
+            ("https://www.opensourceforu.com/kernel", "Embedded Linux BSP Driver Layer"),
+            ("https://www.pcmag.com/reviews", "PC Hardware Parity Benchmarks"),
+            ("https://www.pcworld.com/benchmarks", "GPU Frame Generation Benchmarks"),
+            ("https://www.phoronix.com/news", "Phoronix Kernel Regression Suite"),
+            ("https://techcrunch.com/startups", "Developer Infrastructure Tools"),
+            ("https://www.techpowerup.com/gpu-specs", "GPU-Z VBIOS Power Limit Tuning"),
+            ("https://www.techspot.com/article", "Game Engine Performance Profiling"),
+            ("https://thenewstack.io/ebpf", "Cloud Native eBPF Observability"),
+            ("https://www.windowscentral.com/windows", "Windows DirectStorage MicroVM Sandbox"),
+            ("https://www.windowslatest.com/windows11", "Windows Recall Privacy Audit"),
+            ("https://www.xda-developers.com/android", "Android Kernel Magisk Root Masking"),
+            ("https://www.zdnet.com/security", "Enterprise CIO Security Monitoring"),
+        ];
+
+        for (url, title) in urls_and_titles {
+            assert!(feed.ingest_media_ideas(url, title), "Failed to ingest for url: {}", url);
+        }
+
+        // Test duplicate detection via ingest_media_ideas
+        assert!(!feed.ingest_media_ideas("https://9to5google.com/tech", "Google Pixel 9 AI Tensor Benchmarks"));
+        // Test unknown domain handling
+        assert!(!feed.ingest_media_ideas("https://unknown-domain.org", "Unknown Article"));
     }
 
     #[test]
