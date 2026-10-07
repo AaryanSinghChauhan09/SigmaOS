@@ -30,6 +30,8 @@ pub enum UniversalSubsystemCategory {
     CompilerToolchain,
     AutomationProvisioning,
     SystemAudit,
+    AiWorkflowAgent,
+    VirtualizationHypervisor,
 }
 
 impl UniversalSubsystemCategory {
@@ -56,6 +58,8 @@ impl UniversalSubsystemCategory {
             Self::CompilerToolchain => "CompilerToolchain",
             Self::AutomationProvisioning => "AutomationProvisioning",
             Self::SystemAudit => "SystemAudit",
+            Self::AiWorkflowAgent => "AiWorkflowAgent",
+            Self::VirtualizationHypervisor => "VirtualizationHypervisor",
         }
     }
 }
@@ -387,6 +391,28 @@ impl SovereignUniversalSubsystemInteropEngine {
                 5,
             ),
         );
+
+        self.register_subsystem(
+            "ai_agent",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::AiWorkflowAgent,
+                true,
+                true,
+                &["herdr_pair_programming", "tdl_multi_pane", "omakase_agent_bridge"],
+                8,
+            ),
+        );
+
+        self.register_subsystem(
+            "virt_hypervisor",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::VirtualizationHypervisor,
+                true,
+                true,
+                &["bhyve_kvm", "vmm_openbsd", "zircon_hypervisor", "firecracker_vm"],
+                7,
+            ),
+        );
     }
 
     /// Establish default cross-subsystem translation and isolation policies.
@@ -501,6 +527,30 @@ impl SovereignUniversalSubsystemInteropEngine {
             UniversalSubsystemCategory::SecuritySandboxing,
             "Trigger FineIBT and PaX CFI violation audits on security sandbox policy breaches",
             true,
+        ));
+
+        self.add_interop_policy(SubsystemInteropPolicy::new(
+            "policy_ebpf_pledge",
+            UniversalSubsystemCategory::Networking,
+            UniversalSubsystemCategory::SecuritySandboxing,
+            "Translate eBPF socket filtering rules to OpenBSD pledge and unveil syscall policies",
+            true,
+        ));
+
+        self.add_interop_policy(SubsystemInteropPolicy::new(
+            "policy_landlock_capsicum",
+            UniversalSubsystemCategory::SecuritySandboxing,
+            UniversalSubsystemCategory::FilesystemStorage,
+            "Bridge Linux Landlock v5 sandboxes with FreeBSD Capsicum capabilities for VFS file descriptor rights",
+            true,
+        ));
+
+        self.add_interop_policy(SubsystemInteropPolicy::new(
+            "policy_ai_orchestration",
+            UniversalSubsystemCategory::AiWorkflowAgent,
+            UniversalSubsystemCategory::KernelScheduling,
+            "Route AI agent workflow events to kernel EEVDF/BORE scheduling classes for adaptive process prioritization",
+            false,
         ));
     }
 
@@ -809,6 +859,8 @@ mod tests {
         assert_eq!(UniversalSubsystemCategory::CompilerToolchain.as_str(), "CompilerToolchain");
         assert_eq!(UniversalSubsystemCategory::AutomationProvisioning.as_str(), "AutomationProvisioning");
         assert_eq!(UniversalSubsystemCategory::SystemAudit.as_str(), "SystemAudit");
+        assert_eq!(UniversalSubsystemCategory::AiWorkflowAgent.as_str(), "AiWorkflowAgent");
+        assert_eq!(UniversalSubsystemCategory::VirtualizationHypervisor.as_str(), "VirtualizationHypervisor");
 
         assert!(engine.subsystem_adapters.contains_key("shell"));
         assert!(engine.subsystem_adapters.contains_key("ipc_mem"));
@@ -820,6 +872,8 @@ mod tests {
         assert!(engine.subsystem_adapters.contains_key("compiler"));
         assert!(engine.subsystem_adapters.contains_key("automation"));
         assert!(engine.subsystem_adapters.contains_key("audit"));
+        assert!(engine.subsystem_adapters.contains_key("ai_agent"));
+        assert!(engine.subsystem_adapters.contains_key("virt_hypervisor"));
 
         let event_id = engine
             .dispatch_cross_subsystem_operation_all_distros("shell", "ipc_mem", "alloc_ring_buffer")
@@ -833,6 +887,30 @@ mod tests {
             )
             .expect("Shell-IPC policy should exist");
         assert_eq!(policy.policy_id, "policy_shell_ipc");
+
+        let ebpf_pledge_policy = engine
+            .translate_policy(
+                UniversalSubsystemCategory::Networking,
+                UniversalSubsystemCategory::SecuritySandboxing,
+            )
+            .expect("eBPF-Pledge policy should exist");
+        assert_eq!(ebpf_pledge_policy.policy_id, "policy_ebpf_pledge");
+
+        let landlock_cap_policy = engine
+            .translate_policy(
+                UniversalSubsystemCategory::SecuritySandboxing,
+                UniversalSubsystemCategory::FilesystemStorage,
+            )
+            .expect("Landlock-Capsicum policy should exist");
+        assert_eq!(landlock_cap_policy.policy_id, "policy_landlock_capsicum");
+
+        let ai_sched_policy = engine
+            .translate_policy(
+                UniversalSubsystemCategory::AiWorkflowAgent,
+                UniversalSubsystemCategory::KernelScheduling,
+            )
+            .expect("AI-Scheduling policy should exist");
+        assert_eq!(ai_sched_policy.policy_id, "policy_ai_orchestration");
 
         assert!(engine.verify_all_subsystems_interoperability());
         assert_eq!(engine.evaluate_system_wide_harmony_score(), 100);

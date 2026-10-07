@@ -426,6 +426,9 @@ pub use omarchy_linux_gap_closure_pr_suite::*;
 pub mod sovereign_open_source_os_gap_closure_v27;
 pub use sovereign_open_source_os_gap_closure_v27::*;
 
+pub mod sovereign_universal_subsystem_interop;
+pub use sovereign_universal_subsystem_interop::*;
+
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;
 pub use crate::stubs::large_distro_stubs::*;
