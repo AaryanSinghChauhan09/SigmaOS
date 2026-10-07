@@ -5,32 +5,35 @@
 // - Signal handling delivery and masks
 // - Memory management (mmap/mprotect/munmap)
 
-use sigmaos::filesystem::{FileType, VirtualFilesystem};
-use sigmaos::kernel::{Pcb, Priority, ProcessState};
+use sigmaos::filesystem::sovereign_link_engine::SovereignLinkEngine;
+use sigmaos::kernel::process::{Process, ProcessState};
 use sigmaos::security::unveil::{UnveilManager, UnveilPermission};
 
 #[test]
 fn test_posix_ltp_filesystem_and_hardlinks() {
-    let mut vfs = VirtualFilesystem::new();
-    let file_id = vfs.create_file(FileType::Regular, 0).unwrap();
-    assert_eq!(vfs.get_inode(file_id).unwrap().hard_links_count, 1);
+    let mut link_engine = SovereignLinkEngine::new();
+    let ino = link_engine.create_file("/var/log/syslog", b"log_data");
+    assert_eq!(link_engine.inodes.get(&ino).unwrap().hard_link_count, 1);
 
-    vfs.link_inode(file_id).unwrap();
-    assert_eq!(vfs.get_inode(file_id).unwrap().hard_links_count, 2);
+    link_engine
+        .create_hard_link("/var/log/syslog", "/var/log/syslog.hard")
+        .unwrap();
+    assert_eq!(link_engine.inodes.get(&ino).unwrap().hard_link_count, 2);
 
-    assert_eq!(vfs.unlink_inode(file_id).unwrap(), 1);
-    assert!(vfs.inodes.contains_key(&file_id));
+    link_engine.unlink("/var/log/syslog").unwrap();
+    assert_eq!(link_engine.inodes.get(&ino).unwrap().hard_link_count, 1);
+    assert!(link_engine.inodes.contains_key(&ino));
 
-    assert_eq!(vfs.unlink_inode(file_id).unwrap(), 0);
-    assert!(!vfs.inodes.contains_key(&file_id));
+    link_engine.unlink("/var/log/syslog.hard").unwrap();
+    assert!(!link_engine.inodes.contains_key(&ino));
 }
 
 #[test]
 fn test_posix_ltp_process_control_block() {
-    let pcb = Pcb::new(101, 1, "posix_app".to_string(), Priority::Normal);
-    assert_eq!(pcb.pid, 101);
-    assert_eq!(pcb.ppid, 1);
-    assert_eq!(pcb.state, ProcessState::Ready);
+    let proc = Process::new(101, 1, "posix_app".to_string());
+    assert_eq!(proc.pid, 101);
+    assert_eq!(proc.parent_pid, 1);
+    assert_eq!(proc.state, ProcessState::Running);
 }
 
 #[test]

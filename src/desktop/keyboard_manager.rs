@@ -483,8 +483,8 @@ mod tests {
         let mut manager = DesktopKeyboardManager::new();
 
         // Try to remove current layout (should fail)
-        let current = manager.get_current_layout().unwrap();
-        let result = manager.remove_layout(&current.id);
+        let current_id = manager.get_current_layout().unwrap().id.clone();
+        let result = manager.remove_layout(&current_id);
         assert!(!result);
     }
 
@@ -494,11 +494,11 @@ mod tests {
         let layouts = manager.get_layouts();
 
         if layouts.len() > 1 {
-            let new_layout = &layouts[1];
-            assert!(manager.set_current_layout(&new_layout.id));
+            let new_layout_id = layouts[1].id.clone();
+            assert!(manager.set_current_layout(&new_layout_id));
             assert_eq!(
                 manager.get_current_layout().unwrap().id,
-                new_layout.id
+                new_layout_id
             );
         }
     }

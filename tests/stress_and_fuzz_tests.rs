@@ -24,22 +24,22 @@ fn test_matrix_file_io() {
 
 #[test]
 fn test_matrix_memory_stress_allocation() {
-    let mut buddy = BuddyAllocator::new(1024 * 1024); // 1MB pool
+    let mut buddy = BuddyAllocator::new();
     let mut ptrs = Vec::new();
 
     // Allocate 100 blocks
     for _ in 0..100 {
-        if let Ok(ptr) = buddy.allocate(4096) {
+        if let Some(ptr) = buddy.allocate(4096) {
             ptrs.push(ptr);
         }
     }
 
     // Free 100 blocks
     for ptr in ptrs {
-        buddy.deallocate(ptr, 4096);
+        buddy.deallocate(ptr);
     }
 
-    assert_eq!(buddy.allocated_bytes, 0);
+    assert_eq!(buddy.get_free_memory(), 0);
 }
 
 #[test]

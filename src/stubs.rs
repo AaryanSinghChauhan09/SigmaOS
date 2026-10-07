@@ -130,6 +130,9 @@ pub mod vfs_stubs {
         pub fn write(&mut self, _fd: i32, _data: &[u8]) -> Result<usize, FsError> {
             Ok(_data.len())
         }
+        pub fn write_file(&mut self, fd: i32, data: &[u8]) -> Result<usize, FsError> {
+            self.write(fd, data)
+        }
         /// Close an open fd
         pub fn close_file(&mut self, _fd: u64) -> Result<(), FsError> {
             Ok(())
@@ -137,6 +140,9 @@ pub mod vfs_stubs {
         /// Read from an open fd into buf
         pub fn read(&mut self, _fd: i32, buf: &mut [u8]) -> Result<usize, FsError> {
             Ok(buf.len())
+        }
+        pub fn read_file(&mut self, fd: i32, buf: &mut [u8]) -> Result<usize, FsError> {
+            self.read(fd, buf)
         }
     }
 

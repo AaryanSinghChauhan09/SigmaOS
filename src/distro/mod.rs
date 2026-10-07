@@ -377,6 +377,7 @@ pub mod sovereign_2060_distro_supremacy_engine;
 pub mod sovereign_linux_bsd_master_synthesis;
 
 pub mod sovereign_media_and_distro_unimplemented_innovations;
+pub use sovereign_media_and_distro_unimplemented_innovations::*;
 
 pub mod sovereign_linux_bsd_pinnacle_innovations_v14;
 pub use sovereign_linux_bsd_pinnacle_innovations_v14::*;

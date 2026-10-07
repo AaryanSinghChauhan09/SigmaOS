@@ -67,6 +67,8 @@ pub use file_monitor::{
 };
 pub mod fscrypt_autofs;
 pub mod sovereign_filesystem_hierarchy;
+pub mod sovereign_link_engine;
+pub use sovereign_link_engine::*;
 pub use btrfs::{
     BtrfsCompression, BtrfsError, BtrfsFilesystem, BtrfsRaidLevel, BtrfsSnapshot, BtrfsStats,
     BtrfsSuperblock,
