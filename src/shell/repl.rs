@@ -426,6 +426,17 @@ impl ShellRepl {
             }
         }
 
+        // 4. Cross-Dialect Universal Shell Transpilation & Execution Dispatch
+        let mut cross_engine = crate::shell::universal_cli_shell_system::UniversalShCrossDialectEngine::new();
+        if let Ok(plan) = cross_engine.run_universal_sh_script(&fully_expanded) {
+            for (k, v) in &plan.exported_variables {
+                self.variables.insert(k.clone(), v.clone());
+            }
+            if !plan.posix_sh_script.is_empty() {
+                fully_expanded = plan.posix_sh_script;
+            }
+        }
+
         let command = self.parse_command(&fully_expanded);
         let result = self.execute_command(command);
 
