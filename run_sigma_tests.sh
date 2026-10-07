@@ -841,6 +841,13 @@ if [ -f "scripts/sovereign_mint_omarchy_v34_pantheon_test.sh" ]; then
     ./scripts/sovereign_mint_omarchy_v34_pantheon_test.sh
 fi
 
+if [ -f "src/installer/migration_installer_pipeline.rs" ]; then
+    echo "Running Migration Installer Pipeline test suite..."
+    mkdir -p build
+    rustc --test src/installer/migration_installer_pipeline.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_installer_pipeline
+    ./build/test_installer_pipeline
+fi
+
 if [ -f "scripts/sovereign_migration_first_benchmarks.sh" ]; then
     echo "Running Sovereign Migration-First Desktop Benchmark Suite..."
     ./scripts/sovereign_migration_first_benchmarks.sh
