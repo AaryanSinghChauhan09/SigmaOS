@@ -44,6 +44,111 @@ impl Default for OmarchyOmakubBootstrapEngine {
     }
 }
 
+/// Walker fuzzy application launcher & D-Bus provider engine (websearch, calc, cliphist, emojis).
+#[derive(Debug, Clone)]
+pub struct OmarchyWalkerLauncherEngine {
+    pub active_modules: Vec<String>,
+    pub theme_name: String,
+    pub placeholder_prompt: String,
+}
+
+impl OmarchyWalkerLauncherEngine {
+    pub fn new() -> Self {
+        Self {
+            active_modules: vec![
+                "desktop_applications".to_string(),
+                "websearch".to_string(),
+                "calculator".to_string(),
+                "clipboard_history".to_string(),
+                "emoji_picker".to_string(),
+            ],
+            theme_name: "tokyonight".to_string(),
+            placeholder_prompt: "Type to launch application or search...".to_string(),
+        }
+    }
+
+    pub fn generate_walker_config_json(&self) -> String {
+        format!(
+            "{{\"theme\": \"{}\", \"placeholder\": \"{}\", \"modules\": [\"{}\"]}}",
+            self.theme_name,
+            self.placeholder_prompt,
+            self.active_modules.join("\", \"")
+        )
+    }
+}
+
+impl Default for OmarchyWalkerLauncherEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Ghostty GPU-accelerated terminal configuration generator engine.
+#[derive(Debug, Clone)]
+pub struct OmarchyGhosttyConfigEngine {
+    pub font_family: String,
+    pub font_size: u32,
+    pub theme_name: String,
+    pub window_padding_x: u32,
+    pub window_padding_y: u32,
+}
+
+impl OmarchyGhosttyConfigEngine {
+    pub fn new() -> Self {
+        Self {
+            font_family: "JetBrainsMono Nerd Font".to_string(),
+            font_size: 13,
+            theme_name: "catppuccin-mocha".to_string(),
+            window_padding_x: 12,
+            window_padding_y: 12,
+        }
+    }
+
+    pub fn generate_ghostty_config(&self) -> String {
+        format!(
+            "font-family = {}\nfont-size = {}\ntheme = {}\nwindow-padding-x = {}\nwindow-padding-y = {}\ncursor-style = block\ncursor-style-blink = false\n",
+            self.font_family, self.font_size, self.theme_name, self.window_padding_x, self.window_padding_y
+        )
+    }
+}
+
+impl Default for OmarchyGhosttyConfigEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Hypridle idle management daemon configuration engine.
+#[derive(Debug, Clone)]
+pub struct OmarchyHypridleEngine {
+    pub lock_timeout_secs: u32,
+    pub dpms_off_timeout_secs: u32,
+    pub suspend_timeout_secs: u32,
+}
+
+impl OmarchyHypridleEngine {
+    pub fn new() -> Self {
+        Self {
+            lock_timeout_secs: 300,       // 5 mins
+            dpms_off_timeout_secs: 600,   // 10 mins
+            suspend_timeout_secs: 1800,   // 30 mins
+        }
+    }
+
+    pub fn generate_hypridle_conf(&self) -> String {
+        format!(
+            "listener {{\n  timeout = {}\n  on-timeout = hyprlock\n}}\nlistener {{\n  timeout = {}\n  on-timeout = hyprctl dispatch dpms off\n  on-resume = hyprctl dispatch dpms on\n}}\nlistener {{\n  timeout = {}\n  on-timeout = systemctl suspend\n}}\n",
+            self.lock_timeout_secs, self.dpms_off_timeout_secs, self.suspend_timeout_secs
+        )
+    }
+}
+
+impl Default for OmarchyHypridleEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Zellij terminal multiplexer session layout & theme manager engine.
 #[derive(Debug, Clone)]
 pub struct OmarchyZellijSessionManager {
@@ -166,6 +271,9 @@ impl Default for OmarchyThunarFileActions {
 #[derive(Debug, Clone)]
 pub struct SovereignOmarchyExpandedParitySuite {
     pub omakub: OmarchyOmakubBootstrapEngine,
+    pub walker: OmarchyWalkerLauncherEngine,
+    pub ghostty: OmarchyGhosttyConfigEngine,
+    pub hypridle: OmarchyHypridleEngine,
     pub zellij: OmarchyZellijSessionManager,
     pub hyprlock: OmarchyHyprlockScreenLocker,
     pub rofi: OmarchyRofiAppLauncher,
@@ -176,6 +284,9 @@ impl SovereignOmarchyExpandedParitySuite {
     pub fn new() -> Self {
         Self {
             omakub: OmarchyOmakubBootstrapEngine::new(),
+            walker: OmarchyWalkerLauncherEngine::new(),
+            ghostty: OmarchyGhosttyConfigEngine::new(),
+            hypridle: OmarchyHypridleEngine::new(),
             zellij: OmarchyZellijSessionManager::new(),
             hyprlock: OmarchyHyprlockScreenLocker::new(),
             rofi: OmarchyRofiAppLauncher::new(),
@@ -185,6 +296,9 @@ impl SovereignOmarchyExpandedParitySuite {
 
     pub fn verify_suite(&self) -> bool {
         self.omakub.is_app_installed("Ghostty")
+            && self.walker.generate_walker_config_json().contains("desktop_applications")
+            && self.ghostty.generate_ghostty_config().contains("theme = catppuccin-mocha")
+            && self.hypridle.generate_hypridle_conf().contains("hyprlock")
             && self.zellij.generate_kdl_layout().contains("compact")
             && self
                 .hyprlock
@@ -214,6 +328,9 @@ mod tests {
         let suite = SovereignOmarchyExpandedParitySuite::new();
         assert!(suite.verify_suite());
         assert!(suite.omakub.is_app_installed("Neovim"));
+        assert!(suite.walker.generate_walker_config_json().contains("calculator"));
+        assert!(suite.ghostty.generate_ghostty_config().contains("JetBrainsMono"));
+        assert!(suite.hypridle.generate_hypridle_conf().contains("dpms off"));
         assert!(suite.zellij.generate_kdl_layout().contains("tab-bar"));
         assert!(suite.hyprlock.generate_hyprlock_conf().contains("hyprlock"));
     }
