@@ -136,6 +136,7 @@ pub use distro::sovereign_linux_bsd_ecosystem_advancements_v22::*;
 pub use distro::sovereign_architecture_development_decision_plan::*;
 pub use distro::omarchy_linux_gap_closure_pr_suite::*;
 pub use distro::sovereign_open_source_os_gap_closure_v27::*;
+pub use distro::sovereign_universal_subsystem_interop::*;
 pub use distro::sovereign_media_and_distro_unimplemented_innovations::*;
 pub use distro::omarchy_omakase_ultimate_parity::*;
 pub use distro::tech_media_publication_innovations::*;

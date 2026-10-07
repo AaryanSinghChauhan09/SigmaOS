@@ -709,6 +709,8 @@ if command -v node >/dev/null 2>&1; then
     node tests/test_installer_preview.js
 else
     echo "Skipping desktop UI tests (Node.js is not installed)."
+fi
+
 if [ -f "src/distro/sovereign_linux_bsd_ecosystem_advancements_v22.rs" ]; then
     echo "Running Sovereign Linux & BSD Ecosystem Advancements V22 & PR Gateway test suite..."
     mkdir -p build
@@ -742,6 +744,13 @@ if [ -f "src/distro/sovereign_open_source_os_gap_closure_v27.rs" ]; then
     mkdir -p build
     rustc --test src/distro/sovereign_open_source_os_gap_closure_v27.rs --edition=2021 -o build/test_open_source_v27
     ./build/test_open_source_v27
+fi
+
+if [ -f "src/distro/sovereign_universal_subsystem_interop.rs" ]; then
+    echo "Running Sovereign Universal Subsystem Interoperability test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_universal_subsystem_interop.rs --edition=2021 -o build/universal_subsystem_interop_test
+    ./build/universal_subsystem_interop_test
 fi
 
 echo "All SigmaOS test suites completed."
