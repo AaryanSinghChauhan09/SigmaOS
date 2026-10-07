@@ -325,7 +325,9 @@ pub fn sanitize_for_log(input: &[u8], out: &mut [u8]) -> usize {
 
 // ── Command / shell ────────────────────────────────────────────────────────
 
-/// Validate a shell command string: length-bounded, no NUL bytes.
+/// Validate a shell command string: length-bounded, no NUL bytes or harmful control characters.
+/// Rejects non-whitespace ASCII control characters (`b < 32` except `\t`, `\n`, `\r`) and DEL (`127`)
+/// to prevent ANSI escape sequence hijacking (CWE-150) and terminal injection attacks.
 /// Does NOT attempt to parse shell syntax — callers should use allowlists.
 pub fn validate_command(cmd: &[u8]) -> Result<(), ValidationError> {
     if cmd.is_empty() {
@@ -337,6 +339,9 @@ pub fn validate_command(cmd: &[u8]) -> Result<(), ValidationError> {
     for &b in cmd {
         if b == 0 {
             return Err(ValidationError::NullByte);
+        }
+        if (b < 32 && b != b'\t' && b != b'\n' && b != b'\r') || b == 127 {
+            return Err(ValidationError::InvalidChars);
         }
     }
     Ok(())
@@ -819,6 +824,25 @@ mod tests {
         assert!(validate_port(65535).is_ok());
         assert!(validate_port(0).is_err());
         assert!(validate_port(65536).is_err());
+    }
+
+    #[test]
+    fn test_validate_command() {
+        assert_eq!(validate_command(b"ls -la /tmp"), Ok(()));
+        assert_eq!(validate_command(b"echo \"hello\nworld\""), Ok(()));
+        assert_eq!(validate_command(b"cat file.txt\r\n"), Ok(()));
+        assert_eq!(validate_command(b"printf 'a\tb'"), Ok(()));
+
+        assert_eq!(validate_command(b""), Err(ValidationError::EmptyInput));
+        assert_eq!(validate_command(&[b'a', 0, b'b']), Err(ValidationError::NullByte));
+
+        // ASCII control character injection prevention (prevents ANSI escape hijacking and terminal injection)
+        assert_eq!(validate_command(b"echo \x1b[31mred\x1b[0m"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_command(b"ls \x07"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_command(b"rm \x7f"), Err(ValidationError::InvalidChars));
+
+        let long_cmd = vec![b'a'; MAX_COMMAND_LEN + 1];
+        assert_eq!(validate_command(&long_cmd), Err(ValidationError::TooLong));
     }
 
     #[test]
