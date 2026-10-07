@@ -848,9 +848,21 @@ if [ -f "src/installer/migration_installer_pipeline.rs" ]; then
     ./build/test_installer_pipeline
 fi
 
+if [ -f "src/compatibility/mint_omarchy_migration_bridge.rs" ]; then
+    echo "Running Mint & Omarchy Migration Bridge test suite..."
+    mkdir -p build
+    rustc --test src/compatibility/mint_omarchy_migration_bridge.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_migration_bridge
+    ./build/test_migration_bridge
+fi
+
 if [ -f "scripts/sovereign_migration_first_benchmarks.sh" ]; then
     echo "Running Sovereign Migration-First Desktop Benchmark Suite..."
     ./scripts/sovereign_migration_first_benchmarks.sh
+fi
+
+if [ -f "scripts/release_gate_mint_omarchy_migration.sh" ]; then
+    echo "Running Automated Release Validation Gate (Mint & Omarchy)..."
+    ./scripts/release_gate_mint_omarchy_migration.sh
 fi
 
 echo "All SigmaOS test suites completed."

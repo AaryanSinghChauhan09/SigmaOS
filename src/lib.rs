@@ -196,6 +196,7 @@ pub use compatibility::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
     ContainerRuntime, TargetPlatform, TranslationLayer,
 };
+pub use compatibility::mint_omarchy_migration_bridge::*;
 pub use container::{
     ContainerError, ContainerID, ContainerInfo, ContainerRuntime as CoreContainerRuntime,
     ContainerState, RuntimeCapability, RuntimeStats, SimpleContainer, SimpleContainerRuntime,
