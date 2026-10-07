@@ -142,6 +142,7 @@ pub use distro::sovereign_linux_bsd_ecosystem_advancements_v29::*;
 pub use distro::sovereign_mint_omarchy_apex_dominance_v30::*;
 pub use distro::sovereign_mint_omarchy_innovations_v31::*;
 pub use distro::sovereign_mint_omarchy_v32_apex_arsenal::*;
+pub use distro::sovereign_mint_omarchy_v33_apex_vanguard::*;
 pub use distro::sovereign_media_and_distro_unimplemented_innovations::*;
 pub use distro::omarchy_omakase_ultimate_parity::*;
 pub use distro::tech_media_publication_innovations::*;

@@ -444,6 +444,9 @@ pub use sovereign_mint_omarchy_innovations_v31::*;
 pub mod sovereign_mint_omarchy_v32_apex_arsenal;
 pub use sovereign_mint_omarchy_v32_apex_arsenal::*;
 
+pub mod sovereign_mint_omarchy_v33_apex_vanguard;
+pub use sovereign_mint_omarchy_v33_apex_vanguard::*;
+
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;
 pub use crate::stubs::large_distro_stubs::*;
