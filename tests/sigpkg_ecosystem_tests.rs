@@ -366,14 +366,14 @@ fn test_pillar23_universal_scriptlet_and_capability_mapping() {
 
     let scriptlet_conv = UniversalScriptletConverter::new();
     let hook = scriptlet_conv
-        .convert_scriptlet(PackageFormat::Apt, "postinst", "echo post")
+        .convert_scriptlet(sigmaos::sigpkg::PackageFormat::Apt, "postinst", "echo post")
         .unwrap();
     assert_eq!(hook.hook_type, SigmaPkgHookType::PostInstall);
 
     let simulator = UniversalDryRunSimulator::new();
     let result = simulator
         .simulate_install(
-            PackageFormat::Apt,
+            sigmaos::sigpkg::PackageFormat::Apt,
             b"Package: curl\nVersion: 8.2.1\nDepends: libssl-dev, libc6\n",
         )
         .unwrap();
