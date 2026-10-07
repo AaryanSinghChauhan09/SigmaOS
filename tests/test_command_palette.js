@@ -162,4 +162,17 @@ assert.strictEqual(global.document.activeElement, dockBtn, "Expected focus to be
 
 console.log("✓ Window minimization, dock app toggling, and focus restoration verified successfully!");
 
+// Test 9: Dock icon ARIA pressed state and visual indicator updates
+dockBtn.setAttribute("data-tooltip", "OmniShell Terminal (Alt+T)");
+zenith.launchApp("OmniShell");
+assert.strictEqual(dockBtn.getAttribute("aria-pressed"), "true", "Expected dock button aria-pressed='true' when app window is open");
+assert.strictEqual(dockBtn.classList.contains("app-open"), true, "Expected dock button to have .app-open class when open");
+assert.strictEqual(dockBtn.classList.contains("app-active"), true, "Expected dock button to have .app-active class when focused");
+
+zenith.closeWindow("terminal-win");
+assert.strictEqual(dockBtn.getAttribute("aria-pressed"), "false", "Expected dock button aria-pressed='false' when app window is closed");
+assert.strictEqual(dockBtn.classList.contains("app-open"), false, "Expected dock button .app-open removed when closed");
+assert.strictEqual(dockBtn.classList.contains("app-active"), false, "Expected dock button .app-active removed when closed");
+console.log("✓ Dynamic dock icon ARIA pressed and app state indicators verified successfully!");
+
 console.log("All Command Palette & Desktop UX tests passed successfully!");

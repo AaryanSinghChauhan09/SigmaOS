@@ -257,6 +257,21 @@ body {
     transform: translateX(-50%) translateY(0);
 }
 
+.dock-icon.app-open::before {
+    content: "";
+    position: absolute;
+    bottom: -6px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--text-muted);
+}
+
+.dock-icon.app-active::before {
+    background: var(--accent-gold);
+    box-shadow: 0 0 8px var(--accent-gold);
+}
+
 /* Glassmorphism Drag Windows */
 .window {
     position: absolute;
