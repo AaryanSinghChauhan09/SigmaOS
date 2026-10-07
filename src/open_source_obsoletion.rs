@@ -17,7 +17,11 @@ use std::vec::Vec;
 #[path = "open_source_os_gap_closure.rs"]
 pub mod open_source_os_gap_closure;
 
+#[path = "open_source_os_pinnacle_gap_closure.rs"]
+pub mod open_source_os_pinnacle_gap_closure;
+
 use open_source_os_gap_closure::OpenSourceProjectSupremacySuite;
+pub use open_source_os_pinnacle_gap_closure::*;
 
 // =========================================================================
 // 1. SOVEREIGN VCS ENGINE (Superseding Git, GitHub CLI, Mercurial)
@@ -4643,6 +4647,7 @@ pub struct SovereignOpenSourceObsoletionOrchestrator {
     pub supabase_postgrest: SovereignSupabasePostgrestEngine,
     pub suricata_ids: SovereignSuricataIdsRulesEngine,
     pub caddy_tls: SovereignCaddyAutomaticTlsEngine,
+    pub os_pr_proposals: SovereignOpenSourceOsPrProposalEngine,
     pub total_obsoleted_projects_count: u32,
 }
 
@@ -4767,6 +4772,7 @@ impl SovereignOpenSourceObsoletionOrchestrator {
             supabase_postgrest: SovereignSupabasePostgrestEngine::new(),
             suricata_ids: SovereignSuricataIdsRulesEngine::new(),
             caddy_tls: SovereignCaddyAutomaticTlsEngine::new(),
+            os_pr_proposals: SovereignOpenSourceOsPrProposalEngine::new(),
             total_obsoleted_projects_count: 110,
         }
     }
