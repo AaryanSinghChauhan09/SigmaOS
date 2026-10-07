@@ -788,6 +788,13 @@ if [ -f "src/distro/sovereign_mint_omarchy_innovations_v31.rs" ]; then
     ./build/test_innovations_v31
 fi
 
+if [ -f "src/distro/sovereign_mint_omarchy_v32_apex_arsenal.rs" ]; then
+    echo "Running Sovereign Linux Mint & Omarchy Apex Arsenal Suite V32 test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_mint_omarchy_v32_apex_arsenal.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_apex_arsenal_v32
+    ./build/test_apex_arsenal_v32
+fi
+
 if [ -f "scripts/sovereign_mint_omarchy_supremacy_test.sh" ]; then
     echo "Running Sovereign Mint & Omarchy Supremacy Benchmark Suite..."
     ./scripts/sovereign_mint_omarchy_supremacy_test.sh
@@ -796,6 +803,11 @@ fi
 if [ -f "scripts/sovereign_mint_omarchy_v31_innovations_test.sh" ]; then
     echo "Running Sovereign Mint & Omarchy V31 Innovations Benchmark Suite..."
     ./scripts/sovereign_mint_omarchy_v31_innovations_test.sh
+fi
+
+if [ -f "scripts/sovereign_mint_omarchy_v32_arsenal_test.sh" ]; then
+    echo "Running Sovereign Mint & Omarchy V32 Arsenal Benchmark Suite..."
+    ./scripts/sovereign_mint_omarchy_v32_arsenal_test.sh
 fi
 
 echo "All SigmaOS test suites completed."
