@@ -11,6 +11,40 @@ use std::string::{String, ToString};
 use std::vec::Vec;
 
 // ============================================================================
+// Zero-Allocation ASCII Search Helpers
+// ============================================================================
+
+/// Zero-allocation case-insensitive substring search helper.
+/// Checks whether `haystack` contains `needle`, ignoring ASCII case, without allocating heap Strings.
+fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
+    if needle.is_empty() {
+        return true;
+    }
+    if haystack.len() < needle.len() {
+        return false;
+    }
+    if haystack.is_ascii() && needle.is_ascii() {
+        let needle_bytes = needle.as_bytes();
+        haystack.as_bytes().windows(needle_bytes.len()).any(|window| {
+            window.iter().zip(needle_bytes.iter()).all(|(&b1, &b2)| {
+                b1.to_ascii_lowercase() == b2.to_ascii_lowercase()
+            })
+        })
+    } else {
+        haystack.to_lowercase().contains(&needle.to_lowercase())
+    }
+}
+
+/// Zero-allocation case-insensitive string equality helper.
+fn eq_ignore_case(s1: &str, s2: &str) -> bool {
+    if s1.is_ascii() && s2.is_ascii() {
+        s1.eq_ignore_ascii_case(s2)
+    } else {
+        s1.to_lowercase() == s2.to_lowercase()
+    }
+}
+
+// ============================================================================
 // 1. Linux & Open Source Press Feed Aggregator (28 Media Outlets)
 // ============================================================================
 
@@ -341,22 +375,24 @@ impl LinuxPressFeedEngine {
     }
 
     pub fn search_articles(&self, query: &str) -> Vec<TechMediaArticleFeed> {
-        let q_lower = query.to_lowercase();
+        // Bolt Optimization: Zero-allocation case-insensitive substring search helper avoids
+        // allocating heap String instances via `to_lowercase()` for article titles and categories.
         self.articles
             .iter()
             .filter(|a| {
-                a.title.to_lowercase().contains(&q_lower)
-                    || a.category.to_lowercase().contains(&q_lower)
+                contains_ignore_case(&a.title, query)
+                    || contains_ignore_case(&a.category, query)
             })
             .cloned()
             .collect()
     }
 
     pub fn filter_by_tag(&self, tag: &str) -> Vec<TechMediaArticleFeed> {
-        let tag_lower = tag.to_lowercase();
+        // Bolt Optimization: Zero-allocation case-insensitive string equality helper avoids
+        // allocating heap String instances via `to_lowercase()` for tags.
         self.articles
             .iter()
-            .filter(|a| a.tags.iter().any(|t| t.to_lowercase() == tag_lower))
+            .filter(|a| a.tags.iter().any(|t| eq_ignore_case(t, tag)))
             .cloned()
             .collect()
     }
@@ -1607,6 +1643,11 @@ mod tests {
             timestamp_epoch: 1730000400,
             tags: vec!["hardware".to_string(), "benchmarks".to_string()],
         });
+
+        // Case-insensitive zero-allocation search and tag filtering verification
+        assert!(!engine.search_articles("kernel").is_empty());
+        assert!(!engine.search_articles("KERNEL").is_empty());
+        assert!(!engine.filter_by_tag("HARDWARE").is_empty());
 
         let news = engine.get_latest_news();
         assert_eq!(news[0].portal, "Appuals");
