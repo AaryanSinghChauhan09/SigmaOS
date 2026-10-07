@@ -688,12 +688,10 @@ impl CommandRegistry for SimpleCommandRegistry {
     fn unregister(&mut self, name: &[u8]) -> Result<(), CommandError> {
         let name_len = name.iter().position(|&b| b == 0).unwrap_or(name.len());
         let name_slice = &name[..name_len];
-        for i in 0..self.commands.len() {
-            if let Some(Some(ref cmd)) = self.commands.get(i) {
+        for slot in self.commands.iter_mut() {
+            if let Some(ref cmd) = *slot {
                 if cmd.name() == name_slice {
-                    if let Some(slot) = self.commands.get_mut(i) {
-                        *slot = None;
-                    }
+                    *slot = None;
                     return Ok(());
                 }
             }
@@ -704,14 +702,11 @@ impl CommandRegistry for SimpleCommandRegistry {
     fn get(&self, name: &[u8]) -> Option<&dyn ShellCommand> {
         let name_len = name.iter().position(|&b| b == 0).unwrap_or(name.len());
         let name_slice = &name[..name_len];
-        for i in 0..self.commands.len() {
-            if let Some(Some(ref command)) = self.commands.get(i) {
-                if command.name() == name_slice {
-                    return Some(command.as_ref());
-                }
-            }
-        }
-        None
+        self.commands
+            .iter()
+            .filter_map(|cmd_opt| cmd_opt.as_ref())
+            .find(|cmd| cmd.name() == name_slice)
+            .map(|cmd| cmd.as_ref())
     }
 
     fn list(&self) -> ShellVec<&[u8]> {
@@ -778,25 +773,51 @@ impl ShellSession for SimpleShellSession {
     fn set_environment(&mut self, key: &[u8], value: &[u8]) {
         let mut key_array = [0u8; 64];
         let mut value_array = [0u8; 128];
-        let key_len = key.len().min(63);
-        let value_len = value.len().min(127);
-        for i in 0..key_len {
-            key_array[i] = key[i];
+        let key_len = key
+            .iter()
+            .position(|&b| b == 0)
+            .unwrap_or(key.len())
+            .min(63);
+        let value_len = value
+            .iter()
+            .position(|&b| b == 0)
+            .unwrap_or(value.len())
+            .min(127);
+
+        key_array[..key_len].copy_from_slice(&key[..key_len]);
+        value_array[..value_len].copy_from_slice(&value[..value_len]);
+
+        let target_key = &key[..key_len];
+
+        // Bolt ⚡ Performance Optimization: Check if variable already exists and update in-place,
+        // preventing duplicate environment variable accumulation over long shell sessions.
+        for (existing_key, existing_val) in self.environment.iter_mut() {
+            if existing_key.starts_with(target_key)
+                && existing_key.get(key_len).map_or(true, |&b| b == 0)
+            {
+                *existing_val = value_array;
+                return;
+            }
         }
-        for i in 0..value_len {
-            value_array[i] = value[i];
-        }
+
         self.environment.push((key_array, value_array));
     }
 
     fn get_environment(&self, key: &[u8]) -> Option<&[u8]> {
-        for i in 0..self.environment.len() {
-            if let Some(&(ref k, ref v)) = self.environment.get(i) {
-                let len = k.iter().position(|&b| b == 0).unwrap_or(64);
-                if &k[..len] == key {
-                    let vlen = v.iter().position(|&b| b == 0).unwrap_or(128);
-                    return Some(&v[..vlen]);
-                }
+        // Bolt ⚡ Performance Optimization: Hoist requested key length calculation outside
+        // the environment variable scan loop and perform prefix comparison with zero-byte boundary checks,
+        // eliminating repetitive O(N) zero-byte linear scans (.position(|&b| b == 0)) on every candidate key.
+        let key_len = key
+            .iter()
+            .position(|&b| b == 0)
+            .unwrap_or(key.len())
+            .min(63);
+        let target_key = &key[..key_len];
+
+        for (k, v) in &self.environment {
+            if k.starts_with(target_key) && k.get(key_len).map_or(true, |&b| b == 0) {
+                let vlen = v.iter().position(|&b| b == 0).unwrap_or(128);
+                return Some(&v[..vlen]);
             }
         }
         None
@@ -1064,5 +1085,35 @@ mod tests {
 
         let popd_out = session.execute_line(b"popd").unwrap();
         assert!(popd_out.starts_with(b"popd"));
+    }
+
+    #[test]
+    fn test_environment_variables_set_update_get() {
+        let mut session = SimpleShellSession::new();
+
+        // Check non-existent key
+        assert!(session.get_environment(b"PATH").is_none());
+
+        // Set initial environment variable
+        session.set_environment(b"PATH", b"/usr/bin:/bin");
+        assert_eq!(session.get_environment(b"PATH").unwrap(), b"/usr/bin:/bin");
+
+        // Verify partial name does not match
+        assert!(session.get_environment(b"PAT").is_none());
+        assert!(session.get_environment(b"PATH_EXTRA").is_none());
+
+        // Update existing variable in-place
+        session.set_environment(b"PATH", b"/usr/local/bin:/usr/bin:/bin");
+        assert_eq!(
+            session.get_environment(b"PATH").unwrap(),
+            b"/usr/local/bin:/usr/bin:/bin"
+        );
+        // Ensure no duplicate key accumulation
+        assert_eq!(session.environment.len(), 1);
+
+        // Set second variable
+        session.set_environment(b"EDITOR", b"nvim");
+        assert_eq!(session.get_environment(b"EDITOR").unwrap(), b"nvim");
+        assert_eq!(session.environment.len(), 2);
     }
 }
