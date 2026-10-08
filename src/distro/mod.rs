@@ -394,6 +394,9 @@ pub use sovereign_2080_distro_supremacy_engine::*;
 pub mod sovereign_2085_distro_supremacy_engine;
 pub use sovereign_2085_distro_supremacy_engine::*;
 
+pub mod sovereign_2090_distro_supremacy_engine;
+pub use sovereign_2090_distro_supremacy_engine::*;
+
 pub mod sovereign_mint_omarchy_supremacy_suite;
 pub use sovereign_mint_omarchy_supremacy_suite::*;
 
