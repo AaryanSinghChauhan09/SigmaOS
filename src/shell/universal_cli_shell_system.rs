@@ -351,6 +351,18 @@ impl UniversalShellScriptTranspiler {
         if l.starts_with("or ") {
             return format!("|| {}", &l[3..]);
         }
+        if l.starts_with("abbr -a ") || l.starts_with("abbr ") {
+            let rest = l.trim_start_matches("abbr -a ").trim_start_matches("abbr ").trim();
+            if let Some(space) = rest.find(' ') {
+                let name = rest[..space].trim();
+                let cmd = rest[space + 1..].trim().trim_matches('\'').trim_matches('"');
+                return format!("alias {}='{}'", name, cmd);
+            }
+        }
+        if l.starts_with("string length ") {
+            let arg = l.trim_start_matches("string length ").trim();
+            return format!("echo ${{#\"{}\"}}", arg);
+        }
         l
     }
 
@@ -403,6 +415,20 @@ impl UniversalShellScriptTranspiler {
         if l == "end" || l == "endsw" {
             return "done".to_string();
         }
+        if l.starts_with("alias ") {
+            let rest = l.trim_start_matches("alias ").trim();
+            let parts: Vec<&str> = rest.split_whitespace().collect();
+            if parts.len() >= 2 {
+                let name = parts[0];
+                let cmd = parts[1..].join(" ").trim_matches('\'').trim_matches('"').to_string();
+                return format!("alias {}='{}'", name, cmd);
+            }
+        }
+        if l.starts_with("set prompt = ") {
+            let prompt_str = l.trim_start_matches("set prompt = ").trim().trim_matches('"').trim_matches('\'');
+            vars.insert("PS1".to_string(), prompt_str.to_string());
+            return format!("export PS1=\"{}\"", prompt_str);
+        }
         l
     }
 
@@ -427,6 +453,10 @@ impl UniversalShellScriptTranspiler {
         }
         if l.starts_with("coproc ") {
             return format!("{} &", l.trim_start_matches("coproc ").trim());
+        }
+        if l.starts_with("let ") {
+            let expr = l.trim_start_matches("let ").trim().trim_matches('"').trim_matches('\'');
+            return format!(": $(( {} ))", expr);
         }
         l
     }
@@ -462,6 +492,14 @@ impl UniversalShellScriptTranspiler {
                     .trim_start_matches("Write-Host")
                     .trim()
             );
+        }
+        if l.starts_with("Get-Service") {
+            return l.replace("Get-Service", "systemctl status");
+        }
+        if l.starts_with("New-Item ") {
+            return l.replace("New-Item -ItemType Directory -Path", "mkdir -p")
+                    .replace("New-Item -Path", "touch")
+                    .replace("New-Item", "touch");
         }
         l
     }
@@ -591,6 +629,17 @@ impl UniversalShellScriptTranspiler {
         if l.contains("${(L)") {
             l = l.replace("${(L)", "${");
         }
+        if l.starts_with("autoload ") || l.starts_with("zmodload ") || l.starts_with("compdef ") {
+            return format!("# zsh builtin stub: {}", l);
+        }
+        if l.starts_with("alias -s ") {
+            let rest = l.trim_start_matches("alias -s ").trim();
+            if let Some(eq) = rest.find('=') {
+                let ext = rest[..eq].trim();
+                let app = rest[eq + 1..].trim();
+                return format!("# zsh suffix alias stub: .{} -> {}", ext, app);
+            }
+        }
         if l.starts_with("export ") {
             if let Some(eq) = l.find('=') {
                 let k = l[7..eq].trim();
@@ -605,6 +654,10 @@ impl UniversalShellScriptTranspiler {
         let mut l = line.to_string();
         if l.contains("[[") && l.contains("]]") {
             l = l.replace("[[", "[").replace("]]", "]");
+        }
+        if l.contains("<(") && l.contains(')') {
+            // Process substitution <(cmd) conversion stub into POSIX FIFO
+            l = l.replace("<(", "$( ").replace(")", " )");
         }
         if l.starts_with("export ") {
             if let Some(eq) = l.find('=') {
@@ -728,7 +781,41 @@ impl UniversalCliOptionTranslator {
             };
         }
 
-        // 2. PowerShell Cmdlet Translations
+        // 2. BSD & GNU CLI Option Translations (free, vmstat, ss/netstat, ip/ifconfig, df, du)
+        if cmd == "free" && args.get(0) == Some(&"-m") {
+            return TranslatedCliOptionCommand {
+                original_command: trimmed.to_string(),
+                canonical_command: "free".to_string(),
+                detected_style: OptionStyle::GnuLong,
+                translated_args: vec!["-m".to_string()],
+            };
+        }
+        if cmd == "ifconfig" && (args.is_empty() || args.get(0) == Some(&"-a")) {
+            return TranslatedCliOptionCommand {
+                original_command: trimmed.to_string(),
+                canonical_command: "ip".to_string(),
+                detected_style: OptionStyle::BsdShortCombined,
+                translated_args: vec!["addr".to_string(), "show".to_string()],
+            };
+        }
+        if cmd == "netstat" && args.get(0) == Some(&"-tulpn") {
+            return TranslatedCliOptionCommand {
+                original_command: trimmed.to_string(),
+                canonical_command: "ss".to_string(),
+                detected_style: OptionStyle::GnuLong,
+                translated_args: vec!["-tulpn".to_string()],
+            };
+        }
+        if cmd == "du" && args.get(0) == Some(&"-hd") && args.get(1) == Some(&"1") {
+            return TranslatedCliOptionCommand {
+                original_command: trimmed.to_string(),
+                canonical_command: "du".to_string(),
+                detected_style: OptionStyle::BsdShortCombined,
+                translated_args: vec!["-h".to_string(), "--max-depth=1".to_string()],
+            };
+        }
+
+        // 3. PowerShell Cmdlet Translations
         if cmd == "Get-Process" {
             return TranslatedCliOptionCommand {
                 original_command: trimmed.to_string(),
@@ -745,8 +832,16 @@ impl UniversalCliOptionTranslator {
                 translated_args: args.iter().map(|s| s.to_string()).collect(),
             };
         }
+        if cmd == "Get-Service" {
+            return TranslatedCliOptionCommand {
+                original_command: trimmed.to_string(),
+                canonical_command: "systemctl".to_string(),
+                detected_style: OptionStyle::PowerShellCmdlet,
+                translated_args: vec!["status".to_string()],
+            };
+        }
 
-        // 3. Nushell Query Translations
+        // 4. Nushell Query Translations
         if trimmed.contains("where size >") {
             return TranslatedCliOptionCommand {
                 original_command: trimmed.to_string(),

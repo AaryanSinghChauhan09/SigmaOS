@@ -3003,10 +3003,24 @@ mod tests {
             Some(&"direct://".to_string())
         );
 
+        assert_eq!(
+            audit.get("ungoogled_host_ip_masked"),
+            Some(&"127.0.0.1".to_string())
+        );
+        assert_eq!(
+            audit.get("brave_scriptlet_generated"),
+            Some(&"true".to_string())
+        );
+        assert_eq!(
+            audit.get("chromium_partition_alloc_valid"),
+            Some(&"true".to_string())
+        );
+
         let report = suite.generate_open_source_browser_audit_report("https://example.com/index.html");
         assert!(report.contains("Sovereign SigmaWeb Open-Source Browser Suite Audit Report"));
         assert!(report.contains("thorium_simd_speedup_nodes"));
         assert!(report.contains("orion_webext_polyfill"));
+        assert!(report.contains("ungoogled_host_ip_masked"));
     }
 }
 
@@ -3145,6 +3159,55 @@ impl SovereignOpenSourceBrowserSuiteEngine {
 
         let orion_poly = self.browser.orion_ext_compat.polyfill_browser_action("storage");
         results.insert("orion_webext_polyfill".to_string(), orion_poly);
+
+        let priv_check = self.run_open_source_privacy_hardening_check(target_url);
+        for (k, v) in priv_check {
+            results.insert(k, v);
+        }
+
+        let layout_check = self.run_open_source_layout_and_jit_audit();
+        for (k, v) in layout_check {
+            results.insert(k, v);
+        }
+
+        results
+    }
+
+    /// Evaluates strict open-source privacy hardening features across LibreWolf, Brave, Tor, and Mullvad
+    pub fn run_open_source_privacy_hardening_check(
+        &mut self,
+        target_url: &str,
+    ) -> BTreeMap<String, String> {
+        let mut results = BTreeMap::new();
+        let deamp = self.browser.brave_deamp.unwrap_amp_url(target_url);
+        results.insert("brave_deamp_unwrapped_url".to_string(), deamp);
+
+        let ungoogled_ip = self.browser.ungoogled_host_ip.sanitize_host_address("192.168.0.5");
+        results.insert("ungoogled_host_ip_masked".to_string(), ungoogled_ip);
+
+        let scriptlet = self.browser.brave_scriptlets.generate_injection_code("defuse-adblock");
+        results.insert("brave_scriptlet_generated".to_string(), (!scriptlet.is_empty()).to_string());
+
+        let obfs4_framed = self.browser.tor_obfs4.obfuscate_packet_payload(b"hello_tor");
+        results.insert("tor_obfs4_framed_len".to_string(), obfs4_framed.len().to_string());
+
+        results
+    }
+
+    /// Evaluates open-source browser layout engine and JIT memory sandbox safety
+    pub fn run_open_source_layout_and_jit_audit(&mut self) -> BTreeMap<String, String> {
+        let mut results = BTreeMap::new();
+        let alloc_valid = self.browser.partition_alloc_guard.verify_pointer_tag(0x7fff_0000_1000);
+        results.insert("chromium_partition_alloc_valid".to_string(), alloc_valid.to_string());
+
+        let floorp_pane = self.browser.floorp_split_mgr.switch_active_pane();
+        results.insert("floorp_active_pane_index".to_string(), floorp_pane.to_string());
+
+        let vivaldi_nav = self.browser.vivaldi_spatial_vec.calculate_2d_distance(0.0, 0.0, 10.0, 20.0);
+        results.insert("vivaldi_spatial_nav_distance".to_string(), format!("{:.2}", vivaldi_nav));
+
+        let boost_count = self.browser.arc_boost_styling.active_boosts.len();
+        results.insert("arc_boost_active_count".to_string(), boost_count.to_string());
 
         results
     }
