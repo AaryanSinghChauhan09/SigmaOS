@@ -5,6 +5,9 @@
 // - LCG Pseudo-Random Draw Engine
 // - Consensus-Based Process Audit Ledger (Cryptographic Chained Blocks)
 
+#[path = "../src/kernel/architecture.rs"]
+mod architecture;
+
 #[path = "../src/kernel/structures.rs"]
 mod structures;
 

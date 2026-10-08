@@ -4,7 +4,7 @@
 use core::cell::{Cell, RefCell};
 use core::sync::atomic::AtomicBool;
 
-use crate::kernel::architecture::CpuArchitectureClass;
+use super::architecture::CpuArchitectureClass;
 use std::boxed::Box;
 use std::vec::Vec;
 
