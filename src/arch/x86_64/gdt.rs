@@ -141,6 +141,7 @@ impl GlobalDescriptorTableManager {
     }
 
     /// Initialize GDT and TSS
+    #[cfg(not(test))]
     pub fn init(&mut self) {
         // Load GDT using lgdt instruction
         let gdt_ptr = GdtDescriptor {
@@ -175,6 +176,12 @@ impl GlobalDescriptorTableManager {
             );
         }
 
+        self.is_loaded = true;
+    }
+
+    /// Initialize GDT and TSS (test mode - no assembly)
+    #[cfg(test)]
+    pub fn init(&mut self) {
         self.is_loaded = true;
     }
 

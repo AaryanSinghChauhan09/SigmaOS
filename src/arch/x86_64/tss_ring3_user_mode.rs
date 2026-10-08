@@ -132,6 +132,7 @@ impl UserModeContext {
 
     /// Transition to Ring 3 user mode using iretq
     /// This is unsafe and must be called with proper memory mapping
+    #[cfg(not(test))]
     pub unsafe fn transition_to_ring3_iretq(&mut self) -> Result<(), &'static str> {
         if self.is_transitioned {
             return Err("Already transitioned to Ring 3");
@@ -156,6 +157,20 @@ impl UserModeContext {
             options(nostack)
         );
         
+        self.is_transitioned = true;
+        Ok(())
+    }
+
+    /// Transition to Ring 3 user mode using iretq (test mode - no assembly)
+    #[cfg(test)]
+    pub unsafe fn transition_to_ring3_iretq(&mut self) -> Result<(), &'static str> {
+        if self.is_transitioned {
+            return Err("Already transitioned to Ring 3");
+        }
+
+        let _iframe = self.prepare_interrupt_frame();
+        
+        // In test mode, just mark as transitioned
         self.is_transitioned = true;
         Ok(())
     }
