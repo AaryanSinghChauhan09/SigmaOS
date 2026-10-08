@@ -57,7 +57,7 @@ pub struct SovereignThousandsDistroComponentsEngine {
 
 impl SovereignThousandsDistroComponentsEngine {
     pub fn new() -> Self {
-        let mut components = Vec::with_capacity(1050);
+        let mut components = Vec::with_capacity(10050);
         components.push(DistroComponentItem {
             id: 1,
             name: String::from("Core eBPF Sched_Ext Governor (Linux Generic)"),
@@ -40559,6 +40559,137 @@ impl SovereignThousandsDistroComponentsEngine {
             execution_count: 0,
         });
 
+        let distros = [
+            "Arch Linux", "Debian GNU/Linux", "Ubuntu Linux", "Fedora Linux", "openSUSE Tumbleweed",
+            "Gentoo Linux", "NixOS", "Void Linux", "Alpine Linux", "FreeBSD",
+            "OpenBSD", "NetBSD", "DragonFly BSD", "Solaris / Illumos", "CachyOS",
+            "Pop!_OS", "Linux Mint", "Manjaro", "Garuda Linux", "EndeavourOS",
+            "Clear Linux", "Tails", "Kali Linux", "Whonix", "Bedrock Linux",
+            "Solus / Serpent OS", "Alpine Edge", "Chimera Linux", "Slackware", "Rocky Linux",
+            "AlmaLinux", "Nobara Linux", "Vanilla OS", "RHEL", "Artix Linux",
+            "Guix System", "Mageia", "PCLinuxOS", "Void Musl", "KaOS",
+            "Puppy Linux", "Slax", "Devuan", "Zorin OS", "Elementary OS",
+            "MX Linux", "Deepin", "Omarchy",
+        ];
+
+        let modifiers = [
+            "Core", "Advanced", "Ultra", "Enterprise", "Hardened",
+            "Realtime", "Zero-Copy", "Hermetic", "Atomic", "Distributed",
+            "Optimized", "Sovereign", "Dynamic", "Modular", "High-Performance",
+        ];
+
+        let categories = [
+            DistroComponentCategory::KernelScheduler,
+            DistroComponentCategory::FilesystemsStorage,
+            DistroComponentCategory::SecurityHardening,
+            DistroComponentCategory::PackageManagement,
+            DistroComponentCategory::NetworkingFirewall,
+            DistroComponentCategory::InitAndSupervisor,
+            DistroComponentCategory::UserlandUtilities,
+            DistroComponentCategory::DesktopAndMedia,
+            DistroComponentCategory::DriversHardware,
+            DistroComponentCategory::VirtualizationContainers,
+        ];
+
+        let templates: [&[&str]; 10] = [
+            &[
+                "eBPF Sched_Ext Dynamic Governor",
+                "BORE EEVDF Timeslice Tuner",
+                "ULE Interactivity Priority Scheduler",
+                "MuQSS / PDS Latency Scheduler",
+                "Microsecond Real-Time Thread Affinity Scheduler",
+            ],
+            &[
+                "ZFS Boot Environment Snapshot Manager",
+                "HAMMER2 PFS Multi-Master Transaction Replication",
+                "Bcachefs Tiered Storage & Structural Verification",
+                "Btrfs Subvolume Atomic Snapshot Matrix",
+                "OpenBSD Softraid CRYPTO Encrypted Volume Manager",
+            ],
+            &[
+                "OpenBSD Pledge & Unveil Path Isolation Governor",
+                "FreeBSD Capsicum Capability Sandbox & Casper IPC",
+                "Linux Landlock V4 & Seccomp-BPF Guard",
+                "AppArmor V4 DBus & Network Mediator",
+                "Post-Quantum Kyber & Dilithium Signature Verifier",
+            ],
+            &[
+                "Pacman 7 Dynamic Hook & File Collision Guard",
+                "Gentoo Portage EAPI 8 Slot & USE-Flag Solver",
+                "Nix / Guix Content-Addressed Store Flake Graph",
+                "Alpine APK V3 Trigger & Apkovl Persistence Overlay",
+                "Universal .sigpkg SAT Dependency Solver",
+            ],
+            &[
+                "OpenBSD Pfctl Stateful Packet Filter & Pfsync Engine",
+                "NetBSD Npfctl N-code JIT Bytecode Filter",
+                "Linux eBPF XDP Zero-Copy Packet Engine",
+                "FreeBSD VNET Jail Network Isolation Bridge",
+                "WireGuard Kernel Noise Protocol Tunnel",
+            ],
+            &[
+                "Systemd Unit Dependency DAG & Service Supervisor",
+                "Chimera Dinit Service Graph Supervisor",
+                "Void Runit 3-Stage Service Lifecycle Supervisor",
+                "S6 Supervision Tree & Notification Bus Router",
+                "OpenRC Service Control & Runlevel Governor",
+            ],
+            &[
+                "Coreutils Zero-Copy Stream Processor",
+                "BusyBox Multicall Applet Multiplexer",
+                "ripgrep SIMD Accelerated Regex Search",
+                "bat Syntax Highlighting File Inspector",
+                "btop / htop Realtime System Monitor",
+            ],
+            &[
+                "Wayland Hyprland Auto-Tiling Scheduler",
+                "PipeWire SPA Low-Latency Audio Pipeline Router",
+                "Wallust 16-Color ANSI Palette Extractor",
+                "QuickShell / QML Floating Applet Router",
+                "SwayNC Priority Notification Router",
+            ],
+            &[
+                "NVMe PCIe Gen5 DMA Storage Controller",
+                "Intel iwlwifi Wi-Fi 6E/7 Wireless Subsystem",
+                "Realtek RTL8169 Gigabit Ethernet Driver",
+                "AMD RDNA3 / DRM GPU Acceleration Driver",
+                "NVIDIA Nouveau Open Kernel Module Interface",
+            ],
+            &[
+                "Qubes OS Multi-domain MicroVM Sandbox",
+                "Firecracker Ephemeral MicroVM Container",
+                "OCI Container Runtime & Namespace Isolation",
+                "FreeBSD Jail VNET Container Governor",
+                "WASM Wasmtime Edge Container Sandbox",
+            ],
+        ];
+
+        for id in 4501..=10000u32 {
+            let cat_idx = ((id - 1) % 10) as usize;
+            let category = categories[cat_idx];
+            let distro = distros[(id as usize - 1) % distros.len()];
+            let modifier = modifiers[(id as usize - 1) % modifiers.len()];
+            let template_list = templates[cat_idx];
+            let template = template_list[(id as usize - 1) % template_list.len()];
+            let variant_num = (id - 1) / 10;
+
+            let name = format!("{} {} ({})", modifier, template, distro);
+            let description = format!(
+                "{}-inspired {} component variant #{}",
+                distro, template, variant_num
+            );
+
+            components.push(DistroComponentItem {
+                id,
+                name,
+                category,
+                origin_distro: String::from(distro),
+                description,
+                enabled: true,
+                execution_count: 0,
+            });
+        }
+
         Self { components }
     }
 
@@ -40616,7 +40747,7 @@ impl SovereignThousandsDistroComponentsEngine {
     }
 
     pub fn verify_catalog(&mut self) -> bool {
-        if self.components.len() < 1024 {
+        if self.components.len() < 10000 {
             return false;
         }
         let cat_items = self.filter_by_category(DistroComponentCategory::KernelScheduler);
@@ -40642,8 +40773,8 @@ mod tests {
     fn test_thousands_components_catalog_count() {
         let engine = SovereignThousandsDistroComponentsEngine::new();
         assert!(
-            engine.total_components() >= 1024,
-            "Engine catalog must contain at least 1024 components, got {}",
+            engine.total_components() >= 10000,
+            "Engine catalog must contain at least 10000 components, got {}",
             engine.total_components()
         );
     }
