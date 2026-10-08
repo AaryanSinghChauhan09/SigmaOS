@@ -233,12 +233,29 @@ impl DrmConnector {
 
     /// Detect connector and read EDID
     pub fn detect(&mut self) -> Result<DrmConnectorStatus, DrmError> {
-        // In real implementation: probe hardware and read EDID
+        // In real implementation: probe hardware and read EDID via I2C/DDC
+        // For now, simulate detection
         self.status = DrmConnectorStatus::Connected;
 
-        // Add standard modes
+        // Add standard modes (in real implementation, these come from EDID)
         self.modes.push(DrmModeInfo::mode_1080p_60());
         self.modes.push(DrmModeInfo::mode_720p_60());
+
+        // Add 2560x1440@60Hz mode
+        self.modes.push(DrmModeInfo {
+            clock: 241500,
+            hdisplay: 2560,
+            hsync_start: 2608,
+            hsync_end: 2648,
+            htotal: 2720,
+            vdisplay: 1440,
+            vsync_start: 1443,
+            vsync_end: 1448,
+            vtotal: 1481,
+            vrefresh: 60,
+            flags: 0x5,
+            name: *b"2560x1440\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0",
+        });
 
         Ok(self.status)
     }

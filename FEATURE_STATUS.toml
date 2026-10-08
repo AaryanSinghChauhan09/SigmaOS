@@ -89,6 +89,34 @@ description = "VirtQueue-based block device with init/read/write/flush"
 test_evidence = "Unit tests pass"
 next_milestone = "QEMU VirtIO PCI discovery"
 
+[drivers.nvme_storage]
+status = "partial"
+files = ["src/driver/nvme_storage.rs"]
+description = "NVMe controller with MMIO doorbell ring, queue pair management, and completion queue polling"
+test_evidence = "Unit tests pass; MMIO doorbell implementation added for real hardware"
+next_milestone = "Physical NVMe device testing and PRP list buffer management"
+
+[drivers.ahci_sata]
+status = "partial"
+files = ["src/driver/ahci.rs"]
+description = "AHCI SATA controller with port enumeration, device identification, and FIS command construction"
+test_evidence = "Unit tests pass; enhanced with proper error checking and timeout handling"
+next_milestone = "Command list allocation and PRDT buffer setup for DMA transfers"
+
+[drivers.acpi]
+status = "partial"
+files = ["src/drivers/acpi.rs"]
+description = "ACPI table parser with RSDP discovery in EBDA and BIOS ROM regions, checksum verification"
+test_evidence = "Unit tests pass; RSDP search implementation complete"
+next_milestone = "RSDT/XSDT parsing and FADT/MADT table extraction"
+
+[drivers.drm_kms]
+status = "partial"
+files = ["src/drivers/drm_kms.rs"]
+description = "DRM/KMS subsystem with CRTC, encoder, connector management, and mode setting infrastructure"
+test_evidence = "Unit tests pass; enhanced with additional display modes (2560x1440)"
+next_milestone = "GEM buffer allocation with physical memory mapping and hardware page flip"
+
 [drivers.virtio_net]
 status = "partial"
 files = ["src/drivers/virtio_net.rs"]

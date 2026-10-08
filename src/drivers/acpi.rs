@@ -136,8 +136,54 @@ impl AcpiManager {
         // Search in BIOS ROM area: 0xE0000 - 0xFFFFF
         // Signature: "RSD PTR "
 
-        // For now, return placeholder
-        // In real implementation, scan memory for RSDP signature
+        unsafe {
+            // Search EBDA first (0x80000 - 0x9FFFF)
+            for addr in (0x80000..=0x9FFFF).step_by(16) {
+                let ptr = addr as *const u8;
+                let sig = [
+                    *ptr.add(0), *ptr.add(1), *ptr.add(2), *ptr.add(3),
+                    *ptr.add(4), *ptr.add(5), *ptr.add(6), *ptr.add(7),
+                ];
+
+                if sig == *b"RSD PTR " {
+                    // Verify checksum
+                    let len = 20; // ACPI 1.0 RSDP length
+                    let mut sum: u8 = 0;
+                    for i in 0..len {
+                        sum = sum.wrapping_add(*ptr.add(i));
+                    }
+
+                    if sum == 0 {
+                        self.rsdp_address = Some(addr as u64);
+                        return Ok(addr as u64);
+                    }
+                }
+            }
+
+            // Search BIOS ROM area (0xE0000 - 0xFFFFF)
+            for addr in (0xE0000..=0xFFFFF).step_by(16) {
+                let ptr = addr as *const u8;
+                let sig = [
+                    *ptr.add(0), *ptr.add(1), *ptr.add(2), *ptr.add(3),
+                    *ptr.add(4), *ptr.add(5), *ptr.add(6), *ptr.add(7),
+                ];
+
+                if sig == *b"RSD PTR " {
+                    // Verify checksum
+                    let len = if *ptr.add(15) >= 2 { 36 } else { 20 }; // ACPI 2.0+ has extended length
+                    let mut sum: u8 = 0;
+                    for i in 0..len {
+                        sum = sum.wrapping_add(*ptr.add(i));
+                    }
+
+                    if sum == 0 {
+                        self.rsdp_address = Some(addr as u64);
+                        return Ok(addr as u64);
+                    }
+                }
+            }
+        }
+
         Err(AcpiError::RsdpNotFound)
     }
 

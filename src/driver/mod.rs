@@ -1,4 +1,5 @@
 // SigmaOS Driver Module
+pub mod ahci;
 pub mod device;
 pub mod distro_drivers;
 pub mod dkms_autoloader;
@@ -15,6 +16,7 @@ pub mod mapper;
 pub mod network_framework;
 pub mod nic_intel_e1000;
 pub mod nic_realtek_rtl8169;
+pub mod nvme;
 pub mod nvme_storage;
 pub mod pci_bus;
 pub mod pci_enumeration;
@@ -59,8 +61,14 @@ pub use network_framework::{
 };
 pub use nic_intel_e1000::{DmaRing, IntelNicDriver, IntelNicPciDriver, RxDescriptor, TxDescriptor};
 pub use nic_realtek_rtl8169::{RealtekNicDriver, RealtekRtl8169PciDriver};
-pub use nvme_storage::{
-    NvmeCompletionEntry, NvmeController, NvmeNamespace, NvmePciDriver, QueuePair,
+pub use nvme::{
+    NvmeCompletionEntry, NvmeController, NvmeIdentifyControllerData, NvmeLbaFormat,
+    NvmeNamespace, NvmeNamespaceData, NvmeQueue, NvmeRegisters, NvmeSubmissionEntry,
+};
+pub use nvme_storage::{NvmePciDriver, QueuePair};
+pub use ahci::{
+    AhciCommandFis, AhciCommandHeader, AhciController, AhciGenericHostControl, AhciPort,
+    AhciPrdt, AhciReceivedFis, SataDevice, SataDeviceType,
 };
 pub use pci_bus::{
     PciAddress, PciBarInfo, PciBarType, PciBusManager, PciDeviceNode, PciDriverMatchRule,

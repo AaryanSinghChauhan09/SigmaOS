@@ -125,3 +125,31 @@ status = "partial"
 tested_on = ["qemu-e1000"]
 required_for_release = true
 description = "Ethernet functional; Wi-Fi 802.11 stack in hardware testing phase."
+
+# -----------------------------------------------------------------------------
+# 5. Storage Drivers & Hardware Support (Gap Closure: Bootability)
+# -----------------------------------------------------------------------------
+
+[feature.nvme_driver_mmio]
+status = "partial"
+tested_on = ["unit-test"]
+required_for_release = true
+description = "NVMe controller with MMIO doorbell ring, queue pair management, submission/completion queues with proper volatile writes."
+
+[feature.ahci_sata_controller]
+status = "partial"
+tested_on = ["unit-test"]
+required_for_release = true
+description = "AHCI SATA controller with port enumeration, device identification via signature matching, and FIS command construction."
+
+[feature.acpi_table_parser]
+status = "partial"
+tested_on = ["unit-test"]
+required_for_release = true
+description = "ACPI RSDP discovery in EBDA (0x80000-0x9FFFF) and BIOS ROM (0xE0000-0xFFFFF) with checksum verification."
+
+[feature.drm_kms_graphics]
+status = "partial"
+tested_on = ["unit-test"]
+required_for_release = true
+description = "DRM/KMS subsystem with CRTC, encoder, connector management, mode setting infrastructure, and display mode detection."

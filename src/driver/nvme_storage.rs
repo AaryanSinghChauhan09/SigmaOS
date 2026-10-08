@@ -348,9 +348,9 @@ impl NvmeController {
 
     pub fn read_sectors(
         &mut self,
-        _namespace_id: u32,
-        _start_lba: u64,
-        _num_sectors: u32,
+        namespace_id: u32,
+        start_lba: u64,
+        num_sectors: u32,
     ) -> Result<u16, &'static str> {
         if !self.is_enabled {
             return Err("Controller not enabled");
@@ -362,16 +362,58 @@ impl NvmeController {
 
         self.read_commands.fetch_add(1, Ordering::SeqCst);
 
-        // In real implementation, would submit READ command to I/O queue
+        // Build NVMe READ command (opcode 0x02)
         let cmd_id = self.io_queues[0].allocate_command_id();
-        Ok(cmd_id)
+        let cmd: u64 = (0x02 as u64) // Opcode: READ
+            | ((cmd_id as u64) << 16) // Command ID
+            | ((namespace_id as u64) << 32); // Namespace ID
+
+        // Submit command to I/O queue
+        self.io_queues[0].submit_command(cmd)?;
+
+        // Ring submission queue doorbell with proper MMIO
+        // Doorbell offset: BAR0 + 0x1000 + (queue_id * 2 * doorbell_stride)
+        // For queue 0, SQ doorbell is at 0x1000
+        let sq_tail = self.io_queues[0].submission_queue.get_tail_pointer();
+        let doorbell_offset = NVME_SQ_BASE + (0 * 2 * 4); // Queue 0, stride 4 bytes
+        unsafe {
+            core::ptr::write_volatile(
+                (self.mmio_base + doorbell_offset as u64) as *mut u32,
+                sq_tail as u32,
+            );
+        }
+
+        // Poll for completion
+        let mut timeout = 10000;
+        while timeout > 0 {
+            if let Some(completion) = self.io_queues[0].poll_completion() {
+                if completion.is_success() {
+                    // Ring completion queue doorbell
+                    let cq_head = self.io_queues[0].completion_queue.get_head_pointer();
+                    let cq_doorbell_offset = NVME_CQ_BASE + (0 * 2 * 4);
+                    unsafe {
+                        core::ptr::write_volatile(
+                            (self.mmio_base + cq_doorbell_offset as u64) as *mut u32,
+                            cq_head as u32,
+                        );
+                    }
+                    return Ok(cmd_id);
+                } else {
+                    return Err("NVMe read command failed");
+                }
+            }
+            core::hint::spin_loop();
+            timeout -= 1;
+        }
+
+        Err("NVMe read timeout")
     }
 
     pub fn write_sectors(
         &mut self,
-        _namespace_id: u32,
-        _start_lba: u64,
-        _num_sectors: u32,
+        namespace_id: u32,
+        start_lba: u64,
+        num_sectors: u32,
     ) -> Result<u16, &'static str> {
         if !self.is_enabled {
             return Err("Controller not enabled");
@@ -383,9 +425,49 @@ impl NvmeController {
 
         self.write_commands.fetch_add(1, Ordering::SeqCst);
 
-        // In real implementation, would submit WRITE command to I/O queue
+        // Build NVMe WRITE command (opcode 0x01)
         let cmd_id = self.io_queues[0].allocate_command_id();
-        Ok(cmd_id)
+        let cmd: u64 = (0x01 as u64) // Opcode: WRITE
+            | ((cmd_id as u64) << 16) // Command ID
+            | ((namespace_id as u64) << 32); // Namespace ID
+
+        // Submit command to I/O queue
+        self.io_queues[0].submit_command(cmd)?;
+
+        // Ring submission queue doorbell with proper MMIO
+        let sq_tail = self.io_queues[0].submission_queue.get_tail_pointer();
+        let doorbell_offset = NVME_SQ_BASE + (0 * 2 * 4);
+        unsafe {
+            core::ptr::write_volatile(
+                (self.mmio_base + doorbell_offset as u64) as *mut u32,
+                sq_tail as u32,
+            );
+        }
+
+        // Poll for completion
+        let mut timeout = 10000;
+        while timeout > 0 {
+            if let Some(completion) = self.io_queues[0].poll_completion() {
+                if completion.is_success() {
+                    // Ring completion queue doorbell
+                    let cq_head = self.io_queues[0].completion_queue.get_head_pointer();
+                    let cq_doorbell_offset = NVME_CQ_BASE + (0 * 2 * 4);
+                    unsafe {
+                        core::ptr::write_volatile(
+                            (self.mmio_base + cq_doorbell_offset as u64) as *mut u32,
+                            cq_head as u32,
+                        );
+                    }
+                    return Ok(cmd_id);
+                } else {
+                    return Err("NVMe write command failed");
+                }
+            }
+            core::hint::spin_loop();
+            timeout -= 1;
+        }
+
+        Err("NVMe write timeout")
     }
 
     pub fn poll_completions(&mut self) -> Result<u32, &'static str> {
