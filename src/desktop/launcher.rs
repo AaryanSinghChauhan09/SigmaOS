@@ -408,8 +408,9 @@ impl CommandPalette {
         if trimmed.starts_with(':') {
             let action_q = trimmed.to_lowercase();
             for act in &self.system_actions {
-                if act.trigger.to_lowercase().contains(&action_q)
-                    || act.description.to_lowercase().contains(&action_q)
+                // Performance: zero-allocation matching eliminates transient String heap allocations on every keypress
+                if contains_ignore_case(&act.trigger, &action_q)
+                    || contains_ignore_case(&act.description, &action_q)
                 {
                     results.push(SearchResultItem {
                         title: act.trigger.clone(),
@@ -428,8 +429,9 @@ impl CommandPalette {
         // 3. Window Switcher: search open running windows
         let q_lower = trimmed.to_lowercase();
         for win in &self.open_windows {
-            if win.title.to_lowercase().contains(&q_lower)
-                || win.app_class.to_lowercase().contains(&q_lower)
+            // Performance: zero-allocation matching avoids lowercasing title and app_class in loops
+            if contains_ignore_case(&win.title, &q_lower)
+                || contains_ignore_case(&win.app_class, &q_lower)
             {
                 results.push(SearchResultItem {
                     title: win.title.clone(),
@@ -454,7 +456,8 @@ impl CommandPalette {
                 .trim_start_matches("clip ")
                 .to_lowercase();
             for snippet in &self.clipboard_history {
-                if snippet.content.to_lowercase().contains(&cb_q) {
+                // Performance: zero-allocation matching avoids lowercasing content in loops
+                if contains_ignore_case(&snippet.content, &cb_q) {
                     let preview = clipboard_preview(&snippet.content, 60);
                     results.push(SearchResultItem {
                         title: preview,
@@ -472,19 +475,19 @@ impl CommandPalette {
 
         // 5. Application search
         for app in &self.apps {
-            let name_lower = app.name.to_lowercase();
             let mut score: i32 = -1;
 
-            if name_lower == q_lower {
+            // Performance: zero-allocation matching avoids lowercasing app name and keywords in loops
+            if app.name.eq_ignore_ascii_case(&q_lower) {
                 score = 1000;
-            } else if name_lower.starts_with(&q_lower) {
+            } else if starts_with_ignore_case(&app.name, &q_lower) {
                 score = 800;
-            } else if name_lower.contains(&q_lower) {
+            } else if contains_ignore_case(&app.name, &q_lower) {
                 score = 500;
             } else if app
                 .keywords
                 .iter()
-                .any(|k| k.to_lowercase().contains(&q_lower))
+                .any(|k| contains_ignore_case(k, &q_lower))
             {
                 score = 300;
             }
@@ -518,10 +521,19 @@ impl CommandPalette {
             .apps
             .iter()
             .filter_map(|e| {
-                let name_lower = e.name.to_lowercase();
-                if name_lower.contains(&q) {
-                    Some((e, name_lower.find(&q).unwrap_or(usize::MAX)))
-                } else if e.keywords.iter().any(|k| k.to_lowercase().contains(&q)) {
+                if contains_ignore_case(&e.name, &q) {
+                    let pos = e
+                        .name
+                        .as_bytes()
+                        .windows(q.len())
+                        .position(|w| {
+                            w.iter()
+                                .zip(q.as_bytes())
+                                .all(|(&b1, &b2)| b1.to_ascii_lowercase() == b2)
+                        })
+                        .unwrap_or(usize::MAX);
+                    Some((e, pos))
+                } else if e.keywords.iter().any(|k| contains_ignore_case(k, &q)) {
                     Some((e, 1000))
                 } else {
                     None
@@ -534,33 +546,45 @@ impl CommandPalette {
 
     /// Simple safe arithmetic expression parser for the calculator mode
     fn evaluate_math_expr(expr: &str) -> Option<f64> {
-        let clean: String = expr.chars().filter(|c| !c.is_whitespace()).collect();
+        let trimmed = expr.trim();
+        if trimmed.is_empty() {
+            return None;
+        }
+        if trimmed.as_bytes().iter().any(|b| b.is_ascii_whitespace()) {
+            let clean: String = trimmed.chars().filter(|c| !c.is_whitespace()).collect();
+            return Self::evaluate_math_expr_clean(&clean);
+        }
+        Self::evaluate_math_expr_clean(trimmed)
+    }
+
+    /// Internal helper that operates on whitespace-free expressions without allocations during recursion
+    fn evaluate_math_expr_clean(clean: &str) -> Option<f64> {
         if clean.is_empty() {
             return None;
         }
 
         // Simple binary operation parser (+, -, *, /)
         if let Some(pos) = clean.rfind('+') {
-            let left = Self::evaluate_math_expr(&clean[..pos])?;
-            let right = Self::evaluate_math_expr(&clean[pos + 1..])?;
+            let left = Self::evaluate_math_expr_clean(&clean[..pos])?;
+            let right = Self::evaluate_math_expr_clean(&clean[pos + 1..])?;
             return Some(left + right);
         }
         if let Some(pos) = clean.rfind('-') {
             if pos > 0 {
                 // Avoid unary minus
-                let left = Self::evaluate_math_expr(&clean[..pos])?;
-                let right = Self::evaluate_math_expr(&clean[pos + 1..])?;
+                let left = Self::evaluate_math_expr_clean(&clean[..pos])?;
+                let right = Self::evaluate_math_expr_clean(&clean[pos + 1..])?;
                 return Some(left - right);
             }
         }
         if let Some(pos) = clean.rfind('*') {
-            let left = Self::evaluate_math_expr(&clean[..pos])?;
-            let right = Self::evaluate_math_expr(&clean[pos + 1..])?;
+            let left = Self::evaluate_math_expr_clean(&clean[..pos])?;
+            let right = Self::evaluate_math_expr_clean(&clean[pos + 1..])?;
             return Some(left * right);
         }
         if let Some(pos) = clean.rfind('/') {
-            let left = Self::evaluate_math_expr(&clean[..pos])?;
-            let right = Self::evaluate_math_expr(&clean[pos + 1..])?;
+            let left = Self::evaluate_math_expr_clean(&clean[..pos])?;
+            let right = Self::evaluate_math_expr_clean(&clean[pos + 1..])?;
             if right == 0.0 {
                 return None;
             }
@@ -574,6 +598,37 @@ impl CommandPalette {
         self.is_open = !self.is_open;
         self.is_open
     }
+}
+
+/// Perform zero-allocation ASCII case-insensitive substring search.
+/// `needle_lower` is expected to be lowercased by the caller.
+#[inline]
+pub fn contains_ignore_case(haystack: &str, needle_lower: &str) -> bool {
+    if needle_lower.is_empty() {
+        return true;
+    }
+    if needle_lower.len() > haystack.len() {
+        return false;
+    }
+    haystack.as_bytes().windows(needle_lower.len()).any(|window| {
+        window
+            .iter()
+            .zip(needle_lower.as_bytes())
+            .all(|(&b1, &b2)| b1.to_ascii_lowercase() == b2)
+    })
+}
+
+/// Perform zero-allocation ASCII case-insensitive prefix match.
+/// `needle_lower` is expected to be lowercased by the caller.
+#[inline]
+pub fn starts_with_ignore_case(haystack: &str, needle_lower: &str) -> bool {
+    if needle_lower.len() > haystack.len() {
+        return false;
+    }
+    haystack.as_bytes()[..needle_lower.len()]
+        .iter()
+        .zip(needle_lower.as_bytes())
+        .all(|(&b1, &b2)| b1.to_ascii_lowercase() == b2)
 }
 
 fn clipboard_preview(content: &str, max_bytes: usize) -> String {
@@ -806,5 +861,15 @@ mod tests {
         assert_eq!(palette.clipboard_history.len(), 1);
         palette.set_clipboard_history_enabled(false);
         assert!(palette.clipboard_history.is_empty());
+    }
+
+    #[test]
+    fn test_zero_allocation_case_insensitive_matching() {
+        assert!(contains_ignore_case("Firefox Web Browser", "firefox"));
+        assert!(contains_ignore_case("SigmaOS Terminal", "term"));
+        assert!(!contains_ignore_case("SigmaOS", "nonexistent"));
+
+        assert!(starts_with_ignore_case("Calculator", "calc"));
+        assert!(!starts_with_ignore_case("Calculator", "lator"));
     }
 }
