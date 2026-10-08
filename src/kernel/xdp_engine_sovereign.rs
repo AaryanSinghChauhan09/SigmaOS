@@ -21,7 +21,7 @@
 
 use std::collections::BTreeMap;
 use std::format;
-use std::string::{String, ToString};
+use std::string::String;
 use std::vec::Vec;
 
 // ─── XDP Action ───────────────────────────────────────────────────────────────
@@ -517,7 +517,6 @@ pub fn build_test_packet(
 
 // ─── Tests ────────────────────────────────────────────────────────────────────
 
-#[cfg(test)]
 #[cfg(test)]
 mod xdp_tests {
     use super::*;
