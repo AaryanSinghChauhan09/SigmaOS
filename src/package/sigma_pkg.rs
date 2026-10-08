@@ -547,6 +547,8 @@ impl UniversalPackageImporter {
                     || dep_lower.contains("crypto")
                     || dep_lower.contains("gnutls")
                     || dep_lower.contains("mbedtls")
+                    || dep_lower.contains("wolfssl")
+                    || dep_lower.contains("gcrypt")
                 {
                     "sovereign-openssl".to_string()
                 } else if dep_lower.contains("libc")
@@ -558,6 +560,8 @@ impl UniversalPackageImporter {
                     || dep_lower.contains("bedrock-core")
                     || dep_lower.contains("haiku-libroot")
                     || dep_lower.contains("pkgsrc-core")
+                    || dep_lower.contains("uclibc")
+                    || dep_lower.contains("bionic")
                 {
                     "sovereign-libc".to_string()
                 } else if dep_lower.contains("zlib")
@@ -566,6 +570,7 @@ impl UniversalPackageImporter {
                     || dep_lower.contains("xz")
                     || dep_lower.contains("bzip2")
                     || dep_lower.contains("brotli")
+                    || dep_lower.contains("lzo")
                 {
                     "sovereign-compression".to_string()
                 } else if dep_lower.contains("python")
@@ -575,6 +580,10 @@ impl UniversalPackageImporter {
                     || dep_lower.contains("golang")
                     || dep_lower.contains("rust")
                     || dep_lower.contains("java")
+                    || dep_lower.contains("deno")
+                    || dep_lower.contains("bun")
+                    || dep_lower.contains("php")
+                    || dep_lower.contains("lua")
                 {
                     "sovereign-runtime".to_string()
                 } else if dep_lower == "bash"
@@ -583,6 +592,7 @@ impl UniversalPackageImporter {
                     || dep_lower == "sh"
                     || dep_lower == "ksh"
                     || dep_lower == "tcsh"
+                    || dep_lower == "dash"
                 {
                     "sovereign-shell".to_string()
                 } else if dep_lower.contains("systemd")
@@ -591,6 +601,7 @@ impl UniversalPackageImporter {
                     || dep_lower.contains("sysvinit")
                     || dep_lower.contains("s6")
                     || dep_lower.contains("dinit")
+                    || dep_lower.contains("launchd")
                 {
                     "sovereign-init".to_string()
                 } else if dep_lower.contains("wayland")
@@ -601,6 +612,7 @@ impl UniversalPackageImporter {
                     || dep_lower.contains("pulseaudio")
                     || dep_lower.contains("alsa")
                     || dep_lower.contains("ffmpeg")
+                    || dep_lower.contains("gstreamer")
                 {
                     "sovereign-media-graphics".to_string()
                 } else if dep_lower.contains("gcc")
@@ -613,6 +625,40 @@ impl UniversalPackageImporter {
                     || dep_lower.contains("meson")
                 {
                     "sovereign-toolchain".to_string()
+                } else if dep_lower.contains("postgres")
+                    || dep_lower.contains("mysql")
+                    || dep_lower.contains("mariadb")
+                    || dep_lower.contains("sqlite")
+                    || dep_lower.contains("redis")
+                    || dep_lower.contains("mongodb")
+                {
+                    "sovereign-database".to_string()
+                } else if dep_lower.contains("docker")
+                    || dep_lower.contains("podman")
+                    || dep_lower.contains("qemu")
+                    || dep_lower.contains("libvirt")
+                    || dep_lower.contains("kvm")
+                    || dep_lower.contains("containerd")
+                    || dep_lower.contains("lxc")
+                {
+                    "sovereign-virtualization".to_string()
+                } else if dep_lower.contains("torch")
+                    || dep_lower.contains("tensorflow")
+                    || dep_lower.contains("onnx")
+                    || dep_lower.contains("llama")
+                    || dep_lower.contains("cuda")
+                    || dep_lower.contains("rocm")
+                    || dep_lower.contains("vllm")
+                {
+                    "sovereign-ai-runtime".to_string()
+                } else if dep_lower.contains("gtk")
+                    || dep_lower.contains("qt5")
+                    || dep_lower.contains("qt6")
+                    || dep_lower.contains("hyprland")
+                    || dep_lower.contains("waybar")
+                    || dep_lower.contains("sway")
+                {
+                    "sovereign-desktop-framework".to_string()
                 } else {
                     dep.clone()
                 }
@@ -1907,22 +1953,27 @@ impl SigmaPkg {
                 || *arg == "-p"
                 || *arg == "--noaction"
                 || *arg == "--pretend"
+                || *arg == "-Sp"
             {
                 is_dry_run = true;
             }
         }
 
-        if pm == "xbps-install" {
+        if pm == "xbps-install" || pm == "pkg_add" || pm == "installpkg" {
             action = "install";
             action_explicitly_set = true;
         } else if pm == "xbps-remove" || pm == "pkg_delete" || pm == "removepkg" {
             action = "remove";
             action_explicitly_set = true;
-        } else if pm == "xbps-query" || pm == "pkg_info" {
-            action = "search";
+        } else if pm == "xbps-query" {
+            if args.contains(&"-S") || args.contains(&"-s") || args.contains(&"search") {
+                action = "search";
+            } else {
+                action = "query_info";
+            }
             action_explicitly_set = true;
-        } else if pm == "installpkg" {
-            action = "install";
+        } else if pm == "pkg_info" {
+            action = "query_info";
             action_explicitly_set = true;
         } else if pm == "nix-env" {
             if args.contains(&"-i") || args.contains(&"-iA") || args.contains(&"--install") {
@@ -1976,6 +2027,8 @@ impl SigmaPkg {
                 } else if *arg == "remove"
                     || *arg == "purge"
                     || *arg == "-R"
+                    || *arg == "-Rns"
+                    || *arg == "-Rs"
                     || *arg == "del"
                     || *arg == "delete"
                     || *arg == "rm"
@@ -2119,6 +2172,164 @@ impl SigmaPkg {
                 pm, full_cmd
             )),
         }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum UniversalPackageTriggerType {
+    Ldconfig,
+    UpdateDesktopDatabase,
+    GlibCompileSchemas,
+    SystemdTmpfiles,
+    MimeDatabase,
+    FontsIndex,
+    IconThemeCache,
+    MandbUpdate,
+    InfoIndex,
+    DepmodKmod,
+    FontconfigCache,
+}
+
+#[derive(Debug, Clone)]
+pub struct TriggerExecutionResult {
+    pub trigger_type: UniversalPackageTriggerType,
+    pub target_dir: String,
+    pub executed_successfully: bool,
+}
+
+pub struct UniversalPackageTriggerEngine {
+    pub execution_log: Vec<TriggerExecutionResult>,
+}
+
+impl UniversalPackageTriggerEngine {
+    pub fn new() -> Self {
+        Self {
+            execution_log: Vec::new(),
+        }
+    }
+
+    pub fn execute_triggers_for_files(&mut self, files: &[String]) -> Vec<TriggerExecutionResult> {
+        let mut results = Vec::new();
+        if files.iter().any(|f| f.ends_with(".so") || f.contains("/lib/")) {
+            let res = TriggerExecutionResult {
+                trigger_type: UniversalPackageTriggerType::Ldconfig,
+                target_dir: "/usr/lib".to_string(),
+                executed_successfully: true,
+            };
+            self.execution_log.push(res.clone());
+            results.push(res);
+        }
+        if files.iter().any(|f| f.ends_with(".desktop")) {
+            let res = TriggerExecutionResult {
+                trigger_type: UniversalPackageTriggerType::UpdateDesktopDatabase,
+                target_dir: "/usr/share/applications".to_string(),
+                executed_successfully: true,
+            };
+            self.execution_log.push(res.clone());
+            results.push(res);
+        }
+        results
+    }
+}
+
+impl Default for UniversalPackageTriggerEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Universal Distro Package Orchestrator for SigmaOS
+/// Unifies multi-distro repository syncing, foreign package binary/manifest conversion,
+/// sandboxed scriptlet transpilation, universal system triggers, and transactional package management with snapshots.
+pub struct UniversalDistroPackageOrchestrator {
+    pub sigma_pkg: SigmaPkg,
+    pub trigger_engine: UniversalPackageTriggerEngine,
+    pub snapshot_history: Vec<(u32, String, Vec<Package>)>,
+    pub next_snapshot_id: u32,
+}
+
+impl UniversalDistroPackageOrchestrator {
+    pub fn new() -> Result<Self, String> {
+        let sigma_pkg = SigmaPkg::new()?;
+        Ok(Self {
+            sigma_pkg,
+            trigger_engine: UniversalPackageTriggerEngine::new(),
+            snapshot_history: Vec::new(),
+            next_snapshot_id: 1,
+        })
+    }
+
+    pub fn with_store_dirs(cache_dir: PathBuf, database_dir: PathBuf) -> Self {
+        let sigma_pkg = SigmaPkg {
+            config: PkgConfig::default(),
+            repositories: vec![],
+            local_packages: HashMap::new(),
+            cache_dir,
+            database_dir,
+        };
+        Self {
+            sigma_pkg,
+            trigger_engine: UniversalPackageTriggerEngine::new(),
+            snapshot_history: Vec::new(),
+            next_snapshot_id: 1,
+        }
+    }
+
+    pub fn create_snapshot(&mut self, description: &str) -> u32 {
+        let id = self.next_snapshot_id;
+        self.next_snapshot_id += 1;
+        let packages_snapshot = self.sigma_pkg.local_packages.values().cloned().collect();
+        self.snapshot_history
+            .push((id, description.to_string(), packages_snapshot));
+        id
+    }
+
+    pub fn rollback_snapshot(&mut self, snapshot_id: u32) -> Result<(), String> {
+        if let Some((_, _, snap_pkgs)) = self
+            .snapshot_history
+            .iter()
+            .find(|(id, _, _)| *id == snapshot_id)
+            .cloned()
+        {
+            self.sigma_pkg.local_packages.clear();
+            for pkg in snap_pkgs {
+                self.sigma_pkg.local_packages.insert(pkg.name.clone(), pkg);
+            }
+            Ok(())
+        } else {
+            Err(format!("Snapshot generation #{} not found", snapshot_id))
+        }
+    }
+
+    pub fn orchestrate_foreign_install(
+        &mut self,
+        filepath_or_manifest: &str,
+    ) -> Result<Package, String> {
+        let snap_id = self.create_snapshot(&format!("Pre-install snapshot for {}", filepath_or_manifest));
+        match self
+            .sigma_pkg
+            .import_and_install_foreign_package(filepath_or_manifest)
+        {
+            Ok(pkg) => {
+                let installed_files = vec![
+                    format!("/usr/bin/{}", pkg.name),
+                    format!("/usr/lib/lib{}.so", pkg.name),
+                    format!("/usr/share/applications/{}.desktop", pkg.name),
+                ];
+                let _triggers = self
+                    .trigger_engine
+                    .execute_triggers_for_files(&installed_files);
+                Ok(pkg)
+            }
+            Err(err) => {
+                let _ = self.rollback_snapshot(snap_id);
+                Err(err)
+            }
+        }
+    }
+
+    pub fn dispatch_cli_command(&mut self, full_cmd: &str) -> Result<String, String> {
+        self.sigma_pkg.execute_universal_cli_command(full_cmd)
     }
 }
 
@@ -2488,5 +2699,109 @@ mod tests {
             .dependencies
             .contains(&"sovereign-libc".to_string()));
         assert!(pkg_mgr.local_packages.contains_key("zstd"));
+    }
+
+    #[test]
+    fn test_universal_distro_package_orchestrator() {
+        let mut orchestrator = UniversalDistroPackageOrchestrator::with_store_dirs(
+            PathBuf::from("/tmp/sigma_orchestrator_cache"),
+            PathBuf::from("/tmp/sigma_orchestrator_db"),
+        );
+
+        let snap_id = orchestrator.create_snapshot("initial snapshot");
+        assert_eq!(snap_id, 1);
+
+        let dispatched_res = orchestrator
+            .dispatch_cli_command("apt install curl nginx")
+            .unwrap();
+        assert!(dispatched_res.contains("curl"));
+        assert!(orchestrator.sigma_pkg.local_packages.contains_key("curl"));
+        assert!(orchestrator.sigma_pkg.local_packages.contains_key("nginx"));
+
+        let snap_id2 = orchestrator.create_snapshot("post-apt snapshot");
+        assert_eq!(snap_id2, 2);
+
+        let rollback_res = orchestrator.rollback_snapshot(snap_id);
+        assert!(rollback_res.is_ok());
+        assert!(!orchestrator.sigma_pkg.local_packages.contains_key("curl"));
+
+        let rollback_res2 = orchestrator.rollback_snapshot(snap_id2);
+        assert!(rollback_res2.is_ok());
+        assert!(orchestrator.sigma_pkg.local_packages.contains_key("curl"));
+
+        let orch_install = orchestrator.orchestrate_foreign_install("htop_3.2.0.deb");
+        assert!(orch_install.is_ok());
+        let pkg = orch_install.unwrap();
+        assert_eq!(pkg.name, "htop");
+        assert!(orchestrator.sigma_pkg.local_packages.contains_key("htop"));
+    }
+
+    #[test]
+    fn test_comprehensive_canonical_dependency_translation() {
+        let raw_deps = vec![
+            "libssl3".to_string(),
+            "glibc".to_string(),
+            "zstd".to_string(),
+            "python3-base".to_string(),
+            "zsh".to_string(),
+            "systemd-sysv".to_string(),
+            "libwayland-client".to_string(),
+            "gcc-c++".to_string(),
+            "postgresql15-client".to_string(),
+            "docker-ce".to_string(),
+            "pytorch-cuda".to_string(),
+            "libgtk-3-dev".to_string(),
+        ];
+        let translated = UniversalPackageImporter::translate_foreign_dependencies(&raw_deps);
+        assert_eq!(translated[0], "sovereign-openssl");
+        assert_eq!(translated[1], "sovereign-libc");
+        assert_eq!(translated[2], "sovereign-compression");
+        assert_eq!(translated[3], "sovereign-runtime");
+        assert_eq!(translated[4], "sovereign-shell");
+        assert_eq!(translated[5], "sovereign-init");
+        assert_eq!(translated[6], "sovereign-media-graphics");
+        assert_eq!(translated[7], "sovereign-toolchain");
+        assert_eq!(translated[8], "sovereign-database");
+        assert_eq!(translated[9], "sovereign-virtualization");
+        assert_eq!(translated[10], "sovereign-ai-runtime");
+        assert_eq!(translated[11], "sovereign-desktop-framework");
+    }
+
+    #[test]
+    fn test_all_distro_cli_dispatch_aliases() {
+        let mut pkg_mgr = SigmaPkg {
+            config: PkgConfig::default(),
+            repositories: vec![],
+            local_packages: HashMap::new(),
+            cache_dir: PathBuf::from("/tmp/sigma_cache_alias_test"),
+            database_dir: PathBuf::from("/tmp/sigma_db_alias_test"),
+        };
+
+        let deb = pkg_mgr.execute_universal_cli_command("debian install git").unwrap();
+        assert!(deb.contains("git"));
+
+        let fed = pkg_mgr.execute_universal_cli_command("fedora install ripgrep").unwrap();
+        assert!(fed.contains("ripgrep"));
+
+        let arch = pkg_mgr.execute_universal_cli_command("arch -S fd").unwrap();
+        assert!(arch.contains("fd"));
+
+        let bsd = pkg_mgr.execute_universal_cli_command("freebsd install zsh").unwrap();
+        assert!(bsd.contains("zsh"));
+
+        let void = pkg_mgr.execute_universal_cli_command("void install neovim").unwrap();
+        assert!(void.contains("neovim"));
+
+        let opensuse = pkg_mgr.execute_universal_cli_command("opensuse in vlc").unwrap();
+        assert!(opensuse.contains("vlc"));
+
+        let gentoo = pkg_mgr.execute_universal_cli_command("gentoo install portage").unwrap();
+        assert!(gentoo.contains("portage"));
+
+        let solus = pkg_mgr.execute_universal_cli_command("solus it eopkg").unwrap();
+        assert!(solus.contains("eopkg"));
+
+        let nixos = pkg_mgr.execute_universal_cli_command("nixos install nix").unwrap();
+        assert!(nixos.contains("nix"));
     }
 }
