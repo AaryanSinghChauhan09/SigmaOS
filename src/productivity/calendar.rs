@@ -20,6 +20,21 @@ use std::vec::Vec;
 // SigmaOS Calendar App
 // OOP-based calendar with events, reminders, and scheduling
 
+/// Case-insensitive substring search without allocation for ASCII text.
+#[inline]
+fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
+    if haystack.is_ascii() && needle.is_ascii() {
+        needle.is_empty()
+            || (needle.len() <= haystack.len()
+                && haystack
+                    .as_bytes()
+                    .windows(needle.len())
+                    .any(|window| window.eq_ignore_ascii_case(needle.as_bytes())))
+    } else {
+        haystack.to_lowercase().contains(&needle.to_lowercase())
+    }
+}
+
 use crate::klib::btreemap::BTreeMap;
 // SystemTime not in no_std
 
@@ -307,13 +322,12 @@ impl CalendarApp {
 
     /// Search events
     pub fn search_events(&self, query: &str) -> Vec<CalendarEvent> {
-        let query_lower = query.to_lowercase();
         self.storage
             .get_all_events()
             .into_iter()
             .filter(|e| {
-                e.title.to_lowercase().contains(&query_lower)
-                    || e.description.to_lowercase().contains(&query_lower)
+                contains_ignore_case(&e.title, query)
+                    || contains_ignore_case(&e.description, query)
             })
             .collect()
     }
