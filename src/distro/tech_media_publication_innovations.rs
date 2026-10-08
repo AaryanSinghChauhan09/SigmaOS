@@ -845,6 +845,9 @@ pub struct TechMediaArticleInsight {
     pub category: String,
     pub action_recommendation: String,
     pub impact_score: u32,
+    pub article_url: String,
+    pub publication_domain: String,
+    pub pr_branch_name: String,
 }
 
 /// Sovereign Synthesis Engine for Article Insights across all 28 publications.
@@ -864,6 +867,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             category: String::from("Userland & Terminal"),
             action_recommendation: String::from("Enable zero-alloc prompt caching & zero-dep CLI coreutils"),
             impact_score: 95,
+            article_url: String::from("https://itsfoss.com/cli-tools-guide"),
+            publication_domain: String::from("itsfoss.com"),
+            pr_branch_name: String::from("feature/itsfoss-cli-prompt-optimization"),
         });
 
         insights.push(TechMediaArticleInsight {
@@ -872,6 +878,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             category: String::from("Kernel & Scheduler"),
             action_recommendation: String::from("Configure realtime latency threshold below 5 microseconds"),
             impact_score: 98,
+            article_url: String::from("https://9to5linux.com/kernel-6-12-lts-rt"),
+            publication_domain: String::from("9to5linux.com"),
+            pr_branch_name: String::from("feature/9to5linux-preempt-rt-kernel"),
         });
 
         insights.push(TechMediaArticleInsight {
@@ -880,6 +889,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             category: String::from("Embedded & Hardware"),
             action_recommendation: String::from("Activate SBC pinout polling & I2C sensor bus telemetry"),
             impact_score: 88,
+            article_url: String::from("https://geeky-gadgets.com/sbc-gpio-telemetry"),
+            publication_domain: String::from("geeky-gadgets.com"),
+            pr_branch_name: String::from("feature/geeky-gadgets-gpio-telemetry"),
         });
 
         insights.push(TechMediaArticleInsight {
@@ -888,6 +900,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             category: String::from("Security & Governance"),
             action_recommendation: String::from("Enforce Landlock V5 sandboxing and pledge syscall filters"),
             impact_score: 99,
+            article_url: String::from("https://linux.com/landlock-sandboxing"),
+            publication_domain: String::from("linux.com"),
+            pr_branch_name: String::from("feature/linux-com-landlock-v5-sandboxing"),
         });
 
         insights.push(TechMediaArticleInsight {
@@ -896,6 +911,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             category: String::from("AI & Data Science"),
             action_recommendation: String::from("Deploy zero-allocation vector normalization & drift calculation"),
             impact_score: 94,
+            article_url: String::from("https://kdnuggets.com/zero-copy-vector-normalization"),
+            publication_domain: String::from("kdnuggets.com"),
+            pr_branch_name: String::from("feature/kdnuggets-simd-vector-norm"),
         });
 
         insights.push(TechMediaArticleInsight {
@@ -904,6 +922,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             category: String::from("Power & Hardware"),
             action_recommendation: String::from("Throttle GPU/CPU transients when voltage ripple exceeds 50mV"),
             impact_score: 96,
+            article_url: String::from("https://hwbusters.com/atx31-power-ripple-guard"),
+            publication_domain: String::from("hwbusters.com"),
+            pr_branch_name: String::from("feature/hwbusters-power-rail-protection"),
         });
 
         insights.push(TechMediaArticleInsight {
@@ -912,6 +933,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             category: String::from("Cloud & Enterprise"),
             action_recommendation: String::from("Maintain 99.999% uptime governor with active replica failover"),
             impact_score: 92,
+            article_url: String::from("https://itdaily.com/enterprise-sla-governor"),
+            publication_domain: String::from("itdaily.com"),
+            pr_branch_name: String::from("feature/itdaily-sla-resilience-governor"),
         });
 
         insights.push(TechMediaArticleInsight {
@@ -920,6 +944,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             category: String::from("Sysadmin & CLI"),
             action_recommendation: String::from("Translate legacy net-tools commands to iproute2 modern syntax"),
             impact_score: 85,
+            article_url: String::from("https://howtogeek.com/cli-command-translation"),
+            publication_domain: String::from("howtogeek.com"),
+            pr_branch_name: String::from("feature/howtogeek-cli-command-transpiler"),
         });
 
         insights.push(TechMediaArticleInsight {
@@ -928,6 +955,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             category: String::from("Kernel & Memory"),
             action_recommendation: String::from("Set vm.swappiness=10 and kernel.sched_rt_runtime_us=950000"),
             impact_score: 93,
+            article_url: String::from("https://linux.org/kernel-sysctl-tuning"),
+            publication_domain: String::from("linux.org"),
+            pr_branch_name: String::from("feature/linux-org-sysctl-tuning"),
         });
 
         insights.push(TechMediaArticleInsight {
@@ -936,6 +966,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             category: String::from("Cloud & Security"),
             action_recommendation: String::from("Isolate microservices in eBPF network sandboxes with TLS 1.3"),
             impact_score: 97,
+            article_url: String::from("https://infoworld.com/zero-trust-microservices"),
+            publication_domain: String::from("infoworld.com"),
+            pr_branch_name: String::from("feature/infoworld-zero-trust-mtls"),
         });
 
         insights.push(TechMediaArticleInsight {
@@ -944,6 +977,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             category: String::from("Supply Chain & Compliance"),
             action_recommendation: String::from("Enforce SPDX SBOM generation and license validation in CI/CD"),
             impact_score: 91,
+            article_url: String::from("https://linuxfoundation.org/sbom-compliance-guide"),
+            publication_domain: String::from("linuxfoundation.org"),
+            pr_branch_name: String::from("feature/linuxfoundation-sbom-compliance"),
         });
 
         insights.push(TechMediaArticleInsight {
@@ -952,6 +988,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             category: String::from("Desktop & GUI"),
             action_recommendation: String::from("Auto-switch to Zenith Minimal Tiling DE when RAM < 1GB"),
             impact_score: 89,
+            article_url: String::from("https://makeuseof.com/low-ram-desktop-optimization"),
+            publication_domain: String::from("makeuseof.com"),
+            pr_branch_name: String::from("feature/makeuseof-low-ram-de-profiler"),
         });
 
         insights.push(TechMediaArticleInsight {
@@ -960,6 +999,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             category: String::from("Power Management"),
             action_recommendation: String::from("Cap battery charging at 80% to maximize lifespan cycles"),
             impact_score: 90,
+            article_url: String::from("https://pcworld.com/battery-health-thresholds"),
+            publication_domain: String::from("pcworld.com"),
+            pr_branch_name: String::from("feature/pcworld-battery-threshold-governor"),
         });
 
         insights.push(TechMediaArticleInsight {
@@ -968,6 +1010,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             category: String::from("AI & Machine Learning"),
             action_recommendation: String::from("Apply 4-bit integer quantization for sub-2GB memory footprint"),
             impact_score: 96,
+            article_url: String::from("https://marktechpost.com/slm-int4-quantization"),
+            publication_domain: String::from("marktechpost.com"),
+            pr_branch_name: String::from("feature/marktechpost-slm-int4-quantization"),
         });
 
         insights.push(TechMediaArticleInsight {
@@ -976,6 +1021,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             category: String::from("Interoperability"),
             action_recommendation: String::from("Auto-transpile C:\\ paths to /mnt/c/ POSIX mount points"),
             impact_score: 87,
+            article_url: String::from("https://windowslatest.com/wsl2-path-translation"),
+            publication_domain: String::from("windowslatest.com"),
+            pr_branch_name: String::from("feature/windowslatest-wsl-path-interop"),
         });
 
         insights.push(TechMediaArticleInsight {
@@ -984,6 +1032,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             category: String::from("Graphics & Storage"),
             action_recommendation: String::from("Bypass virtual memory page cache for GPU direct texture loads"),
             impact_score: 95,
+            article_url: String::from("https://techspot.com/directstorage-nvme-frame-pacing"),
+            publication_domain: String::from("techspot.com"),
+            pr_branch_name: String::from("feature/techspot-directstorage-pacing"),
         });
 
         insights.push(TechMediaArticleInsight {
@@ -992,6 +1043,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             category: String::from("Cloud Native"),
             action_recommendation: String::from("Attach eBPF probes to syscalls for zero-overhead tracing"),
             impact_score: 94,
+            article_url: String::from("https://thenewstack.io/ebpf-service-mesh-wasm"),
+            publication_domain: String::from("thenewstack.io"),
+            pr_branch_name: String::from("feature/thenewstack-ebpf-wasm-tracing"),
         });
 
         insights.push(TechMediaArticleInsight {
@@ -1000,6 +1054,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             category: String::from("Hardware & Drivers"),
             action_recommendation: String::from("Ramp fan speed to 100% when hotspot temperature hits 85C"),
             impact_score: 93,
+            article_url: String::from("https://techpowerup.com/gpu-vrm-thermal-control"),
+            publication_domain: String::from("techpowerup.com"),
+            pr_branch_name: String::from("feature/techpowerup-gpu-thermal-protection"),
         });
 
         insights.push(TechMediaArticleInsight {
@@ -1008,6 +1065,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             category: String::from("Desktop Interop"),
             action_recommendation: String::from("Sync clipboard, SMS, and calls via zero-trust TLS channel"),
             impact_score: 86,
+            article_url: String::from("https://windowscentral.com/phone-link-linux-bridge"),
+            publication_domain: String::from("windowscentral.com"),
+            pr_branch_name: String::from("feature/windowscentral-phone-link-bridge"),
         });
 
         insights.push(TechMediaArticleInsight {
@@ -1016,6 +1076,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             category: String::from("Performance & Testing"),
             action_recommendation: String::from("Run automated regression benchmarks on kernel build commits"),
             impact_score: 97,
+            article_url: String::from("https://phoronix.com/automated-pts-benchmarking"),
+            publication_domain: String::from("phoronix.com"),
+            pr_branch_name: String::from("feature/phoronix-pts-auto-benchmark"),
         });
 
         insights.push(TechMediaArticleInsight {
@@ -1024,6 +1087,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             category: String::from("Ecosystem"),
             action_recommendation: String::from("Track maintainer bus factor and issue resolution rate"),
             impact_score: 88,
+            article_url: String::from("https://techcrunch.com/open-source-health-metrics"),
+            publication_domain: String::from("techcrunch.com"),
+            pr_branch_name: String::from("feature/techcrunch-open-source-health"),
         });
 
         insights.push(TechMediaArticleInsight {
@@ -1032,6 +1098,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             category: String::from("Mobile & Wayland"),
             action_recommendation: String::from("Stream Android screen buffers to Wayland surfaces via DMA-BUF"),
             impact_score: 91,
+            article_url: String::from("https://xda-developers.com/android-wayland-mirroring"),
+            publication_domain: String::from("xda-developers.com"),
+            pr_branch_name: String::from("feature/xda-android-wayland-mirror"),
         });
 
         insights.push(TechMediaArticleInsight {
@@ -1040,6 +1109,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             category: String::from("Enterprise Security"),
             action_recommendation: String::from("Validate CIS benchmarks and DISA STIG compliance rules"),
             impact_score: 98,
+            article_url: String::from("https://zdnet.com/enterprise-compliance-audit"),
+            publication_domain: String::from("zdnet.com"),
+            pr_branch_name: String::from("feature/zdnet-enterprise-hardening-audit"),
         });
 
         insights.push(TechMediaArticleInsight {
@@ -1048,6 +1120,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             category: String::from("Kernel Architecture"),
             action_recommendation: String::from("Support hot-swapping driver modules without kernel restart"),
             impact_score: 92,
+            article_url: String::from("https://opensourceforu.com/modular-kernel-hotswap"),
+            publication_domain: String::from("opensourceforu.com"),
+            pr_branch_name: String::from("feature/opensourceforu-modular-kernel-hotswap"),
         });
 
         insights.push(TechMediaArticleInsight {
@@ -1056,6 +1131,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             category: String::from("Endpoint Security"),
             action_recommendation: String::from("Scan binary execution memory using heuristic vector filters"),
             impact_score: 96,
+            article_url: String::from("https://pcmag.com/endpoint-heuristic-security"),
+            publication_domain: String::from("pcmag.com"),
+            pr_branch_name: String::from("feature/pcmag-endpoint-heuristic-shield"),
         });
 
         insights.push(TechMediaArticleInsight {
@@ -1064,6 +1142,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             category: String::from("Networking & Security"),
             action_recommendation: String::from("Drop invalid state TCP packets and rate limit SSH connection bursts"),
             impact_score: 91,
+            article_url: String::from("https://linuxteck.com/firewall-rule-hardening"),
+            publication_domain: String::from("linuxteck.com"),
+            pr_branch_name: String::from("feature/linuxteck-firewall-sysadmin-hardening"),
         });
 
         insights.push(TechMediaArticleInsight {
@@ -1072,6 +1153,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             category: String::from("Package Management"),
             action_recommendation: String::from("Auto-repair dpkg/pacman database locks and broken dependencies"),
             impact_score: 89,
+            article_url: String::from("https://appuals.com/auto-repair-package-locks"),
+            publication_domain: String::from("appuals.com"),
+            pr_branch_name: String::from("feature/appuals-auto-repair-package-locks"),
         });
 
         insights.push(TechMediaArticleInsight {
@@ -1080,6 +1164,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             category: String::from("Distro Analytics"),
             action_recommendation: String::from("Monitor top Linux distribution feature trends and package releases"),
             impact_score: 87,
+            article_url: String::from("https://distrowatch.com/popularity-ranking-analytics"),
+            publication_domain: String::from("distrowatch.com"),
+            pr_branch_name: String::from("feature/distrowatch-popularity-rankings"),
         });
 
         Self {
@@ -1100,6 +1187,22 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             .collect()
     }
 
+    pub fn get_insights_by_domain(&self, domain: &str) -> Vec<TechMediaArticleInsight> {
+        self.insights
+            .iter()
+            .filter(|i| i.publication_domain.eq_ignore_ascii_case(domain))
+            .cloned()
+            .collect()
+    }
+
+    pub fn get_insights_by_category(&self, category: &str) -> Vec<TechMediaArticleInsight> {
+        self.insights
+            .iter()
+            .filter(|i| i.category.eq_ignore_ascii_case(category))
+            .cloned()
+            .collect()
+    }
+
     pub fn filter_high_impact_insights(&self, min_score: u32) -> Vec<TechMediaArticleInsight> {
         self.insights
             .iter()
@@ -1113,6 +1216,25 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             return 0;
         }
         self.insights.len()
+    }
+
+    pub fn format_all_pr_proposals(&self) -> String {
+        let mut manifest = String::from("# SigmaOS Tech Media Multi-Portal PR Proposals Manifest\n\n");
+        manifest.push_str(&format!("Total Registered Portals: {}\n\n", self.insights.len()));
+
+        for insight in &self.insights {
+            manifest.push_str(&format!(
+                "### [{}] Branch: `{}`\n- **Domain:** {}\n- **Article URL:** {}\n- **Category:** {}\n- **Action Recommendation:** {}\n- **Impact Score:** {}/100\n\n",
+                insight.publication,
+                insight.pr_branch_name,
+                insight.publication_domain,
+                insight.article_url,
+                insight.category,
+                insight.action_recommendation,
+                insight.impact_score
+            ));
+        }
+        manifest
     }
 
     pub fn format_as_pull_request_submission(&self, pub_name: &str) -> String {
@@ -1216,7 +1338,13 @@ impl SovereignPublicationInspirationEngine {
     }
 
     pub fn synthesize_and_verify_all_28_portals(&mut self) -> bool {
-        self.itsfoss.verify_tooling()
+        let synthesis_engine = SovereignTechMediaArticleInsightSynthesisEngine::new();
+        let insight_verified = synthesis_engine.get_insights_count() == 28
+            && !synthesis_engine.get_insights_by_domain("itsfoss.com").is_empty()
+            && !synthesis_engine.format_all_pr_proposals().is_empty();
+
+        insight_verified
+            && self.itsfoss.verify_tooling()
             && self.ninetofivelinux.is_lts_rt_active()
             && self.geeky_gadgets.audit_sbc_telemetry()
             && self.linux_dot_com.verify_hardening()
@@ -1365,10 +1493,16 @@ mod tests {
         let itsfoss_insights = engine.filter_by_publication("ItsFOSS");
         assert_eq!(itsfoss_insights.len(), 1);
         assert_eq!(itsfoss_insights[0].category, "Userland & Terminal");
+        assert_eq!(itsfoss_insights[0].publication_domain, "itsfoss.com");
+        assert!(itsfoss_insights[0].article_url.contains("itsfoss.com"));
+        assert!(itsfoss_insights[0].pr_branch_name.contains("itsfoss"));
 
-        let linuxcom_insights = engine.filter_by_publication("Linux.com");
-        assert_eq!(linuxcom_insights.len(), 1);
-        assert!(linuxcom_insights[0].action_recommendation.contains("Landlock"));
+        let domain_insights = engine.get_insights_by_domain("linux.com");
+        assert_eq!(domain_insights.len(), 1);
+        assert!(domain_insights[0].action_recommendation.contains("Landlock"));
+
+        let category_insights = engine.get_insights_by_category("AI & Machine Learning");
+        assert!(!category_insights.is_empty());
 
         let high_impact = engine.filter_high_impact_insights(95);
         assert!(high_impact.len() >= 10);
@@ -1388,5 +1522,10 @@ mod tests {
         let pr_9to5 = engine.format_as_pull_request_submission("9to5Linux");
         assert!(pr_9to5.contains("PREEMPT_RT"));
         assert!(pr_9to5.contains("Impact Score"));
+
+        let manifest = engine.format_all_pr_proposals();
+        assert!(manifest.contains("SigmaOS Tech Media Multi-Portal PR Proposals Manifest"));
+        assert!(manifest.contains("Total Registered Portals: 28"));
+        assert!(manifest.contains("itsfoss.com"));
     }
 }
