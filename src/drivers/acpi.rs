@@ -26,7 +26,7 @@ use core::fmt;
 
 /// ACPI Root System Description Pointer (ACPI 1.0)
 #[derive(Debug, Clone, Copy)]
-#[repr(C, packed)]
+#[repr(C)]
 pub struct Rsdp {
     pub signature: [u8; 8], // "RSD PTR "
     pub checksum: u8,
@@ -37,7 +37,7 @@ pub struct Rsdp {
 
 /// ACPI Extended Root System Description Pointer (ACPI 2.0+)
 #[derive(Debug, Clone, Copy)]
-#[repr(C, packed)]
+#[repr(C)]
 pub struct RsdpExtended {
     pub signature: [u8; 8], // "RSD PTR "
     pub checksum: u8,
@@ -52,7 +52,7 @@ pub struct RsdpExtended {
 
 /// ACPI System Description Table Header
 #[derive(Debug, Clone, Copy)]
-#[repr(C, packed)]
+#[repr(C)]
 pub struct SdtHeader {
     pub signature: [u8; 4],
     pub length: u32,
@@ -67,7 +67,7 @@ pub struct SdtHeader {
 
 /// ACPI Fixed ACPI Description Table (FADT)
 #[derive(Debug, Clone, Copy)]
-#[repr(C, packed)]
+#[repr(C)]
 pub struct Fadt {
     pub header: SdtHeader,
     pub firmware_ctrl: u32,
@@ -95,7 +95,7 @@ pub struct Fadt {
 
 /// ACPI Multiple APIC Description Table (MADT)
 #[derive(Debug, Clone, Copy)]
-#[repr(C, packed)]
+#[repr(C)]
 pub struct Madt {
     pub header: SdtHeader,
     pub local_apic_address: u32,
@@ -104,7 +104,7 @@ pub struct Madt {
 
 /// ACPI High Precision Event Timer (HPET)
 #[derive(Debug, Clone, Copy)]
-#[repr(C, packed)]
+#[repr(C)]
 pub struct Hpet {
     pub header: SdtHeader,
     pub event_timer_block_id: u32,

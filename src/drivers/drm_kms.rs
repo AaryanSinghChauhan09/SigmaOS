@@ -233,31 +233,38 @@ impl DrmConnector {
 
     /// Detect connector and read EDID
     pub fn detect(&mut self) -> Result<DrmConnectorStatus, DrmError> {
-        // In real implementation: probe hardware and read EDID via I2C/DDC
-        // For now, simulate detection
-        self.status = DrmConnectorStatus::Connected;
+        // Create DDC I2C bus for this connector
+        let ddc = DdcI2cBus::new(self.connector_id);
 
-        // Add standard modes (in real implementation, these come from EDID)
-        self.modes.push(DrmModeInfo::mode_1080p_60());
-        self.modes.push(DrmModeInfo::mode_720p_60());
+        // Attempt to read EDID
+        match ddc.read_edid() {
+            Ok(edid) => {
+                self.status = DrmConnectorStatus::Connected;
 
-        // Add 2560x1440@60Hz mode
-        self.modes.push(DrmModeInfo {
-            clock: 241500,
-            hdisplay: 2560,
-            hsync_start: 2608,
-            hsync_end: 2648,
-            htotal: 2720,
-            vdisplay: 1440,
-            vsync_start: 1443,
-            vsync_end: 1448,
-            vtotal: 1481,
-            vrefresh: 60,
-            flags: 0x5,
-            name: *b"2560x1440\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0",
-        });
+                // Extract modes from EDID
+                let edid_modes = edid.extract_modes();
+                self.modes.extend(edid_modes);
 
-        Ok(self.status)
+                // Add fallback standard modes if EDID modes are limited
+                if self.modes.is_empty() {
+                    self.modes.push(DrmModeInfo::mode_1080p_60());
+                    self.modes.push(DrmModeInfo::mode_720p_60());
+                }
+
+                Ok(self.status)
+            }
+            Err(DrmError::InvalidEdid) => {
+                // EDID read failed but connector may still be connected
+                self.status = DrmConnectorStatus::Unknown;
+
+                // Add standard modes as fallback
+                self.modes.push(DrmModeInfo::mode_1080p_60());
+                self.modes.push(DrmModeInfo::mode_720p_60());
+
+                Ok(self.status)
+            }
+            Err(e) => Err(e),
+        }
     }
 }
 
@@ -439,6 +446,173 @@ impl DrmDevice {
     }
 }
 
+/// EDID (Extended Display Identification Data) structure
+#[repr(C, packed)]
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct EdidHeader {
+    pub magic: [u8; 8],     // "00 FF FF FF FF FF FF 00"
+    pub manufacturer: [u8; 2], // Manufacturer ID (PNP ID)
+    pub product_code: [u8; 2], // Product code
+    pub serial_number: u32,    // Serial number
+    pub manufacture_week: u8, // Week of manufacture
+    pub manufacture_year: u8, // Year of manufacture (year - 1990)
+    pub edid_version: u8,     // EDID version
+    pub edid_revision: u8,    // EDID revision
+}
+
+/// EDID detailed timing descriptor
+#[repr(C, packed)]
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct EdidTimingDescriptor {
+    pub pixel_clock: u16,     // Pixel clock in 10kHz units
+    pub h_active: u8,         // Horizontal active pixels
+    pub h_blank: u8,          // Horizontal blanking
+    pub h_active_hi: u8,      // High bits of h_active and h_blank
+    pub h_sync_off: u8,       // Horizontal sync offset
+    pub h_sync_width: u8,     // Horizontal sync pulse width
+    pub h_sync_hi: u8,        // High bits of sync offset and width
+    pub v_active: u8,         // Vertical active lines
+    pub v_blank: u8,          // Vertical blanking
+    pub v_active_hi: u8,      // High bits of v_active and v_blank
+    pub v_sync_off: u8,       // Vertical sync offset
+    pub v_sync_width: u8,     // Vertical sync pulse width
+    pub v_sync_hi: u8,        // High bits of sync offset and width
+    pub flags: u8,            // Misc flags
+}
+
+/// Full EDID structure (128 bytes)
+#[repr(C, packed)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct Edid {
+    pub header: EdidHeader,
+    pub established_timings: [u8; 3],
+    pub standard_timings: [[u8; 2]; 8],
+    pub detailed_timings: [EdidTimingDescriptor; 4],
+    pub extension_flag: u8,
+    pub checksum: u8,
+}
+
+impl Edid {
+    /// Parse EDID from raw data
+    pub fn from_bytes(data: &[u8; 128]) -> Result<Self, DrmError> {
+        // Verify magic header
+        if &data[0..8] != b"\x00\xFF\xFF\xFF\xFF\xFF\xFF\x00" {
+            return Err(DrmError::InvalidEdid);
+        }
+
+        // Verify checksum
+        let sum: u8 = data.iter().fold(0u8, |acc, &b| acc.wrapping_add(b));
+        if sum != 0 {
+            return Err(DrmError::InvalidEdidChecksum);
+        }
+
+        unsafe {
+            let edid_ptr = data.as_ptr() as *const Edid;
+            Ok((*edid_ptr).clone())
+        }
+    }
+
+    /// Extract display modes from EDID
+    pub fn extract_modes(&self) -> Vec<DrmModeInfo> {
+        let mut modes = Vec::new();
+
+        // Extract from detailed timing descriptors
+        for timing in &self.detailed_timings {
+            if timing.pixel_clock != 0 {
+                let h_active = u16::from(timing.h_active) |
+                    ((u16::from(timing.h_active_hi) & 0xF0) << 4);
+                let h_blank = u16::from(timing.h_blank) |
+                    ((u16::from(timing.h_active_hi) & 0x0F) << 8);
+                let v_active = u16::from(timing.v_active) |
+                    ((u16::from(timing.v_active_hi) & 0xF0) << 4);
+                let v_blank = u16::from(timing.v_blank) |
+                    ((u16::from(timing.v_active_hi) & 0x0F) << 8);
+
+                let clock_khz = u32::from(timing.pixel_clock) * 10;
+                let htotal = h_active + h_blank;
+                let vtotal = v_active + v_blank;
+                let vrefresh = ((clock_khz * 1000) / u32::from(htotal * vtotal)) as u16;
+
+                modes.push(DrmModeInfo {
+                    clock: clock_khz,
+                    hdisplay: h_active as u16,
+                    hsync_start: h_active as u16,
+                    hsync_end: htotal as u16,
+                    htotal: htotal as u16,
+                    vdisplay: v_active as u16,
+                    vsync_start: v_active as u16,
+                    vsync_end: vtotal as u16,
+                    vtotal: vtotal as u16,
+                    vrefresh,
+                    flags: 0x5,
+                    name: [0; 32],
+                });
+            }
+        }
+
+        modes
+    }
+}
+
+/// I2C/DDC interface for EDID reading
+pub struct DdcI2cBus {
+    pub bus_id: u32,
+}
+
+impl DdcI2cBus {
+    pub fn new(bus_id: u32) -> Self {
+        Self { bus_id }
+    }
+
+    /// Read EDID via I2C/DDC (typically from address 0x50)
+    pub fn read_edid(&self) -> Result<Edid, DrmError> {
+        // In real implementation: perform I2C transaction to read 128 bytes from 0x50
+        // For now, return simulated EDID
+        let mut edid_data = [0u8; 128];
+
+        // Write valid EDID header
+        edid_data[0..8].copy_from_slice(b"\x00\xFF\xFF\xFF\xFF\xFF\xFF\x00");
+
+        // Write manufacturer ID (example: "DEL" for Dell)
+        edid_data[8] = 0x10; // 'D'
+        edid_data[9] = 0xAC; // 'E' + 'L' packed
+
+        // Write EDID version 1.3
+        edid_data[18] = 1;
+        edid_data[19] = 3;
+
+        // Add a 1920x1080@60Hz detailed timing
+        let timing = EdidTimingDescriptor {
+            pixel_clock: 14850, // 148.5 MHz in 10kHz units
+            h_active: 208,
+            h_blank: 48,
+            h_active_hi: 0,
+            h_sync_off: 32,
+            h_sync_width: 5,
+            h_sync_hi: 0,
+            v_active: 81,
+            v_blank: 3,
+            v_active_hi: 0,
+            v_sync_off: 6,
+            v_sync_width: 5,
+            v_sync_hi: 0,
+            flags: 0x18,
+        };
+
+        unsafe {
+            let timing_ptr = &timing as *const EdidTimingDescriptor as *const u8;
+            let timing_bytes = core::slice::from_raw_parts(timing_ptr, core::mem::size_of::<EdidTimingDescriptor>());
+            edid_data[54..54 + timing_bytes.len()].copy_from_slice(timing_bytes);
+        }
+
+        // Calculate and write checksum
+        let sum: u8 = edid_data[0..127].iter().fold(0u8, |acc, &b| acc.wrapping_add(b));
+        edid_data[127] = sum.wrapping_neg();
+
+        Edid::from_bytes(&edid_data)
+    }
+}
+
 /// DRM error types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DrmError {
@@ -451,9 +625,10 @@ pub enum DrmError {
     NoMemory,
     Busy,
     NotSupported,
+    InvalidEdid,
+    InvalidEdidChecksum,
 }
 
-#[cfg(test)]
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -484,5 +659,55 @@ mod tests {
     fn test_pixel_format_bpp() {
         assert_eq!(DrmPixelFormat::Rgb565.bytes_per_pixel(), 2);
         assert_eq!(DrmPixelFormat::Xrgb8888.bytes_per_pixel(), 4);
+    }
+
+    #[test]
+    fn test_edid_parsing() {
+        let mut edid_data = [0u8; 128];
+        edid_data[0..8].copy_from_slice(b"\x00\xFF\xFF\xFF\xFF\xFF\xFF\x00");
+        edid_data[18] = 1;
+        edid_data[19] = 3;
+
+        let sum: u8 = edid_data[0..127].iter().fold(0u8, |acc, &b| acc.wrapping_add(b));
+        edid_data[127] = sum.wrapping_neg();
+
+        let edid = Edid::from_bytes(&edid_data).unwrap();
+        assert_eq!(edid.header.edid_version, 1);
+        assert_eq!(edid.header.edid_revision, 3);
+    }
+
+    #[test]
+    fn test_edid_invalid_magic() {
+        let mut edid_data = [0u8; 128];
+        edid_data[0..8].copy_from_slice(b"\x00\x00\x00\x00\x00\x00\x00\x00");
+
+        let result = Edid::from_bytes(&edid_data);
+        assert_eq!(result, Err(DrmError::InvalidEdid));
+    }
+
+    #[test]
+    fn test_edid_invalid_checksum() {
+        let mut edid_data = [0u8; 128];
+        edid_data[0..8].copy_from_slice(b"\x00\xFF\xFF\xFF\xFF\xFF\xFF\x00");
+        edid_data[127] = 0xFF; // Invalid checksum
+
+        let result = Edid::from_bytes(&edid_data);
+        assert_eq!(result, Err(DrmError::InvalidEdidChecksum));
+    }
+
+    #[test]
+    fn test_ddc_read_edid() {
+        let ddc = DdcI2cBus::new(0);
+        let edid = ddc.read_edid().unwrap();
+        assert_eq!(edid.header.edid_version, 1);
+        assert_eq!(edid.header.edid_revision, 3);
+    }
+
+    #[test]
+    fn test_edid_extract_modes() {
+        let ddc = DdcI2cBus::new(0);
+        let edid = ddc.read_edid().unwrap();
+        let modes = edid.extract_modes();
+        assert!(modes.len() > 0);
     }
 }
