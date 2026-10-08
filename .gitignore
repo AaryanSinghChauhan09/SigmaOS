@@ -74,3 +74,4 @@ wiki_repo/
 wiki/
 WIKI/
 docs/
+!Agents/*.md
