@@ -461,6 +461,16 @@ export function initCommandPalette() {
       }
     }
   });
+
+  document.addEventListener("click", (event) => {
+    if (
+      cmdPalette.classList.contains("active") &&
+      typeof cmdPalette.contains === "function" &&
+      !cmdPalette.contains(event.target)
+    ) {
+      closeCommandPalette();
+    }
+  });
 }
 
 /**
