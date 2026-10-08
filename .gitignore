@@ -71,7 +71,11 @@ wiki_repo/
 *.md
 *.txt
 *.py
-wiki/
-WIKI/
-docs/
 !Agents/*.md
+!WHAT_IS_WORKING_AND_NOT_WORKING.md
+!docs/
+!docs/*
+!wiki/
+!wiki/*
+!WIKI/
+!WIKI/*
