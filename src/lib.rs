@@ -142,6 +142,7 @@ pub use distro::sovereign_open_source_os_gap_closure_v27::*;
 pub use distro::sovereign_universal_subsystem_interop::*;
 pub use distro::sovereign_linux_bsd_ecosystem_advancements_v28::*;
 pub use distro::sovereign_linux_bsd_ecosystem_advancements_v29::*;
+pub use distro::sovereign_linux_bsd_ecosystem_advancements_v30::*;
 pub use distro::sovereign_mint_omarchy_apex_dominance_v30::*;
 pub use distro::sovereign_mint_omarchy_innovations_v31::*;
 pub use distro::sovereign_mint_omarchy_v32_apex_arsenal::*;

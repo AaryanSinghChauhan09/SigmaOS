@@ -441,6 +441,9 @@ pub use sovereign_linux_bsd_ecosystem_advancements_v28::*;
 pub mod sovereign_linux_bsd_ecosystem_advancements_v29;
 pub use sovereign_linux_bsd_ecosystem_advancements_v29::*;
 
+pub mod sovereign_linux_bsd_ecosystem_advancements_v30;
+pub use sovereign_linux_bsd_ecosystem_advancements_v30::*;
+
 pub mod sovereign_mint_omarchy_apex_dominance_v30;
 pub use sovereign_mint_omarchy_apex_dominance_v30::*;
 
