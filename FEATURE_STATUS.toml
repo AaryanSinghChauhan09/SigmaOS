@@ -47,6 +47,13 @@ description = "SYSCALL/SYSRET via MSR_LSTAR, MSR_STAR, MSR_SFMASK, swapgs"
 test_evidence = "Unit tests for MSR values"
 next_milestone = "Ring-3 userland syscall test"
 
+[arch.x86_64.tss_ring3_transition]
+status = "partial"
+files = ["src/arch/x86_64/tss_ring3_user_mode.rs"]
+description = "TSS structure, InterruptFrame, UserModeContext for Ring 3 transition via iretq/sysretq"
+test_evidence = "Unit tests for TSS initialization and interrupt frame preparation"
+next_milestone = "Real hardware TSS loading with ltr and CR3 user-space page table mapping"
+
 [syscall.abi]
 status = "partial"
 files = ["src/syscall/abi.rs"]

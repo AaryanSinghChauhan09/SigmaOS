@@ -153,3 +153,9 @@ status = "partial"
 tested_on = ["unit-test"]
 required_for_release = true
 description = "DRM/KMS subsystem with CRTC, encoder, connector management, mode setting infrastructure, and display mode detection."
+
+[feature.tss_ring3_transition]
+status = "partial"
+tested_on = ["unit-test"]
+required_for_release = true
+description = "TSS (Task State Segment) structure, InterruptFrame, UserModeContext for Ring 3 user mode transition via iretq/sysretq"
