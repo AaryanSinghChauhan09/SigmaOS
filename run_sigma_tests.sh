@@ -556,6 +556,20 @@ if [ -f "src/distro/sovereign_linux_bsd_pinnacle_innovations_v14.rs" ]; then
     ./build/test_pinnacle_v14
 fi
 
+if [ -f "src/distro/sovereign_linux_bsd_media_wiki_unimplemented_ideas_engine.rs" ]; then
+    echo "Running Sovereign Linux & BSD Media/Wiki Unimplemented Ideas Engine test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_linux_bsd_media_wiki_unimplemented_ideas_engine.rs --edition=2021 -o build/test_media_wiki_engine
+    ./build/test_media_wiki_engine
+fi
+
+if [ -f "src/distro/sovereign_open_source_os_gap_closure_pr.rs" ]; then
+    echo "Running Sovereign Open Source OS Gap Closure PR test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_open_source_os_gap_closure_pr.rs --edition=2021 -o build/test_os_gap_closure_pr
+    ./build/test_os_gap_closure_pr
+fi
+
 if [ -f "src/compatibility/omarchy_supreme_engine.rs" ]; then
     echo "Running Sovereign Omarchy Supreme Engine test suite..."
     mkdir -p build
