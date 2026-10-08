@@ -542,7 +542,31 @@ impl UniversalPackageImporter {
         raw_deps
             .iter()
             .map(|dep| {
-                let dep_lower = dep.to_lowercase();
+                let mut dep_lower = dep.to_lowercase();
+                if dep_lower.starts_with("so:") {
+                    let stripped = &dep_lower["so:".len()..];
+                    if stripped.starts_with("libc.") {
+                        dep_lower = "libc".to_string();
+                    } else {
+                        dep_lower = stripped.split('.').next().unwrap_or(stripped).to_string();
+                    }
+                } else if dep_lower.starts_with("cmd:") {
+                    dep_lower = dep_lower["cmd:".len()..].to_string();
+                } else if dep_lower.starts_with("pkgconfig(") {
+                    dep_lower = dep_lower["pkgconfig(".len()..].trim_end_matches(')').to_string();
+                } else if dep_lower.starts_with("perl-module(") {
+                    dep_lower = dep_lower["perl-module(".len()..].trim_end_matches(')').to_string();
+                } else if dep_lower.starts_with("python3dist(") {
+                    dep_lower = dep_lower["python3dist(".len()..].trim_end_matches(')').to_string();
+                } else if let Some(pos) = dep_lower.rfind(':') {
+                    let suffix = &dep_lower[pos + 1..];
+                    if matches!(suffix, "amd64" | "i386" | "arm64" | "armhf" | "all" | "x86_64" | "native") {
+                        dep_lower = dep_lower[..pos].to_string();
+                    }
+                }
+                dep_lower = dep_lower.strip_suffix(".x86_64").unwrap_or(&dep_lower).to_string();
+                dep_lower = dep_lower.strip_suffix(".noarch").unwrap_or(&dep_lower).to_string();
+
                 if dep_lower.contains("ssl")
                     || dep_lower.contains("crypto")
                     || dep_lower.contains("gnutls")
@@ -2803,5 +2827,21 @@ mod tests {
 
         let nixos = pkg_mgr.execute_universal_cli_command("nixos install nix").unwrap();
         assert!(nixos.contains("nix"));
+    }
+
+    #[test]
+    fn test_virtual_package_dependency_mapping() {
+        let raw = vec![
+            "sh".to_string(),
+            "so:libc.so.6".to_string(),
+            "pkgconfig(openssl)".to_string(),
+            "curl:amd64".to_string(),
+            "htop.x86_64".to_string(),
+        ];
+        let translated = UniversalPackageImporter::translate_foreign_dependencies(&raw);
+        println!("Translated deps: {:?}", translated);
+        assert!(translated.contains(&"sovereign-shell".to_string()));
+        assert!(translated.contains(&"sovereign-libc".to_string()));
+        assert!(translated.contains(&"sovereign-openssl".to_string()));
     }
 }

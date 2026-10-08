@@ -2002,26 +2002,43 @@ impl UniversalDependencyMapper {
     /// Translates a foreign package dependency name to a canonical Sigma-pkg dependency name
     pub fn to_canonical_name(&self, foreign_name: &str) -> String {
         let raw = foreign_name.trim().to_lowercase();
-        let clean_str = if let Some(stripped) = raw.strip_prefix("so:") {
-            if stripped.starts_with("libc.") {
+        let mut clean_raw = raw.clone();
+        if clean_raw.starts_with("so:") {
+            let stripped = &clean_raw["so:".len()..];
+            clean_raw = if stripped.starts_with("libc.") {
                 "libc".to_string()
             } else {
                 stripped.split('.').next().unwrap_or(stripped).to_string()
+            };
+        } else if clean_raw.starts_with("cmd:") {
+            clean_raw = clean_raw["cmd:".len()..].to_string();
+        } else if clean_raw.starts_with("pkgconfig(") {
+            clean_raw = clean_raw["pkgconfig(".len()..].trim_end_matches(')').to_string();
+        } else if clean_raw.starts_with("perl-module(") {
+            clean_raw = clean_raw["perl-module(".len()..].trim_end_matches(')').to_string();
+        } else if clean_raw.starts_with("python3dist(") {
+            clean_raw = clean_raw["python3dist(".len()..].trim_end_matches(')').to_string();
+        } else if let Some(pos) = clean_raw.rfind(':') {
+            let suffix = &clean_raw[pos + 1..];
+            if matches!(suffix, "amd64" | "i386" | "arm64" | "armhf" | "all" | "x86_64" | "native") {
+                clean_raw = clean_raw[..pos].to_string();
             }
-        } else if let Some(stripped) = raw.strip_prefix("cmd:") {
-            stripped.to_string()
-        } else {
-            raw.clone()
-        };
+        }
+
+        let clean_str = clean_raw;
 
         let uncat_str = if let Some(pos) = clean_str.find('/') {
             clean_str[pos + 1..].to_string()
         } else {
             clean_str
         };
-        let clean = uncat_str.as_str();
+        let base_clean = uncat_str.as_str();
+        let clean_temp = base_clean.strip_suffix(".x86_64").unwrap_or(base_clean);
+        let clean = clean_temp.strip_suffix(".noarch").unwrap_or(clean_temp);
 
         match clean {
+            "sh" | "bin/sh" | "usr/bin/sh" => "bash".to_string(),
+            "so:libc.so" | "so:libc.so.6" | "libc.so.6" | "libc.so" => "libc".to_string(),
             "libssl-dev" | "libssl3" | "openssl-devel" | "openssl-dev" | "security/openssl"
             | "dev-libs/openssl" | "libgnutls-dev" | "gnutls-devel" | "mbedtls-devel"
             | "libmbedtls-dev" | "libgcrypt-dev" | "libgcrypt-devel" => "openssl".to_string(),
@@ -2298,6 +2315,21 @@ impl UniversalSandboxCapabilityMatrix {
                 || c == "execpromises"
             {
                 perms.push(Permission::ProcessExec);
+            } else if c.contains("cgroups")
+                || c.contains("memory.max")
+                || c.contains("cpu.max")
+                || c.contains("capsicum")
+                || c == "android.permission.internet"
+                || c == "android.permission.read_external_storage"
+            {
+                if c.contains("internet") {
+                    perms.push(Permission::NetworkTcp);
+                } else if c.contains("external_storage") {
+                    perms.push(Permission::FileRead);
+                    perms.push(Permission::FileWrite);
+                } else {
+                    perms.push(Permission::ProcessExec);
+                }
             }
         }
         if perms.is_empty() {
@@ -4109,5 +4141,32 @@ requires {
         let obsd_manifest = adapter.parse_openbsd_contents(openbsd_contents).unwrap();
         assert_eq!(obsd_manifest.pkgname, "htop");
         assert_eq!(obsd_manifest.version, "3.2.2");
+    }
+
+    #[test]
+    fn test_virtual_package_dependency_mapping() {
+        let mapper = UniversalDependencyMapper::new();
+        assert_eq!(mapper.to_canonical_name("sh"), "bash");
+        assert_eq!(mapper.to_canonical_name("so:libc.so.6"), "libc");
+        assert_eq!(mapper.to_canonical_name("cmd:bash"), "bash");
+        assert_eq!(mapper.to_canonical_name("pkgconfig(openssl)"), "openssl");
+        assert_eq!(mapper.to_canonical_name("perl-module(File::Spec)"), "File::Spec");
+        assert_eq!(mapper.to_canonical_name("python3dist(requests)"), "requests");
+        assert_eq!(mapper.to_canonical_name("curl:amd64"), "curl");
+        assert_eq!(mapper.to_canonical_name("htop.x86_64"), "htop");
+    }
+
+    #[test]
+    fn test_expanded_sandbox_capabilities_mapping() {
+        let matrix = UniversalSandboxCapabilityMatrix::new();
+        let caps = vec![
+            "android.permission.INTERNET".to_string(),
+            "android.permission.READ_EXTERNAL_STORAGE".to_string(),
+            "cgroups.memory.max".to_string(),
+        ];
+        let perms = matrix.map_foreign_capabilities(&caps);
+        assert!(perms.contains(&Permission::NetworkTcp));
+        assert!(perms.contains(&Permission::FileRead));
+        assert!(perms.contains(&Permission::ProcessExec));
     }
 }
