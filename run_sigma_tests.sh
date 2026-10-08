@@ -767,11 +767,25 @@ if [ -f "src/distro/sovereign_universal_subsystem_interop.rs" ]; then
     ./build/universal_subsystem_interop_test
 fi
 
+if [ -f "src/distro/sovereign_open_source_os_gap_closure_pr.rs" ]; then
+    echo "Running Open Source OS Gap Closure PR test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_open_source_os_gap_closure_pr.rs --edition=2021 -o build/test_os_gap_closure_pr
+    ./build/test_os_gap_closure_pr
+fi
+
 if [ -f "src/distro/sovereign_linux_bsd_ecosystem_advancements_v29.rs" ]; then
     echo "Running Sovereign Linux & BSD Ecosystem Advancements V29 test suite..."
     mkdir -p build
     rustc --test src/distro/sovereign_linux_bsd_ecosystem_advancements_v29.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_advancements_v29
     ./build/test_advancements_v29
+fi
+
+if [ -f "src/distro/sovereign_linux_bsd_ecosystem_advancements_v30.rs" ]; then
+    echo "Running Sovereign Linux & BSD Ecosystem Advancements V30 test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_linux_bsd_ecosystem_advancements_v30.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_advancements_v30
+    ./build/test_advancements_v30
 fi
 
 if [ -f "src/distro/sovereign_mint_omarchy_apex_dominance_v30.rs" ]; then

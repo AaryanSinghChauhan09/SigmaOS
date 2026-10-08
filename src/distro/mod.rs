@@ -429,6 +429,9 @@ pub use sovereign_architecture_development_decision_plan::*;
 pub mod omarchy_linux_gap_closure_pr_suite;
 pub use omarchy_linux_gap_closure_pr_suite::*;
 
+pub mod sovereign_open_source_os_gap_closure_pr;
+pub use sovereign_open_source_os_gap_closure_pr::*;
+
 pub mod sovereign_open_source_os_gap_closure_v27;
 pub use sovereign_open_source_os_gap_closure_v27::*;
 
@@ -440,6 +443,9 @@ pub use sovereign_linux_bsd_ecosystem_advancements_v28::*;
 
 pub mod sovereign_linux_bsd_ecosystem_advancements_v29;
 pub use sovereign_linux_bsd_ecosystem_advancements_v29::*;
+
+pub mod sovereign_linux_bsd_ecosystem_advancements_v30;
+pub use sovereign_linux_bsd_ecosystem_advancements_v30::*;
 
 pub mod sovereign_mint_omarchy_apex_dominance_v30;
 pub use sovereign_mint_omarchy_apex_dominance_v30::*;
