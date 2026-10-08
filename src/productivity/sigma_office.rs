@@ -8132,6 +8132,636 @@ impl SovereignBitrix24OmnichannelCallQueueRouterEngine {
     }
 }
 
+// =========================================================================
+// Additional Enterprise Productivity Suite Innovations (Google, MS, Zoho, Salesforce, Odoo, Bitrix24)
+// =========================================================================
+
+// 1. Google Suite: SovereignGoogleSheetsBigQueryDataConnectorEngine
+#[derive(Debug, Clone)]
+pub struct SovereignGoogleSheetsBigQueryDataConnectorEngine {
+    pub dataset_id: String,
+    pub table_name: String,
+    pub query_pushdown_sql: String,
+    pub cached_rows: Vec<Vec<String>>,
+    pub last_sync_timestamp: u64,
+}
+
+impl SovereignGoogleSheetsBigQueryDataConnectorEngine {
+    pub fn new(dataset_id: &str, table_name: &str) -> Self {
+        Self {
+            dataset_id: dataset_id.to_string(),
+            table_name: table_name.to_string(),
+            query_pushdown_sql: format!("SELECT * FROM `{}.{}`", dataset_id, table_name),
+            cached_rows: Vec::new(),
+            last_sync_timestamp: 0,
+        }
+    }
+
+    pub fn set_query_pushdown(&mut self, sql: &str) {
+        self.query_pushdown_sql = sql.to_string();
+    }
+
+    pub fn execute_sync(&mut self, data_batch: Vec<Vec<String>>, timestamp: u64) -> usize {
+        self.cached_rows = data_batch;
+        self.last_sync_timestamp = timestamp;
+        self.cached_rows.len()
+    }
+
+    pub fn get_cached_row_count(&self) -> usize {
+        self.cached_rows.len()
+    }
+
+    pub fn get_cell(&self, row: usize, col: usize) -> Option<&str> {
+        self.cached_rows.get(row)?.get(col).map(|s| s.as_str())
+    }
+}
+
+// 2. Google Suite: SovereignGoogleDocsGeminiSmartWriterEngine
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AiWriterTone {
+    Formal,
+    Concise,
+    Elaborate,
+    Persuasive,
+}
+
+#[derive(Debug, Clone)]
+pub struct GeminiSuggestion {
+    pub original_text: String,
+    pub suggested_text: String,
+    pub tone: AiWriterTone,
+    pub is_accepted: bool,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct SovereignGoogleDocsGeminiSmartWriterEngine {
+    pub history: Vec<GeminiSuggestion>,
+}
+
+impl SovereignGoogleDocsGeminiSmartWriterEngine {
+    pub fn new() -> Self {
+        Self { history: Vec::new() }
+    }
+
+    pub fn generate_rewrite_suggestion(&mut self, original: &str, tone: AiWriterTone) -> GeminiSuggestion {
+        let rewritten = match tone {
+            AiWriterTone::Formal => format!("It is requested that: {}", original),
+            AiWriterTone::Concise => original.split_whitespace().take(5).collect::<Vec<&str>>().join(" "),
+            AiWriterTone::Elaborate => format!("In addition to previous points, note that {}", original),
+            AiWriterTone::Persuasive => format!("We strongly recommend that {}", original),
+        };
+
+        let suggestion = GeminiSuggestion {
+            original_text: original.to_string(),
+            suggested_text: rewritten,
+            tone,
+            is_accepted: false,
+        };
+
+        self.history.push(suggestion.clone());
+        suggestion
+    }
+
+    pub fn accept_suggestion(&mut self, suggestion: &mut GeminiSuggestion) -> String {
+        suggestion.is_accepted = true;
+        suggestion.suggested_text.clone()
+    }
+}
+
+// 3. Google Suite: SovereignLookerStudioDataBlendEngine
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BlendJoinType {
+    LeftOuter,
+    Inner,
+    FullOuter,
+}
+
+#[derive(Debug, Clone)]
+pub struct DataBlendConfig {
+    pub primary_table: String,
+    pub secondary_table: String,
+    pub join_key_idx: usize,
+    pub join_type: BlendJoinType,
+}
+
+#[derive(Debug, Clone)]
+pub struct SovereignLookerStudioDataBlendEngine {
+    pub config: DataBlendConfig,
+}
+
+impl SovereignLookerStudioDataBlendEngine {
+    pub fn new(config: DataBlendConfig) -> Self {
+        Self { config }
+    }
+
+    pub fn blend_datasets(&self, primary: &[Vec<String>], secondary: &[Vec<String>]) -> Vec<Vec<String>> {
+        let mut result = Vec::new();
+
+        for p_row in primary {
+            let key = p_row.get(self.config.join_key_idx).map(|s| s.as_str()).unwrap_or("");
+            let mut matched = false;
+
+            for s_row in secondary {
+                let s_key = s_row.get(self.config.join_key_idx).map(|s| s.as_str()).unwrap_or("");
+                if key == s_key {
+                    let mut combined = p_row.clone();
+                    combined.extend(s_row.clone());
+                    result.push(combined);
+                    matched = true;
+                }
+            }
+
+            if !matched && self.config.join_type == BlendJoinType::LeftOuter {
+                let mut combined = p_row.clone();
+                combined.push("NULL".to_string());
+                result.push(combined);
+            }
+        }
+
+        result
+    }
+
+    pub fn evaluate_case_when(&self, val: f64, threshold: f64, high_label: &str, low_label: &str) -> String {
+        if val >= threshold {
+            high_label.to_string()
+        } else {
+            low_label.to_string()
+        }
+    }
+}
+
+// 4. Microsoft Suite: SovereignMicrosoftPowerAppsCanvasEngine
+#[derive(Debug, Clone)]
+pub struct PowerFxVariable {
+    pub name: String,
+    pub value: String,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct SovereignMicrosoftPowerAppsCanvasEngine {
+    pub variables: Vec<PowerFxVariable>,
+    pub current_screen: String,
+}
+
+impl SovereignMicrosoftPowerAppsCanvasEngine {
+    pub fn new() -> Self {
+        Self {
+            variables: Vec::new(),
+            current_screen: "Screen1".to_string(),
+        }
+    }
+
+    pub fn set_variable(&mut self, name: &str, value: &str) {
+        if let Some(var) = self.variables.iter_mut().find(|v| v.name == name) {
+            var.value = value.to_string();
+        } else {
+            self.variables.push(PowerFxVariable {
+                name: name.to_string(),
+                value: value.to_string(),
+            });
+        }
+    }
+
+    pub fn get_variable(&self, name: &str) -> Option<&str> {
+        self.variables.iter().find(|v| v.name == name).map(|v| v.value.as_str())
+    }
+
+    pub fn filter_collection(&self, items: &[f64], min_val: f64) -> Vec<f64> {
+        items.iter().copied().filter(|&x| x >= min_val).collect()
+    }
+
+    pub fn navigate_screen(&mut self, screen_name: &str) -> String {
+        self.current_screen = screen_name.to_string();
+        format!("Navigated to {}", screen_name)
+    }
+}
+
+// 5. Microsoft Suite: SovereignMicrosoftTeamsChannelBotWorkflowEngine
+#[derive(Debug, Clone)]
+pub struct AdaptiveCardAction {
+    pub action_type: String,
+    pub title: String,
+    pub payload: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct SovereignMicrosoftTeamsChannelBotWorkflowEngine {
+    pub channel_id: String,
+    pub registered_actions: Vec<AdaptiveCardAction>,
+}
+
+impl SovereignMicrosoftTeamsChannelBotWorkflowEngine {
+    pub fn new(channel_id: &str) -> Self {
+        Self {
+            channel_id: channel_id.to_string(),
+            registered_actions: Vec::new(),
+        }
+    }
+
+    pub fn create_adaptive_card_payload(&mut self, title: &str, body: &str, actions: Vec<(&str, &str)>) -> String {
+        for (a_title, a_payload) in &actions {
+            self.registered_actions.push(AdaptiveCardAction {
+                action_type: "Action.Submit".to_string(),
+                title: a_title.to_string(),
+                payload: a_payload.to_string(),
+            });
+        }
+        format!(
+            "{{\"type\":\"AdaptiveCard\",\"title\":\"{}\",\"body\":\"{}\",\"actions_count\":{}}}",
+            title, body, actions.len()
+        )
+    }
+
+    pub fn dispatch_bot_mention_trigger(&self, message: &str) -> String {
+        format!("[Channel: {}] Bot triggered with: {}", self.channel_id, message)
+    }
+}
+
+// 6. Zoho Suite: SovereignZohoUnifiedAppSwitcherEngine
+#[derive(Debug, Clone)]
+pub struct AppPortalModule {
+    pub module_id: String,
+    pub module_name: String,
+    pub required_role: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct UserSessionContext {
+    pub user_id: String,
+    pub roles: Vec<String>,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct SovereignZohoUnifiedAppSwitcherEngine {
+    pub modules: Vec<AppPortalModule>,
+}
+
+impl SovereignZohoUnifiedAppSwitcherEngine {
+    pub fn new() -> Self {
+        Self { modules: Vec::new() }
+    }
+
+    pub fn register_module(&mut self, id: &str, name: &str, required_role: &str) {
+        self.modules.push(AppPortalModule {
+            module_id: id.to_string(),
+            module_name: name.to_string(),
+            required_role: required_role.to_string(),
+        });
+    }
+
+    pub fn can_access_module(&self, session: &UserSessionContext, module_id: &str) -> bool {
+        if let Some(module) = self.modules.iter().find(|m| m.module_id == module_id) {
+            session.roles.contains(&module.required_role) || session.roles.contains(&"admin".to_string())
+        } else {
+            false
+        }
+    }
+
+    pub fn get_accessible_modules(&self, session: &UserSessionContext) -> Vec<AppPortalModule> {
+        self.modules
+            .iter()
+            .filter(|m| session.roles.contains(&m.required_role) || session.roles.contains(&"admin".to_string()))
+            .cloned()
+            .collect()
+    }
+}
+
+// 7. Zoho Suite: SovereignZohoAnalyticsPredictiveForecastingEngine
+#[derive(Debug, Clone)]
+pub struct ForecastResult {
+    pub projected_values: Vec<f64>,
+    pub lower_bound_95: Vec<f64>,
+    pub upper_bound_95: Vec<f64>,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct SovereignZohoAnalyticsPredictiveForecastingEngine;
+
+impl SovereignZohoAnalyticsPredictiveForecastingEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn predict_exponential_smoothing(&self, historical: &[f64], forecast_steps: usize, alpha: f64) -> ForecastResult {
+        if historical.is_empty() {
+            return ForecastResult {
+                projected_values: Vec::new(),
+                lower_bound_95: Vec::new(),
+                upper_bound_95: Vec::new(),
+            };
+        }
+
+        let mut last_s = historical[0];
+        for &x in &historical[1..] {
+            last_s = alpha * x + (1.0 - alpha) * last_s;
+        }
+
+        let mut projected = Vec::new();
+        let mut lower = Vec::new();
+        let mut upper = Vec::new();
+
+        for i in 1..=forecast_steps {
+            let margin = 1.96 * (i as f64).sqrt() * 0.05 * last_s;
+            projected.push(last_s);
+            lower.push((last_s - margin).max(0.0));
+            upper.push(last_s + margin);
+        }
+
+        ForecastResult {
+            projected_values: projected,
+            lower_bound_95: lower,
+            upper_bound_95: upper,
+        }
+    }
+}
+
+// 8. Salesforce Suite: SovereignSalesforceLightningFlowOrchestratorEngine
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FlowNodeKind {
+    Screen,
+    Decision,
+    RecordUpdate,
+}
+
+#[derive(Debug, Clone)]
+pub struct FlowNode {
+    pub node_id: String,
+    pub kind: FlowNodeKind,
+    pub label: String,
+    pub next_node_id: Option<String>,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct SovereignSalesforceLightningFlowOrchestratorEngine {
+    pub nodes: Vec<FlowNode>,
+}
+
+impl SovereignSalesforceLightningFlowOrchestratorEngine {
+    pub fn new() -> Self {
+        Self { nodes: Vec::new() }
+    }
+
+    pub fn add_node(&mut self, node_id: &str, kind: FlowNodeKind, label: &str, next_node_id: Option<&str>) {
+        self.nodes.push(FlowNode {
+            node_id: node_id.to_string(),
+            kind,
+            label: label.to_string(),
+            next_node_id: next_node_id.map(|s| s.to_string()),
+        });
+    }
+
+    pub fn execute_flow(&self, start_node_id: &str) -> Vec<String> {
+        let mut execution_trace = Vec::new();
+        let mut curr_id = Some(start_node_id.to_string());
+
+        while let Some(id) = curr_id {
+            if let Some(node) = self.nodes.iter().find(|n| n.node_id == id) {
+                execution_trace.push(format!("Executed {}: {}", node.node_id, node.label));
+                curr_id = node.next_node_id.clone();
+            } else {
+                break;
+            }
+        }
+
+        execution_trace
+    }
+}
+
+// 9. Salesforce Suite: SovereignSalesforceDataCloudCdpIdentityResolutionEngine
+#[derive(Debug, Clone)]
+pub struct ContactPoint {
+    pub email: String,
+    pub phone: String,
+    pub device_id: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct UnifiedCustomerProfile {
+    pub unified_id: String,
+    pub emails: Vec<String>,
+    pub phones: Vec<String>,
+    pub segment_tags: Vec<String>,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct SovereignSalesforceDataCloudCdpIdentityResolutionEngine {
+    pub profiles: Vec<UnifiedCustomerProfile>,
+}
+
+impl SovereignSalesforceDataCloudCdpIdentityResolutionEngine {
+    pub fn new() -> Self {
+        Self { profiles: Vec::new() }
+    }
+
+    pub fn resolve_and_merge_identity(&mut self, contact: ContactPoint) -> UnifiedCustomerProfile {
+        if let Some(existing) = self.profiles.iter_mut().find(|p| p.emails.contains(&contact.email) || p.phones.contains(&contact.phone)) {
+            if !existing.phones.contains(&contact.phone) {
+                existing.phones.push(contact.phone);
+            }
+            if !existing.segment_tags.contains(&"verified_omnichannel".to_string()) {
+                existing.segment_tags.push("verified_omnichannel".to_string());
+            }
+            existing.clone()
+        } else {
+            let uid = format!("CDP-UNIFIED-{}", self.profiles.len() + 1001);
+            let profile = UnifiedCustomerProfile {
+                unified_id: uid,
+                emails: vec![contact.email],
+                phones: vec![contact.phone],
+                segment_tags: vec!["new_prospect".to_string()],
+            };
+            self.profiles.push(profile.clone());
+            profile
+        }
+    }
+
+    pub fn evaluate_segment_membership(&self, profile: &UnifiedCustomerProfile, required_tag: &str) -> bool {
+        profile.segment_tags.iter().any(|t| t == required_tag)
+    }
+}
+
+// 10. Odoo Suite: SovereignOdooQualityControlInspectionEngine
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum QualityCheckType {
+    PassFail,
+    MeasurementRange,
+}
+
+#[derive(Debug, Clone)]
+pub struct QualityCheckPoint {
+    pub point_id: String,
+    pub title: String,
+    pub check_type: QualityCheckType,
+    pub min_val: f64,
+    pub max_val: f64,
+}
+
+#[derive(Debug, Clone)]
+pub struct QualityInspectionResult {
+    pub point_id: String,
+    pub is_passed: bool,
+    pub measured_value: f64,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct SovereignOdooQualityControlInspectionEngine {
+    pub checkpoints: Vec<QualityCheckPoint>,
+}
+
+impl SovereignOdooQualityControlInspectionEngine {
+    pub fn new() -> Self {
+        Self { checkpoints: Vec::new() }
+    }
+
+    pub fn add_checkpoint(&mut self, point: QualityCheckPoint) {
+        self.checkpoints.push(point);
+    }
+
+    pub fn perform_inspection(&self, point_id: &str, measured_value: f64) -> Option<QualityInspectionResult> {
+        let point = self.checkpoints.iter().find(|p| p.point_id == point_id)?;
+        let is_passed = match point.check_type {
+            QualityCheckType::PassFail => measured_value > 0.0,
+            QualityCheckType::MeasurementRange => measured_value >= point.min_val && measured_value <= point.max_val,
+        };
+
+        Some(QualityInspectionResult {
+            point_id: point_id.to_string(),
+            is_passed,
+            measured_value,
+        })
+    }
+}
+
+// 11. Odoo Suite: SovereignOdooRentalSubscriptionLifecycleEngine
+#[derive(Debug, Clone)]
+pub struct RentalContract {
+    pub contract_id: String,
+    pub asset_id: String,
+    pub daily_rate: f64,
+    pub security_deposit: f64,
+    pub rental_days: u32,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct SovereignOdooRentalSubscriptionLifecycleEngine;
+
+impl SovereignOdooRentalSubscriptionLifecycleEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn calculate_total_contract_fee(&self, contract: &RentalContract, extra_late_days: u32) -> f64 {
+        let base_fee = contract.daily_rate * (contract.rental_days as f64);
+        let late_penalty_multiplier = 1.5;
+        let late_fee = contract.daily_rate * (extra_late_days as f64) * late_penalty_multiplier;
+        base_fee + late_fee
+    }
+}
+
+// 12. Bitrix24 Suite: SovereignBitrix24RpaWorkflowEngine
+#[derive(Debug, Clone)]
+pub struct RpaTask {
+    pub task_id: String,
+    pub current_stage_idx: usize,
+    pub is_completed: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct RpaStage {
+    pub stage_name: String,
+    pub required_role: String,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct SovereignBitrix24RpaWorkflowEngine {
+    pub stages: Vec<RpaStage>,
+}
+
+impl SovereignBitrix24RpaWorkflowEngine {
+    pub fn new() -> Self {
+        Self { stages: Vec::new() }
+    }
+
+    pub fn add_stage(&mut self, stage_name: &str, required_role: &str) {
+        self.stages.push(RpaStage {
+            stage_name: stage_name.to_string(),
+            required_role: required_role.to_string(),
+        });
+    }
+
+    pub fn advance_stage(&self, task: &mut RpaTask, approver_role: &str) -> bool {
+        if task.is_completed || task.current_stage_idx >= self.stages.len() {
+            return false;
+        }
+
+        let stage = &self.stages[task.current_stage_idx];
+        if stage.required_role == approver_role || approver_role == "admin" {
+            task.current_stage_idx += 1;
+            if task.current_stage_idx >= self.stages.len() {
+                task.is_completed = true;
+            }
+            true
+        } else {
+            false
+        }
+    }
+}
+
+// 13. Bitrix24 Suite: SovereignBitrix24SpeechAiSentimentAnalyzerEngine
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SentimentScore {
+    Positive,
+    Neutral,
+    Negative,
+}
+
+#[derive(Debug, Clone)]
+pub struct CallSentimentReport {
+    pub overall_sentiment: SentimentScore,
+    pub keyword_matches: Vec<String>,
+    pub compliance_score: f64,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct SovereignBitrix24SpeechAiSentimentAnalyzerEngine;
+
+impl SovereignBitrix24SpeechAiSentimentAnalyzerEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn analyze_transcript(&self, transcript: &str, required_keywords: &[&str]) -> CallSentimentReport {
+        let lower = transcript.to_lowercase();
+        let mut matches = Vec::new();
+
+        for &kw in required_keywords {
+            if lower.contains(&kw.to_lowercase()) {
+                matches.push(kw.to_string());
+            }
+        }
+
+        let compliance_score = if required_keywords.is_empty() {
+            100.0
+        } else {
+            (matches.len() as f64 / required_keywords.len() as f64) * 100.0
+        };
+
+        let overall_sentiment = if lower.contains("excellent") || lower.contains("great") || lower.contains("thank") {
+            SentimentScore::Positive
+        } else if lower.contains("bad") || lower.contains("issue") || lower.contains("cancel") {
+            SentimentScore::Negative
+        } else {
+            SentimentScore::Neutral
+        };
+
+        CallSentimentReport {
+            overall_sentiment,
+            keyword_matches: matches,
+            compliance_score,
+        }
+    }
+}
+
 // Placeholder types for compilation
 mod sigma_types {
     pub type Result<T> = core::result::Result<T, &'static str>;
@@ -9687,5 +10317,136 @@ mod tests {
         assert_eq!(bitrix_call.route_incoming_call("+15550199"), Some("agent_1".to_string()));
         let auto_lead = bitrix_call.auto_create_lead_from_missed_call("+15550199");
         assert!(auto_lead.contains("CRM Lead Auto-Created"));
+
+        // 41. SovereignGoogleSheetsBigQueryDataConnectorEngine
+        let mut bq_engine = SovereignGoogleSheetsBigQueryDataConnectorEngine::new("analytics_ds", "user_events");
+        bq_engine.set_query_pushdown("SELECT user_id, event FROM `analytics_ds.user_events` WHERE active = true");
+        let synced_count = bq_engine.execute_sync(
+            vec![
+                vec!["u101".to_string(), "login".to_string()],
+                vec!["u102".to_string(), "purchase".to_string()],
+            ],
+            1700000000,
+        );
+        assert_eq!(synced_count, 2);
+        assert_eq!(bq_engine.get_cached_row_count(), 2);
+        assert_eq!(bq_engine.get_cell(0, 1), Some("login"));
+
+        // 42. SovereignGoogleDocsGeminiSmartWriterEngine
+        let mut gemini = SovereignGoogleDocsGeminiSmartWriterEngine::new();
+        let mut suggestion = gemini.generate_rewrite_suggestion("Submit report by Friday", AiWriterTone::Formal);
+        assert!(suggestion.suggested_text.contains("It is requested that:"));
+        let accepted = gemini.accept_suggestion(&mut suggestion);
+        assert_eq!(accepted, suggestion.suggested_text);
+        assert!(suggestion.is_accepted);
+
+        // 43. SovereignLookerStudioDataBlendEngine
+        let blend_cfg = DataBlendConfig {
+            primary_table: "orders".to_string(),
+            secondary_table: "customers".to_string(),
+            join_key_idx: 0,
+            join_type: BlendJoinType::LeftOuter,
+        };
+        let blend_engine = SovereignLookerStudioDataBlendEngine::new(blend_cfg);
+        let primary = vec![vec!["c1".to_string(), "Order#1".to_string()]];
+        let secondary = vec![vec!["c1".to_string(), "Alice".to_string()]];
+        let blended = blend_engine.blend_datasets(&primary, &secondary);
+        assert_eq!(blended.len(), 1);
+        assert_eq!(blended[0].len(), 4);
+        assert_eq!(blend_engine.evaluate_case_when(85.0, 80.0, "High", "Low"), "High");
+
+        // 44. SovereignMicrosoftPowerAppsCanvasEngine
+        let mut power_apps = SovereignMicrosoftPowerAppsCanvasEngine::new();
+        power_apps.set_variable("UserRole", "Manager");
+        assert_eq!(power_apps.get_variable("UserRole"), Some("Manager"));
+        let filtered = power_apps.filter_collection(&[10.0, 25.0, 50.0], 20.0);
+        assert_eq!(filtered, vec![25.0, 50.0]);
+        let nav = power_apps.navigate_screen("DashboardScreen");
+        assert!(nav.contains("Navigated to DashboardScreen"));
+
+        // 45. SovereignMicrosoftTeamsChannelBotWorkflowEngine
+        let mut teams_bot = SovereignMicrosoftTeamsChannelBotWorkflowEngine::new("chan_dev_tech");
+        let payload = teams_bot.create_adaptive_card_payload("Approval Request", "Approve PR #42?", vec![("Approve", "app_42")]);
+        assert!(payload.contains("AdaptiveCard"));
+        let mention_res = teams_bot.dispatch_bot_mention_trigger("check build status");
+        assert!(mention_res.contains("chan_dev_tech"));
+
+        // 46. SovereignZohoUnifiedAppSwitcherEngine
+        let mut app_switcher = SovereignZohoUnifiedAppSwitcherEngine::new();
+        app_switcher.register_module("crm", "Zoho CRM", "sales");
+        let session = UserSessionContext {
+            user_id: "u55".to_string(),
+            roles: vec!["sales".to_string()],
+        };
+        assert!(app_switcher.can_access_module(&session, "crm"));
+        assert_eq!(app_switcher.get_accessible_modules(&session).len(), 1);
+
+        // 47. SovereignZohoAnalyticsPredictiveForecastingEngine
+        let forecasting = SovereignZohoAnalyticsPredictiveForecastingEngine::new();
+        let forecast = forecasting.predict_exponential_smoothing(&[100.0, 110.0, 120.0, 130.0], 3, 0.5);
+        assert_eq!(forecast.projected_values.len(), 3);
+        assert_eq!(forecast.lower_bound_95.len(), 3);
+
+        // 48. SovereignSalesforceLightningFlowOrchestratorEngine
+        let mut flow_engine = SovereignSalesforceLightningFlowOrchestratorEngine::new();
+        flow_engine.add_node("n1", FlowNodeKind::Screen, "Welcome Screen", Some("n2"));
+        flow_engine.add_node("n2", FlowNodeKind::RecordUpdate, "Update Contact", None);
+        let trace = flow_engine.execute_flow("n1");
+        assert_eq!(trace.len(), 2);
+        assert!(trace[0].contains("Welcome Screen"));
+
+        // 49. SovereignSalesforceDataCloudCdpIdentityResolutionEngine
+        let mut cdp_engine = SovereignSalesforceDataCloudCdpIdentityResolutionEngine::new();
+        let contact = ContactPoint {
+            email: "alice@example.com".to_string(),
+            phone: "+15550100".to_string(),
+            device_id: "dev_99".to_string(),
+        };
+        let profile = cdp_engine.resolve_and_merge_identity(contact);
+        assert!(profile.unified_id.starts_with("CDP-UNIFIED-"));
+        assert!(cdp_engine.evaluate_segment_membership(&profile, "new_prospect"));
+
+        // 50. SovereignOdooQualityControlInspectionEngine
+        let mut qc_engine = SovereignOdooQualityControlInspectionEngine::new();
+        qc_engine.add_checkpoint(QualityCheckPoint {
+            point_id: "qc_101".to_string(),
+            title: "Weight Check".to_string(),
+            check_type: QualityCheckType::MeasurementRange,
+            min_val: 10.0,
+            max_val: 12.0,
+        });
+        let qc_res = qc_engine.perform_inspection("qc_101", 11.2).unwrap();
+        assert!(qc_res.is_passed);
+
+        // 51. SovereignOdooRentalSubscriptionLifecycleEngine
+        let rental_engine = SovereignOdooRentalSubscriptionLifecycleEngine::new();
+        let contract = RentalContract {
+            contract_id: "RENT-001".to_string(),
+            asset_id: "ASSET-99".to_string(),
+            daily_rate: 50.0,
+            security_deposit: 200.0,
+            rental_days: 5,
+        };
+        let fee = rental_engine.calculate_total_contract_fee(&contract, 2);
+        assert_eq!(fee, 250.0 + 150.0);
+
+        // 52. SovereignBitrix24RpaWorkflowEngine
+        let mut rpa = SovereignBitrix24RpaWorkflowEngine::new();
+        rpa.add_stage("Review", "reviewer");
+        rpa.add_stage("Approval", "manager");
+        let mut task = RpaTask {
+            task_id: "TASK-1".to_string(),
+            current_stage_idx: 0,
+            is_completed: false,
+        };
+        assert!(rpa.advance_stage(&mut task, "reviewer"));
+        assert_eq!(task.current_stage_idx, 1);
+
+        // 53. SovereignBitrix24SpeechAiSentimentAnalyzerEngine
+        let speech_ai = SovereignBitrix24SpeechAiSentimentAnalyzerEngine::new();
+        let report = speech_ai.analyze_transcript("Thank you for the excellent service and fast resolution", &["service", "resolution"]);
+        assert_eq!(report.overall_sentiment, SentimentScore::Positive);
+        assert_eq!(report.compliance_score, 100.0);
+        assert_eq!(report.keyword_matches.len(), 2);
     }
 }
