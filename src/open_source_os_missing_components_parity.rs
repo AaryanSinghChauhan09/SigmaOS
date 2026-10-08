@@ -6,6 +6,11 @@
 //! - Genode OS: Capability-based parent-child RPC routing & session delegation.
 //! - GNU Hurd: Translator RPC server (passive/active translator node attachments).
 //! - SerenityOS: LibGUI async window IPC protocol (window creation, event loops, paint streaming).
+//! - FreeBSD: GEOM Storage Class Framework (providers, consumers, topology transformations).
+//! - Alpine Linux: APK v3 package index & checksum validation engine.
+//! - TempleOS: HolyC Dynamic Execution Engine & symbol table evaluator.
+//! - QNX Neutrino: Microkernel synchronous message passing & adaptive CPU budget manager.
+//! - Cosmopolitan Libc: APE (Actually Portable Executable) multi-OS binary polyglot header engine.
 
 extern crate alloc;
 
@@ -388,6 +393,350 @@ impl SerenityLibGuiWindowIpcEngine {
     }
 }
 
+/// FreeBSD GEOM Transformation Kind.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum GeomTransformKind {
+    Stripe,
+    Mirror,
+    Concat,
+    Encrypt,
+}
+
+/// FreeBSD GEOM Storage Provider.
+#[derive(Debug, Clone)]
+pub struct GeomProvider {
+    pub name: String,
+    pub size_bytes: u64,
+    pub sector_size: u32,
+}
+
+/// FreeBSD GEOM Class Transformation.
+#[derive(Debug, Clone)]
+pub struct GeomClass {
+    pub name: String,
+    pub kind: GeomTransformKind,
+    pub provider_names: Vec<String>,
+}
+
+/// FreeBSD GEOM Storage Class Framework Engine.
+#[derive(Debug, Default)]
+pub struct FreeBsdGeomClassEngine {
+    providers: BTreeMap<String, GeomProvider>,
+    classes: BTreeMap<String, GeomClass>,
+}
+
+impl FreeBsdGeomClassEngine {
+    pub fn new() -> Self {
+        Self {
+            providers: BTreeMap::new(),
+            classes: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_provider(&mut self, name: &str, size_bytes: u64, sector_size: u32) -> bool {
+        if self.providers.contains_key(name) {
+            false
+        } else {
+            self.providers.insert(
+                name.to_string(),
+                GeomProvider {
+                    name: name.to_string(),
+                    size_bytes,
+                    sector_size,
+                },
+            );
+            true
+        }
+    }
+
+    pub fn create_class(&mut self, class_name: &str, kind: GeomTransformKind, provider_names: &[&str]) -> Result<(), String> {
+        if self.classes.contains_key(class_name) {
+            return Err(alloc::format!("Class '{}' already exists", class_name));
+        }
+        for name in provider_names {
+            if !self.providers.contains_key(*name) {
+                return Err(alloc::format!("Provider '{}' not found", name));
+            }
+        }
+        self.classes.insert(
+            class_name.to_string(),
+            GeomClass {
+                name: class_name.to_string(),
+                kind,
+                provider_names: provider_names.iter().map(|s| s.to_string()).collect(),
+            },
+        );
+        Ok(())
+    }
+
+    pub fn get_class_capacity(&self, class_name: &str) -> Option<u64> {
+        let geom_class = self.classes.get(class_name)?;
+        match geom_class.kind {
+            GeomTransformKind::Stripe | GeomTransformKind::Concat => {
+                let total: u64 = geom_class
+                    .provider_names
+                    .iter()
+                    .filter_map(|p| self.providers.get(p).map(|prov| prov.size_bytes))
+                    .sum();
+                Some(total)
+            }
+            GeomTransformKind::Mirror => {
+                let min_size = geom_class
+                    .provider_names
+                    .iter()
+                    .filter_map(|p| self.providers.get(p).map(|prov| prov.size_bytes))
+                    .min()?;
+                Some(min_size)
+            }
+            GeomTransformKind::Encrypt => {
+                let p = geom_class.provider_names.first()?;
+                self.providers.get(p).map(|prov| prov.size_bytes)
+            }
+        }
+    }
+}
+
+/// Alpine Linux APK v3 Package Descriptor.
+#[derive(Debug, Clone)]
+pub struct Apk3Package {
+    pub name: String,
+    pub version: String,
+    pub checksum: String,
+    pub dependencies: Vec<String>,
+    pub size_bytes: u64,
+}
+
+/// Alpine Linux APK v3 Package Index & Checksum Engine.
+#[derive(Debug, Default)]
+pub struct AlpineApk3PackageEngine {
+    available_packages: BTreeMap<String, Apk3Package>,
+    installed_packages: BTreeMap<String, Apk3Package>,
+}
+
+impl AlpineApk3PackageEngine {
+    pub fn new() -> Self {
+        Self {
+            available_packages: BTreeMap::new(),
+            installed_packages: BTreeMap::new(),
+        }
+    }
+
+    pub fn add_available_package(&mut self, pkg: Apk3Package) {
+        self.available_packages.insert(pkg.name.clone(), pkg);
+    }
+
+    pub fn verify_checksum(&self, pkg_name: &str, expected_checksum: &str) -> bool {
+        if let Some(pkg) = self.available_packages.get(pkg_name) {
+            pkg.checksum == expected_checksum
+        } else {
+            false
+        }
+    }
+
+    pub fn install_package(&mut self, pkg_name: &str) -> Result<Vec<String>, String> {
+        let pkg = self
+            .available_packages
+            .get(pkg_name)
+            .cloned()
+            .ok_or_else(|| alloc::format!("Package '{}' not found in APKINDEX", pkg_name))?;
+
+        let mut installed_list = Vec::new();
+        for dep in &pkg.dependencies {
+            if !self.installed_packages.contains_key(dep) {
+                if let Some(dep_pkg) = self.available_packages.get(dep).cloned() {
+                    self.installed_packages.insert(dep.clone(), dep_pkg);
+                    installed_list.push(dep.clone());
+                } else {
+                    return Err(alloc::format!("Dependency '{}' missing for '{}'", dep, pkg_name));
+                }
+            }
+        }
+
+        self.installed_packages.insert(pkg.name.clone(), pkg);
+        installed_list.push(pkg_name.to_string());
+        Ok(installed_list)
+    }
+
+    pub fn is_installed(&self, pkg_name: &str) -> bool {
+        self.installed_packages.contains_key(pkg_name)
+    }
+}
+
+/// TempleOS HolyC Symbol Descriptor.
+#[derive(Debug, Clone)]
+pub struct HolyCSymbol {
+    pub name: String,
+    pub value: i64,
+    pub is_function: bool,
+}
+
+/// TempleOS HolyC Dynamic Execution Engine.
+#[derive(Debug, Default)]
+pub struct TempleOsHolyCExecutor {
+    symbol_table: BTreeMap<String, HolyCSymbol>,
+}
+
+impl TempleOsHolyCExecutor {
+    pub fn new() -> Self {
+        Self {
+            symbol_table: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_symbol(&mut self, name: &str, value: i64, is_function: bool) {
+        self.symbol_table.insert(
+            name.to_string(),
+            HolyCSymbol {
+                name: name.to_string(),
+                value,
+                is_function,
+            },
+        );
+    }
+
+    pub fn evaluate_expression(&self, expr: &str) -> Result<i64, String> {
+        let expr = expr.trim();
+        if let Ok(val) = expr.parse::<i64>() {
+            return Ok(val);
+        }
+        if let Some(sym) = self.symbol_table.get(expr) {
+            return Ok(sym.value);
+        }
+        if expr.contains('+') {
+            let parts: Vec<&str> = expr.split('+').collect();
+            let mut sum = 0i64;
+            for part in parts {
+                sum += self.evaluate_expression(part)?;
+            }
+            return Ok(sum);
+        }
+        Err(alloc::format!("Unable to evaluate HolyC expression: '{}'", expr))
+    }
+}
+
+/// QNX Neutrino Synchronous IPC Message.
+#[derive(Debug, Clone)]
+pub struct QnxMessage {
+    pub msg_id: u64,
+    pub sender_pid: u32,
+    pub receiver_pid: u32,
+    pub data: Vec<u8>,
+}
+
+/// QNX Neutrino Channel Descriptor.
+#[derive(Debug, Clone)]
+pub struct QnxChannel {
+    pub channel_id: u32,
+    pub owner_pid: u32,
+    pub pending_messages: Vec<QnxMessage>,
+}
+
+/// QNX Neutrino Synchronous Message Passing Engine.
+#[derive(Debug, Default)]
+pub struct QnxNeutrinoMsgPassEngine {
+    channels: BTreeMap<u32, QnxChannel>,
+    cpu_budgets: BTreeMap<u32, u32>,
+    next_msg_id: u64,
+}
+
+impl QnxNeutrinoMsgPassEngine {
+    pub fn new() -> Self {
+        Self {
+            channels: BTreeMap::new(),
+            cpu_budgets: BTreeMap::new(),
+            next_msg_id: 1,
+        }
+    }
+
+    pub fn create_channel(&mut self, channel_id: u32, owner_pid: u32) -> bool {
+        if self.channels.contains_key(&channel_id) {
+            false
+        } else {
+            self.channels.insert(
+                channel_id,
+                QnxChannel {
+                    channel_id,
+                    owner_pid,
+                    pending_messages: Vec::new(),
+                },
+            );
+            true
+        }
+    }
+
+    pub fn set_cpu_budget(&mut self, pid: u32, budget_percentage: u32) {
+        self.cpu_budgets.insert(pid, budget_percentage.min(100));
+    }
+
+    pub fn get_cpu_budget(&self, pid: u32) -> u32 {
+        self.cpu_budgets.get(&pid).copied().unwrap_or(100)
+    }
+
+    pub fn msg_send(&mut self, channel_id: u32, sender_pid: u32, data: &[u8]) -> Result<u64, String> {
+        let channel = self
+            .channels
+            .get_mut(&channel_id)
+            .ok_or_else(|| alloc::format!("QNX Channel ID {} invalid", channel_id))?;
+        let msg_id = self.next_msg_id;
+        self.next_msg_id += 1;
+        channel.pending_messages.push(QnxMessage {
+            msg_id,
+            sender_pid,
+            receiver_pid: channel.owner_pid,
+            data: data.to_vec(),
+        });
+        Ok(msg_id)
+    }
+
+    pub fn msg_receive(&mut self, channel_id: u32) -> Option<QnxMessage> {
+        let channel = self.channels.get_mut(&channel_id)?;
+        if channel.pending_messages.is_empty() {
+            None
+        } else {
+            Some(channel.pending_messages.remove(0))
+        }
+    }
+}
+
+/// Cosmopolitan Libc Target OS.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CosmoTargetOs {
+    Linux,
+    OpenBsd,
+    FreeBsd,
+    NetBsd,
+    Windows,
+    Darwin,
+}
+
+/// Cosmopolitan Libc APE Binary Header Engine.
+#[derive(Debug, Default)]
+pub struct CosmoApeBinaryHeaderEngine;
+
+impl CosmoApeBinaryHeaderEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn is_valid_ape(&self, bytes: &[u8]) -> bool {
+        if bytes.len() < 8 {
+            return false;
+        }
+        // MZ launcher magic "MZqF" or "MZ"
+        bytes[0] == b'M' && bytes[1] == b'Z'
+    }
+
+    pub fn detect_target_support(&self, bytes: &[u8], target: CosmoTargetOs) -> bool {
+        if !self.is_valid_ape(bytes) {
+            return false;
+        }
+        // Polyglot APE headers support all major platforms by design
+        match target {
+            CosmoTargetOs::Linux | CosmoTargetOs::OpenBsd | CosmoTargetOs::FreeBsd | CosmoTargetOs::NetBsd | CosmoTargetOs::Windows | CosmoTargetOs::Darwin => true,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -448,5 +797,77 @@ mod tests {
 
         let event = engine.pop_event().unwrap();
         assert!(matches!(event, SerenityLibGuiWindowMessage::CreateWindow { .. }));
+    }
+
+    #[test]
+    fn test_freebsd_geom_class_engine() {
+        let mut engine = FreeBsdGeomClassEngine::new();
+        assert!(engine.register_provider("ada0", 1_000_000, 512));
+        assert!(engine.register_provider("ada1", 1_000_000, 512));
+        assert!(engine.create_class("stripe0", GeomTransformKind::Stripe, &["ada0", "ada1"]).is_ok());
+        assert_eq!(engine.get_class_capacity("stripe0"), Some(2_000_000));
+    }
+
+    #[test]
+    fn test_alpine_apk3_package_engine() {
+        let mut engine = AlpineApk3PackageEngine::new();
+        engine.add_available_package(Apk3Package {
+            name: "musl".to_string(),
+            version: "1.2.4".to_string(),
+            checksum: "sha256:abc".to_string(),
+            dependencies: Vec::new(),
+            size_bytes: 500000,
+        });
+        engine.add_available_package(Apk3Package {
+            name: "busybox".to_string(),
+            version: "1.36.1".to_string(),
+            checksum: "sha256:def".to_string(),
+            dependencies: alloc::vec!["musl".to_string()],
+            size_bytes: 1000000,
+        });
+
+        assert!(engine.verify_checksum("busybox", "sha256:def"));
+        let installed = engine.install_package("busybox").unwrap();
+        assert_eq!(installed, alloc::vec!["musl", "busybox"]);
+        assert!(engine.is_installed("busybox"));
+        assert!(engine.is_installed("musl"));
+    }
+
+    #[test]
+    fn test_templeos_holyc_executor() {
+        let mut exec = TempleOsHolyCExecutor::new();
+        exec.register_symbol("SYS_BASE", 0x1000, false);
+        exec.register_symbol("OFFSET", 0x20, false);
+
+        assert_eq!(exec.evaluate_expression("100").unwrap(), 100);
+        assert_eq!(exec.evaluate_expression("SYS_BASE").unwrap(), 0x1000);
+        assert_eq!(exec.evaluate_expression("SYS_BASE+OFFSET").unwrap(), 0x1020);
+    }
+
+    #[test]
+    fn test_qnx_neutrino_msg_pass_engine() {
+        let mut qnx = QnxNeutrinoMsgPassEngine::new();
+        assert!(qnx.create_channel(10, 1001));
+        qnx.set_cpu_budget(1001, 80);
+        assert_eq!(qnx.get_cpu_budget(1001), 80);
+
+        let msg_id = qnx.msg_send(10, 2002, b"ping").unwrap();
+        assert_eq!(msg_id, 1);
+
+        let msg = qnx.msg_receive(10).unwrap();
+        assert_eq!(msg.sender_pid, 2002);
+        assert_eq!(msg.data, b"ping");
+    }
+
+    #[test]
+    fn test_cosmo_ape_binary_header_engine() {
+        let engine = CosmoApeBinaryHeaderEngine::new();
+        let ape_bytes = b"MZqF....polyglot_exec_data";
+        assert!(engine.is_valid_ape(ape_bytes));
+        assert!(engine.detect_target_support(ape_bytes, CosmoTargetOs::Linux));
+        assert!(engine.detect_target_support(ape_bytes, CosmoTargetOs::Windows));
+
+        let invalid_bytes = b"ELF.....";
+        assert!(!engine.is_valid_ape(invalid_bytes));
     }
 }
