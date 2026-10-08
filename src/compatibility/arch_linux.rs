@@ -635,22 +635,16 @@ impl ReflectorMirrorlist {
     }
 
     pub fn filter_and_sort(&self, country: &str, protocol: &str) -> Vec<ArchMirror> {
-        let mut filtered = Vec::new();
-        for m in &self.mirrors {
-            if m.country == country && m.protocol == protocol {
-                filtered.push(m.clone());
-            }
-        }
-        let n = filtered.len();
-        for i in 0..n {
-            for j in 0..n - 1 - i {
-                if filtered[j].latency_ms > filtered[j + 1].latency_ms {
-                    let temp = filtered[j].clone();
-                    filtered[j] = filtered[j + 1].clone();
-                    filtered[j + 1] = temp;
-                }
-            }
-        }
+        let mut filtered: Vec<ArchMirror> = self
+            .mirrors
+            .iter()
+            .filter(|m| m.country == country && m.protocol == protocol)
+            .cloned()
+            .collect();
+
+        // Performance Optimization: Replace O(N^2) bubble sort and redundant cloning with O(N log N)
+        // pattern-defeating quicksort (`sort_unstable_by_key`), significantly reducing latency and CPU allocations.
+        filtered.sort_unstable_by_key(|m| m.latency_ms);
         filtered
     }
 }
