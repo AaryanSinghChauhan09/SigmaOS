@@ -31,10 +31,14 @@ jobs:
         run: |
           mkdir -p build
           rustc --edition=2021 --test src/package/sovereign_universal_multi_distro_pm_gateway.rs -o build/test_universal_pm_gateway
+          rustc --edition=2021 --test src/package/omarchy_pr_proposal_engine.rs -o build/test_omarchy_pr_proposal
+          rustc --edition=2021 --test src/distro/sovereign_thousands_distro_components.rs -o build/test_thousands_components
 
       - name: Execute Universal Multi-Distro PM Gateway Verification
         run: |
           ./build/test_universal_pm_gateway
+          ./build/test_omarchy_pr_proposal
+          ./build/test_thousands_components
 
       - name: Verify Multi-Distro Package Formats (Apt, Pacman, Dnf, Apk, Ebuild, Ports, Nix)
         run: |
