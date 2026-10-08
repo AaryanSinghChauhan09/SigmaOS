@@ -186,6 +186,17 @@ impl WikiDataTransferEngine {
             },
         );
 
+        self.feature_specs.insert(
+            "ArchitectureDevelopmentDecisionPlan".to_string(),
+            FeatureMdStatus {
+                spec_name: "18-Architecture-Development-Decision-Plan-PR.md".to_string(),
+                source_path: "wiki/18-Architecture-Development-Decision-Plan-PR.md".to_string(),
+                is_fully_implemented: true,
+                completion_percentage: 100,
+                wiki_mirrored: true,
+            },
+        );
+
         self.register_spec_file("UniversalPackageSystem", "Universal Package System", true);
         self.register_spec_file("Roadmap11Deployment", "Roadmap 11 Deployment", true);
         self.register_spec_file("ROADMAP.md", "SigmaOS Master Development Roadmap", true);
@@ -195,6 +206,11 @@ impl WikiDataTransferEngine {
             true,
         );
         self.register_spec_file("Roadmap11Deployment", "11-Roadmap Deployment Spec", true);
+        self.register_spec_file(
+            "18-Architecture-Development-Decision-Plan-PR.md",
+            "Architecture Development Decision Plan PR",
+            true,
+        );
     }
 
     pub fn register_spec_file(&mut self, filename: &str, title: &str, fully_implemented: bool) {
