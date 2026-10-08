@@ -2882,8 +2882,10 @@ impl DeviceManager {
         for (id, desc_option) in self.descriptors.iter().enumerate() {
             if let Some(desc_ptr) = *desc_option {
                 let desc = unsafe { &*desc_ptr.as_ptr() };
-                let desc_name_len = desc.name.iter().position(|&b| b == 0).unwrap_or(64);
-                if &desc.name[..desc_name_len] == name {
+                // Bolt ⚡ Optimization: Leverage precomputed `desc.name()` which uses cached `name_len`
+                // on `DeviceDescriptor` for O(1) constant-time slice lookup, eliminating repetitive linear $O(N)$
+                // zero-byte scans on every device lookup.
+                if desc.name() == name {
                     return Some(id);
                 }
             }
