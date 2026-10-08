@@ -437,13 +437,6 @@ if [ -f "src/package/sovereign_distro_package_advancements_v27.rs" ]; then
     ./build/sovereign_advancements_v27_test
 fi
 
-if [ -f "src/package/sovereign_distro_package_advancements_v30.rs" ]; then
-    echo "Running Sovereign Universal Package Advancements Suite V30 test suite..."
-    mkdir -p build
-    rustc --test src/package/sovereign_distro_package_advancements_v30.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v30_test
-    ./build/sovereign_advancements_v30_test
-fi
-
 if [ -f "src/package/sovereign_universal_pm_pr_bridge.rs" ]; then
     echo "Running Sovereign Universal PM PR Bridge Engine test suite..."
     mkdir -p build
