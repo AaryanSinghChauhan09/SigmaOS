@@ -75,3 +75,4 @@ wiki/
 WIKI/
 docs/
 !Agents/*.md
+!OPEN_SOURCE_OS_COMPARATIVE_GAP_ANALYSIS.md
