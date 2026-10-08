@@ -67,7 +67,7 @@ pub struct AhciPort {
 }
 
 /// AHCI command header
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 #[repr(C)]
 pub struct AhciCommandHeader {
     pub cfl: u8,          // Command FIS length
@@ -83,6 +83,39 @@ pub struct AhciCommandHeader {
     pub ctba: u32,        // Command table descriptor base address
     pub ctbau: u32,       // Command table descriptor base address upper
     pub rsvd: [u32; 4],
+}
+
+impl AhciCommandHeader {
+    pub fn new() -> Self {
+        Self {
+            cfl: 5, // sizeof(AhciCommandFis) / sizeof(u32)
+            a: 0,
+            w: 0,
+            p: 0,
+            r: 0,
+            b: 0,
+            c: 0,
+            pmp: 0,
+            prdtl: 0,
+            prdbc: 0,
+            ctba: 0,
+            ctbau: 0,
+            rsvd: [0; 4],
+        }
+    }
+
+    pub fn set_write(&mut self, write: bool) {
+        self.w = if write { 1 } else { 0 };
+    }
+
+    pub fn set_prdtl(&mut self, count: u16) {
+        self.prdtl = count;
+    }
+
+    pub fn set_ctba(&mut self, addr: u64) {
+        self.ctba = (addr & 0xFFFFFFFF) as u32;
+        self.ctbau = ((addr >> 32) & 0xFFFFFFFF) as u32;
+    }
 }
 
 /// AHCI command FIS
@@ -109,13 +142,24 @@ pub struct AhciCommandFis {
 }
 
 /// AHCI physical region descriptor
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 #[repr(C)]
 pub struct AhciPrdt {
     pub dba: u32,         // Data base address
     pub dbau: u32,        // Data base address upper
     pub rsvd: u32,
     pub dbc: u32,         // Byte count (0-indexed)
+}
+
+impl AhciPrdt {
+    pub fn new(dba: u64, byte_count: u32) -> Self {
+        Self {
+            dba: (dba & 0xFFFFFFFF) as u32,
+            dbau: ((dba >> 32) & 0xFFFFFFFF) as u32,
+            rsvd: 0,
+            dbc: byte_count - 1, // DBC is 0-indexed
+        }
+    }
 }
 
 /// AHCI received FIS
@@ -165,6 +209,10 @@ pub struct AhciController {
     pub command_slots: u32,
     pub supports_ncq: bool,
     pub supports_64bit: bool,
+    command_lists: BTreeMap<u8, u64>, // port_id -> physical address
+    command_tables: BTreeMap<u8, u64>, // port_id -> physical address
+    fis_buffers: BTreeMap<u8, u64>, // port_id -> physical address
+    next_dma_addr: u64,
 }
 
 /// AHCI command opcodes
@@ -212,6 +260,10 @@ impl AhciController {
             command_slots: 0,
             supports_ncq: false,
             supports_64bit: false,
+            command_lists: BTreeMap::new(),
+            command_tables: BTreeMap::new(),
+            fis_buffers: BTreeMap::new(),
+            next_dma_addr: 0x20000000, // Start DMA buffers at 512MB physical
         }
     }
 
@@ -250,8 +302,94 @@ impl AhciController {
             // Detect devices
             self.detect_devices()?;
 
+            // Allocate DMA buffers for each port
+            let port_ids: Vec<u8> = self.ports.keys().copied().collect();
+            for port_id in port_ids {
+                self.allocate_port_dma_buffers(port_id)?;
+            }
+
             Ok(())
         }
+    }
+
+    /// Allocate DMA buffers for a port (command list, command table, FIS buffer)
+    fn allocate_port_dma_buffers(&mut self, port_id: u8) -> Result<(), &'static str> {
+        // Command list: 32 slots * 32 bytes = 1KB, must be 1KB aligned
+        let cmd_list_addr = self.next_dma_addr;
+        self.next_dma_addr += 0x400; // 1KB aligned
+        self.next_dma_addr = (self.next_dma_addr + 0x3FF) & !0x3FF; // Align to 1KB
+        self.command_lists.insert(port_id, cmd_list_addr);
+
+        // Command table: varies, must be 128-byte aligned
+        let cmd_table_addr = self.next_dma_addr;
+        self.next_dma_addr += 0x1000; // Reserve 4KB for command table
+        self.next_dma_addr = (self.next_dma_addr + 0x7F) & !0x7F; // Align to 128 bytes
+        self.command_tables.insert(port_id, cmd_table_addr);
+
+        // FIS buffer: 256 bytes, must be 256-byte aligned
+        let fis_buffer_addr = self.next_dma_addr;
+        self.next_dma_addr += 0x100; // 256 bytes
+        self.next_dma_addr = (self.next_dma_addr + 0xFF) & !0xFF; // Align to 256 bytes
+        self.fis_buffers.insert(port_id, fis_buffer_addr);
+
+        // Program port registers with DMA addresses
+        if let Some(&port_ptr) = self.ports.get(&port_id) {
+            unsafe {
+                let port = &mut *port_ptr;
+                port.clb = (cmd_list_addr & 0xFFFFFFFF) as u32;
+                port.clbu = ((cmd_list_addr >> 32) & 0xFFFFFFFF) as u32;
+                port.fb = (fis_buffer_addr & 0xFFFFFFFF) as u32;
+                port.fbu = ((fis_buffer_addr >> 32) & 0xFFFFFFFF) as u32;
+            }
+        }
+
+        Ok(())
+    }
+
+    /// Get command list physical address for a port
+    pub fn get_command_list_addr(&self, port_id: u8) -> Option<u64> {
+        self.command_lists.get(&port_id).copied()
+    }
+
+    /// Get command table physical address for a port
+    pub fn get_command_table_addr(&self, port_id: u8) -> Option<u64> {
+        self.command_tables.get(&port_id).copied()
+    }
+
+    /// Get FIS buffer physical address for a port
+    pub fn get_fis_buffer_addr(&self, port_id: u8) -> Option<u64> {
+        self.fis_buffers.get(&port_id).copied()
+    }
+
+    /// Build command header with PRDT entries for a data transfer
+    pub fn build_command_with_prdt(
+        &mut self,
+        port_id: u8,
+        data_addr: u64,
+        data_size: u32,
+        is_write: bool,
+    ) -> Result<AhciCommandHeader, &'static str> {
+        let cmd_table_addr = self.get_command_table_addr(port_id)
+            .ok_or("Command table not allocated")?;
+
+        let mut header = AhciCommandHeader::new();
+        header.set_write(is_write);
+
+        // Calculate number of PRDT entries needed
+        // Each PRDT can handle up to 4MB (minus 1 byte)
+        const MAX_PRDT_SIZE: u32 = 4 * 1024 * 1024 - 1;
+        let num_prdt = ((data_size + MAX_PRDT_SIZE - 1) / MAX_PRDT_SIZE) as u16;
+        
+        if num_prdt > 65535 {
+            return Err("Transfer too large for PRDT");
+        }
+
+        header.set_prdtl(num_prdt);
+        header.set_ctba(cmd_table_addr);
+
+        // In real implementation, would fill PRDT entries in command table
+        // For now, just return the header structure
+        Ok(header)
     }
 
     /// Enumerate AHCI ports
@@ -557,6 +695,76 @@ mod tests {
         assert_eq!(sata_cmd::READ_DMA, 0xC8);
         assert_eq!(sata_cmd::WRITE_DMA, 0xCA);
         assert_eq!(sata_cmd::IDENTIFY_DEVICE, 0xEC);
+    }
+
+    #[test]
+    fn test_ahci_prdt() {
+        let prdt = AhciPrdt::new(0x1000, 4096);
+        assert_eq!(prdt.dba, 0x1000);
+        assert_eq!(prdt.dbau, 0);
+        assert_eq!(prdt.dbc, 4095); // DBC is 0-indexed
+    }
+
+    #[test]
+    fn test_ahci_command_header() {
+        let mut header = AhciCommandHeader::new();
+        assert_eq!(header.cfl, 5);
+        assert_eq!(header.w, 0);
+        
+        header.set_write(true);
+        assert_eq!(header.w, 1);
+        
+        header.set_prdtl(42);
+        assert_eq!(header.prdtl, 42);
+        
+        header.set_ctba(0x5000);
+        assert_eq!(header.ctba, 0x5000);
+        assert_eq!(header.ctbau, 0);
+    }
+
+    #[test]
+    fn test_ahci_dma_buffer_allocation() {
+        let mut controller = AhciController::new(0x40000000);
+        
+        // Manually add a port for testing
+        let port_ptr = (0x40000000 + 0x100) as *mut AhciPort;
+        controller.ports.insert(0, port_ptr);
+        
+        let result = controller.allocate_port_dma_buffers(0);
+        assert!(result.is_ok());
+        
+        // Check that DMA addresses were allocated
+        assert!(controller.get_command_list_addr(0).is_some());
+        assert!(controller.get_command_table_addr(0).is_some());
+        assert!(controller.get_fis_buffer_addr(0).is_some());
+        
+        // Check alignment
+        let cmd_list = controller.get_command_list_addr(0).unwrap();
+        assert_eq!(cmd_list & 0x3FF, 0); // 1KB aligned
+    }
+
+    #[test]
+    fn test_ahci_build_command_with_prdt() {
+        let mut controller = AhciController::new(0x40000000);
+        
+        // Add port and allocate buffers
+        let port_ptr = (0x40000000 + 0x100) as *mut AhciPort;
+        controller.ports.insert(0, port_ptr);
+        controller.allocate_port_dma_buffers(0).unwrap();
+        
+        // Build command for small transfer
+        let header = controller.build_command_with_prdt(0, 0x5000, 4096, false);
+        assert!(header.is_ok());
+        let header = header.unwrap();
+        assert_eq!(header.w, 0); // Read
+        assert_eq!(header.prdtl, 1); // 1 PRDT entry
+        
+        // Build command for large transfer
+        let header = controller.build_command_with_prdt(0, 0x6000, 8 * 1024 * 1024, true);
+        assert!(header.is_ok());
+        let header = header.unwrap();
+        assert_eq!(header.w, 1); // Write
+        assert!(header.prdtl > 1); // Multiple PRDT entries
     }
 
     #[test]
