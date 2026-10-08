@@ -5,6 +5,7 @@ pub mod network_config;
 pub mod network_namespace;
 pub mod network_syscalls;
 pub mod socket;
+pub mod sovereign_tcpip_stack;
 pub mod stack;
 pub mod tcp_ip_implementation;
 pub mod torrent;
@@ -48,6 +49,7 @@ pub use tc_qdisc_sovereign::{
 
 pub mod wireguard_sovereign;
 pub use wireguard_sovereign::{SovereignWireGuardTunnel, WgPeer, WgSessionState};
+pub use sovereign_tcpip_stack::*;
 
 pub mod tech_news_redirection;
 pub use tech_news_redirection::{

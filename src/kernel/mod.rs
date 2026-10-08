@@ -9,6 +9,7 @@ pub mod kprintf;
 pub mod architecture;
 pub mod atomic_extended;
 pub mod cgroup_v2;
+pub mod cgroup_v2_hierarchy;
 pub mod kqueue_event;
 pub mod cgroup_controllers;
 pub mod block_dev;
@@ -144,6 +145,7 @@ pub use virtual_cpu::{SovereignVirtualCPU as VirtualCpu};
 pub use vmm_paging::{PageTableManager, VirtualMemoryManager};
 pub use uts_namespace::{UtsNamespaceManager, NamespaceId};
 pub use kqueue_event::{Kqueue, KqueueManager, Kevent, FilterType, FilterFlags, Interest};
+pub use cgroup_v2_hierarchy::*;
 pub use tss_ring3_user_mode::{
     IretqStackFrame, SovereignRing3UserModeEngine, SovereignTaskStateSegment64,
     UserModeProcessContext,
