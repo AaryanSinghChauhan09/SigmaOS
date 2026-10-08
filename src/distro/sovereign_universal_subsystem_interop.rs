@@ -552,6 +552,30 @@ impl SovereignUniversalSubsystemInteropEngine {
             "Route AI agent workflow events to kernel EEVDF/BORE scheduling classes for adaptive process prioritization",
             false,
         ));
+
+        self.add_interop_policy(SubsystemInteropPolicy::new(
+            "policy_storage_sec",
+            UniversalSubsystemCategory::FilesystemStorage,
+            UniversalSubsystemCategory::SecuritySandboxing,
+            "Bridge ZFS ARC / Btrfs CoW / Bcachefs tiering storage operations with OpenBSD W^X and FreeBSD Capsicum rights",
+            true,
+        ));
+
+        self.add_interop_policy(SubsystemInteropPolicy::new(
+            "policy_virt_sec",
+            UniversalSubsystemCategory::VirtualizationHypervisor,
+            UniversalSubsystemCategory::SecuritySandboxing,
+            "Enforce Bhyve/KVM/Firecracker microVM isolation via Linux Landlock v5 and OpenBSD unveil sandbox contexts",
+            true,
+        ));
+
+        self.add_interop_policy(SubsystemInteropPolicy::new(
+            "policy_ipc_obs",
+            UniversalSubsystemCategory::IpcMemory,
+            UniversalSubsystemCategory::ObservabilityDiagnostics,
+            "Stream microkernel IPC ring buffer telemetry into DTrace probes and eBPF continuous performance profilers",
+            false,
+        ));
     }
 
     pub fn register_subsystem(&mut self, name: &str, adapter: SubsystemAdapterCapabilities) {
@@ -654,6 +678,24 @@ impl SovereignUniversalSubsystemInteropEngine {
         }
 
         Ok(synced_count)
+    }
+
+    /// Complete universal cross-distro mesh synchronization across all registered subsystems.
+    pub fn sync_universal_cross_distro_mesh(&mut self) -> Result<usize, &'static str> {
+        let adapter_names: Vec<String> = self.subsystem_adapters.keys().cloned().collect();
+        let mut total_ops = 0;
+
+        for origin in &adapter_names {
+            for target in &adapter_names {
+                if origin != target {
+                    let action = format!("mesh_sync_{}_to_{}", origin, target);
+                    self.dispatch_cross_subsystem_operation_all_distros(origin, target, &action)?;
+                    total_ops += 1;
+                }
+            }
+        }
+
+        Ok(total_ops)
     }
 
     /// Dispatch an operation across origin and target subsystems, applying policy translation.
@@ -911,6 +953,37 @@ mod tests {
             )
             .expect("AI-Scheduling policy should exist");
         assert_eq!(ai_sched_policy.policy_id, "policy_ai_orchestration");
+
+        let storage_sec_policy = engine
+            .translate_policy(
+                UniversalSubsystemCategory::FilesystemStorage,
+                UniversalSubsystemCategory::SecuritySandboxing,
+            )
+            .expect("Storage-Sec policy should exist");
+        assert_eq!(storage_sec_policy.policy_id, "policy_storage_sec");
+        assert!(storage_sec_policy.enforce_strict_isolation);
+
+        let virt_sec_policy = engine
+            .translate_policy(
+                UniversalSubsystemCategory::VirtualizationHypervisor,
+                UniversalSubsystemCategory::SecuritySandboxing,
+            )
+            .expect("Virt-Sec policy should exist");
+        assert_eq!(virt_sec_policy.policy_id, "policy_virt_sec");
+        assert!(virt_sec_policy.enforce_strict_isolation);
+
+        let ipc_obs_policy = engine
+            .translate_policy(
+                UniversalSubsystemCategory::IpcMemory,
+                UniversalSubsystemCategory::ObservabilityDiagnostics,
+            )
+            .expect("IPC-Obs policy should exist");
+        assert_eq!(ipc_obs_policy.policy_id, "policy_ipc_obs");
+
+        let mesh_ops = engine
+            .sync_universal_cross_distro_mesh()
+            .expect("Mesh sync should succeed");
+        assert!(mesh_ops > 0);
 
         assert!(engine.verify_all_subsystems_interoperability());
         assert_eq!(engine.evaluate_system_wide_harmony_score(), 100);
