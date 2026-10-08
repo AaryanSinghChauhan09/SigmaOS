@@ -672,7 +672,68 @@ impl Elf64Loader {
     }
 }
 
-// ─── 9. Syscall Entry / Return & Frame Context ────────────────────────────────
+// ─── 9. Ring 3 User Mode Transition Integration ────────────────────────────────
+
+/// Complete Ring 3 Transition Orchestrator
+#[derive(Debug)]
+pub struct Ring3TransitionManager {
+    pub user_stack_base: u64,
+    pub user_stack_size: u64,
+    pub entry_point: u64,
+    pub transition_complete: bool,
+}
+
+impl Ring3TransitionManager {
+    pub fn new(entry_point: u64) -> Self {
+        Self {
+            user_stack_base: 0x0000_7FFF_FFE0_0000,
+            user_stack_size: 0x10000, // 64KB user stack
+            entry_point,
+            transition_complete: false,
+        }
+    }
+
+    /// Prepare user-space memory mapping for Ring 3 transition
+    pub fn prepare_user_memory(&self, mem_mgr: &mut AddressSpaceSeparationManager) -> Result<(), &'static str> {
+        // Map user stack as user-accessible
+        for offset in (0..self.user_stack_size).step_by(4096) {
+            let vaddr = self.user_stack_base + offset;
+            let paddr = 0x0080_0000 + offset; // Physical backing
+            mem_mgr.map_user_page(vaddr, paddr, true, false)?;
+        }
+
+        // Map entry point code segment
+        let entry_vaddr = self.entry_point & !0xFFF;
+        let entry_paddr = 0x0040_0000;
+        mem_mgr.map_user_page(entry_vaddr, entry_paddr, false, true)?;
+
+        Ok(())
+    }
+
+    /// Execute Ring 3 transition using iretq
+    pub unsafe fn transition_to_ring3(&mut self) -> Result<(), &'static str> {
+        if self.transition_complete {
+            return Err("Already transitioned to Ring 3");
+        }
+
+        // Use the TSS module to perform the transition
+        use crate::arch::x86_64::tss_ring3_user_mode::{setup_user_mode, UserModeContext};
+        
+        setup_user_mode(self.user_stack_base, self.user_stack_size, self.entry_point);
+        
+        if let Some(ctx) = crate::arch::x86_64::tss_ring3_user_mode::get_user_context_mut() {
+            let result = ctx.transition_to_ring3_iretq();
+            if result.is_ok() {
+                self.transition_complete = true;
+            }
+            result
+        } else {
+            Err("User context not initialized")
+        }
+    }
+}
+
+// ─── 10. Syscall Entry / Return & Frame Context ────────────────────────────────
 
 /// CPU Context Frame captured during Syscall Entry
 #[derive(Debug, Clone, Copy)]
@@ -735,7 +796,7 @@ impl SyscallDispatcher {
     }
 }
 
-// ─── 10. Process Lifecycles, Signals & FD Table ───────────────────────────────
+// ─── 11. Process Lifecycles, Signals & FD Table ───────────────────────────────
 
 /// Process Execution State
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -838,7 +899,7 @@ impl ProcessControlBlock {
     }
 }
 
-// ─── 11. Anonymous Pipes & Pseudo-Terminals (PTY) ─────────────────────────────
+// ─── 12. Anonymous Pipes & Pseudo-Terminals (PTY) ─────────────────────────────
 
 /// Anonymous Ring Buffer Pipe
 #[derive(Debug)]
@@ -889,7 +950,7 @@ impl PseudoTerminalEngine {
     }
 }
 
-// ─── 12. Dynamic /proc Diagnostics Virtual Filesystem ─────────────────────────
+// ─── 13. Dynamic /proc Diagnostics Virtual Filesystem ─────────────────────────
 
 /// `/proc` Virtual Diagnostic Generator
 #[derive(Debug)]
@@ -935,7 +996,7 @@ impl ProcDiagnosticsFs {
     }
 }
 
-// ─── 13. Panic Dumps, Backtrace & Crash Recovery ─────────────────────────────
+// ─── 14. Panic Dumps, Backtrace & Crash Recovery ─────────────────────────────
 
 /// Kernel Panic Diagnostics Dump Structure
 #[derive(Debug, Clone)]
@@ -982,7 +1043,7 @@ impl KernelPanicRecoveryEngine {
     }
 }
 
-// ─── 14. Static Driver & Kernel Module Model ──────────────────────────────────
+// ─── 15. Static Driver & Kernel Module Model ──────────────────────────────────
 
 /// Kernel Driver State
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -1037,7 +1098,7 @@ impl StaticDriverModuleRegistry {
     }
 }
 
-// ─── 15. Orchestrating Complete Boot-to-Userspace Pipeline ────────────────────
+// ─── 16. Orchestrating Complete Boot-to-Userspace Pipeline ────────────────────
 
 /// Supreme Orchestrator for Hardware Boot-to-Userspace Execution Path
 #[derive(Debug)]
@@ -1051,6 +1112,7 @@ pub struct BootToUserspacePipeline {
     pub interrupt_ctrl: InterruptControllerManager,
     pub timer: SystemClockTimer,
     pub addr_space: AddressSpaceSeparationManager,
+    pub ring3_transition: Ring3TransitionManager,
     pub syscalls: SyscallDispatcher,
     pub recovery: KernelPanicRecoveryEngine,
     pub drivers: StaticDriverModuleRegistry,
@@ -1085,6 +1147,11 @@ impl BootToUserspacePipeline {
         // Identity map low memory and higher-half kernel
         let _ = addr_space.map_kernel_page(0xFFFF_8000_0000_0000, 0x0010_0000, true);
 
+        // Setup Ring 3 transition manager
+        let entry_point = 0x0000_0000_0040_0000;
+        let mut ring3_transition = Ring3TransitionManager::new(entry_point);
+        let _ = ring3_transition.prepare_user_memory(&mut addr_space);
+
         let syscalls = SyscallDispatcher::new();
         let recovery = KernelPanicRecoveryEngine::new();
 
@@ -1108,6 +1175,7 @@ impl BootToUserspacePipeline {
             interrupt_ctrl,
             timer,
             addr_space,
+            ring3_transition,
             syscalls,
             recovery,
             drivers,
@@ -1116,7 +1184,6 @@ impl BootToUserspacePipeline {
     }
 }
 
-#[cfg(test)]
 #[cfg(test)]
 mod tests {
     use super::*;

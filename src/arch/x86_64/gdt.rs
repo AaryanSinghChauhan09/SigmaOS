@@ -21,7 +21,7 @@ pub const USER_CS: u16 = 0x20 | 3; // RPL 3
 pub const TSS_SELECTOR: u16 = 0x28;
 
 /// 64-bit Task State Segment (TSS) structure according to AMD64/Intel SDM
-#[repr(C, packed)]
+#[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct TaskStateSegment {
     pub reserved_0: u32,
@@ -142,6 +142,39 @@ impl GlobalDescriptorTableManager {
 
     /// Initialize GDT and TSS
     pub fn init(&mut self) {
+        // Load GDT using lgdt instruction
+        let gdt_ptr = GdtDescriptor {
+            limit: (size_of::<[u64; 8]>() - 1) as u16,
+            base: &self.entries as *const _ as u64,
+        };
+
+        unsafe {
+            core::arch::asm!(
+                "lgdt [{0}]",
+                in(reg) &gdt_ptr,
+                options(nostack)
+            );
+
+            // Reload segment registers
+            core::arch::asm!(
+                "mov ax, {0}",
+                "mov ds, ax",
+                "mov es, ax",
+                "mov fs, ax",
+                "mov gs, ax",
+                "mov ss, ax",
+                in(reg) KERNEL_DS as u16,
+                options(nostack)
+            );
+
+            // Load TSS using ltr instruction
+            core::arch::asm!(
+                "ltr {0}",
+                in(reg) TSS_SELECTOR as u16,
+                options(nostack)
+            );
+        }
+
         self.is_loaded = true;
     }
 
@@ -163,14 +196,30 @@ impl Default for GlobalDescriptorTableManager {
     }
 }
 
+/// Global GDT instance
+static mut GLOBAL_GDT: Option<GlobalDescriptorTableManager> = None;
+
+/// Get the global GDT instance
+pub fn get_gdt() -> Option<&'static GlobalDescriptorTableManager> {
+    unsafe { GLOBAL_GDT.as_ref() }
+}
+
+/// Get mutable global GDT instance
+pub fn get_gdt_mut() -> Option<&'static mut GlobalDescriptorTableManager> {
+    unsafe { GLOBAL_GDT.as_mut() }
+}
+
 /// Global system initializer for GDT and TSS
 pub fn init() {
     let mut gdt = GlobalDescriptorTableManager::new();
     gdt.set_kernel_stack(0xFFFF_8000_0008_0000);
     gdt.init();
+    
+    unsafe {
+        GLOBAL_GDT = Some(gdt);
+    }
 }
 
-#[cfg(test)]
 #[cfg(test)]
 mod tests {
     use super::*;

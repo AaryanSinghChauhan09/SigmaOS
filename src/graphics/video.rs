@@ -6,7 +6,7 @@ extern crate alloc;
 
 use alloc::vec::Vec;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct PixelRgba {
     pub r: u8,
     pub g: u8,
@@ -25,4 +25,15 @@ pub struct VideoFrame {
     pub width: u32,
     pub height: u32,
     pub pixels: Vec<PixelRgba>,
+}
+
+impl VideoFrame {
+    pub fn new(width: u32, height: u32) -> Self {
+        let pixel_count = (width * height) as usize;
+        Self {
+            width,
+            height,
+            pixels: vec![PixelRgba::new(0, 0, 0, 255); pixel_count],
+        }
+    }
 }

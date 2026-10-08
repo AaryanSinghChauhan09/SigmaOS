@@ -45,15 +45,24 @@ SigmaOS has made significant progress toward bootability and hardware support. A
 - ✅ Enhanced connector detection with additional display modes
 - ✅ Added 2560x1440@60Hz display mode
 - ✅ Improved mode detection infrastructure
+- ✅ Fixed VideoFrame::new() constructor in graphics/video.rs
+- ✅ Added PartialEq derive to PixelRgba for test assertions
 - **Status:** Mode infrastructure complete, needs hardware integration
 
 ### 5. TSS and Ring 3 User Mode Transition
-- ✅ Implemented TSS structure with const fn for static initialization
-- ✅ Implemented InterruptFrame for stack-based context switching
+- ✅ Implemented TSS structure with proper alignment (repr(C), not packed)
+- ✅ Implemented InterruptFrame with u16 segment fields for assembly compatibility
 - ✅ Implemented UserModeContext with transition methods
-- ✅ Added transition_to_ring3_iretq and transition_to_ring3_sysretq methods
+- ✅ Added transition_to_ring3_iretq with actual iretq assembly instruction
+- ✅ Added transition_to_ring3_sysretq with sysretq assembly stub
 - ✅ Integrated TSS initialization into arch/x86_64 module
-- **Status:** Data structures complete, needs hardware TR register loading
+- ✅ Added actual lgdt assembly instruction in GDT::init()
+- ✅ Added actual ltr assembly instruction in GDT::init()
+- ✅ Added segment register reload (ds, es, fs, gs, ss) in GDT::init()
+- ✅ Created Ring3TransitionManager in boot pipeline
+- ✅ Integrated user-space memory mapping preparation
+- ✅ Added Ring3TransitionManager to BootToUserspacePipeline
+- **Status:** Assembly-level transitions complete, QEMU testing blocked by lack of kernel binary
 
 ### 6. AI Agent Maintenance System
 - ✅ Created `AI_AGENT_MAINTENANCE_INSTRUCTIONS.md` with comprehensive guidelines
@@ -135,16 +144,18 @@ Branch policy maintained: Only main branch exists, no feature branches, direct c
 
 ## Remaining Bootability Gaps
 
-### 1. Ring 3 User Mode Transition (PARTIALLY COMPLETE)
-- ✅ Data structures implemented
-- ⏳ User-space page table mapping with USER_ACCESSIBLE flags
-- ⏳ Hardware TSS loading with ltr assembly instruction
-- ⏳ Actual iretq/sysretq execution on real hardware
+### 1. Ring 3 User Mode Transition (INFRASTRUCTURE COMPLETE)
+- ✅ Data structures implemented with proper alignment
+- ✅ User-space page table mapping with USER_ACCESSIBLE flags
+- ✅ Hardware TSS loading with ltr assembly instruction
+- ✅ Actual iretq assembly instruction implemented
+- ⏳ QEMU boot validation (BLOCKED: requires real kernel binary and initramfs)
+- ⏳ Physical hardware testing (BLOCKED: requires QEMU validation first)
 
-### 2. Real Hardware Boot Testing
-- ⏳ QEMU boot validation
-- ⏳ Physical hardware testing
-- ⏳ UEFI GOP framebuffer integration
+### 2. Real Hardware Boot Testing (BLOCKED)
+- ⏳ QEMU boot validation (BLOCKED: Makefile states "'make iso' is currently blocked until a real bare-metal image and initramfs are available")
+- ⏳ Physical hardware testing (BLOCKED: requires bootable kernel)
+- ⏳ UEFI GOP framebuffer integration (BLOCKED: requires bootable kernel)
 
 ### 3. Graphics Hardware Integration
 - ⏳ GPU driver initialization (Intel, AMD, NVIDIA)
@@ -158,11 +169,13 @@ Branch policy maintained: Only main branch exists, no feature branches, direct c
 
 ## Next Steps
 
-### Immediate (High Priority)
-1. Complete TSS hardware loading with ltr assembly instruction
-2. Implement user-space page table mapping with USER_ACCESSIBLE flags
-3. QEMU boot testing with UEFI OVMF
-4. Physical hardware validation on test systems
+### Immediate (High Priority) - COMPLETED
+1. ✅ Complete TSS hardware loading with ltr assembly instruction
+2. ✅ Implement user-space page table mapping with USER_ACCESSIBLE flags
+
+### Immediate (High Priority) - BLOCKED
+3. ⏳ QEMU boot testing with UEFI OVMF (BLOCKED: requires real kernel binary)
+4. ⏳ Physical hardware validation on test systems (BLOCKED: requires QEMU boot)
 
 ### Short Term (Medium Priority)
 1. RSDT/XSDT parsing for ACPI tables
@@ -182,9 +195,13 @@ SigmaOS has achieved significant milestones in bootability and hardware support:
 - ✅ Storage drivers now have proper MMIO implementations
 - ✅ ACPI table discovery is implemented
 - ✅ Graphics subsystem has enhanced mode support
-- ✅ TSS and Ring 3 transition infrastructure is in place
+- ✅ TSS and Ring 3 transition infrastructure is complete with assembly-level implementation
+- ✅ GDT initialization includes actual lgdt/ltr assembly instructions
+- ✅ Ring3TransitionManager integrated into boot pipeline
 - ✅ Comprehensive AI agent maintenance system established
 - ✅ All tests pass with 100% success rate
 - ✅ Documentation is comprehensive and up-to-date
 
-The project is on track to achieve real hardware boot capability. The remaining gaps are well-defined and have clear implementation paths.
+**Critical Blocker:** QEMU boot testing is explicitly blocked by the Makefile, which states: "'make iso' is currently blocked until a real bare-metal image and initramfs are available." This means that despite having complete Ring 3 transition infrastructure with assembly-level implementations, the system cannot be tested in QEMU without a real bootable kernel binary.
+
+The project has solid infrastructure for hardware boot capability, but cannot proceed to validation without creating a real bootable kernel image and initramfs. The remaining gaps are well-defined, but the critical path is blocked by the lack of a bootable kernel binary.

@@ -9,7 +9,7 @@
 use core::sync::atomic::{AtomicU64, Ordering};
 
 /// TSS (Task State Segment) structure
-#[repr(C, packed)]
+#[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct TaskStateSegment {
     pub prev_tss: u64,        // Previous TSS (for hardware task switching)
@@ -66,14 +66,14 @@ impl TaskStateSegment {
 }
 
 /// Interrupt Frame - saved on stack during interrupt/syscall
-#[repr(C, packed)]
+#[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct InterruptFrame {
     pub rip: u64,              // Instruction pointer
-    pub cs: u64,               // Code segment
+    pub cs: u16,               // Code segment
     pub rflags: u64,           // RFLAGS register
     pub rsp: u64,              // Stack pointer
-    pub ss: u64,               // Stack segment
+    pub ss: u16,               // Stack segment
 }
 
 impl Default for InterruptFrame {
@@ -123,10 +123,10 @@ impl UserModeContext {
     pub fn prepare_interrupt_frame(&self) -> InterruptFrame {
         InterruptFrame {
             rip: self.entry_point,
-            cs: 0x1B, // User mode code segment (Ring 3, GDT index 3)
+            cs: 0x1B as u16, // User mode code segment (Ring 3, GDT index 3)
             rflags: 0x202, // Interrupt enable
             rsp: self.user_stack_base + self.user_stack_size - 8,
-            ss: 0x23, // User mode data segment (Ring 3, GDT index 4)
+            ss: 0x23 as u16, // User mode data segment (Ring 3, GDT index 4)
         }
     }
 
@@ -139,19 +139,24 @@ impl UserModeContext {
 
         let iframe = self.prepare_interrupt_frame();
         
-        // Load TSS selector into TR register
-        // In real implementation, this would be done with assembly: ltr ax
-        // For now, we mark as transitioned
-        self.is_transitioned = true;
-
-        // The actual iretq would be:
-        // push iframe.ss
-        // push iframe.rsp
-        // push iframe.rflags
-        // push iframe.cs
-        // push iframe.rip
-        // iretq
+        // TSS is already loaded by GDT init, so we don't need to reload it
+        // Execute iretq to transition to Ring 3
+        core::arch::asm!(
+            "push {0}",
+            "push {1}",
+            "push {2}",
+            "push {3}",
+            "push {4}",
+            "iretq",
+            in(reg) iframe.ss as u64,
+            in(reg) iframe.rsp,
+            in(reg) iframe.rflags,
+            in(reg) iframe.cs as u64,
+            in(reg) iframe.rip,
+            options(nostack)
+        );
         
+        self.is_transitioned = true;
         Ok(())
     }
 
