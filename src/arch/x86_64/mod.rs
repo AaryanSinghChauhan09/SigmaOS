@@ -5,6 +5,7 @@ pub mod gdt;
 pub mod idt;
 pub mod interrupts;
 pub mod paging;
+pub mod tss_ring3_user_mode;
 
 pub fn initialize() {
     cpu::init();
@@ -13,4 +14,5 @@ pub fn initialize() {
     paging::init();
     interrupts::enable();
     acpi::init();
+    tss_ring3_user_mode::init_tss();
 }
