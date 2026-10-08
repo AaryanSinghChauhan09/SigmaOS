@@ -48,6 +48,8 @@ pub trait PowerProfile {
 pub struct SimplePowerProfile {
     pub id: PowerProfileID,
     pub name: [u8; 32],
+    /// Cached byte length of profile name to avoid O(N) zero-byte linear scan on name queries
+    pub name_len: u8,
     pub profile_type: AtomicUsize,
     pub cpu_governor: AtomicUsize,
     pub max_cpu_freq: AtomicUsize,
@@ -69,6 +71,7 @@ impl SimplePowerProfile {
         SimplePowerProfile {
             id,
             name: name_array,
+            name_len: name_len as u8,
             profile_type: AtomicUsize::new(profile_type as usize),
             cpu_governor: AtomicUsize::new(governor as usize),
             max_cpu_freq: AtomicUsize::new(3500000),
@@ -82,8 +85,9 @@ impl PowerProfile for SimplePowerProfile {
         self.id
     }
     fn name(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(32);
-        &self.name[..len]
+        // O(1) constant-time slice lookup using cached name_len,
+        // avoiding O(N) zero-byte linear scan (.position(|&b| b == 0)) on every profile name query.
+        &self.name[..self.name_len as usize]
     }
     fn profile_type(&self) -> PowerProfileType {
         match self.profile_type.load(Ordering::SeqCst) {
@@ -380,5 +384,48 @@ impl BatteryManager for SimpleBatteryManager {
             return 0;
         }
         capacity * 5
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_power_profile_name_cached_len() {
+        let profile = SimplePowerProfile::new(
+            1,
+            b"performance",
+            PowerProfileType::Performance,
+            CPUGovernorType::Performance,
+        );
+        assert_eq!(profile.name(), b"performance");
+        assert_eq!(profile.name_len, 11);
+    }
+
+    #[test]
+    fn test_power_profile_name_empty() {
+        let profile = SimplePowerProfile::new(
+            2,
+            b"",
+            PowerProfileType::PowerSaver,
+            CPUGovernorType::Powersave,
+        );
+        assert_eq!(profile.name(), b"");
+        assert_eq!(profile.name_len, 0);
+    }
+
+    #[test]
+    fn test_power_profile_name_truncated() {
+        let long_name = b"this_is_a_very_long_power_profile_name_that_exceeds_limit";
+        let profile = SimplePowerProfile::new(
+            3,
+            long_name,
+            PowerProfileType::Custom,
+            CPUGovernorType::Ondemand,
+        );
+        assert_eq!(profile.name_len, 31);
+        assert_eq!(profile.name().len(), 31);
+        assert_eq!(profile.name(), &long_name[..31]);
     }
 }
