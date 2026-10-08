@@ -767,6 +767,13 @@ if [ -f "src/distro/sovereign_universal_subsystem_interop.rs" ]; then
     ./build/universal_subsystem_interop_test
 fi
 
+if [ -f "src/distro/sovereign_linux_bsd_all_subsystems_harmony.rs" ]; then
+    echo "Running Sovereign Linux & BSD All Subsystems Harmony test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_linux_bsd_all_subsystems_harmony.rs --edition=2021 -o build/test_subsystem_harmony
+    ./build/test_subsystem_harmony
+fi
+
 if [ -f "src/distro/sovereign_linux_bsd_ecosystem_advancements_v29.rs" ]; then
     echo "Running Sovereign Linux & BSD Ecosystem Advancements V29 test suite..."
     mkdir -p build
