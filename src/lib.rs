@@ -158,6 +158,7 @@ pub use distro::tech_media_publication_innovations::*;
 pub use distro::SovereignMasterSubsystemDistroHarmonizer;
 pub use kernel::tss_ring3_user_mode::*;
 pub use open_source_obsoletion::open_source_os_gap_closure::*;
+pub use open_source_obsoletion::open_source_os_pinnacle_gap_closure::*;
 pub use tools::tech_media_extended_suite::*;
 pub mod sovereign_wiki_master_engine;
 pub use sovereign_wiki_master_engine::*;

@@ -4015,9 +4015,7 @@ impl SovereignRuffFastLinterEngine {
                     fixable: true,
                 });
             }
-            if self.enabled_rules.contains(&"F401".to_string())
-                && line.contains("import unused_module")
-            {
+            if self.enabled_rules.contains(&"F401".to_string()) && line.contains("import unused_module") {
                 diags.push(LintDiagnosticRule {
                     code: "F401".to_string(),
                     file_path: path.to_string(),
@@ -4202,11 +4200,7 @@ impl SovereignWasmtimeWasiPreview2Engine {
         });
     }
 
-    pub fn invoke_component_export(
-        &mut self,
-        component_name: &str,
-        func: &str,
-    ) -> Result<u64, &'static str> {
+    pub fn invoke_component_export(&mut self, component_name: &str, func: &str) -> Result<u64, &'static str> {
         let comp = self
             .components
             .iter()
@@ -4560,275 +4554,6 @@ impl Default for SovereignCaddyAutomaticTlsEngine {
     }
 }
 
-// =========================================================================
-// 81. SOVEREIGN PROCS PROCESS VIEWER ENGINE (Superseding procs & ps)
-// =========================================================================
-
-#[derive(Debug, Clone, PartialEq)]
-pub struct ProcsProcessInfo {
-    pub pid: usize,
-    pub ppid: usize,
-    pub name: String,
-    pub user: String,
-    pub cpu_pct: f32,
-    pub mem_rss_bytes: u64,
-    pub read_bytes_sec: u64,
-    pub write_bytes_sec: u64,
-    pub state: String,
-}
-
-pub struct SovereignProcsProcessViewerEngine {
-    pub processes: Vec<ProcsProcessInfo>,
-    pub total_inspected_processes: u64,
-}
-
-impl SovereignProcsProcessViewerEngine {
-    pub fn new() -> Self {
-        Self {
-            processes: Vec::new(),
-            total_inspected_processes: 0,
-        }
-    }
-
-    pub fn register_process(&mut self, proc_info: ProcsProcessInfo) {
-        self.processes.retain(|p| p.pid != proc_info.pid);
-        self.processes.push(proc_info);
-        self.total_inspected_processes += 1;
-    }
-
-    pub fn filter_by_keyword(&self, query: &str) -> Vec<ProcsProcessInfo> {
-        self.processes
-            .iter()
-            .filter(|p| p.name.contains(query) || p.user.contains(query))
-            .cloned()
-            .collect()
-    }
-
-    pub fn filter_high_cpu(&self, min_cpu_pct: f32) -> Vec<ProcsProcessInfo> {
-        self.processes
-            .iter()
-            .filter(|p| p.cpu_pct >= min_cpu_pct)
-            .cloned()
-            .collect()
-    }
-}
-
-impl Default for SovereignProcsProcessViewerEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// 82. SOVEREIGN DUST DISK USAGE ENGINE (Superseding dust, du & ncdu)
-// =========================================================================
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct DustDirectoryNode {
-    pub path: String,
-    pub size_bytes: u64,
-    pub child_count: usize,
-    pub depth: usize,
-}
-
-pub struct SovereignDustDiskUsageEngine {
-    pub nodes: Vec<DustDirectoryNode>,
-    pub total_scanned_bytes: u64,
-}
-
-impl SovereignDustDiskUsageEngine {
-    pub fn new() -> Self {
-        Self {
-            nodes: Vec::new(),
-            total_scanned_bytes: 0,
-        }
-    }
-
-    pub fn record_directory(&mut self, path: &str, size_bytes: u64, children: usize, depth: usize) {
-        self.nodes.retain(|n| n.path != path);
-        self.nodes.push(DustDirectoryNode {
-            path: path.to_string(),
-            size_bytes,
-            child_count: children,
-            depth,
-        });
-        self.total_scanned_bytes += size_bytes;
-    }
-
-    pub fn get_top_consumers(&self, limit: usize) -> Vec<DustDirectoryNode> {
-        let mut sorted = self.nodes.clone();
-        sorted.sort_by(|a, b| b.size_bytes.cmp(&a.size_bytes));
-        sorted.truncate(limit);
-        sorted
-    }
-
-    pub fn filter_by_depth(&self, max_depth: usize) -> Vec<DustDirectoryNode> {
-        self.nodes
-            .iter()
-            .filter(|n| n.depth <= max_depth)
-            .cloned()
-            .collect()
-    }
-}
-
-impl Default for SovereignDustDiskUsageEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// 83. SOVEREIGN DOGDNS DNS QUERY ENGINE (Superseding dog, dig & nslookup)
-// =========================================================================
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum DnsRecordType {
-    A,
-    Aaaa,
-    Mx,
-    Txt,
-    Cname,
-    Ns,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct DnsResponseRecord {
-    pub domain: String,
-    pub record_type: DnsRecordType,
-    pub record_data: String,
-    pub ttl_secs: u32,
-    pub latency_ms: u32,
-    pub protocol: String, // "UDP", "DoH", "DoT"
-}
-
-pub struct SovereignDogdnsDnsQueryEngine {
-    pub cached_responses: Vec<DnsResponseRecord>,
-    pub total_queries_executed: u64,
-}
-
-impl SovereignDogdnsDnsQueryEngine {
-    pub fn new() -> Self {
-        Self {
-            cached_responses: Vec::new(),
-            total_queries_executed: 0,
-        }
-    }
-
-    pub fn execute_dns_query(
-        &mut self,
-        domain: &str,
-        rec_type: DnsRecordType,
-        resolver_protocol: &str,
-    ) -> DnsResponseRecord {
-        self.total_queries_executed += 1;
-        let dummy_data = match rec_type {
-            DnsRecordType::A => "192.168.1.1".to_string(),
-            DnsRecordType::Aaaa => "2001:db8::1".to_string(),
-            DnsRecordType::Mx => "10 mail.sigmaos.org".to_string(),
-            DnsRecordType::Txt => "v=spf1 include:_spf.sigmaos.org ~all".to_string(),
-            DnsRecordType::Cname => "canonical.sigmaos.org".to_string(),
-            DnsRecordType::Ns => "ns1.sigmaos.org".to_string(),
-        };
-
-        let response = DnsResponseRecord {
-            domain: domain.to_string(),
-            record_type: rec_type,
-            record_data: dummy_data,
-            ttl_secs: 300,
-            latency_ms: 12,
-            protocol: resolver_protocol.to_string(),
-        };
-
-        self.cached_responses.push(response.clone());
-        response
-    }
-}
-
-impl Default for SovereignDogdnsDnsQueryEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// 84. SOVEREIGN GPING NETWORK PING ENGINE (Superseding gping & ping)
-// =========================================================================
-
-#[derive(Debug, Clone, PartialEq)]
-pub struct PingSample {
-    pub host: String,
-    pub sequence: u64,
-    pub rtt_ms: f32,
-    pub success: bool,
-}
-
-pub struct SovereignGpingNetworkPingEngine {
-    pub samples: Vec<PingSample>,
-    pub target_hosts: Vec<String>,
-}
-
-impl SovereignGpingNetworkPingEngine {
-    pub fn new() -> Self {
-        Self {
-            samples: Vec::new(),
-            target_hosts: Vec::new(),
-        }
-    }
-
-    pub fn add_target_host(&mut self, host: &str) {
-        if !self.target_hosts.contains(&host.to_string()) {
-            self.target_hosts.push(host.to_string());
-        }
-    }
-
-    pub fn record_ping(&mut self, host: &str, seq: u64, rtt_ms: f32, success: bool) {
-        self.samples.push(PingSample {
-            host: host.to_string(),
-            sequence: seq,
-            rtt_ms,
-            success,
-        });
-    }
-
-    pub fn compute_stats(&self, host: &str) -> Option<(f32, f32, f32, f32)> {
-        let host_samples: Vec<&PingSample> = self
-            .samples
-            .iter()
-            .filter(|s| s.host == host && s.success)
-            .collect();
-
-        if host_samples.is_empty() {
-            return None;
-        }
-
-        let min_rtt = host_samples
-            .iter()
-            .map(|s| s.rtt_ms)
-            .fold(f32::INFINITY, f32::min);
-        let max_rtt = host_samples
-            .iter()
-            .map(|s| s.rtt_ms)
-            .fold(f32::NEG_INFINITY, f32::max);
-        let sum_rtt: f32 = host_samples.iter().map(|s| s.rtt_ms).sum();
-        let avg_rtt = sum_rtt / (host_samples.len() as f32);
-
-        let total_host_samples = self.samples.iter().filter(|s| s.host == host).count();
-        let loss_pct = if total_host_samples == 0 {
-            0.0
-        } else {
-            ((total_host_samples - host_samples.len()) as f32 / total_host_samples as f32) * 100.0
-        };
-
-        Some((min_rtt, avg_rtt, max_rtt, loss_pct))
-    }
-}
-
-impl Default for SovereignGpingNetworkPingEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 pub struct SovereignOpenSourceObsoletionOrchestrator {
     pub vcs: SovereignVcsEngine,
     pub supervisor: SovereignInitSupervisor,
@@ -4923,11 +4648,6 @@ pub struct SovereignOpenSourceObsoletionOrchestrator {
     pub suricata_ids: SovereignSuricataIdsRulesEngine,
     pub caddy_tls: SovereignCaddyAutomaticTlsEngine,
     pub os_pr_proposals: SovereignOpenSourceOsPrProposalEngine,
-    pub pinnacle_orchestrator: SovereignOpenSourceOsPinnacleOrchestrator,
-    pub procs_viewer: SovereignProcsProcessViewerEngine,
-    pub dust_usage: SovereignDustDiskUsageEngine,
-    pub dogdns_query: SovereignDogdnsDnsQueryEngine,
-    pub gping_network: SovereignGpingNetworkPingEngine,
     pub total_obsoleted_projects_count: u32,
 }
 
@@ -5040,15 +4760,10 @@ impl SovereignOpenSourceObsoletionOrchestrator {
             uutils_coreutils: SovereignUutilsCoreutilsEngine::new(),
             freebsd_jail_rctl: SovereignFreeBsdJailRctlEngine::new(),
             nix_flake_lock: SovereignNixFlakeLockEngine::new(),
-            ghostty_gpu_font_renderer: SovereignGhosttyGpuFontRendererEngine::new(
-                "Sovereign Mono",
-                12.0,
-            ),
+            ghostty_gpu_font_renderer: SovereignGhosttyGpuFontRendererEngine::new("Sovereign Mono", 12.0),
             fish_autosuggestion_syntax: SovereignFishAutosuggestionSyntaxEngine::new(),
             ruff_fast_linter: SovereignRuffFastLinterEngine::new(),
-            typst_pdf_compiler: SovereignTypstPdfCompilerEngine::new(
-                "SigmaOS Technical Specification",
-            ),
+            typst_pdf_compiler: SovereignTypstPdfCompilerEngine::new("SigmaOS Technical Specification"),
             tetragon_ebpf_audit: SovereignTetragonEbpfAuditEngine::new(),
             wasmtime_wasi_preview2: SovereignWasmtimeWasiPreview2Engine::new(),
             trivy_scanner: SovereignTrivyContainerVulnerabilityScannerEngine::new(),
@@ -5058,12 +4773,7 @@ impl SovereignOpenSourceObsoletionOrchestrator {
             suricata_ids: SovereignSuricataIdsRulesEngine::new(),
             caddy_tls: SovereignCaddyAutomaticTlsEngine::new(),
             os_pr_proposals: SovereignOpenSourceOsPrProposalEngine::new(),
-            pinnacle_orchestrator: SovereignOpenSourceOsPinnacleOrchestrator::new(),
-            procs_viewer: SovereignProcsProcessViewerEngine::new(),
-            dust_usage: SovereignDustDiskUsageEngine::new(),
-            dogdns_query: SovereignDogdnsDnsQueryEngine::new(),
-            gping_network: SovereignGpingNetworkPingEngine::new(),
-            total_obsoleted_projects_count: 114,
+            total_obsoleted_projects_count: 110,
         }
     }
 
@@ -5222,53 +4932,19 @@ impl SovereignOpenSourceObsoletionOrchestrator {
         );
         assert!(self.nix_flake_lock.verify_flake_lockfile());
 
-        let _ = self
-            .ghostty_gpu_font_renderer
-            .render_terminal_grid_gpu("SigmaOS");
-        self.fish_autosuggestion_syntax
-            .record_history("sigma status");
+        let _ = self.ghostty_gpu_font_renderer.render_terminal_grid_gpu("SigmaOS");
+        self.fish_autosuggestion_syntax.record_history("sigma status");
         let _ = self.ruff_fast_linter.lint_source_code("main.py", "x = 1\n");
-        let _ = self
-            .typst_pdf_compiler
-            .compile_markup_to_pdf("= Title\nContent");
-        self.tetragon_ebpf_audit
-            .register_sensor(1, "sys_execve", true);
-        self.wasmtime_wasi_preview2
-            .register_wasi_component("component_1", &["run"]);
+        let _ = self.typst_pdf_compiler.compile_markup_to_pdf("= Title\nContent");
+        self.tetragon_ebpf_audit.register_sensor(1, "sys_execve", true);
+        self.wasmtime_wasi_preview2.register_wasi_component("component_1", &["run"]);
 
-        self.trivy_scanner.register_vulnerability(
-            "CVE-2026-9999",
-            "CRITICAL",
-            "sovereign-kernel",
-            "Memory issue",
-        );
-        self.aria2_downloader
-            .add_download_source("http://dist.sigmaos.org/pkg.tar.zst");
-        self.just_task_runner
-            .register_recipe("build", &["cargo build --release"]);
-        self.supabase_postgrest
-            .register_table("users", &["id", "username", "role"]);
-        self.suricata_ids
-            .add_signature_rule(1001, "TCP", "any", 80, "ALERT HTTP Traffic");
+        self.trivy_scanner.register_vulnerability("CVE-2026-9999", "CRITICAL", "sovereign-kernel", "Memory issue");
+        self.aria2_downloader.add_download_source("http://dist.sigmaos.org/pkg.tar.zst");
+        self.just_task_runner.register_recipe("build", &["cargo build --release"]);
+        self.supabase_postgrest.register_table("users", &["id", "username", "role"]);
+        self.suricata_ids.add_signature_rule(1001, "TCP", "any", 80, "ALERT HTTP Traffic");
         let _ = self.caddy_tls.provision_acme_certificate("api.sigmaos.org");
-
-        self.procs_viewer.register_process(ProcsProcessInfo {
-            pid: 1,
-            ppid: 0,
-            name: "sovereign_kernel".to_string(),
-            user: "root".to_string(),
-            cpu_pct: 0.1,
-            mem_rss_bytes: 10485760,
-            read_bytes_sec: 1024,
-            write_bytes_sec: 512,
-            state: "S".to_string(),
-        });
-        self.dust_usage.record_directory("/var/log", 1024000, 10, 1);
-        let _ = self
-            .dogdns_query
-            .execute_dns_query("sigmaos.org", DnsRecordType::A, "DoH");
-        self.gping_network.add_target_host("1.1.1.1");
-        self.gping_network.record_ping("1.1.1.1", 1, 10.5, true);
 
         Ok(format!(
             "Sovereign Stack Active: {} legacy open-source projects obsoleted",
@@ -8664,8 +8340,8 @@ mod tests {
     fn test_sovereign_orchestrator_bootstrap() {
         let mut orchestrator = SovereignOpenSourceObsoletionOrchestrator::new();
         let status = orchestrator.bootstrap_sovereign_stack().unwrap();
-        assert!(status.contains("114 legacy open-source projects obsoleted"));
-        assert_eq!(orchestrator.total_obsoleted_projects_count, 114);
+        assert!(status.contains("110 legacy open-source projects obsoleted"));
+        assert_eq!(orchestrator.total_obsoleted_projects_count, 110);
         assert_eq!(orchestrator.serenity_async.processed_count, 0);
         assert_eq!(orchestrator.serenity_async.task_queue.len(), 1);
         assert_eq!(orchestrator.qubes_isolation.domains.len(), 1);
@@ -8719,9 +8395,7 @@ mod tests {
     #[test]
     fn test_sovereign_typst_pdf_compiler_engine() {
         let mut typst = SovereignTypstPdfCompilerEngine::new("Architecture Specification");
-        let pdf_data = typst
-            .compile_markup_to_pdf("= Chapter 1\nSection details")
-            .unwrap();
+        let pdf_data = typst.compile_markup_to_pdf("= Chapter 1\nSection details").unwrap();
         assert!(pdf_data.starts_with(b"%PDF-1.7"));
         assert!(pdf_data.ends_with(b"%%EOF"));
         assert_eq!(typst.compiled_pages.len(), 2);
@@ -8744,14 +8418,10 @@ mod tests {
         let mut wasi = SovereignWasmtimeWasiPreview2Engine::new();
         wasi.register_wasi_component("http_router", &["handle_http_request", "init"]);
 
-        let res = wasi
-            .invoke_component_export("http_router", "handle_http_request")
-            .unwrap();
+        let res = wasi.invoke_component_export("http_router", "handle_http_request").unwrap();
         assert_eq!(res, 1);
         assert_eq!(wasi.executed_invocations, 1);
-        assert!(wasi
-            .invoke_component_export("http_router", "nonexistent")
-            .is_err());
+        assert!(wasi.invoke_component_export("http_router", "nonexistent").is_err());
     }
 
     #[test]
@@ -9214,10 +8884,7 @@ mod tests {
         let mut pg = SovereignSupabasePostgrestEngine::new();
         pg.register_table("audit_logs", &["id", "timestamp", "action"]);
         let endpoint = pg.auto_generate_endpoint("audit_logs").unwrap();
-        assert_eq!(
-            endpoint,
-            "/api/v1/rest/audit_logs?select=id,timestamp,action"
-        );
+        assert_eq!(endpoint, "/api/v1/rest/audit_logs?select=id,timestamp,action");
         assert_eq!(pg.total_api_calls, 1);
         assert_eq!(pg.auto_generate_endpoint("nonexistent"), None);
     }
@@ -9241,76 +8908,5 @@ mod tests {
 
         let renewed = caddy.check_and_renew(1800000000 - 86400 * 10);
         assert_eq!(renewed, 1);
-    }
-
-    #[test]
-    fn test_sovereign_procs_process_viewer() {
-        let mut procs = SovereignProcsProcessViewerEngine::new();
-        procs.register_process(ProcsProcessInfo {
-            pid: 101,
-            ppid: 1,
-            name: "sigma-desktop".to_string(),
-            user: "sovereign".to_string(),
-            cpu_pct: 12.5,
-            mem_rss_bytes: 204800,
-            read_bytes_sec: 4096,
-            write_bytes_sec: 1024,
-            state: "R".to_string(),
-        });
-
-        let matches = procs.filter_by_keyword("desktop");
-        assert_eq!(matches.len(), 1);
-        assert_eq!(matches[0].pid, 101);
-
-        let high_cpu = procs.filter_high_cpu(10.0);
-        assert_eq!(high_cpu.len(), 1);
-
-        assert_eq!(procs.total_inspected_processes, 1);
-    }
-
-    #[test]
-    fn test_sovereign_dust_disk_usage() {
-        let mut dust = SovereignDustDiskUsageEngine::new();
-        dust.record_directory("/usr/lib", 500000000, 120, 2);
-        dust.record_directory("/var/log", 100000000, 45, 2);
-        dust.record_directory("/tmp", 50000000, 10, 1);
-
-        let top = dust.get_top_consumers(2);
-        assert_eq!(top.len(), 2);
-        assert_eq!(top[0].path, "/usr/lib");
-
-        let depth1 = dust.filter_by_depth(1);
-        assert_eq!(depth1.len(), 1);
-        assert_eq!(depth1[0].path, "/tmp");
-        assert!(dust.total_scanned_bytes > 0);
-    }
-
-    #[test]
-    fn test_sovereign_dogdns_dns_query() {
-        let mut dog = SovereignDogdnsDnsQueryEngine::new();
-        let res_a = dog.execute_dns_query("sigmaos.org", DnsRecordType::A, "DoH");
-        assert_eq!(res_a.record_data, "192.168.1.1");
-        assert_eq!(res_a.protocol, "DoH");
-
-        let res_mx = dog.execute_dns_query("sigmaos.org", DnsRecordType::Mx, "UDP");
-        assert!(res_mx.record_data.contains("mail"));
-
-        assert_eq!(dog.total_queries_executed, 2);
-        assert_eq!(dog.cached_responses.len(), 2);
-    }
-
-    #[test]
-    fn test_sovereign_gping_network_ping() {
-        let mut gping = SovereignGpingNetworkPingEngine::new();
-        gping.add_target_host("8.8.8.8");
-        gping.record_ping("8.8.8.8", 1, 10.0, true);
-        gping.record_ping("8.8.8.8", 2, 20.0, true);
-        gping.record_ping("8.8.8.8", 3, 15.0, false);
-
-        let (min_rtt, avg_rtt, max_rtt, loss_pct) = gping.compute_stats("8.8.8.8").unwrap();
-        assert_eq!(min_rtt, 10.0);
-        assert_eq!(avg_rtt, 15.0);
-        assert_eq!(max_rtt, 20.0);
-        assert!((loss_pct - 33.333).abs() < 0.1);
     }
 }
