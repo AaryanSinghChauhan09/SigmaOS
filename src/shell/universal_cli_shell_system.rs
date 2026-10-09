@@ -640,6 +640,13 @@ impl UniversalShellScriptTranspiler {
                 return format!("# zsh suffix alias stub: .{} -> {}", ext, app);
             }
         }
+        if l.starts_with("typeset -A ") || l.starts_with("declare -A ") {
+            let name = l
+                .trim_start_matches("typeset -A ")
+                .trim_start_matches("declare -A ")
+                .trim();
+            return format!("# zsh/bash assoc array declaration: {}", name);
+        }
         if l.starts_with("export ") {
             if let Some(eq) = l.find('=') {
                 let k = l[7..eq].trim();
@@ -656,8 +663,20 @@ impl UniversalShellScriptTranspiler {
             l = l.replace("[[", "[").replace("]]", "]");
         }
         if l.contains("<(") && l.contains(')') {
-            // Process substitution <(cmd) conversion stub into POSIX FIFO
+            // Process substitution <(cmd) conversion stub into POSIX FIFO command substitution
             l = l.replace("<(", "$( ").replace(")", " )");
+        }
+        if l.starts_with("declare -g ") || l.starts_with("local ") {
+            let rest = l
+                .trim_start_matches("declare -g ")
+                .trim_start_matches("local ")
+                .trim();
+            if let Some(eq) = rest.find('=') {
+                let k = rest[..eq].trim();
+                let v = rest[eq + 1..].trim();
+                vars.insert(k.to_string(), v.to_string());
+                return format!("{}={}", k, v);
+            }
         }
         if l.starts_with("export ") {
             if let Some(eq) = l.find('=') {
@@ -1281,5 +1300,20 @@ mod tests {
         let translated = engine.convert_to_posix_command("ps aux");
         assert_eq!(translated.canonical_command, "ps");
         assert_eq!(translated.translated_args, vec!["-e", "-f"]);
+    }
+
+    #[test]
+    fn test_zsh_and_bash_advanced_transpilation() {
+        let zsh_script = "#!/bin/zsh\ntypeset -A config\ndeclare -g MODE=production\n[[ -d /tmp ]] && echo ok";
+        let plan = UniversalShellScriptTranspiler::transpile_script(zsh_script);
+        assert_eq!(plan.target_format, ShellSystemFormat::Zsh);
+        assert!(plan.posix_sh_script.contains("# zsh/bash assoc array declaration"));
+
+        let bash_script = "#!/bin/bash\ndeclare -g SERVICE=httpd\nlocal TIMEOUT=30\ndiff <(ls dir1) <(ls dir2)";
+        let plan_bash = UniversalShellScriptTranspiler::transpile_script(bash_script);
+        assert_eq!(plan_bash.target_format, ShellSystemFormat::Bash);
+        assert!(plan_bash.posix_sh_script.contains("SERVICE=httpd"));
+        assert!(plan_bash.posix_sh_script.contains("TIMEOUT=30"));
+        assert!(plan_bash.posix_sh_script.contains("$( ls dir1 )"));
     }
 }
