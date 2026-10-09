@@ -21,6 +21,8 @@ pub struct AptRepositorySync {
     pub mirror_url: String,
     pub is_gpg_verified: bool,
     pub package_count: usize,
+    pub inrelease_components: Vec<String>,
+    pub security_updates_enabled: bool,
 }
 
 impl AptRepositorySync {
@@ -30,6 +32,8 @@ impl AptRepositorySync {
             mirror_url,
             is_gpg_verified: false,
             package_count: 0,
+            inrelease_components: Vec::new(),
+            security_updates_enabled: false,
         }
     }
 
@@ -48,6 +52,22 @@ impl AptRepositorySync {
         }
         self.package_count = 58240; // Simulated package count of Debian repos
         Ok(self.package_count)
+    }
+
+    pub fn parse_inrelease_metadata(&mut self, inrelease_text: &str) {
+        for line in inrelease_text.lines() {
+            let line = line.trim();
+            if line.starts_with("Components:") {
+                let parts: Vec<&str> = line["Components:".len()..].split_whitespace().collect();
+                for comp in parts {
+                    self.inrelease_components.push(comp.to_string());
+                }
+            }
+        }
+    }
+
+    pub fn enable_security_updates(&mut self) {
+        self.security_updates_enabled = true;
     }
 }
 
@@ -731,6 +751,16 @@ impl DebianPrProposal {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_apt_repository_sync_extended() {
+        let mut sync = AptRepositorySync::new(DebianChannel::Stable, "https://deb.debian.org/debian".to_string());
+        sync.parse_inrelease_metadata("Origin: Debian\nComponents: main contrib non-free non-free-firmware\nArchitectures: amd64 arm64");
+        assert_eq!(sync.inrelease_components.len(), 4);
+        assert!(sync.inrelease_components.contains(&"main".to_string()));
+        sync.enable_security_updates();
+        assert!(sync.security_updates_enabled);
+    }
 
     #[test]
     fn test_debconf_preseed_parsing() {
