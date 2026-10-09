@@ -34,7 +34,6 @@ wiki_repo/
 /cgroup_v2_controllers
 /cron
 /eventfd
-/fd_table
 /flock
 /hostname
 /inotify
@@ -68,10 +67,3 @@ wiki_repo/
 /user_group_db
 /uts_namespace
 /zfs
-*.md
-*.txt
-*.py
-wiki/
-WIKI/
-docs/
-!Agents/*.md
