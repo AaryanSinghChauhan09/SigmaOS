@@ -71,8 +71,11 @@ wiki_repo/
 *.md
 *.txt
 *.py
-wiki/
-WIKI/
-docs/
 !Agents/*.md
-!OPEN_SOURCE_OS_COMPARATIVE_GAP_ANALYSIS.md
+!WHAT_IS_WORKING_AND_NOT_WORKING.md
+!docs/
+!docs/*
+!wiki/
+!wiki/*
+!WIKI/
+!WIKI/*
