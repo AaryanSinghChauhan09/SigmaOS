@@ -16,8 +16,6 @@ mod bore;
 mod community_foundation;
 #[path = "../src/compatibility/distro_bridge.rs"]
 mod distro_bridge;
-#[path = "../src/compatibility/distro_bridge.rs"]
-mod distro_bridge;
 #[path = "../src/boot/firmware.rs"]
 mod firmware;
 #[path = "../src/filesystem/bsd_linux_innovations.rs"]
@@ -26,13 +24,9 @@ mod fs_bsd_linux_innovations;
 mod gap_closure;
 #[path = "../src/compatibility/garuda_zen.rs"]
 mod garuda_zen;
-#[path = "../src/compatibility/garuda_zen.rs"]
-mod garuda_zen;
 #[path = "../src/security/hardening.rs"]
 mod hardening;
-#[path = "../src/security/hardening.rs"]
-mod hardening;
-#[path = "../src/input/keyboard.rs"]
+#[path = "../src/drivers/legacy_keyboard.rs"]
 mod keyboard_driver;
 #[path = "../src/virtualization/kvm_vcpu.rs"]
 mod kvm_vcpu;
@@ -40,36 +34,22 @@ mod kvm_vcpu;
 mod linux_bsd_innovations;
 #[path = "../src/distro/linux_bsd_inspirations.rs"]
 mod linux_bsd_inspirations;
-#[path = "../src/distro/linux_bsd_inspirations.rs"]
-mod linux_bsd_inspirations;
 #[path = "../src/distro/linux_bsd_parity.rs"]
 mod linux_bsd_parity;
 #[path = "../src/distro/missing_distro_innovations.rs"]
 mod missing_distro_innovations;
-#[path = "../src/distro/missing_distro_innovations.rs"]
-mod missing_distro_innovations;
-#[path = "../src/kernel/module_loader.rs"]
-mod module_loader;
 #[path = "../src/kernel/module_loader.rs"]
 mod module_loader;
 #[path = "../src/package/repository.rs"]
 mod package_repository;
-#[path = "../src/package/repository.rs"]
-mod package_repository;
 #[path = "../src/network/protocols.rs"]
 mod protocols;
-#[path = "../src/network/protocols.rs"]
-mod protocols;
-#[path = "../src/distro/ready_to_use.rs"]
-mod ready_to_use;
 #[path = "../src/distro/ready_to_use.rs"]
 mod ready_to_use;
 #[path = "../src/security/root_improvement.rs"]
 mod root_improvement;
 #[path = "../src/boot/sigma_boot.rs"]
 mod sigma_boot;
-#[path = "../src/distro/sovereign_distro_dominance.rs"]
-mod sovereign_distro_dominance;
 #[path = "../src/distro/sovereign_distro_dominance.rs"]
 mod sovereign_distro_dominance;
 #[path = "../src/process/sovereign_process_engine.rs"]
@@ -81,12 +61,6 @@ mod vm_manager;
 #[path = "../src/compatibility/zorin.rs"]
 mod zorin;
 
-#[path = "../src/kernel/linux_bsd_innovations.rs"]
-mod linux_bsd_innovations;
-
-#[path = "../src/boot/firmware.rs"]
-mod firmware;
-
 #[path = "../src/unimplemented_features.rs"]
 mod unimplemented_features;
 
@@ -94,14 +68,6 @@ use bsd::*;
 use gap_closure::{ZorinAppearanceSwitcher, ZorinLayoutPreset};
 use kvm_vcpu::{KvmExitCode, KvmVcpu, VirtioDeviceBackend, VirtioDeviceType, RAX_HLT_SIGNAL};
 use unimplemented_features::*;
-use unimplemented_features::{
-    AlpineApkPackageIndex, ApkPackageEntry, DragonFlyHammer2FsSnapshot,
-    NixOsDeclarativeConfigEngine,
-};
-use unimplemented_features::{
-    AlpineApkPackageIndex, ApkPackageEntry, DragonFlyHammer2FsSnapshot,
-    NixOsDeclarativeConfigEngine,
-};
 use unveil::{UnveilManager, UnveilPermission};
 
 #[test]

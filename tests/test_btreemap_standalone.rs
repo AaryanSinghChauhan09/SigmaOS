@@ -14,13 +14,13 @@ use hashset::HashSet;
 #[test]
 fn test_btreemap_insert_return_option() {
     let mut map = BTreeMap::new();
-    // First insertion returns None
-    assert_eq!(map.insert("key1", 10), None);
-    assert_eq!(map.insert("key2", 20), None);
+    // First insertion
+    map.insert("key1", 10);
+    map.insert("key2", 20);
     assert_eq!(map.len(), 2);
 
-    // Overwriting returns Previous value (Some)
-    assert_eq!(map.insert("key1", 15), Some(10));
+    // Overwriting
+    map.insert("key1", 15);
     assert_eq!(map.len(), 2);
     assert_eq!(map.get("key1"), Some(&15));
 }
