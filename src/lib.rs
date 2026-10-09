@@ -25,7 +25,6 @@ pub mod dashboard;
 pub mod desktop;
 pub mod development;
 pub mod device;
-pub mod input;
 pub mod distro;
 pub mod ipc;
 pub mod storage;
@@ -48,7 +47,7 @@ pub mod orchestration;
 pub mod package;
 pub use package::{
     SovereignDistroPackageAdvancementsSuiteV10, SovereignDistroPackageAdvancementsSuiteV11,
-    SovereignDistroPackageAdvancementsSuiteV14, SovereignDistroPackageAdvancementsSuiteV27,
+    SovereignDistroPackageAdvancementsSuiteV14, SovereignDistroPackageAdvancementsSuiteV19,
     UniversalForeignPackageFormat, UniversalForeignPackageFormatConverter,
 };
 pub mod pacman;
@@ -59,6 +58,26 @@ pub mod cinnamon;
 pub use cinnamon::*;
 pub mod quickshell;
 pub use quickshell::*;
+pub mod nemo;
+pub use nemo::*;
+pub mod zig_memory;
+pub use zig_memory::*;
+pub mod xed;
+pub use xed::*;
+pub mod nim_system;
+pub use nim_system::*;
+pub mod mintinstall;
+pub use mintinstall::*;
+pub mod omarchy_plugin;
+pub use omarchy_plugin::*;
+pub mod timeshift;
+pub use timeshift::*;
+pub mod omarchy_bar;
+pub use omarchy_bar::*;
+pub mod mintupdate;
+pub use mintupdate::*;
+pub mod omarchy_overlay;
+pub use omarchy_overlay::*;
 pub mod process;
 pub mod productivity;
 pub use productivity::*;
@@ -121,39 +140,24 @@ pub use linuxmint_inspirations::{
     XAppThemeEngine, XAppTrayBadge, WARP_AUTH_PORT, WARP_MDNS_UDP_PORT, WARP_TRANSFER_PORT,
 };
 pub mod open_source_obsoletion;
-pub mod open_source_os_missing_components_parity;
 pub mod tools;
 pub use distro::additional_linux_bsd_components::*;
-pub use distro::sovereign_thousands_distro_components::*;
 pub use distro::sovereign_2050_distro_supremacy_engine::*;
 pub use distro::sovereign_2055_distro_supremacy_engine::*;
 pub use distro::sovereign_2060_distro_supremacy_engine::*;
 pub use distro::sovereign_2070_distro_supremacy_engine::*;
 pub use distro::sovereign_2075_distro_supremacy_engine::*;
+pub use distro::sovereign_2080_distro_supremacy_engine::*;
 pub use distro::sovereign_linux_bsd_master_synthesis::*;
 pub use distro::sovereign_linux_bsd_pinnacle_innovations_v14::*;
-pub use distro::sovereign_linux_bsd_ecosystem_advancements_v22::*;
-pub use distro::sovereign_architecture_development_decision_plan::*;
-pub use distro::omarchy_linux_gap_closure_pr_suite::*;
-pub use distro::sovereign_open_source_os_gap_closure_v27::*;
-pub use distro::sovereign_universal_subsystem_interop::*;
-pub use distro::sovereign_linux_bsd_ecosystem_advancements_v28::*;
-pub use distro::sovereign_linux_bsd_ecosystem_advancements_v29::*;
-pub use distro::sovereign_mint_omarchy_apex_dominance_v30::*;
-pub use distro::sovereign_mint_omarchy_innovations_v31::*;
-pub use distro::sovereign_mint_omarchy_v32_apex_arsenal::*;
-pub use distro::sovereign_mint_omarchy_v33_apex_vanguard::*;
-pub use distro::sovereign_mint_omarchy_v34_apex_pantheon::*;
-pub use distro::sovereign_open_source_os_pinnacle_pr_v35::*;
+pub use distro::sovereign_linux_bsd_media_wiki_unimplemented_ideas_engine::*;
 pub use distro::sovereign_media_and_distro_unimplemented_innovations::*;
-pub use distro::omarchy_omakase_ultimate_parity::*;
+pub use distro::sovereign_omarchy_pr_components_engine::*;
+pub use distro::sovereign_wiki_ideas_pr_deployment_engine::*;
 pub use distro::tech_media_publication_innovations::*;
-pub use distro::sovereign_universal_subsystem_interop::*;
-pub use package::omarchy_pr_proposal_engine::*;
 pub use distro::SovereignMasterSubsystemDistroHarmonizer;
 pub use kernel::tss_ring3_user_mode::*;
 pub use open_source_obsoletion::open_source_os_gap_closure::*;
-pub use open_source_obsoletion::open_source_os_pinnacle_gap_closure::*;
 pub use tools::tech_media_extended_suite::*;
 pub mod sovereign_wiki_master_engine;
 pub use sovereign_wiki_master_engine::*;
@@ -169,6 +173,7 @@ pub mod audit;
 pub mod backup;
 pub mod bluetooth;
 pub mod boot;
+pub mod input;
 pub mod printing;
 pub use boot::*;
 pub mod toolchain {
@@ -197,7 +202,6 @@ pub use compatibility::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
     ContainerRuntime, TargetPlatform, TranslationLayer,
 };
-pub use compatibility::mint_omarchy_migration_bridge::*;
 pub use container::{
     ContainerError, ContainerID, ContainerInfo, ContainerRuntime as CoreContainerRuntime,
     ContainerState, RuntimeCapability, RuntimeStats, SimpleContainer, SimpleContainerRuntime,
@@ -271,7 +275,6 @@ pub use filesystem::{
 };
 pub use kernel::roundrobin::SchedulerError as RoundRobinSchedulerError;
 pub use kernel::{
-    SovereignCleanCodeAndOsPrinciplesEngine, SolidDesignValidator, CleanCodeMetricsEvaluator, ResourceAllocationGraph,
     AiNativeRuntime, AndroidBroadcastReceiverRegistry, BottomHalfKernelThread,
     BoundedBufferProducerConsumer, BroadcastReceiver, BuddyAllocator, CgroupResourceLimits,
     Channel, CompletionQueueEntry, CowBlock, CowStorageEngine, EnergyAwareScheduler,
