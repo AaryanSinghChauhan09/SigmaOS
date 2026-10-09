@@ -689,4 +689,25 @@ if [ -f "src/desktop/omarchy_browser_theme_sync.rs" ]; then
     ./build/test_browser_sync
 fi
 
+if [ -f "src/distro/arch_linux_advancements_v37_pr.rs" ]; then
+    echo "Running Arch Linux Advancements PR Suite V37 test suite..."
+    mkdir -p build
+    rustc --test src/distro/arch_linux_advancements_v37_pr.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_arch_v37_pr
+    ./build/test_arch_v37_pr
+fi
+
+if [ -f "src/distro/sovereign_open_source_os_gap_closure_v36_pr.rs" ]; then
+    echo "Running Sovereign Open Source OS Gap Closure PR Suite V36 test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_open_source_os_gap_closure_v36_pr.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_open_source_v36_pr
+    ./build/test_open_source_v36_pr
+fi
+
+if [ -f "src/distro/sovereign_linux_bsd_gap_closure_v39_pr.rs" ]; then
+    echo "Running Sovereign Linux & BSD Distro Gap Closure PR Suite V39 test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_linux_bsd_gap_closure_v39_pr.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_gap_closure_v39_pr
+    ./build/test_gap_closure_v39_pr
+fi
+
 echo "All SigmaOS test suites completed."
