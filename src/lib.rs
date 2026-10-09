@@ -211,6 +211,7 @@ pub use compatibility::{
     ContainerRuntime, TargetPlatform, TranslationLayer,
 };
 pub use compatibility::mint_omarchy_migration_bridge::*;
+pub use compatibility::ubuntu_missing_components::*;
 pub use container::{
     ContainerError, ContainerID, ContainerInfo, ContainerRuntime as CoreContainerRuntime,
     ContainerState, RuntimeCapability, RuntimeStats, SimpleContainer, SimpleContainerRuntime,
