@@ -1190,8 +1190,7 @@ impl Default for SovereignFedoraEcosystemSuite {
 // =========================================================================
 
 #[cfg(test)]
-#[cfg(test)]
-mod tests {
+mod tests_more {
     use super::*;
 
     #[test]

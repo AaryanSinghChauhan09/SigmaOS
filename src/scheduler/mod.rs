@@ -18,3 +18,10 @@ pub use ebpf_scheduler::{
 };
 
 pub use affinity::{CpuAffinityMask, NumaDomainTopology, ProcessCpuAssigner};
+
+// SchedExt: Linux 6.11+ Extensible Scheduler Framework
+pub mod schedext;
+pub use schedext::{
+    SchedExtManager, SchedExtTaskCtx, SchedExtFlags, SchedExtDomain,
+    SchedExtCpuRq, SchedExtStats, SchedExtLavd, SchedExtRusty,
+};

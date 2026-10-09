@@ -82,3 +82,11 @@ pub use packet_filter::{Packet, PacketFilter, PfAction, PfProtocol, PfRule};
 pub use zero_copy::{
     PacketMetadata, ZeroCopyBuffer, ZeroCopyBufferPool, ZeroCopyPacket, ZeroCopyRingBuffer,
 };
+
+// PF Firewall: OpenBSD/FreeBSD PF packet filter implementation
+pub mod pf_firewall;
+pub use pf_firewall::{
+    PfFirewall, PfDir, PfProto, PfAddr, PfPort,
+    PfTable, PfAnchor, PfStats,
+    PfRule as PfFirewallRule, PfAction as PfFirewallAction, PfStateEntry as PfFirewallStateEntry,
+};

@@ -85,7 +85,6 @@ pub use sigma_office::{
     SovereignQuoteToCashEngine, SovereignSalesforceEinsteinAnalyticsPipelineEngine,
     SovereignServiceCloudKnowledgeEngine, SovereignSharedDrivePermissionEngine, SovereignSmartCanvasEngine,
     SovereignSmartDocumentTemplateEngine, SovereignWebConferencingEngine, SmartCanvasChip, SmartCanvasChipKind,
-    WebCmsSectionBlock, WebCmsSectionKind,
     SovereignTaxGstAccountingEngine, SovereignVidsPresentationEngine, SovereignVisioDiagrammingEngine,
     SovereignWebPublisherEngine, SovereignWorkgroupActivityStreamEngine, SovereignWorkgroupGanttEngine,
     SovereignWorkspaceAddonExtensionEngine, SpreadsheetProcessor, SuggestionEdit, TextProcessor,
