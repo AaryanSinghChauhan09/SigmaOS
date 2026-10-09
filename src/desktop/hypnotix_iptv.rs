@@ -162,7 +162,9 @@ impl HypnotixPlayer {
 
     /// Get current provider
     pub fn get_current_provider(&self) -> Option<&IptvProvider> {
-        self.current_provider.as_ref().and_then(|id| self.providers.get(id))
+        self.current_provider
+            .as_ref()
+            .and_then(|id| self.providers.get(id))
     }
 
     /// Play channel
@@ -346,9 +348,9 @@ impl HypnotixPlayer {
         self.providers
             .values()
             .flat_map(|p| {
-                p.channels.iter().filter(|c| {
-                    c.name.to_lowercase().contains(&query.to_lowercase())
-                })
+                p.channels
+                    .iter()
+                    .filter(|c| c.name.to_lowercase().contains(&query.to_lowercase()))
             })
             .collect()
     }
@@ -428,10 +430,10 @@ mod tests {
         let mut player = HypnotixPlayer::with_default_config();
         player.pause();
         assert_eq!(player.playback_state, PlaybackState::Stopped);
-        
+
         player.resume();
         assert_eq!(player.playback_state, PlaybackState::Stopped);
-        
+
         player.stop();
         assert_eq!(player.playback_state, PlaybackState::Stopped);
     }
@@ -441,10 +443,10 @@ mod tests {
         let mut player = HypnotixPlayer::with_default_config();
         player.set_volume(0.75);
         assert_eq!(player.get_volume(), 0.75);
-        
+
         player.set_volume(1.5);
         assert_eq!(player.get_volume(), 1.0);
-        
+
         player.set_volume(-0.5);
         assert_eq!(player.get_volume(), 0.0);
     }
@@ -454,7 +456,7 @@ mod tests {
         let mut player = HypnotixPlayer::with_default_config();
         player.toggle_fullscreen();
         assert!(player.is_fullscreen());
-        
+
         player.toggle_fullscreen();
         assert!(!player.is_fullscreen());
     }
@@ -469,24 +471,22 @@ mod tests {
             url: Some("http://example.com/playlist.m3u".to_string()),
             username: None,
             password: None,
-            channels: vec![
-                Channel {
-                    id: "1".to_string(),
-                    name: "Test Channel".to_string(),
-                    logo: None,
-                    url: "http://example.com/stream.m3u8".to_string(),
-                    categories: vec![],
-                    is_favorite: false,
-                    is_custom: false,
-                },
-            ],
+            channels: vec![Channel {
+                id: "1".to_string(),
+                name: "Test Channel".to_string(),
+                logo: None,
+                url: "http://example.com/stream.m3u8".to_string(),
+                categories: vec![],
+                is_favorite: false,
+                is_custom: false,
+            }],
             movies: vec![],
             series: vec![],
         };
 
         player.add_provider(provider).unwrap();
         let results = player.search_channels("test");
-        
+
         assert_eq!(results.len(), 1);
     }
 
@@ -507,7 +507,7 @@ mod tests {
 
         player.add_provider(provider).unwrap();
         let (providers, channels, movies, series) = player.get_statistics();
-        
+
         assert_eq!(providers, 1);
         assert_eq!(channels, 0);
         assert_eq!(movies, 0);

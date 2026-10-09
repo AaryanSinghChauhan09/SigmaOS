@@ -201,7 +201,10 @@ impl DesktopQuickSettingsManager {
         self.settings.values().collect()
     }
 
-    pub fn get_settings_by_type(&self, setting_type: DesktopQuickSettingType) -> Vec<&DesktopQuickSetting> {
+    pub fn get_settings_by_type(
+        &self,
+        setting_type: DesktopQuickSettingType,
+    ) -> Vec<&DesktopQuickSetting> {
         self.settings
             .values()
             .filter(|s| s.setting_type == setting_type)
@@ -209,10 +212,7 @@ impl DesktopQuickSettingsManager {
     }
 
     pub fn get_enabled_settings(&self) -> Vec<&DesktopQuickSetting> {
-        self.settings
-            .values()
-            .filter(|s| s.is_enabled)
-            .collect()
+        self.settings.values().filter(|s| s.is_enabled).collect()
     }
 
     pub fn set_setting_icon(&mut self, id: &str, icon: String) -> bool {
@@ -271,8 +271,12 @@ impl DesktopQuickSettingsManager {
     pub fn get_statistics(&self) -> DesktopQuickSettingsStatistics {
         DesktopQuickSettingsStatistics {
             total_settings: self.settings.len(),
-            toggle_settings: self.get_settings_by_type(DesktopQuickSettingType::Toggle).len(),
-            slider_settings: self.get_settings_by_type(DesktopQuickSettingType::Slider).len(),
+            toggle_settings: self
+                .get_settings_by_type(DesktopQuickSettingType::Toggle)
+                .len(),
+            slider_settings: self
+                .get_settings_by_type(DesktopQuickSettingType::Slider)
+                .len(),
             enabled_settings: self.get_enabled_settings().len(),
         }
     }

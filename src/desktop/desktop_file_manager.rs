@@ -315,16 +315,13 @@ impl DesktopFileExplorer {
         if self.config.show_hidden {
             self.files.iter().collect()
         } else {
-            self.files.iter()
-                .filter(|f| !f.is_hidden)
-                .collect()
+            self.files.iter().filter(|f| !f.is_hidden).collect()
         }
     }
 
     /// Get a file by name
     pub fn get_file(&self, name: &str) -> Option<&FileInfo> {
-        self.files.iter()
-            .find(|f| f.name == name)
+        self.files.iter().find(|f| f.name == name)
     }
 
     /// Create directory
@@ -359,7 +356,9 @@ impl DesktopFileExplorer {
 
     /// Delete file or directory
     pub fn delete(&mut self, name: &str) -> Result<(), String> {
-        let pos = self.files.iter()
+        let pos = self
+            .files
+            .iter()
             .position(|f| f.name == name)
             .ok_or_else(|| format!("File {} not found", name))?;
 
@@ -369,7 +368,9 @@ impl DesktopFileExplorer {
 
     /// Rename file
     pub fn rename(&mut self, old_name: &str, new_name: String) -> Result<(), String> {
-        let file = self.files.iter_mut()
+        let file = self
+            .files
+            .iter_mut()
             .find(|f| f.name == old_name)
             .ok_or_else(|| format!("File {} not found", old_name))?;
 
@@ -404,13 +405,9 @@ impl DesktopFileExplorer {
     /// Get statistics
     pub fn get_statistics(&self) -> DesktopFileExplorerStatistics {
         let total_files = self.files.len();
-        let directories = self.files.iter()
-            .filter(|f| f.is_directory())
-            .count();
+        let directories = self.files.iter().filter(|f| f.is_directory()).count();
         let regular_files = total_files - directories;
-        let total_size: u64 = self.files.iter()
-            .map(|f| f.size_bytes)
-            .sum();
+        let total_size: u64 = self.files.iter().map(|f| f.size_bytes).sum();
 
         DesktopFileExplorerStatistics {
             current_path: self.current_path.display().to_string(),
@@ -452,14 +449,26 @@ mod tests {
 
     #[test]
     fn test_view_mode_from_str() {
-        assert_eq!(DesktopViewMode::from_str("icon"), Some(DesktopViewMode::Icon));
-        assert_eq!(DesktopViewMode::from_str("list"), Some(DesktopViewMode::List));
+        assert_eq!(
+            DesktopViewMode::from_str("icon"),
+            Some(DesktopViewMode::Icon)
+        );
+        assert_eq!(
+            DesktopViewMode::from_str("list"),
+            Some(DesktopViewMode::List)
+        );
     }
 
     #[test]
     fn test_sort_order_from_str() {
-        assert_eq!(DesktopSortOrder::from_str("name"), Some(DesktopSortOrder::Name));
-        assert_eq!(DesktopSortOrder::from_str("size"), Some(DesktopSortOrder::Size));
+        assert_eq!(
+            DesktopSortOrder::from_str("name"),
+            Some(DesktopSortOrder::Name)
+        );
+        assert_eq!(
+            DesktopSortOrder::from_str("size"),
+            Some(DesktopSortOrder::Size)
+        );
     }
 
     #[test]

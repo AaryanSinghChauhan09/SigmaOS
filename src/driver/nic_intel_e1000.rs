@@ -397,7 +397,6 @@ mod tests {
     }
 
     #[ignore]
-
     #[test]
     fn test_dma_ring_operations() {
         let mut ring = DmaRing::new(0x1000, 1024, 16);

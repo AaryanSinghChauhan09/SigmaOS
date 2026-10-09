@@ -2210,7 +2210,10 @@ impl UniversalPackageTriggerEngine {
 
     pub fn execute_triggers_for_files(&mut self, files: &[String]) -> Vec<TriggerExecutionResult> {
         let mut results = Vec::new();
-        if files.iter().any(|f| f.ends_with(".so") || f.contains("/lib/")) {
+        if files
+            .iter()
+            .any(|f| f.ends_with(".so") || f.contains("/lib/"))
+        {
             let res = TriggerExecutionResult {
                 trigger_type: UniversalPackageTriggerType::Ldconfig,
                 target_dir: "/usr/lib".to_string(),
@@ -2305,7 +2308,10 @@ impl UniversalDistroPackageOrchestrator {
         &mut self,
         filepath_or_manifest: &str,
     ) -> Result<Package, String> {
-        let snap_id = self.create_snapshot(&format!("Pre-install snapshot for {}", filepath_or_manifest));
+        let snap_id = self.create_snapshot(&format!(
+            "Pre-install snapshot for {}",
+            filepath_or_manifest
+        ));
         match self
             .sigma_pkg
             .import_and_install_foreign_package(filepath_or_manifest)
@@ -2777,31 +2783,47 @@ mod tests {
             database_dir: PathBuf::from("/tmp/sigma_db_alias_test"),
         };
 
-        let deb = pkg_mgr.execute_universal_cli_command("debian install git").unwrap();
+        let deb = pkg_mgr
+            .execute_universal_cli_command("debian install git")
+            .unwrap();
         assert!(deb.contains("git"));
 
-        let fed = pkg_mgr.execute_universal_cli_command("fedora install ripgrep").unwrap();
+        let fed = pkg_mgr
+            .execute_universal_cli_command("fedora install ripgrep")
+            .unwrap();
         assert!(fed.contains("ripgrep"));
 
         let arch = pkg_mgr.execute_universal_cli_command("arch -S fd").unwrap();
         assert!(arch.contains("fd"));
 
-        let bsd = pkg_mgr.execute_universal_cli_command("freebsd install zsh").unwrap();
+        let bsd = pkg_mgr
+            .execute_universal_cli_command("freebsd install zsh")
+            .unwrap();
         assert!(bsd.contains("zsh"));
 
-        let void = pkg_mgr.execute_universal_cli_command("void install neovim").unwrap();
+        let void = pkg_mgr
+            .execute_universal_cli_command("void install neovim")
+            .unwrap();
         assert!(void.contains("neovim"));
 
-        let opensuse = pkg_mgr.execute_universal_cli_command("opensuse in vlc").unwrap();
+        let opensuse = pkg_mgr
+            .execute_universal_cli_command("opensuse in vlc")
+            .unwrap();
         assert!(opensuse.contains("vlc"));
 
-        let gentoo = pkg_mgr.execute_universal_cli_command("gentoo install portage").unwrap();
+        let gentoo = pkg_mgr
+            .execute_universal_cli_command("gentoo install portage")
+            .unwrap();
         assert!(gentoo.contains("portage"));
 
-        let solus = pkg_mgr.execute_universal_cli_command("solus it eopkg").unwrap();
+        let solus = pkg_mgr
+            .execute_universal_cli_command("solus it eopkg")
+            .unwrap();
         assert!(solus.contains("eopkg"));
 
-        let nixos = pkg_mgr.execute_universal_cli_command("nixos install nix").unwrap();
+        let nixos = pkg_mgr
+            .execute_universal_cli_command("nixos install nix")
+            .unwrap();
         assert!(nixos.contains("nix"));
     }
 }

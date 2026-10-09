@@ -48,8 +48,8 @@ pub enum ItemStatus {
 /// Descriptor of a registered StatusNotifierItem
 #[derive(Debug, Clone)]
 pub struct StatusNotifierItemDescriptor {
-    pub service_id: String,     // e.g. "org.kde.StatusNotifierItem-1042-1"
-    pub title: String,          // e.g. "Warpinator P2P Transfer"
+    pub service_id: String, // e.g. "org.kde.StatusNotifierItem-1042-1"
+    pub title: String,      // e.g. "Warpinator P2P Transfer"
     pub category: ItemCategory,
     pub status: ItemStatus,
     pub icon_name: String,
@@ -76,10 +76,34 @@ impl SovereignStatusNotifierEngine {
 
     fn init_stock_items(&mut self) {
         let stock = [
-            ("org.sigma.NetworkTray", "Network Manager", ItemCategory::Hardware, ItemStatus::Active, "network-wireless-symbolic"),
-            ("org.sigma.SoundMixer", "Audio Master", ItemCategory::Hardware, ItemStatus::Active, "audio-volume-high-symbolic"),
-            ("org.sigma.PowerBattery", "Power & Thermal", ItemCategory::Hardware, ItemStatus::Active, "battery-good-symbolic"),
-            ("org.sigma.Warpinator", "Warpinator P2P", ItemCategory::Communications, ItemStatus::Passive, "network-transmit-receive"),
+            (
+                "org.sigma.NetworkTray",
+                "Network Manager",
+                ItemCategory::Hardware,
+                ItemStatus::Active,
+                "network-wireless-symbolic",
+            ),
+            (
+                "org.sigma.SoundMixer",
+                "Audio Master",
+                ItemCategory::Hardware,
+                ItemStatus::Active,
+                "audio-volume-high-symbolic",
+            ),
+            (
+                "org.sigma.PowerBattery",
+                "Power & Thermal",
+                ItemCategory::Hardware,
+                ItemStatus::Active,
+                "battery-good-symbolic",
+            ),
+            (
+                "org.sigma.Warpinator",
+                "Warpinator P2P",
+                ItemCategory::Communications,
+                ItemStatus::Passive,
+                "network-transmit-receive",
+            ),
         ];
 
         for (id, title, cat, status, icon) in stock {
@@ -107,12 +131,16 @@ impl SovereignStatusNotifierEngine {
     }
 
     pub fn active_items(&self) -> Vec<&StatusNotifierItemDescriptor> {
-        self.items.values().filter(|i| i.status != ItemStatus::Passive).collect()
+        self.items
+            .values()
+            .filter(|i| i.status != ItemStatus::Passive)
+            .collect()
     }
 
     pub fn trigger_primary_action(&self, service_id: &str) -> bool {
         if self.items.contains_key(service_id) {
-            self.total_actions_dispatched.fetch_add(1, Ordering::Relaxed);
+            self.total_actions_dispatched
+                .fetch_add(1, Ordering::Relaxed);
             true
         } else {
             false
@@ -170,9 +198,33 @@ impl SovereignHypnotixMediaStreamer {
 
     fn init_stock_channels(&mut self) {
         let sample_channels = [
-            ("nasa-tv-4k", "NASA TV 4K", "Science", "https://stream.sigma/nasa4k.m3u8", VideoStreamCodec::Av1HardwareDecoded, 2160, 60),
-            ("bloomberg-hd", "Bloomberg Finance HD", "News", "https://stream.sigma/bloomberg.m3u8", VideoStreamCodec::H265Hevc, 1080, 60),
-            ("euronews-en", "Euronews English", "News", "https://stream.sigma/euronews.m3u8", VideoStreamCodec::H264Avc, 1080, 50),
+            (
+                "nasa-tv-4k",
+                "NASA TV 4K",
+                "Science",
+                "https://stream.sigma/nasa4k.m3u8",
+                VideoStreamCodec::Av1HardwareDecoded,
+                2160,
+                60,
+            ),
+            (
+                "bloomberg-hd",
+                "Bloomberg Finance HD",
+                "News",
+                "https://stream.sigma/bloomberg.m3u8",
+                VideoStreamCodec::H265Hevc,
+                1080,
+                60,
+            ),
+            (
+                "euronews-en",
+                "Euronews English",
+                "News",
+                "https://stream.sigma/euronews.m3u8",
+                VideoStreamCodec::H264Avc,
+                1080,
+                50,
+            ),
         ];
 
         for (id, name, genre, url, codec, height, fps) in sample_channels {
@@ -201,7 +253,9 @@ impl SovereignHypnotixMediaStreamer {
     }
 
     pub fn current_channel(&self) -> Option<&LiveChannelEntry> {
-        self.active_channel.as_ref().and_then(|id| self.channels.get(id))
+        self.active_channel
+            .as_ref()
+            .and_then(|id| self.channels.get(id))
     }
 
     pub fn switch_latency(&self) -> u32 {
@@ -386,7 +440,9 @@ impl SovereignOmarchyDynamicPaletteGenerator {
             is_wcag_aaa_compliant: true,
         };
 
-        Self { current_palette: default_palette }
+        Self {
+            current_palette: default_palette,
+        }
     }
 
     /// Synthesize a high-contrast palette from dominant RGB wallpaper clusters

@@ -1,6 +1,6 @@
-use std::vec::Vec;
-use std::boxed::Box;
 use core::sync::atomic::AtomicUsize;
+use std::boxed::Box;
+use std::vec::Vec;
 
 /// Prototype encryption service API for SigmaOS.
 /// Based on Roadmap Item 15: Encryption service
@@ -10,7 +10,11 @@ pub type KeyID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum CipherType { AES = 0, ChaCha20 = 1, XOR = 2 }
+pub enum CipherType {
+    AES = 0,
+    ChaCha20 = 1,
+    XOR = 2,
+}
 
 pub trait EncryptionKey {
     fn id(&self) -> KeyID;
@@ -43,8 +47,12 @@ impl SimpleEncryptionKey {
 }
 
 impl EncryptionKey for SimpleEncryptionKey {
-    fn id(&self) -> KeyID { self.id }
-    fn cipher_type(&self) -> CipherType { self.cipher_type }
+    fn id(&self) -> KeyID {
+        self.id
+    }
+    fn cipher_type(&self) -> CipherType {
+        self.cipher_type
+    }
     fn key_data(&self) -> &[u8] {
         if self.key_len > 0 {
             &self.key_data[..self.key_len.min(32) as usize]
@@ -77,7 +85,12 @@ pub struct SimpleEncryptionService {
 }
 
 impl SimpleEncryptionService {
-    pub fn new() -> Self { SimpleEncryptionService { keys: Vec::new(), next_id: AtomicUsize::new(1) } }
+    pub fn new() -> Self {
+        SimpleEncryptionService {
+            keys: Vec::new(),
+            next_id: AtomicUsize::new(1),
+        }
+    }
 }
 
 impl Default for SimpleEncryptionService {

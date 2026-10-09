@@ -9,7 +9,7 @@ pub use crate::installer::gui_wizard::{
 
 pub mod production_installer_engine;
 pub use production_installer_engine::*;
+pub mod migration_installer_pipeline;
 pub mod recovery;
 pub mod safe_installer;
-pub mod migration_installer_pipeline;
 pub use migration_installer_pipeline::*;

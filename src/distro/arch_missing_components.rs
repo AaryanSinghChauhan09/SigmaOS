@@ -450,41 +450,62 @@ pub struct ArchMkinitcpioEngine {
 impl ArchMkinitcpioEngine {
     pub fn new() -> Self {
         let mut hooks = BTreeMap::new();
-        hooks.insert("base".to_string(), InitramfsHookSpec {
-            name: "base".to_string(),
-            is_runtime: true,
-            dependencies: Vec::new(),
-        });
-        hooks.insert("udev".to_string(), InitramfsHookSpec {
-            name: "udev".to_string(),
-            is_runtime: true,
-            dependencies: vec!["base".to_string()],
-        });
-        hooks.insert("autodetect".to_string(), InitramfsHookSpec {
-            name: "autodetect".to_string(),
-            is_runtime: false,
-            dependencies: Vec::new(),
-        });
-        hooks.insert("kms".to_string(), InitramfsHookSpec {
-            name: "kms".to_string(),
-            is_runtime: true,
-            dependencies: vec!["udev".to_string()],
-        });
-        hooks.insert("modconf".to_string(), InitramfsHookSpec {
-            name: "modconf".to_string(),
-            is_runtime: false,
-            dependencies: Vec::new(),
-        });
-        hooks.insert("block".to_string(), InitramfsHookSpec {
-            name: "block".to_string(),
-            is_runtime: true,
-            dependencies: vec!["udev".to_string()],
-        });
-        hooks.insert("filesystems".to_string(), InitramfsHookSpec {
-            name: "filesystems".to_string(),
-            is_runtime: true,
-            dependencies: vec!["block".to_string()],
-        });
+        hooks.insert(
+            "base".to_string(),
+            InitramfsHookSpec {
+                name: "base".to_string(),
+                is_runtime: true,
+                dependencies: Vec::new(),
+            },
+        );
+        hooks.insert(
+            "udev".to_string(),
+            InitramfsHookSpec {
+                name: "udev".to_string(),
+                is_runtime: true,
+                dependencies: vec!["base".to_string()],
+            },
+        );
+        hooks.insert(
+            "autodetect".to_string(),
+            InitramfsHookSpec {
+                name: "autodetect".to_string(),
+                is_runtime: false,
+                dependencies: Vec::new(),
+            },
+        );
+        hooks.insert(
+            "kms".to_string(),
+            InitramfsHookSpec {
+                name: "kms".to_string(),
+                is_runtime: true,
+                dependencies: vec!["udev".to_string()],
+            },
+        );
+        hooks.insert(
+            "modconf".to_string(),
+            InitramfsHookSpec {
+                name: "modconf".to_string(),
+                is_runtime: false,
+                dependencies: Vec::new(),
+            },
+        );
+        hooks.insert(
+            "block".to_string(),
+            InitramfsHookSpec {
+                name: "block".to_string(),
+                is_runtime: true,
+                dependencies: vec!["udev".to_string()],
+            },
+        );
+        hooks.insert(
+            "filesystems".to_string(),
+            InitramfsHookSpec {
+                name: "filesystems".to_string(),
+                is_runtime: true,
+                dependencies: vec!["block".to_string()],
+            },
+        );
 
         Self {
             hooks,
@@ -529,7 +550,11 @@ impl ArchPacstrapChrootEngine {
     }
 
     pub fn generate_pacstrap_command(&self) -> String {
-        format!("pacstrap -K {} {}", self.target_rootfs, self.base_packages.join(" "))
+        format!(
+            "pacstrap -K {} {}",
+            self.target_rootfs,
+            self.base_packages.join(" ")
+        )
     }
 
     pub fn generate_chroot_command(&self, cmd: &str) -> String {
@@ -556,12 +581,15 @@ pub struct ArchPacmanKeyringPqcEngine {
 impl ArchPacmanKeyringPqcEngine {
     pub fn new() -> Self {
         let mut keys = BTreeMap::new();
-        keys.insert("arch-master-1".to_string(), PqcDilithiumKeySpec {
-            key_id: "arch-master-1".to_string(),
-            owner_email: "packager@archlinux.org".to_string(),
-            is_trusted: true,
-            dilithium_pubkey_hash: "pqc-dilithium5-hash-9901".to_string(),
-        });
+        keys.insert(
+            "arch-master-1".to_string(),
+            PqcDilithiumKeySpec {
+                key_id: "arch-master-1".to_string(),
+                owner_email: "packager@archlinux.org".to_string(),
+                is_trusted: true,
+                dilithium_pubkey_hash: "pqc-dilithium5-hash-9901".to_string(),
+            },
+        );
         Self { keys }
     }
 
@@ -793,8 +821,14 @@ mod tests {
         assert!(preset.contains("vmlinuz-linux"));
 
         let pacstrap = ArchPacstrapChrootEngine::new("/mnt");
-        assert_eq!(pacstrap.generate_pacstrap_command(), "pacstrap -K /mnt base linux linux-firmware sigma-pkg");
-        assert_eq!(pacstrap.generate_chroot_command("mkinitcpio -P"), "arch-chroot /mnt mkinitcpio -P");
+        assert_eq!(
+            pacstrap.generate_pacstrap_command(),
+            "pacstrap -K /mnt base linux linux-firmware sigma-pkg"
+        );
+        assert_eq!(
+            pacstrap.generate_chroot_command("mkinitcpio -P"),
+            "arch-chroot /mnt mkinitcpio -P"
+        );
     }
 
     #[test]

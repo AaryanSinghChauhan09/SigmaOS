@@ -108,15 +108,24 @@ impl TestSuite {
     }
 
     pub fn get_passed_count(&self) -> usize {
-        self.tests.iter().filter(|t| t.status == TestStatus::Passed).count()
+        self.tests
+            .iter()
+            .filter(|t| t.status == TestStatus::Passed)
+            .count()
     }
 
     pub fn get_failed_count(&self) -> usize {
-        self.tests.iter().filter(|t| t.status == TestStatus::Failed).count()
+        self.tests
+            .iter()
+            .filter(|t| t.status == TestStatus::Failed)
+            .count()
     }
 
     pub fn get_skipped_count(&self) -> usize {
-        self.tests.iter().filter(|t| t.status == TestStatus::Skipped).count()
+        self.tests
+            .iter()
+            .filter(|t| t.status == TestStatus::Skipped)
+            .count()
     }
 
     pub fn get_total_duration_ms(&self) -> u64 {

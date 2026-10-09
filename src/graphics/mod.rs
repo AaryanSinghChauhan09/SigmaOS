@@ -1,7 +1,10 @@
 pub mod drm_kms;
 pub mod video;
 
-pub use drm_kms::{DrmAtomicCommit, DrmCrtc, DrmConnector, DrmConnectorStatus, DrmConnectorType, DrmEncoder, DrmFramebuffer, DrmKmsDevice, DrmMode, DrmNodeType, DrmPlane, DrmPlaneType, GemBuffer};
+pub use drm_kms::{
+    DrmAtomicCommit, DrmConnector, DrmConnectorStatus, DrmConnectorType, DrmCrtc, DrmEncoder,
+    DrmFramebuffer, DrmKmsDevice, DrmMode, DrmNodeType, DrmPlane, DrmPlaneType, GemBuffer,
+};
 pub use video::{PixelRgba, VideoFrame};
 
 // Color type for UI compatibility

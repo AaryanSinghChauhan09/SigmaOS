@@ -422,7 +422,6 @@ mod tests {
     }
 
     #[ignore]
-
     #[test]
     fn test_inode_calculations() {
         let mut sb_data = [0u8; 1024];

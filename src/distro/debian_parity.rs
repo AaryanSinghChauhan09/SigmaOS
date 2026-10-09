@@ -583,8 +583,12 @@ impl SovereignDebianCompleteParityEngine {
             == Some("Berlin".to_string());
 
         // 3. Apt-file check
-        self.apt_file.index_file("/usr/include/stdio.h", "libc6-dev");
-        let apt_file_ok = self.apt_file.search_file("stdio.h").contains(&"libc6-dev".to_string());
+        self.apt_file
+            .index_file("/usr/include/stdio.h", "libc6-dev");
+        let apt_file_ok = self
+            .apt_file
+            .search_file("stdio.h")
+            .contains(&"libc6-dev".to_string());
 
         // 4. Multiarch check
         self.multiarch.add_foreign_architecture("i386");
@@ -598,7 +602,9 @@ impl SovereignDebianCompleteParityEngine {
             architecture: "i386".to_string(),
             multi_arch: MultiArchType::Same,
         });
-        let multiarch_ok = self.multiarch.can_coinstall("libc6", "amd64", "libc6", "i386");
+        let multiarch_ok = self
+            .multiarch
+            .can_coinstall("libc6", "amd64", "libc6", "i386");
 
         div_ok && debconf_ok && apt_file_ok && multiarch_ok
     }
@@ -1045,7 +1051,12 @@ mod tests {
     #[test]
     fn test_debconf_preseed_engine() {
         let mut preseed = DebianDebconfPreseedEngine::new();
-        preseed.set_preseed("locales", "locales/default_environment_locale", "select", "en_US.UTF-8");
+        preseed.set_preseed(
+            "locales",
+            "locales/default_environment_locale",
+            "select",
+            "en_US.UTF-8",
+        );
 
         assert_eq!(
             preseed.get_preseed_answer("locales", "locales/default_environment_locale"),

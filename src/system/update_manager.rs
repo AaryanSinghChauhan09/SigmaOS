@@ -213,11 +213,41 @@ impl UpdateManager {
 
         // Simulate update discovery
         let sample_updates = vec![
-            ("linux-kernel", "6.5.0", "6.6.0", UpdateLevel::Safety, UpdateCategory::Kernel),
-            ("openssl", "3.0.8", "3.0.9", UpdateLevel::Safety, UpdateCategory::Security),
-            ("bash", "5.1.0", "5.2.0", UpdateLevel::Recommended, UpdateCategory::Bugfix),
-            ("firefox", "120.0", "121.0", UpdateLevel::Feature, UpdateCategory::Feature),
-            ("libssl", "1.1.1", "3.0.9", UpdateLevel::Recommended, UpdateCategory::Dependency),
+            (
+                "linux-kernel",
+                "6.5.0",
+                "6.6.0",
+                UpdateLevel::Safety,
+                UpdateCategory::Kernel,
+            ),
+            (
+                "openssl",
+                "3.0.8",
+                "3.0.9",
+                UpdateLevel::Safety,
+                UpdateCategory::Security,
+            ),
+            (
+                "bash",
+                "5.1.0",
+                "5.2.0",
+                UpdateLevel::Recommended,
+                UpdateCategory::Bugfix,
+            ),
+            (
+                "firefox",
+                "120.0",
+                "121.0",
+                UpdateLevel::Feature,
+                UpdateCategory::Feature,
+            ),
+            (
+                "libssl",
+                "1.1.1",
+                "3.0.9",
+                UpdateLevel::Recommended,
+                UpdateCategory::Dependency,
+            ),
         ];
 
         for (name, old, new, level, category) in sample_updates {
@@ -234,7 +264,9 @@ impl UpdateManager {
         }
 
         self.update_count = self.available_updates.len() as u32;
-        self.security_count = self.available_updates.values()
+        self.security_count = self
+            .available_updates
+            .values()
             .filter(|u| u.is_security)
             .count() as u32;
 
@@ -248,28 +280,33 @@ impl UpdateManager {
 
     /// Get updates by level
     pub fn get_updates_by_level(&self, level: UpdateLevel) -> Vec<&UpdatePackage> {
-        self.available_updates.values()
+        self.available_updates
+            .values()
             .filter(|u| u.level == level)
             .collect()
     }
 
     /// Get security updates
     pub fn get_security_updates(&self) -> Vec<&UpdatePackage> {
-        self.available_updates.values()
+        self.available_updates
+            .values()
             .filter(|u| u.is_security)
             .collect()
     }
 
     /// Get kernel updates
     pub fn get_kernel_updates(&self) -> Vec<&UpdatePackage> {
-        self.available_updates.values()
+        self.available_updates
+            .values()
             .filter(|u| u.category == UpdateCategory::Kernel)
             .collect()
     }
 
     /// Install specific update
     pub fn install_update(&mut self, package_name: &str) -> Result<(), String> {
-        let update = self.available_updates.get(package_name)
+        let update = self
+            .available_updates
+            .get(package_name)
             .ok_or_else(|| format!("Update {} not found", package_name))?;
 
         // Simulate installation
@@ -281,7 +318,9 @@ impl UpdateManager {
 
     /// Install all safety updates
     pub fn install_safety_updates(&mut self) -> usize {
-        let safety_names: Vec<String> = self.available_updates.values()
+        let safety_names: Vec<String> = self
+            .available_updates
+            .values()
             .filter(|u| u.level == UpdateLevel::Safety)
             .map(|u| u.name.clone())
             .collect();
@@ -296,7 +335,9 @@ impl UpdateManager {
 
     /// Install all security updates
     pub fn install_security_updates(&mut self) -> usize {
-        let security_names: Vec<String> = self.available_updates.values()
+        let security_names: Vec<String> = self
+            .available_updates
+            .values()
             .filter(|u| u.is_security)
             .map(|u| u.name.clone())
             .collect();
@@ -311,9 +352,7 @@ impl UpdateManager {
 
     /// Install all updates
     pub fn install_all_updates(&mut self) -> usize {
-        let all_names: Vec<String> = self.available_updates.keys()
-            .cloned()
-            .collect();
+        let all_names: Vec<String> = self.available_updates.keys().cloned().collect();
 
         let count = all_names.len();
         for name in all_names {
@@ -325,9 +364,7 @@ impl UpdateManager {
 
     /// Get statistics
     pub fn get_statistics(&self) -> UpdateStatistics {
-        let total_size: u64 = self.available_updates.values()
-            .map(|u| u.size)
-            .sum();
+        let total_size: u64 = self.available_updates.values().map(|u| u.size).sum();
 
         UpdateStatistics {
             total_updates: self.available_updates.len(),
@@ -370,13 +407,22 @@ mod tests {
     #[test]
     fn test_update_level_from_str() {
         assert_eq!(UpdateLevel::from_str("safety"), Some(UpdateLevel::Safety));
-        assert_eq!(UpdateLevel::from_str("unstable"), Some(UpdateLevel::Unstable));
+        assert_eq!(
+            UpdateLevel::from_str("unstable"),
+            Some(UpdateLevel::Unstable)
+        );
     }
 
     #[test]
     fn test_update_category_from_str() {
-        assert_eq!(UpdateCategory::from_str("kernel"), Some(UpdateCategory::Kernel));
-        assert_eq!(UpdateCategory::from_str("security"), Some(UpdateCategory::Security));
+        assert_eq!(
+            UpdateCategory::from_str("kernel"),
+            Some(UpdateCategory::Kernel)
+        );
+        assert_eq!(
+            UpdateCategory::from_str("security"),
+            Some(UpdateCategory::Security)
+        );
     }
 
     #[test]

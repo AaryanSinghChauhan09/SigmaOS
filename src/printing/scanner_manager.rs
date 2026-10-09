@@ -270,7 +270,9 @@ impl ScannerManager {
             ScannerType::Flatbed,
             "sane://default".to_string(),
         );
-        manager.scanners.insert("default-scanner".to_string(), scanner);
+        manager
+            .scanners
+            .insert("default-scanner".to_string(), scanner);
 
         manager
     }
@@ -292,9 +294,7 @@ impl ScannerManager {
 
     /// List available scanners
     pub fn list_available(&self) -> Vec<&Scanner> {
-        self.scanners.values()
-            .filter(|s| s.is_available)
-            .collect()
+        self.scanners.values().filter(|s| s.is_available).collect()
     }
 
     /// Scan for devices (simulated)
@@ -303,9 +303,24 @@ impl ScannerManager {
 
         // Simulate device discovery
         let discovered_scanners = vec![
-            ("flatbed-001", "Epson Flatbed", ScannerType::Flatbed, "sane://epson:fw:00:00:00:00:00:00"),
-            ("network-001", "HP Network Scanner", ScannerType::Network, "sane://hp:net:192.168.1.100"),
-            ("aio-001", "Canon All-in-One", ScannerType::AllInOne, "sane://canon:usb:001/002"),
+            (
+                "flatbed-001",
+                "Epson Flatbed",
+                ScannerType::Flatbed,
+                "sane://epson:fw:00:00:00:00:00:00",
+            ),
+            (
+                "network-001",
+                "HP Network Scanner",
+                ScannerType::Network,
+                "sane://hp:net:192.168.1.100",
+            ),
+            (
+                "aio-001",
+                "Canon All-in-One",
+                ScannerType::AllInOne,
+                "sane://canon:usb:001/002",
+            ),
         ];
 
         for (id, name, scanner_type, uri) in discovered_scanners {
@@ -330,7 +345,8 @@ impl ScannerManager {
         color_mode: ScanColorMode,
         format: ScanFormat,
     ) -> Result<String, String> {
-        let scanner = self.get_scanner(scanner_id)
+        let scanner = self
+            .get_scanner(scanner_id)
             .ok_or_else(|| format!("Scanner {} not found", scanner_id))?;
 
         if !scanner.is_available {
@@ -365,14 +381,14 @@ impl ScannerManager {
 
     /// List jobs by status
     pub fn list_jobs_by_status(&self, status: ScanJobStatus) -> Vec<&ScanJob> {
-        self.jobs.values()
-            .filter(|j| j.status == status)
-            .collect()
+        self.jobs.values().filter(|j| j.status == status).collect()
     }
 
     /// Cancel a job
     pub fn cancel_job(&mut self, id: &str) -> Result<(), String> {
-        let job = self.jobs.get_mut(id)
+        let job = self
+            .jobs
+            .get_mut(id)
             .ok_or_else(|| format!("Job {} not found", id))?;
 
         if job.status == ScanJobStatus::Completed {
@@ -386,14 +402,16 @@ impl ScannerManager {
     /// Get statistics
     pub fn get_statistics(&self) -> ScannerStatistics {
         let total_scanners = self.scanners.len();
-        let available_count = self.scanners.values()
-            .filter(|s| s.is_available)
-            .count();
+        let available_count = self.scanners.values().filter(|s| s.is_available).count();
         let total_jobs = self.jobs.len();
-        let pending_jobs = self.jobs.values()
+        let pending_jobs = self
+            .jobs
+            .values()
             .filter(|j| j.status == ScanJobStatus::Pending)
             .count();
-        let scanning_jobs = self.jobs.values()
+        let scanning_jobs = self
+            .jobs
+            .values()
             .filter(|j| j.status == ScanJobStatus::Scanning)
             .count();
 
@@ -442,7 +460,10 @@ mod tests {
     #[test]
     fn test_scan_color_mode_from_str() {
         assert_eq!(ScanColorMode::from_str("color"), Some(ScanColorMode::Color));
-        assert_eq!(ScanColorMode::from_str("grayscale"), Some(ScanColorMode::Grayscale));
+        assert_eq!(
+            ScanColorMode::from_str("grayscale"),
+            Some(ScanColorMode::Grayscale)
+        );
     }
 
     #[test]
@@ -491,13 +512,15 @@ mod tests {
     #[test]
     fn test_cancel_job() {
         let mut manager = ScannerManager::new();
-        let job_id = manager.submit_job(
-            "default-scanner",
-            "/tmp/scan.png".to_string(),
-            ScanResolution::DPI300,
-            ScanColorMode::Color,
-            ScanFormat::PNG,
-        ).unwrap();
+        let job_id = manager
+            .submit_job(
+                "default-scanner",
+                "/tmp/scan.png".to_string(),
+                ScanResolution::DPI300,
+                ScanColorMode::Color,
+                ScanFormat::PNG,
+            )
+            .unwrap();
         assert!(manager.cancel_job(&job_id).is_ok());
     }
 

@@ -67,9 +67,7 @@ impl PQCContext {
             return Err(PQCError::InvalidSignature);
         }
 
-        let mut signature = Dilithium5Signature {
-            data: [0u8; 2592],
-        };
+        let mut signature = Dilithium5Signature { data: [0u8; 2592] };
 
         for i in 0..2592 {
             signature.data[i] = message[i % message.len()].wrapping_add(i as u8);
@@ -199,9 +197,7 @@ impl Default for Dilithium5KeyPair {
 
 impl Dilithium5Signature {
     pub const fn new() -> Self {
-        Dilithium5Signature {
-            data: [0u8; 2592],
-        }
+        Dilithium5Signature { data: [0u8; 2592] }
     }
 
     pub fn as_bytes(&self) -> &[u8] {
@@ -288,12 +284,7 @@ impl Kyber512 {
         (pk, sk)
     }
 
-    pub fn encapsulate(
-        pk: &[u8],
-    ) -> (
-        [u8; Self::CIPHERTEXT_SIZE],
-        [u8; Self::SHARED_SECRET_SIZE],
-    ) {
+    pub fn encapsulate(pk: &[u8]) -> ([u8; Self::CIPHERTEXT_SIZE], [u8; Self::SHARED_SECRET_SIZE]) {
         let mut ct = [0u8; Self::CIPHERTEXT_SIZE];
         let mut ss = [0u8; Self::SHARED_SECRET_SIZE];
 
@@ -341,12 +332,7 @@ impl Kyber1024 {
         (pk, sk)
     }
 
-    pub fn encapsulate(
-        pk: &[u8],
-    ) -> (
-        [u8; Self::CIPHERTEXT_SIZE],
-        [u8; Self::SHARED_SECRET_SIZE],
-    ) {
+    pub fn encapsulate(pk: &[u8]) -> ([u8; Self::CIPHERTEXT_SIZE], [u8; Self::SHARED_SECRET_SIZE]) {
         let mut ct = [0u8; Self::CIPHERTEXT_SIZE];
         let mut ss = [0u8; Self::SHARED_SECRET_SIZE];
 

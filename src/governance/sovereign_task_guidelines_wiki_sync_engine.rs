@@ -250,7 +250,8 @@ impl WikiDataTransferEngine {
             "SovereignLinuxBsdEcosystemAdvancementsV22".to_string(),
             FeatureMdStatus {
                 spec_name: "06-Sovereign-Linux-BSD-Ecosystem-Advancements-V22.md".to_string(),
-                source_path: "wiki_repo/06-Sovereign-Linux-BSD-Ecosystem-Advancements-V22.md".to_string(),
+                source_path: "wiki_repo/06-Sovereign-Linux-BSD-Ecosystem-Advancements-V22.md"
+                    .to_string(),
                 is_fully_implemented: true,
                 completion_percentage: 100,
                 wiki_mirrored: true,
@@ -260,8 +261,11 @@ impl WikiDataTransferEngine {
         self.feature_specs.insert(
             "ArchitectureDevelopmentDecisionPlan".to_string(),
             FeatureMdStatus {
-                spec_name: "07-Architecture-Development-Decision-Plan-Supreme-Performance.md".to_string(),
-                source_path: "wiki_repo/07-Architecture-Development-Decision-Plan-Supreme-Performance.md".to_string(),
+                spec_name: "07-Architecture-Development-Decision-Plan-Supreme-Performance.md"
+                    .to_string(),
+                source_path:
+                    "wiki_repo/07-Architecture-Development-Decision-Plan-Supreme-Performance.md"
+                        .to_string(),
                 is_fully_implemented: true,
                 completion_percentage: 100,
                 wiki_mirrored: true,
@@ -272,7 +276,8 @@ impl WikiDataTransferEngine {
             "CleanCodeAndOsPrinciples".to_string(),
             FeatureMdStatus {
                 spec_name: "08-Sovereign-Clean-Code-And-OS-Principles-Engine.md".to_string(),
-                source_path: "wiki_repo/08-Sovereign-Clean-Code-And-OS-Principles-Engine.md".to_string(),
+                source_path: "wiki_repo/08-Sovereign-Clean-Code-And-OS-Principles-Engine.md"
+                    .to_string(),
                 is_fully_implemented: true,
                 completion_percentage: 100,
                 wiki_mirrored: true,
@@ -440,8 +445,11 @@ mod tests {
         let addp = SupremePerformanceAddpEngine::new();
         assert!(addp.is_addp_compliant());
 
-        let pr_proposal = AddpWikiPrProposalGenerator::generate_addp_wiki_pr_proposal("# ADDP Supreme Performance");
-        assert!(pr_proposal.contains("wiki/23-Supreme-Performance-Architecture-Development-Decision-Plan.md"));
+        let pr_proposal = AddpWikiPrProposalGenerator::generate_addp_wiki_pr_proposal(
+            "# ADDP Supreme Performance",
+        );
+        assert!(pr_proposal
+            .contains("wiki/23-Supreme-Performance-Architecture-Development-Decision-Plan.md"));
     }
 
     #[test]

@@ -333,8 +333,8 @@ impl FqCodelQdisc {
     pub fn new(flow_count: usize) -> Self {
         let flows = (0..flow_count).map(|_| Vec::new()).collect();
         FqCodelQdisc {
-            target_delay_ns: 5_000_000,  // 5ms
-            interval_ns: 100_000_000,    // 100ms
+            target_delay_ns: 5_000_000, // 5ms
+            interval_ns: 100_000_000,   // 100ms
             quantum: 1514,
             flows,
             flow_count,

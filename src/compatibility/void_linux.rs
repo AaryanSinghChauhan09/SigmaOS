@@ -4,8 +4,8 @@
 
 extern crate alloc;
 use alloc::collections::BTreeMap;
-use alloc::vec::Vec;
 use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 
 // =========================================================================
 // 1. XBPS PACKAGE MANAGER (X Binary Package System)

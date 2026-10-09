@@ -190,7 +190,8 @@ impl DesktopTimeManager {
 
         self.ntp_servers.insert(pool_ntp.id.clone(), pool_ntp);
         self.ntp_servers.insert(ntp_org.id.clone(), ntp_org);
-        self.ntp_servers.insert(time_nist_gov.id.clone(), time_nist_gov);
+        self.ntp_servers
+            .insert(time_nist_gov.id.clone(), time_nist_gov);
     }
 
     pub fn add_timezone(&mut self, timezone: DesktopTimezone) -> String {
@@ -408,10 +409,7 @@ mod tests {
         if timezones.len() > 1 {
             let new_timezone_id = timezones[1].id.clone();
             assert!(manager.set_current_timezone(&new_timezone_id));
-            assert_eq!(
-                manager.get_current_timezone().unwrap().id,
-                new_timezone_id
-            );
+            assert_eq!(manager.get_current_timezone().unwrap().id, new_timezone_id);
         }
     }
 

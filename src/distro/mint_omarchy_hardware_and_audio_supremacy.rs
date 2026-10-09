@@ -145,7 +145,7 @@ pub enum StudioDspEffect {
 /// Configuration for the real-time audio pipeline
 #[derive(Debug, Clone)]
 pub struct AudioPipelineConfig {
-    pub sample_rate: u32,       // e.g. 48000 or 96000
+    pub sample_rate: u32,           // e.g. 48000 or 96000
     pub quantum_buffer_frames: u32, // e.g. 64 or 128 (sub-2ms latency)
     pub enabled_effects: Vec<StudioDspEffect>,
     pub input_noise_gate_db: f32,
@@ -192,7 +192,8 @@ impl SovereignOmarchyStudioAudioPipeline {
 
     /// Process an audio buffer block through the active DSP chain
     pub fn process_audio_buffer(&self, frames: u32) {
-        self.processed_frames.fetch_add(frames as u64, Ordering::Relaxed);
+        self.processed_frames
+            .fetch_add(frames as u64, Ordering::Relaxed);
     }
 
     pub fn total_frames_processed(&self) -> u64 {
@@ -268,7 +269,8 @@ impl SovereignOmarchyHandheldPowerOptimizer {
 
     pub fn set_battery_charge_threshold(&self, limit: u32) {
         let clamped = limit.clamp(40, 100);
-        self.battery_charge_limit_percent.store(clamped, Ordering::Relaxed);
+        self.battery_charge_limit_percent
+            .store(clamped, Ordering::Relaxed);
     }
 
     pub fn battery_charge_threshold(&self) -> u32 {
@@ -318,20 +320,50 @@ pub struct SovereignOmarchyFuzzyLauncherEngine {
 
 impl SovereignOmarchyFuzzyLauncherEngine {
     pub fn new() -> Self {
-        let mut launcher = Self { indexed_apps: Vec::new() };
+        let mut launcher = Self {
+            indexed_apps: Vec::new(),
+        };
         launcher.populate_stock_apps();
         launcher
     }
 
     fn populate_stock_apps(&mut self) {
         self.indexed_apps = vec![
-            (String::from("Sigma Browser"), String::from("sigma-browser"), String::from("Network;WebBrowser;")),
-            (String::from("Terminal Console"), String::from("sigma-term"), String::from("System;TerminalEmulator;")),
-            (String::from("Code Studio"), String::from("code"), String::from("Development;IDE;")),
-            (String::from("Files & Storage"), String::from("sigma-fm"), String::from("System;FileManager;")),
-            (String::from("Audio Mixer & DSP"), String::from("sigma-dsp"), String::from("Audio;Mixer;")),
-            (String::from("Software Store"), String::from("sigma-store"), String::from("System;PackageManager;")),
-            (String::from("System Settings"), String::from("sigma-settings"), String::from("Settings;Preferences;")),
+            (
+                String::from("Sigma Browser"),
+                String::from("sigma-browser"),
+                String::from("Network;WebBrowser;"),
+            ),
+            (
+                String::from("Terminal Console"),
+                String::from("sigma-term"),
+                String::from("System;TerminalEmulator;"),
+            ),
+            (
+                String::from("Code Studio"),
+                String::from("code"),
+                String::from("Development;IDE;"),
+            ),
+            (
+                String::from("Files & Storage"),
+                String::from("sigma-fm"),
+                String::from("System;FileManager;"),
+            ),
+            (
+                String::from("Audio Mixer & DSP"),
+                String::from("sigma-dsp"),
+                String::from("Audio;Mixer;"),
+            ),
+            (
+                String::from("Software Store"),
+                String::from("sigma-store"),
+                String::from("System;PackageManager;"),
+            ),
+            (
+                String::from("System Settings"),
+                String::from("sigma-settings"),
+                String::from("Settings;Preferences;"),
+            ),
         ];
     }
 
@@ -382,13 +414,19 @@ impl SovereignOmarchyFuzzyLauncherEngine {
     fn eval_simple_math(&self, query: &str) -> Option<i64> {
         let parts: Vec<&str> = query.split('+').collect();
         if parts.len() == 2 {
-            if let (Ok(a), Ok(b)) = (parts[0].trim().parse::<i64>(), parts[1].trim().parse::<i64>()) {
+            if let (Ok(a), Ok(b)) = (
+                parts[0].trim().parse::<i64>(),
+                parts[1].trim().parse::<i64>(),
+            ) {
                 return Some(a + b);
             }
         }
         let parts_mul: Vec<&str> = query.split('*').collect();
         if parts_mul.len() == 2 {
-            if let (Ok(a), Ok(b)) = (parts_mul[0].trim().parse::<i64>(), parts_mul[1].trim().parse::<i64>()) {
+            if let (Ok(a), Ok(b)) = (
+                parts_mul[0].trim().parse::<i64>(),
+                parts_mul[1].trim().parse::<i64>(),
+            ) {
                 return Some(a * b);
             }
         }
@@ -424,7 +462,8 @@ mod tests {
 
     #[test]
     fn test_handheld_power_optimizer() {
-        let mut opt = SovereignOmarchyHandheldPowerOptimizer::new(DeviceFormFactor::HandheldGamingConsole);
+        let mut opt =
+            SovereignOmarchyHandheldPowerOptimizer::new(DeviceFormFactor::HandheldGamingConsole);
         assert_eq!(opt.tdp_watts(), 15);
         assert_eq!(opt.battery_charge_threshold(), 80);
 

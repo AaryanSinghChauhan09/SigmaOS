@@ -201,8 +201,16 @@ impl MuslDynamicRelocator {
     }
 
     /// Resolve relocations for a loaded shared object
-    pub fn apply_relocations(&mut self, obj_name: &str, target_memory: &mut [u8]) -> Result<usize, &'static str> {
-        let obj = self.loaded_objects.get(obj_name).ok_or("Object not found")?.clone();
+    pub fn apply_relocations(
+        &mut self,
+        obj_name: &str,
+        target_memory: &mut [u8],
+    ) -> Result<usize, &'static str> {
+        let obj = self
+            .loaded_objects
+            .get(obj_name)
+            .ok_or("Object not found")?
+            .clone();
         let load_base = obj.load_base;
         let mut resolved_count = 0;
 
@@ -218,7 +226,8 @@ impl MuslDynamicRelocator {
                 R_X86_64_RELATIVE => {
                     // B + A: Base load address + Addend
                     let value = (load_base as i64).wrapping_add(rela.addend) as u64;
-                    target_memory[offset_in_buffer..offset_in_buffer + 8].copy_from_slice(&value.to_ne_bytes());
+                    target_memory[offset_in_buffer..offset_in_buffer + 8]
+                        .copy_from_slice(&value.to_ne_bytes());
                     resolved_count += 1;
                 }
                 R_X86_64_GLOB_DAT | R_X86_64_JUMP_SLOT => {
@@ -233,7 +242,8 @@ impl MuslDynamicRelocator {
                 R_X86_64_64 => {
                     // S + A
                     let value = (load_base as i64).wrapping_add(rela.addend) as u64;
-                    target_memory[offset_in_buffer..offset_in_buffer + 8].copy_from_slice(&value.to_ne_bytes());
+                    target_memory[offset_in_buffer..offset_in_buffer + 8]
+                        .copy_from_slice(&value.to_ne_bytes());
                     resolved_count += 1;
                 }
                 _ => {}
@@ -308,11 +318,14 @@ mod tests {
     fn test_apply_relative_relocation() {
         let mut relocator = MuslDynamicRelocator::new();
         let mut app = SharedObject::new("test_app", 0x400000);
-        app.relocations.push(DynamicRela::new(0x20, R_X86_64_RELATIVE, 0, 0x1500));
+        app.relocations
+            .push(DynamicRela::new(0x20, R_X86_64_RELATIVE, 0, 0x1500));
         relocator.add_shared_object(app);
 
         let mut memory = [0u8; 64];
-        let count = relocator.apply_relocations("test_app", &mut memory).unwrap();
+        let count = relocator
+            .apply_relocations("test_app", &mut memory)
+            .unwrap();
         assert_eq!(count, 1);
 
         let expected_val = 0x400000 + 0x1500;
@@ -322,7 +335,8 @@ mod tests {
 
     #[test]
     fn test_auxv_table_structure() {
-        let auxv = MuslDynamicRelocator::build_auxv_table(0x400040, 56, 9, 0x401000, 0x7FFF_FFFF_F000);
+        let auxv =
+            MuslDynamicRelocator::build_auxv_table(0x400040, 56, 9, 0x401000, 0x7FFF_FFFF_F000);
         assert_eq!(auxv.first().unwrap().0, AT_PHDR);
         assert_eq!(auxv.first().unwrap().1, 0x400040);
         assert_eq!(auxv.last().unwrap().0, AT_NULL);

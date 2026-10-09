@@ -227,7 +227,12 @@ impl DesktopSoundManager {
         self.next_device_id += 1;
     }
 
-    pub fn add_device(&mut self, name: String, device_type: DesktopAudioDeviceType, status: DesktopAudioDeviceStatus) -> String {
+    pub fn add_device(
+        &mut self,
+        name: String,
+        device_type: DesktopAudioDeviceType,
+        status: DesktopAudioDeviceStatus,
+    ) -> String {
         let id = format!("dev_{}", self.next_device_id);
         let device = DesktopAudioDevice::new(id.clone(), name, device_type, status);
         self.devices.insert(id.clone(), device);
@@ -252,7 +257,10 @@ impl DesktopSoundManager {
         self.devices.values().collect()
     }
 
-    pub fn get_devices_by_type(&self, device_type: DesktopAudioDeviceType) -> Vec<&DesktopAudioDevice> {
+    pub fn get_devices_by_type(
+        &self,
+        device_type: DesktopAudioDeviceType,
+    ) -> Vec<&DesktopAudioDevice> {
         self.devices
             .values()
             .filter(|d| d.device_type == device_type)
@@ -260,15 +268,31 @@ impl DesktopSoundManager {
     }
 
     pub fn get_default_output_device(&self) -> Option<&DesktopAudioDevice> {
-        self.devices
-            .values()
-            .find(|d| d.is_default && matches!(d.device_type, DesktopAudioDeviceType::Speaker | DesktopAudioDeviceType::Headphones | DesktopAudioDeviceType::Headset | DesktopAudioDeviceType::HDMI | DesktopAudioDeviceType::SPDIF | DesktopAudioDeviceType::LineOut | DesktopAudioDeviceType::Bluetooth))
+        self.devices.values().find(|d| {
+            d.is_default
+                && matches!(
+                    d.device_type,
+                    DesktopAudioDeviceType::Speaker
+                        | DesktopAudioDeviceType::Headphones
+                        | DesktopAudioDeviceType::Headset
+                        | DesktopAudioDeviceType::HDMI
+                        | DesktopAudioDeviceType::SPDIF
+                        | DesktopAudioDeviceType::LineOut
+                        | DesktopAudioDeviceType::Bluetooth
+                )
+        })
     }
 
     pub fn get_default_input_device(&self) -> Option<&DesktopAudioDevice> {
-        self.devices
-            .values()
-            .find(|d| d.is_default && matches!(d.device_type, DesktopAudioDeviceType::Microphone | DesktopAudioDeviceType::Headset | DesktopAudioDeviceType::LineIn))
+        self.devices.values().find(|d| {
+            d.is_default
+                && matches!(
+                    d.device_type,
+                    DesktopAudioDeviceType::Microphone
+                        | DesktopAudioDeviceType::Headset
+                        | DesktopAudioDeviceType::LineIn
+                )
+        })
     }
 
     pub fn set_default_device(&mut self, id: &str) -> bool {
@@ -408,9 +432,18 @@ mod tests {
 
     #[test]
     fn test_audio_device_type_from_str() {
-        assert_eq!(DesktopAudioDeviceType::from_str("speaker"), Some(DesktopAudioDeviceType::Speaker));
-        assert_eq!(DesktopAudioDeviceType::from_str("microphone"), Some(DesktopAudioDeviceType::Microphone));
-        assert_eq!(DesktopAudioDeviceType::from_str("headphones"), Some(DesktopAudioDeviceType::Headphones));
+        assert_eq!(
+            DesktopAudioDeviceType::from_str("speaker"),
+            Some(DesktopAudioDeviceType::Speaker)
+        );
+        assert_eq!(
+            DesktopAudioDeviceType::from_str("microphone"),
+            Some(DesktopAudioDeviceType::Microphone)
+        );
+        assert_eq!(
+            DesktopAudioDeviceType::from_str("headphones"),
+            Some(DesktopAudioDeviceType::Headphones)
+        );
         assert_eq!(DesktopAudioDeviceType::from_str("invalid"), None);
     }
 
@@ -517,7 +550,10 @@ mod tests {
     fn test_output_profile() {
         let mut manager = DesktopSoundManager::new();
         manager.set_output_profile(DesktopSoundProfile::DigitalSurround51);
-        assert_eq!(manager.get_output_profile(), DesktopSoundProfile::DigitalSurround51);
+        assert_eq!(
+            manager.get_output_profile(),
+            DesktopSoundProfile::DigitalSurround51
+        );
     }
 
     #[test]

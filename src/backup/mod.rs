@@ -3,7 +3,7 @@ pub mod recovery;
 pub mod snapshot;
 
 pub use backup_manager::{
-    BackupDestination, BackupJob, BackupJobManager, BackupSource, BackupJobStatistics,
+    BackupDestination, BackupJob, BackupJobManager, BackupJobStatistics, BackupSource,
     BackupStatus, BackupType,
 };
 pub use recovery::{BackupChunk, RecoveryManager, SystemSnapshot};

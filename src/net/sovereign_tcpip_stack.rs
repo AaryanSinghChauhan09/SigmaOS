@@ -33,8 +33,12 @@ impl MacAddress {
     pub const BROADCAST: Self = MacAddress([0xFF; 6]);
     pub const ZERO: Self = MacAddress([0; 6]);
 
-    pub fn is_broadcast(&self) -> bool { *self == Self::BROADCAST }
-    pub fn is_unicast(&self) -> bool { (self.0[0] & 1) == 0 }
+    pub fn is_broadcast(&self) -> bool {
+        *self == Self::BROADCAST
+    }
+    pub fn is_unicast(&self) -> bool {
+        (self.0[0] & 1) == 0
+    }
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -99,8 +103,10 @@ impl ArpPacket {
         if buf.len() < 28 {
             return None;
         }
-        let mut smac = [0u8; 6]; let mut tmac = [0u8; 6];
-        let mut sip = [0u8; 4]; let mut tip = [0u8; 4];
+        let mut smac = [0u8; 6];
+        let mut tmac = [0u8; 6];
+        let mut sip = [0u8; 4];
+        let mut tip = [0u8; 4];
         smac.copy_from_slice(&buf[8..14]);
         sip.copy_from_slice(&buf[14..18]);
         tmac.copy_from_slice(&buf[18..24]);
@@ -154,7 +160,11 @@ pub struct ArpCache {
 
 impl ArpCache {
     pub fn new() -> Self {
-        Self { entries: BTreeMap::new(), hits: AtomicU64::new(0), misses: AtomicU64::new(0) }
+        Self {
+            entries: BTreeMap::new(),
+            hits: AtomicU64::new(0),
+            misses: AtomicU64::new(0),
+        }
     }
 
     pub fn lookup(&self, ip: &[u8; 4]) -> Option<MacAddress> {
@@ -200,9 +210,14 @@ impl Ipv4Packet {
     pub const DEFAULT_TTL: u8 = 64;
 
     pub fn parse(buf: &[u8]) -> Option<Self> {
-        if buf.len() < 20 { return None; }
-        if (buf[0] >> 4) != 4 { return None; }
-        let mut src = [0u8; 4]; let mut dst = [0u8; 4];
+        if buf.len() < 20 {
+            return None;
+        }
+        if (buf[0] >> 4) != 4 {
+            return None;
+        }
+        let mut src = [0u8; 4];
+        let mut dst = [0u8; 4];
         src.copy_from_slice(&buf[12..16]);
         dst.copy_from_slice(&buf[16..20]);
         Some(Self {
@@ -214,7 +229,8 @@ impl Ipv4Packet {
             ttl: buf[8],
             protocol: buf[9],
             checksum: u16::from_be_bytes([buf[10], buf[11]]),
-            src, dst,
+            src,
+            dst,
         })
     }
 
@@ -229,7 +245,8 @@ impl Ipv4Packet {
             ttl: Self::DEFAULT_TTL,
             protocol,
             checksum: 0,
-            src, dst,
+            src,
+            dst,
         };
         pkt.checksum = pkt.compute_checksum();
         pkt
@@ -279,7 +296,9 @@ pub struct IcmpEchoMessage {
 
 impl IcmpEchoMessage {
     pub fn parse(buf: &[u8]) -> Option<Self> {
-        if buf.len() < 8 { return None; }
+        if buf.len() < 8 {
+            return None;
+        }
         Some(Self {
             msg_type: buf[0],
             code: buf[1],
@@ -298,9 +317,14 @@ impl IcmpEchoMessage {
             sequence: request.sequence,
         };
         reply.checksum = internet_checksum(&[
-            reply.msg_type, reply.code, 0, 0,
-            (reply.identifier >> 8) as u8, reply.identifier as u8,
-            (reply.sequence >> 8) as u8, reply.sequence as u8,
+            reply.msg_type,
+            reply.code,
+            0,
+            0,
+            (reply.identifier >> 8) as u8,
+            reply.identifier as u8,
+            (reply.sequence >> 8) as u8,
+            reply.sequence as u8,
         ]);
         reply
     }
@@ -320,7 +344,9 @@ pub struct UdpHeader {
 
 impl UdpHeader {
     pub fn parse(buf: &[u8]) -> Option<Self> {
-        if buf.len() < 8 { return None; }
+        if buf.len() < 8 {
+            return None;
+        }
         Some(Self {
             src_port: u16::from_be_bytes([buf[0], buf[1]]),
             dst_port: u16::from_be_bytes([buf[2], buf[3]]),
@@ -372,7 +398,9 @@ pub struct TcpHeader {
 
 impl TcpHeader {
     pub fn parse(buf: &[u8]) -> Option<Self> {
-        if buf.len() < 20 { return None; }
+        if buf.len() < 20 {
+            return None;
+        }
         Some(Self {
             src_port: u16::from_be_bytes([buf[0], buf[1]]),
             dst_port: u16::from_be_bytes([buf[2], buf[3]]),
@@ -500,7 +528,8 @@ impl SovereignNetworkStack {
     /// Dispatch incoming raw Ethernet frame
     pub fn rx_frame(&mut self, frame_bytes: &[u8]) -> Option<Vec<u8>> {
         self.total_rx_packets.fetch_add(1, Ordering::SeqCst);
-        self.total_rx_bytes.fetch_add(frame_bytes.len() as u64, Ordering::SeqCst);
+        self.total_rx_bytes
+            .fetch_add(frame_bytes.len() as u64, Ordering::SeqCst);
 
         let frame = EthernetFrame::parse(frame_bytes)?;
         match frame.ethertype {
@@ -550,25 +579,37 @@ impl SovereignNetworkStack {
 
     fn handle_icmp(&mut self, ip: &Ipv4Packet, payload: &[u8]) -> Option<Vec<u8>> {
         let echo = IcmpEchoMessage::parse(payload)?;
-        if echo.msg_type != ICMP_ECHO_REQUEST { return None; }
+        if echo.msg_type != ICMP_ECHO_REQUEST {
+            return None;
+        }
 
         let reply = IcmpEchoMessage::build_reply(&echo);
         let mut icmp_buf = vec![
-            reply.msg_type, reply.code,
-            (reply.checksum >> 8) as u8, reply.checksum as u8,
-            (reply.identifier >> 8) as u8, reply.identifier as u8,
-            (reply.sequence >> 8) as u8, reply.sequence as u8,
+            reply.msg_type,
+            reply.code,
+            (reply.checksum >> 8) as u8,
+            reply.checksum as u8,
+            (reply.identifier >> 8) as u8,
+            reply.identifier as u8,
+            (reply.sequence >> 8) as u8,
+            reply.sequence as u8,
         ];
         icmp_buf.extend_from_slice(&payload[8..]);
 
         let ip_reply = Ipv4Packet::new(self.ip, ip.src, IPPROTO_ICMP, icmp_buf.len() as u16);
         let mut ip_buf = vec![
-            ip_reply.version_ihl, ip_reply.dscp_ecn,
-            (ip_reply.total_length >> 8) as u8, ip_reply.total_length as u8,
-            (ip_reply.identification >> 8) as u8, ip_reply.identification as u8,
-            (ip_reply.flags_fragment >> 8) as u8, ip_reply.flags_fragment as u8,
-            ip_reply.ttl, ip_reply.protocol,
-            (ip_reply.checksum >> 8) as u8, ip_reply.checksum as u8,
+            ip_reply.version_ihl,
+            ip_reply.dscp_ecn,
+            (ip_reply.total_length >> 8) as u8,
+            ip_reply.total_length as u8,
+            (ip_reply.identification >> 8) as u8,
+            ip_reply.identification as u8,
+            (ip_reply.flags_fragment >> 8) as u8,
+            ip_reply.flags_fragment as u8,
+            ip_reply.ttl,
+            ip_reply.protocol,
+            (ip_reply.checksum >> 8) as u8,
+            ip_reply.checksum as u8,
         ];
         ip_buf.extend_from_slice(&ip_reply.src);
         ip_buf.extend_from_slice(&ip_reply.dst);
@@ -609,12 +650,18 @@ mod tests {
         let pkt = Ipv4Packet::new([10, 0, 0, 1], [10, 0, 0, 2], IPPROTO_UDP, 8);
         // Re-verify: compute_checksum with the written checksum should sum to 0
         let mut bytes = vec![
-            pkt.version_ihl, pkt.dscp_ecn,
-            (pkt.total_length >> 8) as u8, pkt.total_length as u8,
-            (pkt.identification >> 8) as u8, pkt.identification as u8,
-            (pkt.flags_fragment >> 8) as u8, pkt.flags_fragment as u8,
-            pkt.ttl, pkt.protocol,
-            (pkt.checksum >> 8) as u8, pkt.checksum as u8,
+            pkt.version_ihl,
+            pkt.dscp_ecn,
+            (pkt.total_length >> 8) as u8,
+            pkt.total_length as u8,
+            (pkt.identification >> 8) as u8,
+            pkt.identification as u8,
+            (pkt.flags_fragment >> 8) as u8,
+            pkt.flags_fragment as u8,
+            pkt.ttl,
+            pkt.protocol,
+            (pkt.checksum >> 8) as u8,
+            pkt.checksum as u8,
         ];
         bytes.extend_from_slice(&pkt.src);
         bytes.extend_from_slice(&pkt.dst);

@@ -250,7 +250,6 @@ mod tests {
     }
 
     #[ignore]
-
     #[test]
     fn test_sysfs_read() {
         let sysfs = Sysfs::new();
@@ -265,7 +264,6 @@ mod tests {
     }
 
     #[ignore]
-
     #[test]
     fn test_sysfs_write() {
         let mut sysfs = Sysfs::new();
@@ -284,7 +282,6 @@ mod tests {
     }
 
     #[ignore]
-
     #[test]
     fn test_sysfs_add_attr() {
         let mut sysfs = Sysfs::new();
@@ -311,7 +308,6 @@ mod tests {
     }
 
     #[ignore]
-
     #[test]
     fn test_sysfs_set_hostname() {
         let mut sysfs = Sysfs::new();

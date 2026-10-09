@@ -461,7 +461,6 @@ mod tests {
     }
 
     #[ignore]
-
     #[test]
     fn test_syscall_filter_inheritance() {
         let manager = SyscallFilterManager::new();

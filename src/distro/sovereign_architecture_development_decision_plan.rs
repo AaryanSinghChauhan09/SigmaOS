@@ -256,7 +256,10 @@ mod tests {
         assert!(engine.evaluate_all_decisions_active());
 
         let ad001 = engine.decisions.get("AD-001").unwrap();
-        assert_eq!(ad001.category, ArchitecturalDecisionCategory::NetworkingEbpfXdp);
+        assert_eq!(
+            ad001.category,
+            ArchitecturalDecisionCategory::NetworkingEbpfXdp
+        );
         assert!(ad001.target_performance_metric.contains("10,000,000 pps"));
     }
 

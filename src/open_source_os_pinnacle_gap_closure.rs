@@ -26,18 +26,18 @@ use alloc::format;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec::Vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::BTreeMap;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
-#[cfg(any(feature = "standalone_test", test))]
 use std::vec;
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec::Vec;
 
 /// 1. Plan 9 9P2000 Protocol Engine & Namespace Isolation
 #[derive(Debug, Clone)]
@@ -127,7 +127,8 @@ impl SovereignHaikuBfsEngine {
     }
 
     pub fn set_bfs_attribute(&mut self, file_path: &str, attr: &str) {
-        self.indexed_attributes.insert(file_path.to_string(), attr.to_string());
+        self.indexed_attributes
+            .insert(file_path.to_string(), attr.to_string());
     }
 
     pub fn query_by_bfs_attribute(&self, attr: &str) -> Vec<String> {
@@ -535,7 +536,10 @@ mod tests {
 
         let mut redox = SovereignRedoxSchemeEngine::new();
         redox.register_scheme("proc", "proc_driver");
-        assert_eq!(redox.resolve_scheme_url("proc:1/status"), Some(&"proc_driver".to_string()));
+        assert_eq!(
+            redox.resolve_scheme_url("proc:1/status"),
+            Some(&"proc_driver".to_string())
+        );
 
         let mut fuchsia = SovereignFuchsiaZirconEngine::new();
         fuchsia.create_channel(1001, 0x07);

@@ -198,11 +198,12 @@ impl SearchManager {
     fn search_files(&self, query: &str) -> Vec<SearchResult> {
         // Bolt Optimization: Zero-allocation case-insensitive substring matching.
         // Avoids allocating heap String instances via `to_lowercase()` for title, description, and path on every searched file entry.
-        self.indexed_files.values()
+        self.indexed_files
+            .values()
             .filter(|r| {
-                contains_ignore_case(&r.title, query) ||
-                contains_ignore_case(&r.description, query) ||
-                contains_ignore_case(&r.path, query)
+                contains_ignore_case(&r.title, query)
+                    || contains_ignore_case(&r.description, query)
+                    || contains_ignore_case(&r.path, query)
             })
             .cloned()
             .collect()
@@ -212,10 +213,10 @@ impl SearchManager {
     fn search_applications(&self, query: &str) -> Vec<SearchResult> {
         // Bolt Optimization: Zero-allocation case-insensitive substring matching.
         // Avoids allocating heap String instances via `to_lowercase()` for title and description on every searched app entry.
-        self.indexed_apps.values()
+        self.indexed_apps
+            .values()
             .filter(|r| {
-                contains_ignore_case(&r.title, query) ||
-                contains_ignore_case(&r.description, query)
+                contains_ignore_case(&r.title, query) || contains_ignore_case(&r.description, query)
             })
             .cloned()
             .collect()
@@ -225,10 +226,10 @@ impl SearchManager {
     fn search_settings(&self, query: &str) -> Vec<SearchResult> {
         // Bolt Optimization: Zero-allocation case-insensitive substring matching.
         // Avoids allocating heap String instances via `to_lowercase()` for title and description on every searched setting entry.
-        self.indexed_settings.values()
+        self.indexed_settings
+            .values()
             .filter(|r| {
-                contains_ignore_case(&r.title, query) ||
-                contains_ignore_case(&r.description, query)
+                contains_ignore_case(&r.title, query) || contains_ignore_case(&r.description, query)
             })
             .cloned()
             .collect()
@@ -238,10 +239,10 @@ impl SearchManager {
     fn search_commands(&self, query: &str) -> Vec<SearchResult> {
         // Bolt Optimization: Zero-allocation case-insensitive substring matching.
         // Avoids allocating heap String instances via `to_lowercase()` for title and description on every searched command entry.
-        self.indexed_commands.values()
+        self.indexed_commands
+            .values()
             .filter(|r| {
-                contains_ignore_case(&r.title, query) ||
-                contains_ignore_case(&r.description, query)
+                contains_ignore_case(&r.title, query) || contains_ignore_case(&r.description, query)
             })
             .cloned()
             .collect()
@@ -250,11 +251,36 @@ impl SearchManager {
     /// Index default applications
     fn index_default_applications(&mut self) {
         let apps = vec![
-            ("terminal", "Terminal", "Command line terminal", "/usr/bin/terminal"),
-            ("file-manager", "File Manager", "Browse files", "/usr/bin/file-manager"),
-            ("web-browser", "Web Browser", "Browse the web", "/usr/bin/web-browser"),
-            ("settings", "Settings", "System settings", "/usr/bin/settings"),
-            ("calculator", "Calculator", "Perform calculations", "/usr/bin/calculator"),
+            (
+                "terminal",
+                "Terminal",
+                "Command line terminal",
+                "/usr/bin/terminal",
+            ),
+            (
+                "file-manager",
+                "File Manager",
+                "Browse files",
+                "/usr/bin/file-manager",
+            ),
+            (
+                "web-browser",
+                "Web Browser",
+                "Browse the web",
+                "/usr/bin/web-browser",
+            ),
+            (
+                "settings",
+                "Settings",
+                "System settings",
+                "/usr/bin/settings",
+            ),
+            (
+                "calculator",
+                "Calculator",
+                "Perform calculations",
+                "/usr/bin/calculator",
+            ),
         ];
 
         for (id, title, description, path) in apps {
@@ -296,9 +322,19 @@ impl SearchManager {
     fn index_default_settings(&mut self) {
         let settings = vec![
             ("theme", "Theme", "Desktop theme", "settings://theme"),
-            ("display", "Display", "Display settings", "settings://display"),
+            (
+                "display",
+                "Display",
+                "Display settings",
+                "settings://display",
+            ),
             ("sound", "Sound", "Sound settings", "settings://sound"),
-            ("network", "Network", "Network settings", "settings://network"),
+            (
+                "network",
+                "Network",
+                "Network settings",
+                "settings://network",
+            ),
             ("power", "Power", "Power settings", "settings://power"),
         ];
 
@@ -351,11 +387,15 @@ fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
     }
     if haystack.is_ascii() && needle.is_ascii() {
         let needle_bytes = needle.as_bytes();
-        haystack.as_bytes().windows(needle_bytes.len()).any(|window| {
-            window.iter().zip(needle_bytes.iter()).all(|(&b1, &b2)| {
-                b1.to_ascii_lowercase() == b2.to_ascii_lowercase()
+        haystack
+            .as_bytes()
+            .windows(needle_bytes.len())
+            .any(|window| {
+                window
+                    .iter()
+                    .zip(needle_bytes.iter())
+                    .all(|(&b1, &b2)| b1.to_ascii_lowercase() == b2.to_ascii_lowercase())
             })
-        })
     } else {
         haystack.to_lowercase().contains(&needle.to_lowercase())
     }
@@ -409,8 +449,7 @@ mod tests {
     #[test]
     fn test_search_max_results() {
         let manager = SearchManager::new();
-        let query = SearchQuery::new("t".to_string())
-            .with_max_results(5);
+        let query = SearchQuery::new("t".to_string()).with_max_results(5);
         let results = manager.search(query);
         assert!(results.len() <= 5);
     }

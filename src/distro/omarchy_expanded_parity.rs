@@ -129,9 +129,9 @@ pub struct OmarchyHypridleEngine {
 impl OmarchyHypridleEngine {
     pub fn new() -> Self {
         Self {
-            lock_timeout_secs: 300,       // 5 mins
-            dpms_off_timeout_secs: 600,   // 10 mins
-            suspend_timeout_secs: 1800,   // 30 mins
+            lock_timeout_secs: 300,     // 5 mins
+            dpms_off_timeout_secs: 600, // 10 mins
+            suspend_timeout_secs: 1800, // 30 mins
         }
     }
 
@@ -296,8 +296,14 @@ impl SovereignOmarchyExpandedParitySuite {
 
     pub fn verify_suite(&self) -> bool {
         self.omakub.is_app_installed("Ghostty")
-            && self.walker.generate_walker_config_json().contains("desktop_applications")
-            && self.ghostty.generate_ghostty_config().contains("theme = catppuccin-mocha")
+            && self
+                .walker
+                .generate_walker_config_json()
+                .contains("desktop_applications")
+            && self
+                .ghostty
+                .generate_ghostty_config()
+                .contains("theme = catppuccin-mocha")
             && self.hypridle.generate_hypridle_conf().contains("hyprlock")
             && self.zellij.generate_kdl_layout().contains("compact")
             && self
@@ -328,8 +334,14 @@ mod tests {
         let suite = SovereignOmarchyExpandedParitySuite::new();
         assert!(suite.verify_suite());
         assert!(suite.omakub.is_app_installed("Neovim"));
-        assert!(suite.walker.generate_walker_config_json().contains("calculator"));
-        assert!(suite.ghostty.generate_ghostty_config().contains("JetBrainsMono"));
+        assert!(suite
+            .walker
+            .generate_walker_config_json()
+            .contains("calculator"));
+        assert!(suite
+            .ghostty
+            .generate_ghostty_config()
+            .contains("JetBrainsMono"));
         assert!(suite.hypridle.generate_hypridle_conf().contains("dpms off"));
         assert!(suite.zellij.generate_kdl_layout().contains("tab-bar"));
         assert!(suite.hyprlock.generate_hyprlock_conf().contains("hyprlock"));

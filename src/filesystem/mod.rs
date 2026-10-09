@@ -68,7 +68,6 @@ pub use file_monitor::{
 pub mod fscrypt_autofs;
 pub mod sovereign_filesystem_hierarchy;
 pub mod sovereign_link_engine;
-pub use sovereign_link_engine::*;
 pub use btrfs::{
     BtrfsCompression, BtrfsError, BtrfsFilesystem, BtrfsRaidLevel, BtrfsSnapshot, BtrfsStats,
     BtrfsSuperblock,
@@ -93,6 +92,7 @@ pub use sovereign_filesystem_hierarchy::{
     SovereignCanonicalFhsResolver, SovereignMultiDistroFhsHierarchyEngine,
     SyntheticProcSysfsProvider,
 };
+pub use sovereign_link_engine::*;
 pub use tmpfs::{TmpfsError, TmpfsFilesystem, TmpfsInode};
 pub use watch::{EventQueue, ThreadSafeEventQueue, COALESCE_WINDOW_MS, RING_BUFFER_SIZE};
 pub use zfs::{
