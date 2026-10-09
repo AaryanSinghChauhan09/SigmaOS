@@ -139,6 +139,54 @@ impl Default for FedoraKojiBuildSystemEngine {
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_fedora_ignition_engine() {
+        let mut ignition = FedoraIgnitionEngine::new();
+        assert_eq!(ignition.version, "3.4.0");
+        let res = ignition.parse_and_apply_config("{\"ignition\": {\"version\": \"3.4.0\"}}");
+        assert!(res.is_ok());
+        assert_eq!(ignition.provisioned_files.len(), 1);
+        assert!(ignition.parse_and_apply_config("").is_err());
+    }
+
+    #[test]
+    fn test_fedora_greenboot_engine() {
+        let mut greenboot = FedoraGreenbootEngine::new();
+        assert!(!greenboot.should_rollback());
+        assert_eq!(
+            greenboot.run_health_check("dns", true),
+            GreenbootCheckStatus::Success
+        );
+        assert_eq!(
+            greenboot.run_health_check("storage", false),
+            GreenbootCheckStatus::Failed
+        );
+        greenboot.run_health_check("network", false);
+        greenboot.run_health_check("kernel", false);
+        assert!(greenboot.should_rollback());
+    }
+
+    #[test]
+    fn test_fedora_keylime_engine() {
+        let mut keylime = FedoraKeylimeEngine::new("agent-01");
+        assert!(!keylime.is_verified);
+        assert!(keylime.verify_tpm_quote("TPM2_QUOTE_VALID_SHA256"));
+        assert!(keylime.is_verified);
+    }
+
+    #[test]
+    fn test_fedora_fedocal_engine() {
+        let mut fedocal = FedoraFedocalEngine::new();
+        let count = fedocal.create_event(101, "Fedora 42 Release Party", "RelEng");
+        assert_eq!(count, 1);
+        assert_eq!(fedocal.events[0].name, "Fedora 42 Release Party");
+    }
+}
+
 // =========================================================================
 // 2. FEDORA BODHI UPDATE SYSTEM ENGINE
 // =========================================================================
@@ -944,7 +992,10 @@ impl FedoraSelinuxPolicyAuditEngine {
         booleans.insert("container_manage_dns".to_string(), true);
 
         let mut fcon = BTreeMap::new();
-        fcon.insert("/var/www/html".to_string(), "httpd_sys_content_t".to_string());
+        fcon.insert(
+            "/var/www/html".to_string(),
+            "httpd_sys_content_t".to_string(),
+        );
         fcon.insert("/etc/shadow".to_string(), "shadow_t".to_string());
 
         Self {
@@ -964,7 +1015,14 @@ impl FedoraSelinuxPolicyAuditEngine {
         }
     }
 
-    pub fn log_avc_denial(&mut self, pid: u32, scontext: &str, tcontext: &str, tclass: &str, perm: &str) {
+    pub fn log_avc_denial(
+        &mut self,
+        pid: u32,
+        scontext: &str,
+        tcontext: &str,
+        tclass: &str,
+        perm: &str,
+    ) {
         self.avc_denials.push(SelinuxAvcDenialLog {
             pid,
             scontext: scontext.to_string(),
@@ -977,7 +1035,12 @@ impl FedoraSelinuxPolicyAuditEngine {
     pub fn audit2allow_suggest_rule(&self) -> Vec<String> {
         self.avc_denials
             .iter()
-            .map(|d| format!("allow {} {}:{} {};", d.scontext, d.tcontext, d.tclass, d.permission))
+            .map(|d| {
+                format!(
+                    "allow {} {}:{} {};",
+                    d.scontext, d.tcontext, d.tclass, d.permission
+                )
+            })
             .collect()
     }
 
@@ -1036,7 +1099,11 @@ impl FedoraSystemdResolvedEngine {
 
     pub fn resolve_domain_route(&self, domain: &str) -> Vec<String> {
         for link in self.links.values() {
-            if link.routing_domains.iter().any(|d| domain.ends_with(d) || d == "~.") {
+            if link
+                .routing_domains
+                .iter()
+                .any(|d| domain.ends_with(d) || d == "~.")
+            {
                 return link.dns_servers.clone();
             }
         }
@@ -1191,13 +1258,16 @@ mod tests {
         assert!(fw.is_port_permitted("public", 9090));
 
         fw.allow_service("work", "cockpit").unwrap();
-        assert!(fw.zones["work"].allowed_services.contains(&"cockpit".to_string()));
+        assert!(fw.zones["work"]
+            .allowed_services
+            .contains(&"cockpit".to_string()));
     }
 
     #[test]
     fn test_fedora_flatpak_ostree_repo_server_engine() {
         let mut flatpak = FedoraFlatpakOstreeRepoServerEngine::new("fedora-apps");
-        let hash1 = flatpak.publish_app_commit("org.gnome.Nautilus", "stable", "x86_64", 1700000000);
+        let hash1 =
+            flatpak.publish_app_commit("org.gnome.Nautilus", "stable", "x86_64", 1700000000);
         assert!(!hash1.is_empty());
         assert_eq!(flatpak.get_latest_commit("org.gnome.Nautilus"), Some(hash1));
     }
@@ -1237,7 +1307,10 @@ mod tests {
         assert_eq!(servers, vec!["10.0.0.1".to_string()]);
 
         let default_servers = resolved.resolve_domain_route("google.com");
-        assert_eq!(default_servers, vec!["1.1.1.1".to_string(), "8.8.8.8".to_string()]);
+        assert_eq!(
+            default_servers,
+            vec!["1.1.1.1".to_string(), "8.8.8.8".to_string()]
+        );
     }
 }
 
@@ -1406,4 +1479,160 @@ impl Default for FedoraRpmostreeAtomicEngine {
 pub struct MockChrootProfile {
     pub name: String,
     pub arch: String,
+}
+
+// =========================================================================
+// FEDORA IGNITION FIRST-BOOT PROVISIONING ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct IgnitionFileSpec {
+    pub path: String,
+    pub contents: String,
+    pub mode: u32,
+}
+
+#[derive(Debug, Clone)]
+pub struct FedoraIgnitionEngine {
+    pub version: String,
+    pub provisioned_files: Vec<IgnitionFileSpec>,
+}
+
+impl FedoraIgnitionEngine {
+    pub fn new() -> Self {
+        Self {
+            version: "3.4.0".to_string(),
+            provisioned_files: Vec::new(),
+        }
+    }
+
+    pub fn parse_and_apply_config(&mut self, json_config: &str) -> Result<usize, &'static str> {
+        if json_config.is_empty() {
+            return Err("Ignition config cannot be empty");
+        }
+        let file = IgnitionFileSpec {
+            path: "/etc/ignition/provisioned.conf".to_string(),
+            contents: json_config.to_string(),
+            mode: 0o644,
+        };
+        self.provisioned_files.push(file);
+        Ok(self.provisioned_files.len())
+    }
+}
+
+impl Default for FedoraIgnitionEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// FEDORA GREENBOOT HEALTH CHECK & AUTO-ROLLBACK ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum GreenbootCheckStatus {
+    Success,
+    Failed,
+}
+
+#[derive(Debug, Clone)]
+pub struct FedoraGreenbootEngine {
+    pub check_count: usize,
+    pub failed_count: usize,
+    pub max_retries: usize,
+}
+
+impl FedoraGreenbootEngine {
+    pub fn new() -> Self {
+        Self {
+            check_count: 0,
+            failed_count: 0,
+            max_retries: 3,
+        }
+    }
+
+    pub fn run_health_check(&mut self, check_name: &str, is_healthy: bool) -> GreenbootCheckStatus {
+        self.check_count += 1;
+        if is_healthy {
+            GreenbootCheckStatus::Success
+        } else {
+            self.failed_count += 1;
+            GreenbootCheckStatus::Failed
+        }
+    }
+
+    pub fn should_rollback(&self) -> bool {
+        self.failed_count >= self.max_retries
+    }
+}
+
+impl Default for FedoraGreenbootEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// FEDORA KEYLIME TPM REMOTE ATTESTATION ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct FedoraKeylimeEngine {
+    pub agent_id: String,
+    pub tpm_pcr_quote: String,
+    pub is_verified: bool,
+}
+
+impl FedoraKeylimeEngine {
+    pub fn new(agent_id: &str) -> Self {
+        Self {
+            agent_id: agent_id.to_string(),
+            tpm_pcr_quote: String::new(),
+            is_verified: false,
+        }
+    }
+
+    pub fn verify_tpm_quote(&mut self, quote: &str) -> bool {
+        self.tpm_pcr_quote = quote.to_string();
+        self.is_verified = !quote.is_empty();
+        self.is_verified
+    }
+}
+
+// =========================================================================
+// FEDORA FEDOCAL EVENT CALENDAR ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct FedocalEvent {
+    pub id: u64,
+    pub name: String,
+    pub calendar: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct FedoraFedocalEngine {
+    pub events: Vec<FedocalEvent>,
+}
+
+impl FedoraFedocalEngine {
+    pub fn new() -> Self {
+        Self { events: Vec::new() }
+    }
+
+    pub fn create_event(&mut self, id: u64, name: &str, calendar: &str) -> usize {
+        self.events.push(FedocalEvent {
+            id,
+            name: name.to_string(),
+            calendar: calendar.to_string(),
+        });
+        self.events.len()
+    }
+}
+
+impl Default for FedoraFedocalEngine {
+    fn default() -> Self {
+        Self::new()
+    }
 }
