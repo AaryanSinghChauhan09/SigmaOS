@@ -855,6 +855,13 @@ if [ -f "src/compatibility/mint_omarchy_migration_bridge.rs" ]; then
     ./build/test_migration_bridge
 fi
 
+if [ -f "src/distro/sovereign_2090_distro_supremacy_engine.rs" ]; then
+    echo "Running 2090 Distro Supremacy Engine test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_2090_distro_supremacy_engine.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_2090_supremacy
+    ./build/test_2090_supremacy
+fi
+
 if [ -f "scripts/sovereign_migration_first_benchmarks.sh" ]; then
     echo "Running Sovereign Migration-First Desktop Benchmark Suite..."
     ./scripts/sovereign_migration_first_benchmarks.sh
