@@ -326,6 +326,13 @@ if [ -f "src/distro/arch_missing_components.rs" ]; then
     ./build/arch_missing_test
 fi
 
+if [ -f "src/distro/arch_linux_parity_pr_suite.rs" ]; then
+    echo "Running Arch Linux Parity PR Suite test suite..."
+    mkdir -p build
+    rustc --test src/distro/arch_linux_parity_pr_suite.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_arch_pr_suite
+    ./build/test_arch_pr_suite
+fi
+
 if [ -f "src/package/universal.rs" ]; then
     echo "Running Universal Package Manager multi-distro test suite..."
     mkdir -p build
