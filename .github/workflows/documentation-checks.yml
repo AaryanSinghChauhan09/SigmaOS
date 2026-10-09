@@ -110,7 +110,6 @@ jobs:
       - name: Verify documentation policy compliance
         run: |
           echo "Verifying documentation policy compliance..."
-
           if [ -d "docs" ]; then
             # Check that DOCUMENTATION_SOURCE_POLICY.md exists
             if [ ! -f "docs/DOCUMENTATION_SOURCE_POLICY.md" ]; then
@@ -129,6 +128,8 @@ jobs:
               echo "ERROR: PROJECT_STATUS.md not found"
               exit 1
             fi
+          else
+            echo "Docs directory removed in favor of separate wiki repository."
           fi
 
           echo "Documentation policy compliance verified"

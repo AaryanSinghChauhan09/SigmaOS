@@ -109,8 +109,6 @@ pub mod sovereign_distro_package_advancements_v27;
 pub use sovereign_distro_package_advancements_v27::*;
 pub mod sovereign_distro_package_advancements_v28;
 pub use sovereign_distro_package_advancements_v28::*;
-pub mod sovereign_distro_package_advancements_v29;
-pub use sovereign_distro_package_advancements_v29::*;
 pub mod sovereign_distro_package_advancements_v30;
 pub use sovereign_distro_package_advancements_v30::*;
 pub mod sovereign_universal_multi_distro_pm_gateway;
