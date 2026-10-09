@@ -24,3 +24,9 @@ name = "ipc_parser"
 path = "fuzz_targets/ipc_parser.rs"
 test = false
 doc = false
+
+[[bin]]
+name = "vfs_path_parser"
+path = "fuzz_targets/vfs_path_parser.rs"
+test = false
+doc = false
