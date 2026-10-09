@@ -494,7 +494,6 @@ impl Default for Sovereign2090DistroSupremacyMasterSuite {
     }
 }
 
-#[cfg(feature = "standalone_test")]
 #[cfg(test)]
 mod tests {
     use super::*;

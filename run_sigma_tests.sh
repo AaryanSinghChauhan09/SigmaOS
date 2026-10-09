@@ -584,6 +584,13 @@ if [ -f "src/distro/sovereign_open_source_os_gap_closure_pr.rs" ]; then
     ./build/test_os_gap_closure_pr
 fi
 
+if [ -f "src/distro/sovereign_2090_distro_supremacy_engine.rs" ]; then
+    echo "Running Sovereign 2090 Distro Supremacy Engine test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_2090_distro_supremacy_engine.rs --edition=2021 -o build/test_2090_supremacy
+    ./build/test_2090_supremacy
+fi
+
 if [ -f "src/compatibility/omarchy_supreme_engine.rs" ]; then
     echo "Running Sovereign Omarchy Supreme Engine test suite..."
     mkdir -p build
