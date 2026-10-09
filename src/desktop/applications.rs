@@ -175,7 +175,9 @@ impl AppManager {
 
     /// Remove a repository
     pub fn remove_repository(&mut self, repo: &str) -> Result<(), String> {
-        let pos = self.repositories.iter()
+        let pos = self
+            .repositories
+            .iter()
             .position(|r| r == repo)
             .ok_or_else(|| format!("Repository {} not found", repo))?;
         self.repositories.remove(pos);
@@ -204,7 +206,8 @@ impl AppManager {
 
     /// Install an application
     pub fn install(&mut self, id: &str) -> Result<(), String> {
-        let app = self.get_application_mut(id)
+        let app = self
+            .get_application_mut(id)
             .ok_or_else(|| format!("Application {} not found", id))?;
 
         if app.is_installed() {
@@ -223,7 +226,8 @@ impl AppManager {
 
     /// Remove an application
     pub fn remove(&mut self, id: &str) -> Result<(), String> {
-        let app = self.get_application_mut(id)
+        let app = self
+            .get_application_mut(id)
             .ok_or_else(|| format!("Application {} not found", id))?;
 
         if !app.is_installed() {
@@ -242,7 +246,8 @@ impl AppManager {
 
     /// Update an application
     pub fn update(&mut self, id: &str) -> Result<(), String> {
-        let app = self.get_application_mut(id)
+        let app = self
+            .get_application_mut(id)
             .ok_or_else(|| format!("Application {} not found", id))?;
 
         if !app.is_installed() {
@@ -286,14 +291,16 @@ impl AppManager {
 
     /// List applications by category
     pub fn list_by_category(&self, category: DesktopAppCategory) -> Vec<&Application> {
-        self.applications.values()
+        self.applications
+            .values()
             .filter(|app| app.category == category)
             .collect()
     }
 
     /// List installed applications
     pub fn list_installed(&self) -> Vec<&Application> {
-        self.applications.values()
+        self.applications
+            .values()
             .filter(|app| app.is_installed())
             .collect()
     }
@@ -301,7 +308,8 @@ impl AppManager {
     /// Search applications
     pub fn search(&self, query: &str) -> Vec<&Application> {
         let query_lower = query.to_lowercase();
-        self.applications.values()
+        self.applications
+            .values()
             .filter(|app| {
                 app.name.to_lowercase().contains(&query_lower)
                     || app.description.to_lowercase().contains(&query_lower)
@@ -311,15 +319,21 @@ impl AppManager {
 
     /// Get statistics
     pub fn get_statistics(&self) -> AppStatistics {
-        let installed_count = self.applications.values()
+        let installed_count = self
+            .applications
+            .values()
             .filter(|app| app.is_installed())
             .count();
 
-        let update_count = self.applications.values()
+        let update_count = self
+            .applications
+            .values()
             .filter(|app| app.has_update())
             .count();
 
-        let total_size: u64 = self.applications.values()
+        let total_size: u64 = self
+            .applications
+            .values()
             .map(|app| app.installed_size)
             .sum();
 
@@ -360,8 +374,14 @@ mod tests {
 
     #[test]
     fn test_app_category_from_str() {
-        assert_eq!(DesktopAppCategory::from_str("development"), Some(DesktopAppCategory::Development));
-        assert_eq!(DesktopAppCategory::from_str("games"), Some(DesktopAppCategory::Games));
+        assert_eq!(
+            DesktopAppCategory::from_str("development"),
+            Some(DesktopAppCategory::Development)
+        );
+        assert_eq!(
+            DesktopAppCategory::from_str("games"),
+            Some(DesktopAppCategory::Games)
+        );
     }
 
     #[test]

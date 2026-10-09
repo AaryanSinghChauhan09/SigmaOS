@@ -6,11 +6,11 @@
 #![cfg_attr(not(any(feature = "standalone_test", test)), no_std)]
 
 #[cfg(any(feature = "standalone_test", test))]
-use std::{string::String, format, vec::Vec};
+use std::{format, string::String, vec::Vec};
 #[cfg(not(any(feature = "standalone_test", test)))]
 extern crate alloc;
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::{string::String, format, vec::Vec};
+use alloc::{format, string::String, vec::Vec};
 
 /// AI provider for panel agent
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -91,7 +91,7 @@ impl OmarchyGrokPanelAgent {
             model,
             system_prompt: String::from(
                 "You are the SigmaOS AI panel agent. Help the user with system tasks, \
-                 code, queries, and productivity. You have access to system tools."
+                 code, queries, and productivity. You have access to system tools.",
             ),
             history: Vec::new(),
             state: PanelState::Idle,
@@ -132,7 +132,11 @@ impl OmarchyGrokPanelAgent {
             self.provider.name(),
             self.model,
             content,
-            if self.tool_calls_enabled { "with" } else { "without" }
+            if self.tool_calls_enabled {
+                "with"
+            } else {
+                "without"
+            }
         );
 
         self.history.push(PanelMessage {

@@ -561,7 +561,6 @@ mod tests {
     }
 
     #[ignore]
-
     #[test]
     fn test_syscall_dispatcher() {
         let mut dispatcher = LinuxSyscallDispatcher::new();

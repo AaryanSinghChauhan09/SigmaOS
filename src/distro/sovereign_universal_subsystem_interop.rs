@@ -178,7 +178,13 @@ impl SovereignUniversalSubsystemInteropEngine {
                 UniversalSubsystemCategory::SecuritySandboxing,
                 true,
                 true,
-                &["capsicum", "pledge_unveil", "landlock_v5", "hardenedbsd_pax", "selinux"],
+                &[
+                    "capsicum",
+                    "pledge_unveil",
+                    "landlock_v5",
+                    "hardenedbsd_pax",
+                    "selinux",
+                ],
                 8,
             ),
         );
@@ -189,7 +195,13 @@ impl SovereignUniversalSubsystemInteropEngine {
                 UniversalSubsystemCategory::FilesystemStorage,
                 true,
                 true,
-                &["zfs_arc", "btrfs_snapper", "bcachefs_tiering", "hammer2_pfs", "apfs_cow"],
+                &[
+                    "zfs_arc",
+                    "btrfs_snapper",
+                    "bcachefs_tiering",
+                    "hammer2_pfs",
+                    "apfs_cow",
+                ],
                 10,
             ),
         );
@@ -200,7 +212,13 @@ impl SovereignUniversalSubsystemInteropEngine {
                 UniversalSubsystemCategory::Networking,
                 true,
                 true,
-                &["freebsd_vnet", "ebpf_xdp", "openbsd_pf", "wireguard_pqc", "crossbow_vnic"],
+                &[
+                    "freebsd_vnet",
+                    "ebpf_xdp",
+                    "openbsd_pf",
+                    "wireguard_pqc",
+                    "crossbow_vnic",
+                ],
                 14,
             ),
         );
@@ -211,7 +229,15 @@ impl SovereignUniversalSubsystemInteropEngine {
                 UniversalSubsystemCategory::PackageManagement,
                 true,
                 true,
-                &["alpm_aur", "dpkg_apt", "nix_flakes", "apk3_cas", "xbps", "portage_ebuild", "freebsd_pkg"],
+                &[
+                    "alpm_aur",
+                    "dpkg_apt",
+                    "nix_flakes",
+                    "apk3_cas",
+                    "xbps",
+                    "portage_ebuild",
+                    "freebsd_pkg",
+                ],
                 16,
             ),
         );
@@ -222,7 +248,14 @@ impl SovereignUniversalSubsystemInteropEngine {
                 UniversalSubsystemCategory::InitSupervisor,
                 true,
                 true,
-                &["systemd_v258", "openrc", "runit", "chimera_dinit", "guix_shepherd", "illumos_smf"],
+                &[
+                    "systemd_v258",
+                    "openrc",
+                    "runit",
+                    "chimera_dinit",
+                    "guix_shepherd",
+                    "illumos_smf",
+                ],
                 9,
             ),
         );
@@ -233,7 +266,13 @@ impl SovereignUniversalSubsystemInteropEngine {
                 UniversalSubsystemCategory::DesktopCompositor,
                 true,
                 true,
-                &["hyprland_wayland", "omarchy_omakase", "cosmic_launcher", "solus_raven", "haiku_beapi"],
+                &[
+                    "hyprland_wayland",
+                    "omarchy_omakase",
+                    "cosmic_launcher",
+                    "solus_raven",
+                    "haiku_beapi",
+                ],
                 11,
             ),
         );
@@ -255,7 +294,12 @@ impl SovereignUniversalSubsystemInteropEngine {
                 UniversalSubsystemCategory::HardwarePower,
                 true,
                 true,
-                &["intel_speedstep", "amd_pstate", "system76_power", "fan_curves"],
+                &[
+                    "intel_speedstep",
+                    "amd_pstate",
+                    "system76_power",
+                    "fan_curves",
+                ],
                 5,
             ),
         );
@@ -266,7 +310,12 @@ impl SovereignUniversalSubsystemInteropEngine {
                 UniversalSubsystemCategory::ContainerVirt,
                 true,
                 true,
-                &["firecracker_microvm", "bhyve_jails", "qubes_isolation", "podman_oci"],
+                &[
+                    "firecracker_microvm",
+                    "bhyve_jails",
+                    "qubes_isolation",
+                    "podman_oci",
+                ],
                 7,
             ),
         );
@@ -277,7 +326,12 @@ impl SovereignUniversalSubsystemInteropEngine {
                 UniversalSubsystemCategory::ObservabilityDiagnostics,
                 true,
                 true,
-                &["dtrace", "ebpf_profiler", "htop_monitor", "opentelemetry_traces"],
+                &[
+                    "dtrace",
+                    "ebpf_profiler",
+                    "htop_monitor",
+                    "opentelemetry_traces",
+                ],
                 8,
             ),
         );
@@ -288,7 +342,12 @@ impl SovereignUniversalSubsystemInteropEngine {
                 UniversalSubsystemCategory::ShellTerminal,
                 true,
                 true,
-                &["omarchy_prompt", "fish_smart_shell", "zsh_starship", "tcsh_bsd"],
+                &[
+                    "omarchy_prompt",
+                    "fish_smart_shell",
+                    "zsh_starship",
+                    "tcsh_bsd",
+                ],
                 7,
             ),
         );
@@ -299,7 +358,12 @@ impl SovereignUniversalSubsystemInteropEngine {
                 UniversalSubsystemCategory::IpcMemory,
                 true,
                 true,
-                &["kaslr_wx", "kfifo_ring", "capsicum_rights", "mmap_zero_copy"],
+                &[
+                    "kaslr_wx",
+                    "kfifo_ring",
+                    "capsicum_rights",
+                    "mmap_zero_copy",
+                ],
                 9,
             ),
         );
@@ -321,7 +385,12 @@ impl SovereignUniversalSubsystemInteropEngine {
                 UniversalSubsystemCategory::InstallerBoot,
                 true,
                 true,
-                &["limine_conf", "grub2_bls", "calamares_wizard", "freebsd_loader"],
+                &[
+                    "limine_conf",
+                    "grub2_bls",
+                    "calamares_wizard",
+                    "freebsd_loader",
+                ],
                 6,
             ),
         );
@@ -398,7 +467,11 @@ impl SovereignUniversalSubsystemInteropEngine {
                 UniversalSubsystemCategory::AiWorkflowAgent,
                 true,
                 true,
-                &["herdr_pair_programming", "tdl_multi_pane", "omakase_agent_bridge"],
+                &[
+                    "herdr_pair_programming",
+                    "tdl_multi_pane",
+                    "omakase_agent_bridge",
+                ],
                 8,
             ),
         );
@@ -409,7 +482,12 @@ impl SovereignUniversalSubsystemInteropEngine {
                 UniversalSubsystemCategory::VirtualizationHypervisor,
                 true,
                 true,
-                &["bhyve_kvm", "vmm_openbsd", "zircon_hypervisor", "firecracker_vm"],
+                &[
+                    "bhyve_kvm",
+                    "vmm_openbsd",
+                    "zircon_hypervisor",
+                    "firecracker_vm",
+                ],
                 7,
             ),
         );
@@ -612,9 +690,11 @@ impl SovereignUniversalSubsystemInteropEngine {
             return false;
         }
 
-        self.subsystem_adapters
-            .values()
-            .all(|adapter| adapter.linux_distro_parity && adapter.bsd_distro_parity && !adapter.supported_protocols.is_empty())
+        self.subsystem_adapters.values().all(|adapter| {
+            adapter.linux_distro_parity
+                && adapter.bsd_distro_parity
+                && !adapter.supported_protocols.is_empty()
+        })
     }
 
     /// Compute overall ecosystem harmony score (0..100).
@@ -644,12 +724,7 @@ impl SovereignUniversalSubsystemInteropEngine {
         let adapter_names: Vec<String> = self.subsystem_adapters.keys().cloned().collect();
 
         for name in adapter_names {
-            self.dispatch_event(
-                &name,
-                "kernel",
-                "sync_distro_mode",
-                distro_mode,
-            )?;
+            self.dispatch_event(&name, "kernel", "sync_distro_mode", distro_mode)?;
             synced_count += 1;
         }
 
@@ -801,8 +876,14 @@ mod tests {
     fn test_category_as_str_and_unknown_event_errors() {
         let mut engine = SovereignUniversalSubsystemInteropEngine::new();
 
-        assert_eq!(UniversalSubsystemCategory::KernelScheduling.as_str(), "KernelScheduling");
-        assert_eq!(UniversalSubsystemCategory::AudioSound.as_str(), "AudioSound");
+        assert_eq!(
+            UniversalSubsystemCategory::KernelScheduling.as_str(),
+            "KernelScheduling"
+        );
+        assert_eq!(
+            UniversalSubsystemCategory::AudioSound.as_str(),
+            "AudioSound"
+        );
 
         let err_origin = engine.dispatch_event("unknown_sub", "kernel", "test", "");
         assert_eq!(err_origin, Err("Unknown origin subsystem"));
@@ -849,18 +930,51 @@ mod tests {
     fn test_expanded_subsystem_categories_interop() {
         let mut engine = SovereignUniversalSubsystemInteropEngine::new();
 
-        assert_eq!(UniversalSubsystemCategory::ShellTerminal.as_str(), "ShellTerminal");
+        assert_eq!(
+            UniversalSubsystemCategory::ShellTerminal.as_str(),
+            "ShellTerminal"
+        );
         assert_eq!(UniversalSubsystemCategory::IpcMemory.as_str(), "IpcMemory");
-        assert_eq!(UniversalSubsystemCategory::DriversHardware.as_str(), "DriversHardware");
-        assert_eq!(UniversalSubsystemCategory::InstallerBoot.as_str(), "InstallerBoot");
-        assert_eq!(UniversalSubsystemCategory::AuthIdentity.as_str(), "AuthIdentity");
-        assert_eq!(UniversalSubsystemCategory::I18nLocalization.as_str(), "I18nLocalization");
-        assert_eq!(UniversalSubsystemCategory::MediaGraphics.as_str(), "MediaGraphics");
-        assert_eq!(UniversalSubsystemCategory::CompilerToolchain.as_str(), "CompilerToolchain");
-        assert_eq!(UniversalSubsystemCategory::AutomationProvisioning.as_str(), "AutomationProvisioning");
-        assert_eq!(UniversalSubsystemCategory::SystemAudit.as_str(), "SystemAudit");
-        assert_eq!(UniversalSubsystemCategory::AiWorkflowAgent.as_str(), "AiWorkflowAgent");
-        assert_eq!(UniversalSubsystemCategory::VirtualizationHypervisor.as_str(), "VirtualizationHypervisor");
+        assert_eq!(
+            UniversalSubsystemCategory::DriversHardware.as_str(),
+            "DriversHardware"
+        );
+        assert_eq!(
+            UniversalSubsystemCategory::InstallerBoot.as_str(),
+            "InstallerBoot"
+        );
+        assert_eq!(
+            UniversalSubsystemCategory::AuthIdentity.as_str(),
+            "AuthIdentity"
+        );
+        assert_eq!(
+            UniversalSubsystemCategory::I18nLocalization.as_str(),
+            "I18nLocalization"
+        );
+        assert_eq!(
+            UniversalSubsystemCategory::MediaGraphics.as_str(),
+            "MediaGraphics"
+        );
+        assert_eq!(
+            UniversalSubsystemCategory::CompilerToolchain.as_str(),
+            "CompilerToolchain"
+        );
+        assert_eq!(
+            UniversalSubsystemCategory::AutomationProvisioning.as_str(),
+            "AutomationProvisioning"
+        );
+        assert_eq!(
+            UniversalSubsystemCategory::SystemAudit.as_str(),
+            "SystemAudit"
+        );
+        assert_eq!(
+            UniversalSubsystemCategory::AiWorkflowAgent.as_str(),
+            "AiWorkflowAgent"
+        );
+        assert_eq!(
+            UniversalSubsystemCategory::VirtualizationHypervisor.as_str(),
+            "VirtualizationHypervisor"
+        );
 
         assert!(engine.subsystem_adapters.contains_key("shell"));
         assert!(engine.subsystem_adapters.contains_key("ipc_mem"));

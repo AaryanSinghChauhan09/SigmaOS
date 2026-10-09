@@ -215,7 +215,9 @@ impl ModuleLoadingController {
                     _ => (false, String::from("Module is not signed")),
                 },
                 ModuleLoadPolicy::SignedAndVerified => match module.signature_state {
-                    ModuleSignatureState::Valid => (true, String::from("Module signature is valid")),
+                    ModuleSignatureState::Valid => {
+                        (true, String::from("Module signature is valid"))
+                    }
                     _ => (false, String::from("Module signature is not valid")),
                 },
                 ModuleLoadPolicy::Disabled => (false, String::from("Module loading is disabled")),
@@ -234,7 +236,10 @@ impl ModuleLoadingController {
         if let Some(module) = self.modules.get_mut(name) {
             if module.loaded {
                 module.ref_count += 1;
-                Ok(format!("Module {} ref count increased to {}", name, module.ref_count))
+                Ok(format!(
+                    "Module {} ref count increased to {}",
+                    name, module.ref_count
+                ))
             } else {
                 module.loaded = true;
                 module.ref_count = 1;
@@ -253,7 +258,10 @@ impl ModuleLoadingController {
 
             if module.ref_count > 1 {
                 module.ref_count -= 1;
-                Ok(format!("Module {} ref count decreased to {}", name, module.ref_count))
+                Ok(format!(
+                    "Module {} ref count decreased to {}",
+                    name, module.ref_count
+                ))
             } else {
                 module.loaded = false;
                 module.ref_count = 0;

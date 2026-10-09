@@ -35,19 +35,31 @@ impl Resolution {
     }
 
     pub fn native() -> Self {
-        Resolution { width: 0, height: 0 }
+        Resolution {
+            width: 0,
+            height: 0,
+        }
     }
 
     pub fn hd720() -> Self {
-        Resolution { width: 1280, height: 720 }
+        Resolution {
+            width: 1280,
+            height: 720,
+        }
     }
 
     pub fn hd1080() -> Self {
-        Resolution { width: 1920, height: 1080 }
+        Resolution {
+            width: 1920,
+            height: 1080,
+        }
     }
 
     pub fn uhd4k() -> Self {
-        Resolution { width: 3840, height: 2160 }
+        Resolution {
+            width: 3840,
+            height: 2160,
+        }
     }
 
     pub fn is_native(&self) -> bool {
@@ -179,10 +191,7 @@ impl ScreenRecorder {
 
     /// Detect available webcams
     pub fn detect_webcams(&mut self) {
-        self.available_webcams = vec![
-            "/dev/video0".to_string(),
-            "/dev/video1".to_string(),
-        ];
+        self.available_webcams = vec!["/dev/video0".to_string(), "/dev/video1".to_string()];
     }
 
     /// Get available webcams
@@ -361,7 +370,12 @@ impl ScreenRecorder {
 
     /// Delete session
     pub fn delete_session(&mut self, id: &str) -> Result<(), String> {
-        if self.current_session.as_ref().map(|s| s.id == id).unwrap_or(false) {
+        if self
+            .current_session
+            .as_ref()
+            .map(|s| s.id == id)
+            .unwrap_or(false)
+        {
             return Err("Cannot delete current session".to_string());
         }
 
@@ -459,7 +473,10 @@ mod tests {
         recorder.enable_webcam(true);
         assert!(recorder.config.webcam_enabled);
         recorder.set_webcam_device(Some("/dev/video0".to_string()));
-        assert_eq!(recorder.config.webcam_device, Some("/dev/video0".to_string()));
+        assert_eq!(
+            recorder.config.webcam_device,
+            Some("/dev/video0".to_string())
+        );
     }
 
     #[test]

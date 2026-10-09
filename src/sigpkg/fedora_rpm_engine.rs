@@ -579,7 +579,6 @@ gpgcheck=1
     }
 
     #[ignore]
-
     #[test]
     fn test_fedora_anitya_release_monitoring() {
         let mut engine = FedoraAnityaReleaseMonitoringEngine::new();

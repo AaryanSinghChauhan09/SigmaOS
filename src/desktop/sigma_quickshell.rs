@@ -29,7 +29,10 @@ pub struct ReactiveCell<T: Clone + PartialEq> {
 
 impl<T: Clone + PartialEq> ReactiveCell<T> {
     pub fn new(value: T) -> Self {
-        Self { value, generation: 0 }
+        Self {
+            value,
+            generation: 0,
+        }
     }
 
     /// Set a new value. Returns `true` if the value changed.
@@ -66,13 +69,48 @@ pub struct Anchors {
 }
 
 impl Anchors {
-    pub const TOP_LEFT: Self = Self { top: true, bottom: false, left: true, right: false };
-    pub const TOP_RIGHT: Self = Self { top: true, bottom: false, left: false, right: true };
-    pub const BOTTOM_LEFT: Self = Self { top: false, bottom: true, left: true, right: false };
-    pub const BOTTOM_RIGHT: Self = Self { top: false, bottom: true, left: false, right: true };
-    pub const TOP_FILL: Self = Self { top: true, bottom: false, left: true, right: true };
-    pub const BOTTOM_FILL: Self = Self { top: false, bottom: true, left: true, right: true };
-    pub const FILL: Self = Self { top: true, bottom: true, left: true, right: true };
+    pub const TOP_LEFT: Self = Self {
+        top: true,
+        bottom: false,
+        left: true,
+        right: false,
+    };
+    pub const TOP_RIGHT: Self = Self {
+        top: true,
+        bottom: false,
+        left: false,
+        right: true,
+    };
+    pub const BOTTOM_LEFT: Self = Self {
+        top: false,
+        bottom: true,
+        left: true,
+        right: false,
+    };
+    pub const BOTTOM_RIGHT: Self = Self {
+        top: false,
+        bottom: true,
+        left: false,
+        right: true,
+    };
+    pub const TOP_FILL: Self = Self {
+        top: true,
+        bottom: false,
+        left: true,
+        right: true,
+    };
+    pub const BOTTOM_FILL: Self = Self {
+        top: false,
+        bottom: true,
+        left: true,
+        right: true,
+    };
+    pub const FILL: Self = Self {
+        top: true,
+        bottom: true,
+        left: true,
+        right: true,
+    };
 }
 
 /// Layer surface layer (wlr-layer-shell protocol)
@@ -128,16 +166,40 @@ pub struct PanelContent {
 
 #[derive(Debug, Clone)]
 pub enum PanelItem {
-    Clock { format: String },
-    WorkspaceIndicator { active_color: String, inactive_color: String },
+    Clock {
+        format: String,
+    },
+    WorkspaceIndicator {
+        active_color: String,
+        inactive_color: String,
+    },
     SystemTray,
-    Volume { show_icon: bool, show_percent: bool },
-    Battery { show_icon: bool, show_percent: bool },
-    Network { show_ssid: bool },
-    Memory { show_bar: bool },
-    Cpu { show_graph: bool },
-    AppMenu { icon: String, label: String },
-    Custom { id: String, command: String, interval_ms: u32 },
+    Volume {
+        show_icon: bool,
+        show_percent: bool,
+    },
+    Battery {
+        show_icon: bool,
+        show_percent: bool,
+    },
+    Network {
+        show_ssid: bool,
+    },
+    Memory {
+        show_bar: bool,
+    },
+    Cpu {
+        show_graph: bool,
+    },
+    AppMenu {
+        icon: String,
+        label: String,
+    },
+    Custom {
+        id: String,
+        command: String,
+        interval_ms: u32,
+    },
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -145,7 +207,11 @@ pub enum PanelItem {
 // ─────────────────────────────────────────────────────────────────────────────
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum NotificationUrgency { Low, Normal, Critical }
+pub enum NotificationUrgency {
+    Low,
+    Normal,
+    Critical,
+}
 
 #[derive(Debug, Clone)]
 pub struct NotificationContent {
@@ -203,13 +269,21 @@ impl LauncherContent {
 
         let mut score = 0u32;
         // Exact name match
-        if name_lower == query_lower { score += 1000; }
+        if name_lower == query_lower {
+            score += 1000;
+        }
         // Starts-with match
-        if name_lower.starts_with(&query_lower) { score += 500; }
+        if name_lower.starts_with(&query_lower) {
+            score += 500;
+        }
         // Contains match
-        if name_lower.contains(&query_lower) { score += 100; }
+        if name_lower.contains(&query_lower) {
+            score += 100;
+        }
         // Description match
-        if entry.description.to_lowercase().contains(&query_lower) { score += 20; }
+        if entry.description.to_lowercase().contains(&query_lower) {
+            score += 20;
+        }
         // Frequency bonus
         score += entry.frequency.min(50);
         score
@@ -223,9 +297,9 @@ impl LauncherContent {
 #[derive(Debug, Clone)]
 pub struct StatusBarModule {
     pub name: String,
-    pub text: String,       // display text
-    pub tooltip: String,    // hover tooltip
-    pub class: String,      // CSS class
+    pub text: String,    // display text
+    pub tooltip: String, // hover tooltip
+    pub class: String,   // CSS class
     pub percentage: Option<u8>,
     pub icon: Option<String>,
     pub on_click: Option<String>, // shell command
@@ -311,15 +385,21 @@ impl SigmaQuickshell {
                         inactive_color: "#565f89".to_string(),
                     },
                 ],
-                center_items: alloc::vec![
-                    PanelItem::Clock { format: "%A, %B %-d  %H:%M".to_string() },
-                ],
+                center_items: alloc::vec![PanelItem::Clock {
+                    format: "%A, %B %-d  %H:%M".to_string()
+                },],
                 right_items: alloc::vec![
                     PanelItem::Cpu { show_graph: false },
                     PanelItem::Memory { show_bar: false },
                     PanelItem::Network { show_ssid: true },
-                    PanelItem::Volume { show_icon: true, show_percent: true },
-                    PanelItem::Battery { show_icon: true, show_percent: true },
+                    PanelItem::Volume {
+                        show_icon: true,
+                        show_percent: true
+                    },
+                    PanelItem::Battery {
+                        show_icon: true,
+                        show_percent: true
+                    },
                     PanelItem::SystemTray,
                 ],
                 height_px: 32,
@@ -349,13 +429,30 @@ impl SigmaQuickshell {
 /// Hyprland workspace event (from socket)
 #[derive(Debug, Clone)]
 pub enum HyprlandEvent {
-    WorkspaceChanged { id: u32, name: String },
-    WindowFocused { address: u64, class: String, title: String },
-    WindowClosed { address: u64 },
-    MonitorAdded { name: String },
-    MonitorRemoved { name: String },
-    Fullscreen { entered: bool },
-    SubMap { name: String },
+    WorkspaceChanged {
+        id: u32,
+        name: String,
+    },
+    WindowFocused {
+        address: u64,
+        class: String,
+        title: String,
+    },
+    WindowClosed {
+        address: u64,
+    },
+    MonitorAdded {
+        name: String,
+    },
+    MonitorRemoved {
+        name: String,
+    },
+    Fullscreen {
+        entered: bool,
+    },
+    SubMap {
+        name: String,
+    },
 }
 
 impl HyprlandEvent {
@@ -365,14 +462,19 @@ impl HyprlandEvent {
         match event {
             "workspace" => {
                 let id = data.trim().parse::<u32>().ok()?;
-                Some(HyprlandEvent::WorkspaceChanged { id, name: alloc::format!("{}", id) })
+                Some(HyprlandEvent::WorkspaceChanged {
+                    id,
+                    name: alloc::format!("{}", id),
+                })
             }
             "focusedmon" => None, // ignore for now
             "fullscreen" => {
                 let entered = data.trim() == "1";
                 Some(HyprlandEvent::Fullscreen { entered })
             }
-            "submap" => Some(HyprlandEvent::SubMap { name: data.to_string() }),
+            "submap" => Some(HyprlandEvent::SubMap {
+                name: data.to_string(),
+            }),
             _ => None,
         }
     }
@@ -445,10 +547,16 @@ mod tests {
     #[test]
     fn test_hyprland_event_parsing() {
         let ev = HyprlandEvent::parse("workspace>>3");
-        assert!(matches!(ev, Some(HyprlandEvent::WorkspaceChanged { id: 3, .. })));
+        assert!(matches!(
+            ev,
+            Some(HyprlandEvent::WorkspaceChanged { id: 3, .. })
+        ));
 
         let fullscreen = HyprlandEvent::parse("fullscreen>>1");
-        assert!(matches!(fullscreen, Some(HyprlandEvent::Fullscreen { entered: true })));
+        assert!(matches!(
+            fullscreen,
+            Some(HyprlandEvent::Fullscreen { entered: true })
+        ));
 
         let unknown = HyprlandEvent::parse("unknownevent>>data");
         assert!(unknown.is_none());
@@ -460,6 +568,8 @@ mod tests {
         assert!(Anchors::TOP_FILL.left);
         assert!(Anchors::TOP_FILL.right);
         assert!(!Anchors::TOP_FILL.bottom);
-        assert!(Anchors::FILL.top && Anchors::FILL.bottom && Anchors::FILL.left && Anchors::FILL.right);
+        assert!(
+            Anchors::FILL.top && Anchors::FILL.bottom && Anchors::FILL.left && Anchors::FILL.right
+        );
     }
 }

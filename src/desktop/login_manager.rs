@@ -162,7 +162,8 @@ impl DesktopLoginManager {
         self.desktop_environments.insert(gnome.id.clone(), gnome);
         self.desktop_environments.insert(kde.id.clone(), kde);
         self.desktop_environments.insert(xfce.id.clone(), xfce);
-        self.desktop_environments.insert(cinnamon.id.clone(), cinnamon);
+        self.desktop_environments
+            .insert(cinnamon.id.clone(), cinnamon);
         self.desktop_environments.insert(mate.id.clone(), mate);
     }
 
@@ -260,7 +261,10 @@ impl DesktopLoginManager {
             .collect()
     }
 
-    pub fn get_desktop_environments_by_type(&self, session_type: LoginSessionType) -> Vec<&LoginDesktopEnvironment> {
+    pub fn get_desktop_environments_by_type(
+        &self,
+        session_type: LoginSessionType,
+    ) -> Vec<&LoginDesktopEnvironment> {
         self.desktop_environments
             .values()
             .filter(|de| de.session_type == session_type)
@@ -308,11 +312,8 @@ impl DesktopLoginManager {
 
             let session_type = de.session_type;
 
-            let session = LoginUserSession::new(
-                username.to_string(),
-                display.to_string(),
-                session_type,
-            );
+            let session =
+                LoginUserSession::new(username.to_string(), display.to_string(), session_type);
 
             let id = self.add_session(session);
             self.set_active_session(&id);
@@ -524,9 +525,21 @@ mod tests {
     fn test_get_sessions_by_user() {
         let mut manager = DesktopLoginManager::new();
 
-        manager.add_session(LoginUserSession::new("user1".to_string(), ":0".to_string(), LoginSessionType::Wayland));
-        manager.add_session(LoginUserSession::new("user1".to_string(), ":1".to_string(), LoginSessionType::Wayland));
-        manager.add_session(LoginUserSession::new("user2".to_string(), ":2".to_string(), LoginSessionType::Wayland));
+        manager.add_session(LoginUserSession::new(
+            "user1".to_string(),
+            ":0".to_string(),
+            LoginSessionType::Wayland,
+        ));
+        manager.add_session(LoginUserSession::new(
+            "user1".to_string(),
+            ":1".to_string(),
+            LoginSessionType::Wayland,
+        ));
+        manager.add_session(LoginUserSession::new(
+            "user2".to_string(),
+            ":2".to_string(),
+            LoginSessionType::Wayland,
+        ));
 
         let user1_sessions = manager.get_sessions_by_user("user1");
         assert_eq!(user1_sessions.len(), 2);

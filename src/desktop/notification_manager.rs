@@ -81,7 +81,8 @@ impl DesktopNotification {
         let expires_at = SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .unwrap()
-            .as_secs() + expires_seconds as u64;
+            .as_secs()
+            + expires_seconds as u64;
         self.expires_at = Some(expires_at);
     }
 
@@ -130,7 +131,13 @@ impl DesktopNotificationManager {
     }
 
     /// Send a notification
-    pub fn send(&mut self, app_name: String, title: String, body: String, urgency: DesktopNotificationUrgency) -> String {
+    pub fn send(
+        &mut self,
+        app_name: String,
+        title: String,
+        body: String,
+        urgency: DesktopNotificationUrgency,
+    ) -> String {
         if self.do_not_disturb && urgency != DesktopNotificationUrgency::Critical {
             // Return ID but don't store if DND is enabled and not critical
             let id = format!("notif-{}", self.next_id);
@@ -141,13 +148,7 @@ impl DesktopNotificationManager {
         let id = format!("notif-{}", self.next_id);
         self.next_id += 1;
 
-        let notification = DesktopNotification::new(
-            id.clone(),
-            app_name,
-            title,
-            body,
-            urgency,
-        );
+        let notification = DesktopNotification::new(id.clone(), app_name, title, body, urgency);
 
         self.notifications.insert(id.clone(), notification);
         id
@@ -165,28 +166,36 @@ impl DesktopNotificationManager {
 
     /// List active notifications
     pub fn list_active(&self) -> Vec<&DesktopNotification> {
-        self.notifications.values()
+        self.notifications
+            .values()
             .filter(|n| !n.is_dismissed && !n.is_expired())
             .collect()
     }
 
     /// List by urgency
-    pub fn list_by_urgency(&self, urgency: DesktopNotificationUrgency) -> Vec<&DesktopNotification> {
-        self.notifications.values()
+    pub fn list_by_urgency(
+        &self,
+        urgency: DesktopNotificationUrgency,
+    ) -> Vec<&DesktopNotification> {
+        self.notifications
+            .values()
             .filter(|n| n.urgency == urgency)
             .collect()
     }
 
     /// List by app
     pub fn list_by_app(&self, app_name: &str) -> Vec<&DesktopNotification> {
-        self.notifications.values()
+        self.notifications
+            .values()
             .filter(|n| n.app_name == app_name)
             .collect()
     }
 
     /// Dismiss a notification
     pub fn dismiss(&mut self, id: &str) -> Result<(), String> {
-        let notification = self.notifications.get_mut(id)
+        let notification = self
+            .notifications
+            .get_mut(id)
             .ok_or_else(|| format!("Notification {} not found", id))?;
 
         notification.dismiss();
@@ -202,14 +211,17 @@ impl DesktopNotificationManager {
 
     /// Remove a notification
     pub fn remove(&mut self, id: &str) -> Result<(), String> {
-        self.notifications.remove(id)
+        self.notifications
+            .remove(id)
             .ok_or_else(|| format!("Notification {} not found", id))?;
         Ok(())
     }
 
     /// Clear expired notifications
     pub fn clear_expired(&mut self) -> usize {
-        let expired_ids: Vec<String> = self.notifications.values()
+        let expired_ids: Vec<String> = self
+            .notifications
+            .values()
             .filter(|n| n.is_expired())
             .map(|n| n.id.clone())
             .collect();
@@ -224,7 +236,9 @@ impl DesktopNotificationManager {
 
     /// Clear dismissed notifications
     pub fn clear_dismissed(&mut self) -> usize {
-        let dismissed_ids: Vec<String> = self.notifications.values()
+        let dismissed_ids: Vec<String> = self
+            .notifications
+            .values()
             .filter(|n| n.is_dismissed)
             .map(|n| n.id.clone())
             .collect();
@@ -240,16 +254,24 @@ impl DesktopNotificationManager {
     /// Get statistics
     pub fn get_statistics(&self) -> DesktopNotificationStatistics {
         let total_notifications = self.notifications.len();
-        let active_count = self.notifications.values()
+        let active_count = self
+            .notifications
+            .values()
             .filter(|n| !n.is_dismissed && !n.is_expired())
             .count();
-        let dismissed_count = self.notifications.values()
+        let dismissed_count = self
+            .notifications
+            .values()
             .filter(|n| n.is_dismissed)
             .count();
-        let expired_count = self.notifications.values()
+        let expired_count = self
+            .notifications
+            .values()
             .filter(|n| n.is_expired())
             .count();
-        let critical_count = self.notifications.values()
+        let critical_count = self
+            .notifications
+            .values()
             .filter(|n| n.urgency == DesktopNotificationUrgency::Critical)
             .count();
 
@@ -287,8 +309,14 @@ mod tests {
 
     #[test]
     fn test_notification_urgency_from_str() {
-        assert_eq!(DesktopNotificationUrgency::from_str("low"), Some(DesktopNotificationUrgency::Low));
-        assert_eq!(DesktopNotificationUrgency::from_str("critical"), Some(DesktopNotificationUrgency::Critical));
+        assert_eq!(
+            DesktopNotificationUrgency::from_str("low"),
+            Some(DesktopNotificationUrgency::Low)
+        );
+        assert_eq!(
+            DesktopNotificationUrgency::from_str("critical"),
+            Some(DesktopNotificationUrgency::Critical)
+        );
     }
 
     #[test]
@@ -326,7 +354,7 @@ mod tests {
         let mut manager = DesktopNotificationManager::new();
         manager.set_dnd(true);
         assert!(manager.is_dnd_enabled());
-        
+
         // Normal notification should not be stored in DND mode
         let id = manager.send(
             "TestApp".to_string(),
@@ -335,7 +363,7 @@ mod tests {
             DesktopNotificationUrgency::Normal,
         );
         assert!(manager.get(&id).is_none());
-        
+
         // Critical notification should still work
         let id = manager.send(
             "TestApp".to_string(),

@@ -527,9 +527,24 @@ impl SovereignWebAppManager {
 
     fn init_stock_apps(&mut self) {
         let sample = [
-            ("web-youtube-music", "YouTube Music", "https://music.youtube.com", "multimedia-audio-player"),
-            ("web-discord", "Discord", "https://discord.com/app", "chat-message"),
-            ("web-github", "GitHub Enterprise", "https://github.com", "code-fork"),
+            (
+                "web-youtube-music",
+                "YouTube Music",
+                "https://music.youtube.com",
+                "multimedia-audio-player",
+            ),
+            (
+                "web-discord",
+                "Discord",
+                "https://discord.com/app",
+                "chat-message",
+            ),
+            (
+                "web-github",
+                "GitHub Enterprise",
+                "https://github.com",
+                "code-fork",
+            ),
         ];
 
         for (id, name, url, icon) in sample {
@@ -560,7 +575,10 @@ impl SovereignWebAppManager {
     pub fn launch_app(&self, app_id: &str) -> Result<String, &'static str> {
         if let Some(app) = self.apps.get(app_id) {
             self.total_launches.fetch_add(1, Ordering::Relaxed);
-            Ok(format!("Spawned isolated webapp '{}' -> {}", app.name, app.target_url))
+            Ok(format!(
+                "Spawned isolated webapp '{}' -> {}",
+                app.name, app.target_url
+            ))
         } else {
             Err("WebApp ID not found")
         }
@@ -616,7 +634,15 @@ impl SovereignKeyboardShortcutRemapper {
     fn register_stock_shortcuts(&mut self) {
         let stock = [
             ("launch-term", 36, true, false, false, true, "sigma-term"), // Super+Enter
-            ("launch-browser", 48, false, false, false, true, "sigma-browser"), // Super+B
+            (
+                "launch-browser",
+                48,
+                false,
+                false,
+                false,
+                true,
+                "sigma-browser",
+            ), // Super+B
             ("lock-session", 38, true, true, false, false, "sigma-lock"), // Ctrl+Alt+L
         ];
 
@@ -626,7 +652,12 @@ impl SovereignKeyboardShortcutRemapper {
                 CustomShortcutAction {
                     shortcut_id: id.to_string(),
                     keycode: code,
-                    modifiers: KeyModifiers { ctrl, alt, shift, super_key: sup },
+                    modifiers: KeyModifiers {
+                        ctrl,
+                        alt,
+                        shift,
+                        super_key: sup,
+                    },
                     command: cmd.to_string(),
                     is_enabled: true,
                 },
@@ -643,7 +674,8 @@ impl SovereignKeyboardShortcutRemapper {
     }
 
     pub fn set_gaming_suppression(&self, suppress: bool) {
-        self.gaming_mode_suppression.store(suppress, Ordering::SeqCst);
+        self.gaming_mode_suppression
+            .store(suppress, Ordering::SeqCst);
     }
 
     pub fn evaluate_shortcut(&self, keycode: u32, mods: KeyModifiers) -> Option<&str> {
@@ -760,7 +792,12 @@ mod tests {
         let remapper = SovereignKeyboardShortcutRemapper::new();
         assert!(remapper.is_caps_as_ctrl());
 
-        let mods = KeyModifiers { ctrl: true, alt: false, shift: false, super_key: true };
+        let mods = KeyModifiers {
+            ctrl: true,
+            alt: false,
+            shift: false,
+            super_key: true,
+        };
         let cmd = remapper.evaluate_shortcut(36, mods);
         assert_eq!(cmd, Some("sigma-term"));
 

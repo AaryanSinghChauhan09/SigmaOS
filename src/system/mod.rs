@@ -12,16 +12,16 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-pub mod service_manager;
+pub mod boot_manager;
+pub mod power_manager;
 pub mod scheduler_manager;
+pub mod service_manager;
+pub mod settings_manager;
+pub mod system_manager;
 pub mod system_monitor;
 pub mod task_manager;
 pub mod update_manager;
-pub mod system_manager;
-pub mod power_manager;
 pub mod user_manager;
-pub mod boot_manager;
-pub mod settings_manager;
 
 // SigmaOS System Utilities Module
 // System-level utilities and tools
@@ -57,6 +57,7 @@ pub use abi::{
 
 pub use automation::{AutomationTask, AutomationTaskKind, SovereignAutomationEngine, TaskStatus};
 
+pub use boot_manager::{BootManager, StartupEntry, StartupStatistics, StartupType};
 pub use cleanup::{
     CacheStrategy, CleanupError, CleanupStats, CleanupStrategy, LogFileStrategy,
     SystemCleanupManager, TempFileStrategy,
@@ -87,6 +88,10 @@ pub use power::{
     BatterySaverManager, BatteryStatus, CpuPowerStrategy, DisplayPowerStrategy,
     NetworkPowerStrategy, PowerError, PowerMode, PowerResult, PowerStrategy,
 };
+pub use power_manager::{
+    BatteryInfo, PowerBatteryStatus, PowerConfig, PowerManager, PowerProfile, PowerSource,
+    PowerStatistics, SleepAction,
+};
 pub use process_supervisor::{
     ProcessConfig, ProcessState, ProcessStatus, ProcessSupervisor, SupervisorError,
 };
@@ -95,9 +100,15 @@ pub use sandbox::{
     ResourceLimits, ResourceUsage, SandboxEnforcement, SandboxError, SandboxOperation,
     SandboxProcess, SandboxProfile, SandboxResult,
 };
+pub use scheduler_manager::{
+    ScheduleFrequency, ScheduleStatus, ScheduledTask, SchedulerManager, SchedulerStatistics,
+};
 pub use service_manager::{
     SystemRestartPolicy, SystemService, SystemServiceConfig, SystemServiceManager,
     SystemServiceState, SystemServiceType,
+};
+pub use settings_manager::{
+    SettingCategory, SettingEntry, SettingValue, SettingsManager, SettingsStatistics,
 };
 pub use shredder::{
     Dod5220Shredder, FileShredder, GutmannShredder, RandomPassShredder, ShredderError,
@@ -120,33 +131,21 @@ pub use state::{
     StateError, StateNode, StateValue, SystemConfiguration,
 };
 pub use syslog::{LogAction, LogEntry, LogFacility, LogLevel, LogRule, SyslogError, SyslogManager};
-pub use user::{Group, ShadowEntry, SudoPolicyEngine, SudoersRule, User, UserError, UserManager};
-pub use update_manager::{
-    UpdateCategory, UpdateConfig, UpdateLevel, UpdateManager, UpdatePackage, UpdateStatistics,
-};
 pub use system_manager::{
     CpuInfo, DiskInfo, MemoryInfo, NetworkInfo, SystemHealth, SystemInfo, SystemManager,
     SystemSummary,
 };
-pub use power_manager::{
-    BatteryInfo, PowerBatteryStatus, PowerConfig, PowerManager, PowerProfile, PowerSource,
-    PowerStatistics, SleepAction,
-};
-pub use user_manager::{UserAccount, UserManager as AccountManager, UserStatistics, UserType};
-pub use boot_manager::{StartupEntry, BootManager, StartupStatistics, StartupType};
-pub use settings_manager::{
-    SettingCategory, SettingEntry, SettingValue, SettingsManager, SettingsStatistics,
-};
 pub use system_monitor::{
-    CpuCore, DiskPartition, RamMemoryInfo, NetworkInterface,
-    SystemMonitor, SystemMonitorStatistics,
+    CpuCore, DiskPartition, NetworkInterface, RamMemoryInfo, SystemMonitor, SystemMonitorStatistics,
 };
 pub use task_manager::{
-    TaskProcessEntry, TaskProcessState, ProcessTaskManager, ProcessTaskStatistics,
+    ProcessTaskManager, ProcessTaskStatistics, TaskProcessEntry, TaskProcessState,
 };
-pub use scheduler_manager::{
-    ScheduleFrequency, ScheduleStatus, ScheduledTask, SchedulerManager, SchedulerStatistics,
+pub use update_manager::{
+    UpdateCategory, UpdateConfig, UpdateLevel, UpdateManager, UpdatePackage, UpdateStatistics,
 };
+pub use user::{Group, ShadowEntry, SudoPolicyEngine, SudoersRule, User, UserError, UserManager};
+pub use user_manager::{UserAccount, UserManager as AccountManager, UserStatistics, UserType};
 
 pub mod atomic_upgrade;
 

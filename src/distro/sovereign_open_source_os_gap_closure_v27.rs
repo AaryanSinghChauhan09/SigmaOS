@@ -28,12 +28,18 @@ use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Plan9LMessageType {
-    Tversion, Rversion,
-    Tattach, Rattach,
-    Twalk, Rwalk,
-    Tread, Rread,
-    Twrite, Rwrite,
-    Tclunk, Rclunk,
+    Tversion,
+    Rversion,
+    Tattach,
+    Rattach,
+    Twalk,
+    Rwalk,
+    Tread,
+    Rread,
+    Twrite,
+    Rwrite,
+    Tclunk,
+    Rclunk,
 }
 
 #[derive(Debug, Clone)]
@@ -281,10 +287,19 @@ impl AndroidApexContainerRollbackEngine {
     }
 
     pub fn rollback_apex(&mut self, name: &str) -> bool {
-        if let Some(pos) = self.packages.iter().position(|p| p.package_name == name && p.is_active) {
+        if let Some(pos) = self
+            .packages
+            .iter()
+            .position(|p| p.package_name == name && p.is_active)
+        {
             self.packages[pos].is_active = false;
             let active_ver = self.packages[pos].version_code;
-            if let Some(prev) = self.packages.iter_mut().filter(|p| p.package_name == name && p.version_code < active_ver).max_by_key(|p| p.version_code) {
+            if let Some(prev) = self
+                .packages
+                .iter_mut()
+                .filter(|p| p.package_name == name && p.version_code < active_ver)
+                .max_by_key(|p| p.version_code)
+            {
                 prev.is_active = true;
                 return true;
             }

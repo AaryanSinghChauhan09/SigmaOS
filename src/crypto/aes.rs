@@ -244,7 +244,9 @@ impl AuthenticatedEncryption for SimpleAuthenticatedEncryption {
         iv: &[u8],
         _aad: &[u8],
     ) -> Result<(Vec<u8>, Vec<u8>), CipherError> {
-        let ciphertext = self.cipher_manager.encrypt_data(3, plaintext, key, Some(iv))?;
+        let ciphertext = self
+            .cipher_manager
+            .encrypt_data(3, plaintext, key, Some(iv))?;
 
         let tag = vec![0u8; 16];
         Ok((ciphertext, tag))
@@ -258,7 +260,8 @@ impl AuthenticatedEncryption for SimpleAuthenticatedEncryption {
         iv: &[u8],
         _aad: &[u8],
     ) -> Result<Vec<u8>, CipherError> {
-        self.cipher_manager.decrypt_data(3, ciphertext, key, Some(iv))
+        self.cipher_manager
+            .decrypt_data(3, ciphertext, key, Some(iv))
     }
 }
 

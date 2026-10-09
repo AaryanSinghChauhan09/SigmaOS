@@ -944,10 +944,9 @@ impl SovereignMissingLinuxBsdSuite {
                 "Signify verified: {}",
                 self.signify.verified_signatures_count
             ),
-            "makepkg" | "arch" | "pkgbuild" => format!(
-                "Arch makepkg package: {}",
-                self.makepkg.build_pkg_tar_zst()
-            ),
+            "makepkg" | "arch" | "pkgbuild" => {
+                format!("Arch makepkg package: {}", self.makepkg.build_pkg_tar_zst())
+            }
             "flake" | "nix" => format!("Flake lock valid: {}", self.flake.evaluate_flake()),
             "hammer2" | "pfs" => format!("PFS subvolumes: {}", self.hammer2.pfs_subvolumes.len()),
             "zfs" | "dtrace" => format!(

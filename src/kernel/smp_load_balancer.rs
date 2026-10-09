@@ -63,25 +63,47 @@ impl SmpTopology {
                 },
             ],
             smt_pairs: vec![
-                SmtPair { logical_cpu_a: 0, logical_cpu_b: 1, physical_core: 0 },
-                SmtPair { logical_cpu_a: 2, logical_cpu_b: 3, physical_core: 1 },
+                SmtPair {
+                    logical_cpu_a: 0,
+                    logical_cpu_b: 1,
+                    physical_core: 0,
+                },
+                SmtPair {
+                    logical_cpu_a: 2,
+                    logical_cpu_b: 3,
+                    physical_core: 1,
+                },
             ],
             cache_domains: vec![
-                CacheDomain { level: 3, shared_cpus: vec![0, 1], size_kb: 8192 },
-                CacheDomain { level: 3, shared_cpus: vec![2, 3], size_kb: 8192 },
+                CacheDomain {
+                    level: 3,
+                    shared_cpus: vec![0, 1],
+                    size_kb: 8192,
+                },
+                CacheDomain {
+                    level: 3,
+                    shared_cpus: vec![2, 3],
+                    size_kb: 8192,
+                },
             ],
         }
     }
 
     pub fn numa_node_for_cpu(&self, cpu: u32) -> Option<u32> {
-        self.numa_nodes.iter().find(|n| n.cpu_ids.contains(&cpu)).map(|n| n.node_id)
+        self.numa_nodes
+            .iter()
+            .find(|n| n.cpu_ids.contains(&cpu))
+            .map(|n| n.node_id)
     }
 
     pub fn numa_distance(&self, cpu_a: u32, cpu_b: u32) -> u32 {
         let node_a = self.numa_node_for_cpu(cpu_a).unwrap_or(0);
         let node_b = self.numa_node_for_cpu(cpu_b).unwrap_or(0);
-        if node_a == node_b { return 10; }
-        self.numa_nodes.iter()
+        if node_a == node_b {
+            return 10;
+        }
+        self.numa_nodes
+            .iter()
             .find(|n| n.node_id == node_a)
             .and_then(|n| n.distance_to.get(&node_b))
             .copied()
@@ -118,10 +140,9 @@ impl Task {
     /// Linux-compatible nice-to-weight conversion (prio_to_weight[])
     pub fn nice_to_weight(nice: i32) -> u64 {
         const WEIGHT_TABLE: [u64; 40] = [
-            88761, 71755, 56483, 46273, 36291, 29154, 23254, 18705, 14949, 11916,
-             9548,  7620,  6100,  4904,  3906,  3121,  2501,  1991,  1586,  1277,
-             1024,   820,   655,   526,   423,   335,   272,   215,   172,   137,
-              110,    87,    70,    56,    45,    36,    29,    23,    18,    15,
+            88761, 71755, 56483, 46273, 36291, 29154, 23254, 18705, 14949, 11916, 9548, 7620, 6100,
+            4904, 3906, 3121, 2501, 1991, 1586, 1277, 1024, 820, 655, 526, 423, 335, 272, 215, 172,
+            137, 110, 87, 70, 56, 45, 36, 29, 23, 18, 15,
         ];
         let idx = ((nice + 20).clamp(0, 39)) as usize;
         WEIGHT_TABLE[idx]
@@ -162,7 +183,10 @@ impl PerCpuRunQueue {
 
     pub fn dequeue(&mut self) -> Option<Task> {
         if let Some(task) = self.tasks.pop_front() {
-            self.load.fetch_sub(task.load_weight.min(self.load.load(Ordering::Relaxed)), Ordering::Relaxed);
+            self.load.fetch_sub(
+                task.load_weight.min(self.load.load(Ordering::Relaxed)),
+                Ordering::Relaxed,
+            );
             self.nr_running.fetch_sub(1, Ordering::Relaxed);
             Some(task)
         } else {
@@ -319,15 +343,24 @@ impl SmpLoadBalancer {
         let this_load = self.run_queues[&this_cpu].current_load();
 
         // Find all CPUs in same NUMA node
-        let same_node_cpus: Vec<u32> = self.topology.numa_nodes.iter()
+        let same_node_cpus: Vec<u32> = self
+            .topology
+            .numa_nodes
+            .iter()
             .find(|n| n.node_id == this_node)
             .map(|n| n.cpu_ids.clone())
             .unwrap_or_default();
 
         // Find the busiest CPU
-        let busiest_cpu = same_node_cpus.iter()
+        let busiest_cpu = same_node_cpus
+            .iter()
             .filter(|&&c| c != this_cpu)
-            .max_by_key(|&&c| self.run_queues.get(&c).map(|rq| rq.current_load()).unwrap_or(0));
+            .max_by_key(|&&c| {
+                self.run_queues
+                    .get(&c)
+                    .map(|rq| rq.current_load())
+                    .unwrap_or(0)
+            });
 
         if let Some(&src_cpu) = busiest_cpu {
             let src_load = self.run_queues[&src_cpu].current_load();
@@ -340,7 +373,9 @@ impl SmpLoadBalancer {
 
         // Cross-NUMA balancing (less aggressive)
         if this_load == 0 {
-            let remote_busiest = self.run_queues.iter()
+            let remote_busiest = self
+                .run_queues
+                .iter()
                 .filter(|(&c, _)| c != this_cpu)
                 .max_by_key(|(_, rq)| rq.current_load())
                 .map(|(&c, rq)| (c, rq.current_load()));
@@ -357,7 +392,10 @@ impl SmpLoadBalancer {
 
     /// Pull one task from src_cpu to dst_cpu
     fn pull_task(&mut self, src_cpu: u32, dst_cpu: u32) {
-        let task = self.run_queues.get_mut(&src_cpu).and_then(|rq| rq.dequeue());
+        let task = self
+            .run_queues
+            .get_mut(&src_cpu)
+            .and_then(|rq| rq.dequeue());
         if let Some(task) = task {
             let _ = self.ipi.send(dst_cpu, IpiMessage::Reschedule);
             self.run_queues.get_mut(&dst_cpu).map(|rq| rq.enqueue(task));
@@ -370,7 +408,10 @@ impl SmpLoadBalancer {
         if let Some(rq) = src_rq {
             if let Some(pos) = rq.tasks.iter().position(|t| t.tid == tid) {
                 if let Some(task) = rq.tasks.remove(pos) {
-                    rq.load.fetch_sub(task.load_weight.min(rq.load.load(Ordering::Relaxed)), Ordering::Relaxed);
+                    rq.load.fetch_sub(
+                        task.load_weight.min(rq.load.load(Ordering::Relaxed)),
+                        Ordering::Relaxed,
+                    );
                     rq.nr_running.fetch_sub(1, Ordering::Relaxed);
                     if let Some(dst_rq) = self.run_queues.get_mut(&dst_cpu) {
                         dst_rq.enqueue(task);
@@ -393,7 +434,9 @@ impl SmpLoadBalancer {
 
         for task in tasks {
             // Find the least loaded online CPU
-            let target = self.run_queues.iter()
+            let target = self
+                .run_queues
+                .iter()
                 .filter(|(&c, _)| c != dead_cpu)
                 .min_by_key(|(_, rq)| rq.current_load())
                 .map(|(&c, _)| c);
@@ -406,13 +449,22 @@ impl SmpLoadBalancer {
 
     /// Enqueue a new task, choosing the best CPU (NUMA-aware)
     pub fn enqueue_task(&mut self, task: Task) {
-        let preferred_cpus: Vec<u32> = self.topology.numa_nodes.iter()
+        let preferred_cpus: Vec<u32> = self
+            .topology
+            .numa_nodes
+            .iter()
             .find(|n| n.node_id == task.numa_home)
             .map(|n| n.cpu_ids.clone())
             .unwrap_or_else(|| (0..self.topology.total_cpus).collect());
 
-        let target = preferred_cpus.iter()
-            .min_by_key(|&&c| self.run_queues.get(&c).map(|rq| rq.current_load()).unwrap_or(u64::MAX))
+        let target = preferred_cpus
+            .iter()
+            .min_by_key(|&&c| {
+                self.run_queues
+                    .get(&c)
+                    .map(|rq| rq.current_load())
+                    .unwrap_or(u64::MAX)
+            })
             .copied()
             .unwrap_or(0);
 
@@ -420,12 +472,18 @@ impl SmpLoadBalancer {
     }
 
     pub fn stats(&self) -> SmpStats {
-        let loads: Vec<(u32, u64, usize)> = self.run_queues.iter()
+        let loads: Vec<(u32, u64, usize)> = self
+            .run_queues
+            .iter()
             .map(|(&c, rq)| (c, rq.current_load(), rq.nr_running.load(Ordering::Relaxed)))
             .collect();
         let total_load: u64 = loads.iter().map(|(_, l, _)| l).sum();
         let total_tasks: usize = loads.iter().map(|(_, _, n)| n).sum();
-        SmpStats { per_cpu_loads: loads, total_load, total_tasks }
+        SmpStats {
+            per_cpu_loads: loads,
+            total_load,
+            total_tasks,
+        }
     }
 }
 
@@ -501,7 +559,13 @@ mod tests {
     fn test_ipi_channel() {
         let ipi = IpiChannel::new(&[0, 1, 2, 3]);
         ipi.send(1, IpiMessage::Reschedule).unwrap();
-        ipi.send(1, IpiMessage::TlbFlush { address: 0xDEAD_BEEF }).unwrap();
+        ipi.send(
+            1,
+            IpiMessage::TlbFlush {
+                address: 0xDEAD_BEEF,
+            },
+        )
+        .unwrap();
         let msgs = ipi.drain(1);
         assert_eq!(msgs.len(), 2);
     }
@@ -537,6 +601,9 @@ mod tests {
         balancer.enqueue_task(task);
         let cpu2_tasks = balancer.run_queues[&2].nr_running.load(Ordering::Relaxed);
         let cpu3_tasks = balancer.run_queues[&3].nr_running.load(Ordering::Relaxed);
-        assert!(cpu2_tasks + cpu3_tasks == 1, "Task should land on NUMA node 1 CPUs");
+        assert!(
+            cpu2_tasks + cpu3_tasks == 1,
+            "Task should land on NUMA node 1 CPUs"
+        );
     }
 }

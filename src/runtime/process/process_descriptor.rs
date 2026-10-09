@@ -191,7 +191,6 @@ mod tests {
     }
 
     #[ignore]
-
     #[test]
     fn test_can_access_process_namespaces() {
         let parent = ProcessDescriptor::new_root(1, 1, 0, "init".to_string()).unwrap();
@@ -223,7 +222,6 @@ mod tests {
     }
 
     #[ignore]
-
     #[test]
     fn test_multiple_children_pid_allocation() {
         let parent = ProcessDescriptor::new_root(1, 1, 0, "init".to_string()).unwrap();

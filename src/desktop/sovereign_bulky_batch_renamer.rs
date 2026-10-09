@@ -105,7 +105,12 @@ impl SovereignBulkyBatchRenamer {
                 }
                 RenameMode::SequenceNumbering => {
                     let padding = arg1.parse::<usize>().unwrap_or(3);
-                    format!("{:0width$}_{}", idx + 1, candidate.original_name, width = padding)
+                    format!(
+                        "{:0width$}_{}",
+                        idx + 1,
+                        candidate.original_name,
+                        width = padding
+                    )
                 }
                 RenameMode::ChangeCaseUpper => candidate.original_name.to_ascii_uppercase(),
                 RenameMode::ChangeCaseLower => candidate.original_name.to_ascii_lowercase(),
@@ -160,12 +165,19 @@ impl SovereignBulkyBatchRenamer {
     }
 
     pub fn rollback_transaction(&mut self, tx_id: u64) -> Result<(), String> {
-        if let Some(pos) = self.history.iter().position(|t| t.id == tx_id && t.committed) {
+        if let Some(pos) = self
+            .history
+            .iter()
+            .position(|t| t.id == tx_id && t.committed)
+        {
             let tx = &mut self.history[pos];
             tx.committed = false;
             Ok(())
         } else {
-            Err(format!("Transaction {} not found or already rolled back", tx_id))
+            Err(format!(
+                "Transaction {} not found or already rolled back",
+                tx_id
+            ))
         }
     }
 }

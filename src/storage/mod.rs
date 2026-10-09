@@ -30,11 +30,11 @@ pub use geom::{
     BioCmd, BioRequest, GeomClassType, GeomConsumer, GeomEliConfig, GeomProvider, GeomTopology,
     PartitionEntry,
 };
-pub use sql_engine::{
-    Column, QueryResult, SqlEngine, SqlType, SqlValue, Table, Transaction, TransactionState,
-};
 pub use snapshot_manager::{
     RetentionPolicy, SnapshotManager, SnapshotMetadata, SnapshotStatistics, SnapshotStatus,
     SnapshotType,
+};
+pub use sql_engine::{
+    Column, QueryResult, SqlEngine, SqlType, SqlValue, Table, Transaction, TransactionState,
 };
 pub mod mintstick_flasher;

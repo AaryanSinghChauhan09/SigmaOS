@@ -6,10 +6,10 @@ pub mod printer_manager;
 pub mod scanner_manager;
 
 pub use printer_manager::{
-    Printer, PrinterManager, PrinterStatistics, PrinterStatus, PrinterType,
-    PrintJob, PrintJobStatus,
+    PrintJob, PrintJobStatus, Printer, PrinterManager, PrinterStatistics, PrinterStatus,
+    PrinterType,
 };
 pub use scanner_manager::{
-    ScanColorMode, ScanFormat, ScanJob, ScanJobStatus, ScanResolution,
-    Scanner, ScannerManager, ScannerStatistics, ScannerType,
+    ScanColorMode, ScanFormat, ScanJob, ScanJobStatus, ScanResolution, Scanner, ScannerManager,
+    ScannerStatistics, ScannerType,
 };

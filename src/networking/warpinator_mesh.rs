@@ -191,7 +191,10 @@ impl WarpinatorMesh {
         size_bytes: u64,
         target_peer_id: &str,
     ) -> Result<&mut FileTransferSession, &'static str> {
-        let peer = self.peers.get(target_peer_id).ok_or("Target peer not found")?;
+        let peer = self
+            .peers
+            .get(target_peer_id)
+            .ok_or("Target peer not found")?;
         if peer.status == PeerStatus::Offline {
             return Err("Target peer is offline");
         }

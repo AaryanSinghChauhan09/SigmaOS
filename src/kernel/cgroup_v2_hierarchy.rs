@@ -22,12 +22,12 @@ use core::sync::atomic::{AtomicI64, AtomicU32, AtomicU64, Ordering};
 /// Available cgroup subsystem controllers
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum CgroupController {
-    Cpu,      // cpu.weight, cpu.max
-    Memory,   // memory.max, memory.high, memory.min
-    Pids,     // pids.max
-    Io,       // io.max, io.weight
-    Cpuset,   // cpuset.cpus, cpuset.mems
-    Hugetlb,  // hugetlb.<size>.max
+    Cpu,     // cpu.weight, cpu.max
+    Memory,  // memory.max, memory.high, memory.min
+    Pids,    // pids.max
+    Io,      // io.max, io.weight
+    Cpuset,  // cpuset.cpus, cpuset.mems
+    Hugetlb, // hugetlb.<size>.max
 }
 
 // ============================================================================
@@ -37,10 +37,10 @@ pub enum CgroupController {
 /// CPU controller settings (cpu.weight = 1..10000, cpu.max = quota/period)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CpuLimits {
-    pub weight: u32,          // 1–10000, default 100 (relative shares)
-    pub max_quota_us: i64,    // Microseconds per period; -1 = unlimited
-    pub period_us: u64,       // Period in microseconds (default 100ms)
-    pub burst_us: u64,        // cpu.stat burst allowance
+    pub weight: u32,       // 1–10000, default 100 (relative shares)
+    pub max_quota_us: i64, // Microseconds per period; -1 = unlimited
+    pub period_us: u64,    // Period in microseconds (default 100ms)
+    pub burst_us: u64,     // cpu.stat burst allowance
 }
 
 impl Default for CpuLimits {
@@ -57,10 +57,10 @@ impl Default for CpuLimits {
 /// Memory controller settings
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct MemoryLimits {
-    pub max_bytes: i64,   // memory.max — hard limit; -1 = unlimited
-    pub high_bytes: i64,  // memory.high — soft throttle limit; -1 = unlimited
-    pub min_bytes: i64,   // memory.min — guaranteed minimum; 0 = none
-    pub swap_max: i64,    // memory.swap.max; -1 = unlimited
+    pub max_bytes: i64,  // memory.max — hard limit; -1 = unlimited
+    pub high_bytes: i64, // memory.high — soft throttle limit; -1 = unlimited
+    pub min_bytes: i64,  // memory.min — guaranteed minimum; 0 = none
+    pub swap_max: i64,   // memory.swap.max; -1 = unlimited
 }
 
 impl Default for MemoryLimits {
@@ -223,14 +223,18 @@ impl Cgroup {
         if !self.check_memory_limit(bytes) {
             return false;
         }
-        self.stats.memory_current_bytes.fetch_add(bytes, Ordering::SeqCst);
+        self.stats
+            .memory_current_bytes
+            .fetch_add(bytes, Ordering::SeqCst);
         true
     }
 
     /// Record memory uncharge
     pub fn uncharge_memory(&self, bytes: u64) {
         let cur = self.stats.memory_current_bytes.load(Ordering::SeqCst);
-        self.stats.memory_current_bytes.store(cur.saturating_sub(bytes), Ordering::SeqCst);
+        self.stats
+            .memory_current_bytes
+            .store(cur.saturating_sub(bytes), Ordering::SeqCst);
     }
 
     /// Record CPU time usage
@@ -294,7 +298,9 @@ impl CgroupHierarchy {
     /// Attach PID to a cgroup
     pub fn attach(&mut self, cgroup_id: u64, pid: u32) -> Result<(), &'static str> {
         // Detach from any other cgroup
-        let old_cg_id: Option<u64> = self.cgroups.values()
+        let old_cg_id: Option<u64> = self
+            .cgroups
+            .values()
             .find(|cg| cg.pids.contains(&pid))
             .map(|cg| cg.id);
 
@@ -342,7 +348,8 @@ impl CgroupHierarchy {
 
     /// Find cgroup owning a given PID
     pub fn find_by_pid(&self, pid: u32) -> Option<u64> {
-        self.cgroups.values()
+        self.cgroups
+            .values()
             .find(|cg| cg.pids.contains(&pid))
             .map(|cg| cg.id)
     }

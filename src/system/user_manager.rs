@@ -112,7 +112,11 @@ impl UserManager {
     }
 
     /// Create a new user
-    pub fn create_user(&mut self, username: String, user_type: UserType) -> Result<UserAccount, String> {
+    pub fn create_user(
+        &mut self,
+        username: String,
+        user_type: UserType,
+    ) -> Result<UserAccount, String> {
         if username.is_empty() {
             return Err("Username cannot be empty".to_string());
         }
@@ -147,21 +151,22 @@ impl UserManager {
 
     /// List users by type
     pub fn list_by_type(&self, user_type: UserType) -> Vec<&UserAccount> {
-        self.users.values()
+        self.users
+            .values()
             .filter(|u| u.user_type == user_type)
             .collect()
     }
 
     /// List active users
     pub fn list_active(&self) -> Vec<&UserAccount> {
-        self.users.values()
-            .filter(|u| u.is_active)
-            .collect()
+        self.users.values().filter(|u| u.is_active).collect()
     }
 
     /// Delete a user
     pub fn delete_user(&mut self, username: &str) -> Result<(), String> {
-        let user = self.users.get(username)
+        let user = self
+            .users
+            .get(username)
             .ok_or_else(|| format!("User {} not found", username))?;
 
         if user.username == "root" {
@@ -173,8 +178,16 @@ impl UserManager {
     }
 
     /// Update user
-    pub fn update_user(&mut self, username: &str, full_name: Option<String>, home: Option<String>, shell: Option<String>) -> Result<(), String> {
-        let user = self.users.get_mut(username)
+    pub fn update_user(
+        &mut self,
+        username: &str,
+        full_name: Option<String>,
+        home: Option<String>,
+        shell: Option<String>,
+    ) -> Result<(), String> {
+        let user = self
+            .users
+            .get_mut(username)
             .ok_or_else(|| format!("User {} not found", username))?;
 
         if let Some(name) = full_name {
@@ -192,7 +205,9 @@ impl UserManager {
 
     /// Activate user
     pub fn activate_user(&mut self, username: &str) -> Result<(), String> {
-        let user = self.users.get_mut(username)
+        let user = self
+            .users
+            .get_mut(username)
             .ok_or_else(|| format!("User {} not found", username))?;
 
         user.set_active(true);
@@ -201,7 +216,9 @@ impl UserManager {
 
     /// Deactivate user
     pub fn deactivate_user(&mut self, username: &str) -> Result<(), String> {
-        let user = self.users.get_mut(username)
+        let user = self
+            .users
+            .get_mut(username)
             .ok_or_else(|| format!("User {} not found", username))?;
 
         if user.username == "root" {
@@ -222,8 +239,16 @@ impl UserManager {
         let total_users = self.users.len();
         let active_users = self.users.values().filter(|u| u.is_active).count();
         let admin_users = self.users.values().filter(|u| u.is_admin()).count();
-        let normal_users = self.users.values().filter(|u| u.user_type == UserType::Normal).count();
-        let system_users = self.users.values().filter(|u| u.user_type == UserType::System).count();
+        let normal_users = self
+            .users
+            .values()
+            .filter(|u| u.user_type == UserType::Normal)
+            .count();
+        let system_users = self
+            .users
+            .values()
+            .filter(|u| u.user_type == UserType::System)
+            .count();
 
         UserStatistics {
             total_users,
@@ -279,14 +304,18 @@ mod tests {
     #[test]
     fn test_create_user() {
         let mut manager = UserManager::new();
-        let user = manager.create_user("testuser".to_string(), UserType::Normal).unwrap();
+        let user = manager
+            .create_user("testuser".to_string(), UserType::Normal)
+            .unwrap();
         assert_eq!(user.username, "testuser");
     }
 
     #[test]
     fn test_delete_user() {
         let mut manager = UserManager::new();
-        manager.create_user("testuser".to_string(), UserType::Normal).ok();
+        manager
+            .create_user("testuser".to_string(), UserType::Normal)
+            .ok();
         assert!(manager.delete_user("testuser").is_ok());
         assert!(manager.get_user("testuser").is_none());
     }
@@ -300,14 +329,20 @@ mod tests {
     #[test]
     fn test_update_user() {
         let mut manager = UserManager::new();
-        manager.create_user("testuser".to_string(), UserType::Normal).ok();
-        assert!(manager.update_user("testuser", Some("Test User".to_string()), None, None).is_ok());
+        manager
+            .create_user("testuser".to_string(), UserType::Normal)
+            .ok();
+        assert!(manager
+            .update_user("testuser", Some("Test User".to_string()), None, None)
+            .is_ok());
     }
 
     #[test]
     fn test_deactivate_user() {
         let mut manager = UserManager::new();
-        manager.create_user("testuser".to_string(), UserType::Normal).ok();
+        manager
+            .create_user("testuser".to_string(), UserType::Normal)
+            .ok();
         assert!(manager.deactivate_user("testuser").is_ok());
     }
 

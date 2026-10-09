@@ -124,7 +124,12 @@ pub struct BackupJob {
 }
 
 impl BackupJob {
-    pub fn new(id: String, backup_type: BackupType, source_id: String, destination_id: String) -> Self {
+    pub fn new(
+        id: String,
+        backup_type: BackupType,
+        source_id: String,
+        destination_id: String,
+    ) -> Self {
         Self {
             id,
             backup_type,
@@ -144,10 +149,12 @@ impl BackupJob {
     pub fn set_status(&mut self, status: BackupStatus) {
         self.status = status;
         if status == BackupStatus::Completed || status == BackupStatus::Failed {
-            self.completed_at = Some(std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .unwrap()
-                .as_secs());
+            self.completed_at = Some(
+                std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .unwrap()
+                    .as_secs(),
+            );
         }
     }
 
@@ -191,7 +198,9 @@ impl BackupJobManager {
             "/home/user/Documents".to_string(),
             "Documents".to_string(),
         );
-        manager.sources.insert("documents".to_string(), documents_source);
+        manager
+            .sources
+            .insert("documents".to_string(), documents_source);
 
         // Add default destination
         let backup_dest = BackupDestination::new(
@@ -200,7 +209,9 @@ impl BackupJobManager {
             "Local Backup".to_string(),
             1024 * 1024 * 1024 * 1024, // 1 TB
         );
-        manager.destinations.insert("local-backup".to_string(), backup_dest);
+        manager
+            .destinations
+            .insert("local-backup".to_string(), backup_dest);
 
         manager
     }
@@ -222,7 +233,8 @@ impl BackupJobManager {
 
     /// Add a destination
     pub fn add_destination(&mut self, destination: BackupDestination) {
-        self.destinations.insert(destination.id.clone(), destination);
+        self.destinations
+            .insert(destination.id.clone(), destination);
     }
 
     /// Get a destination
@@ -236,15 +248,24 @@ impl BackupJobManager {
     }
 
     /// Create a backup job
-    pub fn create_backup(&mut self, backup_type: BackupType, source_id: &str, destination_id: &str) -> Result<String, String> {
-        let source = self.sources.get(source_id)
+    pub fn create_backup(
+        &mut self,
+        backup_type: BackupType,
+        source_id: &str,
+        destination_id: &str,
+    ) -> Result<String, String> {
+        let source = self
+            .sources
+            .get(source_id)
             .ok_or_else(|| format!("Source {} not found", source_id))?;
 
         if !source.is_enabled {
             return Err(format!("Source {} is disabled", source_id));
         }
 
-        let destination = self.destinations.get(destination_id)
+        let destination = self
+            .destinations
+            .get(destination_id)
             .ok_or_else(|| format!("Destination {} not found", destination_id))?;
 
         let job_id = format!("backup-{}", self.next_job_id);
@@ -273,14 +294,14 @@ impl BackupJobManager {
 
     /// List jobs by status
     pub fn list_jobs_by_status(&self, status: BackupStatus) -> Vec<&BackupJob> {
-        self.jobs.values()
-            .filter(|j| j.status == status)
-            .collect()
+        self.jobs.values().filter(|j| j.status == status).collect()
     }
 
     /// Cancel a job
     pub fn cancel_job(&mut self, id: &str) -> Result<(), String> {
-        let job = self.jobs.get_mut(id)
+        let job = self
+            .jobs
+            .get_mut(id)
             .ok_or_else(|| format!("Job {} not found", id))?;
 
         if job.status == BackupStatus::Completed {
@@ -294,15 +315,17 @@ impl BackupJobManager {
     /// Get statistics
     pub fn get_statistics(&self) -> BackupJobStatistics {
         let total_sources = self.sources.len();
-        let enabled_sources = self.sources.values()
-            .filter(|s| s.is_enabled)
-            .count();
+        let enabled_sources = self.sources.values().filter(|s| s.is_enabled).count();
         let total_destinations = self.destinations.len();
         let total_jobs = self.jobs.len();
-        let completed_jobs = self.jobs.values()
+        let completed_jobs = self
+            .jobs
+            .values()
             .filter(|j| j.status == BackupStatus::Completed)
             .count();
-        let failed_jobs = self.jobs.values()
+        let failed_jobs = self
+            .jobs
+            .values()
             .filter(|j| j.status == BackupStatus::Failed)
             .count();
 
@@ -341,22 +364,27 @@ mod tests {
     #[test]
     fn test_backup_type_from_str() {
         assert_eq!(BackupType::from_str("full"), Some(BackupType::Full));
-        assert_eq!(BackupType::from_str("incremental"), Some(BackupType::Incremental));
+        assert_eq!(
+            BackupType::from_str("incremental"),
+            Some(BackupType::Incremental)
+        );
     }
 
     #[test]
     fn test_backup_status_from_str() {
-        assert_eq!(BackupStatus::from_str("pending"), Some(BackupStatus::Pending));
-        assert_eq!(BackupStatus::from_str("completed"), Some(BackupStatus::Completed));
+        assert_eq!(
+            BackupStatus::from_str("pending"),
+            Some(BackupStatus::Pending)
+        );
+        assert_eq!(
+            BackupStatus::from_str("completed"),
+            Some(BackupStatus::Completed)
+        );
     }
 
     #[test]
     fn test_backup_source_creation() {
-        let source = BackupSource::new(
-            "test".to_string(),
-            "/path".to_string(),
-            "Test".to_string(),
-        );
+        let source = BackupSource::new("test".to_string(), "/path".to_string(), "Test".to_string());
         assert_eq!(source.name, "Test");
     }
 
@@ -369,11 +397,7 @@ mod tests {
     #[test]
     fn test_add_source() {
         let mut manager = BackupJobManager::new();
-        let source = BackupSource::new(
-            "test".to_string(),
-            "/test".to_string(),
-            "Test".to_string(),
-        );
+        let source = BackupSource::new("test".to_string(), "/test".to_string(), "Test".to_string());
         manager.add_source(source);
         assert!(manager.get_source("test").is_some());
     }
@@ -381,22 +405,16 @@ mod tests {
     #[test]
     fn test_create_backup() {
         let mut manager = BackupJobManager::new();
-        let job_id = manager.create_backup(
-            BackupType::Full,
-            "home",
-            "local-backup",
-        );
+        let job_id = manager.create_backup(BackupType::Full, "home", "local-backup");
         assert!(job_id.is_ok());
     }
 
     #[test]
     fn test_cancel_job() {
         let mut manager = BackupJobManager::new();
-        let job_id = manager.create_backup(
-            BackupType::Full,
-            "home",
-            "local-backup",
-        ).unwrap();
+        let job_id = manager
+            .create_backup(BackupType::Full, "home", "local-backup")
+            .unwrap();
         assert!(manager.cancel_job(&job_id).is_ok());
     }
 

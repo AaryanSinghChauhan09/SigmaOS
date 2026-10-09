@@ -944,7 +944,10 @@ impl FedoraSelinuxPolicyAuditEngine {
         booleans.insert("container_manage_dns".to_string(), true);
 
         let mut fcon = BTreeMap::new();
-        fcon.insert("/var/www/html".to_string(), "httpd_sys_content_t".to_string());
+        fcon.insert(
+            "/var/www/html".to_string(),
+            "httpd_sys_content_t".to_string(),
+        );
         fcon.insert("/etc/shadow".to_string(), "shadow_t".to_string());
 
         Self {
@@ -964,7 +967,14 @@ impl FedoraSelinuxPolicyAuditEngine {
         }
     }
 
-    pub fn log_avc_denial(&mut self, pid: u32, scontext: &str, tcontext: &str, tclass: &str, perm: &str) {
+    pub fn log_avc_denial(
+        &mut self,
+        pid: u32,
+        scontext: &str,
+        tcontext: &str,
+        tclass: &str,
+        perm: &str,
+    ) {
         self.avc_denials.push(SelinuxAvcDenialLog {
             pid,
             scontext: scontext.to_string(),
@@ -977,7 +987,12 @@ impl FedoraSelinuxPolicyAuditEngine {
     pub fn audit2allow_suggest_rule(&self) -> Vec<String> {
         self.avc_denials
             .iter()
-            .map(|d| format!("allow {} {}:{} {};", d.scontext, d.tcontext, d.tclass, d.permission))
+            .map(|d| {
+                format!(
+                    "allow {} {}:{} {};",
+                    d.scontext, d.tcontext, d.tclass, d.permission
+                )
+            })
             .collect()
     }
 
@@ -1036,7 +1051,11 @@ impl FedoraSystemdResolvedEngine {
 
     pub fn resolve_domain_route(&self, domain: &str) -> Vec<String> {
         for link in self.links.values() {
-            if link.routing_domains.iter().any(|d| domain.ends_with(d) || d == "~.") {
+            if link
+                .routing_domains
+                .iter()
+                .any(|d| domain.ends_with(d) || d == "~.")
+            {
                 return link.dns_servers.clone();
             }
         }
@@ -1191,13 +1210,16 @@ mod tests {
         assert!(fw.is_port_permitted("public", 9090));
 
         fw.allow_service("work", "cockpit").unwrap();
-        assert!(fw.zones["work"].allowed_services.contains(&"cockpit".to_string()));
+        assert!(fw.zones["work"]
+            .allowed_services
+            .contains(&"cockpit".to_string()));
     }
 
     #[test]
     fn test_fedora_flatpak_ostree_repo_server_engine() {
         let mut flatpak = FedoraFlatpakOstreeRepoServerEngine::new("fedora-apps");
-        let hash1 = flatpak.publish_app_commit("org.gnome.Nautilus", "stable", "x86_64", 1700000000);
+        let hash1 =
+            flatpak.publish_app_commit("org.gnome.Nautilus", "stable", "x86_64", 1700000000);
         assert!(!hash1.is_empty());
         assert_eq!(flatpak.get_latest_commit("org.gnome.Nautilus"), Some(hash1));
     }
@@ -1237,7 +1259,10 @@ mod tests {
         assert_eq!(servers, vec!["10.0.0.1".to_string()]);
 
         let default_servers = resolved.resolve_domain_route("google.com");
-        assert_eq!(default_servers, vec!["1.1.1.1".to_string(), "8.8.8.8".to_string()]);
+        assert_eq!(
+            default_servers,
+            vec!["1.1.1.1".to_string(), "8.8.8.8".to_string()]
+        );
     }
 }
 

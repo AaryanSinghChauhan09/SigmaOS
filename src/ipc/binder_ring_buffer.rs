@@ -374,7 +374,6 @@ mod tests {
     }
 
     #[ignore]
-
     #[test]
     fn test_ring_buffer_full() {
         let ring = BinderRingBuffer::new(512);

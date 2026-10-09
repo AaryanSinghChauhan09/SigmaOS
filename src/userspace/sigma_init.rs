@@ -1,8 +1,8 @@
 extern crate alloc;
 
+use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum RestartPolicy {
@@ -40,7 +40,7 @@ impl InitSystem {
     pub fn topological_sort(&self) -> Result<Vec<String>, &'static str> {
         let mut sorted = Vec::new();
         let mut visited = BTreeMap::new();
-        
+
         for name in self.services.keys() {
             visited.insert(name.clone(), false);
         }
@@ -50,11 +50,16 @@ impl InitSystem {
                 self.visit(name, &mut visited, &mut sorted)?;
             }
         }
-        
+
         Ok(sorted)
     }
 
-    fn visit(&self, name: &String, visited: &mut BTreeMap<String, bool>, sorted: &mut Vec<String>) -> Result<(), &'static str> {
+    fn visit(
+        &self,
+        name: &String,
+        visited: &mut BTreeMap<String, bool>,
+        sorted: &mut Vec<String>,
+    ) -> Result<(), &'static str> {
         visited.insert(name.clone(), true);
         if let Some(service) = self.services.get(name) {
             for dep in &service.dependencies {

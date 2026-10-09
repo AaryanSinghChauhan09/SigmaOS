@@ -48,8 +48,8 @@ pub use tc_qdisc_sovereign::{
 };
 
 pub mod wireguard_sovereign;
-pub use wireguard_sovereign::{SovereignWireGuardTunnel, WgPeer, WgSessionState};
 pub use sovereign_tcpip_stack::*;
+pub use wireguard_sovereign::{SovereignWireGuardTunnel, WgPeer, WgSessionState};
 
 pub mod tech_news_redirection;
 pub use tech_news_redirection::{

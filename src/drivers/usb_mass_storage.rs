@@ -385,8 +385,8 @@ mod tests {
     fn test_cbw_creation() {
         let cdb = vec![0x12, 0x00, 0x00, 0x00, 36, 0x00]; // INQUIRY
         let cbw = CommandBlockWrapper::new(1, 36, true, 0, &cdb);
-        assert_eq!({cbw.signature}, CommandBlockWrapper::SIGNATURE);
-        assert_eq!({cbw.tag}, 1);
+        assert_eq!({ cbw.signature }, CommandBlockWrapper::SIGNATURE);
+        assert_eq!({ cbw.tag }, 1);
         assert_eq!(cbw.flags, 0x80);
     }
 

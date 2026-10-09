@@ -358,7 +358,6 @@ mod tests {
     use super::*;
 
     #[ignore]
-
     #[test]
     fn test_bio_request() {
         let req = BlockIoRequest::new(1, BioOp::Read, 0, 8, BioFlags::DEFAULT);

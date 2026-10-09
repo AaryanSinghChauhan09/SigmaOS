@@ -6,11 +6,11 @@
 #![cfg_attr(not(any(feature = "standalone_test", test)), no_std)]
 
 #[cfg(any(feature = "standalone_test", test))]
-use std::{string::String, format};
+use std::{format, string::String};
 #[cfg(not(any(feature = "standalone_test", test)))]
 extern crate alloc;
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::{string::String, format};
+use alloc::{format, string::String};
 
 /// HiDPI scale profiles for 1Password and Wayland apps
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -64,8 +64,8 @@ impl OmarchyHiDpiScaleEngine {
         Self {
             global_scale: HiDpiScale::Scale2x,
             targets: [
-                None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None,
             ],
             target_count: 0,
         }

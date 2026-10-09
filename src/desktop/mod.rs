@@ -29,7 +29,8 @@ pub mod tiling;
 pub use tiling::{TilingLayout, TilingWindow, TilingWindowManager, WindowArea, Workspace};
 pub mod applications;
 pub use applications::{
-    AppManager as PackageManager, Application as DesktopApplication, DesktopAppCategory, AppStatus, AppStatistics,
+    AppManager as PackageManager, AppStatistics, AppStatus, Application as DesktopApplication,
+    DesktopAppCategory,
 };
 pub mod display_manager;
 pub use display_manager::{
@@ -37,8 +38,8 @@ pub use display_manager::{
 };
 pub mod desktop_file_manager;
 pub use desktop_file_manager::{
-    FileInfo, DesktopFileExplorer, DesktopFileExplorerConfig, DesktopFileExplorerStatistics,
-    FileType, DesktopSortOrder, DesktopViewMode,
+    DesktopFileExplorer, DesktopFileExplorerConfig, DesktopFileExplorerStatistics,
+    DesktopSortOrder, DesktopViewMode, FileInfo, FileType,
 };
 pub mod notification_manager;
 pub use notification_manager::{
@@ -55,43 +56,45 @@ pub use application_launcher::{
 };
 pub mod screen_saver_manager;
 pub use screen_saver_manager::{
-    DesktopLockOnSleep, DesktopScreenSaverManager, DesktopScreenSaverMode, DesktopScreenSaverStatistics,
+    DesktopLockOnSleep, DesktopScreenSaverManager, DesktopScreenSaverMode,
+    DesktopScreenSaverStatistics,
 };
 pub mod sound_manager;
 pub use sound_manager::{
-    DesktopAudioDevice, DesktopAudioDeviceStatus, DesktopAudioDeviceType, DesktopSoundApplication, DesktopSoundManager, DesktopSoundProfile, DesktopSoundStatistics,
+    DesktopAudioDevice, DesktopAudioDeviceStatus, DesktopAudioDeviceType, DesktopSoundApplication,
+    DesktopSoundManager, DesktopSoundProfile, DesktopSoundStatistics,
 };
 pub mod brightness_manager;
 pub use brightness_manager::{
-    AdaptiveBrightnessMode, BrightnessDevice, BrightnessManager, BrightnessStatistics, BrightnessType,
+    AdaptiveBrightnessMode, BrightnessDevice, BrightnessManager, BrightnessStatistics,
+    BrightnessType,
 };
 pub mod session_manager;
 pub use session_manager::{
-    DesktopSessionManager, DesktopSessionStatistics, DesktopSessionStatus, DesktopSessionType, DesktopUserSession,
+    DesktopSessionManager, DesktopSessionStatistics, DesktopSessionStatus, DesktopSessionType,
+    DesktopUserSession,
 };
 pub mod wallpaper_manager;
 pub use wallpaper_manager::{
     WallpaperManager, WallpaperMode, WallpaperProfile, WallpaperSource, WallpaperStatistics,
 };
 pub mod de_manager;
-pub use de_manager::{
-    DEConfig, DEManager, DEStatistics, DesktopDESessionType, DesktopEnvironment,
-};
+pub use de_manager::{DEConfig, DEManager, DEStatistics, DesktopDESessionType, DesktopEnvironment};
 pub mod icon_manager;
 pub use icon_manager::{
-    DesktopDesktopIcon, DesktopIconManager, GridAlignment, DesktopIconStatistics, DesktopIconType,
+    DesktopDesktopIcon, DesktopIconManager, DesktopIconStatistics, DesktopIconType, GridAlignment,
 };
 pub mod taskbar_manager;
 pub use taskbar_manager::{
-    DesktopTaskbarItem, DesktopTaskbarItemType, DesktopTaskbarManager, DesktopTaskbarPosition, DesktopTaskbarStatistics,
+    DesktopTaskbarItem, DesktopTaskbarItemType, DesktopTaskbarManager, DesktopTaskbarPosition,
+    DesktopTaskbarStatistics,
 };
 pub mod menu_manager;
-pub use menu_manager::{
-    MenuEntry, MenuEntryType, MenuManager, MenuStatistics,
-};
+pub use menu_manager::{MenuEntry, MenuEntryType, MenuManager, MenuStatistics};
 pub mod widget_manager;
 pub use widget_manager::{
-    DesktopWidget, DesktopWidgetManager, DesktopWidgetPosition, DesktopWidgetStatistics, DesktopWidgetType,
+    DesktopWidget, DesktopWidgetManager, DesktopWidgetPosition, DesktopWidgetStatistics,
+    DesktopWidgetType,
 };
 pub mod layout_manager;
 pub use layout_manager::{
@@ -99,7 +102,8 @@ pub use layout_manager::{
 };
 pub mod notification_area_manager;
 pub use notification_area_manager::{
-    NotificationAreaManager, NotificationAreaStatistics, TrayNotificationItem, TrayNotificationItemType,
+    NotificationAreaManager, NotificationAreaStatistics, TrayNotificationItem,
+    TrayNotificationItemType,
 };
 pub mod workspace_manager;
 pub use workspace_manager::{
@@ -107,111 +111,111 @@ pub use workspace_manager::{
 };
 pub mod quick_settings_manager;
 pub use quick_settings_manager::{
-    DesktopQuickSetting, DesktopQuickSettingsManager, DesktopQuickSettingsStatistics, DesktopQuickSettingType,
+    DesktopQuickSetting, DesktopQuickSettingType, DesktopQuickSettingsManager,
+    DesktopQuickSettingsStatistics,
 };
 pub mod screen_lock_manager;
 pub use screen_lock_manager::{
-    LockStatus, ScreenLockConfig, ScreenLockManager, ScreenLockStatistics, LockScreenType,
+    LockScreenType, LockStatus, ScreenLockConfig, ScreenLockManager, ScreenLockStatistics,
 };
 pub mod screenshot_manager;
 pub use screenshot_manager::{
-    DesktopScreenshot, DesktopScreenshotFormat, DesktopScreenshotManager, DesktopScreenshotMode, DesktopScreenshotStatistics,
+    DesktopScreenshot, DesktopScreenshotFormat, DesktopScreenshotManager, DesktopScreenshotMode,
+    DesktopScreenshotStatistics,
 };
 pub mod recent_files_manager;
 pub use recent_files_manager::{
-    RecentFileEntry, RecentFilesManager, RecentFilesStatistics, RecentFileType,
+    RecentFileEntry, RecentFileType, RecentFilesManager, RecentFilesStatistics,
 };
 pub mod a11y_manager;
 pub use a11y_manager::{
-    A11yProfile, A11yCursorSize, A11yManagerStatistics, DesktopA11yManager,
-    HighContrastMode, KeyboardRepeat, ScreenReaderMode, TextScaling,
+    A11yCursorSize, A11yManagerStatistics, A11yProfile, DesktopA11yManager, HighContrastMode,
+    KeyboardRepeat, ScreenReaderMode, TextScaling,
 };
 pub mod notification_sound_manager;
 pub use notification_sound_manager::{
-    NotificationSoundManager, NotificationSoundStatistics, NotificationSoundType,
-    SoundConfig, SoundEvent,
+    NotificationSoundManager, NotificationSoundStatistics, NotificationSoundType, SoundConfig,
+    SoundEvent,
 };
 pub mod display_resolution_manager;
 pub use display_resolution_manager::{
-    Display, DisplayMode, DisplayResolutionManager, DisplayResolutionStatistics,
-    RefreshRate, Resolution,
+    Display, DisplayMode, DisplayResolutionManager, DisplayResolutionStatistics, RefreshRate,
+    Resolution,
 };
 pub mod input_method_manager;
 pub use input_method_manager::{
-    DesktopInputMethodManager, InputMethodManagerStatistics, InputMethodEngine, InputMethodType,
+    DesktopInputMethodManager, InputMethodEngine, InputMethodManagerStatistics, InputMethodType,
 };
 pub mod screen_orientation_manager;
 pub use screen_orientation_manager::{
-    DesktopScreenOrientationManager, ScreenOrientationConfig, ScreenOrientationStatistics,
-    ScreenOrientation, OrientationPolicy,
+    DesktopScreenOrientationManager, OrientationPolicy, ScreenOrientation, ScreenOrientationConfig,
+    ScreenOrientationStatistics,
 };
 pub mod theme_manager;
 pub use theme_manager::{
-    DesktopThemeManager, DesktopThemeStatistics, DesktopTheme, DesktopThemeType,
+    DesktopTheme, DesktopThemeManager, DesktopThemeStatistics, DesktopThemeType,
 };
 pub mod color_scheme_manager;
 pub use color_scheme_manager::{
-    DesktopColorSchemeManager, ColorSchemeStatistics, ColorScheme, ColorSchemeType,
+    ColorScheme, ColorSchemeStatistics, ColorSchemeType, DesktopColorSchemeManager,
 };
 pub mod power_manager;
 pub use power_manager::{
-    DesktopPowerManager, PowerManagerStatistics, BatteryDevice, PowerAction, PowerProfile,
-    BatteryStatus,
+    BatteryDevice, BatteryStatus, DesktopPowerManager, PowerAction, PowerManagerStatistics,
+    PowerProfile,
 };
 pub mod touchpad_manager;
 pub use touchpad_manager::{
-    DesktopTouchpadManager, TouchpadManagerStatistics, TouchpadDevice, TouchpadConfiguration,
-    TapToClickMode, NaturalScrolling, TwoFingerScrolling, EdgeScrolling, PalmDetection,
+    DesktopTouchpadManager, EdgeScrolling, NaturalScrolling, PalmDetection, TapToClickMode,
+    TouchpadConfiguration, TouchpadDevice, TouchpadManagerStatistics, TwoFingerScrolling,
 };
 pub mod keyboard_manager;
 pub use keyboard_manager::{
-    DesktopKeyboardManager, KeyboardManagerStatistics, KeyboardDevice, KeyboardConfiguration,
-    KeyboardLayout, RepeatMode,
+    DesktopKeyboardManager, KeyboardConfiguration, KeyboardDevice, KeyboardLayout,
+    KeyboardManagerStatistics, RepeatMode,
 };
 pub mod login_manager;
 pub use login_manager::{
-    DesktopLoginManager, LoginManagerStatistics, LoginUserSession, LoginDesktopEnvironment,
-    LoginSessionType,
+    DesktopLoginManager, LoginDesktopEnvironment, LoginManagerStatistics, LoginSessionType,
+    LoginUserSession,
 };
 pub mod print_manager;
 pub use print_manager::{
-    DesktopPrintManager, PrintManagerStatistics, Printer, PrintJob, PrinterStatus,
-    PrintJobStatus,
+    DesktopPrintManager, PrintJob, PrintJobStatus, PrintManagerStatistics, Printer, PrinterStatus,
 };
 pub mod network_manager;
 pub use network_manager::{
-    DesktopNetworkManager, NetworkManagerStatistics, NetworkConnection, NetConnectionType,
-    NetConnectionStatus, SecurityType,
+    DesktopNetworkManager, NetConnectionStatus, NetConnectionType, NetworkConnection,
+    NetworkManagerStatistics, SecurityType,
 };
 pub mod desktop_bluetooth_manager;
 pub use desktop_bluetooth_manager::{
-    DesktopBluetoothManager, DesktopBluetoothManagerStatistics, DesktopBluetoothDevice,
-    DesktopBluetoothDeviceType, DesktopBluetoothDeviceStatus,
+    DesktopBluetoothDevice, DesktopBluetoothDeviceStatus, DesktopBluetoothDeviceType,
+    DesktopBluetoothManager, DesktopBluetoothManagerStatistics,
 };
 pub mod time_manager;
 pub use time_manager::{
-    DesktopTimeManager, TimeManagerStatistics, DesktopTimezone, DesktopNTPServer,
-    TimeFormat, DateFormat,
+    DateFormat, DesktopNTPServer, DesktopTimeManager, DesktopTimezone, TimeFormat,
+    TimeManagerStatistics,
 };
 pub mod sound_theme_manager;
 pub use sound_theme_manager::{
-    DesktopSoundThemeManager, DesktopSoundThemeManagerStatistics, DesktopSoundTheme,
-    SoundEventType,
+    DesktopSoundTheme, DesktopSoundThemeManager, DesktopSoundThemeManagerStatistics, SoundEventType,
 };
 pub mod cursor_manager;
 pub use cursor_manager::{
-    DesktopCursorManager, DesktopCursorManagerStatistics, DesktopCursorTheme,
-    DesktopCursorSize, DesktopCursorType,
+    DesktopCursorManager, DesktopCursorManagerStatistics, DesktopCursorSize, DesktopCursorTheme,
+    DesktopCursorType,
 };
 pub mod font_manager;
 pub use font_manager::{
-    DesktopFontManager, FontManagerStatistics, FontFamily, FontStyle,
-    FontWeight, FontSlant, FontWidth, FontUsageType,
+    DesktopFontManager, FontFamily, FontManagerStatistics, FontSlant, FontStyle, FontUsageType,
+    FontWeight, FontWidth,
 };
 pub mod display_settings_manager;
 pub use display_settings_manager::{
-    DesktopDisplaySettingsManager, DesktopDisplaySettingsManagerStatistics, DesktopDisplay,
-    DesktopDisplayMode, DesktopRefreshRate, DesktopResolution,
+    DesktopDisplay, DesktopDisplayMode, DesktopDisplaySettingsManager,
+    DesktopDisplaySettingsManagerStatistics, DesktopRefreshRate, DesktopResolution,
 };
 
 // SigmaOS Desktop Module
@@ -297,9 +301,9 @@ pub use shortcuts::{
     ShortcutConfig,
 };
 pub mod mint_backup_tool;
+pub mod mint_desktop;
 pub mod mint_software_store;
 pub mod mint_update_manager;
-pub mod mint_desktop;
 pub mod notification;
 pub mod omarchy_dynamic_workspace_suite;
 pub use omarchy_dynamic_workspace_suite::*;
@@ -313,20 +317,31 @@ pub use onboarding_wizard::*;
 pub use permission_portal::*;
 pub mod cinnamon_xapp_libgui;
 pub mod file_manager_extensions;
+pub mod sovereign_bulky_batch_renamer;
 pub mod system_tray;
-pub mod sovereign_bulky_batch_renamer; pub use sovereign_bulky_batch_renamer::*;
-pub mod omarchy_disktree_inspector; pub use omarchy_disktree_inspector::*;
-pub mod omarchy_chord_rebind_engine; pub use omarchy_chord_rebind_engine::*;
-pub mod sovereign_xed_code_editor; pub use sovereign_xed_code_editor::*;
-pub mod omarchy_autosave_capture_engine; pub use omarchy_autosave_capture_engine::*;
-pub mod omarchy_browser_theme_sync; pub use omarchy_browser_theme_sync::*;
-pub mod omarchy_hidpi_scale_engine; pub use omarchy_hidpi_scale_engine::*;
+pub use sovereign_bulky_batch_renamer::*;
+pub mod omarchy_disktree_inspector;
+pub use omarchy_disktree_inspector::*;
+pub mod omarchy_chord_rebind_engine;
+pub use omarchy_chord_rebind_engine::*;
+pub mod sovereign_xed_code_editor;
+pub use sovereign_xed_code_editor::*;
+pub mod omarchy_autosave_capture_engine;
+pub use omarchy_autosave_capture_engine::*;
+pub mod omarchy_browser_theme_sync;
+pub use omarchy_browser_theme_sync::*;
+pub mod omarchy_hidpi_scale_engine;
+pub use omarchy_hidpi_scale_engine::*;
 pub mod sigma_quickshell;
 pub use sigma_quickshell::{
-    SigmaQuickshell, ShellWidget, LayerSurface, Anchors, WidgetContent,
-    PanelContent, PanelItem, StatusBarModule, StatusBarContent,
-    LauncherContent, AppEntry, HyprlandEvent, ReactiveCell,
-    NotificationContent, NotificationUrgency,
+    Anchors, AppEntry, HyprlandEvent, LauncherContent, LayerSurface, NotificationContent,
+    NotificationUrgency, PanelContent, PanelItem, ReactiveCell, ShellWidget, SigmaQuickshell,
+    StatusBarContent, StatusBarModule, WidgetContent,
 };
-pub mod sigma_ghostty; pub use sigma_ghostty::{SigmaGhostty, GhosttyConfig, TermGrid, TermCell, TermColor, CellAttrs, VtParser, VtAction, CursorStyle};
-pub mod webapp_manager; pub use webapp_manager::*;
+pub mod sigma_ghostty;
+pub use sigma_ghostty::{
+    CellAttrs, CursorStyle, GhosttyConfig, SigmaGhostty, TermCell, TermColor, TermGrid, VtAction,
+    VtParser,
+};
+pub mod webapp_manager;
+pub use webapp_manager::*;

@@ -98,11 +98,51 @@ impl ProcessTaskManager {
     /// Add default processes
     fn add_default_processes(&mut self) {
         let processes = vec![
-            (1, "init", "/sbin/init", TaskProcessState::Running, 0.1, 10.0, "root"),
-            (2, "kthreadd", "[kthreadd]", TaskProcessState::Sleeping, 0.0, 0.0, "root"),
-            (100, "systemd", "/usr/lib/systemd/systemd", TaskProcessState::Running, 0.5, 20.0, "root"),
-            (200, "sigma-shell", "/usr/bin/sigma-shell", TaskProcessState::Running, 1.0, 50.0, "user"),
-            (300, "sigma-wm", "/usr/bin/sigma-wm", TaskProcessState::Running, 2.0, 100.0, "user"),
+            (
+                1,
+                "init",
+                "/sbin/init",
+                TaskProcessState::Running,
+                0.1,
+                10.0,
+                "root",
+            ),
+            (
+                2,
+                "kthreadd",
+                "[kthreadd]",
+                TaskProcessState::Sleeping,
+                0.0,
+                0.0,
+                "root",
+            ),
+            (
+                100,
+                "systemd",
+                "/usr/lib/systemd/systemd",
+                TaskProcessState::Running,
+                0.5,
+                20.0,
+                "root",
+            ),
+            (
+                200,
+                "sigma-shell",
+                "/usr/bin/sigma-shell",
+                TaskProcessState::Running,
+                1.0,
+                50.0,
+                "user",
+            ),
+            (
+                300,
+                "sigma-wm",
+                "/usr/bin/sigma-wm",
+                TaskProcessState::Running,
+                2.0,
+                100.0,
+                "user",
+            ),
         ];
 
         for (pid, name, command, state, cpu, memory, user) in processes {
@@ -133,32 +173,34 @@ impl ProcessTaskManager {
 
     /// List by state
     pub fn list_by_state(&self, state: TaskProcessState) -> Vec<&TaskProcessEntry> {
-        self.processes.values()
+        self.processes
+            .values()
             .filter(|p| p.state == state)
             .collect()
     }
 
     /// List by user
     pub fn list_by_user(&self, user: &str) -> Vec<&TaskProcessEntry> {
-        self.processes.values()
-            .filter(|p| p.user == user)
-            .collect()
+        self.processes.values().filter(|p| p.user == user).collect()
     }
 
     /// Search processes
     pub fn search(&self, query: &str) -> Vec<&TaskProcessEntry> {
         let query_lower = query.to_lowercase();
-        self.processes.values()
+        self.processes
+            .values()
             .filter(|p| {
-                p.name.to_lowercase().contains(&query_lower) ||
-                p.command.to_lowercase().contains(&query_lower)
+                p.name.to_lowercase().contains(&query_lower)
+                    || p.command.to_lowercase().contains(&query_lower)
             })
             .collect()
     }
 
     /// Terminate a process
     pub fn terminate(&mut self, pid: u32) -> Result<(), String> {
-        let process = self.processes.get(&pid)
+        let process = self
+            .processes
+            .get(&pid)
             .ok_or_else(|| format!("Process {} not found", pid))?;
 
         if process.pid == 1 {
@@ -181,28 +223,30 @@ impl ProcessTaskManager {
 
     /// Get total CPU usage
     pub fn get_total_cpu(&self) -> f32 {
-        self.processes.values()
-            .map(|p| p.cpu_percent)
-            .sum()
+        self.processes.values().map(|p| p.cpu_percent).sum()
     }
 
     /// Get total memory usage
     pub fn get_total_memory(&self) -> f32 {
-        self.processes.values()
-            .map(|p| p.memory_mb)
-            .sum()
+        self.processes.values().map(|p| p.memory_mb).sum()
     }
 
     /// Get statistics
     pub fn get_statistics(&self) -> ProcessTaskStatistics {
         let total_processes = self.processes.len();
-        let running_count = self.processes.values()
+        let running_count = self
+            .processes
+            .values()
             .filter(|p| p.state == TaskProcessState::Running)
             .count();
-        let sleeping_count = self.processes.values()
+        let sleeping_count = self
+            .processes
+            .values()
             .filter(|p| p.state == TaskProcessState::Sleeping)
             .count();
-        let zombie_count = self.processes.values()
+        let zombie_count = self
+            .processes
+            .values()
             .filter(|p| p.state == TaskProcessState::Zombie)
             .count();
         let total_cpu = self.get_total_cpu();
@@ -242,17 +286,19 @@ mod tests {
 
     #[test]
     fn test_process_state_from_str() {
-        assert_eq!(TaskProcessState::from_str("running"), Some(TaskProcessState::Running));
-        assert_eq!(TaskProcessState::from_str("sleeping"), Some(TaskProcessState::Sleeping));
+        assert_eq!(
+            TaskProcessState::from_str("running"),
+            Some(TaskProcessState::Running)
+        );
+        assert_eq!(
+            TaskProcessState::from_str("sleeping"),
+            Some(TaskProcessState::Sleeping)
+        );
     }
 
     #[test]
     fn test_process_entry_creation() {
-        let proc = TaskProcessEntry::new(
-            1,
-            "test".to_string(),
-            "/bin/test".to_string(),
-        );
+        let proc = TaskProcessEntry::new(1, "test".to_string(), "/bin/test".to_string());
         assert_eq!(proc.name, "test");
     }
 
@@ -265,11 +311,7 @@ mod tests {
     #[test]
     fn test_add_process() {
         let mut manager = ProcessTaskManager::new();
-        let proc = TaskProcessEntry::new(
-            999,
-            "test".to_string(),
-            "/bin/test".to_string(),
-        );
+        let proc = TaskProcessEntry::new(999, "test".to_string(), "/bin/test".to_string());
         manager.add_process(proc);
         assert!(manager.get_process(999).is_some());
     }

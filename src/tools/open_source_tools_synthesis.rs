@@ -217,8 +217,7 @@ impl RofiCommandHudEngine {
         self.apps
             .iter()
             .filter(|app| {
-                contains_ignore_case(&app.name, query)
-                    || contains_ignore_case(&app.category, query)
+                contains_ignore_case(&app.name, query) || contains_ignore_case(&app.category, query)
             })
             .cloned()
             .collect()

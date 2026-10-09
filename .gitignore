@@ -73,5 +73,5 @@ wiki_repo/
 *.py
 wiki/
 WIKI/
-docs/
+!docs/*.md
 !Agents/*.md

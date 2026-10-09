@@ -169,7 +169,8 @@ impl TcpControlBlock {
                     } else if ack == self.snd_una {
                         self.dup_acks += 1;
                         if self.dup_acks == 3 {
-                            self.ssthresh = core::cmp::max(self.cwnd / 2, 2 * self.options.mss as u32);
+                            self.ssthresh =
+                                core::cmp::max(self.cwnd / 2, 2 * self.options.mss as u32);
                             self.cwnd = self.ssthresh + 3 * self.options.mss as u32;
                         }
                     }
