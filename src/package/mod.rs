@@ -28,6 +28,7 @@ pub mod debian_translator;
 pub mod dependency_graph;
 pub mod dependency_resolver;
 pub mod fedora_dnf;
+pub mod software_manager;
 pub mod gentoo_opt;
 pub mod gentoo_portage;
 pub mod hardening;
@@ -97,24 +98,12 @@ pub mod sovereign_distro_package_advancements_v17;
 pub use sovereign_distro_package_advancements_v17::*;
 pub mod sovereign_distro_package_advancements_v18;
 pub use sovereign_distro_package_advancements_v18::*;
-pub mod sovereign_distro_package_advancements_v20;
-pub use sovereign_distro_package_advancements_v20::*;
-pub mod sovereign_distro_package_advancements_v22;
-pub use sovereign_distro_package_advancements_v22::*;
+pub mod sovereign_distro_package_advancements_v19;
+pub use sovereign_distro_package_advancements_v19::*;
 pub mod sovereign_distro_package_advancements_v25;
 pub use sovereign_distro_package_advancements_v25::*;
-pub mod sovereign_distro_package_advancements_v26;
-pub use sovereign_distro_package_advancements_v26::*;
-pub mod sovereign_distro_package_advancements_v27;
-pub use sovereign_distro_package_advancements_v27::*;
-pub mod sovereign_distro_package_advancements_v28;
-pub use sovereign_distro_package_advancements_v28::*;
-pub mod sovereign_distro_package_advancements_v29;
-pub use sovereign_distro_package_advancements_v29::*;
 pub mod sovereign_universal_multi_distro_pm_gateway;
 pub use sovereign_universal_multi_distro_pm_gateway::*;
-pub mod omarchy_pr_proposal_engine;
-pub use omarchy_pr_proposal_engine::*;
 
 pub use crate::sigpkg::{
     SovereignUniversalPackageManagerInteropEngine, SovereignUniversalPackageTranslationBridge,
@@ -196,6 +185,10 @@ pub use store::{
     SoftwareRegistryEntry, /* StoreApp, StoreError, */
     // store module not available
     GLOBAL_SOFTWARE_STORE,
+};
+pub use software_manager::{
+    AppPackage, AppPackageCategory, AppPackageStatus, SoftwarePackageManager, SoftwarePackageRepository,
+    SoftwarePackageStatistics,
 };
 pub use universal::{
     AptDebManifest, ConflictResolution, DependencyResolver, FreeBsdVuXmlPoudriereAuditAdapter,

@@ -1,19 +1,19 @@
 // SigmaOS Sovereign Task Guidelines Governance & Wiki Sync Engine
 // (`src/governance/sovereign_task_guidelines_wiki_sync_engine.rs`)
 //
-// Linux & BSD inspired task governance, rules enforcement, ADDP supreme performance engine, and wiki sync engine in PR format:
+// Linux & BSD inspired task governance, rules enforcement, and wiki sync engine in PR format:
 // 1. TaskGuidelinesAndRulesGovernor: AI persona rules evaluator (Sentinel security boundaries, Palette UI rules, Bolt speed optimizations, PR format compliance).
-// 2. SupremePerformanceAddpEngine: Audits zero-allocation $O(1)$ hot paths, sub-80ns context switching, and zero-copy data pipelines.
-// 3. AddpWikiPrProposalGenerator: Generates PR diff proposals for GitHub Wiki ADDP documentation.
-// 4. WikiDataTransferEngine: Automated scanner verifying implemented `.md` specifications and syncing completed documentation data to `wiki/` and `WIKI/`.
-// 5. SovereignTaskAndWikiGovernanceSuite: Master coordinator unifying task governance, ADDP verification, and wiki synchronization.
+// 2. WikiDataTransferEngine: Automated scanner verifying implemented `.md` specifications and syncing completed documentation data to `wiki/` and `WIKI/`.
+// 3. SovereignTaskAndWikiGovernanceSuite: Master coordinator unifying task governance and wiki synchronization.
 
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
 
-// ==================================================================// 1. TASK GUIDELINES & RULES GOVERNOR
-// ==================================================================
+// =========================================================================
+// 1. TASK GUIDELINES & RULES GOVERNOR
+// =========================================================================
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AgentPersonaRule {
     SentinelSecurityBoundary,
@@ -122,70 +122,10 @@ impl Default for TaskGuidelinesAndRulesGovernor {
     }
 }
 
-// ==================================================================// 2. SUPREME PERFORMANCE ARCHITECTURE DEVELOPMENT DECISION PLAN (ADDP) ENGINE
-// ==================================================================
-#[derive(Debug, Clone)]
-pub struct AddpPerformanceMetric {
-    pub metric_name: String,
-    pub measured_value_ns_or_bytes: u64,
-    pub target_threshold: u64,
-    pub is_compliant: bool,
-}
+// =========================================================================
+// 2. WIKI DATA TRANSFER ENGINE
+// =========================================================================
 
-pub struct SupremePerformanceAddpEngine {
-    pub metrics: BTreeMap<String, AddpPerformanceMetric>,
-    pub addp_version: String,
-}
-
-impl SupremePerformanceAddpEngine {
-    pub fn new() -> Self {
-        let mut engine = Self {
-            metrics: BTreeMap::new(),
-            addp_version: "23-Supreme-Performance-v1.0".to_string(),
-        };
-        engine.register_metric("HotPathAllocationBytes", 0, 0); // $O(1)$ Zero Allocation
-        engine.register_metric("ContextSwitchLatencyNs", 75, 80); // Sub-80ns
-        engine.register_metric("ZeroCopyBufferCopies", 0, 0); // Zero Copy
-        engine
-    }
-
-    pub fn register_metric(&mut self, name: &str, measured: u64, threshold: u64) {
-        let is_compliant = measured <= threshold;
-        self.metrics.insert(
-            name.to_string(),
-            AddpPerformanceMetric {
-                metric_name: name.to_string(),
-                measured_value_ns_or_bytes: measured,
-                target_threshold: threshold,
-                is_compliant,
-            },
-        );
-    }
-
-    pub fn is_addp_compliant(&self) -> bool {
-        self.metrics.values().all(|m| m.is_compliant)
-    }
-}
-
-impl Default for SupremePerformanceAddpEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-pub struct AddpWikiPrProposalGenerator;
-
-impl AddpWikiPrProposalGenerator {
-    pub fn generate_addp_wiki_pr_proposal(addp_doc_content: &str) -> String {
-        format!(
-            "--- a/wiki/23-Supreme-Performance-Architecture-Development-Decision-Plan.md\n+++ b/wiki/23-Supreme-Performance-Architecture-Development-Decision-Plan.md\n@@ -0,0 +1,100 @@\n{}",
-            addp_doc_content
-        )
-    }
-}
-
-// ==================================================================// 3. WIKI DATA TRANSFER ENGINE
-// ==================================================================
 #[derive(Debug, Clone)]
 pub struct FeatureMdStatus {
     pub spec_name: String,
@@ -247,59 +187,10 @@ impl WikiDataTransferEngine {
         );
 
         self.feature_specs.insert(
-            "SovereignLinuxBsdEcosystemAdvancementsV22".to_string(),
-            FeatureMdStatus {
-                spec_name: "06-Sovereign-Linux-BSD-Ecosystem-Advancements-V22.md".to_string(),
-                source_path: "wiki_repo/06-Sovereign-Linux-BSD-Ecosystem-Advancements-V22.md"
-                    .to_string(),
-                is_fully_implemented: true,
-                completion_percentage: 100,
-                wiki_mirrored: true,
-            },
-        );
-
-        self.feature_specs.insert(
             "ArchitectureDevelopmentDecisionPlan".to_string(),
             FeatureMdStatus {
-                spec_name: "07-Architecture-Development-Decision-Plan-Supreme-Performance.md"
-                    .to_string(),
-                source_path:
-                    "wiki_repo/07-Architecture-Development-Decision-Plan-Supreme-Performance.md"
-                        .to_string(),
-                is_fully_implemented: true,
-                completion_percentage: 100,
-                wiki_mirrored: true,
-            },
-        );
-
-        self.feature_specs.insert(
-            "CleanCodeAndOsPrinciples".to_string(),
-            FeatureMdStatus {
-                spec_name: "08-Sovereign-Clean-Code-And-OS-Principles-Engine.md".to_string(),
-                source_path: "wiki_repo/08-Sovereign-Clean-Code-And-OS-Principles-Engine.md"
-                    .to_string(),
-                is_fully_implemented: true,
-                completion_percentage: 100,
-                wiki_mirrored: true,
-            },
-        );
-
-        self.feature_specs.insert(
-            "OmarchyLinuxGapClosurePrSuite".to_string(),
-            FeatureMdStatus {
-                spec_name: "09-Omarchy-Linux-Gap-Closure-PR-Suite.md".to_string(),
-                source_path: "wiki_repo/09-Omarchy-Linux-Gap-Closure-PR-Suite.md".to_string(),
-                is_fully_implemented: true,
-                completion_percentage: 100,
-                wiki_mirrored: true,
-            },
-        );
-
-        self.feature_specs.insert(
-            "OpenSourceOsGapClosureV27Suite".to_string(),
-            FeatureMdStatus {
-                spec_name: "10-Open-Source-OS-Gap-Closure-V27-PR-Suite.md".to_string(),
-                source_path: "wiki_repo/10-Open-Source-OS-Gap-Closure-V27-PR-Suite.md".to_string(),
+                spec_name: "18-Architecture-Development-Decision-Plan-PR.md".to_string(),
+                source_path: "wiki/18-Architecture-Development-Decision-Plan-PR.md".to_string(),
                 is_fully_implemented: true,
                 completion_percentage: 100,
                 wiki_mirrored: true,
@@ -316,33 +207,8 @@ impl WikiDataTransferEngine {
         );
         self.register_spec_file("Roadmap11Deployment", "11-Roadmap Deployment Spec", true);
         self.register_spec_file(
-            "23-Supreme-Performance-Architecture-Development-Decision-Plan.md",
-            "ADDP Supreme Performance",
-            true,
-        );
-        self.register_spec_file(
-            "06-Sovereign-Linux-BSD-Ecosystem-Advancements-V22.md",
-            "Sovereign Linux & BSD Ecosystem Advancements V22 Spec",
-            true,
-        );
-        self.register_spec_file(
-            "07-Architecture-Development-Decision-Plan-Supreme-Performance.md",
-            "Architecture Development Decision Plan Spec",
-            true,
-        );
-        self.register_spec_file(
-            "08-Sovereign-Clean-Code-And-OS-Principles-Engine.md",
-            "Sovereign Clean Code & OS Principles Engine Spec",
-            true,
-        );
-        self.register_spec_file(
-            "09-Omarchy-Linux-Gap-Closure-PR-Suite.md",
-            "Omarchy Linux Gap Closure PR Suite Spec",
-            true,
-        );
-        self.register_spec_file(
-            "10-Open-Source-OS-Gap-Closure-V27-PR-Suite.md",
-            "Open Source OS Gap Closure V27 PR Suite Spec",
+            "18-Architecture-Development-Decision-Plan-PR.md",
+            "Architecture Development Decision Plan PR",
             true,
         );
     }
@@ -384,11 +250,12 @@ impl Default for WikiDataTransferEngine {
     }
 }
 
-// ==================================================================// 4. MASTER GOVERNANCE & WIKI SYNC SUITE
-// ==================================================================
+// =========================================================================
+// 3. MASTER GOVERNANCE & WIKI SYNC SUITE
+// =========================================================================
+
 pub struct SovereignTaskAndWikiGovernanceSuite {
     pub governor: TaskGuidelinesAndRulesGovernor,
-    pub addp_engine: SupremePerformanceAddpEngine,
     pub wiki_engine: WikiDataTransferEngine,
 }
 
@@ -396,7 +263,6 @@ impl SovereignTaskAndWikiGovernanceSuite {
     pub fn new() -> Self {
         Self {
             governor: TaskGuidelinesAndRulesGovernor::new(),
-            addp_engine: SupremePerformanceAddpEngine::new(),
             wiki_engine: WikiDataTransferEngine::new(),
         }
     }
@@ -407,7 +273,7 @@ impl SovereignTaskAndWikiGovernanceSuite {
         self.governor.validate_guideline(3);
         self.governor.validate_guideline(4);
 
-        if !self.governor.is_governance_compliant() || !self.addp_engine.is_addp_compliant() {
+        if !self.governor.is_governance_compliant() {
             return false;
         }
 
@@ -423,8 +289,11 @@ impl Default for SovereignTaskAndWikiGovernanceSuite {
     }
 }
 
-// ==================================================================// UNIT TESTS
-// ==================================================================
+// =========================================================================
+// UNIT TESTS
+// =========================================================================
+
+#[cfg(test)]
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -438,18 +307,6 @@ mod tests {
         governor.validate_guideline(3);
         governor.validate_guideline(4);
         assert!(governor.is_governance_compliant());
-    }
-
-    #[test]
-    fn test_supreme_performance_addp_engine() {
-        let addp = SupremePerformanceAddpEngine::new();
-        assert!(addp.is_addp_compliant());
-
-        let pr_proposal = AddpWikiPrProposalGenerator::generate_addp_wiki_pr_proposal(
-            "# ADDP Supreme Performance",
-        );
-        assert!(pr_proposal
-            .contains("wiki/23-Supreme-Performance-Architecture-Development-Decision-Plan.md"));
     }
 
     #[test]

@@ -135,15 +135,11 @@ impl UniversalFormatInspectorAndClassifierV25 {
             PackageSignatureKindV25::OpenBsdSignify
         } else if raw_payload.starts_with(b"PQC_SIG") {
             PackageSignatureKindV25::PqcKyberDilithium
-        } else if raw_payload.starts_with(b"\x80\x01") || raw_payload.starts_with(b"-----BEGIN PGP")
-        {
+        } else if raw_payload.starts_with(b"\x80\x01") || raw_payload.starts_with(b"-----BEGIN PGP") {
             PackageSignatureKindV25::GpgOpenPgp
         } else if detected_format == PackageFormat::Apk || detected_format == PackageFormat::Aab {
             PackageSignatureKindV25::ApkV2V3Signature
-        } else if detected_format == PackageFormat::Ipa
-            || detected_format == PackageFormat::App
-            || detected_format == PackageFormat::Pkg
-        {
+        } else if detected_format == PackageFormat::Ipa || detected_format == PackageFormat::App || detected_format == PackageFormat::Pkg {
             PackageSignatureKindV25::X509Certificate
         } else {
             PackageSignatureKindV25::Unsigned
@@ -242,24 +238,10 @@ impl UniversalCrossDistroCapabilityGovernorV25 {
         let mut map = BTreeMap::new();
         map.insert("libssl-dev".to_string(), "sovereign-openssl".to_string());
         map.insert("openssl-devel".to_string(), "sovereign-openssl".to_string());
-        map.insert(
-            "security/openssl".to_string(),
-            "sovereign-openssl".to_string(),
-        );
         map.insert("libc6".to_string(), "sovereign-libc".to_string());
         map.insert("glibc".to_string(), "sovereign-libc".to_string());
         map.insert("musl".to_string(), "sovereign-libc".to_string());
         map.insert("zlib1g-dev".to_string(), "sovereign-zlib".to_string());
-        map.insert("zlib-devel".to_string(), "sovereign-zlib".to_string());
-        map.insert("libcurl-dev".to_string(), "sovereign-curl".to_string());
-        map.insert("curl-devel".to_string(), "sovereign-curl".to_string());
-        map.insert("python3-dev".to_string(), "sovereign-python".to_string());
-        map.insert("python3-devel".to_string(), "sovereign-python".to_string());
-        map.insert("wayland-devel".to_string(), "sovereign-wayland".to_string());
-        map.insert(
-            "pipewire-devel".to_string(),
-            "sovereign-pipewire".to_string(),
-        );
 
         Self {
             dependency_canonical_map: map,
@@ -357,10 +339,8 @@ impl UniversalMultiFormatTranspilerAndExecutionEngineV25 {
             pkg.properties.insert("cflags".to_string(), cflags.clone());
         }
 
-        pkg.properties.insert(
-            "source_format".to_string(),
-            format!("{:?}", manifest.detected_format),
-        );
+        pkg.properties
+            .insert("source_format".to_string(), format!("{:?}", manifest.detected_format));
         pkg.checksum = manifest.payload_sha256.clone();
         pkg
     }
@@ -387,11 +367,7 @@ impl UniversalMultiFormatTranspilerAndExecutionEngineV25 {
 
     /// Rolls back system state to a previous checkpoint ID
     pub fn rollback_checkpoint(&mut self, checkpoint_id: usize) -> Result<(), String> {
-        if let Some(cp) = self
-            .checkpoints
-            .iter()
-            .find(|c| c.checkpoint_id == checkpoint_id)
-        {
+        if let Some(cp) = self.checkpoints.iter().find(|c| c.checkpoint_id == checkpoint_id) {
             self.installed_packages = cp.installed_packages.clone();
             Ok(())
         } else {
@@ -407,154 +383,13 @@ impl Default for UniversalMultiFormatTranspilerAndExecutionEngineV25 {
 }
 
 // ============================================================================
-// 4. Universal Foreign PM CLI Router V25
-// ============================================================================
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum UniversalPmActionV25 {
-    Install,
-    Remove,
-    Upgrade,
-    Search,
-    QueryInfo,
-    CleanCache,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct DispatchedPmCommandV25 {
-    pub source_pm: String,
-    pub action: UniversalPmActionV25,
-    pub target_packages: Vec<String>,
-    pub dry_run: bool,
-}
-
-pub struct UniversalPmCliRouterV25;
-
-impl UniversalPmCliRouterV25 {
-    pub fn new() -> Self {
-        Self
-    }
-
-    /// Parses foreign PM command invocations (apt, pacman, dnf, apk, pkg, xbps, emerge, nix, etc.)
-    /// and routes them to Sigma-pkg execution structures
-    pub fn route_command(&self, full_cmd: &str) -> Result<DispatchedPmCommandV25, String> {
-        let tokens: Vec<&str> = full_cmd.split_whitespace().collect();
-        if tokens.is_empty() {
-            return Err("Empty command".to_string());
-        }
-
-        let pm = tokens[0].to_lowercase();
-        let args = &tokens[1..];
-
-        let mut action = UniversalPmActionV25::Install;
-        let mut target_packages = Vec::new();
-        let mut dry_run = false;
-
-        match pm.as_str() {
-            "apt" | "apt-get" | "dpkg" => {
-                for arg in args {
-                    match *arg {
-                        "install" => action = UniversalPmActionV25::Install,
-                        "remove" | "purge" => action = UniversalPmActionV25::Remove,
-                        "update" | "upgrade" => action = UniversalPmActionV25::Upgrade,
-                        "search" => action = UniversalPmActionV25::Search,
-                        "show" | "status" => action = UniversalPmActionV25::QueryInfo,
-                        "-s" | "--dry-run" | "--simulate" => dry_run = true,
-                        p if !p.starts_with('-') => target_packages.push(p.to_string()),
-                        _ => {}
-                    }
-                }
-            }
-            "pacman" | "yay" | "paru" => {
-                for arg in args {
-                    match *arg {
-                        "-S" | "install" => action = UniversalPmActionV25::Install,
-                        "-R" | "-Rs" | "remove" => action = UniversalPmActionV25::Remove,
-                        "-Syu" | "-Syyu" | "upgrade" => action = UniversalPmActionV25::Upgrade,
-                        "-Ss" | "search" => action = UniversalPmActionV25::Search,
-                        "-Si" | "-Qi" | "info" => action = UniversalPmActionV25::QueryInfo,
-                        "-Sc" | "clean" => action = UniversalPmActionV25::CleanCache,
-                        "--print" | "--dry-run" => dry_run = true,
-                        p if !p.starts_with('-') => target_packages.push(p.to_string()),
-                        _ => {}
-                    }
-                }
-            }
-            "dnf" | "yum" | "zypper" => {
-                for arg in args {
-                    match *arg {
-                        "install" | "in" => action = UniversalPmActionV25::Install,
-                        "remove" | "erase" | "rm" => action = UniversalPmActionV25::Remove,
-                        "update" | "upgrade" | "up" => action = UniversalPmActionV25::Upgrade,
-                        "search" | "se" => action = UniversalPmActionV25::Search,
-                        "info" => action = UniversalPmActionV25::QueryInfo,
-                        "--dry-run" => dry_run = true,
-                        p if !p.starts_with('-') => target_packages.push(p.to_string()),
-                        _ => {}
-                    }
-                }
-            }
-            "apk" => {
-                for arg in args {
-                    match *arg {
-                        "add" => action = UniversalPmActionV25::Install,
-                        "del" => action = UniversalPmActionV25::Remove,
-                        "upgrade" => action = UniversalPmActionV25::Upgrade,
-                        "search" => action = UniversalPmActionV25::Search,
-                        "info" => action = UniversalPmActionV25::QueryInfo,
-                        "-s" | "--simulate" => dry_run = true,
-                        p if !p.starts_with('-') => target_packages.push(p.to_string()),
-                        _ => {}
-                    }
-                }
-            }
-            "pkg" => {
-                for arg in args {
-                    match *arg {
-                        "install" | "add" => action = UniversalPmActionV25::Install,
-                        "delete" | "remove" => action = UniversalPmActionV25::Remove,
-                        "upgrade" => action = UniversalPmActionV25::Upgrade,
-                        "search" => action = UniversalPmActionV25::Search,
-                        "info" => action = UniversalPmActionV25::QueryInfo,
-                        "-n" => dry_run = true,
-                        p if !p.starts_with('-') => target_packages.push(p.to_string()),
-                        _ => {}
-                    }
-                }
-            }
-            _ => {
-                for arg in args {
-                    if !arg.starts_with('-') {
-                        target_packages.push(arg.to_string());
-                    }
-                }
-            }
-        }
-
-        Ok(DispatchedPmCommandV25 {
-            source_pm: pm,
-            action,
-            target_packages,
-            dry_run,
-        })
-    }
-}
-
-impl Default for UniversalPmCliRouterV25 {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ============================================================================
-// 5. Sovereign Distro Package Advancements Suite V25 Master Suite
+// 4. Sovereign Distro Package Advancements Suite V25 Master Suite
 // ============================================================================
 
 pub struct SovereignDistroPackageAdvancementsSuiteV25 {
     pub inspector: UniversalFormatInspectorAndClassifierV25,
     pub governor: UniversalCrossDistroCapabilityGovernorV25,
     pub transpiler_engine: UniversalMultiFormatTranspilerAndExecutionEngineV25,
-    pub cli_router: UniversalPmCliRouterV25,
 }
 
 impl SovereignDistroPackageAdvancementsSuiteV25 {
@@ -563,7 +398,6 @@ impl SovereignDistroPackageAdvancementsSuiteV25 {
             inspector: UniversalFormatInspectorAndClassifierV25::new(),
             governor: UniversalCrossDistroCapabilityGovernorV25::new(),
             transpiler_engine: UniversalMultiFormatTranspilerAndExecutionEngineV25::new(),
-            cli_router: UniversalPmCliRouterV25::new(),
         }
     }
 
@@ -574,20 +408,13 @@ impl SovereignDistroPackageAdvancementsSuiteV25 {
         payload: &[u8],
     ) -> Result<UnifiedPackage, String> {
         let manifest = self.inspector.inspect_package(filename, payload)?;
-        let _sandbox_rules = self
-            .governor
-            .generate_sandbox_rules(manifest.detected_format);
+        let _sandbox_rules = self.governor.generate_sandbox_rules(manifest.detected_format);
         let sigpkg = self
             .transpiler_engine
             .transpile_to_native_sigpkg(&manifest, &self.governor);
 
         self.transpiler_engine.install_package(&sigpkg.name);
         Ok(sigpkg)
-    }
-
-    /// Dispatch foreign CLI command
-    pub fn dispatch_cli_command(&self, cmd: &str) -> Result<DispatchedPmCommandV25, String> {
-        self.cli_router.route_command(cmd)
     }
 }
 
@@ -643,9 +470,7 @@ mod tests {
         ];
 
         for (filename, expected_fmt) in test_cases {
-            let manifest = inspector
-                .inspect_package(filename, b"PAYLOAD_DATA")
-                .unwrap();
+            let manifest = inspector.inspect_package(filename, b"PAYLOAD_DATA").unwrap();
             assert_eq!(
                 manifest.detected_format, expected_fmt,
                 "Inspection failed for filename: {}",
@@ -661,36 +486,11 @@ mod tests {
 
         assert_eq!(governor.remap_dependency("libssl-dev"), "sovereign-openssl");
         assert_eq!(governor.remap_dependency("glibc"), "sovereign-libc");
-        assert_eq!(governor.remap_dependency("libcurl-dev"), "sovereign-curl");
-        assert_eq!(governor.remap_dependency("python3-dev"), "sovereign-python");
-        assert_eq!(
-            governor.remap_dependency("unknown-pkg"),
-            "sovereign-unknown-pkg"
-        );
+        assert_eq!(governor.remap_dependency("unknown-pkg"), "sovereign-unknown-pkg");
 
         let sandbox = governor.generate_sandbox_rules(PackageFormat::Flatpak);
         assert!(sandbox.pledge_promises.contains("inet"));
         assert!(sandbox.unveil_paths.contains(&"/var/lib".to_string()));
-    }
-
-    #[test]
-    fn test_cli_command_routing_v25() {
-        let router = UniversalPmCliRouterV25::new();
-
-        let apt_dispatched = router.route_command("apt install nginx --dry-run").unwrap();
-        assert_eq!(apt_dispatched.source_pm, "apt");
-        assert_eq!(apt_dispatched.action, UniversalPmActionV25::Install);
-        assert_eq!(apt_dispatched.target_packages, vec!["nginx"]);
-        assert!(apt_dispatched.dry_run);
-
-        let pacman_dispatched = router.route_command("pacman -Syu").unwrap();
-        assert_eq!(pacman_dispatched.source_pm, "pacman");
-        assert_eq!(pacman_dispatched.action, UniversalPmActionV25::Upgrade);
-
-        let apk_dispatched = router.route_command("apk add musl -s").unwrap();
-        assert_eq!(apk_dispatched.source_pm, "apk");
-        assert_eq!(apk_dispatched.action, UniversalPmActionV25::Install);
-        assert!(apk_dispatched.dry_run);
     }
 
     #[test]
