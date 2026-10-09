@@ -2,10 +2,10 @@
 // Sovereign Linux & BSD Ecosystem Advancements Suite V30
 // (`src/distro/sovereign_linux_bsd_ecosystem_advancements_v30.rs`)
 //
-// Advanced zero-dependency PR format engine expanding distro parity across Clear Linux stateless & P-state tuning,
-// Arch/CachyOS BORE scheduler & x86-64-v4 ISA, Alpine APK v3 & apkovl persistence, FreeBSD ZFS boot environments
-// `bectl` & Capsicum Casper delegation, OpenBSD pledge/unveil & pfctl state replication, Gentoo Portage EAPI 8
-// subslot/USE-flag resolution, Fedora OSTree/Bodhi Greenwave CI, Nix/Guix CAS & flake closure graph,
+// Advanced zero-dependency engine expanding distro parity across Clear Linux stateless architecture,
+// Ubuntu AppArmor v4 profile mediation, Arch/CachyOS EEVDF & BORE schedulers, Alpine APK v3 & apkovl persistence,
+// FreeBSD ZFS boot environments `bectl` & Capsicum Casper delegation, OpenBSD pledge/unveil & softraid crypto,
+// Gentoo Portage EAPI 8 subslot/USE-flag resolution, Fedora OSTree & Bodhi Greenwave CI, Nix/Guix CAS & flake closure,
 // Void XBPS/runit supervisor, and DragonFly BSD HAMMER2 PFS cluster replication.
 
 #![allow(non_camel_case_types)]
@@ -21,6 +21,8 @@ use alloc::format;
 use alloc::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::vec;
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::BTreeMap;
@@ -30,504 +32,730 @@ use std::format;
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec;
 
 // ============================================================================
-// 1. Clear Linux Stateless Architecture & P-state Governor PR Engine
-// ============================================================================
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum PstateGovernorMode {
-    Performance,
-    Powersave,
-    Schedutil,
-}
-
-#[derive(Debug, Clone)]
-pub struct ClearLinuxStatelessPstatePrEngine {
-    pub default_config_path: String,
-    pub user_override_path: String,
-    pub pstate_mode: PstateGovernorMode,
-    pub energy_perf_bias: u32, // 0 (perf) .. 15 (powersave)
-    pub stateless_configs: BTreeMap<String, String>,
-}
-
-impl ClearLinuxStatelessPstatePrEngine {
-    pub fn new() -> Self {
-        let mut engine = Self {
-            default_config_path: "/usr/share/defaults/etc".to_string(),
-            user_override_path: "/etc".to_string(),
-            pstate_mode: PstateGovernorMode::Performance,
-            energy_perf_bias: 0,
-            stateless_configs: BTreeMap::new(),
-        };
-        engine.seed_defaults();
-        engine
-    }
-
-    fn seed_defaults(&mut self) {
-        self.stateless_configs.insert(
-            "/usr/share/defaults/etc/swupd/config".to_string(),
-            "AUTO_UPDATE=true".to_string(),
-        );
-    }
-
-    pub fn set_pstate_governor(&mut self, mode: PstateGovernorMode, epb: u32) -> String {
-        self.pstate_mode = mode;
-        self.energy_perf_bias = epb;
-        format!(
-            "PR Proposal: Intel P-state governor tuned to {:?} with EPB bias {}",
-            self.pstate_mode, self.energy_perf_bias
-        )
-    }
-
-    pub fn resolve_stateless_path(&self, config_file: &str) -> String {
-        let user_path = format!("{}/{}", self.user_override_path, config_file);
-        let default_path = format!("{}/{}", self.default_config_path, config_file);
-        if self.stateless_configs.contains_key(&user_path) {
-            user_path
-        } else {
-            default_path
-        }
-    }
-}
-
-impl Default for ClearLinuxStatelessPstatePrEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ============================================================================
-// 2. Arch / CachyOS BORE Scheduler & x86-64 Microarchitecture ISA PR Engine
+// 1. Clear Linux Stateless Architecture & Energy Performance Preference Engine
 // ============================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum MicroArchIsaLevelV30 {
-    V1,
-    V2,
-    V3,
-    V4,
+pub enum EnergyPerformancePreference {
+    Performance,
+    BalancePerformance,
+    BalancePower,
+    Power,
 }
 
 #[derive(Debug, Clone)]
-pub struct ArchCachyBoreIsaPrEngine {
-    pub isa_level: MicroArchIsaLevelV30,
-    pub bore_penalty_scale: u32,
-    pub latency_target_ns: u64,
-    pub task_scores: BTreeMap<u32, u32>,
+pub struct ClearLinuxStatelessPstateEngineV30 {
+    pub vendor_defaults: BTreeMap<String, String>, // /usr/share/defaults/
+    pub user_overrides: BTreeMap<String, String>,  // /etc/
+    pub energy_preference: EnergyPerformancePreference,
+    pub turbo_boost_enabled: bool,
 }
 
-impl ArchCachyBoreIsaPrEngine {
-    pub fn new(isa: MicroArchIsaLevelV30) -> Self {
-        Self {
-            isa_level: isa,
-            bore_penalty_scale: 128,
-            latency_target_ns: 4_000_000, // 4ms latency target
-            task_scores: BTreeMap::new(),
-        }
-    }
-
-    pub fn calculate_bore_penalty(&mut self, pid: u32, burst_time_ns: u64) -> u32 {
-        let base_score = (burst_time_ns / 1_000_000) as u32 * self.bore_penalty_scale;
-        let score = match self.isa_level {
-            MicroArchIsaLevelV30::V4 => base_score / 4,
-            MicroArchIsaLevelV30::V3 => base_score / 2,
-            _ => base_score,
-        };
-        self.task_scores.insert(pid, score);
-        score
-    }
-
-    pub fn get_isa_optimization_flag(&self) -> &'static str {
-        match self.isa_level {
-            MicroArchIsaLevelV30::V4 => "-march=x86-64-v4 -mavx512f -mavx512bw",
-            MicroArchIsaLevelV30::V3 => "-march=x86-64-v3 -mavx2 -mfma",
-            MicroArchIsaLevelV30::V2 => "-march=x86-64-v2 -msse4.2 -mpopcnt",
-            MicroArchIsaLevelV30::V1 => "-march=x86-64",
-        }
-    }
-}
-
-// ============================================================================
-// 3. Alpine APK v3 & apkovl Persistence Overlay PR Engine
-// ============================================================================
-
-#[derive(Debug, Clone)]
-pub struct AlpineApkV3ApkovlPrEngine {
-    pub installed_pkgs: BTreeMap<String, String>, // name -> sha256
-    pub apkovl_entries: Vec<String>,
-    pub trigger_scripts: Vec<String>,
-}
-
-impl AlpineApkV3ApkovlPrEngine {
+impl ClearLinuxStatelessPstateEngineV30 {
     pub fn new() -> Self {
         Self {
-            installed_pkgs: BTreeMap::new(),
-            apkovl_entries: Vec::new(),
-            trigger_scripts: Vec::new(),
+            vendor_defaults: BTreeMap::new(),
+            user_overrides: BTreeMap::new(),
+            energy_preference: EnergyPerformancePreference::BalancePerformance,
+            turbo_boost_enabled: true,
         }
     }
 
-    pub fn register_apk_package(&mut self, pkg_name: &str, sha256: &str) {
-        self.installed_pkgs.insert(pkg_name.to_string(), sha256.to_string());
+    pub fn set_vendor_default(&mut self, path: &str, content: &str) {
+        self.vendor_defaults.insert(path.to_string(), content.to_string());
     }
 
-    pub fn add_apkovl_file(&mut self, path: &str) {
-        if !self.apkovl_entries.contains(&path.to_string()) {
-            self.apkovl_entries.push(path.to_string());
+    pub fn set_user_override(&mut self, path: &str, content: &str) {
+        self.user_overrides.insert(path.to_string(), content.to_string());
+    }
+
+    pub fn resolve_configuration(&self, path: &str) -> Option<String> {
+        if let Some(user_conf) = self.user_overrides.get(path) {
+            Some(user_conf.clone())
+        } else {
+            self.vendor_defaults.get(path).cloned()
         }
     }
 
-    pub fn commit_apkovl_archive(&self) -> String {
-        format!("PR Proposal: Generated .apkovl.tar.gz archive with {} modified entries", self.apkovl_entries.len())
+    pub fn set_epp_preference(&mut self, pref: EnergyPerformancePreference) {
+        self.energy_preference = pref;
     }
-}
 
-impl Default for AlpineApkV3ApkovlPrEngine {
-    fn default() -> Self {
-        Self::new()
+    pub fn set_turbo_boost(&mut self, enabled: bool) {
+        self.turbo_boost_enabled = enabled;
     }
 }
 
 // ============================================================================
-// 4. FreeBSD ZFS Boot Environments `bectl` & Casper Delegation PR Engine
+// 2. Ubuntu AppArmor v4 Profile Mediation Engine
 // ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AppArmorMediationMode {
+    Enforce,
+    Complain,
+    Audit,
+    Disabled,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AppArmorV4Rule {
+    pub path_pattern: String,
+    pub permissions: String, // e.g. "r", "rw", "ix", "px"
+    pub dbus_bus: Option<String>,
+    pub net_domain: Option<String>,
+}
 
 #[derive(Debug, Clone)]
-pub struct FreeBsdBectlCasperPrEngine {
-    pub boot_environments: BTreeMap<String, u64>, // name -> creation_time
-    pub active_be: String,
-    pub casper_delegations: Vec<String>,
+pub struct UbuntuAppArmorV4ProfileMediationEngineV30 {
+    pub profile_name: String,
+    pub mode: AppArmorMediationMode,
+    pub rules: Vec<AppArmorV4Rule>,
+    pub capability_mask: u64,
 }
 
-impl FreeBsdBectlCasperPrEngine {
+impl UbuntuAppArmorV4ProfileMediationEngineV30 {
+    pub fn new(profile_name: &str, mode: AppArmorMediationMode) -> Self {
+        Self {
+            profile_name: profile_name.to_string(),
+            mode,
+            rules: Vec::new(),
+            capability_mask: 0,
+        }
+    }
+
+    pub fn add_rule(&mut self, path: &str, perms: &str, dbus: Option<&str>, net: Option<&str>) {
+        self.rules.push(AppArmorV4Rule {
+            path_pattern: path.to_string(),
+            permissions: perms.to_string(),
+            dbus_bus: dbus.map(|s| s.to_string()),
+            net_domain: net.map(|s| s.to_string()),
+        });
+    }
+
+    pub fn allow_capability(&mut self, cap_id: u32) {
+        if cap_id < 64 {
+            self.capability_mask |= 1 << cap_id;
+        }
+    }
+
+    pub fn check_file_access(&self, target_path: &str, req_perm: char) -> bool {
+        if self.mode == AppArmorMediationMode::Disabled {
+            return true;
+        }
+        for rule in &self.rules {
+            if target_path.starts_with(&rule.path_pattern) && rule.permissions.contains(req_perm) {
+                return true;
+            }
+        }
+        self.mode == AppArmorMediationMode::Complain
+    }
+
+    pub fn check_dbus_mediation(&self, bus: &str) -> bool {
+        if self.mode == AppArmorMediationMode::Disabled {
+            return true;
+        }
+        for rule in &self.rules {
+            if let Some(ref b) = rule.dbus_bus {
+                if b == bus || b == "*" {
+                    return true;
+                }
+            }
+        }
+        self.mode == AppArmorMediationMode::Complain
+    }
+}
+
+// ============================================================================
+// 3. Arch / CachyOS EEVDF & BORE Scheduler Tuner V30
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MicroArchIsaLevel {
+    X86_64_V1,
+    X86_64_V2,
+    X86_64_V3,
+    X86_64_V4,
+}
+
+#[derive(Debug, Clone)]
+pub struct ArchCachyEevdfBoreSchedulerTunerV30 {
+    pub eevdf_latency_ns: u64,
+    pub bore_burst_penalty_scale: u32,
+    pub isa_level: MicroArchIsaLevel,
+    pub active_tasks: BTreeMap<u32, u64>, // pid -> burst_time
+}
+
+impl ArchCachyEevdfBoreSchedulerTunerV30 {
+    pub fn new(isa_level: MicroArchIsaLevel) -> Self {
+        Self {
+            eevdf_latency_ns: 6_000_000, // 6ms default
+            bore_burst_penalty_scale: 128,
+            isa_level,
+            active_tasks: BTreeMap::new(),
+        }
+    }
+
+    pub fn set_latency_target_ms(&mut self, latency_ms: u64) {
+        self.eevdf_latency_ns = latency_ms * 1_000_000;
+    }
+
+    pub fn register_task(&mut self, pid: u32, burst_time: u64) {
+        self.active_tasks.insert(pid, burst_time);
+    }
+
+    pub fn calculate_bore_score(&self, pid: u32) -> u32 {
+        if let Some(&burst) = self.active_tasks.get(&pid) {
+            let base_penalty = (burst / 1_000_000) as u32 * self.bore_burst_penalty_scale;
+            match self.isa_level {
+                MicroArchIsaLevel::X86_64_V4 => base_penalty / 4,
+                MicroArchIsaLevel::X86_64_V3 => base_penalty / 2,
+                _ => base_penalty,
+            }
+        } else {
+            0
+        }
+    }
+
+    pub fn is_isa_v4_capable(&self) -> bool {
+        self.isa_level == MicroArchIsaLevel::X86_64_V4
+    }
+}
+
+// ============================================================================
+// 4. Alpine APK v3 & apkovl Persistence Engine
+// ============================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ApkTriggerHook {
+    pub trigger_name: String,
+    pub watched_dir: String,
+    pub exec_cmd: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct AlpineApkV3ApkovlPersistenceEngineV30 {
+    pub package_checksums: BTreeMap<String, String>,
+    pub triggers: Vec<ApkTriggerHook>,
+    pub apkovl_files: Vec<String>,
+}
+
+impl AlpineApkV3ApkovlPersistenceEngineV30 {
+    pub fn new() -> Self {
+        Self {
+            package_checksums: BTreeMap::new(),
+            triggers: Vec::new(),
+            apkovl_files: Vec::new(),
+        }
+    }
+
+    pub fn add_package(&mut self, pkg_name: &str, sha256_hash: &str) {
+        self.package_checksums.insert(pkg_name.to_string(), sha256_hash.to_string());
+    }
+
+    pub fn register_trigger(&mut self, name: &str, watched_dir: &str, cmd: &str) {
+        self.triggers.push(ApkTriggerHook {
+            trigger_name: name.to_string(),
+            watched_dir: watched_dir.to_string(),
+            exec_cmd: cmd.to_string(),
+        });
+    }
+
+    pub fn track_apkovl_modified_file(&mut self, filepath: &str) {
+        if !self.apkovl_files.contains(&filepath.to_string()) {
+            self.apkovl_files.push(filepath.to_string());
+        }
+    }
+
+    pub fn generate_apkovl_manifest(&self) -> String {
+        format!("APKOVL_ENTRIES:{};TOTAL_FILES:{}", self.apkovl_files.join(","), self.apkovl_files.len())
+    }
+
+    pub fn verify_package(&self, pkg_name: &str, hash: &str) -> bool {
+        self.package_checksums.get(pkg_name).map(|h| h == hash).unwrap_or(false)
+    }
+}
+
+// ============================================================================
+// 5. FreeBSD ZFS Boot Environments `bectl` & Casper Delegation Engine
+// ============================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct BootEnvironmentSpec {
+    pub name: String,
+    pub active_now: bool,
+    pub active_on_reboot: bool,
+    pub mountpoint: String,
+    pub space_used_mb: u64,
+}
+
+#[derive(Debug, Clone)]
+pub struct FreeBsdBectlCasperDelegationEngineV30 {
+    pub boot_environments: BTreeMap<String, BootEnvironmentSpec>,
+    pub casper_services: Vec<String>,
+}
+
+impl FreeBsdBectlCasperDelegationEngineV30 {
     pub fn new() -> Self {
         let mut engine = Self {
             boot_environments: BTreeMap::new(),
-            active_be: "default".to_string(),
-            casper_delegations: Vec::new(),
+            casper_services: Vec::new(),
         };
-        engine.boot_environments.insert("default".to_string(), 1700000000);
+        engine.create_be("default", true, true, "/");
         engine
     }
 
-    pub fn create_boot_env(&mut self, name: &str) -> Result<String, String> {
+    pub fn create_be(&mut self, name: &str, active_now: bool, active_reboot: bool, mount: &str) {
+        self.boot_environments.insert(
+            name.to_string(),
+            BootEnvironmentSpec {
+                name: name.to_string(),
+                active_now,
+                active_on_reboot: active_reboot,
+                mountpoint: mount.to_string(),
+                space_used_mb: 1024,
+            },
+        );
+    }
+
+    pub fn activate_be(&mut self, name: &str) -> bool {
         if self.boot_environments.contains_key(name) {
-            return Err(format!("BE '{}' already exists", name));
-        }
-        self.boot_environments.insert(name.to_string(), 1700001000);
-        Ok(format!("PR Proposal: Created FreeBSD ZFS Boot Environment '{}'", name))
-    }
-
-    pub fn delegate_casper_channel(&mut self, service_name: &str) {
-        if !self.casper_delegations.contains(&service_name.to_string()) {
-            self.casper_delegations.push(service_name.to_string());
-        }
-    }
-}
-
-impl Default for FreeBsdBectlCasperPrEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ============================================================================
-// 5. OpenBSD Pledge, Unveil & pfctl State Replication PR Engine
-// ============================================================================
-
-#[derive(Debug, Clone)]
-pub struct OpenBsdPledgeUnveilPfctlPrEngineV30 {
-    pub promises: Vec<String>,
-    pub unveil_table: BTreeMap<String, String>,
-    pub unveil_locked: bool,
-    pub pf_states_count: u64,
-}
-
-impl OpenBsdPledgeUnveilPfctlPrEngineV30 {
-    pub fn new() -> Self {
-        Self {
-            promises: Vec::new(),
-            unveil_table: BTreeMap::new(),
-            unveil_locked: false,
-            pf_states_count: 256,
-        }
-    }
-
-    pub fn set_pledge(&mut self, promises: &[&str]) {
-        self.promises = promises.iter().map(|s| s.to_string()).collect();
-    }
-
-    pub fn unveil_path(&mut self, path: &str, mode: &str) -> Result<String, String> {
-        if self.unveil_locked {
-            return Err("Unveil table locked with unveil(NULL, NULL)".to_string());
-        }
-        self.unveil_table.insert(path.to_string(), mode.to_string());
-        Ok(format!("PR Proposal: Unveiled path '{}' with mode '{}'", path, mode))
-    }
-
-    pub fn lock_unveil(&mut self) {
-        self.unveil_locked = true;
-    }
-
-    pub fn sync_pfsync_states(&mut self, delta: u64) -> u64 {
-        self.pf_states_count += delta;
-        self.pf_states_count
-    }
-}
-
-impl Default for OpenBsdPledgeUnveilPfctlPrEngineV30 {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ============================================================================
-// 6. Gentoo Portage EAPI 8 Subslot & USE-flag PR Engine
-// ============================================================================
-
-#[derive(Debug, Clone)]
-pub struct GentooPortageEapi8PrEngine {
-    pub atom_slots: BTreeMap<String, (String, String)>, // atom -> (slot, subslot)
-    pub active_use_flags: Vec<String>,
-}
-
-impl GentooPortageEapi8PrEngine {
-    pub fn new() -> Self {
-        Self {
-            atom_slots: BTreeMap::new(),
-            active_use_flags: Vec::new(),
-        }
-    }
-
-    pub fn register_atom(&mut self, atom: &str, slot: &str, subslot: &str) {
-        self.atom_slots.insert(atom.to_string(), (slot.to_string(), subslot.to_string()));
-    }
-
-    pub fn enable_use_flag(&mut self, flag: &str) {
-        if !self.active_use_flags.contains(&flag.to_string()) {
-            self.active_use_flags.push(flag.to_string());
-        }
-    }
-
-    pub fn evaluate_subslot_trigger(&self, atom: &str, current_subslot: &str) -> bool {
-        if let Some((_, subslot)) = self.atom_slots.get(atom) {
-            subslot != current_subslot
+            for existing in self.boot_environments.values_mut() {
+                existing.active_on_reboot = false;
+            }
+            if let Some(be) = self.boot_environments.get_mut(name) {
+                be.active_on_reboot = true;
+            }
+            true
         } else {
             false
         }
     }
-}
 
-impl Default for GentooPortageEapi8PrEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ============================================================================
-// 7. Fedora OSTree & Bodhi Karma PR Engine
-// ============================================================================
-
-#[derive(Debug, Clone)]
-pub struct FedoraOstreeBodhiPrEngineV30 {
-    pub ostree_commit: String,
-    pub bodhi_karma: i32,
-    pub greenwave_ci_ok: bool,
-}
-
-impl FedoraOstreeBodhiPrEngineV30 {
-    pub fn new() -> Self {
-        Self {
-            ostree_commit: "fedora-39-ostree-commit-001".to_string(),
-            bodhi_karma: 0,
-            greenwave_ci_ok: false,
+    pub fn register_casper_service(&mut self, service_name: &str) {
+        if !self.casper_services.contains(&service_name.to_string()) {
+            self.casper_services.push(service_name.to_string());
         }
     }
 
-    pub fn submit_karma(&mut self, karma_delta: i32) {
-        self.bodhi_karma += karma_delta;
-    }
-
-    pub fn set_ci_status(&mut self, status: bool) {
-        self.greenwave_ci_ok = status;
-    }
-
-    pub fn is_ostree_stage_ready(&self) -> bool {
-        self.bodhi_karma >= 3 && self.greenwave_ci_ok
-    }
-}
-
-impl Default for FedoraOstreeBodhiPrEngineV30 {
-    fn default() -> Self {
-        Self::new()
+    pub fn is_casper_service_permitted(&self, service_name: &str) -> bool {
+        self.casper_services.contains(&service_name.to_string())
     }
 }
 
 // ============================================================================
-// 8. NixOS / Guix Content-Addressed Store (CAS) & Flake PR Engine
+// 6. OpenBSD Pledge, Unveil, Softraid Crypto & pfctl State Replication Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct NixGuixCasFlakePrEngine {
-    pub store_paths: BTreeMap<String, String>, // path -> nar_hash
+pub struct OpenBsdPledgeUnveilPfctlStateEngineV30 {
+    pub pledge_promises: Vec<String>,
+    pub unveil_paths: BTreeMap<String, String>, // path -> permissions ("r", "rw", "c")
+    pub is_unveil_locked: bool,
+    pub pf_states: Vec<String>, // "proto src dst state"
+    pub softraid_crypto_active: bool,
+}
+
+impl OpenBsdPledgeUnveilPfctlStateEngineV30 {
+    pub fn new() -> Self {
+        Self {
+            pledge_promises: Vec::new(),
+            unveil_paths: BTreeMap::new(),
+            is_unveil_locked: false,
+            pf_states: Vec::new(),
+            softraid_crypto_active: true,
+        }
+    }
+
+    pub fn set_pledge(&mut self, promises: &[&str]) {
+        self.pledge_promises = promises.iter().map(|s| s.to_string()).collect();
+    }
+
+    pub fn unveil(&mut self, path: &str, perms: &str) -> Result<(), &'static str> {
+        if self.is_unveil_locked {
+            return Err("Unveil table is locked");
+        }
+        self.unveil_paths.insert(path.to_string(), perms.to_string());
+        Ok(())
+    }
+
+    pub fn lock_unveil(&mut self) {
+        self.is_unveil_locked = true;
+    }
+
+    pub fn check_pledge(&self, promise: &str) -> bool {
+        self.pledge_promises.iter().any(|p| p == promise)
+    }
+
+    pub fn register_pf_state(&mut self, state_str: &str) {
+        self.pf_states.push(state_str.to_string());
+    }
+
+    pub fn get_pf_state_count(&self) -> usize {
+        self.pf_states.len()
+    }
+}
+
+// ============================================================================
+// 7. Gentoo Portage EAPI 8 Subslot & USE-flag Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct Eapi8PackageAtom {
+    pub category_name: String,
+    pub slot: String,
+    pub subslot: String,
+    pub active_use_flags: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct GentooPortageEapi8SubslotEngineV30 {
+    pub atom_registry: BTreeMap<String, Eapi8PackageAtom>,
+}
+
+impl GentooPortageEapi8SubslotEngineV30 {
+    pub fn new() -> Self {
+        Self {
+            atom_registry: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_atom(&mut self, atom_key: &str, slot: &str, subslot: &str, use_flags: &[&str]) {
+        self.atom_registry.insert(
+            atom_key.to_string(),
+            Eapi8PackageAtom {
+                category_name: atom_key.to_string(),
+                slot: slot.to_string(),
+                subslot: subslot.to_string(),
+                active_use_flags: use_flags.iter().map(|s| s.to_string()).collect(),
+            },
+        );
+    }
+
+    pub fn evaluate_use_conditional(&self, atom_key: &str, required_flag: &str) -> bool {
+        if let Some(atom) = self.atom_registry.get(atom_key) {
+            atom.active_use_flags.iter().any(|f| f == required_flag)
+        } else {
+            false
+        }
+    }
+
+    pub fn detect_subslot_rebuilds(&mut self, target_atom: &str, new_subslot: &str) -> Vec<String> {
+        let mut affected = Vec::new();
+        let target_slot = if let Some(atom) = self.atom_registry.get_mut(target_atom) {
+            if atom.subslot != new_subslot {
+                atom.subslot = new_subslot.to_string();
+                Some(atom.slot.clone())
+            } else {
+                None
+            }
+        } else {
+            None
+        };
+
+        if let Some(slot) = target_slot {
+            for (other_key, other_atom) in &self.atom_registry {
+                if other_key != target_atom && other_atom.slot == slot {
+                    affected.push(other_key.clone());
+                }
+            }
+        }
+        affected
+    }
+}
+
+// ============================================================================
+// 8. Fedora OSTree & Bodhi Karma Engine
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum OstreeSlot {
+    DeploymentA,
+    DeploymentB,
+}
+
+#[derive(Debug, Clone)]
+pub struct FedoraOstreeBodhiKarmaEngineV30 {
+    pub active_slot: OstreeSlot,
+    pub commit_hash_a: String,
+    pub commit_hash_b: String,
+    pub karma_score: i32,
+    pub greenwave_ci_passed: bool,
+}
+
+impl FedoraOstreeBodhiKarmaEngineV30 {
+    pub fn new() -> Self {
+        Self {
+            active_slot: OstreeSlot::DeploymentA,
+            commit_hash_a: "fedora-40-v1-base".to_string(),
+            commit_hash_b: "fedora-40-v2-staged".to_string(),
+            karma_score: 0,
+            greenwave_ci_passed: false,
+        }
+    }
+
+    pub fn submit_bodhi_karma(&mut self, delta: i32) {
+        self.karma_score += delta;
+    }
+
+    pub fn set_greenwave_ci_status(&mut self, passed: bool) {
+        self.greenwave_ci_passed = passed;
+    }
+
+    pub fn is_update_approved(&self) -> bool {
+        self.karma_score >= 3 && self.greenwave_ci_passed
+    }
+
+    pub fn stage_and_switch_ostree_commit(&mut self, new_commit: &str) -> Result<OstreeSlot, &'static str> {
+        if !self.is_update_approved() {
+            return Err("Update gated by Bodhi karma or Greenwave CI failure");
+        }
+        match self.active_slot {
+            OstreeSlot::DeploymentA => {
+                self.commit_hash_b = new_commit.to_string();
+                self.active_slot = OstreeSlot::DeploymentB;
+                Ok(OstreeSlot::DeploymentB)
+            }
+            OstreeSlot::DeploymentB => {
+                self.commit_hash_a = new_commit.to_string();
+                self.active_slot = OstreeSlot::DeploymentA;
+                Ok(OstreeSlot::DeploymentA)
+            }
+        }
+    }
+}
+
+// ============================================================================
+// 9. NixOS / Guix Content-Addressed Store (CAS) & Flake Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct NixStoreDerivation {
+    pub store_path: String,
+    pub nar_hash: String,
+    pub references: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct NixGuixCasFlakeClosureEngineV30 {
+    pub store_derivations: BTreeMap<String, NixStoreDerivation>,
     pub gc_roots: Vec<String>,
 }
 
-impl NixGuixCasFlakePrEngine {
+impl NixGuixCasFlakeClosureEngineV30 {
     pub fn new() -> Self {
         Self {
-            store_paths: BTreeMap::new(),
+            store_derivations: BTreeMap::new(),
             gc_roots: Vec::new(),
         }
     }
 
-    pub fn add_store_path(&mut self, store_path: &str, nar_hash: &str) {
-        self.store_paths.insert(store_path.to_string(), nar_hash.to_string());
+    pub fn register_derivation(&mut self, path: &str, nar_hash: &str, refs: &[&str]) {
+        self.store_derivations.insert(
+            path.to_string(),
+            NixStoreDerivation {
+                store_path: path.to_string(),
+                nar_hash: nar_hash.to_string(),
+                references: refs.iter().map(|s| s.to_string()).collect(),
+            },
+        );
     }
 
-    pub fn add_gc_root(&mut self, path: &str) {
-        if !self.gc_roots.contains(&path.to_string()) {
-            self.gc_roots.push(path.to_string());
+    pub fn add_gc_root(&mut self, root_path: &str) {
+        if !self.gc_roots.contains(&root_path.to_string()) {
+            self.gc_roots.push(root_path.to_string());
         }
     }
 
-    pub fn run_gc_sweep(&mut self) -> usize {
-        let initial_count = self.store_paths.len();
-        self.store_paths.retain(|p, _| self.gc_roots.contains(p));
-        initial_count - self.store_paths.len()
-    }
-}
+    pub fn sweep_unreferenced_store_paths(&mut self) -> usize {
+        let mut reachable = Vec::new();
+        for root in &self.gc_roots {
+            if let Some(drv) = self.store_derivations.get(root) {
+                if !reachable.contains(root) {
+                    reachable.push(root.clone());
+                }
+                for r in &drv.references {
+                    if !reachable.contains(r) {
+                        reachable.push(r.clone());
+                    }
+                }
+            }
+        }
 
-impl Default for NixGuixCasFlakePrEngine {
-    fn default() -> Self {
-        Self::new()
+        let initial_count = self.store_derivations.len();
+        self.store_derivations.retain(|key, _| reachable.contains(key));
+        initial_count - self.store_derivations.len()
     }
 }
 
 // ============================================================================
-// 9. Void Linux XBPS & runit Supervisor PR Engine
+// 10. Void Linux XBPS & runit Supervisor Engine
+// ============================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum RunitServiceStage {
+    Stage1Setup,
+    Stage2Supervised,
+    Stage3Shutdown,
+}
+
+#[derive(Debug, Clone)]
+pub struct VoidXbpsRunitSupervisorEngineV30 {
+    pub installed_packages: BTreeMap<String, String>, // name -> sha256_sig
+    pub service_states: BTreeMap<String, RunitServiceStage>,
+}
+
+impl VoidXbpsRunitSupervisorEngineV30 {
+    pub fn new() -> Self {
+        Self {
+            installed_packages: BTreeMap::new(),
+            service_states: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_xbps_package(&mut self, pkg_name: &str, sig: &str) {
+        self.installed_packages.insert(pkg_name.to_string(), sig.to_string());
+    }
+
+    pub fn verify_xbps_signature(&self, pkg_name: &str, sig: &str) -> bool {
+        self.installed_packages.get(pkg_name).map(|s| s == sig).unwrap_or(false)
+    }
+
+    pub fn set_runit_stage(&mut self, service_name: &str, stage: RunitServiceStage) {
+        self.service_states.insert(service_name.to_string(), stage);
+    }
+
+    pub fn get_service_stage(&self, service_name: &str) -> Option<RunitServiceStage> {
+        self.service_states.get(service_name).cloned()
+    }
+}
+
+// ============================================================================
+// 11. DragonFly BSD HAMMER2 PFS Cluster Replication Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct VoidXbpsRunitPrEngine {
-    pub installed_xbps: BTreeMap<String, String>, // pkg -> signature
-    pub runit_services: BTreeMap<String, String>, // service -> state ("run", "down")
+pub struct Hammer2PfsNode {
+    pub pfs_name: String,
+    pub is_master: bool,
+    pub transaction_sequence: u64,
 }
-
-impl VoidXbpsRunitPrEngine {
-    pub fn new() -> Self {
-        Self {
-            installed_xbps: BTreeMap::new(),
-            runit_services: BTreeMap::new(),
-        }
-    }
-
-    pub fn register_xbps_pkg(&mut self, pkg: &str, rsa_sig: &str) {
-        self.installed_xbps.insert(pkg.to_string(), rsa_sig.to_string());
-    }
-
-    pub fn set_runit_service_state(&mut self, service: &str, state: &str) {
-        self.runit_services.insert(service.to_string(), state.to_string());
-    }
-}
-
-impl Default for VoidXbpsRunitPrEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ============================================================================
-// 10. DragonFly BSD HAMMER2 PFS Cluster PR Engine
-// ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct DragonFlyHammer2PfsPrEngine {
-    pub pfs_sequence: u64,
-    pub cluster_master: String,
+pub struct DragonFlyHammer2ClusterPfsEngineV30 {
+    pub pfs_cluster: BTreeMap<String, Hammer2PfsNode>,
 }
 
-impl DragonFlyHammer2PfsPrEngine {
+impl DragonFlyHammer2ClusterPfsEngineV30 {
     pub fn new() -> Self {
         Self {
-            pfs_sequence: 10000,
-            cluster_master: "node-master-1".to_string(),
+            pfs_cluster: BTreeMap::new(),
         }
     }
 
-    pub fn commit_pfs_txg(&mut self) -> u64 {
-        self.pfs_sequence += 1;
-        self.pfs_sequence
+    pub fn register_pfs_node(&mut self, name: &str, is_master: bool) {
+        self.pfs_cluster.insert(
+            name.to_string(),
+            Hammer2PfsNode {
+                pfs_name: name.to_string(),
+                is_master,
+                transaction_sequence: 100,
+            },
+        );
     }
-}
 
-impl Default for DragonFlyHammer2PfsPrEngine {
-    fn default() -> Self {
-        Self::new()
+    pub fn commit_transaction(&mut self, master_name: &str) -> Result<u64, &'static str> {
+        if let Some(node) = self.pfs_cluster.get_mut(master_name) {
+            if !node.is_master {
+                return Err("Cannot commit transaction on slave PFS node");
+            }
+            node.transaction_sequence += 1;
+            Ok(node.transaction_sequence)
+        } else {
+            Err("PFS node not found")
+        }
+    }
+
+    pub fn replicate_cluster_state(&mut self, master_name: &str, slave_name: &str) -> bool {
+        let master_seq = self.pfs_cluster.get(master_name).map(|n| n.transaction_sequence);
+        if let Some(seq) = master_seq {
+            if let Some(slave) = self.pfs_cluster.get_mut(slave_name) {
+                slave.transaction_sequence = seq;
+                return true;
+            }
+        }
+        false
     }
 }
 
 // ============================================================================
-// 11. Master Coordinator Suite V30
+// 12. Master Coordinator Suite V30
 // ============================================================================
 
 #[derive(Debug, Clone)]
 pub struct SovereignLinuxBsdEcosystemAdvancementsV30Suite {
-    pub clear_linux: ClearLinuxStatelessPstatePrEngine,
-    pub arch_cachy: ArchCachyBoreIsaPrEngine,
-    pub alpine: AlpineApkV3ApkovlPrEngine,
-    pub freebsd: FreeBsdBectlCasperPrEngine,
-    pub openbsd: OpenBsdPledgeUnveilPfctlPrEngineV30,
-    pub gentoo: GentooPortageEapi8PrEngine,
-    pub fedora: FedoraOstreeBodhiPrEngineV30,
-    pub nix_guix: NixGuixCasFlakePrEngine,
-    pub void_runit: VoidXbpsRunitPrEngine,
-    pub dragonfly: DragonFlyHammer2PfsPrEngine,
+    pub clear_stateless: ClearLinuxStatelessPstateEngineV30,
+    pub apparmor: UbuntuAppArmorV4ProfileMediationEngineV30,
+    pub scheduler: ArchCachyEevdfBoreSchedulerTunerV30,
+    pub alpine: AlpineApkV3ApkovlPersistenceEngineV30,
+    pub freebsd_be: FreeBsdBectlCasperDelegationEngineV30,
+    pub openbsd_security: OpenBsdPledgeUnveilPfctlStateEngineV30,
+    pub gentoo_portage: GentooPortageEapi8SubslotEngineV30,
+    pub fedora_ostree: FedoraOstreeBodhiKarmaEngineV30,
+    pub nix_guix: NixGuixCasFlakeClosureEngineV30,
+    pub void_runit: VoidXbpsRunitSupervisorEngineV30,
+    pub dragonfly_hammer2: DragonFlyHammer2ClusterPfsEngineV30,
 }
 
 impl SovereignLinuxBsdEcosystemAdvancementsV30Suite {
     pub fn new() -> Self {
         Self {
-            clear_linux: ClearLinuxStatelessPstatePrEngine::new(),
-            arch_cachy: ArchCachyBoreIsaPrEngine::new(MicroArchIsaLevelV30::V4),
-            alpine: AlpineApkV3ApkovlPrEngine::new(),
-            freebsd: FreeBsdBectlCasperPrEngine::new(),
-            openbsd: OpenBsdPledgeUnveilPfctlPrEngineV30::new(),
-            gentoo: GentooPortageEapi8PrEngine::new(),
-            fedora: FedoraOstreeBodhiPrEngineV30::new(),
-            nix_guix: NixGuixCasFlakePrEngine::new(),
-            void_runit: VoidXbpsRunitPrEngine::new(),
-            dragonfly: DragonFlyHammer2PfsPrEngine::new(),
+            clear_stateless: ClearLinuxStatelessPstateEngineV30::new(),
+            apparmor: UbuntuAppArmorV4ProfileMediationEngineV30::new("default-profile", AppArmorMediationMode::Enforce),
+            scheduler: ArchCachyEevdfBoreSchedulerTunerV30::new(MicroArchIsaLevel::X86_64_V3),
+            alpine: AlpineApkV3ApkovlPersistenceEngineV30::new(),
+            freebsd_be: FreeBsdBectlCasperDelegationEngineV30::new(),
+            openbsd_security: OpenBsdPledgeUnveilPfctlStateEngineV30::new(),
+            gentoo_portage: GentooPortageEapi8SubslotEngineV30::new(),
+            fedora_ostree: FedoraOstreeBodhiKarmaEngineV30::new(),
+            nix_guix: NixGuixCasFlakeClosureEngineV30::new(),
+            void_runit: VoidXbpsRunitSupervisorEngineV30::new(),
+            dragonfly_hammer2: DragonFlyHammer2ClusterPfsEngineV30::new(),
         }
     }
 
-    pub fn run_v30_ecosystem_pr_validation(&mut self) -> bool {
-        let _pstate = self.clear_linux.set_pstate_governor(PstateGovernorMode::Performance, 0);
-        let bore = self.arch_cachy.calculate_bore_penalty(101, 8_000_000);
-        self.alpine.register_apk_package("busybox", "sha256hash");
-        let _be = self.freebsd.create_boot_env("be-v30").is_ok();
-        let _unveil = self.openbsd.unveil_path("/usr/bin", "rx").is_ok();
-        self.gentoo.register_atom("sys-kernel/linux-headers", "0", "6.6");
-        self.fedora.submit_karma(4);
-        self.fedora.set_ci_status(true);
-        self.nix_guix.add_store_path("/nix/store/sys-1", "narhash1");
-        self.nix_guix.add_gc_root("/nix/store/sys-1");
-        self.void_runit.register_xbps_pkg("kernel", "rsa_sig_123");
-        let txg = self.dragonfly.commit_pfs_txg();
+    pub fn run_master_distro_health_audit(&mut self) -> bool {
+        self.clear_stateless.set_vendor_default("/etc/systemd/system.conf", "LogLevel=info");
+        self.apparmor.add_rule("/usr/bin", "rx", Some("system"), None);
+        self.scheduler.register_task(1001, 5_000_000);
+        self.alpine.add_package("bash", "sha256_dummy_hash");
+        self.freebsd_be.register_casper_service("casper.file");
+        self.openbsd_security.set_pledge(&["stdio", "rpath"]);
+        self.gentoo_portage.register_atom("sys-libs/zlib", "0", "1.2", &["split-usr"]);
+        self.fedora_ostree.submit_bodhi_karma(5);
+        self.fedora_ostree.set_greenwave_ci_status(true);
+        self.nix_guix.register_derivation("/nix/store/drv-1", "nar-1", &[]);
+        self.void_runit.register_xbps_package("curl", "sig_curl");
+        self.dragonfly_hammer2.register_pfs_node("root_pfs", true);
 
-        bore > 0 && self.fedora.is_ostree_stage_ready() && txg > 10000
-    }
-}
-
-impl Default for SovereignLinuxBsdEcosystemAdvancementsV30Suite {
-    fn default() -> Self {
-        Self::new()
+        self.clear_stateless.resolve_configuration("/etc/systemd/system.conf").is_some()
+            && self.apparmor.check_file_access("/usr/bin/ls", 'r')
+            && self.scheduler.calculate_bore_score(1001) > 0
+            && self.alpine.verify_package("bash", "sha256_dummy_hash")
+            && self.freebsd_be.is_casper_service_permitted("casper.file")
+            && self.openbsd_security.check_pledge("stdio")
+            && self.gentoo_portage.evaluate_use_conditional("sys-libs/zlib", "split-usr")
+            && self.fedora_ostree.is_update_approved()
+            && self.void_runit.verify_xbps_signature("curl", "sig_curl")
     }
 }
 
 // ============================================================================
-// Standalone Unit Tests
+// Unit Tests
 // ============================================================================
 
 #[cfg(test)]
@@ -536,95 +764,116 @@ mod tests {
 
     #[test]
     fn test_clear_linux_stateless_pstate() {
-        let mut engine = ClearLinuxStatelessPstatePrEngine::new();
-        assert!(engine.set_pstate_governor(PstateGovernorMode::Performance, 0).contains("Intel P-state"));
-        assert_eq!(engine.resolve_stateless_path("swupd/config"), "/usr/share/defaults/etc/swupd/config");
+        let mut clear = ClearLinuxStatelessPstateEngineV30::new();
+        clear.set_vendor_default("/etc/sysctl.conf", "vm.swappiness=10");
+        assert_eq!(clear.resolve_configuration("/etc/sysctl.conf").unwrap(), "vm.swappiness=10");
+        clear.set_user_override("/etc/sysctl.conf", "vm.swappiness=1");
+        assert_eq!(clear.resolve_configuration("/etc/sysctl.conf").unwrap(), "vm.swappiness=1");
+        clear.set_epp_preference(EnergyPerformancePreference::Performance);
+        assert_eq!(clear.energy_preference, EnergyPerformancePreference::Performance);
     }
 
     #[test]
-    fn test_arch_cachy_bore_isa() {
-        let mut engine = ArchCachyBoreIsaPrEngine::new(MicroArchIsaLevelV30::V4);
-        assert!(engine.get_isa_optimization_flag().contains("-march=x86-64-v4"));
-        assert!(engine.calculate_bore_penalty(42, 10_000_000) > 0);
+    fn test_ubuntu_apparmor_engine() {
+        let mut apparmor = UbuntuAppArmorV4ProfileMediationEngineV30::new("test-profile", AppArmorMediationMode::Enforce);
+        apparmor.add_rule("/etc", "r", Some("system_bus"), None);
+        assert!(apparmor.check_file_access("/etc/hosts", 'r'));
+        assert!(!apparmor.check_file_access("/etc/hosts", 'w'));
+        assert!(apparmor.check_dbus_mediation("system_bus"));
     }
 
     #[test]
-    fn test_alpine_apk_v3_apkovl() {
-        let mut engine = AlpineApkV3ApkovlPrEngine::new();
-        engine.register_apk_package("zsh", "sha256_zsh");
-        engine.add_apkovl_file("/etc/zsh/zshrc");
-        assert!(engine.commit_apkovl_archive().contains("1 modified entries"));
+    fn test_arch_cachy_scheduler_tuner() {
+        let mut tuner = ArchCachyEevdfBoreSchedulerTunerV30::new(MicroArchIsaLevel::X86_64_V4);
+        tuner.register_task(101, 10_000_000);
+        assert!(tuner.is_isa_v4_capable());
+        assert!(tuner.calculate_bore_score(101) > 0);
+    }
+
+    #[test]
+    fn test_alpine_apkovl_engine() {
+        let mut alpine = AlpineApkV3ApkovlPersistenceEngineV30::new();
+        alpine.add_package("alpine-base", "hash123");
+        alpine.track_apkovl_modified_file("/etc/network/interfaces");
+        assert!(alpine.verify_package("alpine-base", "hash123"));
+        assert!(alpine.generate_apkovl_manifest().contains("/etc/network/interfaces"));
     }
 
     #[test]
     fn test_freebsd_bectl_casper() {
-        let mut engine = FreeBsdBectlCasperPrEngine::new();
-        assert!(engine.create_boot_env("test-be").is_ok());
-        assert!(engine.create_boot_env("test-be").is_err());
-        engine.delegate_casper_channel("casper.sysctl");
-        assert_eq!(engine.casper_delegated_count(), 1);
-    }
-
-    impl FreeBsdBectlCasperPrEngine {
-        pub fn casper_delegated_count(&self) -> usize {
-            self.casper_delegations.len()
-        }
+        let mut freebsd = FreeBsdBectlCasperDelegationEngineV30::new();
+        freebsd.create_be("v1.1", false, false, "/mnt");
+        assert!(freebsd.activate_be("v1.1"));
+        freebsd.register_casper_service("casper.dns");
+        assert!(freebsd.is_casper_service_permitted("casper.dns"));
     }
 
     #[test]
-    fn test_openbsd_pledge_unveil() {
-        let mut engine = OpenBsdPledgeUnveilPfctlPrEngineV30::new();
-        engine.set_pledge(&["stdio", "rpath"]);
-        assert!(engine.unveil_path("/tmp", "rwc").is_ok());
-        engine.lock_unveil();
-        assert!(engine.unveil_path("/etc", "r").is_err());
-        assert_eq!(engine.sync_pfsync_states(10), 266);
+    fn test_openbsd_pledge_unveil_pfctl() {
+        let mut openbsd = OpenBsdPledgeUnveilPfctlStateEngineV30::new();
+        openbsd.set_pledge(&["stdio", "wpath"]);
+        assert!(openbsd.check_pledge("stdio"));
+        assert!(openbsd.unveil("/var/log", "rw").is_ok());
+        openbsd.lock_unveil();
+        assert!(openbsd.unveil("/etc", "r").is_err());
+        openbsd.register_pf_state("tcp 10.0.0.1:80 -> 10.0.0.2:50000 ESTABLISHED");
+        assert_eq!(openbsd.get_pf_state_count(), 1);
+        assert!(openbsd.softraid_crypto_active);
     }
 
     #[test]
-    fn test_gentoo_portage_eapi8() {
-        let mut engine = GentooPortageEapi8PrEngine::new();
-        engine.register_atom("dev-lang/rust", "0", "1.75");
-        engine.enable_use_flag("clippy");
-        assert!(engine.evaluate_subslot_trigger("dev-lang/rust", "1.74"));
-        assert!(!engine.evaluate_subslot_trigger("dev-lang/rust", "1.75"));
+    fn test_gentoo_eapi8_subslot() {
+        let mut gentoo = GentooPortageEapi8SubslotEngineV30::new();
+        gentoo.register_atom("media-libs/libpng", "0", "1.6", &["apng"]);
+        assert!(gentoo.evaluate_use_conditional("media-libs/libpng", "apng"));
+        gentoo.register_atom("app-emulation/qemu", "0", "1.6", &[]);
+        let rebuilds = gentoo.detect_subslot_rebuilds("media-libs/libpng", "1.7");
+        assert_eq!(rebuilds, vec!["app-emulation/qemu"]);
     }
 
     #[test]
-    fn test_fedora_ostree_bodhi() {
-        let mut engine = FedoraOstreeBodhiPrEngineV30::new();
-        engine.submit_karma(3);
-        engine.set_ci_status(true);
-        assert!(engine.is_ostree_stage_ready());
+    fn test_fedora_ostree_bodhi_karma() {
+        let mut fedora = FedoraOstreeBodhiKarmaEngineV30::new();
+        fedora.submit_bodhi_karma(3);
+        fedora.set_greenwave_ci_status(true);
+        assert!(fedora.is_update_approved());
+        assert_eq!(fedora.stage_and_switch_ostree_commit("commit_v2").unwrap(), OstreeSlot::DeploymentB);
     }
 
     #[test]
     fn test_nix_guix_cas_flake() {
-        let mut engine = NixGuixCasFlakePrEngine::new();
-        engine.add_store_path("/nix/store/p1", "hash1");
-        engine.add_store_path("/nix/store/p2", "hash2");
-        engine.add_gc_root("/nix/store/p1");
-        assert_eq!(engine.run_gc_sweep(), 1);
-        assert_eq!(engine.store_paths.len(), 1);
+        let mut nix = NixGuixCasFlakeClosureEngineV30::new();
+        nix.register_derivation("/nix/store/root", "hash_root", &["/nix/store/dep1"]);
+        nix.register_derivation("/nix/store/dep1", "hash_dep1", &[]);
+        nix.register_derivation("/nix/store/orphan", "hash_orphan", &[]);
+        nix.add_gc_root("/nix/store/root");
+        let swept = nix.sweep_unreferenced_store_paths();
+        assert_eq!(swept, 1);
+        assert!(!nix.store_derivations.contains_key("/nix/store/orphan"));
     }
 
     #[test]
     fn test_void_xbps_runit() {
-        let mut engine = VoidXbpsRunitPrEngine::new();
-        engine.register_xbps_pkg("runit", "sig_runit");
-        engine.set_runit_service_state("dbus", "run");
-        assert_eq!(engine.runit_services.get("dbus").map(|s| s.as_str()), Some("run"));
+        let mut void = VoidXbpsRunitSupervisorEngineV30::new();
+        void.register_xbps_package("void-repo", "sha256_key");
+        assert!(void.verify_xbps_signature("void-repo", "sha256_key"));
+        void.set_runit_stage("dhcpcd", RunitServiceStage::Stage2Supervised);
+        assert_eq!(void.get_service_stage("dhcpcd"), Some(RunitServiceStage::Stage2Supervised));
     }
 
     #[test]
-    fn test_dragonfly_hammer2_pfs() {
-        let mut engine = DragonFlyHammer2PfsPrEngine::new();
-        assert_eq!(engine.commit_pfs_txg(), 10001);
+    fn test_dragonfly_hammer2_cluster() {
+        let mut df = DragonFlyHammer2ClusterPfsEngineV30::new();
+        df.register_pfs_node("master_pfs", true);
+        df.register_pfs_node("slave_pfs", false);
+        assert_eq!(df.commit_transaction("master_pfs").unwrap(), 101);
+        assert!(df.replicate_cluster_state("master_pfs", "slave_pfs"));
+        assert_eq!(df.pfs_cluster["slave_pfs"].transaction_sequence, 101);
     }
 
     #[test]
-    fn test_v30_suite_master() {
+    fn test_v30_master_suite() {
         let mut suite = SovereignLinuxBsdEcosystemAdvancementsV30Suite::new();
-        assert!(suite.run_v30_ecosystem_pr_validation());
+        assert!(suite.run_master_distro_health_audit());
     }
 }
