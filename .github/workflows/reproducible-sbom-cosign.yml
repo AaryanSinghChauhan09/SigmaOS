@@ -12,6 +12,10 @@ permissions:
   id-token: write
   packages: write
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   verify-reproducible-build:
     name: Verify Reproducible Build Determinism
