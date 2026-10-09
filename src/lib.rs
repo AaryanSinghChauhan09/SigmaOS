@@ -134,6 +134,7 @@ pub use distro::sovereign_2075_distro_supremacy_engine::*;
 pub use distro::sovereign_2080_distro_supremacy_engine::*;
 pub use distro::sovereign_2085_distro_supremacy_engine::*;
 pub use distro::sovereign_2090_distro_supremacy_engine::*;
+pub use distro::arch_linux_gap_closure_pr_suite::*;
 pub use distro::sovereign_linux_bsd_master_synthesis::*;
 pub use distro::sovereign_linux_bsd_pinnacle_innovations_v14::*;
 pub use distro::sovereign_linux_bsd_ecosystem_advancements_v22::*;

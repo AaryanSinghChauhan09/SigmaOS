@@ -605,6 +605,13 @@ if [ -f "src/distro/sovereign_2090_distro_supremacy_engine.rs" ]; then
     ./build/test_2090_supremacy
 fi
 
+if [ -f "src/distro/arch_linux_gap_closure_pr_suite.rs" ]; then
+    echo "Running Arch Linux Gap Closure & PR Integration Suite test suite..."
+    mkdir -p build
+    rustc --test src/distro/arch_linux_gap_closure_pr_suite.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_arch_pr_suite
+    ./build/test_arch_pr_suite
+fi
+
 if [ -f "src/compatibility/omarchy_supreme_engine.rs" ]; then
     echo "Running Sovereign Omarchy Supreme Engine test suite..."
     mkdir -p build
