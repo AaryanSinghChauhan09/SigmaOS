@@ -25,8 +25,8 @@ pub mod dashboard;
 pub mod desktop;
 pub mod development;
 pub mod device;
-pub mod distro;
 pub mod input;
+pub mod distro;
 pub mod ipc;
 pub mod storage;
 pub mod system;
@@ -49,8 +49,8 @@ pub mod package;
 pub use package::{
     SovereignDistroPackageAdvancementsSuiteV10, SovereignDistroPackageAdvancementsSuiteV11,
     SovereignDistroPackageAdvancementsSuiteV14, SovereignDistroPackageAdvancementsSuiteV27,
-    SovereignDistroPackageAdvancementsSuiteV28, UniversalForeignPackageFormat,
-    UniversalForeignPackageFormatConverter,
+    SovereignDistroPackageAdvancementsSuiteV28, SovereignDistroPackageAdvancementsSuiteV30,
+    UniversalForeignPackageFormat, UniversalForeignPackageFormatConverter,
 };
 pub mod pacman;
 pub use pacman::*;
@@ -125,8 +125,7 @@ pub mod open_source_obsoletion;
 pub mod open_source_os_missing_components_parity;
 pub mod tools;
 pub use distro::additional_linux_bsd_components::*;
-pub use distro::omarchy_linux_gap_closure_pr_suite::*;
-pub use distro::omarchy_omakase_ultimate_parity::*;
+pub use distro::sovereign_thousands_distro_components::*;
 pub use distro::sovereign_2050_distro_supremacy_engine::*;
 pub use distro::sovereign_2055_distro_supremacy_engine::*;
 pub use distro::sovereign_2060_distro_supremacy_engine::*;
@@ -134,28 +133,30 @@ pub use distro::sovereign_2070_distro_supremacy_engine::*;
 pub use distro::sovereign_2075_distro_supremacy_engine::*;
 pub use distro::sovereign_2080_distro_supremacy_engine::*;
 pub use distro::sovereign_2085_distro_supremacy_engine::*;
-pub use distro::sovereign_architecture_development_decision_plan::*;
-pub use distro::sovereign_linux_bsd_ecosystem_advancements_v22::*;
-pub use distro::sovereign_linux_bsd_ecosystem_advancements_v28::*;
-pub use distro::sovereign_linux_bsd_ecosystem_advancements_v29::*;
 pub use distro::sovereign_linux_bsd_master_synthesis::*;
 pub use distro::sovereign_linux_bsd_pinnacle_innovations_v14::*;
-pub use distro::sovereign_media_and_distro_unimplemented_innovations::*;
+pub use distro::sovereign_linux_bsd_ecosystem_advancements_v22::*;
+pub use distro::sovereign_architecture_development_decision_plan::*;
+pub use distro::omarchy_linux_gap_closure_pr_suite::*;
+pub use distro::omarchy_missing_components_parity_pr::*;
+pub use distro::sovereign_open_source_os_gap_closure_v27::*;
+pub use distro::sovereign_universal_subsystem_interop::*;
+pub use distro::sovereign_linux_bsd_ecosystem_advancements_v28::*;
+pub use distro::sovereign_linux_bsd_ecosystem_advancements_v29::*;
 pub use distro::sovereign_mint_omarchy_apex_dominance_v30::*;
 pub use distro::sovereign_mint_omarchy_innovations_v31::*;
 pub use distro::sovereign_mint_omarchy_v32_apex_arsenal::*;
 pub use distro::sovereign_mint_omarchy_v33_apex_vanguard::*;
 pub use distro::sovereign_mint_omarchy_v34_apex_pantheon::*;
-pub use distro::sovereign_open_source_os_gap_closure_v27::*;
-pub use distro::sovereign_thousands_distro_components::*;
-pub use distro::sovereign_universal_subsystem_interop::*;
-pub use distro::sovereign_universal_subsystem_interop::*;
+pub use distro::sovereign_media_and_distro_unimplemented_innovations::*;
+pub use distro::omarchy_omakase_ultimate_parity::*;
 pub use distro::tech_media_publication_innovations::*;
+pub use distro::sovereign_universal_subsystem_interop::*;
+pub use package::omarchy_pr_proposal_engine::*;
 pub use distro::SovereignMasterSubsystemDistroHarmonizer;
 pub use kernel::tss_ring3_user_mode::*;
 pub use open_source_obsoletion::open_source_os_gap_closure::*;
 pub use open_source_obsoletion::open_source_os_pinnacle_gap_closure::*;
-pub use package::omarchy_pr_proposal_engine::*;
 pub use tools::tech_media_extended_suite::*;
 pub mod sovereign_wiki_master_engine;
 pub use sovereign_wiki_master_engine::*;
@@ -195,11 +196,11 @@ pub use automation::{
     SystemAction, SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction,
     SystemState,
 };
-pub use compatibility::mint_omarchy_migration_bridge::*;
 pub use compatibility::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
     ContainerRuntime, TargetPlatform, TranslationLayer,
 };
+pub use compatibility::mint_omarchy_migration_bridge::*;
 pub use container::{
     ContainerError, ContainerID, ContainerInfo, ContainerRuntime as CoreContainerRuntime,
     ContainerState, RuntimeCapability, RuntimeStats, SimpleContainer, SimpleContainerRuntime,
@@ -273,19 +274,18 @@ pub use filesystem::{
 };
 pub use kernel::roundrobin::SchedulerError as RoundRobinSchedulerError;
 pub use kernel::{
+    SovereignCleanCodeAndOsPrinciplesEngine, SolidDesignValidator, CleanCodeMetricsEvaluator, ResourceAllocationGraph,
     AiNativeRuntime, AndroidBroadcastReceiverRegistry, BottomHalfKernelThread,
     BoundedBufferProducerConsumer, BroadcastReceiver, BuddyAllocator, CgroupResourceLimits,
-    Channel, CleanCodeMetricsEvaluator, CompletionQueueEntry, CowBlock, CowStorageEngine,
-    EnergyAwareScheduler, FastPacketFrame, FastPathIpc, Hammer2PfsSnapshot, HybridTask,
-    InteractiveHybridScheduler, InterruptMechanism, IoUringEngine, IoUringOpcode, IpcError,
-    IpcManager, KernelAccessController, KernelFastPacketEngine, LandlockAccessRight,
-    LandlockPathRule, MemoryBlock, MemoryCompactionSuperpagesAllocator, Message,
-    PhysicalFrameBlock, PolicyError, PolicyManager, Priority, PrivacyFirstSandbox, PrivilegeLevel,
-    Process, ProcessState, ProtectionDomain, ResourceAllocationGraph, ResourceBroker,
-    RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError, SelfHealingKernel,
-    SigmaFsPlusPlus, SoftIrqType, SolidDesignValidator, SovereignCgroupGovernor,
-    SovereignCleanCodeAndOsPrinciplesEngine, SubmissionQueueEntry, UniversalAbiTranslator,
-    UserDefinedKernelFunctions, VirtualCpu, XdpAction, PAGE_SIZE,
+    Channel, CompletionQueueEntry, CowBlock, CowStorageEngine, EnergyAwareScheduler,
+    FastPacketFrame, FastPathIpc, Hammer2PfsSnapshot, HybridTask, InteractiveHybridScheduler,
+    InterruptMechanism, IoUringEngine, IoUringOpcode, IpcError, IpcManager, KernelAccessController,
+    KernelFastPacketEngine, LandlockAccessRight, LandlockPathRule, MemoryBlock,
+    MemoryCompactionSuperpagesAllocator, Message, PhysicalFrameBlock, PolicyError, PolicyManager,
+    Priority, PrivacyFirstSandbox, PrivilegeLevel, Process, ProcessState, ProtectionDomain,
+    ResourceBroker, RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError,
+    SelfHealingKernel, SigmaFsPlusPlus, SoftIrqType, SovereignCgroupGovernor, SubmissionQueueEntry,
+    UniversalAbiTranslator, UserDefinedKernelFunctions, VirtualCpu, XdpAction, PAGE_SIZE,
 };
 pub use network::{
     compute_checksum as compute_net_checksum, IPv4Address, NetworkPacket, PacketRingBuffer,
@@ -327,9 +327,9 @@ pub use security::{
 };
 pub use shell::{
     ContextualCompleter, HistoryExpansionEngine, JobControlManager, ParameterExpansionEngine,
-    PipelineExecutor, ShellCommand, ShellManager as ShellProfileManager, ShellPledgeUnveilGuard,
-    ShellProfile, ShellStatistics, ShellSyntaxHighlighter, ShellType,
+    PipelineExecutor, ShellCommand, ShellPledgeUnveilGuard, ShellSyntaxHighlighter,
     SimpleShellSession as ShellRepl, ZshPromptFormatter,
+    ShellManager as ShellProfileManager, ShellProfile, ShellType, ShellStatistics,
 };
 pub use sigpkg::{
     AdapterError, BuildSystem, ContentAddressedStore, CryptoVerifier, DebAdapter,

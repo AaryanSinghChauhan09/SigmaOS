@@ -119,6 +119,8 @@ pub mod linux_ideas;
 pub mod missing_distro_innovations;
 pub mod missing_linux_bsd_components;
 pub use missing_linux_bsd_components::*;
+pub mod omarchy_missing_components_parity_pr;
+pub use omarchy_missing_components_parity_pr::*;
 pub mod nixos_inspirations;
 pub mod parity;
 pub mod power_network_tools;
