@@ -245,6 +245,173 @@ impl Default for PacmanEngine {
     }
 }
 
+// ============================================================================
+// PKGBUILD METADATA PARSER
+// ============================================================================
+
+/// Parsed Arch Linux `PKGBUILD` metadata stanza
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct PkgbuildMetadata {
+    pub pkgname: String,
+    pub pkgver: String,
+    pub pkgrel: String,
+    pub pkgdesc: String,
+    pub arch: Vec<String>,
+    pub depends: Vec<String>,
+    pub makedepends: Vec<String>,
+}
+
+pub struct PkgbuildMetadataParser;
+
+impl PkgbuildMetadataParser {
+    pub fn parse_pkgbuild(script: &str) -> PkgbuildMetadata {
+        let mut meta = PkgbuildMetadata::default();
+
+        for line in script.lines() {
+            let line = line.trim();
+            if line.is_empty() || line.starts_with('#') {
+                continue;
+            }
+
+            if let Some(pos) = line.find('=') {
+                let key = line[..pos].trim();
+                let val = line[pos + 1..].trim().trim_matches('"').trim_matches('\'');
+
+                match key {
+                    "pkgname" => meta.pkgname = val.to_string(),
+                    "pkgver" => meta.pkgver = val.to_string(),
+                    "pkgrel" => meta.pkgrel = val.to_string(),
+                    "pkgdesc" => meta.pkgdesc = val.to_string(),
+                    "arch" => {
+                        let clean = val.trim_matches('(').trim_matches(')');
+                        meta.arch = clean
+                            .split_whitespace()
+                            .map(|s| s.trim_matches('\'').trim_matches('"').to_string())
+                            .collect();
+                    }
+                    "depends" => {
+                        let clean = val.trim_matches('(').trim_matches(')');
+                        meta.depends = clean
+                            .split_whitespace()
+                            .map(|s| s.trim_matches('\'').trim_matches('"').to_string())
+                            .collect();
+                    }
+                    "makedepends" => {
+                        let clean = val.trim_matches('(').trim_matches(')');
+                        meta.makedepends = clean
+                            .split_whitespace()
+                            .map(|s| s.trim_matches('\'').trim_matches('"').to_string())
+                            .collect();
+                    }
+                    _ => {}
+                }
+            }
+        }
+
+        meta
+    }
+}
+
+// ============================================================================
+// PACMAN ALPM TRANSACTION HOOKS ENGINE
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PacmanHookWhen {
+    PreTransaction,
+    PostTransaction,
+}
+
+#[derive(Debug, Clone)]
+pub struct PacmanHook {
+    pub name: String,
+    pub when: PacmanHookWhen,
+    pub exec_cmd: String,
+    pub targets: Vec<String>,
+}
+
+pub struct PacmanHooksEngine {
+    pub hooks: Vec<PacmanHook>,
+}
+
+impl PacmanHooksEngine {
+    pub fn new() -> Self {
+        Self { hooks: Vec::new() }
+    }
+
+    pub fn register_hook(&mut self, hook: PacmanHook) {
+        self.hooks.push(hook);
+    }
+
+    pub fn run_hooks(&self, when: PacmanHookWhen, affected_pkgs: &[&str]) -> Vec<String> {
+        let mut executed_cmds = Vec::new();
+        for hook in &self.hooks {
+            if hook.when == when {
+                let matches_target = hook.targets.iter().any(|t| t == "*" || affected_pkgs.contains(&t.as_str()));
+                if matches_target {
+                    executed_cmds.push(hook.exec_cmd.clone());
+                }
+            }
+        }
+        executed_cmds
+    }
+}
+
+impl Default for PacmanHooksEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// ARCH LINUX SUBSYSTEM PARITY PR PROPOSAL ENGINE
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct ArchPrProposal {
+    pub title: String,
+    pub branch_name: String,
+    pub target_subsystem: String,
+    pub description: String,
+    pub changed_files: Vec<String>,
+}
+
+impl ArchPrProposal {
+    pub fn new(title: &str, branch_name: &str, target_subsystem: &str) -> Self {
+        Self {
+            title: title.to_string(),
+            branch_name: branch_name.to_string(),
+            target_subsystem: target_subsystem.to_string(),
+            description: String::new(),
+            changed_files: Vec::new(),
+        }
+    }
+
+    pub fn with_description(mut self, desc: &str) -> Self {
+        self.description = desc.to_string();
+        self
+    }
+
+    pub fn with_changed_file(mut self, file: &str) -> Self {
+        self.changed_files.push(file.to_string());
+        self
+    }
+
+    pub fn format_as_pull_request_submission(&self) -> String {
+        let mut pr = String::new();
+        pr.push_str(&format!("### PR Title: {}\n", self.title));
+        pr.push_str(&format!("**Branch Name:** `{}`\n", self.branch_name));
+        pr.push_str(&format!("**Target Subsystem:** {}\n\n", self.target_subsystem));
+        pr.push_str("#### Summary of Arch Linux Parity Changes\n");
+        pr.push_str(&self.description);
+        pr.push_str("\n\n#### Changed Files\n");
+        for file in &self.changed_files {
+            pr.push_str(&format!("- `{}`\n", file));
+        }
+        pr
+    }
+}
+
 // ==========================================
 // 3. Init System & systemd-analyze Parity
 // ==========================================
@@ -1812,6 +1979,62 @@ mod tests {
         let pkg = aur.search_aur_package("yay").unwrap();
         assert_eq!(pkg.version, "12.3.0");
         assert_eq!(pkg.depends.len(), 2);
+    }
+
+    #[test]
+    fn test_pkgbuild_metadata_parser() {
+        let pkgbuild_script = r#"
+            # Maintainer: Arch Linux Team
+            pkgname="hyprland"
+            pkgver=0.35.0
+            pkgrel=1
+            pkgdesc="Dynamic tiling Wayland compositor"
+            arch=('x86_64' 'aarch64')
+            depends=('wayland' 'wlroots' 'libinput' 'pixman')
+            makedepends=('cmake' 'ninja' 'meson')
+        "#;
+
+        let meta = PkgbuildMetadataParser::parse_pkgbuild(pkgbuild_script);
+        assert_eq!(meta.pkgname, "hyprland");
+        assert_eq!(meta.pkgver, "0.35.0");
+        assert_eq!(meta.pkgrel, "1");
+        assert_eq!(meta.arch.len(), 2);
+        assert_eq!(meta.depends.len(), 4);
+        assert_eq!(meta.makedepends.len(), 3);
+    }
+
+    #[test]
+    fn test_pacman_hooks_engine() {
+        let mut hooks = PacmanHooksEngine::new();
+        hooks.register_hook(PacmanHook {
+            name: "systemd-daemon-reload.hook".to_string(),
+            when: PacmanHookWhen::PostTransaction,
+            exec_cmd: "/usr/bin/systemctl daemon-reload".to_string(),
+            targets: vec!["systemd".to_string(), "systemd-libs".to_string()],
+        });
+
+        let executed = hooks.run_hooks(PacmanHookWhen::PostTransaction, &["systemd"]);
+        assert_eq!(executed.len(), 1);
+        assert_eq!(executed[0], "/usr/bin/systemctl daemon-reload");
+
+        let pre_executed = hooks.run_hooks(PacmanHookWhen::PreTransaction, &["systemd"]);
+        assert!(pre_executed.is_empty());
+    }
+
+    #[test]
+    fn test_arch_pr_proposal_formatting() {
+        let pr = ArchPrProposal::new(
+            "Arch Linux Parity and Pacman ALPM Hooks Suite",
+            "feature/arch-parity-suite",
+            "Arch Compatibility",
+        )
+        .with_description("Adds PKGBUILD stanza parser, Pacman ALPM transaction hooks engine, and Arch PR proposal manifest generator.")
+        .with_changed_file("src/compatibility/arch_linux.rs");
+
+        let submission = pr.format_as_pull_request_submission();
+        assert!(submission.contains("Arch Linux Parity and Pacman ALPM Hooks Suite"));
+        assert!(submission.contains("feature/arch-parity-suite"));
+        assert!(submission.contains("src/compatibility/arch_linux.rs"));
     }
 }
 
