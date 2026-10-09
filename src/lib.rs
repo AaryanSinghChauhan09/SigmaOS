@@ -157,6 +157,7 @@ pub use distro::SovereignMasterSubsystemDistroHarmonizer;
 pub use kernel::tss_ring3_user_mode::*;
 pub use open_source_obsoletion::open_source_os_gap_closure::*;
 pub use open_source_obsoletion::open_source_os_pinnacle_gap_closure::*;
+pub use open_source_os_missing_components_parity::*;
 pub use tools::tech_media_extended_suite::*;
 pub mod sovereign_wiki_master_engine;
 pub use sovereign_wiki_master_engine::*;
@@ -322,8 +323,12 @@ pub use resilience::{
 pub use security::hardening;
 pub use security::{
     AnonSurfShunt, AppSandboxEngine, ArithmeticSubstitutionDeobfuscator, CapabilityGate,
-    CapabilityToken, ForensicStorageFilter, Permission, PledgeManager, PledgePromise, RoutingMode,
-    SandboxPolicy,
+    CapabilityToken, ForensicStorageFilter, KaliAutopsyForensicEngine, KaliBurpSuiteProxyInterceptor,
+    KaliGhidraReverseEngineeringEngine, KaliKismetWirelessSniffer, KaliLinuxPrProposalEngine,
+    KaliMasscanAsyncPortScanner, KaliMimikatzCredentialDumper, KaliSherlockOsintHarvester,
+    Permission, PledgeManager, PledgePromise, QubesAdminVmSplitGpgEngine, QubesAudioDaemonPulseAudioProxy,
+    QubesDispVmDisposableTemplateEngine, QubesInterVmSecureClipboardEngine, QubesOsPrProposalEngine,
+    QubesUsbDomainSysUsbGuardEngine, QubesWhonixTorGatewayEngine, RoutingMode, SandboxPolicy,
 };
 pub use shell::{
     ContextualCompleter, HistoryExpansionEngine, JobControlManager, ParameterExpansionEngine,
