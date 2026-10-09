@@ -781,6 +781,13 @@ if [ -f "src/distro/sovereign_gentoo_gap_closure_pr_engine.rs" ]; then
     ./build/test_gentoo_pr_engine
 fi
 
+if [ -f "src/distro/sovereign_arch_gap_closure_pr_engine.rs" ]; then
+    echo "Running Sovereign Arch Linux Gap Closure PR Engine test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_arch_gap_closure_pr_engine.rs --edition=2021 -o build/test_arch_pr_engine
+    ./build/test_arch_pr_engine
+fi
+
 if [ -f "src/distro/sovereign_linux_bsd_ecosystem_advancements_v29.rs" ]; then
     echo "Running Sovereign Linux & BSD Ecosystem Advancements V29 test suite..."
     mkdir -p build
