@@ -152,6 +152,8 @@ pub use distro::sovereign_linux_bsd_master_synthesis::*;
 pub use distro::sovereign_linux_bsd_pinnacle_innovations_v14::*;
 pub use distro::sovereign_linux_bsd_media_wiki_unimplemented_ideas_engine::*;
 pub use distro::sovereign_media_and_distro_unimplemented_innovations::*;
+pub use distro::sovereign_omarchy_pr_components_engine::*;
+pub use distro::sovereign_wiki_ideas_pr_deployment_engine::*;
 pub use distro::tech_media_publication_innovations::*;
 pub use distro::SovereignMasterSubsystemDistroHarmonizer;
 pub use kernel::tss_ring3_user_mode::*;
@@ -198,7 +200,8 @@ pub use automation::{
 };
 pub use compatibility::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
-    ContainerRuntime, TargetPlatform, TranslationLayer,
+    ContainerRuntime, FedoraMasterPrDeploymentSuite, MintMasterPrDeploymentSuite,
+    TargetPlatform, TranslationLayer,
 };
 pub use container::{
     ContainerError, ContainerID, ContainerInfo, ContainerRuntime as CoreContainerRuntime,

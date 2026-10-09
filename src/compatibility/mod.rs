@@ -25,6 +25,10 @@ pub mod cross_platform_kernel;
 pub mod fedora;
 pub mod fedora_domination;
 pub mod fedora_missing_components;
+pub mod sovereign_fedora_pr_components_engine;
+pub use sovereign_fedora_pr_components_engine::*;
+pub mod sovereign_mint_pr_components_engine;
+pub use sovereign_mint_pr_components_engine::*;
 pub mod zorin;
 
 pub use antix::{
