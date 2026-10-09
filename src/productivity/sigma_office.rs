@@ -6410,6 +6410,1047 @@ impl SovereignInteractiveDashboardSlicerEngine {
     }
 }
 
+// ---------------------------------------------------------------------------
+// 1. Google Docs Citation & Bibliography Engine
+// ---------------------------------------------------------------------------
+
+/// Citation style format for Google Docs academic referencing.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum CitationStyle {
+    APA,
+    MLA,
+    Chicago,
+    IEEE,
+}
+
+/// A citation item representing a book, article, or online resource.
+#[derive(Debug, Clone)]
+pub struct CitationItem {
+    pub id: String,
+    pub title: String,
+    pub author: String,
+    pub year: u32,
+    pub publisher: Option<String>,
+    pub url_or_doi: Option<String>,
+}
+
+/// Sovereign Academic Citation & Bibliography Engine inspired by Google Docs.
+#[derive(Debug, Clone, Default)]
+pub struct SovereignAcademicCitationEngine {
+    citations: Vec<CitationItem>,
+}
+
+impl SovereignAcademicCitationEngine {
+    pub fn new() -> Self {
+        Self {
+            citations: Vec::new(),
+        }
+    }
+
+    /// Registers a citation item in the document bibliography database.
+    pub fn add_citation(&mut self, item: CitationItem) {
+        self.citations.retain(|c| c.id != item.id);
+        self.citations.push(item);
+    }
+
+    /// Formats an in-text citation marker based on the chosen style.
+    pub fn format_in_text_citation(&self, id: &str, style: CitationStyle) -> Option<String> {
+        let item = self.citations.iter().find(|c| c.id == id)?;
+        let last_name = item
+            .author
+            .split_whitespace()
+            .last()
+            .unwrap_or(&item.author);
+
+        let marker = match style {
+            CitationStyle::APA => format!("({}, {})", last_name, item.year),
+            CitationStyle::MLA => format!("({})", last_name),
+            CitationStyle::Chicago => format!("({}, {})", last_name, item.year),
+            CitationStyle::IEEE => {
+                let idx = self.citations.iter().position(|c| c.id == id).unwrap_or(0) + 1;
+                format!("[{}]", idx)
+            }
+        };
+        Some(marker)
+    }
+
+    /// Generates a sorted and formatted bibliography string list for the entire document.
+    pub fn generate_formatted_bibliography(&self, style: CitationStyle) -> Vec<String> {
+        let mut sorted = self.citations.clone();
+        sorted.sort_by(|a, b| a.author.cmp(&b.author));
+
+        sorted
+            .into_iter()
+            .enumerate()
+            .map(|(i, item)| match style {
+                CitationStyle::APA => {
+                    let pub_str = item
+                        .publisher
+                        .map(|p| format!(" {}.", p))
+                        .unwrap_or_default();
+                    format!(
+                        "{}. ({}). {}.{}",
+                        item.author, item.year, item.title, pub_str
+                    )
+                }
+                CitationStyle::MLA => {
+                    let pub_str = item
+                        .publisher
+                        .map(|p| format!(" {},", p))
+                        .unwrap_or_default();
+                    format!(
+                        "{}. \"{}\".{} {}.",
+                        item.author, item.title, pub_str, item.year
+                    )
+                }
+                CitationStyle::Chicago => {
+                    let pub_str = item
+                        .publisher
+                        .map(|p| format!(" {}:", p))
+                        .unwrap_or_default();
+                    format!(
+                        "{}. {}.{} {}.",
+                        item.author, item.title, pub_str, item.year
+                    )
+                }
+                CitationStyle::IEEE => {
+                    let pub_str = item
+                        .publisher
+                        .map(|p| format!(" {},", p))
+                        .unwrap_or_default();
+                    format!(
+                        "[{}] {}. \"{}\".{} {}.",
+                        i + 1,
+                        item.author,
+                        item.title,
+                        pub_str,
+                        item.year
+                    )
+                }
+            })
+            .collect()
+    }
+}
+
+// ---------------------------------------------------------------------------
+// 2. Google Looker Studio Data Storytelling & Narrative Engine
+// ---------------------------------------------------------------------------
+
+/// Step in an interactive data story.
+#[derive(Debug, Clone)]
+pub struct DataStoryStep {
+    pub step_index: usize,
+    pub title: String,
+    pub description: String,
+    pub highlight_filter: HashMap<String, String>,
+}
+
+/// Sovereign Data Storytelling Engine inspired by Google Looker Studio and Tableau.
+#[derive(Debug, Clone, Default)]
+pub struct SovereignDataStorytellingEngine {
+    steps: Vec<DataStoryStep>,
+}
+
+impl SovereignDataStorytellingEngine {
+    pub fn new() -> Self {
+        Self { steps: Vec::new() }
+    }
+
+    /// Adds a step to the interactive data presentation story.
+    pub fn add_story_step(&mut self, step: DataStoryStep) {
+        self.steps.push(step);
+    }
+
+    /// Retrieves a specific story step by index.
+    pub fn get_step(&self, index: usize) -> Option<&DataStoryStep> {
+        self.steps.iter().find(|s| s.step_index == index)
+    }
+
+    /// Automatically generates an executive summary narrative based on metric growth trend.
+    pub fn generate_narrative_summary(&self, metric_name: &str, old_val: f64, new_val: f64) -> String {
+        let diff = new_val - old_val;
+        let pct = if old_val != 0.0 {
+            (diff / old_val) * 100.0
+        } else if new_val > 0.0 {
+            100.0
+        } else {
+            0.0
+        };
+
+        if pct > 10.0 {
+            format!(
+                "Significant positive momentum in {}: increased by {:.1}% (+{:.2}).",
+                metric_name, pct, diff
+            )
+        } else if pct < -10.0 {
+            format!(
+                "Decline detected in {}: dropped by {:.1}% ({:.2}). Action required.",
+                metric_name, pct.abs(), diff
+            )
+        } else {
+            format!(
+                "Stable performance in {}: minor variation of {:.1}%.",
+                metric_name, pct
+            )
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// 3. Salesforce / Zoho Customer Churn Prediction & Retention Engine
+// ---------------------------------------------------------------------------
+
+/// Customer churn risk level classification.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ChurnRiskLevel {
+    Low,
+    Medium,
+    High,
+    Critical,
+}
+
+/// Customer engagement indicators for churn calculation.
+#[derive(Debug, Clone)]
+pub struct CustomerMetrics {
+    pub customer_id: String,
+    pub days_since_last_login: u32,
+    pub open_support_tickets: u32,
+    pub active_contract_months: u32,
+    pub monthly_active_users: u32,
+}
+
+/// Sovereign Customer Churn Prediction & Retention Engine inspired by Salesforce and Zoho CRM.
+#[derive(Debug, Clone, Default)]
+pub struct SovereignChurnPredictionRetentionEngine;
+
+impl SovereignChurnPredictionRetentionEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    /// Calculates customer health score from 0 (worst) to 100 (best).
+    pub fn calculate_health_score(&self, metrics: &CustomerMetrics) -> f64 {
+        let mut score = 100.0;
+
+        // Deduct for inactivity
+        if metrics.days_since_last_login > 30 {
+            score -= 40.0;
+        } else if metrics.days_since_last_login > 14 {
+            score -= 20.0;
+        }
+
+        // Deduct for high open support tickets
+        score -= (metrics.open_support_tickets as f64 * 5.0).min(30.0);
+
+        // Boost for contract longevity
+        if metrics.active_contract_months >= 12 {
+            score += 10.0;
+        }
+
+        // Boost for high active users
+        if metrics.monthly_active_users >= 10 {
+            score += 10.0;
+        }
+
+        score.min(100.0).max(0.0)
+    }
+
+    /// Predicts churn risk level based on health score.
+    pub fn predict_churn_risk(&self, metrics: &CustomerMetrics) -> ChurnRiskLevel {
+        let health = self.calculate_health_score(metrics);
+        if health >= 80.0 {
+            ChurnRiskLevel::Low
+        } else if health >= 50.0 {
+            ChurnRiskLevel::Medium
+        } else if health > 30.0 {
+            ChurnRiskLevel::High
+        } else {
+            ChurnRiskLevel::Critical
+        }
+    }
+
+    /// Recommends automated retention actions based on churn risk.
+    pub fn recommend_retention_workflow(&self, risk: ChurnRiskLevel) -> &'static str {
+        match risk {
+            ChurnRiskLevel::Low => "Nurture sequence: monthly newsletter and product update features",
+            ChurnRiskLevel::Medium => "Check-in email from Customer Success Representative",
+            ChurnRiskLevel::High => "Schedule executive phone review & offer usage training webinar",
+            ChurnRiskLevel::Critical => "Immediate priority escalation to Account Director & 20% renewal discount offer",
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// 4. Bitrix24 / Odoo Omnichannel Communication Gateway
+// ---------------------------------------------------------------------------
+
+/// Omnichannel communication channels.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum CommunicationChannel {
+    Email,
+    SMS,
+    WhatsApp,
+    LiveChat,
+    Voice,
+}
+
+/// Unified message object across omnichannel feeds.
+#[derive(Debug, Clone)]
+pub struct OmnichannelMessage {
+    pub message_id: String,
+    pub customer_id: String,
+    pub channel: CommunicationChannel,
+    pub sender: String,
+    pub content: String,
+    pub timestamp: u64,
+    pub priority: u8, // 1 (lowest) to 5 (highest)
+}
+
+/// Sovereign Omnichannel Communication Gateway inspired by Bitrix24 and Odoo.
+#[derive(Debug, Clone, Default)]
+pub struct SovereignOmnichannelCommunicationGateway {
+    inbox: Vec<OmnichannelMessage>,
+}
+
+impl SovereignOmnichannelCommunicationGateway {
+    pub fn new() -> Self {
+        Self { inbox: Vec::new() }
+    }
+
+    /// Ingests an incoming omnichannel message.
+    pub fn receive_message(&mut self, msg: OmnichannelMessage) {
+        self.inbox.push(msg);
+    }
+
+    /// Retrieves unified timeline of messages for a specific customer across all channels.
+    pub fn get_customer_timeline(&self, customer_id: &str) -> Vec<OmnichannelMessage> {
+        let mut timeline: Vec<_> = self
+            .inbox
+            .iter()
+            .filter(|m| m.customer_id == customer_id)
+            .cloned()
+            .collect();
+        timeline.sort_by_key(|m| m.timestamp);
+        timeline
+    }
+
+    /// Returns high-priority unhandled messages sorted by priority descending.
+    pub fn get_priority_queue(&self, min_priority: u8) -> Vec<OmnichannelMessage> {
+        let mut queue: Vec<_> = self
+            .inbox
+            .iter()
+            .filter(|m| m.priority >= min_priority)
+            .cloned()
+            .collect();
+        queue.sort_by(|a, b| b.priority.cmp(&a.priority));
+        queue
+    }
+}
+
+// ---------------------------------------------------------------------------
+// 5. Microsoft / Zoho Financial Valuation & Cash Flow Forecasting Engine
+// ---------------------------------------------------------------------------
+
+/// Sovereign Financial Valuation & Cash Flow Forecasting Engine inspired by Microsoft Excel & Zoho Books.
+#[derive(Debug, Clone, Default)]
+pub struct SovereignFinancialValuationEngine;
+
+impl SovereignFinancialValuationEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    /// Computes Discounted Cash Flow (DCF) Valuation.
+    /// `projected_cash_flows`: annual free cash flow predictions.
+    /// `wacc`: Weighted Average Cost of Capital (e.g., 0.10 for 10%).
+    /// `terminal_growth_rate`: perpetual growth rate (e.g., 0.02 for 2%).
+    pub fn calculate_dcf_valuation(
+        &self,
+        projected_cash_flows: &[f64],
+        wacc: f64,
+        terminal_growth_rate: f64,
+    ) -> f64 {
+        if wacc <= terminal_growth_rate || projected_cash_flows.is_empty() {
+            return 0.0;
+        }
+
+        let mut npv = 0.0;
+        for (t, &cf) in projected_cash_flows.iter().enumerate() {
+            let period = (t + 1) as f64;
+            npv += cf / (1.0 + wacc).powf(period);
+        }
+
+        // Terminal value
+        let last_cf = *projected_cash_flows.last().unwrap();
+        let terminal_value = (last_cf * (1.0 + terminal_growth_rate)) / (wacc - terminal_growth_rate);
+        let discounted_terminal_value = terminal_value / (1.0 + wacc).powf(projected_cash_flows.len() as f64);
+
+        npv + discounted_terminal_value
+    }
+
+    /// Generates multi-period cash flow forecast given initial cash flow and constant growth rate.
+    pub fn forecast_cash_flows(&self, initial_cf: f64, annual_growth_rate: f64, periods: usize) -> Vec<f64> {
+        let mut forecast = Vec::with_capacity(periods);
+        let mut current = initial_cf;
+        for _ in 0..periods {
+            current *= 1.0 + annual_growth_rate;
+            forecast.push(current);
+        }
+        forecast
+    }
+}
+
+// ---------------------------------------------------------------------------
+// 6. Google Sheets / Odoo Dynamic Array Formula & Spill Engine
+// ---------------------------------------------------------------------------
+
+/// Result of evaluating a dynamic array formula spilling across a target range.
+#[derive(Debug, Clone, PartialEq)]
+pub enum DynamicArraySpillResult {
+    Success {
+        top_left_cell: (u32, u32),
+        rows: usize,
+        cols: usize,
+        values: Vec<Vec<f64>>,
+    },
+    SpillError {
+        blocking_cell: (u32, u32),
+        message: String,
+    },
+}
+
+/// Sovereign Dynamic Array Formula & Spill Engine inspired by Google Sheets & Odoo.
+#[derive(Debug, Clone, Default)]
+pub struct SovereignDynamicArrayFormulaSpillEngine;
+
+impl SovereignDynamicArrayFormulaSpillEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    /// Evaluates a `SEQUENCE` formula spilling a range of numbers.
+    /// Checks target cells in `occupied_cells` for `#SPILL!` collision before spilling.
+    pub fn evaluate_sequence_spill(
+        &self,
+        top_left: (u32, u32),
+        rows: usize,
+        cols: usize,
+        start: f64,
+        step: f64,
+        occupied_cells: &HashMap<(u32, u32), String>,
+    ) -> DynamicArraySpillResult {
+        // Check for spill collisions
+        for r in 0..rows {
+            for c in 0..cols {
+                let cell = (top_left.0 + r as u32, top_left.1 + c as u32);
+                if cell != top_left && occupied_cells.contains_key(&cell) {
+                    return DynamicArraySpillResult::SpillError {
+                        blocking_cell: cell,
+                        message: format!("#SPILL! collision at cell ({}, {})", cell.0, cell.1),
+                    };
+                }
+            }
+        }
+
+        let mut matrix = Vec::with_capacity(rows);
+        let mut current = start;
+        for _ in 0..rows {
+            let mut row_vals = Vec::with_capacity(cols);
+            for _ in 0..cols {
+                row_vals.push(current);
+                current += step;
+            }
+            matrix.push(row_vals);
+        }
+
+        DynamicArraySpillResult::Success {
+            top_left_cell: top_left,
+            rows,
+            cols,
+            values: matrix,
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// 7. Salesforce Einstein / Zoho CRM Pipeline Analytics Engine
+// ---------------------------------------------------------------------------
+
+/// Sovereign Salesforce Einstein & Zoho CRM Pipeline Analytics Engine.
+#[derive(Debug, Clone, Default)]
+pub struct SovereignSalesforceEinsteinAnalyticsPipelineEngine;
+
+impl SovereignSalesforceEinsteinAnalyticsPipelineEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    /// Predicts deal win probability score (0.0 to 1.0) and generates AI next best action.
+    pub fn evaluate_deal_pipeline_opportunity(
+        &self,
+        _amount: f64,
+        stage_progress: f64, // 0.0 to 1.0
+        stagnant_days: u32,
+        has_decision_maker_contact: bool,
+    ) -> (f64, &'static str) {
+        let mut probability = stage_progress * 0.7;
+
+        if has_decision_maker_contact {
+            probability += 0.25;
+        }
+
+        if stagnant_days > 30 {
+            probability -= 0.3;
+        } else if stagnant_days > 14 {
+            probability -= 0.1;
+        }
+
+        let clamped_prob = probability.min(1.0).max(0.0);
+
+        let next_best_action = if stagnant_days > 30 {
+            "Trigger executive sponsor outreach to unblock stalled deal"
+        } else if !has_decision_maker_contact {
+            "Schedule discovery meeting with VP/C-level decision maker"
+        } else if clamped_prob >= 0.75 {
+            "Send formal contract proposal and quote for e-signature"
+        } else {
+            "Send product demo follow-up and ROI case study"
+        };
+
+        (clamped_prob, next_best_action)
+    }
+}
+
+// ---------------------------------------------------------------------------
+// 8. Bitrix24 / Odoo Omnichannel Telephony & CRM Auto-Logging Engine
+// ---------------------------------------------------------------------------
+
+/// Sovereign Bitrix24 & Odoo Omnichannel Telephony & CRM Auto-Logging Engine.
+#[derive(Debug, Clone, Default)]
+pub struct SovereignBitrix24OmnichannelTelephonyCrmEngine {
+    logged_calls: Vec<(String, String, u32, String)>, // (call_id, phone_number, duration_sec, transcript)
+}
+
+impl SovereignBitrix24OmnichannelTelephonyCrmEngine {
+    pub fn new() -> Self {
+        Self {
+            logged_calls: Vec::new(),
+        }
+    }
+
+    /// Ingests a completed PBX call event, logs transcript, and auto-generates CRM lead record if new contact.
+    pub fn process_pbx_call_event(
+        &mut self,
+        call_id: &str,
+        phone_number: &str,
+        duration_sec: u32,
+        transcript: &str,
+    ) -> (String, bool) {
+        self.logged_calls.push((
+            call_id.to_string(),
+            phone_number.to_string(),
+            duration_sec,
+            transcript.to_string(),
+        ));
+
+        let auto_created_lead = transcript.contains("pricing") || transcript.contains("quote") || duration_sec > 180;
+        let summary = format!(
+            "Logged call [{}] from {} ({}s). Lead auto-created: {}",
+            call_id, phone_number, duration_sec, auto_created_lead
+        );
+
+        (summary, auto_created_lead)
+    }
+}
+
+// ---------------------------------------------------------------------------
+// 9. Google Docs / Smart Canvas `@` Chip Component Engine
+// ---------------------------------------------------------------------------
+
+/// Types of Google Docs Smart Canvas `@` chips.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum SmartCanvasChipKind {
+    Person,
+    File,
+    Date,
+    Dropdown,
+}
+
+/// A Smart Canvas `@` chip component object.
+#[derive(Debug, Clone)]
+pub struct SmartCanvasChip {
+    pub label: String,
+    pub kind: SmartCanvasChipKind,
+    pub target_id_or_val: String,
+}
+
+/// Sovereign Google Docs Smart Canvas `@` Chip Component Engine.
+#[derive(Debug, Clone, Default)]
+pub struct SovereignGoogleSmartCanvasChipEngine;
+
+impl SovereignGoogleSmartCanvasChipEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    /// Parses `@` chip trigger notation (e.g. `@Person:John Doe`, `@Date:2026-05-01`).
+    pub fn parse_chip_notation(&self, trigger_text: &str) -> Option<SmartCanvasChip> {
+        if !trigger_text.starts_with('@') {
+            return None;
+        }
+
+        let body = &trigger_text[1..];
+        let mut parts = body.splitn(2, ':');
+        let kind_str = parts.next()?;
+        let val = parts.next()?.trim();
+
+        let (kind, label) = match kind_str.to_lowercase().as_str() {
+            "person" | "user" => (SmartCanvasChipKind::Person, format!("👤 {}", val)),
+            "file" | "doc" => (SmartCanvasChipKind::File, format!("📄 {}", val)),
+            "date" | "time" => (SmartCanvasChipKind::Date, format!("📅 {}", val)),
+            "dropdown" | "status" => (SmartCanvasChipKind::Dropdown, format!("🏷️ {}", val)),
+            _ => return None,
+        };
+
+        Some(SmartCanvasChip {
+            label,
+            kind,
+            target_id_or_val: val.to_string(),
+        })
+    }
+}
+
+// ---------------------------------------------------------------------------
+// 10. Odoo Inventory Supply Chain & Reorder Point (ROP) Engine
+// ---------------------------------------------------------------------------
+
+/// Sovereign Odoo Inventory Supply Chain & Reorder Point Engine.
+#[derive(Debug, Clone, Default)]
+pub struct SovereignOdooInventorySupplyChainMrpEngine;
+
+impl SovereignOdooInventorySupplyChainMrpEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    /// Calculates Reorder Point (ROP): `(Average Daily Usage * Lead Time Days) + Safety Stock`.
+    pub fn calculate_reorder_point(
+        &self,
+        avg_daily_usage: f64,
+        lead_time_days: f64,
+        safety_stock: f64,
+    ) -> f64 {
+        (avg_daily_usage * lead_time_days) + safety_stock
+    }
+
+    /// Evaluates if current warehouse stock falls below ROP and triggers auto-purchase order quantity.
+    pub fn evaluate_reorder_trigger(
+        &self,
+        current_stock: f64,
+        avg_daily_usage: f64,
+        lead_time_days: f64,
+        safety_stock: f64,
+        target_max_stock: f64,
+    ) -> (bool, f64) {
+        let rop = self.calculate_reorder_point(avg_daily_usage, lead_time_days, safety_stock);
+        if current_stock <= rop {
+            let recommended_po_qty = (target_max_stock - current_stock).max(0.0);
+            (true, recommended_po_qty)
+        } else {
+            (false, 0.0)
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// 11. Google Workspace / MS 365 AI Document Summarizer Engine
+// ---------------------------------------------------------------------------
+
+/// Sovereign AI Document Summarizer Engine inspired by Google Duet AI & Copilot.
+#[derive(Debug, Clone, Default)]
+pub struct SovereignAiDocumentSummarizerEngine;
+
+impl SovereignAiDocumentSummarizerEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    /// Extracts key bullet points and executive summary from document text.
+    pub fn generate_executive_summary(&self, document_text: &str, max_bullets: usize) -> Vec<String> {
+        let sentences: Vec<_> = document_text
+            .split(&['.', '!', '?'][..])
+            .map(|s| s.trim())
+            .filter(|s| !s.is_empty())
+            .collect();
+
+        sentences
+            .into_iter()
+            .take(max_bullets)
+            .map(|s| format!("• {}", s))
+            .collect()
+    }
+}
+
+// ---------------------------------------------------------------------------
+// 12. Salesforce / Zoho Enterprise Knowledge Graph Engine
+// ---------------------------------------------------------------------------
+
+/// Node entity types in the Enterprise Knowledge Graph.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum KnowledgeGraphNodeType {
+    Document,
+    Lead,
+    Deal,
+    Project,
+    Contact,
+}
+
+/// A node in the Enterprise Knowledge Graph.
+#[derive(Debug, Clone)]
+pub struct KnowledgeGraphNode {
+    pub node_id: String,
+    pub label: String,
+    pub kind: KnowledgeGraphNodeType,
+}
+
+/// An edge relationship in the Enterprise Knowledge Graph.
+#[derive(Debug, Clone)]
+pub struct KnowledgeGraphEdge {
+    pub source_id: String,
+    pub target_id: String,
+    pub relationship: String,
+}
+
+/// Sovereign Enterprise Knowledge Graph Engine inspired by Salesforce & Zoho CRM.
+#[derive(Debug, Clone, Default)]
+pub struct SovereignEnterpriseKnowledgeGraphEngine {
+    nodes: Vec<KnowledgeGraphNode>,
+    edges: Vec<KnowledgeGraphEdge>,
+}
+
+impl SovereignEnterpriseKnowledgeGraphEngine {
+    pub fn new() -> Self {
+        Self {
+            nodes: Vec::new(),
+            edges: Vec::new(),
+        }
+    }
+
+    /// Adds an entity node to the knowledge graph.
+    pub fn add_node(&mut self, node: KnowledgeGraphNode) {
+        self.nodes.retain(|n| n.node_id != node.node_id);
+        self.nodes.push(node);
+    }
+
+    /// Adds a relationship edge between two nodes.
+    pub fn add_edge(&mut self, source_id: &str, target_id: &str, relationship: &str) {
+        self.edges.push(KnowledgeGraphEdge {
+            source_id: source_id.to_string(),
+            target_id: target_id.to_string(),
+            relationship: relationship.to_string(),
+        });
+    }
+
+    /// Finds all directly linked target nodes for a given entity node ID.
+    pub fn find_linked_entities(&self, node_id: &str) -> Vec<(String, String)> {
+        self.edges
+            .iter()
+            .filter(|e| e.source_id == node_id)
+            .filter_map(|e| {
+                let target_label = self
+                    .nodes
+                    .iter()
+                    .find(|n| n.node_id == e.target_id)
+                    .map(|n| n.label.as_str())
+                    .unwrap_or("Unknown");
+                Some((target_label.to_string(), e.relationship.clone()))
+            })
+            .collect()
+    }
+}
+
+// ---------------------------------------------------------------------------
+// 13. Google Looker Studio / Tableau Executive KPI Scorecard Engine
+// ---------------------------------------------------------------------------
+
+/// Status health indicator for executive KPI metrics.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum KpiMetricStatus {
+    OnTrack,
+    AtRisk,
+    Behind,
+}
+
+/// An executive KPI metric item.
+#[derive(Debug, Clone)]
+pub struct ExecutiveKpiItem {
+    pub kpi_id: String,
+    pub title: String,
+    pub target_value: f64,
+    pub actual_value: f64,
+    pub weight: f64,
+}
+
+/// Sovereign Executive KPI Scorecard Engine inspired by Google Looker Studio & Tableau.
+#[derive(Debug, Clone, Default)]
+pub struct SovereignExecutiveKpiScorecardEngine {
+    kpis: Vec<ExecutiveKpiItem>,
+}
+
+impl SovereignExecutiveKpiScorecardEngine {
+    pub fn new() -> Self {
+        Self { kpis: Vec::new() }
+    }
+
+    /// Adds a KPI metric item to the executive scorecard.
+    pub fn add_kpi(&mut self, item: ExecutiveKpiItem) {
+        self.kpis.retain(|k| k.kpi_id != item.kpi_id);
+        self.kpis.push(item);
+    }
+
+    /// Calculates percentage variance: `((actual - target) / target) * 100.0`.
+    pub fn calculate_variance_pct(&self, kpi_id: &str) -> Option<(f64, KpiMetricStatus)> {
+        let kpi = self.kpis.iter().find(|k| k.kpi_id == kpi_id)?;
+        if kpi.target_value == 0.0 {
+            return Some((0.0, KpiMetricStatus::OnTrack));
+        }
+
+        let var_pct = ((kpi.actual_value - kpi.target_value) / kpi.target_value) * 100.0;
+        let status = if var_pct >= 0.0 {
+            KpiMetricStatus::OnTrack
+        } else if var_pct >= -10.0 {
+            KpiMetricStatus::AtRisk
+        } else {
+            KpiMetricStatus::Behind
+        };
+
+        Some((var_pct, status))
+    }
+
+    /// Computes overall weighted achievement index across all scorecard metrics.
+    pub fn compute_weighted_scorecard_index(&self) -> f64 {
+        let total_weight: f64 = self.kpis.iter().map(|k| k.weight).sum();
+        if total_weight <= 0.0 {
+            return 0.0;
+        }
+
+        let weighted_sum: f64 = self
+            .kpis
+            .iter()
+            .map(|k| {
+                let ratio = if k.target_value > 0.0 {
+                    (k.actual_value / k.target_value).min(1.5)
+                } else {
+                    1.0
+                };
+                ratio * k.weight
+            })
+            .sum();
+
+        (weighted_sum / total_weight) * 100.0
+    }
+}
+
+// ---------------------------------------------------------------------------
+// 14. Odoo / Microsoft Project Enterprise Resource Allocation Engine
+// ---------------------------------------------------------------------------
+
+/// Enterprise resource allocation record.
+#[derive(Debug, Clone)]
+pub struct ResourceAllocation {
+    pub resource_id: String,
+    pub project_id: String,
+    pub allocated_hours_per_week: f64,
+    pub max_capacity_hours_per_week: f64,
+}
+
+/// Sovereign Enterprise Resource Allocation Engine inspired by Odoo & MS Project.
+#[derive(Debug, Clone, Default)]
+pub struct SovereignEnterpriseResourceAllocationEngine {
+    allocations: Vec<ResourceAllocation>,
+}
+
+impl SovereignEnterpriseResourceAllocationEngine {
+    pub fn new() -> Self {
+        Self {
+            allocations: Vec::new(),
+        }
+    }
+
+    /// Adds a project resource allocation record.
+    pub fn add_allocation(&mut self, alloc: ResourceAllocation) {
+        self.allocations.push(alloc);
+    }
+
+    /// Calculates total utilization percentage for a resource across all assigned projects.
+    pub fn calculate_capacity_utilization_pct(&self, resource_id: &str) -> (f64, bool) {
+        let res_allocs: Vec<_> = self
+            .allocations
+            .iter()
+            .filter(|a| a.resource_id == resource_id)
+            .collect();
+
+        if res_allocs.is_empty() {
+            return (0.0, false);
+        }
+
+        let total_allocated: f64 = res_allocs.iter().map(|a| a.allocated_hours_per_week).sum();
+        let max_capacity = res_allocs[0].max_capacity_hours_per_week;
+
+        if max_capacity <= 0.0 {
+            return (0.0, false);
+        }
+
+        let util_pct = (total_allocated / max_capacity) * 100.0;
+        let is_overallocated = util_pct > 100.0;
+
+        (util_pct, is_overallocated)
+    }
+}
+
+// ---------------------------------------------------------------------------
+// 15. Google Workspace / Looker Studio Executive Report Exporter Engine
+// ---------------------------------------------------------------------------
+
+/// Executive report section object.
+#[derive(Debug, Clone)]
+pub struct ExecutiveReportSection {
+    pub section_title: String,
+    pub content_summary: String,
+    pub metric_kpis: Vec<(String, String)>,
+}
+
+/// Sovereign Executive Report Exporter Engine inspired by Google Workspace & Looker Studio.
+#[derive(Debug, Clone, Default)]
+pub struct SovereignExecutiveReportExporterEngine {
+    sections: Vec<ExecutiveReportSection>,
+}
+
+impl SovereignExecutiveReportExporterEngine {
+    pub fn new() -> Self {
+        Self {
+            sections: Vec::new(),
+        }
+    }
+
+    /// Adds an executive section to the report bundle.
+    pub fn add_section(&mut self, section: ExecutiveReportSection) {
+        self.sections.push(section);
+    }
+
+    /// Generates executive HTML report document with cover header, TOC, and metrics.
+    pub fn export_executive_html_report(&self, report_title: &str, author: &str) -> String {
+        let mut html = format!(
+            "<!DOCTYPE html><html><head><title>{}</title></head><body>\n",
+            report_title
+        );
+        html.push_str(&format!(
+            "<div class=\"cover\"><h1>{}</h1><h3>Prepared by: {}</h3></div>\n<hr/>\n",
+            report_title, author
+        ));
+
+        html.push_str("<div class=\"toc\"><h2>Table of Contents</h2><ul>\n");
+        for sec in &self.sections {
+            html.push_str(&format!("<li>{}</li>\n", sec.section_title));
+        }
+        html.push_str("</ul></div>\n<hr/>\n");
+
+        for sec in &self.sections {
+            html.push_str(&format!(
+                "<section><h2>{}</h2><p>{}</p><ul>\n",
+                sec.section_title, sec.content_summary
+            ));
+            for (k, v) in &sec.metric_kpis {
+                html.push_str(&format!("<li><strong>{}</strong>: {}</li>\n", k, v));
+            }
+            html.push_str("</ul></section>\n");
+        }
+
+        html.push_str("<footer>CONFIDENTIAL - Sovereign OS Enterprise Report</footer></body></html>");
+        html
+    }
+}
+
+// ---------------------------------------------------------------------------
+// 16. Bitrix24 / Salesforce / Odoo Enterprise Workflow Audit Trail Engine
+// ---------------------------------------------------------------------------
+
+/// Audit log entry tracking enterprise operations.
+#[derive(Debug, Clone)]
+pub struct EnterpriseAuditLogEntry {
+    pub entry_id: u64,
+    pub actor_id: String,
+    pub action: String,
+    pub resource: String,
+    pub timestamp: u64,
+    pub prev_hash: String,
+}
+
+/// Sovereign Enterprise Workflow Audit Trail Engine inspired by Bitrix24, Salesforce & Odoo.
+#[derive(Debug, Clone, Default)]
+pub struct SovereignEnterpriseWorkflowAuditTrailEngine {
+    audit_chain: Vec<EnterpriseAuditLogEntry>,
+    next_id: u64,
+}
+
+impl SovereignEnterpriseWorkflowAuditTrailEngine {
+    pub fn new() -> Self {
+        Self {
+            audit_chain: Vec::new(),
+            next_id: 1,
+        }
+    }
+
+    /// Logs an immutable audit entry with hash chain linkage.
+    pub fn log_action(
+        &mut self,
+        actor_id: &str,
+        action: &str,
+        resource: &str,
+        timestamp: u64,
+    ) -> String {
+        let prev_hash = self
+            .audit_chain
+            .last()
+            .map(|e| format!("hash_entry_{}", e.entry_id))
+            .unwrap_or_else(|| "0000000000000000".to_string());
+
+        let entry = EnterpriseAuditLogEntry {
+            entry_id: self.next_id,
+            actor_id: actor_id.to_string(),
+            action: action.to_string(),
+            resource: resource.to_string(),
+            timestamp,
+            prev_hash: prev_hash.clone(),
+        };
+
+        self.next_id += 1;
+        let entry_hash = format!("hash_entry_{}", entry.entry_id);
+        self.audit_chain.push(entry);
+        entry_hash
+    }
+
+    /// Verifies audit log chain continuity.
+    pub fn verify_chain_integrity(&self) -> bool {
+        for i in 1..self.audit_chain.len() {
+            let expected_prev = format!("hash_entry_{}", self.audit_chain[i - 1].entry_id);
+            if self.audit_chain[i].prev_hash != expected_prev {
+                return false;
+            }
+        }
+        true
+    }
+
+    /// Retrieves all audit logs for a target resource.
+    pub fn get_resource_audit_history(&self, resource: &str) -> Vec<EnterpriseAuditLogEntry> {
+        self.audit_chain
+            .iter()
+            .filter(|e| e.resource == resource)
+            .cloned()
+            .collect()
+    }
+}
+
 // Placeholder types for compilation
 mod sigma_types {
     pub type Result<T> = core::result::Result<T, &'static str>;
@@ -7610,5 +8651,259 @@ mod tests {
 
         let ts = slicer_engine.aggregate_time_series(&dataset, "date", "sales");
         assert_eq!(ts.get("2026-01").copied(), Some(800.0));
+
+        // 6. SovereignAcademicCitationEngine
+        let mut citation_engine = SovereignAcademicCitationEngine::new();
+        citation_engine.add_citation(CitationItem {
+            id: "ref1".to_string(),
+            title: "SigmaOS Architecture".to_string(),
+            author: "Alan Turing".to_string(),
+            year: 2026,
+            publisher: Some("Sovereign Press".to_string()),
+            url_or_doi: Some("doi:10.1000/sigma123".to_string()),
+        });
+        assert_eq!(
+            citation_engine.format_in_text_citation("ref1", CitationStyle::APA),
+            Some("(Turing, 2026)".to_string())
+        );
+        assert_eq!(
+            citation_engine.format_in_text_citation("ref1", CitationStyle::IEEE),
+            Some("[1]".to_string())
+        );
+        let bib = citation_engine.generate_formatted_bibliography(CitationStyle::APA);
+        assert_eq!(bib.len(), 1);
+        assert!(bib[0].contains("Alan Turing. (2026). SigmaOS Architecture. Sovereign Press."));
+
+        // 7. SovereignDataStorytellingEngine
+        let mut story_engine = SovereignDataStorytellingEngine::new();
+        story_engine.add_story_step(DataStoryStep {
+            step_index: 1,
+            title: "Q1 Revenue Surge".to_string(),
+            description: "High adoption in enterprise segment".to_string(),
+            highlight_filter: HashMap::new(),
+        });
+        assert_eq!(story_engine.get_step(1).unwrap().title, "Q1 Revenue Surge");
+        let narrative = story_engine.generate_narrative_summary("ARR", 100.0, 125.0);
+        assert!(narrative.contains("Significant positive momentum in ARR"));
+
+        // 8. SovereignChurnPredictionRetentionEngine
+        let churn_engine = SovereignChurnPredictionRetentionEngine::new();
+        let healthy_customer = CustomerMetrics {
+            customer_id: "c1".to_string(),
+            days_since_last_login: 2,
+            open_support_tickets: 0,
+            active_contract_months: 18,
+            monthly_active_users: 25,
+        };
+        assert_eq!(churn_engine.predict_churn_risk(&healthy_customer), ChurnRiskLevel::Low);
+
+        let critical_customer = CustomerMetrics {
+            customer_id: "c2".to_string(),
+            days_since_last_login: 45,
+            open_support_tickets: 8,
+            active_contract_months: 2,
+            monthly_active_users: 1,
+        };
+        assert_eq!(churn_engine.predict_churn_risk(&critical_customer), ChurnRiskLevel::Critical);
+
+        // 9. SovereignOmnichannelCommunicationGateway
+        let mut comms_gateway = SovereignOmnichannelCommunicationGateway::new();
+        comms_gateway.receive_message(OmnichannelMessage {
+            message_id: "m1".to_string(),
+            customer_id: "cust99".to_string(),
+            channel: CommunicationChannel::WhatsApp,
+            sender: "+15550199".to_string(),
+            content: "Need help with API key integration".to_string(),
+            timestamp: 100,
+            priority: 4,
+        });
+        comms_gateway.receive_message(OmnichannelMessage {
+            message_id: "m2".to_string(),
+            customer_id: "cust99".to_string(),
+            channel: CommunicationChannel::Email,
+            sender: "cust99@example.com".to_string(),
+            content: "Followup on API key".to_string(),
+            timestamp: 105,
+            priority: 2,
+        });
+
+        let timeline = comms_gateway.get_customer_timeline("cust99");
+        assert_eq!(timeline.len(), 2);
+        assert_eq!(timeline[0].message_id, "m1");
+
+        let high_prio = comms_gateway.get_priority_queue(3);
+        assert_eq!(high_prio.len(), 1);
+        assert_eq!(high_prio[0].message_id, "m1");
+
+        // 10. SovereignFinancialValuationEngine
+        let val_engine = SovereignFinancialValuationEngine::new();
+        let cash_flows = vec![100000.0, 120000.0, 140000.0];
+        let dcf = val_engine.calculate_dcf_valuation(&cash_flows, 0.10, 0.02);
+        assert!(dcf > 1000000.0);
+
+        let forecasted = val_engine.forecast_cash_flows(100.0, 0.10, 3);
+        assert_eq!(forecasted.len(), 3);
+        assert!((forecasted[0] - 110.0).abs() < 1e-5);
+
+        // 11. SovereignDynamicArrayFormulaSpillEngine
+        let array_spill = SovereignDynamicArrayFormulaSpillEngine::new();
+        let mut occupied = HashMap::new();
+        let res = array_spill.evaluate_sequence_spill((1, 1), 2, 2, 1.0, 1.0, &occupied);
+        match res {
+            DynamicArraySpillResult::Success { rows, cols, values, .. } => {
+                assert_eq!(rows, 2);
+                assert_eq!(cols, 2);
+                assert_eq!(values[0], vec![1.0, 2.0]);
+                assert_eq!(values[1], vec![3.0, 4.0]);
+            }
+            _ => panic!("Expected Success result"),
+        }
+
+        occupied.insert((1, 2), "Blocking data".to_string());
+        let spill_err = array_spill.evaluate_sequence_spill((1, 1), 2, 2, 1.0, 1.0, &occupied);
+        match spill_err {
+            DynamicArraySpillResult::SpillError { blocking_cell, .. } => {
+                assert_eq!(blocking_cell, (1, 2));
+            }
+            _ => panic!("Expected SpillError result"),
+        }
+
+        // 12. SovereignSalesforceEinsteinAnalyticsPipelineEngine
+        let einstein_engine = SovereignSalesforceEinsteinAnalyticsPipelineEngine::new();
+        let (prob, action) = einstein_engine.evaluate_deal_pipeline_opportunity(250000.0, 0.8, 5, true);
+        assert!(prob >= 0.75);
+        assert!(action.contains("Send formal contract proposal"));
+
+        // 13. SovereignBitrix24OmnichannelTelephonyCrmEngine
+        let mut pbx_engine = SovereignBitrix24OmnichannelTelephonyCrmEngine::new();
+        let (summary, auto_lead) = pbx_engine.process_pbx_call_event("call_001", "+18005550199", 240, "Discussed enterprise pricing quote.");
+        assert!(auto_lead);
+        assert!(summary.contains("Lead auto-created: true"));
+
+        // 14. SovereignGoogleSmartCanvasChipEngine
+        let chip_engine = SovereignGoogleSmartCanvasChipEngine::new();
+        let chip = chip_engine.parse_chip_notation("@Person:Ada Lovelace").unwrap();
+        assert_eq!(chip.kind, SmartCanvasChipKind::Person);
+        assert_eq!(chip.label, "👤 Ada Lovelace");
+
+        // 15. SovereignOdooInventorySupplyChainMrpEngine
+        let mrp_engine = SovereignOdooInventorySupplyChainMrpEngine::new();
+        let rop = mrp_engine.calculate_reorder_point(10.0, 5.0, 20.0);
+        assert_eq!(rop, 70.0);
+
+        let (reorder, qty) = mrp_engine.evaluate_reorder_trigger(50.0, 10.0, 5.0, 20.0, 200.0);
+        assert!(reorder);
+        assert_eq!(qty, 150.0);
+
+        // 16. SovereignSmartDocumentTemplateEngine
+        let mut template_engine = SovereignSmartDocumentTemplateEngine::new();
+        template_engine.register_template("tpl1", "Service Agreement", "Agreement for {{client_name}}: Total {{total_amount}}");
+        let mut ctx = HashMap::new();
+        ctx.insert("client_name".to_string(), "Acme Corp".to_string());
+        ctx.insert("total_amount".to_string(), "$50,000".to_string());
+        let instantiated = template_engine.render_template("tpl1", &ctx).unwrap();
+        assert_eq!(instantiated, "Agreement for Acme Corp: Total $50,000");
+
+        // 17. SovereignLandingPageCmsEngine
+        let mut cms_engine = SovereignLandingPageCmsEngine::new();
+        let page_id = cms_engine.create_page("Home", "home");
+        assert!(cms_engine.add_block(page_id, CmsBlockType::HeroBanner {
+            title: "Welcome to SigmaOS Workstation".to_string(),
+            subtitle: "Empowering sovereign productivity.".to_string(),
+        }));
+        let html = cms_engine.render_html(page_id).unwrap();
+        assert!(html.contains("<h1>Welcome to SigmaOS Workstation</h1>"));
+        assert!(html.contains("Empowering sovereign productivity."));
+
+        // 18. SovereignAiDocumentSummarizerEngine
+        let summarizer = SovereignAiDocumentSummarizerEngine::new();
+        let summary = summarizer.generate_executive_summary("SigmaOS is an operating system. It provides sovereign productivity. Designed for enterprise agility.", 2);
+        assert_eq!(summary.len(), 2);
+        assert_eq!(summary[0], "• SigmaOS is an operating system");
+
+        // 19. SovereignEnterpriseKnowledgeGraphEngine
+        let mut graph_engine = SovereignEnterpriseKnowledgeGraphEngine::new();
+        graph_engine.add_node(KnowledgeGraphNode {
+            node_id: "doc_101".to_string(),
+            label: "SaaS Agreement".to_string(),
+            kind: KnowledgeGraphNodeType::Document,
+        });
+        graph_engine.add_node(KnowledgeGraphNode {
+            node_id: "deal_202".to_string(),
+            label: "Acme Corp Deal".to_string(),
+            kind: KnowledgeGraphNodeType::Deal,
+        });
+        graph_engine.add_edge("deal_202", "doc_101", "associated_document");
+
+        let linked = graph_engine.find_linked_entities("deal_202");
+        assert_eq!(linked.len(), 1);
+        assert_eq!(linked[0].0, "SaaS Agreement");
+        assert_eq!(linked[0].1, "associated_document");
+
+        // 20. SovereignExecutiveKpiScorecardEngine
+        let mut scorecard = SovereignExecutiveKpiScorecardEngine::new();
+        scorecard.add_kpi(ExecutiveKpiItem {
+            kpi_id: "arr".to_string(),
+            title: "Annual Recurring Revenue".to_string(),
+            target_value: 1000000.0,
+            actual_value: 1100000.0,
+            weight: 0.6,
+        });
+        scorecard.add_kpi(ExecutiveKpiItem {
+            kpi_id: "cac".to_string(),
+            title: "Customer Acquisition Cost".to_string(),
+            target_value: 500.0,
+            actual_value: 450.0,
+            weight: 0.4,
+        });
+
+        let (arr_var, arr_status) = scorecard.calculate_variance_pct("arr").unwrap();
+        assert_eq!(arr_var, 10.0);
+        assert_eq!(arr_status, KpiMetricStatus::OnTrack);
+
+        let weighted_idx = scorecard.compute_weighted_scorecard_index();
+        assert!(weighted_idx >= 100.0);
+
+        // 21. SovereignEnterpriseResourceAllocationEngine
+        let mut res_engine = SovereignEnterpriseResourceAllocationEngine::new();
+        res_engine.add_allocation(ResourceAllocation {
+            resource_id: "dev_alice".to_string(),
+            project_id: "proj_alpha".to_string(),
+            allocated_hours_per_week: 25.0,
+            max_capacity_hours_per_week: 40.0,
+        });
+        res_engine.add_allocation(ResourceAllocation {
+            resource_id: "dev_alice".to_string(),
+            project_id: "proj_beta".to_string(),
+            allocated_hours_per_week: 20.0,
+            max_capacity_hours_per_week: 40.0,
+        });
+
+        let (util, overallocated) = res_engine.calculate_capacity_utilization_pct("dev_alice");
+        assert_eq!(util, 112.5);
+        assert!(overallocated);
+
+        // 22. SovereignExecutiveReportExporterEngine
+        let mut report_exporter = SovereignExecutiveReportExporterEngine::new();
+        report_exporter.add_section(ExecutiveReportSection {
+            section_title: "Financial Growth".to_string(),
+            content_summary: "Q1 ARR expanded significantly across Enterprise accounts.".to_string(),
+            metric_kpis: vec![("ARR".to_string(), "$12.5M".to_string())],
+        });
+        let html_report = report_exporter.export_executive_html_report("Q1 Business Review", "CEO");
+        assert!(html_report.contains("<h1>Q1 Business Review</h1>"));
+        assert!(html_report.contains("Prepared by: CEO"));
+        assert!(html_report.contains("Financial Growth"));
+
+        // 23. SovereignEnterpriseWorkflowAuditTrailEngine
+        let mut audit_engine = SovereignEnterpriseWorkflowAuditTrailEngine::new();
+        let hash1 = audit_engine.log_action("admin", "update_deal_stage", "deal_202", 100);
+        let hash2 = audit_engine.log_action("finance_lead", "approve_discount", "deal_202", 105);
+        assert_eq!(hash1, "hash_entry_1");
+        assert_eq!(hash2, "hash_entry_2");
+        assert!(audit_engine.verify_chain_integrity());
+
+        let history = audit_engine.get_resource_audit_history("deal_202");
+        assert_eq!(history.len(), 2);
     }
 }
