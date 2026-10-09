@@ -148,12 +148,21 @@ fn test_network_ring_buffer_and_fingerprinting_inspection() {
 #[test]
 fn test_kernel_hardening_kaslr_smep_and_syscalls_inspection() {
     // 1. KASLR Virtual Address Slide Inspection
-    let mut kaslr = SovereignKaslrEngine::new(0xFFFF_8000_0000_0000, 0xFFFF_C000_0000_0000, 0x1234_5678_9ABC_DEF0);
-    assert_eq!(kaslr.active_kernel_base, 0xFFFF_8000_0000_0000 + kaslr.current_slide);
+    let mut kaslr = SovereignKaslrEngine::new(
+        0xFFFF_8000_0000_0000,
+        0xFFFF_C000_0000_0000,
+        0x1234_5678_9ABC_DEF0,
+    );
+    assert_eq!(
+        kaslr.active_kernel_base,
+        0xFFFF_8000_0000_0000 + kaslr.current_slide
+    );
 
     // 2. SMEP / SMAP Execution Control Inspection
     let smep_smap = SmepSmapEnforcer::new(0x0000_0000_0000_1000, 0x0000_7FFF_FFFF_FFFF);
-    assert!(smep_smap.validate_kernel_execution(0x0000_7FFF_0000_1000).is_err());
+    assert!(smep_smap
+        .validate_kernel_execution(0x0000_7FFF_0000_1000)
+        .is_err());
 
     // 3. Hardened Syscall Dispatcher Filtering
     let mut dispatcher = HardenedSyscallDispatcher::new(1000, smep_smap);

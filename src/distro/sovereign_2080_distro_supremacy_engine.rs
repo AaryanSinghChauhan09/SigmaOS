@@ -30,7 +30,9 @@ impl Systemd700AutonomousMeshEngine {
     pub fn new() -> Self {
         Self {
             active_services_count: 5000,
-            pqc_signature_algorithm: String::from("Dilithium-5 / Falcon-1024 / Kyber-1024 Quantum Mesh"),
+            pqc_signature_algorithm: String::from(
+                "Dilithium-5 / Falcon-1024 / Kyber-1024 Quantum Mesh",
+            ),
             sub_yoctosecond_hot_swap_latency_ys: 1,
             self_healing_active: true,
         }
@@ -128,7 +130,9 @@ impl FreeBsd400QuantumVnetXdpMeshEngine {
         Self {
             active_vnet_micro_jails: 2500,
             ebpf_xdp_sub_picosecond_offload: true,
-            pqc_mesh_tunneling_protocol: String::from("Kyber-1024 / Dilithium-5 WireGuard-Mesh 2080"),
+            pqc_mesh_tunneling_protocol: String::from(
+                "Kyber-1024 / Dilithium-5 WireGuard-Mesh 2080",
+            ),
             capsicum_fd_rights_enforced: true,
         }
     }
@@ -237,12 +241,14 @@ impl Plan9SyntheticNamespaceEngine2080 {
             mounted_namespaces: BTreeMap::new(),
             rfork_flags_mask: 0x0001 | 0x0002 | 0x0004 | 0x0008, // RFNAMEG | RFENVG | RFFDG | RFNOTEG
         };
-        engine
-            .mounted_namespaces
-            .insert(String::from("/net"), String::from("9p://network_service_2080"));
-        engine
-            .mounted_namespaces
-            .insert(String::from("/dev"), String::from("9p://device_service_2080"));
+        engine.mounted_namespaces.insert(
+            String::from("/net"),
+            String::from("9p://network_service_2080"),
+        );
+        engine.mounted_namespaces.insert(
+            String::from("/dev"),
+            String::from("9p://device_service_2080"),
+        );
         engine
     }
 

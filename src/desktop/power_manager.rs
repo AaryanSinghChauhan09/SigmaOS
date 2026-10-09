@@ -70,11 +70,11 @@ impl BatteryStatus {
 pub struct BatteryDevice {
     pub id: String,
     pub name: String,
-    pub capacity: u32,      // 0-100 percentage
+    pub capacity: u32, // 0-100 percentage
     pub status: BatteryStatus,
-    pub health: u32,        // 0-100 percentage
-    pub voltage: f32,       // Volts
-    pub current: f32,       // Amperes
+    pub health: u32,                 // 0-100 percentage
+    pub voltage: f32,                // Volts
+    pub current: f32,                // Amperes
     pub time_remaining: Option<u32>, // minutes
 }
 
@@ -137,10 +137,7 @@ impl DesktopPowerManager {
     }
 
     fn add_default_battery(&mut self) {
-        let battery = BatteryDevice::new(
-            "battery_0".to_string(),
-            "Battery 0".to_string(),
-        );
+        let battery = BatteryDevice::new("battery_0".to_string(), "Battery 0".to_string());
 
         self.batteries.insert(battery.id.clone(), battery);
     }
@@ -321,10 +318,7 @@ mod tests {
         let mut manager = DesktopPowerManager::new();
         let initial_count = manager.get_batteries().len();
 
-        let battery = BatteryDevice::new(
-            "custom".to_string(),
-            "Custom Battery".to_string(),
-        );
+        let battery = BatteryDevice::new("custom".to_string(), "Custom Battery".to_string());
 
         let id = manager.add_battery(battery);
         assert!(manager.get_battery(&id).is_some());
@@ -335,10 +329,7 @@ mod tests {
     fn test_remove_battery() {
         let mut manager = DesktopPowerManager::new();
 
-        let battery = BatteryDevice::new(
-            "custom".to_string(),
-            "Custom Battery".to_string(),
-        );
+        let battery = BatteryDevice::new("custom".to_string(), "Custom Battery".to_string());
 
         let id = manager.add_battery(battery);
         assert!(manager.remove_battery(&id));
@@ -446,10 +437,7 @@ mod tests {
 
         manager.update_battery_capacity("battery_0", 80);
 
-        let battery2 = BatteryDevice::new(
-            "custom".to_string(),
-            "Battery 2".to_string(),
-        );
+        let battery2 = BatteryDevice::new("custom".to_string(), "Battery 2".to_string());
         let id2 = manager.add_battery(battery2);
         manager.update_battery_capacity(&id2, 60);
 

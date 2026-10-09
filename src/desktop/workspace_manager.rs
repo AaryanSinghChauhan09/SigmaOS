@@ -110,7 +110,8 @@ impl DesktopWorkspaceManager {
             if workspace.is_active {
                 return false; // Cannot remove active workspace
             }
-            if workspace.workspace_type == DesktopWorkspaceType::Normal && self.num_workspaces <= 1 {
+            if workspace.workspace_type == DesktopWorkspaceType::Normal && self.num_workspaces <= 1
+            {
                 return false; // Must have at least one normal workspace
             }
         }
@@ -133,13 +134,13 @@ impl DesktopWorkspaceManager {
     }
 
     pub fn get_visible_workspaces(&self) -> Vec<&DesktopWorkspace> {
-        self.workspaces
-            .values()
-            .filter(|w| w.is_visible)
-            .collect()
+        self.workspaces.values().filter(|w| w.is_visible).collect()
     }
 
-    pub fn get_workspaces_by_type(&self, workspace_type: DesktopWorkspaceType) -> Vec<&DesktopWorkspace> {
+    pub fn get_workspaces_by_type(
+        &self,
+        workspace_type: DesktopWorkspaceType,
+    ) -> Vec<&DesktopWorkspace> {
         self.workspaces
             .values()
             .filter(|w| w.workspace_type == workspace_type)
@@ -248,7 +249,9 @@ impl DesktopWorkspaceManager {
             return false;
         }
 
-        let current_normal = self.get_workspaces_by_type(DesktopWorkspaceType::Normal).len() as u32;
+        let current_normal = self
+            .get_workspaces_by_type(DesktopWorkspaceType::Normal)
+            .len() as u32;
 
         if num > current_normal {
             // Add workspaces
@@ -266,7 +269,8 @@ impl DesktopWorkspaceManager {
             // Remove workspaces (but not active)
             let mut to_remove: Vec<String> = Vec::new();
             for workspace in self.workspaces.values() {
-                if workspace.workspace_type == DesktopWorkspaceType::Normal && !workspace.is_active {
+                if workspace.workspace_type == DesktopWorkspaceType::Normal && !workspace.is_active
+                {
                     to_remove.push(workspace.id.clone());
                 }
             }
@@ -286,7 +290,9 @@ impl DesktopWorkspaceManager {
         DesktopWorkspaceStatistics {
             total_workspaces: self.workspaces.len(),
             active_workspace: self.active_workspace.clone(),
-            normal_workspaces: self.get_workspaces_by_type(DesktopWorkspaceType::Normal).len(),
+            normal_workspaces: self
+                .get_workspaces_by_type(DesktopWorkspaceType::Normal)
+                .len(),
             visible_workspaces: self.get_visible_workspaces().len(),
         }
     }

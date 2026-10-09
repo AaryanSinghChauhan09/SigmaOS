@@ -127,7 +127,8 @@ impl BLEDevice {
     }
 
     pub fn is_connected(&self) -> bool {
-        self.status == BluetoothDeviceStatus::Connected || self.status == BluetoothDeviceStatus::Paired
+        self.status == BluetoothDeviceStatus::Connected
+            || self.status == BluetoothDeviceStatus::Paired
     }
 }
 
@@ -221,16 +222,15 @@ impl BluetoothDeviceManager {
 
     /// List devices by type
     pub fn list_by_type(&self, device_type: BluetoothDeviceType) -> Vec<&BLEDevice> {
-        self.devices.values()
+        self.devices
+            .values()
             .filter(|d| d.device_type == device_type)
             .collect()
     }
 
     /// List connected devices
     pub fn list_connected(&self) -> Vec<&BLEDevice> {
-        self.devices.values()
-            .filter(|d| d.is_connected())
-            .collect()
+        self.devices.values().filter(|d| d.is_connected()).collect()
     }
 
     /// Scan for devices (simulated)
@@ -239,18 +239,26 @@ impl BluetoothDeviceManager {
 
         // Simulate device discovery
         let discovered_devices = vec![
-            ("00:1A:2B:3C:4D:5E", "Headset Pro", BluetoothDeviceType::Headset),
-            ("00:1A:2B:3C:4D:5F", "Wireless Mouse", BluetoothDeviceType::Mouse),
-            ("00:1A:2B:3C:4D:60", "Bluetooth Keyboard", BluetoothDeviceType::Keyboard),
+            (
+                "00:1A:2B:3C:4D:5E",
+                "Headset Pro",
+                BluetoothDeviceType::Headset,
+            ),
+            (
+                "00:1A:2B:3C:4D:5F",
+                "Wireless Mouse",
+                BluetoothDeviceType::Mouse,
+            ),
+            (
+                "00:1A:2B:3C:4D:60",
+                "Bluetooth Keyboard",
+                BluetoothDeviceType::Keyboard,
+            ),
             ("00:1A:2B:3C:4D:61", "Phone", BluetoothDeviceType::Phone),
         ];
 
         for (address, name, device_type) in discovered_devices {
-            let mut device = BLEDevice::new(
-                address.to_string(),
-                name.to_string(),
-                device_type,
-            );
+            let mut device = BLEDevice::new(address.to_string(), name.to_string(), device_type);
             device.set_rssi(-60);
             self.devices.insert(address.to_string(), device);
         }
@@ -260,7 +268,8 @@ impl BluetoothDeviceManager {
 
     /// Connect to a device
     pub fn connect(&mut self, address: &str) -> Result<(), String> {
-        let device = self.get_device_mut(address)
+        let device = self
+            .get_device_mut(address)
             .ok_or_else(|| format!("Device {} not found", address))?;
 
         if device.is_blocked {
@@ -278,7 +287,8 @@ impl BluetoothDeviceManager {
 
     /// Disconnect from a device
     pub fn disconnect(&mut self, address: &str) -> Result<(), String> {
-        let device = self.get_device_mut(address)
+        let device = self
+            .get_device_mut(address)
             .ok_or_else(|| format!("Device {} not found", address))?;
 
         device.set_status(BluetoothDeviceStatus::Disconnected);
@@ -287,7 +297,8 @@ impl BluetoothDeviceManager {
 
     /// Pair a device
     pub fn pair(&mut self, address: &str) -> Result<(), String> {
-        let device = self.get_device_mut(address)
+        let device = self
+            .get_device_mut(address)
             .ok_or_else(|| format!("Device {} not found", address))?;
 
         device.set_status(BluetoothDeviceStatus::Paired);
@@ -298,7 +309,8 @@ impl BluetoothDeviceManager {
 
     /// Unpair a device
     pub fn unpair(&mut self, address: &str) -> Result<(), String> {
-        let device = self.get_device_mut(address)
+        let device = self
+            .get_device_mut(address)
             .ok_or_else(|| format!("Device {} not found", address))?;
 
         device.set_status(BluetoothDeviceStatus::Disconnected);
@@ -309,7 +321,8 @@ impl BluetoothDeviceManager {
 
     /// Trust a device
     pub fn trust(&mut self, address: &str) -> Result<(), String> {
-        let device = self.get_device_mut(address)
+        let device = self
+            .get_device_mut(address)
             .ok_or_else(|| format!("Device {} not found", address))?;
 
         device.set_trusted(true);
@@ -318,7 +331,8 @@ impl BluetoothDeviceManager {
 
     /// Block a device
     pub fn block(&mut self, address: &str) -> Result<(), String> {
-        let device = self.get_device_mut(address)
+        let device = self
+            .get_device_mut(address)
             .ok_or_else(|| format!("Device {} not found", address))?;
 
         device.set_blocked(true);
@@ -331,7 +345,8 @@ impl BluetoothDeviceManager {
 
     /// Remove a device
     pub fn remove(&mut self, address: &str) -> Result<(), String> {
-        self.devices.remove(address)
+        self.devices
+            .remove(address)
             .ok_or_else(|| format!("Device {} not found", address))?;
         Ok(())
     }
@@ -339,18 +354,14 @@ impl BluetoothDeviceManager {
     /// Get statistics
     pub fn get_statistics(&self) -> BluetoothStatistics {
         let total_devices = self.devices.len();
-        let connected_count = self.devices.values()
-            .filter(|d| d.is_connected())
-            .count();
-        let paired_count = self.devices.values()
+        let connected_count = self.devices.values().filter(|d| d.is_connected()).count();
+        let paired_count = self
+            .devices
+            .values()
             .filter(|d| d.status == BluetoothDeviceStatus::Paired)
             .count();
-        let trusted_count = self.devices.values()
-            .filter(|d| d.is_trusted)
-            .count();
-        let blocked_count = self.devices.values()
-            .filter(|d| d.is_blocked)
-            .count();
+        let trusted_count = self.devices.values().filter(|d| d.is_trusted).count();
+        let blocked_count = self.devices.values().filter(|d| d.is_blocked).count();
 
         BluetoothStatistics {
             total_devices,
@@ -386,14 +397,26 @@ mod tests {
 
     #[test]
     fn test_device_type_from_str() {
-        assert_eq!(BluetoothDeviceType::from_str("headset"), Some(BluetoothDeviceType::Headset));
-        assert_eq!(BluetoothDeviceType::from_str("mouse"), Some(BluetoothDeviceType::Mouse));
+        assert_eq!(
+            BluetoothDeviceType::from_str("headset"),
+            Some(BluetoothDeviceType::Headset)
+        );
+        assert_eq!(
+            BluetoothDeviceType::from_str("mouse"),
+            Some(BluetoothDeviceType::Mouse)
+        );
     }
 
     #[test]
     fn test_device_status_from_str() {
-        assert_eq!(BluetoothDeviceStatus::from_str("connected"), Some(BluetoothDeviceStatus::Connected));
-        assert_eq!(BluetoothDeviceStatus::from_str("paired"), Some(BluetoothDeviceStatus::Paired));
+        assert_eq!(
+            BluetoothDeviceStatus::from_str("connected"),
+            Some(BluetoothDeviceStatus::Connected)
+        );
+        assert_eq!(
+            BluetoothDeviceStatus::from_str("paired"),
+            Some(BluetoothDeviceStatus::Paired)
+        );
     }
 
     #[test]

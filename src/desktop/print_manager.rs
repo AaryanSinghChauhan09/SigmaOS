@@ -316,12 +316,32 @@ impl DesktopPrintManager {
     pub fn get_statistics(&self) -> PrintManagerStatistics {
         PrintManagerStatistics {
             total_printers: self.printers.len(),
-            idle_printers: self.printers.values().filter(|p| p.status == PrinterStatus::Idle).count(),
-            printing_printers: self.printers.values().filter(|p| p.status == PrinterStatus::Printing).count(),
-            error_printers: self.printers.values().filter(|p| p.status == PrinterStatus::Error).count(),
+            idle_printers: self
+                .printers
+                .values()
+                .filter(|p| p.status == PrinterStatus::Idle)
+                .count(),
+            printing_printers: self
+                .printers
+                .values()
+                .filter(|p| p.status == PrinterStatus::Printing)
+                .count(),
+            error_printers: self
+                .printers
+                .values()
+                .filter(|p| p.status == PrinterStatus::Error)
+                .count(),
             total_jobs: self.print_jobs.len(),
-            pending_jobs: self.print_jobs.values().filter(|j| j.status == PrintJobStatus::Pending).count(),
-            processing_jobs: self.print_jobs.values().filter(|j| j.status == PrintJobStatus::Processing).count(),
+            pending_jobs: self
+                .print_jobs
+                .values()
+                .filter(|j| j.status == PrintJobStatus::Pending)
+                .count(),
+            processing_jobs: self
+                .print_jobs
+                .values()
+                .filter(|j| j.status == PrintJobStatus::Processing)
+                .count(),
             default_printer_set: self.default_printer.is_some(),
         }
     }

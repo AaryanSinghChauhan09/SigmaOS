@@ -346,7 +346,10 @@ impl SystemManager {
         // CPU and memory report percentages, not the load averages accepted by
         // SystemHealth::from_load. A single saturated resource is enough to
         // degrade the system, even when the other resource is idle.
-        let usage = self.cpu_info.usage_percent.max(self.memory_info.usage_percent());
+        let usage = self
+            .cpu_info
+            .usage_percent
+            .max(self.memory_info.usage_percent());
         self.health = if usage >= 90.0 {
             SystemHealth::Critical
         } else if usage >= 70.0 {
@@ -363,9 +366,8 @@ impl SystemManager {
             uptime: self.system_info.uptime_human(),
             cpu_usage: self.cpu_info.usage_percent,
             memory_usage: self.memory_info.usage_percent(),
-            disk_usage: self.disks.values()
-                .map(|d| d.usage_percent())
-                .sum::<f64>() / self.disks.len() as f64,
+            disk_usage: self.disks.values().map(|d| d.usage_percent()).sum::<f64>()
+                / self.disks.len() as f64,
             health: self.health,
         }
     }

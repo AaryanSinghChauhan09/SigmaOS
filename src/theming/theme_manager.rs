@@ -259,7 +259,8 @@ impl ThemeManager {
 
     /// Get current theme
     pub fn get_current_theme(&self) -> &ThemeConfig {
-        self.themes.get(&self.current_theme)
+        self.themes
+            .get(&self.current_theme)
             .unwrap_or_else(|| self.themes.get(&self.default_theme).unwrap())
     }
 
@@ -279,14 +280,14 @@ impl ThemeManager {
 
     /// List custom themes
     pub fn list_custom_themes(&self) -> Vec<&ThemeConfig> {
-        self.themes.values()
-            .filter(|t| t.is_custom)
-            .collect()
+        self.themes.values().filter(|t| t.is_custom).collect()
     }
 
     /// Remove a custom theme
     pub fn remove_theme(&mut self, name: &str) -> Result<(), String> {
-        let theme = self.themes.get(name)
+        let theme = self
+            .themes
+            .get(name)
             .ok_or_else(|| format!("Theme {} not found", name))?;
 
         if !theme.is_custom {
@@ -302,8 +303,15 @@ impl ThemeManager {
     }
 
     /// Create a variant of an existing theme
-    pub fn create_variant(&mut self, base_name: &str, variant_name: String, accent: AccentColor) -> Result<(), String> {
-        let base = self.themes.get(base_name)
+    pub fn create_variant(
+        &mut self,
+        base_name: &str,
+        variant_name: String,
+        accent: AccentColor,
+    ) -> Result<(), String> {
+        let base = self
+            .themes
+            .get(base_name)
             .ok_or_else(|| format!("Base theme {} not found", base_name))?;
 
         let mut variant = base.clone();
@@ -319,9 +327,7 @@ impl ThemeManager {
     /// Get statistics
     pub fn get_statistics(&self) -> ThemeStatistics {
         let total_themes = self.themes.len();
-        let custom_themes = self.themes.values()
-            .filter(|t| t.is_custom)
-            .count();
+        let custom_themes = self.themes.values().filter(|t| t.is_custom).count();
         let default_themes = total_themes - custom_themes;
 
         ThemeStatistics {
@@ -406,7 +412,13 @@ mod tests {
     #[test]
     fn test_create_variant() {
         let mut manager = ThemeManager::new();
-        assert!(manager.create_variant("Sigma Dark", "Sigma Dark Green".to_string(), AccentColor::Green).is_ok());
+        assert!(manager
+            .create_variant(
+                "Sigma Dark",
+                "Sigma Dark Green".to_string(),
+                AccentColor::Green
+            )
+            .is_ok());
         assert!(manager.get_theme("Sigma Dark Green").is_some());
     }
 

@@ -6,11 +6,11 @@
 #![cfg_attr(not(any(feature = "standalone_test", test)), no_std)]
 
 #[cfg(any(feature = "standalone_test", test))]
-use std::{string::String, format, vec::Vec};
+use std::{format, string::String, vec::Vec};
 #[cfg(not(any(feature = "standalone_test", test)))]
 extern crate alloc;
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::{string::String, format, vec::Vec};
+use alloc::{format, string::String, vec::Vec};
 
 /// Docker runtime mode
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -41,7 +41,7 @@ pub struct RootlessContainerConfig {
     pub image: String,
     pub mode: DockerMode,
     pub ns_level: NamespaceLevel,
-    pub uid_map: String,  // "0 100000 65536"
+    pub uid_map: String, // "0 100000 65536"
     pub gid_map: String,
     pub network_mode: String,
 }
@@ -86,14 +86,12 @@ impl OmarchyDockerRootlessEngine {
     pub fn generate_daemon_json(&self) -> String {
         match self.mode {
             DockerMode::Rootless => String::from(
-                r#"{"userns-remap":"default","no-new-privileges":true,"log-driver":"json-file","log-opts":{"max-size":"10m","max-file":"3"}}"#
+                r#"{"userns-remap":"default","no-new-privileges":true,"log-driver":"json-file","log-opts":{"max-size":"10m","max-file":"3"}}"#,
             ),
             DockerMode::PodmanRootless => String::from(
-                r#"{"runtime":"crun","network_backend":"netavark","userns":"keep-id"}"#
+                r#"{"runtime":"crun","network_backend":"netavark","userns":"keep-id"}"#,
             ),
-            DockerMode::Privileged => String::from(
-                r#"{"log-driver":"json-file"}"#
-            ),
+            DockerMode::Privileged => String::from(r#"{"log-driver":"json-file"}"#),
         }
     }
 
@@ -107,7 +105,7 @@ impl OmarchyDockerRootlessEngine {
         String::from(
             "[Unit]\nDescription=Docker Application Container Engine (Rootless)\n\
             [Service]\nType=simple\nExecStart=/usr/bin/dockerd-rootless.sh\nRestart=on-failure\n\
-            [Install]\nWantedBy=default.target\n"
+            [Install]\nWantedBy=default.target\n",
         )
     }
 

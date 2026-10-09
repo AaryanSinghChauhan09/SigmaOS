@@ -32,9 +32,9 @@ use alloc::format;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec::Vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::BTreeMap;
@@ -43,9 +43,9 @@ use std::format;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
-#[cfg(any(feature = "standalone_test", test))]
 use std::vec;
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec::Vec;
 
 // ============================================================================
 // 1. MintUpdate & Snapshot Rollback Engine
@@ -54,9 +54,9 @@ use std::vec;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum KernelTier {
     ZenithProduction, // Linux 6.12+ / SigmaOS Zenith
-    LtsStable,         // Linux 6.6 LTS
-    HardenedSecurity,  // Hardened with strict CFI, Landlock, seccomp
-    SchedExtGaming,    // SchedExt eBPF low-jitter kernel
+    LtsStable,        // Linux 6.6 LTS
+    HardenedSecurity, // Hardened with strict CFI, Landlock, seccomp
+    SchedExtGaming,   // SchedExt eBPF low-jitter kernel
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -106,7 +106,8 @@ impl MintUpdateSnapshotEngine {
             tier: KernelTier::ZenithProduction,
             installed: true,
             active: true,
-            changelog_summary: "High-performance tickless kernel with BORE/EEVDF dynamic balancing".to_string(),
+            changelog_summary: "High-performance tickless kernel with BORE/EEVDF dynamic balancing"
+                .to_string(),
         });
         self.kernel_catalog.push(KernelPackageMeta {
             version: "6.6.78-sigma-lts".to_string(),
@@ -120,11 +121,17 @@ impl MintUpdateSnapshotEngine {
             tier: KernelTier::SchedExtGaming,
             installed: false,
             active: false,
-            changelog_summary: "Ultra low-latency gaming kernel with scx_rustland eBPF dispatcher".to_string(),
+            changelog_summary: "Ultra low-latency gaming kernel with scx_rustland eBPF dispatcher"
+                .to_string(),
         });
     }
 
-    pub fn create_pre_update_snapshot(&mut self, description: &str, fs_type: &str, subvolume: &str) -> u64 {
+    pub fn create_pre_update_snapshot(
+        &mut self,
+        description: &str,
+        fs_type: &str,
+        subvolume: &str,
+    ) -> u64 {
         let id = self.next_snapshot_id;
         self.next_snapshot_id += 1;
         let snap = SnapshotTransaction {
@@ -141,8 +148,10 @@ impl MintUpdateSnapshotEngine {
 
     pub fn rollback_to_snapshot(&mut self, snapshot_id: u64) -> Result<String, String> {
         if let Some(snap) = self.snapshots.get(&snapshot_id) {
-            Ok(format!("Successfully rolled back system state to snapshot #{} ({}) via {}",
-                snap.snapshot_id, snap.description, snap.fs_type))
+            Ok(format!(
+                "Successfully rolled back system state to snapshot #{} ({}) via {}",
+                snap.snapshot_id, snap.description, snap.fs_type
+            ))
         } else {
             Err(format!("Snapshot #{} not found in catalog", snapshot_id))
         }
@@ -190,19 +199,25 @@ impl NemoDirectPreviewEngine {
     }
 
     pub fn inspect_file(&mut self, path: &str, byte_size: u64) -> FilePreviewMetadata {
-        let category = if path.ends_with(".png") || path.ends_with(".jpg") || path.ends_with(".webp") {
-            MimeCategory::Image
-        } else if path.ends_with(".mp4") || path.ends_with(".mkv") {
-            MimeCategory::Video
-        } else if path.ends_with(".pdf") {
-            MimeCategory::DocumentPdf
-        } else if path.ends_with(".rs") || path.ends_with(".zig") || path.ends_with(".nim") || path.ends_with(".sh") {
-            MimeCategory::SourceCode
-        } else if path.ends_with(".tar.gz") || path.ends_with(".zip") || path.ends_with(".zst") {
-            MimeCategory::Archive
-        } else {
-            MimeCategory::Unknown
-        };
+        let category =
+            if path.ends_with(".png") || path.ends_with(".jpg") || path.ends_with(".webp") {
+                MimeCategory::Image
+            } else if path.ends_with(".mp4") || path.ends_with(".mkv") {
+                MimeCategory::Video
+            } else if path.ends_with(".pdf") {
+                MimeCategory::DocumentPdf
+            } else if path.ends_with(".rs")
+                || path.ends_with(".zig")
+                || path.ends_with(".nim")
+                || path.ends_with(".sh")
+            {
+                MimeCategory::SourceCode
+            } else if path.ends_with(".tar.gz") || path.ends_with(".zip") || path.ends_with(".zst")
+            {
+                MimeCategory::Archive
+            } else {
+                MimeCategory::Unknown
+            };
 
         let mime = match category {
             MimeCategory::Image => "image/png",
@@ -211,7 +226,8 @@ impl NemoDirectPreviewEngine {
             MimeCategory::SourceCode => "text/x-src",
             MimeCategory::Archive => "application/x-archive",
             _ => "application/octet-stream",
-        }.to_string();
+        }
+        .to_string();
 
         let meta = FilePreviewMetadata {
             file_path: path.to_string(),
@@ -290,8 +306,14 @@ impl XAppGpuHybridOffloadEngine {
         // Prepare prime offload environment variables
         let env_vars = vec![
             ("__NV_PRIME_RENDER_OFFLOAD".to_string(), "1".to_string()),
-            ("__GLX_VENDOR_LIBRARY_NAME".to_string(), "nvidia".to_string()),
-            ("__VK_LAYER_NV_optimus".to_string(), "NVIDIA_only".to_string()),
+            (
+                "__GLX_VENDOR_LIBRARY_NAME".to_string(),
+                "nvidia".to_string(),
+            ),
+            (
+                "__VK_LAYER_NV_optimus".to_string(),
+                "NVIDIA_only".to_string(),
+            ),
         ];
         // Wake up discrete GPU
         for dev in &mut self.devices {
@@ -299,7 +321,10 @@ impl XAppGpuHybridOffloadEngine {
                 dev.power_state = "D0-Active".to_string();
             }
         }
-        (format!("Offloading {} to discrete GPU", app_binary), env_vars)
+        (
+            format!("Offloading {} to discrete GPU", app_binary),
+            env_vars,
+        )
     }
 }
 
@@ -347,10 +372,17 @@ impl MintInstallSandboxedPortalEngine {
     pub fn spawn_sandboxed(&mut self, app_id: &str) -> Result<String, String> {
         if let Some(inst) = self.instances.get_mut(app_id) {
             inst.running = true;
-            Ok(format!("Spawned sandboxed application '{}' with {:?} and {} portals",
-                inst.app_id, inst.isolation_level, inst.allowed_portals.len()))
+            Ok(format!(
+                "Spawned sandboxed application '{}' with {:?} and {} portals",
+                inst.app_id,
+                inst.isolation_level,
+                inst.allowed_portals.len()
+            ))
         } else {
-            Err(format!("Application '{}' not registered in portal governor", app_id))
+            Err(format!(
+                "Application '{}' not registered in portal governor",
+                app_id
+            ))
         }
     }
 }
@@ -383,7 +415,13 @@ impl ThingyContentAddressedIndex {
         }
     }
 
-    pub fn index_document(&mut self, path: &str, title: &str, tags: &[&str], words: &[&str]) -> u64 {
+    pub fn index_document(
+        &mut self,
+        path: &str,
+        title: &str,
+        tags: &[&str],
+        words: &[&str],
+    ) -> u64 {
         let id = self.next_doc_id;
         self.next_doc_id += 1;
 
@@ -408,10 +446,12 @@ impl ThingyContentAddressedIndex {
 
     pub fn search(&self, keyword: &str) -> Vec<&DocumentRecord> {
         let target_bit = 1u64 << (Self::simple_hash(keyword) % 64);
-        self.documents.values().filter(|doc| {
-            (doc.bloom_filter_bits & target_bit) == target_bit ||
-            doc.title.contains(keyword)
-        }).collect()
+        self.documents
+            .values()
+            .filter(|doc| {
+                (doc.bloom_filter_bits & target_bit) == target_bit || doc.title.contains(keyword)
+            })
+            .collect()
     }
 
     fn simple_hash(s: &str) -> u64 {
@@ -459,7 +499,11 @@ impl OmarchyWalkerFuzzyLauncher {
         self.entries.push(WalkerAppEntry {
             name: "Alacritty Terminal".to_string(),
             exec_cmd: "alacritty".to_string(),
-            keywords: vec!["terminal".to_string(), "shell".to_string(), "cli".to_string()],
+            keywords: vec![
+                "terminal".to_string(),
+                "shell".to_string(),
+                "cli".to_string(),
+            ],
             acronym: "at".to_string(),
             launch_count: 42,
         });
@@ -473,7 +517,11 @@ impl OmarchyWalkerFuzzyLauncher {
         self.entries.push(WalkerAppEntry {
             name: "Firefox Sovereign Web Browser".to_string(),
             exec_cmd: "firefox".to_string(),
-            keywords: vec!["web".to_string(), "internet".to_string(), "browser".to_string()],
+            keywords: vec![
+                "web".to_string(),
+                "internet".to_string(),
+                "browser".to_string(),
+            ],
             acronym: "fswb".to_string(),
             launch_count: 64,
         });
@@ -571,7 +619,8 @@ impl OmarchySchedExtGamingGovernor {
     pub fn disengage_gamemode(&mut self) -> String {
         self.gamemode_engaged = false;
         self.pinned_pids.clear();
-        "Disengaged GameMode: Restored standard EEVDF scheduling and default PipeWire buffers".to_string()
+        "Disengaged GameMode: Restored standard EEVDF scheduling and default PipeWire buffers"
+            .to_string()
     }
 }
 
@@ -623,39 +672,123 @@ impl OmarchyThemeSyncHotReload {
     fn register_themes(&mut self) {
         // Omarchy 22 Themes + SigmaOS 8 Exclusive Themes
         let default_themes = [
-            ("tokyo-night", "#1a1b26", "#c0caf5", "#7aa2f7", "#bb9af7", "#7aa2f7", "#414868", false),
-            ("catppuccin-mocha", "#1e1e2e", "#cdd6f4", "#89b4fa", "#f5c2e7", "#89b4fa", "#45475a", false),
-            ("rose-pine", "#191724", "#e0def4", "#eb6f92", "#9ccfd8", "#eb6f92", "#26233a", false),
-            ("nord", "#2e3440", "#d8dee9", "#88c0d0", "#81a1c1", "#88c0d0", "#4c566a", false),
-            ("gruvbox-dark", "#282828", "#ebdbb2", "#fe8019", "#fabd2f", "#fe8019", "#504945", false),
-            ("everforest", "#2d353b", "#d3c6aa", "#a7c080", "#dbbc7f", "#a7c080", "#475258", false),
-            ("kanagawa", "#1f1f28", "#dcd7ba", "#7e9cd8", "#957fb8", "#7e9cd8", "#363646", false),
-            ("dracula", "#282a36", "#f8f8f2", "#bd93f9", "#ff79c6", "#bd93f9", "#6272a4", false),
+            (
+                "tokyo-night",
+                "#1a1b26",
+                "#c0caf5",
+                "#7aa2f7",
+                "#bb9af7",
+                "#7aa2f7",
+                "#414868",
+                false,
+            ),
+            (
+                "catppuccin-mocha",
+                "#1e1e2e",
+                "#cdd6f4",
+                "#89b4fa",
+                "#f5c2e7",
+                "#89b4fa",
+                "#45475a",
+                false,
+            ),
+            (
+                "rose-pine",
+                "#191724",
+                "#e0def4",
+                "#eb6f92",
+                "#9ccfd8",
+                "#eb6f92",
+                "#26233a",
+                false,
+            ),
+            (
+                "nord", "#2e3440", "#d8dee9", "#88c0d0", "#81a1c1", "#88c0d0", "#4c566a", false,
+            ),
+            (
+                "gruvbox-dark",
+                "#282828",
+                "#ebdbb2",
+                "#fe8019",
+                "#fabd2f",
+                "#fe8019",
+                "#504945",
+                false,
+            ),
+            (
+                "everforest",
+                "#2d353b",
+                "#d3c6aa",
+                "#a7c080",
+                "#dbbc7f",
+                "#a7c080",
+                "#475258",
+                false,
+            ),
+            (
+                "kanagawa", "#1f1f28", "#dcd7ba", "#7e9cd8", "#957fb8", "#7e9cd8", "#363646", false,
+            ),
+            (
+                "dracula", "#282a36", "#f8f8f2", "#bd93f9", "#ff79c6", "#bd93f9", "#6272a4", false,
+            ),
             // SigmaOS Exclusive Themes
-            ("sigma-zenith-cyber", "#0a0d14", "#d0e0ff", "#00e5ff", "#7c4dff", "#00e5ff", "#1f293d", true),
-            ("sigma-sovereign-emerald", "#0b1612", "#e2f8ec", "#00f076", "#50e3c2", "#00f076", "#1e3a2b", true),
-            ("sigma-solar-flare", "#140c08", "#ffe8d6", "#ff6b35", "#f7c59f", "#ff6b35", "#3a2217", true),
+            (
+                "sigma-zenith-cyber",
+                "#0a0d14",
+                "#d0e0ff",
+                "#00e5ff",
+                "#7c4dff",
+                "#00e5ff",
+                "#1f293d",
+                true,
+            ),
+            (
+                "sigma-sovereign-emerald",
+                "#0b1612",
+                "#e2f8ec",
+                "#00f076",
+                "#50e3c2",
+                "#00f076",
+                "#1e3a2b",
+                true,
+            ),
+            (
+                "sigma-solar-flare",
+                "#140c08",
+                "#ffe8d6",
+                "#ff6b35",
+                "#f7c59f",
+                "#ff6b35",
+                "#3a2217",
+                true,
+            ),
         ];
 
         for (name, bg, fg, p_acc, s_acc, b_act, b_inact, excl) in default_themes {
-            self.installed_themes.insert(name.to_string(), SovereignThemeDefinition {
-                name: name.to_string(),
-                background: bg.to_string(),
-                foreground: fg.to_string(),
-                accent_primary: p_acc.to_string(),
-                accent_secondary: s_acc.to_string(),
-                border_active: b_act.to_string(),
-                border_inactive: b_inact.to_string(),
-                is_sigma_exclusive: excl,
-            });
+            self.installed_themes.insert(
+                name.to_string(),
+                SovereignThemeDefinition {
+                    name: name.to_string(),
+                    background: bg.to_string(),
+                    foreground: fg.to_string(),
+                    accent_primary: p_acc.to_string(),
+                    accent_secondary: s_acc.to_string(),
+                    border_active: b_act.to_string(),
+                    border_inactive: b_inact.to_string(),
+                    is_sigma_exclusive: excl,
+                },
+            );
         }
     }
 
     pub fn apply_theme(&mut self, theme_name: &str) -> Result<String, String> {
         if self.installed_themes.contains_key(theme_name) {
             self.current_theme = theme_name.to_string();
-            Ok(format!("Propagated theme '{}' across {} active clients with 0 latency",
-                theme_name, self.synced_clients.len()))
+            Ok(format!(
+                "Propagated theme '{}' across {} active clients with 0 latency",
+                theme_name,
+                self.synced_clients.len()
+            ))
         } else {
             Err(format!("Theme '{}' not found", theme_name))
         }
@@ -726,13 +859,17 @@ impl SovereignMintOmarchyApexDominanceSuiteV30 {
 
     pub fn run_full_parity_audit(&mut self) -> bool {
         // 1. Validate snapshot engine
-        let snap_id = self.update_engine.create_pre_update_snapshot("Apex V30 Baseline", "btrfs", "@root");
+        let snap_id =
+            self.update_engine
+                .create_pre_update_snapshot("Apex V30 Baseline", "btrfs", "@root");
         if snap_id == 0 {
             return false;
         }
 
         // 2. Validate VFS preview
-        let preview = self.preview_engine.inspect_file("/usr/share/backgrounds/zenith.png", 4194304);
+        let preview = self
+            .preview_engine
+            .inspect_file("/usr/share/backgrounds/zenith.png", 4194304);
         if preview.category != MimeCategory::Image {
             return false;
         }
@@ -798,7 +935,11 @@ mod tests {
     #[test]
     fn test_mint_install_sandboxed_portal_engine() {
         let mut engine = MintInstallSandboxedPortalEngine::new();
-        engine.register_app("org.mozilla.firefox", SandboxIsolationLevel::DesktopAppNetwork, &["FileChooser"]);
+        engine.register_app(
+            "org.mozilla.firefox",
+            SandboxIsolationLevel::DesktopAppNetwork,
+            &["FileChooser"],
+        );
         let res = engine.spawn_sandboxed("org.mozilla.firefox");
         assert!(res.is_ok());
     }
@@ -806,7 +947,12 @@ mod tests {
     #[test]
     fn test_thingy_content_addressed_index() {
         let mut idx = ThingyContentAddressedIndex::new();
-        let doc_id = idx.index_document("/docs/kernel.txt", "Kernel Guide", &["os", "kernel"], &["scheduler", "vfs"]);
+        let doc_id = idx.index_document(
+            "/docs/kernel.txt",
+            "Kernel Guide",
+            &["os", "kernel"],
+            &["scheduler", "vfs"],
+        );
         assert_eq!(doc_id, 1);
         let results = idx.search("scheduler");
         assert_eq!(results.len(), 1);

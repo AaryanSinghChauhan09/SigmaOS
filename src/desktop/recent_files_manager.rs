@@ -36,7 +36,9 @@ impl RecentFileType {
             "mp4" | "avi" | "mkv" | "mov" | "webm" | "flv" => RecentFileType::Video,
             "mp3" | "wav" | "ogg" | "flac" | "aac" | "m4a" => RecentFileType::Audio,
             "zip" | "tar" | "gz" | "rar" | "7z" | "xz" => RecentFileType::Archive,
-            "rs" | "py" | "js" | "ts" | "c" | "cpp" | "h" | "java" | "go" | "sh" => RecentFileType::Code,
+            "rs" | "py" | "js" | "ts" | "c" | "cpp" | "h" | "java" | "go" | "sh" => {
+                RecentFileType::Code
+            }
             _ => RecentFileType::Other,
         }
     }
@@ -54,12 +56,7 @@ pub struct RecentFileEntry {
 }
 
 impl RecentFileEntry {
-    pub fn new(
-        id: String,
-        name: String,
-        path: PathBuf,
-        file_type: RecentFileType,
-    ) -> Self {
+    pub fn new(id: String, name: String, path: PathBuf, file_type: RecentFileType) -> Self {
         let accessed = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap()
@@ -125,11 +122,13 @@ impl RecentFilesManager {
             .map(|(id, _)| id.clone())
     }
 
-    pub fn add_recent_file(&mut self, name: String, path: PathBuf, application: Option<String>) -> String {
-        let extension = path
-            .extension()
-            .and_then(|e| e.to_str())
-            .unwrap_or("");
+    pub fn add_recent_file(
+        &mut self,
+        name: String,
+        path: PathBuf,
+        application: Option<String>,
+    ) -> String {
+        let extension = path.extension().and_then(|e| e.to_str()).unwrap_or("");
 
         let file_type = RecentFileType::from_extension(extension);
 
@@ -194,7 +193,8 @@ impl RecentFilesManager {
     }
 
     pub fn get_recent_files_by_type(&self, file_type: RecentFileType) -> Vec<&RecentFileEntry> {
-        let mut files: Vec<_> = self.recent_files
+        let mut files: Vec<_> = self
+            .recent_files
             .values()
             .filter(|f| f.file_type == file_type)
             .collect();
@@ -203,7 +203,8 @@ impl RecentFilesManager {
     }
 
     pub fn get_recent_files_by_application(&self, application: &str) -> Vec<&RecentFileEntry> {
-        let mut files: Vec<_> = self.recent_files
+        let mut files: Vec<_> = self
+            .recent_files
             .values()
             .filter(|f| f.application.as_ref().map_or(false, |a| a == application))
             .collect();
@@ -219,7 +220,9 @@ impl RecentFilesManager {
         RecentFilesStatistics {
             total_files: self.recent_files.len(),
             max_files: self.max_recent_files,
-            documents: self.get_recent_files_by_type(RecentFileType::Document).len(),
+            documents: self
+                .get_recent_files_by_type(RecentFileType::Document)
+                .len(),
             images: self.get_recent_files_by_type(RecentFileType::Image).len(),
             videos: self.get_recent_files_by_type(RecentFileType::Video).len(),
         }
@@ -267,11 +270,17 @@ mod tests {
 
     #[test]
     fn test_file_type_from_extension() {
-        assert_eq!(RecentFileType::from_extension("txt"), RecentFileType::Document);
+        assert_eq!(
+            RecentFileType::from_extension("txt"),
+            RecentFileType::Document
+        );
         assert_eq!(RecentFileType::from_extension("png"), RecentFileType::Image);
         assert_eq!(RecentFileType::from_extension("mp4"), RecentFileType::Video);
         assert_eq!(RecentFileType::from_extension("mp3"), RecentFileType::Audio);
-        assert_eq!(RecentFileType::from_extension("zip"), RecentFileType::Archive);
+        assert_eq!(
+            RecentFileType::from_extension("zip"),
+            RecentFileType::Archive
+        );
         assert_eq!(RecentFileType::from_extension("rs"), RecentFileType::Code);
     }
 
@@ -301,7 +310,11 @@ mod tests {
     #[test]
     fn test_clear_recent_files() {
         let mut manager = RecentFilesManager::new();
-        manager.add_recent_file("test.txt".to_string(), PathBuf::from("/home/user/test.txt"), None);
+        manager.add_recent_file(
+            "test.txt".to_string(),
+            PathBuf::from("/home/user/test.txt"),
+            None,
+        );
         manager.clear_recent_files();
         assert_eq!(manager.get_recent_files().len(), 0);
     }
@@ -309,8 +322,16 @@ mod tests {
     #[test]
     fn test_get_recent_files_by_type() {
         let mut manager = RecentFilesManager::new();
-        manager.add_recent_file("doc.txt".to_string(), PathBuf::from("/home/user/doc.txt"), None);
-        manager.add_recent_file("img.png".to_string(), PathBuf::from("/home/user/img.png"), None);
+        manager.add_recent_file(
+            "doc.txt".to_string(),
+            PathBuf::from("/home/user/doc.txt"),
+            None,
+        );
+        manager.add_recent_file(
+            "img.png".to_string(),
+            PathBuf::from("/home/user/img.png"),
+            None,
+        );
 
         let docs = manager.get_recent_files_by_type(RecentFileType::Document);
         assert_eq!(docs.len(), 1);
@@ -347,8 +368,16 @@ mod tests {
     #[test]
     fn test_statistics() {
         let mut manager = RecentFilesManager::new();
-        manager.add_recent_file("doc.txt".to_string(), PathBuf::from("/home/user/doc.txt"), None);
-        manager.add_recent_file("img.png".to_string(), PathBuf::from("/home/user/img.png"), None);
+        manager.add_recent_file(
+            "doc.txt".to_string(),
+            PathBuf::from("/home/user/doc.txt"),
+            None,
+        );
+        manager.add_recent_file(
+            "img.png".to_string(),
+            PathBuf::from("/home/user/img.png"),
+            None,
+        );
         let stats = manager.get_statistics();
         assert_eq!(stats.total_files, 2);
         assert_eq!(stats.documents, 1);

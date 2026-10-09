@@ -217,7 +217,12 @@ impl WallpaperManager {
         }
     }
 
-    pub fn add_profile(&mut self, name: String, wallpaper_id: String, mode: WallpaperMode) -> String {
+    pub fn add_profile(
+        &mut self,
+        name: String,
+        wallpaper_id: String,
+        mode: WallpaperMode,
+    ) -> String {
         let id = format!("prof_{}", self.next_profile_id);
         let profile = WallpaperProfile::new(id.clone(), name, wallpaper_id, mode);
         self.profiles.insert(id.clone(), profile);
@@ -336,7 +341,10 @@ mod tests {
 
     #[test]
     fn test_wallpaper_mode_from_str() {
-        assert_eq!(WallpaperMode::from_str("stretch"), Some(WallpaperMode::Stretch));
+        assert_eq!(
+            WallpaperMode::from_str("stretch"),
+            Some(WallpaperMode::Stretch)
+        );
         assert_eq!(WallpaperMode::from_str("fill"), Some(WallpaperMode::Fill));
         assert_eq!(WallpaperMode::from_str("invalid"), None);
     }
@@ -387,11 +395,7 @@ mod tests {
     fn test_add_profile() {
         let mut manager = WallpaperManager::new();
         let source_id = manager.get_sources()[0].id.clone();
-        let id = manager.add_profile(
-            "Custom Profile".to_string(),
-            source_id,
-            WallpaperMode::Fit,
-        );
+        let id = manager.add_profile("Custom Profile".to_string(), source_id, WallpaperMode::Fit);
         assert!(manager.get_profile(&id).is_some());
         assert_eq!(manager.get_profiles().len(), 2);
     }
@@ -411,11 +415,7 @@ mod tests {
     fn test_set_profile() {
         let mut manager = WallpaperManager::new();
         let source_id = manager.get_sources()[0].id.clone();
-        let id = manager.add_profile(
-            "Custom Profile".to_string(),
-            source_id,
-            WallpaperMode::Fit,
-        );
+        let id = manager.add_profile("Custom Profile".to_string(), source_id, WallpaperMode::Fit);
         assert!(manager.set_profile(&id));
         assert_eq!(manager.get_current_profile().unwrap().id, id);
     }

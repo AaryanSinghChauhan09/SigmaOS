@@ -26,17 +26,17 @@ extern crate alloc;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::{
     collections::BTreeMap,
+    format,
     string::{String, ToString},
     vec::Vec,
-    format,
 };
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::{
     collections::BTreeMap,
+    format,
     string::{String, ToString},
     vec::Vec,
-    format,
 };
 
 // ============================================================================
@@ -287,8 +287,15 @@ impl SlickGreeterDisplayManager {
         self.sessions.insert(user.username.clone(), user);
     }
 
-    pub fn authenticate_and_launch(&mut self, username: &str, password_token: &str) -> Result<SessionType, String> {
-        let user = self.sessions.get(username).ok_or_else(|| format!("User '{}' not found", username))?;
+    pub fn authenticate_and_launch(
+        &mut self,
+        username: &str,
+        password_token: &str,
+    ) -> Result<SessionType, String> {
+        let user = self
+            .sessions
+            .get(username)
+            .ok_or_else(|| format!("User '{}' not found", username))?;
         if password_token.is_empty() {
             return Err("Password token cannot be empty".to_string());
         }
@@ -356,7 +363,10 @@ impl WebAppSandboxIsolatedEngine {
     }
 
     pub fn launch_sandbox(&mut self, app_id: &str) -> Result<String, String> {
-        let app = self.apps.get(app_id).ok_or_else(|| format!("WebApp '{}' not found", app_id))?;
+        let app = self
+            .apps
+            .get(app_id)
+            .ok_or_else(|| format!("WebApp '{}' not found", app_id))?;
         self.active_sandboxes += 1;
         // Generate command line sandbox string
         let sandbox_cmd = format!(
@@ -461,10 +471,10 @@ impl Default for OmarchyWaybarStatusMatrix {
 /// PipeWire audio operating mode.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AudioProfileMode {
-    LowLatencyGaming,     // 32 samples (0.66 ms)
-    ProAudioDawProduction,// 16 samples (0.33 ms)
-    CasualListeningEco,   // 512 samples (10.6 ms)
-    VoiceCommunication,   // 128 samples (2.6 ms)
+    LowLatencyGaming,      // 32 samples (0.66 ms)
+    ProAudioDawProduction, // 16 samples (0.33 ms)
+    CasualListeningEco,    // 512 samples (10.6 ms)
+    VoiceCommunication,    // 128 samples (2.6 ms)
 }
 
 /// Audio profile configuration.
@@ -520,7 +530,8 @@ impl OmarchyAudioLatencyGovernor {
     }
 
     pub fn latency_milliseconds(&self) -> f32 {
-        (self.active_profile.quantum_samples as f32 / self.active_profile.sample_rate_hz as f32) * 1000.0
+        (self.active_profile.quantum_samples as f32 / self.active_profile.sample_rate_hz as f32)
+            * 1000.0
     }
 }
 
@@ -623,7 +634,10 @@ mod tests {
         assert_eq!(engine.note_count(), 2);
 
         assert!(engine.update_body("note-todo", "Milk, Apples, Bread"));
-        assert_eq!(engine.get_note("note-todo").unwrap().body, "Milk, Apples, Bread");
+        assert_eq!(
+            engine.get_note("note-todo").unwrap().body,
+            "Milk, Apples, Bread"
+        );
 
         let alarms = engine.check_alarms(1005);
         assert_eq!(alarms.len(), 1);

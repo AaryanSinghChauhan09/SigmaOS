@@ -247,12 +247,10 @@ impl SovereignDistroPackageAdvancementsSuiteV20 {
             .interop_engine
             .ingest_foreign_package_pr(filename_or_manifest, payload)?;
 
-        let mut pkg = UnifiedPackage::new(
-            format!("sovereign-{}", pr.package_name),
-            pr.version.clone(),
-        )
-        .with_format(PackageFormat::SigmaPkg)
-        .with_provides(pr.package_name.clone());
+        let mut pkg =
+            UnifiedPackage::new(format!("sovereign-{}", pr.package_name), pr.version.clone())
+                .with_format(PackageFormat::SigmaPkg)
+                .with_provides(pr.package_name.clone());
 
         for dep in &pr.canonical_dependencies {
             pkg = pkg.with_dependency(dep.clone());
@@ -289,7 +287,9 @@ mod tests {
             .unwrap();
         assert_eq!(pr1.original_format, PackageFormat::Pacman);
         assert_eq!(pr1.package_name, "gcc-13");
-        assert!(pr1.canonical_dependencies.contains(&"sovereign-libc".to_string()));
+        assert!(pr1
+            .canonical_dependencies
+            .contains(&"sovereign-libc".to_string()));
 
         let pr2 = engine
             .ingest_foreign_package_pr("Package: nginx\nVersion: 1.24\n", b"DEB_MANIFEST")

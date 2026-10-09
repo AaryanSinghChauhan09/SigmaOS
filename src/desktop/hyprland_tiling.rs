@@ -10,16 +10,16 @@ use std::collections::HashMap;
 /// Layout type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LayoutType {
-    Dwindle,     // All windows visible, splitting focused window
-    Scrolling,   // Side-scrolling tape of columns
+    Dwindle,   // All windows visible, splitting focused window
+    Scrolling, // Side-scrolling tape of columns
 }
 
 /// Window state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum WindowState {
-    Tiled,       // Tiled in layout
-    Floating,    // Floating on top
-    Pinned,      // Pinned as float
+    Tiled,    // Tiled in layout
+    Floating, // Floating on top
+    Pinned,   // Pinned as float
 }
 
 /// Window
@@ -103,13 +103,16 @@ impl HyprlandTilingManager {
     pub fn new(config: HyprlandConfig) -> Self {
         let mut workspaces = HashMap::new();
         for i in 1..=10 {
-            workspaces.insert(i, HyprlandWorkspace {
-                id: i,
-                name: i.to_string(),
-                layout: config.default_layout,
-                windows: vec![],
-                is_active: i == 1,
-            });
+            workspaces.insert(
+                i,
+                HyprlandWorkspace {
+                    id: i,
+                    name: i.to_string(),
+                    layout: config.default_layout,
+                    windows: vec![],
+                    is_active: i == 1,
+                },
+            );
         }
 
         Self {
@@ -276,12 +279,15 @@ impl HyprlandTilingManager {
     /// Create window group
     pub fn create_group(&mut self, name: String) -> Result<(), String> {
         let id = self.window_groups.len() as u32 + 1;
-        self.window_groups.insert(id, WindowGroup {
+        self.window_groups.insert(
             id,
-            name,
-            windows: vec![],
-            is_active: false,
-        });
+            WindowGroup {
+                id,
+                name,
+                windows: vec![],
+                is_active: false,
+            },
+        );
         Ok(())
     }
 
@@ -388,9 +394,15 @@ mod tests {
     fn test_toggle_layout() {
         let mut manager = HyprlandTilingManager::with_default_config();
         manager.toggle_layout().unwrap();
-        assert_eq!(manager.get_current_workspace().unwrap().layout, LayoutType::Scrolling);
+        assert_eq!(
+            manager.get_current_workspace().unwrap().layout,
+            LayoutType::Scrolling
+        );
         manager.toggle_layout().unwrap();
-        assert_eq!(manager.get_current_workspace().unwrap().layout, LayoutType::Dwindle);
+        assert_eq!(
+            manager.get_current_workspace().unwrap().layout,
+            LayoutType::Dwindle
+        );
     }
 
     #[test]

@@ -818,7 +818,6 @@ mod tests {
     }
 
     #[ignore]
-
     #[test]
     fn test_ethernet_frame() {
         let src = MacAddr::new(0x00, 0x01, 0x02, 0x03, 0x04, 0x05);

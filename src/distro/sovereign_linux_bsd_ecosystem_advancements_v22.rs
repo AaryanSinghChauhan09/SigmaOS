@@ -291,7 +291,12 @@ impl FedoraOstreeBodhiPrEngine {
         );
     }
 
-    pub fn evaluate_selinux_avc_cache(&mut self, scontext: &str, tcontext: &str, class: &str) -> bool {
+    pub fn evaluate_selinux_avc_cache(
+        &mut self,
+        scontext: &str,
+        tcontext: &str,
+        class: &str,
+    ) -> bool {
         self.selinux_avc_hits += 1;
         !scontext.contains("unconfined_u") && !tcontext.contains("invalid") && !class.is_empty()
     }
@@ -831,7 +836,10 @@ mod tests {
 
         assert!(freebsd.submit_poudriere_build_job("jail_web", "www/nginx"));
         assert_eq!(freebsd.total_ports_built, 1);
-        assert_eq!(freebsd.jails.get("jail_web").unwrap().poudriere_batch_jobs, 1);
+        assert_eq!(
+            freebsd.jails.get("jail_web").unwrap().poudriere_batch_jobs,
+            1
+        );
     }
 
     #[test]
@@ -874,7 +882,10 @@ mod tests {
         arch.register_arch_spec("ripgrep", &["PostTransaction = /usr/bin/rg-init"], 80);
 
         assert_eq!(
-            arch.arch_specs.get("ripgrep").unwrap().bore_sched_timeslice_ns,
+            arch.arch_specs
+                .get("ripgrep")
+                .unwrap()
+                .bore_sched_timeslice_ns,
             9_000_000
         );
         assert!(arch.set_alpm_db_lock("ripgrep", true));

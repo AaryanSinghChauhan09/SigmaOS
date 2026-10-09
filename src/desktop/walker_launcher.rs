@@ -177,7 +177,8 @@ impl WalkerLauncher {
         };
 
         if !is_sensitive {
-            self.clipboard_history.retain(|e| e.content != entry.content);
+            self.clipboard_history
+                .retain(|e| e.content != entry.content);
             self.clipboard_history.insert(0, entry);
             if self.clipboard_history.len() > self.config.clipboard_history_size {
                 self.clipboard_history.pop();
@@ -209,7 +210,8 @@ impl WalkerLauncher {
             .filter(|app| {
                 let name_lower = app.name.to_lowercase();
                 let desc_lower = app.description.to_lowercase();
-                let keywords_lower: Vec<String> = app.keywords.iter().map(|k| k.to_lowercase()).collect();
+                let keywords_lower: Vec<String> =
+                    app.keywords.iter().map(|k| k.to_lowercase()).collect();
 
                 if self.config.fuzzy_search {
                     name_lower.contains(&query_lower)
@@ -279,7 +281,8 @@ impl WalkerLauncher {
             .iter()
             .filter(|emoji| {
                 let name_lower = emoji.name.to_lowercase();
-                let keywords_lower: Vec<String> = emoji.keywords.iter().map(|k| k.to_lowercase()).collect();
+                let keywords_lower: Vec<String> =
+                    emoji.keywords.iter().map(|k| k.to_lowercase()).collect();
                 name_lower.contains(&query_lower)
                     || keywords_lower.iter().any(|k| k.contains(&query_lower))
             })

@@ -169,13 +169,13 @@ impl NotificationAreaManager {
     }
 
     pub fn get_visible_items(&self) -> Vec<&TrayNotificationItem> {
-        self.items
-            .values()
-            .filter(|i| i.is_visible)
-            .collect()
+        self.items.values().filter(|i| i.is_visible).collect()
     }
 
-    pub fn get_items_by_type(&self, item_type: TrayNotificationItemType) -> Vec<&TrayNotificationItem> {
+    pub fn get_items_by_type(
+        &self,
+        item_type: TrayNotificationItemType,
+    ) -> Vec<&TrayNotificationItem> {
         self.items
             .values()
             .filter(|i| i.item_type == item_type)
@@ -298,7 +298,10 @@ mod tests {
         let mut manager = NotificationAreaManager::new();
         let id = manager.add_item("Clock".to_string(), TrayNotificationItemType::System);
         assert!(manager.set_item_icon(&id, "clock".to_string()));
-        assert_eq!(manager.get_item(&id).unwrap().icon, Some("clock".to_string()));
+        assert_eq!(
+            manager.get_item(&id).unwrap().icon,
+            Some("clock".to_string())
+        );
     }
 
     #[test]
@@ -306,7 +309,10 @@ mod tests {
         let mut manager = NotificationAreaManager::new();
         let id = manager.add_item("Clock".to_string(), TrayNotificationItemType::System);
         assert!(manager.set_item_tooltip(&id, "Current time".to_string()));
-        assert_eq!(manager.get_item(&id).unwrap().tooltip, Some("Current time".to_string()));
+        assert_eq!(
+            manager.get_item(&id).unwrap().tooltip,
+            Some("Current time".to_string())
+        );
     }
 
     #[test]

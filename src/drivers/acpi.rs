@@ -44,7 +44,7 @@ pub struct RsdpExtended {
     pub oem_id: [u8; 6],
     pub revision: u8,
     pub rsdt_address: u32,
-    pub length: u32, // Length of RSDP (ACPI 2.0+)
+    pub length: u32,       // Length of RSDP (ACPI 2.0+)
     pub xsdt_address: u64, // Extended System Description Table
     pub extended_checksum: u8,
     pub reserved: [u8; 3],
@@ -200,13 +200,19 @@ impl AcpiManager {
             for addr in (0x80000..=0x9FFFF).step_by(16) {
                 let ptr = addr as *const u8;
                 let sig = [
-                    *ptr.add(0), *ptr.add(1), *ptr.add(2), *ptr.add(3),
-                    *ptr.add(4), *ptr.add(5), *ptr.add(6), *ptr.add(7),
+                    *ptr.add(0),
+                    *ptr.add(1),
+                    *ptr.add(2),
+                    *ptr.add(3),
+                    *ptr.add(4),
+                    *ptr.add(5),
+                    *ptr.add(6),
+                    *ptr.add(7),
                 ];
 
                 if sig == *b"RSD PTR " {
                     let revision = *ptr.add(15);
-                    
+
                     if revision >= 2 {
                         // ACPI 2.0+ - use extended RSDP
                         let len = 36;
@@ -214,7 +220,7 @@ impl AcpiManager {
                         for i in 0..len {
                             sum = sum.wrapping_add(*ptr.add(i));
                         }
-                        
+
                         if sum == 0 {
                             let rsdp_ext = &*(ptr as *const RsdpExtended);
                             self.rsdp_address = Some(addr as u64);
@@ -244,20 +250,26 @@ impl AcpiManager {
             for addr in (0xE0000..=0xFFFFF).step_by(16) {
                 let ptr = addr as *const u8;
                 let sig = [
-                    *ptr.add(0), *ptr.add(1), *ptr.add(2), *ptr.add(3),
-                    *ptr.add(4), *ptr.add(5), *ptr.add(6), *ptr.add(7),
+                    *ptr.add(0),
+                    *ptr.add(1),
+                    *ptr.add(2),
+                    *ptr.add(3),
+                    *ptr.add(4),
+                    *ptr.add(5),
+                    *ptr.add(6),
+                    *ptr.add(7),
                 ];
 
                 if sig == *b"RSD PTR " {
                     let revision = *ptr.add(15);
-                    
+
                     if revision >= 2 {
                         let len = 36;
                         let mut sum: u8 = 0;
                         for i in 0..len {
                             sum = sum.wrapping_add(*ptr.add(i));
                         }
-                        
+
                         if sum == 0 {
                             let rsdp_ext = &*(ptr as *const RsdpExtended);
                             self.rsdp_address = Some(addr as u64);
@@ -327,7 +339,8 @@ impl AcpiManager {
             // Parse table entries (32-bit pointers to other tables)
             let entry_count = (header.length as usize - core::mem::size_of::<SdtHeader>()) / 4;
             for i in 0..entry_count {
-                let entry_addr = *((address as *const u32).add(core::mem::size_of::<SdtHeader>() / 4 + i));
+                let entry_addr =
+                    *((address as *const u32).add(core::mem::size_of::<SdtHeader>() / 4 + i));
                 self.parse_table_entry(entry_addr as u64)?;
             }
         }
@@ -360,7 +373,8 @@ impl AcpiManager {
             // Parse table entries (64-bit pointers to other tables)
             let entry_count = (header.length as usize - core::mem::size_of::<SdtHeader>()) / 8;
             for i in 0..entry_count {
-                let entry_addr = *((address as *const u64).add(core::mem::size_of::<SdtHeader>() / 8 + i));
+                let entry_addr =
+                    *((address as *const u64).add(core::mem::size_of::<SdtHeader>() / 8 + i));
                 self.parse_table_entry(entry_addr)?;
             }
         }

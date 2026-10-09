@@ -26,17 +26,17 @@ extern crate alloc;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::{
     collections::BTreeMap,
+    format,
     string::{String, ToString},
     vec::Vec,
-    format,
 };
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::{
     collections::BTreeMap,
+    format,
     string::{String, ToString},
     vec::Vec,
-    format,
 };
 
 // ============================================================================
@@ -110,7 +110,8 @@ impl CinnamonControlCenterGovernor {
     }
 
     pub fn register_service(&mut self, service: AutostartEntry) {
-        self.autostart_services.insert(service.service_name.clone(), service);
+        self.autostart_services
+            .insert(service.service_name.clone(), service);
     }
 
     pub fn service_count(&self) -> usize {
@@ -201,7 +202,8 @@ impl XedLanguageServerMultiplexer {
     }
 
     pub fn register_server(&mut self, descriptor: LspServerDescriptor) {
-        self.servers.insert(descriptor.language_id.clone(), descriptor);
+        self.servers
+            .insert(descriptor.language_id.clone(), descriptor);
     }
 
     pub fn push_diagnostic(&mut self, diag: LspDiagnostic) {
@@ -210,7 +212,10 @@ impl XedLanguageServerMultiplexer {
     }
 
     pub fn diagnostics_for_file(&self, path: &str) -> Vec<&LspDiagnostic> {
-        self.diagnostics_cache.iter().filter(|d| d.file_path == path).collect()
+        self.diagnostics_cache
+            .iter()
+            .filter(|d| d.file_path == path)
+            .collect()
     }
 
     pub fn server_count(&self) -> usize {
@@ -285,7 +290,8 @@ impl MintBackupDifferentialArchiveEngine {
     }
 
     pub fn create_snapshot(&mut self, snapshot: BackupSnapshot) {
-        self.snapshots.insert(snapshot.snapshot_id.clone(), snapshot);
+        self.snapshots
+            .insert(snapshot.snapshot_id.clone(), snapshot);
     }
 
     pub fn snapshot_count(&self) -> usize {
@@ -357,11 +363,15 @@ impl SigmaCircadianGammaScheduler {
         } else if (18.0..20.0).contains(&hour) {
             self.phase = CircadianPhase::SunsetTransition;
             let factor = (hour - 18.0) / 2.0;
-            self.active_temp_k = (self.day_temp_k as f32 - factor * (self.day_temp_k - self.night_temp_k) as f32) as u32;
+            self.active_temp_k = (self.day_temp_k as f32
+                - factor * (self.day_temp_k - self.night_temp_k) as f32)
+                as u32;
         } else if (6.0..7.0).contains(&hour) {
             self.phase = CircadianPhase::SunriseTransition;
             let factor = hour - 6.0;
-            self.active_temp_k = (self.night_temp_k as f32 + factor * (self.day_temp_k - self.night_temp_k) as f32) as u32;
+            self.active_temp_k = (self.night_temp_k as f32
+                + factor * (self.day_temp_k - self.night_temp_k) as f32)
+                as u32;
         } else {
             self.phase = CircadianPhase::NightCandlelight;
             self.active_temp_k = self.night_temp_k;
@@ -424,7 +434,13 @@ impl OmarchyNotificationDaemonEngine {
         }
     }
 
-    pub fn post(&mut self, app_name: &str, summary: &str, body: &str, urgency: NotificationUrgency) -> u32 {
+    pub fn post(
+        &mut self,
+        app_name: &str,
+        summary: &str,
+        body: &str,
+        urgency: NotificationUrgency,
+    ) -> u32 {
         let id = self.next_id;
         self.next_id += 1;
         self.total_received += 1;
@@ -435,7 +451,11 @@ impl OmarchyNotificationDaemonEngine {
             summary: summary.to_string(),
             body: body.to_string(),
             urgency,
-            timeout_ms: if urgency == NotificationUrgency::Critical { 0 } else { 5000 },
+            timeout_ms: if urgency == NotificationUrgency::Critical {
+                0
+            } else {
+                5000
+            },
             actions: Vec::new(),
             dismissed: false,
         });
@@ -462,7 +482,9 @@ impl OmarchyNotificationDaemonEngine {
     pub fn active_notifications(&self) -> Vec<&DesktopNotification> {
         self.notifications
             .iter()
-            .filter(|n| !n.dismissed && (!self.dnd_enabled || n.urgency == NotificationUrgency::Critical))
+            .filter(|n| {
+                !n.dismissed && (!self.dnd_enabled || n.urgency == NotificationUrgency::Critical)
+            })
             .collect()
     }
 }
@@ -523,7 +545,13 @@ impl OmarchyScreenCapturePortalEngine {
         }
     }
 
-    pub fn start_session(&mut self, id: &str, target: CaptureTarget, codec: VideoCodec, fps: u32) -> Result<(), String> {
+    pub fn start_session(
+        &mut self,
+        id: &str,
+        target: CaptureTarget,
+        codec: VideoCodec,
+        fps: u32,
+    ) -> Result<(), String> {
         if self.sessions.contains_key(id) {
             return Err("Session already exists".to_string());
         }
@@ -705,8 +733,18 @@ mod tests {
     #[test]
     fn test_notification_daemon_priorities_and_dnd() {
         let mut notif = OmarchyNotificationDaemonEngine::new();
-        let id1 = notif.post("app", "Low Battery", "15% remaining", NotificationUrgency::Normal);
-        let id2 = notif.post("kernel", "Kernel Panic Risk", "OOM imminent", NotificationUrgency::Critical);
+        let id1 = notif.post(
+            "app",
+            "Low Battery",
+            "15% remaining",
+            NotificationUrgency::Normal,
+        );
+        let id2 = notif.post(
+            "kernel",
+            "Kernel Panic Risk",
+            "OOM imminent",
+            NotificationUrgency::Critical,
+        );
 
         assert_eq!(notif.active_notifications().len(), 2);
 

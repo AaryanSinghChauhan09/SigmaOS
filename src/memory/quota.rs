@@ -496,7 +496,6 @@ mod tests {
     }
 
     #[ignore]
-
     #[test]
     fn test_process_account_exceeds_limit() {
         let mut account = ProcessMemoryAccount::new(100);
@@ -553,7 +552,6 @@ mod tests {
     }
 
     #[ignore]
-
     #[test]
     fn test_memory_controller_check_oom() {
         let controller = MemoryController::new();

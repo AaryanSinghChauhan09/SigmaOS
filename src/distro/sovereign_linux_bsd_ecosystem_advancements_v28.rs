@@ -28,9 +28,19 @@ use alloc::vec::Vec;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum AppArmorRuleKind {
-    PathAccess { path: String, permissions: String },
-    NetworkDomain { domain: String, sock_type: String },
-    DbusMediation { interface: String, member: String, action: String },
+    PathAccess {
+        path: String,
+        permissions: String,
+    },
+    NetworkDomain {
+        domain: String,
+        sock_type: String,
+    },
+    DbusMediation {
+        interface: String,
+        member: String,
+        action: String,
+    },
 }
 
 #[derive(Debug, Clone)]
@@ -71,14 +81,25 @@ impl UbuntuAppArmorV4ConfinementEngine {
         }
     }
 
-    pub fn evaluate_path_access(&self, profile_name: &str, path: &str, requested_perm: &str) -> bool {
+    pub fn evaluate_path_access(
+        &self,
+        profile_name: &str,
+        path: &str,
+        requested_perm: &str,
+    ) -> bool {
         if let Some(prof) = self.profiles.get(profile_name) {
             if !prof.is_enforcing {
                 return true;
             }
             for rule in &prof.rules {
-                if let AppArmorRuleKind::PathAccess { path: r_path, permissions } = rule {
-                    if (r_path == path || r_path == "/*" || path.starts_with(r_path)) && permissions.contains(requested_perm) {
+                if let AppArmorRuleKind::PathAccess {
+                    path: r_path,
+                    permissions,
+                } = rule
+                {
+                    if (r_path == path || r_path == "/*" || path.starts_with(r_path))
+                        && permissions.contains(requested_perm)
+                    {
                         return true;
                     }
                 }
@@ -246,8 +267,12 @@ impl FreeBsdBectlCasperEngine {
     }
 
     pub fn delegate_casper_service(&mut self, service_name: &str) {
-        if !self.casper_delegated_services.contains(&service_name.to_string()) {
-            self.casper_delegated_services.push(service_name.to_string());
+        if !self
+            .casper_delegated_services
+            .contains(&service_name.to_string())
+        {
+            self.casper_delegated_services
+                .push(service_name.to_string());
         }
     }
 }
@@ -287,7 +312,11 @@ impl OpenBsdPledgePfctlStateEngine {
         }
     }
 
-    pub fn unveil(&mut self, path: Option<&str>, permissions: Option<&str>) -> Result<(), &'static str> {
+    pub fn unveil(
+        &mut self,
+        path: Option<&str>,
+        permissions: Option<&str>,
+    ) -> Result<(), &'static str> {
         if self.is_unveil_locked {
             return Err("OpenBSD: Unveil table is locked");
         }
@@ -715,7 +744,12 @@ mod tests {
     #[test]
     fn test_alpine_apk_v3_transpiler() {
         let mut alpine = AlpineApkV3IndexTranspilerEngine::new();
-        alpine.register_apk("busybox", "1.36.1", "hash123", Some("/bin/busybox --install"));
+        alpine.register_apk(
+            "busybox",
+            "1.36.1",
+            "hash123",
+            Some("/bin/busybox --install"),
+        );
         alpine.commit_apkovl("/etc/network/interfaces");
 
         assert!(alpine.verify_integrity("busybox", "hash123"));
@@ -725,7 +759,10 @@ mod tests {
     #[test]
     fn test_arch_cachy_eevdf_bore_scheduler() {
         let mut sched = ArchCachyEevdfBoreSchedulerEngine::new(MicroarchIsaLevel::X86_64_V4);
-        assert_eq!(sched.get_optimization_flags(), "-march=x86-64-v4 -mavx512f -mavx512bw -mavx512vl");
+        assert_eq!(
+            sched.get_optimization_flags(),
+            "-march=x86-64-v4 -mavx512f -mavx512bw -mavx512vl"
+        );
 
         let score = sched.update_bore_score(10000, 20000);
         assert_eq!(score, 0); // Interactive priority
@@ -737,8 +774,16 @@ mod tests {
         bectl.create_be("active_be_2026", true);
         bectl.delegate_casper_service("system.dns");
 
-        assert!(bectl.boot_environments.get("active_be_2026").unwrap().is_active);
-        assert!(bectl.casper_delegated_services.contains(&"system.dns".to_string()));
+        assert!(
+            bectl
+                .boot_environments
+                .get("active_be_2026")
+                .unwrap()
+                .is_active
+        );
+        assert!(bectl
+            .casper_delegated_services
+            .contains(&"system.dns".to_string()));
     }
 
     #[test]

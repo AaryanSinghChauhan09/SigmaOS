@@ -82,7 +82,12 @@ impl KeyDerivation for SimpleKeyDerivation {
 
 pub trait PostQuantumSignature {
     fn sign(&self, message: &[u8], private_key: &[u8]) -> Result<Vec<u8>, CryptoError>;
-    fn verify(&self, message: &[u8], signature: &[u8], public_key: &[u8]) -> Result<bool, CryptoError>;
+    fn verify(
+        &self,
+        message: &[u8],
+        signature: &[u8],
+        public_key: &[u8],
+    ) -> Result<bool, CryptoError>;
     fn generate_keypair(&mut self) -> Result<(Vec<u8>, Vec<u8>), CryptoError>;
 }
 
@@ -162,7 +167,12 @@ impl PostQuantumSignature for Dilithium5Signature {
 
 pub trait SecureBootSigning {
     fn sign_bootloader(&self, bootloader: &[u8], key: &[u8]) -> Result<Vec<u8>, CryptoError>;
-    fn verify_bootloader(&self, bootloader: &[u8], signature: &[u8], key: &[u8]) -> Result<bool, CryptoError>;
+    fn verify_bootloader(
+        &self,
+        bootloader: &[u8],
+        signature: &[u8],
+        key: &[u8],
+    ) -> Result<bool, CryptoError>;
 }
 
 #[repr(C)]
@@ -189,7 +199,12 @@ impl SecureBootSigning for SimpleSecureBootSigning {
         self.signature.sign(bootloader, key)
     }
 
-    fn verify_bootloader(&self, bootloader: &[u8], signature: &[u8], key: &[u8]) -> Result<bool, CryptoError> {
+    fn verify_bootloader(
+        &self,
+        bootloader: &[u8],
+        signature: &[u8],
+        key: &[u8],
+    ) -> Result<bool, CryptoError> {
         self.signature.verify(bootloader, signature, key)
     }
 }

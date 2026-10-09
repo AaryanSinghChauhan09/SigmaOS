@@ -221,7 +221,7 @@ pub fn init() {
     let mut gdt = GlobalDescriptorTableManager::new();
     gdt.set_kernel_stack(0xFFFF_8000_0008_0000);
     gdt.init();
-    
+
     unsafe {
         GLOBAL_GDT = Some(gdt);
     }

@@ -379,7 +379,6 @@ mod tests {
     use super::*;
 
     #[ignore]
-
     #[test]
     fn test_create_namespace() {
         let mut manager = NamespaceManager::new();
@@ -390,7 +389,6 @@ mod tests {
     }
 
     #[ignore]
-
     #[test]
     fn test_delete_namespace() {
         let mut manager = NamespaceManager::new();

@@ -147,16 +147,16 @@ impl PrpList {
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct NvmeSubmissionQueueEntry {
-    pub dword0: u32, // CDW0: command-specific
-    pub dword1: u32, // CDW1: namespace ID
-    pub dword2: u32, // CDW2: command-specific
-    pub dword3: u32, // CDW3: command-specific
-    pub dword4: u32, // CDW4: command-specific
-    pub dword5: u32, // CDW5: command-specific
-    pub dword6: u32, // CDW6: command-specific
-    pub dword7: u32, // CDW7: command-specific
-    pub dword8: u32, // CDW8: command-specific
-    pub dword9: u32, // CDW9: command-specific
+    pub dword0: u32,  // CDW0: command-specific
+    pub dword1: u32,  // CDW1: namespace ID
+    pub dword2: u32,  // CDW2: command-specific
+    pub dword3: u32,  // CDW3: command-specific
+    pub dword4: u32,  // CDW4: command-specific
+    pub dword5: u32,  // CDW5: command-specific
+    pub dword6: u32,  // CDW6: command-specific
+    pub dword7: u32,  // CDW7: command-specific
+    pub dword8: u32,  // CDW8: command-specific
+    pub dword9: u32,  // CDW9: command-specific
     pub dword10: u32, // CDW10: command-specific
     pub dword11: u32, // CDW11: command-specific
     pub dword12: u32, // CDW12: command-specific
@@ -474,25 +474,31 @@ impl NvmeController {
     pub fn allocate_prp_list(&mut self) -> Result<u64, &'static str> {
         let prp_list = PrpList::new(self.next_prp_list_addr);
         let physical_addr = prp_list.get_physical_address();
-        
+
         self.prp_lists.push(prp_list);
         self.next_prp_list_addr += NVME_PRP_LIST_PAGE_SIZE as u64;
-        
+
         Ok(physical_addr)
     }
 
     /// Get a mutable reference to a PRP list by physical address
     pub fn get_prp_list_mut(&mut self, physical_addr: u64) -> Option<&mut PrpList> {
-        self.prp_lists.iter_mut().find(|pl| pl.get_physical_address() == physical_addr)
+        self.prp_lists
+            .iter_mut()
+            .find(|pl| pl.get_physical_address() == physical_addr)
     }
 
     /// Build PRP entries for a data buffer
-    pub fn build_prp_entries(&mut self, data_addr: u64, data_size: u64) -> Result<(u64, u64), &'static str> {
+    pub fn build_prp_entries(
+        &mut self,
+        data_addr: u64,
+        data_size: u64,
+    ) -> Result<(u64, u64), &'static str> {
         // For transfers up to 2 pages (8KB), we can use PRP1 and PRP2 directly
         // For larger transfers, we need a PRP list
-        
+
         let num_pages = (data_size + NVME_PAGE_SIZE - 1) / NVME_PAGE_SIZE;
-        
+
         if num_pages <= 2 {
             // Use PRP1 and PRP2 directly
             let prp1 = data_addr;
@@ -505,18 +511,20 @@ impl NvmeController {
         } else {
             // Need a PRP list
             let prp_list_addr = self.allocate_prp_list()?;
-            let prp_list = self.get_prp_list_mut(prp_list_addr).ok_or("PRP list not found")?;
-            
+            let prp_list = self
+                .get_prp_list_mut(prp_list_addr)
+                .ok_or("PRP list not found")?;
+
             // Clear existing entries
             prp_list.entries.clear();
-            
+
             // Add PRP entries for each page
             for i in 0..num_pages {
                 let page_addr = data_addr + (i * NVME_PAGE_SIZE);
                 let prp = PrpEntry::new(page_addr);
                 prp_list.add_entry(prp)?;
             }
-            
+
             // PRP1 points to first page, PRP2 points to PRP list
             let prp1 = data_addr;
             let prp2 = prp_list_addr;
@@ -600,7 +608,7 @@ impl NvmeController {
         // Convert SQE to u64 array for submission
         let sqe_ptr = &sqe as *const NvmeSubmissionQueueEntry as *const u64;
         let sqe_words = unsafe { core::slice::from_raw_parts(sqe_ptr, 8) };
-        
+
         // Submit command to I/O queue (submit as individual words)
         for &word in sqe_words {
             self.io_queues[0].submit_command(word)?;
@@ -676,7 +684,7 @@ impl NvmeController {
         // Convert SQE to u64 array for submission
         let sqe_ptr = &sqe as *const NvmeSubmissionQueueEntry as *const u64;
         let sqe_words = unsafe { core::slice::from_raw_parts(sqe_ptr, 8) };
-        
+
         // Submit command to I/O queue (submit as individual words)
         for &word in sqe_words {
             self.io_queues[0].submit_command(word)?;
@@ -889,7 +897,7 @@ mod tests {
         let prp = PrpEntry::new(0x1000);
         assert_eq!(prp.address, 0x1000);
         assert!(prp.is_page_aligned());
-        
+
         let prp_unaligned = PrpEntry::new(0x1001);
         assert!(!prp_unaligned.is_page_aligned());
     }
@@ -899,7 +907,7 @@ mod tests {
         let mut prp_list = PrpList::new(0x20000000);
         assert_eq!(prp_list.get_physical_address(), 0x20000000);
         assert!(prp_list.is_empty());
-        
+
         let prp = PrpEntry::new(0x1000);
         assert!(prp_list.add_entry(prp).is_ok());
         assert_eq!(prp_list.len(), 1);
@@ -909,13 +917,13 @@ mod tests {
     #[test]
     fn test_prp_list_full() {
         let mut prp_list = PrpList::new(0x20000000);
-        
+
         // Add maximum entries
         for i in 0..NVME_MAX_PRP_ENTRIES {
             let prp = PrpEntry::new((i as u64 + 1) * NVME_PAGE_SIZE);
             assert!(prp_list.add_entry(prp).is_ok());
         }
-        
+
         // Should fail when full
         let prp = PrpEntry::new(0x1000);
         assert!(prp_list.add_entry(prp).is_err());
@@ -924,14 +932,14 @@ mod tests {
     #[test]
     fn test_nvme_submission_queue_entry() {
         let mut sqe = NvmeSubmissionQueueEntry::new();
-        
+
         sqe.set_opcode(NVME_CMD_READ);
         sqe.set_command_id(42);
         sqe.set_slba(0x1000);
         sqe.set_nlb(15); // 16 sectors (0-based)
         sqe.set_prp1(0x2000);
         sqe.set_prp2(0x3000);
-        
+
         assert_eq!(sqe.dword0 & 0xFF, NVME_CMD_READ as u32);
         assert_eq!(sqe.dword0 & 0xFFFF, 42);
     }
@@ -939,25 +947,28 @@ mod tests {
     #[test]
     fn test_nvme_controller_prp_allocation() {
         let mut controller = NvmeController::new(0x0001, "0000:00:1f.0");
-        
+
         let prp_addr = controller.allocate_prp_list();
         assert!(prp_addr.is_ok());
         assert_eq!(prp_addr.unwrap(), 0x10000000);
-        
+
         let prp_addr2 = controller.allocate_prp_list();
         assert!(prp_addr2.is_ok());
-        assert_eq!(prp_addr2.unwrap(), 0x10000000 + NVME_PRP_LIST_PAGE_SIZE as u64);
+        assert_eq!(
+            prp_addr2.unwrap(),
+            0x10000000 + NVME_PRP_LIST_PAGE_SIZE as u64
+        );
     }
 
     #[test]
     fn test_nvme_controller_build_prp_small() {
         let mut controller = NvmeController::new(0x0001, "0000:00:1f.0");
-        
+
         // Small transfer (1 page)
         let (prp1, prp2) = controller.build_prp_entries(0x5000, 4096).unwrap();
         assert_eq!(prp1, 0x5000);
         assert_eq!(prp2, 0);
-        
+
         // Medium transfer (2 pages)
         let (prp1, prp2) = controller.build_prp_entries(0x6000, 8192).unwrap();
         assert_eq!(prp1, 0x6000);
@@ -967,7 +978,7 @@ mod tests {
     #[test]
     fn test_nvme_controller_build_prp_large() {
         let mut controller = NvmeController::new(0x0001, "0000:00:1f.0");
-        
+
         // Large transfer (needs PRP list)
         let (prp1, prp2) = controller.build_prp_entries(0x8000, 16384).unwrap();
         assert_eq!(prp1, 0x8000);

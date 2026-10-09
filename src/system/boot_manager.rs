@@ -93,9 +93,21 @@ impl BootManager {
     /// Add default startup entries
     fn add_default_entries(&mut self) {
         let default_entries = vec![
-            ("Network Manager", "/usr/bin/sigma-network-manager", "Network connection management"),
-            ("Power Manager", "/usr/bin/sigma-power-manager", "Power management daemon"),
-            ("Display Manager", "/usr/bin/sigma-display-manager", "Display and login manager"),
+            (
+                "Network Manager",
+                "/usr/bin/sigma-network-manager",
+                "Network connection management",
+            ),
+            (
+                "Power Manager",
+                "/usr/bin/sigma-power-manager",
+                "Power management daemon",
+            ),
+            (
+                "Display Manager",
+                "/usr/bin/sigma-display-manager",
+                "Display and login manager",
+            ),
             ("Bluetooth", "/usr/bin/sigma-bluetooth", "Bluetooth daemon"),
             ("Audio", "/usr/bin/sigma-audio", "Audio system"),
         ];
@@ -142,28 +154,27 @@ impl BootManager {
 
     /// List entries by startup type
     pub fn list_by_type(&self, startup_type: StartupType) -> Vec<&StartupEntry> {
-        self.entries.values()
+        self.entries
+            .values()
             .filter(|e| e.startup_type == startup_type)
             .collect()
     }
 
     /// List enabled entries
     pub fn list_enabled(&self) -> Vec<&StartupEntry> {
-        self.entries.values()
-            .filter(|e| e.is_enabled)
-            .collect()
+        self.entries.values().filter(|e| e.is_enabled).collect()
     }
 
     /// List entries that should start
     pub fn list_should_start(&self) -> Vec<&StartupEntry> {
-        self.entries.values()
-            .filter(|e| e.should_start())
-            .collect()
+        self.entries.values().filter(|e| e.should_start()).collect()
     }
 
     /// Enable a startup entry
     pub fn enable_entry(&mut self, name: &str) -> Result<(), String> {
-        let entry = self.entries.get_mut(name)
+        let entry = self
+            .entries
+            .get_mut(name)
             .ok_or_else(|| format!("Startup entry {} not found", name))?;
 
         entry.set_enabled(true);
@@ -172,7 +183,9 @@ impl BootManager {
 
     /// Disable a startup entry
     pub fn disable_entry(&mut self, name: &str) -> Result<(), String> {
-        let entry = self.entries.get_mut(name)
+        let entry = self
+            .entries
+            .get_mut(name)
             .ok_or_else(|| format!("Startup entry {} not found", name))?;
 
         entry.set_enabled(false);
@@ -180,8 +193,14 @@ impl BootManager {
     }
 
     /// Set startup type
-    pub fn set_startup_type(&mut self, name: &str, startup_type: StartupType) -> Result<(), String> {
-        let entry = self.entries.get_mut(name)
+    pub fn set_startup_type(
+        &mut self,
+        name: &str,
+        startup_type: StartupType,
+    ) -> Result<(), String> {
+        let entry = self
+            .entries
+            .get_mut(name)
             .ok_or_else(|| format!("Startup entry {} not found", name))?;
 
         entry.set_startup_type(startup_type);
@@ -190,7 +209,8 @@ impl BootManager {
 
     /// Remove a startup entry
     pub fn remove_entry(&mut self, name: &str) -> Result<(), String> {
-        self.entries.remove(name)
+        self.entries
+            .remove(name)
             .ok_or_else(|| format!("Startup entry {} not found", name))?;
         Ok(())
     }
@@ -212,9 +232,21 @@ impl BootManager {
     pub fn get_statistics(&self) -> StartupStatistics {
         let total_entries = self.entries.len();
         let enabled_entries = self.entries.values().filter(|e| e.is_enabled).count();
-        let auto_start = self.entries.values().filter(|e| e.startup_type == StartupType::Auto).count();
-        let manual_start = self.entries.values().filter(|e| e.startup_type == StartupType::Manual).count();
-        let disabled = self.entries.values().filter(|e| e.startup_type == StartupType::Disabled).count();
+        let auto_start = self
+            .entries
+            .values()
+            .filter(|e| e.startup_type == StartupType::Auto)
+            .count();
+        let manual_start = self
+            .entries
+            .values()
+            .filter(|e| e.startup_type == StartupType::Manual)
+            .count();
+        let disabled = self
+            .entries
+            .values()
+            .filter(|e| e.startup_type == StartupType::Disabled)
+            .count();
 
         StartupStatistics {
             total_entries,
@@ -298,7 +330,9 @@ mod tests {
     #[test]
     fn test_set_startup_type() {
         let mut manager = BootManager::new();
-        assert!(manager.set_startup_type("Network Manager", StartupType::Manual).is_ok());
+        assert!(manager
+            .set_startup_type("Network Manager", StartupType::Manual)
+            .is_ok());
     }
 
     #[test]

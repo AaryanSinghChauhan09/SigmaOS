@@ -60,11 +60,7 @@ pub struct SoundConfig {
 }
 
 impl SoundConfig {
-    pub fn new(
-        id: String,
-        event: SoundEvent,
-        sound_file: String,
-    ) -> Self {
+    pub fn new(id: String, event: SoundEvent, sound_file: String) -> Self {
         SoundConfig {
             id,
             event,
@@ -164,11 +160,7 @@ impl NotificationSoundManager {
         self.master_volume = volume.min(100);
     }
 
-    pub fn add_sound(
-        &mut self,
-        event: SoundEvent,
-        sound_file: String,
-    ) -> String {
+    pub fn add_sound(&mut self, event: SoundEvent, sound_file: String) -> String {
         let id = format!("sound_{}", self.next_sound_id);
         self.next_sound_id += 1;
 
@@ -190,17 +182,11 @@ impl NotificationSoundManager {
     }
 
     pub fn get_sounds_by_event(&self, event: SoundEvent) -> Vec<&SoundConfig> {
-        self.sounds
-            .values()
-            .filter(|s| s.event == event)
-            .collect()
+        self.sounds.values().filter(|s| s.event == event).collect()
     }
 
     pub fn get_enabled_sounds(&self) -> Vec<&SoundConfig> {
-        self.sounds
-            .values()
-            .filter(|s| s.enabled)
-            .collect()
+        self.sounds.values().filter(|s| s.enabled).collect()
     }
 
     pub fn set_sound_volume(&mut self, id: &str, volume: u8) -> bool {

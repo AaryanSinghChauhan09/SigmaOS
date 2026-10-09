@@ -637,7 +637,6 @@ mod tests {
     }
 
     #[ignore]
-
     #[test]
     fn test_device_allow_deny() {
         let mut controller = DeviceController::new();

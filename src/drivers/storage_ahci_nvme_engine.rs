@@ -44,13 +44,13 @@ pub enum StorageTransferStatus {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u8)]
 pub enum FisType {
-    RegH2d = 0x27, // Register FIS - host to device
-    RegD2h = 0x34, // Register FIS - device to host
-    DmaAct = 0x39, // DMA activate FIS - device to host
-    DmaSetup = 0x41, // DMA setup FIS - bidirectional
-    Data = 0x46,   // Data FIS - bidirectional
-    Bist = 0x58,   // BIST activate FIS - bidirectional
-    PioSetup = 0x5F, // PIO setup FIS - device to host
+    RegH2d = 0x27,     // Register FIS - host to device
+    RegD2h = 0x34,     // Register FIS - device to host
+    DmaAct = 0x39,     // DMA activate FIS - device to host
+    DmaSetup = 0x41,   // DMA setup FIS - bidirectional
+    Data = 0x46,       // Data FIS - bidirectional
+    Bist = 0x58,       // BIST activate FIS - bidirectional
+    PioSetup = 0x5F,   // PIO setup FIS - device to host
     SetDevBits = 0xA1, // Set device bits FIS - device to host
 }
 
@@ -83,15 +83,20 @@ impl AhciPrdtEntry {
 #[repr(C, packed)]
 #[derive(Debug, Clone, Copy, Default)]
 pub struct AhciCommandHeader {
-    pub flags: u16,        // CFL (bits 0-4), A, W, P, R, B, C, R, PMP (bits 12-15)
-    pub prdt_length: u16,  // PRDT entries count
+    pub flags: u16,          // CFL (bits 0-4), A, W, P, R, B, C, R, PMP (bits 12-15)
+    pub prdt_length: u16,    // PRDT entries count
     pub prd_byte_count: u32, // Transferred byte count
     pub command_table_base_addr: u64, // 64-bit physical address of Command Table
     pub reserved: [u32; 4],
 }
 
 impl AhciCommandHeader {
-    pub fn new(command_table_addr: u64, prdt_count: u16, is_write: bool, fis_length_dwords: u8) -> Self {
+    pub fn new(
+        command_table_addr: u64,
+        prdt_count: u16,
+        is_write: bool,
+        fis_length_dwords: u8,
+    ) -> Self {
         let mut flags: u16 = (fis_length_dwords as u16) & 0x1F;
         if is_write {
             flags |= 1 << 6; // Bit 6: Write
@@ -130,7 +135,12 @@ impl SovereignAhciPort {
         }
     }
 
-    pub fn issue_dma_rw(&self, lba: u64, sector_count: u16, is_write: bool) -> StorageTransferStatus {
+    pub fn issue_dma_rw(
+        &self,
+        lba: u64,
+        sector_count: u16,
+        is_write: bool,
+    ) -> StorageTransferStatus {
         if !self.is_connected {
             return StorageTransferStatus::DeviceError;
         }
@@ -140,9 +150,11 @@ impl SovereignAhciPort {
 
         self.active_commands.fetch_add(1, Ordering::SeqCst);
         if is_write {
-            self.total_sectors_written.fetch_add(sector_count as u64, Ordering::SeqCst);
+            self.total_sectors_written
+                .fetch_add(sector_count as u64, Ordering::SeqCst);
         } else {
-            self.total_sectors_read.fetch_add(sector_count as u64, Ordering::SeqCst);
+            self.total_sectors_read
+                .fetch_add(sector_count as u64, Ordering::SeqCst);
         }
         self.active_commands.fetch_sub(1, Ordering::SeqCst);
 
@@ -158,22 +170,29 @@ impl SovereignAhciPort {
 #[repr(C, packed)]
 #[derive(Debug, Clone, Copy, Default)]
 pub struct NvmeSubmissionQueueEntry {
-    pub cdw0: u32,       // Command identifier (bits 16-31), Fused (bits 8-9), Opcode (bits 0-7)
-    pub nsid: u32,       // Namespace Identifier
+    pub cdw0: u32, // Command identifier (bits 16-31), Fused (bits 8-9), Opcode (bits 0-7)
+    pub nsid: u32, // Namespace Identifier
     pub reserved0: u64,
-    pub mptr: u64,       // Metadata Pointer
-    pub prp1: u64,       // PRP Entry 1
-    pub prp2: u64,       // PRP Entry 2 (or PRP List pointer)
-    pub cdw10: u32,      // Command Dword 10 (e.g. Starting LBA lower 32 bits)
-    pub cdw11: u32,      // Command Dword 11 (Starting LBA upper 32 bits)
-    pub cdw12: u32,      // Command Dword 12 (Number of Logical Blocks, 0-based)
-    pub cdw13: u32,      // Command Dword 13 (DSM attributes)
-    pub cdw14: u32,      // Command Dword 14
-    pub cdw15: u32,      // Command Dword 15
+    pub mptr: u64,  // Metadata Pointer
+    pub prp1: u64,  // PRP Entry 1
+    pub prp2: u64,  // PRP Entry 2 (or PRP List pointer)
+    pub cdw10: u32, // Command Dword 10 (e.g. Starting LBA lower 32 bits)
+    pub cdw11: u32, // Command Dword 11 (Starting LBA upper 32 bits)
+    pub cdw12: u32, // Command Dword 12 (Number of Logical Blocks, 0-based)
+    pub cdw13: u32, // Command Dword 13 (DSM attributes)
+    pub cdw14: u32, // Command Dword 14
+    pub cdw15: u32, // Command Dword 15
 }
 
 impl NvmeSubmissionQueueEntry {
-    pub fn build_io_read(cid: u16, nsid: u32, prp1: u64, prp2: u64, start_lba: u64, count: u16) -> Self {
+    pub fn build_io_read(
+        cid: u16,
+        nsid: u32,
+        prp1: u64,
+        prp2: u64,
+        start_lba: u64,
+        count: u16,
+    ) -> Self {
         Self {
             cdw0: (0x02) | ((cid as u32) << 16), // Opcode 0x02 = NVM Read
             nsid,
@@ -190,7 +209,14 @@ impl NvmeSubmissionQueueEntry {
         }
     }
 
-    pub fn build_io_write(cid: u16, nsid: u32, prp1: u64, prp2: u64, start_lba: u64, count: u16) -> Self {
+    pub fn build_io_write(
+        cid: u16,
+        nsid: u32,
+        prp1: u64,
+        prp2: u64,
+        start_lba: u64,
+        count: u16,
+    ) -> Self {
         Self {
             cdw0: (0x01) | ((cid as u32) << 16), // Opcode 0x01 = NVM Write
             nsid,
@@ -359,14 +385,22 @@ impl SovereignStorageSubsystem {
     }
 
     /// Read physical sectors via DMA
-    pub fn read_sectors(&self, device_id: u32, start_sector: u64, sector_count: u32) -> StorageTransferStatus {
+    pub fn read_sectors(
+        &self,
+        device_id: u32,
+        start_sector: u64,
+        sector_count: u32,
+    ) -> StorageTransferStatus {
         let dev = match self.devices.get(&device_id) {
             Some(d) => d,
             None => return StorageTransferStatus::DeviceError,
         };
 
         let max_lba = dev.total_capacity_bytes / (dev.sector_size as u64);
-        if start_sector.checked_add(sector_count as u64).map_or(true, |end| end > max_lba) {
+        if start_sector
+            .checked_add(sector_count as u64)
+            .map_or(true, |end| end > max_lba)
+        {
             return StorageTransferStatus::InvalidSector;
         }
 
@@ -404,14 +438,22 @@ impl SovereignStorageSubsystem {
     }
 
     /// Write physical sectors via DMA
-    pub fn write_sectors(&self, device_id: u32, start_sector: u64, sector_count: u32) -> StorageTransferStatus {
+    pub fn write_sectors(
+        &self,
+        device_id: u32,
+        start_sector: u64,
+        sector_count: u32,
+    ) -> StorageTransferStatus {
         let dev = match self.devices.get(&device_id) {
             Some(d) => d,
             None => return StorageTransferStatus::DeviceError,
         };
 
         let max_lba = dev.total_capacity_bytes / (dev.sector_size as u64);
-        if start_sector.checked_add(sector_count as u64).map_or(true, |end| end > max_lba) {
+        if start_sector
+            .checked_add(sector_count as u64)
+            .map_or(true, |end| end > max_lba)
+        {
             return StorageTransferStatus::InvalidSector;
         }
 

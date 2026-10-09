@@ -179,11 +179,11 @@ mod tests {
         let mut plugin = QuickshellPlugin::new(
             String::from("bar"),
             String::from("Unified Bar"),
-            QuickshellPluginType::Bar
+            QuickshellPluginType::Bar,
         );
         plugin.set_config(String::from("position"), String::from("top"));
         plugin.set_ipc_endpoint(String::from("unix:/tmp/bar.sock"));
-        
+
         assert_eq!(plugin.plugin_type, QuickshellPluginType::Bar);
         assert_eq!(plugin.ipc_endpoint, String::from("unix:/tmp/bar.sock"));
     }
@@ -191,14 +191,14 @@ mod tests {
     #[test]
     fn test_quickshell_unified_shell() {
         let mut shell = QuickshellUnifiedShell::new();
-        
+
         let plugin = QuickshellPlugin::new(
             String::from("launcher"),
             String::from("Unified Launcher"),
-            QuickshellPluginType::Launcher
+            QuickshellPluginType::Launcher,
         );
         shell.add_plugin(plugin);
-        
+
         assert!(shell.activate_plugin(String::from("launcher")).is_ok());
         assert!(shell.active_plugins.contains(&String::from("launcher")));
     }
@@ -209,10 +209,10 @@ mod tests {
         let plugin = QuickshellPlugin::new(
             String::from("menu"),
             String::from("Unified Menu"),
-            QuickshellPluginType::Menu
+            QuickshellPluginType::Menu,
         );
         shell.add_plugin(plugin);
-        
+
         shell.activate_plugin(String::from("menu")).unwrap();
         shell.deactivate_plugin("menu");
         assert!(!shell.active_plugins.contains(&String::from("menu")));
@@ -224,14 +224,18 @@ mod tests {
         let plugin = QuickshellPlugin::new(
             String::from("notification"),
             String::from("Unified Notification"),
-            QuickshellPluginType::Notification
+            QuickshellPluginType::Notification,
         );
         shell.add_plugin(plugin);
         shell.activate_plugin(String::from("notification")).unwrap();
-        
-        assert!(shell.send_ipc_message("notification", String::from("show:hello")).is_ok());
+
+        assert!(shell
+            .send_ipc_message("notification", String::from("show:hello"))
+            .is_ok());
         shell.disable_ipc();
-        assert!(shell.send_ipc_message("notification", String::from("show:hello")).is_err());
+        assert!(shell
+            .send_ipc_message("notification", String::from("show:hello"))
+            .is_err());
     }
 
     #[test]
@@ -239,7 +243,7 @@ mod tests {
         let mut shell = QuickshellUnifiedShell::new();
         shell.set_theme_base(String::from("24-color"));
         shell.set_layout_mode(String::from("adaptive"));
-        
+
         assert_eq!(shell.theme_base, String::from("24-color"));
         assert_eq!(shell.layout_mode, String::from("adaptive"));
     }
