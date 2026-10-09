@@ -1,9 +1,10 @@
-# Documentation Source Policy
+# SIGMAOS DOCUMENTATION SOURCE POLICY
 
-## Overview
-All documentation for SigmaOS is maintained natively within the repository.
+## 1. Single Source of Truth
+The `docs/` directory serves as the canonical single source of truth for all technical documentation, specifications, architecture decision records, and roadmaps within the SigmaOS repository.
 
-## Rules
-1. `docs/` is the authoritative source for system documentation and specifications.
-2. Auto-generated assets for public deployment are produced directly from `docs/`.
-3. Legacy mirrors (`WIKI/`, `wiki_repo/`) are deprecated.
+## 2. Wiki Synchronization
+All GitHub Wiki content (`wiki/`, `WIKI/`) is generated and synchronized from the canonical documents in `docs/`. Direct modifications to `wiki_content/` or standalone `wiki/` files are prohibited.
+
+## 3. Self-Sufficiency Standard
+All documentation must maintain complete coverage of the 12 Core System Shards of SigmaOS, ensuring absolute self-sufficiency and zero external dependency requirements.
