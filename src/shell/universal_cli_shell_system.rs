@@ -46,6 +46,11 @@ pub enum ShellSystemFormat {
     Bsh,
     MinixSh,
     Psh,
+    BusyBox,
+    Almquist,
+    FreeBsdSh,
+    NetBsdSh,
+    OpenBsdSh,
 }
 
 impl ShellSystemFormat {
@@ -69,6 +74,11 @@ impl ShellSystemFormat {
             Self::Bsh => "Bourne Shell (Bsh)",
             Self::MinixSh => "Minix Shell",
             Self::Psh => "Perl Shell (Psh)",
+            Self::BusyBox => "BusyBox Ash Shell",
+            Self::Almquist => "Almquist Shell (ash)",
+            Self::FreeBsdSh => "FreeBSD Almquist Shell (sh)",
+            Self::NetBsdSh => "NetBSD Almquist Shell (sh)",
+            Self::OpenBsdSh => "OpenBSD Public Domain Ksh (sh)",
         }
     }
 
@@ -92,6 +102,11 @@ impl ShellSystemFormat {
             Self::Bsh => ".profile",
             Self::MinixSh => ".profile",
             Self::Psh => ".pshrc",
+            Self::BusyBox => ".profile",
+            Self::Almquist => ".profile",
+            Self::FreeBsdSh => ".profile",
+            Self::NetBsdSh => ".profile",
+            Self::OpenBsdSh => ".profile",
         }
     }
 
@@ -115,6 +130,11 @@ impl ShellSystemFormat {
             Self::Bsh => "#!/bin/bsh",
             Self::MinixSh => "#!/bin/minixsh",
             Self::Psh => "#!/usr/bin/env psh",
+            Self::BusyBox => "#!/bin/sh",
+            Self::Almquist => "#!/bin/ash",
+            Self::FreeBsdSh => "#!/bin/sh",
+            Self::NetBsdSh => "#!/bin/sh",
+            Self::OpenBsdSh => "#!/bin/sh",
         }
     }
 }
@@ -158,9 +178,19 @@ impl UniversalShellScriptTranspiler {
                     return ShellSystemFormat::Fish;
                 } else if line.contains("tcsh") || line.contains("csh") {
                     return ShellSystemFormat::Tcsh;
-                } else if line.contains("ksh") || line.contains("mksh") || line.contains("oksh") {
+                } else if line.contains("busybox") {
+                    return ShellSystemFormat::BusyBox;
+                } else if line.contains("freebsd") {
+                    return ShellSystemFormat::FreeBsdSh;
+                } else if line.contains("netbsd") {
+                    return ShellSystemFormat::NetBsdSh;
+                } else if line.contains("openbsd") || line.contains("oksh") {
+                    return ShellSystemFormat::OpenBsdSh;
+                } else if line.contains("ksh") || line.contains("mksh") {
                     return ShellSystemFormat::Ksh;
-                } else if line.contains("dash") || line.contains("ash") {
+                } else if line.contains("ash") {
+                    return ShellSystemFormat::Almquist;
+                } else if line.contains("dash") {
                     return ShellSystemFormat::Dash;
                 } else if line.contains("yash") {
                     return ShellSystemFormat::Yash;
@@ -264,7 +294,12 @@ impl UniversalShellScriptTranspiler {
                 | ShellSystemFormat::Es
                 | ShellSystemFormat::Bsh
                 | ShellSystemFormat::MinixSh
-                | ShellSystemFormat::Psh => {
+                | ShellSystemFormat::Psh
+                | ShellSystemFormat::BusyBox
+                | ShellSystemFormat::Almquist
+                | ShellSystemFormat::FreeBsdSh
+                | ShellSystemFormat::NetBsdSh
+                | ShellSystemFormat::OpenBsdSh => {
                     Self::transpile_bash_posix_line(line, &mut exported_vars)
                 }
             };
@@ -1156,6 +1191,57 @@ impl Default for UniversalShCrossDialectEngine {
 }
 
 // =========================================================================
+// 7. UNIVERSAL SH SCRIPT EXECUTION BRIDGE
+// =========================================================================
+
+pub struct UniversalShScriptExecutionBridge {
+    pub engine: UniversalShCrossDialectEngine,
+}
+
+impl UniversalShScriptExecutionBridge {
+    pub fn new() -> Self {
+        Self {
+            engine: UniversalShCrossDialectEngine::new(),
+        }
+    }
+
+    /// Wraps any foreign shell script into a clean, POSIX-compliant /bin/sh script string
+    pub fn generate_universal_sh_wrapper(&self, script: &str) -> String {
+        let plan = UniversalShellScriptTranspiler::transpile_script(script);
+        let mut wrapper = String::from("#!/bin/sh\n# SigmaOS Universal POSIX Execution Wrapper\nset -e\n");
+        for (k, v) in &plan.exported_variables {
+            wrapper.push_str(&format!("export {}=\"{}\"\n", k, v));
+        }
+        wrapper.push_str(&plan.posix_sh_script);
+        wrapper.push('\n');
+        wrapper
+    }
+
+    /// Prepares execution plan and exports environment variables for universal /bin/sh
+    pub fn execute_script_with_sh(
+        &mut self,
+        script: &str,
+    ) -> Result<UniversalExecutableScriptPlan, &'static str> {
+        self.engine.run_universal_sh_script(script)
+    }
+
+    /// Returns transpiled POSIX /bin/sh code and extracted exported variables
+    pub fn transpile_and_export_variables(
+        &self,
+        script: &str,
+    ) -> (String, BTreeMap<String, String>) {
+        let plan = UniversalShellScriptTranspiler::transpile_script(script);
+        (plan.posix_sh_script, plan.exported_variables)
+    }
+}
+
+impl Default for UniversalShScriptExecutionBridge {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
 // UNIT TESTS
 // =========================================================================
 
@@ -1306,5 +1392,20 @@ mod tests {
         let translated = engine.convert_to_posix_command("ps aux");
         assert_eq!(translated.canonical_command, "ps");
         assert_eq!(translated.translated_args, vec!["-e", "-f"]);
+    }
+
+    #[test]
+    fn test_universal_sh_execution_bridge_and_formats() {
+        let bridge = UniversalShScriptExecutionBridge::new();
+        let freebsd_script = "#!/usr/bin/freebsd-sh\nexport BSD_VAR=freebsd\necho hello_freebsd";
+        let wrapper = bridge.generate_universal_sh_wrapper(freebsd_script);
+
+        assert!(wrapper.contains("#!/bin/sh"));
+        assert!(wrapper.contains("export BSD_VAR=\"freebsd\""));
+        assert!(wrapper.contains("echo hello_freebsd"));
+
+        let (code, vars) = bridge.transpile_and_export_variables("#!/bin/busybox sh\nexport BBOX=1");
+        assert_eq!(vars.get("BBOX"), Some(&"1".to_string()));
+        assert!(code.contains("export BBOX=1"));
     }
 }

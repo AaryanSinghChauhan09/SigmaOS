@@ -1921,6 +1921,133 @@ impl ArcBoostDomainStylingEngine {
 }
 
 // =========================================================================
+// ADDITIONAL OPEN-SOURCE BROWSER INNOVATION ENGINES
+// =========================================================================
+
+pub struct FirefoxQuantumStyleSystemEngine {
+    pub css_variables: BTreeMap<String, String>,
+    pub dark_mode_preferred: bool,
+}
+
+impl FirefoxQuantumStyleSystemEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        let mut vars = BTreeMap::new();
+        vars.insert("--primary-color".to_string(), "#0060DF".to_string());
+        vars.insert("--bg-color".to_string(), "#FFFFFF".to_string());
+        Self {
+            css_variables: vars,
+            dark_mode_preferred: true,
+        }
+    }
+
+    pub fn resolve_var(&self, var_name: &str) -> String {
+        self.css_variables
+            .get(var_name)
+            .cloned()
+            .unwrap_or_else(|| "#000000".to_string())
+    }
+
+    pub fn evaluate_color_scheme_preference(&self) -> &'static str {
+        if self.dark_mode_preferred {
+            "dark"
+        } else {
+            "light"
+        }
+    }
+}
+
+pub struct ChromiumV8JitSandboxAuditorEngine {
+    pub compressed_pointer_base: u64,
+    pub sandbox_size_bytes: u64,
+}
+
+impl ChromiumV8JitSandboxAuditorEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            compressed_pointer_base: 0x1000_0000_0000,
+            sandbox_size_bytes: 0x0001_0000_0000, // 4GB V8 Heap Sandbox
+        }
+    }
+
+    pub fn verify_v8_compressed_pointer(&self, raw_tagged_ptr: u32) -> u64 {
+        self.compressed_pointer_base | (raw_tagged_ptr as u64 & !0x01)
+    }
+
+    pub fn audit_v8_jit_memory_bounds(&self, decompressed_ptr: u64) -> bool {
+        decompressed_ptr >= self.compressed_pointer_base
+            && decompressed_ptr < (self.compressed_pointer_base + self.sandbox_size_bytes)
+    }
+}
+
+pub struct FirefoxSpiderMonkeyJitCompilerEngine {
+    pub warp_compilation_tier: &'static str,
+    pub ic_stub_optimizations_count: u32,
+}
+
+impl FirefoxSpiderMonkeyJitCompilerEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            warp_compilation_tier: "WarpMonkey",
+            ic_stub_optimizations_count: 128,
+        }
+    }
+
+    pub fn optimize_ic_stub(&mut self, stub_id: u32) -> u32 {
+        self.ic_stub_optimizations_count += 1;
+        stub_id ^ 0xA5A5
+    }
+}
+
+pub struct ChromiumBlinkCssGridSubgridEngine {
+    pub subgrid_tracks: Vec<f32>,
+}
+
+impl ChromiumBlinkCssGridSubgridEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            subgrid_tracks: vec![120.0, 240.0, 360.0],
+        }
+    }
+
+    pub fn compute_subgrid_track_sizes(&mut self, parent_container_width: f32, columns: usize) -> Vec<f32> {
+        self.subgrid_tracks.clear();
+        if columns > 0 {
+            let track_w = parent_container_width / columns as f32;
+            for _ in 0..columns {
+                self.subgrid_tracks.push(track_w);
+            }
+        }
+        self.subgrid_tracks.clone()
+    }
+}
+
+pub struct LibreWolfStrictCanvasFingerprintDefenseEngine {
+    pub noise_seed: u64,
+}
+
+impl LibreWolfStrictCanvasFingerprintDefenseEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            noise_seed: 0x1234_5678_9ABC_DEF0,
+        }
+    }
+
+    pub fn randomize_canvas_pixels(&self, pixels: &mut [u8]) {
+        for (i, p) in pixels.iter_mut().enumerate() {
+            if i % 4 != 3 {
+                let delta = (((self.noise_seed ^ (i as u64 + 1)) % 3) as u8) + 1;
+                *p = p.wrapping_add(delta);
+            }
+        }
+    }
+}
+
+// =========================================================================
 // 22. UNIFIED SIGMAWEB BROWSER SUITE
 // =========================================================================
 
@@ -1980,6 +2107,11 @@ pub struct SigmaWebBrowser {
     pub floorp_split_mgr: FloorpSplitViewManagerEngine,
     pub vivaldi_spatial_vec: VivaldiSpatialVectorNavEngine,
     pub arc_boost_styling: ArcBoostDomainStylingEngine,
+    pub firefox_quantum_style: FirefoxQuantumStyleSystemEngine,
+    pub chromium_v8_jit_auditor: ChromiumV8JitSandboxAuditorEngine,
+    pub firefox_spidermonkey_jit: FirefoxSpiderMonkeyJitCompilerEngine,
+    pub blink_grid_subgrid: ChromiumBlinkCssGridSubgridEngine,
+    pub librewolf_strict_canvas_defense: LibreWolfStrictCanvasFingerprintDefenseEngine,
 }
 
 impl SigmaWebBrowser {
@@ -2041,6 +2173,11 @@ impl SigmaWebBrowser {
             floorp_split_mgr: FloorpSplitViewManagerEngine::new(),
             vivaldi_spatial_vec: VivaldiSpatialVectorNavEngine::new(),
             arc_boost_styling: ArcBoostDomainStylingEngine::new(),
+            firefox_quantum_style: FirefoxQuantumStyleSystemEngine::new(),
+            chromium_v8_jit_auditor: ChromiumV8JitSandboxAuditorEngine::new(),
+            firefox_spidermonkey_jit: FirefoxSpiderMonkeyJitCompilerEngine::new(),
+            blink_grid_subgrid: ChromiumBlinkCssGridSubgridEngine::new(),
+            librewolf_strict_canvas_defense: LibreWolfStrictCanvasFingerprintDefenseEngine::new(),
         }
     }
 
@@ -2901,6 +3038,31 @@ mod tests {
     }
 
     #[test]
+    fn test_new_open_source_browser_innovation_engines() {
+        let quantum = FirefoxQuantumStyleSystemEngine::new();
+        assert_eq!(quantum.resolve_var("--primary-color"), "#0060DF");
+        assert_eq!(quantum.evaluate_color_scheme_preference(), "dark");
+
+        let v8_auditor = ChromiumV8JitSandboxAuditorEngine::new();
+        let ptr = v8_auditor.verify_v8_compressed_pointer(0x2000);
+        assert!(v8_auditor.audit_v8_jit_memory_bounds(ptr));
+
+        let mut spidermonkey = FirefoxSpiderMonkeyJitCompilerEngine::new();
+        assert_eq!(spidermonkey.warp_compilation_tier, "WarpMonkey");
+        assert_ne!(spidermonkey.optimize_ic_stub(10), 10);
+
+        let mut subgrid = ChromiumBlinkCssGridSubgridEngine::new();
+        let tracks = subgrid.compute_subgrid_track_sizes(1000.0, 4);
+        assert_eq!(tracks.len(), 4);
+        assert_eq!(tracks[0], 250.0);
+
+        let canvas_defense = LibreWolfStrictCanvasFingerprintDefenseEngine::new();
+        let mut pixels = [10u8, 20, 30, 255];
+        canvas_defense.randomize_canvas_pixels(&mut pixels);
+        assert_ne!(pixels[0], 10);
+    }
+
+    #[test]
     fn test_expanded_open_source_browser_engines() {
         let mut geckoview = FirefoxGeckoViewLayoutEngine::new();
         let tracks = geckoview.compute_subgrid_tracks(900.0);
@@ -3251,6 +3413,19 @@ impl SovereignOpenSourceBrowserSuiteEngine {
             "arc_boost_active_count".to_string(),
             boost_count.to_string(),
         );
+
+        let quantum_color = self.browser.firefox_quantum_style.resolve_var("--primary-color");
+        results.insert("firefox_quantum_primary_color".to_string(), quantum_color);
+
+        let v8_decompressed = self.browser.chromium_v8_jit_auditor.verify_v8_compressed_pointer(0x1000);
+        let v8_bounded = self.browser.chromium_v8_jit_auditor.audit_v8_jit_memory_bounds(v8_decompressed);
+        results.insert("chromium_v8_jit_sandbox_bounded".to_string(), v8_bounded.to_string());
+
+        let spidermonkey_tier = self.browser.firefox_spidermonkey_jit.warp_compilation_tier;
+        results.insert("firefox_spidermonkey_tier".to_string(), spidermonkey_tier.to_string());
+
+        let subgrid_tracks = self.browser.blink_grid_subgrid.compute_subgrid_track_sizes(1200.0, 3);
+        results.insert("blink_subgrid_tracks_count".to_string(), subgrid_tracks.len().to_string());
 
         results
     }

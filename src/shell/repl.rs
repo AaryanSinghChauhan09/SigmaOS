@@ -214,6 +214,9 @@ pub enum ShellCommand {
     Dialect {
         code: String,
     },
+    SetShell {
+        format: String,
+    },
 
     Unknown(String),
 }
@@ -275,6 +278,7 @@ pub struct ShellRepl {
     pub installed_packages: std::collections::HashSet<String>,
     pub current_theme: String,
     pub current_profile: String,
+    pub active_shell_format: crate::shell::universal_cli_shell_system::ShellSystemFormat,
     pub a11y_features: std::collections::HashMap<String, bool>,
     pub command_history: Vec<String>,
     pub customization: CustomizationEngine,
@@ -317,6 +321,7 @@ impl ShellRepl {
             installed_packages: HashSet::new(),
             current_theme: "default".to_string(),
             current_profile: "default".to_string(),
+            active_shell_format: crate::shell::universal_cli_shell_system::ShellSystemFormat::Bash,
             a11y_features: HashMap::new(),
             command_history: Vec::new(),
             customization: CustomizationEngine::new(),
@@ -341,7 +346,7 @@ impl ShellRepl {
     }
 
     pub fn get_rendered_prompt(&self) -> String {
-        self.prompt_builder.render_prompt()
+        format!("[{}] {}", self.active_shell_format.name(), self.prompt_builder.render_prompt())
     }
 
     pub fn run(&mut self) {
@@ -879,6 +884,15 @@ impl ShellRepl {
                 if parts.len() >= 2 {
                     ShellCommand::Dialect {
                         code: parts[1..].join(" "),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "set-shell" | "chsh" => {
+                if parts.len() >= 2 {
+                    ShellCommand::SetShell {
+                        format: parts[1].trim_start_matches('-').to_string(),
                     }
                 } else {
                     ShellCommand::Unknown(input.to_string())
@@ -1502,6 +1516,29 @@ impl ShellRepl {
                 let dialect = crate::shell::zsh_bash_parity::UniversalShellCompatibilityEngine::detect_shebang_dialect(&code);
                 Ok(format!("Detected shell script dialect: {:?}", dialect))
             }
+            ShellCommand::SetShell { format } => {
+                let fmt = match format.to_lowercase().as_str() {
+                    "bash" => crate::shell::universal_cli_shell_system::ShellSystemFormat::Bash,
+                    "zsh" => crate::shell::universal_cli_shell_system::ShellSystemFormat::Zsh,
+                    "fish" => crate::shell::universal_cli_shell_system::ShellSystemFormat::Fish,
+                    "tcsh" | "csh" => crate::shell::universal_cli_shell_system::ShellSystemFormat::Tcsh,
+                    "ksh" | "mksh" | "oksh" => crate::shell::universal_cli_shell_system::ShellSystemFormat::Ksh,
+                    "dash" | "ash" => crate::shell::universal_cli_shell_system::ShellSystemFormat::Dash,
+                    "rc" => crate::shell::universal_cli_shell_system::ShellSystemFormat::Rc,
+                    "nu" | "nushell" => crate::shell::universal_cli_shell_system::ShellSystemFormat::Nushell,
+                    "ion" => crate::shell::universal_cli_shell_system::ShellSystemFormat::Ion,
+                    "elvish" => crate::shell::universal_cli_shell_system::ShellSystemFormat::Elvish,
+                    "xonsh" => crate::shell::universal_cli_shell_system::ShellSystemFormat::Xonsh,
+                    "pwsh" | "powershell" => crate::shell::universal_cli_shell_system::ShellSystemFormat::PowerShell,
+                    "busybox" => crate::shell::universal_cli_shell_system::ShellSystemFormat::BusyBox,
+                    "freebsd" | "freebsd-sh" => crate::shell::universal_cli_shell_system::ShellSystemFormat::FreeBsdSh,
+                    "netbsd" | "netbsd-sh" => crate::shell::universal_cli_shell_system::ShellSystemFormat::NetBsdSh,
+                    "openbsd" | "openbsd-sh" => crate::shell::universal_cli_shell_system::ShellSystemFormat::OpenBsdSh,
+                    _ => crate::shell::universal_cli_shell_system::ShellSystemFormat::Bash,
+                };
+                self.active_shell_format = fmt;
+                Ok(format!("Active REPL shell format switched to: {}", fmt.name()))
+            }
 
             ShellCommand::Echo { message } => Ok(message.clone()),
             ShellCommand::Set { variable, value } => {
@@ -2046,8 +2083,15 @@ mod tests {
         let unveil_res = repl.execute_command(unveil_cmd).unwrap();
         assert!(unveil_res.contains("Unveiled path '/usr/bin'"));
 
-        // Test prompt rendering
+        // Test prompt rendering and shell switching
         let rendered_prompt = repl.get_rendered_prompt();
+        assert!(rendered_prompt.contains("GNU Bash"));
         assert!(rendered_prompt.contains("ubuntu@sigmaos"));
+
+        let switch_cmd = repl.parse_command("set-shell zsh");
+        assert!(matches!(switch_cmd, ShellCommand::SetShell { .. }));
+        let switch_res = repl.execute_command(switch_cmd).unwrap();
+        assert!(switch_res.contains("Z Shell"));
+        assert!(repl.get_rendered_prompt().contains("Z Shell"));
     }
 }
