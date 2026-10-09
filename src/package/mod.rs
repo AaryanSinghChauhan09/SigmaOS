@@ -101,6 +101,10 @@ pub mod sovereign_distro_package_advancements_v19;
 pub use sovereign_distro_package_advancements_v19::*;
 pub mod sovereign_distro_package_advancements_v20;
 pub use sovereign_distro_package_advancements_v20::*;
+pub mod sovereign_distro_package_advancements_v30;
+pub use sovereign_distro_package_advancements_v30::*;
+pub mod sovereign_distro_package_advancements_v31;
+pub use sovereign_distro_package_advancements_v31::*;
 pub mod sovereign_universal_multi_distro_pm_gateway;
 pub use sovereign_universal_multi_distro_pm_gateway::*;
 
