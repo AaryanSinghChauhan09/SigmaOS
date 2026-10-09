@@ -99,6 +99,8 @@ pub mod sovereign_distro_package_advancements_v18;
 pub use sovereign_distro_package_advancements_v18::*;
 pub mod sovereign_distro_package_advancements_v20;
 pub use sovereign_distro_package_advancements_v20::*;
+pub mod sovereign_distro_package_advancements_v26;
+pub use sovereign_distro_package_advancements_v26::*;
 pub mod sovereign_universal_multi_distro_pm_gateway;
 pub use sovereign_universal_multi_distro_pm_gateway::*;
 pub mod omarchy_pr_proposal_engine;
