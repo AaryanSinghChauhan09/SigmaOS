@@ -112,7 +112,10 @@ pub use linuxmint_inspirations::{
     XAppDocumentReader, XAppImageViewer, XAppStatusIconBadgeManager, XAppTextEditor,
     XAppThemeEngine, XAppTrayBadge, WARP_AUTH_PORT, WARP_MDNS_UDP_PORT, WARP_TRANSFER_PORT,
 };
+pub mod distro_inspirations;
 pub mod open_source_obsoletion;
+pub mod open_source_os_missing_components_parity;
+pub use open_source_os_missing_components_parity::*;
 pub mod tools;
 pub use distro::additional_linux_bsd_components::*;
 pub use distro::sovereign_2050_distro_supremacy_engine::*;
