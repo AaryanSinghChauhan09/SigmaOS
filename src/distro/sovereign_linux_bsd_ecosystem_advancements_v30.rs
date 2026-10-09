@@ -21,8 +21,6 @@ use alloc::format;
 use alloc::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec;
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::BTreeMap;

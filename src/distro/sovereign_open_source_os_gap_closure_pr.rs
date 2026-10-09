@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-// Sovereign Open Source Operating System Gap Closure PR Suite V30
+// Sovereign Open Source Operating System Gap Closure PR Suite
 // (`src/distro/sovereign_open_source_os_gap_closure_pr.rs`)
 //
 // Implements missing components from open source operating systems (FreeBSD, OpenBSD,
