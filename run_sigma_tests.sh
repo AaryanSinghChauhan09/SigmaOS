@@ -689,4 +689,11 @@ if [ -f "src/desktop/omarchy_browser_theme_sync.rs" ]; then
     ./build/test_browser_sync
 fi
 
+if [ -f "src/distro/sovereign_open_source_os_fedora_github_pr_suite.rs" ]; then
+    echo "Running Sovereign Open Source OS & Fedora GitHub PR Suite test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_open_source_os_fedora_github_pr_suite.rs --edition=2021 -o build/test_fedora_github_pr
+    ./build/test_fedora_github_pr
+fi
+
 echo "All SigmaOS test suites completed."
