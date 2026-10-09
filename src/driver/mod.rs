@@ -28,6 +28,10 @@ pub mod vault;
 pub mod wifi_broadcom_bcm4318;
 pub mod wifi_intel_iwlwifi;
 
+pub use ahci::{
+    AhciCommandFis, AhciCommandHeader, AhciController, AhciGenericHostControl, AhciPort, AhciPrdt,
+    AhciReceivedFis, SataDevice, SataDeviceType,
+};
 pub use driver_test_framework::{
     DriverTestRunner, GpuTestSuite, GuestOs, MockMmioSpace, MockPciDevice, NicTestSuite,
     QemuSimulator, StorageTestSuite, TestResult, TestStatus, TestSummary, WifiTestSuite,
@@ -62,14 +66,10 @@ pub use network_framework::{
 pub use nic_intel_e1000::{DmaRing, IntelNicDriver, IntelNicPciDriver, RxDescriptor, TxDescriptor};
 pub use nic_realtek_rtl8169::{RealtekNicDriver, RealtekRtl8169PciDriver};
 pub use nvme::{
-    NvmeCompletionEntry, NvmeController, NvmeIdentifyControllerData, NvmeLbaFormat,
-    NvmeNamespace, NvmeNamespaceData, NvmeQueue, NvmeRegisters, NvmeSubmissionEntry,
+    NvmeCompletionEntry, NvmeController, NvmeIdentifyControllerData, NvmeLbaFormat, NvmeNamespace,
+    NvmeNamespaceData, NvmeQueue, NvmeRegisters, NvmeSubmissionEntry,
 };
 pub use nvme_storage::{NvmePciDriver, QueuePair};
-pub use ahci::{
-    AhciCommandFis, AhciCommandHeader, AhciController, AhciGenericHostControl, AhciPort,
-    AhciPrdt, AhciReceivedFis, SataDevice, SataDeviceType,
-};
 pub use pci_bus::{
     PciAddress, PciBarInfo, PciBarType, PciBusManager, PciDeviceNode, PciDriverMatchRule,
     PciHardwareAccess, PciHeaderType, PciInterruptMode, PcieAerLog, PcieAerSeverity, PcieAspmState,

@@ -113,13 +113,62 @@ impl ApplicationLauncher {
     /// Add default applications
     fn add_default_apps(&mut self) {
         let apps = vec![
-            ("terminal", "Terminal", "sigma-terminal", "terminal", LauncherCategory::System, "Terminal emulator"),
-            ("file-manager", "Files", "sigma-file-manager", "folder", LauncherCategory::System, "File manager"),
-            ("text-editor", "Text Editor", "sigma-text-editor", "text-editor", LauncherCategory::Development, "Text editor"),
-            ("web-browser", "Web Browser", "sigma-web-browser", "web-browser", LauncherCategory::Network, "Web browser"),
-            ("media-player", "Media Player", "sigma-media-player", "media-player", LauncherCategory::Multimedia, "Media player"),
-            ("settings", "Settings", "sigma-settings", "settings", LauncherCategory::System, "System settings"),
-            ("calculator", "Calculator", "sigma-calculator", "calculator", LauncherCategory::Utility, "Calculator"),
+            (
+                "terminal",
+                "Terminal",
+                "sigma-terminal",
+                "terminal",
+                LauncherCategory::System,
+                "Terminal emulator",
+            ),
+            (
+                "file-manager",
+                "Files",
+                "sigma-file-manager",
+                "folder",
+                LauncherCategory::System,
+                "File manager",
+            ),
+            (
+                "text-editor",
+                "Text Editor",
+                "sigma-text-editor",
+                "text-editor",
+                LauncherCategory::Development,
+                "Text editor",
+            ),
+            (
+                "web-browser",
+                "Web Browser",
+                "sigma-web-browser",
+                "web-browser",
+                LauncherCategory::Network,
+                "Web browser",
+            ),
+            (
+                "media-player",
+                "Media Player",
+                "sigma-media-player",
+                "media-player",
+                LauncherCategory::Multimedia,
+                "Media player",
+            ),
+            (
+                "settings",
+                "Settings",
+                "sigma-settings",
+                "settings",
+                LauncherCategory::System,
+                "System settings",
+            ),
+            (
+                "calculator",
+                "Calculator",
+                "sigma-calculator",
+                "calculator",
+                LauncherCategory::Utility,
+                "Calculator",
+            ),
         ];
 
         for (id, name, exec, icon, category, description) in apps {
@@ -155,7 +204,8 @@ impl ApplicationLauncher {
         if category == LauncherCategory::All {
             self.list_apps()
         } else {
-            self.apps.values()
+            self.apps
+                .values()
                 .filter(|a| a.category == category)
                 .collect()
         }
@@ -164,17 +214,20 @@ impl ApplicationLauncher {
     /// Search applications
     pub fn search(&self, query: &str) -> Vec<&LauncherApp> {
         let query_lower = query.to_lowercase();
-        self.apps.values()
+        self.apps
+            .values()
             .filter(|a| {
-                a.name.to_lowercase().contains(&query_lower) ||
-                a.description.to_lowercase().contains(&query_lower)
+                a.name.to_lowercase().contains(&query_lower)
+                    || a.description.to_lowercase().contains(&query_lower)
             })
             .collect()
     }
 
     /// Launch an application
     pub fn launch(&mut self, id: &str) -> Result<(), String> {
-        let app = self.apps.get(id)
+        let app = self
+            .apps
+            .get(id)
             .ok_or_else(|| format!("Application {} not found", id))?;
 
         // Add to recent
@@ -194,7 +247,9 @@ impl ApplicationLauncher {
 
     /// Add to favorites
     pub fn add_favorite(&mut self, id: &str) -> Result<(), String> {
-        let app = self.apps.get_mut(id)
+        let app = self
+            .apps
+            .get_mut(id)
             .ok_or_else(|| format!("Application {} not found", id))?;
 
         app.set_favorite(true);
@@ -203,7 +258,9 @@ impl ApplicationLauncher {
 
     /// Remove from favorites
     pub fn remove_favorite(&mut self, id: &str) -> Result<(), String> {
-        let app = self.apps.get_mut(id)
+        let app = self
+            .apps
+            .get_mut(id)
             .ok_or_else(|| format!("Application {} not found", id))?;
 
         app.set_favorite(false);
@@ -212,14 +269,13 @@ impl ApplicationLauncher {
 
     /// List favorites
     pub fn list_favorites(&self) -> Vec<&LauncherApp> {
-        self.apps.values()
-            .filter(|a| a.is_favorite)
-            .collect()
+        self.apps.values().filter(|a| a.is_favorite).collect()
     }
 
     /// List recent applications
     pub fn list_recent(&self) -> Vec<&LauncherApp> {
-        self.recent_apps.iter()
+        self.recent_apps
+            .iter()
             .filter_map(|id| self.apps.get(id))
             .collect()
     }
@@ -227,9 +283,7 @@ impl ApplicationLauncher {
     /// Get statistics
     pub fn get_statistics(&self) -> LauncherStatistics {
         let total_apps = self.apps.len();
-        let favorite_count = self.apps.values()
-            .filter(|a| a.is_favorite)
-            .count();
+        let favorite_count = self.apps.values().filter(|a| a.is_favorite).count();
         let recent_count = self.recent_apps.len();
 
         LauncherStatistics {
@@ -260,8 +314,14 @@ mod tests {
 
     #[test]
     fn test_launcher_category_from_str() {
-        assert_eq!(LauncherCategory::from_str("system"), Some(LauncherCategory::System));
-        assert_eq!(LauncherCategory::from_str("development"), Some(LauncherCategory::Development));
+        assert_eq!(
+            LauncherCategory::from_str("system"),
+            Some(LauncherCategory::System)
+        );
+        assert_eq!(
+            LauncherCategory::from_str("development"),
+            Some(LauncherCategory::Development)
+        );
     }
 
     #[test]

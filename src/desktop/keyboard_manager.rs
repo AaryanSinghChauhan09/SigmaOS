@@ -90,8 +90,8 @@ pub struct KeyboardConfiguration {
     pub layout: String,
     pub variant: Option<String>,
     pub repeat_mode: RepeatMode,
-    pub repeat_delay: u32,    // milliseconds
-    pub repeat_rate: u32,     // repeats per second
+    pub repeat_delay: u32, // milliseconds
+    pub repeat_rate: u32,  // repeats per second
     pub numlock_on: bool,
     pub capslock_warning: bool,
 }
@@ -423,10 +423,7 @@ mod tests {
         let mut manager = DesktopKeyboardManager::new();
         let initial_count = manager.get_devices().len();
 
-        let device = KeyboardDevice::new(
-            "custom".to_string(),
-            "Custom Keyboard".to_string(),
-        );
+        let device = KeyboardDevice::new("custom".to_string(), "Custom Keyboard".to_string());
 
         let id = manager.add_device(device);
         assert!(manager.get_device(&id).is_some());
@@ -437,10 +434,7 @@ mod tests {
     fn test_remove_device() {
         let mut manager = DesktopKeyboardManager::new();
 
-        let device = KeyboardDevice::new(
-            "custom".to_string(),
-            "Custom Keyboard".to_string(),
-        );
+        let device = KeyboardDevice::new("custom".to_string(), "Custom Keyboard".to_string());
 
         let id = manager.add_device(device);
         assert!(manager.remove_device(&id));
@@ -496,10 +490,7 @@ mod tests {
         if layouts.len() > 1 {
             let new_layout_id = layouts[1].id.clone();
             assert!(manager.set_current_layout(&new_layout_id));
-            assert_eq!(
-                manager.get_current_layout().unwrap().id,
-                new_layout_id
-            );
+            assert_eq!(manager.get_current_layout().unwrap().id, new_layout_id);
         }
     }
 
@@ -570,8 +561,10 @@ mod tests {
 
         assert!(!results.is_empty());
         for layout in results {
-            assert!(layout.name.to_lowercase().contains("english")
-                || layout.language.to_lowercase().contains("en"));
+            assert!(
+                layout.name.to_lowercase().contains("english")
+                    || layout.language.to_lowercase().contains("en")
+            );
         }
     }
 

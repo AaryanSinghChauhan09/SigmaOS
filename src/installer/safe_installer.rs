@@ -1,7 +1,6 @@
 /// SigmaOS Safe Installer (Phase 3)
 /// Inspired by Linux Mint's Ubiquity and Omarchy's streamlined setup.
 /// CRITICAL: No unsafe defaults. All destructive ops require explicit confirmation.
-
 use std::string::String;
 use std::vec::Vec;
 
@@ -116,7 +115,8 @@ impl SafeInstaller {
     pub fn create_partitions(&mut self) -> Result<(), &'static str> {
         self.validate_target()?;
         if self.config.dry_run {
-            self.log.push("[DRY-RUN] Would create GPT partitions".into());
+            self.log
+                .push("[DRY-RUN] Would create GPT partitions".into());
         } else {
             self.log.push("Created GPT partition table".into());
         }
@@ -198,10 +198,9 @@ mod tests {
         assert!(inst.create_user().is_ok());
         assert!(inst.install_bootloader().is_ok());
         assert!(inst.finalize().is_ok());
-        assert!(inst
-            .log
-            .iter()
-            .all(|l| l.contains("[DRY-RUN]") || l.contains("Discovered") || l.contains("finalized")));
+        assert!(inst.log.iter().all(|l| l.contains("[DRY-RUN]")
+            || l.contains("Discovered")
+            || l.contains("finalized")));
     }
 
     #[test]
@@ -232,13 +231,8 @@ mod tests {
 
     #[test]
     fn test_ordering_enforced() {
-        let mut inst = SafeInstaller::new(
-            "h",
-            "u",
-            "p",
-            DiskTarget::Explicit("/dev/vda".into()),
-            true,
-        );
+        let mut inst =
+            SafeInstaller::new("h", "u", "p", DiskTarget::Explicit("/dev/vda".into()), true);
         inst.discover_disks();
         inst.confirm_destructive();
         assert!(inst.install_system().is_err()); // must partition first

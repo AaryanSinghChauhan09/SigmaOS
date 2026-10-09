@@ -10,8 +10,8 @@ pub mod sovereign_video_editor;
 pub mod sovereign_video_player;
 
 pub use distro_media_engine::{
-    AudioSinkBackend, FfmpegHwEncoderBackend, FfmpegZeroCopyEncoder, GstHardwareDecoder,
-    GStreamerPulseAudioPipeline, LinuxBsdDistroMediaSuite, MpvAudioTrack, MpvFreeBsdSndioEngine,
+    AudioSinkBackend, FfmpegHwEncoderBackend, FfmpegZeroCopyEncoder, GStreamerPulseAudioPipeline,
+    GstHardwareDecoder, LinuxBsdDistroMediaSuite, MpvAudioTrack, MpvFreeBsdSndioEngine,
     SubtitleTrackEntry, VlcSubtitleManager,
 };
 
@@ -26,8 +26,9 @@ pub use browser::{
     ChromiumBlinkLayoutEngine, ChromiumIpcChannelEngine, ChromiumIpcMessage,
     ChromiumPartitionAllocSlotGuardEngine, DeclarativeNetRequestEngine, DnrActionType,
     DohEchEncryptionEngine, DuckAssistPrivacyEngine, DuckDuckGoAiAssistSummarizerEngine,
-    FirefoxContainerJarManager, FirefoxContentSecurityPolicyEngine, FirefoxGeckoFlexboxLayoutEngine,
-    FirefoxGeckoViewLayoutEngine, FirefoxTotalCookieProtectionEngine, FloorpSplitViewManagerEngine,
+    FirefoxContainerJarManager, FirefoxContentSecurityPolicyEngine,
+    FirefoxGeckoFlexboxLayoutEngine, FirefoxGeckoViewLayoutEngine,
+    FirefoxTotalCookieProtectionEngine, FloorpSplitViewManagerEngine,
     FloorpWorkspacesSplitViewEngine, GlobalPrivacyControl, LadybirdLibWebCss3ParserEngine,
     LadybirdLibWebCssParserEngine, LibreWolfStrictFingerprintingProtectionEngine,
     LibreWolfWebRtcProtectionEngine, MullvadODohRelayEngine, MullvadPrivacyIsolationEngine,

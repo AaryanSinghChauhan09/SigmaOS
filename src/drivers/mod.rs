@@ -1,5 +1,4 @@
 // SigmaOS Drivers Module
-pub mod driver_manager;
 pub mod acpi;
 pub mod advanced_types;
 pub mod ahci_sata;
@@ -9,6 +8,7 @@ pub mod block_io;
 pub mod boot_init;
 pub mod dde;
 pub mod distro_device_expansion;
+pub mod driver_manager;
 pub mod drm_kms;
 pub mod ethernet;
 pub mod even_more_devices;
@@ -99,9 +99,7 @@ pub use touch_jingos::TouchJingosDriver;
 pub use usb_hid::{HidError, HidKeyboardEvent, HidReportType, UsbHidDriver};
 pub use vesa::{VesaDriver, VesaError, VesaModeInfo};
 
-pub use driver_manager::{
-    Driver, DriverManager, DriverStatistics, DriverStatus, DriverType,
-};
+pub use driver_manager::{Driver, DriverManager, DriverStatistics, DriverStatus, DriverType};
 pub use ethernet::{
     E1000Device, EtherType, EthernetError, EthernetFrame, EthernetHeader, MacAddr, NetDevStats,
     NetDevice,

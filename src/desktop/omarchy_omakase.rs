@@ -258,10 +258,16 @@ impl SovereignOmarchyCompleteDeveloperEnvironmentEngine {
     }
 
     pub fn verify_complete_developer_environment(&self) -> bool {
-        let term_ok = self.terminal.generate_alacritty_toml().contains("JetBrainsMono");
+        let term_ok = self
+            .terminal
+            .generate_alacritty_toml()
+            .contains("JetBrainsMono");
         let nvim_ok = self.nvim.generate_init_lua().contains("rust_analyzer");
         let tmux_ok = self.tmux.generate_tmux_conf().contains("prefix C-a");
-        let wofi_ok = self.launcher.generate_wofi_style_css().contains("tokyonight");
+        let wofi_ok = self
+            .launcher
+            .generate_wofi_style_css()
+            .contains("tokyonight");
 
         term_ok && nvim_ok && tmux_ok && wofi_ok
     }

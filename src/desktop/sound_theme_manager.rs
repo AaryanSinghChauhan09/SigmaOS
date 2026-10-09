@@ -83,7 +83,7 @@ impl DesktopSoundTheme {
 pub struct DesktopSoundThemeManager {
     themes: HashMap<String, DesktopSoundTheme>,
     current_theme: Option<String>,
-    volume: u32,  // 0-100
+    volume: u32, // 0-100
     counter: u32,
 }
 
@@ -110,16 +110,46 @@ impl DesktopSoundThemeManager {
         );
 
         // Add default sounds
-        theme.add_sound(SoundEventType::Boot, "/usr/share/sounds/sigmaos/boot.ogg".to_string());
-        theme.add_sound(SoundEventType::Shutdown, "/usr/share/sounds/sigmaos/shutdown.ogg".to_string());
-        theme.add_sound(SoundEventType::Notification, "/usr/share/sounds/sigmaos/notification.ogg".to_string());
-        theme.add_sound(SoundEventType::Message, "/usr/share/sounds/sigmaos/message.ogg".to_string());
-        theme.add_sound(SoundEventType::Error, "/usr/share/sounds/sigmaos/error.ogg".to_string());
-        theme.add_sound(SoundEventType::Warning, "/usr/share/sounds/sigmaos/warning.ogg".to_string());
-        theme.add_sound(SoundEventType::Success, "/usr/share/sounds/sigmaos/success.ogg".to_string());
-        theme.add_sound(SoundEventType::BatteryLow, "/usr/share/sounds/sigmaos/battery-low.ogg".to_string());
-        theme.add_sound(SoundEventType::DeviceConnect, "/usr/share/sounds/sigmaos/device-connect.ogg".to_string());
-        theme.add_sound(SoundEventType::DeviceDisconnect, "/usr/share/sounds/sigmaos/device-disconnect.ogg".to_string());
+        theme.add_sound(
+            SoundEventType::Boot,
+            "/usr/share/sounds/sigmaos/boot.ogg".to_string(),
+        );
+        theme.add_sound(
+            SoundEventType::Shutdown,
+            "/usr/share/sounds/sigmaos/shutdown.ogg".to_string(),
+        );
+        theme.add_sound(
+            SoundEventType::Notification,
+            "/usr/share/sounds/sigmaos/notification.ogg".to_string(),
+        );
+        theme.add_sound(
+            SoundEventType::Message,
+            "/usr/share/sounds/sigmaos/message.ogg".to_string(),
+        );
+        theme.add_sound(
+            SoundEventType::Error,
+            "/usr/share/sounds/sigmaos/error.ogg".to_string(),
+        );
+        theme.add_sound(
+            SoundEventType::Warning,
+            "/usr/share/sounds/sigmaos/warning.ogg".to_string(),
+        );
+        theme.add_sound(
+            SoundEventType::Success,
+            "/usr/share/sounds/sigmaos/success.ogg".to_string(),
+        );
+        theme.add_sound(
+            SoundEventType::BatteryLow,
+            "/usr/share/sounds/sigmaos/battery-low.ogg".to_string(),
+        );
+        theme.add_sound(
+            SoundEventType::DeviceConnect,
+            "/usr/share/sounds/sigmaos/device-connect.ogg".to_string(),
+        );
+        theme.add_sound(
+            SoundEventType::DeviceDisconnect,
+            "/usr/share/sounds/sigmaos/device-disconnect.ogg".to_string(),
+        );
 
         let theme_id = theme.id.clone();
         self.themes.insert(theme_id.clone(), theme);
@@ -185,7 +215,12 @@ impl DesktopSoundThemeManager {
         self.volume
     }
 
-    pub fn add_sound_to_theme(&mut self, theme_id: &str, event: SoundEventType, file_path: String) -> bool {
+    pub fn add_sound_to_theme(
+        &mut self,
+        theme_id: &str,
+        event: SoundEventType,
+        file_path: String,
+    ) -> bool {
         if let Some(theme) = self.themes.get_mut(theme_id) {
             theme.add_sound(event, file_path);
             true
@@ -332,7 +367,10 @@ mod tests {
         ));
 
         let theme = manager.get_theme(theme_id).unwrap();
-        assert_eq!(theme.get_sound(SoundEventType::Message), Some(&"/custom/message.ogg".to_string()));
+        assert_eq!(
+            theme.get_sound(SoundEventType::Message),
+            Some(&"/custom/message.ogg".to_string())
+        );
     }
 
     #[test]

@@ -49,7 +49,7 @@ impl MintstickFlasher {
         self.progress = 100.0;
         Ok(())
     }
-    
+
     pub fn verify_checksum(&self) -> bool {
         true
     }
@@ -61,35 +61,60 @@ mod tests {
 
     #[test]
     fn test_safety_validator_system() {
-        let dev = BlockDevice { path: String::from("/dev/sda1"), is_system_partition: true, is_mounted: false, size_bytes: 100000 };
+        let dev = BlockDevice {
+            path: String::from("/dev/sda1"),
+            is_system_partition: true,
+            is_mounted: false,
+            size_bytes: 100000,
+        };
         let flasher = MintstickFlasher::new(dev, String::from("image.iso"));
         assert!(flasher.validate_safety().is_err());
     }
 
     #[test]
     fn test_safety_validator_mounted() {
-        let dev = BlockDevice { path: String::from("/dev/sdb1"), is_system_partition: false, is_mounted: true, size_bytes: 100000 };
+        let dev = BlockDevice {
+            path: String::from("/dev/sdb1"),
+            is_system_partition: false,
+            is_mounted: true,
+            size_bytes: 100000,
+        };
         let flasher = MintstickFlasher::new(dev, String::from("image.iso"));
         assert!(flasher.validate_safety().is_err());
     }
 
     #[test]
     fn test_safety_validator_ok() {
-        let dev = BlockDevice { path: String::from("/dev/sdc1"), is_system_partition: false, is_mounted: false, size_bytes: 100000 };
+        let dev = BlockDevice {
+            path: String::from("/dev/sdc1"),
+            is_system_partition: false,
+            is_mounted: false,
+            size_bytes: 100000,
+        };
         let flasher = MintstickFlasher::new(dev, String::from("image.iso"));
         assert!(flasher.validate_safety().is_ok());
     }
 
     #[test]
     fn test_formatting() {
-        let dev = BlockDevice { path: String::from("/dev/sdc1"), is_system_partition: false, is_mounted: false, size_bytes: 100000 };
+        let dev = BlockDevice {
+            path: String::from("/dev/sdc1"),
+            is_system_partition: false,
+            is_mounted: false,
+            size_bytes: 100000,
+        };
         let mut flasher = MintstickFlasher::new(dev, String::from("image.iso"));
         assert!(flasher.format_device(FsFormat::FAT32).is_ok());
     }
 
     #[test]
     fn test_flashing_progress() {
-        let dev = BlockDevice { path: String::from("/dev/sdc1"), is_system_partition: false, is_mounted: false, size_bytes: 100000 };
+        let dev = BlockDevice {
+            path: String::from("/dev/sdc1"),
+            is_system_partition: false,
+            is_mounted: false,
+            size_bytes: 100000,
+        };
         let mut flasher = MintstickFlasher::new(dev, String::from("image.iso"));
         assert!(flasher.start_flashing().is_ok());
         assert_eq!(flasher.progress, 100.0);

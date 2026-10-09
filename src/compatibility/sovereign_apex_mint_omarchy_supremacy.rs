@@ -239,7 +239,7 @@ pub struct NimThemeCompilerBridge {
 impl NimThemeCompilerBridge {
     pub fn new() -> Self {
         Self {
-            theme_count: 30, // 22 Omarchy + 8 SigmaOS exclusive
+            theme_count: 30,              // 22 Omarchy + 8 SigmaOS exclusive
             last_compile_latency_us: 750, // Sub-millisecond (<0.8ms)
         }
     }
@@ -283,10 +283,22 @@ pub struct SovereignApexSupremacyEngine {
 impl SovereignApexSupremacyEngine {
     pub fn new() -> Self {
         let mut status = BTreeMap::new();
-        status.insert("Rust".into(), "Kernel Core, MMU, VFS, Drivers (#![no_std])".into());
-        status.insert("Zig".into(), "Vulkan GPU Wayland Engine, Direct-I/O Flasher".into());
-        status.insert("Nim".into(), "P2P Warpinator Mesh, Fast Palette AST Compiler".into());
-        status.insert("Shell".into(), "Automated System Benchmarking & Bootstrap".into());
+        status.insert(
+            "Rust".into(),
+            "Kernel Core, MMU, VFS, Drivers (#![no_std])".into(),
+        );
+        status.insert(
+            "Zig".into(),
+            "Vulkan GPU Wayland Engine, Direct-I/O Flasher".into(),
+        );
+        status.insert(
+            "Nim".into(),
+            "P2P Warpinator Mesh, Fast Palette AST Compiler".into(),
+        );
+        status.insert(
+            "Shell".into(),
+            "Automated System Benchmarking & Bootstrap".into(),
+        );
 
         Self {
             zig_gpu: ZigGpuCompositorBridge::new(),

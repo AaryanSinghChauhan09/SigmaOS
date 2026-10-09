@@ -209,14 +209,26 @@ mod tests {
 
     #[test]
     fn test_screen_saver_mode_from_str() {
-        assert_eq!(DesktopScreenSaverMode::from_str("blank"), Some(DesktopScreenSaverMode::Blank));
-        assert_eq!(DesktopScreenSaverMode::from_str("photos"), Some(DesktopScreenSaverMode::Photos));
+        assert_eq!(
+            DesktopScreenSaverMode::from_str("blank"),
+            Some(DesktopScreenSaverMode::Blank)
+        );
+        assert_eq!(
+            DesktopScreenSaverMode::from_str("photos"),
+            Some(DesktopScreenSaverMode::Photos)
+        );
     }
 
     #[test]
     fn test_lock_on_sleep_from_str() {
-        assert_eq!(DesktopLockOnSleep::from_str("never"), Some(DesktopLockOnSleep::Never));
-        assert_eq!(DesktopLockOnSleep::from_str("whenscreensaver"), Some(DesktopLockOnSleep::WhenScreenSaver));
+        assert_eq!(
+            DesktopLockOnSleep::from_str("never"),
+            Some(DesktopLockOnSleep::Never)
+        );
+        assert_eq!(
+            DesktopLockOnSleep::from_str("whenscreensaver"),
+            Some(DesktopLockOnSleep::WhenScreenSaver)
+        );
     }
 
     #[test]

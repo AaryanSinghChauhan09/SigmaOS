@@ -50,11 +50,7 @@ pub struct DisplayMode {
 }
 
 impl DisplayMode {
-    pub fn new(
-        id: String,
-        resolution: Resolution,
-        refresh_rate: RefreshRate,
-    ) -> Self {
+    pub fn new(id: String, resolution: Resolution, refresh_rate: RefreshRate) -> Self {
         DisplayMode {
             id,
             resolution,
@@ -81,10 +77,7 @@ pub struct Display {
 }
 
 impl Display {
-    pub fn new(
-        id: String,
-        name: String,
-    ) -> Self {
+    pub fn new(id: String, name: String) -> Self {
         Display {
             id,
             name,
@@ -138,10 +131,7 @@ impl DisplayResolutionManager {
         let id = format!("display_{}", self.next_display_id);
         self.next_display_id += 1;
 
-        let mut display = Display::new(
-            id.clone(),
-            "eDP-1".to_string(),
-        );
+        let mut display = Display::new(id.clone(), "eDP-1".to_string());
         display.set_primary(true);
 
         // Add common resolutions
@@ -156,19 +146,11 @@ impl DisplayResolutionManager {
         display.set_current_mode(mode1_id);
 
         let mode2_id = format!("mode_{}_2", id);
-        let mode2 = DisplayMode::new(
-            mode2_id,
-            Resolution::new(2560, 1440),
-            RefreshRate::new(60),
-        );
+        let mode2 = DisplayMode::new(mode2_id, Resolution::new(2560, 1440), RefreshRate::new(60));
         display.add_mode(mode2);
 
         let mode3_id = format!("mode_{}_3", id);
-        let mode3 = DisplayMode::new(
-            mode3_id,
-            Resolution::new(3840, 2160),
-            RefreshRate::new(60),
-        );
+        let mode3 = DisplayMode::new(mode3_id, Resolution::new(3840, 2160), RefreshRate::new(60));
         display.add_mode(mode3);
 
         self.displays.insert(id, display);
@@ -200,10 +182,7 @@ impl DisplayResolutionManager {
     }
 
     pub fn get_enabled_displays(&self) -> Vec<&Display> {
-        self.displays
-            .values()
-            .filter(|d| d.is_enabled)
-            .collect()
+        self.displays.values().filter(|d| d.is_enabled).collect()
     }
 
     pub fn set_primary_display(&mut self, id: &str) -> bool {
@@ -319,7 +298,11 @@ mod tests {
     #[test]
     fn test_set_display_enabled() {
         let mut manager = DisplayResolutionManager::new();
-        let display_id = manager.get_displays().first().map(|d| d.id.clone()).unwrap();
+        let display_id = manager
+            .get_displays()
+            .first()
+            .map(|d| d.id.clone())
+            .unwrap();
         assert!(manager.set_display_enabled(&display_id, false));
         assert!(!manager.get_display(&display_id).unwrap().is_enabled);
     }
@@ -327,15 +310,26 @@ mod tests {
     #[test]
     fn test_set_display_position() {
         let mut manager = DisplayResolutionManager::new();
-        let display_id = manager.get_displays().first().map(|d| d.id.clone()).unwrap();
+        let display_id = manager
+            .get_displays()
+            .first()
+            .map(|d| d.id.clone())
+            .unwrap();
         assert!(manager.set_display_position(&display_id, 100, 100));
-        assert_eq!(manager.get_display(&display_id).unwrap().position, (100, 100));
+        assert_eq!(
+            manager.get_display(&display_id).unwrap().position,
+            (100, 100)
+        );
     }
 
     #[test]
     fn test_add_display_mode() {
         let mut manager = DisplayResolutionManager::new();
-        let display_id = manager.get_displays().first().map(|d| d.id.clone()).unwrap();
+        let display_id = manager
+            .get_displays()
+            .first()
+            .map(|d| d.id.clone())
+            .unwrap();
         let mode = DisplayMode::new(
             "test_mode".to_string(),
             Resolution::new(1280, 720),

@@ -392,7 +392,8 @@ impl SovereignOmarchyOmakaseParitySuite {
     }
 
     pub fn run_parity_check(&mut self) -> bool {
-        self.theme_manager.apply_theme(OmarchyThemePreset::TokyoNight);
+        self.theme_manager
+            .apply_theme(OmarchyThemePreset::TokyoNight);
         self.status_hud.update_module_value("cpu", "8%");
         self.bootstrap_engine.run_omakub_bootstrap();
         self.locker.lock();
@@ -433,7 +434,14 @@ mod tests {
         let mut hud = OmarchyWaybarStatusHud::new();
         assert!(hud.active_modules_count() >= 8);
         assert!(hud.update_module_value("cpu", "15%"));
-        assert_eq!(hud.modules.iter().find(|m| m.module_name == "cpu").unwrap().text_value, "15%");
+        assert_eq!(
+            hud.modules
+                .iter()
+                .find(|m| m.module_name == "cpu")
+                .unwrap()
+                .text_value,
+            "15%"
+        );
     }
 
     #[test]

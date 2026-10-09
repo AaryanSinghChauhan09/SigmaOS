@@ -360,7 +360,11 @@ impl PhotoFlareEditor {
     }
 
     /// Apply adjustment
-    pub fn apply_adjustment(&mut self, adjustment: AdjustmentType, value: f64) -> Result<(), String> {
+    pub fn apply_adjustment(
+        &mut self,
+        adjustment: AdjustmentType,
+        value: f64,
+    ) -> Result<(), String> {
         if let Some(idx) = self.current_document {
             if let Some(doc) = self.documents.get_mut(idx) {
                 doc.history.push(HistoryEntry {
@@ -492,7 +496,11 @@ impl PhotoFlareEditor {
     }
 
     /// Set layer blend mode
-    pub fn set_layer_blend_mode(&mut self, layer_id: usize, blend_mode: BlendMode) -> Result<(), String> {
+    pub fn set_layer_blend_mode(
+        &mut self,
+        layer_id: usize,
+        blend_mode: BlendMode,
+    ) -> Result<(), String> {
         if let Some(idx) = self.current_document {
             if let Some(doc) = self.documents.get_mut(idx) {
                 if let Some(layer) = doc.layers.iter_mut().find(|l| l.id == layer_id) {

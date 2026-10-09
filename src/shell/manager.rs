@@ -57,7 +57,9 @@ impl ShellType {
             ShellType::Zsh => PathBuf::from(".zprofile"),
             ShellType::Fish => PathBuf::from(".config/fish/config.fish"),
             ShellType::Nu => PathBuf::from(".config/nu/env.nu"),
-            ShellType::PowerShell => PathBuf::from(".config/powershell/Microsoft.PowerShell_profile.ps1"),
+            ShellType::PowerShell => {
+                PathBuf::from(".config/powershell/Microsoft.PowerShell_profile.ps1")
+            }
             ShellType::Custom => PathBuf::from(".profile"),
         }
     }
@@ -149,7 +151,10 @@ impl ShellProfile {
                     config.push_str(&format!("fish_add_path -g {}\n", path_str));
                 }
                 ShellType::Nu => {
-                    config.push_str(&format!("$env.PATH = ($env.PATH | split row (char esep) | prepend \"{}\")\n", path_str));
+                    config.push_str(&format!(
+                        "$env.PATH = ($env.PATH | split row (char esep) | prepend \"{}\")\n",
+                        path_str
+                    ));
                 }
                 ShellType::PowerShell => {
                     config.push_str(&format!("$env:PATH = \"{};$env:PATH\"\n", path_str));
@@ -219,7 +224,9 @@ impl ShellManager {
 
         // Create default profile
         let default_profile = ShellProfile::new("default".to_string(), default_shell);
-        manager.profiles.insert("default".to_string(), default_profile);
+        manager
+            .profiles
+            .insert("default".to_string(), default_profile);
         manager.current_profile = Some("default".to_string());
 
         manager
@@ -258,7 +265,8 @@ impl ShellManager {
 
     /// Get current profile
     pub fn get_current_profile(&self) -> Option<&ShellProfile> {
-        self.current_profile.as_ref()
+        self.current_profile
+            .as_ref()
             .and_then(|name| self.profiles.get(name))
     }
 
@@ -272,7 +280,8 @@ impl ShellManager {
             self.current_profile = Some("default".to_string());
         }
 
-        self.profiles.remove(name)
+        self.profiles
+            .remove(name)
             .ok_or_else(|| format!("Profile {} not found", name))?;
 
         Ok(())
@@ -309,17 +318,15 @@ impl ShellManager {
 
     /// Get statistics
     pub fn get_statistics(&self) -> ShellStatistics {
-        let total_env_vars: usize = self.profiles.values()
+        let total_env_vars: usize = self
+            .profiles
+            .values()
             .map(|p| p.environment_vars.len())
             .sum();
 
-        let total_aliases: usize = self.profiles.values()
-            .map(|p| p.aliases.len())
-            .sum();
+        let total_aliases: usize = self.profiles.values().map(|p| p.aliases.len()).sum();
 
-        let total_functions: usize = self.profiles.values()
-            .map(|p| p.functions.len())
-            .sum();
+        let total_functions: usize = self.profiles.values().map(|p| p.functions.len()).sum();
 
         ShellStatistics {
             profile_count: self.profiles.len(),
@@ -365,7 +372,10 @@ mod tests {
     fn test_shell_type_config_file() {
         assert_eq!(ShellType::Bash.config_file(), PathBuf::from(".bashrc"));
         assert_eq!(ShellType::Zsh.config_file(), PathBuf::from(".zshrc"));
-        assert_eq!(ShellType::Fish.config_file(), PathBuf::from(".config/fish/config.fish"));
+        assert_eq!(
+            ShellType::Fish.config_file(),
+            PathBuf::from(".config/fish/config.fish")
+        );
     }
 
     #[test]
@@ -379,7 +389,10 @@ mod tests {
     fn test_shell_profile_env_vars() {
         let mut profile = ShellProfile::new("test".to_string(), ShellType::Bash);
         profile.set_env_var("TEST".to_string(), "value".to_string());
-        assert_eq!(profile.environment_vars.get("TEST"), Some(&"value".to_string()));
+        assert_eq!(
+            profile.environment_vars.get("TEST"),
+            Some(&"value".to_string())
+        );
     }
 
     #[test]
@@ -394,7 +407,7 @@ mod tests {
         let mut profile = ShellProfile::new("test".to_string(), ShellType::Bash);
         profile.set_env_var("EDITOR".to_string(), "vim".to_string());
         profile.add_alias("ll".to_string(), "ls -la".to_string());
-        
+
         let config = profile.generate_config();
         assert!(config.contains("export EDITOR=\"vim\""));
         assert!(config.contains("alias ll='ls -la'"));
@@ -410,14 +423,18 @@ mod tests {
     #[test]
     fn test_shell_manager_create_profile() {
         let mut manager = ShellManager::new(ShellType::Bash);
-        assert!(manager.create_profile("test".to_string(), ShellType::Zsh).is_ok());
+        assert!(manager
+            .create_profile("test".to_string(), ShellType::Zsh)
+            .is_ok());
         assert_eq!(manager.list_profiles().len(), 2);
     }
 
     #[test]
     fn test_shell_manager_set_current() {
         let mut manager = ShellManager::new(ShellType::Bash);
-        manager.create_profile("test".to_string(), ShellType::Zsh).ok();
+        manager
+            .create_profile("test".to_string(), ShellType::Zsh)
+            .ok();
         assert!(manager.set_current_profile("test").is_ok());
         assert_eq!(manager.current_profile, Some("test".to_string()));
     }
@@ -425,7 +442,9 @@ mod tests {
     #[test]
     fn test_shell_manager_delete_profile() {
         let mut manager = ShellManager::new(ShellType::Bash);
-        manager.create_profile("test".to_string(), ShellType::Zsh).ok();
+        manager
+            .create_profile("test".to_string(), ShellType::Zsh)
+            .ok();
         assert!(manager.delete_profile("test").is_ok());
         assert_eq!(manager.list_profiles().len(), 1);
     }

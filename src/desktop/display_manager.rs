@@ -150,7 +150,8 @@ impl DisplayManager {
             "/usr/bin/sigma-session-x11".to_string(),
             SessionType::X11,
         );
-        self.sessions.insert("SigmaOS (X11)".to_string(), x11_session);
+        self.sessions
+            .insert("SigmaOS (X11)".to_string(), x11_session);
 
         let tty_session = DesktopSession::new(
             "TTY".to_string(),
@@ -177,7 +178,8 @@ impl DisplayManager {
 
     /// Get default session
     pub fn get_default_session(&self) -> Option<&DesktopSession> {
-        self.sessions.values()
+        self.sessions
+            .values()
             .find(|s| s.is_default)
             .or_else(|| self.sessions.get(&self.config.default_session))
     }
@@ -219,7 +221,11 @@ impl DisplayManager {
     }
 
     /// Start a user session
-    pub fn start_session(&mut self, username: String, session_name: String) -> Result<String, String> {
+    pub fn start_session(
+        &mut self,
+        username: String,
+        session_name: String,
+    ) -> Result<String, String> {
         if !self.sessions.contains_key(&session_name) {
             return Err(format!("Session {} not found", session_name));
         }
@@ -241,13 +247,14 @@ impl DisplayManager {
 
     /// Get session for user
     pub fn get_user_session(&self, username: &str) -> Option<&UserSession> {
-        self.active_sessions.iter()
-            .find(|s| s.username == username)
+        self.active_sessions.iter().find(|s| s.username == username)
     }
 
     /// End a session
     pub fn end_session(&mut self, display: &str) -> Result<(), String> {
-        let pos = self.active_sessions.iter()
+        let pos = self
+            .active_sessions
+            .iter()
             .position(|s| s.display == display)
             .ok_or_else(|| format!("Session {} not found", display))?;
 
@@ -257,7 +264,9 @@ impl DisplayManager {
 
     /// Switch session
     pub fn switch_session(&mut self, display: &str) -> Result<(), String> {
-        let session = self.active_sessions.iter()
+        let session = self
+            .active_sessions
+            .iter()
             .find(|s| s.display == display)
             .ok_or_else(|| format!("Session {} not found", display))?;
 
@@ -267,8 +276,11 @@ impl DisplayManager {
         }
 
         // Activate specified session
-        if let Some(active) = self.active_sessions.iter_mut()
-            .find(|s| s.display == display) {
+        if let Some(active) = self
+            .active_sessions
+            .iter_mut()
+            .find(|s| s.display == display)
+        {
             active.set_active(true);
         }
 
@@ -358,20 +370,27 @@ mod tests {
         let mut manager = DisplayManager::new();
         manager.enable_auto_login("user".to_string());
         assert!(manager.get_config().auto_login_enabled);
-        assert_eq!(manager.get_config().auto_login_user, Some("user".to_string()));
+        assert_eq!(
+            manager.get_config().auto_login_user,
+            Some("user".to_string())
+        );
     }
 
     #[test]
     fn test_start_session() {
         let mut manager = DisplayManager::new();
-        let display = manager.start_session("user".to_string(), "SigmaOS".to_string()).unwrap();
+        let display = manager
+            .start_session("user".to_string(), "SigmaOS".to_string())
+            .unwrap();
         assert_eq!(display, ":0");
     }
 
     #[test]
     fn test_end_session() {
         let mut manager = DisplayManager::new();
-        let display = manager.start_session("user".to_string(), "SigmaOS".to_string()).unwrap();
+        let display = manager
+            .start_session("user".to_string(), "SigmaOS".to_string())
+            .unwrap();
         assert!(manager.end_session(&display).is_ok());
     }
 

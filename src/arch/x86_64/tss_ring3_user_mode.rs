@@ -12,24 +12,24 @@ use core::sync::atomic::{AtomicU64, Ordering};
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct TaskStateSegment {
-    pub prev_tss: u64,        // Previous TSS (for hardware task switching)
-    pub rsp0: u64,             // Stack pointer for Ring 0
-    pub rsp1: u64,             // Stack pointer for Ring 1
-    pub rsp2: u64,             // Stack pointer for Ring 2
+    pub prev_tss: u64, // Previous TSS (for hardware task switching)
+    pub rsp0: u64,     // Stack pointer for Ring 0
+    pub rsp1: u64,     // Stack pointer for Ring 1
+    pub rsp2: u64,     // Stack pointer for Ring 2
     pub reserved1: u64,
-    pub ist1: u64,             // Interrupt Stack Table entry 1
-    pub ist2: u64,             // Interrupt Stack Table entry 2
-    pub ist3: u64,             // Interrupt Stack Table entry 3
-    pub ist4: u64,             // Interrupt Stack Table entry 4
-    pub ist5: u64,             // Interrupt Stack Table entry 5
-    pub ist6: u64,             // Interrupt Stack Table entry 6
-    pub ist7: u64,             // Interrupt Stack Table entry 7
+    pub ist1: u64, // Interrupt Stack Table entry 1
+    pub ist2: u64, // Interrupt Stack Table entry 2
+    pub ist3: u64, // Interrupt Stack Table entry 3
+    pub ist4: u64, // Interrupt Stack Table entry 4
+    pub ist5: u64, // Interrupt Stack Table entry 5
+    pub ist6: u64, // Interrupt Stack Table entry 6
+    pub ist7: u64, // Interrupt Stack Table entry 7
     pub reserved2: u64,
     pub reserved3: u64,
     pub reserved4: u64,
     pub reserved5: u64,
     pub reserved6: u64,
-    pub iomap_base: u16,       // I/O permission bitmap base
+    pub iomap_base: u16, // I/O permission bitmap base
     pub reserved7: [u8; 6],
 }
 
@@ -69,11 +69,11 @@ impl TaskStateSegment {
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct InterruptFrame {
-    pub rip: u64,              // Instruction pointer
-    pub cs: u16,               // Code segment
-    pub rflags: u64,           // RFLAGS register
-    pub rsp: u64,              // Stack pointer
-    pub ss: u16,               // Stack segment
+    pub rip: u64,    // Instruction pointer
+    pub cs: u16,     // Code segment
+    pub rflags: u64, // RFLAGS register
+    pub rsp: u64,    // Stack pointer
+    pub ss: u16,     // Stack segment
 }
 
 impl Default for InterruptFrame {
@@ -101,10 +101,10 @@ pub struct UserModeContext {
 impl UserModeContext {
     pub fn new(user_stack_base: u64, user_stack_size: u64, entry_point: u64) -> Self {
         let mut tss = TaskStateSegment::default();
-        
+
         // Set Ring 0 stack pointer (kernel stack)
         tss.rsp0 = user_stack_base + user_stack_size;
-        
+
         Self {
             tss,
             user_stack_base,
@@ -124,7 +124,7 @@ impl UserModeContext {
         InterruptFrame {
             rip: self.entry_point,
             cs: 0x1B as u16, // User mode code segment (Ring 3, GDT index 3)
-            rflags: 0x202, // Interrupt enable
+            rflags: 0x202,   // Interrupt enable
             rsp: self.user_stack_base + self.user_stack_size - 8,
             ss: 0x23 as u16, // User mode data segment (Ring 3, GDT index 4)
         }
@@ -139,7 +139,7 @@ impl UserModeContext {
         }
 
         let iframe = self.prepare_interrupt_frame();
-        
+
         // TSS is already loaded by GDT init, so we don't need to reload it
         // Execute iretq to transition to Ring 3
         core::arch::asm!(
@@ -156,7 +156,7 @@ impl UserModeContext {
             in(reg) iframe.rip,
             options(nostack)
         );
-        
+
         self.is_transitioned = true;
         Ok(())
     }
@@ -169,7 +169,7 @@ impl UserModeContext {
         }
 
         let _iframe = self.prepare_interrupt_frame();
-        
+
         // In test mode, just mark as transitioned
         self.is_transitioned = true;
         Ok(())

@@ -233,10 +233,13 @@ pub enum VtAction {
     CursorDown(u32),
     CursorForward(u32),
     CursorBack(u32),
-    CursorPosition { row: u32, col: u32 },
+    CursorPosition {
+        row: u32,
+        col: u32,
+    },
     /// Erase: EL, ED
-    EraseInLine(u32),      // 0=to end, 1=to start, 2=whole
-    EraseInDisplay(u32),   // 0=below, 1=above, 2=all, 3=saved
+    EraseInLine(u32), // 0=to end, 1=to start, 2=whole
+    EraseInDisplay(u32), // 0=below, 1=above, 2=all, 3=saved
     /// SGR (Select Graphic Rendition) — color and style
     Sgr(Vec<u32>),
     /// Set window title (OSC 0/2)
@@ -301,30 +304,56 @@ impl VtParser {
                 0x09 => Some(VtAction::Tab),
                 0x0A => Some(VtAction::Newline),
                 0x0D => Some(VtAction::CarriageReturn),
-                0x1B => { self.state = ParserState::Escape; None }
+                0x1B => {
+                    self.state = ParserState::Escape;
+                    None
+                }
                 b => {
                     let ch = char::from(b);
                     Some(VtAction::Print(ch))
                 }
             },
             ParserState::Escape => match byte {
-                b'[' => { self.state = ParserState::CsiParam; self.params.clear(); self.current_param = 0; None }
-                b']' => { self.state = ParserState::OscString; self.osc_buf.clear(); None }
-                b'M' => { self.state = ParserState::Ground; None } // Reverse index
-                _ => { self.state = ParserState::Ground; None }
+                b'[' => {
+                    self.state = ParserState::CsiParam;
+                    self.params.clear();
+                    self.current_param = 0;
+                    None
+                }
+                b']' => {
+                    self.state = ParserState::OscString;
+                    self.osc_buf.clear();
+                    None
+                }
+                b'M' => {
+                    self.state = ParserState::Ground;
+                    None
+                } // Reverse index
+                _ => {
+                    self.state = ParserState::Ground;
+                    None
+                }
             },
             ParserState::CsiParam => match byte {
                 b'0'..=b'9' => {
-                    self.current_param = self.current_param.saturating_mul(10) + (byte - b'0') as u32;
+                    self.current_param =
+                        self.current_param.saturating_mul(10) + (byte - b'0') as u32;
                     None
                 }
-                b';' => { self.params.push(self.current_param); self.current_param = 0; None }
+                b';' => {
+                    self.params.push(self.current_param);
+                    self.current_param = 0;
+                    None
+                }
                 b'A'..=b'Z' | b'a'..=b'z' | b'@' | b'`' => {
                     self.params.push(self.current_param);
                     self.state = ParserState::Ground;
                     self.dispatch_csi(byte)
                 }
-                _ => { self.state = ParserState::Ground; None }
+                _ => {
+                    self.state = ParserState::Ground;
+                    None
+                }
             },
             ParserState::CsiIntermediate => {
                 self.state = ParserState::Ground;
@@ -359,7 +388,10 @@ impl VtParser {
             b'B' => Some(VtAction::CursorDown(p0.max(1))),
             b'C' => Some(VtAction::CursorForward(p0.max(1))),
             b'D' => Some(VtAction::CursorBack(p0.max(1))),
-            b'H' | b'f' => Some(VtAction::CursorPosition { row: p0.max(1), col: p1.max(1) }),
+            b'H' | b'f' => Some(VtAction::CursorPosition {
+                row: p0.max(1),
+                col: p1.max(1),
+            }),
             b'J' => Some(VtAction::EraseInDisplay(p0)),
             b'K' => Some(VtAction::EraseInLine(p0)),
             b'm' => Some(VtAction::Sgr(self.params.clone())),
@@ -404,8 +436,8 @@ impl Default for GhosttyConfig {
             font_size: 13.0,
             line_height: 1.2,
             padding: 8,
-            background: TermColor::Rgb(0x1a, 0x1b, 0x26),  // Tokyo Night bg
-            foreground: TermColor::Rgb(0xc0, 0xca, 0xf5),  // Tokyo Night fg
+            background: TermColor::Rgb(0x1a, 0x1b, 0x26), // Tokyo Night bg
+            foreground: TermColor::Rgb(0xc0, 0xca, 0xf5), // Tokyo Night fg
             cursor_style: CursorStyle::Block,
             cursor_color: TermColor::Rgb(0x7a, 0xa2, 0xf7),
             scrollback_lines: 10_000,
@@ -491,7 +523,8 @@ impl SigmaGhostty {
                     self.cursor_col = 0;
                 }
                 let attrs = self.current_attrs;
-                self.grid.write_char(self.cursor_row, self.cursor_col, ch, attrs);
+                self.grid
+                    .write_char(self.cursor_row, self.cursor_col, ch, attrs);
                 self.cursor_col += if is_wide_char(ch) { 2 } else { 1 };
             }
             VtAction::Newline => self.newline(),
@@ -519,14 +552,18 @@ impl SigmaGhostty {
             }
             VtAction::EraseInLine(mode) => {
                 match mode {
-                    0 => { // to end of line
+                    0 => {
+                        // to end of line
                         for c in self.cursor_col..self.grid.cols {
-                            self.grid.write_char(self.cursor_row, c, ' ', CellAttrs::default());
+                            self.grid
+                                .write_char(self.cursor_row, c, ' ', CellAttrs::default());
                         }
                     }
-                    1 => { // to start of line
+                    1 => {
+                        // to start of line
                         for c in 0..=self.cursor_col {
-                            self.grid.write_char(self.cursor_row, c, ' ', CellAttrs::default());
+                            self.grid
+                                .write_char(self.cursor_row, c, ' ', CellAttrs::default());
                         }
                     }
                     2 => self.grid.clear_row(self.cursor_row),
@@ -580,12 +617,14 @@ impl SigmaGhostty {
                     if params.get(i + 1) == Some(&2) && params.len() > i + 4 {
                         // 38;2;R;G;B — true color fg
                         self.current_attrs.fg = TermColor::Rgb(
-                            params[i+2] as u8, params[i+3] as u8, params[i+4] as u8
+                            params[i + 2] as u8,
+                            params[i + 3] as u8,
+                            params[i + 4] as u8,
                         );
                         i += 4;
                     } else if params.get(i + 1) == Some(&5) && params.len() > i + 2 {
                         // 38;5;N — 256-color fg
-                        self.current_attrs.fg = TermColor::Indexed(params[i+2] as u8);
+                        self.current_attrs.fg = TermColor::Indexed(params[i + 2] as u8);
                         i += 2;
                     }
                 }
@@ -595,11 +634,13 @@ impl SigmaGhostty {
                 48 => {
                     if params.get(i + 1) == Some(&2) && params.len() > i + 4 {
                         self.current_attrs.bg = TermColor::Rgb(
-                            params[i+2] as u8, params[i+3] as u8, params[i+4] as u8
+                            params[i + 2] as u8,
+                            params[i + 3] as u8,
+                            params[i + 4] as u8,
                         );
                         i += 4;
                     } else if params.get(i + 1) == Some(&5) && params.len() > i + 2 {
-                        self.current_attrs.bg = TermColor::Indexed(params[i+2] as u8);
+                        self.current_attrs.bg = TermColor::Indexed(params[i + 2] as u8);
                         i += 2;
                     }
                 }
@@ -643,9 +684,16 @@ mod tests {
     fn test_vt_parser_basic() {
         let mut parser = VtParser::new();
         let actions = parser.feed(b"Hello\r\n");
-        let prints: Vec<char> = actions.iter().filter_map(|a| {
-            if let VtAction::Print(c) = a { Some(*c) } else { None }
-        }).collect();
+        let prints: Vec<char> = actions
+            .iter()
+            .filter_map(|a| {
+                if let VtAction::Print(c) = a {
+                    Some(*c)
+                } else {
+                    None
+                }
+            })
+            .collect();
         assert_eq!(prints, vec!['H', 'e', 'l', 'l', 'o']);
         assert!(actions.contains(&VtAction::CarriageReturn));
         assert!(actions.contains(&VtAction::Newline));
@@ -683,7 +731,7 @@ mod tests {
     fn test_wide_char_detection() {
         assert!(is_wide_char('中')); // CJK
         assert!(is_wide_char('🔥')); // Emoji
-        assert!(!is_wide_char('A'));  // ASCII
+        assert!(!is_wide_char('A')); // ASCII
         assert!(!is_wide_char('é')); // Latin extended
     }
 

@@ -108,7 +108,12 @@ pub struct SettingEntry {
 }
 
 impl SettingEntry {
-    pub fn new(key: String, value: SettingValue, category: SettingCategory, description: String) -> Self {
+    pub fn new(
+        key: String,
+        value: SettingValue,
+        category: SettingCategory,
+        description: String,
+    ) -> Self {
         Self {
             key,
             value,
@@ -151,53 +156,132 @@ impl SettingsManager {
     fn add_default_settings(&mut self) {
         let defaults = vec![
             // Appearance
-            ("theme", SettingValue::String("Sigma Dark".to_string()), SettingCategory::Appearance, "Current theme"),
-            ("accent_color", SettingValue::String("Blue".to_string()), SettingCategory::Appearance, "Accent color"),
-            ("font_size", SettingValue::Integer(14), SettingCategory::Appearance, "Default font size"),
-            
+            (
+                "theme",
+                SettingValue::String("Sigma Dark".to_string()),
+                SettingCategory::Appearance,
+                "Current theme",
+            ),
+            (
+                "accent_color",
+                SettingValue::String("Blue".to_string()),
+                SettingCategory::Appearance,
+                "Accent color",
+            ),
+            (
+                "font_size",
+                SettingValue::Integer(14),
+                SettingCategory::Appearance,
+                "Default font size",
+            ),
             // Display
-            ("brightness", SettingValue::Integer(100), SettingCategory::Display, "Screen brightness"),
-            ("night_light", SettingValue::Boolean(false), SettingCategory::Display, "Night light enabled"),
-            
+            (
+                "brightness",
+                SettingValue::Integer(100),
+                SettingCategory::Display,
+                "Screen brightness",
+            ),
+            (
+                "night_light",
+                SettingValue::Boolean(false),
+                SettingCategory::Display,
+                "Night light enabled",
+            ),
             // Sound
-            ("volume", SettingValue::Integer(75), SettingCategory::Sound, "Master volume"),
-            ("mute", SettingValue::Boolean(false), SettingCategory::Sound, "Mute all sounds"),
-            
+            (
+                "volume",
+                SettingValue::Integer(75),
+                SettingCategory::Sound,
+                "Master volume",
+            ),
+            (
+                "mute",
+                SettingValue::Boolean(false),
+                SettingCategory::Sound,
+                "Mute all sounds",
+            ),
             // Network
-            ("auto_connect", SettingValue::Boolean(true), SettingCategory::Network, "Auto-connect to known networks"),
-            ("metered_warning", SettingValue::Boolean(true), SettingCategory::Network, "Warn on metered connections"),
-            
+            (
+                "auto_connect",
+                SettingValue::Boolean(true),
+                SettingCategory::Network,
+                "Auto-connect to known networks",
+            ),
+            (
+                "metered_warning",
+                SettingValue::Boolean(true),
+                SettingCategory::Network,
+                "Warn on metered connections",
+            ),
             // Power
-            ("power_profile", SettingValue::String("Balanced".to_string()), SettingCategory::Power, "Power profile"),
-            ("auto_sleep", SettingValue::Boolean(true), SettingCategory::Power, "Auto-sleep enabled"),
-            ("sleep_timeout", SettingValue::Integer(30), SettingCategory::Power, "Sleep timeout (minutes)"),
-            
+            (
+                "power_profile",
+                SettingValue::String("Balanced".to_string()),
+                SettingCategory::Power,
+                "Power profile",
+            ),
+            (
+                "auto_sleep",
+                SettingValue::Boolean(true),
+                SettingCategory::Power,
+                "Auto-sleep enabled",
+            ),
+            (
+                "sleep_timeout",
+                SettingValue::Integer(30),
+                SettingCategory::Power,
+                "Sleep timeout (minutes)",
+            ),
             // Privacy
-            ("collect_analytics", SettingValue::Boolean(false), SettingCategory::Privacy, "Collect analytics"),
-            ("location_services", SettingValue::Boolean(false), SettingCategory::Privacy, "Location services"),
-            
+            (
+                "collect_analytics",
+                SettingValue::Boolean(false),
+                SettingCategory::Privacy,
+                "Collect analytics",
+            ),
+            (
+                "location_services",
+                SettingValue::Boolean(false),
+                SettingCategory::Privacy,
+                "Location services",
+            ),
             // Input
-            ("keyboard_layout", SettingValue::String("us".to_string()), SettingCategory::Input, "Keyboard layout"),
-            ("mouse_acceleration", SettingValue::Boolean(true), SettingCategory::Input, "Mouse acceleration"),
-            
+            (
+                "keyboard_layout",
+                SettingValue::String("us".to_string()),
+                SettingCategory::Input,
+                "Keyboard layout",
+            ),
+            (
+                "mouse_acceleration",
+                SettingValue::Boolean(true),
+                SettingCategory::Input,
+                "Mouse acceleration",
+            ),
             // System
-            ("timezone", SettingValue::String("UTC".to_string()), SettingCategory::System, "System timezone"),
-            ("language", SettingValue::String("en_US".to_string()), SettingCategory::System, "System language"),
+            (
+                "timezone",
+                SettingValue::String("UTC".to_string()),
+                SettingCategory::System,
+                "System timezone",
+            ),
+            (
+                "language",
+                SettingValue::String("en_US".to_string()),
+                SettingCategory::System,
+                "System language",
+            ),
         ];
 
         for (key, value, category, description) in defaults {
-            let mut entry = SettingEntry::new(
-                key.to_string(),
-                value,
-                category,
-                description.to_string(),
-            );
-            
+            let mut entry =
+                SettingEntry::new(key.to_string(), value, category, description.to_string());
+
             // Mark some settings as readonly
             if key == "timezone" || key == "language" {
                 entry.set_readonly(true);
             }
-            
+
             self.settings.insert(key.to_string(), entry);
         }
     }
@@ -214,7 +298,9 @@ impl SettingsManager {
 
     /// Set a setting value
     pub fn set(&mut self, key: &str, value: SettingValue) -> Result<(), String> {
-        let entry = self.settings.get_mut(key)
+        let entry = self
+            .settings
+            .get_mut(key)
             .ok_or_else(|| format!("Setting {} not found", key))?;
 
         entry.update_value(value)
@@ -232,7 +318,8 @@ impl SettingsManager {
 
     /// List settings by category
     pub fn list_by_category(&self, category: SettingCategory) -> Vec<&SettingEntry> {
-        self.settings.values()
+        self.settings
+            .values()
             .filter(|s| s.category == category)
             .collect()
     }
@@ -240,14 +327,17 @@ impl SettingsManager {
     /// Search settings by key
     pub fn search(&self, query: &str) -> Vec<&SettingEntry> {
         let query_lower = query.to_lowercase();
-        self.settings.values()
+        self.settings
+            .values()
             .filter(|s| s.key.to_lowercase().contains(&query_lower))
             .collect()
     }
 
     /// Reset a setting to default
     pub fn reset(&mut self, key: &str) -> Result<(), String> {
-        let entry = self.settings.get_mut(key)
+        let entry = self
+            .settings
+            .get_mut(key)
             .ok_or_else(|| format!("Setting {} not found", key))?;
 
         if entry.is_readonly {
@@ -267,7 +357,9 @@ impl SettingsManager {
 
     /// Reset all settings in a category
     pub fn reset_category(&mut self, category: SettingCategory) -> usize {
-        let keys: Vec<String> = self.settings.values()
+        let keys: Vec<String> = self
+            .settings
+            .values()
             .filter(|s| s.category == category && !s.is_readonly)
             .map(|s| s.key.clone())
             .collect();
@@ -284,7 +376,8 @@ impl SettingsManager {
 
     /// Export settings
     pub fn export(&self) -> HashMap<String, SettingValue> {
-        self.settings.values()
+        self.settings
+            .values()
             .map(|s| (s.key.clone(), s.value.clone()))
             .collect()
     }
@@ -345,8 +438,14 @@ mod tests {
 
     #[test]
     fn test_setting_category_from_str() {
-        assert_eq!(SettingCategory::from_str("appearance"), Some(SettingCategory::Appearance));
-        assert_eq!(SettingCategory::from_str("network"), Some(SettingCategory::Network));
+        assert_eq!(
+            SettingCategory::from_str("appearance"),
+            Some(SettingCategory::Appearance)
+        );
+        assert_eq!(
+            SettingCategory::from_str("network"),
+            Some(SettingCategory::Network)
+        );
     }
 
     #[test]
@@ -375,13 +474,17 @@ mod tests {
     #[test]
     fn test_set_setting() {
         let mut manager = SettingsManager::new();
-        assert!(manager.set("theme", SettingValue::String("Sigma Light".to_string())).is_ok());
+        assert!(manager
+            .set("theme", SettingValue::String("Sigma Light".to_string()))
+            .is_ok());
     }
 
     #[test]
     fn test_set_readonly_fails() {
         let mut manager = SettingsManager::new();
-        assert!(manager.set("timezone", SettingValue::String("EST".to_string())).is_err());
+        assert!(manager
+            .set("timezone", SettingValue::String("EST".to_string()))
+            .is_err());
     }
 
     #[test]
@@ -401,7 +504,9 @@ mod tests {
     #[test]
     fn test_reset() {
         let mut manager = SettingsManager::new();
-        manager.set("theme", SettingValue::String("Custom".to_string())).ok();
+        manager
+            .set("theme", SettingValue::String("Custom".to_string()))
+            .ok();
         assert!(manager.reset("theme").is_ok());
     }
 

@@ -135,11 +135,15 @@ impl UniversalFormatInspectorAndClassifierV26 {
             PackageSignatureKindV26::OpenBsdSignify
         } else if raw_payload.starts_with(b"PQC_SIG") {
             PackageSignatureKindV26::PqcKyberDilithium
-        } else if raw_payload.starts_with(b"\x80\x01") || raw_payload.starts_with(b"-----BEGIN PGP") {
+        } else if raw_payload.starts_with(b"\x80\x01") || raw_payload.starts_with(b"-----BEGIN PGP")
+        {
             PackageSignatureKindV26::GpgOpenPgp
         } else if detected_format == PackageFormat::Apk || detected_format == PackageFormat::Aab {
             PackageSignatureKindV26::ApkV2V3Signature
-        } else if detected_format == PackageFormat::Ipa || detected_format == PackageFormat::App || detected_format == PackageFormat::Pkg {
+        } else if detected_format == PackageFormat::Ipa
+            || detected_format == PackageFormat::App
+            || detected_format == PackageFormat::Pkg
+        {
             PackageSignatureKindV26::X509Certificate
         } else {
             PackageSignatureKindV26::Unsigned
@@ -238,7 +242,10 @@ impl UniversalCrossDistroCapabilityGovernorV26 {
         let mut map = BTreeMap::new();
         map.insert("libssl-dev".to_string(), "sovereign-openssl".to_string());
         map.insert("openssl-devel".to_string(), "sovereign-openssl".to_string());
-        map.insert("security/openssl".to_string(), "sovereign-openssl".to_string());
+        map.insert(
+            "security/openssl".to_string(),
+            "sovereign-openssl".to_string(),
+        );
         map.insert("libc6".to_string(), "sovereign-libc".to_string());
         map.insert("glibc".to_string(), "sovereign-libc".to_string());
         map.insert("musl".to_string(), "sovereign-libc".to_string());
@@ -249,7 +256,10 @@ impl UniversalCrossDistroCapabilityGovernorV26 {
         map.insert("python3-dev".to_string(), "sovereign-python".to_string());
         map.insert("python3-devel".to_string(), "sovereign-python".to_string());
         map.insert("wayland-devel".to_string(), "sovereign-wayland".to_string());
-        map.insert("pipewire-devel".to_string(), "sovereign-pipewire".to_string());
+        map.insert(
+            "pipewire-devel".to_string(),
+            "sovereign-pipewire".to_string(),
+        );
 
         Self {
             dependency_canonical_map: map,
@@ -332,7 +342,10 @@ impl UdfScriptletSandboxEngineV26 {
 
     pub fn execute_hook(&mut self, name: &str, package_name: &str) -> Result<bool, String> {
         if let Some(kind) = self.registered_hooks.get(name) {
-            let entry = format!("Executed UDF scriptlet [{}] ({:?}) for package '{}'", name, kind, package_name);
+            let entry = format!(
+                "Executed UDF scriptlet [{}] ({:?}) for package '{}'",
+                name, kind, package_name
+            );
             self.execution_log.push(entry);
             Ok(true)
         } else {
@@ -394,8 +407,10 @@ impl UniversalMultiFormatTranspilerAndExecutionEngineV26 {
             pkg.properties.insert("cflags".to_string(), cflags.clone());
         }
 
-        pkg.properties
-            .insert("source_format".to_string(), format!("{:?}", manifest.detected_format));
+        pkg.properties.insert(
+            "source_format".to_string(),
+            format!("{:?}", manifest.detected_format),
+        );
         pkg.checksum = manifest.payload_sha256.clone();
         pkg
     }
@@ -422,7 +437,11 @@ impl UniversalMultiFormatTranspilerAndExecutionEngineV26 {
 
     /// Rolls back system state to a previous checkpoint ID V26
     pub fn rollback_checkpoint(&mut self, checkpoint_id: usize) -> Result<(), String> {
-        if let Some(cp) = self.checkpoints.iter().find(|c| c.checkpoint_id == checkpoint_id) {
+        if let Some(cp) = self
+            .checkpoints
+            .iter()
+            .find(|c| c.checkpoint_id == checkpoint_id)
+        {
             self.installed_packages = cp.installed_packages.clone();
             Ok(())
         } else {
@@ -607,7 +626,9 @@ impl SovereignDistroPackageAdvancementsSuiteV26 {
         payload: &[u8],
     ) -> Result<UnifiedPackage, String> {
         let manifest = self.inspector.inspect_package(filename, payload)?;
-        let _sandbox_rules = self.governor.generate_sandbox_rules(manifest.detected_format);
+        let _sandbox_rules = self
+            .governor
+            .generate_sandbox_rules(manifest.detected_format);
         let sigpkg = self
             .transpiler_engine
             .transpile_to_native_sigpkg(&manifest, &self.governor);
@@ -674,7 +695,9 @@ mod tests {
         ];
 
         for (filename, expected_fmt) in test_cases {
-            let manifest = inspector.inspect_package(filename, b"PAYLOAD_DATA").unwrap();
+            let manifest = inspector
+                .inspect_package(filename, b"PAYLOAD_DATA")
+                .unwrap();
             assert_eq!(
                 manifest.detected_format, expected_fmt,
                 "Inspection failed for filename: {}",
@@ -692,7 +715,10 @@ mod tests {
         assert_eq!(governor.remap_dependency("glibc"), "sovereign-libc");
         assert_eq!(governor.remap_dependency("libcurl-dev"), "sovereign-curl");
         assert_eq!(governor.remap_dependency("python3-dev"), "sovereign-python");
-        assert_eq!(governor.remap_dependency("unknown-pkg"), "sovereign-unknown-pkg");
+        assert_eq!(
+            governor.remap_dependency("unknown-pkg"),
+            "sovereign-unknown-pkg"
+        );
 
         let sandbox = governor.generate_sandbox_rules(PackageFormat::Flatpak);
         assert!(sandbox.pledge_promises.contains("inet"));
@@ -704,7 +730,9 @@ mod tests {
         let mut scriptlets = UdfScriptletSandboxEngineV26::new();
         scriptlets.register_hook("post_install_clean", ScriptletHookKindV26::PostInstall);
 
-        assert!(scriptlets.execute_hook("post_install_clean", "nginx").unwrap());
+        assert!(scriptlets
+            .execute_hook("post_install_clean", "nginx")
+            .unwrap());
         assert_eq!(scriptlets.execution_log.len(), 1);
         assert!(scriptlets.execute_hook("non_existent", "nginx").is_err());
     }

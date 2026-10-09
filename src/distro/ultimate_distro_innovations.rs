@@ -366,7 +366,6 @@ mod tests {
     }
 
     #[ignore]
-
     #[test]
     fn test_debian_multiarch_apt_engine() {
         let mut engine = DebianMultiarchAptEngine::new();

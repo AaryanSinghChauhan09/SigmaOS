@@ -103,7 +103,7 @@ pub struct DesktopCursorManager {
     themes: HashMap<String, DesktopCursorTheme>,
     current_theme: Option<String>,
     cursor_size: DesktopCursorSize,
-    cursor_speed: u32,  // 0-100
+    cursor_speed: u32, // 0-100
     default_cursor: DesktopCursorType,
     counter: u32,
 }
@@ -133,15 +133,42 @@ impl DesktopCursorManager {
         );
 
         // Add default cursors
-        theme.add_cursor(DesktopCursorType::Default, "/usr/share/cursors/default/left_ptr".to_string());
-        theme.add_cursor(DesktopCursorType::Pointer, "/usr/share/cursors/default/hand2".to_string());
-        theme.add_cursor(DesktopCursorType::Text, "/usr/share/cursors/default/text".to_string());
-        theme.add_cursor(DesktopCursorType::Move, "/usr/share/cursors/default/fleur".to_string());
-        theme.add_cursor(DesktopCursorType::Busy, "/usr/share/cursors/default/watch".to_string());
-        theme.add_cursor(DesktopCursorType::Progress, "/usr/share/cursors/default/left_ptr_watch".to_string());
-        theme.add_cursor(DesktopCursorType::Crosshair, "/usr/share/cursors/default/crosshair".to_string());
-        theme.add_cursor(DesktopCursorType::Hand, "/usr/share/cursors/default/hand1".to_string());
-        theme.add_cursor(DesktopCursorType::NotAllowed, "/usr/share/cursors/default/circle".to_string());
+        theme.add_cursor(
+            DesktopCursorType::Default,
+            "/usr/share/cursors/default/left_ptr".to_string(),
+        );
+        theme.add_cursor(
+            DesktopCursorType::Pointer,
+            "/usr/share/cursors/default/hand2".to_string(),
+        );
+        theme.add_cursor(
+            DesktopCursorType::Text,
+            "/usr/share/cursors/default/text".to_string(),
+        );
+        theme.add_cursor(
+            DesktopCursorType::Move,
+            "/usr/share/cursors/default/fleur".to_string(),
+        );
+        theme.add_cursor(
+            DesktopCursorType::Busy,
+            "/usr/share/cursors/default/watch".to_string(),
+        );
+        theme.add_cursor(
+            DesktopCursorType::Progress,
+            "/usr/share/cursors/default/left_ptr_watch".to_string(),
+        );
+        theme.add_cursor(
+            DesktopCursorType::Crosshair,
+            "/usr/share/cursors/default/crosshair".to_string(),
+        );
+        theme.add_cursor(
+            DesktopCursorType::Hand,
+            "/usr/share/cursors/default/hand1".to_string(),
+        );
+        theme.add_cursor(
+            DesktopCursorType::NotAllowed,
+            "/usr/share/cursors/default/circle".to_string(),
+        );
 
         let theme_id = theme.id.clone();
         self.themes.insert(theme_id.clone(), theme);
@@ -223,7 +250,12 @@ impl DesktopCursorManager {
         }
     }
 
-    pub fn add_cursor_to_theme(&mut self, theme_id: &str, cursor_type: DesktopCursorType, file_path: String) -> bool {
+    pub fn add_cursor_to_theme(
+        &mut self,
+        theme_id: &str,
+        cursor_type: DesktopCursorType,
+        file_path: String,
+    ) -> bool {
         if let Some(theme) = self.themes.get_mut(theme_id) {
             theme.add_cursor(cursor_type, file_path);
             true
@@ -232,7 +264,11 @@ impl DesktopCursorManager {
         }
     }
 
-    pub fn remove_cursor_from_theme(&mut self, theme_id: &str, cursor_type: DesktopCursorType) -> bool {
+    pub fn remove_cursor_from_theme(
+        &mut self,
+        theme_id: &str,
+        cursor_type: DesktopCursorType,
+    ) -> bool {
         if let Some(theme) = self.themes.get_mut(theme_id) {
             theme.cursors.remove(&cursor_type).is_some()
         } else {
@@ -390,7 +426,10 @@ mod tests {
         ));
 
         let theme = manager.get_theme(theme_id).unwrap();
-        assert_eq!(theme.get_cursor(DesktopCursorType::NotAllowed), Some(&"/custom/circle.png".to_string()));
+        assert_eq!(
+            theme.get_cursor(DesktopCursorType::NotAllowed),
+            Some(&"/custom/circle.png".to_string())
+        );
     }
 
     #[test]

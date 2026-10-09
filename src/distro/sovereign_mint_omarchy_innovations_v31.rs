@@ -16,17 +16,17 @@ extern crate alloc;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::{
     collections::BTreeMap,
+    format,
     string::{String, ToString},
     vec::Vec,
-    format,
 };
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::{
     collections::BTreeMap,
+    format,
     string::{String, ToString},
     vec::Vec,
-    format,
 };
 
 // ============================================================================
@@ -195,8 +195,7 @@ impl MintSourcesRepositoryManager {
 
     /// Get ordered list of enabled repos by priority.
     pub fn priority_ordered_repos(&self) -> Vec<&RepoEntry> {
-        let mut enabled: Vec<&RepoEntry> =
-            self.repos.values().filter(|r| r.enabled).collect();
+        let mut enabled: Vec<&RepoEntry> = self.repos.values().filter(|r| r.enabled).collect();
         enabled.sort_by_key(|r| r.priority);
         enabled
     }
@@ -351,23 +350,23 @@ impl CinnamonEffectsEngine {
 
     /// Get the interpolated progress [0.0, 1.0] for a window animation.
     pub fn progress(&self, window_id: u64) -> Option<f32> {
-        self.active.iter().find(|a| a.window_id == window_id).map(|a| {
-            if a.duration_ms == 0 {
-                1.0
-            } else {
-                (a.elapsed_ms as f32 / a.duration_ms as f32).clamp(0.0, 1.0)
-            }
-        })
+        self.active
+            .iter()
+            .find(|a| a.window_id == window_id)
+            .map(|a| {
+                if a.duration_ms == 0 {
+                    1.0
+                } else {
+                    (a.elapsed_ms as f32 / a.duration_ms as f32).clamp(0.0, 1.0)
+                }
+            })
     }
 
     /// Evaluate cubic bezier at parameter t ∈ [0,1].
     /// Uses the de Casteljau algorithm for numerical stability.
     pub fn bezier_eval(p0: f32, p1: f32, p2: f32, p3: f32, t: f32) -> f32 {
         let t1 = 1.0 - t;
-        t1 * t1 * t1 * p0
-            + 3.0 * t1 * t1 * t * p1
-            + 3.0 * t1 * t * t * p2
-            + t * t * t * p3
+        t1 * t1 * t1 * p0 + 3.0 * t1 * t1 * t * p1 + 3.0 * t1 * t * t * p2 + t * t * t * p3
     }
 
     /// Evaluate spring physics: returns position given elapsed time.
@@ -447,7 +446,11 @@ pub enum ExtMsg {
     /// Context menu about to open at given coordinates.
     ContextMenuOpen { x: i32, y: i32 },
     /// File operation started.
-    OpStarted { op: String, src: String, dst: String },
+    OpStarted {
+        op: String,
+        src: String,
+        dst: String,
+    },
     /// File operation completed.
     OpCompleted { op: String, success: bool },
     /// Request to refresh a column for a file path.
@@ -649,10 +652,7 @@ impl OmarchyDotfileVersionControl {
 
     /// Detect conflicts between the current active profile and a new profile.
     /// Returns a list of conflicting symlink targets.
-    pub fn detect_conflicts(
-        &self,
-        new_profile_name: &str,
-    ) -> Result<Vec<DotfileConflict>, String> {
+    pub fn detect_conflicts(&self, new_profile_name: &str) -> Result<Vec<DotfileConflict>, String> {
         let new = self
             .profiles
             .get(new_profile_name)
@@ -802,7 +802,11 @@ impl NvimPreset {
         // Core Omarchy nvim plugins
         let plugins = [
             ("LazyVim/LazyVim", false, &[] as &[&str]),
-            ("nvim-treesitter/nvim-treesitter", true, &["BufReadPost", "BufNewFile"]),
+            (
+                "nvim-treesitter/nvim-treesitter",
+                true,
+                &["BufReadPost", "BufNewFile"],
+            ),
             ("neovim/nvim-lspconfig", true, &["BufReadPre"]),
             ("hrsh7th/nvim-cmp", true, &["InsertEnter"]),
             ("folke/which-key.nvim", true, &["VeryLazy"]),
@@ -887,10 +891,7 @@ impl OmarchyNeovimPresetsManager {
     /// Generate a lazy.nvim Lua spec for the active preset.
     /// Returns the Lua source as a String.
     pub fn generate_lua_spec(&self) -> Result<String, String> {
-        let name = self
-            .active_preset
-            .as_deref()
-            .ok_or("No active preset")?;
+        let name = self.active_preset.as_deref().ok_or("No active preset")?;
         let preset = &self.presets[name];
 
         let mut lua = String::from("return {\n");
@@ -1056,7 +1057,11 @@ impl SigmaHyprlandConfigEngine {
         engine.set("general", "gaps_in", "5");
         engine.set("general", "gaps_out", "10");
         engine.set("general", "border_size", "2");
-        engine.set("general", "col.active_border", "rgba(ca9ee6ff) rgba(99d1db11) 45deg");
+        engine.set(
+            "general",
+            "col.active_border",
+            "rgba(ca9ee6ff) rgba(99d1db11) 45deg",
+        );
         engine.set("general", "col.inactive_border", "rgba(595959aa)");
         engine.set("decoration", "rounding", "10");
         engine.set("decoration", "blur:enabled", "true");
@@ -1082,7 +1087,8 @@ impl SigmaHyprlandConfigEngine {
 
     /// Set a configuration key-value pair.
     pub fn set(&mut self, section: &str, key: &str, value: &str) {
-        self.kvs.insert((section.to_string(), key.to_string()), value.to_string());
+        self.kvs
+            .insert((section.to_string(), key.to_string()), value.to_string());
         self.pending_reload = true;
     }
 
@@ -1103,13 +1109,13 @@ impl SigmaHyprlandConfigEngine {
     pub fn add_keybind(&mut self, mods: &str, key: &str, action: &str) -> bool {
         // Check for conflicts
         let conflict = self.keybinds.iter().any(|(m, k, _)| {
-            m.to_uppercase() == mods.to_uppercase()
-                && k.to_uppercase() == key.to_uppercase()
+            m.to_uppercase() == mods.to_uppercase() && k.to_uppercase() == key.to_uppercase()
         });
         if conflict {
             return false;
         }
-        self.keybinds.push((mods.to_string(), key.to_string(), action.to_string()));
+        self.keybinds
+            .push((mods.to_string(), key.to_string(), action.to_string()));
         self.pending_reload = true;
         true
     }
@@ -1161,7 +1167,12 @@ impl SigmaHyprlandConfigEngine {
 
     /// Statistics.
     pub fn stats(&self) -> (usize, usize, u64, bool) {
-        (self.kvs.len(), self.keybinds.len(), self.reload_count, self.pending_reload)
+        (
+            self.kvs.len(),
+            self.keybinds.len(),
+            self.reload_count,
+            self.pending_reload,
+        )
     }
 }
 
@@ -1193,10 +1204,7 @@ impl SovereignMintOmarchyInnovationsSuiteV31 {
             repo_manager: MintSourcesRepositoryManager::new(),
             effects_engine: CinnamonEffectsEngine::new(FrameBudget::standard_60hz()),
             plugin_bus: NemoExtensionPluginBus::new(),
-            dotfile_vc: OmarchyDotfileVersionControl::new(
-                "/home/user/.dotfiles",
-                "/home/user",
-            ),
+            dotfile_vc: OmarchyDotfileVersionControl::new("/home/user/.dotfiles", "/home/user"),
             nvim_manager: OmarchyNeovimPresetsManager::new(),
             hyprland_config: SigmaHyprlandConfigEngine::new(),
         };
@@ -1249,13 +1257,20 @@ impl SovereignMintOmarchyInnovationsSuiteV31 {
              - Nvim: {} presets, {} loads, {} health-fails\n\
              - Hyprland: {} kvs, {} keybinds, {} reloads (pending={})\n",
             self.repo_manager.repo_count(),
-            completed, active, dropped,
+            completed,
+            active,
+            dropped,
             self.plugin_bus.plugin_count(),
             self.plugin_bus.total_dispatched(),
             self.dotfile_vc.list_profiles().len(),
             self.dotfile_vc.stats().0,
-            presets, loads, hfails,
-            kvs, keybinds, reloads, pending,
+            presets,
+            loads,
+            hfails,
+            kvs,
+            keybinds,
+            reloads,
+            pending,
         )
     }
 }
@@ -1415,13 +1430,7 @@ mod tests {
     #[test]
     fn test_hyprland_config_serialization() {
         let mut cfg = SigmaHyprlandConfigEngine::new();
-        cfg.add_monitor(HyprMonitor::new(
-            "DP-1",
-            (2560, 1440),
-            165,
-            (0, 0),
-            1.0,
-        ));
+        cfg.add_monitor(HyprMonitor::new("DP-1", (2560, 1440), 165, (0, 0), 1.0));
 
         let serialized = cfg.serialize();
         assert!(serialized.contains("monitor = DP-1"));

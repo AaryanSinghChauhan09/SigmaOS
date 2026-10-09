@@ -144,7 +144,11 @@ impl ScreenshotCapture {
     }
 
     /// Take screenshot with delay
-    pub fn take_screenshot_with_delay(&mut self, mode: ScreenshotMode, delay: u32) -> Result<Screenshot, String> {
+    pub fn take_screenshot_with_delay(
+        &mut self,
+        mode: ScreenshotMode,
+        delay: u32,
+    ) -> Result<Screenshot, String> {
         let original_delay = self.config.delay_seconds;
         self.config.delay_seconds = delay;
         let result = self.take_screenshot(mode);
@@ -154,7 +158,9 @@ impl ScreenshotCapture {
 
     // Keep the history entry in sync with edits to the current screenshot.
     fn sync_current(&mut self) {
-        if let (Some(current), Some(saved)) = (&self.current_screenshot, self.screenshots.last_mut()) {
+        if let (Some(current), Some(saved)) =
+            (&self.current_screenshot, self.screenshots.last_mut())
+        {
             *saved = current.clone();
         }
     }
@@ -252,7 +258,12 @@ impl ScreenshotCapture {
     /// Delete screenshot
     pub fn delete_screenshot(&mut self, id: &str) -> Result<(), String> {
         self.screenshots.retain(|s| s.id != id);
-        if self.current_screenshot.as_ref().map(|s| s.id == id).unwrap_or(false) {
+        if self
+            .current_screenshot
+            .as_ref()
+            .map(|s| s.id == id)
+            .unwrap_or(false)
+        {
             self.current_screenshot = None;
         }
         Ok(())
@@ -322,7 +333,9 @@ mod tests {
     #[test]
     fn test_take_screenshot_with_delay() {
         let mut capture = ScreenshotCapture::new();
-        let screenshot = capture.take_screenshot_with_delay(ScreenshotMode::Region, 5).unwrap();
+        let screenshot = capture
+            .take_screenshot_with_delay(ScreenshotMode::Region, 5)
+            .unwrap();
         assert_eq!(capture.screenshots.len(), 1);
     }
 

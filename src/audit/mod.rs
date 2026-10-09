@@ -194,7 +194,8 @@ impl SandboxAuditShard {
         // its slot. For compatibility we store the permission mask directly
         // and record the pid slot in a dedicated side table via bit 63.
         let _ = bit;
-        self.process_pledge_table.store(permissions, Ordering::SeqCst);
+        self.process_pledge_table
+            .store(permissions, Ordering::SeqCst);
     }
 
     fn get_process_pledges(&self, process_id: usize) -> u64 {
@@ -434,7 +435,6 @@ mod tests {
     use super::*;
 
     #[ignore]
-
     #[test]
     fn test_memory_audit_shard() {
         let shard = MemoryAuditShard::new();
@@ -452,7 +452,6 @@ mod tests {
     }
 
     #[ignore]
-
     #[test]
     fn test_crypto_audit_shard() {
         let shard = CryptoAuditShard::new();
@@ -469,7 +468,6 @@ mod tests {
     }
 
     #[ignore]
-
     #[test]
     fn test_audit_collector_bus() {
         let bus = AuditCollectorBus::new();
@@ -480,7 +478,6 @@ mod tests {
     }
 
     #[ignore]
-
     #[test]
     fn test_comprehensive_stats() {
         let bus = AuditCollectorBus::new();

@@ -272,21 +272,24 @@ impl NetworkManager {
 
     /// List connections by type
     pub fn list_by_type(&self, conn_type: ConnectionType) -> Vec<&NetworkConnection> {
-        self.connections.values()
+        self.connections
+            .values()
             .filter(|c| c.connection_type == conn_type)
             .collect()
     }
 
     /// List connected connections
     pub fn list_connected(&self) -> Vec<&NetworkConnection> {
-        self.connections.values()
+        self.connections
+            .values()
             .filter(|c| c.is_connected())
             .collect()
     }
 
     /// Connect to a network
     pub fn connect(&mut self, id: &str) -> Result<(), String> {
-        let connection = self.get_connection_mut(id)
+        let connection = self
+            .get_connection_mut(id)
             .ok_or_else(|| format!("Connection {} not found", id))?;
 
         if connection.is_connected() {
@@ -307,7 +310,8 @@ impl NetworkManager {
 
     /// Disconnect from a network
     pub fn disconnect(&mut self, id: &str) -> Result<(), String> {
-        let connection = self.get_connection_mut(id)
+        let connection = self
+            .get_connection_mut(id)
             .ok_or_else(|| format!("Connection {} not found", id))?;
 
         if !connection.is_connected() {
@@ -328,10 +332,34 @@ impl NetworkManager {
 
         // Simulate WiFi scan
         let networks = vec![
-            ("HomeNetwork", "00:11:22:33:44:55", WiFiSecurity::WPA2_PSK, 80, 2412),
-            ("GuestNetwork", "00:11:22:33:44:56", WiFiSecurity::WPA2_PSK, 60, 2412),
-            ("FreeWiFi", "00:11:22:33:44:57", WiFiSecurity::Open, 40, 2437),
-            ("5GHz-Network", "00:11:22:33:44:58", WiFiSecurity::WPA3_PSK, 70, 5180),
+            (
+                "HomeNetwork",
+                "00:11:22:33:44:55",
+                WiFiSecurity::WPA2_PSK,
+                80,
+                2412,
+            ),
+            (
+                "GuestNetwork",
+                "00:11:22:33:44:56",
+                WiFiSecurity::WPA2_PSK,
+                60,
+                2412,
+            ),
+            (
+                "FreeWiFi",
+                "00:11:22:33:44:57",
+                WiFiSecurity::Open,
+                40,
+                2437,
+            ),
+            (
+                "5GHz-Network",
+                "00:11:22:33:44:58",
+                WiFiSecurity::WPA3_PSK,
+                70,
+                5180,
+            ),
         ];
 
         for (ssid, bssid, security, signal, freq) in networks {
@@ -351,7 +379,9 @@ impl NetworkManager {
 
     /// Connect to WiFi network
     pub fn connect_wifi(&mut self, ssid: &str, password: Option<String>) -> Result<String, String> {
-        let wifi = self.wifi_networks.iter()
+        let wifi = self
+            .wifi_networks
+            .iter()
             .find(|w| w.ssid == ssid)
             .ok_or_else(|| format!("WiFi network {} not found", ssid))?;
 
@@ -376,7 +406,9 @@ impl NetworkManager {
     /// Get statistics
     pub fn get_statistics(&self) -> NetworkStatistics {
         let total_connections = self.connections.len();
-        let connected_count = self.connections.values()
+        let connected_count = self
+            .connections
+            .values()
             .filter(|c| c.is_connected())
             .count();
         let wifi_count = self.list_by_type(ConnectionType::WiFi).len();
@@ -417,13 +449,22 @@ mod tests {
     #[test]
     fn test_connection_type_from_str() {
         assert_eq!(ConnectionType::from_str("wifi"), Some(ConnectionType::WiFi));
-        assert_eq!(ConnectionType::from_str("ethernet"), Some(ConnectionType::Ethernet));
+        assert_eq!(
+            ConnectionType::from_str("ethernet"),
+            Some(ConnectionType::Ethernet)
+        );
     }
 
     #[test]
     fn test_connection_status_from_str() {
-        assert_eq!(ConnectionStatus::from_str("connected"), Some(ConnectionStatus::Connected));
-        assert_eq!(ConnectionStatus::from_str("disconnected"), Some(ConnectionStatus::Disconnected));
+        assert_eq!(
+            ConnectionStatus::from_str("connected"),
+            Some(ConnectionStatus::Connected)
+        );
+        assert_eq!(
+            ConnectionStatus::from_str("disconnected"),
+            Some(ConnectionStatus::Disconnected)
+        );
     }
 
     #[test]
@@ -501,7 +542,9 @@ mod tests {
     fn test_connect_wifi() {
         let mut manager = NetworkManager::new();
         manager.scan_wifi();
-        assert!(manager.connect_wifi("HomeNetwork", Some("password".to_string())).is_ok());
+        assert!(manager
+            .connect_wifi("HomeNetwork", Some("password".to_string()))
+            .is_ok());
     }
 
     #[test]

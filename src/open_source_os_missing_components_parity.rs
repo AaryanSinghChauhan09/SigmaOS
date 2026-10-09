@@ -55,12 +55,17 @@ impl RedoxSchemeHandlerEngine {
         if self.schemes.contains_key(scheme_name) {
             false
         } else {
-            self.schemes.insert(scheme_name.to_string(), BTreeMap::new());
+            self.schemes
+                .insert(scheme_name.to_string(), BTreeMap::new());
             true
         }
     }
 
-    pub fn dispatch(&mut self, scheme_name: &str, op: RedoxSchemeOp) -> Result<RedoxSchemeResponse, String> {
+    pub fn dispatch(
+        &mut self,
+        scheme_name: &str,
+        op: RedoxSchemeOp,
+    ) -> Result<RedoxSchemeResponse, String> {
         let scheme = self
             .schemes
             .get_mut(scheme_name)
@@ -79,7 +84,9 @@ impl RedoxSchemeHandlerEngine {
                 })
             }
             RedoxSchemeOp::Read { fd, count } => {
-                let buf = scheme.get(&fd).ok_or_else(|| alloc::format!("Invalid FD {}", fd))?;
+                let buf = scheme
+                    .get(&fd)
+                    .ok_or_else(|| alloc::format!("Invalid FD {}", fd))?;
                 let read_len = core::cmp::min(count, buf.len());
                 let payload = buf[..read_len].to_vec();
                 Ok(RedoxSchemeResponse {
@@ -90,7 +97,9 @@ impl RedoxSchemeHandlerEngine {
                 })
             }
             RedoxSchemeOp::Write { fd, data } => {
-                let buf = scheme.get_mut(&fd).ok_or_else(|| alloc::format!("Invalid FD {}", fd))?;
+                let buf = scheme
+                    .get_mut(&fd)
+                    .ok_or_else(|| alloc::format!("Invalid FD {}", fd))?;
                 let len = data.len();
                 buf.extend_from_slice(&data);
                 Ok(RedoxSchemeResponse {
@@ -101,7 +110,9 @@ impl RedoxSchemeHandlerEngine {
                 })
             }
             RedoxSchemeOp::Close { fd } => {
-                scheme.remove(&fd).ok_or_else(|| alloc::format!("Invalid FD {}", fd))?;
+                scheme
+                    .remove(&fd)
+                    .ok_or_else(|| alloc::format!("Invalid FD {}", fd))?;
                 Ok(RedoxSchemeResponse {
                     fd,
                     bytes_processed: 0,
@@ -173,7 +184,13 @@ impl IllumosDTraceZonesEngine {
         }
     }
 
-    pub fn get_fire_count(&self, provider: &str, module: &str, function: &str, name: &str) -> Option<u64> {
+    pub fn get_fire_count(
+        &self,
+        provider: &str,
+        module: &str,
+        function: &str,
+        name: &str,
+    ) -> Option<u64> {
         let probe = IllumosDTraceProbe {
             provider: provider.to_string(),
             module: module.to_string(),
@@ -187,7 +204,8 @@ impl IllumosDTraceZonesEngine {
         if self.zones.contains_key(zone_name) {
             false
         } else {
-            self.zones.insert(zone_name.to_string(), IllumosZoneState::Configured);
+            self.zones
+                .insert(zone_name.to_string(), IllumosZoneState::Configured);
             true
         }
     }
@@ -231,7 +249,11 @@ impl GenodeCapabilityRpcRouter {
         }
     }
 
-    pub fn grant_capability(&mut self, service_label: &str, parent_id: u64) -> GenodeCapabilityToken {
+    pub fn grant_capability(
+        &mut self,
+        service_label: &str,
+        parent_id: u64,
+    ) -> GenodeCapabilityToken {
         let cap_id = self.next_cap_id;
         self.next_cap_id += 1;
         let token = GenodeCapabilityToken {
@@ -253,7 +275,12 @@ impl GenodeCapabilityRpcRouter {
             .capabilities
             .get(cap_id)
             .ok_or_else(|| alloc::format!("Capability ID {} invalid", cap_id))?;
-        Ok(alloc::format!("RPC_DISPATCHED[cap={} parent={} payload='{}']", cap.cap_id, cap.parent_id, payload))
+        Ok(alloc::format!(
+            "RPC_DISPATCHED[cap={} parent={} payload='{}']",
+            cap.cap_id,
+            cap.parent_id,
+            payload
+        ))
     }
 }
 
@@ -313,9 +340,18 @@ impl GnuHurdTranslatorServer {
 /// SerenityOS LibGUI Async Window Message.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SerenityLibGuiWindowMessage {
-    CreateWindow { title: String, width: u32, height: u32 },
-    PaintWindow { window_id: u32, rect: (u32, u32, u32, u32) },
-    CloseWindow { window_id: u32 },
+    CreateWindow {
+        title: String,
+        width: u32,
+        height: u32,
+    },
+    PaintWindow {
+        window_id: u32,
+        rect: (u32, u32, u32, u32),
+    },
+    CloseWindow {
+        window_id: u32,
+    },
 }
 
 /// SerenityOS LibGUI Window Descriptor.
@@ -347,7 +383,11 @@ impl SerenityLibGuiWindowIpcEngine {
 
     pub fn send_message(&mut self, msg: SerenityLibGuiWindowMessage) -> Result<u32, String> {
         match msg.clone() {
-            SerenityLibGuiWindowMessage::CreateWindow { title, width, height } => {
+            SerenityLibGuiWindowMessage::CreateWindow {
+                title,
+                width,
+                height,
+            } => {
                 let window_id = self.next_window_id;
                 self.next_window_id += 1;
                 let window = SerenityLibGuiWindow {
@@ -449,7 +489,12 @@ impl FreeBsdGeomClassEngine {
         }
     }
 
-    pub fn create_class(&mut self, class_name: &str, kind: GeomTransformKind, provider_names: &[&str]) -> Result<(), String> {
+    pub fn create_class(
+        &mut self,
+        class_name: &str,
+        kind: GeomTransformKind,
+        provider_names: &[&str],
+    ) -> Result<(), String> {
         if self.classes.contains_key(class_name) {
             return Err(alloc::format!("Class '{}' already exists", class_name));
         }
@@ -547,7 +592,11 @@ impl AlpineApk3PackageEngine {
                     self.installed_packages.insert(dep.clone(), dep_pkg);
                     installed_list.push(dep.clone());
                 } else {
-                    return Err(alloc::format!("Dependency '{}' missing for '{}'", dep, pkg_name));
+                    return Err(alloc::format!(
+                        "Dependency '{}' missing for '{}'",
+                        dep,
+                        pkg_name
+                    ));
                 }
             }
         }
@@ -610,7 +659,10 @@ impl TempleOsHolyCExecutor {
             }
             return Ok(sum);
         }
-        Err(alloc::format!("Unable to evaluate HolyC expression: '{}'", expr))
+        Err(alloc::format!(
+            "Unable to evaluate HolyC expression: '{}'",
+            expr
+        ))
     }
 }
 
@@ -672,7 +724,12 @@ impl QnxNeutrinoMsgPassEngine {
         self.cpu_budgets.get(&pid).copied().unwrap_or(100)
     }
 
-    pub fn msg_send(&mut self, channel_id: u32, sender_pid: u32, data: &[u8]) -> Result<u64, String> {
+    pub fn msg_send(
+        &mut self,
+        channel_id: u32,
+        sender_pid: u32,
+        data: &[u8],
+    ) -> Result<u64, String> {
         let channel = self
             .channels
             .get_mut(&channel_id)
@@ -732,7 +789,12 @@ impl CosmoApeBinaryHeaderEngine {
         }
         // Polyglot APE headers support all major platforms by design
         match target {
-            CosmoTargetOs::Linux | CosmoTargetOs::OpenBsd | CosmoTargetOs::FreeBsd | CosmoTargetOs::NetBsd | CosmoTargetOs::Windows | CosmoTargetOs::Darwin => true,
+            CosmoTargetOs::Linux
+            | CosmoTargetOs::OpenBsd
+            | CosmoTargetOs::FreeBsd
+            | CosmoTargetOs::NetBsd
+            | CosmoTargetOs::Windows
+            | CosmoTargetOs::Darwin => true,
         }
     }
 }
@@ -745,13 +807,31 @@ mod tests {
     fn test_redox_scheme_engine() {
         let mut engine = RedoxSchemeHandlerEngine::new();
         assert!(engine.register_scheme("file"));
-        let open_res = engine.dispatch("file", RedoxSchemeOp::Open { path: "test.txt".to_string(), flags: 0 }).unwrap();
+        let open_res = engine
+            .dispatch(
+                "file",
+                RedoxSchemeOp::Open {
+                    path: "test.txt".to_string(),
+                    flags: 0,
+                },
+            )
+            .unwrap();
         assert_eq!(open_res.fd, 1);
 
-        let write_res = engine.dispatch("file", RedoxSchemeOp::Write { fd: 1, data: b"hello".to_vec() }).unwrap();
+        let write_res = engine
+            .dispatch(
+                "file",
+                RedoxSchemeOp::Write {
+                    fd: 1,
+                    data: b"hello".to_vec(),
+                },
+            )
+            .unwrap();
         assert_eq!(write_res.bytes_processed, 5);
 
-        let read_res = engine.dispatch("file", RedoxSchemeOp::Read { fd: 1, count: 20 }).unwrap();
+        let read_res = engine
+            .dispatch("file", RedoxSchemeOp::Read { fd: 1, count: 20 })
+            .unwrap();
         assert_eq!(read_res.payload, b"test.txthello".to_vec());
     }
 
@@ -760,11 +840,17 @@ mod tests {
         let mut engine = IllumosDTraceZonesEngine::new();
         engine.register_probe("syscall", "sys", "read", "entry");
         assert!(engine.fire_probe("syscall", "sys", "read", "entry"));
-        assert_eq!(engine.get_fire_count("syscall", "sys", "read", "entry"), Some(1));
+        assert_eq!(
+            engine.get_fire_count("syscall", "sys", "read", "entry"),
+            Some(1)
+        );
 
         assert!(engine.create_zone("web-zone"));
         assert!(engine.set_zone_state("web-zone", IllumosZoneState::Running));
-        assert_eq!(engine.get_zone_state("web-zone"), Some(IllumosZoneState::Running));
+        assert_eq!(
+            engine.get_zone_state("web-zone"),
+            Some(IllumosZoneState::Running)
+        );
     }
 
     #[test]
@@ -780,7 +866,11 @@ mod tests {
     #[test]
     fn test_gnu_hurd_translators() {
         let mut server = GnuHurdTranslatorServer::new();
-        server.set_translator("/bin/isofs", "isofs_translator", GnuHurdTranslatorMode::Passive);
+        server.set_translator(
+            "/bin/isofs",
+            "isofs_translator",
+            GnuHurdTranslatorMode::Passive,
+        );
         assert!(server.activate_translator("/bin/isofs"));
         let node = server.lookup_node("/bin/isofs").unwrap();
         assert!(node.is_active);
@@ -789,14 +879,23 @@ mod tests {
     #[test]
     fn test_serenity_libgui_window_ipc() {
         let mut engine = SerenityLibGuiWindowIpcEngine::new();
-        let win_id = engine.send_message(SerenityLibGuiWindowMessage::CreateWindow { title: "Terminal".to_string(), width: 800, height: 600 }).unwrap();
+        let win_id = engine
+            .send_message(SerenityLibGuiWindowMessage::CreateWindow {
+                title: "Terminal".to_string(),
+                width: 800,
+                height: 600,
+            })
+            .unwrap();
         assert_eq!(win_id, 1);
 
         let window = engine.get_window(1).unwrap();
         assert_eq!(window.title, "Terminal");
 
         let event = engine.pop_event().unwrap();
-        assert!(matches!(event, SerenityLibGuiWindowMessage::CreateWindow { .. }));
+        assert!(matches!(
+            event,
+            SerenityLibGuiWindowMessage::CreateWindow { .. }
+        ));
     }
 
     #[test]
@@ -804,7 +903,9 @@ mod tests {
         let mut engine = FreeBsdGeomClassEngine::new();
         assert!(engine.register_provider("ada0", 1_000_000, 512));
         assert!(engine.register_provider("ada1", 1_000_000, 512));
-        assert!(engine.create_class("stripe0", GeomTransformKind::Stripe, &["ada0", "ada1"]).is_ok());
+        assert!(engine
+            .create_class("stripe0", GeomTransformKind::Stripe, &["ada0", "ada1"])
+            .is_ok());
         assert_eq!(engine.get_class_capacity("stripe0"), Some(2_000_000));
     }
 

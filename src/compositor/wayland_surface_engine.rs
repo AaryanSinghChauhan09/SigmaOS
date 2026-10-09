@@ -34,7 +34,12 @@ pub struct DamageRect {
 
 impl DamageRect {
     pub fn new(x: i32, y: i32, width: i32, height: i32) -> Self {
-        Self { x, y, width, height }
+        Self {
+            x,
+            y,
+            width,
+            height,
+        }
     }
 
     pub fn is_empty(&self) -> bool {
@@ -151,7 +156,8 @@ impl WaylandSurfaceEngine {
     }
 
     pub fn create_surface(&mut self, surface_id: u32, client_id: u32) {
-        self.surfaces.insert(surface_id, WaylandSurface::new(surface_id, client_id));
+        self.surfaces
+            .insert(surface_id, WaylandSurface::new(surface_id, client_id));
         if self.active_surface_id.is_none() {
             self.active_surface_id = Some(surface_id);
         }
@@ -186,7 +192,8 @@ impl WaylandSurfaceEngine {
         for (_id, surf) in self.surfaces.iter_mut() {
             if surf.is_mapped && surf.attached_buffer_id.is_some() {
                 let damage_count = surf.current_damage.len();
-                self.total_damage_rects_flushed.fetch_add(damage_count as u64, Ordering::SeqCst);
+                self.total_damage_rects_flushed
+                    .fetch_add(damage_count as u64, Ordering::SeqCst);
                 surf.current_damage.clear();
                 presented_surfaces += 1;
             }
@@ -227,7 +234,14 @@ mod tests {
     fn test_compositor_presentation() {
         let mut engine = WaylandSurfaceEngine::new(2560, 1440);
         engine.create_surface(1, 10);
-        engine.register_shm_buffer(100, 800, 600, 3200, WaylandPixelFormat::Xrgb8888, 800 * 600 * 4);
+        engine.register_shm_buffer(
+            100,
+            800,
+            600,
+            3200,
+            WaylandPixelFormat::Xrgb8888,
+            800 * 600 * 4,
+        );
 
         let surf = engine.surfaces.get_mut(&1).unwrap();
         surf.attach_buffer(100, 800, 600);

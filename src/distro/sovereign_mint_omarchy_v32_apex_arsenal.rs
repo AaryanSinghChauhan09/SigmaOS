@@ -26,17 +26,17 @@ extern crate alloc;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::{
     collections::BTreeMap,
+    format,
     string::{String, ToString},
     vec::Vec,
-    format,
 };
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::{
     collections::BTreeMap,
+    format,
     string::{String, ToString},
     vec::Vec,
-    format,
 };
 
 // ============================================================================
@@ -144,8 +144,16 @@ impl HypnotixStreamPipelineEngine {
                 let id = format!("chan-{}", self.channels.len() + 1);
                 self.add_channel(IptvChannel {
                     id: id.clone(),
-                    name: if pending_name.is_empty() { id } else { pending_name.clone() },
-                    group_title: if pending_group.is_empty() { "General".to_string() } else { pending_group.clone() },
+                    name: if pending_name.is_empty() {
+                        id
+                    } else {
+                        pending_name.clone()
+                    },
+                    group_title: if pending_group.is_empty() {
+                        "General".to_string()
+                    } else {
+                        pending_group.clone()
+                    },
                     logo_url: None,
                     stream_url: trimmed.to_string(),
                     epg_id: None,
@@ -173,7 +181,9 @@ impl HypnotixStreamPipelineEngine {
     }
 
     pub fn active_channel(&self) -> Option<&IptvChannel> {
-        self.active_stream_channel.as_ref().and_then(|id| self.channels.get(id))
+        self.active_stream_channel
+            .as_ref()
+            .and_then(|id| self.channels.get(id))
     }
 }
 
@@ -263,8 +273,17 @@ impl WarpinatorPinPairingMesh {
         false
     }
 
-    pub fn queue_transfer(&mut self, transfer_id: &str, peer_id: &str, filename: &str, size: u64) -> Result<(), String> {
-        let peer = self.peers.get(peer_id).ok_or_else(|| format!("Peer '{}' not found", peer_id))?;
+    pub fn queue_transfer(
+        &mut self,
+        transfer_id: &str,
+        peer_id: &str,
+        filename: &str,
+        size: u64,
+    ) -> Result<(), String> {
+        let peer = self
+            .peers
+            .get(peer_id)
+            .ok_or_else(|| format!("Peer '{}' not found", peer_id))?;
         if peer.state != PeerPairingState::PairingApproved && peer.state != PeerPairingState::Idle {
             return Err("Peer is not in approved pairing state".to_string());
         }
@@ -301,11 +320,20 @@ impl WarpinatorPinPairingMesh {
     }
 
     pub fn approved_peer_count(&self) -> usize {
-        self.peers.values().filter(|p| p.state == PeerPairingState::PairingApproved || p.state == PeerPairingState::Idle).count()
+        self.peers
+            .values()
+            .filter(|p| {
+                p.state == PeerPairingState::PairingApproved || p.state == PeerPairingState::Idle
+            })
+            .count()
     }
 
     pub fn stats(&self) -> (usize, u64, u64) {
-        (self.peers.len(), self.transfers_completed, self.total_bytes_transferred)
+        (
+            self.peers.len(),
+            self.transfers_completed,
+            self.total_bytes_transferred,
+        )
     }
 }
 
@@ -358,7 +386,8 @@ impl MintReportHardwareAdvisor {
             id: "audit-secureboot".to_string(),
             component: "Firmware/UEFI".to_string(),
             title: "Secure Boot Status Verified".to_string(),
-            description: "SigmaOS sovereign bootloader signature is enrolled in MokList.".to_string(),
+            description: "SigmaOS sovereign bootloader signature is enrolled in MokList."
+                .to_string(),
             severity: ReportSeverity::Info,
             suggested_fix: "None required".to_string(),
             resolved: true,
@@ -382,7 +411,11 @@ impl MintReportHardwareAdvisor {
     pub fn active_warnings_and_criticals(&self) -> Vec<&HardwareReport> {
         self.reports
             .values()
-            .filter(|r| !r.resolved && (r.severity == ReportSeverity::Warning || r.severity == ReportSeverity::Critical))
+            .filter(|r| {
+                !r.resolved
+                    && (r.severity == ReportSeverity::Warning
+                        || r.severity == ReportSeverity::Critical)
+            })
             .collect()
     }
 
@@ -457,7 +490,8 @@ impl MintLocaleLayoutGovernor {
 
     pub fn cycle_layout(&mut self) -> &KeyboardLayout {
         if !self.available_layouts.is_empty() {
-            self.active_layout_index = (self.active_layout_index + 1) % self.available_layouts.len();
+            self.active_layout_index =
+                (self.active_layout_index + 1) % self.available_layouts.len();
         }
         self.active_layout()
     }
@@ -516,7 +550,9 @@ impl OmarchyHypridleGovernor {
             rules: vec![
                 IdleTimeoutRule {
                     timeout_seconds: 150, // 2.5 min
-                    action: IdleAction::DimScreen { brightness_percent: 20 },
+                    action: IdleAction::DimScreen {
+                        brightness_percent: 20,
+                    },
                     resume_action: Some("brightness_restore".to_string()),
                 },
                 IdleTimeoutRule {
@@ -758,7 +794,8 @@ mod tests {
     #[test]
     fn test_hypnotix_m3u_parsing() {
         let mut engine = HypnotixStreamPipelineEngine::new();
-        let m3u = "#EXTM3U\n#EXTINF:-1 group-title=\"News\",BBC World\nhttp://example.com/live.m3u8\n";
+        let m3u =
+            "#EXTM3U\n#EXTINF:-1 group-title=\"News\",BBC World\nhttp://example.com/live.m3u8\n";
         let parsed = engine.parse_m3u_content(m3u);
         assert_eq!(parsed, 1);
     }
@@ -786,7 +823,9 @@ mod tests {
         assert!(mesh.approve_pairing_with_pin("peer-1", "987654"));
 
         // Queue transfer
-        assert!(mesh.queue_transfer("tx-1", "peer-1", "kernel.iso", 1000).is_ok());
+        assert!(mesh
+            .queue_transfer("tx-1", "peer-1", "kernel.iso", 1000)
+            .is_ok());
 
         // Progress transfer
         assert!(!mesh.progress_transfer("tx-1", 500));

@@ -224,20 +224,14 @@ impl DesktopA11yManager {
         // Default Profile
         let default_id = format!("profile_{}", self.next_profile_id);
         self.next_profile_id += 1;
-        let default = A11yProfile::new(
-            default_id.clone(),
-            "Default".to_string(),
-        );
+        let default = A11yProfile::new(default_id.clone(), "Default".to_string());
         self.profiles.insert(default_id.clone(), default);
         self.current_profile_id = Some(default_id);
 
         // Visual Impairment Profile
         let visual_id = format!("profile_{}", self.next_profile_id);
         self.next_profile_id += 1;
-        let mut visual = A11yProfile::new(
-            visual_id.clone(),
-            "Visual Impairment".to_string(),
-        );
+        let mut visual = A11yProfile::new(visual_id.clone(), "Visual Impairment".to_string());
         visual.set_screen_reader(ScreenReaderMode::On);
         visual.set_high_contrast(HighContrastMode::HighContrastBlack);
         visual.set_text_scaling(TextScaling::Larger);
@@ -247,10 +241,7 @@ impl DesktopA11yManager {
         // Motor Impairment Profile
         let motor_id = format!("profile_{}", self.next_profile_id);
         self.next_profile_id += 1;
-        let mut motor = A11yProfile::new(
-            motor_id.clone(),
-            "Motor Impairment".to_string(),
-        );
+        let mut motor = A11yProfile::new(motor_id.clone(), "Motor Impairment".to_string());
         motor.set_sticky_keys(true);
         motor.set_slow_keys(true);
         motor.set_bounce_keys(true);
@@ -260,10 +251,7 @@ impl DesktopA11yManager {
         // High Contrast Profile
         let contrast_id = format!("profile_{}", self.next_profile_id);
         self.next_profile_id += 1;
-        let mut contrast = A11yProfile::new(
-            contrast_id.clone(),
-            "High Contrast".to_string(),
-        );
+        let mut contrast = A11yProfile::new(contrast_id.clone(), "High Contrast".to_string());
         contrast.set_high_contrast(HighContrastMode::HighContrastBlack);
         contrast.set_text_scaling(TextScaling::Large);
         self.profiles.insert(contrast_id, contrast);
@@ -405,21 +393,33 @@ mod tests {
     #[test]
     fn test_update_profile_screen_reader() {
         let mut manager = DesktopA11yManager::new();
-        let profile_id = manager.get_profiles().first().map(|p| p.id.clone()).unwrap();
+        let profile_id = manager
+            .get_profiles()
+            .first()
+            .map(|p| p.id.clone())
+            .unwrap();
         assert!(manager.update_profile_screen_reader(&profile_id, ScreenReaderMode::On));
     }
 
     #[test]
     fn test_update_profile_high_contrast() {
         let mut manager = DesktopA11yManager::new();
-        let profile_id = manager.get_profiles().first().map(|p| p.id.clone()).unwrap();
+        let profile_id = manager
+            .get_profiles()
+            .first()
+            .map(|p| p.id.clone())
+            .unwrap();
         assert!(manager.update_profile_high_contrast(&profile_id, HighContrastMode::On));
     }
 
     #[test]
     fn test_update_profile_sticky_keys() {
         let mut manager = DesktopA11yManager::new();
-        let profile_id = manager.get_profiles().first().map(|p| p.id.clone()).unwrap();
+        let profile_id = manager
+            .get_profiles()
+            .first()
+            .map(|p| p.id.clone())
+            .unwrap();
         assert!(manager.update_profile_sticky_keys(&profile_id, true));
     }
 

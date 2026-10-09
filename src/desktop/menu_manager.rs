@@ -243,10 +243,7 @@ impl MenuManager {
     }
 
     pub fn get_visible_entries(&self) -> Vec<&MenuEntry> {
-        self.entries
-            .values()
-            .filter(|e| e.is_visible)
-            .collect()
+        self.entries.values().filter(|e| e.is_visible).collect()
     }
 
     pub fn set_entry_icon(&mut self, id: &str, icon: String) -> bool {
@@ -291,7 +288,9 @@ impl MenuManager {
             .values()
             .filter(|e| {
                 e.name.to_lowercase().contains(&query_lower)
-                    || e.command.as_ref().map_or(false, |c| c.to_lowercase().contains(&query_lower))
+                    || e.command
+                        .as_ref()
+                        .map_or(false, |c| c.to_lowercase().contains(&query_lower))
             })
             .collect()
     }
@@ -374,7 +373,10 @@ mod tests {
         let mut manager = MenuManager::new();
         let id = manager.add_entry("Calculator".to_string(), MenuEntryType::Application);
         assert!(manager.set_entry_command(&id, "calc".to_string()));
-        assert_eq!(manager.get_entry(&id).unwrap().command, Some("calc".to_string()));
+        assert_eq!(
+            manager.get_entry(&id).unwrap().command,
+            Some("calc".to_string())
+        );
     }
 
     #[test]
@@ -383,7 +385,10 @@ mod tests {
         let cat_id = manager.add_category("Test".to_string());
         let entry_id = manager.add_entry("Test App".to_string(), MenuEntryType::Application);
         assert!(manager.set_entry_parent(&entry_id, cat_id.clone()));
-        assert_eq!(manager.get_entry(&entry_id).unwrap().parent_id, Some(cat_id));
+        assert_eq!(
+            manager.get_entry(&entry_id).unwrap().parent_id,
+            Some(cat_id)
+        );
     }
 
     #[test]

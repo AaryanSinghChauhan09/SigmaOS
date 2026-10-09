@@ -205,7 +205,8 @@ impl DesktopThemeManager {
         self.themes.insert(adwaita_icons.id.clone(), adwaita_icons);
         self.themes.insert(mint_icons.id.clone(), mint_icons);
         self.themes.insert(papirus.id.clone(), papirus);
-        self.themes.insert(adwaita_cursor.id.clone(), adwaita_cursor);
+        self.themes
+            .insert(adwaita_cursor.id.clone(), adwaita_cursor);
         self.themes.insert(breeze_cursor.id.clone(), breeze_cursor);
         self.themes.insert(freedesktop.id.clone(), freedesktop);
         self.themes.insert(mint_sound.id.clone(), mint_sound);
@@ -452,10 +453,7 @@ mod tests {
         if gtk_themes.len() > 1 {
             let new_theme_id = gtk_themes[1].id.clone();
             assert!(manager.set_gtk_theme(&new_theme_id));
-            assert_eq!(
-                manager.get_current_gtk_theme().unwrap().id,
-                new_theme_id
-            );
+            assert_eq!(manager.get_current_gtk_theme().unwrap().id, new_theme_id);
         }
     }
 

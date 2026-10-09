@@ -77,7 +77,7 @@ impl NetworkManager {
         self.dhcp_state = DhcpState::Request;
         self.dhcp_state = DhcpState::Bound;
     }
-    
+
     pub fn wifi_scan(&self) -> Vec<String> {
         let mut ve = Vec::new();
         ve.push("SigmaOS_Guest".into());

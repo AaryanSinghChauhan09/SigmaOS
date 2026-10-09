@@ -6,6 +6,8 @@ extern crate alloc;
 mod audio_editor;
 #[path = "../src/compatibility/bsd.rs"]
 mod bsd;
+#[path = "../src/compatibility/cachy_os.rs"]
+mod cachy_os;
 #[path = "../src/compatibility/chimera_linux.rs"]
 mod chimera_linux;
 #[path = "../src/compatibility/debian.rs"]
@@ -16,8 +18,6 @@ pub mod distro;
 mod geom;
 #[path = "../src/ipc/pipes.rs"]
 mod pipes;
-#[path = "../src/compatibility/cachy_os.rs"]
-mod cachy_os;
 #[path = "../src/security/unveil.rs"]
 mod unveil;
 #[path = "../src/graphics/video_editor.rs"]
@@ -154,9 +154,7 @@ use unveil::{UnveilManager, UnveilPermission};
 use video_editor::{ExportFormat, ExportProfile, VideoClip, VideoTimeline, VideoTrack};
 
 use access_control::{NtfsAce, NtfsDacl, PosixAclTable, SecurityIdentifier};
-use community_toolkit::{
-    HybridFirewallTemplateStore, VirtualizationBlueprintStore,
-};
+use community_toolkit::{HybridFirewallTemplateStore, VirtualizationBlueprintStore};
 use debian_compat::{AptRepositorySync, DebianAlternativesSystem, DebianChannel};
 use elf_relocation::{ElfRelaEntry, ElfRelocator, ElfSymbol, R_X86_64_GLOB_DAT, R_X86_64_RELATIVE};
 use endeavour_os::{AurPackageSpec, PacmanMirror, ReflectorMirrorManager, YayParuHelper};

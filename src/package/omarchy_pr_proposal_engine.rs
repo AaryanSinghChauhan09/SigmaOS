@@ -60,7 +60,13 @@ impl OmarchyPrProposalEngine {
         }
     }
 
-    pub fn submit_proposal(&mut self, title: &str, author: &str, component: &str, diff: &str) -> u64 {
+    pub fn submit_proposal(
+        &mut self,
+        title: &str,
+        author: &str,
+        component: &str,
+        diff: &str,
+    ) -> u64 {
         let pr_id = self.next_pr_id;
         self.next_pr_id += 1;
         self.proposals.insert(
@@ -78,7 +84,10 @@ impl OmarchyPrProposalEngine {
     }
 
     pub fn validate_and_merge_pr(&mut self, pr_id: u64) -> Result<OmarchyPrStatus, &'static str> {
-        let prop = self.proposals.get_mut(&pr_id).ok_or("Omarchy PR Error: Proposal not found")?;
+        let prop = self
+            .proposals
+            .get_mut(&pr_id)
+            .ok_or("Omarchy PR Error: Proposal not found")?;
         if prop.unified_diff.is_empty() {
             prop.status = OmarchyPrStatus::Rejected;
             return Err("Omarchy PR Error: Empty diff in proposal");
@@ -138,7 +147,11 @@ impl HyprlandPluginPrGateway {
         }
     }
 
-    pub fn transpile_plugin_pr(&mut self, plugin_name: &str, cpp_code: &str) -> Result<String, &'static str> {
+    pub fn transpile_plugin_pr(
+        &mut self,
+        plugin_name: &str,
+        cpp_code: &str,
+    ) -> Result<String, &'static str> {
         if plugin_name.is_empty() || cpp_code.is_empty() {
             return Err("Hyprland Plugin Error: Invalid plugin metadata or code");
         }
@@ -168,7 +181,11 @@ impl OmarchyPkgbuildAurPrValidator {
         }
     }
 
-    pub fn validate_and_generate_pr_diff(&mut self, pkgname: &str, pkgbuild_content: &str) -> Result<String, &'static str> {
+    pub fn validate_and_generate_pr_diff(
+        &mut self,
+        pkgname: &str,
+        pkgbuild_content: &str,
+    ) -> Result<String, &'static str> {
         if !pkgbuild_content.contains("pkgname=") || !pkgbuild_content.contains("pkgver=") {
             return Err("PKGBUILD Error: Invalid PKGBUILD manifest format");
         }
@@ -205,9 +222,16 @@ impl SovereignOmarchyPrProposalMasterSuite {
     }
 
     pub fn run_master_omarchy_pr_workflow(&mut self) -> bool {
-        let recipe_diff = self.recipe_transpiler.transpile_omakub_recipe("sudo pacman -S alacritty");
-        let plugin_diff = self.hyprland_gateway.transpile_plugin_pr("hyprspace", "void init() {}");
-        let pkg_diff = self.pkgbuild_validator.validate_and_generate_pr_diff("omarchy-theme", "pkgname=omarchy-theme\npkgver=1.1.0\n");
+        let recipe_diff = self
+            .recipe_transpiler
+            .transpile_omakub_recipe("sudo pacman -S alacritty");
+        let plugin_diff = self
+            .hyprland_gateway
+            .transpile_plugin_pr("hyprspace", "void init() {}");
+        let pkg_diff = self.pkgbuild_validator.validate_and_generate_pr_diff(
+            "omarchy-theme",
+            "pkgname=omarchy-theme\npkgver=1.1.0\n",
+        );
 
         if recipe_diff.is_err() || plugin_diff.is_err() || pkg_diff.is_err() {
             return false;
@@ -238,7 +262,12 @@ mod tests {
     #[test]
     fn test_omarchy_pr_proposal_engine() {
         let mut engine = OmarchyPrProposalEngine::new();
-        let pr_id = engine.submit_proposal("Fix Waybar CSS", "dev", "waybar", "--- a/style.css\n+++ b/style.css");
+        let pr_id = engine.submit_proposal(
+            "Fix Waybar CSS",
+            "dev",
+            "waybar",
+            "--- a/style.css\n+++ b/style.css",
+        );
         assert_eq!(pr_id, 1001);
 
         let status = engine.validate_and_merge_pr(pr_id).unwrap();
@@ -248,7 +277,9 @@ mod tests {
     #[test]
     fn test_omakub_recipe_transpiler() {
         let mut transpiler = OmakubRecipeTranspiler::new();
-        let diff = transpiler.transpile_omakub_recipe("echo 'Omakase'").unwrap();
+        let diff = transpiler
+            .transpile_omakub_recipe("echo 'Omakase'")
+            .unwrap();
         assert!(diff.contains("TRANSPILED_OMAKUB_SIGPKG"));
         assert_eq!(transpiler.total_recipes_transpiled, 1);
     }
@@ -256,7 +287,9 @@ mod tests {
     #[test]
     fn test_hyprland_plugin_pr_gateway() {
         let mut gateway = HyprlandPluginPrGateway::new();
-        let diff = gateway.transpile_plugin_pr("hyprscrb", "int main() { return 0; }").unwrap();
+        let diff = gateway
+            .transpile_plugin_pr("hyprscrb", "int main() { return 0; }")
+            .unwrap();
         assert!(diff.contains("Transpiled Hyprland Plugin PR: hyprscrb"));
         assert_eq!(gateway.registered_plugins_count, 1);
     }
@@ -264,7 +297,8 @@ mod tests {
     #[test]
     fn test_omarchy_pkgbuild_aur_pr_validator() {
         let mut validator = OmarchyPkgbuildAurPrValidator::new();
-        let res = validator.validate_and_generate_pr_diff("omarchy-theme", "pkgname=omarchy-theme\npkgver=1.0");
+        let res = validator
+            .validate_and_generate_pr_diff("omarchy-theme", "pkgname=omarchy-theme\npkgver=1.0");
         assert!(res.is_ok());
         assert_eq!(validator.validated_pkgbuilds_count, 1);
 

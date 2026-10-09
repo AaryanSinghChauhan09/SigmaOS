@@ -222,7 +222,8 @@ mod tests {
     #[test]
     fn test_supervisor_service_lifecycle() {
         let mut supervisor = SovereignInitSupervisor::new();
-        let unit = SovereignServiceUnit::new("networkd", "/bin/sigma-networkd", RestartPolicy::Always);
+        let unit =
+            SovereignServiceUnit::new("networkd", "/bin/sigma-networkd", RestartPolicy::Always);
         supervisor.register_service(unit);
 
         let pid = supervisor.start_service("networkd").unwrap();
@@ -248,7 +249,8 @@ mod tests {
     #[test]
     fn test_never_restart_on_success() {
         let mut supervisor = SovereignInitSupervisor::new();
-        let unit = SovereignServiceUnit::new("oneshot-backup", "/bin/backup", RestartPolicy::OnFailure);
+        let unit =
+            SovereignServiceUnit::new("oneshot-backup", "/bin/backup", RestartPolicy::OnFailure);
         supervisor.register_service(unit);
 
         let pid = supervisor.start_service("oneshot-backup").unwrap();

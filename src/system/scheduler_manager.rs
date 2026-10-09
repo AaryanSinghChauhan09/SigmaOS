@@ -85,12 +85,7 @@ pub struct ScheduledTask {
 }
 
 impl ScheduledTask {
-    pub fn new(
-        id: String,
-        name: String,
-        command: String,
-        frequency: ScheduleFrequency,
-    ) -> Self {
+    pub fn new(id: String, name: String, command: String, frequency: ScheduleFrequency) -> Self {
         Self {
             id,
             name,
@@ -138,10 +133,30 @@ impl SchedulerManager {
     /// Add default tasks
     fn add_default_tasks(&mut self) {
         let tasks = vec![
-            ("backup", "System Backup", "/usr/bin/sigma-backup", ScheduleFrequency::Daily),
-            ("update", "System Update", "/usr/bin/sigma-update", ScheduleFrequency::Weekly),
-            ("cleanup", "System Cleanup", "/usr/bin/sigma-cleanup", ScheduleFrequency::Weekly),
-            ("logrotate", "Log Rotation", "/usr/sbin/logrotate", ScheduleFrequency::Daily),
+            (
+                "backup",
+                "System Backup",
+                "/usr/bin/sigma-backup",
+                ScheduleFrequency::Daily,
+            ),
+            (
+                "update",
+                "System Update",
+                "/usr/bin/sigma-update",
+                ScheduleFrequency::Weekly,
+            ),
+            (
+                "cleanup",
+                "System Cleanup",
+                "/usr/bin/sigma-cleanup",
+                ScheduleFrequency::Weekly,
+            ),
+            (
+                "logrotate",
+                "Log Rotation",
+                "/usr/sbin/logrotate",
+                ScheduleFrequency::Daily,
+            ),
         ];
 
         for (id, name, command, frequency) in tasks {
@@ -172,16 +187,15 @@ impl SchedulerManager {
 
     /// List by frequency
     pub fn list_by_frequency(&self, frequency: ScheduleFrequency) -> Vec<&ScheduledTask> {
-        self.tasks.values()
+        self.tasks
+            .values()
             .filter(|t| t.frequency == frequency)
             .collect()
     }
 
     /// List by status
     pub fn list_by_status(&self, status: ScheduleStatus) -> Vec<&ScheduledTask> {
-        self.tasks.values()
-            .filter(|t| t.status == status)
-            .collect()
+        self.tasks.values().filter(|t| t.status == status).collect()
     }
 
     /// Create a task
@@ -201,7 +215,9 @@ impl SchedulerManager {
 
     /// Enable a task
     pub fn enable_task(&mut self, id: &str) -> Result<(), String> {
-        let task = self.tasks.get_mut(id)
+        let task = self
+            .tasks
+            .get_mut(id)
             .ok_or_else(|| format!("Task {} not found", id))?;
 
         task.set_enabled(true);
@@ -210,7 +226,9 @@ impl SchedulerManager {
 
     /// Disable a task
     pub fn disable_task(&mut self, id: &str) -> Result<(), String> {
-        let task = self.tasks.get_mut(id)
+        let task = self
+            .tasks
+            .get_mut(id)
             .ok_or_else(|| format!("Task {} not found", id))?;
 
         task.set_enabled(false);
@@ -220,7 +238,9 @@ impl SchedulerManager {
 
     /// Run a task
     pub fn run_task(&mut self, id: &str) -> Result<(), String> {
-        let task = self.tasks.get_mut(id)
+        let task = self
+            .tasks
+            .get_mut(id)
             .ok_or_else(|| format!("Task {} not found", id))?;
 
         if !task.is_enabled {
@@ -231,17 +251,20 @@ impl SchedulerManager {
 
         // Simulate task execution
         task.set_status(ScheduleStatus::Completed);
-        task.last_run = Some(std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_secs());
+        task.last_run = Some(
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_secs(),
+        );
 
         Ok(())
     }
 
     /// Remove a task
     pub fn remove_task(&mut self, id: &str) -> Result<(), String> {
-        self.tasks.remove(id)
+        self.tasks
+            .remove(id)
             .ok_or_else(|| format!("Task {} not found", id))?;
         Ok(())
     }
@@ -249,13 +272,15 @@ impl SchedulerManager {
     /// Get statistics
     pub fn get_statistics(&self) -> SchedulerStatistics {
         let total_tasks = self.tasks.len();
-        let enabled_count = self.tasks.values()
-            .filter(|t| t.is_enabled)
-            .count();
-        let pending_count = self.tasks.values()
+        let enabled_count = self.tasks.values().filter(|t| t.is_enabled).count();
+        let pending_count = self
+            .tasks
+            .values()
             .filter(|t| t.status == ScheduleStatus::Pending)
             .count();
-        let failed_count = self.tasks.values()
+        let failed_count = self
+            .tasks
+            .values()
             .filter(|t| t.status == ScheduleStatus::Failed)
             .count();
 
@@ -289,14 +314,26 @@ mod tests {
 
     #[test]
     fn test_schedule_frequency_from_str() {
-        assert_eq!(ScheduleFrequency::from_str("daily"), Some(ScheduleFrequency::Daily));
-        assert_eq!(ScheduleFrequency::from_str("weekly"), Some(ScheduleFrequency::Weekly));
+        assert_eq!(
+            ScheduleFrequency::from_str("daily"),
+            Some(ScheduleFrequency::Daily)
+        );
+        assert_eq!(
+            ScheduleFrequency::from_str("weekly"),
+            Some(ScheduleFrequency::Weekly)
+        );
     }
 
     #[test]
     fn test_schedule_status_from_str() {
-        assert_eq!(ScheduleStatus::from_str("pending"), Some(ScheduleStatus::Pending));
-        assert_eq!(ScheduleStatus::from_str("completed"), Some(ScheduleStatus::Completed));
+        assert_eq!(
+            ScheduleStatus::from_str("pending"),
+            Some(ScheduleStatus::Pending)
+        );
+        assert_eq!(
+            ScheduleStatus::from_str("completed"),
+            Some(ScheduleStatus::Completed)
+        );
     }
 
     #[test]
@@ -340,7 +377,10 @@ mod tests {
     fn test_run_task() {
         let mut manager = SchedulerManager::new();
         assert!(manager.run_task("backup").is_ok());
-        assert_eq!(manager.get_task("backup").unwrap().status, ScheduleStatus::Completed);
+        assert_eq!(
+            manager.get_task("backup").unwrap().status,
+            ScheduleStatus::Completed
+        );
     }
 
     #[test]

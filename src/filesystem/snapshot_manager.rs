@@ -261,7 +261,6 @@ mod tests {
     }
 
     #[ignore]
-
     #[test]
     fn test_retention_policy_hourly_cleanup() {
         let policy = RetentionPolicy {

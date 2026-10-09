@@ -348,8 +348,14 @@ mod tests {
 
     #[test]
     fn test_taskbar_position_from_str() {
-        assert_eq!(DesktopTaskbarPosition::from_str("top"), Some(DesktopTaskbarPosition::Top));
-        assert_eq!(DesktopTaskbarPosition::from_str("bottom"), Some(DesktopTaskbarPosition::Bottom));
+        assert_eq!(
+            DesktopTaskbarPosition::from_str("top"),
+            Some(DesktopTaskbarPosition::Top)
+        );
+        assert_eq!(
+            DesktopTaskbarPosition::from_str("bottom"),
+            Some(DesktopTaskbarPosition::Bottom)
+        );
         assert_eq!(DesktopTaskbarPosition::from_str("invalid"), None);
     }
 
@@ -399,7 +405,10 @@ mod tests {
         let mut manager = DesktopTaskbarManager::new();
         let id = manager.add_item("Text Editor".to_string(), DesktopTaskbarItemType::Running);
         assert!(manager.pin_item(&id));
-        assert_eq!(manager.get_item(&id).unwrap().item_type, DesktopTaskbarItemType::Pinned);
+        assert_eq!(
+            manager.get_item(&id).unwrap().item_type,
+            DesktopTaskbarItemType::Pinned
+        );
     }
 
     #[test]
@@ -407,7 +416,10 @@ mod tests {
         let mut manager = DesktopTaskbarManager::new();
         let id = manager.add_item("Text Editor".to_string(), DesktopTaskbarItemType::Pinned);
         assert!(manager.unpin_item(&id));
-        assert_eq!(manager.get_item(&id).unwrap().item_type, DesktopTaskbarItemType::Running);
+        assert_eq!(
+            manager.get_item(&id).unwrap().item_type,
+            DesktopTaskbarItemType::Running
+        );
     }
 
     #[test]

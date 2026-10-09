@@ -23,11 +23,11 @@
 //! - Fibril-based async framework for pseudo-thread management
 //! - Capability-based security for IPC operations
 
-use std::vec::Vec;
+use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 use std::boxed::Box;
-use std::string::String;
 use std::collections::BTreeMap;
-use core::sync::atomic::{AtomicUsize, AtomicBool, Ordering};
+use std::string::String;
+use std::vec::Vec;
 
 /// HelenOS-style Phone ID for connection management
 pub type PhoneId = usize;
@@ -63,13 +63,13 @@ pub enum HelenIpcError {
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct HelenMessage {
-    pub method: u64,        // Method number on send, return value on answer
+    pub method: u64, // Method number on send, return value on answer
     pub arg1: u64,
     pub arg2: u64,
     pub arg3: u64,
     pub arg4: u64,
-    pub call_id: CallId,    // Unique message identifier
-    pub phone_id: PhoneId,  // Source connection identification
+    pub call_id: CallId,   // Unique message identifier
+    pub phone_id: PhoneId, // Source connection identification
 }
 
 impl HelenMessage {
@@ -113,9 +113,9 @@ pub struct Answerbox {
     pub task_id: usize,
 
     // Four message queues as per HelenOS design
-    pub incoming_queue: Vec<HelenMessage>,     // Incoming call queue
-    pub dispatched_queue: Vec<HelenMessage>,   // Dispatched call queue
-    pub answer_queue: Vec<HelenMessage>,       // Answer queue
+    pub incoming_queue: Vec<HelenMessage>, // Incoming call queue
+    pub dispatched_queue: Vec<HelenMessage>, // Dispatched call queue
+    pub answer_queue: Vec<HelenMessage>,   // Answer queue
     pub notification_queue: Vec<HelenMessage>, // Notification queue
 
     // Phone connections
@@ -344,17 +344,22 @@ impl HelenIpcManager {
         phone_id: PhoneId,
         mut message: HelenMessage,
     ) -> Result<(), HelenIpcError> {
-        let phone = self.phones.get(&phone_id)
+        let phone = self
+            .phones
+            .get(&phone_id)
             .ok_or(HelenIpcError::PhoneNotFound)?;
 
         if !phone.is_connected() {
             return Err(HelenIpcError::NotConnected);
         }
 
-        let answerbox_id = phone.connected_answerbox
+        let answerbox_id = phone
+            .connected_answerbox
             .ok_or(HelenIpcError::NotConnected)?;
 
-        let answerbox = self.answerboxes.get(&answerbox_id)
+        let answerbox = self
+            .answerboxes
+            .get(&answerbox_id)
             .ok_or(HelenIpcError::AnswerboxNotFound)?;
 
         if !answerbox.can_send_async() {
@@ -384,7 +389,9 @@ impl HelenIpcManager {
         from_phone: PhoneId,
         to_answerbox: AnswerboxId,
     ) -> Result<(), HelenIpcError> {
-        let answerbox = self.answerboxes.get(&to_answerbox)
+        let answerbox = self
+            .answerboxes
+            .get(&to_answerbox)
             .ok_or(HelenIpcError::AnswerboxNotFound)?;
 
         if !answerbox.can_send_async() {
@@ -403,8 +410,13 @@ impl HelenIpcManager {
     }
 
     /// Pull message from incoming queue to dispatched queue (server processing)
-    pub fn dispatch_message(&mut self, answerbox_id: AnswerboxId) -> Result<HelenMessage, HelenIpcError> {
-        let answerbox = self.answerboxes.get_mut(&answerbox_id)
+    pub fn dispatch_message(
+        &mut self,
+        answerbox_id: AnswerboxId,
+    ) -> Result<HelenMessage, HelenIpcError> {
+        let answerbox = self
+            .answerboxes
+            .get_mut(&answerbox_id)
             .ok_or(HelenIpcError::AnswerboxNotFound)?;
 
         if answerbox.incoming_queue.is_empty() {
@@ -426,36 +438,55 @@ impl HelenIpcManager {
     ) -> Result<(), HelenIpcError> {
         // Resolve the caller before consuming the dispatched message. The
         // phone's connected_answerbox is the *server*, not the caller's box.
-        let message = self.answerboxes.get(&answerbox_id)
+        let message = self
+            .answerboxes
+            .get(&answerbox_id)
             .ok_or(HelenIpcError::AnswerboxNotFound)?
-            .dispatched_queue.iter()
+            .dispatched_queue
+            .iter()
             .find(|m| m.call_id == call_id)
             .copied()
             .ok_or(HelenIpcError::BufferEmpty)?;
-        let caller_task = self.phones.get(&message.phone_id)
-            .ok_or(HelenIpcError::NotConnected)?.task_id;
-        let origin_answerbox_id = self.answerboxes.values()
+        let caller_task = self
+            .phones
+            .get(&message.phone_id)
+            .ok_or(HelenIpcError::NotConnected)?
+            .task_id;
+        let origin_answerbox_id = self
+            .answerboxes
+            .values()
             .find(|box_| box_.task_id == caller_task)
             .map(|box_| box_.id)
             .ok_or(HelenIpcError::NotConnected)?;
 
-        let receiver = self.answerboxes.get_mut(&answerbox_id)
+        let receiver = self
+            .answerboxes
+            .get_mut(&answerbox_id)
             .ok_or(HelenIpcError::AnswerboxNotFound)?;
-        let msg_index = receiver.dispatched_queue.iter()
+        let msg_index = receiver
+            .dispatched_queue
+            .iter()
             .position(|m| m.call_id == call_id)
             .ok_or(HelenIpcError::BufferEmpty)?;
         let mut message = receiver.dispatched_queue.remove(msg_index);
         receiver.decrement_async(); // The receiver's outstanding slot is now free.
         message.method = return_value;
-        self.answerboxes.get_mut(&origin_answerbox_id)
+        self.answerboxes
+            .get_mut(&origin_answerbox_id)
             .expect("origin answerbox was checked above")
-            .answer_queue.push(message);
+            .answer_queue
+            .push(message);
         Ok(())
     }
 
     /// Receive answer from answer queue
-    pub fn receive_answer(&mut self, answerbox_id: AnswerboxId) -> Result<HelenMessage, HelenIpcError> {
-        let answerbox = self.answerboxes.get_mut(&answerbox_id)
+    pub fn receive_answer(
+        &mut self,
+        answerbox_id: AnswerboxId,
+    ) -> Result<HelenMessage, HelenIpcError> {
+        let answerbox = self
+            .answerboxes
+            .get_mut(&answerbox_id)
             .ok_or(HelenIpcError::AnswerboxNotFound)?;
 
         if answerbox.answer_queue.is_empty() {
@@ -506,7 +537,9 @@ impl HelenIpcManager {
 
     /// Handle interrupt and send notification to userspace
     pub fn handle_interrupt(&mut self, irq: IrqNumber) -> Result<(), HelenIpcError> {
-        let registration = self.irq_registrations.get(&irq)
+        let registration = self
+            .irq_registrations
+            .get(&irq)
             .ok_or(HelenIpcError::InvalidIrq)?;
 
         if !registration.enabled.load(Ordering::SeqCst) {
@@ -515,12 +548,11 @@ impl HelenIpcManager {
 
         registration.increment_counter();
 
-        let (method, arg1, arg2, arg3, arg4) = (irq as u64, registration.get_counter() as u64, 0, 0, 0);
+        let (method, arg1, arg2, arg3, arg4) =
+            (irq as u64, registration.get_counter() as u64, 0, 0, 0);
 
         let call_id = self.next_call_id.fetch_add(1, Ordering::SeqCst);
-        let notification = HelenMessage::with_args(
-            method, arg1, arg2, arg3, arg4, call_id, 0
-        );
+        let notification = HelenMessage::with_args(method, arg1, arg2, arg3, arg4, call_id, 0);
 
         let answerbox_id = registration.answerbox_id;
         if let Some(answerbox) = self.answerboxes.get_mut(&answerbox_id) {
@@ -532,8 +564,13 @@ impl HelenIpcManager {
     }
 
     /// Pull notification from notification queue
-    pub fn receive_notification(&mut self, answerbox_id: AnswerboxId) -> Result<HelenMessage, HelenIpcError> {
-        let answerbox = self.answerboxes.get_mut(&answerbox_id)
+    pub fn receive_notification(
+        &mut self,
+        answerbox_id: AnswerboxId,
+    ) -> Result<HelenMessage, HelenIpcError> {
+        let answerbox = self
+            .answerboxes
+            .get_mut(&answerbox_id)
             .ok_or(HelenIpcError::AnswerboxNotFound)?;
 
         if answerbox.notification_queue.is_empty() {
@@ -545,14 +582,21 @@ impl HelenIpcManager {
 
     /// Send hangup message (connection termination)
     pub fn send_hangup(&mut self, phone_id: PhoneId) -> Result<(), HelenIpcError> {
-        let phone = self.phones.get(&phone_id)
+        let phone = self
+            .phones
+            .get(&phone_id)
             .ok_or(HelenIpcError::PhoneNotFound)?;
 
         if let Some(answerbox_id) = phone.connected_answerbox {
             let call_id = self.next_call_id.fetch_add(1, Ordering::SeqCst);
             let hangup_msg = HelenMessage::with_args(
                 0xFFFFFFFFFFFFFFFF, // Special hangup method
-                0, 0, 0, 0, call_id, phone_id
+                0,
+                0,
+                0,
+                0,
+                call_id,
+                phone_id,
             );
 
             if let Some(answerbox) = self.answerboxes.get_mut(&answerbox_id) {
@@ -566,7 +610,9 @@ impl HelenIpcManager {
 
     /// Cleanup task resources (HelenOS task death cleanup)
     pub fn cleanup_task(&mut self, task_id: usize) {
-        let phones_to_hangup: Vec<PhoneId> = self.phones.iter()
+        let phones_to_hangup: Vec<PhoneId> = self
+            .phones
+            .iter()
             .filter(|(_, p)| p.task_id == task_id)
             .map(|(id, _)| *id)
             .collect();
@@ -609,7 +655,9 @@ impl HelenIpcManager {
                 msg.method = 0xFFFFFFFFFFFFFFFE; // Error code
                 if let Some(phone) = self.phones.get(&msg.phone_id) {
                     if let Some(origin_answerbox_id) = phone.connected_answerbox {
-                        if let Some(origin_answerbox) = self.answerboxes.get_mut(&origin_answerbox_id) {
+                        if let Some(origin_answerbox) =
+                            self.answerboxes.get_mut(&origin_answerbox_id)
+                        {
                             origin_answerbox.answer_queue.push(msg);
                         }
                     }
@@ -633,8 +681,8 @@ impl Default for HelenIpcManager {
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FibrilType {
-    Manager,    // Manager fibril
-    Worker,     // Worker fibril
+    Manager, // Manager fibril
+    Worker,  // Worker fibril
 }
 
 /// Fibril state for async execution
@@ -707,9 +755,11 @@ impl FibrilManager {
     }
 
     pub fn get_manager_fibril(&mut self, answerbox_id: AnswerboxId) -> usize {
-        if let Some(fibril) = self.fibrils.iter().find(|f| {
-            f.fibril_type == FibrilType::Manager && f.answerbox_id == Some(answerbox_id)
-        }) {
+        if let Some(fibril) = self
+            .fibrils
+            .iter()
+            .find(|f| f.fibril_type == FibrilType::Manager && f.answerbox_id == Some(answerbox_id))
+        {
             return fibril.id;
         }
 
@@ -775,7 +825,8 @@ impl HelenAsyncSystem {
         let answerbox_id = self.ipc_manager.create_answerbox(task_id, 64);
         let phone_id = self.ipc_manager.create_phone(task_id);
         // The task's own phone supports local async dispatch out of the box.
-        self.ipc_manager.connect_phone_to_answerbox(phone_id, answerbox_id)
+        self.ipc_manager
+            .connect_phone_to_answerbox(phone_id, answerbox_id)
             .expect("new phone and answerbox must exist");
 
         self.fibril_manager.get_manager_fibril(answerbox_id);
@@ -799,7 +850,10 @@ impl HelenAsyncSystem {
         }
     }
 
-    pub fn process_messages(&mut self, answerbox_id: AnswerboxId) -> Result<Vec<HelenMessage>, HelenIpcError> {
+    pub fn process_messages(
+        &mut self,
+        answerbox_id: AnswerboxId,
+    ) -> Result<Vec<HelenMessage>, HelenIpcError> {
         let mut messages = Vec::new();
         loop {
             match self.ipc_manager.dispatch_message(answerbox_id) {
@@ -857,12 +911,23 @@ mod tests {
         ipc.connect_phone_to_answerbox(phone, receiver).unwrap();
 
         ipc.send_async(phone, HelenMessage::new(10, 0, 0)).unwrap();
-        assert_eq!(ipc.send_async(phone, HelenMessage::new(11, 0, 0)), Err(HelenIpcError::BufferFull));
+        assert_eq!(
+            ipc.send_async(phone, HelenMessage::new(11, 0, 0)),
+            Err(HelenIpcError::BufferFull)
+        );
         let request = ipc.dispatch_message(receiver).unwrap();
         ipc.answer_message(receiver, request.call_id, 42).unwrap();
-        assert_eq!(ipc.answerboxes[&receiver].current_async_count.load(Ordering::SeqCst), 0);
+        assert_eq!(
+            ipc.answerboxes[&receiver]
+                .current_async_count
+                .load(Ordering::SeqCst),
+            0
+        );
         assert_eq!(ipc.receive_answer(caller).unwrap().method, 42);
-        assert_eq!(ipc.receive_answer(receiver), Err(HelenIpcError::BufferEmpty));
+        assert_eq!(
+            ipc.receive_answer(receiver),
+            Err(HelenIpcError::BufferEmpty)
+        );
         ipc.send_async(phone, HelenMessage::new(11, 0, 0)).unwrap();
     }
 
@@ -893,9 +958,18 @@ mod tests {
 
         let worker_id = fibril_manager.create_worker_fibril(123);
 
-        assert_eq!(fibril_manager.fibrils[manager_id - 1].fibril_type, FibrilType::Manager);
-        assert_eq!(fibril_manager.fibrils[worker_id - 1].fibril_type, FibrilType::Worker);
-        assert_eq!(fibril_manager.fibrils[worker_id - 1].state, FibrilState::Waiting);
+        assert_eq!(
+            fibril_manager.fibrils[manager_id - 1].fibril_type,
+            FibrilType::Manager
+        );
+        assert_eq!(
+            fibril_manager.fibrils[worker_id - 1].fibril_type,
+            FibrilType::Worker
+        );
+        assert_eq!(
+            fibril_manager.fibrils[worker_id - 1].state,
+            FibrilState::Waiting
+        );
     }
 
     #[test]

@@ -17,62 +17,62 @@
 
 extern crate alloc;
 
-use alloc::vec::Vec;
 use alloc::collections::BTreeMap;
+use alloc::vec::Vec;
 
 /// NVMe controller registers
 #[derive(Debug, Clone)]
 #[repr(C)]
 pub struct NvmeRegisters {
-    pub cap: u64,         // Controller capabilities
-    pub vs: u32,          // Version
-    pub intms: u32,       // Interrupt mask set
-    pub intmc: u32,       // Interrupt mask clear
-    pub cc: u32,          // Controller configuration
+    pub cap: u64,   // Controller capabilities
+    pub vs: u32,    // Version
+    pub intms: u32, // Interrupt mask set
+    pub intmc: u32, // Interrupt mask clear
+    pub cc: u32,    // Controller configuration
     pub rsvd1: u32,
-    pub csts: u32,        // Controller status
+    pub csts: u32, // Controller status
     pub rsvd2: u32,
-    pub nssr: u32,        // NVM subsystem reset
-    pub aqa: u32,         // Admin queue attributes
-    pub asq: u64,         // Admin submission queue base address
-    pub acq: u64,         // Admin completion queue base address
-    pub cmbloc: u32,      // Controller memory buffer location
-    pub cmbsz: u32,       // Controller memory buffer size
-    pub bpmbl: u32,       // Boot partition memory buffer block location
-    pub cmbms: u32,       // Controller memory buffer memory space
+    pub nssr: u32,   // NVM subsystem reset
+    pub aqa: u32,    // Admin queue attributes
+    pub asq: u64,    // Admin submission queue base address
+    pub acq: u64,    // Admin completion queue base address
+    pub cmbloc: u32, // Controller memory buffer location
+    pub cmbsz: u32,  // Controller memory buffer size
+    pub bpmbl: u32,  // Boot partition memory buffer block location
+    pub cmbms: u32,  // Controller memory buffer memory space
     pub rsvd3: [u32; 1024],
-    pub sq0tdbl: u32,      // Submission queue 0 tail doorbell
-    pub sq0hdbl: u32,      // Submission queue 0 head doorbell
-    pub cq0hdbl: u32,      // Completion queue 0 head doorbell
-    pub cq0tdbl: u32,      // Completion queue 0 tail doorbell
+    pub sq0tdbl: u32, // Submission queue 0 tail doorbell
+    pub sq0hdbl: u32, // Submission queue 0 head doorbell
+    pub cq0hdbl: u32, // Completion queue 0 head doorbell
+    pub cq0tdbl: u32, // Completion queue 0 tail doorbell
 }
 
 /// NVMe submission queue entry
 #[derive(Debug, Clone)]
 #[repr(C)]
 pub struct NvmeSubmissionEntry {
-    pub cdw0: u32,        // Command dword 0
-    pub cdw1: u32,        // Command dword 1
-    pub cdw2: u32,        // Command dword 2
-    pub cdw3: u32,        // Command dword 3
-    pub cdw4: u32,        // Command dword 4
-    pub cdw5: u32,        // Command dword 5
+    pub cdw0: u32, // Command dword 0
+    pub cdw1: u32, // Command dword 1
+    pub cdw2: u32, // Command dword 2
+    pub cdw3: u32, // Command dword 3
+    pub cdw4: u32, // Command dword 4
+    pub cdw5: u32, // Command dword 5
     pub rsvd: [u64; 2],
-    pub mptr: u64,        // Metadata pointer
-    pub dptr1: u64,       // Data pointer 1
-    pub dptr2: u64,       // Data pointer 2
+    pub mptr: u64,  // Metadata pointer
+    pub dptr1: u64, // Data pointer 1
+    pub dptr2: u64, // Data pointer 2
 }
 
 /// NVMe completion queue entry
 #[derive(Debug, Clone)]
 #[repr(C)]
 pub struct NvmeCompletionEntry {
-    pub result: u32,      // Command-specific result
+    pub result: u32, // Command-specific result
     pub rsvd: u32,
-    pub sq_head: u16,     // Submission queue head pointer
-    pub sq_id: u16,       // Submission queue identifier
-    pub cmd_id: u16,      // Command identifier
-    pub status: u16,      // Status field
+    pub sq_head: u16, // Submission queue head pointer
+    pub sq_id: u16,   // Submission queue identifier
+    pub cmd_id: u16,  // Command identifier
+    pub status: u16,  // Status field
 }
 
 /// NVMe identify command data
@@ -89,7 +89,7 @@ pub struct NvmeIdentifyControllerData {
     pub mic: u8,           // Management interface capabilities
     pub mdts: u8,          // Maximum data transfer size
     pub rsvd1: [u8; 256],
-    pub oacs: u16,         // Optional admin command support
+    pub oacs: u16, // Optional admin command support
     pub rsvd2: [u8; 9],
     pub acl: u8,           // Abort command limit
     pub aers: u8,          // Asynchronous event request limit
@@ -107,21 +107,21 @@ pub struct NvmeIdentifyControllerData {
     pub tnvmcap: [u64; 2], // Total NVM capacity
     pub unvmcap: [u64; 2], // Unallocated NVM capacity
     pub rsvd3: [u32; 384],
-    pub sqes: u8,          // Submission queue entry size
-    pub cqes: u8,          // Completion queue entry size
+    pub sqes: u8, // Submission queue entry size
+    pub cqes: u8, // Completion queue entry size
     pub rsvd4: [u8; 2],
-    pub nn: u32,           // Number of namespaces
-    pub oncs: u16,         // Optional NVM command support
-    pub fuses: u16,        // Fused operation support
-    pub fna: u8,           // Format NVM attributes
-    pub vwc: u8,           // Volatile write cache
-    pub awun: u16,         // Atomic write unit normal
-    pub awupf: u16,        // Atomic write unit power fail
-    pub nvscc: u8,         // NVM vendor specific command configuration
+    pub nn: u32,    // Number of namespaces
+    pub oncs: u16,  // Optional NVM command support
+    pub fuses: u16, // Fused operation support
+    pub fna: u8,    // Format NVM attributes
+    pub vwc: u8,    // Volatile write cache
+    pub awun: u16,  // Atomic write unit normal
+    pub awupf: u16, // Atomic write unit power fail
+    pub nvscc: u8,  // NVM vendor specific command configuration
     pub rsvd5: [u8; 1],
-    pub acwu: u16,         // Atomic compare write unit
+    pub acwu: u16, // Atomic compare write unit
     pub rsvd6: [u32; 22],
-    pub sgl_support: u32,  // SGL support
+    pub sgl_support: u32, // SGL support
     pub rsvd7: [u32; 1024],
 }
 
@@ -129,30 +129,30 @@ pub struct NvmeIdentifyControllerData {
 #[derive(Debug, Clone)]
 #[repr(C)]
 pub struct NvmeNamespaceData {
-    pub nsze: u64,         // Namespace size
-    pub ncap: u64,         // Namespace capacity
-    pub nuse: u64,         // Namespace utilization
-    pub nsfeat: u8,        // Namespace features
+    pub nsze: u64,  // Namespace size
+    pub ncap: u64,  // Namespace capacity
+    pub nuse: u64,  // Namespace utilization
+    pub nsfeat: u8, // Namespace features
     pub rsvd1: [u8; 3],
-    pub nlbaf: u8,         // Number of LBA formats
-    pub flbas: u8,         // Formatted LBA size
-    pub mc: u8,            // Metadata capabilities
-    pub dpc: u8,            // End-to-end data protection capabilities
-    pub dps: u8,            // End-to-end data protection settings
+    pub nlbaf: u8, // Number of LBA formats
+    pub flbas: u8, // Formatted LBA size
+    pub mc: u8,    // Metadata capabilities
+    pub dpc: u8,   // End-to-end data protection capabilities
+    pub dps: u8,   // End-to-end data protection settings
     pub rsvd2: [u8; 1],
-    pub nmu: u8,           // Namespace multi-path I/O
+    pub nmu: u8, // Namespace multi-path I/O
     pub rsvd3: [u8; 1],
-    pub nawun: u16,        // Namespace atomic write unit normal
-    pub nawupf: u16,       // Namespace atomic write unit power fail
-    pub nacwu: u16,        // Namespace atomic compare write unit
-    pub nabsn: u16,        // Namespace atomic block size normal
-    pub nabo: u16,         // Namespace atomic boundary offset
-    pub nabspf: u16,       // Namespace atomic boundary size power fail
+    pub nawun: u16,  // Namespace atomic write unit normal
+    pub nawupf: u16, // Namespace atomic write unit power fail
+    pub nacwu: u16,  // Namespace atomic compare write unit
+    pub nabsn: u16,  // Namespace atomic block size normal
+    pub nabo: u16,   // Namespace atomic boundary offset
+    pub nabspf: u16, // Namespace atomic boundary size power fail
     pub rsvd4: [u8; 2],
-    pub nvmcap: [u64; 2],  // NVM capacity
+    pub nvmcap: [u64; 2], // NVM capacity
     pub rsvd5: [u8; 40],
-    pub nguid: [u8; 16],   // Namespace globally unique identifier
-    pub eui64: [u8; 8],    // Extended unique identifier
+    pub nguid: [u8; 16], // Namespace globally unique identifier
+    pub eui64: [u8; 8],  // Extended unique identifier
     pub lba_formats: [NvmeLbaFormat; 16],
 }
 
@@ -160,9 +160,9 @@ pub struct NvmeNamespaceData {
 #[derive(Debug, Clone)]
 #[repr(C)]
 pub struct NvmeLbaFormat {
-    pub ms: u16,           // Metadata size
-    pub ds: u8,            // Data size
-    pub rp: u8,            // Relative performance
+    pub ms: u16, // Metadata size
+    pub ds: u8,  // Data size
+    pub rp: u8,  // Relative performance
 }
 
 /// NVMe queue
@@ -299,7 +299,7 @@ impl NvmeController {
                     (0 << 4) |  // IO queue entries (2^0 = 1)
                     (0 << 8) |  // Page size (4KB)
                     (0 << 11) | // Arbitration mechanism (round robin)
-                    (0 << 14);  // Shutdown notification
+                    (0 << 14); // Shutdown notification
             regs.cc = cc;
 
             // Setup admin queues

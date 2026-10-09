@@ -278,7 +278,10 @@ mod tests {
         let mut manager = DesktopLayoutManager::new();
         let id = manager.add_layout("Spiral".to_string(), DesktopLayoutType::Spiral);
         assert!(manager.set_default_layout(&id));
-        assert_eq!(manager.get_default_layout().unwrap().layout_type, DesktopLayoutType::Spiral);
+        assert_eq!(
+            manager.get_default_layout().unwrap().layout_type,
+            DesktopLayoutType::Spiral
+        );
     }
 
     #[test]
