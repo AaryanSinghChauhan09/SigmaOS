@@ -863,13 +863,13 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
 
         insights.push(TechMediaArticleInsight {
             publication: String::from("ItsFOSS"),
-            title: String::from("Zero-Dependency Terminal Tooling & Prompt Optimization"),
-            category: String::from("Userland & Terminal"),
-            action_recommendation: String::from("Enable zero-alloc prompt caching & zero-dep CLI coreutils"),
+            title: String::from("Zero-Dependency Terminal Tooling & elementaryOS AppCenter PWYW Parity"),
+            category: String::from("Userland & Desktop"),
+            action_recommendation: String::from("Enable zero-alloc prompt caching, zero-dep CLI coreutils, and elementaryOS AppCenter PWYW monetization gateway"),
             impact_score: 95,
             article_url: String::from("https://itsfoss.com/cli-tools-guide"),
             publication_domain: String::from("itsfoss.com"),
-            pr_branch_name: String::from("feature/itsfoss-cli-prompt-optimization"),
+            pr_branch_name: String::from("feature/itsfoss-cli-prompt-and-pantheon-appcenter-pwyw"),
         });
 
         insights.push(TechMediaArticleInsight {
@@ -1531,7 +1531,7 @@ mod tests {
 
         let itsfoss_insights = engine.filter_by_publication("ItsFOSS");
         assert_eq!(itsfoss_insights.len(), 1);
-        assert_eq!(itsfoss_insights[0].category, "Userland & Terminal");
+        assert_eq!(itsfoss_insights[0].category, "Userland & Desktop");
         assert_eq!(itsfoss_insights[0].publication_domain, "itsfoss.com");
         assert!(itsfoss_insights[0].article_url.contains("itsfoss.com"));
         assert!(itsfoss_insights[0].pr_branch_name.contains("itsfoss"));
