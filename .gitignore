@@ -75,3 +75,7 @@ wiki/
 WIKI/
 docs/
 !Agents/*.md
+!ImprovementPlan.md
+!NEXT_STEPS_GUIDELINES.md
+!.jules/
+!.jules/*.md
