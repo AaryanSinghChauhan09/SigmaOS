@@ -581,6 +581,40 @@ export function initEscapeKeyDismissal() {
   });
 }
 
+const CONTEXT_MESSAGES = {
+  refresh: "🔄 System refreshed and window state synchronized.",
+  cleanup: "🧹 System caches purged (128 MB reclaimed).",
+  audit: "🛡️ System security attestation verified: Kyber-1024.",
+};
+
+/**
+ * Displays an accessible, transient toast notification with role="status" and aria-live="polite".
+ */
+export function showToast(message, duration = 3000) {
+  if (typeof document === "undefined") return null;
+  const container = document.getElementById("kernel-logs");
+  if (!container) return null;
+
+  const toast = document.createElement("div");
+  toast.className = "kernel-toast";
+  toast.setAttribute("role", "status");
+  toast.setAttribute("aria-live", "polite");
+  toast.textContent = message;
+  container.appendChild(toast);
+
+  if (typeof setTimeout === "function") {
+    setTimeout(() => {
+      toast.classList.add("fade-out");
+      setTimeout(() => {
+        if (toast.parentNode) {
+          toast.parentNode.removeChild(toast);
+        }
+      }, 300);
+    }, duration);
+  }
+  return toast;
+}
+
 /**
  * Initializes desktop right-click context menu positioning, viewport boundary calculations,
  * and WAI-ARIA accessibility state synchronization (aria-hidden, auto-focus).
@@ -589,11 +623,14 @@ export function initContextMenu() {
   if (typeof window === "undefined" || typeof document === "undefined") return;
 
   if (!window.contextAction) {
-    window.contextAction = function () {
+    window.contextAction = function (action) {
       const contextMenu = document.getElementById("context-menu");
       if (contextMenu) {
         contextMenu.style.display = "none";
         contextMenu.setAttribute("aria-hidden", "true");
+      }
+      if (action && CONTEXT_MESSAGES[action]) {
+        showToast(CONTEXT_MESSAGES[action]);
       }
     };
   }
@@ -1227,6 +1264,7 @@ if (typeof window !== "undefined") {
   window.initCommandPalette = initCommandPalette;
   window.initWindowFocus = initWindowFocus;
   window.updateDockAppStates = updateDockAppStates;
+  window.showToast = showToast;
 }
 
 // Minimal dummy index file to export initialization and basic attributes
