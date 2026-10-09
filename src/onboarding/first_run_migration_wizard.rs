@@ -24,17 +24,17 @@ extern crate alloc;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::{
     collections::BTreeMap,
+    format,
     string::{String, ToString},
     vec::Vec,
-    format,
 };
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::{
     collections::BTreeMap,
+    format,
     string::{String, ToString},
     vec::Vec,
-    format,
 };
 
 /// Supported source operating systems for direct seamless migration.
@@ -120,7 +120,10 @@ impl FirstRunMigrationCoordinator {
     }
 
     /// Autodetect the host distro from filesystem markers.
-    pub fn autodetect_source(os_release_content: &str, has_hyprland: bool) -> MigrationSourceDistro {
+    pub fn autodetect_source(
+        os_release_content: &str,
+        has_hyprland: bool,
+    ) -> MigrationSourceDistro {
         let lower = os_release_content.to_lowercase();
         if lower.contains("linux mint") || lower.contains("id=linuxmint") {
             MigrationSourceDistro::LinuxMint
@@ -402,7 +405,11 @@ impl FirstRunMigrationCoordinator {
             self.total_migrated_bytes,
             self.browser_profiles.len(),
             self.app_mappings.len(),
-            if self.dry_run_passed { "PASSED" } else { "PENDING" },
+            if self.dry_run_passed {
+                "PASSED"
+            } else {
+                "PENDING"
+            },
         )
     }
 }

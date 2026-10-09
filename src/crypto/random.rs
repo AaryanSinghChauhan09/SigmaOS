@@ -156,7 +156,8 @@ impl EntropyCollector for SimpleEntropyCollector {
         for &byte in data {
             self.entropy_pool.push(byte.wrapping_add(source));
         }
-        self.entropy_estimate.fetch_add(data.len(), Ordering::SeqCst);
+        self.entropy_estimate
+            .fetch_add(data.len(), Ordering::SeqCst);
     }
 
     fn get_entropy_estimate(&self) -> usize {
@@ -286,6 +287,9 @@ mod tests {
     #[test]
     fn test_random_generator_fails_closed() {
         let mut rng = SimpleRandomGenerator::new(101);
-        assert!(matches!(rng.next_byte(), Err(RNGError::InsufficientEntropy)));
+        assert!(matches!(
+            rng.next_byte(),
+            Err(RNGError::InsufficientEntropy)
+        ));
     }
 }

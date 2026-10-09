@@ -534,7 +534,10 @@ impl XreaderViewer {
         color: String,
     ) -> Result<(), String> {
         if let Some(path) = &self.current_document {
-            let annotations = self.annotations.entry(path.clone()).or_insert_with(Vec::new);
+            let annotations = self
+                .annotations
+                .entry(path.clone())
+                .or_insert_with(Vec::new);
             annotations.push(Annotation {
                 id: format!("{}_{}", page, annotations.len()),
                 page,

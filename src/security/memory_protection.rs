@@ -260,9 +260,15 @@ mod tests {
         for _ in 0..16 {
             let old = manager.get_aslr_offset();
             manager.re_randomize_aslr();
-            assert_eq!(manager.get_aslr_offset(), if old == 4096 { 8192 } else { 4096 });
+            assert_eq!(
+                manager.get_aslr_offset(),
+                if old == 4096 { 8192 } else { 4096 }
+            );
         }
         manager.aslr_config.randomization_bits = 64; // No overflowing shifts
-        assert_ne!(MemoryProtectionManager::generate_random_offset(&manager.aslr_config), 0);
+        assert_ne!(
+            MemoryProtectionManager::generate_random_offset(&manager.aslr_config),
+            0
+        );
     }
 }

@@ -172,10 +172,18 @@ impl SystemdServiceManager {
         };
 
         // Initialize common targets
-        manager.targets.insert(String::from("multi-user.target"), Vec::new());
-        manager.targets.insert(String::from("graphical.target"), Vec::new());
-        manager.targets.insert(String::from("basic.target"), Vec::new());
-        manager.targets.insert(String::from("network.target"), Vec::new());
+        manager
+            .targets
+            .insert(String::from("multi-user.target"), Vec::new());
+        manager
+            .targets
+            .insert(String::from("graphical.target"), Vec::new());
+        manager
+            .targets
+            .insert(String::from("basic.target"), Vec::new());
+        manager
+            .targets
+            .insert(String::from("network.target"), Vec::new());
 
         manager
     }
@@ -238,28 +246,35 @@ impl SystemdServiceManager {
             return Err("Target not found");
         }
         self.active_target = target.clone();
-        
+
         // Start services for the target
         let services_to_start: Vec<String> = if let Some(services) = self.targets.get(&target) {
             services.clone()
         } else {
             Vec::new()
         };
-        
+
         for service_name in services_to_start {
             self.start_service(&service_name).ok();
         }
-        
+
         Ok(())
     }
 
     /// Add service to target
     pub fn add_to_target(&mut self, target: String, service: String) {
-        self.targets.entry(target).or_insert_with(Vec::new).push(service);
+        self.targets
+            .entry(target)
+            .or_insert_with(Vec::new)
+            .push(service);
     }
 
     /// Enable service (add to wanted_by)
-    pub fn enable_service(&mut self, service_name: &str, target: String) -> Result<(), &'static str> {
+    pub fn enable_service(
+        &mut self,
+        service_name: &str,
+        target: String,
+    ) -> Result<(), &'static str> {
         if let Some(service) = self.services.get_mut(service_name) {
             service.wanted_by.push(target.clone());
             self.add_to_target(target, service_name.to_string());
@@ -270,7 +285,11 @@ impl SystemdServiceManager {
     }
 
     /// Disable service
-    pub fn disable_service(&mut self, service_name: &str, target: String) -> Result<(), &'static str> {
+    pub fn disable_service(
+        &mut self,
+        service_name: &str,
+        target: String,
+    ) -> Result<(), &'static str> {
         let service_name_string = service_name.to_string();
         if let Some(service) = self.services.get_mut(service_name) {
             service.wanted_by.retain(|t| t != &target);
@@ -317,7 +336,7 @@ mod tests {
         let mut service = SystemdServiceUnit::new(String::from("test.service"));
         service.description = String::from("Test service");
         service.exec_start = String::from("/usr/bin/test");
-        
+
         assert_eq!(service.state, SystemdServiceState::Inactive);
         service.start().unwrap();
         assert_eq!(service.state, SystemdServiceState::Active);
@@ -328,12 +347,15 @@ mod tests {
     #[test]
     fn test_systemd_service_manager() {
         let mut manager = SystemdServiceManager::new();
-        
+
         let service = SystemdServiceUnit::new(String::from("nginx.service"));
         manager.add_service(service);
-        
+
         assert!(manager.start_service("nginx.service").is_ok());
-        assert_eq!(manager.get_service_status("nginx.service"), Some(&SystemdServiceState::Active));
+        assert_eq!(
+            manager.get_service_status("nginx.service"),
+            Some(&SystemdServiceState::Active)
+        );
         assert!(manager.stop_service("nginx.service").is_ok());
     }
 
@@ -342,7 +364,7 @@ mod tests {
         let mut service = SystemdServiceUnit::new(String::from("web.service"));
         service.add_dependency(String::from("network.target"));
         service.add_after(String::from("network.target"));
-        
+
         assert!(service.requires.contains(&String::from("network.target")));
         assert!(service.after.contains(&String::from("network.target")));
     }
@@ -352,7 +374,7 @@ mod tests {
         let mut service = SystemdServiceUnit::new(String::from("app.service"));
         service.set_memory_limit(1024 * 1024 * 512); // 512MB
         service.set_cpu_quota(String::from("50%"));
-        
+
         assert_eq!(service.memory_limit, 1024 * 1024 * 512);
         assert_eq!(service.cpu_quota, String::from("50%"));
     }
@@ -360,7 +382,9 @@ mod tests {
     #[test]
     fn test_target_switching() {
         let mut manager = SystemdServiceManager::new();
-        assert!(manager.switch_target(String::from("graphical.target")).is_ok());
+        assert!(manager
+            .switch_target(String::from("graphical.target"))
+            .is_ok());
         assert_eq!(manager.active_target, String::from("graphical.target"));
     }
 
@@ -369,9 +393,11 @@ mod tests {
         let mut manager = SystemdServiceManager::new();
         let service = SystemdServiceUnit::new(String::from("ssh.service"));
         manager.add_service(service);
-        
+
         let target = String::from("multi-user.target");
-        assert!(manager.enable_service("ssh.service", target.clone()).is_ok());
+        assert!(manager
+            .enable_service("ssh.service", target.clone())
+            .is_ok());
         assert!(manager.disable_service("ssh.service", target).is_ok());
     }
 }

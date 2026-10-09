@@ -17,9 +17,9 @@
 
 extern crate alloc;
 
-use alloc::vec::Vec;
-use alloc::string::String;
 use alloc::collections::BTreeMap;
+use alloc::string::String;
+use alloc::vec::Vec;
 
 /// ELF 64-bit header
 #[derive(Debug, Clone, Copy)]
@@ -231,7 +231,11 @@ impl DynamicLinker {
         Self {
             loaded_objects: Vec::new(),
             symbol_cache: BTreeMap::new(),
-            load_bias: if aslr_enabled { 0x555555550000 } else { 0x400000 },
+            load_bias: if aslr_enabled {
+                0x555555550000
+            } else {
+                0x400000
+            },
             aslr_enabled,
         }
     }
@@ -257,17 +261,14 @@ impl DynamicLinker {
             return None;
         }
 
-        let header = unsafe {
-            *(data.as_ptr() as *const Elf64Ehdr)
-        };
+        let header = unsafe { *(data.as_ptr() as *const Elf64Ehdr) };
 
         Some(header)
     }
 
     /// Load ELF binary
     pub fn load_elf(&mut self, data: &[u8]) -> Result<LoadedObject, &'static str> {
-        let header = Self::parse_elf_header(data)
-            .ok_or("Invalid ELF header")?;
+        let header = Self::parse_elf_header(data).ok_or("Invalid ELF header")?;
 
         // Parse program headers
         let mut phdrs = Vec::new();
@@ -281,9 +282,7 @@ impl DynamicLinker {
                 return Err("Program header out of bounds");
             }
 
-            let phdr = unsafe {
-                *(data.as_ptr().add(offset) as *const Elf64Phdr)
-            };
+            let phdr = unsafe { *(data.as_ptr().add(offset) as *const Elf64Phdr) };
             phdrs.push(phdr);
         }
 
@@ -303,7 +302,14 @@ impl DynamicLinker {
         let mut runpath = Vec::new();
 
         if dynamic_addr != 0 {
-            self.parse_dynamic_section(data, &phdrs, &mut needed, &mut soname, &mut rpath, &mut runpath);
+            self.parse_dynamic_section(
+                data,
+                &phdrs,
+                &mut needed,
+                &mut soname,
+                &mut rpath,
+                &mut runpath,
+            );
         }
 
         let base_addr = self.load_bias;
@@ -348,9 +354,7 @@ impl DynamicLinker {
                         break;
                     }
 
-                    let dyn_entry = unsafe {
-                        *(data.as_ptr().add(offset) as *const Elf64Dyn)
-                    };
+                    let dyn_entry = unsafe { *(data.as_ptr().add(offset) as *const Elf64Dyn) };
 
                     if dyn_entry.d_tag == dt::NULL {
                         break;
@@ -365,7 +369,8 @@ impl DynamicLinker {
                                 if name_offset < strtab_size as usize {
                                     // Extract string (simplified)
                                     unsafe {
-                                        let str_ptr = data.as_ptr().add(strtab_addr as usize + name_offset);
+                                        let str_ptr =
+                                            data.as_ptr().add(strtab_addr as usize + name_offset);
                                         let mut len = 0;
                                         while *str_ptr.add(len) != 0 && len < 256 {
                                             len += 1;
@@ -382,7 +387,8 @@ impl DynamicLinker {
                                 let name_offset = dyn_entry.d_un as usize;
                                 if name_offset < strtab_size as usize {
                                     unsafe {
-                                        let str_ptr = data.as_ptr().add(strtab_addr as usize + name_offset);
+                                        let str_ptr =
+                                            data.as_ptr().add(strtab_addr as usize + name_offset);
                                         let mut len = 0;
                                         while *str_ptr.add(len) != 0 && len < 256 {
                                             len += 1;
@@ -399,7 +405,8 @@ impl DynamicLinker {
                                 let path_offset = dyn_entry.d_un as usize;
                                 if path_offset < strtab_size as usize {
                                     unsafe {
-                                        let str_ptr = data.as_ptr().add(strtab_addr as usize + path_offset);
+                                        let str_ptr =
+                                            data.as_ptr().add(strtab_addr as usize + path_offset);
                                         let mut len = 0;
                                         while *str_ptr.add(len) != 0 && len < 256 {
                                             len += 1;
@@ -416,7 +423,8 @@ impl DynamicLinker {
                                 let path_offset = dyn_entry.d_un as usize;
                                 if path_offset < strtab_size as usize {
                                     unsafe {
-                                        let str_ptr = data.as_ptr().add(strtab_addr as usize + path_offset);
+                                        let str_ptr =
+                                            data.as_ptr().add(strtab_addr as usize + path_offset);
                                         let mut len = 0;
                                         while *str_ptr.add(len) != 0 && len < 256 {
                                             len += 1;

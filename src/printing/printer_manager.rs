@@ -224,7 +224,9 @@ impl PrinterManager {
             "pdf://".to_string(),
         );
         pdf_printer.set_default(true);
-        manager.printers.insert("pdf-printer".to_string(), pdf_printer);
+        manager
+            .printers
+            .insert("pdf-printer".to_string(), pdf_printer);
 
         manager
     }
@@ -251,15 +253,12 @@ impl PrinterManager {
 
     /// List enabled printers
     pub fn list_enabled(&self) -> Vec<&Printer> {
-        self.printers.values()
-            .filter(|p| p.is_enabled)
-            .collect()
+        self.printers.values().filter(|p| p.is_enabled).collect()
     }
 
     /// Get default printer
     pub fn get_default(&self) -> Option<&Printer> {
-        self.printers.values()
-            .find(|p| p.is_default)
+        self.printers.values().find(|p| p.is_default)
     }
 
     /// Set default printer
@@ -269,7 +268,8 @@ impl PrinterManager {
             printer.set_default(false);
         }
 
-        let printer = self.get_printer_mut(id)
+        let printer = self
+            .get_printer_mut(id)
             .ok_or_else(|| format!("Printer {} not found", id))?;
 
         printer.set_default(true);
@@ -278,7 +278,8 @@ impl PrinterManager {
 
     /// Enable a printer
     pub fn enable(&mut self, id: &str) -> Result<(), String> {
-        let printer = self.get_printer_mut(id)
+        let printer = self
+            .get_printer_mut(id)
             .ok_or_else(|| format!("Printer {} not found", id))?;
 
         printer.set_enabled(true);
@@ -287,7 +288,8 @@ impl PrinterManager {
 
     /// Disable a printer
     pub fn disable(&mut self, id: &str) -> Result<(), String> {
-        let printer = self.get_printer_mut(id)
+        let printer = self
+            .get_printer_mut(id)
             .ok_or_else(|| format!("Printer {} not found", id))?;
 
         printer.set_enabled(false);
@@ -296,21 +298,30 @@ impl PrinterManager {
 
     /// Remove a printer
     pub fn remove(&mut self, id: &str) -> Result<(), String> {
-        let printer = self.get_printer(id)
+        let printer = self
+            .get_printer(id)
             .ok_or_else(|| format!("Printer {} not found", id))?;
 
         if printer.is_default {
             return Err("Cannot remove default printer".to_string());
         }
 
-        self.printers.remove(id)
+        self.printers
+            .remove(id)
             .ok_or_else(|| format!("Printer {} not found", id))?;
         Ok(())
     }
 
     /// Submit a print job
-    pub fn submit_job(&mut self, printer_id: &str, title: String, file_path: String, pages: u32) -> Result<String, String> {
-        let printer = self.get_printer(printer_id)
+    pub fn submit_job(
+        &mut self,
+        printer_id: &str,
+        title: String,
+        file_path: String,
+        pages: u32,
+    ) -> Result<String, String> {
+        let printer = self
+            .get_printer(printer_id)
             .ok_or_else(|| format!("Printer {} not found", printer_id))?;
 
         if !printer.is_enabled {
@@ -338,14 +349,14 @@ impl PrinterManager {
 
     /// List jobs by status
     pub fn list_jobs_by_status(&self, status: PrintJobStatus) -> Vec<&PrintJob> {
-        self.jobs.values()
-            .filter(|j| j.status == status)
-            .collect()
+        self.jobs.values().filter(|j| j.status == status).collect()
     }
 
     /// Cancel a job
     pub fn cancel_job(&mut self, id: &str) -> Result<(), String> {
-        let job = self.jobs.get_mut(id)
+        let job = self
+            .jobs
+            .get_mut(id)
             .ok_or_else(|| format!("Job {} not found", id))?;
 
         if job.status == PrintJobStatus::Completed {
@@ -359,17 +370,21 @@ impl PrinterManager {
     /// Get statistics
     pub fn get_statistics(&self) -> PrinterStatistics {
         let total_printers = self.printers.len();
-        let enabled_count = self.printers.values()
-            .filter(|p| p.is_enabled)
-            .count();
-        let offline_count = self.printers.values()
+        let enabled_count = self.printers.values().filter(|p| p.is_enabled).count();
+        let offline_count = self
+            .printers
+            .values()
             .filter(|p| p.status == PrinterStatus::Offline)
             .count();
         let total_jobs = self.jobs.len();
-        let pending_jobs = self.jobs.values()
+        let pending_jobs = self
+            .jobs
+            .values()
             .filter(|j| j.status == PrintJobStatus::Pending)
             .count();
-        let processing_jobs = self.jobs.values()
+        let processing_jobs = self
+            .jobs
+            .values()
             .filter(|j| j.status == PrintJobStatus::Processing)
             .count();
 
@@ -414,7 +429,10 @@ mod tests {
     #[test]
     fn test_printer_status_from_str() {
         assert_eq!(PrinterStatus::from_str("idle"), Some(PrinterStatus::Idle));
-        assert_eq!(PrinterStatus::from_str("printing"), Some(PrinterStatus::Printing));
+        assert_eq!(
+            PrinterStatus::from_str("printing"),
+            Some(PrinterStatus::Printing)
+        );
     }
 
     #[test]
@@ -475,12 +493,14 @@ mod tests {
     #[test]
     fn test_cancel_job() {
         let mut manager = PrinterManager::new();
-        let job_id = manager.submit_job(
-            "pdf-printer",
-            "Test".to_string(),
-            "/tmp/doc.pdf".to_string(),
-            1,
-        ).unwrap();
+        let job_id = manager
+            .submit_job(
+                "pdf-printer",
+                "Test".to_string(),
+                "/tmp/doc.pdf".to_string(),
+                1,
+            )
+            .unwrap();
         assert!(manager.cancel_job(&job_id).is_ok());
     }
 

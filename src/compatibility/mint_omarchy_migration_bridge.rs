@@ -20,9 +20,9 @@ extern crate alloc;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::{
     collections::BTreeMap,
+    format,
     string::{String, ToString},
     vec::Vec,
-    format,
 };
 
 #[cfg(any(feature = "standalone_test", test))]
@@ -109,19 +109,28 @@ impl MintOmarchyMigrationBridge {
         );
 
         // Nemo bookmarks
-        self.nemo_bookmarks.push("file:///home/user/Documents".to_string());
-        self.nemo_bookmarks.push("file:///home/user/Downloads".to_string());
-        self.nemo_bookmarks.push("file:///home/user/Projects".to_string());
+        self.nemo_bookmarks
+            .push("file:///home/user/Documents".to_string());
+        self.nemo_bookmarks
+            .push("file:///home/user/Downloads".to_string());
+        self.nemo_bookmarks
+            .push("file:///home/user/Projects".to_string());
 
         // Timeshift snapshots
-        self.timeshift_snapshot_dirs.push("/timeshift/snapshots/2026-10-01_12-00-00".to_string());
-        self.timeshift_snapshot_dirs.push("/timeshift/snapshots/2026-10-07_18-00-00".to_string());
+        self.timeshift_snapshot_dirs
+            .push("/timeshift/snapshots/2026-10-01_12-00-00".to_string());
+        self.timeshift_snapshot_dirs
+            .push("/timeshift/snapshots/2026-10-07_18-00-00".to_string());
 
         // Omarchy Hyprland sample binds
-        self.hyprland_binds.insert("SUPER, Return".to_string(), "exec, ghostty".to_string());
-        self.hyprland_binds.insert("SUPER, Space".to_string(), "exec, walker".to_string());
-        self.hyprland_binds.insert("SUPER, Q".to_string(), "killactive".to_string());
-        self.hyprland_binds.insert("SUPER, E".to_string(), "exec, nemo".to_string());
+        self.hyprland_binds
+            .insert("SUPER, Return".to_string(), "exec, ghostty".to_string());
+        self.hyprland_binds
+            .insert("SUPER, Space".to_string(), "exec, walker".to_string());
+        self.hyprland_binds
+            .insert("SUPER, Q".to_string(), "killactive".to_string());
+        self.hyprland_binds
+            .insert("SUPER, E".to_string(), "exec, nemo".to_string());
 
         // Omarchy Waybar modules
         self.waybar_modules.push("hyprland/workspaces".to_string());
@@ -132,8 +141,14 @@ impl MintOmarchyMigrationBridge {
         self.waybar_modules.push("clock".to_string());
 
         // Browser profiles
-        self.browser_profiles.push(("Firefox".to_string(), "/home/user/.mozilla/firefox/default".to_string()));
-        self.browser_profiles.push(("Chromium".to_string(), "/home/user/.config/chromium/Default".to_string()));
+        self.browser_profiles.push((
+            "Firefox".to_string(),
+            "/home/user/.mozilla/firefox/default".to_string(),
+        ));
+        self.browser_profiles.push((
+            "Chromium".to_string(),
+            "/home/user/.config/chromium/Default".to_string(),
+        ));
     }
 
     /// Execute full bridge conversion and return verification report.
@@ -147,7 +162,8 @@ impl MintOmarchyMigrationBridge {
             converted_entries_count: self.hyprland_binds.len() + self.mint_dconf_mappings.len(),
             success: true,
             latency_microseconds: 45,
-            notes: "Hyprland and Cinnamon window rules mapped to Zenith Wayland compositor".to_string(),
+            notes: "Hyprland and Cinnamon window rules mapped to Zenith Wayland compositor"
+                .to_string(),
         });
 
         // 2. Status Bar
@@ -167,7 +183,8 @@ impl MintOmarchyMigrationBridge {
             converted_entries_count: 1,
             success: true,
             latency_microseconds: 12,
-            notes: "Walker fuzzy search binds converted to SigmaOS lock-free ring launcher".to_string(),
+            notes: "Walker fuzzy search binds converted to SigmaOS lock-free ring launcher"
+                .to_string(),
         });
 
         // 4. File Manager VFS Bookmarks
@@ -187,7 +204,8 @@ impl MintOmarchyMigrationBridge {
             converted_entries_count: self.timeshift_snapshot_dirs.len(),
             success: true,
             latency_microseconds: 85,
-            notes: "Timeshift BTRFS subvolumes mapped to SigmaOS kernel rollback targets".to_string(),
+            notes: "Timeshift BTRFS subvolumes mapped to SigmaOS kernel rollback targets"
+                .to_string(),
         });
 
         // 6. Browser Profiles

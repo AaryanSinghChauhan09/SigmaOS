@@ -55,7 +55,10 @@ impl SolidDesignValidator {
         !component_name.is_empty() && responsibility_count == 1
     }
 
-    pub fn verify_open_closed_extension(extensible: bool, requires_source_modification: bool) -> bool {
+    pub fn verify_open_closed_extension(
+        extensible: bool,
+        requires_source_modification: bool,
+    ) -> bool {
         extensible && !requires_source_modification
     }
 
@@ -106,7 +109,7 @@ pub struct ResourceAllocationGraph {
     pub resource_count: usize,
     pub allocation_matrix: Vec<Vec<u32>>, // [process][resource] -> count
     pub claim_request_matrix: Vec<Vec<u32>>, // [process][resource] -> count
-    pub available_resources: Vec<u32>,     // [resource] -> unallocated count
+    pub available_resources: Vec<u32>,    // [resource] -> unallocated count
 }
 
 impl ResourceAllocationGraph {
@@ -171,7 +174,9 @@ impl ResourceAllocationGraph {
         let mut finish = vec![false; self.process_count];
 
         for p in 0..self.process_count {
-            if self.allocation_matrix[p].iter().all(|&a| a == 0) && self.claim_request_matrix[p].iter().all(|&c| c == 0) {
+            if self.allocation_matrix[p].iter().all(|&a| a == 0)
+                && self.claim_request_matrix[p].iter().all(|&c| c == 0)
+            {
                 finish[p] = true;
             }
         }
@@ -273,8 +278,13 @@ mod tests {
         assert_eq!(proc_obj.resource_type(), "Process");
         assert!(SolidDesignValidator::verify_liskov_substitution(&proc_obj));
 
-        assert!(SolidDesignValidator::verify_single_responsibility("ProcessManager", 1));
-        assert!(SolidDesignValidator::verify_open_closed_extension(true, false));
+        assert!(SolidDesignValidator::verify_single_responsibility(
+            "ProcessManager",
+            1
+        ));
+        assert!(SolidDesignValidator::verify_open_closed_extension(
+            true, false
+        ));
         assert!(SolidDesignValidator::verify_interface_segregation(3));
         assert!(SolidDesignValidator::verify_dependency_inversion(true));
     }

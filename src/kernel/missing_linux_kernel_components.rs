@@ -253,7 +253,11 @@ impl UserfaultfdSubsystemEngine {
     }
 
     pub fn resolve_page_fault(&mut self, fault_addr: usize) -> bool {
-        if let Some(pos) = self.pending_faults.iter().position(|f| f.fault_addr == fault_addr) {
+        if let Some(pos) = self
+            .pending_faults
+            .iter()
+            .position(|f| f.fault_addr == fault_addr)
+        {
             self.pending_faults.remove(pos);
             true
         } else {
@@ -388,7 +392,9 @@ pub struct LinuxFanotifyEngine {
 
 impl LinuxFanotifyEngine {
     pub fn new() -> Self {
-        Self { watches: Vec::new() }
+        Self {
+            watches: Vec::new(),
+        }
     }
 
     pub fn add_mark(&mut self, path: &str) -> Result<(), &'static str> {
@@ -494,7 +500,9 @@ mod tests {
     #[test]
     fn test_userfaultfd_subsystem() {
         let mut uffd = UserfaultfdSubsystemEngine::new();
-        assert!(uffd.register_range(0x7fff_0000_0000, 8192, UffdMode::Missing).is_ok());
+        assert!(uffd
+            .register_range(0x7fff_0000_0000, 8192, UffdMode::Missing)
+            .is_ok());
 
         assert!(uffd.trigger_page_fault(0x7fff_0000_1000, UffdMode::Missing, 4201));
         assert!(!uffd.trigger_page_fault(0x1000, UffdMode::Missing, 4201));
@@ -673,7 +681,12 @@ impl LinuxKprobesTracepointEngine {
         }
     }
 
-    pub fn register_kprobe(&mut self, symbol: &str, offset: usize, is_retprobe: bool) -> Result<(), &'static str> {
+    pub fn register_kprobe(
+        &mut self,
+        symbol: &str,
+        offset: usize,
+        is_retprobe: bool,
+    ) -> Result<(), &'static str> {
         if symbol.is_empty() {
             return Err("Kprobes: Symbol name cannot be empty");
         }
@@ -737,7 +750,10 @@ mod extended_kernel_tests {
 
     #[test]
     fn test_memcg_v2_oom_killer() {
-        let mut oom = LinuxMemoryCgroupV2OomKillerEngine::new("/sys/fs/cgroup/user.slice", 1024 * 1024 * 1024);
+        let mut oom = LinuxMemoryCgroupV2OomKillerEngine::new(
+            "/sys/fs/cgroup/user.slice",
+            1024 * 1024 * 1024,
+        );
         oom.register_process(MemcgProcessEntry {
             pid: 100,
             oom_score_adj: -1000,

@@ -1,14 +1,14 @@
 //! Ubuntu/Debian-Inspired Package Management Integration
-//! 
+//!
 //! APT-compatible package management with PPA support
 
-use std::vec;
 use std::boxed::Box;
-use std::string::{String, ToString};
-use std::vec::Vec;
 use std::format;
-use std::path::PathBuf;
 use std::fs;
+use std::path::PathBuf;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 use crate::klib::HashMap;
 use std::process::Command;
@@ -62,7 +62,7 @@ impl SigmaApt {
             available_packages: HashMap::new(),
             cache_dir,
         };
-        
+
         apt.initialize_default_sources();
         apt
     }
@@ -76,17 +76,17 @@ impl SigmaApt {
 
         let ppa_path = &ppa[4..]; // Remove "ppa:" prefix
         let parts: Vec<&str> = ppa_path.split('/').collect();
-        
+
         if parts.len() != 2 {
             return Err("Invalid PPA format. Use ppa:user/repository".into());
         }
 
         let user = parts[0];
         let repo = parts[1];
-        
+
         // Create PPA URL
         let ppa_url = format!("http://ppa.launchpad.net/{}/{}/ubuntu", user, repo);
-        
+
         let ppa_entry = PersonalPackageArchive {
             name: format!("{}/{}", user, repo),
             url: ppa_url,
@@ -97,12 +97,12 @@ impl SigmaApt {
 
         // Add PPA key (simplified)
         self.add_ppa_key(&ppa_entry)?;
-        
+
         self.ppas.push(ppa_entry);
-        
+
         // Update package lists
         self.update_package_lists()?;
-        
+
         println!("PPA {} added successfully", ppa);
         Ok(())
     }
@@ -117,7 +117,7 @@ impl SigmaApt {
 
         let initial_len = self.ppas.len();
         self.ppas.retain(|p| p.name != ppa_path);
-        
+
         if self.ppas.len() < initial_len {
             println!("PPA {} removed", ppa);
             self.update_package_lists()?;
@@ -148,7 +148,10 @@ impl SigmaApt {
     }
 
     /// Install a package
-    pub fn install_package(&mut self, package_name: &str) -> Result<(), Box<dyn std::error::Error>> {
+    pub fn install_package(
+        &mut self,
+        package_name: &str,
+    ) -> Result<(), Box<dyn std::error::Error>> {
         if self.installed_packages.contains_key(package_name) {
             println!("Package {} is already installed", package_name);
             return Ok(());
@@ -159,7 +162,7 @@ impl SigmaApt {
 
             // Resolve dependencies
             let dependencies = self.resolve_dependencies(&package.depends)?;
-            
+
             // Install dependencies first
             for dep in dependencies {
                 if !self.installed_packages.contains_key(&dep) {
@@ -170,10 +173,11 @@ impl SigmaApt {
             // Download and install package
             self.download_package(&package)?;
             self.extract_and_install_package(&package)?;
-            
+
             // Mark as installed
-            self.installed_packages.insert(package_name.to_string(), package);
-            
+            self.installed_packages
+                .insert(package_name.to_string(), package);
+
             println!("Package {} installed successfully", package_name);
             Ok(())
         } else {
@@ -185,10 +189,10 @@ impl SigmaApt {
     pub fn remove_package(&mut self, package_name: &str) -> Result<(), Box<dyn std::error::Error>> {
         if let Some(package) = self.installed_packages.remove(package_name) {
             println!("Removing {}...", package_name);
-            
+
             // Remove package files
             self.remove_package_files(&package)?;
-            
+
             println!("Package {} removed successfully", package_name);
             Ok(())
         } else {
@@ -201,15 +205,19 @@ impl SigmaApt {
         self.available_packages
             .values()
             .filter(|pkg| {
-                pkg.name.contains(query) || 
-                pkg.description.to_lowercase().contains(&query.to_lowercase())
+                pkg.name.contains(query)
+                    || pkg
+                        .description
+                        .to_lowercase()
+                        .contains(&query.to_lowercase())
             })
             .collect()
     }
 
     /// Show package information
     pub fn show_package(&self, package_name: &str) -> Option<&DebianPackage> {
-        self.available_packages.get(package_name)
+        self.available_packages
+            .get(package_name)
             .or_else(|| self.installed_packages.get(package_name))
     }
 
@@ -221,11 +229,11 @@ impl SigmaApt {
     /// Upgrade all packages
     pub fn upgrade_packages(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         println!("Upgrading packages...");
-        
+
         self.update_package_lists()?;
-        
+
         let mut upgradable = Vec::new();
-        
+
         for (name, installed) in &self.installed_packages {
             if let Some(available) = self.available_packages.get(name) {
                 if self.is_version_newer(&available.version, &installed.version) {
@@ -235,12 +243,12 @@ impl SigmaApt {
         }
 
         println!("Found {} upgradable packages", upgradable.len());
-        
+
         for package_name in upgradable {
             self.remove_package(&package_name)?;
             self.install_package(&package_name)?;
         }
-        
+
         println!("All packages upgraded successfully");
         Ok(())
     }
@@ -262,7 +270,9 @@ impl SigmaApt {
             uri: "http://archive.ubuntu.com/ubuntu/".to_string(),
             distribution: "jammy".to_string(),
             components: vec!["main", "restricted", "universe", "multiverse"]
-                .iter().map(|s| s.to_string()).collect(),
+                .iter()
+                .map(|s| s.to_string())
+                .collect(),
         });
 
         self.sources_list.push(PackageSource {
@@ -270,18 +280,17 @@ impl SigmaApt {
             uri: "http://security.ubuntu.com/ubuntu/".to_string(),
             distribution: "jammy-security".to_string(),
             components: vec!["main", "restricted", "universe", "multiverse"]
-                .iter().map(|s| s.to_string()).collect(),
+                .iter()
+                .map(|s| s.to_string())
+                .collect(),
         });
     }
 
     fn add_ppa_key(&self, ppa: &PersonalPackageArchive) -> Result<(), Box<dyn std::error::Error>> {
         // Add PPA signing key (simplified implementation)
         let key_url = format!("{}/key", ppa.url);
-        
-        let output = Command::new("wget")
-            .arg("-qO-")
-            .arg(&key_url)
-            .output();
+
+        let output = Command::new("wget").arg("-qO-").arg(&key_url).output();
 
         if let Ok(output) = output {
             if output.status.success() {
@@ -289,14 +298,17 @@ impl SigmaApt {
                 println!("Added PPA key for {}", ppa.name);
             }
         }
-        
+
         Ok(())
     }
 
-    fn fetch_package_list(&mut self, source: &PackageSource) -> Result<(), Box<dyn std::error::Error>> {
+    fn fetch_package_list(
+        &mut self,
+        source: &PackageSource,
+    ) -> Result<(), Box<dyn std::error::Error>> {
         // Simplified package list fetching
         // In reality, this would download and parse Packages.gz files
-        
+
         // Mock some packages for demonstration
         let mock_packages = vec![
             DebianPackage {
@@ -328,16 +340,20 @@ impl SigmaApt {
         ];
 
         for package in mock_packages {
-            self.available_packages.insert(package.name.clone(), package);
+            self.available_packages
+                .insert(package.name.clone(), package);
         }
 
         Ok(())
     }
 
-    fn fetch_ppa_package_list(&mut self, ppa: &PersonalPackageArchive) -> Result<(), Box<dyn std::error::Error>> {
+    fn fetch_ppa_package_list(
+        &mut self,
+        ppa: &PersonalPackageArchive,
+    ) -> Result<(), Box<dyn std::error::Error>> {
         // Fetch packages from PPA
         println!("Fetching packages from PPA: {}", ppa.name);
-        
+
         // Mock PPA package for demonstration
         let ppa_package = DebianPackage {
             name: format!("{}-custom", ppa.name.replace('/', "-")),
@@ -353,14 +369,18 @@ impl SigmaApt {
             installed_size: 1000000,
         };
 
-        self.available_packages.insert(ppa_package.name.clone(), ppa_package);
+        self.available_packages
+            .insert(ppa_package.name.clone(), ppa_package);
         Ok(())
     }
 
-    fn resolve_dependencies(&self, depends: &[String]) -> Result<Vec<String>, Box<dyn std::error::Error>> {
+    fn resolve_dependencies(
+        &self,
+        depends: &[String],
+    ) -> Result<Vec<String>, Box<dyn std::error::Error>> {
         // Simplified dependency resolution
         let mut resolved = Vec::new();
-        
+
         for dep in depends {
             // Parse dependency (simplified - just take package name)
             let package_name = dep.split_whitespace().next().unwrap_or(dep);
@@ -368,46 +388,62 @@ impl SigmaApt {
                 resolved.push(package_name.to_string());
             }
         }
-        
+
         Ok(resolved)
     }
 
     fn download_package(&self, package: &DebianPackage) -> Result<(), Box<dyn std::error::Error>> {
         println!("Downloading {}...", package.name);
-        
+
         // Create cache directory
         fs::create_dir_all(&self.cache_dir)?;
-        
+
         // Mock download (in reality, would download .deb file)
-        let package_file = format!("{}/{}", self.cache_dir.display(), format!("{}_{}.deb", package.name, package.version));
+        let package_file = format!(
+            "{}/{}",
+            self.cache_dir.display(),
+            format!("{}_{}.deb", package.name, package.version)
+        );
         fs::write(package_file, "mock package data")?;
-        
+
         Ok(())
     }
 
-    fn extract_and_install_package(&self, package: &DebianPackage) -> Result<(), Box<dyn std::error::Error>> {
+    fn extract_and_install_package(
+        &self,
+        package: &DebianPackage,
+    ) -> Result<(), Box<dyn std::error::Error>> {
         println!("Extracting and installing {}...", package.name);
-        
+
         // Mock installation process
         // In reality, would extract .deb and copy files to system
-        
+
         let install_dir = PathBuf::from("/usr/local/sigma-apt").join(&package.name);
         fs::create_dir_all(&install_dir)?;
-        
+
         // Create mock installed files
-        fs::write(format!("{}/{}", install_dir.display(), "binary"), "mock binary")?;
-        fs::write(format!("{}/{}", install_dir.display(), "config"), "mock config")?;
-        
+        fs::write(
+            format!("{}/{}", install_dir.display(), "binary"),
+            "mock binary",
+        )?;
+        fs::write(
+            format!("{}/{}", install_dir.display(), "config"),
+            "mock config",
+        )?;
+
         Ok(())
     }
 
-    fn remove_package_files(&self, package: &DebianPackage) -> Result<(), Box<dyn std::error::Error>> {
+    fn remove_package_files(
+        &self,
+        package: &DebianPackage,
+    ) -> Result<(), Box<dyn std::error::Error>> {
         let install_dir = PathBuf::from("/usr/local/sigma-apt").join(&package.name);
-        
+
         if install_dir.exists() {
             fs::remove_dir_all(install_dir)?;
         }
-        
+
         Ok(())
     }
 
@@ -443,13 +479,13 @@ impl SigmaAptCli {
                     return Err("Package name required".into());
                 }
                 self.apt.install_package(&args[1])
-            },
+            }
             "remove" => {
                 if args.len() < 2 {
                     return Err("Package name required".into());
                 }
                 self.apt.remove_package(&args[1])
-            },
+            }
             "search" => {
                 if args.len() < 2 {
                     return Err("Search term required".into());
@@ -459,7 +495,7 @@ impl SigmaAptCli {
                     println!("{} - {}", package.name, package.description);
                 }
                 Ok(())
-            },
+            }
             "show" => {
                 if args.len() < 2 {
                     return Err("Package name required".into());
@@ -474,20 +510,20 @@ impl SigmaAptCli {
                     println!("Package {} not found", args[1]);
                 }
                 Ok(())
-            },
+            }
             "list" => {
                 let installed = self.apt.list_installed();
                 for package in installed {
                     println!("{} {}", package.name, package.version);
                 }
                 Ok(())
-            },
+            }
             "add-apt-repository" => {
                 if args.len() < 2 {
                     return Err("Repository required".into());
                 }
                 self.apt.add_ppa(&args[1])
-            },
+            }
             "clean" => self.apt.clean_cache(),
             _ => {
                 println!("Unknown command: {}", args[0]);
@@ -524,7 +560,7 @@ mod tests {
     fn test_apt_initialization() {
         let temp_dir = TempDir::new().unwrap();
         let apt = SigmaApt::new(temp_dir.path().to_path_buf());
-        
+
         assert!(!apt.sources_list.is_empty());
         assert_eq!(apt.installed_packages.len(), 0);
     }
@@ -533,7 +569,7 @@ mod tests {
     fn test_ppa_addition() {
         let temp_dir = TempDir::new().unwrap();
         let mut apt = SigmaApt::new(temp_dir.path().to_path_buf());
-        
+
         let result = apt.add_ppa("ppa:deadsnakes/ppa");
         // Note: This will fail in test environment due to network requirements
         // In real implementation, would mock the network calls
@@ -543,10 +579,10 @@ mod tests {
     fn test_package_search() {
         let temp_dir = TempDir::new().unwrap();
         let mut apt = SigmaApt::new(temp_dir.path().to_path_buf());
-        
+
         // Trigger loading of mock packages
         let _ = apt.update_package_lists();
-        
+
         let results = apt.search_packages("firefox");
         assert!(!results.is_empty());
     }

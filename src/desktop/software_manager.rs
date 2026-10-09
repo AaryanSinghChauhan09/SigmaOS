@@ -191,7 +191,9 @@ impl SoftwareManager {
                 }
 
                 // Summary match score
-                if self.config.search_by_summary && pkg.summary.to_lowercase().contains(&query_lower) {
+                if self.config.search_by_summary
+                    && pkg.summary.to_lowercase().contains(&query_lower)
+                {
                     score += 10.0;
                 }
 
@@ -459,7 +461,9 @@ mod tests {
     fn test_flatpak_remotes() {
         let mut manager = SoftwareManager::new();
         manager.add_flatpak_remote("flathub-beta".to_string());
-        assert!(manager.flatpak_remotes.contains(&"flathub-beta".to_string()));
+        assert!(manager
+            .flatpak_remotes
+            .contains(&"flathub-beta".to_string()));
     }
 
     #[test]

@@ -308,7 +308,6 @@ mod tests {
     use super::*;
 
     #[ignore]
-
     #[test]
     fn test_congestion_window() {
         let mut cwnd = CongestionWindow::new();

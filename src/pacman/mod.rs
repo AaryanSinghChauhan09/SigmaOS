@@ -215,18 +215,21 @@ impl PacmanPackageManager {
             if self.database.is_installed(package_name) && self.needed {
                 return Err("Package already installed and --needed flag set");
             }
-            
+
             let mut local_pkg = pkg.clone();
-            local_pkg.install_date = format!("{}", std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .unwrap_or_default()
-                .as_secs());
+            local_pkg.install_date = format!(
+                "{}",
+                std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .unwrap_or_default()
+                    .as_secs()
+            );
             local_pkg.install_reason = if self.asdeps {
                 String::from("dependency")
             } else {
                 String::from("explicit")
             };
-            
+
             self.database.add_local_package(local_pkg);
             Ok(())
         } else {
@@ -239,7 +242,7 @@ impl PacmanPackageManager {
         if !self.database.is_installed(package_name) {
             return Err("Package not installed");
         }
-        
+
         self.database.local_packages.remove(package_name);
         Ok(())
     }
@@ -252,7 +255,7 @@ impl PacmanPackageManager {
                     return Err("Package already up to date");
                 }
             }
-            
+
             self.remove(package_name)?;
             self.install(package_name)?;
             Ok(())
@@ -270,13 +273,13 @@ impl PacmanPackageManager {
     /// Upgrade all packages
     pub fn upgrade(&mut self) -> Result<Vec<String>, &'static str> {
         let mut upgraded = Vec::new();
-        
+
         for package_name in self.database.list_installed_packages() {
             if let Ok(_) = self.update(&package_name) {
                 upgraded.push(package_name);
             }
         }
-        
+
         Ok(upgraded)
     }
 
@@ -340,7 +343,7 @@ mod tests {
         let mut pkg = PacmanPackage::new(String::from("test"), String::from("1.0.0"));
         pkg.description = String::from("Test package");
         pkg.add_dependency(String::from("libc"));
-        
+
         assert_eq!(pkg.name, String::from("test"));
         assert!(pkg.depends.contains(&String::from("libc")));
     }
@@ -350,7 +353,7 @@ mod tests {
         let mut db = PacmanDatabase::new();
         let pkg = PacmanPackage::new(String::from("nginx"), String::from("1.24.0"));
         db.add_package(pkg);
-        
+
         assert!(db.get_package("nginx").is_some());
         assert!(db.search_packages("ngi").contains(&String::from("nginx")));
     }
@@ -360,7 +363,7 @@ mod tests {
         let mut manager = PacmanPackageManager::new();
         let pkg = PacmanPackage::new(String::from("vim"), String::from("9.0"));
         manager.database.add_package(pkg);
-        
+
         assert!(manager.install("vim").is_ok());
         assert!(manager.database.is_installed("vim"));
     }
@@ -371,7 +374,7 @@ mod tests {
         let pkg = PacmanPackage::new(String::from("nano"), String::from("7.0"));
         manager.database.add_package(pkg.clone());
         manager.database.add_local_package(pkg);
-        
+
         assert!(manager.remove("nano").is_ok());
         assert!(!manager.database.is_installed("nano"));
     }
@@ -383,7 +386,7 @@ mod tests {
         let new_pkg = PacmanPackage::new(String::from("git"), String::from("2.40"));
         manager.database.add_package(new_pkg);
         manager.database.add_local_package(old_pkg);
-        
+
         assert!(manager.update("git").is_ok());
     }
 
@@ -392,7 +395,7 @@ mod tests {
         let mut manager = PacmanPackageManager::new();
         let pkg = PacmanPackage::new(String::from("docker"), String::from("24.0"));
         manager.database.add_package(pkg);
-        
+
         let results = manager.search("doc");
         assert!(results.contains(&String::from("docker")));
     }

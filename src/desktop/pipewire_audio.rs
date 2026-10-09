@@ -10,9 +10,9 @@ use std::collections::HashMap;
 /// Audio device type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AudioDeviceType {
-    Sink,        // Output device
-    Source,      // Input device
-    Monitor,     // Monitor stream
+    Sink,    // Output device
+    Source,  // Input device
+    Monitor, // Monitor stream
 }
 
 /// Audio device state

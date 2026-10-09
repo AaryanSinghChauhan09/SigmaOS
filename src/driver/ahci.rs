@@ -17,25 +17,25 @@
 
 extern crate alloc;
 
-use alloc::vec::Vec;
 use alloc::collections::BTreeMap;
+use alloc::vec::Vec;
 
 /// AHCI generic host control registers
 #[derive(Debug, Clone)]
 #[repr(C)]
 pub struct AhciGenericHostControl {
-    pub cap: u32,         // Host capabilities
-    pub ghc: u32,         // Global host control
-    pub is: u32,          // Interrupt status
-    pub pi: u32,          // Ports implemented
-    pub vs: u32,          // Version
-    pub ccc_ctl: u32,     // Command completion coalescing control
-    pub ccc_pts: u32,     // Command completion coalescing ports
-    pub em_loc: u32,      // Enclosure management location
-    pub em_ctl: u32,      // Enclosure management control
-    pub cap2: u32,        // Host capabilities extended
-    pub bios_sem: u32,    // BIOS/OS handoff control and status
-    pub bohc: u32,        // BIOS/OS handoff control and status
+    pub cap: u32,      // Host capabilities
+    pub ghc: u32,      // Global host control
+    pub is: u32,       // Interrupt status
+    pub pi: u32,       // Ports implemented
+    pub vs: u32,       // Version
+    pub ccc_ctl: u32,  // Command completion coalescing control
+    pub ccc_pts: u32,  // Command completion coalescing ports
+    pub em_loc: u32,   // Enclosure management location
+    pub em_ctl: u32,   // Enclosure management control
+    pub cap2: u32,     // Host capabilities extended
+    pub bios_sem: u32, // BIOS/OS handoff control and status
+    pub bohc: u32,     // BIOS/OS handoff control and status
     pub rsvd: [u8; 116],
     pub vendor: [u32; 24],
 }
@@ -44,24 +44,24 @@ pub struct AhciGenericHostControl {
 #[derive(Debug, Clone)]
 #[repr(C)]
 pub struct AhciPort {
-    pub clb: u32,         // Command list base address
-    pub clbu: u32,        // Command list base address upper
-    pub fb: u32,          // FIS base address
-    pub fbu: u32,         // FIS base address upper
-    pub is: u32,          // Interrupt status
-    pub ie: u32,          // Interrupt enable
-    pub cmd: u32,         // Command and status
+    pub clb: u32,  // Command list base address
+    pub clbu: u32, // Command list base address upper
+    pub fb: u32,   // FIS base address
+    pub fbu: u32,  // FIS base address upper
+    pub is: u32,   // Interrupt status
+    pub ie: u32,   // Interrupt enable
+    pub cmd: u32,  // Command and status
     pub rsvd1: [u32; 1],
-    pub tfd: u32,         // Task file data
-    pub sig: u32,         // Signature
-    pub ssts: u32,        // SATA status (SCR0: SStatus)
-    pub sctl: u32,        // SATA control (SCR2: SControl)
-    pub serr: u32,        // SATA error (SCR1: SError)
-    pub sact: u32,        // SATA active (SCR3: SActive)
-    pub ci: u32,          // Command issue
-    pub sntf: u32,        // SATA notification (SCR4: SNotification)
-    pub fbs: u32,         // FIS-based switch control
-    pub devslp: u32,      // Device sleep
+    pub tfd: u32,    // Task file data
+    pub sig: u32,    // Signature
+    pub ssts: u32,   // SATA status (SCR0: SStatus)
+    pub sctl: u32,   // SATA control (SCR2: SControl)
+    pub serr: u32,   // SATA error (SCR1: SError)
+    pub sact: u32,   // SATA active (SCR3: SActive)
+    pub ci: u32,     // Command issue
+    pub sntf: u32,   // SATA notification (SCR4: SNotification)
+    pub fbs: u32,    // FIS-based switch control
+    pub devslp: u32, // Device sleep
     pub rsvd2: [u32; 11],
     pub vendor: [u32; 4],
 }
@@ -70,18 +70,18 @@ pub struct AhciPort {
 #[derive(Debug, Clone, Copy)]
 #[repr(C)]
 pub struct AhciCommandHeader {
-    pub cfl: u8,          // Command FIS length
-    pub a: u8,            // ATAPI
-    pub w: u8,            // Write
-    pub p: u8,            // Prefetchable
-    pub r: u8,            // Reset
-    pub b: u8,            // BIST
-    pub c: u8,            // Clear busy upon R_OK
-    pub pmp: u8,          // Port multiplier port
-    pub prdtl: u16,       // Physical region descriptor table length
-    pub prdbc: u32,       // Physical region descriptor byte count
-    pub ctba: u32,        // Command table descriptor base address
-    pub ctbau: u32,       // Command table descriptor base address upper
+    pub cfl: u8,    // Command FIS length
+    pub a: u8,      // ATAPI
+    pub w: u8,      // Write
+    pub p: u8,      // Prefetchable
+    pub r: u8,      // Reset
+    pub b: u8,      // BIST
+    pub c: u8,      // Clear busy upon R_OK
+    pub pmp: u8,    // Port multiplier port
+    pub prdtl: u16, // Physical region descriptor table length
+    pub prdbc: u32, // Physical region descriptor byte count
+    pub ctba: u32,  // Command table descriptor base address
+    pub ctbau: u32, // Command table descriptor base address upper
     pub rsvd: [u32; 4],
 }
 
@@ -122,22 +122,22 @@ impl AhciCommandHeader {
 #[derive(Debug, Clone)]
 #[repr(C)]
 pub struct AhciCommandFis {
-    pub fis_type: u8,     // FIS type
-    pub c: u8,            // C bit
-    pub command: u8,      // Command
-    pub features: u8,     // Features
-    pub lba0: u8,         // LBA low
-    pub lba1: u8,         // LBA mid
-    pub lba2: u8,         // LBA high
-    pub device: u8,       // Device
-    pub lba3: u8,         // LBA extended
-    pub lba4: u8,         // LBA extended
-    pub lba5: u8,         // LBA extended
-    pub features_exp: u8, // Features extended
-    pub sector_count: u8, // Sector count
+    pub fis_type: u8,         // FIS type
+    pub c: u8,                // C bit
+    pub command: u8,          // Command
+    pub features: u8,         // Features
+    pub lba0: u8,             // LBA low
+    pub lba1: u8,             // LBA mid
+    pub lba2: u8,             // LBA high
+    pub device: u8,           // Device
+    pub lba3: u8,             // LBA extended
+    pub lba4: u8,             // LBA extended
+    pub lba5: u8,             // LBA extended
+    pub features_exp: u8,     // Features extended
+    pub sector_count: u8,     // Sector count
     pub sector_count_exp: u8, // Sector count extended
     pub rsvd: [u8; 6],
-    pub count: u16,       // Transfer count
+    pub count: u16, // Transfer count
     pub rsvd2: [u8; 6],
 }
 
@@ -145,10 +145,10 @@ pub struct AhciCommandFis {
 #[derive(Debug, Clone, Copy)]
 #[repr(C)]
 pub struct AhciPrdt {
-    pub dba: u32,         // Data base address
-    pub dbau: u32,        // Data base address upper
+    pub dba: u32,  // Data base address
+    pub dbau: u32, // Data base address upper
     pub rsvd: u32,
-    pub dbc: u32,         // Byte count (0-indexed)
+    pub dbc: u32, // Byte count (0-indexed)
 }
 
 impl AhciPrdt {
@@ -166,14 +166,14 @@ impl AhciPrdt {
 #[derive(Debug, Clone)]
 #[repr(C)]
 pub struct AhciReceivedFis {
-    pub dsfis: [u8; 28],  // DMA setup FIS
+    pub dsfis: [u8; 28], // DMA setup FIS
     pub rsvd1: [u8; 4],
-    pub psfis: [u8; 28],  // PIO setup FIS
+    pub psfis: [u8; 28], // PIO setup FIS
     pub rsvd2: [u8; 4],
-    pub rfis: [u8; 20],   // D2H register FIS
+    pub rfis: [u8; 20], // D2H register FIS
     pub rsvd3: [u8; 4],
-    pub sdbfis: [u8; 8],  // Set device bits FIS
-    pub ufis: [u8; 32],   // Unknown FIS
+    pub sdbfis: [u8; 8], // Set device bits FIS
+    pub ufis: [u8; 32],  // Unknown FIS
     pub rsvd4: [u8; 96],
 }
 
@@ -209,9 +209,9 @@ pub struct AhciController {
     pub command_slots: u32,
     pub supports_ncq: bool,
     pub supports_64bit: bool,
-    command_lists: BTreeMap<u8, u64>, // port_id -> physical address
+    command_lists: BTreeMap<u8, u64>,  // port_id -> physical address
     command_tables: BTreeMap<u8, u64>, // port_id -> physical address
-    fis_buffers: BTreeMap<u8, u64>, // port_id -> physical address
+    fis_buffers: BTreeMap<u8, u64>,    // port_id -> physical address
     next_dma_addr: u64,
 }
 
@@ -369,7 +369,8 @@ impl AhciController {
         data_size: u32,
         is_write: bool,
     ) -> Result<AhciCommandHeader, &'static str> {
-        let cmd_table_addr = self.get_command_table_addr(port_id)
+        let cmd_table_addr = self
+            .get_command_table_addr(port_id)
             .ok_or("Command table not allocated")?;
 
         let mut header = AhciCommandHeader::new();
@@ -379,7 +380,7 @@ impl AhciController {
         // Each PRDT can handle up to 4MB (minus 1 byte)
         const MAX_PRDT_SIZE: u32 = 4 * 1024 * 1024 - 1;
         let num_prdt = ((data_size + MAX_PRDT_SIZE - 1) / MAX_PRDT_SIZE) as u16;
-        
+
         if num_prdt > 65535 {
             return Err("Transfer too large for PRDT");
         }
@@ -516,9 +517,14 @@ impl AhciController {
     }
 
     /// Read from SATA device
-    pub fn read(&self, port_id: u8, lba: u64, sectors: u16, buffer: u64) -> Result<(), &'static str> {
-        let port = self.ports.get(&port_id)
-            .ok_or("Port not found")?;
+    pub fn read(
+        &self,
+        port_id: u8,
+        lba: u64,
+        sectors: u16,
+        buffer: u64,
+    ) -> Result<(), &'static str> {
+        let port = self.ports.get(&port_id).ok_or("Port not found")?;
 
         unsafe {
             let port = &mut **port;
@@ -582,9 +588,14 @@ impl AhciController {
     }
 
     /// Write to SATA device
-    pub fn write(&self, port_id: u8, lba: u64, sectors: u16, buffer: u64) -> Result<(), &'static str> {
-        let port = self.ports.get(&port_id)
-            .ok_or("Port not found")?;
+    pub fn write(
+        &self,
+        port_id: u8,
+        lba: u64,
+        sectors: u16,
+        buffer: u64,
+    ) -> Result<(), &'static str> {
+        let port = self.ports.get(&port_id).ok_or("Port not found")?;
 
         unsafe {
             let port = &mut **port;
@@ -710,13 +721,13 @@ mod tests {
         let mut header = AhciCommandHeader::new();
         assert_eq!(header.cfl, 5);
         assert_eq!(header.w, 0);
-        
+
         header.set_write(true);
         assert_eq!(header.w, 1);
-        
+
         header.set_prdtl(42);
         assert_eq!(header.prdtl, 42);
-        
+
         header.set_ctba(0x5000);
         assert_eq!(header.ctba, 0x5000);
         assert_eq!(header.ctbau, 0);
@@ -725,19 +736,19 @@ mod tests {
     #[test]
     fn test_ahci_dma_buffer_allocation() {
         let mut controller = AhciController::new(0x40000000);
-        
+
         // Manually add a port for testing
         let port_ptr = (0x40000000 + 0x100) as *mut AhciPort;
         controller.ports.insert(0, port_ptr);
-        
+
         let result = controller.allocate_port_dma_buffers(0);
         assert!(result.is_ok());
-        
+
         // Check that DMA addresses were allocated
         assert!(controller.get_command_list_addr(0).is_some());
         assert!(controller.get_command_table_addr(0).is_some());
         assert!(controller.get_fis_buffer_addr(0).is_some());
-        
+
         // Check alignment
         let cmd_list = controller.get_command_list_addr(0).unwrap();
         assert_eq!(cmd_list & 0x3FF, 0); // 1KB aligned
@@ -746,19 +757,19 @@ mod tests {
     #[test]
     fn test_ahci_build_command_with_prdt() {
         let mut controller = AhciController::new(0x40000000);
-        
+
         // Add port and allocate buffers
         let port_ptr = (0x40000000 + 0x100) as *mut AhciPort;
         controller.ports.insert(0, port_ptr);
         controller.allocate_port_dma_buffers(0).unwrap();
-        
+
         // Build command for small transfer
         let header = controller.build_command_with_prdt(0, 0x5000, 4096, false);
         assert!(header.is_ok());
         let header = header.unwrap();
         assert_eq!(header.w, 0); // Read
         assert_eq!(header.prdtl, 1); // 1 PRDT entry
-        
+
         // Build command for large transfer
         let header = controller.build_command_with_prdt(0, 0x6000, 8 * 1024 * 1024, true);
         assert!(header.is_ok());

@@ -10,10 +10,10 @@
 
 extern crate alloc;
 
-#[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec::Vec;
 
 use std::format;
 use std::string::{String, ToString};

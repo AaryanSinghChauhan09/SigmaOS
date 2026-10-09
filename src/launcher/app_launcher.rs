@@ -14,10 +14,10 @@
 
 extern crate alloc;
 use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::vec;
 use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 use core::fmt;
 
 /// Case-insensitive equality without allocation for ASCII text.

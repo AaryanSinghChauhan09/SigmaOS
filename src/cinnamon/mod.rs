@@ -189,10 +189,10 @@ mod tests {
         let mut applet = CinnamonApplet::new(
             String::from("menu@cinnamon.org"),
             String::from("Menu"),
-            CinnamonAppletType::Menu
+            CinnamonAppletType::Menu,
         );
         applet.set_config(String::from("icon"), String::from("start-here"));
-        
+
         assert_eq!(applet.applet_type, CinnamonAppletType::Menu);
         assert_eq!(applet.get_config("icon"), Some(&String::from("start-here")));
     }
@@ -202,7 +202,7 @@ mod tests {
         let mut panel = CinnamonPanel::new(String::from("panel1"));
         panel.add_applet(String::from("menu@cinnamon.org"));
         panel.add_applet(String::from("systray@cinnamon.org"));
-        
+
         assert_eq!(panel.applets.len(), 2);
         panel.remove_applet("menu@cinnamon.org");
         assert_eq!(panel.applets.len(), 1);
@@ -211,17 +211,17 @@ mod tests {
     #[test]
     fn test_cinnamon_desktop_manager() {
         let mut manager = CinnamonDesktopManager::new();
-        
+
         let applet = CinnamonApplet::new(
             String::from("clock@cinnamon.org"),
             String::from("Clock"),
-            CinnamonAppletType::Clock
+            CinnamonAppletType::Clock,
         );
         manager.add_applet(applet);
-        
+
         let panel = CinnamonPanel::new(String::from("bottom-panel"));
         manager.add_panel(panel);
-        
+
         assert!(manager.get_applet("clock@cinnamon.org").is_some());
         assert!(manager.get_panel("bottom-panel").is_some());
     }
@@ -232,15 +232,19 @@ mod tests {
         let applet = CinnamonApplet::new(
             String::from("network@cinnamon.org"),
             String::from("Network"),
-            CinnamonAppletType::NetworkStatus
+            CinnamonAppletType::NetworkStatus,
         );
         manager.add_applet(applet);
-        
+
         manager.enable_applet(String::from("network@cinnamon.org"));
-        assert!(manager.enabled_applets.contains(&String::from("network@cinnamon.org")));
-        
+        assert!(manager
+            .enabled_applets
+            .contains(&String::from("network@cinnamon.org")));
+
         manager.disable_applet("network@cinnamon.org");
-        assert!(!manager.enabled_applets.contains(&String::from("network@cinnamon.org")));
+        assert!(!manager
+            .enabled_applets
+            .contains(&String::from("network@cinnamon.org")));
     }
 
     #[test]
@@ -248,7 +252,7 @@ mod tests {
         let mut manager = CinnamonDesktopManager::new();
         manager.set_theme(String::from("Mint-Y-Dark"));
         manager.set_layout(String::from("modern"));
-        
+
         assert_eq!(manager.theme, String::from("Mint-Y-Dark"));
         assert_eq!(manager.layout, String::from("modern"));
     }

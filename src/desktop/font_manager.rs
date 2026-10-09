@@ -36,7 +36,13 @@ pub struct FontStyle {
 }
 
 impl FontStyle {
-    pub fn new(name: String, weight: FontWeight, slant: FontSlant, width: FontWidth, file_path: String) -> Self {
+    pub fn new(
+        name: String,
+        weight: FontWeight,
+        slant: FontSlant,
+        width: FontWidth,
+        file_path: String,
+    ) -> Self {
         Self {
             name,
             weight,
@@ -163,7 +169,7 @@ pub struct DesktopFontManager {
     interface_font: Option<String>,
     title_font: Option<String>,
     heading_font: Option<String>,
-    font_size: u32,  // 6-72
+    font_size: u32, // 6-72
     counter: u32,
 }
 
@@ -276,10 +282,11 @@ impl DesktopFontManager {
     }
 
     pub fn remove_family(&mut self, id: &str) -> bool {
-        if Some(id.to_string()) == self.default_font ||
-           Some(id.to_string()) == self.monospace_font ||
-           Some(id.to_string()) == self.sans_serif_font ||
-           Some(id.to_string()) == self.serif_font {
+        if Some(id.to_string()) == self.default_font
+            || Some(id.to_string()) == self.monospace_font
+            || Some(id.to_string()) == self.sans_serif_font
+            || Some(id.to_string()) == self.serif_font
+        {
             return false;
         }
         self.families.remove(id).is_some()
@@ -447,7 +454,9 @@ mod tests {
         let id = manager.add_family(family);
         assert!(manager.set_font_for_usage(FontUsageType::Monospace, &id));
 
-        let font = manager.get_font_for_usage(FontUsageType::Monospace).unwrap();
+        let font = manager
+            .get_font_for_usage(FontUsageType::Monospace)
+            .unwrap();
         assert_eq!(font.name, id);
     }
 

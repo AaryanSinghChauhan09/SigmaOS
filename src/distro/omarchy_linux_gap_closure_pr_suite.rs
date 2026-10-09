@@ -36,10 +36,22 @@ pub struct OmarchyWallustPaletteExtractorEngine {
 impl OmarchyWallustPaletteExtractorEngine {
     pub fn new() -> Self {
         let default_ansi = [
-            "#1e1e2e".to_string(), "#f38ba8".to_string(), "#a6e3a1".to_string(), "#f9e2af".to_string(),
-            "#89b4fa".to_string(), "#f5c2e7".to_string(), "#94e2d5".to_string(), "#bac2de".to_string(),
-            "#585b70".to_string(), "#f38ba8".to_string(), "#a6e3a1".to_string(), "#f9e2af".to_string(),
-            "#89b4fa".to_string(), "#f5c2e7".to_string(), "#94e2d5".to_string(), "#a6adc8".to_string(),
+            "#1e1e2e".to_string(),
+            "#f38ba8".to_string(),
+            "#a6e3a1".to_string(),
+            "#f9e2af".to_string(),
+            "#89b4fa".to_string(),
+            "#f5c2e7".to_string(),
+            "#94e2d5".to_string(),
+            "#bac2de".to_string(),
+            "#585b70".to_string(),
+            "#f38ba8".to_string(),
+            "#a6e3a1".to_string(),
+            "#f9e2af".to_string(),
+            "#89b4fa".to_string(),
+            "#f5c2e7".to_string(),
+            "#94e2d5".to_string(),
+            "#a6adc8".to_string(),
         ];
 
         Self {
@@ -123,18 +135,12 @@ impl OmarchyHyprlandWorkspaceBinderEngine {
             is_scratchpad: true,
         });
 
-        self.chorded_keybindings.insert(
-            "SUPER ALT, K".to_string(),
-            "sigomarchy tdl ai".to_string(),
-        );
-        self.chorded_keybindings.insert(
-            "SUPER, Return".to_string(),
-            "foot".to_string(),
-        );
-        self.chorded_keybindings.insert(
-            "SUPER, Space".to_string(),
-            "rofi -show drun".to_string(),
-        );
+        self.chorded_keybindings
+            .insert("SUPER ALT, K".to_string(), "sigomarchy tdl ai".to_string());
+        self.chorded_keybindings
+            .insert("SUPER, Return".to_string(), "foot".to_string());
+        self.chorded_keybindings
+            .insert("SUPER, Space".to_string(), "rofi -show drun".to_string());
     }
 
     pub fn match_window_rule(&self, class_name: &str, title: &str) -> Option<HyprlandWindowRule> {
@@ -208,8 +214,9 @@ impl OmarchyOmakaseCliDoctorEngine {
                 self.is_dotfile_in_sync = true;
                 "Omarchy Dotfiles: In Sync with ~/.files".to_string()
             }
-            "backup" => "Omarchy Backup: Created zstd archive ~/.config/omarchy/backup.tar.zst"
-                .to_string(),
+            "backup" => {
+                "Omarchy Backup: Created zstd archive ~/.config/omarchy/backup.tar.zst".to_string()
+            }
             _ => format!("Unknown sigomarchy command: '{}'", cmd),
         }
     }

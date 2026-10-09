@@ -24,8 +24,8 @@ use core::sync::atomic::{AtomicBool, AtomicU32, AtomicU64, Ordering};
 pub enum EfiPixelFormat {
     PixelRedGreenBlueReserved8BitPerColor = 0, // BGR-X
     PixelBlueGreenRedReserved8BitPerColor = 1, // RGB-X (most common)
-    PixelBitMask = 2,                           // Custom bitmask
-    PixelBltOnly = 3,                           // No direct framebuffer access
+    PixelBitMask = 2,                          // Custom bitmask
+    PixelBltOnly = 3,                          // No direct framebuffer access
     PixelFormatMax = 4,
 }
 
@@ -145,18 +145,22 @@ impl SovereignGopRegistry {
         ];
 
         for (pw, ph) in &preferred {
-            if let Some(mode) = self.modes.iter().find(|m| {
-                m.info.horizontal_resolution == *pw && m.info.vertical_resolution == *ph
-            }) {
+            if let Some(mode) = self
+                .modes
+                .iter()
+                .find(|m| m.info.horizontal_resolution == *pw && m.info.vertical_resolution == *ph)
+            {
                 self.selected_mode = Some(mode.mode_number);
                 return GopModeSelectResult::Selected;
             }
         }
 
         // Fallback: pick highest resolution
-        if let Some(best) = self.modes.iter().max_by_key(|m| {
-            m.info.horizontal_resolution as u64 * m.info.vertical_resolution as u64
-        }) {
+        if let Some(best) = self
+            .modes
+            .iter()
+            .max_by_key(|m| m.info.horizontal_resolution as u64 * m.info.vertical_resolution as u64)
+        {
             self.selected_mode = Some(best.mode_number);
             return GopModeSelectResult::Selected;
         }
@@ -166,7 +170,10 @@ impl SovereignGopRegistry {
 
     pub fn selected_info(&self) -> Option<&EfiGraphicsOutputModeInfo> {
         self.selected_mode.and_then(|mn| {
-            self.modes.iter().find(|m| m.mode_number == mn).map(|m| &m.info)
+            self.modes
+                .iter()
+                .find(|m| m.mode_number == mn)
+                .map(|m| &m.info)
         })
     }
 }
@@ -189,12 +196,12 @@ pub enum FramebufferRotation {
 /// Sovereign Kernel Framebuffer Handoff — passed from bootloader to kernel
 #[derive(Debug)]
 pub struct SovereignFramebufferHandoff {
-    pub base_addr: u64,          // Physical base address of linear framebuffer
-    pub size_bytes: u64,         // Total framebuffer size in bytes
-    pub width: u32,              // Horizontal pixels
-    pub height: u32,             // Vertical pixels
-    pub stride_bytes: u32,       // Bytes per scanline (may be > width × bpp/8)
-    pub bits_per_pixel: u8,      // Usually 32
+    pub base_addr: u64,     // Physical base address of linear framebuffer
+    pub size_bytes: u64,    // Total framebuffer size in bytes
+    pub width: u32,         // Horizontal pixels
+    pub height: u32,        // Vertical pixels
+    pub stride_bytes: u32,  // Bytes per scanline (may be > width × bpp/8)
+    pub bits_per_pixel: u8, // Usually 32
     pub red_shift: u8,
     pub red_size: u8,
     pub green_shift: u8,
@@ -310,9 +317,9 @@ pub enum EfiMemoryType {
     BootServicesData = 4,
     RuntimeServicesCode = 5,
     RuntimeServicesData = 6,
-    ConventionalMemory = 7,   // Usable RAM
+    ConventionalMemory = 7, // Usable RAM
     UnusableMemory = 8,
-    AcpiReclaimMemory = 9,    // Reclaimable after ACPI tables parsed
+    AcpiReclaimMemory = 9, // Reclaimable after ACPI tables parsed
     AcpiMemoryNvs = 10,
     MemoryMappedIo = 11,
     MemoryMappedIoPortSpace = 12,
@@ -327,7 +334,7 @@ pub struct EfiMemoryDescriptor {
     pub memory_type: u32,
     pub physical_start: u64,
     pub virtual_start: u64,
-    pub number_of_pages: u64,  // 4KB pages
+    pub number_of_pages: u64, // 4KB pages
     pub attribute: u64,
 }
 
@@ -382,9 +389,30 @@ mod tests {
     #[test]
     fn test_gop_mode_selection_prefers_fhd() {
         let mut registry = SovereignGopRegistry::new();
-        registry.register_mode(0, EfiGraphicsOutputModeInfo::new(640, 480, EfiPixelFormat::PixelBlueGreenRedReserved8BitPerColor));
-        registry.register_mode(1, EfiGraphicsOutputModeInfo::new(1920, 1080, EfiPixelFormat::PixelBlueGreenRedReserved8BitPerColor));
-        registry.register_mode(2, EfiGraphicsOutputModeInfo::new(1280, 720, EfiPixelFormat::PixelBlueGreenRedReserved8BitPerColor));
+        registry.register_mode(
+            0,
+            EfiGraphicsOutputModeInfo::new(
+                640,
+                480,
+                EfiPixelFormat::PixelBlueGreenRedReserved8BitPerColor,
+            ),
+        );
+        registry.register_mode(
+            1,
+            EfiGraphicsOutputModeInfo::new(
+                1920,
+                1080,
+                EfiPixelFormat::PixelBlueGreenRedReserved8BitPerColor,
+            ),
+        );
+        registry.register_mode(
+            2,
+            EfiGraphicsOutputModeInfo::new(
+                1280,
+                720,
+                EfiPixelFormat::PixelBlueGreenRedReserved8BitPerColor,
+            ),
+        );
 
         let result = registry.select_best_mode();
         assert_eq!(result, GopModeSelectResult::Selected);
@@ -394,8 +422,22 @@ mod tests {
     #[test]
     fn test_gop_mode_fallback_to_highest() {
         let mut registry = SovereignGopRegistry::new();
-        registry.register_mode(0, EfiGraphicsOutputModeInfo::new(640, 480, EfiPixelFormat::PixelBlueGreenRedReserved8BitPerColor));
-        registry.register_mode(1, EfiGraphicsOutputModeInfo::new(1366, 768, EfiPixelFormat::PixelBlueGreenRedReserved8BitPerColor));
+        registry.register_mode(
+            0,
+            EfiGraphicsOutputModeInfo::new(
+                640,
+                480,
+                EfiPixelFormat::PixelBlueGreenRedReserved8BitPerColor,
+            ),
+        );
+        registry.register_mode(
+            1,
+            EfiGraphicsOutputModeInfo::new(
+                1366,
+                768,
+                EfiPixelFormat::PixelBlueGreenRedReserved8BitPerColor,
+            ),
+        );
 
         let result = registry.select_best_mode();
         assert_eq!(result, GopModeSelectResult::Selected);
@@ -426,7 +468,7 @@ mod tests {
             memory_type: EfiMemoryType::ConventionalMemory as u32,
             physical_start: 0x100000,
             virtual_start: 0,
-            number_of_pages: 512,  // 512 × 4KB = 2MB
+            number_of_pages: 512, // 512 × 4KB = 2MB
             attribute: 0xF,
         });
         mmap.add_descriptor(EfiMemoryDescriptor {

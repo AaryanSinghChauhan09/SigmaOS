@@ -450,34 +450,34 @@ impl DrmDevice {
 #[repr(C, packed)]
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct EdidHeader {
-    pub magic: [u8; 8],     // "00 FF FF FF FF FF FF 00"
+    pub magic: [u8; 8],        // "00 FF FF FF FF FF FF 00"
     pub manufacturer: [u8; 2], // Manufacturer ID (PNP ID)
     pub product_code: [u8; 2], // Product code
     pub serial_number: u32,    // Serial number
-    pub manufacture_week: u8, // Week of manufacture
-    pub manufacture_year: u8, // Year of manufacture (year - 1990)
-    pub edid_version: u8,     // EDID version
-    pub edid_revision: u8,    // EDID revision
+    pub manufacture_week: u8,  // Week of manufacture
+    pub manufacture_year: u8,  // Year of manufacture (year - 1990)
+    pub edid_version: u8,      // EDID version
+    pub edid_revision: u8,     // EDID revision
 }
 
 /// EDID detailed timing descriptor
 #[repr(C, packed)]
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct EdidTimingDescriptor {
-    pub pixel_clock: u16,     // Pixel clock in 10kHz units
-    pub h_active: u8,         // Horizontal active pixels
-    pub h_blank: u8,          // Horizontal blanking
-    pub h_active_hi: u8,      // High bits of h_active and h_blank
-    pub h_sync_off: u8,       // Horizontal sync offset
-    pub h_sync_width: u8,     // Horizontal sync pulse width
-    pub h_sync_hi: u8,        // High bits of sync offset and width
-    pub v_active: u8,         // Vertical active lines
-    pub v_blank: u8,          // Vertical blanking
-    pub v_active_hi: u8,      // High bits of v_active and v_blank
-    pub v_sync_off: u8,       // Vertical sync offset
-    pub v_sync_width: u8,     // Vertical sync pulse width
-    pub v_sync_hi: u8,        // High bits of sync offset and width
-    pub flags: u8,            // Misc flags
+    pub pixel_clock: u16, // Pixel clock in 10kHz units
+    pub h_active: u8,     // Horizontal active pixels
+    pub h_blank: u8,      // Horizontal blanking
+    pub h_active_hi: u8,  // High bits of h_active and h_blank
+    pub h_sync_off: u8,   // Horizontal sync offset
+    pub h_sync_width: u8, // Horizontal sync pulse width
+    pub h_sync_hi: u8,    // High bits of sync offset and width
+    pub v_active: u8,     // Vertical active lines
+    pub v_blank: u8,      // Vertical blanking
+    pub v_active_hi: u8,  // High bits of v_active and v_blank
+    pub v_sync_off: u8,   // Vertical sync offset
+    pub v_sync_width: u8, // Vertical sync pulse width
+    pub v_sync_hi: u8,    // High bits of sync offset and width
+    pub flags: u8,        // Misc flags
 }
 
 /// Full EDID structure (128 bytes)
@@ -519,14 +519,14 @@ impl Edid {
         // Extract from detailed timing descriptors
         for timing in &self.detailed_timings {
             if timing.pixel_clock != 0 {
-                let h_active = u16::from(timing.h_active) |
-                    ((u16::from(timing.h_active_hi) & 0xF0) << 4);
-                let h_blank = u16::from(timing.h_blank) |
-                    ((u16::from(timing.h_active_hi) & 0x0F) << 8);
-                let v_active = u16::from(timing.v_active) |
-                    ((u16::from(timing.v_active_hi) & 0xF0) << 4);
-                let v_blank = u16::from(timing.v_blank) |
-                    ((u16::from(timing.v_active_hi) & 0x0F) << 8);
+                let h_active =
+                    u16::from(timing.h_active) | ((u16::from(timing.h_active_hi) & 0xF0) << 4);
+                let h_blank =
+                    u16::from(timing.h_blank) | ((u16::from(timing.h_active_hi) & 0x0F) << 8);
+                let v_active =
+                    u16::from(timing.v_active) | ((u16::from(timing.v_active_hi) & 0xF0) << 4);
+                let v_blank =
+                    u16::from(timing.v_blank) | ((u16::from(timing.v_active_hi) & 0x0F) << 8);
 
                 let clock_khz = u32::from(timing.pixel_clock) * 10;
                 let htotal = h_active + h_blank;
@@ -601,12 +601,17 @@ impl DdcI2cBus {
 
         unsafe {
             let timing_ptr = &timing as *const EdidTimingDescriptor as *const u8;
-            let timing_bytes = core::slice::from_raw_parts(timing_ptr, core::mem::size_of::<EdidTimingDescriptor>());
+            let timing_bytes = core::slice::from_raw_parts(
+                timing_ptr,
+                core::mem::size_of::<EdidTimingDescriptor>(),
+            );
             edid_data[54..54 + timing_bytes.len()].copy_from_slice(timing_bytes);
         }
 
         // Calculate and write checksum
-        let sum: u8 = edid_data[0..127].iter().fold(0u8, |acc, &b| acc.wrapping_add(b));
+        let sum: u8 = edid_data[0..127]
+            .iter()
+            .fold(0u8, |acc, &b| acc.wrapping_add(b));
         edid_data[127] = sum.wrapping_neg();
 
         Edid::from_bytes(&edid_data)
@@ -668,7 +673,9 @@ mod tests {
         edid_data[18] = 1;
         edid_data[19] = 3;
 
-        let sum: u8 = edid_data[0..127].iter().fold(0u8, |acc, &b| acc.wrapping_add(b));
+        let sum: u8 = edid_data[0..127]
+            .iter()
+            .fold(0u8, |acc, &b| acc.wrapping_add(b));
         edid_data[127] = sum.wrapping_neg();
 
         let edid = Edid::from_bytes(&edid_data).unwrap();

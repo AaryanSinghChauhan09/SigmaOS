@@ -1,8 +1,8 @@
+use super::omarchy_dynamic_workspace_suite::{OmarchyTilingLayoutEngine, TilingAlgorithm};
 /// SigmaOS Compositor (Phase 4 Desktop)
 /// Inspired by Omarchy's keyboard-first tiling and Mint Cinnamon's window management.
 use std::string::String;
 use std::vec::Vec;
-use super::omarchy_dynamic_workspace_suite::{OmarchyTilingLayoutEngine, TilingAlgorithm};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum CompositorBackend {

@@ -90,8 +90,8 @@ pub struct TouchpadDevice {
     pub name: String,
     pub vendor: String,
     pub product: String,
-    pub width: u32,    // mm
-    pub height: u32,   // mm
+    pub width: u32,  // mm
+    pub height: u32, // mm
     pub num_fingers: u32,
 }
 
@@ -139,9 +139,9 @@ pub struct TouchpadConfiguration {
     pub two_finger_scrolling: TwoFingerScrolling,
     pub edge_scrolling: EdgeScrolling,
     pub palm_detection: PalmDetection,
-    pub sensitivity: u32,       // 0-100
-    pub acceleration: f32,     // multiplier
-    pub speed: u32,            // 0-100
+    pub sensitivity: u32,  // 0-100
+    pub acceleration: f32, // multiplier
+    pub speed: u32,        // 0-100
     pub disable_while_typing: bool,
     pub tap_and_drag: bool,
 }
@@ -367,11 +367,13 @@ impl DesktopTouchpadManager {
         TouchpadManagerStatistics {
             total_devices: self.devices.len(),
             total_configurations: self.configurations.len(),
-            tap_to_click_enabled: self.configurations
+            tap_to_click_enabled: self
+                .configurations
                 .values()
                 .filter(|c| c.tap_to_click == TapToClickMode::Enabled)
                 .count(),
-            natural_scrolling_enabled: self.configurations
+            natural_scrolling_enabled: self
+                .configurations
                 .values()
                 .filter(|c| c.natural_scrolling == NaturalScrolling::Enabled)
                 .count(),
@@ -413,10 +415,7 @@ mod tests {
         let mut manager = DesktopTouchpadManager::new();
         let initial_count = manager.get_devices().len();
 
-        let device = TouchpadDevice::new(
-            "custom".to_string(),
-            "Custom Touchpad".to_string(),
-        );
+        let device = TouchpadDevice::new("custom".to_string(), "Custom Touchpad".to_string());
 
         let id = manager.add_device(device);
         assert!(manager.get_device(&id).is_some());
@@ -427,10 +426,7 @@ mod tests {
     fn test_remove_device() {
         let mut manager = DesktopTouchpadManager::new();
 
-        let device = TouchpadDevice::new(
-            "custom".to_string(),
-            "Custom Touchpad".to_string(),
-        );
+        let device = TouchpadDevice::new("custom".to_string(), "Custom Touchpad".to_string());
 
         let id = manager.add_device(device);
         assert!(manager.remove_device(&id));

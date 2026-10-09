@@ -11,11 +11,11 @@ use std::string::String;
 use std::vec::Vec;
 
 pub mod gatt;
-pub use gatt::{GattCharacteristic, GattClient, GattDevice, GattService};
 pub use bluetooth_manager::{
-    BluetoothAdapter, BLEDevice, BluetoothDeviceStatus, BluetoothDeviceType,
-    BluetoothDeviceManager, BluetoothStatistics,
+    BLEDevice, BluetoothAdapter, BluetoothDeviceManager, BluetoothDeviceStatus,
+    BluetoothDeviceType, BluetoothStatistics,
 };
+pub use gatt::{GattCharacteristic, GattClient, GattDevice, GattService};
 
 /// Error type for the Bluetooth module
 #[derive(Debug, Clone, PartialEq, Eq)]

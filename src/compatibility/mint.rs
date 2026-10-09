@@ -457,8 +457,16 @@ impl MintStickUsbWriterEngine {
         });
     }
 
-    pub fn format_drive(&mut self, dev_path: &str, format_type: UsbTargetFormat, label: &str) -> Result<String, &'static str> {
-        let drive = self.connected_drives.iter().find(|d| d.dev_path == dev_path)
+    pub fn format_drive(
+        &mut self,
+        dev_path: &str,
+        format_type: UsbTargetFormat,
+        label: &str,
+    ) -> Result<String, &'static str> {
+        let drive = self
+            .connected_drives
+            .iter()
+            .find(|d| d.dev_path == dev_path)
             .ok_or("USB drive not found")?;
 
         if drive.is_read_only {
@@ -467,12 +475,22 @@ impl MintStickUsbWriterEngine {
 
         Ok(std::format!(
             "Formatted {} ({}) to {:?} with label '{}'",
-            drive.dev_path, drive.vendor, format_type, label
+            drive.dev_path,
+            drive.vendor,
+            format_type,
+            label
         ))
     }
 
-    pub fn write_iso_image(&mut self, dev_path: &str, iso_path: &str) -> Result<String, &'static str> {
-        let drive = self.connected_drives.iter().find(|d| d.dev_path == dev_path)
+    pub fn write_iso_image(
+        &mut self,
+        dev_path: &str,
+        iso_path: &str,
+    ) -> Result<String, &'static str> {
+        let drive = self
+            .connected_drives
+            .iter()
+            .find(|d| d.dev_path == dev_path)
             .ok_or("Target USB drive not found")?;
 
         if drive.is_read_only {
@@ -481,7 +499,9 @@ impl MintStickUsbWriterEngine {
 
         Ok(std::format!(
             "Flashed ISO '{}' to drive {} ({}) successfully",
-            iso_path, drive.dev_path, drive.vendor
+            iso_path,
+            drive.dev_path,
+            drive.vendor
         ))
     }
 }
@@ -538,8 +558,16 @@ impl WarpinatorLanFileSharingEngine {
         });
     }
 
-    pub fn send_file_request(&mut self, peer_name: &str, file_name: &str, file_size_bytes: u64) -> Result<u64, &'static str> {
-        let _peer = self.discovered_peers.iter().find(|p| p.name == peer_name)
+    pub fn send_file_request(
+        &mut self,
+        peer_name: &str,
+        file_name: &str,
+        file_size_bytes: u64,
+    ) -> Result<u64, &'static str> {
+        let _peer = self
+            .discovered_peers
+            .iter()
+            .find(|p| p.name == peer_name)
             .ok_or("Warpinator peer not found on LAN")?;
 
         let request_id = (self.pending_requests.len() + 1) as u64;
@@ -555,7 +583,10 @@ impl WarpinatorLanFileSharingEngine {
     }
 
     pub fn accept_request(&mut self, request_id: u64) -> Result<(), &'static str> {
-        let req = self.pending_requests.iter_mut().find(|r| r.request_id == request_id)
+        let req = self
+            .pending_requests
+            .iter_mut()
+            .find(|r| r.request_id == request_id)
             .ok_or("Transfer request not found")?;
         req.is_accepted = true;
         Ok(())
@@ -612,10 +643,17 @@ impl HypnotixIptvStreamingEngine {
     }
 
     pub fn play_channel(&mut self, id: &str) -> Result<String, &'static str> {
-        let ch = self.channels.iter().find(|c| c.id == id)
+        let ch = self
+            .channels
+            .iter()
+            .find(|c| c.id == id)
             .ok_or("Hypnotix channel not found")?;
         self.current_channel = Some(id.to_string());
-        Ok(std::format!("Streaming '{}' from {}", ch.name, ch.stream_url))
+        Ok(std::format!(
+            "Streaming '{}' from {}",
+            ch.name,
+            ch.stream_url
+        ))
     }
 }
 
@@ -670,7 +708,10 @@ impl MintReportSystemDiagnosticEngine {
     }
 
     pub fn unresolved_issues_count(&self) -> usize {
-        self.detected_issues.iter().filter(|i| !i.is_resolved).count()
+        self.detected_issues
+            .iter()
+            .filter(|i| !i.is_resolved)
+            .count()
     }
 }
 

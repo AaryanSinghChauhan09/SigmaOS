@@ -11,9 +11,11 @@ pub struct SovereignXAppLibraryEngine {
 
 impl SovereignXAppLibraryEngine {
     pub fn new() -> Self {
-        Self { is_parity_achieved: true }
+        Self {
+            is_parity_achieved: true,
+        }
     }
-    
+
     pub fn check_cross_de_parity(&self) -> bool {
         self.is_parity_achieved
     }
@@ -33,11 +35,11 @@ impl SovereignNemoFileManagerEngine {
             emblems: Vec::new(),
         }
     }
-    
+
     pub fn add_bookmark(&mut self, bm: String) {
         self.bookmarks.push(bm);
     }
-    
+
     pub fn bulk_rename(&self, files: Vec<String>, suffix: &str) -> Vec<String> {
         let mut renamed = Vec::new();
         for f in files {
@@ -61,7 +63,7 @@ impl SovereignCinnamonSpicesEngine {
             extensions: Vec::new(),
         }
     }
-    
+
     pub fn install_applet(&mut self, applet: String) {
         self.applets.push(applet);
     }
@@ -85,7 +87,7 @@ impl SovereignMintToolsSupremeEngine {
             is_system_info_ready: true,
         }
     }
-    
+
     pub fn system_snapshot(&self) -> bool {
         self.is_timeshift_parity_ready
     }
@@ -99,7 +101,7 @@ impl SovereignMintUpdateEngine {
     pub fn new() -> Self {
         Self { current_level: 1 }
     }
-    
+
     pub fn classify_update(&mut self, level: u8) {
         if level >= 1 && level <= 5 {
             self.current_level = level;
@@ -111,19 +113,19 @@ impl SovereignMintUpdateEngine {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_sovereign_xapp_library_engine() {
         let engine = SovereignXAppLibraryEngine::new();
         assert!(engine.check_cross_de_parity());
     }
-    
+
     #[test]
     fn test_sovereign_nemo_file_manager_engine() {
         let mut nemo = SovereignNemoFileManagerEngine::new();
         nemo.add_bookmark(String::from("/home/user/Documents"));
         assert_eq!(nemo.bookmarks.len(), 1);
-        
+
         let mut files = Vec::new();
         files.push(String::from("file1"));
         files.push(String::from("file2"));
@@ -131,21 +133,21 @@ mod tests {
         assert_eq!(renamed[0], "file1_renamed");
         assert_eq!(renamed[1], "file2_renamed");
     }
-    
+
     #[test]
     fn test_sovereign_cinnamon_spices_engine() {
         let mut spices = SovereignCinnamonSpicesEngine::new();
         spices.install_applet(String::from("weather-applet"));
         assert_eq!(spices.applets.len(), 1);
     }
-    
+
     #[test]
     fn test_sovereign_mint_tools_supreme_engine() {
         let tools = SovereignMintToolsSupremeEngine::new();
         assert!(tools.is_usb_writer_ready);
         assert!(tools.system_snapshot());
     }
-    
+
     #[test]
     fn test_sovereign_mint_update_engine() {
         let mut update = SovereignMintUpdateEngine::new();
