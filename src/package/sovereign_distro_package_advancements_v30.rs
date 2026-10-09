@@ -35,8 +35,6 @@ use std::format;
 #[cfg(feature = "standalone_test")]
 use std::string::{String, ToString};
 #[cfg(feature = "standalone_test")]
-use std::vec;
-#[cfg(feature = "standalone_test")]
 use std::vec::Vec;
 
 #[cfg(not(feature = "standalone_test"))]

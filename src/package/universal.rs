@@ -3,7 +3,6 @@ extern crate alloc;
 use alloc::boxed::Box;
 // use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
-use alloc::vec;
 use alloc::vec::Vec;
 
 // SigmaOS Universal Package Manager
@@ -72,7 +71,7 @@ pub mod node_distribution_dummy {
     }
 }
 #[cfg(any(feature = "standalone_test", test))]
-pub use node_distribution_dummy::*;
+pub use self::node_distribution_dummy::*;
 
 /// Case-insensitive substring search without heap allocation for ASCII text.
 #[inline]
