@@ -423,6 +423,12 @@ pub use tech_media_publication_innovations::*;
 pub mod sovereign_open_source_os_gap_closure_pr;
 pub use sovereign_open_source_os_gap_closure_pr::*;
 
+pub mod open_source_os_unimplemented_ideas_pr_suite;
+pub use open_source_os_unimplemented_ideas_pr_suite::*;
+
+pub mod cachy_linux_missing_components_engine;
+pub use cachy_linux_missing_components_engine::*;
+
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;
 pub use crate::stubs::large_distro_stubs::*;

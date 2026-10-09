@@ -124,6 +124,8 @@ pub use distro::sovereign_linux_bsd_all_subsystems_harmony::*;
 pub use distro::sovereign_linux_bsd_master_synthesis::*;
 pub use distro::sovereign_linux_bsd_pinnacle_innovations_v14::*;
 pub use distro::sovereign_media_and_distro_unimplemented_innovations::*;
+pub use distro::open_source_os_unimplemented_ideas_pr_suite::*;
+pub use distro::cachy_linux_missing_components_engine::*;
 pub use distro::SovereignMasterSubsystemDistroHarmonizer;
 pub use kernel::tss_ring3_user_mode::*;
 pub use open_source_obsoletion::open_source_os_gap_closure::*;
