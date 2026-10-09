@@ -1,10 +1,9 @@
 # SIGMAOS DOCUMENTATION SOURCE POLICY
 
-## 1. Single Source of Truth
-The `docs/` directory serves as the canonical single source of truth for all technical documentation, specifications, architecture decision records, and roadmaps within the SigmaOS repository.
+## Single Source of Truth
+The `docs/` directory serves as the primary single source of truth for all official SigmaOS documentation, architectural specifications, and strategic roadmaps.
 
-## 2. Wiki Synchronization
-All GitHub Wiki content (`wiki/`, `WIKI/`) is generated and synchronized from the canonical documents in `docs/`. Direct modifications to `wiki_content/` or standalone `wiki/` files are prohibited.
-
-## 3. Self-Sufficiency Standard
-All documentation must maintain complete coverage of the 12 Core System Shards of SigmaOS, ensuring absolute self-sufficiency and zero external dependency requirements.
+## Synchronization Rules
+1. All documentation edits must take place in `docs/` or the root repository specification files.
+2. Mirror directories (`wiki/`, `WIKI/`, `wiki_repo/`, `wiki_content/`) are automatically updated via `./scripts/sync_wiki.sh` and CI automation pipelines.
+3. Direct manual edits to auto-generated wiki mirrors are prohibited and enforced via GitHub CI check gates.

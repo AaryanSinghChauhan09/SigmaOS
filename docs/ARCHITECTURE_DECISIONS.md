@@ -1,16 +1,16 @@
-# SIGMAOS ARCHITECTURE DECISION RECORDS (ADR)
+# SIGMAOS ARCHITECTURE DECISIONS (ADR)
 
-## ADR-001: Zero External Binary Dependencies Strategy
-- **Status:** Accepted
-- **Context:** Third-party binary dependencies introduce security risks, supply chain vulnerabilities, and platform fragmentation.
-- **Decision:** All system tools, userland utilities, media codecs, ML frameworks, LLM inference engines, and scientific simulators will be natively implemented in Safe Rust (`klib` / core system shards).
+## ADR-001: Zero-Dependency `#![no_std]` Bare-Metal Sovereignty
+- **Status**: Accepted
+- **Context**: SigmaOS aims to be a zero-trust, zero-dependency bare-metal operating system.
+- **Decision**: All kernel and core userland subsystems are implemented in safe systems languages (Rust, Zig, Nim) without reliance on standard C libraries or language std runtimes.
 
-## ADR-002: 12 Core System Shards Architecture
-- **Status:** Accepted
-- **Context:** Modular organization of operating system capabilities is required for security isolation and scalable development.
-- **Decision:** Partition the system into 12 core system shards covering kernel, storage, networking, virtualization, POSIX userland, desktop compositor, media, document processing, ML/agent orchestration, LLMs/vision, scientific computing, and cyber security.
+## ADR-002: Direct DRM/KMS Zenith Compositor
+- **Status**: Accepted
+- **Context**: Display server dependencies like X11 or Wayland introduce heavy abstractions and security risks.
+- **Decision**: Zenith renders directly to DRM/KMS hardware display planes with type-safe Rust tiling WM extensions.
 
-## ADR-003: Post-Quantum Cryptographic Security Standard
-- **Status:** Accepted
-- **Context:** Classical asymmetric cryptography faces quantum decryption risks.
-- **Decision:** Implement lattice-based PQC standards (Dilithium5, Falcon-1024, Kyber) for code signing, kernel attestation, and secure IPC.
+## ADR-003: Post-Quantum Cryptography & Zero-Trust Capabilities
+- **Status**: Accepted
+- **Context**: Standard classical cryptography is vulnerable to quantum attacks.
+- **Decision**: Kyber-1024 and Dilithium-5 PQC primitives are integrated into the kernel memory, network, and package layers alongside OpenBSD-inspired capability tokens and Retguard protections.
