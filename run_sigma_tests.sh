@@ -760,6 +760,13 @@ if [ -f "src/distro/sovereign_open_source_os_gap_closure_v27.rs" ]; then
     ./build/test_open_source_v27
 fi
 
+if [ -f "src/distro/sovereign_open_source_os_gap_closure_v31_pr.rs" ]; then
+    echo "Running Open Source OS Gap Closure V31 PR test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_open_source_os_gap_closure_v31_pr.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_open_source_v31_pr
+    ./build/test_open_source_v31_pr
+fi
+
 if [ -f "src/distro/sovereign_linux_bsd_ecosystem_advancements_v28.rs" ]; then
     echo "Running Sovereign Linux & BSD Ecosystem Advancements V28 test suite..."
     mkdir -p build
