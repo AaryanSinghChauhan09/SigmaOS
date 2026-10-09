@@ -109,6 +109,8 @@ pub mod mesh_hub;
 pub mod mint;
 pub mod mint_ecosystem;
 pub mod mint_linux;
+pub mod mint_repolib;
+pub use mint_repolib::*;
 
 pub use mint_ecosystem::{
     CaptainMintManager, CinnamonSpiceDesklet, CinnamonSpiceTheme, CinnamonSpicesEngine,

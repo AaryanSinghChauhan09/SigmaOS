@@ -2,10 +2,16 @@ pub mod mobile_variant;
 pub use mobile_variant::*;
 
 // SigmaOS Desktop Module
+pub mod font_manager;
+pub use font_manager::*;
+
 pub mod mate_betsy;
 pub mod mint_tools;
 pub mod moksha;
 pub mod omarchy_omakase;
+pub mod omarchy_palette;
+pub mod omarchy_theme;
+pub mod zenith_quickshell_plugin;
 pub mod pantheon;
 pub mod screensaver;
 pub mod sovereign_navigation_engine;
@@ -75,3 +81,7 @@ pub use crate::desktop::sovereign_navigation_engine::{
 pub use weather_panel::{
     WeatherCondition, WeatherData, WeatherForecast, WeatherPanel,
 };
+
+pub use omarchy_palette::*;
+pub use omarchy_theme::*;
+pub use zenith_quickshell_plugin::*;

@@ -691,6 +691,22 @@ mod tests {
     }
 
     #[test]
+    fn test_wayland_surface_damage_tracker() {
+        let mut tracker = WaylandSurfaceDamageTracker::new();
+        tracker.add_damage(101, DamageRegion::new(10, 10, 100, 100));
+        tracker.add_damage(101, DamageRegion::new(50, 50, 100, 100));
+
+        let merged = tracker.get_accumulated_damage(101).unwrap();
+        assert_eq!(merged.x, 10);
+        assert_eq!(merged.y, 10);
+        assert_eq!(merged.width, 140);
+        assert_eq!(merged.height, 140);
+
+        tracker.clear_surface_damage(101);
+        assert!(tracker.get_accumulated_damage(101).is_none());
+    }
+
+    #[test]
     fn test_unified_design_system_tokens() {
         let capability = CapabilityToken { id: 1 };
         let mut compositor = ZenithCompositor::new(capability);

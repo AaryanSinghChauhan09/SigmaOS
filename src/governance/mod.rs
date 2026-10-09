@@ -7,6 +7,9 @@ pub mod okr;
 pub mod rfc;
 pub mod strategic_vision;
 pub mod future_protocol;
+pub mod risk_mitigation;
+
+pub use risk_mitigation::*;
 
 pub use okr::*;
 pub use strategic_vision::{
