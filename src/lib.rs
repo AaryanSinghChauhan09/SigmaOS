@@ -325,7 +325,9 @@ pub use security::{
     CapabilityToken, ForensicStorageFilter, KaliAutopsyForensicEngine, KaliBurpSuiteProxyInterceptor,
     KaliGhidraReverseEngineeringEngine, KaliKismetWirelessSniffer, KaliLinuxPrProposalEngine,
     KaliMasscanAsyncPortScanner, KaliMimikatzCredentialDumper, KaliSherlockOsintHarvester,
-    Permission, PledgeManager, PledgePromise, RoutingMode, SandboxPolicy,
+    Permission, PledgeManager, PledgePromise, QubesAdminVmSplitGpgEngine, QubesAudioDaemonPulseAudioProxy,
+    QubesDispVmDisposableTemplateEngine, QubesInterVmSecureClipboardEngine, QubesOsPrProposalEngine,
+    QubesUsbDomainSysUsbGuardEngine, QubesWhonixTorGatewayEngine, RoutingMode, SandboxPolicy,
 };
 pub use shell::{
     ContextualCompleter, HistoryExpansionEngine, JobControlManager, ParameterExpansionEngine,
