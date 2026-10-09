@@ -22,9 +22,10 @@
 //! - GPU compute queue integration (similar to DRM/KMS submission)
 
 extern crate alloc;
+use alloc::vec;
 use alloc::vec::Vec;
 use alloc::collections::BTreeMap;
-use core::sync::atomic::{AtomicU32, Ordering};
+use std::sync::atomic::{AtomicU32, Ordering};
 
 /// io_uring v2 extended opcodes (beyond base io_uring)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

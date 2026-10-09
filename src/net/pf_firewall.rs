@@ -198,7 +198,7 @@ impl PfRule {
     pub fn block(number: u32, direction: PfDir) -> Self {
         let mut rule = Self::pass(number, direction, PfProto::Any);
         rule.action = PfAction::Block;
-        rule.quick = true;
+        rule.quick = false;
         rule.state = PfStateMode::None;
         rule
     }

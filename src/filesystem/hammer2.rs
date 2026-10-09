@@ -518,8 +518,8 @@ mod tests {
         let f1 = vol.create_file(1, "a.txt", 0o644).unwrap();
         let f2 = vol.create_file(1, "b.txt", 0o644).unwrap();
         
-        // Write same data to both files
-        let data = b"Duplicate content that should be deduped";
+        // Write same data (>64 bytes to avoid inline embedding) to both files
+        let data = b"Duplicate content that should be deduped across multiple blocks in the HAMMER2 volume storage engine";
         vol.write(f1, data).unwrap();
         vol.write(f2, data).unwrap();
         
