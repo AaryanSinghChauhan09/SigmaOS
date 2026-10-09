@@ -85,6 +85,19 @@ pub enum PullRequestPackageFormat {
     ArchAuditVulnerability,
     ArchNamcapLinterReport,
     ArchMakepkgConfProfile,
+    ArchReflectorMirrorlist,
+    ArchDracutInitramfs,
+    ArchSystemdBootConfig,
+    ArchPacmanDatabaseDb,
+    ArchJournalctlBinaryLog,
+    ArchPamUnixSecuritySpec,
+    ArchLvmVolumeGroupSpec,
+    ArchPacmanBinaryTarXz,
+    ArchDpllSatDependencyConstraint,
+    ArchInitServiceUnitSpec,
+    ArchPamAuthModuleSpec,
+    ArchNetworkManagerProfile,
+    ArchSeccompFilterProfile,
     OpenSuseZypperSpec,
     SolusMossSpec,
     HaikuPackagefsSpec,
@@ -125,6 +138,19 @@ impl PullRequestPackageFormat {
             Self::ArchAuditVulnerability => "Arch Linux arch-audit Security Vulnerability Record",
             Self::ArchNamcapLinterReport => "Arch Linux namcap Package Auditor Linter Report",
             Self::ArchMakepkgConfProfile => "Arch Linux makepkg.conf Compiler Optimization Specs",
+            Self::ArchReflectorMirrorlist => "Arch Linux Reflector Mirrorlist Configuration",
+            Self::ArchDracutInitramfs => "Arch Linux Dracut Initramfs Image Specification",
+            Self::ArchSystemdBootConfig => "Arch Linux systemd-boot Loader Configuration Entry",
+            Self::ArchPacmanDatabaseDb => "Arch Linux ALPM Local Sync Database DB Files",
+            Self::ArchJournalctlBinaryLog => "Arch Linux systemd Binary Journal Diagnostics Log",
+            Self::ArchPamUnixSecuritySpec => "Arch Linux PAM Security Authentication Spec (/etc/pam.d/system-auth)",
+            Self::ArchLvmVolumeGroupSpec => "Arch Linux LVM2 Volume Group & LUKS Root Encryption Spec",
+            Self::ArchPacmanBinaryTarXz => "Arch Linux Native .pkg.tar.zst Binary Package",
+            Self::ArchDpllSatDependencyConstraint => "Arch Linux ALPM Boolean SAT Solver Constraint Matrix",
+            Self::ArchInitServiceUnitSpec => "Arch Linux systemd Service Unit Specification",
+            Self::ArchPamAuthModuleSpec => "Arch Linux PAM Pluggable Authentication Module Specification",
+            Self::ArchNetworkManagerProfile => "Arch Linux NetworkManager System Connection Profile",
+            Self::ArchSeccompFilterProfile => "Arch Linux Seccomp BPF System Call Filter Profile",
             Self::AlpineApk => "Alpine Linux .apk Package",
             Self::GentooEbuild => "Gentoo Portage .ebuild Script",
             Self::VoidXbps => "Void Linux XBPS Template",
@@ -468,6 +494,71 @@ impl ArchLinuxComponentPullRequestGatewayEngine {
     }
 }
 
+/// Specialized Arch Linux System Parity PR Gateway Engine
+/// Manages PR submission, verification, diff generation, and auto-merging for all Arch Linux ecosystem formats
+#[derive(Debug, Clone)]
+pub struct ArchLinuxSystemParityPullRequestEngine {
+    pub gateway: ArchLinuxComponentPullRequestGatewayEngine,
+    pub parity_records: BTreeMap<String, String>,
+}
+
+impl Default for ArchLinuxSystemParityPullRequestEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl ArchLinuxSystemParityPullRequestEngine {
+    pub fn new() -> Self {
+        Self {
+            gateway: ArchLinuxComponentPullRequestGatewayEngine::new(),
+            parity_records: BTreeMap::new(),
+        }
+    }
+
+    /// Submits a missing Arch Linux system parity component PR
+    pub fn submit_parity_pr(
+        &mut self,
+        author: &str,
+        component_name: &str,
+        version: &str,
+        format: PullRequestPackageFormat,
+        manifest_spec: &str,
+        deps: &[&str],
+        pqc_signature: &[u8],
+    ) -> u64 {
+        self.gateway.submit_arch_component_pr(
+            author,
+            component_name,
+            version,
+            format,
+            manifest_spec,
+            deps,
+            pqc_signature,
+        )
+    }
+
+    /// Verifies PQC signature and validates dependencies
+    pub fn verify_and_gate_pr(&mut self, pr_id: u64) -> Result<bool, &'static str> {
+        self.gateway.validate_arch_component(pr_id)
+    }
+
+    /// Computes unified diff for parity PR
+    pub fn compute_parity_diff(&self, pr_id: u64, base_spec: &str) -> Result<String, &'static str> {
+        self.gateway.generate_arch_component_diff(pr_id, base_spec)
+    }
+
+    /// Merges parity PR into the active system parity registry
+    pub fn merge_parity_pr(&mut self, pr_id: u64) -> Result<ConsolidatedSovereignPackage, &'static str> {
+        let package = self.gateway.merge_arch_component(pr_id)?;
+        self.parity_records.insert(
+            package.name.clone(),
+            format!("Format: {:?} | Merge: {}", package.source_format, package.merge_commit_hash),
+        );
+        Ok(package)
+    }
+}
+
 #[cfg(test)]
 #[cfg(test)]
 mod tests {
@@ -670,5 +761,29 @@ mod tests {
         }
 
         assert_eq!(arch_gateway.arch_component_registry.len(), 10);
+    }
+
+    #[test]
+    fn test_arch_linux_system_parity_pr_engine() {
+        let mut parity_engine = ArchLinuxSystemParityPullRequestEngine::new();
+
+        let parity_pr = parity_engine.submit_parity_pr(
+            "arch_dev",
+            "reflector-mirrorlist",
+            "2024.10",
+            PullRequestPackageFormat::ArchReflectorMirrorlist,
+            "Server = https://mirror.rackspace.com/archlinux/$repo/os/$arch",
+            &["reflector", "pacman"],
+            b"dilithium5_pqc_sig",
+        );
+
+        assert_eq!(parity_pr, 1);
+        assert!(parity_engine.verify_and_gate_pr(parity_pr).unwrap());
+        let diff = parity_engine.compute_parity_diff(parity_pr, "").unwrap();
+        assert!(diff.contains("+++ b/reflector-mirrorlist"));
+
+        let merged = parity_engine.merge_parity_pr(parity_pr).unwrap();
+        assert_eq!(merged.name, "reflector-mirrorlist");
+        assert!(parity_engine.parity_records.contains_key("reflector-mirrorlist"));
     }
 }
