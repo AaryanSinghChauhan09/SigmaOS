@@ -423,6 +423,12 @@ pub use tech_media_publication_innovations::*;
 pub mod sovereign_open_source_os_gap_closure_pr;
 pub use sovereign_open_source_os_gap_closure_pr::*;
 
+pub mod sovereign_omarchy_github_repo_parity;
+pub use sovereign_omarchy_github_repo_parity::*;
+
+pub mod open_source_os_unimplemented_ideas_pr;
+pub use open_source_os_unimplemented_ideas_pr::*;
+
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;
 pub use crate::stubs::large_distro_stubs::*;
