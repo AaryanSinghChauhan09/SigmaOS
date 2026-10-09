@@ -119,21 +119,9 @@ pub use sovereign_distro_package_advancements_v17::*;
 pub mod sovereign_distro_package_advancements_v20;
 pub use sovereign_distro_package_advancements_v20::*;
 
-#[path = "../package/sovereign_distro_package_advancements_v22.rs"]
-pub mod sovereign_distro_package_advancements_v22;
-pub use sovereign_distro_package_advancements_v22::*;
-
-#[path = "../package/sovereign_distro_package_advancements_v25.rs"]
-pub mod sovereign_distro_package_advancements_v25;
-pub use sovereign_distro_package_advancements_v25::*;
-
 #[path = "../package/sovereign_distro_package_advancements_v26.rs"]
 pub mod sovereign_distro_package_advancements_v26;
 pub use sovereign_distro_package_advancements_v26::*;
-
-#[path = "../package/sovereign_distro_package_advancements_v30.rs"]
-pub mod sovereign_distro_package_advancements_v30;
-pub use sovereign_distro_package_advancements_v30::*;
 
 #[path = "../package/bsd_linux_package_innovations.rs"]
 pub mod bsd_linux_package_innovations;
