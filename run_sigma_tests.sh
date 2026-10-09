@@ -710,4 +710,11 @@ if [ -f "src/distro/sovereign_linux_bsd_gap_closure_v39_pr.rs" ]; then
     ./build/test_gap_closure_v39_pr
 fi
 
+if [ -f "src/distro/debian_linux_gap_closure_v40_pr.rs" ]; then
+    echo "Running Debian Linux Gap Closure PR Suite V40 test suite..."
+    mkdir -p build
+    rustc --test src/distro/debian_linux_gap_closure_v40_pr.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_debian_v40_pr
+    ./build/test_debian_v40_pr
+fi
+
 echo "All SigmaOS test suites completed."
