@@ -119,6 +119,7 @@ pub use kali_stack::{
     PluggableAuthenticationModule, SudoPrivilegeEscalation, SwapSpaceManager, TmuxMultiplexer,
     TmuxPane, UndercoverDisguiseTheme, WifiFrameType,
 };
+pub use kali_components::*;
 
 pub use libgksu::{
     GksuAuthBackend, GksuDisplayServer, GksuExecutionRequest, GksuExecutionResult,

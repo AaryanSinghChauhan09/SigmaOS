@@ -322,8 +322,10 @@ pub use resilience::{
 pub use security::hardening;
 pub use security::{
     AnonSurfShunt, AppSandboxEngine, ArithmeticSubstitutionDeobfuscator, CapabilityGate,
-    CapabilityToken, ForensicStorageFilter, Permission, PledgeManager, PledgePromise, RoutingMode,
-    SandboxPolicy,
+    CapabilityToken, ForensicStorageFilter, KaliAutopsyForensicEngine, KaliBurpSuiteProxyInterceptor,
+    KaliGhidraReverseEngineeringEngine, KaliKismetWirelessSniffer, KaliLinuxPrProposalEngine,
+    KaliMasscanAsyncPortScanner, KaliMimikatzCredentialDumper, KaliSherlockOsintHarvester,
+    Permission, PledgeManager, PledgePromise, RoutingMode, SandboxPolicy,
 };
 pub use shell::{
     ContextualCompleter, HistoryExpansionEngine, JobControlManager, ParameterExpansionEngine,
