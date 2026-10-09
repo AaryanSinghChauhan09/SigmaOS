@@ -158,8 +158,7 @@ impl KDnuggetsZeroCopyVectorPipelineEngine {
         }
         let sum: f32 = input.iter().sum();
         let mean = sum / input.len() as f32;
-        let variance: f32 =
-            input.iter().map(|&x| (x - mean) * (x - mean)).sum::<f32>() / input.len() as f32;
+        let variance: f32 = input.iter().map(|&x| (x - mean) * (x - mean)).sum::<f32>() / input.len() as f32;
         let std_dev = variance.sqrt().max(1e-6);
         input.iter().map(|&x| (x - mean) / std_dev).collect()
     }
@@ -284,8 +283,7 @@ impl LinuxOrgKernelSysctlTuningEngine {
     }
 
     pub fn is_realtime_tuned(&self) -> bool {
-        self.swappiness <= 10
-            && (self.tcp_congestion_control == "bbr" || self.tcp_congestion_control == "bbr3")
+        self.swappiness <= 10 && (self.tcp_congestion_control == "bbr" || self.tcp_congestion_control == "bbr3")
     }
 }
 
@@ -803,10 +801,7 @@ impl AppualsAutomatedPackageResolverEngine {
     pub fn auto_repair(&mut self, err_code: u32) -> String {
         self.diagnostic_code = err_code;
         self.packages_repaired += 1;
-        format!(
-            "Diagnostic code {} resolved and package dependencies repaired.",
-            err_code
-        )
+        format!("Diagnostic code {} resolved and package dependencies repaired.", err_code)
     }
 }
 
@@ -868,24 +863,20 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
 
         insights.push(TechMediaArticleInsight {
             publication: String::from("ItsFOSS"),
-            title: String::from("Zero-Dependency Terminal Tooling & Prompt Optimization"),
-            category: String::from("Userland & Terminal"),
-            action_recommendation: String::from(
-                "Enable zero-alloc prompt caching & zero-dep CLI coreutils",
-            ),
+            title: String::from("Zero-Dependency Terminal Tooling & elementaryOS AppCenter PWYW Parity"),
+            category: String::from("Userland & Desktop"),
+            action_recommendation: String::from("Enable zero-alloc prompt caching, zero-dep CLI coreutils, and elementaryOS AppCenter PWYW monetization gateway"),
             impact_score: 95,
             article_url: String::from("https://itsfoss.com/cli-tools-guide"),
             publication_domain: String::from("itsfoss.com"),
-            pr_branch_name: String::from("feature/itsfoss-cli-prompt-optimization"),
+            pr_branch_name: String::from("feature/itsfoss-cli-prompt-and-pantheon-appcenter-pwyw"),
         });
 
         insights.push(TechMediaArticleInsight {
             publication: String::from("9to5Linux"),
             title: String::from("Linux Kernel PREEMPT_RT Realtime Extensions"),
             category: String::from("Kernel & Scheduler"),
-            action_recommendation: String::from(
-                "Configure realtime latency threshold below 5 microseconds",
-            ),
+            action_recommendation: String::from("Configure realtime latency threshold below 5 microseconds"),
             impact_score: 98,
             article_url: String::from("https://9to5linux.com/kernel-6-12-lts-rt"),
             publication_domain: String::from("9to5linux.com"),
@@ -896,9 +887,7 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("GeekyGadgets"),
             title: String::from("Single Board Computer GPIO Telemetry & Sensor Integration"),
             category: String::from("Embedded & Hardware"),
-            action_recommendation: String::from(
-                "Activate SBC pinout polling & I2C sensor bus telemetry",
-            ),
+            action_recommendation: String::from("Activate SBC pinout polling & I2C sensor bus telemetry"),
             impact_score: 88,
             article_url: String::from("https://geeky-gadgets.com/sbc-gpio-telemetry"),
             publication_domain: String::from("geeky-gadgets.com"),
@@ -909,9 +898,7 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("Linux.com"),
             title: String::from("Zero-Trust System Hardening & LSM Rules"),
             category: String::from("Security & Governance"),
-            action_recommendation: String::from(
-                "Enforce Landlock V5 sandboxing and pledge syscall filters",
-            ),
+            action_recommendation: String::from("Enforce Landlock V5 sandboxing and pledge syscall filters"),
             impact_score: 99,
             article_url: String::from("https://linux.com/landlock-sandboxing"),
             publication_domain: String::from("linux.com"),
@@ -922,9 +909,7 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("KDnuggets"),
             title: String::from("Zero-Copy AI Vector Data Pipeline Normalization"),
             category: String::from("AI & Data Science"),
-            action_recommendation: String::from(
-                "Deploy zero-allocation vector normalization & drift calculation",
-            ),
+            action_recommendation: String::from("Deploy zero-allocation vector normalization & drift calculation"),
             impact_score: 94,
             article_url: String::from("https://kdnuggets.com/zero-copy-vector-normalization"),
             publication_domain: String::from("kdnuggets.com"),
@@ -935,9 +920,7 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("HWBusters"),
             title: String::from("ATX 3.1 12V-2x6 Transient Power Rail Protection"),
             category: String::from("Power & Hardware"),
-            action_recommendation: String::from(
-                "Throttle GPU/CPU transients when voltage ripple exceeds 50mV",
-            ),
+            action_recommendation: String::from("Throttle GPU/CPU transients when voltage ripple exceeds 50mV"),
             impact_score: 96,
             article_url: String::from("https://hwbusters.com/atx31-power-ripple-guard"),
             publication_domain: String::from("hwbusters.com"),
@@ -948,9 +931,7 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("ITDaily"),
             title: String::from("Hybrid Cloud Enterprise SLA & Resilience Governor"),
             category: String::from("Cloud & Enterprise"),
-            action_recommendation: String::from(
-                "Maintain 99.999% uptime governor with active replica failover",
-            ),
+            action_recommendation: String::from("Maintain 99.999% uptime governor with active replica failover"),
             impact_score: 92,
             article_url: String::from("https://itdaily.com/enterprise-sla-governor"),
             publication_domain: String::from("itdaily.com"),
@@ -961,9 +942,7 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("HowToGeek"),
             title: String::from("POSIX Coreutil & CLI Command Translation Matrix"),
             category: String::from("Sysadmin & CLI"),
-            action_recommendation: String::from(
-                "Translate legacy net-tools commands to iproute2 modern syntax",
-            ),
+            action_recommendation: String::from("Translate legacy net-tools commands to iproute2 modern syntax"),
             impact_score: 85,
             article_url: String::from("https://howtogeek.com/cli-command-translation"),
             publication_domain: String::from("howtogeek.com"),
@@ -974,9 +953,7 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("Linux.org"),
             title: String::from("Kernel Sysctl Low-Latency Tuning"),
             category: String::from("Kernel & Memory"),
-            action_recommendation: String::from(
-                "Set vm.swappiness=10 and kernel.sched_rt_runtime_us=950000",
-            ),
+            action_recommendation: String::from("Set vm.swappiness=10 and kernel.sched_rt_runtime_us=950000"),
             impact_score: 93,
             article_url: String::from("https://linux.org/kernel-sysctl-tuning"),
             publication_domain: String::from("linux.org"),
@@ -987,9 +964,7 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("InfoWorld"),
             title: String::from("Zero-Trust Microservice Isolation & mTLS Gateway"),
             category: String::from("Cloud & Security"),
-            action_recommendation: String::from(
-                "Isolate microservices in eBPF network sandboxes with TLS 1.3",
-            ),
+            action_recommendation: String::from("Isolate microservices in eBPF network sandboxes with TLS 1.3"),
             impact_score: 97,
             article_url: String::from("https://infoworld.com/zero-trust-microservices"),
             publication_domain: String::from("infoworld.com"),
@@ -1000,9 +975,7 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("LinuxFoundation"),
             title: String::from("SBOM Compliance & License Supply Chain Governance"),
             category: String::from("Supply Chain & Compliance"),
-            action_recommendation: String::from(
-                "Enforce SPDX SBOM generation and license validation in CI/CD",
-            ),
+            action_recommendation: String::from("Enforce SPDX SBOM generation and license validation in CI/CD"),
             impact_score: 91,
             article_url: String::from("https://linuxfoundation.org/sbom-compliance-guide"),
             publication_domain: String::from("linuxfoundation.org"),
@@ -1013,9 +986,7 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("MakeUseOf"),
             title: String::from("Low-RAM Desktop Environment Adaptive Profiler"),
             category: String::from("Desktop & GUI"),
-            action_recommendation: String::from(
-                "Auto-switch to Zenith Minimal Tiling DE when RAM < 1GB",
-            ),
+            action_recommendation: String::from("Auto-switch to Zenith Minimal Tiling DE when RAM < 1GB"),
             impact_score: 89,
             article_url: String::from("https://makeuseof.com/low-ram-desktop-optimization"),
             publication_domain: String::from("makeuseof.com"),
@@ -1026,9 +997,7 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("PCWorld"),
             title: String::from("Laptop Battery Charge Threshold Governor"),
             category: String::from("Power Management"),
-            action_recommendation: String::from(
-                "Cap battery charging at 80% to maximize lifespan cycles",
-            ),
+            action_recommendation: String::from("Cap battery charging at 80% to maximize lifespan cycles"),
             impact_score: 90,
             article_url: String::from("https://pcworld.com/battery-health-thresholds"),
             publication_domain: String::from("pcworld.com"),
@@ -1039,9 +1008,7 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("MarkTechPost"),
             title: String::from("Small Language Model (SLM) INT4 Quantization"),
             category: String::from("AI & Machine Learning"),
-            action_recommendation: String::from(
-                "Apply 4-bit integer quantization for sub-2GB memory footprint",
-            ),
+            action_recommendation: String::from("Apply 4-bit integer quantization for sub-2GB memory footprint"),
             impact_score: 96,
             article_url: String::from("https://marktechpost.com/slm-int4-quantization"),
             publication_domain: String::from("marktechpost.com"),
@@ -1052,9 +1019,7 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("WindowsLatest"),
             title: String::from("WSL2 / POSIX Cross-Platform Path Translation"),
             category: String::from("Interoperability"),
-            action_recommendation: String::from(
-                "Auto-transpile C:\\ paths to /mnt/c/ POSIX mount points",
-            ),
+            action_recommendation: String::from("Auto-transpile C:\\ paths to /mnt/c/ POSIX mount points"),
             impact_score: 87,
             article_url: String::from("https://windowslatest.com/wsl2-path-translation"),
             publication_domain: String::from("windowslatest.com"),
@@ -1065,9 +1030,7 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("TechSpot"),
             title: String::from("DirectStorage NVMe Low-Latency Frame Pacing"),
             category: String::from("Graphics & Storage"),
-            action_recommendation: String::from(
-                "Bypass virtual memory page cache for GPU direct texture loads",
-            ),
+            action_recommendation: String::from("Bypass virtual memory page cache for GPU direct texture loads"),
             impact_score: 95,
             article_url: String::from("https://techspot.com/directstorage-nvme-frame-pacing"),
             publication_domain: String::from("techspot.com"),
@@ -1078,9 +1041,7 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("TheNewStack"),
             title: String::from("eBPF Service Mesh & Wasm Runtime Observability"),
             category: String::from("Cloud Native"),
-            action_recommendation: String::from(
-                "Attach eBPF probes to syscalls for zero-overhead tracing",
-            ),
+            action_recommendation: String::from("Attach eBPF probes to syscalls for zero-overhead tracing"),
             impact_score: 94,
             article_url: String::from("https://thenewstack.io/ebpf-service-mesh-wasm"),
             publication_domain: String::from("thenewstack.io"),
@@ -1091,9 +1052,7 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("TechPowerUp"),
             title: String::from("GPU VRM Thermal Throttling & Fan Curve Control"),
             category: String::from("Hardware & Drivers"),
-            action_recommendation: String::from(
-                "Ramp fan speed to 100% when hotspot temperature hits 85C",
-            ),
+            action_recommendation: String::from("Ramp fan speed to 100% when hotspot temperature hits 85C"),
             impact_score: 93,
             article_url: String::from("https://techpowerup.com/gpu-vrm-thermal-control"),
             publication_domain: String::from("techpowerup.com"),
@@ -1104,9 +1063,7 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("WindowsCentral"),
             title: String::from("Mobile Device Subsystem Bridge & Notification Sync"),
             category: String::from("Desktop Interop"),
-            action_recommendation: String::from(
-                "Sync clipboard, SMS, and calls via zero-trust TLS channel",
-            ),
+            action_recommendation: String::from("Sync clipboard, SMS, and calls via zero-trust TLS channel"),
             impact_score: 86,
             article_url: String::from("https://windowscentral.com/phone-link-linux-bridge"),
             publication_domain: String::from("windowscentral.com"),
@@ -1117,9 +1074,7 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("Phoronix"),
             title: String::from("Automated Phoronix Test Suite Regression Benchmarking"),
             category: String::from("Performance & Testing"),
-            action_recommendation: String::from(
-                "Run automated regression benchmarks on kernel build commits",
-            ),
+            action_recommendation: String::from("Run automated regression benchmarks on kernel build commits"),
             impact_score: 97,
             article_url: String::from("https://phoronix.com/automated-pts-benchmarking"),
             publication_domain: String::from("phoronix.com"),
@@ -1130,9 +1085,7 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("TechCrunch"),
             title: String::from("Open-Source Project Sustainability & Governance Metrics"),
             category: String::from("Ecosystem"),
-            action_recommendation: String::from(
-                "Track maintainer bus factor and issue resolution rate",
-            ),
+            action_recommendation: String::from("Track maintainer bus factor and issue resolution rate"),
             impact_score: 88,
             article_url: String::from("https://techcrunch.com/open-source-health-metrics"),
             publication_domain: String::from("techcrunch.com"),
@@ -1143,9 +1096,7 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("XDA-Developers"),
             title: String::from("Android Subsystem Wayland Compositor Hardware Mirroring"),
             category: String::from("Mobile & Wayland"),
-            action_recommendation: String::from(
-                "Stream Android screen buffers to Wayland surfaces via DMA-BUF",
-            ),
+            action_recommendation: String::from("Stream Android screen buffers to Wayland surfaces via DMA-BUF"),
             impact_score: 91,
             article_url: String::from("https://xda-developers.com/android-wayland-mirroring"),
             publication_domain: String::from("xda-developers.com"),
@@ -1156,9 +1107,7 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("ZDNet"),
             title: String::from("Enterprise Infrastructure Compliance & Hardening Audit"),
             category: String::from("Enterprise Security"),
-            action_recommendation: String::from(
-                "Validate CIS benchmarks and DISA STIG compliance rules",
-            ),
+            action_recommendation: String::from("Validate CIS benchmarks and DISA STIG compliance rules"),
             impact_score: 98,
             article_url: String::from("https://zdnet.com/enterprise-compliance-audit"),
             publication_domain: String::from("zdnet.com"),
@@ -1169,9 +1118,7 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("OpenSourceForU"),
             title: String::from("Modular Microkernel Subsystem Hot-Swapping"),
             category: String::from("Kernel Architecture"),
-            action_recommendation: String::from(
-                "Support hot-swapping driver modules without kernel restart",
-            ),
+            action_recommendation: String::from("Support hot-swapping driver modules without kernel restart"),
             impact_score: 92,
             article_url: String::from("https://opensourceforu.com/modular-kernel-hotswap"),
             publication_domain: String::from("opensourceforu.com"),
@@ -1182,9 +1129,7 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("PCMag"),
             title: String::from("Endpoint Heuristic Malware & Zero-Day Threat Shield"),
             category: String::from("Endpoint Security"),
-            action_recommendation: String::from(
-                "Scan binary execution memory using heuristic vector filters",
-            ),
+            action_recommendation: String::from("Scan binary execution memory using heuristic vector filters"),
             impact_score: 96,
             article_url: String::from("https://pcmag.com/endpoint-heuristic-security"),
             publication_domain: String::from("pcmag.com"),
@@ -1195,9 +1140,7 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("LinuxTeck"),
             title: String::from("IPTables / NFTables Firewall Rule Hardening"),
             category: String::from("Networking & Security"),
-            action_recommendation: String::from(
-                "Drop invalid state TCP packets and rate limit SSH connection bursts",
-            ),
+            action_recommendation: String::from("Drop invalid state TCP packets and rate limit SSH connection bursts"),
             impact_score: 91,
             article_url: String::from("https://linuxteck.com/firewall-rule-hardening"),
             publication_domain: String::from("linuxteck.com"),
@@ -1208,9 +1151,7 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("Appuals"),
             title: String::from("Automated Package Dependency & Broken Lock Resolution"),
             category: String::from("Package Management"),
-            action_recommendation: String::from(
-                "Auto-repair dpkg/pacman database locks and broken dependencies",
-            ),
+            action_recommendation: String::from("Auto-repair dpkg/pacman database locks and broken dependencies"),
             impact_score: 89,
             article_url: String::from("https://appuals.com/auto-repair-package-locks"),
             publication_domain: String::from("appuals.com"),
@@ -1221,9 +1162,7 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("DistroWatch"),
             title: String::from("Distribution Popularity & Release Matrix Analytics"),
             category: String::from("Distro Analytics"),
-            action_recommendation: String::from(
-                "Monitor top Linux distribution feature trends and package releases",
-            ),
+            action_recommendation: String::from("Monitor top Linux distribution feature trends and package releases"),
             impact_score: 87,
             article_url: String::from("https://distrowatch.com/popularity-ranking-analytics"),
             publication_domain: String::from("distrowatch.com"),
@@ -1244,6 +1183,45 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
         self.insights
             .iter()
             .filter(|i| i.publication.eq_ignore_ascii_case(pub_name))
+            .cloned()
+            .collect()
+    }
+
+    pub fn query_insights_by_flexible_domain(&self, raw_query: &str) -> Vec<TechMediaArticleInsight> {
+        let mut clean = raw_query.trim();
+        if clean.starts_with("https://") {
+            clean = &clean[8..];
+        } else if clean.starts_with("http://") {
+            clean = &clean[7..];
+        }
+        if clean.starts_with("www.") {
+            clean = &clean[4..];
+        }
+        if clean.ends_with('/') {
+            clean = &clean[..clean.len() - 1];
+        }
+
+        let clean_lower = clean.to_lowercase();
+
+        self.insights
+            .iter()
+            .filter(|i| {
+                let domain_lower = i.publication_domain.to_lowercase();
+                if domain_lower == clean_lower {
+                    return true;
+                }
+                if clean_lower.contains(&domain_lower) {
+                    return true;
+                }
+                let domain_base = domain_lower
+                    .trim_end_matches(".com")
+                    .trim_end_matches(".io")
+                    .trim_end_matches(".org");
+                if !domain_base.is_empty() && clean_lower.contains(domain_base) {
+                    return true;
+                }
+                false
+            })
             .cloned()
             .collect()
     }
@@ -1280,12 +1258,8 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
     }
 
     pub fn format_all_pr_proposals(&self) -> String {
-        let mut manifest =
-            String::from("# SigmaOS Tech Media Multi-Portal PR Proposals Manifest\n\n");
-        manifest.push_str(&format!(
-            "Total Registered Portals: {}\n\n",
-            self.insights.len()
-        ));
+        let mut manifest = String::from("# SigmaOS Tech Media Multi-Portal PR Proposals Manifest\n\n");
+        manifest.push_str(&format!("Total Registered Portals: {}\n\n", self.insights.len()));
 
         for insight in &self.insights {
             manifest.push_str(&format!(
@@ -1325,28 +1299,6 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
         }
 
         pr.push_str("\n#### PR Verification Check:\n- [x] Zero-dependency Rust compilation verified\n- [x] Unit tests passed\n- [x] Subsystem performance impact score validated\n");
-        pr
-    }
-
-    pub fn generate_universal_open_source_os_parity_pr_proposal(&self) -> String {
-        let mut pr = String::from("### Pull Request Proposal: [SigmaOS] Universal Open Source Operating System Subsystem Parity Engine\n\n");
-        pr.push_str("**Branch Name:** `feature/universal-open-source-os-parity-suite`\n");
-        pr.push_str("**Target Subsystems:** Universal Open Source Operating System Ecosystems\n\n");
-        pr.push_str("#### Summary of Open Source OS Components Integrated:\n");
-        pr.push_str("- **Arch Linux:** Pacman package database sync, PKGBUILD stanza parsing, and ALPM transaction hooks\n");
-        pr.push_str("- **Debian Linux:** dpkg-divert file redirection, dpkg-trigger processing, debconf preseed engine, and deb-control parser\n");
-        pr.push_str("- **Fedora / RHEL:** Active Directory / FreeIPA realm joining, SSSD integration, and RPM-OSTree atomic deployment rollback\n");
-        pr.push_str("- **Alpine Linux:** apk package solver, musl libc compatibility bridge, and OpenRC runlevel init scripts\n");
-        pr.push_str("- **Gentoo Linux:** Portage USE flags engine, ebuild emerge dependency solver, and toolchain optimization flags\n");
-        pr.push_str("- **Void Linux:** xbps package transaction solver and runit service supervision daemon\n");
-        pr.push_str("- **NixOS:** Declarative Nix flake state management and atomic system generation rollback\n");
-        pr.push_str("- **FreeBSD:** VNET network virtualization, Capsicum capability sandbox, and bsd-pkg package translator\n");
-        pr.push_str("- **OpenBSD:** Pledge syscall sandboxing, unveil filesystem visibility, and KARL kernel address space layout randomization\n");
-        pr.push_str("- **NetBSD:** Rump kernel component virtualization and pkgsrc package manager compatibility\n\n");
-        pr.push_str("#### PR Verification Check:\n");
-        pr.push_str("- [x] Zero-dependency Rust #![no_std]/std compilation verified\n");
-        pr.push_str("- [x] Standalone unit tests passed across all distro compatibility modules\n");
-        pr.push_str("- [x] Zero-copy $O(1)$ memory & sub-millisecond execution verified\n");
         pr
     }
 }
@@ -1427,9 +1379,7 @@ impl SovereignPublicationInspirationEngine {
     pub fn synthesize_and_verify_all_28_portals(&mut self) -> bool {
         let synthesis_engine = SovereignTechMediaArticleInsightSynthesisEngine::new();
         let insight_verified = synthesis_engine.get_insights_count() == 28
-            && !synthesis_engine
-                .get_insights_by_domain("itsfoss.com")
-                .is_empty()
+            && !synthesis_engine.get_insights_by_domain("itsfoss.com").is_empty()
             && !synthesis_engine.format_all_pr_proposals().is_empty();
 
         insight_verified
@@ -1447,10 +1397,7 @@ impl SovereignPublicationInspirationEngine {
             && self.makeuseof.recommend_de(512) == "Zenith-Minimal-Tiling"
             && self.pcworld.should_charge(75)
             && self.marktechpost.estimate_memory_mb(8192) > 2000
-            && self
-                .windowslatest
-                .win_to_posix("C:\\Users")
-                .contains("/mnt/c/Users")
+            && self.windowslatest.win_to_posix("C:\\Users").contains("/mnt/c/Users")
             && self.techspot.is_smooth()
             && self.thenewstack.is_observable()
             && self.techpowerup.is_thermal_safe()
@@ -1533,14 +1480,8 @@ mod tests {
         assert!(mtp.estimate_memory_mb(8192) > 2000);
 
         let winlatest = WindowsLatestWslPathInteropEngine::new();
-        assert_eq!(
-            winlatest.win_to_posix("C:\\Users\\Sigma"),
-            "/mnt/c/Users/Sigma"
-        );
-        assert_eq!(
-            winlatest.posix_to_win("/mnt/c/Users/Sigma"),
-            "C:\\Users\\Sigma"
-        );
+        assert_eq!(winlatest.win_to_posix("C:\\Users\\Sigma"), "/mnt/c/Users/Sigma");
+        assert_eq!(winlatest.posix_to_win("/mnt/c/Users/Sigma"), "C:\\Users\\Sigma");
 
         let techspot = TechSpotFramePacingDirectStorageEngine::new();
         assert!(techspot.is_smooth());
@@ -1590,16 +1531,14 @@ mod tests {
 
         let itsfoss_insights = engine.filter_by_publication("ItsFOSS");
         assert_eq!(itsfoss_insights.len(), 1);
-        assert_eq!(itsfoss_insights[0].category, "Userland & Terminal");
+        assert_eq!(itsfoss_insights[0].category, "Userland & Desktop");
         assert_eq!(itsfoss_insights[0].publication_domain, "itsfoss.com");
         assert!(itsfoss_insights[0].article_url.contains("itsfoss.com"));
         assert!(itsfoss_insights[0].pr_branch_name.contains("itsfoss"));
 
         let domain_insights = engine.get_insights_by_domain("linux.com");
         assert_eq!(domain_insights.len(), 1);
-        assert!(domain_insights[0]
-            .action_recommendation
-            .contains("Landlock"));
+        assert!(domain_insights[0].action_recommendation.contains("Landlock"));
 
         let category_insights = engine.get_insights_by_category("AI & Machine Learning");
         assert!(!category_insights.is_empty());
@@ -1609,6 +1548,25 @@ mod tests {
 
         let tuned_count = engine.execute_auto_tuning();
         assert_eq!(tuned_count, 28);
+    }
+
+    #[test]
+    fn test_flexible_domain_query_resolution() {
+        let engine = SovereignTechMediaArticleInsightSynthesisEngine::new();
+
+        let flex_itsfoss = engine.query_insights_by_flexible_domain("https://www.itsfoss.com/");
+        assert_eq!(flex_itsfoss.len(), 1);
+        assert_eq!(flex_itsfoss[0].publication_domain, "itsfoss.com");
+
+        let flex_concat = engine.query_insights_by_flexible_domain("techpowerup.techpwindowscentral.com");
+        assert!(flex_concat.len() >= 2);
+        let domains: Vec<String> = flex_concat.iter().map(|i| i.publication_domain.clone()).collect();
+        assert!(domains.contains(&String::from("techpowerup.com")));
+        assert!(domains.contains(&String::from("windowscentral.com")));
+
+        let flex_scheme = engine.query_insights_by_flexible_domain("http://phoronix.com");
+        assert_eq!(flex_scheme.len(), 1);
+        assert_eq!(flex_scheme[0].publication_domain, "phoronix.com");
     }
 
     #[test]
@@ -1627,13 +1585,5 @@ mod tests {
         assert!(manifest.contains("SigmaOS Tech Media Multi-Portal PR Proposals Manifest"));
         assert!(manifest.contains("Total Registered Portals: 28"));
         assert!(manifest.contains("itsfoss.com"));
-
-        let os_pr = engine.generate_universal_open_source_os_parity_pr_proposal();
-        assert!(os_pr.contains("Universal Open Source Operating System Subsystem Parity Engine"));
-        assert!(os_pr.contains("feature/universal-open-source-os-parity-suite"));
-        assert!(os_pr.contains("Arch Linux"));
-        assert!(os_pr.contains("Debian Linux"));
-        assert!(os_pr.contains("FreeBSD"));
-        assert!(os_pr.contains("OpenBSD"));
     }
 }
