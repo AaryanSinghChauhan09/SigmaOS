@@ -57,6 +57,8 @@ pub mod arch;
 pub use arch::*;
 pub mod arch_linux_parity_pr_suite;
 pub use arch_linux_parity_pr_suite::*;
+pub mod arch_linux_advancements_v37_pr;
+pub use arch_linux_advancements_v37_pr::*;
 pub mod sovereign_linux_bsd_ecosystem_advancements_v30;
 pub use sovereign_linux_bsd_ecosystem_advancements_v30::*;
 pub mod arch_inspirations;

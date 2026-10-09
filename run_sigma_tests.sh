@@ -333,6 +333,13 @@ if [ -f "src/distro/arch_linux_parity_pr_suite.rs" ]; then
     ./build/test_arch_pr_suite
 fi
 
+if [ -f "src/distro/arch_linux_advancements_v37_pr.rs" ]; then
+    echo "Running Arch Linux Advancements V37 PR test suite..."
+    mkdir -p build
+    rustc --test src/distro/arch_linux_advancements_v37_pr.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_arch_v37_pr
+    ./build/test_arch_v37_pr
+fi
+
 if [ -f "src/package/universal.rs" ]; then
     echo "Running Universal Package Manager multi-distro test suite..."
     mkdir -p build
