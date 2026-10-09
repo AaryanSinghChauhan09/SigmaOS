@@ -149,6 +149,13 @@ if [ -f "src/distro/sovereign_thousands_distro_components.rs" ]; then
     ./build/test_thousands
 fi
 
+if [ -f "src/distro/sovereign_open_source_os_gap_closure_pr.rs" ]; then
+    echo "Running Sovereign Open Source OS Gap Closure PR test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_open_source_os_gap_closure_pr.rs --edition=2021 -o build/test_os_gap_closure_pr
+    ./build/test_os_gap_closure_pr
+fi
+
 if [ -f "src/distro/sovereign_linux_bsd_distro_master_suite.rs" ]; then
     echo "Running Sovereign Linux & BSD Distro Innovations Master Suite test suite..."
     mkdir -p build
