@@ -142,6 +142,13 @@ if [ -f "src/distro/missing_linux_bsd_components.rs" ]; then
     ./build/missing_components_test
 fi
 
+if [ -f "src/distro/additional_linux_bsd_components.rs" ]; then
+    echo "Running Additional Linux & BSD Components test suite..."
+    mkdir -p build
+    rustc --test src/distro/additional_linux_bsd_components.rs --edition=2021 -o build/test_additional_components
+    ./build/test_additional_components
+fi
+
 if [ -f "src/distro/sovereign_thousands_distro_components.rs" ]; then
     echo "Running Sovereign Thousands Distro Components test suite..."
     mkdir -p build
