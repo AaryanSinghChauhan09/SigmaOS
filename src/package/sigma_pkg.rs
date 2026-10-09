@@ -1983,20 +1983,20 @@ impl SigmaPkg {
             }
         }
 
-        if pm == "xbps-install" || pm == "pkg_add" || pm == "installpkg" {
+        if pm == "xbps-install" || pm == "pkg_add" || pm == "pkgadd" || pm == "installpkg" || pm == "urpmi" {
             action = "install";
             action_explicitly_set = true;
-        } else if pm == "xbps-remove" || pm == "pkg_delete" || pm == "removepkg" {
+        } else if pm == "xbps-remove" || pm == "pkg_delete" || pm == "pkgrm" || pm == "removepkg" || pm == "urpme" {
             action = "remove";
             action_explicitly_set = true;
-        } else if pm == "xbps-query" {
-            if args.contains(&"-S") || args.contains(&"-s") || args.contains(&"search") {
+        } else if pm == "xbps-query" || pm == "urpmq" || pm == "dpkg-query" {
+            if args.contains(&"-S") || args.contains(&"-s") || args.contains(&"-l") || args.contains(&"search") {
                 action = "search";
             } else {
                 action = "query_info";
             }
             action_explicitly_set = true;
-        } else if pm == "pkg_info" {
+        } else if pm == "pkg_info" || pm == "pkginfo" {
             action = "query_info";
             action_explicitly_set = true;
         } else if pm == "nix-env" {
