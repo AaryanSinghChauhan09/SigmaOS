@@ -59,12 +59,16 @@ jobs:
       - name: Check documentation links
         run: |
           echo "Checking documentation links in docs/..."
-          find docs/ -name "*.md" -exec markdown-link-check {} \; || true
+          if [ -d "docs" ]; then
+            find docs/ -name "*.md" -exec markdown-link-check {} \; || true
+          fi
 
       - name: Check wiki links
         run: |
           echo "Checking wiki links..."
-          find wiki/ -name "*.md" -exec markdown-link-check {} \; || true
+          if [ -d "wiki" ]; then
+            find wiki/ -name "*.md" -exec markdown-link-check {} \; || true
+          fi
 
       - name: Validate internal links
         run: |
@@ -72,18 +76,20 @@ jobs:
           echo "Checking that all referenced docs/ files exist..."
 
           # Simple check for common reference patterns
-          cd docs/
-          for file in *.md; do
-            if [ -f "$file" ]; then
-              echo "Checking $file..."
-              # Extract markdown links
-              grep -o '\[.*\](.*\.md)' "$file" | sed 's/.*(\(.*\))/\1/' | while read link; do
-                if [ -n "$link" ] && [ ! -f "$link" ]; then
-                  echo "WARNING: Broken link in $file: $link"
-                fi
-              done
-            fi
-          done
+          if [ -d "docs" ]; then
+            cd docs/
+            for file in *.md; do
+              if [ -f "$file" ]; then
+                echo "Checking $file..."
+                # Extract markdown links
+                grep -o '\[.*\](.*\.md)' "$file" | sed 's/.*(\(.*\))/\1/' | while read link; do
+                  if [ -n "$link" ] && [ ! -f "$link" ]; then
+                    echo "WARNING: Broken link in $file: $link"
+                  fi
+                done
+              fi
+            done
+          fi
 
       - name: Check for duplicate documentation
         run: |
@@ -91,17 +97,19 @@ jobs:
           echo "Looking for files with similar content..."
 
           # Check for duplicate titles
-          cd docs/
-          for file in *.md; do
-            if [ -f "$file" ]; then
-              title=$(head -1 "$file")
-              echo "$file: $title"
-            fi
-          done | sort | uniq -d -c | while read count line; do
-            if [ "$count" -gt "1" ]; then
-              echo "WARNING: Duplicate title detected: $line"
-            fi
-          done
+          if [ -d "docs" ]; then
+            cd docs/
+            for file in *.md; do
+              if [ -f "$file" ]; then
+                title=$(head -1 "$file")
+                echo "$file: $title"
+              fi
+            done | sort | uniq -d -c | while read count line; do
+              if [ "$count" -gt "1" ]; then
+                echo "WARNING: Duplicate title detected: $line"
+              fi
+            done
+          fi
 
       - name: Verify documentation policy compliance
         run: |
