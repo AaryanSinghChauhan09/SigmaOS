@@ -750,7 +750,7 @@ impl ZenithCompositor {
             return None;
         }
         self.keyboard_shortcuts
-            .handle_key_press(event.modifiers, event.key)
+            .handle_key_press(&event.modifiers, &event.key)
     }
 
     /// Set keyboard focus to a specific surface
