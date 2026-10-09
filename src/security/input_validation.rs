@@ -54,6 +54,23 @@ pub fn validate_path(path: &[u8]) -> Result<(), ValidationError> {
         return Err(ValidationError::TooLong);
     }
 
+    // Reject URL-encoded path traversal sequences (%2e%2e, %2f, %5c)
+    // to prevent parser differential / decoding bypass attacks (CWE-22).
+    if path.windows(6).any(|w| {
+        w[0] == b'%'
+            && w[1] == b'2'
+            && (w[2] == b'e' || w[2] == b'E')
+            && w[3] == b'%'
+            && w[4] == b'2'
+            && (w[5] == b'e' || w[5] == b'E')
+    }) || path.windows(3).any(|w| {
+        w[0] == b'%'
+            && ((w[1] == b'2' && (w[2] == b'f' || w[2] == b'F'))
+                || (w[1] == b'5' && (w[2] == b'c' || w[2] == b'C')))
+    }) {
+        return Err(ValidationError::PathTraversal);
+    }
+
     // Single-pass byte slice scan combining NUL-byte injection checks,
     // ASCII control character rejection, and path-traversal detection.
     // Inspects path segments bounded by directory separators (`/`, `\`, `:`).
@@ -506,6 +523,32 @@ mod tests {
         assert_eq!(validate_path(b"..."), Err(ValidationError::PathTraversal));
         assert_eq!(
             validate_path(b"foo/.../bar"),
+            Err(ValidationError::PathTraversal)
+        );
+
+        // URL-encoded path traversal sequence rejection (%2e%2e, %2E%2E, %2f, %2F, %5c, %5C)
+        assert_eq!(
+            validate_path(b"/var/www/%2e%2e/etc/passwd"),
+            Err(ValidationError::PathTraversal)
+        );
+        assert_eq!(
+            validate_path(b"/var/www/%2E%2E/etc/passwd"),
+            Err(ValidationError::PathTraversal)
+        );
+        assert_eq!(
+            validate_path(b"/var/www/%2fetc/passwd"),
+            Err(ValidationError::PathTraversal)
+        );
+        assert_eq!(
+            validate_path(b"/var/www/%2Fetc/passwd"),
+            Err(ValidationError::PathTraversal)
+        );
+        assert_eq!(
+            validate_path(b"/var/www/%5cetc/passwd"),
+            Err(ValidationError::PathTraversal)
+        );
+        assert_eq!(
+            validate_path(b"/var/www/%5Cetc/passwd"),
             Err(ValidationError::PathTraversal)
         );
     }
