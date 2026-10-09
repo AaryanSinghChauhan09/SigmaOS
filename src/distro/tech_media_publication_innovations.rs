@@ -1187,6 +1187,45 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             .collect()
     }
 
+    pub fn query_insights_by_flexible_domain(&self, raw_query: &str) -> Vec<TechMediaArticleInsight> {
+        let mut clean = raw_query.trim();
+        if clean.starts_with("https://") {
+            clean = &clean[8..];
+        } else if clean.starts_with("http://") {
+            clean = &clean[7..];
+        }
+        if clean.starts_with("www.") {
+            clean = &clean[4..];
+        }
+        if clean.ends_with('/') {
+            clean = &clean[..clean.len() - 1];
+        }
+
+        let clean_lower = clean.to_lowercase();
+
+        self.insights
+            .iter()
+            .filter(|i| {
+                let domain_lower = i.publication_domain.to_lowercase();
+                if domain_lower == clean_lower {
+                    return true;
+                }
+                if clean_lower.contains(&domain_lower) {
+                    return true;
+                }
+                let domain_base = domain_lower
+                    .trim_end_matches(".com")
+                    .trim_end_matches(".io")
+                    .trim_end_matches(".org");
+                if !domain_base.is_empty() && clean_lower.contains(domain_base) {
+                    return true;
+                }
+                false
+            })
+            .cloned()
+            .collect()
+    }
+
     pub fn get_insights_by_domain(&self, domain: &str) -> Vec<TechMediaArticleInsight> {
         self.insights
             .iter()
@@ -1509,6 +1548,25 @@ mod tests {
 
         let tuned_count = engine.execute_auto_tuning();
         assert_eq!(tuned_count, 28);
+    }
+
+    #[test]
+    fn test_flexible_domain_query_resolution() {
+        let engine = SovereignTechMediaArticleInsightSynthesisEngine::new();
+
+        let flex_itsfoss = engine.query_insights_by_flexible_domain("https://www.itsfoss.com/");
+        assert_eq!(flex_itsfoss.len(), 1);
+        assert_eq!(flex_itsfoss[0].publication_domain, "itsfoss.com");
+
+        let flex_concat = engine.query_insights_by_flexible_domain("techpowerup.techpwindowscentral.com");
+        assert!(flex_concat.len() >= 2);
+        let domains: Vec<String> = flex_concat.iter().map(|i| i.publication_domain.clone()).collect();
+        assert!(domains.contains(&String::from("techpowerup.com")));
+        assert!(domains.contains(&String::from("windowscentral.com")));
+
+        let flex_scheme = engine.query_insights_by_flexible_domain("http://phoronix.com");
+        assert_eq!(flex_scheme.len(), 1);
+        assert_eq!(flex_scheme[0].publication_domain, "phoronix.com");
     }
 
     #[test]
