@@ -55,12 +55,6 @@ pub use arch_ultimate_gap_closure::*;
 // SigmaOS Distro/Ecosystem Maturity Module
 pub mod arch;
 pub use arch::*;
-pub mod arch_linux_parity_pr_suite;
-pub use arch_linux_parity_pr_suite::*;
-pub mod arch_linux_advancements_v37_pr;
-pub use arch_linux_advancements_v37_pr::*;
-pub mod sovereign_linux_bsd_ecosystem_advancements_v30;
-pub use sovereign_linux_bsd_ecosystem_advancements_v30::*;
 pub mod arch_inspirations;
 pub mod arch_missing_components;
 pub mod arch_parity;
@@ -125,8 +119,6 @@ pub mod linux_ideas;
 pub mod missing_distro_innovations;
 pub mod missing_linux_bsd_components;
 pub use missing_linux_bsd_components::*;
-pub mod omarchy_missing_components_parity_pr;
-pub use omarchy_missing_components_parity_pr::*;
 pub mod nixos_inspirations;
 pub mod parity;
 pub mod power_network_tools;
@@ -375,16 +367,9 @@ pub mod community_ecosystem;
 pub use community_ecosystem::*;
 
 pub mod additional_linux_bsd_components;
-pub use additional_linux_bsd_components::*;
 
 pub mod sovereign_thousands_distro_components;
 pub use sovereign_thousands_distro_components::*;
-
-pub mod sovereign_thousands_distro_components;
-pub use sovereign_thousands_distro_components::*;
-
-pub mod sovereign_open_source_os_gap_closure_pr;
-pub use sovereign_open_source_os_gap_closure_pr::*;
 
 pub mod sovereign_2050_distro_supremacy_engine;
 
@@ -402,18 +387,6 @@ pub use sovereign_linux_bsd_pinnacle_innovations_v14::*;
 
 pub mod sovereign_2075_distro_supremacy_engine;
 pub use sovereign_2075_distro_supremacy_engine::*;
-
-pub mod sovereign_2080_distro_supremacy_engine;
-pub use sovereign_2080_distro_supremacy_engine::*;
-
-pub mod sovereign_2085_distro_supremacy_engine;
-pub use sovereign_2085_distro_supremacy_engine::*;
-
-pub mod sovereign_2090_distro_supremacy_engine;
-pub use sovereign_2090_distro_supremacy_engine::*;
-
-pub mod arch_linux_gap_closure_pr_suite;
-pub use arch_linux_gap_closure_pr_suite::*;
 
 pub mod sovereign_mint_omarchy_supremacy_suite;
 pub use sovereign_mint_omarchy_supremacy_suite::*;
@@ -453,15 +426,6 @@ pub use omarchy_linux_gap_closure_pr_suite::*;
 pub mod sovereign_open_source_os_gap_closure_v27;
 pub use sovereign_open_source_os_gap_closure_v27::*;
 
-pub mod sovereign_open_source_os_gap_closure_v31_pr;
-pub use sovereign_open_source_os_gap_closure_v31_pr::*;
-
-pub mod sovereign_open_source_os_pinnacle_pr_v35;
-pub use sovereign_open_source_os_pinnacle_pr_v35::*;
-
-pub mod sovereign_open_source_os_gap_closure_v36_pr;
-pub use sovereign_open_source_os_gap_closure_v36_pr::*;
-
 pub mod sovereign_universal_subsystem_interop;
 pub use sovereign_universal_subsystem_interop::*;
 
@@ -470,9 +434,6 @@ pub use sovereign_linux_bsd_ecosystem_advancements_v28::*;
 
 pub mod sovereign_linux_bsd_ecosystem_advancements_v29;
 pub use sovereign_linux_bsd_ecosystem_advancements_v29::*;
-
-pub mod sovereign_linux_bsd_ecosystem_advancements_v30;
-pub use sovereign_linux_bsd_ecosystem_advancements_v30::*;
 
 pub mod sovereign_mint_omarchy_apex_dominance_v30;
 pub use sovereign_mint_omarchy_apex_dominance_v30::*;
@@ -489,8 +450,8 @@ pub use sovereign_mint_omarchy_v33_apex_vanguard::*;
 pub mod sovereign_mint_omarchy_v34_apex_pantheon;
 pub use sovereign_mint_omarchy_v34_apex_pantheon::*;
 
-pub mod sovereign_2090_distro_supremacy_engine;
-pub use sovereign_2090_distro_supremacy_engine::*;
+pub mod sovereign_open_source_os_pinnacle_pr_v35;
+pub use sovereign_open_source_os_pinnacle_pr_v35::*;
 
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;
