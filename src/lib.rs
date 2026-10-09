@@ -148,6 +148,7 @@ pub use distro::sovereign_mint_omarchy_v32_apex_arsenal::*;
 pub use distro::sovereign_mint_omarchy_v33_apex_vanguard::*;
 pub use distro::sovereign_mint_omarchy_v34_apex_pantheon::*;
 pub use distro::sovereign_linux_bsd_all_subsystems_harmony::*;
+pub use distro::sovereign_gentoo_gap_closure_pr_engine::*;
 pub use distro::sovereign_media_and_distro_unimplemented_innovations::*;
 pub use distro::omarchy_omakase_ultimate_parity::*;
 pub use distro::tech_media_publication_innovations::*;

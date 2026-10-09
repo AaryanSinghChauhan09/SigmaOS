@@ -459,6 +459,9 @@ pub use sovereign_mint_omarchy_v34_apex_pantheon::*;
 pub mod sovereign_linux_bsd_all_subsystems_harmony;
 pub use sovereign_linux_bsd_all_subsystems_harmony::*;
 
+pub mod sovereign_gentoo_gap_closure_pr_engine;
+pub use sovereign_gentoo_gap_closure_pr_engine::*;
+
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;
 pub use crate::stubs::large_distro_stubs::*;
