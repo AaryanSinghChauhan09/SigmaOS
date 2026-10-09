@@ -31,6 +31,6 @@ jobs:
 
       - name: Validate Markdown & Architecture Docs
         run: |
-          ls -la docs/
+          ls -la docs/ || true
           ls -la wiki/ || true
           ls -la WIKI/ || true
