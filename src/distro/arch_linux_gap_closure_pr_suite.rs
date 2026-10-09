@@ -265,7 +265,6 @@ impl Default for SovereignArchLinuxMasterPrGateway {
     }
 }
 
-#[cfg(feature = "standalone_test")]
 #[cfg(test)]
 mod tests {
     use super::*;
