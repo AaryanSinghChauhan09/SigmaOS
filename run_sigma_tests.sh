@@ -333,6 +333,20 @@ if [ -f "src/distro/arch_missing_components.rs" ]; then
     ./build/arch_missing_test
 fi
 
+if [ -f "src/distro/arch_linux_parity_pr_suite.rs" ]; then
+    echo "Running Arch Linux Parity PR Suite test suite..."
+    mkdir -p build
+    rustc --test src/distro/arch_linux_parity_pr_suite.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_arch_pr_suite
+    ./build/test_arch_pr_suite
+fi
+
+if [ -f "src/distro/arch_linux_advancements_v37_pr.rs" ]; then
+    echo "Running Arch Linux Advancements V37 PR test suite..."
+    mkdir -p build
+    rustc --test src/distro/arch_linux_advancements_v37_pr.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_arch_v37_pr
+    ./build/test_arch_v37_pr
+fi
+
 if [ -f "src/package/universal.rs" ]; then
     echo "Running Universal Package Manager multi-distro test suite..."
     mkdir -p build
@@ -779,6 +793,27 @@ if [ -f "src/distro/sovereign_open_source_os_gap_closure_v27.rs" ]; then
     mkdir -p build
     rustc --test src/distro/sovereign_open_source_os_gap_closure_v27.rs --edition=2021 -o build/test_open_source_v27
     ./build/test_open_source_v27
+fi
+
+if [ -f "src/distro/sovereign_open_source_os_gap_closure_v31_pr.rs" ]; then
+    echo "Running Open Source OS Gap Closure V31 PR test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_open_source_os_gap_closure_v31_pr.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_open_source_v31_pr
+    ./build/test_open_source_v31_pr
+fi
+
+if [ -f "src/distro/sovereign_open_source_os_pinnacle_pr_v35.rs" ]; then
+    echo "Running Open Source OS Pinnacle PR V35 test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_open_source_os_pinnacle_pr_v35.rs --edition=2021 -o build/test_open_source_v35
+    ./build/test_open_source_v35
+fi
+
+if [ -f "src/distro/sovereign_open_source_os_gap_closure_v36_pr.rs" ]; then
+    echo "Running Open Source OS Gap Closure V36 PR test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_open_source_os_gap_closure_v36_pr.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_open_source_v36_pr
+    ./build/test_open_source_v36_pr
 fi
 
 if [ -f "src/distro/sovereign_linux_bsd_ecosystem_advancements_v28.rs" ]; then

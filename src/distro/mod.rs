@@ -55,6 +55,12 @@ pub use arch_ultimate_gap_closure::*;
 // SigmaOS Distro/Ecosystem Maturity Module
 pub mod arch;
 pub use arch::*;
+pub mod arch_linux_parity_pr_suite;
+pub use arch_linux_parity_pr_suite::*;
+pub mod arch_linux_advancements_v37_pr;
+pub use arch_linux_advancements_v37_pr::*;
+pub mod sovereign_linux_bsd_ecosystem_advancements_v30;
+pub use sovereign_linux_bsd_ecosystem_advancements_v30::*;
 pub mod arch_inspirations;
 pub mod arch_missing_components;
 pub mod arch_parity;
@@ -440,6 +446,15 @@ pub use omarchy_linux_gap_closure_pr_suite::*;
 
 pub mod sovereign_open_source_os_gap_closure_v27;
 pub use sovereign_open_source_os_gap_closure_v27::*;
+
+pub mod sovereign_open_source_os_gap_closure_v31_pr;
+pub use sovereign_open_source_os_gap_closure_v31_pr::*;
+
+pub mod sovereign_open_source_os_pinnacle_pr_v35;
+pub use sovereign_open_source_os_pinnacle_pr_v35::*;
+
+pub mod sovereign_open_source_os_gap_closure_v36_pr;
+pub use sovereign_open_source_os_gap_closure_v36_pr::*;
 
 pub mod sovereign_universal_subsystem_interop;
 pub use sovereign_universal_subsystem_interop::*;
