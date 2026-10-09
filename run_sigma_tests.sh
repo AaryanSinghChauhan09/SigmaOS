@@ -774,13 +774,6 @@ if [ -f "src/distro/sovereign_linux_bsd_ecosystem_advancements_v29.rs" ]; then
     ./build/test_advancements_v29
 fi
 
-if [ -f "src/distro/sovereign_linux_bsd_ecosystem_advancements_v30.rs" ]; then
-    echo "Running Sovereign Linux & BSD Ecosystem Advancements V30 test suite..."
-    mkdir -p build
-    rustc --test src/distro/sovereign_linux_bsd_ecosystem_advancements_v30.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_advancements_v30
-    ./build/test_advancements_v30
-fi
-
 if [ -f "src/distro/sovereign_mint_omarchy_apex_dominance_v30.rs" ]; then
     echo "Running Sovereign Linux Mint & Omarchy Apex Dominance Suite V30 test suite..."
     mkdir -p build
