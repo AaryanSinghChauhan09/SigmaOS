@@ -30,6 +30,9 @@ function createMockElement(id, tag = "div") {
     value: "",
     innerHTML: "",
     listeners: {},
+    contains(other) {
+      return this === other || this.children.some((child) => child === other || (child.contains && child.contains(other)));
+    },
     focus() { activeElement = el; },
     blur() { if (activeElement === el) activeElement = null; },
     setAttribute(k, v) { this.attributes[k] = v; },
@@ -50,6 +53,7 @@ function createMockElement(id, tag = "div") {
   return el;
 }
 
+const docListeners = {};
 global.document = {
   readyState: "complete",
   get activeElement() { return activeElement; },
@@ -59,7 +63,15 @@ global.document = {
   },
   createTextNode: (text) => ({ textContent: text }),
   getElementById: (id) => mockElements[id] || createMockElement(id),
-  querySelectorAll: () => []
+  querySelectorAll: () => [],
+  addEventListener: (event, fn) => {
+    if (!docListeners[event]) docListeners[event] = [];
+    docListeners[event].push(fn);
+  },
+  dispatchEvent: (event) => {
+    const fns = docListeners[event.type] || [];
+    fns.forEach((fn) => fn(event));
+  }
 };
 
 // Test 1: Full command list rendering and ARIA combobox attributes
@@ -145,7 +157,6 @@ console.log("✓ toggleHelp modal overlay and ARIA states verified successfully!
 zenith.initEscapeKeyDismissal();
 zenith.toggleHelp();
 assert.strictEqual(helpOverlay.classList.contains("wizard-overlay--hidden"), false, "Expected help-overlay open for focus trap test");
-const docListeners = global.document.listeners || {};
 // Keydown listener registered via initEscapeKeyDismissal
 console.log("✓ Modal focus trap listener initialized successfully!");
 
@@ -188,5 +199,16 @@ assert.strictEqual(dockBtn.getAttribute("aria-pressed"), "false", "Expected dock
 assert.strictEqual(dockBtn.classList.contains("app-open"), false, "Expected dock button .app-open removed when closed");
 assert.strictEqual(dockBtn.classList.contains("app-active"), false, "Expected dock button .app-active removed when closed");
 console.log("✓ Dynamic dock icon ARIA pressed and app state indicators verified successfully!");
+
+// Test 10: Command Palette outside-click dismissal
+const cmdPaletteEl = mockElements["cmd-palette"];
+cmdPaletteEl.classList.add("active");
+cmdPaletteEl.setAttribute("aria-hidden", "false");
+const outsideTarget = createMockElement("outside-target");
+
+global.document.dispatchEvent({ type: "click", target: outsideTarget });
+assert.strictEqual(cmdPaletteEl.classList.contains("active"), false, "Expected cmd-palette to lose .active class on outside click");
+assert.strictEqual(cmdPaletteEl.getAttribute("aria-hidden"), "true", "Expected cmd-palette aria-hidden='true' on outside click");
+console.log("✓ Command Palette outside-click dismissal verified successfully!");
 
 console.log("All Command Palette & Desktop UX tests passed successfully!");
