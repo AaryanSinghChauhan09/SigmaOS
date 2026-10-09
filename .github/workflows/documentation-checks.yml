@@ -59,68 +59,72 @@ jobs:
       - name: Check documentation links
         run: |
           echo "Checking documentation links in docs/..."
-          if [ -d "docs" ]; then
-            find docs/ -name "*.md" -exec markdown-link-check {} \; || true
-          fi
+          find docs/ -name "*.md" -exec markdown-link-check {} \; || true
 
       - name: Check wiki links
         run: |
           echo "Checking wiki links..."
-          if [ -d "wiki" ]; then
-            find wiki/ -name "*.md" -exec markdown-link-check {} \; || true
-          fi
+          find wiki/ -name "*.md" -exec markdown-link-check {} \; || true
 
       - name: Validate internal links
         run: |
           echo "Validating internal documentation structure..."
-          if [ -d "docs" ]; then
-            echo "Checking that all referenced docs/ files exist..."
-            cd docs/
-            for file in *.md; do
-              if [ -f "$file" ]; then
-                echo "Checking $file..."
-                # Extract markdown links
-                grep -o '\[.*\](.*\.md)' "$file" | sed 's/.*(\(.*\))/\1/' | while read link; do
-                  if [ -n "$link" ] && [ ! -f "$link" ]; then
-                    echo "WARNING: Broken link in $file: $link"
-                  fi
-                done
-              fi
-            done
-          fi
+          echo "Checking that all referenced docs/ files exist..."
+
+          # Simple check for common reference patterns
+          cd docs/
+          for file in *.md; do
+            if [ -f "$file" ]; then
+              echo "Checking $file..."
+              # Extract markdown links
+              grep -o '\[.*\](.*\.md)' "$file" | sed 's/.*(\(.*\))/\1/' | while read link; do
+                if [ -n "$link" ] && [ ! -f "$link" ]; then
+                  echo "WARNING: Broken link in $file: $link"
+                fi
+              done
+            fi
+          done
 
       - name: Check for duplicate documentation
         run: |
           echo "Checking for duplicate documentation..."
-          if [ -d "docs" ]; then
-            echo "Looking for files with similar content..."
-            cd docs/
-            for file in *.md; do
-              if [ -f "$file" ]; then
-                title=$(head -1 "$file")
-                echo "$file: $title"
-              fi
-            done | sort | uniq -d -c | while read count line; do
-              if [ "$count" -gt "1" ]; then
-                echo "WARNING: Duplicate title detected: $line"
-              fi
-            done
-          fi
+          echo "Looking for files with similar content..."
+
+          # Check for duplicate titles
+          cd docs/
+          for file in *.md; do
+            if [ -f "$file" ]; then
+              title=$(head -1 "$file")
+              echo "$file: $title"
+            fi
+          done | sort | uniq -d -c | while read count line; do
+            if [ "$count" -gt "1" ]; then
+              echo "WARNING: Duplicate title detected: $line"
+            fi
+          done
 
       - name: Verify documentation policy compliance
         run: |
           echo "Verifying documentation policy compliance..."
-          if [ -d "docs" ]; then
-            if [ ! -f "docs/DOCUMENTATION_SOURCE_POLICY.md" ]; then
-              echo "WARNING: DOCUMENTATION_SOURCE_POLICY.md not found"
-            fi
-            if [ ! -f "docs/ARCHITECTURE_DECISIONS.md" ]; then
-              echo "WARNING: ARCHITECTURE_DECISIONS.md not found"
-            fi
-            if [ ! -f "docs/PROJECT_STATUS.md" ]; then
-              echo "WARNING: PROJECT_STATUS.md not found"
-            fi
+
+          # Check that DOCUMENTATION_SOURCE_POLICY.md exists
+          if [ ! -f "docs/DOCUMENTATION_SOURCE_POLICY.md" ]; then
+            echo "ERROR: DOCUMENTATION_SOURCE_POLICY.md not found"
+            exit 1
           fi
+
+          # Check that ARCHITECTURE_DECISIONS.md exists
+          if [ ! -f "docs/ARCHITECTURE_DECISIONS.md" ]; then
+            echo "ERROR: ARCHITECTURE_DECISIONS.md not found"
+            exit 1
+          fi
+
+          # Check that PROJECT_STATUS.md exists
+          if [ ! -f "docs/PROJECT_STATUS.md" ]; then
+            echo "ERROR: PROJECT_STATUS.md not found"
+            exit 1
+          fi
+
           echo "Documentation policy compliance verified"
 
       - name: Generate documentation summary
