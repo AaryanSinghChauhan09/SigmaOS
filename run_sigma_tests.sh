@@ -865,4 +865,11 @@ if [ -f "scripts/release_gate_mint_omarchy_migration.sh" ]; then
     ./scripts/release_gate_mint_omarchy_migration.sh
 fi
 
+if [ -f "src/distro/sovereign_open_source_os_pinnacle_pr_v35.rs" ]; then
+    echo "Running Sovereign Open Source OS Pinnacle PR Suite V35 test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_open_source_os_pinnacle_pr_v35.rs --edition=2021 -o build/test_open_source_v35
+    ./build/test_open_source_v35
+fi
+
 echo "All SigmaOS test suites completed."

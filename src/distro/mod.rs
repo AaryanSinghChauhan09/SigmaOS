@@ -450,6 +450,9 @@ pub use sovereign_mint_omarchy_v33_apex_vanguard::*;
 pub mod sovereign_mint_omarchy_v34_apex_pantheon;
 pub use sovereign_mint_omarchy_v34_apex_pantheon::*;
 
+pub mod sovereign_open_source_os_pinnacle_pr_v35;
+pub use sovereign_open_source_os_pinnacle_pr_v35::*;
+
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;
 pub use crate::stubs::large_distro_stubs::*;

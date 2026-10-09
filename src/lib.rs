@@ -144,6 +144,7 @@ pub use distro::sovereign_mint_omarchy_innovations_v31::*;
 pub use distro::sovereign_mint_omarchy_v32_apex_arsenal::*;
 pub use distro::sovereign_mint_omarchy_v33_apex_vanguard::*;
 pub use distro::sovereign_mint_omarchy_v34_apex_pantheon::*;
+pub use distro::sovereign_open_source_os_pinnacle_pr_v35::*;
 pub use distro::sovereign_media_and_distro_unimplemented_innovations::*;
 pub use distro::omarchy_omakase_ultimate_parity::*;
 pub use distro::tech_media_publication_innovations::*;
