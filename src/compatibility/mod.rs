@@ -320,5 +320,7 @@ pub mod void_linux;
 pub mod wasm_sandbox;
 pub mod sssd;
 pub mod ubuntu_apt;
+pub mod ubuntu_missing_components;
+pub use ubuntu_missing_components::*;
 pub mod mint_omarchy_migration_bridge;
 pub use mint_omarchy_migration_bridge::*;
