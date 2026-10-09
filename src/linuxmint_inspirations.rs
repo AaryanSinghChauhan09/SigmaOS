@@ -1333,14 +1333,15 @@ impl MintMenuEngine {
     }
 
     pub fn search(&self, query: &str) -> Vec<&MintMenuItem> {
-        let q = query.to_lowercase();
+        // Bolt performance optimization: use zero-allocation case-insensitive substring search helper `contains_ignore_case`
+        // to avoid allocating heap String instances for `item.name`, `item.generic_name`, `item.app_id`, and `item.category` on every item check.
         self.items
             .iter()
             .filter(|item| {
-                item.name.to_lowercase().contains(&q)
-                    || item.generic_name.to_lowercase().contains(&q)
-                    || item.app_id.to_lowercase().contains(&q)
-                    || item.category.to_lowercase().contains(&q)
+                contains_ignore_case(&item.name, query)
+                    || contains_ignore_case(&item.generic_name, query)
+                    || contains_ignore_case(&item.app_id, query)
+                    || contains_ignore_case(&item.category, query)
             })
             .collect()
     }
@@ -2024,14 +2025,15 @@ impl MintSoftwareCatalogEngine {
     }
 
     pub fn search(&self, query: &str) -> Vec<&CatalogPackage> {
-        let q = query.to_lowercase();
+        // Bolt performance optimization: use zero-allocation case-insensitive substring search helper `contains_ignore_case`
+        // to avoid allocating heap String instances for `p.name`, `p.summary`, `p.pkg_id`, and `p.category` on every package check.
         self.packages
             .iter()
             .filter(|p| {
-                p.name.to_lowercase().contains(&q)
-                    || p.summary.to_lowercase().contains(&q)
-                    || p.pkg_id.to_lowercase().contains(&q)
-                    || p.category.to_lowercase().contains(&q)
+                contains_ignore_case(&p.name, query)
+                    || contains_ignore_case(&p.summary, query)
+                    || contains_ignore_case(&p.pkg_id, query)
+                    || contains_ignore_case(&p.category, query)
             })
             .collect()
     }
@@ -2394,5 +2396,26 @@ mod tests {
 
         let top = catalog.get_top_rated(2);
         assert_eq!(top.len(), 2);
+    }
+}
+
+/// Zero-allocation case-insensitive substring search helper.
+/// Checks whether `haystack` contains `needle`, ignoring ASCII case, without allocating heap Strings.
+fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
+    if needle.is_empty() {
+        return true;
+    }
+    if haystack.len() < needle.len() {
+        return false;
+    }
+    if haystack.is_ascii() && needle.is_ascii() {
+        let needle_bytes = needle.as_bytes();
+        haystack.as_bytes().windows(needle_bytes.len()).any(|window| {
+            window.iter().zip(needle_bytes.iter()).all(|(&b1, &b2)| {
+                b1.to_ascii_lowercase() == b2.to_ascii_lowercase()
+            })
+        })
+    } else {
+        haystack.to_lowercase().contains(&needle.to_lowercase())
     }
 }
