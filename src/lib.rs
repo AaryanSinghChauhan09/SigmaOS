@@ -140,6 +140,7 @@ pub use distro::sovereign_architecture_development_decision_plan::*;
 pub use distro::omarchy_linux_gap_closure_pr_suite::*;
 pub use distro::sovereign_open_source_os_gap_closure_v27::*;
 pub use distro::sovereign_open_source_os_gap_closure_v31_pr::*;
+pub use distro::sovereign_open_source_os_pinnacle_pr_v35::*;
 pub use distro::sovereign_universal_subsystem_interop::*;
 pub use distro::sovereign_linux_bsd_ecosystem_advancements_v28::*;
 pub use distro::sovereign_linux_bsd_ecosystem_advancements_v29::*;

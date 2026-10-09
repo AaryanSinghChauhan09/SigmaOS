@@ -439,6 +439,9 @@ pub use sovereign_open_source_os_gap_closure_v27::*;
 pub mod sovereign_open_source_os_gap_closure_v31_pr;
 pub use sovereign_open_source_os_gap_closure_v31_pr::*;
 
+pub mod sovereign_open_source_os_pinnacle_pr_v35;
+pub use sovereign_open_source_os_pinnacle_pr_v35::*;
+
 pub mod sovereign_universal_subsystem_interop;
 pub use sovereign_universal_subsystem_interop::*;
 
