@@ -64,7 +64,7 @@ In accordance with direct main-branch commit guidelines, **no external GitHub Pu
 ## 5. Repo Governance & Release Readiness
 - **Branch Strategy & Direct Commit Policy:**
   - All feature implementations, roadmap specs, and agent analyses are committed directly to `main` branch.
-  - Roadmap specifications are formatted as Pull Request proposals inside `docs/roadmap/` and mirrored across `wiki/` and `WIKI/` documentation portals.
+  - Roadmap specifications are formatted as Pull Request proposals inside `docs/roadmap/` or root PR proposals (such as `PR_PROPOSAL_ARCH_LINUX_MISSING_COMPONENTS_PARITY.md` and `PR_PROPOSAL_OPEN_SOURCE_OS_MISSING_COMPONENTS_PARITY.md`) and mirrored across `wiki/` and `WIKI/` documentation portals.
 - **Semantic Versioning:**
   - Current release target: **SigmaOS V34 Pantheon Apex Edition** (v0.1.0-v34).
 
