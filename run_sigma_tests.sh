@@ -584,6 +584,13 @@ if [ -f "src/distro/sovereign_open_source_os_gap_closure_pr.rs" ]; then
     ./build/test_os_gap_closure_pr
 fi
 
+if [ -f "src/distro/sovereign_linux_bsd_ecosystem_advancements_v38.rs" ]; then
+    echo "Running Sovereign Linux & BSD Ecosystem Advancements V38 test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_linux_bsd_ecosystem_advancements_v38.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_advancements_v38
+    ./build/test_advancements_v38
+fi
+
 if [ -f "src/compatibility/omarchy_supreme_engine.rs" ]; then
     echo "Running Sovereign Omarchy Supreme Engine test suite..."
     mkdir -p build
