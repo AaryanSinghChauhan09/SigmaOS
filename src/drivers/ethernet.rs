@@ -403,7 +403,6 @@ mod tests {
     }
 
     #[ignore]
-
     #[test]
     fn test_ethernet_frame() {
         let dst = MacAddr::new([0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]);

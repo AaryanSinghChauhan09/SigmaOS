@@ -625,7 +625,6 @@ mod autotuner_tests {
     }
 
     #[ignore]
-
     #[test]
     fn test_classify_server() {
         let tuner = SigmaKernelAutotuner::new();

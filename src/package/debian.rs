@@ -340,13 +340,16 @@ impl DebianUpdateAlternativesEngine {
             priority,
         };
 
-        let entry = self.groups.entry(name.to_string()).or_insert_with(|| AlternativeGroup {
-            name: name.to_string(),
-            master_link: master_link.to_string(),
-            choices: Vec::new(),
-            selected_path: None,
-            is_auto: true,
-        });
+        let entry = self
+            .groups
+            .entry(name.to_string())
+            .or_insert_with(|| AlternativeGroup {
+                name: name.to_string(),
+                master_link: master_link.to_string(),
+                choices: Vec::new(),
+                selected_path: None,
+                is_auto: true,
+            });
 
         if !entry.choices.iter().any(|c| c.path == path) {
             entry.choices.push(choice);
@@ -681,19 +684,31 @@ mod tests {
         alts.install_alternative("editor", "/usr/bin/editor", "/usr/bin/nano", 40);
 
         // Highest priority (50) auto-selected
-        assert_eq!(alts.get_active_path("editor"), Some("/usr/bin/vim.basic".to_string()));
+        assert_eq!(
+            alts.get_active_path("editor"),
+            Some("/usr/bin/vim.basic".to_string())
+        );
 
         // Install higher priority choice (100)
         alts.install_alternative("editor", "/usr/bin/editor", "/usr/bin/neovim", 100);
-        assert_eq!(alts.get_active_path("editor"), Some("/usr/bin/neovim".to_string()));
+        assert_eq!(
+            alts.get_active_path("editor"),
+            Some("/usr/bin/neovim".to_string())
+        );
 
         // Manual override
         assert!(alts.set_manual_selection("editor", "/usr/bin/nano").is_ok());
-        assert_eq!(alts.get_active_path("editor"), Some("/usr/bin/nano".to_string()));
+        assert_eq!(
+            alts.get_active_path("editor"),
+            Some("/usr/bin/nano".to_string())
+        );
 
         // Return to auto mode
         assert!(alts.auto_select("editor").is_ok());
-        assert_eq!(alts.get_active_path("editor"), Some("/usr/bin/neovim".to_string()));
+        assert_eq!(
+            alts.get_active_path("editor"),
+            Some("/usr/bin/neovim".to_string())
+        );
     }
 
     #[test]

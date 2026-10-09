@@ -5,7 +5,7 @@
 //! - sys_gethostname(2)
 //! - sys_clone with CLONE_NEWUTS support
 
-use crate::kernel::uts_namespace::{UtsNamespaceManager, NamespaceId};
+use crate::kernel::uts_namespace::{NamespaceId, UtsNamespaceManager};
 use std::sync::OnceLock;
 
 // Global UTS namespace manager
@@ -104,11 +104,7 @@ pub unsafe fn sys_gethostname(namespace_id: u64, hostname_ptr: *mut u8, len: usi
     // SAFETY: guaranteed by this function's contract; `copy_len < len`, so
     // the payload and trailing NUL fit in the caller-provided output buffer.
     unsafe {
-        std::ptr::copy_nonoverlapping(
-            hostname.as_ptr(),
-            hostname_ptr,
-            copy_len,
-        );
+        std::ptr::copy_nonoverlapping(hostname.as_ptr(), hostname_ptr, copy_len);
         // Null terminate
         *hostname_ptr.add(copy_len) = 0;
     }
@@ -176,11 +172,7 @@ pub unsafe fn sys_getdomainname(namespace_id: u64, domainname_ptr: *mut u8, len:
     // SAFETY: guaranteed by this function's contract; `copy_len < len`, so
     // the payload and trailing NUL fit in the caller-provided output buffer.
     unsafe {
-        std::ptr::copy_nonoverlapping(
-            domainname.as_ptr(),
-            domainname_ptr,
-            copy_len,
-        );
+        std::ptr::copy_nonoverlapping(domainname.as_ptr(), domainname_ptr, copy_len);
         *domainname_ptr.add(copy_len) = 0;
     }
 
@@ -194,7 +186,9 @@ mod tests {
     #[test]
     fn test_sethostname_success() {
         let manager = get_uts_manager();
-        let ns = manager.create_namespace(None).expect("Failed to create namespace");
+        let ns = manager
+            .create_namespace(None)
+            .expect("Failed to create namespace");
 
         let hostname = b"test-host".to_vec();
         let result = unsafe { sys_sethostname(ns.raw(), hostname.as_ptr(), hostname.len()) };
@@ -204,7 +198,9 @@ mod tests {
     #[test]
     fn test_sethostname_too_long() {
         let manager = get_uts_manager();
-        let ns = manager.create_namespace(None).expect("Failed to create namespace");
+        let ns = manager
+            .create_namespace(None)
+            .expect("Failed to create namespace");
 
         let hostname = "a".repeat(256).into_bytes();
         let result = unsafe { sys_sethostname(ns.raw(), hostname.as_ptr(), hostname.len()) };
@@ -214,7 +210,9 @@ mod tests {
     #[test]
     fn test_sethostname_empty() {
         let manager = get_uts_manager();
-        let ns = manager.create_namespace(None).expect("Failed to create namespace");
+        let ns = manager
+            .create_namespace(None)
+            .expect("Failed to create namespace");
 
         let result = unsafe { sys_sethostname(ns.raw(), std::ptr::null(), 0) };
         assert_eq!(result, -22); // EINVAL
@@ -223,7 +221,9 @@ mod tests {
     #[test]
     fn test_gethostname_success() {
         let manager = get_uts_manager();
-        let ns = manager.create_namespace(None).expect("Failed to create namespace");
+        let ns = manager
+            .create_namespace(None)
+            .expect("Failed to create namespace");
 
         let hostname = b"test-host".to_vec();
         unsafe { sys_sethostname(ns.raw(), hostname.as_ptr(), hostname.len()) };
@@ -232,15 +232,20 @@ mod tests {
         let result = unsafe { sys_gethostname(ns.raw(), buffer.as_mut_ptr(), 256) };
         assert_eq!(result, 0);
 
-        let retrieved = String::from_utf8(buffer.iter().copied().take_while(|&b| b != 0).collect()).unwrap();
+        let retrieved =
+            String::from_utf8(buffer.iter().copied().take_while(|&b| b != 0).collect()).unwrap();
         assert_eq!(retrieved, "test-host");
     }
 
     #[test]
     fn test_hostname_isolation() {
         let manager = get_uts_manager();
-        let ns1 = manager.create_namespace(None).expect("Failed to create ns1");
-        let ns2 = manager.create_namespace(None).expect("Failed to create ns2");
+        let ns1 = manager
+            .create_namespace(None)
+            .expect("Failed to create ns1");
+        let ns2 = manager
+            .create_namespace(None)
+            .expect("Failed to create ns2");
 
         let host1 = b"host1".to_vec();
         let host2 = b"host2".to_vec();

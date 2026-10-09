@@ -324,7 +324,9 @@ mod tests {
         assert_eq!(alpine.source_pm, "alpine");
         assert_eq!(alpine.operation, UniversalPmOperation::Install);
 
-        let gentoo = dispatcher.dispatch_command("gentoo install portage").unwrap();
+        let gentoo = dispatcher
+            .dispatch_command("gentoo install portage")
+            .unwrap();
         assert_eq!(gentoo.source_pm, "gentoo");
         assert_eq!(gentoo.operation, UniversalPmOperation::Install);
 
@@ -332,7 +334,9 @@ mod tests {
         assert_eq!(opensuse.source_pm, "opensuse");
         assert_eq!(opensuse.operation, UniversalPmOperation::Install);
 
-        let nixos = dispatcher.dispatch_command("nixos install firefox").unwrap();
+        let nixos = dispatcher
+            .dispatch_command("nixos install firefox")
+            .unwrap();
         assert_eq!(nixos.source_pm, "nixos");
         assert_eq!(nixos.operation, UniversalPmOperation::Install);
     }

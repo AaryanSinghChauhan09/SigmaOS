@@ -299,7 +299,9 @@ impl DesktopColorSchemeManager {
             total_schemes: self.schemes.len(),
             light_schemes: self.get_schemes_by_type(ColorSchemeType::Light).len(),
             dark_schemes: self.get_schemes_by_type(ColorSchemeType::Dark).len(),
-            high_contrast_schemes: self.get_schemes_by_type(ColorSchemeType::HighContrast).len(),
+            high_contrast_schemes: self
+                .get_schemes_by_type(ColorSchemeType::HighContrast)
+                .len(),
             custom_schemes: self.get_schemes_by_type(ColorSchemeType::Custom).len(),
             current_set: self.current_scheme.is_some(),
         }
@@ -397,10 +399,7 @@ mod tests {
         if schemes.len() > 1 {
             let new_scheme_id = schemes[1].id.clone();
             assert!(manager.set_current_scheme(&new_scheme_id));
-            assert_eq!(
-                manager.get_current_scheme().unwrap().id,
-                new_scheme_id
-            );
+            assert_eq!(manager.get_current_scheme().unwrap().id, new_scheme_id);
         }
     }
 

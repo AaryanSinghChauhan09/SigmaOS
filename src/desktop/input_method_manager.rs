@@ -34,12 +34,7 @@ pub struct InputMethodEngine {
 }
 
 impl InputMethodEngine {
-    pub fn new(
-        id: String,
-        name: String,
-        language: String,
-        layout: String,
-    ) -> Self {
+    pub fn new(id: String, name: String, language: String, layout: String) -> Self {
         InputMethodEngine {
             id,
             name,
@@ -138,12 +133,7 @@ impl DesktopInputMethodManager {
         self.input_method_type = im_type;
     }
 
-    pub fn add_engine(
-        &mut self,
-        name: String,
-        language: String,
-        layout: String,
-    ) -> String {
+    pub fn add_engine(&mut self, name: String, language: String, layout: String) -> String {
         let id = format!("engine_{}", self.next_engine_id);
         self.next_engine_id += 1;
 

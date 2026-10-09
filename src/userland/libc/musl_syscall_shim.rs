@@ -135,7 +135,8 @@ impl MuslSyscallContext {
                     return EBADF;
                 }
                 if fd == 1 || fd == 2 {
-                    self.bytes_written_stdout.fetch_add(count as u64, Ordering::SeqCst);
+                    self.bytes_written_stdout
+                        .fetch_add(count as u64, Ordering::SeqCst);
                 }
                 count as i64
             }
@@ -231,7 +232,15 @@ mod tests {
     #[test]
     fn test_mmap_and_munmap() {
         let mut ctx = MuslSyscallContext::new(1002);
-        let addr = ctx.dispatch(SYS_MMAP, 0, 8192, PROT_READ | PROT_WRITE, MAP_ANONYMOUS, 0, 0);
+        let addr = ctx.dispatch(
+            SYS_MMAP,
+            0,
+            8192,
+            PROT_READ | PROT_WRITE,
+            MAP_ANONYMOUS,
+            0,
+            0,
+        );
         assert!(addr > 0);
 
         let unmap_res = ctx.dispatch(SYS_MUNMAP, addr as u64, 8192, 0, 0, 0, 0);

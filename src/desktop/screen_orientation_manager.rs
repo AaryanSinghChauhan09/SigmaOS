@@ -164,7 +164,11 @@ impl DesktopScreenOrientationManager {
     pub fn get_statistics(&self) -> ScreenOrientationStatistics {
         ScreenOrientationStatistics {
             total_configs: self.configs.len(),
-            auto_orientation: self.configs.values().filter(|c| c.policy == OrientationPolicy::Auto).count(),
+            auto_orientation: self
+                .configs
+                .values()
+                .filter(|c| c.policy == OrientationPolicy::Auto)
+                .count(),
         }
     }
 }
@@ -221,7 +225,10 @@ mod tests {
         let mut manager = DesktopScreenOrientationManager::new();
         let config_id = manager.get_configs().first().map(|c| c.id.clone()).unwrap();
         assert!(manager.set_config_orientation(&config_id, ScreenOrientation::PortraitLeft));
-        assert_eq!(manager.get_config(&config_id).unwrap().orientation, ScreenOrientation::PortraitLeft);
+        assert_eq!(
+            manager.get_config(&config_id).unwrap().orientation,
+            ScreenOrientation::PortraitLeft
+        );
     }
 
     #[test]
@@ -229,7 +236,10 @@ mod tests {
         let mut manager = DesktopScreenOrientationManager::new();
         let config_id = manager.get_configs().first().map(|c| c.id.clone()).unwrap();
         assert!(manager.set_config_policy(&config_id, OrientationPolicy::Auto));
-        assert_eq!(manager.get_config(&config_id).unwrap().policy, OrientationPolicy::Auto);
+        assert_eq!(
+            manager.get_config(&config_id).unwrap().policy,
+            OrientationPolicy::Auto
+        );
     }
 
     #[test]

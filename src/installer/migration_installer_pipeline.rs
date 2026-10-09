@@ -21,9 +21,9 @@ extern crate alloc;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::{
     collections::BTreeMap,
+    format,
     string::{String, ToString},
     vec::Vec,
-    format,
 };
 
 #[cfg(any(feature = "standalone_test", test))]
@@ -47,9 +47,18 @@ pub enum MigrationInstallPath {
 /// GPU and wireless hardware driver profile automatically detected during install.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum DetectedGpuVendor {
-    NvidiaDedicated { model: String, driver_recommended: String },
-    AmdRadeon { model: String, mesa_driver: String },
-    IntelIntegrated { model: String, mesa_driver: String },
+    NvidiaDedicated {
+        model: String,
+        driver_recommended: String,
+    },
+    AmdRadeon {
+        model: String,
+        mesa_driver: String,
+    },
+    IntelIntegrated {
+        model: String,
+        mesa_driver: String,
+    },
     VirtualQemu,
 }
 
@@ -159,7 +168,8 @@ impl MigrationInstallerPipeline {
         match self.progress_percent {
             0..=19 => {
                 self.progress_percent = 20;
-                self.current_action = "Partitioning target disk with atomic BTRFS subvolumes".to_string();
+                self.current_action =
+                    "Partitioning target disk with atomic BTRFS subvolumes".to_string();
             }
             20..=39 => {
                 self.progress_percent = 40;
@@ -168,16 +178,19 @@ impl MigrationInstallerPipeline {
             }
             40..=59 => {
                 self.progress_percent = 60;
-                self.current_action = "Configuring hardware drivers and SchedExt kernel tier".to_string();
+                self.current_action =
+                    "Configuring hardware drivers and SchedExt kernel tier".to_string();
             }
             60..=79 => {
                 self.progress_percent = 80;
                 self.current_action = match self.config.install_path {
                     MigrationInstallPath::MigrateFromLinuxMint => {
-                        "Importing Linux Mint dotfiles, Nemo bookmarks, and Timeshift state".to_string()
+                        "Importing Linux Mint dotfiles, Nemo bookmarks, and Timeshift state"
+                            .to_string()
                     }
                     MigrationInstallPath::MigrateFromOmarchy => {
-                        "Importing Omarchy Hyprland layout, Waybar CSS, and Walker keybinds".to_string()
+                        "Importing Omarchy Hyprland layout, Waybar CSS, and Walker keybinds"
+                            .to_string()
                     }
                     _ => "Configuring default desktop shell and theme profile".to_string(),
                 };
@@ -185,7 +198,8 @@ impl MigrationInstallerPipeline {
             }
             80..=99 => {
                 self.progress_percent = 100;
-                self.current_action = "Installation complete. System ready for instant first login.".to_string();
+                self.current_action =
+                    "Installation complete. System ready for instant first login.".to_string();
                 self.installation_completed = true;
             }
             _ => {

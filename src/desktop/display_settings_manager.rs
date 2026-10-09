@@ -26,7 +26,7 @@ impl DesktopDisplayMode {
 /// Desktop Refresh Rate
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct DesktopRefreshRate {
-    pub value: u32,  // Hz
+    pub value: u32, // Hz
 }
 
 impl DesktopRefreshRate {
@@ -116,10 +116,7 @@ impl DesktopDisplaySettingsManager {
     }
 
     fn add_default_display(&mut self) {
-        let mut display = DesktopDisplay::new(
-            "display_0".to_string(),
-            "eDP-1".to_string(),
-        );
+        let mut display = DesktopDisplay::new("display_0".to_string(), "eDP-1".to_string());
 
         display.connected = true;
         display.enabled = true;
@@ -233,17 +230,11 @@ impl DesktopDisplaySettingsManager {
     }
 
     pub fn get_connected_displays(&self) -> Vec<&DesktopDisplay> {
-        self.displays
-            .values()
-            .filter(|d| d.connected)
-            .collect()
+        self.displays.values().filter(|d| d.connected).collect()
     }
 
     pub fn get_enabled_displays(&self) -> Vec<&DesktopDisplay> {
-        self.displays
-            .values()
-            .filter(|d| d.enabled)
-            .collect()
+        self.displays.values().filter(|d| d.enabled).collect()
     }
 
     pub fn get_statistics(&self) -> DesktopDisplaySettingsManagerStatistics {
@@ -366,10 +357,7 @@ mod tests {
         let mut manager = DesktopDisplaySettingsManager::new();
         let display_id = "display_0";
 
-        assert!(manager.set_display_resolution(
-            display_id,
-            DesktopResolution::new(2560, 1440),
-        ));
+        assert!(manager.set_display_resolution(display_id, DesktopResolution::new(2560, 1440),));
 
         let display = manager.get_display(display_id).unwrap();
         assert_eq!(display.resolution.as_ref().unwrap().width, 2560);
@@ -381,10 +369,7 @@ mod tests {
         let mut manager = DesktopDisplaySettingsManager::new();
         let display_id = "display_0";
 
-        assert!(manager.set_display_refresh_rate(
-            display_id,
-            DesktopRefreshRate::new(144),
-        ));
+        assert!(manager.set_display_refresh_rate(display_id, DesktopRefreshRate::new(144),));
 
         let display = manager.get_display(display_id).unwrap();
         assert_eq!(display.refresh_rate.as_ref().unwrap().value, 144);

@@ -19,15 +19,15 @@
 
 extern crate alloc;
 
-use alloc::vec::Vec;
 use alloc::collections::BTreeMap;
 use alloc::string::String;
+use alloc::vec::Vec;
 
 /// DRM node type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DrmNodeType {
-    Primary,   // /dev/dri/card0 - Modesetting + display output
-    Render,    // /dev/dri/renderD128 - Unprivileged compute
+    Primary, // /dev/dri/card0 - Modesetting + display output
+    Render,  // /dev/dri/renderD128 - Unprivileged compute
 }
 
 /// DRM connector type
@@ -111,18 +111,18 @@ pub enum DrmPlaneType {
 /// DRM mode (display mode)
 #[derive(Debug, Clone)]
 pub struct DrmMode {
-    pub clock: u32,        // Pixel clock in kHz
-    pub hdisplay: u16,     // Horizontal display size
+    pub clock: u32,    // Pixel clock in kHz
+    pub hdisplay: u16, // Horizontal display size
     pub hsync_start: u16,
     pub hsync_end: u16,
     pub htotal: u16,
     pub hskew: u16,
-    pub vdisplay: u16,     // Vertical display size
+    pub vdisplay: u16, // Vertical display size
     pub vsync_start: u16,
     pub vsync_end: u16,
     pub vtotal: u16,
     pub vscan: u16,
-    pub vrefresh: u32,     // Vertical refresh rate in Hz
+    pub vrefresh: u32, // Vertical refresh rate in Hz
     pub flags: u32,
     pub name: [u8; 32],
 }

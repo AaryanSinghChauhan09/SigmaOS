@@ -937,7 +937,6 @@ mod tests {
     }
 
     #[ignore]
-
     #[test]
     fn test_energy_aware_scheduler() {
         let mut scheduler = EnergyAwareScheduler::new(5.0);

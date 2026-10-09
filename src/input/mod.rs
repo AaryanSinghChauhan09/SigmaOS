@@ -11,10 +11,9 @@
 pub mod event;
 
 pub use event::{
-    InputEvent, InputTimestamp, InputValue, InputEventType, InputCode,
-    InputEventReader, InputDeviceInfo, InputProductId, KeyState,
-    enumerate_devices, AVAILABLE_EVENT_TYPES, KEY_CODE_RANGE, REL_CODE_RANGE, ABS_CODE_RANGE,
-    MAX_DEVICE_NAME, KEY_MAX, ABS_CNT, REL_CNT,
+    enumerate_devices, InputCode, InputDeviceInfo, InputEvent, InputEventReader, InputEventType,
+    InputProductId, InputTimestamp, InputValue, KeyState, ABS_CNT, ABS_CODE_RANGE,
+    AVAILABLE_EVENT_TYPES, KEY_CODE_RANGE, KEY_MAX, MAX_DEVICE_NAME, REL_CNT, REL_CODE_RANGE,
 };
 
 #[cfg(test)]

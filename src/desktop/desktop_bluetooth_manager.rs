@@ -59,7 +59,12 @@ pub struct DesktopBluetoothDevice {
 }
 
 impl DesktopBluetoothDevice {
-    pub fn new(id: String, name: String, mac_address: String, device_type: DesktopBluetoothDeviceType) -> Self {
+    pub fn new(
+        id: String,
+        name: String,
+        mac_address: String,
+        device_type: DesktopBluetoothDeviceType,
+    ) -> Self {
         Self {
             id,
             name,
@@ -160,14 +165,20 @@ impl DesktopBluetoothManager {
         self.devices.values().collect()
     }
 
-    pub fn get_devices_by_type(&self, device_type: DesktopBluetoothDeviceType) -> Vec<&DesktopBluetoothDevice> {
+    pub fn get_devices_by_type(
+        &self,
+        device_type: DesktopBluetoothDeviceType,
+    ) -> Vec<&DesktopBluetoothDevice> {
         self.devices
             .values()
             .filter(|d| d.device_type == device_type)
             .collect()
     }
 
-    pub fn get_devices_by_status(&self, status: DesktopBluetoothDeviceStatus) -> Vec<&DesktopBluetoothDevice> {
+    pub fn get_devices_by_status(
+        &self,
+        status: DesktopBluetoothDeviceStatus,
+    ) -> Vec<&DesktopBluetoothDevice> {
         self.devices
             .values()
             .filter(|d| d.status == status)
@@ -267,8 +278,12 @@ impl DesktopBluetoothManager {
             total_devices: self.devices.len(),
             paired_devices: self.devices.values().filter(|d| d.paired).count(),
             connected_devices: self.devices.values().filter(|d| d.connected).count(),
-            audio_devices: self.get_devices_by_type(DesktopBluetoothDeviceType::Audio).len(),
-            input_devices: self.get_devices_by_type(DesktopBluetoothDeviceType::Input).len(),
+            audio_devices: self
+                .get_devices_by_type(DesktopBluetoothDeviceType::Audio)
+                .len(),
+            input_devices: self
+                .get_devices_by_type(DesktopBluetoothDeviceType::Input)
+                .len(),
             adapter_enabled: self.adapter_enabled,
             scanning: self.scanning,
         }
@@ -444,7 +459,8 @@ mod tests {
         let paired = manager.get_devices_by_status(DesktopBluetoothDeviceStatus::Paired);
         assert!(!paired.is_empty());
 
-        let disconnected = manager.get_devices_by_status(DesktopBluetoothDeviceStatus::Disconnected);
+        let disconnected =
+            manager.get_devices_by_status(DesktopBluetoothDeviceStatus::Disconnected);
         assert!(!disconnected.is_empty());
     }
 }

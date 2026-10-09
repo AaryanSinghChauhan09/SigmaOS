@@ -18,7 +18,9 @@ impl Priority {
     pub const Idle: Self = Self { value: 19 };
 
     pub fn new(value: i32) -> Self {
-        Self { value: value.max(-20).min(19) }
+        Self {
+            value: value.max(-20).min(19),
+        }
     }
 
     pub fn highest() -> Self {
@@ -53,7 +55,7 @@ impl Priority {
 /// Scheduler policy
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SchedulerPolicy {
-    Normal,  // CFS
+    Normal, // CFS
     Realtime,
     Idle,
     Batch,
@@ -84,11 +86,11 @@ pub struct ProcessTask {
     pub priority: Priority,
     pub policy: SchedulerPolicy,
     pub state: ProcessState,
-    pub vruntime: u64,     // Virtual runtime for CFS
-    pub exec_start: u64,   // Execution start time
+    pub vruntime: u64,      // Virtual runtime for CFS
+    pub exec_start: u64,    // Execution start time
     pub exec_duration: u64, // Total execution duration
-    pub cpu_time: u64,     // CPU time used
-    pub slice: u64,        // Time slice
+    pub cpu_time: u64,      // CPU time used
+    pub slice: u64,         // Time slice
 }
 
 impl ProcessTask {
@@ -272,7 +274,8 @@ impl RtScheduler {
     }
 
     pub fn pick_next_task(&mut self) -> Option<ProcessTask> {
-        self.runnable_tasks.sort_by(|a, b| a.priority.cmp(&b.priority));
+        self.runnable_tasks
+            .sort_by(|a, b| a.priority.cmp(&b.priority));
 
         if let Some(current) = self.current_task.take() {
             if current.state == ProcessState::Running {

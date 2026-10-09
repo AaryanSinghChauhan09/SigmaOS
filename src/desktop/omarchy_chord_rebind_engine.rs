@@ -79,7 +79,10 @@ impl OmarchyChordRebindEngine {
         self.register(ChordBinding {
             chord_id: "mouse-thumb-workspace".into(),
             description: "Mouse thumb workspace switch".into(),
-            trigger: ChordTrigger::MouseChord { button: 8, with_modifier: "ScrollUp".into() },
+            trigger: ChordTrigger::MouseChord {
+                button: 8,
+                with_modifier: "ScrollUp".into(),
+            },
             action: "workspace +1".into(),
             target_window_class: None,
             submap: None,

@@ -39,14 +39,14 @@ pub const TPM2_SIGNATURE: &[u8; 4] = b"TPM2";
 #[repr(C, packed)]
 #[derive(Debug, Clone, Copy, Default)]
 pub struct AcpiRsdpDescriptor {
-    pub signature: [u8; 8],  // "RSD PTR "
+    pub signature: [u8; 8], // "RSD PTR "
     pub checksum: u8,
     pub oem_id: [u8; 6],
-    pub revision: u8,        // 0 = ACPI 1.0, 2 = ACPI 2.0+
-    pub rsdt_addr: u32,      // Physical address of RSDT (ACPI 1.0)
+    pub revision: u8,   // 0 = ACPI 1.0, 2 = ACPI 2.0+
+    pub rsdt_addr: u32, // Physical address of RSDT (ACPI 1.0)
     // Extended fields (revision >= 2):
     pub length: u32,
-    pub xsdt_addr: u64,      // Physical address of XSDT (ACPI 2.0+)
+    pub xsdt_addr: u64, // Physical address of XSDT (ACPI 2.0+)
     pub extended_checksum: u8,
     pub reserved: [u8; 3],
 }
@@ -58,9 +58,8 @@ impl AcpiRsdpDescriptor {
             return false;
         }
         // Sum all bytes of the descriptor v1 section (20 bytes) must be 0
-        let bytes: &[u8] = unsafe {
-            core::slice::from_raw_parts(self as *const _ as *const u8, 20)
-        };
+        let bytes: &[u8] =
+            unsafe { core::slice::from_raw_parts(self as *const _ as *const u8, 20) };
         let sum: u8 = bytes.iter().fold(0u8, |acc, &b| acc.wrapping_add(b));
         sum == 0
     }
@@ -92,7 +91,9 @@ impl AcpiSdtHeader {
     }
 
     pub fn validate_checksum(&self, full_table_bytes: &[u8]) -> bool {
-        let sum: u8 = full_table_bytes.iter().fold(0u8, |acc, &b| acc.wrapping_add(b));
+        let sum: u8 = full_table_bytes
+            .iter()
+            .fold(0u8, |acc, &b| acc.wrapping_add(b));
         sum == 0
     }
 }
@@ -133,7 +134,7 @@ pub struct MadtLocalApicEntry {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct MadtIoApicEntry {
     pub io_apic_id: u8,
-    pub io_apic_addr: u32,   // Physical address
+    pub io_apic_addr: u32,    // Physical address
     pub global_irq_base: u32, // Global system interrupt base
 }
 
@@ -189,8 +190,10 @@ impl ParsedMadt {
                 0 if entry_len >= 8 => {
                     let apic_id = bytes[offset + 3];
                     let flags = u32::from_le_bytes([
-                        bytes[offset + 4], bytes[offset + 5],
-                        bytes[offset + 6], bytes[offset + 7],
+                        bytes[offset + 4],
+                        bytes[offset + 5],
+                        bytes[offset + 6],
+                        bytes[offset + 7],
                     ]);
                     let cpu_enabled = (flags & 1) != 0;
                     let entry = MadtLocalApicEntry {
@@ -207,12 +210,16 @@ impl ParsedMadt {
                     let entry = MadtIoApicEntry {
                         io_apic_id: bytes[offset + 2],
                         io_apic_addr: u32::from_le_bytes([
-                            bytes[offset + 4], bytes[offset + 5],
-                            bytes[offset + 6], bytes[offset + 7],
+                            bytes[offset + 4],
+                            bytes[offset + 5],
+                            bytes[offset + 6],
+                            bytes[offset + 7],
                         ]),
                         global_irq_base: u32::from_le_bytes([
-                            bytes[offset + 8], bytes[offset + 9],
-                            bytes[offset + 10], bytes[offset + 11],
+                            bytes[offset + 8],
+                            bytes[offset + 9],
+                            bytes[offset + 10],
+                            bytes[offset + 11],
                         ]),
                     };
                     madt.io_apics.push(entry);
@@ -222,8 +229,10 @@ impl ParsedMadt {
                         bus: bytes[offset + 2],
                         source_irq: bytes[offset + 3],
                         global_irq: u32::from_le_bytes([
-                            bytes[offset + 4], bytes[offset + 5],
-                            bytes[offset + 6], bytes[offset + 7],
+                            bytes[offset + 4],
+                            bytes[offset + 5],
+                            bytes[offset + 6],
+                            bytes[offset + 7],
                         ]),
                         flags: u16::from_le_bytes([bytes[offset + 8], bytes[offset + 9]]),
                     };
@@ -345,8 +354,7 @@ impl ParsedHpet {
         }
 
         let base_address = u64::from_le_bytes([
-            bytes[44], bytes[45], bytes[46], bytes[47],
-            bytes[48], bytes[49], bytes[50], bytes[51],
+            bytes[44], bytes[45], bytes[46], bytes[47], bytes[48], bytes[49], bytes[50], bytes[51],
         ]);
 
         Some(ParsedHpet {
@@ -397,11 +405,11 @@ impl Clone for SovereignAcpiSubsystem {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
 pub enum AcpiPowerState {
-    S0Running = 0,    // Normal operation
-    S1Standby = 1,    // CPU stopped, power on
-    S3Suspend = 3,    // RAM refresh, suspend-to-RAM
-    S4Hibernate = 4,  // Suspend-to-disk
-    S5SoftOff = 5,    // Mechanical off
+    S0Running = 0,   // Normal operation
+    S1Standby = 1,   // CPU stopped, power on
+    S3Suspend = 3,   // RAM refresh, suspend-to-RAM
+    S4Hibernate = 4, // Suspend-to-disk
+    S5SoftOff = 5,   // Mechanical off
 }
 
 impl Default for SovereignAcpiSubsystem {
@@ -427,9 +435,8 @@ impl SovereignAcpiSubsystem {
 
     /// Initialize from RSDP descriptor bytes
     pub fn init_from_rsdp(&mut self, rsdp_bytes: &[u8; 36]) -> bool {
-        let rsdp: AcpiRsdpDescriptor = unsafe {
-            core::ptr::read_unaligned(rsdp_bytes.as_ptr() as *const AcpiRsdpDescriptor)
-        };
+        let rsdp: AcpiRsdpDescriptor =
+            unsafe { core::ptr::read_unaligned(rsdp_bytes.as_ptr() as *const AcpiRsdpDescriptor) };
         if !rsdp.validate() {
             return false;
         }
@@ -460,7 +467,9 @@ impl SovereignAcpiSubsystem {
                     self.table_count += 1;
                 }
             }
-            _ => { self.table_count += 1; }
+            _ => {
+                self.table_count += 1;
+            }
         }
     }
 
@@ -493,7 +502,7 @@ mod tests {
 
     fn build_madt_bytes(apic_addr: u32, flags: u32) -> Vec<u8> {
         let mut bytes = vec![0u8; 44 + 8 + 12]; // header(44) + local_apic(8) + io_apic(12)
-        // Signature
+                                                // Signature
         bytes[0..4].copy_from_slice(b"APIC");
         let total_len = bytes.len() as u32;
         bytes[4..8].copy_from_slice(&total_len.to_le_bytes());
@@ -506,10 +515,10 @@ mod tests {
         bytes[46] = 0; // ACPI CPU ID
         bytes[47] = 0; // APIC ID
         bytes[48..52].copy_from_slice(&1u32.to_le_bytes()); // enabled flag
-        // I/O APIC entry (type=1, length=12)
-        bytes[52] = 1;  // type
+                                                            // I/O APIC entry (type=1, length=12)
+        bytes[52] = 1; // type
         bytes[53] = 12; // length
-        bytes[54] = 1;  // I/O APIC ID
+        bytes[54] = 1; // I/O APIC ID
         bytes[55] = 0;
         bytes[56..60].copy_from_slice(&0xFEC00000u32.to_le_bytes()); // I/O APIC addr
         bytes[60..64].copy_from_slice(&0u32.to_le_bytes()); // global IRQ base

@@ -61,11 +61,36 @@ impl OmarchyDiskTreeInspector {
 
     fn scan_defaults(&mut self) {
         let default_items = [
-            ("/usr/lib", "lib", 1024 * 1024 * 850, StorageNodeKind::Directory),
-            ("/var/cache/pacman/pkg", "pacman_cache", 1024 * 1024 * 420, StorageNodeKind::PackageCache),
-            ("/var/cache/apt/archives", "apt_cache", 1024 * 1024 * 310, StorageNodeKind::PackageCache),
-            ("/home/user/.cache", ".cache", 1024 * 1024 * 1500, StorageNodeKind::Directory),
-            ("/.snapshots/1", "snap_root_1", 1024 * 1024 * 3200, StorageNodeKind::Snapshot),
+            (
+                "/usr/lib",
+                "lib",
+                1024 * 1024 * 850,
+                StorageNodeKind::Directory,
+            ),
+            (
+                "/var/cache/pacman/pkg",
+                "pacman_cache",
+                1024 * 1024 * 420,
+                StorageNodeKind::PackageCache,
+            ),
+            (
+                "/var/cache/apt/archives",
+                "apt_cache",
+                1024 * 1024 * 310,
+                StorageNodeKind::PackageCache,
+            ),
+            (
+                "/home/user/.cache",
+                ".cache",
+                1024 * 1024 * 1500,
+                StorageNodeKind::Directory,
+            ),
+            (
+                "/.snapshots/1",
+                "snap_root_1",
+                1024 * 1024 * 3200,
+                StorageNodeKind::Snapshot,
+            ),
         ];
 
         for (path, name, size, kind) in default_items {
@@ -78,7 +103,11 @@ impl OmarchyDiskTreeInspector {
                 path: path.into(),
                 name: name.into(),
                 size_bytes: size,
-                shared_extent_bytes: if kind == StorageNodeKind::Snapshot { size / 2 } else { 0 },
+                shared_extent_bytes: if kind == StorageNodeKind::Snapshot {
+                    size / 2
+                } else {
+                    0
+                },
                 kind,
                 children_count: 12,
             });
@@ -101,7 +130,13 @@ impl OmarchyDiskTreeInspector {
             let bar_len = percentage as usize;
             let bar: String = (0..bar_len).map(|_| '#').collect();
             let padding: String = (0..(20 - bar_len)).map(|_| ' ').collect();
-            output.push(format!("{:<15} [{}{}] {:>6} MB", n.name, bar, padding, n.size_bytes / (1024 * 1024)));
+            output.push(format!(
+                "{:<15} [{}{}] {:>6} MB",
+                n.name,
+                bar,
+                padding,
+                n.size_bytes / (1024 * 1024)
+            ));
         }
         output
     }

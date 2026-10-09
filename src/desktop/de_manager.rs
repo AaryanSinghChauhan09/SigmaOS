@@ -6,15 +6,15 @@ use std::collections::HashMap;
 /// Desktop environment type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DesktopEnvironment {
-    Zenith,     // SigmaOS native Wayland compositor
-    GNOME,      // GNOME
-    KDE,        // KDE Plasma
-    XFCE,       // XFCE
-    MATE,       // MATE
-    Cinnamon,   // Cinnamon (Linux Mint)
-    LXQt,       // LXQt
-    Pantheon,   // Pantheon (elementary OS)
-    TTY,        // Text terminal
+    Zenith,   // SigmaOS native Wayland compositor
+    GNOME,    // GNOME
+    KDE,      // KDE Plasma
+    XFCE,     // XFCE
+    MATE,     // MATE
+    Cinnamon, // Cinnamon (Linux Mint)
+    LXQt,     // LXQt
+    Pantheon, // Pantheon (elementary OS)
+    TTY,      // Text terminal
 }
 
 impl DesktopEnvironment {
@@ -225,7 +225,10 @@ impl DEManager {
             .collect()
     }
 
-    pub fn get_configs_by_session_type(&self, session_type: DesktopDESessionType) -> Vec<&DEConfig> {
+    pub fn get_configs_by_session_type(
+        &self,
+        session_type: DesktopDESessionType,
+    ) -> Vec<&DEConfig> {
         self.configs
             .values()
             .filter(|c| c.session_type == session_type)
@@ -304,10 +307,7 @@ impl DEManager {
     }
 
     pub fn get_available_des(&self) -> Vec<&DEConfig> {
-        self.configs
-            .values()
-            .filter(|c| c.is_available)
-            .collect()
+        self.configs.values().filter(|c| c.is_available).collect()
     }
 
     pub fn get_statistics(&self) -> DEStatistics {
@@ -315,8 +315,12 @@ impl DEManager {
             total_configs: self.configs.len(),
             installed_count: self.installed_des.len(),
             available_count: self.get_available_des().len(),
-            wayland_count: self.get_configs_by_session_type(DesktopDESessionType::Wayland).len(),
-            x11_count: self.get_configs_by_session_type(DesktopDESessionType::X11).len(),
+            wayland_count: self
+                .get_configs_by_session_type(DesktopDESessionType::Wayland)
+                .len(),
+            x11_count: self
+                .get_configs_by_session_type(DesktopDESessionType::X11)
+                .len(),
         }
     }
 }
@@ -343,9 +347,18 @@ mod tests {
 
     #[test]
     fn test_de_from_str() {
-        assert_eq!(DesktopEnvironment::from_str("zenith"), Some(DesktopEnvironment::Zenith));
-        assert_eq!(DesktopEnvironment::from_str("gnome"), Some(DesktopEnvironment::GNOME));
-        assert_eq!(DesktopEnvironment::from_str("kde"), Some(DesktopEnvironment::KDE));
+        assert_eq!(
+            DesktopEnvironment::from_str("zenith"),
+            Some(DesktopEnvironment::Zenith)
+        );
+        assert_eq!(
+            DesktopEnvironment::from_str("gnome"),
+            Some(DesktopEnvironment::GNOME)
+        );
+        assert_eq!(
+            DesktopEnvironment::from_str("kde"),
+            Some(DesktopEnvironment::KDE)
+        );
         assert_eq!(DesktopEnvironment::from_str("invalid"), None);
     }
 
@@ -388,7 +401,10 @@ mod tests {
     fn test_set_default_de() {
         let mut manager = DEManager::new();
         assert!(manager.set_default_de("gnome-wayland"));
-        assert_eq!(manager.get_default_de().unwrap().de_type, DesktopEnvironment::GNOME);
+        assert_eq!(
+            manager.get_default_de().unwrap().de_type,
+            DesktopEnvironment::GNOME
+        );
     }
 
     #[test]

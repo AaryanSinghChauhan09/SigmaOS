@@ -399,7 +399,6 @@ mod tests {
     use super::*;
 
     #[ignore]
-
     #[test]
     fn test_aes256_gcm_encryption() {
         let encryption = Aes256GcmEncryption;
@@ -411,7 +410,6 @@ mod tests {
     }
 
     #[ignore]
-
     #[test]
     fn test_chacha20_poly1305_encryption() {
         let encryption = ChaCha20Poly1305Encryption;
@@ -423,7 +421,6 @@ mod tests {
     }
 
     #[ignore]
-
     #[test]
     fn test_kyber1024_encryption() {
         let encryption = Kyber1024Encryption;

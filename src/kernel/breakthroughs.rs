@@ -412,7 +412,6 @@ mod tests {
     }
 
     #[ignore]
-
     #[test]
     fn test_energy_aware_scheduler() {
         let eas = EnergyAwareScheduler::new(85);

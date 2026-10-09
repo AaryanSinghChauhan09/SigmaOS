@@ -31,8 +31,8 @@ use core::sync::atomic::{AtomicBool, AtomicU32, AtomicU64, Ordering};
 /// Display monitor output specification
 #[derive(Debug, Clone)]
 pub struct MonitorOutputSpec {
-    pub connector_id: String,  // e.g. "eDP-1", "DP-2", "HDMI-A-1"
-    pub edid_name: String,     // e.g. "LG UltraFine 4K"
+    pub connector_id: String, // e.g. "eDP-1", "DP-2", "HDMI-A-1"
+    pub edid_name: String,    // e.g. "LG UltraFine 4K"
     pub native_width_px: u32,
     pub native_height_px: u32,
     pub refresh_rate_millihz: u32, // e.g. 144000 = 144Hz, 240000 = 240Hz
@@ -78,7 +78,7 @@ impl SovereignMixedDpiFractionalScalingEngine {
             native_width_px: 2880,
             native_height_px: 1800,
             refresh_rate_millihz: 120000, // 120Hz
-            scale_factor_percent: 150,     // 1.5x fractional scale
+            scale_factor_percent: 150,    // 1.5x fractional scale
             vrr_adaptive_sync: true,
             is_primary: true,
         };
@@ -89,13 +89,15 @@ impl SovereignMixedDpiFractionalScalingEngine {
             native_width_px: 2560,
             native_height_px: 1440,
             refresh_rate_millihz: 360000, // 360Hz
-            scale_factor_percent: 100,     // 1.0x native
+            scale_factor_percent: 100,    // 1.0x native
             vrr_adaptive_sync: true,
             is_primary: false,
         };
 
-        self.monitors.insert(laptop_internal.connector_id.clone(), laptop_internal);
-        self.monitors.insert(external_gaming.connector_id.clone(), external_gaming);
+        self.monitors
+            .insert(laptop_internal.connector_id.clone(), laptop_internal);
+        self.monitors
+            .insert(external_gaming.connector_id.clone(), external_gaming);
     }
 
     /// Compute crisp, blur-free viewport destination bounds for a Wayland surface
@@ -106,7 +108,10 @@ impl SovereignMixedDpiFractionalScalingEngine {
         src_h: u32,
         connector_id: &str,
     ) -> Result<ViewportSurfaceAllocation, &'static str> {
-        let monitor = self.monitors.get(connector_id).ok_or("Output connector not found")?;
+        let monitor = self
+            .monitors
+            .get(connector_id)
+            .ok_or("Output connector not found")?;
 
         let scale = monitor.scale_factor_percent;
         let dest_w = (src_w * scale) / 100;
@@ -167,16 +172,34 @@ impl SovereignFastContentSearchEngine {
 
     fn index_stock_files(&mut self) {
         let files = [
-            ("/home/sigma/dev/kernel/src/main.rs", "text/rust", "fn main() { println!(\"SigmaOS Kernel Booted\"); }"),
-            ("/home/sigma/documents/manifesto.md", "text/markdown", "# The Sovereign Operating System Revolution"),
-            ("/home/sigma/config/theme.toml", "text/toml", "[colors]\nbackground = \"#1e1e2e\"\naccent = \"#89b4fa\""),
-            ("/etc/sigma/security.policy", "text/plain", "sandbox_mode = strict\npledge = stdio rpath wpath cpath"),
+            (
+                "/home/sigma/dev/kernel/src/main.rs",
+                "text/rust",
+                "fn main() { println!(\"SigmaOS Kernel Booted\"); }",
+            ),
+            (
+                "/home/sigma/documents/manifesto.md",
+                "text/markdown",
+                "# The Sovereign Operating System Revolution",
+            ),
+            (
+                "/home/sigma/config/theme.toml",
+                "text/toml",
+                "[colors]\nbackground = \"#1e1e2e\"\naccent = \"#89b4fa\"",
+            ),
+            (
+                "/etc/sigma/security.policy",
+                "text/plain",
+                "sandbox_mode = strict\npledge = stdio rpath wpath cpath",
+            ),
         ];
 
         for (path, mime, content) in files {
-            self.indexed_documents.push((path.to_string(), mime.to_string(), content.to_string()));
+            self.indexed_documents
+                .push((path.to_string(), mime.to_string(), content.to_string()));
         }
-        self.total_indexed_files.store(self.indexed_documents.len() as u32, Ordering::Relaxed);
+        self.total_indexed_files
+            .store(self.indexed_documents.len() as u32, Ordering::Relaxed);
     }
 
     /// Search across file contents and file paths with sub-5ms latency
@@ -231,10 +254,23 @@ impl SovereignFastContentSearchEngine {
 /// Real-time compositor events
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum CompositorIpcEvent {
-    WorkspaceSwitched { from_id: u32, to_id: u32 },
-    WindowFocused { window_id: u64, app_id: String, title: String },
-    FullscreenToggled { window_id: u64, is_fullscreen: bool },
-    MonitorHotplug { connector_id: String, connected: bool },
+    WorkspaceSwitched {
+        from_id: u32,
+        to_id: u32,
+    },
+    WindowFocused {
+        window_id: u64,
+        app_id: String,
+        title: String,
+    },
+    FullscreenToggled {
+        window_id: u64,
+        is_fullscreen: bool,
+    },
+    MonitorHotplug {
+        connector_id: String,
+        connected: bool,
+    },
 }
 
 /// Sovereign Event-Driven IPC Bus
@@ -274,17 +310,17 @@ impl SovereignEventDrivenIpcBus {
 /// Gamepad button mapping
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GamepadButton {
-    ButtonA,      // Left click / Select
-    ButtonB,      // Back / Cancel
-    ButtonX,      // Context Menu / Right click
-    ButtonY,      // Virtual Keyboard Toggle
+    ButtonA, // Left click / Select
+    ButtonB, // Back / Cancel
+    ButtonX, // Context Menu / Right click
+    ButtonY, // Virtual Keyboard Toggle
     DpadUp,
     DpadDown,
     DpadLeft,
     DpadRight,
-    LeftBumper,   // Previous Workspace
-    RightBumper,  // Next Workspace
-    GuideHome,    // Open Radial App Launcher
+    LeftBumper,  // Previous Workspace
+    RightBumper, // Next Workspace
+    GuideHome,   // Open Radial App Launcher
 }
 
 /// Gamepad navigation action outcome
@@ -324,13 +360,17 @@ impl SovereignGamepadDesktopNavigator {
         }
 
         // Apply non-linear curve for precision aiming
-        let normalized_mag = (magnitude - self.deadzone_threshold) / (1.0 - self.deadzone_threshold);
+        let normalized_mag =
+            (magnitude - self.deadzone_threshold) / (1.0 - self.deadzone_threshold);
         let curved = normalized_mag * normalized_mag;
 
         let norm_x = (stick_x / magnitude) * curved * self.analog_sensitivity;
         let norm_y = (stick_y / magnitude) * curved * self.analog_sensitivity;
 
-        Some(NavigationAction::CursorMove { delta_x: norm_x, delta_y: norm_y })
+        Some(NavigationAction::CursorMove {
+            delta_x: norm_x,
+            delta_y: norm_y,
+        })
     }
 
     /// Process controller button inputs into direct shell actions
@@ -341,7 +381,8 @@ impl SovereignGamepadDesktopNavigator {
             GamepadButton::ButtonX => NavigationAction::SecondaryClick,
             GamepadButton::ButtonY => {
                 let current = self.virtual_keyboard_visible.load(Ordering::Relaxed);
-                self.virtual_keyboard_visible.store(!current, Ordering::Relaxed);
+                self.virtual_keyboard_visible
+                    .store(!current, Ordering::Relaxed);
                 NavigationAction::ToggleVirtualKeyboard
             }
             GamepadButton::RightBumper => NavigationAction::NextWorkspace,
@@ -371,7 +412,9 @@ mod tests {
         assert_eq!(engine.outputs().len(), 2);
 
         // eDP-1 is 1.5x scale (150%)
-        let viewport = engine.compute_surface_viewport(101, 800, 600, "eDP-1").unwrap();
+        let viewport = engine
+            .compute_surface_viewport(101, 800, 600, "eDP-1")
+            .unwrap();
         assert_eq!(viewport.destination_width, 1200);
         assert_eq!(viewport.destination_height, 900);
         assert_eq!(viewport.target_scale_percent, 150);
@@ -392,7 +435,10 @@ mod tests {
     #[test]
     fn test_event_driven_ipc_bus() {
         let mut bus = SovereignEventDrivenIpcBus::new();
-        bus.publish_event(CompositorIpcEvent::WorkspaceSwitched { from_id: 1, to_id: 2 });
+        bus.publish_event(CompositorIpcEvent::WorkspaceSwitched {
+            from_id: 1,
+            to_id: 2,
+        });
         assert_eq!(bus.total_dispatched(), 1);
 
         if let Some(CompositorIpcEvent::WorkspaceSwitched { from_id, to_id }) = bus.last_event() {

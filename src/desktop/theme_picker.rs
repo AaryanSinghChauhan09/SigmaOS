@@ -199,7 +199,9 @@ impl ThemePickerManager {
 
     /// Get current theme
     pub fn get_current_theme(&self) -> Option<&Theme> {
-        self.current_theme.as_ref().and_then(|id| self.themes.get(id))
+        self.current_theme
+            .as_ref()
+            .and_then(|id| self.themes.get(id))
     }
 
     /// Get history
@@ -226,9 +228,7 @@ impl ThemePickerManager {
 
     /// Get theme by name
     pub fn get_theme_by_name(&self, name: &str) -> Option<&Theme> {
-        self.themes
-            .values()
-            .find(|t| t.name == name)
+        self.themes.values().find(|t| t.name == name)
     }
 
     /// Get themes by author
@@ -271,10 +271,14 @@ impl ThemePickerManager {
             variant: "custom".to_string(),
             colors,
             wallpaper: None,
-            supports_terminal: targets.contains(&ThemeTarget::Terminal) || targets.contains(&ThemeTarget::All),
-            supports_editor: targets.contains(&ThemeTarget::Editor) || targets.contains(&ThemeTarget::All),
-            supports_browser: targets.contains(&ThemeTarget::Browser) || targets.contains(&ThemeTarget::All),
-            supports_bar: targets.contains(&ThemeTarget::Bar) || targets.contains(&ThemeTarget::All),
+            supports_terminal: targets.contains(&ThemeTarget::Terminal)
+                || targets.contains(&ThemeTarget::All),
+            supports_editor: targets.contains(&ThemeTarget::Editor)
+                || targets.contains(&ThemeTarget::All),
+            supports_browser: targets.contains(&ThemeTarget::Browser)
+                || targets.contains(&ThemeTarget::All),
+            supports_bar: targets.contains(&ThemeTarget::Bar)
+                || targets.contains(&ThemeTarget::All),
         };
 
         self.add_theme(theme)?;
@@ -286,7 +290,12 @@ impl ThemePickerManager {
         if let Some(theme) = self.themes.get(id) {
             Ok(format!(
                 "Name: {}\nVariant: {}\nAuthor: {}\nBackground: {}\nForeground: {}\nPrimary: {}",
-                theme.name, theme.variant, theme.author, theme.colors.background, theme.colors.foreground, theme.colors.primary
+                theme.name,
+                theme.variant,
+                theme.author,
+                theme.colors.background,
+                theme.colors.foreground,
+                theme.colors.primary
             ))
         } else {
             Err(format!("Theme {} not found", id))
@@ -296,11 +305,17 @@ impl ThemePickerManager {
     /// Get theme statistics
     pub fn get_statistics(&self) -> (usize, usize, usize) {
         let total = self.themes.len();
-        let with_wallpaper = self.themes.values().filter(|t| t.wallpaper.is_some()).count();
+        let with_wallpaper = self
+            .themes
+            .values()
+            .filter(|t| t.wallpaper.is_some())
+            .count();
         let full_support = self
             .themes
             .values()
-            .filter(|t| t.supports_terminal && t.supports_editor && t.supports_browser && t.supports_bar)
+            .filter(|t| {
+                t.supports_terminal && t.supports_editor && t.supports_browser && t.supports_bar
+            })
             .count();
         (total, with_wallpaper, full_support)
     }
