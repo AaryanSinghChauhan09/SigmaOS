@@ -584,6 +584,13 @@ if [ -f "src/distro/sovereign_open_source_os_gap_closure_pr.rs" ]; then
     ./build/test_os_gap_closure_pr
 fi
 
+if [ -f "src/distro/open_source_os_arch_unimplemented_parity_engine.rs" ]; then
+    echo "Running Open Source OS & Arch Linux Parity Engine test suite..."
+    mkdir -p build
+    rustc --test src/distro/open_source_os_arch_unimplemented_parity_engine.rs --edition=2021 -o build/test_open_source_os_arch_parity
+    ./build/test_open_source_os_arch_parity
+fi
+
 if [ -f "src/compatibility/omarchy_supreme_engine.rs" ]; then
     echo "Running Sovereign Omarchy Supreme Engine test suite..."
     mkdir -p build

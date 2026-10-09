@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 // SigmaOS Wiki & Distro Innovations Subsystem
 // Incorporates declarative system configurations (NixOS pattern),
 // Arch-style plaintext recipe sandbox compilation (Arch pattern),

@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 // SPDX-License-Identifier: MIT
 // SigmaOS GitHub Wiki Unimplemented Ideas Parity Subsystem
 // Zero-dependency, zero-allocation-ready, safe Rust implementations of Phase 2-8 Wiki Roadmap Tasks
