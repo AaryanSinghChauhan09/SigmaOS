@@ -85,6 +85,19 @@ pub enum PullRequestPackageFormat {
     ArchAuditVulnerability,
     ArchNamcapLinterReport,
     ArchMakepkgConfProfile,
+    ArchReflectorMirrorlist,
+    ArchDracutInitramfs,
+    ArchSystemdBootConfig,
+    ArchPacmanDatabaseDb,
+    ArchJournalctlBinaryLog,
+    ArchPamUnixSecuritySpec,
+    ArchLvmVolumeGroupSpec,
+    ArchPacmanBinaryTarXz,
+    ArchDpllSatDependencyConstraint,
+    ArchInitServiceUnitSpec,
+    ArchPamAuthModuleSpec,
+    ArchNetworkManagerProfile,
+    ArchSeccompFilterProfile,
     OpenSuseZypperSpec,
     SolusMossSpec,
     HaikuPackagefsSpec,
@@ -125,6 +138,19 @@ impl PullRequestPackageFormat {
             Self::ArchAuditVulnerability => "Arch Linux arch-audit Security Vulnerability Record",
             Self::ArchNamcapLinterReport => "Arch Linux namcap Package Auditor Linter Report",
             Self::ArchMakepkgConfProfile => "Arch Linux makepkg.conf Compiler Optimization Specs",
+            Self::ArchReflectorMirrorlist => "Arch Linux Reflector Mirrorlist Generator Config",
+            Self::ArchDracutInitramfs => "Arch Linux Dracut Initramfs Image Specification",
+            Self::ArchSystemdBootConfig => "Arch Linux systemd-boot Bootloader Configuration",
+            Self::ArchPacmanDatabaseDb => "Arch Linux pacman Repository Database (.db)",
+            Self::ArchJournalctlBinaryLog => "Arch Linux journalctl System Binary Log Schema",
+            Self::ArchPamUnixSecuritySpec => "Arch Linux PAM Security Policy & Limits Spec",
+            Self::ArchLvmVolumeGroupSpec => "Arch Linux LVM2 Logical Volume Group Layout",
+            Self::ArchPacmanBinaryTarXz => "Arch Linux pacman Binary Package (.pkg.tar.zst)",
+            Self::ArchDpllSatDependencyConstraint => "Arch Linux DPLL SAT Package Dependency Constraint",
+            Self::ArchInitServiceUnitSpec => "Arch Linux systemd Unit Service File Spec",
+            Self::ArchPamAuthModuleSpec => "Arch Linux PAM Authentication Module Spec",
+            Self::ArchNetworkManagerProfile => "Arch Linux NetworkManager Connection Profile",
+            Self::ArchSeccompFilterProfile => "Arch Linux Seccomp System Call Filter Profile",
             Self::AlpineApk => "Alpine Linux .apk Package",
             Self::GentooEbuild => "Gentoo Portage .ebuild Script",
             Self::VoidXbps => "Void Linux XBPS Template",
@@ -468,6 +494,70 @@ impl ArchLinuxComponentPullRequestGatewayEngine {
     }
 }
 
+/// Sovereign Arch Linux System Parity Pull Request Engine
+/// Manages end-to-end pull request workflows for missing Arch Linux system components
+#[derive(Debug, Clone)]
+pub struct ArchLinuxSystemParityPullRequestEngine {
+    pub gateway: ArchLinuxComponentPullRequestGatewayEngine,
+    pub verified_pr_log: Vec<u64>,
+}
+
+impl Default for ArchLinuxSystemParityPullRequestEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl ArchLinuxSystemParityPullRequestEngine {
+    pub fn new() -> Self {
+        Self {
+            gateway: ArchLinuxComponentPullRequestGatewayEngine::new(),
+            verified_pr_log: Vec::new(),
+        }
+    }
+
+    /// Submits a missing Arch Linux system component PR with automated gating
+    pub fn submit_arch_parity_pr(
+        &mut self,
+        author: &str,
+        component_name: &str,
+        version: &str,
+        format: PullRequestPackageFormat,
+        spec_content: &str,
+        deps: &[&str],
+        pqc_signature: &[u8],
+    ) -> u64 {
+        self.gateway.submit_arch_component_pr(
+            author,
+            component_name,
+            version,
+            format,
+            spec_content,
+            deps,
+            pqc_signature,
+        )
+    }
+
+    /// Runs full automated CI gating pipeline (SAT validation + PQC signature) for an Arch parity PR
+    pub fn run_automated_ci_pr_gate(&mut self, pr_id: u64) -> Result<bool, &'static str> {
+        let valid = self.gateway.validate_arch_component(pr_id)?;
+        if valid {
+            self.verified_pr_log.push(pr_id);
+        }
+        Ok(valid)
+    }
+
+    /// Generates unified diff for Arch parity PR
+    pub fn generate_unified_diff(&self, pr_id: u64, base_spec: &str) -> Result<String, &'static str> {
+        self.gateway.generate_arch_component_diff(pr_id, base_spec)
+    }
+
+    /// Merges Arch parity PR into active system component registry
+    pub fn merge_arch_parity_pr(&mut self, pr_id: u64) -> Result<ConsolidatedSovereignPackage, &'static str> {
+        self.gateway.merge_arch_component(pr_id)
+    }
+}
+
 #[cfg(test)]
 #[cfg(test)]
 mod tests {
@@ -670,5 +760,130 @@ mod tests {
         }
 
         assert_eq!(arch_gateway.arch_component_registry.len(), 10);
+    }
+
+    #[test]
+    fn test_arch_linux_system_parity_pull_request_engine() {
+        let mut engine = ArchLinuxSystemParityPullRequestEngine::new();
+
+        let parity_components = [
+            (
+                "reflector-mirrorlist-gen",
+                "2026.1",
+                PullRequestPackageFormat::ArchReflectorMirrorlist,
+                "--country US,DE --latest 20 --protocol https --sort rate --save /etc/pacman.d/mirrorlist",
+                &["reflector", "python"][..],
+            ),
+            (
+                "dracut-initramfs-spec",
+                "059.1",
+                PullRequestPackageFormat::ArchDracutInitramfs,
+                "add_dracutmodules+=\" lvm resume systemd systemd-initrd \"",
+                &["dracut", "systemd"][..],
+            ),
+            (
+                "systemd-boot-loader-conf",
+                "256.2",
+                PullRequestPackageFormat::ArchSystemdBootConfig,
+                "default arch.conf\ntimeout 3\nconsole-mode max",
+                &["systemd", "efibootmgr"][..],
+            ),
+            (
+                "pacman-sync-db-schema",
+                "6.1.0",
+                PullRequestPackageFormat::ArchPacmanDatabaseDb,
+                "%NAME%\nlinux-zen\n%VERSION%\n6.9.1.zen1-1",
+                &["pacman", "libarchive"][..],
+            ),
+            (
+                "journalctl-binary-log-schema",
+                "256.2",
+                PullRequestPackageFormat::ArchJournalctlBinaryLog,
+                "HEADER_MAGIC=LPKSHHRH\nSTORAGE=persistent",
+                &["systemd"][..],
+            ),
+            (
+                "pam-security-limits-spec",
+                "1.6.1",
+                PullRequestPackageFormat::ArchPamUnixSecuritySpec,
+                "* hard nofile 524288\n* soft nofile 1048576",
+                &["pam"][..],
+            ),
+            (
+                "lvm2-volume-group-spec",
+                "2.03.24",
+                PullRequestPackageFormat::ArchLvmVolumeGroupSpec,
+                "vg_arch { id = \"sigma-arch-vg0\" flags = [\"READ\", \"WRITE\"] }",
+                &["lvm2"][..],
+            ),
+            (
+                "pacman-pkg-tar-zst",
+                "6.1.0",
+                PullRequestPackageFormat::ArchPacmanBinaryTarXz,
+                "pkgname = hyprland\npkgver = 0.40.0-1\narch = x86_64",
+                &["pacman", "zstd"][..],
+            ),
+            (
+                "dpll-sat-dependency-constraint",
+                "1.0.0",
+                PullRequestPackageFormat::ArchDpllSatDependencyConstraint,
+                "CLAUSE: (linux-zen >= 6.9) AND NOT (nvidia-390xx-dkms)",
+                &["pacman"][..],
+            ),
+            (
+                "systemd-init-service-unit",
+                "256.2",
+                PullRequestPackageFormat::ArchInitServiceUnitSpec,
+                "[Unit]\nDescription=SigmaOS Arch Parity Daemon\n[Service]\nExecStart=/usr/bin/sigma-arch-daemon",
+                &["systemd"][..],
+            ),
+            (
+                "pam-auth-module-spec",
+                "1.6.1",
+                PullRequestPackageFormat::ArchPamAuthModuleSpec,
+                "auth required pam_unix.so try_first_pass nullok",
+                &["pam"][..],
+            ),
+            (
+                "network-manager-connection-profile",
+                "1.48.0",
+                PullRequestPackageFormat::ArchNetworkManagerProfile,
+                "[connection]\nid=ArchEthernet\ntype=ethernet\n[ipv4]\nmethod=auto",
+                &["networkmanager"][..],
+            ),
+            (
+                "seccomp-syscall-filter-profile",
+                "2.5.5",
+                PullRequestPackageFormat::ArchSeccompFilterProfile,
+                "DEFAULT_ACTION ALLOW\nVALIDATE_SYSCALL execve DENY",
+                &["libseccomp"][..],
+            ),
+        ];
+
+        for (name, ver, fmt, spec, deps) in parity_components {
+            assert!(!fmt.name().is_empty());
+            let pr_id = engine.submit_arch_parity_pr(
+                "arch_core_team",
+                name,
+                ver,
+                fmt,
+                spec,
+                deps,
+                b"pqc_signature_dilithium5_arch_parity",
+            );
+
+            let passed_ci = engine.run_automated_ci_pr_gate(pr_id).unwrap();
+            assert!(passed_ci);
+
+            let diff = engine.generate_unified_diff(pr_id, "base_spec").unwrap();
+            assert!(diff.contains(&format!("+++ b/{}", name)));
+
+            let merged = engine.merge_arch_parity_pr(pr_id).unwrap();
+            assert_eq!(merged.name, name);
+            assert_eq!(merged.source_format, fmt);
+        }
+
+        assert_eq!(engine.verified_pr_log.len(), 13);
+        assert_eq!(engine.gateway.arch_component_registry.len(), 13);
     }
 }
