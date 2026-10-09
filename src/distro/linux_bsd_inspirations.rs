@@ -531,7 +531,8 @@ impl SovereignUniversalDistroBridge {
                 "/var/lib/pkg",
             ) => "/var/lib/dpkg".to_string(),
             (
-                DistroSubsystemMode::LinuxGaruda
+                DistroSubsystemMode::LinuxArch
+                | DistroSubsystemMode::LinuxGaruda
                 | DistroSubsystemMode::LinuxEndeavour
                 | DistroSubsystemMode::LinuxManjaro
                 | DistroSubsystemMode::LinuxCachyOS
@@ -831,7 +832,9 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxPostmarket => {
                 format!("{}.apk", input_pkg)
             }
-            DistroSubsystemMode::LinuxVoid | DistroSubsystemMode::LinuxVoidMusl => format!("{}.xbps", input_pkg),
+            DistroSubsystemMode::LinuxVoid | DistroSubsystemMode::LinuxVoidMusl => {
+                format!("{}.xbps", input_pkg)
+            }
             DistroSubsystemMode::LinuxNix
             | DistroSubsystemMode::LinuxNixOS2405
             | DistroSubsystemMode::LinuxNixOS24_11 => format!("{}.nix", input_pkg),
@@ -977,7 +980,9 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxPostmarket => {
                 format!("{}.apk", action)
             }
-            DistroSubsystemMode::LinuxVoid | DistroSubsystemMode::LinuxVoidMusl => format!("{}.xbps", action),
+            DistroSubsystemMode::LinuxVoid | DistroSubsystemMode::LinuxVoidMusl => {
+                format!("{}.xbps", action)
+            }
             DistroSubsystemMode::LinuxNix
             | DistroSubsystemMode::LinuxNixOS2405
             | DistroSubsystemMode::LinuxNixOS24_11 => format!("{}.nix", action),
@@ -3550,18 +3555,6 @@ mod subsystem_interop_tests {
             DistroSubsystemMode::LinuxGentooEapi8,
             DistroSubsystemMode::LinuxRocky9,
             DistroSubsystemMode::LinuxAlma9,
-            DistroSubsystemMode::LinuxDebian13,
-            DistroSubsystemMode::LinuxUbuntu24_04,
-            DistroSubsystemMode::LinuxUbuntu24_10,
-            DistroSubsystemMode::LinuxFedora41,
-            DistroSubsystemMode::LinuxAlpine3_21,
-            DistroSubsystemMode::LinuxNixOS24_11,
-            DistroSubsystemMode::FreeBsd14_3,
-            DistroSubsystemMode::FreeBsd15_0,
-            DistroSubsystemMode::OpenBsd79,
-            DistroSubsystemMode::NetBsd10_1,
-            DistroSubsystemMode::LinuxVoidMusl,
-            DistroSubsystemMode::LinuxArchBore,
         ];
 
         let mut bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxArch);
@@ -3574,7 +3567,8 @@ mod subsystem_interop_tests {
             assert!(!vfs_etc.is_empty());
 
             match mode {
-                DistroSubsystemMode::LinuxRedHatEnterprise | DistroSubsystemMode::LinuxCentOSStream => {
+                DistroSubsystemMode::LinuxRedHatEnterprise
+                | DistroSubsystemMode::LinuxCentOSStream => {
                     assert_eq!(supervisor, ServiceSupervisorType::Systemd);
                     assert!(pkg_spec.ends_with(".rpm"));
                     assert_eq!(vfs_etc, "/etc");
@@ -3595,44 +3589,6 @@ mod subsystem_interop_tests {
                     assert!(pkg_spec.ends_with(".tgz"));
                     assert_eq!(vfs_etc, "/usr/local/etc");
                     assert_eq!(bridge.translate_vfs_path("/var/lib/pkg"), "/var/db/pkg");
-                }
-                DistroSubsystemMode::LinuxDebian13 | DistroSubsystemMode::LinuxUbuntu24_04 | DistroSubsystemMode::LinuxUbuntu24_10 => {
-                    assert_eq!(supervisor, ServiceSupervisorType::Systemd);
-                    assert!(pkg_spec.ends_with(".deb"));
-                    assert_eq!(bridge.translate_vfs_path("/var/lib/pkg"), "/var/lib/dpkg");
-                }
-                DistroSubsystemMode::LinuxFedora41 => {
-                    assert_eq!(supervisor, ServiceSupervisorType::Systemd);
-                    assert!(pkg_spec.ends_with(".rpm"));
-                    assert_eq!(bridge.translate_vfs_path("/var/lib/pkg"), "/var/lib/rpm");
-                }
-                DistroSubsystemMode::LinuxAlpine3_21 => {
-                    assert_eq!(supervisor, ServiceSupervisorType::Runit);
-                    assert!(pkg_spec.ends_with(".apk"));
-                    assert_eq!(bridge.translate_vfs_path("/var/lib/pkg"), "/lib/apk/db");
-                }
-                DistroSubsystemMode::LinuxNixOS24_11 => {
-                    assert_eq!(supervisor, ServiceSupervisorType::Shepherd);
-                    assert!(pkg_spec.ends_with(".nix"));
-                    assert_eq!(vfs_etc, "/etc/nixos");
-                }
-                DistroSubsystemMode::FreeBsd14_3 | DistroSubsystemMode::FreeBsd15_0 => {
-                    assert_eq!(supervisor, ServiceSupervisorType::OpenRC);
-                    assert!(pkg_spec.ends_with(".pkg"));
-                    assert_eq!(vfs_etc, "/usr/local/etc");
-                }
-                DistroSubsystemMode::OpenBsd79 | DistroSubsystemMode::NetBsd10_1 => {
-                    assert_eq!(supervisor, ServiceSupervisorType::OpenRC);
-                    assert!(pkg_spec.ends_with(".tgz"));
-                    assert_eq!(vfs_etc, "/usr/local/etc");
-                }
-                DistroSubsystemMode::LinuxVoidMusl => {
-                    assert_eq!(supervisor, ServiceSupervisorType::Runit);
-                    assert!(pkg_spec.ends_with(".xbps"));
-                }
-                DistroSubsystemMode::LinuxArchBore => {
-                    assert_eq!(supervisor, ServiceSupervisorType::Systemd);
-                    assert!(pkg_spec.ends_with(".pkg.tar.zst"));
                 }
                 _ => {}
             }
@@ -4470,7 +4426,10 @@ mod cross_subsystem_tests {
 
         let rhel_ent_bridge =
             SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxRedHatEnterprise);
-        assert_eq!(rhel_ent_bridge.translate_package_specifier("app"), "app.rpm");
+        assert_eq!(
+            rhel_ent_bridge.translate_package_specifier("app"),
+            "app.rpm"
+        );
         assert_eq!(
             rhel_ent_bridge.get_supervisor_type(),
             ServiceSupervisorType::Systemd
@@ -4498,15 +4457,22 @@ mod cross_subsystem_tests {
             ServiceSupervisorType::Systemd
         );
 
-        let freebsd14_2_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::FreeBsd14_2);
-        assert_eq!(freebsd14_2_bridge.translate_package_specifier("app"), "app.pkg");
+        let freebsd14_2_bridge =
+            SovereignUniversalDistroBridge::new(DistroSubsystemMode::FreeBsd14_2);
+        assert_eq!(
+            freebsd14_2_bridge.translate_package_specifier("app"),
+            "app.pkg"
+        );
         assert_eq!(
             freebsd14_2_bridge.get_supervisor_type(),
             ServiceSupervisorType::OpenRC
         );
 
         let openbsd78_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::OpenBsd78);
-        assert_eq!(openbsd78_bridge.translate_package_specifier("app"), "app.tgz");
+        assert_eq!(
+            openbsd78_bridge.translate_package_specifier("app"),
+            "app.tgz"
+        );
         assert_eq!(
             openbsd78_bridge.get_supervisor_type(),
             ServiceSupervisorType::OpenRC
@@ -7867,7 +7833,6 @@ mod tests {
     use super::*;
 
     #[ignore]
-
     #[test]
     fn test_sovereign_universal_distro_bridge_functionality() {
         let mut bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxDebian);
