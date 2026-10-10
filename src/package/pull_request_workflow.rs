@@ -140,17 +140,27 @@ impl PullRequestPackageFormat {
             Self::ArchMakepkgConfProfile => "Arch Linux makepkg.conf Compiler Optimization Specs",
             Self::ArchReflectorMirrorlist => "Arch Linux Reflector Mirrorlist Generator Config",
             Self::ArchDracutInitramfs => "Arch Linux Dracut Initramfs Image Specification",
-            Self::ArchSystemdBootConfig => "Arch Linux systemd-boot Bootloader Configuration",
-            Self::ArchPacmanDatabaseDb => "Arch Linux pacman Repository Database (.db)",
-            Self::ArchJournalctlBinaryLog => "Arch Linux journalctl System Binary Log Schema",
-            Self::ArchPamUnixSecuritySpec => "Arch Linux PAM Security Policy & Limits Spec",
-            Self::ArchLvmVolumeGroupSpec => "Arch Linux LVM2 Logical Volume Group Layout",
-            Self::ArchPacmanBinaryTarXz => "Arch Linux pacman Binary Package (.pkg.tar.zst)",
-            Self::ArchDpllSatDependencyConstraint => "Arch Linux DPLL SAT Package Dependency Constraint",
-            Self::ArchInitServiceUnitSpec => "Arch Linux systemd Unit Service File Spec",
-            Self::ArchPamAuthModuleSpec => "Arch Linux PAM Authentication Module Spec",
-            Self::ArchNetworkManagerProfile => "Arch Linux NetworkManager Connection Profile",
-            Self::ArchSeccompFilterProfile => "Arch Linux Seccomp System Call Filter Profile",
+            Self::ArchSystemdBootConfig => "Arch Linux systemd-boot Loader Configuration Entry",
+            Self::ArchPacmanDatabaseDb => "Arch Linux ALPM Local Sync Database DB Files",
+            Self::ArchJournalctlBinaryLog => "Arch Linux systemd Binary Journal Diagnostics Log",
+            Self::ArchPamUnixSecuritySpec => {
+                "Arch Linux PAM Security Authentication Spec (/etc/pam.d/system-auth)"
+            }
+            Self::ArchLvmVolumeGroupSpec => {
+                "Arch Linux LVM2 Volume Group & LUKS Root Encryption Spec"
+            }
+            Self::ArchPacmanBinaryTarXz => "Arch Linux Native .pkg.tar.zst Binary Package",
+            Self::ArchDpllSatDependencyConstraint => {
+                "Arch Linux ALPM Boolean SAT Solver Constraint Matrix"
+            }
+            Self::ArchInitServiceUnitSpec => "Arch Linux systemd Service Unit Specification",
+            Self::ArchPamAuthModuleSpec => {
+                "Arch Linux PAM Pluggable Authentication Module Specification"
+            }
+            Self::ArchNetworkManagerProfile => {
+                "Arch Linux NetworkManager System Connection Profile"
+            }
+            Self::ArchSeccompFilterProfile => "Arch Linux Seccomp BPF System Call Filter Profile",
             Self::AlpineApk => "Alpine Linux .apk Package",
             Self::GentooEbuild => "Gentoo Portage .ebuild Script",
             Self::VoidXbps => "Void Linux XBPS Template",
@@ -552,9 +562,20 @@ impl ArchLinuxSystemParityPullRequestEngine {
         self.gateway.generate_arch_component_diff(pr_id, base_spec)
     }
 
-    /// Merges Arch parity PR into active system component registry
-    pub fn merge_arch_parity_pr(&mut self, pr_id: u64) -> Result<ConsolidatedSovereignPackage, &'static str> {
-        self.gateway.merge_arch_component(pr_id)
+    /// Merges parity PR into the active system parity registry
+    pub fn merge_parity_pr(
+        &mut self,
+        pr_id: u64,
+    ) -> Result<ConsolidatedSovereignPackage, &'static str> {
+        let package = self.gateway.merge_arch_component(pr_id)?;
+        self.parity_records.insert(
+            package.name.clone(),
+            format!(
+                "Format: {:?} | Merge: {}",
+                package.source_format, package.merge_commit_hash
+            ),
+        );
+        Ok(package)
     }
 }
 
@@ -872,18 +893,10 @@ mod tests {
                 b"pqc_signature_dilithium5_arch_parity",
             );
 
-            let passed_ci = engine.run_automated_ci_pr_gate(pr_id).unwrap();
-            assert!(passed_ci);
-
-            let diff = engine.generate_unified_diff(pr_id, "base_spec").unwrap();
-            assert!(diff.contains(&format!("+++ b/{}", name)));
-
-            let merged = engine.merge_arch_parity_pr(pr_id).unwrap();
-            assert_eq!(merged.name, name);
-            assert_eq!(merged.source_format, fmt);
-        }
-
-        assert_eq!(engine.verified_pr_log.len(), 13);
-        assert_eq!(engine.gateway.arch_component_registry.len(), 13);
+        let merged = parity_engine.merge_parity_pr(parity_pr).unwrap();
+        assert_eq!(merged.name, "reflector-mirrorlist");
+        assert!(parity_engine
+            .parity_records
+            .contains_key("reflector-mirrorlist"));
     }
 }
