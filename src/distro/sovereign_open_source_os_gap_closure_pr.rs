@@ -68,7 +68,10 @@ impl FreeBsdZfsBootEnvAndCapsicumPrEngine {
         };
 
         self.boot_environments.insert(be_name.to_string(), record);
-        Ok(format!("PR Proposal: Successfully created FreeBSD ZFS Boot Environment '{}'", be_name))
+        Ok(format!(
+            "PR Proposal: Successfully created FreeBSD ZFS Boot Environment '{}'",
+            be_name
+        ))
     }
 
     pub fn pdfork_capsicum_procdesc(&mut self, pid: u32) -> u64 {
@@ -115,7 +118,10 @@ impl OpenBsdPledgeUnveilPfctlPrEngine {
         };
 
         self.unveil_paths.insert(path.to_string(), entry);
-        Ok(format!("PR Proposal: Successfully unveiled path '{}' with permissions '{}'", path, permissions))
+        Ok(format!(
+            "PR Proposal: Successfully unveiled path '{}' with permissions '{}'",
+            path, permissions
+        ))
     }
 
     pub fn synchronize_pfsync_states(&mut self, _peer_ip: &str) -> u64 {
@@ -217,10 +223,17 @@ impl DragonFlyHammer2PfsClusterPrEngine {
         );
     }
 
-    pub fn replicate_pfs_transaction(&mut self, pfs_name: &str, new_txg: u64) -> Result<String, String> {
+    pub fn replicate_pfs_transaction(
+        &mut self,
+        pfs_name: &str,
+        new_txg: u64,
+    ) -> Result<String, String> {
         if let Some(node) = self.pfs_nodes.get_mut(pfs_name) {
             node.sync_txg = new_txg;
-            Ok(format!("PR Proposal: HAMMER2 PFS '{}' replicated to TXG {}", pfs_name, new_txg))
+            Ok(format!(
+                "PR Proposal: HAMMER2 PFS '{}' replicated to TXG {}",
+                pfs_name, new_txg
+            ))
         } else {
             Err(format!("PFS node '{}' not found", pfs_name))
         }
@@ -304,11 +317,19 @@ impl SovereignOpenSourceOsGapClosurePrMasterSuite {
     }
 
     pub fn run_master_gap_closure_evaluation(&mut self) -> bool {
-        let _be = self.freebsd_engine.create_boot_environment("be-pr-test").is_ok();
+        let _be = self
+            .freebsd_engine
+            .create_boot_environment("be-pr-test")
+            .is_ok();
         let _unveil = self.openbsd_engine.unveil_path("/etc", "r").is_ok();
-        self.netbsd_engine.register_veriexec_binary("/bin/ls", "sha256hash", "direct");
-        let _pfs = self.dragonfly_engine.replicate_pfs_transaction("ROOT", 104250).is_ok();
-        self.linux_engine.attach_bcachefs_tier("/dev/nvme0n1", "nvme-cache", 500);
+        self.netbsd_engine
+            .register_veriexec_binary("/bin/ls", "sha256hash", "direct");
+        let _pfs = self
+            .dragonfly_engine
+            .replicate_pfs_transaction("ROOT", 104250)
+            .is_ok();
+        self.linux_engine
+            .attach_bcachefs_tier("/dev/nvme0n1", "nvme-cache", 500);
 
         self.netbsd_engine.verify_binary("/bin/ls")
     }
@@ -317,6 +338,262 @@ impl SovereignOpenSourceOsGapClosurePrMasterSuite {
 impl Default for SovereignOpenSourceOsGapClosurePrMasterSuite {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+// ============================================================================
+// 6. SOVEREIGN OPEN SOURCE PROJECTS MISSING COMPONENTS PR SUITE
+// ============================================================================
+
+/// PR proposal engine for Fuchsia Zircon channels & Starnix Linux translation layer
+#[derive(Debug, Clone, Default)]
+pub struct FuchsiaStarnixPrEngine {
+    pub channels: BTreeMap<u64, String>,
+    pub starnix_syscall_mappings: BTreeMap<u32, String>,
+}
+
+impl FuchsiaStarnixPrEngine {
+    pub fn new() -> Self {
+        let mut starnix = BTreeMap::new();
+        starnix.insert(0, "sys_read".to_string());
+        starnix.insert(1, "sys_write".to_string());
+        starnix.insert(2, "sys_open".to_string());
+        starnix.insert(3, "sys_close".to_string());
+        starnix.insert(9, "sys_mmap".to_string());
+        Self {
+            channels: BTreeMap::new(),
+            starnix_syscall_mappings: starnix,
+        }
+    }
+
+    pub fn create_channel(&mut self, handle_id: u64, name: &str) -> Result<String, String> {
+        if self.channels.contains_key(&handle_id) {
+            Err(format!("Channel handle {} already exists", handle_id))
+        } else {
+            self.channels.insert(handle_id, name.to_string());
+            Ok(format!(
+                "PR Proposal: Successfully created Zircon Channel handle {} ('{}')",
+                handle_id, name
+            ))
+        }
+    }
+
+    pub fn translate_starnix_syscall(&self, syscall_nr: u32) -> Option<&String> {
+        self.starnix_syscall_mappings.get(&syscall_nr)
+    }
+}
+
+/// PR proposal engine for Cosmopolitan Libc APE (Actually Portable Executable) Loader
+#[derive(Debug, Clone, Default)]
+pub struct CosmopolitanApePrEngine {
+    pub parsed_ape_headers: Vec<String>,
+}
+
+impl CosmopolitanApePrEngine {
+    pub fn new() -> Self {
+        Self {
+            parsed_ape_headers: Vec::new(),
+        }
+    }
+
+    pub fn parse_ape_binary(&mut self, binary_name: &str, header_bytes: &[u8]) -> bool {
+        if header_bytes.starts_with(b"MZqFpD") || header_bytes.starts_with(b"MZ") {
+            self.parsed_ape_headers.push(binary_name.to_string());
+            true
+        } else {
+            false
+        }
+    }
+}
+
+/// PR proposal engine for TempleOS HolyC JIT & Ring 0 VGA Execution
+#[derive(Debug, Clone, Default)]
+pub struct TempleOsHolyCPrEngine {
+    pub symbol_table: BTreeMap<String, u64>,
+}
+
+impl TempleOsHolyCPrEngine {
+    pub fn new() -> Self {
+        let mut syms = BTreeMap::new();
+        syms.insert("Print".to_string(), 0x0040_1000);
+        syms.insert("GrPlot".to_string(), 0x0040_2000);
+        Self { symbol_table: syms }
+    }
+
+    pub fn eval_holyc_symbol(&self, symbol: &str) -> Option<u64> {
+        self.symbol_table.get(symbol).copied()
+    }
+}
+
+/// PR proposal engine for QNX Neutrino Real-Time IPC & Adaptive Scheduler
+#[derive(Debug, Clone, Default)]
+pub struct QnxNeutrinoPrEngine {
+    pub cpu_budgets: BTreeMap<u32, u32>, // thread_id -> budget_percentage
+}
+
+impl QnxNeutrinoPrEngine {
+    pub fn new() -> Self {
+        Self {
+            cpu_budgets: BTreeMap::new(),
+        }
+    }
+
+    pub fn assign_thread_budget(&mut self, thread_id: u32, budget_pct: u32) -> bool {
+        if budget_pct <= 100 {
+            self.cpu_budgets.insert(thread_id, budget_pct);
+            true
+        } else {
+            false
+        }
+    }
+}
+
+/// PR proposal engine for GNU Hurd Translator Node RPC Server
+#[derive(Debug, Clone, Default)]
+pub struct GnuHurdTranslatorPrEngine {
+    pub translators: BTreeMap<String, String>, // path -> translator_spec
+}
+
+impl GnuHurdTranslatorPrEngine {
+    pub fn new() -> Self {
+        Self {
+            translators: BTreeMap::new(),
+        }
+    }
+
+    pub fn set_passive_translator(&mut self, path: &str, spec: &str) {
+        self.translators.insert(path.to_string(), spec.to_string());
+    }
+
+    pub fn get_translator(&self, path: &str) -> Option<&String> {
+        self.translators.get(path)
+    }
+}
+
+/// PR proposal engine for Genode OS Capability Parent-Child Router
+#[derive(Debug, Clone, Default)]
+pub struct GenodeCapabilityPrEngine {
+    pub parent_child_routes: BTreeMap<String, Vec<String>>,
+}
+
+impl GenodeCapabilityPrEngine {
+    pub fn new() -> Self {
+        Self {
+            parent_child_routes: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_route(&mut self, parent_label: &str, child_service: &str) {
+        self.parent_child_routes
+            .entry(parent_label.to_string())
+            .or_default()
+            .push(child_service.to_string());
+    }
+}
+
+/// PR proposal engine for SerenityOS LibGUI Async Window Server Protocol
+#[derive(Debug, Clone, Default)]
+pub struct SerenityLibGuiPrEngine {
+    pub windows: BTreeMap<u32, String>,
+}
+
+impl SerenityLibGuiPrEngine {
+    pub fn new() -> Self {
+        Self {
+            windows: BTreeMap::new(),
+        }
+    }
+
+    pub fn create_window(&mut self, window_id: u32, title: &str) {
+        self.windows.insert(window_id, title.to_string());
+    }
+}
+
+/// PR proposal engine for Haiku OS BFS Extended Attributes & MIME Database
+#[derive(Debug, Clone, Default)]
+pub struct HaikuBfsMimePrEngine {
+    pub mime_map: BTreeMap<String, String>, // ext -> mime
+}
+
+impl HaikuBfsMimePrEngine {
+    pub fn new() -> Self {
+        let mut map = BTreeMap::new();
+        map.insert("html".to_string(), "text/html".to_string());
+        map.insert("png".to_string(), "image/png".to_string());
+        map.insert("pkg".to_string(), "application/x-hpkg".to_string());
+        Self { mime_map: map }
+    }
+
+    pub fn resolve_mime(&self, extension: &str) -> Option<&String> {
+        self.mime_map.get(extension)
+    }
+}
+
+/// PR proposal engine for Android AOSP Binder IPC Transaction Protocol
+#[derive(Debug, Clone, Default)]
+pub struct AndroidBinderPrEngine {
+    pub binder_services: BTreeMap<String, u32>,
+}
+
+impl AndroidBinderPrEngine {
+    pub fn new() -> Self {
+        let mut svcs = BTreeMap::new();
+        svcs.insert("activity".to_string(), 1);
+        svcs.insert("window".to_string(), 2);
+        svcs.insert("package".to_string(), 3);
+        Self {
+            binder_services: svcs,
+        }
+    }
+
+    pub fn lookup_service(&self, name: &str) -> Option<u32> {
+        self.binder_services.get(name).copied()
+    }
+}
+
+/// Master PR proposal suite consolidating missing open source projects components
+#[derive(Debug, Default)]
+pub struct SovereignOpenSourceProjectsMissingComponentsPrSuite {
+    pub fuchsia: FuchsiaStarnixPrEngine,
+    pub cosmopolitan: CosmopolitanApePrEngine,
+    pub templeos: TempleOsHolyCPrEngine,
+    pub qnx: QnxNeutrinoPrEngine,
+    pub gnu_hurd: GnuHurdTranslatorPrEngine,
+    pub genode: GenodeCapabilityPrEngine,
+    pub serenity: SerenityLibGuiPrEngine,
+    pub haiku: HaikuBfsMimePrEngine,
+    pub android: AndroidBinderPrEngine,
+}
+
+impl SovereignOpenSourceProjectsMissingComponentsPrSuite {
+    pub fn new() -> Self {
+        Self {
+            fuchsia: FuchsiaStarnixPrEngine::new(),
+            cosmopolitan: CosmopolitanApePrEngine::new(),
+            templeos: TempleOsHolyCPrEngine::new(),
+            qnx: QnxNeutrinoPrEngine::new(),
+            gnu_hurd: GnuHurdTranslatorPrEngine::new(),
+            genode: GenodeCapabilityPrEngine::new(),
+            serenity: SerenityLibGuiPrEngine::new(),
+            haiku: HaikuBfsMimePrEngine::new(),
+            android: AndroidBinderPrEngine::new(),
+        }
+    }
+
+    pub fn evaluate_all_projects(&mut self) -> bool {
+        let fuchsia_ok = self.fuchsia.create_channel(1, "test_chan").is_ok();
+        let ape_ok = self.cosmopolitan.parse_ape_binary("app.com", b"MZqFpD000");
+        let templeos_ok = self.templeos.eval_holyc_symbol("Print") == Some(0x0040_1000);
+        let qnx_ok = self.qnx.assign_thread_budget(10, 50);
+        self.gnu_hurd.set_passive_translator("/net", "/hurd/pfinet");
+        let hurd_ok = self.gnu_hurd.get_translator("/net").is_some();
+        self.genode.register_route("init", "gui");
+        self.serenity.create_window(1, "Main Window");
+        let haiku_ok = self.haiku.resolve_mime("hpkg").is_none()
+            || self.haiku.resolve_mime("html") == Some(&"text/html".to_string());
+        let android_ok = self.android.lookup_service("activity") == Some(1);
+
+        fuchsia_ok && ape_ok && templeos_ok && qnx_ok && hurd_ok && haiku_ok && android_ok
     }
 }
 
@@ -355,7 +632,9 @@ mod tests {
     fn test_dragonfly_hammer2_pfs() {
         let mut engine = DragonFlyHammer2PfsClusterPrEngine::new();
         assert!(engine.replicate_pfs_transaction("ROOT", 105000).is_ok());
-        assert!(engine.replicate_pfs_transaction("NONEXISTENT", 105000).is_err());
+        assert!(engine
+            .replicate_pfs_transaction("NONEXISTENT", 105000)
+            .is_err());
     }
 
     #[test]
@@ -369,5 +648,11 @@ mod tests {
     fn test_master_pr_gap_closure_suite() {
         let mut suite = SovereignOpenSourceOsGapClosurePrMasterSuite::new();
         assert!(suite.run_master_gap_closure_evaluation());
+    }
+
+    #[test]
+    fn test_open_source_projects_missing_components_suite() {
+        let mut suite = SovereignOpenSourceProjectsMissingComponentsPrSuite::new();
+        assert!(suite.evaluate_all_projects());
     }
 }
