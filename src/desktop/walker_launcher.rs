@@ -217,7 +217,8 @@ impl WalkerLauncher {
                             || contains_ignore_case(&app.description, query)
                             || app.keywords.iter().any(|k| contains_ignore_case(k, query))
                     } else if self.config.acronym_search {
-                        contains_ignore_case(&app.name, query) || self.acronym_match(&app.name, query)
+                        contains_ignore_case(&app.name, query)
+                            || self.acronym_match(&app.name, query)
                     } else {
                         eq_ignore_case(&app.name, query)
                     }
@@ -233,7 +234,11 @@ impl WalkerLauncher {
             })
             .collect();
 
-        results.sort_by(|a, b| b.score.partial_cmp(&a.score).unwrap_or(std::cmp::Ordering::Equal));
+        results.sort_by(|a, b| {
+            b.score
+                .partial_cmp(&a.score)
+                .unwrap_or(std::cmp::Ordering::Equal)
+        });
         results.truncate(self.config.max_results);
         results
     }
@@ -274,7 +279,10 @@ impl WalkerLauncher {
                     emoji.name.contains(query) || emoji.keywords.iter().any(|k| k.contains(query))
                 } else {
                     contains_ignore_case(&emoji.name, query)
-                        || emoji.keywords.iter().any(|k| contains_ignore_case(k, query))
+                        || emoji
+                            .keywords
+                            .iter()
+                            .any(|k| contains_ignore_case(k, query))
                 }
             })
             .map(|emoji| SearchResult {

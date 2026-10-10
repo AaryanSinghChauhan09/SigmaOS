@@ -116,7 +116,7 @@ impl PfPort {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PfStateMode {
     None,
-    Keep,   // Track state (default for pass rules)
+    Keep,     // Track state (default for pass rules)
     Modulate, // Randomize sequence numbers
     SynProxy, // SYN proxy protection
 }
@@ -404,10 +404,8 @@ impl PfFirewall {
         };
         // Default policy: block all (PF default)
         // Rule 0: block all (default deny)
-        pf.rules.push(
-            PfRule::block(0, PfDir::Any)
-                .with_label("default deny")
-        );
+        pf.rules
+            .push(PfRule::block(0, PfDir::Any).with_label("default deny"));
         pf
     }
 
@@ -461,8 +459,10 @@ impl PfFirewall {
                     // SYN flag — new connection
                     if self.state_table.len() < self.max_states as usize {
                         let state = PfStateEntry::new_tcp(
-                            pkt.src_ip, pkt.src_port,
-                            pkt.dst_ip, pkt.dst_port
+                            pkt.src_ip,
+                            pkt.src_port,
+                            pkt.dst_ip,
+                            pkt.dst_port,
                         );
                         self.state_table.push(state);
                         self.stats.states_created += 1;
@@ -479,7 +479,11 @@ impl PfFirewall {
     }
 
     /// Check if a rule matches a packet
-    fn rule_matches_packet(tables: &BTreeMap<String, PfTable>, rule: &PfRule, pkt: &PfPacket) -> bool {
+    fn rule_matches_packet(
+        tables: &BTreeMap<String, PfTable>,
+        rule: &PfRule,
+        pkt: &PfPacket,
+    ) -> bool {
         // Direction
         if rule.direction != PfDir::Any && rule.direction != pkt.direction {
             return false;
@@ -526,7 +530,9 @@ impl PfFirewall {
             PfAddr::Any => true,
             PfAddr::Ipv4(ip) => *ip == addr,
             PfAddr::Ipv4Net(net, prefix) => {
-                if *prefix == 0 { return true; }
+                if *prefix == 0 {
+                    return true;
+                }
                 let mask = !0u32 << (32 - prefix);
                 (addr & mask) == (net & mask)
             }
@@ -549,48 +555,39 @@ impl PfFirewall {
             PfRule::pass(10, PfDir::Any, PfProto::Any)
                 .with_interface("lo0")
                 .with_label("allow loopback")
-                .quick()
+                .quick(),
         );
         // Rule 2: Block spoofed RFC1918 from external
         // Rule 3: Allow established connections (stateful)
-        self.add_rule(
-            PfRule::pass(20, PfDir::In, PfProto::Tcp)
-                .with_label("pass established")
-        );
+        self.add_rule(PfRule::pass(20, PfDir::In, PfProto::Tcp).with_label("pass established"));
         // Rule 4: Allow SSH inbound
         self.add_rule(
             PfRule::pass(30, PfDir::In, PfProto::Tcp)
                 .with_dst(PfAddr::Any, PfPort::Eq(22))
                 .with_label("allow ssh")
-                .log()
+                .log(),
         );
         // Rule 5: Allow all outbound
-        self.add_rule(
-            PfRule::pass(40, PfDir::Out, PfProto::Any)
-                .with_label("allow all outbound")
-        );
+        self.add_rule(PfRule::pass(40, PfDir::Out, PfProto::Any).with_label("allow all outbound"));
         // Rule 6: Allow HTTPS inbound
         self.add_rule(
             PfRule::pass(50, PfDir::In, PfProto::Tcp)
                 .with_dst(PfAddr::Any, PfPort::Eq(443))
-                .with_label("allow https")
+                .with_label("allow https"),
         );
         // Rule 7: Allow HTTP inbound
         self.add_rule(
             PfRule::pass(60, PfDir::In, PfProto::Tcp)
                 .with_dst(PfAddr::Any, PfPort::Eq(80))
-                .with_label("allow http")
+                .with_label("allow http"),
         );
         // Rule 8: Allow ICMP ping
-        self.add_rule(
-            PfRule::pass(70, PfDir::In, PfProto::Icmp)
-                .with_label("allow icmp ping")
-        );
+        self.add_rule(PfRule::pass(70, PfDir::In, PfProto::Icmp).with_label("allow icmp ping"));
         // Rule 9: Allow DNS outbound
         self.add_rule(
             PfRule::pass(80, PfDir::Out, PfProto::Udp)
                 .with_dst(PfAddr::Any, PfPort::Eq(53))
-                .with_label("allow dns")
+                .with_label("allow dns"),
         );
     }
 
@@ -630,7 +627,7 @@ mod tests {
     fn test_pf_allow_ssh() {
         let mut pf = PfFirewall::new();
         pf.load_sigmaos_default_rules();
-        
+
         let ssh_pkt = PfPacket {
             direction: PfDir::In,
             interface: String::from("eth0"),
@@ -638,7 +635,7 @@ mod tests {
             src_ip: 0x0a000001, // 10.0.0.1
             src_port: 54321,
             dst_ip: 0x0a000002, // 10.0.0.2
-            dst_port: 22, // SSH
+            dst_port: 22,       // SSH
             size: 64,
             tcp_flags: 0x02, // SYN
         };
@@ -650,7 +647,7 @@ mod tests {
     fn test_pf_block_unknown() {
         let mut pf = PfFirewall::new();
         // No rules besides default deny
-        
+
         let pkt = PfPacket {
             direction: PfDir::In,
             interface: String::from("eth0"),
@@ -672,13 +669,13 @@ mod tests {
         let mut blocklist = PfTable::new("blocklist");
         blocklist.add_ipv4(0xC0A80100, 24); // 192.168.1.0/24
         pf.add_table(blocklist);
-        
+
         // Add block rule using table
         pf.add_rule(
             PfRule::block(5, PfDir::In)
                 .with_src(PfAddr::Table(String::from("blocklist")), PfPort::Any)
                 .with_label("block bad IPs")
-                .quick()
+                .quick(),
         );
 
         // 192.168.1.100 should be blocked
@@ -713,7 +710,7 @@ mod tests {
     fn test_state_tracking() {
         let mut pf = PfFirewall::new();
         pf.load_sigmaos_default_rules();
-        
+
         let syn_pkt = PfPacket {
             direction: PfDir::In,
             interface: String::from("eth0"),
@@ -734,7 +731,7 @@ mod tests {
     fn test_pf_stats() {
         let mut pf = PfFirewall::new();
         pf.load_sigmaos_default_rules();
-        
+
         let pkt = PfPacket {
             direction: PfDir::Out,
             interface: String::from("eth0"),
