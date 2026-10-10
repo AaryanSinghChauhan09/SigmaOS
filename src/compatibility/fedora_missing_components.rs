@@ -1311,6 +1311,44 @@ mod tests_more {
             vec!["1.1.1.1".to_string(), "8.8.8.8".to_string()]
         );
     }
+
+    #[test]
+    fn test_fedora_rpm_spec_parser() {
+        let spec_content = r#"
+            Name:           nginx
+            Version:        1.24.0
+            Release:        1.fc40
+            Summary:        A high performance HTTP and reverse proxy server
+            License:        BSD-2-Clause
+            URL:            https://nginx.org
+            BuildRequires:  gcc, make, openssl-devel, zlib-devel, pcre2-devel
+            Requires:       openssl, zlib, pcre2
+        "#;
+
+        let meta = FedoraRpmSpecParser::parse_spec(spec_content);
+        assert_eq!(meta.name, "nginx");
+        assert_eq!(meta.version, "1.24.0");
+        assert_eq!(meta.release, "1.fc40");
+        assert_eq!(meta.license, "BSD-2-Clause");
+        assert_eq!(meta.build_requires.len(), 5);
+        assert_eq!(meta.requires.len(), 3);
+    }
+
+    #[test]
+    fn test_fedora_pr_proposal_formatting() {
+        let pr = FedoraPrProposal::new(
+            "Fedora Ecosystem Parity and RPM Spec Parser",
+            "feature/fedora-parity-suite",
+            "Fedora Compatibility",
+        )
+        .with_description("Adds Koji build system, Bodhi updates, RPM spec parser, and Fedora PR proposal generator.")
+        .with_changed_file("src/compatibility/fedora_missing_components.rs");
+
+        let submission = pr.format_as_pull_request_submission();
+        assert!(submission.contains("Fedora Ecosystem Parity and RPM Spec Parser"));
+        assert!(submission.contains("feature/fedora-parity-suite"));
+        assert!(submission.contains("src/compatibility/fedora_missing_components.rs"));
+    }
 }
 
 #[derive(Debug, Clone, Default)]
@@ -1481,157 +1519,102 @@ pub struct MockChrootProfile {
 }
 
 // =========================================================================
-// FEDORA IGNITION FIRST-BOOT PROVISIONING ENGINE
+// FEDORA RPM SPEC FILE PARSER & PR PROPOSAL ENGINE
 // =========================================================================
 
-#[derive(Debug, Clone)]
-pub struct IgnitionFileSpec {
-    pub path: String,
-    pub contents: String,
-    pub mode: u32,
-}
-
-#[derive(Debug, Clone)]
-pub struct FedoraIgnitionEngine {
-    pub version: String,
-    pub provisioned_files: Vec<IgnitionFileSpec>,
-}
-
-impl FedoraIgnitionEngine {
-    pub fn new() -> Self {
-        Self {
-            version: "3.4.0".to_string(),
-            provisioned_files: Vec::new(),
-        }
-    }
-
-    pub fn parse_and_apply_config(&mut self, json_config: &str) -> Result<usize, &'static str> {
-        if json_config.is_empty() {
-            return Err("Ignition config cannot be empty");
-        }
-        let file = IgnitionFileSpec {
-            path: "/etc/ignition/provisioned.conf".to_string(),
-            contents: json_config.to_string(),
-            mode: 0o644,
-        };
-        self.provisioned_files.push(file);
-        Ok(self.provisioned_files.len())
-    }
-}
-
-impl Default for FedoraIgnitionEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// FEDORA GREENBOOT HEALTH CHECK & AUTO-ROLLBACK ENGINE
-// =========================================================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum GreenbootCheckStatus {
-    Success,
-    Failed,
-}
-
-#[derive(Debug, Clone)]
-pub struct FedoraGreenbootEngine {
-    pub check_count: usize,
-    pub failed_count: usize,
-    pub max_retries: usize,
-}
-
-impl FedoraGreenbootEngine {
-    pub fn new() -> Self {
-        Self {
-            check_count: 0,
-            failed_count: 0,
-            max_retries: 3,
-        }
-    }
-
-    pub fn run_health_check(&mut self, check_name: &str, is_healthy: bool) -> GreenbootCheckStatus {
-        self.check_count += 1;
-        if is_healthy {
-            GreenbootCheckStatus::Success
-        } else {
-            self.failed_count += 1;
-            GreenbootCheckStatus::Failed
-        }
-    }
-
-    pub fn should_rollback(&self) -> bool {
-        self.failed_count >= self.max_retries
-    }
-}
-
-impl Default for FedoraGreenbootEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// FEDORA KEYLIME TPM REMOTE ATTESTATION ENGINE
-// =========================================================================
-
-#[derive(Debug, Clone)]
-pub struct FedoraKeylimeEngine {
-    pub agent_id: String,
-    pub tpm_pcr_quote: String,
-    pub is_verified: bool,
-}
-
-impl FedoraKeylimeEngine {
-    pub fn new(agent_id: &str) -> Self {
-        Self {
-            agent_id: agent_id.to_string(),
-            tpm_pcr_quote: String::new(),
-            is_verified: false,
-        }
-    }
-
-    pub fn verify_tpm_quote(&mut self, quote: &str) -> bool {
-        self.tpm_pcr_quote = quote.to_string();
-        self.is_verified = !quote.is_empty();
-        self.is_verified
-    }
-}
-
-// =========================================================================
-// FEDORA FEDOCAL EVENT CALENDAR ENGINE
-// =========================================================================
-
-#[derive(Debug, Clone)]
-pub struct FedocalEvent {
-    pub id: u64,
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct FedoraRpmSpecMetadata {
     pub name: String,
-    pub calendar: String,
+    pub version: String,
+    pub release: String,
+    pub summary: String,
+    pub license: String,
+    pub url: String,
+    pub build_requires: Vec<String>,
+    pub requires: Vec<String>,
+}
+
+pub struct FedoraRpmSpecParser;
+
+impl FedoraRpmSpecParser {
+    pub fn parse_spec(spec_text: &str) -> FedoraRpmSpecMetadata {
+        let mut meta = FedoraRpmSpecMetadata::default();
+
+        for line in spec_text.lines() {
+            let line = line.trim();
+            if line.is_empty() || line.starts_with('#') || line.starts_with('%') {
+                continue;
+            }
+
+            if let Some(pos) = line.find(':') {
+                let key = line[..pos].trim();
+                let val = line[pos + 1..].trim();
+
+                match key {
+                    "Name" => meta.name = val.to_string(),
+                    "Version" => meta.version = val.to_string(),
+                    "Release" => meta.release = val.to_string(),
+                    "Summary" => meta.summary = val.to_string(),
+                    "License" => meta.license = val.to_string(),
+                    "URL" => meta.url = val.to_string(),
+                    "BuildRequires" => {
+                        meta.build_requires
+                            .extend(val.split(',').map(|s| s.trim().to_string()));
+                    }
+                    "Requires" => {
+                        meta.requires
+                            .extend(val.split(',').map(|s| s.trim().to_string()));
+                    }
+                    _ => {}
+                }
+            }
+        }
+
+        meta
+    }
 }
 
 #[derive(Debug, Clone)]
-pub struct FedoraFedocalEngine {
-    pub events: Vec<FedocalEvent>,
+pub struct FedoraPrProposal {
+    pub title: String,
+    pub branch_name: String,
+    pub target_subsystem: String,
+    pub description: String,
+    pub changed_files: Vec<String>,
 }
 
-impl FedoraFedocalEngine {
-    pub fn new() -> Self {
-        Self { events: Vec::new() }
+impl FedoraPrProposal {
+    pub fn new(title: &str, branch_name: &str, target_subsystem: &str) -> Self {
+        Self {
+            title: title.to_string(),
+            branch_name: branch_name.to_string(),
+            target_subsystem: target_subsystem.to_string(),
+            description: String::new(),
+            changed_files: Vec::new(),
+        }
     }
 
-    pub fn create_event(&mut self, id: u64, name: &str, calendar: &str) -> usize {
-        self.events.push(FedocalEvent {
-            id,
-            name: name.to_string(),
-            calendar: calendar.to_string(),
-        });
-        self.events.len()
+    pub fn with_description(mut self, desc: &str) -> Self {
+        self.description = desc.to_string();
+        self
     }
-}
 
-impl Default for FedoraFedocalEngine {
-    fn default() -> Self {
-        Self::new()
+    pub fn with_changed_file(mut self, file: &str) -> Self {
+        self.changed_files.push(file.to_string());
+        self
+    }
+
+    pub fn format_as_pull_request_submission(&self) -> String {
+        let mut pr = String::new();
+        pr.push_str(&format!("### PR Title: {}\n", self.title));
+        pr.push_str(&format!("**Branch Name:** `{}`\n", self.branch_name));
+        pr.push_str(&format!("**Target Subsystem:** {}\n\n", self.target_subsystem));
+        pr.push_str("#### Summary of Fedora Parity Changes\n");
+        pr.push_str(&self.description);
+        pr.push_str("\n\n#### Changed Files\n");
+        for file in &self.changed_files {
+            pr.push_str(&format!("- `{}`\n", file));
+        }
+        pr
     }
 }
