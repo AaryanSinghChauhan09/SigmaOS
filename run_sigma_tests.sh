@@ -626,6 +626,20 @@ if [ -f "src/distro/sovereign_open_source_os_gap_closure_pr.rs" ]; then
     ./build/test_os_gap_closure_pr
 fi
 
+if [ -f "src/distro/open_source_os_unimplemented_ideas_pr.rs" ]; then
+    echo "Running Open Source OS Unimplemented Ideas PR test suite..."
+    mkdir -p build
+    rustc --test src/distro/open_source_os_unimplemented_ideas_pr.rs --edition=2021 -o build/test_open_source_os_unimplemented_ideas_pr
+    ./build/test_open_source_os_unimplemented_ideas_pr
+fi
+
+if [ -f "src/distro/debian_github_repo_inspirations_pr.rs" ]; then
+    echo "Running Debian GitHub Repo Inspirations PR test suite..."
+    mkdir -p build
+    rustc --test src/distro/debian_github_repo_inspirations_pr.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_debian_github_repo_inspirations_pr
+    ./build/test_debian_github_repo_inspirations_pr
+fi
+
 if [ -f "src/distro/sovereign_2090_distro_supremacy_engine.rs" ]; then
     echo "Running Sovereign 2090 Distro Supremacy Engine test suite..."
     mkdir -p build
