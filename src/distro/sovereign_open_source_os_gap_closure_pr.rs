@@ -68,7 +68,10 @@ impl FreeBsdZfsBootEnvAndCapsicumPrEngine {
         };
 
         self.boot_environments.insert(be_name.to_string(), record);
-        Ok(format!("PR Proposal: Successfully created FreeBSD ZFS Boot Environment '{}'", be_name))
+        Ok(format!(
+            "PR Proposal: Successfully created FreeBSD ZFS Boot Environment '{}'",
+            be_name
+        ))
     }
 
     pub fn pdfork_capsicum_procdesc(&mut self, pid: u32) -> u64 {
@@ -115,7 +118,10 @@ impl OpenBsdPledgeUnveilPfctlPrEngine {
         };
 
         self.unveil_paths.insert(path.to_string(), entry);
-        Ok(format!("PR Proposal: Successfully unveiled path '{}' with permissions '{}'", path, permissions))
+        Ok(format!(
+            "PR Proposal: Successfully unveiled path '{}' with permissions '{}'",
+            path, permissions
+        ))
     }
 
     pub fn synchronize_pfsync_states(&mut self, _peer_ip: &str) -> u64 {
@@ -217,10 +223,17 @@ impl DragonFlyHammer2PfsClusterPrEngine {
         );
     }
 
-    pub fn replicate_pfs_transaction(&mut self, pfs_name: &str, new_txg: u64) -> Result<String, String> {
+    pub fn replicate_pfs_transaction(
+        &mut self,
+        pfs_name: &str,
+        new_txg: u64,
+    ) -> Result<String, String> {
         if let Some(node) = self.pfs_nodes.get_mut(pfs_name) {
             node.sync_txg = new_txg;
-            Ok(format!("PR Proposal: HAMMER2 PFS '{}' replicated to TXG {}", pfs_name, new_txg))
+            Ok(format!(
+                "PR Proposal: HAMMER2 PFS '{}' replicated to TXG {}",
+                pfs_name, new_txg
+            ))
         } else {
             Err(format!("PFS node '{}' not found", pfs_name))
         }
@@ -304,11 +317,19 @@ impl SovereignOpenSourceOsGapClosurePrMasterSuite {
     }
 
     pub fn run_master_gap_closure_evaluation(&mut self) -> bool {
-        let _be = self.freebsd_engine.create_boot_environment("be-pr-test").is_ok();
+        let _be = self
+            .freebsd_engine
+            .create_boot_environment("be-pr-test")
+            .is_ok();
         let _unveil = self.openbsd_engine.unveil_path("/etc", "r").is_ok();
-        self.netbsd_engine.register_veriexec_binary("/bin/ls", "sha256hash", "direct");
-        let _pfs = self.dragonfly_engine.replicate_pfs_transaction("ROOT", 104250).is_ok();
-        self.linux_engine.attach_bcachefs_tier("/dev/nvme0n1", "nvme-cache", 500);
+        self.netbsd_engine
+            .register_veriexec_binary("/bin/ls", "sha256hash", "direct");
+        let _pfs = self
+            .dragonfly_engine
+            .replicate_pfs_transaction("ROOT", 104250)
+            .is_ok();
+        self.linux_engine
+            .attach_bcachefs_tier("/dev/nvme0n1", "nvme-cache", 500);
 
         self.netbsd_engine.verify_binary("/bin/ls")
     }
@@ -355,7 +376,9 @@ mod tests {
     fn test_dragonfly_hammer2_pfs() {
         let mut engine = DragonFlyHammer2PfsClusterPrEngine::new();
         assert!(engine.replicate_pfs_transaction("ROOT", 105000).is_ok());
-        assert!(engine.replicate_pfs_transaction("NONEXISTENT", 105000).is_err());
+        assert!(engine
+            .replicate_pfs_transaction("NONEXISTENT", 105000)
+            .is_err());
     }
 
     #[test]
