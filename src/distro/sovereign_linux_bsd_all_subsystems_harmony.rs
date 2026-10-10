@@ -5,6 +5,11 @@ use std::collections::BTreeMap;
 use std::string::String;
 use std::vec::Vec;
 
+#[path = "sovereign_universal_subsystem_interop.rs"]
+pub mod sovereign_universal_subsystem_interop;
+
+use sovereign_universal_subsystem_interop::SovereignUniversalSubsystemInteropEngine;
+
 /// Complete catalog of Linux & BSD distribution inspirations supported in SigmaOS.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum LinuxBsdDistroInspiration {
@@ -720,6 +725,53 @@ impl Default for SovereignSubsystemDistroHarmonyEngine {
     }
 }
 
+/// Sovereign Universal Cross-Distro Subsystem Orchestrator.
+/// Combines the 23-subsystem Distro Harmony Engine with the Universal Subsystem Interop Engine
+/// to execute system-wide Linux & BSD distro profile switching, event routing, and policy translation.
+#[derive(Debug, Clone)]
+pub struct SovereignUniversalCrossDistroSubsystemOrchestrator {
+    pub harmony_engine: SovereignSubsystemDistroHarmonyEngine,
+    pub interop_engine: SovereignUniversalSubsystemInteropEngine,
+}
+
+impl SovereignUniversalCrossDistroSubsystemOrchestrator {
+    pub fn new() -> Self {
+        Self {
+            harmony_engine: SovereignSubsystemDistroHarmonyEngine::new(),
+            interop_engine: SovereignUniversalSubsystemInteropEngine::new(),
+        }
+    }
+
+    /// Synchronize all 23 subsystems with a specific distro inspiration and dispatch policy translation.
+    pub fn orchestrate_distro_mode_switch(
+        &mut self,
+        inspiration: LinuxBsdDistroInspiration,
+    ) -> Result<usize, &'static str> {
+        let synced = self.harmony_engine.sync_all_subsystems_with_distro_inspiration(inspiration)?;
+        let _ = self.interop_engine.sync_all_subsystems_with_distro_innovations(inspiration.name())?;
+        Ok(synced)
+    }
+
+    /// Harmonize all 23 subsystems across all 25 supported Linux & BSD distro inspirations.
+    pub fn harmonize_entire_sovereign_stack(&mut self) -> Result<usize, &'static str> {
+        let count = self.harmony_engine.harmonize_all_subsystems_across_all_distros()?;
+        Ok(count)
+    }
+
+    /// Evaluate total cross-subsystem harmony index (0..100).
+    pub fn evaluate_master_harmony_score(&self) -> u32 {
+        let harmony_score = self.harmony_engine.compute_system_harmony_score();
+        let interop_score = self.interop_engine.evaluate_system_wide_harmony_score();
+        (harmony_score + interop_score) / 2
+    }
+}
+
+impl Default for SovereignUniversalCrossDistroSubsystemOrchestrator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -778,5 +830,25 @@ mod tests {
             .expect("Harmonization across all distros should succeed");
         assert_eq!(total_synced, 23 * 25);
         assert_eq!(engine.compute_system_harmony_score(), 100);
+    }
+
+    #[test]
+    fn test_universal_cross_distro_orchestrator() {
+        let mut orchestrator = SovereignUniversalCrossDistroSubsystemOrchestrator::new();
+        let synced = orchestrator
+            .orchestrate_distro_mode_switch(LinuxBsdDistroInspiration::FreeBSD)
+            .expect("Orchestration mode switch should succeed");
+        assert_eq!(synced, 23);
+        assert_eq!(
+            orchestrator.harmony_engine.active_inspiration,
+            LinuxBsdDistroInspiration::FreeBSD
+        );
+        assert_eq!(orchestrator.evaluate_master_harmony_score(), 100);
+
+        let total_synced = orchestrator
+            .harmonize_entire_sovereign_stack()
+            .expect("Entire sovereign stack harmonization should succeed");
+        assert_eq!(total_synced, 23 * 25);
+        assert_eq!(orchestrator.evaluate_master_harmony_score(), 100);
     }
 }
