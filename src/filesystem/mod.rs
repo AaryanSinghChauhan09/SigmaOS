@@ -107,6 +107,6 @@ pub type FilePermissions = u32;
 // HAMMER2: DragonFlyBSD-inspired CoW filesystem with dedup and snapshots
 pub mod hammer2;
 pub use hammer2::{
-    Hammer2Volume, Hammer2Inode, Hammer2BlockRef, Hammer2PFS,
-    Hammer2Snapshot, Hammer2Statfs, Hammer2Compress, Hammer2Check,
+    Hammer2BlockRef, Hammer2Check, Hammer2Compress, Hammer2Inode, Hammer2PFS, Hammer2Snapshot,
+    Hammer2Statfs, Hammer2Volume,
 };
