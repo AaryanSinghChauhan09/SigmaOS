@@ -5,6 +5,11 @@ use std::collections::BTreeMap;
 use std::string::String;
 use std::vec::Vec;
 
+#[path = "sovereign_universal_subsystem_interop.rs"]
+pub mod sovereign_universal_subsystem_interop;
+
+use sovereign_universal_subsystem_interop::SovereignUniversalSubsystemInteropEngine;
+
 /// Complete catalog of Linux & BSD distribution inspirations supported in SigmaOS.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum LinuxBsdDistroInspiration {
@@ -720,327 +725,50 @@ impl Default for SovereignSubsystemDistroHarmonyEngine {
     }
 }
 
-impl SovereignSubsystemDistroHarmonyEngine {
+/// Sovereign Universal Cross-Distro Subsystem Orchestrator.
+/// Combines the 23-subsystem Distro Harmony Engine with the Universal Subsystem Interop Engine
+/// to execute system-wide Linux & BSD distro profile switching, event routing, and policy translation.
+#[derive(Debug, Clone)]
+pub struct SovereignUniversalCrossDistroSubsystemOrchestrator {
+    pub harmony_engine: SovereignSubsystemDistroHarmonyEngine,
+    pub interop_engine: SovereignUniversalSubsystemInteropEngine,
+}
+
+impl SovereignUniversalCrossDistroSubsystemOrchestrator {
     pub fn new() -> Self {
-        let mut engine = Self {
-            subsystems: BTreeMap::new(),
-            translations: Vec::new(),
-            event_log: Vec::new(),
-            next_event_id: 1,
-        };
-        engine.bootstrap_subsystem_matrix();
-        engine.bootstrap_default_translations();
-        engine
-    }
-
-    fn bootstrap_subsystem_matrix(&mut self) {
-        let all_distros = vec![
-            LinuxBsdDistroInspiration::ArchLinux,
-            LinuxBsdDistroInspiration::DebianGNU,
-            LinuxBsdDistroInspiration::UbuntuLinux,
-            LinuxBsdDistroInspiration::LinuxMint,
-            LinuxBsdDistroInspiration::AlpineLinux,
-            LinuxBsdDistroInspiration::NixOS,
-            LinuxBsdDistroInspiration::GentooLinux,
-            LinuxBsdDistroInspiration::FedoraLinux,
-            LinuxBsdDistroInspiration::VoidLinux,
-            LinuxBsdDistroInspiration::OpenSUSE,
-            LinuxBsdDistroInspiration::SolusLinux,
-            LinuxBsdDistroInspiration::ClearLinux,
-            LinuxBsdDistroInspiration::SlackwareLinux,
-            LinuxBsdDistroInspiration::KaliLinux,
-            LinuxBsdDistroInspiration::GarudaLinux,
-            LinuxBsdDistroInspiration::PopOS,
-            LinuxBsdDistroInspiration::TailsOS,
-            LinuxBsdDistroInspiration::GNUGuix,
-            LinuxBsdDistroInspiration::ParrotOS,
-            LinuxBsdDistroInspiration::FreeBSD,
-            LinuxBsdDistroInspiration::OpenBSD,
-            LinuxBsdDistroInspiration::NetBSD,
-            LinuxBsdDistroInspiration::DragonFlyBSD,
-            LinuxBsdDistroInspiration::IllumosSolaris,
-            LinuxBsdDistroInspiration::Plan9Frontier,
-        ];
-
-        let subsystems_list = [
-            (
-                SigmaOsSubsystem::KernelScheduling,
-                vec!["EEVDF", "BORE", "sched_ext", "NuttX_RT"],
-            ),
-            (
-                SigmaOsSubsystem::SecuritySandboxing,
-                vec![
-                    "Pledge",
-                    "Unveil",
-                    "Capsicum",
-                    "LandlockV5",
-                    "AppArmor",
-                    "SELinux",
-                ],
-            ),
-            (
-                SigmaOsSubsystem::FilesystemStorage,
-                vec!["Bcachefs", "ZFS", "Btrfs", "HAMMER2", "BFS", "9P2000"],
-            ),
-            (
-                SigmaOsSubsystem::Networking,
-                vec![
-                    "eBPF_XDP",
-                    "VNET_Jails",
-                    "Crossbow_VNIC",
-                    "pf_firewall",
-                    "nftables",
-                ],
-            ),
-            (
-                SigmaOsSubsystem::PackageManagement,
-                vec![
-                    "sigma-pkg",
-                    "Pacman",
-                    "Apt",
-                    "Dnf",
-                    "Apk",
-                    "Ebuild",
-                    "NixFlakes",
-                    "Guix",
-                ],
-            ),
-            (
-                SigmaOsSubsystem::InitSupervisor,
-                vec!["Systemd", "OpenRC", "Runit", "Dinit", "SMF", "Shepherd"],
-            ),
-            (
-                SigmaOsSubsystem::DesktopCompositor,
-                vec![
-                    "Wayland_HDR",
-                    "Hyprland",
-                    "KDE_Plasma6",
-                    "Cosmic",
-                    "X11_Bridge",
-                ],
-            ),
-            (
-                SigmaOsSubsystem::AudioSound,
-                vec!["PipeWire", "ALSA", "SNDIO", "PulseAudio"],
-            ),
-            (
-                SigmaOsSubsystem::HardwarePower,
-                vec!["PowerProfiles", "TLP", "DVFS", "ACPI_APIC"],
-            ),
-            (
-                SigmaOsSubsystem::ContainerVirt,
-                vec![
-                    "Podman_OCI",
-                    "FreeBSD_Jails",
-                    "Zones",
-                    "Bubblewrap",
-                    "Firejail",
-                ],
-            ),
-            (
-                SigmaOsSubsystem::ObservabilityDiagnostics,
-                vec!["DTrace", "eBPF_Trace", "Sysdig", "Fastfetch"],
-            ),
-            (
-                SigmaOsSubsystem::ShellTerminal,
-                vec!["OmarchyPrompt", "Zsh", "Fish", "Bash", "VT100_Grid"],
-            ),
-            (
-                SigmaOsSubsystem::IpcMemory,
-                vec!["ZeroCopyRing", "THP_Collapse", "zram", "kswapd"],
-            ),
-            (
-                SigmaOsSubsystem::DriversHardware,
-                vec!["PCIe_MMIO", "xHCI_USB", "NVMe", "Intel_Xe", "iwlwifi"],
-            ),
-            (
-                SigmaOsSubsystem::InstallerBoot,
-                vec!["Limine", "GRUB2", "systemd-boot", "Calamares_Wizard"],
-            ),
-            (
-                SigmaOsSubsystem::AuthIdentity,
-                vec!["PAM", "systemd-homed", "bsd_auth", "PQC_Token"],
-            ),
-            (
-                SigmaOsSubsystem::I18nLocalization,
-                vec!["Locale_Manager", "IME_Engine", "FontConfig"],
-            ),
-            (
-                SigmaOsSubsystem::MediaGraphics,
-                vec!["DRM_KMS", "DirectScanout", "XViewer", "Hypnotix"],
-            ),
-            (
-                SigmaOsSubsystem::CompilerToolchain,
-                vec!["LLVM_Clang", "GCC_SSP", "Ccache", "Makepkg_Chroot"],
-            ),
-            (
-                SigmaOsSubsystem::AutomationProvisioning,
-                vec!["CloudInit", "Kickstart", "Preseed", "Netplan"],
-            ),
-            (
-                SigmaOsSubsystem::SystemAudit,
-                vec!["Auditd", "arch-audit", "CII_BestPractices", "Syzkaller"],
-            ),
-            (
-                SigmaOsSubsystem::AiWorkflowAgent,
-                vec!["Omarchy_AI", "Herdr_Orchestrator", "SuperA_Keybinding"],
-            ),
-            (
-                SigmaOsSubsystem::VirtualizationHypervisor,
-                vec!["KVM", "Bhyve", "VMM", "VirtIO_Ring"],
-            ),
-        ];
-
-        for (sub, caps) in subsystems_list {
-            let spec = SubsystemCapabilitySpec {
-                subsystem: sub,
-                supported_distros: all_distros.clone(),
-                capabilities: caps.into_iter().map(String::from).collect(),
-                interop_score: 100,
-            };
-            self.subsystems.insert(sub, spec);
+        Self {
+            harmony_engine: SovereignSubsystemDistroHarmonyEngine::new(),
+            interop_engine: SovereignUniversalSubsystemInteropEngine::new(),
         }
     }
 
-    fn bootstrap_default_translations(&mut self) {
-        let default_rules = [
-            (
-                SigmaOsSubsystem::KernelScheduling,
-                SigmaOsSubsystem::SecuritySandboxing,
-                LinuxBsdDistroInspiration::OpenBSD,
-                "pol_sched_sec",
-                "apply_pledge_unveil_on_task_context_switch",
-                true,
-            ),
-            (
-                SigmaOsSubsystem::SecuritySandboxing,
-                SigmaOsSubsystem::FilesystemStorage,
-                LinuxBsdDistroInspiration::FreeBSD,
-                "pol_sec_storage",
-                "enforce_capsicum_rights_on_vfs_lookup",
-                true,
-            ),
-            (
-                SigmaOsSubsystem::Networking,
-                SigmaOsSubsystem::SecuritySandboxing,
-                LinuxBsdDistroInspiration::ArchLinux,
-                "pol_net_sec",
-                "enforce_ebpf_xdp_landlock_v5_network_guard",
-                true,
-            ),
-            (
-                SigmaOsSubsystem::PackageManagement,
-                SigmaOsSubsystem::InitSupervisor,
-                LinuxBsdDistroInspiration::NixOS,
-                "pol_pkg_init",
-                "declarative_systemd_unit_generation_from_manifest",
-                false,
-            ),
-            (
-                SigmaOsSubsystem::AiWorkflowAgent,
-                SigmaOsSubsystem::KernelScheduling,
-                LinuxBsdDistroInspiration::GentooLinux,
-                "pol_ai_sched",
-                "ai_assisted_bore_eevdf_priority_boosting",
-                false,
-            ),
-            (
-                SigmaOsSubsystem::ContainerVirt,
-                SigmaOsSubsystem::SecuritySandboxing,
-                LinuxBsdDistroInspiration::IllumosSolaris,
-                "pol_virt_sec",
-                "zone_capsicum_pledge_isolation_layer",
-                true,
-            ),
-        ];
-
-        for (src, tgt, distro, id, rule, strict) in default_rules {
-            self.translations.push(SubsystemPolicyTranslation {
-                source_subsystem: src,
-                target_subsystem: tgt,
-                distro_inspiration: distro,
-                policy_id: String::from(id),
-                rule_expression: String::from(rule),
-                enforce_strict_isolation: strict,
-            });
-        }
-    }
-
-    pub fn dispatch_event(
+    /// Synchronize all 23 subsystems with a specific distro inspiration and dispatch policy translation.
+    pub fn orchestrate_distro_mode_switch(
         &mut self,
-        source: SigmaOsSubsystem,
-        target: SigmaOsSubsystem,
-        action: &str,
-        payload: &str,
-    ) -> u64 {
-        let id = self.next_event_id;
-        self.next_event_id += 1;
-
-        let event = CrossSubsystemEvent {
-            event_id: id,
-            source,
-            target,
-            action: String::from(action),
-            payload: String::from(payload),
-            status: String::from("DISPATCHED_OK"),
-        };
-
-        self.event_log.push(event);
-        id
+        inspiration: LinuxBsdDistroInspiration,
+    ) -> Result<usize, &'static str> {
+        let synced = self.harmony_engine.sync_all_subsystems_with_distro_inspiration(inspiration)?;
+        let _ = self.interop_engine.sync_all_subsystems_with_distro_innovations(inspiration.name())?;
+        Ok(synced)
     }
 
-    pub fn translate_policy(
-        &self,
-        source: SigmaOsSubsystem,
-        target: SigmaOsSubsystem,
-    ) -> Option<&SubsystemPolicyTranslation> {
-        self.translations
-            .iter()
-            .find(|t| t.source_subsystem == source && t.target_subsystem == target)
-    }
-
-    pub fn harmonize_all_subsystems_and_distros(&mut self) -> Result<usize, String> {
-        let mut count = 0;
-        let subs: Vec<SigmaOsSubsystem> = self.subsystems.keys().copied().collect();
-
-        for &src in &subs {
-            for &tgt in &subs {
-                if src != tgt {
-                    self.dispatch_event(
-                        src,
-                        tgt,
-                        "HARMONIZE_INTEROP",
-                        "SYNCHRONIZED_CROSS_DISTRO_INTEROP",
-                    );
-                    count += 1;
-                }
-            }
-        }
+    /// Harmonize all 23 subsystems across all 25 supported Linux & BSD distro inspirations.
+    pub fn harmonize_entire_sovereign_stack(&mut self) -> Result<usize, &'static str> {
+        let count = self.harmony_engine.harmonize_all_subsystems_across_all_distros()?;
         Ok(count)
     }
 
-    pub fn verify_all_subsystems_compatibility_matrix(&self) -> bool {
-        if self.subsystems.len() < 23 {
-            return false;
-        }
-
-        for spec in self.subsystems.values() {
-            if spec.supported_distros.len() < 25
-                || spec.capabilities.is_empty()
-                || spec.interop_score < 100
-            {
-                return false;
-            }
-        }
-        true
+    /// Evaluate total cross-subsystem harmony index (0..100).
+    pub fn evaluate_master_harmony_score(&self) -> u32 {
+        let harmony_score = self.harmony_engine.compute_system_harmony_score();
+        let interop_score = self.interop_engine.evaluate_system_wide_harmony_score();
+        (harmony_score + interop_score) / 2
     }
+}
 
-    pub fn compute_harmony_index(&self) -> u32 {
-        if self.verify_all_subsystems_compatibility_matrix() {
-            100
-        } else {
-            0
-        }
+impl Default for SovereignUniversalCrossDistroSubsystemOrchestrator {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -1129,5 +857,25 @@ mod tests {
             .expect("Harmonization across all distros should succeed");
         assert_eq!(total_synced, 23 * 25);
         assert_eq!(engine.compute_system_harmony_score(), 100);
+    }
+
+    #[test]
+    fn test_universal_cross_distro_orchestrator() {
+        let mut orchestrator = SovereignUniversalCrossDistroSubsystemOrchestrator::new();
+        let synced = orchestrator
+            .orchestrate_distro_mode_switch(LinuxBsdDistroInspiration::FreeBSD)
+            .expect("Orchestration mode switch should succeed");
+        assert_eq!(synced, 23);
+        assert_eq!(
+            orchestrator.harmony_engine.active_inspiration,
+            LinuxBsdDistroInspiration::FreeBSD
+        );
+        assert_eq!(orchestrator.evaluate_master_harmony_score(), 100);
+
+        let total_synced = orchestrator
+            .harmonize_entire_sovereign_stack()
+            .expect("Entire sovereign stack harmonization should succeed");
+        assert_eq!(total_synced, 23 * 25);
+        assert_eq!(orchestrator.evaluate_master_harmony_score(), 100);
     }
 }

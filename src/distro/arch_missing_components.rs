@@ -522,15 +522,17 @@ impl ArchPacmanHookRunner {
             },
         );
 
-        let default_hook = PacmanHookRule {
-            name: "fc-cache".to_string(),
-            when: PacmanHookWhen::PostTransaction,
-            target_packages: vec!["fontconfig*".to_string()],
-            exec_command: "fc-cache -s".to_string(),
-        };
+        let registered_hooks = vec![
+            PacmanHookRule {
+                name: "fontconfig".to_string(),
+                when: PacmanHookWhen::PostTransaction,
+                target_packages: vec!["fontconfig*".to_string(), "ttf-*".to_string()],
+                exec_command: "fc-cache -s".to_string(),
+            },
+        ];
 
         Self {
-            registered_hooks: vec![default_hook],
+            registered_hooks,
             hooks,
             compression_format: "zstd".to_string(),
         }
@@ -603,6 +605,14 @@ pub struct PqcDilithiumKeySpec {
     pub dilithium_pubkey_hash: String,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PqcDilithiumKeySpec {
+    pub key_id: String,
+    pub owner_email: String,
+    pub is_trusted: bool,
+    pub dilithium_pubkey_hash: String,
+}
+
 pub struct ArchPacmanKeyringPqcEngine {
     pub keys: BTreeMap<String, PqcDilithiumKeySpec>,
 }
@@ -627,13 +637,6 @@ impl Default for ArchPacmanKeyringPqcEngine {
     fn default() -> Self {
         Self::new()
     }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct CachedPackageFile {
-    pub pkgname: String,
-    pub version: String,
-    pub file_size_bytes: u64,
 }
 
 pub struct ArchPacmanCacheScrubber {

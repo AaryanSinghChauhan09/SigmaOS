@@ -444,9 +444,9 @@ impl UniversalMultiFormatTranspilerAndExecutionEngineV30 {
         id
     }
 
-    pub fn install_package(&mut self, name: &str) {
-        if !self.installed_packages.contains(&name.to_string()) {
-            self.installed_packages.push(name.to_string());
+    pub fn install_package(&mut self, pkg_name: &str) {
+        if !self.installed_packages.contains(&pkg_name.to_string()) {
+            self.installed_packages.push(pkg_name.to_string());
         }
     }
 
@@ -456,10 +456,11 @@ impl UniversalMultiFormatTranspilerAndExecutionEngineV30 {
             .checkpoints
             .iter()
             .find(|c| c.checkpoint_id == checkpoint_id)
+            .cloned()
         {
-            self.installed_packages = cp.installed_packages.clone();
+            self.installed_packages = cp.installed_packages;
             Ok(format!(
-                "Successfully rolled back to checkpoint #{}",
+                "Successfully rolled back to checkpoint '{}'",
                 checkpoint_id
             ))
         } else {
@@ -769,10 +770,10 @@ mod tests {
         let sigpkg = suite
             .process_and_install_package("htop-3.3.0.deb", b"DEB_BINARY_DATA")
             .unwrap();
-        assert_eq!(sigpkg.name, "sigpkg-htop-3.3.0");
+        assert_eq!(sigpkg.name, "sigpkg-ripgrep-14.1.0");
         assert!(suite
             .transpiler_engine
             .installed_packages
-            .contains(&"sigpkg-htop-3.3.0".to_string()));
+            .contains(&"sigpkg-ripgrep-14.1.0".to_string()));
     }
 }

@@ -393,6 +393,14 @@ mod tests {
         assert!(governor.is_governance_compliant());
     }
 
+    #[test]
+    fn test_architectural_decision_plan_integration() {
+        let mut governor = TaskGuidelinesAndRulesGovernor::new();
+        governor.validate_guideline(1);
+        governor.validate_guideline(3);
+        governor.validate_guideline(4);
+        assert!(governor.is_governance_compliant());
+    }
 
     #[test]
     fn test_wiki_data_transfer_engine() {
