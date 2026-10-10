@@ -570,6 +570,13 @@ if [ -f "src/open_source_os_gap_closure.rs" ]; then
     ./build/test_open_source_gap_closure
 fi
 
+if [ -f "src/open_source_os_missing_components_parity.rs" ]; then
+    echo "Running Open Source OS Missing Components Parity test suite..."
+    mkdir -p build
+    rustc --test src/open_source_os_missing_components_parity.rs --edition=2021 -o build/test_open_source_missing_components
+    ./build/test_open_source_missing_components
+fi
+
 if [ -f "src/open_source_obsoletion.rs" ]; then
     echo "Running Open Source Obsoletion test suite..."
     mkdir -p build
