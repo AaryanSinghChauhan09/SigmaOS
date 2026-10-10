@@ -22,9 +22,9 @@
 //! - GPU compute queue integration (similar to DRM/KMS submission)
 
 extern crate alloc;
+use alloc::collections::BTreeMap;
 use alloc::vec;
 use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
 use std::sync::atomic::{AtomicU32, Ordering};
 
 /// io_uring v2 extended opcodes (beyond base io_uring)
@@ -308,14 +308,32 @@ impl IoUringV2 {
     }
 
     /// Register a file into the fixed file table
-    pub fn register_file(&mut self, slot: u32, fd: i32, file_type: RegisteredFileType) -> Result<(), &'static str> {
-        self.registered_files.insert(slot, IoUringRegisteredFile { slot, fd, file_type });
+    pub fn register_file(
+        &mut self,
+        slot: u32,
+        fd: i32,
+        file_type: RegisteredFileType,
+    ) -> Result<(), &'static str> {
+        self.registered_files.insert(
+            slot,
+            IoUringRegisteredFile {
+                slot,
+                fd,
+                file_type,
+            },
+        );
         self.stats.registered_files += 1;
         Ok(())
     }
 
     /// Submit a zero-copy send operation
-    pub fn submit_send_zc(&mut self, user_data: u64, fd: i32, buf_index: u16, len: u32) -> Result<(), &'static str> {
+    pub fn submit_send_zc(
+        &mut self,
+        user_data: u64,
+        fd: i32,
+        buf_index: u16,
+        len: u32,
+    ) -> Result<(), &'static str> {
         if !self.registered_bufs.contains_key(&buf_index) {
             return Err("Buffer not registered — use register_buffer first");
         }
@@ -337,7 +355,11 @@ impl IoUringV2 {
     }
 
     /// Start a multishot accept operation
-    pub fn submit_accept_multishot(&mut self, user_data: u64, listen_fd: i32) -> Result<(), &'static str> {
+    pub fn submit_accept_multishot(
+        &mut self,
+        user_data: u64,
+        listen_fd: i32,
+    ) -> Result<(), &'static str> {
         let ms = MultishotState::new(user_data, IoUringOpV2::AcceptMultishot);
         self.multishots.push(ms);
         self.stats.sq_submissions += 1;
@@ -346,12 +368,16 @@ impl IoUringV2 {
 
     /// Simulate an incoming connection for multishot accept
     pub fn simulate_incoming_connection(&mut self, listen_user_data: u64) -> Option<CqeV2> {
-        if let Some(ms) = self.multishots.iter_mut().find(|m| m.user_data == listen_user_data && m.active) {
+        if let Some(ms) = self
+            .multishots
+            .iter_mut()
+            .find(|m| m.user_data == listen_user_data && m.active)
+        {
             ms.fire();
             let new_fd = 100 + ms.completions as i32;
             let cqe = CqeV2 {
                 user_data: listen_user_data,
-                res: new_fd, // New accepted fd
+                res: new_fd,          // New accepted fd
                 flags: CqeV2::F_MORE, // More coming (multishot still active)
                 extra1: 0,
                 extra2: 0,
@@ -365,7 +391,12 @@ impl IoUringV2 {
     }
 
     /// Submit a multishot receive
-    pub fn submit_recv_multishot(&mut self, user_data: u64, fd: i32, buf_index: u16) -> Result<(), &'static str> {
+    pub fn submit_recv_multishot(
+        &mut self,
+        user_data: u64,
+        fd: i32,
+        buf_index: u16,
+    ) -> Result<(), &'static str> {
         if !self.registered_bufs.contains_key(&buf_index) {
             return Err("Buffer not registered");
         }
@@ -376,7 +407,11 @@ impl IoUringV2 {
     }
 
     /// Submit a direct NVMe passthrough command
-    pub fn submit_nvme_cmd(&mut self, user_data: u64, cmd: NvmeUringCmd) -> Result<(), &'static str> {
+    pub fn submit_nvme_cmd(
+        &mut self,
+        user_data: u64,
+        cmd: NvmeUringCmd,
+    ) -> Result<(), &'static str> {
         if !self.registered_bufs.contains_key(&cmd.buf_index) {
             return Err("Data buffer not registered");
         }
@@ -437,7 +472,7 @@ mod tests {
         ring.register_buffer(0, 65536).unwrap();
         ring.register_buffer(1, 65536).unwrap();
         assert_eq!(ring.stats.registered_bufs, 2);
-        
+
         // Duplicate registration should fail
         assert!(ring.register_buffer(0, 65536).is_err());
     }
@@ -447,7 +482,7 @@ mod tests {
         let mut ring = IoUringV2::new(256, IoUringV2::SETUP_SQPOLL);
         ring.register_buffer(0, 65536).unwrap();
         ring.submit_send_zc(42, 3, 0, 1024).unwrap();
-        
+
         let completions = ring.drain_completions();
         assert_eq!(completions.len(), 1);
         assert_eq!(completions[0].user_data, 42);
@@ -460,21 +495,21 @@ mod tests {
     fn test_multishot_accept() {
         let mut ring = IoUringV2::new(256, 0);
         ring.submit_accept_multishot(99, 5).unwrap();
-        
+
         // Simulate 3 incoming connections
         let c1 = ring.simulate_incoming_connection(99).unwrap();
         let c2 = ring.simulate_incoming_connection(99).unwrap();
         let c3 = ring.simulate_incoming_connection(99).unwrap();
-        
+
         // All should have MORE flag (multishot still active)
         assert!(c1.is_multishot());
         assert!(c2.is_multishot());
         assert!(c3.is_multishot());
-        
+
         // Each should get a different fd
         assert_ne!(c1.res, c2.res);
         assert_ne!(c2.res, c3.res);
-        
+
         assert_eq!(ring.stats.multishot_events, 3);
     }
 
@@ -482,7 +517,7 @@ mod tests {
     fn test_nvme_passthrough() {
         let mut ring = IoUringV2::new(256, IoUringV2::SETUP_IOPOLL);
         ring.register_buffer(0, 512 * 8).unwrap(); // 8 sectors
-        
+
         let cmd = NvmeUringCmd {
             opcode: 0x02, // NVMe Read
             nsid: 1,
@@ -503,13 +538,13 @@ mod tests {
         let mut ring = IoUringV2::new(256, 0);
         ring.register_buffer(0, 1024).unwrap();
         ring.submit_send_zc(1, 3, 0, 512).unwrap();
-        
+
         // Buffer should be marked in-use
         assert!(ring.registered_bufs[&0].in_use);
-        
+
         // Cannot unregister while in use
         assert!(!ring.unregister_buffer(0));
-        
+
         // After flush, can unregister
         ring.flush_zc_notif(0);
         assert!(!ring.registered_bufs[&0].in_use);
@@ -521,9 +556,9 @@ mod tests {
         let mut ring = IoUringV2::new(256, 0);
         ring.submit_accept_multishot(1, 5).unwrap();
         ring.submit_accept_multishot(2, 6).unwrap();
-        
+
         ring.cancel_all_multishots();
-        
+
         for ms in &ring.multishots {
             assert!(!ms.active);
         }

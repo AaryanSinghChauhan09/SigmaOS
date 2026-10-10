@@ -184,7 +184,8 @@ impl NixProfile {
 
     /// Install a package (add to profile, bump generation)
     pub fn install(&mut self, pkg_name: &str, store_path: &str) {
-        self.packages.insert(String::from(pkg_name), String::from(store_path));
+        self.packages
+            .insert(String::from(pkg_name), String::from(store_path));
         self.bump_generation(alloc::format!("Installed {}", pkg_name));
     }
 
@@ -273,10 +274,9 @@ impl NixStore {
             stats: NixStoreStats::default(),
         };
         // Create default user profile
-        store.profiles.insert(
-            String::from("root/default"),
-            NixProfile::new("default")
-        );
+        store
+            .profiles
+            .insert(String::from("root/default"), NixProfile::new("default"));
         store
     }
 
@@ -294,7 +294,11 @@ impl NixStore {
 
     /// Add a derivation to the store
     pub fn add_derivation(&mut self, drv: NixDerivation) -> String {
-        let drv_path = alloc::format!("{}/{}.drv", self.store_dir, drv.drv_hash.to_store_path(&drv.name));
+        let drv_path = alloc::format!(
+            "{}/{}.drv",
+            self.store_dir,
+            drv.drv_hash.to_store_path(&drv.name)
+        );
         self.derivations.insert(drv_path.clone(), drv);
         drv_path
     }
@@ -327,11 +331,17 @@ impl NixStore {
     }
 
     /// Install a package into a user profile
-    pub fn install_package(&mut self, profile_key: &str, pkg_name: &str, store_path: &str) -> Result<(), &'static str> {
+    pub fn install_package(
+        &mut self,
+        profile_key: &str,
+        pkg_name: &str,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
         if !self.paths.contains_key(store_path) {
             return Err("Store path not valid — build or fetch package first");
         }
-        let profile = self.profiles
+        let profile = self
+            .profiles
             .entry(String::from(profile_key))
             .or_insert_with(|| NixProfile::new(profile_key));
         profile.install(pkg_name, store_path);
@@ -379,26 +389,28 @@ impl NixStore {
     /// Garbage collect unreferenced store paths
     pub fn gc(&mut self) -> (u64, u64) {
         let live = self.compute_live_paths();
-        let dead_paths: Vec<String> = self.paths.keys()
+        let dead_paths: Vec<String> = self
+            .paths
+            .keys()
             .filter(|p| !live.contains(*p))
             .cloned()
             .collect();
-        
+
         let mut freed_count = 0u64;
         let mut freed_bytes = 0u64;
-        
+
         for path in dead_paths {
             if let Some(sp) = self.paths.remove(&path) {
                 freed_bytes += sp.nar_size;
                 freed_count += 1;
             }
         }
-        
+
         self.stats.paths_garbage_collected += freed_count;
         self.stats.bytes_freed += freed_bytes;
         self.stats.total_paths -= freed_count;
         self.stats.total_size_bytes -= freed_bytes;
-        
+
         (freed_count, freed_bytes)
     }
 
@@ -459,7 +471,7 @@ mod tests {
         profile.install("bash", "/sigma/store/abc-bash-5.2");
         assert_eq!(profile.packages.len(), 1);
         assert_eq!(profile.generation, 1);
-        
+
         let removed = profile.uninstall("bash");
         assert!(removed);
         assert_eq!(profile.packages.len(), 0);
@@ -471,10 +483,10 @@ mod tests {
         let mut profile = NixProfile::new("default");
         profile.install("bash", "/sigma/store/abc-bash-5.2");
         profile.install("vim", "/sigma/store/def-vim-9.0");
-        
+
         // 2 packages installed
         assert_eq!(profile.packages.len(), 2);
-        
+
         // Rollback to before vim
         profile.rollback().unwrap();
         assert_eq!(profile.packages.len(), 1);
@@ -488,15 +500,27 @@ mod tests {
         let hash2 = NixHash::from_bytes(NixHashAlgo::Sha256, b"pkg2");
         let path1 = hash1.to_store_path("pkg1");
         let path2 = hash2.to_store_path("pkg2");
-        
-        store.register_path(NixStorePath::new(path1.clone(), String::from("pkg1"), hash1, 100));
-        store.register_path(NixStorePath::new(path2.clone(), String::from("pkg2"), hash2, 200));
-        
+
+        store.register_path(NixStorePath::new(
+            path1.clone(),
+            String::from("pkg1"),
+            hash1,
+            100,
+        ));
+        store.register_path(NixStorePath::new(
+            path2.clone(),
+            String::from("pkg2"),
+            hash2,
+            200,
+        ));
+
         // Add pkg1 to a profile (live), pkg2 is unreferenced (dead)
-        store.profiles.entry(String::from("root/default"))
+        store
+            .profiles
+            .entry(String::from("root/default"))
             .or_insert_with(|| NixProfile::new("default"))
             .install("pkg1", &path1);
-        
+
         let (freed_count, freed_bytes) = store.gc();
         assert_eq!(freed_count, 1); // pkg2 was GC'd
         assert_eq!(freed_bytes, 200);
@@ -511,19 +535,21 @@ mod tests {
         let hash_b = NixHash::from_bytes(NixHashAlgo::Sha256, b"pkg-b");
         let path_a = hash_a.to_store_path("dep-a");
         let path_b = hash_b.to_store_path("pkg-b");
-        
+
         let sp_a = NixStorePath::new(path_a.clone(), String::from("dep-a"), hash_a, 50);
         let mut sp_b = NixStorePath::new(path_b.clone(), String::from("pkg-b"), hash_b, 150);
         sp_b.references.insert(path_a.clone()); // pkg-b depends on dep-a
-        
+
         store.register_path(sp_a);
         store.register_path(sp_b);
-        
+
         // Install pkg-b (should keep dep-a alive through closure)
-        store.profiles.entry(String::from("root/default"))
+        store
+            .profiles
+            .entry(String::from("root/default"))
             .or_insert_with(|| NixProfile::new("default"))
             .install("pkg-b", &path_b);
-        
+
         let live = store.compute_live_paths();
         assert!(live.contains(&path_a)); // dep-a is in closure
         assert!(live.contains(&path_b)); // pkg-b is direct
