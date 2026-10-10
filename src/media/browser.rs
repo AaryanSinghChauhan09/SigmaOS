@@ -3023,6 +3023,20 @@ mod tests {
         assert!(report.contains("orion_webext_polyfill"));
         assert!(report.contains("ungoogled_host_ip_masked"));
     }
+
+    #[test]
+    fn test_spidermonkey_and_v8_jit_engines() {
+        let mut sm = FirefoxSpiderMonkeyJitCompilerEngine::new();
+        assert_eq!(sm.audit_jit_tiering(5), "C++Interpreter");
+        assert_eq!(sm.audit_jit_tiering(50), "BaselineJIT");
+        assert_eq!(sm.audit_jit_tiering(2000), "WarpMonkey_IonJIT");
+
+        let v8 = ChromiumV8JitSandboxAuditorEngine::new();
+        let decomp = v8.decompress_32bit_tagged_pointer(0x0000_1000);
+        assert_eq!(decomp, 0x0000_7f00_0000_1000);
+        assert!(v8.is_address_within_v8_sandbox(decomp));
+        assert!(!v8.is_address_within_v8_sandbox(0x0000_1000));
+    }
 }
 
 pub struct SovereignOpenSourceBrowserSuiteEngine {
@@ -3265,5 +3279,55 @@ impl SovereignOpenSourceBrowserSuiteEngine {
             report.push_str(&format!("{:<35} : {}\n", k, v));
         }
         report
+    }
+}
+
+pub struct FirefoxSpiderMonkeyJitCompilerEngine {
+    pub warp_monkey_active: bool,
+    pub ic_stub_cache_hits: u64,
+}
+
+impl FirefoxSpiderMonkeyJitCompilerEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            warp_monkey_active: true,
+            ic_stub_cache_hits: 128,
+        }
+    }
+
+    pub fn audit_jit_tiering(&mut self, execution_count: u32) -> &'static str {
+        if execution_count > 1000 {
+            self.ic_stub_cache_hits += 1;
+            "WarpMonkey_IonJIT"
+        } else if execution_count > 10 {
+            "BaselineJIT"
+        } else {
+            "C++Interpreter"
+        }
+    }
+}
+
+pub struct ChromiumV8JitSandboxAuditorEngine {
+    pub compressed_pointer_base: u64,
+    pub sandbox_size_bytes: u64,
+}
+
+impl ChromiumV8JitSandboxAuditorEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            compressed_pointer_base: 0x0000_7f00_0000_0000,
+            sandbox_size_bytes: 1024 * 1024 * 1024, // 1GB V8 Sandbox
+        }
+    }
+
+    pub fn decompress_32bit_tagged_pointer(&self, tagged_ptr: u32) -> u64 {
+        self.compressed_pointer_base | (tagged_ptr as u64)
+    }
+
+    pub fn is_address_within_v8_sandbox(&self, addr: u64) -> bool {
+        addr >= self.compressed_pointer_base
+            && addr < (self.compressed_pointer_base + self.sandbox_size_bytes)
     }
 }

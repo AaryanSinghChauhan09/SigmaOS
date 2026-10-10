@@ -4,13 +4,14 @@
 //
 // Inspired by Linux & BSD distributions, this suite provides complete universal
 // multi-format package inspection, classification, sandboxing, transpilation,
-// OOP design patterns (Factory, Template Method, Strategy, Command, Observer,
-// Chain of Responsibility, Memento), UDF scriptlet execution, upstream distro
-// delta ingestion & synchronization, CAS delta deduplication, boot environment
-// snapshots, and transactional installation across all major Linux distro formats:
-// .deb, .rpm, .pkg.tar.zst, .apk, .ebuild, .xbps, .eopkg, .nixpkg, .portage,
-// .flatpak, .snap, .AppImage, .openbsd.tgz, .hpkg, .swupd, .air, .bottle, .ipa,
-// .ports, .pkg, .aab, .app, .hap, .PiSi, .lzm, .pup, .pet, .tgz, .superdeb, etc.
+// UDF scriptlet execution, CAS delta deduplication, boot environment snapshots,
+// and transactional installation across all package formats including:
+// .air, .bottle, .ipa, .ports, .pkg, .aab, .apk, AppImage, .eopkg, .nixpkg,
+// .portage, .deb, .tar.gz, .tar .gz, .xz, .rpm, .ebuild, .pkg.tar.xz, Flatpak,
+// .app, .hap, .PiSi, .tgz, .superdeb, .lzm, pup, .snap, pacman, .tar, .pet,
+// .xbps, .hpkg, .openbsd.tgz, .spack, .conan, .whl, .crate, .gem, .nupkg, .msi,
+// .apex, .conda, .brew, .wasm, .oci, .tazpkg, .sif, .slp, .winget, .scoop,
+// .choco, .pixi, .nimble, .zig, .swift, .dub, .opam, .shard, .plt, .sysupdate, etc.
 
 extern crate alloc;
 
@@ -88,7 +89,7 @@ impl UniversalPackageFormatInspectorV33 {
         }
     }
 
-    /// Inspects a raw package file by name and binary payload header, classifying format, signature, and microarch V33
+    /// Inspects a raw package file by name and binary payload header, classifying its format, signature, and microarch V33
     pub fn inspect_package(
         &mut self,
         filename: &str,
@@ -223,9 +224,11 @@ impl UniversalPackageFormatInspectorV33 {
                 PackageSignatureKindV33::Unsigned,
                 "squashfs",
             ),
-            f if f.ends_with(".pup") || f == "pup" => {
-                (PackageFormat::Pup, PackageSignatureKindV33::Unsigned, "zip")
-            }
+            f if f.ends_with(".pup") || f == "pup" => (
+                PackageFormat::Pup,
+                PackageSignatureKindV33::Unsigned,
+                "zip",
+            ),
             f if f.ends_with(".pet") || f == "pet" => (
                 PackageFormat::Pet,
                 PackageSignatureKindV33::Unsigned,
@@ -236,9 +239,11 @@ impl UniversalPackageFormatInspectorV33 {
                 PackageSignatureKindV33::Unsigned,
                 "gzip",
             ),
-            f if f.ends_with(".xz") || f.ends_with(".tar.xz") => {
-                (PackageFormat::Xz, PackageSignatureKindV33::Unsigned, "xz")
-            }
+            f if f.ends_with(".xz") || f.ends_with(".tar.xz") => (
+                PackageFormat::Xz,
+                PackageSignatureKindV33::Unsigned,
+                "xz",
+            ),
             f if f.ends_with(".tar") => (
                 PackageFormat::Tar,
                 PackageSignatureKindV33::Unsigned,
@@ -283,13 +288,12 @@ impl UniversalPackageFormatInspectorV33 {
             dependencies: deps,
             provides,
             conflicts: Vec::new(),
-            target_microarch: "x86-64-v3".to_string(),
-            build_cflags: Some("-O3 -march=x86-64-v3 -pipe".to_string()),
+            target_microarch: "x86-64-v4".to_string(),
+            build_cflags: Some("-O3 -march=x86-64-v4 -pipe".to_string()),
             payload_sha256: format!("sha256-v33-{:x}", raw_payload.len()),
         };
 
-        self.inspection_cache
-            .insert(filename.to_string(), manifest.clone());
+        self.inspection_cache.insert(filename.to_string(), manifest.clone());
         Ok(manifest)
     }
 }
@@ -301,214 +305,7 @@ impl Default for UniversalPackageFormatInspectorV33 {
 }
 
 // ============================================================================
-// 2. OOP Architectural Design Patterns Engine V33
-// ============================================================================
-
-/// Factory Pattern: Creates universal format adapters dynamically
-pub struct UniversalFormatAdapterFactoryV33;
-
-impl UniversalFormatAdapterFactoryV33 {
-    pub fn create_adapter(format: PackageFormat) -> String {
-        match format {
-            PackageFormat::Deb => "DebianAptAdapterV33".to_string(),
-            PackageFormat::Rpm => "FedoraDnfAdapterV33".to_string(),
-            PackageFormat::Pacman => "ArchPacmanAdapterV33".to_string(),
-            PackageFormat::Apk => "AlpineApkAdapterV33".to_string(),
-            PackageFormat::Ebuild => "GentooPortageAdapterV33".to_string(),
-            PackageFormat::Xbps => "VoidXbpsAdapterV33".to_string(),
-            PackageFormat::Flatpak => "FlatpakAdapterV33".to_string(),
-            PackageFormat::Snap => "SnapAdapterV33".to_string(),
-            PackageFormat::AppImage => "AppImageAdapterV33".to_string(),
-            PackageFormat::Nixpkg => "NixFlakeAdapterV33".to_string(),
-            _ => "GenericUniversalAdapterV33".to_string(),
-        }
-    }
-}
-
-/// Template Method Pattern: Defines the universal package lifecycle steps
-pub trait BaseUniversalPackageLifecycleV33 {
-    fn prepare(&self, name: &str) -> Result<String, String> {
-        Ok(format!("Prepared payload for {}", name))
-    }
-
-    fn validate_signatures(&self, name: &str) -> Result<bool, String> {
-        Ok(name.len() > 0)
-    }
-
-    fn transpile_metadata(&self, name: &str) -> Result<String, String> {
-        Ok(format!("Transpiled metadata for {}", name))
-    }
-
-    fn apply_payload_atomic(&self, name: &str) -> Result<String, String> {
-        Ok(format!("Atomically installed {}", name))
-    }
-
-    /// Template method orchestrating execution
-    fn execute_installation_pipeline(&self, name: &str) -> Result<String, String> {
-        self.prepare(name)?;
-        self.validate_signatures(name)?;
-        self.transpile_metadata(name)?;
-        self.apply_payload_atomic(name)
-    }
-}
-
-pub struct ConcretePackageLifecycleV33;
-impl BaseUniversalPackageLifecycleV33 for ConcretePackageLifecycleV33 {}
-
-/// Strategy Pattern: Multi-distro dependency resolution strategies
-pub trait DependencyResolverStrategyV33 {
-    fn resolve(&self, raw_deps: &[String]) -> Result<Vec<String>, String>;
-}
-
-pub struct SatSolverStrategyV33 {
-    pub mappings: BTreeMap<String, String>,
-}
-
-impl SatSolverStrategyV33 {
-    pub fn new() -> Self {
-        let mut mappings = BTreeMap::new();
-        mappings.insert("libssl-dev".to_string(), "sovereign-openssl".to_string());
-        mappings.insert("openssl-devel".to_string(), "sovereign-openssl".to_string());
-        mappings.insert("glibc".to_string(), "sovereign-libc".to_string());
-        mappings.insert("libc6".to_string(), "sovereign-libc".to_string());
-        mappings.insert("bash".to_string(), "sovereign-coreutils".to_string());
-        Self { mappings }
-    }
-}
-
-impl Default for SatSolverStrategyV33 {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl DependencyResolverStrategyV33 for SatSolverStrategyV33 {
-    fn resolve(&self, raw_deps: &[String]) -> Result<Vec<String>, String> {
-        let mut res = Vec::new();
-        for dep in raw_deps {
-            if let Some(mapped) = self.mappings.get(dep) {
-                if !res.contains(mapped) {
-                    res.push(mapped.clone());
-                }
-            } else if !res.contains(dep) {
-                res.push(dep.clone());
-            }
-        }
-        Ok(res)
-    }
-}
-
-/// Command Pattern: Transactional Package Commands with undo/rollback
-pub trait TransactionalPackageCommandV33 {
-    fn execute(&mut self) -> Result<String, String>;
-    fn undo(&mut self) -> Result<String, String>;
-}
-
-pub struct InstallCommandV33 {
-    pub package_name: String,
-    pub executed: bool,
-}
-
-impl InstallCommandV33 {
-    pub fn new(package_name: &str) -> Self {
-        Self {
-            package_name: package_name.to_string(),
-            executed: false,
-        }
-    }
-}
-
-impl TransactionalPackageCommandV33 for InstallCommandV33 {
-    fn execute(&mut self) -> Result<String, String> {
-        self.executed = true;
-        Ok(format!("Executed installation of {}", self.package_name))
-    }
-
-    fn undo(&mut self) -> Result<String, String> {
-        if self.executed {
-            self.executed = false;
-            Ok(format!("Rolled back installation of {}", self.package_name))
-        } else {
-            Err("Command was not executed yet".to_string())
-        }
-    }
-}
-
-/// Observer Pattern: Monitored package state transitions and events
-pub trait PackageObserverV33 {
-    fn on_package_event(&mut self, event: &str);
-}
-
-pub struct PackageLifecycleSubjectV33 {
-    pub observers: Vec<String>,
-    pub events_history: Vec<String>,
-}
-
-impl PackageLifecycleSubjectV33 {
-    pub fn new() -> Self {
-        Self {
-            observers: Vec::new(),
-            events_history: Vec::new(),
-        }
-    }
-
-    pub fn notify(&mut self, event: &str) {
-        self.events_history.push(event.to_string());
-    }
-}
-
-impl Default for PackageLifecycleSubjectV33 {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Memento Pattern: Snapshot and restore package system states
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct PackageSystemStateMementoV33 {
-    pub state_id: usize,
-    pub installed_packages: Vec<String>,
-    pub timestamp: u64,
-}
-
-pub struct CaretakerV33 {
-    pub mementos: Vec<PackageSystemStateMementoV33>,
-}
-
-impl CaretakerV33 {
-    pub fn new() -> Self {
-        Self {
-            mementos: Vec::new(),
-        }
-    }
-
-    pub fn save_memento(&mut self, installed: Vec<String>) -> usize {
-        let id = self.mementos.len() + 1;
-        self.mementos.push(PackageSystemStateMementoV33 {
-            state_id: id,
-            installed_packages: installed,
-            timestamp: 1700000033,
-        });
-        id
-    }
-
-    pub fn restore_memento(&self, id: usize) -> Result<Vec<String>, String> {
-        if let Some(mem) = self.mementos.iter().find(|m| m.state_id == id) {
-            Ok(mem.installed_packages.clone())
-        } else {
-            Err(format!("Memento #{} not found", id))
-        }
-    }
-}
-
-impl Default for CaretakerV33 {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ============================================================================
-// 3. User-Defined Functions (UDF) Engine V33
+// 2. OOP Architectural Patterns Engine V33
 // ============================================================================
 
 /// User-Defined Function (UDF) hook types in package lifecycles V33
@@ -521,9 +318,6 @@ pub enum UdfHookTypeV33 {
     DependencyRemap,
     MicroarchOptimize,
     TriggerEvaluate,
-    BuildHook,
-    FileFilter,
-    SignatureVerifier,
 }
 
 /// User-Defined Function (UDF) execution payload and context V33
@@ -584,61 +378,51 @@ impl Default for UdfScriptletEngineV33 {
 }
 
 // ============================================================================
-// 4. Upstream Distro Change Ingestion & Delta Synchronizer Engine V33
+// 3. SAT Solver & Dependency Remapping Engine V33
 // ============================================================================
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct UpstreamDistroPackageUpdateV33 {
-    pub distro_origin: String,
-    pub package_name: String,
-    pub upstream_version: String,
-    pub delta_patch_summary: String,
-    pub ingested_at: u64,
+pub struct UniversalCrossDistroSatSolverV33 {
+    pub dependency_map: BTreeMap<String, String>,
 }
 
-pub struct UpstreamDistroDeltaSynchronizerV33 {
-    pub update_feed: Vec<UpstreamDistroPackageUpdateV33>,
-}
-
-impl UpstreamDistroDeltaSynchronizerV33 {
+impl UniversalCrossDistroSatSolverV33 {
     pub fn new() -> Self {
+        let mut map = BTreeMap::new();
+        map.insert("libssl-dev".to_string(), "sovereign-openssl".to_string());
+        map.insert("openssl-devel".to_string(), "sovereign-openssl".to_string());
+        map.insert("glibc".to_string(), "sovereign-libc".to_string());
+        map.insert("libc6".to_string(), "sovereign-libc".to_string());
+        map.insert("bash".to_string(), "sovereign-coreutils".to_string());
+        map.insert("coreutils".to_string(), "sovereign-coreutils".to_string());
+
         Self {
-            update_feed: Vec::new(),
+            dependency_map: map,
         }
     }
 
-    /// Ingests an upstream package change from any major distro (Arch, Debian, Fedora, Alpine, Gentoo, etc.)
-    pub fn ingest_upstream_update(
-        &mut self,
-        distro: &str,
-        pkg: &str,
-        version: &str,
-        summary: &str,
-    ) -> UpstreamDistroPackageUpdateV33 {
-        let update = UpstreamDistroPackageUpdateV33 {
-            distro_origin: distro.to_string(),
-            package_name: pkg.to_string(),
-            upstream_version: version.to_string(),
-            delta_patch_summary: summary.to_string(),
-            ingested_at: 1700000033,
-        };
-        self.update_feed.push(update.clone());
-        update
-    }
-
-    pub fn check_package_sync_status(&self, pkg: &str) -> Option<&UpstreamDistroPackageUpdateV33> {
-        self.update_feed.iter().find(|u| u.package_name == pkg)
+    pub fn solve_dependencies(&self, raw_deps: &[String]) -> Result<Vec<String>, String> {
+        let mut solved = Vec::new();
+        for dep in raw_deps {
+            if let Some(mapped) = self.dependency_map.get(dep) {
+                if !solved.contains(mapped) {
+                    solved.push(mapped.clone());
+                }
+            } else if !solved.contains(dep) {
+                solved.push(dep.clone());
+            }
+        }
+        Ok(solved)
     }
 }
 
-impl Default for UpstreamDistroDeltaSynchronizerV33 {
+impl Default for UniversalCrossDistroSatSolverV33 {
     fn default() -> Self {
         Self::new()
     }
 }
 
 // ============================================================================
-// 5. Sandbox Security & Isolation Governor V33
+// 4. Sandbox Security & Isolation Governor V33
 // ============================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -658,14 +442,12 @@ impl UniversalMultiSandboxGovernorV33 {
 
     pub fn generate_sandbox_rules(&self, format: PackageFormat) -> SandboxRulesV33 {
         match format {
-            PackageFormat::Flatpak | PackageFormat::Snap | PackageFormat::AppImage => {
-                SandboxRulesV33 {
-                    pledge_promises: "stdio rpath wpath cpath inet unix".to_string(),
-                    unveil_paths: vec!["/tmp".to_string(), "/var/lib".to_string()],
-                    landlock_read_only: vec!["/usr/lib".to_string(), "/etc".to_string()],
-                    landlock_read_write: vec!["/var/lib/flatpak".to_string(), "/tmp".to_string()],
-                }
-            }
+            PackageFormat::Flatpak | PackageFormat::Snap | PackageFormat::AppImage => SandboxRulesV33 {
+                pledge_promises: "stdio rpath wpath cpath inet unix".to_string(),
+                unveil_paths: vec!["/tmp".to_string(), "/var/lib".to_string()],
+                landlock_read_only: vec!["/usr/lib".to_string(), "/etc".to_string()],
+                landlock_read_write: vec!["/var/lib/flatpak".to_string(), "/tmp".to_string()],
+            },
             _ => SandboxRulesV33 {
                 pledge_promises: "stdio rpath wpath cpath tty".to_string(),
                 unveil_paths: vec!["/var/lib/sigmaos".to_string(), "/tmp".to_string()],
@@ -683,7 +465,7 @@ impl Default for UniversalMultiSandboxGovernorV33 {
 }
 
 // ============================================================================
-// 6. Zero-Copy CAS Delta Store & Boot Snapshot Governor V33
+// 5. Zero-Copy CAS Delta Store & Boot Snapshot Governor V33
 // ============================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -704,15 +486,11 @@ impl UniversalCasDeltaStoreGovernorV33 {
         }
     }
 
-    pub fn apply_delta_patch(
-        &mut self,
-        base: &str,
-        delta: &str,
-    ) -> Result<CasDeltaRecordV33, String> {
+    pub fn apply_delta_patch(&mut self, base: &str, delta: &str) -> Result<CasDeltaRecordV33, String> {
         let rec = CasDeltaRecordV33 {
             base_hash: base.to_string(),
             delta_hash: delta.to_string(),
-            compression_savings_ratio: 75,
+            compression_savings_ratio: 78,
         };
         self.delta_records.push(rec.clone());
         Ok(rec)
@@ -730,6 +508,7 @@ pub enum BootEnvKindV33 {
     FreeBsdBectl,
     BtrfsSubvolume,
     ZfsDataset,
+    DragonFlyHammer2,
     SigmaSnapshot,
 }
 
@@ -765,10 +544,7 @@ impl UniversalBootEnvSnapshotGovernorV33 {
 
     pub fn rollback(&mut self, snapshot_id: usize) -> Result<String, String> {
         if let Some(snap) = self.snapshots.iter().find(|s| s.snapshot_id == snapshot_id) {
-            Ok(format!(
-                "Successfully rolled back to snapshot #{}: {}",
-                snap.snapshot_id, snap.label
-            ))
+            Ok(format!("Successfully rolled back to snapshot #{}: {}", snap.snapshot_id, snap.label))
         } else {
             Err(format!("Snapshot #{} not found", snapshot_id))
         }
@@ -782,7 +558,7 @@ impl Default for UniversalBootEnvSnapshotGovernorV33 {
 }
 
 // ============================================================================
-// 7. Foreign Package Manager CLI Router V33
+// 6. Foreign Package Manager CLI Router V33
 // ============================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -916,20 +692,17 @@ impl Default for UniversalPmCliRouterV33 {
 }
 
 // ============================================================================
-// 8. Sovereign Distro Package Advancements Master Coordinator V33
+// 7. Sovereign Distro Package Advancements Master Coordinator V33
 // ============================================================================
 
 pub struct SovereignDistroPackageAdvancementsSuiteV33 {
     pub inspector: UniversalPackageFormatInspectorV33,
     pub udf_engine: UdfScriptletEngineV33,
-    pub solver_strategy: SatSolverStrategyV33,
+    pub solver: UniversalCrossDistroSatSolverV33,
     pub sandbox_governor: UniversalMultiSandboxGovernorV33,
     pub cas_delta_store: UniversalCasDeltaStoreGovernorV33,
     pub boot_env_governor: UniversalBootEnvSnapshotGovernorV33,
     pub cli_router: UniversalPmCliRouterV33,
-    pub upstream_synchronizer: UpstreamDistroDeltaSynchronizerV33,
-    pub caretaker: CaretakerV33,
-    pub subject: PackageLifecycleSubjectV33,
     pub installed_packages: Vec<String>,
 }
 
@@ -938,14 +711,11 @@ impl SovereignDistroPackageAdvancementsSuiteV33 {
         Self {
             inspector: UniversalPackageFormatInspectorV33::new(),
             udf_engine: UdfScriptletEngineV33::new(),
-            solver_strategy: SatSolverStrategyV33::new(),
+            solver: UniversalCrossDistroSatSolverV33::new(),
             sandbox_governor: UniversalMultiSandboxGovernorV33::new(),
             cas_delta_store: UniversalCasDeltaStoreGovernorV33::new(),
             boot_env_governor: UniversalBootEnvSnapshotGovernorV33::new(),
             cli_router: UniversalPmCliRouterV33::new(),
-            upstream_synchronizer: UpstreamDistroDeltaSynchronizerV33::new(),
-            caretaker: CaretakerV33::new(),
-            subject: PackageLifecycleSubjectV33::new(),
             installed_packages: Vec::new(),
         }
     }
@@ -957,7 +727,7 @@ impl SovereignDistroPackageAdvancementsSuiteV33 {
         payload: &[u8],
     ) -> Result<UnifiedPackage, String> {
         let manifest = self.inspector.inspect_package(filename, payload)?;
-        let resolved_deps = self.solver_strategy.resolve(&manifest.dependencies)?;
+        let resolved_deps = self.solver.solve_dependencies(&manifest.dependencies)?;
 
         // Register default UDF pre/post hooks
         self.udf_engine.register_hook(UdfExecutionContextV33 {
@@ -998,10 +768,6 @@ impl SovereignDistroPackageAdvancementsSuiteV33 {
         if !self.installed_packages.contains(&sigpkg.name) {
             self.installed_packages.push(sigpkg.name.clone());
         }
-
-        // Notify observers and save state memento
-        self.subject.notify(&format!("INSTALLED: {}", sigpkg.name));
-        self.caretaker.save_memento(self.installed_packages.clone());
 
         Ok(sigpkg)
     }
@@ -1066,57 +832,48 @@ mod tests {
     }
 
     #[test]
-    fn test_oop_patterns_v33() {
-        // Factory pattern test
-        let adapter_name = UniversalFormatAdapterFactoryV33::create_adapter(PackageFormat::Deb);
-        assert_eq!(adapter_name, "DebianAptAdapterV33");
+    fn test_inspector_and_classification_v33() {
+        let mut inspector = UniversalPackageFormatInspectorV33::new();
 
-        // Template Method pattern test
-        let lifecycle = ConcretePackageLifecycleV33;
-        let res = lifecycle.execute_installation_pipeline("curl").unwrap();
-        assert_eq!(res, "Atomically installed curl");
+        let deb_payload = b"DEB_BINARY_DATA";
+        let manifest = inspector
+            .inspect_package("zstd_1.5.5_amd64.deb", deb_payload)
+            .unwrap();
+        assert_eq!(manifest.detected_format, PackageFormat::Deb);
+        assert_eq!(manifest.name, "zstd-1.5.5-amd64");
+        assert_eq!(manifest.dependencies, vec!["sovereign-libc"]);
 
-        // Strategy pattern test
-        let strategy = SatSolverStrategyV33::new();
-        let raw = vec!["libssl-dev".to_string(), "glibc".to_string()];
-        let solved = strategy.resolve(&raw).unwrap();
+        let signify_payload = b"untrusted comment: openbsd signify signature\nDATA";
+        let openbsd_manifest = inspector
+            .inspect_package("base75.openbsd.tgz", signify_payload)
+            .unwrap();
+        assert_eq!(openbsd_manifest.detected_format, PackageFormat::OpenBsdPkg);
+        assert_eq!(
+            openbsd_manifest.signature_kind,
+            PackageSignatureKindV33::OpenBsdSignify
+        );
+    }
+
+    #[test]
+    fn test_sat_solver_and_sandboxing_v33() {
+        let solver = UniversalCrossDistroSatSolverV33::new();
+        let raw_deps = vec!["libssl-dev".to_string(), "glibc".to_string()];
+        let solved = solver.solve_dependencies(&raw_deps).unwrap();
         assert_eq!(solved, vec!["sovereign-openssl", "sovereign-libc"]);
 
-        // Command pattern test
-        let mut cmd = InstallCommandV33::new("nginx");
-        assert_eq!(cmd.execute().unwrap(), "Executed installation of nginx");
-        assert_eq!(cmd.undo().unwrap(), "Rolled back installation of nginx");
-
-        // Memento pattern test
-        let mut caretaker = CaretakerV33::new();
-        let id = caretaker.save_memento(vec!["base-system".to_string()]);
-        let restored = caretaker.restore_memento(id).unwrap();
-        assert_eq!(restored, vec!["base-system"]);
+        let sandbox_gov = UniversalMultiSandboxGovernorV33::new();
+        let rules = sandbox_gov.generate_sandbox_rules(PackageFormat::Flatpak);
+        assert!(rules.pledge_promises.contains("inet"));
+        assert!(rules.unveil_paths.contains(&"/var/lib".to_string()));
     }
 
     #[test]
-    fn test_upstream_delta_synchronizer_v33() {
-        let mut sync = UpstreamDistroDeltaSynchronizerV33::new();
-        let update = sync.ingest_upstream_update(
-            "ArchLinux",
-            "glibc",
-            "2.39-1",
-            "Security patch for malloc",
-        );
-        assert_eq!(update.distro_origin, "ArchLinux");
-        assert_eq!(update.package_name, "glibc");
-
-        let status = sync.check_package_sync_status("glibc").unwrap();
-        assert_eq!(status.upstream_version, "2.39-1");
-    }
-
-    #[test]
-    fn test_cas_udf_boot_and_cli_router_v33() {
+    fn test_cas_delta_udf_and_boot_env_snapshot_v33() {
         let mut cas_store = UniversalCasDeltaStoreGovernorV33::new();
         let delta_rec = cas_store
             .apply_delta_patch("base_hash_v33", "delta_hash_v33")
             .unwrap();
-        assert_eq!(delta_rec.compression_savings_ratio, 75);
+        assert_eq!(delta_rec.compression_savings_ratio, 78);
 
         let mut boot_env = UniversalBootEnvSnapshotGovernorV33::new();
         let snap_id = boot_env.create_snapshot(BootEnvKindV33::FreeBsdBectl, "Pre-Update-v33");
@@ -1135,15 +892,21 @@ mod tests {
             .execute_hooks_for_phase("curl", UdfHookTypeV33::PreInstall)
             .unwrap();
         assert_eq!(executed, 1);
+    }
 
+    #[test]
+    fn test_cli_router_and_master_coordinator_v33() {
         let mut suite = SovereignDistroPackageAdvancementsSuiteV33::new();
+
+        let cmd = suite.cli_router.route_command("apt install ripgrep --dry-run").unwrap();
+        assert_eq!(cmd.action, UniversalPmActionV33::Install);
+        assert!(cmd.dry_run);
+
         let sigpkg = suite
             .process_and_install("htop-3.3.0.apk", b"APK_PAYLOAD")
             .unwrap();
         assert_eq!(sigpkg.name, "sigpkg-v33-htop-3.3.0");
-        assert!(suite
-            .installed_packages
-            .contains(&"sigpkg-v33-htop-3.3.0".to_string()));
-        assert_eq!(suite.subject.events_history.len(), 1);
+        assert!(suite.installed_packages.contains(&"sigpkg-v33-htop-3.3.0".to_string()));
+        assert_eq!(suite.udf_engine.execution_log.len(), 2);
     }
 }

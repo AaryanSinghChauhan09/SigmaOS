@@ -1,7 +1,6 @@
 // Walker Application Launcher
 // Omarchy Walker-inspired universal launcher and selector
 
-use std::collections::HashMap;
 use std::path::PathBuf;
 
 /// Walker mode
@@ -198,30 +197,31 @@ impl WalkerLauncher {
 
     /// Search applications
     pub fn search_applications(&self, query: &str) -> Vec<SearchResult> {
-        let query_lower = if self.config.case_sensitive {
-            query.to_string()
-        } else {
-            query.to_lowercase()
-        };
-
         let mut results: Vec<SearchResult> = self
             .applications
             .iter()
             .filter(|app| {
-                let name_lower = app.name.to_lowercase();
-                let desc_lower = app.description.to_lowercase();
-                let keywords_lower: Vec<String> =
-                    app.keywords.iter().map(|k| k.to_lowercase()).collect();
-
-                if self.config.fuzzy_search {
-                    name_lower.contains(&query_lower)
-                        || desc_lower.contains(&query_lower)
-                        || keywords_lower.iter().any(|k| k.contains(&query_lower))
-                } else if self.config.acronym_search {
-                    name_lower.contains(&query_lower)
-                        || self.acronym_match(&name_lower, &query_lower)
+                if self.config.case_sensitive {
+                    if self.config.fuzzy_search {
+                        app.name.contains(query)
+                            || app.description.contains(query)
+                            || app.keywords.iter().any(|k| k.contains(query))
+                    } else if self.config.acronym_search {
+                        app.name.contains(query) || self.acronym_match(&app.name, query)
+                    } else {
+                        app.name == query
+                    }
                 } else {
-                    name_lower == query_lower
+                    if self.config.fuzzy_search {
+                        contains_ignore_case(&app.name, query)
+                            || contains_ignore_case(&app.description, query)
+                            || app.keywords.iter().any(|k| contains_ignore_case(k, query))
+                    } else if self.config.acronym_search {
+                        contains_ignore_case(&app.name, query)
+                            || self.acronym_match(&app.name, query)
+                    } else {
+                        eq_ignore_case(&app.name, query)
+                    }
                 }
             })
             .map(|app| SearchResult {
@@ -234,25 +234,26 @@ impl WalkerLauncher {
             })
             .collect();
 
-        results.sort_by(|a, b| b.score.partial_cmp(&a.score).unwrap());
+        results.sort_by(|a, b| {
+            b.score
+                .partial_cmp(&a.score)
+                .unwrap_or(std::cmp::Ordering::Equal)
+        });
         results.truncate(self.config.max_results);
         results
     }
 
     /// Search clipboard
     pub fn search_clipboard(&self, query: &str) -> Vec<SearchResult> {
-        let query_lower = if self.config.case_sensitive {
-            query.to_string()
-        } else {
-            query.to_lowercase()
-        };
-
         let mut results: Vec<SearchResult> = self
             .clipboard_history
             .iter()
             .filter(|entry| {
-                let content_lower = entry.content.to_lowercase();
-                content_lower.contains(&query_lower)
+                if self.config.case_sensitive {
+                    entry.content.contains(query)
+                } else {
+                    contains_ignore_case(&entry.content, query)
+                }
             })
             .map(|entry| SearchResult {
                 entry_type: "clipboard".to_string(),
@@ -270,21 +271,19 @@ impl WalkerLauncher {
 
     /// Search emojis
     pub fn search_emojis(&self, query: &str) -> Vec<SearchResult> {
-        let query_lower = if self.config.case_sensitive {
-            query.to_string()
-        } else {
-            query.to_lowercase()
-        };
-
         let mut results: Vec<SearchResult> = self
             .emojis
             .iter()
             .filter(|emoji| {
-                let name_lower = emoji.name.to_lowercase();
-                let keywords_lower: Vec<String> =
-                    emoji.keywords.iter().map(|k| k.to_lowercase()).collect();
-                name_lower.contains(&query_lower)
-                    || keywords_lower.iter().any(|k| k.contains(&query_lower))
+                if self.config.case_sensitive {
+                    emoji.name.contains(query) || emoji.keywords.iter().any(|k| k.contains(query))
+                } else {
+                    contains_ignore_case(&emoji.name, query)
+                        || emoji
+                            .keywords
+                            .iter()
+                            .any(|k| contains_ignore_case(k, query))
+                }
             })
             .map(|emoji| SearchResult {
                 entry_type: "emoji".to_string(),
@@ -339,12 +338,6 @@ impl WalkerLauncher {
 
     /// Search files
     pub fn search_files(&self, query: &str) -> Vec<SearchResult> {
-        let query_lower = if self.config.case_sensitive {
-            query.to_string()
-        } else {
-            query.to_lowercase()
-        };
-
         let mut results: Vec<SearchResult> = Vec::new();
 
         for path in &self.config.file_search_paths {
@@ -352,12 +345,16 @@ impl WalkerLauncher {
                 for entry in entries.flatten() {
                     let file_path = entry.path();
                     let name = file_path.file_name().unwrap().to_string_lossy().to_string();
-                    let name_lower = name.to_lowercase();
 
-                    if name_lower.contains(&query_lower) {
+                    let is_match = if self.config.case_sensitive {
+                        name.contains(query)
+                    } else {
+                        contains_ignore_case(&name, query)
+                    };
+
+                    if is_match {
                         let metadata = entry.metadata().ok();
                         let is_directory = metadata.as_ref().map(|m| m.is_dir()).unwrap_or(false);
-                        let size = metadata.as_ref().map(|m| m.len()).unwrap_or(0);
 
                         results.push(SearchResult {
                             entry_type: if is_directory { "directory" } else { "file" }.to_string(),
@@ -463,34 +460,39 @@ impl WalkerLauncher {
 
     /// Calculate relevance score
     fn calculate_score(&self, name: &str, description: &str, query: &str) -> f64 {
-        let query_lower = query.to_lowercase();
-        let name_lower = name.to_lowercase();
-        let desc_lower = description.to_lowercase();
-
         let mut score = 0.0;
 
-        // Exact name match
-        if name_lower == query_lower {
+        let (exact_match, starts_with, contains, desc_contains) = if self.config.case_sensitive {
+            (
+                name == query,
+                name.starts_with(query),
+                name.contains(query),
+                description.contains(query),
+            )
+        } else {
+            (
+                eq_ignore_case(name, query),
+                starts_with_ignore_case(name, query),
+                contains_ignore_case(name, query),
+                contains_ignore_case(description, query),
+            )
+        };
+
+        if exact_match {
             score += 100.0;
         }
-
-        // Name starts with query
-        if name_lower.starts_with(&query_lower) {
+        if starts_with {
             score += 50.0;
         }
-
-        // Name contains query
-        if name_lower.contains(&query_lower) {
+        if contains {
             score += 25.0;
         }
-
-        // Description contains query
-        if desc_lower.contains(&query_lower) {
+        if desc_contains {
             score += 10.0;
         }
 
-        // Pinned apps get boost
-        if self.pinned_apps.contains(&name.to_string()) {
+        // Bolt optimization: check pinned apps without String allocation
+        if self.pinned_apps.iter().any(|p| p == name) {
             score += 20.0;
         }
 
@@ -499,17 +501,13 @@ impl WalkerLauncher {
 
     /// Acronym matching
     fn acronym_match(&self, text: &str, query: &str) -> bool {
-        let text_words: Vec<&str> = text.split_whitespace().collect();
-        let query_chars: Vec<char> = query.chars().collect();
-
-        if text_words.len() < query_chars.len() {
-            return false;
-        }
-
-        for (i, q_char) in query_chars.iter().enumerate() {
-            if let Some(word) = text_words.get(i) {
+        let mut words = text.split_whitespace();
+        for q_char in query.chars() {
+            if let Some(word) = words.next() {
                 if let Some(first_char) = word.chars().next() {
-                    if first_char.to_lowercase().ne(q_char.to_lowercase()) {
+                    if !first_char.eq_ignore_ascii_case(&q_char)
+                        && first_char.to_lowercase().ne(q_char.to_lowercase())
+                    {
                         return false;
                     }
                 } else {
@@ -541,6 +539,49 @@ impl WalkerLauncher {
             self.emojis.len(),
             self.search_history.len(),
         )
+    }
+}
+
+// Bolt performance optimization: Zero-allocation case-insensitive matching helpers
+fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
+    if needle.is_empty() {
+        return true;
+    }
+    if haystack.len() < needle.len() {
+        return false;
+    }
+    if haystack.is_ascii() && needle.is_ascii() {
+        haystack
+            .as_bytes()
+            .windows(needle.len())
+            .any(|w| w.eq_ignore_ascii_case(needle.as_bytes()))
+    } else {
+        haystack.to_lowercase().contains(&needle.to_lowercase())
+    }
+}
+
+fn starts_with_ignore_case(haystack: &str, needle: &str) -> bool {
+    if needle.is_empty() {
+        return true;
+    }
+    if haystack.len() < needle.len() {
+        return false;
+    }
+    if haystack.is_ascii() && needle.is_ascii() {
+        haystack.as_bytes()[..needle.len()].eq_ignore_ascii_case(needle.as_bytes())
+    } else {
+        haystack.to_lowercase().starts_with(&needle.to_lowercase())
+    }
+}
+
+fn eq_ignore_case(a: &str, b: &str) -> bool {
+    if a.len() != b.len() {
+        return false;
+    }
+    if a.is_ascii() && b.is_ascii() {
+        a.as_bytes().eq_ignore_ascii_case(b.as_bytes())
+    } else {
+        a.to_lowercase() == b.to_lowercase()
     }
 }
 

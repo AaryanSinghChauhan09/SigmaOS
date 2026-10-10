@@ -135,10 +135,6 @@ pub use sovereign_distro_package_advancements_v30::*;
 pub mod sovereign_distro_package_advancements_v31;
 pub use sovereign_distro_package_advancements_v31::*;
 
-#[path = "../package/sovereign_distro_package_advancements_v32.rs"]
-pub mod sovereign_distro_package_advancements_v32;
-pub use sovereign_distro_package_advancements_v32::*;
-
 #[path = "../package/sovereign_distro_package_advancements_v33.rs"]
 pub mod sovereign_distro_package_advancements_v33;
 pub use sovereign_distro_package_advancements_v33::*;

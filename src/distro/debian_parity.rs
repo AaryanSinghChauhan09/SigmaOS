@@ -20,6 +20,7 @@ use std::format;
 pub struct DebianPackageManager {
     pub sources_list: Vec<String>,
     pub installed_packages: Vec<String>,
+    pub held_packages: Vec<String>,
     pub cache_updated: Cell<bool>,
 }
 
@@ -28,8 +29,33 @@ impl DebianPackageManager {
         DebianPackageManager {
             sources_list: Vec::new(),
             installed_packages: Vec::new(),
+            held_packages: Vec::new(),
             cache_updated: Cell::new(false),
         }
+    }
+
+    /// Hold package from automatic upgrades (apt-mark hold equivalent)
+    pub fn hold_package(&mut self, package: &str) {
+        if !self.held_packages.contains(&String::from(package)) {
+            self.held_packages.push(String::from(package));
+        }
+    }
+
+    /// Unhold package (apt-mark unhold equivalent)
+    pub fn unhold_package(&mut self, package: &str) -> bool {
+        let package_str = String::from(package);
+        for i in 0..self.held_packages.len() {
+            if self.held_packages[i] == package_str {
+                self.held_packages.remove(i);
+                return true;
+            }
+        }
+        false
+    }
+
+    /// Check if package is held
+    pub fn is_held(&self, package: &str) -> bool {
+        self.held_packages.contains(&String::from(package))
     }
 
     /// Add repository to sources.list
@@ -949,9 +975,21 @@ impl Default for UbuntuDesktopIntegration {
 }
 
 #[cfg(test)]
-#[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_debian_package_manager_hold() {
+        let mut pm = DebianPackageManager::new();
+        pm.install_package("linux-image-generic");
+        assert!(!pm.is_held("linux-image-generic"));
+
+        pm.hold_package("linux-image-generic");
+        assert!(pm.is_held("linux-image-generic"));
+
+        assert!(pm.unhold_package("linux-image-generic"));
+        assert!(!pm.is_held("linux-image-generic"));
+    }
 
     #[test]
     fn test_dpkg_triggers_engine() {

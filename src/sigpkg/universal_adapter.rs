@@ -2418,29 +2418,31 @@ impl UniversalPmCommandDispatcher {
         let mut dry_run = false;
 
         match pm.as_str() {
-            "apt" | "apt-get" | "dpkg" | "debian" | "ubuntu" => {
+            "apt" | "apt-get" | "dpkg" | "dpkg-query" | "debian" | "ubuntu" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
                         "install" | "-i" | "download" => operation = UniversalPmOperation::Install,
-                        "remove" | "purge" | "-r" => operation = UniversalPmOperation::Remove,
+                        "remove" | "purge" | "-r" | "-P" => {
+                            operation = UniversalPmOperation::Remove
+                        }
                         "autoremove" | "auto-remove" | "clean" | "autoclean" => {
                             operation = UniversalPmOperation::CleanCache
                         }
                         "update" | "upgrade" | "dist-upgrade" | "full-upgrade" => {
                             operation = UniversalPmOperation::Upgrade
                         }
-                        "search" => operation = UniversalPmOperation::Search,
-                        "show" | "status" | "policy" | "depends" | "rdepends" | "list"
-                        | "check" => operation = UniversalPmOperation::QueryInfo,
-                        "-s" | "--dry-run" | "--simulate" => dry_run = true,
+                        "search" | "-l" => operation = UniversalPmOperation::Search,
+                        "show" | "status" | "policy" | "depends" | "rdepends" | "list" | "-s"
+                        | "check" | "-W" | "-p" => operation = UniversalPmOperation::QueryInfo,
+                        "--dry-run" | "--simulate" => dry_run = true,
                         arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
                         _ => {}
                     }
                     i += 1;
                 }
             }
-            "spack" | "conan" | "pip" | "cargo" | "gem" | "nuget" | "vcpkg" => {
+            "spack" | "conan" | "pip" | "pip3" | "cargo" | "gem" | "nuget" | "vcpkg" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
@@ -2480,8 +2482,8 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "dnf" | "yum" | "zypper" | "microdnf" | "fedora" | "rhel" | "centos" | "opensuse"
-            | "suse" => {
+            "dnf" | "yum" | "zypper" | "microdnf" | "rpm" | "fedora" | "rhel" | "centos"
+            | "rocky" | "alma" | "almalinux" | "opensuse" | "suse" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
@@ -2680,7 +2682,14 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "kiss" | "cpt" => {
+            "kiss" | "cpt" | "crux" | "pkgmk" | "pkgadd" | "pkgrm" | "pkginfo" => {
+                if pm == "pkgadd" {
+                    operation = UniversalPmOperation::Install;
+                } else if pm == "pkgrm" {
+                    operation = UniversalPmOperation::Remove;
+                } else if pm == "pkginfo" {
+                    operation = UniversalPmOperation::QueryInfo;
+                }
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
@@ -2696,7 +2705,8 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "flatpak" | "snap" | "pkgman" | "swupd" | "brew" | "cachyos-hello" | "chwd" => {
+            "flatpak" | "snap" | "pkgman" | "swupd" | "clearlinux" | "brew" | "cachyos-hello"
+            | "chwd" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
@@ -2728,7 +2738,12 @@ impl UniversalPmCommandDispatcher {
                     }
                 }
             }
-            "pisi" | "urpmi" | "slapt-get" => {
+            "pisi" | "urpmi" | "urpmq" | "urpme" | "slapt-get" => {
+                if pm == "urpme" {
+                    operation = UniversalPmOperation::Remove;
+                } else if pm == "urpmq" {
+                    operation = UniversalPmOperation::QueryInfo;
+                }
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {

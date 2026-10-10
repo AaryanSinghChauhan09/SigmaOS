@@ -128,6 +128,20 @@ if [ -f "src/distro/sovereign_2026_distro_leap_engine.rs" ]; then
     ./build/test_2026_leap
 fi
 
+if [ -f "src/distro/sovereign_2085_distro_supremacy_engine.rs" ]; then
+    echo "Running 2085 Distro Supremacy test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_2085_distro_supremacy_engine.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_2085_supremacy
+    ./build/test_2085_supremacy
+fi
+
+if [ -f "src/distro/sovereign_2090_distro_supremacy_engine.rs" ]; then
+    echo "Running 2090 Distro Supremacy test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_2090_distro_supremacy_engine.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_2090_supremacy
+    ./build/test_2090_supremacy
+fi
+
 if [ -f "src/distro/linux_bsd_distro_breakthroughs.rs" ]; then
     echo "Running Linux & BSD Distro Breakthroughs test suite..."
     mkdir -p build
@@ -161,6 +175,13 @@ if [ -f "src/distro/sovereign_linux_bsd_all_subsystems_harmony.rs" ]; then
     mkdir -p build
     rustc --test src/distro/sovereign_linux_bsd_all_subsystems_harmony.rs --edition=2021 -o build/test_subsystem_harmony
     ./build/test_subsystem_harmony
+fi
+
+if [ -f "src/distro/sovereign_thousands_distro_components.rs" ]; then
+    echo "Running Sovereign Thousands Distro Components Subsystem test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_thousands_distro_components.rs --edition=2021 -o build/test_thousands
+    ./build/test_thousands
 fi
 
 if [ -f "src/distro/sovereign_linux_bsd_distro_next_gen_innovations.rs" ]; then
@@ -416,6 +437,13 @@ if [ -f "src/package/sovereign_distro_package_advancements_v32.rs" ]; then
     ./build/sovereign_advancements_v32_test
 fi
 
+if [ -f "src/package/sovereign_distro_package_advancements_v33.rs" ]; then
+    echo "Running Sovereign Universal Package Advancements Suite V33 test suite..."
+    mkdir -p build
+    rustc --test src/package/sovereign_distro_package_advancements_v33.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v33_test
+    ./build/sovereign_advancements_v33_test
+fi
+
 if [ -f "src/package/sovereign_universal_pm_pr_bridge.rs" ]; then
     echo "Running Sovereign Universal PM PR Bridge Engine test suite..."
     mkdir -p build
@@ -540,6 +568,13 @@ if [ -f "src/open_source_os_gap_closure.rs" ]; then
     mkdir -p build
     rustc --test src/open_source_os_gap_closure.rs --edition=2021 --cfg 'feature="gap_closure_test"' -o build/test_open_source_gap_closure
     ./build/test_open_source_gap_closure
+fi
+
+if [ -f "src/open_source_os_missing_components_parity.rs" ]; then
+    echo "Running Open Source OS Missing Components Parity test suite..."
+    mkdir -p build
+    rustc --test src/open_source_os_missing_components_parity.rs --edition=2021 -o build/test_open_source_missing_components
+    ./build/test_open_source_missing_components
 fi
 
 if [ -f "src/open_source_obsoletion.rs" ]; then

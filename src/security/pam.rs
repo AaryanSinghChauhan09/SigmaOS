@@ -35,6 +35,11 @@ pub struct PamUser {
     pub failed_attempts: u32,
 }
 
+#[inline]
+fn contains_invalid_chars(s: &str) -> bool {
+    s.bytes().any(|b| b == 0 || b < 32 || b == 127)
+}
+
 /// Group entry representing standard Unix-like groups
 #[derive(Debug, Clone)]
 pub struct PamGroup {
@@ -130,7 +135,16 @@ impl SovereignPamManager {
         user_token: &str,
         primary_group: &str,
     ) -> Result<u32, PamError> {
-        if self.users.get(&username.to_string()).is_some() {
+        // Security Hardening: Reject inputs containing embedded NUL bytes or ASCII control characters
+        // to prevent C-ABI truncation, log injection, and CWE-20 input validation bypass.
+        if contains_invalid_chars(username)
+            || contains_invalid_chars(user_token)
+            || contains_invalid_chars(primary_group)
+        {
+            return Err(PamError::PermissionDenied);
+        }
+
+        if self.users.get(username).is_some() {
             return Err(PamError::UserAlreadyExists);
         }
 
@@ -180,7 +194,11 @@ impl SovereignPamManager {
 
     /// Create a system group
     pub fn create_group(&mut self, group_name: &str) -> Result<u32, PamError> {
-        if self.groups.get(&group_name.to_string()).is_some() {
+        if contains_invalid_chars(group_name) {
+            return Err(PamError::PermissionDenied);
+        }
+
+        if self.groups.get(group_name).is_some() {
             return Err(PamError::GroupAlreadyExists);
         }
 
@@ -199,16 +217,20 @@ impl SovereignPamManager {
 
     /// Add a user to a group
     pub fn add_user_to_group(&mut self, username: &str, group_name: &str) -> Result<(), PamError> {
-        if self.users.get(&username.to_string()).is_none() {
+        if contains_invalid_chars(username) || contains_invalid_chars(group_name) {
+            return Err(PamError::PermissionDenied);
+        }
+
+        if self.users.get(username).is_none() {
             return Err(PamError::UserNotFound);
         }
 
-        if self.groups.get(&group_name.to_string()).is_none() {
+        if self.groups.get(group_name).is_none() {
             self.create_group(group_name)?;
         }
 
-        if let Some(group) = self.groups.get_mut(&group_name.to_string()) {
-            if !group.members.contains(&username.to_string()) {
+        if let Some(group) = self.groups.get_mut(group_name) {
+            if !group.members.iter().any(|m| m == username) {
                 group.members.push(username.to_string());
             }
         }
@@ -218,11 +240,22 @@ impl SovereignPamManager {
 
     /// Authenticate a user credentials via stacked PAM verification
     pub fn authenticate(&mut self, username: &str, user_token: &str) -> Result<(), PamError> {
+        if contains_invalid_chars(username) || contains_invalid_chars(user_token) {
+            return Err(PamError::PermissionDenied);
+        }
+
         // Retrieve the user
-        let user = self
-            .users
-            .get_mut(&username.to_string())
-            .ok_or(PamError::UserNotFound)?;
+        let user = match self.users.get_mut(username) {
+            Some(u) => u,
+            None => {
+                // Timing side-channel mitigation: Perform dummy password hashing
+                // to match computation time of existing user lookup (CWE-208 / CWE-385)
+                let dummy_salt = [0u8; 16];
+                let dummy_hash = hash_password_placeholder(user_token, &dummy_salt);
+                let _ = constant_time_eq(&dummy_hash, &[0u8; 32]);
+                return Err(PamError::UserNotFound);
+            }
+        };
 
         // Validate account/lock state through stacked pam modules first
         for module in &self.modules {
@@ -252,8 +285,12 @@ impl SovereignPamManager {
 
     /// Check if a user is in a group
     pub fn is_member_of(&self, username: &str, group_name: &str) -> bool {
-        if let Some(group) = self.groups.get(&group_name.to_string()) {
-            group.members.contains(&username.to_string())
+        if contains_invalid_chars(username) || contains_invalid_chars(group_name) {
+            return false;
+        }
+
+        if let Some(group) = self.groups.get(group_name) {
+            group.members.iter().any(|m| m == username)
         } else {
             false
         }
@@ -335,6 +372,56 @@ mod tests {
         assert_eq!(
             manager.authenticate("alice", alice_valid_pass),
             Err(PamError::AccountLocked)
+        );
+    }
+
+    #[test]
+    fn test_pam_input_validation_and_timing_side_channel_mitigation() {
+        let mut manager = SovereignPamManager::new();
+        manager.create_group("wheel").unwrap();
+        manager
+            .register_user("jules", "secretpass123", "wheel")
+            .unwrap();
+
+        // Reject NUL bytes and control characters in registration
+        assert_eq!(
+            manager.register_user("evil\0user", "pass12345", "wheel"),
+            Err(PamError::PermissionDenied)
+        );
+        assert_eq!(
+            manager.register_user("evil_user", "pass\x1b[31m", "wheel"),
+            Err(PamError::PermissionDenied)
+        );
+        assert_eq!(
+            manager.register_user("evil_user", "pass12345", "wheel\nadmin"),
+            Err(PamError::PermissionDenied)
+        );
+
+        // Reject NUL bytes and control characters in authentication
+        assert_eq!(
+            manager.authenticate("jules\0admin", "secretpass123"),
+            Err(PamError::PermissionDenied)
+        );
+        assert_eq!(
+            manager.authenticate("jules", "secretpass123\r\n"),
+            Err(PamError::PermissionDenied)
+        );
+
+        // Reject NUL bytes in group operations
+        assert_eq!(
+            manager.create_group("wheel\0group"),
+            Err(PamError::PermissionDenied)
+        );
+        assert_eq!(
+            manager.add_user_to_group("jules", "wheel\0group"),
+            Err(PamError::PermissionDenied)
+        );
+        assert!(!manager.is_member_of("jules\0", "wheel"));
+
+        // Verify non-existent user returns UserNotFound (executes dummy hashing path)
+        assert_eq!(
+            manager.authenticate("non_existent_user", "somepassword"),
+            Err(PamError::UserNotFound)
         );
     }
 }

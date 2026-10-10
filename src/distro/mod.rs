@@ -72,6 +72,8 @@ pub mod clear_linux;
 pub mod community;
 pub mod compat_layers;
 pub mod compliance;
+pub mod debian_gap_closure_advancements_v26;
+pub use debian_gap_closure_advancements_v26::*;
 pub mod debian_parity;
 pub mod developer;
 pub mod enterprise;
@@ -329,6 +331,10 @@ pub mod sovereign_2070_distro_supremacy_engine;
 pub use sovereign_2070_distro_supremacy_engine::*;
 pub mod sovereign_2080_distro_supremacy_engine;
 pub use sovereign_2080_distro_supremacy_engine::*;
+pub mod sovereign_2085_distro_supremacy_engine;
+pub use sovereign_2085_distro_supremacy_engine::*;
+pub mod sovereign_2090_distro_supremacy_engine;
+pub use sovereign_2090_distro_supremacy_engine::*;
 pub mod sovereign_2028_distro_supremacy_engine;
 pub use sovereign_2028_distro_supremacy_engine::{
     BpfSchedExtPolicy, DirectScanoutFrame, EbpfSchedTask, FineIbtCallsiteGuard, MicroVmSpawnSpec,
@@ -369,6 +375,8 @@ pub mod community_ecosystem;
 pub use community_ecosystem::*;
 
 pub mod additional_linux_bsd_components;
+pub mod sovereign_thousands_distro_components;
+pub use sovereign_thousands_distro_components::*;
 pub mod tech_media_distro_innovations;
 pub use tech_media_distro_innovations::*;
 pub mod tech_media_extended_innovations;
@@ -422,6 +430,9 @@ pub use tech_media_publication_innovations::*;
 
 pub mod sovereign_open_source_os_gap_closure_pr;
 pub use sovereign_open_source_os_gap_closure_pr::*;
+
+pub mod sovereign_open_source_inspirations_engine;
+pub use sovereign_open_source_inspirations_engine::*;
 
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;

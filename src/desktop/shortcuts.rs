@@ -2,7 +2,7 @@
 // Keyboard shortcuts per Wiki 08-Desktop.md
 // Provides global shortcuts and window management shortcuts
 
-use std::string::{String, ToString};
+use std::string::String;
 use std::vec::Vec;
 
 /// Key modifier
@@ -357,13 +357,16 @@ impl KeyboardShortcutsManager {
         }
     }
 
-    pub fn handle_key_press(&self, modifiers: Vec<KeyModifier>, key: String) -> Option<KeyAction> {
+    /// Evaluates if a key combination matches a registered shortcut action.
+    /// Uses borrowed slices (`&[KeyModifier]` and `&str`) to eliminate heap
+    /// allocations (`Vec` and `String`) on every keyboard event in the compositor loop.
+    pub fn handle_key_press(&self, modifiers: &[KeyModifier], key: &str) -> Option<KeyAction> {
         if !self.config.enabled {
             return None;
         }
 
         for shortcut in &self.shortcuts {
-            if shortcut.matches(&modifiers, &key) {
+            if shortcut.matches(modifiers, key) {
                 return Some(shortcut.action);
             }
         }
@@ -546,7 +549,7 @@ mod tests {
             String::from("Open terminal"),
         ));
 
-        let action = manager.handle_key_press(vec![KeyModifier::Super], String::from("T"));
+        let action = manager.handle_key_press(&[KeyModifier::Super], "T");
         assert_eq!(action, Some(KeyAction::OpenTerminal));
     }
 
