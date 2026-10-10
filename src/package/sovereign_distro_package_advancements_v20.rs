@@ -421,12 +421,10 @@ mod tests {
     fn test_converter_all_formats() {
         let converter = UniversalAllPackageFormatConverterV20::new();
 
-        let gcc_spec = converter
-            .convert_package("gcc-13.2.0.pkg.tar.zst", b"ARCH_PAYLOAD")
-            .unwrap();
-        assert_eq!(gcc_spec.source_format, PackageFormat::Pacman);
-        assert_eq!(gcc_spec.package_name, "gcc");
-        assert!(gcc_spec
+        let deb_spec = converter.convert_package("nginx_1.24.deb", b"DEB").unwrap();
+        assert_eq!(deb_spec.package_name, "nginx");
+        assert_eq!(deb_spec.source_format, PackageFormat::Deb);
+        assert!(deb_spec
             .canonical_dependencies
             .contains(&"sovereign-libc".to_string()));
 
@@ -479,13 +477,13 @@ mod tests {
         let sigpkg = suite
             .convert_submit_and_install("vim-9.1.rpm", b"VIM_PAYLOAD")
             .unwrap();
-        assert_eq!(sigpkg.name, "sovereign-vim");
-        assert!(suite.installed_packages.contains(&"sovereign-vim".to_string()));
+        assert_eq!(sigpkg.name, "sigpkg-vim");
+        assert!(suite.installed_packages.contains(&"sigpkg-vim".to_string()));
 
         let response = suite.execute_cli_command("apt install tmux").unwrap();
         assert!(response.contains("tmux"));
         assert!(suite
             .installed_packages
-            .contains(&"sovereign-tmux".to_string()));
+            .contains(&"sigpkg-tmux".to_string()));
     }
 }

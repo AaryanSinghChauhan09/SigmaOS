@@ -214,29 +214,132 @@ impl SovereignSubsystemDistroHarmonyEngine {
         ];
 
         let subsystems_list = [
-            (SigmaOsSubsystem::KernelScheduling, vec!["EEVDF", "BORE", "sched_ext", "NuttX_RT"]),
-            (SigmaOsSubsystem::SecuritySandboxing, vec!["Pledge", "Unveil", "Capsicum", "LandlockV5", "AppArmor", "SELinux"]),
-            (SigmaOsSubsystem::FilesystemStorage, vec!["Bcachefs", "ZFS", "Btrfs", "HAMMER2", "BFS", "9P2000"]),
-            (SigmaOsSubsystem::Networking, vec!["eBPF_XDP", "VNET_Jails", "Crossbow_VNIC", "pf_firewall", "nftables"]),
-            (SigmaOsSubsystem::PackageManagement, vec!["sigma-pkg", "Pacman", "Apt", "Dnf", "Apk", "Ebuild", "NixFlakes", "Guix"]),
-            (SigmaOsSubsystem::InitSupervisor, vec!["Systemd", "OpenRC", "Runit", "Dinit", "SMF", "Shepherd"]),
-            (SigmaOsSubsystem::DesktopCompositor, vec!["Wayland_HDR", "Hyprland", "KDE_Plasma6", "Cosmic", "X11_Bridge"]),
-            (SigmaOsSubsystem::AudioSound, vec!["PipeWire", "ALSA", "SNDIO", "PulseAudio"]),
-            (SigmaOsSubsystem::HardwarePower, vec!["PowerProfiles", "TLP", "DVFS", "ACPI_APIC"]),
-            (SigmaOsSubsystem::ContainerVirt, vec!["Podman_OCI", "FreeBSD_Jails", "Zones", "Bubblewrap", "Firejail"]),
-            (SigmaOsSubsystem::ObservabilityDiagnostics, vec!["DTrace", "eBPF_Trace", "Sysdig", "Fastfetch"]),
-            (SigmaOsSubsystem::ShellTerminal, vec!["OmarchyPrompt", "Zsh", "Fish", "Bash", "VT100_Grid"]),
-            (SigmaOsSubsystem::IpcMemory, vec!["ZeroCopyRing", "THP_Collapse", "zram", "kswapd"]),
-            (SigmaOsSubsystem::DriversHardware, vec!["PCIe_MMIO", "xHCI_USB", "NVMe", "Intel_Xe", "iwlwifi"]),
-            (SigmaOsSubsystem::InstallerBoot, vec!["Limine", "GRUB2", "systemd-boot", "Calamares_Wizard"]),
-            (SigmaOsSubsystem::AuthIdentity, vec!["PAM", "systemd-homed", "bsd_auth", "PQC_Token"]),
-            (SigmaOsSubsystem::I18nLocalization, vec!["Locale_Manager", "IME_Engine", "FontConfig"]),
-            (SigmaOsSubsystem::MediaGraphics, vec!["DRM_KMS", "DirectScanout", "XViewer", "Hypnotix"]),
-            (SigmaOsSubsystem::CompilerToolchain, vec!["LLVM_Clang", "GCC_SSP", "Ccache", "Makepkg_Chroot"]),
-            (SigmaOsSubsystem::AutomationProvisioning, vec!["CloudInit", "Kickstart", "Preseed", "Netplan"]),
-            (SigmaOsSubsystem::SystemAudit, vec!["Auditd", "arch-audit", "CII_BestPractices", "Syzkaller"]),
-            (SigmaOsSubsystem::AiWorkflowAgent, vec!["Omarchy_AI", "Herdr_Orchestrator", "SuperA_Keybinding"]),
-            (SigmaOsSubsystem::VirtualizationHypervisor, vec!["KVM", "Bhyve", "VMM", "VirtIO_Ring"]),
+            (
+                SigmaOsSubsystem::KernelScheduling,
+                vec!["EEVDF", "BORE", "sched_ext", "NuttX_RT"],
+            ),
+            (
+                SigmaOsSubsystem::SecuritySandboxing,
+                vec![
+                    "Pledge",
+                    "Unveil",
+                    "Capsicum",
+                    "LandlockV5",
+                    "AppArmor",
+                    "SELinux",
+                ],
+            ),
+            (
+                SigmaOsSubsystem::FilesystemStorage,
+                vec!["Bcachefs", "ZFS", "Btrfs", "HAMMER2", "BFS", "9P2000"],
+            ),
+            (
+                SigmaOsSubsystem::Networking,
+                vec![
+                    "eBPF_XDP",
+                    "VNET_Jails",
+                    "Crossbow_VNIC",
+                    "pf_firewall",
+                    "nftables",
+                ],
+            ),
+            (
+                SigmaOsSubsystem::PackageManagement,
+                vec![
+                    "sigma-pkg",
+                    "Pacman",
+                    "Apt",
+                    "Dnf",
+                    "Apk",
+                    "Ebuild",
+                    "NixFlakes",
+                    "Guix",
+                ],
+            ),
+            (
+                SigmaOsSubsystem::InitSupervisor,
+                vec!["Systemd", "OpenRC", "Runit", "Dinit", "SMF", "Shepherd"],
+            ),
+            (
+                SigmaOsSubsystem::DesktopCompositor,
+                vec![
+                    "Wayland_HDR",
+                    "Hyprland",
+                    "KDE_Plasma6",
+                    "Cosmic",
+                    "X11_Bridge",
+                ],
+            ),
+            (
+                SigmaOsSubsystem::AudioSound,
+                vec!["PipeWire", "ALSA", "SNDIO", "PulseAudio"],
+            ),
+            (
+                SigmaOsSubsystem::HardwarePower,
+                vec!["PowerProfiles", "TLP", "DVFS", "ACPI_APIC"],
+            ),
+            (
+                SigmaOsSubsystem::ContainerVirt,
+                vec![
+                    "Podman_OCI",
+                    "FreeBSD_Jails",
+                    "Zones",
+                    "Bubblewrap",
+                    "Firejail",
+                ],
+            ),
+            (
+                SigmaOsSubsystem::ObservabilityDiagnostics,
+                vec!["DTrace", "eBPF_Trace", "Sysdig", "Fastfetch"],
+            ),
+            (
+                SigmaOsSubsystem::ShellTerminal,
+                vec!["OmarchyPrompt", "Zsh", "Fish", "Bash", "VT100_Grid"],
+            ),
+            (
+                SigmaOsSubsystem::IpcMemory,
+                vec!["ZeroCopyRing", "THP_Collapse", "zram", "kswapd"],
+            ),
+            (
+                SigmaOsSubsystem::DriversHardware,
+                vec!["PCIe_MMIO", "xHCI_USB", "NVMe", "Intel_Xe", "iwlwifi"],
+            ),
+            (
+                SigmaOsSubsystem::InstallerBoot,
+                vec!["Limine", "GRUB2", "systemd-boot", "Calamares_Wizard"],
+            ),
+            (
+                SigmaOsSubsystem::AuthIdentity,
+                vec!["PAM", "systemd-homed", "bsd_auth", "PQC_Token"],
+            ),
+            (
+                SigmaOsSubsystem::I18nLocalization,
+                vec!["Locale_Manager", "IME_Engine", "FontConfig"],
+            ),
+            (
+                SigmaOsSubsystem::MediaGraphics,
+                vec!["DRM_KMS", "DirectScanout", "XViewer", "Hypnotix"],
+            ),
+            (
+                SigmaOsSubsystem::CompilerToolchain,
+                vec!["LLVM_Clang", "GCC_SSP", "Ccache", "Makepkg_Chroot"],
+            ),
+            (
+                SigmaOsSubsystem::AutomationProvisioning,
+                vec!["CloudInit", "Kickstart", "Preseed", "Netplan"],
+            ),
+            (
+                SigmaOsSubsystem::SystemAudit,
+                vec!["Auditd", "arch-audit", "CII_BestPractices", "Syzkaller"],
+            ),
+            (
+                SigmaOsSubsystem::AiWorkflowAgent,
+                vec!["Omarchy_AI", "Herdr_Orchestrator", "SuperA_Keybinding"],
+            ),
+            (
+                SigmaOsSubsystem::VirtualizationHypervisor,
+                vec!["KVM", "Bhyve", "VMM", "VirtIO_Ring"],
+            ),
         ];
 
         for (sub, caps) in subsystems_list {
@@ -373,7 +476,10 @@ impl SovereignSubsystemDistroHarmonyEngine {
         }
 
         for spec in self.subsystems.values() {
-            if spec.supported_distros.len() < 25 || spec.capabilities.is_empty() || spec.interop_score < 100 {
+            if spec.supported_distros.len() < 25
+                || spec.capabilities.is_empty()
+                || spec.interop_score < 100
+            {
                 return false;
             }
         }
@@ -397,11 +503,23 @@ mod tests {
     fn test_subsystem_and_distro_enums() {
         assert_eq!(LinuxBsdDistroInspiration::ArchLinux.as_str(), "ArchLinux");
         assert_eq!(LinuxBsdDistroInspiration::FreeBSD.as_str(), "FreeBSD");
-        assert_eq!(LinuxBsdDistroInspiration::Plan9Frontier.as_str(), "Plan9Frontier");
+        assert_eq!(
+            LinuxBsdDistroInspiration::Plan9Frontier.as_str(),
+            "Plan9Frontier"
+        );
 
-        assert_eq!(SigmaOsSubsystem::KernelScheduling.as_str(), "KernelScheduling");
-        assert_eq!(SigmaOsSubsystem::AiWorkflowAgent.as_str(), "AiWorkflowAgent");
-        assert_eq!(SigmaOsSubsystem::VirtualizationHypervisor.as_str(), "VirtualizationHypervisor");
+        assert_eq!(
+            SigmaOsSubsystem::KernelScheduling.as_str(),
+            "KernelScheduling"
+        );
+        assert_eq!(
+            SigmaOsSubsystem::AiWorkflowAgent.as_str(),
+            "AiWorkflowAgent"
+        );
+        assert_eq!(
+            SigmaOsSubsystem::VirtualizationHypervisor.as_str(),
+            "VirtualizationHypervisor"
+        );
     }
 
     #[test]
