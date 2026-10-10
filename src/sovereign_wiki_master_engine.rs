@@ -200,6 +200,12 @@ impl SovereignLinuxBsdWikiRoadmapParityEngine {
                 "src/distro/arch_linux_parity_pr_suite.rs",
                 "Arch Linux Parity PR Suite",
             ),
+            (
+                26,
+                "System Utilities Architecture & Development Decision Plan",
+                "src/userland/system_utilities.rs",
+                "System Utilities Development Plan",
+            ),
         ];
 
         for (id, title, module, _spec) in default_ideas {
@@ -329,8 +335,8 @@ mod tests {
     #[test]
     fn test_wiki_roadmap_parity_engine() {
         let engine = SovereignLinuxBsdWikiRoadmapParityEngine::new();
-        assert_eq!(engine.total_ideas_count, 25);
-        assert_eq!(engine.implemented_ideas_count(), 25);
+        assert_eq!(engine.total_ideas_count, 26);
+        assert_eq!(engine.implemented_ideas_count(), 26);
         assert_eq!(engine.verification_percentage(), 100.0);
     }
 
