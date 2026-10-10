@@ -928,23 +928,79 @@ pub struct SovereignDistroMissingComponentsExpansionEngine {
 impl SovereignDistroMissingComponentsExpansionEngine {
     pub fn new() -> Self {
         let distros = [
-            "Debian GNU/Linux", "Ubuntu Linux", "Fedora Linux", "Arch Linux", "openSUSE Tumbleweed",
-            "Gentoo Linux", "NixOS", "Void Linux", "Alpine Linux", "FreeBSD",
-            "OpenBSD", "NetBSD", "DragonFly BSD", "Solaris / Illumos", "CachyOS",
-            "Pop!_OS", "Linux Mint", "Manjaro", "Garuda Linux", "EndeavourOS",
-            "Clear Linux", "Tails", "Kali Linux", "Whonix", "Bedrock Linux",
-            "Solus / Serpent OS", "Alpine Edge", "Chimera Linux", "Slackware", "Rocky Linux",
-            "AlmaLinux", "Nobara Linux", "Vanilla OS", "RHEL", "Artix Linux",
-            "Guix System", "Mageia", "PCLinuxOS", "Void Musl", "KaOS",
-            "Puppy Linux", "Slax", "Devuan", "Zorin OS", "Elementary OS",
-            "MX Linux", "Deepin", "Omarchy", "Haiku OS", "Redox OS",
+            "Debian GNU/Linux",
+            "Ubuntu Linux",
+            "Fedora Linux",
+            "Arch Linux",
+            "openSUSE Tumbleweed",
+            "Gentoo Linux",
+            "NixOS",
+            "Void Linux",
+            "Alpine Linux",
+            "FreeBSD",
+            "OpenBSD",
+            "NetBSD",
+            "DragonFly BSD",
+            "Solaris / Illumos",
+            "CachyOS",
+            "Pop!_OS",
+            "Linux Mint",
+            "Manjaro",
+            "Garuda Linux",
+            "EndeavourOS",
+            "Clear Linux",
+            "Tails",
+            "Kali Linux",
+            "Whonix",
+            "Bedrock Linux",
+            "Solus / Serpent OS",
+            "Alpine Edge",
+            "Chimera Linux",
+            "Slackware",
+            "Rocky Linux",
+            "AlmaLinux",
+            "Nobara Linux",
+            "Vanilla OS",
+            "RHEL",
+            "Artix Linux",
+            "Guix System",
+            "Mageia",
+            "PCLinuxOS",
+            "Void Musl",
+            "KaOS",
+            "Puppy Linux",
+            "Slax",
+            "Devuan",
+            "Zorin OS",
+            "Elementary OS",
+            "MX Linux",
+            "Deepin",
+            "Omarchy",
+            "Haiku OS",
+            "Redox OS",
         ];
 
         let modifiers = [
-            "NextGen", "Sovereign", "Hardened", "Zero-Copy", "Realtime",
-            "Hermetic", "Atomic", "Distributed", "Optimized", "Dynamic",
-            "Modular", "High-Performance", "Ultra", "Enterprise", "Adaptive",
-            "Autonomous", "Resilient", "Quantum-Safe", "Microsecond", "Isolated",
+            "NextGen",
+            "Sovereign",
+            "Hardened",
+            "Zero-Copy",
+            "Realtime",
+            "Hermetic",
+            "Atomic",
+            "Distributed",
+            "Optimized",
+            "Dynamic",
+            "Modular",
+            "High-Performance",
+            "Ultra",
+            "Enterprise",
+            "Adaptive",
+            "Autonomous",
+            "Resilient",
+            "Quantum-Safe",
+            "Microsecond",
+            "Isolated",
         ];
 
         let categories = [
@@ -1077,8 +1133,14 @@ impl SovereignDistroMissingComponentsExpansionEngine {
         self.components.iter_mut().find(|c| c.id == id)
     }
 
-    pub fn filter_by_category(&self, category: DistroExpansionCategory) -> Vec<&MissingDistroComponentItem> {
-        self.components.iter().filter(|c| c.category == category).collect()
+    pub fn filter_by_category(
+        &self,
+        category: DistroExpansionCategory,
+    ) -> Vec<&MissingDistroComponentItem> {
+        self.components
+            .iter()
+            .filter(|c| c.category == category)
+            .collect()
     }
 
     pub fn filter_by_distro(&self, distro: &str) -> Vec<&MissingDistroComponentItem> {
@@ -1100,7 +1162,11 @@ impl SovereignDistroMissingComponentsExpansionEngine {
             .collect()
     }
 
-    pub fn execute_component_action(&mut self, id: u32, action: &str) -> Result<String, &'static str> {
+    pub fn execute_component_action(
+        &mut self,
+        id: u32,
+        action: &str,
+    ) -> Result<String, &'static str> {
         let item = self.get_by_id_mut(id).ok_or("Component ID not found")?;
         if !item.enabled {
             return Err("Component is disabled");
@@ -1127,7 +1193,8 @@ impl SovereignDistroMissingComponentsExpansionEngine {
             return false;
         }
         let first_id = cat_items[0].id;
-        self.execute_component_action(first_id, "health_check").is_ok()
+        self.execute_component_action(first_id, "health_check")
+            .is_ok()
     }
 }
 
