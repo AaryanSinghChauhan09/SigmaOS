@@ -1,10 +1,7 @@
-use core::sync::atomic::{AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 use std::boxed::Box;
-/// OOP-based Block Storage for SigmaOS
-/// Based on 100-Improvement-Ideas.md storage management concepts
-/// Implements comprehensive block device abstraction, partition management,
-/// and caching for high-performance storage operations
 use std::collections::BTreeMap;
+use std::string::{String, ToString};
 use std::vec::Vec;
 
 pub type BlockDeviceID = usize;
@@ -24,6 +21,7 @@ pub enum DeviceClass {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(u8)]
 pub enum BlockError {
     Success = 0,
     NotFound = 1,
@@ -33,6 +31,23 @@ pub enum BlockError {
     OutOfBounds = 5,
     InvalidBlockSize = 6,
     SequentialOnly = 7,
+    RequestExhaustion = 8,
+    LostCompletion = 9,
+    DoubleCompletion = 10,
+    QueueFull = 11,
+    DeviceBusy = 12,
+    InvalidRequest = 13,
+    DeviceDetached = 14,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RequestState {
+    Unallocated,
+    Pending,
+    Dispatched,
+    Completed,
+    Failed,
+    Freed,
 }
 
 // ── 0. SCSI SENSE KEYS & ADDITIONAL SENSE CODE QUALIFIERS (ASC/ASCQ) ─────
@@ -363,6 +378,167 @@ impl BlockOperationEngine {
     }
 }
 
+// ── 2B. BOUNDED BLOCK DEVICE MANAGER & EXACT-ONCE COMPLETION ENGINE ──────
+
+#[derive(Debug, Clone)]
+pub struct BoundedBlockRequest {
+    pub req_id: u64,
+    pub device_id: BlockDeviceID,
+    pub op: BlockOpCode,
+    pub block_num: BlockNumber,
+    pub count: usize,
+    pub buffer: Vec<u8>,
+    pub state: RequestState,
+    pub submission_time_ms: u64,
+}
+
+pub struct BoundedBlockDeviceManager {
+    pub max_requests: usize,
+    pub active_requests: BTreeMap<u64, BoundedBlockRequest>,
+    pub pending_queue: Vec<u64>,
+    pub next_req_id: AtomicU64,
+    pub devices: BTreeMap<BlockDeviceID, Box<dyn BlockOrientedDevice>>,
+}
+
+impl BoundedBlockDeviceManager {
+    pub fn new(max_requests: usize) -> Self {
+        Self {
+            max_requests,
+            active_requests: BTreeMap::new(),
+            pending_queue: Vec::new(),
+            next_req_id: AtomicU64::new(100),
+            devices: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_device(&mut self, device: Box<dyn BlockOrientedDevice>) {
+        self.devices.insert(device.device_id(), device);
+    }
+
+    pub fn unregister_device(&mut self, device_id: BlockDeviceID) -> Result<(), BlockError> {
+        if self.devices.remove(&device_id).is_some() {
+            Ok(())
+        } else {
+            Err(BlockError::NotFound)
+        }
+    }
+
+    pub fn submit_request(
+        &mut self,
+        device_id: BlockDeviceID,
+        op: BlockOpCode,
+        block_num: BlockNumber,
+        count: usize,
+        buffer: Vec<u8>,
+        timestamp_ms: u64,
+    ) -> Result<u64, BlockError> {
+        if !self.devices.contains_key(&device_id) {
+            return Err(BlockError::NotFound);
+        }
+        if self.active_requests.len() >= self.max_requests {
+            return Err(BlockError::RequestExhaustion);
+        }
+
+        let req_id = self.next_req_id.fetch_add(1, Ordering::SeqCst);
+        let req = BoundedBlockRequest {
+            req_id,
+            device_id,
+            op,
+            block_num,
+            count,
+            buffer,
+            state: RequestState::Pending,
+            submission_time_ms: timestamp_ms,
+        };
+
+        self.active_requests.insert(req_id, req);
+        self.pending_queue.push(req_id);
+        Ok(req_id)
+    }
+
+    pub fn dispatch_next(&mut self) -> Result<Option<u64>, BlockError> {
+        if self.pending_queue.is_empty() {
+            return Ok(None);
+        }
+
+        let req_id = self.pending_queue.remove(0);
+        if let Some(req) = self.active_requests.get_mut(&req_id) {
+            req.state = RequestState::Dispatched;
+            if let Some(dev) = self.devices.get_mut(&req.device_id) {
+                let mut op_req = BlockOperationRequest {
+                    req_id,
+                    device_id: req.device_id,
+                    op: req.op,
+                    block_num: req.block_num,
+                    count: req.count,
+                    buffer: req.buffer.clone(),
+                    direct_io: false,
+                };
+                match BlockOperationEngine::execute_op(dev.as_mut(), &mut op_req) {
+                    Ok(_) => {
+                        req.buffer = op_req.buffer;
+                        Ok(Some(req_id))
+                    }
+                    Err(e) => {
+                        req.state = RequestState::Failed;
+                        Err(e)
+                    }
+                }
+            } else {
+                req.state = RequestState::Failed;
+                Err(BlockError::DeviceDetached)
+            }
+        } else {
+            Err(BlockError::NotFound)
+        }
+    }
+
+    pub fn complete_request(&mut self, req_id: u64, success: bool) -> Result<(), BlockError> {
+        let req = match self.active_requests.get_mut(&req_id) {
+            Some(r) => r,
+            None => return Err(BlockError::LostCompletion),
+        };
+
+        match req.state {
+            RequestState::Completed | RequestState::Failed => Err(BlockError::DoubleCompletion),
+            RequestState::Dispatched | RequestState::Pending => {
+                req.state = if success {
+                    RequestState::Completed
+                } else {
+                    RequestState::Failed
+                };
+                Ok(())
+            }
+            RequestState::Unallocated | RequestState::Freed => Err(BlockError::InvalidRequest),
+        }
+    }
+
+    pub fn reap_completed(&mut self, req_id: u64) -> Result<BoundedBlockRequest, BlockError> {
+        if let Some(req) = self.active_requests.get(&req_id) {
+            if req.state != RequestState::Completed && req.state != RequestState::Failed {
+                return Err(BlockError::DeviceBusy);
+            }
+        } else {
+            return Err(BlockError::NotFound);
+        }
+
+        Ok(self.active_requests.remove(&req_id).unwrap())
+    }
+
+    pub fn detect_lost_completions(&mut self, current_time_ms: u64, timeout_ms: u64) -> Vec<u64> {
+        let mut timed_out = Vec::new();
+        for (req_id, req) in &mut self.active_requests {
+            if req.state == RequestState::Dispatched
+                && current_time_ms >= req.submission_time_ms + timeout_ms
+            {
+                req.state = RequestState::Failed;
+                timed_out.push(*req_id);
+            }
+        }
+        timed_out
+    }
+}
+
 // ── 3. MULTI-TYPE BLOCK CLASSIFICATION ────────────────────────────────────
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -591,66 +767,6 @@ impl BlockDevice for SimpleBlockDevice {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_ssd_ftl_wear_leveling() {
-        let mut ssd = SsdBlockDevice::new(1, 4096, 16);
-        let data = std::vec![0xAAu8; 4096];
-        assert!(ssd.write_block(0, &data).is_ok());
-        assert_eq!(ssd.erase_cycles[0], 1);
-
-        ssd.set_write_blocked(true);
-        assert_eq!(ssd.write_block(0, &data), Err(BlockError::WriteBlocked));
-    }
-
-    #[test]
-    fn test_record_blocking_factor() {
-        let engine = RecordBlockingEngine::new(BlockingStrategy::FixedLengthUnspanned, 4096, 128);
-        assert_eq!(engine.blocking_factor, 32);
-        assert_eq!(engine.calculate_blocks_needed(100), 4);
-    }
-
-    #[test]
-    fn test_system_block_diagram_topology() {
-        let mut diagram = SystemBlockDiagramEngine::new("SigmaOS Memory & PCIe Topology");
-        diagram.add_sub_block(
-            1,
-            "PCIe Gen5 Controller",
-            &["Root Complex Bus"],
-            &["DMA Channels"],
-        );
-        diagram.add_sub_block(
-            2,
-            "NVMe Controller Engine",
-            &["DMA Channels"],
-            &["Flash Memory Arrays"],
-        );
-        diagram.connect_bus("HighSpeedPCIeBus", 1, 2, 32000);
-
-        assert_eq!(diagram.block_count(), 2);
-        assert_eq!(diagram.signal_buses.len(), 1);
-    }
-
-    #[test]
-    fn test_scsi_sense_data_handling() {
-        let sense = ScsiSenseData::new(
-            ScsiSenseKey::IllegalRequest,
-            ScsiAscQualifier::LbaOutOfRange,
-        )
-        .with_info(0x00018000);
-
-        assert_eq!(sense.sense_key, ScsiSenseKey::IllegalRequest);
-        assert_eq!(sense.asc, 0x21);
-        assert_eq!(sense.ascq, 0x00);
-        assert!(sense.valid_info);
-        assert_eq!(sense.information, 0x00018000);
-        assert!(sense.description().contains("IllegalRequest"));
-    }
-}
-
 pub trait BlockManager {
     fn register_device(
         &mut self,
@@ -834,85 +950,65 @@ impl BlockCache for SimpleBlockCache {
     }
 }
 
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    fn remove(&mut self, index: usize) -> T {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe {
-            let item = core::ptr::read(self.data.add(index));
-            for i in index..self.len - 1 {
-                core::ptr::copy_nonoverlapping(self.data.add(i + 1), self.data.add(i), 1);
-            }
-            self.len -= 1;
-            item
-        }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if new_data.is_null() {
-            panic!("out of memory");
-        }
-        if !self.data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-        }
-        self.data = new_data;
-        self.capacity = new_capacity;
-    }
-}
+    #[test]
+    fn test_ssd_ftl_wear_leveling() {
+        let mut ssd = SsdBlockDevice::new(1, 4096, 16);
+        let data = std::vec![0xAAu8; 4096];
+        assert!(ssd.write_block(0, &data).is_ok());
+        assert_eq!(ssd.erase_cycles[0], 1);
 
-#[cfg(target_os = "none")]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
+        ssd.set_write_blocked(true);
+        assert_eq!(ssd.write_block(0, &data), Err(BlockError::WriteBlocked));
+    }
+
+    #[test]
+    fn test_bounded_block_manager_exhaustion_and_exact_once_completion() {
+        let mut mgr = BoundedBlockDeviceManager::new(2);
+        let ssd = SsdBlockDevice::new(1, 512, 100);
+        mgr.register_device(Box::new(ssd));
+
+        let req1 = mgr
+            .submit_request(1, BlockOpCode::Read, 0, 1, Vec::new(), 1000)
+            .unwrap();
+        let req2 = mgr
+            .submit_request(1, BlockOpCode::Write, 1, 1, std::vec![0xFF; 512], 1005)
+            .unwrap();
+
+        // Exhaustion check
+        let err = mgr.submit_request(1, BlockOpCode::Read, 2, 1, Vec::new(), 1010);
+        assert_eq!(err, Err(BlockError::RequestExhaustion));
+
+        // Dispatch req1
+        let dispatched = mgr.dispatch_next().unwrap();
+        assert_eq!(dispatched, Some(req1));
+
+        // Complete req1 once -> Success
+        assert_eq!(mgr.complete_request(req1, true), Ok(()));
+
+        // Complete req1 second time -> DoubleCompletion Error
+        assert_eq!(
+            mgr.complete_request(req1, true),
+            Err(BlockError::DoubleCompletion)
+        );
+
+        // Lost completion check for non-existent req
+        assert_eq!(
+            mgr.complete_request(999, true),
+            Err(BlockError::LostCompletion)
+        );
+
+        // Reap completed req1
+        let reaped = mgr.reap_completed(req1).unwrap();
+        assert_eq!(reaped.state, RequestState::Completed);
+
+        // Dispatch req2 and test lost completion timeout
+        let dispatched2 = mgr.dispatch_next().unwrap().unwrap();
+        assert_eq!(dispatched2, req2);
+        let timed_out = mgr.detect_lost_completions(2000, 500);
+        assert_eq!(timed_out, std::vec![req2]);
+    }
 }

@@ -17,15 +17,16 @@
 // Virtual filesystem, journaling filesystems (Btrfs, XFS), and storage support
 
 pub mod btrfs;
-// pub mod filesystem;
+pub mod cache;
 pub mod sigmacas;
 pub mod sigmafs;
-// pub mod support;
-// pub mod vfs;
 pub mod xfs;
 
 pub use btrfs::{
     BtrfsExtent, BtrfsFilesystem, BtrfsSnapshot, BtrfsSubvolume, ChecksumType, CompressionType,
+};
+pub use cache::{
+    BlockCacheManager, CacheError, CacheOomMetrics, CachePage, CachePageState, WatermarkLevel,
 };
 pub use sigmacas::{CasBlock, SigmaFsCasEngine, DILITHIUM5_SIGNATURE_SIZE, SHA256_HASH_SIZE};
 pub use sigmafs::{
@@ -38,16 +39,21 @@ pub use xfs::{
 };
 
 pub mod bcachefs_sovereign;
-pub use bcachefs_sovereign::{SovereignBcachefsVolume, BcachefsInode, BcachefsExtent, BcachefsSnapshot, ChecksumAlgorithm, CompressionType, sovereign_crc32c};
+pub use bcachefs_sovereign::{
+    sovereign_crc32c, BcachefsExtent, BcachefsInode, BcachefsSnapshot, ChecksumAlgorithm,
+    SovereignBcachefsVolume,
+};
 
 pub mod overlayfs_sovereign;
-pub use overlayfs_sovereign::{SovereignOverlayFs, OverlayLayer, OverlayEntry, OverlayEntryKind};
+pub use overlayfs_sovereign::{OverlayEntry, OverlayEntryKind, OverlayLayer, SovereignOverlayFs};
 
 pub mod zfs_arc_sovereign;
-pub use zfs_arc_sovereign::{SovereignZfsArc, ArcBufferHeader};
+pub use zfs_arc_sovereign::{ArcBufferHeader, SovereignZfsArc};
 
 pub mod fanotify_sovereign;
-pub use fanotify_sovereign::{SovereignFanotifyGroup, FanotifyEvent, FanotifyEventKind, FanotifyResponse, FanotifyMark};
+pub use fanotify_sovereign::{
+    FanotifyEvent, FanotifyEventKind, FanotifyMark, FanotifyResponse, SovereignFanotifyGroup,
+};
 
 pub mod fscrypt_sovereign;
 pub use fscrypt_sovereign::*;
