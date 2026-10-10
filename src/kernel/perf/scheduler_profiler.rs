@@ -77,7 +77,6 @@ impl Default for SchedulerProfiler {
 }
 
 #[cfg(test)]
-#[cfg(test)]
 mod tests {
     use super::*;
 

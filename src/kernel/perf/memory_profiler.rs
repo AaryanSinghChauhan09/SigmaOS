@@ -59,7 +59,6 @@ impl Default for MemoryProfiler {
 }
 
 #[cfg(test)]
-#[cfg(test)]
 mod tests {
     use super::*;
 

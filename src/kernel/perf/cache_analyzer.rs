@@ -62,7 +62,6 @@ impl Default for CacheStats {
 }
 
 #[cfg(test)]
-#[cfg(test)]
 mod tests {
     use super::*;
 

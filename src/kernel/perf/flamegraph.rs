@@ -82,7 +82,6 @@ impl Default for FlamegraphGenerator {
 }
 
 #[cfg(test)]
-#[cfg(test)]
 mod tests {
     use super::*;
 
