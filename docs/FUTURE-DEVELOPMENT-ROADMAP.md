@@ -166,7 +166,51 @@ SigmaOS embeds native compliance verification directly into the OS runtime and C
 
 ---
 
-## 8. SOVEREIGN SIGMAOS 10-PHASE MASTER DEVELOPMENT PLAN
+## 8. ARCH LINUX GAP CLOSURE & AI AGENT DEVELOPMENT ROADMAP (PR FORMAT)
+
+### 8.1 Arch Linux Parity Gap Closure Pull Request Specs
+```markdown
+### PR #204: Arch Linux ALPM v7 Engine & Parallel Download Sync
+- **Description**: Integrates Pacman v7 ALPM database engine, `pacman.conf` directive parser, and lockless parallel download pipeline.
+- **Components**: `ArchAlpmDbIntegrityEngine`, `ArchPacmanConflictResolverEngine`.
+- **Validation**: Pass `arch_missing_test` and `arch_test` suites.
+
+### PR #205: Clean Chroot Builder & Namcap Linter Integration
+- **Description**: Integrates `arch-nspawn` isolated clean chroot build container environment and `namcap` PKGBUILD linter.
+- **Components**: `ArchPkgctlDevtoolsEngine`, `ArchNamcapLinterEngine`.
+- **Validation**: Pass `test_arch_pr_engine` and clean chroot build checks.
+
+### PR #206: Pacman Keyring Web-Of-Trust & WKS PGP Verification
+- **Description**: Integrates `pacman-key` WOT master keyring, WKS key fetcher, and PQC Dilithium-5 signature verification.
+- **Components**: `ArchKeyringWotPrDeployer`, `CryptoVerifier`.
+- **Validation**: Pass PGP/PQC signature checks on Arch package mirrors.
+
+### PR #207: Arch Audit CVE Security Tracker & AUR v5 RPC Search
+- **Description**: Integrates `arch-audit` security vulnerability feed scanner and AUR v5 RPC client search aggregator.
+- **Components**: `ArchNewsAdvisoryFeedEngine`, `ArchAurWebRpcClient`.
+- **Validation**: Verify live search results and CVE advisory parsing.
+```
+
+### 8.2 AI Agent Subsystem Development Roadmap Inspired by Linux & BSD
+```markdown
+### Phase A: Kernel & Scheduling Specialist AI Skill
+- **Inspiration**: CachyOS BORE/EEVDF & FreeBSD ULE schedulers.
+- **Execution**: AI agent evaluates task interactivity and sleep ratios to dynamically adjust `sched_ext` BPF scheduling slice hints.
+
+### Phase B: Security & Isolation Specialist AI Skill
+- **Inspiration**: OpenBSD Pledge/Unveil & FreeBSD Capsicum capabilities.
+- **Execution**: AI agent inspects binary syscall patterns and automatically generates minimal pledge promises and unveiled VFS path masks.
+
+### Phase C: Package Manager & Dependency Resolution AI Skill
+- **Inspiration**: Arch Linux ALPM & Gentoo Portage USE flags.
+- **Execution**: AI agent runs DPLL SAT solver to resolve multi-distro dependency constraints and clean build chroot profiles.
+
+### Phase D: Display & Compositor Specialist AI Skill
+- **Inspiration**: Omarchy Hyprland Quickshell & Wayland direct KMS scanout.
+- **Execution**: AI agent adjusts Wayland HDR tone-mapping curves and manages GPU page-flip latencies in sub-millisecond intervals.
+```
+
+## 9. SOVEREIGN SIGMAOS 10-PHASE MASTER DEVELOPMENT PLAN
 
 ### Phase 1: Foundation Hardening (Months 1 - 3)
 - Formalize `#![no_std]` core primitives, bare-metal memory allocators, and x86_64/ARM64 interrupt descriptor tables.
