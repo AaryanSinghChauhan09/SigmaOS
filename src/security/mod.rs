@@ -69,6 +69,8 @@ pub mod unveil;
 pub mod vulnerability;
 pub use landlock::{LandlockEngine, LandlockPathBeneathAttr, LandlockRuleset};
 pub mod landlock_sovereign;
+pub mod unified_mac_sandbox;
+pub use unified_mac_sandbox::*;
 
 pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
 pub use bsd_hardening::{

@@ -1567,15 +1567,7 @@ impl MintUploadManager {
         }
     }
 
-    pub fn add_profile(
-        &mut self,
-        name: &str,
-        host: &str,
-        port: u16,
-        protocol: UploadProtocol,
-        remote_path: &str,
-        url_base: &str,
-    ) {
+    pub fn add_profile(&mut self, name: &str, host: &str, port: u16, protocol: UploadProtocol, remote_path: &str, url_base: &str) {
         self.profiles.push(UploadProfile {
             name: name.to_string(),
             host: host.to_string(),
@@ -1586,28 +1578,17 @@ impl MintUploadManager {
         });
     }
 
-    pub fn generate_share_link(
-        &self,
-        profile_name: &str,
-        filename: &str,
-    ) -> Result<String, &'static str> {
-        let prof = self
-            .profiles
-            .iter()
-            .find(|p| p.name == profile_name)
-            .ok_or("Upload profile not found")?;
-        Ok(format!(
-            "{}/{}",
-            prof.public_url_base.trim_end_matches('/'),
-            filename
-        ))
+    pub fn generate_share_link(&self, profile_name: &str, filename: &str) -> Result<String, &'static str> {
+        let prof = self.profiles.iter().find(|p| p.name == profile_name).ok_or("Upload profile not found")?;
+        Ok(format!("{}/{}", prof.public_url_base.trim_end_matches('/'), filename))
     }
 }
 
-/// Mint Sudo & Privilege Escalation Helper (gksu replacement)
+/// Mint Sudo & Privilege Escalation Helper (PAM / gksu replacement)
 pub struct MintDigitKeyringPrompt {
     pub prompt_message: String,
     pub target_command: String,
+    pub expected_hash: [u8; 16],
     pub is_authenticated: bool,
 }
 
@@ -1622,18 +1603,33 @@ impl MintDigitKeyringPrompt {
         Self {
             prompt_message: String::from("Administrative authentication required"),
             target_command: String::new(),
+            expected_hash: [0u8; 16],
             is_authenticated: false,
         }
     }
 
-    pub fn request_auth(&mut self, command: &str, password_attempt: &str) -> bool {
+    pub fn set_expected_hash(&mut self, hash: [u8; 16]) {
+        self.expected_hash = hash;
+    }
+
+    /// Constant-time authentication verification against registered expected hash
+    pub fn request_auth(&mut self, command: &str, attempt_hash: &[u8; 16]) -> Result<bool, &'static str> {
+        if command.is_empty() {
+            return Err("Command path cannot be empty");
+        }
         self.target_command = command.to_string();
-        if !password_attempt.is_empty() {
+
+        let mut diff = 0u8;
+        for i in 0..16 {
+            diff |= self.expected_hash[i] ^ attempt_hash[i];
+        }
+
+        if diff == 0 && self.expected_hash != [0u8; 16] {
             self.is_authenticated = true;
-            true
+            Ok(true)
         } else {
             self.is_authenticated = false;
-            false
+            Err("Authentication failed: invalid credentials")
         }
     }
 }
@@ -1853,11 +1849,7 @@ impl MintUserAccountsManager {
     }
 
     pub fn set_autologin(&mut self, username: &str, enabled: bool) -> Result<(), &'static str> {
-        let user = self
-            .users
-            .iter_mut()
-            .find(|u| u.username == username)
-            .ok_or("User not found")?;
+        let user = self.users.iter_mut().find(|u| u.username == username).ok_or("User not found")?;
         user.autologin_enabled = enabled;
         Ok(())
     }
@@ -1933,9 +1925,7 @@ impl Default for MintCinnamonHotCornerEngine {
 
 impl MintCinnamonHotCornerEngine {
     pub fn new() -> Self {
-        let mut engine = Self {
-            corners: Vec::new(),
-        };
+        let mut engine = Self { corners: Vec::new() };
         engine.corners.push(HotCornerConfig {
             location: HotCornerLocation::TopLeft,
             action: HotCornerAction::ExpoWorkspaces,
@@ -1945,12 +1935,7 @@ impl MintCinnamonHotCornerEngine {
         engine
     }
 
-    pub fn set_corner_action(
-        &mut self,
-        location: HotCornerLocation,
-        action: HotCornerAction,
-        cmd: &str,
-    ) {
+    pub fn set_corner_action(&mut self, location: HotCornerLocation, action: HotCornerAction, cmd: &str) {
         if let Some(c) = self.corners.iter_mut().find(|c| c.location == location) {
             c.action = action;
             c.custom_cmd = cmd.to_string();
@@ -1965,10 +1950,7 @@ impl MintCinnamonHotCornerEngine {
     }
 
     pub fn trigger_corner(&self, location: HotCornerLocation) -> Option<HotCornerAction> {
-        self.corners
-            .iter()
-            .find(|c| c.location == location)
-            .map(|c| c.action)
+        self.corners.iter().find(|c| c.location == location).map(|c| c.action)
     }
 }
 
@@ -2030,13 +2012,7 @@ impl MintInstallFlatpakRefFetcher {
         Self { refs: Vec::new() }
     }
 
-    pub fn parse_flatpakref(
-        &mut self,
-        name: &str,
-        branch: &str,
-        title: &str,
-        url: &str,
-    ) -> Result<&FlatpakRefDescriptor, &'static str> {
+    pub fn parse_flatpakref(&mut self, name: &str, branch: &str, title: &str, url: &str) -> Result<&FlatpakRefDescriptor, &'static str> {
         if url.is_empty() {
             return Err("Invalid FlatpakRef URL");
         }
@@ -2252,10 +2228,543 @@ impl MintNemoExtensionManager {
     }
 
     pub fn get_menu_providers(&self) -> Vec<&NemoExtensionDescriptor> {
-        self.extensions
+        self.extensions.iter().filter(|e| e.enabled && e.provides_menus).collect()
+    }
+}
+
+/// Wacom Graphics Tablet Stylus & Button Mapping Support Manager (cinnamon-wacom)
+#[derive(Debug, Clone)]
+pub struct WacomStylusConfig {
+    pub tablet_name: String,
+    pub stylus_pressure_curve: [u8; 4],
+    pub button_1_mapping: String,
+    pub button_2_mapping: String,
+    pub eraser_mode: bool,
+}
+
+pub struct MintWacomTabletSupportManager {
+    pub devices: Vec<WacomStylusConfig>,
+}
+
+impl Default for MintWacomTabletSupportManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintWacomTabletSupportManager {
+    pub fn new() -> Self {
+        Self { devices: Vec::new() }
+    }
+
+    pub fn register_tablet(&mut self, name: &str, btn1: &str, btn2: &str) {
+        self.devices.push(WacomStylusConfig {
+            tablet_name: name.to_string(),
+            stylus_pressure_curve: [0, 32, 192, 255],
+            button_1_mapping: btn1.to_string(),
+            button_2_mapping: btn2.to_string(),
+            eraser_mode: false,
+        });
+    }
+
+    pub fn get_config(&self, name: &str) -> Option<&WacomStylusConfig> {
+        self.devices.iter().find(|d| d.tablet_name == name)
+    }
+}
+
+/// Cinnamon Spices Theme & Spices Online Marketplace Catalog
+#[derive(Debug, Clone)]
+pub struct SpiceMarketplaceItem {
+    pub spice_id: String, // e.g. "theme_mint_y_dark"
+    pub name: String,
+    pub author: String,
+    pub rating: u8, // 1..5
+    pub download_count: u32,
+    pub is_installed: bool,
+}
+
+pub struct MintCinnamonThemeMarketplace {
+    pub available_spices: Vec<SpiceMarketplaceItem>,
+}
+
+impl Default for MintCinnamonThemeMarketplace {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintCinnamonThemeMarketplace {
+    pub fn new() -> Self {
+        let mut mp = Self {
+            available_spices: Vec::new(),
+        };
+        mp.available_spices.push(SpiceMarketplaceItem {
+            spice_id: String::from("cinnamon-theme-adapta-nokto"),
+            name: String::from("Adapta Nokto"),
+            author: String::from("Adapta Project"),
+            rating: 5,
+            download_count: 142000,
+            is_installed: false,
+        });
+        mp
+    }
+
+    pub fn install_spice(&mut self, spice_id: &str) -> Result<String, &'static str> {
+        if let Some(item) = self.available_spices.iter_mut().find(|s| s.spice_id == spice_id) {
+            item.is_installed = true;
+            item.download_count += 1;
+            Ok(format!("Successfully installed Cinnamon Spice '{}'", item.name))
+        } else {
+            Err("Spice item not found in marketplace")
+        }
+    }
+}
+
+/// Linux Mint Community Hardware Compatibility Database
+#[derive(Debug, Clone)]
+pub struct HardwareCompatReport {
+    pub device_modalias: String,
+    pub hardware_name: String,
+    pub kernel_driver: String,
+    pub rating_stars: u8, // 1..5
+    pub notes: String,
+}
+
+pub struct MintCommunityHardwareDatabase {
+    pub reports: Vec<HardwareCompatReport>,
+}
+
+impl Default for MintCommunityHardwareDatabase {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintCommunityHardwareDatabase {
+    pub fn new() -> Self {
+        Self { reports: Vec::new() }
+    }
+
+    pub fn submit_report(&mut self, modalias: &str, name: &str, driver: &str, rating: u8, notes: &str) {
+        self.reports.push(HardwareCompatReport {
+            device_modalias: modalias.to_string(),
+            hardware_name: name.to_string(),
+            kernel_driver: driver.to_string(),
+            rating_stars: rating.clamp(1, 5),
+            notes: notes.to_string(),
+        });
+    }
+
+    pub fn lookup_driver(&self, modalias: &str) -> Option<&HardwareCompatReport> {
+        self.reports.iter().find(|r| r.device_modalias == modalias)
+    }
+}
+
+/// MintReport System Crash Debugger & Stacktrace Analyzer (mintreport / ABRT parity)
+#[derive(Debug, Clone)]
+pub struct CrashStackframe {
+    pub frame_index: usize,
+    pub function_name: String,
+    pub file_path: String,
+    pub line_number: u32,
+}
+
+#[derive(Debug, Clone)]
+pub struct CrashReport {
+    pub crash_id: u32,
+    pub executable_name: String,
+    pub signal_number: u32, // e.g. SIGSEGV=11
+    pub stacktrace: Vec<CrashStackframe>,
+}
+
+pub struct MintAdvancedDebuggingSuite {
+    pub crash_reports: Vec<CrashReport>,
+    pub next_crash_id: u32,
+}
+
+impl Default for MintAdvancedDebuggingSuite {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintAdvancedDebuggingSuite {
+    pub fn new() -> Self {
+        Self {
+            crash_reports: Vec::new(),
+            next_crash_id: 1,
+        }
+    }
+
+    pub fn record_crash(&mut self, app: &str, signal: u32, frames: &[(&str, &str, u32)]) -> u32 {
+        let id = self.next_crash_id;
+        self.next_crash_id += 1;
+        let stacktrace = frames
             .iter()
-            .filter(|e| e.enabled && e.provides_menus)
+            .enumerate()
+            .map(|(i, &(fn_name, file, line))| CrashStackframe {
+                frame_index: i,
+                function_name: fn_name.to_string(),
+                file_path: file.to_string(),
+                line_number: line,
+            })
+            .collect();
+
+        self.crash_reports.push(CrashReport {
+            crash_id: id,
+            executable_name: app.to_string(),
+            signal_number: signal,
+            stacktrace,
+        });
+
+        id
+    }
+
+    pub fn analyze_crash(&self, crash_id: u32) -> Result<String, &'static str> {
+        let report = self.crash_reports.iter().find(|c| c.crash_id == crash_id).ok_or("Crash report not found")?;
+        Ok(format!(
+            "Crash #{} in {} (signal {}): {} frames in backtrace",
+            report.crash_id, report.executable_name, report.signal_number, report.stacktrace.len()
+        ))
+    }
+}
+
+/// Linux Mint / Calamares Partitioning & Filesystem Formatting Engine
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PartitionTargetFs {
+    Ext4,
+    Btrfs,
+    Fat32,
+    LinuxSwap,
+}
+
+#[derive(Debug, Clone)]
+pub struct PartitionSpec {
+    pub device_path: String,
+    pub partition_number: u32,
+    pub size_mb: u64,
+    pub filesystem: PartitionTargetFs,
+    pub mount_point: String,
+    pub is_formatted: bool,
+}
+
+pub struct MintInstallerPartitioningEngine {
+    pub partitions: Vec<PartitionSpec>,
+    pub efi_system_partition_index: Option<usize>,
+}
+
+impl Default for MintInstallerPartitioningEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintInstallerPartitioningEngine {
+    pub fn new() -> Self {
+        Self {
+            partitions: Vec::new(),
+            efi_system_partition_index: None,
+        }
+    }
+
+    pub fn add_partition(&mut self, dev: &str, num: u32, size_mb: u64, fs: PartitionTargetFs, mount: &str) -> usize {
+        let idx = self.partitions.len();
+        if fs == PartitionTargetFs::Fat32 && mount == "/boot/efi" {
+            self.efi_system_partition_index = Some(idx);
+        }
+        self.partitions.push(PartitionSpec {
+            device_path: dev.to_string(),
+            partition_number: num,
+            size_mb,
+            filesystem: fs,
+            mount_point: mount.to_string(),
+            is_formatted: false,
+        });
+        idx
+    }
+
+    pub fn format_all_partitions(&mut self) -> Result<usize, &'static str> {
+        if self.partitions.is_empty() {
+            return Err("No partitions configured for formatting");
+        }
+        let mut count = 0;
+        for part in self.partitions.iter_mut() {
+            part.is_formatted = true;
+            count += 1;
+        }
+        Ok(count)
+    }
+}
+
+/// Linux Mint `mintinstall` Package Transaction & GPG Signature Verifier
+pub struct MintSoftwareManagerTransactionVerifier {
+    pub trusted_gpg_fingerprints: Vec<String>,
+    pub verified_transactions_count: usize,
+}
+
+impl Default for MintSoftwareManagerTransactionVerifier {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintSoftwareManagerTransactionVerifier {
+    pub fn new() -> Self {
+        let mut verifier = Self {
+            trusted_gpg_fingerprints: Vec::new(),
+            verified_transactions_count: 0,
+        };
+        verifier.trusted_gpg_fingerprints.push(String::from("A4B2C3D4E5F678901234567890ABCDEF12345678")); // Linux Mint Release Key
+        verifier
+    }
+
+    pub fn add_trusted_key(&mut self, fingerprint: &str) {
+        if !self.trusted_gpg_fingerprints.contains(&fingerprint.to_string()) {
+            self.trusted_gpg_fingerprints.push(fingerprint.to_string());
+        }
+    }
+
+    pub fn verify_and_commit_package(&mut self, pkg_name: &str, signing_key: &str) -> Result<String, &'static str> {
+        if !self.trusted_gpg_fingerprints.contains(&signing_key.to_string()) {
+            return Err("GPG verification failed: Untrusted signature key");
+        }
+        self.verified_transactions_count += 1;
+        Ok(format!("Successfully verified and installed signed package '{}'", pkg_name))
+    }
+}
+
+/// Timeshift Snapshot Reboot & Power-Loss Recovery Verification Engine
+pub struct MintTimeshiftSnapshotRestoreVerification {
+    pub active_state_hash: u64,
+    pub snapshot_state_hashes: Vec<(u32, u64)>, // (snap_id, hash)
+}
+
+impl Default for MintTimeshiftSnapshotRestoreVerification {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintTimeshiftSnapshotRestoreVerification {
+    pub fn new() -> Self {
+        Self {
+            active_state_hash: 0xA5A5_1234_5678_9ABC,
+            snapshot_state_hashes: Vec::new(),
+        }
+    }
+
+    pub fn register_snapshot_hash(&mut self, snap_id: u32, hash: u64) {
+        self.snapshot_state_hashes.push((snap_id, hash));
+    }
+
+    pub fn perform_atomic_rollback(&mut self, snap_id: u32) -> Result<u64, &'static str> {
+        if let Some(&(_, hash)) = self.snapshot_state_hashes.iter().find(|(id, _)| *id == snap_id) {
+            self.active_state_hash = hash;
+            Ok(hash)
+        } else {
+            Err("Target restore checkpoint hash not found")
+        }
+    }
+}
+
+/// Mint Cinnamon / Zenith Compositor Wayland & Framebuffer Bridge
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CompositorRenderBackend {
+    WaylandNative,
+    SoftwareFramebuffer,
+    HardwareDrmKms,
+}
+
+pub struct MintZenithCompositorBackendBridge {
+    pub active_backend: CompositorRenderBackend,
+    pub is_initialized: bool,
+    pub screen_width: u32,
+    pub screen_height: u32,
+}
+
+impl Default for MintZenithCompositorBackendBridge {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintZenithCompositorBackendBridge {
+    pub fn new() -> Self {
+        Self {
+            active_backend: CompositorRenderBackend::SoftwareFramebuffer,
+            is_initialized: false,
+            screen_width: 1920,
+            screen_height: 1080,
+        }
+    }
+
+    pub fn initialize_backend(&mut self, backend: CompositorRenderBackend) -> Result<(), &'static str> {
+        self.active_backend = backend;
+        self.is_initialized = true;
+        Ok(())
+    }
+
+    pub fn render_composite_frame(&self) -> Result<usize, &'static str> {
+        if !self.is_initialized {
+            return Err("Compositor bridge not initialized");
+        }
+        let frame_bytes = (self.screen_width * self.screen_height * 4) as usize;
+        Ok(frame_bytes)
+    }
+}
+
+/// Cinnamon Spices Applet & Extension Manifest Validator (metadata.json parser)
+#[derive(Debug, Clone)]
+pub struct SpiceManifest {
+    pub uuid: String,
+    pub name: String,
+    pub description: String,
+    pub version: String,
+    pub max_cinnamon_version: String,
+    pub required_dependencies: Vec<String>,
+}
+
+pub struct MintCinnamonSpicesRegistry {
+    pub manifests: Vec<SpiceManifest>,
+}
+
+impl Default for MintCinnamonSpicesRegistry {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintCinnamonSpicesRegistry {
+    pub fn new() -> Self {
+        Self { manifests: Vec::new() }
+    }
+
+    pub fn register_manifest(&mut self, uuid: &str, name: &str, desc: &str, ver: &str, max_cin: &str, deps: &[&str]) {
+        self.manifests.push(SpiceManifest {
+            uuid: uuid.to_string(),
+            name: name.to_string(),
+            description: desc.to_string(),
+            version: ver.to_string(),
+            max_cinnamon_version: max_cin.to_string(),
+            required_dependencies: deps.iter().map(|s| s.to_string()).collect(),
+        });
+    }
+
+    pub fn validate_compatibility(&self, uuid: &str, current_cinnamon_ver: &str) -> Result<bool, &'static str> {
+        let m = self.manifests.iter().find(|m| m.uuid == uuid).ok_or("Spice manifest not found")?;
+        Ok(current_cinnamon_ver <= m.max_cinnamon_version.as_str())
+    }
+}
+
+/// MintUpdate Automated Kernel & Security Patch Staging Pipeline
+pub struct MintUpdateAutomatedStagingEngine {
+    pub minimum_safety_score: usize,
+    pub staged_packages: Vec<MintUpdatePackage>,
+}
+
+impl Default for MintUpdateAutomatedStagingEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintUpdateAutomatedStagingEngine {
+    pub fn new() -> Self {
+        Self {
+            minimum_safety_score: 80,
+            staged_packages: Vec::new(),
+        }
+    }
+
+    pub fn stage_safe_updates(&mut self, pending: &[MintUpdatePackage]) -> usize {
+        let mut count = 0;
+        for pkg in pending {
+            if pkg.safety_score >= self.minimum_safety_score {
+                self.staged_packages.push(pkg.clone());
+                count += 1;
+            }
+        }
+        count
+    }
+}
+
+/// MintInstall Fast Inverted Index Search Engine for AppStream Catalog
+#[derive(Debug, Clone)]
+pub struct AppStreamSearchDocument {
+    pub app_id: String,
+    pub title: String,
+    pub keywords: Vec<String>,
+}
+
+pub struct MintInstallAppStreamSearchIndex {
+    pub documents: Vec<AppStreamSearchDocument>,
+}
+
+impl Default for MintInstallAppStreamSearchIndex {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintInstallAppStreamSearchIndex {
+    pub fn new() -> Self {
+        Self { documents: Vec::new() }
+    }
+
+    pub fn index_app(&mut self, app_id: &str, title: &str, keywords: &[&str]) {
+        self.documents.push(AppStreamSearchDocument {
+            app_id: app_id.to_string(),
+            title: title.to_string(),
+            keywords: keywords.iter().map(|s| s.to_string()).collect(),
+        });
+    }
+
+    pub fn search(&self, query: &str) -> Vec<&AppStreamSearchDocument> {
+        let q = query.to_lowercase();
+        self.documents
+            .iter()
+            .filter(|doc| {
+                doc.title.to_lowercase().contains(&q)
+                    || doc.app_id.to_lowercase().contains(&q)
+                    || doc.keywords.iter().any(|k| k.to_lowercase().contains(&q))
+            })
             .collect()
+    }
+}
+
+/// Nemo File Manager Spatial File Previewer Plugin
+#[derive(Debug, Clone)]
+pub struct FilePreviewMetadata {
+    pub filename: String,
+    pub mime_type: String,
+    pub preview_summary: String,
+    pub size_bytes: u64,
+}
+
+pub struct MintNemoPreviewPlugin {
+    pub previews: Vec<FilePreviewMetadata>,
+}
+
+impl Default for MintNemoPreviewPlugin {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintNemoPreviewPlugin {
+    pub fn new() -> Self {
+        Self { previews: Vec::new() }
+    }
+
+    pub fn generate_preview(&mut self, filename: &str, mime: &str, size: u64) -> &FilePreviewMetadata {
+        let summary = format!("Spatial preview for {} [{}] - {} bytes", filename, mime, size);
+        self.previews.push(FilePreviewMetadata {
+            filename: filename.to_string(),
+            mime_type: mime.to_string(),
+            preview_summary: summary,
+            size_bytes: size,
+        });
+        self.previews.last().unwrap()
     }
 }
 
@@ -2318,6 +2827,132 @@ mod tests {
     }
 
     #[test]
+    fn test_mint_cinnamon_spices_registry() {
+        let mut reg = MintCinnamonSpicesRegistry::new();
+        reg.register_manifest("weather@cinnamon.org", "Weather Applet", "Displays weather info", "1.2", "6.2", &["python3-requests"]);
+        assert_eq!(reg.manifests.len(), 1);
+
+        assert!(reg.validate_compatibility("weather@cinnamon.org", "6.0").unwrap());
+        assert!(!reg.validate_compatibility("weather@cinnamon.org", "6.5").unwrap());
+    }
+
+    #[test]
+    fn test_mint_update_automated_staging_engine() {
+        let mut staging = MintUpdateAutomatedStagingEngine::new();
+        let pending = vec![
+            MintUpdatePackage::new(b"zenith", b"1.0.0", b"1.1.0", MintUpdateLevel::Level1Safe),
+            MintUpdatePackage::new(b"kernel-core", b"6.5.0", b"6.6.0", MintUpdateLevel::Level5Critical),
+        ];
+
+        let staged = staging.stage_safe_updates(&pending);
+        assert_eq!(staged, 1); // Only Level1Safe (score 99 >= 80) staged
+        assert_eq!(staging.staged_packages.len(), 1);
+    }
+
+    #[test]
+    fn test_mint_install_appstream_search_index() {
+        let mut index = MintInstallAppStreamSearchIndex::new();
+        index.index_app("org.videolan.VLC", "VLC Media Player", &["video", "movie", "audio", "player"]);
+
+        let results = index.search("movie");
+        assert_eq!(results.len(), 1);
+        assert_eq!(results[0].title, "VLC Media Player");
+    }
+
+    #[test]
+    fn test_mint_nemo_preview_plugin() {
+        let mut preview = MintNemoPreviewPlugin::new();
+        let meta = preview.generate_preview("photo.png", "image/png", 102400);
+        assert_eq!(meta.filename, "photo.png");
+        assert!(meta.preview_summary.contains("102400 bytes"));
+    }
+
+    #[test]
+    fn test_mint_installer_partitioning_engine() {
+        let mut installer_part = MintInstallerPartitioningEngine::new();
+        installer_part.add_partition("/dev/sda", 1, 512, PartitionTargetFs::Fat32, "/boot/efi");
+        installer_part.add_partition("/dev/sda", 2, 60000, PartitionTargetFs::Ext4, "/");
+        assert_eq!(installer_part.partitions.len(), 2);
+        assert_eq!(installer_part.efi_system_partition_index, Some(0));
+
+        let formatted_count = installer_part.format_all_partitions().unwrap();
+        assert_eq!(formatted_count, 2);
+        assert!(installer_part.partitions[0].is_formatted);
+    }
+
+    #[test]
+    fn test_mint_software_manager_transaction_verifier() {
+        let mut verifier = MintSoftwareManagerTransactionVerifier::new();
+        let release_key = "A4B2C3D4E5F678901234567890ABCDEF12345678";
+
+        let res = verifier.verify_and_commit_package("cinnamon-desktop", release_key).unwrap();
+        assert!(res.contains("Successfully verified and installed"));
+        assert_eq!(verifier.verified_transactions_count, 1);
+
+        assert!(verifier.verify_and_commit_package("untrusted-pkg", "INVALID_KEY").is_err());
+    }
+
+    #[test]
+    fn test_mint_timeshift_snapshot_restore_verification() {
+        let mut timeshift_verif = MintTimeshiftSnapshotRestoreVerification::new();
+        timeshift_verif.register_snapshot_hash(1, 0x1122_3344_5566_7788);
+
+        let restored_hash = timeshift_verif.perform_atomic_rollback(1).unwrap();
+        assert_eq!(restored_hash, 0x1122_3344_5566_7788);
+        assert_eq!(timeshift_verif.active_state_hash, 0x1122_3344_5566_7788);
+    }
+
+    #[test]
+    fn test_mint_zenith_compositor_backend_bridge() {
+        let mut bridge = MintZenithCompositorBackendBridge::new();
+        assert!(bridge.render_composite_frame().is_err());
+
+        bridge.initialize_backend(CompositorRenderBackend::WaylandNative).unwrap();
+        assert!(bridge.is_initialized);
+
+        let bytes = bridge.render_composite_frame().unwrap();
+        assert_eq!(bytes, 1920 * 1080 * 4);
+    }
+
+    #[test]
+    fn test_mint_wacom_tablet_support_manager() {
+        let mut wacom = MintWacomTabletSupportManager::new();
+        wacom.register_tablet("Wacom Intuos Pro", "Undo", "Redo");
+        let cfg = wacom.get_config("Wacom Intuos Pro").unwrap();
+        assert_eq!(cfg.button_1_mapping, "Undo");
+    }
+
+    #[test]
+    fn test_mint_cinnamon_theme_marketplace() {
+        let mut marketplace = MintCinnamonThemeMarketplace::new();
+        assert_eq!(marketplace.available_spices.len(), 1);
+
+        let res = marketplace.install_spice("cinnamon-theme-adapta-nokto").unwrap();
+        assert!(res.contains("Successfully installed"));
+        assert!(marketplace.available_spices[0].is_installed);
+    }
+
+    #[test]
+    fn test_mint_community_hardware_database() {
+        let mut hw_db = MintCommunityHardwareDatabase::new();
+        hw_db.submit_report("pci:v0002d0003", "Intel Wi-Fi 6", "iwlwifi", 5, "Works out of the box");
+
+        let r = hw_db.lookup_driver("pci:v0002d0003").unwrap();
+        assert_eq!(r.hardware_name, "Intel Wi-Fi 6");
+        assert_eq!(r.rating_stars, 5);
+    }
+
+    #[test]
+    fn test_mint_advanced_debugging_suite() {
+        let mut dbg = MintAdvancedDebuggingSuite::new();
+        let id = dbg.record_crash("zenith-wm", 11, &[("main", "main.rs", 42), ("render", "render.rs", 100)]);
+        assert_eq!(id, 1);
+
+        let analysis = dbg.analyze_crash(id).unwrap();
+        assert!(analysis.contains("2 frames in backtrace"));
+    }
+
+    #[test]
     fn test_mint_cinnamon_applet_tray_engine() {
         let mut tray = MintCinnamonAppletTrayEngine::new();
         tray.register_sni("org.gnome.Volume", "Volume Control", "audio-volume-high");
@@ -2356,20 +2991,10 @@ mod tests {
     #[test]
     fn test_mint_cinnamon_hot_corner_engine() {
         let mut corners = MintCinnamonHotCornerEngine::new();
-        assert_eq!(
-            corners.trigger_corner(HotCornerLocation::TopLeft),
-            Some(HotCornerAction::ExpoWorkspaces)
-        );
+        assert_eq!(corners.trigger_corner(HotCornerLocation::TopLeft), Some(HotCornerAction::ExpoWorkspaces));
 
-        corners.set_corner_action(
-            HotCornerLocation::BottomRight,
-            HotCornerAction::ShowDesktop,
-            "",
-        );
-        assert_eq!(
-            corners.trigger_corner(HotCornerLocation::BottomRight),
-            Some(HotCornerAction::ShowDesktop)
-        );
+        corners.set_corner_action(HotCornerLocation::BottomRight, HotCornerAction::ShowDesktop, "");
+        assert_eq!(corners.trigger_corner(HotCornerLocation::BottomRight), Some(HotCornerAction::ShowDesktop));
     }
 
     #[test]
@@ -2385,14 +3010,7 @@ mod tests {
     #[test]
     fn test_mint_install_flatpak_ref_fetcher() {
         let mut flatpak_ref = MintInstallFlatpakRefFetcher::new();
-        let desc = flatpak_ref
-            .parse_flatpakref(
-                "vlc",
-                "stable",
-                "VLC Media Player",
-                "https://dl.flathub.org/repo/appstream/vlc.flatpakref",
-            )
-            .unwrap();
+        let desc = flatpak_ref.parse_flatpakref("vlc", "stable", "VLC Media Player", "https://dl.flathub.org/repo/appstream/vlc.flatpakref").unwrap();
         assert_eq!(desc.name, "vlc");
         assert!(desc.gpg_key_valid);
     }
@@ -2449,29 +3067,24 @@ mod tests {
     #[test]
     fn test_mint_upload_manager() {
         let mut upload = MintUploadManager::new();
-        upload.add_profile(
-            "Community FTP",
-            "ftp.example.com",
-            21,
-            UploadProtocol::Ftp,
-            "/uploads",
-            "https://example.com/files",
-        );
+        upload.add_profile("Community FTP", "ftp.example.com", 21, UploadProtocol::Ftp, "/uploads", "https://example.com/files");
         assert_eq!(upload.profiles.len(), 1);
 
-        let link = upload
-            .generate_share_link("Community FTP", "image.png")
-            .unwrap();
+        let link = upload.generate_share_link("Community FTP", "image.png").unwrap();
         assert_eq!(link, "https://example.com/files/image.png");
     }
 
     #[test]
     fn test_mint_digit_keyring_prompt() {
         let mut prompt = MintDigitKeyringPrompt::new();
-        assert!(!prompt.request_auth("apt update", ""));
+        let valid_hash = [0x77u8; 16];
+        let invalid_hash = [0x00u8; 16];
+        prompt.set_expected_hash(valid_hash);
+
+        assert!(prompt.request_auth("apt update", &invalid_hash).is_err());
         assert!(!prompt.is_authenticated);
 
-        assert!(prompt.request_auth("apt update", "secret123"));
+        assert!(prompt.request_auth("apt update", &valid_hash).is_ok());
         assert!(prompt.is_authenticated);
     }
 

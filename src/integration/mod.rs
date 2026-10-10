@@ -152,6 +152,9 @@ pub use fedora_messaging::{
     WebhookEndpoint,
 };
 
+pub mod sigma_native;
+pub use sigma_native::*;
+
 /// OS-wide integration manager
 pub struct OSIntegrationManager {
     pub integrations: Vec<SigmaIntegration>,

@@ -389,4 +389,56 @@ mod tests {
             .get_setting(b"kern.ipc.maxsockbuf")
             .is_some());
     }
+
+    #[test]
+    fn test_settings_control_center_gui_engine() {
+        let mut engine = SettingsControlCenterGuiEngine::new();
+        engine.register_panel("Display", "Resolution, Scaling, Refresh Rate");
+        engine.register_panel("Sound", "Output device, Input volume");
+
+        assert_eq!(engine.panels.len(), 2);
+        let results = engine.search_settings("Resolution");
+        assert_eq!(results.len(), 1);
+        assert_eq!(results[0].title, "Display");
+    }
+}
+
+/// Settings Control Center GUI Engine (GNOME Control Center / Cinnamon Settings)
+pub struct ControlCenterPanel {
+    pub title: String,
+    pub description: String,
+}
+
+pub struct SettingsControlCenterGuiEngine {
+    pub panels: Vec<ControlCenterPanel>,
+}
+
+impl SettingsControlCenterGuiEngine {
+    pub fn new() -> Self {
+        Self { panels: Vec::new() }
+    }
+
+    pub fn register_panel(&mut self, title: &str, description: &str) {
+        self.panels.push(ControlCenterPanel {
+            title: title.to_string(),
+            description: description.to_string(),
+        });
+    }
+
+    pub fn search_settings(&self, query: &str) -> Vec<&ControlCenterPanel> {
+        let q_lower = query.to_lowercase();
+        self.panels
+            .iter()
+            .filter(|p| {
+                p.title.to_lowercase().contains(&q_lower)
+                    || p.description.to_lowercase().contains(&q_lower)
+            })
+            .collect()
+    }
+}
+
+impl Default for SettingsControlCenterGuiEngine {
+    fn default() -> Self {
+        Self::new()
+    }
 }

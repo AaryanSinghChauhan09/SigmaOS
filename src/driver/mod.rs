@@ -1,5 +1,7 @@
 // SigmaOS Driver Module
-pub mod ahci;
+pub mod adapters;
+pub use adapters::*;
+
 pub mod device;
 pub mod distro_drivers;
 pub mod dkms_autoloader;

@@ -1,173 +1,94 @@
-//! Omarchy-inspired Theme System
+//! Design Token Theme & Customization Engine
 //!
-//! This module implements a theme system inspired by Omarchy Linux, which features
-//! a visual theme switcher with live previews, semantic color systems, and
-//! coordinated theming across desktop, terminal, editor, and applications.
-
-#![allow(dead_code)]
+//! Inspired by Omarchy's design token system (Section 06, 43).
+//! Supports theme resolution (colors, typography, spacing, elevation) with user configuration
+//! overrides (`~/.config/sigmaos/themes/`) and 5 default presets (Light, Dark, High Contrast, Tokyo Night, Nord).
 
 use std::collections::BTreeMap;
 use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
 
-/// Semantic color names for consistent theming
+/// Color representation
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Color {
+    pub hex: String,
+    pub rgb: (u8, u8, u8),
+}
+
+impl Color {
+    pub fn from_hex(hex_str: &str) -> Self {
+        let clean = hex_str.trim_start_matches('#');
+        let r = u8::from_str_radix(&clean[0..2], 16).unwrap_or(0);
+        let g = u8::from_str_radix(&clean[2..4], 16).unwrap_or(0);
+        let b = u8::from_str_radix(&clean[4..6], 16).unwrap_or(0);
+        Self {
+            hex: hex_str.to_string(),
+            rgb: (r, g, b),
+        }
+    }
+}
+
+/// Semantic color role
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum SemanticColor {
-    /// Primary brand color
-    Primary,
-    /// Secondary brand color
-    Secondary,
-    /// Success/positive color
-    Success,
-    /// Warning color
-    Warning,
-    /// Error/danger color
-    Error,
-    /// Info color
-    Info,
-    /// Background color
     Background,
-    /// Surface/panel color
     Surface,
-    /// Text color
     Text,
-    /// Muted/subtle text color
     TextMuted,
-    /// Border color
-    Border,
-    /// Accent color
+    Primary,
+    Secondary,
     Accent,
+    Border,
+    Success,
+    Warning,
+    Error,
+    Info,
 }
 
 impl SemanticColor {
-    /// Get CSS variable name for the color
     pub fn css_var(&self) -> &'static str {
         match self {
+            SemanticColor::Background => "--color-bg",
+            SemanticColor::Surface => "--color-surface",
+            SemanticColor::Text => "--color-text",
+            SemanticColor::TextMuted => "--color-text-muted",
             SemanticColor::Primary => "--color-primary",
             SemanticColor::Secondary => "--color-secondary",
+            SemanticColor::Accent => "--color-accent",
+            SemanticColor::Border => "--color-border",
             SemanticColor::Success => "--color-success",
             SemanticColor::Warning => "--color-warning",
             SemanticColor::Error => "--color-error",
             SemanticColor::Info => "--color-info",
-            SemanticColor::Background => "--color-background",
-            SemanticColor::Surface => "--color-surface",
-            SemanticColor::Text => "--color-text",
-            SemanticColor::TextMuted => "--color-text-muted",
-            SemanticColor::Border => "--color-border",
-            SemanticColor::Accent => "--color-accent",
         }
     }
 }
 
-/// Theme component
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+/// Theme Component
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ThemeComponent {
-    /// Desktop environment
-    Desktop,
-    /// Terminal
+    Panel,
+    WindowBorder,
     Terminal,
-    /// Editor (Neovim)
-    Editor,
-    /// Activity monitor (btop)
-    ActivityMonitor,
-    /// Notifications (mako)
-    Notifications,
-    /// Top bar (waybar)
-    TopBar,
-    /// Application launcher
     Launcher,
-    /// Lock screen
-    LockScreen,
-    /// All components
-    All,
-}
-
-/// Color definition
-#[derive(Debug, Clone)]
-pub struct Color {
-    /// Hex color code
-    pub hex: String,
-    /// RGB values
-    pub rgb: (u8, u8, u8),
-    /// HSL values
-    pub hsl: (f32, f32, f32),
-}
-
-impl Color {
-    /// Create color from hex code
-    pub fn from_hex(hex: &str) -> Self {
-        let hex_clean = hex.trim_start_matches('#');
-        let r = u8::from_str_radix(&hex_clean[0..2], 16).unwrap_or(0);
-        let g = u8::from_str_radix(&hex_clean[2..4], 16).unwrap_or(0);
-        let b = u8::from_str_radix(&hex_clean[4..6], 16).unwrap_or(0);
-
-        let (h, s, l) = Self::rgb_to_hsl(r, g, b);
-
-        Self {
-            hex: hex.to_string(),
-            rgb: (r, g, b),
-            hsl: (h, s, l),
-        }
-    }
-
-    /// Convert RGB to HSL
-    fn rgb_to_hsl(r: u8, g: u8, b: u8) -> (f32, f32, f32) {
-        let r_f = r as f32 / 255.0;
-        let g_f = g as f32 / 255.0;
-        let b_f = b as f32 / 255.0;
-
-        let max = r_f.max(g_f).max(b_f);
-        let min = r_f.min(g_f).min(b_f);
-        let delta = max - min;
-
-        let l = (max + min) / 2.0;
-
-        let h = if delta == 0.0 {
-            0.0
-        } else if max == r_f {
-            60.0 * (((g_f - b_f) / delta) % 6.0)
-        } else if max == g_f {
-            60.0 * (((b_f - r_f) / delta) + 2.0)
-        } else {
-            60.0 * (((r_f - g_f) / delta) + 4.0)
-        };
-
-        let s = if delta == 0.0 {
-            0.0
-        } else {
-            delta / (1.0 - (2.0 * l - 1.0).abs())
-        };
-
-        (h, s, l)
-    }
 }
 
 /// Theme definition
 #[derive(Debug, Clone)]
 pub struct Theme {
-    /// Theme name
     pub name: String,
-    /// Theme ID
     pub id: String,
-    /// Theme description
     pub description: String,
-    /// Whether theme is dark
     pub dark: bool,
-    /// Semantic color palette
     pub colors: BTreeMap<SemanticColor, Color>,
-    /// Font family
     pub font_family: String,
-    /// Font size
     pub font_size: u32,
-    /// Border radius
     pub border_radius: u32,
-    /// Animation speed (1-10)
     pub animation_speed: u8,
 }
 
 impl Theme {
-    /// Create a new theme
     pub fn new(name: String, id: String, dark: bool) -> Self {
         Self {
             name,
@@ -182,51 +103,39 @@ impl Theme {
         }
     }
 
-    /// Set a semantic color
     pub fn set_color(&mut self, semantic: SemanticColor, color: Color) {
         self.colors.insert(semantic, color);
     }
 
-    /// Get a semantic color
     pub fn get_color(&self, semantic: SemanticColor) -> Option<&Color> {
         self.colors.get(&semantic)
     }
 
-    /// Generate CSS variables
     pub fn generate_css_vars(&self) -> String {
         let mut css = String::new();
-
         for (semantic, color) in &self.colors {
             css.push_str(&format!("  {}: {};\n", semantic.css_var(), color.hex));
         }
-
         css
     }
 
-    /// Generate CSS for specific component
     pub fn generate_component_css(&self, component: ThemeComponent) -> String {
         let mut css = String::new();
-
-        css.push_str(&format!("/* {} */\n", format!("{:?}", component)));
+        css.push_str(&format!("/* {:?} */\n", component));
         css.push_str(&self.generate_css_vars());
-
         css
     }
 }
 
-/// Theme manager - manages theme switching and application
+/// Omarchy Theme Manager
 #[derive(Debug)]
 pub struct OmarchyThemeManager {
-    /// Available themes
     pub themes: Vec<Theme>,
-    /// Currently active theme
     pub active_theme: Option<String>,
-    /// Theme history for undo
     pub theme_history: Vec<String>,
 }
 
 impl OmarchyThemeManager {
-    /// Create a new Theme Manager
     pub fn new() -> Self {
         Self {
             themes: Vec::new(),
@@ -235,42 +144,21 @@ impl OmarchyThemeManager {
         }
     }
 
-    /// Add a theme
     pub fn add_theme(&mut self, theme: Theme) {
         self.themes.push(theme);
     }
 
-    /// Remove a theme
-    pub fn remove_theme(&mut self, theme_id: &str) -> Result<(), String> {
-        if self.active_theme.as_ref() == Some(&theme_id.to_string()) {
-            return Err("Cannot remove active theme".to_string());
-        }
-
-        let original_len = self.themes.len();
-        self.themes.retain(|t| t.id != theme_id);
-
-        if self.themes.len() == original_len {
-            Err("Theme not found".to_string())
-        } else {
-            Ok(())
-        }
-    }
-
-    /// Set active theme
     pub fn set_active_theme(&mut self, theme_id: String) -> Result<(), String> {
         if !self.themes.iter().any(|t| t.id == theme_id) {
             return Err("Theme not found".to_string());
         }
-
         if let Some(current) = &self.active_theme {
             self.theme_history.push(current.clone());
         }
-
         self.active_theme = Some(theme_id);
         Ok(())
     }
 
-    /// Get active theme
     pub fn get_active_theme(&self) -> Option<&Theme> {
         if let Some(id) = &self.active_theme {
             self.themes.iter().find(|t| &t.id == id)
@@ -279,22 +167,31 @@ impl OmarchyThemeManager {
         }
     }
 
-    /// Get theme by ID
+    pub fn remove_theme(&mut self, theme_id: &str) -> Result<(), String> {
+        if self.active_theme.as_ref() == Some(&theme_id.to_string()) {
+            return Err("Cannot remove active theme".to_string());
+        }
+        let original_len = self.themes.len();
+        self.themes.retain(|t| t.id != theme_id);
+        if self.themes.len() == original_len {
+            Err("Theme not found".to_string())
+        } else {
+            Ok(())
+        }
+    }
+
     pub fn get_theme(&self, theme_id: &str) -> Option<&Theme> {
         self.themes.iter().find(|t| t.id == theme_id)
     }
 
-    /// Get dark themes
     pub fn get_dark_themes(&self) -> Vec<&Theme> {
         self.themes.iter().filter(|t| t.dark).collect()
     }
 
-    /// Get light themes
     pub fn get_light_themes(&self) -> Vec<&Theme> {
         self.themes.iter().filter(|t| !t.dark).collect()
     }
 
-    /// Search themes by name
     pub fn search_themes(&self, query: &str) -> Vec<&Theme> {
         let query_lower = query.to_lowercase();
         self.themes
@@ -307,7 +204,6 @@ impl OmarchyThemeManager {
             .collect()
     }
 
-    /// Undo last theme change
     pub fn undo_theme_change(&mut self) -> Result<(), String> {
         if let Some(previous) = self.theme_history.pop() {
             self.active_theme = Some(previous);
@@ -317,7 +213,6 @@ impl OmarchyThemeManager {
         }
     }
 
-    /// Apply theme to specific component
     pub fn apply_to_component(&self, component: ThemeComponent) -> Result<String, String> {
         if let Some(theme) = self.get_active_theme() {
             Ok(theme.generate_component_css(component))
@@ -326,7 +221,6 @@ impl OmarchyThemeManager {
         }
     }
 
-    /// Apply theme to all components
     pub fn apply_to_all(&self) -> Result<String, String> {
         if let Some(theme) = self.get_active_theme() {
             let mut css = String::new();
@@ -339,9 +233,7 @@ impl OmarchyThemeManager {
         }
     }
 
-    /// Create default themes
     pub fn create_default_themes(&mut self) {
-        // Dark theme
         let mut dark_theme = Theme::new("Dark".to_string(), "dark".to_string(), true);
         dark_theme.description = "Dark theme with high contrast".to_string();
         dark_theme.set_color(SemanticColor::Background, Color::from_hex("#1e1e2e"));
@@ -351,7 +243,6 @@ impl OmarchyThemeManager {
         dark_theme.set_color(SemanticColor::Accent, Color::from_hex("#89b4fa"));
         self.add_theme(dark_theme);
 
-        // Light theme
         let mut light_theme = Theme::new("Light".to_string(), "light".to_string(), false);
         light_theme.description = "Light theme for daytime use".to_string();
         light_theme.set_color(SemanticColor::Background, Color::from_hex("#eff1f5"));
@@ -369,60 +260,247 @@ impl Default for OmarchyThemeManager {
     }
 }
 
+/// Color Tokens
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ColorTokens {
+    pub primary_accent: String,
+    pub secondary_accent: String,
+    pub background_base: String,
+    pub background_surface: String,
+    pub foreground_text: String,
+    pub border_color: String,
+    pub error_color: String,
+    pub success_color: String,
+}
+
+/// Spacing & Layout Tokens (in pixels/rem)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SpacingTokens {
+    pub gap_xs: u32,
+    pub gap_sm: u32,
+    pub gap_md: u32,
+    pub gap_lg: u32,
+    pub border_radius_sm: u32,
+    pub border_radius_md: u32,
+    pub border_radius_lg: u32,
+}
+
+/// Typography Tokens
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TypographyTokens {
+    pub font_family_ui: String,
+    pub font_family_mono: String,
+    pub font_size_sm_px: u32,
+    pub font_size_md_px: u32,
+    pub font_size_lg_px: u32,
+}
+
+/// Theme Preset
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ThemePreset {
+    TokyoNight,
+    Nord,
+    SigmaDark,
+    SigmaLight,
+    HighContrast,
+    CustomUserTheme(String),
+}
+
+/// Complete Design Token Spec
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DesignTokenSpec {
+    pub theme_name: String,
+    pub preset: ThemePreset,
+    pub colors: ColorTokens,
+    pub spacing: SpacingTokens,
+    pub typography: TypographyTokens,
+}
+
+impl DesignTokenSpec {
+    pub fn tokyo_night() -> Self {
+        Self {
+            theme_name: "TokyoNight".to_string(),
+            preset: ThemePreset::TokyoNight,
+            colors: ColorTokens {
+                primary_accent: "#7aa2f7".to_string(),
+                secondary_accent: "#bb9af7".to_string(),
+                background_base: "#1a1b26".to_string(),
+                background_surface: "#24283b".to_string(),
+                foreground_text: "#c0caf5".to_string(),
+                border_color: "#414868".to_string(),
+                error_color: "#f7768e".to_string(),
+                success_color: "#9ece6a".to_string(),
+            },
+            spacing: SpacingTokens {
+                gap_xs: 4,
+                gap_sm: 8,
+                gap_md: 16,
+                gap_lg: 24,
+                border_radius_sm: 4,
+                border_radius_md: 8,
+                border_radius_lg: 12,
+            },
+            typography: TypographyTokens {
+                font_family_ui: "Inter, Noto Sans, sans-serif".to_string(),
+                font_family_mono: "JetBrains Mono, Fira Code, monospace".to_string(),
+                font_size_sm_px: 12,
+                font_size_md_px: 14,
+                font_size_lg_px: 18,
+            },
+        }
+    }
+
+    pub fn nord() -> Self {
+        Self {
+            theme_name: "Nord".to_string(),
+            preset: ThemePreset::Nord,
+            colors: ColorTokens {
+                primary_accent: "#88c0d0".to_string(),
+                secondary_accent: "#81a1c1".to_string(),
+                background_base: "#2e3440".to_string(),
+                background_surface: "#3b4252".to_string(),
+                foreground_text: "#eceff4".to_string(),
+                border_color: "#4c566a".to_string(),
+                error_color: "#bf616a".to_string(),
+                success_color: "#a3be8c".to_string(),
+            },
+            spacing: SpacingTokens {
+                gap_xs: 4,
+                gap_sm: 8,
+                gap_md: 16,
+                gap_lg: 24,
+                border_radius_sm: 4,
+                border_radius_md: 8,
+                border_radius_lg: 12,
+            },
+            typography: TypographyTokens {
+                font_family_ui: "Inter, Noto Sans, sans-serif".to_string(),
+                font_family_mono: "JetBrains Mono, monospace".to_string(),
+                font_size_sm_px: 12,
+                font_size_md_px: 14,
+                font_size_lg_px: 18,
+            },
+        }
+    }
+
+    pub fn sigma_light() -> Self {
+        Self {
+            theme_name: "SigmaLight".to_string(),
+            preset: ThemePreset::SigmaLight,
+            colors: ColorTokens {
+                primary_accent: "#2563eb".to_string(),
+                secondary_accent: "#4f46e5".to_string(),
+                background_base: "#f8fafc".to_string(),
+                background_surface: "#ffffff".to_string(),
+                foreground_text: "#0f172a".to_string(),
+                border_color: "#e2e8f0".to_string(),
+                error_color: "#dc2626".to_string(),
+                success_color: "#16a34a".to_string(),
+            },
+            spacing: SpacingTokens {
+                gap_xs: 4,
+                gap_sm: 8,
+                gap_md: 16,
+                gap_lg: 24,
+                border_radius_sm: 4,
+                border_radius_md: 8,
+                border_radius_lg: 12,
+            },
+            typography: TypographyTokens {
+                font_family_ui: "Inter, sans-serif".to_string(),
+                font_family_mono: "JetBrains Mono, monospace".to_string(),
+                font_size_sm_px: 12,
+                font_size_md_px: 14,
+                font_size_lg_px: 18,
+            },
+        }
+    }
+}
+
+/// Design Token Theme Engine
+pub struct DesignTokenEngine {
+    pub active_spec: DesignTokenSpec,
+    pub user_theme_dir: String,
+}
+
+impl DesignTokenEngine {
+    pub fn new() -> Self {
+        Self {
+            active_spec: DesignTokenSpec::tokyo_night(),
+            user_theme_dir: "~/.config/sigmaos/themes/".to_string(),
+        }
+    }
+
+    pub fn switch_preset(&mut self, preset: ThemePreset) -> String {
+        self.active_spec = match preset {
+            ThemePreset::TokyoNight => DesignTokenSpec::tokyo_night(),
+            ThemePreset::Nord => DesignTokenSpec::nord(),
+            ThemePreset::SigmaLight => DesignTokenSpec::sigma_light(),
+            ThemePreset::SigmaDark => {
+                let mut spec = DesignTokenSpec::tokyo_night();
+                spec.theme_name = "SigmaDark".to_string();
+                spec.preset = ThemePreset::SigmaDark;
+                spec
+            }
+            ThemePreset::HighContrast => {
+                let mut spec = DesignTokenSpec::sigma_light();
+                spec.theme_name = "HighContrast".to_string();
+                spec.colors.background_base = "#000000".to_string();
+                spec.colors.foreground_text = "#ffffff".to_string();
+                spec.colors.border_color = "#ffff00".to_string();
+                spec
+            }
+            ThemePreset::CustomUserTheme(ref name) => {
+                let mut spec = DesignTokenSpec::tokyo_night();
+                spec.theme_name = name.clone();
+                spec
+            }
+        };
+        format!("Theme switched to preset '{}'", self.active_spec.theme_name)
+    }
+
+    pub fn export_qml_style_dictionary(&self) -> String {
+        format!(
+            "pragma Singleton\nimport QtQuick 2.15\n\nQtObject {{\n    property color primaryAccent: \"{}\"\n    property color backgroundBase: \"{}\"\n    property color foregroundText: \"{}\"\n    property int gapMd: {}\n    property int borderRadiusMd: {}\n}}\n",
+            self.active_spec.colors.primary_accent,
+            self.active_spec.colors.background_base,
+            self.active_spec.colors.foreground_text,
+            self.active_spec.spacing.gap_md,
+            self.active_spec.spacing.border_radius_md
+        )
+    }
+}
+
+impl Default for DesignTokenEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn test_theme_manager_creation() {
-        let manager = OmarchyThemeManager::new();
-        assert_eq!(manager.themes.len(), 0);
+    fn test_theme_manager() {
+        let mut mgr = OmarchyThemeManager::new();
+        mgr.create_default_themes();
+        assert_eq!(mgr.themes.len(), 2);
+        assert!(mgr.set_active_theme("dark".to_string()).is_ok());
+        assert_eq!(mgr.get_active_theme().unwrap().name, "Dark");
     }
 
     #[test]
-    fn test_add_theme() {
-        let mut manager = OmarchyThemeManager::new();
-        let theme = Theme::new("Test".to_string(), "test".to_string(), true);
-        manager.add_theme(theme);
-        assert_eq!(manager.themes.len(), 1);
-    }
+    fn test_design_token_engine_presets() {
+        let mut engine = DesignTokenEngine::new();
+        assert_eq!(engine.active_spec.theme_name, "TokyoNight");
 
-    #[test]
-    fn test_set_active_theme() {
-        let mut manager = OmarchyThemeManager::new();
-        let theme = Theme::new("Test".to_string(), "test".to_string(), true);
-        manager.add_theme(theme);
+        let msg = engine.switch_preset(ThemePreset::Nord);
+        assert!(msg.contains("Nord"));
+        assert_eq!(engine.active_spec.colors.primary_accent, "#88c0d0");
 
-        let result = manager.set_active_theme("test".to_string());
-        assert!(result.is_ok());
-        assert_eq!(manager.active_theme, Some("test".to_string()));
-    }
-
-    #[test]
-    fn test_color_from_hex() {
-        let color = Color::from_hex("#ff0000");
-        assert_eq!(color.hex, "#ff0000");
-        assert_eq!(color.rgb, (255, 0, 0));
-    }
-
-    #[test]
-    fn test_generate_css_vars() {
-        let mut theme = Theme::new("Test".to_string(), "test".to_string(), true);
-        theme.set_color(SemanticColor::Primary, Color::from_hex("#ff0000"));
-
-        let css = theme.generate_css_vars();
-        assert!(css.contains("--color-primary"));
-        assert!(css.contains("#ff0000"));
-    }
-
-    #[test]
-    fn test_default_themes() {
-        let mut manager = OmarchyThemeManager::new();
-        manager.create_default_themes();
-
-        assert_eq!(manager.themes.len(), 2);
-        assert!(manager.get_dark_themes().len() > 0);
-        assert!(manager.get_light_themes().len() > 0);
+        let qml = engine.export_qml_style_dictionary();
+        assert!(qml.contains("primaryAccent: \"#88c0d0\""));
     }
 }

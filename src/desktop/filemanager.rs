@@ -402,4 +402,79 @@ mod tests {
         let diff = FileSnapshotDiff::compare(1, 2, 10, 1024, 2048);
         assert!(diff.is_modified);
     }
+
+    #[test]
+    fn test_spatial_file_manager_engine() {
+        let mut engine = SpatialFileManagerEngine::new();
+        engine.open_spatial_window("/home/user/Documents", 100, 100, 800, 600);
+        assert_eq!(engine.windows.len(), 1);
+        assert_eq!(engine.windows[0].directory_path, "/home/user/Documents");
+
+        engine.cache_thumbnail(42, vec![0xFF, 0xD8, 0xFF]);
+        assert_eq!(engine.get_thumbnail(42), Some(&[0xFF, 0xD8, 0xFF][..]));
+    }
+}
+
+/// Spatial GUI File Manager Engine (Pantheon Files & Nautilus Spatial Navigation)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SpatialWindow {
+    pub directory_path: String,
+    pub x: i32,
+    pub y: i32,
+    pub width: u32,
+    pub height: u32,
+    pub zoom_level: u32,
+}
+
+pub struct SpatialFileManagerEngine {
+    pub windows: Vec<SpatialWindow>,
+    pub thumbnail_cache: Vec<(FileID, Vec<u8>)>,
+}
+
+impl SpatialFileManagerEngine {
+    pub fn new() -> Self {
+        Self {
+            windows: Vec::new(),
+            thumbnail_cache: Vec::new(),
+        }
+    }
+
+    pub fn open_spatial_window(&mut self, path: &str, x: i32, y: i32, width: u32, height: u32) {
+        if let Some(win) = self.windows.iter_mut().find(|w| w.directory_path == path) {
+            win.x = x;
+            win.y = y;
+            win.width = width;
+            win.height = height;
+        } else {
+            self.windows.push(SpatialWindow {
+                directory_path: path.to_string(),
+                x,
+                y,
+                width,
+                height,
+                zoom_level: 100,
+            });
+        }
+    }
+
+    pub fn cache_thumbnail(&mut self, file_id: FileID, thumbnail_bytes: Vec<u8>) {
+        if let Some(existing) = self.thumbnail_cache.iter_mut().find(|(id, _)| *id == file_id) {
+            existing.1 = thumbnail_bytes;
+        } else {
+            self.thumbnail_cache.push((file_id, thumbnail_bytes));
+        }
+    }
+
+    pub fn get_thumbnail(&self, file_id: FileID) -> Option<&[u8]> {
+        self.thumbnail_cache
+            .iter()
+            .find(|(id, _)| *id == file_id)
+            .map(|(_, bytes)| bytes.as_slice())
+    }
+}
+
+impl Default for SpatialFileManagerEngine {
+    fn default() -> Self {
+        Self::new()
+    }
 }

@@ -1,5 +1,11 @@
 pub mod drm_kms;
 pub mod video;
+pub mod video_editor;
+pub mod advanced_accel;
+pub mod nvidia_prime;
+pub mod virtio_gpu;
+
+pub use virtio_gpu::*;
 
 pub use drm_kms::{
     DrmAtomicCommit, DrmConnector, DrmConnectorStatus, DrmConnectorType, DrmCrtc, DrmEncoder,

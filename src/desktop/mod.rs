@@ -219,11 +219,16 @@ pub use display_settings_manager::{
 };
 
 // SigmaOS Desktop Module
-pub mod elementary_pantheon_innovations;
+pub mod font_manager;
+pub use font_manager::*;
+
 pub mod mate_betsy;
 pub mod mint_tools;
 pub mod moksha;
 pub mod omarchy_omakase;
+pub mod omarchy_palette;
+pub mod omarchy_theme;
+pub mod zenith_quickshell_plugin;
 pub mod pantheon;
 pub mod screensaver;
 pub mod sovereign_navigation_engine;
@@ -301,49 +306,7 @@ pub use shortcuts::{
     KeyAction, KeyModifier, KeyboardShortcut, KeyboardShortcutsManager, ShortcutCategory,
     ShortcutConfig,
 };
-pub mod mint_backup_tool;
-pub mod mint_desktop;
-pub mod mint_software_store;
-pub mod mint_update_manager;
-pub mod notification;
-pub mod omarchy_dynamic_workspace_suite;
-pub use omarchy_dynamic_workspace_suite::*;
-pub mod dev_workspace;
-pub mod localization;
-pub mod network_sharing;
-pub mod onboarding_wizard;
-pub mod permission_portal;
 
-pub use onboarding_wizard::*;
-pub use permission_portal::*;
-pub mod cinnamon_xapp_libgui;
-pub mod file_manager_extensions;
-pub mod sovereign_bulky_batch_renamer;
-pub mod system_tray;
-pub use sovereign_bulky_batch_renamer::*;
-pub mod omarchy_disktree_inspector;
-pub use omarchy_disktree_inspector::*;
-pub mod omarchy_chord_rebind_engine;
-pub use omarchy_chord_rebind_engine::*;
-pub mod sovereign_xed_code_editor;
-pub use sovereign_xed_code_editor::*;
-pub mod omarchy_autosave_capture_engine;
-pub use omarchy_autosave_capture_engine::*;
-pub mod omarchy_browser_theme_sync;
-pub use omarchy_browser_theme_sync::*;
-pub mod omarchy_hidpi_scale_engine;
-pub use omarchy_hidpi_scale_engine::*;
-pub mod sigma_quickshell;
-pub use sigma_quickshell::{
-    Anchors, AppEntry, HyprlandEvent, LauncherContent, LayerSurface, NotificationContent,
-    NotificationUrgency, PanelContent, PanelItem, ReactiveCell, ShellWidget, SigmaQuickshell,
-    StatusBarContent, StatusBarModule, WidgetContent,
-};
-pub mod sigma_ghostty;
-pub use sigma_ghostty::{
-    CellAttrs, CursorStyle, GhosttyConfig, SigmaGhostty, TermCell, TermColor, TermGrid, VtAction,
-    VtParser,
-};
-pub mod webapp_manager;
-pub use elementary_pantheon_innovations::*;
-pub use webapp_manager::*;
+pub use omarchy_palette::*;
+pub use omarchy_theme::*;
+pub use zenith_quickshell_plugin::*;

@@ -8,6 +8,10 @@ pub mod okr;
 pub mod rfc;
 pub mod sovereign_task_guidelines_wiki_sync_engine;
 pub mod strategic_vision;
+pub mod future_protocol;
+pub mod risk_mitigation;
+
+pub use risk_mitigation::*;
 
 use crate::klib::HashMap;
 use core::sync::atomic::{AtomicUsize, Ordering};
