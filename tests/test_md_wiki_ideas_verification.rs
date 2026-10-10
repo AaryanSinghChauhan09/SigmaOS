@@ -323,13 +323,17 @@ fn test_frappe_and_tech_media_engines_wiki_parity() {
     assert_eq!(recipe.pkgname, "htop");
 
     let compiler = ArchRecipeSandboxCompiler::new();
-    let artifact = compiler.compile_in_sandbox(&recipe, "/tmp/sandbox").unwrap();
+    let artifact = compiler
+        .compile_in_sandbox(&recipe, "/tmp/sandbox")
+        .unwrap();
     assert!(!artifact.is_empty());
 
     let mut snapper = SnapperTransactionGuard::new();
     let pre_id = snapper.create_pre_snapshot("pre-update", 1000);
     assert_eq!(pre_id, 1);
-    let post_id = snapper.create_post_snapshot(pre_id, "post-update", 1001).unwrap();
+    let post_id = snapper
+        .create_post_snapshot(pre_id, "post-update", 1001)
+        .unwrap();
     assert_eq!(post_id, 2);
     assert!(snapper.rollback_to_snapshot(pre_id).is_ok());
 
@@ -342,8 +346,11 @@ fn test_frappe_and_tech_media_engines_wiki_parity() {
     assert_eq!(verifier.evaluate_syscall(103), PolicyAction::Allow);
 
     // Capsicum delegation and CAP_FSTAT
-    let cap = FreeBsdCapsicumDescriptorDelegate::grant_capability(3, CAP_READ | CAP_WRITE | CAP_FSTAT);
-    assert!(FreeBsdCapsicumDescriptorDelegate::validate_access(&cap, CAP_FSTAT));
+    let cap =
+        FreeBsdCapsicumDescriptorDelegate::grant_capability(3, CAP_READ | CAP_WRITE | CAP_FSTAT);
+    assert!(FreeBsdCapsicumDescriptorDelegate::validate_access(
+        &cap, CAP_FSTAT
+    ));
 
     let arch_eng = SovereignLinuxBsdWikiArchitectureEngine::new();
     assert!(arch_eng.verify_all_wiki_ideas());

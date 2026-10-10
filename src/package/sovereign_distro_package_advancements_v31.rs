@@ -204,7 +204,8 @@ impl UniversalPackageFormatInspectorV31 {
             payload_sha256: format!("sha256-v31-{:x}", raw_payload.len()),
         };
 
-        self.inspection_cache.insert(filename.to_string(), manifest.clone());
+        self.inspection_cache
+            .insert(filename.to_string(), manifest.clone());
         Ok(manifest)
     }
 }
@@ -353,12 +354,14 @@ impl UniversalMultiSandboxGovernorV31 {
 
     pub fn generate_sandbox_rules(&self, format: PackageFormat) -> SandboxRulesV31 {
         match format {
-            PackageFormat::Flatpak | PackageFormat::Snap | PackageFormat::AppImage => SandboxRulesV31 {
-                pledge_promises: "stdio rpath wpath cpath inet unix".to_string(),
-                unveil_paths: vec!["/tmp".to_string(), "/var/lib".to_string()],
-                landlock_read_only: vec!["/usr/lib".to_string(), "/etc".to_string()],
-                landlock_read_write: vec!["/var/lib/flatpak".to_string(), "/tmp".to_string()],
-            },
+            PackageFormat::Flatpak | PackageFormat::Snap | PackageFormat::AppImage => {
+                SandboxRulesV31 {
+                    pledge_promises: "stdio rpath wpath cpath inet unix".to_string(),
+                    unveil_paths: vec!["/tmp".to_string(), "/var/lib".to_string()],
+                    landlock_read_only: vec!["/usr/lib".to_string(), "/etc".to_string()],
+                    landlock_read_write: vec!["/var/lib/flatpak".to_string(), "/tmp".to_string()],
+                }
+            }
             _ => SandboxRulesV31 {
                 pledge_promises: "stdio rpath wpath cpath tty".to_string(),
                 unveil_paths: vec!["/var/lib/sigmaos".to_string(), "/tmp".to_string()],
@@ -397,7 +400,11 @@ impl UniversalCasDeltaStoreGovernorV31 {
         }
     }
 
-    pub fn apply_delta_patch(&mut self, base: &str, delta: &str) -> Result<CasDeltaRecordV31, String> {
+    pub fn apply_delta_patch(
+        &mut self,
+        base: &str,
+        delta: &str,
+    ) -> Result<CasDeltaRecordV31, String> {
         let rec = CasDeltaRecordV31 {
             base_hash: base.to_string(),
             delta_hash: delta.to_string(),
@@ -454,7 +461,10 @@ impl UniversalBootEnvSnapshotGovernorV31 {
 
     pub fn rollback(&mut self, snapshot_id: usize) -> Result<String, String> {
         if let Some(snap) = self.snapshots.iter().find(|s| s.snapshot_id == snapshot_id) {
-            Ok(format!("Successfully rolled back to snapshot #{}: {}", snap.snapshot_id, snap.label))
+            Ok(format!(
+                "Successfully rolled back to snapshot #{}: {}",
+                snap.snapshot_id, snap.label
+            ))
         } else {
             Err(format!("Snapshot #{} not found", snapshot_id))
         }
@@ -760,7 +770,10 @@ mod tests {
     fn test_cli_router_and_master_coordinator_v31() {
         let mut suite = SovereignDistroPackageAdvancementsSuiteV31::new();
 
-        let cmd = suite.cli_router.route_command("apt install ripgrep --dry-run").unwrap();
+        let cmd = suite
+            .cli_router
+            .route_command("apt install ripgrep --dry-run")
+            .unwrap();
         assert_eq!(cmd.action, UniversalPmActionV31::Install);
         assert!(cmd.dry_run);
 
@@ -768,7 +781,9 @@ mod tests {
             .process_and_install("htop-3.3.0.apk", b"APK_PAYLOAD")
             .unwrap();
         assert_eq!(sigpkg.name, "sigpkg-v31-htop-3.3.0");
-        assert!(suite.installed_packages.contains(&"sigpkg-v31-htop-3.3.0".to_string()));
+        assert!(suite
+            .installed_packages
+            .contains(&"sigpkg-v31-htop-3.3.0".to_string()));
         assert_eq!(suite.udf_engine.execution_log.len(), 2);
     }
 }
