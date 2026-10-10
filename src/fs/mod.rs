@@ -14,15 +14,27 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
 // SigmaOS Filesystem Module
-// Virtual filesystem, journaling filesystems (Btrfs, XFS), and storage support
+// Virtual filesystem, journaling filesystems (Btrfs, XFS), storage, and VFS file management support
 
 pub mod btrfs;
-// pub mod filesystem;
 pub mod sigmacas;
 pub mod sigmafs;
-// pub mod support;
-// pub mod vfs;
 pub mod xfs;
+
+pub mod fd;
+pub mod fd_table;
+pub mod inode;
+pub mod directory;
+pub mod permission;
+pub mod flock;
+pub mod lock;
+
+pub use fd::{FileDescriptor, FileHandle, FsError, SeekFrom, FD_CLOEXEC, O_RDONLY, O_WRONLY, O_RDWR, O_CREAT, O_EXCL, O_TRUNC, O_APPEND, O_NONBLOCK, O_DIRECTORY};
+pub use fd_table::{ProcessFdTable, DEFAULT_MAX_FDS, STDIN_FILENO, STDOUT_FILENO, STDERR_FILENO};
+pub use inode::{Inode, InodeManager, InodeMetadata, InodeState, InodeType};
+pub use directory::{Directory, DirectoryEntry, MAX_DIR_ENTRIES, MAX_FILENAME_LEN};
+pub use permission::{AccessMode, PermissionEngine, ProcessCredentials, CAP_DAC_OVERRIDE, CAP_DAC_READ_SEARCH, CAP_FOWNER};
+pub use flock::{FileLockManager, FileRangeLock, LockType, F_RDLCK, F_UNLCK, F_WRLCK, LOCK_EX, LOCK_NB, LOCK_SH, LOCK_UN};
 
 pub use btrfs::{
     BtrfsExtent, BtrfsFilesystem, BtrfsSnapshot, BtrfsSubvolume, ChecksumType, CompressionType,
