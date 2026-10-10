@@ -1248,13 +1248,20 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             .collect()
     }
 
-    pub fn query_insights_by_flexible_domain(&self, raw_input: &str) -> Vec<TechMediaArticleInsight> {
+    pub fn query_insights_by_flexible_domain(
+        &self,
+        raw_input: &str,
+    ) -> Vec<TechMediaArticleInsight> {
         let cleaned = raw_input
             .trim()
             .trim_start_matches("https://")
             .trim_start_matches("http://")
             .trim_start_matches("www.");
-        let host = cleaned.split(&['/', ':', '?', '#'][..]).next().unwrap_or("").trim();
+        let host = cleaned
+            .split(&['/', ':', '?', '#'][..])
+            .next()
+            .unwrap_or("")
+            .trim();
         if host.is_empty() {
             return Vec::new();
         }
@@ -1365,12 +1372,21 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
         );
         pr.push_str("#### CachyOS Parity Subsystem Innovations:\n");
 
-        let cachy_domains = ["9to5linux.com", "phoronix.com", "techspot.com", "hwbusters.com"];
+        let cachy_domains = [
+            "9to5linux.com",
+            "phoronix.com",
+            "techspot.com",
+            "hwbusters.com",
+        ];
         for domain in &cachy_domains {
             for insight in self.get_insights_by_domain(domain) {
                 pr.push_str(&format!(
                     "- **[{}] {}** (`{}`)\n  - Recommendation: {}\n  - Impact Score: {}/100\n",
-                    insight.publication, insight.title, insight.pr_branch_name, insight.action_recommendation, insight.impact_score
+                    insight.publication,
+                    insight.title,
+                    insight.pr_branch_name,
+                    insight.action_recommendation,
+                    insight.impact_score
                 ));
             }
         }
@@ -1407,7 +1423,10 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             for insight in self.get_insights_by_domain(domain) {
                 pr.push_str(&format!(
                     "- **[{}] {}**\n  - Branch: `{}`\n  - Action: {}\n",
-                    insight.publication, insight.title, insight.pr_branch_name, insight.action_recommendation
+                    insight.publication,
+                    insight.title,
+                    insight.pr_branch_name,
+                    insight.action_recommendation
                 ));
             }
         }
@@ -1722,7 +1741,8 @@ mod tests {
         assert_eq!(flex1.len(), 1);
         assert_eq!(flex1[0].publication, "ItsFOSS");
 
-        let flex2 = engine.query_insights_by_flexible_domain("http://www.9to5linux.com:8080/path?query=1");
+        let flex2 =
+            engine.query_insights_by_flexible_domain("http://www.9to5linux.com:8080/path?query=1");
         assert_eq!(flex2.len(), 1);
         assert_eq!(flex2[0].publication, "9to5Linux");
 
