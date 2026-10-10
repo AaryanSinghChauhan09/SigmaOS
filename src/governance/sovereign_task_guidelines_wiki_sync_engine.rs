@@ -378,6 +378,10 @@ impl AddpWikiPrProposalGenerator {
 // =========================================================================
 
 #[cfg(test)]
+#[path = "../distro/sovereign_architecture_development_decision_plan.rs"]
+#[allow(dead_code)]
+mod sovereign_architecture_development_decision_plan;
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -394,12 +398,20 @@ mod tests {
     }
 
     #[test]
-    fn test_architectural_decision_plan_integration() {
-        let mut governor = TaskGuidelinesAndRulesGovernor::new();
-        governor.validate_guideline(1);
-        governor.validate_guideline(3);
-        governor.validate_guideline(4);
-        assert!(governor.is_governance_compliant());
+    fn test_supreme_performance_addp_engine() {
+        use sovereign_architecture_development_decision_plan::SovereignArchitectureDevelopmentDecisionPlanEngine;
+        let mut addp = SovereignArchitectureDevelopmentDecisionPlanEngine::new();
+        assert!(addp.evaluate_all_decisions_active());
+
+        let pr_id = addp.submit_pr_proposal(
+            "sentinel",
+            "ADDP Supreme Performance Plan Verification",
+            "AD-001",
+            "--- a/addp.md\n+++ b/addp.md",
+            10_000_000.0,
+            b"pqc_signature",
+        );
+        assert!(addp.validate_and_merge_proposal(pr_id).is_ok());
     }
 
     #[test]

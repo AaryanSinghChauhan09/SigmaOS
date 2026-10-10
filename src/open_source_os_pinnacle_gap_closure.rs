@@ -340,6 +340,7 @@ mod tests {
         assert_eq!(matches, vec!["/boot/doc.txt".to_string()]);
     }
 
+
     #[test]
     fn test_open_source_os_pr_proposal_engine() {
         let mut engine = SovereignOpenSourceOsPrProposalEngine::new();
