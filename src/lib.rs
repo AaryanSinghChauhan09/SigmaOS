@@ -142,7 +142,9 @@ pub use distro::sovereign_mint_omarchy_v34_apex_pantheon::*;
 pub use distro::sovereign_open_source_os_pinnacle_pr_v35::*;
 pub use distro::arch_linux_parity_pr_suite::*;
 pub use distro::sovereign_media_and_distro_unimplemented_innovations::*;
-pub use distro::sovereign_open_source_inspirations_engine::*;
+pub use distro::sovereign_omarchy_pr_components_engine::*;
+pub use distro::sovereign_wiki_ideas_pr_deployment_engine::*;
+pub use distro::tech_media_publication_innovations::*;
 pub use distro::SovereignMasterSubsystemDistroHarmonizer;
 pub use kernel::tss_ring3_user_mode::*;
 pub use open_source_obsoletion::open_source_os_gap_closure::*;
@@ -186,7 +188,8 @@ pub use automation::{
 };
 pub use compatibility::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
-    ContainerRuntime, TargetPlatform, TranslationLayer,
+    ContainerRuntime, FedoraMasterPrDeploymentSuite, MintMasterPrDeploymentSuite,
+    TargetPlatform, TranslationLayer,
 };
 pub use container::{
     ContainerError, ContainerID, ContainerInfo, ContainerRuntime as CoreContainerRuntime,

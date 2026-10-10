@@ -30,8 +30,6 @@ pub enum UniversalSubsystemCategory {
     CompilerToolchain,
     AutomationProvisioning,
     SystemAudit,
-    AiWorkflowAgent,
-    VirtualizationHypervisor,
 }
 
 impl UniversalSubsystemCategory {
@@ -58,8 +56,6 @@ impl UniversalSubsystemCategory {
             Self::CompilerToolchain => "CompilerToolchain",
             Self::AutomationProvisioning => "AutomationProvisioning",
             Self::SystemAudit => "SystemAudit",
-            Self::AiWorkflowAgent => "AiWorkflowAgent",
-            Self::VirtualizationHypervisor => "VirtualizationHypervisor",
         }
     }
 }
@@ -391,28 +387,6 @@ impl SovereignUniversalSubsystemInteropEngine {
                 5,
             ),
         );
-
-        self.register_subsystem(
-            "ai_agent",
-            SubsystemAdapterCapabilities::new(
-                UniversalSubsystemCategory::AiWorkflowAgent,
-                true,
-                true,
-                &["herdr_pair_programming", "tdl_multi_pane", "omakase_agent_bridge"],
-                8,
-            ),
-        );
-
-        self.register_subsystem(
-            "virt_hypervisor",
-            SubsystemAdapterCapabilities::new(
-                UniversalSubsystemCategory::VirtualizationHypervisor,
-                true,
-                true,
-                &["bhyve_kvm", "vmm_openbsd", "zircon_hypervisor", "firecracker_vm"],
-                7,
-            ),
-        );
     }
 
     /// Establish default cross-subsystem translation and isolation policies.
@@ -528,54 +502,6 @@ impl SovereignUniversalSubsystemInteropEngine {
             "Trigger FineIBT and PaX CFI violation audits on security sandbox policy breaches",
             true,
         ));
-
-        self.add_interop_policy(SubsystemInteropPolicy::new(
-            "policy_ebpf_pledge",
-            UniversalSubsystemCategory::Networking,
-            UniversalSubsystemCategory::SecuritySandboxing,
-            "Translate eBPF socket filtering rules to OpenBSD pledge and unveil syscall policies",
-            true,
-        ));
-
-        self.add_interop_policy(SubsystemInteropPolicy::new(
-            "policy_landlock_capsicum",
-            UniversalSubsystemCategory::SecuritySandboxing,
-            UniversalSubsystemCategory::FilesystemStorage,
-            "Bridge Linux Landlock v5 sandboxes with FreeBSD Capsicum capabilities for VFS file descriptor rights",
-            true,
-        ));
-
-        self.add_interop_policy(SubsystemInteropPolicy::new(
-            "policy_ai_orchestration",
-            UniversalSubsystemCategory::AiWorkflowAgent,
-            UniversalSubsystemCategory::KernelScheduling,
-            "Route AI agent workflow events to kernel EEVDF/BORE scheduling classes for adaptive process prioritization",
-            false,
-        ));
-
-        self.add_interop_policy(SubsystemInteropPolicy::new(
-            "policy_storage_sec",
-            UniversalSubsystemCategory::FilesystemStorage,
-            UniversalSubsystemCategory::SecuritySandboxing,
-            "Bridge ZFS ARC / Btrfs CoW / Bcachefs tiering storage operations with OpenBSD W^X and FreeBSD Capsicum rights",
-            true,
-        ));
-
-        self.add_interop_policy(SubsystemInteropPolicy::new(
-            "policy_virt_sec",
-            UniversalSubsystemCategory::VirtualizationHypervisor,
-            UniversalSubsystemCategory::SecuritySandboxing,
-            "Enforce Bhyve/KVM/Firecracker microVM isolation via Linux Landlock v5 and OpenBSD unveil sandbox contexts",
-            true,
-        ));
-
-        self.add_interop_policy(SubsystemInteropPolicy::new(
-            "policy_ipc_obs",
-            UniversalSubsystemCategory::IpcMemory,
-            UniversalSubsystemCategory::ObservabilityDiagnostics,
-            "Stream microkernel IPC ring buffer telemetry into DTrace probes and eBPF continuous performance profilers",
-            false,
-        ));
     }
 
     pub fn register_subsystem(&mut self, name: &str, adapter: SubsystemAdapterCapabilities) {
@@ -678,24 +604,6 @@ impl SovereignUniversalSubsystemInteropEngine {
         }
 
         Ok(synced_count)
-    }
-
-    /// Complete universal cross-distro mesh synchronization across all registered subsystems.
-    pub fn sync_universal_cross_distro_mesh(&mut self) -> Result<usize, &'static str> {
-        let adapter_names: Vec<String> = self.subsystem_adapters.keys().cloned().collect();
-        let mut total_ops = 0;
-
-        for origin in &adapter_names {
-            for target in &adapter_names {
-                if origin != target {
-                    let action = format!("mesh_sync_{}_to_{}", origin, target);
-                    self.dispatch_cross_subsystem_operation_all_distros(origin, target, &action)?;
-                    total_ops += 1;
-                }
-            }
-        }
-
-        Ok(total_ops)
     }
 
     /// Dispatch an operation across origin and target subsystems, applying policy translation.
@@ -901,8 +809,6 @@ mod tests {
         assert_eq!(UniversalSubsystemCategory::CompilerToolchain.as_str(), "CompilerToolchain");
         assert_eq!(UniversalSubsystemCategory::AutomationProvisioning.as_str(), "AutomationProvisioning");
         assert_eq!(UniversalSubsystemCategory::SystemAudit.as_str(), "SystemAudit");
-        assert_eq!(UniversalSubsystemCategory::AiWorkflowAgent.as_str(), "AiWorkflowAgent");
-        assert_eq!(UniversalSubsystemCategory::VirtualizationHypervisor.as_str(), "VirtualizationHypervisor");
 
         assert!(engine.subsystem_adapters.contains_key("shell"));
         assert!(engine.subsystem_adapters.contains_key("ipc_mem"));
@@ -914,8 +820,6 @@ mod tests {
         assert!(engine.subsystem_adapters.contains_key("compiler"));
         assert!(engine.subsystem_adapters.contains_key("automation"));
         assert!(engine.subsystem_adapters.contains_key("audit"));
-        assert!(engine.subsystem_adapters.contains_key("ai_agent"));
-        assert!(engine.subsystem_adapters.contains_key("virt_hypervisor"));
 
         let event_id = engine
             .dispatch_cross_subsystem_operation_all_distros("shell", "ipc_mem", "alloc_ring_buffer")
@@ -929,61 +833,6 @@ mod tests {
             )
             .expect("Shell-IPC policy should exist");
         assert_eq!(policy.policy_id, "policy_shell_ipc");
-
-        let ebpf_pledge_policy = engine
-            .translate_policy(
-                UniversalSubsystemCategory::Networking,
-                UniversalSubsystemCategory::SecuritySandboxing,
-            )
-            .expect("eBPF-Pledge policy should exist");
-        assert_eq!(ebpf_pledge_policy.policy_id, "policy_ebpf_pledge");
-
-        let landlock_cap_policy = engine
-            .translate_policy(
-                UniversalSubsystemCategory::SecuritySandboxing,
-                UniversalSubsystemCategory::FilesystemStorage,
-            )
-            .expect("Landlock-Capsicum policy should exist");
-        assert_eq!(landlock_cap_policy.policy_id, "policy_landlock_capsicum");
-
-        let ai_sched_policy = engine
-            .translate_policy(
-                UniversalSubsystemCategory::AiWorkflowAgent,
-                UniversalSubsystemCategory::KernelScheduling,
-            )
-            .expect("AI-Scheduling policy should exist");
-        assert_eq!(ai_sched_policy.policy_id, "policy_ai_orchestration");
-
-        let storage_sec_policy = engine
-            .translate_policy(
-                UniversalSubsystemCategory::FilesystemStorage,
-                UniversalSubsystemCategory::SecuritySandboxing,
-            )
-            .expect("Storage-Sec policy should exist");
-        assert_eq!(storage_sec_policy.policy_id, "policy_storage_sec");
-        assert!(storage_sec_policy.enforce_strict_isolation);
-
-        let virt_sec_policy = engine
-            .translate_policy(
-                UniversalSubsystemCategory::VirtualizationHypervisor,
-                UniversalSubsystemCategory::SecuritySandboxing,
-            )
-            .expect("Virt-Sec policy should exist");
-        assert_eq!(virt_sec_policy.policy_id, "policy_virt_sec");
-        assert!(virt_sec_policy.enforce_strict_isolation);
-
-        let ipc_obs_policy = engine
-            .translate_policy(
-                UniversalSubsystemCategory::IpcMemory,
-                UniversalSubsystemCategory::ObservabilityDiagnostics,
-            )
-            .expect("IPC-Obs policy should exist");
-        assert_eq!(ipc_obs_policy.policy_id, "policy_ipc_obs");
-
-        let mesh_ops = engine
-            .sync_universal_cross_distro_mesh()
-            .expect("Mesh sync should succeed");
-        assert!(mesh_ops > 0);
 
         assert!(engine.verify_all_subsystems_interoperability());
         assert_eq!(engine.evaluate_system_wide_harmony_score(), 100);
