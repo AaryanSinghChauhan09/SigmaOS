@@ -74,14 +74,26 @@ impl OmarchyHyprlandThemeSyncEngine {
     }
 
     fn init_default_keybindings(&mut self) {
-        self.keybindings.insert(String::from("SUPER, Q"), String::from("exec, ghostty"));
-        self.keybindings.insert(String::from("SUPER, C"), String::from("killactive"));
-        self.keybindings.insert(String::from("SUPER, M"), String::from("exit"));
-        self.keybindings.insert(String::from("SUPER, E"), String::from("exec, nemo"));
-        self.keybindings.insert(String::from("SUPER, V"), String::from("togglefloating"));
-        self.keybindings.insert(String::from("SUPER, R"), String::from("exec, walker"));
-        self.keybindings.insert(String::from("SUPER, A"), String::from("exec, omarchy-ai-panel"));
-        self.keybindings.insert(String::from("SUPER, T"), String::from("exec, omarchy-theme-picker"));
+        self.keybindings
+            .insert(String::from("SUPER, Q"), String::from("exec, ghostty"));
+        self.keybindings
+            .insert(String::from("SUPER, C"), String::from("killactive"));
+        self.keybindings
+            .insert(String::from("SUPER, M"), String::from("exit"));
+        self.keybindings
+            .insert(String::from("SUPER, E"), String::from("exec, nemo"));
+        self.keybindings
+            .insert(String::from("SUPER, V"), String::from("togglefloating"));
+        self.keybindings
+            .insert(String::from("SUPER, R"), String::from("exec, walker"));
+        self.keybindings.insert(
+            String::from("SUPER, A"),
+            String::from("exec, omarchy-ai-panel"),
+        );
+        self.keybindings.insert(
+            String::from("SUPER, T"),
+            String::from("exec, omarchy-theme-picker"),
+        );
     }
 
     fn init_default_palettes(&mut self) {
@@ -217,11 +229,16 @@ impl OmarchyQuickshellWidgetPalette {
 
     fn load_default_widgets(&mut self) {
         self.active_widgets.push(String::from("omarchy-bar-clock"));
-        self.active_widgets.push(String::from("omarchy-bar-workspaces"));
-        self.active_widgets.push(String::from("omarchy-bar-audio-slider"));
-        self.active_widgets.push(String::from("omarchy-bar-network-mlo"));
-        self.active_widgets.push(String::from("omarchy-bar-system-tray"));
-        self.active_widgets.push(String::from("omarchy-bar-ai-herdr-button"));
+        self.active_widgets
+            .push(String::from("omarchy-bar-workspaces"));
+        self.active_widgets
+            .push(String::from("omarchy-bar-audio-slider"));
+        self.active_widgets
+            .push(String::from("omarchy-bar-network-mlo"));
+        self.active_widgets
+            .push(String::from("omarchy-bar-system-tray"));
+        self.active_widgets
+            .push(String::from("omarchy-bar-ai-herdr-button"));
     }
 
     pub fn send_notification(&mut self, title: &str, body: &str) {
@@ -289,7 +306,8 @@ impl OmarchyDotfilePkgbuildInstaller {
             depends=('hyprland' 'wayland')\n",
             pkgname, version, desc
         );
-        self.registered_pkgbuilds.insert(String::from(pkgname), content.clone());
+        self.registered_pkgbuilds
+            .insert(String::from(pkgname), content.clone());
         content
     }
 }
@@ -378,9 +396,12 @@ mod tests {
         let mut installer = OmarchyDotfilePkgbuildInstaller::new();
         assert_eq!(installer.managed_stow_profiles.len(), 4);
 
-        let pkg = installer.generate_custom_pkgbuild("omarchy-ai-tools", "2.0.0", "AI Tools for Omarchy");
+        let pkg =
+            installer.generate_custom_pkgbuild("omarchy-ai-tools", "2.0.0", "AI Tools for Omarchy");
         assert!(pkg.contains("pkgname=omarchy-ai-tools"));
-        assert!(installer.registered_pkgbuilds.contains_key("omarchy-ai-tools"));
+        assert!(installer
+            .registered_pkgbuilds
+            .contains_key("omarchy-ai-tools"));
     }
 
     #[test]

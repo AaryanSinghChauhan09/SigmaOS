@@ -692,7 +692,11 @@ impl QubesAdminVmSplitGpgEngine {
         }
     }
 
-    pub fn sign_data(&self, app_vm_id: usize, payload: &[u8]) -> Result<std::vec::Vec<u8>, &'static str> {
+    pub fn sign_data(
+        &self,
+        app_vm_id: usize,
+        payload: &[u8],
+    ) -> Result<std::vec::Vec<u8>, &'static str> {
         if !self.vault_authorized {
             return Err("Vault VM access denied by user policy");
         }
@@ -725,11 +729,18 @@ impl QubesWhonixTorGatewayEngine {
         }
     }
 
-    pub fn route_anon_traffic(&self, client_vm_id: usize, target: &str) -> Result<String, &'static str> {
+    pub fn route_anon_traffic(
+        &self,
+        client_vm_id: usize,
+        target: &str,
+    ) -> Result<String, &'static str> {
         if !self.tor_circuit_active {
             return Err("sys-whonix Tor circuit unavailable");
         }
-        Ok(format!("TOR_CIRCUIT[client={} gateway={}] -> {}", client_vm_id, self.sys_whonix_id, target))
+        Ok(format!(
+            "TOR_CIRCUIT[client={} gateway={}] -> {}",
+            client_vm_id, self.sys_whonix_id, target
+        ))
     }
 }
 
@@ -761,12 +772,24 @@ impl QubesUsbDomainSysUsbGuardEngine {
         self.connected_devices.push(dev);
     }
 
-    pub fn attach_to_app_vm(&self, bus_id: u8, dev_id: u8, target_app_vm: usize) -> Result<String, &'static str> {
-        let dev = self.connected_devices.iter().find(|d| d.bus_id == bus_id && d.dev_id == dev_id).ok_or("USB device not found in sys-usb")?;
+    pub fn attach_to_app_vm(
+        &self,
+        bus_id: u8,
+        dev_id: u8,
+        target_app_vm: usize,
+    ) -> Result<String, &'static str> {
+        let dev = self
+            .connected_devices
+            .iter()
+            .find(|d| d.bus_id == bus_id && d.dev_id == dev_id)
+            .ok_or("USB device not found in sys-usb")?;
         if !dev.allowed {
             return Err("USBGuard blocked attachment of device");
         }
-        Ok(format!("USB_ATTACH bus={} dev={} vendor={:04x} product={:04x} -> app_vm={}", bus_id, dev_id, dev.vendor_id, dev.product_id, target_app_vm))
+        Ok(format!(
+            "USB_ATTACH bus={} dev={} vendor={:04x} product={:04x} -> app_vm={}",
+            bus_id, dev_id, dev.vendor_id, dev.product_id, target_app_vm
+        ))
     }
 }
 
@@ -833,7 +856,11 @@ impl QubesDispVmDisposableTemplateEngine {
     }
 
     pub fn terminate_and_wipe(&mut self, disp_id: usize) -> bool {
-        if let Some(vm) = self.active_disp_vms.iter_mut().find(|v| v.disp_id == disp_id) {
+        if let Some(vm) = self
+            .active_disp_vms
+            .iter_mut()
+            .find(|v| v.disp_id == disp_id)
+        {
             vm.is_running = false;
             vm.is_wiped = true;
             true
@@ -859,7 +886,8 @@ impl QubesAudioDaemonPulseAudioProxy {
     }
 
     pub fn register_audio_stream(&mut self, app_vm_id: usize, stream_name: &str) {
-        self.active_streams.push((app_vm_id, stream_name.to_string()));
+        self.active_streams
+            .push((app_vm_id, stream_name.to_string()));
     }
 
     pub fn is_stream_active(&self, app_vm_id: usize) -> bool {
@@ -963,7 +991,9 @@ mod tests {
     #[test]
     fn test_qubes_whonix_tor_gateway() {
         let whonix = QubesWhonixTorGatewayEngine::new(200); // sys-whonix
-        let route = whonix.route_anon_traffic(101, "check.torproject.org").unwrap();
+        let route = whonix
+            .route_anon_traffic(101, "check.torproject.org")
+            .unwrap();
         assert!(route.contains("TOR_CIRCUIT"));
         assert!(route.contains("client=101"));
         assert!(route.contains("gateway=200"));
@@ -1003,7 +1033,11 @@ mod tests {
         assert!(!disp.is_wiped);
 
         assert!(disp_engine.terminate_and_wipe(disp.disp_id));
-        let wiped = disp_engine.active_disp_vms.iter().find(|v| v.disp_id == disp.disp_id).unwrap();
+        let wiped = disp_engine
+            .active_disp_vms
+            .iter()
+            .find(|v| v.disp_id == disp.disp_id)
+            .unwrap();
         assert!(!wiped.is_running);
         assert!(wiped.is_wiped);
     }
@@ -1019,7 +1053,8 @@ mod tests {
 
     #[test]
     fn test_qubes_os_pr_proposal_engine() {
-        let proposal = QubesOsPrProposalEngine::generate_pr_proposal(101, "Qubes OS Complete Parity", "Jules");
+        let proposal =
+            QubesOsPrProposalEngine::generate_pr_proposal(101, "Qubes OS Complete Parity", "Jules");
         assert!(proposal.contains("PR-0101"));
         assert!(proposal.contains("QubesAdminVmSplitGpgEngine"));
         assert!(proposal.contains("QubesWhonixTorGatewayEngine"));

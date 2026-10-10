@@ -115,6 +115,7 @@ pub use linuxmint_inspirations::{
 pub mod open_source_obsoletion;
 pub mod tools;
 pub use distro::additional_linux_bsd_components::*;
+pub use distro::open_source_os_unimplemented_ideas_pr::*;
 pub use distro::sovereign_2050_distro_supremacy_engine::*;
 pub use distro::sovereign_2055_distro_supremacy_engine::*;
 pub use distro::sovereign_2060_distro_supremacy_engine::*;
@@ -122,10 +123,9 @@ pub use distro::sovereign_2070_distro_supremacy_engine::*;
 pub use distro::sovereign_2075_distro_supremacy_engine::*;
 pub use distro::sovereign_linux_bsd_all_subsystems_harmony::*;
 pub use distro::sovereign_linux_bsd_master_synthesis::*;
-pub use distro::sovereign_omarchy_github_repo_parity::*;
-pub use distro::open_source_os_unimplemented_ideas_pr::*;
 pub use distro::sovereign_linux_bsd_pinnacle_innovations_v14::*;
 pub use distro::sovereign_media_and_distro_unimplemented_innovations::*;
+pub use distro::sovereign_omarchy_github_repo_parity::*;
 pub use distro::SovereignMasterSubsystemDistroHarmonizer;
 pub use kernel::tss_ring3_user_mode::*;
 pub use open_source_obsoletion::open_source_os_gap_closure::*;
@@ -296,9 +296,9 @@ pub use security::{
 };
 pub use shell::{
     ContextualCompleter, HistoryExpansionEngine, JobControlManager, ParameterExpansionEngine,
-    PipelineExecutor, ShellCommand, ShellPledgeUnveilGuard, ShellSyntaxHighlighter,
+    PipelineExecutor, ShellCommand, ShellManager as ShellProfileManager, ShellPledgeUnveilGuard,
+    ShellProfile, ShellStatistics, ShellSyntaxHighlighter, ShellType,
     SimpleShellSession as ShellRepl, ZshPromptFormatter,
-    ShellManager as ShellProfileManager, ShellProfile, ShellType, ShellStatistics,
 };
 pub use sigpkg::{
     AdapterError, BuildSystem, ContentAddressedStore, CryptoVerifier, DebAdapter,

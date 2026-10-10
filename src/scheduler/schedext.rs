@@ -249,9 +249,13 @@ impl SchedExtLavd {
     /// Calculate virtual deadline for a task
     pub fn compute_deadline(&self, task: &SchedExtTaskCtx) -> u64 {
         let base_slice_ns: u64 = 5_000_000; // 5ms default slice
-        let weight = if task.priority < 0 { 1u64 } else { (100 - task.priority.min(99)) as u64 };
+        let weight = if task.priority < 0 {
+            1u64
+        } else {
+            (100 - task.priority.min(99)) as u64
+        };
         let slice = base_slice_ns * weight / 100;
-        
+
         if task.is_latency_sensitive() {
             self.current_ns + slice.saturating_sub(self.latency_boost_ns)
         } else if task.is_realtime() {
@@ -269,7 +273,10 @@ impl SchedExtLavd {
         // For P-core preference tasks, use first domain; E-core for others
         if task.flags.0 & SchedExtFlags::PREFER_ECORE.0 != 0 {
             if let Some(domain) = domains.last() {
-                if let Some(cpu) = domain.find_idle_cpu().or_else(|| domain.find_least_loaded_cpu()) {
+                if let Some(cpu) = domain
+                    .find_idle_cpu()
+                    .or_else(|| domain.find_least_loaded_cpu())
+                {
                     return cpu;
                 }
             }
@@ -322,9 +329,12 @@ impl SchedExtRusty {
             return;
         }
 
-        let loads: Vec<u64> = domains.iter().map(|d| d.rqueues.iter().map(|rq| rq.load).sum()).collect();
+        let loads: Vec<u64> = domains
+            .iter()
+            .map(|d| d.rqueues.iter().map(|rq| rq.load).sum())
+            .collect();
         let avg_load = loads.iter().sum::<u64>() / loads.len() as u64;
-        
+
         for (i, &load) in loads.iter().enumerate() {
             self.domain_loads[i] = load;
             if load > avg_load + self.migration_threshold {
@@ -470,12 +480,12 @@ impl SchedExtManager {
     pub fn stats(&self) -> &SchedExtStats {
         &self.stats
     }
-    
+
     /// Set active scheduling policy  
     pub fn set_policy(&mut self, policy: &str) {
         self.active_policy = String::from(policy);
     }
-    
+
     /// Get list of available scheduling policies
     pub fn available_policies() -> Vec<&'static str> {
         vec!["lavd", "rusty", "cfs-compat", "deadline", "idle"]
@@ -502,15 +512,15 @@ mod tests {
         ctx.flags = SchedExtFlags::LATENCY_SENSITIVE;
         mgr.task_init(ctx);
         assert_eq!(mgr.stats.latency_sensitive_boosts, 1);
-        
+
         let cpu = mgr.select_cpu(1234);
         mgr.enqueue(1234, cpu);
         assert_eq!(mgr.stats.total_enqueues, 1);
-        
+
         let dispatched = mgr.dispatch(cpu);
         assert_eq!(dispatched, Some(1234));
         assert_eq!(mgr.stats.total_dispatches, 1);
-        
+
         mgr.task_exit(1234);
         assert!(!mgr.tasks.contains_key(&1234));
     }
@@ -519,7 +529,7 @@ mod tests {
     fn test_hybrid_topology() {
         let mut mgr = SchedExtManager::new();
         mgr.configure_hybrid_topology(
-            vec![0, 1, 2, 3],   // P-cores
+            vec![0, 1, 2, 3],               // P-cores
             vec![4, 5, 6, 7, 8, 9, 10, 11], // E-cores
         );
         assert_eq!(mgr.domains.len(), 2);
@@ -532,10 +542,10 @@ mod tests {
         let lavd = SchedExtLavd::new();
         let mut rt_task = SchedExtTaskCtx::new(100, -20);
         rt_task.flags = SchedExtFlags::REALTIME;
-        
+
         let mut latency_task = SchedExtTaskCtx::new(200, 0);
         latency_task.flags = SchedExtFlags::LATENCY_SENSITIVE;
-        
+
         let rt_deadline = lavd.compute_deadline(&rt_task);
         let lat_deadline = lavd.compute_deadline(&latency_task);
         // RT tasks should have shorter deadlines (higher priority)
@@ -546,15 +556,15 @@ mod tests {
     fn test_cpu_rq_operations() {
         let mut rq = SchedExtCpuRq::new(0);
         assert!(rq.idle);
-        
+
         rq.enqueue(42);
         assert!(!rq.idle);
         assert_eq!(rq.load, 1);
-        
+
         let pid = rq.dequeue_next();
         assert_eq!(pid, Some(42));
         assert_eq!(rq.current_pid, 42);
-        
+
         let none = rq.dequeue_next();
         assert!(none.is_none());
         assert!(rq.idle);

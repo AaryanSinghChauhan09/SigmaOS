@@ -131,7 +131,13 @@ impl OpenSourceOsUnimplementedIdeasPrEngine {
         for (title, cat, target_sub) in pr_definitions {
             let pr_id = self.next_pr_id;
             self.next_pr_id += 1;
-            let patch_content = format!("PR #{}: {}\nCategory: {}\nTarget: {}\n", pr_id, title, cat.as_str(), target_sub);
+            let patch_content = format!(
+                "PR #{}: {}\nCategory: {}\nTarget: {}\n",
+                pr_id,
+                title,
+                cat.as_str(),
+                target_sub
+            );
             let digest = fnv1a_pr_patch_digest(patch_content.as_bytes());
 
             let pr = OpenSourceOsPrProposalSpec {
@@ -193,7 +199,10 @@ impl SovereignOpenSourceOsIdeasMasterSuite {
         for pr in self.pr_engine.pr_proposals.values() {
             *counts.entry(pr.category.as_str()).or_insert(0) += 1;
         }
-        counts.into_iter().map(|(k, v)| (String::from(k), v)).collect()
+        counts
+            .into_iter()
+            .map(|(k, v)| (String::from(k), v))
+            .collect()
     }
 }
 
