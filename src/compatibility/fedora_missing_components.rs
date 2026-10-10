@@ -1239,6 +1239,44 @@ mod tests {
         let default_servers = resolved.resolve_domain_route("google.com");
         assert_eq!(default_servers, vec!["1.1.1.1".to_string(), "8.8.8.8".to_string()]);
     }
+
+    #[test]
+    fn test_fedora_rpm_spec_parser() {
+        let spec_content = r#"
+            Name:           nginx
+            Version:        1.24.0
+            Release:        1.fc40
+            Summary:        A high performance HTTP and reverse proxy server
+            License:        BSD-2-Clause
+            URL:            https://nginx.org
+            BuildRequires:  gcc, make, openssl-devel, zlib-devel, pcre2-devel
+            Requires:       openssl, zlib, pcre2
+        "#;
+
+        let meta = FedoraRpmSpecParser::parse_spec(spec_content);
+        assert_eq!(meta.name, "nginx");
+        assert_eq!(meta.version, "1.24.0");
+        assert_eq!(meta.release, "1.fc40");
+        assert_eq!(meta.license, "BSD-2-Clause");
+        assert_eq!(meta.build_requires.len(), 5);
+        assert_eq!(meta.requires.len(), 3);
+    }
+
+    #[test]
+    fn test_fedora_pr_proposal_formatting() {
+        let pr = FedoraPrProposal::new(
+            "Fedora Ecosystem Parity and RPM Spec Parser",
+            "feature/fedora-parity-suite",
+            "Fedora Compatibility",
+        )
+        .with_description("Adds Koji build system, Bodhi updates, RPM spec parser, and Fedora PR proposal generator.")
+        .with_changed_file("src/compatibility/fedora_missing_components.rs");
+
+        let submission = pr.format_as_pull_request_submission();
+        assert!(submission.contains("Fedora Ecosystem Parity and RPM Spec Parser"));
+        assert!(submission.contains("feature/fedora-parity-suite"));
+        assert!(submission.contains("src/compatibility/fedora_missing_components.rs"));
+    }
 }
 
 #[derive(Debug, Clone, Default)]
@@ -1406,4 +1444,105 @@ impl Default for FedoraRpmostreeAtomicEngine {
 pub struct MockChrootProfile {
     pub name: String,
     pub arch: String,
+}
+
+// =========================================================================
+// FEDORA RPM SPEC FILE PARSER & PR PROPOSAL ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct FedoraRpmSpecMetadata {
+    pub name: String,
+    pub version: String,
+    pub release: String,
+    pub summary: String,
+    pub license: String,
+    pub url: String,
+    pub build_requires: Vec<String>,
+    pub requires: Vec<String>,
+}
+
+pub struct FedoraRpmSpecParser;
+
+impl FedoraRpmSpecParser {
+    pub fn parse_spec(spec_text: &str) -> FedoraRpmSpecMetadata {
+        let mut meta = FedoraRpmSpecMetadata::default();
+
+        for line in spec_text.lines() {
+            let line = line.trim();
+            if line.is_empty() || line.starts_with('#') || line.starts_with('%') {
+                continue;
+            }
+
+            if let Some(pos) = line.find(':') {
+                let key = line[..pos].trim();
+                let val = line[pos + 1..].trim();
+
+                match key {
+                    "Name" => meta.name = val.to_string(),
+                    "Version" => meta.version = val.to_string(),
+                    "Release" => meta.release = val.to_string(),
+                    "Summary" => meta.summary = val.to_string(),
+                    "License" => meta.license = val.to_string(),
+                    "URL" => meta.url = val.to_string(),
+                    "BuildRequires" => {
+                        meta.build_requires
+                            .extend(val.split(',').map(|s| s.trim().to_string()));
+                    }
+                    "Requires" => {
+                        meta.requires
+                            .extend(val.split(',').map(|s| s.trim().to_string()));
+                    }
+                    _ => {}
+                }
+            }
+        }
+
+        meta
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct FedoraPrProposal {
+    pub title: String,
+    pub branch_name: String,
+    pub target_subsystem: String,
+    pub description: String,
+    pub changed_files: Vec<String>,
+}
+
+impl FedoraPrProposal {
+    pub fn new(title: &str, branch_name: &str, target_subsystem: &str) -> Self {
+        Self {
+            title: title.to_string(),
+            branch_name: branch_name.to_string(),
+            target_subsystem: target_subsystem.to_string(),
+            description: String::new(),
+            changed_files: Vec::new(),
+        }
+    }
+
+    pub fn with_description(mut self, desc: &str) -> Self {
+        self.description = desc.to_string();
+        self
+    }
+
+    pub fn with_changed_file(mut self, file: &str) -> Self {
+        self.changed_files.push(file.to_string());
+        self
+    }
+
+    pub fn format_as_pull_request_submission(&self) -> String {
+        let mut pr = String::new();
+        pr.push_str(&format!("### PR Title: {}\n", self.title));
+        pr.push_str(&format!("**Branch Name:** `{}`\n", self.branch_name));
+        pr.push_str(&format!("**Target Subsystem:** {}\n\n", self.target_subsystem));
+        pr.push_str("#### Summary of Fedora Parity Changes\n");
+        pr.push_str(&self.description);
+        pr.push_str("\n\n#### Changed Files\n");
+        for file in &self.changed_files {
+            pr.push_str(&format!("- `{}`\n", file));
+        }
+        pr
+    }
 }

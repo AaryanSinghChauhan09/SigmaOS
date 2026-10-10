@@ -501,7 +501,233 @@ impl Default for AptBuildDepResolver {
     }
 }
 
-#[cfg(test)]
+// ==============================================================================
+// 9. dpkg-divert File Redirection & Diversion Engine
+// ==============================================================================
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DpkgDiversionEntry {
+    pub original_path: String,
+    pub diverted_path: String,
+    pub package: String,
+    pub is_local: bool,
+}
+
+pub struct DpkgDivertEngine {
+    pub diversions: Vec<DpkgDiversionEntry>,
+}
+
+impl DpkgDivertEngine {
+    pub fn new() -> Self {
+        Self {
+            diversions: Vec::new(),
+        }
+    }
+
+    pub fn add_diversion(
+        &mut self,
+        original_path: &str,
+        diverted_path: &str,
+        package: &str,
+        is_local: bool,
+    ) {
+        self.remove_diversion(original_path);
+        self.diversions.push(DpkgDiversionEntry {
+            original_path: original_path.to_string(),
+            diverted_path: diverted_path.to_string(),
+            package: package.to_string(),
+            is_local,
+        });
+    }
+
+    pub fn remove_diversion(&mut self, original_path: &str) -> bool {
+        let initial_len = self.diversions.len();
+        self.diversions.retain(|d| d.original_path != original_path);
+        self.diversions.len() < initial_len
+    }
+
+    pub fn get_effective_path(&self, path: &str, calling_package: &str) -> String {
+        for div in &self.diversions {
+            if div.original_path == path {
+                if div.package != calling_package {
+                    return div.diverted_path.clone();
+                }
+            }
+        }
+        path.to_string()
+    }
+}
+
+impl Default for DpkgDivertEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==============================================================================
+// 10. dpkg-trigger Deferred Trigger Processing Engine
+// ==============================================================================
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TriggerKind {
+    Interest,
+    Activate,
+}
+
+#[derive(Debug, Clone)]
+pub struct TriggerEntry {
+    pub name: String,
+    pub kind: TriggerKind,
+    pub target_package: String,
+}
+
+pub struct DpkgTriggersEngine {
+    pub registered_triggers: Vec<TriggerEntry>,
+    pub pending_triggers: Vec<String>,
+}
+
+impl DpkgTriggersEngine {
+    pub fn new() -> Self {
+        Self {
+            registered_triggers: Vec::new(),
+            pending_triggers: Vec::new(),
+        }
+    }
+
+    pub fn register_trigger(&mut self, name: &str, kind: TriggerKind, target_package: &str) {
+        self.registered_triggers.push(TriggerEntry {
+            name: name.to_string(),
+            kind,
+            target_package: target_package.to_string(),
+        });
+    }
+
+    pub fn activate_trigger(&mut self, name: &str) -> Vec<String> {
+        let mut notified_packages = Vec::new();
+        if !self.pending_triggers.contains(&name.to_string()) {
+            self.pending_triggers.push(name.to_string());
+        }
+
+        for trig in &self.registered_triggers {
+            if trig.name == name && trig.kind == TriggerKind::Interest {
+                if !notified_packages.contains(&trig.target_package) {
+                    notified_packages.push(trig.target_package.clone());
+                }
+            }
+        }
+        notified_packages
+    }
+
+    pub fn clear_pending(&mut self) {
+        self.pending_triggers.clear();
+    }
+}
+
+impl Default for DpkgTriggersEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==============================================================================
+// 11. Debian Control Stanza & Control File Parser
+// ==============================================================================
+#[derive(Debug, Clone, Default)]
+pub struct DebControlStanza {
+    pub package: String,
+    pub version: String,
+    pub architecture: String,
+    pub depends: Vec<String>,
+    pub recommends: Vec<String>,
+    pub suggests: Vec<String>,
+    pub description: String,
+}
+
+pub struct DebControlParser;
+
+impl DebControlParser {
+    pub fn parse_stanza(text: &str) -> DebControlStanza {
+        let mut stanza = DebControlStanza::default();
+
+        for line in text.lines() {
+            let line = line.trim();
+            if line.is_empty() || line.starts_with('#') {
+                continue;
+            }
+
+            if let Some(pos) = line.find(':') {
+                let key = line[..pos].trim();
+                let val = line[pos + 1..].trim();
+
+                match key {
+                    "Package" | "Source" => stanza.package = val.to_string(),
+                    "Version" => stanza.version = val.to_string(),
+                    "Architecture" => stanza.architecture = val.to_string(),
+                    "Depends" => {
+                        stanza.depends = val.split(',').map(|s| s.trim().to_string()).collect();
+                    }
+                    "Recommends" => {
+                        stanza.recommends = val.split(',').map(|s| s.trim().to_string()).collect();
+                    }
+                    "Suggests" => {
+                        stanza.suggests = val.split(',').map(|s| s.trim().to_string()).collect();
+                    }
+                    "Description" => stanza.description = val.to_string(),
+                    _ => {}
+                }
+            }
+        }
+
+        stanza
+    }
+}
+
+// ==============================================================================
+// 12. Debian Subsystem Parity PR Proposal Engine
+// ==============================================================================
+#[derive(Debug, Clone)]
+pub struct DebianPrProposal {
+    pub title: String,
+    pub branch_name: String,
+    pub target_subsystem: String,
+    pub description: String,
+    pub changed_files: Vec<String>,
+}
+
+impl DebianPrProposal {
+    pub fn new(title: &str, branch_name: &str, target_subsystem: &str) -> Self {
+        Self {
+            title: title.to_string(),
+            branch_name: branch_name.to_string(),
+            target_subsystem: target_subsystem.to_string(),
+            description: String::new(),
+            changed_files: Vec::new(),
+        }
+    }
+
+    pub fn with_description(mut self, desc: &str) -> Self {
+        self.description = desc.to_string();
+        self
+    }
+
+    pub fn with_changed_file(mut self, file: &str) -> Self {
+        self.changed_files.push(file.to_string());
+        self
+    }
+
+    pub fn format_as_pull_request_submission(&self) -> String {
+        let mut pr = String::new();
+        pr.push_str(&std::format!("### PR Title: {}\n", self.title));
+        pr.push_str(&std::format!("**Branch Name:** `{}`\n", self.branch_name));
+        pr.push_str(&std::format!("**Target Subsystem:** {}\n\n", self.target_subsystem));
+        pr.push_str("#### Summary of Debian Parity Changes\n");
+        pr.push_str(&self.description);
+        pr.push_str("\n\n#### Changed Files\n");
+        for file in &self.changed_files {
+            pr.push_str(&std::format!("- `{}`\n", file));
+        }
+        pr
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -580,5 +806,72 @@ mod tests {
         assert_eq!(deps[1], "libssl-dev");
         assert_eq!(deps[2], "zlib1g-dev");
         assert_eq!(deps[3], "libpcre2-dev");
+    }
+
+    #[test]
+    fn test_dpkg_divert_engine() {
+        let mut divert = DpkgDivertEngine::new();
+        divert.add_diversion("/usr/bin/gcc", "/usr/bin/gcc.real", "gcc-snapshot", false);
+
+        assert_eq!(
+            divert.get_effective_path("/usr/bin/gcc", "gcc-snapshot"),
+            "/usr/bin/gcc"
+        );
+        assert_eq!(
+            divert.get_effective_path("/usr/bin/gcc", "gcc-standard"),
+            "/usr/bin/gcc.real"
+        );
+        assert!(divert.remove_diversion("/usr/bin/gcc"));
+    }
+
+    #[test]
+    fn test_dpkg_triggers_engine() {
+        let mut triggers = DpkgTriggersEngine::new();
+        triggers.register_trigger("/usr/share/icons", TriggerKind::Interest, "hicolor-icon-theme");
+
+        let notified = triggers.activate_trigger("/usr/share/icons");
+        assert_eq!(notified.len(), 1);
+        assert_eq!(notified[0], "hicolor-icon-theme");
+        assert_eq!(triggers.pending_triggers.len(), 1);
+
+        triggers.clear_pending();
+        assert!(triggers.pending_triggers.is_empty());
+    }
+
+    #[test]
+    fn test_deb_control_parser() {
+        let control_text = r#"
+            Package: coreutils
+            Version: 9.1-1
+            Architecture: amd64
+            Depends: libc6 (>= 2.34), libacl1 (>= 2.3.1), libselinux1 (>= 3.1)
+            Recommends: xz-utils
+            Suggests: coreutils-doc
+            Description: GNU core utilities
+        "#;
+
+        let stanza = DebControlParser::parse_stanza(control_text);
+        assert_eq!(stanza.package, "coreutils");
+        assert_eq!(stanza.version, "9.1-1");
+        assert_eq!(stanza.architecture, "amd64");
+        assert_eq!(stanza.depends.len(), 3);
+        assert_eq!(stanza.recommends.len(), 1);
+        assert_eq!(stanza.suggests.len(), 1);
+    }
+
+    #[test]
+    fn test_debian_pr_proposal_formatting() {
+        let pr = DebianPrProposal::new(
+            "Debian Subsystem Feature Parity",
+            "feature/debian-parity-suite",
+            "Debian Compatibility",
+        )
+        .with_description("Adds dpkg-divert, dpkg-trigger, debconf preseed, and deb-control parsing.")
+        .with_changed_file("src/compatibility/debian.rs");
+
+        let submission = pr.format_as_pull_request_submission();
+        assert!(submission.contains("Debian Subsystem Feature Parity"));
+        assert!(submission.contains("feature/debian-parity-suite"));
+        assert!(submission.contains("src/compatibility/debian.rs"));
     }
 }
