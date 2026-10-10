@@ -701,7 +701,10 @@ impl KaliBurpSuiteProxyInterceptor {
 
     pub fn intercept_request(&mut self, mut req: HttpRequestIntercept) -> HttpRequestIntercept {
         if self.intercept_enabled {
-            req.headers.push(("X-Intercepted-By".to_string(), "SigmaOS-BurpProxy".to_string()));
+            req.headers.push((
+                "X-Intercepted-By".to_string(),
+                "SigmaOS-BurpProxy".to_string(),
+            ));
             req.is_modified = true;
         }
         self.history.push(req.clone());
@@ -709,7 +712,9 @@ impl KaliBurpSuiteProxyInterceptor {
     }
 
     pub fn scan_csrf_tokens(&self, req: &HttpRequestIntercept) -> bool {
-        req.headers.iter().any(|(k, _)| k.eq_ignore_ascii_case("x-csrf-token") || k.eq_ignore_ascii_case("csrf-token"))
+        req.headers.iter().any(|(k, _)| {
+            k.eq_ignore_ascii_case("x-csrf-token") || k.eq_ignore_ascii_case("csrf-token")
+        })
     }
 }
 
@@ -781,23 +786,43 @@ impl KaliGhidraReverseEngineeringEngine {
             let addr = base_addr + ip as u64;
             match code_bytes[ip] {
                 0x90 => {
-                    instructions.push(InstructionOpcode { address: addr, mnemonic: "nop", operands: String::new() });
+                    instructions.push(InstructionOpcode {
+                        address: addr,
+                        mnemonic: "nop",
+                        operands: String::new(),
+                    });
                     ip += 1;
                 }
                 0xC3 => {
-                    instructions.push(InstructionOpcode { address: addr, mnemonic: "ret", operands: String::new() });
+                    instructions.push(InstructionOpcode {
+                        address: addr,
+                        mnemonic: "ret",
+                        operands: String::new(),
+                    });
                     ip += 1;
                 }
                 0x31 => {
-                    instructions.push(InstructionOpcode { address: addr, mnemonic: "xor", operands: "eax, eax".to_string() });
+                    instructions.push(InstructionOpcode {
+                        address: addr,
+                        mnemonic: "xor",
+                        operands: "eax, eax".to_string(),
+                    });
                     ip += 2;
                 }
                 0xE8 => {
-                    instructions.push(InstructionOpcode { address: addr, mnemonic: "call", operands: format!("{:#x}", addr + 5) });
+                    instructions.push(InstructionOpcode {
+                        address: addr,
+                        mnemonic: "call",
+                        operands: format!("{:#x}", addr + 5),
+                    });
                     ip += 5;
                 }
                 _ => {
-                    instructions.push(InstructionOpcode { address: addr, mnemonic: "db", operands: format!("{:#04x}", code_bytes[ip]) });
+                    instructions.push(InstructionOpcode {
+                        address: addr,
+                        mnemonic: "db",
+                        operands: format!("{:#04x}", code_bytes[ip]),
+                    });
                     ip += 1;
                 }
             }
@@ -813,7 +838,9 @@ pub struct KaliMasscanAsyncPortScanner {
 
 impl KaliMasscanAsyncPortScanner {
     pub fn new(rate_packets_per_sec: u32) -> Self {
-        Self { rate_packets_per_sec }
+        Self {
+            rate_packets_per_sec,
+        }
     }
 
     pub fn fast_sweep(&self, _target_ip: [u8; 4], ports: &[u16]) -> Vec<u16> {
@@ -875,7 +902,10 @@ impl KaliMimikatzCredentialDumper {
             creds.push(LsassCredential {
                 domain: "SOVEREIGN".to_string(),
                 username: "Administrator".to_string(),
-                ntlm_hash: [0x31, 0xD6, 0xCF, 0xE0, 0xD1, 0x6A, 0xE9, 0x31, 0xB7, 0x3C, 0x59, 0xD7, 0xE0, 0xC0, 0x89, 0xC0],
+                ntlm_hash: [
+                    0x31, 0xD6, 0xCF, 0xE0, 0xD1, 0x6A, 0xE9, 0x31, 0xB7, 0x3C, 0x59, 0xD7, 0xE0,
+                    0xC0, 0x89, 0xC0,
+                ],
             });
         }
         creds
@@ -1081,7 +1111,9 @@ mod tests {
     fn test_kali_sherlock_osint_harvester() {
         let results = KaliSherlockOsintHarvester::check_username("sovereign_dev");
         assert_eq!(results.len(), 4);
-        assert!(results.iter().any(|r| r.platform == "GitHub" && r.profile_url.contains("sovereign_dev")));
+        assert!(results
+            .iter()
+            .any(|r| r.platform == "GitHub" && r.profile_url.contains("sovereign_dev")));
     }
 
     #[test]
@@ -1094,7 +1126,11 @@ mod tests {
 
     #[test]
     fn test_kali_linux_pr_proposal_engine() {
-        let proposal = KaliLinuxPrProposalEngine::generate_pr_proposal(42, "Kali Linux Native Parity", "Jules");
+        let proposal = KaliLinuxPrProposalEngine::generate_pr_proposal(
+            42,
+            "Kali Linux Native Parity",
+            "Jules",
+        );
         assert!(proposal.contains("PR-0042"));
         assert!(proposal.contains("KaliKismetWirelessSniffer"));
         assert!(proposal.contains("KaliBurpSuiteProxyInterceptor"));

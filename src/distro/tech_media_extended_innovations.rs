@@ -380,7 +380,11 @@ impl MarkTechPostLlmVectorEngine {
             .collect()
     }
 
-    pub fn filter_high_similarity_tokens(&self, similarities: &[f32], threshold: f32) -> Vec<usize> {
+    pub fn filter_high_similarity_tokens(
+        &self,
+        similarities: &[f32],
+        threshold: f32,
+    ) -> Vec<usize> {
         similarities
             .iter()
             .enumerate()

@@ -737,7 +737,10 @@ impl DebianPrProposal {
         let mut pr = String::new();
         pr.push_str(&std::format!("### PR Title: {}\n", self.title));
         pr.push_str(&std::format!("**Branch Name:** `{}`\n", self.branch_name));
-        pr.push_str(&std::format!("**Target Subsystem:** {}\n\n", self.target_subsystem));
+        pr.push_str(&std::format!(
+            "**Target Subsystem:** {}\n\n",
+            self.target_subsystem
+        ));
         pr.push_str("#### Summary of Debian Parity Changes\n");
         pr.push_str(&self.description);
         pr.push_str("\n\n#### Changed Files\n");
@@ -754,7 +757,10 @@ mod tests {
 
     #[test]
     fn test_apt_repository_sync_extended() {
-        let mut sync = AptRepositorySync::new(DebianChannel::Stable, "https://deb.debian.org/debian".to_string());
+        let mut sync = AptRepositorySync::new(
+            DebianChannel::Stable,
+            "https://deb.debian.org/debian".to_string(),
+        );
         sync.parse_inrelease_metadata("Origin: Debian\nComponents: main contrib non-free non-free-firmware\nArchitectures: amd64 arm64");
         assert_eq!(sync.inrelease_components.len(), 4);
         assert!(sync.inrelease_components.contains(&"main".to_string()));
@@ -857,7 +863,11 @@ mod tests {
     #[test]
     fn test_dpkg_triggers_engine() {
         let mut triggers = DpkgTriggersEngine::new();
-        triggers.register_trigger("/usr/share/icons", TriggerKind::Interest, "hicolor-icon-theme");
+        triggers.register_trigger(
+            "/usr/share/icons",
+            TriggerKind::Interest,
+            "hicolor-icon-theme",
+        );
 
         let notified = triggers.activate_trigger("/usr/share/icons");
         assert_eq!(notified.len(), 1);
@@ -896,7 +906,9 @@ mod tests {
             "feature/debian-parity-suite",
             "Debian Compatibility",
         )
-        .with_description("Adds dpkg-divert, dpkg-trigger, debconf preseed, and deb-control parsing.")
+        .with_description(
+            "Adds dpkg-divert, dpkg-trigger, debconf preseed, and deb-control parsing.",
+        )
         .with_changed_file("src/compatibility/debian.rs");
 
         let submission = pr.format_as_pull_request_submission();
