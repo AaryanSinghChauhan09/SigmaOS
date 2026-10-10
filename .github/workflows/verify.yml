@@ -1,0 +1,41 @@
+name: Reproducible Verification Workflow
+
+on:
+  push:
+    branches: [ main, "feat/*", "study/*", "fix/*", "test/*", "docs/*", "chore/*", "security/*" ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  verify:
+    name: Build & Verify
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Generate Build Manifest
+        run: |
+          chmod +x scripts/generate_build_manifest.sh
+          ./scripts/generate_build_manifest.sh
+
+      - name: Verify Code Formatting
+        run: make fmt
+
+      - name: Static Check
+        run: make check
+
+      - name: Native Test Suite
+        run: ./run_sigma_tests.sh
+
+      - name: Upload Build Manifest Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-manifest
+          path: reports/build_manifest.json
