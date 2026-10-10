@@ -29,39 +29,237 @@ impl TechMediaPortalIntelligenceFeed {
     pub fn new() -> Self {
         let mut portals = BTreeMap::new();
         let list = [
-            ("9to5google", "9to5Google", "https://9to5google.com", "Mobile & Gadgets", "Android APEX container modules & Pixel Tensor TPU governor"),
-            ("9to5linux", "9to5Linux", "https://9to5linux.com", "Linux & Open Source", "Linux 6.12+ Sched_ext BPF scheduling & Mesa Vulkan explicit sync"),
-            ("9to5mac", "9to5Mac", "https://9to5mac.com", "Mobile & Gadgets", "Apple Silicon M1-M4 SMC power domains & Rosetta 2 binary translation"),
-            ("androidauthority", "Android Authority", "https://www.androidauthority.com", "Mobile Ecosystem", "ART v15 GC & Binder/Ashmem IPC acceleration"),
-            ("androidpolice", "Android Police", "https://www.androidpolice.com", "Mobile Ecosystem", "Mainline modular updates & Scoped storage privacy sandbox"),
-            ("appuals", "Appuals", "https://appuals.com", "Troubleshooting", "Automated system diagnostic repair & sysctl/registry repair"),
-            ("distrowatch", "DistroWatch", "https://distrowatch.com", "Linux & BSD Distros", "Universal Linux & BSD distribution ranking & package format matrix"),
-            ("frappe", "Frappe Framework", "https://frappe.io", "Enterprise Low-Code", "Low-code ERP metadata engine & automated schema migration queues"),
-            ("geekygadgets", "Geeky Gadgets", "https://www.geeky-gadgets.com", "Hardware & Peripherals", "Raspberry Pi 5 PCIe / RISC-V SBC hardware expansion governor"),
-            ("hwbusters", "HW Busters", "https://hwbusters.com", "Hardware & PSU Telemetry", "ATX 3.1 PSU power rail transient response & thermal efficiency profiling"),
-            ("howtogeek", "How-To Geek", "https://www.howtogeek.com", "OS Explainer Guides", "Power-user multi-boot & Wine/WSL2 system optimization"),
-            ("infoworld", "InfoWorld", "https://www.infoworld.com", "Enterprise Architecture", "Enterprise distributed microservice consensus & hybrid cloud"),
-            ("itsfoss", "ItsFOSS", "https://itsfoss.com", "Linux Tutorials", "FOSS application ecosystem & QuickShare HUD"),
-            ("itdaily", "ITDaily", "https://www.itdaily.com", "Enterprise IT", "Enterprise Zero Trust access control & automated disaster recovery"),
-            ("kdnuggets", "KDnuggets", "https://www.kdnuggets.com", "AI & Data Science", "AI/Data Science vector search & ONNX/LLM model runtime"),
-            ("linuxdotcom", "Linux.com", "https://www.linux.com", "Linux Community", "Linux kernel LTS tracking & init supervisor service management"),
-            ("linuxorg", "Linux.org", "https://www.linux.org", "Linux Forums", "Linux shell scripting & system diagnostic routines"),
-            ("linuxfoundation", "Linux Foundation", "https://www.linuxfoundation.org", "Open Source Governance", "eBPF Foundation standards & OpenSSF supply chain attestation"),
-            ("linuxteck", "LinuxTeck", "https://www.linuxteck.com", "SysAdmin & DevOps", "SysAdmin Hardened Nginx/HAProxy ingress & Ansible playbooks"),
-            ("makeuseof", "MakeUseOf", "https://www.makeuseof.com", "Consumer Tech & Linux", "Consumer OS feature synthesis & desktop environment customization"),
-            ("marktechpost", "MarkTechPost", "https://www.marktechpost.com", "AI & LLM Research", "AI MoE Mixture-of-Experts inference & KV cache quantization"),
-            ("opensourceforu", "Open Source For You", "https://www.opensourceforu.com", "Linux Kernel & FOSS", "FOSS kernel driver abstraction & embedded Linux BSP"),
-            ("pcmag", "PCMag", "https://www.pcmag.com", "Hardware Reviews", "Hardware benchmarking suite & OS feature parity matrix"),
-            ("pcworld", "PCWorld", "https://www.pcworld.com", "PC Benchmarks", "PC gaming GPU frame generation & CPU power limit tuning"),
-            ("phoronix", "Phoronix", "https://www.phoronix.com", "Linux Hardware Benchmarks", "Phoronix Test Suite (PTS) automated runner & kernel regression detector"),
-            ("techcrunch", "TechCrunch", "https://techcrunch.com", "Tech Startup Ecosystem", "Venture-grade cloud infrastructure & developer tooling pipeline"),
-            ("techpowerup", "TechPowerUp", "https://www.techpowerup.com", "GPU & Hardware Databases", "GPU-Z VBIOS power target limit & VRAM timing tuner"),
-            ("techspot", "TechSpot", "https://www.techspot.com", "Gaming Benchmarks", "Game engine performance profiling & CPU microarchitecture analysis"),
-            ("thenewstack", "The New Stack", "https://thenewstack.io", "Cloud Native & eBPF", "Cloud-native eBPF observability & OpenTelemetry trace collector"),
-            ("windowscentral", "Windows Central", "https://www.windowscentral.com", "Windows Ecosystem", "Windows DirectStorage / DirectSR & Hyper-V microVM sandboxing"),
-            ("windowslatest", "Windows Latest", "https://www.windowslatest.com", "Windows Platform News", "Windows Recall privacy auditing & File Explorer virtual filesystem"),
-            ("xdadevelopers", "XDA Developers", "https://www.xda-developers.com", "Custom ROMs & Mobile Modding", "Android kernel modding, Magisk root masking, & LineageOS HAL bridges"),
-            ("zdnet", "ZDNET", "https://www.zdnet.com", "Enterprise Technology", "Enterprise Security advisory monitoring & CIO IT strategy compliance"),
+            (
+                "9to5google",
+                "9to5Google",
+                "https://9to5google.com",
+                "Mobile & Gadgets",
+                "Android APEX container modules & Pixel Tensor TPU governor",
+            ),
+            (
+                "9to5linux",
+                "9to5Linux",
+                "https://9to5linux.com",
+                "Linux & Open Source",
+                "Linux 6.12+ Sched_ext BPF scheduling & Mesa Vulkan explicit sync",
+            ),
+            (
+                "9to5mac",
+                "9to5Mac",
+                "https://9to5mac.com",
+                "Mobile & Gadgets",
+                "Apple Silicon M1-M4 SMC power domains & Rosetta 2 binary translation",
+            ),
+            (
+                "androidauthority",
+                "Android Authority",
+                "https://www.androidauthority.com",
+                "Mobile Ecosystem",
+                "ART v15 GC & Binder/Ashmem IPC acceleration",
+            ),
+            (
+                "androidpolice",
+                "Android Police",
+                "https://www.androidpolice.com",
+                "Mobile Ecosystem",
+                "Mainline modular updates & Scoped storage privacy sandbox",
+            ),
+            (
+                "appuals",
+                "Appuals",
+                "https://appuals.com",
+                "Troubleshooting",
+                "Automated system diagnostic repair & sysctl/registry repair",
+            ),
+            (
+                "distrowatch",
+                "DistroWatch",
+                "https://distrowatch.com",
+                "Linux & BSD Distros",
+                "Universal Linux & BSD distribution ranking & package format matrix",
+            ),
+            (
+                "frappe",
+                "Frappe Framework",
+                "https://frappe.io",
+                "Enterprise Low-Code",
+                "Low-code ERP metadata engine & automated schema migration queues",
+            ),
+            (
+                "geekygadgets",
+                "Geeky Gadgets",
+                "https://www.geeky-gadgets.com",
+                "Hardware & Peripherals",
+                "Raspberry Pi 5 PCIe / RISC-V SBC hardware expansion governor",
+            ),
+            (
+                "hwbusters",
+                "HW Busters",
+                "https://hwbusters.com",
+                "Hardware & PSU Telemetry",
+                "ATX 3.1 PSU power rail transient response & thermal efficiency profiling",
+            ),
+            (
+                "howtogeek",
+                "How-To Geek",
+                "https://www.howtogeek.com",
+                "OS Explainer Guides",
+                "Power-user multi-boot & Wine/WSL2 system optimization",
+            ),
+            (
+                "infoworld",
+                "InfoWorld",
+                "https://www.infoworld.com",
+                "Enterprise Architecture",
+                "Enterprise distributed microservice consensus & hybrid cloud",
+            ),
+            (
+                "itsfoss",
+                "ItsFOSS",
+                "https://itsfoss.com",
+                "Linux Tutorials",
+                "FOSS application ecosystem & QuickShare HUD",
+            ),
+            (
+                "itdaily",
+                "ITDaily",
+                "https://www.itdaily.com",
+                "Enterprise IT",
+                "Enterprise Zero Trust access control & automated disaster recovery",
+            ),
+            (
+                "kdnuggets",
+                "KDnuggets",
+                "https://www.kdnuggets.com",
+                "AI & Data Science",
+                "AI/Data Science vector search & ONNX/LLM model runtime",
+            ),
+            (
+                "linuxdotcom",
+                "Linux.com",
+                "https://www.linux.com",
+                "Linux Community",
+                "Linux kernel LTS tracking & init supervisor service management",
+            ),
+            (
+                "linuxorg",
+                "Linux.org",
+                "https://www.linux.org",
+                "Linux Forums",
+                "Linux shell scripting & system diagnostic routines",
+            ),
+            (
+                "linuxfoundation",
+                "Linux Foundation",
+                "https://www.linuxfoundation.org",
+                "Open Source Governance",
+                "eBPF Foundation standards & OpenSSF supply chain attestation",
+            ),
+            (
+                "linuxteck",
+                "LinuxTeck",
+                "https://www.linuxteck.com",
+                "SysAdmin & DevOps",
+                "SysAdmin Hardened Nginx/HAProxy ingress & Ansible playbooks",
+            ),
+            (
+                "makeuseof",
+                "MakeUseOf",
+                "https://www.makeuseof.com",
+                "Consumer Tech & Linux",
+                "Consumer OS feature synthesis & desktop environment customization",
+            ),
+            (
+                "marktechpost",
+                "MarkTechPost",
+                "https://www.marktechpost.com",
+                "AI & LLM Research",
+                "AI MoE Mixture-of-Experts inference & KV cache quantization",
+            ),
+            (
+                "opensourceforu",
+                "Open Source For You",
+                "https://www.opensourceforu.com",
+                "Linux Kernel & FOSS",
+                "FOSS kernel driver abstraction & embedded Linux BSP",
+            ),
+            (
+                "pcmag",
+                "PCMag",
+                "https://www.pcmag.com",
+                "Hardware Reviews",
+                "Hardware benchmarking suite & OS feature parity matrix",
+            ),
+            (
+                "pcworld",
+                "PCWorld",
+                "https://www.pcworld.com",
+                "PC Benchmarks",
+                "PC gaming GPU frame generation & CPU power limit tuning",
+            ),
+            (
+                "phoronix",
+                "Phoronix",
+                "https://www.phoronix.com",
+                "Linux Hardware Benchmarks",
+                "Phoronix Test Suite (PTS) automated runner & kernel regression detector",
+            ),
+            (
+                "techcrunch",
+                "TechCrunch",
+                "https://techcrunch.com",
+                "Tech Startup Ecosystem",
+                "Venture-grade cloud infrastructure & developer tooling pipeline",
+            ),
+            (
+                "techpowerup",
+                "TechPowerUp",
+                "https://www.techpowerup.com",
+                "GPU & Hardware Databases",
+                "GPU-Z VBIOS power target limit & VRAM timing tuner",
+            ),
+            (
+                "techspot",
+                "TechSpot",
+                "https://www.techspot.com",
+                "Gaming Benchmarks",
+                "Game engine performance profiling & CPU microarchitecture analysis",
+            ),
+            (
+                "thenewstack",
+                "The New Stack",
+                "https://thenewstack.io",
+                "Cloud Native & eBPF",
+                "Cloud-native eBPF observability & OpenTelemetry trace collector",
+            ),
+            (
+                "windowscentral",
+                "Windows Central",
+                "https://www.windowscentral.com",
+                "Windows Ecosystem",
+                "Windows DirectStorage / DirectSR & Hyper-V microVM sandboxing",
+            ),
+            (
+                "windowslatest",
+                "Windows Latest",
+                "https://www.windowslatest.com",
+                "Windows Platform News",
+                "Windows Recall privacy auditing & File Explorer virtual filesystem",
+            ),
+            (
+                "xdadevelopers",
+                "XDA Developers",
+                "https://www.xda-developers.com",
+                "Custom ROMs & Mobile Modding",
+                "Android kernel modding, Magisk root masking, & LineageOS HAL bridges",
+            ),
+            (
+                "zdnet",
+                "ZDNET",
+                "https://www.zdnet.com",
+                "Enterprise Technology",
+                "Enterprise Security advisory monitoring & CIO IT strategy compliance",
+            ),
         ];
 
         for (idx, (key, name, url, cat, feature)) in list.iter().enumerate() {
@@ -308,7 +506,8 @@ impl LinuxBsdDistroUnimplementedIdeasSuite {
         if permissions.is_empty() {
             return Err("Permissions cannot be empty");
         }
-        self.openbsd_unveiled_paths.push(format!("{}:{}", path, permissions));
+        self.openbsd_unveiled_paths
+            .push(format!("{}:{}", path, permissions));
         Ok(())
     }
 
@@ -324,7 +523,11 @@ impl LinuxBsdDistroUnimplementedIdeasSuite {
         if self.distros.is_empty() {
             return 0;
         }
-        let total: u32 = self.distros.values().map(|d| d.parity_score_pct as u32).sum();
+        let total: u32 = self
+            .distros
+            .values()
+            .map(|d| d.parity_score_pct as u32)
+            .sum();
         (total / self.distros.len() as u32) as u8
     }
 }
@@ -422,7 +625,12 @@ impl GpuDirectPcieDmaEngine {
         }
     }
 
-    pub fn build_dma_descriptor(&mut self, host_virt_addr: u64, vram_pci_bar: u64, len: usize) -> Result<usize, &'static str> {
+    pub fn build_dma_descriptor(
+        &mut self,
+        host_virt_addr: u64,
+        vram_pci_bar: u64,
+        len: usize,
+    ) -> Result<usize, &'static str> {
         if len == 0 || (len % 64) != 0 {
             return Err("DMA length must be non-zero and 64-byte aligned");
         }
@@ -537,7 +745,8 @@ impl SigmaStoreCasRollbackEngine {
     pub fn new() -> Self {
         let gen1 = StoreGeneration {
             id: 1,
-            cas_hash: "3a8b2f10d9e87c6b5a4f3e2d1c0b9a8f7e6d5c4b3a2f1e0d9c8b7a6f5e4d3c2b".to_string(),
+            cas_hash: "3a8b2f10d9e87c6b5a4f3e2d1c0b9a8f7e6d5c4b3a2f1e0d9c8b7a6f5e4d3c2b"
+                .to_string(),
             profile_path: "/sigma/store/profiles/default-1-link".to_string(),
         };
         Self {
@@ -653,7 +862,10 @@ mod tests {
 
         assert!(feed.ingest_article("phoronix", "Linux 6.12 Kernel Benchmarks"));
         assert!(!feed.ingest_article("phoronix", "Linux 6.12 Kernel Benchmarks"));
-        assert_eq!(feed.get_portal("phoronix").unwrap().intelligence_feed_items, 269);
+        assert_eq!(
+            feed.get_portal("phoronix").unwrap().intelligence_feed_items,
+            269
+        );
 
         let linux_portals = feed.filter_by_category("Linux & Open Source");
         assert!(!linux_portals.is_empty());
@@ -663,47 +875,153 @@ mod tests {
     fn test_ingest_media_ideas_all_33_urls() {
         let mut feed = TechMediaPortalIntelligenceFeed::new();
         let urls_and_titles = [
-            ("https://9to5google.com/tech", "Google Pixel 9 AI Tensor Benchmarks"),
-            ("https://9to5linux.com/article", "Linux 6.12 Kernel Released with Sched_ext"),
-            ("https://9to5mac.com/news", "Apple M4 Mac Mini SMC Thermal Profile"),
-            ("https://www.androidauthority.com/news", "Android 15 ART GC Improvements"),
-            ("https://www.androidpolice.com/features", "Mainline Modular Updates in Android 15"),
-            ("https://appuals.com/guides", "System Diagnostic Repair Routines"),
-            ("https://distrowatch.com/weekly", "DistroWatch Weekly BSD & Linux Rankings"),
-            ("https://frappe.io/framework", "Frappe Low-Code Schema Migration Engine"),
-            ("https://www.geeky-gadgets.com/hardware", "Raspberry Pi 5 PCIe Expansion"),
-            ("https://hwbusters.com/psu", "ATX 3.1 PSU Transient Power Benchmarks"),
-            ("https://www.howtogeek.com/explainers", "Dual-Booting Linux & Windows Guide"),
-            ("https://www.infoworld.com/architecture", "Enterprise Cloud Microservice Consensus"),
-            ("https://itsfoss.com/apps", "Top FOSS Linux Desktop Applications"),
-            ("https://www.itdaily.com/enterprise", "Zero Trust Architecture Guide"),
-            ("https://www.kdnuggets.com/ai", "KDnuggets Vector Database Benchmark"),
-            ("https://www.linux.com/news", "Linux Kernel LTS Release Notes"),
-            ("https://www.linux.org/forum", "Linux Shell Diagnostic Tutorials"),
-            ("https://www.linuxfoundation.org/standards", "OpenSSF Supply Chain Security"),
-            ("https://www.linuxteck.com/devops", "Hardened Nginx SysAdmin Playbook"),
-            ("https://www.makeuseof.com/linux", "Customizing Desktop Environments"),
-            ("https://www.marktechpost.com/ai", "Mixture of Experts LLM Quantization"),
-            ("https://www.opensourceforu.com/kernel", "Embedded Linux BSP Driver Layer"),
-            ("https://www.pcmag.com/reviews", "PC Hardware Parity Benchmarks"),
-            ("https://www.pcworld.com/benchmarks", "GPU Frame Generation Benchmarks"),
-            ("https://www.phoronix.com/news", "Phoronix Kernel Regression Suite"),
-            ("https://techcrunch.com/startups", "Developer Infrastructure Tools"),
-            ("https://www.techpowerup.com/gpu-specs", "GPU-Z VBIOS Power Limit Tuning"),
-            ("https://www.techspot.com/article", "Game Engine Performance Profiling"),
-            ("https://thenewstack.io/ebpf", "Cloud Native eBPF Observability"),
-            ("https://www.windowscentral.com/windows", "Windows DirectStorage MicroVM Sandbox"),
-            ("https://www.windowslatest.com/windows11", "Windows Recall Privacy Audit"),
-            ("https://www.xda-developers.com/android", "Android Kernel Magisk Root Masking"),
-            ("https://www.zdnet.com/security", "Enterprise CIO Security Monitoring"),
+            (
+                "https://9to5google.com/tech",
+                "Google Pixel 9 AI Tensor Benchmarks",
+            ),
+            (
+                "https://9to5linux.com/article",
+                "Linux 6.12 Kernel Released with Sched_ext",
+            ),
+            (
+                "https://9to5mac.com/news",
+                "Apple M4 Mac Mini SMC Thermal Profile",
+            ),
+            (
+                "https://www.androidauthority.com/news",
+                "Android 15 ART GC Improvements",
+            ),
+            (
+                "https://www.androidpolice.com/features",
+                "Mainline Modular Updates in Android 15",
+            ),
+            (
+                "https://appuals.com/guides",
+                "System Diagnostic Repair Routines",
+            ),
+            (
+                "https://distrowatch.com/weekly",
+                "DistroWatch Weekly BSD & Linux Rankings",
+            ),
+            (
+                "https://frappe.io/framework",
+                "Frappe Low-Code Schema Migration Engine",
+            ),
+            (
+                "https://www.geeky-gadgets.com/hardware",
+                "Raspberry Pi 5 PCIe Expansion",
+            ),
+            (
+                "https://hwbusters.com/psu",
+                "ATX 3.1 PSU Transient Power Benchmarks",
+            ),
+            (
+                "https://www.howtogeek.com/explainers",
+                "Dual-Booting Linux & Windows Guide",
+            ),
+            (
+                "https://www.infoworld.com/architecture",
+                "Enterprise Cloud Microservice Consensus",
+            ),
+            (
+                "https://itsfoss.com/apps",
+                "Top FOSS Linux Desktop Applications",
+            ),
+            (
+                "https://www.itdaily.com/enterprise",
+                "Zero Trust Architecture Guide",
+            ),
+            (
+                "https://www.kdnuggets.com/ai",
+                "KDnuggets Vector Database Benchmark",
+            ),
+            (
+                "https://www.linux.com/news",
+                "Linux Kernel LTS Release Notes",
+            ),
+            (
+                "https://www.linux.org/forum",
+                "Linux Shell Diagnostic Tutorials",
+            ),
+            (
+                "https://www.linuxfoundation.org/standards",
+                "OpenSSF Supply Chain Security",
+            ),
+            (
+                "https://www.linuxteck.com/devops",
+                "Hardened Nginx SysAdmin Playbook",
+            ),
+            (
+                "https://www.makeuseof.com/linux",
+                "Customizing Desktop Environments",
+            ),
+            (
+                "https://www.marktechpost.com/ai",
+                "Mixture of Experts LLM Quantization",
+            ),
+            (
+                "https://www.opensourceforu.com/kernel",
+                "Embedded Linux BSP Driver Layer",
+            ),
+            (
+                "https://www.pcmag.com/reviews",
+                "PC Hardware Parity Benchmarks",
+            ),
+            (
+                "https://www.pcworld.com/benchmarks",
+                "GPU Frame Generation Benchmarks",
+            ),
+            (
+                "https://www.phoronix.com/news",
+                "Phoronix Kernel Regression Suite",
+            ),
+            (
+                "https://techcrunch.com/startups",
+                "Developer Infrastructure Tools",
+            ),
+            (
+                "https://www.techpowerup.com/gpu-specs",
+                "GPU-Z VBIOS Power Limit Tuning",
+            ),
+            (
+                "https://www.techspot.com/article",
+                "Game Engine Performance Profiling",
+            ),
+            (
+                "https://thenewstack.io/ebpf",
+                "Cloud Native eBPF Observability",
+            ),
+            (
+                "https://www.windowscentral.com/windows",
+                "Windows DirectStorage MicroVM Sandbox",
+            ),
+            (
+                "https://www.windowslatest.com/windows11",
+                "Windows Recall Privacy Audit",
+            ),
+            (
+                "https://www.xda-developers.com/android",
+                "Android Kernel Magisk Root Masking",
+            ),
+            (
+                "https://www.zdnet.com/security",
+                "Enterprise CIO Security Monitoring",
+            ),
         ];
 
         for (url, title) in urls_and_titles {
-            assert!(feed.ingest_media_ideas(url, title), "Failed to ingest for url: {}", url);
+            assert!(
+                feed.ingest_media_ideas(url, title),
+                "Failed to ingest for url: {}",
+                url
+            );
         }
 
         // Test duplicate detection via ingest_media_ideas
-        assert!(!feed.ingest_media_ideas("https://9to5google.com/tech", "Google Pixel 9 AI Tensor Benchmarks"));
+        assert!(!feed.ingest_media_ideas(
+            "https://9to5google.com/tech",
+            "Google Pixel 9 AI Tensor Benchmarks"
+        ));
         // Test unknown domain handling
         assert!(!feed.ingest_media_ideas("https://unknown-domain.org", "Unknown Article"));
     }
@@ -727,11 +1045,16 @@ mod tests {
         assert!(p_core >= 4);
 
         // GPUDirect PCIe DMA
-        let desc_id = suite.gpudirect_dma.build_dma_descriptor(0x7fff_0000, 0xe000_0000, 4096).unwrap();
+        let desc_id = suite
+            .gpudirect_dma
+            .build_dma_descriptor(0x7fff_0000, 0xe000_0000, 4096)
+            .unwrap();
         assert_eq!(desc_id, 1);
 
         // eBPF relative jmp trampoline
-        let jmp = suite.ebpf_trampoline.generate_x86_relative_jmp(0x1000, 0x2000);
+        let jmp = suite
+            .ebpf_trampoline
+            .generate_x86_relative_jmp(0x1000, 0x2000);
         assert_eq!(jmp[0], 0xE9);
 
         // PQC Kyber peer

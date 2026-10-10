@@ -122,8 +122,15 @@ impl PrProposalMatrix {
         pr_num
     }
 
-    pub fn sign_and_verify_pr(&mut self, pr_number: u32, pqc_key: &[u8]) -> Result<PrStatus, &'static str> {
-        let pr = self.proposals.get_mut(&pr_number).ok_or("PR number not found")?;
+    pub fn sign_and_verify_pr(
+        &mut self,
+        pr_number: u32,
+        pqc_key: &[u8],
+    ) -> Result<PrStatus, &'static str> {
+        let pr = self
+            .proposals
+            .get_mut(&pr_number)
+            .ok_or("PR number not found")?;
         if pqc_key.is_empty() {
             return Err("Empty PQC key");
         }
@@ -136,10 +143,16 @@ impl PrProposalMatrix {
     pub fn generate_markdown_pr(&self, pr_number: u32) -> Option<String> {
         let pr = self.proposals.get(&pr_number)?;
         let mut md = String::new();
-        md.push_str(&format!("## Pull Request #{}: {}\n\n", pr.pr_number, pr.title));
+        md.push_str(&format!(
+            "## Pull Request #{}: {}\n\n",
+            pr.pr_number, pr.title
+        ));
         md.push_str(&format!("- **Branch Name:** `{}`\n", pr.branch_name));
         md.push_str(&format!("- **Origin OS:** {}\n", pr.origin_os));
-        md.push_str(&format!("- **Target Subsystem:** {}\n", pr.subsystem_target));
+        md.push_str(&format!(
+            "- **Target Subsystem:** {}\n",
+            pr.subsystem_target
+        ));
         md.push_str(&format!("- **Status:** `{:?}`\n\n", pr.status));
         md.push_str("### Description\n");
         md.push_str(&format!("{}\n\n", pr.description));
@@ -344,7 +357,12 @@ impl DebianDebconfQuestionEngine {
         }
     }
 
-    pub fn register_question(&mut self, key: &str, priority: DebconfPriorityThreshold, default_val: &str) {
+    pub fn register_question(
+        &mut self,
+        key: &str,
+        priority: DebconfPriorityThreshold,
+        default_val: &str,
+    ) {
         self.templates.insert(
             key.to_string(),
             DebconfTemplate {
@@ -368,7 +386,11 @@ impl DebianDebconfQuestionEngine {
     pub fn get_answer(&self, key: &str) -> Option<String> {
         let tmpl = self.templates.get(key)?;
         if tmpl.priority >= self.min_priority {
-            Some(tmpl.user_value.clone().unwrap_or_else(|| tmpl.default_value.clone()))
+            Some(
+                tmpl.user_value
+                    .clone()
+                    .unwrap_or_else(|| tmpl.default_value.clone()),
+            )
         } else {
             Some(tmpl.default_value.clone())
         }
@@ -520,7 +542,10 @@ impl DebianSbuildCleanroomSandbox {
             return Err("Empty dsc file");
         }
         self.is_clean = false;
-        Ok(format!("Build of '{}' completed in '{}'", dsc_file, self.chroot_name))
+        Ok(format!(
+            "Build of '{}' completed in '{}'",
+            dsc_file, self.chroot_name
+        ))
     }
 
     pub fn sanitize_chroot(&mut self) {
@@ -734,8 +759,10 @@ impl DebianDpkgQueryManifestSearch {
     }
 
     pub fn register_manifest(&mut self, pkg: &str, files: &[&str]) {
-        self.package_manifests
-            .insert(pkg.to_string(), files.iter().map(|s| s.to_string()).collect());
+        self.package_manifests.insert(
+            pkg.to_string(),
+            files.iter().map(|s| s.to_string()).collect(),
+        );
     }
 
     pub fn search_file_owner(&self, path: &str) -> Option<String> {
@@ -781,7 +808,9 @@ impl DebianGithubRepoInspirationsPrSuite {
     pub fn new() -> Self {
         Self {
             pr_matrix: PrProposalMatrix::new(),
-            salsa_ci: DebianGithubSalsaWorkflowEngine::new("https://salsa.debian.org/sigma/sigmaos"),
+            salsa_ci: DebianGithubSalsaWorkflowEngine::new(
+                "https://salsa.debian.org/sigma/sigmaos",
+            ),
             apt_resolver: DebianAptDependencyResolverEngine::new(),
             divert_mgr: DebianDpkgDivertManager::new(),
             debconf_engine: DebianDebconfQuestionEngine::new(),
@@ -809,15 +838,26 @@ impl DebianGithubRepoInspirationsPrSuite {
             &["src/distro/debian_github_repo_inspirations_pr.rs"],
         );
 
-        let signed = self.pr_matrix.sign_and_verify_pr(pr_num, b"pqc_key").is_ok();
-        self.salsa_ci.add_ci_step("sbuild-build", "sbuild --dist=sid");
+        let signed = self
+            .pr_matrix
+            .sign_and_verify_pr(pr_num, b"pqc_key")
+            .is_ok();
+        self.salsa_ci
+            .add_ci_step("sbuild-build", "sbuild --dist=sid");
         let ci_count = self.salsa_ci.execute_pipeline();
 
-        self.divert_mgr.add_diversion("/bin/sh", "/bin/sh.real", "dash");
-        self.statoverride_mgr.set_override("/usr/bin/sudo", "root", "sudo", 0o4755);
+        self.divert_mgr
+            .add_diversion("/bin/sh", "/bin/sh.real", "dash");
+        self.statoverride_mgr
+            .set_override("/usr/bin/sudo", "root", "sudo", 0o4755);
         self.apt_mark.set_package_state("libc6", AptMarkState::Hold);
 
-        signed && ci_count > 0 && self.statoverride_mgr.get_override("/usr/bin/sudo").is_some()
+        signed
+            && ci_count > 0
+            && self
+                .statoverride_mgr
+                .get_override("/usr/bin/sudo")
+                .is_some()
     }
 }
 
@@ -860,8 +900,14 @@ mod tests {
     fn test_debian_tools_components() {
         let mut divert = DebianDpkgDivertManager::new();
         divert.add_diversion("/usr/bin/gcc", "/usr/bin/gcc.real", "gcc-wrapper");
-        assert_eq!(divert.lookup_redirect("/usr/bin/gcc", "gcc-wrapper"), "/usr/bin/gcc");
-        assert_eq!(divert.lookup_redirect("/usr/bin/gcc", "other"), "/usr/bin/gcc.real");
+        assert_eq!(
+            divert.lookup_redirect("/usr/bin/gcc", "gcc-wrapper"),
+            "/usr/bin/gcc"
+        );
+        assert_eq!(
+            divert.lookup_redirect("/usr/bin/gcc", "other"),
+            "/usr/bin/gcc.real"
+        );
 
         let mut debconf = DebianDebconfQuestionEngine::new();
         debconf.register_question("tzdata/zone", DebconfPriorityThreshold::Critical, "UTC");
@@ -873,7 +919,10 @@ mod tests {
         assert_eq!(statoverride.get_override("/bin/su").unwrap().mode, 0o4755);
 
         let mut debootstrap = DebianDebootstrapBaseInstaller::new("/target", "bookworm");
-        assert_eq!(debootstrap.advance_installer_stage(), DebootstrapInstallerStage::Unpack);
+        assert_eq!(
+            debootstrap.advance_installer_stage(),
+            DebootstrapInstallerStage::Unpack
+        );
 
         let dh = DebianDebhelperPipelineAutomation::new(13);
         assert_eq!(dh.execute_all_steps(), 9);
@@ -901,11 +950,17 @@ mod tests {
 
         let mut apt_mark = DebianAptMarkStateGovernor::new();
         apt_mark.set_package_state("htop", AptMarkState::Manual);
-        assert_eq!(apt_mark.get_package_state("htop"), Some(AptMarkState::Manual));
+        assert_eq!(
+            apt_mark.get_package_state("htop"),
+            Some(AptMarkState::Manual)
+        );
 
         let mut query = DebianDpkgQueryManifestSearch::new();
         query.register_manifest("coreutils", &["/bin/cat", "/bin/ls"]);
-        assert_eq!(query.search_file_owner("/bin/cat"), Some("coreutils".to_string()));
+        assert_eq!(
+            query.search_file_owner("/bin/cat"),
+            Some("coreutils".to_string())
+        );
     }
 
     #[test]

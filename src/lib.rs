@@ -114,8 +114,8 @@ pub use linuxmint_inspirations::{
 };
 pub mod open_source_obsoletion;
 pub mod tools;
-pub use distro::debian_github_repo_inspirations_pr::*;
 pub use distro::additional_linux_bsd_components::*;
+pub use distro::debian_github_repo_inspirations_pr::*;
 pub use distro::sovereign_2050_distro_supremacy_engine::*;
 pub use distro::sovereign_2055_distro_supremacy_engine::*;
 pub use distro::sovereign_2060_distro_supremacy_engine::*;
@@ -295,9 +295,9 @@ pub use security::{
 };
 pub use shell::{
     ContextualCompleter, HistoryExpansionEngine, JobControlManager, ParameterExpansionEngine,
-    PipelineExecutor, ShellCommand, ShellPledgeUnveilGuard, ShellSyntaxHighlighter,
+    PipelineExecutor, ShellCommand, ShellManager as ShellProfileManager, ShellPledgeUnveilGuard,
+    ShellProfile, ShellStatistics, ShellSyntaxHighlighter, ShellType,
     SimpleShellSession as ShellRepl, ZshPromptFormatter,
-    ShellManager as ShellProfileManager, ShellProfile, ShellType, ShellStatistics,
 };
 pub use sigpkg::{
     AdapterError, BuildSystem, ContentAddressedStore, CryptoVerifier, DebAdapter,
