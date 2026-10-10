@@ -317,14 +317,39 @@ impl MintSystemReport {
 
     /// Search information items
     pub fn search(&self, query: &str) -> Vec<&SystemInfoItem> {
-        let query_lower = query.to_lowercase();
+        // Bolt Optimization: Zero-allocation case-insensitive substring search helper avoids
+        // allocating heap String instances via `to_lowercase()` for item names and values.
         self.info_items
             .iter()
             .filter(|item| {
-                item.name.to_lowercase().contains(&query_lower)
-                    || item.value.to_lowercase().contains(&query_lower)
+                contains_ignore_case(&item.name, query) || contains_ignore_case(&item.value, query)
             })
             .collect()
+    }
+}
+
+/// Zero-allocation case-insensitive substring search helper.
+/// Checks whether `haystack` contains `needle`, ignoring ASCII case, without allocating heap Strings.
+fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
+    if needle.is_empty() {
+        return true;
+    }
+    if haystack.len() < needle.len() {
+        return false;
+    }
+    if haystack.is_ascii() && needle.is_ascii() {
+        let needle_bytes = needle.as_bytes();
+        haystack
+            .as_bytes()
+            .windows(needle_bytes.len())
+            .any(|window| {
+                window
+                    .iter()
+                    .zip(needle_bytes.iter())
+                    .all(|(&b1, &b2)| b1.to_ascii_lowercase() == b2.to_ascii_lowercase())
+            })
+    } else {
+        haystack.to_lowercase().contains(&needle.to_lowercase())
     }
 }
 
