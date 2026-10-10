@@ -75,5 +75,7 @@ WIKI/
 !.github/PULL_REQUEST_TEMPLATE.md
 !docs/*.md
 !Agents/*.md
-!research/**/*.md
-!research/*.md
+!.github/**/*.md
+!.github/*.md
+!CONTRIBUTING.md
+!scripts/*.py
