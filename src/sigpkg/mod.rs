@@ -135,6 +135,14 @@ pub use sovereign_distro_package_advancements_v30::*;
 pub mod sovereign_distro_package_advancements_v31;
 pub use sovereign_distro_package_advancements_v31::*;
 
+#[path = "../package/sovereign_distro_package_advancements_v32.rs"]
+pub mod sovereign_distro_package_advancements_v32;
+pub use sovereign_distro_package_advancements_v32::*;
+
+#[path = "../package/sovereign_distro_package_advancements_v33.rs"]
+pub mod sovereign_distro_package_advancements_v33;
+pub use sovereign_distro_package_advancements_v33::*;
+
 #[path = "../package/bsd_linux_package_innovations.rs"]
 pub mod bsd_linux_package_innovations;
 pub use bsd_linux_package_innovations::{
@@ -395,6 +403,6 @@ pub use crate::stubs::package_stubs::*;
 // Nix Content-Addressed Store: reproducible builds & functional package management
 pub mod nix_store;
 pub use nix_store::{
-    NixStore, NixStorePath, NixHash, NixHashAlgo,
-    NixOutput, NixProfile, NixProfileGeneration, NixGcRoot,
+    NixGcRoot, NixHash, NixHashAlgo, NixOutput, NixProfile, NixProfileGeneration, NixStore,
+    NixStorePath,
 };

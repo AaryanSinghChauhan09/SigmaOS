@@ -86,7 +86,6 @@ pub use zero_copy::{
 // PF Firewall: OpenBSD/FreeBSD PF packet filter implementation
 pub mod pf_firewall;
 pub use pf_firewall::{
-    PfFirewall, PfDir, PfProto, PfAddr, PfPort,
-    PfTable, PfAnchor, PfStats,
-    PfRule as PfFirewallRule, PfAction as PfFirewallAction, PfStateEntry as PfFirewallStateEntry,
+    PfAction as PfFirewallAction, PfAddr, PfAnchor, PfDir, PfFirewall, PfPort, PfProto,
+    PfRule as PfFirewallRule, PfStateEntry as PfFirewallStateEntry, PfStats, PfTable,
 };
