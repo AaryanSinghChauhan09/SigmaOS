@@ -1,0 +1,27 @@
+[rule.storage_completeness]
+requirement = "Secondary memory defines block I/O, cache, mount, and filesystem semantics."
+enforcement = "Storage tests + rehearsals"
+
+[rule.no_leak]
+requirement = "Storage leaks are zero under stress tests."
+enforcement = "Storage stress tests"
+
+[rule.oom_metric]
+requirement = "Storage defines and measures OOM behavior."
+enforcement = "Limit rehearsal"
+
+[rule.mount_integrity]
+requirement = "Mount/unmount preserves filesystem and scheduler integrity."
+enforcement = "Mount rehearsal"
+
+[rule.cache_semantics]
+requirement = "Cache eviction defines legal eviction and error codes."
+enforcement = "Cache tests"
+
+[rule.no_model_only_status]
+requirement = "Storage features cannot be marked complete from model tests alone."
+enforcement = "Status audit"
+
+[rule.runtime_evidence]
+requirement = "Boot-affecting storage changes require boot-to-shell or integration evidence."
+enforcement = "CI boot gate"

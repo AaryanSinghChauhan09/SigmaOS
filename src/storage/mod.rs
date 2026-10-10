@@ -24,8 +24,14 @@ pub mod search;
 pub mod snapshot_manager;
 pub mod sovereign_disk_manager;
 pub mod sql_engine;
+pub mod virtio;
 pub mod volume;
 
+pub use block::{
+    BlockDeviceID, BlockError, BlockNumber, BlockOpCode, BlockOrientedDevice,
+    BoundedBlockDeviceManager, BoundedBlockRequest, DeviceClass, NvmeBlockDevice, RequestState,
+    SsdBlockDevice,
+};
 pub use geom::{
     BioCmd, BioRequest, GeomClassType, GeomConsumer, GeomEliConfig, GeomProvider, GeomTopology,
     PartitionEntry,
@@ -37,4 +43,5 @@ pub use snapshot_manager::{
 pub use sql_engine::{
     Column, QueryResult, SqlEngine, SqlType, SqlValue, Table, Transaction, TransactionState,
 };
+pub use virtio::{VirtIoBlockDevice, VirtIoBlockHeader, VirtQueueDesc};
 pub mod mintstick_flasher;
