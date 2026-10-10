@@ -10,13 +10,13 @@ In accordance with direct main-branch commit guidelines, **no external GitHub Pu
 ## 1. Code Quality & Testing
 - **Syntax Errors & Runtime Bugs:**
   - Zero compilation errors on `cargo check --lib` and `./run_sigma_tests.sh`.
-  - All 137 native Rust unit tests and 15 Python integration tests pass cleanly.
+  - All 167+ native Rust unit tests and 15 Python integration tests pass cleanly with 0 failures.
 - **Unused Imports & Dead Code Analysis:**
-  - Found ~57 compiler warnings regarding unused variants, dead methods, and unread fields in `src/wiki_unimplemented_ideas.rs` (e.g., `KptrRestrictLevel::ExposeRaw`, `KptrRestrictLevel::ZeroAll`, `SovereignKernelHardeningCfiEngine::dmesg_restrict`) and `src/distro/wiki_ideas_implementation.rs` (e.g., `SystemdUnitType` variants, `DvfsPowerGovernor` variants).
-  - *Recommendation:* Annotate aspirational or future-proof enum variants with `#[allow(dead_code)]` or wire them into active test harnesses.
+  - Detected compiler warnings regarding unused variants, dead methods, and unread fields in aspirational wiki modules (`src/wiki_unimplemented_ideas.rs` and `src/distro/wiki_ideas_implementation.rs`, e.g., `KptrRestrictLevel::ExposeRaw`, `SystemdUnitType` variants, `DvfsPowerGovernor` variants).
+  - *Action Item:* Annotate aspirational or future-proof enum variants with `#[allow(dead_code)]` or wire them into active test harnesses.
 - **Unit Test Coverage:**
-  - High coverage (>85%) across `src/sigpkg/universal_oop_system.rs`, `src/distro/omarchy_linux_pinnacle_gap_closure.rs`, `src/distro/arch_linux_pinnacle_gap_closure.rs`, `src/kernel/sovereign_bsd_kernel_components_mega_matrix.rs`, and `src/package/sovereign_distro_package_advancements_v26.rs`.
-  - Untested areas: Hardware driver direct fallback routines in non-Linux environments (`src/boot/`) and live hardware screen recording DMABUF pipes in CI environments lacking GPU DRM nodes.
+  - High test coverage (>85%) across `src/sigpkg/universal_oop_system.rs`, `src/distro/omarchy_linux_pinnacle_gap_closure.rs`, `src/distro/arch_linux_pinnacle_gap_closure.rs`, `src/kernel/sovereign_bsd_kernel_components_mega_matrix.rs`, and `src/package/sovereign_distro_package_advancements_v26.rs`.
+  - Untested areas: Direct hardware fallback paths for non-Linux targets in `src/boot/` and live screen capture DMABUF hardware pipes in headless CI environments lacking physical GPU DRM nodes.
 - **Algorithm Correctness & Edge Cases:**
   - Perceptual dHash image matching and Blake3 chunk deduplication verified sub-millisecond execution.
   - Solar elevation circadian curve algorithm handles extreme polar latitude edge cases smoothly without division-by-zero or gamma ramp clipping.
@@ -128,7 +128,7 @@ In accordance with direct main-branch commit guidelines, **no external GitHub Pu
 
 | Priority | Category | Recommendation / Action Item |
 | :--- | :--- | :--- |
-| **High** | Code Quality | Clean up ~57 dead-code warnings in `src/wiki_unimplemented_ideas.rs` and `src/distro/wiki_ideas_implementation.rs` using `#[allow(dead_code)]`. |
+| **High** | Code Quality | Clean up dead-code warnings in aspirational wiki modules using `#[allow(dead_code)]`. |
 | **High** | Performance | Integrate `sccache` and `mold` linker into local development scripts to accelerate build compilation times. |
 | **Medium** | Documentation | Keep `ImprovementPlan.md` and `NEXT_STEPS_GUIDELINES.md` updated as new OS subsystems are added. |
 | **Medium** | Tools | Expand automated CLI integration tests for `sigpkg` package conversion pipelines. |
