@@ -219,6 +219,7 @@ pub use display_settings_manager::{
 };
 
 // SigmaOS Desktop Module
+pub mod elementary_pantheon_innovations;
 pub mod mate_betsy;
 pub mod mint_tools;
 pub mod moksha;
@@ -344,4 +345,5 @@ pub use sigma_ghostty::{
     VtParser,
 };
 pub mod webapp_manager;
+pub use elementary_pantheon_innovations::*;
 pub use webapp_manager::*;
