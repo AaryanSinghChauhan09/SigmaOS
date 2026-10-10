@@ -419,12 +419,10 @@ mod tests {
     fn test_converter_all_formats() {
         let converter = UniversalAllPackageFormatConverterV20::new();
 
-        let pr1 = engine
-            .ingest_foreign_package_pr("gcc-13.2.0.pkg.tar.zst", b"ARCH_PAYLOAD")
-            .unwrap();
-        assert_eq!(pr1.original_format, PackageFormat::Pacman);
-        assert_eq!(pr1.package_name, "gcc-13");
-        assert!(pr1
+        let deb_spec = converter.convert_package("nginx_1.24.deb", b"DEB").unwrap();
+        assert_eq!(deb_spec.package_name, "nginx");
+        assert_eq!(deb_spec.source_format, PackageFormat::Deb);
+        assert!(deb_spec
             .canonical_dependencies
             .contains(&"sovereign-libc".to_string()));
 
