@@ -85,7 +85,10 @@ impl MultiDistroUniversalPmInteropEngineV19 {
         dep_map.insert("musl".to_string(), "sovereign-libc".to_string());
         dep_map.insert("libssl-dev".to_string(), "sovereign-openssl".to_string());
         dep_map.insert("openssl-devel".to_string(), "sovereign-openssl".to_string());
-        dep_map.insert("security/openssl".to_string(), "sovereign-openssl".to_string());
+        dep_map.insert(
+            "security/openssl".to_string(),
+            "sovereign-openssl".to_string(),
+        );
         dep_map.insert("zlib".to_string(), "sovereign-compression".to_string());
         dep_map.insert("zstd".to_string(), "sovereign-compression".to_string());
         dep_map.insert("systemd".to_string(), "sovereign-init".to_string());
@@ -108,9 +111,15 @@ impl MultiDistroUniversalPmInteropEngineV19 {
             mapped.clone()
         } else if dep_lower.contains("ssl") || dep_lower.contains("crypto") {
             "sovereign-openssl".to_string()
-        } else if dep_lower.contains("libc") || dep_lower.contains("musl") || dep_lower.contains("glibc") {
+        } else if dep_lower.contains("libc")
+            || dep_lower.contains("musl")
+            || dep_lower.contains("glibc")
+        {
             "sovereign-libc".to_string()
-        } else if dep_lower.contains("zlib") || dep_lower.contains("zstd") || dep_lower.contains("xz") {
+        } else if dep_lower.contains("zlib")
+            || dep_lower.contains("zstd")
+            || dep_lower.contains("xz")
+        {
             "sovereign-compression".to_string()
         } else {
             format!("sovereign-{}", raw_dep)
@@ -145,7 +154,10 @@ impl MultiDistroUniversalPmInteropEngineV19 {
             clean_name
         };
 
-        let base_name = name_no_ext.split(&['-', '_'][..]).next().unwrap_or(name_no_ext);
+        let base_name = name_no_ext
+            .split(&['-', '_'][..])
+            .next()
+            .unwrap_or(name_no_ext);
 
         let mut raw_deps = Vec::new();
         let mut provides = vec![base_name.to_string()];
@@ -185,10 +197,7 @@ impl MultiDistroUniversalPmInteropEngineV19 {
             }
         }
 
-        let canonical_deps = raw_deps
-            .iter()
-            .map(|d| self.remap_dependency(d))
-            .collect();
+        let canonical_deps = raw_deps.iter().map(|d| self.remap_dependency(d)).collect();
 
         let hash_val = format!("fnv1a64-{:x}", raw_payload.len() * 31);
 
@@ -326,7 +335,12 @@ impl UniversalDistroPmCliRouterV19 {
 
         for arg in args {
             if !action_explicit {
-                if *arg == "install" || *arg == "add" || *arg == "in" || *arg == "it" || *arg == "get" {
+                if *arg == "install"
+                    || *arg == "add"
+                    || *arg == "in"
+                    || *arg == "it"
+                    || *arg == "get"
+                {
                     action = UniversalPmCliActionV19::Install;
                 } else if *arg == "remove"
                     || *arg == "purge"
@@ -355,7 +369,10 @@ impl UniversalDistroPmCliRouterV19 {
                 } else if *arg == "-S" {
                     if args.contains(&"-s") || args.contains(&"-Ss") || args.contains(&"-Si") {
                         action = UniversalPmCliActionV19::Search;
-                    } else if args.contains(&"-u") || args.contains(&"-yyu") || args.contains(&"-yu") {
+                    } else if args.contains(&"-u")
+                        || args.contains(&"-yyu")
+                        || args.contains(&"-yu")
+                    {
                         action = UniversalPmCliActionV19::Upgrade;
                     } else {
                         action = UniversalPmCliActionV19::Install;
@@ -462,7 +479,9 @@ impl SovereignDistroPackageAdvancementsSuiteV19 {
         filename: &str,
         payload: &[u8],
     ) -> Result<UnifiedPackage, String> {
-        let manifest = self.interop_engine.ingest_foreign_package(filename, payload)?;
+        let manifest = self
+            .interop_engine
+            .ingest_foreign_package(filename, payload)?;
 
         let mut pkg = UnifiedPackage::new(
             format!("sigpkg-{}", manifest.name),
@@ -500,7 +519,8 @@ impl SovereignDistroPackageAdvancementsSuiteV19 {
                 UniversalPmCliActionV19::Remove => {
                     for pkg in &result.target_packages {
                         let sigpkg_name = format!("sigpkg-{}", pkg);
-                        self.installed_packages.retain(|p| p != &sigpkg_name && p != pkg);
+                        self.installed_packages
+                            .retain(|p| p != &sigpkg_name && p != pkg);
                     }
                 }
                 _ => {}
@@ -529,16 +549,26 @@ mod tests {
     fn test_multi_distro_interop_ingestion() {
         let mut engine = MultiDistroUniversalPmInteropEngineV19::new();
 
-        let manifest = engine.ingest_foreign_package("curl_8.2.1.deb", b"DEB_CONTENT").unwrap();
+        let manifest = engine
+            .ingest_foreign_package("curl_8.2.1.deb", b"DEB_CONTENT")
+            .unwrap();
         assert_eq!(manifest.name, "curl");
         assert_eq!(manifest.detected_format, PackageFormat::Deb);
-        assert!(manifest.canonical_dependencies.contains(&"sovereign-libc".to_string()));
-        assert!(manifest.canonical_dependencies.contains(&"sovereign-openssl".to_string()));
+        assert!(manifest
+            .canonical_dependencies
+            .contains(&"sovereign-libc".to_string()));
+        assert!(manifest
+            .canonical_dependencies
+            .contains(&"sovereign-openssl".to_string()));
 
-        let arch_manifest = engine.ingest_foreign_package("ripgrep-13.0.0.pkg.tar.zst", b"PACMAN_CONTENT").unwrap();
+        let arch_manifest = engine
+            .ingest_foreign_package("ripgrep-13.0.0.pkg.tar.zst", b"PACMAN_CONTENT")
+            .unwrap();
         assert_eq!(arch_manifest.name, "ripgrep");
         assert_eq!(arch_manifest.detected_format, PackageFormat::Pacman);
-        assert!(arch_manifest.canonical_dependencies.contains(&"sovereign-libc".to_string()));
+        assert!(arch_manifest
+            .canonical_dependencies
+            .contains(&"sovereign-libc".to_string()));
     }
 
     #[test]
@@ -551,7 +581,9 @@ mod tests {
 
     #[test]
     fn test_universal_pm_cli_router() {
-        let res_apt = UniversalDistroPmCliRouterV19::route_command("apt install nginx curl --dry-run").unwrap();
+        let res_apt =
+            UniversalDistroPmCliRouterV19::route_command("apt install nginx curl --dry-run")
+                .unwrap();
         assert_eq!(res_apt.package_manager, "apt");
         assert_eq!(res_apt.action, UniversalPmCliActionV19::Install);
         assert!(res_apt.target_packages.contains(&"nginx".to_string()));
@@ -582,15 +614,21 @@ mod tests {
             .process_and_install_foreign_package("firefox-120.0.rpm", b"RPM_DATA")
             .unwrap();
         assert_eq!(sigpkg.name, "sigpkg-firefox");
-        assert!(suite.installed_packages.contains(&"sigpkg-firefox".to_string()));
+        assert!(suite
+            .installed_packages
+            .contains(&"sigpkg-firefox".to_string()));
 
-        let cli_res = suite.execute_foreign_cli_command("apt install git").unwrap();
+        let cli_res = suite
+            .execute_foreign_cli_command("apt install git")
+            .unwrap();
         assert!(cli_res.contains("git"));
         assert!(suite.installed_packages.contains(&"sigpkg-git".to_string()));
 
         // Rollback
         suite.rollback_to_checkpoint(cp1).unwrap();
-        assert!(!suite.installed_packages.contains(&"sigpkg-firefox-120.0".to_string()));
+        assert!(!suite
+            .installed_packages
+            .contains(&"sigpkg-firefox-120.0".to_string()));
         assert!(!suite.installed_packages.contains(&"sigpkg-git".to_string()));
     }
 }

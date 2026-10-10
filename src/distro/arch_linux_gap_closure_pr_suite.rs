@@ -46,16 +46,21 @@ impl ArchinstallProfilePrEngine {
         let mut profiles = BTreeMap::new();
         profiles.insert(
             "desktop-minimal".to_string(),
-            "{\"hostname\":\"sigma-arch\",\"desktop\":\"sway\",\"filesystem\":\"btrfs\"}".to_string(),
+            "{\"hostname\":\"sigma-arch\",\"desktop\":\"sway\",\"filesystem\":\"btrfs\"}"
+                .to_string(),
         );
         profiles.insert(
             "workstation-full".to_string(),
-            "{\"hostname\":\"sigma-arch-ws\",\"desktop\":\"hyprland\",\"filesystem\":\"zfs\"}".to_string(),
+            "{\"hostname\":\"sigma-arch-ws\",\"desktop\":\"hyprland\",\"filesystem\":\"zfs\"}"
+                .to_string(),
         );
         Self { profiles }
     }
 
-    pub fn generate_profile_pr(&self, profile_name: &str) -> Result<ArchLinuxPrProposal, &'static str> {
+    pub fn generate_profile_pr(
+        &self,
+        profile_name: &str,
+    ) -> Result<ArchLinuxPrProposal, &'static str> {
         let json = self.profiles.get(profile_name).ok_or("Profile not found")?;
         Ok(ArchLinuxPrProposal {
             pr_id: 1001,
@@ -134,7 +139,8 @@ impl PacmanKeyringManagerEngine {
 
     pub fn import_and_verify_key(&mut self, key_id: &str, sig: &str) -> bool {
         if sig.contains("pqc_dilithium5") {
-            self.trusted_keys.insert(key_id.to_string(), sig.to_string());
+            self.trusted_keys
+                .insert(key_id.to_string(), sig.to_string());
             true
         } else {
             false
@@ -162,7 +168,11 @@ impl ArchAuditRemediationEngine {
         Self { known_cves: cves }
     }
 
-    pub fn generate_cve_remediation_pr(&self, package: &str, current_ver: &str) -> Option<ArchLinuxPrProposal> {
+    pub fn generate_cve_remediation_pr(
+        &self,
+        package: &str,
+        current_ver: &str,
+    ) -> Option<ArchLinuxPrProposal> {
         let fixed_ver = self.known_cves.get(package)?;
         if current_ver < fixed_ver {
             Some(ArchLinuxPrProposal {
@@ -196,11 +206,16 @@ impl AurRpcBuilderEngine {
         let mut pkgs = BTreeMap::new();
         pkgs.insert("yay".to_string(), "12.3.5".to_string());
         pkgs.insert("paru".to_string(), "2.0.3".to_string());
-        Self { cached_packages: pkgs }
+        Self {
+            cached_packages: pkgs,
+        }
     }
 
     pub fn build_aur_package_pr(&self, pkgname: &str) -> Result<ArchLinuxPrProposal, &'static str> {
-        let ver = self.cached_packages.get(pkgname).ok_or("AUR package not found")?;
+        let ver = self
+            .cached_packages
+            .get(pkgname)
+            .ok_or("AUR package not found")?;
         Ok(ArchLinuxPrProposal {
             pr_id: 3003,
             title: format!("Ingest AUR package: {} v{}", pkgname, ver),
@@ -297,7 +312,9 @@ mod tests {
         let pr = engine.generate_cve_remediation_pr("xz", "5.4.1-1").unwrap();
         assert_eq!(pr.component_name, "xz");
         assert!(pr.title.contains("Remediate CVE"));
-        assert!(engine.generate_cve_remediation_pr("xz", "5.6.2-1").is_none());
+        assert!(engine
+            .generate_cve_remediation_pr("xz", "5.6.2-1")
+            .is_none());
     }
 
     #[test]
@@ -311,10 +328,16 @@ mod tests {
     #[test]
     fn test_sovereign_arch_linux_master_pr_gateway() {
         let mut gateway = SovereignArchLinuxMasterPrGateway::new();
-        let pr_proposal = gateway.archinstall_engine.generate_profile_pr("desktop-minimal").unwrap();
+        let pr_proposal = gateway
+            .archinstall_engine
+            .generate_profile_pr("desktop-minimal")
+            .unwrap();
         let pr_id = gateway.submit_pr(pr_proposal);
         assert_eq!(pr_id, 1);
         assert!(gateway.validate_and_merge_pr(pr_id));
-        assert_eq!(gateway.managed_prs.get(&pr_id).unwrap().status, ArchPrStatus::Merged);
+        assert_eq!(
+            gateway.managed_prs.get(&pr_id).unwrap().status,
+            ArchPrStatus::Merged
+        );
     }
 }
