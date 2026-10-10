@@ -89,7 +89,12 @@ pub struct NetworkConnection {
 }
 
 impl NetworkConnection {
-    pub fn new(id: String, name: String, connection_type: NetConnectionType, interface: String) -> Self {
+    pub fn new(
+        id: String,
+        name: String,
+        connection_type: NetConnectionType,
+        interface: String,
+    ) -> Self {
         Self {
             id,
             name,
@@ -202,14 +207,20 @@ impl DesktopNetworkManager {
         self.connections.values().collect()
     }
 
-    pub fn get_connections_by_type(&self, connection_type: NetConnectionType) -> Vec<&NetworkConnection> {
+    pub fn get_connections_by_type(
+        &self,
+        connection_type: NetConnectionType,
+    ) -> Vec<&NetworkConnection> {
         self.connections
             .values()
             .filter(|c| c.connection_type == connection_type)
             .collect()
     }
 
-    pub fn get_connections_by_status(&self, status: NetConnectionStatus) -> Vec<&NetworkConnection> {
+    pub fn get_connections_by_status(
+        &self,
+        status: NetConnectionStatus,
+    ) -> Vec<&NetworkConnection> {
         self.connections
             .values()
             .filter(|c| c.status == status)
@@ -298,8 +309,14 @@ impl DesktopNetworkManager {
     pub fn get_statistics(&self) -> NetworkManagerStatistics {
         NetworkManagerStatistics {
             total_connections: self.connections.len(),
-            connected: self.connections.values().filter(|c| c.status == NetConnectionStatus::Connected).count(),
-            ethernet_connections: self.get_connections_by_type(NetConnectionType::Ethernet).len(),
+            connected: self
+                .connections
+                .values()
+                .filter(|c| c.status == NetConnectionStatus::Connected)
+                .count(),
+            ethernet_connections: self
+                .get_connections_by_type(NetConnectionType::Ethernet)
+                .len(),
             wifi_connections: self.get_connections_by_type(NetConnectionType::WiFi).len(),
             vpn_connections: self.get_connections_by_type(NetConnectionType::VPN).len(),
             active_connection_set: self.active_connection.is_some(),
@@ -441,10 +458,7 @@ mod tests {
         let mut manager = DesktopNetworkManager::new();
         let conn_id = "conn_0";
 
-        let dns = vec![
-            "8.8.8.8".to_string(),
-            "8.8.4.4".to_string(),
-        ];
+        let dns = vec!["8.8.8.8".to_string(), "8.8.4.4".to_string()];
 
         assert!(manager.update_dns_servers(conn_id, dns.clone()));
         let conn = manager.get_connection(conn_id).unwrap();

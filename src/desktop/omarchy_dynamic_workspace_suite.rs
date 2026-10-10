@@ -387,8 +387,8 @@ impl OmarchyTilingLayoutEngine {
                 } else {
                     0.55
                 };
-                let master_w = ((usable_w as f32 * ratio) as u32)
-                    .saturating_sub(self.gap_inner / 2);
+                let master_w =
+                    ((usable_w as f32 * ratio) as u32).saturating_sub(self.gap_inner / 2);
                 let stack_w = usable_w
                     .saturating_sub(master_w)
                     .saturating_sub(self.gap_inner);
@@ -403,9 +403,7 @@ impl OmarchyTilingLayoutEngine {
                 });
 
                 // 2. Stack Windows
-                let total_gaps = stack_count
-                    .saturating_sub(1)
-                    .saturating_mul(self.gap_inner);
+                let total_gaps = stack_count.saturating_sub(1).saturating_mul(self.gap_inner);
                 let each_h = usable_h.saturating_sub(total_gaps) / stack_count;
                 let stack_x = self
                     .gap_outer
@@ -413,9 +411,9 @@ impl OmarchyTilingLayoutEngine {
                     .saturating_add(self.gap_inner);
 
                 for i in 0..stack_count {
-                    let stack_y = self.gap_outer.saturating_add(
-                        i.saturating_mul(each_h.saturating_add(self.gap_inner)),
-                    );
+                    let stack_y = self
+                        .gap_outer
+                        .saturating_add(i.saturating_mul(each_h.saturating_add(self.gap_inner)));
                     geoms.push(LayoutGeometry {
                         x: stack_x,
                         y: stack_y,

@@ -400,7 +400,6 @@ mod tests {
     }
 
     #[ignore]
-
     #[test]
     fn test_dot11_header() {
         let mut header = Dot11Header {

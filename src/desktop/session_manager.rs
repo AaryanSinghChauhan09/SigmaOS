@@ -165,13 +165,13 @@ impl DesktopSessionManager {
     }
 
     pub fn get_sessions_by_user(&self, user: &str) -> Vec<&DesktopUserSession> {
-        self.sessions
-            .values()
-            .filter(|s| s.user == user)
-            .collect()
+        self.sessions.values().filter(|s| s.user == user).collect()
     }
 
-    pub fn get_sessions_by_type(&self, session_type: DesktopSessionType) -> Vec<&DesktopUserSession> {
+    pub fn get_sessions_by_type(
+        &self,
+        session_type: DesktopSessionType,
+    ) -> Vec<&DesktopUserSession> {
         self.sessions
             .values()
             .filter(|s| s.session_type == session_type)
@@ -378,9 +378,21 @@ mod tests {
     #[test]
     fn test_get_sessions_by_user() {
         let mut manager = DesktopSessionManager::new();
-        manager.create_session("user1".to_string(), DesktopSessionType::Wayland, ":0".to_string());
-        manager.create_session("user1".to_string(), DesktopSessionType::X11, ":1".to_string());
-        manager.create_session("user2".to_string(), DesktopSessionType::Wayland, ":2".to_string());
+        manager.create_session(
+            "user1".to_string(),
+            DesktopSessionType::Wayland,
+            ":0".to_string(),
+        );
+        manager.create_session(
+            "user1".to_string(),
+            DesktopSessionType::X11,
+            ":1".to_string(),
+        );
+        manager.create_session(
+            "user2".to_string(),
+            DesktopSessionType::Wayland,
+            ":2".to_string(),
+        );
 
         let user1_sessions = manager.get_sessions_by_user("user1");
         assert_eq!(user1_sessions.len(), 2);
@@ -389,9 +401,21 @@ mod tests {
     #[test]
     fn test_get_sessions_by_type() {
         let mut manager = DesktopSessionManager::new();
-        manager.create_session("user1".to_string(), DesktopSessionType::Wayland, ":0".to_string());
-        manager.create_session("user2".to_string(), DesktopSessionType::X11, ":1".to_string());
-        manager.create_session("user3".to_string(), DesktopSessionType::Wayland, ":2".to_string());
+        manager.create_session(
+            "user1".to_string(),
+            DesktopSessionType::Wayland,
+            ":0".to_string(),
+        );
+        manager.create_session(
+            "user2".to_string(),
+            DesktopSessionType::X11,
+            ":1".to_string(),
+        );
+        manager.create_session(
+            "user3".to_string(),
+            DesktopSessionType::Wayland,
+            ":2".to_string(),
+        );
 
         let wayland_sessions = manager.get_sessions_by_type(DesktopSessionType::Wayland);
         assert_eq!(wayland_sessions.len(), 2);
@@ -400,9 +424,21 @@ mod tests {
     #[test]
     fn test_statistics() {
         let mut manager = DesktopSessionManager::new();
-        manager.create_session("user1".to_string(), DesktopSessionType::Wayland, ":0".to_string());
-        manager.create_session("user2".to_string(), DesktopSessionType::X11, ":1".to_string());
-        manager.create_session("user3".to_string(), DesktopSessionType::TTY, "tty1".to_string());
+        manager.create_session(
+            "user1".to_string(),
+            DesktopSessionType::Wayland,
+            ":0".to_string(),
+        );
+        manager.create_session(
+            "user2".to_string(),
+            DesktopSessionType::X11,
+            ":1".to_string(),
+        );
+        manager.create_session(
+            "user3".to_string(),
+            DesktopSessionType::TTY,
+            "tty1".to_string(),
+        );
 
         let stats = manager.get_statistics();
         assert_eq!(stats.total_sessions, 3);

@@ -191,10 +191,7 @@ impl DesktopWidgetManager {
     }
 
     pub fn get_visible_widgets(&self) -> Vec<&DesktopWidget> {
-        self.widgets
-            .values()
-            .filter(|w| w.is_visible)
-            .collect()
+        self.widgets.values().filter(|w| w.is_visible).collect()
     }
 
     pub fn get_widgets_by_type(&self, widget_type: DesktopWidgetType) -> Vec<&DesktopWidget> {
@@ -320,7 +317,10 @@ mod tests {
         let mut manager = DesktopWidgetManager::new();
         let id = manager.add_widget("Weather".to_string(), DesktopWidgetType::Weather);
         assert!(manager.set_widget_position(&id, DesktopWidgetPosition::TopLeft));
-        assert_eq!(manager.get_widget(&id).unwrap().position, DesktopWidgetPosition::TopLeft);
+        assert_eq!(
+            manager.get_widget(&id).unwrap().position,
+            DesktopWidgetPosition::TopLeft
+        );
     }
 
     #[test]
@@ -336,7 +336,10 @@ mod tests {
         let mut manager = DesktopWidgetManager::new();
         let id = manager.add_widget("Weather".to_string(), DesktopWidgetType::Weather);
         assert!(manager.set_widget_config(&id, "location".to_string(), "London".to_string()));
-        assert_eq!(manager.get_widget_config(&id, "location"), Some("London".to_string()));
+        assert_eq!(
+            manager.get_widget_config(&id, "location"),
+            Some("London".to_string())
+        );
     }
 
     #[test]

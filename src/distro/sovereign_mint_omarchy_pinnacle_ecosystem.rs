@@ -138,7 +138,8 @@ impl SovereignMintBackupEngine {
             checksum_sha256: [0x5A; 32], // Simulated SHA-256 verification hash
         };
 
-        self.manifests.insert(archive_id.to_string(), manifest.clone());
+        self.manifests
+            .insert(archive_id.to_string(), manifest.clone());
         self.backup_in_progress.store(false, Ordering::SeqCst);
         Ok(manifest)
     }
@@ -253,7 +254,9 @@ impl SovereignOmarchyGamingPrefixManager {
     }
 
     pub fn active_game(&self) -> Option<&GamePrefixConfiguration> {
-        self.active_game_id.as_ref().and_then(|id| self.prefixes.get(id))
+        self.active_game_id
+            .as_ref()
+            .and_then(|id| self.prefixes.get(id))
     }
 }
 
@@ -326,7 +329,11 @@ impl SovereignCinnamonScreenLockAndBioAuth {
         self.state = LockscreenState::Locked;
     }
 
-    pub fn unlock_with_credential(&mut self, cred_type: AuthCredentialType, is_valid: bool) -> bool {
+    pub fn unlock_with_credential(
+        &mut self,
+        cred_type: AuthCredentialType,
+        is_valid: bool,
+    ) -> bool {
         if !is_valid {
             self.failed_attempts.fetch_add(1, Ordering::SeqCst);
             self.state = LockscreenState::Locked;
@@ -481,7 +488,13 @@ mod tests {
         assert_eq!(selection.len(), 3); // 3 explicit packages
 
         let manifest = engine
-            .create_backup_manifest("bkp-2026-10", BackupType::FullSystemSnapshot, 45_000, 10_000_000_000, 1760000000)
+            .create_backup_manifest(
+                "bkp-2026-10",
+                BackupType::FullSystemSnapshot,
+                45_000,
+                10_000_000_000,
+                1760000000,
+            )
             .unwrap();
         assert_eq!(manifest.archive_id, "bkp-2026-10");
         assert_eq!(manifest.total_files_count, 45_000);
@@ -509,7 +522,8 @@ mod tests {
         locker.lock();
         assert_eq!(locker.state(), LockscreenState::Locked);
 
-        let unlocked = locker.unlock_with_credential(AuthCredentialType::FingerprintBiometric, true);
+        let unlocked =
+            locker.unlock_with_credential(AuthCredentialType::FingerprintBiometric, true);
         assert!(unlocked);
         assert_eq!(locker.state(), LockscreenState::AccessGranted);
         assert_eq!(locker.failed_attempts(), 0);
@@ -521,7 +535,10 @@ mod tests {
         let ev = engine.on_touch_update(3, 150.0, 10.0, 1.2);
         assert!(ev.is_some());
         let gesture = ev.unwrap();
-        assert_eq!(gesture.gesture_type, GestureType::ThreeFingerSwipeHorizontal);
+        assert_eq!(
+            gesture.gesture_type,
+            GestureType::ThreeFingerSwipeHorizontal
+        );
         assert_eq!(gesture.direction, GestureDirection::Right);
         assert_eq!(engine.active_fingers(), 3);
     }

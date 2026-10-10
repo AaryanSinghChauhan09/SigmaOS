@@ -43,12 +43,7 @@ pub struct DesktopDesktopIcon {
 }
 
 impl DesktopDesktopIcon {
-    pub fn new(
-        id: String,
-        name: String,
-        icon_type: DesktopIconType,
-        path: PathBuf,
-    ) -> Self {
+    pub fn new(id: String, name: String, icon_type: DesktopIconType, path: PathBuf) -> Self {
         DesktopDesktopIcon {
             id,
             name,
@@ -162,12 +157,7 @@ impl DesktopIconManager {
         self.next_icon_id += 1;
     }
 
-    pub fn add_icon(
-        &mut self,
-        name: String,
-        icon_type: DesktopIconType,
-        path: PathBuf,
-    ) -> String {
+    pub fn add_icon(&mut self, name: String, icon_type: DesktopIconType, path: PathBuf) -> String {
         let id = format!("icon_{}", self.next_icon_id);
         let icon = DesktopDesktopIcon::new(id.clone(), name, icon_type, path);
         self.icons.insert(id.clone(), icon);
@@ -193,10 +183,7 @@ impl DesktopIconManager {
     }
 
     pub fn get_visible_icons(&self) -> Vec<&DesktopDesktopIcon> {
-        self.icons
-            .values()
-            .filter(|i| i.is_visible)
-            .collect()
+        self.icons.values().filter(|i| i.is_visible).collect()
     }
 
     pub fn get_icons_by_type(&self, icon_type: DesktopIconType) -> Vec<&DesktopDesktopIcon> {
@@ -276,10 +263,7 @@ impl DesktopIconManager {
     }
 
     pub fn auto_arrange(&mut self) {
-        let mut visible_icons: Vec<_> = self.icons
-            .values_mut()
-            .filter(|i| i.is_visible)
-            .collect();
+        let mut visible_icons: Vec<_> = self.icons.values_mut().filter(|i| i.is_visible).collect();
 
         match self.grid_alignment {
             GridAlignment::LeftToRight => {
@@ -379,7 +363,9 @@ mod tests {
     fn test_remove_locked_icon() {
         let mut manager = DesktopIconManager::new();
         // Trash is locked by default
-        let trash_id = manager.get_icons_by_type(DesktopIconType::Trash)[0].id.clone();
+        let trash_id = manager.get_icons_by_type(DesktopIconType::Trash)[0]
+            .id
+            .clone();
         assert!(!manager.remove_icon(&trash_id));
     }
 

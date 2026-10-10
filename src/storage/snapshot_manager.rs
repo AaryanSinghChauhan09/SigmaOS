@@ -184,7 +184,11 @@ impl SnapshotManager {
     }
 
     /// Create a snapshot
-    pub fn create_snapshot(&mut self, snapshot_type: SnapshotType, description: String) -> Result<String, String> {
+    pub fn create_snapshot(
+        &mut self,
+        snapshot_type: SnapshotType,
+        description: String,
+    ) -> Result<String, String> {
         let id = format!("snapshot-{}", self.next_id);
         self.next_id += 1;
 
@@ -223,14 +227,17 @@ impl SnapshotManager {
 
     /// List snapshots by type
     pub fn list_by_type(&self, snapshot_type: SnapshotType) -> Vec<&SnapshotMetadata> {
-        self.snapshots.values()
+        self.snapshots
+            .values()
             .filter(|s| s.snapshot_type == snapshot_type)
             .collect()
     }
 
     /// Delete a snapshot
     pub fn delete_snapshot(&mut self, id: &str) -> Result<(), String> {
-        let snapshot = self.snapshots.get_mut(id)
+        let snapshot = self
+            .snapshots
+            .get_mut(id)
             .ok_or_else(|| format!("Snapshot {} not found", id))?;
 
         snapshot.set_status(SnapshotStatus::Deleting);
@@ -243,7 +250,9 @@ impl SnapshotManager {
 
     /// Restore from a snapshot
     pub fn restore_snapshot(&mut self, id: &str) -> Result<(), String> {
-        let snapshot = self.snapshots.get(id)
+        let snapshot = self
+            .snapshots
+            .get(id)
             .ok_or_else(|| format!("Snapshot {} not found", id))?;
 
         if !snapshot.is_complete() {
@@ -269,13 +278,16 @@ impl SnapshotManager {
         ];
 
         for (snapshot_type, max_count) in types {
-            let mut snapshots: Vec<_> = self.snapshots.values()
+            let mut snapshots: Vec<_> = self
+                .snapshots
+                .values()
                 .filter(|s| s.snapshot_type == snapshot_type)
                 .collect();
 
             snapshots.sort_by(|a, b| b.created_at.cmp(&a.created_at));
 
-            let to_remove: Vec<String> = snapshots.iter()
+            let to_remove: Vec<String> = snapshots
+                .iter()
                 .skip(max_count as usize)
                 .map(|s| s.id.clone())
                 .collect();
@@ -289,11 +301,14 @@ impl SnapshotManager {
     /// Get statistics
     pub fn get_statistics(&self) -> SnapshotStatistics {
         let total_snapshots = self.snapshots.len();
-        let total_size: u64 = self.snapshots.values()
-            .map(|s| s.size_bytes)
-            .sum();
+        let total_size: u64 = self.snapshots.values().map(|s| s.size_bytes).sum();
 
-        let by_type = |t| self.snapshots.values().filter(|s| s.snapshot_type == t).count();
+        let by_type = |t| {
+            self.snapshots
+                .values()
+                .filter(|s| s.snapshot_type == t)
+                .count()
+        };
 
         SnapshotStatistics {
             total_snapshots,
@@ -353,14 +368,18 @@ mod tests {
     #[test]
     fn test_create_snapshot() {
         let mut manager = SnapshotManager::new();
-        let id = manager.create_snapshot(SnapshotType::Manual, "Test snapshot".to_string()).unwrap();
+        let id = manager
+            .create_snapshot(SnapshotType::Manual, "Test snapshot".to_string())
+            .unwrap();
         assert!(manager.get_snapshot(&id).is_some());
     }
 
     #[test]
     fn test_delete_snapshot() {
         let mut manager = SnapshotManager::new();
-        let id = manager.create_snapshot(SnapshotType::Manual, "Test".to_string()).unwrap();
+        let id = manager
+            .create_snapshot(SnapshotType::Manual, "Test".to_string())
+            .unwrap();
         assert!(manager.delete_snapshot(&id).is_ok());
         assert!(manager.get_snapshot(&id).is_none());
     }
@@ -368,7 +387,9 @@ mod tests {
     #[test]
     fn test_restore_snapshot() {
         let mut manager = SnapshotManager::new();
-        let id = manager.create_snapshot(SnapshotType::Manual, "Test".to_string()).unwrap();
+        let id = manager
+            .create_snapshot(SnapshotType::Manual, "Test".to_string())
+            .unwrap();
         assert!(manager.restore_snapshot(&id).is_ok());
     }
 
@@ -376,7 +397,9 @@ mod tests {
     fn test_retention_policy() {
         let mut manager = SnapshotManager::new();
         for _ in 0..10 {
-            manager.create_snapshot(SnapshotType::Daily, "Test".to_string()).ok();
+            manager
+                .create_snapshot(SnapshotType::Daily, "Test".to_string())
+                .ok();
         }
         let stats = manager.get_statistics();
         assert!(stats.daily_snapshots <= 7);
@@ -385,7 +408,9 @@ mod tests {
     #[test]
     fn test_statistics() {
         let mut manager = SnapshotManager::new();
-        manager.create_snapshot(SnapshotType::Manual, "Test".to_string()).ok();
+        manager
+            .create_snapshot(SnapshotType::Manual, "Test".to_string())
+            .ok();
         let stats = manager.get_statistics();
         assert_eq!(stats.total_snapshots, 1);
     }

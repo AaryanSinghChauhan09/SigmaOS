@@ -264,9 +264,9 @@ mod tests {
     #[test]
     fn idt_entry_missing_is_zero() {
         let e = IdtEntry::missing();
-        assert_eq!({e.offset_low}, 0);
+        assert_eq!({ e.offset_low }, 0);
         assert_eq!(e.type_attr, 0);
-        assert_eq!({e.offset_high}, 0);
+        assert_eq!({ e.offset_high }, 0);
     }
 
     #[test]
@@ -274,14 +274,14 @@ mod tests {
         let handler: u64 = 0xDEAD_BEEF_1234_5678;
         let entry = IdtEntry::new(handler, 0x08, 0, 0);
         // offset_low = bits 15:0
-        assert_eq!({entry.offset_low}, 0x5678);
+        assert_eq!({ entry.offset_low }, 0x5678);
         // offset_mid = bits 31:16
-        assert_eq!({entry.offset_mid}, 0x1234);
+        assert_eq!({ entry.offset_mid }, 0x1234);
         // offset_high = bits 63:32
-        assert_eq!({entry.offset_high}, 0xDEAD_BEEF);
+        assert_eq!({ entry.offset_high }, 0xDEAD_BEEF);
         // type_attr: P=1, DPL=0, type=0xE  =>  0x8E
         assert_eq!(entry.type_attr, 0x8E);
-        assert_eq!({entry.selector}, 0x08);
+        assert_eq!({ entry.selector }, 0x08);
     }
 
     #[test]

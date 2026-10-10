@@ -140,16 +140,15 @@ impl DesktopScreenshotManager {
             .unwrap()
             .as_secs();
 
-        let filename = format!("Screenshot_{}.{}", timestamp, self.default_format.extension());
+        let filename = format!(
+            "Screenshot_{}.{}",
+            timestamp,
+            self.default_format.extension()
+        );
         let path = self.save_directory.join(&filename);
 
-        let screenshot = DesktopScreenshot::new(
-            id.clone(),
-            filename,
-            path,
-            mode,
-            self.default_format,
-        );
+        let screenshot =
+            DesktopScreenshot::new(id.clone(), filename, path, mode, self.default_format);
 
         self.screenshots.insert(id.clone(), screenshot);
         self.next_screenshot_id += 1;
@@ -187,7 +186,10 @@ impl DesktopScreenshotManager {
             .collect()
     }
 
-    pub fn get_screenshots_by_format(&self, format: DesktopScreenshotFormat) -> Vec<&DesktopScreenshot> {
+    pub fn get_screenshots_by_format(
+        &self,
+        format: DesktopScreenshotFormat,
+    ) -> Vec<&DesktopScreenshot> {
         self.screenshots
             .values()
             .filter(|s| s.format == format)
@@ -209,9 +211,15 @@ impl DesktopScreenshotManager {
     pub fn get_statistics(&self) -> DesktopScreenshotStatistics {
         DesktopScreenshotStatistics {
             total_screenshots: self.screenshots.len(),
-            full_screen_count: self.get_screenshots_by_mode(DesktopScreenshotMode::FullScreen).len(),
-            window_count: self.get_screenshots_by_mode(DesktopScreenshotMode::Window).len(),
-            selection_count: self.get_screenshots_by_mode(DesktopScreenshotMode::Selection).len(),
+            full_screen_count: self
+                .get_screenshots_by_mode(DesktopScreenshotMode::FullScreen)
+                .len(),
+            window_count: self
+                .get_screenshots_by_mode(DesktopScreenshotMode::Window)
+                .len(),
+            selection_count: self
+                .get_screenshots_by_mode(DesktopScreenshotMode::Selection)
+                .len(),
         }
     }
 }
@@ -239,7 +247,10 @@ mod tests {
     fn test_screenshot_manager_initialization() {
         let manager = DesktopScreenshotManager::new();
         assert_eq!(manager.get_default_format(), DesktopScreenshotFormat::PNG);
-        assert_eq!(manager.get_default_mode(), DesktopScreenshotMode::FullScreen);
+        assert_eq!(
+            manager.get_default_mode(),
+            DesktopScreenshotMode::FullScreen
+        );
     }
 
     #[test]
@@ -255,7 +266,10 @@ mod tests {
         let mut manager = DesktopScreenshotManager::new();
         let id = manager.capture_full_screen();
         assert!(manager.get_screenshot(&id).is_some());
-        assert_eq!(manager.get_screenshot(&id).unwrap().mode, DesktopScreenshotMode::FullScreen);
+        assert_eq!(
+            manager.get_screenshot(&id).unwrap().mode,
+            DesktopScreenshotMode::FullScreen
+        );
     }
 
     #[test]
@@ -263,7 +277,10 @@ mod tests {
         let mut manager = DesktopScreenshotManager::new();
         let id = manager.capture_window();
         assert!(manager.get_screenshot(&id).is_some());
-        assert_eq!(manager.get_screenshot(&id).unwrap().mode, DesktopScreenshotMode::Window);
+        assert_eq!(
+            manager.get_screenshot(&id).unwrap().mode,
+            DesktopScreenshotMode::Window
+        );
     }
 
     #[test]

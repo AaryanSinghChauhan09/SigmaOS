@@ -221,7 +221,6 @@ mod tests {
     use super::*;
 
     #[ignore]
-
     #[test]
     fn test_create_namespace() {
         let mut manager = NetworkNamespaceManager::new();
@@ -232,7 +231,6 @@ mod tests {
     }
 
     #[ignore]
-
     #[test]
     fn test_delete_namespace() {
         let mut manager = NetworkNamespaceManager::new();

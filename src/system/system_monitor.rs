@@ -161,11 +161,8 @@ impl SystemMonitor {
         monitor.memory.available_mb = 4096;
 
         // Initialize partitions
-        let mut root = DiskPartition::new(
-            "/dev/sda1".to_string(),
-            "/".to_string(),
-            "ext4".to_string(),
-        );
+        let mut root =
+            DiskPartition::new("/dev/sda1".to_string(), "/".to_string(), "ext4".to_string());
         root.total_gb = 100;
         root.used_gb = 50;
         root.free_gb = 50;
@@ -178,7 +175,9 @@ impl SystemMonitor {
 
         let mut wlan0 = NetworkInterface::new("wlan0".to_string());
         wlan0.set_up(true);
-        monitor.network_interfaces.insert("wlan0".to_string(), wlan0);
+        monitor
+            .network_interfaces
+            .insert("wlan0".to_string(), wlan0);
 
         monitor
     }
@@ -225,7 +224,8 @@ impl SystemMonitor {
 
     /// Add a network interface
     pub fn add_network_interface(&mut self, interface: NetworkInterface) {
-        self.network_interfaces.insert(interface.name.clone(), interface);
+        self.network_interfaces
+            .insert(interface.name.clone(), interface);
     }
 
     /// Get a network interface
@@ -280,7 +280,11 @@ impl SystemMonitor {
         let cpu_usage = self.get_cpu_usage();
         let memory_usage = self.memory.usage_percent();
         let (disk_total, disk_used) = self.get_total_disk_usage();
-        let disk_usage = if disk_total == 0 { 0.0 } else { (disk_used as f32 / disk_total as f32) * 100.0 };
+        let disk_usage = if disk_total == 0 {
+            0.0
+        } else {
+            (disk_used as f32 / disk_total as f32) * 100.0
+        };
         let network_up = self.network_interfaces.values().filter(|n| n.is_up).count();
 
         SystemMonitorStatistics {
@@ -339,21 +343,14 @@ mod tests {
 
     #[test]
     fn test_disk_partition_creation() {
-        let part = DiskPartition::new(
-            "/dev/sda1".to_string(),
-            "/".to_string(),
-            "ext4".to_string(),
-        );
+        let part = DiskPartition::new("/dev/sda1".to_string(), "/".to_string(), "ext4".to_string());
         assert_eq!(part.mount_point, "/");
     }
 
     #[test]
     fn test_disk_usage_percent() {
-        let mut part = DiskPartition::new(
-            "/dev/sda1".to_string(),
-            "/".to_string(),
-            "ext4".to_string(),
-        );
+        let mut part =
+            DiskPartition::new("/dev/sda1".to_string(), "/".to_string(), "ext4".to_string());
         part.total_gb = 100;
         part.used_gb = 50;
         assert_eq!(part.usage_percent(), 50.0);

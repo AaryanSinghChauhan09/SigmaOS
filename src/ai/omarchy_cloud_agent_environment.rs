@@ -6,11 +6,11 @@
 #![cfg_attr(not(any(feature = "standalone_test", test)), no_std)]
 
 #[cfg(any(feature = "standalone_test", test))]
-use std::{string::String, format, vec::Vec};
+use std::{format, string::String, vec::Vec};
 #[cfg(not(any(feature = "standalone_test", test)))]
 extern crate alloc;
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::{string::String, format, vec::Vec};
+use alloc::{format, string::String, vec::Vec};
 
 /// Cloud provider type
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -53,7 +53,7 @@ pub struct CloudAgentTarget {
     pub provider: CloudProvider,
     pub region: String,
     pub env_vars: Vec<AgentEnvVar>,
-    pub cpu_limit: u32,     // millicores
+    pub cpu_limit: u32, // millicores
     pub memory_limit_mb: u32,
 }
 
@@ -88,7 +88,7 @@ impl OmarchyCloudAgentEnvironment {
             provider,
             region: String::from(region),
             env_vars: Vec::new(),
-            cpu_limit: 1000,        // 1 vCPU default
+            cpu_limit: 1000, // 1 vCPU default
             memory_limit_mb: 512,
         });
     }

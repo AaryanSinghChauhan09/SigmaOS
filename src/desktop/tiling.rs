@@ -880,7 +880,6 @@ mod tests {
     }
 
     #[ignore]
-
     #[test]
     fn test_create_workspace() {
         let mut manager = TilingWindowManager::new();

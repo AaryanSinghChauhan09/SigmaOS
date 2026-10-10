@@ -87,7 +87,11 @@ impl SovereignMintKernelWatchdog {
     }
 
     /// Register a newly staged kernel into the inactive slot
-    pub fn stage_kernel(&mut self, version: &str, tier: KernelSafetyTier) -> Result<BootSlot, &'static str> {
+    pub fn stage_kernel(
+        &mut self,
+        version: &str,
+        tier: KernelSafetyTier,
+    ) -> Result<BootSlot, &'static str> {
         let target_slot = match self.active_slot {
             BootSlot::SlotA => BootSlot::SlotB,
             BootSlot::SlotB => BootSlot::SlotA,
@@ -133,11 +137,13 @@ impl SovereignMintKernelWatchdog {
     /// Confirm that current kernel booted and is operational (disarms rollback)
     pub fn confirm_boot_health(&mut self, now_epoch: u64) -> bool {
         self.rollback_pending.store(false, Ordering::SeqCst);
-        self.last_verified_boot_epoch.store(now_epoch, Ordering::SeqCst);
+        self.last_verified_boot_epoch
+            .store(now_epoch, Ordering::SeqCst);
 
         if let Some(active_k) = self.kernels.iter_mut().find(|k| k.is_active) {
             active_k.boot_success_count = active_k.boot_success_count.saturating_add(1);
-            active_k.stability_score = core::cmp::min(100, active_k.stability_score.saturating_add(1));
+            active_k.stability_score =
+                core::cmp::min(100, active_k.stability_score.saturating_add(1));
             return true;
         }
         false
@@ -181,13 +187,13 @@ impl SovereignMintKernelWatchdog {
 /// Linguistic and regional format settings (MintLocale inspired)
 #[derive(Debug, Clone)]
 pub struct LocaleConfig {
-    pub lang_code: String,      // e.g., "en_US"
-    pub territory: String,      // e.g., "US"
-    pub encoding: String,       // e.g., "UTF-8"
-    pub date_format: String,    // e.g., "YYYY-MM-DD"
-    pub time_format_24h: bool,  // true for 24-hour, false for 12-hour
-    pub currency_symbol: String,// e.g., "$"
-    pub first_day_of_week: u8,  // 0=Sunday, 1=Monday
+    pub lang_code: String,       // e.g., "en_US"
+    pub territory: String,       // e.g., "US"
+    pub encoding: String,        // e.g., "UTF-8"
+    pub date_format: String,     // e.g., "YYYY-MM-DD"
+    pub time_format_24h: bool,   // true for 24-hour, false for 12-hour
+    pub currency_symbol: String, // e.g., "$"
+    pub first_day_of_week: u8,   // 0=Sunday, 1=Monday
 }
 
 /// Input Method Editor (IME) layout descriptor
@@ -347,7 +353,12 @@ impl SovereignCinnamonAppletRuntime {
         let stock = [
             ("workspace-switcher@sigma", "Workspace Switcher", 4096, 250),
             ("sound-mixer@sigma", "Sound & Media Mixer", 8192, 100),
-            ("calendar-clock@sigma", "Precision Clock & Agenda", 4096, 1000),
+            (
+                "calendar-clock@sigma",
+                "Precision Clock & Agenda",
+                4096,
+                1000,
+            ),
             ("system-monitor@sigma", "Hardware Resource HUD", 6144, 500),
             ("network-tray@sigma", "Network & Wi-Fi Tray", 8192, 1000),
         ];
@@ -388,7 +399,10 @@ impl SovereignCinnamonAppletRuntime {
     }
 
     pub fn active_applets_count(&self) -> usize {
-        self.applets.values().filter(|a| a.state == AppletState::Active).count()
+        self.applets
+            .values()
+            .filter(|a| a.state == AppletState::Active)
+            .count()
     }
 }
 
@@ -473,7 +487,9 @@ impl SovereignOmarchyDeclarativeRules {
             },
         ];
 
-        Self { rules: default_rules }
+        Self {
+            rules: default_rules,
+        }
     }
 
     pub fn add_rule(&mut self, rule: DeclarativeWindowRule) {
@@ -608,7 +624,9 @@ pub struct SovereignProductionLaunchReadinessVerifier {
 
 impl SovereignProductionLaunchReadinessVerifier {
     pub fn new() -> Self {
-        let mut verifier = Self { evaluations: Vec::new() };
+        let mut verifier = Self {
+            evaluations: Vec::new(),
+        };
         verifier.run_exhaustive_verification();
         verifier
     }
@@ -735,7 +753,9 @@ mod tests {
         let mut watchdog = SovereignMintKernelWatchdog::new();
         assert_eq!(watchdog.active_slot, BootSlot::SlotA);
 
-        let target_slot = watchdog.stage_kernel("6.13.0-sigma-hwe", KernelSafetyTier::HardwareEnablement).unwrap();
+        let target_slot = watchdog
+            .stage_kernel("6.13.0-sigma-hwe", KernelSafetyTier::HardwareEnablement)
+            .unwrap();
         assert_eq!(target_slot, BootSlot::SlotB);
 
         watchdog.arm_reboot_to_staged().unwrap();

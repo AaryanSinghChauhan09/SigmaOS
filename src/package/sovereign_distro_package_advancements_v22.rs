@@ -129,7 +129,8 @@ impl DistroPackageAdapterV22 for ArchPacmanAdapterV22 {
         })
     }
     fn remap_to_sigma_package(&self, meta: &DistroPackageMetadataV22) -> UnifiedPackage {
-        let mut pkg = UnifiedPackage::new(format!("sigma-arch-{}", meta.name), meta.version.clone());
+        let mut pkg =
+            UnifiedPackage::new(format!("sigma-arch-{}", meta.name), meta.version.clone());
         pkg.formats = vec![PackageFormat::Pacman];
         pkg.state = PackageState::Uninstalled;
         pkg.dependencies = meta.raw_dependencies.clone();
@@ -241,7 +242,10 @@ impl DistroPackageAdapterV22 for FedoraDnfAdapterV22 {
     }
     fn generate_installation_scriptlets(&self, meta: &DistroPackageMetadataV22) -> Vec<String> {
         vec![
-            format!("echo 'Executing RPM post-install scriptlet for {}'", meta.name),
+            format!(
+                "echo 'Executing RPM post-install scriptlet for {}'",
+                meta.name
+            ),
             "rpm-ostree status".to_string(),
         ]
     }
@@ -256,9 +260,7 @@ impl DistroPackageAdapterV22 for FedoraDnfAdapterV22 {
 // ----------------------------------------------------------------------------
 pub struct UniversalDistroAdapterFactoryV22;
 impl UniversalDistroAdapterFactoryV22 {
-    pub fn create_adapter(
-        kind: LinuxDistroPackagingKindV22,
-    ) -> Box<dyn DistroPackageAdapterV22> {
+    pub fn create_adapter(kind: LinuxDistroPackagingKindV22) -> Box<dyn DistroPackageAdapterV22> {
         match kind {
             LinuxDistroPackagingKindV22::ArchPacman => Box::new(ArchPacmanAdapterV22),
             LinuxDistroPackagingKindV22::DebianApt => Box::new(DebianAptAdapterV22),
@@ -521,7 +523,10 @@ mod tests {
     #[test]
     fn test_udf_and_command_memento() {
         let udf_override = UdfDependencyOverrideEngineV22::new();
-        assert_eq!(udf_override.apply_udf_override("libssl-dev"), "sovereign-openssl");
+        assert_eq!(
+            udf_override.apply_udf_override("libssl-dev"),
+            "sovereign-openssl"
+        );
 
         let mut installed = vec!["coreutils".to_string()];
         let cmd = PackageTransactionCommandV22 {

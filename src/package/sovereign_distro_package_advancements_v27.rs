@@ -135,7 +135,8 @@ impl UniversalFormatInspectorAndClassifierV27 {
             PackageSignatureKindV27::OpenBsdSignify
         } else if raw_payload.starts_with(b"PQC_SIG") {
             PackageSignatureKindV27::PqcKyberDilithium
-        } else if raw_payload.starts_with(b"\x80\x01") || raw_payload.starts_with(b"-----BEGIN PGP") {
+        } else if raw_payload.starts_with(b"\x80\x01") || raw_payload.starts_with(b"-----BEGIN PGP")
+        {
             PackageSignatureKindV27::GpgOpenPgp
         } else if detected_format == PackageFormat::Apk || detected_format == PackageFormat::Aab {
             PackageSignatureKindV27::ApkV2V3Signature
@@ -241,7 +242,10 @@ impl UniversalCrossDistroCapabilityGovernorV27 {
         let mut map = BTreeMap::new();
         map.insert("libssl-dev".to_string(), "sovereign-openssl".to_string());
         map.insert("openssl-devel".to_string(), "sovereign-openssl".to_string());
-        map.insert("security/openssl".to_string(), "sovereign-openssl".to_string());
+        map.insert(
+            "security/openssl".to_string(),
+            "sovereign-openssl".to_string(),
+        );
         map.insert("libc6".to_string(), "sovereign-libc".to_string());
         map.insert("glibc".to_string(), "sovereign-libc".to_string());
         map.insert("musl".to_string(), "sovereign-libc".to_string());
@@ -252,7 +256,10 @@ impl UniversalCrossDistroCapabilityGovernorV27 {
         map.insert("python3-dev".to_string(), "sovereign-python".to_string());
         map.insert("python3-devel".to_string(), "sovereign-python".to_string());
         map.insert("wayland-devel".to_string(), "sovereign-wayland".to_string());
-        map.insert("pipewire-devel".to_string(), "sovereign-pipewire".to_string());
+        map.insert(
+            "pipewire-devel".to_string(),
+            "sovereign-pipewire".to_string(),
+        );
 
         Self {
             dependency_canonical_map: map,
@@ -400,8 +407,10 @@ impl UniversalMultiFormatTranspilerAndExecutionEngineV27 {
             pkg.properties.insert("cflags".to_string(), cflags.clone());
         }
 
-        pkg.properties
-            .insert("source_format".to_string(), format!("{:?}", manifest.detected_format));
+        pkg.properties.insert(
+            "source_format".to_string(),
+            format!("{:?}", manifest.detected_format),
+        );
         pkg.checksum = manifest.payload_sha256.clone();
         pkg
     }
@@ -428,7 +437,11 @@ impl UniversalMultiFormatTranspilerAndExecutionEngineV27 {
 
     /// Rolls back system state to a previous checkpoint ID V27
     pub fn rollback_checkpoint(&mut self, checkpoint_id: usize) -> Result<(), String> {
-        if let Some(cp) = self.checkpoints.iter().find(|c| c.checkpoint_id == checkpoint_id) {
+        if let Some(cp) = self
+            .checkpoints
+            .iter()
+            .find(|c| c.checkpoint_id == checkpoint_id)
+        {
             self.installed_packages = cp.installed_packages.clone();
             Ok(())
         } else {
@@ -597,8 +610,7 @@ impl SovereignDistroPackageAdvancementsSuiteV27 {
             .transpiler_engine
             .transpile_to_native_sigpkg(&manifest, &self.governor);
 
-        self.transpiler_engine
-            .install_package(&native_sigpkg.name);
+        self.transpiler_engine.install_package(&native_sigpkg.name);
         Ok(native_sigpkg)
     }
 }
@@ -650,11 +662,11 @@ mod tests {
     fn test_governor_remapping_and_sandboxing_v27() {
         let governor = UniversalCrossDistroCapabilityGovernorV27::new();
 
+        assert_eq!(governor.remap_dependency("libssl-dev"), "sovereign-openssl");
         assert_eq!(
-            governor.remap_dependency("libssl-dev"),
-            "sovereign-openssl"
+            governor.remap_dependency("custom-lib"),
+            "sovereign-custom-lib"
         );
-        assert_eq!(governor.remap_dependency("custom-lib"), "sovereign-custom-lib");
 
         let sandbox = governor.generate_sandbox_rules(PackageFormat::Flatpak);
         assert!(sandbox.pledge_promises.contains("inet"));

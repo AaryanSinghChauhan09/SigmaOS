@@ -71,11 +71,36 @@ impl OmarchyMultiAgentProvider {
 
     fn register_default_agents(&mut self) {
         let default_list = [
-            ("copilot-agent", "GitHub Copilot Bridge", AgentProviderKind::GitHubCopilot, 16384),
-            ("cursor-agent", "Cursor Claude Agent", AgentProviderKind::CursorAgent, 32768),
-            ("opencode-agent", "OpenCode Local Interpreter", AgentProviderKind::OpenCode, 8192),
-            ("muse-agent", "Muse Multi-Modal Agent", AgentProviderKind::MuseCreative, 16384),
-            ("sovereign-local", "SigmaOS Sovereign LLM", AgentProviderKind::SovereignLocalLlama, 65536),
+            (
+                "copilot-agent",
+                "GitHub Copilot Bridge",
+                AgentProviderKind::GitHubCopilot,
+                16384,
+            ),
+            (
+                "cursor-agent",
+                "Cursor Claude Agent",
+                AgentProviderKind::CursorAgent,
+                32768,
+            ),
+            (
+                "opencode-agent",
+                "OpenCode Local Interpreter",
+                AgentProviderKind::OpenCode,
+                8192,
+            ),
+            (
+                "muse-agent",
+                "Muse Multi-Modal Agent",
+                AgentProviderKind::MuseCreative,
+                16384,
+            ),
+            (
+                "sovereign-local",
+                "SigmaOS Sovereign LLM",
+                AgentProviderKind::SovereignLocalLlama,
+                65536,
+            ),
         ];
 
         for (id, name, kind, tokens) in default_list {
@@ -99,7 +124,10 @@ impl OmarchyMultiAgentProvider {
             self.next_task_id += 1;
             agent.completed_tasks_count += 1;
 
-            let response = format!("Task executed by {}: Generated safe solution for prompt", agent.name);
+            let response = format!(
+                "Task executed by {}: Generated safe solution for prompt",
+                agent.name
+            );
             self.tasks.push(AgentPromptTask {
                 task_id: tid,
                 assigned_agent_id: agent_id.into(),
@@ -135,10 +163,16 @@ mod tests {
         let mut orch = OmarchyMultiAgentProvider::new();
         assert_eq!(orch.agent_count(), 5);
 
-        let tid = orch.dispatch_prompt("cursor-agent", "Optimize buddy allocator").unwrap();
+        let tid = orch
+            .dispatch_prompt("cursor-agent", "Optimize buddy allocator")
+            .unwrap();
         assert_eq!(tid, 1);
         assert_eq!(orch.tasks.len(), 1);
-        assert!(orch.tasks[0].response.as_ref().unwrap().contains("Cursor Claude"));
+        assert!(orch.tasks[0]
+            .response
+            .as_ref()
+            .unwrap()
+            .contains("Cursor Claude"));
 
         assert!(orch.dispatch_prompt("unknown-agent", "test").is_err());
     }

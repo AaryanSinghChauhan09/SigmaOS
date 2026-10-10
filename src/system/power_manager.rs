@@ -250,7 +250,8 @@ impl PowerManager {
 
     /// Check if battery is critical
     pub fn is_battery_critical(&self) -> bool {
-        self.battery.is_critical(self.config.critical_battery_threshold)
+        self.battery
+            .is_critical(self.config.critical_battery_threshold)
     }
 
     /// Suggest sleep action based on battery level
@@ -315,14 +316,26 @@ mod tests {
 
     #[test]
     fn test_battery_status_from_str() {
-        assert_eq!(PowerBatteryStatus::from_str("charging"), Some(PowerBatteryStatus::Charging));
-        assert_eq!(PowerBatteryStatus::from_str("discharging"), Some(PowerBatteryStatus::Discharging));
+        assert_eq!(
+            PowerBatteryStatus::from_str("charging"),
+            Some(PowerBatteryStatus::Charging)
+        );
+        assert_eq!(
+            PowerBatteryStatus::from_str("discharging"),
+            Some(PowerBatteryStatus::Discharging)
+        );
     }
 
     #[test]
     fn test_power_profile_from_str() {
-        assert_eq!(PowerProfile::from_str("performance"), Some(PowerProfile::Performance));
-        assert_eq!(PowerProfile::from_str("balanced"), Some(PowerProfile::Balanced));
+        assert_eq!(
+            PowerProfile::from_str("performance"),
+            Some(PowerProfile::Performance)
+        );
+        assert_eq!(
+            PowerProfile::from_str("balanced"),
+            Some(PowerProfile::Balanced)
+        );
     }
 
     #[test]

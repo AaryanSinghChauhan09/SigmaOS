@@ -436,7 +436,6 @@ mod tests {
     }
 
     #[ignore]
-
     #[test]
     fn test_package_cleanup_manager_autoremove() {
         let mut manager = PackageCleanupManager::new();
@@ -512,7 +511,6 @@ mod tests {
     }
 
     #[ignore]
-
     #[test]
     fn test_package_cleanup_manager_remove_orphans() {
         let mut manager = PackageCleanupManager::new();

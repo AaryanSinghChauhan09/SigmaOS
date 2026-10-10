@@ -2163,21 +2163,32 @@ impl UniversalScriptletConverter {
         content: &str,
     ) -> Option<MappedScriptletHook> {
         let hook_type = match format {
-            PackageFormat::Apt | PackageFormat::Deb | PackageFormat::Superdeb => match script_name {
-                "preinst" => Some(SigmaPkgHookType::PreInstall),
-                "postinst" => Some(SigmaPkgHookType::PostInstall),
-                "prerm" => Some(SigmaPkgHookType::PreRemove),
-                "postrm" => Some(SigmaPkgHookType::PostRemove),
-                _ => None,
-            },
-            PackageFormat::Yum | PackageFormat::Rpm | PackageFormat::Zypper | PackageFormat::Pisi | PackageFormat::Drpm => match script_name {
+            PackageFormat::Apt | PackageFormat::Deb | PackageFormat::Superdeb => {
+                match script_name {
+                    "preinst" => Some(SigmaPkgHookType::PreInstall),
+                    "postinst" => Some(SigmaPkgHookType::PostInstall),
+                    "prerm" => Some(SigmaPkgHookType::PreRemove),
+                    "postrm" => Some(SigmaPkgHookType::PostRemove),
+                    _ => None,
+                }
+            }
+            PackageFormat::Yum
+            | PackageFormat::Rpm
+            | PackageFormat::Zypper
+            | PackageFormat::Pisi
+            | PackageFormat::Drpm => match script_name {
                 "%pre" | "pre" | "preInstall" => Some(SigmaPkgHookType::PreInstall),
-                "%post" | "%posttrans" | "post" | "postInstall" => Some(SigmaPkgHookType::PostInstall),
+                "%post" | "%posttrans" | "post" | "postInstall" => {
+                    Some(SigmaPkgHookType::PostInstall)
+                }
                 "%preun" | "preun" | "preRemove" => Some(SigmaPkgHookType::PreRemove),
                 "%postun" | "postun" | "postRemove" => Some(SigmaPkgHookType::PostRemove),
                 _ => None,
             },
-            PackageFormat::Pkg | PackageFormat::Ports | PackageFormat::OpenBsdPkg | PackageFormat::Pkgsrc => match script_name {
+            PackageFormat::Pkg
+            | PackageFormat::Ports
+            | PackageFormat::OpenBsdPkg
+            | PackageFormat::Pkgsrc => match script_name {
                 "+POST_INSTALL" | "+INSTALL" | "pkg-post-install" | "post-install" => {
                     Some(SigmaPkgHookType::PostInstall)
                 }
@@ -2197,11 +2208,18 @@ impl UniversalScriptletConverter {
                 "post_remove" => Some(SigmaPkgHookType::PostRemove),
                 _ => None,
             },
-            PackageFormat::Apk | PackageFormat::Xbps | PackageFormat::Eopkg | PackageFormat::Moss => match script_name {
+            PackageFormat::Apk
+            | PackageFormat::Xbps
+            | PackageFormat::Eopkg
+            | PackageFormat::Moss => match script_name {
                 "pre-install" | "pre-install.sh" => Some(SigmaPkgHookType::PreInstall),
-                "post-install" | "post-install.sh" | "postInstall" => Some(SigmaPkgHookType::PostInstall),
+                "post-install" | "post-install.sh" | "postInstall" => {
+                    Some(SigmaPkgHookType::PostInstall)
+                }
                 "pre-deinstall" | "pre-remove" | "preRemove" => Some(SigmaPkgHookType::PreRemove),
-                "post-deinstall" | "post-remove" | "postRemove" => Some(SigmaPkgHookType::PostRemove),
+                "post-deinstall" | "post-remove" | "postRemove" => {
+                    Some(SigmaPkgHookType::PostRemove)
+                }
                 _ => None,
             },
             PackageFormat::Portage | PackageFormat::Ebuild => match script_name {
@@ -2211,17 +2229,22 @@ impl UniversalScriptletConverter {
                 "pkg_postrm" | "post_remove" => Some(SigmaPkgHookType::PostRemove),
                 _ => None,
             },
-            PackageFormat::Nix | PackageFormat::Guix | PackageFormat::GuixNar => match script_name {
-                "preInstall" | "preUnpack" | "preBuild" => Some(SigmaPkgHookType::PreInstall),
-                "postInstall" | "postBuild" => Some(SigmaPkgHookType::PostInstall),
-                _ => None,
-            },
+            PackageFormat::Nix | PackageFormat::Guix | PackageFormat::GuixNar => {
+                match script_name {
+                    "preInstall" | "preUnpack" | "preBuild" => Some(SigmaPkgHookType::PreInstall),
+                    "postInstall" | "postBuild" => Some(SigmaPkgHookType::PostInstall),
+                    _ => None,
+                }
+            }
             PackageFormat::SlackBuild | PackageFormat::Txz => match script_name {
                 "doinst.sh" | "install" | "post-install" => Some(SigmaPkgHookType::PostInstall),
                 _ => None,
             },
-            PackageFormat::Snap | PackageFormat::Flatpak | PackageFormat::Hpkg => match script_name {
-                "install" | "post-install" | "configure" | "post-refresh" => Some(SigmaPkgHookType::PostInstall),
+            PackageFormat::Snap | PackageFormat::Flatpak | PackageFormat::Hpkg => match script_name
+            {
+                "install" | "post-install" | "configure" | "post-refresh" => {
+                    Some(SigmaPkgHookType::PostInstall)
+                }
                 "remove" | "pre-remove" => Some(SigmaPkgHookType::PreRemove),
                 _ => None,
             },

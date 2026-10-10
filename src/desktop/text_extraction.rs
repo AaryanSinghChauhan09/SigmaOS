@@ -134,7 +134,12 @@ impl TextExtractionManager {
         // Simulate OCR extraction
         let text = "Sample extracted text from screen region".to_string();
         let confidence = 0.95;
-        let language = self.config.languages.get(0).copied().unwrap_or(OcrLanguage::English);
+        let language = self
+            .config
+            .languages
+            .get(0)
+            .copied()
+            .unwrap_or(OcrLanguage::English);
         let extraction_time_ms = std::cmp::max(1, start.elapsed().as_millis() as u64);
         let word_count = text.split_whitespace().count();
         let line_count = text.lines().count();
@@ -260,7 +265,11 @@ impl TextExtractionManager {
             0.0
         };
         let avg_time_ms = if total_extractions > 0 {
-            let sum: u64 = self.extraction_history.iter().map(|r| r.extraction_time_ms).sum();
+            let sum: u64 = self
+                .extraction_history
+                .iter()
+                .map(|r| r.extraction_time_ms)
+                .sum();
             sum / total_extractions as u64
         } else {
             0

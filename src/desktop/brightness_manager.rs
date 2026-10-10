@@ -6,9 +6,9 @@ use std::collections::HashMap;
 /// Brightness level type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BrightnessType {
-    Backlight,     // Screen backlight
-    Keyboard,      // Keyboard backlight
-    Indicator,     // Indicator LED
+    Backlight, // Screen backlight
+    Keyboard,  // Keyboard backlight
+    Indicator, // Indicator LED
 }
 
 impl BrightnessType {
@@ -132,7 +132,13 @@ impl BrightnessManager {
         min_brightness: u8,
     ) -> String {
         let id = format!("dev_{}", self.next_device_id);
-        let device = BrightnessDevice::new(id.clone(), name, device_type, max_brightness, min_brightness);
+        let device = BrightnessDevice::new(
+            id.clone(),
+            name,
+            device_type,
+            max_brightness,
+            min_brightness,
+        );
         self.devices.insert(id.clone(), device);
         self.next_device_id += 1;
         id
@@ -267,7 +273,10 @@ mod tests {
     fn test_brightness_manager_initialization() {
         let manager = BrightnessManager::new();
         assert_eq!(manager.get_devices().len(), 2);
-        assert_eq!(manager.get_adaptive_mode(), AdaptiveBrightnessMode::Disabled);
+        assert_eq!(
+            manager.get_adaptive_mode(),
+            AdaptiveBrightnessMode::Disabled
+        );
     }
 
     #[test]

@@ -85,12 +85,7 @@ pub struct Driver {
 }
 
 impl Driver {
-    pub fn new(
-        name: String,
-        version: String,
-        driver_type: DriverType,
-        device_id: String,
-    ) -> Self {
+    pub fn new(name: String, version: String, driver_type: DriverType, device_id: String) -> Self {
         Self {
             name,
             version,
@@ -161,35 +156,34 @@ impl DriverManager {
 
     /// List drivers by type
     pub fn list_by_type(&self, driver_type: DriverType) -> Vec<&Driver> {
-        self.drivers.values()
+        self.drivers
+            .values()
             .filter(|d| d.driver_type == driver_type)
             .collect()
     }
 
     /// List recommended drivers
     pub fn list_recommended(&self) -> Vec<&Driver> {
-        self.drivers.values()
-            .filter(|d| d.is_recommended)
-            .collect()
+        self.drivers.values().filter(|d| d.is_recommended).collect()
     }
 
     /// List proprietary drivers
     pub fn list_proprietary(&self) -> Vec<&Driver> {
-        self.drivers.values()
+        self.drivers
+            .values()
             .filter(|d| !d.is_open_source)
             .collect()
     }
 
     /// List open source drivers
     pub fn list_open_source(&self) -> Vec<&Driver> {
-        self.drivers.values()
-            .filter(|d| d.is_open_source)
-            .collect()
+        self.drivers.values().filter(|d| d.is_open_source).collect()
     }
 
     /// Install a driver
     pub fn install(&mut self, device_id: &str) -> Result<(), String> {
-        let driver = self.get_driver_mut(device_id)
+        let driver = self
+            .get_driver_mut(device_id)
             .ok_or_else(|| format!("Driver {} not found", device_id))?;
 
         if driver.is_installed() {
@@ -205,7 +199,8 @@ impl DriverManager {
 
     /// Activate a driver
     pub fn activate(&mut self, device_id: &str) -> Result<(), String> {
-        let driver = self.get_driver_mut(device_id)
+        let driver = self
+            .get_driver_mut(device_id)
             .ok_or_else(|| format!("Driver {} not found", device_id))?;
 
         if !driver.is_installed() {
@@ -219,7 +214,8 @@ impl DriverManager {
 
     /// Remove a driver
     pub fn remove(&mut self, device_id: &str) -> Result<(), String> {
-        let driver = self.get_driver_mut(device_id)
+        let driver = self
+            .get_driver_mut(device_id)
             .ok_or_else(|| format!("Driver {} not found", device_id))?;
 
         if !driver.is_installed() {
@@ -237,7 +233,11 @@ impl DriverManager {
     pub fn detect_hardware(&mut self) -> Vec<&Driver> {
         // Simulate hardware detection
         let detected_drivers = vec![
-            ("0000:01:00.0", "NVIDIA GeForce RTX 3080", DriverType::Nvidia),
+            (
+                "0000:01:00.0",
+                "NVIDIA GeForce RTX 3080",
+                DriverType::Nvidia,
+            ),
             ("0000:00:02.0", "Intel UHD Graphics 630", DriverType::Intel),
             ("0000:02:00.0", "Intel Wi-Fi 6 AX200", DriverType::Wifi),
         ];
@@ -262,15 +262,9 @@ impl DriverManager {
     /// Get statistics
     pub fn get_statistics(&self) -> DriverStatistics {
         let total_drivers = self.drivers.len();
-        let installed_drivers = self.drivers.values()
-            .filter(|d| d.is_installed())
-            .count();
-        let recommended_drivers = self.drivers.values()
-            .filter(|d| d.is_recommended)
-            .count();
-        let proprietary_drivers = self.drivers.values()
-            .filter(|d| !d.is_open_source)
-            .count();
+        let installed_drivers = self.drivers.values().filter(|d| d.is_installed()).count();
+        let recommended_drivers = self.drivers.values().filter(|d| d.is_recommended).count();
+        let proprietary_drivers = self.drivers.values().filter(|d| !d.is_open_source).count();
 
         DriverStatistics {
             total_drivers,

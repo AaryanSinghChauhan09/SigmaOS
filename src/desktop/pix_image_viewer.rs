@@ -210,7 +210,10 @@ impl PixImageViewer {
             ImageFormat::AVIF
         } else if path_lower.ends_with(".webp") {
             ImageFormat::WebP
-        } else if path_lower.ends_with(".cr2") || path_lower.ends_with(".nef") || path_lower.ends_with(".arw") {
+        } else if path_lower.ends_with(".cr2")
+            || path_lower.ends_with(".nef")
+            || path_lower.ends_with(".arw")
+        {
             ImageFormat::RAW
         } else if path_lower.ends_with(".hdr") || path_lower.ends_with(".exr") {
             ImageFormat::HDR
@@ -223,7 +226,9 @@ impl PixImageViewer {
 
     /// Get current image metadata
     pub fn get_metadata(&self) -> Option<&ImageMetadata> {
-        self.current_image.as_ref().and_then(|path| self.image_cache.get(path))
+        self.current_image
+            .as_ref()
+            .and_then(|path| self.image_cache.get(path))
     }
 
     /// Load EXIF data
@@ -252,7 +257,9 @@ impl PixImageViewer {
 
     /// Get EXIF data
     pub fn get_exif(&self) -> Option<&ExifData> {
-        self.current_image.as_ref().and_then(|path| self.exif_cache.get(path))
+        self.current_image
+            .as_ref()
+            .and_then(|path| self.exif_cache.get(path))
     }
 
     /// Apply transformation
@@ -409,8 +416,14 @@ mod tests {
         assert_eq!(PixImageViewer::detect_format("test.jpg"), ImageFormat::JPEG);
         assert_eq!(PixImageViewer::detect_format("test.png"), ImageFormat::PNG);
         assert_eq!(PixImageViewer::detect_format("test.jxl"), ImageFormat::JXL);
-        assert_eq!(PixImageViewer::detect_format("test.avif"), ImageFormat::AVIF);
-        assert_eq!(PixImageViewer::detect_format("test.webp"), ImageFormat::WebP);
+        assert_eq!(
+            PixImageViewer::detect_format("test.avif"),
+            ImageFormat::AVIF
+        );
+        assert_eq!(
+            PixImageViewer::detect_format("test.webp"),
+            ImageFormat::WebP
+        );
         assert_eq!(PixImageViewer::detect_format("test.cr2"), ImageFormat::RAW);
         assert_eq!(PixImageViewer::detect_format("test.hdr"), ImageFormat::HDR);
         assert_eq!(PixImageViewer::detect_format("test.svg"), ImageFormat::SVG);
