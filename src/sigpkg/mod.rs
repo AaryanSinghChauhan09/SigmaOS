@@ -119,13 +119,8 @@ pub use sovereign_distro_package_advancements_v17::*;
 pub mod sovereign_distro_package_advancements_v20;
 pub use sovereign_distro_package_advancements_v20::*;
 
-#[path = "../package/sovereign_distro_package_advancements_v26.rs"]
-pub mod sovereign_distro_package_advancements_v26;
-pub use sovereign_distro_package_advancements_v26::*;
-
-#[path = "../package/sovereign_distro_package_advancements_v29.rs"]
-pub mod sovereign_distro_package_advancements_v29;
-pub use sovereign_distro_package_advancements_v29::*;
+pub use crate::package::sovereign_distro_package_advancements_v26::*;
+pub use crate::package::sovereign_distro_package_advancements_v29::*;
 
 #[path = "../package/sovereign_distro_package_advancements_v30.rs"]
 pub mod sovereign_distro_package_advancements_v30;
@@ -138,6 +133,10 @@ pub use sovereign_distro_package_advancements_v31::*;
 #[path = "../package/sovereign_distro_package_advancements_v33.rs"]
 pub mod sovereign_distro_package_advancements_v33;
 pub use sovereign_distro_package_advancements_v33::*;
+
+#[path = "../package/sovereign_distro_package_advancements_v34.rs"]
+pub mod sovereign_distro_package_advancements_v34;
+pub use sovereign_distro_package_advancements_v34::*;
 
 #[path = "../package/bsd_linux_package_innovations.rs"]
 pub mod bsd_linux_package_innovations;

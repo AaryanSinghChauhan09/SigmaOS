@@ -455,67 +455,23 @@ pub struct ArchPacmanHookRunner {
 
 impl ArchPacmanHookRunner {
     pub fn new() -> Self {
-        let mut hooks = BTreeMap::new();
-        hooks.insert(
-            "base".to_string(),
-            InitramfsHookSpec {
-                name: "base".to_string(),
-                is_runtime: true,
-                dependencies: Vec::new(),
+        let hooks = vec![
+            PacmanHookRule {
+                name: "fontconfig".to_string(),
+                when: PacmanHookWhen::PostTransaction,
+                target_packages: vec!["fontconfig*".to_string(), "ttf-*".to_string()],
+                exec_command: "fc-cache -s".to_string(),
             },
-        );
-        hooks.insert(
-            "udev".to_string(),
-            InitramfsHookSpec {
-                name: "udev".to_string(),
-                is_runtime: true,
-                dependencies: vec!["base".to_string()],
+            PacmanHookRule {
+                name: "systemd-daemon-reload".to_string(),
+                when: PacmanHookWhen::PostTransaction,
+                target_packages: vec!["systemd*".to_string()],
+                exec_command: "systemctl daemon-reload".to_string(),
             },
-        );
-        hooks.insert(
-            "autodetect".to_string(),
-            InitramfsHookSpec {
-                name: "autodetect".to_string(),
-                is_runtime: false,
-                dependencies: Vec::new(),
-            },
-        );
-        hooks.insert(
-            "kms".to_string(),
-            InitramfsHookSpec {
-                name: "kms".to_string(),
-                is_runtime: true,
-                dependencies: vec!["udev".to_string()],
-            },
-        );
-        hooks.insert(
-            "modconf".to_string(),
-            InitramfsHookSpec {
-                name: "modconf".to_string(),
-                is_runtime: false,
-                dependencies: Vec::new(),
-            },
-        );
-        hooks.insert(
-            "block".to_string(),
-            InitramfsHookSpec {
-                name: "block".to_string(),
-                is_runtime: true,
-                dependencies: vec!["udev".to_string()],
-            },
-        );
-        hooks.insert(
-            "filesystems".to_string(),
-            InitramfsHookSpec {
-                name: "filesystems".to_string(),
-                is_runtime: true,
-                dependencies: vec!["block".to_string()],
-            },
-        );
+        ];
 
         Self {
-            hooks,
-            compression_format: "zstd".to_string(),
+            registered_hooks: hooks,
         }
     }
 
@@ -579,15 +535,15 @@ impl ArchPacstrapChrootEngine {
 // =========================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct CachedPackageFile {
-    pub pkgname: String,
-    pub version: String,
-    pub file_size_bytes: u64,
+pub struct PqcDilithiumKeySpec {
+    pub key_id: String,
+    pub owner_email: String,
+    pub is_trusted: bool,
+    pub dilithium_pubkey_hash: String,
 }
 
-pub struct ArchPacmanCacheScrubber {
-    pub cached_files: Vec<CachedPackageFile>,
-    pub retain_keep_count: usize,
+pub struct ArchPacmanKeyringPqcEngine {
+    pub keys: BTreeMap<String, PqcDilithiumKeySpec>,
 }
 
 impl ArchPacmanKeyringPqcEngine {
@@ -603,6 +559,33 @@ impl ArchPacmanKeyringPqcEngine {
             },
         );
         Self { keys }
+    }
+}
+
+impl Default for ArchPacmanKeyringPqcEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CachedPackageFile {
+    pub pkgname: String,
+    pub version: String,
+    pub file_size_bytes: u64,
+}
+
+pub struct ArchPacmanCacheScrubber {
+    pub cached_files: Vec<CachedPackageFile>,
+    pub retain_keep_count: usize,
+}
+
+impl ArchPacmanCacheScrubber {
+    pub fn new(retain_keep_count: usize) -> Self {
+        Self {
+            cached_files: Vec::new(),
+            retain_keep_count,
+        }
     }
 
     /// Calculates which old package cache files should be purged
