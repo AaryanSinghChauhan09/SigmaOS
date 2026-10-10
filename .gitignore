@@ -72,5 +72,8 @@ wiki_repo/
 *.py
 wiki/
 WIKI/
+!.github/PULL_REQUEST_TEMPLATE.md
 !docs/*.md
 !Agents/*.md
+!research/**/*.md
+!research/*.md

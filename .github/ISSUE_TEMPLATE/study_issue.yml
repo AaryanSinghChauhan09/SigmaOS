@@ -1,0 +1,50 @@
+name: Study issue
+description: Study one upstream OS mechanism for periodic research cycle
+title: "study(<component>): "
+labels: ["type:study"]
+body:
+  - type: textarea
+    id: component
+    attributes:
+      label: Component
+      description: Component name (e.g., kernel, memory, VFS, security, packaging, desktop)
+    validations:
+      required: true
+  - type: textarea
+    id: upstream_project
+    attributes:
+      label: Upstream project
+      description: Upstream project studied (e.g., Linux, xv6, FreeBSD, OpenBSD, Arch, Debian, Fedora, Redox)
+    validations:
+      required: true
+  - type: textarea
+    id: mechanism
+    attributes:
+      label: Mechanism to study
+      description: One narrow mechanism only
+    validations:
+      required: true
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Why SigmaOS needs it
+      description: Link to capability gap or failing runtime path
+    validations:
+      required: true
+  - type: checkboxes
+    id: expected_output
+    attributes:
+      label: Expected output
+      options:
+        - label: Research note
+        - label: ADR
+        - label: Implementation PR
+        - label: Test PR
+        - label: Documentation/status PR
+  - type: textarea
+    id: validation
+    attributes:
+      label: Validation requirement
+      description: QEMU boot, installer test, package dry-run, hardware log, etc.
+    validations:
+      required: true

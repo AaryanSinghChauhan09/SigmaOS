@@ -1,0 +1,57 @@
+name: Missing component issue
+description: Track implementation of a missing OS component
+title: "feat(<component>): "
+labels: ["type:missing-component"]
+body:
+  - type: textarea
+    id: missing_component
+    attributes:
+      label: Missing component
+      description: Exact component or capability
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - P0
+        - P1
+        - P2
+        - P3
+    validations:
+      required: true
+  - type: textarea
+    id: user_visible_outcome
+    attributes:
+      label: User-visible outcome
+      description: What will work after this component exists?
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies
+      description: Other components that must exist first
+  - type: textarea
+    id: minimum_viable_slice
+    attributes:
+      label: Minimum viable slice
+      description: Smallest complete implementation
+    validations:
+      required: true
+  - type: checkboxes
+    id: required_evidence
+    attributes:
+      label: Required evidence
+      options:
+        - label: Unit tests
+        - label: Integration tests
+        - label: QEMU/runtime evidence
+        - label: Documentation
+        - label: Capability/status update
+  - type: textarea
+    id: non_goals
+    attributes:
+      label: Non-goals
+      description: What this issue deliberately does not implement
