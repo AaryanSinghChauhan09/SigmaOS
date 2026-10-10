@@ -326,8 +326,7 @@ impl CalendarApp {
             .get_all_events()
             .into_iter()
             .filter(|e| {
-                contains_ignore_case(&e.title, query)
-                    || contains_ignore_case(&e.description, query)
+                contains_ignore_case(&e.title, query) || contains_ignore_case(&e.description, query)
             })
             .collect()
     }

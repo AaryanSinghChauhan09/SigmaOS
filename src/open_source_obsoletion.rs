@@ -4015,7 +4015,9 @@ impl SovereignRuffFastLinterEngine {
                     fixable: true,
                 });
             }
-            if self.enabled_rules.contains(&"F401".to_string()) && line.contains("import unused_module") {
+            if self.enabled_rules.contains(&"F401".to_string())
+                && line.contains("import unused_module")
+            {
                 diags.push(LintDiagnosticRule {
                     code: "F401".to_string(),
                     file_path: path.to_string(),
@@ -4200,7 +4202,11 @@ impl SovereignWasmtimeWasiPreview2Engine {
         });
     }
 
-    pub fn invoke_component_export(&mut self, component_name: &str, func: &str) -> Result<u64, &'static str> {
+    pub fn invoke_component_export(
+        &mut self,
+        component_name: &str,
+        func: &str,
+    ) -> Result<u64, &'static str> {
         let comp = self
             .components
             .iter()
@@ -4760,10 +4766,15 @@ impl SovereignOpenSourceObsoletionOrchestrator {
             uutils_coreutils: SovereignUutilsCoreutilsEngine::new(),
             freebsd_jail_rctl: SovereignFreeBsdJailRctlEngine::new(),
             nix_flake_lock: SovereignNixFlakeLockEngine::new(),
-            ghostty_gpu_font_renderer: SovereignGhosttyGpuFontRendererEngine::new("Sovereign Mono", 12.0),
+            ghostty_gpu_font_renderer: SovereignGhosttyGpuFontRendererEngine::new(
+                "Sovereign Mono",
+                12.0,
+            ),
             fish_autosuggestion_syntax: SovereignFishAutosuggestionSyntaxEngine::new(),
             ruff_fast_linter: SovereignRuffFastLinterEngine::new(),
-            typst_pdf_compiler: SovereignTypstPdfCompilerEngine::new("SigmaOS Technical Specification"),
+            typst_pdf_compiler: SovereignTypstPdfCompilerEngine::new(
+                "SigmaOS Technical Specification",
+            ),
             tetragon_ebpf_audit: SovereignTetragonEbpfAuditEngine::new(),
             wasmtime_wasi_preview2: SovereignWasmtimeWasiPreview2Engine::new(),
             trivy_scanner: SovereignTrivyContainerVulnerabilityScannerEngine::new(),
@@ -4932,18 +4943,34 @@ impl SovereignOpenSourceObsoletionOrchestrator {
         );
         assert!(self.nix_flake_lock.verify_flake_lockfile());
 
-        let _ = self.ghostty_gpu_font_renderer.render_terminal_grid_gpu("SigmaOS");
-        self.fish_autosuggestion_syntax.record_history("sigma status");
+        let _ = self
+            .ghostty_gpu_font_renderer
+            .render_terminal_grid_gpu("SigmaOS");
+        self.fish_autosuggestion_syntax
+            .record_history("sigma status");
         let _ = self.ruff_fast_linter.lint_source_code("main.py", "x = 1\n");
-        let _ = self.typst_pdf_compiler.compile_markup_to_pdf("= Title\nContent");
-        self.tetragon_ebpf_audit.register_sensor(1, "sys_execve", true);
-        self.wasmtime_wasi_preview2.register_wasi_component("component_1", &["run"]);
+        let _ = self
+            .typst_pdf_compiler
+            .compile_markup_to_pdf("= Title\nContent");
+        self.tetragon_ebpf_audit
+            .register_sensor(1, "sys_execve", true);
+        self.wasmtime_wasi_preview2
+            .register_wasi_component("component_1", &["run"]);
 
-        self.trivy_scanner.register_vulnerability("CVE-2026-9999", "CRITICAL", "sovereign-kernel", "Memory issue");
-        self.aria2_downloader.add_download_source("http://dist.sigmaos.org/pkg.tar.zst");
-        self.just_task_runner.register_recipe("build", &["cargo build --release"]);
-        self.supabase_postgrest.register_table("users", &["id", "username", "role"]);
-        self.suricata_ids.add_signature_rule(1001, "TCP", "any", 80, "ALERT HTTP Traffic");
+        self.trivy_scanner.register_vulnerability(
+            "CVE-2026-9999",
+            "CRITICAL",
+            "sovereign-kernel",
+            "Memory issue",
+        );
+        self.aria2_downloader
+            .add_download_source("http://dist.sigmaos.org/pkg.tar.zst");
+        self.just_task_runner
+            .register_recipe("build", &["cargo build --release"]);
+        self.supabase_postgrest
+            .register_table("users", &["id", "username", "role"]);
+        self.suricata_ids
+            .add_signature_rule(1001, "TCP", "any", 80, "ALERT HTTP Traffic");
         let _ = self.caddy_tls.provision_acme_certificate("api.sigmaos.org");
 
         Ok(format!(
@@ -8395,7 +8422,9 @@ mod tests {
     #[test]
     fn test_sovereign_typst_pdf_compiler_engine() {
         let mut typst = SovereignTypstPdfCompilerEngine::new("Architecture Specification");
-        let pdf_data = typst.compile_markup_to_pdf("= Chapter 1\nSection details").unwrap();
+        let pdf_data = typst
+            .compile_markup_to_pdf("= Chapter 1\nSection details")
+            .unwrap();
         assert!(pdf_data.starts_with(b"%PDF-1.7"));
         assert!(pdf_data.ends_with(b"%%EOF"));
         assert_eq!(typst.compiled_pages.len(), 2);
@@ -8418,10 +8447,14 @@ mod tests {
         let mut wasi = SovereignWasmtimeWasiPreview2Engine::new();
         wasi.register_wasi_component("http_router", &["handle_http_request", "init"]);
 
-        let res = wasi.invoke_component_export("http_router", "handle_http_request").unwrap();
+        let res = wasi
+            .invoke_component_export("http_router", "handle_http_request")
+            .unwrap();
         assert_eq!(res, 1);
         assert_eq!(wasi.executed_invocations, 1);
-        assert!(wasi.invoke_component_export("http_router", "nonexistent").is_err());
+        assert!(wasi
+            .invoke_component_export("http_router", "nonexistent")
+            .is_err());
     }
 
     #[test]
@@ -8884,7 +8917,10 @@ mod tests {
         let mut pg = SovereignSupabasePostgrestEngine::new();
         pg.register_table("audit_logs", &["id", "timestamp", "action"]);
         let endpoint = pg.auto_generate_endpoint("audit_logs").unwrap();
-        assert_eq!(endpoint, "/api/v1/rest/audit_logs?select=id,timestamp,action");
+        assert_eq!(
+            endpoint,
+            "/api/v1/rest/audit_logs?select=id,timestamp,action"
+        );
         assert_eq!(pg.total_api_calls, 1);
         assert_eq!(pg.auto_generate_endpoint("nonexistent"), None);
     }

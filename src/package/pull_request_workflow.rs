@@ -143,13 +143,23 @@ impl PullRequestPackageFormat {
             Self::ArchSystemdBootConfig => "Arch Linux systemd-boot Loader Configuration Entry",
             Self::ArchPacmanDatabaseDb => "Arch Linux ALPM Local Sync Database DB Files",
             Self::ArchJournalctlBinaryLog => "Arch Linux systemd Binary Journal Diagnostics Log",
-            Self::ArchPamUnixSecuritySpec => "Arch Linux PAM Security Authentication Spec (/etc/pam.d/system-auth)",
-            Self::ArchLvmVolumeGroupSpec => "Arch Linux LVM2 Volume Group & LUKS Root Encryption Spec",
+            Self::ArchPamUnixSecuritySpec => {
+                "Arch Linux PAM Security Authentication Spec (/etc/pam.d/system-auth)"
+            }
+            Self::ArchLvmVolumeGroupSpec => {
+                "Arch Linux LVM2 Volume Group & LUKS Root Encryption Spec"
+            }
             Self::ArchPacmanBinaryTarXz => "Arch Linux Native .pkg.tar.zst Binary Package",
-            Self::ArchDpllSatDependencyConstraint => "Arch Linux ALPM Boolean SAT Solver Constraint Matrix",
+            Self::ArchDpllSatDependencyConstraint => {
+                "Arch Linux ALPM Boolean SAT Solver Constraint Matrix"
+            }
             Self::ArchInitServiceUnitSpec => "Arch Linux systemd Service Unit Specification",
-            Self::ArchPamAuthModuleSpec => "Arch Linux PAM Pluggable Authentication Module Specification",
-            Self::ArchNetworkManagerProfile => "Arch Linux NetworkManager System Connection Profile",
+            Self::ArchPamAuthModuleSpec => {
+                "Arch Linux PAM Pluggable Authentication Module Specification"
+            }
+            Self::ArchNetworkManagerProfile => {
+                "Arch Linux NetworkManager System Connection Profile"
+            }
             Self::ArchSeccompFilterProfile => "Arch Linux Seccomp BPF System Call Filter Profile",
             Self::AlpineApk => "Alpine Linux .apk Package",
             Self::GentooEbuild => "Gentoo Portage .ebuild Script",
@@ -549,11 +559,17 @@ impl ArchLinuxSystemParityPullRequestEngine {
     }
 
     /// Merges parity PR into the active system parity registry
-    pub fn merge_parity_pr(&mut self, pr_id: u64) -> Result<ConsolidatedSovereignPackage, &'static str> {
+    pub fn merge_parity_pr(
+        &mut self,
+        pr_id: u64,
+    ) -> Result<ConsolidatedSovereignPackage, &'static str> {
         let package = self.gateway.merge_arch_component(pr_id)?;
         self.parity_records.insert(
             package.name.clone(),
-            format!("Format: {:?} | Merge: {}", package.source_format, package.merge_commit_hash),
+            format!(
+                "Format: {:?} | Merge: {}",
+                package.source_format, package.merge_commit_hash
+            ),
         );
         Ok(package)
     }
@@ -784,6 +800,8 @@ mod tests {
 
         let merged = parity_engine.merge_parity_pr(parity_pr).unwrap();
         assert_eq!(merged.name, "reflector-mirrorlist");
-        assert!(parity_engine.parity_records.contains_key("reflector-mirrorlist"));
+        assert!(parity_engine
+            .parity_records
+            .contains_key("reflector-mirrorlist"));
     }
 }

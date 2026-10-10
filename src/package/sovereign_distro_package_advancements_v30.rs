@@ -140,7 +140,8 @@ impl UniversalPackageFormatInspectorV30 {
             PackageSignatureKindV30::OpenBsdSignify
         } else if raw_payload.starts_with(b"PQC_SIG") {
             PackageSignatureKindV30::PqcKyberDilithium
-        } else if raw_payload.starts_with(b"\x80\x01") || raw_payload.starts_with(b"-----BEGIN PGP") {
+        } else if raw_payload.starts_with(b"\x80\x01") || raw_payload.starts_with(b"-----BEGIN PGP")
+        {
             PackageSignatureKindV30::GpgOpenPgp
         } else if detected_format == PackageFormat::Apk || detected_format == PackageFormat::Aab {
             PackageSignatureKindV30::ApkV2V3Signature
@@ -238,7 +239,10 @@ impl UniversalCrossDistroSatSolverV30 {
         let mut map = BTreeMap::new();
         map.insert("libssl-dev".to_string(), "sovereign-openssl".to_string());
         map.insert("openssl-devel".to_string(), "sovereign-openssl".to_string());
-        map.insert("security/openssl".to_string(), "sovereign-openssl".to_string());
+        map.insert(
+            "security/openssl".to_string(),
+            "sovereign-openssl".to_string(),
+        );
         map.insert("libc6".to_string(), "sovereign-libc".to_string());
         map.insert("glibc".to_string(), "sovereign-libc".to_string());
         map.insert("musl".to_string(), "sovereign-libc".to_string());
@@ -249,7 +253,10 @@ impl UniversalCrossDistroSatSolverV30 {
         map.insert("python3-dev".to_string(), "sovereign-python".to_string());
         map.insert("python3-devel".to_string(), "sovereign-python".to_string());
         map.insert("wayland-devel".to_string(), "sovereign-wayland".to_string());
-        map.insert("pipewire-devel".to_string(), "sovereign-pipewire".to_string());
+        map.insert(
+            "pipewire-devel".to_string(),
+            "sovereign-pipewire".to_string(),
+        );
 
         Self {
             dependency_canonical_map: map,
@@ -433,9 +440,16 @@ impl UniversalBootEnvSnapshotGovernorV30 {
 
     /// Rolls back system state to selected boot environment snapshot V30
     pub fn rollback(&mut self, snapshot_id: usize) -> Result<String, String> {
-        if let Some(snap) = self.snapshots.iter_mut().find(|s| s.snapshot_id == snapshot_id) {
+        if let Some(snap) = self
+            .snapshots
+            .iter_mut()
+            .find(|s| s.snapshot_id == snapshot_id)
+        {
             snap.active = true;
-            Ok(format!("Successfully rolled back to snapshot '{}'", snap.label))
+            Ok(format!(
+                "Successfully rolled back to snapshot '{}'",
+                snap.label
+            ))
         } else {
             Err(format!("Snapshot ID {} not found", snapshot_id))
         }
@@ -691,7 +705,10 @@ mod tests {
     fn test_cli_router_and_master_coordinator_v30() {
         let mut suite = SovereignDistroPackageAdvancementsSuiteV30::new();
 
-        let cmd = suite.cli_router.route_command("apt install ripgrep --dry-run").unwrap();
+        let cmd = suite
+            .cli_router
+            .route_command("apt install ripgrep --dry-run")
+            .unwrap();
         assert_eq!(cmd.action, UniversalPmActionV30::Install);
         assert!(cmd.dry_run);
 
@@ -699,6 +716,8 @@ mod tests {
             .process_and_install("htop-3.3.0.apk", b"APK_PAYLOAD")
             .unwrap();
         assert_eq!(sigpkg.name, "sigpkg-htop-3.3.0");
-        assert!(suite.installed_packages.contains(&"sigpkg-htop-3.3.0".to_string()));
+        assert!(suite
+            .installed_packages
+            .contains(&"sigpkg-htop-3.3.0".to_string()));
     }
 }
