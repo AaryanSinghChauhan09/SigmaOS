@@ -132,14 +132,21 @@ impl RiotOsNetdevDriverPrEngine {
         let mut engine = Self {
             active_interfaces: BTreeMap::new(),
         };
-        engine.active_interfaces.insert("netdev_eth0".to_string(), 1500);
-        engine.active_interfaces.insert("netdev_ieee802154".to_string(), 127);
+        engine
+            .active_interfaces
+            .insert("netdev_eth0".to_string(), 1500);
+        engine
+            .active_interfaces
+            .insert("netdev_ieee802154".to_string(), 127);
         engine
     }
 
     pub fn register_netdev(&mut self, name: &str, mtu: u32) -> String {
         self.active_interfaces.insert(name.to_string(), mtu);
-        format!("PR Proposal: RIOT OS registered netdev driver '{}' (MTU: {})", name, mtu)
+        format!(
+            "PR Proposal: RIOT OS registered netdev driver '{}' (MTU: {})",
+            name, mtu
+        )
     }
 }
 
@@ -180,7 +187,12 @@ impl SeL4CapabilitySpacePrEngine {
         engine
     }
 
-    pub fn mint_capability(&mut self, cptr: u64, cap_type: &str, rights: u8) -> Result<String, String> {
+    pub fn mint_capability(
+        &mut self,
+        cptr: u64,
+        cap_type: &str,
+        rights: u8,
+    ) -> Result<String, String> {
         if self.cnode_slots.contains_key(&cptr) {
             return Err(format!("seL4 CNode slot 0x{:x} occupied", cptr));
         }
@@ -192,7 +204,10 @@ impl SeL4CapabilitySpacePrEngine {
                 rights_mask: rights,
             },
         );
-        Ok(format!("PR Proposal: seL4 minted Capability '{}' into slot 0x{:x}", cap_type, cptr))
+        Ok(format!(
+            "PR Proposal: seL4 minted Capability '{}' into slot 0x{:x}",
+            cap_type, cptr
+        ))
     }
 }
 
@@ -420,7 +435,10 @@ impl SovereignOpenSourceOsGapClosureV36PrSuite {
         let rcvid = self.qnx.msg_send_synchronous(1, 2, b"IPC");
         let win = self.kolibri.define_window_sys_fn0(100, 100, 800, 600);
         self.morphos.create_msg_port("ExecPort0");
-        let _lock = self.openvms.sys_enq_lock("DISK_VOL1", LockMode::Exclusive).is_ok();
+        let _lock = self
+            .openvms
+            .sys_enq_lock("DISK_VOL1", LockMode::Exclusive)
+            .is_ok();
 
         tid > 0 && rcvid > 0 && win > 0 && !self.morphos.message_ports.is_empty()
     }

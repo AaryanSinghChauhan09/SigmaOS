@@ -269,23 +269,15 @@ pub struct ArchLinuxBtrfsSubvolumeLayoutPrEngine {
 impl ArchLinuxBtrfsSubvolumeLayoutPrEngine {
     pub fn new() -> Self {
         Self {
-            subvolumes: vec![
-                "@",
-                "@home",
-                "@cache",
-                "@log",
-                "@snapshots",
-            ]
-            .iter()
-            .map(|s| s.to_string())
-            .collect(),
+            subvolumes: vec!["@", "@home", "@cache", "@log", "@snapshots"]
+                .iter()
+                .map(|s| s.to_string())
+                .collect(),
         }
     }
 
     pub fn generate_mount_options_fstab(&self) -> String {
-        format!(
-            "UUID=xxxx / btrfs rw,noatime,compress=zstd:1,space_cache=v2,subvol=@ 0 0\n"
-        )
+        format!("UUID=xxxx / btrfs rw,noatime,compress=zstd:1,space_cache=v2,subvol=@ 0 0\n")
     }
 }
 
@@ -314,7 +306,10 @@ impl ArchLinuxAurPgpKeyImportPrEngine {
         if !self.trusted_keys.contains(&key_id.to_string()) {
             self.trusted_keys.push(key_id.to_string());
         }
-        format!("PR Proposal: Imported GPG key {} from keyserver.ubuntu.com", key_id)
+        format!(
+            "PR Proposal: Imported GPG key {} from keyserver.ubuntu.com",
+            key_id
+        )
     }
 }
 
@@ -356,7 +351,9 @@ impl ArchLinuxAdvancementsV37PrSuite {
     pub fn run_arch_v37_pr_validation(&mut self) -> bool {
         let cleanup = self.paccache.run_paccache_cleanup();
         let conf = self.pacman_conf.generate_pacman_conf_header();
-        let ala_url = self.downgrade.fetch_ala_package_url("linux", "6.8.1.arch1-1", "x86_64");
+        let ala_url = self
+            .downgrade
+            .fetch_ala_package_url("linux", "6.8.1.arch1-1", "x86_64");
         let wiki = self.wiki_docs.query_offline_wiki("Pacman");
         let makepkg = self.makepkg_conf.generate_makepkg_conf_snippet();
         let iso = self.archiso.generate_packages_x86_64();
@@ -398,14 +395,18 @@ mod tests {
     fn test_pacman_conf_parser() {
         let mut engine = ArchLinuxPacmanConfParserPrEngine::new();
         engine.set_parallel_downloads(10);
-        assert!(engine.generate_pacman_conf_header().contains("ParallelDownloads = 10"));
+        assert!(engine
+            .generate_pacman_conf_header()
+            .contains("ParallelDownloads = 10"));
     }
 
     #[test]
     fn test_downgrade_ala() {
         let engine = ArchLinuxDowngradeToolPrEngine::new();
         let url = engine.fetch_ala_package_url("bash", "5.2.0-1", "x86_64");
-        assert!(url.contains("archive.archlinux.org/packages/b/bash/bash-5.2.0-1-x86_64.pkg.tar.zst"));
+        assert!(
+            url.contains("archive.archlinux.org/packages/b/bash/bash-5.2.0-1-x86_64.pkg.tar.zst")
+        );
     }
 
     #[test]
@@ -418,7 +419,9 @@ mod tests {
     #[test]
     fn test_makepkg_conf_tuner() {
         let engine = ArchLinuxMakepkgConfTunerPrEngine::new();
-        assert!(engine.generate_makepkg_conf_snippet().contains("MAKEFLAGS="));
+        assert!(engine
+            .generate_makepkg_conf_snippet()
+            .contains("MAKEFLAGS="));
     }
 
     #[test]
@@ -434,7 +437,9 @@ mod tests {
     #[test]
     fn test_aur_pgp_and_master_v37_suite() {
         let mut pgp = ArchLinuxAurPgpKeyImportPrEngine::new();
-        assert!(pgp.import_key_from_keyserver("ABCDEF1234567890").contains("Imported"));
+        assert!(pgp
+            .import_key_from_keyserver("ABCDEF1234567890")
+            .contains("Imported"));
 
         let mut master = ArchLinuxAdvancementsV37PrSuite::new();
         assert!(master.run_arch_v37_pr_validation());

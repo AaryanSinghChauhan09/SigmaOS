@@ -438,11 +438,17 @@ pub use tech_media_publication_innovations::*;
 pub mod sovereign_open_source_os_gap_closure_pr;
 pub use sovereign_open_source_os_gap_closure_pr::*;
 
-pub mod open_source_os_unimplemented_ideas_pr_suite;
-pub use open_source_os_unimplemented_ideas_pr_suite::*;
+pub mod arch_linux_advancements_v37_pr;
+pub use arch_linux_advancements_v37_pr::*;
 
-pub mod cachy_linux_missing_components_engine;
-pub use cachy_linux_missing_components_engine::*;
+pub mod sovereign_open_source_os_gap_closure_v36_pr;
+pub use sovereign_open_source_os_gap_closure_v36_pr::*;
+
+pub mod sovereign_linux_bsd_gap_closure_v39_pr;
+pub use sovereign_linux_bsd_gap_closure_v39_pr::*;
+
+pub mod debian_linux_gap_closure_v40_pr;
+pub use debian_linux_gap_closure_v40_pr::*;
 
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;
