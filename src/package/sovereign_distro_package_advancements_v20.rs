@@ -365,12 +365,12 @@ impl SovereignDistroPackageAdvancementsSuiteV20 {
         payload: &[u8],
     ) -> Result<UnifiedPackage, String> {
         let spec = self.converter.convert_package(filename, payload)?;
-        let _pr = self.pr_pipeline.submit_package_pr(spec.clone());
+        let pr = self.pr_pipeline.submit_package_pr(spec.clone());
 
         let mut pkg =
-            UnifiedPackage::new(format!("sovereign-{}", pr.package_name), pr.version.clone())
+            UnifiedPackage::new(format!("sovereign-{}", pr.converted_spec.package_name), pr.converted_spec.version.clone())
                 .with_format(PackageFormat::SigmaPkg)
-                .with_provides(pr.package_name.clone());
+                .with_provides(pr.converted_spec.package_name.clone());
 
         for dep in &spec.canonical_dependencies {
             pkg = pkg.with_dependency(dep.clone());
@@ -390,7 +390,7 @@ impl SovereignDistroPackageAdvancementsSuiteV20 {
         let res = UniversalMultiPmCliForwarderEngineV20::forward_command(cmd)?;
         if !res.is_simulation && res.action == "install" {
             for p in &res.packages {
-                let name = format!("sigpkg-{}", p);
+                let name = format!("sovereign-{}", p);
                 if !self.installed_packages.contains(&name) {
                     self.installed_packages.push(name);
                 }
@@ -419,12 +419,12 @@ mod tests {
     fn test_converter_all_formats() {
         let converter = UniversalAllPackageFormatConverterV20::new();
 
-        let pr1 = engine
-            .ingest_foreign_package_pr("gcc-13.2.0.pkg.tar.zst", b"ARCH_PAYLOAD")
+        let gcc_spec = converter
+            .convert_package("gcc-13.2.0.pkg.tar.zst", b"ARCH_PAYLOAD")
             .unwrap();
-        assert_eq!(pr1.original_format, PackageFormat::Pacman);
-        assert_eq!(pr1.package_name, "gcc-13");
-        assert!(pr1
+        assert_eq!(gcc_spec.source_format, PackageFormat::Pacman);
+        assert_eq!(gcc_spec.package_name, "gcc");
+        assert!(gcc_spec
             .canonical_dependencies
             .contains(&"sovereign-libc".to_string()));
 
@@ -477,13 +477,13 @@ mod tests {
         let sigpkg = suite
             .convert_submit_and_install("vim-9.1.rpm", b"VIM_PAYLOAD")
             .unwrap();
-        assert_eq!(sigpkg.name, "sigpkg-vim");
-        assert!(suite.installed_packages.contains(&"sigpkg-vim".to_string()));
+        assert_eq!(sigpkg.name, "sovereign-vim");
+        assert!(suite.installed_packages.contains(&"sovereign-vim".to_string()));
 
         let response = suite.execute_cli_command("apt install tmux").unwrap();
         assert!(response.contains("tmux"));
         assert!(suite
             .installed_packages
-            .contains(&"sigpkg-tmux".to_string()));
+            .contains(&"sovereign-tmux".to_string()));
     }
 }

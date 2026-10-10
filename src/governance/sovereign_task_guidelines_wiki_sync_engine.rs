@@ -343,6 +343,10 @@ impl Default for SovereignTaskAndWikiGovernanceSuite {
 // =========================================================================
 
 #[cfg(test)]
+#[path = "../distro/sovereign_architecture_development_decision_plan.rs"]
+#[allow(dead_code)]
+mod sovereign_architecture_development_decision_plan;
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -360,14 +364,19 @@ mod tests {
 
     #[test]
     fn test_supreme_performance_addp_engine() {
-        let addp = SupremePerformanceAddpEngine::new();
-        assert!(addp.is_addp_compliant());
+        use sovereign_architecture_development_decision_plan::SovereignArchitectureDevelopmentDecisionPlanEngine;
+        let mut addp = SovereignArchitectureDevelopmentDecisionPlanEngine::new();
+        assert!(addp.evaluate_all_decisions_active());
 
-        let pr_proposal = AddpWikiPrProposalGenerator::generate_addp_wiki_pr_proposal(
-            "# ADDP Supreme Performance",
+        let pr_id = addp.submit_pr_proposal(
+            "sentinel",
+            "ADDP Supreme Performance Plan Verification",
+            "AD-001",
+            "--- a/addp.md\n+++ b/addp.md",
+            10_000_000.0,
+            b"pqc_signature",
         );
-        assert!(pr_proposal
-            .contains("wiki/23-Supreme-Performance-Architecture-Development-Decision-Plan.md"));
+        assert!(addp.validate_and_merge_proposal(pr_id).is_ok());
     }
 
     #[test]

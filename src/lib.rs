@@ -137,6 +137,7 @@ pub use distro::sovereign_linux_bsd_ecosystem_advancements_v22::*;
 pub use distro::sovereign_linux_bsd_ecosystem_advancements_v28::*;
 pub use distro::sovereign_linux_bsd_ecosystem_advancements_v29::*;
 pub use distro::sovereign_linux_bsd_master_synthesis::*;
+pub use distro::sovereign_linux_bsd_ecosystem_parity_v42_pr::*;
 pub use distro::sovereign_linux_bsd_pinnacle_innovations_v14::*;
 pub use distro::sovereign_media_and_distro_unimplemented_innovations::*;
 pub use distro::sovereign_mint_omarchy_apex_dominance_v30::*;
