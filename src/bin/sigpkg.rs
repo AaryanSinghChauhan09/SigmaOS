@@ -355,7 +355,9 @@ mod tests {
     #[test]
     fn test_format_flag_mapping() {
         assert_eq!(format_flag_for_source_pm("apt"), Some("--apt"));
+        assert_eq!(format_flag_for_source_pm("dpkg-query"), Some("--apt"));
         assert_eq!(format_flag_for_source_pm("dnf"), Some("--dnf"));
+        assert_eq!(format_flag_for_source_pm("rocky"), Some("--dnf"));
         assert_eq!(format_flag_for_source_pm("pacman"), Some("--pacman"));
         assert_eq!(format_flag_for_source_pm("apk"), Some("--apk"));
         assert_eq!(format_flag_for_source_pm("freebsd"), Some("--pkg"));
@@ -370,6 +372,10 @@ mod tests {
         assert_eq!(format_flag_for_source_pm("conan"), Some("--conan"));
         assert_eq!(format_flag_for_source_pm("flatpak"), Some("--flatpak"));
         assert_eq!(format_flag_for_source_pm("snap"), Some("--snap"));
+        assert_eq!(format_flag_for_source_pm("pip3"), Some("--wheel"));
+        assert_eq!(format_flag_for_source_pm("clearlinux"), Some("--swupd"));
+        assert_eq!(format_flag_for_source_pm("bedrock"), Some("--stratum"));
+        assert_eq!(format_flag_for_source_pm("crux"), Some("--crux"));
     }
 
     #[test]
@@ -410,10 +416,9 @@ mod tests {
 
 fn format_flag_for_source_pm(source_pm: &str) -> Option<&'static str> {
     match source_pm.to_lowercase().as_str() {
-        "apt" | "apt-get" | "dpkg" | "debian" | "ubuntu" => Some("--apt"),
-        "dnf" | "yum" | "microdnf" | "rpm" | "fedora" | "rhel" | "centos" | "urpmi" => {
-            Some("--dnf")
-        }
+        "apt" | "apt-get" | "dpkg" | "dpkg-query" | "debian" | "ubuntu" => Some("--apt"),
+        "dnf" | "yum" | "microdnf" | "rpm" | "urpmq" | "urpme" | "urpmi" | "fedora" | "rhel"
+        | "centos" | "rocky" | "alma" | "almalinux" => Some("--dnf"),
         "pacman" | "yay" | "paru" | "pikaur" | "trizen" | "aura" | "arch" | "manjaro" | "cachy"
         | "cachyos" => Some("--pacman"),
         "apk" | "alpine" => Some("--apk"),
@@ -434,7 +439,7 @@ fn format_flag_for_source_pm(source_pm: &str) -> Option<&'static str> {
         "flatpak" => Some("--flatpak"),
         "snap" => Some("--snap"),
         "appimage" => Some("--appimage"),
-        "pip" => Some("--wheel"),
+        "pip" | "pip3" => Some("--wheel"),
         "cargo" => Some("--crate"),
         "gem" => Some("--gem"),
         "nuget" => Some("--nupkg"),
@@ -443,7 +448,9 @@ fn format_flag_for_source_pm(source_pm: &str) -> Option<&'static str> {
         "conan" => Some("--conan"),
         "brew" => Some("--bottle"),
         "opkg" | "ipkg" => Some("--opkg"),
-        "swupd" => Some("--swupd"),
+        "swupd" | "clearlinux" => Some("--swupd"),
+        "stratum" | "bedrock" => Some("--stratum"),
+        "crux" | "pkgmk" | "pkgadd" | "pkgrm" | "pkginfo" => Some("--crux"),
         _ => None,
     }
 }
