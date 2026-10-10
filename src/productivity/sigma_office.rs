@@ -6508,7 +6508,10 @@ impl SovereignAcademicCitationEngine {
                         .publisher
                         .map(|p| format!(" {}:", p))
                         .unwrap_or_default();
-                    format!("{}. {}.{} {}.", item.author, item.title, pub_str, item.year)
+                    format!(
+                        "{}. {}.{} {}.",
+                        item.author, item.title, pub_str, item.year
+                    )
                 }
                 CitationStyle::IEEE => {
                     let pub_str = item
@@ -6564,12 +6567,7 @@ impl SovereignDataStorytellingEngine {
     }
 
     /// Automatically generates an executive summary narrative based on metric growth trend.
-    pub fn generate_narrative_summary(
-        &self,
-        metric_name: &str,
-        old_val: f64,
-        new_val: f64,
-    ) -> String {
+    pub fn generate_narrative_summary(&self, metric_name: &str, old_val: f64, new_val: f64) -> String {
         let diff = new_val - old_val;
         let pct = if old_val != 0.0 {
             (diff / old_val) * 100.0
@@ -6587,9 +6585,7 @@ impl SovereignDataStorytellingEngine {
         } else if pct < -10.0 {
             format!(
                 "Decline detected in {}: dropped by {:.1}% ({:.2}). Action required.",
-                metric_name,
-                pct.abs(),
-                diff
+                metric_name, pct.abs(), diff
             )
         } else {
             format!(
@@ -6676,16 +6672,10 @@ impl SovereignChurnPredictionRetentionEngine {
     /// Recommends automated retention actions based on churn risk.
     pub fn recommend_retention_workflow(&self, risk: ChurnRiskLevel) -> &'static str {
         match risk {
-            ChurnRiskLevel::Low => {
-                "Nurture sequence: monthly newsletter and product update features"
-            }
+            ChurnRiskLevel::Low => "Nurture sequence: monthly newsletter and product update features",
             ChurnRiskLevel::Medium => "Check-in email from Customer Success Representative",
-            ChurnRiskLevel::High => {
-                "Schedule executive phone review & offer usage training webinar"
-            }
-            ChurnRiskLevel::Critical => {
-                "Immediate priority escalation to Account Director & 20% renewal discount offer"
-            }
+            ChurnRiskLevel::High => "Schedule executive phone review & offer usage training webinar",
+            ChurnRiskLevel::Critical => "Immediate priority escalation to Account Director & 20% renewal discount offer",
         }
     }
 }
@@ -6792,21 +6782,14 @@ impl SovereignFinancialValuationEngine {
 
         // Terminal value
         let last_cf = *projected_cash_flows.last().unwrap();
-        let terminal_value =
-            (last_cf * (1.0 + terminal_growth_rate)) / (wacc - terminal_growth_rate);
-        let discounted_terminal_value =
-            terminal_value / (1.0 + wacc).powf(projected_cash_flows.len() as f64);
+        let terminal_value = (last_cf * (1.0 + terminal_growth_rate)) / (wacc - terminal_growth_rate);
+        let discounted_terminal_value = terminal_value / (1.0 + wacc).powf(projected_cash_flows.len() as f64);
 
         npv + discounted_terminal_value
     }
 
     /// Generates multi-period cash flow forecast given initial cash flow and constant growth rate.
-    pub fn forecast_cash_flows(
-        &self,
-        initial_cf: f64,
-        annual_growth_rate: f64,
-        periods: usize,
-    ) -> Vec<f64> {
+    pub fn forecast_cash_flows(&self, initial_cf: f64, annual_growth_rate: f64, periods: usize) -> Vec<f64> {
         let mut forecast = Vec::with_capacity(periods);
         let mut current = initial_cf;
         for _ in 0..periods {
@@ -6970,8 +6953,7 @@ impl SovereignBitrix24OmnichannelTelephonyCrmEngine {
             transcript.to_string(),
         ));
 
-        let auto_created_lead =
-            transcript.contains("pricing") || transcript.contains("quote") || duration_sec > 180;
+        let auto_created_lead = transcript.contains("pricing") || transcript.contains("quote") || duration_sec > 180;
         let summary = format!(
             "Logged call [{}] from {} ({}s). Lead auto-created: {}",
             call_id, phone_number, duration_sec, auto_created_lead
@@ -7094,11 +7076,7 @@ impl SovereignAiDocumentSummarizerEngine {
     }
 
     /// Extracts key bullet points and executive summary from document text.
-    pub fn generate_executive_summary(
-        &self,
-        document_text: &str,
-        max_bullets: usize,
-    ) -> Vec<String> {
+    pub fn generate_executive_summary(&self, document_text: &str, max_bullets: usize) -> Vec<String> {
         let sentences: Vec<_> = document_text
             .split(&['.', '!', '?'][..])
             .map(|s| s.trim())
@@ -7327,6 +7305,149 @@ impl SovereignEnterpriseResourceAllocationEngine {
         let is_overallocated = util_pct > 100.0;
 
         (util_pct, is_overallocated)
+    }
+}
+
+// ---------------------------------------------------------------------------
+// 15. Google Workspace / Looker Studio Executive Report Exporter Engine
+// ---------------------------------------------------------------------------
+
+/// Executive report section object.
+#[derive(Debug, Clone)]
+pub struct ExecutiveReportSection {
+    pub section_title: String,
+    pub content_summary: String,
+    pub metric_kpis: Vec<(String, String)>,
+}
+
+/// Sovereign Executive Report Exporter Engine inspired by Google Workspace & Looker Studio.
+#[derive(Debug, Clone, Default)]
+pub struct SovereignExecutiveReportExporterEngine {
+    sections: Vec<ExecutiveReportSection>,
+}
+
+impl SovereignExecutiveReportExporterEngine {
+    pub fn new() -> Self {
+        Self {
+            sections: Vec::new(),
+        }
+    }
+
+    /// Adds an executive section to the report bundle.
+    pub fn add_section(&mut self, section: ExecutiveReportSection) {
+        self.sections.push(section);
+    }
+
+    /// Generates executive HTML report document with cover header, TOC, and metrics.
+    pub fn export_executive_html_report(&self, report_title: &str, author: &str) -> String {
+        let mut html = format!(
+            "<!DOCTYPE html><html><head><title>{}</title></head><body>\n",
+            report_title
+        );
+        html.push_str(&format!(
+            "<div class=\"cover\"><h1>{}</h1><h3>Prepared by: {}</h3></div>\n<hr/>\n",
+            report_title, author
+        ));
+
+        html.push_str("<div class=\"toc\"><h2>Table of Contents</h2><ul>\n");
+        for sec in &self.sections {
+            html.push_str(&format!("<li>{}</li>\n", sec.section_title));
+        }
+        html.push_str("</ul></div>\n<hr/>\n");
+
+        for sec in &self.sections {
+            html.push_str(&format!(
+                "<section><h2>{}</h2><p>{}</p><ul>\n",
+                sec.section_title, sec.content_summary
+            ));
+            for (k, v) in &sec.metric_kpis {
+                html.push_str(&format!("<li><strong>{}</strong>: {}</li>\n", k, v));
+            }
+            html.push_str("</ul></section>\n");
+        }
+
+        html.push_str("<footer>CONFIDENTIAL - Sovereign OS Enterprise Report</footer></body></html>");
+        html
+    }
+}
+
+// ---------------------------------------------------------------------------
+// 16. Bitrix24 / Salesforce / Odoo Enterprise Workflow Audit Trail Engine
+// ---------------------------------------------------------------------------
+
+/// Audit log entry tracking enterprise operations.
+#[derive(Debug, Clone)]
+pub struct EnterpriseAuditLogEntry {
+    pub entry_id: u64,
+    pub actor_id: String,
+    pub action: String,
+    pub resource: String,
+    pub timestamp: u64,
+    pub prev_hash: String,
+}
+
+/// Sovereign Enterprise Workflow Audit Trail Engine inspired by Bitrix24, Salesforce & Odoo.
+#[derive(Debug, Clone, Default)]
+pub struct SovereignEnterpriseWorkflowAuditTrailEngine {
+    audit_chain: Vec<EnterpriseAuditLogEntry>,
+    next_id: u64,
+}
+
+impl SovereignEnterpriseWorkflowAuditTrailEngine {
+    pub fn new() -> Self {
+        Self {
+            audit_chain: Vec::new(),
+            next_id: 1,
+        }
+    }
+
+    /// Logs an immutable audit entry with hash chain linkage.
+    pub fn log_action(
+        &mut self,
+        actor_id: &str,
+        action: &str,
+        resource: &str,
+        timestamp: u64,
+    ) -> String {
+        let prev_hash = self
+            .audit_chain
+            .last()
+            .map(|e| format!("hash_entry_{}", e.entry_id))
+            .unwrap_or_else(|| "0000000000000000".to_string());
+
+        let entry = EnterpriseAuditLogEntry {
+            entry_id: self.next_id,
+            actor_id: actor_id.to_string(),
+            action: action.to_string(),
+            resource: resource.to_string(),
+            timestamp,
+            prev_hash: prev_hash.clone(),
+        };
+
+        self.next_id += 1;
+        let entry_hash = format!("hash_entry_{}", entry.entry_id);
+        self.audit_chain.push(entry);
+        entry_hash
+    }
+
+    /// Verifies audit log chain continuity.
+    pub fn verify_chain_integrity(&self) -> bool {
+        for i in 1..self.audit_chain.len() {
+            let expected_prev = format!("hash_entry_{}", self.audit_chain[i - 1].entry_id);
+            if self.audit_chain[i].prev_hash != expected_prev {
+                return false;
+            }
+        }
+        true
+    }
+
+    /// Retrieves all audit logs for a target resource.
+    pub fn get_resource_audit_history(&self, resource: &str) -> Vec<EnterpriseAuditLogEntry> {
+        self.audit_chain
+            .iter()
+            .filter(|e| e.resource == resource)
+            .cloned()
+            .collect()
     }
 }
 
@@ -8574,10 +8695,7 @@ mod tests {
             active_contract_months: 18,
             monthly_active_users: 25,
         };
-        assert_eq!(
-            churn_engine.predict_churn_risk(&healthy_customer),
-            ChurnRiskLevel::Low
-        );
+        assert_eq!(churn_engine.predict_churn_risk(&healthy_customer), ChurnRiskLevel::Low);
 
         let critical_customer = CustomerMetrics {
             customer_id: "c2".to_string(),
@@ -8586,10 +8704,7 @@ mod tests {
             active_contract_months: 2,
             monthly_active_users: 1,
         };
-        assert_eq!(
-            churn_engine.predict_churn_risk(&critical_customer),
-            ChurnRiskLevel::Critical
-        );
+        assert_eq!(churn_engine.predict_churn_risk(&critical_customer), ChurnRiskLevel::Critical);
 
         // 9. SovereignOmnichannelCommunicationGateway
         let mut comms_gateway = SovereignOmnichannelCommunicationGateway::new();
@@ -8635,9 +8750,7 @@ mod tests {
         let mut occupied = HashMap::new();
         let res = array_spill.evaluate_sequence_spill((1, 1), 2, 2, 1.0, 1.0, &occupied);
         match res {
-            DynamicArraySpillResult::Success {
-                rows, cols, values, ..
-            } => {
+            DynamicArraySpillResult::Success { rows, cols, values, .. } => {
                 assert_eq!(rows, 2);
                 assert_eq!(cols, 2);
                 assert_eq!(values[0], vec![1.0, 2.0]);
@@ -8657,27 +8770,19 @@ mod tests {
 
         // 12. SovereignSalesforceEinsteinAnalyticsPipelineEngine
         let einstein_engine = SovereignSalesforceEinsteinAnalyticsPipelineEngine::new();
-        let (prob, action) =
-            einstein_engine.evaluate_deal_pipeline_opportunity(250000.0, 0.8, 5, true);
+        let (prob, action) = einstein_engine.evaluate_deal_pipeline_opportunity(250000.0, 0.8, 5, true);
         assert!(prob >= 0.75);
         assert!(action.contains("Send formal contract proposal"));
 
         // 13. SovereignBitrix24OmnichannelTelephonyCrmEngine
         let mut pbx_engine = SovereignBitrix24OmnichannelTelephonyCrmEngine::new();
-        let (summary, auto_lead) = pbx_engine.process_pbx_call_event(
-            "call_001",
-            "+18005550199",
-            240,
-            "Discussed enterprise pricing quote.",
-        );
+        let (summary, auto_lead) = pbx_engine.process_pbx_call_event("call_001", "+18005550199", 240, "Discussed enterprise pricing quote.");
         assert!(auto_lead);
         assert!(summary.contains("Lead auto-created: true"));
 
         // 14. SovereignGoogleSmartCanvasChipEngine
         let chip_engine = SovereignGoogleSmartCanvasChipEngine::new();
-        let chip = chip_engine
-            .parse_chip_notation("@Person:Ada Lovelace")
-            .unwrap();
+        let chip = chip_engine.parse_chip_notation("@Person:Ada Lovelace").unwrap();
         assert_eq!(chip.kind, SmartCanvasChipKind::Person);
         assert_eq!(chip.label, "👤 Ada Lovelace");
 
@@ -8692,11 +8797,7 @@ mod tests {
 
         // 16. SovereignSmartDocumentTemplateEngine
         let mut template_engine = SovereignSmartDocumentTemplateEngine::new();
-        template_engine.register_template(
-            "tpl1",
-            "Service Agreement",
-            "Agreement for {{client_name}}: Total {{total_amount}}",
-        );
+        template_engine.register_template("tpl1", "Service Agreement", "Agreement for {{client_name}}: Total {{total_amount}}");
         let mut ctx = HashMap::new();
         ctx.insert("client_name".to_string(), "Acme Corp".to_string());
         ctx.insert("total_amount".to_string(), "$50,000".to_string());
@@ -8706,13 +8807,10 @@ mod tests {
         // 17. SovereignLandingPageCmsEngine
         let mut cms_engine = SovereignLandingPageCmsEngine::new();
         let page_id = cms_engine.create_page("Home", "home");
-        assert!(cms_engine.add_block(
-            page_id,
-            CmsBlockType::HeroBanner {
-                title: "Welcome to SigmaOS Workstation".to_string(),
-                subtitle: "Empowering sovereign productivity.".to_string(),
-            }
-        ));
+        assert!(cms_engine.add_block(page_id, CmsBlockType::HeroBanner {
+            title: "Welcome to SigmaOS Workstation".to_string(),
+            subtitle: "Empowering sovereign productivity.".to_string(),
+        }));
         let html = cms_engine.render_html(page_id).unwrap();
         assert!(html.contains("<h1>Welcome to SigmaOS Workstation</h1>"));
         assert!(html.contains("Empowering sovereign productivity."));
@@ -8784,5 +8882,28 @@ mod tests {
         let (util, overallocated) = res_engine.calculate_capacity_utilization_pct("dev_alice");
         assert_eq!(util, 112.5);
         assert!(overallocated);
+
+        // 22. SovereignExecutiveReportExporterEngine
+        let mut report_exporter = SovereignExecutiveReportExporterEngine::new();
+        report_exporter.add_section(ExecutiveReportSection {
+            section_title: "Financial Growth".to_string(),
+            content_summary: "Q1 ARR expanded significantly across Enterprise accounts.".to_string(),
+            metric_kpis: vec![("ARR".to_string(), "$12.5M".to_string())],
+        });
+        let html_report = report_exporter.export_executive_html_report("Q1 Business Review", "CEO");
+        assert!(html_report.contains("<h1>Q1 Business Review</h1>"));
+        assert!(html_report.contains("Prepared by: CEO"));
+        assert!(html_report.contains("Financial Growth"));
+
+        // 23. SovereignEnterpriseWorkflowAuditTrailEngine
+        let mut audit_engine = SovereignEnterpriseWorkflowAuditTrailEngine::new();
+        let hash1 = audit_engine.log_action("admin", "update_deal_stage", "deal_202", 100);
+        let hash2 = audit_engine.log_action("finance_lead", "approve_discount", "deal_202", 105);
+        assert_eq!(hash1, "hash_entry_1");
+        assert_eq!(hash2, "hash_entry_2");
+        assert!(audit_engine.verify_chain_integrity());
+
+        let history = audit_engine.get_resource_audit_history("deal_202");
+        assert_eq!(history.len(), 2);
     }
 }
