@@ -1,0 +1,27 @@
+[rule.vfs_completeness]
+requirement = "File management defines descriptor, inode, permission, and lock semantics."
+enforcement = "VFS tests + rehearsals"
+
+[rule.no_leak]
+requirement = "VFS leaks are zero under stress tests."
+enforcement = "VFS stress tests"
+
+[rule.oom_metric]
+requirement = "VFS defines and measures OOM behavior."
+enforcement = "Limit rehearsal"
+
+[rule.mount_integrity]
+requirement = "Mount/unmount preserves filesystem and scheduler integrity."
+enforcement = "Mount rehearsal"
+
+[rule.permission_semantics]
+requirement = "Mapping protection defines legal access and error codes."
+enforcement = "Protection tests"
+
+[rule.no_model_only_status]
+requirement = "VFS features cannot be marked complete from model tests alone."
+enforcement = "Status audit"
+
+[rule.runtime_evidence]
+requirement = "Boot-affecting VFS changes require boot-to-shell or integration evidence."
+enforcement = "CI boot gate"
