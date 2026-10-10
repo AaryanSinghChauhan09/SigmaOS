@@ -4015,7 +4015,9 @@ impl SovereignRuffFastLinterEngine {
                     fixable: true,
                 });
             }
-            if self.enabled_rules.contains(&"F401".to_string()) && line.contains("import unused_module") {
+            if self.enabled_rules.contains(&"F401".to_string())
+                && line.contains("import unused_module")
+            {
                 diags.push(LintDiagnosticRule {
                     code: "F401".to_string(),
                     file_path: path.to_string(),
@@ -4200,7 +4202,11 @@ impl SovereignWasmtimeWasiPreview2Engine {
         });
     }
 
-    pub fn invoke_component_export(&mut self, component_name: &str, func: &str) -> Result<u64, &'static str> {
+    pub fn invoke_component_export(
+        &mut self,
+        component_name: &str,
+        func: &str,
+    ) -> Result<u64, &'static str> {
         let comp = self
             .components
             .iter()
@@ -4587,7 +4593,11 @@ impl SovereignGhidraReverseEngineeringEngine {
         }
     }
 
-    pub fn disassemble_bytes(&mut self, base_addr: u64, bytes: &[u8]) -> Vec<DisassembledInstruction> {
+    pub fn disassemble_bytes(
+        &mut self,
+        base_addr: u64,
+        bytes: &[u8],
+    ) -> Vec<DisassembledInstruction> {
         let mut result = Vec::new();
         let mut offset = 0;
 
@@ -4958,7 +4968,9 @@ impl SovereignCosmopolitanApepolyglotEngine {
             return Err("APE: Binary payload too small");
         }
 
-        let is_ape = binary_bytes.starts_with(b"MZqFpD") || binary_bytes.starts_with(b"\x7fELF") || binary_bytes.starts_with(b"MZ");
+        let is_ape = binary_bytes.starts_with(b"MZqFpD")
+            || binary_bytes.starts_with(b"\x7fELF")
+            || binary_bytes.starts_with(b"MZ");
 
         Ok(ApeBinaryHeader {
             is_valid_ape: is_ape,
@@ -5084,7 +5096,9 @@ pub struct SovereignFuchsiaFidlWireCodecEngine {
 
 impl SovereignFuchsiaFidlWireCodecEngine {
     pub fn new() -> Self {
-        Self { max_wire_version: 2 }
+        Self {
+            max_wire_version: 2,
+        }
     }
 
     pub fn encode_fidl_table(&self, ordinal: u64, fields: &[FidlTableField]) -> Vec<u8> {
@@ -5100,7 +5114,10 @@ impl SovereignFuchsiaFidlWireCodecEngine {
         encoded
     }
 
-    pub fn decode_fidl_table(&self, payload: &[u8]) -> Result<(u64, Vec<FidlTableField>), &'static str> {
+    pub fn decode_fidl_table(
+        &self,
+        payload: &[u8],
+    ) -> Result<(u64, Vec<FidlTableField>), &'static str> {
         if payload.len() < 12 {
             return Err("FIDL: Wire payload too small");
         }
@@ -5115,7 +5132,8 @@ impl SovereignFuchsiaFidlWireCodecEngine {
                 break;
             }
             let ord = u32::from_le_bytes(payload[offset..offset + 4].try_into().unwrap());
-            let len = u32::from_le_bytes(payload[offset + 4..offset + 8].try_into().unwrap()) as usize;
+            let len =
+                u32::from_le_bytes(payload[offset + 4..offset + 8].try_into().unwrap()) as usize;
             offset += 8;
 
             if offset + len <= payload.len() {
@@ -5178,7 +5196,12 @@ impl SovereignNixGuixFunctionalBuildEngine {
         }
     }
 
-    pub fn instantiate_derivation(&mut self, drv_name: &str, inputs: &[&str], builder_cmd: &str) -> String {
+    pub fn instantiate_derivation(
+        &mut self,
+        drv_name: &str,
+        inputs: &[&str],
+        builder_cmd: &str,
+    ) -> String {
         let hash = format!("nar_hash_sha256_{:x}", drv_name.len() + inputs.len() * 31);
         self.derivations.push(DerivationSpec {
             name: drv_name.to_string(),
@@ -5189,7 +5212,10 @@ impl SovereignNixGuixFunctionalBuildEngine {
         hash
     }
 
-    pub fn execute_sandboxed_build(&mut self, drv_hash: &str) -> Result<NarArchivePackage, &'static str> {
+    pub fn execute_sandboxed_build(
+        &mut self,
+        drv_hash: &str,
+    ) -> Result<NarArchivePackage, &'static str> {
         let drv = self
             .derivations
             .iter()
@@ -5288,7 +5314,11 @@ impl SovereignOpenBsdPfAltqEngine {
             let proto_match = rule.protocol == "any" || rule.protocol == proto;
             let port_match = rule.destination_port == 0 || rule.destination_port == dst_port;
 
-            let cidr_prefix = rule.source_cidr.split('/').next().unwrap_or(&rule.source_cidr);
+            let cidr_prefix = rule
+                .source_cidr
+                .split('/')
+                .next()
+                .unwrap_or(&rule.source_cidr);
             let src_prefix = src_ip.split('.').next().unwrap_or(src_ip);
             let rule_prefix = cidr_prefix.split('.').next().unwrap_or(cidr_prefix);
 
@@ -5527,10 +5557,15 @@ impl SovereignOpenSourceObsoletionOrchestrator {
             uutils_coreutils: SovereignUutilsCoreutilsEngine::new(),
             freebsd_jail_rctl: SovereignFreeBsdJailRctlEngine::new(),
             nix_flake_lock: SovereignNixFlakeLockEngine::new(),
-            ghostty_gpu_font_renderer: SovereignGhosttyGpuFontRendererEngine::new("Sovereign Mono", 12.0),
+            ghostty_gpu_font_renderer: SovereignGhosttyGpuFontRendererEngine::new(
+                "Sovereign Mono",
+                12.0,
+            ),
             fish_autosuggestion_syntax: SovereignFishAutosuggestionSyntaxEngine::new(),
             ruff_fast_linter: SovereignRuffFastLinterEngine::new(),
-            typst_pdf_compiler: SovereignTypstPdfCompilerEngine::new("SigmaOS Technical Specification"),
+            typst_pdf_compiler: SovereignTypstPdfCompilerEngine::new(
+                "SigmaOS Technical Specification",
+            ),
             tetragon_ebpf_audit: SovereignTetragonEbpfAuditEngine::new(),
             wasmtime_wasi_preview2: SovereignWasmtimeWasiPreview2Engine::new(),
             trivy_scanner: SovereignTrivyContainerVulnerabilityScannerEngine::new(),
@@ -5709,33 +5744,64 @@ impl SovereignOpenSourceObsoletionOrchestrator {
         );
         assert!(self.nix_flake_lock.verify_flake_lockfile());
 
-        let _ = self.ghostty_gpu_font_renderer.render_terminal_grid_gpu("SigmaOS");
-        self.fish_autosuggestion_syntax.record_history("sigma status");
+        let _ = self
+            .ghostty_gpu_font_renderer
+            .render_terminal_grid_gpu("SigmaOS");
+        self.fish_autosuggestion_syntax
+            .record_history("sigma status");
         let _ = self.ruff_fast_linter.lint_source_code("main.py", "x = 1\n");
-        let _ = self.typst_pdf_compiler.compile_markup_to_pdf("= Title\nContent");
-        self.tetragon_ebpf_audit.register_sensor(1, "sys_execve", true);
-        self.wasmtime_wasi_preview2.register_wasi_component("component_1", &["run"]);
+        let _ = self
+            .typst_pdf_compiler
+            .compile_markup_to_pdf("= Title\nContent");
+        self.tetragon_ebpf_audit
+            .register_sensor(1, "sys_execve", true);
+        self.wasmtime_wasi_preview2
+            .register_wasi_component("component_1", &["run"]);
 
-        self.trivy_scanner.register_vulnerability("CVE-2026-9999", "CRITICAL", "sovereign-kernel", "Memory issue");
-        self.aria2_downloader.add_download_source("http://dist.sigmaos.org/pkg.tar.zst");
-        self.just_task_runner.register_recipe("build", &["cargo build --release"]);
-        self.supabase_postgrest.register_table("users", &["id", "username", "role"]);
-        self.suricata_ids.add_signature_rule(1001, "TCP", "any", 80, "ALERT HTTP Traffic");
+        self.trivy_scanner.register_vulnerability(
+            "CVE-2026-9999",
+            "CRITICAL",
+            "sovereign-kernel",
+            "Memory issue",
+        );
+        self.aria2_downloader
+            .add_download_source("http://dist.sigmaos.org/pkg.tar.zst");
+        self.just_task_runner
+            .register_recipe("build", &["cargo build --release"]);
+        self.supabase_postgrest
+            .register_table("users", &["id", "username", "role"]);
+        self.suricata_ids
+            .add_signature_rule(1001, "TCP", "any", 80, "ALERT HTTP Traffic");
         let _ = self.caddy_tls.provision_acme_certificate("api.sigmaos.org");
 
-        let _ghidra_instrs = self.ghidra_re.disassemble_bytes(0x1000, b"\x90\x31\xc0\xc3");
+        let _ghidra_instrs = self
+            .ghidra_re
+            .disassemble_bytes(0x1000, b"\x90\x31\xc0\xc3");
         self.kismet_wireless.hop_channel();
-        self.bioctl_raid.register_volume("sd0", "RAID1", &["sd0a", "sd0b"]);
-        let dom = self.libweb_engine.parse_html_tokens("<body><main></main></body>");
+        self.bioctl_raid
+            .register_volume("sd0", "RAID1", &["sd0a", "sd0b"]);
+        let dom = self
+            .libweb_engine
+            .parse_html_tokens("<body><main></main></body>");
         let _layout = self.libweb_engine.construct_layout_tree(&dom);
-        self.mojo_compiler.build_tensor_graph("tensor_0", &[1, 64, 64], SimdVectorWidth::Avx512_512);
-        let _ape_header = self.ape_polyglot.validate_ape_stub(b"MZqFpD_stub_header_bytes_padding_long_enough_for_validation");
-        self.templeos_vga.set_vga_pixel(10, 10, VgaColor16::LightCyan);
+        self.mojo_compiler.build_tensor_graph(
+            "tensor_0",
+            &[1, 64, 64],
+            SimdVectorWidth::Avx512_512,
+        );
+        let _ape_header = self
+            .ape_polyglot
+            .validate_ape_stub(b"MZqFpD_stub_header_bytes_padding_long_enough_for_validation");
+        self.templeos_vga
+            .set_vga_pixel(10, 10, VgaColor16::LightCyan);
         let fidl_payload = self.fidl_codec.encode_fidl_table(1001, &[]);
         let _ = self.fidl_codec.decode_fidl_table(&fidl_payload);
-        let drv_hash = self.functional_build.instantiate_derivation("sigma_core", &["gcc"], "make");
+        let drv_hash = self
+            .functional_build
+            .instantiate_derivation("sigma_core", &["gcc"], "make");
         let _pkg = self.functional_build.execute_sandboxed_build(&drv_hash);
-        self.pf_altq.add_pf_rule("pass", "tcp", "0.0.0.0/0", 80, Some("http_queue"));
+        self.pf_altq
+            .add_pf_rule("pass", "tcp", "0.0.0.0/0", 80, Some("http_queue"));
 
         Ok(format!(
             "Sovereign Stack Active: {} legacy open-source projects obsoleted",
@@ -9186,7 +9252,9 @@ mod tests {
     #[test]
     fn test_sovereign_typst_pdf_compiler_engine() {
         let mut typst = SovereignTypstPdfCompilerEngine::new("Architecture Specification");
-        let pdf_data = typst.compile_markup_to_pdf("= Chapter 1\nSection details").unwrap();
+        let pdf_data = typst
+            .compile_markup_to_pdf("= Chapter 1\nSection details")
+            .unwrap();
         assert!(pdf_data.starts_with(b"%PDF-1.7"));
         assert!(pdf_data.ends_with(b"%%EOF"));
         assert_eq!(typst.compiled_pages.len(), 2);
@@ -9209,10 +9277,14 @@ mod tests {
         let mut wasi = SovereignWasmtimeWasiPreview2Engine::new();
         wasi.register_wasi_component("http_router", &["handle_http_request", "init"]);
 
-        let res = wasi.invoke_component_export("http_router", "handle_http_request").unwrap();
+        let res = wasi
+            .invoke_component_export("http_router", "handle_http_request")
+            .unwrap();
         assert_eq!(res, 1);
         assert_eq!(wasi.executed_invocations, 1);
-        assert!(wasi.invoke_component_export("http_router", "nonexistent").is_err());
+        assert!(wasi
+            .invoke_component_export("http_router", "nonexistent")
+            .is_err());
     }
 
     #[test]
@@ -9675,7 +9747,10 @@ mod tests {
         let mut pg = SovereignSupabasePostgrestEngine::new();
         pg.register_table("audit_logs", &["id", "timestamp", "action"]);
         let endpoint = pg.auto_generate_endpoint("audit_logs").unwrap();
-        assert_eq!(endpoint, "/api/v1/rest/audit_logs?select=id,timestamp,action");
+        assert_eq!(
+            endpoint,
+            "/api/v1/rest/audit_logs?select=id,timestamp,action"
+        );
         assert_eq!(pg.total_api_calls, 1);
         assert_eq!(pg.auto_generate_endpoint("nonexistent"), None);
     }
@@ -9843,7 +9918,8 @@ mod tests {
     #[test]
     fn test_sovereign_nix_guix_functional_build_engine() {
         let mut build_env = SovereignNixGuixFunctionalBuildEngine::new();
-        let drv_hash = build_env.instantiate_derivation("sigma_core", &["gcc", "musl"], "cargo build");
+        let drv_hash =
+            build_env.instantiate_derivation("sigma_core", &["gcc", "musl"], "cargo build");
         assert!(drv_hash.starts_with("nar_hash_sha256"));
 
         let pkg = build_env.execute_sandboxed_build(&drv_hash).unwrap();
