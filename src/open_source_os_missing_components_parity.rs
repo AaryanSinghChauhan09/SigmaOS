@@ -971,4 +971,296 @@ mod tests {
         let invalid_bytes = b"ELF.....";
         assert!(!engine.is_valid_ape(invalid_bytes));
     }
+
+    #[test]
+    fn test_amigaos_exec_library_engine() {
+        let mut exec = AmigaOsExecLibraryEngine::new();
+        assert!(exec.create_port("RenderPort", 1001));
+        assert_eq!(exec.put_message("RenderPort", 2002, b"DRAW_FRAME"), Ok(1));
+        let msg = exec.get_message("RenderPort").unwrap();
+        assert_eq!(msg.data, b"DRAW_FRAME");
+
+        exec.set_signal_mask(1001, 0x00000004);
+        assert!(exec.check_signal(1001, 0x00000004));
+    }
+
+    #[test]
+    fn test_beos_media_kit_engine() {
+        let mut media = BeOsMediaKitEngine::new();
+        assert!(media.register_node(1, "AudioProducer", 1)); // Producer
+        assert!(media.register_node(2, "AudioConsumer", 2)); // Consumer
+        assert!(media.connect_nodes(1, 2, 44100));
+        assert!(media.start_node(1));
+        assert!(media.start_node(2));
+        assert_eq!(media.active_connections_count(), 1);
+    }
+
+    #[test]
+    fn test_plan9_rfork_namespace_engine() {
+        let mut plan9 = Plan9RforkNamespaceEngine::new();
+        plan9.set_env(100, "TERM", "vt100");
+        let child_pid = plan9.rfork(100, 200, RFORK_RFENV | RFORK_RFFDG).unwrap();
+        assert_eq!(child_pid, 200);
+
+        // Child environment update shouldn't modify parent
+        plan9.set_env(200, "TERM", "xterm-256color");
+        assert_eq!(plan9.get_env(100, "TERM").unwrap(), "vt100");
+        assert_eq!(plan9.get_env(200, "TERM").unwrap(), "xterm-256color");
+    }
+
+    #[test]
+    fn test_openbsd_pledge_unveil_engine() {
+        let mut sec = OpenBsdPledgeUnveilEngine::new();
+        assert!(sec.pledge(1000, &["stdio", "rpath"]));
+        assert!(sec.check_pledge(1000, "stdio"));
+        assert!(!sec.check_pledge(1000, "exec"));
+
+        assert!(sec.unveil(1000, "/usr/share", "r"));
+        assert!(sec.check_unveil(1000, "/usr/share/fonts", "r"));
+        assert!(!sec.check_unveil(1000, "/etc/shadow", "r"));
+    }
+}
+
+/// 11. AmigaOS Exec Library Preemptive Multitasking & Signal Message Port Engine
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AmigaMessage {
+    pub msg_id: u64,
+    pub sender_pid: u64,
+    pub data: Vec<u8>,
+}
+
+#[derive(Debug, Default)]
+pub struct AmigaOsExecLibraryEngine {
+    pub ports: BTreeMap<String, (u64, Vec<AmigaMessage>)>, // PortName -> (OwnerPID, Queue)
+    pub signals: BTreeMap<u64, u32>,                     // PID -> SignalMask
+    pub next_msg_id: u64,
+}
+
+impl AmigaOsExecLibraryEngine {
+    pub fn new() -> Self {
+        Self {
+            ports: BTreeMap::new(),
+            signals: BTreeMap::new(),
+            next_msg_id: 1,
+        }
+    }
+
+    pub fn create_port(&mut self, port_name: &str, owner_pid: u64) -> bool {
+        if self.ports.contains_key(port_name) {
+            return false;
+        }
+        self.ports.insert(port_name.to_string(), (owner_pid, Vec::new()));
+        true
+    }
+
+    pub fn put_message(&mut self, port_name: &str, sender_pid: u64, data: &[u8]) -> Result<u64, &'static str> {
+        let entry = self.ports.get_mut(port_name).ok_or("AmigaOS Exec: Port not found")?;
+        let msg_id = self.next_msg_id;
+        self.next_msg_id += 1;
+        entry.1.push(AmigaMessage {
+            msg_id,
+            sender_pid,
+            data: data.to_vec(),
+        });
+
+        // Trigger signal bit 2 for message arrival
+        let current_sig = self.signals.entry(entry.0).or_insert(0);
+        *current_sig |= 0x00000004;
+
+        Ok(msg_id)
+    }
+
+    pub fn get_message(&mut self, port_name: &str) -> Option<AmigaMessage> {
+        let entry = self.ports.get_mut(port_name)?;
+        if entry.1.is_empty() {
+            None
+        } else {
+            Some(entry.1.remove(0))
+        }
+    }
+
+    pub fn set_signal_mask(&mut self, pid: u64, mask: u32) {
+        self.signals.insert(pid, mask);
+    }
+
+    pub fn check_signal(&self, pid: u64, mask: u32) -> bool {
+        if let Some(&current) = self.signals.get(&pid) {
+            (current & mask) != 0
+        } else {
+            false
+        }
+    }
+}
+
+/// 12. BeOS / Haiku Media Kit Real-Time Media Node Routing Graph Engine
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MediaConnection {
+    pub producer_node: u32,
+    pub consumer_node: u32,
+    pub sample_rate: u32,
+    pub is_active: bool,
+}
+
+#[derive(Debug, Default)]
+pub struct BeOsMediaKitEngine {
+    pub nodes: BTreeMap<u32, (String, u8, bool)>, // NodeID -> (Name, Kind [1=Producer, 2=Consumer, 3=Filter], Running)
+    pub connections: Vec<MediaConnection>,
+}
+
+impl BeOsMediaKitEngine {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn register_node(&mut self, node_id: u32, name: &str, kind: u8) -> bool {
+        if self.nodes.contains_key(&node_id) {
+            return false;
+        }
+        self.nodes.insert(node_id, (name.to_string(), kind, false));
+        true
+    }
+
+    pub fn connect_nodes(&mut self, producer: u32, consumer: u32, sample_rate: u32) -> bool {
+        if !self.nodes.contains_key(&producer) || !self.nodes.contains_key(&consumer) {
+            return false;
+        }
+        self.connections.push(MediaConnection {
+            producer_node: producer,
+            consumer_node: consumer,
+            sample_rate,
+            is_active: true,
+        });
+        true
+    }
+
+    pub fn start_node(&mut self, node_id: u32) -> bool {
+        if let Some(entry) = self.nodes.get_mut(&node_id) {
+            entry.2 = true;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn active_connections_count(&self) -> usize {
+        self.connections.iter().filter(|c| c.is_active).count()
+    }
+}
+
+/// 13. Plan 9 rfork Namespace & File Descriptor Sharing Control Engine
+pub const RFORK_RFNAMEG: u32 = 0x0001; // New name space
+pub const RFORK_RFENVG: u32  = 0x0002; // New environment
+pub const RFORK_RFFDG: u32   = 0x0004; // New file descriptor table
+pub const RFORK_RFNOTEG: u32  = 0x0008; // New note group
+pub const RFORK_RFENV: u32    = 0x0010; // Copy environment
+pub const RFORK_RFFD: u32     = 0x0020; // Copy file descriptors
+
+#[derive(Debug, Clone, Default)]
+pub struct Plan9ProcessNamespace {
+    pub pid: u64,
+    pub env: BTreeMap<String, String>,
+    pub fds: BTreeMap<u32, String>,
+}
+
+#[derive(Debug, Default)]
+pub struct Plan9RforkNamespaceEngine {
+    pub processes: BTreeMap<u64, Plan9ProcessNamespace>,
+}
+
+impl Plan9RforkNamespaceEngine {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn set_env(&mut self, pid: u64, key: &str, val: &str) {
+        let ns = self.processes.entry(pid).or_insert_with(|| Plan9ProcessNamespace {
+            pid,
+            ..Default::default()
+        });
+        ns.env.insert(key.to_string(), val.to_string());
+    }
+
+    pub fn get_env(&self, pid: u64, key: &str) -> Option<String> {
+        self.processes.get(&pid)?.env.get(key).cloned()
+    }
+
+    pub fn rfork(&mut self, parent_pid: u64, child_pid: u64, flags: u32) -> Result<u64, &'static str> {
+        let parent = self.processes.get(&parent_pid).cloned().unwrap_or(Plan9ProcessNamespace {
+            pid: parent_pid,
+            ..Default::default()
+        });
+
+        let mut child = Plan9ProcessNamespace {
+            pid: child_pid,
+            ..Default::default()
+        };
+
+        if (flags & RFORK_RFENV) != 0 || (flags & RFORK_RFENVG) == 0 {
+            child.env = parent.env.clone();
+        }
+
+        if (flags & RFORK_RFFD) != 0 || (flags & RFORK_RFFDG) == 0 {
+            child.fds = parent.fds.clone();
+        }
+
+        self.processes.insert(child_pid, child);
+        Ok(child_pid)
+    }
+}
+
+/// 14. OpenBSD Pledge Promises & Unveil Subtree Restriction Engine
+#[derive(Debug, Default)]
+pub struct OpenBsdPledgeUnveilEngine {
+    pub pledges: BTreeMap<u64, Vec<String>>,         // PID -> Active Pledge Promises
+    pub unveils: BTreeMap<u64, BTreeMap<String, String>>, // PID -> (Path -> Permissions [r, w, x, c])
+}
+
+impl OpenBsdPledgeUnveilEngine {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn pledge(&mut self, pid: u64, promises: &[&str]) -> bool {
+        let promise_list = promises.iter().map(|s| s.to_string()).collect();
+        self.pledges.insert(pid, promise_list);
+        true
+    }
+
+    pub fn check_pledge(&self, pid: u64, promise: &str) -> bool {
+        if let Some(active) = self.pledges.get(&pid) {
+            active.iter().any(|p| p == promise)
+        } else {
+            true // If pledge not called, unrestricted
+        }
+    }
+
+    pub fn unveil(&mut self, pid: u64, path: &str, permissions: &str) -> bool {
+        let map = self.unveils.entry(pid).or_default();
+        map.insert(path.to_string(), permissions.to_string());
+        true
+    }
+
+    pub fn check_unveil(&self, pid: u64, path: &str, req_perm: &str) -> bool {
+        if let Some(map) = self.unveils.get(&pid) {
+            if map.is_empty() {
+                return true;
+            }
+            // Find the longest matching unveiled path prefix for accurate permissions
+            let mut longest_match: Option<(&String, &String)> = None;
+            for (unveiled_path, perms) in map {
+                if path.starts_with(unveiled_path) {
+                    if longest_match.map_or(true, |(m, _)| unveiled_path.len() > m.len()) {
+                        longest_match = Some((unveiled_path, perms));
+                    }
+                }
+            }
+            if let Some((_, perms)) = longest_match {
+                perms.contains(req_perm)
+            } else {
+                false
+            }
+        } else {
+            true // Unrestricted if unveil not called
+        }
+    }
 }
