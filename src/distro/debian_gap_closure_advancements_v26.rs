@@ -147,7 +147,11 @@ impl DebianDebconfDatabaseEngine {
     pub fn get_effective_answer(&self, key: &str) -> Option<String> {
         let q = self.questions.get(key)?;
         if q.priority >= self.system_priority_threshold {
-            Some(q.user_answer.clone().unwrap_or_else(|| q.default_answer.clone()))
+            Some(
+                q.user_answer
+                    .clone()
+                    .unwrap_or_else(|| q.default_answer.clone()),
+            )
         } else {
             Some(q.default_answer.clone())
         }
@@ -236,7 +240,13 @@ impl DebianAptMarkGovernorEngine {
         }
     }
 
-    pub fn register_package(&mut self, name: &str, state: AptMarkSelectionState, installed: bool, required: bool) {
+    pub fn register_package(
+        &mut self,
+        name: &str,
+        state: AptMarkSelectionState,
+        installed: bool,
+        required: bool,
+    ) {
         self.packages.insert(
             name.to_string(),
             AptMarkPackageRecord {
@@ -260,9 +270,7 @@ impl DebianAptMarkGovernorEngine {
     pub fn list_orphan_packages(&self) -> Vec<String> {
         let mut orphans = Vec::new();
         for pkg in self.packages.values() {
-            if pkg.is_installed
-                && pkg.state == AptMarkSelectionState::Auto
-                && !pkg.is_required_dep
+            if pkg.is_installed && pkg.state == AptMarkSelectionState::Auto && !pkg.is_required_dep
             {
                 orphans.push(pkg.package_name.clone());
             }
@@ -312,7 +320,11 @@ impl DebianUscanWatchfileEngine {
         );
     }
 
-    pub fn check_upstream_release(&mut self, pkg: &str, detected_upstream_ver: &str) -> Option<bool> {
+    pub fn check_upstream_release(
+        &mut self,
+        pkg: &str,
+        detected_upstream_ver: &str,
+    ) -> Option<bool> {
         let spec = self.watchfiles.get_mut(pkg)?;
         spec.latest_upstream_version = Some(detected_upstream_ver.to_string());
         Some(spec.current_version != detected_upstream_ver)
@@ -371,7 +383,10 @@ impl DebianDebootstrapBaseInstallerEngine {
     }
 
     pub fn advance_stage(&mut self, target_dir: &str) -> Result<DebootstrapStage, &'static str> {
-        let target = self.targets.get_mut(target_dir).ok_or("Debootstrap target not found")?;
+        let target = self
+            .targets
+            .get_mut(target_dir)
+            .ok_or("Debootstrap target not found")?;
 
         target.stage = match target.stage {
             DebootstrapStage::DownloadingPackages => DebootstrapStage::ExtractingCore,
@@ -500,7 +515,11 @@ impl DebianSbuildChrootEnvironmentEngine {
         );
     }
 
-    pub fn run_sbuild_job(&mut self, chroot_name: &str, dsc_package: &str) -> Result<String, &'static str> {
+    pub fn run_sbuild_job(
+        &mut self,
+        chroot_name: &str,
+        dsc_package: &str,
+    ) -> Result<String, &'static str> {
         let instance = self
             .chroots
             .get_mut(chroot_name)
@@ -564,7 +583,12 @@ impl DebianDpkgBuildPackageOrchestrator {
         self.signing_key_id = Some(key_id.to_string());
     }
 
-    pub fn build_package(&mut self, pkg_name: &str, version: &str, arch: &str) -> Result<DpkgBuildArtifacts, &'static str> {
+    pub fn build_package(
+        &mut self,
+        pkg_name: &str,
+        version: &str,
+        arch: &str,
+    ) -> Result<DpkgBuildArtifacts, &'static str> {
         if pkg_name.is_empty() || version.is_empty() {
             return Err("Invalid package name or version for dpkg-buildpackage");
         }
@@ -617,7 +641,11 @@ impl DebianDebsignsPqcSignatureEngine {
         }
     }
 
-    pub fn sign_changes_or_deb(&mut self, path: &str, secret_key: &[u8]) -> Result<String, &'static str> {
+    pub fn sign_changes_or_deb(
+        &mut self,
+        path: &str,
+        secret_key: &[u8],
+    ) -> Result<String, &'static str> {
         if secret_key.is_empty() {
             return Err("Empty secret key for Dilithium-5 PQC signing");
         }
@@ -749,7 +777,8 @@ impl DebianBugReportScriptEngine {
     }
 
     pub fn record_bug_script_output(&mut self, pkg: &str, output: &str) {
-        self.package_diagnostics.insert(pkg.to_string(), output.to_string());
+        self.package_diagnostics
+            .insert(pkg.to_string(), output.to_string());
     }
 
     pub fn get_bug_script_report(&self, pkg: &str) -> Option<&String> {
@@ -877,8 +906,15 @@ impl OpenSourceOsPrProposalEngine {
         pr_id
     }
 
-    pub fn advance_pr_workflow(&mut self, pr_id: u64, secret_key: &[u8]) -> Result<PrWorkflowStatus, &'static str> {
-        let pr = self.proposals.get_mut(&pr_id).ok_or("PR proposal ID not found")?;
+    pub fn advance_pr_workflow(
+        &mut self,
+        pr_id: u64,
+        secret_key: &[u8],
+    ) -> Result<PrWorkflowStatus, &'static str> {
+        let pr = self
+            .proposals
+            .get_mut(&pr_id)
+            .ok_or("PR proposal ID not found")?;
 
         pr.status = PrWorkflowStatus::CapabilityVerified;
         pr.status = PrWorkflowStatus::CiValidated;
@@ -897,7 +933,10 @@ impl OpenSourceOsPrProposalEngine {
         let mut md = String::new();
         md.push_str(&format!("## Pull Request #{}: {}\n\n", pr.pr_id, pr.title));
         md.push_str(&format!("- **Branch Name:** `{}`\n", pr.branch_name));
-        md.push_str(&format!("- **Target Subsystem:** {}\n", pr.target_subsystem));
+        md.push_str(&format!(
+            "- **Target Subsystem:** {}\n",
+            pr.target_subsystem
+        ));
         md.push_str(&format!("- **Origin OS:** {}\n", pr.origin_open_source_os));
         md.push_str(&format!("- **Status:** `{:?}`\n\n", pr.status));
         md.push_str("### Description\n");
@@ -1014,10 +1053,18 @@ mod tests {
     #[test]
     fn test_dpkg_divert_engine() {
         let mut divert = DebianDpkgDivertEngine::new();
-        divert.add_diversion("/usr/bin/gcc", "/usr/bin/gcc.real", "gcc-wrapper", false).unwrap();
+        divert
+            .add_diversion("/usr/bin/gcc", "/usr/bin/gcc.real", "gcc-wrapper", false)
+            .unwrap();
 
-        assert_eq!(divert.resolve_path("/usr/bin/gcc", "gcc-wrapper"), "/usr/bin/gcc");
-        assert_eq!(divert.resolve_path("/usr/bin/gcc", "other-pkg"), "/usr/bin/gcc.real");
+        assert_eq!(
+            divert.resolve_path("/usr/bin/gcc", "gcc-wrapper"),
+            "/usr/bin/gcc"
+        );
+        assert_eq!(
+            divert.resolve_path("/usr/bin/gcc", "other-pkg"),
+            "/usr/bin/gcc.real"
+        );
     }
 
     #[test]
@@ -1027,7 +1074,10 @@ mod tests {
 
         assert_eq!(debconf.get_effective_answer("tzdata/zones").unwrap(), "UTC");
         debconf.answer_question("tzdata/zones", "America/New_York");
-        assert_eq!(debconf.get_effective_answer("tzdata/zones").unwrap(), "America/New_York");
+        assert_eq!(
+            debconf.get_effective_answer("tzdata/zones").unwrap(),
+            "America/New_York"
+        );
     }
 
     #[test]
@@ -1053,7 +1103,11 @@ mod tests {
     #[test]
     fn test_uscan_watchfile_engine() {
         let mut uscan = DebianUscanWatchfileEngine::new();
-        uscan.register_watchfile("nginx", "https://nginx.org/download/nginx-(.*).tar.gz", "1.24.0");
+        uscan.register_watchfile(
+            "nginx",
+            "https://nginx.org/download/nginx-(.*).tar.gz",
+            "1.24.0",
+        );
 
         let has_new = uscan.check_upstream_release("nginx", "1.26.0").unwrap();
         assert!(has_new);
@@ -1062,7 +1116,8 @@ mod tests {
     #[test]
     fn test_debootstrap_installer_engine() {
         let mut debootstrap = DebianDebootstrapBaseInstallerEngine::new();
-        let msg = debootstrap.start_debootstrap("/chroots/sid", "sid", "http://deb.debian.org/debian");
+        let msg =
+            debootstrap.start_debootstrap("/chroots/sid", "sid", "http://deb.debian.org/debian");
         assert!(msg.contains("initialized"));
 
         let stage = debootstrap.advance_stage("/chroots/sid").unwrap();
@@ -1076,7 +1131,9 @@ mod tests {
 
         let mut sbuild = DebianSbuildChrootEnvironmentEngine::new();
         sbuild.create_chroot("bookworm-amd64-sbuild", "bookworm", "amd64");
-        let res = sbuild.run_sbuild_job("bookworm-amd64-sbuild", "curl_8.5.0-1.dsc").unwrap();
+        let res = sbuild
+            .run_sbuild_job("bookworm-amd64-sbuild", "curl_8.5.0-1.dsc")
+            .unwrap();
         assert!(res.contains("sbuild successfully built"));
         assert!(sbuild.reset_chroot("bookworm-amd64-sbuild"));
     }
@@ -1089,7 +1146,9 @@ mod tests {
         assert_eq!(artifacts.deb_files[0], "bash_5.2.21-1_amd64.deb");
 
         let mut debsigns = DebianDebsignsPqcSignatureEngine::new();
-        let sig = debsigns.sign_changes_or_deb(&artifacts.changes_file, b"secret_pqc_key").unwrap();
+        let sig = debsigns
+            .sign_changes_or_deb(&artifacts.changes_file, b"secret_pqc_key")
+            .unwrap();
         assert!(sig.contains("DILITHIUM5_SIG"));
         assert!(debsigns.verify_signature(&artifacts.changes_file));
     }
@@ -1112,7 +1171,10 @@ mod tests {
 
         let files = indexer.list_files_for_package("coreutils").unwrap();
         assert_eq!(files.len(), 3);
-        assert_eq!(indexer.search_package_owning_file("/bin/cat"), Some("coreutils".to_string()));
+        assert_eq!(
+            indexer.search_package_owning_file("/bin/cat"),
+            Some("coreutils".to_string())
+        );
     }
 
     #[test]
