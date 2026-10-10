@@ -1,11 +1,21 @@
 // SPDX-License-Identifier: MIT
-// SigmaOS Perf (Performance Events) Subsystem
-// Performance monitoring and profiling inspired by Linux perf
+// SigmaOS Perf (Performance Events & Profiling Suite) Subsystem
+// Performance monitoring and profiling inspired by Linux perf and Omarchy performance architecture
 
 #![allow(dead_code)]
 
+pub mod cache_analyzer;
+pub mod flamegraph;
+pub mod memory_profiler;
+pub mod scheduler_profiler;
+
+pub use cache_analyzer::CacheStats;
+pub use flamegraph::{FlamegraphFrame, FlamegraphGenerator, FlamegraphStackSample};
+pub use memory_profiler::{MemoryAllocationSnapshot, MemoryProfiler};
+pub use scheduler_profiler::{PriorityInheritanceRecord, SchedulerLatencyEntry, SchedulerProfiler};
+
 use std::collections::BTreeMap;
-use std::sync::atomic::{AtomicU64, AtomicU32, Ordering};
+use std::sync::atomic::{AtomicU32, AtomicU64, Ordering};
 
 /// Performance event type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -86,7 +96,7 @@ pub struct PerfSample {
     pub sample_id: u64,
     pub event_id: u64,
     pub timestamp_ns: u64,
-    pub ip: u64,  // Instruction pointer
+    pub ip: u64, // Instruction pointer
     pub period: u64,
     pub callchain: Vec<u64>,
 }
@@ -233,10 +243,10 @@ mod tests {
     #[test]
     fn test_perf_event_creation() {
         let mut perf = PerfSubsystem::new(100);
-        
+
         let config = PerfEventConfig::default();
         let event_id = perf.create_event(config);
-        
+
         assert!(event_id > 0);
         assert_eq!(perf.event_count(), 1);
     }
@@ -244,10 +254,10 @@ mod tests {
     #[test]
     fn test_perf_event_increment() {
         let mut perf = PerfSubsystem::new(100);
-        
+
         let config = PerfEventConfig::default();
         let event_id = perf.create_event(config);
-        
+
         perf.increment_event(event_id, 100).unwrap();
         assert_eq!(perf.read_event(event_id).unwrap(), 100);
     }
@@ -255,10 +265,10 @@ mod tests {
     #[test]
     fn test_perf_event_reset() {
         let mut perf = PerfSubsystem::new(100);
-        
+
         let config = PerfEventConfig::default();
         let event_id = perf.create_event(config);
-        
+
         perf.increment_event(event_id, 100).unwrap();
         perf.reset_event(event_id).unwrap();
         assert_eq!(perf.read_event(event_id).unwrap(), 0);
@@ -267,14 +277,14 @@ mod tests {
     #[test]
     fn test_perf_event_enable_disable() {
         let mut perf = PerfSubsystem::new(100);
-        
+
         let config = PerfEventConfig::default();
         let event_id = perf.create_event(config);
-        
+
         perf.disable_event(event_id).unwrap();
         let result = perf.increment_event(event_id, 100);
         assert!(result.is_err());
-        
+
         perf.enable_event(event_id).unwrap();
         let result = perf.increment_event(event_id, 100);
         assert!(result.is_ok());
@@ -283,10 +293,10 @@ mod tests {
     #[test]
     fn test_perf_sample_collection() {
         let mut perf = PerfSubsystem::new(100);
-        
+
         let config = PerfEventConfig::default();
         let event_id = perf.create_event(config);
-        
+
         perf.add_sample(event_id, 1000, 0x4000, 1000).unwrap();
         assert_eq!(perf.sample_count(), 1);
     }
@@ -294,10 +304,10 @@ mod tests {
     #[test]
     fn test_perf_clear_samples() {
         let mut perf = PerfSubsystem::new(100);
-        
+
         let config = PerfEventConfig::default();
         let event_id = perf.create_event(config);
-        
+
         perf.add_sample(event_id, 1000, 0x4000, 1000).unwrap();
         perf.clear_samples();
         assert_eq!(perf.sample_count(), 0);
