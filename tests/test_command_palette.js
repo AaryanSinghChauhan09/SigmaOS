@@ -211,4 +211,20 @@ assert.strictEqual(cmdPaletteEl.classList.contains("active"), false, "Expected c
 assert.strictEqual(cmdPaletteEl.getAttribute("aria-hidden"), "true", "Expected cmd-palette aria-hidden='true' on outside click");
 console.log("✓ Command Palette outside-click dismissal verified successfully!");
 
+// Test 11: Accessible showToast notification and contextAction feedback
+const kernelLogs = createMockElement("kernel-logs");
+const toast = zenith.showToast("Test Toast Message");
+assert.notStrictEqual(toast, null, "Expected showToast to return a toast element");
+assert.strictEqual(toast.getAttribute("role"), "status", "Expected role='status' on toast notification");
+assert.strictEqual(toast.getAttribute("aria-live"), "polite", "Expected aria-live='polite' on toast notification");
+assert.strictEqual(toast.textContent, "Test Toast Message", "Expected toast text content to match");
+
+global.window = globalThis;
+zenith.initContextMenu();
+createMockElement("context-menu");
+global.window.contextAction("cleanup");
+assert.strictEqual(kernelLogs.children.length, 2, "Expected contextAction('cleanup') to append a new toast notification");
+assert.strictEqual(kernelLogs.children[1].textContent.includes("purged"), true, "Expected toast notification text to mention purged caches");
+console.log("✓ Accessible Toast Notifications & Context Action Feedback verified successfully!");
+
 console.log("All Command Palette & Desktop UX tests passed successfully!");
