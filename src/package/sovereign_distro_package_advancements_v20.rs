@@ -368,7 +368,7 @@ impl SovereignDistroPackageAdvancementsSuiteV20 {
         let pr = self.pr_pipeline.submit_package_pr(spec.clone());
 
         let mut pkg = UnifiedPackage::new(
-            format!("sovereign-{}", pr.converted_spec.package_name),
+            format!("sigpkg-{}", pr.converted_spec.package_name),
             pr.converted_spec.version.clone(),
         )
         .with_format(PackageFormat::SigmaPkg)
@@ -421,9 +421,11 @@ mod tests {
     fn test_converter_all_formats() {
         let converter = UniversalAllPackageFormatConverterV20::new();
 
-        let deb_spec = converter.convert_package("nginx_1.24.deb", b"DEB").unwrap();
-        assert_eq!(deb_spec.package_name, "nginx");
+        let deb_spec = converter
+            .convert_package("gcc-13.2.0.deb", b"DEB_PAYLOAD")
+            .unwrap();
         assert_eq!(deb_spec.source_format, PackageFormat::Deb);
+        assert_eq!(deb_spec.package_name, "gcc");
         assert!(deb_spec
             .canonical_dependencies
             .contains(&"sovereign-libc".to_string()));

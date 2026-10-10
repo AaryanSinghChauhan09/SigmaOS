@@ -471,14 +471,11 @@ impl ArchPacmanHookRunner {
                 target_packages: vec!["fontconfig*".to_string(), "ttf-*".to_string()],
                 exec_command: "fc-cache -s".to_string(),
             },
-        ];
-
-        let registered_hooks = vec![
             PacmanHookRule {
-                name: "fontconfig".to_string(),
+                name: "systemd-daemon-reload".to_string(),
                 when: PacmanHookWhen::PostTransaction,
-                target_packages: vec!["fontconfig*".to_string(), "ttf-*".to_string()],
-                exec_command: "fc-cache -s".to_string(),
+                target_packages: vec!["systemd*".to_string()],
+                exec_command: "systemctl daemon-reload".to_string(),
             },
         ];
 

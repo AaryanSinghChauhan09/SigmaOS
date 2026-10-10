@@ -121,6 +121,8 @@ pub mod sovereign_distro_package_advancements_v32;
 pub use sovereign_distro_package_advancements_v32::*;
 pub mod sovereign_distro_package_advancements_v33;
 pub use sovereign_distro_package_advancements_v33::*;
+pub mod sovereign_distro_package_advancements_v34;
+pub use sovereign_distro_package_advancements_v34::*;
 pub mod sovereign_universal_multi_distro_pm_gateway;
 pub use sovereign_universal_multi_distro_pm_gateway::*;
 

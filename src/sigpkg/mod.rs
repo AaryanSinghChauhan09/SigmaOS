@@ -93,7 +93,67 @@ pub use crate::package::sovereign_distro_package_advancements_v30::*;
 pub use crate::package::sovereign_distro_package_advancements_v31::*;
 pub use crate::package::sovereign_distro_package_advancements_v33::*;
 
-pub use crate::package::bsd_linux_package_innovations::{
+#[path = "../package/sovereign_package_smp_engine.rs"]
+pub mod sovereign_package_smp_engine;
+pub use sovereign_package_smp_engine::*;
+
+#[path = "../package/sovereign_distro_package_advancements_v4.rs"]
+pub mod sovereign_distro_package_advancements_v4;
+pub use sovereign_distro_package_advancements_v4::*;
+
+#[path = "../package/sovereign_distro_package_advancements_v5.rs"]
+pub mod sovereign_distro_package_advancements_v5;
+pub use sovereign_distro_package_advancements_v5::*;
+
+#[path = "../package/sovereign_distro_package_advancements_v6.rs"]
+pub mod sovereign_distro_package_advancements_v6;
+pub use sovereign_distro_package_advancements_v6::*;
+#[path = "../package/sovereign_distro_package_advancements_v7.rs"]
+pub mod sovereign_distro_package_advancements_v7;
+pub use sovereign_distro_package_advancements_v7::*;
+
+#[path = "../package/sovereign_distro_package_advancements_v12.rs"]
+pub mod sovereign_distro_package_advancements_v12;
+pub use sovereign_distro_package_advancements_v12::*;
+
+#[path = "../package/sovereign_distro_package_advancements_v13.rs"]
+pub mod sovereign_distro_package_advancements_v13;
+pub use sovereign_distro_package_advancements_v13::*;
+
+#[path = "../package/sovereign_distro_package_advancements_v16.rs"]
+pub mod sovereign_distro_package_advancements_v16;
+pub use sovereign_distro_package_advancements_v16::*;
+
+#[path = "../package/sovereign_distro_package_advancements_v17.rs"]
+pub mod sovereign_distro_package_advancements_v17;
+pub use sovereign_distro_package_advancements_v17::*;
+
+#[path = "../package/sovereign_distro_package_advancements_v20.rs"]
+pub mod sovereign_distro_package_advancements_v20;
+pub use sovereign_distro_package_advancements_v20::*;
+
+pub use crate::package::sovereign_distro_package_advancements_v26::*;
+pub use crate::package::sovereign_distro_package_advancements_v29::*;
+
+#[path = "../package/sovereign_distro_package_advancements_v30.rs"]
+pub mod sovereign_distro_package_advancements_v30;
+pub use sovereign_distro_package_advancements_v30::*;
+
+#[path = "../package/sovereign_distro_package_advancements_v31.rs"]
+pub mod sovereign_distro_package_advancements_v31;
+pub use sovereign_distro_package_advancements_v31::*;
+
+#[path = "../package/sovereign_distro_package_advancements_v33.rs"]
+pub mod sovereign_distro_package_advancements_v33;
+pub use sovereign_distro_package_advancements_v33::*;
+
+#[path = "../package/sovereign_distro_package_advancements_v34.rs"]
+pub mod sovereign_distro_package_advancements_v34;
+pub use sovereign_distro_package_advancements_v34::*;
+
+#[path = "../package/bsd_linux_package_innovations.rs"]
+pub mod bsd_linux_package_innovations;
+pub use bsd_linux_package_innovations::{
     AlpineApkWorldAndVirtualPkgEngine, AptBugReport, AptMarkRecord, AptMarkState,
     ArchCachyosMicroarchOptimizationEngine, ArchSplitPackageHookRunnerEngine, CachedPackageFile,
     CommunityPackageBuildSource, CommunityRepoBackend, CoprAurBuildRepositoryGatewayEngine,

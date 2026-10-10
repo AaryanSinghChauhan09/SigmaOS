@@ -4977,6 +4977,11 @@ impl SovereignOpenSourceObsoletionOrchestrator {
             .add_signature_rule(1001, "TCP", "any", 80, "ALERT HTTP Traffic");
         let _ = self.caddy_tls.provision_acme_certificate("api.sigmaos.org");
 
+        // self.procs_viewer.register_process(...)
+        // self.dust_usage.record_directory(...)
+        // self.dogdns_query.execute_dns_query(...)
+        // self.gping_network.record_ping(...)
+
         Ok(format!(
             "Sovereign Stack Active: {} legacy open-source projects obsoleted",
             self.total_obsoleted_projects_count
