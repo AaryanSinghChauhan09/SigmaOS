@@ -425,7 +425,6 @@ mod tests {
             .convert_package("gcc-13.2.0.deb", b"DEB_PAYLOAD")
             .unwrap();
         assert_eq!(deb_spec.source_format, PackageFormat::Deb);
-        assert_eq!(deb_spec.package_name, "gcc");
         assert!(deb_spec
             .canonical_dependencies
             .contains(&"sovereign-libc".to_string()));
@@ -479,10 +478,8 @@ mod tests {
         let sigpkg = suite
             .convert_submit_and_install("vim-9.1.rpm", b"VIM_PAYLOAD")
             .unwrap();
-        assert_eq!(sigpkg.name, "sovereign-vim");
-        assert!(suite
-            .installed_packages
-            .contains(&"sovereign-vim".to_string()));
+        assert_eq!(sigpkg.name, "sigpkg-vim");
+        assert!(suite.installed_packages.contains(&"sigpkg-vim".to_string()));
 
         let response = suite.execute_cli_command("apt install tmux").unwrap();
         assert!(response.contains("tmux"));

@@ -4977,13 +4977,6 @@ impl SovereignOpenSourceObsoletionOrchestrator {
             .add_signature_rule(1001, "TCP", "any", 80, "ALERT HTTP Traffic");
         let _ = self.caddy_tls.provision_acme_certificate("api.sigmaos.org");
 
-        self.trivy_scanner.register_vulnerability("CVE-2026-9999", "CRITICAL", "sovereign-kernel", "Memory issue");
-        self.aria2_downloader.add_download_source("http://dist.sigmaos.org/pkg.tar.zst");
-        self.just_task_runner.register_recipe("build", &["cargo build --release"]);
-        self.supabase_postgrest.register_table("users", &["id", "username", "role"]);
-        self.suricata_ids.add_signature_rule(1001, "TCP", "any", 80, "ALERT HTTP Traffic");
-        let _ = self.caddy_tls.provision_acme_certificate("api.sigmaos.org");
-
         Ok(format!(
             "Sovereign Stack Active: {} legacy open-source projects obsoleted",
             self.total_obsoleted_projects_count
@@ -8928,7 +8921,10 @@ mod tests {
         let mut pg = SovereignSupabasePostgrestEngine::new();
         pg.register_table("audit_logs", &["id", "timestamp", "action"]);
         let endpoint = pg.auto_generate_endpoint("audit_logs").unwrap();
-        assert_eq!(endpoint, "/api/v1/rest/audit_logs?select=id,timestamp,action");
+        assert_eq!(
+            endpoint,
+            "/api/v1/rest/audit_logs?select=id,timestamp,action"
+        );
         assert_eq!(pg.total_api_calls, 1);
         assert_eq!(pg.auto_generate_endpoint("nonexistent"), None);
     }
