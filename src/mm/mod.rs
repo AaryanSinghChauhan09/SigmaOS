@@ -11,7 +11,14 @@ use std::vec::Vec;
 pub mod mmap;
 pub mod page_directory;
 pub mod page_fault;
+pub mod page_table;
+pub mod paging;
+pub mod r#virtual;
 pub mod virtual_memory;
+
+pub use page_table::{MultiLevelPageTableTree, PageTableEntry, PageTableFlags, ENTRIES_PER_TABLE, PAGE_SIZE as MM_PAGE_SIZE};
+pub use paging::{PagingError, PagingManager, PagingResult};
+pub use r#virtual::{VirtualMemoryManager, VmaProtection, VmaRegion, KERNEL_SPACE_END, KERNEL_SPACE_START, USER_SPACE_END, USER_SPACE_START};
 
 pub use mmap::{
     do_mmap, do_mprotect, do_munmap, find_vma, list_vmas, MmapAddressSpace, MmapBacking, MmapError,
