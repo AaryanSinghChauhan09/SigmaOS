@@ -745,11 +745,18 @@ if [ -f "src/desktop/omarchy_browser_theme_sync.rs" ]; then
     ./build/test_browser_sync
 fi
 
-if [ -f "src/distro/sovereign_open_source_os_fedora_github_pr_suite.rs" ]; then
-    echo "Running Sovereign Open Source OS & Fedora GitHub PR Suite test suite..."
+if [ -f "src/distro/open_source_os_unimplemented_ideas_pr_suite.rs" ]; then
+    echo "Running Sovereign Open Source OS Unimplemented Ideas PR test suite..."
     mkdir -p build
-    rustc --test src/distro/sovereign_open_source_os_fedora_github_pr_suite.rs --edition=2021 -o build/test_fedora_github_pr
-    ./build/test_fedora_github_pr
+    rustc --test src/distro/open_source_os_unimplemented_ideas_pr_suite.rs --edition=2021 -o build/test_open_source_unimplemented_pr
+    ./build/test_open_source_unimplemented_pr
+fi
+
+if [ -f "src/distro/cachy_linux_missing_components_engine.rs" ]; then
+    echo "Running Sovereign Cachy Linux Missing Components Engine test suite..."
+    mkdir -p build
+    rustc --test src/distro/cachy_linux_missing_components_engine.rs --edition=2021 -o build/test_cachy_linux_components
+    ./build/test_cachy_linux_components
 fi
 
 echo "All SigmaOS test suites completed."
