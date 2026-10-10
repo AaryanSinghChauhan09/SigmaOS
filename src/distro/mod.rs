@@ -438,8 +438,8 @@ pub use tech_media_publication_innovations::*;
 pub mod sovereign_open_source_os_gap_closure_pr;
 pub use sovereign_open_source_os_gap_closure_pr::*;
 
-pub mod open_source_os_arch_unimplemented_parity_engine;
-pub use open_source_os_arch_unimplemented_parity_engine::*;
+pub mod sovereign_open_source_os_fedora_github_pr_suite;
+pub use sovereign_open_source_os_fedora_github_pr_suite::*;
 
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;
