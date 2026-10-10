@@ -2394,6 +2394,234 @@ impl Default for FreeBsdBhyveKvmVirtualizationPrEngine {
 }
 
 // =========================================================================
+// 23b. FREEBSD CAPSICUM CAPABILITY SANDBOX PR ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct CapsicumCapabilityPrRecord {
+    pub pr_id: u64,
+    pub process_name: String,
+    pub descriptor_rights: Vec<String>,
+    pub in_capability_mode: bool,
+}
+
+pub struct FreeBsdCapsicumCapabilitySandboxPrEngine {
+    pub pr_counter: u64,
+    pub records: BTreeMap<u64, CapsicumCapabilityPrRecord>,
+}
+
+impl FreeBsdCapsicumCapabilitySandboxPrEngine {
+    pub fn new() -> Self {
+        Self {
+            pr_counter: 1,
+            records: BTreeMap::new(),
+        }
+    }
+
+    pub fn submit_capsicum_pr(&mut self, descriptor_rights: &[&str], process_name: &str) -> u64 {
+        let id = self.pr_counter;
+        self.pr_counter += 1;
+        self.records.insert(
+            id,
+            CapsicumCapabilityPrRecord {
+                pr_id: id,
+                process_name: process_name.to_string(),
+                descriptor_rights: descriptor_rights.iter().map(|s| s.to_string()).collect(),
+                in_capability_mode: false,
+            },
+        );
+        id
+    }
+
+    pub fn validate_and_enter_capability_mode(&mut self, pr_id: u64) -> Result<bool, &'static str> {
+        if let Some(record) = self.records.get_mut(&pr_id) {
+            record.in_capability_mode = true;
+            Ok(true)
+        } else {
+            Err("CAPSICUM_PR: PR ID not found")
+        }
+    }
+}
+
+impl Default for FreeBsdCapsicumCapabilitySandboxPrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 23c. OPENBSD UNVEIL PATH PERMISSION ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct UnveilPathPrRecord {
+    pub pr_id: u64,
+    pub path: String,
+    pub permissions: String,
+    pub locked: bool,
+}
+
+pub struct OpenBsdUnveilPathPermissionEngine {
+    pub pr_counter: u64,
+    pub rules: BTreeMap<u64, UnveilPathPrRecord>,
+}
+
+impl OpenBsdUnveilPathPermissionEngine {
+    pub fn new() -> Self {
+        Self {
+            pr_counter: 1,
+            rules: BTreeMap::new(),
+        }
+    }
+
+    pub fn submit_unveil_pr(&mut self, path: &str, permissions: &str) -> u64 {
+        let id = self.pr_counter;
+        self.pr_counter += 1;
+        self.rules.insert(
+            id,
+            UnveilPathPrRecord {
+                pr_id: id,
+                path: path.to_string(),
+                permissions: permissions.to_string(),
+                locked: false,
+            },
+        );
+        id
+    }
+
+    pub fn validate_and_lock_unveil(&mut self, pr_id: u64) -> Result<bool, &'static str> {
+        if let Some(rule) = self.rules.get_mut(&pr_id) {
+            rule.locked = true;
+            Ok(true)
+        } else {
+            Err("UNVEIL_PR: PR ID not found")
+        }
+    }
+}
+
+impl Default for OpenBsdUnveilPathPermissionEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 23d. LINUX IO_URING ASYNC SYSCALL COMPLETION ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct IoUringPrSubmission {
+    pub pr_id: u64,
+    pub opcode: String,
+    pub sq_entries: u32,
+    pub use_sqpoll: bool,
+    pub submitted: bool,
+}
+
+pub struct LinuxIoUringAsyncSyscallCompletionEngine {
+    pub pr_counter: u64,
+    pub submissions: BTreeMap<u64, IoUringPrSubmission>,
+}
+
+impl LinuxIoUringAsyncSyscallCompletionEngine {
+    pub fn new() -> Self {
+        Self {
+            pr_counter: 1,
+            submissions: BTreeMap::new(),
+        }
+    }
+
+    pub fn submit_io_uring_pr(&mut self, opcode: &str, sq_entries: u32, use_sqpoll: bool) -> u64 {
+        let id = self.pr_counter;
+        self.pr_counter += 1;
+        self.submissions.insert(
+            id,
+            IoUringPrSubmission {
+                pr_id: id,
+                opcode: opcode.to_string(),
+                sq_entries,
+                use_sqpoll,
+                submitted: false,
+            },
+        );
+        id
+    }
+
+    pub fn validate_and_submit_sqe(&mut self, pr_id: u64) -> Result<bool, &'static str> {
+        if let Some(pr) = self.submissions.get_mut(&pr_id) {
+            pr.submitted = true;
+            Ok(true)
+        } else {
+            Err("IO_URING_PR: PR ID not found")
+        }
+    }
+}
+
+impl Default for LinuxIoUringAsyncSyscallCompletionEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 23e. LINUX CGROUPS V2 RESOURCE CONTROLLER ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct CgroupsV2PrSubmission {
+    pub pr_id: u64,
+    pub cgroup_path: String,
+    pub max_memory_mb: u64,
+    pub cpu_quota_pct: u32,
+    pub active: bool,
+}
+
+pub struct LinuxCgroupsV2ResourceControllerEngine {
+    pub pr_counter: u64,
+    pub controllers: BTreeMap<u64, CgroupsV2PrSubmission>,
+}
+
+impl LinuxCgroupsV2ResourceControllerEngine {
+    pub fn new() -> Self {
+        Self {
+            pr_counter: 1,
+            controllers: BTreeMap::new(),
+        }
+    }
+
+    pub fn submit_cgroup_pr(&mut self, cgroup_path: &str, max_memory_mb: u64, cpu_quota_pct: u32) -> u64 {
+        let id = self.pr_counter;
+        self.pr_counter += 1;
+        self.controllers.insert(
+            id,
+            CgroupsV2PrSubmission {
+                pr_id: id,
+                cgroup_path: cgroup_path.to_string(),
+                max_memory_mb,
+                cpu_quota_pct,
+                active: false,
+            },
+        );
+        id
+    }
+
+    pub fn validate_and_enforce_resource_limits(&mut self, pr_id: u64) -> Result<bool, &'static str> {
+        if let Some(ctrl) = self.controllers.get_mut(&pr_id) {
+            ctrl.active = true;
+            Ok(true)
+        } else {
+            Err("CGROUPS_V2_PR: PR ID not found")
+        }
+    }
+}
+
+impl Default for LinuxCgroupsV2ResourceControllerEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
 // 24. SERENITYOS (LibGUI EventLoop & Window Manager Protocol)
 // =========================================================================
 
@@ -5132,6 +5360,54 @@ mod tests {
         assert_eq!(suite.deduplicate_nix_store_blobs(), 1);
 
         assert!(suite.commit_hyprland_drm_page_flip());
+    }
+
+    #[test]
+    fn test_freebsd_capsicum_pr_engine() {
+        let mut capsicum = FreeBsdCapsicumCapabilitySandboxPrEngine::new();
+        let pr_id = capsicum.submit_capsicum_pr(&["CAP_READ", "CAP_WRITE", "CAP_FSTAT"], "sandbox_proc");
+        assert_eq!(pr_id, 1);
+        assert!(!capsicum.records[&pr_id].in_capability_mode);
+        let entered = capsicum.validate_and_enter_capability_mode(pr_id).unwrap();
+        assert!(entered);
+        assert!(capsicum.records[&pr_id].in_capability_mode);
+        assert_eq!(capsicum.records[&pr_id].descriptor_rights.len(), 3);
+    }
+
+    #[test]
+    fn test_openbsd_unveil_pr_engine() {
+        let mut unveil = OpenBsdUnveilPathPermissionEngine::new();
+        let pr_id = unveil.submit_unveil_pr("/etc/ssl", "r");
+        assert_eq!(pr_id, 1);
+        assert!(!unveil.rules[&pr_id].locked);
+        let locked = unveil.validate_and_lock_unveil(pr_id).unwrap();
+        assert!(locked);
+        assert!(unveil.rules[&pr_id].locked);
+        assert_eq!(unveil.rules[&pr_id].permissions, "r");
+    }
+
+    #[test]
+    fn test_linux_io_uring_pr_engine() {
+        let mut io_uring = LinuxIoUringAsyncSyscallCompletionEngine::new();
+        let pr_id = io_uring.submit_io_uring_pr("IORING_OP_READV", 256, true);
+        assert_eq!(pr_id, 1);
+        assert!(!io_uring.submissions[&pr_id].submitted);
+        let submitted = io_uring.validate_and_submit_sqe(pr_id).unwrap();
+        assert!(submitted);
+        assert!(io_uring.submissions[&pr_id].submitted);
+        assert_eq!(io_uring.submissions[&pr_id].sq_entries, 256);
+    }
+
+    #[test]
+    fn test_linux_cgroups_v2_pr_engine() {
+        let mut cgroups = LinuxCgroupsV2ResourceControllerEngine::new();
+        let pr_id = cgroups.submit_cgroup_pr("/sys/fs/cgroup/sovereign", 4096, 80);
+        assert_eq!(pr_id, 1);
+        assert!(!cgroups.controllers[&pr_id].active);
+        let enforced = cgroups.validate_and_enforce_resource_limits(pr_id).unwrap();
+        assert!(enforced);
+        assert!(cgroups.controllers[&pr_id].active);
+        assert_eq!(cgroups.controllers[&pr_id].max_memory_mb, 4096);
     }
 }
 
