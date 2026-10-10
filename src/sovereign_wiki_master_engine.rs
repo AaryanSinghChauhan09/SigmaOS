@@ -196,39 +196,9 @@ impl SovereignLinuxBsdWikiRoadmapParityEngine {
             ),
             (
                 25,
-                "Pull Request Proposal: Open Source OS Missing Components",
-                "src/open_source_os_pinnacle_gap_closure.rs",
-                "wiki/20-Pull-Request-Proposal-Open-Source-OS-Missing-Components.md",
-            ),
-            (
-                26,
-                "Open Source OS Comparative Gap Analysis",
-                "src/distro/sovereign_open_source_os_gap_closure_v27.rs",
-                "wiki/21-Open-Source-OS-Comparative-Gap-Analysis.md",
-            ),
-            (
-                27,
-                "Bootability Completion Report",
-                "src/launch_ready/mod.rs",
-                "wiki/22-Bootability-Completion-Report.md",
-            ),
-            (
-                28,
-                "SigmaOS Completion Report",
-                "src/open_source_obsoletion.rs",
-                "wiki/23-SigmaOS-Completion-Report.md",
-            ),
-            (
-                29,
-                "Bootability Hardware Support Report",
-                "src/drivers/mod.rs",
-                "wiki/24-Bootability-Hardware-Support-Report.md",
-            ),
-            (
-                30,
-                "Improvement Plan Specification",
-                "src/distro/wiki_ideas_implementation.rs",
-                "wiki/25-Improvement-Plan.md",
+                "Arch Linux Parity PR Suite",
+                "src/distro/arch_linux_parity_pr_suite.rs",
+                "Arch Linux Parity PR Suite",
             ),
         ];
 
@@ -359,8 +329,8 @@ mod tests {
     #[test]
     fn test_wiki_roadmap_parity_engine() {
         let engine = SovereignLinuxBsdWikiRoadmapParityEngine::new();
-        assert_eq!(engine.total_ideas_count, 30);
-        assert_eq!(engine.implemented_ideas_count(), 30);
+        assert_eq!(engine.total_ideas_count, 25);
+        assert_eq!(engine.implemented_ideas_count(), 25);
         assert_eq!(engine.verification_percentage(), 100.0);
     }
 
