@@ -3,6 +3,8 @@ pub mod archive;
 pub mod bsd_linux_innovations;
 pub mod btrfs;
 pub mod btrfs_snapshots;
+pub mod cache;
+pub mod core;
 pub mod cow_snapshot;
 pub mod defragmenter;
 pub mod disk_usage;
@@ -11,6 +13,7 @@ pub mod ext4_mount;
 pub mod ext4_ntfs_security;
 pub mod file_monitor;
 pub mod manager;
+pub mod mount;
 pub mod mount_namespace;
 pub mod sigma_fs;
 pub mod smart_symlink;
@@ -22,9 +25,11 @@ pub mod watch;
 pub mod zfs;
 pub mod zfs_arc;
 
+pub use cache::*;
+pub use core::*;
+pub use mount::*;
 pub use crate::filesystem::vfs::{FileType, FsError, Inode, VfsError, VirtualFilesystem};
 pub use smart_symlink::{LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule};
-// Removed non-existent vfs exports: FileDescriptor, FilePermissions
 pub use crate::filesystem::sigma_fs::{
     JournalState,
     SigmaFS,
@@ -34,7 +39,6 @@ pub use crate::filesystem::sigma_fs::{
     SigmaFhsRouter,
     SigmaFsCrypt,
     SigmaFsVirtio,
-    // Removed potentially incomplete exports: RaidLevel, SigmaFsJournal, SigmaFsCow, SigmaFsVolume, SigmaFsRaid
 };
 
 pub use archive::{
@@ -60,8 +64,6 @@ pub use mount_namespace::{
     MountFlags, MountId, MountInfo, MountNamespace, MountNamespaceStats, MountSource,
 };
 pub use support::{FilesystemError, FilesystemType, SimpleFilesystem, SimpleFilesystemManager};
-// Removed duplicate vfs imports - already imported above
-// pub use ext4::{Ext4FileSystem, Ext4Superblock as Ext4SB, BlockGroupDescriptor};
 pub use file_monitor::{
     EventFilter, EventId, FileEvent, FileEventType, WatchConfig, WatchId, WatchManager,
 };
