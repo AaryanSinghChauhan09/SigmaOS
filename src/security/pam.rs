@@ -135,7 +135,16 @@ impl SovereignPamManager {
         user_token: &str,
         primary_group: &str,
     ) -> Result<u32, PamError> {
-        if self.users.get(&username.to_string()).is_some() {
+        // Security Hardening: Reject inputs containing embedded NUL bytes or ASCII control characters
+        // to prevent C-ABI truncation, log injection, and CWE-20 input validation bypass.
+        if contains_invalid_chars(username)
+            || contains_invalid_chars(user_token)
+            || contains_invalid_chars(primary_group)
+        {
+            return Err(PamError::PermissionDenied);
+        }
+
+        if self.users.get(username).is_some() {
             return Err(PamError::UserAlreadyExists);
         }
 

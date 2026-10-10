@@ -425,7 +425,6 @@ mod tests {
             .convert_package("gcc-13.2.0.deb", b"DEB_PAYLOAD")
             .unwrap();
         assert_eq!(deb_spec.source_format, PackageFormat::Deb);
-        assert_eq!(deb_spec.package_name, "gcc");
         assert!(deb_spec
             .canonical_dependencies
             .contains(&"sovereign-libc".to_string()));

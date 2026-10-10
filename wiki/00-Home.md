@@ -16,6 +16,7 @@
 - [12-Contributing](12-Contributing.md)
 - [13-Agents](13-Agents.md)
 - [14-Future-Development](14-Future-Development.md)
+- [22-Arch-Linux-Parity-And-AI-Agent-Roadmap](../docs/roadmap/ARCH_LINUX_PARITY_AI_AGENT_ROADMAP.md)
 - [15-Architecture-Decisions](15-Architecture-Decisions.md)
 - [18-Enterprise-Productivity-Suite-Roadmap](18-Enterprise-Productivity-Suite-Roadmap.md)
 - [19-Pull-Request-Gateway-Workflows](19-Pull-Request-Gateway-Workflows.md)
