@@ -67,15 +67,22 @@ impl AlpineApkV3AutostartPrEngine {
     }
 
     pub fn solve_and_install_pr(&mut self, package: &str, version: &str) -> String {
-        self.installed_packages.insert(package.to_string(), version.to_string());
-        format!("PR-ALPINE-APKv3: Installed {} = {} with overlay commit", package, version)
+        self.installed_packages
+            .insert(package.to_string(), version.to_string());
+        format!(
+            "PR-ALPINE-APKv3: Installed {} = {} with overlay commit",
+            package, version
+        )
     }
 
     pub fn enable_autostart_service(&mut self, service: &str) -> String {
         if !self.auto_start_services.contains(&service.to_string()) {
             self.auto_start_services.push(service.to_string());
         }
-        format!("PR-ALPINE-OPENRC: Service '{}' added to default runlevel", service)
+        format!(
+            "PR-ALPINE-OPENRC: Service '{}' added to default runlevel",
+            service
+        )
     }
 }
 
@@ -91,7 +98,10 @@ pub struct FreeBsdCtlCasperPrEngine {
 impl FreeBsdCtlCasperPrEngine {
     pub fn new() -> Self {
         let mut iscsi_targets = BTreeMap::new();
-        iscsi_targets.insert("iqn.2026-07.org.sigmaos:storage.lun0".to_string(), "10.0.0.1:3260".to_string());
+        iscsi_targets.insert(
+            "iqn.2026-07.org.sigmaos:storage.lun0".to_string(),
+            "10.0.0.1:3260".to_string(),
+        );
 
         let mut casper_delegations = Vec::new();
         casper_delegations.push("system.dns".to_string());
@@ -104,15 +114,22 @@ impl FreeBsdCtlCasperPrEngine {
     }
 
     pub fn bind_iscsi_lun_pr(&mut self, target_iqn: &str, portal: &str) -> String {
-        self.iscsi_targets.insert(target_iqn.to_string(), portal.to_string());
-        format!("PR-FREEBSD-CTL: iSCSI LUN target '{}' bound to portal {}", target_iqn, portal)
+        self.iscsi_targets
+            .insert(target_iqn.to_string(), portal.to_string());
+        format!(
+            "PR-FREEBSD-CTL: iSCSI LUN target '{}' bound to portal {}",
+            target_iqn, portal
+        )
     }
 
     pub fn delegate_casper_service_pr(&mut self, service: &str) -> String {
         if !self.casper_delegations.contains(&service.to_string()) {
             self.casper_delegations.push(service.to_string());
         }
-        format!("PR-FREEBSD-CASPER: Capability service '{}' delegated via Casper IPC", service)
+        format!(
+            "PR-FREEBSD-CASPER: Capability service '{}' delegated via Casper IPC",
+            service
+        )
     }
 }
 
@@ -139,13 +156,20 @@ impl OpenBsdIkedSlaacPrEngine {
     }
 
     pub fn establish_ikev2_sa_pr(&mut self, spi: &str, peer: &str) -> String {
-        self.active_ipsec_sas.insert(spi.to_string(), peer.to_string());
-        format!("PR-OPENBSD-IKED: Established IKEv2 IPsec Security Association SPI {} with {}", spi, peer)
+        self.active_ipsec_sas
+            .insert(spi.to_string(), peer.to_string());
+        format!(
+            "PR-OPENBSD-IKED: Established IKEv2 IPsec Security Association SPI {} with {}",
+            spi, peer
+        )
     }
 
     pub fn rotate_slaac_privacy_address_pr(&mut self, new_ipv6: &str) -> String {
         self.temporary_ipv6 = new_ipv6.to_string();
-        format!("PR-OPENBSD-SLAAC: Rotated RFC 4941 IPv6 privacy address to {}", new_ipv6)
+        format!(
+            "PR-OPENBSD-SLAAC: Rotated RFC 4941 IPv6 privacy address to {}",
+            new_ipv6
+        )
     }
 }
 
@@ -181,14 +205,20 @@ impl GentooPortageEapi8SlotPrEngine {
 
     pub fn resolve_eapi8_slot_pr(&mut self, pkg: &str, slot: &str) -> String {
         self.slot_map.insert(pkg.to_string(), slot.to_string());
-        format!("PR-GENTOO-EAPI8: Slot '{}' assigned to package '{}'", slot, pkg)
+        format!(
+            "PR-GENTOO-EAPI8: Slot '{}' assigned to package '{}'",
+            slot, pkg
+        )
     }
 
     pub fn preserve_soname_pr(&mut self, soname: &str) -> String {
         if !self.preserved_sonames.contains(&soname.to_string()) {
             self.preserved_sonames.push(soname.to_string());
         }
-        format!("PR-GENTOO-PRESERVE-LIBS: Soname '{}' protected against breaking rebuilds", soname)
+        format!(
+            "PR-GENTOO-PRESERVE-LIBS: Soname '{}' protected against breaking rebuilds",
+            soname
+        )
     }
 }
 
@@ -210,7 +240,10 @@ impl NixGuixCasFlakeClosurePrEngine {
         let mut gc_roots = Vec::new();
         gc_roots.push("/nix/var/nix/gcroots/boot-direct".to_string());
 
-        Self { store_paths, gc_roots }
+        Self {
+            store_paths,
+            gc_roots,
+        }
     }
 
     pub fn verify_flake_closure_pr(&self, flake_uri: &str) -> String {
@@ -246,12 +279,18 @@ impl FedoraOstreeBodhiPrEngine {
 
     pub fn stage_sysroot_deployment_pr(&mut self, new_commit: &str) -> String {
         self.current_commit = new_commit.to_string();
-        format!("PR-OSTREE-ATOMIC: Staged atomic deployment commit '{}' for next reboot", new_commit)
+        format!(
+            "PR-OSTREE-ATOMIC: Staged atomic deployment commit '{}' for next reboot",
+            new_commit
+        )
     }
 
     pub fn evaluate_bodhi_karma_pr(&mut self, test_delta_karma: i32) -> String {
         self.bodhi_karma_score += test_delta_karma;
-        format!("PR-FEDORA-BODHI: Greenwave CI karma updated to {} (gated at >= 3)", self.bodhi_karma_score)
+        format!(
+            "PR-FEDORA-BODHI: Greenwave CI karma updated to {} (gated at >= 3)",
+            self.bodhi_karma_score
+        )
     }
 }
 
@@ -267,7 +306,10 @@ pub struct VoidXbpsRunitSupervisorPrEngine {
 impl VoidXbpsRunitSupervisorPrEngine {
     pub fn new() -> Self {
         let mut verified_packages = BTreeMap::new();
-        verified_packages.insert("runit".to_string(), "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855".to_string());
+        verified_packages.insert(
+            "runit".to_string(),
+            "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855".to_string(),
+        );
 
         let mut runit_services = Vec::new();
         runit_services.push("udevd".to_string());
@@ -280,15 +322,22 @@ impl VoidXbpsRunitSupervisorPrEngine {
     }
 
     pub fn verify_xbps_package_pr(&mut self, pkg: &str, sha256: &str) -> String {
-        self.verified_packages.insert(pkg.to_string(), sha256.to_string());
-        format!("PR-VOID-XBPS: Package '{}' RSA-2048 & SHA-256 verified successfully", pkg)
+        self.verified_packages
+            .insert(pkg.to_string(), sha256.to_string());
+        format!(
+            "PR-VOID-XBPS: Package '{}' RSA-2048 & SHA-256 verified successfully",
+            pkg
+        )
     }
 
     pub fn register_runit_service_pr(&mut self, service: &str) -> String {
         if !self.runit_services.contains(&service.to_string()) {
             self.runit_services.push(service.to_string());
         }
-        format!("PR-VOID-RUNIT: Service '{}' registered under /var/service", service)
+        format!(
+            "PR-VOID-RUNIT: Service '{}' registered under /var/service",
+            service
+        )
     }
 }
 
@@ -315,7 +364,10 @@ impl DragonFlyHammer2ClusterPrEngine {
 
     pub fn sync_pfs_transaction_pr(&mut self, node: &str, txg: u64) -> String {
         self.pfs_nodes.insert(node.to_string(), txg);
-        format!("PR-DRAGONFLY-HAMMER2: PFS node '{}' replicated transaction state up to TXG {}", node, txg)
+        format!(
+            "PR-DRAGONFLY-HAMMER2: PFS node '{}' replicated transaction state up to TXG {}",
+            node, txg
+        )
     }
 }
 
@@ -331,7 +383,10 @@ pub struct SlackwarePkgtoolSlackBuildPrEngine {
 impl SlackwarePkgtoolSlackBuildPrEngine {
     pub fn new() -> Self {
         let mut package_db = BTreeMap::new();
-        package_db.insert("glibc-2.39-x86_64-1".to_string(), "GNU C Library".to_string());
+        package_db.insert(
+            "glibc-2.39-x86_64-1".to_string(),
+            "GNU C Library".to_string(),
+        );
 
         let mut sbo_recipes = Vec::new();
         sbo_recipes.push("system/neofetch".to_string());
@@ -344,14 +399,20 @@ impl SlackwarePkgtoolSlackBuildPrEngine {
 
     pub fn install_slackpkg_pr(&mut self, pkg_id: &str, desc: &str) -> String {
         self.package_db.insert(pkg_id.to_string(), desc.to_string());
-        format!("PR-SLACKWARE-PKGTOOL: Installed package '{}' into /var/log/packages", pkg_id)
+        format!(
+            "PR-SLACKWARE-PKGTOOL: Installed package '{}' into /var/log/packages",
+            pkg_id
+        )
     }
 
     pub fn build_sbo_recipe_pr(&mut self, recipe: &str) -> String {
         if !self.sbo_recipes.contains(&recipe.to_string()) {
             self.sbo_recipes.push(recipe.to_string());
         }
-        format!("PR-SLACKWARE-SBO: SlackBuild recipe '{}' compiled into tar.xz package", recipe)
+        format!(
+            "PR-SLACKWARE-SBO: SlackBuild recipe '{}' compiled into tar.xz package",
+            recipe
+        )
     }
 }
 
@@ -377,8 +438,12 @@ impl ChimeraDinitUserlandPrEngine {
     }
 
     pub fn set_service_state_pr(&mut self, service: &str, state: &str) -> String {
-        self.dinit_services.insert(service.to_string(), state.to_string());
-        format!("PR-CHIMERA-DINIT: Service '{}' transition state set to '{}'", service, state)
+        self.dinit_services
+            .insert(service.to_string(), state.to_string());
+        format!(
+            "PR-CHIMERA-DINIT: Service '{}' transition state set to '{}'",
+            service, state
+        )
     }
 }
 
@@ -419,15 +484,42 @@ impl SovereignLinuxBsdGapClosureV39PrSuite {
         let mut results = Vec::new();
 
         results.push(self.alpine_engine.solve_and_install_pr("curl", "8.7.1"));
-        results.push(self.freebsd_engine.bind_iscsi_lun_pr("iqn.2026-07.org.sigmaos:storage.lun1", "10.0.0.2:3260"));
-        results.push(self.openbsd_engine.establish_ikev2_sa_pr("spi-0x98765432", "10.100.0.1"));
-        results.push(self.gentoo_engine.resolve_eapi8_slot_pr("sys-devel/gcc", "14"));
-        results.push(self.nix_engine.verify_flake_closure_pr("github:sigmaos/config"));
-        results.push(self.fedora_engine.stage_sysroot_deployment_pr("ostree-commit-a01f99c2"));
-        results.push(self.void_engine.verify_xbps_package_pr("bash", "a8b7c6d5e4f32109876543210fedcba9876543210fedcba9876543210fedcba9"));
-        results.push(self.dragonfly_engine.sync_pfs_transaction_pr("node-master-1", 1048577));
-        results.push(self.slackware_engine.install_slackpkg_pr("zstd-1.5.5-x86_64-1", "Fast Zstandard Compression"));
-        results.push(self.chimera_engine.set_service_state_pr("pipewire", "started"));
+        results.push(
+            self.freebsd_engine
+                .bind_iscsi_lun_pr("iqn.2026-07.org.sigmaos:storage.lun1", "10.0.0.2:3260"),
+        );
+        results.push(
+            self.openbsd_engine
+                .establish_ikev2_sa_pr("spi-0x98765432", "10.100.0.1"),
+        );
+        results.push(
+            self.gentoo_engine
+                .resolve_eapi8_slot_pr("sys-devel/gcc", "14"),
+        );
+        results.push(
+            self.nix_engine
+                .verify_flake_closure_pr("github:sigmaos/config"),
+        );
+        results.push(
+            self.fedora_engine
+                .stage_sysroot_deployment_pr("ostree-commit-a01f99c2"),
+        );
+        results.push(self.void_engine.verify_xbps_package_pr(
+            "bash",
+            "a8b7c6d5e4f32109876543210fedcba9876543210fedcba9876543210fedcba9",
+        ));
+        results.push(
+            self.dragonfly_engine
+                .sync_pfs_transaction_pr("node-master-1", 1048577),
+        );
+        results.push(
+            self.slackware_engine
+                .install_slackpkg_pr("zstd-1.5.5-x86_64-1", "Fast Zstandard Compression"),
+        );
+        results.push(
+            self.chimera_engine
+                .set_service_state_pr("pipewire", "started"),
+        );
 
         results
     }

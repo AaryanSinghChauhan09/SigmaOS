@@ -50,7 +50,10 @@ pub struct DebianAptListbugsPrEngine {
 impl DebianAptListbugsPrEngine {
     pub fn new() -> Self {
         let mut grave_bugs = BTreeMap::new();
-        grave_bugs.insert("openssl".to_string(), "CVE-2026-9999: Memory corruption in TLS handshake".to_string());
+        grave_bugs.insert(
+            "openssl".to_string(),
+            "CVE-2026-9999: Memory corruption in TLS handshake".to_string(),
+        );
 
         let mut held_packages = Vec::new();
         held_packages.push("openssl".to_string());
@@ -66,7 +69,10 @@ impl DebianAptListbugsPrEngine {
             if !self.held_packages.contains(&pkg.to_string()) {
                 self.held_packages.push(pkg.to_string());
             }
-            format!("PR-DEBIAN-APT-LISTBUGS: Grave bug found in package '{}': {}. Placed on hold.", pkg, bug)
+            format!(
+                "PR-DEBIAN-APT-LISTBUGS: Grave bug found in package '{}': {}. Placed on hold.",
+                pkg, bug
+            )
         } else {
             format!("PR-DEBIAN-APT-LISTBUGS: Package '{}' clean. Zero grave/critical bugs reported in BTS.", pkg)
         }
@@ -85,8 +91,14 @@ pub struct DebianAptListchangesPrEngine {
 impl DebianAptListchangesPrEngine {
     pub fn new() -> Self {
         let mut changelog_entries = BTreeMap::new();
-        changelog_entries.insert("sysvinit".to_string(), "10.0: Default runlevel changed to multi-user target.".to_string());
-        changelog_entries.insert("systemd".to_string(), "256.4: Varlink RPC interface enabled by default.".to_string());
+        changelog_entries.insert(
+            "sysvinit".to_string(),
+            "10.0: Default runlevel changed to multi-user target.".to_string(),
+        );
+        changelog_entries.insert(
+            "systemd".to_string(),
+            "256.4: Varlink RPC interface enabled by default.".to_string(),
+        );
 
         Self {
             changelog_entries,
@@ -97,9 +109,15 @@ impl DebianAptListchangesPrEngine {
     pub fn display_news_and_confirm_pr(&mut self, pkg: &str) -> String {
         self.confirmed_upgrades.push(pkg.to_string());
         if let Some(news) = self.changelog_entries.get(pkg) {
-            format!("PR-DEBIAN-APT-LISTCHANGES: NEWS for '{}': {}. Upgrade confirmed.", pkg, news)
+            format!(
+                "PR-DEBIAN-APT-LISTCHANGES: NEWS for '{}': {}. Upgrade confirmed.",
+                pkg, news
+            )
         } else {
-            format!("PR-DEBIAN-APT-LISTCHANGES: No critical NEWS for '{}'. Upgrade confirmed.", pkg)
+            format!(
+                "PR-DEBIAN-APT-LISTCHANGES: No critical NEWS for '{}'. Upgrade confirmed.",
+                pkg
+            )
         }
     }
 }
@@ -127,7 +145,10 @@ impl DebianPopconPrEngine {
 
     pub fn record_package_use_pr(&mut self, pkg: &str, timestamp: u64) -> String {
         self.package_access_times.insert(pkg.to_string(), timestamp);
-        format!("PR-DEBIAN-POPCON: Recorded access time {} for package '{}'", timestamp, pkg)
+        format!(
+            "PR-DEBIAN-POPCON: Recorded access time {} for package '{}'",
+            timestamp, pkg
+        )
     }
 
     pub fn generate_submission_pr(&self) -> String {
@@ -147,7 +168,10 @@ pub struct DebianAptCacherNgPrEngine {
 impl DebianAptCacherNgPrEngine {
     pub fn new() -> Self {
         let mut cached_urls = BTreeMap::new();
-        cached_urls.insert("http://deb.debian.org/debian/pool/main/c/curl/curl_8.7.1-1_amd64.deb".to_string(), 250000);
+        cached_urls.insert(
+            "http://deb.debian.org/debian/pool/main/c/curl/curl_8.7.1-1_amd64.deb".to_string(),
+            250000,
+        );
 
         Self {
             cached_urls,
@@ -158,10 +182,16 @@ impl DebianAptCacherNgPrEngine {
     pub fn fetch_package_proxy_pr(&mut self, url: &str, size_bytes: u64) -> String {
         if self.cached_urls.contains_key(url) {
             self.cache_hit_count += 1;
-            format!("PR-DEBIAN-APT-CACHER-NG: Cache HIT for {} (Served from local spool)", url)
+            format!(
+                "PR-DEBIAN-APT-CACHER-NG: Cache HIT for {} (Served from local spool)",
+                url
+            )
         } else {
             self.cached_urls.insert(url.to_string(), size_bytes);
-            format!("PR-DEBIAN-APT-CACHER-NG: Cache MISS for {}. Cached {} bytes.", url, size_bytes)
+            format!(
+                "PR-DEBIAN-APT-CACHER-NG: Cache MISS for {}. Cached {} bytes.",
+                url, size_bytes
+            )
         }
     }
 }
@@ -188,15 +218,24 @@ impl DebianNeedrestartPrEngine {
     }
 
     pub fn scan_processes_pr(&mut self) -> String {
-        format!("PR-DEBIAN-NEEDRESTART: Found {} services holding deleted library files", self.outdated_services.len())
+        format!(
+            "PR-DEBIAN-NEEDRESTART: Found {} services holding deleted library files",
+            self.outdated_services.len()
+        )
     }
 
     pub fn restart_service_pr(&mut self, service: &str) -> String {
         if let Some(pos) = self.outdated_services.iter().position(|s| s == service) {
             self.outdated_services.remove(pos);
-            format!("PR-DEBIAN-NEEDRESTART: Restarted outdated service '{}'", service)
+            format!(
+                "PR-DEBIAN-NEEDRESTART: Restarted outdated service '{}'",
+                service
+            )
         } else {
-            format!("PR-DEBIAN-NEEDRESTART: Service '{}' is already up to date", service)
+            format!(
+                "PR-DEBIAN-NEEDRESTART: Service '{}' is already up to date",
+                service
+            )
         }
     }
 }
@@ -223,7 +262,10 @@ impl DebianTaskselProfilesPrEngine {
         if !self.active_tasks.contains(&task_name.to_string()) {
             self.active_tasks.push(task_name.to_string());
         }
-        format!("PR-DEBIAN-TASKSEL: Tasksel profile '{}' installed with meta-dependencies", task_name)
+        format!(
+            "PR-DEBIAN-TASKSEL: Tasksel profile '{}' installed with meta-dependencies",
+            task_name
+        )
     }
 }
 
@@ -250,7 +292,10 @@ impl DebianEtckeeperGitPrEngine {
     pub fn pre_apt_commit_pr(&mut self, commit_msg: &str) -> String {
         self.git_commits.push(commit_msg.to_string());
         self.uncommitted_changes = 0;
-        format!("PR-DEBIAN-ETCKEEPER: Committed /etc changes before APT transaction: '{}'", commit_msg)
+        format!(
+            "PR-DEBIAN-ETCKEEPER: Committed /etc changes before APT transaction: '{}'",
+            commit_msg
+        )
     }
 }
 
@@ -280,7 +325,10 @@ impl DebianDpkgTriggerDbPrEngine {
         for trig in self.pending_triggers.drain(..) {
             self.processed_triggers.push(trig);
         }
-        format!("PR-DEBIAN-DPKG-TRIGGERS: Processed {} deferred triggers (ldconfig, mime, desktop)", count)
+        format!(
+            "PR-DEBIAN-DPKG-TRIGGERS: Processed {} deferred triggers (ldconfig, mime, desktop)",
+            count
+        )
     }
 }
 
@@ -296,16 +344,25 @@ impl DebianAptFileContentsPrEngine {
     pub fn new() -> Self {
         let mut file_index = BTreeMap::new();
         file_index.insert("/usr/bin/curl".to_string(), "curl".to_string());
-        file_index.insert("/usr/include/openssl/ssl.h".to_string(), "libssl-dev".to_string());
+        file_index.insert(
+            "/usr/include/openssl/ssl.h".to_string(),
+            "libssl-dev".to_string(),
+        );
 
         Self { file_index }
     }
 
     pub fn search_owner_pr(&self, path: &str) -> String {
         if let Some(pkg) = self.file_index.get(path) {
-            format!("PR-DEBIAN-APT-FILE: Path '{}' belongs to package '{}'", path, pkg)
+            format!(
+                "PR-DEBIAN-APT-FILE: Path '{}' belongs to package '{}'",
+                path, pkg
+            )
         } else {
-            format!("PR-DEBIAN-APT-FILE: Path '{}' not found in Contents-amd64.gz index", path)
+            format!(
+                "PR-DEBIAN-APT-FILE: Path '{}' not found in Contents-amd64.gz index",
+                path
+            )
         }
     }
 }
@@ -321,19 +378,29 @@ pub struct DebianSchrootSessionPrEngine {
 impl DebianSchrootSessionPrEngine {
     pub fn new() -> Self {
         let mut active_sessions = BTreeMap::new();
-        active_sessions.insert("schroot-sid-amd64-001".to_string(), "unstable-sid".to_string());
+        active_sessions.insert(
+            "schroot-sid-amd64-001".to_string(),
+            "unstable-sid".to_string(),
+        );
 
         Self { active_sessions }
     }
 
     pub fn create_session_pr(&mut self, session_id: &str, profile: &str) -> String {
-        self.active_sessions.insert(session_id.to_string(), profile.to_string());
-        format!("PR-DEBIAN-SCHROOT: Created ephemeral session '{}' using profile '{}'", session_id, profile)
+        self.active_sessions
+            .insert(session_id.to_string(), profile.to_string());
+        format!(
+            "PR-DEBIAN-SCHROOT: Created ephemeral session '{}' using profile '{}'",
+            session_id, profile
+        )
     }
 
     pub fn end_session_pr(&mut self, session_id: &str) -> String {
         if self.active_sessions.remove(session_id).is_some() {
-            format!("PR-DEBIAN-SCHROOT: Terminated session '{}' and cleaned overlay mounts", session_id)
+            format!(
+                "PR-DEBIAN-SCHROOT: Terminated session '{}' and cleaned overlay mounts",
+                session_id
+            )
         } else {
             format!("PR-DEBIAN-SCHROOT: Session '{}' not found", session_id)
         }
@@ -379,13 +446,22 @@ impl DebianLinuxGapClosureV40PrSuite {
         results.push(self.apt_listbugs.query_bts_bugs_pr("openssl"));
         results.push(self.apt_listchanges.display_news_and_confirm_pr("systemd"));
         results.push(self.popcon.generate_submission_pr());
-        results.push(self.apt_cacher_ng.fetch_package_proxy_pr("http://deb.debian.org/debian/pool/main/c/curl/curl_8.7.1-1_amd64.deb", 250000));
+        results.push(self.apt_cacher_ng.fetch_package_proxy_pr(
+            "http://deb.debian.org/debian/pool/main/c/curl/curl_8.7.1-1_amd64.deb",
+            250000,
+        ));
         results.push(self.needrestart.scan_processes_pr());
         results.push(self.tasksel.install_task_pr("web-server"));
-        results.push(self.etckeeper.pre_apt_commit_pr("saving /etc before apt upgrade"));
+        results.push(
+            self.etckeeper
+                .pre_apt_commit_pr("saving /etc before apt upgrade"),
+        );
         results.push(self.dpkg_triggers.process_triggers_pr());
         results.push(self.apt_file.search_owner_pr("/usr/bin/curl"));
-        results.push(self.schroot.create_session_pr("schroot-trixie-002", "testing-trixie"));
+        results.push(
+            self.schroot
+                .create_session_pr("schroot-trixie-002", "testing-trixie"),
+        );
 
         results
     }

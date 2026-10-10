@@ -395,6 +395,6 @@ pub use crate::stubs::package_stubs::*;
 // Nix Content-Addressed Store: reproducible builds & functional package management
 pub mod nix_store;
 pub use nix_store::{
-    NixStore, NixStorePath, NixHash, NixHashAlgo,
-    NixOutput, NixProfile, NixProfileGeneration, NixGcRoot,
+    NixGcRoot, NixHash, NixHashAlgo, NixOutput, NixProfile, NixProfileGeneration, NixStore,
+    NixStorePath,
 };

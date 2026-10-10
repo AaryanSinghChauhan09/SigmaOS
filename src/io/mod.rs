@@ -9,6 +9,6 @@ pub use io_uring::{
 // io_uring v2: Advanced Async I/O (multishot, zero-copy, NVMe passthrough)
 pub mod io_uring_v2;
 pub use io_uring_v2::{
-    IoUringV2, IoUringOpV2, IoUringRegisteredBuf, CqeV2,
-    MultishotState, NvmeUringCmd, RegisteredFileType,
+    CqeV2, IoUringOpV2, IoUringRegisteredBuf, IoUringV2, MultishotState, NvmeUringCmd,
+    RegisteredFileType,
 };
