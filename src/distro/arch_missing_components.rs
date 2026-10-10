@@ -464,117 +464,14 @@ pub struct ArchPacmanHookRunner {
 
 impl ArchPacmanHookRunner {
     pub fn new() -> Self {
-        let sample_hooks = vec![
+        let hooks = vec![
             PacmanHookRule {
                 name: "fontconfig".to_string(),
                 when: PacmanHookWhen::PostTransaction,
                 target_packages: vec!["fontconfig*".to_string(), "ttf-*".to_string()],
                 exec_command: "fc-cache -s".to_string(),
             },
-            PacmanHookRule {
-                name: "systemd-daemon-reload".to_string(),
-                when: PacmanHookWhen::PostTransaction,
-                target_packages: vec!["systemd*".to_string()],
-                exec_command: "systemctl daemon-reload".to_string(),
-            },
         ];
-
-        Self {
-            registered_hooks: sample_hooks,
-        }
-    }
-
-    pub fn match_hooks(&self, when: PacmanHookWhen, updated_pkgs: &[&str]) -> Vec<&PacmanHookRule> {
-        self.registered_hooks
-            .iter()
-            .filter(|h| {
-                h.when == when
-                    && h.target_packages.iter().any(|t| {
-                        let t_clean = t.trim_end_matches('*');
-                        updated_pkgs.iter().any(|p| p.starts_with(t_clean))
-                    })
-            })
-            .collect()
-    }
-}
-
-impl Default for ArchPacmanHookRunner {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct InitramfsHookSpec {
-    pub name: String,
-    pub is_runtime: bool,
-    pub dependencies: Vec<String>,
-}
-
-pub struct ArchMkinitcpioHooksEngine {
-    pub hooks: BTreeMap<String, InitramfsHookSpec>,
-    pub compression_format: String,
-}
-
-impl ArchMkinitcpioHooksEngine {
-    pub fn new() -> Self {
-        let mut hooks = BTreeMap::new();
-        hooks.insert(
-            "base".to_string(),
-            InitramfsHookSpec {
-                name: "base".to_string(),
-                is_runtime: true,
-                dependencies: Vec::new(),
-            },
-        );
-        hooks.insert(
-            "udev".to_string(),
-            InitramfsHookSpec {
-                name: "udev".to_string(),
-                is_runtime: true,
-                dependencies: vec!["base".to_string()],
-            },
-        );
-        hooks.insert(
-            "autodetect".to_string(),
-            InitramfsHookSpec {
-                name: "autodetect".to_string(),
-                is_runtime: false,
-                dependencies: Vec::new(),
-            },
-        );
-        hooks.insert(
-            "kms".to_string(),
-            InitramfsHookSpec {
-                name: "kms".to_string(),
-                is_runtime: true,
-                dependencies: vec!["udev".to_string()],
-            },
-        );
-        hooks.insert(
-            "modconf".to_string(),
-            InitramfsHookSpec {
-                name: "modconf".to_string(),
-                is_runtime: false,
-                dependencies: Vec::new(),
-            },
-        );
-        hooks.insert(
-            "block".to_string(),
-            InitramfsHookSpec {
-                name: "block".to_string(),
-                is_runtime: true,
-                dependencies: vec!["udev".to_string()],
-            },
-        );
-        hooks.insert(
-            "filesystems".to_string(),
-            InitramfsHookSpec {
-                name: "filesystems".to_string(),
-                is_runtime: true,
-                dependencies: vec!["block".to_string()],
-            },
-        );
 
         let registered_hooks = vec![
             PacmanHookRule {
@@ -586,9 +483,7 @@ impl ArchMkinitcpioHooksEngine {
         ];
 
         Self {
-            registered_hooks,
-            hooks,
-            compression_format: "zstd".to_string(),
+            registered_hooks: hooks,
         }
     }
 }

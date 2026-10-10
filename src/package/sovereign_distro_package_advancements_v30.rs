@@ -444,23 +444,24 @@ impl UniversalMultiFormatTranspilerAndExecutionEngineV30 {
         id
     }
 
-    pub fn install_package(&mut self, name: &str) {
-        if !self.installed_packages.contains(&name.to_string()) {
-            self.installed_packages.push(name.to_string());
+    pub fn install_package(&mut self, package_name: &str) {
+        if !self.installed_packages.contains(&package_name.to_string()) {
+            self.installed_packages.push(package_name.to_string());
         }
     }
 
-    /// Rolls back system state to selected boot environment snapshot V30
-    pub fn rollback(&mut self, snapshot_id: usize) -> Result<String, String> {
+    /// Rolls back system state to selected checkpoint V30
+    pub fn rollback(&mut self, checkpoint_id: usize) -> Result<String, String> {
         if let Some(cp) = self
             .checkpoints
             .iter()
-            .find(|c| c.checkpoint_id == snapshot_id)
+            .find(|c| c.checkpoint_id == checkpoint_id)
+            .cloned()
         {
-            self.installed_packages = cp.installed_packages.clone();
+            self.installed_packages = cp.installed_packages;
             Ok(format!(
-                "Successfully rolled back to checkpoint #{}",
-                cp.checkpoint_id
+                "Successfully rolled back to checkpoint '{}'",
+                checkpoint_id
             ))
         } else {
             Err(format!("Checkpoint ID {} not found", snapshot_id))

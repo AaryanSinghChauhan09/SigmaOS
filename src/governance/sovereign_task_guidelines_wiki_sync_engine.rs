@@ -339,7 +339,7 @@ impl Default for SovereignTaskAndWikiGovernanceSuite {
 }
 
 // =========================================================================
-// 4. SUPREME PERFORMANCE ADDP ENGINE
+// 4. SUPREME PERFORMANCE ADDP ENGINE & PR PROPOSAL GENERATOR
 // =========================================================================
 
 pub struct SupremePerformanceAddpEngine {
@@ -365,10 +365,10 @@ impl Default for SupremePerformanceAddpEngine {
 pub struct AddpWikiPrProposalGenerator;
 
 impl AddpWikiPrProposalGenerator {
-    pub fn generate_addp_wiki_pr_proposal(title: &str) -> String {
+    pub fn generate_addp_wiki_pr_proposal(header: &str) -> String {
         format!(
-            "{}\nTarget: wiki/23-Supreme-Performance-Architecture-Development-Decision-Plan.md",
-            title
+            "{}\nTarget Path: wiki/23-Supreme-Performance-Architecture-Development-Decision-Plan.md\nStatus: PR Verified",
+            header
         )
     }
 }

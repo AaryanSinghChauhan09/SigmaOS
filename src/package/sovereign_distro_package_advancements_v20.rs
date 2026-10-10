@@ -367,10 +367,12 @@ impl SovereignDistroPackageAdvancementsSuiteV20 {
         let spec = self.converter.convert_package(filename, payload)?;
         let pr = self.pr_pipeline.submit_package_pr(spec.clone());
 
-        let mut pkg =
-            UnifiedPackage::new(format!("sovereign-{}", pr.converted_spec.package_name), pr.converted_spec.version.clone())
-                .with_format(PackageFormat::SigmaPkg)
-                .with_provides(pr.converted_spec.package_name.clone());
+        let mut pkg = UnifiedPackage::new(
+            format!("sovereign-{}", pr.converted_spec.package_name),
+            pr.converted_spec.version.clone(),
+        )
+        .with_format(PackageFormat::SigmaPkg)
+        .with_provides(pr.converted_spec.package_name.clone());
 
         for dep in &spec.canonical_dependencies {
             pkg = pkg.with_dependency(dep.clone());
