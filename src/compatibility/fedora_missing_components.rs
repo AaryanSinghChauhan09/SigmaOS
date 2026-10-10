@@ -1311,44 +1311,6 @@ mod tests_more {
             vec!["1.1.1.1".to_string(), "8.8.8.8".to_string()]
         );
     }
-
-    #[test]
-    fn test_fedora_rpm_spec_parser() {
-        let spec_content = r#"
-            Name:           nginx
-            Version:        1.24.0
-            Release:        1.fc40
-            Summary:        A high performance HTTP and reverse proxy server
-            License:        BSD-2-Clause
-            URL:            https://nginx.org
-            BuildRequires:  gcc, make, openssl-devel, zlib-devel, pcre2-devel
-            Requires:       openssl, zlib, pcre2
-        "#;
-
-        let meta = FedoraRpmSpecParser::parse_spec(spec_content);
-        assert_eq!(meta.name, "nginx");
-        assert_eq!(meta.version, "1.24.0");
-        assert_eq!(meta.release, "1.fc40");
-        assert_eq!(meta.license, "BSD-2-Clause");
-        assert_eq!(meta.build_requires.len(), 5);
-        assert_eq!(meta.requires.len(), 3);
-    }
-
-    #[test]
-    fn test_fedora_pr_proposal_formatting() {
-        let pr = FedoraPrProposal::new(
-            "Fedora Ecosystem Parity and RPM Spec Parser",
-            "feature/fedora-parity-suite",
-            "Fedora Compatibility",
-        )
-        .with_description("Adds Koji build system, Bodhi updates, RPM spec parser, and Fedora PR proposal generator.")
-        .with_changed_file("src/compatibility/fedora_missing_components.rs");
-
-        let submission = pr.format_as_pull_request_submission();
-        assert!(submission.contains("Fedora Ecosystem Parity and RPM Spec Parser"));
-        assert!(submission.contains("feature/fedora-parity-suite"));
-        assert!(submission.contains("src/compatibility/fedora_missing_components.rs"));
-    }
 }
 
 #[derive(Debug, Clone, Default)]

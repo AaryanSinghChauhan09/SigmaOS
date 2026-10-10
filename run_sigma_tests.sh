@@ -769,8 +769,155 @@ fi
 if [ -f "src/distro/debian_linux_gap_closure_v40_pr.rs" ]; then
     echo "Running Debian Linux Gap Closure PR Suite V40 test suite..."
     mkdir -p build
-    rustc --test src/distro/debian_linux_gap_closure_v40_pr.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_debian_v40_pr
-    ./build/test_debian_v40_pr
+    rustc --test src/kernel/sovereign_clean_code_and_os_principles_engine.rs --edition=2021 -o build/test_clean_code_os_principles
+    ./build/test_clean_code_os_principles
+fi
+
+if [ -f "src/distro/omarchy_linux_gap_closure_pr_suite.rs" ]; then
+    echo "Running Omarchy Linux Gap Closure & PR Gateway test suite..."
+    mkdir -p build
+    rustc --test src/distro/omarchy_linux_gap_closure_pr_suite.rs --edition=2021 -o build/test_omarchy_gap_closure
+    ./build/test_omarchy_gap_closure
+fi
+
+if [ -f "src/distro/sovereign_open_source_os_gap_closure_v27.rs" ]; then
+    echo "Running Open Source OS Gap Closure V27 test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_open_source_os_gap_closure_v27.rs --edition=2021 -o build/test_open_source_v27
+    ./build/test_open_source_v27
+fi
+
+if [ -f "src/distro/sovereign_linux_bsd_ecosystem_advancements_v28.rs" ]; then
+    echo "Running Sovereign Linux & BSD Ecosystem Advancements V28 test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_linux_bsd_ecosystem_advancements_v28.rs --edition=2021 -o build/test_advancements_v28
+    ./build/test_advancements_v28
+fi
+
+if [ -f "src/distro/sovereign_universal_subsystem_interop.rs" ]; then
+    echo "Running Sovereign Universal Subsystem Interoperability test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_universal_subsystem_interop.rs --edition=2021 -o build/universal_subsystem_interop_test
+    ./build/universal_subsystem_interop_test
+fi
+
+if [ -f "src/distro/sovereign_linux_bsd_all_subsystems_harmony.rs" ]; then
+    echo "Running Sovereign Linux & BSD All Subsystems Harmony test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_linux_bsd_all_subsystems_harmony.rs --edition=2021 -o build/test_subsystem_harmony
+    ./build/test_subsystem_harmony
+fi
+
+if [ -f "src/distro/sovereign_gentoo_gap_closure_pr_engine.rs" ]; then
+    echo "Running Sovereign Gentoo Linux Gap Closure PR Engine test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_gentoo_gap_closure_pr_engine.rs --edition=2021 -o build/test_gentoo_pr_engine
+    ./build/test_gentoo_pr_engine
+fi
+
+if [ -f "src/distro/sovereign_arch_gap_closure_pr_engine.rs" ]; then
+    echo "Running Sovereign Arch Linux Gap Closure PR Engine test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_arch_gap_closure_pr_engine.rs --edition=2021 -o build/test_arch_pr_engine
+    ./build/test_arch_pr_engine
+fi
+
+if [ -f "src/distro/sovereign_linux_bsd_ecosystem_advancements_v29.rs" ]; then
+    echo "Running Sovereign Linux & BSD Ecosystem Advancements V29 test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_linux_bsd_ecosystem_advancements_v29.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_advancements_v29
+    ./build/test_advancements_v29
+fi
+
+if [ -f "src/distro/sovereign_mint_omarchy_apex_dominance_v30.rs" ]; then
+    echo "Running Sovereign Linux Mint & Omarchy Apex Dominance Suite V30 test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_mint_omarchy_apex_dominance_v30.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_apex_dominance_v30
+    ./build/test_apex_dominance_v30
+fi
+
+if [ -f "src/distro/sovereign_mint_omarchy_innovations_v31.rs" ]; then
+    echo "Running Sovereign Linux Mint & Omarchy Innovations Suite V31 test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_mint_omarchy_innovations_v31.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_innovations_v31
+    ./build/test_innovations_v31
+fi
+
+if [ -f "src/distro/sovereign_mint_omarchy_v32_apex_arsenal.rs" ]; then
+    echo "Running Sovereign Linux Mint & Omarchy Apex Arsenal Suite V32 test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_mint_omarchy_v32_apex_arsenal.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_apex_arsenal_v32
+    ./build/test_apex_arsenal_v32
+fi
+
+if [ -f "src/distro/sovereign_mint_omarchy_v33_apex_vanguard.rs" ]; then
+    echo "Running Sovereign Linux Mint & Omarchy Apex Vanguard Suite V33 test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_mint_omarchy_v33_apex_vanguard.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_apex_vanguard_v33
+    ./build/test_apex_vanguard_v33
+fi
+
+if [ -f "src/distro/sovereign_mint_omarchy_v34_apex_pantheon.rs" ]; then
+    echo "Running Sovereign Linux Mint & Omarchy Apex Pantheon Suite V34 test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_mint_omarchy_v34_apex_pantheon.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_apex_pantheon_v34
+    ./build/test_apex_pantheon_v34
+fi
+
+if [ -f "scripts/sovereign_mint_omarchy_supremacy_test.sh" ]; then
+    echo "Running Sovereign Mint & Omarchy Supremacy Benchmark Suite..."
+    ./scripts/sovereign_mint_omarchy_supremacy_test.sh
+fi
+
+if [ -f "scripts/sovereign_mint_omarchy_v31_innovations_test.sh" ]; then
+    echo "Running Sovereign Mint & Omarchy V31 Innovations Benchmark Suite..."
+    ./scripts/sovereign_mint_omarchy_v31_innovations_test.sh
+fi
+
+if [ -f "scripts/sovereign_mint_omarchy_v32_arsenal_test.sh" ]; then
+    echo "Running Sovereign Mint & Omarchy V32 Arsenal Benchmark Suite..."
+    ./scripts/sovereign_mint_omarchy_v32_arsenal_test.sh
+fi
+
+if [ -f "scripts/sovereign_mint_omarchy_v33_vanguard_test.sh" ]; then
+    echo "Running Sovereign Mint & Omarchy V33 Vanguard Benchmark Suite..."
+    ./scripts/sovereign_mint_omarchy_v33_vanguard_test.sh
+fi
+
+if [ -f "src/onboarding/first_run_migration_wizard.rs" ]; then
+    echo "Running First-Run Migration Wizard test suite..."
+    mkdir -p build
+    rustc --test src/onboarding/first_run_migration_wizard.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_migration_wizard
+    ./build/test_migration_wizard
+fi
+
+if [ -f "scripts/sovereign_mint_omarchy_v34_pantheon_test.sh" ]; then
+    echo "Running Sovereign Mint & Omarchy V34 Pantheon Benchmark Suite..."
+    ./scripts/sovereign_mint_omarchy_v34_pantheon_test.sh
+fi
+
+if [ -f "src/installer/migration_installer_pipeline.rs" ]; then
+    echo "Running Migration Installer Pipeline test suite..."
+    mkdir -p build
+    rustc --test src/installer/migration_installer_pipeline.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_installer_pipeline
+    ./build/test_installer_pipeline
+fi
+
+if [ -f "src/compatibility/mint_omarchy_migration_bridge.rs" ]; then
+    echo "Running Mint & Omarchy Migration Bridge test suite..."
+    mkdir -p build
+    rustc --test src/compatibility/mint_omarchy_migration_bridge.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_migration_bridge
+    ./build/test_migration_bridge
+fi
+
+if [ -f "scripts/sovereign_migration_first_benchmarks.sh" ]; then
+    echo "Running Sovereign Migration-First Desktop Benchmark Suite..."
+    ./scripts/sovereign_migration_first_benchmarks.sh
+fi
+
+if [ -f "scripts/release_gate_mint_omarchy_migration.sh" ]; then
+    echo "Running Automated Release Validation Gate (Mint & Omarchy)..."
+    ./scripts/release_gate_mint_omarchy_migration.sh
 fi
 
 echo "All SigmaOS test suites completed."

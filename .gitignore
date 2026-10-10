@@ -67,3 +67,10 @@ wiki_repo/
 /user_group_db
 /uts_namespace
 /zfs
+*.md
+*.txt
+*.py
+wiki/
+WIKI/
+!docs/*.md
+!Agents/*.md

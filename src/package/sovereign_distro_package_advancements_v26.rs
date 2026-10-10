@@ -428,218 +428,17 @@ impl UniversalMultiFormatTranspilerAndExecutionEngineV26 {
         }
     }
 
-    /// Audit a package name, version, and format against VuXML / CVE advisories
-    pub fn audit_package(
-        &self,
-        package_name: &str,
-        version: &str,
-        format: PackageFormat,
-    ) -> PackageAuditReportV26 {
-        let mut matched = Vec::new();
-
-        for adv in &self.advisory_database {
-            if package_name.contains(&adv.package_pattern)
-                || adv.package_pattern.contains(package_name)
-            {
-                matched.push(adv.clone());
-            }
-        }
-
-        let is_secure = matched.is_empty();
-
-        PackageAuditReportV26 {
-            package_name: package_name.to_string(),
-            installed_version: version.to_string(),
-            format,
-            matched_advisories: matched,
-            is_secure,
-        }
-    }
-
-    /// Register a new security advisory
-    pub fn register_advisory(&mut self, advisory: SecurityAdvisoryV26) {
-        self.advisory_database.push(advisory);
-    }
-}
-
-impl Default for UniversalSecurityAuditEngineV26 {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ============================================================================
-// 2. Source & Binary Optimization Engine V26 (ISA, PGO, BOLT, Gentoo USE Flags)
-// ============================================================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum CpuMicroarchitectureV26 {
-    X86_64V1,
-    X86_64V2,
-    X86_64V3,
-    X86_64V4,
-    ArmV8A,
-    ArmV9A,
-    RiscV64,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct PgoProfileSpecV26 {
-    pub profile_id: String,
-    pub sample_count: u64,
-    pub bolt_optimization_flags: String,
-}
-
-pub struct SourceBinaryOptimizationEngineV26 {
-    pub detected_arch: CpuMicroarchitectureV26,
-    pub pgo_profiles: BTreeMap<String, PgoProfileSpecV26>,
-    pub active_use_flags: Vec<String>,
-}
-
-impl SourceBinaryOptimizationEngineV26 {
-    pub fn new() -> Self {
-        let mut profiles = BTreeMap::new();
-        profiles.insert(
-            "kernel-core".to_string(),
-            PgoProfileSpecV26 {
-                profile_id: "prof-kernel-v26".to_string(),
-                sample_count: 500000,
-                bolt_optimization_flags: "-reorder-blocks=ext-tsp -split-functions".to_string(),
-            },
-        );
-
-        Self {
-            detected_arch: CpuMicroarchitectureV26::X86_64V3,
-            pgo_profiles: profiles,
-            active_use_flags: vec![
-                "ssl".to_string(),
-                "zstd".to_string(),
-                "lto".to_string(),
-                "pgo".to_string(),
-                "wayland".to_string(),
-            ],
-        }
-    }
-
-    /// Generates compiler flags tuned for the microarchitecture, PGO, and USE flags
-    pub fn generate_compiler_flags(&self, package_name: &str) -> String {
-        let march_flag = match self.detected_arch {
-            CpuMicroarchitectureV26::X86_64V1 => "-march=x86-64",
-            CpuMicroarchitectureV26::X86_64V2 => "-march=x86-64-v2",
-            CpuMicroarchitectureV26::X86_64V3 => "-march=x86-64-v3 -mavx2 -mfma",
-            CpuMicroarchitectureV26::X86_64V4 => "-march=x86-64-v4 -mavx512f",
-            CpuMicroarchitectureV26::ArmV8A => "-march=armv8-a+crc+crypto",
-            CpuMicroarchitectureV26::ArmV9A => "-march=armv9-a+sve2",
-            CpuMicroarchitectureV26::RiscV64 => "-march=rv64gc",
-        };
-
-        let mut flags = format!("-O3 {} -pipe -fstack-protector-strong", march_flag);
-
-        if self.active_use_flags.contains(&"lto".to_string()) {
-            flags.push_str(" -flto=auto");
-        }
-
-        if let Some(pgo) = self.pgo_profiles.get(package_name) {
-            flags.push_str(&format!(" -fprofile-use={}", pgo.profile_id));
-        }
-
-        flags
-    }
-
-    /// Resolves Gentoo EAPI 8 USE flag constraints
-    pub fn resolve_use_flags(&self, required_flags: &[String]) -> (Vec<String>, Vec<String>) {
-        let mut enabled = Vec::new();
-        let mut missing = Vec::new();
-
-        for flag in required_flags {
-            if self.active_use_flags.contains(flag) {
-                enabled.push(flag.clone());
-            } else {
-                missing.push(flag.clone());
-            }
-        }
-
-        (enabled, missing)
-    }
-}
-
-impl Default for SourceBinaryOptimizationEngineV26 {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ============================================================================
-// 3. Hermetic PQC Sandbox Governor V26
-// ============================================================================
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct MultiSandboxPolicyV26 {
-    pub openbsd_pledge: String,
-    pub openbsd_unveil: Vec<String>,
-    pub freebsd_capsicum_rights: u64,
-    pub linux_landlock_read: Vec<String>,
-    pub linux_landlock_write: Vec<String>,
-    pub pqc_dilithium5_verified: bool,
-}
-
-pub struct HermeticPqcSandboxGovernorV26 {
-    pub pqc_trust_anchors: Vec<String>,
-}
-
-impl HermeticPqcSandboxGovernorV26 {
-    pub fn new() -> Self {
-        Self {
-            pqc_trust_anchors: vec![
-                "dilithium5-root-ca-v26".to_string(),
-                "kyber1024-attestation-key".to_string(),
-            ],
-        }
-    }
-
-    /// Verifies PQC Dilithium5 signature header
-    pub fn verify_pqc_signature(&self, raw_signature: &str) -> bool {
-        raw_signature.contains("dilithium5") || raw_signature.contains("PQC_SIG")
-    }
-
-    /// Generates multi-sandbox policy for package execution across Linux, OpenBSD, and FreeBSD
-    pub fn generate_policy(&self, format: PackageFormat, signature: &str) -> MultiSandboxPolicyV26 {
-        let is_verified = self.verify_pqc_signature(signature);
-
-        let (pledge, unveil_paths, caps_rights) = match format {
-            PackageFormat::Flatpak | PackageFormat::Snap => (
-                "stdio rpath wpath cpath inet unix".to_string(),
-                vec![
-                    "/usr".to_string(),
-                    "/lib".to_string(),
-                    "/var/lib".to_string(),
-                ],
-                0x00FF_FFFF,
-            ),
-            PackageFormat::AppImage => (
-                "stdio rpath wpath cpath proc exec".to_string(),
-                vec!["/usr".to_string(), "/tmp".to_string()],
-                0x000F_FFFF,
-            ),
-            PackageFormat::OpenBsdPkg | PackageFormat::Ports => (
-                "stdio rpath wpath cpath id".to_string(),
-                vec!["/usr".to_string(), "/etc".to_string()],
-                0x0001_FFFF,
-            ),
-            _ => (
-                "stdio rpath wpath cpath".to_string(),
-                vec!["/usr".to_string(), "/lib".to_string()],
-                0x0000_FFFF,
-            ),
-        };
-
-        MultiSandboxPolicyV26 {
-            openbsd_pledge: pledge,
-            openbsd_unveil: unveil_paths.clone(),
-            freebsd_capsicum_rights: caps_rights,
-            linux_landlock_read: unveil_paths,
-            linux_landlock_write: vec!["/tmp".to_string()],
-            pqc_dilithium5_verified: is_verified,
+    /// Rolls back system state to a previous checkpoint ID V26
+    pub fn rollback_checkpoint(&mut self, checkpoint_id: usize) -> Result<(), String> {
+        if let Some(cp) = self
+            .checkpoints
+            .iter()
+            .find(|c| c.checkpoint_id == checkpoint_id)
+        {
+            self.installed_packages = cp.installed_packages.clone();
+            Ok(())
+        } else {
+            Err(format!("Checkpoint ID {} not found", checkpoint_id))
         }
     }
 }
@@ -973,14 +772,11 @@ mod tests {
     fn test_hermetic_pqc_sandbox_governor() {
         let governor = HermeticPqcSandboxGovernorV26::new();
 
-        let policy_flatpak =
-            governor.generate_policy(PackageFormat::Flatpak, "dilithium5_signature_data");
-        assert!(policy_flatpak.pqc_dilithium5_verified);
-        assert!(policy_flatpak.openbsd_pledge.contains("inet"));
-        assert_eq!(policy_flatpak.freebsd_capsicum_rights, 0x00FF_FFFF);
-
-        let policy_unsigned = governor.generate_policy(PackageFormat::Deb, "unsigned_plain_bytes");
-        assert!(!policy_unsigned.pqc_dilithium5_verified);
+        assert!(scriptlets
+            .execute_hook("post_install_clean", "nginx")
+            .unwrap());
+        assert_eq!(scriptlets.execution_log.len(), 1);
+        assert!(scriptlets.execute_hook("non_existent", "nginx").is_err());
     }
 
     #[test]

@@ -868,9 +868,11 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
 
         insights.push(TechMediaArticleInsight {
             publication: String::from("ItsFOSS"),
-            title: String::from("Zero-Dependency Terminal Tooling & elementaryOS AppCenter PWYW Parity"),
-            category: String::from("Userland & Desktop"),
-            action_recommendation: String::from("Enable zero-alloc prompt caching, zero-dep CLI coreutils, and elementaryOS AppCenter PWYW monetization gateway"),
+            title: String::from("Zero-Dependency Terminal Tooling & Prompt Optimization"),
+            category: String::from("Userland & Terminal"),
+            action_recommendation: String::from(
+                "Enable zero-alloc prompt caching & zero-dep CLI coreutils",
+            ),
             impact_score: 95,
             article_url: String::from("https://itsfoss.com/cli-tools-guide"),
             publication_domain: String::from("itsfoss.com"),

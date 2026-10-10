@@ -450,6 +450,15 @@ pub use sovereign_linux_bsd_gap_closure_v39_pr::*;
 pub mod debian_linux_gap_closure_v40_pr;
 pub use debian_linux_gap_closure_v40_pr::*;
 
+pub mod sovereign_linux_bsd_all_subsystems_harmony;
+pub use sovereign_linux_bsd_all_subsystems_harmony::*;
+
+pub mod sovereign_gentoo_gap_closure_pr_engine;
+pub use sovereign_gentoo_gap_closure_pr_engine::*;
+
+pub mod sovereign_arch_gap_closure_pr_engine;
+pub use sovereign_arch_gap_closure_pr_engine::*;
+
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;
 pub use crate::stubs::large_distro_stubs::*;
