@@ -19,6 +19,7 @@
 - [15-Architecture-Decisions](15-Architecture-Decisions.md)
 - [18-Enterprise-Productivity-Suite-Roadmap](18-Enterprise-Productivity-Suite-Roadmap.md)
 - [19-Pull-Request-Gateway-Workflows](19-Pull-Request-Gateway-Workflows.md)
+- [20-Ai-Agent-Linux-Bsd-Components-Future-Development-Roadmap-PR](20-Ai-Agent-Linux-Bsd-Components-Future-Development-Roadmap-PR.md)
 - [16-Self-Sufficiency-Encyclopedia](16-Self-Sufficiency-Encyclopedia.md)
 - [17-Repository-Documents](17-Repository-Documents.md)
 - [AI-and-Agent-Runtime](AI-and-Agent-Runtime.md)

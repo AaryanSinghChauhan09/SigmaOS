@@ -17,6 +17,8 @@ pub mod omarchy;
 pub mod omarchy_advanced_parity;
 pub use omarchy_advanced_parity::*;
 pub mod omarchy_future_roadmap;
+pub mod omarchy_linux_gap_closure_pr_suite;
+pub use omarchy_linux_gap_closure_pr_suite::*;
 pub mod sovereign_gap_closure_master_suite;
 pub mod sovereign_open_source_distro_synthesis;
 pub mod sovereign_stack_replacements;
