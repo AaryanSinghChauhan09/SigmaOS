@@ -359,15 +359,12 @@ mod tests {
     }
 
     #[test]
-    fn test_supreme_performance_addp_engine() {
-        let addp = SupremePerformanceAddpEngine::new();
-        assert!(addp.is_addp_compliant());
-
-        let pr_proposal = AddpWikiPrProposalGenerator::generate_addp_wiki_pr_proposal(
-            "# ADDP Supreme Performance",
-        );
-        assert!(pr_proposal
-            .contains("wiki/23-Supreme-Performance-Architecture-Development-Decision-Plan.md"));
+    fn test_architectural_decision_plan_integration() {
+        let mut governor = TaskGuidelinesAndRulesGovernor::new();
+        governor.validate_guideline(1);
+        governor.validate_guideline(3);
+        governor.validate_guideline(4);
+        assert!(governor.is_governance_compliant());
     }
 
     #[test]
