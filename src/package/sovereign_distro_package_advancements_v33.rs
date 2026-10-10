@@ -212,16 +212,12 @@ impl UniversalPackageFormatInspectorV33 {
                 PackageSignatureKindV33::Unsigned,
                 "lzma",
             ),
-            f if f.ends_with(".pup") => (
-                PackageFormat::Pup,
-                PackageSignatureKindV33::Unsigned,
-                "zip",
-            ),
-            f if f.ends_with(".pet") => (
-                PackageFormat::Pet,
-                PackageSignatureKindV33::Unsigned,
-                "tgz",
-            ),
+            f if f.ends_with(".pup") => {
+                (PackageFormat::Pup, PackageSignatureKindV33::Unsigned, "zip")
+            }
+            f if f.ends_with(".pet") => {
+                (PackageFormat::Pet, PackageSignatureKindV33::Unsigned, "tgz")
+            }
             f if f.ends_with(".spack") => (
                 PackageFormat::Spack,
                 PackageSignatureKindV33::GpgOpenPgp,
@@ -277,16 +273,12 @@ impl UniversalPackageFormatInspectorV33 {
                 PackageSignatureKindV33::Unsigned,
                 "gzip",
             ),
-            f if f.ends_with(".xz") || f.ends_with(".tar.xz") => (
-                PackageFormat::Xz,
-                PackageSignatureKindV33::Unsigned,
-                "xz",
-            ),
-            f if f.ends_with(".tar") => (
-                PackageFormat::Tar,
-                PackageSignatureKindV33::Unsigned,
-                "raw",
-            ),
+            f if f.ends_with(".xz") || f.ends_with(".tar.xz") => {
+                (PackageFormat::Xz, PackageSignatureKindV33::Unsigned, "xz")
+            }
+            f if f.ends_with(".tar") => {
+                (PackageFormat::Tar, PackageSignatureKindV33::Unsigned, "raw")
+            }
             _ => (
                 PackageFormat::SigmaPkg,
                 PackageSignatureKindV33::PqcKyberDilithium,
@@ -334,7 +326,10 @@ impl UniversalPackageFormatInspectorV33 {
             detected_format: format,
             signature_kind: sig_kind,
             compression_type: compression.to_string(),
-            dependencies: vec!["sovereign-libc".to_string(), "sovereign-openssl".to_string()],
+            dependencies: vec![
+                "sovereign-libc".to_string(),
+                "sovereign-openssl".to_string(),
+            ],
             provides: vec!["virtual/universal-pkg".to_string()],
             conflicts: vec![],
             target_microarch: detected_microarch,
@@ -476,12 +471,14 @@ impl UniversalMultiSandboxGovernorV33 {
 
     pub fn generate_sandbox_rules(&self, format: PackageFormat) -> SandboxRulesV33 {
         match format {
-            PackageFormat::Flatpak | PackageFormat::Snap | PackageFormat::AppImage => SandboxRulesV33 {
-                landlock_version: 5,
-                pledge_promises: "stdio rpath wpath cpath inet dns".to_string(),
-                unveil_paths: vec!["/tmp".to_string(), "/var/lib".to_string()],
-                capsicum_rights: vec!["CAP_READ".to_string(), "CAP_WRITE".to_string()],
-            },
+            PackageFormat::Flatpak | PackageFormat::Snap | PackageFormat::AppImage => {
+                SandboxRulesV33 {
+                    landlock_version: 5,
+                    pledge_promises: "stdio rpath wpath cpath inet dns".to_string(),
+                    unveil_paths: vec!["/tmp".to_string(), "/var/lib".to_string()],
+                    capsicum_rights: vec!["CAP_READ".to_string(), "CAP_WRITE".to_string()],
+                }
+            }
             PackageFormat::OpenBsdPkg | PackageFormat::Ports => SandboxRulesV33 {
                 landlock_version: 5,
                 pledge_promises: "stdio rpath wpath cpath id process".to_string(),
@@ -527,7 +524,8 @@ impl UniversalCasDeltaStoreGovernorV33 {
         delta_hash: &str,
     ) -> Result<CasDeltaRecordV33, String> {
         let dummy_chunk = vec![0x90; 1024];
-        self.stored_chunks.insert(delta_hash.to_string(), dummy_chunk);
+        self.stored_chunks
+            .insert(delta_hash.to_string(), dummy_chunk);
 
         Ok(CasDeltaRecordV33 {
             chunk_hash: delta_hash.to_string(),
@@ -877,7 +875,10 @@ mod tests {
             .unwrap();
         assert_eq!(manifest.detected_format, PackageFormat::Deb);
         assert_eq!(manifest.name, "zstd-1-5-5-amd64");
-        assert_eq!(manifest.dependencies, vec!["sovereign-libc", "sovereign-openssl"]);
+        assert_eq!(
+            manifest.dependencies,
+            vec!["sovereign-libc", "sovereign-openssl"]
+        );
 
         let signify_payload = b"untrusted comment: openbsd signify signature\nDATA";
         let openbsd_manifest = inspector
@@ -934,7 +935,10 @@ mod tests {
     fn test_cli_router_and_master_coordinator_v33() {
         let mut suite = SovereignDistroPackageAdvancementsSuiteV33::new();
 
-        let cmd = suite.cli_router.route_command("apt install ripgrep --dry-run").unwrap();
+        let cmd = suite
+            .cli_router
+            .route_command("apt install ripgrep --dry-run")
+            .unwrap();
         assert_eq!(cmd.action, UniversalPmActionV33::Install);
         assert!(cmd.dry_run);
 
@@ -942,7 +946,9 @@ mod tests {
             .process_and_install("htop-3.3.0.apk", b"APK_PAYLOAD")
             .unwrap();
         assert_eq!(sigpkg.name, "htop-3-3-0");
-        assert!(suite.installed_packages.contains(&"sigpkg-v33-htop-3-3-0".to_string()));
+        assert!(suite
+            .installed_packages
+            .contains(&"sigpkg-v33-htop-3-3-0".to_string()));
         assert_eq!(suite.udf_engine.execution_log.len(), 2);
     }
 }
