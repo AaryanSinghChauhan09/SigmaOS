@@ -307,9 +307,30 @@ impl AppCenterStoreEngine {
 
     fn populate_sample_catalog(&mut self) {
         let sample_apps = vec![
-            ("io.elementary.code", "Code", "Text editor for developers", "elementary OS Team", 0, true),
-            ("io.elementary.tasks", "Tasks", "Manage your to-do lists", "elementary OS Team", 5, true),
-            ("com.github.cassidyjames.ephemeral", "Ephemeral", "Private web browser", "Cassidy James", 3, true),
+            (
+                "io.elementary.code",
+                "Code",
+                "Text editor for developers",
+                "elementary OS Team",
+                0,
+                true,
+            ),
+            (
+                "io.elementary.tasks",
+                "Tasks",
+                "Manage your to-do lists",
+                "elementary OS Team",
+                5,
+                true,
+            ),
+            (
+                "com.github.cassidyjames.ephemeral",
+                "Ephemeral",
+                "Private web browser",
+                "Cassidy James",
+                3,
+                true,
+            ),
         ];
 
         for (id, title, summary, dev, price, curated) in sample_apps {
@@ -328,7 +349,11 @@ impl AppCenterStoreEngine {
         }
     }
 
-    pub fn purchase_and_install(&mut self, app_id: &str, custom_payment_usd: u32) -> Result<bool, &'static str> {
+    pub fn purchase_and_install(
+        &mut self,
+        app_id: &str,
+        custom_payment_usd: u32,
+    ) -> Result<bool, &'static str> {
         let cost_cents = custom_payment_usd * 100;
         if cost_cents > self.user_balance_cents {
             return Err("Insufficient account balance in AppCenter");
@@ -376,8 +401,16 @@ impl SwitchboardControlCenter {
             ("Network", "Hardware", "preferences-system-network"),
             ("Sound", "Hardware", "preferences-desktop-sound"),
             ("Security & Privacy", "System", "preferences-system-privacy"),
-            ("Parental Controls", "System", "preferences-system-parental-controls"),
-            ("Desktop & Appearance", "Personal", "preferences-desktop-wallpaper"),
+            (
+                "Parental Controls",
+                "System",
+                "preferences-system-parental-controls",
+            ),
+            (
+                "Desktop & Appearance",
+                "Personal",
+                "preferences-desktop-wallpaper",
+            ),
         ];
 
         for (name, category, icon) in defaults {
@@ -423,11 +456,26 @@ impl OnboardingWizardEngine {
 
     fn init_steps(&mut self) {
         let default_steps = vec![
-            ("Welcome to elementary OS", "Get ready for a fast, open, and privacy-respecting desktop."),
-            ("Location Services", "Enable location services for automatic time zone and night light."),
-            ("Night Light", "Protect your eyes at night by turning display colors warmer."),
-            ("Housekeeping", "Automatically clear trash and temporary files to free space."),
-            ("AppCenter", "Discover curated apps designed specifically for elementary OS."),
+            (
+                "Welcome to elementary OS",
+                "Get ready for a fast, open, and privacy-respecting desktop.",
+            ),
+            (
+                "Location Services",
+                "Enable location services for automatic time zone and night light.",
+            ),
+            (
+                "Night Light",
+                "Protect your eyes at night by turning display colors warmer.",
+            ),
+            (
+                "Housekeeping",
+                "Automatically clear trash and temporary files to free space.",
+            ),
+            (
+                "AppCenter",
+                "Discover curated apps designed specifically for elementary OS.",
+            ),
         ];
 
         for (idx, (title, desc)) in default_steps.into_iter().enumerate() {
