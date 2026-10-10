@@ -2452,16 +2452,33 @@ impl Default for DirenvEnvironmentManager {
     }
 }
 
+/// Case-insensitive substring search without heap allocation for ASCII text.
+#[inline]
+fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
+    if haystack.is_ascii() && needle.is_ascii() {
+        needle.is_empty()
+            || (needle.len() <= haystack.len()
+                && haystack
+                    .as_bytes()
+                    .windows(needle.len())
+                    .any(|window| window.eq_ignore_ascii_case(needle.as_bytes())))
+    } else {
+        haystack.to_lowercase().contains(&needle.to_lowercase())
+    }
+}
+
 /// Zsh/Bash fzf-based interactive reverse history search engine (as featured on XDA Developers & Linux.com)
 pub struct ZshFzfHistorySearchEngine;
 
 impl ZshFzfHistorySearchEngine {
+    /// Searches shell history in reverse order.
+    /// Bolt performance optimization: Uses zero-allocation ASCII substring window matching
+    /// (`contains_ignore_case`) to eliminate temporary `String` heap allocations per entry.
     pub fn search(history: &[String], query: &str) -> Vec<String> {
-        let query_lower = query.to_lowercase();
         let mut matches = Vec::new();
 
         for entry in history.iter().rev() {
-            if entry.to_lowercase().contains(&query_lower) {
+            if contains_ignore_case(entry, query) {
                 if !matches.contains(entry) {
                     matches.push(entry.clone());
                 }
