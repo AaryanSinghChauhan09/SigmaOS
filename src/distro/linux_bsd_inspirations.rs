@@ -3917,8 +3917,12 @@ impl SovereignLinuxBsdSubsystemFullInteropMatrix {
         }
     }
 
-    pub fn audit_and_verify_all_distro_subsystems(&mut self) -> Result<(usize, usize), &'static str> {
-        let _synced = self.harmonizer.harmonize_all_subsystems_across_all_distros()?;
+    pub fn audit_and_verify_all_distro_subsystems(
+        &mut self,
+    ) -> Result<(usize, usize), &'static str> {
+        let _synced = self
+            .harmonizer
+            .harmonize_all_subsystems_across_all_distros()?;
         let active_distros = self.harmonizer.harmonized_distros_count;
         let total_subsystems = self.harmonizer.harmonized_subsystems_count;
 
@@ -3929,7 +3933,8 @@ impl SovereignLinuxBsdSubsystemFullInteropMatrix {
     }
 
     pub fn verify_subsystem_interoperability_score(&mut self) -> u32 {
-        self.harmonizer.compute_distro_subsystem_harmonization_score()
+        self.harmonizer
+            .compute_distro_subsystem_harmonization_score()
     }
 }
 
