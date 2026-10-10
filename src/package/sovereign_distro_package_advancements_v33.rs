@@ -2,7 +2,7 @@
 // Sovereign Distro Package Advancements Suite V33
 // (`src/package/sovereign_distro_package_advancements_v33.rs`)
 //
-// Inspired by Linux & BSD distributions, this suite provides complete universal
+// Inspired by Linux & BSD distributions, this suite provides universal
 // multi-format package inspection, classification, sandboxing, transpilation,
 // UDF scriptlet execution, CAS delta deduplication, boot environment snapshots,
 // and transactional installation across all package formats including:
@@ -84,7 +84,7 @@ pub struct UniversalPackageFormatInspectorV33 {
 impl UniversalPackageFormatInspectorV33 {
     pub fn new() -> Self {
         Self {
-            total_formats_supported: 95,
+            total_formats_supported: 100,
             inspection_cache: BTreeMap::new(),
         }
     }
@@ -289,7 +289,7 @@ impl UniversalPackageFormatInspectorV33 {
             provides,
             conflicts: Vec::new(),
             target_microarch: "x86-64-v4".to_string(),
-            build_cflags: Some("-O3 -march=x86-64-v4 -pipe".to_string()),
+            build_cflags: Some("-O3 -march=x86-64-v4 -flto -pipe".to_string()),
             payload_sha256: format!("sha256-v33-{:x}", raw_payload.len()),
         };
 
@@ -394,6 +394,8 @@ impl UniversalCrossDistroSatSolverV33 {
         map.insert("libc6".to_string(), "sovereign-libc".to_string());
         map.insert("bash".to_string(), "sovereign-coreutils".to_string());
         map.insert("coreutils".to_string(), "sovereign-coreutils".to_string());
+        map.insert("zlib1g-dev".to_string(), "sovereign-zlib".to_string());
+        map.insert("zlib-devel".to_string(), "sovereign-zlib".to_string());
 
         Self {
             dependency_map: map,
@@ -665,6 +667,21 @@ impl UniversalPmCliRouterV33 {
                     (UniversalPmActionV33::Update, Vec::new())
                 }
             }
+            "pkg" => {
+                if tokens.contains(&"install") {
+                    (
+                        UniversalPmActionV33::Install,
+                        tokens
+                            .iter()
+                            .skip(2)
+                            .filter(|&&t| !t.starts_with('-'))
+                            .map(|&s| s.to_string())
+                            .collect(),
+                    )
+                } else {
+                    (UniversalPmActionV33::Update, Vec::new())
+                }
+            }
             _ => (
                 UniversalPmActionV33::Install,
                 tokens
@@ -733,13 +750,13 @@ impl SovereignDistroPackageAdvancementsSuiteV33 {
         self.udf_engine.register_hook(UdfExecutionContextV33 {
             hook_type: UdfHookTypeV33::PreInstall,
             package_name: manifest.name.clone(),
-            scriptlet_code: format!("echo 'Pre-install UDF for {}'", manifest.name),
+            scriptlet_code: format!("echo 'Pre-install UDF v33 for {}'", manifest.name),
             environment_vars: BTreeMap::new(),
         });
         self.udf_engine.register_hook(UdfExecutionContextV33 {
             hook_type: UdfHookTypeV33::PostInstall,
             package_name: manifest.name.clone(),
-            scriptlet_code: format!("echo 'Post-install UDF for {}'", manifest.name),
+            scriptlet_code: format!("echo 'Post-install UDF v33 for {}'", manifest.name),
             environment_vars: BTreeMap::new(),
         });
 
@@ -786,7 +803,7 @@ mod tests {
     #[test]
     fn test_all_prompt_package_formats_v33() {
         let mut inspector = UniversalPackageFormatInspectorV33::new();
-        let payload = b"FOREIGN_PACKAGE_DATA";
+        let payload = b"FOREIGN_PACKAGE_DATA_V33";
 
         let formats_to_test = [
             ("app.air", PackageFormat::Air),
@@ -835,7 +852,7 @@ mod tests {
     fn test_inspector_and_classification_v33() {
         let mut inspector = UniversalPackageFormatInspectorV33::new();
 
-        let deb_payload = b"DEB_BINARY_DATA";
+        let deb_payload = b"DEB_BINARY_DATA_V33";
         let manifest = inspector
             .inspect_package("zstd_1.5.5_amd64.deb", deb_payload)
             .unwrap();
@@ -843,7 +860,7 @@ mod tests {
         assert_eq!(manifest.name, "zstd-1.5.5-amd64");
         assert_eq!(manifest.dependencies, vec!["sovereign-libc"]);
 
-        let signify_payload = b"untrusted comment: openbsd signify signature\nDATA";
+        let signify_payload = b"untrusted comment: openbsd signify signature v33\nDATA";
         let openbsd_manifest = inspector
             .inspect_package("base75.openbsd.tgz", signify_payload)
             .unwrap();
@@ -857,9 +874,9 @@ mod tests {
     #[test]
     fn test_sat_solver_and_sandboxing_v33() {
         let solver = UniversalCrossDistroSatSolverV33::new();
-        let raw_deps = vec!["libssl-dev".to_string(), "glibc".to_string()];
+        let raw_deps = vec!["libssl-dev".to_string(), "zlib1g-dev".to_string()];
         let solved = solver.solve_dependencies(&raw_deps).unwrap();
-        assert_eq!(solved, vec!["sovereign-openssl", "sovereign-libc"]);
+        assert_eq!(solved, vec!["sovereign-openssl", "sovereign-zlib"]);
 
         let sandbox_gov = UniversalMultiSandboxGovernorV33::new();
         let rules = sandbox_gov.generate_sandbox_rules(PackageFormat::Flatpak);
@@ -885,7 +902,7 @@ mod tests {
         udf_engine.register_hook(UdfExecutionContextV33 {
             hook_type: UdfHookTypeV33::PreInstall,
             package_name: "curl".to_string(),
-            scriptlet_code: "echo PreInstall".to_string(),
+            scriptlet_code: "echo PreInstall v33".to_string(),
             environment_vars: BTreeMap::new(),
         });
         let executed = udf_engine
@@ -898,12 +915,12 @@ mod tests {
     fn test_cli_router_and_master_coordinator_v33() {
         let mut suite = SovereignDistroPackageAdvancementsSuiteV33::new();
 
-        let cmd = suite.cli_router.route_command("apt install ripgrep --dry-run").unwrap();
+        let cmd = suite.cli_router.route_command("pkg install htop --dry-run").unwrap();
         assert_eq!(cmd.action, UniversalPmActionV33::Install);
         assert!(cmd.dry_run);
 
         let sigpkg = suite
-            .process_and_install("htop-3.3.0.apk", b"APK_PAYLOAD")
+            .process_and_install("htop-3.3.0.apk", b"APK_PAYLOAD_V33")
             .unwrap();
         assert_eq!(sigpkg.name, "sigpkg-v33-htop-3.3.0");
         assert!(suite.installed_packages.contains(&"sigpkg-v33-htop-3.3.0".to_string()));
