@@ -73,7 +73,10 @@ impl UniversalAllPackageFormatConverterV20 {
         map.insert("musl".to_string(), "sovereign-libc".to_string());
         map.insert("libssl-dev".to_string(), "sovereign-openssl".to_string());
         map.insert("openssl-devel".to_string(), "sovereign-openssl".to_string());
-        map.insert("security/openssl".to_string(), "sovereign-openssl".to_string());
+        map.insert(
+            "security/openssl".to_string(),
+            "sovereign-openssl".to_string(),
+        );
         map.insert("zlib".to_string(), "sovereign-compression".to_string());
         map.insert("zstd".to_string(), "sovereign-compression".to_string());
         map.insert("systemd".to_string(), "sovereign-init".to_string());
@@ -127,7 +130,10 @@ impl UniversalAllPackageFormatConverterV20 {
             clean_name
         };
 
-        let base_name = name_no_ext.split(&['-', '_'][..]).next().unwrap_or(name_no_ext);
+        let base_name = name_no_ext
+            .split(&['-', '_'][..])
+            .next()
+            .unwrap_or(name_no_ext);
 
         let mut raw_deps = Vec::new();
         match source_format {
@@ -217,7 +223,10 @@ impl UniversalPrPackageSubmissionPipelineV20 {
         );
         let diff_summary = format!(
             "+ Package: {}\n+ Version: {}\n+ Dependencies: {:?}\n+ SLSA: {}",
-            spec.package_name, spec.version, spec.canonical_dependencies, spec.slsa_attestation_hash
+            spec.package_name,
+            spec.version,
+            spec.canonical_dependencies,
+            spec.slsa_attestation_hash
         );
 
         let manifest = PullRequestPackageManifestV20 {
@@ -290,7 +299,13 @@ impl UniversalMultiPmCliForwarderEngineV20 {
         for arg in args {
             if *arg == "install" || *arg == "add" || *arg == "in" || *arg == "it" || *arg == "-S" {
                 action = "install".to_string();
-            } else if *arg == "remove" || *arg == "del" || *arg == "delete" || *arg == "rm" || *arg == "purge" || *arg == "-R" {
+            } else if *arg == "remove"
+                || *arg == "del"
+                || *arg == "delete"
+                || *arg == "rm"
+                || *arg == "purge"
+                || *arg == "-R"
+            {
                 action = "remove".to_string();
             } else if *arg == "update" || *arg == "upgrade" || *arg == "-Syu" {
                 action = "upgrade".to_string();
@@ -409,9 +424,13 @@ mod tests {
         let deb_spec = converter.convert_package("nginx_1.24.deb", b"DEB").unwrap();
         assert_eq!(deb_spec.package_name, "nginx");
         assert_eq!(deb_spec.source_format, PackageFormat::Deb);
-        assert!(deb_spec.canonical_dependencies.contains(&"sovereign-libc".to_string()));
+        assert!(deb_spec
+            .canonical_dependencies
+            .contains(&"sovereign-libc".to_string()));
 
-        let pac_spec = converter.convert_package("htop-3.3.0.pkg.tar.zst", b"PACMAN").unwrap();
+        let pac_spec = converter
+            .convert_package("htop-3.3.0.pkg.tar.zst", b"PACMAN")
+            .unwrap();
         assert_eq!(pac_spec.package_name, "htop");
         assert_eq!(pac_spec.source_format, PackageFormat::Pacman);
 
@@ -425,7 +444,9 @@ mod tests {
         let converter = UniversalAllPackageFormatConverterV20::new();
         let mut pipeline = UniversalPrPackageSubmissionPipelineV20::new();
 
-        let spec = converter.convert_package("git-2.43.deb", b"GIT_DATA").unwrap();
+        let spec = converter
+            .convert_package("git-2.43.deb", b"GIT_DATA")
+            .unwrap();
         let pr = pipeline.submit_package_pr(spec);
 
         assert_eq!(pr.pr_id, 101);
@@ -435,12 +456,15 @@ mod tests {
 
     #[test]
     fn test_cli_forwarder() {
-        let res_apt = UniversalMultiPmCliForwarderEngineV20::forward_command("apt install redis --dry-run").unwrap();
+        let res_apt =
+            UniversalMultiPmCliForwarderEngineV20::forward_command("apt install redis --dry-run")
+                .unwrap();
         assert_eq!(res_apt.tool_name, "apt");
         assert!(res_apt.is_simulation);
         assert!(res_apt.packages.contains(&"redis".to_string()));
 
-        let res_pac = UniversalMultiPmCliForwarderEngineV20::forward_command("pacman -S zsh").unwrap();
+        let res_pac =
+            UniversalMultiPmCliForwarderEngineV20::forward_command("pacman -S zsh").unwrap();
         assert_eq!(res_pac.tool_name, "pacman");
         assert!(!res_pac.is_simulation);
         assert!(res_pac.packages.contains(&"zsh".to_string()));
@@ -450,12 +474,16 @@ mod tests {
     fn test_suite_v20_end_to_end() {
         let mut suite = SovereignDistroPackageAdvancementsSuiteV20::new();
 
-        let sigpkg = suite.convert_submit_and_install("vim-9.1.rpm", b"VIM_PAYLOAD").unwrap();
+        let sigpkg = suite
+            .convert_submit_and_install("vim-9.1.rpm", b"VIM_PAYLOAD")
+            .unwrap();
         assert_eq!(sigpkg.name, "sigpkg-vim");
         assert!(suite.installed_packages.contains(&"sigpkg-vim".to_string()));
 
         let response = suite.execute_cli_command("apt install tmux").unwrap();
         assert!(response.contains("tmux"));
-        assert!(suite.installed_packages.contains(&"sigpkg-tmux".to_string()));
+        assert!(suite
+            .installed_packages
+            .contains(&"sigpkg-tmux".to_string()));
     }
 }
