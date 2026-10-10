@@ -368,3 +368,52 @@ files = ["src/power/management.rs", "src/power/battery.rs", "src/power/advanced.
 description = "Power management inspired by Linux ACPI and BSD powerd: CPU frequency scaling, battery monitoring, power profiles, and thermal management"
 test_evidence = "Unit tests for power profile switching; no hardware validation or ACPI integration"
 next_milestone = "ACPI table parsing and QEMU power state integration"
+
+[sync.wait_queue]
+status = "prototype"
+files = ["src/kernel/wait_queue.rs"]
+description = "Linux-inspired wait queues, wait events, and completions for thread blocking/wakeup"
+test_evidence = "Unit tests pass; waiting states and completion flags verified"
+next_milestone = "Scheduler task state transition integration and signal cancellation"
+
+[sync.spinlock]
+status = "working"
+files = ["src/kernel/sigma_spinlock.rs"]
+description = "Fair ticket spinlock and reader-writer spinlock with exponential backoff"
+test_evidence = "Unit tests pass; ticket order and RW lock contention verified"
+next_milestone = "IRQ-safe spinlock variants and per-CPU lockdep annotation"
+
+[sync.semaphore]
+status = "prototype"
+files = ["src/kernel/semaphore.rs"]
+description = "Counting semaphore primitive with wait, try_wait, and post counter management"
+test_evidence = "Unit tests pass; counter bounds and waiter queue state verified"
+next_milestone = "Scheduler blocking gate and process-shared POSIX semaphore support"
+
+[sync.futex]
+status = "prototype"
+files = ["src/kernel/futex.rs", "src/ipc/futex.rs"]
+description = "Fast Userspace Mutex (futex) wait/wake/requeue primitives and PI state tracking"
+test_evidence = "Unit tests pass for hash table keys and queue management"
+next_milestone = "Syscall dispatch boundary validation and user-memory safety checks"
+
+[sync.flock]
+status = "prototype"
+files = ["src/kernel/flock.rs"]
+description = "Advisory file locking (BSD flock) supporting shared and exclusive locks"
+test_evidence = "Unit tests pass for lock conflict detection"
+next_milestone = "VFS inode integration and process exit cleanup"
+
+[sync.ipc_primitives]
+status = "prototype"
+files = ["src/kernel/pipe.rs", "src/kernel/msgqueue.rs", "src/kernel/shm.rs", "src/kernel/eventfd.rs", "src/ipc/pipe.rs", "src/ipc/sigma_shm.rs"]
+description = "Kernel and IPC pipe, message queue, shared memory, and eventfd primitives"
+test_evidence = "Unit tests pass for ring buffer reads/writes and event signaling"
+next_milestone = "Process-shared mapping lifecycle, permissions, and VFS file descriptor binding"
+
+[sync.lockdep]
+status = "prototype"
+files = ["src/kernel/lockdep.rs"]
+description = "Lock dependency tracking graph for deadlock and context violation detection"
+test_evidence = "Unit tests pass for lock acquisition order checks"
+next_milestone = "Kernel lock class registration and IRQ context validation"

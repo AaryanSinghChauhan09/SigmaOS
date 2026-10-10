@@ -19,7 +19,7 @@ Develop SigmaOS into a competitive operating system by improving reliability, se
 
 Roadmaps live with their owning component so implementation status, reference comparisons, validation, and future work stay together:
 
-- [Kernel](04-Kernel.md), [memory management](Memory-Management.md), [scheduler](Scheduler.md)
+- [Kernel](04-Kernel.md), [memory management](Memory-Management.md), [scheduler](Scheduler.md), [process synchronization](PROCESS_SYNCHRONIZATION_PLAN.md)
 - [Filesystems and VFS](05-Filesystems.md), [networking](06-Networking.md), [security](07-Security.md)
 - [Drivers](Hardware-Drivers.md), [desktop](08-Desktop.md), [packaging and updates](09-Packaging.md)
 - [Enterprise Productivity Suite Roadmap](18-Enterprise-Productivity-Suite-Roadmap.md), [Pull Request Gateway Workflows](19-Pull-Request-Gateway-Workflows.md)
