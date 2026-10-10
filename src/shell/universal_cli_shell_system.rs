@@ -352,10 +352,16 @@ impl UniversalShellScriptTranspiler {
             return format!("|| {}", &l[3..]);
         }
         if l.starts_with("abbr -a ") || l.starts_with("abbr ") {
-            let rest = l.trim_start_matches("abbr -a ").trim_start_matches("abbr ").trim();
+            let rest = l
+                .trim_start_matches("abbr -a ")
+                .trim_start_matches("abbr ")
+                .trim();
             if let Some(space) = rest.find(' ') {
                 let name = rest[..space].trim();
-                let cmd = rest[space + 1..].trim().trim_matches('\'').trim_matches('"');
+                let cmd = rest[space + 1..]
+                    .trim()
+                    .trim_matches('\'')
+                    .trim_matches('"');
                 return format!("alias {}='{}'", name, cmd);
             }
         }
@@ -420,12 +426,20 @@ impl UniversalShellScriptTranspiler {
             let parts: Vec<&str> = rest.split_whitespace().collect();
             if parts.len() >= 2 {
                 let name = parts[0];
-                let cmd = parts[1..].join(" ").trim_matches('\'').trim_matches('"').to_string();
+                let cmd = parts[1..]
+                    .join(" ")
+                    .trim_matches('\'')
+                    .trim_matches('"')
+                    .to_string();
                 return format!("alias {}='{}'", name, cmd);
             }
         }
         if l.starts_with("set prompt = ") {
-            let prompt_str = l.trim_start_matches("set prompt = ").trim().trim_matches('"').trim_matches('\'');
+            let prompt_str = l
+                .trim_start_matches("set prompt = ")
+                .trim()
+                .trim_matches('"')
+                .trim_matches('\'');
             vars.insert("PS1".to_string(), prompt_str.to_string());
             return format!("export PS1=\"{}\"", prompt_str);
         }
@@ -455,7 +469,11 @@ impl UniversalShellScriptTranspiler {
             return format!("{} &", l.trim_start_matches("coproc ").trim());
         }
         if l.starts_with("let ") {
-            let expr = l.trim_start_matches("let ").trim().trim_matches('"').trim_matches('\'');
+            let expr = l
+                .trim_start_matches("let ")
+                .trim()
+                .trim_matches('"')
+                .trim_matches('\'');
             return format!(": $(( {} ))", expr);
         }
         l
@@ -497,9 +515,10 @@ impl UniversalShellScriptTranspiler {
             return l.replace("Get-Service", "systemctl status");
         }
         if l.starts_with("New-Item ") {
-            return l.replace("New-Item -ItemType Directory -Path", "mkdir -p")
-                    .replace("New-Item -Path", "touch")
-                    .replace("New-Item", "touch");
+            return l
+                .replace("New-Item -ItemType Directory -Path", "mkdir -p")
+                .replace("New-Item -Path", "touch")
+                .replace("New-Item", "touch");
         }
         l
     }
@@ -1101,7 +1120,10 @@ impl UniversalShCrossDialectEngine {
     pub fn new() -> Self {
         let mut exported = BTreeMap::new();
         exported.insert("SHELL".to_string(), "/bin/sh".to_string());
-        exported.insert("PATH".to_string(), "/usr/bin:/bin:/usr/local/bin".to_string());
+        exported.insert(
+            "PATH".to_string(),
+            "/usr/bin:/bin:/usr/local/bin".to_string(),
+        );
         Self {
             default_sh_path: String::from("/bin/sh"),
             strict_posix_mode: true,
@@ -1276,7 +1298,10 @@ mod tests {
         let plan = engine.run_universal_sh_script(es_script).unwrap();
 
         assert_eq!(plan.target_format, ShellSystemFormat::Es);
-        assert_eq!(engine.exported_environment.get("PORT"), Some(&"9090".to_string()));
+        assert_eq!(
+            engine.exported_environment.get("PORT"),
+            Some(&"9090".to_string())
+        );
 
         let translated = engine.convert_to_posix_command("ps aux");
         assert_eq!(translated.canonical_command, "ps");
