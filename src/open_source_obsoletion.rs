@@ -4973,42 +4973,6 @@ impl SovereignOpenSourceObsoletionOrchestrator {
             .add_signature_rule(1001, "TCP", "any", 80, "ALERT HTTP Traffic");
         let _ = self.caddy_tls.provision_acme_certificate("api.sigmaos.org");
 
-        let _ghidra_instrs = self
-            .ghidra_re
-            .disassemble_bytes(0x1000, b"\x90\x31\xc0\xc3");
-        self.kismet_wireless.hop_channel();
-        self.bioctl_raid
-            .register_volume("sd0", "RAID1", &["sd0a", "sd0b"]);
-        let dom = self
-            .libweb_engine
-            .parse_html_tokens("<body><main></main></body>");
-        let _layout = self.libweb_engine.construct_layout_tree(&dom);
-        self.mojo_compiler.build_tensor_graph(
-            "tensor_0",
-            &[1, 64, 64],
-            SimdVectorWidth::Avx512_512,
-        );
-        let _ape_header = self
-            .ape_polyglot
-            .validate_ape_stub(b"MZqFpD_stub_header_bytes_padding_long_enough_for_validation");
-        self.templeos_vga
-            .set_vga_pixel(10, 10, VgaColor16::LightCyan);
-        let fidl_payload = self.fidl_codec.encode_fidl_table(1001, &[]);
-        let _ = self.fidl_codec.decode_fidl_table(&fidl_payload);
-        let drv_hash = self
-            .functional_build
-            .instantiate_derivation("sigma_core", &["gcc"], "make");
-        let _pkg = self.functional_build.execute_sandboxed_build(&drv_hash);
-        self.pf_altq
-            .add_pf_rule("pass", "tcp", "0.0.0.0/0", 80, Some("http_queue"));
-
-        self.trivy_scanner.register_vulnerability("CVE-2026-9999", "CRITICAL", "sovereign-kernel", "Memory issue");
-        self.aria2_downloader.add_download_source("http://dist.sigmaos.org/pkg.tar.zst");
-        self.just_task_runner.register_recipe("build", &["cargo build --release"]);
-        self.supabase_postgrest.register_table("users", &["id", "username", "role"]);
-        self.suricata_ids.add_signature_rule(1001, "TCP", "any", 80, "ALERT HTTP Traffic");
-        let _ = self.caddy_tls.provision_acme_certificate("api.sigmaos.org");
-
         Ok(format!(
             "Sovereign Stack Active: {} legacy open-source projects obsoleted",
             self.total_obsoleted_projects_count
@@ -8953,7 +8917,10 @@ mod tests {
         let mut pg = SovereignSupabasePostgrestEngine::new();
         pg.register_table("audit_logs", &["id", "timestamp", "action"]);
         let endpoint = pg.auto_generate_endpoint("audit_logs").unwrap();
-        assert_eq!(endpoint, "/api/v1/rest/audit_logs?select=id,timestamp,action");
+        assert_eq!(
+            endpoint,
+            "/api/v1/rest/audit_logs?select=id,timestamp,action"
+        );
         assert_eq!(pg.total_api_calls, 1);
         assert_eq!(pg.auto_generate_endpoint("nonexistent"), None);
     }
