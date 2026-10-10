@@ -120,7 +120,9 @@ impl UniversalSecurityAuditEngineV26 {
         let mut matched = Vec::new();
 
         for adv in &self.advisory_database {
-            if package_name.contains(&adv.package_pattern) || adv.package_pattern.contains(package_name) {
+            if package_name.contains(&adv.package_pattern)
+                || adv.package_pattern.contains(package_name)
+            {
                 matched.push(adv.clone());
             }
         }
@@ -283,17 +285,17 @@ impl HermeticPqcSandboxGovernorV26 {
     }
 
     /// Generates multi-sandbox policy for package execution across Linux, OpenBSD, and FreeBSD
-    pub fn generate_policy(
-        &self,
-        format: PackageFormat,
-        signature: &str,
-    ) -> MultiSandboxPolicyV26 {
+    pub fn generate_policy(&self, format: PackageFormat, signature: &str) -> MultiSandboxPolicyV26 {
         let is_verified = self.verify_pqc_signature(signature);
 
         let (pledge, unveil_paths, caps_rights) = match format {
             PackageFormat::Flatpak | PackageFormat::Snap => (
                 "stdio rpath wpath cpath inet unix".to_string(),
-                vec!["/usr".to_string(), "/lib".to_string(), "/var/lib".to_string()],
+                vec![
+                    "/usr".to_string(),
+                    "/lib".to_string(),
+                    "/var/lib".to_string(),
+                ],
                 0x00FF_FFFF,
             ),
             PackageFormat::AppImage => (
@@ -390,11 +392,17 @@ impl BootEnvironmentSnapshotEngineV26 {
     }
 
     /// Rolls back system state to a previous snapshot ID
-    pub fn rollback_snapshot(&self, snapshot_id: usize) -> Result<BootEnvironmentSnapshotV26, String> {
+    pub fn rollback_snapshot(
+        &self,
+        snapshot_id: usize,
+    ) -> Result<BootEnvironmentSnapshotV26, String> {
         if let Some(snap) = self.snapshots.iter().find(|s| s.snapshot_id == snapshot_id) {
             Ok(snap.clone())
         } else {
-            Err(format!("Boot Environment Snapshot ID {} not found", snapshot_id))
+            Err(format!(
+                "Boot Environment Snapshot ID {} not found",
+                snapshot_id
+            ))
         }
     }
 }
@@ -609,7 +617,10 @@ mod tests {
         let report_vulnerable = audit_engine.audit_package("openssl", "3.0.5", PackageFormat::Deb);
         assert!(!report_vulnerable.is_secure);
         assert_eq!(report_vulnerable.matched_advisories.len(), 1);
-        assert_eq!(report_vulnerable.matched_advisories[0].cve_id, "CVE-2026-1001");
+        assert_eq!(
+            report_vulnerable.matched_advisories[0].cve_id,
+            "CVE-2026-1001"
+        );
 
         let report_clean = audit_engine.audit_package("ripgrep", "14.1.0", PackageFormat::Pacman);
         assert!(report_clean.is_secure);
@@ -625,7 +636,8 @@ mod tests {
         assert!(cflags.contains("-flto=auto"));
         assert!(cflags.contains("-fprofile-use=prof-kernel-v26"));
 
-        let (enabled, missing) = optimizer.resolve_use_flags(&["ssl".to_string(), "cuda".to_string()]);
+        let (enabled, missing) =
+            optimizer.resolve_use_flags(&["ssl".to_string(), "cuda".to_string()]);
         assert_eq!(enabled, vec!["ssl".to_string()]);
         assert_eq!(missing, vec!["cuda".to_string()]);
     }
@@ -634,7 +646,8 @@ mod tests {
     fn test_hermetic_pqc_sandbox_governor() {
         let governor = HermeticPqcSandboxGovernorV26::new();
 
-        let policy_flatpak = governor.generate_policy(PackageFormat::Flatpak, "dilithium5_signature_data");
+        let policy_flatpak =
+            governor.generate_policy(PackageFormat::Flatpak, "dilithium5_signature_data");
         assert!(policy_flatpak.pqc_dilithium5_verified);
         assert!(policy_flatpak.openbsd_pledge.contains("inet"));
         assert_eq!(policy_flatpak.freebsd_capsicum_rights, 0x00FF_FFFF);
@@ -647,24 +660,39 @@ mod tests {
     fn test_boot_environment_snapshot_and_rollback() {
         let mut snapshot_engine = BootEnvironmentSnapshotEngineV26::new();
 
-        let id = snapshot_engine.create_snapshot("pre-upgrade", &["curl".to_string(), "nginx".to_string()], 1700000000);
+        let id = snapshot_engine.create_snapshot(
+            "pre-upgrade",
+            &["curl".to_string(), "nginx".to_string()],
+            1700000000,
+        );
         assert_eq!(id, 1);
 
         let rolled_back = snapshot_engine.rollback_snapshot(id).unwrap();
         assert_eq!(rolled_back.label, "pre-upgrade");
-        assert_eq!(rolled_back.installed_packages, vec!["curl".to_string(), "nginx".to_string()]);
+        assert_eq!(
+            rolled_back.installed_packages,
+            vec!["curl".to_string(), "nginx".to_string()]
+        );
     }
 
     #[test]
     fn test_cli_router_and_master_suite() {
         let mut suite = SovereignDistroPackageAdvancementsSuiteV26::new();
 
-        let dispatched = suite.cli_router.route_command("pacman -Syu --print").unwrap();
+        let dispatched = suite
+            .cli_router
+            .route_command("pacman -Syu --print")
+            .unwrap();
         assert_eq!(dispatched.source_pm, "pacman");
         assert_eq!(dispatched.action, UniversalPmActionV26::Upgrade);
         assert!(dispatched.dry_run);
 
-        let (audit, cflags, policy, snap_id) = suite.process_and_audit_package("openssl", "3.0.5", PackageFormat::Deb, "dilithium5_sig");
+        let (audit, cflags, policy, snap_id) = suite.process_and_audit_package(
+            "openssl",
+            "3.0.5",
+            PackageFormat::Deb,
+            "dilithium5_sig",
+        );
         assert!(!audit.is_secure);
         assert!(cflags.contains("-march=x86-64-v3"));
         assert!(policy.pqc_dilithium5_verified);
