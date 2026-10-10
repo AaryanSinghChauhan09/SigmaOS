@@ -1,4 +1,4 @@
-# SOVEREIGN OS ABSOLUTE OMNIPRESENT SELF-SUFFICIENCY ULTRA ENCYCLOPEDIA V48
+# SOVEREIGN OS ABSOLUTE OMNIPRESENT SELF-SUFFICIENCY ULTRA ENCYCLOPEDIA V49
 
 **System Architectural Standard & Complete Operating System Self-Sufficiency Blueprint**
 **Core Objective:** Absolute Native Zero-External-Dependency Self-Sufficiency Across All 12 Core System Shards of SigmaOS. Eliminating the need for external software downloads, third-party binary dependencies, or external web services.
@@ -47,10 +47,10 @@ This encyclopedia maps **every single application, format, codec, framework, and
 
 | External Application / Format / Tool | Native Safe-Rust Replacement in SigmaOS | System Shard / Module Path |
 | :--- | :--- | :--- |
-| **7-Zip / PeaZip / Tar / Zip** | Native `TapeArchiveV2`, `sigma_zip_compat`, `SigmactlAppManagerEngine` | `src/package/declarative_app.rs`, `tools/sigma_zip_compat.rs` |
+| **7-Zip / PeaZip / Tar / Zip / BitTorrent** | Native `TapeArchiveV2`, `sigma_zip_compat`, BitTorrent P2P Engine, `SigmactlAppManagerEngine` | `src/package/declarative_app.rs`, `tools/sigma_zip_compat.rs` |
 | **GParted / TestDisk / FIPS** | `sigma_fdisk_compat`, Zero-Copy Partition Engine | `tools/sigma_fdisk_compat.rs`, `src/filesystem/` |
 | **BleachBit / Leaf Project** | Kernel Memory & Storage Sanitizer | `src/security/hardening.rs` |
-| **Structured Data Formats** (.avro, .parquet, .orc, .hdf5, .shp, .sqlite, .csv, .tsv, .json, .xml, .protobuf, .cml) | Native Columnar Data Decoder & In-Memory Zero-Copy Structured Storage Engine | `src/filesystem/sigma_fs.rs`, `src/userland/` |
+| **Structured Data Formats** (.avro, .cml, .csv, .hdf5, .ods, .orc, .parquet, .protobuf, .shp, .sqlite, .tsv, .xml) | Native Columnar Data Decoder & In-Memory Zero-Copy Structured Storage Engine | `src/filesystem/sigma_fs.rs`, `src/userland/` |
 
 ---
 
@@ -105,7 +105,7 @@ This encyclopedia maps **every single application, format, codec, framework, and
 | **Raster Imagery Codecs** (.apng, .avif, .bpg, .exr, .fits, .flif, .gif, .iff/.lbm, .jng, .jpg/.jpeg, .jxl, .mng, .miff/.mi, .pam, .pbm, .pgm, .ppm, .pnm, .pgf, .png, .qoi, .tiff, .wbmp, .webp, .xbm, .xcf, .xpm, Ghostscript, OpenRAW, LibRaw, dcraw) | Native SIMD Image Decoder & Perceptual dHash Engine | `src/userland/format_runner.rs` |
 | **Vector & Document Graphics** (.cgm, .eps, .pdf, .pgml, .svg, .vml, .xar) | Native Vector Graphic Parser & GPU Tessellator | `src/userland/format_runner.rs` |
 | **Audio Codecs** (Apple Lossless, CELT, Codec2, FAAD2, FFmpeg, FLAC, Fraunhofer FDK AAC, iLBC, iSAC, LAME, libdca, libopus, libvorbis, Musepack, Speex, TooLAME / TwoLAME, WavPack) | Native Real-time SIMD Audio Decoders | `src/userland/format_runner.rs` |
-| **Video Codecs** (Daala, dav1d, Dirac, FFmpeg, Huffyuv, Lagarith, libaom, libgav1, libtheora, libvpx, OpenH264, rav1e, SVT-AV1, Thor, x264, x265, Xvid) | Direct DRM/KMS Hardware Accelerated Video Decoder | `src/video/`, `src/userland/format_runner.rs` |
+| **Video Codecs** (Daala, dav1d, Dirac, FFmpeg, Huffyuv, Lagarith, libaom, libgav1, libtheora, libvpx, OpenH264, rav1e, SVT-AV1, Thor, x264, x265, Xvid, .mkv, .ogv, .webm) | Direct DRM/KMS Hardware Accelerated Video Decoder | `src/video/`, `src/userland/format_runner.rs` |
 
 ---
 
@@ -125,12 +125,12 @@ This encyclopedia maps **every single application, format, codec, framework, and
 | External Framework / Tool | Native Safe-Rust Replacement in SigmaOS | System Shard / Module Path |
 | :--- | :--- | :--- |
 | **PyTorch / TensorFlow / JAX / Keras / Caffe / MXNet / MindSpore / ML.NET / Flux.jl / Theano / Torch / PyTorch Lightning / Fastai / FANN / Horovod / PlaidML / BigDL / Deeplearning4j / DeepSpeed** | Native Tensor Compute Pipeline, Matrix Multiplication Engine & SIMD Tensor Allocator | `src/userland/` |
-| **AutoGPT / CrewAI / AgentGPT / OpenClaw / LangChain / Multi-Agent Orchestrators** | Sovereign AI Agent Orchestrator & Task Execution Engine | `src/governance/sovereign_task_guidelines_wiki_sync_engine.rs` |
+| **Auto-GPT / CrewAI / AgentGPT / OpenClaw / LangChain / Multi-Agent Orchestrators** | Sovereign AI Agent Orchestrator & Task Execution Engine | `src/governance/sovereign_task_guidelines_wiki_sync_engine.rs` |
 | **scikit-learn / XGBoost / LightGBM / CatBoost / LIBSVM / Vowpal Wabbit / Mahout / Spark MLlib / SystemDS / ELKI / Gensim / H2O / Infer.NET / Jubatus / Mallet / mlpack / OpenNN / Shogun / Weka / MOA / Yooreeka / TPOT / NNI / MindsDB** | Native Statistical Learning & Decision Tree Engine | `src/userland/` |
 | **Commercial Machine Learning Platforms** (Amazon ML, Angoss, Azure ML, IBM Watson, Google Cloud Vertex AI, Google Prediction API, IBM SPSS, KXEN, LIONsolver, Mathematica, MATLAB, Neural Designer, NeuroSolutions, Oracle Data Mining, Oracle AI, PolyAnalyst, RCASE, SAS Enterprise Miner, SequenceL, Splunk, STATISTICA) | Native High-Performance Analytics & Machine Learning Pipeline | `src/userland/` |
 | **Apache Cassandra / Apache CouchDB / MariaDB / PostGIS / PostgreSQL / MySQL / ApexDB** | Sovereign Unified In-Memory Database Engine (`ApexDB`, `PostGIS` Spatial Extension) | `src/userland/` |
 | **Lucene / Nutch / Solr / Xapian / OpenSearch / Pgvector** | Native Vector Search, In-Memory Full-Text Search & Index Engine | `src/userland/` |
-| **Data Mining & ETL Tools** (ELKI, FrontlineSMS, KNIME, Orange, RapidMiner, Scriptella ETL, Weka, Jaspersoft, ParaView, VTK) | Native Data Mining Pipeline, Visual Analytics & ETL Processor | `src/userland/` |
+| **Data Mining & ETL Tools** (ELKI, FrontlineSMS, KNIME, Orange, RapidMiner, Scriptella ETL, Weka, Jaspersoft, ParaView, VTK, Libxml2) | Native Data Mining Pipeline, Visual Analytics & ETL Processor | `src/userland/` |
 
 ---
 
@@ -140,11 +140,11 @@ This encyclopedia maps **every single application, format, codec, framework, and
 | :--- | :--- | :--- |
 | **AI LLM Models & Architectures** (Apertus, BERT, Cerebras-GPT, DeepSeek R1/V3, Gemma 4, GLM-4.5, GPT-1/2/OSS, GPT-J/Neo/NeoX, Granite, Grok-1, Kimi, Mistral, OLMo, Phi, Qwen, Sarvam-M/105B/30B, Step-3.5-Flash, T5, XLNet, Meta LLaMA, Falcon) | Sovereign Unified LLM Inference Engine, Memory Multiplexer & SIMD Kernel | `src/userland/` |
 | **LLM Execution & Serving Runtimes** (vLLM, Ollama, llama.cpp, SGLang, ONNX, OpenVINO, TensorRT-LLM) | Sovereign Sub-Millisecond KV Cache & Direct Memory Tensor Allocator | `src/userland/` |
-| **Spiking & Brain-Inspired Neural Frameworks** (EDLUT, Emergent, Encog, JOONE, Nengo, Neuroph, OpenNN, SNNS, OpenCog, Soar, CLARION, LAION OpenAssistant, Mycroft) | Native Cognitive Engine & Neuromorphic Neural Simulator | `src/userland/` |
+| **Spiking & Brain-Inspired Neural Frameworks** (EDLUT, Emergent, Encog, JOONE, Nengo, Neuroph, OpenNN, SNNS, OpenCog, Soar, CLARION, LAION OpenAssistant, Mycroft, AlexNet, VGGNet, Inception) | Native Cognitive Engine & Neuromorphic Neural Simulator | `src/userland/` |
 | **Computer Vision & OCR** (AForge.NET, Dlib, OpenCV, Tesseract, Trex) | Native SIMD Computer Vision & OCR Feature Extractor | `src/userland/` |
-| **NLP & Language Processing** (Apache OpenNLP, Apertium, ChatScript, Gensim, GloVe, Mallet, MontyLingua, Moses, NiuTrans, NLTK, spaCy, Spark NLP, Word2vec) | Native Natural Language Processing & Tokenization Engine | `src/userland/` |
+| **NLP & Language Processing** (Apache OpenNLP, Apertium, ChatScript, Gensim, GloVe, Mallet, MontyLingua, Moses, NiuTrans, NLTK, Probabilistic Action Cores, spaCy, Spark NLP, Word2vec) | Native Natural Language Processing & Tokenization Engine | `src/userland/` |
 | **Speech-to-Text & Speech Synthesis** (CMU Sphinx, DeepSpeech, Julius, Whisper, Festival, WaveNet, eSpeak) | Native Real-time Speech Recognition & Speech Synthesis Engine | `src/userland/` |
-| **Generative AI & RL** (Flux, Stable Diffusion, Hugging Face Transformers, AlphaDev, AlphaTensor, GOLOG, AlphaStar, Deep RL, Deep Q-learning, KataGo) | Native Multi-Modal Generative Model & Reinforcement Learning Suite | `src/userland/` |
+| **Generative AI & RL** (Flux, Stable Diffusion, Hugging Face Transformers, AlphaDev, AlphaTensor, GOLOG, AlphaStar, Deep RL, Deep Q-learning, KataGo, Scratch) | Native Multi-Modal Generative Model & Reinforcement Learning Suite | `src/userland/` |
 
 ---
 

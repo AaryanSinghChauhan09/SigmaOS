@@ -449,14 +449,23 @@ pub struct PacmanHookRule {
     pub exec_command: String,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct InitramfsHookSpec {
+    pub name: String,
+    pub is_runtime: bool,
+    pub dependencies: Vec<String>,
+}
+
 pub struct ArchPacmanHookRunner {
     pub registered_hooks: Vec<PacmanHookRule>,
+    pub initramfs_hooks: BTreeMap<String, InitramfsHookSpec>,
+    pub compression_format: String,
 }
 
 impl ArchPacmanHookRunner {
     pub fn new() -> Self {
-        let mut hooks = BTreeMap::new();
-        hooks.insert(
+        let mut initramfs_hooks = BTreeMap::new();
+        initramfs_hooks.insert(
             "base".to_string(),
             InitramfsHookSpec {
                 name: "base".to_string(),
@@ -464,7 +473,7 @@ impl ArchPacmanHookRunner {
                 dependencies: Vec::new(),
             },
         );
-        hooks.insert(
+        initramfs_hooks.insert(
             "udev".to_string(),
             InitramfsHookSpec {
                 name: "udev".to_string(),
@@ -472,7 +481,7 @@ impl ArchPacmanHookRunner {
                 dependencies: vec!["base".to_string()],
             },
         );
-        hooks.insert(
+        initramfs_hooks.insert(
             "autodetect".to_string(),
             InitramfsHookSpec {
                 name: "autodetect".to_string(),
@@ -480,7 +489,7 @@ impl ArchPacmanHookRunner {
                 dependencies: Vec::new(),
             },
         );
-        hooks.insert(
+        initramfs_hooks.insert(
             "kms".to_string(),
             InitramfsHookSpec {
                 name: "kms".to_string(),
@@ -488,7 +497,7 @@ impl ArchPacmanHookRunner {
                 dependencies: vec!["udev".to_string()],
             },
         );
-        hooks.insert(
+        initramfs_hooks.insert(
             "modconf".to_string(),
             InitramfsHookSpec {
                 name: "modconf".to_string(),
@@ -496,7 +505,7 @@ impl ArchPacmanHookRunner {
                 dependencies: Vec::new(),
             },
         );
-        hooks.insert(
+        initramfs_hooks.insert(
             "block".to_string(),
             InitramfsHookSpec {
                 name: "block".to_string(),
@@ -504,7 +513,7 @@ impl ArchPacmanHookRunner {
                 dependencies: vec!["udev".to_string()],
             },
         );
-        hooks.insert(
+        initramfs_hooks.insert(
             "filesystems".to_string(),
             InitramfsHookSpec {
                 name: "filesystems".to_string(),
@@ -513,8 +522,16 @@ impl ArchPacmanHookRunner {
             },
         );
 
+        let sample_hooks = vec![PacmanHookRule {
+            name: "fontconfig".to_string(),
+            when: PacmanHookWhen::PostTransaction,
+            target_packages: vec!["fontconfig*".to_string(), "ttf-*".to_string()],
+            exec_command: "fc-cache -s".to_string(),
+        }];
+
         Self {
-            hooks,
+            registered_hooks: sample_hooks,
+            initramfs_hooks,
             compression_format: "zstd".to_string(),
         }
     }
@@ -585,9 +602,16 @@ pub struct CachedPackageFile {
     pub file_size_bytes: u64,
 }
 
-pub struct ArchPacmanCacheScrubber {
-    pub cached_files: Vec<CachedPackageFile>,
-    pub retain_keep_count: usize,
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PqcDilithiumKeySpec {
+    pub key_id: String,
+    pub owner_email: String,
+    pub is_trusted: bool,
+    pub dilithium_pubkey_hash: String,
+}
+
+pub struct ArchPacmanKeyringPqcEngine {
+    pub keys: BTreeMap<String, PqcDilithiumKeySpec>,
 }
 
 impl ArchPacmanKeyringPqcEngine {
@@ -603,6 +627,26 @@ impl ArchPacmanKeyringPqcEngine {
             },
         );
         Self { keys }
+    }
+}
+
+impl Default for ArchPacmanKeyringPqcEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct ArchPacmanCacheScrubber {
+    pub cached_files: Vec<CachedPackageFile>,
+    pub retain_keep_count: usize,
+}
+
+impl ArchPacmanCacheScrubber {
+    pub fn new(retain_keep_count: usize) -> Self {
+        Self {
+            cached_files: Vec::new(),
+            retain_keep_count,
+        }
     }
 
     /// Calculates which old package cache files should be purged
