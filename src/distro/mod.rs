@@ -423,6 +423,9 @@ pub use tech_media_publication_innovations::*;
 pub mod sovereign_open_source_os_gap_closure_pr;
 pub use sovereign_open_source_os_gap_closure_pr::*;
 
+pub mod arch_linux_advancements_v38_pr;
+pub use arch_linux_advancements_v38_pr::*;
+
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;
 pub use crate::stubs::large_distro_stubs::*;

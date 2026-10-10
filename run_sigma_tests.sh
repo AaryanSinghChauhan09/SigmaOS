@@ -584,6 +584,13 @@ if [ -f "src/distro/sovereign_open_source_os_gap_closure_pr.rs" ]; then
     ./build/test_os_gap_closure_pr
 fi
 
+if [ -f "src/distro/arch_linux_advancements_v38_pr.rs" ]; then
+    echo "Running Sovereign Arch Linux Advancements Suite V38 PR test suite..."
+    mkdir -p build
+    rustc --test src/distro/arch_linux_advancements_v38_pr.rs --edition=2021 -o build/test_arch_v38_pr
+    ./build/test_arch_v38_pr
+fi
+
 if [ -f "src/compatibility/omarchy_supreme_engine.rs" ]; then
     echo "Running Sovereign Omarchy Supreme Engine test suite..."
     mkdir -p build
