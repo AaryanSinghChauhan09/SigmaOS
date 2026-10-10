@@ -30,6 +30,8 @@ pub enum UniversalSubsystemCategory {
     CompilerToolchain,
     AutomationProvisioning,
     SystemAudit,
+    AiWorkflowAgent,
+    VirtualizationHypervisor,
 }
 
 impl UniversalSubsystemCategory {
@@ -56,6 +58,8 @@ impl UniversalSubsystemCategory {
             Self::CompilerToolchain => "CompilerToolchain",
             Self::AutomationProvisioning => "AutomationProvisioning",
             Self::SystemAudit => "SystemAudit",
+            Self::AiWorkflowAgent => "AiWorkflowAgent",
+            Self::VirtualizationHypervisor => "VirtualizationHypervisor",
         }
     }
 }
