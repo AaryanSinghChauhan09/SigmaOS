@@ -619,11 +619,11 @@ if [ -f "src/distro/sovereign_open_source_os_gap_closure_pr.rs" ]; then
     ./build/test_os_gap_closure_pr
 fi
 
-if [ -f "src/distro/open_source_os_arch_unimplemented_parity_engine.rs" ]; then
-    echo "Running Open Source OS & Arch Linux Parity Engine test suite..."
+if [ -f "src/distro/sovereign_linux_bsd_ecosystem_advancements_v38.rs" ]; then
+    echo "Running Sovereign Linux & BSD Ecosystem Advancements V38 test suite..."
     mkdir -p build
-    rustc --test src/distro/open_source_os_arch_unimplemented_parity_engine.rs --edition=2021 -o build/test_open_source_os_arch_parity
-    ./build/test_open_source_os_arch_parity
+    rustc --test src/distro/sovereign_linux_bsd_ecosystem_advancements_v38.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_advancements_v38
+    ./build/test_advancements_v38
 fi
 
 if [ -f "src/compatibility/omarchy_supreme_engine.rs" ]; then
