@@ -922,6 +922,18 @@ impl KaliLinuxPrProposalEngine {
             **Author**: {}\n\
             **Status**: APPROVED & VERIFIED\n\n\
             #### Subsystem Architecture & Parity Matrix:\n\
+            - `KaliNmapPortScanner`: SYN/Stealth, Connect, and UDP network port scanning engine\n\
+            - `KaliGdbPedaExploitMitigation`: Executable mitigation analyzer (NX, ASLR, Canary, PIE, RELRO)\n\
+            - `KaliBloodHoundActiveDirectoryGraph`: Graph-based Active Directory path auditor & privilege escalation mapper\n\
+            - `KaliEttercapMitmAnalyzer`: ARP poisoning & MITM traffic analyzer\n\
+            - `KaliHydraNetworkBruteforce`: Parallel multi-protocol network authentication password auditing engine\n\
+            - `KaliNiktoWebScanner`: Web server misconfiguration & CGI vulnerability auditor\n\
+            - `KaliExploitEncoder`: Metasploit-style XOR shellcode encoder\n\
+            - `KaliCredentialCracker`: Parallel dictionary & brute-force hash auditor\n\
+            - `KaliPcapDissector`: PCAP packet dissector & TCP stream reconstructor\n\
+            - `KaliWebVulnScanner`: HTTP proxy interceptor & SQLi/XSS fuzzing auditor\n\
+            - `KaliRamMemoryForensics`: Volatility-style RAM memory artifact & process list analyzer\n\
+            - `KaliHashcatCracker`: Multi-algorithm hash identifier & accelerated cracker\n\
             - `KaliKismetWirelessSniffer`: 802.11 Radiotap & WPA2/3 Handshake Auditor\n\
             - `KaliBurpSuiteProxyInterceptor`: HTTP/HTTPS Proxy Interceptor & CSRF Scanner\n\
             - `KaliAutopsyForensicEngine`: Storage Partition & Raw File Carver\n\
@@ -931,7 +943,7 @@ impl KaliLinuxPrProposalEngine {
             - `KaliMimikatzCredentialDumper`: LSASS Memory NTLM/Kerberos Extractor\n\n\
             #### Verification & Testing:\n\
             - 100% `#![no_std]` / `alloc` zero-dependency compliance\n\
-            - Standalone unit tests verified via `cargo test` / `rustc --test`",
+            - Standalone unit tests verified via `cargo test` / `./run_sigma_tests.sh`",
             pr_id, title, author
         )
     }
