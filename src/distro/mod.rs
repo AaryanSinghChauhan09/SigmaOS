@@ -81,6 +81,8 @@ pub mod compat_layers;
 pub mod compliance;
 pub mod debian_github_repo_inspirations_pr;
 pub use debian_github_repo_inspirations_pr::*;
+pub mod open_source_os_unimplemented_ideas_pr_suite;
+pub use open_source_os_unimplemented_ideas_pr_suite::*;
 pub mod debian_parity;
 pub mod developer;
 pub mod enterprise;
