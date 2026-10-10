@@ -72,6 +72,8 @@ pub mod clear_linux;
 pub mod community;
 pub mod compat_layers;
 pub mod compliance;
+pub mod debian_gap_closure_advancements_v26;
+pub use debian_gap_closure_advancements_v26::*;
 pub mod debian_parity;
 pub mod developer;
 pub mod enterprise;
