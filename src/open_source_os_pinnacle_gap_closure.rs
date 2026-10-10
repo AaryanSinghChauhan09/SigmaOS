@@ -292,6 +292,47 @@ mod tests {
     }
 
     #[test]
+    fn test_dragonfly_and_smartos_engines() {
+        let mut hammer = SovereignDragonFlyHammer2Engine::new("/hammer2");
+        assert_eq!(hammer.commit_transaction(), 2);
+        hammer.spawn_vkernel("vk0", 2001);
+        assert_eq!(hammer.active_vkernel_pids.get("vk0"), Some(&2001));
+
+        let mut crossbow = SovereignSmartOSCrossbowEngine::new();
+        crossbow.create_etherstub("stub0");
+        assert!(crossbow.create_vnic("vnic0", "stub0"));
+        crossbow.set_zone_rbac("zoneA", "sys_net_config");
+        assert_eq!(crossbow.zone_rbac_policies.get("zoneA").unwrap().len(), 1);
+    }
+
+    #[test]
+    fn test_openbsd_redox_fuchsia_freebsd_serenity_engines() {
+        let mut obsd = SovereignOpenBsdSecurityEngine::new(1);
+        obsd.pledge(&["stdio", "rpath"]);
+        obsd.unveil("/etc", "r");
+        assert_eq!(obsd.pledged_promises.len(), 2);
+
+        let mut redox = SovereignRedoxSchemeEngine::new();
+        redox.register_scheme("proc", "proc_driver");
+        assert_eq!(
+            redox.resolve_scheme_url("proc:1/status"),
+            Some(&"proc_driver".to_string())
+        );
+
+        let mut fuchsia = SovereignFuchsiaZirconEngine::new();
+        fuchsia.create_channel(1001, 0x07);
+        assert!(fuchsia.write_channel_msg(1001, b"ping"));
+
+        let mut geom = SovereignFreeBsdGeomEngine::new();
+        assert!(geom.register_provider("ada0", "DISK"));
+
+        let mut serenity = SovereignSerenityCoreEngine::new();
+        serenity.post_event("PaintEvent");
+        serenity.set_property("window_title", "SigmaOS Terminal");
+        assert_eq!(serenity.event_queue.len(), 1);
+    }
+
+    #[test]
     fn test_open_source_os_pr_proposal_engine() {
         let mut engine = SovereignOpenSourceOsPrProposalEngine::new();
         let pending = engine.list_pending_pr_proposals();

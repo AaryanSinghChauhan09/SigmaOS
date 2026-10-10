@@ -455,20 +455,68 @@ pub struct ArchPacmanHookRunner {
 
 impl ArchPacmanHookRunner {
     pub fn new() -> Self {
-        let mut hooks = Vec::new();
-        hooks.push(PacmanHookRule {
-            name: "fontconfig.hook".to_string(),
-            when: PacmanHookWhen::PostTransaction,
-            target_packages: vec!["fontconfig".to_string(), "ttf-*".to_string()],
-            exec_command: "fc-cache -s".to_string(),
-        });
-        hooks.push(PacmanHookRule {
-            name: "systemd-daemon-reload.hook".to_string(),
-            when: PacmanHookWhen::PostTransaction,
-            target_packages: vec!["systemd".to_string()],
-            exec_command: "systemctl daemon-reload".to_string(),
-        });
-        Self { registered_hooks: hooks }
+        let mut hooks = BTreeMap::new();
+        hooks.insert(
+            "base".to_string(),
+            InitramfsHookSpec {
+                name: "base".to_string(),
+                is_runtime: true,
+                dependencies: Vec::new(),
+            },
+        );
+        hooks.insert(
+            "udev".to_string(),
+            InitramfsHookSpec {
+                name: "udev".to_string(),
+                is_runtime: true,
+                dependencies: vec!["base".to_string()],
+            },
+        );
+        hooks.insert(
+            "autodetect".to_string(),
+            InitramfsHookSpec {
+                name: "autodetect".to_string(),
+                is_runtime: false,
+                dependencies: Vec::new(),
+            },
+        );
+        hooks.insert(
+            "kms".to_string(),
+            InitramfsHookSpec {
+                name: "kms".to_string(),
+                is_runtime: true,
+                dependencies: vec!["udev".to_string()],
+            },
+        );
+        hooks.insert(
+            "modconf".to_string(),
+            InitramfsHookSpec {
+                name: "modconf".to_string(),
+                is_runtime: false,
+                dependencies: Vec::new(),
+            },
+        );
+        hooks.insert(
+            "block".to_string(),
+            InitramfsHookSpec {
+                name: "block".to_string(),
+                is_runtime: true,
+                dependencies: vec!["udev".to_string()],
+            },
+        );
+        hooks.insert(
+            "filesystems".to_string(),
+            InitramfsHookSpec {
+                name: "filesystems".to_string(),
+                is_runtime: true,
+                dependencies: vec!["block".to_string()],
+            },
+        );
+
+        Self {
+            hooks,
+            compression_format: "zstd".to_string(),
+        }
     }
 
     pub fn match_hooks(&self, when: PacmanHookWhen, updated_pkgs: &[&str]) -> Vec<&PacmanHookRule> {
@@ -492,7 +540,42 @@ impl Default for ArchPacmanHookRunner {
 }
 
 // =========================================================================
-// 10. PACMAN CACHE SCRUBBER (paccache)
+// 10. PACSTRAP & ARCH-CHROOT ROOTFS ENGINE (pacstrap / arch-chroot)
+// =========================================================================
+
+pub struct ArchPacstrapChrootEngine {
+    pub target_rootfs: String,
+    pub base_packages: Vec<String>,
+}
+
+impl ArchPacstrapChrootEngine {
+    pub fn new(target_rootfs: &str) -> Self {
+        Self {
+            target_rootfs: target_rootfs.to_string(),
+            base_packages: vec![
+                "base".to_string(),
+                "linux".to_string(),
+                "linux-firmware".to_string(),
+                "sigma-pkg".to_string(),
+            ],
+        }
+    }
+
+    pub fn generate_pacstrap_command(&self) -> String {
+        format!(
+            "pacstrap -K {} {}",
+            self.target_rootfs,
+            self.base_packages.join(" ")
+        )
+    }
+
+    pub fn generate_chroot_command(&self, cmd: &str) -> String {
+        format!("arch-chroot {} {}", self.target_rootfs, cmd)
+    }
+}
+
+// =========================================================================
+// 11. PACMAN-KEY PQC DILITHIUM5 KEYRING ENGINE (pacman-key)
 // =========================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -507,20 +590,19 @@ pub struct ArchPacmanCacheScrubber {
     pub retain_keep_count: usize,
 }
 
-impl ArchPacmanCacheScrubber {
-    pub fn new(retain_count: usize) -> Self {
-        Self {
-            cached_files: Vec::new(),
-            retain_keep_count: retain_count,
-        }
-    }
-
-    pub fn add_cache_entry(&mut self, pkgname: &str, version: &str, size_bytes: u64) {
-        self.cached_files.push(CachedPackageFile {
-            pkgname: pkgname.to_string(),
-            version: version.to_string(),
-            file_size_bytes: size_bytes,
-        });
+impl ArchPacmanKeyringPqcEngine {
+    pub fn new() -> Self {
+        let mut keys = BTreeMap::new();
+        keys.insert(
+            "arch-master-1".to_string(),
+            PqcDilithiumKeySpec {
+                key_id: "arch-master-1".to_string(),
+                owner_email: "packager@archlinux.org".to_string(),
+                is_trusted: true,
+                dilithium_pubkey_hash: "pqc-dilithium5-hash-9901".to_string(),
+            },
+        );
+        Self { keys }
     }
 
     /// Calculates which old package cache files should be purged
@@ -802,14 +884,15 @@ mod tests {
         assert_eq!(matched.len(), 1);
         assert_eq!(matched[0].exec_command, "fc-cache -s");
 
-        let mut scrubber = ArchPacmanCacheScrubber::new(1);
-        scrubber.add_cache_entry("bash", "5.1-1", 1000);
-        scrubber.add_cache_entry("bash", "5.2-1", 1200);
-        scrubber.add_cache_entry("bash", "5.2-2", 1300);
-
-        let (purged, freed) = scrubber.purge_unneeded_cache();
-        assert_eq!(purged, 2);
-        assert_eq!(freed, 2200);
+        let pacstrap = ArchPacstrapChrootEngine::new("/mnt");
+        assert_eq!(
+            pacstrap.generate_pacstrap_command(),
+            "pacstrap -K /mnt base linux linux-firmware sigma-pkg"
+        );
+        assert_eq!(
+            pacstrap.generate_chroot_command("mkinitcpio -P"),
+            "arch-chroot /mnt mkinitcpio -P"
+        );
     }
 
     #[test]

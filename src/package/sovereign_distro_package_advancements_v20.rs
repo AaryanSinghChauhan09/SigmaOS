@@ -367,12 +367,10 @@ impl SovereignDistroPackageAdvancementsSuiteV20 {
         let spec = self.converter.convert_package(filename, payload)?;
         let _pr = self.pr_pipeline.submit_package_pr(spec.clone());
 
-        let mut pkg = UnifiedPackage::new(
-            format!("sigpkg-{}", spec.package_name),
-            spec.version.clone(),
-        )
-        .with_format(PackageFormat::SigmaPkg)
-        .with_provides(spec.package_name.clone());
+        let mut pkg =
+            UnifiedPackage::new(format!("sovereign-{}", pr.package_name), pr.version.clone())
+                .with_format(PackageFormat::SigmaPkg)
+                .with_provides(pr.package_name.clone());
 
         for dep in &spec.canonical_dependencies {
             pkg = pkg.with_dependency(dep.clone());
@@ -421,10 +419,12 @@ mod tests {
     fn test_converter_all_formats() {
         let converter = UniversalAllPackageFormatConverterV20::new();
 
-        let deb_spec = converter.convert_package("nginx_1.24.deb", b"DEB").unwrap();
-        assert_eq!(deb_spec.package_name, "nginx");
-        assert_eq!(deb_spec.source_format, PackageFormat::Deb);
-        assert!(deb_spec
+        let pr1 = engine
+            .ingest_foreign_package_pr("gcc-13.2.0.pkg.tar.zst", b"ARCH_PAYLOAD")
+            .unwrap();
+        assert_eq!(pr1.original_format, PackageFormat::Pacman);
+        assert_eq!(pr1.package_name, "gcc-13");
+        assert!(pr1
             .canonical_dependencies
             .contains(&"sovereign-libc".to_string()));
 

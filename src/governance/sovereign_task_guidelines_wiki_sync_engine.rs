@@ -187,10 +187,59 @@ impl WikiDataTransferEngine {
         );
 
         self.feature_specs.insert(
+            "SovereignLinuxBsdEcosystemAdvancementsV22".to_string(),
+            FeatureMdStatus {
+                spec_name: "06-Sovereign-Linux-BSD-Ecosystem-Advancements-V22.md".to_string(),
+                source_path: "wiki_repo/06-Sovereign-Linux-BSD-Ecosystem-Advancements-V22.md"
+                    .to_string(),
+                is_fully_implemented: true,
+                completion_percentage: 100,
+                wiki_mirrored: true,
+            },
+        );
+
+        self.feature_specs.insert(
             "ArchitectureDevelopmentDecisionPlan".to_string(),
             FeatureMdStatus {
-                spec_name: "18-Architecture-Development-Decision-Plan-PR.md".to_string(),
-                source_path: "wiki/18-Architecture-Development-Decision-Plan-PR.md".to_string(),
+                spec_name: "07-Architecture-Development-Decision-Plan-Supreme-Performance.md"
+                    .to_string(),
+                source_path:
+                    "wiki_repo/07-Architecture-Development-Decision-Plan-Supreme-Performance.md"
+                        .to_string(),
+                is_fully_implemented: true,
+                completion_percentage: 100,
+                wiki_mirrored: true,
+            },
+        );
+
+        self.feature_specs.insert(
+            "CleanCodeAndOsPrinciples".to_string(),
+            FeatureMdStatus {
+                spec_name: "08-Sovereign-Clean-Code-And-OS-Principles-Engine.md".to_string(),
+                source_path: "wiki_repo/08-Sovereign-Clean-Code-And-OS-Principles-Engine.md"
+                    .to_string(),
+                is_fully_implemented: true,
+                completion_percentage: 100,
+                wiki_mirrored: true,
+            },
+        );
+
+        self.feature_specs.insert(
+            "OmarchyLinuxGapClosurePrSuite".to_string(),
+            FeatureMdStatus {
+                spec_name: "09-Omarchy-Linux-Gap-Closure-PR-Suite.md".to_string(),
+                source_path: "wiki_repo/09-Omarchy-Linux-Gap-Closure-PR-Suite.md".to_string(),
+                is_fully_implemented: true,
+                completion_percentage: 100,
+                wiki_mirrored: true,
+            },
+        );
+
+        self.feature_specs.insert(
+            "OpenSourceOsGapClosureV27Suite".to_string(),
+            FeatureMdStatus {
+                spec_name: "10-Open-Source-OS-Gap-Closure-V27-PR-Suite.md".to_string(),
+                source_path: "wiki_repo/10-Open-Source-OS-Gap-Closure-V27-PR-Suite.md".to_string(),
                 is_fully_implemented: true,
                 completion_percentage: 100,
                 wiki_mirrored: true,
@@ -307,6 +356,18 @@ mod tests {
         governor.validate_guideline(3);
         governor.validate_guideline(4);
         assert!(governor.is_governance_compliant());
+    }
+
+    #[test]
+    fn test_supreme_performance_addp_engine() {
+        let addp = SupremePerformanceAddpEngine::new();
+        assert!(addp.is_addp_compliant());
+
+        let pr_proposal = AddpWikiPrProposalGenerator::generate_addp_wiki_pr_proposal(
+            "# ADDP Supreme Performance",
+        );
+        assert!(pr_proposal
+            .contains("wiki/23-Supreme-Performance-Architecture-Development-Decision-Plan.md"));
     }
 
     #[test]

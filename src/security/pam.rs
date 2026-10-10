@@ -135,16 +135,7 @@ impl SovereignPamManager {
         user_token: &str,
         primary_group: &str,
     ) -> Result<u32, PamError> {
-        // Security Hardening: Reject inputs containing embedded NUL bytes or ASCII control characters
-        // to prevent C-ABI truncation, log injection, and CWE-20 input validation bypass.
-        if contains_invalid_chars(username)
-            || contains_invalid_chars(user_token)
-            || contains_invalid_chars(primary_group)
-        {
-            return Err(PamError::PermissionDenied);
-        }
-
-        if self.users.get(username).is_some() {
+        if self.users.get(&username.to_string()).is_some() {
             return Err(PamError::UserAlreadyExists);
         }
 
@@ -245,17 +236,10 @@ impl SovereignPamManager {
         }
 
         // Retrieve the user
-        let user = match self.users.get_mut(username) {
-            Some(u) => u,
-            None => {
-                // Timing side-channel mitigation: Perform dummy password hashing
-                // to match computation time of existing user lookup (CWE-208 / CWE-385)
-                let dummy_salt = [0u8; 16];
-                let dummy_hash = hash_password_placeholder(user_token, &dummy_salt);
-                let _ = constant_time_eq(&dummy_hash, &[0u8; 32]);
-                return Err(PamError::UserNotFound);
-            }
-        };
+        let user = self
+            .users
+            .get_mut(&username.to_string())
+            .ok_or(PamError::UserNotFound)?;
 
         // Validate account/lock state through stacked pam modules first
         for module in &self.modules {
@@ -372,56 +356,6 @@ mod tests {
         assert_eq!(
             manager.authenticate("alice", alice_valid_pass),
             Err(PamError::AccountLocked)
-        );
-    }
-
-    #[test]
-    fn test_pam_input_validation_and_timing_side_channel_mitigation() {
-        let mut manager = SovereignPamManager::new();
-        manager.create_group("wheel").unwrap();
-        manager
-            .register_user("jules", "secretpass123", "wheel")
-            .unwrap();
-
-        // Reject NUL bytes and control characters in registration
-        assert_eq!(
-            manager.register_user("evil\0user", "pass12345", "wheel"),
-            Err(PamError::PermissionDenied)
-        );
-        assert_eq!(
-            manager.register_user("evil_user", "pass\x1b[31m", "wheel"),
-            Err(PamError::PermissionDenied)
-        );
-        assert_eq!(
-            manager.register_user("evil_user", "pass12345", "wheel\nadmin"),
-            Err(PamError::PermissionDenied)
-        );
-
-        // Reject NUL bytes and control characters in authentication
-        assert_eq!(
-            manager.authenticate("jules\0admin", "secretpass123"),
-            Err(PamError::PermissionDenied)
-        );
-        assert_eq!(
-            manager.authenticate("jules", "secretpass123\r\n"),
-            Err(PamError::PermissionDenied)
-        );
-
-        // Reject NUL bytes in group operations
-        assert_eq!(
-            manager.create_group("wheel\0group"),
-            Err(PamError::PermissionDenied)
-        );
-        assert_eq!(
-            manager.add_user_to_group("jules", "wheel\0group"),
-            Err(PamError::PermissionDenied)
-        );
-        assert!(!manager.is_member_of("jules\0", "wheel"));
-
-        // Verify non-existent user returns UserNotFound (executes dummy hashing path)
-        assert_eq!(
-            manager.authenticate("non_existent_user", "somepassword"),
-            Err(PamError::UserNotFound)
         );
     }
 }

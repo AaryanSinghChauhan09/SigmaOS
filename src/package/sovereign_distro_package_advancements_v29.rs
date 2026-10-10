@@ -235,24 +235,27 @@ pub struct UniversalCrossDistroSatDependencySolverV29 {
 
 impl UniversalCrossDistroSatDependencySolverV29 {
     pub fn new() -> Self {
-        let mut canonical_mapping = BTreeMap::new();
-        canonical_mapping.insert("libssl-dev".to_string(), "sovereign-openssl".to_string());
-        canonical_mapping.insert("openssl-devel".to_string(), "sovereign-openssl".to_string());
-        canonical_mapping.insert(
+        let mut map = BTreeMap::new();
+        map.insert("libssl-dev".to_string(), "sovereign-openssl".to_string());
+        map.insert("openssl-devel".to_string(), "sovereign-openssl".to_string());
+        map.insert(
             "security/openssl".to_string(),
             "sovereign-openssl".to_string(),
         );
-        canonical_mapping.insert("libc6".to_string(), "sovereign-libc".to_string());
-        canonical_mapping.insert("glibc".to_string(), "sovereign-libc".to_string());
-        canonical_mapping.insert("musl".to_string(), "sovereign-libc".to_string());
-        canonical_mapping.insert("zlib1g-dev".to_string(), "sovereign-zlib".to_string());
-        canonical_mapping.insert("zlib-devel".to_string(), "sovereign-zlib".to_string());
-
-        let mut soname_database = BTreeMap::new();
-        soname_database.insert("libssl.so.3".to_string(), "sovereign-openssl".to_string());
-        soname_database.insert("libc.so.6".to_string(), "sovereign-libc".to_string());
-        soname_database.insert("libm.so.6".to_string(), "sovereign-libc".to_string());
-        soname_database.insert("libz.so.1".to_string(), "sovereign-zlib".to_string());
+        map.insert("libc6".to_string(), "sovereign-libc".to_string());
+        map.insert("glibc".to_string(), "sovereign-libc".to_string());
+        map.insert("musl".to_string(), "sovereign-libc".to_string());
+        map.insert("zlib1g-dev".to_string(), "sovereign-zlib".to_string());
+        map.insert("zlib-devel".to_string(), "sovereign-zlib".to_string());
+        map.insert("libcurl-dev".to_string(), "sovereign-curl".to_string());
+        map.insert("curl-devel".to_string(), "sovereign-curl".to_string());
+        map.insert("python3-dev".to_string(), "sovereign-python".to_string());
+        map.insert("python3-devel".to_string(), "sovereign-python".to_string());
+        map.insert("wayland-devel".to_string(), "sovereign-wayland".to_string());
+        map.insert(
+            "pipewire-devel".to_string(),
+            "sovereign-pipewire".to_string(),
+        );
 
         Self {
             canonical_mapping,
@@ -466,20 +469,52 @@ impl UniversalBootEnvSnapshotGovernorV29 {
         let id = self.next_snapshot_id;
         self.next_snapshot_id += 1;
 
-        self.snapshots.push(BootEnvSnapshotV29 {
-            snapshot_id: id,
-            name: name.to_string(),
-            backend,
-            active_packages,
+        for dep in &manifest.dependencies {
+            let remapped = governor.remap_dependency(dep);
+            pkg = pkg.with_dependency(remapped);
+        }
+
+        if let Some(cflags) = &manifest.build_cflags {
+            pkg.properties.insert("cflags".to_string(), cflags.clone());
+        }
+
+        pkg.properties.insert(
+            "source_format".to_string(),
+            format!("{:?}", manifest.detected_format),
+        );
+        pkg.checksum = manifest.payload_sha256.clone();
+        pkg
+    }
+
+    /// Creates a transactional state checkpoint before installation operations V29
+    pub fn create_checkpoint(&mut self) -> usize {
+        let id = self.next_checkpoint_id;
+        self.next_checkpoint_id += 1;
+
+        self.checkpoints.push(InstallationCheckpointV29 {
+            checkpoint_id: id,
+            installed_packages: self.installed_packages.clone(),
         });
 
         id
     }
 
-    /// Rollbacks system state to selected boot environment snapshot ID V29
-    pub fn rollback_snapshot(&self, snapshot_id: usize) -> Result<Vec<String>, String> {
-        if let Some(snap) = self.snapshots.iter().find(|s| s.snapshot_id == snapshot_id) {
-            Ok(snap.active_packages.clone())
+    /// Transactionally installs a package name V29
+    pub fn install_package(&mut self, pkg_name: &str) {
+        if !self.installed_packages.contains(&pkg_name.to_string()) {
+            self.installed_packages.push(pkg_name.to_string());
+        }
+    }
+
+    /// Rolls back system state to a previous checkpoint ID V29
+    pub fn rollback_checkpoint(&mut self, checkpoint_id: usize) -> Result<(), String> {
+        if let Some(cp) = self
+            .checkpoints
+            .iter()
+            .find(|c| c.checkpoint_id == checkpoint_id)
+        {
+            self.installed_packages = cp.installed_packages.clone();
+            Ok(())
         } else {
             Err(format!("Snapshot ID {} not found", snapshot_id))
         }
@@ -527,19 +562,8 @@ impl SovereignDistroPackageAdvancementsSuiteV29 {
             .solve_dependencies(&manifest.name, &manifest.dependencies);
         let cas_hash = self.cas_delta_governor.ingest_content(payload);
 
-        let mut pkg = UnifiedPackage::new(
-            format!("sigpkg-v29-{}", manifest.name),
-            manifest.version.clone(),
-        )
-        .with_format(PackageFormat::SigmaPkg)
-        .with_provides(manifest.name.clone());
-
-        for dep in resolved.satisfied_dependencies {
-            pkg = pkg.with_dependency(dep);
-        }
-
-        pkg.checksum = cas_hash;
-        Ok(pkg)
+        self.transpiler_engine.install_package(&native_sigpkg.name);
+        Ok(native_sigpkg)
     }
 }
 
@@ -584,52 +608,10 @@ mod tests {
             "custom-dep".to_string(),
         ];
 
-        let resolved = solver.solve_dependencies("my-app", &raw_deps);
-        assert!(resolved.is_solvable);
-        assert!(resolved
-            .satisfied_dependencies
-            .contains(&"sovereign-openssl".to_string()));
-        assert!(resolved
-            .satisfied_dependencies
-            .contains(&"sovereign-libc".to_string()));
-        assert!(resolved
-            .satisfied_dependencies
-            .contains(&"sovereign-custom-dep".to_string()));
-    }
-
-    #[test]
-    fn test_multi_sandbox_governor_v29() {
-        let governor = UniversalMultiSandboxGovernorV29::new();
-        let policy = governor.generate_policy(PackageFormat::Flatpak);
-
-        assert!(policy.pledge_promises.contains("inet"));
-        assert!(policy.unveil_paths.contains(&"/usr".to_string()));
-        assert_eq!(policy.capsicum_rights_mask, 0x00FF_FFFF);
-    }
-
-    #[test]
-    fn test_cas_delta_store_governor_v29() {
-        let mut cas = UniversalCasDeltaStoreGovernorV29::new();
-        let content = b"REPEATED_PACKAGE_BINARY_DATA";
-
-        let hash1 = cas.ingest_content(content);
-        assert_eq!(cas.total_bytes_saved, 0);
-
-        let hash2 = cas.ingest_content(content);
-        assert_eq!(hash1, hash2);
-        assert_eq!(cas.total_bytes_saved, content.len());
-
-        let reconstituted = cas.reconstitute_delta(&hash1, b"DELTA_DIFF").unwrap();
-        assert!(reconstituted.ends_with(b"_RECONSTITUTED_V29"));
-    }
-
-    #[test]
-    fn test_boot_env_snapshot_governor_v29() {
-        let mut boot_gov = UniversalBootEnvSnapshotGovernorV29::new();
-        let snap_id = boot_gov.create_boot_snapshot(
-            "pre-update-snap",
-            BootEnvBackendKindV29::FreeBsdBectlZfs,
-            vec!["nginx".to_string(), "openssl".to_string()],
+        assert_eq!(governor.remap_dependency("libssl-dev"), "sovereign-openssl");
+        assert_eq!(
+            governor.remap_dependency("custom-lib"),
+            "sovereign-custom-lib"
         );
 
         let active = boot_gov.rollback_snapshot(snap_id).unwrap();

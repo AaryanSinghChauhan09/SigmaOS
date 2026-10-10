@@ -201,16 +201,18 @@ impl WalkerLauncher {
             .applications
             .iter()
             .filter(|app| {
-                if self.config.case_sensitive {
-                    if self.config.fuzzy_search {
-                        app.name.contains(query)
-                            || app.description.contains(query)
-                            || app.keywords.iter().any(|k| k.contains(query))
-                    } else if self.config.acronym_search {
-                        app.name.contains(query) || self.acronym_match(&app.name, query)
-                    } else {
-                        app.name == query
-                    }
+                let name_lower = app.name.to_lowercase();
+                let desc_lower = app.description.to_lowercase();
+                let keywords_lower: Vec<String> =
+                    app.keywords.iter().map(|k| k.to_lowercase()).collect();
+
+                if self.config.fuzzy_search {
+                    name_lower.contains(&query_lower)
+                        || desc_lower.contains(&query_lower)
+                        || keywords_lower.iter().any(|k| k.contains(&query_lower))
+                } else if self.config.acronym_search {
+                    name_lower.contains(&query_lower)
+                        || self.acronym_match(&name_lower, &query_lower)
                 } else {
                     if self.config.fuzzy_search {
                         contains_ignore_case(&app.name, query)
@@ -275,15 +277,11 @@ impl WalkerLauncher {
             .emojis
             .iter()
             .filter(|emoji| {
-                if self.config.case_sensitive {
-                    emoji.name.contains(query) || emoji.keywords.iter().any(|k| k.contains(query))
-                } else {
-                    contains_ignore_case(&emoji.name, query)
-                        || emoji
-                            .keywords
-                            .iter()
-                            .any(|k| contains_ignore_case(k, query))
-                }
+                let name_lower = emoji.name.to_lowercase();
+                let keywords_lower: Vec<String> =
+                    emoji.keywords.iter().map(|k| k.to_lowercase()).collect();
+                name_lower.contains(&query_lower)
+                    || keywords_lower.iter().any(|k| k.contains(&query_lower))
             })
             .map(|emoji| SearchResult {
                 entry_type: "emoji".to_string(),
