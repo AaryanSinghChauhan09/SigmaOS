@@ -246,6 +246,17 @@ impl WikiDataTransferEngine {
             },
         );
 
+        self.feature_specs.insert(
+            "CliDevelopmentPlan".to_string(),
+            FeatureMdStatus {
+                spec_name: "SIGMAOS_CLI_DEVELOPMENT_PLAN.md".to_string(),
+                source_path: "docs/SIGMAOS_CLI_DEVELOPMENT_PLAN.md".to_string(),
+                is_fully_implemented: true,
+                completion_percentage: 100,
+                wiki_mirrored: true,
+            },
+        );
+
         self.register_spec_file("UniversalPackageSystem", "Universal Package System", true);
         self.register_spec_file("Roadmap11Deployment", "Roadmap 11 Deployment", true);
         self.register_spec_file("ROADMAP.md", "SigmaOS Master Development Roadmap", true);
@@ -258,6 +269,11 @@ impl WikiDataTransferEngine {
         self.register_spec_file(
             "18-Architecture-Development-Decision-Plan-PR.md",
             "Architecture Development Decision Plan PR",
+            true,
+        );
+        self.register_spec_file(
+            "SIGMAOS_CLI_DEVELOPMENT_PLAN.md",
+            "SigmaOS CLI Development Plan",
             true,
         );
     }
