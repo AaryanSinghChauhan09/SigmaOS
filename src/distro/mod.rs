@@ -438,14 +438,11 @@ pub use tech_media_publication_innovations::*;
 pub mod sovereign_open_source_os_gap_closure_pr;
 pub use sovereign_open_source_os_gap_closure_pr::*;
 
-pub mod sovereign_open_source_inspirations_engine;
-pub use sovereign_open_source_inspirations_engine::*;
+pub mod sovereign_omarchy_github_repo_parity;
+pub use sovereign_omarchy_github_repo_parity::*;
 
-pub mod sovereign_open_source_os_pinnacle_pr_v35;
-pub use sovereign_open_source_os_pinnacle_pr_v35::*;
-
-pub mod arch_linux_parity_pr_suite;
-pub use arch_linux_parity_pr_suite::*;
+pub mod open_source_os_unimplemented_ideas_pr;
+pub use open_source_os_unimplemented_ideas_pr::*;
 
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;
