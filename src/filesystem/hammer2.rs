@@ -328,7 +328,12 @@ impl Hammer2Volume {
     }
 
     /// Create a file at a path under parent_inum
-    pub fn create_file(&mut self, parent_inum: u64, name: &str, mode: u32) -> Result<u64, &'static str> {
+    pub fn create_file(
+        &mut self,
+        parent_inum: u64,
+        name: &str,
+        mode: u32,
+    ) -> Result<u64, &'static str> {
         if !self.inodes.contains_key(&parent_inum) {
             return Err("Parent inode not found");
         }
@@ -344,7 +349,12 @@ impl Hammer2Volume {
     }
 
     /// Create a directory
-    pub fn create_dir(&mut self, parent_inum: u64, name: &str, mode: u32) -> Result<u64, &'static str> {
+    pub fn create_dir(
+        &mut self,
+        parent_inum: u64,
+        name: &str,
+        mode: u32,
+    ) -> Result<u64, &'static str> {
         if !self.inodes.contains_key(&parent_inum) {
             return Err("Parent inode not found");
         }
@@ -365,7 +375,7 @@ impl Hammer2Volume {
             return Err("Inode not found");
         }
         let len = data.len();
-        
+
         // Check dedup table
         let hash = Hammer2BlockRef::crc32_hash(data);
         let block_ref = if self.dedup && self.dedup_table.contains_key(&hash) {
@@ -414,10 +424,7 @@ impl Hammer2Volume {
 
     /// List directory contents
     pub fn readdir(&self, inum: u64) -> Vec<(String, u64)> {
-        self.dentries
-            .get(&inum)
-            .cloned()
-            .unwrap_or_default()
+        self.dentries.get(&inum).cloned().unwrap_or_default()
     }
 
     /// Lookup a name in a directory
@@ -494,11 +501,11 @@ mod tests {
         let mut vol = Hammer2Volume::new("test", 10);
         let dir_inum = vol.create_dir(1, "src", 0o755).unwrap();
         let file_inum = vol.create_file(dir_inum, "main.rs", 0o644).unwrap();
-        
+
         let entries = vol.readdir(dir_inum);
         assert_eq!(entries.len(), 1);
         assert_eq!(entries[0].0, "main.rs");
-        
+
         let looked_up = vol.lookup(dir_inum, "main.rs");
         assert_eq!(looked_up, Some(file_inum));
     }
@@ -517,12 +524,12 @@ mod tests {
         let mut vol = Hammer2Volume::new("test", 10);
         let f1 = vol.create_file(1, "a.txt", 0o644).unwrap();
         let f2 = vol.create_file(1, "b.txt", 0o644).unwrap();
-        
+
         // Write same data (>64 bytes to avoid inline embedding) to both files
         let data = b"Duplicate content that should be deduped across multiple blocks in the HAMMER2 volume storage engine";
         vol.write(f1, data).unwrap();
         vol.write(f2, data).unwrap();
-        
+
         // Both should have the same block hash (dedup)
         let inode1 = vol.inodes.get(&f1).unwrap();
         let inode2 = vol.inodes.get(&f2).unwrap();
@@ -537,7 +544,7 @@ mod tests {
         vol.create_pfs("var").unwrap();
         assert!(vol.pfs_map.contains_key("home"));
         assert!(vol.pfs_map.contains_key("var"));
-        
+
         // Duplicate PFS should fail
         assert!(vol.create_pfs("home").is_err());
     }
@@ -547,7 +554,7 @@ mod tests {
         let mut vol = Hammer2Volume::new("test", 10);
         let inum = vol.create_file(1, "tiny.txt", 0o644).unwrap();
         vol.write(inum, b"tiny").unwrap();
-        
+
         let inode = vol.inodes.get(&inum).unwrap();
         assert!(inode.block_refs[0].is_embedded);
     }
@@ -557,7 +564,7 @@ mod tests {
         let mut vol = Hammer2Volume::new("test", 10);
         vol.create_file(1, "a.txt", 0o644).unwrap();
         vol.create_dir(1, "dir", 0o755).unwrap();
-        
+
         let stats = vol.statfs();
         assert_eq!(stats.pfs_count, 1);
         assert!(stats.inodes_used >= 3); // root + file + dir

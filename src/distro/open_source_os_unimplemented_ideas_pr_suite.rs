@@ -44,11 +44,20 @@ impl FreeBsdGeomAndCapsicumPrEngine {
             next_procdesc_fd: 1000,
         };
         engine.register_geom_provider("ada0p1", GeomTransformationType::SoftUpdatesJournal, 102400);
-        engine.register_geom_provider("ada0p2.eli", GeomTransformationType::GeliEncryptionAes256, 204800);
+        engine.register_geom_provider(
+            "ada0p2.eli",
+            GeomTransformationType::GeliEncryptionAes256,
+            204800,
+        );
         engine
     }
 
-    pub fn register_geom_provider(&mut self, name: &str, transform: GeomTransformationType, capacity_mb: u64) {
+    pub fn register_geom_provider(
+        &mut self,
+        name: &str,
+        transform: GeomTransformationType,
+        capacity_mb: u64,
+    ) {
         self.providers.insert(
             name.to_string(),
             GeomProviderRecord {
@@ -122,11 +131,19 @@ impl OpenBsdPledgeUnveilPfPrEngine {
         if path.is_empty() {
             return Err("Invalid empty unveil path");
         }
-        self.unveiled_paths.insert(path.to_string(), permissions.to_string());
+        self.unveiled_paths
+            .insert(path.to_string(), permissions.to_string());
         Ok(())
     }
 
-    pub fn add_pf_rule(&mut self, rule_id: u32, src_ip: &str, dst_ip: &str, port: u16, action: &str) {
+    pub fn add_pf_rule(
+        &mut self,
+        rule_id: u32,
+        src_ip: &str,
+        dst_ip: &str,
+        port: u16,
+        action: &str,
+    ) {
         self.pf_rules.push(PfStateRule {
             rule_id,
             src_ip: src_ip.to_string(),
@@ -177,7 +194,9 @@ impl NetBsdRumpAndVeriexecPrEngine {
             bioctl_volumes: Vec::new(),
         };
         engine.rump_userland_drivers.push("rumpvfs_ffs".to_string());
-        engine.rump_userland_drivers.push("rumpnet_net80211".to_string());
+        engine
+            .rump_userland_drivers
+            .push("rumpnet_net80211".to_string());
         engine.bioctl_volumes.push("raid0:OPTIMAL".to_string());
         engine
     }
@@ -259,7 +278,7 @@ impl Default for DragonFlyHammer2VkernelPrEngine {
 #[derive(Debug, Clone)]
 pub struct IllumosZone {
     pub name: String,
-    pub brand: String, // "sparse", "whole-root", or "bhyve"
+    pub brand: String,   // "sparse", "whole-root", or "bhyve"
     pub ip_type: String, // "exclusive" or "shared"
     pub state: String,   // "running", "installed", "configured"
 }
@@ -371,7 +390,10 @@ impl HaikuBfsAttributeAndQueryPrEngine {
     }
 
     pub fn add_attribute(&mut self, filepath: &str, attr_name: &str, attr_type: &str, val: &str) {
-        let entry = self.file_attr_index.entry(filepath.to_string()).or_default();
+        let entry = self
+            .file_attr_index
+            .entry(filepath.to_string())
+            .or_default();
         entry.push(BfsAttributeRecord {
             attr_name: attr_name.to_string(),
             attr_type: attr_type.to_string(),
@@ -470,8 +492,12 @@ impl Minix3ReincarnationServerPrEngine {
             monitored_driver_pids: BTreeMap::new(),
             restarted_driver_count: 0,
         };
-        engine.monitored_driver_pids.insert(101, "driver_ahci".to_string());
-        engine.monitored_driver_pids.insert(102, "driver_e1000e".to_string());
+        engine
+            .monitored_driver_pids
+            .insert(101, "driver_ahci".to_string());
+        engine
+            .monitored_driver_pids
+            .insert(102, "driver_e1000e".to_string());
         engine
     }
 
@@ -569,15 +595,20 @@ impl OpenSourceOsUnimplementedIdeasPrMasterSuite {
         self.openbsd_pf.pledge("wpath");
         let _ = self.openbsd_pf.unveil("/var/log", "rw");
 
-        self.netbsd_rump.register_veriexec("/bin/ls", "sha256_mock", 2);
+        self.netbsd_rump
+            .register_veriexec("/bin/ls", "sha256_mock", 2);
         assert!(self.netbsd_rump.verify_executable("/bin/ls", "sha256_mock"));
 
-        self.dragonfly_hammer2.create_pfs_snapshot("ROOT", 1001, 5000);
+        self.dragonfly_hammer2
+            .create_pfs_snapshot("ROOT", 1001, 5000);
         self.illumos_zones.attach_crossbow_vnic("vnic1");
         self.redox_scheme.register_scheme("custom");
 
-        self.haiku_bfs.add_attribute("/doc.pdf", "BEOS:TYPE", "MIME", "application/pdf");
-        let matches = self.haiku_bfs.query_by_attribute("BEOS:TYPE", "application/pdf");
+        self.haiku_bfs
+            .add_attribute("/doc.pdf", "BEOS:TYPE", "MIME", "application/pdf");
+        let matches = self
+            .haiku_bfs
+            .query_by_attribute("BEOS:TYPE", "application/pdf");
         assert_eq!(matches.len(), 1);
 
         self.plan9_9p.mount_9p_share("virtio-9p1");
@@ -588,7 +619,8 @@ impl OpenSourceOsUnimplementedIdeasPrMasterSuite {
         assert!(new_pid.is_some());
 
         self.serenity_temple.process_gui_ipc_event();
-        self.serenity_temple.eval_holyc_symbol("Print(\"Hello HolyC\");");
+        self.serenity_temple
+            .eval_holyc_symbol("Print(\"Hello HolyC\");");
 
         true
     }

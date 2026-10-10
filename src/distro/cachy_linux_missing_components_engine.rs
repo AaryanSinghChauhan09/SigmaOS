@@ -392,7 +392,8 @@ impl CachyLinuxMissingComponentsMasterEngine {
         let mirror = self.rate_mirrors.get_fastest_v3_v4_mirror();
         assert!(mirror.is_some());
 
-        self.hello_installer.install_meta_package("cachyos-desktop-v3-meta");
+        self.hello_installer
+            .install_meta_package("cachyos-desktop-v3-meta");
         assert_eq!(self.calamares_settings.subvolumes.len(), 4);
 
         let deduped = self.uksm_dedup.scan_and_deduplicate();
