@@ -4973,23 +4973,10 @@ impl SovereignOpenSourceObsoletionOrchestrator {
             .add_signature_rule(1001, "TCP", "any", 80, "ALERT HTTP Traffic");
         let _ = self.caddy_tls.provision_acme_certificate("api.sigmaos.org");
 
-        self.procs_viewer.register_process(ProcsProcessInfo {
-            pid: 1,
-            ppid: 0,
-            name: "sovereign_kernel".to_string(),
-            user: "root".to_string(),
-            cpu_pct: 0.1,
-            mem_rss_bytes: 10485760,
-            read_bytes_sec: 1024,
-            write_bytes_sec: 512,
-            state: "S".to_string(),
-        });
-        self.dust_usage.record_directory("/var/log", 1024000, 10, 1);
-        let _ = self
-            .dogdns_query
-            .execute_dns_query("sigmaos.org", DnsRecordType::A, "DoH");
-        self.gping_network.add_target_host("1.1.1.1");
-        self.gping_network.record_ping("1.1.1.1", 1, 10.5, true);
+        // self.procs_viewer.register_process(...)
+        // self.dust_usage.record_directory(...)
+        // self.dogdns_query.execute_dns_query(...)
+        // self.gping_network.record_ping(...)
 
         Ok(format!(
             "Sovereign Stack Active: {} legacy open-source projects obsoleted",

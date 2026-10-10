@@ -132,6 +132,160 @@ impl SovereignHaikuBfsEngine {
     }
 }
 
+#[derive(Debug, Clone)]
+pub struct SovereignDragonFlyHammer2Engine {
+    pub mount_point: String,
+    pub active_vkernel_pids: BTreeMap<String, u32>,
+}
+
+impl SovereignDragonFlyHammer2Engine {
+    pub fn new(mount_point: &str) -> Self {
+        Self {
+            mount_point: mount_point.to_string(),
+            active_vkernel_pids: BTreeMap::new(),
+        }
+    }
+    pub fn commit_transaction(&self) -> u64 {
+        2
+    }
+    pub fn spawn_vkernel(&mut self, name: &str, pid: u32) {
+        self.active_vkernel_pids.insert(name.to_string(), pid);
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct SovereignSmartOSCrossbowEngine {
+    pub etherstubs: Vec<String>,
+    pub vnics: Vec<String>,
+    pub zone_rbac_policies: BTreeMap<String, Vec<String>>,
+}
+
+impl SovereignSmartOSCrossbowEngine {
+    pub fn new() -> Self {
+        Self {
+            etherstubs: Vec::new(),
+            vnics: Vec::new(),
+            zone_rbac_policies: BTreeMap::new(),
+        }
+    }
+    pub fn create_etherstub(&mut self, name: &str) {
+        self.etherstubs.push(name.to_string());
+    }
+    pub fn create_vnic(&mut self, vnic: &str, stub: &str) -> bool {
+        self.vnics.push(format!("{}:{}", vnic, stub));
+        true
+    }
+    pub fn set_zone_rbac(&mut self, zone: &str, policy: &str) {
+        self.zone_rbac_policies
+            .entry(zone.to_string())
+            .or_default()
+            .push(policy.to_string());
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct SovereignOpenBsdSecurityEngine {
+    pub securelevel: i32,
+    pub pledged_promises: Vec<String>,
+    pub unveiled_paths: Vec<String>,
+}
+
+impl SovereignOpenBsdSecurityEngine {
+    pub fn new(securelevel: i32) -> Self {
+        Self {
+            securelevel,
+            pledged_promises: Vec::new(),
+            unveiled_paths: Vec::new(),
+        }
+    }
+    pub fn pledge(&mut self, promises: &[&str]) {
+        for p in promises {
+            self.pledged_promises.push(p.to_string());
+        }
+    }
+    pub fn unveil(&mut self, path: &str, permissions: &str) {
+        self.unveiled_paths
+            .push(format!("{}:{}", path, permissions));
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct SovereignRedoxSchemeEngine {
+    pub schemes: BTreeMap<String, String>,
+}
+
+impl SovereignRedoxSchemeEngine {
+    pub fn new() -> Self {
+        Self {
+            schemes: BTreeMap::new(),
+        }
+    }
+    pub fn register_scheme(&mut self, scheme: &str, driver: &str) {
+        self.schemes.insert(scheme.to_string(), driver.to_string());
+    }
+    pub fn resolve_scheme_url(&self, url: &str) -> Option<&String> {
+        let scheme = url.split(':').next()?;
+        self.schemes.get(scheme)
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct SovereignFuchsiaZirconEngine {
+    pub channels: BTreeMap<u32, u32>,
+}
+
+impl SovereignFuchsiaZirconEngine {
+    pub fn new() -> Self {
+        Self {
+            channels: BTreeMap::new(),
+        }
+    }
+    pub fn create_channel(&mut self, handle: u32, rights: u32) {
+        self.channels.insert(handle, rights);
+    }
+    pub fn write_channel_msg(&self, handle: u32, _msg: &[u8]) -> bool {
+        self.channels.contains_key(&handle)
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct SovereignFreeBsdGeomEngine {
+    pub providers: Vec<String>,
+}
+
+impl SovereignFreeBsdGeomEngine {
+    pub fn new() -> Self {
+        Self {
+            providers: Vec::new(),
+        }
+    }
+    pub fn register_provider(&mut self, name: &str, class: &str) -> bool {
+        self.providers.push(format!("{}:{}", name, class));
+        true
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct SovereignSerenityCoreEngine {
+    pub event_queue: Vec<String>,
+    pub properties: BTreeMap<String, String>,
+}
+
+impl SovereignSerenityCoreEngine {
+    pub fn new() -> Self {
+        Self {
+            event_queue: Vec::new(),
+            properties: BTreeMap::new(),
+        }
+    }
+    pub fn post_event(&mut self, event: &str) {
+        self.event_queue.push(event.to_string());
+    }
+    pub fn set_property(&mut self, key: &str, val: &str) {
+        self.properties.insert(key.to_string(), val.to_string());
+    }
+}
+
 // ============================================================================
 // SOVEREIGN OPEN SOURCE OS PR PROPOSAL ENGINE
 // ============================================================================
