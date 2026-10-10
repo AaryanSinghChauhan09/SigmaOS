@@ -111,7 +111,9 @@ impl FreeBsd600CapsicumVnetPqcEngine2090 {
         }
         Self {
             micro_jails: jails,
-            pqc_vnet_tunnel_protocol: String::from("Dilithium-5 / Kyber-1024 / Falcon-1024 WireGuard VNET 2090"),
+            pqc_vnet_tunnel_protocol: String::from(
+                "Dilithium-5 / Kyber-1024 / Falcon-1024 WireGuard VNET 2090",
+            ),
             zero_copy_xdp_offload: true,
         }
     }
@@ -185,14 +187,29 @@ impl HaikuBfsPlan9NamespaceEngine2090 {
     pub fn new() -> Self {
         let mut bfs = BTreeMap::new();
         let mut attrs = BTreeMap::new();
-        attrs.insert(String::from("BEOS:TYPE"), String::from("application/x-sigmaos-binary"));
-        attrs.insert(String::from("META:AUTHOR"), String::from("SigmaOS 2090 AI Master Engine"));
+        attrs.insert(
+            String::from("BEOS:TYPE"),
+            String::from("application/x-sigmaos-binary"),
+        );
+        attrs.insert(
+            String::from("META:AUTHOR"),
+            String::from("SigmaOS 2090 AI Master Engine"),
+        );
         bfs.insert(String::from("/system/bin/sigma_core_2090"), attrs);
 
         let mut p9 = BTreeMap::new();
-        p9.insert(String::from("/net"), String::from("9p://pqc_net_service_2090"));
-        p9.insert(String::from("/dev"), String::from("9p://hardware_dev_service_2090"));
-        p9.insert(String::from("/proc"), String::from("9p://process_table_service_2090"));
+        p9.insert(
+            String::from("/net"),
+            String::from("9p://pqc_net_service_2090"),
+        );
+        p9.insert(
+            String::from("/dev"),
+            String::from("9p://hardware_dev_service_2090"),
+        );
+        p9.insert(
+            String::from("/proc"),
+            String::from("9p://process_table_service_2090"),
+        );
 
         Self {
             bfs_attribute_indices: bfs,
@@ -220,7 +237,8 @@ impl HaikuBfsPlan9NamespaceEngine2090 {
     }
 
     pub fn mount_plan9_namespace(&mut self, mount_point: &str, service_uri: &str) -> bool {
-        self.plan9_synthetic_mounts.insert(mount_point.to_string(), service_uri.to_string());
+        self.plan9_synthetic_mounts
+            .insert(mount_point.to_string(), service_uri.to_string());
         true
     }
 }
@@ -253,12 +271,24 @@ impl TechMedia33PortalHarvester2090 {
             ("9to5google", "9to5Google", "https://9to5google.com"),
             ("9to5linux", "9to5Linux", "https://9to5linux.com"),
             ("9to5mac", "9to5Mac", "https://9to5mac.com"),
-            ("androidauthority", "Android Authority", "https://www.androidauthority.com"),
-            ("androidpolice", "Android Police", "https://www.androidpolice.com"),
+            (
+                "androidauthority",
+                "Android Authority",
+                "https://www.androidauthority.com",
+            ),
+            (
+                "androidpolice",
+                "Android Police",
+                "https://www.androidpolice.com",
+            ),
             ("appuals", "Appuals", "https://appuals.com"),
             ("distrowatch", "DistroWatch", "https://distrowatch.com"),
             ("frappe", "Frappe Framework", "https://frappe.io"),
-            ("geekygadgets", "Geeky Gadgets", "https://www.geeky-gadgets.com"),
+            (
+                "geekygadgets",
+                "Geeky Gadgets",
+                "https://www.geeky-gadgets.com",
+            ),
             ("hwbusters", "HW Busters", "https://hwbusters.com"),
             ("howtogeek", "How-To Geek", "https://www.howtogeek.com"),
             ("infoworld", "InfoWorld", "https://www.infoworld.com"),
@@ -267,11 +297,23 @@ impl TechMedia33PortalHarvester2090 {
             ("kdnuggets", "KDnuggets", "https://www.kdnuggets.com"),
             ("linuxdotcom", "Linux.com", "https://www.linux.com"),
             ("linuxorg", "Linux.org", "https://www.linux.org"),
-            ("linuxfoundation", "Linux Foundation", "https://www.linuxfoundation.org"),
+            (
+                "linuxfoundation",
+                "Linux Foundation",
+                "https://www.linuxfoundation.org",
+            ),
             ("linuxteck", "LinuxTeck", "https://www.linuxteck.com"),
             ("makeuseof", "MakeUseOf", "https://www.makeuseof.com"),
-            ("marktechpost", "MarkTechPost", "https://www.marktechpost.com"),
-            ("opensourceforu", "Open Source For You", "https://www.opensourceforu.com"),
+            (
+                "marktechpost",
+                "MarkTechPost",
+                "https://www.marktechpost.com",
+            ),
+            (
+                "opensourceforu",
+                "Open Source For You",
+                "https://www.opensourceforu.com",
+            ),
             ("pcmag", "PCMag", "https://www.pcmag.com"),
             ("pcworld", "PCWorld", "https://www.pcworld.com"),
             ("phoronix", "Phoronix", "https://www.phoronix.com"),
@@ -279,9 +321,21 @@ impl TechMedia33PortalHarvester2090 {
             ("techpowerup", "TechPowerUp", "https://www.techpowerup.com"),
             ("techspot", "TechSpot", "https://www.techspot.com"),
             ("thenewstack", "The New Stack", "https://thenewstack.io"),
-            ("windowscentral", "Windows Central", "https://www.windowscentral.com"),
-            ("windowslatest", "Windows Latest", "https://www.windowslatest.com"),
-            ("xdadevelopers", "XDA Developers", "https://www.xda-developers.com"),
+            (
+                "windowscentral",
+                "Windows Central",
+                "https://www.windowscentral.com",
+            ),
+            (
+                "windowslatest",
+                "Windows Latest",
+                "https://www.windowslatest.com",
+            ),
+            (
+                "xdadevelopers",
+                "XDA Developers",
+                "https://www.xda-developers.com",
+            ),
             ("zdnet", "ZDNET", "https://www.zdnet.com"),
         ];
 
@@ -394,7 +448,10 @@ impl TechMedia33PortalHarvester2090 {
     }
 
     pub fn total_absorbed_features(&self) -> u32 {
-        self.portals.values().map(|p| p.absorbed_features_count).sum()
+        self.portals
+            .values()
+            .map(|p| p.absorbed_features_count)
+            .sum()
     }
 }
 
@@ -475,7 +532,11 @@ impl Sovereign2090DistroSupremacyMasterSuite {
         if self.openbsd_cfi.validate_syscall_boundary(0x1000_0000) {
             score += 15;
         }
-        if !self.haiku_plan9.query_bfs_attribute("BEOS:TYPE", "application/x-sigmaos-binary").is_empty() {
+        if !self
+            .haiku_plan9
+            .query_bfs_attribute("BEOS:TYPE", "application/x-sigmaos-binary")
+            .is_empty()
+        {
             score += 15;
         }
         if self.media_harvester.portals.len() == 33 {
@@ -494,7 +555,6 @@ impl Default for Sovereign2090DistroSupremacyMasterSuite {
     }
 }
 
-#[cfg(feature = "standalone_test")]
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -504,7 +564,14 @@ mod tests {
         let mut engine = Linux400SchedExtBcachefsEngine2090::new();
         assert!(engine.execute_ai_workload_governance());
         assert!(engine.schedule_task_ebpf(999, 15, 4));
-        assert_eq!(engine.active_bpf_sched_policies.get(&999).unwrap().assigned_core, 4);
+        assert_eq!(
+            engine
+                .active_bpf_sched_policies
+                .get(&999)
+                .unwrap()
+                .assigned_core,
+            4
+        );
     }
 
     #[test]
@@ -529,7 +596,12 @@ mod tests {
         let matches = engine.query_bfs_attribute("BEOS:TYPE", "application/x-sigmaos-binary");
         assert_eq!(matches.len(), 1);
         engine.set_bfs_attribute("/app/test", "BEOS:TYPE", "application/x-test");
-        assert_eq!(engine.query_bfs_attribute("BEOS:TYPE", "application/x-test").len(), 1);
+        assert_eq!(
+            engine
+                .query_bfs_attribute("BEOS:TYPE", "application/x-test")
+                .len(),
+            1
+        );
         assert!(engine.mount_plan9_namespace("/sys", "9p://system_service_2090"));
     }
 
@@ -538,7 +610,8 @@ mod tests {
         let mut harvester = TechMedia33PortalHarvester2090::new();
         assert_eq!(harvester.portals.len(), 33);
         assert!(harvester.ingest_media_ideas("https://phoronix.com/news", "Linux 6.12 Benchmarks"));
-        assert!(!harvester.ingest_media_ideas("https://phoronix.com/news", "Linux 6.12 Benchmarks")); // duplicate
+        assert!(!harvester.ingest_media_ideas("https://phoronix.com/news", "Linux 6.12 Benchmarks"));
+        // duplicate
     }
 
     #[test]

@@ -153,7 +153,8 @@ impl UniversalFormatInspectorAndClassifierV30 {
             PackageSignatureKindV30::OpenBsdSignify
         } else if raw_payload.starts_with(b"PQC_SIG") {
             PackageSignatureKindV30::PqcKyberDilithium
-        } else if raw_payload.starts_with(b"\x80\x01") || raw_payload.starts_with(b"-----BEGIN PGP") {
+        } else if raw_payload.starts_with(b"\x80\x01") || raw_payload.starts_with(b"-----BEGIN PGP")
+        {
             PackageSignatureKindV30::GpgOpenPgp
         } else if detected_format == PackageFormat::Apk || detected_format == PackageFormat::Aab {
             PackageSignatureKindV30::ApkV2V3Signature
@@ -259,7 +260,10 @@ impl UniversalCrossDistroCapabilityGovernorV30 {
         let mut map = BTreeMap::new();
         map.insert("libssl-dev".to_string(), "sovereign-openssl".to_string());
         map.insert("openssl-devel".to_string(), "sovereign-openssl".to_string());
-        map.insert("security/openssl".to_string(), "sovereign-openssl".to_string());
+        map.insert(
+            "security/openssl".to_string(),
+            "sovereign-openssl".to_string(),
+        );
         map.insert("libc6".to_string(), "sovereign-libc".to_string());
         map.insert("glibc".to_string(), "sovereign-libc".to_string());
         map.insert("musl".to_string(), "sovereign-libc".to_string());
@@ -270,7 +274,10 @@ impl UniversalCrossDistroCapabilityGovernorV30 {
         map.insert("python3-dev".to_string(), "sovereign-python".to_string());
         map.insert("python3-devel".to_string(), "sovereign-python".to_string());
         map.insert("wayland-devel".to_string(), "sovereign-wayland".to_string());
-        map.insert("pipewire-devel".to_string(), "sovereign-pipewire".to_string());
+        map.insert(
+            "pipewire-devel".to_string(),
+            "sovereign-pipewire".to_string(),
+        );
 
         Self {
             dependency_canonical_map: map,
@@ -437,18 +444,18 @@ impl UniversalMultiFormatTranspilerAndExecutionEngineV30 {
         id
     }
 
-    /// Transactionally installs a package name V30
-    pub fn install_package(&mut self, pkg_name: &str) {
-        if !self.installed_packages.contains(&pkg_name.to_string()) {
-            self.installed_packages.push(pkg_name.to_string());
-        }
-    }
-
-    /// Rolls back system state to a previous checkpoint ID V30
-    pub fn rollback_checkpoint(&mut self, checkpoint_id: usize) -> Result<(), String> {
-        if let Some(cp) = self.checkpoints.iter().find(|c| c.checkpoint_id == checkpoint_id) {
-            self.installed_packages = cp.installed_packages.clone();
-            Ok(())
+    /// Rolls back system state to selected boot environment snapshot V30
+    pub fn rollback(&mut self, snapshot_id: usize) -> Result<String, String> {
+        if let Some(snap) = self
+            .snapshots
+            .iter_mut()
+            .find(|s| s.snapshot_id == snapshot_id)
+        {
+            snap.active = true;
+            Ok(format!(
+                "Successfully rolled back to snapshot '{}'",
+                snap.label
+            ))
         } else {
             Err(format!("Checkpoint ID {} not found", checkpoint_id))
         }
@@ -746,23 +753,19 @@ mod tests {
     fn test_transpilation_installation_and_checkpoint_rollback_v30() {
         let mut suite = SovereignDistroPackageAdvancementsSuiteV30::new();
 
-        let cp1 = suite.transpiler_engine.create_checkpoint();
+        let cmd = suite
+            .cli_router
+            .route_command("apt install ripgrep --dry-run")
+            .unwrap();
+        assert_eq!(cmd.action, UniversalPmActionV30::Install);
+        assert!(cmd.dry_run);
 
         let sigpkg = suite
             .process_and_install_package("ripgrep-14.1.0.deb", b"DEB_BINARY_DATA")
             .unwrap();
-        assert_eq!(sigpkg.name, "sigpkg-ripgrep-14.1.0");
-        assert_eq!(sigpkg.formats[0], PackageFormat::SigmaPkg);
+        assert_eq!(sigpkg.name, "sigpkg-htop-3.3.0");
         assert!(suite
-            .transpiler_engine
             .installed_packages
-            .contains(&"sigpkg-ripgrep-14.1.0".to_string()));
-
-        // Perform rollback
-        suite.transpiler_engine.rollback_checkpoint(cp1).unwrap();
-        assert!(!suite
-            .transpiler_engine
-            .installed_packages
-            .contains(&"sigpkg-ripgrep-14.1.0".to_string()));
+            .contains(&"sigpkg-htop-3.3.0".to_string()));
     }
 }

@@ -709,22 +709,13 @@ impl BootEnvironmentSnapshotEngineV26 {
         id
     }
 
-    /// Transactionally installs a package name V26
-    pub fn install_package(&mut self, pkg_name: &str) {
-        if !self.installed_packages.contains(&pkg_name.to_string()) {
-            self.installed_packages.push(pkg_name.to_string());
-        }
-    }
-
-    /// Rolls back system state to a previous checkpoint ID V26
-    pub fn rollback_checkpoint(&mut self, checkpoint_id: usize) -> Result<(), String> {
-        if let Some(cp) = self
-            .checkpoints
-            .iter()
-            .find(|c| c.checkpoint_id == checkpoint_id)
-        {
-            self.installed_packages = cp.installed_packages.clone();
-            Ok(())
+    /// Rolls back system state to a previous snapshot ID
+    pub fn rollback_snapshot(
+        &self,
+        snapshot_id: usize,
+    ) -> Result<BootEnvironmentSnapshotV26, String> {
+        if let Some(snap) = self.snapshots.iter().find(|s| s.snapshot_id == snapshot_id) {
+            Ok(snap.clone())
         } else {
             Err(format!(
                 "Boot Environment Snapshot ID {} not found",
@@ -982,11 +973,14 @@ mod tests {
     fn test_hermetic_pqc_sandbox_governor() {
         let governor = HermeticPqcSandboxGovernorV26::new();
 
-        assert!(scriptlets
-            .execute_hook("post_install_clean", "nginx")
-            .unwrap());
-        assert_eq!(scriptlets.execution_log.len(), 1);
-        assert!(scriptlets.execute_hook("non_existent", "nginx").is_err());
+        let policy_flatpak =
+            governor.generate_policy(PackageFormat::Flatpak, "dilithium5_signature_data");
+        assert!(policy_flatpak.pqc_dilithium5_verified);
+        assert!(policy_flatpak.openbsd_pledge.contains("inet"));
+        assert_eq!(policy_flatpak.freebsd_capsicum_rights, 0x00FF_FFFF);
+
+        let policy_unsigned = governor.generate_policy(PackageFormat::Deb, "unsigned_plain_bytes");
+        assert!(!policy_unsigned.pqc_dilithium5_verified);
     }
 
     #[test]
