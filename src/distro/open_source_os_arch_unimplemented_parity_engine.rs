@@ -107,7 +107,9 @@ impl ReflectorMirrorRankerEngine {
         let mut filtered: Vec<ReflectorArchMirror> = self
             .mirrors
             .iter()
-            .filter(|m| (m.country_code == country || country == "*") && m.latency_ms <= max_latency_ms)
+            .filter(|m| {
+                (m.country_code == country || country == "*") && m.latency_ms <= max_latency_ms
+            })
             .cloned()
             .collect();
         filtered.sort_by_key(|m| m.latency_ms);
@@ -212,7 +214,13 @@ impl ArchTestingSignoffTrackerEngine {
         }
     }
 
-    pub fn register_testing_package(&mut self, pkgname: &str, pkgver: &str, repo: &str, required: u8) {
+    pub fn register_testing_package(
+        &mut self,
+        pkgname: &str,
+        pkgver: &str,
+        repo: &str,
+        required: u8,
+    ) {
         self.pending_packages.insert(
             pkgname.to_string(),
             TestingPackageSignoff {
@@ -325,14 +333,12 @@ pub struct ArchSecurityTrackerCveEngine {
 impl ArchSecurityTrackerCveEngine {
     pub fn new() -> Self {
         Self {
-            advisories: vec![
-                ArchSecurityAdvisory {
-                    asa_id: "ASA-202403-1".to_string(),
-                    cve_ids: vec!["CVE-2024-3094".to_string()],
-                    package_name: "xz".to_string(),
-                    status: "Fixed".to_string(),
-                },
-            ],
+            advisories: vec![ArchSecurityAdvisory {
+                asa_id: "ASA-202403-1".to_string(),
+                cve_ids: vec!["CVE-2024-3094".to_string()],
+                package_name: "xz".to_string(),
+                status: "Fixed".to_string(),
+            }],
         }
     }
 
@@ -405,7 +411,11 @@ pub struct ModprobedDbKernelProfilerEngine {
 impl ModprobedDbKernelProfilerEngine {
     pub fn new() -> Self {
         Self {
-            active_modules: vec!["ext4".to_string(), "snd_hda_intel".to_string(), "iwlwifi".to_string()],
+            active_modules: vec![
+                "ext4".to_string(),
+                "snd_hda_intel".to_string(),
+                "iwlwifi".to_string(),
+            ],
         }
     }
 
@@ -875,7 +885,9 @@ mod tests {
         assert!(testing.add_signoff("bash", "tester2"));
 
         let devtools = DevtoolsSudoContainerEngine::new("/var/lib/archbuild/extra-x86_64");
-        assert!(devtools.build_in_chroot("/home/pkg/neofetch").contains("arch-nspawn"));
+        assert!(devtools
+            .build_in_chroot("/home/pkg/neofetch")
+            .contains("arch-nspawn"));
 
         let mut dbscripts = DbscriptsRepoAddEngine::new("custom");
         dbscripts.repo_add(AlpmRepoEntry {
@@ -898,7 +910,9 @@ mod tests {
         assert_eq!(id, 1);
 
         let profiler = ModprobedDbKernelProfilerEngine::new();
-        assert!(profiler.generate_minimal_config().contains("CONFIG_MODULES=y"));
+        assert!(profiler
+            .generate_minimal_config()
+            .contains("CONFIG_MODULES=y"));
 
         let mut aur = AurBuildLocalRepoEngine::new("/var/cache/pacman/aur");
         aur.add_built_package("yay-12.3.5-1-x86_64.pkg.tar.zst");
