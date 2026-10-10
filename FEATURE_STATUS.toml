@@ -368,3 +368,10 @@ files = ["src/power/management.rs", "src/power/battery.rs", "src/power/advanced.
 description = "Power management inspired by Linux ACPI and BSD powerd: CPU frequency scaling, battery monitoring, power profiles, and thermal management"
 test_evidence = "Unit tests for power profile switching; no hardware validation or ACPI integration"
 next_milestone = "ACPI table parsing and QEMU power state integration"
+
+[thread.manager]
+status = "unit-tested"
+files = ["src/kernel/thread.rs", "docs/thread-manager.md"]
+description = "Canonical thread manager with defined thread lifecycle states, CPU context, stack metadata, wait channels, and lock-order tracking"
+test_evidence = "Unit tests pass for state transitions, wait-channel wakeups, join/detach, stack bounds, and lock ordering"
+next_milestone = "Runtime scheduler integration"

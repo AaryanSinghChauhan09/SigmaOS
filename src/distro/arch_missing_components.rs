@@ -8,9 +8,9 @@
 // 6. arch-news Arch Linux News & Manual Intervention Detector
 // 7. pkgctl Devtools Package Repo Management Engine
 // 8. pacman File Collision & Conflict Resolution Engine
-// 9. mkinitcpio Modular Initramfs Hooks Engine
+// 9. pacman Hooks Execution Engine
 // 10. pacstrap & arch-chroot Rootfs Chroot Engine
-// 11. pacman-key PQC Dilithium5 Keyring Engine
+// 11. pacman-key PQC Dilithium5 Keyring Engine & Cache Scrubber
 // 12. arch-audit CVE Vulnerability Scanner Engine
 // 13. archinstall Profile & Automated Installer Engine
 
@@ -455,68 +455,15 @@ pub struct ArchPacmanHookRunner {
 
 impl ArchPacmanHookRunner {
     pub fn new() -> Self {
-        let mut hooks = BTreeMap::new();
-        hooks.insert(
-            "base".to_string(),
-            InitramfsHookSpec {
-                name: "base".to_string(),
-                is_runtime: true,
-                dependencies: Vec::new(),
+        let registered_hooks = vec![
+            PacmanHookRule {
+                name: "fontconfig".to_string(),
+                when: PacmanHookWhen::PostTransaction,
+                target_packages: vec!["fontconfig*".to_string(), "ttf-*".to_string()],
+                exec_command: "fc-cache -s".to_string(),
             },
-        );
-        hooks.insert(
-            "udev".to_string(),
-            InitramfsHookSpec {
-                name: "udev".to_string(),
-                is_runtime: true,
-                dependencies: vec!["base".to_string()],
-            },
-        );
-        hooks.insert(
-            "autodetect".to_string(),
-            InitramfsHookSpec {
-                name: "autodetect".to_string(),
-                is_runtime: false,
-                dependencies: Vec::new(),
-            },
-        );
-        hooks.insert(
-            "kms".to_string(),
-            InitramfsHookSpec {
-                name: "kms".to_string(),
-                is_runtime: true,
-                dependencies: vec!["udev".to_string()],
-            },
-        );
-        hooks.insert(
-            "modconf".to_string(),
-            InitramfsHookSpec {
-                name: "modconf".to_string(),
-                is_runtime: false,
-                dependencies: Vec::new(),
-            },
-        );
-        hooks.insert(
-            "block".to_string(),
-            InitramfsHookSpec {
-                name: "block".to_string(),
-                is_runtime: true,
-                dependencies: vec!["udev".to_string()],
-            },
-        );
-        hooks.insert(
-            "filesystems".to_string(),
-            InitramfsHookSpec {
-                name: "filesystems".to_string(),
-                is_runtime: true,
-                dependencies: vec!["block".to_string()],
-            },
-        );
-
-        Self {
-            hooks,
-            compression_format: "zstd".to_string(),
-        }
+        ];
+        Self { registered_hooks }
     }
 
     pub fn match_hooks(&self, when: PacmanHookWhen, updated_pkgs: &[&str]) -> Vec<&PacmanHookRule> {
@@ -575,19 +522,19 @@ impl ArchPacstrapChrootEngine {
 }
 
 // =========================================================================
-// 11. PACMAN-KEY PQC DILITHIUM5 KEYRING ENGINE (pacman-key)
+// 11. PACMAN-KEY PQC DILITHIUM5 KEYRING ENGINE & CACHE SCRUBBER
 // =========================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct CachedPackageFile {
-    pub pkgname: String,
-    pub version: String,
-    pub file_size_bytes: u64,
+pub struct PqcDilithiumKeySpec {
+    pub key_id: String,
+    pub owner_email: String,
+    pub is_trusted: bool,
+    pub dilithium_pubkey_hash: String,
 }
 
-pub struct ArchPacmanCacheScrubber {
-    pub cached_files: Vec<CachedPackageFile>,
-    pub retain_keep_count: usize,
+pub struct ArchPacmanKeyringPqcEngine {
+    pub keys: BTreeMap<String, PqcDilithiumKeySpec>,
 }
 
 impl ArchPacmanKeyringPqcEngine {
@@ -603,6 +550,33 @@ impl ArchPacmanKeyringPqcEngine {
             },
         );
         Self { keys }
+    }
+}
+
+impl Default for ArchPacmanKeyringPqcEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CachedPackageFile {
+    pub pkgname: String,
+    pub version: String,
+    pub file_size_bytes: u64,
+}
+
+pub struct ArchPacmanCacheScrubber {
+    pub cached_files: Vec<CachedPackageFile>,
+    pub retain_keep_count: usize,
+}
+
+impl ArchPacmanCacheScrubber {
+    pub fn new(keep_count: usize) -> Self {
+        Self {
+            cached_files: Vec::new(),
+            retain_keep_count: keep_count,
+        }
     }
 
     /// Calculates which old package cache files should be purged
@@ -636,7 +610,7 @@ impl Default for ArchPacmanCacheScrubber {
 }
 
 // =========================================================================
-// 11. BTRFS PACMAN SNAPSHOTTER ENGINE (snap-pac)
+// 12. BTRFS PACMAN SNAPSHOTTER ENGINE (snap-pac)
 // =========================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -692,7 +666,7 @@ impl Default for ArchBtrfsSnapperSnapshotter {
 }
 
 // =========================================================================
-// 12. ARCH AUDIT VULNERABILITY SCANNER (arch-audit)
+// 13. ARCH AUDIT VULNERABILITY SCANNER (arch-audit)
 // =========================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -746,7 +720,7 @@ impl Default for ArchAuditVulnerabilityScanner {
 }
 
 // =========================================================================
-// 13. MODPROBED-DB KERNEL MODULE LOGGER ENGINE (modprobed-db)
+// 14. MODPROBED-DB KERNEL MODULE LOGGER ENGINE (modprobed-db)
 // =========================================================================
 
 pub struct ArchModprobedDbEngine {
