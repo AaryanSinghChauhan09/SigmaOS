@@ -4313,16 +4313,20 @@ impl SovereignAria2MultiSourceDownloaderEngine {
 
     pub fn allocate_chunks(&mut self, total_size: u64, num_chunks: u32) {
         self.chunks.clear();
-        let chunk_size = total_size / (num_chunks as u64).max(1);
-        for i in 0..num_chunks {
-            let start = i as u64 * chunk_size;
-            let end = if i == num_chunks - 1 {
-                total_size
+        if total_size == 0 || num_chunks == 0 {
+            return;
+        }
+        let chunk_count = (num_chunks as u64).min(total_size);
+        let chunk_size = total_size / chunk_count;
+        for i in 0..chunk_count {
+            let start = i * chunk_size;
+            let end = if i == chunk_count - 1 {
+                total_size.saturating_sub(1)
             } else {
-                (i + 1) as u64 * chunk_size - 1
+                ((i + 1) * chunk_size).saturating_sub(1)
             };
             self.chunks.push(DownloadChunk {
-                chunk_id: i,
+                chunk_id: i as u32,
                 start_byte: start,
                 end_byte: end,
                 completed: false,
@@ -4971,6 +4975,13 @@ impl SovereignOpenSourceObsoletionOrchestrator {
             .register_table("users", &["id", "username", "role"]);
         self.suricata_ids
             .add_signature_rule(1001, "TCP", "any", 80, "ALERT HTTP Traffic");
+        let _ = self.caddy_tls.provision_acme_certificate("api.sigmaos.org");
+
+        self.trivy_scanner.register_vulnerability("CVE-2026-9999", "CRITICAL", "sovereign-kernel", "Memory issue");
+        self.aria2_downloader.add_download_source("http://dist.sigmaos.org/pkg.tar.zst");
+        self.just_task_runner.register_recipe("build", &["cargo build --release"]);
+        self.supabase_postgrest.register_table("users", &["id", "username", "role"]);
+        self.suricata_ids.add_signature_rule(1001, "TCP", "any", 80, "ALERT HTTP Traffic");
         let _ = self.caddy_tls.provision_acme_certificate("api.sigmaos.org");
 
         Ok(format!(
@@ -8917,10 +8928,7 @@ mod tests {
         let mut pg = SovereignSupabasePostgrestEngine::new();
         pg.register_table("audit_logs", &["id", "timestamp", "action"]);
         let endpoint = pg.auto_generate_endpoint("audit_logs").unwrap();
-        assert_eq!(
-            endpoint,
-            "/api/v1/rest/audit_logs?select=id,timestamp,action"
-        );
+        assert_eq!(endpoint, "/api/v1/rest/audit_logs?select=id,timestamp,action");
         assert_eq!(pg.total_api_calls, 1);
         assert_eq!(pg.auto_generate_endpoint("nonexistent"), None);
     }

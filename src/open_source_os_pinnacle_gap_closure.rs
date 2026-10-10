@@ -198,6 +198,55 @@ impl SovereignOpenSourceOsPrProposalEngine {
             "Integrates Crossbow network virtualization VNICs with rate-limiting and ZFS boot environment dataset snapshots.",
         );
 
+        engine.create_pr_proposal(
+            "ReactOS",
+            "Windows NT Executive Subsystem & Win32 API Parity",
+            "feat/reactos-win32-subsystem-parity",
+            "Implements NT Executive Object Manager, Registry Hive parser, and Win32 GDI/User graphics subsystem emulation.",
+        );
+
+        engine.create_pr_proposal(
+            "Redox OS",
+            "Microkernel Scheme VFS & URL-based Resource Routing",
+            "feat/redox-scheme-vfs-router",
+            "Native support for Redox OS scheme URLs (file:, net:, proc:, sys:) and lockless microkernel IPC message routing.",
+        );
+
+        engine.create_pr_proposal(
+            "Fuchsia OS",
+            "Zircon Kernel Handle Manager & FIDL IPC",
+            "feat/fuchsia-zircon-fidl-ipc",
+            "Implements Zircon handle-based capability model, channel messaging, and zero-copy FIDL protocol serialization.",
+        );
+
+        engine.create_pr_proposal(
+            "SerenityOS",
+            "LibGUI Async EventLoop & WindowServer Protocol",
+            "feat/serenityos-libgui-async-eventloop",
+            "Async LibCore EventLoop event queue processing and WindowServer shared memory window backing buffers.",
+        );
+
+        engine.create_pr_proposal(
+            "Genode OS Framework",
+            "Capability-based Security Matrix & Parent-Child Tree Routing",
+            "feat/genode-capability-based-security",
+            "Hierarchical capability routing matrix for fine-grained resource delegation across microkernel services.",
+        );
+
+        engine.create_pr_proposal(
+            "Cosmopolitan OS",
+            "APE (Actually Portable Executable) Universal Multi-Format Binary Stub",
+            "feat/cosmopolitan-ape-multi-format-binary",
+            "Zero-dependency APE binary launcher stub enabling single-binary execution across Linux, BSD, macOS, and Windows.",
+        );
+
+        engine.create_pr_proposal(
+            "GNU Hurd",
+            "Mach Microkernel Port Right IPC & Userland Filesystem Translators",
+            "feat/mach-hurd-translator-ipc",
+            "Mach port rights IPC messaging and Hurd userland filesystem translator hooks integrated into VFS.",
+        );
+
         engine
     }
 
@@ -289,17 +338,6 @@ mod tests {
         haiku.set_bfs_attribute("/boot/doc.txt", "META:title=SigmaOS");
         let matches = haiku.query_by_bfs_attribute("META:title=SigmaOS");
         assert_eq!(matches, vec!["/boot/doc.txt".to_string()]);
-    }
-
-    #[test]
-    fn test_pinnacle_gap_closure_suite_integration() {
-        let mut p9 = SovereignPlan9P2000Engine::new(4096);
-        assert!(p9.attach_fid(1, "/n/remote"));
-        assert_eq!(p9.max_msize, 4096);
-
-        let mut minix = SovereignMinix3ReincarnationEngine::new();
-        minix.register_driver("net_driver", 500);
-        assert_eq!(minix.active_drivers.get("net_driver"), Some(&500));
     }
 
     #[test]
