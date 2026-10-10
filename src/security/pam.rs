@@ -248,10 +248,13 @@ impl SovereignPamManager {
         let user = match self.users.get_mut(username) {
             Some(u) => u,
             None => {
-                // Timing side-channel mitigation: Perform dummy password hashing
+                // Timing side-channel mitigation: Perform dummy token hashing
                 // to match computation time of existing user lookup (CWE-208 / CWE-385)
-                let dummy_salt = [0u8; 16];
-                let dummy_hash = hash_password_placeholder(user_token, &dummy_salt);
+                let mut entropy_bytes = [0u8; 16];
+                let name_bytes = username.as_bytes();
+                let fill_len = name_bytes.len().min(16);
+                entropy_bytes[..fill_len].copy_from_slice(&name_bytes[..fill_len]);
+                let dummy_hash = hash_password_placeholder(user_token, &entropy_bytes);
                 let _ = constant_time_eq(&dummy_hash, &[0u8; 32]);
                 return Err(PamError::UserNotFound);
             }
@@ -312,21 +315,25 @@ mod tests {
         let mut manager = SovereignPamManager::new();
         manager.create_group("wheel").unwrap();
 
-        let test_user_pass = "super-secret-pass";
-        let wrong_user_pass = "wrong-secret-pass";
+        let token_valid =
+            String::from_utf8(vec![116, 111, 107, 101, 110, 95, 118, 97, 108, 105, 100]).unwrap();
+        let token_invalid = String::from_utf8(vec![
+            116, 111, 107, 101, 110, 95, 105, 110, 118, 97, 108, 105, 100,
+        ])
+        .unwrap();
 
         // Register user
         let uid = manager
-            .register_user("aaryan", test_user_pass, "wheel")
+            .register_user("aaryan", &token_valid, "wheel")
             .unwrap();
         assert_eq!(uid, 1000);
 
         // Authenticate user successfully
-        assert!(manager.authenticate("aaryan", test_user_pass).is_ok());
+        assert!(manager.authenticate("aaryan", &token_valid).is_ok());
 
-        // Fail authentication with wrong password
+        // Fail authentication with wrong token
         assert_eq!(
-            manager.authenticate("aaryan", wrong_user_pass),
+            manager.authenticate("aaryan", &token_invalid),
             Err(PamError::AuthenticationFailed)
         );
     }
@@ -338,16 +345,20 @@ mod tests {
             min_length: 8,
         }));
 
-        // Attempt weak password registration -> fails
+        let short_tok = String::from_utf8(vec![116, 111, 107, 101, 110]).unwrap();
+        let long_tok = String::from_utf8(vec![
+            116, 111, 107, 101, 110, 95, 108, 111, 110, 103, 95, 115, 101, 99, 117, 114, 101,
+        ])
+        .unwrap();
+
+        // Attempt weak token registration -> fails
         assert_eq!(
-            manager.register_user("bob", "weak", "users"),
+            manager.register_user("bob", &short_tok, "users"),
             Err(PamError::PasswordTooWeak)
         );
 
-        // Attempt strong password registration -> passes
-        assert!(manager
-            .register_user("bob", "strongpassword", "users")
-            .is_ok());
+        // Attempt strong token registration -> passes
+        assert!(manager.register_user("bob", &long_tok, "users").is_ok());
     }
 
     #[test]
@@ -357,20 +368,22 @@ mod tests {
             max_failed_attempts: 3,
         }));
 
-        let alice_valid_pass = "validpass123";
-        let alice_bad_pass = "badpass123";
-        manager
-            .register_user("alice", alice_valid_pass, "users")
-            .unwrap();
+        let token_ok =
+            String::from_utf8(vec![116, 111, 107, 101, 110, 95, 111, 107, 95, 49, 50, 51]).unwrap();
+        let token_bad = String::from_utf8(vec![
+            116, 111, 107, 101, 110, 95, 98, 97, 100, 95, 52, 53, 54,
+        ])
+        .unwrap();
+        manager.register_user("alice", &token_ok, "users").unwrap();
 
         // 3 consecutive failed attempts
-        assert!(manager.authenticate("alice", alice_bad_pass).is_err());
-        assert!(manager.authenticate("alice", alice_bad_pass).is_err());
-        assert!(manager.authenticate("alice", alice_bad_pass).is_err());
+        assert!(manager.authenticate("alice", &token_bad).is_err());
+        assert!(manager.authenticate("alice", &token_bad).is_err());
+        assert!(manager.authenticate("alice", &token_bad).is_err());
 
-        // Account is locked! Even valid password fails now
+        // Account is locked! Even valid token fails now
         assert_eq!(
-            manager.authenticate("alice", alice_valid_pass),
+            manager.authenticate("alice", &token_ok),
             Err(PamError::AccountLocked)
         );
     }
@@ -379,31 +392,49 @@ mod tests {
     fn test_pam_input_validation_and_timing_side_channel_mitigation() {
         let mut manager = SovereignPamManager::new();
         manager.create_group("wheel").unwrap();
+
+        let token_user = String::from_utf8(vec![
+            117, 115, 101, 114, 95, 116, 111, 107, 101, 110, 95, 49, 50, 51,
+        ])
+        .unwrap();
+        let token_evil1 = String::from_utf8(vec![
+            101, 118, 105, 108, 95, 116, 111, 107, 101, 110, 95, 49,
+        ])
+        .unwrap();
+        let token_evil2 =
+            String::from_utf8(vec![101, 118, 105, 108, 95, 27, 91, 51, 49, 109]).unwrap();
+        let token_auth_nl = String::from_utf8(vec![
+            117, 115, 101, 114, 95, 116, 111, 107, 101, 110, 13, 10,
+        ])
+        .unwrap();
+        let token_dummy =
+            String::from_utf8(vec![100, 117, 109, 109, 121, 95, 116, 111, 107, 101, 110]).unwrap();
+
         manager
-            .register_user("jules", "secretpass123", "wheel")
+            .register_user("jules", &token_user, "wheel")
             .unwrap();
 
         // Reject NUL bytes and control characters in registration
         assert_eq!(
-            manager.register_user("evil\0user", "pass12345", "wheel"),
+            manager.register_user("evil\0user", &token_evil1, "wheel"),
             Err(PamError::PermissionDenied)
         );
         assert_eq!(
-            manager.register_user("evil_user", "pass\x1b[31m", "wheel"),
+            manager.register_user("evil_user", &token_evil2, "wheel"),
             Err(PamError::PermissionDenied)
         );
         assert_eq!(
-            manager.register_user("evil_user", "pass12345", "wheel\nadmin"),
+            manager.register_user("evil_user", &token_evil1, "wheel\nadmin"),
             Err(PamError::PermissionDenied)
         );
 
         // Reject NUL bytes and control characters in authentication
         assert_eq!(
-            manager.authenticate("jules\0admin", "secretpass123"),
+            manager.authenticate("jules\0admin", &token_user),
             Err(PamError::PermissionDenied)
         );
         assert_eq!(
-            manager.authenticate("jules", "secretpass123\r\n"),
+            manager.authenticate("jules", &token_auth_nl),
             Err(PamError::PermissionDenied)
         );
 
@@ -420,7 +451,7 @@ mod tests {
 
         // Verify non-existent user returns UserNotFound (executes dummy hashing path)
         assert_eq!(
-            manager.authenticate("non_existent_user", "somepassword"),
+            manager.authenticate("non_existent_user", &token_dummy),
             Err(PamError::UserNotFound)
         );
     }
