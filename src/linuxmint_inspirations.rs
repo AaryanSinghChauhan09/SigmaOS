@@ -2410,11 +2410,15 @@ fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
     }
     if haystack.is_ascii() && needle.is_ascii() {
         let needle_bytes = needle.as_bytes();
-        haystack.as_bytes().windows(needle_bytes.len()).any(|window| {
-            window.iter().zip(needle_bytes.iter()).all(|(&b1, &b2)| {
-                b1.to_ascii_lowercase() == b2.to_ascii_lowercase()
+        haystack
+            .as_bytes()
+            .windows(needle_bytes.len())
+            .any(|window| {
+                window
+                    .iter()
+                    .zip(needle_bytes.iter())
+                    .all(|(&b1, &b2)| b1.to_ascii_lowercase() == b2.to_ascii_lowercase())
             })
-        })
     } else {
         haystack.to_lowercase().contains(&needle.to_lowercase())
     }

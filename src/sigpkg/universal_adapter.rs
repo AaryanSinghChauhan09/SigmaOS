@@ -2013,14 +2013,23 @@ impl UniversalDependencyMapper {
         } else if clean_raw.starts_with("cmd:") {
             clean_raw = clean_raw["cmd:".len()..].to_string();
         } else if clean_raw.starts_with("pkgconfig(") {
-            clean_raw = clean_raw["pkgconfig(".len()..].trim_end_matches(')').to_string();
+            clean_raw = clean_raw["pkgconfig(".len()..]
+                .trim_end_matches(')')
+                .to_string();
         } else if clean_raw.starts_with("perl-module(") {
-            clean_raw = clean_raw["perl-module(".len()..].trim_end_matches(')').to_string();
+            clean_raw = clean_raw["perl-module(".len()..]
+                .trim_end_matches(')')
+                .to_string();
         } else if clean_raw.starts_with("python3dist(") {
-            clean_raw = clean_raw["python3dist(".len()..].trim_end_matches(')').to_string();
+            clean_raw = clean_raw["python3dist(".len()..]
+                .trim_end_matches(')')
+                .to_string();
         } else if let Some(pos) = clean_raw.rfind(':') {
             let suffix = &clean_raw[pos + 1..];
-            if matches!(suffix, "amd64" | "i386" | "arm64" | "armhf" | "all" | "x86_64" | "native") {
+            if matches!(
+                suffix,
+                "amd64" | "i386" | "arm64" | "armhf" | "all" | "x86_64" | "native"
+            ) {
                 clean_raw = clean_raw[..pos].to_string();
             }
         }
@@ -4173,8 +4182,14 @@ requires {
         assert_eq!(mapper.to_canonical_name("so:libc.so.6"), "libc");
         assert_eq!(mapper.to_canonical_name("cmd:bash"), "bash");
         assert_eq!(mapper.to_canonical_name("pkgconfig(openssl)"), "openssl");
-        assert_eq!(mapper.to_canonical_name("perl-module(File::Spec)"), "File::Spec");
-        assert_eq!(mapper.to_canonical_name("python3dist(requests)"), "requests");
+        assert_eq!(
+            mapper.to_canonical_name("perl-module(File::Spec)"),
+            "File::Spec"
+        );
+        assert_eq!(
+            mapper.to_canonical_name("python3dist(requests)"),
+            "requests"
+        );
         assert_eq!(mapper.to_canonical_name("curl:amd64"), "curl");
         assert_eq!(mapper.to_canonical_name("htop.x86_64"), "htop");
     }

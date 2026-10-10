@@ -347,7 +347,10 @@ impl PacmanHooksEngine {
         let mut executed_cmds = Vec::new();
         for hook in &self.hooks {
             if hook.when == when {
-                let matches_target = hook.targets.iter().any(|t| t == "*" || affected_pkgs.contains(&t.as_str()));
+                let matches_target = hook
+                    .targets
+                    .iter()
+                    .any(|t| t == "*" || affected_pkgs.contains(&t.as_str()));
                 if matches_target {
                     executed_cmds.push(hook.exec_cmd.clone());
                 }
@@ -401,7 +404,10 @@ impl ArchPrProposal {
         let mut pr = String::new();
         pr.push_str(&format!("### PR Title: {}\n", self.title));
         pr.push_str(&format!("**Branch Name:** `{}`\n", self.branch_name));
-        pr.push_str(&format!("**Target Subsystem:** {}\n\n", self.target_subsystem));
+        pr.push_str(&format!(
+            "**Target Subsystem:** {}\n\n",
+            self.target_subsystem
+        ));
         pr.push_str("#### Summary of Arch Linux Parity Changes\n");
         pr.push_str(&self.description);
         pr.push_str("\n\n#### Changed Files\n");
