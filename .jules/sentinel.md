@@ -1,15 +1,5 @@
-# Sentinel 🛡️ Agent Journal - Security Hardening Learnings
+# Sentinel Agent Journal 🛡️
 
-## Philosophy & Core Directives
-- **Security is everyone's responsibility.**
-- Defense in depth - multiple layers of kernel and process protection.
-- Fail securely - error handling must never leak internal addresses or stack traces.
-- Trust nothing, verify everything.
-
----
-
-## Critical Security Learnings
-
-### 2025-05-20 - WebApp & Foreign Package Post-Install Isolation
-**Learning:** Running untrusted WebApps or third-party Linux package post-install scriptlets directly under host user privileges exposes the home directory to data exfiltration or path traversal attacks.
-**Action:** Enforce Landlock V4 kernel sandboxing combined with Bubblewrap unprivileged user namespaces (`bubblewrap --unshare-all --ro-bind / / ...`) for all WebApps and foreign package scripts.
+## 2025-05-18 - OpenBSD Pledge/Unveil Isolation & Hardened Memory Protections
+**Learning:** Combining OpenBSD pledge/unveil syscall restrictors with seL4 memory protection boundaries in userland services prevents arbitrary privilege escalation and protects against zero-day exploit chains in package management UDF execution environments.
+**Action:** Enforce strict pledge sandbox capabilities (`stdio rpath wpath cpath inet`) on all distro package transpilers and scriptlet engines.

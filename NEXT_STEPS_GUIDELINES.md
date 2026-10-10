@@ -1,56 +1,59 @@
-# SigmaOS Next Steps & Operational Guidelines (`NEXT_STEPS_GUIDELINES.md`)
+# SigmaOS Next Steps & Operational Execution Guidelines
 
-## Overview
-This document outlines operational workflows, guidelines, and next steps for software engineers, AI agents, and open-source contributors working on the **SigmaOS** codebase (`https://github.com/AaryanSinghChauhan09/SigmaOS`).
-
----
-
-## 1. Direct Commit & Branch Governance Policy
-- **No External PRs:** SigmaOS strictly follows a direct main-branch commit policy. Feature proposals and architectural plans should be prepared as Markdown specifications in `docs/` or `docs/roadmap/` and committed directly to `main`.
-- **Roadmap Synchronization:** Synchronize documentation updates across `docs/`, `wiki/`, and `WIKI/` mirrors using automated sync engines or scripts.
+This document outlines operational guidelines for developers, AI agents, and maintainers working on **SigmaOS**.
 
 ---
 
-## 2. Pre-Commit Verification Workflow
-Before committing any changes to `main`, every developer or agent **must** perform the following steps:
-1. **Compilation Check:** Run `cargo check --lib` to verify zero Rust compilation errors.
-2. **Full Test Suite Run:** Execute `./run_sigma_tests.sh` to ensure all 167+ native Rust unit tests, system benchmarks, and Python integration tests pass with zero failures.
-3. **Format Check:** Ensure code adheres to standard formatting guidelines (`cargo fmt --check` if formatted).
-4. **Agent Journal Review:** If critical learnings, performance insights, or security findings were discovered during the task, document them in `.jules/bolt.md`, `.jules/palette.md`, or `.jules/sentinel.md`.
+## 1. Architectural Overview & Distro Migration (Mint & Omarchy)
+
+SigmaOS differs from Linux Mint and Omarchy by utilizing a sovereign, pure-Rust microkernel/hybrid architecture instead of a traditional monolithic Linux kernel stack.
+
+- **For Linux Mint Users**:
+  SigmaOS provides native XApps compatibility (`src/compatibility/mint_linux_xapps_parity_expansion.rs`) and automated APT/Debian package translation via `sigpkg`. Run the First-Run Migration Assistant to convert Nemo file manager actions, Timeshift backup rules, and Mint preferences automatically.
+
+- **For Omarchy Users**:
+  SigmaOS provides native Hyprland keybind parsing and Waybar telemetry integration (`src/distro/omarchy_linux_pinnacle_gap_closure.rs`). Run the First-Run Migration Assistant to import Hyprland dotfiles and Walker launcher binds directly into Zenith.
 
 ---
 
-## 3. Tri-Agent Framework Guidelines
+## 2. Development Guidelines & Direct Commit Policy
 
-### ⚡ Bolt Agent (Performance)
-- Always profile before optimizing.
-- Focus on low-risk, measurable optimizations (<50 lines changed per targeted optimization).
-- Document expected millisecond or RAM impact in commit messages and journal entries (`.jules/bolt.md`).
+1. **Direct Main Branch Policy**:
+   - In accordance with repository conventions, changes are committed directly to `main` branch.
+   - Pull Requests (PRs) are drafted and documented as Markdown proposals inside `docs/roadmap/` and synchronized across `wiki/` and `WIKI/` mirrors rather than creating external GitHub PR branches.
 
-### 🎨 Palette Agent (UX & Accessibility)
-- Ensure all UI widgets and terminal interfaces include proper accessibility attributes (ARIA labels, high contrast, focus states).
-- Verify keyboard navigation works seamlessly without requiring mouse interaction.
-- Document UX learnings in `.jules/palette.md`.
-
-### 🛡️ Sentinel Agent (Security)
-- Prioritize vulnerability mitigation: hardcoded secrets, input sanitization, Landlock/Bubblewrap sandbox enforcement.
-- Maintain `#![no_std]` security boundaries where required in low-level kernel crates.
-- Document security findings and mitigations in `.jules/sentinel.md`.
+2. **Tri-Agent Collaboration Framework**:
+   - **Bolt ⚡**: Focus on microsecond performance optimizations, zero-copy memory buffers, and benchmark verification. Log critical learnings in `.jules/bolt.md`.
+   - **Palette 🎨**: Focus on visual accessibility, ARIA labels, responsive UI widgets, and user delight. Log critical UX insights in `.jules/palette.md`.
+   - **Sentinel 🛡️**: Focus on security hardening, Landlock V4 / OpenBSD pledge sandboxing, and vulnerability scanning. Log security insights in `.jules/sentinel.md`.
 
 ---
 
-## 4. Development & Build Optimization Recommendations
-- **Linker Speed:** For faster local build iterations, enable the `mold` or `lld` linker in `.cargo/config.toml`:
-  ```toml
-  [target.x86_64-unknown-linux-gnu]
-  linker = "clang"
-  rustflags = ["-C", "link-arg=-fuse-ld=mold"]
-  ```
-- **Shared Compiler Cache:** Set `export RUSTC_WRAPPER=sccache` in your shell environment to share object file compilation cache across builds.
+## 3. Testing & Verification Workflow
+
+Before finalizing any code modification:
+
+1. **Native Subsystem Testing**:
+   Run the comprehensive test suite:
+   ```bash
+   ./run_sigma_tests.sh
+   ```
+
+2. **Compilation & Warning Verification**:
+   Verify clean library checking without errors:
+   ```bash
+   cargo check --lib
+   ```
+
+3. **Release Gate Validation**:
+   Validate system performance gates:
+   ```bash
+   ./scripts/release_gate_mint_omarchy_migration.sh
+   ```
 
 ---
 
-## 5. Summary of Priority Action Items
-1. Keep `./run_sigma_tests.sh` green at all times.
-2. Address compiler dead-code warnings across aspirational wiki engine modules using targeted `#[allow(dead_code)]` annotations where appropriate.
-3. Maintain comprehensive documentation in `ImprovementPlan.md` and `NEXT_STEPS_GUIDELINES.md`.
+## 4. Roadmaps & Feature Synchronization
+
+- Keep `ImprovementPlan.md` updated with daily findings across Code Quality, Performance, Security, Documentation, Governance, Community, Tools, and OOP Principles.
+- Synchronize all feature specifications between `docs/` and documentation mirrors in `wiki/` and `WIKI/`.
