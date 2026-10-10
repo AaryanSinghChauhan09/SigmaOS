@@ -135,6 +135,10 @@ pub use sovereign_distro_package_advancements_v30::*;
 pub mod sovereign_distro_package_advancements_v31;
 pub use sovereign_distro_package_advancements_v31::*;
 
+#[path = "../package/sovereign_distro_package_advancements_v33.rs"]
+pub mod sovereign_distro_package_advancements_v33;
+pub use sovereign_distro_package_advancements_v33::*;
+
 #[path = "../package/bsd_linux_package_innovations.rs"]
 pub mod bsd_linux_package_innovations;
 pub use bsd_linux_package_innovations::{
