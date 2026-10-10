@@ -121,10 +121,9 @@ impl UnifiedClipboardHistoryManager {
     }
 
     pub fn search_history(&self, query: &str) -> Vec<&ClipboardHistoryEntry> {
-        let q = query.to_lowercase();
         self.entries
             .iter()
-            .filter(|e| e.searchable_text().to_lowercase().contains(&q))
+            .filter(|e| contains_ignore_case(&e.searchable_text(), query))
             .collect()
     }
 }
@@ -207,13 +206,12 @@ impl CmdKCommandPaletteEngine {
         if query.trim().is_empty() {
             return self.items.iter().collect();
         }
-        let q = query.to_lowercase();
         self.items
             .iter()
             .filter(|item| {
-                item.title.to_lowercase().contains(&q)
-                    || item.category.to_lowercase().contains(&q)
-                    || item.id.to_lowercase().contains(&q)
+                contains_ignore_case(&item.title, query)
+                    || contains_ignore_case(&item.category, query)
+                    || contains_ignore_case(&item.id, query)
             })
             .collect()
     }
@@ -230,6 +228,35 @@ impl CmdKCommandPaletteEngine {
 impl Default for CmdKCommandPaletteEngine {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+/// Zero-allocation case-insensitive ASCII substring search helper.
+///
+/// Bolt Performance Optimization:
+/// Avoids heap allocations (`to_lowercase()`) during high-frequency search query filtering
+/// in the clipboard manager and command palette.
+#[inline]
+fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
+    if needle.is_empty() {
+        return true;
+    }
+    if haystack.len() < needle.len() {
+        return false;
+    }
+    if haystack.is_ascii() && needle.is_ascii() {
+        let needle_bytes = needle.as_bytes();
+        haystack
+            .as_bytes()
+            .windows(needle_bytes.len())
+            .any(|window| {
+                window
+                    .iter()
+                    .zip(needle_bytes.iter())
+                    .all(|(&b1, &b2)| b1.to_ascii_lowercase() == b2.to_ascii_lowercase())
+            })
+    } else {
+        haystack.to_lowercase().contains(&needle.to_lowercase())
     }
 }
 
