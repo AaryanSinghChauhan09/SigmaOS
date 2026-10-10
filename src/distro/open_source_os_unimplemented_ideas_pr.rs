@@ -6,7 +6,8 @@
 // 1. OpenSourceOsUnimplementedIdeasPrEngine: Staging, diff generation, and validation for open-source OS PRs.
 // 2. OpenSourceOsPrProposalRegistry: Pull request metadata tracker and FNV-1a patch digest validator.
 // 3. SovereignOpenSourceOsIdeasMasterSuite: Master coordinator ensuring 100% PR deployment status across Linux,
-//    BSD, Illumos, Redox, Haiku, Plan 9, Minix 3, and Genode OS paradigms.
+//    BSD, Illumos, Redox, Haiku, Plan 9, Minix 3, Genode, SerenityOS, TempleOS, Cosmopolitan, NetBSD,
+//    and DragonFly BSD OS paradigms.
 
 use std::collections::BTreeMap;
 use std::string::String;
@@ -23,6 +24,11 @@ pub enum OpenSourceOsCategory {
     Plan9Filesystem,
     MinixSelfHealing,
     GenodeCapabilityRpc,
+    SerenityOsLibGui,
+    TempleOsHolyC,
+    CosmopolitanApe,
+    NetBsdRump,
+    DragonFlyHammer2,
 }
 
 impl OpenSourceOsCategory {
@@ -36,6 +42,11 @@ impl OpenSourceOsCategory {
             Self::Plan9Filesystem => "Plan 9 9P2000 Protocol",
             Self::MinixSelfHealing => "Minix 3 Reincarnation Server",
             Self::GenodeCapabilityRpc => "Genode Capability RPC Router",
+            Self::SerenityOsLibGui => "SerenityOS LibGUI Async Window IPC",
+            Self::TempleOsHolyC => "TempleOS HolyC Dynamic Execution Engine",
+            Self::CosmopolitanApe => "Cosmopolitan Libc Polyglot APE Runner",
+            Self::NetBsdRump => "NetBSD Rump Kernel Anykernel Subsystem",
+            Self::DragonFlyHammer2 => "DragonFly BSD HAMMER2 CoW Storage Engine",
         }
     }
 }
@@ -126,6 +137,31 @@ impl OpenSourceOsUnimplementedIdeasPrEngine {
                 OpenSourceOsCategory::GenodeCapabilityRpc,
                 "genode_capability_rpc",
             ),
+            (
+                "feat(serenity): LibGUI async event-driven window IPC event loop router",
+                OpenSourceOsCategory::SerenityOsLibGui,
+                "serenity_libgui_ipc",
+            ),
+            (
+                "feat(templeos): HolyC dynamic JIT compiler and graphics ring executor",
+                OpenSourceOsCategory::TempleOsHolyC,
+                "templeos_holyc_executor",
+            ),
+            (
+                "feat(cosmopolitan): Actually Portable Executable (APE) multi-OS header runner",
+                OpenSourceOsCategory::CosmopolitanApe,
+                "cosmo_ape_runner",
+            ),
+            (
+                "feat(netbsd): Rump kernel userland driver abstraction & virtual dev bus",
+                OpenSourceOsCategory::NetBsdRump,
+                "netbsd_rump_bus",
+            ),
+            (
+                "feat(dragonfly): HAMMER2 CoW snapshot & clustered storage replication pool",
+                OpenSourceOsCategory::DragonFlyHammer2,
+                "dragonfly_hammer2_pool",
+            ),
         ];
 
         for (title, cat, target_sub) in pr_definitions {
@@ -191,7 +227,7 @@ impl SovereignOpenSourceOsIdeasMasterSuite {
     }
 
     pub fn verify_all_open_source_os_pr_ideas(&self) -> bool {
-        self.pr_engine.get_merged_pr_count() >= 8
+        self.pr_engine.get_merged_pr_count() >= 13
     }
 
     pub fn get_category_pr_summary(&self) -> Vec<(String, usize)> {
@@ -219,7 +255,7 @@ mod tests {
     #[test]
     fn test_open_source_os_unimplemented_ideas_pr_engine() {
         let engine = OpenSourceOsUnimplementedIdeasPrEngine::new();
-        assert_eq!(engine.get_merged_pr_count(), 8);
+        assert_eq!(engine.get_merged_pr_count(), 13);
 
         let diff = engine.generate_pr_diff_patch(1001);
         assert!(diff.is_some());
@@ -234,6 +270,6 @@ mod tests {
         assert!(master.verify_all_open_source_os_pr_ideas());
 
         let summary = master.get_category_pr_summary();
-        assert_eq!(summary.len(), 8);
+        assert_eq!(summary.len(), 13);
     }
 }
