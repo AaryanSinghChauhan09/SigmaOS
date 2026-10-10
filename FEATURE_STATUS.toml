@@ -33,6 +33,20 @@ description = "Naked asm push/pop all GPRs + FPU fxsave/fxrstor, System V AMD64 
 test_evidence = "Unit tests for context initialization"
 next_milestone = "Integration with EEVDF scheduler"
 
+[kernel.interrupt_framework]
+status = "working"
+files = ["src/kernel/interrupt.rs", "docs/INTERRUPT_HANDLER_PLAN.md"]
+description = "Generic interrupt vector allocation, handler registration, enable/disable toggle, and synchronous dispatch"
+test_evidence = "Unit tests pass via rustc --test src/kernel/interrupt.rs; audit matrix published in docs/INTERRUPT_HANDLER_PLAN.md"
+next_milestone = "x86_64 QEMU Local APIC timer dispatch validation"
+
+[kernel.irq_subsystem]
+status = "working"
+files = ["src/kernel/irq/mod.rs", "src/kernel/irq/irq_controller.rs", "src/kernel/irq/irq_domain.rs", "src/kernel/irq/softirq.rs", "src/kernel/irq/workqueue.rs"]
+description = "Multi-controller IRQ management, irq_domain hwirq-to-virq mapping, softirqs/tasklets, and async workqueues"
+test_evidence = "Unit tests pass via rustc --test src/kernel/irq/mod.rs; lifecycle and context contracts defined"
+next_milestone = "APIC / GICv3 / PLIC chip trait operations & QEMU flow validation"
+
 [arch.x86_64.apic]
 status = "working"
 files = ["src/arch/x86_64/apic.rs"]
