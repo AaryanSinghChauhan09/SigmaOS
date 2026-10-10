@@ -5,31 +5,15 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-use std::boxed::Box;
-use std::format;
-use std::string::{String, ToString};
-use std::vec::Vec;
 
-// (no_std only applicable at crate root - removed)
-// #![no_main]  // crate-root only
-
-use core::mem;
-/// OOP-based Desktop Menu for SigmaOS
-/// Based on Ideas-999-Structured: User Experience & Desktop Item 736
-/// Implements application menu and context menu
 use core::sync::atomic::{AtomicUsize, Ordering};
+use std::boxed::Box;
+use std::vec::Vec;
 
 pub type MenuItemID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MenuItemType {
     Separator = 0,
     Action = 1,
@@ -38,7 +22,7 @@ pub enum MenuItemType {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MenuError {
     Success = 0,
     NotFound = 1,
@@ -56,6 +40,7 @@ pub trait MenuItem {
 pub struct SimpleMenuItem {
     pub id: MenuItemID,
     pub label: [u8; 128],
+    pub label_len: u8,
     pub item_type: AtomicUsize,
     pub enabled: AtomicUsize,
     pub checked: AtomicUsize,
@@ -65,12 +50,12 @@ impl SimpleMenuItem {
     pub fn new(id: MenuItemID, label: &[u8], item_type: MenuItemType) -> Self {
         let mut label_array = [0u8; 128];
         let label_len = label.len().min(127);
-        unsafe {
-            core::ptr::copy_nonoverlapping(label.as_ptr(), label_array.as_mut_ptr(), label_len);
-        }
+        label_array[..label_len].copy_from_slice(&label[..label_len]);
+
         SimpleMenuItem {
             id,
             label: label_array,
+            label_len: label_len as u8,
             item_type: AtomicUsize::new(item_type as usize),
             enabled: AtomicUsize::new(1),
             checked: AtomicUsize::new(0),
@@ -82,16 +67,26 @@ impl MenuItem for SimpleMenuItem {
     fn id(&self) -> MenuItemID {
         self.id
     }
+
     fn label(&self) -> &[u8] {
-        let len = self.label.iter().position(|&b| b == 0).unwrap_or(128);
-        &self.label[..len]
+        // O(1) constant-time slice range indexing using precomputed label_len,
+        // avoiding O(N) zero-byte linear scan (.position(|&b| b == 0)) on every menu label query.
+        &self.label[..self.label_len as usize]
     }
+
     fn item_type(&self) -> MenuItemType {
-        unsafe { core::mem::transmute(self.item_type.load(Ordering::SeqCst)) }
+        match self.item_type.load(Ordering::SeqCst) {
+            0 => MenuItemType::Separator,
+            1 => MenuItemType::Action,
+            2 => MenuItemType::Submenu,
+            _ => MenuItemType::Checkbox,
+        }
     }
+
     fn is_enabled(&self) -> bool {
         self.enabled.load(Ordering::SeqCst) == 1
     }
+
     fn is_checked(&self) -> bool {
         self.checked.load(Ordering::SeqCst) == 1
     }
@@ -133,6 +128,7 @@ impl Menu for SimpleMenu {
         for item_option in &mut self.items {
             if let Some(ref item) = *item_option {
                 if item.id() == id {
+                    *item_option = None;
                     return Ok(());
                 }
             }
@@ -182,93 +178,34 @@ impl ContextMenu for SimpleContextMenu {
     }
 }
 
-struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
+    #[test]
+    fn test_simple_menu_item_cached_label_length() {
+        let item = SimpleMenuItem::new(1, b"Open File", MenuItemType::Action);
+        assert_eq!(item.id(), 1);
+        assert_eq!(item.label(), b"Open File");
+        assert_eq!(item.item_type(), MenuItemType::Action);
+        assert!(item.is_enabled());
+        assert!(!item.is_checked());
+        assert_eq!(item.label_len, 9);
     }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
 
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
+    #[test]
+    fn test_simple_menu_operations() {
+        let mut menu = SimpleMenu::new();
+        let item1 = SimpleMenuItem::new(101, b"Copy", MenuItemType::Action);
+        let item2 = SimpleMenuItem::new(102, b"Paste", MenuItemType::Action);
 
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
+        assert_eq!(menu.add_item(Box::new(item1)).unwrap(), 101);
+        assert_eq!(menu.add_item(Box::new(item2)).unwrap(), 102);
 
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
+        let retrieved = menu.get_item(101).unwrap();
+        assert_eq!(retrieved.label(), b"Copy");
 
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::Deref;
-        self.deref().iter()
-    }
-}
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
+        assert!(menu.remove_item(101).is_ok());
+        assert!(menu.get_item(101).is_none());
     }
 }
