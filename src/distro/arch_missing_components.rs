@@ -449,8 +449,17 @@ pub struct PacmanHookRule {
     pub exec_command: String,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct InitramfsHookSpec {
+    pub name: String,
+    pub is_runtime: bool,
+    pub dependencies: Vec<String>,
+}
+
 pub struct ArchPacmanHookRunner {
     pub registered_hooks: Vec<PacmanHookRule>,
+    pub hooks: BTreeMap<String, InitramfsHookSpec>,
+    pub compression_format: String,
 }
 
 impl ArchPacmanHookRunner {
@@ -513,7 +522,15 @@ impl ArchPacmanHookRunner {
             },
         );
 
+        let default_hook = PacmanHookRule {
+            name: "fc-cache".to_string(),
+            when: PacmanHookWhen::PostTransaction,
+            target_packages: vec!["fontconfig*".to_string()],
+            exec_command: "fc-cache -s".to_string(),
+        };
+
         Self {
+            registered_hooks: vec![default_hook],
             hooks,
             compression_format: "zstd".to_string(),
         }
@@ -579,15 +596,15 @@ impl ArchPacstrapChrootEngine {
 // =========================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct CachedPackageFile {
-    pub pkgname: String,
-    pub version: String,
-    pub file_size_bytes: u64,
+pub struct PqcDilithiumKeySpec {
+    pub key_id: String,
+    pub owner_email: String,
+    pub is_trusted: bool,
+    pub dilithium_pubkey_hash: String,
 }
 
-pub struct ArchPacmanCacheScrubber {
-    pub cached_files: Vec<CachedPackageFile>,
-    pub retain_keep_count: usize,
+pub struct ArchPacmanKeyringPqcEngine {
+    pub keys: BTreeMap<String, PqcDilithiumKeySpec>,
 }
 
 impl ArchPacmanKeyringPqcEngine {
@@ -603,6 +620,33 @@ impl ArchPacmanKeyringPqcEngine {
             },
         );
         Self { keys }
+    }
+}
+
+impl Default for ArchPacmanKeyringPqcEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CachedPackageFile {
+    pub pkgname: String,
+    pub version: String,
+    pub file_size_bytes: u64,
+}
+
+pub struct ArchPacmanCacheScrubber {
+    pub cached_files: Vec<CachedPackageFile>,
+    pub retain_keep_count: usize,
+}
+
+impl ArchPacmanCacheScrubber {
+    pub fn new(retain_keep_count: usize) -> Self {
+        Self {
+            cached_files: Vec::new(),
+            retain_keep_count,
+        }
     }
 
     /// Calculates which old package cache files should be purged
