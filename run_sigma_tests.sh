@@ -156,6 +156,13 @@ if [ -f "src/distro/sovereign_linux_bsd_master_synthesis.rs" ]; then
     ./build/linux_bsd_master_synthesis_test
 fi
 
+if [ -f "src/distro/sovereign_linux_bsd_all_subsystems_harmony.rs" ]; then
+    echo "Running Sovereign Linux & BSD All Subsystems Harmony test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_linux_bsd_all_subsystems_harmony.rs --edition=2021 -o build/test_subsystem_harmony
+    ./build/test_subsystem_harmony
+fi
+
 if [ -f "src/distro/sovereign_linux_bsd_distro_next_gen_innovations.rs" ]; then
     echo "Running Next-Gen Sovereign Linux & BSD Distro Innovations test suite..."
     mkdir -p build
