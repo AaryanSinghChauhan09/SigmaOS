@@ -128,6 +128,27 @@ if [ -f "src/distro/sovereign_2026_distro_leap_engine.rs" ]; then
     ./build/test_2026_leap
 fi
 
+if [ -f "src/distro/sovereign_2085_distro_supremacy_engine.rs" ]; then
+    echo "Running 2085 Distro Supremacy test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_2085_distro_supremacy_engine.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_2085_supremacy
+    ./build/test_2085_supremacy
+fi
+
+if [ -f "src/distro/sovereign_2090_distro_supremacy_engine.rs" ]; then
+    echo "Running 2090 Distro Supremacy test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_2090_distro_supremacy_engine.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_2090_supremacy
+    ./build/test_2090_supremacy
+fi
+
+if [ -f "src/distro/sovereign_arch_gap_closure_pr_engine.rs" ]; then
+    echo "Running Sovereign Arch Gap Closure PR test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_arch_gap_closure_pr_engine.rs --edition=2021 -o build/test_arch_pr_engine
+    ./build/test_arch_pr_engine
+fi
+
 if [ -f "src/distro/linux_bsd_distro_breakthroughs.rs" ]; then
     echo "Running Linux & BSD Distro Breakthroughs test suite..."
     mkdir -p build
