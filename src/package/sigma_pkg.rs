@@ -553,19 +553,34 @@ impl UniversalPackageImporter {
                 } else if dep_lower.starts_with("cmd:") {
                     dep_lower = dep_lower["cmd:".len()..].to_string();
                 } else if dep_lower.starts_with("pkgconfig(") {
-                    dep_lower = dep_lower["pkgconfig(".len()..].trim_end_matches(')').to_string();
+                    dep_lower = dep_lower["pkgconfig(".len()..]
+                        .trim_end_matches(')')
+                        .to_string();
                 } else if dep_lower.starts_with("perl-module(") {
-                    dep_lower = dep_lower["perl-module(".len()..].trim_end_matches(')').to_string();
+                    dep_lower = dep_lower["perl-module(".len()..]
+                        .trim_end_matches(')')
+                        .to_string();
                 } else if dep_lower.starts_with("python3dist(") {
-                    dep_lower = dep_lower["python3dist(".len()..].trim_end_matches(')').to_string();
+                    dep_lower = dep_lower["python3dist(".len()..]
+                        .trim_end_matches(')')
+                        .to_string();
                 } else if let Some(pos) = dep_lower.rfind(':') {
                     let suffix = &dep_lower[pos + 1..];
-                    if matches!(suffix, "amd64" | "i386" | "arm64" | "armhf" | "all" | "x86_64" | "native") {
+                    if matches!(
+                        suffix,
+                        "amd64" | "i386" | "arm64" | "armhf" | "all" | "x86_64" | "native"
+                    ) {
                         dep_lower = dep_lower[..pos].to_string();
                     }
                 }
-                dep_lower = dep_lower.strip_suffix(".x86_64").unwrap_or(&dep_lower).to_string();
-                dep_lower = dep_lower.strip_suffix(".noarch").unwrap_or(&dep_lower).to_string();
+                dep_lower = dep_lower
+                    .strip_suffix(".x86_64")
+                    .unwrap_or(&dep_lower)
+                    .to_string();
+                dep_lower = dep_lower
+                    .strip_suffix(".noarch")
+                    .unwrap_or(&dep_lower)
+                    .to_string();
 
                 if dep_lower.contains("ssl")
                     || dep_lower.contains("crypto")
@@ -1983,14 +1998,28 @@ impl SigmaPkg {
             }
         }
 
-        if pm == "xbps-install" || pm == "pkg_add" || pm == "pkgadd" || pm == "installpkg" || pm == "urpmi" {
+        if pm == "xbps-install"
+            || pm == "pkg_add"
+            || pm == "pkgadd"
+            || pm == "installpkg"
+            || pm == "urpmi"
+        {
             action = "install";
             action_explicitly_set = true;
-        } else if pm == "xbps-remove" || pm == "pkg_delete" || pm == "pkgrm" || pm == "removepkg" || pm == "urpme" {
+        } else if pm == "xbps-remove"
+            || pm == "pkg_delete"
+            || pm == "pkgrm"
+            || pm == "removepkg"
+            || pm == "urpme"
+        {
             action = "remove";
             action_explicitly_set = true;
         } else if pm == "xbps-query" || pm == "urpmq" || pm == "dpkg-query" {
-            if args.contains(&"-S") || args.contains(&"-s") || args.contains(&"-l") || args.contains(&"search") {
+            if args.contains(&"-S")
+                || args.contains(&"-s")
+                || args.contains(&"-l")
+                || args.contains(&"search")
+            {
                 action = "search";
             } else {
                 action = "query_info";

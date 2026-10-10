@@ -2013,14 +2013,23 @@ impl UniversalDependencyMapper {
         } else if clean_raw.starts_with("cmd:") {
             clean_raw = clean_raw["cmd:".len()..].to_string();
         } else if clean_raw.starts_with("pkgconfig(") {
-            clean_raw = clean_raw["pkgconfig(".len()..].trim_end_matches(')').to_string();
+            clean_raw = clean_raw["pkgconfig(".len()..]
+                .trim_end_matches(')')
+                .to_string();
         } else if clean_raw.starts_with("perl-module(") {
-            clean_raw = clean_raw["perl-module(".len()..].trim_end_matches(')').to_string();
+            clean_raw = clean_raw["perl-module(".len()..]
+                .trim_end_matches(')')
+                .to_string();
         } else if clean_raw.starts_with("python3dist(") {
-            clean_raw = clean_raw["python3dist(".len()..].trim_end_matches(')').to_string();
+            clean_raw = clean_raw["python3dist(".len()..]
+                .trim_end_matches(')')
+                .to_string();
         } else if let Some(pos) = clean_raw.rfind(':') {
             let suffix = &clean_raw[pos + 1..];
-            if matches!(suffix, "amd64" | "i386" | "arm64" | "armhf" | "all" | "x86_64" | "native") {
+            if matches!(
+                suffix,
+                "amd64" | "i386" | "arm64" | "armhf" | "all" | "x86_64" | "native"
+            ) {
                 clean_raw = clean_raw[..pos].to_string();
             }
         }
@@ -2414,7 +2423,9 @@ impl UniversalPmCommandDispatcher {
                 while i < args.len() {
                     match args[i] {
                         "install" | "-i" | "download" => operation = UniversalPmOperation::Install,
-                        "remove" | "purge" | "-r" | "-P" => operation = UniversalPmOperation::Remove,
+                        "remove" | "purge" | "-r" | "-P" => {
+                            operation = UniversalPmOperation::Remove
+                        }
                         "autoremove" | "auto-remove" | "clean" | "autoclean" => {
                             operation = UniversalPmOperation::CleanCache
                         }
@@ -2471,8 +2482,8 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "dnf" | "yum" | "zypper" | "microdnf" | "rpm" | "fedora" | "rhel" | "centos" | "rocky"
-            | "alma" | "almalinux" | "opensuse" | "suse" => {
+            "dnf" | "yum" | "zypper" | "microdnf" | "rpm" | "fedora" | "rhel" | "centos"
+            | "rocky" | "alma" | "almalinux" | "opensuse" | "suse" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
@@ -2694,7 +2705,8 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "flatpak" | "snap" | "pkgman" | "swupd" | "clearlinux" | "brew" | "cachyos-hello" | "chwd" => {
+            "flatpak" | "snap" | "pkgman" | "swupd" | "clearlinux" | "brew" | "cachyos-hello"
+            | "chwd" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
@@ -4185,8 +4197,14 @@ requires {
         assert_eq!(mapper.to_canonical_name("so:libc.so.6"), "libc");
         assert_eq!(mapper.to_canonical_name("cmd:bash"), "bash");
         assert_eq!(mapper.to_canonical_name("pkgconfig(openssl)"), "openssl");
-        assert_eq!(mapper.to_canonical_name("perl-module(File::Spec)"), "File::Spec");
-        assert_eq!(mapper.to_canonical_name("python3dist(requests)"), "requests");
+        assert_eq!(
+            mapper.to_canonical_name("perl-module(File::Spec)"),
+            "File::Spec"
+        );
+        assert_eq!(
+            mapper.to_canonical_name("python3dist(requests)"),
+            "requests"
+        );
         assert_eq!(mapper.to_canonical_name("curl:amd64"), "curl");
         assert_eq!(mapper.to_canonical_name("htop.x86_64"), "htop");
     }

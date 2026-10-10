@@ -6508,10 +6508,7 @@ impl SovereignAcademicCitationEngine {
                         .publisher
                         .map(|p| format!(" {}:", p))
                         .unwrap_or_default();
-                    format!(
-                        "{}. {}.{} {}.",
-                        item.author, item.title, pub_str, item.year
-                    )
+                    format!("{}. {}.{} {}.", item.author, item.title, pub_str, item.year)
                 }
                 CitationStyle::IEEE => {
                     let pub_str = item
@@ -6567,7 +6564,12 @@ impl SovereignDataStorytellingEngine {
     }
 
     /// Automatically generates an executive summary narrative based on metric growth trend.
-    pub fn generate_narrative_summary(&self, metric_name: &str, old_val: f64, new_val: f64) -> String {
+    pub fn generate_narrative_summary(
+        &self,
+        metric_name: &str,
+        old_val: f64,
+        new_val: f64,
+    ) -> String {
         let diff = new_val - old_val;
         let pct = if old_val != 0.0 {
             (diff / old_val) * 100.0
@@ -6585,7 +6587,9 @@ impl SovereignDataStorytellingEngine {
         } else if pct < -10.0 {
             format!(
                 "Decline detected in {}: dropped by {:.1}% ({:.2}). Action required.",
-                metric_name, pct.abs(), diff
+                metric_name,
+                pct.abs(),
+                diff
             )
         } else {
             format!(
@@ -6672,10 +6676,16 @@ impl SovereignChurnPredictionRetentionEngine {
     /// Recommends automated retention actions based on churn risk.
     pub fn recommend_retention_workflow(&self, risk: ChurnRiskLevel) -> &'static str {
         match risk {
-            ChurnRiskLevel::Low => "Nurture sequence: monthly newsletter and product update features",
+            ChurnRiskLevel::Low => {
+                "Nurture sequence: monthly newsletter and product update features"
+            }
             ChurnRiskLevel::Medium => "Check-in email from Customer Success Representative",
-            ChurnRiskLevel::High => "Schedule executive phone review & offer usage training webinar",
-            ChurnRiskLevel::Critical => "Immediate priority escalation to Account Director & 20% renewal discount offer",
+            ChurnRiskLevel::High => {
+                "Schedule executive phone review & offer usage training webinar"
+            }
+            ChurnRiskLevel::Critical => {
+                "Immediate priority escalation to Account Director & 20% renewal discount offer"
+            }
         }
     }
 }
@@ -6782,14 +6792,21 @@ impl SovereignFinancialValuationEngine {
 
         // Terminal value
         let last_cf = *projected_cash_flows.last().unwrap();
-        let terminal_value = (last_cf * (1.0 + terminal_growth_rate)) / (wacc - terminal_growth_rate);
-        let discounted_terminal_value = terminal_value / (1.0 + wacc).powf(projected_cash_flows.len() as f64);
+        let terminal_value =
+            (last_cf * (1.0 + terminal_growth_rate)) / (wacc - terminal_growth_rate);
+        let discounted_terminal_value =
+            terminal_value / (1.0 + wacc).powf(projected_cash_flows.len() as f64);
 
         npv + discounted_terminal_value
     }
 
     /// Generates multi-period cash flow forecast given initial cash flow and constant growth rate.
-    pub fn forecast_cash_flows(&self, initial_cf: f64, annual_growth_rate: f64, periods: usize) -> Vec<f64> {
+    pub fn forecast_cash_flows(
+        &self,
+        initial_cf: f64,
+        annual_growth_rate: f64,
+        periods: usize,
+    ) -> Vec<f64> {
         let mut forecast = Vec::with_capacity(periods);
         let mut current = initial_cf;
         for _ in 0..periods {
@@ -6953,7 +6970,8 @@ impl SovereignBitrix24OmnichannelTelephonyCrmEngine {
             transcript.to_string(),
         ));
 
-        let auto_created_lead = transcript.contains("pricing") || transcript.contains("quote") || duration_sec > 180;
+        let auto_created_lead =
+            transcript.contains("pricing") || transcript.contains("quote") || duration_sec > 180;
         let summary = format!(
             "Logged call [{}] from {} ({}s). Lead auto-created: {}",
             call_id, phone_number, duration_sec, auto_created_lead
@@ -7076,7 +7094,11 @@ impl SovereignAiDocumentSummarizerEngine {
     }
 
     /// Extracts key bullet points and executive summary from document text.
-    pub fn generate_executive_summary(&self, document_text: &str, max_bullets: usize) -> Vec<String> {
+    pub fn generate_executive_summary(
+        &self,
+        document_text: &str,
+        max_bullets: usize,
+    ) -> Vec<String> {
         let sentences: Vec<_> = document_text
             .split(&['.', '!', '?'][..])
             .map(|s| s.trim())
@@ -8552,7 +8574,10 @@ mod tests {
             active_contract_months: 18,
             monthly_active_users: 25,
         };
-        assert_eq!(churn_engine.predict_churn_risk(&healthy_customer), ChurnRiskLevel::Low);
+        assert_eq!(
+            churn_engine.predict_churn_risk(&healthy_customer),
+            ChurnRiskLevel::Low
+        );
 
         let critical_customer = CustomerMetrics {
             customer_id: "c2".to_string(),
@@ -8561,7 +8586,10 @@ mod tests {
             active_contract_months: 2,
             monthly_active_users: 1,
         };
-        assert_eq!(churn_engine.predict_churn_risk(&critical_customer), ChurnRiskLevel::Critical);
+        assert_eq!(
+            churn_engine.predict_churn_risk(&critical_customer),
+            ChurnRiskLevel::Critical
+        );
 
         // 9. SovereignOmnichannelCommunicationGateway
         let mut comms_gateway = SovereignOmnichannelCommunicationGateway::new();
@@ -8607,7 +8635,9 @@ mod tests {
         let mut occupied = HashMap::new();
         let res = array_spill.evaluate_sequence_spill((1, 1), 2, 2, 1.0, 1.0, &occupied);
         match res {
-            DynamicArraySpillResult::Success { rows, cols, values, .. } => {
+            DynamicArraySpillResult::Success {
+                rows, cols, values, ..
+            } => {
                 assert_eq!(rows, 2);
                 assert_eq!(cols, 2);
                 assert_eq!(values[0], vec![1.0, 2.0]);
@@ -8627,19 +8657,27 @@ mod tests {
 
         // 12. SovereignSalesforceEinsteinAnalyticsPipelineEngine
         let einstein_engine = SovereignSalesforceEinsteinAnalyticsPipelineEngine::new();
-        let (prob, action) = einstein_engine.evaluate_deal_pipeline_opportunity(250000.0, 0.8, 5, true);
+        let (prob, action) =
+            einstein_engine.evaluate_deal_pipeline_opportunity(250000.0, 0.8, 5, true);
         assert!(prob >= 0.75);
         assert!(action.contains("Send formal contract proposal"));
 
         // 13. SovereignBitrix24OmnichannelTelephonyCrmEngine
         let mut pbx_engine = SovereignBitrix24OmnichannelTelephonyCrmEngine::new();
-        let (summary, auto_lead) = pbx_engine.process_pbx_call_event("call_001", "+18005550199", 240, "Discussed enterprise pricing quote.");
+        let (summary, auto_lead) = pbx_engine.process_pbx_call_event(
+            "call_001",
+            "+18005550199",
+            240,
+            "Discussed enterprise pricing quote.",
+        );
         assert!(auto_lead);
         assert!(summary.contains("Lead auto-created: true"));
 
         // 14. SovereignGoogleSmartCanvasChipEngine
         let chip_engine = SovereignGoogleSmartCanvasChipEngine::new();
-        let chip = chip_engine.parse_chip_notation("@Person:Ada Lovelace").unwrap();
+        let chip = chip_engine
+            .parse_chip_notation("@Person:Ada Lovelace")
+            .unwrap();
         assert_eq!(chip.kind, SmartCanvasChipKind::Person);
         assert_eq!(chip.label, "👤 Ada Lovelace");
 
@@ -8654,7 +8692,11 @@ mod tests {
 
         // 16. SovereignSmartDocumentTemplateEngine
         let mut template_engine = SovereignSmartDocumentTemplateEngine::new();
-        template_engine.register_template("tpl1", "Service Agreement", "Agreement for {{client_name}}: Total {{total_amount}}");
+        template_engine.register_template(
+            "tpl1",
+            "Service Agreement",
+            "Agreement for {{client_name}}: Total {{total_amount}}",
+        );
         let mut ctx = HashMap::new();
         ctx.insert("client_name".to_string(), "Acme Corp".to_string());
         ctx.insert("total_amount".to_string(), "$50,000".to_string());
@@ -8664,10 +8706,13 @@ mod tests {
         // 17. SovereignLandingPageCmsEngine
         let mut cms_engine = SovereignLandingPageCmsEngine::new();
         let page_id = cms_engine.create_page("Home", "home");
-        assert!(cms_engine.add_block(page_id, CmsBlockType::HeroBanner {
-            title: "Welcome to SigmaOS Workstation".to_string(),
-            subtitle: "Empowering sovereign productivity.".to_string(),
-        }));
+        assert!(cms_engine.add_block(
+            page_id,
+            CmsBlockType::HeroBanner {
+                title: "Welcome to SigmaOS Workstation".to_string(),
+                subtitle: "Empowering sovereign productivity.".to_string(),
+            }
+        ));
         let html = cms_engine.render_html(page_id).unwrap();
         assert!(html.contains("<h1>Welcome to SigmaOS Workstation</h1>"));
         assert!(html.contains("Empowering sovereign productivity."));
