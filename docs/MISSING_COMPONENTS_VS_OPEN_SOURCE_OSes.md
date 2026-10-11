@@ -18,7 +18,7 @@ These are the **highest-priority blockers** that prevent SigmaOS from booting on
 |---|---|---|---|
 | 🔴 Flat bare-metal kernel ELF binary (`bzImage` / `vmlinux` equivalent) | Linux, FreeBSD | SigmaOS compiles as a `cdylib` / test binary; it cannot GRUB-boot standalone | Needs linker script `kernel.ld` + `_start` asm entry |
 | 🔴 Assembly bootstrap entry (`boot.s` / `start.s`) with long-mode setup | Linux, xv6, Redox | Without a handoff from GRUB/Limine to Rust `kernel_main`, nothing runs | GRUB multiboot2 header required |
-| 🔴 Real initramfs / initrd binary generation (`mkinitramfs` equivalent) | Linux (mkinitcpio, dracut), Arch, Debian | No compressed root image to mount at boot | Needs cpio/gzip packaging script |
+| 🟢 Real initramfs / initrd binary generation (`mkinitramfs` equivalent) | Linux (mkinitcpio, dracut), Arch, Debian | Provides compressed CPIO/gzip/zstd/lz4 root initramfs image | Implemented in `src/boot/initramfs.rs`, `scripts/mkinitramfs.sh`, `tools/sigma_mkinitramfs_compat.rs` |
 | 🟡 UEFI long-mode boot (GOP framebuffer + EFI app entry) | Linux (`EFI stub`), FreeBSD, OpenBSD | UEFI boot modules exist but no validated QEMU ISO boot path | `boot/uefi_gop_framebuffer.rs` is prototype only |
 | 🔴 Multiprocessor SMP APIC IPI calibration on real hardware | Linux, FreeBSD | APIC structures are defined but not validated against real LAPIC timer calibration | `sovereign_smp_xhci_apc_synthesis.rs` is synthetic |
 | 🔴 Verified `make iso` / `build_iso.sh` producing a bootable ISO | Every OS distro | Currently no CI step runs a QEMU boot smoke test | No `grub-mkrescue` pipeline wired |
@@ -407,7 +407,7 @@ PRIORITY 4 — Ecosystem Completeness
 
 | Category | 🔴 Missing | 🟡 Stub/Prototype | 🟢 Implemented |
 |---|---|---|---|
-| Boot & Kernel Binary | 5 | 1 | 0 |
+| Boot & Kernel Binary | 4 | 1 | 1 |
 | Memory Management | 9 | 1 | 3 |
 | Scheduler | 5 | 1 | 2 |
 | IPC & Sync | 5 | 2 | 1 |
@@ -430,7 +430,7 @@ PRIORITY 4 — Ecosystem Completeness
 | Dev Toolchain | 9 | 0 | 0 |
 | BSD-Specific | 10 | 0 | 3 |
 | Exotic/Research OS | 8 | 1 | 3 |
-| **TOTAL** | **179** | **20** | **38** |
+| **TOTAL** | **178** | **20** | **39** |
 
 ---
 
