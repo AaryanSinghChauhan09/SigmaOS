@@ -794,6 +794,13 @@ if [ -f "src/distro/sovereign_linux_bsd_ecosystem_advancements_v28.rs" ]; then
     ./build/test_advancements_v28
 fi
 
+if [ -f "src/boot/sovereign_initramfs_initrd_pr_engine.rs" ]; then
+    echo "Running Sovereign Initramfs & Initrd PR Subsystem test suite..."
+    mkdir -p build
+    rustc --test src/boot/sovereign_initramfs_initrd_pr_engine.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_sovereign_initramfs_pr
+    ./build/test_sovereign_initramfs_pr
+fi
+
 if [ -f "src/distro/sovereign_universal_subsystem_interop.rs" ]; then
     echo "Running Sovereign Universal Subsystem Interoperability test suite..."
     mkdir -p build
@@ -827,6 +834,13 @@ if [ -f "src/distro/sovereign_linux_bsd_ecosystem_advancements_v29.rs" ]; then
     mkdir -p build
     rustc --test src/distro/sovereign_linux_bsd_ecosystem_advancements_v29.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_advancements_v29
     ./build/test_advancements_v29
+fi
+
+if [ -f "src/distro/sovereign_linux_bsd_ecosystem_advancements_v41.rs" ]; then
+    echo "Running Sovereign Linux & BSD Ecosystem Advancements V41 test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_linux_bsd_ecosystem_advancements_v41.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_advancements_v41
+    ./build/test_advancements_v41
 fi
 
 if [ -f "src/distro/sovereign_mint_omarchy_apex_dominance_v30.rs" ]; then

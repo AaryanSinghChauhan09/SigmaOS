@@ -18,6 +18,7 @@ pub mod post;
 pub mod secure;
 pub mod sigma_boot;
 pub mod sigma_bootloader;
+pub mod sovereign_initramfs_initrd_pr_engine;
 pub mod sovereign_multi_distro_bootloader;
 pub mod uefi;
 pub mod uefi_gop_framebuffer;
@@ -53,6 +54,12 @@ pub use uefi::{
 };
 pub use uefi_gop_framebuffer::*;
 
+pub use sovereign_initramfs_initrd_pr_engine::{
+    EarlySecurityVolumeType, EarlySecurityVolumeUnsealStagingEngine, InitramfsHookModule,
+    InitramfsRecipePr, InitrdCompressionAlgorithm, MultiDistroInitramfsHookResolver,
+    SovereignCpioInitrdArchiveGenerator, SovereignInitramfsInitrdPrGatewaySuite,
+    SwitchRootPivotStagingEngine, SysrootPivotType,
+};
 pub use sovereign_multi_distro_bootloader::{
     BootloaderKind, FreeBsdLoaderConfig, LimineBootEntry, LimineConfig, OpenBsdBootConfig,
     RefindMenuEntry, SovereignMultiDistroBootloaderEngine, SystemdBootBlsEntry, UniversalBootEntry,

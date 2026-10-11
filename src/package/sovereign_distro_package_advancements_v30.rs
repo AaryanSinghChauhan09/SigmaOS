@@ -444,17 +444,23 @@ impl UniversalMultiFormatTranspilerAndExecutionEngineV30 {
         id
     }
 
-    /// Rolls back system state to selected boot environment snapshot V30
-    pub fn rollback(&mut self, snapshot_id: usize) -> Result<String, String> {
-        if let Some(snap) = self
-            .snapshots
-            .iter_mut()
-            .find(|s| s.snapshot_id == snapshot_id)
+    pub fn install_package(&mut self, name: &str) {
+        if !self.installed_packages.contains(&name.to_string()) {
+            self.installed_packages.push(name.to_string());
+        }
+    }
+
+    /// Rolls back system state to selected checkpoint V30
+    pub fn rollback(&mut self, checkpoint_id: usize) -> Result<String, String> {
+        if let Some(cp) = self
+            .checkpoints
+            .iter()
+            .find(|c| c.checkpoint_id == checkpoint_id)
         {
-            snap.active = true;
+            self.installed_packages = cp.installed_packages.clone();
             Ok(format!(
-                "Successfully rolled back to snapshot '{}'",
-                snap.label
+                "Successfully rolled back to checkpoint #{}",
+                checkpoint_id
             ))
         } else {
             Err(format!("Checkpoint ID {} not found", checkpoint_id))
@@ -761,10 +767,11 @@ mod tests {
         assert!(cmd.dry_run);
 
         let sigpkg = suite
-            .process_and_install_package("ripgrep-14.1.0.deb", b"DEB_BINARY_DATA")
+            .process_and_install_package("htop-3.3.0.deb", b"DEB_BINARY_DATA")
             .unwrap();
         assert_eq!(sigpkg.name, "sigpkg-htop-3.3.0");
         assert!(suite
+            .transpiler_engine
             .installed_packages
             .contains(&"sigpkg-htop-3.3.0".to_string()));
     }
