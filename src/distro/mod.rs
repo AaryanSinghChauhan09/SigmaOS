@@ -441,6 +441,9 @@ pub use sovereign_open_source_os_gap_closure_pr::*;
 pub mod arch_linux_advancements_v37_pr;
 pub use arch_linux_advancements_v37_pr::*;
 
+pub mod arch_linux_gap_closure_v38_pr;
+pub use arch_linux_gap_closure_v38_pr::*;
+
 pub mod sovereign_open_source_os_gap_closure_v36_pr;
 pub use sovereign_open_source_os_gap_closure_v36_pr::*;
 
