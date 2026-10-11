@@ -88,9 +88,9 @@ pub use desktop::{
     WindowsCopilotAiAssistantSidebar, Xfce418Engine,
 };
 pub use kernel::{
-    CfiFunctionSignature, KptrRestrictLevel, SovereignHardenedSecurityMitigationsEngine,
-    SovereignKernelAdvancedOsParityPrGateway, SovereignKernelPinnacleSynthesisPrGateway,
-    SovereignLinuxBsdKernelInnovationsPrGateway,
+    CfiFunctionSignature, KptrRestrictLevel, SovereignBareMetalElfKernelPrGateway,
+    SovereignHardenedSecurityMitigationsEngine, SovereignKernelAdvancedOsParityPrGateway,
+    SovereignKernelPinnacleSynthesisPrGateway, SovereignLinuxBsdKernelInnovationsPrGateway,
 };
 pub use process::{
     AdvancedIpcHub, BsdRusage, CancellationType, CoreDumpMetadata, EventFd,

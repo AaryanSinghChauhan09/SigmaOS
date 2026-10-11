@@ -177,6 +177,9 @@ pub use sovereign_kernel_advanced_os_parity_pr::*;
 pub mod sovereign_kernel_pinnacle_synthesis_pr;
 pub use sovereign_kernel_pinnacle_synthesis_pr::*;
 
+pub mod sovereign_bare_metal_elf_kernel_pr;
+pub use sovereign_bare_metal_elf_kernel_pr::*;
+
 pub mod sovereign_clean_code_and_os_principles_engine;
 pub use sovereign_clean_code_and_os_principles_engine::{
     CleanCodeMetricsEvaluator, ResourceAllocationGraph, SolidDesignValidator,
