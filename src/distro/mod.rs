@@ -63,6 +63,8 @@ pub mod arch;
 pub use arch::*;
 pub mod arch_inspirations;
 pub mod arch_missing_components;
+pub mod arch_missing_components_parity_pr;
+pub use arch_missing_components_parity_pr::*;
 pub mod arch_parity;
 
 pub use arch_missing_components::{

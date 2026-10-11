@@ -455,67 +455,14 @@ pub struct ArchPacmanHookRunner {
 
 impl ArchPacmanHookRunner {
     pub fn new() -> Self {
-        let mut hooks = BTreeMap::new();
-        hooks.insert(
-            "base".to_string(),
-            InitramfsHookSpec {
-                name: "base".to_string(),
-                is_runtime: true,
-                dependencies: Vec::new(),
-            },
-        );
-        hooks.insert(
-            "udev".to_string(),
-            InitramfsHookSpec {
-                name: "udev".to_string(),
-                is_runtime: true,
-                dependencies: vec!["base".to_string()],
-            },
-        );
-        hooks.insert(
-            "autodetect".to_string(),
-            InitramfsHookSpec {
-                name: "autodetect".to_string(),
-                is_runtime: false,
-                dependencies: Vec::new(),
-            },
-        );
-        hooks.insert(
-            "kms".to_string(),
-            InitramfsHookSpec {
-                name: "kms".to_string(),
-                is_runtime: true,
-                dependencies: vec!["udev".to_string()],
-            },
-        );
-        hooks.insert(
-            "modconf".to_string(),
-            InitramfsHookSpec {
-                name: "modconf".to_string(),
-                is_runtime: false,
-                dependencies: Vec::new(),
-            },
-        );
-        hooks.insert(
-            "block".to_string(),
-            InitramfsHookSpec {
-                name: "block".to_string(),
-                is_runtime: true,
-                dependencies: vec!["udev".to_string()],
-            },
-        );
-        hooks.insert(
-            "filesystems".to_string(),
-            InitramfsHookSpec {
-                name: "filesystems".to_string(),
-                is_runtime: true,
-                dependencies: vec!["block".to_string()],
-            },
-        );
-
+        let sample_rule = PacmanHookRule {
+            name: "fontconfig-update".to_string(),
+            when: PacmanHookWhen::PostTransaction,
+            target_packages: vec!["fontconfig*".to_string(), "ttf-*".to_string()],
+            exec_command: "fc-cache -s".to_string(),
+        };
         Self {
-            hooks,
-            compression_format: "zstd".to_string(),
+            registered_hooks: vec![sample_rule],
         }
     }
 
@@ -579,15 +526,15 @@ impl ArchPacstrapChrootEngine {
 // =========================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct CachedPackageFile {
-    pub pkgname: String,
-    pub version: String,
-    pub file_size_bytes: u64,
+pub struct PqcDilithiumKeySpec {
+    pub key_id: String,
+    pub owner_email: String,
+    pub is_trusted: bool,
+    pub dilithium_pubkey_hash: String,
 }
 
-pub struct ArchPacmanCacheScrubber {
-    pub cached_files: Vec<CachedPackageFile>,
-    pub retain_keep_count: usize,
+pub struct ArchPacmanKeyringPqcEngine {
+    pub keys: BTreeMap<String, PqcDilithiumKeySpec>,
 }
 
 impl ArchPacmanKeyringPqcEngine {
@@ -604,8 +551,34 @@ impl ArchPacmanKeyringPqcEngine {
         );
         Self { keys }
     }
+}
 
-    /// Calculates which old package cache files should be purged
+impl Default for ArchPacmanKeyringPqcEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CachedPackageFile {
+    pub pkgname: String,
+    pub version: String,
+    pub file_size_bytes: u64,
+}
+
+pub struct ArchPacmanCacheScrubber {
+    pub cached_files: Vec<CachedPackageFile>,
+    pub retain_keep_count: usize,
+}
+
+impl ArchPacmanCacheScrubber {
+    pub fn new(retain_keep_count: usize) -> Self {
+        Self {
+            cached_files: Vec::new(),
+            retain_keep_count,
+        }
+    }
+
     pub fn purge_unneeded_cache(&self) -> (usize, u64) {
         let mut by_name: BTreeMap<String, Vec<&CachedPackageFile>> = BTreeMap::new();
         for file in &self.cached_files {
@@ -636,7 +609,7 @@ impl Default for ArchPacmanCacheScrubber {
 }
 
 // =========================================================================
-// 11. BTRFS PACMAN SNAPSHOTTER ENGINE (snap-pac)
+// 12. BTRFS PACMAN SNAPSHOTTER ENGINE (snap-pac)
 // =========================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -692,7 +665,7 @@ impl Default for ArchBtrfsSnapperSnapshotter {
 }
 
 // =========================================================================
-// 12. ARCH AUDIT VULNERABILITY SCANNER (arch-audit)
+// 13. ARCH AUDIT VULNERABILITY SCANNER (arch-audit)
 // =========================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -746,7 +719,7 @@ impl Default for ArchAuditVulnerabilityScanner {
 }
 
 // =========================================================================
-// 13. MODPROBED-DB KERNEL MODULE LOGGER ENGINE (modprobed-db)
+// 14. MODPROBED-DB KERNEL MODULE LOGGER ENGINE (modprobed-db)
 // =========================================================================
 
 pub struct ArchModprobedDbEngine {
@@ -779,7 +752,6 @@ impl Default for ArchModprobedDbEngine {
 // UNIT TESTS
 // =========================================================================
 
-#[cfg(test)]
 #[cfg(test)]
 mod tests {
     use super::*;

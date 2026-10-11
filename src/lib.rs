@@ -129,6 +129,7 @@ pub use distro::sovereign_2070_distro_supremacy_engine::*;
 pub use distro::sovereign_2075_distro_supremacy_engine::*;
 pub use distro::sovereign_2080_distro_supremacy_engine::*;
 pub use distro::sovereign_2085_distro_supremacy_engine::*;
+pub use distro::arch_missing_components_parity_pr::*;
 pub use distro::sovereign_arch_gap_closure_pr_engine::*;
 pub use distro::sovereign_architecture_development_decision_plan::*;
 pub use distro::sovereign_gentoo_gap_closure_pr_engine::*;
