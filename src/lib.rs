@@ -120,6 +120,7 @@ pub use distro::sovereign_2055_distro_supremacy_engine::*;
 pub use distro::sovereign_2060_distro_supremacy_engine::*;
 pub use distro::sovereign_2070_distro_supremacy_engine::*;
 pub use distro::sovereign_2075_distro_supremacy_engine::*;
+pub use distro::sovereign_linux_bsd_all_subsystems_harmony::*;
 pub use distro::sovereign_linux_bsd_master_synthesis::*;
 pub use distro::sovereign_linux_bsd_pinnacle_innovations_v14::*;
 pub use distro::sovereign_media_and_distro_unimplemented_innovations::*;
