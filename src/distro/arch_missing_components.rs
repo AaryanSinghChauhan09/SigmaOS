@@ -455,6 +455,51 @@ pub struct ArchPacmanHookRunner {
 
 impl ArchPacmanHookRunner {
     pub fn new() -> Self {
+        let default_hooks = vec![PacmanHookRule {
+            name: "fontconfig".to_string(),
+            when: PacmanHookWhen::PostTransaction,
+            target_packages: vec!["fontconfig*".to_string(), "ttf-*".to_string()],
+            exec_command: "fc-cache -s".to_string(),
+        }];
+        Self {
+            registered_hooks: default_hooks,
+        }
+    }
+
+    pub fn match_hooks(&self, when: PacmanHookWhen, updated_pkgs: &[&str]) -> Vec<&PacmanHookRule> {
+        self.registered_hooks
+            .iter()
+            .filter(|h| {
+                h.when == when
+                    && h.target_packages.iter().any(|t| {
+                        let t_clean = t.trim_end_matches('*');
+                        updated_pkgs.iter().any(|p| p.starts_with(t_clean))
+                    })
+            })
+            .collect()
+    }
+}
+
+impl Default for ArchPacmanHookRunner {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct InitramfsHookSpec {
+    pub name: String,
+    pub is_runtime: bool,
+    pub dependencies: Vec<String>,
+}
+
+pub struct ArchMkinitcpioHooksEngine {
+    pub hooks: BTreeMap<String, InitramfsHookSpec>,
+    pub compression_format: String,
+}
+
+impl ArchMkinitcpioHooksEngine {
+    pub fn new() -> Self {
         let mut hooks = BTreeMap::new();
         hooks.insert(
             "base".to_string(),
@@ -518,22 +563,9 @@ impl ArchPacmanHookRunner {
             compression_format: "zstd".to_string(),
         }
     }
-
-    pub fn match_hooks(&self, when: PacmanHookWhen, updated_pkgs: &[&str]) -> Vec<&PacmanHookRule> {
-        self.registered_hooks
-            .iter()
-            .filter(|h| {
-                h.when == when
-                    && h.target_packages.iter().any(|t| {
-                        let t_clean = t.trim_end_matches('*');
-                        updated_pkgs.iter().any(|p| p.starts_with(t_clean))
-                    })
-            })
-            .collect()
-    }
 }
 
-impl Default for ArchPacmanHookRunner {
+impl Default for ArchMkinitcpioHooksEngine {
     fn default() -> Self {
         Self::new()
     }
@@ -575,19 +607,19 @@ impl ArchPacstrapChrootEngine {
 }
 
 // =========================================================================
-// 11. PACMAN-KEY PQC DILITHIUM5 KEYRING ENGINE (pacman-key)
+// 11. PACMAN-KEY PQC DILITHIUM5 KEYRING ENGINE & CACHE SCRUBBER
 // =========================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct CachedPackageFile {
-    pub pkgname: String,
-    pub version: String,
-    pub file_size_bytes: u64,
+pub struct PqcDilithiumKeySpec {
+    pub key_id: String,
+    pub owner_email: String,
+    pub is_trusted: bool,
+    pub dilithium_pubkey_hash: String,
 }
 
-pub struct ArchPacmanCacheScrubber {
-    pub cached_files: Vec<CachedPackageFile>,
-    pub retain_keep_count: usize,
+pub struct ArchPacmanKeyringPqcEngine {
+    pub keys: BTreeMap<String, PqcDilithiumKeySpec>,
 }
 
 impl ArchPacmanKeyringPqcEngine {
@@ -603,6 +635,33 @@ impl ArchPacmanKeyringPqcEngine {
             },
         );
         Self { keys }
+    }
+}
+
+impl Default for ArchPacmanKeyringPqcEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CachedPackageFile {
+    pub pkgname: String,
+    pub version: String,
+    pub file_size_bytes: u64,
+}
+
+pub struct ArchPacmanCacheScrubber {
+    pub cached_files: Vec<CachedPackageFile>,
+    pub retain_keep_count: usize,
+}
+
+impl ArchPacmanCacheScrubber {
+    pub fn new(retain_keep_count: usize) -> Self {
+        Self {
+            cached_files: Vec::new(),
+            retain_keep_count,
+        }
     }
 
     /// Calculates which old package cache files should be purged

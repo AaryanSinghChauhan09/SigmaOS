@@ -444,17 +444,24 @@ impl UniversalMultiFormatTranspilerAndExecutionEngineV30 {
         id
     }
 
-    /// Rolls back system state to selected boot environment snapshot V30
-    pub fn rollback(&mut self, snapshot_id: usize) -> Result<String, String> {
-        if let Some(snap) = self
-            .snapshots
-            .iter_mut()
-            .find(|s| s.snapshot_id == snapshot_id)
+    pub fn install_package(&mut self, package_name: &str) {
+        if !self.installed_packages.contains(&package_name.to_string()) {
+            self.installed_packages.push(package_name.to_string());
+        }
+    }
+
+    /// Rolls back system state to selected checkpoint ID V30
+    pub fn rollback(&mut self, checkpoint_id: usize) -> Result<String, String> {
+        if let Some(cp) = self
+            .checkpoints
+            .iter()
+            .find(|c| c.checkpoint_id == checkpoint_id)
+            .cloned()
         {
-            snap.active = true;
+            self.installed_packages = cp.installed_packages;
             Ok(format!(
-                "Successfully rolled back to snapshot '{}'",
-                snap.label
+                "Successfully rolled back to checkpoint ID '{}'",
+                checkpoint_id
             ))
         } else {
             Err(format!("Checkpoint ID {} not found", checkpoint_id))
@@ -590,6 +597,7 @@ pub struct SovereignDistroPackageAdvancementsSuiteV30 {
     pub scriptlet_engine: UdfScriptletSandboxEngineV30,
     pub transpiler_engine: UniversalMultiFormatTranspilerAndExecutionEngineV30,
     pub cli_router: UniversalPmCliRouterV30,
+    pub installed_packages: Vec<String>,
 }
 
 impl SovereignDistroPackageAdvancementsSuiteV30 {
@@ -600,6 +608,7 @@ impl SovereignDistroPackageAdvancementsSuiteV30 {
             scriptlet_engine: UdfScriptletSandboxEngineV30::new(),
             transpiler_engine: UniversalMultiFormatTranspilerAndExecutionEngineV30::new(),
             cli_router: UniversalPmCliRouterV30::new(),
+            installed_packages: Vec::new(),
         }
     }
 
@@ -616,6 +625,9 @@ impl SovereignDistroPackageAdvancementsSuiteV30 {
 
         self.transpiler_engine
             .install_package(&native_sigpkg.name);
+        if !self.installed_packages.contains(&native_sigpkg.name) {
+            self.installed_packages.push(native_sigpkg.name.clone());
+        }
         Ok(native_sigpkg)
     }
 }
@@ -763,9 +775,9 @@ mod tests {
         let sigpkg = suite
             .process_and_install_package("ripgrep-14.1.0.deb", b"DEB_BINARY_DATA")
             .unwrap();
-        assert_eq!(sigpkg.name, "sigpkg-htop-3.3.0");
+        assert_eq!(sigpkg.name, "sigpkg-ripgrep-14.1.0");
         assert!(suite
             .installed_packages
-            .contains(&"sigpkg-htop-3.3.0".to_string()));
+            .contains(&"sigpkg-ripgrep-14.1.0".to_string()));
     }
 }

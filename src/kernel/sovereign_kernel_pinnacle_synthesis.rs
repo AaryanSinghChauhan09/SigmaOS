@@ -144,6 +144,14 @@ impl FreeBsdVnetJailStackEngine {
         stack
     }
 
+    pub fn verify_capsicum_rights(&self, jail_id: u32, rights_mask: u64) -> bool {
+        if let Some(stack) = self.vnet_stacks.get(&jail_id) {
+            stack.is_isolated && (rights_mask & 0xFF) == rights_mask
+        } else {
+            false
+        }
+    }
+
     pub fn get_vnet_stack(&self, jail_id: u32) -> Option<&FreeBsdVnetStack> {
         self.vnet_stacks.get(&jail_id)
     }
@@ -311,6 +319,16 @@ impl LinuxEevdfLatencySchedulerEngine {
         self.tasks.insert(pid, spec);
     }
 
+    pub fn apply_bore_wakeup_boost(&mut self, pid: usize, interactive_burst_score: u32) -> bool {
+        if let Some(t) = self.tasks.get_mut(&pid) {
+            let boost_ns = (u64::from(interactive_burst_score) * 100_000).min(t.virtual_deadline);
+            t.virtual_deadline = t.virtual_deadline.saturating_sub(boost_ns);
+            true
+        } else {
+            false
+        }
+    }
+
     pub fn pick_eligible_task(&mut self) -> Option<usize> {
         let eligible = self.tasks.values().min_by_key(|t| t.virtual_deadline)?;
         let pid = eligible.pid;
@@ -404,6 +422,17 @@ impl Default for SovereignKernelPinnacleSuite {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_bore_boost_and_capsicum_rights() {
+        let mut vnet = FreeBsdVnetJailStackEngine::new();
+        vnet.create_vnet_jail_stack(42, "10.0.0.42");
+        assert!(vnet.verify_capsicum_rights(42, 0x01));
+
+        let mut eevdf = LinuxEevdfLatencySchedulerEngine::new();
+        eevdf.enqueue_task(99, 1024, 1_000_000);
+        assert!(eevdf.apply_bore_wakeup_boost(99, 5));
+    }
 
     #[test]
     fn test_linux_bpf_lsm() {

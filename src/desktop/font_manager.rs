@@ -6,7 +6,7 @@
 //! - CJK (Chinese, Japanese, Korean) and Emoji font fallback chains
 //! - Multi-language text layout engine with advance metrics calculation
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, HashMap};
 use std::string::{String, ToString};
 use std::vec::Vec;
 
@@ -56,14 +56,9 @@ pub struct FontFallbackChain {
     pub symbol_fallback_font: String,  // e.g. "Symbola"
 }
 
-impl FontStyle {
-    pub fn new(
-        name: String,
-        weight: FontWeight,
-        slant: FontSlant,
-        width: FontWidth,
-        file_path: String,
-    ) -> Self {
+
+impl FontFallbackChain {
+    pub fn default_system_chain() -> Self {
         Self {
             primary_font_family: String::from("Inter"),
             cjk_fallback_font: String::from("Noto Sans CJK SC"),
@@ -71,6 +66,24 @@ impl FontStyle {
             symbol_fallback_font: String::from("DejaVu Sans Symbols"),
         }
     }
+
+    pub fn resolve_font_for_char(&self, ch: char) -> &str {
+        let code = ch as u32;
+        // CJK Unified Ideographs & Hangul / Kana
+        if (0x4E00..=0x9FFF).contains(&code) || (0x3000..=0x303F).contains(&code) || (0xAC00..=0xD7AF).contains(&code) {
+            &self.cjk_fallback_font
+        } else if (0x1F600..=0x1F64F).contains(&code) || (0x1F300..=0x1F5FF).contains(&code) || (0x1F680..=0x1F6FF).contains(&code) {
+            &self.emoji_fallback_font
+        } else if (0x2600..=0x26FF).contains(&code) || (0x2700..=0x27BF).contains(&code) {
+            &self.symbol_fallback_font
+        } else {
+            &self.primary_font_family
+        }
+    }
+}
+
+impl FontStyle {
+
 
     pub fn as_number(&self) -> u32 {
         match self {
@@ -160,6 +173,7 @@ pub struct DesktopFontManager {
     title_font: Option<String>,
     heading_font: Option<String>,
     font_size: u32, // 6-72
+    primary_font_family: String,
     counter: u32,
 }
 
@@ -176,6 +190,7 @@ impl DesktopFontManager {
             title_font: None,
             heading_font: None,
             font_size: 12,
+            primary_font_family: "Inter".to_string(),
             counter: 1000,
         };
 

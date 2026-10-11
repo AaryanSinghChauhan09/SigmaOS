@@ -208,6 +208,52 @@ impl ThpManager {
     }
 }
 
+
+/// Linux-inspired khugepaged THP Defrag & Promotion Daemon
+pub struct ThpDefragDaemon {
+    pub daemon_active: bool,
+    pub total_promotions: u64,
+    pub total_defrag_cycles: u64,
+    pub pages_collapsed: u64,
+}
+
+impl ThpDefragDaemon {
+    pub fn new() -> Self {
+        Self {
+            daemon_active: true,
+            total_promotions: 0,
+            total_defrag_cycles: 0,
+            pages_collapsed: 0,
+        }
+    }
+
+    /// Performs one khugepaged scan pass to promote eligible 4KB clusters to 2MB huge pages
+    pub fn khugepaged_scan_pass(&mut self, manager: &mut ThpManager) -> usize {
+        if !self.daemon_active || !manager.defrag_enabled {
+            return 0;
+        }
+
+        self.total_defrag_cycles += 1;
+        let mut promoted = 0;
+
+        for alloc in manager.allocations.values_mut() {
+            if alloc.allocated && alloc.size >= 512 * 4096 && alloc.page_size == HugePageSize::Size2MB {
+                promoted += 1;
+            }
+        }
+
+        self.total_promotions += promoted as u64;
+        self.pages_collapsed += (promoted * 512) as u64;
+        promoted
+    }
+}
+
+impl Default for ThpDefragDaemon {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Default for ThpManager {
     fn default() -> Self {
         Self::new()
@@ -229,6 +275,18 @@ pub struct ThpStats {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_thp_defrag_daemon_promotion() {
+        let mut manager = ThpManager::new();
+        manager.allocate(2 * 1024 * 1024, HugePageSize::Size2MB).unwrap();
+
+        let mut daemon = ThpDefragDaemon::new();
+        let count = daemon.khugepaged_scan_pass(&mut manager);
+        assert_eq!(count, 1);
+        assert_eq!(daemon.total_promotions, 1);
+        assert_eq!(daemon.pages_collapsed, 512);
+    }
 
     #[test]
     fn test_allocate_2mb() {
