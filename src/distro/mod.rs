@@ -15,7 +15,15 @@ pub use market_readiness::*;
 
 pub mod omarchy;
 pub mod omarchy_advanced_parity;
+pub mod omarchy_gaming_enhanced;
 pub use omarchy_advanced_parity::*;
+pub use omarchy_gaming_enhanced::{
+    SovereignOmarchyGamingGovernor, CpuGovernor, GpuProfile, GameTrigger, GamingState,
+    VrrMode, HudElement, DeveloperStack,
+    SovereignOmarchyHudEngine, SovereignOmarchyVrrPacingController,
+    SovereignSteamShaderPrecacheManager, SovereignOmarchyGamingPerformanceSuite,
+    init_gaming_performance_suite, get_gaming_performance_suite,
+};
 pub mod omarchy_future_roadmap;
 pub mod omarchy_linux_gap_closure_pr_suite;
 pub use omarchy_linux_gap_closure_pr_suite::*;
