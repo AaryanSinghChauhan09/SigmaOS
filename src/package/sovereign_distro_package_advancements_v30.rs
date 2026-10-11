@@ -433,6 +433,12 @@ impl UniversalMultiFormatTranspilerAndExecutionEngineV30 {
         pkg
     }
 
+    pub fn install_package(&mut self, name: &str) {
+        if !self.installed_packages.contains(&name.to_string()) {
+            self.installed_packages.push(name.to_string());
+        }
+    }
+
     /// Creates a transactional state checkpoint before installation operations V30
     pub fn create_checkpoint(&mut self) -> usize {
         let id = self.next_checkpoint_id;

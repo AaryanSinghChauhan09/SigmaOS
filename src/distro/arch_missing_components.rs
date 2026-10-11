@@ -436,6 +436,13 @@ impl Default for ArchPacmanConflictResolverEngine {
 // =========================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
+pub struct InitramfsHookSpec {
+    pub name: String,
+    pub is_runtime: bool,
+    pub dependencies: Vec<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum PacmanHookWhen {
     PreTransaction,
     PostTransaction,
@@ -600,6 +607,32 @@ pub struct CachedPackageFile {
     pub file_size_bytes: u64,
 }
 
+pub struct ArchPacmanKeyringPqcEngine {
+    pub keys: BTreeMap<String, PqcDilithiumKeySpec>,
+}
+
+impl ArchPacmanCacheScrubber {
+    pub fn new(retain_keep_count: usize) -> Self {
+        Self {
+            cached_files: Vec::new(),
+            retain_keep_count,
+        }
+    }
+}
+
+impl Default for ArchPacmanKeyringPqcEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CachedPackageFile {
+    pub pkgname: String,
+    pub version: String,
+    pub file_size_bytes: u64,
+}
+
 pub struct ArchPacmanCacheScrubber {
     pub cached_files: Vec<CachedPackageFile>,
     pub retain_keep_count: usize,
@@ -644,7 +677,7 @@ impl Default for ArchPacmanCacheScrubber {
 }
 
 // =========================================================================
-// 11. BTRFS PACMAN SNAPSHOTTER ENGINE (snap-pac)
+// 12. BTRFS PACMAN SNAPSHOTTER ENGINE (snap-pac)
 // =========================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -706,7 +739,7 @@ impl Default for ArchBtrfsSnapperSnapshotter {
 }
 
 // =========================================================================
-// 12. ARCH AUDIT VULNERABILITY SCANNER (arch-audit)
+// 13. ARCH AUDIT VULNERABILITY SCANNER (arch-audit)
 // =========================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -765,7 +798,7 @@ impl Default for ArchAuditVulnerabilityScanner {
 }
 
 // =========================================================================
-// 13. MODPROBED-DB KERNEL MODULE LOGGER ENGINE (modprobed-db)
+// 14. MODPROBED-DB KERNEL MODULE LOGGER ENGINE (modprobed-db)
 // =========================================================================
 
 pub struct ArchModprobedDbEngine {
@@ -800,7 +833,6 @@ impl Default for ArchModprobedDbEngine {
 // UNIT TESTS
 // =========================================================================
 
-#[cfg(test)]
 #[cfg(test)]
 mod tests {
     use super::*;

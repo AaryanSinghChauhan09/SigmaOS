@@ -413,7 +413,6 @@ impl Default for SovereignDistroPackageAdvancementsSuiteV20 {
 // ============================================================================
 
 #[cfg(test)]
-#[cfg(test)]
 mod tests {
     use super::*;
 
