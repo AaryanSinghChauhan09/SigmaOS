@@ -208,7 +208,10 @@ pub use cursor_manager::{
     DesktopCursorType,
 };
 pub mod font_manager;
-pub use font_manager::*;
+pub use font_manager::{
+    DesktopFontManager, FontFamily, FontManagerStatistics, FontSlant, FontStyle, FontUsageType,
+    FontWeight, FontWidth,
+};
 pub mod display_settings_manager;
 pub use display_settings_manager::{
     DesktopDisplay, DesktopDisplayMode, DesktopDisplaySettingsManager,

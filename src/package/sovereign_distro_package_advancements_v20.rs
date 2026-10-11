@@ -421,7 +421,6 @@ mod tests {
     fn test_converter_all_formats() {
         let mut pipeline = UniversalPrPackageSubmissionPipelineV20::new();
         let converter = UniversalAllPackageFormatConverterV20::new();
-        let mut engine = SovereignDistroPackageAdvancementsSuiteV20::new();
 
         let deb_spec = converter
             .convert_package("gcc-13.2.0.deb", b"DEB_PAYLOAD")

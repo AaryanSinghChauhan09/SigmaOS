@@ -105,7 +105,9 @@ impl UniversalSecurityAuditEngineV26 {
             recommended_patch_version: "1.26.0".to_string(),
         });
 
-        id
+        Self {
+            advisory_database: advisories,
+        }
     }
 
     /// Audit a package name, version, and format against VuXML / CVE advisories
@@ -547,7 +549,6 @@ impl Default for UniversalPmCliRouterV26 {
 // ============================================================================
 
 pub struct SovereignDistroPackageAdvancementsSuiteV26 {
-    pub inspector: UniversalFormatInspectorAndClassifierV26,
     pub auditor: UniversalSecurityAuditEngineV26,
     pub optimizer: SourceBinaryOptimizationEngineV26,
     pub sandbox_governor: HermeticPqcSandboxGovernorV26,
@@ -558,7 +559,6 @@ pub struct SovereignDistroPackageAdvancementsSuiteV26 {
 impl SovereignDistroPackageAdvancementsSuiteV26 {
     pub fn new() -> Self {
         Self {
-            inspector: UniversalFormatInspectorAndClassifierV26::new(),
             auditor: UniversalSecurityAuditEngineV26::new(),
             optimizer: SourceBinaryOptimizationEngineV26::new(),
             sandbox_governor: HermeticPqcSandboxGovernorV26::new(),
@@ -584,7 +584,7 @@ impl SovereignDistroPackageAdvancementsSuiteV26 {
             1700000000,
         );
 
-        Ok((audit, cflags, policy.sandbox_id, snap_id))
+        (audit, cflags, policy, snap_id)
     }
 }
 
