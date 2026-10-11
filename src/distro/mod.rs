@@ -570,6 +570,9 @@ pub mod wiki_unimplemented_ideas;
 pub mod sovereign_tech_media_wiki_ultimate_parity_pr;
 pub use sovereign_tech_media_wiki_ultimate_parity_pr::*;
 
+pub mod sovereign_linux_bsd_lfs_master_harmony;
+pub use sovereign_linux_bsd_lfs_master_harmony::*;
+
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;
 pub use crate::stubs::large_distro_stubs::*;

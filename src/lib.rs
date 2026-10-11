@@ -153,6 +153,7 @@ pub use distro::sovereign_universal_subsystem_interop::*;
 pub use distro::sovereign_universal_subsystem_interop::*;
 pub use distro::sovereign_tech_media_wiki_ultimate_parity_pr::*;
 pub use distro::tech_media_publication_innovations::*;
+pub use distro::sovereign_linux_bsd_lfs_master_harmony::*;
 pub use distro::SovereignMasterSubsystemDistroHarmonizer;
 pub use kernel::tss_ring3_user_mode::*;
 pub use open_source_obsoletion::open_source_os_gap_closure::*;
