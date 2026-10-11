@@ -752,6 +752,13 @@ if [ -f "src/distro/arch_linux_advancements_v37_pr.rs" ]; then
     ./build/test_arch_v37_pr
 fi
 
+if [ -f "src/distro/arch_linux_gap_closure_v38_pr.rs" ]; then
+    echo "Running Arch Linux Gap Closure PR Suite V38 test suite..."
+    mkdir -p build
+    rustc --test src/distro/arch_linux_gap_closure_v38_pr.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_arch_v38_pr
+    ./build/test_arch_v38_pr
+fi
+
 if [ -f "src/distro/sovereign_open_source_os_gap_closure_v36_pr.rs" ]; then
     echo "Running Sovereign Open Source OS Gap Closure PR Suite V36 test suite..."
     mkdir -p build
