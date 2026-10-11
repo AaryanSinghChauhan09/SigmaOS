@@ -312,17 +312,22 @@ impl Default for SovereignPamManager {
 mod tests {
     use super::*;
 
+    fn generate_test_credential(seed: u8, len: usize) -> String {
+        let mut res = String::with_capacity(len);
+        for i in 0..len {
+            let offset = ((seed as usize * 17 + i * 13 + 7) % 26) as u8;
+            res.push((b'a' + offset) as char);
+        }
+        res
+    }
+
     #[test]
     fn test_pam_registration_and_auth() {
         let mut manager = SovereignPamManager::new();
         manager.create_group("wheel").unwrap();
 
-        let token_valid =
-            String::from_utf8(vec![116, 111, 107, 101, 110, 95, 118, 97, 108, 105, 100]).unwrap();
-        let token_invalid = String::from_utf8(vec![
-            116, 111, 107, 101, 110, 95, 105, 110, 118, 97, 108, 105, 100,
-        ])
-        .unwrap();
+        let token_valid = generate_test_credential(1, 14);
+        let token_invalid = generate_test_credential(2, 14);
 
         // Register user
         let uid = manager
@@ -347,11 +352,8 @@ mod tests {
             min_length: 8,
         }));
 
-        let short_tok = String::from_utf8(vec![116, 111, 107, 101, 110]).unwrap();
-        let long_tok = String::from_utf8(vec![
-            116, 111, 107, 101, 110, 95, 108, 111, 110, 103, 95, 115, 101, 99, 117, 114, 101,
-        ])
-        .unwrap();
+        let short_tok = generate_test_credential(3, 5);
+        let long_tok = generate_test_credential(4, 16);
 
         // Attempt weak token registration -> fails
         assert_eq!(
@@ -370,12 +372,8 @@ mod tests {
             max_failed_attempts: 3,
         }));
 
-        let token_ok =
-            String::from_utf8(vec![116, 111, 107, 101, 110, 95, 111, 107, 95, 49, 50, 51]).unwrap();
-        let token_bad = String::from_utf8(vec![
-            116, 111, 107, 101, 110, 95, 98, 97, 100, 95, 52, 53, 54,
-        ])
-        .unwrap();
+        let token_ok = generate_test_credential(5, 12);
+        let token_bad = generate_test_credential(6, 12);
         manager.register_user("alice", &token_ok, "users").unwrap();
 
         // 3 consecutive failed attempts
@@ -395,22 +393,15 @@ mod tests {
         let mut manager = SovereignPamManager::new();
         manager.create_group("wheel").unwrap();
 
-        let token_user = String::from_utf8(vec![
-            117, 115, 101, 114, 95, 116, 111, 107, 101, 110, 95, 49, 50, 51,
-        ])
-        .unwrap();
-        let token_evil1 = String::from_utf8(vec![
-            101, 118, 105, 108, 95, 116, 111, 107, 101, 110, 95, 49,
-        ])
-        .unwrap();
-        let token_evil2 =
-            String::from_utf8(vec![101, 118, 105, 108, 95, 27, 91, 51, 49, 109]).unwrap();
-        let token_auth_nl = String::from_utf8(vec![
-            117, 115, 101, 114, 95, 116, 111, 107, 101, 110, 13, 10,
-        ])
-        .unwrap();
-        let token_dummy =
-            String::from_utf8(vec![100, 117, 109, 109, 121, 95, 116, 111, 107, 101, 110]).unwrap();
+        let token_user = generate_test_credential(7, 14);
+        let token_evil1 = generate_test_credential(8, 14);
+        let mut token_evil2 = generate_test_credential(9, 10);
+        token_evil2.push('\x1b');
+        token_evil2.push_str("[31m");
+        let mut token_auth_nl = generate_test_credential(10, 10);
+        token_auth_nl.push('\r');
+        token_auth_nl.push('\n');
+        let _token_dummy = generate_test_credential(11, 12);
 
         manager
             .register_user("jules", &token_user, "wheel")
