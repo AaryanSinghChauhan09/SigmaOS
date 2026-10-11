@@ -57,3 +57,6 @@ pub use sovereign_multi_distro_bootloader::{
     BootloaderKind, FreeBsdLoaderConfig, LimineBootEntry, LimineConfig, OpenBsdBootConfig,
     RefindMenuEntry, SovereignMultiDistroBootloaderEngine, SystemdBootBlsEntry, UniversalBootEntry,
 };
+
+pub mod sovereign_assembly_bootstrap_pr_suite;
+pub use sovereign_assembly_bootstrap_pr_suite::*;
