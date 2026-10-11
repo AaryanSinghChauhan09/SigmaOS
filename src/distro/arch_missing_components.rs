@@ -451,9 +451,8 @@ pub enum PacmanHookWhen {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PacmanHookRule {
     pub name: String,
-    pub when: PacmanHookWhen,
-    pub target_packages: Vec<String>,
-    pub exec_command: String,
+    pub is_runtime: bool,
+    pub dependencies: Vec<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -469,7 +468,7 @@ pub struct ArchPacmanHookRunner {
     pub compression_format: String,
 }
 
-impl ArchPacmanHookRunner {
+impl ArchMkinitcpioEngine {
     pub fn new() -> Self {
         let hooks = vec![
             PacmanHookRule {
@@ -836,9 +835,8 @@ pub struct CachedPackageFile {
     pub file_size_bytes: u64,
 }
 
-pub struct ArchPacmanCacheScrubber {
-    pub cached_files: Vec<CachedPackageFile>,
-    pub retain_keep_count: usize,
+pub struct ArchPacmanKeyringPqcEngine {
+    pub keys: BTreeMap<String, PqcDilithiumKeySpec>,
 }
 
 impl ArchPacmanCacheScrubber {
@@ -846,6 +844,37 @@ impl ArchPacmanCacheScrubber {
         Self {
             cached_files: Vec::new(),
             retain_keep_count: keep_count,
+        }
+    }
+}
+
+impl Default for ArchPacmanKeyringPqcEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 11B. PACMAN CACHE SCRUBBER ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CachedPackageFile {
+    pub pkgname: String,
+    pub version: String,
+    pub file_size_bytes: u64,
+}
+
+pub struct ArchPacmanCacheScrubber {
+    pub cached_files: Vec<CachedPackageFile>,
+    pub retain_keep_count: usize,
+}
+
+impl ArchPacmanCacheScrubber {
+    pub fn new(retain_keep_count: usize) -> Self {
+        Self {
+            cached_files: Vec::new(),
+            retain_keep_count,
         }
     }
 
