@@ -2,7 +2,7 @@ name: Reproducible Verification Workflow
 
 on:
   push:
-    branches: [ main, "feat/*", "study/*", "fix/*", "test/*", "docs/*", "chore/*", "security/*" ]
+    branches: [ main ]
   pull_request:
     branches: [ main ]
 
@@ -15,27 +15,19 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up Rust Toolchain
+      - name: Set up Rust Toolchain (stable)
         uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
 
-      - name: Generate Build Manifest
-        run: |
-          chmod +x scripts/generate_build_manifest.sh
-          ./scripts/generate_build_manifest.sh
-
       - name: Verify Code Formatting
-        run: make fmt
+        run: cargo fmt --all -- --check
 
-      - name: Static Check
-        run: make check
+      - name: Static Check (cargo check)
+        run: cargo check --all-targets
 
-      - name: Native Test Suite
-        run: ./run_sigma_tests.sh
+      - name: Clippy Lints
+        run: cargo clippy --all-targets -- -D warnings
 
-      - name: Upload Build Manifest Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-manifest
-          path: reports/build_manifest.json
+      - name: Run Tests
+        run: cargo test --all
