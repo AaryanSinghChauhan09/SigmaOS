@@ -780,6 +780,13 @@ if [ -f "src/distro/sovereign_linux_bsd_ecosystem_parity_v42_pr.rs" ]; then
     ./build/test_linux_bsd_v42_pr
 fi
 
+if [ -f "src/distro/arch_linux_ecosystem_parity_v43_pr.rs" ]; then
+    echo "Running Arch Linux Ecosystem Parity PR Suite V43 test suite..."
+    mkdir -p build
+    rustc --test src/distro/arch_linux_ecosystem_parity_v43_pr.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_arch_v43_pr
+    ./build/test_arch_v43_pr
+fi
+
 if [ -f "src/distro/omarchy_linux_gap_closure_pr_suite.rs" ]; then
     echo "Running Omarchy Linux Gap Closure & PR Gateway test suite..."
     mkdir -p build

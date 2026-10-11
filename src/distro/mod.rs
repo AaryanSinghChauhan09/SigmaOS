@@ -453,6 +453,9 @@ pub use debian_linux_gap_closure_v40_pr::*;
 pub mod sovereign_linux_bsd_ecosystem_parity_v42_pr;
 pub use sovereign_linux_bsd_ecosystem_parity_v42_pr::*;
 
+pub mod arch_linux_ecosystem_parity_v43_pr;
+pub use arch_linux_ecosystem_parity_v43_pr::*;
+
 pub mod sovereign_linux_bsd_all_subsystems_harmony;
 pub use sovereign_linux_bsd_all_subsystems_harmony::*;
 
