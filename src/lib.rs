@@ -20,6 +20,7 @@ pub mod community;
 pub mod compatibility;
 pub mod container;
 pub mod contributing;
+pub mod creative;
 pub mod customization;
 pub mod dashboard;
 pub mod desktop;
