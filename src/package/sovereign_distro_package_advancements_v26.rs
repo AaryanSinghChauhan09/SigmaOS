@@ -80,139 +80,44 @@ pub struct UniversalSecurityAuditEngineV26 {
 impl UniversalSecurityAuditEngineV26 {
     pub fn new() -> Self {
         Self {
-            total_formats_supported: 36,
-            inspection_cache: BTreeMap::new(),
+            advisory_database: vec![
+                SecurityAdvisoryV26 {
+                    cve_id: "CVE-2026-1001".to_string(),
+                    package_pattern: "openssl".to_string(),
+                    vulnerable_version_range: "< 3.0.8".to_string(),
+                    severity: VulnerabilitySeverityV26::Critical,
+                    advisory_summary: "Buffer overflow in OpenSSL TLS handshake".to_string(),
+                    recommended_patch_version: "3.0.8".to_string(),
+                },
+            ],
         }
     }
 
-    /// Inspects a raw package file by name and binary payload header, classifying its format and signature V26
-    pub fn inspect_package(
-        &mut self,
-        filename: &str,
-        raw_payload: &[u8],
-    ) -> Result<InspectedPackageManifestV26, String> {
-        let detected_format = PackageFormat::from_filename(filename)
-            .ok_or_else(|| format!("Unknown package extension for file: {}", filename))?;
+    pub fn audit_package(
+        &self,
+        name: &str,
+        version: &str,
+        format: PackageFormat,
+    ) -> PackageAuditReportV26 {
+        let matched: Vec<SecurityAdvisoryV26> = self
+            .advisory_database
+            .iter()
+            .filter(|a| a.package_pattern == name)
+            .cloned()
+            .collect();
 
-        let clean_filename = filename.split('/').last().unwrap_or(filename);
-        let base_name = if let Some(last_dot) = clean_filename.rfind('.') {
-            if clean_filename.ends_with(".tar.gz")
-                || clean_filename.ends_with(".tar.xz")
-                || clean_filename.ends_with(".pkg.tar.xz")
-                || clean_filename.ends_with(".pkg.tar.zst")
-            {
-                if let Some(first_ext) = clean_filename.find(".tar") {
-                    &clean_filename[..first_ext]
-                } else {
-                    &clean_filename[..last_dot]
-                }
-            } else {
-                &clean_filename[..last_dot]
-            }
-        } else {
-            clean_filename
-        };
-
-        // Determine compression type
-        let compression_type = if filename.contains(".gz") || filename.contains(".tgz") {
-            "gzip".to_string()
-        } else if filename.contains(".xz") {
-            "xz".to_string()
-        } else if filename.contains(".zst") {
-            "zstd".to_string()
-        } else if filename.contains(".lzm") {
-            "lzma".to_string()
-        } else if filename.contains(".bz2") {
-            "bzip2".to_string()
-        } else {
-            "uncompressed/zip/squashfs".to_string()
-        };
-
-        // Determine signature kind from magic bytes or header hints
-        let signature_kind = if raw_payload.starts_with(b"untrusted comment:") {
-            PackageSignatureKindV26::OpenBsdSignify
-        } else if raw_payload.starts_with(b"PQC_SIG") {
-            PackageSignatureKindV26::PqcKyberDilithium
-        } else if raw_payload.starts_with(b"\x80\x01") || raw_payload.starts_with(b"-----BEGIN PGP")
-        {
-            PackageSignatureKindV26::GpgOpenPgp
-        } else if detected_format == PackageFormat::Apk || detected_format == PackageFormat::Aab {
-            PackageSignatureKindV26::ApkV2V3Signature
-        } else if detected_format == PackageFormat::Ipa
-            || detected_format == PackageFormat::App
-            || detected_format == PackageFormat::Pkg
-        {
-            PackageSignatureKindV26::X509Certificate
-        } else {
-            PackageSignatureKindV26::Unsigned
-        };
-
-        let mut deps = Vec::new();
-        let mut provides = vec![base_name.to_string()];
-        let conflicts = Vec::new();
-
-        // Default canonical dependencies per package ecosystem V26
-        match detected_format {
-            PackageFormat::Deb | PackageFormat::Superdeb | PackageFormat::Apt => {
-                deps.push("sovereign-libc".to_string());
-                provides.push("debian-runtime".to_string());
-            }
-            PackageFormat::Rpm
-            | PackageFormat::Drpm
-            | PackageFormat::Yum
-            | PackageFormat::Zypper => {
-                deps.push("sovereign-libc".to_string());
-                provides.push("redhat-runtime".to_string());
-            }
-            PackageFormat::Pacman | PackageFormat::Cachy | PackageFormat::CachyOS => {
-                deps.push("sovereign-libc".to_string());
-                provides.push("arch-runtime".to_string());
-            }
-            PackageFormat::Apk => {
-                deps.push("sovereign-libc".to_string());
-                provides.push("alpine-runtime".to_string());
-            }
-            PackageFormat::Ebuild | PackageFormat::Portage => {
-                deps.push("sovereign-toolchain".to_string());
-                provides.push("gentoo-runtime".to_string());
-            }
-            PackageFormat::Pkg | PackageFormat::Ports | PackageFormat::OpenBsdPkg => {
-                deps.push("sovereign-libc".to_string());
-                provides.push("bsd-runtime".to_string());
-            }
-            PackageFormat::Flatpak
-            | PackageFormat::FlatpakRef
-            | PackageFormat::Snap
-            | PackageFormat::AppImage => {
-                provides.push("container-app".to_string());
-            }
-            _ => {
-                deps.push("sovereign-libc".to_string());
-            }
+        let is_secure = matched.is_empty();
+        PackageAuditReportV26 {
+            package_name: name.to_string(),
+            installed_version: version.to_string(),
+            format,
+            matched_advisories: matched,
+            is_secure,
         }
-
-        let payload_sha256 = format!("sha256-v26-{:x}", raw_payload.len() * 104729);
-
-        let manifest = InspectedPackageManifestV26 {
-            name: base_name.to_string(),
-            version: "1.0.0".to_string(),
-            detected_format,
-            signature_kind,
-            compression_type,
-            dependencies: deps,
-            provides,
-            conflicts,
-            build_cflags: Some("-O3 -march=x86-64-v3 -fstack-protector-strong".to_string()),
-            payload_sha256,
-        };
-
-        self.inspection_cache
-            .insert(base_name.to_string(), manifest.clone());
-        Ok(manifest)
     }
 }
 
-impl Default for UniversalFormatInspectorAndClassifierV26 {
+impl Default for UniversalSecurityAuditEngineV26 {
     fn default() -> Self {
         Self::new()
     }
@@ -402,7 +307,7 @@ impl UniversalMultiFormatTranspilerAndExecutionEngineV26 {
         }
 
         if let Some(cflags) = &manifest.build_cflags {
-            pkg.properties.insert("cflags".to_string(), cflags.clone());
+            pkg.properties.insert("cflags".to_string(), cflags.to_string());
         }
 
         pkg.properties.insert(
@@ -422,10 +327,7 @@ impl UniversalMultiFormatTranspilerAndExecutionEngineV26 {
             checkpoint_id: id,
             installed_packages: self.installed_packages.clone(),
         });
-
-        Self {
-            advisory_database: advisories,
-        }
+        id
     }
 
     /// Rolls back system state to a previous checkpoint ID V26
@@ -695,17 +597,19 @@ impl SovereignDistroPackageAdvancementsSuiteV26 {
     /// Process a package through audit, flag optimization, sandboxing, and snapshotting
     pub fn process_and_audit_package(
         &mut self,
-        filename: &str,
-        payload: &[u8],
-    ) -> Result<UnifiedPackage, String> {
-        let manifest = self.inspector.inspect_package(filename, payload)?;
-        let _sandbox_rules = self
-            .governor
-            .generate_sandbox_rules(manifest.detected_format);
-        let sigpkg = self
-            .transpiler_engine
-            .transpile_to_native_sigpkg(&manifest, &self.governor);
-
+        name: &str,
+        version: &str,
+        format: PackageFormat,
+        pqc_signature: &str,
+    ) -> (PackageAuditReportV26, String, PqcSandboxPolicyV26, usize) {
+        let audit = self.auditor.audit_package(name, version, format);
+        let cflags = self.optimizer.get_target_cflags();
+        let policy = self.sandbox_governor.generate_policy(pqc_signature);
+        let snap_id = self.snapshot_engine.create_snapshot(
+            &format!("pre-install-{}", name),
+            &[format!("{}-{}", name, version)],
+            1700000000,
+        );
         (audit, cflags, policy, snap_id)
     }
 }

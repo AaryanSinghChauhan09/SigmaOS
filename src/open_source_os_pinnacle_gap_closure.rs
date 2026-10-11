@@ -132,6 +132,185 @@ impl SovereignHaikuBfsEngine {
     }
 }
 
+/// DragonFly BSD HAMMER2 File System Engine
+#[derive(Debug, Clone)]
+pub struct SovereignDragonFlyHammer2Engine {
+    pub mount_point: String,
+    pub active_vkernel_pids: BTreeMap<String, u32>,
+    pub transaction_counter: u32,
+}
+
+impl SovereignDragonFlyHammer2Engine {
+    pub fn new(mount_point: &str) -> Self {
+        Self {
+            mount_point: mount_point.to_string(),
+            active_vkernel_pids: BTreeMap::new(),
+            transaction_counter: 1,
+        }
+    }
+
+    pub fn commit_transaction(&mut self) -> u32 {
+        self.transaction_counter += 1;
+        self.transaction_counter
+    }
+
+    pub fn spawn_vkernel(&mut self, name: &str, pid: u32) {
+        self.active_vkernel_pids.insert(name.to_string(), pid);
+    }
+}
+
+/// SmartOS Crossbow Network Virtualization Engine
+#[derive(Debug, Clone)]
+pub struct SovereignSmartOSCrossbowEngine {
+    pub etherstubs: Vec<String>,
+    pub vnics: BTreeMap<String, String>,
+    pub zone_rbac_policies: BTreeMap<String, Vec<String>>,
+}
+
+impl SovereignSmartOSCrossbowEngine {
+    pub fn new() -> Self {
+        Self {
+            etherstubs: Vec::new(),
+            vnics: BTreeMap::new(),
+            zone_rbac_policies: BTreeMap::new(),
+        }
+    }
+
+    pub fn create_etherstub(&mut self, stub: &str) {
+        self.etherstubs.push(stub.to_string());
+    }
+
+    pub fn create_vnic(&mut self, vnic: &str, stub: &str) -> bool {
+        self.vnics.insert(vnic.to_string(), stub.to_string());
+        true
+    }
+
+    pub fn set_zone_rbac(&mut self, zone: &str, policy: &str) {
+        self.zone_rbac_policies
+            .entry(zone.to_string())
+            .or_default()
+            .push(policy.to_string());
+    }
+}
+
+/// OpenBSD Security (Pledge & Unveil) Engine
+#[derive(Debug, Clone)]
+pub struct SovereignOpenBsdSecurityEngine {
+    pub pid: u32,
+    pub pledged_promises: Vec<String>,
+    pub unveiled_paths: BTreeMap<String, String>,
+}
+
+impl SovereignOpenBsdSecurityEngine {
+    pub fn new(pid: u32) -> Self {
+        Self {
+            pid,
+            pledged_promises: Vec::new(),
+            unveiled_paths: BTreeMap::new(),
+        }
+    }
+
+    pub fn pledge(&mut self, promises: &[&str]) {
+        for p in promises {
+            self.pledged_promises.push(p.to_string());
+        }
+    }
+
+    pub fn unveil(&mut self, path: &str, permissions: &str) {
+        self.unveiled_paths
+            .insert(path.to_string(), permissions.to_string());
+    }
+}
+
+/// Redox OS Scheme Handler Router Engine
+#[derive(Debug, Clone)]
+pub struct SovereignRedoxSchemeEngine {
+    pub schemes: BTreeMap<String, String>,
+}
+
+impl SovereignRedoxSchemeEngine {
+    pub fn new() -> Self {
+        Self {
+            schemes: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_scheme(&mut self, scheme: &str, driver: &str) {
+        self.schemes.insert(scheme.to_string(), driver.to_string());
+    }
+
+    pub fn resolve_scheme_url(&self, url: &str) -> Option<&String> {
+        let scheme = url.split(':').next()?;
+        self.schemes.get(scheme)
+    }
+}
+
+/// Fuchsia OS Zircon Channel IPC Engine
+#[derive(Debug, Clone)]
+pub struct SovereignFuchsiaZirconEngine {
+    pub channels: BTreeMap<u32, u8>,
+}
+
+impl SovereignFuchsiaZirconEngine {
+    pub fn new() -> Self {
+        Self {
+            channels: BTreeMap::new(),
+        }
+    }
+
+    pub fn create_channel(&mut self, channel_id: u32, rights: u8) {
+        self.channels.insert(channel_id, rights);
+    }
+
+    pub fn write_channel_msg(&mut self, channel_id: u32, _msg: &[u8]) -> bool {
+        self.channels.contains_key(&channel_id)
+    }
+}
+
+/// FreeBSD GEOM Storage Transformation Engine
+#[derive(Debug, Clone)]
+pub struct SovereignFreeBsdGeomEngine {
+    pub providers: BTreeMap<String, String>,
+}
+
+impl SovereignFreeBsdGeomEngine {
+    pub fn new() -> Self {
+        Self {
+            providers: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_provider(&mut self, name: &str, provider_type: &str) -> bool {
+        self.providers
+            .insert(name.to_string(), provider_type.to_string());
+        true
+    }
+}
+
+/// SerenityOS Core Async Event Engine
+#[derive(Debug, Clone)]
+pub struct SovereignSerenityCoreEngine {
+    pub event_queue: Vec<String>,
+    pub properties: BTreeMap<String, String>,
+}
+
+impl SovereignSerenityCoreEngine {
+    pub fn new() -> Self {
+        Self {
+            event_queue: Vec::new(),
+            properties: BTreeMap::new(),
+        }
+    }
+
+    pub fn post_event(&mut self, event: &str) {
+        self.event_queue.push(event.to_string());
+    }
+
+    pub fn set_property(&mut self, key: &str, val: &str) {
+        self.properties.insert(key.to_string(), val.to_string());
+    }
+}
+
 // ============================================================================
 // SOVEREIGN OPEN SOURCE OS PR PROPOSAL ENGINE
 // ============================================================================

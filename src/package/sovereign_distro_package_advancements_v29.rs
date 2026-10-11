@@ -469,52 +469,18 @@ impl UniversalBootEnvSnapshotGovernorV29 {
         let id = self.next_snapshot_id;
         self.next_snapshot_id += 1;
 
-        for dep in &manifest.dependencies {
-            let remapped = governor.remap_dependency(dep);
-            pkg = pkg.with_dependency(remapped);
-        }
-
-        if let Some(cflags) = &manifest.build_cflags {
-            pkg.properties.insert("cflags".to_string(), cflags.clone());
-        }
-
-        pkg.properties.insert(
-            "source_format".to_string(),
-            format!("{:?}", manifest.detected_format),
-        );
-        pkg.checksum = manifest.payload_sha256.clone();
-        pkg
-    }
-
-    /// Creates a transactional state checkpoint before installation operations V29
-    pub fn create_checkpoint(&mut self) -> usize {
-        let id = self.next_checkpoint_id;
-        self.next_checkpoint_id += 1;
-
-        self.checkpoints.push(InstallationCheckpointV29 {
-            checkpoint_id: id,
-            installed_packages: self.installed_packages.clone(),
+        self.snapshots.push(BootEnvSnapshotV29 {
+            snapshot_id: id,
+            name: name.to_string(),
+            backend,
+            active_packages,
         });
-
         id
     }
 
-    /// Transactionally installs a package name V29
-    pub fn install_package(&mut self, pkg_name: &str) {
-        if !self.installed_packages.contains(&pkg_name.to_string()) {
-            self.installed_packages.push(pkg_name.to_string());
-        }
-    }
-
-    /// Rolls back system state to a previous checkpoint ID V29
-    pub fn rollback_checkpoint(&mut self, checkpoint_id: usize) -> Result<(), String> {
-        if let Some(cp) = self
-            .checkpoints
-            .iter()
-            .find(|c| c.checkpoint_id == checkpoint_id)
-        {
-            self.installed_packages = cp.installed_packages.clone();
-            Ok(())
+    pub fn rollback_snapshot(&self, snapshot_id: usize) -> Result<Vec<String>, String> {
+        if let Some(snap) = self.snapshots.iter().find(|s| s.snapshot_id == snapshot_id) {
+            Ok(snap.active_packages.clone())
         } else {
             Err(format!("Snapshot ID {} not found", snapshot_id))
         }
@@ -562,8 +528,19 @@ impl SovereignDistroPackageAdvancementsSuiteV29 {
             .solve_dependencies(&manifest.name, &manifest.dependencies);
         let cas_hash = self.cas_delta_governor.ingest_content(payload);
 
-        self.transpiler_engine.install_package(&native_sigpkg.name);
-        Ok(native_sigpkg)
+        let mut pkg = UnifiedPackage::new(
+            format!("sigpkg-v29-{}", manifest.name),
+            manifest.version.clone(),
+        )
+        .with_format(PackageFormat::SigmaPkg)
+        .with_provides(manifest.name.clone());
+
+        for dep in &resolved.satisfied_dependencies {
+            pkg = pkg.with_dependency(dep.clone());
+        }
+
+        pkg.checksum = cas_hash;
+        Ok(pkg)
     }
 }
 
