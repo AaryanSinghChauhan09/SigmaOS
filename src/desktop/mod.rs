@@ -437,3 +437,5 @@ pub mod zenith;
 pub mod sovereign_gui_development_and_pr_suite;
 pub use sovereign_gui_development_and_pr_suite::*;
 pub mod zenith_advanced_features;
+pub mod sovereign_desktop_toolkits_and_services;
+pub use sovereign_desktop_toolkits_and_services::*;
