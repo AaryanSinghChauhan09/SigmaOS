@@ -115,7 +115,7 @@ impl UniversalFormatInspectorAndClassifierV30 {
             .ok_or_else(|| format!("Unknown package extension for file: {}", filename))?;
 
         let clean_filename = filename.split('/').last().unwrap_or(filename);
-        let base_name = if let Some(idx) = clean_filename.find(".pkg.tar.") {
+        let base_name_with_ver = if let Some(idx) = clean_filename.find(".pkg.tar.") {
             &clean_filename[..idx]
         } else if let Some(idx) = clean_filename.find(".tar.") {
             &clean_filename[..idx]
@@ -127,11 +127,16 @@ impl UniversalFormatInspectorAndClassifierV30 {
             clean_filename
         };
 
-        let base_name = if base_name.is_empty() {
+        let base_name_with_ver = if base_name_with_ver.is_empty() {
             clean_filename
         } else {
-            base_name
+            base_name_with_ver
         };
+
+        let base_name = base_name_with_ver
+            .split(&['-', '_'][..])
+            .next()
+            .unwrap_or(base_name_with_ver);
 
         // Determine compression type
         let compression_type = if filename.contains(".gz") || filename.contains(".tgz") {
@@ -444,17 +449,23 @@ impl UniversalMultiFormatTranspilerAndExecutionEngineV30 {
         id
     }
 
+    pub fn install_package(&mut self, pkg_name: &str) {
+        if !self.installed_packages.contains(&pkg_name.to_string()) {
+            self.installed_packages.push(pkg_name.to_string());
+        }
+    }
+
     /// Rolls back system state to selected boot environment snapshot V30
-    pub fn rollback(&mut self, snapshot_id: usize) -> Result<String, String> {
-        if let Some(snap) = self
-            .snapshots
-            .iter_mut()
-            .find(|s| s.snapshot_id == snapshot_id)
+    pub fn rollback(&mut self, checkpoint_id: usize) -> Result<String, String> {
+        if let Some(cp) = self
+            .checkpoints
+            .iter()
+            .find(|c| c.checkpoint_id == checkpoint_id)
         {
-            snap.active = true;
+            self.installed_packages = cp.installed_packages.clone();
             Ok(format!(
-                "Successfully rolled back to snapshot '{}'",
-                snap.label
+                "Successfully rolled back to checkpoint '{}'",
+                checkpoint_id
             ))
         } else {
             Err(format!("Checkpoint ID {} not found", checkpoint_id))
@@ -763,9 +774,10 @@ mod tests {
         let sigpkg = suite
             .process_and_install_package("ripgrep-14.1.0.deb", b"DEB_BINARY_DATA")
             .unwrap();
-        assert_eq!(sigpkg.name, "sigpkg-htop-3.3.0");
+        assert_eq!(sigpkg.name, "sigpkg-ripgrep");
         assert!(suite
+            .transpiler_engine
             .installed_packages
-            .contains(&"sigpkg-htop-3.3.0".to_string()));
+            .contains(&"sigpkg-ripgrep".to_string()));
     }
 }
