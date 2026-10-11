@@ -4,7 +4,7 @@
 
 ## Related issue
 
-Closes #
+Closes #<issue-id>
 
 ## Component
 
@@ -32,6 +32,13 @@ Closes #
 ## What SigmaOS changes or rejects
 
 <!-- State simplifications, deviations, and rejected ideas. -->
+
+## Component impact
+
+- Component:
+- Maturity before:
+- Maturity after:
+- Runtime path affected:
 
 ## Changes
 
@@ -66,8 +73,8 @@ make format
 ## Safety and rollback
 
 - [ ] No broad credentials or host access introduced
-- [ ] Untrusted input validated
-- [ ] Package scripts sandboxed, if applicable
+- [ ] Untrusted input is validated
+- [ ] Package scripts are sandboxed, if applicable
 - [ ] Rollback/recovery behavior defined
 - [ ] Security review completed, if applicable
 
@@ -75,7 +82,7 @@ make format
 
 - [ ] Scope is narrow
 - [ ] Component rules are enforceable
-- [ ] Tests cover the rules
+- [ ] Tests cover the change and rules
 - [ ] Runtime evidence is linked
 - [ ] Documentation matches implementation
 - [ ] Capability status is evidence-based

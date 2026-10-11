@@ -20,11 +20,26 @@ jobs:
         with:
           components: rustfmt, clippy
 
-      - name: Verify Code Formatting
+      - name: Generate Build Manifest
+        run: bash scripts/generate_build_manifest.sh
+
+      - name: Verify Code Formatting (cargo fmt)
         run: cargo fmt --all -- --check
 
       - name: Static Check (cargo check)
         run: cargo check --lib
 
-      - name: Native Test Suite
+      - name: Cargo Unit Tests (cargo test)
+        run: cargo test --lib
+
+      - name: Native Test Suite (run_sigma_tests.sh)
         run: ./run_sigma_tests.sh
+
+      - name: Makefile Verification (make check)
+        run: make check
+
+      - name: Makefile Test Suite (make test)
+        run: make test
+
+      - name: Makefile Format Check (make format)
+        run: make format

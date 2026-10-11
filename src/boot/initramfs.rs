@@ -141,11 +141,36 @@ impl RealMkinitramfsEngine {
         self.add_file("dev/null", 0o20666, b"");
 
         // Add standard hooks
-        self.hooks.push(InitramfsHook::new("base", 10, &[], "/lib/initrd/base_hook.sh"));
-        self.hooks.push(InitramfsHook::new("udev", 20, &["base"], "/lib/initrd/udev_hook.sh"));
-        self.hooks.push(InitramfsHook::new("autodetect", 30, &["udev"], "/lib/initrd/autodetect_hook.sh"));
-        self.hooks.push(InitramfsHook::new("block", 40, &["autodetect"], "/lib/initrd/block_hook.sh"));
-        self.hooks.push(InitramfsHook::new("filesystems", 50, &["block"], "/lib/initrd/filesystems_hook.sh"));
+        self.hooks.push(InitramfsHook::new(
+            "base",
+            10,
+            &[],
+            "/lib/initrd/base_hook.sh",
+        ));
+        self.hooks.push(InitramfsHook::new(
+            "udev",
+            20,
+            &["base"],
+            "/lib/initrd/udev_hook.sh",
+        ));
+        self.hooks.push(InitramfsHook::new(
+            "autodetect",
+            30,
+            &["udev"],
+            "/lib/initrd/autodetect_hook.sh",
+        ));
+        self.hooks.push(InitramfsHook::new(
+            "block",
+            40,
+            &["autodetect"],
+            "/lib/initrd/block_hook.sh",
+        ));
+        self.hooks.push(InitramfsHook::new(
+            "filesystems",
+            50,
+            &["block"],
+            "/lib/initrd/filesystems_hook.sh",
+        ));
     }
 
     pub fn add_file(&mut self, filename: &str, mode: u32, data: &[u8]) {
@@ -158,9 +183,16 @@ impl RealMkinitramfsEngine {
     }
 
     pub fn add_module(&mut self, module_name: &str) {
-        let mod_path = format!("lib/modules/{}/kernel/drivers/{}.ko", self.kernel_version, module_name);
+        let mod_path = format!(
+            "lib/modules/{}/kernel/drivers/{}.ko",
+            self.kernel_version, module_name
+        );
         self.modules.push(module_name.to_string());
-        self.add_file(&mod_path, 0o644, format!("// Kernel module ELF stub for {}", module_name).as_bytes());
+        self.add_file(
+            &mod_path,
+            0o644,
+            format!("// Kernel module ELF stub for {}", module_name).as_bytes(),
+        );
     }
 
     pub fn add_hook(&mut self, hook: InitramfsHook) {
@@ -181,7 +213,10 @@ impl RealMkinitramfsEngine {
 
             // Calculate simple CRC if Crc format
             let crc = if self.format == InitramfsFormat::Crc {
-                entry.data.iter().fold(0u32, |acc, &b| acc.wrapping_add(b as u32))
+                entry
+                    .data
+                    .iter()
+                    .fold(0u32, |acc, &b| acc.wrapping_add(b as u32))
             } else {
                 0u32
             };
@@ -191,9 +226,9 @@ impl RealMkinitramfsEngine {
                 magic,
                 inode,
                 entry.mode,
-                0u32, // uid
-                0u32, // gid
-                1u32, // nlink
+                0u32,          // uid
+                0u32,          // gid
+                1u32,          // nlink
                 1704067200u32, // mtime
                 entry.data.len() as u32,
                 3u32, // devmajor
@@ -238,14 +273,20 @@ impl RealMkinitramfsEngine {
     }
 
     /// Compresses CPIO archive bytes into chosen packaging stream
-    pub fn compress_initramfs(&self, cpio_bytes: &[u8], compression: InitramfsCompression) -> Vec<u8> {
+    pub fn compress_initramfs(
+        &self,
+        cpio_bytes: &[u8],
+        compression: InitramfsCompression,
+    ) -> Vec<u8> {
         match compression {
             InitramfsCompression::None => cpio_bytes.to_vec(),
             InitramfsCompression::Gzip => {
                 // Real Gzip RFC 1952 header + DEFLATE payload representation + CRC32 & ISIZE footer
                 let mut out = Vec::with_capacity(cpio_bytes.len() + 20);
                 // Magic number 0x1f 0x8b, CM=8 (deflate), FLG=0, MTIME=0, XFL=0, OS=255 (unknown)
-                out.extend_from_slice(&[0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff]);
+                out.extend_from_slice(&[
+                    0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff,
+                ]);
 
                 // Deflate uncompressed block representation
                 // BFINAL=1, BTYPE=00 (uncompressed block)
@@ -706,10 +747,14 @@ mod tests {
         assert!(text.contains("lib/modules/6.8.1-sigmaos-1/kernel/drivers/nvme.ko"));
         assert!(text.contains("TRAILER!!!"));
 
-        let gzip_initrd = mkinit.generate_compressed_initramfs(InitramfsCompression::Gzip).unwrap();
+        let gzip_initrd = mkinit
+            .generate_compressed_initramfs(InitramfsCompression::Gzip)
+            .unwrap();
         assert_eq!(&gzip_initrd[0..2], &[0x1f, 0x8b]);
 
-        let zstd_initrd = mkinit.generate_compressed_initramfs(InitramfsCompression::Zstd).unwrap();
+        let zstd_initrd = mkinit
+            .generate_compressed_initramfs(InitramfsCompression::Zstd)
+            .unwrap();
         assert_eq!(&zstd_initrd[0..4], &[0x28, 0xB5, 0x2F, 0xFD]);
     }
 

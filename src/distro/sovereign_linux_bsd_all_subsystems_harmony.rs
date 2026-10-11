@@ -279,7 +279,9 @@ impl SovereignSubsystemDistroHarmonyEngine {
             ),
             (
                 SigmaOsSubsystem::FilesystemStorage,
-                vec!["Bcachefs", "ZFS", "Btrfs", "HAMMER2", "BFS", "9P2000", "RedoxFS"],
+                vec![
+                    "Bcachefs", "ZFS", "Btrfs", "HAMMER2", "BFS", "9P2000", "RedoxFS",
+                ],
             ),
             (
                 SigmaOsSubsystem::Networking,
@@ -308,7 +310,9 @@ impl SovereignSubsystemDistroHarmonyEngine {
             ),
             (
                 SigmaOsSubsystem::InitSupervisor,
-                vec!["Systemd", "OpenRC", "Runit", "Dinit", "SMF", "Shepherd", "Launchd"],
+                vec![
+                    "Systemd", "OpenRC", "Runit", "Dinit", "SMF", "Shepherd", "Launchd",
+                ],
             ),
             (
                 SigmaOsSubsystem::DesktopCompositor,
@@ -327,7 +331,13 @@ impl SovereignSubsystemDistroHarmonyEngine {
             ),
             (
                 SigmaOsSubsystem::HardwarePower,
-                vec!["PowerProfiles", "TLP", "DVFS", "ACPI_APIC", "System76_Power"],
+                vec![
+                    "PowerProfiles",
+                    "TLP",
+                    "DVFS",
+                    "ACPI_APIC",
+                    "System76_Power",
+                ],
             ),
             (
                 SigmaOsSubsystem::ContainerVirt,
@@ -342,11 +352,24 @@ impl SovereignSubsystemDistroHarmonyEngine {
             ),
             (
                 SigmaOsSubsystem::ObservabilityDiagnostics,
-                vec!["DTrace", "eBPF_Trace", "Sysdig", "Fastfetch", "Opentelemetry"],
+                vec![
+                    "DTrace",
+                    "eBPF_Trace",
+                    "Sysdig",
+                    "Fastfetch",
+                    "Opentelemetry",
+                ],
             ),
             (
                 SigmaOsSubsystem::ShellTerminal,
-                vec!["OmarchyPrompt", "Zsh", "Fish", "Bash", "VT100_Grid", "Starship"],
+                vec![
+                    "OmarchyPrompt",
+                    "Zsh",
+                    "Fish",
+                    "Bash",
+                    "VT100_Grid",
+                    "Starship",
+                ],
             ),
             (
                 SigmaOsSubsystem::IpcMemory,
@@ -354,15 +377,34 @@ impl SovereignSubsystemDistroHarmonyEngine {
             ),
             (
                 SigmaOsSubsystem::DriversHardware,
-                vec!["PCIe_MMIO", "xHCI_USB", "NVMe", "Intel_Xe", "iwlwifi", "Rump_Anykernel"],
+                vec![
+                    "PCIe_MMIO",
+                    "xHCI_USB",
+                    "NVMe",
+                    "Intel_Xe",
+                    "iwlwifi",
+                    "Rump_Anykernel",
+                ],
             ),
             (
                 SigmaOsSubsystem::InstallerBoot,
-                vec!["Limine", "GRUB2", "systemd-boot", "Calamares_Wizard", "ISOHybrid"],
+                vec![
+                    "Limine",
+                    "GRUB2",
+                    "systemd-boot",
+                    "Calamares_Wizard",
+                    "ISOHybrid",
+                ],
             ),
             (
                 SigmaOsSubsystem::AuthIdentity,
-                vec!["PAM", "systemd-homed", "bsd_auth", "PQC_Token", "Fido2_Passkey"],
+                vec![
+                    "PAM",
+                    "systemd-homed",
+                    "bsd_auth",
+                    "PQC_Token",
+                    "Fido2_Passkey",
+                ],
             ),
             (
                 SigmaOsSubsystem::I18nLocalization,
@@ -370,11 +412,23 @@ impl SovereignSubsystemDistroHarmonyEngine {
             ),
             (
                 SigmaOsSubsystem::MediaGraphics,
-                vec!["DRM_KMS", "DirectScanout", "XViewer", "Hypnotix", "VAAPI_Vulkan"],
+                vec![
+                    "DRM_KMS",
+                    "DirectScanout",
+                    "XViewer",
+                    "Hypnotix",
+                    "VAAPI_Vulkan",
+                ],
             ),
             (
                 SigmaOsSubsystem::CompilerToolchain,
-                vec!["LLVM_Clang", "GCC_SSP", "Ccache", "Makepkg_Chroot", "Zig_Toolchain"],
+                vec![
+                    "LLVM_Clang",
+                    "GCC_SSP",
+                    "Ccache",
+                    "Makepkg_Chroot",
+                    "Zig_Toolchain",
+                ],
             ),
             (
                 SigmaOsSubsystem::AutomationProvisioning,
@@ -382,11 +436,22 @@ impl SovereignSubsystemDistroHarmonyEngine {
             ),
             (
                 SigmaOsSubsystem::SystemAudit,
-                vec!["Auditd", "arch-audit", "CII_BestPractices", "Syzkaller", "CodeQL_Scan"],
+                vec![
+                    "Auditd",
+                    "arch-audit",
+                    "CII_BestPractices",
+                    "Syzkaller",
+                    "CodeQL_Scan",
+                ],
             ),
             (
                 SigmaOsSubsystem::AiWorkflowAgent,
-                vec!["Omarchy_AI", "Herdr_Orchestrator", "SuperA_Keybinding", "Copilot_Lsp"],
+                vec![
+                    "Omarchy_AI",
+                    "Herdr_Orchestrator",
+                    "SuperA_Keybinding",
+                    "Copilot_Lsp",
+                ],
             ),
             (
                 SigmaOsSubsystem::VirtualizationHypervisor,
@@ -394,19 +459,37 @@ impl SovereignSubsystemDistroHarmonyEngine {
             ),
             (
                 SigmaOsSubsystem::ProcessActivity,
-                vec!["Rusage_Collector", "Job_Control", "CgroupV2_Tasks", "PidFd_Signals"],
+                vec![
+                    "Rusage_Collector",
+                    "Job_Control",
+                    "CgroupV2_Tasks",
+                    "PidFd_Signals",
+                ],
             ),
             (
                 SigmaOsSubsystem::MemoryVirtualization,
-                vec!["DAMON_Reclaim", "CXL_Photonic_Mesh", "ZRAM_Zstd", "MGLRU_Pages"],
+                vec![
+                    "DAMON_Reclaim",
+                    "CXL_Photonic_Mesh",
+                    "ZRAM_Zstd",
+                    "MGLRU_Pages",
+                ],
             ),
             (
                 SigmaOsSubsystem::TimeSynchronization,
-                vec!["Chrony_NTP", "PTP_Hardware_Clock", "Microsecond_Solar_Clock"],
+                vec![
+                    "Chrony_NTP",
+                    "PTP_Hardware_Clock",
+                    "Microsecond_Solar_Clock",
+                ],
             ),
             (
                 SigmaOsSubsystem::SignalDelivery,
-                vec!["Realtime_SigQueue", "Sigreturn_Frame_Guard", "Uncatchable_Bypass"],
+                vec![
+                    "Realtime_SigQueue",
+                    "Sigreturn_Frame_Guard",
+                    "Uncatchable_Bypass",
+                ],
             ),
             (
                 SigmaOsSubsystem::DeviceHotplug,
@@ -418,11 +501,20 @@ impl SovereignSubsystemDistroHarmonyEngine {
             ),
             (
                 SigmaOsSubsystem::TelemetryObservability,
-                vec!["Prometheus_Exporter", "Privacy_Telemetry_Filter", "CrashDump_Pstore"],
+                vec![
+                    "Prometheus_Exporter",
+                    "Privacy_Telemetry_Filter",
+                    "CrashDump_Pstore",
+                ],
             ),
             (
                 SigmaOsSubsystem::AccessibilityInput,
-                vec!["Orca_ScreenReader", "Fcitx5_IME", "Libinput_Gestures", "Braille_Display"],
+                vec![
+                    "Orca_ScreenReader",
+                    "Fcitx5_IME",
+                    "Libinput_Gestures",
+                    "Braille_Display",
+                ],
             ),
         ];
 
@@ -571,7 +663,10 @@ impl SovereignSubsystemDistroHarmonyEngine {
         }
     }
 
-    pub fn resolve_package_format_specifier(&self, distro: LinuxBsdDistroInspiration) -> &'static str {
+    pub fn resolve_package_format_specifier(
+        &self,
+        distro: LinuxBsdDistroInspiration,
+    ) -> &'static str {
         match distro {
             LinuxBsdDistroInspiration::ArchLinux
             | LinuxBsdDistroInspiration::GarudaLinux
@@ -740,10 +835,9 @@ impl SovereignUniversalCrossDistroSubsystemOrchestrator {
 
     /// Verify absolute system-wide harmony and compatibility matrix across all subsystems.
     pub fn verify_orchestration_harmony(&self) -> bool {
-        self.harmony_engine.verify_all_subsystems_compatibility_matrix()
-            && self
-                .interop_engine
-                .verify_all_subsystems_interoperability()
+        self.harmony_engine
+            .verify_all_subsystems_compatibility_matrix()
+            && self.interop_engine.verify_all_subsystems_interoperability()
     }
 
     pub fn master_harmony_index(&self) -> u32 {
@@ -835,33 +929,67 @@ mod tests {
     fn test_expanded_distro_inspirations_harmony() {
         let engine = SovereignSubsystemDistroHarmonyEngine::new();
         for spec in engine.subsystems.values() {
-            assert!(spec.supported_distros.contains(&LinuxBsdDistroInspiration::GhostBSD));
-            assert!(spec.supported_distros.contains(&LinuxBsdDistroInspiration::HardenedBSD));
-            assert!(spec.supported_distros.contains(&LinuxBsdDistroInspiration::RedoxOS));
-            assert!(spec.supported_distros.contains(&LinuxBsdDistroInspiration::HaikuOS));
+            assert!(spec
+                .supported_distros
+                .contains(&LinuxBsdDistroInspiration::GhostBSD));
+            assert!(spec
+                .supported_distros
+                .contains(&LinuxBsdDistroInspiration::HardenedBSD));
+            assert!(spec
+                .supported_distros
+                .contains(&LinuxBsdDistroInspiration::RedoxOS));
+            assert!(spec
+                .supported_distros
+                .contains(&LinuxBsdDistroInspiration::HaikuOS));
         }
     }
 
     #[test]
     fn test_cross_distro_policy_translations() {
         let engine = SovereignSubsystemDistroHarmonyEngine::new();
-        let policy = engine.translate_policy(
-            SigmaOsSubsystem::ContainerVirt,
-            SigmaOsSubsystem::SecuritySandboxing,
-        ).expect("ContainerVirt -> SecuritySandboxing translation must exist");
-        assert_eq!(policy.distro_inspiration, LinuxBsdDistroInspiration::IllumosSolaris);
+        let policy = engine
+            .translate_policy(
+                SigmaOsSubsystem::ContainerVirt,
+                SigmaOsSubsystem::SecuritySandboxing,
+            )
+            .expect("ContainerVirt -> SecuritySandboxing translation must exist");
+        assert_eq!(
+            policy.distro_inspiration,
+            LinuxBsdDistroInspiration::IllumosSolaris
+        );
         assert!(policy.enforce_strict_isolation);
     }
 
     #[test]
     fn test_subsystem_vfs_and_security_mapping() {
         let engine = SovereignSubsystemDistroHarmonyEngine::new();
-        assert_eq!(engine.translate_vfs_path(LinuxBsdDistroInspiration::FreeBSD, "/etc/nginx/nginx.conf"), "/usr/local/etc/nginx/nginx.conf");
-        assert_eq!(engine.translate_vfs_path(LinuxBsdDistroInspiration::NixOS, "/usr/bin/git"), "/run/current-system/sw/usr/bin/git");
-        assert_eq!(engine.map_security_isolation_level(LinuxBsdDistroInspiration::OpenBSD), 100);
-        assert_eq!(engine.map_security_isolation_level(LinuxBsdDistroInspiration::FreeBSD), 90);
-        assert_eq!(engine.resolve_package_format_specifier(LinuxBsdDistroInspiration::ArchLinux), "pkg.tar.zst");
-        assert_eq!(engine.resolve_package_format_specifier(LinuxBsdDistroInspiration::DebianGNU), "deb");
-        assert_eq!(engine.resolve_package_format_specifier(LinuxBsdDistroInspiration::FedoraLinux), "rpm");
+        assert_eq!(
+            engine.translate_vfs_path(LinuxBsdDistroInspiration::FreeBSD, "/etc/nginx/nginx.conf"),
+            "/usr/local/etc/nginx/nginx.conf"
+        );
+        assert_eq!(
+            engine.translate_vfs_path(LinuxBsdDistroInspiration::NixOS, "/usr/bin/git"),
+            "/run/current-system/sw/usr/bin/git"
+        );
+        assert_eq!(
+            engine.map_security_isolation_level(LinuxBsdDistroInspiration::OpenBSD),
+            100
+        );
+        assert_eq!(
+            engine.map_security_isolation_level(LinuxBsdDistroInspiration::FreeBSD),
+            90
+        );
+        assert_eq!(
+            engine.resolve_package_format_specifier(LinuxBsdDistroInspiration::ArchLinux),
+            "pkg.tar.zst"
+        );
+        assert_eq!(
+            engine.resolve_package_format_specifier(LinuxBsdDistroInspiration::DebianGNU),
+            "deb"
+        );
+        assert_eq!(
+            engine.resolve_package_format_specifier(LinuxBsdDistroInspiration::FedoraLinux),
+            "rpm"
+        );
     }
 }

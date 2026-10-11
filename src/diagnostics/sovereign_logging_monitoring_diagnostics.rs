@@ -290,15 +290,60 @@ impl DmesgKernelRingBufferEngine {
 
     fn populate_initial_kernel_boot_sequence(&mut self) {
         let boot_msgs: &[(&str, LogSeverity, &str, u64)] = &[
-            ("Linux/BSD Sovereign Microkernel initializing...", LogSeverity::Info, "kernel", 0),
-            ("Command line: root=/dev/sda1 ro quiet splash", LogSeverity::Info, "kernel", 120),
-            ("BIOS-provided physical RAM map: 64 GB detected", LogSeverity::Info, "memory", 1200),
-            ("ACPI: RSDP at 0x000F0240, parsing FADT and MADT tables...", LogSeverity::Info, "acpi", 4500),
-            ("SMP: 64 logical CPU cores online", LogSeverity::Info, "smp", 12400),
-            ("PCI: Host bridge initialized at 0000:00", LogSeverity::Info, "pci", 25000),
-            ("usbcore: registered new interface driver usbfs", LogSeverity::Info, "usb", 88000),
-            ("SovereignFS: Mounting root filesystem...", LogSeverity::Info, "fs", 150000),
-            ("systemd[1]: Reached target Graphical Interface", LogSeverity::Notice, "init", 250000),
+            (
+                "Linux/BSD Sovereign Microkernel initializing...",
+                LogSeverity::Info,
+                "kernel",
+                0,
+            ),
+            (
+                "Command line: root=/dev/sda1 ro quiet splash",
+                LogSeverity::Info,
+                "kernel",
+                120,
+            ),
+            (
+                "BIOS-provided physical RAM map: 64 GB detected",
+                LogSeverity::Info,
+                "memory",
+                1200,
+            ),
+            (
+                "ACPI: RSDP at 0x000F0240, parsing FADT and MADT tables...",
+                LogSeverity::Info,
+                "acpi",
+                4500,
+            ),
+            (
+                "SMP: 64 logical CPU cores online",
+                LogSeverity::Info,
+                "smp",
+                12400,
+            ),
+            (
+                "PCI: Host bridge initialized at 0000:00",
+                LogSeverity::Info,
+                "pci",
+                25000,
+            ),
+            (
+                "usbcore: registered new interface driver usbfs",
+                LogSeverity::Info,
+                "usb",
+                88000,
+            ),
+            (
+                "SovereignFS: Mounting root filesystem...",
+                LogSeverity::Info,
+                "fs",
+                150000,
+            ),
+            (
+                "systemd[1]: Reached target Graphical Interface",
+                LogSeverity::Notice,
+                "init",
+                250000,
+            ),
         ];
 
         for &(msg, sev, subsys, ts) in boot_msgs {
@@ -330,7 +375,11 @@ impl DmesgKernelRingBufferEngine {
         });
     }
 
-    pub fn filter(&self, min_severity: Option<LogSeverity>, subsystem: Option<&str>) -> Vec<&DmesgRecord> {
+    pub fn filter(
+        &self,
+        min_severity: Option<LogSeverity>,
+        subsystem: Option<&str>,
+    ) -> Vec<&DmesgRecord> {
         self.buffer
             .iter()
             .filter(|rec| {
@@ -421,22 +470,46 @@ impl TopHtopProcessMonitorEngine {
     fn populate_sample_processes(&mut self) {
         let samples = vec![
             ProcessTelemetry {
-                pid: 1, ppid: 0, user: "root".to_string(), name: "systemd".to_string(),
-                state: ProcessState::Sleeping, cpu_usage_pct: 0.1, mem_usage_pct: 0.2,
-                virt_mem_kb: 168000, res_mem_kb: 12400, num_threads: 1,
-                read_bytes_sec: 1024, write_bytes_sec: 512,
+                pid: 1,
+                ppid: 0,
+                user: "root".to_string(),
+                name: "systemd".to_string(),
+                state: ProcessState::Sleeping,
+                cpu_usage_pct: 0.1,
+                mem_usage_pct: 0.2,
+                virt_mem_kb: 168000,
+                res_mem_kb: 12400,
+                num_threads: 1,
+                read_bytes_sec: 1024,
+                write_bytes_sec: 512,
             },
             ProcessTelemetry {
-                pid: 102, ppid: 1, user: "root".to_string(), name: "journald".to_string(),
-                state: ProcessState::Sleeping, cpu_usage_pct: 0.5, mem_usage_pct: 0.4,
-                virt_mem_kb: 84000, res_mem_kb: 8100, num_threads: 2,
-                read_bytes_sec: 4096, write_bytes_sec: 16384,
+                pid: 102,
+                ppid: 1,
+                user: "root".to_string(),
+                name: "journald".to_string(),
+                state: ProcessState::Sleeping,
+                cpu_usage_pct: 0.5,
+                mem_usage_pct: 0.4,
+                virt_mem_kb: 84000,
+                res_mem_kb: 8100,
+                num_threads: 2,
+                read_bytes_sec: 4096,
+                write_bytes_sec: 16384,
             },
             ProcessTelemetry {
-                pid: 540, ppid: 1, user: "sigma".to_string(), name: "zenith-desktop".to_string(),
-                state: ProcessState::Running, cpu_usage_pct: 4.8, mem_usage_pct: 2.5,
-                virt_mem_kb: 512000, res_mem_kb: 164000, num_threads: 8,
-                read_bytes_sec: 32768, write_bytes_sec: 8192,
+                pid: 540,
+                ppid: 1,
+                user: "sigma".to_string(),
+                name: "zenith-desktop".to_string(),
+                state: ProcessState::Running,
+                cpu_usage_pct: 4.8,
+                mem_usage_pct: 2.5,
+                virt_mem_kb: 512000,
+                res_mem_kb: 164000,
+                num_threads: 8,
+                read_bytes_sec: 32768,
+                write_bytes_sec: 8192,
             },
         ];
 
@@ -579,9 +652,21 @@ impl VmstatIostatSarMetricsCollectorEngine {
             return (0.0, 0.0, 0.0);
         }
         let total = self.vmstat_history.len() as f32;
-        let user: f32 = self.vmstat_history.iter().map(|v| v.cpu_user_pct as f32).sum();
-        let sys: f32 = self.vmstat_history.iter().map(|v| v.cpu_sys_pct as f32).sum();
-        let idle: f32 = self.vmstat_history.iter().map(|v| v.cpu_idle_pct as f32).sum();
+        let user: f32 = self
+            .vmstat_history
+            .iter()
+            .map(|v| v.cpu_user_pct as f32)
+            .sum();
+        let sys: f32 = self
+            .vmstat_history
+            .iter()
+            .map(|v| v.cpu_sys_pct as f32)
+            .sum();
+        let idle: f32 = self
+            .vmstat_history
+            .iter()
+            .map(|v| v.cpu_idle_pct as f32)
+            .sum();
 
         (user / total, sys / total, idle / total)
     }
@@ -641,19 +726,34 @@ impl LsofOpenFilesInspectorEngine {
     fn populate_sample_open_files(&mut self) {
         self.open_files.extend(vec![
             OpenFileRecord {
-                pid: 1, command: "systemd".to_string(), user: "root".to_string(),
-                fd_name: "cwd".to_string(), file_type: OpenFileType::Directory,
-                device: "8,1".to_string(), node_inode: 2, path_name: "/".to_string(),
+                pid: 1,
+                command: "systemd".to_string(),
+                user: "root".to_string(),
+                fd_name: "cwd".to_string(),
+                file_type: OpenFileType::Directory,
+                device: "8,1".to_string(),
+                node_inode: 2,
+                path_name: "/".to_string(),
             },
             OpenFileRecord {
-                pid: 540, command: "zenith-desktop".to_string(), user: "sigma".to_string(),
-                fd_name: "3u".to_string(), file_type: OpenFileType::UnixSocket,
-                device: "0,12".to_string(), node_inode: 15420, path_name: "@wayland-0".to_string(),
+                pid: 540,
+                command: "zenith-desktop".to_string(),
+                user: "sigma".to_string(),
+                fd_name: "3u".to_string(),
+                file_type: OpenFileType::UnixSocket,
+                device: "0,12".to_string(),
+                node_inode: 15420,
+                path_name: "@wayland-0".to_string(),
             },
             OpenFileRecord {
-                pid: 540, command: "zenith-desktop".to_string(), user: "sigma".to_string(),
-                fd_name: "4u".to_string(), file_type: OpenFileType::Ipv4Socket,
-                device: "0,14".to_string(), node_inode: 18910, path_name: "127.0.0.1:8080".to_string(),
+                pid: 540,
+                command: "zenith-desktop".to_string(),
+                user: "sigma".to_string(),
+                fd_name: "4u".to_string(),
+                file_type: OpenFileType::Ipv4Socket,
+                device: "0,14".to_string(),
+                node_inode: 18910,
+                path_name: "127.0.0.1:8080".to_string(),
             },
         ]);
     }
@@ -753,13 +853,15 @@ impl HardwareDiscoveryInspectorEngine {
                     kernel_modules: vec!["nvidia".to_string(), "nouveau".to_string()],
                 },
             ],
-            usb_devices: vec![
-                UsbDeviceRecord {
-                    bus_num: 1, device_num: 2, vendor_id: 0x046d, product_id: 0xc52b,
-                    manufacturer: "Logitech".to_string(), product: "USB Receiver".to_string(),
-                    speed_mbps: 12,
-                },
-            ],
+            usb_devices: vec![UsbDeviceRecord {
+                bus_num: 1,
+                device_num: 2,
+                vendor_id: 0x046d,
+                product_id: 0xc52b,
+                manufacturer: "Logitech".to_string(),
+                product: "USB Receiver".to_string(),
+                speed_mbps: 12,
+            }],
             dmi_info: DmiDecodeInfo {
                 bios_vendor: "American Megatrends Inc.".to_string(),
                 bios_version: "2.40".to_string(),
@@ -831,7 +933,9 @@ impl SosreportPrometheusExporterEngine {
         for rec in &dmesg.buffer {
             dmesg_txt.push_str(&format!(
                 "[{:10.6}] [{}] {}\n",
-                rec.timestamp_us as f64 / 1_000_000.0, rec.subsystem, rec.message
+                rec.timestamp_us as f64 / 1_000_000.0,
+                rec.subsystem,
+                rec.message
             ));
         }
         files.insert("var/log/dmesg".to_string(), dmesg_txt);
@@ -847,8 +951,10 @@ impl SosreportPrometheusExporterEngine {
         // Include DMI / hardware discovery
         let dmi_txt = format!(
             "BIOS Vendor: {}\nBIOS Version: {}\nSystem: {} {}\nSerial: {}\n",
-            hw.dmi_info.bios_vendor, hw.dmi_info.bios_version,
-            hw.dmi_info.sys_manufacturer, hw.dmi_info.sys_product_name,
+            hw.dmi_info.bios_vendor,
+            hw.dmi_info.bios_version,
+            hw.dmi_info.sys_manufacturer,
+            hw.dmi_info.sys_product_name,
             hw.dmi_info.sys_serial_number
         );
         files.insert("sys/class/dmi/id/bios".to_string(), dmi_txt);
@@ -873,23 +979,36 @@ impl SosreportPrometheusExporterEngine {
         out.push_str("# HELP node_cpu_seconds_total Seconds the CPUs spent in each mode.\n");
         out.push_str("# TYPE node_cpu_seconds_total counter\n");
         out.push_str(&format!(
-            "node_cpu_seconds_total{{mode=\"user\"}} {}\n", top.total_cpu_user_pct
+            "node_cpu_seconds_total{{mode=\"user\"}} {}\n",
+            top.total_cpu_user_pct
         ));
         out.push_str(&format!(
-            "node_cpu_seconds_total{{mode=\"system\"}} {}\n", top.total_cpu_sys_pct
+            "node_cpu_seconds_total{{mode=\"system\"}} {}\n",
+            top.total_cpu_sys_pct
         ));
         out.push_str(&format!(
-            "node_cpu_seconds_total{{mode=\"idle\"}} {}\n", top.total_cpu_idle_pct
+            "node_cpu_seconds_total{{mode=\"idle\"}} {}\n",
+            top.total_cpu_idle_pct
         ));
 
         if let Some(vm) = vmstat.vmstat_history.last() {
-            out.push_str("# HELP node_memory_MemFree_bytes Memory information field MemFree_bytes.\n");
+            out.push_str(
+                "# HELP node_memory_MemFree_bytes Memory information field MemFree_bytes.\n",
+            );
             out.push_str("# TYPE node_memory_MemFree_bytes gauge\n");
-            out.push_str(&format!("node_memory_MemFree_bytes {}\n", vm.free_kb * 1024));
+            out.push_str(&format!(
+                "node_memory_MemFree_bytes {}\n",
+                vm.free_kb * 1024
+            ));
 
-            out.push_str("# HELP node_memory_Cached_bytes Memory information field Cached_bytes.\n");
+            out.push_str(
+                "# HELP node_memory_Cached_bytes Memory information field Cached_bytes.\n",
+            );
             out.push_str("# TYPE node_memory_Cached_bytes gauge\n");
-            out.push_str(&format!("node_memory_Cached_bytes {}\n", vm.cache_kb * 1024));
+            out.push_str(&format!(
+                "node_memory_Cached_bytes {}\n",
+                vm.cache_kb * 1024
+            ));
         }
 
         out
@@ -929,13 +1048,34 @@ impl SovereignLinuxBsdLoggingMonitoringDiagnosticsSuite {
     pub fn run_system_diagnostic(&self) -> HashMap<String, String> {
         let mut diag = HashMap::new();
         diag.insert("hostname".to_string(), self.journal.hostname.clone());
-        diag.insert("journal_entries".to_string(), self.journal.entries.len().to_string());
-        diag.insert("dmesg_records".to_string(), self.dmesg.buffer.len().to_string());
-        diag.insert("monitored_processes".to_string(), self.top_monitor.processes.len().to_string());
-        diag.insert("open_file_descriptors".to_string(), self.lsof_inspector.open_files.len().to_string());
-        diag.insert("pci_devices_count".to_string(), self.hardware.pci_devices.len().to_string());
-        diag.insert("usb_devices_count".to_string(), self.hardware.usb_devices.len().to_string());
-        diag.insert("bios_vendor".to_string(), self.hardware.dmi_info.bios_vendor.clone());
+        diag.insert(
+            "journal_entries".to_string(),
+            self.journal.entries.len().to_string(),
+        );
+        diag.insert(
+            "dmesg_records".to_string(),
+            self.dmesg.buffer.len().to_string(),
+        );
+        diag.insert(
+            "monitored_processes".to_string(),
+            self.top_monitor.processes.len().to_string(),
+        );
+        diag.insert(
+            "open_file_descriptors".to_string(),
+            self.lsof_inspector.open_files.len().to_string(),
+        );
+        diag.insert(
+            "pci_devices_count".to_string(),
+            self.hardware.pci_devices.len().to_string(),
+        );
+        diag.insert(
+            "usb_devices_count".to_string(),
+            self.hardware.usb_devices.len().to_string(),
+        );
+        diag.insert(
+            "bios_vendor".to_string(),
+            self.hardware.dmi_info.bios_vendor.clone(),
+        );
         diag
     }
 }
@@ -979,7 +1119,11 @@ mod tests {
         let mut dmesg = DmesgKernelRingBufferEngine::new(10);
         assert!(!dmesg.buffer.is_empty());
 
-        dmesg.print_klog("usb", LogSeverity::Warning, "Overcurrent condition on port 1");
+        dmesg.print_klog(
+            "usb",
+            LogSeverity::Warning,
+            "Overcurrent condition on port 1",
+        );
         let filtered = dmesg.filter(Some(LogSeverity::Warning), Some("usb"));
         assert!(!filtered.is_empty());
     }
@@ -1029,10 +1173,14 @@ mod tests {
     #[test]
     fn test_sosreport_and_prometheus_export() {
         let suite = SovereignLinuxBsdLoggingMonitoringDiagnosticsSuite::new("test-host");
-        let sos = suite.exporter.generate_sosreport(&suite.journal, &suite.dmesg, &suite.hardware);
+        let sos = suite
+            .exporter
+            .generate_sosreport(&suite.journal, &suite.dmesg, &suite.hardware);
         assert!(sos.captured_files.contains_key("var/log/dmesg"));
 
-        let prom = suite.exporter.export_prometheus_metrics(&suite.top_monitor, &suite.vmstat_collector);
+        let prom = suite
+            .exporter
+            .export_prometheus_metrics(&suite.top_monitor, &suite.vmstat_collector);
         assert!(prom.contains("node_cpu_seconds_total"));
         assert!(prom.contains("node_memory_MemFree_bytes"));
     }

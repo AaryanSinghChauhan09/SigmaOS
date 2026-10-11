@@ -39,7 +39,9 @@ impl Multiboot2HeaderSpec {
         let magic = MULTIBOOT2_HEADER_MAGIC;
         let architecture = MULTIBOOT2_ARCH_I386;
         let header_length = 48; // Total header length with framebuffer + console + end tags
-        let checksum = (0x100000000u64 - ((magic as u64) + (architecture as u64) + (header_length as u64))) as u32;
+        let checksum = (0x100000000u64
+            - ((magic as u64) + (architecture as u64) + (header_length as u64)))
+            as u32;
 
         Self {
             magic,
@@ -98,7 +100,7 @@ impl LongModePageTableSetup {
             pml4_entries: pml4,
             pdpt_entries: pdpt,
             pd_entries: pd,
-            identity_mapped_bytes: 1024 * 1024 * 1024,   // 1 GiB
+            identity_mapped_bytes: 1024 * 1024 * 1024, // 1 GiB
             higher_half_mapped_bytes: 1024 * 1024 * 1024, // 1 GiB
         }
     }
