@@ -166,7 +166,33 @@ SigmaOS embeds native compliance verification directly into the OS runtime and C
 
 ---
 
-## 8. SOVEREIGN SIGMAOS 10-PHASE MASTER DEVELOPMENT PLAN
+## 8. ARCH LINUX GAP CLOSURE & AI AGENT DEVELOPMENT ROADMAP (PR FORMAT)
+
+### 8.1 Arch Linux Parity PR Specifications
+- **PR #204: Pacman v7 ALPM Core & Parallel Download Sync Engine**
+  - *Target*: `src/package/sigpkg/arch_pacman.rs`
+  - *Scope*: C-free implementation of ALPM parallel HTTP/3 package mirror downloading and `pacman.conf` parsing.
+- **PR #205: ABS Clean Chroot & arch-nspawn Container Sandbox**
+  - *Target*: `src/package/sigpkg/arch_nspawn.rs`
+  - *Scope*: Clean-chroot package compilation with `namcap` static analysis linter.
+- **PR #206: pacman-key Web of Trust (WOT) & PGP Signature Verifier**
+  - *Target*: `src/security/arch_keyring.rs`
+  - *Scope*: Master keyring import, WKS key retrieval, and PQC fallback verification.
+- **PR #207: AUR v5 RPC Helper & Paccache Vacuum Engine**
+  - *Target*: `src/package/aur_helper.rs`
+  - *Scope*: AUR v5 JSON RPC search, voting, and `paccache` build cache cleanup.
+
+### 8.2 AI Agent Component Development Roadmap Matrix
+| Domain | PR Reference | Inspiration Source | Target Capability |
+|---|---|---|---|
+| **Kernel Scheduling** | PR #101 | Linux 6.12+ `sched_ext` & CachyOS BORE | Sub-microsecond eBPF scheduling governor |
+| **Package Management** | PR #301 | Arch ALPM, Portage EAPI 8, Alpine APK | Universal SAT solver & PQC signature verifier |
+| **Security Isolation** | PR #401 | OpenBSD Pledge/Unveil & FreeBSD Capsicum | Quantum FineIBT & dynamic file capability sandboxing |
+| **Display Compositing** | PR #601 | Wayland 1.25+, Direct KMS, Hyprland | Direct KMS atomic scanout with 3D LUT HDR rendering |
+
+---
+
+## 9. SOVEREIGN SIGMAOS 10-PHASE MASTER DEVELOPMENT PLAN
 
 ### Phase 1: Foundation Hardening (Months 1 - 3)
 - Formalize `#![no_std]` core primitives, bare-metal memory allocators, and x86_64/ARM64 interrupt descriptor tables.
