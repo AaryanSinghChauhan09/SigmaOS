@@ -54,11 +54,36 @@ impl LinuxKernelSyscallPrDeployer {
 
     fn stage_all_kernel_prs(&mut self) {
         let prs = [
-            ("wiki/01-Kernel-and-Architecture.md", "feat(kernel): Implement PIDFD pidfd_open and pidfd_send_signal syscalls", "pidfd", 0x1A2B3C4D),
-            ("wiki/01-Kernel-and-Architecture.md", "feat(io_uring): Enable Kernel Thread SQPOLL async I/O offload", "io_uring_sqpoll", 0x2B3C4D5E),
-            ("wiki/04-Security-and-Isolation.md", "feat(landlock): Landlock v5 network port bind/connect capability restrictions", "landlock_v5_net", 0x3C4D5E6F),
-            ("wiki/01-Kernel-and-Architecture.md", "feat(ebpf): Native x86_64 eBPF-XDP machine-code JIT compilation engine", "ebpf_xdp_jit", 0x4D5E6F70),
-            ("wiki/01-Kernel-and-Architecture.md", "feat(memory): MGLRU Multi-Generational LRU memory page reclaimer", "mglru_reclaimer", 0x5E6F7081),
+            (
+                "wiki/01-Kernel-and-Architecture.md",
+                "feat(kernel): Implement PIDFD pidfd_open and pidfd_send_signal syscalls",
+                "pidfd",
+                0x1A2B3C4D,
+            ),
+            (
+                "wiki/01-Kernel-and-Architecture.md",
+                "feat(io_uring): Enable Kernel Thread SQPOLL async I/O offload",
+                "io_uring_sqpoll",
+                0x2B3C4D5E,
+            ),
+            (
+                "wiki/04-Security-and-Isolation.md",
+                "feat(landlock): Landlock v5 network port bind/connect capability restrictions",
+                "landlock_v5_net",
+                0x3C4D5E6F,
+            ),
+            (
+                "wiki/01-Kernel-and-Architecture.md",
+                "feat(ebpf): Native x86_64 eBPF-XDP machine-code JIT compilation engine",
+                "ebpf_xdp_jit",
+                0x4D5E6F70,
+            ),
+            (
+                "wiki/01-Kernel-and-Architecture.md",
+                "feat(memory): MGLRU Multi-Generational LRU memory page reclaimer",
+                "mglru_reclaimer",
+                0x5E6F7081,
+            ),
         ];
 
         for (wiki_src, title, target_sub, digest) in prs {
@@ -112,10 +137,30 @@ impl BsdSecurityIsolationPrDeployer {
 
     fn stage_all_bsd_prs(&mut self) {
         let prs = [
-            ("wiki/04-Security-and-Isolation.md", "feat(openbsd): OpenBSD Pledge & Unveil file descriptor capability gate", "pledge_unveil", 0x6F708192),
-            ("wiki/04-Security-and-Isolation.md", "feat(freebsd): FreeBSD Capsicum cap_rights_limit and pdfork process descriptors", "capsicum_procdesc", 0x708192A3),
-            ("wiki/03-Networking-and-Connectivity.md", "feat(vnet): FreeBSD Netlink-native VNET dual-stack micro-jails", "vnet_jails", 0x8192A3B4),
-            ("wiki/02-Drivers-and-Hardware.md", "feat(rump): NetBSD Rump Kernel userland driver hypercall router", "rump_kernel", 0x92A3B4C5),
+            (
+                "wiki/04-Security-and-Isolation.md",
+                "feat(openbsd): OpenBSD Pledge & Unveil file descriptor capability gate",
+                "pledge_unveil",
+                0x6F708192,
+            ),
+            (
+                "wiki/04-Security-and-Isolation.md",
+                "feat(freebsd): FreeBSD Capsicum cap_rights_limit and pdfork process descriptors",
+                "capsicum_procdesc",
+                0x708192A3,
+            ),
+            (
+                "wiki/03-Networking-and-Connectivity.md",
+                "feat(vnet): FreeBSD Netlink-native VNET dual-stack micro-jails",
+                "vnet_jails",
+                0x8192A3B4,
+            ),
+            (
+                "wiki/02-Drivers-and-Hardware.md",
+                "feat(rump): NetBSD Rump Kernel userland driver hypercall router",
+                "rump_kernel",
+                0x92A3B4C5,
+            ),
         ];
 
         for (wiki_src, title, target_sub, digest) in prs {

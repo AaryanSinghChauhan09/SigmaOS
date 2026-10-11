@@ -51,9 +51,9 @@ impl GlyphBitmap {
 #[derive(Debug, Clone)]
 pub struct FontFallbackChain {
     pub primary_font_family: String,
-    pub cjk_fallback_font: String,     // e.g. "Noto Sans CJK SC"
-    pub emoji_fallback_font: String,   // e.g. "Noto Color Emoji"
-    pub symbol_fallback_font: String,  // e.g. "Symbola"
+    pub cjk_fallback_font: String,    // e.g. "Noto Sans CJK SC"
+    pub emoji_fallback_font: String,  // e.g. "Noto Color Emoji"
+    pub symbol_fallback_font: String, // e.g. "Symbola"
 }
 
 impl FontFallbackChain {
@@ -429,7 +429,12 @@ impl SovereignFontManager {
     }
 
     /// Rasterizes a glyph or retrieves it from the LRU cache
-    pub fn get_or_rasterize_glyph(&mut self, font_family: &str, font_size_px: u32, ch: char) -> GlyphBitmap {
+    pub fn get_or_rasterize_glyph(
+        &mut self,
+        font_family: &str,
+        font_size_px: u32,
+        ch: char,
+    ) -> GlyphBitmap {
         let key = GlyphCacheKey {
             font_family: font_family.to_string(),
             font_size_px,
@@ -469,7 +474,12 @@ impl SovereignFontManager {
     }
 
     /// Measures text metrics and performs line layout
-    pub fn layout_text_line(&mut self, text: &str, font_size_px: u32, max_width_px: u32) -> TextLayoutMetrics {
+    pub fn layout_text_line(
+        &mut self,
+        text: &str,
+        font_size_px: u32,
+        max_width_px: u32,
+    ) -> TextLayoutMetrics {
         let mut current_x = 0u32;
         let mut line_count = 1usize;
         let mut glyph_count = 0usize;
