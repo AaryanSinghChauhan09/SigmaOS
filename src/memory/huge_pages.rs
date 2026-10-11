@@ -21,6 +21,16 @@ pub enum TransparentHugePageMode {
     Never,   // THP disabled
 }
 
+/// THP Defrag Mode Settings (matching Linux `/sys/kernel/mm/transparent_hugepage/defrag`)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ThpDefragMode {
+    Always,       // Direct reclaim and compaction on allocation fault
+    Defer,        // Wake khugepaged daemon to compact asynchronously
+    DeferMadvise, // Direct compaction only for MADV_HUGEPAGE, defer others
+    Madvise,      // Direct compaction only for MADV_HUGEPAGE
+    Never,        // Disable THP defragmentation and compaction
+}
+
 /// Page Table Entry (PTE) Flags for 2MiB Huge Pages
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct HugePageFlags {
@@ -162,6 +172,192 @@ impl Default for SovereignHugePageEngine {
     }
 }
 
+// =========================================================================
+// THP KHUGEPAGED DEFRAG DAEMON & RUNTIME PAGE PROMOTION ENGINE
+// =========================================================================
+
+/// THP Page Promotion Policy Descriptor
+#[derive(Debug, Clone)]
+pub struct ThpPagePromotionPolicy {
+    pub pages_to_scan: usize,          // Pages scanned per khugepaged iteration (default: 4096)
+    pub scan_sleep_millisecs: u64,     // Sleep between scan passes (default: 10000ms)
+    pub alloc_sleep_millisecs: u64,    // Sleep on allocation failure (default: 60000ms)
+    pub max_ptes_none: usize,          // Max unmapped PTEs allowed during collapse (default: 511)
+    pub max_ptes_swap: usize,          // Max swapped PTEs allowed during collapse (default: 64)
+    pub max_ptes_shared: usize,        // Max shared PTEs allowed during collapse (default: 256)
+    pub access_frequency_threshold: u32, // Access count required for 4KiB -> 2MiB promotion
+}
+
+impl Default for ThpPagePromotionPolicy {
+    fn default() -> Self {
+        Self {
+            pages_to_scan: 4096,
+            scan_sleep_millisecs: 10000,
+            alloc_sleep_millisecs: 60000,
+            max_ptes_none: 511,
+            max_ptes_swap: 64,
+            max_ptes_shared: 256,
+            access_frequency_threshold: 10,
+        }
+    }
+}
+
+/// THP Memory Compactor for Zone Defragmentation
+#[derive(Debug, Clone)]
+pub struct ThpMemoryCompactor {
+    pub defrag_mode: ThpDefragMode,
+    pub total_compactions_run: u64,
+    pub total_compacted_2mb_blocks: u64,
+}
+
+impl ThpMemoryCompactor {
+    pub fn new(mode: ThpDefragMode) -> Self {
+        Self {
+            defrag_mode: mode,
+            total_compactions_run: 0,
+            total_compacted_2mb_blocks: 0,
+        }
+    }
+
+    /// Compacts fragmented 4KiB page runs into aligned 2MiB physical blocks
+    pub fn compact_zone_for_thp(
+        &mut self,
+        fragmented_phys_pages: &mut [u64],
+    ) -> Result<Vec<u64>, &'static str> {
+        if self.defrag_mode == ThpDefragMode::Never {
+            return Err("THP Defrag is disabled");
+        }
+
+        self.total_compactions_run += 1;
+        let mut aligned_2mb_blocks = Vec::new();
+
+        // Sort physical page addresses to locate contiguous 2MiB runs
+        fragmented_phys_pages.sort_unstable();
+
+        let mut current_run = Vec::new();
+        for &phys in fragmented_phys_pages.iter() {
+            if current_run.is_empty() {
+                if phys % (PAGE_SIZE_2MB as u64) == 0 {
+                    current_run.push(phys);
+                }
+            } else {
+                let last = *current_run.last().unwrap();
+                if phys == last + (PAGE_SIZE_4KB as u64) {
+                    current_run.push(phys);
+                    if current_run.len() == PAGES_PER_2MB_HUGE_PAGE {
+                        let base_2mb = current_run[0];
+                        aligned_2mb_blocks.push(base_2mb);
+                        self.total_compacted_2mb_blocks += 1;
+                        current_run.clear();
+                    }
+                } else {
+                    current_run.clear();
+                    if phys % (PAGE_SIZE_2MB as u64) == 0 {
+                        current_run.push(phys);
+                    }
+                }
+            }
+        }
+
+        Ok(aligned_2mb_blocks)
+    }
+}
+
+/// Background khugepaged THP Defrag & Runtime Page Promotion Daemon
+pub struct ThpKhugepagedDefragDaemon {
+    pub policy: ThpPagePromotionPolicy,
+    pub compactor: ThpMemoryCompactor,
+    pub huge_page_engine: SovereignHugePageEngine,
+    pub pages_collapsed: u64,
+    pub alloc_success: u64,
+    pub alloc_fail: u64,
+    pub scan_count: u64,
+}
+
+impl ThpKhugepagedDefragDaemon {
+    pub fn new(
+        thp_mode: TransparentHugePageMode,
+        defrag_mode: ThpDefragMode,
+    ) -> Self {
+        Self {
+            policy: ThpPagePromotionPolicy::default(),
+            compactor: ThpMemoryCompactor::new(defrag_mode),
+            huge_page_engine: SovereignHugePageEngine::new(thp_mode),
+            pages_collapsed: 0,
+            alloc_success: 0,
+            alloc_fail: 0,
+            scan_count: 0,
+        }
+    }
+
+    /// Evaluates runtime page access counters and promotes 4KiB page ranges to 2MiB THPs
+    pub fn evaluate_and_promote_page_range(
+        &mut self,
+        base_phys_2mb: u64,
+        access_counts: &[u32; PAGES_PER_2MB_HUGE_PAGE],
+        has_madv_hugepage: bool,
+    ) -> Option<u64> {
+        self.scan_count += 1;
+
+        if self.huge_page_engine.thp_mode == TransparentHugePageMode::Never {
+            self.alloc_fail += 1;
+            return None;
+        }
+
+        if self.huge_page_engine.thp_mode == TransparentHugePageMode::Madvise && !has_madv_hugepage {
+            self.alloc_fail += 1;
+            return None;
+        }
+
+        let avg_access: u32 = access_counts.iter().sum::<u32>() / (PAGES_PER_2MB_HUGE_PAGE as u32);
+        if !has_madv_hugepage && avg_access < self.policy.access_frequency_threshold {
+            self.alloc_fail += 1;
+            return None;
+        }
+
+        let mut contiguous_4k_pages = Vec::with_capacity(PAGES_PER_2MB_HUGE_PAGE);
+        for i in 0..PAGES_PER_2MB_HUGE_PAGE {
+            contiguous_4k_pages.push(base_phys_2mb + (i * PAGE_SIZE_4KB) as u64);
+        }
+
+        if let Some(promoted_2mb) = self.huge_page_engine.attempt_thp_coalesce(&contiguous_4k_pages) {
+            self.pages_collapsed += PAGES_PER_2MB_HUGE_PAGE as u64;
+            self.alloc_success += 1;
+            Some(promoted_2mb)
+        } else {
+            self.alloc_fail += 1;
+            None
+        }
+    }
+
+    /// Triggers memory compaction on defragmentation requests and promotes newly formed 2MiB blocks
+    pub fn trigger_khugepaged_scan_and_defrag(
+        &mut self,
+        fragmented_pages: &mut [u64],
+    ) -> usize {
+        self.scan_count += 1;
+
+        if let Ok(compacted_blocks) = self.compactor.compact_zone_for_thp(fragmented_pages) {
+            let mut promoted_count = 0;
+            for block_base in compacted_blocks {
+                let dummy_access = [20u32; PAGES_PER_2MB_HUGE_PAGE];
+                if self.evaluate_and_promote_page_range(block_base, &dummy_access, true).is_some() {
+                    promoted_count += 1;
+                }
+            }
+            promoted_count
+        } else {
+            0
+        }
+    }
+}
+
+impl Default for ThpKhugepagedDefragDaemon {
+    fn default() -> Self {
+        Self::new(TransparentHugePageMode::Always, ThpDefragMode::Always)
+    }
+}
+
 #[cfg(test)]
 #[cfg(test)]
 mod tests {
@@ -201,5 +397,32 @@ mod tests {
         assert_eq!(split[0], base_phys);
         assert_eq!(split[511], base_phys + (511 * 4096) as u64);
         assert_eq!(engine.total_thp_split, 1);
+    }
+
+    #[test]
+    fn test_thp_khugepaged_daemon_and_compaction() {
+        let mut daemon = ThpKhugepagedDefragDaemon::new(
+            TransparentHugePageMode::Always,
+            ThpDefragMode::Always,
+        );
+
+        let base_phys = 0x4000_0000u64; // 2MiB aligned
+        let access_counts = [15u32; PAGES_PER_2MB_HUGE_PAGE];
+
+        let promoted = daemon.evaluate_and_promote_page_range(base_phys, &access_counts, false);
+        assert_eq!(promoted, Some(base_phys));
+        assert_eq!(daemon.alloc_success, 1);
+        assert_eq!(daemon.pages_collapsed, 512);
+
+        let mut fragmented_run = Vec::new();
+        let run_base = 0x6000_0000u64; // 2MiB aligned
+        for i in 0..512 {
+            fragmented_run.push(run_base + (i * 4096) as u64);
+        }
+
+        let promoted_count = daemon.trigger_khugepaged_scan_and_defrag(&mut fragmented_run);
+        assert_eq!(promoted_count, 1);
+        assert_eq!(daemon.compactor.total_compactions_run, 1);
+        assert_eq!(daemon.compactor.total_compacted_2mb_blocks, 1);
     }
 }
