@@ -403,6 +403,12 @@ impl UniversalMultiFormatTranspilerAndExecutionEngineV30 {
         }
     }
 
+    pub fn install_package(&mut self, name: &str) {
+        if !self.installed_packages.contains(&name.to_string()) {
+            self.installed_packages.push(name.to_string());
+        }
+    }
+
     /// Transpiles an inspected package manifest into native `UnifiedPackage` in `SigmaPkg` format V30
     pub fn transpile_to_native_sigpkg(
         &self,

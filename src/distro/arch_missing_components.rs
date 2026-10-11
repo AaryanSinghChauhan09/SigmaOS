@@ -8,9 +8,9 @@
 // 6. arch-news Arch Linux News & Manual Intervention Detector
 // 7. pkgctl Devtools Package Repo Management Engine
 // 8. pacman File Collision & Conflict Resolution Engine
-// 9. mkinitcpio Modular Initramfs Hooks Engine
+// 9. pacman Hooks Execution Engine
 // 10. pacstrap & arch-chroot Rootfs Chroot Engine
-// 11. pacman-key PQC Dilithium5 Keyring Engine
+// 11. pacman-key PQC Dilithium5 Keyring Engine & Cache Scrubber
 // 12. arch-audit CVE Vulnerability Scanner Engine
 // 13. archinstall Profile & Automated Installer Engine
 
@@ -765,6 +765,33 @@ impl ArchPacmanCacheScrubber {
         Self {
             cached_files: Vec::new(),
             retain_keep_count,
+        }
+    }
+}
+
+impl Default for ArchPacmanKeyringPqcEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CachedPackageFile {
+    pub pkgname: String,
+    pub version: String,
+    pub file_size_bytes: u64,
+}
+
+pub struct ArchPacmanCacheScrubber {
+    pub cached_files: Vec<CachedPackageFile>,
+    pub retain_keep_count: usize,
+}
+
+impl ArchPacmanCacheScrubber {
+    pub fn new(keep_count: usize) -> Self {
+        Self {
+            cached_files: Vec::new(),
+            retain_keep_count: keep_count,
         }
     }
 
