@@ -106,6 +106,13 @@ if [ -f "src/desktop/mint_backup_tool.rs" ]; then
     ./build/mint_backup_tool_test
 fi
 
+if [ -f "src/backup/sovereign_backup_and_recovery_advancements.rs" ]; then
+    echo "Running Sovereign Backup & Recovery Advancements Master Suite test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/backup/sovereign_backup_and_recovery_advancements.rs -o build/sovereign_backup_advancements_test
+    ./build/sovereign_backup_advancements_test
+fi
+
 if [ -f "src/distro/linux_bsd_inspirations.rs" ]; then
     echo "Running Linux & BSD distro inspirations & subsystem bridge test suite..."
     mkdir -p build
