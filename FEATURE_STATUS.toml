@@ -292,26 +292,40 @@ description = "ChaCha20-Poly1305 AEAD with RFC 8439 test vectors"
 test_evidence = "Unit tests with RFC 8439 vectors"
 next_milestone = "ARM NEON acceleration"
 
+[scheduler.core]
+status = "prototype"
+files = ["src/scheduler/scheduler.rs", "src/kernel/scheduler.rs"]
+description = "Core run-queue operations, class dispatch interface, and task state transitions"
+test_evidence = "Unit tests for run queues and state machine stubs"
+next_milestone = "Integration with task lifecycle and timer preemption"
+
 [scheduler.bore]
-status = "working"
+status = "prototype"
 files = ["src/scheduler/bore.rs"]
 description = "BORE burst-scored scheduling with interactive task boosting"
-test_evidence = "Unit tests for burst scoring and priority"
-next_milestone = "Integration with EEVDF as hybrid scheduler"
+test_evidence = "Unit tests for burst scoring, EMA decay, and priority"
+next_milestone = "Integration with Fair class preemption logic"
 
 [scheduler.cfs]
-status = "working"
-files = ["src/scheduler/cfs.rs"]
+status = "prototype"
+files = ["src/kernel/cfs_scheduler.rs", "src/scheduler/distro_schedulers.rs"]
 description = "CFS with vruntime, weight table, group scheduling stubs"
-test_evidence = "Unit tests for fairness"
-next_milestone = "Autogroup scheduling"
+test_evidence = "Unit tests for vruntime and fairness"
+next_milestone = "Autogroup scheduling and timer tick integration"
 
 [scheduler.realtime]
-status = "working"
-files = ["src/scheduler/realtime.rs"]
+status = "prototype"
+files = ["src/scheduler/distro_schedulers.rs", "src/kernel/roundrobin.rs"]
 description = "SCHED_FIFO + SCHED_RR with 100 priority levels, bitmap-based O(1) pick"
 test_evidence = "Unit tests for FIFO order and RR rotation"
-next_milestone = "Deadline scheduling (SCHED_DEADLINE)"
+next_milestone = "RT bandwidth throttling and permission checks"
+
+[scheduler.eevdf]
+status = "prototype"
+files = ["src/scheduler/eevdf.rs", "src/kernel/sigma_scheduler_eevdf.rs"]
+description = "EEVDF virtual deadline scheduling algorithm with lag and eligibility tracking"
+test_evidence = "Unit tests for eligibility, lag calculation, and deadline ordering"
+next_milestone = "Evaluation as primary Fair scheduling class"
 
 [security.landlock_v4]
 status = "working"
