@@ -871,6 +871,20 @@ if [ -f "src/distro/sovereign_arch_gap_closure_pr_engine.rs" ]; then
     ./build/test_arch_pr_engine
 fi
 
+if [ -f "src/distro/open_source_os_unimplemented_ideas_pr_suite.rs" ]; then
+    echo "Running Open Source OS Unimplemented Ideas PR Suite test suite..."
+    mkdir -p build
+    rustc --test src/distro/open_source_os_unimplemented_ideas_pr_suite.rs --edition=2021 -o build/test_open_source_os_unimplemented_ideas_pr_suite
+    ./build/test_open_source_os_unimplemented_ideas_pr_suite
+fi
+
+if [ -f "src/distro/cachy_linux_missing_components_engine.rs" ]; then
+    echo "Running Cachy Linux Missing Components Engine test suite..."
+    mkdir -p build
+    rustc --test src/distro/cachy_linux_missing_components_engine.rs --edition=2021 -o build/test_cachy_linux_missing_components_engine
+    ./build/test_cachy_linux_missing_components_engine
+fi
+
 if [ -f "src/distro/sovereign_linux_bsd_ecosystem_advancements_v29.rs" ]; then
     echo "Running Sovereign Linux & BSD Ecosystem Advancements V29 test suite..."
     mkdir -p build

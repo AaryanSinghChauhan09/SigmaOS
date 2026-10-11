@@ -544,6 +544,12 @@ pub use sovereign_omarchy_github_repo_parity::*;
 pub mod open_source_os_unimplemented_ideas_pr;
 pub use open_source_os_unimplemented_ideas_pr::*;
 
+pub mod open_source_os_unimplemented_ideas_pr_suite;
+pub use open_source_os_unimplemented_ideas_pr_suite::*;
+
+pub mod cachy_linux_missing_components_engine;
+pub use cachy_linux_missing_components_engine::*;
+
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;
 pub use crate::stubs::large_distro_stubs::*;
