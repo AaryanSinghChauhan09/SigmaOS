@@ -1104,6 +1104,15 @@ impl ArchPacmanCacheScrubber {
             retain_keep_count,
         }
     }
+}
+
+impl ArchPacmanCacheScrubber {
+    pub fn new(retain_keep_count: usize) -> Self {
+        Self {
+            cached_files: Vec::new(),
+            retain_keep_count,
+        }
+    }
 
     /// Calculates which old package cache files should be purged
     pub fn purge_unneeded_cache(&self) -> (usize, u64) {
