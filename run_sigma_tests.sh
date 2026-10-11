@@ -331,6 +331,13 @@ if [ -f "src/kernel/sovereign_smp_xhci_apc_synthesis.rs" ]; then
     ./build/sovereign_smp_xhci_apc_test
 fi
 
+if [ -f "src/kernel/sovereign_linux_bsd_kernel_innovations_pr.rs" ]; then
+    echo "Running Sovereign Linux & BSD Kernel Innovations PR Engine test suite..."
+    mkdir -p build
+    rustc --test src/kernel/sovereign_linux_bsd_kernel_innovations_pr.rs --edition=2021 -o build/sovereign_kernel_innovations_pr_test
+    ./build/sovereign_kernel_innovations_pr_test
+fi
+
 if [ -f "src/iso/sovereign_rufus_installer_synthesis.rs" ]; then
     echo "Running Sovereign Rufus & ISOHybrid Installer Synthesis test suite..."
     mkdir -p build
