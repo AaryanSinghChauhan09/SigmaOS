@@ -11,7 +11,9 @@
 
 pub mod allocator;
 pub mod cgroups;
+pub mod frame;
 pub mod kswapd;
+pub mod physical;
 pub mod low_level;
 pub mod page_cache;
 pub mod paging;
@@ -45,3 +47,6 @@ pub use segmentation_paging::{
 pub use thp::{HugePageBlock, HugePageFlags, SovereignHugePageEngine, TransparentHugePageMode};
 pub use tlb_associative::{AssociativeTlbCache, TlbAssociativityMode, TlbEntry, TlbPageFlags};
 pub use zone::{BsdZoneAllocator, Slab, Zone, ZoneStats};
+
+pub use frame::{Frame, FrameDescriptor, FrameFlags, FrameState, PAGE_SIZE_4K};
+pub use physical::{FrameAllocationError, PhysicalMemoryManager, PhysicalResult};
