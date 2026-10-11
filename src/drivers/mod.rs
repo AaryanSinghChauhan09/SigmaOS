@@ -33,6 +33,7 @@ pub mod network;
 pub mod nl80211;
 pub mod nvme_driver;
 pub mod pci_bus;
+pub mod pcie_hotplug;
 pub mod peripheral;
 pub mod printing;
 pub mod rtc;
