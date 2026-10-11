@@ -576,7 +576,7 @@ impl NvmeController {
 
     pub fn read_sectors(
         &mut self,
-        namespace_id: u32,
+        _namespace_id: u32,
         start_lba: u64,
         num_sectors: u32,
         data_addr: u64,
@@ -652,7 +652,7 @@ impl NvmeController {
 
     pub fn write_sectors(
         &mut self,
-        namespace_id: u32,
+        _namespace_id: u32,
         start_lba: u64,
         num_sectors: u32,
         data_addr: u64,

@@ -330,7 +330,7 @@ impl IoUringV2 {
     pub fn submit_send_zc(
         &mut self,
         user_data: u64,
-        fd: i32,
+        _fd: i32,
         buf_index: u16,
         len: u32,
     ) -> Result<(), &'static str> {
@@ -358,7 +358,7 @@ impl IoUringV2 {
     pub fn submit_accept_multishot(
         &mut self,
         user_data: u64,
-        listen_fd: i32,
+        _listen_fd: i32,
     ) -> Result<(), &'static str> {
         let ms = MultishotState::new(user_data, IoUringOpV2::AcceptMultishot);
         self.multishots.push(ms);
@@ -394,7 +394,7 @@ impl IoUringV2 {
     pub fn submit_recv_multishot(
         &mut self,
         user_data: u64,
-        fd: i32,
+        _fd: i32,
         buf_index: u16,
     ) -> Result<(), &'static str> {
         if !self.registered_bufs.contains_key(&buf_index) {

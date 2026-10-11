@@ -172,7 +172,7 @@ impl HypnotixPlayer {
         if let Some(provider_id) = &self.current_provider {
             if let Some(provider) = self.providers.get(provider_id) {
                 let channel = provider.channels.iter().find(|c| c.id == channel_id);
-                if let Some(ch) = channel {
+                if let Some(_ch) = channel {
                     self.current_channel = Some(channel_id.to_string());
                     self.playback_state = PlaybackState::Buffering;
                     self.stream_info = Some(StreamInfo {
@@ -199,7 +199,7 @@ impl HypnotixPlayer {
         if let Some(provider_id) = &self.current_provider {
             if let Some(provider) = self.providers.get(provider_id) {
                 let movie = provider.movies.iter().find(|m| m.id == movie_id);
-                if let Some(m) = movie {
+                if let Some(_m) = movie {
                     self.current_channel = Some(movie_id.to_string());
                     self.playback_state = PlaybackState::Buffering;
                     self.stream_info = Some(StreamInfo {

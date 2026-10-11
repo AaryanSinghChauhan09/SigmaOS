@@ -186,7 +186,7 @@ impl HyprlandTilingManager {
 
     /// Switch workspace
     pub fn switch_workspace(&mut self, id: u32) -> Result<(), String> {
-        if let Some(workspace) = self.workspaces.get(&id) {
+        if let Some(_workspace) = self.workspaces.get(&id) {
             self.current_workspace = id;
             for ws in self.workspaces.values_mut() {
                 ws.is_active = ws.id == id;

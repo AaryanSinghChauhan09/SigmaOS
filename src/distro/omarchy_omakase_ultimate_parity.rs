@@ -321,7 +321,8 @@ impl OmarchyHyprlockScreenLocker {
     }
 
     pub fn authenticate_and_unlock(&mut self, password: &str) -> bool {
-        if password == "sigma_secret" || !password.is_empty() {
+        // Accept any non-empty password (real implementation uses PAM)
+        if !password.is_empty() {
             self.is_locked = false;
             self.failed_attempts = 0;
             true

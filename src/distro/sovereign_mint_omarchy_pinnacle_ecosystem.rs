@@ -331,7 +331,7 @@ impl SovereignCinnamonScreenLockAndBioAuth {
 
     pub fn unlock_with_credential(
         &mut self,
-        cred_type: AuthCredentialType,
+        _cred_type: AuthCredentialType,
         is_valid: bool,
     ) -> bool {
         if !is_valid {

@@ -341,7 +341,7 @@ impl PhotoFlareEditor {
     }
 
     /// Apply filter
-    pub fn apply_filter(&mut self, filter: FilterType, intensity: f64) -> Result<(), String> {
+    pub fn apply_filter(&mut self, filter: FilterType, _intensity: f64) -> Result<(), String> {
         if let Some(idx) = self.current_document {
             if let Some(doc) = self.documents.get_mut(idx) {
                 doc.history.push(HistoryEntry {
@@ -363,7 +363,7 @@ impl PhotoFlareEditor {
     pub fn apply_adjustment(
         &mut self,
         adjustment: AdjustmentType,
-        value: f64,
+        _value: f64,
     ) -> Result<(), String> {
         if let Some(idx) = self.current_document {
             if let Some(doc) = self.documents.get_mut(idx) {

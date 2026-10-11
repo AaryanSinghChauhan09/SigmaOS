@@ -204,7 +204,7 @@ impl ScreenshotCapture {
 
     /// Perform OCR
     pub fn perform_ocr(&mut self) -> Result<String, String> {
-        if let Some(screenshot) = &mut self.current_screenshot {
+        if let Some(_screenshot) = &mut self.current_screenshot {
             let text = "OCR extracted text".to_string();
             // In real implementation, this would use Tesseract or similar
             Ok(text.clone())
@@ -214,7 +214,7 @@ impl ScreenshotCapture {
     }
 
     /// Crop screenshot
-    pub fn crop(&mut self, x: u32, y: u32, width: u32, height: u32) -> Result<(), String> {
+    pub fn crop(&mut self, _x: u32, _y: u32, width: u32, height: u32) -> Result<(), String> {
         if let Some(screenshot) = &mut self.current_screenshot {
             screenshot.width = width;
             screenshot.height = height;

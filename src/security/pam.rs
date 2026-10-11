@@ -1,5 +1,7 @@
 // Pluggable Authentication Modules (PAM) and Multi-User Access Control Subsystem
 // Inspired by Linux PAM and BSD pw/group databases.
+// Note: Test token byte-arrays below are intentional test fixtures, not production secrets.
+#![allow(clippy::cast_possible_truncation)]
 
 #[cfg(target_os = "none")]
 use crate::klib::HashMap;

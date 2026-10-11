@@ -304,7 +304,7 @@ impl SigmaApt {
 
     fn fetch_package_list(
         &mut self,
-        source: &PackageSource,
+        _source: &PackageSource,
     ) -> Result<(), Box<dyn std::error::Error>> {
         // Simplified package list fetching
         // In reality, this would download and parse Packages.gz files

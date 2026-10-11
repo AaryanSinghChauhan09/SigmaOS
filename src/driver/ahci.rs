@@ -365,7 +365,7 @@ impl AhciController {
     pub fn build_command_with_prdt(
         &mut self,
         port_id: u8,
-        data_addr: u64,
+        _data_addr: u64,
         data_size: u32,
         is_write: bool,
     ) -> Result<AhciCommandHeader, &'static str> {

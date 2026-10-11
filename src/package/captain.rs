@@ -339,13 +339,13 @@ impl CaptainEngine {
     }
 
     /// Verify package checksum
-    pub fn verify_checksum(&self, path: &str, expected: &str) -> Result<bool, String> {
+    pub fn verify_checksum(&self, _path: &str, _expected: &str) -> Result<bool, String> {
         // Simulate checksum verification
         Ok(true)
     }
 
     /// Extract package contents
-    pub fn extract_package(&self, path: &str, dest: &str) -> Result<(), String> {
+    pub fn extract_package(&self, _path: &str, _dest: &str) -> Result<(), String> {
         // Simulate package extraction
         Ok(())
     }
