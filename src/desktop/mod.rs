@@ -20,6 +20,13 @@ pub use wayland::{
     WaylandPointer, WaylandKeyboard, WaylandTouch,
     init_wayland_compositor, get_wayland_compositor,
 };
+pub mod layer_shell;
+pub use layer_shell::{
+    Layer, Anchor, ExclusiveZone, LayerSurfaceState, LayerSurface,
+    LayerShellManager,
+    init_layer_shell_manager, get_layer_shell_manager,
+    create_hud_overlay, create_status_bar,
+};
 pub mod xreader;
 pub use xreader::*;
 pub mod walker_launcher;
