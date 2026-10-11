@@ -1,0 +1,35 @@
+[rule.boot_first]
+requirement = "Boot-affecting changes must include or preserve a boot-to-shell validation path."
+enforcement = "CI + review"
+
+[rule.no_model_only_completion]
+requirement = "A subsystem cannot be marked complete from model tests alone."
+enforcement = "Status audit"
+
+[rule.syscall_contract]
+requirement = "Every syscall defines validation, capability, error, restart, and compatibility behavior."
+enforcement = "Syscall table test + review"
+
+[rule.memory_safety]
+requirement = "Allocation, ownership, locking, and interrupt-context rules must be explicit."
+enforcement = "Review + tests"
+
+[rule.driver_evidence]
+requirement = "Driver support claims require hardware or emulator evidence."
+enforcement = "Hardware matrix audit"
+
+[rule.fuzz_coverage]
+requirement = "Parsers and external-input paths require fuzz targets."
+enforcement = "CI fuzz smoke"
+
+[rule.panic_discipline]
+requirement = "Panics are allowed only for unrecoverable invariant violations and must produce diagnostics."
+enforcement = "Review"
+
+[rule.security_review]
+requirement = "Privilege, syscall, crypto, driver, filesystem, and network changes require security review."
+enforcement = "CODEOWNERS + label"
+
+[rule.status_evidence]
+requirement = "FEATURE_STATUS and CAPABILITY_MATRIX changes require linked evidence."
+enforcement = "CI + review"

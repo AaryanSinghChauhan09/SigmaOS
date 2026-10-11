@@ -1,0 +1,39 @@
+name: SigmaOS QEMU Boot Smoke Test
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    - cron: '0 0 * * *' # Daily boot validation
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  boot-smoke:
+    name: QEMU Boot-to-Shell Smoke Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run Boot-to-Shell Smoke Test
+        run: |
+          chmod +x scripts/ci/qemu_boot_smoke.sh
+          ./scripts/ci/qemu_boot_smoke.sh
+
+      - name: Upload Boot Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qemu-boot-smoke-artifact
+          path: build/boot/boot_smoke_result.json

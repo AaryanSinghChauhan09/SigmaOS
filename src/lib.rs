@@ -25,6 +25,7 @@ pub mod dashboard;
 pub mod desktop;
 pub mod development;
 pub mod device;
+pub mod diagnostics;
 pub mod distro;
 pub mod input;
 pub mod ipc;
