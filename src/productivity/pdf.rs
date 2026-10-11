@@ -112,7 +112,7 @@ impl SovereignPdf24Engine {
         let mut splitted = PdfDocument::new(format!("Split Range {}-{}", start_page, end_page));
         for i in (start_page - 1)..end_page {
             let mut page = document.pages[i].clone();
-            page.page_number = i - start_page + 2;
+            page.page_number = i + 1 - (start_page - 1);
             splitted.add_page(page);
         }
         Ok(splitted)
