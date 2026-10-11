@@ -149,6 +149,20 @@ if [ -f "src/distro/sovereign_arch_gap_closure_pr_engine.rs" ]; then
     ./build/test_arch_pr_engine
 fi
 
+if [ -f "src/compatibility/sovereign_fedora_pr_components_engine.rs" ]; then
+    echo "Running Sovereign Fedora PR Components Deployment test suite..."
+    mkdir -p build
+    rustc --test src/compatibility/sovereign_fedora_pr_components_engine.rs --edition=2021 -o build/test_fedora_pr_deploy
+    ./build/test_fedora_pr_deploy
+fi
+
+if [ -f "src/compatibility/sovereign_mint_pr_components_engine.rs" ]; then
+    echo "Running Sovereign Linux Mint PR Components Deployment test suite..."
+    mkdir -p build
+    rustc --test src/compatibility/sovereign_mint_pr_components_engine.rs --edition=2021 -o build/test_mint_pr_deploy
+    ./build/test_mint_pr_deploy
+fi
+
 if [ -f "src/distro/linux_bsd_distro_breakthroughs.rs" ]; then
     echo "Running Linux & BSD Distro Breakthroughs test suite..."
     mkdir -p build
