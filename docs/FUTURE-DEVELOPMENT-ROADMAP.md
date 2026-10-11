@@ -214,10 +214,12 @@ SigmaOS embeds native compliance verification directly into the OS runtime and C
 
 ### Phase 1: Foundation Hardening (Months 1 - 3)
 - Formalize `#![no_std]` core primitives, bare-metal memory allocators, and x86_64/ARM64 interrupt descriptor tables.
+- Execute Process Synchronization Plan Phase 1 (PRs 1–8: wait queues, mutexes, spinlocks, completions, semaphores; see [`docs/PROCESS_SYNCHRONIZATION_PLAN.md`](PROCESS_SYNCHRONIZATION_PLAN.md)).
 - Achieve 100% test pass rate across unit, integration, and standalone test runners.
 
 ### Phase 2: Linux Compatibility Layer (Months 4 - 6)
 - Expand POSIX and Linux 6.12+ syscall gates (`io_uring`, `Landlock v5`, `sched_ext`, `bcachefs` shims).
+- Execute Process Synchronization Plan Phase 2 & 3 (PRs 9–14: condvars, futex syscalls, process-shared IPC sync; see [`docs/PROCESS_SYNCHRONIZATION_PLAN.md`](PROCESS_SYNCHRONIZATION_PLAN.md)).
 - Implement zero-copy ABI translation for glibc/musl binaries.
 
 ### Phase 3: Storage & Filesystem Layer (Months 7 - 9)
