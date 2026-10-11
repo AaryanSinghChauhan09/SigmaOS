@@ -35,6 +35,7 @@ pub mod driver;
 pub mod drivers;
 pub use drivers::sovereign_comprehensive_drivers::*;
 pub mod crypto;
+pub mod fs;
 pub mod filesystem;
 pub mod futuristic_modules;
 pub mod governance;
