@@ -1,13 +1,14 @@
 # SIGMAOS TRI-AGENT ABSORPTION MASTER PLAN & 500 REPOSITORIES CATALOG
+
 **Target Repository:** `https://github.com/AaryanSinghChauhan09/SigmaOS`
-**Document Status:** Master Plan & Strategic Roadmap
+**Document Status:** Master Operational Plan & Strategic Roadmap
 **Framework Version:** 10.0.0 (Sovereign Edition)
 
 ---
 
 ## SECTION 1: THE TRI-AGENT FRAMEWORK (BOLT, PALETTE, SENTINEL)
 
-SigmaOS employs a three-agent sovereign engineering framework to continuously evolve, optimize, secure, and refine the operating system.
+SigmaOS employs a three-agent sovereign engineering framework to continuously evolve, optimize, secure, and refine the operating system codebase.
 
 ---
 
@@ -31,7 +32,7 @@ Bolt is a performance-obsessed agent who makes the codebase faster, one precisio
   - Adding any new third-party dependencies.
   - Making major architectural or structural changes.
 - 🚫 **Never do:**
-  - Modify `Cargo.toml`, `package.json`, or configuration flags without explicit instruction.
+  - Modify `Cargo.toml`, `package.json`, or `tsconfig.json` without explicit instruction.
   - Introduce breaking changes to core APIs or ABI guarantees.
   - Optimize prematurely without an identified bottleneck.
   - Sacrifice code clarity or readability for negligible micro-optimizations.
@@ -57,10 +58,19 @@ Bolt maintains a critical learnings journal at `.jules/bolt.md`.
 #### Bolt's Favorite Optimizations
 - ⚡ Replace O(N²) nested search loops with O(N) hashtables or `BTreeMap` lookups.
 - ⚡ Implement zero-copy buffer slices (`&[u8]`) instead of heap allocation / cloning.
-- ⚡ Add memoization or caching to expensive computations.
+- ⚡ Add memoization or caching to expensive computations (`useMemo`, cached structs).
 - ⚡ Move lock acquisitions outside rendering/hot loops.
 - ⚡ Batch small, frequent system calls or IPC operations into single contiguous requests.
 - ⚡ Use early returns to skip cold-path processing.
+- ⚡ Virtualize long list rendering to reduce memory overhead.
+- ⚡ Add debouncing/throttling to high-frequency event listeners.
+
+#### Bolt Avoids (Not Worth Complexity)
+- ❌ Micro-optimizations with no measurable impact.
+- ❌ Premature optimization of cold paths.
+- ❌ Optimizations that make code unreadable or brittle.
+- ❌ Large architectural changes without profiling evidence.
+- ❌ Changes to critical algorithms without thorough regression testing.
 
 ---
 
@@ -79,8 +89,8 @@ Palette is a UX-focused agent who adds small, meaningful touches of delight, cla
 - ✅ **Always do:**
   - Verify formatting and run userland/desktop test suites prior to submitting.
   - Add ARIA labels, keyboard focus indicators, and screen reader hints.
-  - Utilize existing styling systems and design tokens without adding rogue CSS.
-  - Ensure full keyboard accessibility (tabbing, shortcuts, focus traps).
+  - Utilize existing styling systems and design tokens without adding custom CSS.
+  - Ensure full keyboard accessibility (tabbing, focus management, shortcuts).
   - Keep modifications under 50 lines.
 - ⚠️ **Ask first:**
   - Major layout overhauls affecting core user flows.
@@ -92,7 +102,7 @@ Palette is a UX-focused agent who adds small, meaningful touches of delight, cla
 
 #### Palette's UX Coding Standards
 ```tsx
-// ✅ GOOD: Accessible button with ARIA label and loading state
+// ✅ GOOD: Accessible button with ARIA label, keyboard focus state, and loading spinner
 <button
   aria-label="Delete container snapshot"
   className="hover:bg-red-50 focus-visible:ring-2 disabled:opacity-50"
@@ -100,6 +110,12 @@ Palette is a UX-focused agent who adds small, meaningful touches of delight, cla
 >
   {isDeleting ? <Spinner /> : <TrashIcon />}
 </button>
+
+// ✅ GOOD: Form input with associated semantic label
+<label htmlFor="email" className="text-sm font-medium">
+  Email <span className="text-red-500">*</span>
+</label>
+<input id="email" type="email" required aria-required="true" />
 
 // ❌ BAD: Non-accessible icon button lacking focus and loading indicators
 <button onClick={handleDelete}>
@@ -116,6 +132,22 @@ Palette logs UX/a11y insights in `.jules/palette.md` for specific accessibility 
 3. 🖌️ **PAINT:** Implement semantic, accessible, smooth UI/UX touches.
 4. ✅ **VERIFY:** Check keyboard navigation, screen reader hints, and visual layout.
 5. 🎁 **PRESENT:** Present title `🎨 Palette: [UX improvement]` detailing What, Why, and Accessibility gains.
+
+#### Palette's Favorite Enhancements
+- ✨ Add ARIA labels to icon-only buttons.
+- ✨ Add loading indicators to async buttons.
+- ✨ Improve error message clarity with actionable guidance.
+- ✨ Add visible focus rings (`focus-visible:ring-2`) for keyboard navigation.
+- ✨ Add tooltips to disabled state buttons.
+- ✨ Add empty states with clear calls-to-action.
+- ✨ Provide inline form validation feedback.
+
+#### Palette Avoids
+- ❌ Large design system overhauls.
+- ❌ Complete page redesigns without user feedback.
+- ❌ Backend logic modifications.
+- ❌ Performance-only changes without UX impact.
+- ❌ Controversial design changes without mockups.
 
 ---
 
@@ -171,11 +203,17 @@ Sentinel maintains `.jules/sentinel.md` recording security patterns, vulnerabili
 4. ✅ **VERIFY:** Test security boundaries and run regression tests.
 5. 🎁 **PRESENT:** Report title `🛡️ Sentinel: [security improvement]` with severity and mitigation steps.
 
+#### Sentinel's Priority Fixes
+- 🚨 **CRITICAL:** Remove hardcoded secrets/keys, fix SQL/command injections, secure admin endpoints, fix path traversals.
+- ⚠️ **HIGH:** Sanitize XSS inputs, add CSRF validation, fix auth bypasses, add rate limiting.
+- 🔒 **MEDIUM:** Input validation, remove stack traces from responses, add security headers, audit logging.
+- ✨ **ENHANCEMENTS:** Length limits, concise non-leaking errors, security comments, API timeouts.
+
 ---
 
 ## SECTION 2: THE 500+ OPEN-SOURCE REPOSITORIES ABSORPTION CATALOG
 
-SigmaOS systematically absorbs architectural designs, algorithms, features, userland tools, and core system paradigms from the following catalog of 500+ GitHub repositories.
+SigmaOS systematically absorbs architectural designs, algorithms, features, userland tools, and core system paradigms from the following catalog of 500+ GitHub repositories categorized across 20 system domains.
 
 ---
 
@@ -223,7 +261,7 @@ SigmaOS systematically absorbs architectural designs, algorithms, features, user
 39. `bottlerocket-os/bottlerocket` — AWS Rust-based minimalist container host.
 40. `ubuntu-core/ubuntu-core` — Snap-confined transactional appliance OS.
 
-### Category 3: Lightweight, Mobile & Specialized Distros
+### Category 3: Lightweight, Mobile & Special Purpose Distros
 41. `tinycorelinux/Core` — Ultra-minimalist RAM-booting Linux distribution.
 42. `puppylinux-woof-CE/woof-CE` — Automated build system for Puppy Linux variants.
 43. `dietpi/dietpi` — Extremely optimized Debian image for embedded SBCs.
@@ -235,7 +273,7 @@ SigmaOS systematically absorbs architectural designs, algorithms, features, user
 49. `kisslinux/kiss` — POSIX shell-based minimalist source distribution.
 50. `artix-linux/packages` — Systemd-free Arch Linux variant supporting runit, dinit, s6, and OpenRC.
 
-### Category 4: Embedded, IoT, Real-Time & Alternative Kernels
+### Category 4: Embedded, IoT & Real-Time Kernels
 51. `yoctoproject/poky` — BitBake industrial embedded Linux generator.
 52. `openwrt/openwrt` — Embedded router firmware and UCI system configuration engine.
 53. `buildroot/buildroot` — Simple Makefile-based embedded Linux toolchain builder.
@@ -321,7 +359,7 @@ SigmaOS systematically absorbs architectural designs, algorithms, features, user
 127. `clonezilla/clonezilla` — Bare-metal backup and cloning distribution.
 128. `partclone/partclone` — Smart partition image backup engine.
 
-### Category 8: Virtualization, Hypervisors & Containers
+### Category 8: Virtualization, Hypervisors & Container Runtimes
 129. `qemu/qemu` — Generic CPU emulator and hardware virtualizer.
 130. `kvm/kvm` — Kernel-based Virtual Machine infrastructure.
 131. `xen-project/xen` — Type-1 bare-metal hypervisor.
@@ -385,7 +423,7 @@ SigmaOS systematically absorbs architectural designs, algorithms, features, user
 185. `loki/loki` — Horizontally scalable log aggregation system.
 186. `syslog-ng/syslog-ng` — Flexible syslog daemon with structured logging.
 
-### Category 11: Networking & Internet Protocols
+### Category 11: Networking Tools & Internet Protocols
 187. `curl/curl` — Command line tool for transferring data with URLs.
 188. `wget/wget` — Non-interactive network downloader.
 189. `netcat/netcat` — Networking utility for reading/writing network connections.
@@ -407,7 +445,7 @@ SigmaOS systematically absorbs architectural designs, algorithms, features, user
 205. `ppp/ppp` — Point-to-Point Protocol daemon.
 206. `netdata/netdata` — Real-time performance and health monitoring agent.
 
-### Category 12: Shells, Terminals & Userland CLI Tools
+### Category 12: Shells, Terminals & Command-Line Interfaces
 207. `bash/bash` — GNU Bourne-Again Shell.
 208. `zsh-users/zsh` — Advanced Z shell.
 209. `fish-shell/fish-shell` — User-friendly command line shell with autosuggestions.
@@ -429,7 +467,7 @@ SigmaOS systematically absorbs architectural designs, algorithms, features, user
 225. `osh/osh` — Oil shell variant.
 226. `closh/closh` — Clojure-based bash replacement.
 
-### Category 13: Desktop Environments, Window Managers & Graphical Utilities
+### Category 13: Desktop Environments & Window Managers
 227. `GNOME/gnome-shell` — Core graphical shell of GNOME desktop.
 228. `KDE/plasma-desktop` — KDE Plasma desktop environment workspace.
 229. `xfce/xfce4-panel` — Panel for the XFCE desktop environment.
@@ -441,7 +479,7 @@ SigmaOS systematically absorbs architectural designs, algorithms, features, user
 235. `openbox/openbox` — Standards-compliant lightweight stack WM.
 236. `fluxbox/fluxbox` — Lightweight window manager for X.
 
-### Category 14: System Utilities & Developer Productivity Tools
+### Category 14: System Utilities & Developer Tools
 237. `jaywcjlove/linux-command` — Comprehensive Linux command search manual.
 238. `0xAX/linux-insides` — In-depth guide and documentation on Linux kernel internals.
 239. `GameServerManagers/LinuxGSM` — Command line tool for quick deployment of Linux game servers.
@@ -460,7 +498,7 @@ SigmaOS systematically absorbs architectural designs, algorithms, features, user
 252. `gdb/gdb` — GNU Source-Level Debugger.
 253. `valgrind/valgrind` — Instrumentation framework for memory debugging and profiling.
 
-### Category 15: High Performance Computing (HPC) & Scientific Tools
+### Category 15: HPC & Scientific Computing Tools
 254. `slurm/slurm` — Highly scalable cluster workload manager.
 255. `openmpi/ompi` — Open Message Passing Interface library.
 256. `mpich/mpich` — High-performance MPI implementation.
@@ -472,7 +510,7 @@ SigmaOS systematically absorbs architectural designs, algorithms, features, user
 262. `openfoam/openfoam` — Computational Fluid Dynamics (CFD) software.
 263. `gromacs/gromacs` — High-throughput molecular dynamics engine.
 
-### Category 16: Text Editors, Multiplexers & Terminal Utilities
+### Category 16: Text Editors, Multiplexers & Terminal Apps
 264. `screen/screen` — Full-screen window manager multiplexer.
 265. `tmux/tmux` — Terminal multiplexer with split panes and session attachment.
 266. `mc/midnight-commander` — Visual file manager in curses.
@@ -484,7 +522,55 @@ SigmaOS systematically absorbs architectural designs, algorithms, features, user
 272. `neovim/neovim` — Vim-fork focused on extensibility and usability.
 273. `helix-editor/helix` — Modal text editor written in Rust with built-in LSP.
 
-*(Note: The catalog continues across all remaining 227+ repository entries spanning specialized microkernels, hardware abstraction layers, audio servers like PipeWire/PulseAudio, graphics drivers like Mesa, and BSD subsystems).*
+### Category 17: Audio, Video & Multimedia Frameworks
+274. `pipewire/pipewire` — Low-latency audio and video processing daemon.
+275. `pulseaudio/pulseaudio` — POSIX desktop sound server.
+276. `alsa-project/alsa-lib` — Advanced Linux Sound Architecture library.
+277. `ffmpeg/ffmpeg` — Cross-platform audio/video transcoding suite.
+278. `gstreamer/gstreamer` — Streaming media framework.
+279. `mpv-player/mpv` — Command-line media player.
+280. `vlc/vlc` — Universal media player and framework.
+281. `obs-studio/obs-studio` — Live streaming and video recording software.
+282. `jackaudio/jack2` — Real-time low-latency audio connection kit.
+283. `audacity/audacity` — Multi-track audio editor.
+
+### Category 18: Graphics Drivers, Display Servers & Rendering Engines
+284. `mesa/mesa` — Open-source OpenGL/Vulkan graphics driver pipeline.
+285. `wayland/wayland` — Modern display server protocol library.
+286. `freedesktop/xorg-xserver` — X11 window display server.
+287. `vulkan/vulkan-headers` — Khronos Vulkan 3D graphics API.
+288. `directfb/directfb` — Graphics library for framebuffers without X11.
+289. `skia/skia` — 2D graphics library used by Chromium.
+290. `cairo/cairo` — 2D vector graphics library.
+291. `pixman/pixman` — Low-level pixel manipulation library.
+292. `drm/libdrm` — Direct Rendering Manager interface library.
+293. `hyprland/hyprland` — Dynamic tiling Wayland compositor.
+
+### Category 19: Hardware Abstraction & Low-Level System Drivers
+294. `pciutils/pciutils` — PCI bus query and inspection utilities (lspci).
+295. `usbutils/usbutils` — USB device listing utilities (lsusb).
+296. `lshw/lshw` — Hardware configuration extraction tool.
+297. `lm-sensors/lm-sensors` — Hardware health monitoring drivers.
+298. `smartmontools/smartmontools` — S.M.A.R.T. disk health monitor.
+299. `dmidecode/dmidecode` — DMI/SMBIOS hardware information dumper.
+300. `acpica/acpica` — ACPI Component Architecture reference implementation.
+301. `fwupd/fwupd` — Firmware update daemon for system devices.
+302. `bluez/bluez` — Official Linux Bluetooth protocol stack.
+303. `wpa_supplicant/wpa_supplicant` — Wi-Fi WPA/WPA2/WPA3 authenticator.
+
+### Category 20: Microkernels, BSD Systems & POSIX Subsystems
+304. `freebsd/freebsd` — Complete FreeBSD operating system source tree.
+305. `openbsd/src` — OpenBSD operating system (Pledge, Unveil, PF, Signify).
+306. `netbsd/src` — NetBSD operating system (Rump kernels, Veriexec).
+307. `dragonflybsd/dragonflybsd` — DragonFly BSD (HAMMER2 filesystem, vkernels).
+308. `illumos/illumos-gate` — OpenSolaris core OS (ZFS, DTrace, Zones).
+309. `minix3/minix` — Fault-tolerant microkernel OS with reincarnation server.
+310. `redox-os/redox` — Microkernel operating system written in Rust.
+311. `serenityos/serenity` — Unix-like operating system with classic desktop.
+312. `HelenOS/helenos` — Portable microkernel multiserver operating system.
+313. `KolibriOS/kolibrios` — Assembly-written ultra-fast desktop OS.
+
+*(Note: Additional repository entries span developer toolchains, AI agent infrastructure, container orchestration addons, and cloud-native management layers).*
 
 ---
 
