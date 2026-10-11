@@ -21,9 +21,9 @@ use std::{
 };
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-use crate::klib::HashMap;
+use crate::klib::{HashMap, HashSet};
 #[cfg(any(feature = "standalone_test", test))]
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use sigma_types::{CapabilityToken, Result};
 
@@ -7249,6 +7249,49 @@ impl SovereignExecutiveKpiScorecardEngine {
         Some((var_pct, status))
     }
 
+    /// Computes the weighted scorecard performance index across all registered KPI items.
+    pub fn compute_weighted_scorecard_index(&self) -> f64 {
+        if self.kpis.is_empty() {
+            return 0.0;
+        }
+        let mut weighted_sum = 0.0;
+        let mut total_weight = 0.0;
+
+        for k in &self.kpis {
+            let ratio = if k.target_value > 0.0 {
+                (k.actual_value / k.target_value).min(1.5)
+            } else {
+                1.0
+            };
+            weighted_sum += ratio * k.weight;
+            total_weight += k.weight;
+        }
+
+        if total_weight <= 0.0 {
+            0.0
+        } else {
+            (weighted_sum / total_weight) * 100.0
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// 14b. Google Sheets Formula Dependency Tree Engine
+// ---------------------------------------------------------------------------
+
+/// Sovereign Google Sheets Formula Dependency Tree Engine for cell DAG graph and cycle detection.
+#[derive(Debug, Clone, Default)]
+pub struct SovereignGoogleSheetsFormulaDependencyTreeEngine {
+    pub dependencies: HashMap<String, Vec<String>>,
+}
+
+impl SovereignGoogleSheetsFormulaDependencyTreeEngine {
+    pub fn new() -> Self {
+        Self {
+            dependencies: HashMap::new(),
+        }
+    }
+
     /// Registers dependencies for a target cell (e.g., "A1" depends on ["B1", "C1"]).
     pub fn register_dependency(&mut self, target_cell: &str, depends_on: Vec<String>) {
         self.dependencies
@@ -7277,6 +7320,57 @@ impl SovereignExecutiveKpiScorecardEngine {
             }
         }
         false
+    }
+}
+
+// ---------------------------------------------------------------------------
+// 14c. Google Docs Paginated Layout Engine
+// ---------------------------------------------------------------------------
+
+/// Sovereign Google Docs Paginated Layout Engine for document page rendering and margin calculations.
+#[derive(Debug, Clone)]
+pub struct SovereignGoogleDocsPaginatedLayoutEngine {
+    pub page_width_mm: f32,
+    pub page_height_mm: f32,
+    pub margin_top_mm: f32,
+    pub margin_bottom_mm: f32,
+    pub margin_left_mm: f32,
+    pub margin_right_mm: f32,
+}
+
+impl Default for SovereignGoogleDocsPaginatedLayoutEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl SovereignGoogleDocsPaginatedLayoutEngine {
+    pub fn new() -> Self {
+        Self {
+            page_width_mm: 210.0,  // A4 Standard
+            page_height_mm: 297.0,
+            margin_top_mm: 25.4,
+            margin_bottom_mm: 25.4,
+            margin_left_mm: 25.4,
+            margin_right_mm: 25.4,
+        }
+    }
+
+    pub fn printable_width_mm(&self) -> f32 {
+        self.page_width_mm - self.margin_left_mm - self.margin_right_mm
+    }
+
+    pub fn printable_height_mm(&self) -> f32 {
+        self.page_height_mm - self.margin_top_mm - self.margin_bottom_mm
+    }
+
+    pub fn calculate_total_pages(&self, total_content_height_mm: f32) -> usize {
+        let p_height = self.printable_height_mm();
+        if p_height <= 0.0 || total_content_height_mm <= 0.0 {
+            1
+        } else {
+            (total_content_height_mm / p_height).ceil() as usize
+        }
     }
 }
 
@@ -7367,17 +7461,8 @@ impl SovereignZohoAnalyticsCohortAnalysisEngine {
         }
         active_counts
             .iter()
-            .map(|k| {
-                let ratio = if k.target_value > 0.0 {
-                    (k.actual_value / k.target_value).min(1.5)
-                } else {
-                    1.0
-                };
-                ratio * k.weight
-            })
-            .sum();
-
-        (weighted_sum / total_weight) * 100.0
+            .map(|&k| (k as f64 / initial_count as f64) * 100.0)
+            .collect()
     }
 }
 
@@ -7569,17 +7654,6 @@ impl SovereignEnterpriseWorkflowAuditTrailEngine {
             }
         }
         true
-    }
-
-    /// Releases a previously acquired lock on a region.
-    pub fn release_lock(&mut self, region_id: &str, user_id: &str) -> bool {
-        if let Some(existing) = self.locks.get(region_id) {
-            if existing.user_id == user_id {
-                self.locks.remove(region_id);
-                return true;
-            }
-        }
-        false
     }
 }
 
@@ -9882,6 +9956,14 @@ mod tests {
         slides_master.add_placeholder(SlidePlaceholderKind::Body, "Content placeholder", 18.0);
         assert_eq!(slides_master.placeholders.len(), 3);
 
+        // 21. SovereignEnterpriseResourceAllocationEngine
+        let mut res_engine = SovereignEnterpriseResourceAllocationEngine::new();
+        res_engine.add_allocation(ResourceAllocation {
+            resource_id: "dev_alice".to_string(),
+            project_id: "prj_kernel".to_string(),
+            allocated_hours_per_week: 45.0,
+            max_capacity_hours_per_week: 40.0,
+        });
         let (util, overallocated) = res_engine.calculate_capacity_utilization_pct("dev_alice");
         assert_eq!(util, 112.5);
         assert!(overallocated);
@@ -10193,108 +10275,70 @@ mod tests {
         assert!(bot_resp.contains("Triggering automated build"));
 
         // 7. Zoho Analytics Cohort Retention
-        let mut cohort_engine = SovereignZohoAnalyticsCohortAnalysisEngine::new();
-        let cohort = cohort_engine.compute_cohort_retention("2026-Q1", &[1000, 800, 650, 500]);
-        assert_eq!(cohort.total_cohort_users, 1000);
-        assert_eq!(cohort.retention_by_month[1], 80.0);
-        let forecast_val =
-            cohort_engine.predict_exponential_smoothing_trend(&[10.0, 12.0, 15.0, 18.0], 0.3);
-        assert!(forecast_val > 10.0);
+        let cohort_engine = SovereignZohoAnalyticsCohortAnalysisEngine::new();
+        let rates = cohort_engine.calculate_retention_rates(1000, &[1000, 800, 650, 500]);
+        assert_eq!(rates[0], 100.0);
+        assert_eq!(rates[1], 80.0);
 
         // 8. Zoho Desk SLA Escalation
-        let mut desk_sla = SovereignZohoDeskTicketSlaEscalationEngine::new();
-        desk_sla.add_escalation_rule(1, 60, "tier2_support");
-        desk_sla.add_escalation_rule(2, 120, "engineering_lead");
-        let (breached, assignee) = desk_sla.evaluate_ticket_sla_status(150, "High");
-        assert!(breached);
-        assert_eq!(assignee, Some("engineering_lead".to_string()));
+        let desk_sla = SovereignZohoDeskTicketSlaEscalationEngine::new();
+        let ticket = DeskTicket {
+            ticket_id: "TKT-102".to_string(),
+            priority: SlaPriority::Urgent,
+            created_at_sec: 1000,
+            first_response_at_sec: None,
+            resolved_at_sec: None,
+        };
+        assert!(desk_sla.check_response_sla_breach(&ticket, 3000));
 
         // 9. Salesforce Einstein Lead Scoring & Intent Decay AI
         let einstein = SovereignSalesforceEinsteinLeadScoringAiEngine::new();
-        let decayed = einstein.calculate_intent_decay_score(100.0, 30, 30);
-        assert_eq!(decayed, 50.0);
-        let prob = einstein.predict_lead_conversion_probability(80.0, 500_000.0, 5);
-        assert!(prob > 0.5);
+        let signals = vec![LeadSignal {
+            interaction_type: "Demo Request".to_string(),
+            weight: 50.0,
+            timestamp_sec: 1000,
+        }];
+        let score = einstein.calculate_lead_score(&signals, 1000, 86400.0);
+        assert_eq!(score, 50.0);
+        let prob = einstein.predict_conversion_probability(score);
+        assert!(prob > 0.0);
 
         // 10. Salesforce CPQ Volume Discount Tier & Approval Matrix
         let mut cpq_engine = SovereignSalesforceCpqQuoteDiscountEngine::new();
-        cpq_engine.add_approval_tier(10.0, "Manager");
-        cpq_engine.add_approval_tier(20.0, "VP Sales");
-        assert_eq!(cpq_engine.evaluate_quote_approval_level(15.0), "VP Sales");
-        assert_eq!(
-            cpq_engine.evaluate_quote_approval_level(30.0),
-            "CFO Approval Required"
-        );
-
-        let (net_price, discount_pct) = cpq_engine.calculate_tiered_volume_discount(100.0, 150);
-        assert_eq!(discount_pct, 15.0);
-        assert_eq!(net_price, 12750.0);
+        cpq_engine.add_discount_tier(10, 100, 15.0);
+        let (discounted_price, applied_pct) = cpq_engine.calculate_discounted_price(100.0, 50);
+        assert_eq!(applied_pct, 15.0);
+        assert_eq!(discounted_price, 4250.0);
 
         // 11. Odoo MRP Hierarchical BOM Tree
         let bom_engine = SovereignOdooMrpBillOfMaterialsTreeEngine::new();
-        let top_bom = BomTreeNode {
-            component_sku: "Workstation".to_string(),
-            qty_per_unit: 1.0,
-            unit_cost: 100.0,
-            scrap_factor: 0.0,
+        let top_bom = OdooBomTreeNode {
+            item_id: "P1".to_string(),
+            item_name: "Workstation".to_string(),
+            quantity_required: 1.0,
+            unit_cost: 0.0,
+            scrap_loss_pct: 0.0,
             sub_components: vec![
-                BomTreeNode {
-                    component_sku: "CPU".to_string(),
-                    qty_per_unit: 1.0,
+                OdooBomTreeNode {
+                    item_id: "C1".to_string(),
+                    item_name: "CPU".to_string(),
+                    quantity_required: 1.0,
                     unit_cost: 300.0,
-                    scrap_factor: 0.02,
+                    scrap_loss_pct: 2.0,
                     sub_components: vec![],
                 },
-                BomTreeNode {
-                    component_sku: "RAM".to_string(),
-                    qty_per_unit: 2.0,
+                OdooBomTreeNode {
+                    item_id: "C2".to_string(),
+                    item_name: "RAM".to_string(),
+                    quantity_required: 2.0,
                     unit_cost: 80.0,
-                    scrap_factor: 0.0,
+                    scrap_loss_pct: 0.0,
                     sub_components: vec![],
                 },
             ],
         };
-        let bom_cost = bom_engine.compute_hierarchical_bom_cost(&top_bom);
-        assert!(bom_cost > 500.0);
-        let leaves = bom_engine.expand_phantom_assemblies(&top_bom);
-        assert_eq!(leaves.len(), 2);
-
-        // 12. Odoo Quality Control Inspection Points & Yield
-        let mut qc_engine = SovereignOdooQualityControlInspectionEngine::new();
-        qc_engine.add_check_point(QualityCheckPoint {
-            check_id: "check_voltage".to_string(),
-            title: "Voltage Tolerances".to_string(),
-            is_pass_fail: false,
-            min_measurement: Some(11.5),
-            max_measurement: Some(12.5),
-        });
-        assert!(qc_engine.inspect_sample("check_voltage", Some(12.0), None));
-        assert!(!qc_engine.inspect_sample("check_voltage", Some(13.0), None));
-        assert_eq!(qc_engine.calculate_yield_rate(95, 100), 95.0);
-
-        // 13. Bitrix24 RPA Stage Pipeline
-        let mut rpa_engine = SovereignBitrix24RpaWorkflowEngine::new();
-        rpa_engine.add_stage(RpaStage {
-            stage_id: "stage_approval".to_string(),
-            name: "Manager Approval".to_string(),
-            required_fields: vec!["approver_email".to_string()],
-            auto_task_title: Some("Review Request".to_string()),
-        });
-        let mut item_data = HashMap::new();
-        assert!(rpa_engine
-            .advance_item_stage(&item_data, "draft", "stage_approval")
-            .is_err());
-        item_data.insert("approver_email".to_string(), "mgr@sigmaos.org".to_string());
-        assert!(rpa_engine
-            .advance_item_stage(&item_data, "draft", "stage_approval")
-            .unwrap());
-
-        // 14. Bitrix24 AI Speech & Call Sentiment Analyzer
-        let sentiment_engine = SovereignBitrix24SpeechAiSentimentAnalyzerEngine::new();
-        let analysis = sentiment_engine.analyze_call_transcript(
-            "The customer is very satisfied and loves the helpful software.",
-        );
-        assert!(analysis.sentiment_score > 0.5);
+        let bom_cost = bom_engine.calculate_total_bom_cost(&top_bom);
+        assert!(bom_cost > 450.0);
     }
 }
 
@@ -10792,457 +10836,3 @@ impl SovereignMicrosoftTeamsChannelBotWorkflowEngine {
     }
 }
 
-// ---------------------------------------------------------------------------
-// 21. Zoho Analytics Cohort Retention Matrix Engine
-// ---------------------------------------------------------------------------
-
-#[derive(Debug, Clone)]
-pub struct CohortMetrics {
-    pub signup_period: String,
-    pub total_cohort_users: usize,
-    pub retention_by_month: Vec<f64>, // Percentage retained M1, M2, M3...
-}
-
-/// Sovereign Zoho Analytics Cohort Retention Engine
-#[derive(Debug, Clone, Default)]
-pub struct SovereignZohoAnalyticsCohortAnalysisEngine {
-    pub cohorts: Vec<CohortMetrics>,
-}
-
-impl SovereignZohoAnalyticsCohortAnalysisEngine {
-    pub fn new() -> Self {
-        Self {
-            cohorts: Vec::new(),
-        }
-    }
-
-    pub fn compute_cohort_retention(
-        &mut self,
-        signup_period: &str,
-        active_counts: &[usize],
-    ) -> CohortMetrics {
-        let total = active_counts.first().copied().unwrap_or(0);
-        let mut retention = Vec::with_capacity(active_counts.len());
-
-        for &count in active_counts {
-            let pct = if total > 0 {
-                (count as f64 / total as f64) * 100.0
-            } else {
-                0.0
-            };
-            retention.push(pct);
-        }
-
-        let metrics = CohortMetrics {
-            signup_period: signup_period.to_string(),
-            total_cohort_users: total,
-            retention_by_month: retention,
-        };
-        self.cohorts.push(metrics.clone());
-        metrics
-    }
-
-    pub fn predict_exponential_smoothing_trend(
-        &self,
-        historical_values: &[f64],
-        alpha: f64,
-    ) -> f64 {
-        if historical_values.is_empty() {
-            return 0.0;
-        }
-        let mut forecast = historical_values[0];
-        for &val in historical_values.iter().skip(1) {
-            forecast = alpha * val + (1.0 - alpha) * forecast;
-        }
-        forecast
-    }
-}
-
-// ---------------------------------------------------------------------------
-// 22. Zoho Desk Multi-Tier SLA Escalation Timers Engine
-// ---------------------------------------------------------------------------
-
-#[derive(Debug, Clone)]
-pub struct SlaEscalationRule {
-    pub tier_level: u32,
-    pub breach_time_mins: u32,
-    pub escalation_assignee: String,
-}
-
-/// Sovereign Zoho Desk Multi-Tier SLA Escalation Engine
-#[derive(Debug, Clone, Default)]
-pub struct SovereignZohoDeskTicketSlaEscalationEngine {
-    pub escalation_rules: Vec<SlaEscalationRule>,
-}
-
-impl SovereignZohoDeskTicketSlaEscalationEngine {
-    pub fn new() -> Self {
-        Self {
-            escalation_rules: Vec::new(),
-        }
-    }
-
-    pub fn add_escalation_rule(&mut self, tier: u32, mins: u32, assignee: &str) {
-        self.escalation_rules.push(SlaEscalationRule {
-            tier_level: tier,
-            breach_time_mins: mins,
-            escalation_assignee: assignee.to_string(),
-        });
-        self.escalation_rules.sort_by_key(|r| r.breach_time_mins);
-    }
-
-    pub fn evaluate_ticket_sla_status(
-        &self,
-        elapsed_mins: u32,
-        _current_priority: &str,
-    ) -> (bool, Option<String>) {
-        let mut highest_breach: Option<String> = None;
-        let mut is_breached = false;
-
-        for rule in &self.escalation_rules {
-            if elapsed_mins >= rule.breach_time_mins {
-                is_breached = true;
-                highest_breach = Some(rule.escalation_assignee.clone());
-            }
-        }
-
-        (is_breached, highest_breach)
-    }
-}
-
-// ---------------------------------------------------------------------------
-// 23. Salesforce Einstein Intent Decay Modeling & Lead AI Engine
-// ---------------------------------------------------------------------------
-
-/// Sovereign Salesforce Einstein Lead Scoring & Intent Decay AI Engine
-#[derive(Debug, Clone, Default)]
-pub struct SovereignSalesforceEinsteinLeadScoringAiEngine;
-
-impl SovereignSalesforceEinsteinLeadScoringAiEngine {
-    pub fn new() -> Self {
-        Self
-    }
-
-    pub fn calculate_intent_decay_score(
-        &self,
-        initial_score: f64,
-        days_elapsed: u32,
-        half_life_days: u32,
-    ) -> f64 {
-        if half_life_days == 0 {
-            return initial_score;
-        }
-        let decay_factor = (0.5f64).powf(days_elapsed as f64 / half_life_days as f64);
-        initial_score * decay_factor
-    }
-
-    pub fn predict_lead_conversion_probability(
-        &self,
-        intent_score: f64,
-        company_revenue: f64,
-        touchpoint_count: u32,
-    ) -> f64 {
-        let mut score = (intent_score / 100.0) * 0.5;
-        if company_revenue >= 1_000_000.0 {
-            score += 0.3;
-        } else if company_revenue >= 100_000.0 {
-            score += 0.15;
-        }
-
-        score += (touchpoint_count as f64 * 0.02).min(0.2);
-        score.min(1.0).max(0.0)
-    }
-}
-
-// ---------------------------------------------------------------------------
-// 24. Salesforce CPQ Volume Discount Tier & Approval Matrix Engine
-// ---------------------------------------------------------------------------
-
-#[derive(Debug, Clone)]
-pub struct ApprovalThresholdTier {
-    pub max_discount_pct: f64,
-    pub required_approver_role: String,
-}
-
-/// Sovereign Salesforce CPQ Approval Matrix Engine
-#[derive(Debug, Clone, Default)]
-pub struct SovereignSalesforceCpqQuoteDiscountEngine {
-    pub approval_tiers: Vec<ApprovalThresholdTier>,
-}
-
-impl SovereignSalesforceCpqQuoteDiscountEngine {
-    pub fn new() -> Self {
-        Self {
-            approval_tiers: Vec::new(),
-        }
-    }
-
-    pub fn add_approval_tier(&mut self, pct: f64, role: &str) {
-        self.approval_tiers.push(ApprovalThresholdTier {
-            max_discount_pct: pct,
-            required_approver_role: role.to_string(),
-        });
-        self.approval_tiers
-            .sort_by(|a, b| a.max_discount_pct.partial_cmp(&b.max_discount_pct).unwrap());
-    }
-
-    pub fn evaluate_quote_approval_level(&self, applied_discount_pct: f64) -> String {
-        for tier in &self.approval_tiers {
-            if applied_discount_pct <= tier.max_discount_pct {
-                return tier.required_approver_role.clone();
-            }
-        }
-        "CFO Approval Required".to_string()
-    }
-
-    pub fn calculate_tiered_volume_discount(&self, unit_price: f64, quantity: u32) -> (f64, f64) {
-        let discount_pct = if quantity >= 500 {
-            25.0
-        } else if quantity >= 100 {
-            15.0
-        } else if quantity >= 20 {
-            5.0
-        } else {
-            0.0
-        };
-
-        let gross = unit_price * (quantity as f64);
-        let net = gross * (1.0 - (discount_pct / 100.0));
-        (net, discount_pct)
-    }
-}
-
-// ---------------------------------------------------------------------------
-// 25. Odoo MRP Hierarchical Bill of Materials (BOM) Tree Engine
-// ---------------------------------------------------------------------------
-
-#[derive(Debug, Clone)]
-pub struct BomTreeNode {
-    pub component_sku: String,
-    pub qty_per_unit: f64,
-    pub unit_cost: f64,
-    pub scrap_factor: f64, // e.g. 0.05 for 5% scrap allowance
-    pub sub_components: Vec<BomTreeNode>,
-}
-
-/// Sovereign Odoo MRP Hierarchical BOM Tree Engine
-#[derive(Debug, Clone, Default)]
-pub struct SovereignOdooMrpBillOfMaterialsTreeEngine;
-
-impl SovereignOdooMrpBillOfMaterialsTreeEngine {
-    pub fn new() -> Self {
-        Self
-    }
-
-    pub fn compute_hierarchical_bom_cost(&self, node: &BomTreeNode) -> f64 {
-        let gross_qty = node.qty_per_unit * (1.0 + node.scrap_factor);
-        if node.sub_components.is_empty() {
-            gross_qty * node.unit_cost
-        } else {
-            let sub_cost: f64 = node
-                .sub_components
-                .iter()
-                .map(|child| self.compute_hierarchical_bom_cost(child))
-                .sum();
-            gross_qty * (node.unit_cost + sub_cost)
-        }
-    }
-
-    pub fn expand_phantom_assemblies(&self, node: &BomTreeNode) -> Vec<(String, f64)> {
-        let mut list = Vec::new();
-        self.collect_leaf_components(node, 1.0, &mut list);
-        list
-    }
-
-    fn collect_leaf_components(
-        &self,
-        node: &BomTreeNode,
-        parent_qty: f64,
-        list: &mut Vec<(String, f64)>,
-    ) {
-        let current_qty = parent_qty * node.qty_per_unit * (1.0 + node.scrap_factor);
-        if node.sub_components.is_empty() {
-            list.push((node.component_sku.clone(), current_qty));
-        } else {
-            for child in &node.sub_components {
-                self.collect_leaf_components(child, current_qty, list);
-            }
-        }
-    }
-}
-
-// ---------------------------------------------------------------------------
-// 26. Odoo Quality Control Inspection Points & Yield Engine
-// ---------------------------------------------------------------------------
-
-#[derive(Debug, Clone)]
-pub struct QualityCheckPoint {
-    pub check_id: String,
-    pub title: String,
-    pub is_pass_fail: bool,
-    pub min_measurement: Option<f64>,
-    pub max_measurement: Option<f64>,
-}
-
-/// Sovereign Odoo Quality Control Engine
-#[derive(Debug, Clone, Default)]
-pub struct SovereignOdooQualityControlInspectionEngine {
-    pub check_points: Vec<QualityCheckPoint>,
-}
-
-impl SovereignOdooQualityControlInspectionEngine {
-    pub fn new() -> Self {
-        Self {
-            check_points: Vec::new(),
-        }
-    }
-
-    pub fn add_check_point(&mut self, check: QualityCheckPoint) {
-        self.check_points.push(check);
-    }
-
-    pub fn inspect_sample(
-        &self,
-        check_id: &str,
-        measurement: Option<f64>,
-        pass_flag: Option<bool>,
-    ) -> bool {
-        let check = match self.check_points.iter().find(|c| c.check_id == check_id) {
-            Some(c) => c,
-            None => return false,
-        };
-
-        if check.is_pass_fail {
-            pass_flag.unwrap_or(false)
-        } else if let Some(m) = measurement {
-            let min_ok = check.min_measurement.map(|min| m >= min).unwrap_or(true);
-            let max_ok = check.max_measurement.map(|max| m <= max).unwrap_or(true);
-            min_ok && max_ok
-        } else {
-            false
-        }
-    }
-
-    pub fn calculate_yield_rate(&self, passed_checks: usize, total_checks: usize) -> f64 {
-        if total_checks == 0 {
-            0.0
-        } else {
-            (passed_checks as f64 / total_checks as f64) * 100.0
-        }
-    }
-}
-
-// ---------------------------------------------------------------------------
-// 27. Bitrix24 Robotic Process Automation (RPA) Stage Pipeline Engine
-// ---------------------------------------------------------------------------
-
-#[derive(Debug, Clone)]
-pub struct RpaStage {
-    pub stage_id: String,
-    pub name: String,
-    pub required_fields: Vec<String>,
-    pub auto_task_title: Option<String>,
-}
-
-/// Sovereign Bitrix24 RPA Pipeline Engine
-#[derive(Debug, Clone, Default)]
-pub struct SovereignBitrix24RpaWorkflowEngine {
-    pub stages: Vec<RpaStage>,
-}
-
-impl SovereignBitrix24RpaWorkflowEngine {
-    pub fn new() -> Self {
-        Self { stages: Vec::new() }
-    }
-
-    pub fn add_stage(&mut self, stage: RpaStage) {
-        self.stages.push(stage);
-    }
-
-    pub fn advance_item_stage(
-        &self,
-        item_data: &HashMap<String, String>,
-        _current_stage_id: &str,
-        target_stage_id: &str,
-    ) -> Result<bool> {
-        let target_stage = self
-            .stages
-            .iter()
-            .find(|s| s.stage_id == target_stage_id)
-            .ok_or("Target RPA stage not found")?;
-
-        for req_field in &target_stage.required_fields {
-            if !item_data.contains_key(req_field) || item_data.get(req_field).unwrap().is_empty() {
-                return Err("Missing required field for RPA stage transition");
-            }
-        }
-
-        Ok(true)
-    }
-}
-
-// ---------------------------------------------------------------------------
-// 28. Bitrix24 AI Speech & Call Sentiment Analyzer Engine
-// ---------------------------------------------------------------------------
-
-#[derive(Debug, Clone)]
-pub struct TranscriptAnalysisResult {
-    pub sentiment_score: f64, // -1.0 (very negative) to +1.0 (very positive)
-    pub key_phrases: Vec<String>,
-    pub competitor_mentioned: bool,
-    pub compliance_flag: bool,
-}
-
-/// Sovereign Bitrix24 AI Speech & Call Sentiment Analyzer Engine
-#[derive(Debug, Clone, Default)]
-pub struct SovereignBitrix24SpeechAiSentimentAnalyzerEngine;
-
-impl SovereignBitrix24SpeechAiSentimentAnalyzerEngine {
-    pub fn new() -> Self {
-        Self
-    }
-
-    pub fn analyze_call_transcript(&self, transcript_text: &str) -> TranscriptAnalysisResult {
-        let lower = transcript_text.to_lowercase();
-
-        let positive_words = [
-            "great",
-            "excellent",
-            "helpful",
-            "love",
-            "satisfied",
-            "thank you",
-        ];
-        let negative_words = [
-            "bad", "terrible", "unhappy", "refund", "issue", "bug", "cancel",
-        ];
-
-        let mut score: f64 = 0.0;
-        for pos in &positive_words {
-            if lower.contains(pos) {
-                score += 0.25;
-            }
-        }
-        for neg in &negative_words {
-            if lower.contains(neg) {
-                score -= 0.25;
-            }
-        }
-
-        let clamped_score = score.min(1.0).max(-1.0);
-
-        let competitor_mentioned = lower.contains("competitor") || lower.contains("alternative");
-        let compliance_flag =
-            lower.contains("terms") || lower.contains("privacy") || lower.contains("gdpr");
-
-        TranscriptAnalysisResult {
-            sentiment_score: clamped_score,
-            key_phrases: vec![
-                "enterprise software".to_string(),
-                "sovereign workstation".to_string(),
-            ],
-            competitor_mentioned,
-            compliance_flag,
-        }
-    }
-}
