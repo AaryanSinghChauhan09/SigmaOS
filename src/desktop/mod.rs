@@ -13,6 +13,11 @@ pub mod hypnotix_iptv;
 pub use hypnotix_iptv::*;
 pub mod hyprland_tiling;
 pub use hyprland_tiling::*;
+pub mod hyprland;
+pub use hyprland::{
+    HyprlandInstance, HyprlandWindow, HyprlandWorkspace, LayoutRule, WindowState, HyprlandConfig,
+    init_hyprland, get_hyprland,
+};
 pub mod wayland;
 pub use wayland::{
     WaylandDisplay, WaylandCompositor, WaylandObject, WaylandObjectType,
@@ -52,6 +57,16 @@ pub use direct_scanout::{
     DirectScanoutManager, ScanoutMode, DirectScanoutConfig,
     init_direct_scanout_manager, get_direct_scanout_manager,
     enable_gaming_direct_scanout, disable_direct_scanout,
+};
+pub mod wlogout;
+pub use wlogout::{
+    WlogoutInstance, LogoutAction,
+    init_wlogout, get_wlogout, show_wlogout, hide_wlogout,
+};
+pub mod waypaper;
+pub use waypaper::{
+    WaypaperInstance, Wallpaper,
+    init_waypaper, get_waypaper, set_wallpaper,
 };
 pub mod xreader;
 pub use xreader::*;
