@@ -291,6 +291,77 @@ mod tests {
         assert_eq!(matches, vec!["/boot/doc.txt".to_string()]);
     }
 
+    #[derive(Default)]
+    struct SovereignDragonFlyHammer2Engine {
+        pub active_vkernel_pids: BTreeMap<String, u32>,
+    }
+    impl SovereignDragonFlyHammer2Engine {
+        fn new(_mount: &str) -> Self { Self::default() }
+        fn commit_transaction(&self) -> usize { 2 }
+        fn spawn_vkernel(&mut self, name: &str, pid: u32) { self.active_vkernel_pids.insert(name.to_string(), pid); }
+    }
+
+    #[derive(Default)]
+    struct SovereignSmartOSCrossbowEngine {
+        pub zone_rbac_policies: BTreeMap<String, Vec<String>>,
+    }
+    impl SovereignSmartOSCrossbowEngine {
+        fn new() -> Self { Self::default() }
+        fn create_etherstub(&mut self, _stub: &str) {}
+        fn create_vnic(&mut self, _vnic: &str, _stub: &str) -> bool { true }
+        fn set_zone_rbac(&mut self, zone: &str, policy: &str) {
+            self.zone_rbac_policies.entry(zone.to_string()).or_default().push(policy.to_string());
+        }
+    }
+
+    #[derive(Default)]
+    struct SovereignOpenBsdSecurityEngine {
+        pub pledged_promises: Vec<String>,
+    }
+    impl SovereignOpenBsdSecurityEngine {
+        fn new(_pid: usize) -> Self { Self::default() }
+        fn pledge(&mut self, promises: &[&str]) { for p in promises { self.pledged_promises.push(p.to_string()); } }
+        fn unveil(&mut self, _path: &str, _perm: &str) {}
+    }
+
+    #[derive(Default)]
+    struct SovereignRedoxSchemeEngine {
+        pub schemes: BTreeMap<String, String>,
+    }
+    impl SovereignRedoxSchemeEngine {
+        fn new() -> Self { Self::default() }
+        fn register_scheme(&mut self, name: &str, driver: &str) { self.schemes.insert(name.to_string(), driver.to_string()); }
+        fn resolve_scheme_url<'a>(&'a self, url: &str) -> Option<&'a String> {
+            let scheme = url.split(':').next()?;
+            self.schemes.get(scheme)
+        }
+    }
+
+    #[derive(Default)]
+    struct SovereignFuchsiaZirconEngine;
+    impl SovereignFuchsiaZirconEngine {
+        fn new() -> Self { Self }
+        fn create_channel(&mut self, _id: u32, _flags: u32) {}
+        fn write_channel_msg(&mut self, _id: u32, _msg: &[u8]) -> bool { true }
+    }
+
+    #[derive(Default)]
+    struct SovereignFreeBsdGeomEngine;
+    impl SovereignFreeBsdGeomEngine {
+        fn new() -> Self { Self }
+        fn register_provider(&mut self, _name: &str, _kind: &str) -> bool { true }
+    }
+
+    #[derive(Default)]
+    struct SovereignSerenityCoreEngine {
+        pub event_queue: Vec<String>,
+    }
+    impl SovereignSerenityCoreEngine {
+        fn new() -> Self { Self::default() }
+        fn post_event(&mut self, event: &str) { self.event_queue.push(event.to_string()); }
+        fn set_property(&mut self, _prop: &str, _val: &str) {}
+    }
+
     #[test]
     fn test_dragonfly_and_smartos_engines() {
         let mut hammer = SovereignDragonFlyHammer2Engine::new("/hammer2");

@@ -80,6 +80,50 @@ pub struct UniversalSecurityAuditEngineV26 {
 impl UniversalSecurityAuditEngineV26 {
     pub fn new() -> Self {
         Self {
+            advisory_database: vec![
+                SecurityAdvisoryV26 {
+                    cve_id: "CVE-2026-1001".to_string(),
+                    package_pattern: "openssl".to_string(),
+                    vulnerable_version_range: "< 3.0.6".to_string(),
+                    severity: VulnerabilitySeverityV26::Critical,
+                    advisory_summary: "Buffer overflow vulnerability in OpenSSL handshake".to_string(),
+                    recommended_patch_version: "3.0.6".to_string(),
+                },
+            ],
+        }
+    }
+
+    pub fn audit_package(
+        &self,
+        pkg_name: &str,
+        version: &str,
+        format: PackageFormat,
+    ) -> PackageAuditReportV26 {
+        let matched: Vec<SecurityAdvisoryV26> = self
+            .advisory_database
+            .iter()
+            .filter(|adv| adv.package_pattern == pkg_name)
+            .cloned()
+            .collect();
+        let is_secure = matched.is_empty();
+        PackageAuditReportV26 {
+            package_name: pkg_name.to_string(),
+            installed_version: version.to_string(),
+            format,
+            matched_advisories: matched,
+            is_secure,
+        }
+    }
+}
+
+pub struct UniversalFormatInspectorAndClassifierV26 {
+    pub total_formats_supported: usize,
+    pub inspection_cache: BTreeMap<String, InspectedPackageManifestV26>,
+}
+
+impl UniversalFormatInspectorAndClassifierV26 {
+    pub fn new() -> Self {
+        Self {
             total_formats_supported: 36,
             inspection_cache: BTreeMap::new(),
         }
@@ -401,8 +445,8 @@ impl UniversalMultiFormatTranspilerAndExecutionEngineV26 {
             pkg = pkg.with_dependency(remapped);
         }
 
-        if let Some(cflags) = &manifest.build_cflags {
-            pkg.properties.insert("cflags".to_string(), cflags.clone());
+        if let Some(ref cflags_val) = manifest.build_cflags {
+            pkg.properties.insert("cflags".to_string(), cflags_val.to_string());
         }
 
         pkg.properties.insert(
@@ -423,9 +467,7 @@ impl UniversalMultiFormatTranspilerAndExecutionEngineV26 {
             installed_packages: self.installed_packages.clone(),
         });
 
-        Self {
-            advisory_database: advisories,
-        }
+        id
     }
 
     /// Rolls back system state to a previous checkpoint ID V26
@@ -674,6 +716,7 @@ impl Default for UniversalPmCliRouterV26 {
 // ============================================================================
 
 pub struct SovereignDistroPackageAdvancementsSuiteV26 {
+    pub inspector: UniversalFormatInspectorAndClassifierV26,
     pub auditor: UniversalSecurityAuditEngineV26,
     pub optimizer: SourceBinaryOptimizationEngineV26,
     pub sandbox_governor: HermeticPqcSandboxGovernorV26,
@@ -684,6 +727,7 @@ pub struct SovereignDistroPackageAdvancementsSuiteV26 {
 impl SovereignDistroPackageAdvancementsSuiteV26 {
     pub fn new() -> Self {
         Self {
+            inspector: UniversalFormatInspectorAndClassifierV26::new(),
             auditor: UniversalSecurityAuditEngineV26::new(),
             optimizer: SourceBinaryOptimizationEngineV26::new(),
             sandbox_governor: HermeticPqcSandboxGovernorV26::new(),
@@ -697,16 +741,18 @@ impl SovereignDistroPackageAdvancementsSuiteV26 {
         &mut self,
         filename: &str,
         payload: &[u8],
-    ) -> Result<UnifiedPackage, String> {
+    ) -> Result<(PackageAuditReportV26, String, String, usize), String> {
         let manifest = self.inspector.inspect_package(filename, payload)?;
-        let _sandbox_rules = self
-            .governor
-            .generate_sandbox_rules(manifest.detected_format);
-        let sigpkg = self
-            .transpiler_engine
-            .transpile_to_native_sigpkg(&manifest, &self.governor);
+        let audit = self.auditor.audit_package(&manifest.name, &manifest.version, manifest.detected_format);
+        let cflags = self.optimizer.auto_tune_microarchitecture("x86_64_v3");
+        let policy = self.sandbox_governor.generate_landlock_policy(filename);
+        let snap_id = self.snapshot_engine.create_snapshot(
+            filename,
+            &manifest.provides,
+            1700000000,
+        );
 
-        (audit, cflags, policy, snap_id)
+        Ok((audit, cflags, policy.sandbox_id, snap_id))
     }
 }
 
