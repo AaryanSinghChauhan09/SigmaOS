@@ -34,6 +34,29 @@ pub enum LinuxBsdDistroInspiration {
     DragonFlyBSD,
     IllumosSolaris,
     Plan9Frontier,
+    ChimeraLinux,
+    AntiXLinux,
+    ZorinOS,
+    WhonixOS,
+    QubesOS,
+    TalosLinux,
+    OpenWrtLinux,
+    MidnightBSD,
+    HardenedBSD,
+    GhostBSD,
+    NomadBSD,
+    MageiaLinux,
+    PuppyLinux,
+    AlmaLinux,
+    RockyLinux,
+    DeepinLinux,
+    AsahiLinux,
+    SteamOS,
+    VanillaOS,
+    SerpentOS,
+    BazziteLinux,
+    RedoxOS,
+    HaikuOS,
 }
 
 impl LinuxBsdDistroInspiration {
@@ -64,6 +87,29 @@ impl LinuxBsdDistroInspiration {
             Self::DragonFlyBSD => "DragonFlyBSD",
             Self::IllumosSolaris => "IllumosSolaris",
             Self::Plan9Frontier => "Plan9Frontier",
+            Self::ChimeraLinux => "ChimeraLinux",
+            Self::AntiXLinux => "AntiXLinux",
+            Self::ZorinOS => "ZorinOS",
+            Self::WhonixOS => "WhonixOS",
+            Self::QubesOS => "QubesOS",
+            Self::TalosLinux => "TalosLinux",
+            Self::OpenWrtLinux => "OpenWrtLinux",
+            Self::MidnightBSD => "MidnightBSD",
+            Self::HardenedBSD => "HardenedBSD",
+            Self::GhostBSD => "GhostBSD",
+            Self::NomadBSD => "NomadBSD",
+            Self::MageiaLinux => "MageiaLinux",
+            Self::PuppyLinux => "PuppyLinux",
+            Self::AlmaLinux => "AlmaLinux",
+            Self::RockyLinux => "RockyLinux",
+            Self::DeepinLinux => "DeepinLinux",
+            Self::AsahiLinux => "AsahiLinux",
+            Self::SteamOS => "SteamOS",
+            Self::VanillaOS => "VanillaOS",
+            Self::SerpentOS => "SerpentOS",
+            Self::BazziteLinux => "BazziteLinux",
+            Self::RedoxOS => "RedoxOS",
+            Self::HaikuOS => "HaikuOS",
         }
     }
 }
@@ -94,6 +140,14 @@ pub enum SigmaOsSubsystem {
     SystemAudit,
     AiWorkflowAgent,
     VirtualizationHypervisor,
+    ProcessActivity,
+    MemoryVirtualization,
+    TimeSynchronization,
+    SignalDelivery,
+    DeviceHotplug,
+    CryptographySecurity,
+    TelemetryObservability,
+    AccessibilityInput,
 }
 
 impl SigmaOsSubsystem {
@@ -122,6 +176,14 @@ impl SigmaOsSubsystem {
             Self::SystemAudit => "SystemAudit",
             Self::AiWorkflowAgent => "AiWorkflowAgent",
             Self::VirtualizationHypervisor => "VirtualizationHypervisor",
+            Self::ProcessActivity => "ProcessActivity",
+            Self::MemoryVirtualization => "MemoryVirtualization",
+            Self::TimeSynchronization => "TimeSynchronization",
+            Self::SignalDelivery => "SignalDelivery",
+            Self::DeviceHotplug => "DeviceHotplug",
+            Self::CryptographySecurity => "CryptographySecurity",
+            Self::TelemetryObservability => "TelemetryObservability",
+            Self::AccessibilityInput => "AccessibilityInput",
         }
     }
 }
@@ -211,12 +273,35 @@ impl SovereignSubsystemDistroHarmonyEngine {
             LinuxBsdDistroInspiration::DragonFlyBSD,
             LinuxBsdDistroInspiration::IllumosSolaris,
             LinuxBsdDistroInspiration::Plan9Frontier,
+            LinuxBsdDistroInspiration::ChimeraLinux,
+            LinuxBsdDistroInspiration::AntiXLinux,
+            LinuxBsdDistroInspiration::ZorinOS,
+            LinuxBsdDistroInspiration::WhonixOS,
+            LinuxBsdDistroInspiration::QubesOS,
+            LinuxBsdDistroInspiration::TalosLinux,
+            LinuxBsdDistroInspiration::OpenWrtLinux,
+            LinuxBsdDistroInspiration::MidnightBSD,
+            LinuxBsdDistroInspiration::HardenedBSD,
+            LinuxBsdDistroInspiration::GhostBSD,
+            LinuxBsdDistroInspiration::NomadBSD,
+            LinuxBsdDistroInspiration::MageiaLinux,
+            LinuxBsdDistroInspiration::PuppyLinux,
+            LinuxBsdDistroInspiration::AlmaLinux,
+            LinuxBsdDistroInspiration::RockyLinux,
+            LinuxBsdDistroInspiration::DeepinLinux,
+            LinuxBsdDistroInspiration::AsahiLinux,
+            LinuxBsdDistroInspiration::SteamOS,
+            LinuxBsdDistroInspiration::VanillaOS,
+            LinuxBsdDistroInspiration::SerpentOS,
+            LinuxBsdDistroInspiration::BazziteLinux,
+            LinuxBsdDistroInspiration::RedoxOS,
+            LinuxBsdDistroInspiration::HaikuOS,
         ];
 
         let subsystems_list = [
             (
                 SigmaOsSubsystem::KernelScheduling,
-                vec!["EEVDF", "BORE", "sched_ext", "NuttX_RT"],
+                vec!["EEVDF", "BORE", "sched_ext", "NuttX_RT", "Preempt_RT"],
             ),
             (
                 SigmaOsSubsystem::SecuritySandboxing,
@@ -227,11 +312,12 @@ impl SovereignSubsystemDistroHarmonyEngine {
                     "LandlockV5",
                     "AppArmor",
                     "SELinux",
+                    "PaX_Guard",
                 ],
             ),
             (
                 SigmaOsSubsystem::FilesystemStorage,
-                vec!["Bcachefs", "ZFS", "Btrfs", "HAMMER2", "BFS", "9P2000"],
+                vec!["Bcachefs", "ZFS", "Btrfs", "HAMMER2", "BFS", "9P2000", "Redox_Scheme"],
             ),
             (
                 SigmaOsSubsystem::Networking,
@@ -241,6 +327,7 @@ impl SovereignSubsystemDistroHarmonyEngine {
                     "Crossbow_VNIC",
                     "pf_firewall",
                     "nftables",
+                    "WireGuard_PQC",
                 ],
             ),
             (
@@ -254,11 +341,12 @@ impl SovereignSubsystemDistroHarmonyEngine {
                     "Ebuild",
                     "NixFlakes",
                     "Guix",
+                    "Moss",
                 ],
             ),
             (
                 SigmaOsSubsystem::InitSupervisor,
-                vec!["Systemd", "OpenRC", "Runit", "Dinit", "SMF", "Shepherd"],
+                vec!["Systemd", "OpenRC", "Runit", "Dinit", "SMF", "Shepherd", "Launchd_Compat"],
             ),
             (
                 SigmaOsSubsystem::DesktopCompositor,
@@ -268,15 +356,16 @@ impl SovereignSubsystemDistroHarmonyEngine {
                     "KDE_Plasma6",
                     "Cosmic",
                     "X11_Bridge",
+                    "Zenith_KMS",
                 ],
             ),
             (
                 SigmaOsSubsystem::AudioSound,
-                vec!["PipeWire", "ALSA", "SNDIO", "PulseAudio"],
+                vec!["PipeWire", "ALSA", "SNDIO", "PulseAudio", "Jack2_RT"],
             ),
             (
                 SigmaOsSubsystem::HardwarePower,
-                vec!["PowerProfiles", "TLP", "DVFS", "ACPI_APIC"],
+                vec!["PowerProfiles", "TLP", "DVFS", "ACPI_APIC", "System76_Power"],
             ),
             (
                 SigmaOsSubsystem::ContainerVirt,
@@ -286,59 +375,92 @@ impl SovereignSubsystemDistroHarmonyEngine {
                     "Zones",
                     "Bubblewrap",
                     "Firejail",
+                    "Qubes_Xen",
                 ],
             ),
             (
                 SigmaOsSubsystem::ObservabilityDiagnostics,
-                vec!["DTrace", "eBPF_Trace", "Sysdig", "Fastfetch"],
+                vec!["DTrace", "eBPF_Trace", "Sysdig", "Fastfetch", "Opentelemetry"],
             ),
             (
                 SigmaOsSubsystem::ShellTerminal,
-                vec!["OmarchyPrompt", "Zsh", "Fish", "Bash", "VT100_Grid"],
+                vec!["OmarchyPrompt", "Zsh", "Fish", "Bash", "VT100_Grid", "Starship"],
             ),
             (
                 SigmaOsSubsystem::IpcMemory,
-                vec!["ZeroCopyRing", "THP_Collapse", "zram", "kswapd"],
+                vec!["ZeroCopyRing", "THP_Collapse", "zram", "kswapd", "Kaslr_Wx"],
             ),
             (
                 SigmaOsSubsystem::DriversHardware,
-                vec!["PCIe_MMIO", "xHCI_USB", "NVMe", "Intel_Xe", "iwlwifi"],
+                vec!["PCIe_MMIO", "xHCI_USB", "NVMe", "Intel_Xe", "iwlwifi", "Rump_Anykernel"],
             ),
             (
                 SigmaOsSubsystem::InstallerBoot,
-                vec!["Limine", "GRUB2", "systemd-boot", "Calamares_Wizard"],
+                vec!["Limine", "GRUB2", "systemd-boot", "Calamares_Wizard", "ISOHybrid"],
             ),
             (
                 SigmaOsSubsystem::AuthIdentity,
-                vec!["PAM", "systemd-homed", "bsd_auth", "PQC_Token"],
+                vec!["PAM", "systemd-homed", "bsd_auth", "PQC_Token", "Fido2_Passkey"],
             ),
             (
                 SigmaOsSubsystem::I18nLocalization,
-                vec!["Locale_Manager", "IME_Engine", "FontConfig"],
+                vec!["Locale_Manager", "IME_Engine", "FontConfig", "CLDR_I18n"],
             ),
             (
                 SigmaOsSubsystem::MediaGraphics,
-                vec!["DRM_KMS", "DirectScanout", "XViewer", "Hypnotix"],
+                vec!["DRM_KMS", "DirectScanout", "XViewer", "Hypnotix", "VAAPI_Vulkan"],
             ),
             (
                 SigmaOsSubsystem::CompilerToolchain,
-                vec!["LLVM_Clang", "GCC_SSP", "Ccache", "Makepkg_Chroot"],
+                vec!["LLVM_Clang", "GCC_SSP", "Ccache", "Makepkg_Chroot", "Zig_Toolchain"],
             ),
             (
                 SigmaOsSubsystem::AutomationProvisioning,
-                vec!["CloudInit", "Kickstart", "Preseed", "Netplan"],
+                vec!["CloudInit", "Kickstart", "Preseed", "Netplan", "Ansible_Decl"],
             ),
             (
                 SigmaOsSubsystem::SystemAudit,
-                vec!["Auditd", "arch-audit", "CII_BestPractices", "Syzkaller"],
+                vec!["Auditd", "arch-audit", "CII_BestPractices", "Syzkaller", "CodeQL_Scan"],
             ),
             (
                 SigmaOsSubsystem::AiWorkflowAgent,
-                vec!["Omarchy_AI", "Herdr_Orchestrator", "SuperA_Keybinding"],
+                vec!["Omarchy_AI", "Herdr_Orchestrator", "SuperA_Keybinding", "Copilot_Lsp"],
             ),
             (
                 SigmaOsSubsystem::VirtualizationHypervisor,
-                vec!["KVM", "Bhyve", "VMM", "VirtIO_Ring"],
+                vec!["KVM", "Bhyve", "VMM", "VirtIO_Ring", "Firecracker_MicroVM"],
+            ),
+            (
+                SigmaOsSubsystem::ProcessActivity,
+                vec!["Rusage_Collector", "Job_Control", "CgroupV2_Tasks", "PidFd_Signals"],
+            ),
+            (
+                SigmaOsSubsystem::MemoryVirtualization,
+                vec!["DAMON_Reclaim", "CXL_Photonic_Mesh", "ZRAM_Zstd", "MGLRU_Pages"],
+            ),
+            (
+                SigmaOsSubsystem::TimeSynchronization,
+                vec!["Chrony_NTP", "PTP_Hardware_Clock", "Microsecond_Solar_Clock"],
+            ),
+            (
+                SigmaOsSubsystem::SignalDelivery,
+                vec!["Realtime_SigQueue", "Sigreturn_Frame_Guard", "Uncatchable_Bypass"],
+            ),
+            (
+                SigmaOsSubsystem::DeviceHotplug,
+                vec!["Udev_Devd_Bridge", "Xhci_Hotplug", "Evdev_Multitouch"],
+            ),
+            (
+                SigmaOsSubsystem::CryptographySecurity,
+                vec!["PQC_Dilithium", "Falcon_1024", "Kyber_1024", "LUKS2_GELI"],
+            ),
+            (
+                SigmaOsSubsystem::TelemetryObservability,
+                vec!["Prometheus_Exporter", "Privacy_Telemetry_Filter", "CrashDump_Pstore"],
+            ),
+            (
+                SigmaOsSubsystem::AccessibilityInput,
+                vec!["Orca_ScreenReader", "Fcitx5_IME", "Libinput_Gestures", "Braille_Display"],
             ),
         ];
 
@@ -401,6 +523,38 @@ impl SovereignSubsystemDistroHarmonyEngine {
                 LinuxBsdDistroInspiration::IllumosSolaris,
                 "pol_virt_sec",
                 "zone_capsicum_pledge_isolation_layer",
+                true,
+            ),
+            (
+                SigmaOsSubsystem::VirtualizationHypervisor,
+                SigmaOsSubsystem::SecuritySandboxing,
+                LinuxBsdDistroInspiration::QubesOS,
+                "pol_qubes_hypervisor_sec",
+                "xen_qubes_domain_isolation_with_pqc_attestation",
+                true,
+            ),
+            (
+                SigmaOsSubsystem::Networking,
+                SigmaOsSubsystem::SecuritySandboxing,
+                LinuxBsdDistroInspiration::WhonixOS,
+                "pol_whonix_tor_net",
+                "amnesic_tor_gateway_isolation_shunt",
+                true,
+            ),
+            (
+                SigmaOsSubsystem::FilesystemStorage,
+                SigmaOsSubsystem::MemoryVirtualization,
+                LinuxBsdDistroInspiration::HaikuOS,
+                "pol_haiku_bfs_mem",
+                "bfs_relational_attribute_index_caching",
+                false,
+            ),
+            (
+                SigmaOsSubsystem::DriversHardware,
+                SigmaOsSubsystem::KernelScheduling,
+                LinuxBsdDistroInspiration::NetBSD,
+                "pol_netbsd_rump_drivers",
+                "rump_anykernel_userspace_driver_context_switch_guard",
                 true,
             ),
         ];
@@ -471,12 +625,12 @@ impl SovereignSubsystemDistroHarmonyEngine {
     }
 
     pub fn verify_all_subsystems_compatibility_matrix(&self) -> bool {
-        if self.subsystems.len() < 23 {
+        if self.subsystems.len() < 31 {
             return false;
         }
 
         for spec in self.subsystems.values() {
-            if spec.supported_distros.len() < 25
+            if spec.supported_distros.len() < 48
                 || spec.capabilities.is_empty()
                 || spec.interop_score < 100
             {
@@ -609,7 +763,7 @@ mod tests {
     #[test]
     fn test_harmony_engine_initialization_and_verification() {
         let engine = SovereignSubsystemDistroHarmonyEngine::new();
-        assert_eq!(engine.subsystems.len(), 23);
+        assert_eq!(engine.subsystems.len(), 31);
         assert!(engine.verify_all_subsystems_compatibility_matrix());
         assert_eq!(engine.compute_harmony_index(), 100);
     }
@@ -634,6 +788,14 @@ mod tests {
             .expect("Policy should exist");
         assert_eq!(policy.policy_id, "pol_sched_sec");
         assert!(policy.enforce_strict_isolation);
+
+        let qubes_policy = engine
+            .translate_policy(
+                SigmaOsSubsystem::VirtualizationHypervisor,
+                SigmaOsSubsystem::SecuritySandboxing,
+            )
+            .expect("Qubes policy should exist");
+        assert_eq!(qubes_policy.policy_id, "pol_qubes_hypervisor_sec");
     }
 
     #[test]
@@ -642,7 +804,7 @@ mod tests {
         let count = engine
             .harmonize_all_subsystems_and_distros()
             .expect("Harmonization should succeed");
-        assert_eq!(count, 23 * 22);
+        assert_eq!(count, 31 * 30);
         assert_eq!(engine.compute_harmony_index(), 100);
     }
 
