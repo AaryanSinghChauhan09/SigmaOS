@@ -5,15 +5,15 @@ pub mod browser;
 pub mod browser_innovations_suite;
 pub use browser_innovations_suite::*;
 pub mod distro_media_engine;
-pub mod pix_image_organizer;
 pub mod sovereign_screen_recorder;
 pub mod sovereign_video_editor;
 pub mod sovereign_video_player;
+pub mod pix_image_organizer;
 
 pub use pix_image_organizer::{
-    CropRect, ImageFormat, PixBatchConverterEngine, PixBatchRenameEngine, PixBatchWatermarkEngine,
-    PixCatalog, PixCollection, PixImageEditParams, PixImageEditor, PixImageMetadata,
-    PixSlideshowEngine, PixWebAlbumGenerator, SlideshowTransition, WatermarkSpec,
+    CropRect, ImageFormat, PixBatchConverterEngine, PixBatchRenameEngine,
+    PixBatchWatermarkEngine, PixCatalog, PixCollection, PixImageEditParams, PixImageEditor,
+    PixImageMetadata, PixSlideshowEngine, PixWebAlbumGenerator, SlideshowTransition, WatermarkSpec,
 };
 
 pub use distro_media_engine::{

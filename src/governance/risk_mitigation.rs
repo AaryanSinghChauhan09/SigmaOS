@@ -26,17 +26,11 @@ pub enum LicenseType {
 
 impl LicenseType {
     pub fn is_copyleft(&self) -> bool {
-        matches!(
-            self,
-            LicenseType::Gplv2 | LicenseType::Gplv3 | LicenseType::Agplv3
-        )
+        matches!(self, LicenseType::Gplv2 | LicenseType::Gplv3 | LicenseType::Agplv3)
     }
 
     pub fn is_permissive(&self) -> bool {
-        matches!(
-            self,
-            LicenseType::Mit | LicenseType::Apache2 | LicenseType::Bsd3Clause
-        )
+        matches!(self, LicenseType::Mit | LicenseType::Apache2 | LicenseType::Bsd3Clause)
     }
 }
 
@@ -63,11 +57,7 @@ impl LicenseAuditEngine {
         }
     }
 
-    pub fn audit_import(
-        &mut self,
-        module_name: &str,
-        license: LicenseType,
-    ) -> Result<bool, String> {
+    pub fn audit_import(&mut self, module_name: &str, license: LicenseType) -> Result<bool, String> {
         let is_compatible = if license.is_copyleft() {
             // Requires dual-licensing or GPL boundary isolation
             false
@@ -123,12 +113,7 @@ impl PerformanceRegressionGovernor {
         }
     }
 
-    pub fn record_benchmark(
-        &mut self,
-        name: &str,
-        baseline: u64,
-        current: u64,
-    ) -> Result<(), String> {
+    pub fn record_benchmark(&mut self, name: &str, baseline: u64, current: u64) -> Result<(), String> {
         self.benchmarks.push(BenchmarkMetric {
             benchmark_name: name.to_string(),
             baseline_latency_us: baseline,
@@ -187,7 +172,7 @@ impl Default for SentinelSecurityAuditor {
 /// Isolation Tier for Hardware Drivers
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DriverIsolationTier {
-    Tier1CoreRing0,    // Trusted serial/RTC
+    Tier1CoreRing0,   // Trusted serial/RTC
     Tier2UserCapsicum, // User-space Capsicum sandbox
     Tier3IommuMicrovm, // IOMMU fault-contained VM
 }
@@ -201,18 +186,9 @@ pub struct DriverCrashContainmentEngine {
 impl DriverCrashContainmentEngine {
     pub fn new() -> Self {
         let mut map = BTreeMap::new();
-        map.insert(
-            "serial_uart".to_string(),
-            DriverIsolationTier::Tier1CoreRing0,
-        );
-        map.insert(
-            "intel_xe_gpu".to_string(),
-            DriverIsolationTier::Tier3IommuMicrovm,
-        );
-        map.insert(
-            "iwlwifi_ax210".to_string(),
-            DriverIsolationTier::Tier2UserCapsicum,
-        );
+        map.insert("serial_uart".to_string(), DriverIsolationTier::Tier1CoreRing0);
+        map.insert("intel_xe_gpu".to_string(), DriverIsolationTier::Tier3IommuMicrovm);
+        map.insert("iwlwifi_ax210".to_string(), DriverIsolationTier::Tier2UserCapsicum);
         Self {
             driver_isolation_map: map,
             caught_panics_count: 0,
@@ -220,27 +196,17 @@ impl DriverCrashContainmentEngine {
     }
 
     pub fn handle_driver_crash(&mut self, driver_name: &str) -> Result<String, String> {
-        let tier = self
-            .driver_isolation_map
-            .get(driver_name)
-            .cloned()
-            .unwrap_or(DriverIsolationTier::Tier2UserCapsicum);
+        let tier = self.driver_isolation_map.get(driver_name).cloned().unwrap_or(DriverIsolationTier::Tier2UserCapsicum);
 
         match tier {
-            DriverIsolationTier::Tier1CoreRing0 => Err(format!(
-                "Kernel Panic: Core Tier 1 driver '{}' crashed in Ring 0!",
-                driver_name
-            )),
+            DriverIsolationTier::Tier1CoreRing0 => Err(format!("Kernel Panic: Core Tier 1 driver '{}' crashed in Ring 0!", driver_name)),
             DriverIsolationTier::Tier2UserCapsicum => {
                 self.caught_panics_count += 1;
                 Ok(format!("Contained Tier 2 driver crash in '{}': Capsicum sandbox process terminated safely without taking down the kernel.", driver_name))
             }
             DriverIsolationTier::Tier3IommuMicrovm => {
                 self.caught_panics_count += 1;
-                Ok(format!(
-                    "Contained Tier 3 driver crash in '{}': IOMMU domain fault isolated safely.",
-                    driver_name
-                ))
+                Ok(format!("Contained Tier 3 driver crash in '{}': IOMMU domain fault isolated safely.", driver_name))
             }
         }
     }
@@ -287,9 +253,7 @@ mod tests {
     fn test_license_audit_engine() {
         let mut engine = LicenseAuditEngine::new();
         assert!(engine.audit_import("rust-alloc", LicenseType::Mit).is_ok());
-        assert!(engine
-            .audit_import("linux-gpl-driver", LicenseType::Gplv2)
-            .is_err());
+        assert!(engine.audit_import("linux-gpl-driver", LicenseType::Gplv2).is_err());
     }
 
     #[test]

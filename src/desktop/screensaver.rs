@@ -429,9 +429,7 @@ mod tests {
     #[test]
     fn test_cinnamon_screensaver_media_and_osk_widgets() {
         let mut config = ScreenSaverConfig::default();
-        config
-            .media_widget
-            .update_track("Midnight City", "M83", "file:///cover.jpg");
+        config.media_widget.update_track("Midnight City", "M83", "file:///cover.jpg");
         assert_eq!(config.media_widget.track_title, "Midnight City");
         assert!(config.media_widget.toggle_play_pause());
 

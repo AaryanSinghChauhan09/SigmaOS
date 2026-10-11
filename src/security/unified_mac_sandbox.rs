@@ -22,14 +22,14 @@ pub enum MacPolicyMode {
 /// OpenBSD-Style Syscall Pledge Promise Categories
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PledgePromise {
-    StdIo,    // Standard input/output/pipes
-    RPath,    // Read-only filesystem access
-    WPath,    // Write filesystem access
-    CPath,    // Create/delete filesystem nodes
-    INet,     // Network socket operations
-    Exec,     // Execute binary images
-    Proc,     // Process management (fork/kill/ps)
-    ProtExec, // Executable memory allocation (mprotect/mmap PROT_EXEC)
+    StdIo,   // Standard input/output/pipes
+    RPath,   // Read-only filesystem access
+    WPath,   // Write filesystem access
+    CPath,   // Create/delete filesystem nodes
+    INet,    // Network socket operations
+    Exec,    // Execute binary images
+    Proc,    // Process management (fork/kill/ps)
+    ProtExec,// Executable memory allocation (mprotect/mmap PROT_EXEC)
 }
 
 impl PledgePromise {
@@ -58,48 +58,23 @@ pub struct UnveilPermissions {
 
 impl UnveilPermissions {
     pub fn read_only() -> Self {
-        Self {
-            read: true,
-            write: false,
-            execute: false,
-            create: false,
-        }
+        Self { read: true, write: false, execute: false, create: false }
     }
 
     pub fn read_write() -> Self {
-        Self {
-            read: true,
-            write: true,
-            execute: false,
-            create: true,
-        }
+        Self { read: true, write: true, execute: false, create: true }
     }
 
     pub fn read_execute() -> Self {
-        Self {
-            read: true,
-            write: false,
-            execute: true,
-            create: false,
-        }
+        Self { read: true, write: false, execute: true, create: false }
     }
 
     pub fn full_access() -> Self {
-        Self {
-            read: true,
-            write: true,
-            execute: true,
-            create: true,
-        }
+        Self { read: true, write: true, execute: true, create: true }
     }
 
     pub fn none() -> Self {
-        Self {
-            read: false,
-            write: false,
-            execute: false,
-            create: false,
-        }
+        Self { read: false, write: false, execute: false, create: false }
     }
 }
 
@@ -152,11 +127,7 @@ impl MacSandboxProfile {
 
     pub fn strict_browser_sandbox(profile_id: &str) -> Self {
         let mut prof = Self::new(profile_id, "Sovereign Browser");
-        prof.pledged_promises = vec![
-            PledgePromise::StdIo,
-            PledgePromise::RPath,
-            PledgePromise::INet,
-        ];
+        prof.pledged_promises = vec![PledgePromise::StdIo, PledgePromise::RPath, PledgePromise::INet];
         prof.allow_network = true;
         prof.unveil_rules.push(UnveilPathRule {
             path_pattern: "/home/user/Downloads".to_string(),
@@ -202,11 +173,7 @@ impl UnifiedMacSandboxEngine {
     }
 
     pub fn register_profile(&mut self, profile: MacSandboxProfile) {
-        if let Some(pos) = self
-            .active_profiles
-            .iter()
-            .position(|p| p.profile_id == profile.profile_id)
-        {
+        if let Some(pos) = self.active_profiles.iter().position(|p| p.profile_id == profile.profile_id) {
             self.active_profiles[pos] = profile;
         } else {
             self.active_profiles.push(profile);
@@ -214,18 +181,9 @@ impl UnifiedMacSandboxEngine {
     }
 
     /// Checks if a process syscall promise is granted under its active profile
-    pub fn evaluate_pledge_syscall(
-        &mut self,
-        profile_id: &str,
-        pid: u32,
-        promise: PledgePromise,
-    ) -> bool {
+    pub fn evaluate_pledge_syscall(&mut self, profile_id: &str, pid: u32, promise: PledgePromise) -> bool {
         self.timestamp_clock_sec += 1;
-        let profile = match self
-            .active_profiles
-            .iter()
-            .find(|p| p.profile_id == profile_id)
-        {
+        let profile = match self.active_profiles.iter().find(|p| p.profile_id == profile_id) {
             Some(p) => p,
             None => return true, // Default unconfined
         };
@@ -268,11 +226,7 @@ impl UnifiedMacSandboxEngine {
         req_exec: bool,
     ) -> bool {
         self.timestamp_clock_sec += 1;
-        let profile = match self
-            .active_profiles
-            .iter()
-            .find(|p| p.profile_id == profile_id)
-        {
+        let profile = match self.active_profiles.iter().find(|p| p.profile_id == profile_id) {
             Some(p) => p,
             None => return true,
         };
@@ -293,11 +247,7 @@ impl UnifiedMacSandboxEngine {
                     policy_mode: profile.mode,
                     event_type: "UNVEIL_DENIED_EXPLICIT".to_string(),
                     target_resource: target_path.to_string(),
-                    decision_action: if profile.mode == MacPolicyMode::Permissive {
-                        "AUDIT_ONLY".to_string()
-                    } else {
-                        "BLOCKED".to_string()
-                    },
+                    decision_action: if profile.mode == MacPolicyMode::Permissive { "AUDIT_ONLY".to_string() } else { "BLOCKED".to_string() },
                 });
                 return profile.mode == MacPolicyMode::Permissive;
             }
@@ -310,10 +260,7 @@ impl UnifiedMacSandboxEngine {
             for rule in &profile.unveil_rules {
                 if !rule.is_denylist && target_path.starts_with(&rule.path_pattern) {
                     let perm = rule.permissions;
-                    if (!req_read || perm.read)
-                        && (!req_write || perm.write)
-                        && (!req_exec || perm.execute)
-                    {
+                    if (!req_read || perm.read) && (!req_write || perm.write) && (!req_exec || perm.execute) {
                         allowed = true;
                         break;
                     }
@@ -372,28 +319,11 @@ mod tests {
         assert!(!engine.evaluate_pledge_syscall("prof.browser", 1001, PledgePromise::Exec));
 
         // 2. Evaluate unveil path restrictions
-        assert!(engine.evaluate_unveil_access(
-            "prof.browser",
-            1001,
-            "/home/user/Downloads/file.pdf",
-            true,
-            true,
-            false
-        ));
-        assert!(!engine.evaluate_unveil_access(
-            "prof.browser",
-            1001,
-            "/etc/shadow",
-            true,
-            false,
-            false
-        ));
+        assert!(engine.evaluate_unveil_access("prof.browser", 1001, "/home/user/Downloads/file.pdf", true, true, false));
+        assert!(!engine.evaluate_unveil_access("prof.browser", 1001, "/etc/shadow", true, false, false));
 
         // 3. Verify auditable security event log
         assert_eq!(engine.audit_log.len(), 4);
-        assert!(engine
-            .audit_log
-            .iter()
-            .any(|e| e.decision_action == "BLOCKED"));
+        assert!(engine.audit_log.iter().any(|e| e.decision_action == "BLOCKED"));
     }
 }

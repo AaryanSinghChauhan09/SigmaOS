@@ -4,12 +4,12 @@ use std::vec::Vec;
 // Foundation Model, Democratic Voting, and Release Roadmaps
 
 pub mod future_protocol;
-pub mod future_protocol;
 pub mod okr;
 pub mod rfc;
-pub mod risk_mitigation;
 pub mod sovereign_task_guidelines_wiki_sync_engine;
 pub mod strategic_vision;
+pub mod future_protocol;
+pub mod risk_mitigation;
 
 pub use risk_mitigation::*;
 
