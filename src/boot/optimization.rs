@@ -105,6 +105,8 @@ impl ServiceCapability {
 pub struct SimpleBootService {
     pub id: ServiceID,
     pub name: [u8; 64],
+    /// Precomputed byte length of service name to enable O(1) slice lookup
+    pub name_len: u8,
     pub priority: ServicePriority,
     pub startup_time: u32,
     pub status: AtomicUsize, // ServiceStatus as usize
@@ -121,15 +123,16 @@ impl SimpleBootService {
         capability: ServiceCapability,
     ) -> Self {
         let mut name_array = [0u8; 64];
-        let name_len = name.len().min(63);
+        let len = name.len().min(63);
 
         unsafe {
-            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
+            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), len);
         }
 
         SimpleBootService {
             id,
             name: name_array,
+            name_len: len as u8,
             priority,
             startup_time,
             status: AtomicUsize::new(ServiceStatus::Pending as usize),
@@ -163,7 +166,8 @@ impl BootService for SimpleBootService {
     }
 
     fn name(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
+        // O(1) slice lookup using cached name_len, avoiding O(N) zero-byte linear scan (.position(|&b| b == 0))
+        let len = (self.name_len as usize).min(63);
         &self.name[..len]
     }
 
@@ -359,16 +363,8 @@ impl BootOptimizer for SimpleBootOptimizer {
             }
         }
 
-        // Sort by priority (lower priority = higher importance)
-        for i in 0..services_with_priority.len() {
-            for j in (i + 1)..services_with_priority.len() {
-                if services_with_priority[j].1 < services_with_priority[i].1 {
-                    let temp = services_with_priority[i];
-                    services_with_priority[i] = services_with_priority[j];
-                    services_with_priority[j] = temp;
-                }
-            }
-        }
+        // O(N log N) sort by priority (lower priority enum variant = higher boot importance)
+        services_with_priority.sort_by_key(|&(_, priority)| priority);
 
         for (id, _) in &services_with_priority {
             ordered_ids.push(*id);
@@ -404,5 +400,74 @@ impl BootOptimizer for SimpleBootOptimizer {
 
     fn stats(&self) -> BootStats {
         self.stats
+    }
+}
+
+#[cfg(any(test, feature = "standalone_test"))]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_simple_boot_service_name_length_caching() {
+        let cap = ServiceCapability::full();
+        let service = SimpleBootService::new(101, b"network-manager", ServicePriority::High, 150, cap);
+        assert_eq!(service.name_len, 15);
+        assert_eq!(service.name(), b"network-manager");
+    }
+
+    #[test]
+    fn test_simple_boot_service_dependencies_and_status() {
+        let cap = ServiceCapability::full();
+        let mut service = SimpleBootService::new(102, b"display-daemon", ServicePriority::Medium, 200, cap);
+        assert_eq!(service.get_status() as u32, ServiceStatus::Pending as u32);
+
+        service.add_dependency(101);
+        assert_eq!(service.dependencies.len(), 1);
+        assert_eq!(service.dependencies[0], 101);
+
+        assert!(service.initialize().is_ok());
+        assert_eq!(service.get_status() as u32, ServiceStatus::Ready as u32);
+    }
+
+    #[test]
+    fn test_boot_optimizer_ordering_and_initialization() {
+        let opt_cap = OptimizerCapability::full();
+        let mut optimizer = SimpleBootOptimizer::new(opt_cap);
+
+        let service_low = Box::new(SimpleBootService::new(
+            1,
+            b"cron-daemon",
+            ServicePriority::Low,
+            50,
+            ServiceCapability::full(),
+        ));
+        let service_crit = Box::new(SimpleBootService::new(
+            2,
+            b"vfs-root",
+            ServicePriority::Critical,
+            10,
+            ServiceCapability::full(),
+        ));
+        let service_high = Box::new(SimpleBootService::new(
+            3,
+            b"udev-device-mgr",
+            ServicePriority::High,
+            30,
+            ServiceCapability::full(),
+        ));
+
+        assert!(optimizer.register_service(service_low).is_ok());
+        assert!(optimizer.register_service(service_crit).is_ok());
+        assert!(optimizer.register_service(service_high).is_ok());
+
+        let order = optimizer.optimize_boot_order().unwrap();
+        assert_eq!(order, vec![2, 3, 1]);
+
+        assert!(optimizer.initialize_all().is_ok());
+        let stats = optimizer.stats();
+        assert_eq!(stats.total_services, 3);
+        assert_eq!(stats.ready_services, 3);
+        assert_eq!(stats.failed_services, 0);
+        assert_eq!(stats.total_boot_time, 90);
     }
 }
