@@ -3,6 +3,8 @@ pub mod archive;
 pub mod bsd_linux_innovations;
 pub mod btrfs;
 pub mod btrfs_snapshots;
+pub mod cache;
+pub mod core;
 pub mod cow_snapshot;
 pub mod defragmenter;
 pub mod disk_usage;
@@ -11,6 +13,7 @@ pub mod ext4_mount;
 pub mod ext4_ntfs_security;
 pub mod file_monitor;
 pub mod manager;
+pub mod mount;
 pub mod mount_namespace;
 pub mod sigma_fs;
 pub mod smart_symlink;
@@ -22,6 +25,9 @@ pub mod watch;
 pub mod zfs;
 pub mod zfs_arc;
 
+pub use cache::{BlockCacheManager, CacheBlock, CacheError};
+pub use core::{FilesystemCoreManager, FsCoreError, FsNode};
+pub use mount::{MountError, MountManager, MountPoint};
 pub use crate::filesystem::vfs::{FileType, FsError, Inode, VfsError, VirtualFilesystem};
 pub use smart_symlink::{LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule};
 // Removed non-existent vfs exports: FileDescriptor, FilePermissions

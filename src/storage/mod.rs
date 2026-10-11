@@ -24,8 +24,10 @@ pub mod search;
 pub mod snapshot_manager;
 pub mod sovereign_disk_manager;
 pub mod sql_engine;
+pub mod virtio;
 pub mod volume;
 
+pub use block::{BoundedBlockDeviceManager, BoundedBlockError, BoundedRequest};
 pub use geom::{
     BioCmd, BioRequest, GeomClassType, GeomConsumer, GeomEliConfig, GeomProvider, GeomTopology,
     PartitionEntry,
@@ -37,4 +39,5 @@ pub use snapshot_manager::{
 pub use sql_engine::{
     Column, QueryResult, SqlEngine, SqlType, SqlValue, Table, Transaction, TransactionState,
 };
+pub use virtio::{RequestType, VirtIoBlockDevice, VirtIoBlockError, VirtIoRequest};
 pub mod mintstick_flasher;
