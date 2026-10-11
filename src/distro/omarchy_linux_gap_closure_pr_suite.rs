@@ -136,6 +136,21 @@ impl SovereignOmarchyLinuxDistroGapClosurePrEngine {
             false
         }
     }
+
+    pub fn generate_pr_diff_for_kind(&self, kind: OmarchyPrKind, param: &str) -> String {
+        match kind {
+            OmarchyPrKind::GhosttyAlacrittyConfig => {
+                OmarchyGhosttyAlacrittyConfigPrEngine::generate_ghostty_pr_diff(param, 12.0)
+            }
+            OmarchyPrKind::HypridleHyprlockConfig => {
+                OmarchyHypridleHyprlockPrEngine::generate_hyprlock_pr_diff(param)
+            }
+            OmarchyPrKind::WalkerLauncherConfig => {
+                OmarchyWalkerLauncherPrEngine::generate_walker_pr_diff(param)
+            }
+            _ => format!("--- a/config\n+++ b/config\n@@ -1 +1 @@\n-old\n+{}", param),
+        }
+    }
 }
 
 impl Default for SovereignOmarchyLinuxDistroGapClosurePrEngine {
