@@ -218,10 +218,6 @@ pub use display_settings_manager::{
     DesktopDisplaySettingsManagerStatistics, DesktopRefreshRate, DesktopResolution,
 };
 
-// SigmaOS Desktop Module
-pub mod font_manager;
-pub use font_manager::*;
-
 pub mod mate_betsy;
 pub mod mint_tools;
 pub mod moksha;
