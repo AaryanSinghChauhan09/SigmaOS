@@ -30,6 +30,7 @@ pub mod thp;
 pub mod tlb_associative;
 pub mod userfaultfd;
 pub mod zone;
+pub mod zram;
 pub mod zswap;
 
 pub use acpi_slit::AcpiSlitTable;
@@ -48,6 +49,11 @@ pub use paging::{
 
 pub use allocator::{BuddyAllocator, MemoryBlock, SlabAllocator, SlabCache, SlabObject};
 pub use cgroups::{MemCgroup, MemCgroupManager};
+pub use zram::{
+    ZramConfig, ZramStats, ZramDevice, ZramManager,
+    CompressionAlgorithm,
+    init_zram_manager, get_zram_manager, create_default_zram,
+};
 pub use kswapd::{LinuxKswapd, PageState};
 pub use quota::{
     MemoryController, MemoryStats, MemoryUnit, OomEvent, OomPolicy, PageCacheStat,
