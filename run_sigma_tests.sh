@@ -1074,6 +1074,20 @@ if [ -f "src/distro/open_source_os_unimplemented_ideas_pr_suite.rs" ]; then
     ./build/test_os_ideas_suite
 fi
 
+if [ -f "src/distro/open_source_os_unimplemented_ideas_pr_gateway.rs" ]; then
+    echo "Running Open Source OS Unimplemented Ideas PR Gateway test suite..."
+    mkdir -p build
+    rustc --test src/distro/open_source_os_unimplemented_ideas_pr_gateway.rs --edition=2021 -o build/test_os_ideas_gateway
+    ./build/test_os_ideas_gateway
+fi
+
+if [ -f "src/distro/arch_linux_github_repo_components_pr_engine.rs" ]; then
+    echo "Running Arch Linux GitHub Repo Components PR Engine test suite..."
+    mkdir -p build
+    rustc --test src/distro/arch_linux_github_repo_components_pr_engine.rs --edition=2021 -o build/test_arch_github_repo_components
+    ./build/test_arch_github_repo_components
+fi
+
 if [ -f "src/distro/debian_github_repo_inspirations_pr.rs" ]; then
     echo "Running Debian GitHub Repo Inspirations PR Suite test suite..."
     mkdir -p build
