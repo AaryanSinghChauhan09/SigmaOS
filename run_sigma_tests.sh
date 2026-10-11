@@ -416,6 +416,13 @@ if [ -f "src/package/sovereign_distro_package_advancements_v32.rs" ]; then
     ./build/sovereign_advancements_v32_test
 fi
 
+if [ -f "src/package/sovereign_distro_package_advancements_v35.rs" ]; then
+    echo "Running Sovereign Universal Package Advancements Suite V35 test suite..."
+    mkdir -p build
+    rustc --test src/package/sovereign_distro_package_advancements_v35.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v35_test
+    ./build/sovereign_advancements_v35_test
+fi
+
 if [ -f "src/package/sovereign_universal_pm_pr_bridge.rs" ]; then
     echo "Running Sovereign Universal PM PR Bridge Engine test suite..."
     mkdir -p build
@@ -582,6 +589,20 @@ if [ -f "src/distro/sovereign_open_source_os_gap_closure_pr.rs" ]; then
     mkdir -p build
     rustc --test src/distro/sovereign_open_source_os_gap_closure_pr.rs --edition=2021 -o build/test_os_gap_closure_pr
     ./build/test_os_gap_closure_pr
+fi
+
+if [ -f "src/distro/arch_linux_advancements_v38_pr.rs" ]; then
+    echo "Running Sovereign Arch Linux Advancements Suite V38 PR test suite..."
+    mkdir -p build
+    rustc --test src/distro/arch_linux_advancements_v38_pr.rs --edition=2021 -o build/test_arch_v38_pr
+    ./build/test_arch_v38_pr
+fi
+
+if [ -f "src/distro/arch_linux_missing_components_pr_suite.rs" ]; then
+    echo "Running Sovereign Arch Linux Missing Components PR test suite..."
+    mkdir -p build
+    rustc --test src/distro/arch_linux_missing_components_pr_suite.rs --edition=2021 -o build/test_arch_missing_pr
+    ./build/test_arch_missing_pr
 fi
 
 if [ -f "src/compatibility/omarchy_supreme_engine.rs" ]; then
