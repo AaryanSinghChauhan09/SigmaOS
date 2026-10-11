@@ -53,6 +53,8 @@ function createMockElement(id, tag = "div") {
   return el;
 }
 
+global.window = globalThis;
+
 const docListeners = {};
 global.document = {
   readyState: "complete",
@@ -221,10 +223,23 @@ assert.strictEqual(toast.textContent, "Test Toast Message", "Expected toast text
 
 global.window = globalThis;
 zenith.initContextMenu();
-createMockElement("context-menu");
+const ctxMenuEl = createMockElement("context-menu");
 global.window.contextAction("cleanup");
 assert.strictEqual(kernelLogs.children.length, 2, "Expected contextAction('cleanup') to append a new toast notification");
 assert.strictEqual(kernelLogs.children[1].textContent.includes("purged"), true, "Expected toast notification text to mention purged caches");
 console.log("✓ Accessible Toast Notifications & Context Action Feedback verified successfully!");
+
+// Test 12: Context menu keyboard focus restoration
+const triggerBtn = createMockElement("trigger-btn");
+triggerBtn.focus();
+assert.strictEqual(global.document.activeElement, triggerBtn, "Expected trigger-btn to be active before contextmenu");
+
+global.document.dispatchEvent({ type: "contextmenu", target: triggerBtn, clientX: 100, clientY: 100, preventDefault: () => {} });
+
+// Dismiss context menu with Escape key
+global.document.dispatchEvent({ type: "keydown", key: "Escape" });
+assert.strictEqual(ctxMenuEl.style.display, "none", "Expected context-menu to close on Escape key");
+assert.strictEqual(global.document.activeElement, triggerBtn, "Expected focus to be restored to triggerBtn on Escape");
+console.log("✓ Context Menu Keyboard Focus Restoration verified successfully!");
 
 console.log("All Command Palette & Desktop UX tests passed successfully!");
