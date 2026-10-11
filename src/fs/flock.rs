@@ -42,12 +42,26 @@ impl FileRangeLock {
     }
 
     pub fn overlaps(&self, start: u64, len: u64) -> bool {
-        let self_end = if self.len == 0 { u64::MAX } else { self.start.saturating_add(self.len) };
-        let other_end = if len == 0 { u64::MAX } else { start.saturating_add(len) };
+        let self_end = if self.len == 0 {
+            u64::MAX
+        } else {
+            self.start.saturating_add(self.len)
+        };
+        let other_end = if len == 0 {
+            u64::MAX
+        } else {
+            start.saturating_add(len)
+        };
         self.start < other_end && start < self_end
     }
 
-    pub fn conflicts_with(&self, other_pid: u32, lock_type: LockType, start: u64, len: u64) -> bool {
+    pub fn conflicts_with(
+        &self,
+        other_pid: u32,
+        lock_type: LockType,
+        start: u64,
+        len: u64,
+    ) -> bool {
         if self.owner_pid == other_pid {
             return false;
         }
@@ -71,12 +85,7 @@ impl FileLockManager {
         Self { locks: Vec::new() }
     }
 
-    pub fn apply_flock(
-        &mut self,
-        pid: u32,
-        fd_id: i32,
-        operation: u32,
-    ) -> Result<(), FsError> {
+    pub fn apply_flock(&mut self, pid: u32, fd_id: i32, operation: u32) -> Result<(), FsError> {
         let is_unlock = (operation & LOCK_UN) != 0;
 
         if is_unlock {
@@ -92,13 +101,17 @@ impl FileLockManager {
             return Err(FsError::InvalidOperation);
         };
 
-        let confl = self.locks.iter().any(|l| l.conflicts_with(pid, lock_type, 0, 0));
+        let confl = self
+            .locks
+            .iter()
+            .any(|l| l.conflicts_with(pid, lock_type, 0, 0));
         if confl {
             return Err(FsError::ResourceBusy);
         }
 
         self.release_locks_for_fd(pid, fd_id);
-        self.locks.push(FileRangeLock::new(pid, fd_id, lock_type, 0, 0));
+        self.locks
+            .push(FileRangeLock::new(pid, fd_id, lock_type, 0, 0));
         Ok(())
     }
 
@@ -130,16 +143,19 @@ impl FileLockManager {
             return Err(FsError::ResourceBusy);
         }
 
-        self.locks.push(FileRangeLock::new(pid, fd_id, lock_type, start, len));
+        self.locks
+            .push(FileRangeLock::new(pid, fd_id, lock_type, start, len));
         Ok(())
     }
 
     pub fn unlock_range(&mut self, pid: u32, start: u64, len: u64) {
-        self.locks.retain(|l| !(l.owner_pid == pid && l.overlaps(start, len)));
+        self.locks
+            .retain(|l| !(l.owner_pid == pid && l.overlaps(start, len)));
     }
 
     pub fn release_locks_for_fd(&mut self, pid: u32, fd_id: i32) {
-        self.locks.retain(|l| !(l.owner_pid == pid && l.fd_id == fd_id));
+        self.locks
+            .retain(|l| !(l.owner_pid == pid && l.fd_id == fd_id));
     }
 
     pub fn release_locks_for_process(&mut self, pid: u32) {

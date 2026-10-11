@@ -83,7 +83,9 @@ impl FileHandle {
             }
             SeekFrom::End(off) => {
                 if off >= 0 {
-                    file_size.checked_add(off as u64).ok_or(FsError::BadOffset)?
+                    file_size
+                        .checked_add(off as u64)
+                        .ok_or(FsError::BadOffset)?
                 } else {
                     let neg = (-off) as u64;
                     file_size.checked_sub(neg).ok_or(FsError::BadOffset)?
