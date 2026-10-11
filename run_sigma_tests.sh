@@ -1109,4 +1109,11 @@ if [ -f "src/drivers/sovereign_device_driver_development_and_pr_suite.rs" ]; the
     ./build/test_device_driver_pr_suite
 fi
 
+if [ -f "src/userland/system_utilities.rs" ]; then
+    echo "Running System Utilities Architecture & Registry Framework test suite..."
+    mkdir -p build
+    rustc --test src/userland/system_utilities.rs --edition=2021 -o build/test_system_utilities
+    ./build/test_system_utilities
+fi
+
 echo "All SigmaOS test suites completed."
