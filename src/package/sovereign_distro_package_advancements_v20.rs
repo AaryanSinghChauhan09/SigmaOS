@@ -358,6 +358,17 @@ impl SovereignDistroPackageAdvancementsSuiteV20 {
         }
     }
 
+    /// Converts a foreign package, generates a Pull Request submission, and returns the converted spec
+    pub fn ingest_foreign_package_pr(
+        &mut self,
+        filename: &str,
+        payload: &[u8],
+    ) -> Result<ConvertedPackageSpecV20, String> {
+        let spec = self.converter.convert_package(filename, payload)?;
+        let _pr = self.pr_pipeline.submit_package_pr(spec.clone());
+        Ok(spec)
+    }
+
     /// Converts a foreign package, generates a Pull Request submission, and installs into Sigma-pkg
     pub fn convert_submit_and_install(
         &mut self,
