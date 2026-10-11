@@ -19,6 +19,7 @@ pub mod kswapd;
 pub mod low_level;
 pub mod oom_killer;
 pub mod page_cache;
+pub mod page_compaction;
 pub mod paging;
 pub mod quota;
 pub mod segmentation_paging;
@@ -59,4 +60,5 @@ pub use segmentation_paging::{
 };
 pub use thp::{HugePageBlock, HugePageFlags, SovereignHugePageEngine, TransparentHugePageMode};
 pub use tlb_associative::{AssociativeTlbCache, TlbAssociativityMode, TlbEntry, TlbPageFlags};
+pub use page_compaction::*;
 pub use zone::{BsdZoneAllocator, Slab, Zone, ZoneStats};

@@ -45,6 +45,7 @@ pub mod kernel;
 pub mod klib;
 pub mod memory;
 pub use memory::low_level;
+pub use memory::page_compaction::*;
 pub mod network;
 pub mod observability;
 pub mod orchestration;

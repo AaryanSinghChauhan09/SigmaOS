@@ -57,6 +57,13 @@ if [ -f "src/memory/huge_pages.rs" ]; then
     ./build/huge_pages_test
 fi
 
+if [ -f "src/memory/page_compaction.rs" ]; then
+    echo "Running page compaction & anti-fragmentation test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/memory/page_compaction.rs -o build/page_compaction_test
+    ./build/page_compaction_test
+fi
+
 if [ -f "src/memory/kswapd.rs" ]; then
     echo "Running kswapd LRU page reclaim & ZRAM test suite..."
     mkdir -p build
