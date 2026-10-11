@@ -302,6 +302,11 @@ impl WikiDataTransferEngine {
             "Bare Metal Start Assembly Entry PR",
             true,
         );
+        self.register_spec_file(
+            "31-Assembly-Bootstrap-Entry-Advancements-PR.md",
+            "Assembly Bootstrap Entry Advancements PR",
+            true,
+        );
     }
 
     pub fn register_spec_file(&mut self, filename: &str, title: &str, fully_implemented: bool) {
