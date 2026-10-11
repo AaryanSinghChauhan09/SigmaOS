@@ -496,6 +496,50 @@ impl Default for ArchMkinitcpioGenerator {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct InitramfsHookSpec {
+    pub name: String,
+    pub is_runtime: bool,
+    pub dependencies: Vec<String>,
+}
+
+pub struct ArchMkinitcpioHooksEngine {
+    pub hooks: BTreeMap<String, InitramfsHookSpec>,
+    pub compression_format: String,
+}
+
+impl ArchMkinitcpioHooksEngine {
+    pub fn new() -> Self {
+        let mut hooks = BTreeMap::new();
+        hooks.insert(
+            "base".to_string(),
+            InitramfsHookSpec {
+                name: "base".to_string(),
+                is_runtime: true,
+                dependencies: Vec::new(),
+            },
+        );
+        hooks.insert(
+            "udev".to_string(),
+            InitramfsHookSpec {
+                name: "udev".to_string(),
+                is_runtime: true,
+                dependencies: vec!["base".to_string()],
+            },
+        );
+        Self {
+            hooks,
+            compression_format: "zstd".to_string(),
+        }
+    }
+}
+
+impl Default for ArchMkinitcpioHooksEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // =========================================================================
 // 10. PACSTRAP & ARCH-CHROOT ROOTFS ENGINE (pacstrap / arch-chroot)
 // =========================================================================
@@ -652,6 +696,33 @@ impl ArchPacmanCacheScrubber {
             retain_keep_count,
         }
     }
+}
+
+pub struct ArchPacmanCacheScrubber {
+    pub cached_files: Vec<CachedPackageFile>,
+    pub retain_keep_count: usize,
+}
+
+impl ArchPacmanCacheScrubber {
+    pub fn new(retain_keep_count: usize) -> Self {
+        Self {
+            cached_files: Vec::new(),
+            retain_keep_count,
+        }
+    }
+}
+
+impl Default for ArchPacmanKeyringPqcEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CachedPackageFile {
+    pub pkgname: String,
+    pub version: String,
+    pub file_size_bytes: u64,
 }
 
 pub struct ArchPacmanCacheScrubber {

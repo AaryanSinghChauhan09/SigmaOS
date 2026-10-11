@@ -534,6 +534,12 @@ pub mod sovereign_open_source_os_pinnacle_pr_v35;
 pub mod whonix_privacy_synthesis;
 pub mod wiki_unimplemented_ideas;
 
+pub mod open_source_os_unimplemented_ideas_pr;
+pub use open_source_os_unimplemented_ideas_pr::*;
+
+pub mod sovereign_omarchy_github_repo_parity;
+pub use sovereign_omarchy_github_repo_parity::*;
+
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;
 pub use crate::stubs::large_distro_stubs::*;

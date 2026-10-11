@@ -4,7 +4,7 @@
 // Zero-dependency, `#![no_std]` compliant Rust subsystem implementing full feature parity
 // with the Omarchy Linux GitHub repository:
 // 1. OmarchyHyprlandThemeSyncEngine: Hyprland dynamic keybinding & theme sync manager across
-//    Catppuccin, TokyoNight, Gruvbox, Nord, Everforest, and Kanagawa.
+//    Catppuccin, TokyoNight, Gruvbox, Nord, Everforest, Kanagawa, RosePine, Dracula, and SolarizedDark.
 // 2. OmarchyQuickshellWidgetPalette: Quickshell QML widget manager & status bar applet provider.
 // 3. OmarchyDotfilePkgbuildInstaller: GNU Stow dotfiles installer & Arch Linux AUR PKGBUILD manager.
 // 4. OmarchyOmakaseEcosystemMasterSuite: Master orchestrator unifying Omarchy themes, quickshell widgets,
@@ -23,6 +23,9 @@ pub enum OmarchyThemeName {
     Nord,
     Everforest,
     Kanagawa,
+    RosePine,
+    Dracula,
+    SolarizedDark,
 }
 
 impl OmarchyThemeName {
@@ -34,6 +37,9 @@ impl OmarchyThemeName {
             Self::Nord => "nord",
             Self::Everforest => "everforest",
             Self::Kanagawa => "kanagawa",
+            Self::RosePine => "rose-pine",
+            Self::Dracula => "dracula",
+            Self::SolarizedDark => "solarized-dark",
         }
     }
 }
@@ -93,6 +99,14 @@ impl OmarchyHyprlandThemeSyncEngine {
         self.keybindings.insert(
             String::from("SUPER, T"),
             String::from("exec, omarchy-theme-picker"),
+        );
+        self.keybindings.insert(
+            String::from("SUPER, S"),
+            String::from("exec, omarchy-screenshot"),
+        );
+        self.keybindings.insert(
+            String::from("SUPER, L"),
+            String::from("exec, hyprlock"),
         );
     }
 
@@ -161,6 +175,39 @@ impl OmarchyHyprlandThemeSyncEngine {
                 foreground: String::from("#dcd7ba"),
                 border_color: String::from("#957fb8"),
                 active_workspace: String::from("#ffa066"),
+            },
+        );
+        self.theme_palettes.insert(
+            OmarchyThemeName::RosePine,
+            OmarchyThemeColors {
+                name: String::from("Rosé Pine"),
+                primary_accent: String::from("#ebbcba"),
+                background: String::from("#191724"),
+                foreground: String::from("#e0def4"),
+                border_color: String::from("#c4a7e7"),
+                active_workspace: String::from("#f6c177"),
+            },
+        );
+        self.theme_palettes.insert(
+            OmarchyThemeName::Dracula,
+            OmarchyThemeColors {
+                name: String::from("Dracula"),
+                primary_accent: String::from("#ff79c6"),
+                background: String::from("#282a36"),
+                foreground: String::from("#f8f8f2"),
+                border_color: String::from("#bd93f9"),
+                active_workspace: String::from("#50fa7b"),
+            },
+        );
+        self.theme_palettes.insert(
+            OmarchyThemeName::SolarizedDark,
+            OmarchyThemeColors {
+                name: String::from("Solarized Dark"),
+                primary_accent: String::from("#268bd2"),
+                background: String::from("#002b36"),
+                foreground: String::from("#839496"),
+                border_color: String::from("#2aa198"),
+                active_workspace: String::from("#859900"),
             },
         );
     }
@@ -239,6 +286,10 @@ impl OmarchyQuickshellWidgetPalette {
             .push(String::from("omarchy-bar-system-tray"));
         self.active_widgets
             .push(String::from("omarchy-bar-ai-herdr-button"));
+        self.active_widgets
+            .push(String::from("omarchy-bar-cpu-temp"));
+        self.active_widgets
+            .push(String::from("omarchy-bar-battery-status"));
     }
 
     pub fn send_notification(&mut self, title: &str, body: &str) {
@@ -283,6 +334,8 @@ impl OmarchyDotfilePkgbuildInstaller {
         self.managed_stow_profiles.push(String::from("ghostty"));
         self.managed_stow_profiles.push(String::from("neovim"));
         self.managed_stow_profiles.push(String::from("waybar"));
+        self.managed_stow_profiles.push(String::from("rofi"));
+        self.managed_stow_profiles.push(String::from("zsh"));
 
         self.registered_pkgbuilds.insert(
             String::from("omarchy-theme-pack"),
@@ -380,12 +433,15 @@ mod tests {
 
         let ghostty_cfg = engine.generate_ghostty_theme_config();
         assert!(ghostty_cfg.contains("background = #1a1b26"));
+
+        assert!(engine.set_theme(OmarchyThemeName::RosePine));
+        assert!(engine.generate_ghostty_theme_config().contains("Rosé Pine"));
     }
 
     #[test]
     fn test_omarchy_quickshell_widget_palette() {
         let mut palette = OmarchyQuickshellWidgetPalette::new();
-        assert_eq!(palette.get_active_widget_count(), 6);
+        assert_eq!(palette.get_active_widget_count(), 8);
 
         palette.send_notification("Update Available", "System updates ready");
         assert_eq!(palette.notification_history.len(), 1);
@@ -394,7 +450,7 @@ mod tests {
     #[test]
     fn test_omarchy_dotfile_pkgbuild_installer() {
         let mut installer = OmarchyDotfilePkgbuildInstaller::new();
-        assert_eq!(installer.managed_stow_profiles.len(), 4);
+        assert_eq!(installer.managed_stow_profiles.len(), 6);
 
         let pkg =
             installer.generate_custom_pkgbuild("omarchy-ai-tools", "2.0.0", "AI Tools for Omarchy");
