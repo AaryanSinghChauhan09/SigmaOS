@@ -222,6 +222,13 @@ pub use module_tools::{
 };
 pub use procfs_linux::{ProcFs, ProcessInfo};
 pub use sysfs_manager::{Sysfs, SysfsAttribute, SysfsKobject};
+pub mod msgqueue;
+pub mod shm;
+pub mod shm_anon;
+pub use shm_anon::{
+    ShmAnonMapping, ShmAnonManager, init_shm_anon, get_shm_anon_manager,
+    shm_open, shm_close, shm_unlink, mmap_shm, munmap_shm,
+};
 pub mod smp_load_balancer;
 pub mod wx_pte_hardening;
 pub mod crash_dump;

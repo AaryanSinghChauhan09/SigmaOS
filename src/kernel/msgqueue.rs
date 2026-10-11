@@ -43,11 +43,11 @@ impl Default for MsgQPerm {
 #[derive(Debug, Clone)]
 pub struct Message {
     pub mtype: i64,
-    pub data: Vec<u8>,
+    pub data: alloc::vec::Vec<u8>,
 }
 
 impl Message {
-    pub fn new(mtype: i64, data: Vec<u8>) -> Self {
+    pub fn new(mtype: i64, data: alloc::vec::Vec<u8>) -> Self {
         Self { mtype, data }
     }
 }
@@ -57,7 +57,7 @@ impl Message {
 pub struct MessageQueue {
     pub id: u64,
     pub key: i32,
-    pub messages: VecDeque<Message>,
+    pub messages: alloc::collections::VecDeque<Message>,
     pub perm: MsgQPerm,
     pub max_size: usize,
 }
@@ -67,7 +67,7 @@ impl MessageQueue {
         Self {
             id,
             key,
-            messages: VecDeque::new(),
+            messages: alloc::collections::VecDeque::new(),
             perm,
             max_size,
         }

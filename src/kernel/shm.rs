@@ -1,8 +1,11 @@
 // Linux-inspired shared memory for IPC
 // Provides shared memory segments for inter-process communication
 
-use std::collections::HashMap;
-use std::sync::{Arc, Mutex};
+#![no_std]
+
+extern crate alloc;
+use alloc::collections::HashMap;
+use alloc::sync::{Arc, Mutex};
 
 /// Shared memory permissions
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -63,18 +66,21 @@ pub struct ShmSegment {
     pub id: u64,
     pub key: i32,
     pub size: usize,
-    pub data: Vec<u8>,
+    pub data: alloc::vec::Vec<u8>,
     pub perm: ShmPerm,
     pub attached: bool,
 }
 
 impl ShmSegment {
     pub fn new(id: u64, key: i32, size: usize, perm: ShmPerm) -> Self {
+        let mut data = alloc::vec::Vec::with_capacity(size);
+        data.resize(size, 0);
+        
         Self {
             id,
             key,
             size,
-            data: vec![0; size],
+            data,
             perm,
             attached: false,
         }
@@ -150,13 +156,13 @@ impl ShmManager {
 
     /// Create a new shared memory segment
     pub fn create_segment(&self, key: i32, size: usize, perm: ShmPerm) -> u64 {
-        let mut next_id = self.next_segment_id.lock().unwrap_or_else(|e| e.into_inner());
+        let mut next_id = self.next_segment_id.lock().unwrap();
         let segment_id = *next_id;
         *next_id += 1;
         drop(next_id);
 
         let segment = ShmSegment::new(segment_id, key, size, perm);
-        let mut segments = self.segments.lock().unwrap_or_else(|e| e.into_inner());
+        let mut segments = self.segments.lock().unwrap();
         segments.insert(segment_id, segment);
 
         segment_id
@@ -164,19 +170,19 @@ impl ShmManager {
 
     /// Get a segment by ID
     pub fn get_segment(&self, segment_id: u64) -> Option<ShmSegment> {
-        let segments = self.segments.lock().unwrap_or_else(|e| e.into_inner());
+        let segments = self.segments.lock().unwrap();
         segments.get(&segment_id).cloned()
     }
 
     /// Get a segment by key
     pub fn get_segment_by_key(&self, key: i32) -> Option<ShmSegment> {
-        let segments = self.segments.lock().unwrap_or_else(|e| e.into_inner());
+        let segments = self.segments.lock().unwrap();
         segments.values().find(|s| s.key == key).cloned()
     }
 
     /// Remove a segment
     pub fn remove_segment(&self, segment_id: u64) -> Result<(), String> {
-        let mut segments = self.segments.lock().unwrap_or_else(|e| e.into_inner());
+        let mut segments = self.segments.lock().unwrap();
         match segments.remove(&segment_id) {
             Some(_) => Ok(()),
             None => Err(format!("Segment {} not found", segment_id)),
@@ -185,7 +191,7 @@ impl ShmManager {
 
     /// Attach to segment
     pub fn attach(&self, segment_id: u64) -> Result<(), String> {
-        let mut segments = self.segments.lock().unwrap_or_else(|e| e.into_inner());
+        let mut segments = self.segments.lock().unwrap();
         match segments.get_mut(&segment_id) {
             Some(segment) => segment.attach(),
             None => Err(format!("Segment {} not found", segment_id)),
@@ -194,7 +200,7 @@ impl ShmManager {
 
     /// Detach from segment
     pub fn detach(&self, segment_id: u64) -> Result<(), String> {
-        let mut segments = self.segments.lock().unwrap_or_else(|e| e.into_inner());
+        let mut segments = self.segments.lock().unwrap();
         match segments.get_mut(&segment_id) {
             Some(segment) => {
                 segment.detach();
@@ -206,7 +212,7 @@ impl ShmManager {
 
     /// Read from segment
     pub fn read(&self, segment_id: u64, offset: usize, count: usize) -> Result<Vec<u8>, String> {
-        let segments = self.segments.lock().unwrap_or_else(|e| e.into_inner());
+        let segments = self.segments.lock().unwrap();
         match segments.get(&segment_id) {
             Some(segment) => segment.read(offset, count),
             None => Err(format!("Segment {} not found", segment_id)),
@@ -215,7 +221,7 @@ impl ShmManager {
 
     /// Write to segment
     pub fn write(&self, segment_id: u64, offset: usize, data: &[u8]) -> Result<(), String> {
-        let mut segments = self.segments.lock().unwrap_or_else(|e| e.into_inner());
+        let mut segments = self.segments.lock().unwrap();
         match segments.get_mut(&segment_id) {
             Some(segment) => segment.write(offset, data),
             None => Err(format!("Segment {} not found", segment_id)),
@@ -224,7 +230,7 @@ impl ShmManager {
 
     /// Get segment count
     pub fn segment_count(&self) -> usize {
-        let segments = self.segments.lock().unwrap_or_else(|e| e.into_inner());
+        let segments = self.segments.lock().unwrap();
         segments.len()
     }
 }
