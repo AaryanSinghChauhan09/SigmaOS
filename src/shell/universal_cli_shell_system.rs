@@ -1175,6 +1175,75 @@ impl Default for UniversalShCrossDialectEngine {
 }
 
 // =========================================================================
+// 7. SOVEREIGN UNIVERSAL SH INTERPRETER ENGINE
+// =========================================================================
+
+pub struct SovereignUniversalShInterpreterEngine {
+    pub cross_dialect_engine: UniversalShCrossDialectEngine,
+    pub active_shell_format: ShellSystemFormat,
+}
+
+impl SovereignUniversalShInterpreterEngine {
+    pub fn new() -> Self {
+        Self {
+            cross_dialect_engine: UniversalShCrossDialectEngine::new(),
+            active_shell_format: ShellSystemFormat::Dash,
+        }
+    }
+
+    /// Evaluates direct `sh -c "code"`, `bash -c "code"`, `fish -c "code"`, etc. CLI commands
+    pub fn execute_sh_command_string(&mut self, full_cmd: &str) -> Result<String, &'static str> {
+        let trimmed = full_cmd.trim();
+        let parts: Vec<&str> = trimmed.split_whitespace().collect();
+        if parts.is_empty() {
+            return Ok(String::new());
+        }
+
+        let shell_binary = parts[0];
+        let target_format = match shell_binary {
+            "bash" => ShellSystemFormat::Bash,
+            "zsh" => ShellSystemFormat::Zsh,
+            "fish" => ShellSystemFormat::Fish,
+            "tcsh" | "csh" => ShellSystemFormat::Tcsh,
+            "ksh" | "mksh" => ShellSystemFormat::Ksh,
+            "pwsh" | "powershell" => ShellSystemFormat::PowerShell,
+            "nu" => ShellSystemFormat::Nushell,
+            "ion" => ShellSystemFormat::Ion,
+            "elvish" => ShellSystemFormat::Elvish,
+            "xonsh" => ShellSystemFormat::Xonsh,
+            "ysh" | "oil" => ShellSystemFormat::Oil,
+            _ => ShellSystemFormat::Dash,
+        };
+
+        let mut script_code = String::new();
+        if let Some(c_idx) = parts.iter().position(|&p| p == "-c") {
+            if c_idx + 1 < parts.len() {
+                let code_raw = trimmed.splitn(c_idx + 2, ' ').last().unwrap_or_default();
+                script_code = code_raw.trim_matches('"').trim_matches('\'').to_string();
+            }
+        } else {
+            script_code = trimmed.to_string();
+        }
+
+        let shebang_script = format!("{}\n{}", target_format.primary_shebang(), script_code);
+        let plan = self.cross_dialect_engine.run_universal_sh_script(&shebang_script)?;
+
+        Ok(format!(
+            "Universal POSIX /bin/sh Execution Success [{}]\nTranspiled POSIX Script:\n{}\nStages Count: {}",
+            plan.target_format.name(),
+            plan.posix_sh_script,
+            plan.stages.len()
+        ))
+    }
+}
+
+impl Default for SovereignUniversalShInterpreterEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
 // UNIT TESTS
 // =========================================================================
 
