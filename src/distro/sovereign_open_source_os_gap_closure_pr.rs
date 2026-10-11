@@ -294,7 +294,169 @@ impl Default for LinuxBcachefsIoUringMemfdPrEngine {
 }
 
 // ============================================================================
-// 6. Master PR Gateway Coordinator
+// 6. Haiku OS BFS Attribute Indexing & BeAPI PR Engine
+// ============================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct HaikuBfsAttributeRecord {
+    pub file_path: String,
+    pub attribute_key: String,
+    pub attribute_value: String,
+}
+
+pub struct HaikuBfsAttributeIndexingPrEngine {
+    pub indexed_attributes: BTreeMap<String, HaikuBfsAttributeRecord>,
+}
+
+impl HaikuBfsAttributeIndexingPrEngine {
+    pub fn new() -> Self {
+        Self {
+            indexed_attributes: BTreeMap::new(),
+        }
+    }
+
+    pub fn set_bfs_attribute(&mut self, file_path: &str, key: &str, val: &str) -> String {
+        let rec = HaikuBfsAttributeRecord {
+            file_path: file_path.to_string(),
+            attribute_key: key.to_string(),
+            attribute_value: val.to_string(),
+        };
+        self.indexed_attributes.insert(format!("{}:{}", file_path, key), rec);
+        format!(
+            "PR Proposal [Haiku OS BFS]: Set attribute '{}'='{}' on '{}'",
+            key, val, file_path
+        )
+    }
+}
+
+impl Default for HaikuBfsAttributeIndexingPrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 7. Redox OS Scheme Handler PR Engine
+// ============================================================================
+
+pub struct RedoxSchemeHandlerPrEngine {
+    pub registered_schemes: BTreeMap<String, String>,
+}
+
+impl RedoxSchemeHandlerPrEngine {
+    pub fn new() -> Self {
+        Self {
+            registered_schemes: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_scheme(&mut self, scheme_name: &str, handler: &str) -> String {
+        self.registered_schemes.insert(scheme_name.to_string(), handler.to_string());
+        format!(
+            "PR Proposal [Redox OS Scheme]: Registered scheme '{}:' to handler driver '{}'",
+            scheme_name, handler
+        )
+    }
+}
+
+impl Default for RedoxSchemeHandlerPrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 8. illumos / SmartOS Crossbow VNIC PR Engine
+// ============================================================================
+
+pub struct IllumosCrossbowVnicPrEngine {
+    pub active_vnics: BTreeMap<String, String>,
+}
+
+impl IllumosCrossbowVnicPrEngine {
+    pub fn new() -> Self {
+        Self {
+            active_vnics: BTreeMap::new(),
+        }
+    }
+
+    pub fn create_vnic(&mut self, vnic_name: &str, over_stub: &str) -> String {
+        self.active_vnics.insert(vnic_name.to_string(), over_stub.to_string());
+        format!(
+            "PR Proposal [illumos Crossbow]: Created VNIC '{}' over etherstub '{}'",
+            vnic_name, over_stub
+        )
+    }
+}
+
+impl Default for IllumosCrossbowVnicPrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 9. Genode Capability Router PR Engine
+// ============================================================================
+
+pub struct GenodeCapabilityRouterPrEngine {
+    pub capabilities: BTreeMap<u64, String>,
+}
+
+impl GenodeCapabilityRouterPrEngine {
+    pub fn new() -> Self {
+        Self {
+            capabilities: BTreeMap::new(),
+        }
+    }
+
+    pub fn grant_capability(&mut self, cap_id: u64, service_name: &str) -> String {
+        self.capabilities.insert(cap_id, service_name.to_string());
+        format!(
+            "PR Proposal [Genode OS]: Granted capability ID {} to service '{}'",
+            cap_id, service_name
+        )
+    }
+}
+
+impl Default for GenodeCapabilityRouterPrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 10. SerenityOS LibGUI IPC Window Protocol PR Engine
+// ============================================================================
+
+pub struct SerenityOsLibGuiProtocolPrEngine {
+    pub active_windows: BTreeMap<u32, String>,
+}
+
+impl SerenityOsLibGuiProtocolPrEngine {
+    pub fn new() -> Self {
+        Self {
+            active_windows: BTreeMap::new(),
+        }
+    }
+
+    pub fn create_window(&mut self, window_id: u32, title: &str) -> String {
+        self.active_windows.insert(window_id, title.to_string());
+        format!(
+            "PR Proposal [SerenityOS LibGUI]: Created window ID {} with title '{}'",
+            window_id, title
+        )
+    }
+}
+
+impl Default for SerenityOsLibGuiProtocolPrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 11. Master PR Gateway Coordinator
 // ============================================================================
 
 pub struct SovereignOpenSourceOsGapClosurePrMasterSuite {
@@ -303,6 +465,11 @@ pub struct SovereignOpenSourceOsGapClosurePrMasterSuite {
     pub netbsd_engine: NetBsdVeriexecBioctlPrEngine,
     pub dragonfly_engine: DragonFlyHammer2PfsClusterPrEngine,
     pub linux_engine: LinuxBcachefsIoUringMemfdPrEngine,
+    pub haiku_engine: HaikuBfsAttributeIndexingPrEngine,
+    pub redox_engine: RedoxSchemeHandlerPrEngine,
+    pub illumos_engine: IllumosCrossbowVnicPrEngine,
+    pub genode_engine: GenodeCapabilityRouterPrEngine,
+    pub serenity_engine: SerenityOsLibGuiProtocolPrEngine,
 }
 
 impl SovereignOpenSourceOsGapClosurePrMasterSuite {
@@ -313,6 +480,11 @@ impl SovereignOpenSourceOsGapClosurePrMasterSuite {
             netbsd_engine: NetBsdVeriexecBioctlPrEngine::new(),
             dragonfly_engine: DragonFlyHammer2PfsClusterPrEngine::new(),
             linux_engine: LinuxBcachefsIoUringMemfdPrEngine::new(),
+            haiku_engine: HaikuBfsAttributeIndexingPrEngine::new(),
+            redox_engine: RedoxSchemeHandlerPrEngine::new(),
+            illumos_engine: IllumosCrossbowVnicPrEngine::new(),
+            genode_engine: GenodeCapabilityRouterPrEngine::new(),
+            serenity_engine: SerenityOsLibGuiProtocolPrEngine::new(),
         }
     }
 
@@ -330,6 +502,12 @@ impl SovereignOpenSourceOsGapClosurePrMasterSuite {
             .is_ok();
         self.linux_engine
             .attach_bcachefs_tier("/dev/nvme0n1", "nvme-cache", 500);
+
+        let _bfs = self.haiku_engine.set_bfs_attribute("/boot/doc", "title", "SigmaOS");
+        let _scheme = self.redox_engine.register_scheme("proc", "proc_driver");
+        let _vnic = self.illumos_engine.create_vnic("vnic0", "stub0");
+        let _cap = self.genode_engine.grant_capability(101, "gui_service");
+        let _win = self.serenity_engine.create_window(1, "Terminal");
 
         self.netbsd_engine.verify_binary("/bin/ls")
     }
@@ -392,5 +570,28 @@ mod tests {
     fn test_master_pr_gap_closure_suite() {
         let mut suite = SovereignOpenSourceOsGapClosurePrMasterSuite::new();
         assert!(suite.run_master_gap_closure_evaluation());
+    }
+
+    #[test]
+    fn test_haiku_redox_illumos_genode_serenity_pr_engines() {
+        let mut haiku = HaikuBfsAttributeIndexingPrEngine::new();
+        let bfs_res = haiku.set_bfs_attribute("/boot/system", "BE:attr", "val");
+        assert!(bfs_res.contains("Haiku OS BFS"));
+
+        let mut redox = RedoxSchemeHandlerPrEngine::new();
+        let scheme_res = redox.register_scheme("net", "net_driver");
+        assert!(scheme_res.contains("Redox OS Scheme"));
+
+        let mut illumos = IllumosCrossbowVnicPrEngine::new();
+        let vnic_res = illumos.create_vnic("vnic1", "stub0");
+        assert!(vnic_res.contains("illumos Crossbow"));
+
+        let mut genode = GenodeCapabilityRouterPrEngine::new();
+        let cap_res = genode.grant_capability(200, "audio_drv");
+        assert!(cap_res.contains("Genode OS"));
+
+        let mut serenity = SerenityOsLibGuiProtocolPrEngine::new();
+        let win_res = serenity.create_window(10, "LibGUI App");
+        assert!(win_res.contains("SerenityOS LibGUI"));
     }
 }

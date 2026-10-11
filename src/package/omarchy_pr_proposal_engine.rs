@@ -106,6 +106,108 @@ impl Default for OmarchyPrProposalEngine {
 }
 
 #[derive(Debug, Clone)]
+pub struct OmarchyWallpaperPalettePrGateway {
+    pub registered_palettes_count: usize,
+}
+
+impl OmarchyWallpaperPalettePrGateway {
+    pub fn new() -> Self {
+        Self {
+            registered_palettes_count: 0,
+        }
+    }
+
+    pub fn generate_palette_pr_diff(
+        &mut self,
+        theme_name: &str,
+        palette_hex: &str,
+    ) -> Result<String, &'static str> {
+        if theme_name.is_empty() || palette_hex.is_empty() {
+            return Err("Wallpaper Palette Error: Invalid theme name or hex colors");
+        }
+        self.registered_palettes_count += 1;
+        Ok(format!(
+            "--- a/.config/wallust/palettes/{}.json\n+++ b/.config/wallust/palettes/{}.json\n@@ -0,0 +1,5 @@\n+// Omarchy Wallust Palette PR: {}\n{}",
+            theme_name, theme_name, theme_name, palette_hex
+        ))
+    }
+}
+
+impl Default for OmarchyWallpaperPalettePrGateway {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct OmarchyNeovimPresetPrGateway {
+    pub registered_presets_count: usize,
+}
+
+impl OmarchyNeovimPresetPrGateway {
+    pub fn new() -> Self {
+        Self {
+            registered_presets_count: 0,
+        }
+    }
+
+    pub fn generate_neovim_pr_diff(
+        &mut self,
+        preset_name: &str,
+        lua_config: &str,
+    ) -> Result<String, &'static str> {
+        if preset_name.is_empty() || lua_config.is_empty() {
+            return Err("Neovim Gateway Error: Invalid preset name or Lua config");
+        }
+        self.registered_presets_count += 1;
+        Ok(format!(
+            "--- a/.config/nvim/lua/plugins/{}.lua\n+++ b/.config/nvim/lua/plugins/{}.lua\n@@ -0,0 +1,5 @@\n-- Omarchy Neovim Preset PR: {}\n{}",
+            preset_name, preset_name, preset_name, lua_config
+        ))
+    }
+}
+
+impl Default for OmarchyNeovimPresetPrGateway {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct OmarchyWaybarStatusHudPrGateway {
+    pub registered_modules_count: usize,
+}
+
+impl OmarchyWaybarStatusHudPrGateway {
+    pub fn new() -> Self {
+        Self {
+            registered_modules_count: 0,
+        }
+    }
+
+    pub fn generate_waybar_module_pr_diff(
+        &mut self,
+        module_name: &str,
+        module_json: &str,
+    ) -> Result<String, &'static str> {
+        if module_name.is_empty() || module_json.is_empty() {
+            return Err("Waybar Gateway Error: Invalid module name or JSON config");
+        }
+        self.registered_modules_count += 1;
+        Ok(format!(
+            "--- a/.config/waybar/modules/{}.json\n+++ b/.config/waybar/modules/{}.json\n@@ -0,0 +1,5 @@\n+// Omarchy Waybar Module PR: {}\n{}",
+            module_name, module_name, module_name, module_json
+        ))
+    }
+}
+
+impl Default for OmarchyWaybarStatusHudPrGateway {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct OmakubRecipeTranspiler {
     pub total_recipes_transpiled: usize,
 }
@@ -209,6 +311,9 @@ pub struct SovereignOmarchyPrProposalMasterSuite {
     pub recipe_transpiler: OmakubRecipeTranspiler,
     pub hyprland_gateway: HyprlandPluginPrGateway,
     pub pkgbuild_validator: OmarchyPkgbuildAurPrValidator,
+    pub waybar_gateway: OmarchyWaybarStatusHudPrGateway,
+    pub neovim_gateway: OmarchyNeovimPresetPrGateway,
+    pub palette_gateway: OmarchyWallpaperPalettePrGateway,
 }
 
 impl SovereignOmarchyPrProposalMasterSuite {
@@ -218,6 +323,9 @@ impl SovereignOmarchyPrProposalMasterSuite {
             recipe_transpiler: OmakubRecipeTranspiler::new(),
             hyprland_gateway: HyprlandPluginPrGateway::new(),
             pkgbuild_validator: OmarchyPkgbuildAurPrValidator::new(),
+            waybar_gateway: OmarchyWaybarStatusHudPrGateway::new(),
+            neovim_gateway: OmarchyNeovimPresetPrGateway::new(),
+            palette_gateway: OmarchyWallpaperPalettePrGateway::new(),
         }
     }
 
@@ -232,8 +340,26 @@ impl SovereignOmarchyPrProposalMasterSuite {
             "omarchy-theme",
             "pkgname=omarchy-theme\npkgver=1.1.0\n",
         );
+        let waybar_diff = self.waybar_gateway.generate_waybar_module_pr_diff(
+            "battery",
+            "{\"interval\": 10}",
+        );
+        let nvim_diff = self.neovim_gateway.generate_neovim_pr_diff(
+            "lsp",
+            "return { 'neovim/nvim-lspconfig' }",
+        );
+        let palette_diff = self.palette_gateway.generate_palette_pr_diff(
+            "catppuccin",
+            "{\"bg\": \"#1e1e2e\"}",
+        );
 
-        if recipe_diff.is_err() || plugin_diff.is_err() || pkg_diff.is_err() {
+        if recipe_diff.is_err()
+            || plugin_diff.is_err()
+            || pkg_diff.is_err()
+            || waybar_diff.is_err()
+            || nvim_diff.is_err()
+            || palette_diff.is_err()
+        {
             return false;
         }
 
@@ -310,5 +436,23 @@ mod tests {
     fn test_sovereign_omarchy_pr_proposal_master_suite() {
         let mut suite = SovereignOmarchyPrProposalMasterSuite::new();
         assert!(suite.run_master_omarchy_pr_workflow());
+    }
+
+    #[test]
+    fn test_waybar_neovim_palette_pr_gateways() {
+        let mut waybar = OmarchyWaybarStatusHudPrGateway::new();
+        let waybar_diff = waybar.generate_waybar_module_pr_diff("network", "{\"interval\": 5}").unwrap();
+        assert!(waybar_diff.contains("Omarchy Waybar Module PR"));
+        assert_eq!(waybar.registered_modules_count, 1);
+
+        let mut nvim = OmarchyNeovimPresetPrGateway::new();
+        let nvim_diff = nvim.generate_neovim_pr_diff("treesitter", "return {}").unwrap();
+        assert!(nvim_diff.contains("Omarchy Neovim Preset PR"));
+        assert_eq!(nvim.registered_presets_count, 1);
+
+        let mut palette = OmarchyWallpaperPalettePrGateway::new();
+        let pal_diff = palette.generate_palette_pr_diff("tokyo-night", "{\"bg\": \"#1a1b26\"}").unwrap();
+        assert!(pal_diff.contains("Omarchy Wallust Palette PR"));
+        assert_eq!(palette.registered_palettes_count, 1);
     }
 }
