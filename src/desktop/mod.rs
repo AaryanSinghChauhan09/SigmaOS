@@ -13,6 +13,13 @@ pub mod hypnotix_iptv;
 pub use hypnotix_iptv::*;
 pub mod hyprland_tiling;
 pub use hyprland_tiling::*;
+pub mod wayland;
+pub use wayland::{
+    WaylandDisplay, WaylandCompositor, WaylandObject, WaylandObjectType,
+    WaylandMessage, WaylandArg, WaylandSurface, WaylandSeat,
+    WaylandPointer, WaylandKeyboard, WaylandTouch,
+    init_wayland_compositor, get_wayland_compositor,
+};
 pub mod xreader;
 pub use xreader::*;
 pub mod walker_launcher;
