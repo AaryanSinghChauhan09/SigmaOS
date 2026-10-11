@@ -9,8 +9,10 @@ pub mod stratum;
 pub mod system_utilities;
 pub mod job_control;
 pub mod terminal_emulator;
+pub mod coreutils_pr_gateway;
 
 
+pub use coreutils_pr_gateway::*;
 pub use format_runner::*;
 pub use libc::*;
 pub use pkg::*;
