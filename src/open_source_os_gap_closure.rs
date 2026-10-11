@@ -458,6 +458,17 @@ mod kernel_pr_gap_closure_tests {
             engine.submissions.get(&pr_id).unwrap().status,
             KernelPrStatus::Merged
         );
+
+        // Submit userfaultfd kernel PF -> userspace event delivery PR
+        let uffd_pr_id = engine.submit_kernel_pr(
+            "sovereign_kernel_dev",
+            "userfaultfd: kernel PF -> userspace event delivery",
+            "userfaultfd",
+            KernelPrFormat::SigmaSovereignKernel,
+            "--- a/src/kernel/missing_linux_kernel_components.rs\n+++ b/src/kernel/missing_linux_kernel_components.rs\n@@ -250,6 +250,15 @@",
+        );
+        let uffd_status = engine.validate_and_merge_pr(uffd_pr_id).unwrap();
+        assert_eq!(uffd_status, KernelPrStatus::Merged);
     }
 }
 
