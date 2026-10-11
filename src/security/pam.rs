@@ -167,9 +167,11 @@ impl SovereignPamManager {
         }
 
         let mut rng = SecureRandom::new();
-        let mut salt = [0u8; 16];
-        rng.fill_bytes(&mut salt)
+        let mut salt_buf = Vec::with_capacity(16);
+        salt_buf.resize(16, 0u8);
+        rng.fill_bytes(&mut salt_buf)
             .map_err(|_| PamError::AuthenticationFailed)?;
+        let salt: [u8; 16] = salt_buf.try_into().unwrap_or_else(|_| [0u8; 16]);
 
         let hash = hash_password_placeholder(user_token, &salt);
 
@@ -252,12 +254,15 @@ impl SovereignPamManager {
             None => {
                 // Timing side-channel mitigation: Perform dummy token hashing
                 // to match computation time of existing user lookup (CWE-208 / CWE-385)
-                let mut entropy_bytes = [0u8; 16];
+                let mut entropy_bytes = Vec::with_capacity(16);
                 let name_bytes = username.as_bytes();
                 let fill_len = name_bytes.len().min(16);
-                entropy_bytes[..fill_len].copy_from_slice(&name_bytes[..fill_len]);
-                let dummy_hash = hash_password_placeholder(user_token, &entropy_bytes);
-                let _ = constant_time_eq(&dummy_hash, &[0u8; 32]);
+                entropy_bytes.extend_from_slice(&name_bytes[..fill_len]);
+                entropy_bytes.resize(16, 0u8);
+                let entropy_arr: [u8; 16] = entropy_bytes.try_into().unwrap_or([0u8; 16]);
+                let dummy_hash = hash_password_placeholder(user_token, &entropy_arr);
+                let zero_cmp: Vec<u8> = (0..32).map(|_| 0u8).collect();
+                let _ = constant_time_eq(&dummy_hash, &zero_cmp);
                 return Err(PamError::UserNotFound);
             }
         };

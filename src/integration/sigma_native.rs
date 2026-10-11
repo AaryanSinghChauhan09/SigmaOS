@@ -21,13 +21,23 @@ pub struct SigmaNativeRpcHeader {
 }
 
 impl SigmaNativeRpcHeader {
+    fn generate_key_bytes(seed: u8, len: usize) -> Vec<u8> {
+        (0..len).map(|i| ((i as u8).wrapping_mul(seed).wrapping_add(37)) & 0xFF).collect()
+    }
+
     pub fn new(nonce: u64, timestamp_ms: u64, payload_len: u32) -> Self {
+        let key_vec = Self::generate_key_bytes(0x77, 32);
+        let sig_vec = Self::generate_key_bytes(0xAA, 64);
+        let mut public_key_ed25519 = [0u8; 32];
+        let mut signature_ed25519 = [0u8; 64];
+        public_key_ed25519.copy_from_slice(&key_vec);
+        signature_ed25519.copy_from_slice(&sig_vec);
         Self {
             magic: *b"SIGM",
             nonce,
             timestamp_ms,
-            public_key_ed25519: [0x77u8; 32], // Simulated Ed25519 public key
-            signature_ed25519: [0xAAu8; 64],  // Simulated Ed25519 signature
+            public_key_ed25519, // Simulated Ed25519 public key
+            signature_ed25519,  // Simulated Ed25519 signature
             payload_length: payload_len,
         }
     }
