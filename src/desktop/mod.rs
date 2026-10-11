@@ -27,6 +27,11 @@ pub use layer_shell::{
     init_layer_shell_manager, get_layer_shell_manager,
     create_hud_overlay, create_status_bar,
 };
+pub mod waybar;
+pub use waybar::{
+    WaybarInstance, WaybarModule, WaybarModuleType, WaybarConfig, BarPosition,
+    init_waybar, get_waybar,
+};
 pub mod xreader;
 pub use xreader::*;
 pub mod walker_launcher;

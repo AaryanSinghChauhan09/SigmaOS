@@ -3,9 +3,20 @@
 // Gaming-related components including Steam, Wine, Proton integration
 
 pub mod steam;
+pub mod wine;
+pub mod gamemode;
 
 pub use steam::{
     SteamGame, SteamManager, ProtonVersion,
     init_steam_manager, get_steam_manager,
     launch_game_with_proton,
+};
+pub use wine::{
+    WinePrefix, WineArch, WindowsVersion, ProtonConfig, WineApplication, WineManager,
+    init_wine_manager, get_wine_manager, create_default_prefix,
+};
+pub use gamemode::{
+    GameModeInstance, GameModeManager, GameOptimizationState, GameModeConfig,
+    init_gamemode_manager, get_gamemode_manager,
+    gamemode_request_start, gamemode_request_end, gamemode_query_status,
 };

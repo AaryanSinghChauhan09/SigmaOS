@@ -161,7 +161,13 @@ pub use omarchy_atreyu_system_plugin::*;
 pub mod omarchy_docker_rootless_engine;
 pub use omarchy_docker_rootless_engine::*;
 pub mod gamemode_daemon;
+pub mod boot_analyzer;
 pub use preload::{
     PreloadEntry, PreloadManager,
     init_preload_manager, get_preload_manager, add_common_preloads,
+};
+pub use boot_analyzer::{
+    BootAnalyzer, ServiceBootTime, ServiceStatus, BootAnalysis,
+    init_boot_analyzer, get_boot_analyzer,
+    analyze_boot_time, analyze_blame, analyze_critical_chain,
 };
