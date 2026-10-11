@@ -287,7 +287,104 @@ impl Default for OmarchyHerdrAiAgentRouterEngine {
 }
 
 // =========================================================================
-// 5. OMARCHY DISTRO PR GATEWAY SUITE
+// 5. OMARCHY GHOSTTY & ALACRITTY TERMINAL CONFIG PR ENGINE
+// =========================================================================
+
+pub struct OmarchyGhosttyAlacrittyConfigPrEngine;
+
+impl OmarchyGhosttyAlacrittyConfigPrEngine {
+    pub fn generate_ghostty_pr_diff(font_family: &str, font_size: f32) -> String {
+        format!(
+            "--- a/.config/ghostty/config\n\
+             +++ b/.config/ghostty/config\n\
+             @@ -1,4 +1,6 @@\n\
+             -font-family = monospace\n\
+             +font-family = {}\n\
+             +font-size = {}\n\
+             +theme = Catppuccin Mocha\n\
+             +window-padding-x = 12\n\
+             +window-padding-y = 12",
+            font_family, font_size
+        )
+    }
+
+    pub fn generate_alacritty_pr_diff(font_family: &str, font_size: f32) -> String {
+        format!(
+            "--- a/.config/alacritty/alacritty.toml\n\
+             +++ b/.config/alacritty/alacritty.toml\n\
+             @@ -1,4 +1,6 @@\n\
+             -[font.normal]\n\
+             -family = \"Monospace\"\n\
+             +[font.normal]\n\
+             +family = \"{}\"\n\
+             +size = {}\n\
+             +[window.padding]\n\
+             +x = 12\n\
+             +y = 12",
+            font_family, font_size
+        )
+    }
+}
+
+// =========================================================================
+// 6. OMARCHY HYPRIDLE & HYPRLOCK BIOMETRIC PR ENGINE
+// =========================================================================
+
+pub struct OmarchyHypridleHyprlockPrEngine;
+
+impl OmarchyHypridleHyprlockPrEngine {
+    pub fn generate_hyprlock_pr_diff(pam_module: &str) -> String {
+        format!(
+            "--- a/.config/hypr/hyprlock.conf\n\
+             +++ b/.config/hypr/hyprlock.conf\n\
+             @@ -1,4 +1,6 @@\n\
+             -auth_module = system-auth\n\
+             +auth_module = {}\n\
+             +grace_period = 5\n\
+             +fade_on_empty = false\n\
+             +background_blur = 8",
+            pam_module
+        )
+    }
+
+    pub fn generate_hypridle_pr_diff(timeout_secs: u32) -> String {
+        format!(
+            "--- a/.config/hypr/hypridle.conf\n\
+             +++ b/.config/hypr/hypridle.conf\n\
+             @@ -1,4 +1,6 @@\n\
+             -timeout = 300\n\
+             +timeout = {}\n\
+             +on_timeout = hyprlock\n\
+             +on_resume = notify-send 'Welcome back'",
+            timeout_secs
+        )
+    }
+}
+
+// =========================================================================
+// 7. OMARCHY WALKER FUZZY LAUNCHER & CLIPBOARD PR ENGINE
+// =========================================================================
+
+pub struct OmarchyWalkerLauncherPrEngine;
+
+impl OmarchyWalkerLauncherPrEngine {
+    pub fn generate_walker_pr_diff(hotkey: &str) -> String {
+        format!(
+            "--- a/.config/walker/config.toml\n\
+             +++ b/.config/walker/config.toml\n\
+             @@ -1,4 +1,6 @@\n\
+             -hotkey = \"SUPER_R\"\n\
+             +hotkey = \"{}\"\n\
+             +enable_clipboard_history = true\n\
+             +enable_calc_provider = true\n\
+             +theme = \"catppuccin-mocha\"",
+            hotkey
+        )
+    }
+}
+
+// =========================================================================
+// 8. OMARCHY DISTRO PR GATEWAY SUITE
 // =========================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -296,6 +393,9 @@ pub enum OmarchyPrKind {
     HyprlandConfig,
     WallustPalette,
     QuickShellQml,
+    GhosttyAlacrittyConfig,
+    HypridleHyprlockConfig,
+    WalkerLauncherConfig,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -378,6 +478,21 @@ impl OmarchyDistroPrGatewaySuite {
 
         Ok(format!("sigomarchy-pkg-{}", sub.pr_id))
     }
+
+    pub fn generate_pr_diff_for_kind(&self, kind: OmarchyPrKind, param: &str) -> String {
+        match kind {
+            OmarchyPrKind::GhosttyAlacrittyConfig => {
+                OmarchyGhosttyAlacrittyConfigPrEngine::generate_ghostty_pr_diff(param, 12.0)
+            }
+            OmarchyPrKind::HypridleHyprlockConfig => {
+                OmarchyHypridleHyprlockPrEngine::generate_hyprlock_pr_diff(param)
+            }
+            OmarchyPrKind::WalkerLauncherConfig => {
+                OmarchyWalkerLauncherPrEngine::generate_walker_pr_diff(param)
+            }
+            _ => format!("--- a/config\n+++ b/config\n@@ -1 +1 @@\n-old\n+{}", param),
+        }
+    }
 }
 
 impl Default for OmarchyDistroPrGatewaySuite {
@@ -455,5 +570,28 @@ mod tests {
         assert_eq!(pr_id, 500);
         let merged_name = gateway.validate_and_merge_pr(pr_id).unwrap();
         assert_eq!(merged_name, "sigomarchy-pkg-500");
+    }
+
+    #[test]
+    fn test_omarchy_missing_components_pr_diff_generation() {
+        let ghostty_diff = OmarchyGhosttyAlacrittyConfigPrEngine::generate_ghostty_pr_diff("FiraCode Nerd Font", 14.0);
+        assert!(ghostty_diff.contains("FiraCode Nerd Font"));
+        assert!(ghostty_diff.contains("Catppuccin Mocha"));
+
+        let alacritty_diff = OmarchyGhosttyAlacrittyConfigPrEngine::generate_alacritty_pr_diff("JetBrains Mono", 12.0);
+        assert!(alacritty_diff.contains("JetBrains Mono"));
+
+        let hyprlock_diff = OmarchyHypridleHyprlockPrEngine::generate_hyprlock_pr_diff("fprintd-pam");
+        assert!(hyprlock_diff.contains("fprintd-pam"));
+
+        let hypridle_diff = OmarchyHypridleHyprlockPrEngine::generate_hypridle_pr_diff(600);
+        assert!(hypridle_diff.contains("timeout = 600"));
+
+        let walker_diff = OmarchyWalkerLauncherPrEngine::generate_walker_pr_diff("SUPER_SPACE");
+        assert!(walker_diff.contains("SUPER_SPACE"));
+
+        let gateway = OmarchyDistroPrGatewaySuite::new();
+        let pr_diff = gateway.generate_pr_diff_for_kind(OmarchyPrKind::WalkerLauncherConfig, "SUPER_SPACE");
+        assert!(pr_diff.contains("SUPER_SPACE"));
     }
 }
