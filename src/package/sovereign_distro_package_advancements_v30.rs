@@ -621,6 +621,7 @@ pub struct SovereignDistroPackageAdvancementsSuiteV30 {
     pub scriptlet_engine: UdfScriptletSandboxEngineV30,
     pub transpiler_engine: UniversalMultiFormatTranspilerAndExecutionEngineV30,
     pub cli_router: UniversalPmCliRouterV30,
+    pub installed_packages: Vec<String>,
 }
 
 impl SovereignDistroPackageAdvancementsSuiteV30 {
@@ -631,6 +632,7 @@ impl SovereignDistroPackageAdvancementsSuiteV30 {
             scriptlet_engine: UdfScriptletSandboxEngineV30::new(),
             transpiler_engine: UniversalMultiFormatTranspilerAndExecutionEngineV30::new(),
             cli_router: UniversalPmCliRouterV30::new(),
+            installed_packages: Vec::new(),
         }
     }
 

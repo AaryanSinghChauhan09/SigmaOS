@@ -7217,11 +7217,15 @@ pub struct ExecutiveKpiItem {
 #[derive(Debug, Clone, Default)]
 pub struct SovereignExecutiveKpiScorecardEngine {
     kpis: Vec<ExecutiveKpiItem>,
+    pub dependencies: HashMap<String, Vec<String>>,
 }
 
 impl SovereignExecutiveKpiScorecardEngine {
     pub fn new() -> Self {
-        Self { kpis: Vec::new() }
+        Self {
+            kpis: Vec::new(),
+            dependencies: HashMap::new(),
+        }
     }
 
     /// Adds a KPI metric item to the executive scorecard.

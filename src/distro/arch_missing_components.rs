@@ -521,22 +521,9 @@ impl ArchMkinitcpioHooksEngine {
             registered_hooks: vec![sample_rule],
         }
     }
-
-    pub fn match_hooks(&self, when: PacmanHookWhen, updated_pkgs: &[&str]) -> Vec<&PacmanHookRule> {
-        self.registered_hooks
-            .iter()
-            .filter(|h| {
-                h.when == when
-                    && h.target_packages.iter().any(|t| {
-                        let t_clean = t.trim_end_matches('*');
-                        updated_pkgs.iter().any(|p| p.starts_with(t_clean))
-                    })
-            })
-            .collect()
-    }
 }
 
-impl Default for ArchPacmanHookRunner {
+impl Default for ArchMkinitcpioHooksEngine {
     fn default() -> Self {
         Self::new()
     }
@@ -1006,6 +993,32 @@ impl ArchPacmanCacheScrubber {
         Self {
             cached_files: Vec::new(),
             retain_keep_count: keep,
+        }
+    }
+}
+
+impl Default for ArchPacmanKeyringPqcEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CachedPackageFile {
+    pub pkgname: String,
+    pub version: String,
+    pub file_size_bytes: u64,
+}
+
+pub struct ArchPacmanKeyringPqcEngine {
+    pub keys: BTreeMap<String, PqcDilithiumKeySpec>,
+}
+
+impl ArchPacmanCacheScrubber {
+    pub fn new(retain_keep_count: usize) -> Self {
+        Self {
+            cached_files: Vec::new(),
+            retain_keep_count,
         }
     }
 }

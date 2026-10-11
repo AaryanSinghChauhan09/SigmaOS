@@ -241,6 +241,7 @@ pub struct DesktopFontManager {
     title_font: Option<String>,
     heading_font: Option<String>,
     font_size: u32, // 6-72
+    primary_font_family: String,
     counter: u32,
 }
 
@@ -257,6 +258,7 @@ impl DesktopFontManager {
             title_font: None,
             heading_font: None,
             font_size: 12,
+            primary_font_family: "Inter".to_string(),
             counter: 1000,
         };
 
