@@ -769,8 +769,17 @@ fi
 if [ -f "src/distro/debian_linux_gap_closure_v40_pr.rs" ]; then
     echo "Running Debian Linux Gap Closure PR Suite V40 test suite..."
     mkdir -p build
+    rustc --test src/distro/debian_linux_gap_closure_v40_pr.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_debian_v40_pr
+    ./build/test_debian_v40_pr
     rustc --test src/kernel/sovereign_clean_code_and_os_principles_engine.rs --edition=2021 -o build/test_clean_code_os_principles
     ./build/test_clean_code_os_principles
+fi
+
+if [ -f "src/distro/sovereign_linux_bsd_ecosystem_gap_closure_v43_pr.rs" ]; then
+    echo "Running Sovereign Linux & BSD Ecosystem Gap Closure PR Suite V43 test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_linux_bsd_ecosystem_gap_closure_v43_pr.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_gap_closure_v43_pr
+    ./build/test_gap_closure_v43_pr
 fi
 
 if [ -f "src/distro/omarchy_linux_gap_closure_pr_suite.rs" ]; then
