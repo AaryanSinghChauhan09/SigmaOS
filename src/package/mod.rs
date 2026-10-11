@@ -48,7 +48,10 @@ pub mod spac;
 pub mod store;
 pub mod universal;
 pub mod updater;
+pub mod zsync_delta;
+
 pub use sovereign_distro_package_matrix::*;
+pub use zsync_delta::{DeltaOp, RollingAdler32, ZsyncBlockSignature, ZsyncDeltaEngine};
 pub mod sovereign_distro_package_advancements_v5;
 pub use sovereign_distro_package_advancements_v5::*;
 pub mod sovereign_distro_package_advancements_v6;

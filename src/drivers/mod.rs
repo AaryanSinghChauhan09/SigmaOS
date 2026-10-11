@@ -1,4 +1,3 @@
-// SigmaOS Drivers Module
 pub mod acpi;
 pub mod advanced_types;
 pub mod ahci_sata;
@@ -7,15 +6,20 @@ pub mod audio_intel_hda;
 pub mod block_io;
 pub mod boot_init;
 pub mod dde;
+pub mod device_mapper;
 pub mod distro_device_expansion;
 pub mod driver_manager;
 pub mod drm_kms;
+pub mod drm_kms_atomic;
 pub mod ethernet;
 pub mod even_more_devices;
 pub mod flipper_gpio_sensor;
 pub mod framebuffer;
+pub mod framebuffer_console;
 pub mod gpu;
+pub mod hpd_hotplug;
 pub mod input;
+pub mod iommu;
 pub mod legacy_audio_ac97;
 pub mod legacy_keyboard;
 pub mod legacy_parallel_printer;
@@ -26,12 +30,14 @@ pub mod modern_usb;
 pub mod modern_usb_printer;
 pub mod modern_wifi;
 pub mod network;
+pub mod nl80211;
 pub mod nvme_driver;
 pub mod pci_bus;
 pub mod peripheral;
 pub mod printing;
 pub mod rtc;
 pub mod rtc_cmos;
+pub mod sdmmc;
 pub mod serial;
 pub mod sovereign_comprehensive_drivers;
 pub mod sovereign_driver_lifecycle;
@@ -47,7 +53,21 @@ pub mod usb_mass_storage;
 pub mod usb_stack;
 pub mod usb_video;
 pub mod vesa;
+pub mod virtio_net_irq;
+pub mod vulkan_icd;
 pub mod wifi_80211;
+pub mod wifi_supplicant;
+
+pub use device_mapper::{DeviceMapperController, DmTableEntry, DmTargetType};
+pub use drm_kms_atomic::{DrmAtomicRequest, DrmCrtc, DrmKmsAtomicDriver};
+pub use framebuffer_console::FbConsole;
+pub use hpd_hotplug::{ConnectorType, HpdConnectionStatus, HpdEvent, HpdHotplugEngine};
+pub use iommu::{IommuController, IommuDomain, IommuPermissions, PciBdf};
+pub use nl80211::{Nl80211Cmd, Nl80211Subsystem, WiphyDevice};
+pub use sdmmc::{SdCardInfo, SdHostController};
+pub use virtio_net_irq::VirtioNetDevice;
+pub use vulkan_icd::{VkPhysicalDeviceProperties, VkPhysicalDeviceType, VulkanIcdLoader};
+pub use wifi_supplicant::{SupplicantState, Wpa3Supplicant};
 
 pub use gpu::{
     GpuCommand, GpuCommandBuffer, GpuDriver, GpuError, GpuPipeline, GpuResetState, GpuShader,

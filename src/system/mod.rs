@@ -47,9 +47,12 @@ pub mod sovereign_init_supervisor;
 pub mod startup;
 
 pub use sovereign_init_supervisor::*;
+pub mod dmesg;
 pub mod state;
 pub mod syslog;
 pub mod user;
+
+pub use dmesg::{DmesgRingBuffer, KernelLogLevel, KernelLogRecord};
 
 pub use abi::{
     AbiType, SovereignSyscallAbiCompatibilityEngine, SyscallAbiResult, SyscallRegisters64,

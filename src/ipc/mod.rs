@@ -75,10 +75,19 @@ pub use tech_media_std_streams_synthesis::{
     ZeroCopySpliceTeeStreamEngine,
 };
 pub mod binder_ring_buffer;
+pub mod fuchsia_fidl;
+pub mod minix_rendezvous;
 pub mod plan9_9p2000;
 pub mod posix_mq;
+pub mod robust_futex;
+pub mod rt_signals;
 pub mod sysv_ipc;
 pub mod zircon_channels;
+
+pub use fuchsia_fidl::{FidlDispatcher, FidlMethod, FidlMsgHeader, FidlProtocol, FidlType};
+pub use minix_rendezvous::{MinixMessage, MinixRendezvousEngine, RendezvousState};
+pub use robust_futex::{RobustFutexManager, RobustFutexState, RobustFutexWaiter, FUTEX_OWNER_DIED, FUTEX_WAITERS};
+pub use rt_signals::{ProcessRtSignalManager, QueuedRtSignal, RtSignalQueue, SigVal, SIGRTMAX, SIGRTMIN};
 
 pub use posix_mq::{MessageQueue as PosixMessageQueue, MqAttr, MqError, MqRegistry};
 pub use sysv_ipc::{

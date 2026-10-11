@@ -2,14 +2,25 @@
 // eBPF-based scheduling system & CPU affinity manager
 
 pub mod affinity;
+pub mod cpuidle;
 pub mod distro_schedulers;
 pub mod ebpf_scheduler;
 pub mod eevdf;
 pub mod energy_aware;
+pub mod numa_balancer;
 pub mod numa_scheduler;
+pub mod preempt_rt;
 pub mod process;
+pub mod sched_deadline;
 pub mod scheduler;
+pub mod schedutil;
 pub mod sovereign;
+
+pub use cpuidle::{CState, CpuIdleGovernor};
+pub use numa_balancer::{NumaLoadBalancer, NumaNodeStats, NumaTask};
+pub use preempt_rt::{PreemptGuard, RtMutex, RtWaiter};
+pub use sched_deadline::{DeadlineScheduler, DeadlineTask};
+pub use schedutil::{CpuFreqPolicy, FreqGovernorMode, SchedutilGovernor};
 
 pub use distro_schedulers::*;
 pub use ebpf_scheduler::{

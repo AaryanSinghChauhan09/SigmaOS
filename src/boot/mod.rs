@@ -12,6 +12,8 @@ pub mod bridge_grid;
 pub mod firmware;
 pub mod firmware_bridge;
 pub mod initramfs;
+pub mod initramfs_builder;
+pub mod kernel_ld_script;
 pub mod multiboot2;
 pub mod optimization;
 pub mod pci;
@@ -20,12 +22,16 @@ pub mod post;
 pub mod secure;
 pub mod sigma_boot;
 pub mod sigma_bootloader;
+pub mod smp_apic_calibration;
 pub mod sovereign_multi_distro_bootloader;
 pub mod uefi;
 pub mod uefi_gop_framebuffer;
 pub mod verified;
 
 pub use initramfs::*;
+pub use initramfs_builder::{InitramfsBuilder, InitramfsEntry, CPIO_NEWC_MAGIC};
+pub use kernel_ld_script::{KernelLinkerScriptConfig, DEFAULT_KERNEL_LD};
+pub use smp_apic_calibration::{ApCpuInfo, ApCpuState, ApicCalibrator};
 
 pub use sigma_bootloader::{
     BootArch, BootMemoryMap, BootPlatform, FramebufferInfo, KernelCmdline, LiveEnvironmentConfig,
