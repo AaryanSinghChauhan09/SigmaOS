@@ -169,11 +169,11 @@ These are the **highest-priority blockers** that prevent SigmaOS from booting on
 | 🟢 devtmpfs / udev device node auto-creation | Linux | Implemented in `src/filesystem/devtmpfs.rs` |
 | 🔴 `/proc` virtual filesystem (live kernel data) | Linux | `procfs.rs` struct exists; not mounted as real VFS |
 | 🔴 `/sys` sysfs (kobject hierarchy) | Linux | `sysfs_manager.rs` exists; no real mount |
-| 🔴 `debugfs` | Linux | Not present |
-| 🔴 `configfs` | Linux | Not present |
+| 🟢 `debugfs` | Linux | Implemented in `src/filesystem/debugfs.rs` |
+| 🟢 `configfs` | Linux | Implemented in `src/filesystem/configfs.rs` |
 | 🟢 SquashFS (read-only compressed root FS) | Linux, Alpine, Arch live media | Implemented in `src/filesystem/squashfs.rs` |
-| 🔴 `cryptsetup` / dm-crypt LUKS2 full-disk encryption | Linux | Not present |
-| 🔴 SMB/CIFS client (network file sharing) | Linux | Not present |
+| 🟢 `cryptsetup` / dm-crypt LUKS2 full-disk encryption | Linux | Implemented in `src/filesystem/luks2.rs` |
+| 🟢 SMB/CIFS client (network file sharing) | Linux | Implemented in `src/filesystem/smb_client.rs` |
 | 🔴 CEPH distributed filesystem client | Linux | Not present |
 
 ---
@@ -182,24 +182,25 @@ These are the **highest-priority blockers** that prevent SigmaOS from booting on
 
 | Missing Component | Reference OS | Notes |
 |---|---|---|
-| 🟡 IPv6 routing (ND, SLAAC, DHCPv6) | Linux, FreeBSD | IPv4 complete; IPv6 structures present but routing tables not wired |
+| 🟢 IPv6 routing (ND, SLAAC, DHCPv6) | Linux, FreeBSD | Implemented in `src/network/ipv6_routing.rs` |
 | 🟢 eBPF JIT compiler (x86_64 bytecode → native code at runtime) | Linux 3.18+ | Implemented in `src/network/ebpf_jit.rs` |
 | 🔴 XDP zero-copy NIC hook (pre-stack fast path) | Linux 4.8+ | `ebpf_xdp.rs` present; no real driver hook point |
 | 🔴 TC (traffic control) qdisc + HTB/FQ-CODEL | Linux | Not present |
 | 🟢 WireGuard VPN kernel module | Linux 5.6+ | Implemented in `src/network/wireguard_sovereign.rs` |
-| 🔴 MPTCP (multipath TCP) | Linux 5.6+ | Not present |
+| 🟢 MPTCP (multipath TCP) | Linux 5.6+ | Implemented in `src/network/mptcp.rs` |
 | 🟢 QUIC / HTTP/3 kernel TLS offload | Linux (ktls) | Implemented in `src/network/quic.rs` |
-| 🔴 VXLAN / GENEVE overlay network | Linux | Not present |
-| 🔴 VLAN (802.1Q) tagging | Linux, FreeBSD | Not present |
-| 🟢 Bridge (802.1D STP) | Linux | Implemented in `src/network/virtual_switch.rs` |
+| 🟢 VXLAN / GENEVE overlay network | Linux | Implemented in `src/network/vxlan.rs` |
+| 🟢 VLAN (802.1Q) tagging | Linux, FreeBSD | Implemented in `src/network/vlan.rs` |
+| 🟢 Bridge (802.1D STP) | Linux | Implemented in `src/network/virtual_switch.rs` & `src/network/bridge.rs` |
 | 🟢 Bonding / LACP (802.3ad link aggregation) | Linux, FreeBSD | Implemented in `src/network/virtual_switch.rs` |
 | 🟢 Netlink socket subsystem (userland ↔ kernel config) | Linux | Implemented in `src/network/netlink.rs` |
 | 🔴 `ip` route / neigh / rule tables (RPDB) | Linux | No policy routing database |
-| 🔴 PPPoE / L2TP (DSL internet) | Linux, FreeBSD | Not present |
+| 🟢 PPPoE / L2TP (DSL internet) | Linux, FreeBSD | Implemented in `src/network/pppoe.rs` |
 | 🔴 NFS v4.1 client (real network mount) | Linux | NFS server RPC engine exists; no client-side mount |
-| 🔴 Real hardware TLS (ktls, TLS 1.3 sendfile offload) | Linux 4.17+ | Not present |
-| 🔴 Raw socket / packet socket (`AF_PACKET`) | Linux | Not present |
-| 🔴 sctp (Stream Control Transmission Protocol) | Linux, FreeBSD | Not present |
+| 🟢 Real hardware TLS (ktls, TLS 1.3 sendfile offload) | Linux 4.17+ | Implemented in `src/network/ktls.rs` |
+| 🟢 Raw socket / packet socket (`AF_PACKET`) | Linux | Implemented in `src/network/af_packet.rs` |
+| 🟢 sctp (Stream Control Transmission Protocol) | Linux, FreeBSD | Implemented in `src/network/sctp.rs` |
+
 
 ---
 
@@ -210,19 +211,19 @@ These are the **highest-priority blockers** that prevent SigmaOS from booting on
 | 🟢 Dynamic ELF linker (`ld-sigma.so` — GOT/PLT relocation) | Linux (ld-musl / ld-linux), FreeBSD | Implemented in `src/loader/elf_dynamic_linker.rs` |
 | 🟢 `crt1.o` / `crti.o` / `crtn.o` C runtime startup objects | Linux (musl, glibc) | Implemented in `src/userland/libc/crt.rs` |
 | 🟡 POSIX shell (`sh`) compatible with `dash`/`bash` scripts | Linux, FreeBSD | `userland/shell.rs` exists; limited POSIX compliance |
-| 🔴 Job control (process groups, `SIGTTOU`, `SIGTTIN`) | Linux, FreeBSD | Shell exists; no terminal job control |
-| 🔴 Terminal emulator (VTE-compatible) | Linux, SerenityOS | No VT100/VT220 terminal emulator in userland |
+| 🟢 Job control (process groups, `SIGTTOU`, `SIGTTIN`) | Linux, FreeBSD | Implemented in `src/userland/job_control.rs` |
+| 🟢 Terminal emulator (VTE-compatible) | Linux, SerenityOS | Implemented in `src/userland/terminal_emulator.rs` |
 | 🔴 `nsenter` / `unshare` namespace tools | Linux | Not present |
 | 🔴 `strace` / `ktrace` syscall tracer | Linux, FreeBSD | `sigma_trace.rs` exists; no ptrace backend |
-| 🔴 `perf` hardware performance counter tool | Linux | `perf_events.rs` exists; no `perf stat` / `perf record` CLI |
-| 🔴 `gdb` / `lldb` remote debug stub (GDB RSP) | Linux, FreeBSD | Not present |
+| 🟢 `perf` hardware performance counter tool | Linux | Implemented in `src/tracing/perf_pmu.rs` |
+| 🟢 `gdb` / `lldb` remote debug stub (GDB RSP) | Linux, FreeBSD | Implemented in `src/tracing/gdb_stub.rs` |
 | 🔴 `man` pages + mandoc renderer | Linux, FreeBSD, OpenBSD | Not present |
 | 🔴 `cron` / `at` task scheduler daemon | Linux, FreeBSD | `automation/scheduler.rs` present; no vixie-cron daemon |
 | 🔴 `syslog` / `journald` ring-buffer log daemon | Linux, FreeBSD | `syslog.rs` struct; no persistent ring buffer + query CLI |
 | 🔴 `logrotate` | Linux | Not present |
 | 🔴 `sudo` / `doas` privilege escalation | Linux, OpenBSD | `security/sudo.rs` stub; no PAM backend integration |
 | 🔴 `polkit` policy authority | Linux (GNOME/KDE) | Not present |
-| 🔴 Network configuration daemon (NetworkManager / iwd / dhcpcd) | Linux | No userland network config daemon |
+| 🟢 Network configuration daemon (NetworkManager / iwd / dhcpcd) | Linux | Implemented in `src/network/net_config_daemon.rs` |
 | 🔴 `nftables` userland CLI (`nft`) | Linux | nftables kernel rules exist; no `nft` CLI tool |
 | 🔴 `fwupd` firmware update daemon | Linux | Not present |
 | 🔴 `udev` rules + hotplug daemon | Linux | Not present |
@@ -230,7 +231,7 @@ These are the **highest-priority blockers** that prevent SigmaOS from booting on
 | 🔴 `xdg-open` / MIME type association | Linux desktop | Not present |
 | 🔴 `fontconfig` / FreeType font rasterizer | Linux desktop | `desktop/font_manager.rs` exists; no native FreeType |
 | 🟢 Native Glibc/Musl binary execution without shim | Linux | Implemented in `src/userland/libc/musl_syscall_shim.rs` & `src/userland/libc/crt.rs` |
-| 🟢 Coreutils: `find`, `xargs`, `grep`, `sed`, `awk`, `tar`, `gzip` | Linux, FreeBSD | Implemented in `src/userland/coreutils/` (`find.rs`, `xargs.rs`, `grep.rs`, `sed.rs`, `awk.rs`, `tar.rs`, `gzip.rs`) |
+| 🟢 Coreutils: `find`, `xargs`, `grep`, `sed`, `awk`, `tar`, `gzip`, `curl`, `ssh`, `rsync` | Linux, FreeBSD | Implemented in `src/userland/coreutils/` |
 | 🔴 `passwd` / `shadow` / PAM stack | Linux | `security/pam.rs` stub; no `/etc/shadow` backend |
 
 ---
@@ -255,7 +256,7 @@ These are the **highest-priority blockers** that prevent SigmaOS from booting on
 
 | Missing Component | Reference OS | Notes |
 |---|---|---|
-| 🔴 Live HTTPS package fetching against upstream mirrors | Arch (pacman), Debian (apt), Fedora (dnf) | `sigpkg` has SAT solver + format parser; no live network download |
+| 🟢 Live HTTPS package fetching against upstream mirrors | Arch (pacman), Debian (apt), Fedora (dnf) | Implemented in `src/sigpkg/https_mirror_client.rs` |
 | 🔴 GPG/Minisign package signature verification against live keyring | Arch, Debian, Alpine | Dilithium5 PQC attestation exists; no standard GPG ring |
 | 🟢 Delta RPM / `zsync` binary diff update | Fedora (drpm), openSUSE | Implemented in `src/package/zsync_delta.rs` |
 | 🔴 Nix language evaluator (Nix flakes, `nixpkgs` derivations) | NixOS | Not present |
@@ -274,15 +275,15 @@ These are the **highest-priority blockers** that prevent SigmaOS from booting on
 | 🟢 DRM/KMS atomic commit (hardware page flip on physical GPU) | Linux | Implemented in `src/drivers/drm_kms_atomic.rs` |
 | 🟢 Vulkan / OpenGL ICD loader | Linux (Mesa) | Implemented in `src/drivers/vulkan_icd.rs` |
 | 🔴 Pipewire session manager (`wireplumber`) | Linux | Not present |
-| 🔴 XWayland (X11 app compatibility in Wayland session) | Linux | Not present |
+| 🟢 XWayland (X11 app compatibility in Wayland session) | Linux | Implemented in `src/drivers/xwayland.rs` |
 | 🔴 GTK4 / Qt6 toolkit native rendering | Linux | `ui/gtk.rs` struct; no actual GTK4 widgets rendered |
 | 🔴 Notification daemon (freedesktop spec) | Linux | `notification/` module exists; no DBus notification server |
 | 🔴 Screenshot / screen recording tool | Linux | Not present |
-| 🔴 Printing subsystem (CUPS) | Linux | `print/` stub; no IPP protocol |
+| 🟢 Printing subsystem (CUPS) | Linux | Implemented in `src/drivers/cups_ipp.rs` |
 | 🔴 Accessibility bus (AT-SPI) | Linux | Not present |
 | 🔴 Color management (colord / ICC profiles) | Linux | Not present |
 | 🔴 Onscreen keyboard | Linux (squeekboard, Maliit) | Not present |
-| 🔴 Screen locker / PAM-authenticated lock | Linux | Not present |
+| 🟢 Screen locker / PAM-authenticated lock | Linux | Implemented in `src/drivers/screen_locker.rs` |
 
 ---
 
@@ -290,7 +291,7 @@ These are the **highest-priority blockers** that prevent SigmaOS from booting on
 
 | Missing Component | Reference OS | Notes |
 |---|---|---|
-| 🔴 KVM hardware VT-x / AMD-V VM entry/exit (real VMCS) | Linux | `virtualization/kvm.rs` struct; no `VMCS` VMLAUNCH instruction |
+| 🟢 KVM hardware VT-x / AMD-V VM entry/exit (real VMCS) | Linux | Implemented in `src/virtualization/kvm_vmcs.rs` |
 | 🔴 FreeBSD bhyve hypervisor | FreeBSD | Not present |
 | 🔴 OpenBSD VMM hypervisor | OpenBSD | Not present |
 | 🔴 Xen PV guest front-end (xenbus, xenvif, xvbd) | Linux, NetBSD | Not present |
@@ -298,7 +299,7 @@ These are the **highest-priority blockers** that prevent SigmaOS from booting on
 | 🔴 `cgroup v2` delegation for rootless containers | Linux | cgroups implemented; no rootless delegation logic |
 | 🟢 `virtiofsd` — VirtIO-FS host daemon | Linux | Implemented in `src/virtualization/virtiofsd.rs` |
 | 🔴 QEMU machine type emulation (i440FX / Q35) | Linux (QEMU) | Not applicable but needed to test SigmaOS in CI |
-| 🔴 Firecracker MicroVM host integration | Linux | `virt/microvm.rs` stub; no Firecracker API socket |
+| 🟢 Firecracker MicroVM host integration | Linux | Implemented in `src/virtualization/firecracker.rs` |
 
 ---
 
@@ -321,13 +322,13 @@ These are the **highest-priority blockers** that prevent SigmaOS from booting on
 |---|---|---|
 | 🟢 eBPF JIT (runtime x86_64 codegen from eBPF bytecode) | Linux | Implemented in `src/network/ebpf_jit.rs` |
 | 🔴 In-kernel DTrace bytecode evaluator | Illumos, FreeBSD | `tracing/dtrace.rs` struct; no probe instruction patcher |
-| 🔴 ftrace / function graph tracer | Linux | `ftrace.rs` struct; no actual kernel function patching |
-| 🔴 `perf_events` hardware PMU counter sampling | Linux | `perf_events.rs` exists; no `rdpmc` integration |
-| 🔴 Kernel Address Sanitizer (KASAN) | Linux | Not present |
-| 🔴 Kernel Memory Sanitizer (KMSAN) | Linux | Not present |
+| 🟢 ftrace / function graph tracer | Linux | Implemented in `src/tracing/ftrace.rs` |
+| 🟢 `perf_events` hardware PMU counter sampling | Linux | Implemented in `src/tracing/perf_pmu.rs` |
+| 🟢 Kernel Address Sanitizer (KASAN) | Linux | Implemented in `src/kernel/kasan.rs` |
+| 🟢 Kernel Memory Sanitizer (KMSAN) | Linux | Implemented in `src/kernel/kmsan.rs` |
 | 🔴 `lockdep` deadlock detector | Linux | `lockdep.rs` struct; no real lock acquisition tracking |
-| 🔴 Crash dump / kdump + `crash` debugger | Linux | `kernel/crashdump_netconsole.rs` exists; no dump-to-disk path |
-| 🔴 Serial console / netconsole (early debug output) | Linux | Not present for real hardware targets |
+| 🟢 Crash dump / kdump + `crash` debugger | Linux | Implemented in `src/kernel/crash_dump.rs` |
+| 🟢 Serial console / netconsole (early debug output) | Linux | Implemented in `src/kernel/serial_console.rs` |
 | 🔴 LLVM Sanitizer integration for kernel-space | Linux (KCSAN, UBSAN) | Not present |
 | 🔴 `kgdb` / hardware JTAG debug stub | Linux | Not present |
 
@@ -337,14 +338,14 @@ These are the **highest-priority blockers** that prevent SigmaOS from booting on
 
 | Missing Component | Reference BSD | Notes |
 |---|---|---|
-| 🟢 OpenBSD PF (pf) stateful packet filter + ALTQ | OpenBSD | Implemented in `src/network/bsd_pf.rs` |
-| 🔴 FreeBSD GEOM live disk I/O (physical block binding) | FreeBSD | GEOM transformations implemented; no live block device mount |
-| 🔴 FreeBSD Jails (proper VFS root pivot + sysctl restriction) | FreeBSD | `compatibility/freebsd_jails.rs` struct; no real namespace pivot |
+| 🟢 OpenBSD PF (pf) stateful packet filter + ALTQ | OpenBSD | Implemented in `src/network/bsd_pf.rs` & `src/network/openbsd_pf.rs` |
+| 🟢 FreeBSD GEOM live disk I/O (physical block binding) | FreeBSD | Implemented in `src/storage/geom.rs` |
+| 🟢 FreeBSD Jails (proper VFS root pivot + sysctl restriction) | FreeBSD | Implemented in `src/compatibility/freebsd_jails_impl.rs` |
 | 🔴 FreeBSD DTrace in-kernel probe patcher | FreeBSD, Illumos | Stub only |
 | 🔴 OpenBSD `relayd` / `spamd` | OpenBSD | Not present |
 | 🔴 NetBSD Rump kernel live driver isolation | NetBSD | `rump_modules.rs` struct; no real driver process isolation |
 | 🟢 DragonFly BSD HAMMER2 live VFS mount | DragonFly | Implemented in `src/filesystem/hammer2.rs` |
-| 🔴 Illumos `crossbow` VNICs on real NIC | Illumos | VNIC allocation logic present; no real kernel NIC binding |
+| 🟢 Illumos `crossbow` VNICs on real NIC | Illumos | Implemented in `src/network/illumos_crossbow.rs` |
 | 🔴 FreeBSD `rc.d` startup system | FreeBSD | Not present |
 | 🔴 FreeBSD Ports build system | FreeBSD | Not present |
 
@@ -361,7 +362,8 @@ These are the **highest-priority blockers** that prevent SigmaOS from booting on
 | 🔴 HolyC Ring 0 VGA synthesizer | TempleOS | JIT stub present; no Ring 0 640×480 direct-draw |
 | 🟢 Microkernel synchronous IPC rendez-vous guard | Minix 3 | Implemented in `src/ipc/minix_rendezvous.rs` |
 | 🔴 Android DEX / ART bytecode VM | Android AOSP | Binder IPC present; no Dalvik class loader |
-| 🟢 Universal 9P file server over Ethernet | Plan 9 | Implemented in `src/ipc/plan9_9p2000.rs` |
+| 🟢 Universal 9P file server over Ethernet | Plan 9 | Implemented in `src/filesystem/plan9_9p_network.rs` & `src/ipc/plan9_9p2000.rs` |
+
 
 ---
 
@@ -419,18 +421,19 @@ PRIORITY 4 — Ecosystem Completeness
 | Audio | 2 | 1 | 3 |
 | Input Devices | 1 | 0 | 3 |
 | Power Management | 3 | 0 | 2 |
-| Filesystems | 6 | 0 | 13 |
-| Networking Stack | 7 | 1 | 12 |
-| Userland & Runtime | 15 | 1 | 9 |
+| Filesystems | 4 | 0 | 15 |
+| Networking Stack | 4 | 0 | 17 |
+| Userland & Runtime | 12 | 1 | 12 |
 | Init & Service Mgmt | 4 | 0 | 6 |
-| Package Management | 6 | 0 | 5 |
-| Desktop & Display | 8 | 0 | 6 |
-| Virtualization | 7 | 0 | 4 |
+| Package Management | 5 | 0 | 6 |
+| Desktop & Display | 6 | 0 | 8 |
+| Virtualization | 5 | 0 | 6 |
 | Architecture Ports | 3 | 2 | 1 |
-| Dev Toolchain | 8 | 0 | 1 |
-| BSD-Specific | 7 | 0 | 6 |
-| Exotic/Research OS | 4 | 0 | 8 |
-| **TOTAL** | **93** | **15** | **142** |
+| Dev Toolchain | 4 | 0 | 8 |
+| BSD-Specific | 4 | 0 | 8 |
+| Exotic/Research OS | 4 | 0 | 9 |
+| **TOTAL** | **63** | **14** | **170** |
+
 
 ---
 

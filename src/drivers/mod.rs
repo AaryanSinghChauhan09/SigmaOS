@@ -57,6 +57,11 @@ pub mod virtio_net_irq;
 pub mod vulkan_icd;
 pub mod wifi_80211;
 pub mod wifi_supplicant;
+pub mod cups_ipp;
+pub mod fat32_driver;
+pub mod screen_locker;
+pub mod xwayland;
+
 
 pub use device_mapper::{DeviceMapperController, DmTableEntry, DmTargetType};
 pub use drm_kms_atomic::{DrmAtomicRequest, DrmCrtc, DrmKmsAtomicDriver};

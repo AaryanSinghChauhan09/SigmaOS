@@ -331,4 +331,6 @@ pub mod ubuntu_apt;
 pub mod universal_app_interface;
 pub mod void_linux;
 pub mod wasm_sandbox;
+pub mod freebsd_jails_impl;
 pub use mint_omarchy_migration_bridge::*;
+

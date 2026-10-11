@@ -115,3 +115,12 @@ pub use hammer2::{
     Hammer2BlockRef, Hammer2Check, Hammer2Compress, Hammer2Inode, Hammer2PFS, Hammer2Snapshot,
     Hammer2Statfs, Hammer2Volume,
 };
+
+pub mod configfs;
+pub mod debugfs;
+pub mod fat32;
+pub mod luks2;
+pub mod ntfs;
+pub mod plan9_9p_network;
+pub mod smb_client;
+

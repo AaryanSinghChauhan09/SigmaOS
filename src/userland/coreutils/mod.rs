@@ -36,6 +36,10 @@ pub mod uname;
 pub mod uniq;
 pub mod wc;
 pub mod xargs;
+pub mod curl;
+pub mod rsync;
+pub mod ssh;
+
 
 pub use awk::{run as awk_run, AwkConfig};
 pub use cat::run as cat_run;
