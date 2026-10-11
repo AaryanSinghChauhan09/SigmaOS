@@ -104,6 +104,66 @@ pub struct ConsolidatedSovereignKernelPatch {
     pub pqc_verified: bool,
 }
 
+// ============================================================================
+// SCHED_EXT BPF DISPATCHER PR ENGINE (Linux 6.7+ BPF-Programmable Scheduler)
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SchedExtPolicyKind {
+    ScxBpfland,
+    ScxLavd,
+    ScxCentral,
+    ScxRustland,
+    ScxFlatCg,
+}
+
+impl SchedExtPolicyKind {
+    pub fn name(&self) -> &'static str {
+        match self {
+            Self::ScxBpfland => "scx_bpfland",
+            Self::ScxLavd => "scx_lavd",
+            Self::ScxCentral => "scx_central",
+            Self::ScxRustland => "scx_rustland",
+            Self::ScxFlatCg => "scx_flatcg",
+        }
+    }
+}
+
+pub struct SchedExtBpfDispatcherPrEngine;
+
+impl SchedExtBpfDispatcherPrEngine {
+    pub fn generate_bpf_dispatcher_pr_diff(policy: SchedExtPolicyKind, slice_ns: u64) -> String {
+        format!(
+            "--- a/kernel/sched/ext/bpf_dispatcher.c\n\
+             +++ b/kernel/sched/ext/bpf_dispatcher.c\n\
+             @@ -0,0 +1,18 @@\n\
+             +// Linux 6.7+ SchedExt BPF Dispatcher Hook: {}\n\
+             +#include <vmlinux.h>\n\
+             +#include <bpf/bpf_helpers.h>\n\
+             +\n\
+             +SEC(\"struct_ops/{}_select_cpu\")\n\
+             +s32 BPF_PROG({}_select_cpu, struct task_struct *p, s32 prev_cpu, u64 wake_flags) {{\n\
+             +    return bpf_get_prctl_opt_cpu(p, prev_cpu);\n\
+             +}}\n\
+             +\n\
+             +SEC(\"struct_ops/{}_enqueue\")\n\
+             +void BPF_PROG({}_enqueue, struct task_struct *p, u64 enq_flags) {{\n\
+             +    scx_bpf_dispatch(p, SCX_DSQ_GLOBAL, {}, enq_flags);\n\
+             +}}\n\
+             +\n\
+             +SCX_OPS_DEFINE({}, \"{}\");",
+            policy.name(),
+            policy.name(),
+            policy.name(),
+            policy.name(),
+            policy.name(),
+            slice_ns,
+            policy.name(),
+            policy.name()
+        )
+    }
+}
+
 /// Sovereign Universal Kernel Pull Request Gateway Engine
 pub struct SovereignKernelPrGatewayEngine {
     pub pr_submissions: BTreeMap<u64, KernelPullRequestSubmission>,
@@ -297,6 +357,28 @@ impl SovereignKernelPrGatewayEngine {
         Ok(consolidated)
     }
 
+    /// Submits, validates, and generates PR diff for a BPF-programmable sched_ext scheduler policy
+    pub fn submit_schedext_bpf_pr(
+        &mut self,
+        author: &str,
+        policy: SchedExtPolicyKind,
+        slice_ns: u64,
+        pqc_sig: &[u8],
+    ) -> u64 {
+        let diff = SchedExtBpfDispatcherPrEngine::generate_bpf_dispatcher_pr_diff(policy, slice_ns);
+        let title = format!("sched_ext BPF Dispatcher Hook: {}", policy.name());
+        self.submit_kernel_pr(
+            author,
+            &title,
+            KernelSubsystemTarget::CoreScheduler,
+            KernelPrSubmissionType::EbpfProgramBytecode,
+            &diff,
+            &["schedule", "bpf_trace_printk"],
+            pqc_sig,
+            1700000000,
+        )
+    }
+
     /// Search active and merged Kernel PRs by author, subsystem, or title query
     pub fn search_kernel_prs(&self, query: &str) -> Vec<KernelPullRequestSubmission> {
         let q = query.to_lowercase();
@@ -383,5 +465,27 @@ mod tests {
             1700000000,
         );
         assert!(gateway.validate_kernel_pr(pr_missing_sym).is_err());
+    }
+
+    #[test]
+    fn test_schedext_bpf_dispatcher_pr_engine() {
+        let diff = SchedExtBpfDispatcherPrEngine::generate_bpf_dispatcher_pr_diff(
+            SchedExtPolicyKind::ScxBpfland,
+            5000000,
+        );
+        assert!(diff.contains("scx_bpfland"));
+        assert!(diff.contains("SCX_OPS_DEFINE"));
+
+        let mut gateway = SovereignKernelPrGatewayEngine::new();
+        let pr_id = gateway.submit_schedext_bpf_pr(
+            "kernel_dev",
+            SchedExtPolicyKind::ScxLavd,
+            3000000,
+            b"pqc_valid_sig",
+        );
+
+        assert!(pr_id > 0);
+        let merged = gateway.auto_merge_kernel_pr(pr_id).unwrap();
+        assert!(merged.title.contains("scx_lavd"));
     }
 }
