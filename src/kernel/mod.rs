@@ -227,6 +227,7 @@ pub mod shm;
 pub mod shm_anon;
 pub mod event_notification;
 pub mod msi_routing;
+pub mod timekeeping;
 pub use shm_anon::{
     ShmAnonMapping, ShmAnonManager, init_shm_anon, get_shm_anon_manager,
     shm_open, shm_close, shm_unlink, mmap_shm, munmap_shm,
@@ -239,6 +240,11 @@ pub use event_notification::{
 pub use msi_routing::{
     MsiCapabilityHeader, MsixCapability, MsiVector, MsixTableEntry,
     MsiConfig, MsixConfig, MsiRoutingEngine, init_msi_routing, get_msi_routing_engine,
+};
+pub use timekeeping::{
+    Timekeeper, ClockSource, ClockQuality, HighResTimer, TimerManager,
+    init_timekeeping, get_timekeeper, get_timer_manager,
+    get_current_time, get_current_time_seconds,
 };
 pub mod smp_load_balancer;
 pub mod wx_pte_hardening;

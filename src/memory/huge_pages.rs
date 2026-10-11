@@ -4,9 +4,12 @@
 // Provides 2MiB / 1GiB Huge Page Pool allocation, THP transparent page coalescing,
 // TLB shootdown optimizations, and THP sysfs tuning interfaces.
 
-use std::collections::BTreeMap;
-use std::string::{String, ToString};
-use std::vec::Vec;
+#![no_std]
+
+extern crate alloc;
+use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 
 pub const PAGE_SIZE_4KB: usize = 4096;
 pub const PAGE_SIZE_2MB: usize = 2 * 1024 * 1024; // 2MiB Huge Page
@@ -358,7 +361,6 @@ impl Default for ThpKhugepagedDefragDaemon {
     }
 }
 
-#[cfg(test)]
 #[cfg(test)]
 mod tests {
     use super::*;
