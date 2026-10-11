@@ -7,6 +7,7 @@ pub mod linux_proc;
 pub mod linux_sysfs;
 pub mod manager;
 pub mod pidfd_procdesc_subreaper;
+pub mod pthread;
 pub mod scheduler;
 pub mod sovereign_process_engine;
 pub mod spawn;
@@ -31,4 +32,12 @@ pub use advanced_process_control::{
 
 pub use sovereign_process_engine::{
     SovereignProcess, SovereignProcessManager, SovereignProcessState, ZeroCopyIpcChannel,
+};
+
+pub use pthread::{
+    PthreadT, PthreadAttr, DetachState, ThreadFunc, ThreadControlBlock,
+    PthreadMutex, PthreadCond, PthreadKey, ThreadLocalStorage, PthreadManager,
+    pthread_init, get_pthread_manager,
+    pthread_create, pthread_join, pthread_detach, pthread_exit,
+    pthread_key_create, pthread_key_delete, pthread_setspecific, pthread_getspecific,
 };
