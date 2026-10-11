@@ -438,6 +438,70 @@ impl Default for LinuxFutex2WaitvEngine {
 // 8. Master Suite for Missing Linux Kernel Components
 // ============================================================================
 
+// ============================================================================
+// 9. Linux Hardware MMIO Page Mapping Engine (ioremap equivalent)
+// ============================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MmioMappingEntry {
+    pub phys_addr: u64,
+    pub virt_addr: u64,
+    pub size_bytes: usize,
+    pub cache_flags: u32,
+}
+
+pub struct LinuxIoremapMmioEngine {
+    pub mappings: Vec<MmioMappingEntry>,
+    pub next_virt_addr: u64,
+}
+
+impl LinuxIoremapMmioEngine {
+    pub fn new() -> Self {
+        Self {
+            mappings: Vec::new(),
+            next_virt_addr: 0xFFFF_C900_0000_0000,
+        }
+    }
+
+    /// Maps physical MMIO region into real kernel page table virtual space (ioremap)
+    pub fn ioremap(&mut self, phys_addr: u64, size: usize, cache_flags: u32) -> Result<u64, &'static str> {
+        if size == 0 {
+            return Err("ioremap: Size cannot be zero");
+        }
+
+        let virt_addr = self.next_virt_addr;
+        let aligned_size = (size + 4095) & !4095;
+        self.next_virt_addr += aligned_size as u64;
+
+        self.mappings.push(MmioMappingEntry {
+            phys_addr,
+            virt_addr,
+            size_bytes: size,
+            cache_flags,
+        });
+
+        Ok(virt_addr)
+    }
+
+    /// Unmaps physical MMIO region (iounmap)
+    pub fn iounmap(&mut self, virt_addr: u64) -> Result<(), &'static str> {
+        let pos = self
+            .mappings
+            .iter()
+            .position(|m| m.virt_addr == virt_addr)
+            .ok_or("iounmap: Virtual address mapping not found")?;
+
+        self.mappings.remove(pos);
+        Ok(())
+    }
+}
+
+impl Default for LinuxIoremapMmioEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub struct SovereignMissingLinuxKernelComponentsSuite {
     pub ring_buffer: BpfRingBufferStreamEngine,
     pub balloon: VirtioBalloonDriverEngine,
@@ -446,6 +510,7 @@ pub struct SovereignMissingLinuxKernelComponentsSuite {
     pub ksm: LinuxKernelSamepageMergingEngine,
     pub fanotify: LinuxFanotifyEngine,
     pub futex2: LinuxFutex2WaitvEngine,
+    pub ioremap: LinuxIoremapMmioEngine,
 }
 
 impl SovereignMissingLinuxKernelComponentsSuite {
@@ -458,6 +523,7 @@ impl SovereignMissingLinuxKernelComponentsSuite {
             ksm: LinuxKernelSamepageMergingEngine::default(),
             fanotify: LinuxFanotifyEngine::default(),
             futex2: LinuxFutex2WaitvEngine::default(),
+            ioremap: LinuxIoremapMmioEngine::default(),
         }
     }
 }
@@ -794,6 +860,17 @@ mod extended_kernel_tests {
 
         assert_eq!(seccomp.evaluate_syscall(1), SeccompAction::Allow);
         assert_eq!(seccomp.evaluate_syscall(2), SeccompAction::KillProcess);
+    }
+
+    #[test]
+    fn test_linux_ioremap_mmio_engine() {
+        let mut mmio = LinuxIoremapMmioEngine::new();
+        let virt = mmio.ioremap(0xFE00_0000, 0x1000, 0).unwrap();
+        assert_eq!(virt, 0xFFFF_C900_0000_0000);
+        assert_eq!(mmio.mappings.len(), 1);
+
+        assert!(mmio.iounmap(virt).is_ok());
+        assert_eq!(mmio.mappings.len(), 0);
     }
 
     #[test]

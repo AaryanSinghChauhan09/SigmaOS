@@ -13,6 +13,7 @@ pub const MAX_ENV_VAR_LEN: usize = 32768;
 pub const MAX_ENV_KEY_LEN: usize = 256;
 pub const MAX_IPV4_LEN: usize = 15; // "255.255.255.255"
 pub const MAX_IPV6_LEN: usize = 39; // full IPv6 text
+pub const MAX_URL_LEN: usize = 2048;
 
 /// Errors produced by input validation routines.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -490,6 +491,76 @@ pub fn validate_port(port: u32) -> Result<(), ValidationError> {
     Ok(())
 }
 
+// ── URL validation ─────────────────────────────────────────────────────────
+
+/// Validate a URL byte slice per RFC 3986 / WHATWG standards.
+/// Rejects NUL bytes, control chars, spaces, userinfo credentials (`user:pass@`),
+/// and non-http/https schemes to prevent SSRF and injection attacks (CWE-918, CWE-150).
+pub fn validate_url(url: &[u8]) -> Result<(), ValidationError> {
+    if url.is_empty() {
+        return Err(ValidationError::EmptyInput);
+    }
+    if url.len() > MAX_URL_LEN {
+        return Err(ValidationError::TooLong);
+    }
+    for &b in url {
+        if b == 0 {
+            return Err(ValidationError::NullByte);
+        }
+        if b <= 32 || b == 127 {
+            return Err(ValidationError::InvalidChars);
+        }
+    }
+    let rest = if url.starts_with(b"http://") {
+        &url[7..]
+    } else if url.starts_with(b"https://") {
+        &url[8..]
+    } else {
+        return Err(ValidationError::InvalidChars);
+    };
+    if rest.is_empty() {
+        return Err(ValidationError::EmptyInput);
+    }
+    let authority_len = rest.iter().position(|&b| b == b'/' || b == b'?' || b == b'#').unwrap_or(rest.len());
+    let authority = &rest[..authority_len];
+    if authority.is_empty() || authority.contains(&b'@') {
+        return Err(ValidationError::InvalidChars);
+    }
+    let (host, port_bytes) = if authority.starts_with(b"[") {
+        let end_idx = authority.iter().position(|&b| b == b']').ok_or(ValidationError::InvalidChars)?;
+        validate_ipv6(&authority[1..end_idx])?;
+        let rem = &authority[end_idx + 1..];
+        if rem.is_empty() {
+            (&[][..], None)
+        } else if rem.starts_with(b":") {
+            (&[][..], Some(&rem[1..]))
+        } else {
+            return Err(ValidationError::InvalidChars);
+        }
+    } else if let Some(colon_pos) = authority.iter().rposition(|&b| b == b':') {
+        (&authority[..colon_pos], Some(&authority[colon_pos + 1..]))
+    } else {
+        (authority, None)
+    };
+    if !host.is_empty() && validate_ipv4(host).is_err() && validate_hostname(host).is_err() {
+        return Err(ValidationError::InvalidChars);
+    }
+    if let Some(pbytes) = port_bytes {
+        if pbytes.is_empty() || pbytes.len() > 5 {
+            return Err(ValidationError::OutOfRange);
+        }
+        let mut port_num: u32 = 0;
+        for &b in pbytes {
+            if !b.is_ascii_digit() {
+                return Err(ValidationError::InvalidChars);
+            }
+            port_num = port_num.saturating_mul(10).saturating_add((b - b'0') as u32);
+        }
+        validate_port(port_num)?;
+    }
+    Ok(())
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 #[cfg(test)]
 #[cfg(test)]
@@ -922,5 +993,39 @@ mod tests {
         // Non-hex digits
         assert_eq!(validate_mac_address(b"00:1G:2B:3C:4D:5E"), Err(ValidationError::InvalidChars));
         assert_eq!(validate_mac_address(b"00:1A:2B:3C:4D:5Z"), Err(ValidationError::InvalidChars));
+    }
+
+    #[test]
+    fn test_url_validation() {
+        // Valid HTTP/HTTPS URLs
+        assert_eq!(validate_url(b"https://example.com"), Ok(()));
+        assert_eq!(validate_url(b"http://localhost:8080/api/v1?query=1#hash"), Ok(()));
+        assert_eq!(validate_url(b"https://192.168.1.1:8443/config"), Ok(()));
+        assert_eq!(validate_url(b"https://[2001:db8::1]:443/status"), Ok(()));
+
+        // Empty and too long
+        assert_eq!(validate_url(b""), Err(ValidationError::EmptyInput));
+        let long_url = vec![b'a'; MAX_URL_LEN + 1];
+        assert_eq!(validate_url(&long_url), Err(ValidationError::TooLong));
+
+        // NUL byte and control chars
+        assert_eq!(validate_url(b"https://example.com/\0evil"), Err(ValidationError::NullByte));
+        assert_eq!(validate_url(b"https://example.com/ foo"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_url(b"https://example.com/\n"), Err(ValidationError::InvalidChars));
+
+        // Unsafe schemes (SSRF prevention)
+        assert_eq!(validate_url(b"javascript:alert(1)"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_url(b"file:///etc/passwd"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_url(b"data:text/plain;base64,AAA"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_url(b"ftp://example.com"), Err(ValidationError::InvalidChars));
+
+        // Embedded userinfo credentials rejection
+        assert_eq!(validate_url(b"https://user:pass@example.com"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_url(b"http://admin@localhost/"), Err(ValidationError::InvalidChars));
+
+        // Invalid port
+        assert_eq!(validate_url(b"http://example.com:70000"), Err(ValidationError::OutOfRange));
+        assert_eq!(validate_url(b"http://example.com:0"), Err(ValidationError::OutOfRange));
+        assert_eq!(validate_url(b"http://example.com:abc"), Err(ValidationError::InvalidChars));
     }
 }
