@@ -226,6 +226,7 @@ pub mod msgqueue;
 pub mod shm;
 pub mod shm_anon;
 pub mod event_notification;
+pub mod msi_routing;
 pub use shm_anon::{
     ShmAnonMapping, ShmAnonManager, init_shm_anon, get_shm_anon_manager,
     shm_open, shm_close, shm_unlink, mmap_shm, munmap_shm,
@@ -234,6 +235,10 @@ pub use event_notification::{
     EpollEvent, EpollEventFlags, EpollInstance, EpollOp,
     KqueueEvent, KqueueEventFlags, KqueueFilter, KqueueInstance,
     EventNotificationManager, init_event_manager, get_event_manager,
+};
+pub use msi_routing::{
+    MsiCapabilityHeader, MsixCapability, MsiVector, MsixTableEntry,
+    MsiConfig, MsixConfig, MsiRoutingEngine, init_msi_routing, get_msi_routing_engine,
 };
 pub mod smp_load_balancer;
 pub mod wx_pte_hardening;

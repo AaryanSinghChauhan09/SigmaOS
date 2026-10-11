@@ -1,8 +1,11 @@
 // Interrupt Handling Framework
 // Inspired by Linux and BSD interrupt handling with IDT and IRQ management
 
-use std::collections::HashMap;
-use std::sync::atomic::{AtomicU32, AtomicU64, AtomicU8, Ordering};
+#![no_std]
+
+extern crate alloc;
+use alloc::collections::HashMap;
+use alloc::sync::atomic::{AtomicU32, AtomicU64, AtomicU8, Ordering};
 
 /// Interrupt vector
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -261,10 +264,9 @@ impl InterruptController {
 }
 
 #[cfg(test)]
-#[cfg(test)]
 mod tests {
     use super::*;
-
+    
     #[test]
     fn test_allocate_vector() {
         let controller = InterruptController::new();
