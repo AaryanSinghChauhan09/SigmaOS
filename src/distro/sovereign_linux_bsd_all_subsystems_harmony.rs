@@ -43,6 +43,8 @@ pub enum LinuxBsdDistroInspiration {
     MidnightBSD,
     RedoxOS,
     HaikuOS,
+    QubesOS,
+    WhonixOS,
 }
 
 impl LinuxBsdDistroInspiration {
@@ -82,6 +84,8 @@ impl LinuxBsdDistroInspiration {
             Self::MidnightBSD => "MidnightBSD",
             Self::RedoxOS => "RedoxOS",
             Self::HaikuOS => "HaikuOS",
+            Self::QubesOS => "QubesOS",
+            Self::WhonixOS => "WhonixOS",
         }
     }
 }
