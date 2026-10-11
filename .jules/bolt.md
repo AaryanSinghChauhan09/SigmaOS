@@ -11,3 +11,7 @@
 ## 2025-05-22 - Bulk Buffer Operations and Single-Pass Registry Lookups
 **Learning:** Replacing byte-by-byte `output.push(byte)` loops with `extend_from_slice` and pre-allocated `with_capacity` in hot shell command output builders eliminates repeated re-allocation checks. Replacing two-pass registry lookup (`.position()` followed by index subscripting) with a single-pass `iter_mut()` loop eliminates redundant linear scans over trait object pointers.
 **Action:** Always pre-allocate capacity and use bulk slice extension for byte buffer formatting, and use single-pass iterator loops for trait object searches.
+
+## 2025-05-25 - Zero-Allocation File Block Skipping via Seek
+**Learning:** Core utilities processing archived/chunked data (such as `tar`) often discard data blocks by allocating `vec![0u8; bytes_to_skip]` and reading bytes off disk into heap memory, causing $O(N)$ allocation and disk throughput overhead during index/header listing operations. Replacing buffer allocation with $O(1)$ zero-allocation `File::seek(SeekFrom::Current(bytes_to_skip))` eliminates both memory allocation and byte copy overhead completely.
+**Action:** Always use relative file seeking (`SeekFrom::Current`) instead of heap allocation buffers when skipping data blocks in stream processors and core utilities.
