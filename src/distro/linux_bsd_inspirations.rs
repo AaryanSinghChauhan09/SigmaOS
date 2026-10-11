@@ -287,6 +287,79 @@ impl LinuxBsdSubsystemInspirationHarmonizer {
             subsystem, action, self.mode
         ))
     }
+
+    pub fn translate_vfs_path(&self, raw_path: &str) -> String {
+        match self.mode {
+            DistroSubsystemMode::FreeBsd
+            | DistroSubsystemMode::FreeBsdHardened
+            | DistroSubsystemMode::FreeBsdHardenedPqc
+            | DistroSubsystemMode::FreeBsdCapsicumHardened
+            | DistroSubsystemMode::FreeBsdBhyveVirtualization
+            | DistroSubsystemMode::FreeBsd14_1
+            | DistroSubsystemMode::FreeBsd14_2
+            | DistroSubsystemMode::FreeBsd15 => {
+                if raw_path.starts_with("/usr/bin") {
+                    raw_path.replace("/usr/bin", "/usr/local/bin")
+                } else if raw_path.starts_with("/etc") {
+                    raw_path.replace("/etc", "/usr/local/etc")
+                } else {
+                    raw_path.to_string()
+                }
+            }
+            DistroSubsystemMode::OpenBsd
+            | DistroSubsystemMode::OpenBsdHardened
+            | DistroSubsystemMode::OpenBsdUnveilHardened
+            | DistroSubsystemMode::OpenBsdKarled
+            | DistroSubsystemMode::OpenBsd76
+            | DistroSubsystemMode::OpenBsd77
+            | DistroSubsystemMode::OpenBsd78 => {
+                if raw_path.starts_with("/usr/bin") {
+                    raw_path.replace("/usr/bin", "/usr/local/bin")
+                } else {
+                    raw_path.to_string()
+                }
+            }
+            DistroSubsystemMode::LinuxNix
+            | DistroSubsystemMode::LinuxNixOS2405 => {
+                format!("/nix/store/sovereign-hash{}", raw_path)
+            }
+            _ => raw_path.to_string(),
+        }
+    }
+
+    pub fn get_security_isolation_level(&self) -> &'static str {
+        match self.mode {
+            DistroSubsystemMode::OpenBsd
+            | DistroSubsystemMode::OpenBsdHardened
+            | DistroSubsystemMode::OpenBsdUnveilHardened
+            | DistroSubsystemMode::OpenBsdKarled
+            | DistroSubsystemMode::OpenBsd76
+            | DistroSubsystemMode::OpenBsd77
+            | DistroSubsystemMode::OpenBsd78 => "PledgeUnveilStrictW^X",
+
+            DistroSubsystemMode::FreeBsd
+            | DistroSubsystemMode::FreeBsdHardened
+            | DistroSubsystemMode::FreeBsdHardenedPqc
+            | DistroSubsystemMode::FreeBsdCapsicumHardened
+            | DistroSubsystemMode::FreeBsdBhyveVirtualization => "CapsicumJailsMandatoryAccessControl",
+
+            DistroSubsystemMode::LinuxQubes => "XenHypervisorMicrokernelIsolation",
+            DistroSubsystemMode::LinuxWhonix | DistroSubsystemMode::LinuxTails => "AmnesicTorGatewayIsolation",
+            _ => "StandardCgroupV2NamespaceAppArmorSELinux",
+        }
+    }
+
+    pub fn verify_subsystem_interoperability(&mut self, subsystem_name: &str) -> bool {
+        let test_action = match subsystem_name {
+            "auth" => "verify_credentials",
+            "vfs" => "mount_point",
+            "network" => "bind_socket",
+            "package" => "query_manifest",
+            _ => "ping_health",
+        };
+
+        self.process_subsystem_action(subsystem_name, test_action).is_ok()
+    }
 }
 
 pub struct SovereignUniversalDistroBridge {
@@ -4345,6 +4418,15 @@ mod cross_subsystem_tests {
             hardened_obsd_bridge.get_supervisor_type(),
             ServiceSupervisorType::OpenRC
         );
+
+        let mut bsd_harmonizer = LinuxBsdSubsystemInspirationHarmonizer::new(DistroSubsystemMode::FreeBsd);
+        assert_eq!(bsd_harmonizer.translate_vfs_path("/usr/bin/tool"), "/usr/local/bin/tool");
+        assert_eq!(bsd_harmonizer.get_security_isolation_level(), "CapsicumJailsMandatoryAccessControl");
+        assert!(bsd_harmonizer.verify_subsystem_interoperability("auth"));
+        assert!(bsd_harmonizer.verify_subsystem_interoperability("vfs"));
+
+        let nix_harmonizer = LinuxBsdSubsystemInspirationHarmonizer::new(DistroSubsystemMode::LinuxNix);
+        assert!(nix_harmonizer.translate_vfs_path("/bin/app").contains("/nix/store/sovereign-hash"));
 
         let rhel_ent_bridge =
             SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxRedHatEnterprise);

@@ -3,13 +3,13 @@
 **Branch:** `pr/architecture-development-decision-plan-supreme-performance`
 **Status:** Under Review / Approved for Merge
 **Target Systems:** SigmaOS Kernel, Universal Package Subsystem, Storage, Network, and Userland Runtime
-**Inspirations:** Linux (Clear Linux, CachyOS, Gentoo), BSD (OpenBSD, FreeBSD, NetBSD, DragonFly BSD), Alpine Linux
+**Inspirations:** Linux (Clear Linux, CachyOS, Gentoo, Alpine, Fedora), BSD (OpenBSD, FreeBSD, NetBSD, DragonFly BSD), Solaris/illumos
 
 ---
 
 ## Executive Summary
 
-This Architecture Development Decision Plan (ADDP) establishes the core engineering principles, performance invariants, and architectural guidelines for **SigmaOS**. Inspired by the high-performance techniques of Clear Linux (compiler optimizations & auto-vectorization), CachyOS (BORE CPU scheduler & microarch tuning), FreeBSD (UMA & Capsicum), OpenBSD (otto-malloc & pledge/unveil), NetBSD (Rump Kernels), and DragonFly BSD (HAMMER2 multi-master PFS), this plan codifies the **Supreme Performance Architecture** for SigmaOS.
+This Architecture Development Decision Plan (ADDP) establishes the core engineering principles, performance invariants, and architectural guidelines for **SigmaOS**. Inspired by the high-performance techniques of Clear Linux (compiler auto-vectorization & x86-64-v4 microarch target tuning), CachyOS (BORE CPU scheduler & EEVDF tuning), FreeBSD (UMA slab allocator, VIMAGE, & Capsicum rights), OpenBSD (otto-malloc, KARL, & pledge/unveil W^X), NetBSD (Rump Kernels), DragonFly BSD (HAMMER2 multi-master PFS), and Alpine Linux (LBU RAM overlay persistence), this plan codifies the **Supreme Performance Architecture** for SigmaOS in Pull Request (PR) format.
 
 ---
 
@@ -25,11 +25,11 @@ This Architecture Development Decision Plan (ADDP) establishes the core engineer
 
 ### 1.3 Sub-Microsecond Kernel Preemption
 - **Invariant:** Interactive and real-time scheduling lanes must achieve sub-5 microsecond preemption latencies.
-- **Implementation:** NuttX-inspired preemption threshold evaluation and ULE-inspired interactivity boosting (from FreeBSD and CachyOS BORE scheduler tuning).
+- **Implementation:** Preemption threshold evaluation and ULE-inspired interactivity boosting (from FreeBSD and CachyOS BORE v2 scheduler tuning).
 
 ### 1.4 Zero-Copy DMA & Direct Page Mapping
 - **Invariant:** High-throughput I/O (network, storage, GPU) must bypass user-kernel memory copy operations.
-- **Implementation:** Direct DMA ring buffer descriptors, virtio-net acceleration, and `memfd_secret`/`io_uring` zero-copy buffer passing.
+- **Implementation:** Direct DMA ring buffer descriptors, virtio-net acceleration, eBPF XDP zero-copy redirects, and `memfd_secret`/`io_uring` buffer passing.
 
 ---
 
@@ -43,7 +43,7 @@ This Architecture Development Decision Plan (ADDP) establishes the core engineer
                                    |
                                    v
 +-----------------------------------------------------------------------+
-|             Universal Multi-Format Package Engine (V1 - V25)          |
+|             Universal Multi-Format Package Engine (V1 - V33)          |
 |  (.deb, .rpm, .apk, .nixpkg, .pkg, .ebuild, .aab, .ipa, AppImage)     |
 +-----------------------------------------------------------------------+
                                    |
@@ -66,12 +66,14 @@ This Architecture Development Decision Plan (ADDP) establishes the core engineer
 
 | Component | Linux / BSD Inspiration | Decision / Architecture Implementation in SigmaOS |
 | :--- | :--- | :--- |
-| **CPU Scheduler** | CachyOS BORE + FreeBSD ULE | Hybrid interactive scheduler with burst protection and microarch timeslice tuning. |
+| **CPU Scheduler** | CachyOS BORE v2 + FreeBSD ULE | Hybrid interactive scheduler with burst protection and microarch timeslice tuning. |
 | **Memory Allocator** | OpenBSD `otto-malloc` + FreeBSD UMA | Guard-page enabled slab allocator with per-CPU bucket caching and randomized allocation. |
 | **Package System** | Gentoo Portage + Arch Pacman + NixOS | Multi-format transpiler engine (`.deb`, `.rpm`, `.apk`, `.nixpkg`, etc.) transpiling to native `.sigpkg` with SAT solving. |
 | **Storage Engine** | Btrfs + DragonFly BSD HAMMER2 | Atomic rootfs snapshotting, multi-master PFS replication, and transactional update rollback. |
 | **Security Model** | OpenBSD `pledge`/`unveil` + FreeBSD Capsicum | Fine-grained capability pledges, path unveil restriction tables, and auditable MAC rules. |
-| **Network Stack** | FreeBSD Netstack + NetBSD `npfctl` | Lock-free TCP/IP stack with N-code JIT bytecode filtering and VirtIO-net DMA acceleration. |
+| **Network Stack** | FreeBSD Netstack + NetBSD `npfctl` + eBPF | Lock-free TCP/IP stack with N-code JIT bytecode filtering, VirtIO-net, and XDP zero-copy redirects. |
+| **RAM Persistence** | Alpine Linux LBU | RAM-overlay persistent commit engine writing state snapshots to encrypted backing store on shutdown. |
+| **Kernel Hardening** | OpenBSD KARL + HardenedBSD | Kernel Address Randomized Link Engine (KARL) re-linking kernel binary layouts on boot. |
 
 ---
 
