@@ -7,14 +7,14 @@ body:
     id: component
     attributes:
       label: Component
-      description: Component name (e.g., kernel, memory, VFS, security, packaging, desktop)
+      description: Component name (kernel, memory, VFS, security, packaging, desktop, etc.)
     validations:
       required: true
   - type: textarea
     id: upstream_project
     attributes:
       label: Upstream project
-      description: Upstream project studied (e.g., Linux, xv6, FreeBSD, OpenBSD, Arch, Debian, Fedora, Redox)
+      description: Upstream project studied (Linux, xv6, FreeBSD, OpenBSD, Arch, Debian, Fedora, Redox)
     validations:
       required: true
   - type: textarea

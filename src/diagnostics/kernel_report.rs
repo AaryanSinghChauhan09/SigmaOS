@@ -3,9 +3,9 @@
 //! Provides structured boot initialization reporting, panic reporting formats,
 //! CPU register/context serialization, and greppable event logging.
 
-use std::vec::Vec;
-use std::string::{String, ToString};
 use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Kernel Subsystem Boot Status
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -66,7 +66,10 @@ impl KernelBootDiagnosticReport {
 
     pub fn generate_greppable_log(&self) -> String {
         let mut out = String::new();
-        out.push_str(&format!("[BOOT_REPORT] os={} success={}\n", self.os_version, self.overall_success));
+        out.push_str(&format!(
+            "[BOOT_REPORT] os={} success={}\n",
+            self.os_version, self.overall_success
+        ));
         for res in &self.results {
             let status_str = match &res.status {
                 SubsystemBootStatus::Success => "SUCCESS",
@@ -146,7 +149,12 @@ mod tests {
     fn test_boot_diagnostic_report() {
         let mut report = KernelBootDiagnosticReport::new("SigmaOS 1.0");
         report.record_subsystem("Paging", SubsystemBootStatus::Success, 150, "memory_init");
-        report.record_subsystem("Scheduler", SubsystemBootStatus::Success, 300, "scheduler_init");
+        report.record_subsystem(
+            "Scheduler",
+            SubsystemBootStatus::Success,
+            300,
+            "scheduler_init",
+        );
 
         assert!(report.overall_success);
         let log = report.generate_greppable_log();
@@ -156,7 +164,8 @@ mod tests {
 
     #[test]
     fn test_panic_diagnostic_report() {
-        let mut panic_report = KernelPanicDiagnosticReport::new("VFS", "mount_root", "Null vnode pointer");
+        let mut panic_report =
+            KernelPanicDiagnosticReport::new("VFS", "mount_root", "Null vnode pointer");
         panic_report.fault_address = Some(0x0000000000000000);
         panic_report.set_register("RIP", 0xFFFFFFFF80100050);
         panic_report.add_stack_frame(0xFFFFFFFF80100050);

@@ -162,11 +162,13 @@ impl UniversalPackageFormatInspectorV35 {
                 PackageSignatureKindV35::X509Certificate,
                 "squashfs",
             ),
-            f if f.ends_with(".flatpak") || f.ends_with(".flatpakref") || f.contains("Flatpak") => (
-                PackageFormat::Flatpak,
-                PackageSignatureKindV35::CosignSigstore,
-                "ostree",
-            ),
+            f if f.ends_with(".flatpak") || f.ends_with(".flatpakref") || f.contains("Flatpak") => {
+                (
+                    PackageFormat::Flatpak,
+                    PackageSignatureKindV35::CosignSigstore,
+                    "ostree",
+                )
+            }
             f if f.ends_with(".AppImage") || f.ends_with(".appimage") => (
                 PackageFormat::AppImage,
                 PackageSignatureKindV35::GpgOpenPgp,

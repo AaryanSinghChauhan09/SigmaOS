@@ -1,28 +1,76 @@
-## Description
-<!-- Provide a brief description of the changes introduced by this PR. -->
+## Summary
 
-## Type of Change
-- [ ] Bug fix (non-breaking change fixing an issue)
-- [ ] New feature (non-breaking change adding functionality)
-- [ ] Driver addition/modification
-- [ ] Breaking change (fix or feature that breaks existing interface/syscall ABI)
-- [ ] Refactoring / Code hygiene
-- [ ] Documentation update
+<!-- What component does this PR improve or add? -->
 
-## Architectural Compliance Checklist
-- [ ] **`no_std` Compliance**: Verified that modified kernel/driver crates use `#![no_std]` without direct `std` dependencies (except `cfg(test)`).
-- [ ] **Capability-Based Security**: Syscall entrypoints verify caller `CapabilityToken` permissions before executing privileged operations.
-- [ ] **Driver Design Pattern**: Driver changes follow WDM-style `IoManager` / `DriverObject` / `DeviceObject` / `DeviceExtension` structures.
-- [ ] **Driver Lifecycle Test**: New or modified drivers include lifecycle unit tests (`DriverObject` init, device attach/detach, unload).
-- [ ] **Memory Safety**: Bounds-checked copy operations (`copy_nonoverlapping`) and explicit Paged/NonPaged memory pool selection.
-- [ ] **Type Annotations**: Explicit type annotations provided for public API functions and key collections.
-- [ ] **Standalone Tests**: Standalone `rustc --test` checks compile and pass cleanly for all modified files.
+## Related issue
 
-## Testing & Verification
-- [ ] Executed `cargo fmt --check` and `cargo clippy -- -D warnings`.
-- [ ] Executed `./scripts/changed_files_rustc_tests.sh`.
-- [ ] Executed `./scripts/no_std_check.sh`.
-- [ ] Executed QEMU boot smoke test if kernel/boot files were touched (`python3 scripts/qemu_smoke_test.py`).
+Closes #<issue-id>
 
-## Related Issues
-Closes #
+## Upstream study
+
+- Project:
+- Version/commit:
+- Research note:
+- ADR:
+
+## What SigmaOS adopts
+
+<!-- State the design principle or mechanism adopted. -->
+
+## What SigmaOS changes or rejects
+
+<!-- State simplifications, deviations, and rejected ideas. -->
+
+## Component impact
+
+- Component:
+- Maturity before:
+- Maturity after:
+- Runtime path affected:
+
+## Changes
+
+- [ ] Source implementation
+- [ ] Unit tests
+- [ ] Integration tests
+- [ ] QEMU/runtime test
+- [ ] Documentation
+- [ ] Capability/status update
+- [ ] Regression protection
+- [ ] Security review, if applicable
+
+## Verification
+
+```bash
+cargo check --lib
+cargo test --lib
+./run_sigma_tests.sh
+make check
+make test
+make format
+```
+
+## Runtime evidence
+
+- [ ] QEMU boot log
+- [ ] Installer/update test log
+- [ ] Package dry-run report
+- [ ] Hardware test log, if applicable
+- [ ] Artifact hash
+
+## Safety and rollback
+
+- [ ] No broad credentials or host access introduced
+- [ ] Untrusted input is validated
+- [ ] Package scripts are sandboxed, if applicable
+- [ ] Rollback/recovery behavior defined
+- [ ] Security review completed, if applicable
+
+## Reviewer checklist
+
+- [ ] Scope is narrow
+- [ ] Tests cover the change
+- [ ] Runtime evidence is linked
+- [ ] Documentation matches implementation
+- [ ] Capability status is evidence-based
+- [ ] No unsupported parity claims
