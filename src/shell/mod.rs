@@ -15,6 +15,7 @@ pub mod terminal_emulator;
 pub mod zsh_bash_parity;
 
 pub use self::command::{ShellCommand, SimpleShellSession};
+pub use self::zsh_bash_parity::BashParameterExpansion;
 pub use self::sigma_sh::{
     ContextualCompleter, HistoryExpansionEngine, JobControlManager, ParameterExpansionEngine,
     PipelineExecutor, ShellPledgeUnveilGuard, ShellSyntaxHighlighter, ZshPromptFormatter,

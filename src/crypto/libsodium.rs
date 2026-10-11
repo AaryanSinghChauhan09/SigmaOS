@@ -13,7 +13,7 @@ use std::vec;
 
 use std::vec::Vec;
 
-use core::ffi::c_int;
+pub type c_int = i32;
 
 /// Sodium initialization status
 static mut SODIUM_INITIALIZED: bool = false;

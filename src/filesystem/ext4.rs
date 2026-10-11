@@ -207,10 +207,14 @@ impl FileSystem for Ext4FileSystem {
         let new_size = (offset + written as u64).max(inode.size);
 
         // Allocate blocks if needed
-        while (inode.data_blocks.len() * self.superblock.block_size as usize) < (new_size as usize) {
+        let block_size = self.superblock.block_size as usize;
+        while (inode.data.len() * block_size) < (new_size as usize) {
             let block = self.allocate_block();
             match block {
-                Ok(b) => inode.data_blocks.push(b),
+                Ok(_) => {
+                    let mut zeros = vec![0u8; block_size];
+                    inode.data.append(&mut zeros);
+                }
                 Err(_) => break,
             }
         }
@@ -267,12 +271,7 @@ impl FileSystem for Ext4FileSystem {
 
     fn unlink(&mut self, parent_inode: u64, name: &str) -> Result<(), VfsError> {
         let inode_num = self.lookup(parent_inode, name)?;
-        let inode = self.read_inode(inode_num)?;
-
-        // Free all data blocks
-        for block in inode.data_blocks {
-            self.deallocate_block(block)?;
-        }
+        let _inode = self.read_inode(inode_num)?;
 
         // Deallocate inode
         self.deallocate_inode(inode_num)?;

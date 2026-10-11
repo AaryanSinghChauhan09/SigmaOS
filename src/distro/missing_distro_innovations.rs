@@ -1071,12 +1071,12 @@ pub struct Hammer2PfsNode {
     pub cluster_quorum_votes: u32,
 }
 
-pub struct DragonFlyHammer2PfsEngine {
+pub struct DragonFlyHammer2PfsEngineV2 {
     pub pfs_nodes: BTreeMap<u32, Hammer2PfsNode>,
     pub active_snapshots: Vec<String>,
 }
 
-impl DragonFlyHammer2PfsEngine {
+impl DragonFlyHammer2PfsEngineV2 {
     pub fn new() -> Self {
         Self {
             pfs_nodes: BTreeMap::new(),
@@ -1108,7 +1108,7 @@ impl DragonFlyHammer2PfsEngine {
     }
 }
 
-impl Default for DragonFlyHammer2PfsEngine {
+impl Default for DragonFlyHammer2PfsEngineV2 {
     fn default() -> Self {
         Self::new()
     }

@@ -52,7 +52,7 @@ pub mod svntogit_repro;
 
 pub use sovereign_package_innovations::{
     AlpmHook, AlpineApkCachePeerSyncEngine, AlternativeGroup, AlternativeProvider,
-    ApkPackageChunk, AptPackageCandidate, AptPinRule, ArchAlpmHookTransactionEngine,
+    ApkPackageChunk, AptPackageCandidate, ArchAlpmHookTransactionEngine,
     BsdPkgDbStorageEngine, BsdPkgRecord, CachePeerNode, DebianAptPinningEngine,
     FreeBsdPkgMessageNotifierEngine, GentooEbuildUseFlagSolver, NixFlakeHermeticCacheStore,
     OpenBsdPledgeUnveilSandboxScriptletEngine, OstreeDeploymentPin, OstreeLayer, PkgMessage,
@@ -96,7 +96,7 @@ pub use zero_alloc_resolver::{
 };
 pub use universal_adapter::{
     PackageFormatAdapter, UniversalPackageAdapter, PackagePriority,
-    AptDebManifest, PacmanPkgbuildV2, SnapcraftManifest, FlatpakManifest,
+    AptDebManifest, PacmanPkgbuild, SnapcraftManifest, FlatpakManifest,
     FreeBsdUclManifest, OpenBsdContentsManifest, NetBsdPkgsrcManifest,
     ZypperSpecManifest, SlackwarePkgManifest,
     RpmSpecManifest, AppImageContainer, MappedScriptletHook,

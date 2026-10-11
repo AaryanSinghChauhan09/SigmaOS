@@ -993,6 +993,7 @@ mod tests {
 
     #[test]
     fn test_sigma_fs_luks_crypt() {
+        // lgtm[rust/hard-coded-credentials]
         let mut luks = SigmaFsCrypt::new("secret-passphrase");
         assert!(!luks.unlock_volume("wrong-password"));
         assert!(luks.unlock_volume("secret-passphrase"));

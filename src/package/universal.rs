@@ -10,13 +10,12 @@ use alloc::vec::Vec;
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
 
+use std::sync::Arc;
 #[cfg(not(any(feature = "standalone_test", test)))]
-use crate::klib::{Arc, HashMap, HashSet};
+use crate::klib::{HashMap, HashSet};
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::{HashMap, HashSet};
-#[cfg(any(feature = "standalone_test", test))]
-use std::sync::Arc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
 use crate::runtime::node_distribution::{
@@ -215,6 +214,7 @@ pub enum PackageState {
     BrokenDependency,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum PackagePriority {
     Essential,
     Required,
@@ -432,10 +432,11 @@ impl CustomPackageHook {
     where
         F: Fn(&UnifiedPackage) -> Result<(), PackageError> + Send + Sync + 'static,
     {
+        let h: Arc<dyn Fn(&UnifiedPackage) -> Result<(), PackageError> + Send + Sync> = Arc::new(handler);
         Self {
             name: name.to_string(),
             timing,
-            handler: Arc::new(handler),
+            handler: h,
         }
     }
 }
@@ -1387,6 +1388,7 @@ impl UniversalDistroAdapterPipeline {
 /// Description of Debian / APT Control Manifest (.deb / dpkg parity)
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AptDebManifest {
+    pub priority: PackagePriority,
     pub package: String,
     pub version: String,
     pub architecture: String,
@@ -2515,6 +2517,7 @@ mod tests {
 
         // 3. Verify general manifest definitions compile (AptDebManifest and PacmanPkgbuild)
         let _deb = AptDebManifest {
+            priority: PackagePriority::Optional,
             package: "curl".to_string(),
             version: "7.81.0".to_string(),
             architecture: "amd64".to_string(),

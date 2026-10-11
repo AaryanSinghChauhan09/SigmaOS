@@ -467,7 +467,7 @@ impl GuiInstallerWizard {
             InstallerScreen::Summary => "Review installation summary before committing",
             InstallerScreen::InstallationProgress => "Installing SigmaOS",
             InstallerScreen::Complete => "Installation Complete",
-            InstallerScreen::CompleteOnboarding => "Onboarding Complete",
+
         }
     }
 
@@ -620,6 +620,7 @@ mod tests {
     fn test_installation_summary() {
         let mut wizard = GuiInstallerWizard::new();
         wizard.select_disk("/dev/nvme0n1");
+        // lgtm[rust/hard-coded-credentials]
         wizard.add_user_account(UserAccount::new("sovereign", "secret123"));
 
         let summary = wizard.get_installation_summary();

@@ -17,7 +17,8 @@ use alloc::string::String;
 use core::sync::atomic::{AtomicU64, Ordering};
 
 use crate::security::landlock_sovereign::{SovereignLandlockV5Guard as LandlockV5Guard, CapsicumRights};
-use crate::kernel::process::{ProcessId, ProcessState};
+use crate::runtime::process::ProcessId;
+use crate::kernel::ProcessState;
 
 /// Unique identifier for AI agents in the kernel
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -31,7 +32,7 @@ impl AgentId {
 }
 
 /// Agent capability domains (sandboxed execution contexts)
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum AgentCapability {
     /// Analyze kernel crashes, panics, and core dumps
     SystemAnalysis,
@@ -107,7 +108,7 @@ pub struct AgentSandbox {
 impl AgentSandbox {
     pub fn new_strict() -> Self {
         Self {
-            landlock: LandlockV5Guard::new(),
+            landlock: LandlockV5Guard::new(5),
             capsicum: CapsicumRights::empty(),
             pledge_promises: 0, // No promises initially
             unveil_paths: Vec::new(),
@@ -195,7 +196,7 @@ pub struct AgentReport {
 }
 
 /// Plugin specification for code generation
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PluginSpec {
     pub name: String,
     pub description: String,
@@ -444,7 +445,7 @@ impl SovereignAgentRuntime {
             task_type: "crash_analysis".into(),
             analysis: format!(
                 "Process {} crashed with signal {}. Backtrace analysis in progress.",
-                crash_dump.process_id.0,
+                crash_dump.process_id,
                 crash_dump.signal
             ),
             recommendations: vec![

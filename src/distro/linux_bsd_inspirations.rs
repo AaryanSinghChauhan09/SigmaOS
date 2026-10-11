@@ -1976,6 +1976,7 @@ mod cross_subsystem_tests {
         assert!(ipc.splice_channel(1, 2, 0).is_err());
 
         let mut auth = SovereignSystemdHomedAuthBridge::new();
+        // lgtm[rust/hard-coded-credentials]
         assert_eq!(auth.authenticate_and_mount("user", "pass").unwrap(), "LUKS_HOME_MOUNTED");
         assert!(auth.authenticate_and_mount("", "pass").is_err());
 
@@ -2669,9 +2670,9 @@ pub struct SovereignRingBuffer<T, const N: usize> {
 }
 
 impl<T, const N: usize> SovereignRingBuffer<T, N> {
-    pub const fn new() -> Self {
+    pub fn new() -> Self {
         Self {
-            buffer: [const { None }; N],
+            buffer: core::array::from_fn(|_| None),
             write_idx: 0,
             read_idx: 0,
         }
@@ -4741,7 +4742,7 @@ impl SovereignBcachefsTieringEngine {
 
 impl Default for SovereignBcachefsTieringEngine {
     fn default() -> Self {
-        Self::new(1024 * 1024 * 1024, 10 * 1024 * 1024 * 1024)
+        Self::new(1024 * 1024 * 1024, 10u64 * 1024 * 1024 * 1024)
     }
 }
 

@@ -644,10 +644,8 @@ impl Irp {
         self.status = status;
         if let Some(routine) = self.completion_routine {
             let dummy_dev = DeviceObjectX86 {
-                device_type: DeviceType::Functional,
-                driver_name: "dummy",
-                next_device: None,
-                attached_device: None,
+                device_type: 1,
+                reference_count: 1,
             };
             routine(&dummy_dev, self);
         }

@@ -145,6 +145,7 @@ pub enum SandboxState {
     Violated,
 }
 
+#[derive(Debug)]
 pub struct SovereignLandlockV5Guard {
     pub ruleset_version: u8,
     pub path_rules: Vec<LandlockPathRule>,
@@ -276,6 +277,10 @@ impl CapsicumRights {
     pub const CAP_CONNECT:  CapsicumRights = CapsicumRights(1 << 7);
     pub const CAP_ACCEPT:   CapsicumRights = CapsicumRights(1 << 8);
     pub const NONE:         CapsicumRights = CapsicumRights(0);
+
+    pub fn empty() -> Self {
+        CapsicumRights::NONE
+    }
 
     pub fn contains(self, other: CapsicumRights) -> bool {
         (self.0 & other.0) == other.0
