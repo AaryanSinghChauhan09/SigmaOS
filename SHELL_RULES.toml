@@ -1,0 +1,43 @@
+[rule.deterministic_scripts]
+requirement = "Non-interactive shell execution must be deterministic for identical input and environment."
+enforcement = "Conformance tests"
+
+[rule.explicit_exit_status]
+requirement = "Every command path defines success, failure, signal, and parse-error exit behavior."
+enforcement = "Exit-code tests"
+
+[rule.no_partial_execution_on_parse_error]
+requirement = "A parse error must not execute partially parsed commands in non-interactive mode."
+enforcement = "Parser tests"
+
+[rule.safe_expansion_order]
+requirement = "Expansion must follow a documented order: brace, tilde, parameter, command, arithmetic, word splitting, pathname expansion."
+enforcement = "Expansion tests"
+
+[rule.quoting_integrity]
+requirement = "Quoted values must not undergo unintended word splitting or glob expansion."
+enforcement = "Quoting tests"
+
+[rule.redirection_safety]
+requirement = "Redirections must validate targets, preserve fd state, and clean up on failure."
+enforcement = "Redirection tests"
+
+[rule.signal_safety]
+requirement = "Signal handling must be defined for interactive and non-interactive execution."
+enforcement = "Signal tests"
+
+[rule.builtin_contract]
+requirement = "Every built-in documents synopsis, arguments, side effects, errors, and exit codes."
+enforcement = "Docs lint + tests"
+
+[rule.no_unbounded_input]
+requirement = "Input buffers, history, aliases, and expansion results have defined limits."
+enforcement = "Stress tests"
+
+[rule.fuzz_external_input]
+requirement = "Lexer, parser, and expansion paths require fuzz coverage."
+enforcement = "CI fuzz smoke"
+
+[rule.status_evidence]
+requirement = "Shell capability claims require linked tests or runtime evidence."
+enforcement = "Status audit"
