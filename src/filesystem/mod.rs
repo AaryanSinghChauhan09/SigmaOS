@@ -105,6 +105,11 @@ pub use zfs::{
     ZfsVdev,
 };
 pub use zfs_arc::{ArcConfig, ArcEntry, ArcStats, ZfsArc};
+pub use mqueue::{
+    MqueueAttr, MqueueInode, MqueueFileType, MqueueStats, MqueueSuperblock,
+    init_mqueue_fs, get_mqueue_fs, mq_open, mq_close, mq_unlink, mq_send, mq_receive,
+    mq_getattr, mq_setattr,
+};
 
 pub type FileDescriptor = i32;
 pub type FilePermissions = u32;
@@ -120,6 +125,7 @@ pub mod configfs;
 pub mod debugfs;
 pub mod fat32;
 pub mod luks2;
+pub mod mqueue;
 pub mod ntfs;
 pub mod plan9_9p_network;
 pub mod smb_client;
