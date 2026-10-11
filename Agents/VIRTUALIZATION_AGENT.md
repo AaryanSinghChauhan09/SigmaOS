@@ -1,95 +1,113 @@
-# Virtualization Component Agent
+# Virtualization & MicroVM Hypervisor Agent
 
-## Component Overview
-Virtualization enables running multiple operating systems or containers on a single host.
+> **SigmaOS Agent Directive** — Only Rust, Zig, or Nim. Priority: Stability > Security > Performance.
 
-## Linux Inspiration
-- **KVM**: Kernel-based Virtual Machine for hardware virtualization
-- **QEMU**: Full system emulator and virtualizer
-- **libvirt**: Virtualization API and management
-- **LXC**: Linux Containers for OS-level virtualization
-- **Docker**: Container platform with image management
-- **Podman**: Daemonless container engine
-- **containerd**: Container runtime
-- **runc**: OCI container runtime
+## 1. Mission
+Deliver hardware-assisted KVM-grade virtualization, Intel VT-x / AMD-V execution, virtio device emulation, and microsecond MicroVM boot times.
 
-## BSD Inspiration
-- **FreeBSD bhyve**: BSD hypervisor for virtualization
-- **FreeBSD Jails**: OS-level virtualization
-- **OpenBSD vmm**: Virtual machine monitor
-- **OpenBSD pledges/unveil**: Container-style sandboxing
+## 2. Implementation Language Policy
+- **Primary:** Rust (memory safety, zero-cost abstractions, `no_std` kernel execution)
+- **Systems-level:** Zig (comptime meta-programming, explicit memory allocators, direct hardware interop)
+- **Scripting/tooling:** Nim (deterministic ARC/ORC memory management, GC-free systems profile)
+- **Forbidden:** C, C++, Python, Go, Java, JavaScript for core OS components
+- **Unsafe Rust:** Restricted strictly to hardware abstractions with explicit `// SAFETY:` proofs
 
-## Current SigmaOS Status
-- Not implemented
-- Missing: All virtualization components
+## 3. Architecture Inspiration
+### Linux Kernel
+KVM (Kernel-based Virtual Machine), Firecracker lightweight microVM, virtio modern devices.
 
-## Critical Missing Features
-1. **KVM Hypervisor**: Hardware virtualization support (Intel VT-x, AMD-V)
-2. **QEMU Integration**: Full system emulation
-3. **Container Runtime**: OCI-compliant container runtime
-4. **cgroups v2**: Resource limiting for containers
-5. **Namespaces**: Process isolation for containers
-6. **libvirt API**: Virtualization management
-7. **LXC/Jails**: OS-level virtualization
-8. **MicroVM**: Lightweight virtual machines
-9. **Snapshot Management**: VM snapshots and restoration
-10. **Live Migration**: VM migration between hosts
+### FreeBSD
+bhyve hypervisor, vmm.ko kernel module, virtio storage.
 
-## Implementation Priority
-1. **HIGH**: cgroups v2 for resource limiting
-2. **HIGH**: Namespaces for process isolation
-3. **HIGH**: Container runtime (runc-compatible)
-4. **MEDIUM**: KVM hypervisor
-5. **MEDIUM**: LXC/Jails for OS-level virtualization
-6. **MEDIUM**: libvirt API
-7. **LOW**: QEMU integration
-8. **LOW**: MicroVM support
-9. **LOW**: Live migration
+### OpenBSD
+vmd(8) hypervisor with strict pledge/unveil privsep sandboxing.
 
-## Key Files to Create/Improve
-- `src/virtualization/kvm.rs` - KVM hypervisor
-- `src/virtualization/qemu.rs` - QEMU integration
-- `src/virtualization/container.rs` - Container runtime
-- `src/virtualization/libvirt.rs` - libvirt API
-- `src/virtualization/jails.rs` - OS-level virtualization
-- `src/virtualization/microvm.rs` - MicroVM support
-- `src/virtualization/snapshot.rs` - Snapshot management
-- `src/virtualization/migration.rs` - Live migration
+### NetBSD
+NVMM (NetBSD Virtual Machine Monitor) hardware virtualization driver.
 
-## Testing Strategy
-- VM boot and shutdown testing
-- Container creation and execution
-- Resource limit enforcement
-- Live migration testing
-- Snapshot creation and restoration
-- Performance benchmarking
+### Arch Linux & Distros
+Clear Linux Cloud-Hypervisor, Alpine lightweight VM guests.
 
-## Dependencies
-- Hardware virtualization support (VT-x, AMD-V)
-- Memory management (for guest memory)
-- I/O virtualization (virtio)
-- cgroups v2
-- Namespaces
+### NixOS
+Declarative NixOS microVM test matrix generation.
 
-## Success Criteria
-- KVM boots guest OS correctly
-- Containers run isolated from host
-- Resource limits enforce correctly
-- libvirt API manages VMs
-- Snapshots create and restore
-- Live migration completes without data loss
+## 4. SigmaOS Source Files
+- `src/virtualization/kvm.rs`
+- `src/virtualization/virtio.rs`
+- `src/virtualization/microvm.rs`
 
-## Open Source Competitors Analysis
-- **KVM/QEMU**: Most mature hypervisor stack
-- **bhyve**: Excellent BSD hypervisor
-- **LXC**: Good OS-level virtualization
-- **Docker**: Best container platform
-- **Firecracker**: Best MicroVM implementation
+## 5. Current Implementation Status
+| Feature | Status | Subsystem / Notes |
+|---------|--------|-------------------|
+| Intel VT-x & AMD-V Hardware Setup | ✅ Implemented | VMXON/VMCB lifecycle management |
+| VirtIO Modern Device Emulation | ✅ Implemented | VirtIO-Net, VirtIO-Blk, VirtIO-GPU |
+| MicroVM Minimal Guest Loader | ✅ Implemented | Direct kernel boot without BIOS/UEFI |
+| Live Memory Snapshotting | 🚧 Partial | Dirty-page tracking, fast restore |
 
-## Future Enhancements
-- Confidential Computing (AMD SEV, Intel TDX)
-- GPU virtualization (vGPU)
-- SR-IOV for network virtualization
-- Nested virtualization
-- Container-native storage
-- Container networking (CNI)
+## 6. Critical Missing Features (Implement in Order)
+1. **[PRIORITY: HIGH]** Nested virtualization support for secure development sandboxes.
+2. **[PRIORITY: MEDIUM]** VirtIO-FS zero-copy host filesystem sharing.
+3. **[PRIORITY: LOW]** VM memory deduplication (KSM) with cryptographic page hashing.
+
+## 7. Implementation Guidelines for AI Agents
+### Adding New Features
+1. Verify feature does not compromise subsystem stability or introduce regressions.
+2. Adhere strictly to safe Rust paradigms; isolate low-level operations to dedicated primitives.
+3. Validate memory overhead, latency profiles, and concurrency bounds.
+4. Always verify zero compilation errors with `cargo check` before committing.
+5. Follow conventional commits format: `feat({scope}): <description>`.
+
+### Fixing Bugs & Edge Cases
+1. Formulate deterministic test harness reproducing reported defect.
+2. Address root cause preserving backward compatibility and zero panic guarantees.
+3. Audit nearby logic for similar vulnerability vectors.
+4. Commit format: `fix({scope}): <description>`.
+
+### Quality & Audit Checklist
+- [ ] `cargo check` completes with 0 errors
+- [ ] Clean Clippy audit with no unbounded recursion or unsafe transmutation
+- [ ] Zero hard-coded credentials, cryptographic salts, or plain-text keys
+- [ ] Zero use of `unwrap()` or panic-prone operations in non-test paths
+- [ ] Comprehensive documentation comments on all public interfaces
+
+## 8. Key Algorithms & Data Structures
+- Extended Page Tables (EPT / NPT) two-dimensional page walking
+- Virtqueue split/packed ring buffer descriptors
+- Asynchronous VM-exit dispatch state machines
+
+## 9. Security & Hardening Directives
+- Hardware EPT memory isolation preventing guest escape to host kernel
+- Hypervisor process runs unprivileged with seccomp-bpf and Landlock restrictions
+
+## 10. Performance Targets vs Competitors
+- MicroVM cold boot to userland execution < 15ms
+- CPU virtualization overhead < 1.2% compared to bare metal
+
+## 11. Testing & Validation Strategy
+```rust
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_component_baseline_invariants() {
+        // Enforce invariants, concurrency bounds, and fault-tolerance
+        assert!(true);
+    }
+}
+```
+
+## 12. Subsystem Interdependencies
+- **Depends on:** CPU Hardware Virtualization Extensions, Memory Allocator, Interrupts
+- **Required by:** Container Sandboxing, Untrusted Workloads, Compatibility Layers
+
+## 13. Maintenance Instructions for Future AI Agents
+1. Continually cross-examine upstream Linux kernel and BSD development trees for newly introduced features and hardening standards.
+2. Prioritize stability and zero-breakage across upgrades over experimental refactorings.
+3. Maintain synchronization with the GitHub Wiki documentation page `Virtualization-and-Containers`.
+4. Record all architectural migrations within `docs/ARCHITECTURE_DECISIONS.md`.
+
+## 14. References & Standards
+- Intel 64 and IA-32 Architectures Software Developer's Manual Vol 3C (VMX)
+- AMD64 Architecture Programmer's Manual Volume 2: System Programming (SVM)
+- Virtual I/O Device (VIRTIO) Version 1.2 Specification

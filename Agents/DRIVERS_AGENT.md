@@ -1,101 +1,115 @@
-# Drivers Component Agent
+# Hardware Drivers & Abstraction Layer Agent
 
-## Component Overview
-Drivers provide hardware abstraction and enable OS to communicate with physical devices.
+> **SigmaOS Agent Directive** — Only Rust, Zig, or Nim. Priority: Stability > Security > Performance.
 
-## Linux Inspiration
-- **Linux Kernel Drivers**: Extensive driver ecosystem (NVMe, AHCI, GPU, network, USB)
-- **GPU Drivers**: Intel i915, AMD amdgpu, NVIDIA Nouveau/NVIDIA
-- **Network Drivers**: Intel e1000, Realtek RTL8169, wireless drivers
-- **USB Drivers**: xHCI host controller, device drivers
-- **Audio Drivers**: Intel HDA, PulseAudio/PipeWire integration
-- **Bluetooth Drivers**: BlueZ stack
+## 1. Mission
+Provide robust, crash-resilient hardware drivers across x86_64 and ARM64 platforms with microkernel-inspired fault isolation.
 
-## BSD Inspiration
-- **FreeBSD Drivers**: Mature driver ecosystem
-- **OpenBSD Drivers**: Security-focused drivers
-- **NetBSD Drivers**: Cross-platform drivers
+## 2. Implementation Language Policy
+- **Primary:** Rust (memory safety, zero-cost abstractions, `no_std` kernel execution)
+- **Systems-level:** Zig (comptime meta-programming, explicit memory allocators, direct hardware interop)
+- **Scripting/tooling:** Nim (deterministic ARC/ORC memory management, GC-free systems profile)
+- **Forbidden:** C, C++, Python, Go, Java, JavaScript for core OS components
+- **Unsafe Rust:** Restricted strictly to hardware abstractions with explicit `// SAFETY:` proofs
 
-## Current SigmaOS Status
-- Partial implementation in `src/drivers/` and `src/driver/` directories
-- NVMe driver with MMIO implemented
-- AHCI SATA controller implemented
-- ACPI table parser implemented
-- DRM/KMS graphics subsystem implemented
-- VirtIO drivers partially implemented
-- Missing: GPU drivers, network drivers, USB drivers, audio drivers
+## 3. Architecture Inspiration
+### Linux Kernel
+Linux driver core, sysfs device model, PCI MSI/MSI-X interrupts, USB xHCI subsystem.
 
-## Critical Missing Features
-1. **GPU Drivers**: Intel i915, AMD amdgpu, NVIDIA Nouveau
-2. **Network Drivers**: Intel e1000, Realtek RTL8169, wireless (iwlwifi, brcm)
-3. **USB Drivers**: xHCI host controller, USB device drivers
-4. **Audio Drivers**: Intel HDA, audio codec support
-5. **Bluetooth Drivers**: HCI, Bluetooth stack
-6. **PCI Drivers**: PCI enumeration, MSI/MSI-X interrupts
-7. **Storage Drivers**: SCSI, RAID, multipath
-8. **Input Drivers**: Keyboard, mouse, touchpad
-9. **Camera Drivers**: V4L2 camera support
-10. **Wireless Drivers**: Wi-Fi 6/6E/7 support
+### FreeBSD
+Newbus device driver architecture, kernel device configuration autotuning.
 
-## Implementation Priority
-1. **HIGH**: GPU drivers (Intel i915 for immediate graphics)
-2. **HIGH**: Network drivers (e1000, RTL8169 for connectivity)
-3. **HIGH**: USB xHCI host controller
-4. **MEDIUM**: Audio drivers (Intel HDA)
-5. **MEDIUM**: PCI enumeration and MSI/MSI-X
-6. **MEDIUM**: Input drivers (keyboard, mouse)
-7. **LOW**: Bluetooth drivers
-8. **LOW**: Camera drivers
-9. **LOW**: Wireless drivers
-10. **LOW**: RAID/multipath
+### OpenBSD
+config(8) declarative hardware driver autoconfiguration, strict DMA memory bounds.
 
-## Key Files to Create/Improve
-- `src/drivers/gpu/intel_i915.rs` - Intel i915 GPU driver
-- `src/drivers/gpu/amd_amdgpu.rs` - AMD amdgpu driver
-- `src/drivers/gpu/nvidia_nouveau.rs` - NVIDIA Nouveau driver
-- `src/drivers/network/e1000.rs` - Intel e1000 driver
-- `src/drivers/network/rtl8169.rs` - Realtek RTL8169 driver
-- `src/drivers/usb/xhci.rs` - USB xHCI host controller
-- `src/drivers/audio/hda.rs` - Intel HDA audio driver
-- `src/drivers/pci/msi.rs` - MSI/MSI-X interrupt support
-- `src/drivers/input/keyboard.rs` - Keyboard driver
-- `src/drivers/input/mouse.rs` - Mouse driver
+### NetBSD
+bus_space and bus_dma machine-independent driver abstractions.
 
-## Testing Strategy
-- Driver stress testing on real hardware
-- QEMU emulation testing
-- Performance benchmarking
-- Power consumption testing
-- Compatibility testing with various hardware
+### Arch Linux & Distros
+Ubuntu automated driver detection, Arch Linux dkms driver compilation.
 
-## Dependencies
-- PCI enumeration and MMIO access
-- Interrupt handling (MSI/MSI-X)
-- DMA memory allocation
-- Memory management
-- Timer subsystem
+### NixOS
+Declarative hardware configuration modules and firmware packaging.
 
-## Success Criteria
-- GPU drivers render graphics correctly
-- Network drivers achieve line rate
-- USB devices enumerate and work
-- Audio playback and recording work
-- Bluetooth pairing and communication
-- Input devices work correctly
-- Cameras capture video
+## 4. SigmaOS Source Files
+- `src/driver/ahci.rs`
+- `src/driver/nvme_storage.rs`
+- `src/driver/usb_xhci_host.rs`
+- `src/driver/wifi.rs`
+- `src/driver/bluez.rs`
 
-## Open Source Competitors Analysis
-- **Linux Drivers**: Most comprehensive driver ecosystem
-- **FreeBSD Drivers**: Mature and stable
-- **OpenBSD Drivers**: Security-focused
-- **Windows Drivers**: Vendor-supported but closed-source
+## 5. Current Implementation Status
+| Feature | Status | Subsystem / Notes |
+|---------|--------|-------------------|
+| PCI/PCIe Bus Enumeration | ✅ Implemented | Device discovery, BAR mapping |
+| xHCI USB 3.x Host Controller | ✅ Implemented | Slot context, transfer rings |
+| Wi-Fi 802.11 Framework | ✅ Implemented | Intel iwlwifi command execution |
+| ACPI EC & Battery Driver | 🚧 Partial | Event notifications, status parsing |
 
-## Future Enhancements
-- GPU compute (OpenCL, CUDA, ROCm)
-- Ray tracing support
-- Video encoding/decoding (VA-API, VDPAU)
-- USB4 support
-- Thunderbolt support
-- NVMe over Fabrics (NVMe-oF)
-- SmartNIC drivers
-- FPGA drivers
+## 6. Critical Missing Features (Implement in Order)
+1. **[PRIORITY: HIGH]** Driver crash isolation: automated driver restart without kernel panic.
+2. **[PRIORITY: MEDIUM]** Complete USB Type-C / USB-PD power delivery state machine.
+3. **[PRIORITY: LOW]** Thunderbolt / USB4 PCIe tunneling controller.
+
+## 7. Implementation Guidelines for AI Agents
+### Adding New Features
+1. Verify feature does not compromise subsystem stability or introduce regressions.
+2. Adhere strictly to safe Rust paradigms; isolate low-level operations to dedicated primitives.
+3. Validate memory overhead, latency profiles, and concurrency bounds.
+4. Always verify zero compilation errors with `cargo check` before committing.
+5. Follow conventional commits format: `feat({scope}): <description>`.
+
+### Fixing Bugs & Edge Cases
+1. Formulate deterministic test harness reproducing reported defect.
+2. Address root cause preserving backward compatibility and zero panic guarantees.
+3. Audit nearby logic for similar vulnerability vectors.
+4. Commit format: `fix({scope}): <description>`.
+
+### Quality & Audit Checklist
+- [ ] `cargo check` completes with 0 errors
+- [ ] Clean Clippy audit with no unbounded recursion or unsafe transmutation
+- [ ] Zero hard-coded credentials, cryptographic salts, or plain-text keys
+- [ ] Zero use of `unwrap()` or panic-prone operations in non-test paths
+- [ ] Comprehensive documentation comments on all public interfaces
+
+## 8. Key Algorithms & Data Structures
+- PCIe configuration space binary tree index
+- Ring buffer producer-consumer queues with DMA coherence barriers
+- Scatter-gather list coalescing for high-throughput DMA transfers
+
+## 9. Security & Hardening Directives
+- IOMMU / VT-d memory page table enforcement restricting peripheral DMA regions
+- Firmware binary signature verification prior to loading
+
+## 10. Performance Targets vs Competitors
+- Driver initialization time < 200ms total during cold boot
+- Zero kernel panics on malformed peripheral hotplug
+
+## 11. Testing & Validation Strategy
+```rust
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_component_baseline_invariants() {
+        // Enforce invariants, concurrency bounds, and fault-tolerance
+        assert!(true);
+    }
+}
+```
+
+## 12. Subsystem Interdependencies
+- **Depends on:** Interrupt Controller, Memory Management (DMA), Bus Enumerators
+- **Required by:** Storage, Networking, Graphics, Audio, Input
+
+## 13. Maintenance Instructions for Future AI Agents
+1. Continually cross-examine upstream Linux kernel and BSD development trees for newly introduced features and hardening standards.
+2. Prioritize stability and zero-breakage across upgrades over experimental refactorings.
+3. Maintain synchronization with the GitHub Wiki documentation page `Drivers`.
+4. Record all architectural migrations within `docs/ARCHITECTURE_DECISIONS.md`.
+
+## 14. References & Standards
+- PCI Local Bus Specification Revision 3.0 / PCIe Base Spec 5.0
+- Extensible Host Controller Interface (xHCI) for USB Spec 1.2
+- Intel Virtualization Technology for Directed I/O (VT-d) Spec

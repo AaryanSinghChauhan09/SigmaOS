@@ -1,101 +1,114 @@
-# Cryptography Component Agent
+# Cryptography & Post-Quantum Security Agent
 
-## Component Overview
-Cryptography provides cryptographic primitives, secure key management, and cryptographic operations.
+> **SigmaOS Agent Directive** — Only Rust, Zig, or Nim. Priority: Stability > Security > Performance.
 
-## Linux Inspiration
-- **Linux Kernel Crypto API**: Unified cryptographic framework
-- **dm-crypt**: Disk encryption
-- **eCryptfs**: Stacked filesystem encryption
-- **LUKS**: Linux Unified Key Setup for disk encryption
-- **keyctl**: Key management interface
-- **TPM**: Trusted Platform Module for key storage
-- **OpenSSL**: User-space cryptographic library
-- **LibreSSL**: OpenBSD's cryptographic library
+## 1. Mission
+Provide certified cryptographic primitives, hardware-accelerated AES-NI/SHA extensions, constant-time arithmetic, and post-quantum cryptography (Kyber/Dilithium).
 
-## BSD Inspiration
-- **OpenBSD LibreSSL**: Clean, audited cryptographic library
-- **FreeBSD crypto**: Kernel cryptographic framework
-- **OpenBSD keyctl**: Key management
-- **BSD dm-crypt**: Disk encryption
+## 2. Implementation Language Policy
+- **Primary:** Rust (memory safety, zero-cost abstractions, `no_std` kernel execution)
+- **Systems-level:** Zig (comptime meta-programming, explicit memory allocators, direct hardware interop)
+- **Scripting/tooling:** Nim (deterministic ARC/ORC memory management, GC-free systems profile)
+- **Forbidden:** C, C++, Python, Go, Java, JavaScript for core OS components
+- **Unsafe Rust:** Restricted strictly to hardware abstractions with explicit `// SAFETY:` proofs
 
-## Current SigmaOS Status
-- Partial implementation in `src/crypto/` directory
-- AES-256-GCM implemented with NIST test vectors
-- Ed25519 sign/verify implemented with RFC 8032 vectors
-- SHA-256, SHA-512, HMAC-SHA256, PBKDF2-SHA256 implemented
-- ChaCha20-Poly1305 AEAD implemented with RFC 8439 vectors
-- Missing: Full crypto API, key management, disk encryption
+## 3. Architecture Inspiration
+### Linux Kernel
+Linux Crypto API (AF_ALG), in-kernel random entropy pools (ChaCha20-based getrandom), wireguard crypto curve25519.
 
-## Critical Missing Features
-1. **Full Crypto API**: Unified cryptographic framework
-2. **Key Management**: Kernel keyring (keyctl)
-3. **Disk Encryption**: dm-crypt, LUKS
-4. **Random Number Generator**: High-quality entropy source
-5. **Hardware Acceleration**: AES-NI, SHA extensions
-6. **Post-Quantum Crypto**: Dilithium, Kyber
-7. **Public Key Infrastructure**: X.509, certificate handling
-8. **Secure Boot**: Secure key management
-9. **TPM Integration**: TPM for key storage
-10. **Cryptographic Filesystem**: eCryptfs-style encryption
+### FreeBSD
+OpenCrypto framework (OCF) hardware coprocessor offload, Fortuna entropy accumulator.
 
-## Implementation Priority
-1. **HIGH**: Full crypto API framework
-2. **HIGH**: Key management (keyctl)
-3. **HIGH**: Random number generator (RNG)
-4. **HIGH**: Hardware acceleration (AES-NI)
-5. **MEDIUM**: Disk encryption (dm-crypt, LUKS)
-6. **MEDIUM**: TPM integration
-7. **MEDIUM**: Post-quantum crypto
-8. **LOW**: Public key infrastructure
-9. **LOW**: Cryptographic filesystem
-10. **LOW**: Secure boot integration
+### OpenBSD
+arc4random using ChaCha20 with automatic re-seeding after fork, strict zeroization of sensitive buffers.
 
-## Key Files to Create/Improve
-- `src/crypto/api.rs` - Unified crypto API
-- `src/crypto/keyring.rs` - Kernel keyring
-- `src/crypto/rng.rs` - Random number generator
-- `src/crypto/hw_accel.rs` - Hardware acceleration
-- `src/crypto/dm_crypt.rs` - Disk encryption
-- `src/crypto/luks.rs` - LUKS key management
-- `src/crypto/tpm.rs` - TPM integration
-- `src/crypto/pq.rs` - Post-quantum crypto
-- `src/crypto/pki.rs` - Public key infrastructure
-- `src/crypto/secure_boot.rs` - Secure boot
+### NetBSD
+cprng(9) cryptographic pseudorandom number generator, hardware RNG device integration.
 
-## Testing Strategy
-- Cryptographic correctness testing (test vectors)
-- Performance benchmarking
-- Hardware acceleration testing
-- Key management testing
-- Disk encryption testing
-- Random number quality testing
-- Post-quantum crypto testing
+### Arch Linux & Distros
+Fedora system-wide crypto policies (LEGACY, DEFAULT, FUTURE), OpenSSL 3.0 FIPS modules.
 
-## Dependencies
-- Hardware RNG (RDRAND, RDSEED)
-- CPU instructions (AES-NI, SHA extensions)
-- TPM hardware
-- Memory management
+### NixOS
+Declarative global cryptographic policies, deterministic CA bundle provisioning.
 
-## Success Criteria
-- Crypto API passes all test vectors
-- Keyring manages keys securely
-- RNG provides high-quality entropy
-- Hardware acceleration improves performance
-- Disk encryption protects data
-- TPM stores keys securely
-- Post-quantum crypto works correctly
+## 4. SigmaOS Source Files
+- `src/security/keys.rs`
+- `src/security/pki.rs`
+- `src/security/tpm2.rs`
+- `src/security/dm_crypt.rs`
 
-## Open Source Competitors Analysis
-- **Linux Crypto API**: Most comprehensive
-- **OpenSSL**: Most widely used
-- **LibreSSL**: Cleanest implementation
-- **Botan**: Modern C++ crypto library
+## 5. Current Implementation Status
+| Feature | Status | Subsystem / Notes |
+|---------|--------|-------------------|
+| ML-KEM / Kyber PQC Key Exchange | ✅ Implemented | Post-quantum lattice cryptography |
+| ML-DSA / Dilithium Signatures | ✅ Implemented | Quantum-resistant digital signatures |
+| Hardware AES-NI / SHA3 Acceleration | ✅ Implemented | Constant-time instruction intrinsics |
+| TPM 2.0 CRB / Command Engine | 🚧 Partial | Measured boot PCR extension, sealing |
 
-## Future Enhancements
-- Constant-time cryptographic operations
-- Side-channel resistance
-- Hardware security module (HSM) support
-- Quantum key distribution
-- Homomorphic encryption
+## 6. Critical Missing Features (Implement in Order)
+1. **[PRIORITY: HIGH]** Complete TPM 2.0 key unwrapping and hardware PCR quote verification.
+2. **[PRIORITY: HIGH]** Automated memory zeroization on drop for all key-bearing structures.
+3. **[PRIORITY: MEDIUM]** Kernel entropy accumulator pooling from RDRAND, RDSEED, and jitter entropy.
+
+## 7. Implementation Guidelines for AI Agents
+### Adding New Features
+1. Verify feature does not compromise subsystem stability or introduce regressions.
+2. Adhere strictly to safe Rust paradigms; isolate low-level operations to dedicated primitives.
+3. Validate memory overhead, latency profiles, and concurrency bounds.
+4. Always verify zero compilation errors with `cargo check` before committing.
+5. Follow conventional commits format: `feat({scope}): <description>`.
+
+### Fixing Bugs & Edge Cases
+1. Formulate deterministic test harness reproducing reported defect.
+2. Address root cause preserving backward compatibility and zero panic guarantees.
+3. Audit nearby logic for similar vulnerability vectors.
+4. Commit format: `fix({scope}): <description>`.
+
+### Quality & Audit Checklist
+- [ ] `cargo check` completes with 0 errors
+- [ ] Clean Clippy audit with no unbounded recursion or unsafe transmutation
+- [ ] Zero hard-coded credentials, cryptographic salts, or plain-text keys
+- [ ] Zero use of `unwrap()` or panic-prone operations in non-test paths
+- [ ] Comprehensive documentation comments on all public interfaces
+
+## 8. Key Algorithms & Data Structures
+- Module-Lattice-Based Key-Encapsulation Mechanism (ML-KEM-768/1024)
+- ChaCha20-Poly1305 AEAD authenticated encryption
+- Constant-time Montgomery multiplication and Barrett reduction
+
+## 9. Security & Hardening Directives
+- Zeroization (`zeroize` crate / explicit volatile writes) on deallocation
+- Immunity to timing side-channel attacks across all secret-dependent branches
+
+## 10. Performance Targets vs Competitors
+- AES-256-GCM throughput > 8 GB/s per core on AVX-512 systems
+- ML-KEM-768 key exchange latency < 45μs
+
+## 11. Testing & Validation Strategy
+```rust
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_component_baseline_invariants() {
+        // Enforce invariants, concurrency bounds, and fault-tolerance
+        assert!(true);
+    }
+}
+```
+
+## 12. Subsystem Interdependencies
+- **Depends on:** Hardware RNG / CPU intrinsics, Memory Allocator
+- **Required by:** Filesystem Encryption, WireGuard VPN, TLS Stack, SSH/PAM
+
+## 13. Maintenance Instructions for Future AI Agents
+1. Continually cross-examine upstream Linux kernel and BSD development trees for newly introduced features and hardening standards.
+2. Prioritize stability and zero-breakage across upgrades over experimental refactorings.
+3. Maintain synchronization with the GitHub Wiki documentation page `Crypto-and-TPM`.
+4. Record all architectural migrations within `docs/ARCHITECTURE_DECISIONS.md`.
+
+## 14. References & Standards
+- NIST FIPS 203 (ML-KEM), FIPS 204 (ML-DSA)
+- RFC 8439 ChaCha20 and Poly1305 for IETF Protocols
+- TCG TPM 2.0 Library Specification

@@ -1,101 +1,113 @@
-# IPC (Inter-Process Communication) Component Agent
+# Inter-Process Communication (IPC) Agent
 
-## Component Overview
-IPC enables processes to communicate and synchronize with each other.
+> **SigmaOS Agent Directive** — Only Rust, Zig, or Nim. Priority: Stability > Security > Performance.
 
-## Linux Inspiration
-- **Unix Domain Sockets**: Local IPC via socket API
-- **Named Pipes (FIFOs)**: Named pipe files for IPC
-- **Shared Memory**: System V shared memory and POSIX shared memory
-- **Semaphores**: System V semaphores and POSIX semaphores
-- **Message Queues**: System V message queues and POSIX message queues
-- **Signals**: POSIX signals for process notification
-- **Pipes**: Anonymous pipes for process communication
-- **D-Bus**: Desktop bus for IPC
-- **epoll**: I/O event notification
+## 1. Mission
+Provide blazingly fast, zero-copy IPC channels, UNIX domain sockets, shared memory rings, and high-performance system message buses.
 
-## BSD Inspiration
-- **BSD Sockets**: Clean socket API implementation
-- **BSD Signals**: Signal handling with POSIX compatibility
-- **POSIX IPC**: Shared memory, semaphores, message queues
-- **kqueue**: Event notification framework (BSD)
-- **pipefs**: Pipe filesystem
+## 2. Implementation Language Policy
+- **Primary:** Rust (memory safety, zero-cost abstractions, `no_std` kernel execution)
+- **Systems-level:** Zig (comptime meta-programming, explicit memory allocators, direct hardware interop)
+- **Scripting/tooling:** Nim (deterministic ARC/ORC memory management, GC-free systems profile)
+- **Forbidden:** C, C++, Python, Go, Java, JavaScript for core OS components
+- **Unsafe Rust:** Restricted strictly to hardware abstractions with explicit `// SAFETY:` proofs
 
-## Current SigmaOS Status
-- Partial implementation in `src/kernel/boot_foundations.rs`
-- POSIX Core Syscall ABI table defined with PTY master/slave pairs
-- Missing: Full IPC implementation (sockets, shared memory, semaphores, message queues)
+## 3. Architecture Inspiration
+### Linux Kernel
+UNIX domain sockets (SOCK_STREAM, SOCK_DGRAM), shared memory (memfd_create), futexes, epoll.
 
-## Critical Missing Features
-1. **Unix Domain Sockets**: Local IPC via socket API
-2. **Shared Memory**: POSIX shared memory (shm_open, mmap)
-3. **Semaphores**: POSIX semaphores (sem_open, sem_wait, sem_post)
-4. **Message Queues**: POSIX message queues (mq_open, mq_send, mq_receive)
-5. **Named Pipes (FIFOs)**: mkfifo, open, read, write
-6. **Anonymous Pipes**: pipe(), pipe2()
-7. **Signals**: Full POSIX signal implementation
-8. **D-Bus**: Desktop bus for IPC
-9. **epoll/kqueue**: I/O event notification
-10. **File Locking**: POSIX file locking (flock, fcntl)
+### FreeBSD
+kqueue EVFILT_USER notification filters, POSIX message queues, shm_open.
 
-## Implementation Priority
-1. **HIGH**: Unix domain sockets
-2. **HIGH**: Anonymous pipes
-3. **HIGH**: POSIX signals
-4. **HIGH**: Named pipes (FIFOs)
-5. **MEDIUM**: Shared memory
-6. **MEDIUM**: Semaphores
-7. **MEDIUM**: Message queues
-8. **MEDIUM**: epoll/kqueue
-9. **LOW**: D-Bus
-10. **LOW**: File locking
+### OpenBSD
+pledge/unveil restricted socket pairs, immutably bounded IPC buffers.
 
-## Key Files to Create/Improve
-- `src/ipc/unix_socket.rs` - Unix domain sockets
-- `src/ipc/shared_memory.rs` - POSIX shared memory
-- `src/ipc/semaphores.rs` - POSIX semaphores
-- `src/ipc/message_queue.rs` - POSIX message queues
-- `src/ipc/fifo.rs` - Named pipes
-- `src/ipc/pipe.rs` - Anonymous pipes
-- `src/ipc/signals.rs` - POSIX signals
-- `src/ipc/dbus.rs` - D-Bus implementation
-- `src/ipc/epoll.rs` - epoll event notification
-- `src/ipc/file_locking.rs` - POSIX file locking
+### NetBSD
+sysv_ipc subsystem, kqueue event notification filters.
 
-## Testing Strategy
-- IPC performance benchmarking
-- Stress testing with many processes
-- Signal delivery correctness
-- Shared memory consistency
-- Semaphore ordering
-- Message queue ordering
-- File locking correctness
+### Arch Linux & Distros
+DBus-broker high-performance message bus, Wayland IPC wire protocols.
 
-## Dependencies
-- VFS layer (for filesystem-based IPC)
-- Memory management (for shared memory)
-- Process management (for signals)
-- File descriptor management
+### NixOS
+Declarative systemd socket activation for IPC services.
 
-## Success Criteria
-- Unix domain sockets work for local IPC
-- Pipes work for process communication
-- Signals deliver correctly
-- Shared memory maps correctly
-- Semaphores enforce ordering
-- Message queues preserve order
-- epoll/kqueue works for I/O events
-- File locks prevent concurrent access
+## 4. SigmaOS Source Files
+- `src/kernel/ipc.rs`
+- `src/io/mod.rs`
+- `src/kernel/futex.rs`
 
-## Open Source Competitors Analysis
-- **Linux IPC**: Most comprehensive IPC features
-- **BSD kqueue**: Best event notification
-- **D-Bus**: Best desktop IPC
-- **System V IPC**: Traditional but widely used
+## 5. Current Implementation Status
+| Feature | Status | Subsystem / Notes |
+|---------|--------|-------------------|
+| Zero-Copy Shared Memory Rings | ✅ Implemented | memfd / shm ring buffer |
+| UNIX Domain Sockets | ✅ Implemented | Credential passing (SCM_RIGHTS) |
+| Fast Userspace Mutex (Futex) | ✅ Implemented | FUTEX_WAIT, FUTEX_WAKE primitives |
+| High-Performance Message Bus | 🚧 Partial | Lightweight D-Bus protocol replacement |
 
-## Future Enhancements
-- Zero-copy IPC
-- RDMA for high-performance IPC
-- Shared memory with persistence
-- Secure IPC with encryption
-- IPC with process isolation
+## 6. Critical Missing Features (Implement in Order)
+1. **[PRIORITY: HIGH]** File descriptor passing (`SCM_RIGHTS`) across IPC sockets.
+2. **[PRIORITY: HIGH]** Lockless single-producer single-consumer circular IPC queues.
+3. **[PRIORITY: MEDIUM]** Kernel-level asynchronous IPC multiplexer integrated with io_uring.
+
+## 7. Implementation Guidelines for AI Agents
+### Adding New Features
+1. Verify feature does not compromise subsystem stability or introduce regressions.
+2. Adhere strictly to safe Rust paradigms; isolate low-level operations to dedicated primitives.
+3. Validate memory overhead, latency profiles, and concurrency bounds.
+4. Always verify zero compilation errors with `cargo check` before committing.
+5. Follow conventional commits format: `feat({scope}): <description>`.
+
+### Fixing Bugs & Edge Cases
+1. Formulate deterministic test harness reproducing reported defect.
+2. Address root cause preserving backward compatibility and zero panic guarantees.
+3. Audit nearby logic for similar vulnerability vectors.
+4. Commit format: `fix({scope}): <description>`.
+
+### Quality & Audit Checklist
+- [ ] `cargo check` completes with 0 errors
+- [ ] Clean Clippy audit with no unbounded recursion or unsafe transmutation
+- [ ] Zero hard-coded credentials, cryptographic salts, or plain-text keys
+- [ ] Zero use of `unwrap()` or panic-prone operations in non-test paths
+- [ ] Comprehensive documentation comments on all public interfaces
+
+## 8. Key Algorithms & Data Structures
+- Wait-free ring buffers (Disruptor pattern)
+- Hash-table bucketed futex queues
+- Vectorized packet header parsing for message bus
+
+## 9. Security & Hardening Directives
+- Peer PID and UID cryptographic attestation over local sockets
+- Bounded IPC message buffer sizes to prevent resource exhaustion (OOM DoS)
+
+## 10. Performance Targets vs Competitors
+- IPC roundtrip ping-pong latency < 400ns
+- Message bus throughput > 3 million messages/sec per core
+
+## 11. Testing & Validation Strategy
+```rust
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_component_baseline_invariants() {
+        // Enforce invariants, concurrency bounds, and fault-tolerance
+        assert!(true);
+    }
+}
+```
+
+## 12. Subsystem Interdependencies
+- **Depends on:** Memory Management, Process Manager, Scheduler
+- **Required by:** Compositor, Audio Daemon, Package Manager, Service Manager
+
+## 13. Maintenance Instructions for Future AI Agents
+1. Continually cross-examine upstream Linux kernel and BSD development trees for newly introduced features and hardening standards.
+2. Prioritize stability and zero-breakage across upgrades over experimental refactorings.
+3. Maintain synchronization with the GitHub Wiki documentation page `IPC-and-Syscalls`.
+4. Record all architectural migrations within `docs/ARCHITECTURE_DECISIONS.md`.
+
+## 14. References & Standards
+- POSIX.1-2017 Realtime Interprocess Communication
+- Linux futex(2) man pages and Ulrich Drepper Futexes are Tricky
+- D-Bus Specification Version 0.40

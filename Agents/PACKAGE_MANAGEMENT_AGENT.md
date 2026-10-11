@@ -1,102 +1,114 @@
-# Package Management Component Agent
+# Package Management & Sovereign Distro Adapter Agent
 
-## Component Overview
-Package management handles software installation, updates, dependencies, and repository management.
+> **SigmaOS Agent Directive** — Only Rust, Zig, or Nim. Priority: Stability > Security > Performance.
 
-## Linux Inspiration
-- **APT**: Debian/Ubuntu package manager with dpkg
-- **DNF**: Fedora/RHEL package manager with RPM
-- **Pacman**: Arch Linux package manager
-- **Flatpak**: Universal package format with sandboxing
-- **Snap**: Canonical's universal package system
-- **Nix**: Functional package manager with reproducibility
-- **Guix**: GNU Guix package manager
+## 1. Mission
+Provide atomic, reproducible package management (SigPkg), transactional rollbacks, sandboxed builds, and universal multi-distro package transpilation.
 
-## BSD Inspiration
-- **FreeBSD Ports**: Source-based package collection
-- **FreeBSD pkg**: Binary package manager
-- **OpenBSD ports**: Source-based with security focus
-- **NetBSD pkgsrc**: Cross-platform package system
+## 2. Implementation Language Policy
+- **Primary:** Rust (memory safety, zero-cost abstractions, `no_std` kernel execution)
+- **Systems-level:** Zig (comptime meta-programming, explicit memory allocators, direct hardware interop)
+- **Scripting/tooling:** Nim (deterministic ARC/ORC memory management, GC-free systems profile)
+- **Forbidden:** C, C++, Python, Go, Java, JavaScript for core OS components
+- **Unsafe Rust:** Restricted strictly to hardware abstractions with explicit `// SAFETY:` proofs
 
-## Current SigmaOS Status
-- Partial implementation in `src/package/` directory
-- sigmactl declarative app manager implemented
-- 28-distro package converter engine implemented
-- PR transaction submission implemented
-- SAT dependency solver implemented
-- Missing: Full package manager, repository management, sandboxing
+## 3. Architecture Inspiration
+### Linux Kernel
+Nix/Guix content-addressed stores, Arch pacman speed, Fedora rpm-ostree atomic trees.
 
-## Critical Missing Features
-1. **Full Package Manager**: Install, remove, update, query operations
-2. **Repository Management**: Repository metadata, mirrors, GPG verification
-3. **Dependency Resolution**: Automatic dependency resolution with conflicts
-4. **Package Build System**: Source package building (PKGBUILD, spec, ebuild)
-5. **Package Database**: Fast package database queries
-6. **Package Verification**: GPG/Ed25519 signature verification
-7. **Package Sandboxing**: Flatpak/Snap-style containerization
-8. **Package Hooks**: Pre/post install, remove scripts
-9. **Package Rollback**: Atomic rollback on failure
-10. **Package Updates**: Automatic security updates
+### FreeBSD
+pkg(8) binary package manager, FreeBSD Ports collection with options dialogs.
 
-## Implementation Priority
-1. **HIGH**: Full package manager (install, remove, update)
-2. **HIGH**: Repository management with GPG verification
-3. **HIGH**: Dependency resolution
-4. **MEDIUM**: Package build system
-5. **MEDIUM**: Package database optimization
-6. **MEDIUM**: Package verification
-7. **LOW**: Package sandboxing
-8. **LOW**: Package hooks
-9. **LOW**: Automatic updates
+### OpenBSD
+pkg_add with pledge sandboxing and cryptographic signatures.
 
-## Key Files to Create/Improve
-- `src/package/manager.rs` - Full package manager
-- `src/package/repository.rs` - Repository management
-- `src/package/dependency.rs` - Dependency resolution
-- `src/package/build.rs` - Package build system
-- `src/package/database.rs` - Package database
-- `src/package/verification.rs` - GPG/Ed25519 verification
-- `src/package/sandbox.rs` - Package sandboxing
-- `src/package/hooks.rs` - Package hooks
+### NetBSD
+pkgsrc multi-platform portable package system.
 
-## Testing Strategy
-- Package installation/removal testing
-- Dependency resolution correctness
-- Repository metadata parsing
-- GPG signature verification
-- Package build reproducibility
-- Package rollback testing
-- Security update testing
+### Arch Linux & Distros
+Arch Linux pacman simplicity, NixOS declarative generations, Alpine apk speed.
 
-## Dependencies
-- Cryptographic library (GPG, Ed25519)
-- Archive library (tar, xz, zstd)
-- HTTP client (for repositories)
-- Filesystem operations
-- Process management (for hooks)
+### NixOS
+Atomic store path `/sigma/store/<hash>-<name>`, garbage collection, rollback pins.
 
-## Success Criteria
-- Packages install/remove/update correctly
-- Dependencies resolve automatically
-- Repository metadata downloads and verifies
-- GPG signatures validate correctly
-- Package builds from source
-- Package database queries are fast
-- Sandboxed packages don't affect system
-- Rollback works on failure
+## 4. SigmaOS Source Files
+- `src/package/captain.rs`
+- `src/package/aptkit.rs`
+- `src/package/software_manager.rs`
+- `src/package/declarative_app.rs`
 
-## Open Source Competitors Analysis
-- **APT**: Most mature, widely used
-- **DNF**: Good dependency solver
-- **Pacman**: Simple and fast
-- **Flatpak**: Best sandboxing
-- **Nix**: Best reproducibility
+## 5. Current Implementation Status
+| Feature | Status | Subsystem / Notes |
+|---------|--------|-------------------|
+| SigPkg Content-Addressed Store | ✅ Implemented | Deterministic hash paths |
+| Atomic Transaction Journal | ✅ Implemented | ACID rollback support |
+| Universal Distro Transpiler | ✅ Implemented | DEB, RPM, PKGBUILD, APK intake |
+| Sandboxed Build Daemon | 🚧 Partial | Landlock/namespaces build isolation |
 
-## Future Enhancements
-- Binary diff updates (delta packages)
-- Package caching and proxy
-- Package search and recommendation
-- Package statistics and analytics
-- Package signing with multiple keys
-- Package virtualization
-- Cross-distro package compatibility
+## 6. Critical Missing Features (Implement in Order)
+1. **[PRIORITY: HIGH]** Complete cryptographic package signature verification (Ed25519 + Dilithium).
+2. **[PRIORITY: HIGH]** Delta-package binary diff updates (90% bandwidth reduction).
+3. **[PRIORITY: MEDIUM]** System generation snapshots with instant GRUB/bootloader rollback.
+
+## 7. Implementation Guidelines for AI Agents
+### Adding New Features
+1. Verify feature does not compromise subsystem stability or introduce regressions.
+2. Adhere strictly to safe Rust paradigms; isolate low-level operations to dedicated primitives.
+3. Validate memory overhead, latency profiles, and concurrency bounds.
+4. Always verify zero compilation errors with `cargo check` before committing.
+5. Follow conventional commits format: `feat({scope}): <description>`.
+
+### Fixing Bugs & Edge Cases
+1. Formulate deterministic test harness reproducing reported defect.
+2. Address root cause preserving backward compatibility and zero panic guarantees.
+3. Audit nearby logic for similar vulnerability vectors.
+4. Commit format: `fix({scope}): <description>`.
+
+### Quality & Audit Checklist
+- [ ] `cargo check` completes with 0 errors
+- [ ] Clean Clippy audit with no unbounded recursion or unsafe transmutation
+- [ ] Zero hard-coded credentials, cryptographic salts, or plain-text keys
+- [ ] Zero use of `unwrap()` or panic-prone operations in non-test paths
+- [ ] Comprehensive documentation comments on all public interfaces
+
+## 8. Key Algorithms & Data Structures
+- SAT/DPLL dependency solver with CDCL (Conflict-Driven Clause Learning)
+- Merkle DAG content verification for package trees
+- Content-defined chunking (FastCDC) for delta updates
+
+## 9. Security & Hardening Directives
+- Dual cryptographic signatures on all repo manifests
+- Builds run in unprivileged user namespaces with zero network access
+
+## 10. Performance Targets vs Competitors
+- 10,000 package dependency resolution < 80ms
+- Package install throughput > 120MB/s uncompressed write speed
+
+## 11. Testing & Validation Strategy
+```rust
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_component_baseline_invariants() {
+        // Enforce invariants, concurrency bounds, and fault-tolerance
+        assert!(true);
+    }
+}
+```
+
+## 12. Subsystem Interdependencies
+- **Depends on:** Filesystems, Cryptography, Networking, Sandboxing
+- **Required by:** System Provisioning, Userland Applications, Updates
+
+## 13. Maintenance Instructions for Future AI Agents
+1. Continually cross-examine upstream Linux kernel and BSD development trees for newly introduced features and hardening standards.
+2. Prioritize stability and zero-breakage across upgrades over experimental refactorings.
+3. Maintain synchronization with the GitHub Wiki documentation page `09-Packaging`.
+4. Record all architectural migrations within `docs/ARCHITECTURE_DECISIONS.md`.
+
+## 14. References & Standards
+- Nix: A Safe and Flexible Software Deployment Model (Eelco Dolstra PhD thesis)
+- Arch Linux PKGBUILD Specifications
+- Debian Binary Package Format Specification

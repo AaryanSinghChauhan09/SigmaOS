@@ -1,99 +1,115 @@
-# Desktop Environment Component Agent
+# Zenith Desktop Environment & UI Framework Agent
 
-## Component Overview
-Desktop environment provides window management, compositor, and desktop UI for graphical user interaction.
+> **SigmaOS Agent Directive** — Only Rust, Zig, or Nim. Priority: Stability > Security > Performance.
 
-## Linux Inspiration
-- **Wayland**: Modern display server protocol
-- **GNOME**: GTK-based desktop with Shell
-- **KDE Plasma**: Qt-based desktop with KWin
-- **Sway**: i3-compatible Wayland compositor
-- **Hyprland**: Dynamic tiling Wayland compositor
-- **X11**: Legacy X Window System
-- **Mutter**: GNOME compositor with Wayland support
+## 1. Mission
+Deliver a fast, beautiful, keyboard-driven Wayland desktop environment combining Omarchy aesthetics, Hyprland tiling, and Linux Mint rock-solid usability.
 
-## BSD Inspiration
-- **FreeBSD Desktop**: LXQt, XFCE desktop environments
-- **OpenBSD Xenocara**: X11 with security hardening
-- **NetBSD Desktop**: WindowMaker, XFCE support
+## 2. Implementation Language Policy
+- **Primary:** Rust (memory safety, zero-cost abstractions, `no_std` kernel execution)
+- **Systems-level:** Zig (comptime meta-programming, explicit memory allocators, direct hardware interop)
+- **Scripting/tooling:** Nim (deterministic ARC/ORC memory management, GC-free systems profile)
+- **Forbidden:** C, C++, Python, Go, Java, JavaScript for core OS components
+- **Unsafe Rust:** Restricted strictly to hardware abstractions with explicit `// SAFETY:` proofs
 
-## Current SigmaOS Status
-- Partial implementation in `src/desktop/` directory
-- Zenith compositor model implemented
-- Omarchy Omakase Hyprland rule engine implemented
-- Theme synthesis engine implemented
-- Missing: Full Wayland compositor, input handling, real graphics driver integration
+## 3. Architecture Inspiration
+### Linux Kernel
+Hyprland smooth rendering, GNOME Shell Mutter compositor, KDE KWin window management.
 
-## Critical Missing Features
-1. **Full Wayland Compositor**: Protocol implementation with libwayland
-2. **Input Handling**: Keyboard, mouse, touch input processing
-3. **XDG Shell Protocol**: Desktop shell protocol for Wayland
-4. **OpenGL/Vulkan**: 3D graphics API support
-5. **EGL**: Platform-specific graphics binding
-6. **X11 Compatibility**: XWayland for legacy applications
-7. **Desktop Shell**: Panel, launcher, notifications
-8. **Screen Capture**: Screen recording and screenshots
-9. **Accessibility**: Screen readers, keyboard navigation
-10. **Multi-Monitor**: Multiple display support
+### FreeBSD
+Lumina desktop lightweight memory footprint, devd desktop integration.
 
-## Implementation Priority
-1. **HIGH**: Full Wayland compositor with XDG shell
-2. **HIGH**: Input handling (keyboard, mouse, touch)
-3. **HIGH**: OpenGL/Vulkan support via Mesa
-4. **HIGH**: Graphics driver integration (Intel, AMD, NVIDIA)
-5. **MEDIUM**: Desktop shell (panel, launcher)
-6. **MEDIUM**: XWayland for X11 compatibility
-7. **MEDIUM**: Screen capture and screenshots
-8. **LOW**: Accessibility features
-9. **LOW**: Multi-monitor support
+### OpenBSD
+cwm (calm window manager) minimalistic keyboard bindings and security model.
 
-## Key Files to Create/Improve
-- `src/desktop/wayland_compositor.rs` - Full Wayland compositor
-- `src/desktop/input.rs` - Input handling (libinput)
-- `src/desktop/xdg_shell.rs` - XDG shell protocol
-- `src/desktop/opengl.rs` - OpenGL support
-- `src/desktop/vulkan.rs` - Vulkan support
-- `src/desktop/xwayland.rs` - X11 compatibility
-- `src/desktop/shell.rs` - Desktop shell (panel, launcher)
-- `src/desktop/screencast.rs` - Screen capture
-- `src/desktop/accessibility.rs` - Accessibility features
+### NetBSD
+CTWM and basic X11 window managers with rock-solid stability.
 
-## Testing Strategy
-- Wayland protocol conformance testing
-- Input device testing (keyboard, mouse, touch)
-- Graphics driver testing on real hardware
-- XWayland application compatibility
-- Multi-monitor configuration testing
-- Performance benchmarking (glmark2, vkmark)
+### Arch Linux & Distros
+Omarchy Linux Omakase desktop, Linux Mint Cinnamon applet ecosystem, Arch minimalist Hyprland dots.
 
-## Dependencies
-- DRM/KMS graphics subsystem
-- Input device drivers (evdev, libinput)
-- Mesa 3D graphics library
-- Wayland protocol library
-- EGL platform binding
+### NixOS
+Declarative desktop theming, font configurations, and shortcut matrices.
 
-## Success Criteria
-- Wayland compositor launches and displays windows
-- Input devices work correctly
-- OpenGL/Vulkan applications run
-- X11 applications work via XWayland
-- Desktop shell provides panel and launcher
-- Screen capture and screenshots work
-- Multi-monitor configuration supported
+## 4. SigmaOS Source Files
+- `src/desktop/hyprland_tiling.rs`
+- `src/desktop/panel.rs`
+- `src/desktop/workspace.rs`
+- `src/desktop/menu.rs`
+- `src/desktop/notifications.rs`
 
-## Open Source Competitors Analysis
-- **GNOME Shell**: Most polished Wayland compositor
-- **KDE KWin**: Feature-rich with excellent multi-monitor
-- **Sway**: Minimal, i3-compatible Wayland compositor
-- **Hyprland**: Modern dynamic tiling with animations
-- **Weston**: Reference Wayland compositor
+## 5. Current Implementation Status
+| Feature | Status | Subsystem / Notes |
+|---------|--------|-------------------|
+| Hyprland Dynamic Tiling | ✅ Implemented | Dwindle / master-stack tiling layouts |
+| Top/Bottom Status Bar & HUD | ✅ Implemented | CPU, RAM, battery, network indicators |
+| Modal Application Launcher | ✅ Implemented | Fuzzy search, command palette |
+| Multi-Monitor Workspace Binding | ✅ Implemented | Independent workspace per display |
 
-## Future Enhancements
-- HDR display support
-- Variable refresh rate (VRR)
-- GPU acceleration for video decoding (VA-API, VDPAU)
-- Ray tracing support (Vulkan Ray Tracing)
-- AI-assisted window management
-- Gesture-based navigation
-- Eye tracking support
+## 6. Critical Missing Features (Implement in Order)
+1. **[PRIORITY: HIGH]** Wayland Layer-Shell V1 support for popups and notification overlays.
+2. **[PRIORITY: MEDIUM]** Smooth hardware-interpolated spring physics animations.
+3. **[PRIORITY: LOW]** Live workspace overview / expose view with window drag-and-drop.
+
+## 7. Implementation Guidelines for AI Agents
+### Adding New Features
+1. Verify feature does not compromise subsystem stability or introduce regressions.
+2. Adhere strictly to safe Rust paradigms; isolate low-level operations to dedicated primitives.
+3. Validate memory overhead, latency profiles, and concurrency bounds.
+4. Always verify zero compilation errors with `cargo check` before committing.
+5. Follow conventional commits format: `feat({scope}): <description>`.
+
+### Fixing Bugs & Edge Cases
+1. Formulate deterministic test harness reproducing reported defect.
+2. Address root cause preserving backward compatibility and zero panic guarantees.
+3. Audit nearby logic for similar vulnerability vectors.
+4. Commit format: `fix({scope}): <description>`.
+
+### Quality & Audit Checklist
+- [ ] `cargo check` completes with 0 errors
+- [ ] Clean Clippy audit with no unbounded recursion or unsafe transmutation
+- [ ] Zero hard-coded credentials, cryptographic salts, or plain-text keys
+- [ ] Zero use of `unwrap()` or panic-prone operations in non-test paths
+- [ ] Comprehensive documentation comments on all public interfaces
+
+## 8. Key Algorithms & Data Structures
+- Binary Space Partitioning (BSP) tree window layout engine
+- Crit-bit or Levenshtein distance fuzzy search matching for app launcher
+- Spring-damper ODE physical animation solvers
+
+## 9. Security & Hardening Directives
+- Wayland client isolation preventing eavesdropping on adjacent window surfaces
+- Privileged screen capture prompt with user confirmation token
+
+## 10. Performance Targets vs Competitors
+- Compositor frame rendering latency < 2ms @ 144Hz
+- Idle desktop memory footprint < 120MB RSS
+
+## 11. Testing & Validation Strategy
+```rust
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_component_baseline_invariants() {
+        // Enforce invariants, concurrency bounds, and fault-tolerance
+        assert!(true);
+    }
+}
+```
+
+## 12. Subsystem Interdependencies
+- **Depends on:** Display Compositor, GPU Drivers, Input Subsystem
+- **Required by:** User Applications, System Settings, Notification Daemons
+
+## 13. Maintenance Instructions for Future AI Agents
+1. Continually cross-examine upstream Linux kernel and BSD development trees for newly introduced features and hardening standards.
+2. Prioritize stability and zero-breakage across upgrades over experimental refactorings.
+3. Maintain synchronization with the GitHub Wiki documentation page `Desktop-Environment-Component-Guide`.
+4. Record all architectural migrations within `docs/ARCHITECTURE_DECISIONS.md`.
+
+## 14. References & Standards
+- Wayland Layer Shell Protocol Specification
+- FreeDesktop.org Desktop Entry and Notification Specs
+- CSS Box Model and Animation Timing Curves

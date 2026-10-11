@@ -1,96 +1,113 @@
-# Internationalization (i18n) Component Agent
+# Internationalization (i18n) & Localization (l10n) Agent
 
-## Component Overview
-Internationalization enables SigmaOS to support multiple languages, locales, and character encodings.
+> **SigmaOS Agent Directive** — Only Rust, Zig, or Nim. Priority: Stability > Security > Performance.
 
-## Linux Inspiration
-- **gettext**: GNU gettext for message translation
-- **locale**: Locale settings and configuration
-- **iconv**: Character encoding conversion
-- **UTF-8**: Universal character encoding
-- **localedef**: Locale definition compiler
-- **keyboard layouts**: XKB keyboard layout support
-- **fonts**: Font rendering (FreeType, FontConfig)
-- **input methods**: IBus, Fcitx for non-Latin input
+## 1. Mission
+Provide complete UTF-8/Unicode 16.0 support, multi-lingual keyboard input engines (IBus/Fcitx style), and locale-aware formatting across all userland.
 
-## BSD Inspiration
-- **FreeBSD locale**: Locale support
-- **OpenBSD nls**: Native language support
-- **NetBSD locale**: Locale configuration
+## 2. Implementation Language Policy
+- **Primary:** Rust (memory safety, zero-cost abstractions, `no_std` kernel execution)
+- **Systems-level:** Zig (comptime meta-programming, explicit memory allocators, direct hardware interop)
+- **Scripting/tooling:** Nim (deterministic ARC/ORC memory management, GC-free systems profile)
+- **Forbidden:** C, C++, Python, Go, Java, JavaScript for core OS components
+- **Unsafe Rust:** Restricted strictly to hardware abstractions with explicit `// SAFETY:` proofs
 
-## Current SigmaOS Status
-- Not implemented
-- Missing: All internationalization components
+## 3. Architecture Inspiration
+### Linux Kernel
+glibc locale architecture, gettext translation catalogs, fontconfig font fallback.
 
-## Critical Missing Features
-1. **Locale Support**: Locale detection and configuration
-2. **Unicode Support**: Full Unicode (UTF-8) handling
-3. **Character Encoding**: iconv for encoding conversion
-4. **Message Translation**: gettext-style message translation
-5. **Keyboard Layouts**: XKB keyboard layout support
-6. **Font Rendering**: FreeType, FontConfig integration
-7. **Input Methods**: IBus/Fcitx for non-Latin input
-8. **Time/Date Formatting**: Locale-aware formatting
-9. **Number Formatting**: Locale-aware number formatting
-10. **Right-to-Left (RTL)**: RTL language support (Arabic, Hebrew)
+### FreeBSD
+BSD libc locale database, UTF-8 console localization.
 
-## Implementation Priority
-1. **HIGH**: Unicode (UTF-8) support
-2. **HIGH**: Locale support
-3. **HIGH**: Character encoding conversion (iconv)
-4. **MEDIUM**: Message translation (gettext)
-5. **MEDIUM**: Keyboard layouts
-6. **MEDIUM**: Font rendering
-7. **LOW**: Input methods
-8. **LOW**: RTL support
-9. **LOW**: Time/date formatting
-10. **LOW**: Number formatting
+### OpenBSD
+Safe UTF-8 string validation without multibyte buffer overflow vulnerabilities.
 
-## Key Files to Create/Improve
-- `src/i18n/locale.rs` - Locale support
-- `src/i18n/unicode.rs` - Unicode handling
-- `src/i18n/iconv.rs` - Character encoding conversion
-- `src/i18n/gettext.rs` - Message translation
-- `src/i18n/keyboard.rs` - Keyboard layouts
-- `src/i18n/fonts.rs` - Font rendering
-- `src/i18n/input_method.rs` - Input methods
-- `src/i18n/rtl.rs` - RTL support
-- `src/i18n/formatting.rs` - Locale-aware formatting
+### NetBSD
+citrus internationalization framework for multibyte character encoding.
 
-## Testing Strategy
-- Unicode correctness testing
-- Locale switching testing
-- Encoding conversion testing
-- Message translation accuracy
-- Keyboard layout testing
-- Font rendering quality
-- Input method functionality
+### Arch Linux & Distros
+Ubuntu multilingual language packs, Arch Linux locale-gen infrastructure.
 
-## Dependencies
-- Unicode database (Unicode Character Database)
-- Font libraries (FreeType, FontConfig)
-- Input method frameworks
-- Keyboard layout databases
+### NixOS
+Declarative global i18n profiles, console font mappings, and keyboard layout trees.
 
-## Success Criteria
-- Unicode text displays correctly
-- Locale switching works
-- Encoding conversion preserves data
-- Messages translate correctly
-- Keyboard layouts work
-- Fonts render correctly
-- Input methods accept non-Latin characters
-- RTL languages display correctly
+## 4. SigmaOS Source Files
+- `src/desktop/i18n.rs`
+- `src/graphics/font_builder.rs`
+- `src/desktop/text_scaling.rs`
 
-## Open Source Competitors Analysis
-- **GNU gettext**: Most mature translation system
-- **ICU**: Best internationalization library
-- **FreeType**: Best font rendering
-- **IBus**: Best input method framework
+## 5. Current Implementation Status
+| Feature | Status | Subsystem / Notes |
+|---------|--------|-------------------|
+| Unicode 16.0 Normalization | ✅ Implemented | NFC, NFD, NFKC, NFKD transforms |
+| Multilingual Input Method Engine | ✅ Implemented | Pinyin, Romaji, Hangul input shims |
+| Locale-aware String Formatting | ✅ Implemented | Numbers, currency, date-time |
+| Bi-Directional (BiDi) Text Layout | 🚧 Partial | Arabic, Hebrew RTL rendering |
 
-## Future Enhancements
-- Emoji support
-- Complex text shaping (Arabic, Indic scripts)
-- Font fallback mechanisms
-- Dynamic language switching
-- Translation memory
+## 6. Critical Missing Features (Implement in Order)
+1. **[PRIORITY: HIGH]** HarfBuzz-grade complex text shaping in safe Rust.
+2. **[PRIORITY: MEDIUM]** System-wide translation catalog (.mo / gettext compatible) loader.
+3. **[PRIORITY: LOW]** Multi-script font fallback chaining in Zenith font renderer.
+
+## 7. Implementation Guidelines for AI Agents
+### Adding New Features
+1. Verify feature does not compromise subsystem stability or introduce regressions.
+2. Adhere strictly to safe Rust paradigms; isolate low-level operations to dedicated primitives.
+3. Validate memory overhead, latency profiles, and concurrency bounds.
+4. Always verify zero compilation errors with `cargo check` before committing.
+5. Follow conventional commits format: `feat({scope}): <description>`.
+
+### Fixing Bugs & Edge Cases
+1. Formulate deterministic test harness reproducing reported defect.
+2. Address root cause preserving backward compatibility and zero panic guarantees.
+3. Audit nearby logic for similar vulnerability vectors.
+4. Commit format: `fix({scope}): <description>`.
+
+### Quality & Audit Checklist
+- [ ] `cargo check` completes with 0 errors
+- [ ] Clean Clippy audit with no unbounded recursion or unsafe transmutation
+- [ ] Zero hard-coded credentials, cryptographic salts, or plain-text keys
+- [ ] Zero use of `unwrap()` or panic-prone operations in non-test paths
+- [ ] Comprehensive documentation comments on all public interfaces
+
+## 8. Key Algorithms & Data Structures
+- Unicode Bidirectional Algorithm (UAX #9)
+- Unicode Line Breaking Algorithm (UAX #14)
+- Trie-based character property lookup tables
+
+## 9. Security & Hardening Directives
+- Enforce strict UTF-8 validation rejecting non-shortest form UTF-8 and invalid surrogate codepoints
+- Protect against homoglyph attacks in system usernames and filenames
+
+## 10. Performance Targets vs Competitors
+- UTF-8 validation throughput > 4 GB/s with AVX-512
+- Text shaping latency < 0.5ms per paragraph
+
+## 11. Testing & Validation Strategy
+```rust
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_component_baseline_invariants() {
+        // Enforce invariants, concurrency bounds, and fault-tolerance
+        assert!(true);
+    }
+}
+```
+
+## 12. Subsystem Interdependencies
+- **Depends on:** Font Renderer, Desktop Compositor, Terminal Subsystem
+- **Required by:** Desktop Shell, Application UI, Terminal, System Settings
+
+## 13. Maintenance Instructions for Future AI Agents
+1. Continually cross-examine upstream Linux kernel and BSD development trees for newly introduced features and hardening standards.
+2. Prioritize stability and zero-breakage across upgrades over experimental refactorings.
+3. Maintain synchronization with the GitHub Wiki documentation page `Internationalization-Component-Guide`.
+4. Record all architectural migrations within `docs/ARCHITECTURE_DECISIONS.md`.
+
+## 14. References & Standards
+- Unicode Standard Version 16.0.0
+- Unicode Technical Standard #35: Unicode Locale Data (CLDR)
+- GNU gettext Runtime Library Manual

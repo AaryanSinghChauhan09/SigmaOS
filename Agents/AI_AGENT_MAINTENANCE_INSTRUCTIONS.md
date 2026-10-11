@@ -1,275 +1,296 @@
 # AI Agent Maintenance Instructions
 
-## Purpose
-This document provides instructions for AI agents to maintain SigmaOS by creating component-specific GitHub Wiki pages based on open source competitors (Linux, BSD, Windows, etc.).
+> **SigmaOS Master Directive** — All AI agents operating on SigmaOS MUST read and follow this document before making any changes. Stability > Security > Performance. Only Rust, Zig, or Nim.
 
-## AI Agent Guidelines
+---
 
-### 1. Component Wiki Page Creation
+## 1. Core Principles
 
-**When to Create:**
-- When implementing a new component in SigmaOS
-- When significantly improving an existing component
-- When adding missing critical components from Linux/BSD
+SigmaOS aims to defeat Linux and BSD distributions in speed, stability, and performance. Every decision made by AI agents must align with:
 
-**Wiki Page Naming Convention:**
-- Format: `COMPONENT_NAME-Component-Guide.md`
-- Examples: `Scheduler-Component-Guide.md`, `Memory-Management-Component-Guide.md`
+1. **Stability First** — Never break existing functionality when adding new features.
+2. **Security Second** — Audit all code, never bypass safety checks.
+3. **Performance Third** — Optimize only after stability and security are assured.
+4. **Modern Languages Only** — Rust, Zig, or Nim. No C, C++, Python, Go, Java, or JavaScript for OS components.
 
-**Wiki Page Structure:**
-```markdown
-# COMPONENT_NAME Component Guide
+---
 
-## Overview
-[Brief description of the component and its purpose]
+## 2. Language Policy
 
-## Linux Inspiration
-[List relevant Linux kernel/user-space components and their features]
+| Language | Role | Notes |
+|----------|------|-------|
+| **Rust** | Primary OS components | Use `no_std` for kernel space; zero-cost abstractions; memory safety |
+| **Zig** | Systems-level, C interop | Use for comptime metaprogramming, explicit allocators, hardware init |
+| **Nim** | Tooling, scripts, build helpers | Use `--gc:none` or `--mm:arc` for GC-free operation |
+| C | **FORBIDDEN** | No exceptions for OS components |
+| C++ | **FORBIDDEN** | No exceptions |
+| Python | **FORBIDDEN** | Not even for build scripts |
+| Go | **FORBIDDEN** | Runtime GC unacceptable in kernel |
+| JavaScript | **FORBIDDEN** | Not even for tooling |
 
-## BSD Inspiration
-[List relevant BSD components and their features]
+### `unsafe` Rust Policy
+- `unsafe` blocks are permitted **only** when:
+  - Interfacing with hardware registers
+  - Implementing core memory primitives (allocators, page tables)
+  - Wrapping Zig/C FFI boundaries (if unavoidable)
+- Every `unsafe` block **must** have a `// SAFETY:` comment explaining why it is sound.
+- Prefer safe abstractions; wrap unsafe in a safe API as soon as possible.
 
-## Current SigmaOS Status
-[Current implementation status, what works, what's missing]
+---
 
-## Critical Missing Features
-[List critical features that SigmaOS is missing compared to Linux/BSD]
+## 3. Git Workflow
 
-## Implementation Priority
-[HIGH/MEDIUM/LOW priority for each missing feature]
+### Branch Policy
+- **Only one branch exists: `main`**
+- All commits go directly to `main`
+- No feature branches, no pull requests, no merge commits
+- Rebase if needed: `git pull --rebase origin main`
 
-## Key Files to Create/Improve
-[List specific source files that need to be created or improved]
+### Commit Message Format (Conventional Commits)
 
-## Testing Strategy
-[How to test the component implementation]
+```
+<type>(<scope>): <short description>
 
-## Dependencies
-[What other components this depends on]
+[optional body — explain WHY, not WHAT]
 
-## Success Criteria
-[What defines successful implementation]
-
-## Open Source Competitors Analysis
-[Compare with Linux, BSD, Windows implementations]
-
-## Future Enhancements
-[Potential future improvements]
+[optional footer: breaking changes, issue refs]
 ```
 
-### 2. Agent File Creation
+**Types:**
+| Type | When to Use |
+|------|------------|
+| `feat` | New feature or capability |
+| `fix` | Bug fix |
+| `docs` | Documentation-only changes (agent files, wiki, comments) |
+| `chore` | Build system, dependencies, CI changes |
+| `refactor` | Code restructuring without behavior change |
+| `perf` | Performance improvement |
+| `test` | Adding or fixing tests |
+| `security` | Security fix or hardening |
 
-**Location:** `Agents/COMPONENT_AGENT.md`
+**Scopes (one per component):**
+`kernel`, `boot`, `scheduler`, `memory`, `fs`, `net`, `ipc`, `drivers`, `desktop`, `audio`, `graphics`, `input`, `display`, `storage`, `power`, `security`, `crypto`, `packages`, `init`, `monitoring`, `timekeeping`, `virt`, `containers`, `i18n`, `a11y`, `compat`, `agents`
 
-**When to Create:**
-- One agent file per OS component
-- Even for components not yet implemented in SigmaOS
-- Focus on critical components from Linux/BSD
-
-**Agent File Structure:**
-```markdown
-# COMPONENT Component Agent
-
-## Component Overview
-[Brief description]
-
-## Linux Inspiration
-[Linux components and features]
-
-## BSD Inspiration
-[BSD components and features]
-
-## Current SigmaOS Status
-[Current implementation status]
-
-## Critical Missing Features
-[List missing features]
-
-## Implementation Priority
-[HIGH/MEDIUM/LOW priority]
-
-## Key Files to Create/Improve
-[Specific files needed]
-
-## Testing Strategy
-[Testing approach]
-
-## Dependencies
-[Component dependencies]
-
-## Success Criteria
-[Success metrics]
-
-## Open Source Competitors Analysis
-[Competitor comparison]
-
-## Future Enhancements
-[Future improvements]
+**Examples:**
+```
+feat(scheduler): implement O(1) CFS-inspired runqueue with per-CPU migration
+fix(memory): prevent UAF in slab allocator free path
+security(crypto): replace MD5 with BLAKE3 in integrity checks
+perf(fs): add readahead buffer for ext4-compatible driver
+docs(agents): update NETWORKING_AGENT with QUIC transport notes
+chore(agents): comprehensive update with Linux/BSD-inspired best practices
 ```
 
-### 3. Research Requirements
+### Push Policy
+- Always `git push origin main` immediately after committing
+- Never leave unpushed commits for more than one session
+- If push fails due to upstream divergence: `git pull --rebase origin main && git push origin main`
 
-**Open Source Competitors to Research:**
-- **Linux Kernel:** `https://github.com/torvalds/linux`
-- **FreeBSD:** `https://github.com/freebsd/freebsd-src`
-- **OpenBSD:** `https://github.com/openbsd/src`
-- **NetBSD:** `https://github.com/NetBSD/src`
-- **DragonFlyBSD:** `https://github.com/DragonFlyBSD/DragonFlyBSD`
-- **systemd:** `https://github.com/systemd/systemd`
-- **GNOME:** `https://github.com/GNOME`
-- **KDE:** `https://github.com/KDE`
+---
 
-**Research Focus:**
-- Architecture and design patterns
-- Key algorithms and data structures
-- API design and interfaces
-- Security considerations
-- Performance optimizations
-- Known limitations and trade-offs
+## 4. Running Cargo Check
 
-### 4. Implementation Guidelines
+Every AI agent **must** run `cargo check` before committing any Rust code changes:
 
-**Code Style:**
-- Follow existing SigmaOS code style
-- Use Rust idioms and patterns
-- Write comprehensive unit tests
-- Add inline documentation comments
-- Use unsafe only when necessary with justification
+```bash
+# From the repo root
+cd /home/aaryansinghchauhan/SigmaOS
+cargo check --workspace 2>&1
 
-**Architecture Principles:**
-- Zero external dependencies where possible
-- Safe Rust over unsafe
-- Clear separation of concerns
-- Modular design
-- Document trade-offs
+# For a specific crate
+cargo check -p sigma-kernel 2>&1
 
-**Documentation Requirements:**
-- Update FEATURE_STATUS.toml with component status
-- Update CAPABILITY_MATRIX.toml with capabilities
-- Update WHAT_IS_WORKING_AND_NOT_WORKING.md with progress
-- Create/update wiki pages for component documentation
-
-### 5. Workflow
-
-**For New Components:**
-1. Create `Agents/COMPONENT_AGENT.md` with research
-2. Implement component in `src/` directory
-3. Write comprehensive unit tests
-4. Update documentation (FEATURE_STATUS, CAPABILITY_MATRIX, wiki)
-5. Commit and push to main branch
-6. Create GitHub Wiki page for component
-
-**For Existing Components:**
-1. Review existing implementation
-2. Identify gaps compared to Linux/BSD
-3. Implement missing features
-4. Update documentation
-5. Commit and push
-6. Update GitHub Wiki page
-
-### 6. Critical Components List
-
-**Must Have Agent Files (even if not implemented):**
-- Bootloaders
-- Scheduler
-- Memory Management
-- Filesystems
-- Networking
-- Security
-- Desktop Environment
-- Systemd/Init
-- Package Management
-- Drivers
-- Virtualization
-- Container Runtime
-- System Monitoring
-- Logging
-- IPC
-- Timekeeping
-- Cryptography
-- Internationalization (i18n)
-- Accessibility
-
-### 7. Quality Standards
-
-**Code Quality:**
-- All code must pass `cargo check`
-- All tests must pass
-- No clippy warnings
-- Proper error handling
-- Memory safety guarantees
-
-**Documentation Quality:**
-- Clear and concise
-- Up-to-date with implementation
-- Includes examples where appropriate
-- References to standards (RFCs, specifications)
-
-**Testing Quality:**
-- Unit tests for all functions
-- Integration tests for component interactions
-- Edge case coverage
-- Performance benchmarks where applicable
-
-### 8. Git Workflow
-
-**Branch Policy:**
-- Only main branch exists
-- All commits go directly to main
-- No feature branches
-- No pull requests (direct commits)
-
-**Commit Message Format:**
-```
-Brief summary of changes
-
-Detailed description if needed
-
-Generated with [Devin](https://devin.ai)
-
-Co-Authored-By: Devin <158243242+devin-ai-integration[bot]@users.noreply.github.com>
+# With all features enabled
+cargo check --workspace --all-features 2>&1
 ```
 
-**Sync with GitHub:**
-- Commit all changes
-- Push to origin/main immediately
-- Update GitHub Wiki after each major change
+**Clippy (run before every commit):**
+```bash
+cargo clippy --workspace -- \
+  -D clippy::unused_variables \
+  -D clippy::unwrap_in_result \
+  -W clippy::missing_safety_doc \
+  -W clippy::undocumented_unsafe_blocks
+```
 
-### 9. Continuous Improvement
+**If `cargo check` fails:**
+1. Fix ALL errors before committing — zero-error policy.
+2. Warnings are allowed temporarily but must be tracked as GitHub Issues.
+3. Never use `#[allow(unused)]` to silence warnings without a comment.
 
-**Review Cycle:**
-- Periodically review existing components
-- Compare with latest Linux/BSD releases
-- Identify new features to implement
-- Update agent files with new research
+---
 
-**Feedback Loop:**
-- Monitor GitHub issues for component requests
-- Update priorities based on user feedback
-- Revise implementation plans based on testing results
+## 5. Code Quality Checklist
 
-### 10. Safety and Security
+Before every commit, verify:
 
-**Security Considerations:**
-- Audit all unsafe code
-- Validate all user input
-- Use secure coding practices
-- Follow principle of least privilege
-- Test for common vulnerabilities
+- [ ] `cargo check` passes with **0 errors**
+- [ ] `cargo clippy` produces no new warnings vs. `main`
+- [ ] No `unwrap()` or `expect()` in production paths — use `?` or explicit `match`
+- [ ] No hard-coded credentials, secrets, or magic numbers without named constants
+- [ ] Every `unsafe` block has a `// SAFETY:` justification comment
+- [ ] Every public function, struct, and trait has a `///` doc comment
+- [ ] New files include the SPDX license header: `// SPDX-License-Identifier: MIT OR Apache-2.0`
+- [ ] Error types implement `core::fmt::Display` and `core::fmt::Debug`
+- [ ] No `std::process::exit()` in library code — return `Result` up the stack
+- [ ] Integration tests updated if behavior changed
+- [ ] Relevant agent `.md` file updated to reflect new implementation status
 
-**Safety Checklist:**
-- No buffer overflows
-- No use-after-free
-- No double-free
-- No integer overflows
-- Proper bounds checking
-- Safe error handling
+---
 
-## Conclusion
+## 6. Code Scanning Alert Response Procedures
 
-Follow these guidelines to ensure SigmaOS grows with high-quality, well-documented components that match or exceed Linux/BSD capabilities. Always prioritize:
-1. Correctness and safety
-2. Performance
-3. Compatibility with Linux/BSD
-4. Clear documentation
-5. Comprehensive testing
+When GitHub Code Scanning (or local `cargo audit`) raises alerts:
+
+### Severity: Critical / High
+1. **Stop all other work immediately.**
+2. Reproduce the issue locally.
+3. Create a fix in a single commit with type `security(<scope>)`.
+4. Run `cargo audit fix` for dependency vulnerabilities where safe.
+5. Push immediately: `git push origin main`.
+6. Update the relevant `Agents/SECURITY_AGENT.md` with the post-mortem.
+7. If the vulnerability is in a dependency, pin to a safe version in `Cargo.toml`.
+
+### Severity: Medium
+1. Track as a GitHub Issue labeled `security`.
+2. Fix within the current session if possible, otherwise within 48 hours.
+3. Commit with type `security(<scope>): fix <cve-or-description>`.
+
+### Severity: Low / Informational
+1. Track as a GitHub Issue labeled `security/low`.
+2. Batch-fix with other low-severity items.
+3. Commit with type `fix` or `chore`.
+
+### Running Local Security Audit
+```bash
+cargo install cargo-audit  # one-time setup
+cargo audit
+cargo audit fix --dry-run  # preview dependency fixes
+```
+
+---
+
+## 7. Security Vulnerability Response Procedures
+
+If a vulnerability is discovered in SigmaOS itself (not a dependency):
+
+1. **Assess scope** — kernel, userspace, or both?
+2. **Classify** — privilege escalation, information disclosure, DoS, memory corruption?
+3. **Patch immediately** — no disclosure delay for a pre-release OS.
+4. **Commit with**: `security(<scope>): [VULN] <description>`
+5. **Update** `Agents/SECURITY_AGENT.md` Section 9 with details.
+6. **Add regression test** that reproduces the vulnerability and confirms the fix.
+7. **Document in** `SECURITY.md` at repo root (create if missing).
+
+---
+
+## 8. Agent File (`.md`) Maintenance
+
+### When to Update an Agent File
+- When implementing a new feature in that component → update Section 5 (status table)
+- When discovering a bug → add to Section 6 (missing features) if architectural
+- When Linux/BSD releases a new major version → review their changelog for that subsystem
+- After every commit that touches `src/<component>/` → update the agent file in the same commit
+
+### Transfer to GitHub Wiki
+Transfer agent content to the GitHub Wiki (`<Component>-Component-Guide`) when:
+- The component is **≥ 50% implemented** (as judged by the status table)
+- The implementation is stable enough for external contributors to read
+- Format: Copy Sections 1, 4, 5, 7, 8, 11, 14 into the wiki page
+
+**Wiki page naming:** `<Component>-Component-Guide` (e.g., `Scheduler-Component-Guide`)
+
+### Agent File Naming Convention
+`Agents/<COMPONENT_NAME_IN_CAPS>_AGENT.md`
+
+---
+
+## 9. Stability-First Conflict Resolution Policy
+
+When a proposed change conflicts with an existing feature:
+
+1. **Never remove existing functionality** without a deprecation period (minimum 2 commits / sessions).
+2. If a new algorithm replaces an old one, keep the old one behind a feature flag: `#[cfg(feature = "legacy-<name>")]`.
+3. If API changes are required, provide a compatibility shim in `src/<component>/compat.rs`.
+4. Document the conflict in the commit message body (not just the subject line).
+5. When in doubt, choose the more conservative option and open a GitHub Issue for discussion.
+
+**Priority order when resolving conflicts:**
+```
+Stability > Security > Performance > Feature completeness > Code elegance
+```
+
+---
+
+## 10. Component Ownership Map
+
+Each AI agent session should identify which component it owns and operate only within that scope unless explicitly tasked with cross-component work.
+
+| Component | Agent File | Primary Source Directory |
+|-----------|-----------|--------------------------|
+| Kernel core | `KERNEL_AGENT.md` | `src/kernel/` |
+| Boot | `BOOTLOADERS_AGENT.md` | `src/boot/` |
+| Scheduler | `SCHEDULER_AGENT.md` | `src/kernel/sched/` |
+| Memory | `MEMORY_MANAGEMENT_AGENT.md` | `src/kernel/mm/` |
+| Filesystems | `FILESYSTEMS_AGENT.md` | `src/fs/` |
+| Networking | `NETWORKING_AGENT.md` | `src/net/` |
+| IPC | `IPC_AGENT.md` | `src/ipc/` |
+| Drivers | `DRIVERS_AGENT.md` | `src/drivers/` |
+| Desktop | `DESKTOP_AGENT.md` | `src/desktop/` |
+| Audio | `AUDIO_AGENT.md` | `src/audio/` |
+| Graphics | `GRAPHICS_AGENT.md` | `src/graphics/` |
+| Input | `INPUT_AGENT.md` | `src/input/` |
+| Display | `DISPLAY_AGENT.md` | `src/display/` |
+| Storage | `STORAGE_AGENT.md` | `src/storage/` |
+| Power | `POWER_MANAGEMENT_AGENT.md` | `src/power/` |
+| Security | `SECURITY_AGENT.md` | `src/security/` |
+| Cryptography | `CRYPTOGRAPHY_AGENT.md` | `src/crypto/` |
+| Packages | `PACKAGE_MANAGEMENT_AGENT.md` | `src/packages/` |
+| Init/systemd | `SYSTEMD_INIT_AGENT.md` | `src/init/` |
+| Monitoring | `SYSTEM_MONITORING_AGENT.md` | `src/monitoring/` |
+| Timekeeping | `TIMEKEEPING_AGENT.md` | `src/time/` |
+| Virtualization | `VIRTUALIZATION_AGENT.md` | `src/virt/` |
+| Containers | `CONTAINERS_AGENT.md` | `src/containers/` |
+| i18n | `INTERNATIONALIZATION_AGENT.md` | `src/i18n/` |
+| Accessibility | `ACCESSIBILITY_AGENT.md` | `src/a11y/` |
+| Compatibility | `COMPATIBILITY_AGENT.md` | `src/compat/` |
+| Linux/BSD parity | `LINUX_BSD_DISTRO_PARITY_ROADMAP_AGENT.md` | (cross-cutting) |
+| Omarchy parity | `OMARCHY_LINUX_PARITY_AGENT.md` | (cross-cutting) |
+
+---
+
+## 11. Session Startup Checklist
+
+At the start of every AI agent session:
+
+1. `git pull --rebase origin main` — sync with latest upstream
+2. `cargo check --workspace` — verify clean state
+3. Read the relevant `Agents/<COMPONENT>_AGENT.md` for your component
+4. Check `WHAT_IS_WORKING_AND_NOT_WORKING.md` for current status
+5. Check `FEATURE_STATUS.toml` for component priorities
+6. Begin work on the highest-priority missing feature in your component's Section 6
+
+---
+
+## 12. Session End Checklist
+
+Before ending every AI agent session:
+
+1. `cargo check --workspace` — must pass with 0 errors
+2. `cargo clippy --workspace` — no new warnings
+3. Update the relevant `Agents/<COMPONENT>_AGENT.md` Section 5 status table
+4. `git add -A && git commit -m '<type>(<scope>): <description>'`
+5. `git push origin main`
+6. Report summary back to the orchestrating agent
+
+---
+
+## 13. References
+
+- Conventional Commits: https://www.conventionalcommits.org/
+- Rust API Guidelines: https://rust-lang.github.io/api-guidelines/
+- Rust `unsafe` guidelines: https://doc.rust-lang.org/nomicon/
+- Zig documentation: https://ziglang.org/documentation/master/
+- Linux kernel coding style (for inspiration): https://www.kernel.org/doc/html/latest/process/coding-style.html
+- FreeBSD Developer Handbook: https://docs.freebsd.org/en/books/developers-handbook/
+- OpenBSD coding style: https://man.openbsd.org/style.9

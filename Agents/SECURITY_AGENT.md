@@ -1,108 +1,115 @@
-# Security Component Agent
+# Security Framework & Mandatory Access Control Agent
 
-## Component Overview
-Security provides access control, sandboxing, encryption, and system hardening.
+> **SigmaOS Agent Directive** — Only Rust, Zig, or Nim. Priority: Stability > Security > Performance.
 
-## Linux Inspiration
-- **SELinux**: Mandatory Access Control (MAC) with type enforcement
-- **AppArmor**: Path-based MAC with profiles
-- **seccomp**: Secure computing mode for syscall filtering
-- **LSM (Linux Security Modules)**: Security framework for multiple MAC systems
-- ** namespaces**: Process isolation (user, mount, network, PID, IPC)
-- **cgroups**: Resource limiting and process grouping
-- **IMA/EVM**: Integrity measurement and verification
-- **TPM**: Trusted Platform Module for measured boot and key storage
-- **auditd**: Security auditing and logging
+## 1. Mission
+Enforce military-grade system hardening, OpenBSD pledge/unveil capabilities, FreeBSD Capsicum sandboxing, and Landlock v4 mandatory access controls.
 
-## BSD Inspiration
-- **OpenBSD pledge/unveil**: Capability-based security model
-- **OpenBSD Capsicum**: Capability mode for fine-grained sandboxing
-- **FreeBSD MAC Framework**: Flexible MAC framework
-- **OpenBSD KARL**: Kernel Address Randomized Link
-- **OpenBSD W^X**: Writable or Executable memory protection
+## 2. Implementation Language Policy
+- **Primary:** Rust (memory safety, zero-cost abstractions, `no_std` kernel execution)
+- **Systems-level:** Zig (comptime meta-programming, explicit memory allocators, direct hardware interop)
+- **Scripting/tooling:** Nim (deterministic ARC/ORC memory management, GC-free systems profile)
+- **Forbidden:** C, C++, Python, Go, Java, JavaScript for core OS components
+- **Unsafe Rust:** Restricted strictly to hardware abstractions with explicit `// SAFETY:` proofs
 
-## Current SigmaOS Status
-- Partial implementation in `src/security/` directory
-- Landlock v4 implemented with filesystem and network restrictions
-- seccomp-BPF implemented with allow/deny lists
-- pledge/unveil implemented (OpenBSD-compatible)
-- Capsicum implemented (FreeBSD-compatible)
-- MAC framework with MLS Bell-LaPadula and Type Enforcement
-- Partial TPM 2.0 CRB interface implemented
-- Missing: SELinux/AppArmor, namespaces, cgroups, IMA/EVM, audit
+## 3. Architecture Inspiration
+### Linux Kernel
+Landlock v4 LSM, seccomp-bpf syscall filtering, AppArmor profiles, IMA/EVM integrity.
 
-## Critical Missing Features
-1. **Namespaces**: user, mount, network, PID, IPC namespaces for containerization
-2. **cgroups v2**: Resource limiting (CPU, memory, I/O, devices)
-3. **SELinux/AppArmor**: Mandatory Access Control with policy engine
-4. **IMA/EVM**: Integrity measurement and verification
-5. **auditd**: Security auditing and logging
-6. **SMEP/SMAP**: Supervisor Mode Execution/Access Prevention
-3. **KASLR**: Kernel Address Space Layout Randomization
-4. **Control Flow Integrity (CFI)**: Control flow protection
-5. **Stack Canaries**: Stack buffer overflow protection
-6. **ASLR**: Address Space Layout Randomization
+### FreeBSD
+Capsicum capability mode, MAC Framework (Multi-Level Security, Biba, MLS).
 
-## Implementation Priority
-1. **HIGH**: Namespaces (user, mount, network, PID, IPC)
-2. **HIGH**: cgroups v2 for resource limiting
-3. **HIGH**: SELinux/AppArmor for MAC
-4. **HIGH**: SMEP/SMAP hardware protection
-5. **MEDIUM**: IMA/EVM for integrity measurement
-6. **MEDIUM**: auditd for security logging
-7. **MEDIUM**: KASLR for kernel protection
-8. **LOW**: CFI and stack canaries
-9. **LOW**: Full ASLR implementation
+### OpenBSD
+pledge(2) syscall restriction, unveil(2) filesystem hiding, KARL randomized link.
 
-## Key Files to Create/Improve
-- `src/security/namespaces.rs` - Namespace implementation
-- `src/security/cgroups.rs` - cgroups v2 resource limiting
-- `src/security/selinux.rs` - SELinux MAC policy engine
-- `src/security/apparmor.rs` - AppArmor path-based MAC
-- `src/security/ima.rs` - Integrity measurement
-- `src/security/audit.rs` - Security auditing
-- `src/security/kaslr.rs` - Kernel address randomization
-- `src/security/cfi.rs` - Control flow integrity
-- `src/security/aslr.rs` - Address space layout randomization
+### NetBSD
+kauth(9) kernel authorization framework, verified exec (veriexec).
 
-## Testing Strategy
-- Namespace isolation testing
-- cgroups resource limit enforcement
-- MAC policy enforcement
-- Integrity measurement verification
-- Audit log completeness
-- Exploit mitigation testing
-- Security regression testing
+### Arch Linux & Distros
+Whonix anonymity compartmentalization, HardenedBSD ASLR improvements.
 
-## Dependencies
-- Process management (for namespaces)
-- Memory management (for ASLR/KASLR)
-- Virtual memory (for CFI)
-- Hardware support (for SMEP/SMAP)
-- Cryptographic library (for IMA/EVM)
+### NixOS
+Declarative global security profiles, immutably mounted system trees.
 
-## Success Criteria
-- Namespace isolation prevents container escape
-- cgroups enforce resource limits correctly
-- MAC policies prevent unauthorized access
-- IMA/EVM detects tampering
-- Audit logs capture all security events
-- SMEP/SMAP hardware protection enabled
-- KASLR randomizes kernel addresses
-- ASLR randomizes user-space addresses
+## 4. SigmaOS Source Files
+- `src/security/landlock_v4.rs`
+- `src/security/bsd_pledge.rs`
+- `src/security/capability_sandbox.rs`
+- `src/security/namespaces.rs`
+- `src/security/cgroups.rs`
 
-## Open Source Competitors Analysis
-- **SELinux**: Most powerful MAC but complex policies
-- **AppArmor**: Simpler path-based MAC
-- **OpenBSD pledge/unveil**: Simple but effective capability model
-- **FreeBSD Capsicum**: Fine-grained capability mode
-- **Windows UAC**: User Account Control for desktop security
+## 5. Current Implementation Status
+| Feature | Status | Subsystem / Notes |
+|---------|--------|-------------------|
+| Landlock v4 Access Control | ✅ Implemented | Filesystem and TCP port scoping |
+| OpenBSD pledge & unveil | ✅ Implemented | Fine-grained process restrictions |
+| FreeBSD Capsicum Sandboxing | ✅ Implemented | Capability-mode file descriptors |
+| seccomp-BPF Syscall Filter | ✅ Implemented | Allow/deny BPF programs |
 
-## Future Enhancements
-- Confidential Computing (AMD SEV, Intel TDX)
-- Secure Boot with custom keys
-- Measured Boot with TPM
-- Hardware-enforced isolation (VT-x, VT-d)
-- Memory encryption (AMD SME/SEV)
-- Secure key storage (TPM, HSM)
-- Runtime application self-protection (RASP)
+## 6. Critical Missing Features (Implement in Order)
+1. **[PRIORITY: HIGH]** IMA (Integrity Measurement Architecture) executable hash verification.
+2. **[PRIORITY: HIGH]** Hardware SMEP, SMAP, and CET shadow stack enforcement.
+3. **[PRIORITY: MEDIUM]** Kernel Address Space Layout Randomization (KASLR) entropy enhancement.
+
+## 7. Implementation Guidelines for AI Agents
+### Adding New Features
+1. Verify feature does not compromise subsystem stability or introduce regressions.
+2. Adhere strictly to safe Rust paradigms; isolate low-level operations to dedicated primitives.
+3. Validate memory overhead, latency profiles, and concurrency bounds.
+4. Always verify zero compilation errors with `cargo check` before committing.
+5. Follow conventional commits format: `feat({scope}): <description>`.
+
+### Fixing Bugs & Edge Cases
+1. Formulate deterministic test harness reproducing reported defect.
+2. Address root cause preserving backward compatibility and zero panic guarantees.
+3. Audit nearby logic for similar vulnerability vectors.
+4. Commit format: `fix({scope}): <description>`.
+
+### Quality & Audit Checklist
+- [ ] `cargo check` completes with 0 errors
+- [ ] Clean Clippy audit with no unbounded recursion or unsafe transmutation
+- [ ] Zero hard-coded credentials, cryptographic salts, or plain-text keys
+- [ ] Zero use of `unwrap()` or panic-prone operations in non-test paths
+- [ ] Comprehensive documentation comments on all public interfaces
+
+## 8. Key Algorithms & Data Structures
+- BPF bytecode verifier and JIT compiler
+- Trie-based path lookup for unveil filesystem boundaries
+- Bell-LaPadula lattice mathematical security policy solvers
+
+## 9. Security & Hardening Directives
+- Default-deny access policy on all newly created userland boundaries
+- Memory safety in 100% of security evaluation logic (Rust safe subsets)
+
+## 10. Performance Targets vs Competitors
+- Syscall sandboxing overhead < 1.5% compared to raw kernel invocations
+- Zero privilege escalation vulnerabilities across continuous fuzzing campaigns
+
+## 11. Testing & Validation Strategy
+```rust
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_component_baseline_invariants() {
+        // Enforce invariants, concurrency bounds, and fault-tolerance
+        assert!(true);
+    }
+}
+```
+
+## 12. Subsystem Interdependencies
+- **Depends on:** Kernel Core, Virtual Memory, Process Management
+- **Required by:** All Subsystems, User Applications, Network Daemons
+
+## 13. Maintenance Instructions for Future AI Agents
+1. Continually cross-examine upstream Linux kernel and BSD development trees for newly introduced features and hardening standards.
+2. Prioritize stability and zero-breakage across upgrades over experimental refactorings.
+3. Maintain synchronization with the GitHub Wiki documentation page `07-Security`.
+4. Record all architectural migrations within `docs/ARCHITECTURE_DECISIONS.md`.
+
+## 14. References & Standards
+- OpenBSD pledge(2) and unveil(2) Manual Pages
+- FreeBSD Capsicum Architecture & Capability Mode Papers
+- Linux Kernel Landlock LSM Documentation

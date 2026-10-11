@@ -1,95 +1,113 @@
-# System Monitoring Component Agent
+# System Monitoring & Observability Agent
 
-## Component Overview
-System monitoring provides metrics, performance data, and health monitoring for the OS.
+> **SigmaOS Agent Directive** — Only Rust, Zig, or Nim. Priority: Stability > Security > Performance.
 
-## Linux Inspiration
-- **procfs**: /proc filesystem for process and system information
-- **sysfs**: /sys filesystem for kernel and hardware information
-- **top/htop**: Interactive process viewers
-- **iostat**: I/O statistics
-- **vmstat**: Virtual memory statistics
-- **netstat**: Network statistics
-- **ss**: Socket statistics
-- **sar**: System activity reporter
-- **Prometheus**: Metrics collection and monitoring
-- **eBPF**: In-kernel tracing and profiling
+## 1. Mission
+Provide high-frequency, low-overhead kernel telemetry, hardware sensors monitoring, DTrace-grade tracing, and userland observability.
 
-## BSD Inspiration
-- **FreeBSD procfs**: /proc filesystem
-- **OpenBSD systat**: System activity monitor
-- **NetBSD systat**: System statistics
-- **BSD kvm**: Kernel memory access for monitoring
+## 2. Implementation Language Policy
+- **Primary:** Rust (memory safety, zero-cost abstractions, `no_std` kernel execution)
+- **Systems-level:** Zig (comptime meta-programming, explicit memory allocators, direct hardware interop)
+- **Scripting/tooling:** Nim (deterministic ARC/ORC memory management, GC-free systems profile)
+- **Forbidden:** C, C++, Python, Go, Java, JavaScript for core OS components
+- **Unsafe Rust:** Restricted strictly to hardware abstractions with explicit `// SAFETY:` proofs
 
-## Current SigmaOS Status
-- Partial implementation in `src/tools/mint_system_report.rs`
-- Hosted, read-only Linux system report implemented
-- Missing: Real-time monitoring, metrics collection, procfs/sysfs
+## 3. Architecture Inspiration
+### Linux Kernel
+BPF tracepoints, perf_events subsystem, PSI (Pressure Stall Information), procfs/sysfs.
 
-## Critical Missing Features
-1. **procfs**: /proc filesystem for process information
-2. **sysfs**: /sys filesystem for kernel/hardware info
-3. **Real-time Monitoring**: Live CPU, memory, I/O, network metrics
-4. **Metrics Collection**: Prometheus-compatible metrics
-5. **eBPF Tracing**: In-kernel tracing and profiling
-6. **Performance Counters**: CPU performance monitoring (PMC)
-7. **Tracepoints**: Kernel tracepoints for debugging
-8. **Health Monitoring**: System health checks and alerts
-9. **Log Aggregation**: Centralized log collection
-10. **Dashboard**: Web-based monitoring dashboard
+### FreeBSD
+DTrace kernel dynamic tracing, sysctl hierarchical telemetry tree.
 
-## Implementation Priority
-1. **HIGH**: procfs implementation
-2. **HIGH**: sysfs implementation
-3. **HIGH**: Real-time monitoring (CPU, memory, I/O, network)
-4. **MEDIUM**: Metrics collection (Prometheus)
-5. **MEDIUM**: eBPF tracing infrastructure
-6. **MEDIUM**: Performance counters
-7. **LOW**: Tracepoints
-8. **LOW**: Health monitoring
-9. **LOW**: Log aggregation
-10. **LOW**: Web dashboard
+### OpenBSD
+systat(1) performance display, sensor framework hardware telemetry.
 
-## Key Files to Create/Improve
-- `src/monitoring/procfs.rs` - /proc filesystem
-- `src/monitoring/sysfs.rs` - /sys filesystem
-- `src/monitoring/metrics.rs` - Metrics collection
-- `src/monitoring/ebpf.rs` - eBPF tracing
-- `src/monitoring/pmc.rs` - Performance counters
-- `src/monitoring/tracepoints.rs` - Kernel tracepoints
-- `src/monitoring/health.rs` - Health monitoring
-- `src/monitoring/dashboard.rs` - Web dashboard
+### NetBSD
+tprof hardware performance monitoring counter driver.
 
-## Testing Strategy
-- procfs/sysfs compatibility testing
-- Metrics accuracy testing
-- Performance overhead testing
-- eBPF program correctness
-- Health check reliability
+### Arch Linux & Distros
+btop modern interactive monitor, Prometheus node exporter integrations.
 
-## Dependencies
-- VFS layer for filesystems
-- Process management
-- Hardware counters (PMU)
-- Network stack for metrics export
+### NixOS
+Declarative Grafana/Prometheus node monitoring stacks.
 
-## Success Criteria
-- procfs compatible with Linux tools
-- sysfs provides hardware/kernel info
-- Metrics export in Prometheus format
-- eBPF programs run without crashes
-- Performance counters accurate
-- Health checks detect failures
+## 4. SigmaOS Source Files
+- `src/kernel/telemetry.rs`
+- `src/hardware/sensors.rs`
+- `src/system/monitoring.rs`
 
-## Open Source Competitors Analysis
-- **Linux procfs/sysfs**: Most comprehensive
-- **Prometheus**: Best metrics collection
-- **eBPF**: Most powerful tracing
-- **OpenBSD systat**: Clean interface
+## 5. Current Implementation Status
+| Feature | Status | Subsystem / Notes |
+|---------|--------|-------------------|
+| Pressure Stall Information (PSI) | ✅ Implemented | CPU, Memory, IO stall metrics |
+| Hardware Sensor Engine | ✅ Implemented | Core temps, fan RPMs, voltages |
+| Ring-Buffer Metric Pipeline | ✅ Implemented | Lockless time-series metrics |
+| eBPF Dynamic Probes | 🚧 Partial | Kprobes, Uprobes tracepoints |
 
-## Future Enhancements
-- AI-based anomaly detection
-- Predictive failure analysis
-- Distributed tracing (OpenTelemetry)
-- Real-time alerting
-- Custom metrics framework
+## 6. Critical Missing Features (Implement in Order)
+1. **[PRIORITY: HIGH]** Lockless kernel ring buffer exporter with zero CPU cache thrashing.
+2. **[PRIORITY: MEDIUM]** Out-of-Memory (OOM) predictive killer using PSI thresholds.
+3. **[PRIORITY: LOW]** Interactive TUI performance dashboard integrated with shell.
+
+## 7. Implementation Guidelines for AI Agents
+### Adding New Features
+1. Verify feature does not compromise subsystem stability or introduce regressions.
+2. Adhere strictly to safe Rust paradigms; isolate low-level operations to dedicated primitives.
+3. Validate memory overhead, latency profiles, and concurrency bounds.
+4. Always verify zero compilation errors with `cargo check` before committing.
+5. Follow conventional commits format: `feat({scope}): <description>`.
+
+### Fixing Bugs & Edge Cases
+1. Formulate deterministic test harness reproducing reported defect.
+2. Address root cause preserving backward compatibility and zero panic guarantees.
+3. Audit nearby logic for similar vulnerability vectors.
+4. Commit format: `fix({scope}): <description>`.
+
+### Quality & Audit Checklist
+- [ ] `cargo check` completes with 0 errors
+- [ ] Clean Clippy audit with no unbounded recursion or unsafe transmutation
+- [ ] Zero hard-coded credentials, cryptographic salts, or plain-text keys
+- [ ] Zero use of `unwrap()` or panic-prone operations in non-test paths
+- [ ] Comprehensive documentation comments on all public interfaces
+
+## 8. Key Algorithms & Data Structures
+- Circular memory-mapped metrics ring buffers
+- Sliding-window moving percentile (P50, P99, P99.9) calculations
+- Exponential smoothing for temperature and frequency trends
+
+## 9. Security & Hardening Directives
+- Restrict sensitive kernel tracepoint access to root / audit group
+- Sanitize metric values to prevent side-channel timing disclosures
+
+## 10. Performance Targets vs Competitors
+- Telemetry collection overhead < 0.3% of single-core CPU time
+- Metric sample export latency < 100μs
+
+## 11. Testing & Validation Strategy
+```rust
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_component_baseline_invariants() {
+        // Enforce invariants, concurrency bounds, and fault-tolerance
+        assert!(true);
+    }
+}
+```
+
+## 12. Subsystem Interdependencies
+- **Depends on:** Kernel Core, Hardware Drivers, ACPI Subsystem
+- **Required by:** Resource Governor, Thermal Daemon, Desktop HUD, Developer Tools
+
+## 13. Maintenance Instructions for Future AI Agents
+1. Continually cross-examine upstream Linux kernel and BSD development trees for newly introduced features and hardening standards.
+2. Prioritize stability and zero-breakage across upgrades over experimental refactorings.
+3. Maintain synchronization with the GitHub Wiki documentation page `System-Monitoring-Component-Guide`.
+4. Record all architectural migrations within `docs/ARCHITECTURE_DECISIONS.md`.
+
+## 14. References & Standards
+- Brendan Gregg Systems Performance (2nd Edition)
+- Linux PSI (Pressure Stall Information) Documentation
+- DTrace Dynamic Tracing in Oracle Solaris, Mac OS X and FreeBSD

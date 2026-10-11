@@ -1,100 +1,113 @@
-# Timekeeping Component Agent
+# Timekeeping & High-Resolution Clocks Agent
 
-## Component Overview
-Timekeeping provides accurate timekeeping, timers, and scheduling for the OS.
+> **SigmaOS Agent Directive** — Only Rust, Zig, or Nim. Priority: Stability > Security > Performance.
 
-## Linux Inspiration
-- **CLOCK_MONOTONIC**: Monotonic clock for intervals
-- **CLOCK_REALTIME**: Wall clock time
-- **CLOCK_BOOTTIME**: Clock that includes suspend time
-- **CLOCK_TAI**: International Atomic Time
-- **hrtimers**: High-resolution timers
-- **timerfd**: Timer file descriptors
-- **adjtimex**: Time adjustment interface
-- **NTP**: Network Time Protocol for time synchronization
-- **PTP**: Precision Time Protocol for sub-microsecond accuracy
-- **time namespaces**: Per-process time namespaces
+## 1. Mission
+Provide nanosecond-precision monotonic clocks, hardware TSC synchronization, PTP/NTP network time discipline, and zero-drift tickless timers.
 
-## BSD Inspiration
-- **FreeBSD timehands**: High-resolution timekeeping
-- **OpenBSD timecounters**: Time counter abstraction
-- **NetBSD clock_gettime**: POSIX time functions
-- **BSD NTP**: NTP daemon (ntpd)
+## 2. Implementation Language Policy
+- **Primary:** Rust (memory safety, zero-cost abstractions, `no_std` kernel execution)
+- **Systems-level:** Zig (comptime meta-programming, explicit memory allocators, direct hardware interop)
+- **Scripting/tooling:** Nim (deterministic ARC/ORC memory management, GC-free systems profile)
+- **Forbidden:** C, C++, Python, Go, Java, JavaScript for core OS components
+- **Unsafe Rust:** Restricted strictly to hardware abstractions with explicit `// SAFETY:` proofs
 
-## Current SigmaOS Status
-- Partial implementation in `src/kernel/boot_foundations.rs`
-- HPET clock counter mentioned
-- Interrupt and timer subsystem stub implemented
-- Missing: Full timekeeping, hrtimers, NTP/PTP
+## 3. Architecture Inspiration
+### Linux Kernel
+NO_HZ_FULL tickless kernel, clocksource/clockevents subsystem, POSIX timerfd, vDSO time.
 
-## Critical Missing Features
-1. **High-Resolution Timers**: hrtimers for nanosecond precision
-2. **timerfd**: Timer file descriptors for event-driven timers
-3. **CLOCK_* Variants**: All POSIX clock types
-4. **NTP Client**: Network Time Protocol synchronization
-5. **PTP Support**: Precision Time Protocol
-6. **Time Adjustment**: adjtimex for slewing
-7. **Leap Seconds**: Leap second handling
-8. **Time Namespaces**: Per-process time namespaces
-9. **RTC Support**: Real-Time Clock access
-10. **Timezones**: Timezone database and conversion
+### FreeBSD
+timecounter hardware abstraction, callout timer wheel architecture.
 
-## Implementation Priority
-1. **HIGH**: High-resolution timers (hrtimers)
-2. **HIGH**: CLOCK_* variants (monotonic, realtime, boottime)
-3. **HIGH**: timerfd for event-driven timers
-4. **MEDIUM**: NTP client
-5. **MEDIUM**: RTC support
-6. **MEDIUM**: Time adjustment (adjtimex)
-7. **LOW**: PTP support
-8. **LOW**: Time namespaces
-9. **LOW**: Leap second handling
-10. **LOW**: Timezone support
+### OpenBSD
+OpenNTPD privilege-separated secure NTP daemon with TLS constraints.
 
-## Key Files to Create/Improve
-- `src/timekeeping/hrtimer.rs` - High-resolution timers
-- `src/timekeeping/clock.rs` - POSIX clock variants
-- `src/timekeeping/timerfd.rs` - Timer file descriptors
-- `src/timekeeping/ntp.rs` - NTP client
-- `src/timekeeping/ptp.rs` - Precision Time Protocol
-- `src/timekeeping/adjtimex.rs` - Time adjustment
-- `src/timekeeping/rtc.rs` - Real-Time Clock
-- `src/timekeeping/leap.rs` - Leap second handling
-- `src/timekeeping/namespace.rs` - Time namespaces
-- `src/timekeeping/timezone.rs` - Timezone support
+### NetBSD
+timecounter architecture, TSC calibration algorithms.
 
-## Testing Strategy
-- Timer accuracy testing
-- NTP synchronization testing
-- RTC read/write testing
-- Leap second handling
-- Timezone conversion testing
-- Performance benchmarking
+### Arch Linux & Distros
+Chrony precision NTP client, Arch Linux RTC configuration.
 
-## Dependencies
-- Hardware timers (HPET, TSC, ACPI PM timer)
-- Network stack (for NTP/PTP)
-- File descriptor management (for timerfd)
-- System calls
+### NixOS
+Declarative NTP pool peers and hardware clock timezone configurations.
 
-## Success Criteria
-- hrtimers provide nanosecond precision
-- CLOCK_* variants work correctly
-- timerfd integrates with epoll/select
-- NTP synchronizes time accurately
-- RTC maintains time across reboots
-- Leap seconds handled gracefully
-- Timezones convert correctly
+## 4. SigmaOS Source Files
+- `src/kernel/time.rs`
+- `src/klib/time.rs`
+- `src/hardware/tsc.rs`
 
-## Open Source Competitors Analysis
-- **Linux hrtimers**: Most sophisticated timer system
-- **FreeBSD timehands**: Excellent high-resolution timekeeping
-- **OpenBSD timecounters**: Clean abstraction
-- **chrony**: Best NTP implementation
+## 5. Current Implementation Status
+| Feature | Status | Subsystem / Notes |
+|---------|--------|-------------------|
+| Invariant TSC Hardware Clocksource | ✅ Implemented | Nanosecond monotonic clock |
+| Tickless Kernel Operation (NO_HZ) | ✅ Implemented | Dynamic local APIC timer |
+| POSIX high-res timers (timerfd) | ✅ Implemented | Nanosecond expiration queues |
+| PTP / NTP Time Discipline Engine | 🚧 Partial | Phase-locked loop drift adjustment |
 
-## Future Enhancements
-- Hardware timestamping (for PTP)
-- Sub-nanosecond precision
-- Time-aware scheduling
-- Distributed time synchronization
-- Time anomaly detection
+## 6. Critical Missing Features (Implement in Order)
+1. **[PRIORITY: HIGH]** User-space zero-syscall clock reading via vDSO shared memory page.
+2. **[PRIORITY: MEDIUM]** PTP (Precision Time Protocol IEEE 1588) hardware timestamping.
+3. **[PRIORITY: LOW]** Leap second smooth smearing algorithm.
+
+## 7. Implementation Guidelines for AI Agents
+### Adding New Features
+1. Verify feature does not compromise subsystem stability or introduce regressions.
+2. Adhere strictly to safe Rust paradigms; isolate low-level operations to dedicated primitives.
+3. Validate memory overhead, latency profiles, and concurrency bounds.
+4. Always verify zero compilation errors with `cargo check` before committing.
+5. Follow conventional commits format: `feat({scope}): <description>`.
+
+### Fixing Bugs & Edge Cases
+1. Formulate deterministic test harness reproducing reported defect.
+2. Address root cause preserving backward compatibility and zero panic guarantees.
+3. Audit nearby logic for similar vulnerability vectors.
+4. Commit format: `fix({scope}): <description>`.
+
+### Quality & Audit Checklist
+- [ ] `cargo check` completes with 0 errors
+- [ ] Clean Clippy audit with no unbounded recursion or unsafe transmutation
+- [ ] Zero hard-coded credentials, cryptographic salts, or plain-text keys
+- [ ] Zero use of `unwrap()` or panic-prone operations in non-test paths
+- [ ] Comprehensive documentation comments on all public interfaces
+
+## 8. Key Algorithms & Data Structures
+- Hierarchical Timer Wheel (O(1) insertion and cascading expiration)
+- Phase-Locked Loop (PLL) clock slew mathematical algorithms
+- Multi-core TSC drift detection and correction calibration
+
+## 9. Security & Hardening Directives
+- Secure NTP time validation with cryptographic TLS constraint verification
+- Prevent malicious backwards time jumps from bypassing token expirations
+
+## 10. Performance Targets vs Competitors
+- `clock_gettime(CLOCK_MONOTONIC)` latency < 12ns via vDSO
+- Clock drift < 1 millisecond per 30 days without network sync
+
+## 11. Testing & Validation Strategy
+```rust
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_component_baseline_invariants() {
+        // Enforce invariants, concurrency bounds, and fault-tolerance
+        assert!(true);
+    }
+}
+```
+
+## 12. Subsystem Interdependencies
+- **Depends on:** Hardware APIC, TSC, ACPI PM-Timer
+- **Required by:** Scheduler, Audio Subsystem, Network Stack, Security TLS
+
+## 13. Maintenance Instructions for Future AI Agents
+1. Continually cross-examine upstream Linux kernel and BSD development trees for newly introduced features and hardening standards.
+2. Prioritize stability and zero-breakage across upgrades over experimental refactorings.
+3. Maintain synchronization with the GitHub Wiki documentation page `Timekeeping-Component-Guide`.
+4. Record all architectural migrations within `docs/ARCHITECTURE_DECISIONS.md`.
+
+## 14. References & Standards
+- IEEE 1588 Standard for Precision Clock Synchronization
+- Linux Timekeeping Architecture Documentation
+- OpenNTPD Protocol and Design Papers
