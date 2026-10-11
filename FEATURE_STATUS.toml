@@ -431,3 +431,52 @@ files = ["src/ipc/", "docs/ipc-handler.md"]
 description = "Formally specified, testable IPC handler subsystem covering pipes, FIFOs, UNIX sockets, shared memory, message queues, futexes, event wakeups, signal control plane, FD passing, and access control policies."
 test_evidence = "Architecture specification complete in docs/ipc-handler.md; unit tests pass for futex and signal primitives."
 next_milestone = "Phase 2 Core IPC objects and Phase 3 Anonymous Pipes implementation"
+
+[sync.wait_queue]
+status = "prototype"
+files = ["src/kernel/wait_queue.rs", "docs/PROCESS_SYNCHRONIZATION_PLAN.md"]
+description = "Scheduler-integrated wait queue primitive for sleeping tasks, supporting exclusive/non-exclusive wakeups and timeouts"
+test_evidence = "Unit tests pass via rustc --test src/kernel/wait_queue.rs"
+next_milestone = "EEVDF scheduler enqueue/dequeue task integration"
+
+[sync.spinlock]
+status = "working"
+files = ["src/kernel/sigma_spinlock.rs", "docs/PROCESS_SYNCHRONIZATION_PLAN.md"]
+description = "Bounded ticket spinlock and read/write spinlock for short SMP critical sections"
+test_evidence = "Unit tests pass via rustc --test src/kernel/sigma_spinlock.rs"
+next_milestone = "Per-CPU IRQ-save state validation"
+
+[sync.semaphore]
+status = "prototype"
+files = ["src/kernel/semaphore.rs", "docs/PROCESS_SYNCHRONIZATION_PLAN.md"]
+description = "Counting semaphore with bounded counter, wait/post operations, and multi-semaphore sets"
+test_evidence = "Unit tests pass via rustc --test src/kernel/semaphore.rs"
+next_milestone = "Process-shared unnamed semaphore support in shared memory"
+
+[sync.futex]
+status = "prototype"
+files = ["src/kernel/futex.rs", "src/ipc/futex.rs", "docs/PROCESS_SYNCHRONIZATION_PLAN.md"]
+description = "Fast Userspace Mutex (futex) key hashing, wait/wake queues, requeueing, and priority inheritance state"
+test_evidence = "Unit tests pass via rustc --test src/kernel/futex.rs and src/ipc/futex.rs"
+next_milestone = "User memory physical page resolution and futex wait/wake system call dispatch"
+
+[sync.flock]
+status = "prototype"
+files = ["src/kernel/flock.rs", "docs/PROCESS_SYNCHRONIZATION_PLAN.md"]
+description = "Advisory file locking mechanism with shared/exclusive locks and lock conflict resolution"
+test_evidence = "Unit tests pass via rustc --test src/kernel/flock.rs"
+next_milestone = "VFS file descriptor table integration"
+
+[sync.ipc_primitives]
+status = "prototype"
+files = ["src/kernel/pipe.rs", "src/kernel/eventfd.rs", "docs/PROCESS_SYNCHRONIZATION_PLAN.md"]
+description = "Interprocess synchronization primitives including pipes and eventfd counter/semaphore notifications"
+test_evidence = "Unit tests pass via rustc --test src/kernel/pipe.rs and src/kernel/eventfd.rs"
+next_milestone = "Non-blocking readiness polling and epoll/kqueue event loop binding"
+
+[sync.lockdep]
+status = "prototype"
+files = ["src/kernel/lockdep.rs", "docs/PROCESS_SYNCHRONIZATION_PLAN.md"]
+description = "Runtime lock dependency tracking graph for deadlock and lock ordering detection"
+test_evidence = "Architecture specification published in docs/PROCESS_SYNCHRONIZATION_PLAN.md"
+next_milestone = "Instrument kernel locks with lockdep annotations"
