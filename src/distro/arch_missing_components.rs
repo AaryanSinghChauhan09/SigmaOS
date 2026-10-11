@@ -460,13 +460,6 @@ pub struct ArchPacmanHookRunner {
     pub registered_hooks: Vec<PacmanHookRule>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct InitramfsHookSpec {
-    pub name: String,
-    pub is_runtime: bool,
-    pub dependencies: Vec<String>,
-}
-
 impl ArchPacmanHookRunner {
     pub fn new() -> Self {
         let hooks = vec![
