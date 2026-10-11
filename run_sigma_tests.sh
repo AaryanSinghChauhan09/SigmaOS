@@ -934,4 +934,18 @@ if [ -f "scripts/release_gate_mint_omarchy_migration.sh" ]; then
     ./scripts/release_gate_mint_omarchy_migration.sh
 fi
 
+if [ -f "src/distro/open_source_os_unimplemented_ideas_pr_suite.rs" ]; then
+    echo "Running Open Source OS Unimplemented Ideas PR Suite test suite..."
+    mkdir -p build
+    rustc --test src/distro/open_source_os_unimplemented_ideas_pr_suite.rs --edition=2021 -o build/test_os_ideas_suite
+    ./build/test_os_ideas_suite
+fi
+
+if [ -f "src/distro/debian_github_repo_inspirations_pr.rs" ]; then
+    echo "Running Debian GitHub Repo Inspirations PR Suite test suite..."
+    mkdir -p build
+    rustc --test src/distro/debian_github_repo_inspirations_pr.rs --edition=2021 -o build/test_debian_pr
+    ./build/test_debian_pr
+fi
+
 echo "All SigmaOS test suites completed."
