@@ -200,6 +200,30 @@ impl SovereignLinuxBsdWikiRoadmapParityEngine {
                 "src/distro/arch_linux_parity_pr_suite.rs",
                 "Arch Linux Parity PR Suite",
             ),
+            (
+                26,
+                "System Utilities Architecture & Development Decision Plan",
+                "src/userland/system_utilities.rs",
+                "System Utilities Development Plan",
+            ),
+            (
+                27,
+                "Arch Linux Gap Closure Advancements V43 PR Gateway Suite",
+                "src/distro/arch_linux_gap_closure_v43_pr.rs",
+                "Arch Linux Gap Closure V43 PR",
+            ),
+            (
+                28,
+                "Omarchy Linux Gap Closure V44 PR Gateway Suite",
+                "src/distro/omarchy_linux_gap_closure_v44_pr.rs",
+                "Omarchy Linux Gap Closure V44 PR",
+            ),
+            (
+                29,
+                "Open Source OS Missing Components V45 PR Gateway Suite",
+                "src/distro/open_source_os_missing_components_v45_pr.rs",
+                "Open Source OS Missing Components V45 PR",
+            ),
         ];
 
         for (id, title, module, _spec) in default_ideas {
@@ -329,8 +353,8 @@ mod tests {
     #[test]
     fn test_wiki_roadmap_parity_engine() {
         let engine = SovereignLinuxBsdWikiRoadmapParityEngine::new();
-        assert_eq!(engine.total_ideas_count, 25);
-        assert_eq!(engine.implemented_ideas_count(), 25);
+        assert_eq!(engine.total_ideas_count, 29);
+        assert_eq!(engine.implemented_ideas_count(), 29);
         assert_eq!(engine.verification_percentage(), 100.0);
     }
 

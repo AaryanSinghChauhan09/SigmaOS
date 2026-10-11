@@ -176,6 +176,17 @@ impl WikiDataTransferEngine {
         );
 
         self.feature_specs.insert(
+            "ArchLinuxGapClosureV43Pr".to_string(),
+            FeatureMdStatus {
+                spec_name: "27-Arch-Linux-Gap-Closure-V43-PR.md".to_string(),
+                source_path: "wiki/27-Arch-Linux-Gap-Closure-V43-PR.md".to_string(),
+                is_fully_implemented: true,
+                completion_percentage: 100,
+                wiki_mirrored: true,
+            },
+        );
+
+        self.feature_specs.insert(
             "Roadmap11Deployment".to_string(),
             FeatureMdStatus {
                 spec_name: "11-Roadmap.md".to_string(),
@@ -246,6 +257,17 @@ impl WikiDataTransferEngine {
             },
         );
 
+        self.feature_specs.insert(
+            "SystemUtilitiesDevelopmentPlan".to_string(),
+            FeatureMdStatus {
+                spec_name: "26-System-Utilities-Development-Plan.md".to_string(),
+                source_path: "wiki/26-System-Utilities-Development-Plan.md".to_string(),
+                is_fully_implemented: true,
+                completion_percentage: 100,
+                wiki_mirrored: true,
+            },
+        );
+
         self.register_spec_file("UniversalPackageSystem", "Universal Package System", true);
         self.register_spec_file("Roadmap11Deployment", "Roadmap 11 Deployment", true);
         self.register_spec_file("ROADMAP.md", "SigmaOS Master Development Roadmap", true);
@@ -258,6 +280,21 @@ impl WikiDataTransferEngine {
         self.register_spec_file(
             "18-Architecture-Development-Decision-Plan-PR.md",
             "Architecture Development Decision Plan PR",
+            true,
+        );
+        self.register_spec_file(
+            "26-System-Utilities-Development-Plan.md",
+            "System Utilities Development Plan PR",
+            true,
+        );
+        self.register_spec_file(
+            "27-Arch-Linux-Gap-Closure-V43-PR.md",
+            "Arch Linux Gap Closure V43 PR",
+            true,
+        );
+        self.register_spec_file(
+            "29-Open-Source-OS-Missing-Components-V45-PR.md",
+            "Open Source OS Missing Components V45 PR",
             true,
         );
     }

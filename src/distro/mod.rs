@@ -342,6 +342,12 @@ pub mod sovereign_2090_distro_supremacy_engine;
 pub use sovereign_2090_distro_supremacy_engine::*;
 pub mod arch_linux_gap_closure_pr_suite;
 pub use arch_linux_gap_closure_pr_suite::*;
+pub mod arch_linux_gap_closure_v43_pr;
+pub use arch_linux_gap_closure_v43_pr::*;
+pub mod omarchy_linux_gap_closure_v44_pr;
+pub use omarchy_linux_gap_closure_v44_pr::*;
+pub mod open_source_os_missing_components_v45_pr;
+pub use open_source_os_missing_components_v45_pr::*;
 pub mod sovereign_2028_distro_supremacy_engine;
 pub use sovereign_2028_distro_supremacy_engine::{
     BpfSchedExtPolicy, DirectScanoutFrame, EbpfSchedTask, FineIbtCallsiteGuard, MicroVmSpawnSpec,
