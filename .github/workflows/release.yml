@@ -1,0 +1,45 @@
+name: Release Preparation & Validation
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version tag (e.g. v1.0.0-rc1)'
+        required: true
+        default: 'v1.0.0-dev'
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  release-prep:
+    name: Prepare Release Artifacts & Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@4360b52568e2003a75bf9bc1d59f33a8e3fc893c  # stable
+        with:
+          toolchain: stable
+
+      - name: Install QEMU and Python3
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y qemu-system-x86 python3
+
+      - name: Run Release Preparation Script
+        run: |
+          chmod +x scripts/release/prepare_release.sh
+          ./scripts/release/prepare_release.sh "${{ github.event.inputs.version || 'v1.0.0-dev' }}"
+
+      - name: Upload SBOM Artifact
+        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882  # v4.4.3
+        with:
+          name: sbom-release
+          path: build/sbom_*.json
