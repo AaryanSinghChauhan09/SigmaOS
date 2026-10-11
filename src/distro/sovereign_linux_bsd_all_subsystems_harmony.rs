@@ -34,6 +34,15 @@ pub enum LinuxBsdDistroInspiration {
     DragonFlyBSD,
     IllumosSolaris,
     Plan9Frontier,
+    RockyLinux,
+    AlmaLinux,
+    EndeavourOS,
+    ChimeraLinux,
+    GhostBSD,
+    HardenedBSD,
+    MidnightBSD,
+    RedoxOS,
+    HaikuOS,
 }
 
 impl LinuxBsdDistroInspiration {
@@ -64,6 +73,15 @@ impl LinuxBsdDistroInspiration {
             Self::DragonFlyBSD => "DragonFlyBSD",
             Self::IllumosSolaris => "IllumosSolaris",
             Self::Plan9Frontier => "Plan9Frontier",
+            Self::RockyLinux => "RockyLinux",
+            Self::AlmaLinux => "AlmaLinux",
+            Self::EndeavourOS => "EndeavourOS",
+            Self::ChimeraLinux => "ChimeraLinux",
+            Self::GhostBSD => "GhostBSD",
+            Self::HardenedBSD => "HardenedBSD",
+            Self::MidnightBSD => "MidnightBSD",
+            Self::RedoxOS => "RedoxOS",
+            Self::HaikuOS => "HaikuOS",
         }
     }
 }
@@ -211,12 +229,21 @@ impl SovereignSubsystemDistroHarmonyEngine {
             LinuxBsdDistroInspiration::DragonFlyBSD,
             LinuxBsdDistroInspiration::IllumosSolaris,
             LinuxBsdDistroInspiration::Plan9Frontier,
+            LinuxBsdDistroInspiration::RockyLinux,
+            LinuxBsdDistroInspiration::AlmaLinux,
+            LinuxBsdDistroInspiration::EndeavourOS,
+            LinuxBsdDistroInspiration::ChimeraLinux,
+            LinuxBsdDistroInspiration::GhostBSD,
+            LinuxBsdDistroInspiration::HardenedBSD,
+            LinuxBsdDistroInspiration::MidnightBSD,
+            LinuxBsdDistroInspiration::RedoxOS,
+            LinuxBsdDistroInspiration::HaikuOS,
         ];
 
         let subsystems_list = [
             (
                 SigmaOsSubsystem::KernelScheduling,
-                vec!["EEVDF", "BORE", "sched_ext", "NuttX_RT"],
+                vec!["EEVDF", "BORE", "sched_ext", "NuttX_RT", "ULE_Scheduler"],
             ),
             (
                 SigmaOsSubsystem::SecuritySandboxing,
@@ -227,11 +254,12 @@ impl SovereignSubsystemDistroHarmonyEngine {
                     "LandlockV5",
                     "AppArmor",
                     "SELinux",
+                    "PaxGuard",
                 ],
             ),
             (
                 SigmaOsSubsystem::FilesystemStorage,
-                vec!["Bcachefs", "ZFS", "Btrfs", "HAMMER2", "BFS", "9P2000"],
+                vec!["Bcachefs", "ZFS", "Btrfs", "HAMMER2", "BFS", "9P2000", "RedoxFS"],
             ),
             (
                 SigmaOsSubsystem::Networking,
@@ -254,11 +282,12 @@ impl SovereignSubsystemDistroHarmonyEngine {
                     "Ebuild",
                     "NixFlakes",
                     "Guix",
+                    "Pkgsrc",
                 ],
             ),
             (
                 SigmaOsSubsystem::InitSupervisor,
-                vec!["Systemd", "OpenRC", "Runit", "Dinit", "SMF", "Shepherd"],
+                vec!["Systemd", "OpenRC", "Runit", "Dinit", "SMF", "Shepherd", "Launchd"],
             ),
             (
                 SigmaOsSubsystem::DesktopCompositor,
@@ -268,11 +297,12 @@ impl SovereignSubsystemDistroHarmonyEngine {
                     "KDE_Plasma6",
                     "Cosmic",
                     "X11_Bridge",
+                    "HaikuDecorator",
                 ],
             ),
             (
                 SigmaOsSubsystem::AudioSound,
-                vec!["PipeWire", "ALSA", "SNDIO", "PulseAudio"],
+                vec!["PipeWire", "ALSA", "SNDIO", "PulseAudio", "OpenSoundSystem"],
             ),
             (
                 SigmaOsSubsystem::HardwarePower,
@@ -326,7 +356,7 @@ impl SovereignSubsystemDistroHarmonyEngine {
             ),
             (
                 SigmaOsSubsystem::AutomationProvisioning,
-                vec!["CloudInit", "Kickstart", "Preseed", "Netplan"],
+                vec!["CloudInit", "Kickstart", "Preseed", "Netplan", "Ignition"],
             ),
             (
                 SigmaOsSubsystem::SystemAudit,
@@ -414,6 +444,66 @@ impl SovereignSubsystemDistroHarmonyEngine {
                 rule_expression: String::from(rule),
                 enforce_strict_isolation: strict,
             });
+        }
+    }
+
+    pub fn translate_vfs_path(&self, distro: LinuxBsdDistroInspiration, path: &str) -> String {
+        match distro {
+            LinuxBsdDistroInspiration::FreeBSD
+            | LinuxBsdDistroInspiration::GhostBSD
+            | LinuxBsdDistroInspiration::HardenedBSD
+            | LinuxBsdDistroInspiration::MidnightBSD => {
+                if path.starts_with("/usr/local/etc") {
+                    path.to_string()
+                } else if path.starts_with("/etc") {
+                    format!("/usr/local{}", path)
+                } else {
+                    path.to_string()
+                }
+            }
+            LinuxBsdDistroInspiration::NixOS | LinuxBsdDistroInspiration::GNUGuix => {
+                if path.starts_with("/bin") || path.starts_with("/usr/bin") {
+                    format!("/run/current-system/sw{}", path)
+                } else {
+                    path.to_string()
+                }
+            }
+            _ => path.to_string(),
+        }
+    }
+
+    pub fn map_security_isolation_level(&self, distro: LinuxBsdDistroInspiration) -> u32 {
+        match distro {
+            LinuxBsdDistroInspiration::OpenBSD | LinuxBsdDistroInspiration::HardenedBSD => 100,
+            LinuxBsdDistroInspiration::FreeBSD
+            | LinuxBsdDistroInspiration::TailsOS
+            | LinuxBsdDistroInspiration::KaliLinux => 90,
+            LinuxBsdDistroInspiration::NixOS
+            | LinuxBsdDistroInspiration::AlpineLinux
+            | LinuxBsdDistroInspiration::ChimeraLinux => 85,
+            _ => 75,
+        }
+    }
+
+    pub fn resolve_package_format_specifier(&self, distro: LinuxBsdDistroInspiration) -> &'static str {
+        match distro {
+            LinuxBsdDistroInspiration::ArchLinux
+            | LinuxBsdDistroInspiration::GarudaLinux
+            | LinuxBsdDistroInspiration::EndeavourOS => "pkg.tar.zst",
+            LinuxBsdDistroInspiration::DebianGNU
+            | LinuxBsdDistroInspiration::UbuntuLinux
+            | LinuxBsdDistroInspiration::LinuxMint
+            | LinuxBsdDistroInspiration::KaliLinux
+            | LinuxBsdDistroInspiration::ParrotOS => "deb",
+            LinuxBsdDistroInspiration::FedoraLinux
+            | LinuxBsdDistroInspiration::OpenSUSE
+            | LinuxBsdDistroInspiration::RockyLinux
+            | LinuxBsdDistroInspiration::AlmaLinux => "rpm",
+            LinuxBsdDistroInspiration::AlpineLinux => "apk",
+            LinuxBsdDistroInspiration::FreeBSD
+            | LinuxBsdDistroInspiration::GhostBSD
+            | LinuxBsdDistroInspiration::HardenedBSD => "pkg",
+            _ => "sigpkg",
         }
     }
 
@@ -507,6 +597,7 @@ mod tests {
             LinuxBsdDistroInspiration::Plan9Frontier.as_str(),
             "Plan9Frontier"
         );
+        assert_eq!(LinuxBsdDistroInspiration::GhostBSD.as_str(), "GhostBSD");
 
         assert_eq!(
             SigmaOsSubsystem::KernelScheduling.as_str(),
@@ -560,5 +651,39 @@ mod tests {
             .expect("Harmonization should succeed");
         assert_eq!(count, 23 * 22);
         assert_eq!(engine.compute_harmony_index(), 100);
+    }
+
+    #[test]
+    fn test_expanded_distro_inspirations_harmony() {
+        let engine = SovereignSubsystemDistroHarmonyEngine::new();
+        for spec in engine.subsystems.values() {
+            assert!(spec.supported_distros.contains(&LinuxBsdDistroInspiration::GhostBSD));
+            assert!(spec.supported_distros.contains(&LinuxBsdDistroInspiration::HardenedBSD));
+            assert!(spec.supported_distros.contains(&LinuxBsdDistroInspiration::RedoxOS));
+            assert!(spec.supported_distros.contains(&LinuxBsdDistroInspiration::HaikuOS));
+        }
+    }
+
+    #[test]
+    fn test_cross_distro_policy_translations() {
+        let engine = SovereignSubsystemDistroHarmonyEngine::new();
+        let policy = engine.translate_policy(
+            SigmaOsSubsystem::ContainerVirt,
+            SigmaOsSubsystem::SecuritySandboxing,
+        ).expect("ContainerVirt -> SecuritySandboxing translation must exist");
+        assert_eq!(policy.distro_inspiration, LinuxBsdDistroInspiration::IllumosSolaris);
+        assert!(policy.enforce_strict_isolation);
+    }
+
+    #[test]
+    fn test_subsystem_vfs_and_security_mapping() {
+        let engine = SovereignSubsystemDistroHarmonyEngine::new();
+        assert_eq!(engine.translate_vfs_path(LinuxBsdDistroInspiration::FreeBSD, "/etc/nginx/nginx.conf"), "/usr/local/etc/nginx/nginx.conf");
+        assert_eq!(engine.translate_vfs_path(LinuxBsdDistroInspiration::NixOS, "/usr/bin/git"), "/run/current-system/sw/usr/bin/git");
+        assert_eq!(engine.map_security_isolation_level(LinuxBsdDistroInspiration::OpenBSD), 100);
+        assert_eq!(engine.map_security_isolation_level(LinuxBsdDistroInspiration::FreeBSD), 90);
+        assert_eq!(engine.resolve_package_format_specifier(LinuxBsdDistroInspiration::ArchLinux), "pkg.tar.zst");
+        assert_eq!(engine.resolve_package_format_specifier(LinuxBsdDistroInspiration::DebianGNU), "deb");
+        assert_eq!(engine.resolve_package_format_specifier(LinuxBsdDistroInspiration::FedoraLinux), "rpm");
     }
 }
