@@ -801,6 +801,13 @@ if [ -f "src/boot/sovereign_initramfs_initrd_pr_engine.rs" ]; then
     ./build/test_sovereign_initramfs_pr
 fi
 
+if [ -f "src/boot/sovereign_assembly_bootstrap_entry_pr_engine.rs" ]; then
+    echo "Running Sovereign Assembly Bootstrap Entry PR Subsystem test suite..."
+    mkdir -p build
+    rustc --test src/boot/sovereign_assembly_bootstrap_entry_pr_engine.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_assembly_bootstrap_pr
+    ./build/test_assembly_bootstrap_pr
+fi
+
 if [ -f "src/distro/sovereign_universal_subsystem_interop.rs" ]; then
     echo "Running Sovereign Universal Subsystem Interoperability test suite..."
     mkdir -p build

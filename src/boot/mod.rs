@@ -18,6 +18,7 @@ pub mod post;
 pub mod secure;
 pub mod sigma_boot;
 pub mod sigma_bootloader;
+pub mod sovereign_assembly_bootstrap_entry_pr_engine;
 pub mod sovereign_initramfs_initrd_pr_engine;
 pub mod sovereign_multi_distro_bootloader;
 pub mod uefi;
@@ -54,6 +55,11 @@ pub use uefi::{
 };
 pub use uefi_gop_framebuffer::*;
 
+pub use sovereign_assembly_bootstrap_entry_pr_engine::{
+    AssemblyBootstrapPrGatewaySuite, AssemblyBootstrapPrRecord, BootstrapArch,
+    EarlyCpuFeatureDetector, EarlyUartSerialConsoleLogger, GdtDescriptorEntry, MicroarchIsaLevel,
+    Multiboot2HeaderAssemblyParser,
+};
 pub use sovereign_initramfs_initrd_pr_engine::{
     EarlySecurityVolumeType, EarlySecurityVolumeUnsealStagingEngine, InitramfsHookModule,
     InitramfsRecipePr, InitrdCompressionAlgorithm, MultiDistroInitramfsHookResolver,
