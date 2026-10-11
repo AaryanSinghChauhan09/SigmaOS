@@ -13,6 +13,9 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
+pub mod sovereign_signal_development_and_pr_suite;
+pub use sovereign_signal_development_and_pr_suite::*;
+
 // S-Signal Dispatcher (Capability-Gated Async Signals)
 // Sovereign AI-Native zero-dependency implementation
 
