@@ -513,6 +513,129 @@ impl PciDriverManager {
     }
 }
 
+// ============================================================================
+// PCI BAR MMIO Mapping Engine (ioremap / iounmap)
+// ============================================================================
+
+/// Page caching policy for MMIO mappings (Linux ioremap_nocache / ioremap_wc / ioremap_wt parity)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MmioCachePolicy {
+    Uncacheable,      // Strong Uncacheable (UC) - Default for PCI BAR I/O registers
+    WriteCombining,   // Write Combining (WC) - High throughput for GPU framebuffers
+    WriteThrough,     // Write Through (WT) - Cached reads, immediate writes
+    WriteBack,        // Write Back (WB) - Full cacheability
+}
+
+/// Represents an active MMIO virtual memory mapping of a PCI Base Address Register (BAR)
+#[derive(Debug, Clone)]
+pub struct PciBarMmioMapping {
+    pub phys_addr: u64,
+    pub virt_addr: u64,
+    pub mapped_size: u64,
+    pub bar_index: u8,
+    pub cache_policy: MmioCachePolicy,
+    pub is_mapped: bool,
+}
+
+impl PciBarMmioMapping {
+    pub fn new(phys_addr: u64, size: u64, bar_index: u8, policy: MmioCachePolicy) -> Self {
+        // High 128TB virtual memory base offset for Kernel MMIO space
+        let virt_offset = 0xFFFF_8000_0000_0000u64;
+        let virt_addr = phys_addr.wrapping_add(virt_offset);
+        Self {
+            phys_addr,
+            virt_addr,
+            mapped_size: size,
+            bar_index,
+            cache_policy: policy,
+            is_mapped: true,
+        }
+    }
+
+    /// Read 8-bit byte from MMIO virtual offset (`readb`)
+    pub fn readb(&self, offset: u64) -> u8 {
+        if !self.is_mapped || offset >= self.mapped_size {
+            return 0xFF;
+        }
+        let addr = (self.virt_addr + offset) as *const u8;
+        unsafe { core::ptr::read_volatile(addr) }
+    }
+
+    /// Read 16-bit word from MMIO virtual offset (`readw`)
+    pub fn readw(&self, offset: u64) -> u16 {
+        if !self.is_mapped || offset + 1 >= self.mapped_size {
+            return 0xFFFF;
+        }
+        let addr = (self.virt_addr + offset) as *const u16;
+        unsafe { core::ptr::read_volatile(addr) }
+    }
+
+    /// Read 32-bit dword from MMIO virtual offset (`readl`)
+    pub fn readl(&self, offset: u64) -> u32 {
+        if !self.is_mapped || offset + 3 >= self.mapped_size {
+            return 0xFFFF_FFFF;
+        }
+        let addr = (self.virt_addr + offset) as *const u32;
+        unsafe { core::ptr::read_volatile(addr) }
+    }
+
+    /// Read 64-bit qword from MMIO virtual offset (`readq`)
+    pub fn readq(&self, offset: u64) -> u64 {
+        if !self.is_mapped || offset + 7 >= self.mapped_size {
+            return 0xFFFF_FFFF_FFFF_FFFF;
+        }
+        let addr = (self.virt_addr + offset) as *const u64;
+        unsafe { core::ptr::read_volatile(addr) }
+    }
+
+    /// Write 8-bit byte to MMIO virtual offset (`writeb`)
+    pub fn writeb(&self, offset: u64, value: u8) {
+        if self.is_mapped && offset < self.mapped_size {
+            let addr = (self.virt_addr + offset) as *mut u8;
+            unsafe { core::ptr::write_volatile(addr, value) }
+        }
+    }
+
+    /// Write 16-bit word to MMIO virtual offset (`writew`)
+    pub fn writew(&self, offset: u64, value: u16) {
+        if self.is_mapped && offset + 1 < self.mapped_size {
+            let addr = (self.virt_addr + offset) as *mut u16;
+            unsafe { core::ptr::write_volatile(addr, value) }
+        }
+    }
+
+    /// Write 32-bit dword to MMIO virtual offset (`writel`)
+    pub fn writel(&self, offset: u64, value: u32) {
+        if self.is_mapped && offset + 3 < self.mapped_size {
+            let addr = (self.virt_addr + offset) as *mut u32;
+            unsafe { core::ptr::write_volatile(addr, value) }
+        }
+    }
+
+    /// Write 64-bit qword to MMIO virtual offset (`writeq`)
+    pub fn writeq(&self, offset: u64, value: u64) {
+        if self.is_mapped && offset + 7 < self.mapped_size {
+            let addr = (self.virt_addr + offset) as *mut u64;
+            unsafe { core::ptr::write_volatile(addr, value) }
+        }
+    }
+}
+
+/// Linux/BSD Kernel ioremap API parity function mapping physical BAR address to MMIO virtual address
+pub fn ioremap(phys_addr: u64, size: u64) -> PciBarMmioMapping {
+    PciBarMmioMapping::new(phys_addr, size, 0, MmioCachePolicy::Uncacheable)
+}
+
+/// Linux/BSD Kernel ioremap_wc API parity function mapping physical BAR for Write-Combining (GPU framebuffers)
+pub fn ioremap_wc(phys_addr: u64, size: u64) -> PciBarMmioMapping {
+    PciBarMmioMapping::new(phys_addr, size, 0, MmioCachePolicy::WriteCombining)
+}
+
+/// Unmaps an active MMIO BAR virtual address mapping (Linux iounmap parity)
+pub fn iounmap(mapping: &mut PciBarMmioMapping) {
+    mapping.is_mapped = false;
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -571,5 +694,30 @@ mod tests {
     fn test_pci_driver_manager_creation() {
         let manager = PciDriverManager::new();
         assert_eq!(manager.get_bound_devices().len(), 0);
+    }
+
+    #[test]
+    fn test_pci_bar_ioremap_and_iounmap() {
+        let phys_addr = 0xFE00_0000u64;
+        let size = 0x1000u64;
+
+        let mut mapping = ioremap(phys_addr, size);
+        assert!(mapping.is_mapped);
+        assert_eq!(mapping.phys_addr, phys_addr);
+        assert_eq!(mapping.mapped_size, size);
+        assert_eq!(mapping.cache_policy, MmioCachePolicy::Uncacheable);
+        assert_eq!(mapping.virt_addr, phys_addr.wrapping_add(0xFFFF_8000_0000_0000u64));
+
+        let mapping_wc = ioremap_wc(phys_addr, size);
+        assert_eq!(mapping_wc.cache_policy, MmioCachePolicy::WriteCombining);
+
+        iounmap(&mut mapping);
+        assert!(!mapping.is_mapped);
+
+        // Verify out-of-bounds / unmapped read protection
+        assert_eq!(mapping.readb(0), 0xFF);
+        assert_eq!(mapping.readw(0), 0xFFFF);
+        assert_eq!(mapping.readl(0), 0xFFFF_FFFF);
+        assert_eq!(mapping.readq(0), 0xFFFF_FFFF_FFFF_FFFF);
     }
 }
