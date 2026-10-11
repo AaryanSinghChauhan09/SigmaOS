@@ -425,8 +425,10 @@ impl UniversalMultiFormatTranspilerAndExecutionEngineV30 {
             pkg.properties.insert("cflags".to_string(), cflags.clone());
         }
 
-        pkg.properties
-            .insert("source_format".to_string(), format!("{:?}", manifest.detected_format));
+        pkg.properties.insert(
+            "source_format".to_string(),
+            format!("{:?}", manifest.detected_format),
+        );
         pkg.checksum = manifest.payload_sha256.clone();
         pkg
     }
@@ -543,7 +545,12 @@ impl UniversalPmCliRouterV30 {
         let mut target_packages = Vec::new();
 
         for arg in &parts[1..] {
-            if *arg == "--dry-run" || *arg == "-s" || *arg == "-n" || *arg == "-p" || *arg == "--simulate" {
+            if *arg == "--dry-run"
+                || *arg == "-s"
+                || *arg == "-n"
+                || *arg == "-p"
+                || *arg == "--simulate"
+            {
                 dry_run = true;
                 continue;
             }
@@ -552,7 +559,8 @@ impl UniversalPmCliRouterV30 {
                 "install" | "add" | "in" | "-S" | "-Sy" | "-Syy" | "-a" | "-ask" | "--ask" => {
                     action = UniversalPmActionV30::Install;
                 }
-                "remove" | "purge" | "del" | "delete" | "uninstall" | "-R" | "-Rns" | "-C" | "--unmerge" | "rm" => {
+                "remove" | "purge" | "del" | "delete" | "uninstall" | "-R" | "-Rns" | "-C"
+                | "--unmerge" | "rm" => {
                     action = UniversalPmActionV30::Remove;
                 }
                 "update" | "upgrade" | "up" | "-Syu" | "-Syyu" | "-u" | "--update" => {
@@ -620,8 +628,7 @@ impl SovereignDistroPackageAdvancementsSuiteV30 {
             .transpiler_engine
             .transpile_to_native_sigpkg(&manifest, &self.governor);
 
-        self.transpiler_engine
-            .install_package(&native_sigpkg.name);
+        self.transpiler_engine.install_package(&native_sigpkg.name);
         Ok(native_sigpkg)
     }
 }
@@ -674,7 +681,9 @@ mod tests {
         ];
 
         for (filename, expected_format) in prompt_cases {
-            let manifest = inspector.inspect_package(filename, b"DATA_PAYLOAD").unwrap();
+            let manifest = inspector
+                .inspect_package(filename, b"DATA_PAYLOAD")
+                .unwrap();
             assert_eq!(
                 manifest.detected_format, expected_format,
                 "Format mismatch for file: {}",
@@ -692,11 +701,11 @@ mod tests {
     fn test_governor_remapping_and_sandboxing_v30() {
         let governor = UniversalCrossDistroCapabilityGovernorV30::new();
 
+        assert_eq!(governor.remap_dependency("libssl-dev"), "sovereign-openssl");
         assert_eq!(
-            governor.remap_dependency("libssl-dev"),
-            "sovereign-openssl"
+            governor.remap_dependency("custom-lib"),
+            "sovereign-custom-lib"
         );
-        assert_eq!(governor.remap_dependency("custom-lib"), "sovereign-custom-lib");
 
         let sandbox = governor.generate_sandbox_rules(PackageFormat::Flatpak);
         assert!(sandbox.pledge_promises.contains("inet"));

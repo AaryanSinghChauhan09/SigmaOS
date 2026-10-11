@@ -226,7 +226,6 @@ pub mod moksha;
 pub mod omarchy_omakase;
 pub mod omarchy_palette;
 pub mod omarchy_theme;
-pub mod zenith_quickshell_plugin;
 pub mod pantheon;
 pub mod screensaver;
 pub mod sovereign_navigation_engine;
@@ -236,6 +235,7 @@ pub mod wayland_protocol;
 pub mod weather_panel;
 pub mod web_wasm_bridge;
 pub mod zenith_compositor;
+pub mod zenith_quickshell_plugin;
 
 pub use sovereign_ux_innovation_hub::*;
 pub use wayland_protocol::*;
