@@ -37,9 +37,9 @@ pub struct AptRepositorySource {
     pub id: String,
     pub repo_type: AptRepoType,
     pub uri: String,
-    pub suite: String, // e.g. "noble", "virginiamint", "stable"
-    pub components: Vec<String>, // e.g. ["main", "restricted", "universe", "multiverse"]
-    pub architectures: Vec<String>, // e.g. ["amd64", "arm64"]
+    pub suite: String,                     // e.g. "noble", "virginiamint", "stable"
+    pub components: Vec<String>,           // e.g. ["main", "restricted", "universe", "multiverse"]
+    pub architectures: Vec<String>,        // e.g. ["amd64", "arm64"]
     pub signed_by_keyring: Option<String>, // e.g. "/usr/share/keyrings/linuxmint-archive-keyring.gpg"
     pub format: AptSourceFormat,
     pub enabled: bool,
@@ -95,13 +95,19 @@ impl AptRepositorySource {
     /// Renders DEB822 multi-line stanza specification (.sources)
     pub fn to_deb822_stanza(&self) -> String {
         let mut stanza = String::new();
-        stanza.push_str(&format!("Enabled: {}\n", if self.enabled { "yes" } else { "no" }));
+        stanza.push_str(&format!(
+            "Enabled: {}\n",
+            if self.enabled { "yes" } else { "no" }
+        ));
         stanza.push_str(&format!("Types: {}\n", self.repo_type.as_str()));
         stanza.push_str(&format!("URIs: {}\n", self.uri));
         stanza.push_str(&format!("Suites: {}\n", self.suite));
         stanza.push_str(&format!("Components: {}\n", self.components.join(" ")));
         if !self.architectures.is_empty() {
-            stanza.push_str(&format!("Architectures: {}\n", self.architectures.join(" ")));
+            stanza.push_str(&format!(
+                "Architectures: {}\n",
+                self.architectures.join(" ")
+            ));
         }
         if let Some(ref key) = self.signed_by_keyring {
             stanza.push_str(&format!("Signed-By: {}\n", key));
@@ -134,7 +140,8 @@ impl RepolibSourcesManager {
             "wilma",
             &["main", "upstream", "import", "backport"],
         );
-        mint_main.signed_by_keyring = Some("/usr/share/keyrings/linuxmint-archive-keyring.gpg".to_string());
+        mint_main.signed_by_keyring =
+            Some("/usr/share/keyrings/linuxmint-archive-keyring.gpg".to_string());
         self.sources.push(mint_main);
 
         let mut ubuntu_base = AptRepositorySource::new(
@@ -143,7 +150,8 @@ impl RepolibSourcesManager {
             "noble",
             &["main", "restricted", "universe", "multiverse"],
         );
-        ubuntu_base.signed_by_keyring = Some("/usr/share/keyrings/ubuntu-archive-keyring.gpg".to_string());
+        ubuntu_base.signed_by_keyring =
+            Some("/usr/share/keyrings/ubuntu-archive-keyring.gpg".to_string());
         self.sources.push(ubuntu_base);
     }
 
@@ -171,10 +179,14 @@ impl RepolibSourcesManager {
         let owner = parts[0];
         let ppa_name = parts[1];
         let ppa_id = format!("ppa-{}-{}", owner, ppa_name);
-        let uri = format!("https://ppa.launchpadcontent.net/{}/{}/ubuntu", owner, ppa_name);
+        let uri = format!(
+            "https://ppa.launchpadcontent.net/{}/{}/ubuntu",
+            owner, ppa_name
+        );
 
         let mut source = AptRepositorySource::new(&ppa_id, &uri, "noble", &["main"]);
-        source.signed_by_keyring = Some(format!("/etc/apt/trusted.gpg.d/{}_{}.gpg", owner, ppa_name));
+        source.signed_by_keyring =
+            Some(format!("/etc/apt/trusted.gpg.d/{}_{}.gpg", owner, ppa_name));
 
         self.add_source(source);
         Ok(format!("Added PPA '{}' successfully", ppa_spec))
@@ -191,11 +203,21 @@ impl RepolibSourcesManager {
     }
 
     /// Benchmark and select fastest mirror
-    pub fn benchmark_and_switch_mirror(&mut self, repo_id: &str, mirrors: &[(&str, u32)]) -> Result<String, String> {
-        let fastest = mirrors.iter().min_by_key(|m| m.1).ok_or("No mirrors provided for benchmarking")?;
+    pub fn benchmark_and_switch_mirror(
+        &mut self,
+        repo_id: &str,
+        mirrors: &[(&str, u32)],
+    ) -> Result<String, String> {
+        let fastest = mirrors
+            .iter()
+            .min_by_key(|m| m.1)
+            .ok_or("No mirrors provided for benchmarking")?;
         if let Some(source) = self.sources.iter_mut().find(|s| s.id == repo_id) {
             source.uri = fastest.0.to_string();
-            Ok(format!("Switched '{}' to fastest mirror: {} ({}ms)", repo_id, fastest.0, fastest.1))
+            Ok(format!(
+                "Switched '{}' to fastest mirror: {} ({}ms)",
+                repo_id, fastest.0, fastest.1
+            ))
         } else {
             Err(format!("Repository ID '{}' not found", repo_id))
         }
@@ -214,7 +236,12 @@ impl RepolibSourcesManager {
             let trimmed = line.trim();
             if trimmed.is_empty() {
                 if !current_uri.is_empty() {
-                    let mut src = AptRepositorySource::new("deb822-parsed", &current_uri, &current_suite, &[]);
+                    let mut src = AptRepositorySource::new(
+                        "deb822-parsed",
+                        &current_uri,
+                        &current_suite,
+                        &[],
+                    );
                     src.enabled = current_enabled;
                     src.repo_type = current_types;
                     src.components = current_components.clone();
@@ -231,7 +258,10 @@ impl RepolibSourcesManager {
                 let key = trimmed[..pos].trim();
                 let val = trimmed[pos + 1..].trim();
                 match key {
-                    "Enabled" => current_enabled = val.eq_ignore_ascii_case("yes") || val.eq_ignore_ascii_case("true"),
+                    "Enabled" => {
+                        current_enabled =
+                            val.eq_ignore_ascii_case("yes") || val.eq_ignore_ascii_case("true")
+                    }
                     "Types" => {
                         if val.contains("deb-src") {
                             current_types = AptRepoType::DebSrc;
@@ -241,14 +271,17 @@ impl RepolibSourcesManager {
                     }
                     "URIs" => current_uri = val.to_string(),
                     "Suites" => current_suite = val.to_string(),
-                    "Components" => current_components = val.split_whitespace().map(|s| s.to_string()).collect(),
+                    "Components" => {
+                        current_components = val.split_whitespace().map(|s| s.to_string()).collect()
+                    }
                     _ => {}
                 }
             }
         }
 
         if !current_uri.is_empty() {
-            let mut src = AptRepositorySource::new("deb822-parsed", &current_uri, &current_suite, &[]);
+            let mut src =
+                AptRepositorySource::new("deb822-parsed", &current_uri, &current_suite, &[]);
             src.enabled = current_enabled;
             src.repo_type = current_types;
             src.components = current_components;
@@ -272,7 +305,12 @@ mod tests {
 
     #[test]
     fn test_apt_repository_source_formatting() {
-        let mut src = AptRepositorySource::new("mint-main", "https://packages.linuxmint.com", "wilma", &["main", "upstream"]);
+        let mut src = AptRepositorySource::new(
+            "mint-main",
+            "https://packages.linuxmint.com",
+            "wilma",
+            &["main", "upstream"],
+        );
         src.signed_by_keyring = Some("/usr/share/keyrings/mint.gpg".to_string());
 
         let one_line = src.to_one_line_spec();
@@ -294,10 +332,20 @@ mod tests {
         assert!(ppa_res.is_ok());
         assert!(mgr.sources.iter().any(|s| s.id == "ppa-cinnamon-stable"));
 
-        let mirrors = vec![("https://mirror.us.kernel.org/ubuntu", 12), ("https://mirror.eu.kernel.org/ubuntu", 45)];
+        let mirrors = vec![
+            ("https://mirror.us.kernel.org/ubuntu", 12),
+            ("https://mirror.eu.kernel.org/ubuntu", 45),
+        ];
         let switch_res = mgr.benchmark_and_switch_mirror("ubuntu-base", &mirrors);
         assert!(switch_res.is_ok());
-        assert_eq!(mgr.sources.iter().find(|s| s.id == "ubuntu-base").unwrap().uri, "https://mirror.us.kernel.org/ubuntu");
+        assert_eq!(
+            mgr.sources
+                .iter()
+                .find(|s| s.id == "ubuntu-base")
+                .unwrap()
+                .uri,
+            "https://mirror.us.kernel.org/ubuntu"
+        );
     }
 
     #[test]

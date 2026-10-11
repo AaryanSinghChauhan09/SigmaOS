@@ -24,8 +24,8 @@ pub enum DriverSourceOS {
 /// Isolation & Sandboxing Mode for Drivers
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DriverSandboxLevel {
-    Ring0KernelDirect,  // Legacy path for trusted core drivers (UART, RTC)
-    Ring3CapsicumUser,  // Restricted to specific /dev/pciX nodes (Capsicum)
+    Ring0KernelDirect,    // Legacy path for trusted core drivers (UART, RTC)
+    Ring3CapsicumUser,    // Restricted to specific /dev/pciX nodes (Capsicum)
     IommuMicrovmIsolated, // Microvm VM-in-VM fault containment (EPT/VT-d)
 }
 
@@ -44,17 +44,28 @@ impl LinuxCSymbolBridge {
     }
 
     fn register_default_symbols(&mut self) {
-        self.symbol_table.insert("kmalloc".to_string(), 0xFFFFFFFF_81001000);
-        self.symbol_table.insert("kfree".to_string(), 0xFFFFFFFF_81002000);
-        self.symbol_table.insert("printk".to_string(), 0xFFFFFFFF_81000100);
-        self.symbol_table.insert("pci_read_config_word".to_string(), 0xFFFFFFFF_81100000);
-        self.symbol_table.insert("pci_write_config_word".to_string(), 0xFFFFFFFF_81100100);
-        self.symbol_table.insert("dma_alloc_coherent".to_string(), 0xFFFFFFFF_81300000);
-        self.symbol_table.insert("dma_free_coherent".to_string(), 0xFFFFFFFF_81300100);
-        self.symbol_table.insert("udelay".to_string(), 0xFFFFFFFF_81400000);
-        self.symbol_table.insert("mdelay".to_string(), 0xFFFFFFFF_81400100);
-        self.symbol_table.insert("request_irq".to_string(), 0xFFFFFFFF_81500000);
-        self.symbol_table.insert("free_irq".to_string(), 0xFFFFFFFF_81500100);
+        self.symbol_table
+            .insert("kmalloc".to_string(), 0xFFFFFFFF_81001000);
+        self.symbol_table
+            .insert("kfree".to_string(), 0xFFFFFFFF_81002000);
+        self.symbol_table
+            .insert("printk".to_string(), 0xFFFFFFFF_81000100);
+        self.symbol_table
+            .insert("pci_read_config_word".to_string(), 0xFFFFFFFF_81100000);
+        self.symbol_table
+            .insert("pci_write_config_word".to_string(), 0xFFFFFFFF_81100100);
+        self.symbol_table
+            .insert("dma_alloc_coherent".to_string(), 0xFFFFFFFF_81300000);
+        self.symbol_table
+            .insert("dma_free_coherent".to_string(), 0xFFFFFFFF_81300100);
+        self.symbol_table
+            .insert("udelay".to_string(), 0xFFFFFFFF_81400000);
+        self.symbol_table
+            .insert("mdelay".to_string(), 0xFFFFFFFF_81400100);
+        self.symbol_table
+            .insert("request_irq".to_string(), 0xFFFFFFFF_81500000);
+        self.symbol_table
+            .insert("free_irq".to_string(), 0xFFFFFFFF_81500100);
     }
 
     pub fn resolve_symbol(&self, name: &str) -> Option<u64> {
@@ -78,9 +89,12 @@ impl FreeBsdKldShim {
         let mut shim = Self {
             kld_symbols: BTreeMap::new(),
         };
-        shim.kld_symbols.insert("kobj_class_compile".to_string(), 0xFFFFFFFF_82001000);
-        shim.kld_symbols.insert("device_add_child".to_string(), 0xFFFFFFFF_82002000);
-        shim.kld_symbols.insert("bus_generic_attach".to_string(), 0xFFFFFFFF_82003000);
+        shim.kld_symbols
+            .insert("kobj_class_compile".to_string(), 0xFFFFFFFF_82001000);
+        shim.kld_symbols
+            .insert("device_add_child".to_string(), 0xFFFFFFFF_82002000);
+        shim.kld_symbols
+            .insert("bus_generic_attach".to_string(), 0xFFFFFFFF_82003000);
         shim
     }
 
@@ -105,8 +119,10 @@ impl OpenBsdDevShim {
         let mut shim = Self {
             dev_symbols: BTreeMap::new(),
         };
-        shim.dev_symbols.insert("config_found".to_string(), 0xFFFFFFFF_83001000);
-        shim.dev_symbols.insert("wsmouse_attach".to_string(), 0xFFFFFFFF_83002000);
+        shim.dev_symbols
+            .insert("config_found".to_string(), 0xFFFFFFFF_83001000);
+        shim.dev_symbols
+            .insert("wsmouse_attach".to_string(), 0xFFFFFFFF_83002000);
         shim
     }
 
@@ -151,7 +167,8 @@ impl FirmwareBlobRegistry {
             "iwlwifi-ax210.ucode".to_string(),
             FirmwareBlobEntry {
                 name: "iwlwifi-ax210.ucode".to_string(),
-                expected_sha256: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855".to_string(),
+                expected_sha256: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                    .to_string(),
                 size_bytes: 1024,
                 license: "Proprietary Intel".to_string(),
                 source_os: DriverSourceOS::LinuxKernel,
@@ -162,7 +179,8 @@ impl FirmwareBlobRegistry {
             "rtl8852ae.bin".to_string(),
             FirmwareBlobEntry {
                 name: "rtl8852ae.bin".to_string(),
-                expected_sha256: "ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb".to_string(),
+                expected_sha256: "ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb"
+                    .to_string(),
                 size_bytes: 2048,
                 license: "GPL-2.0 / Realtek".to_string(),
                 source_os: DriverSourceOS::LinuxKernel,
@@ -176,7 +194,9 @@ impl FirmwareBlobRegistry {
     }
 
     pub fn validate_firmware_integrity(&self, name: &str) -> Result<bool, &'static str> {
-        let blob = self.get_firmware(name).ok_or("Firmware blob not found in registry")?;
+        let blob = self
+            .get_firmware(name)
+            .ok_or("Firmware blob not found in registry")?;
         if blob.payload_bytes.len() == blob.size_bytes {
             Ok(true)
         } else {
@@ -254,7 +274,12 @@ impl DriverShardContainer {
         self.next_shard_id += 1;
     }
 
-    pub fn load_driver_shard(&mut self, name: &str, device_type: &str, source_os: DriverSourceOS) -> usize {
+    pub fn load_driver_shard(
+        &mut self,
+        name: &str,
+        device_type: &str,
+        source_os: DriverSourceOS,
+    ) -> usize {
         let id = self.next_shard_id;
         self.next_shard_id += 1;
 
@@ -277,7 +302,10 @@ impl DriverShardContainer {
                 return Err("Driver shard is not hot-swappable");
             }
             shard.is_active = false;
-            Ok(format!("Unloaded driver shard '{}', falling back to VESA/BIOS mode", name))
+            Ok(format!(
+                "Unloaded driver shard '{}', falling back to VESA/BIOS mode",
+                name
+            ))
         } else {
             Err("Driver shard not found")
         }
@@ -305,7 +333,9 @@ mod tests {
     #[test]
     fn test_firmware_blob_registry_validation() {
         let registry = FirmwareBlobRegistry::new();
-        assert!(registry.validate_firmware_integrity("iwlwifi-ax210.ucode").unwrap());
+        assert!(registry
+            .validate_firmware_integrity("iwlwifi-ax210.ucode")
+            .unwrap());
         assert!(registry.get_firmware("rtl8852ae.bin").is_some());
     }
 
@@ -318,7 +348,8 @@ mod tests {
         assert!(unload_msg.contains("falling back to VESA/BIOS mode"));
         assert!(!container.shards[0].is_active);
 
-        let new_id = container.load_driver_shard("amdgpu-rdna3", "gpu", DriverSourceOS::LinuxKernel);
+        let new_id =
+            container.load_driver_shard("amdgpu-rdna3", "gpu", DriverSourceOS::LinuxKernel);
         assert!(new_id > 2);
     }
 }

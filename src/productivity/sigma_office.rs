@@ -7496,7 +7496,9 @@ impl SovereignExecutiveReportExporterEngine {
             html.push_str("</ul></section>\n");
         }
 
-        html.push_str("<footer>CONFIDENTIAL - Sovereign OS Enterprise Report</footer></body></html>");
+        html.push_str(
+            "<footer>CONFIDENTIAL - Sovereign OS Enterprise Report</footer></body></html>",
+        );
         html
     }
 }
@@ -9890,7 +9892,8 @@ mod tests {
         let mut report_exporter = SovereignExecutiveReportExporterEngine::new();
         report_exporter.add_section(ExecutiveReportSection {
             section_title: "Financial Growth".to_string(),
-            content_summary: "Q1 ARR expanded significantly across Enterprise accounts.".to_string(),
+            content_summary: "Q1 ARR expanded significantly across Enterprise accounts."
+                .to_string(),
             metric_kpis: vec![("ARR".to_string(), "$12.5M".to_string())],
         });
         let html_report = report_exporter.export_executive_html_report("Q1 Business Review", "CEO");

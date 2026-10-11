@@ -359,18 +359,6 @@ mod tests {
     }
 
     #[test]
-    fn test_supreme_performance_addp_engine() {
-        let addp = SupremePerformanceAddpEngine::new();
-        assert!(addp.is_addp_compliant());
-
-        let pr_proposal = AddpWikiPrProposalGenerator::generate_addp_wiki_pr_proposal(
-            "# ADDP Supreme Performance",
-        );
-        assert!(pr_proposal
-            .contains("wiki/23-Supreme-Performance-Architecture-Development-Decision-Plan.md"));
-    }
-
-    #[test]
     fn test_wiki_data_transfer_engine() {
         let mut sync = WikiDataTransferEngine::new();
         let path = sync

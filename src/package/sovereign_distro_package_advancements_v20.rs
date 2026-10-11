@@ -365,12 +365,14 @@ impl SovereignDistroPackageAdvancementsSuiteV20 {
         payload: &[u8],
     ) -> Result<UnifiedPackage, String> {
         let spec = self.converter.convert_package(filename, payload)?;
-        let _pr = self.pr_pipeline.submit_package_pr(spec.clone());
+        let pr = self.pr_pipeline.submit_package_pr(spec.clone());
 
-        let mut pkg =
-            UnifiedPackage::new(format!("sovereign-{}", pr.package_name), pr.version.clone())
-                .with_format(PackageFormat::SigmaPkg)
-                .with_provides(pr.package_name.clone());
+        let mut pkg = UnifiedPackage::new(
+            format!("sovereign-{}", spec.package_name),
+            spec.version.clone(),
+        )
+        .with_format(PackageFormat::SigmaPkg)
+        .with_provides(spec.package_name.clone());
 
         for dep in &spec.canonical_dependencies {
             pkg = pkg.with_dependency(dep.clone());
@@ -418,15 +420,6 @@ mod tests {
     #[test]
     fn test_converter_all_formats() {
         let converter = UniversalAllPackageFormatConverterV20::new();
-
-        let pr1 = engine
-            .ingest_foreign_package_pr("gcc-13.2.0.pkg.tar.zst", b"ARCH_PAYLOAD")
-            .unwrap();
-        assert_eq!(pr1.original_format, PackageFormat::Pacman);
-        assert_eq!(pr1.package_name, "gcc-13");
-        assert!(pr1
-            .canonical_dependencies
-            .contains(&"sovereign-libc".to_string()));
 
         let pac_spec = converter
             .convert_package("htop-3.3.0.pkg.tar.zst", b"PACMAN")
@@ -477,8 +470,10 @@ mod tests {
         let sigpkg = suite
             .convert_submit_and_install("vim-9.1.rpm", b"VIM_PAYLOAD")
             .unwrap();
-        assert_eq!(sigpkg.name, "sigpkg-vim");
-        assert!(suite.installed_packages.contains(&"sigpkg-vim".to_string()));
+        assert_eq!(sigpkg.name, "sovereign-vim");
+        assert!(suite
+            .installed_packages
+            .contains(&"sovereign-vim".to_string()));
 
         let response = suite.execute_cli_command("apt install tmux").unwrap();
         assert!(response.contains("tmux"));

@@ -425,8 +425,10 @@ impl UniversalMultiFormatTranspilerAndExecutionEngineV30 {
             pkg.properties.insert("cflags".to_string(), cflags.clone());
         }
 
-        pkg.properties
-            .insert("source_format".to_string(), format!("{:?}", manifest.detected_format));
+        pkg.properties.insert(
+            "source_format".to_string(),
+            format!("{:?}", manifest.detected_format),
+        );
         pkg.checksum = manifest.payload_sha256.clone();
         pkg
     }
@@ -444,17 +446,24 @@ impl UniversalMultiFormatTranspilerAndExecutionEngineV30 {
         id
     }
 
-    /// Rolls back system state to selected boot environment snapshot V30
-    pub fn rollback(&mut self, snapshot_id: usize) -> Result<String, String> {
-        if let Some(snap) = self
-            .snapshots
-            .iter_mut()
-            .find(|s| s.snapshot_id == snapshot_id)
+    /// Installs a package into system state V30
+    pub fn install_package(&mut self, pkg_name: &str) {
+        if !self.installed_packages.contains(&pkg_name.to_string()) {
+            self.installed_packages.push(pkg_name.to_string());
+        }
+    }
+
+    /// Rolls back system state to selected checkpoint V30
+    pub fn rollback(&mut self, checkpoint_id: usize) -> Result<String, String> {
+        if let Some(cp) = self
+            .checkpoints
+            .iter()
+            .find(|c| c.checkpoint_id == checkpoint_id)
         {
-            snap.active = true;
+            self.installed_packages = cp.installed_packages.clone();
             Ok(format!(
-                "Successfully rolled back to snapshot '{}'",
-                snap.label
+                "Successfully rolled back to checkpoint #{}",
+                checkpoint_id
             ))
         } else {
             Err(format!("Checkpoint ID {} not found", checkpoint_id))
@@ -537,7 +546,12 @@ impl UniversalPmCliRouterV30 {
         let mut target_packages = Vec::new();
 
         for arg in &parts[1..] {
-            if *arg == "--dry-run" || *arg == "-s" || *arg == "-n" || *arg == "-p" || *arg == "--simulate" {
+            if *arg == "--dry-run"
+                || *arg == "-s"
+                || *arg == "-n"
+                || *arg == "-p"
+                || *arg == "--simulate"
+            {
                 dry_run = true;
                 continue;
             }
@@ -546,7 +560,8 @@ impl UniversalPmCliRouterV30 {
                 "install" | "add" | "in" | "-S" | "-Sy" | "-Syy" | "-a" | "-ask" | "--ask" => {
                     action = UniversalPmActionV30::Install;
                 }
-                "remove" | "purge" | "del" | "delete" | "uninstall" | "-R" | "-Rns" | "-C" | "--unmerge" | "rm" => {
+                "remove" | "purge" | "del" | "delete" | "uninstall" | "-R" | "-Rns" | "-C"
+                | "--unmerge" | "rm" => {
                     action = UniversalPmActionV30::Remove;
                 }
                 "update" | "upgrade" | "up" | "-Syu" | "-Syyu" | "-u" | "--update" => {
@@ -614,8 +629,7 @@ impl SovereignDistroPackageAdvancementsSuiteV30 {
             .transpiler_engine
             .transpile_to_native_sigpkg(&manifest, &self.governor);
 
-        self.transpiler_engine
-            .install_package(&native_sigpkg.name);
+        self.transpiler_engine.install_package(&native_sigpkg.name);
         Ok(native_sigpkg)
     }
 }
@@ -668,7 +682,9 @@ mod tests {
         ];
 
         for (filename, expected_format) in prompt_cases {
-            let manifest = inspector.inspect_package(filename, b"DATA_PAYLOAD").unwrap();
+            let manifest = inspector
+                .inspect_package(filename, b"DATA_PAYLOAD")
+                .unwrap();
             assert_eq!(
                 manifest.detected_format, expected_format,
                 "Format mismatch for file: {}",
@@ -686,11 +702,11 @@ mod tests {
     fn test_governor_remapping_and_sandboxing_v30() {
         let governor = UniversalCrossDistroCapabilityGovernorV30::new();
 
+        assert_eq!(governor.remap_dependency("libssl-dev"), "sovereign-openssl");
         assert_eq!(
-            governor.remap_dependency("libssl-dev"),
-            "sovereign-openssl"
+            governor.remap_dependency("custom-lib"),
+            "sovereign-custom-lib"
         );
-        assert_eq!(governor.remap_dependency("custom-lib"), "sovereign-custom-lib");
 
         let sandbox = governor.generate_sandbox_rules(PackageFormat::Flatpak);
         assert!(sandbox.pledge_promises.contains("inet"));
@@ -763,9 +779,10 @@ mod tests {
         let sigpkg = suite
             .process_and_install_package("ripgrep-14.1.0.deb", b"DEB_BINARY_DATA")
             .unwrap();
-        assert_eq!(sigpkg.name, "sigpkg-htop-3.3.0");
+        assert_eq!(sigpkg.name, "sigpkg-ripgrep-14.1.0");
         assert!(suite
+            .transpiler_engine
             .installed_packages
-            .contains(&"sigpkg-htop-3.3.0".to_string()));
+            .contains(&"sigpkg-ripgrep-14.1.0".to_string()));
     }
 }
