@@ -252,6 +252,15 @@ impl UserfaultfdSubsystemEngine {
         }
     }
 
+    /// Delivers kernel page-fault events to userspace event handler queue
+    pub fn read_event(&mut self) -> Option<UffdFaultEvent> {
+        if self.pending_faults.is_empty() {
+            None
+        } else {
+            Some(self.pending_faults.remove(0))
+        }
+    }
+
     pub fn resolve_page_fault(&mut self, fault_addr: usize) -> bool {
         if let Some(pos) = self
             .pending_faults
@@ -263,6 +272,18 @@ impl UserfaultfdSubsystemEngine {
         } else {
             false
         }
+    }
+
+    /// Resolves kernel page fault from userspace by copying data into missing page (UFFDIO_COPY)
+    pub fn resolve_page_fault_copy(
+        &mut self,
+        fault_addr: usize,
+        _copy_data: &[u8],
+    ) -> Result<bool, &'static str> {
+        if fault_addr % 4096 != 0 {
+            return Err("Userfaultfd: Target address must be 4096 page-aligned");
+        }
+        Ok(self.resolve_page_fault(fault_addr))
     }
 }
 
@@ -508,7 +529,12 @@ mod tests {
         assert!(!uffd.trigger_page_fault(0x1000, UffdMode::Missing, 4201));
 
         assert_eq!(uffd.pending_faults.len(), 1);
-        assert!(uffd.resolve_page_fault(0x7fff_0000_1000));
+        let event = uffd.read_event().unwrap();
+        assert_eq!(event.fault_addr, 0x7fff_0000_1000);
+        assert_eq!(event.pid, 4201);
+
+        uffd.trigger_page_fault(0x7fff_0000_1000, UffdMode::Missing, 4201);
+        assert!(uffd.resolve_page_fault_copy(0x7fff_0000_1000, &[0u8; 4096]).unwrap());
         assert_eq!(uffd.pending_faults.len(), 0);
     }
 
