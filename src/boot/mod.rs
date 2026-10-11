@@ -21,6 +21,7 @@ pub mod sigma_bootloader;
 pub mod sovereign_multi_distro_bootloader;
 pub mod uefi;
 pub mod uefi_gop_framebuffer;
+pub mod uefi_long_mode;
 pub mod verified;
 
 pub use sigma_bootloader::{
@@ -52,6 +53,7 @@ pub use uefi::{
     SovereignBootWatchdog, UEFIBootloader, UsbHostController,
 };
 pub use uefi_gop_framebuffer::*;
+pub use uefi_long_mode::*;
 
 pub use sovereign_multi_distro_bootloader::{
     BootloaderKind, FreeBsdLoaderConfig, LimineBootEntry, LimineConfig, OpenBsdBootConfig,

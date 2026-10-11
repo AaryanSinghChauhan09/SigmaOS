@@ -598,6 +598,13 @@ if [ -f "src/boot/grub_engine.rs" ]; then
     ./build/test_grub_engine
 fi
 
+if [ -f "src/boot/uefi_long_mode.rs" ]; then
+    echo "Running Sovereign UEFI Long Mode Boot & GOP Framebuffer test suite..."
+    mkdir -p build
+    rustc --test src/boot/uefi_long_mode.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_uefi_long_mode
+    ./build/test_uefi_long_mode
+fi
+
 if [ -f "src/distro/sovereign_linux_bsd_ecosystem_pinnacle_suite.rs" ]; then
     echo "Running Sovereign Linux & BSD Ecosystem Pinnacle Suite test suite..."
     mkdir -p build
