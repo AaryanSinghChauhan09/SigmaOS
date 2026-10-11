@@ -26,6 +26,7 @@ pub mod dashboard;
 pub mod desktop;
 pub mod development;
 pub mod device;
+pub use device::sovereign_device_management_inspirations_pr::*;
 pub mod diagnostics;
 pub use diagnostics::*;
 pub mod distro;
