@@ -73,4 +73,6 @@ wiki_repo/
 wiki/
 WIKI/
 !docs/*.md
+!docs/**/*.md
 !Agents/*.md
+!wiki/29-SigmaOS-System-Call-Plan.md
