@@ -1,0 +1,31 @@
+[rule.scheduler_completeness]
+requirement = "Scheduler defines run-queue, time-slice, priority, and fairness semantics."
+enforcement = "Scheduler tests + benchmarks"
+
+[rule.no_starvation]
+requirement = "Scheduler prevents starvation under nested priorities."
+enforcement = "Starvation regression tests"
+
+[rule.fairness_metric]
+requirement = "Scheduler defines and measures runnable-vs-waiting fairness."
+enforcement = "Scheduler benchmark"
+
+[rule.preemption_safety]
+requirement = "Preemption points define interrupt safety and context-switch restrictions."
+enforcement = "Scheduler tests"
+
+[rule.context_switch_integrity]
+requirement = "Context switch preserves registers, address space, and scheduler state."
+enforcement = "Context-switch tests"
+
+[rule.affinity_semantics]
+requirement = "CPU affinity defines legal migration and migration restrictions."
+enforcement = "Affinity tests"
+
+[rule.no_model_only_status]
+requirement = "Scheduler features cannot be marked complete from model tests alone."
+enforcement = "Status audit"
+
+[rule.runtime_evidence]
+requirement = "Boot-affecting scheduler changes require boot-to-shell or integration evidence."
+enforcement = "CI boot gate"
