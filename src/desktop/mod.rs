@@ -298,6 +298,11 @@ pub use crate::desktop::sovereign_navigation_engine::{
 
 pub use weather_panel::{WeatherCondition, WeatherData, WeatherForecast, WeatherPanel};
 pub mod compositor;
+pub use compositor::{
+    Compositor, DesktopEnvironment, InputEvent, InputEventType, Surface, SurfaceFormat,
+    Window, WindowAttributes, WindowState, WindowManager,
+    init_desktop_environment, get_desktop_environment,
+};
 pub mod launcher;
 pub mod shortcuts;
 pub use shortcuts::{
