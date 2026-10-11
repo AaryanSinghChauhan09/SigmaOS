@@ -483,7 +483,7 @@ impl ArchPacmanHookRunner {
     }
 }
 
-impl Default for ArchMkinitcpioGenerator {
+impl Default for ArchPacmanHookRunner {
     fn default() -> Self {
         Self::new()
     }
