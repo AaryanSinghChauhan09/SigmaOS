@@ -11,6 +11,7 @@ pub mod bootloader;
 pub mod bridge_grid;
 pub mod firmware;
 pub mod firmware_bridge;
+pub mod initramfs;
 pub mod multiboot2;
 pub mod optimization;
 pub mod pci;
@@ -23,6 +24,8 @@ pub mod sovereign_multi_distro_bootloader;
 pub mod uefi;
 pub mod uefi_gop_framebuffer;
 pub mod verified;
+
+pub use initramfs::*;
 
 pub use sigma_bootloader::{
     BootArch, BootMemoryMap, BootPlatform, FramebufferInfo, KernelCmdline, LiveEnvironmentConfig,
