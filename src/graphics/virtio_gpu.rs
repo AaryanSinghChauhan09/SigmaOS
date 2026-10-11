@@ -90,11 +90,19 @@ impl QemuVirtioGpuEngine {
         });
 
         self.is_initialized = true;
-        Ok(format!("VirtIO-GPU initialized primary scanout at {}x{}", width, height))
+        Ok(format!(
+            "VirtIO-GPU initialized primary scanout at {}x{}",
+            width, height
+        ))
     }
 
     /// Creates a 2D GPU hardware resource framebuffer
-    pub fn create_2d_resource(&mut self, width: u32, height: u32, format: VirtioGpuFormat) -> Result<u32, &'static str> {
+    pub fn create_2d_resource(
+        &mut self,
+        width: u32,
+        height: u32,
+        format: VirtioGpuFormat,
+    ) -> Result<u32, &'static str> {
         if !self.is_initialized {
             return Err("VirtIO-GPU engine not initialized");
         }
@@ -133,7 +141,11 @@ impl QemuVirtioGpuEngine {
     }
 
     /// Sets display scanout target to a created resource
-    pub fn set_scanout_resource(&mut self, scanout_id: u32, resource_id: u32) -> Result<(), &'static str> {
+    pub fn set_scanout_resource(
+        &mut self,
+        scanout_id: u32,
+        resource_id: u32,
+    ) -> Result<(), &'static str> {
         let scanout = self
             .scanouts
             .iter_mut()
@@ -149,7 +161,14 @@ impl QemuVirtioGpuEngine {
     }
 
     /// Flushes damaged framebuffer regions to host QEMU display window
-    pub fn flush_resource_to_host(&self, resource_id: u32, x: u32, y: u32, w: u32, h: u32) -> Result<String, &'static str> {
+    pub fn flush_resource_to_host(
+        &self,
+        resource_id: u32,
+        x: u32,
+        y: u32,
+        w: u32,
+        h: u32,
+    ) -> Result<String, &'static str> {
         let res = self
             .resources
             .iter()
@@ -182,13 +201,17 @@ mod tests {
         let mut gpu = QemuVirtioGpuEngine::new();
         assert!(gpu.initialize_hardware(1920, 1080).is_ok());
 
-        let res_id = gpu.create_2d_resource(1920, 1080, VirtioGpuFormat::B8G8R8A8Unorm).unwrap();
+        let res_id = gpu
+            .create_2d_resource(1920, 1080, VirtioGpuFormat::B8G8R8A8Unorm)
+            .unwrap();
         assert_eq!(res_id, 1);
 
         assert!(gpu.attach_resource_backing(res_id).is_ok());
         assert!(gpu.set_scanout_resource(0, res_id).is_ok());
 
-        let flush_res = gpu.flush_resource_to_host(res_id, 0, 0, 1920, 1080).unwrap();
+        let flush_res = gpu
+            .flush_resource_to_host(res_id, 0, 0, 1920, 1080)
+            .unwrap();
         assert!(flush_res.contains("Flushed Resource #1 Damage Region"));
     }
 }

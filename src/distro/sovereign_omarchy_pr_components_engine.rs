@@ -57,9 +57,24 @@ impl OmarchyDesktopHyprlandPrDeployer {
 
     fn stage_all_desktop_prs(&mut self) {
         let prs = [
-            ("omarchy-hyprland", "feat(omarchy): Hyprland 0.40+ dwindle tiling & MD3 animation curves", "hyprland_layout", 0x1E2F3A4B),
-            ("omarchy-quickshell", "feat(quickshell): Quickshell QML & Waybar JSON status applets", "quickshell_applets", 0x2F3A4B5C),
-            ("omarchy-wofi-walker", "feat(walker): Walker fuzzy application launcher & frecent search index", "walker_launcher", 0x3A4B5C6D),
+            (
+                "omarchy-hyprland",
+                "feat(omarchy): Hyprland 0.40+ dwindle tiling & MD3 animation curves",
+                "hyprland_layout",
+                0x1E2F3A4B,
+            ),
+            (
+                "omarchy-quickshell",
+                "feat(quickshell): Quickshell QML & Waybar JSON status applets",
+                "quickshell_applets",
+                0x2F3A4B5C,
+            ),
+            (
+                "omarchy-wofi-walker",
+                "feat(walker): Walker fuzzy application launcher & frecent search index",
+                "walker_launcher",
+                0x3A4B5C6D,
+            ),
         ];
 
         for (comp, title, target_sub, digest) in prs {
@@ -112,8 +127,18 @@ impl OmarchyNeovimGhosttyPrDeployer {
 
     fn stage_all_dev_prs(&mut self) {
         let prs = [
-            ("omarchy-neovim", "feat(neovim): Omakase Neovim preset with Treesitter & Mason LSP installer", "neovim_omakase", 0x4B5C6D7E),
-            ("omarchy-ghostty", "feat(terminal): Ghostty & Kitty GPU terminal config generator & font profiles", "terminal_font_studio", 0x5C6D7E8F),
+            (
+                "omarchy-neovim",
+                "feat(neovim): Omakase Neovim preset with Treesitter & Mason LSP installer",
+                "neovim_omakase",
+                0x4B5C6D7E,
+            ),
+            (
+                "omarchy-ghostty",
+                "feat(terminal): Ghostty & Kitty GPU terminal config generator & font profiles",
+                "terminal_font_studio",
+                0x5C6D7E8F,
+            ),
         ];
 
         for (comp, title, target_sub, digest) in prs {
@@ -166,8 +191,18 @@ impl OmarchyHerdrAiPrDeployer {
 
     fn stage_all_ai_prs(&mut self) {
         let prs = [
-            ("omarchy-herdr-ai", "feat(herdr): Herdr 10-provider multi-agent AI coding orchestrator", "herdr_multi_agent", 0x6D7E8F90),
-            ("omarchy-ai-hotkey", "feat(ai): Super+A instant AI panel & clipboard context inspection", "super_a_ai_hotkey", 0x7E8F90A1),
+            (
+                "omarchy-herdr-ai",
+                "feat(herdr): Herdr 10-provider multi-agent AI coding orchestrator",
+                "herdr_multi_agent",
+                0x6D7E8F90,
+            ),
+            (
+                "omarchy-ai-hotkey",
+                "feat(ai): Super+A instant AI panel & clipboard context inspection",
+                "super_a_ai_hotkey",
+                0x7E8F90A1,
+            ),
         ];
 
         for (comp, title, target_sub, digest) in prs {

@@ -358,7 +358,6 @@ mod tests {
         assert!(governor.is_governance_compliant());
     }
 
-
     #[test]
     fn test_wiki_data_transfer_engine() {
         let mut sync = WikiDataTransferEngine::new();
