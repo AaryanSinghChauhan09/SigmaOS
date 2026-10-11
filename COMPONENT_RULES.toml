@@ -1,0 +1,42 @@
+# COMPONENT_RULES.toml
+# SigmaOS Global Engineering & Component Quality Directives
+
+[rule.status_honesty]
+requirement = "No component or subsystem may be marked as complete or fully integrated without verified runtime, boot, or integration test evidence."
+enforcement = "CI status audit + mandatory review"
+remediation = "Downgrade component status in FEATURE_STATUS.toml and CAPABILITY_MATRIX.toml to partial or experimental until evidence is provided."
+
+[rule.test_minimum]
+requirement = "Every public behavior change, new syscall, driver capability, or bug fix must include positive-path and failure-path tests."
+enforcement = "PR checklist + CI unit test gate"
+remediation = "PRs lacking tests must be blocked or tagged with an explicit testing waiver approved by maintainers."
+
+[rule.no_silent_failure]
+requirement = "Errors must be strongly typed, propagated, logged via kernel/userland diagnostic mechanisms, or explicitly handled with error context."
+enforcement = "Clippy lint gates + code review"
+remediation = "Replace unhandled unwraps or silent ignores with typed Result error returns."
+
+[rule.unsafe_justification]
+requirement = "Every unsafe code block must include a explicit '// SAFETY:' comment documenting invariants, memory boundaries, and reviewer verification."
+enforcement = "Security CI workflow (`.github/workflows/security.yml`) + mandatory security maintainer review"
+remediation = "Unjustified unsafe blocks fail security CI."
+
+[rule.resource_limits]
+requirement = "Kernel and no_std paths must enforce explicit allocation, ring buffer, queue depth, and timeout limits to prevent resource exhaustion."
+enforcement = "Code review + stress/fuzz testing"
+remediation = "Clamp all variable inputs and buffer allocations to system bounds."
+
+[rule.security_review]
+requirement = "Changes affecting syscall dispatchers, capability validation, memory isolation, drivers, networking, or updates require security maintainer review."
+enforcement = "CODEOWNERS + workflow security label check"
+remediation = "PRs touching security-sensitive code require 2 maintainer approvals."
+
+[rule.destructive_operation_safety]
+requirement = "Installer, partition management, system updates, and filesystem mutations must support dry-run simulation, user confirmation, and recovery guidance."
+enforcement = "Installer safety test suite (`installer/tests/`)"
+remediation = "Destructive operations without dry-run flags or recovery documentation are release blockers."
+
+[rule.documentation_currency]
+requirement = "Documentation, FEATURE_STATUS.toml, and CAPABILITY_MATRIX.toml must accurately reflect currently implemented and verified code behavior."
+enforcement = "Biweekly documentation audit + CI documentation check workflow"
+remediation = "Discrepancies between documentation and code must be resolved in the same or follow-up PR."

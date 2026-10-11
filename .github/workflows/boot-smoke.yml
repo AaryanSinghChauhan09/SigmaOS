@@ -1,0 +1,45 @@
+name: Boot Smoke & QEMU Validation
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run nightly at 02:00 UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  boot-smoke-test:
+    name: QEMU x86_64 Boot Smoke Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      - name: Install QEMU and Python3 Dependencies
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y qemu-system-x86 python3
+
+      - name: Execute Boot Smoke Harness
+        run: |
+          mkdir -p build
+          chmod +x scripts/ci/qemu_boot_smoke.sh
+          ./scripts/ci/qemu_boot_smoke.sh
+
+      - name: Analyze Boot Markers
+        run: |
+          python3 tests/boot/boot_to_shell_test.py build/qemu_boot_smoke.log
+
+      - name: Upload Boot Log Artifact
+        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882  # v4.4.3
+        if: always()
+        with:
+          name: boot-smoke-log
+          path: build/qemu_boot_smoke.log
