@@ -22,6 +22,7 @@ pub mod system_monitor;
 pub mod task_manager;
 pub mod update_manager;
 pub mod user_manager;
+pub mod preload;
 
 // SigmaOS System Utilities Module
 // System-level utilities and tools
@@ -160,3 +161,7 @@ pub use omarchy_atreyu_system_plugin::*;
 pub mod omarchy_docker_rootless_engine;
 pub use omarchy_docker_rootless_engine::*;
 pub mod gamemode_daemon;
+pub use preload::{
+    PreloadEntry, PreloadManager,
+    init_preload_manager, get_preload_manager, add_common_preloads,
+};
