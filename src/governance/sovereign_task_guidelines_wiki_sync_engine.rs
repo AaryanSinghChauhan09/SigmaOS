@@ -176,6 +176,17 @@ impl WikiDataTransferEngine {
         );
 
         self.feature_specs.insert(
+            "SignalDevelopmentAndMaintenancePlan".to_string(),
+            FeatureMdStatus {
+                spec_name: "26-Signal-Development-And-Maintenance-Plan.md".to_string(),
+                source_path: "wiki/26-Signal-Development-And-Maintenance-Plan.md".to_string(),
+                is_fully_implemented: true,
+                completion_percentage: 100,
+                wiki_mirrored: true,
+            },
+        );
+
+        self.feature_specs.insert(
             "Roadmap11Deployment".to_string(),
             FeatureMdStatus {
                 spec_name: "11-Roadmap.md".to_string(),

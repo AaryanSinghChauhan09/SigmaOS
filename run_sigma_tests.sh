@@ -920,4 +920,11 @@ if [ -f "scripts/release_gate_mint_omarchy_migration.sh" ]; then
     ./scripts/release_gate_mint_omarchy_migration.sh
 fi
 
+if [ -f "src/signal/sovereign_signal_development_and_pr_suite.rs" ]; then
+    echo "Running Sovereign Signal Development and Parity PR Suite..."
+    mkdir -p build
+    rustc --test src/signal/sovereign_signal_development_and_pr_suite.rs --edition=2021 -o build/test_signal_pr_suite
+    ./build/test_signal_pr_suite
+fi
+
 echo "All SigmaOS test suites completed."
