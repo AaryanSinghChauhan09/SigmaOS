@@ -633,6 +633,27 @@ pub struct CachedPackageFile {
     pub file_size_bytes: u64,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PqcDilithiumKeySpec {
+    pub key_id: String,
+    pub owner_email: String,
+    pub is_trusted: bool,
+    pub dilithium_pubkey_hash: String,
+}
+
+pub struct ArchPacmanKeyringPqcEngine {
+    pub keys: BTreeMap<String, PqcDilithiumKeySpec>,
+}
+
+impl ArchPacmanCacheScrubber {
+    pub fn new(retain_keep_count: usize) -> Self {
+        Self {
+            cached_files: Vec::new(),
+            retain_keep_count,
+        }
+    }
+}
+
 pub struct ArchPacmanCacheScrubber {
     pub cached_files: Vec<CachedPackageFile>,
     pub retain_keep_count: usize,
