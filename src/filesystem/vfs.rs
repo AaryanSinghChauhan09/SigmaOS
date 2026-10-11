@@ -355,100 +355,78 @@ impl VirtualFileSystem {
         Ok(fd)
     }
 
-    pub fn close_file(&mut self, fd: u64) -> Result<(), FsError> {
-        if !self.file_descriptors.contains_key(&fd) {
-            return Err(FsError::InvalidFd);
+    pub fn close(&mut self, fd: i32) -> Result<(), VfsError> {
+        if let Some(pos) = self.open_files.iter().position(|h| h.fd == fd) {
+            self.open_files.remove(pos);
+            Ok(())
+        } else {
+            Err(VfsError::BadFileDescriptor)
         }
+    }
 
-        self.file_descriptors.remove(&fd);
-        Ok(())
+    pub fn close_file(&mut self, fd: u64) -> Result<(), FsError> {
+        let fd_i32 = fd as i32;
+        if let Some(pos) = self.open_files.iter().position(|h| h.fd == fd_i32) {
+            self.open_files.remove(pos);
+            Ok(())
+        } else {
+            Err(FsError::InvalidFd)
+        }
     }
 
     pub fn read_file(&mut self, fd: u64, buffer: &mut [u8]) -> Result<usize, FsError> {
-        let file_descriptor = self
-            .file_descriptors
-            .get_mut(&fd)
+        let fd_i32 = fd as i32;
+        let handle = self
+            .open_files
+            .iter_mut()
+            .find(|h| h.fd == fd_i32)
             .ok_or(FsError::InvalidFd)?;
 
         let inode = self
             .inodes
-            .get(&file_descriptor.inode_id)
+            .get(&handle.inode_number)
             .ok_or(FsError::NotFound)?;
 
-        // Check read permission
-        if !inode.permissions.read {
-            return Err(FsError::PermissionDenied);
-        }
-
-        // Check file offset and file size
-        if file_descriptor.offset >= inode.size {
+        if handle.position >= inode.size {
             return Ok(0);
         }
 
-        let remaining = (inode.size - file_descriptor.offset) as usize;
+        let remaining = (inode.size - handle.position) as usize;
         let bytes_to_read = buffer.len().min(remaining);
 
-        // Prevent integer overflow in offset calculation
-        let _new_offset = file_descriptor
-            .offset
-            .checked_add(bytes_to_read as u64)
-            .ok_or(FsError::InvalidFd)?;
-
-        // Read the actual bytes from storage data
-        let start = file_descriptor.offset as usize;
+        let start = handle.position as usize;
         let end = start + bytes_to_read;
-        buffer[..bytes_to_read].copy_from_slice(&inode.data[start..end]);
+        if end <= inode.data.len() {
+            buffer[..bytes_to_read].copy_from_slice(&inode.data[start..end]);
+        }
 
-        file_descriptor.offset += bytes_to_read as u64;
+        handle.position += bytes_to_read as u64;
         Ok(bytes_to_read)
     }
 
     pub fn write_file(&mut self, fd: u64, buffer: &[u8]) -> Result<usize, FsError> {
-        let file_descriptor = self
-            .file_descriptors
-            .get_mut(&fd)
+        let fd_i32 = fd as i32;
+        let handle = self
+            .open_files
+            .iter_mut()
+            .find(|h| h.fd == fd_i32)
             .ok_or(FsError::InvalidFd)?;
 
         let inode = self
             .inodes
-            .get_mut(&file_descriptor.inode_id)
+            .get_mut(&handle.inode_number)
             .ok_or(FsError::NotFound)?;
 
-        // Check write permission
-        if !inode.permissions.write {
-            return Err(FsError::PermissionDenied);
+        let start = handle.position as usize;
+        if start + buffer.len() > inode.data.len() {
+            inode.data.resize(start + buffer.len(), 0);
         }
-
-        // If open flag O_APPEND is set, offset is moved to the end of the file before each write
-        if (file_descriptor.flags & O_APPEND) != 0 {
-            file_descriptor.offset = inode.size;
+        inode.data[start..start + buffer.len()].copy_from_slice(buffer);
+        handle.position += buffer.len() as u64;
+        if handle.position > inode.size {
+            inode.size = handle.position;
         }
-
-        // Prevent integer overflow in size and offset calculation
-        let _new_size = inode
-            .size
-            .checked_add(buffer.len() as u64)
-            .ok_or(FsError::NoSpace)?;
-
-        let new_offset = file_descriptor
-            .offset
-            .checked_add(buffer.len() as u64)
-            .ok_or(FsError::NoSpace)?;
-
-        // Resize storage data buffer if offset + written bytes exceeds size (handling holes)
-        if new_offset > inode.size {
-            inode.data.resize(new_offset as usize, 0);
-            inode.size = new_offset;
-        }
-
-        // Write the actual bytes into file storage data
-        let start = file_descriptor.offset as usize;
-        let end = start + buffer.len();
-        inode.data[start..end].copy_from_slice(buffer);
-
-        file_descriptor.offset = new_offset;
-        inode.modified = 1716000000; // Simulated timestamp
-
+        inode.modified = 1716000000;
         Ok(buffer.len())
     }
 

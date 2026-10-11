@@ -60,9 +60,11 @@ pub mod vec {
 
 // Re-exports
 pub use arc::Arc;
+pub use btreemap::BTreeMap;
 pub use custom_string::SigmaString;
 pub use linked_list::{LinkedList, SList};
 pub use ring_buffer::{HeapRingBuffer, RingBuffer};
+pub use sigmalib::ZeroDependencyPrimitiveHub;
 pub use slab::{SlabCache, TypedSlabCache};
 pub use uuid::Uuid;
 

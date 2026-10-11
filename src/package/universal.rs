@@ -10,13 +10,13 @@ use alloc::vec::Vec;
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
 
+use alloc::sync::Arc;
+
 #[cfg(not(any(feature = "standalone_test", test)))]
-use crate::klib::{Arc, HashMap, HashSet};
+use crate::klib::{HashMap, HashSet};
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::{HashMap, HashSet};
-#[cfg(any(feature = "standalone_test", test))]
-use std::sync::Arc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
 use crate::runtime::node_distribution::{

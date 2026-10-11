@@ -1,6 +1,20 @@
 //! SigmaLib - Custom Standard Library (musl/dietlibc Inspiration)
 //! Zero-dependency implementation of standard library functions
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ZeroDependencyPrimitiveHub;
+
+impl ZeroDependencyPrimitiveHub {
+    pub fn fnv1a_hash_64(bytes: &[u8]) -> u64 {
+        let mut hash: u64 = 0xcbf29ce484222325;
+        for &byte in bytes {
+            hash ^= byte as u64;
+            hash = hash.wrapping_mul(0x100000001b3);
+        }
+        hash
+    }
+}
+
 /// String operations (zero-allocation)
 pub mod string {
     /// Calculate string length

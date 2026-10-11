@@ -509,176 +509,6 @@ impl Default for CronJobScheduler {
     }
 }
 
-// ============================================================================
-// 7. Encrypted DNS-over-TLS & DNSSEC Resolver Engine (systemd-resolved / Unbound)
-// ============================================================================
-
-#[derive(Debug, Clone)]
-pub struct DnsRecordEntry {
-    pub domain_name: &'static str,
-    pub ip_address: [u8; 4],
-    pub ttl_seconds: u32,
-    pub dnssec_validated: bool,
-}
-
-#[derive(Debug)]
-pub struct SovereignDnsTlsResolverEngine {
-    pub upstream_dot_server: [u8; 4], // e.g. 1.1.1.1
-    pub dot_port: u16,                // 853
-    pub local_cache: Vec<DnsRecordEntry>,
-    pub dnssec_enforced: bool,
-}
-
-impl SovereignDnsTlsResolverEngine {
-    pub fn lookup_modprobe_alias(&self, alias: &str) -> Option<&'static str> {
-        match alias {
-            "char-major-10-200" => Some("tun"),
-            "net-pf-10" => Some("ipv6"),
-            "block-major-8-0" => Some("sda"),
-            _ => None,
-        }
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DeviceNodeType {
-    CharacterDevice,
-    BlockDevice,
-    Fifo,
-    Socket,
-}
-
-#[derive(Debug, Clone)]
-pub struct DeviceNodeEntry {
-    pub name: String,
-    pub node_type: DeviceNodeType,
-    pub major: u32,
-    pub minor: u32,
-    pub symlink_paths: Vec<String>,
-}
-
-pub struct SovereignDynamicDevfsEngine {
-    pub nodes: Vec<DeviceNodeEntry>,
-}
-
-impl SovereignDynamicDevfsEngine {
-    pub fn new() -> Self {
-        Self { nodes: Vec::new() }
-    }
-
-    pub fn register_device_node(&mut self, name: &str, node_type: DeviceNodeType, major: u32, minor: u32) {
-        self.nodes.push(DeviceNodeEntry {
-            name: name.to_string(),
-            node_type,
-            major,
-            minor,
-            symlink_paths: Vec::new(),
-        });
-    }
-}
-
-impl Default for SovereignDynamicDevfsEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum NatType {
-    Snat,
-    Dnat,
-    Masquerade,
-}
-
-#[derive(Debug, Clone)]
-pub struct ConntrackTableEntry {
-    pub original_src: [u8; 4],
-    pub original_dst: [u8; 4],
-    pub src_port: u16,
-    pub dst_port: u16,
-    pub translated_ip: [u8; 4],
-    pub translated_port: u16,
-    pub nat_type: NatType,
-    pub packets_counter: u64,
-}
-
-pub struct SovereignStatefulNatEngine {
-    pub public_ip: [u8; 4],
-    pub conntrack_table: Vec<ConntrackTableEntry>,
-}
-
-impl SovereignStatefulNatEngine {
-    pub fn new(public_ip: [u8; 4]) -> Self {
-        Self {
-            public_ip,
-            conntrack_table: Vec::new(),
-        }
-    }
-
-    pub fn create_snat_mapping(
-        &mut self,
-        internal_src: [u8; 4],
-        dst_ip: [u8; 4],
-        src_port: u16,
-        dst_port: u16,
-        protocol: u8,
-    ) -> ([u8; 4], u16) {
-        let _ = protocol;
-        if let Some(conn) = self.conntrack_table.iter_mut().find(|c| {
-            c.original_src == internal_src
-                && c.src_port == src_port
-                && c.original_dst == dst_ip
-                && c.dst_port == dst_port
-        }) {
-            conn.packets_counter += 1;
-        } else {
-            self.conntrack_table.push(ConntrackTableEntry {
-                original_src: internal_src,
-                original_dst: dst_ip,
-                src_port,
-                dst_port,
-                translated_ip: self.public_ip,
-                translated_port: src_port,
-                nat_type: NatType::Snat,
-                packets_counter: 1,
-            });
-        }
-        (self.public_ip, src_port)
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct JournaldLogRecord {
-    pub timestamp_epoch_ms: u64,
-    pub identifier: String,
-    pub message: String,
-    pub priority: u8,
-}
-
-pub struct SovereignJournaldBinaryStorageEngine {
-    pub log_records: Vec<JournaldLogRecord>,
-}
-
-impl SovereignJournaldBinaryStorageEngine {
-    pub fn new() -> Self {
-        Self { log_records: Vec::new() }
-    }
-
-    pub fn append_log(&mut self, identifier: &str, message: &str, priority: u8) {
-        self.log_records.push(JournaldLogRecord {
-            timestamp_epoch_ms: 1000,
-            identifier: identifier.to_string(),
-            message: message.to_string(),
-            priority,
-        });
-    }
-}
-
-impl Default for SovereignJournaldBinaryStorageEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
 
 #[derive(Debug, Clone)]
 pub struct DnsRecordEntry {
@@ -800,6 +630,13 @@ impl Default for SovereignDynamicDevfsEngine {
 // ============================================================================
 // 9. Stateful NAT & Connection Tracking Engine (OpenBSD PF / Linux conntrack)
 // ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NatType {
+    Snat,
+    Dnat,
+    Masquerade,
+}
 
 #[derive(Debug, Clone)]
 pub struct ConntrackTableEntry {
@@ -1066,44 +903,44 @@ impl Default for SovereignMasterDistroEcosystemEngine {
 
 #[derive(Debug, Clone)]
 pub struct JournaldLogRecord {
-    pub timestamp_unix_epoch: u64,
+    pub timestamp_epoch_ms: u64,
     pub priority: u8, // 0=Emergency, 3=Error, 6=Info
-    pub unit_name: &'static str,
-    pub message: &'static str,
+    pub identifier: &'static str,
+    pub message: String,
 }
 
 #[derive(Debug)]
 pub struct SovereignJournaldBinaryStorageEngine {
-    pub logs: Vec<JournaldLogRecord>,
+    pub log_records: Vec<JournaldLogRecord>,
     pub max_logs_capacity: usize,
 }
 
 impl SovereignJournaldBinaryStorageEngine {
     pub fn new(capacity: usize) -> Self {
         Self {
-            logs: Vec::new(),
+            log_records: Vec::new(),
             max_logs_capacity: capacity,
         }
     }
 
     pub fn log(&mut self, timestamp: u64, priority: u8, unit: &'static str, msg: &'static str) {
-        if self.logs.len() >= self.max_logs_capacity {
-            self.logs.remove(0); // Journal rotation
+        if self.log_records.len() >= self.max_logs_capacity {
+            self.log_records.remove(0); // Journal rotation
         }
-        self.logs.push(JournaldLogRecord {
-            timestamp_unix_epoch: timestamp,
+        self.log_records.push(JournaldLogRecord {
+            timestamp_epoch_ms: timestamp,
             priority,
-            unit_name: unit,
+            identifier: unit,
             message: msg.to_string(),
         });
     }
 
     pub fn query_unit(&self, unit: &str) -> Vec<&JournaldLogRecord> {
-        self.logs.iter().filter(|l| l.unit_name == unit).collect()
+        self.log_records.iter().filter(|l| l.identifier == unit).collect()
     }
 
     pub fn query_priority(&self, min_priority: u8) -> Vec<&JournaldLogRecord> {
-        self.logs.iter().filter(|l| l.priority <= min_priority).collect()
+        self.log_records.iter().filter(|l| l.priority <= min_priority).collect()
     }
 }
 
