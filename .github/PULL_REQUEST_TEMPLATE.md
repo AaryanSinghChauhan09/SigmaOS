@@ -8,30 +8,42 @@ Closes #<issue-id>
 
 ## Component
 
-<!-- kernel, memory, VFS, IPC, security, drivers, packaging, desktop, installer, etc. -->
+- [ ] IPC handler
+- [ ] Pipes / FIFOs
+- [ ] UNIX-domain sockets
+- [ ] Shared memory
+- [ ] Message queues
+- [ ] Event wakeups
+- [ ] Signals
+- [ ] Process/thread management
+- [ ] VFS
+- [ ] Security
+- [ ] Documentation
+- [ ] CI / tooling
 
-## Upstream study
+## Upstream study / Motivation
 
-- Project:
-- Version/commit:
-- Research note:
-- ADR:
+- Project / Reference:
+- Research note / ADR:
 
-## Component rules added or enforced
+## IPC & Subsystem Semantics
 
-- [ ] New rule
-- [ ] Existing rule enforced
-- [ ] Rule test added
-- [ ] CI gate added
-- [ ] Documentation updated
+- Blocking behavior:
+- Non-blocking behavior:
+- EOF / closure behavior:
+- Error behavior:
+- Permission model:
+- Resource limits:
+- Backpressure policy:
 
-## What SigmaOS adopts
+## Security review
 
-<!-- State the upstream principle or mechanism adopted. -->
-
-## What SigmaOS changes or rejects
-
-<!-- State simplifications, deviations, and rejected ideas. -->
+- [ ] User input validated
+- [ ] Descriptor lifecycle checked
+- [ ] Capability/namespace checks enforced
+- [ ] No unbounded kernel allocation
+- [ ] `unsafe` justified with SAFETY comments
+- [ ] Threat model updated
 
 ## Component impact
 
@@ -40,16 +52,15 @@ Closes #<issue-id>
 - Maturity after:
 - Runtime path affected:
 
-## Changes
+## Tests
 
-- [ ] Source implementation
 - [ ] Unit tests
 - [ ] Integration tests
-- [ ] QEMU/runtime test
-- [ ] Documentation
-- [ ] Capability/status update
-- [ ] Regression protection
-- [ ] Security review, if applicable
+- [ ] Concurrency/stress tests
+- [ ] Timeout tests
+- [ ] Fuzz tests
+- [ ] Resource-exhaustion tests
+- [ ] Regression test attached for fixed bug
 
 ## Verification
 
@@ -57,26 +68,23 @@ Closes #<issue-id>
 cargo check --lib
 cargo test --lib
 ./run_sigma_tests.sh
-make check
-make test
-make format
 ```
 
-## Runtime evidence
+Paste output below.
 
-- [ ] QEMU boot log
-- [ ] Installer/update test log
-- [ ] Package dry-run report
-- [ ] Hardware test log, if applicable
-- [ ] Artifact hash
+## Capability status
 
-## Safety and rollback
+- Previous status:
+- New status:
+- Evidence:
 
-- [ ] No broad credentials or host access introduced
-- [ ] Untrusted input is validated
-- [ ] Package scripts are sandboxed, if applicable
-- [ ] Rollback/recovery behavior defined
-- [ ] Security review completed, if applicable
+## Integration impact
+
+- [ ] Unit-tested only
+- [ ] Connected to runtime path
+- [ ] Boot path validated
+- [ ] Installer/update path validated
+- [ ] Hardware tested
 
 ## Reviewer checklist
 
