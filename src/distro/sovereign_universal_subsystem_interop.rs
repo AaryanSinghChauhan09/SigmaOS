@@ -28,6 +28,8 @@ pub enum UniversalSubsystemCategory {
     I18nLocalization,
     MediaGraphics,
     CompilerToolchain,
+    AiWorkflowAgent,
+    VirtualizationHypervisor,
     AutomationProvisioning,
     SystemAudit,
 }
@@ -54,6 +56,8 @@ impl UniversalSubsystemCategory {
             Self::I18nLocalization => "I18nLocalization",
             Self::MediaGraphics => "MediaGraphics",
             Self::CompilerToolchain => "CompilerToolchain",
+            Self::AiWorkflowAgent => "AiWorkflowAgent",
+            Self::VirtualizationHypervisor => "VirtualizationHypervisor",
             Self::AutomationProvisioning => "AutomationProvisioning",
             Self::SystemAudit => "SystemAudit",
         }

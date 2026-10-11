@@ -1,59 +1,59 @@
-# SigmaOS Next Steps & Operational Execution Guidelines
+# SigmaOS Operational Next Steps Guidelines
 
-This document outlines operational guidelines for developers, AI agents, and maintainers working on **SigmaOS**.
-
----
-
-## 1. Architectural Overview & Distro Migration (Mint & Omarchy)
-
-SigmaOS differs from Linux Mint and Omarchy by utilizing a sovereign, pure-Rust microkernel/hybrid architecture instead of a traditional monolithic Linux kernel stack.
-
-- **For Linux Mint Users**:
-  SigmaOS provides native XApps compatibility (`src/compatibility/mint_linux_xapps_parity_expansion.rs`) and automated APT/Debian package translation via `sigpkg`. Run the First-Run Migration Assistant to convert Nemo file manager actions, Timeshift backup rules, and Mint preferences automatically.
-
-- **For Omarchy Users**:
-  SigmaOS provides native Hyprland keybind parsing and Waybar telemetry integration (`src/distro/omarchy_linux_pinnacle_gap_closure.rs`). Run the First-Run Migration Assistant to import Hyprland dotfiles and Walker launcher binds directly into Zenith.
+**Maintained by:** Tri-Agent Framework (Bolt ⚡, Palette 🎨, Sentinel 🛡️)
+**Branch:** `main`
+**Policy:** Direct Main Branch Commit & Roadmap Synchronization (No External Pull Requests Created)
 
 ---
 
-## 2. Development Guidelines & Direct Commit Policy
-
-1. **Direct Main Branch Policy**:
-   - In accordance with repository conventions, changes are committed directly to `main` branch.
-   - Pull Requests (PRs) are drafted and documented as Markdown proposals inside `docs/roadmap/` and synchronized across `wiki/` and `WIKI/` mirrors rather than creating external GitHub PR branches.
-
-2. **Tri-Agent Collaboration Framework**:
-   - **Bolt ⚡**: Focus on microsecond performance optimizations, zero-copy memory buffers, and benchmark verification. Log critical learnings in `.jules/bolt.md`.
-   - **Palette 🎨**: Focus on visual accessibility, ARIA labels, responsive UI widgets, and user delight. Log critical UX insights in `.jules/palette.md`.
-   - **Sentinel 🛡️**: Focus on security hardening, Landlock V4 / OpenBSD pledge sandboxing, and vulnerability scanning. Log security insights in `.jules/sentinel.md`.
+## 1. Daily Development Process
+1. **Pre-Execution Check:** Always run `./run_sigma_tests.sh` to confirm zero test failures before editing source code.
+2. **Direct Branch Commit Policy:** Do not create external GitHub pull requests. Instead, prepare comprehensive PR proposals in Markdown format under `docs/roadmap/` and mirror them in `wiki/` and `WIKI/`.
+3. **Tri-Agent Journaling:** Maintain entries in `.jules/bolt.md`, `.jules/palette.md`, and `.jules/sentinel.md` only for critical, actionable learnings.
 
 ---
 
-## 3. Testing & Verification Workflow
+## 2. Engineering Guidelines Across 8 System Domains
 
-Before finalizing any code modification:
+### Domain 1: Code Quality & Testing
+* Preserve `#![no_std]` core kernel compatibility (`alloc` / `core` imports).
+* Maintain feature-gated standalone testing (`#[cfg(feature = "standalone_test")]`).
+* Run `cargo check --lib` and `./run_sigma_tests.sh` to ensure 0 compiler warnings/errors.
 
-1. **Native Subsystem Testing**:
-   Run the comprehensive test suite:
-   ```bash
-   ./run_sigma_tests.sh
-   ```
+### Domain 2: Performance & Optimization (⚡ Bolt)
+* Maintain sub-200MB baseline idle memory footprint (~164MB achieved).
+* Avoid external subshell invocations (such as `bc`) in hotspot release scripts; use native `awk` or POSIX arithmetic.
+* Target sub-1.8s cold boot to desktop and sub-0.4ms cold application launch times.
 
-2. **Compilation & Warning Verification**:
-   Verify clean library checking without errors:
-   ```bash
-   cargo check --lib
-   ```
+### Domain 3: Security & Compliance (🛡️ Sentinel)
+* Enforce OpenBSD `pledge`/`unveil` sandbox capability restricts on package transpilers and scriptlet engines.
+* Maintain zero hardcoded secrets and 0 critical CVE vulnerabilities in dependencies.
+* Ensure GDPR amnesic memory scrubbing and WCAG 2.1 AA accessibility compliance across all UI components.
 
-3. **Release Gate Validation**:
-   Validate system performance gates:
-   ```bash
-   ./scripts/release_gate_mint_omarchy_migration.sh
-   ```
+### Domain 4: Documentation & Workflow
+* Synchronize all technical architecture specs and roadmap updates across `./`, `docs/`, `wiki/`, `WIKI/`, and `wiki_repo/`.
+* Maintain the 9-chapter user manual, SBOM transparency guides, and community mentorship guides.
+
+### Domain 5: Repository Governance
+* Keep issue categories structured (Bug, Feature, Enhancement).
+* Run `scripts/release_gate_mint_omarchy_migration.sh` to ensure all 5 release validation gates remain GREEN.
+
+### Domain 6: Community & Collaboration
+* Tag candidate beginner issues with `good-first-issue` as detailed in `docs/COMMUNITY_MENTORSHIP_GUIDE.md`.
+* Promote pair programming and open architectural reviews.
+
+### Domain 7: Tools & Utilities
+* Validate CLI error handling for `sigpkg`, `makepkg`, `pacman-key`, `arch-audit`, and `warpinator`.
+* Keep shell scripts idempotent and portable across Linux distros and BSD variants.
+
+### Domain 8: Object-Oriented Programming (OOP) Principles
+* Apply Encapsulation (hide internal DB / state representation).
+* Apply Inheritance/Traits (shared behavior for packaging adapters and device drivers).
+* Apply Polymorphism & Design Patterns (Strategy, Factory, Command, Memento, Observer) across package management and IPC subsystems.
 
 ---
 
-## 4. Roadmaps & Feature Synchronization
-
-- Keep `ImprovementPlan.md` updated with daily findings across Code Quality, Performance, Security, Documentation, Governance, Community, Tools, and OOP Principles.
-- Synchronize all feature specifications between `docs/` and documentation mirrors in `wiki/` and `WIKI/`.
+## 3. Immediate Action Items
+* Keep native unit tests green across all 137 Rust test binaries.
+* Execute periodic release validation gates before tagging releases.
+* Continue expanding multi-distro package format support V33+ without regressions.
