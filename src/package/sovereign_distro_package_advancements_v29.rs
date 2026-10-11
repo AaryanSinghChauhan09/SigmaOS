@@ -461,7 +461,6 @@ impl UniversalBootEnvSnapshotGovernorV29 {
             backend,
             active_packages,
         });
-
         id
     }
 
