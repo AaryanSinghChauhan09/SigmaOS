@@ -134,6 +134,7 @@ pub use distro::sovereign_2075_distro_supremacy_engine::*;
 pub use distro::sovereign_linux_bsd_all_subsystems_harmony::*;
 pub use distro::sovereign_linux_bsd_master_synthesis::*;
 pub use distro::sovereign_linux_bsd_ecosystem_parity_v42_pr::*;
+pub use distro::arch_linux_ecosystem_parity_v43_pr::*;
 pub use distro::sovereign_linux_bsd_pinnacle_innovations_v14::*;
 pub use distro::sovereign_media_and_distro_unimplemented_innovations::*;
 pub use distro::sovereign_mint_omarchy_apex_dominance_v30::*;
