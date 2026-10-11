@@ -43,6 +43,7 @@ pub mod filesystem;
 pub mod futuristic_modules;
 pub mod governance;
 pub mod gpu;
+pub mod gaming;
 pub mod kernel;
 pub mod klib;
 pub mod memory;
