@@ -73,4 +73,7 @@ wiki_repo/
 wiki/
 WIKI/
 !docs/*.md
+!docs/**/*.md
 !Agents/*.md
+!.github/*.md
+!.github/**/*.md
