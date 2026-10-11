@@ -73,13 +73,7 @@ impl IRQController {
         IRQController {
             controller_type,
             irq_count: AtomicUsize::new(0),
-            handlers: {
-                let mut arr = [AtomicPtr::new(core::ptr::null_mut()); 256];
-                for i in 0..256 {
-                    arr[i] = AtomicPtr::new(core::ptr::null_mut());
-                }
-                arr
-            },
+            handlers: core::array::from_fn(|_| AtomicPtr::new(core::ptr::null_mut())),
             spurious_count: AtomicUsize::new(0),
         }
     }
