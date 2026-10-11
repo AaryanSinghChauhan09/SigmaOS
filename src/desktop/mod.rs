@@ -374,4 +374,6 @@ pub mod workspace;
 pub mod x11_desktop_environment;
 pub mod xfce_engine;
 pub mod zenith;
+pub mod sovereign_gui_development_and_pr_suite;
+pub use sovereign_gui_development_and_pr_suite::*;
 pub mod zenith_advanced_features;

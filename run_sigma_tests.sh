@@ -1060,4 +1060,11 @@ if [ -f "src/kernel/sovereign_kernel_signal_interruption_suite.rs" ]; then
     ./build/test_kernel_signal_interruption
 fi
 
+if [ -f "src/desktop/sovereign_gui_development_and_pr_suite.rs" ]; then
+    echo "Running Sovereign GUI Development and PR Gateway Suite..."
+    mkdir -p build
+    rustc --test src/desktop/sovereign_gui_development_and_pr_suite.rs --edition=2021 -o build/test_gui_pr_suite
+    ./build/test_gui_pr_suite
+fi
+
 echo "All SigmaOS test suites completed."
