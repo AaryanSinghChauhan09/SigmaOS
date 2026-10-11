@@ -297,6 +297,11 @@ impl WikiDataTransferEngine {
             "Open Source OS Missing Components V45 PR",
             true,
         );
+        self.register_spec_file(
+            "30-Bare-Metal-Start-Assembly-Entry-PR.md",
+            "Bare Metal Start Assembly Entry PR",
+            true,
+        );
     }
 
     pub fn register_spec_file(&mut self, filename: &str, title: &str, fully_implemented: bool) {

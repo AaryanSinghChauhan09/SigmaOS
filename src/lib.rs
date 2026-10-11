@@ -173,6 +173,7 @@ pub mod backup;
 pub mod bluetooth;
 pub mod boot;
 pub use boot::*;
+pub use boot::start_assembly_entry::*;
 pub mod toolchain {
     pub mod adapter;
     pub mod bootstrap;

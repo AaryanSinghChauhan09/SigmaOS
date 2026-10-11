@@ -224,6 +224,12 @@ impl SovereignLinuxBsdWikiRoadmapParityEngine {
                 "src/distro/open_source_os_missing_components_v45_pr.rs",
                 "Open Source OS Missing Components V45 PR",
             ),
+            (
+                30,
+                "Bare Metal x86_64 Start Assembly Entry PR",
+                "src/boot/start_assembly_entry.rs",
+                "Bare Metal Start Assembly Entry PR",
+            ),
         ];
 
         for (id, title, module, _spec) in default_ideas {
@@ -353,8 +359,8 @@ mod tests {
     #[test]
     fn test_wiki_roadmap_parity_engine() {
         let engine = SovereignLinuxBsdWikiRoadmapParityEngine::new();
-        assert_eq!(engine.total_ideas_count, 29);
-        assert_eq!(engine.implemented_ideas_count(), 29);
+        assert_eq!(engine.total_ideas_count, 30);
+        assert_eq!(engine.implemented_ideas_count(), 30);
         assert_eq!(engine.verification_percentage(), 100.0);
     }
 
