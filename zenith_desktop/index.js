@@ -564,8 +564,13 @@ export function initEscapeKeyDismissal() {
       }
       const contextMenu = document.getElementById("context-menu");
       if (contextMenu) {
+        const wasVisible = contextMenu.style.display === "block" || contextMenu.getAttribute("aria-hidden") === "false";
         contextMenu.style.display = "none";
         contextMenu.setAttribute("aria-hidden", "true");
+        if (wasVisible && contextLastFocusedElement && typeof contextLastFocusedElement.focus === "function") {
+          contextLastFocusedElement.focus();
+          contextLastFocusedElement = null;
+        }
       }
       const helpOverlay = document.getElementById("help-overlay");
       if (helpOverlay) {
@@ -586,6 +591,8 @@ const CONTEXT_MESSAGES = {
   cleanup: "🧹 System caches purged (128 MB reclaimed).",
   audit: "🛡️ System security attestation verified: Kyber-1024.",
 };
+
+let contextLastFocusedElement = null;
 
 /**
  * Displays an accessible, transient toast notification with role="status" and aria-live="polite".
@@ -617,7 +624,7 @@ export function showToast(message, duration = 3000) {
 
 /**
  * Initializes desktop right-click context menu positioning, viewport boundary calculations,
- * and WAI-ARIA accessibility state synchronization (aria-hidden, auto-focus).
+ * and WAI-ARIA accessibility state synchronization (aria-hidden, auto-focus, keyboard focus restoration).
  */
 export function initContextMenu() {
   if (typeof window === "undefined" || typeof document === "undefined") return;
@@ -626,8 +633,13 @@ export function initContextMenu() {
     window.contextAction = function (action) {
       const contextMenu = document.getElementById("context-menu");
       if (contextMenu) {
+        const wasVisible = contextMenu.style.display === "block" || contextMenu.getAttribute("aria-hidden") === "false";
         contextMenu.style.display = "none";
         contextMenu.setAttribute("aria-hidden", "true");
+        if (wasVisible && contextLastFocusedElement && typeof contextLastFocusedElement.focus === "function") {
+          contextLastFocusedElement.focus();
+          contextLastFocusedElement = null;
+        }
       }
       if (action && CONTEXT_MESSAGES[action]) {
         showToast(CONTEXT_MESSAGES[action]);
@@ -645,6 +657,9 @@ export function initContextMenu() {
     }
 
     event.preventDefault();
+    if (typeof document !== "undefined" && document.activeElement) {
+      contextLastFocusedElement = document.activeElement;
+    }
 
     contextMenu.style.display = "block";
     contextMenu.setAttribute("aria-hidden", "false");
@@ -669,6 +684,10 @@ export function initContextMenu() {
       if (!contextMenu.contains(event.target)) {
         contextMenu.style.display = "none";
         contextMenu.setAttribute("aria-hidden", "true");
+        if (contextLastFocusedElement && typeof contextLastFocusedElement.focus === "function") {
+          contextLastFocusedElement.focus();
+          contextLastFocusedElement = null;
+        }
       }
     }
   });

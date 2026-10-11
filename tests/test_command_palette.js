@@ -53,6 +53,8 @@ function createMockElement(id, tag = "div") {
   return el;
 }
 
+global.window = globalThis;
+
 const docListeners = {};
 global.document = {
   readyState: "complete",
