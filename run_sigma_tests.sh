@@ -121,6 +121,13 @@ if [ -f "src/distro/linux_bsd_ultimate_synthesis.rs" ]; then
     ./build/linux_bsd_ultimate_synthesis_test
 fi
 
+if [ -f "src/distro/sovereign_distro_outpacing_engine.rs" ]; then
+    echo "Running Sovereign Distro Outpacing Engine test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_distro_outpacing_engine.rs --edition=2021 -o build/test_outpacing
+    ./build/test_outpacing
+fi
+
 if [ -f "src/distro/sovereign_2026_distro_leap_engine.rs" ]; then
     echo "Running 2026 Distro Leap test suite..."
     mkdir -p build
