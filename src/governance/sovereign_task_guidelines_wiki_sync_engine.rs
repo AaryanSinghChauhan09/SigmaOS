@@ -176,17 +176,6 @@ impl WikiDataTransferEngine {
         );
 
         self.feature_specs.insert(
-            "ArchLinuxGapClosureV43Pr".to_string(),
-            FeatureMdStatus {
-                spec_name: "27-Arch-Linux-Gap-Closure-V43-PR.md".to_string(),
-                source_path: "wiki/27-Arch-Linux-Gap-Closure-V43-PR.md".to_string(),
-                is_fully_implemented: true,
-                completion_percentage: 100,
-                wiki_mirrored: true,
-            },
-        );
-
-        self.feature_specs.insert(
             "Roadmap11Deployment".to_string(),
             FeatureMdStatus {
                 spec_name: "11-Roadmap.md".to_string(),
@@ -257,17 +246,6 @@ impl WikiDataTransferEngine {
             },
         );
 
-        self.feature_specs.insert(
-            "SystemUtilitiesDevelopmentPlan".to_string(),
-            FeatureMdStatus {
-                spec_name: "26-System-Utilities-Development-Plan.md".to_string(),
-                source_path: "wiki/26-System-Utilities-Development-Plan.md".to_string(),
-                is_fully_implemented: true,
-                completion_percentage: 100,
-                wiki_mirrored: true,
-            },
-        );
-
         self.register_spec_file("UniversalPackageSystem", "Universal Package System", true);
         self.register_spec_file("Roadmap11Deployment", "Roadmap 11 Deployment", true);
         self.register_spec_file("ROADMAP.md", "SigmaOS Master Development Roadmap", true);
@@ -280,16 +258,6 @@ impl WikiDataTransferEngine {
         self.register_spec_file(
             "18-Architecture-Development-Decision-Plan-PR.md",
             "Architecture Development Decision Plan PR",
-            true,
-        );
-        self.register_spec_file(
-            "26-System-Utilities-Development-Plan.md",
-            "System Utilities Development Plan PR",
-            true,
-        );
-        self.register_spec_file(
-            "27-Arch-Linux-Gap-Closure-V43-PR.md",
-            "Arch Linux Gap Closure V43 PR",
             true,
         );
     }
@@ -332,42 +300,7 @@ impl Default for WikiDataTransferEngine {
 }
 
 // =========================================================================
-// 3. ADDP SUPREME PERFORMANCE ENGINE
-// =========================================================================
-
-pub struct SupremePerformanceAddpEngine {
-    pub is_compliant: bool,
-}
-
-impl SupremePerformanceAddpEngine {
-    pub fn new() -> Self {
-        Self { is_compliant: true }
-    }
-
-    pub fn is_addp_compliant(&self) -> bool {
-        self.is_compliant
-    }
-}
-
-impl Default for SupremePerformanceAddpEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-pub struct AddpWikiPrProposalGenerator;
-
-impl AddpWikiPrProposalGenerator {
-    pub fn generate_addp_wiki_pr_proposal(content: &str) -> String {
-        format!(
-            "{} - synced to wiki/23-Supreme-Performance-Architecture-Development-Decision-Plan.md",
-            content
-        )
-    }
-}
-
-// =========================================================================
-// 4. MASTER GOVERNANCE & WIKI SYNC SUITE
+// 3. MASTER GOVERNANCE & WIKI SYNC SUITE
 // =========================================================================
 
 // =========================================================================
@@ -420,7 +353,6 @@ impl SovereignTaskAndWikiGovernanceSuite {
 
     pub fn run_complete_governance_cycle(&mut self) -> bool {
         self.governor.validate_guideline(1);
-        self.governor.validate_governance_guideline_2_if_needed();
         self.governor.validate_guideline(2);
         self.governor.validate_guideline(3);
         self.governor.validate_guideline(4);
@@ -433,10 +365,6 @@ impl SovereignTaskAndWikiGovernanceSuite {
             .transfer_implemented_data_to_wiki("ROADMAP.md")
             .is_ok()
     }
-}
-
-impl TaskGuidelinesAndRulesGovernor {
-    fn validate_governance_guideline_2_if_needed(&mut self) {}
 }
 
 impl Default for SovereignTaskAndWikiGovernanceSuite {

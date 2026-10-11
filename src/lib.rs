@@ -121,10 +121,8 @@ pub mod open_source_os_missing_components_parity;
 pub use open_source_os_missing_components_parity::*;
 pub mod tools;
 pub use distro::additional_linux_bsd_components::*;
-pub use distro::cachy_linux_missing_components_engine::*;
 pub use distro::omarchy_linux_gap_closure_pr_suite::*;
 pub use distro::omarchy_omakase_ultimate_parity::*;
-pub use distro::open_source_os_unimplemented_ideas_pr_suite::*;
 pub use distro::sovereign_2050_distro_supremacy_engine::*;
 pub use distro::sovereign_2055_distro_supremacy_engine::*;
 pub use distro::sovereign_2060_distro_supremacy_engine::*;
@@ -334,7 +332,6 @@ pub use userland::shell::{
     Parser as UserlandShellParser, RedirectSpec, RedirectionEngine, Shell as UserlandShell,
     StreamTarget,
 };
-pub use userland::system_utilities::*;
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
