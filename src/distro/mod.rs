@@ -66,12 +66,13 @@ pub mod arch_missing_components;
 pub mod arch_parity;
 
 pub use arch_missing_components::{
-    AlpmInstalledPackage, ArchAlpmDbIntegrityEngine, ArchAuditVulnerabilityScanner, ArchAurWebRpcClient,
-    ArchBtrfsSnapperSnapshotter, ArchMakepkgEngine, ArchModprobedDbEngine, ArchNamcapLinterEngine,
-    ArchNewsAdvisoryFeedEngine, ArchNewsItem, ArchPacmanCacheScrubber, ArchPacmanConflictResolverEngine,
-    ArchPacmanHookRunner, ArchPkgctlDevtoolsEngine, ArchRepoBranch, ArchVercmpVersionComparisonEngine,
-    ArchVulnerabilityAdvisory, AurPackageResult, CachedPackageFile, NamcapLintWarning, PacmanFileCollision,
-    PacmanHookRule, PacmanHookWhen, ParsedAlpmVersion, PkgbuildSpec, SnapperSnapshotRecord,
+    AlpmInstalledPackage, ArchAlpmDbIntegrityEngine, ArchAuditVulnerabilityScanner,
+    ArchAurWebRpcClient, ArchBtrfsSnapperSnapshotter, ArchMakepkgEngine, ArchModprobedDbEngine,
+    ArchNamcapLinterEngine, ArchNewsAdvisoryFeedEngine, ArchNewsItem, ArchPacmanCacheScrubber,
+    ArchPacmanConflictResolverEngine, ArchPacmanHookRunner, ArchPkgctlDevtoolsEngine,
+    ArchRepoBranch, ArchVercmpVersionComparisonEngine, ArchVulnerabilityAdvisory, AurPackageResult,
+    CachedPackageFile, NamcapLintWarning, PacmanFileCollision, PacmanHookRule, PacmanHookWhen,
+    ParsedAlpmVersion, PkgbuildSpec, SnapperSnapshotRecord,
 };
 pub mod certification;
 pub mod chakra_parity;
@@ -458,6 +459,12 @@ pub use sovereign_gentoo_gap_closure_pr_engine::*;
 
 pub mod sovereign_arch_gap_closure_pr_engine;
 pub use sovereign_arch_gap_closure_pr_engine::*;
+
+pub mod open_source_os_unimplemented_ideas_pr_suite;
+pub use open_source_os_unimplemented_ideas_pr_suite::*;
+
+pub mod cachy_linux_missing_components_engine;
+pub use cachy_linux_missing_components_engine::*;
 
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;

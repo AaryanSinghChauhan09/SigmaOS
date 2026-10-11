@@ -120,8 +120,10 @@ pub mod open_source_os_missing_components_parity;
 pub use open_source_os_missing_components_parity::*;
 pub mod tools;
 pub use distro::additional_linux_bsd_components::*;
+pub use distro::cachy_linux_missing_components_engine::*;
 pub use distro::omarchy_linux_gap_closure_pr_suite::*;
 pub use distro::omarchy_omakase_ultimate_parity::*;
+pub use distro::open_source_os_unimplemented_ideas_pr_suite::*;
 pub use distro::sovereign_2050_distro_supremacy_engine::*;
 pub use distro::sovereign_2055_distro_supremacy_engine::*;
 pub use distro::sovereign_2060_distro_supremacy_engine::*;
@@ -195,8 +197,8 @@ pub use automation::{
 pub use compatibility::mint_omarchy_migration_bridge::*;
 pub use compatibility::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
-    ContainerRuntime, FedoraMasterPrDeploymentSuite, MintMasterPrDeploymentSuite,
-    TargetPlatform, TranslationLayer,
+    ContainerRuntime, FedoraMasterPrDeploymentSuite, MintMasterPrDeploymentSuite, TargetPlatform,
+    TranslationLayer,
 };
 pub use container::{
     ContainerError, ContainerID, ContainerInfo, ContainerRuntime as CoreContainerRuntime,

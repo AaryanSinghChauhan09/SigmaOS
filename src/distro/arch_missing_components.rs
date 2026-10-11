@@ -455,67 +455,14 @@ pub struct ArchPacmanHookRunner {
 
 impl ArchPacmanHookRunner {
     pub fn new() -> Self {
-        let mut hooks = BTreeMap::new();
-        hooks.insert(
-            "base".to_string(),
-            InitramfsHookSpec {
-                name: "base".to_string(),
-                is_runtime: true,
-                dependencies: Vec::new(),
-            },
-        );
-        hooks.insert(
-            "udev".to_string(),
-            InitramfsHookSpec {
-                name: "udev".to_string(),
-                is_runtime: true,
-                dependencies: vec!["base".to_string()],
-            },
-        );
-        hooks.insert(
-            "autodetect".to_string(),
-            InitramfsHookSpec {
-                name: "autodetect".to_string(),
-                is_runtime: false,
-                dependencies: Vec::new(),
-            },
-        );
-        hooks.insert(
-            "kms".to_string(),
-            InitramfsHookSpec {
-                name: "kms".to_string(),
-                is_runtime: true,
-                dependencies: vec!["udev".to_string()],
-            },
-        );
-        hooks.insert(
-            "modconf".to_string(),
-            InitramfsHookSpec {
-                name: "modconf".to_string(),
-                is_runtime: false,
-                dependencies: Vec::new(),
-            },
-        );
-        hooks.insert(
-            "block".to_string(),
-            InitramfsHookSpec {
-                name: "block".to_string(),
-                is_runtime: true,
-                dependencies: vec!["udev".to_string()],
-            },
-        );
-        hooks.insert(
-            "filesystems".to_string(),
-            InitramfsHookSpec {
-                name: "filesystems".to_string(),
-                is_runtime: true,
-                dependencies: vec!["block".to_string()],
-            },
-        );
-
+        let default_rule = PacmanHookRule {
+            name: "fontconfig-cache".to_string(),
+            when: PacmanHookWhen::PostTransaction,
+            target_packages: vec!["fontconfig".to_string(), "ttf-*".to_string()],
+            exec_command: "fc-cache -s".to_string(),
+        };
         Self {
-            hooks,
-            compression_format: "zstd".to_string(),
+            registered_hooks: vec![default_rule],
         }
     }
 
@@ -585,9 +532,16 @@ pub struct CachedPackageFile {
     pub file_size_bytes: u64,
 }
 
-pub struct ArchPacmanCacheScrubber {
-    pub cached_files: Vec<CachedPackageFile>,
-    pub retain_keep_count: usize,
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PqcDilithiumKeySpec {
+    pub key_id: String,
+    pub owner_email: String,
+    pub is_trusted: bool,
+    pub dilithium_pubkey_hash: String,
+}
+
+pub struct ArchPacmanKeyringPqcEngine {
+    pub keys: BTreeMap<String, PqcDilithiumKeySpec>,
 }
 
 impl ArchPacmanKeyringPqcEngine {
@@ -603,6 +557,26 @@ impl ArchPacmanKeyringPqcEngine {
             },
         );
         Self { keys }
+    }
+}
+
+impl Default for ArchPacmanKeyringPqcEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct ArchPacmanCacheScrubber {
+    pub cached_files: Vec<CachedPackageFile>,
+    pub retain_keep_count: usize,
+}
+
+impl ArchPacmanCacheScrubber {
+    pub fn new(keep_count: usize) -> Self {
+        Self {
+            cached_files: Vec::new(),
+            retain_keep_count: keep_count,
+        }
     }
 
     /// Calculates which old package cache files should be purged
@@ -666,7 +640,10 @@ impl ArchBtrfsSnapperSnapshotter {
         self.snapshots.push(SnapperSnapshotRecord {
             id,
             snapshot_type: "pre".to_string(),
-            description: format!("snap-pac pre-transaction snapshot before upgrading {}", pkg_list.join(", ")),
+            description: format!(
+                "snap-pac pre-transaction snapshot before upgrading {}",
+                pkg_list.join(", ")
+            ),
             cleanup_algorithm: "number".to_string(),
         });
         id
@@ -678,7 +655,10 @@ impl ArchBtrfsSnapperSnapshotter {
         self.snapshots.push(SnapperSnapshotRecord {
             id,
             snapshot_type: "post".to_string(),
-            description: format!("snap-pac post-transaction snapshot for pre-snapshot #{}", pre_id),
+            description: format!(
+                "snap-pac post-transaction snapshot for pre-snapshot #{}",
+                pre_id
+            ),
             cleanup_algorithm: "number".to_string(),
         });
         id
@@ -723,10 +703,15 @@ impl ArchAuditVulnerabilityScanner {
                 fixed_version: Some("5.6.1-2".to_string()),
             },
         ];
-        Self { known_advisories: sample }
+        Self {
+            known_advisories: sample,
+        }
     }
 
-    pub fn audit_installed_packages(&self, installed: &[(&str, &str)]) -> Vec<ArchVulnerabilityAdvisory> {
+    pub fn audit_installed_packages(
+        &self,
+        installed: &[(&str, &str)],
+    ) -> Vec<ArchVulnerabilityAdvisory> {
         let mut vulnerabilities = Vec::new();
         for (pkg, _ver) in installed {
             for adv in &self.known_advisories {
@@ -755,7 +740,9 @@ pub struct ArchModprobedDbEngine {
 
 impl ArchModprobedDbEngine {
     pub fn new() -> Self {
-        Self { loaded_modules: Vec::new() }
+        Self {
+            loaded_modules: Vec::new(),
+        }
     }
 
     pub fn log_active_module(&mut self, mod_name: &str) {
@@ -880,7 +867,10 @@ mod tests {
     #[test]
     fn test_arch_pacman_hook_runner_and_cache_scrubber() {
         let runner = ArchPacmanHookRunner::new();
-        let matched = runner.match_hooks(PacmanHookWhen::PostTransaction, &["fontconfig", "ttf-liberation"]);
+        let matched = runner.match_hooks(
+            PacmanHookWhen::PostTransaction,
+            &["fontconfig", "ttf-liberation"],
+        );
         assert_eq!(matched.len(), 1);
         assert_eq!(matched[0].exec_command, "fc-cache -s");
 
