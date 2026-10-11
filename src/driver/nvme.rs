@@ -290,9 +290,12 @@ impl NvmeController {
 
             // Reset controller
             regs.cc = 0;
-            while regs.csts & 1 != 0 {
-                // Wait for reset
+            for _ in 0..1000 {
+                if core::ptr::read_volatile(core::ptr::addr_of!(regs.csts)) & 1 == 0 {
+                    break;
+                }
             }
+            regs.csts &= !1;
 
             // Set controller configuration
             let cc = (4 << 0) |  // Enable

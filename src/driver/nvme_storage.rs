@@ -616,7 +616,7 @@ impl NvmeController {
 
         // Ring submission queue doorbell with proper MMIO
         let sq_tail = self.io_queues[0].submission_queue.get_tail_pointer();
-        let doorbell_offset = NVME_SQ_BASE + (0 * 2 * 4); // Queue 0, stride 4 bytes
+        let doorbell_offset = NVME_SQ_BASE; // Queue 0
         unsafe {
             core::ptr::write_volatile(
                 (self.mmio_base + doorbell_offset as u64) as *mut u32,
@@ -631,7 +631,7 @@ impl NvmeController {
                 if completion.is_success() {
                     // Ring completion queue doorbell
                     let cq_head = self.io_queues[0].completion_queue.get_head_pointer();
-                    let cq_doorbell_offset = NVME_CQ_BASE + (0 * 2 * 4);
+                    let cq_doorbell_offset = NVME_CQ_BASE; // Queue 0
                     unsafe {
                         core::ptr::write_volatile(
                             (self.mmio_base + cq_doorbell_offset as u64) as *mut u32,
@@ -692,7 +692,7 @@ impl NvmeController {
 
         // Ring submission queue doorbell with proper MMIO
         let sq_tail = self.io_queues[0].submission_queue.get_tail_pointer();
-        let doorbell_offset = NVME_SQ_BASE + (0 * 2 * 4);
+        let doorbell_offset = NVME_SQ_BASE; // Queue 0
         unsafe {
             core::ptr::write_volatile(
                 (self.mmio_base + doorbell_offset as u64) as *mut u32,
@@ -707,7 +707,7 @@ impl NvmeController {
                 if completion.is_success() {
                     // Ring completion queue doorbell
                     let cq_head = self.io_queues[0].completion_queue.get_head_pointer();
-                    let cq_doorbell_offset = NVME_CQ_BASE + (0 * 2 * 4);
+                    let cq_doorbell_offset = NVME_CQ_BASE; // Queue 0
                     unsafe {
                         core::ptr::write_volatile(
                             (self.mmio_base + cq_doorbell_offset as u64) as *mut u32,

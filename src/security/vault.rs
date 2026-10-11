@@ -370,9 +370,17 @@ mod fail_closed_tests {
         VaultError,
     };
 
+    fn generate_test_bytes(len: usize) -> Vec<u8> {
+        (0..len).map(|i| ((i.wrapping_mul(43).wrapping_add(29)) & 0xFF) as u8).collect()
+    }
+
     #[test]
     fn named_vault_algorithms_fail_closed_without_providers() {
-        let key = [1u8; 32];
+        let key = generate_test_bytes(32);
+        let sample_payload = generate_test_bytes(16);
+        let sample_ciphertext = generate_test_bytes(24);
+        let sample_nonce = generate_test_bytes(12);
+        let sample_tag = generate_test_bytes(16);
         let aes = Aes256GcmEncryption;
         let chacha = ChaCha20Poly1305Encryption;
         let kyber = Kyber1024Encryption;
@@ -383,11 +391,11 @@ mod fail_closed_tests {
             &kyber as &dyn VaultEncryption,
         ] {
             assert!(matches!(
-                adapter.encrypt(b"secret", &key),
+                adapter.encrypt(&sample_payload, &key),
                 Err(VaultError::CryptoUnavailable)
             ));
             assert!(matches!(
-                adapter.decrypt(b"ciphertext", &key, b"nonce", b"tag"),
+                adapter.decrypt(&sample_ciphertext, &key, &sample_nonce, &sample_tag),
                 Err(VaultError::CryptoUnavailable)
             ));
         }

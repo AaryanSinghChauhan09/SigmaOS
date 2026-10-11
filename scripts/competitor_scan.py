@@ -9,7 +9,6 @@ to feed into SigmaOS continuous OS improvement cadences.
 
 import json
 import os
-import sys
 import time
 
 COMPETITOR_PROJECTS = [

@@ -289,9 +289,11 @@ impl AhciController {
 
             // Reset controller
             hba.ghc |= 0x00000001; // HR bit
-            while hba.ghc & 0x00000001 != 0 {
-                // Wait for reset
+            let mut timeout = 1000;
+            while core::ptr::read_volatile(core::ptr::addr_of!(hba.ghc)) & 0x00000001 != 0 && timeout > 0 {
+                timeout -= 1;
             }
+            hba.ghc &= !0x00000001;
 
             // Re-enable AHCI mode after reset
             hba.ghc |= 0x80000000;
@@ -379,11 +381,11 @@ impl AhciController {
         // Calculate number of PRDT entries needed
         // Each PRDT can handle up to 4MB (minus 1 byte)
         const MAX_PRDT_SIZE: u32 = 4 * 1024 * 1024 - 1;
-        let num_prdt = ((data_size + MAX_PRDT_SIZE - 1) / MAX_PRDT_SIZE) as u16;
-
-        if num_prdt > 65535 {
+        let num_prdt_val = (data_size + MAX_PRDT_SIZE - 1) / MAX_PRDT_SIZE;
+        if num_prdt_val > 65535 {
             return Err("Transfer too large for PRDT");
         }
+        let num_prdt = num_prdt_val as u16;
 
         header.set_prdtl(num_prdt);
         header.set_ctba(cmd_table_addr);
@@ -423,8 +425,13 @@ impl AhciController {
 
                 // Stop command engine
                 port.cmd &= 0xFFFFFFFE; // Clear ST bit
-                while (port.cmd & 0x8000) != 0 || (port.cmd & 0x4000) != 0 {
-                    // Wait for CR and FR to clear
+                let mut cr_timeout = 1000;
+                while (core::ptr::read_volatile(core::ptr::addr_of!(port.cmd)) & 0x8000) != 0 || (core::ptr::read_volatile(core::ptr::addr_of!(port.cmd)) & 0x4000) != 0 {
+                    cr_timeout -= 1;
+                    if cr_timeout == 0 {
+                        port.cmd &= !0xC000;
+                        break;
+                    }
                 }
 
                 // Start command engine

@@ -182,12 +182,18 @@ impl SafeInstaller {
 mod tests {
     use super::*;
 
+    fn get_test_credential() -> String {
+        std::env::var("SIGMA_TEST_PASSWORD_CREDENTIAL")
+            .unwrap_or_else(|_| (0..16).map(|i| ((b'A' + (i as u8 % 26)) as char)).collect())
+    }
+
     #[test]
     fn test_dry_run_full_install() {
+        let cred = get_test_credential();
         let mut inst = SafeInstaller::new(
             "sigma-host",
             "admin",
-            "Str0ngP@ss!",
+            &cred,
             DiskTarget::Explicit("/dev/vda".into()),
             true,
         );
@@ -205,10 +211,11 @@ mod tests {
 
     #[test]
     fn test_rejects_unconfirmed_destructive() {
+        let cred = get_test_credential();
         let mut inst = SafeInstaller::new(
             "h",
             "u",
-            "p",
+            &cred,
             DiskTarget::Explicit("/dev/vda".into()),
             false,
         );
@@ -218,21 +225,23 @@ mod tests {
 
     #[test]
     fn test_password_never_stored_plaintext() {
+        let cred = get_test_credential();
         let inst = SafeInstaller::new(
             "h",
             "u",
-            "secret",
+            &cred,
             DiskTarget::Explicit("/dev/vda".into()),
             true,
         );
         assert!(inst.config.password_hash.starts_with("$argon2id$"));
-        assert!(!inst.config.password_hash.contains("secret"));
+        assert!(!inst.config.password_hash.contains(&cred));
     }
 
     #[test]
     fn test_ordering_enforced() {
+        let cred = get_test_credential();
         let mut inst =
-            SafeInstaller::new("h", "u", "p", DiskTarget::Explicit("/dev/vda".into()), true);
+            SafeInstaller::new("h", "u", &cred, DiskTarget::Explicit("/dev/vda".into()), true);
         inst.discover_disks();
         inst.confirm_destructive();
         assert!(inst.install_system().is_err()); // must partition first

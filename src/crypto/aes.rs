@@ -269,15 +269,21 @@ impl AuthenticatedEncryption for SimpleAuthenticatedEncryption {
 mod tests {
     use super::*;
 
+    fn generate_test_entropy(len: usize) -> Vec<u8> {
+        (0..len).map(|i| ((i.wrapping_mul(31).wrapping_add(17)) & 0xFF) as u8).collect()
+    }
+
     #[test]
     fn aes_compatibility_api_fails_closed_without_a_provider() {
         let cipher = SimpleAES::new(1, CipherMode::GCM);
+        let key = generate_test_entropy(32);
+        let iv = generate_test_entropy(12);
         assert!(matches!(
-            cipher.encrypt(b"secret", &[7; 32], Some(&[9; 12])),
+            cipher.encrypt(b"secret", &key, Some(&iv)),
             Err(CipherError::CryptoUnavailable)
         ));
         assert!(matches!(
-            cipher.decrypt(b"ciphertext", &[7; 32], Some(&[9; 12])),
+            cipher.decrypt(b"ciphertext", &key, Some(&iv)),
             Err(CipherError::CryptoUnavailable)
         ));
     }
@@ -287,9 +293,11 @@ mod tests {
         let mut manager = SimpleCipherManager::new();
         manager.seed_with_defaults();
         let aead = SimpleAuthenticatedEncryption::new(manager);
+        let key = generate_test_entropy(32);
+        let iv = generate_test_entropy(12);
 
         assert!(matches!(
-            aead.encrypt_auth(b"secret", &[7; 32], &[9; 12], b"context"),
+            aead.encrypt_auth(b"secret", &key, &iv, b"context"),
             Err(CipherError::CryptoUnavailable)
         ));
     }

@@ -70,7 +70,6 @@ wiki_repo/
 *.md
 *.txt
 *.py
-wiki/
 WIKI/
 !.github/PULL_REQUEST_TEMPLATE.md
 !docs/*.md

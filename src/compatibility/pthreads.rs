@@ -192,21 +192,24 @@ impl Default for PthreadRwlock {
 pub type ThreadStartRoutine = fn(*mut ()) -> *mut ();
 
 /// pthread_create - create a new thread
-pub fn pthread_create(
+/// # Safety
+/// Dereferences raw pointer `thread`. Caller must ensure `thread` is valid and aligned.
+pub unsafe fn pthread_create(
     thread: *mut PthreadT,
     _attr: *const PthreadAttr,
     _start_routine: ThreadStartRoutine,
     _arg: *mut (),
 ) -> Result<(), String> {
+    if thread.is_null() {
+        return Err("Null thread pointer".to_string());
+    }
     static NEXT_THREAD_ID: AtomicU32 = AtomicU32::new(1);
 
     let thread_id = NEXT_THREAD_ID.fetch_add(1, Ordering::SeqCst) as u64;
 
     // In real implementation, would spawn thread with start_routine
     // For compatibility layer structure, just create thread ID
-    unsafe {
-        *thread = PthreadT::new(thread_id);
-    }
+    *thread = PthreadT::new(thread_id);
 
     Ok(())
 }
@@ -255,17 +258,20 @@ impl PthreadKey {
 }
 
 /// pthread_key_create - create thread-specific data key
-pub fn pthread_key_create(
+/// # Safety
+/// Dereferences raw pointer `key`. Caller must ensure `key` is valid and aligned.
+pub unsafe fn pthread_key_create(
     key: *mut PthreadKey,
     _destructor: Option<fn(*mut ())>,
 ) -> Result<(), String> {
+    if key.is_null() {
+        return Err("Null key pointer".to_string());
+    }
     static NEXT_KEY: AtomicU32 = AtomicU32::new(1);
 
     let key_value = NEXT_KEY.fetch_add(1, Ordering::SeqCst);
 
-    unsafe {
-        *key = PthreadKey::new(key_value);
-    }
+    *key = PthreadKey::new(key_value);
 
     // In real implementation, would store destructor
     Ok(())

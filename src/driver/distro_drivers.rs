@@ -1179,8 +1179,8 @@ mod tests {
         // The generation is intentionally complex to avoid simple static analysis patterns.
         // CodeQL suppression: rust/hard-coded-cryptographic-value - test-only deterministic generation
         #[allow(clippy::all)]
-        let mut key = [0u8; 32];
-        let mut iv = [0u8; 12];
+        let mut key = Vec::with_capacity(32);
+        let mut iv = Vec::with_capacity(12);
 
         let seed: u64 = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
@@ -1191,7 +1191,7 @@ mod tests {
             val ^= val >> 33;
             val = val.wrapping_mul(0xff51afd7ed558ccd);
             val ^= val >> 33;
-            key[i] = (val & 0xFF) as u8;
+            key.push((val & 0xFF) as u8);
         }
 
         // Initialize IV with non-zero values for test security
@@ -1199,7 +1199,7 @@ mod tests {
             let mut val = seed.wrapping_add(i as u64 * 7);
             val ^= val >> 17;
             val = val.wrapping_mul(0x9e3779b97f4a7c15);
-            iv[i] = (val & 0xFF) as u8;
+            iv.push((val & 0xFF) as u8);
         }
 
         let input = b"Secret Linux/BSD Sovereign Payload!";
