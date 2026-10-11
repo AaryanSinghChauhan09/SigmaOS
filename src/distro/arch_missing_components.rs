@@ -540,6 +540,18 @@ pub struct ArchPacmanKeyringPqcEngine {
     pub keys: BTreeMap<String, PqcDilithiumKeySpec>,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PqcDilithiumKeySpec {
+    pub key_id: String,
+    pub owner_email: String,
+    pub is_trusted: bool,
+    pub dilithium_pubkey_hash: String,
+}
+
+pub struct ArchPacmanKeyringPqcEngine {
+    pub keys: BTreeMap<String, PqcDilithiumKeySpec>,
+}
+
 impl ArchPacmanKeyringPqcEngine {
     pub fn new() -> Self {
         let mut keys = BTreeMap::new();
