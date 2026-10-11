@@ -465,6 +465,8 @@ pub struct InitramfsHookSpec {
 
 pub struct ArchPacmanHookRunner {
     pub registered_hooks: Vec<PacmanHookRule>,
+    pub initramfs_hooks: BTreeMap<String, InitramfsHookSpec>,
+    pub compression_format: String,
 }
 
 impl ArchPacmanHookRunner {
@@ -519,7 +521,7 @@ impl ArchMkinitcpioHooksEngine {
                 dependencies: Vec::new(),
             },
         );
-        hooks.insert(
+        initramfs_hooks.insert(
             "udev".to_string(),
             InitramfsHookSpec {
                 name: "udev".to_string(),
@@ -528,7 +530,8 @@ impl ArchMkinitcpioHooksEngine {
             },
         );
         Self {
-            hooks,
+            registered_hooks: sample_hooks,
+            initramfs_hooks,
             compression_format: "zstd".to_string(),
         }
     }
@@ -723,6 +726,33 @@ pub struct CachedPackageFile {
     pub pkgname: String,
     pub version: String,
     pub file_size_bytes: u64,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PqcDilithiumKeySpec {
+    pub key_id: String,
+    pub owner_email: String,
+    pub is_trusted: bool,
+    pub dilithium_pubkey_hash: String,
+}
+
+pub struct ArchPacmanKeyringPqcEngine {
+    pub keys: BTreeMap<String, PqcDilithiumKeySpec>,
+}
+
+impl ArchPacmanCacheScrubber {
+    pub fn new(retain_keep_count: usize) -> Self {
+        Self {
+            cached_files: Vec::new(),
+            retain_keep_count,
+        }
+    }
+}
+
+impl Default for ArchPacmanKeyringPqcEngine {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 pub struct ArchPacmanCacheScrubber {
