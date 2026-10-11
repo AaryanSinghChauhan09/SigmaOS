@@ -282,6 +282,13 @@ if [ -f "src/kernel/panic_handler.rs" ]; then
     ./build/sovereign_kernel_panic_test
 fi
 
+if [ -f "src/kernel/bare_metal_target.rs" ]; then
+    echo "Running Bare Metal ELF Kernel Binary & Target Boot test suite..."
+    mkdir -p build
+    rustc --test src/kernel/bare_metal_target.rs --edition=2021 -o build/bare_metal_target_test
+    ./build/bare_metal_target_test
+fi
+
 if [ -f "src/kernel/sovereign_smp_xhci_apc_synthesis.rs" ]; then
     echo "Running Sovereign SMP Multi-Core, xHCI & APC Subsystem test suite..."
     mkdir -p build
