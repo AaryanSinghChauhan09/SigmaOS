@@ -17,7 +17,9 @@ fn test_fd_table_allocation_and_closure() {
     let fd1 = table.allocate_fd(handle.clone(), 0).expect("allocate fd1");
     assert_eq!(fd1, 0);
 
-    let fd2 = table.allocate_fd(handle.clone(), FD_CLOEXEC).expect("allocate fd2");
+    let fd2 = table
+        .allocate_fd(handle.clone(), FD_CLOEXEC)
+        .expect("allocate fd2");
     assert_eq!(fd2, 1);
 
     assert_eq!(table.active_fd_count(), 2);

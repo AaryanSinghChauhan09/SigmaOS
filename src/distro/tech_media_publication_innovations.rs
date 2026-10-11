@@ -867,7 +867,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("ItsFOSS"),
             title: String::from("Zero-Dependency Terminal Tooling & Prompt Optimization"),
             category: String::from("Userland & Terminal"),
-            action_recommendation: String::from("Enable zero-alloc prompt caching & zero-dep CLI coreutils"),
+            action_recommendation: String::from(
+                "Enable zero-alloc prompt caching & zero-dep CLI coreutils",
+            ),
             impact_score: 95,
         });
 
@@ -875,7 +877,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("9to5Linux"),
             title: String::from("Linux Kernel PREEMPT_RT Realtime Extensions"),
             category: String::from("Kernel & Scheduler"),
-            action_recommendation: String::from("Configure realtime latency threshold below 5 microseconds"),
+            action_recommendation: String::from(
+                "Configure realtime latency threshold below 5 microseconds",
+            ),
             impact_score: 98,
         });
 
@@ -883,7 +887,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("GeekyGadgets"),
             title: String::from("Single Board Computer GPIO Telemetry & Sensor Integration"),
             category: String::from("Embedded & Hardware"),
-            action_recommendation: String::from("Activate SBC pinout polling & I2C sensor bus telemetry"),
+            action_recommendation: String::from(
+                "Activate SBC pinout polling & I2C sensor bus telemetry",
+            ),
             impact_score: 88,
         });
 
@@ -891,7 +897,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("Linux.com"),
             title: String::from("Zero-Trust System Hardening & LSM Rules"),
             category: String::from("Security & Governance"),
-            action_recommendation: String::from("Enforce Landlock V5 sandboxing and pledge syscall filters"),
+            action_recommendation: String::from(
+                "Enforce Landlock V5 sandboxing and pledge syscall filters",
+            ),
             impact_score: 99,
         });
 
@@ -899,7 +907,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("KDnuggets"),
             title: String::from("Zero-Copy AI Vector Data Pipeline Normalization"),
             category: String::from("AI & Data Science"),
-            action_recommendation: String::from("Deploy zero-allocation vector normalization & drift calculation"),
+            action_recommendation: String::from(
+                "Deploy zero-allocation vector normalization & drift calculation",
+            ),
             impact_score: 94,
         });
 
@@ -907,7 +917,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("HWBusters"),
             title: String::from("ATX 3.1 12V-2x6 Transient Power Rail Protection"),
             category: String::from("Power & Hardware"),
-            action_recommendation: String::from("Throttle GPU/CPU transients when voltage ripple exceeds 50mV"),
+            action_recommendation: String::from(
+                "Throttle GPU/CPU transients when voltage ripple exceeds 50mV",
+            ),
             impact_score: 96,
         });
 
@@ -915,7 +927,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("ITDaily"),
             title: String::from("Hybrid Cloud Enterprise SLA & Resilience Governor"),
             category: String::from("Cloud & Enterprise"),
-            action_recommendation: String::from("Maintain 99.999% uptime governor with active replica failover"),
+            action_recommendation: String::from(
+                "Maintain 99.999% uptime governor with active replica failover",
+            ),
             impact_score: 92,
         });
 
@@ -923,7 +937,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("HowToGeek"),
             title: String::from("POSIX Coreutil & CLI Command Translation Matrix"),
             category: String::from("Sysadmin & CLI"),
-            action_recommendation: String::from("Translate legacy net-tools commands to iproute2 modern syntax"),
+            action_recommendation: String::from(
+                "Translate legacy net-tools commands to iproute2 modern syntax",
+            ),
             impact_score: 85,
         });
 
@@ -931,7 +947,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("Linux.org"),
             title: String::from("Kernel Sysctl Low-Latency Tuning"),
             category: String::from("Kernel & Memory"),
-            action_recommendation: String::from("Set vm.swappiness=10 and kernel.sched_rt_runtime_us=950000"),
+            action_recommendation: String::from(
+                "Set vm.swappiness=10 and kernel.sched_rt_runtime_us=950000",
+            ),
             impact_score: 93,
         });
 
@@ -939,7 +957,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("InfoWorld"),
             title: String::from("Zero-Trust Microservice Isolation & mTLS Gateway"),
             category: String::from("Cloud & Security"),
-            action_recommendation: String::from("Isolate microservices in eBPF network sandboxes with TLS 1.3"),
+            action_recommendation: String::from(
+                "Isolate microservices in eBPF network sandboxes with TLS 1.3",
+            ),
             impact_score: 97,
         });
 
@@ -947,7 +967,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("LinuxFoundation"),
             title: String::from("SBOM Compliance & License Supply Chain Governance"),
             category: String::from("Supply Chain & Compliance"),
-            action_recommendation: String::from("Enforce SPDX SBOM generation and license validation in CI/CD"),
+            action_recommendation: String::from(
+                "Enforce SPDX SBOM generation and license validation in CI/CD",
+            ),
             impact_score: 91,
         });
 
@@ -955,7 +977,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("MakeUseOf"),
             title: String::from("Low-RAM Desktop Environment Adaptive Profiler"),
             category: String::from("Desktop & GUI"),
-            action_recommendation: String::from("Auto-switch to Zenith Minimal Tiling DE when RAM < 1GB"),
+            action_recommendation: String::from(
+                "Auto-switch to Zenith Minimal Tiling DE when RAM < 1GB",
+            ),
             impact_score: 89,
         });
 
@@ -963,7 +987,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("PCWorld"),
             title: String::from("Laptop Battery Charge Threshold Governor"),
             category: String::from("Power Management"),
-            action_recommendation: String::from("Cap battery charging at 80% to maximize lifespan cycles"),
+            action_recommendation: String::from(
+                "Cap battery charging at 80% to maximize lifespan cycles",
+            ),
             impact_score: 90,
         });
 
@@ -971,7 +997,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("MarkTechPost"),
             title: String::from("Small Language Model (SLM) INT4 Quantization"),
             category: String::from("AI & Machine Learning"),
-            action_recommendation: String::from("Apply 4-bit integer quantization for sub-2GB memory footprint"),
+            action_recommendation: String::from(
+                "Apply 4-bit integer quantization for sub-2GB memory footprint",
+            ),
             impact_score: 96,
         });
 
@@ -979,7 +1007,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("WindowsLatest"),
             title: String::from("WSL2 / POSIX Cross-Platform Path Translation"),
             category: String::from("Interoperability"),
-            action_recommendation: String::from("Auto-transpile C:\\ paths to /mnt/c/ POSIX mount points"),
+            action_recommendation: String::from(
+                "Auto-transpile C:\\ paths to /mnt/c/ POSIX mount points",
+            ),
             impact_score: 87,
         });
 
@@ -987,7 +1017,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("TechSpot"),
             title: String::from("DirectStorage NVMe Low-Latency Frame Pacing"),
             category: String::from("Graphics & Storage"),
-            action_recommendation: String::from("Bypass virtual memory page cache for GPU direct texture loads"),
+            action_recommendation: String::from(
+                "Bypass virtual memory page cache for GPU direct texture loads",
+            ),
             impact_score: 95,
         });
 
@@ -995,7 +1027,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("TheNewStack"),
             title: String::from("eBPF Service Mesh & Wasm Runtime Observability"),
             category: String::from("Cloud Native"),
-            action_recommendation: String::from("Attach eBPF probes to syscalls for zero-overhead tracing"),
+            action_recommendation: String::from(
+                "Attach eBPF probes to syscalls for zero-overhead tracing",
+            ),
             impact_score: 94,
         });
 
@@ -1003,7 +1037,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("TechPowerUp"),
             title: String::from("GPU VRM Thermal Throttling & Fan Curve Control"),
             category: String::from("Hardware & Drivers"),
-            action_recommendation: String::from("Ramp fan speed to 100% when hotspot temperature hits 85C"),
+            action_recommendation: String::from(
+                "Ramp fan speed to 100% when hotspot temperature hits 85C",
+            ),
             impact_score: 93,
         });
 
@@ -1011,7 +1047,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("WindowsCentral"),
             title: String::from("Mobile Device Subsystem Bridge & Notification Sync"),
             category: String::from("Desktop Interop"),
-            action_recommendation: String::from("Sync clipboard, SMS, and calls via zero-trust TLS channel"),
+            action_recommendation: String::from(
+                "Sync clipboard, SMS, and calls via zero-trust TLS channel",
+            ),
             impact_score: 86,
         });
 
@@ -1019,7 +1057,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("Phoronix"),
             title: String::from("Automated Phoronix Test Suite Regression Benchmarking"),
             category: String::from("Performance & Testing"),
-            action_recommendation: String::from("Run automated regression benchmarks on kernel build commits"),
+            action_recommendation: String::from(
+                "Run automated regression benchmarks on kernel build commits",
+            ),
             impact_score: 97,
         });
 
@@ -1027,7 +1067,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("TechCrunch"),
             title: String::from("Open-Source Project Sustainability & Governance Metrics"),
             category: String::from("Ecosystem"),
-            action_recommendation: String::from("Track maintainer bus factor and issue resolution rate"),
+            action_recommendation: String::from(
+                "Track maintainer bus factor and issue resolution rate",
+            ),
             impact_score: 88,
         });
 
@@ -1035,7 +1077,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("XDA-Developers"),
             title: String::from("Android Subsystem Wayland Compositor Hardware Mirroring"),
             category: String::from("Mobile & Wayland"),
-            action_recommendation: String::from("Stream Android screen buffers to Wayland surfaces via DMA-BUF"),
+            action_recommendation: String::from(
+                "Stream Android screen buffers to Wayland surfaces via DMA-BUF",
+            ),
             impact_score: 91,
         });
 
@@ -1043,7 +1087,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("ZDNet"),
             title: String::from("Enterprise Infrastructure Compliance & Hardening Audit"),
             category: String::from("Enterprise Security"),
-            action_recommendation: String::from("Validate CIS benchmarks and DISA STIG compliance rules"),
+            action_recommendation: String::from(
+                "Validate CIS benchmarks and DISA STIG compliance rules",
+            ),
             impact_score: 98,
         });
 
@@ -1051,7 +1097,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("OpenSourceForU"),
             title: String::from("Modular Microkernel Subsystem Hot-Swapping"),
             category: String::from("Kernel Architecture"),
-            action_recommendation: String::from("Support hot-swapping driver modules without kernel restart"),
+            action_recommendation: String::from(
+                "Support hot-swapping driver modules without kernel restart",
+            ),
             impact_score: 92,
         });
 
@@ -1059,7 +1107,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("PCMag"),
             title: String::from("Endpoint Heuristic Malware & Zero-Day Threat Shield"),
             category: String::from("Endpoint Security"),
-            action_recommendation: String::from("Scan binary execution memory using heuristic vector filters"),
+            action_recommendation: String::from(
+                "Scan binary execution memory using heuristic vector filters",
+            ),
             impact_score: 96,
         });
 
@@ -1067,7 +1117,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("LinuxTeck"),
             title: String::from("IPTables / NFTables Firewall Rule Hardening"),
             category: String::from("Networking & Security"),
-            action_recommendation: String::from("Drop invalid state TCP packets and rate limit SSH connection bursts"),
+            action_recommendation: String::from(
+                "Drop invalid state TCP packets and rate limit SSH connection bursts",
+            ),
             impact_score: 91,
         });
 
@@ -1075,7 +1127,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("Appuals"),
             title: String::from("Automated Package Dependency & Broken Lock Resolution"),
             category: String::from("Package Management"),
-            action_recommendation: String::from("Auto-repair dpkg/pacman database locks and broken dependencies"),
+            action_recommendation: String::from(
+                "Auto-repair dpkg/pacman database locks and broken dependencies",
+            ),
             impact_score: 89,
         });
 
@@ -1083,7 +1137,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             publication: String::from("DistroWatch"),
             title: String::from("Distribution Popularity & Release Matrix Analytics"),
             category: String::from("Distro Analytics"),
-            action_recommendation: String::from("Monitor top Linux distribution feature trends and package releases"),
+            action_recommendation: String::from(
+                "Monitor top Linux distribution feature trends and package releases",
+            ),
             impact_score: 87,
         });
 
@@ -1211,7 +1267,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
         pr.push_str("- **Memory Management:** UKSM (Ultra Kernel Samepage Merging) deduplication and zswap zstd pool compression\n");
         pr.push_str("\n#### PR Verification & Test Execution:\n");
         pr.push_str("- [x] `./run_sigma_tests.sh` test suite executed cleanly\n");
-        pr.push_str("- [x] BORE interactive latency benchmark verified (< 50us context switch latency)\n");
+        pr.push_str(
+            "- [x] BORE interactive latency benchmark verified (< 50us context switch latency)\n",
+        );
         pr.push_str("- [x] Microarch x86-64 v3/v4 vectorization validated\n");
         pr
     }
@@ -1241,7 +1299,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
         }
 
         pr.push_str("\n#### Verification & Quality Gates:\n");
-        pr.push_str("- [x] Standalone test compilation (`rustc --test`) verified with 0 failures\n");
+        pr.push_str(
+            "- [x] Standalone test compilation (`rustc --test`) verified with 0 failures\n",
+        );
         pr.push_str("- [x] Zero external library dependencies enforced\n");
         pr.push_str("- [x] Architectural compliance and performance benchmarks validated\n");
         pr
@@ -1521,7 +1581,9 @@ mod tests {
 
         let linuxcom_insights = engine.filter_by_publication("Linux.com");
         assert_eq!(linuxcom_insights.len(), 1);
-        assert!(linuxcom_insights[0].action_recommendation.contains("Landlock"));
+        assert!(linuxcom_insights[0]
+            .action_recommendation
+            .contains("Landlock"));
 
         let high_impact = engine.filter_high_impact_insights(95);
         assert!(high_impact.len() >= 10);

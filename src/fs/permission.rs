@@ -111,7 +111,10 @@ impl PermissionEngine {
         Ok(())
     }
 
-    pub fn check_chmod_permission(creds: &ProcessCredentials, file_uid: u32) -> Result<(), FsError> {
+    pub fn check_chmod_permission(
+        creds: &ProcessCredentials,
+        file_uid: u32,
+    ) -> Result<(), FsError> {
         if creds.euid == 0 || creds.euid == file_uid || creds.has_capability(CAP_FOWNER) {
             Ok(())
         } else {

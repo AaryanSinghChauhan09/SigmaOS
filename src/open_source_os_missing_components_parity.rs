@@ -1032,7 +1032,7 @@ pub struct AmigaMessage {
 #[derive(Debug, Default)]
 pub struct AmigaOsExecLibraryEngine {
     pub ports: BTreeMap<String, (u64, Vec<AmigaMessage>)>, // PortName -> (OwnerPID, Queue)
-    pub signals: BTreeMap<u64, u32>,                     // PID -> SignalMask
+    pub signals: BTreeMap<u64, u32>,                       // PID -> SignalMask
     pub next_msg_id: u64,
 }
 
@@ -1049,12 +1049,21 @@ impl AmigaOsExecLibraryEngine {
         if self.ports.contains_key(port_name) {
             return false;
         }
-        self.ports.insert(port_name.to_string(), (owner_pid, Vec::new()));
+        self.ports
+            .insert(port_name.to_string(), (owner_pid, Vec::new()));
         true
     }
 
-    pub fn put_message(&mut self, port_name: &str, sender_pid: u64, data: &[u8]) -> Result<u64, &'static str> {
-        let entry = self.ports.get_mut(port_name).ok_or("AmigaOS Exec: Port not found")?;
+    pub fn put_message(
+        &mut self,
+        port_name: &str,
+        sender_pid: u64,
+        data: &[u8],
+    ) -> Result<u64, &'static str> {
+        let entry = self
+            .ports
+            .get_mut(port_name)
+            .ok_or("AmigaOS Exec: Port not found")?;
         let msg_id = self.next_msg_id;
         self.next_msg_id += 1;
         entry.1.push(AmigaMessage {
@@ -1149,11 +1158,11 @@ impl BeOsMediaKitEngine {
 
 /// 13. Plan 9 rfork Namespace & File Descriptor Sharing Control Engine
 pub const RFORK_RFNAMEG: u32 = 0x0001; // New name space
-pub const RFORK_RFENVG: u32  = 0x0002; // New environment
-pub const RFORK_RFFDG: u32   = 0x0004; // New file descriptor table
-pub const RFORK_RFNOTEG: u32  = 0x0008; // New note group
-pub const RFORK_RFENV: u32    = 0x0010; // Copy environment
-pub const RFORK_RFFD: u32     = 0x0020; // Copy file descriptors
+pub const RFORK_RFENVG: u32 = 0x0002; // New environment
+pub const RFORK_RFFDG: u32 = 0x0004; // New file descriptor table
+pub const RFORK_RFNOTEG: u32 = 0x0008; // New note group
+pub const RFORK_RFENV: u32 = 0x0010; // Copy environment
+pub const RFORK_RFFD: u32 = 0x0020; // Copy file descriptors
 
 #[derive(Debug, Clone, Default)]
 pub struct Plan9ProcessNamespace {
@@ -1173,10 +1182,13 @@ impl Plan9RforkNamespaceEngine {
     }
 
     pub fn set_env(&mut self, pid: u64, key: &str, val: &str) {
-        let ns = self.processes.entry(pid).or_insert_with(|| Plan9ProcessNamespace {
-            pid,
-            ..Default::default()
-        });
+        let ns = self
+            .processes
+            .entry(pid)
+            .or_insert_with(|| Plan9ProcessNamespace {
+                pid,
+                ..Default::default()
+            });
         ns.env.insert(key.to_string(), val.to_string());
     }
 
@@ -1184,11 +1196,20 @@ impl Plan9RforkNamespaceEngine {
         self.processes.get(&pid)?.env.get(key).cloned()
     }
 
-    pub fn rfork(&mut self, parent_pid: u64, child_pid: u64, flags: u32) -> Result<u64, &'static str> {
-        let parent = self.processes.get(&parent_pid).cloned().unwrap_or(Plan9ProcessNamespace {
-            pid: parent_pid,
-            ..Default::default()
-        });
+    pub fn rfork(
+        &mut self,
+        parent_pid: u64,
+        child_pid: u64,
+        flags: u32,
+    ) -> Result<u64, &'static str> {
+        let parent = self
+            .processes
+            .get(&parent_pid)
+            .cloned()
+            .unwrap_or(Plan9ProcessNamespace {
+                pid: parent_pid,
+                ..Default::default()
+            });
 
         let mut child = Plan9ProcessNamespace {
             pid: child_pid,
@@ -1211,7 +1232,7 @@ impl Plan9RforkNamespaceEngine {
 /// 14. OpenBSD Pledge Promises & Unveil Subtree Restriction Engine
 #[derive(Debug, Default)]
 pub struct OpenBsdPledgeUnveilEngine {
-    pub pledges: BTreeMap<u64, Vec<String>>,         // PID -> Active Pledge Promises
+    pub pledges: BTreeMap<u64, Vec<String>>, // PID -> Active Pledge Promises
     pub unveils: BTreeMap<u64, BTreeMap<String, String>>, // PID -> (Path -> Permissions [r, w, x, c])
 }
 

@@ -666,7 +666,10 @@ impl ArchBtrfsSnapperSnapshotter {
         self.snapshots.push(SnapperSnapshotRecord {
             id,
             snapshot_type: "pre".to_string(),
-            description: format!("snap-pac pre-transaction snapshot before upgrading {}", pkg_list.join(", ")),
+            description: format!(
+                "snap-pac pre-transaction snapshot before upgrading {}",
+                pkg_list.join(", ")
+            ),
             cleanup_algorithm: "number".to_string(),
         });
         id
@@ -678,7 +681,10 @@ impl ArchBtrfsSnapperSnapshotter {
         self.snapshots.push(SnapperSnapshotRecord {
             id,
             snapshot_type: "post".to_string(),
-            description: format!("snap-pac post-transaction snapshot for pre-snapshot #{}", pre_id),
+            description: format!(
+                "snap-pac post-transaction snapshot for pre-snapshot #{}",
+                pre_id
+            ),
             cleanup_algorithm: "number".to_string(),
         });
         id
@@ -723,10 +729,15 @@ impl ArchAuditVulnerabilityScanner {
                 fixed_version: Some("5.6.1-2".to_string()),
             },
         ];
-        Self { known_advisories: sample }
+        Self {
+            known_advisories: sample,
+        }
     }
 
-    pub fn audit_installed_packages(&self, installed: &[(&str, &str)]) -> Vec<ArchVulnerabilityAdvisory> {
+    pub fn audit_installed_packages(
+        &self,
+        installed: &[(&str, &str)],
+    ) -> Vec<ArchVulnerabilityAdvisory> {
         let mut vulnerabilities = Vec::new();
         for (pkg, _ver) in installed {
             for adv in &self.known_advisories {
@@ -755,7 +766,9 @@ pub struct ArchModprobedDbEngine {
 
 impl ArchModprobedDbEngine {
     pub fn new() -> Self {
-        Self { loaded_modules: Vec::new() }
+        Self {
+            loaded_modules: Vec::new(),
+        }
     }
 
     pub fn log_active_module(&mut self, mod_name: &str) {
@@ -880,7 +893,10 @@ mod tests {
     #[test]
     fn test_arch_pacman_hook_runner_and_cache_scrubber() {
         let runner = ArchPacmanHookRunner::new();
-        let matched = runner.match_hooks(PacmanHookWhen::PostTransaction, &["fontconfig", "ttf-liberation"]);
+        let matched = runner.match_hooks(
+            PacmanHookWhen::PostTransaction,
+            &["fontconfig", "ttf-liberation"],
+        );
         assert_eq!(matched.len(), 1);
         assert_eq!(matched[0].exec_command, "fc-cache -s");
 

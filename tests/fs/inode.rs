@@ -1,16 +1,16 @@
 // Standalone Unit Tests for Inode and Directory Subsystem
 // Part of SigmaOS File Management Subsystem
 
+#[path = "../../src/fs/directory.rs"]
+mod directory;
 #[path = "../../src/fs/fd.rs"]
 mod fd;
 #[path = "../../src/fs/inode.rs"]
 mod inode;
-#[path = "../../src/fs/directory.rs"]
-mod directory;
 
+use directory::Directory;
 use fd::FsError;
 use inode::{InodeManager, InodeType};
-use directory::Directory;
 
 #[test]
 fn test_inode_lifecycle_and_unlinking() {

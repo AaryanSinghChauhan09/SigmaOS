@@ -39,7 +39,11 @@ impl Directory {
     pub fn new(dir_inode_id: u64, parent_inode_id: u64) -> Self {
         let mut entries = Vec::new();
         entries.push(DirectoryEntry::new(".", dir_inode_id, InodeType::Directory));
-        entries.push(DirectoryEntry::new("..", parent_inode_id, InodeType::Directory));
+        entries.push(DirectoryEntry::new(
+            "..",
+            parent_inode_id,
+            InodeType::Directory,
+        ));
         Self {
             dir_inode_id,
             entries,
@@ -62,7 +66,8 @@ impl Directory {
         if self.lookup(name).is_ok() {
             return Err(FsError::FileAlreadyExists);
         }
-        self.entries.push(DirectoryEntry::new(name, inode_id, inode_type));
+        self.entries
+            .push(DirectoryEntry::new(name, inode_id, inode_type));
         Ok(())
     }
 

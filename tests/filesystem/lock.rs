@@ -26,7 +26,8 @@ fn test_flock_shared_and_exclusive_locks() {
     mgr.apply_flock(200, 4, LOCK_UN).expect("p200 unlock");
     assert_eq!(mgr.active_lock_count(), 0);
 
-    mgr.apply_flock(300, 5, LOCK_EX | LOCK_NB).expect("p300 exclusive lock");
+    mgr.apply_flock(300, 5, LOCK_EX | LOCK_NB)
+        .expect("p300 exclusive lock");
     assert_eq!(mgr.active_lock_count(), 1);
 }
 
@@ -46,6 +47,7 @@ fn test_range_lock_overlaps_and_cleanup() {
     mgr.release_locks_for_process(100);
     assert_eq!(mgr.active_lock_count(), 1);
 
-    mgr.apply_range_lock(200, 4, F_UNLCK, 150, 50, false).expect("unlock range");
+    mgr.apply_range_lock(200, 4, F_UNLCK, 150, 50, false)
+        .expect("unlock range");
     assert_eq!(mgr.active_lock_count(), 0);
 }
