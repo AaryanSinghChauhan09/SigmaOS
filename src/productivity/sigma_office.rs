@@ -21,9 +21,9 @@ use std::{
 };
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-use crate::klib::{HashMap, HashSet};
+use crate::klib::HashMap;
 #[cfg(any(feature = "standalone_test", test))]
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 
 use sigma_types::{CapabilityToken, Result};
 
@@ -7217,15 +7217,11 @@ pub struct ExecutiveKpiItem {
 #[derive(Debug, Clone, Default)]
 pub struct SovereignExecutiveKpiScorecardEngine {
     kpis: Vec<ExecutiveKpiItem>,
-    pub dependencies: HashMap<String, Vec<String>>,
 }
 
 impl SovereignExecutiveKpiScorecardEngine {
     pub fn new() -> Self {
-        Self {
-            kpis: Vec::new(),
-            dependencies: HashMap::new(),
-        }
+        Self { kpis: Vec::new() }
     }
 
     /// Adds a KPI metric item to the executive scorecard.
@@ -7274,57 +7270,6 @@ impl SovereignExecutiveKpiScorecardEngine {
             .sum();
 
         (weighted_sum / total_weight) * 100.0
-    }
-}
-
-// ---------------------------------------------------------------------------
-// 14c. Google Docs Paginated Layout Engine
-// ---------------------------------------------------------------------------
-
-/// Sovereign Google Docs Paginated Layout Engine for document page rendering and margin calculations.
-#[derive(Debug, Clone)]
-pub struct SovereignGoogleDocsPaginatedLayoutEngine {
-    pub page_width_mm: f32,
-    pub page_height_mm: f32,
-    pub margin_top_mm: f32,
-    pub margin_bottom_mm: f32,
-    pub margin_left_mm: f32,
-    pub margin_right_mm: f32,
-}
-
-impl Default for SovereignGoogleDocsPaginatedLayoutEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl SovereignGoogleDocsPaginatedLayoutEngine {
-    pub fn new() -> Self {
-        Self {
-            page_width_mm: 210.0,  // A4 Standard
-            page_height_mm: 297.0,
-            margin_top_mm: 25.4,
-            margin_bottom_mm: 25.4,
-            margin_left_mm: 25.4,
-            margin_right_mm: 25.4,
-        }
-    }
-
-    pub fn printable_width_mm(&self) -> f32 {
-        self.page_width_mm - self.margin_left_mm - self.margin_right_mm
-    }
-
-    pub fn printable_height_mm(&self) -> f32 {
-        self.page_height_mm - self.margin_top_mm - self.margin_bottom_mm
-    }
-
-    pub fn calculate_total_pages(&self, total_content_height_mm: f32) -> usize {
-        let p_height = self.printable_height_mm();
-        if p_height <= 0.0 || total_content_height_mm <= 0.0 {
-            1
-        } else {
-            (total_content_height_mm / p_height).ceil() as usize
-        }
     }
 }
 
@@ -7535,9 +7480,7 @@ impl SovereignExecutiveReportExporterEngine {
             html.push_str("</ul></section>\n");
         }
 
-        html.push_str(
-            "<footer>CONFIDENTIAL - Sovereign OS Enterprise Report</footer></body></html>",
-        );
+        html.push_str("<footer>CONFIDENTIAL - Sovereign OS Enterprise Report</footer></body></html>");
         html
     }
 }
@@ -9920,14 +9863,6 @@ mod tests {
         slides_master.add_placeholder(SlidePlaceholderKind::Body, "Content placeholder", 18.0);
         assert_eq!(slides_master.placeholders.len(), 3);
 
-        // 21. SovereignEnterpriseResourceAllocationEngine
-        let mut res_engine = SovereignEnterpriseResourceAllocationEngine::new();
-        res_engine.add_allocation(ResourceAllocation {
-            resource_id: "dev_alice".to_string(),
-            project_id: "prj_kernel".to_string(),
-            allocated_hours_per_week: 45.0,
-            max_capacity_hours_per_week: 40.0,
-        });
         let (util, overallocated) = res_engine.calculate_capacity_utilization_pct("dev_alice");
         assert_eq!(util, 112.5);
         assert!(overallocated);
@@ -9936,8 +9871,7 @@ mod tests {
         let mut report_exporter = SovereignExecutiveReportExporterEngine::new();
         report_exporter.add_section(ExecutiveReportSection {
             section_title: "Financial Growth".to_string(),
-            content_summary: "Q1 ARR expanded significantly across Enterprise accounts."
-                .to_string(),
+            content_summary: "Q1 ARR expanded significantly across Enterprise accounts.".to_string(),
             metric_kpis: vec![("ARR".to_string(), "$12.5M".to_string())],
         });
         let html_report = report_exporter.export_executive_html_report("Q1 Business Review", "CEO");
@@ -10240,70 +10174,108 @@ mod tests {
         assert!(bot_resp.contains("Triggering automated build"));
 
         // 7. Zoho Analytics Cohort Retention
-        let cohort_engine = SovereignZohoAnalyticsCohortAnalysisEngine::new();
-        let rates = cohort_engine.calculate_retention_rates(1000, &[1000, 800, 650, 500]);
-        assert_eq!(rates[0], 100.0);
-        assert_eq!(rates[1], 80.0);
+        let mut cohort_engine = SovereignZohoAnalyticsCohortAnalysisEngine::new();
+        let cohort = cohort_engine.compute_cohort_retention("2026-Q1", &[1000, 800, 650, 500]);
+        assert_eq!(cohort.total_cohort_users, 1000);
+        assert_eq!(cohort.retention_by_month[1], 80.0);
+        let forecast_val =
+            cohort_engine.predict_exponential_smoothing_trend(&[10.0, 12.0, 15.0, 18.0], 0.3);
+        assert!(forecast_val > 10.0);
 
         // 8. Zoho Desk SLA Escalation
-        let desk_sla = SovereignZohoDeskTicketSlaEscalationEngine::new();
-        let ticket = DeskTicket {
-            ticket_id: "TKT-102".to_string(),
-            priority: SlaPriority::Urgent,
-            created_at_sec: 1000,
-            first_response_at_sec: None,
-            resolved_at_sec: None,
-        };
-        assert!(desk_sla.check_response_sla_breach(&ticket, 3000));
+        let mut desk_sla = SovereignZohoDeskTicketSlaEscalationEngine::new();
+        desk_sla.add_escalation_rule(1, 60, "tier2_support");
+        desk_sla.add_escalation_rule(2, 120, "engineering_lead");
+        let (breached, assignee) = desk_sla.evaluate_ticket_sla_status(150, "High");
+        assert!(breached);
+        assert_eq!(assignee, Some("engineering_lead".to_string()));
 
         // 9. Salesforce Einstein Lead Scoring & Intent Decay AI
         let einstein = SovereignSalesforceEinsteinLeadScoringAiEngine::new();
-        let signals = vec![LeadSignal {
-            interaction_type: "Demo Request".to_string(),
-            weight: 50.0,
-            timestamp_sec: 1000,
-        }];
-        let score = einstein.calculate_lead_score(&signals, 1000, 86400.0);
-        assert_eq!(score, 50.0);
-        let prob = einstein.predict_conversion_probability(score);
-        assert!(prob > 0.0);
+        let decayed = einstein.calculate_intent_decay_score(100.0, 30, 30);
+        assert_eq!(decayed, 50.0);
+        let prob = einstein.predict_lead_conversion_probability(80.0, 500_000.0, 5);
+        assert!(prob > 0.5);
 
         // 10. Salesforce CPQ Volume Discount Tier & Approval Matrix
         let mut cpq_engine = SovereignSalesforceCpqQuoteDiscountEngine::new();
-        cpq_engine.add_discount_tier(10, 100, 15.0);
-        let (discounted_price, applied_pct) = cpq_engine.calculate_discounted_price(100.0, 50);
-        assert_eq!(applied_pct, 15.0);
-        assert_eq!(discounted_price, 4250.0);
+        cpq_engine.add_approval_tier(10.0, "Manager");
+        cpq_engine.add_approval_tier(20.0, "VP Sales");
+        assert_eq!(cpq_engine.evaluate_quote_approval_level(15.0), "VP Sales");
+        assert_eq!(
+            cpq_engine.evaluate_quote_approval_level(30.0),
+            "CFO Approval Required"
+        );
+
+        let (net_price, discount_pct) = cpq_engine.calculate_tiered_volume_discount(100.0, 150);
+        assert_eq!(discount_pct, 15.0);
+        assert_eq!(net_price, 12750.0);
 
         // 11. Odoo MRP Hierarchical BOM Tree
         let bom_engine = SovereignOdooMrpBillOfMaterialsTreeEngine::new();
-        let top_bom = OdooBomTreeNode {
-            item_id: "P1".to_string(),
-            item_name: "Workstation".to_string(),
-            quantity_required: 1.0,
-            unit_cost: 0.0,
-            scrap_loss_pct: 0.0,
+        let top_bom = BomTreeNode {
+            component_sku: "Workstation".to_string(),
+            qty_per_unit: 1.0,
+            unit_cost: 100.0,
+            scrap_factor: 0.0,
             sub_components: vec![
-                OdooBomTreeNode {
-                    item_id: "C1".to_string(),
-                    item_name: "CPU".to_string(),
-                    quantity_required: 1.0,
+                BomTreeNode {
+                    component_sku: "CPU".to_string(),
+                    qty_per_unit: 1.0,
                     unit_cost: 300.0,
-                    scrap_loss_pct: 2.0,
+                    scrap_factor: 0.02,
                     sub_components: vec![],
                 },
-                OdooBomTreeNode {
-                    item_id: "C2".to_string(),
-                    item_name: "RAM".to_string(),
-                    quantity_required: 2.0,
+                BomTreeNode {
+                    component_sku: "RAM".to_string(),
+                    qty_per_unit: 2.0,
                     unit_cost: 80.0,
-                    scrap_loss_pct: 0.0,
+                    scrap_factor: 0.0,
                     sub_components: vec![],
                 },
             ],
         };
-        let bom_cost = bom_engine.calculate_total_bom_cost(&top_bom);
-        assert!(bom_cost > 450.0);
+        let bom_cost = bom_engine.compute_hierarchical_bom_cost(&top_bom);
+        assert!(bom_cost > 500.0);
+        let leaves = bom_engine.expand_phantom_assemblies(&top_bom);
+        assert_eq!(leaves.len(), 2);
+
+        // 12. Odoo Quality Control Inspection Points & Yield
+        let mut qc_engine = SovereignOdooQualityControlInspectionEngine::new();
+        qc_engine.add_check_point(QualityCheckPoint {
+            check_id: "check_voltage".to_string(),
+            title: "Voltage Tolerances".to_string(),
+            is_pass_fail: false,
+            min_measurement: Some(11.5),
+            max_measurement: Some(12.5),
+        });
+        assert!(qc_engine.inspect_sample("check_voltage", Some(12.0), None));
+        assert!(!qc_engine.inspect_sample("check_voltage", Some(13.0), None));
+        assert_eq!(qc_engine.calculate_yield_rate(95, 100), 95.0);
+
+        // 13. Bitrix24 RPA Stage Pipeline
+        let mut rpa_engine = SovereignBitrix24RpaWorkflowEngine::new();
+        rpa_engine.add_stage(RpaStage {
+            stage_id: "stage_approval".to_string(),
+            name: "Manager Approval".to_string(),
+            required_fields: vec!["approver_email".to_string()],
+            auto_task_title: Some("Review Request".to_string()),
+        });
+        let mut item_data = HashMap::new();
+        assert!(rpa_engine
+            .advance_item_stage(&item_data, "draft", "stage_approval")
+            .is_err());
+        item_data.insert("approver_email".to_string(), "mgr@sigmaos.org".to_string());
+        assert!(rpa_engine
+            .advance_item_stage(&item_data, "draft", "stage_approval")
+            .unwrap());
+
+        // 14. Bitrix24 AI Speech & Call Sentiment Analyzer
+        let sentiment_engine = SovereignBitrix24SpeechAiSentimentAnalyzerEngine::new();
+        let analysis = sentiment_engine.analyze_call_transcript(
+            "The customer is very satisfied and loves the helpful software.",
+        );
+        assert!(analysis.sentiment_score > 0.5);
     }
 }
 

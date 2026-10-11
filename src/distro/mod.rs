@@ -70,13 +70,12 @@ pub mod arch_parity;
 pub use arch_missing_components_parity_pr::*;
 
 pub use arch_missing_components::{
-    AlpmInstalledPackage, ArchAlpmDbIntegrityEngine, ArchAuditVulnerabilityScanner,
-    ArchAurWebRpcClient, ArchBtrfsSnapperSnapshotter, ArchMakepkgEngine, ArchModprobedDbEngine,
-    ArchNamcapLinterEngine, ArchNewsAdvisoryFeedEngine, ArchNewsItem, ArchPacmanCacheScrubber,
-    ArchPacmanConflictResolverEngine, ArchPacmanHookRunner, ArchPkgctlDevtoolsEngine,
-    ArchRepoBranch, ArchVercmpVersionComparisonEngine, ArchVulnerabilityAdvisory, AurPackageResult,
-    CachedPackageFile, NamcapLintWarning, PacmanFileCollision, PacmanHookRule, PacmanHookWhen,
-    ParsedAlpmVersion, PkgbuildSpec, SnapperSnapshotRecord,
+    AlpmInstalledPackage, ArchAlpmDbIntegrityEngine, ArchAuditVulnerabilityScanner, ArchAurWebRpcClient,
+    ArchBtrfsSnapperSnapshotter, ArchMakepkgEngine, ArchModprobedDbEngine, ArchNamcapLinterEngine,
+    ArchNewsAdvisoryFeedEngine, ArchNewsItem, ArchPacmanCacheScrubber, ArchPacmanConflictResolverEngine,
+    ArchPacmanHookRunner, ArchPkgctlDevtoolsEngine, ArchRepoBranch, ArchVercmpVersionComparisonEngine,
+    ArchVulnerabilityAdvisory, AurPackageResult, CachedPackageFile, NamcapLintWarning, PacmanFileCollision,
+    PacmanHookRule, PacmanHookWhen, ParsedAlpmVersion, PkgbuildSpec, SnapperSnapshotRecord,
 };
 pub mod certification;
 pub mod chakra_parity;
@@ -86,8 +85,6 @@ pub mod compat_layers;
 pub mod compliance;
 pub mod debian_github_repo_inspirations_pr;
 pub use debian_github_repo_inspirations_pr::*;
-pub mod open_source_os_unimplemented_ideas_pr_suite;
-pub use open_source_os_unimplemented_ideas_pr_suite::*;
 pub mod debian_parity;
 pub mod developer;
 pub mod enterprise;
@@ -411,7 +408,6 @@ pub mod sovereign_media_and_distro_unimplemented_innovations;
 pub mod sovereign_linux_bsd_all_subsystems_harmony;
 pub use sovereign_linux_bsd_all_subsystems_harmony::*;
 
-
 pub mod sovereign_linux_bsd_media_wiki_unimplemented_ideas_engine;
 pub use sovereign_linux_bsd_media_wiki_unimplemented_ideas_engine::*;
 
@@ -534,21 +530,6 @@ pub mod sovereign_open_source_os_gap_closure_v36_pr;
 pub mod sovereign_open_source_os_pinnacle_pr_v35;
 pub mod whonix_privacy_synthesis;
 pub mod wiki_unimplemented_ideas;
-
-pub mod open_source_os_unimplemented_ideas_pr;
-pub use open_source_os_unimplemented_ideas_pr::*;
-
-pub mod sovereign_omarchy_github_repo_parity;
-pub use sovereign_omarchy_github_repo_parity::*;
-
-pub mod open_source_os_unimplemented_ideas_pr;
-pub use open_source_os_unimplemented_ideas_pr::*;
-
-pub mod open_source_os_unimplemented_ideas_pr_suite;
-pub use open_source_os_unimplemented_ideas_pr_suite::*;
-
-pub mod cachy_linux_missing_components_engine;
-pub use cachy_linux_missing_components_engine::*;
 
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;

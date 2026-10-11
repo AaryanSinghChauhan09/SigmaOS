@@ -22,11 +22,7 @@ pub struct ProcessFdTable {
 
 impl ProcessFdTable {
     pub fn new(max_fds: usize) -> Self {
-        let max = if max_fds == 0 {
-            DEFAULT_MAX_FDS
-        } else {
-            max_fds
-        };
+        let max = if max_fds == 0 { DEFAULT_MAX_FDS } else { max_fds };
         let mut entries = Vec::with_capacity(max);
         for _ in 0..max {
             entries.push(None);
@@ -42,12 +38,7 @@ impl ProcessFdTable {
         self.allocate_fd_above(0, handle, flags)
     }
 
-    pub fn allocate_fd_above(
-        &mut self,
-        min_fd: i32,
-        handle: FileHandle,
-        flags: u32,
-    ) -> Result<i32, FsError> {
+    pub fn allocate_fd_above(&mut self, min_fd: i32, handle: FileHandle, flags: u32) -> Result<i32, FsError> {
         if min_fd < 0 || (min_fd as usize) >= self.max_fds {
             return Err(FsError::InvalidFileDescriptor);
         }
@@ -96,11 +87,7 @@ impl ProcessFdTable {
     }
 
     pub fn dup2_fd(&mut self, old_fd: i32, new_fd: i32) -> Result<i32, FsError> {
-        if old_fd < 0
-            || (old_fd as usize) >= self.max_fds
-            || new_fd < 0
-            || (new_fd as usize) >= self.max_fds
-        {
+        if old_fd < 0 || (old_fd as usize) >= self.max_fds || new_fd < 0 || (new_fd as usize) >= self.max_fds {
             return Err(FsError::InvalidFileDescriptor);
         }
         if old_fd == new_fd {

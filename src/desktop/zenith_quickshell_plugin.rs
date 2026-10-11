@@ -132,41 +132,13 @@ impl ZenithQuickshellPluginRegistry {
     /// Registers standard Omarchy-inspired first-party plugins
     fn register_first_party_plugins(&mut self) {
         let first_party = vec![
-            PluginManifestContract::new(
-                "omarchy.bar",
-                "Omarchy Status Bar & Widgets",
-                PluginCategory::BarWidget,
-            ),
-            PluginManifestContract::new(
-                "omarchy.clipboard",
-                "Unified Clipboard & History",
-                PluginCategory::ClipboardManager,
-            ),
-            PluginManifestContract::new(
-                "omarchy.notifications",
-                "Sovereign Notifications Service",
-                PluginCategory::NotificationsService,
-            ),
-            PluginManifestContract::new(
-                "omarchy.agents",
-                "Herdr AI Workstation Agent",
-                PluginCategory::AiAgentIntegration,
-            ),
-            PluginManifestContract::new(
-                "omarchy.reminders",
-                "Tasks & Reminders Manager",
-                PluginCategory::RemindersManager,
-            ),
-            PluginManifestContract::new(
-                "omarchy.image_picker",
-                "Quick Image & Screenshot Picker",
-                PluginCategory::ImagePicker,
-            ),
-            PluginManifestContract::new(
-                "omarchy.lockscreen",
-                "Zenith Lock Screen",
-                PluginCategory::LockScreen,
-            ),
+            PluginManifestContract::new("omarchy.bar", "Omarchy Status Bar & Widgets", PluginCategory::BarWidget),
+            PluginManifestContract::new("omarchy.clipboard", "Unified Clipboard & History", PluginCategory::ClipboardManager),
+            PluginManifestContract::new("omarchy.notifications", "Sovereign Notifications Service", PluginCategory::NotificationsService),
+            PluginManifestContract::new("omarchy.agents", "Herdr AI Workstation Agent", PluginCategory::AiAgentIntegration),
+            PluginManifestContract::new("omarchy.reminders", "Tasks & Reminders Manager", PluginCategory::RemindersManager),
+            PluginManifestContract::new("omarchy.image_picker", "Quick Image & Screenshot Picker", PluginCategory::ImagePicker),
+            PluginManifestContract::new("omarchy.lockscreen", "Zenith Lock Screen", PluginCategory::LockScreen),
         ];
 
         for manifest in first_party {
@@ -177,15 +149,8 @@ impl ZenithQuickshellPluginRegistry {
     /// Registers a new plugin with manifest contract
     pub fn register_plugin(&mut self, manifest: PluginManifestContract) -> Result<(), String> {
         manifest.validate()?;
-        if self
-            .plugins
-            .iter()
-            .any(|p| p.manifest.plugin_id == manifest.plugin_id)
-        {
-            return Err(format!(
-                "Plugin ID '{}' is already registered",
-                manifest.plugin_id
-            ));
+        if self.plugins.iter().any(|p| p.manifest.plugin_id == manifest.plugin_id) {
+            return Err(format!("Plugin ID '{}' is already registered", manifest.plugin_id));
         }
 
         self.plugins.push(QuickshellPluginInstance {
@@ -199,11 +164,7 @@ impl ZenithQuickshellPluginRegistry {
 
     /// Enables and activates a plugin by ID
     pub fn activate_plugin(&mut self, plugin_id: &str) -> Result<String, String> {
-        if let Some(plugin) = self
-            .plugins
-            .iter_mut()
-            .find(|p| p.manifest.plugin_id == plugin_id)
-        {
+        if let Some(plugin) = self.plugins.iter_mut().find(|p| p.manifest.plugin_id == plugin_id) {
             plugin.state = PluginState::Active;
             Ok(format!("Plugin '{}' activated successfully", plugin_id))
         } else {
@@ -242,10 +203,7 @@ impl ZenithQuickshellPluginRegistry {
                 active_count += 1;
             }
         }
-        format!(
-            "Zenith Quickshell Frame Rendered: {} active plugins updated",
-            active_count
-        )
+        format!("Zenith Quickshell Frame Rendered: {} active plugins updated", active_count)
     }
 }
 
@@ -261,8 +219,7 @@ mod tests {
 
     #[test]
     fn test_plugin_manifest_validation() {
-        let manifest =
-            PluginManifestContract::new("test.bar", "Test Bar", PluginCategory::BarWidget);
+        let manifest = PluginManifestContract::new("test.bar", "Test Bar", PluginCategory::BarWidget);
         assert!(manifest.validate().is_ok());
         assert!(manifest.to_json_manifest().contains("test.bar"));
 

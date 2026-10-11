@@ -201,12 +201,6 @@ pub use process_monitor::{
     MonitoredProcessState, ProcessEntry, ProcessFilter, ProcessMonitor, ProcessSortField,
     ProcessTreeNode,
 };
-
-pub mod thread;
-pub use thread::{
-    CpuContext, SchedulingClass, StackMeta, Thread, ThreadId, ThreadManager, ThreadOwnership,
-    ThreadState, WaitChannelId,
-};
 pub use scheduler::{
     CfsScheduler, Priority, ProcessState as SchedulerProcessState, ProcessTask, RtScheduler,
     SchedulerPolicy, ThermalState,

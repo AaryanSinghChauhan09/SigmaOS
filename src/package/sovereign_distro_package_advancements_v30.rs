@@ -115,7 +115,7 @@ impl UniversalFormatInspectorAndClassifierV30 {
             .ok_or_else(|| format!("Unknown package extension for file: {}", filename))?;
 
         let clean_filename = filename.split('/').last().unwrap_or(filename);
-        let base_name_with_ver = if let Some(idx) = clean_filename.find(".pkg.tar.") {
+        let base_name = if let Some(idx) = clean_filename.find(".pkg.tar.") {
             &clean_filename[..idx]
         } else if let Some(idx) = clean_filename.find(".tar.") {
             &clean_filename[..idx]
@@ -127,16 +127,11 @@ impl UniversalFormatInspectorAndClassifierV30 {
             clean_filename
         };
 
-        let base_name_with_ver = if base_name_with_ver.is_empty() {
+        let base_name = if base_name.is_empty() {
             clean_filename
         } else {
-            base_name_with_ver
+            base_name
         };
-
-        let base_name = base_name_with_ver
-            .split(&['-', '_'][..])
-            .next()
-            .unwrap_or(base_name_with_ver);
 
         // Determine compression type
         let compression_type = if filename.contains(".gz") || filename.contains(".tgz") {
@@ -408,12 +403,6 @@ impl UniversalMultiFormatTranspilerAndExecutionEngineV30 {
         }
     }
 
-    pub fn install_package(&mut self, name: &str) {
-        if !self.installed_packages.contains(&name.to_string()) {
-            self.installed_packages.push(name.to_string());
-        }
-    }
-
     /// Transpiles an inspected package manifest into native `UnifiedPackage` in `SigmaPkg` format V30
     pub fn transpile_to_native_sigpkg(
         &self,
@@ -436,18 +425,10 @@ impl UniversalMultiFormatTranspilerAndExecutionEngineV30 {
             pkg.properties.insert("cflags".to_string(), cflags.clone());
         }
 
-        pkg.properties.insert(
-            "source_format".to_string(),
-            format!("{:?}", manifest.detected_format),
-        );
+        pkg.properties
+            .insert("source_format".to_string(), format!("{:?}", manifest.detected_format));
         pkg.checksum = manifest.payload_sha256.clone();
         pkg
-    }
-
-    pub fn install_package(&mut self, name: &str) {
-        if !self.installed_packages.contains(&name.to_string()) {
-            self.installed_packages.push(name.to_string());
-        }
     }
 
     /// Creates a transactional state checkpoint before installation operations V30
@@ -562,12 +543,7 @@ impl UniversalPmCliRouterV30 {
         let mut target_packages = Vec::new();
 
         for arg in &parts[1..] {
-            if *arg == "--dry-run"
-                || *arg == "-s"
-                || *arg == "-n"
-                || *arg == "-p"
-                || *arg == "--simulate"
-            {
+            if *arg == "--dry-run" || *arg == "-s" || *arg == "-n" || *arg == "-p" || *arg == "--simulate" {
                 dry_run = true;
                 continue;
             }
@@ -576,8 +552,7 @@ impl UniversalPmCliRouterV30 {
                 "install" | "add" | "in" | "-S" | "-Sy" | "-Syy" | "-a" | "-ask" | "--ask" => {
                     action = UniversalPmActionV30::Install;
                 }
-                "remove" | "purge" | "del" | "delete" | "uninstall" | "-R" | "-Rns" | "-C"
-                | "--unmerge" | "rm" => {
+                "remove" | "purge" | "del" | "delete" | "uninstall" | "-R" | "-Rns" | "-C" | "--unmerge" | "rm" => {
                     action = UniversalPmActionV30::Remove;
                 }
                 "update" | "upgrade" | "up" | "-Syu" | "-Syyu" | "-u" | "--update" => {
@@ -621,7 +596,6 @@ pub struct SovereignDistroPackageAdvancementsSuiteV30 {
     pub scriptlet_engine: UdfScriptletSandboxEngineV30,
     pub transpiler_engine: UniversalMultiFormatTranspilerAndExecutionEngineV30,
     pub cli_router: UniversalPmCliRouterV30,
-    pub installed_packages: Vec<String>,
 }
 
 impl SovereignDistroPackageAdvancementsSuiteV30 {
@@ -632,7 +606,6 @@ impl SovereignDistroPackageAdvancementsSuiteV30 {
             scriptlet_engine: UdfScriptletSandboxEngineV30::new(),
             transpiler_engine: UniversalMultiFormatTranspilerAndExecutionEngineV30::new(),
             cli_router: UniversalPmCliRouterV30::new(),
-            installed_packages: Vec::new(),
         }
     }
 
@@ -647,7 +620,8 @@ impl SovereignDistroPackageAdvancementsSuiteV30 {
             .transpiler_engine
             .transpile_to_native_sigpkg(&manifest, &self.governor);
 
-        self.transpiler_engine.install_package(&native_sigpkg.name);
+        self.transpiler_engine
+            .install_package(&native_sigpkg.name);
         Ok(native_sigpkg)
     }
 }
@@ -700,9 +674,7 @@ mod tests {
         ];
 
         for (filename, expected_format) in prompt_cases {
-            let manifest = inspector
-                .inspect_package(filename, b"DATA_PAYLOAD")
-                .unwrap();
+            let manifest = inspector.inspect_package(filename, b"DATA_PAYLOAD").unwrap();
             assert_eq!(
                 manifest.detected_format, expected_format,
                 "Format mismatch for file: {}",
@@ -720,11 +692,11 @@ mod tests {
     fn test_governor_remapping_and_sandboxing_v30() {
         let governor = UniversalCrossDistroCapabilityGovernorV30::new();
 
-        assert_eq!(governor.remap_dependency("libssl-dev"), "sovereign-openssl");
         assert_eq!(
-            governor.remap_dependency("custom-lib"),
-            "sovereign-custom-lib"
+            governor.remap_dependency("libssl-dev"),
+            "sovereign-openssl"
         );
+        assert_eq!(governor.remap_dependency("custom-lib"), "sovereign-custom-lib");
 
         let sandbox = governor.generate_sandbox_rules(PackageFormat::Flatpak);
         assert!(sandbox.pledge_promises.contains("inet"));
@@ -797,10 +769,9 @@ mod tests {
         let sigpkg = suite
             .process_and_install_package("htop-3.3.0.deb", b"DEB_BINARY_DATA")
             .unwrap();
-        assert_eq!(sigpkg.name, "sigpkg-ripgrep-14.1.0");
+        assert_eq!(sigpkg.name, "sigpkg-htop-3.3.0");
         assert!(suite
-            .transpiler_engine
             .installed_packages
-            .contains(&"sigpkg-ripgrep-14.1.0".to_string()));
+            .contains(&"sigpkg-htop-3.3.0".to_string()));
     }
 }

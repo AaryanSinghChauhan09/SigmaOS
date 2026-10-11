@@ -461,6 +461,7 @@ impl UniversalBootEnvSnapshotGovernorV29 {
             backend,
             active_packages,
         });
+
         id
     }
 
@@ -469,7 +470,7 @@ impl UniversalBootEnvSnapshotGovernorV29 {
         if let Some(snap) = self.snapshots.iter().find(|s| s.snapshot_id == snapshot_id) {
             Ok(snap.active_packages.clone())
         } else {
-            Err(format!("Snapshot ID {} not found", checkpoint_id))
+            Err(format!("Snapshot ID {} not found", snapshot_id))
         }
     }
 }
@@ -506,8 +507,8 @@ impl SovereignDistroPackageAdvancementsSuiteV29 {
     /// Ingests, inspects, solves dependencies, sandboxes, and installs foreign packages V29
     pub fn process_and_install_package(
         &mut self,
-        _filename: &str,
-        _payload: &[u8],
+        filename: &str,
+        payload: &[u8],
     ) -> Result<UnifiedPackage, String> {
         let manifest = self.inspector.inspect_package(filename, payload)?;
         let resolved = self.solver.solve_dependencies(&manifest.name, &manifest.dependencies);

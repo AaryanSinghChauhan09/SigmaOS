@@ -1567,15 +1567,7 @@ impl MintUploadManager {
         }
     }
 
-    pub fn add_profile(
-        &mut self,
-        name: &str,
-        host: &str,
-        port: u16,
-        protocol: UploadProtocol,
-        remote_path: &str,
-        url_base: &str,
-    ) {
+    pub fn add_profile(&mut self, name: &str, host: &str, port: u16, protocol: UploadProtocol, remote_path: &str, url_base: &str) {
         self.profiles.push(UploadProfile {
             name: name.to_string(),
             host: host.to_string(),
@@ -1586,21 +1578,9 @@ impl MintUploadManager {
         });
     }
 
-    pub fn generate_share_link(
-        &self,
-        profile_name: &str,
-        filename: &str,
-    ) -> Result<String, &'static str> {
-        let prof = self
-            .profiles
-            .iter()
-            .find(|p| p.name == profile_name)
-            .ok_or("Upload profile not found")?;
-        Ok(format!(
-            "{}/{}",
-            prof.public_url_base.trim_end_matches('/'),
-            filename
-        ))
+    pub fn generate_share_link(&self, profile_name: &str, filename: &str) -> Result<String, &'static str> {
+        let prof = self.profiles.iter().find(|p| p.name == profile_name).ok_or("Upload profile not found")?;
+        Ok(format!("{}/{}", prof.public_url_base.trim_end_matches('/'), filename))
     }
 }
 
@@ -1633,11 +1613,7 @@ impl MintDigitKeyringPrompt {
     }
 
     /// Constant-time authentication verification against registered expected hash
-    pub fn request_auth(
-        &mut self,
-        command: &str,
-        attempt_hash: &[u8; 16],
-    ) -> Result<bool, &'static str> {
+    pub fn request_auth(&mut self, command: &str, attempt_hash: &[u8; 16]) -> Result<bool, &'static str> {
         if command.is_empty() {
             return Err("Command path cannot be empty");
         }
@@ -1873,11 +1849,7 @@ impl MintUserAccountsManager {
     }
 
     pub fn set_autologin(&mut self, username: &str, enabled: bool) -> Result<(), &'static str> {
-        let user = self
-            .users
-            .iter_mut()
-            .find(|u| u.username == username)
-            .ok_or("User not found")?;
+        let user = self.users.iter_mut().find(|u| u.username == username).ok_or("User not found")?;
         user.autologin_enabled = enabled;
         Ok(())
     }
@@ -1953,9 +1925,7 @@ impl Default for MintCinnamonHotCornerEngine {
 
 impl MintCinnamonHotCornerEngine {
     pub fn new() -> Self {
-        let mut engine = Self {
-            corners: Vec::new(),
-        };
+        let mut engine = Self { corners: Vec::new() };
         engine.corners.push(HotCornerConfig {
             location: HotCornerLocation::TopLeft,
             action: HotCornerAction::ExpoWorkspaces,
@@ -1965,12 +1935,7 @@ impl MintCinnamonHotCornerEngine {
         engine
     }
 
-    pub fn set_corner_action(
-        &mut self,
-        location: HotCornerLocation,
-        action: HotCornerAction,
-        cmd: &str,
-    ) {
+    pub fn set_corner_action(&mut self, location: HotCornerLocation, action: HotCornerAction, cmd: &str) {
         if let Some(c) = self.corners.iter_mut().find(|c| c.location == location) {
             c.action = action;
             c.custom_cmd = cmd.to_string();
@@ -1985,10 +1950,7 @@ impl MintCinnamonHotCornerEngine {
     }
 
     pub fn trigger_corner(&self, location: HotCornerLocation) -> Option<HotCornerAction> {
-        self.corners
-            .iter()
-            .find(|c| c.location == location)
-            .map(|c| c.action)
+        self.corners.iter().find(|c| c.location == location).map(|c| c.action)
     }
 }
 
@@ -2050,13 +2012,7 @@ impl MintInstallFlatpakRefFetcher {
         Self { refs: Vec::new() }
     }
 
-    pub fn parse_flatpakref(
-        &mut self,
-        name: &str,
-        branch: &str,
-        title: &str,
-        url: &str,
-    ) -> Result<&FlatpakRefDescriptor, &'static str> {
+    pub fn parse_flatpakref(&mut self, name: &str, branch: &str, title: &str, url: &str) -> Result<&FlatpakRefDescriptor, &'static str> {
         if url.is_empty() {
             return Err("Invalid FlatpakRef URL");
         }
@@ -2272,10 +2228,7 @@ impl MintNemoExtensionManager {
     }
 
     pub fn get_menu_providers(&self) -> Vec<&NemoExtensionDescriptor> {
-        self.extensions
-            .iter()
-            .filter(|e| e.enabled && e.provides_menus)
-            .collect()
+        self.extensions.iter().filter(|e| e.enabled && e.provides_menus).collect()
     }
 }
 
@@ -2301,9 +2254,7 @@ impl Default for MintWacomTabletSupportManager {
 
 impl MintWacomTabletSupportManager {
     pub fn new() -> Self {
-        Self {
-            devices: Vec::new(),
-        }
+        Self { devices: Vec::new() }
     }
 
     pub fn register_tablet(&mut self, name: &str, btn1: &str, btn2: &str) {
@@ -2359,17 +2310,10 @@ impl MintCinnamonThemeMarketplace {
     }
 
     pub fn install_spice(&mut self, spice_id: &str) -> Result<String, &'static str> {
-        if let Some(item) = self
-            .available_spices
-            .iter_mut()
-            .find(|s| s.spice_id == spice_id)
-        {
+        if let Some(item) = self.available_spices.iter_mut().find(|s| s.spice_id == spice_id) {
             item.is_installed = true;
             item.download_count += 1;
-            Ok(format!(
-                "Successfully installed Cinnamon Spice '{}'",
-                item.name
-            ))
+            Ok(format!("Successfully installed Cinnamon Spice '{}'", item.name))
         } else {
             Err("Spice item not found in marketplace")
         }
@@ -2398,19 +2342,10 @@ impl Default for MintCommunityHardwareDatabase {
 
 impl MintCommunityHardwareDatabase {
     pub fn new() -> Self {
-        Self {
-            reports: Vec::new(),
-        }
+        Self { reports: Vec::new() }
     }
 
-    pub fn submit_report(
-        &mut self,
-        modalias: &str,
-        name: &str,
-        driver: &str,
-        rating: u8,
-        notes: &str,
-    ) {
+    pub fn submit_report(&mut self, modalias: &str, name: &str, driver: &str, rating: u8, notes: &str) {
         self.reports.push(HardwareCompatReport {
             device_modalias: modalias.to_string(),
             hardware_name: name.to_string(),
@@ -2486,17 +2421,10 @@ impl MintAdvancedDebuggingSuite {
     }
 
     pub fn analyze_crash(&self, crash_id: u32) -> Result<String, &'static str> {
-        let report = self
-            .crash_reports
-            .iter()
-            .find(|c| c.crash_id == crash_id)
-            .ok_or("Crash report not found")?;
+        let report = self.crash_reports.iter().find(|c| c.crash_id == crash_id).ok_or("Crash report not found")?;
         Ok(format!(
             "Crash #{} in {} (signal {}): {} frames in backtrace",
-            report.crash_id,
-            report.executable_name,
-            report.signal_number,
-            report.stacktrace.len()
+            report.crash_id, report.executable_name, report.signal_number, report.stacktrace.len()
         ))
     }
 }
@@ -2539,14 +2467,7 @@ impl MintInstallerPartitioningEngine {
         }
     }
 
-    pub fn add_partition(
-        &mut self,
-        dev: &str,
-        num: u32,
-        size_mb: u64,
-        fs: PartitionTargetFs,
-        mount: &str,
-    ) -> usize {
+    pub fn add_partition(&mut self, dev: &str, num: u32, size_mb: u64, fs: PartitionTargetFs, mount: &str) -> usize {
         let idx = self.partitions.len();
         if fs == PartitionTargetFs::Fat32 && mount == "/boot/efi" {
             self.efi_system_partition_index = Some(idx);
@@ -2593,37 +2514,22 @@ impl MintSoftwareManagerTransactionVerifier {
             trusted_gpg_fingerprints: Vec::new(),
             verified_transactions_count: 0,
         };
-        verifier
-            .trusted_gpg_fingerprints
-            .push(String::from("A4B2C3D4E5F678901234567890ABCDEF12345678")); // Linux Mint Release Key
+        verifier.trusted_gpg_fingerprints.push(String::from("A4B2C3D4E5F678901234567890ABCDEF12345678")); // Linux Mint Release Key
         verifier
     }
 
     pub fn add_trusted_key(&mut self, fingerprint: &str) {
-        if !self
-            .trusted_gpg_fingerprints
-            .contains(&fingerprint.to_string())
-        {
+        if !self.trusted_gpg_fingerprints.contains(&fingerprint.to_string()) {
             self.trusted_gpg_fingerprints.push(fingerprint.to_string());
         }
     }
 
-    pub fn verify_and_commit_package(
-        &mut self,
-        pkg_name: &str,
-        signing_key: &str,
-    ) -> Result<String, &'static str> {
-        if !self
-            .trusted_gpg_fingerprints
-            .contains(&signing_key.to_string())
-        {
+    pub fn verify_and_commit_package(&mut self, pkg_name: &str, signing_key: &str) -> Result<String, &'static str> {
+        if !self.trusted_gpg_fingerprints.contains(&signing_key.to_string()) {
             return Err("GPG verification failed: Untrusted signature key");
         }
         self.verified_transactions_count += 1;
-        Ok(format!(
-            "Successfully verified and installed signed package '{}'",
-            pkg_name
-        ))
+        Ok(format!("Successfully verified and installed signed package '{}'", pkg_name))
     }
 }
 
@@ -2652,11 +2558,7 @@ impl MintTimeshiftSnapshotRestoreVerification {
     }
 
     pub fn perform_atomic_rollback(&mut self, snap_id: u32) -> Result<u64, &'static str> {
-        if let Some(&(_, hash)) = self
-            .snapshot_state_hashes
-            .iter()
-            .find(|(id, _)| *id == snap_id)
-        {
+        if let Some(&(_, hash)) = self.snapshot_state_hashes.iter().find(|(id, _)| *id == snap_id) {
             self.active_state_hash = hash;
             Ok(hash)
         } else {
@@ -2696,10 +2598,7 @@ impl MintZenithCompositorBackendBridge {
         }
     }
 
-    pub fn initialize_backend(
-        &mut self,
-        backend: CompositorRenderBackend,
-    ) -> Result<(), &'static str> {
+    pub fn initialize_backend(&mut self, backend: CompositorRenderBackend) -> Result<(), &'static str> {
         self.active_backend = backend;
         self.is_initialized = true;
         Ok(())
@@ -2737,20 +2636,10 @@ impl Default for MintCinnamonSpicesRegistry {
 
 impl MintCinnamonSpicesRegistry {
     pub fn new() -> Self {
-        Self {
-            manifests: Vec::new(),
-        }
+        Self { manifests: Vec::new() }
     }
 
-    pub fn register_manifest(
-        &mut self,
-        uuid: &str,
-        name: &str,
-        desc: &str,
-        ver: &str,
-        max_cin: &str,
-        deps: &[&str],
-    ) {
+    pub fn register_manifest(&mut self, uuid: &str, name: &str, desc: &str, ver: &str, max_cin: &str, deps: &[&str]) {
         self.manifests.push(SpiceManifest {
             uuid: uuid.to_string(),
             name: name.to_string(),
@@ -2761,16 +2650,8 @@ impl MintCinnamonSpicesRegistry {
         });
     }
 
-    pub fn validate_compatibility(
-        &self,
-        uuid: &str,
-        current_cinnamon_ver: &str,
-    ) -> Result<bool, &'static str> {
-        let m = self
-            .manifests
-            .iter()
-            .find(|m| m.uuid == uuid)
-            .ok_or("Spice manifest not found")?;
+    pub fn validate_compatibility(&self, uuid: &str, current_cinnamon_ver: &str) -> Result<bool, &'static str> {
+        let m = self.manifests.iter().find(|m| m.uuid == uuid).ok_or("Spice manifest not found")?;
         Ok(current_cinnamon_ver <= m.max_cinnamon_version.as_str())
     }
 }
@@ -2827,9 +2708,7 @@ impl Default for MintInstallAppStreamSearchIndex {
 
 impl MintInstallAppStreamSearchIndex {
     pub fn new() -> Self {
-        Self {
-            documents: Vec::new(),
-        }
+        Self { documents: Vec::new() }
     }
 
     pub fn index_app(&mut self, app_id: &str, title: &str, keywords: &[&str]) {
@@ -2874,21 +2753,11 @@ impl Default for MintNemoPreviewPlugin {
 
 impl MintNemoPreviewPlugin {
     pub fn new() -> Self {
-        Self {
-            previews: Vec::new(),
-        }
+        Self { previews: Vec::new() }
     }
 
-    pub fn generate_preview(
-        &mut self,
-        filename: &str,
-        mime: &str,
-        size: u64,
-    ) -> &FilePreviewMetadata {
-        let summary = format!(
-            "Spatial preview for {} [{}] - {} bytes",
-            filename, mime, size
-        );
+    pub fn generate_preview(&mut self, filename: &str, mime: &str, size: u64) -> &FilePreviewMetadata {
+        let summary = format!("Spatial preview for {} [{}] - {} bytes", filename, mime, size);
         self.previews.push(FilePreviewMetadata {
             filename: filename.to_string(),
             mime_type: mime.to_string(),
@@ -2960,22 +2829,11 @@ mod tests {
     #[test]
     fn test_mint_cinnamon_spices_registry() {
         let mut reg = MintCinnamonSpicesRegistry::new();
-        reg.register_manifest(
-            "weather@cinnamon.org",
-            "Weather Applet",
-            "Displays weather info",
-            "1.2",
-            "6.2",
-            &["python3-requests"],
-        );
+        reg.register_manifest("weather@cinnamon.org", "Weather Applet", "Displays weather info", "1.2", "6.2", &["python3-requests"]);
         assert_eq!(reg.manifests.len(), 1);
 
-        assert!(reg
-            .validate_compatibility("weather@cinnamon.org", "6.0")
-            .unwrap());
-        assert!(!reg
-            .validate_compatibility("weather@cinnamon.org", "6.5")
-            .unwrap());
+        assert!(reg.validate_compatibility("weather@cinnamon.org", "6.0").unwrap());
+        assert!(!reg.validate_compatibility("weather@cinnamon.org", "6.5").unwrap());
     }
 
     #[test]
@@ -2983,12 +2841,7 @@ mod tests {
         let mut staging = MintUpdateAutomatedStagingEngine::new();
         let pending = vec![
             MintUpdatePackage::new(b"zenith", b"1.0.0", b"1.1.0", MintUpdateLevel::Level1Safe),
-            MintUpdatePackage::new(
-                b"kernel-core",
-                b"6.5.0",
-                b"6.6.0",
-                MintUpdateLevel::Level5Critical,
-            ),
+            MintUpdatePackage::new(b"kernel-core", b"6.5.0", b"6.6.0", MintUpdateLevel::Level5Critical),
         ];
 
         let staged = staging.stage_safe_updates(&pending);
@@ -2999,11 +2852,7 @@ mod tests {
     #[test]
     fn test_mint_install_appstream_search_index() {
         let mut index = MintInstallAppStreamSearchIndex::new();
-        index.index_app(
-            "org.videolan.VLC",
-            "VLC Media Player",
-            &["video", "movie", "audio", "player"],
-        );
+        index.index_app("org.videolan.VLC", "VLC Media Player", &["video", "movie", "audio", "player"]);
 
         let results = index.search("movie");
         assert_eq!(results.len(), 1);
@@ -3036,15 +2885,11 @@ mod tests {
         let mut verifier = MintSoftwareManagerTransactionVerifier::new();
         let release_key = "A4B2C3D4E5F678901234567890ABCDEF12345678";
 
-        let res = verifier
-            .verify_and_commit_package("cinnamon-desktop", release_key)
-            .unwrap();
+        let res = verifier.verify_and_commit_package("cinnamon-desktop", release_key).unwrap();
         assert!(res.contains("Successfully verified and installed"));
         assert_eq!(verifier.verified_transactions_count, 1);
 
-        assert!(verifier
-            .verify_and_commit_package("untrusted-pkg", "INVALID_KEY")
-            .is_err());
+        assert!(verifier.verify_and_commit_package("untrusted-pkg", "INVALID_KEY").is_err());
     }
 
     #[test]
@@ -3062,9 +2907,7 @@ mod tests {
         let mut bridge = MintZenithCompositorBackendBridge::new();
         assert!(bridge.render_composite_frame().is_err());
 
-        bridge
-            .initialize_backend(CompositorRenderBackend::WaylandNative)
-            .unwrap();
+        bridge.initialize_backend(CompositorRenderBackend::WaylandNative).unwrap();
         assert!(bridge.is_initialized);
 
         let bytes = bridge.render_composite_frame().unwrap();
@@ -3084,9 +2927,7 @@ mod tests {
         let mut marketplace = MintCinnamonThemeMarketplace::new();
         assert_eq!(marketplace.available_spices.len(), 1);
 
-        let res = marketplace
-            .install_spice("cinnamon-theme-adapta-nokto")
-            .unwrap();
+        let res = marketplace.install_spice("cinnamon-theme-adapta-nokto").unwrap();
         assert!(res.contains("Successfully installed"));
         assert!(marketplace.available_spices[0].is_installed);
     }
@@ -3094,13 +2935,7 @@ mod tests {
     #[test]
     fn test_mint_community_hardware_database() {
         let mut hw_db = MintCommunityHardwareDatabase::new();
-        hw_db.submit_report(
-            "pci:v0002d0003",
-            "Intel Wi-Fi 6",
-            "iwlwifi",
-            5,
-            "Works out of the box",
-        );
+        hw_db.submit_report("pci:v0002d0003", "Intel Wi-Fi 6", "iwlwifi", 5, "Works out of the box");
 
         let r = hw_db.lookup_driver("pci:v0002d0003").unwrap();
         assert_eq!(r.hardware_name, "Intel Wi-Fi 6");
@@ -3110,11 +2945,7 @@ mod tests {
     #[test]
     fn test_mint_advanced_debugging_suite() {
         let mut dbg = MintAdvancedDebuggingSuite::new();
-        let id = dbg.record_crash(
-            "zenith-wm",
-            11,
-            &[("main", "main.rs", 42), ("render", "render.rs", 100)],
-        );
+        let id = dbg.record_crash("zenith-wm", 11, &[("main", "main.rs", 42), ("render", "render.rs", 100)]);
         assert_eq!(id, 1);
 
         let analysis = dbg.analyze_crash(id).unwrap();
@@ -3160,20 +2991,10 @@ mod tests {
     #[test]
     fn test_mint_cinnamon_hot_corner_engine() {
         let mut corners = MintCinnamonHotCornerEngine::new();
-        assert_eq!(
-            corners.trigger_corner(HotCornerLocation::TopLeft),
-            Some(HotCornerAction::ExpoWorkspaces)
-        );
+        assert_eq!(corners.trigger_corner(HotCornerLocation::TopLeft), Some(HotCornerAction::ExpoWorkspaces));
 
-        corners.set_corner_action(
-            HotCornerLocation::BottomRight,
-            HotCornerAction::ShowDesktop,
-            "",
-        );
-        assert_eq!(
-            corners.trigger_corner(HotCornerLocation::BottomRight),
-            Some(HotCornerAction::ShowDesktop)
-        );
+        corners.set_corner_action(HotCornerLocation::BottomRight, HotCornerAction::ShowDesktop, "");
+        assert_eq!(corners.trigger_corner(HotCornerLocation::BottomRight), Some(HotCornerAction::ShowDesktop));
     }
 
     #[test]
@@ -3189,14 +3010,7 @@ mod tests {
     #[test]
     fn test_mint_install_flatpak_ref_fetcher() {
         let mut flatpak_ref = MintInstallFlatpakRefFetcher::new();
-        let desc = flatpak_ref
-            .parse_flatpakref(
-                "vlc",
-                "stable",
-                "VLC Media Player",
-                "https://dl.flathub.org/repo/appstream/vlc.flatpakref",
-            )
-            .unwrap();
+        let desc = flatpak_ref.parse_flatpakref("vlc", "stable", "VLC Media Player", "https://dl.flathub.org/repo/appstream/vlc.flatpakref").unwrap();
         assert_eq!(desc.name, "vlc");
         assert!(desc.gpg_key_valid);
     }
@@ -3253,19 +3067,10 @@ mod tests {
     #[test]
     fn test_mint_upload_manager() {
         let mut upload = MintUploadManager::new();
-        upload.add_profile(
-            "Community FTP",
-            "ftp.example.com",
-            21,
-            UploadProtocol::Ftp,
-            "/uploads",
-            "https://example.com/files",
-        );
+        upload.add_profile("Community FTP", "ftp.example.com", 21, UploadProtocol::Ftp, "/uploads", "https://example.com/files");
         assert_eq!(upload.profiles.len(), 1);
 
-        let link = upload
-            .generate_share_link("Community FTP", "image.png")
-            .unwrap();
+        let link = upload.generate_share_link("Community FTP", "image.png").unwrap();
         assert_eq!(link, "https://example.com/files/image.png");
     }
 

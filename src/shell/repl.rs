@@ -214,9 +214,6 @@ pub enum ShellCommand {
     Dialect {
         code: String,
     },
-    Sh {
-        code: String,
-    },
 
     Unknown(String),
 }
@@ -869,19 +866,10 @@ impl ShellRepl {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
-            "script" | "source" => {
+            "script" | "sh" | "source" => {
                 if parts.len() >= 2 {
                     ShellCommand::Script {
                         code: parts[1..].join(" "),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "sh" | "bash" | "zsh" | "fish" | "tcsh" | "ksh" | "dash" | "nu" | "pwsh" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Sh {
-                        code: input.to_string(),
                     }
                 } else {
                     ShellCommand::Unknown(input.to_string())
@@ -1514,16 +1502,6 @@ impl ShellRepl {
                 let dialect = crate::shell::zsh_bash_parity::UniversalShellCompatibilityEngine::detect_shebang_dialect(&code);
                 Ok(format!("Detected shell script dialect: {:?}", dialect))
             }
-            ShellCommand::Sh { code } => {
-                let mut interpreter = crate::shell::universal_cli_shell_system::SovereignUniversalShInterpreterEngine::new();
-                for (k, v) in &self.variables {
-                    interpreter.cross_dialect_engine.exported_environment.insert(k.clone(), v.clone());
-                }
-                match interpreter.execute_sh_command_string(&code) {
-                    Ok(out) => Ok(out),
-                    Err(e) => Err(format!("sh execution error: {}", e)),
-                }
-            }
 
             ShellCommand::Echo { message } => Ok(message.clone()),
             ShellCommand::Set { variable, value } => {
@@ -2071,20 +2049,5 @@ mod tests {
         // Test prompt rendering
         let rendered_prompt = repl.get_rendered_prompt();
         assert!(rendered_prompt.contains("ubuntu@sigmaos"));
-    }
-
-    #[test]
-    fn test_universal_sh_command_in_repl() {
-        let mut repl = ShellRepl::new();
-
-        let sh_cmd = repl.parse_command("sh -c 'export PORT=8080'");
-        assert!(matches!(sh_cmd, ShellCommand::Sh { .. }));
-        let sh_res = repl.execute_command(sh_cmd).unwrap();
-        assert!(sh_res.contains("Universal POSIX /bin/sh Execution Success"));
-
-        let fish_cmd = repl.parse_command("fish -c 'set -gx VAR val'");
-        assert!(matches!(fish_cmd, ShellCommand::Sh { .. }));
-        let fish_res = repl.execute_command(fish_cmd).unwrap();
-        assert!(fish_res.contains("Friendly Interactive Shell"));
     }
 }

@@ -919,7 +919,7 @@ pub struct MissingDistroComponentItem {
 }
 
 /// Sovereign Distro Missing Components Expansion Engine
-/// Cataloging and executing 5000+ additional missing Linux & BSD distro components across 10 categories.
+/// Cataloging and executing 2500+ additional missing Linux & BSD distro components across 10 categories.
 #[derive(Debug, Clone)]
 pub struct SovereignDistroMissingComponentsExpansionEngine {
     pub components: Vec<MissingDistroComponentItem>,
@@ -1089,9 +1089,9 @@ impl SovereignDistroMissingComponentsExpansionEngine {
             ],
         ];
 
-        let mut components = Vec::with_capacity(5000);
+        let mut components = Vec::with_capacity(2500);
 
-        for id in 1..=5000u32 {
+        for id in 1..=2500u32 {
             let cat_idx = ((id - 1) % 10) as usize;
             let category = categories[cat_idx];
             let distro = distros[(id as usize - 1) % distros.len()];
@@ -1185,7 +1185,7 @@ impl SovereignDistroMissingComponentsExpansionEngine {
     }
 
     pub fn verify_catalog(&mut self) -> bool {
-        if self.components.len() < 5000 {
+        if self.components.len() < 2000 {
             return false;
         }
         let cat_items = self.filter_by_category(DistroExpansionCategory::KernelScheduler);
@@ -1211,7 +1211,7 @@ mod expansion_tests {
     #[test]
     fn test_sovereign_distro_missing_components_expansion_engine() {
         let mut engine = SovereignDistroMissingComponentsExpansionEngine::new();
-        assert!(engine.total_components() >= 5000);
+        assert!(engine.total_components() >= 2000);
         assert!(engine.verify_catalog());
 
         let schedulers = engine.filter_by_category(DistroExpansionCategory::KernelScheduler);

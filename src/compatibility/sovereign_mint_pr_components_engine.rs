@@ -112,24 +112,9 @@ impl MintToolsWarpinatorPrDeployer {
 
     fn stage_all_mint_tools_prs(&mut self) {
         let prs = [
-            (
-                "warpinator-lan",
-                "feat(warpinator): Warpinator secure LAN file transfer with mDNS discovery",
-                "warpinator_mesh",
-                0x5D6E7F80,
-            ),
-            (
-                "mintstick-flasher",
-                "feat(mintstick): MintStick ISO image USB writer & safety verification",
-                "mintstick_flasher",
-                0x6E7F8091,
-            ),
-            (
-                "mintbackup-tool",
-                "feat(mintbackup): MintBackup system user data & package list snapshot tool",
-                "mint_backup",
-                0x7F8091A2,
-            ),
+            ("warpinator-lan", "feat(warpinator): Warpinator secure LAN file transfer with mDNS discovery", "warpinator_mesh", 0x5D6E7F80),
+            ("mintstick-flasher", "feat(mintstick): MintStick ISO image USB writer & safety verification", "mintstick_flasher", 0x6E7F8091),
+            ("mintbackup-tool", "feat(mintbackup): MintBackup system user data & package list snapshot tool", "mint_backup", 0x7F8091A2),
         ];
 
         for (comp, title, target_sub, digest) in prs {

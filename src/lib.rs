@@ -25,7 +25,6 @@ pub mod dashboard;
 pub mod desktop;
 pub mod development;
 pub mod device;
-pub mod diagnostics;
 pub mod distro;
 pub mod input;
 pub mod ipc;
@@ -36,7 +35,6 @@ pub mod driver;
 pub mod drivers;
 pub use drivers::sovereign_comprehensive_drivers::*;
 pub mod crypto;
-pub mod fs;
 pub mod filesystem;
 pub mod futuristic_modules;
 pub mod governance;
@@ -44,8 +42,6 @@ pub mod kernel;
 pub mod klib;
 pub mod memory;
 pub use memory::low_level;
-pub mod swap;
-pub use swap::*;
 pub mod network;
 pub mod observability;
 pub mod orchestration;
@@ -134,7 +130,6 @@ pub use distro::sovereign_2075_distro_supremacy_engine::*;
 pub use distro::sovereign_linux_bsd_all_subsystems_harmony::*;
 pub use distro::sovereign_linux_bsd_master_synthesis::*;
 pub use distro::sovereign_linux_bsd_ecosystem_parity_v42_pr::*;
-pub use distro::arch_linux_ecosystem_parity_v43_pr::*;
 pub use distro::sovereign_linux_bsd_pinnacle_innovations_v14::*;
 pub use distro::sovereign_media_and_distro_unimplemented_innovations::*;
 pub use distro::sovereign_mint_omarchy_apex_dominance_v30::*;
@@ -192,8 +187,8 @@ pub use automation::{
 pub use compatibility::mint_omarchy_migration_bridge::*;
 pub use compatibility::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
-    ContainerRuntime, FedoraMasterPrDeploymentSuite, MintMasterPrDeploymentSuite, TargetPlatform,
-    TranslationLayer,
+    ContainerRuntime, FedoraMasterPrDeploymentSuite, MintMasterPrDeploymentSuite,
+    TargetPlatform, TranslationLayer,
 };
 pub use container::{
     ContainerError, ContainerID, ContainerInfo, ContainerRuntime as CoreContainerRuntime,
@@ -336,7 +331,6 @@ pub use userland::shell::{
     Parser as UserlandShellParser, RedirectSpec, RedirectionEngine, Shell as UserlandShell,
     StreamTarget,
 };
-pub use userland::system_utilities::*;
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
@@ -411,7 +405,6 @@ pub mod sigma_boot;
 pub mod sigma_sandbox;
 pub mod sigma_validation;
 pub mod signal;
-pub use signal::*;
 pub mod smartcard;
 pub mod support;
 pub mod syscall;

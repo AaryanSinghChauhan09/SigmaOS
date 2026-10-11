@@ -43,41 +43,41 @@ pub mod universal;
 pub use universal::{PackageError, PackageFormat, PackageState, UnifiedPackage};
 
 // ============================================================================
-// 1. Universal Format Inspector and Classifier V26
+// 1. Universal Security Audit Engine V26 (VuXML & CVE Vulnerability Scanner)
 // ============================================================================
 
-/// Signature attestation types supported across Linux, BSD, and mobile ecosystems V26
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum PackageSignatureKindV26 {
-    OpenBsdSignify,
-    PqcKyberDilithium,
-    GpgOpenPgp,
-    X509Certificate,
-    ApkV2V3Signature,
-    Unsigned,
+pub enum VulnerabilitySeverityV26 {
+    Critical,
+    High,
+    Medium,
+    Low,
 }
 
-/// Extracted metadata from zero-copy inspection of foreign package files V26
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct InspectedPackageManifestV26 {
-    pub name: String,
-    pub version: String,
-    pub detected_format: PackageFormat,
-    pub signature_kind: PackageSignatureKindV26,
-    pub compression_type: String,
-    pub dependencies: Vec<String>,
-    pub provides: Vec<String>,
-    pub conflicts: Vec<String>,
-    pub build_cflags: Option<String>,
-    pub payload_sha256: String,
+pub struct SecurityAdvisoryV26 {
+    pub cve_id: String,
+    pub package_pattern: String,
+    pub vulnerable_version_range: String,
+    pub severity: VulnerabilitySeverityV26,
+    pub advisory_summary: String,
+    pub recommended_patch_version: String,
 }
 
-pub struct UniversalFormatInspectorAndClassifierV26 {
-    pub total_formats_supported: usize,
-    pub inspection_cache: BTreeMap<String, InspectedPackageManifestV26>,
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PackageAuditReportV26 {
+    pub package_name: String,
+    pub installed_version: String,
+    pub format: PackageFormat,
+    pub matched_advisories: Vec<SecurityAdvisoryV26>,
+    pub is_secure: bool,
 }
 
-impl UniversalFormatInspectorAndClassifierV26 {
+pub struct UniversalSecurityAuditEngineV26 {
+    pub advisory_database: Vec<SecurityAdvisoryV26>,
+}
+
+impl UniversalSecurityAuditEngineV26 {
     pub fn new() -> Self {
         let mut advisories = Vec::new();
         advisories.push(SecurityAdvisoryV26 {
@@ -105,7 +105,9 @@ impl UniversalFormatInspectorAndClassifierV26 {
             recommended_patch_version: "1.26.0".to_string(),
         });
 
-        id
+        Self {
+            advisory_database: advisories,
+        }
     }
 
     /// Audit a package name, version, and format against VuXML / CVE advisories
@@ -322,14 +324,14 @@ impl HermeticPqcSandboxGovernorV26 {
     }
 }
 
-impl Default for UniversalMultiFormatTranspilerAndExecutionEngineV26 {
+impl Default for HermeticPqcSandboxGovernorV26 {
     fn default() -> Self {
         Self::new()
     }
 }
 
 // ============================================================================
-// 8. Boot Environment Snapshot Engine V26 (ZFS, Btrfs, HAMMER2, OSTree, Nix)
+// 4. Boot Environment Snapshot Engine V26 (ZFS, Btrfs, HAMMER2, OSTree, Nix)
 // ============================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -404,7 +406,7 @@ impl Default for BootEnvironmentSnapshotEngineV26 {
 }
 
 // ============================================================================
-// 9. Universal Foreign PM CLI Router V26
+// 5. Universal Foreign PM CLI Router V26
 // ============================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -543,12 +545,10 @@ impl Default for UniversalPmCliRouterV26 {
 }
 
 // ============================================================================
-// 10. Sovereign Distro Package Advancements Master Suite V26
+// 6. Sovereign Distro Package Advancements Master Suite V26
 // ============================================================================
 
 pub struct SovereignDistroPackageAdvancementsSuiteV26 {
-    pub inspector: UniversalFormatInspectorAndClassifierV26,
-    pub governor: UniversalCrossDistroCapabilityGovernorV26,
     pub auditor: UniversalSecurityAuditEngineV26,
     pub optimizer: SourceBinaryOptimizationEngineV26,
     pub sandbox_governor: HermeticPqcSandboxGovernorV26,
@@ -559,8 +559,6 @@ pub struct SovereignDistroPackageAdvancementsSuiteV26 {
 impl SovereignDistroPackageAdvancementsSuiteV26 {
     pub fn new() -> Self {
         Self {
-            inspector: UniversalFormatInspectorAndClassifierV26::new(),
-            governor: UniversalCrossDistroCapabilityGovernorV26::new(),
             auditor: UniversalSecurityAuditEngineV26::new(),
             optimizer: SourceBinaryOptimizationEngineV26::new(),
             sandbox_governor: HermeticPqcSandboxGovernorV26::new(),
@@ -586,7 +584,7 @@ impl SovereignDistroPackageAdvancementsSuiteV26 {
             1700000000,
         );
 
-        (audit_report, cflags, pqc_policy, snap_id)
+        (audit, cflags, policy, snap_id)
     }
 }
 
@@ -621,7 +619,6 @@ mod tests {
     #[test]
     fn test_source_binary_optimization_and_use_flags() {
         let optimizer = SourceBinaryOptimizationEngineV26::new();
-        let governor = UniversalCrossDistroCapabilityGovernorV26::new();
 
         let cflags = optimizer.generate_compiler_flags("kernel-core");
         assert!(cflags.contains("-march=x86-64-v3"));
@@ -635,8 +632,7 @@ mod tests {
 
     #[test]
     fn test_hermetic_pqc_sandbox_governor() {
-        let mut scriptlets = UdfScriptletSandboxEngineV26::new();
-        scriptlets.register_hook("post_install_clean", ScriptletHookKindV26::PostInstall);
+        let governor = HermeticPqcSandboxGovernorV26::new();
 
         let policy_flatpak = governor.generate_policy(PackageFormat::Flatpak, "dilithium5_signature_data");
         assert!(policy_flatpak.pqc_dilithium5_verified);

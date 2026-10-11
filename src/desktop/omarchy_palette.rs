@@ -71,11 +71,7 @@ impl ClipboardHistoryEntry {
         match &self.content {
             ClipboardContentType::PlainText(s) => s.clone(),
             ClipboardContentType::RichText(s) => s.clone(),
-            ClipboardContentType::ImageMetadata {
-                format,
-                preview_data_hash,
-                ..
-            } => {
+            ClipboardContentType::ImageMetadata { format, preview_data_hash, .. } => {
                 format!("image {} {}", format, preview_data_hash)
             }
             ClipboardContentType::CodeSnippet { language, code } => {
@@ -225,10 +221,7 @@ impl CmdKCommandPaletteEngine {
             return None;
         }
         let item = matches[self.active_selection_index];
-        Some(format!(
-            "Executed command '{}' ({:?})",
-            item.title, item.action
-        ))
+        Some(format!("Executed command '{}' ({:?})", item.title, item.action))
     }
 }
 

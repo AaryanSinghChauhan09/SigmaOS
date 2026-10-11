@@ -8,9 +8,9 @@
 // 6. arch-news Arch Linux News & Manual Intervention Detector
 // 7. pkgctl Devtools Package Repo Management Engine
 // 8. pacman File Collision & Conflict Resolution Engine
-// 9. pacman Hooks Execution Engine
+// 9. mkinitcpio Modular Initramfs Hooks Engine
 // 10. pacstrap & arch-chroot Rootfs Chroot Engine
-// 11. pacman-key PQC Dilithium5 Keyring Engine & Cache Scrubber
+// 11. pacman-key PQC Dilithium5 Keyring Engine
 // 12. arch-audit CVE Vulnerability Scanner Engine
 // 13. archinstall Profile & Automated Installer Engine
 
@@ -436,30 +436,17 @@ impl Default for ArchPacmanConflictResolverEngine {
 // =========================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct InitramfsHookSpec {
-    pub name: String,
-    pub is_runtime: bool,
-    pub dependencies: Vec<String>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum PacmanHookWhen {
     PreTransaction,
     PostTransaction,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct InitramfsHookSpec {
-    pub name: String,
-    pub is_runtime: bool,
-    pub dependencies: Vec<String>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PacmanHookRule {
     pub name: String,
-    pub is_runtime: bool,
-    pub dependencies: Vec<String>,
+    pub when: PacmanHookWhen,
+    pub target_packages: Vec<String>,
+    pub exec_command: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -471,11 +458,9 @@ pub struct InitramfsHookSpec {
 
 pub struct ArchPacmanHookRunner {
     pub registered_hooks: Vec<PacmanHookRule>,
-    pub initramfs_hooks: BTreeMap<String, InitramfsHookSpec>,
-    pub compression_format: String,
 }
 
-impl ArchMkinitcpioEngine {
+impl ArchPacmanHookRunner {
     pub fn new() -> Self {
         let hooks = vec![
             PacmanHookRule {
@@ -498,88 +483,7 @@ impl ArchMkinitcpioEngine {
     }
 }
 
-impl Default for ArchMkinitcpioGenerator {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct InitramfsHookSpec {
-    pub name: String,
-    pub is_runtime: bool,
-    pub dependencies: Vec<String>,
-}
-
-pub struct ArchMkinitcpioHooksEngine {
-    pub hooks: BTreeMap<String, InitramfsHookSpec>,
-    pub compression_format: String,
-}
-
-impl ArchMkinitcpioHooksEngine {
-    pub fn new() -> Self {
-        let sample_rule = PacmanHookRule {
-            name: "fontconfig".to_string(),
-            when: PacmanHookWhen::PostTransaction,
-            target_packages: vec!["fontconfig*".to_string(), "ttf-*".to_string()],
-            exec_command: "fc-cache -s".to_string(),
-        };
-        Self {
-            registered_hooks: vec![sample_rule],
-        }
-    }
-}
-
-impl Default for ArchMkinitcpioHooksEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// 9b. MKINITCPIO MODULAR INITRAMFS HOOKS ENGINE
-// =========================================================================
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct InitramfsHookSpec {
-    pub name: String,
-    pub is_runtime: bool,
-    pub dependencies: Vec<String>,
-}
-
-pub struct ArchMkinitcpioInitramfsEngine {
-    pub hooks: BTreeMap<String, InitramfsHookSpec>,
-    pub compression_format: String,
-}
-
-impl ArchMkinitcpioInitramfsEngine {
-    pub fn new() -> Self {
-        let mut hooks = BTreeMap::new();
-        hooks.insert(
-            "base".to_string(),
-            InitramfsHookSpec {
-                name: "base".to_string(),
-                is_runtime: true,
-                dependencies: Vec::new(),
-            },
-        );
-        initramfs_hooks.insert(
-            "udev".to_string(),
-            InitramfsHookSpec {
-                name: "udev".to_string(),
-                is_runtime: true,
-                dependencies: vec!["base".to_string()],
-            },
-        );
-        Self {
-            registered_hooks: sample_hooks,
-            initramfs_hooks,
-            compression_format: "zstd".to_string(),
-        }
-    }
-}
-
-impl Default for ArchMkinitcpioHooksEngine {
+impl Default for ArchPacmanHookRunner {
     fn default() -> Self {
         Self::new()
     }
@@ -636,542 +540,19 @@ pub struct ArchPacmanKeyringPqcEngine {
     pub keys: BTreeMap<String, PqcDilithiumKeySpec>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct PqcDilithiumKeySpec {
-    pub key_id: String,
-    pub owner_email: String,
-    pub is_trusted: bool,
-    pub dilithium_pubkey_hash: String,
-}
-
-pub struct ArchPacmanKeyringPqcEngine {
-    pub keys: BTreeMap<String, PqcDilithiumKeySpec>,
-}
-
-impl ArchPacmanCacheScrubber {
-    pub fn new(retain_keep_count: usize) -> Self {
-        Self {
-            cached_files: Vec::new(),
-            retain_keep_count,
-        }
-    }
-}
-
-impl Default for ArchPacmanKeyringPqcEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct CachedPackageFile {
-    pub pkgname: String,
-    pub version: String,
-    pub file_size_bytes: u64,
-}
-
-pub struct ArchPacmanKeyringPqcEngine {
-    pub keys: BTreeMap<String, PqcDilithiumKeySpec>,
-}
-
-impl ArchPacmanCacheScrubber {
-    pub fn new(retain_keep_count: usize) -> Self {
-        Self {
-            cached_files: Vec::new(),
-            retain_keep_count,
-        }
-    }
-}
-
-impl Default for ArchPacmanKeyringPqcEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct CachedPackageFile {
-    pub pkgname: String,
-    pub version: String,
-    pub file_size_bytes: u64,
-}
-
-pub struct ArchPacmanKeyringPqcEngine {
-    pub keys: BTreeMap<String, PqcDilithiumKeySpec>,
-}
-
-impl ArchPacmanCacheScrubber {
-    pub fn new(retain_keep_count: usize) -> Self {
-        Self {
-            cached_files: Vec::new(),
-            retain_keep_count,
-        }
-    }
-}
-
-impl Default for ArchPacmanKeyringPqcEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct CachedPackageFile {
-    pub pkgname: String,
-    pub version: String,
-    pub file_size_bytes: u64,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct PqcDilithiumKeySpec {
-    pub key_id: String,
-    pub owner_email: String,
-    pub is_trusted: bool,
-    pub dilithium_pubkey_hash: String,
-}
-
-pub struct ArchPacmanKeyringPqcEngine {
-    pub keys: BTreeMap<String, PqcDilithiumKeySpec>,
-}
-
-impl ArchPacmanCacheScrubber {
-    pub fn new(retain_keep_count: usize) -> Self {
-        Self {
-            cached_files: Vec::new(),
-            retain_keep_count,
-        }
-    }
-}
-
-pub struct ArchPacmanCacheScrubber {
-    pub cached_files: Vec<CachedPackageFile>,
-    pub retain_keep_count: usize,
-}
-
-impl ArchPacmanCacheScrubber {
-    pub fn new(retain_keep_count: usize) -> Self {
-        Self {
-            cached_files: Vec::new(),
-            retain_keep_count,
-        }
-    }
-}
-
-impl Default for ArchPacmanKeyringPqcEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct CachedPackageFile {
-    pub pkgname: String,
-    pub version: String,
-    pub file_size_bytes: u64,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct PqcDilithiumKeySpec {
-    pub key_id: String,
-    pub owner_email: String,
-    pub is_trusted: bool,
-    pub dilithium_pubkey_hash: String,
-}
-
-pub struct ArchPacmanKeyringPqcEngine {
-    pub keys: BTreeMap<String, PqcDilithiumKeySpec>,
-}
-
-impl ArchPacmanCacheScrubber {
-    pub fn new(retain_keep_count: usize) -> Self {
-        Self {
-            cached_files: Vec::new(),
-            retain_keep_count,
-        }
-    }
-}
-
-impl Default for ArchPacmanKeyringPqcEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-pub struct ArchPacmanCacheScrubber {
-    pub cached_files: Vec<CachedPackageFile>,
-    pub retain_keep_count: usize,
-}
-
-impl ArchPacmanCacheScrubber {
-    pub fn new(retain_keep_count: usize) -> Self {
-        Self {
-            cached_files: Vec::new(),
-            retain_keep_count,
-        }
-    }
-}
-
-impl Default for ArchPacmanKeyringPqcEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct CachedPackageFile {
-    pub pkgname: String,
-    pub version: String,
-    pub file_size_bytes: u64,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct PqcDilithiumKeySpec {
-    pub key_id: String,
-    pub owner_email: String,
-    pub is_trusted: bool,
-    pub dilithium_pubkey_hash: String,
-}
-
-pub struct ArchPacmanKeyringPqcEngine {
-    pub keys: BTreeMap<String, PqcDilithiumKeySpec>,
-}
-
-impl ArchPacmanCacheScrubber {
-    pub fn new(keep_count: usize) -> Self {
-        Self {
-            cached_files: Vec::new(),
-            retain_keep_count: keep_count,
-        }
-    }
-}
-
-impl Default for ArchPacmanKeyringPqcEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-pub struct ArchPacmanCacheScrubber {
-    pub cached_files: Vec<CachedPackageFile>,
-    pub retain_keep_count: usize,
-}
-
-impl ArchPacmanCacheScrubber {
-    pub fn new(retain_keep_count: usize) -> Self {
-        Self {
-            cached_files: Vec::new(),
-            retain_keep_count,
-        }
-    }
-}
-
-impl Default for ArchPacmanKeyringPqcEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct CachedPackageFile {
-    pub pkgname: String,
-    pub version: String,
-    pub file_size_bytes: u64,
-}
-
-pub struct ArchPacmanKeyringPqcEngine {
-    pub keys: BTreeMap<String, PqcDilithiumKeySpec>,
-}
-
-impl ArchPacmanCacheScrubber {
-    pub fn new(keep_count: usize) -> Self {
-        Self {
-            cached_files: Vec::new(),
-            retain_keep_count: keep_count,
-        }
-    }
-}
-
-impl Default for ArchPacmanKeyringPqcEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// 11B. PACMAN CACHE SCRUBBER ENGINE
-// =========================================================================
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct PqcDilithiumKeySpec {
-    pub key_id: String,
-    pub owner_email: String,
-    pub is_trusted: bool,
-    pub dilithium_pubkey_hash: String,
-}
-
-pub struct ArchPacmanKeyringPqcEngine {
-    pub keys: BTreeMap<String, PqcDilithiumKeySpec>,
-}
-
-impl ArchPacmanCacheScrubber {
-    pub fn new(retain_keep_count: usize) -> Self {
-        Self {
-            cached_files: Vec::new(),
-            retain_keep_count,
-        }
-    }
-}
-
-impl Default for ArchPacmanKeyringPqcEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct CachedPackageFile {
-    pub pkgname: String,
-    pub version: String,
-    pub file_size_bytes: u64,
-}
-
-pub struct ArchPacmanKeyringPqcEngine {
-    pub keys: BTreeMap<String, PqcDilithiumKeySpec>,
-}
-
-impl ArchPacmanCacheScrubber {
-    pub fn new(retain_keep_count: usize) -> Self {
-        Self {
-            cached_files: Vec::new(),
-            retain_keep_count,
-        }
-    }
-
-    pub fn verify_key_trust(&self, key_id: &str) -> bool {
-        self.keys.get(key_id).map_or(false, |k| k.is_trusted)
-    }
-}
-
-impl Default for ArchPacmanKeyringPqcEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct CachedPackageFile {
-    pub pkgname: String,
-    pub version: String,
-    pub file_size_bytes: u64,
-}
-
-pub struct ArchPacmanKeyringPqcEngine {
-    pub keys: BTreeMap<String, PqcDilithiumKeySpec>,
-}
-
-impl ArchPacmanCacheScrubber {
-    pub fn new(retain_keep_count: usize) -> Self {
-        Self {
-            cached_files: Vec::new(),
-            retain_keep_count,
-        }
-    }
-}
-
-impl Default for ArchPacmanKeyringPqcEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct CachedPackageFile {
-    pub pkgname: String,
-    pub version: String,
-    pub file_size_bytes: u64,
-}
-
-pub struct ArchPacmanKeyringPqcEngine {
-    pub keys: BTreeMap<String, PqcDilithiumKeySpec>,
-}
-
-impl ArchPacmanCacheScrubber {
-    pub fn new(keep: usize) -> Self {
-        Self {
-            cached_files: Vec::new(),
-            retain_keep_count: keep,
-        }
-    }
-}
-
-impl Default for ArchPacmanKeyringPqcEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct CachedPackageFile {
-    pub pkgname: String,
-    pub version: String,
-    pub file_size_bytes: u64,
-}
-
-pub struct ArchPacmanKeyringPqcEngine {
-    pub keys: BTreeMap<String, PqcDilithiumKeySpec>,
-}
-
-impl ArchPacmanCacheScrubber {
-    pub fn new(retain_keep_count: usize) -> Self {
-        Self {
-            cached_files: Vec::new(),
-            retain_keep_count,
-        }
-    }
-}
-
-impl Default for ArchPacmanKeyringPqcEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct CachedPackageFile {
-    pub pkgname: String,
-    pub version: String,
-    pub file_size_bytes: u64,
-}
-
-pub struct ArchPacmanKeyringPqcEngine {
-    pub keys: BTreeMap<String, PqcDilithiumKeySpec>,
-}
-
-impl ArchPacmanCacheScrubber {
-    pub fn new(retain_keep_count: usize) -> Self {
-        Self {
-            cached_files: Vec::new(),
-            retain_keep_count,
-        }
-    }
-}
-
-impl Default for ArchPacmanKeyringPqcEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct CachedPackageFile {
-    pub pkgname: String,
-    pub version: String,
-    pub file_size_bytes: u64,
-}
-
-pub struct ArchPacmanKeyringPqcEngine {
-    pub keys: BTreeMap<String, PqcDilithiumKeySpec>,
-}
-
-impl ArchPacmanCacheScrubber {
-    pub fn new(retain_keep_count: usize) -> Self {
-        Self {
-            cached_files: Vec::new(),
-            retain_keep_count,
-        }
-    }
-
-    pub fn verify_pqc_key(&self, key_id: &str) -> bool {
-        self.keys.get(key_id).map_or(false, |k| k.is_trusted)
-    }
-}
-
-impl Default for ArchPacmanKeyringPqcEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct CachedPackageFile {
-    pub pkgname: String,
-    pub version: String,
-    pub file_size_bytes: u64,
-}
-
-pub struct ArchPacmanKeyringPqcEngine {
-    pub keys: BTreeMap<String, PqcDilithiumKeySpec>,
-}
-
-impl ArchPacmanCacheScrubber {
-    pub fn new(retain_keep_count: usize) -> Self {
-        Self {
-            cached_files: Vec::new(),
-            retain_keep_count,
-        }
-    }
-}
-
-impl ArchPacmanCacheScrubber {
-    pub fn new(retain_keep_count: usize) -> Self {
-        Self {
-            cached_files: Vec::new(),
-            retain_keep_count,
-        }
-    }
-}
-
-impl Default for ArchPacmanKeyringPqcEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct CachedPackageFile {
-    pub pkgname: String,
-    pub version: String,
-    pub file_size_bytes: u64,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct PqcDilithiumKeySpec {
-    pub key_id: String,
-    pub owner_email: String,
-    pub is_trusted: bool,
-    pub dilithium_pubkey_hash: String,
-}
-
-pub struct ArchPacmanKeyringPqcEngine {
-    pub keys: BTreeMap<String, PqcDilithiumKeySpec>,
-}
-
-impl ArchPacmanCacheScrubber {
-    pub fn new(retain_keep_count: usize) -> Self {
-        Self {
-            cached_files: Vec::new(),
-            retain_keep_count,
-        }
-    }
-}
-
-impl Default for ArchPacmanKeyringPqcEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-pub struct ArchPacmanCacheScrubber {
-    pub cached_files: Vec<CachedPackageFile>,
-    pub retain_keep_count: usize,
-}
-
-impl ArchPacmanCacheScrubber {
-    pub fn new(retain_keep_count: usize) -> Self {
-        Self {
-            cached_files: Vec::new(),
-            retain_keep_count,
-        }
+impl ArchPacmanKeyringPqcEngine {
+    pub fn new() -> Self {
+        let mut keys = BTreeMap::new();
+        keys.insert(
+            "arch-master-1".to_string(),
+            PqcDilithiumKeySpec {
+                key_id: "arch-master-1".to_string(),
+                owner_email: "packager@archlinux.org".to_string(),
+                is_trusted: true,
+                dilithium_pubkey_hash: "pqc-dilithium5-hash-9901".to_string(),
+            },
+        );
+        Self { keys }
     }
 }
 
@@ -1225,34 +606,6 @@ impl ArchPacmanCacheScrubber {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct PqcDilithiumKeySpec {
-    pub key_id: String,
-    pub owner_email: String,
-    pub is_trusted: bool,
-    pub dilithium_pubkey_hash: String,
-}
-
-pub struct ArchPacmanKeyringPqcEngine {
-    pub keys: BTreeMap<String, PqcDilithiumKeySpec>,
-}
-
-impl ArchPacmanKeyringPqcEngine {
-    pub fn new() -> Self {
-        let mut keys = BTreeMap::new();
-        keys.insert(
-            "arch-master-1".to_string(),
-            PqcDilithiumKeySpec {
-                key_id: "arch-master-1".to_string(),
-                owner_email: "packager@archlinux.org".to_string(),
-                is_trusted: true,
-                dilithium_pubkey_hash: "pqc-dilithium5-hash-9901".to_string(),
-            },
-        );
-        Self { keys }
-    }
-}
-
 impl Default for ArchPacmanCacheScrubber {
     fn default() -> Self {
         Self::new(2)
@@ -1260,7 +613,7 @@ impl Default for ArchPacmanCacheScrubber {
 }
 
 // =========================================================================
-// 12. BTRFS PACMAN SNAPSHOTTER ENGINE (snap-pac)
+// 11. BTRFS PACMAN SNAPSHOTTER ENGINE (snap-pac)
 // =========================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -1290,10 +643,7 @@ impl ArchBtrfsSnapperSnapshotter {
         self.snapshots.push(SnapperSnapshotRecord {
             id,
             snapshot_type: "pre".to_string(),
-            description: format!(
-                "snap-pac pre-transaction snapshot before upgrading {}",
-                pkg_list.join(", ")
-            ),
+            description: format!("snap-pac pre-transaction snapshot before upgrading {}", pkg_list.join(", ")),
             cleanup_algorithm: "number".to_string(),
         });
         id
@@ -1305,10 +655,7 @@ impl ArchBtrfsSnapperSnapshotter {
         self.snapshots.push(SnapperSnapshotRecord {
             id,
             snapshot_type: "post".to_string(),
-            description: format!(
-                "snap-pac post-transaction snapshot for pre-snapshot #{}",
-                pre_id
-            ),
+            description: format!("snap-pac post-transaction snapshot for pre-snapshot #{}", pre_id),
             cleanup_algorithm: "number".to_string(),
         });
         id
@@ -1322,7 +669,7 @@ impl Default for ArchBtrfsSnapperSnapshotter {
 }
 
 // =========================================================================
-// 13. ARCH AUDIT VULNERABILITY SCANNER (arch-audit)
+// 12. ARCH AUDIT VULNERABILITY SCANNER (arch-audit)
 // =========================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -1353,15 +700,10 @@ impl ArchAuditVulnerabilityScanner {
                 fixed_version: Some("5.6.1-2".to_string()),
             },
         ];
-        Self {
-            known_advisories: sample,
-        }
+        Self { known_advisories: sample }
     }
 
-    pub fn audit_installed_packages(
-        &self,
-        installed: &[(&str, &str)],
-    ) -> Vec<ArchVulnerabilityAdvisory> {
+    pub fn audit_installed_packages(&self, installed: &[(&str, &str)]) -> Vec<ArchVulnerabilityAdvisory> {
         let mut vulnerabilities = Vec::new();
         for (pkg, _ver) in installed {
             for adv in &self.known_advisories {
@@ -1381,7 +723,7 @@ impl Default for ArchAuditVulnerabilityScanner {
 }
 
 // =========================================================================
-// 14. MODPROBED-DB KERNEL MODULE LOGGER ENGINE (modprobed-db)
+// 13. MODPROBED-DB KERNEL MODULE LOGGER ENGINE (modprobed-db)
 // =========================================================================
 
 pub struct ArchModprobedDbEngine {
@@ -1390,9 +732,7 @@ pub struct ArchModprobedDbEngine {
 
 impl ArchModprobedDbEngine {
     pub fn new() -> Self {
-        Self {
-            loaded_modules: Vec::new(),
-        }
+        Self { loaded_modules: Vec::new() }
     }
 
     pub fn log_active_module(&mut self, mod_name: &str) {
@@ -1416,6 +756,7 @@ impl Default for ArchModprobedDbEngine {
 // UNIT TESTS
 // =========================================================================
 
+#[cfg(test)]
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1516,10 +857,7 @@ mod tests {
     #[test]
     fn test_arch_pacman_hook_runner_and_cache_scrubber() {
         let runner = ArchPacmanHookRunner::new();
-        let matched = runner.match_hooks(
-            PacmanHookWhen::PostTransaction,
-            &["fontconfig", "ttf-liberation"],
-        );
+        let matched = runner.match_hooks(PacmanHookWhen::PostTransaction, &["fontconfig", "ttf-liberation"]);
         assert_eq!(matched.len(), 1);
         assert_eq!(matched[0].exec_command, "fc-cache -s");
 

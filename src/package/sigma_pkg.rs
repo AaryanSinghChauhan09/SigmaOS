@@ -83,19 +83,6 @@ pub enum UniversalPackageFormat {
     BedrockStratum,  // .stratum (Bedrock Linux)
     SpackHpc,        // .spack (Spack HPC)
     ConanCpp,        // .conan (Conan C++)
-    ClearLinuxSwupd, // .swupd (Clear Linux)
-    SuseZypper,      // .zypper / .spec (openSUSE)
-    GobolinuxGobo,   // .gobo (GoboLinux)
-    OstreeCommit,    // .ostree (OSTree atomic commit)
-    KissPkg,         // .kiss (KISS Linux)
-    CptPkg,          // .cpt (Carbs Linux)
-    PukPkg,          // .puk (PUK package)
-    SfsModule,       // .sfs (SquashFS module)
-    WheelPython,     // .whl (Python wheel)
-    CrateRust,       // .crate (Cargo crate)
-    GemRuby,         // .gem (Ruby gem)
-    NupkgDotnet,     // .nupkg (.NET package)
-    VcpkgCpp,        // .vcpkg (vcpkg C++)
 }
 
 /// Importer/Converter engine mapping foreign Linux/BSD packages into SigmaPkg native representation
@@ -171,32 +158,6 @@ impl UniversalPackageImporter {
             Some(UniversalPackageFormat::SpackHpc)
         } else if filename.ends_with(".conan") {
             Some(UniversalPackageFormat::ConanCpp)
-        } else if filename.ends_with(".zypper") {
-            Some(UniversalPackageFormat::SuseZypper)
-        } else if filename.ends_with(".gobo") {
-            Some(UniversalPackageFormat::GobolinuxGobo)
-        } else if filename.ends_with(".ostree") {
-            Some(UniversalPackageFormat::OstreeCommit)
-        } else if filename.ends_with(".kiss") {
-            Some(UniversalPackageFormat::KissPkg)
-        } else if filename.ends_with(".cpt") {
-            Some(UniversalPackageFormat::CptPkg)
-        } else if filename.ends_with(".puk") {
-            Some(UniversalPackageFormat::PukPkg)
-        } else if filename.ends_with(".whl") {
-            Some(UniversalPackageFormat::WheelPython)
-        } else if filename.ends_with(".crate") {
-            Some(UniversalPackageFormat::CrateRust)
-        } else if filename.ends_with(".gem") {
-            Some(UniversalPackageFormat::GemRuby)
-        } else if filename.ends_with(".nupkg") {
-            Some(UniversalPackageFormat::NupkgDotnet)
-        } else if filename.ends_with(".vcpkg") {
-            Some(UniversalPackageFormat::VcpkgCpp)
-        } else if filename.ends_with(".swupd") {
-            Some(UniversalPackageFormat::ClearLinuxSwupd)
-        } else if filename.ends_with(".sfs") {
-            Some(UniversalPackageFormat::SfsModule)
         } else {
             None
         }
@@ -324,19 +285,6 @@ impl UniversalPackageImporter {
                 vec!["spack-runtime".to_string(), "openmpi".to_string()],
             ),
             UniversalPackageFormat::ConanCpp => ("MIT", vec!["conan-center".to_string()]),
-            UniversalPackageFormat::ClearLinuxSwupd => ("Apache-2.0", vec!["glibc".to_string()]),
-            UniversalPackageFormat::SuseZypper => ("GPL-2.0+", vec!["glibc".to_string()]),
-            UniversalPackageFormat::GobolinuxGobo => ("GPL-2.0", vec!["glibc".to_string()]),
-            UniversalPackageFormat::OstreeCommit => ("LGPL-2.1+", vec!["ostree".to_string()]),
-            UniversalPackageFormat::KissPkg => ("MIT", vec!["musl".to_string()]),
-            UniversalPackageFormat::CptPkg => ("MIT", vec!["musl".to_string()]),
-            UniversalPackageFormat::PukPkg => ("MIT", vec!["glibc".to_string()]),
-            UniversalPackageFormat::SfsModule => ("GPL", vec!["glibc".to_string()]),
-            UniversalPackageFormat::WheelPython => ("MIT/BSD", vec!["python3".to_string()]),
-            UniversalPackageFormat::CrateRust => ("MIT/Apache-2.0", vec!["rustc".to_string()]),
-            UniversalPackageFormat::GemRuby => ("MIT/Ruby", vec!["ruby".to_string()]),
-            UniversalPackageFormat::NupkgDotnet => ("MIT", vec!["dotnet".to_string()]),
-            UniversalPackageFormat::VcpkgCpp => ("MIT", vec!["cmake".to_string()]),
         };
 
         let translated_deps = Self::translate_foreign_dependencies(&raw_deps);

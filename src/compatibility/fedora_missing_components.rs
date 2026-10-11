@@ -1608,10 +1608,7 @@ impl FedoraPrProposal {
         let mut pr = String::new();
         pr.push_str(&format!("### PR Title: {}\n", self.title));
         pr.push_str(&format!("**Branch Name:** `{}`\n", self.branch_name));
-        pr.push_str(&format!(
-            "**Target Subsystem:** {}\n\n",
-            self.target_subsystem
-        ));
+        pr.push_str(&format!("**Target Subsystem:** {}\n\n", self.target_subsystem));
         pr.push_str("#### Summary of Fedora Parity Changes\n");
         pr.push_str(&self.description);
         pr.push_str("\n\n#### Changed Files\n");

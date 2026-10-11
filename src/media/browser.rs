@@ -1920,64 +1920,6 @@ impl ArcBoostDomainStylingEngine {
     }
 }
 
-pub struct FirefoxCSSContainerQueriesEngine {
-    pub container_type: String,
-    pub min_width_px: f32,
-}
-
-impl FirefoxCSSContainerQueriesEngine {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
-        Self {
-            container_type: String::from("inline-size"),
-            min_width_px: 400.0,
-        }
-    }
-
-    pub fn evaluate_container_query(&self, current_container_width: f32) -> bool {
-        current_container_width >= self.min_width_px
-    }
-}
-
-pub struct ChromiumSiteIsolationSecurityEngine {
-    pub oopif_active: bool,
-    pub isolated_origins: Vec<String>,
-}
-
-impl ChromiumSiteIsolationSecurityEngine {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
-        Self {
-            oopif_active: true,
-            isolated_origins: vec![
-                "https://bank.com".to_string(),
-                "https://accounts.google.com".to_string(),
-            ],
-        }
-    }
-
-    pub fn is_origin_isolated(&self, origin: &str) -> bool {
-        self.oopif_active && self.isolated_origins.iter().any(|o| origin.starts_with(o))
-    }
-}
-
-pub struct FirefoxWebSocketsSanitizerEngine;
-
-impl FirefoxWebSocketsSanitizerEngine {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
-        Self
-    }
-
-    pub fn sanitize_websocket_url(&self, raw_url: &str) -> String {
-        if raw_url.starts_with("ws://") {
-            format!("wss://{}", &raw_url[5..])
-        } else {
-            raw_url.to_string()
-        }
-    }
-}
-
 // =========================================================================
 // 22. UNIFIED SIGMAWEB BROWSER SUITE
 // =========================================================================
@@ -2038,9 +1980,6 @@ pub struct SigmaWebBrowser {
     pub floorp_split_mgr: FloorpSplitViewManagerEngine,
     pub vivaldi_spatial_vec: VivaldiSpatialVectorNavEngine,
     pub arc_boost_styling: ArcBoostDomainStylingEngine,
-    pub firefox_container_queries: FirefoxCSSContainerQueriesEngine,
-    pub chromium_site_isolation: ChromiumSiteIsolationSecurityEngine,
-    pub firefox_ws_sanitizer: FirefoxWebSocketsSanitizerEngine,
 }
 
 impl SigmaWebBrowser {
@@ -2102,9 +2041,6 @@ impl SigmaWebBrowser {
             floorp_split_mgr: FloorpSplitViewManagerEngine::new(),
             vivaldi_spatial_vec: VivaldiSpatialVectorNavEngine::new(),
             arc_boost_styling: ArcBoostDomainStylingEngine::new(),
-            firefox_container_queries: FirefoxCSSContainerQueriesEngine::new(),
-            chromium_site_isolation: ChromiumSiteIsolationSecurityEngine::new(),
-            firefox_ws_sanitizer: FirefoxWebSocketsSanitizerEngine::new(),
         }
     }
 
@@ -3247,30 +3183,6 @@ impl SovereignOpenSourceBrowserSuiteEngine {
             .orion_ext_compat
             .polyfill_browser_action("storage");
         results.insert("orion_webext_polyfill".to_string(), orion_poly);
-
-        let container_q = self
-            .browser
-            .firefox_container_queries
-            .evaluate_container_query(500.0);
-        results.insert(
-            "firefox_container_query_evaluated".to_string(),
-            container_q.to_string(),
-        );
-
-        let site_isolated = self
-            .browser
-            .chromium_site_isolation
-            .is_origin_isolated("https://bank.com/login");
-        results.insert(
-            "chromium_site_origin_isolated".to_string(),
-            site_isolated.to_string(),
-        );
-
-        let sanitized_ws = self
-            .browser
-            .firefox_ws_sanitizer
-            .sanitize_websocket_url("ws://example.com/socket");
-        results.insert("firefox_ws_sanitized_url".to_string(), sanitized_ws);
 
         let priv_check = self.run_open_source_privacy_hardening_check(target_url);
         for (k, v) in priv_check {

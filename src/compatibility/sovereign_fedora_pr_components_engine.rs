@@ -57,18 +57,8 @@ impl FedoraKojiBodhiPrDeployer {
 
     fn stage_all_koji_prs(&mut self) {
         let prs = [
-            (
-                "fedora-koji",
-                "feat(koji): Koji RPM build system task scheduling & build log auditing",
-                "koji_build_system",
-                0x1B2C3D4E,
-            ),
-            (
-                "fedora-bodhi",
-                "feat(bodhi): Bodhi update system with karma threshold gating & CVE tracking",
-                "bodhi_updates",
-                0x2C3D4E5F,
-            ),
+            ("fedora-koji", "feat(koji): Koji RPM build system task scheduling & build log auditing", "koji_build_system", 0x1B2C3D4E),
+            ("fedora-bodhi", "feat(bodhi): Bodhi update system with karma threshold gating & CVE tracking", "bodhi_updates", 0x2C3D4E5F),
         ];
 
         for (comp, title, target_sub, digest) in prs {
@@ -121,18 +111,8 @@ impl FedoraPagureCoprPrDeployer {
 
     fn stage_all_pagure_prs(&mut self) {
         let prs = [
-            (
-                "fedora-pagure",
-                "feat(pagure): Pagure git forge, PR review workflows & git-notes CI integration",
-                "pagure_forge",
-                0x3C4D5E6F,
-            ),
-            (
-                "fedora-copr",
-                "feat(copr): COPR community build repos with multi-chroot RPM generation",
-                "copr_builds",
-                0x4D5E6F70,
-            ),
+            ("fedora-pagure", "feat(pagure): Pagure git forge, PR review workflows & git-notes CI integration", "pagure_forge", 0x3C4D5E6F),
+            ("fedora-copr", "feat(copr): COPR community build repos with multi-chroot RPM generation", "copr_builds", 0x4D5E6F70),
         ];
 
         for (comp, title, target_sub, digest) in prs {
@@ -238,24 +218,9 @@ impl FedoraMockDnf5PrDeployer {
 
     fn stage_all_mock_prs(&mut self) {
         let prs = [
-            (
-                "fedora-mock",
-                "feat(mock): Mock clean chroot SRPM/RPM build environment generator",
-                "mock_builder",
-                0x6F708192,
-            ),
-            (
-                "fedora-dnf5",
-                "feat(dnf5): DNF5 package transaction solver & comps group installer",
-                "dnf5_solver",
-                0x708192A3,
-            ),
-            (
-                "fedora-rpmostree",
-                "feat(rpm-ostree): rpm-ostree atomic image updates & package layering",
-                "rpmostree_atomic",
-                0x8192A3B4,
-            ),
+            ("fedora-mock", "feat(mock): Mock clean chroot SRPM/RPM build environment generator", "mock_builder", 0x6F708192),
+            ("fedora-dnf5", "feat(dnf5): DNF5 package transaction solver & comps group installer", "dnf5_solver", 0x708192A3),
+            ("fedora-rpmostree", "feat(rpm-ostree): rpm-ostree atomic image updates & package layering", "rpmostree_atomic", 0x8192A3B4),
         ];
 
         for (comp, title, target_sub, digest) in prs {

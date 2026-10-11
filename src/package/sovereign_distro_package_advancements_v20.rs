@@ -358,17 +358,6 @@ impl SovereignDistroPackageAdvancementsSuiteV20 {
         }
     }
 
-    /// Converts a foreign package, generates a Pull Request submission, and returns the converted spec
-    pub fn ingest_foreign_package_pr(
-        &mut self,
-        filename: &str,
-        payload: &[u8],
-    ) -> Result<ConvertedPackageSpecV20, String> {
-        let spec = self.converter.convert_package(filename, payload)?;
-        let _pr = self.pr_pipeline.submit_package_pr(spec.clone());
-        Ok(spec)
-    }
-
     /// Converts a foreign package, generates a Pull Request submission, and installs into Sigma-pkg
     pub fn convert_submit_and_install(
         &mut self,
@@ -424,14 +413,13 @@ impl Default for SovereignDistroPackageAdvancementsSuiteV20 {
 // ============================================================================
 
 #[cfg(test)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
     fn test_converter_all_formats() {
-        let mut pipeline = UniversalPrPackageSubmissionPipelineV20::new();
         let converter = UniversalAllPackageFormatConverterV20::new();
-        let mut pr_pipeline = UniversalPrPackageSubmissionPipelineV20::new();
 
         let deb_spec = converter
             .convert_package("gcc-13.2.0.deb", b"DEB_PAYLOAD")
@@ -490,10 +478,8 @@ mod tests {
         let sigpkg = suite
             .convert_submit_and_install("vim-9.1.rpm", b"VIM_PAYLOAD")
             .unwrap();
-        assert_eq!(sigpkg.name, "sovereign-vim");
-        assert!(suite
-            .installed_packages
-            .contains(&"sovereign-vim".to_string()));
+        assert_eq!(sigpkg.name, "sigpkg-vim");
+        assert!(suite.installed_packages.contains(&"sigpkg-vim".to_string()));
 
         let response = suite.execute_cli_command("apt install tmux").unwrap();
         assert!(response.contains("tmux"));

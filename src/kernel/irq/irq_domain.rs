@@ -12,7 +12,6 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use std::collections::BTreeMap;
 use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
@@ -20,6 +19,7 @@ use std::vec::Vec;
 /// SigmaOS IRQ Domain mapper
 /// Maps physical hardware interrupts (hwirq) to virtual interrupt numbers (virq)
 /// Inspired by the Linux irq_domain architecture
+use crate::klib::btreemap::BTreeMap;
 
 pub struct IrqDomain {
     pub name: String,

@@ -108,11 +108,7 @@ impl Inode {
 
     pub fn dec_ref(&self) -> u32 {
         let prev = self.ref_count.fetch_sub(1, Ordering::SeqCst);
-        if prev > 0 {
-            prev - 1
-        } else {
-            0
-        }
+        if prev > 0 { prev - 1 } else { 0 }
     }
 
     pub fn get_ref_count(&self) -> u32 {
