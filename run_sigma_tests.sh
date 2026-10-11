@@ -605,6 +605,13 @@ if [ -f "src/boot/uefi_long_mode.rs" ]; then
     ./build/test_uefi_long_mode
 fi
 
+if [ -f "src/power/intel_idle_cpuidle.rs" ]; then
+    echo "Running Sovereign Intel Idle & Cpuidle Power Management test suite..."
+    mkdir -p build
+    rustc --test src/power/intel_idle_cpuidle.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_intel_idle
+    ./build/test_intel_idle
+fi
+
 if [ -f "src/distro/sovereign_linux_bsd_ecosystem_pinnacle_suite.rs" ]; then
     echo "Running Sovereign Linux & BSD Ecosystem Pinnacle Suite test suite..."
     mkdir -p build

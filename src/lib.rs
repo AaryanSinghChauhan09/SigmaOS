@@ -396,6 +396,7 @@ pub mod performance;
 pub mod pillars;
 pub mod plugin;
 pub mod power;
+pub use power::*;
 pub mod print;
 pub mod privacy;
 pub mod provisioning;
