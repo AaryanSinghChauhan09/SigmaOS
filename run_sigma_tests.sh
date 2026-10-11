@@ -57,6 +57,13 @@ if [ -f "src/memory/huge_pages.rs" ]; then
     ./build/huge_pages_test
 fi
 
+if [ -f "src/memory/page_compaction.rs" ]; then
+    echo "Running page compaction & anti-fragmentation test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/memory/page_compaction.rs -o build/page_compaction_test
+    ./build/page_compaction_test
+fi
+
 if [ -f "src/memory/kswapd.rs" ]; then
     echo "Running kswapd LRU page reclaim & ZRAM test suite..."
     mkdir -p build
@@ -315,6 +322,13 @@ if [ -f "src/governance/sovereign_task_guidelines_wiki_sync_engine.rs" ]; then
     mkdir -p build
     rustc --test src/governance/sovereign_task_guidelines_wiki_sync_engine.rs --edition=2021 -o build/sovereign_governance_wiki_test
     ./build/sovereign_governance_wiki_test
+fi
+
+if [ -f "src/diagnostics/sovereign_logging_monitoring_diagnostics.rs" ]; then
+    echo "Running Sovereign Linux & BSD Logging, Monitoring, and Diagnostics test suite..."
+    mkdir -p build
+    rustc --test src/diagnostics/sovereign_logging_monitoring_diagnostics.rs --edition=2021 -o build/sovereign_logging_monitoring_diagnostics_test
+    ./build/sovereign_logging_monitoring_diagnostics_test
 fi
 
 if [ -f "src/kernel/panic_handler.rs" ]; then
