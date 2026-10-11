@@ -1149,6 +1149,23 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
         }
     }
 
+
+    pub fn get_insights_by_domain(&self, domain: &str) -> Vec<TechMediaArticleInsight> {
+        self.insights
+            .iter()
+            .filter(|i| i.publication.to_lowercase().contains(&domain.to_lowercase()))
+            .cloned()
+            .collect()
+    }
+
+    pub fn format_all_pr_proposals(&self) -> String {
+        let mut pr = String::from("### Universal PR Proposals for All Tech Media Insights\n\n");
+        for insight in &self.insights {
+            pr.push_str(&format!("- [{}] {}: {}\n", insight.publication, insight.title, insight.action_recommendation));
+        }
+        pr
+    }
+
     pub fn get_insights_count(&self) -> usize {
         self.insights.len()
     }
