@@ -391,6 +391,7 @@ pub mod performance;
 pub mod pillars;
 pub mod plugin;
 pub mod power;
+pub use power::sovereign_acpi_slit_pr_engine::*;
 pub mod print;
 pub mod privacy;
 pub mod provisioning;

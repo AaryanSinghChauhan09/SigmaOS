@@ -222,6 +222,21 @@ impl NumaScheduler {
         self.distance_matrix[from_node][to_node] = distance;
     }
 
+    /// Load NUMA inter-node distance matrix directly from an ACPI SLIT table
+    pub fn load_acpi_slit_table(&mut self, slit: &crate::power::acpi_table_parser::ParsedSlit) {
+        let localities = slit.number_of_localities as usize;
+        self.distance_matrix.clear();
+        self.distance_matrix.reserve(localities);
+
+        for row in 0..localities {
+            let mut row_vec = Vec::with_capacity(localities);
+            for col in 0..localities {
+                row_vec.push(slit.matrix[row][col] as u32);
+            }
+            self.distance_matrix.push(row_vec);
+        }
+    }
+
     /// Get NUMA distance between two nodes (default: 10 local, 20 remote)
     pub fn get_node_distance(&self, from_node: usize, to_node: usize) -> u32 {
         if from_node == to_node {

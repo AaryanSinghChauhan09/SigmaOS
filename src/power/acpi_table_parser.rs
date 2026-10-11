@@ -30,6 +30,7 @@ pub const SSDT_SIGNATURE: &[u8; 4] = b"SSDT";
 pub const MCFG_SIGNATURE: &[u8; 4] = b"MCFG";
 pub const BGRT_SIGNATURE: &[u8; 4] = b"BGRT"; // Boot Graphics Resource Table
 pub const TPM2_SIGNATURE: &[u8; 4] = b"TPM2";
+pub const SLIT_SIGNATURE: &[u8; 4] = b"SLIT"; // System Locality Information Table
 
 // ============================================================================
 // 2. ACPI TABLE HEADERS
@@ -368,6 +369,54 @@ impl ParsedHpet {
 }
 
 // ============================================================================
+// 5B. SLIT — System Locality Information Table (ACPI Spec 5.2.17 / 6.5)
+// ============================================================================
+
+/// Parsed ACPI SLIT Table (Inter-Node NUMA Distance Matrix)
+#[derive(Debug, Clone, Default)]
+pub struct ParsedSlit {
+    pub number_of_localities: u64,
+    pub matrix: Vec<Vec<u8>>, // Localities x Localities relative distances (10 = local, >10 = remote)
+}
+
+impl ParsedSlit {
+    pub fn parse_from_bytes(bytes: &[u8]) -> Option<Self> {
+        if bytes.len() < 44 {
+            return None; // Header (36) + Locality Count (8)
+        }
+        if &bytes[0..4] != SLIT_SIGNATURE {
+            return None;
+        }
+
+        let number_of_localities = u64::from_le_bytes([
+            bytes[36], bytes[37], bytes[38], bytes[39], bytes[40], bytes[41], bytes[42], bytes[43],
+        ]);
+
+        let total_matrix_cells = (number_of_localities * number_of_localities) as usize;
+        let matrix_start = 44usize;
+
+        if bytes.len() < matrix_start + total_matrix_cells {
+            return None; // Truncated SLIT matrix
+        }
+
+        let mut matrix = Vec::with_capacity(number_of_localities as usize);
+        for row in 0..number_of_localities as usize {
+            let mut row_vec = Vec::with_capacity(number_of_localities as usize);
+            for col in 0..number_of_localities as usize {
+                let cell_idx = matrix_start + (row * number_of_localities as usize) + col;
+                row_vec.push(bytes[cell_idx]);
+            }
+            matrix.push(row_vec);
+        }
+
+        Some(ParsedSlit {
+            number_of_localities,
+            matrix,
+        })
+    }
+}
+
+// ============================================================================
 // 6. SOVEREIGN ACPI SUBSYSTEM — Top-level table registry and power controller
 // ============================================================================
 
@@ -378,6 +427,7 @@ pub struct SovereignAcpiSubsystem {
     pub madt: Option<ParsedMadt>,
     pub fadt: Option<ParsedFadt>,
     pub hpet: Option<ParsedHpet>,
+    pub slit: Option<ParsedSlit>,
     pub table_count: u32,
     pub cpu_count: u32,
     pub io_apic_count: u32,
@@ -392,6 +442,7 @@ impl Clone for SovereignAcpiSubsystem {
             madt: self.madt.clone(),
             fadt: self.fadt.clone(),
             hpet: self.hpet.clone(),
+            slit: self.slit.clone(),
             table_count: self.table_count,
             cpu_count: self.cpu_count,
             io_apic_count: self.io_apic_count,
@@ -419,6 +470,7 @@ impl Default for SovereignAcpiSubsystem {
             madt: None,
             fadt: None,
             hpet: None,
+            slit: None,
             table_count: 0,
             cpu_count: 0,
             io_apic_count: 0,
@@ -452,6 +504,12 @@ impl SovereignAcpiSubsystem {
                     self.cpu_count = madt.active_cpu_count;
                     self.io_apic_count = madt.io_apics.len() as u32;
                     self.madt = Some(madt);
+                    self.table_count += 1;
+                }
+            }
+            s if s == SLIT_SIGNATURE => {
+                if let Some(slit) = ParsedSlit::parse_from_bytes(data) {
+                    self.slit = Some(slit);
                     self.table_count += 1;
                 }
             }
@@ -499,6 +557,7 @@ impl SovereignAcpiSubsystem {
 #[cfg(any(test, feature = "standalone_test"))]
 mod tests {
     use super::*;
+    use alloc::vec;
 
     fn build_madt_bytes(apic_addr: u32, flags: u32) -> Vec<u8> {
         let mut bytes = vec![0u8; 44 + 8 + 12]; // header(44) + local_apic(8) + io_apic(12)
