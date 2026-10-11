@@ -170,7 +170,11 @@ pub mod toolchain {
     pub mod bootstrap;
     pub mod capsule;
     pub mod codex;
+    pub mod cross_compile;
+    pub mod self_host;
+    pub mod sovereign_toolchain_development_advancements_pr;
 }
+pub use toolchain::sovereign_toolchain_development_advancements_pr::*;
 pub mod scheduler;
 
 pub use accessibility::{
