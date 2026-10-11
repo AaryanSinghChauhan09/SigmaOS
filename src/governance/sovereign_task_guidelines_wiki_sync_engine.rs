@@ -279,6 +279,17 @@ impl WikiDataTransferEngine {
             },
         );
 
+        self.feature_specs.insert(
+            "SystemUtilitiesDevelopmentPlan".to_string(),
+            FeatureMdStatus {
+                spec_name: "26-System-Utilities-Development-Plan.md".to_string(),
+                source_path: "wiki/26-System-Utilities-Development-Plan.md".to_string(),
+                is_fully_implemented: true,
+                completion_percentage: 100,
+                wiki_mirrored: true,
+            },
+        );
+
         self.register_spec_file("UniversalPackageSystem", "Universal Package System", true);
         self.register_spec_file("Roadmap11Deployment", "Roadmap 11 Deployment", true);
         self.register_spec_file("ROADMAP.md", "SigmaOS Master Development Roadmap", true);
@@ -291,6 +302,31 @@ impl WikiDataTransferEngine {
         self.register_spec_file(
             "18-Architecture-Development-Decision-Plan-PR.md",
             "Architecture Development Decision Plan PR",
+            true,
+        );
+        self.register_spec_file(
+            "26-System-Utilities-Development-Plan.md",
+            "System Utilities Development Plan PR",
+            true,
+        );
+        self.register_spec_file(
+            "27-Arch-Linux-Gap-Closure-V43-PR.md",
+            "Arch Linux Gap Closure V43 PR",
+            true,
+        );
+        self.register_spec_file(
+            "29-Open-Source-OS-Missing-Components-V45-PR.md",
+            "Open Source OS Missing Components V45 PR",
+            true,
+        );
+        self.register_spec_file(
+            "30-Bare-Metal-Start-Assembly-Entry-PR.md",
+            "Bare Metal Start Assembly Entry PR",
+            true,
+        );
+        self.register_spec_file(
+            "31-Assembly-Bootstrap-Entry-Advancements-PR.md",
+            "Assembly Bootstrap Entry Advancements PR",
             true,
         );
     }

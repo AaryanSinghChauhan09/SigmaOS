@@ -168,6 +168,7 @@ pub mod backup;
 pub mod bluetooth;
 pub mod boot;
 pub use boot::*;
+pub use boot::start_assembly_entry::*;
 pub mod toolchain {
     pub mod adapter;
     pub mod bootstrap;
@@ -341,6 +342,7 @@ pub use userland::shell::{
     Parser as UserlandShellParser, RedirectSpec, RedirectionEngine, Shell as UserlandShell,
     StreamTarget,
 };
+pub use userland::system_utilities::*;
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
