@@ -475,7 +475,9 @@ impl ArchMkinitcpioHookGeneratorV38 {
                 dependencies: vec!["udev".to_string()],
             },
         );
-        Self { registered_hooks: hooks }
+        Self {
+            registered_hooks: hooks,
+        }
     }
 
     pub fn resolve_hook_sequence(&self, active_hooks: &[&str]) -> Vec<String> {
@@ -609,10 +611,15 @@ impl ArchAuditVulnerabilityScannerV38 {
                 fixed_version: Some("5.6.1-2".to_string()),
             },
         ];
-        Self { known_advisories: sample }
+        Self {
+            known_advisories: sample,
+        }
     }
 
-    pub fn audit_installed_packages(&self, installed: &[(&str, &str)]) -> Vec<ArchVulnerabilityAdvisoryV38> {
+    pub fn audit_installed_packages(
+        &self,
+        installed: &[(&str, &str)],
+    ) -> Vec<ArchVulnerabilityAdvisoryV38> {
         let mut vulnerabilities = Vec::new();
         for (pkg, _ver) in installed {
             for adv in &self.known_advisories {
@@ -705,7 +712,9 @@ impl ReflectorMirrorlistRankerV38 {
                 completion_pct: 100,
             },
         ];
-        Self { mirrors: sample_mirrors }
+        Self {
+            mirrors: sample_mirrors,
+        }
     }
 
     pub fn rank_fastest_mirrors(&self, limit: usize) -> Vec<MirrorEntryV38> {
@@ -733,7 +742,11 @@ pub struct ArchBuildSystemSyncEngineV38 {
 impl ArchBuildSystemSyncEngineV38 {
     pub fn new() -> Self {
         Self {
-            synced_repos: vec!["core".to_string(), "extra".to_string(), "multilib".to_string()],
+            synced_repos: vec![
+                "core".to_string(),
+                "extra".to_string(),
+                "multilib".to_string(),
+            ],
         }
     }
 
@@ -837,7 +850,8 @@ mod tests {
         );
         assert!(makepkg.generate_pkginfo().contains("pkgname = htop"));
 
-        let lint_res = ArchNamcapLinterEngineV38::lint_pkgbuild("pkgname=foo\ninstall -d $pkgdir/usr/local\n");
+        let lint_res =
+            ArchNamcapLinterEngineV38::lint_pkgbuild("pkgname=foo\ninstall -d $pkgdir/usr/local\n");
         assert!(lint_res.iter().any(|w| w.rule_id == "fhs-usr-local"));
     }
 
@@ -872,7 +886,10 @@ mod tests {
     #[test]
     fn test_pkgctl_initramfs_keyring_v38() {
         let gateway = SovereignArchLinuxGapClosurePrGatewayV38::new();
-        assert!(gateway.pkgctl.format_build_command().contains("pkgctl build"));
+        assert!(gateway
+            .pkgctl
+            .format_build_command()
+            .contains("pkgctl build"));
 
         let seq = gateway.initramfs_gen.resolve_hook_sequence(&["kms"]);
         assert_eq!(seq, vec!["base", "udev", "kms"]);

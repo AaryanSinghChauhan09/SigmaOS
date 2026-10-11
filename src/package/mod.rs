@@ -134,7 +134,6 @@ pub mod omarchy_pr_proposal_engine;
 pub mod packagekit;
 pub mod software_manager;
 pub mod sovereign_distro_package_advancements_v2;
-pub mod sovereign_distro_package_advancements_v34;
 pub mod sovereign_distro_package_innovations;
 pub mod sovereign_distro_package_master_suite;
 pub mod sovereign_distro_package_matrix_expansion;

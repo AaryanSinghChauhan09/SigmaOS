@@ -478,6 +478,7 @@ pub mod mint_omarchy_inspirations;
 pub mod omarchy_dotfiles;
 pub mod omarchy_gap_closure_advancements_v25;
 pub mod omarchy_inspiration;
+pub mod omarchy_linux_gap_closure_v44_pr;
 pub mod omarchy_linux_pinnacle_gap_closure;
 pub mod omarchy_missing_components;
 pub mod omarchy_missing_components_parity_pr;

@@ -171,6 +171,9 @@ pub use sovereign_kernel_pr_gateway::*;
 pub mod sovereign_linux_bsd_kernel_innovations_pr;
 pub use sovereign_linux_bsd_kernel_innovations_pr::*;
 
+pub mod sovereign_kernel_advanced_os_parity_pr;
+pub use sovereign_kernel_advanced_os_parity_pr::*;
+
 pub mod sovereign_clean_code_and_os_principles_engine;
 pub use sovereign_clean_code_and_os_principles_engine::{
     CleanCodeMetricsEvaluator, ResourceAllocationGraph, SolidDesignValidator,
