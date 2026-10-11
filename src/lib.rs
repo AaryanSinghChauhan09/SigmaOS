@@ -129,6 +129,7 @@ pub use distro::sovereign_2070_distro_supremacy_engine::*;
 pub use distro::sovereign_2075_distro_supremacy_engine::*;
 pub use distro::sovereign_2080_distro_supremacy_engine::*;
 pub use distro::sovereign_2085_distro_supremacy_engine::*;
+pub use distro::arch_linux_gap_closure_v43_pr::*;
 pub use distro::sovereign_arch_gap_closure_pr_engine::*;
 pub use distro::sovereign_architecture_development_decision_plan::*;
 pub use distro::sovereign_gentoo_gap_closure_pr_engine::*;
@@ -338,6 +339,7 @@ pub use userland::shell::{
     Parser as UserlandShellParser, RedirectSpec, RedirectionEngine, Shell as UserlandShell,
     StreamTarget,
 };
+pub use userland::system_utilities::*;
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
