@@ -40,6 +40,7 @@ pub mod rtc_cmos;
 pub mod sdmmc;
 pub mod serial;
 pub mod sovereign_comprehensive_drivers;
+pub mod sovereign_device_driver_development_and_pr_suite;
 pub mod sovereign_driver_lifecycle;
 pub mod sovereign_hardware_expansion;
 pub mod sovereign_usb_xhci;

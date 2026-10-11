@@ -1088,4 +1088,11 @@ if [ -f "src/desktop/sovereign_gui_development_and_pr_suite.rs" ]; then
     ./build/test_gui_pr_suite
 fi
 
+if [ -f "src/drivers/sovereign_device_driver_development_and_pr_suite.rs" ]; then
+    echo "Running Sovereign Device Driver Development and PR Gateway Suite..."
+    mkdir -p build
+    rustc --test src/drivers/sovereign_device_driver_development_and_pr_suite.rs --edition=2021 -o build/test_device_driver_pr_suite
+    ./build/test_device_driver_pr_suite
+fi
+
 echo "All SigmaOS test suites completed."

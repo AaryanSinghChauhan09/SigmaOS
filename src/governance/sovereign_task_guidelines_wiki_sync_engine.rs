@@ -176,6 +176,17 @@ impl WikiDataTransferEngine {
         );
 
         self.feature_specs.insert(
+            "DeviceDriverDevelopmentPlan".to_string(),
+            FeatureMdStatus {
+                spec_name: "31-Device-Driver-Development-And-Maintenance-Plan.md".to_string(),
+                source_path: "wiki/31-Device-Driver-Development-And-Maintenance-Plan.md".to_string(),
+                is_fully_implemented: true,
+                completion_percentage: 100,
+                wiki_mirrored: true,
+            },
+        );
+
+        self.feature_specs.insert(
             "SigmaOSGuiDevelopmentPlan".to_string(),
             FeatureMdStatus {
                 spec_name: "30-SigmaOS-GUI-Development-Plan.md".to_string(),
