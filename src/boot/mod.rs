@@ -5,6 +5,7 @@
 
 extern crate alloc;
 
+pub mod assembly_bootstrap;
 pub mod boot_snapshot;
 pub mod bootloader;
 pub mod bridge_grid;
@@ -53,6 +54,11 @@ pub use uefi::{
 };
 pub use uefi_gop_framebuffer::*;
 
+pub use assembly_bootstrap::{
+    AssemblyBootstrapEngine, AssemblyBootstrapPrGenerator, AssemblyHandoffPayload,
+    Gdt64DescriptorTable, LongModePageTableSetup, Multiboot2HeaderSpec,
+    MULTIBOOT2_BOOTLOADER_MAGIC, MULTIBOOT2_HEADER_MAGIC,
+};
 pub use sovereign_multi_distro_bootloader::{
     BootloaderKind, FreeBsdLoaderConfig, LimineBootEntry, LimineConfig, OpenBsdBootConfig,
     RefindMenuEntry, SovereignMultiDistroBootloaderEngine, SystemdBootBlsEntry, UniversalBootEntry,
