@@ -13,6 +13,7 @@ pub mod drm_kms;
 pub mod drm_kms_atomic;
 pub mod ethernet;
 pub mod even_more_devices;
+pub mod e1000e_dma;
 pub mod flipper_gpio_sensor;
 pub mod framebuffer;
 pub mod framebuffer_console;
