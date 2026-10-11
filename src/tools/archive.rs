@@ -374,6 +374,25 @@ impl SovereignCpioEngine {
 
         archive
     }
+
+    pub fn generate_cpio_pr_proposal(&self, archive_name: &str) -> String {
+        let mut diff = format!(
+            "--- a/boot/initramfs/{}.cpio\n+++ b/boot/initramfs/{}.cpio\n@@ -0,0 +1,{} @@\n",
+            archive_name,
+            archive_name,
+            self.entries.len() + 1
+        );
+        for entry in &self.entries {
+            diff.push_str(&format!(
+                "+ Entry: '{}' (mode: {:o}, size: {} bytes)\n",
+                entry.name,
+                entry.mode,
+                entry.data.len()
+            ));
+        }
+        diff.push_str("+ Trailer: TRAILER!!! (magic: 070701 newc format)\n");
+        diff
+    }
 }
 
 /// Multi-Threaded Parallel Stream Compressor (pigz / pbzip2 / pixz / zstd -T0 parity)
@@ -588,6 +607,18 @@ mod tests {
         assert!(text.contains("070701"));
         assert!(text.contains("init"));
         assert!(text.contains("TRAILER!!!"));
+    }
+
+    #[test]
+    fn test_sovereign_cpio_pr_proposal() {
+        let mut cpio = SovereignCpioEngine::new();
+        cpio.add_entry("init", b"#!/bin/sh\necho Booting SigmaOS", false);
+        cpio.add_entry("etc", b"", true);
+
+        let proposal = cpio.generate_cpio_pr_proposal("sigma_initramfs");
+        assert!(proposal.contains("--- a/boot/initramfs/sigma_initramfs.cpio"));
+        assert!(proposal.contains("Entry: 'init'"));
+        assert!(proposal.contains("Trailer: TRAILER!!!"));
     }
 
     #[test]
