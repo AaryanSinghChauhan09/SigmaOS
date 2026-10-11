@@ -7249,34 +7249,27 @@ impl SovereignExecutiveKpiScorecardEngine {
         Some((var_pct, status))
     }
 
-    /// Registers dependencies for a target cell (e.g., "A1" depends on ["B1", "C1"]).
-    pub fn register_dependency(&mut self, target_cell: &str, depends_on: Vec<String>) {
-        self.dependencies
-            .insert(target_cell.to_string(), depends_on);
-    }
-
-    /// Checks if adding a dependency from `target_cell` to `source_cell` introduces a circular reference cycle.
-    pub fn has_circular_dependency(
-        &self,
-        start_cell: &str,
-        current_cell: &str,
-        visited: &mut HashSet<String>,
-    ) -> bool {
-        if start_cell == current_cell && !visited.is_empty() {
-            return true;
-        }
-        if !visited.insert(current_cell.to_string()) {
-            return false;
+    /// Computes overall weighted achievement index across all scorecard metrics.
+    pub fn compute_weighted_scorecard_index(&self) -> f64 {
+        let total_weight: f64 = self.kpis.iter().map(|k| k.weight).sum();
+        if total_weight <= 0.0 {
+            return 0.0;
         }
 
-        if let Some(deps) = self.dependencies.get(current_cell) {
-            for dep in deps {
-                if self.has_circular_dependency(start_cell, dep, visited) {
-                    return true;
-                }
-            }
-        }
-        false
+        let weighted_sum: f64 = self
+            .kpis
+            .iter()
+            .map(|k| {
+                let ratio = if k.target_value > 0.0 {
+                    (k.actual_value / k.target_value).min(1.5)
+                } else {
+                    1.0
+                };
+                ratio * k.weight
+            })
+            .sum();
+
+        (weighted_sum / total_weight) * 100.0
     }
 }
 
@@ -7367,17 +7360,8 @@ impl SovereignZohoAnalyticsCohortAnalysisEngine {
         }
         active_counts
             .iter()
-            .map(|k| {
-                let ratio = if k.target_value > 0.0 {
-                    (k.actual_value / k.target_value).min(1.5)
-                } else {
-                    1.0
-                };
-                ratio * k.weight
-            })
-            .sum();
-
-        (weighted_sum / total_weight) * 100.0
+            .map(|&count| (count as f64 / initial_count as f64) * 100.0)
+            .collect()
     }
 }
 
@@ -7571,15 +7555,12 @@ impl SovereignEnterpriseWorkflowAuditTrailEngine {
         true
     }
 
-    /// Releases a previously acquired lock on a region.
-    pub fn release_lock(&mut self, region_id: &str, user_id: &str) -> bool {
-        if let Some(existing) = self.locks.get(region_id) {
-            if existing.user_id == user_id {
-                self.locks.remove(region_id);
-                return true;
-            }
-        }
-        false
+    /// Retrieves audit history for a specific resource.
+    pub fn get_resource_audit_history(&self, resource: &str) -> Vec<&EnterpriseAuditLogEntry> {
+        self.audit_chain
+            .iter()
+            .filter(|e| e.resource == resource)
+            .collect()
     }
 }
 
@@ -10805,11 +10786,11 @@ pub struct CohortMetrics {
 
 /// Sovereign Zoho Analytics Cohort Retention Engine
 #[derive(Debug, Clone, Default)]
-pub struct SovereignZohoAnalyticsCohortAnalysisEngine {
+pub struct SovereignZohoAnalyticsCohortMatrixEngine {
     pub cohorts: Vec<CohortMetrics>,
 }
 
-impl SovereignZohoAnalyticsCohortAnalysisEngine {
+impl SovereignZohoAnalyticsCohortMatrixEngine {
     pub fn new() -> Self {
         Self {
             cohorts: Vec::new(),
@@ -10871,11 +10852,11 @@ pub struct SlaEscalationRule {
 
 /// Sovereign Zoho Desk Multi-Tier SLA Escalation Engine
 #[derive(Debug, Clone, Default)]
-pub struct SovereignZohoDeskTicketSlaEscalationEngine {
+pub struct SovereignZohoDeskMultiTierSlaEscalationEngine {
     pub escalation_rules: Vec<SlaEscalationRule>,
 }
 
-impl SovereignZohoDeskTicketSlaEscalationEngine {
+impl SovereignZohoDeskMultiTierSlaEscalationEngine {
     pub fn new() -> Self {
         Self {
             escalation_rules: Vec::new(),
@@ -10916,9 +10897,9 @@ impl SovereignZohoDeskTicketSlaEscalationEngine {
 
 /// Sovereign Salesforce Einstein Lead Scoring & Intent Decay AI Engine
 #[derive(Debug, Clone, Default)]
-pub struct SovereignSalesforceEinsteinLeadScoringAiEngine;
+pub struct SovereignSalesforceEinsteinIntentDecayAiEngine;
 
-impl SovereignSalesforceEinsteinLeadScoringAiEngine {
+impl SovereignSalesforceEinsteinIntentDecayAiEngine {
     pub fn new() -> Self {
         Self
     }
@@ -10966,11 +10947,11 @@ pub struct ApprovalThresholdTier {
 
 /// Sovereign Salesforce CPQ Approval Matrix Engine
 #[derive(Debug, Clone, Default)]
-pub struct SovereignSalesforceCpqQuoteDiscountEngine {
+pub struct SovereignSalesforceCpqApprovalMatrixEngine {
     pub approval_tiers: Vec<ApprovalThresholdTier>,
 }
 
-impl SovereignSalesforceCpqQuoteDiscountEngine {
+impl SovereignSalesforceCpqApprovalMatrixEngine {
     pub fn new() -> Self {
         Self {
             approval_tiers: Vec::new(),
@@ -11027,9 +11008,9 @@ pub struct BomTreeNode {
 
 /// Sovereign Odoo MRP Hierarchical BOM Tree Engine
 #[derive(Debug, Clone, Default)]
-pub struct SovereignOdooMrpBillOfMaterialsTreeEngine;
+pub struct SovereignOdooMrpHierarchicalBomTreeEngine;
 
-impl SovereignOdooMrpBillOfMaterialsTreeEngine {
+impl SovereignOdooMrpHierarchicalBomTreeEngine {
     pub fn new() -> Self {
         Self
     }
@@ -11245,6 +11226,12 @@ impl SovereignBitrix24SpeechAiSentimentAnalyzerEngine {
             compliance_flag,
         }
     }
+}
+
+#[cfg(test)]
+mod tests_phase2 {
+    use super::*;
+    use super::sigma_types::CapabilityToken;
 
     #[test]
     fn test_suite_engines_phase2_google_ms_zoho_salesforce_odoo_bitrix() {
@@ -11365,7 +11352,7 @@ impl SovereignBitrix24SpeechAiSentimentAnalyzerEngine {
         assert!(bot_resp.contains("Triggering automated build"));
 
         // 7. Zoho Analytics Cohort Retention
-        let mut cohort_engine = SovereignZohoAnalyticsCohortAnalysisEngine::new();
+        let mut cohort_engine = SovereignZohoAnalyticsCohortMatrixEngine::new();
         let cohort = cohort_engine.compute_cohort_retention("2026-Q1", &[1000, 800, 650, 500]);
         assert_eq!(cohort.total_cohort_users, 1000);
         assert_eq!(cohort.retention_by_month[1], 80.0);
@@ -11374,7 +11361,7 @@ impl SovereignBitrix24SpeechAiSentimentAnalyzerEngine {
         assert!(forecast_val > 10.0);
 
         // 8. Zoho Desk SLA Escalation
-        let mut desk_sla = SovereignZohoDeskTicketSlaEscalationEngine::new();
+        let mut desk_sla = SovereignZohoDeskMultiTierSlaEscalationEngine::new();
         desk_sla.add_escalation_rule(1, 60, "tier2_support");
         desk_sla.add_escalation_rule(2, 120, "engineering_lead");
         let (breached, assignee) = desk_sla.evaluate_ticket_sla_status(150, "High");
@@ -11382,14 +11369,14 @@ impl SovereignBitrix24SpeechAiSentimentAnalyzerEngine {
         assert_eq!(assignee, Some("engineering_lead".to_string()));
 
         // 9. Salesforce Einstein Lead Scoring & Intent Decay AI
-        let einstein = SovereignSalesforceEinsteinLeadScoringAiEngine::new();
+        let einstein = SovereignSalesforceEinsteinIntentDecayAiEngine::new();
         let decayed = einstein.calculate_intent_decay_score(100.0, 30, 30);
         assert_eq!(decayed, 50.0);
         let prob = einstein.predict_lead_conversion_probability(80.0, 500_000.0, 5);
         assert!(prob > 0.5);
 
         // 10. Salesforce CPQ Volume Discount Tier & Approval Matrix
-        let mut cpq_engine = SovereignSalesforceCpqQuoteDiscountEngine::new();
+        let mut cpq_engine = SovereignSalesforceCpqApprovalMatrixEngine::new();
         cpq_engine.add_approval_tier(10.0, "Manager");
         cpq_engine.add_approval_tier(20.0, "VP Sales");
         assert_eq!(cpq_engine.evaluate_quote_approval_level(15.0), "VP Sales");
@@ -11403,7 +11390,7 @@ impl SovereignBitrix24SpeechAiSentimentAnalyzerEngine {
         assert_eq!(net_price, 12750.0);
 
         // 11. Odoo MRP Hierarchical BOM Tree
-        let bom_engine = SovereignOdooMrpBillOfMaterialsTreeEngine::new();
+        let bom_engine = SovereignOdooMrpHierarchicalBomTreeEngine::new();
         let top_bom = BomTreeNode {
             component_sku: "Workstation".to_string(),
             qty_per_unit: 1.0,
@@ -11467,954 +11454,5 @@ impl SovereignBitrix24SpeechAiSentimentAnalyzerEngine {
             "The customer is very satisfied and loves the helpful software.",
         );
         assert!(analysis.sentiment_score > 0.5);
-    }
-}
-
-// ---------------------------------------------------------------------------
-// 15. Google Sheets / BigQuery Connected Sheets & Pushdown Analytics Engine
-// ---------------------------------------------------------------------------
-
-#[derive(Debug, Clone)]
-pub struct BigQueryConnectedSheetConfig {
-    pub project_id: String,
-    pub dataset_id: String,
-    pub table_id: String,
-    pub pushdown_sql_where: Option<String>,
-    pub refresh_interval_mins: u32,
-    pub cached_timestamp: u64,
-}
-
-#[derive(Debug, Clone)]
-pub struct ConnectedSheetQueryResult {
-    pub headers: Vec<String>,
-    pub rows: Vec<Vec<String>>,
-    pub total_rows: usize,
-}
-
-/// Sovereign Google Sheets & BigQuery Connected Sheets Pushdown Engine
-#[derive(Debug, Clone, Default)]
-pub struct SovereignGoogleSheetsBigQueryDataConnectorEngine {
-    pub config: Option<BigQueryConnectedSheetConfig>,
-    pub query_cache: Option<ConnectedSheetQueryResult>,
-}
-
-impl SovereignGoogleSheetsBigQueryDataConnectorEngine {
-    pub fn new() -> Self {
-        Self {
-            config: None,
-            query_cache: None,
-        }
-    }
-
-    pub fn configure_connection(
-        &mut self,
-        project: &str,
-        dataset: &str,
-        table: &str,
-        refresh_mins: u32,
-    ) {
-        self.config = Some(BigQueryConnectedSheetConfig {
-            project_id: project.to_string(),
-            dataset_id: dataset.to_string(),
-            table_id: table.to_string(),
-            pushdown_sql_where: None,
-            refresh_interval_mins: refresh_mins,
-            cached_timestamp: 1000,
-        });
-    }
-
-    pub fn set_pushdown_where_clause(&mut self, sql_where: &str) {
-        if let Some(ref mut cfg) = self.config {
-            cfg.pushdown_sql_where = Some(sql_where.to_string());
-        }
-    }
-
-    pub fn cache_query_results(&mut self, headers: Vec<String>, rows: Vec<Vec<String>>) {
-        let total = rows.len();
-        self.query_cache = Some(ConnectedSheetQueryResult {
-            headers,
-            rows,
-            total_rows: total,
-        });
-    }
-
-    pub fn populate_spreadsheet_range(
-        &self,
-        spreadsheet: &mut SpreadsheetProcessor,
-        start_row: u32,
-        start_col: u32,
-    ) -> Result<usize> {
-        let cache = self.query_cache.as_ref().ok_or("No cached query result")?;
-
-        for (c_idx, header) in cache.headers.iter().enumerate() {
-            spreadsheet.set_cell(
-                start_row,
-                start_col + (c_idx as u32),
-                CellValue::Text(header.clone()),
-            )?;
-        }
-
-        for (r_idx, row) in cache.rows.iter().enumerate() {
-            let row_num = start_row + 1 + (r_idx as u32);
-            for (c_idx, cell_str) in row.iter().enumerate() {
-                let cell_val = if let Ok(val_f) = cell_str.parse::<f64>() {
-                    CellValue::Number(val_f)
-                } else {
-                    CellValue::Text(cell_str.clone())
-                };
-                spreadsheet.set_cell(row_num, start_col + (c_idx as u32), cell_val)?;
-            }
-        }
-
-        Ok(cache.total_rows)
-    }
-}
-
-// ---------------------------------------------------------------------------
-// 16. Google Docs / Gemini AI Generative Smart Writer & Tone Stylist Engine
-// ---------------------------------------------------------------------------
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum SmartWriterTone {
-    Formal,
-    Concise,
-    Persuasive,
-    Executive,
-    Technical,
-}
-
-/// Sovereign Google Docs & Gemini AI Generative Smart Writer Engine
-#[derive(Debug, Clone, Default)]
-pub struct SovereignGoogleDocsGeminiSmartWriterEngine;
-
-impl SovereignGoogleDocsGeminiSmartWriterEngine {
-    pub fn new() -> Self {
-        Self
-    }
-
-    pub fn generate_text_prompt(&self, prompt: &str, tone: SmartWriterTone) -> String {
-        let prefix = match tone {
-            SmartWriterTone::Formal => "Dear Esteemed Stakeholders,",
-            SmartWriterTone::Concise => "Key Directive:",
-            SmartWriterTone::Persuasive => "Unlock Next-Gen Potential:",
-            SmartWriterTone::Executive => "Executive Action Summary:",
-            SmartWriterTone::Technical => "System Architecture Specification:",
-        };
-        format!("{} Generated response for prompt: '{}'", prefix, prompt)
-    }
-
-    pub fn rewrite_text(&self, input: &str, tone: SmartWriterTone) -> String {
-        match tone {
-            SmartWriterTone::Concise => input.split_whitespace().collect::<Vec<_>>().join(" "),
-            SmartWriterTone::Formal => format!("It is respectfully noted that {}", input),
-            SmartWriterTone::Persuasive => format!("Empower your workflow: {}", input),
-            SmartWriterTone::Executive => format!("Strategic Insight: {}", input),
-            SmartWriterTone::Technical => format!("[Technical Spec] {}", input),
-        }
-    }
-
-    pub fn expand_section(&self, topic: &str, depth_bullets: usize) -> Vec<String> {
-        let mut bullets = Vec::with_capacity(depth_bullets);
-        for i in 1..=depth_bullets {
-            bullets.push(format!(
-                "• Key aspect #{} regarding {}: Optimized performance & reliability.",
-                i, topic
-            ));
-        }
-        bullets
-    }
-}
-
-// ---------------------------------------------------------------------------
-// 17. Google Looker Studio Multi-Table Data Blending Engine
-// ---------------------------------------------------------------------------
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
-pub enum BlendJoinType {
-    #[default]
-    LeftOuter,
-    Inner,
-    FullOuter,
-}
-
-#[derive(Debug, Clone)]
-pub struct BlendDataSourceSpec {
-    pub source_name: String,
-    pub join_key: String,
-    pub selected_fields: Vec<String>,
-}
-
-/// Sovereign Google Looker Studio Multi-Table Data Blending Engine
-#[derive(Debug, Clone, Default)]
-pub struct SovereignGoogleLookerStudioDataBlendEngine {
-    pub primary_source: Option<BlendDataSourceSpec>,
-    pub secondary_source: Option<BlendDataSourceSpec>,
-    pub join_type: BlendJoinType,
-}
-
-impl SovereignGoogleLookerStudioDataBlendEngine {
-    pub fn new() -> Self {
-        Self {
-            primary_source: None,
-            secondary_source: None,
-            join_type: BlendJoinType::LeftOuter,
-        }
-    }
-
-    pub fn configure_blend(
-        &mut self,
-        primary: BlendDataSourceSpec,
-        secondary: BlendDataSourceSpec,
-        join_type: BlendJoinType,
-    ) {
-        self.primary_source = Some(primary);
-        self.secondary_source = Some(secondary);
-        self.join_type = join_type;
-    }
-
-    pub fn execute_blend(
-        &self,
-        primary_data: &[HashMap<String, String>],
-        secondary_data: &[HashMap<String, String>],
-    ) -> Vec<HashMap<String, String>> {
-        let prim_spec = match &self.primary_source {
-            Some(s) => s,
-            None => return Vec::new(),
-        };
-        let sec_spec = match &self.secondary_source {
-            Some(s) => s,
-            None => return Vec::new(),
-        };
-
-        let mut blended = Vec::new();
-        for p_row in primary_data {
-            let mut row_map = HashMap::new();
-            for field in &prim_spec.selected_fields {
-                if let Some(val) = p_row.get(field) {
-                    row_map.insert(format!("{}.{}", prim_spec.source_name, field), val.clone());
-                }
-            }
-
-            let p_key_val = p_row
-                .get(&prim_spec.join_key)
-                .map(|s| s.as_str())
-                .unwrap_or("");
-
-            let matching_sec = secondary_data.iter().find(|s_row| {
-                s_row
-                    .get(&sec_spec.join_key)
-                    .map(|s| s.as_str())
-                    .unwrap_or("")
-                    == p_key_val
-            });
-
-            if let Some(s_row) = matching_sec {
-                for field in &sec_spec.selected_fields {
-                    if let Some(val) = s_row.get(field) {
-                        row_map.insert(format!("{}.{}", sec_spec.source_name, field), val.clone());
-                    }
-                }
-            } else if self.join_type == BlendJoinType::Inner {
-                continue;
-            }
-
-            blended.push(row_map);
-        }
-        blended
-    }
-
-    pub fn evaluate_case_when_expression(
-        &self,
-        row: &HashMap<String, String>,
-        field: &str,
-        conditions: &[(&str, &str)],
-        default_val: &str,
-    ) -> String {
-        let field_val = row.get(field).map(|s| s.as_str()).unwrap_or("");
-        for &(match_str, result_str) in conditions {
-            if field_val == match_str {
-                return result_str.to_string();
-            }
-        }
-        default_val.to_string()
-    }
-}
-
-// ---------------------------------------------------------------------------
-// 18. Microsoft 365 Operational Transformation & Granular Locking Engine
-// ---------------------------------------------------------------------------
-
-#[derive(Debug, Clone)]
-pub struct CellOrSectionLock {
-    pub resource_id: String,
-    pub user_email: String,
-    pub lock_timestamp: u64,
-    pub ttl_secs: u64,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct VectorTimestamp {
-    pub user_id: String,
-    pub seq_num: u64,
-}
-
-/// Sovereign Microsoft 365 Co-authoring OT & Resource Locking Engine
-#[derive(Debug, Clone, Default)]
-pub struct SovereignMicrosoft365CoauthoringLockEngine {
-    pub active_locks: HashMap<String, CellOrSectionLock>,
-    pub user_vectors: HashMap<String, u64>,
-}
-
-impl SovereignMicrosoft365CoauthoringLockEngine {
-    pub fn new() -> Self {
-        Self {
-            active_locks: HashMap::new(),
-            user_vectors: HashMap::new(),
-        }
-    }
-
-    pub fn acquire_resource_lock(
-        &mut self,
-        resource_id: &str,
-        user_email: &str,
-        ttl_secs: u64,
-    ) -> bool {
-        if let Some(lock) = self.active_locks.get(resource_id) {
-            if lock.user_email == user_email {
-                return true;
-            }
-            false
-        } else {
-            self.active_locks.insert(
-                resource_id.to_string(),
-                CellOrSectionLock {
-                    resource_id: resource_id.to_string(),
-                    user_email: user_email.to_string(),
-                    lock_timestamp: 1000,
-                    ttl_secs,
-                },
-            );
-            true
-        }
-    }
-
-    pub fn release_lock(&mut self, resource_id: &str, user_email: &str) -> bool {
-        if let Some(lock) = self.active_locks.get(resource_id) {
-            if lock.user_email == user_email {
-                self.active_locks.remove(resource_id);
-                return true;
-            }
-        }
-        false
-    }
-
-    pub fn apply_operational_transform(
-        &mut self,
-        vector: VectorTimestamp,
-        doc_content: &str,
-        edit_op: &str,
-    ) -> String {
-        let current_seq = self.user_vectors.entry(vector.user_id.clone()).or_insert(0);
-        *current_seq = (*current_seq).max(vector.seq_num);
-
-        if edit_op.starts_with("APPEND:") {
-            format!("{}{}", doc_content, &edit_op[7..])
-        } else if edit_op.starts_with("PREPEND:") {
-            format!("{}{}", &edit_op[8..], doc_content)
-        } else {
-            doc_content.to_string()
-        }
-    }
-}
-
-// ---------------------------------------------------------------------------
-// 19. Microsoft PowerApps Canvas App & Expression Evaluation Engine
-// ---------------------------------------------------------------------------
-
-#[derive(Debug, Clone)]
-pub struct CanvasAppScreen {
-    pub screen_id: String,
-    pub screen_name: String,
-    pub controls: Vec<String>,
-}
-
-/// Sovereign Microsoft PowerApps Canvas Engine
-#[derive(Debug, Clone, Default)]
-pub struct SovereignMicrosoftPowerAppsCanvasEngine {
-    pub screens: HashMap<String, CanvasAppScreen>,
-    pub active_screen_id: Option<String>,
-}
-
-impl SovereignMicrosoftPowerAppsCanvasEngine {
-    pub fn new() -> Self {
-        Self {
-            screens: HashMap::new(),
-            active_screen_id: None,
-        }
-    }
-
-    pub fn create_screen(&mut self, screen_id: &str, name: &str, controls: Vec<String>) {
-        let screen = CanvasAppScreen {
-            screen_id: screen_id.to_string(),
-            screen_name: name.to_string(),
-            controls,
-        };
-        if self.active_screen_id.is_none() {
-            self.active_screen_id = Some(screen_id.to_string());
-        }
-        self.screens.insert(screen_id.to_string(), screen);
-    }
-
-    pub fn navigate_screen(&mut self, target_screen_id: &str) -> bool {
-        if self.screens.contains_key(target_screen_id) {
-            self.active_screen_id = Some(target_screen_id.to_string());
-            true
-        } else {
-            false
-        }
-    }
-
-    pub fn eval_power_fx_expression(
-        &self,
-        expr: &str,
-        context: &HashMap<String, String>,
-    ) -> String {
-        let trimmed = expr.trim();
-        if trimmed.starts_with("Set(") && trimmed.ends_with(')') {
-            let inner = &trimmed[4..trimmed.len() - 1];
-            let parts: Vec<&str> = inner.split(',').map(|s| s.trim()).collect();
-            if parts.len() == 2 {
-                let var_name = parts[0];
-                let val = parts[1].trim_matches('"');
-                return format!("Variable '{}' set to '{}'", var_name, val);
-            }
-        } else if trimmed.starts_with("Navigate(") && trimmed.ends_with(')') {
-            let target = trimmed[9..trimmed.len() - 1].trim();
-            return format!("Navigated to screen '{}'", target);
-        } else if let Some(val) = context.get(trimmed) {
-            return val.clone();
-        }
-        format!("Evaluated PowerFx: {}", trimmed)
-    }
-}
-
-// ---------------------------------------------------------------------------
-// 20. Microsoft Teams Channel Bot & Adaptive Cards Engine
-// ---------------------------------------------------------------------------
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum TeamsBotTriggerEvent {
-    ChannelMessage,
-    UserMention,
-    CardActionSubmitted,
-}
-
-/// Sovereign Microsoft Teams Channel Bot & Adaptive Cards Engine
-#[derive(Debug, Clone, Default)]
-pub struct SovereignMicrosoftTeamsChannelBotWorkflowEngine {
-    pub bot_name: String,
-    pub registered_intents: HashMap<String, String>,
-}
-
-impl SovereignMicrosoftTeamsChannelBotWorkflowEngine {
-    pub fn new(bot_name: &str) -> Self {
-        Self {
-            bot_name: bot_name.to_string(),
-            registered_intents: HashMap::new(),
-        }
-    }
-
-    pub fn register_intent_handler(&mut self, intent_keyword: &str, response_template: &str) {
-        self.registered_intents
-            .insert(intent_keyword.to_lowercase(), response_template.to_string());
-    }
-
-    pub fn parse_adaptive_card_json(&self, card_json: &str) -> Vec<String> {
-        let mut elements = Vec::new();
-        if card_json.contains("\"type\": \"TextBlock\"") {
-            elements.push("TextBlock".to_string());
-        }
-        if card_json.contains("\"type\": \"Input.Text\"") {
-            elements.push("Input.Text".to_string());
-        }
-        if card_json.contains("\"type\": \"Action.Submit\"") {
-            elements.push("Action.Submit".to_string());
-        }
-        elements
-    }
-
-    pub fn dispatch_bot_trigger(&self, event: TeamsBotTriggerEvent, payload: &str) -> String {
-        let lower = payload.to_lowercase();
-        for (intent, template) in &self.registered_intents {
-            if lower.contains(intent) {
-                return format!("[{}] {}", self.bot_name, template);
-            }
-        }
-        match event {
-            TeamsBotTriggerEvent::ChannelMessage => {
-                format!("[{}] Received channel message.", self.bot_name)
-            }
-            TeamsBotTriggerEvent::UserMention => {
-                format!("[{}] Hello! How can I assist you?", self.bot_name)
-            }
-            TeamsBotTriggerEvent::CardActionSubmitted => {
-                format!("[{}] Card action processed.", self.bot_name)
-            }
-        }
-    }
-}
-
-// ---------------------------------------------------------------------------
-// 21. Zoho Analytics Cohort Retention Matrix Engine
-// ---------------------------------------------------------------------------
-
-#[derive(Debug, Clone)]
-pub struct CohortMetrics {
-    pub signup_period: String,
-    pub total_cohort_users: usize,
-    pub retention_by_month: Vec<f64>, // Percentage retained M1, M2, M3...
-}
-
-/// Sovereign Zoho Analytics Cohort Retention Engine
-#[derive(Debug, Clone, Default)]
-pub struct SovereignZohoAnalyticsCohortAnalysisEngine {
-    pub cohorts: Vec<CohortMetrics>,
-}
-
-impl SovereignZohoAnalyticsCohortAnalysisEngine {
-    pub fn new() -> Self {
-        Self {
-            cohorts: Vec::new(),
-        }
-    }
-
-    pub fn compute_cohort_retention(
-        &mut self,
-        signup_period: &str,
-        active_counts: &[usize],
-    ) -> CohortMetrics {
-        let total = active_counts.first().copied().unwrap_or(0);
-        let mut retention = Vec::with_capacity(active_counts.len());
-
-        for &count in active_counts {
-            let pct = if total > 0 {
-                (count as f64 / total as f64) * 100.0
-            } else {
-                0.0
-            };
-            retention.push(pct);
-        }
-
-        let metrics = CohortMetrics {
-            signup_period: signup_period.to_string(),
-            total_cohort_users: total,
-            retention_by_month: retention,
-        };
-        self.cohorts.push(metrics.clone());
-        metrics
-    }
-
-    pub fn predict_exponential_smoothing_trend(
-        &self,
-        historical_values: &[f64],
-        alpha: f64,
-    ) -> f64 {
-        if historical_values.is_empty() {
-            return 0.0;
-        }
-        let mut forecast = historical_values[0];
-        for &val in historical_values.iter().skip(1) {
-            forecast = alpha * val + (1.0 - alpha) * forecast;
-        }
-        forecast
-    }
-}
-
-// ---------------------------------------------------------------------------
-// 22. Zoho Desk Multi-Tier SLA Escalation Timers Engine
-// ---------------------------------------------------------------------------
-
-#[derive(Debug, Clone)]
-pub struct SlaEscalationRule {
-    pub tier_level: u32,
-    pub breach_time_mins: u32,
-    pub escalation_assignee: String,
-}
-
-/// Sovereign Zoho Desk Multi-Tier SLA Escalation Engine
-#[derive(Debug, Clone, Default)]
-pub struct SovereignZohoDeskTicketSlaEscalationEngine {
-    pub escalation_rules: Vec<SlaEscalationRule>,
-}
-
-impl SovereignZohoDeskTicketSlaEscalationEngine {
-    pub fn new() -> Self {
-        Self {
-            escalation_rules: Vec::new(),
-        }
-    }
-
-    pub fn add_escalation_rule(&mut self, tier: u32, mins: u32, assignee: &str) {
-        self.escalation_rules.push(SlaEscalationRule {
-            tier_level: tier,
-            breach_time_mins: mins,
-            escalation_assignee: assignee.to_string(),
-        });
-        self.escalation_rules.sort_by_key(|r| r.breach_time_mins);
-    }
-
-    pub fn evaluate_ticket_sla_status(
-        &self,
-        elapsed_mins: u32,
-        _current_priority: &str,
-    ) -> (bool, Option<String>) {
-        let mut highest_breach: Option<String> = None;
-        let mut is_breached = false;
-
-        for rule in &self.escalation_rules {
-            if elapsed_mins >= rule.breach_time_mins {
-                is_breached = true;
-                highest_breach = Some(rule.escalation_assignee.clone());
-            }
-        }
-
-        (is_breached, highest_breach)
-    }
-}
-
-// ---------------------------------------------------------------------------
-// 23. Salesforce Einstein Intent Decay Modeling & Lead AI Engine
-// ---------------------------------------------------------------------------
-
-/// Sovereign Salesforce Einstein Lead Scoring & Intent Decay AI Engine
-#[derive(Debug, Clone, Default)]
-pub struct SovereignSalesforceEinsteinLeadScoringAiEngine;
-
-impl SovereignSalesforceEinsteinLeadScoringAiEngine {
-    pub fn new() -> Self {
-        Self
-    }
-
-    pub fn calculate_intent_decay_score(
-        &self,
-        initial_score: f64,
-        days_elapsed: u32,
-        half_life_days: u32,
-    ) -> f64 {
-        if half_life_days == 0 {
-            return initial_score;
-        }
-        let decay_factor = (0.5f64).powf(days_elapsed as f64 / half_life_days as f64);
-        initial_score * decay_factor
-    }
-
-    pub fn predict_lead_conversion_probability(
-        &self,
-        intent_score: f64,
-        company_revenue: f64,
-        touchpoint_count: u32,
-    ) -> f64 {
-        let mut score = (intent_score / 100.0) * 0.5;
-        if company_revenue >= 1_000_000.0 {
-            score += 0.3;
-        } else if company_revenue >= 100_000.0 {
-            score += 0.15;
-        }
-
-        score += (touchpoint_count as f64 * 0.02).min(0.2);
-        score.min(1.0).max(0.0)
-    }
-}
-
-// ---------------------------------------------------------------------------
-// 24. Salesforce CPQ Volume Discount Tier & Approval Matrix Engine
-// ---------------------------------------------------------------------------
-
-#[derive(Debug, Clone)]
-pub struct ApprovalThresholdTier {
-    pub max_discount_pct: f64,
-    pub required_approver_role: String,
-}
-
-/// Sovereign Salesforce CPQ Approval Matrix Engine
-#[derive(Debug, Clone, Default)]
-pub struct SovereignSalesforceCpqQuoteDiscountEngine {
-    pub approval_tiers: Vec<ApprovalThresholdTier>,
-}
-
-impl SovereignSalesforceCpqQuoteDiscountEngine {
-    pub fn new() -> Self {
-        Self {
-            approval_tiers: Vec::new(),
-        }
-    }
-
-    pub fn add_approval_tier(&mut self, pct: f64, role: &str) {
-        self.approval_tiers.push(ApprovalThresholdTier {
-            max_discount_pct: pct,
-            required_approver_role: role.to_string(),
-        });
-        self.approval_tiers
-            .sort_by(|a, b| a.max_discount_pct.partial_cmp(&b.max_discount_pct).unwrap());
-    }
-
-    pub fn evaluate_quote_approval_level(&self, applied_discount_pct: f64) -> String {
-        for tier in &self.approval_tiers {
-            if applied_discount_pct <= tier.max_discount_pct {
-                return tier.required_approver_role.clone();
-            }
-        }
-        "CFO Approval Required".to_string()
-    }
-
-    pub fn calculate_tiered_volume_discount(&self, unit_price: f64, quantity: u32) -> (f64, f64) {
-        let discount_pct = if quantity >= 500 {
-            25.0
-        } else if quantity >= 100 {
-            15.0
-        } else if quantity >= 20 {
-            5.0
-        } else {
-            0.0
-        };
-
-        let gross = unit_price * (quantity as f64);
-        let net = gross * (1.0 - (discount_pct / 100.0));
-        (net, discount_pct)
-    }
-}
-
-// ---------------------------------------------------------------------------
-// 25. Odoo MRP Hierarchical Bill of Materials (BOM) Tree Engine
-// ---------------------------------------------------------------------------
-
-#[derive(Debug, Clone)]
-pub struct BomTreeNode {
-    pub component_sku: String,
-    pub qty_per_unit: f64,
-    pub unit_cost: f64,
-    pub scrap_factor: f64, // e.g. 0.05 for 5% scrap allowance
-    pub sub_components: Vec<BomTreeNode>,
-}
-
-/// Sovereign Odoo MRP Hierarchical BOM Tree Engine
-#[derive(Debug, Clone, Default)]
-pub struct SovereignOdooMrpBillOfMaterialsTreeEngine;
-
-impl SovereignOdooMrpBillOfMaterialsTreeEngine {
-    pub fn new() -> Self {
-        Self
-    }
-
-    pub fn compute_hierarchical_bom_cost(&self, node: &BomTreeNode) -> f64 {
-        let gross_qty = node.qty_per_unit * (1.0 + node.scrap_factor);
-        if node.sub_components.is_empty() {
-            gross_qty * node.unit_cost
-        } else {
-            let sub_cost: f64 = node
-                .sub_components
-                .iter()
-                .map(|child| self.compute_hierarchical_bom_cost(child))
-                .sum();
-            gross_qty * (node.unit_cost + sub_cost)
-        }
-    }
-
-    pub fn expand_phantom_assemblies(&self, node: &BomTreeNode) -> Vec<(String, f64)> {
-        let mut list = Vec::new();
-        self.collect_leaf_components(node, 1.0, &mut list);
-        list
-    }
-
-    fn collect_leaf_components(
-        &self,
-        node: &BomTreeNode,
-        parent_qty: f64,
-        list: &mut Vec<(String, f64)>,
-    ) {
-        let current_qty = parent_qty * node.qty_per_unit * (1.0 + node.scrap_factor);
-        if node.sub_components.is_empty() {
-            list.push((node.component_sku.clone(), current_qty));
-        } else {
-            for child in &node.sub_components {
-                self.collect_leaf_components(child, current_qty, list);
-            }
-        }
-    }
-}
-
-// ---------------------------------------------------------------------------
-// 26. Odoo Quality Control Inspection Points & Yield Engine
-// ---------------------------------------------------------------------------
-
-#[derive(Debug, Clone)]
-pub struct QualityCheckPoint {
-    pub check_id: String,
-    pub title: String,
-    pub is_pass_fail: bool,
-    pub min_measurement: Option<f64>,
-    pub max_measurement: Option<f64>,
-}
-
-/// Sovereign Odoo Quality Control Engine
-#[derive(Debug, Clone, Default)]
-pub struct SovereignOdooQualityControlInspectionEngine {
-    pub check_points: Vec<QualityCheckPoint>,
-}
-
-impl SovereignOdooQualityControlInspectionEngine {
-    pub fn new() -> Self {
-        Self {
-            check_points: Vec::new(),
-        }
-    }
-
-    pub fn add_check_point(&mut self, check: QualityCheckPoint) {
-        self.check_points.push(check);
-    }
-
-    pub fn inspect_sample(
-        &self,
-        check_id: &str,
-        measurement: Option<f64>,
-        pass_flag: Option<bool>,
-    ) -> bool {
-        let check = match self.check_points.iter().find(|c| c.check_id == check_id) {
-            Some(c) => c,
-            None => return false,
-        };
-
-        if check.is_pass_fail {
-            pass_flag.unwrap_or(false)
-        } else if let Some(m) = measurement {
-            let min_ok = check.min_measurement.map(|min| m >= min).unwrap_or(true);
-            let max_ok = check.max_measurement.map(|max| m <= max).unwrap_or(true);
-            min_ok && max_ok
-        } else {
-            false
-        }
-    }
-
-    pub fn calculate_yield_rate(&self, passed_checks: usize, total_checks: usize) -> f64 {
-        if total_checks == 0 {
-            0.0
-        } else {
-            (passed_checks as f64 / total_checks as f64) * 100.0
-        }
-    }
-}
-
-// ---------------------------------------------------------------------------
-// 27. Bitrix24 Robotic Process Automation (RPA) Stage Pipeline Engine
-// ---------------------------------------------------------------------------
-
-#[derive(Debug, Clone)]
-pub struct RpaStage {
-    pub stage_id: String,
-    pub name: String,
-    pub required_fields: Vec<String>,
-    pub auto_task_title: Option<String>,
-}
-
-/// Sovereign Bitrix24 RPA Pipeline Engine
-#[derive(Debug, Clone, Default)]
-pub struct SovereignBitrix24RpaWorkflowEngine {
-    pub stages: Vec<RpaStage>,
-}
-
-impl SovereignBitrix24RpaWorkflowEngine {
-    pub fn new() -> Self {
-        Self { stages: Vec::new() }
-    }
-
-    pub fn add_stage(&mut self, stage: RpaStage) {
-        self.stages.push(stage);
-    }
-
-    pub fn advance_item_stage(
-        &self,
-        item_data: &HashMap<String, String>,
-        _current_stage_id: &str,
-        target_stage_id: &str,
-    ) -> Result<bool> {
-        let target_stage = self
-            .stages
-            .iter()
-            .find(|s| s.stage_id == target_stage_id)
-            .ok_or("Target RPA stage not found")?;
-
-        for req_field in &target_stage.required_fields {
-            if !item_data.contains_key(req_field) || item_data.get(req_field).unwrap().is_empty() {
-                return Err("Missing required field for RPA stage transition");
-            }
-        }
-
-        Ok(true)
-    }
-}
-
-// ---------------------------------------------------------------------------
-// 28. Bitrix24 AI Speech & Call Sentiment Analyzer Engine
-// ---------------------------------------------------------------------------
-
-#[derive(Debug, Clone)]
-pub struct TranscriptAnalysisResult {
-    pub sentiment_score: f64, // -1.0 (very negative) to +1.0 (very positive)
-    pub key_phrases: Vec<String>,
-    pub competitor_mentioned: bool,
-    pub compliance_flag: bool,
-}
-
-/// Sovereign Bitrix24 AI Speech & Call Sentiment Analyzer Engine
-#[derive(Debug, Clone, Default)]
-pub struct SovereignBitrix24SpeechAiSentimentAnalyzerEngine;
-
-impl SovereignBitrix24SpeechAiSentimentAnalyzerEngine {
-    pub fn new() -> Self {
-        Self
-    }
-
-    pub fn analyze_call_transcript(&self, transcript_text: &str) -> TranscriptAnalysisResult {
-        let lower = transcript_text.to_lowercase();
-
-        let positive_words = [
-            "great",
-            "excellent",
-            "helpful",
-            "love",
-            "satisfied",
-            "thank you",
-        ];
-        let negative_words = [
-            "bad", "terrible", "unhappy", "refund", "issue", "bug", "cancel",
-        ];
-
-        let mut score: f64 = 0.0;
-        for pos in &positive_words {
-            if lower.contains(pos) {
-                score += 0.25;
-            }
-        }
-        for neg in &negative_words {
-            if lower.contains(neg) {
-                score -= 0.25;
-            }
-        }
-
-        let clamped_score = score.min(1.0).max(-1.0);
-
-        let competitor_mentioned = lower.contains("competitor") || lower.contains("alternative");
-        let compliance_flag =
-            lower.contains("terms") || lower.contains("privacy") || lower.contains("gdpr");
-
-        TranscriptAnalysisResult {
-            sentiment_score: clamped_score,
-            key_phrases: vec![
-                "enterprise software".to_string(),
-                "sovereign workstation".to_string(),
-            ],
-            competitor_mentioned,
-            compliance_flag,
-        }
     }
 }

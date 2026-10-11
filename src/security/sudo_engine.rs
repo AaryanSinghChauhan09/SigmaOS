@@ -1,14 +1,8 @@
 // SigmaOS Sovereign Privilege Escalation Engine (Sigsudo / Sigdoas)
 // Zero-dependency Rust #![no_std] / std implementation of privilege delegation & authentication.
 
-#[cfg(not(test))]
-#[cfg(not(test))]
-use alloc::string::{String, ToString};
-#[cfg(not(test))]
-use alloc::vec::Vec;
-
-#[cfg(test)]
-#[cfg(test)]
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Privilege Escalation Action Result
 #[derive(Debug, Clone, PartialEq, Eq)]

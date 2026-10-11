@@ -23,9 +23,9 @@ impl PathBuf {
         }
     }
 
-    pub fn from(s: &str) -> Self {
+    pub fn from<S: Into<String>>(s: S) -> Self {
         PathBuf {
-            inner: String::from(s),
+            inner: s.into(),
         }
     }
 
@@ -46,6 +46,28 @@ impl PathBuf {
 
     pub fn exists(&self) -> bool {
         !self.inner.is_empty()
+    }
+
+    pub fn to_string_lossy(&self) -> String {
+        self.inner.clone()
+    }
+
+    pub fn file_name(&self) -> Option<PathBuf> {
+        self.inner.rsplit('/').next().filter(|s| !s.is_empty()).map(PathBuf::from)
+    }
+
+    pub fn extension(&self) -> Option<&str> {
+        self.inner.rsplit('.').next().filter(|s| !s.is_empty())
+    }
+
+    pub fn parent(&self) -> Option<PathBuf> {
+        self.inner.rfind('/').map(|idx| PathBuf::from(&self.inner[..idx]))
+    }
+}
+
+impl AsRef<std::ffi::OsStr> for PathBuf {
+    fn as_ref(&self) -> &std::ffi::OsStr {
+        std::ffi::OsStr::new(&self.inner)
     }
 }
 

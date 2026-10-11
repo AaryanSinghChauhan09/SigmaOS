@@ -197,6 +197,7 @@ impl WalkerLauncher {
 
     /// Search applications
     pub fn search_applications(&self, query: &str) -> Vec<SearchResult> {
+        let query_lower = query.to_lowercase();
         let mut results: Vec<SearchResult> = self
             .applications
             .iter()
@@ -273,6 +274,7 @@ impl WalkerLauncher {
 
     /// Search emojis
     pub fn search_emojis(&self, query: &str) -> Vec<SearchResult> {
+        let query_lower = query.to_lowercase();
         let mut results: Vec<SearchResult> = self
             .emojis
             .iter()

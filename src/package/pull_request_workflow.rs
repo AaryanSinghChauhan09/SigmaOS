@@ -510,6 +510,7 @@ impl ArchLinuxComponentPullRequestGatewayEngine {
 pub struct ArchLinuxSystemParityPullRequestEngine {
     pub gateway: ArchLinuxComponentPullRequestGatewayEngine,
     pub verified_pr_log: Vec<u64>,
+    pub parity_records: BTreeMap<String, String>,
 }
 
 impl Default for ArchLinuxSystemParityPullRequestEngine {
@@ -523,6 +524,7 @@ impl ArchLinuxSystemParityPullRequestEngine {
         Self {
             gateway: ArchLinuxComponentPullRequestGatewayEngine::new(),
             verified_pr_log: Vec::new(),
+            parity_records: BTreeMap::new(),
         }
     }
 
@@ -892,11 +894,10 @@ mod tests {
                 deps,
                 b"pqc_signature_dilithium5_arch_parity",
             );
-
-        let merged = parity_engine.merge_parity_pr(parity_pr).unwrap();
-        assert_eq!(merged.name, "reflector-mirrorlist");
-        assert!(parity_engine
-            .parity_records
-            .contains_key("reflector-mirrorlist"));
+            assert!(engine.run_automated_ci_pr_gate(pr_id).unwrap());
+            let merged = engine.merge_parity_pr(pr_id).unwrap();
+            assert_eq!(merged.name, name);
+        }
+        assert_eq!(engine.parity_records.len(), 10);
     }
 }

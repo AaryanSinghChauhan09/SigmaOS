@@ -116,7 +116,7 @@ impl Keyring {
                     .as_secs() as u64;
                 return current < expiry;
             }
-            true
+            return true;
         }
         false
     }

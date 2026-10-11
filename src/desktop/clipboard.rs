@@ -14,7 +14,6 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::boxed::Box;
 use std::string::{String, ToString};
-use std::vec::Vec;
 use std::format;
 
 // (no_std only applicable at crate root - removed)
@@ -69,7 +68,14 @@ impl SimpleClipboardItem {
 
 impl ClipboardItem for SimpleClipboardItem {
     fn id(&self) -> ClipboardID { self.id }
-    fn format(&self) -> ClipboardFormat { unsafe { core::mem::transmute(self.format.load(Ordering::SeqCst)) } }
+    fn format(&self) -> ClipboardFormat {
+        match self.format.load(Ordering::SeqCst) {
+            0 => ClipboardFormat::Text,
+            1 => ClipboardFormat::Image,
+            2 => ClipboardFormat::HTML,
+            _ => ClipboardFormat::Files,
+        }
+    }
     fn data(&self) -> &[u8] { &self.data }
     fn timestamp(&self) -> u64 { self.timestamp.load(Ordering::SeqCst) as u64 }
 }
@@ -77,7 +83,7 @@ impl ClipboardItem for SimpleClipboardItem {
 pub trait Clipboard {
     fn set_content(&mut self, format: ClipboardFormat, data: &[u8]) -> Result<ClipboardID, ClipboardError>;
     fn get_content(&self) -> Option<&dyn ClipboardItem>;
-    def clear(&mut self);
+    fn clear(&mut self);
 }
 
 #[repr(C)]
@@ -125,8 +131,8 @@ impl Clipboard for SimpleClipboard {
 
 pub trait ClipboardHistory {
     fn get_history(&self) -> Vec<&dyn ClipboardItem>;
-    def restore_from_history(&mut self, index: usize) -> Result<(), ClipboardError>;
-    def clear_history(&mut self);
+    fn restore_from_history(&mut self, index: usize) -> Result<(), ClipboardError>;
+    fn clear_history(&mut self);
 }
 
 #[repr(C)]

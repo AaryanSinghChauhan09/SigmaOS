@@ -23,7 +23,6 @@ use alloc::vec::Vec;
 use std::collections::BTreeMap;
 #[cfg(any(feature = "standalone_test", test))]
 use std::format;
-#[cfg(any(feature = "standalone_test", test))]
 
 // ============================================================================
 // 1. OMARCHY 22-THEME CATALOG

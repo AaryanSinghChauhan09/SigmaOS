@@ -76,6 +76,21 @@ impl PixImageMetadata {
 // =========================================================================
 
 #[derive(Debug, Clone)]
+pub struct PixCatalog {
+    pub name: String,
+    pub collections: Vec<PixCollection>,
+}
+
+impl PixCatalog {
+    pub fn new(name: &str) -> Self {
+        Self {
+            name: String::from(name),
+            collections: Vec::new(),
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct PixCollection {
     pub name: String,
     pub images: Vec<PixImageMetadata>,

@@ -14,7 +14,6 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::boxed::Box;
 use std::string::{String, ToString};
-use std::vec::Vec;
 use std::format;
 
 // (no_std only applicable at crate root - removed)
@@ -68,7 +67,14 @@ impl SimplePanel {
 
 impl Panel for SimplePanel {
     fn id(&self) -> PanelID { self.id }
-    fn position(&self) -> PanelPosition { unsafe { core::mem::transmute(self.position.load(Ordering::SeqCst)) } }
+    fn position(&self) -> PanelPosition {
+        match self.position.load(Ordering::SeqCst) {
+            0 => PanelPosition::Top,
+            1 => PanelPosition::Bottom,
+            2 => PanelPosition::Left,
+            _ => PanelPosition::Right,
+        }
+    }
     fn height(&self) -> u32 { self.height.load(Ordering::SeqCst) as u32 }
     fn width(&self) -> u32 { self.width.load(Ordering::SeqCst) as u32 }
     fn is_autohide(&self) -> bool { self.autohide.load(Ordering::SeqCst) == 1 }
@@ -78,7 +84,7 @@ pub trait PanelManager {
     fn create_panel(&mut self, position: PanelPosition, height: u32, width: u32) -> Result<PanelID, PanelError>;
     fn remove_panel(&mut self, id: PanelID) -> Result<(), PanelError>;
     fn get_panel(&self, id: PanelID) -> Option<&dyn Panel>;
-    def add_applet(&mut self, panel_id: PanelID, applet: &[u8]) -> Result<(), PanelError>;
+    fn add_applet(&mut self, panel_id: PanelID, applet: &[u8]) -> Result<(), PanelError>;
 }
 
 #[repr(C)]

@@ -1,14 +1,8 @@
 // SigmaOS Sovereign XFCE Desktop Integration Engine
 // Zero-dependency Rust #![no_std] / std implementation of xfwm4, xfce4-panel, xfconf & Thunar integrations.
 
-#[cfg(not(test))]
-#[cfg(not(test))]
-use alloc::string::{String, ToString};
-#[cfg(not(test))]
-use alloc::vec::Vec;
-
-#[cfg(test)]
-#[cfg(test)]
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Xfconf Configuration Setting Value
 #[derive(Debug, Clone, PartialEq, Eq)]

@@ -29,6 +29,20 @@ pub mod ubuntu_common_drivers;
 pub mod vault;
 pub mod wifi_broadcom_bcm4318;
 pub mod wifi_intel_iwlwifi;
+pub mod ahci;
+pub mod ahci_sata_controller;
+pub mod audio_codec_hda;
+pub mod bluez;
+pub mod cups;
+pub mod device_roadmap;
+pub mod gpu;
+pub mod hid_input_device;
+pub mod simulation;
+pub mod universal_support;
+pub mod usb_xhci_host;
+pub mod v4l2;
+pub mod wifi;
+pub mod windows_compat;
 
 pub use ahci::{
     AhciCommandFis, AhciCommandHeader, AhciController, AhciGenericHostControl, AhciPort, AhciPrdt,

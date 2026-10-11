@@ -45,6 +45,7 @@ pub enum ValidationVerdict {
     NeedsReview,
 }
 
+#[derive(Debug, Clone)]
 pub struct VvahFinding {
     pub cve_id: String,
     pub title: String,

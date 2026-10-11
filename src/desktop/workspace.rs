@@ -15,7 +15,6 @@
 use std::boxed::Box;
 use std::format;
 use std::string::{String, ToString};
-use std::vec::Vec;
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
@@ -82,7 +81,12 @@ impl Workspace for SimpleWorkspace {
         &self.name[..len]
     }
     fn layout(&self) -> WorkspaceLayout {
-        unsafe { core::mem::transmute(self.layout.load(Ordering::SeqCst)) }
+        match self.layout.load(Ordering::SeqCst) {
+            0 => WorkspaceLayout::Tiling,
+            1 => WorkspaceLayout::Stacking,
+            2 => WorkspaceLayout::Tabbed,
+            _ => WorkspaceLayout::Floating,
+        }
     }
 
     fn set_layout(&mut self, layout: WorkspaceLayout) {

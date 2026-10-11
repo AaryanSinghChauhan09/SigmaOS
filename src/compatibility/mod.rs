@@ -128,7 +128,8 @@ pub use mint_ecosystem::{
 };
 pub mod mobile_desktop_parity;
 pub mod nixos;
-// pub mod nixos_reproducible;
+pub mod nixos_reproducible;
+pub mod ubuntu_missing_components;
 pub mod oldlinux;
 pub mod open_source_dominance;
 pub mod open_source_tier1;

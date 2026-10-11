@@ -180,7 +180,7 @@ impl AccessVectorCache {
         op: MacAccessOp,
     ) -> String {
         format!(
-            "{}:{}:{:?}->{}:{}:{:?}",
+            "{}:{}:{:?}->{}:{}",
             subject.domain_type,
             subject.sensitivity as u32,
             op,

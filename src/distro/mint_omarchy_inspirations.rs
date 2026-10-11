@@ -230,7 +230,6 @@ fn chrono_timestamp() -> String {
 }
 
 #[cfg(test)]
-#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -241,7 +240,7 @@ mod tests {
         assert!(manager.auto_updates_enabled);
         
         let updates = manager.check_updates();
-        assert!updates.is_empty());
+        assert!(updates.is_empty());
     }
 
     #[test]

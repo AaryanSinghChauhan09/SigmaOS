@@ -5,9 +5,9 @@ use std::vec::Vec;
 // SigmaOS Screen Recorder
 // OOP-based screen recording with multiple formats and quality settings
 
-// PathBuf not in no_std
+use crate::klib::path::PathBuf;
+use crate::klib::time::Instant;
 use core::time::Duration;
-// Instant not in no_std
 
 /// Recording format
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

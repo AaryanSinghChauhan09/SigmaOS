@@ -19,6 +19,15 @@ pub mod sigma_office;
 pub mod sovereign_apps;
 pub mod subtitle_editor;
 pub mod tmux;
+pub mod notes;
+pub mod pdf;
+pub mod screen_recorder;
+pub mod screenshot;
+pub mod sigmadev;
+pub mod system_settings;
+pub mod tasks;
+pub mod terminal;
+pub mod utility_suite;
 
 pub use enterprise_productivity_suite::*;
 

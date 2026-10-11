@@ -85,6 +85,10 @@ where
         }
     }
 
+    pub fn clear(&mut self) {
+        self.entries.clear();
+    }
+
     /// Optimized by Bolt ⚡: replaces O(N) linear iteration with O(log N) binary search (`binary_search_by`),
     /// finding the exact match or sorted insertion index in logarithmic time.
     pub fn insert(&mut self, key: K, value: V) {

@@ -132,8 +132,7 @@ impl UniversalPackageManifestInspectorV29 {
             PackageSignatureKindV29::OpenBsdSignify
         } else if raw_payload.starts_with(b"PQC_SIG") {
             PackageSignatureKindV29::PqcKyberDilithium
-        } else if raw_payload.starts_with(b"\x80\x01") || raw_payload.starts_with(b"-----BEGIN PGP")
-        {
+        } else if raw_payload.starts_with(b"\x80\x01") || raw_payload.starts_with(b"-----BEGIN PGP") {
             PackageSignatureKindV29::GpgOpenPgp
         } else if detected_format == PackageFormat::Apk || detected_format == PackageFormat::Aab {
             PackageSignatureKindV29::ApkV2V3Signature
@@ -238,10 +237,7 @@ impl UniversalCrossDistroSatDependencySolverV29 {
         let mut canonical_mapping = BTreeMap::new();
         canonical_mapping.insert("libssl-dev".to_string(), "sovereign-openssl".to_string());
         canonical_mapping.insert("openssl-devel".to_string(), "sovereign-openssl".to_string());
-        canonical_mapping.insert(
-            "security/openssl".to_string(),
-            "sovereign-openssl".to_string(),
-        );
+        canonical_mapping.insert("security/openssl".to_string(), "sovereign-openssl".to_string());
         canonical_mapping.insert("libc6".to_string(), "sovereign-libc".to_string());
         canonical_mapping.insert("glibc".to_string(), "sovereign-libc".to_string());
         canonical_mapping.insert("musl".to_string(), "sovereign-libc".to_string());
@@ -337,16 +333,9 @@ impl UniversalMultiSandboxGovernorV29 {
         MultidistroSandboxPolicyV29 {
             pledge_promises: pledge.to_string(),
             unveil_paths: unveil,
-            landlock_access_rules: vec![
-                "read_only:/usr".to_string(),
-                "read_write:/tmp".to_string(),
-            ],
+            landlock_access_rules: vec!["read_only:/usr".to_string(), "read_write:/tmp".to_string()],
             capsicum_rights_mask: 0x00FF_FFFF,
-            seccomp_syscall_filter: vec![
-                "read".to_string(),
-                "write".to_string(),
-                "exit".to_string(),
-            ],
+            seccomp_syscall_filter: vec!["read".to_string(), "write".to_string(), "exit".to_string()],
         }
     }
 }
@@ -466,52 +455,20 @@ impl UniversalBootEnvSnapshotGovernorV29 {
         let id = self.next_snapshot_id;
         self.next_snapshot_id += 1;
 
-        for dep in &manifest.dependencies {
-            let remapped = governor.remap_dependency(dep);
-            pkg = pkg.with_dependency(remapped);
-        }
-
-        if let Some(cflags) = &manifest.build_cflags {
-            pkg.properties.insert("cflags".to_string(), cflags.clone());
-        }
-
-        pkg.properties.insert(
-            "source_format".to_string(),
-            format!("{:?}", manifest.detected_format),
-        );
-        pkg.checksum = manifest.payload_sha256.clone();
-        pkg
-    }
-
-    /// Creates a transactional state checkpoint before installation operations V29
-    pub fn create_checkpoint(&mut self) -> usize {
-        let id = self.next_checkpoint_id;
-        self.next_checkpoint_id += 1;
-
-        self.checkpoints.push(InstallationCheckpointV29 {
-            checkpoint_id: id,
-            installed_packages: self.installed_packages.clone(),
+        self.snapshots.push(BootEnvSnapshotV29 {
+            snapshot_id: id,
+            name: name.to_string(),
+            backend,
+            active_packages,
         });
 
         id
     }
 
-    /// Transactionally installs a package name V29
-    pub fn install_package(&mut self, pkg_name: &str) {
-        if !self.installed_packages.contains(&pkg_name.to_string()) {
-            self.installed_packages.push(pkg_name.to_string());
-        }
-    }
-
-    /// Rolls back system state to a previous checkpoint ID V29
-    pub fn rollback_checkpoint(&mut self, checkpoint_id: usize) -> Result<(), String> {
-        if let Some(cp) = self
-            .checkpoints
-            .iter()
-            .find(|c| c.checkpoint_id == checkpoint_id)
-        {
-            self.installed_packages = cp.installed_packages.clone();
-            Ok(())
+    /// Rollbacks system state to selected boot environment snapshot ID V29
+    pub fn rollback_snapshot(&self, snapshot_id: usize) -> Result<Vec<String>, String> {
+        if let Some(snap) = self.snapshots.iter().find(|s| s.snapshot_id == snapshot_id) {
+            Ok(snap.active_packages.clone())
         } else {
             Err(format!("Snapshot ID {} not found", snapshot_id))
         }
@@ -554,13 +511,22 @@ impl SovereignDistroPackageAdvancementsSuiteV29 {
         payload: &[u8],
     ) -> Result<UnifiedPackage, String> {
         let manifest = self.inspector.inspect_package(filename, payload)?;
-        let resolved = self
-            .solver
-            .solve_dependencies(&manifest.name, &manifest.dependencies);
+        let resolved = self.solver.solve_dependencies(&manifest.name, &manifest.dependencies);
         let cas_hash = self.cas_delta_governor.ingest_content(payload);
 
-        self.transpiler_engine.install_package(&native_sigpkg.name);
-        Ok(native_sigpkg)
+        let mut pkg = UnifiedPackage::new(
+            format!("sigpkg-v29-{}", manifest.name),
+            manifest.version.clone(),
+        )
+        .with_format(PackageFormat::SigmaPkg)
+        .with_provides(manifest.name.clone());
+
+        for dep in resolved.satisfied_dependencies {
+            pkg = pkg.with_dependency(dep);
+        }
+
+        pkg.checksum = cas_hash;
+        Ok(pkg)
     }
 }
 
@@ -607,15 +573,9 @@ mod tests {
 
         let resolved = solver.solve_dependencies("my-app", &raw_deps);
         assert!(resolved.is_solvable);
-        assert!(resolved
-            .satisfied_dependencies
-            .contains(&"sovereign-openssl".to_string()));
-        assert!(resolved
-            .satisfied_dependencies
-            .contains(&"sovereign-libc".to_string()));
-        assert!(resolved
-            .satisfied_dependencies
-            .contains(&"sovereign-custom-dep".to_string()));
+        assert!(resolved.satisfied_dependencies.contains(&"sovereign-openssl".to_string()));
+        assert!(resolved.satisfied_dependencies.contains(&"sovereign-libc".to_string()));
+        assert!(resolved.satisfied_dependencies.contains(&"sovereign-custom-dep".to_string()));
     }
 
     #[test]

@@ -325,13 +325,13 @@ impl NixLikeStore {
     }
 
     fn extract_hash_from_path(&self, path: &Path) -> Option<String> {
-        if let Some(file_name) = path.file_name().and_then(|n| n.to_str()) {
-            if let Some(hash_part) = file_name.split('-').next() {
-                if hash_part.len() >= 8 {
-                    for full_hash in self.derivations.keys() {
-                        if full_hash.starts_with(hash_part) {
-                            return Some(full_hash.clone());
-                        }
+        let fname_buf = path.file_name()?;
+        let file_name = fname_buf.to_str()?;
+        if let Some(hash_part) = file_name.split('-').next() {
+            if hash_part.len() >= 8 {
+                for full_hash in self.derivations.keys() {
+                    if full_hash.starts_with(hash_part) {
+                        return Some(full_hash.clone());
                     }
                 }
             }

@@ -5,6 +5,7 @@
 use core::cell::Cell;
 
 pub use super::btreemap::BTreeMap;
+pub use super::btreemap::BTreeMap as SigmaBTreeMap;
 pub use super::hashmap::{Entry, HashMap};
 
 /// Simple HashSet implementation for klib (Using BTreeSet internally)

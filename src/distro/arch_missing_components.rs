@@ -458,8 +458,6 @@ pub struct InitramfsHookSpec {
 
 pub struct ArchPacmanHookRunner {
     pub registered_hooks: Vec<PacmanHookRule>,
-    pub hooks: BTreeMap<String, InitramfsHookSpec>,
-    pub compression_format: String,
 }
 
 impl ArchPacmanHookRunner {
@@ -485,7 +483,7 @@ impl ArchPacmanHookRunner {
     }
 }
 
-impl Default for ArchMkinitcpioHooksEngine {
+impl Default for ArchPacmanHookRunner {
     fn default() -> Self {
         Self::new()
     }

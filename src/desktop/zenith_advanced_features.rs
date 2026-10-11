@@ -34,7 +34,23 @@ pub enum DesktopInspirationPreset {
     CosmicRust,   // Pop!_OS COSMIC auto-tiling Rust workspace
 }
 
+/// Zenith Desktop Environment
+#[derive(Debug, Clone, PartialEq)]
+pub struct ZenithDesktopEnvironment {
+    pub layout_mode: WindowLayoutMode,
+    pub panel_height: u32,
+    pub enable_gestures: bool,
+}
+
 impl ZenithDesktopEnvironment {
+    pub fn new() -> Self {
+        Self {
+            layout_mode: WindowLayoutMode::Floating,
+            panel_height: 32,
+            enable_gestures: false,
+        }
+    }
+
     /// Apply Linux or BSD desktop inspiration preset parameters
     pub fn apply_desktop_inspiration(&mut self, preset: DesktopInspirationPreset) {
         match preset {

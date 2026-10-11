@@ -18,6 +18,7 @@ pub struct SecurityContext {
     pub role: Vec<u8>,  // SELinux role
     pub stype: Vec<u8>, // SELinux type
     pub level: Vec<u8>, // MLS/MCS level (optional)
+    pub type_name: alloc::string::String,
 }
 
 impl SecurityContext {
@@ -27,7 +28,13 @@ impl SecurityContext {
             role: role.to_vec(),
             stype: stype.to_vec(),
             level: Vec::new(),
+            type_name: alloc::string::String::from_utf8_lossy(stype).into_owned(),
         }
+    }
+
+    /// Parse context string from str
+    pub fn parse(s: &str) -> Option<Self> {
+        Self::from_string(s.as_bytes()).ok()
     }
 
     /// Parse context string (user:role:type:level)
@@ -287,6 +294,15 @@ pub enum EnforcementMode {
     Permissive = 1,
     Enforcing = 2,
 }
+pub type SeLinuxMode = EnforcementMode;
+
+#[derive(Debug, Clone)]
+pub struct SelinuxPolicyRule {
+    pub source_type: alloc::string::String,
+    pub target_type: alloc::string::String,
+    pub class: alloc::string::String,
+    pub permission: alloc::string::String,
+}
 
 /// Main SELinux security server
 pub struct Selinux {
@@ -294,6 +310,7 @@ pub struct Selinux {
     pub avc: Avc,
     pub mode: EnforcementMode,
     pub initial_contexts: BTreeMap<Vec<u8>, SecurityId>,
+    pub policies: Vec<SelinuxPolicyRule>,
 }
 
 impl Selinux {
@@ -303,6 +320,7 @@ impl Selinux {
             avc: Avc::new(),
             mode: EnforcementMode::Enforcing,
             initial_contexts: BTreeMap::new(),
+            policies: Vec::new(),
         };
 
         // Create initial contexts
@@ -311,6 +329,20 @@ impl Selinux {
         sel.initial_contexts.insert(b"kernel".to_vec(), kernel_sid);
 
         sel
+    }
+
+    pub fn set_mode(&mut self, mode: EnforcementMode) {
+        self.set_enforce_mode(mode);
+    }
+
+    pub fn allow(&mut self, source: &str, target: &str, class: &str, permission: &str) {
+        use alloc::string::ToString;
+        self.policies.push(SelinuxPolicyRule {
+            source_type: source.to_string(),
+            target_type: target.to_string(),
+            class: class.to_string(),
+            permission: permission.to_string(),
+        });
     }
 
     /// Check access with AVC caching

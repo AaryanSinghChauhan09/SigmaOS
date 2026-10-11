@@ -219,8 +219,6 @@ pub use display_settings_manager::{
 };
 
 // SigmaOS Desktop Module
-pub mod font_manager;
-pub use font_manager::*;
 
 pub mod mate_betsy;
 pub mod mint_tools;
@@ -351,3 +349,29 @@ pub use sigma_ghostty::{
 };
 pub mod webapp_manager;
 pub use webapp_manager::*;
+pub mod appstore;
+pub mod clipboard;
+pub mod clipboard_advanced;
+pub mod desktop_portal;
+pub mod elementary_pantheon_innovations;
+pub mod filemanager;
+pub mod gaming_engine;
+pub mod granite_contractor;
+pub mod mate_packages;
+pub mod media_inspired_desktop;
+pub mod menu;
+pub mod network_panel;
+pub mod notifications;
+pub mod onboarding;
+pub mod panel;
+pub mod screenshot;
+pub mod settings;
+pub mod terminal;
+pub mod text_scaling;
+pub mod universal_desktop_framework;
+pub mod volume_manager;
+pub mod workspace;
+pub mod x11_desktop_environment;
+pub mod xfce_engine;
+pub mod zenith;
+pub mod zenith_advanced_features;

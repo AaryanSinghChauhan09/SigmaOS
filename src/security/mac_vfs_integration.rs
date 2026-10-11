@@ -9,7 +9,7 @@ use std::string::String;
 use std::vec::Vec;
 
 use crate::security::mac::{
-    ContextCapability, ContextID, EngineCapability, MACError, MACPolicy, MLSPolicy,
+    ContextCapability, ContextID, EngineCapability, MACEngine, MACError, MACPolicy, MLSPolicy,
     SecurityContext, SecurityDomain, SecurityLevel, SecurityOperation, SimpleMACEngine,
 };
 
@@ -92,7 +92,7 @@ impl MacVfsIntegration {
 
     /// Add MAC policy to the engine
     pub fn add_policy(&mut self, policy: Box<dyn MACPolicy>) -> Result<(), MACError> {
-        self.mac_engine.add_policy(policy)
+        self.mac_engine.register_policy(policy).map(|_| ())
     }
 
     /// Check if VFS operation is allowed

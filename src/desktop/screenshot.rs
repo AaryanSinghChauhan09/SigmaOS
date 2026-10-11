@@ -15,7 +15,6 @@
 use std::boxed::Box;
 use std::format;
 use std::string::{String, ToString};
-use std::vec::Vec;
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only

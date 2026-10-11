@@ -6,7 +6,7 @@
 //! - CJK (Chinese, Japanese, Korean) and Emoji font fallback chains
 //! - Multi-language text layout engine with advance metrics calculation
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, HashMap};
 use std::string::{String, ToString};
 use std::vec::Vec;
 
@@ -56,14 +56,8 @@ pub struct FontFallbackChain {
     pub symbol_fallback_font: String,  // e.g. "Symbola"
 }
 
-impl FontStyle {
-    pub fn new(
-        name: String,
-        weight: FontWeight,
-        slant: FontSlant,
-        width: FontWidth,
-        file_path: String,
-    ) -> Self {
+impl FontFallbackChain {
+    pub fn default_system_chain() -> Self {
         Self {
             primary_font_family: String::from("Inter"),
             cjk_fallback_font: String::from("Noto Sans CJK SC"),
@@ -72,6 +66,35 @@ impl FontStyle {
         }
     }
 
+    pub fn resolve_font_for_char(&self, ch: char) -> &str {
+        let code = ch as u32;
+        if (0x4E00..=0x9FFF).contains(&code) || (0x3400..=0x4DBF).contains(&code) || (0xAC00..=0xD7AF).contains(&code) {
+            &self.cjk_fallback_font
+        } else if (0x1F300..=0x1FAFF).contains(&code) || (0x1F600..=0x1F64F).contains(&code) {
+            &self.emoji_fallback_font
+        } else if (0x2000..=0x2BFF).contains(&code) {
+            &self.symbol_fallback_font
+        } else {
+            &self.primary_font_family
+        }
+    }
+}
+
+/// Font Weight
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FontWeight {
+    Thin,
+    ExtraLight,
+    Light,
+    Regular,
+    Medium,
+    SemiBold,
+    Bold,
+    ExtraBold,
+    Black,
+}
+
+impl FontWeight {
     pub fn as_number(&self) -> u32 {
         match self {
             FontWeight::Thin => 100,
@@ -85,6 +108,64 @@ impl FontStyle {
             FontWeight::Black => 900,
         }
     }
+}
+
+/// Font Style
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FontStyle {
+    pub name: String,
+    pub weight: FontWeight,
+    pub slant: FontSlant,
+    pub width: FontWidth,
+    pub file_path: String,
+}
+
+impl FontStyle {
+    pub fn new(
+        name: String,
+        weight: FontWeight,
+        slant: FontSlant,
+        width: FontWidth,
+        file_path: String,
+    ) -> Self {
+        Self {
+            name,
+            weight,
+            slant,
+            width,
+            file_path,
+        }
+    }
+}
+
+/// Font Family containing styles
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FontFamily {
+    pub name: String,
+    pub generic: bool,
+    pub styles: Vec<FontStyle>,
+}
+
+impl FontFamily {
+    pub fn new(name: String, generic: bool) -> Self {
+        Self {
+            name,
+            generic,
+            styles: Vec::new(),
+        }
+    }
+
+    pub fn add_style(&mut self, style: FontStyle) {
+        self.styles.push(style);
+    }
+}
+
+/// Font Manager Statistics
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FontManagerStatistics {
+    pub total_families: usize,
+    pub default_font_set: bool,
+    pub font_size: u32,
 }
 
 /// Font Slant
@@ -295,7 +376,15 @@ impl DesktopFontManager {
             self.default_font = Some(id.to_string());
             true
         } else {
-            &self.primary_font_family
+            false
+        }
+    }
+
+    pub fn get_statistics(&self) -> FontManagerStatistics {
+        FontManagerStatistics {
+            total_families: self.families.len(),
+            default_font_set: self.default_font.is_some(),
+            font_size: self.font_size,
         }
     }
 }

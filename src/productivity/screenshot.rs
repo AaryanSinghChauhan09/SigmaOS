@@ -5,7 +5,7 @@ use std::vec::Vec;
 // SigmaOS Screenshot Tool
 // OOP-based screenshot capture with multiple modes and formats
 
-// PathBuf not in no_std
+use crate::klib::path::PathBuf;
 
 /// Screenshot mode
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
