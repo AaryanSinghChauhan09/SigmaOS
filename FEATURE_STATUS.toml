@@ -56,10 +56,10 @@ next_milestone = "Real hardware TSS loading with ltr and CR3 user-space page tab
 
 [syscall.abi]
 status = "partial"
-files = ["src/syscall/abi.rs"]
-description = "64 syscall numbers defined, libc wrappers with inline asm"
-test_evidence = "Compile-only — needs Ring 3 execution"
-next_milestone = "Kernel-side syscall handler dispatch"
+files = ["src/syscall/abi.rs", "docs/syscall/SIGMAOS_SYSTEM_CALL_PLAN.md", "wiki/29-SigmaOS-System-Call-Plan.md"]
+description = "64 syscall numbers defined, libc wrappers with inline asm, comprehensive ABI stability policy & 17-PR roadmap documented"
+test_evidence = "Unit tests pass; ABI policy documented in docs/syscall/ and wiki/; compile-only — needs Ring 3 execution"
+next_milestone = "PR 2: ABI inventory consistency checker & PR 4: Kernel-side syscall handler dispatch"
 
 [vfs.ramfs]
 status = "working"
