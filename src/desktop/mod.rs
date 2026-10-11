@@ -32,6 +32,21 @@ pub use waybar::{
     WaybarInstance, WaybarModule, WaybarModuleType, WaybarConfig, BarPosition,
     init_waybar, get_waybar,
 };
+pub mod wofi;
+pub use wofi::{
+    WofiInstance, AppEntry,
+    init_wofi, get_wofi, show_wofi, hide_wofi,
+};
+pub mod mako;
+pub use mako::{
+    MakoDaemon, Notification, NotificationUrgency, MakoConfig, Layer,
+    init_mako_daemon, get_mako_daemon, send_notification,
+};
+pub mod swaylock;
+pub use swaylock::{
+    SwaylockInstance, LockState,
+    init_swaylock, get_swaylock, lock_screen, unlock_screen,
+};
 pub mod xreader;
 pub use xreader::*;
 pub mod walker_launcher;
