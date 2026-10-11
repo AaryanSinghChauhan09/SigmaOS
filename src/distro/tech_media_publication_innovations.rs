@@ -1312,7 +1312,7 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             .collect()
     }
 
-    pub fn get_insights_by_domain(&self, domain: &str) -> Vec<TechMediaArticleInsight> {
+    pub fn get_insights_by_exact_domain(&self, domain: &str) -> Vec<TechMediaArticleInsight> {
         self.insights
             .iter()
             .filter(|i| i.publication_domain.eq_ignore_ascii_case(domain))
@@ -1343,7 +1343,7 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
         self.insights.len()
     }
 
-    pub fn format_all_pr_proposals(&self) -> String {
+    pub fn format_multi_portal_pr_manifest(&self) -> String {
         let mut manifest = String::from("# SigmaOS Tech Media Multi-Portal PR Proposals Manifest\n\n");
         manifest.push_str(&format!("Total Registered Portals: {}\n\n", self.insights.len()));
 

@@ -483,7 +483,7 @@ impl ArchPacmanHookRunner {
     }
 }
 
-impl Default for ArchMkinitcpioInitramfsEngine {
+impl Default for ArchPacmanHookRunner {
     fn default() -> Self {
         Self::new()
     }
