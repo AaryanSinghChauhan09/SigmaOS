@@ -374,6 +374,7 @@ pub mod launch_ready;
 pub mod launcher;
 pub mod legal;
 pub mod loader;
+pub use loader::sovereign_ld_sigma_linker_pr_engine::*;
 pub mod location;
 pub mod logging;
 pub mod media;
