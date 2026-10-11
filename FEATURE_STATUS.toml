@@ -75,6 +75,20 @@ description = "PID 1 service manager with dependency ordering, service state man
 test_evidence = "Unit tests pass; service state tracking complete"
 next_milestone = "Process spawning via execve and service dependency enforcement"
 
+[kernel.process_manager]
+status = "modeled"
+files = ["src/kernel/proc/process_lifecycle.rs", "src/kernel/process.rs", "docs/PROCESS_MANAGER_PLAN.md"]
+description = "Kernel process lifecycle, parent/child tracking, child status collection, and orphan reparenting architecture"
+test_evidence = "Process lifecycle state machine unit tests; runtime QEMU user process execution pending"
+next_milestone = "User-mode Ring 3 transition and execve launch path"
+
+[userspace.process_manager]
+status = "modeled"
+files = ["src/userspace/init.rs", "src/userspace/sigma_init.rs", "docs/PROCESS_MANAGER_PLAN.md"]
+description = "Service supervision, declarative dependency validation, bounded restart policies, and graceful stop orchestration"
+test_evidence = "Service dependency state unit tests; end-to-end PID 1 service supervision under QEMU pending"
+next_milestone = "Supervise real user-mode binaries and enforce restart rate limits"
+
 [userspace.libc]
 status = "working"
 files = ["src/userland/libc/mod.rs", "src/userland/libc/musl_syscall_shim.rs"]
