@@ -418,6 +418,7 @@ mod tests {
 
     #[test]
     fn test_converter_all_formats() {
+        let mut pipeline = UniversalPrPackageSubmissionPipelineV20::new();
         let converter = UniversalAllPackageFormatConverterV20::new();
 
         let deb_spec = converter
