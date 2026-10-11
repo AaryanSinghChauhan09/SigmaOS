@@ -54,6 +54,13 @@ description = "TSS structure, InterruptFrame, UserModeContext for Ring 3 transit
 test_evidence = "Unit tests for TSS initialization and interrupt frame preparation"
 next_milestone = "Real hardware TSS loading with ltr and CR3 user-space page table mapping"
 
+[kernel.physical_memory_manager]
+status = "modeled"
+files = ["src/memory/bitmap_pmm.rs", "src/memory/pmm_vmm.rs", "src/kernel/memory.rs"]
+description = "Physical Memory Manager (PMM) architecture, two-stage early boot/runtime handoff, frame reservation, and page lifecycle management"
+test_evidence = "Modeled architecture guide and 20-PR sequence roadmap published in docs/PHYSICAL_MEMORY_MANAGER_PLAN.md"
+next_milestone = "PR 1-9 audit, map parser fixtures, normalized boot map, reservations, and first QEMU frame allocator"
+
 [syscall.abi]
 status = "partial"
 files = ["src/syscall/abi.rs"]
