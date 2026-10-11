@@ -179,7 +179,7 @@ fi
 if [ -f "src/distro/missing_linux_bsd_components.rs" ]; then
     echo "Running Missing Linux & BSD Components test suite..."
     mkdir -p build
-    rustc --test src/distro/missing_linux_bsd_components.rs --edition=2021 -o build/missing_components_test
+    rustc --test src/distro/missing_linux_bsd_components.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/missing_components_test
     ./build/missing_components_test
 fi
 
