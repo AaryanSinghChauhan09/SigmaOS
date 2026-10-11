@@ -20,9 +20,14 @@ fn test_filesystem_core_and_mount_conformance() {
     let mut mount_mgr = MountManager::new();
     let flags = CustomMountFlags::default();
 
-    assert!(mount_mgr.mount("/dev/data", "/mnt/data", "ext4", flags).is_ok());
+    assert!(mount_mgr
+        .mount("/dev/data", "/mnt/data", "ext4", flags)
+        .is_ok());
     assert!(mount_mgr.acquire_ref("/mnt/data").is_ok());
-    assert_eq!(mount_mgr.unmount("/mnt/data"), Err(MountError::ResourceBusy));
+    assert_eq!(
+        mount_mgr.unmount("/mnt/data"),
+        Err(MountError::ResourceBusy)
+    );
 
     assert!(mount_mgr.release_ref("/mnt/data").is_ok());
     assert!(mount_mgr.unmount("/mnt/data").is_ok());

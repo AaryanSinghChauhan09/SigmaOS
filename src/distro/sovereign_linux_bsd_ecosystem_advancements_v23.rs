@@ -59,7 +59,12 @@ impl GentooPortageEmbeddedEngine {
         );
     }
 
-    pub fn set_use_flag(&mut self, target: &str, flag: &str, enabled: bool) -> Result<(), &'static str> {
+    pub fn set_use_flag(
+        &mut self,
+        target: &str,
+        flag: &str,
+        enabled: bool,
+    ) -> Result<(), &'static str> {
         let profile = self
             .profiles
             .get_mut(target)
@@ -77,7 +82,10 @@ impl GentooPortageEmbeddedEngine {
 
     pub fn evaluate_build_flags(&self, target: &str) -> Option<String> {
         let profile = self.profiles.get(target)?;
-        let mut flags = format!("--target={} --sysroot={}", profile.target_triple, profile.sysroot_path);
+        let mut flags = format!(
+            "--target={} --sysroot={}",
+            profile.target_triple, profile.sysroot_path
+        );
         for flag in &profile.active_use_flags {
             flags.push_str(&format!(" USE={}", flag));
         }
@@ -308,7 +316,13 @@ impl VoidXbpsSolverEngine {
         }
     }
 
-    pub fn register_repository_package(&mut self, name: &str, ver: &str, deps: &[&str], hash: &str) {
+    pub fn register_repository_package(
+        &mut self,
+        name: &str,
+        ver: &str,
+        deps: &[&str],
+        hash: &str,
+    ) {
         let pkg = XbpsBinaryPackage {
             name: name.to_string(),
             version: ver.to_string(),
@@ -352,7 +366,11 @@ impl VoidXbpsSolverEngine {
         Ok(())
     }
 
-    pub fn verify_and_install(&mut self, pkg_name: &str, expected_hash: &str) -> Result<String, &'static str> {
+    pub fn verify_and_install(
+        &mut self,
+        pkg_name: &str,
+        expected_hash: &str,
+    ) -> Result<String, &'static str> {
         let pkg = self
             .repository
             .get(pkg_name)
@@ -366,7 +384,10 @@ impl VoidXbpsSolverEngine {
         installed_pkg.is_installed = true;
         self.installed.insert(pkg_name.to_string(), installed_pkg);
 
-        Ok(format!("Successfully verified and installed XBPS package '{}'", pkg_name))
+        Ok(format!(
+            "Successfully verified and installed XBPS package '{}'",
+            pkg_name
+        ))
     }
 }
 
@@ -457,8 +478,14 @@ pub struct DebianDpkgPreseedEngine {
 impl DebianDpkgPreseedEngine {
     pub fn new() -> Self {
         let mut preseed_config = BTreeMap::new();
-        preseed_config.insert("d-i debian-installer/locale string".to_string(), "en_US.UTF-8".to_string());
-        preseed_config.insert("d-i netcfg/get_hostname string".to_string(), "sigmaos".to_string());
+        preseed_config.insert(
+            "d-i debian-installer/locale string".to_string(),
+            "en_US.UTF-8".to_string(),
+        );
+        preseed_config.insert(
+            "d-i netcfg/get_hostname string".to_string(),
+            "sigmaos".to_string(),
+        );
 
         Self {
             triggers: BTreeMap::new(),
@@ -467,12 +494,13 @@ impl DebianDpkgPreseedEngine {
     }
 
     pub fn activate_trigger(&mut self, trigger_name: &str) {
-        let handler = self.triggers.entry(trigger_name.to_string()).or_insert_with(|| {
-            DpkgTriggerHandler {
+        let handler = self
+            .triggers
+            .entry(trigger_name.to_string())
+            .or_insert_with(|| DpkgTriggerHandler {
                 name: trigger_name.to_string(),
                 is_pending: false,
-            }
-        });
+            });
         handler.is_pending = true;
     }
 
@@ -573,9 +601,13 @@ mod tests {
     fn test_gentoo_portage_embedded() {
         let mut embedded = GentooPortageEmbeddedEngine::new();
         embedded.register_profile("riscv64-unknown-linux-gnu", "/usr/riscv64");
-        embedded.set_use_flag("riscv64-unknown-linux-gnu", "vPU", true).unwrap();
+        embedded
+            .set_use_flag("riscv64-unknown-linux-gnu", "vPU", true)
+            .unwrap();
 
-        let flags = embedded.evaluate_build_flags("riscv64-unknown-linux-gnu").unwrap();
+        let flags = embedded
+            .evaluate_build_flags("riscv64-unknown-linux-gnu")
+            .unwrap();
         assert!(flags.contains("riscv64-unknown-linux-gnu"));
         assert!(flags.contains("USE=vPU"));
     }
@@ -595,7 +627,8 @@ mod tests {
     fn test_freebsd_vnet_jail() {
         let mut vnet = FreeBsdVnetJailEngine::new();
         let jid = vnet.create_vnet_jail("web-sandbox", "/jails/web");
-        vnet.attach_vnet_interface(jid, "epair0b", "192.168.1.50/24", "02:00:00:00:00:01").unwrap();
+        vnet.attach_vnet_interface(jid, "epair0b", "192.168.1.50/24", "02:00:00:00:00:01")
+            .unwrap();
 
         let msg = vnet.start_jail(jid).unwrap();
         assert!(msg.contains("Started"));
@@ -631,7 +664,8 @@ mod tests {
         let processed = dpkg.process_pending_triggers();
         assert_eq!(processed, 1);
 
-        let preseed = "d-i mirror/http/hostname string mirror.debian.org\nd-i time/zone string UTC\n";
+        let preseed =
+            "d-i mirror/http/hostname string mirror.debian.org\nd-i time/zone string UTC\n";
         let count = dpkg.parse_preseed_file(preseed);
         assert_eq!(count, 2);
     }

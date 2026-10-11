@@ -17,9 +17,9 @@ use alloc::format;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec::Vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::BTreeMap;
@@ -28,9 +28,9 @@ use std::format;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
-#[cfg(any(feature = "standalone_test", test))]
 use std::vec;
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec::Vec;
 
 /// Mkinitcpio Hook Configuration Builder
 #[derive(Debug, Clone)]
@@ -122,7 +122,11 @@ impl AurChrootCleanBuilder {
         }
     }
 
-    pub fn build_aur_package(&self, pkgname: &str, pkgbuild_content: &str) -> Result<String, &'static str> {
+    pub fn build_aur_package(
+        &self,
+        pkgname: &str,
+        pkgbuild_content: &str,
+    ) -> Result<String, &'static str> {
         if !pkgbuild_content.contains("pkgname=") {
             return Err("Invalid PKGBUILD: missing pkgname");
         }
@@ -140,9 +144,18 @@ impl ReflectorMirrorlistRanker {
     pub fn new() -> Self {
         Self {
             active_mirrors: vec![
-                ("https://geo.mirror.pkg.archlinux.org/$repo/os/$arch".to_string(), 12),
-                ("https://mirror.rackspace.com/archlinux/$repo/os/$arch".to_string(), 25),
-                ("https://mirror.kernel.org/archlinux/$repo/os/$arch".to_string(), 18),
+                (
+                    "https://geo.mirror.pkg.archlinux.org/$repo/os/$arch".to_string(),
+                    12,
+                ),
+                (
+                    "https://mirror.rackspace.com/archlinux/$repo/os/$arch".to_string(),
+                    25,
+                ),
+                (
+                    "https://mirror.kernel.org/archlinux/$repo/os/$arch".to_string(),
+                    18,
+                ),
             ],
         }
     }
@@ -261,11 +274,18 @@ impl ArchPkgctlDevtoolsEngine {
         }
     }
 
-    pub fn build_in_chroot(&self, target_chroot: &str, pkgname: &str) -> Result<String, &'static str> {
+    pub fn build_in_chroot(
+        &self,
+        target_chroot: &str,
+        pkgname: &str,
+    ) -> Result<String, &'static str> {
         if !self.build_chroots.contains(&target_chroot.to_string()) {
             return Err("Unknown devtools chroot target");
         }
-        Ok(format!("Successfully built {} in chroot {}", pkgname, target_chroot))
+        Ok(format!(
+            "Successfully built {} in chroot {}",
+            pkgname, target_chroot
+        ))
     }
 }
 
@@ -311,7 +331,9 @@ mod tests {
         let gen = ArchMkinitcpioHookGenerator::new();
         let config = gen.generate_preset_config();
         assert!(config.contains("MODULES=(btrfs zfs)"));
-        assert!(config.contains("HOOKS=(base udev autodetect modconf block filesystems keyboard fsck)"));
+        assert!(
+            config.contains("HOOKS=(base udev autodetect modconf block filesystems keyboard fsck)")
+        );
         assert!(config.contains("COMPRESSION=\"zstd\""));
     }
 
@@ -325,7 +347,9 @@ mod tests {
     #[test]
     fn test_aur_chroot_builder() {
         let builder = AurChrootCleanBuilder::new("/var/lib/aurbuild");
-        let pkg = builder.build_aur_package("ripgrep", "pkgname=ripgrep\npkgver=14.1.0").unwrap();
+        let pkg = builder
+            .build_aur_package("ripgrep", "pkgname=ripgrep\npkgver=14.1.0")
+            .unwrap();
         assert_eq!(pkg, "sigpkg-ripgrep-1.0.0-1-x86_64.sigpkg");
     }
 
@@ -333,7 +357,10 @@ mod tests {
     fn test_reflector_mirrorlist_ranker() {
         let mut ranker = ReflectorMirrorlistRanker::new();
         let mirrors = ranker.get_ranked_mirrorlist();
-        assert_eq!(mirrors[0], "https://geo.mirror.pkg.archlinux.org/$repo/os/$arch");
+        assert_eq!(
+            mirrors[0],
+            "https://geo.mirror.pkg.archlinux.org/$repo/os/$arch"
+        );
     }
 
     #[test]
@@ -362,7 +389,8 @@ mod tests {
     #[test]
     fn test_arch_pacman_file_collision_resolver() {
         let resolver = ArchPacmanFileCollisionResolverEngine::new();
-        let merged = resolver.resolve_pacnew("/etc/pacman.conf", "[options]\nParallelDownloads = 5");
+        let merged =
+            resolver.resolve_pacnew("/etc/pacman.conf", "[options]\nParallelDownloads = 5");
         assert!(merged.contains("Auto-merged"));
         assert!(merged.contains("ParallelDownloads = 5"));
     }

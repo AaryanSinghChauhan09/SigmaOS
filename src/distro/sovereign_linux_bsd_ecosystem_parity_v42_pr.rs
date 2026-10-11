@@ -86,7 +86,9 @@ pub struct NixGuixFlakeStoreClosurePrEngineV42 {
 
 impl NixGuixFlakeStoreClosurePrEngineV42 {
     pub fn new() -> Self {
-        Self { total_store_paths: 128 }
+        Self {
+            total_store_paths: 128,
+        }
     }
 
     pub fn generate_store_path(&self, pkg_name: &str, version: &str) -> String {
@@ -123,7 +125,10 @@ impl ArchCachyosPacman7ScxPrEngineV42 {
     }
 
     pub fn format_pacman_trigger(&self, hook_name: &str, target_pkg: &str) -> String {
-        format!("[Pacman7 Hook] {} -> Exec: /usr/bin/scx_rusty --target {}", hook_name, target_pkg)
+        format!(
+            "[Pacman7 Hook] {} -> Exec: /usr/bin/scx_rusty --target {}",
+            hook_name, target_pkg
+        )
     }
 
     pub fn compute_bore_timeslice(&self, latency_target_us: u64) -> u64 {
@@ -180,7 +185,12 @@ pub struct OpenBsdPledgeUnveilPfSyncPrEngineV42 {
 impl OpenBsdPledgeUnveilPfSyncPrEngineV42 {
     pub fn new() -> Self {
         Self {
-            active_promises: vec!["stdio".to_string(), "rpath".to_string(), "wpath".to_string(), "inet".to_string()],
+            active_promises: vec![
+                "stdio".to_string(),
+                "rpath".to_string(),
+                "wpath".to_string(),
+                "inet".to_string(),
+            ],
         }
     }
 
@@ -357,7 +367,10 @@ impl UbuntuAppArmorV4SnapPrEngineV42 {
     }
 
     pub fn compile_apparmor_v4_profile(&self, binary_path: &str) -> String {
-        format!("profile {} flags=({}) {{\n  dbus send,\n  network domain=inet,\n}}", binary_path, self.profile_mode)
+        format!(
+            "profile {} flags=({}) {{\n  dbus send,\n  network domain=inet,\n}}",
+            binary_path, self.profile_mode
+        )
     }
 }
 
@@ -432,7 +445,10 @@ impl SovereignLinuxBsdEcosystemParityV42PrSuite {
     }
 
     pub fn process_and_merge_pr(&mut self, pr_id: u64) -> Result<bool, &'static str> {
-        let rec = self.pr_records.get_mut(&pr_id).ok_or("PR record not found")?;
+        let rec = self
+            .pr_records
+            .get_mut(&pr_id)
+            .ok_or("PR record not found")?;
 
         if rec.pqc_dilithium_signature.is_empty() {
             rec.status = DistroPrStatusV42::Rejected;
@@ -471,22 +487,33 @@ mod tests {
     #[test]
     fn test_v42_pr_subengine_outputs() {
         let nix = NixGuixFlakeStoreClosurePrEngineV42::new();
-        assert!(nix.generate_store_path("glibc", "2.38").contains("/nix/store"));
+        assert!(nix
+            .generate_store_path("glibc", "2.38")
+            .contains("/nix/store"));
 
         let arch = ArchCachyosPacman7ScxPrEngineV42::new();
-        assert!(arch.format_pacman_trigger("glibc-post", "glibc").contains("Hook"));
+        assert!(arch
+            .format_pacman_trigger("glibc-post", "glibc")
+            .contains("Hook"));
 
         let freebsd = FreeBsdCapsicumBectlPrEngineV42::new();
-        assert!(freebsd.create_boot_env_snapshot("default").contains("bectl create"));
+        assert!(freebsd
+            .create_boot_env_snapshot("default")
+            .contains("bectl create"));
 
         let openbsd = OpenBsdPledgeUnveilPfSyncPrEngineV42::new();
         assert!(openbsd.verify_unveil_lock("/etc"));
 
         let alpine = AlpineApkV3ApkovlPrEngineV42::new();
-        assert!(alpine.generate_apkovl_archive_name("localhost").contains("apkovl"));
+        assert!(alpine
+            .generate_apkovl_archive_name("localhost")
+            .contains("apkovl"));
 
         let gentoo = GentooPortageEapi8SlotPrEngineV42::new();
-        assert_eq!(gentoo.resolve_slot_dependency("dev-lang/python", "3.12"), "dev-lang/python:=3.12");
+        assert_eq!(
+            gentoo.resolve_slot_dependency("dev-lang/python", "3.12"),
+            "dev-lang/python:=3.12"
+        );
 
         let fedora = FedoraOstreeBodhiKarmaPrEngineV42::new();
         assert!(fedora.evaluate_bodhi_karma(5));
@@ -495,10 +522,14 @@ mod tests {
         assert!(void.verify_xbps_rsa_sig("rsa-sha256-key"));
 
         let dfly = DragonFlyHammer2ClusterPrEngineV42::new();
-        assert!(dfly.compute_pfs_txg_sync("ROOT", 100).contains("hammer2 pfs-sync"));
+        assert!(dfly
+            .compute_pfs_txg_sync("ROOT", 100)
+            .contains("hammer2 pfs-sync"));
 
         let ubuntu = UbuntuAppArmorV4SnapPrEngineV42::new();
-        assert!(ubuntu.compile_apparmor_v4_profile("/usr/bin/firefox").contains("profile"));
+        assert!(ubuntu
+            .compile_apparmor_v4_profile("/usr/bin/firefox")
+            .contains("profile"));
     }
 
     #[test]

@@ -11233,8 +11233,8 @@ impl SovereignBitrix24SpeechAiSentimentAnalyzerEngine {
 
 #[cfg(test)]
 mod tests_phase2 {
-    use super::*;
     use super::sigma_types::CapabilityToken;
+    use super::*;
 
     #[test]
     fn test_suite_engines_phase2_google_ms_zoho_salesforce_odoo_bitrix() {

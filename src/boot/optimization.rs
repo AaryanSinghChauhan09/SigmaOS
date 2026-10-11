@@ -410,7 +410,8 @@ mod tests {
     #[test]
     fn test_simple_boot_service_name_length_caching() {
         let cap = ServiceCapability::full();
-        let service = SimpleBootService::new(101, b"network-manager", ServicePriority::High, 150, cap);
+        let service =
+            SimpleBootService::new(101, b"network-manager", ServicePriority::High, 150, cap);
         assert_eq!(service.name_len, 15);
         assert_eq!(service.name(), b"network-manager");
     }
@@ -418,7 +419,8 @@ mod tests {
     #[test]
     fn test_simple_boot_service_dependencies_and_status() {
         let cap = ServiceCapability::full();
-        let mut service = SimpleBootService::new(102, b"display-daemon", ServicePriority::Medium, 200, cap);
+        let mut service =
+            SimpleBootService::new(102, b"display-daemon", ServicePriority::Medium, 200, cap);
         assert_eq!(service.get_status() as u32, ServiceStatus::Pending as u32);
 
         service.add_dependency(101);

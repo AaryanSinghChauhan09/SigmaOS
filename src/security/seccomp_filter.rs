@@ -88,7 +88,11 @@ impl SeccompFilter {
 
     /// Remove a rule by syscall number
     pub fn remove_rule(&mut self, syscall_number: u64) -> bool {
-        if let Some(pos) = self.rules.iter().position(|r| r.syscall_number == syscall_number) {
+        if let Some(pos) = self
+            .rules
+            .iter()
+            .position(|r| r.syscall_number == syscall_number)
+        {
             self.rules.remove(pos);
             true
         } else {
@@ -101,7 +105,6 @@ impl SeccompFilter {
         let rule = SeccompRule::new(syscall, action);
         self.add_rule(rule);
     }
-
 
     /// Filter a syscall
     pub fn filter_syscall(&self, syscall_number: u64, args: &[u64]) -> SeccompAction {
@@ -130,7 +133,9 @@ impl SeccompFilter {
                         SeccompCmpOp::LessThanOrEqual => masked_value <= masked_target,
                         SeccompCmpOp::GreaterThanOrEqual => masked_value >= masked_target,
                         SeccompCmpOp::GreaterThan => masked_value > masked_target,
-                        SeccompCmpOp::MaskedEqual => (arg_value & filter.value_mask) == filter.value,
+                        SeccompCmpOp::MaskedEqual => {
+                            (arg_value & filter.value_mask) == filter.value
+                        }
                     }
                 });
 
@@ -175,7 +180,6 @@ impl SeccompManager {
             active_filter: None,
         }
     }
-
 
     /// Create a new filter
     pub fn create_filter(
@@ -255,8 +259,16 @@ impl SeccompManager {
     }
 
     /// Create a strict filter (deny all except allowed)
-    pub fn create_strict_filter(&mut self, name: String, allowed_syscalls: Vec<u64>) -> Result<(), &'static str> {
-        self.create_filter(name.clone(), SeccompAction::KillProcess, "x86_64".to_string())?;
+    pub fn create_strict_filter(
+        &mut self,
+        name: String,
+        allowed_syscalls: Vec<u64>,
+    ) -> Result<(), &'static str> {
+        self.create_filter(
+            name.clone(),
+            SeccompAction::KillProcess,
+            "x86_64".to_string(),
+        )?;
 
         let filter = self.get_filter_mut(&name).ok_or("Filter not found")?;
 
@@ -281,14 +293,26 @@ mod tests {
     #[test]
     fn test_create_filter() {
         let mut manager = SeccompManager::new();
-        assert!(manager.create_filter("test".to_string(), SeccompAction::KillProcess, "x86_64".to_string()).is_ok());
+        assert!(manager
+            .create_filter(
+                "test".to_string(),
+                SeccompAction::KillProcess,
+                "x86_64".to_string()
+            )
+            .is_ok());
         assert_eq!(manager.filter_count(), 1);
     }
 
     #[test]
     fn test_add_rule() {
         let mut manager = SeccompManager::new();
-        manager.create_filter("test".to_string(), SeccompAction::KillProcess, "x86_64".to_string()).unwrap();
+        manager
+            .create_filter(
+                "test".to_string(),
+                SeccompAction::KillProcess,
+                "x86_64".to_string(),
+            )
+            .unwrap();
 
         let rule = SeccompRule {
             syscall_number: 1,
@@ -304,7 +328,13 @@ mod tests {
     #[test]
     fn test_filter_syscall() {
         let mut manager = SeccompManager::new();
-        manager.create_filter("test".to_string(), SeccompAction::KillProcess, "x86_64".to_string()).unwrap();
+        manager
+            .create_filter(
+                "test".to_string(),
+                SeccompAction::KillProcess,
+                "x86_64".to_string(),
+            )
+            .unwrap();
 
         let rule = SeccompRule {
             syscall_number: 1,
@@ -325,7 +355,13 @@ mod tests {
     #[test]
     fn test_arg_filter() {
         let mut manager = SeccompManager::new();
-        manager.create_filter("test".to_string(), SeccompAction::KillProcess, "x86_64".to_string()).unwrap();
+        manager
+            .create_filter(
+                "test".to_string(),
+                SeccompAction::KillProcess,
+                "x86_64".to_string(),
+            )
+            .unwrap();
 
         let arg_filter = SeccompArgFilter {
             arg_num: 0,
@@ -353,7 +389,13 @@ mod tests {
     #[test]
     fn test_set_active_filter() {
         let mut manager = SeccompManager::new();
-        manager.create_filter("test".to_string(), SeccompAction::KillProcess, "x86_64".to_string()).unwrap();
+        manager
+            .create_filter(
+                "test".to_string(),
+                SeccompAction::KillProcess,
+                "x86_64".to_string(),
+            )
+            .unwrap();
         assert!(manager.set_active_filter("test".to_string()).is_ok());
         assert_eq!(manager.active_filter(), Some("test"));
     }
@@ -361,7 +403,9 @@ mod tests {
     #[test]
     fn test_strict_filter() {
         let mut manager = SeccompManager::new();
-        assert!(manager.create_strict_filter("strict".to_string(), vec![1, 2, 3]).is_ok());
+        assert!(manager
+            .create_strict_filter("strict".to_string(), vec![1, 2, 3])
+            .is_ok());
 
         let filter = manager.get_filter("strict").unwrap();
         assert_eq!(filter.default_action, SeccompAction::KillProcess);
@@ -371,7 +415,13 @@ mod tests {
     #[test]
     fn test_enable_disable() {
         let mut manager = SeccompManager::new();
-        manager.create_filter("test".to_string(), SeccompAction::KillProcess, "x86_64".to_string()).unwrap();
+        manager
+            .create_filter(
+                "test".to_string(),
+                SeccompAction::KillProcess,
+                "x86_64".to_string(),
+            )
+            .unwrap();
 
         let filter = manager.get_filter_mut("test").unwrap();
         filter.disable();
@@ -381,4 +431,3 @@ mod tests {
         assert!(filter.enabled);
     }
 }
-

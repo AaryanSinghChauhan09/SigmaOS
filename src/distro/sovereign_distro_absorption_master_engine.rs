@@ -90,12 +90,20 @@ impl MintAbsorptionEngine {
         self.warpinator_peers.len()
     }
 
-    pub fn mintstick_format_iso(&mut self, iso_path: &str, device_path: &str) -> Result<String, &'static str> {
+    pub fn mintstick_format_iso(
+        &mut self,
+        iso_path: &str,
+        device_path: &str,
+    ) -> Result<String, &'static str> {
         if iso_path.is_empty() || device_path.is_empty() {
             return Err("Invalid ISO or device path");
         }
         self.mintstick_usb_devices.push(String::from(device_path));
-        Ok(alloc::format!("Successfully wrote {} to USB device {}", iso_path, device_path))
+        Ok(alloc::format!(
+            "Successfully wrote {} to USB device {}",
+            iso_path,
+            device_path
+        ))
     }
 }
 
@@ -134,7 +142,7 @@ impl OmarchyArchAbsorptionEngine {
                 votes: 1540,
                 popularity: 45.2,
                 maintainer: String::from("vaxry"),
-            }
+            },
         );
         engine
     }
@@ -285,7 +293,7 @@ impl VoidAlpineGentooEngine {
 
 #[derive(Debug, Default)]
 pub struct BsdAbsorptionEngine {
-    pub boot_environments: Vec<String>, // bectl snapshots
+    pub boot_environments: Vec<String>,      // bectl snapshots
     pub pledge_active_promises: Vec<String>, // stdio rpath wpath cpath inet
     pub pf_sync_nodes: u32,
 }
@@ -294,7 +302,8 @@ impl BsdAbsorptionEngine {
     pub fn new() -> Self {
         let mut bsd = Self::default();
         bsd.boot_environments.push(String::from("default"));
-        bsd.boot_environments.push(String::from("2026-10-09-update-snapshot"));
+        bsd.boot_environments
+            .push(String::from("2026-10-09-update-snapshot"));
         bsd.pledge_active_promises = vec![
             String::from("stdio"),
             String::from("rpath"),
@@ -351,30 +360,69 @@ impl SovereignDistroAbsorptionMasterEngine {
 
     pub fn run_master_absorption_suite(&mut self) -> BTreeMap<&'static str, String> {
         let mut report = BTreeMap::new();
-        
+
         // Mint
         let peers = self.mint.discover_warpinator_peers();
-        report.insert("Linux Mint", alloc::format!("MintUpdate active, Warpinator discovered {} LAN peers", peers));
-        
+        report.insert(
+            "Linux Mint",
+            alloc::format!(
+                "MintUpdate active, Warpinator discovered {} LAN peers",
+                peers
+            ),
+        );
+
         // Omarchy
         self.omarchy.enable_omarchy_gaming_mode(144);
-        report.insert("Omarchy Arch", alloc::format!("Gaming mode active ({} FPS target), MangoHud enabled", self.omarchy.gamescope_fps_target));
-        
+        report.insert(
+            "Omarchy Arch",
+            alloc::format!(
+                "Gaming mode active ({} FPS target), MangoHud enabled",
+                self.omarchy.gamescope_fps_target
+            ),
+        );
+
         // Debian
         self.debian.add_multiarch("arm64");
-        report.insert("Debian", alloc::format!("Multi-arch supported: {:?}", self.debian.supported_architectures));
-        
+        report.insert(
+            "Debian",
+            alloc::format!(
+                "Multi-arch supported: {:?}",
+                self.debian.supported_architectures
+            ),
+        );
+
         // CachyOS
         self.cachy.apply_cachy_kernel_sysctl_profile();
-        report.insert("CachyOS", alloc::format!("BORE scheduler granularity {}ns, Microarch Level {:?}", self.cachy.bore_granularity_ns, self.cachy.detected_microarch));
-        
+        report.insert(
+            "CachyOS",
+            alloc::format!(
+                "BORE scheduler granularity {}ns, Microarch Level {:?}",
+                self.cachy.bore_granularity_ns,
+                self.cachy.detected_microarch
+            ),
+        );
+
         // Void/Alpine/Gentoo
-        report.insert("Void/Alpine/Gentoo", alloc::format!("Gentoo USE flags: {:?}, runit active services: {}", self.void_alpine_gentoo.gentoo_use_flags, self.void_alpine_gentoo.runit_services_active));
-        
+        report.insert(
+            "Void/Alpine/Gentoo",
+            alloc::format!(
+                "Gentoo USE flags: {:?}, runit active services: {}",
+                self.void_alpine_gentoo.gentoo_use_flags,
+                self.void_alpine_gentoo.runit_services_active
+            ),
+        );
+
         // BSD
         let be = self.bsd.create_bectl_snapshot("master-absorption-complete");
-        report.insert("FreeBSD/OpenBSD", alloc::format!("bectl boot env created: {}, pledge promises: {:?}", be, self.bsd.pledge_active_promises));
-        
+        report.insert(
+            "FreeBSD/OpenBSD",
+            alloc::format!(
+                "bectl boot env created: {}, pledge promises: {:?}",
+                be,
+                self.bsd.pledge_active_promises
+            ),
+        );
+
         report
     }
 }

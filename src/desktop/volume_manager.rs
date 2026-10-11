@@ -44,7 +44,7 @@ pub struct DesktopVolumeDevice {
     pub name: String,
     pub device_type: DesktopVolumeDeviceType,
     pub status: DesktopVolumeDeviceStatus,
-    pub volume: u32,  // 0-100
+    pub volume: u32, // 0-100
     pub muted: bool,
     pub default: bool,
 }
@@ -76,7 +76,7 @@ pub struct DesktopVolumeManager {
     devices: HashMap<String, DesktopVolumeDevice>,
     default_output: Option<String>,
     default_input: Option<String>,
-    system_volume: u32,  // 0-100
+    system_volume: u32, // 0-100
     system_muted: bool,
     counter: u32,
 }
@@ -142,8 +142,8 @@ impl DesktopVolumeManager {
     }
 
     pub fn remove_device(&mut self, id: &str) -> bool {
-        if Some(id.to_string()) == self.default_output ||
-           Some(id.to_string()) == self.default_input {
+        if Some(id.to_string()) == self.default_output || Some(id.to_string()) == self.default_input
+        {
             return false;
         }
         self.devices.remove(id).is_some()

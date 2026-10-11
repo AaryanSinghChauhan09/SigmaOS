@@ -384,13 +384,7 @@ impl AsahiAppleSiliconDtsPrEngine {
         }
     }
 
-    pub fn register_soc_driver(
-        &mut self,
-        soc: &str,
-        dt_compat: &str,
-        module: &str,
-        ans2: bool,
-    ) {
+    pub fn register_soc_driver(&mut self, soc: &str, dt_compat: &str, module: &str, ans2: bool) {
         self.dts_entries.insert(
             soc.to_string(),
             AsahiAppleSiliconPrSpec {
@@ -667,7 +661,12 @@ mod tests {
     #[test]
     fn test_popos_power_pr_engine() {
         let mut popos = PopOsSystem76PowerPrEngine::new();
-        popos.submit_power_pr(1, System76PowerProfile::Performance, System76GpuMode::Nvidia, "aggressive");
+        popos.submit_power_pr(
+            1,
+            System76PowerProfile::Performance,
+            System76GpuMode::Nvidia,
+            "aggressive",
+        );
 
         let mode = popos.evaluate_power_mode(1).unwrap();
         assert!(mode.contains("Performance"));
@@ -739,7 +738,10 @@ mod tests {
         dfly.register_pfs_cluster("home_pfs", 1001, &["node1", "node2"], "snap_v1");
 
         assert!(dfly.replicate_transaction("home_pfs", 1002));
-        assert_eq!(dfly.pfs_clusters.get("home_pfs").unwrap().cluster_tx_id, 1002);
+        assert_eq!(
+            dfly.pfs_clusters.get("home_pfs").unwrap().cluster_tx_id,
+            1002
+        );
     }
 
     #[test]

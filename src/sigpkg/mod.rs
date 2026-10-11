@@ -76,12 +76,6 @@ pub use crate::package::sovereign_distro_package_matrix::*;
 pub use crate::package::sovereign_pr_package_gateway::SovereignUniversalPrGatewayEngine;
 pub use crate::package::sovereign_universal_pm_pr_bridge::SovereignUniversalPmPrBridgeEngine;
 
-pub use crate::package::sovereign_distro_package_advancements_v3::*;
-pub use crate::package::sovereign_package_smp_engine::*;
-pub use crate::package::sovereign_distro_package_advancements_v4::*;
-pub use crate::package::sovereign_distro_package_advancements_v5::*;
-pub use crate::package::sovereign_distro_package_advancements_v6::*;
-pub use crate::package::sovereign_distro_package_advancements_v7::*;
 pub use crate::package::sovereign_distro_package_advancements_v12::*;
 pub use crate::package::sovereign_distro_package_advancements_v13::*;
 pub use crate::package::sovereign_distro_package_advancements_v16::*;
@@ -89,9 +83,15 @@ pub use crate::package::sovereign_distro_package_advancements_v17::*;
 pub use crate::package::sovereign_distro_package_advancements_v20::*;
 pub use crate::package::sovereign_distro_package_advancements_v26::*;
 pub use crate::package::sovereign_distro_package_advancements_v29::*;
+pub use crate::package::sovereign_distro_package_advancements_v3::*;
 pub use crate::package::sovereign_distro_package_advancements_v30::*;
 pub use crate::package::sovereign_distro_package_advancements_v31::*;
 pub use crate::package::sovereign_distro_package_advancements_v33::*;
+pub use crate::package::sovereign_distro_package_advancements_v4::*;
+pub use crate::package::sovereign_distro_package_advancements_v5::*;
+pub use crate::package::sovereign_distro_package_advancements_v6::*;
+pub use crate::package::sovereign_distro_package_advancements_v7::*;
+pub use crate::package::sovereign_package_smp_engine::*;
 
 #[path = "../package/sovereign_package_smp_engine.rs"]
 pub mod sovereign_package_smp_engine;

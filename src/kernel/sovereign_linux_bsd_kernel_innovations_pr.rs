@@ -46,7 +46,14 @@ impl SigmaSchedExtEevdfEngine {
         }
     }
 
-    pub fn register_task(&mut self, id: u64, name: &str, priority: u32, weight: u64, latency_sensitive: bool) {
+    pub fn register_task(
+        &mut self,
+        id: u64,
+        name: &str,
+        priority: u32,
+        weight: u64,
+        latency_sensitive: bool,
+    ) {
         let vtime = 1000;
         let deadline = vtime + (100_000_000 / (weight.max(1)));
         self.tasks.push(SchedExtTask {
@@ -324,7 +331,8 @@ impl OpenBsdHardenedSecurityKernelEngine {
     }
 
     pub fn unveil(&mut self, path: &str, permissions: &str) {
-        self.unveiled_paths.push((String::from(path), String::from(permissions)));
+        self.unveiled_paths
+            .push((String::from(path), String::from(permissions)));
     }
 
     pub fn verify_retguard_frame(&self, return_address: u64, xor_canary: u64) -> bool {
@@ -442,8 +450,10 @@ impl SovereignLinuxBsdKernelInnovationsPrGateway {
 
     pub fn generate_kernel_pr_proposal(&mut self) -> KernelPrDescriptor {
         // Register sample test data across subsystems
-        self.sched_engine.register_task(101, "kernel-worker-0", 10, 100, true);
-        self.sched_engine.register_task(102, "kernel-worker-1", 5, 50, false);
+        self.sched_engine
+            .register_task(101, "kernel-worker-0", 10, 100, true);
+        self.sched_engine
+            .register_task(102, "kernel-worker-1", 5, 50, false);
 
         self.io_uring_engine.submit(SqEntry {
             user_data: 0x9001,
@@ -454,19 +464,28 @@ impl SovereignLinuxBsdKernelInnovationsPrGateway {
         });
         let _ = self.io_uring_engine.poll_sq_and_dispatch();
 
-        self.vnet_engine.create_vnet(1, "vnet-container-1", "10.200.0.5");
-        self.openbsd_security_engine.pledge(&["stdio", "rpath", "inet"]);
-        let snap_id = self.hammer2_vkernel_engine.create_snapshot("root-subvolume-0", 1_048_576);
-        self.illumos_engine.create_zone(10, "app-zone-production", 50);
+        self.vnet_engine
+            .create_vnet(1, "vnet-container-1", "10.200.0.5");
+        self.openbsd_security_engine
+            .pledge(&["stdio", "rpath", "inet"]);
+        let snap_id = self
+            .hammer2_vkernel_engine
+            .create_snapshot("root-subvolume-0", 1_048_576);
+        self.illumos_engine
+            .create_zone(10, "app-zone-production", 50);
 
-        let title = String::from("feat(kernel): Implement Sovereign Linux 6.12+ & BSD Kernel Innovations Parity Engine");
+        let title = String::from(
+            "feat(kernel): Implement Sovereign Linux 6.12+ & BSD Kernel Innovations Parity Engine",
+        );
         let desc = format!(
             "Integrates Linux 6.12+ sched_ext/EEVDF scheduler (tasks: {}), io_uring SQPOLL, eBPF/XDP zero-copy networking, FreeBSD Capsicum & VNET (id: 1), OpenBSD pledge/unveil/retguard, DragonFly HAMMER2 (snapshot: {}), and Illumos DTrace/Zones.",
             self.sched_engine.tasks.len(),
             snap_id
         );
 
-        let dummy_pqc_sig = String::from("DILITHIUM5_SIG_6b9f1a0e8d7c6b5a4f3e2d1c0b9a8f7e6d5c4b3a2f1e0d9c8b7a6f5e4d3c2b1a");
+        let dummy_pqc_sig = String::from(
+            "DILITHIUM5_SIG_6b9f1a0e8d7c6b5a4f3e2d1c0b9a8f7e6d5c4b3a2f1e0d9c8b7a6f5e4d3c2b1a",
+        );
 
         KernelPrDescriptor {
             pr_id: String::from("PR-KERNEL-LINUX-BSD-2026-V1"),
@@ -543,12 +562,15 @@ mod tests {
     fn test_capsicum_rights() {
         let mut cap = FreeBsdCapsicumCapabilityEngine::new();
         cap.enter_capability_mode();
-        cap.limit_fd_rights(3, CapsicumRights {
-            allow_read: true,
-            allow_write: false,
-            allow_seek: true,
-            allow_ioctl: false,
-        });
+        cap.limit_fd_rights(
+            3,
+            CapsicumRights {
+                allow_read: true,
+                allow_write: false,
+                allow_seek: true,
+                allow_ioctl: false,
+            },
+        );
 
         assert!(cap.check_rights(3, true, false));
         assert!(!cap.check_rights(3, true, true));

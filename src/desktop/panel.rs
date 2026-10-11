@@ -13,28 +13,35 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::boxed::Box;
-use std::string::{String, ToString};
 use std::format;
+use std::string::{String, ToString};
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
+use core::mem;
 /// OOP-based Desktop Panel for SigmaOS
 /// Based on Ideas-999-Structured: User Experience & Desktop Item 726
 /// Implements taskbar and panel management
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type PanelID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum PanelPosition { Top = 0, Bottom = 1, Left = 2, Right = 3 }
+pub enum PanelPosition {
+    Top = 0,
+    Bottom = 1,
+    Left = 2,
+    Right = 3,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum PanelError { Success = 0, NotFound = 1 }
+pub enum PanelError {
+    Success = 0,
+    NotFound = 1,
+}
 
 pub trait Panel {
     fn id(&self) -> PanelID;
@@ -66,7 +73,9 @@ impl SimplePanel {
 }
 
 impl Panel for SimplePanel {
-    fn id(&self) -> PanelID { self.id }
+    fn id(&self) -> PanelID {
+        self.id
+    }
     fn position(&self) -> PanelPosition {
         match self.position.load(Ordering::SeqCst) {
             0 => PanelPosition::Top,
@@ -75,13 +84,24 @@ impl Panel for SimplePanel {
             _ => PanelPosition::Right,
         }
     }
-    fn height(&self) -> u32 { self.height.load(Ordering::SeqCst) as u32 }
-    fn width(&self) -> u32 { self.width.load(Ordering::SeqCst) as u32 }
-    fn is_autohide(&self) -> bool { self.autohide.load(Ordering::SeqCst) == 1 }
+    fn height(&self) -> u32 {
+        self.height.load(Ordering::SeqCst) as u32
+    }
+    fn width(&self) -> u32 {
+        self.width.load(Ordering::SeqCst) as u32
+    }
+    fn is_autohide(&self) -> bool {
+        self.autohide.load(Ordering::SeqCst) == 1
+    }
 }
 
 pub trait PanelManager {
-    fn create_panel(&mut self, position: PanelPosition, height: u32, width: u32) -> Result<PanelID, PanelError>;
+    fn create_panel(
+        &mut self,
+        position: PanelPosition,
+        height: u32,
+        width: u32,
+    ) -> Result<PanelID, PanelError>;
     fn remove_panel(&mut self, id: PanelID) -> Result<(), PanelError>;
     fn get_panel(&self, id: PanelID) -> Option<&dyn Panel>;
     fn add_applet(&mut self, panel_id: PanelID, applet: &[u8]) -> Result<(), PanelError>;
@@ -106,13 +126,18 @@ impl SimplePanelManager {
 }
 
 impl PanelManager for SimplePanelManager {
-    fn create_panel(&mut self, position: PanelPosition, height: u32, width: u32) -> Result<PanelID, PanelError> {
+    fn create_panel(
+        &mut self,
+        position: PanelPosition,
+        height: u32,
+        width: u32,
+    ) -> Result<PanelID, PanelError> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
         let panel = SimplePanel::new(id, position, height, width);
         self.panels.push(Some(Box::new(panel)));
         Ok(id)
     }
-    
+
     fn remove_panel(&mut self, id: PanelID) -> Result<(), PanelError> {
         for panel_option in &mut self.panels {
             if let Some(ref panel) = *panel_option {
@@ -123,16 +148,18 @@ impl PanelManager for SimplePanelManager {
         }
         Err(PanelError::NotFound)
     }
-    
+
     fn get_panel(&self, id: PanelID) -> Option<&dyn Panel> {
         for panel_option in &self.panels {
             if let Some(ref panel) = *panel_option {
-                if panel.id() == id { return Some(panel.as_ref()); }
+                if panel.id() == id {
+                    return Some(panel.as_ref());
+                }
             }
         }
         None
     }
-    
+
     fn add_applet(&mut self, panel_id: PanelID, applet: &[u8]) -> Result<(), PanelError> {
         let mut applet_array = [0u8; 64];
         let applet_len = applet.len().min(63);
@@ -158,9 +185,7 @@ pub struct SimpleTaskbar {
 impl SimpleTaskbar {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        SimpleTaskbar {
-            tasks: Vec::new(),
-        }
+        SimpleTaskbar { tasks: Vec::new() }
     }
 }
 
@@ -174,7 +199,7 @@ impl Taskbar for SimpleTaskbar {
         self.tasks.push((window_id, title_array));
         Ok(())
     }
-    
+
     fn remove_task(&mut self, window_id: usize) -> Result<(), PanelError> {
         for i in 0..self.tasks.len() {
             if self.tasks[i].0 == window_id {
@@ -184,7 +209,7 @@ impl Taskbar for SimpleTaskbar {
         }
         Err(PanelError::NotFound)
     }
-    
+
     fn get_tasks(&self) -> Vec<(usize, &[u8])> {
         let mut result = Vec::new();
         for &(id, ref title) in &self.tasks {
@@ -195,13 +220,25 @@ impl Taskbar for SimpleTaskbar {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
     fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity { self.grow(); }
+            if self.len >= self.capacity {
+                self.grow();
+            }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
@@ -219,19 +256,29 @@ impl<T> Vec<T> {
         }
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
 
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
@@ -263,7 +310,6 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
         self.deref().iter()
     }
 }
-
 
 impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;

@@ -431,8 +431,7 @@ impl Sovereign2065DistroSupremacyMasterSuite {
             [0; 16],
             0xFF,
         );
-        self.wayland400_engine
-            .submit_zero_copy_frame(1, 3840, 2160);
+        self.wayland400_engine.submit_zero_copy_frame(1, 3840, 2160);
 
         100
     }

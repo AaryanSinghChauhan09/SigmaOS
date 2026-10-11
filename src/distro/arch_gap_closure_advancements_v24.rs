@@ -121,7 +121,8 @@ impl Pacman7HooksCollisionGuardEngine {
 
     pub fn register_installed_files(&mut self, pkg_name: &str, files: &[&str]) {
         for &f in files {
-            self.registered_files.insert(f.to_string(), pkg_name.to_string());
+            self.registered_files
+                .insert(f.to_string(), pkg_name.to_string());
         }
     }
 
@@ -212,15 +213,25 @@ impl AurV5PkgbuildSandboxEngine {
         for line in content.lines() {
             let trimmed = line.trim();
             if trimmed.starts_with("pkgname=") {
-                pkgname = trimmed.trim_start_matches("pkgname=").trim_matches('"').trim_matches('\'').to_string();
+                pkgname = trimmed
+                    .trim_start_matches("pkgname=")
+                    .trim_matches('"')
+                    .trim_matches('\'')
+                    .to_string();
             } else if trimmed.starts_with("pkgver=") {
-                pkgver = trimmed.trim_start_matches("pkgver=").trim_matches('"').trim_matches('\'').to_string();
+                pkgver = trimmed
+                    .trim_start_matches("pkgver=")
+                    .trim_matches('"')
+                    .trim_matches('\'')
+                    .to_string();
             } else if trimmed.starts_with("pkgrel=") {
                 if let Ok(val) = trimmed.trim_start_matches("pkgrel=").parse::<u32>() {
                     pkgrel = val;
                 }
             } else if trimmed.starts_with("depends=(") {
-                let raw = trimmed.trim_start_matches("depends=(").trim_end_matches(')');
+                let raw = trimmed
+                    .trim_start_matches("depends=(")
+                    .trim_end_matches(')');
                 for item in raw.split_whitespace() {
                     depends.push(item.trim_matches('"').trim_matches('\'').to_string());
                 }
@@ -269,8 +280,8 @@ impl CachyOsBoreSchedulerTunerEngine {
     pub fn new() -> Self {
         Self {
             active_profile: BoreOptimizationProfile::DesktopInteractive,
-            base_slice_ns: 3_000_000,       // 3ms
-            min_granularity_ns: 750_000,    // 0.75ms
+            base_slice_ns: 3_000_000,    // 3ms
+            min_granularity_ns: 750_000, // 0.75ms
             burst_factor: 4,
         }
     }
@@ -344,11 +355,17 @@ impl MicroarchIsaDetectorEngine {
     }
 
     pub fn evaluate_isa_tier(&self) -> X86MicroarchIsaLevel {
-        if self.supported_features.contains("avx512f") && self.supported_features.contains("avx512bw") {
+        if self.supported_features.contains("avx512f")
+            && self.supported_features.contains("avx512bw")
+        {
             X86MicroarchIsaLevel::V4
-        } else if self.supported_features.contains("avx2") && self.supported_features.contains("fma") {
+        } else if self.supported_features.contains("avx2")
+            && self.supported_features.contains("fma")
+        {
             X86MicroarchIsaLevel::V3
-        } else if self.supported_features.contains("sse4_2") && self.supported_features.contains("popcnt") {
+        } else if self.supported_features.contains("sse4_2")
+            && self.supported_features.contains("popcnt")
+        {
             X86MicroarchIsaLevel::V2
         } else {
             X86MicroarchIsaLevel::V1
@@ -432,7 +449,8 @@ mod tests {
         let mut guard = Pacman7HooksCollisionGuardEngine::new();
         guard.register_installed_files("filesystem", &["/etc/fstab", "/etc/hosts"]);
 
-        let collisions = guard.check_file_collisions("systemd", &["/etc/fstab", "/etc/systemd/system.conf"]);
+        let collisions =
+            guard.check_file_collisions("systemd", &["/etc/fstab", "/etc/systemd/system.conf"]);
         assert_eq!(collisions.len(), 1);
 
         let executed = guard.trigger_post_transaction_hooks(&["linux-cachyos"]);

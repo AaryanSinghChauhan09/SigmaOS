@@ -306,7 +306,11 @@ impl FedoraKojiBuildSystemEngine {
     pub fn new() -> Self {
         Self {
             tasks: BTreeMap::new(),
-            tags: vec!["f40-build".to_string(), "f40-updates-testing".to_string(), "f40".to_string()],
+            tags: vec![
+                "f40-build".to_string(),
+                "f40-updates-testing".to_string(),
+                "f40".to_string(),
+            ],
             next_task_id: 1001,
         }
     }
@@ -400,7 +404,9 @@ impl FedoraCoreOsIgnitionButaneEngine {
     }
 
     pub fn transpile_butane_to_ignition_json(&self, butane_yaml: &str) -> String {
-        let mut json = String::from("{\n  \"ignition\": { \"version\": \"3.4.0\" },\n  \"storage\": { \"files\": [\n");
+        let mut json = String::from(
+            "{\n  \"ignition\": { \"version\": \"3.4.0\" },\n  \"storage\": { \"files\": [\n",
+        );
         if butane_yaml.contains("path: /etc/hostname") {
             json.push_str("    { \"path\": \"/etc/hostname\", \"contents\": { \"source\": \"data:,sigma-coreos\" } }\n");
         } else {
@@ -496,15 +502,20 @@ impl SovereignFedoraGapClosureSuite {
         let mls_ok = self.selinux_mls.evaluate_mls_dominance(&subj, &obj);
 
         // Verify Koji
-        let k_id = self.koji.submit_build_task("bash-5.2.21-1.fc40", "f40-build");
+        let k_id = self
+            .koji
+            .submit_build_task("bash-5.2.21-1.fc40", "f40-build");
         let koji_ok = self.koji.process_task(k_id) == Ok(KojiTaskState::Closed);
 
         // Verify Bodhi
-        self.bodhi.create_update("FEDORA-2026-0001", "bash-5.2.21-1.fc40");
+        self.bodhi
+            .create_update("FEDORA-2026-0001", "bash-5.2.21-1.fc40");
         let bodhi_ok = self.bodhi.add_karma("FEDORA-2026-0001", 3) == Ok(3);
 
         // Verify Ignition
-        let ign_json = self.ignition.transpile_butane_to_ignition_json("variant: fcos\npath: /etc/hostname\n");
+        let ign_json = self
+            .ignition
+            .transpile_butane_to_ignition_json("variant: fcos\npath: /etc/hostname\n");
         let ign_ok = ign_json.contains("ignition");
 
         // Verify Rawhide

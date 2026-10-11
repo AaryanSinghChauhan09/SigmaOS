@@ -84,7 +84,8 @@ impl SolarisIllumosZfsDtracePrEngine {
             is_enabled: true,
             trigger_count: 0,
         };
-        self.probes.insert("sys:vfs:read:entry".to_string(), default_probe);
+        self.probes
+            .insert("sys:vfs:read:entry".to_string(), default_probe);
     }
 
     pub fn register_usdt_probe(
@@ -177,7 +178,11 @@ impl GnuHurdMachTranslatorPrEngine {
             .insert("/net".to_string(), "/hurd/pfinet".to_string());
     }
 
-    pub fn allocate_mach_port(&mut self, port_id: u32, right: MachPortRight) -> Result<(), &'static str> {
+    pub fn allocate_mach_port(
+        &mut self,
+        port_id: u32,
+        right: MachPortRight,
+    ) -> Result<(), &'static str> {
         if self.mach_ports.contains_key(&port_id) {
             return Err("Mach port already allocated");
         }
@@ -192,11 +197,7 @@ impl GnuHurdMachTranslatorPrEngine {
         Ok(())
     }
 
-    pub fn settrans_active_translator(
-        &mut self,
-        path: &str,
-        translator_binary: &str,
-    ) -> String {
+    pub fn settrans_active_translator(&mut self, path: &str, translator_binary: &str) -> String {
         self.active_translators
             .insert(path.to_string(), translator_binary.to_string());
         format!("Hurd settrans bound {} -> {}", path, translator_binary)
@@ -246,7 +247,8 @@ impl ReactOsWin32ExecutivePrEngine {
                 handle_count: 1,
             },
         );
-        self.handle_table.insert(0x0004, "\\Device\\HarddiskVolume1".to_string());
+        self.handle_table
+            .insert(0x0004, "\\Device\\HarddiskVolume1".to_string());
     }
 
     pub fn create_nt_object(
@@ -329,7 +331,10 @@ impl GenodeCapabilityFrameworkPrEngine {
             active_sessions: vec!["LOG".to_string(), "ROM".to_string()],
         };
         self.domains.insert(child_name.to_string(), domain);
-        Ok(format!("Spawned Genode capability child [{}] with {} MB RAM", child_name, ram_quota_mb))
+        Ok(format!(
+            "Spawned Genode capability child [{}] with {} MB RAM",
+            child_name, ram_quota_mb
+        ))
     }
 }
 
@@ -378,11 +383,7 @@ impl HelenOsPhantomPersistentMemoryPrEngine {
         );
     }
 
-    pub fn create_orthogonal_snapshot(
-        &mut self,
-        state_hash: &str,
-        heap_bytes: u64,
-    ) -> u64 {
+    pub fn create_orthogonal_snapshot(&mut self, state_hash: &str, heap_bytes: u64) -> u64 {
         let id = (self.snapshots.len() as u64) + 101;
         let snap = PhantomPersistentSnapshot {
             snapshot_id: id,
@@ -437,12 +438,7 @@ impl NuttxRtMicrokernelSchedulerPrEngine {
         });
     }
 
-    pub fn schedule_work_task(
-        &mut self,
-        name: &str,
-        priority: u8,
-        is_hpwork: bool,
-    ) -> u32 {
+    pub fn schedule_work_task(&mut self, name: &str, priority: u8, is_hpwork: bool) -> u32 {
         let task_id = (self.work_queue.len() as u32) + 1;
         self.work_queue.push(NuttxWorkTask {
             task_id,
@@ -633,8 +629,17 @@ mod tests {
         );
 
         assert!(master.validate_os_pr(pr_id).unwrap());
-        assert!(master.transpile_os_pr(pr_id).unwrap().contains("Transpiled"));
-        assert!(master.generate_pr_diff(pr_id).unwrap().contains("--- a/src/distro"));
-        assert!(master.merge_os_pr(pr_id).unwrap().contains("Successfully merged PR #1"));
+        assert!(master
+            .transpile_os_pr(pr_id)
+            .unwrap()
+            .contains("Transpiled"));
+        assert!(master
+            .generate_pr_diff(pr_id)
+            .unwrap()
+            .contains("--- a/src/distro"));
+        assert!(master
+            .merge_os_pr(pr_id)
+            .unwrap()
+            .contains("Successfully merged PR #1"));
     }
 }

@@ -84,15 +84,60 @@ impl PrivacyManager {
     /// Add default settings
     fn add_default_settings(&mut self) {
         let settings = vec![
-            ("telemetry", "Telemetry", "Send anonymous usage data", "Data Collection"),
-            ("crash-reports", "Crash Reports", "Send crash reports to developers", "Data Collection"),
-            ("location-services", "Location Services", "Allow applications to access location", "Permissions"),
-            ("camera-access", "Camera Access", "Allow applications to access camera", "Permissions"),
-            ("microphone-access", "Microphone Access", "Allow applications to access microphone", "Permissions"),
-            ("desktop-notifications", "Desktop Notifications", "Allow desktop notifications", "Notifications"),
-            ("background-activity", "Background Activity", "Allow applications to run in background", "Permissions"),
-            ("search-history", "Search History", "Save search history", "Data Collection"),
-            ("analytics", "Analytics", "Send analytics data", "Data Collection"),
+            (
+                "telemetry",
+                "Telemetry",
+                "Send anonymous usage data",
+                "Data Collection",
+            ),
+            (
+                "crash-reports",
+                "Crash Reports",
+                "Send crash reports to developers",
+                "Data Collection",
+            ),
+            (
+                "location-services",
+                "Location Services",
+                "Allow applications to access location",
+                "Permissions",
+            ),
+            (
+                "camera-access",
+                "Camera Access",
+                "Allow applications to access camera",
+                "Permissions",
+            ),
+            (
+                "microphone-access",
+                "Microphone Access",
+                "Allow applications to access microphone",
+                "Permissions",
+            ),
+            (
+                "desktop-notifications",
+                "Desktop Notifications",
+                "Allow desktop notifications",
+                "Notifications",
+            ),
+            (
+                "background-activity",
+                "Background Activity",
+                "Allow applications to run in background",
+                "Permissions",
+            ),
+            (
+                "search-history",
+                "Search History",
+                "Save search history",
+                "Data Collection",
+            ),
+            (
+                "analytics",
+                "Analytics",
+                "Send analytics data",
+                "Data Collection",
+            ),
         ];
 
         for (id, name, description, category) in settings {
@@ -123,14 +168,17 @@ impl PrivacyManager {
 
     /// List by category
     pub fn list_by_category(&self, category: &str) -> Vec<&PrivacySetting> {
-        self.settings.values()
+        self.settings
+            .values()
             .filter(|s| s.category == category)
             .collect()
     }
 
     /// Enable a setting
     pub fn enable(&mut self, id: &str) -> Result<(), String> {
-        let setting = self.settings.get_mut(id)
+        let setting = self
+            .settings
+            .get_mut(id)
             .ok_or_else(|| format!("Setting {} not found", id))?;
 
         setting.set_enabled(true);
@@ -139,7 +187,9 @@ impl PrivacyManager {
 
     /// Disable a setting
     pub fn disable(&mut self, id: &str) -> Result<(), String> {
-        let setting = self.settings.get_mut(id)
+        let setting = self
+            .settings
+            .get_mut(id)
             .ok_or_else(|| format!("Setting {} not found", id))?;
 
         setting.set_enabled(false);
@@ -178,13 +228,15 @@ impl PrivacyManager {
     /// Get statistics
     pub fn get_statistics(&self) -> PrivacyStatistics {
         let total_settings = self.settings.len();
-        let enabled_count = self.settings.values()
-            .filter(|s| s.is_enabled)
-            .count();
-        let data_collection_count = self.settings.values()
+        let enabled_count = self.settings.values().filter(|s| s.is_enabled).count();
+        let data_collection_count = self
+            .settings
+            .values()
             .filter(|s| s.category == "Data Collection" && s.is_enabled)
             .count();
-        let permissions_count = self.settings.values()
+        let permissions_count = self
+            .settings
+            .values()
             .filter(|s| s.category == "Permissions")
             .count();
 
@@ -220,8 +272,14 @@ mod tests {
 
     #[test]
     fn test_privacy_level_from_str() {
-        assert_eq!(PrivacyLevel::from_str("standard"), Some(PrivacyLevel::Standard));
-        assert_eq!(PrivacyLevel::from_str("maximum"), Some(PrivacyLevel::Maximum));
+        assert_eq!(
+            PrivacyLevel::from_str("standard"),
+            Some(PrivacyLevel::Standard)
+        );
+        assert_eq!(
+            PrivacyLevel::from_str("maximum"),
+            Some(PrivacyLevel::Maximum)
+        );
     }
 
     #[test]

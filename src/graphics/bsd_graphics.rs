@@ -1,10 +1,9 @@
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 // SPDX-License-Identifier: MIT
 // BSD-Inspired Graphics & Display Subsystem Innovations
 // Clean-room implementations of FreeBSD vt(4)/wscons, OpenBSD drm(4)/KMS, DragonFly LWKT SMP rendering rings, and FreeBSD kqueue-backed Compositors.
-
 
 /// Virtual Console Display Mode (FreeBSD vt(4) / NetBSD wscons inspired)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -96,7 +95,12 @@ impl OpenBsdDrmKmsSovereignShim {
         }
     }
 
-    pub fn create_dumb_buffer(&mut self, width: u32, height: u32, bpp: u32) -> Result<DrmDumbBuffer, &'static str> {
+    pub fn create_dumb_buffer(
+        &mut self,
+        width: u32,
+        height: u32,
+        bpp: u32,
+    ) -> Result<DrmDumbBuffer, &'static str> {
         let pitch = width * (bpp / 8);
         let size = (pitch * height) as usize;
         let handle = self.next_handle;
@@ -129,8 +133,18 @@ impl Default for OpenBsdDrmKmsSovereignShim {
 /// Render Command for SMP Ring Queue
 #[derive(Debug, Clone)]
 pub enum RenderCommand {
-    FillRect { x: u32, y: u32, w: u32, h: u32, color: u32 },
-    CopyBuffer { src_handle: u32, dest_x: u32, dest_y: u32 },
+    FillRect {
+        x: u32,
+        y: u32,
+        w: u32,
+        h: u32,
+        color: u32,
+    },
+    CopyBuffer {
+        src_handle: u32,
+        dest_x: u32,
+        dest_y: u32,
+    },
     SyncVblank,
 }
 
@@ -230,8 +244,13 @@ mod tests {
     fn test_dragonfly_smp_ring() {
         let mut ring = DragonFlySmpGraphicsRing::new(0, 10);
         ring.push_command(RenderCommand::FillRect {
-            x: 0, y: 0, w: 10, h: 10, color: 0xFFFFFF
-        }).unwrap();
+            x: 0,
+            y: 0,
+            w: 10,
+            h: 10,
+            color: 0xFFFFFF,
+        })
+        .unwrap();
 
         let mut processed = 0;
         ring.process_commands(|_cmd| {

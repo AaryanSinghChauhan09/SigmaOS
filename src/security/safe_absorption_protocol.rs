@@ -15,9 +15,9 @@
 // Stage 3: Integration & Validation (SigmaOS adapter module, unit tests, QEMU functional testing, performance baseline, Sentinel 🛡️ security audit)
 
 use std::collections::BTreeMap;
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 
 // =========================================================================
 // STAGE 1: SOURCE VALIDATION
@@ -91,8 +91,17 @@ pub struct AdaptationDesignSpec {
 }
 
 impl AdaptationDesignSpec {
-    pub fn new(hal_name: &str, no_std: bool, unsafe_points: Vec<String>, error_contract: bool) -> Self {
-        let passed = no_std && error_contract && unsafe_points.iter().all(|p| p.contains("MMIO") || p.contains("DMA"));
+    pub fn new(
+        hal_name: &str,
+        no_std: bool,
+        unsafe_points: Vec<String>,
+        error_contract: bool,
+    ) -> Self {
+        let passed = no_std
+            && error_contract
+            && unsafe_points
+                .iter()
+                .all(|p| p.contains("MMIO") || p.contains("DMA"));
         Self {
             hal_wrapper_name: hal_name.to_string(),
             is_no_std_compatible: no_std,
@@ -147,7 +156,14 @@ impl IntegrationValidationReport {
 // =========================================================================
 
 pub struct SafeAbsorptionProtocolEngine {
-    pub absorbed_components: BTreeMap<String, (SourceValidationResult, AdaptationDesignSpec, IntegrationValidationReport)>,
+    pub absorbed_components: BTreeMap<
+        String,
+        (
+            SourceValidationResult,
+            AdaptationDesignSpec,
+            IntegrationValidationReport,
+        ),
+    >,
 }
 
 impl SafeAbsorptionProtocolEngine {
@@ -171,10 +187,13 @@ impl SafeAbsorptionProtocolEngine {
             return Err("SafeAbsorption: Failed Stage 2 Adaptation Design filter");
         }
         if !stage3.stage3_passed {
-            return Err("SafeAbsorption: Failed Stage 3 Integration & Sentinel Security Audit filter");
+            return Err(
+                "SafeAbsorption: Failed Stage 3 Integration & Sentinel Security Audit filter",
+            );
         }
 
-        self.absorbed_components.insert(name.to_string(), (stage1, stage2, stage3));
+        self.absorbed_components
+            .insert(name.to_string(), (stage1, stage2, stage3));
         Ok(true)
     }
 }
@@ -196,17 +215,34 @@ mod tests {
 
     #[test]
     fn test_safe_absorption_protocol_pipeline() {
-        let stage1 = SourceValidationResult::evaluate("VirtIO-Net", LicenseType::Mit, 2, ExecutionRing::Ring0Kernel, 0, true);
+        let stage1 = SourceValidationResult::evaluate(
+            "VirtIO-Net",
+            LicenseType::Mit,
+            2,
+            ExecutionRing::Ring0Kernel,
+            0,
+            true,
+        );
         assert!(stage1.stage1_passed);
 
-        let stage2 = AdaptationDesignSpec::new("VirtIoNetHalWrapper", true, vec!["MMIO Base Access".to_string(), "DMA Ring Buffer".to_string()], true);
+        let stage2 = AdaptationDesignSpec::new(
+            "VirtIoNetHalWrapper",
+            true,
+            vec![
+                "MMIO Base Access".to_string(),
+                "DMA Ring Buffer".to_string(),
+            ],
+            true,
+        );
         assert!(stage2.stage2_passed);
 
         let stage3 = IntegrationValidationReport::verify(true, 95, true, 0.98, true);
         assert!(stage3.stage3_passed);
 
         let mut engine = SafeAbsorptionProtocolEngine::new();
-        assert!(engine.process_absorption_pipeline("VirtIO-Net", stage1, stage2, stage3).unwrap());
+        assert!(engine
+            .process_absorption_pipeline("VirtIO-Net", stage1, stage2, stage3)
+            .unwrap());
         assert_eq!(engine.absorbed_components.len(), 1);
     }
 }

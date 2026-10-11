@@ -877,12 +877,24 @@ mod tests {
         assert_eq!(validate_command(b"printf 'a\tb'"), Ok(()));
 
         assert_eq!(validate_command(b""), Err(ValidationError::EmptyInput));
-        assert_eq!(validate_command(&[b'a', 0, b'b']), Err(ValidationError::NullByte));
+        assert_eq!(
+            validate_command(&[b'a', 0, b'b']),
+            Err(ValidationError::NullByte)
+        );
 
         // ASCII control character injection prevention (prevents ANSI escape hijacking and terminal injection)
-        assert_eq!(validate_command(b"echo \x1b[31mred\x1b[0m"), Err(ValidationError::InvalidChars));
-        assert_eq!(validate_command(b"ls \x07"), Err(ValidationError::InvalidChars));
-        assert_eq!(validate_command(b"rm \x7f"), Err(ValidationError::InvalidChars));
+        assert_eq!(
+            validate_command(b"echo \x1b[31mred\x1b[0m"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_command(b"ls \x07"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_command(b"rm \x7f"),
+            Err(ValidationError::InvalidChars)
+        );
 
         let long_cmd = vec![b'a'; MAX_COMMAND_LEN + 1];
         assert_eq!(validate_command(&long_cmd), Err(ValidationError::TooLong));
@@ -909,18 +921,39 @@ mod tests {
 
         // Empty and length checks
         assert_eq!(validate_mac_address(b""), Err(ValidationError::EmptyInput));
-        assert_eq!(validate_mac_address(b"00:1A:2B:3C:4D"), Err(ValidationError::OutOfRange));
-        assert_eq!(validate_mac_address(b"00:1A:2B:3C:4D:5E:6F"), Err(ValidationError::TooLong));
+        assert_eq!(
+            validate_mac_address(b"00:1A:2B:3C:4D"),
+            Err(ValidationError::OutOfRange)
+        );
+        assert_eq!(
+            validate_mac_address(b"00:1A:2B:3C:4D:5E:6F"),
+            Err(ValidationError::TooLong)
+        );
 
         // Mixed delimiters (rejected to prevent parser differential attacks)
-        assert_eq!(validate_mac_address(b"00:1A-2B:3C-4D:5E"), Err(ValidationError::InvalidChars));
-        assert_eq!(validate_mac_address(b"00-1A:2B-3C:4D-5E"), Err(ValidationError::InvalidChars));
+        assert_eq!(
+            validate_mac_address(b"00:1A-2B:3C-4D:5E"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_mac_address(b"00-1A:2B-3C:4D-5E"),
+            Err(ValidationError::InvalidChars)
+        );
 
         // Invalid delimiter character
-        assert_eq!(validate_mac_address(b"00.1A.2B.3C.4D.5E"), Err(ValidationError::InvalidChars));
+        assert_eq!(
+            validate_mac_address(b"00.1A.2B.3C.4D.5E"),
+            Err(ValidationError::InvalidChars)
+        );
 
         // Non-hex digits
-        assert_eq!(validate_mac_address(b"00:1G:2B:3C:4D:5E"), Err(ValidationError::InvalidChars));
-        assert_eq!(validate_mac_address(b"00:1A:2B:3C:4D:5Z"), Err(ValidationError::InvalidChars));
+        assert_eq!(
+            validate_mac_address(b"00:1G:2B:3C:4D:5E"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_mac_address(b"00:1A:2B:3C:4D:5Z"),
+            Err(ValidationError::InvalidChars)
+        );
     }
 }

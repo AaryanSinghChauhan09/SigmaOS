@@ -2628,7 +2628,12 @@ impl LinuxCgroupsV2ResourceControllerEngine {
         }
     }
 
-    pub fn submit_cgroup_pr(&mut self, cgroup_path: &str, max_memory_mb: u64, cpu_quota_pct: u32) -> u64 {
+    pub fn submit_cgroup_pr(
+        &mut self,
+        cgroup_path: &str,
+        max_memory_mb: u64,
+        cpu_quota_pct: u32,
+    ) -> u64 {
         let id = self.pr_counter;
         self.pr_counter += 1;
         self.controllers.insert(
@@ -2644,7 +2649,10 @@ impl LinuxCgroupsV2ResourceControllerEngine {
         id
     }
 
-    pub fn validate_and_enforce_resource_limits(&mut self, pr_id: u64) -> Result<bool, &'static str> {
+    pub fn validate_and_enforce_resource_limits(
+        &mut self,
+        pr_id: u64,
+    ) -> Result<bool, &'static str> {
         if let Some(ctrl) = self.controllers.get_mut(&pr_id) {
             ctrl.active = true;
             Ok(true)
@@ -5477,7 +5485,8 @@ mod tests {
     #[test]
     fn test_freebsd_capsicum_pr_engine() {
         let mut capsicum = FreeBsdCapsicumCapabilitySandboxPrEngine::new();
-        let pr_id = capsicum.submit_capsicum_pr(&["CAP_READ", "CAP_WRITE", "CAP_FSTAT"], "sandbox_proc");
+        let pr_id =
+            capsicum.submit_capsicum_pr(&["CAP_READ", "CAP_WRITE", "CAP_FSTAT"], "sandbox_proc");
         assert_eq!(pr_id, 1);
         assert!(!capsicum.records[&pr_id].in_capability_mode);
         let entered = capsicum.validate_and_enter_capability_mode(pr_id).unwrap();

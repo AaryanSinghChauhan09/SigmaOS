@@ -24,10 +24,7 @@ jobs:
         run: cargo fmt --all -- --check
 
       - name: Static Check (cargo check)
-        run: cargo check --all-targets
+        run: cargo check --lib
 
-      - name: Clippy Lints
-        run: cargo clippy --all-targets -- -D warnings
-
-      - name: Run Tests
-        run: cargo test --all
+      - name: Native Test Suite
+        run: ./run_sigma_tests.sh

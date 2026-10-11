@@ -301,9 +301,16 @@ impl NetBsdRumpHypercallIsolationBridge {
         }
     }
 
-    pub fn dispatch_rump_syscall(&mut self, driver_name: &str, call_id: u32) -> Result<u64, String> {
+    pub fn dispatch_rump_syscall(
+        &mut self,
+        driver_name: &str,
+        call_id: u32,
+    ) -> Result<u64, String> {
         if !self.isolated_drivers.contains(&driver_name.to_string()) {
-            return Err(format!("rump: Driver '{}' not registered in userland", driver_name));
+            return Err(format!(
+                "rump: Driver '{}' not registered in userland",
+                driver_name
+            ));
         }
 
         self.hypercall_count += 1;
@@ -352,7 +359,8 @@ impl SovereignNetBsdParityEngine {
         let sensor_ok = self.sysmon.update_temperature("cpu0_temp", 80.0);
 
         // 3. Verify pkgsrc
-        self.pkgsrc.configure_pkg_options("zsh", &["pcre", "multibyte"]);
+        self.pkgsrc
+            .configure_pkg_options("zsh", &["pcre", "multibyte"]);
         let pkg_ok = self.pkgsrc.build_pbulk_target("zsh").is_ok();
 
         // 4. Verify npf
@@ -416,14 +424,8 @@ mod tests {
     fn test_netbsd_npf_filter() {
         let mut npf = NetBsdNpfBytecodePacketFilter::new();
         npf.add_rule(10, "vioif0", NpfRuleAction::Block, 22);
-        assert_eq!(
-            npf.evaluate_packet("vioif0", 22),
-            NpfRuleAction::Block
-        );
-        assert_eq!(
-            npf.evaluate_packet("vioif0", 443),
-            NpfRuleAction::Pass
-        );
+        assert_eq!(npf.evaluate_packet("vioif0", 22), NpfRuleAction::Block);
+        assert_eq!(npf.evaluate_packet("vioif0", 443), NpfRuleAction::Pass);
     }
 
     #[test]

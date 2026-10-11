@@ -207,19 +207,136 @@ impl SystemUtilityRegistry {
 
     fn seed_default_commands(&mut self) {
         let defaults = [
-            ("cat", "Concatenate and print files", PrivilegeLevel::User, MutationBehavior::ReadOnly, BackendDependency::Vfs, "SentinelTeam", UtilityStatus::Integrated, "man/cat.1"),
-            ("pwd", "Print working directory name", PrivilegeLevel::User, MutationBehavior::ReadOnly, BackendDependency::Vfs, "SentinelTeam", UtilityStatus::Integrated, "man/pwd.1"),
-            ("ls", "List directory contents", PrivilegeLevel::User, MutationBehavior::ReadOnly, BackendDependency::Vfs, "SentinelTeam", UtilityStatus::Integrated, "man/ls.1"),
-            ("stat", "Display file or filesystem status", PrivilegeLevel::User, MutationBehavior::ReadOnly, BackendDependency::Vfs, "SentinelTeam", UtilityStatus::Integrated, "man/stat.1"),
-            ("mkdir", "Make directories", PrivilegeLevel::User, MutationBehavior::MutatingSafe, BackendDependency::Vfs, "SentinelTeam", UtilityStatus::Integrated, "man/mkdir.1"),
-            ("touch", "Change file access and modification times", PrivilegeLevel::User, MutationBehavior::MutatingSafe, BackendDependency::Vfs, "SentinelTeam", UtilityStatus::Integrated, "man/touch.1"),
-            ("cp", "Copy files and directories", PrivilegeLevel::User, MutationBehavior::MutatingSafe, BackendDependency::Vfs, "SentinelTeam", UtilityStatus::Proposed, "man/cp.1"),
-            ("mv", "Move files", PrivilegeLevel::User, MutationBehavior::MutatingSafe, BackendDependency::Vfs, "SentinelTeam", UtilityStatus::Proposed, "man/mv.1"),
-            ("rm", "Remove files or directories", PrivilegeLevel::User, MutationBehavior::MutatingDestructive, BackendDependency::Vfs, "SentinelTeam", UtilityStatus::Proposed, "man/rm.1"),
-            ("ps", "Report process status", PrivilegeLevel::User, MutationBehavior::ReadOnly, BackendDependency::ProcessManager, "SentinelTeam", UtilityStatus::Proposed, "man/ps.1"),
-            ("df", "Report file system disk space usage", PrivilegeLevel::User, MutationBehavior::ReadOnly, BackendDependency::Vfs, "SentinelTeam", UtilityStatus::Proposed, "man/df.1"),
-            ("sigma-diag", "SigmaOS system status and diagnostics", PrivilegeLevel::Admin, MutationBehavior::ReadOnly, BackendDependency::SystemInfo, "SentinelTeam", UtilityStatus::Integrated, "man/sigma-diag.1"),
-            ("sigma-periodic", "Scheduled maintenance task runner", PrivilegeLevel::Admin, MutationBehavior::ReadOnly, BackendDependency::SystemInfo, "SentinelTeam", UtilityStatus::Proposed, "man/sigma-periodic.1"),
+            (
+                "cat",
+                "Concatenate and print files",
+                PrivilegeLevel::User,
+                MutationBehavior::ReadOnly,
+                BackendDependency::Vfs,
+                "SentinelTeam",
+                UtilityStatus::Integrated,
+                "man/cat.1",
+            ),
+            (
+                "pwd",
+                "Print working directory name",
+                PrivilegeLevel::User,
+                MutationBehavior::ReadOnly,
+                BackendDependency::Vfs,
+                "SentinelTeam",
+                UtilityStatus::Integrated,
+                "man/pwd.1",
+            ),
+            (
+                "ls",
+                "List directory contents",
+                PrivilegeLevel::User,
+                MutationBehavior::ReadOnly,
+                BackendDependency::Vfs,
+                "SentinelTeam",
+                UtilityStatus::Integrated,
+                "man/ls.1",
+            ),
+            (
+                "stat",
+                "Display file or filesystem status",
+                PrivilegeLevel::User,
+                MutationBehavior::ReadOnly,
+                BackendDependency::Vfs,
+                "SentinelTeam",
+                UtilityStatus::Integrated,
+                "man/stat.1",
+            ),
+            (
+                "mkdir",
+                "Make directories",
+                PrivilegeLevel::User,
+                MutationBehavior::MutatingSafe,
+                BackendDependency::Vfs,
+                "SentinelTeam",
+                UtilityStatus::Integrated,
+                "man/mkdir.1",
+            ),
+            (
+                "touch",
+                "Change file access and modification times",
+                PrivilegeLevel::User,
+                MutationBehavior::MutatingSafe,
+                BackendDependency::Vfs,
+                "SentinelTeam",
+                UtilityStatus::Integrated,
+                "man/touch.1",
+            ),
+            (
+                "cp",
+                "Copy files and directories",
+                PrivilegeLevel::User,
+                MutationBehavior::MutatingSafe,
+                BackendDependency::Vfs,
+                "SentinelTeam",
+                UtilityStatus::Proposed,
+                "man/cp.1",
+            ),
+            (
+                "mv",
+                "Move files",
+                PrivilegeLevel::User,
+                MutationBehavior::MutatingSafe,
+                BackendDependency::Vfs,
+                "SentinelTeam",
+                UtilityStatus::Proposed,
+                "man/mv.1",
+            ),
+            (
+                "rm",
+                "Remove files or directories",
+                PrivilegeLevel::User,
+                MutationBehavior::MutatingDestructive,
+                BackendDependency::Vfs,
+                "SentinelTeam",
+                UtilityStatus::Proposed,
+                "man/rm.1",
+            ),
+            (
+                "ps",
+                "Report process status",
+                PrivilegeLevel::User,
+                MutationBehavior::ReadOnly,
+                BackendDependency::ProcessManager,
+                "SentinelTeam",
+                UtilityStatus::Proposed,
+                "man/ps.1",
+            ),
+            (
+                "df",
+                "Report file system disk space usage",
+                PrivilegeLevel::User,
+                MutationBehavior::ReadOnly,
+                BackendDependency::Vfs,
+                "SentinelTeam",
+                UtilityStatus::Proposed,
+                "man/df.1",
+            ),
+            (
+                "sigma-diag",
+                "SigmaOS system status and diagnostics",
+                PrivilegeLevel::Admin,
+                MutationBehavior::ReadOnly,
+                BackendDependency::SystemInfo,
+                "SentinelTeam",
+                UtilityStatus::Integrated,
+                "man/sigma-diag.1",
+            ),
+            (
+                "sigma-periodic",
+                "Scheduled maintenance task runner",
+                PrivilegeLevel::Admin,
+                MutationBehavior::ReadOnly,
+                BackendDependency::SystemInfo,
+                "SentinelTeam",
+                UtilityStatus::Proposed,
+                "man/sigma-periodic.1",
+            ),
         ];
 
         for (name, syn, priv_lvl, mut_lvl, back, owner, status, man) in defaults {
@@ -251,7 +368,9 @@ impl SystemUtilityRegistry {
     pub fn integrated_count(&self) -> usize {
         self.registry
             .values()
-            .filter(|c| c.status == UtilityStatus::Integrated || c.status == UtilityStatus::Supported)
+            .filter(|c| {
+                c.status == UtilityStatus::Integrated || c.status == UtilityStatus::Supported
+            })
             .count()
     }
 }
@@ -284,7 +403,10 @@ impl PwdEngine {
 pub struct CatEngine;
 
 impl CatEngine {
-    pub fn run(files: &[(&str, Option<&str>)], parser: &SystemUtilityArgParser) -> SystemUtilityOutput {
+    pub fn run(
+        files: &[(&str, Option<&str>)],
+        parser: &SystemUtilityArgParser,
+    ) -> SystemUtilityOutput {
         let mut stdout = String::new();
         let mut stderr = String::new();
         let mut status = EXIT_SUCCESS;
@@ -309,7 +431,11 @@ impl CatEngine {
         };
 
         if parser.format_json {
-            let json = format!("{{\"status\": {}, \"bytes_read\": {}}}", status, output.stdout.len());
+            let json = format!(
+                "{{\"status\": {}, \"bytes_read\": {}}}",
+                status,
+                output.stdout.len()
+            );
             output = output.with_json(json);
         }
 
@@ -323,10 +449,18 @@ pub struct StatEngine;
 impl StatEngine {
     pub fn run(path: &str, file_exists: bool, file_size: u64) -> SystemUtilityOutput {
         if !file_exists {
-            return SystemUtilityOutput::failure(EXIT_FAILURE, format!("stat: cannot stat '{}': No such file or directory\n", path));
+            return SystemUtilityOutput::failure(
+                EXIT_FAILURE,
+                format!("stat: cannot stat '{}': No such file or directory\n", path),
+            );
         }
 
-        let stdout = format!("  File: {}\n  Size: {}\tBlocks: {}\tIO Block: 4096\n", path, file_size, (file_size + 511) / 512);
+        let stdout = format!(
+            "  File: {}\n  Size: {}\tBlocks: {}\tIO Block: 4096\n",
+            path,
+            file_size,
+            (file_size + 511) / 512
+        );
         let json = format!("{{\"file\": \"{}\", \"size\": {}}}", path, file_size);
         SystemUtilityOutput::success(stdout).with_json(json)
     }

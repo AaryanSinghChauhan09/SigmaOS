@@ -177,7 +177,9 @@ impl SoftwarePackageManager {
             "Community Repository".to_string(),
             "https://packages.sigmaos.org/community".to_string(),
         );
-        manager.repositories.insert("community".to_string(), community_repo);
+        manager
+            .repositories
+            .insert("community".to_string(), community_repo);
 
         // Add default packages
         manager.add_default_packages();
@@ -188,11 +190,41 @@ impl SoftwarePackageManager {
     /// Add default packages
     fn add_default_packages(&mut self) {
         let packages = vec![
-            ("sigma-terminal", "Sigma Terminal", "1.0.0", "Terminal emulator", AppPackageCategory::System),
-            ("sigma-file-manager", "Sigma File Manager", "1.0.0", "File manager", AppPackageCategory::System),
-            ("sigma-text-editor", "Sigma Text Editor", "1.0.0", "Text editor", AppPackageCategory::Development),
-            ("sigma-web-browser", "Sigma Web Browser", "1.0.0", "Web browser", AppPackageCategory::Network),
-            ("sigma-media-player", "Sigma Media Player", "1.0.0", "Media player", AppPackageCategory::Multimedia),
+            (
+                "sigma-terminal",
+                "Sigma Terminal",
+                "1.0.0",
+                "Terminal emulator",
+                AppPackageCategory::System,
+            ),
+            (
+                "sigma-file-manager",
+                "Sigma File Manager",
+                "1.0.0",
+                "File manager",
+                AppPackageCategory::System,
+            ),
+            (
+                "sigma-text-editor",
+                "Sigma Text Editor",
+                "1.0.0",
+                "Text editor",
+                AppPackageCategory::Development,
+            ),
+            (
+                "sigma-web-browser",
+                "Sigma Web Browser",
+                "1.0.0",
+                "Web browser",
+                AppPackageCategory::Network,
+            ),
+            (
+                "sigma-media-player",
+                "Sigma Media Player",
+                "1.0.0",
+                "Media player",
+                AppPackageCategory::Multimedia,
+            ),
         ];
 
         for (id, name, version, description, category) in packages {
@@ -226,14 +258,16 @@ impl SoftwarePackageManager {
 
     /// List packages by category
     pub fn list_by_category(&self, category: AppPackageCategory) -> Vec<&AppPackage> {
-        self.packages.values()
+        self.packages
+            .values()
             .filter(|p| p.category == category)
             .collect()
     }
 
     /// List packages by status
     pub fn list_by_status(&self, status: AppPackageStatus) -> Vec<&AppPackage> {
-        self.packages.values()
+        self.packages
+            .values()
             .filter(|p| p.status == status)
             .collect()
     }
@@ -241,17 +275,20 @@ impl SoftwarePackageManager {
     /// Search packages
     pub fn search(&self, query: &str) -> Vec<&AppPackage> {
         let query_lower = query.to_lowercase();
-        self.packages.values()
+        self.packages
+            .values()
             .filter(|p| {
-                p.name.to_lowercase().contains(&query_lower) ||
-                p.description.to_lowercase().contains(&query_lower)
+                p.name.to_lowercase().contains(&query_lower)
+                    || p.description.to_lowercase().contains(&query_lower)
             })
             .collect()
     }
 
     /// Install a package
     pub fn install(&mut self, id: &str) -> Result<(), String> {
-        let package = self.packages.get_mut(id)
+        let package = self
+            .packages
+            .get_mut(id)
             .ok_or_else(|| format!("AppPackage {} not found", id))?;
 
         if package.status == AppPackageStatus::Installed {
@@ -264,7 +301,9 @@ impl SoftwarePackageManager {
 
     /// Remove a package
     pub fn remove(&mut self, id: &str) -> Result<(), String> {
-        let package = self.packages.get_mut(id)
+        let package = self
+            .packages
+            .get_mut(id)
             .ok_or_else(|| format!("AppPackage {} not found", id))?;
 
         if package.status == AppPackageStatus::NotInstalled {
@@ -277,7 +316,9 @@ impl SoftwarePackageManager {
 
     /// Update a package
     pub fn update(&mut self, id: &str) -> Result<(), String> {
-        let package = self.packages.get_mut(id)
+        let package = self
+            .packages
+            .get_mut(id)
             .ok_or_else(|| format!("AppPackage {} not found", id))?;
 
         if package.status != AppPackageStatus::UpdateAvailable {
@@ -290,7 +331,9 @@ impl SoftwarePackageManager {
 
     /// Pin a package
     pub fn pin(&mut self, id: &str) -> Result<(), String> {
-        let package = self.packages.get_mut(id)
+        let package = self
+            .packages
+            .get_mut(id)
             .ok_or_else(|| format!("AppPackage {} not found", id))?;
 
         package.set_status(AppPackageStatus::Pinned);
@@ -314,7 +357,9 @@ impl SoftwarePackageManager {
 
     /// Enable a repository
     pub fn enable_repository(&mut self, id: &str) -> Result<(), String> {
-        let repo = self.repositories.get_mut(id)
+        let repo = self
+            .repositories
+            .get_mut(id)
             .ok_or_else(|| format!("Repository {} not found", id))?;
 
         repo.set_enabled(true);
@@ -323,7 +368,9 @@ impl SoftwarePackageManager {
 
     /// Disable a repository
     pub fn disable_repository(&mut self, id: &str) -> Result<(), String> {
-        let repo = self.repositories.get_mut(id)
+        let repo = self
+            .repositories
+            .get_mut(id)
             .ok_or_else(|| format!("Repository {} not found", id))?;
 
         repo.set_enabled(false);
@@ -333,16 +380,18 @@ impl SoftwarePackageManager {
     /// Get statistics
     pub fn get_statistics(&self) -> SoftwarePackageStatistics {
         let total_packages = self.packages.len();
-        let installed_count = self.packages.values()
+        let installed_count = self
+            .packages
+            .values()
             .filter(|p| p.status == AppPackageStatus::Installed)
             .count();
-        let update_available_count = self.packages.values()
+        let update_available_count = self
+            .packages
+            .values()
             .filter(|p| p.status == AppPackageStatus::UpdateAvailable)
             .count();
         let total_repositories = self.repositories.len();
-        let enabled_repositories = self.repositories.values()
-            .filter(|r| r.is_enabled)
-            .count();
+        let enabled_repositories = self.repositories.values().filter(|r| r.is_enabled).count();
 
         SoftwarePackageStatistics {
             total_packages,
@@ -376,14 +425,26 @@ mod tests {
 
     #[test]
     fn test_package_status_from_str() {
-        assert_eq!(AppPackageStatus::from_str("installed"), Some(AppPackageStatus::Installed));
-        assert_eq!(AppPackageStatus::from_str("notinstalled"), Some(AppPackageStatus::NotInstalled));
+        assert_eq!(
+            AppPackageStatus::from_str("installed"),
+            Some(AppPackageStatus::Installed)
+        );
+        assert_eq!(
+            AppPackageStatus::from_str("notinstalled"),
+            Some(AppPackageStatus::NotInstalled)
+        );
     }
 
     #[test]
     fn test_package_category_from_str() {
-        assert_eq!(AppPackageCategory::from_str("system"), Some(AppPackageCategory::System));
-        assert_eq!(AppPackageCategory::from_str("development"), Some(AppPackageCategory::Development));
+        assert_eq!(
+            AppPackageCategory::from_str("system"),
+            Some(AppPackageCategory::System)
+        );
+        assert_eq!(
+            AppPackageCategory::from_str("development"),
+            Some(AppPackageCategory::Development)
+        );
     }
 
     #[test]
@@ -408,9 +469,15 @@ mod tests {
     fn test_install_remove() {
         let mut manager = SoftwarePackageManager::new();
         manager.install("sigma-terminal").ok();
-        assert_eq!(manager.get_package("sigma-terminal").unwrap().status, AppPackageStatus::Installed);
+        assert_eq!(
+            manager.get_package("sigma-terminal").unwrap().status,
+            AppPackageStatus::Installed
+        );
         manager.remove("sigma-terminal").ok();
-        assert_eq!(manager.get_package("sigma-terminal").unwrap().status, AppPackageStatus::NotInstalled);
+        assert_eq!(
+            manager.get_package("sigma-terminal").unwrap().status,
+            AppPackageStatus::NotInstalled
+        );
     }
 
     #[test]

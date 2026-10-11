@@ -368,7 +368,7 @@ impl SovereignDistroPackageAdvancementsSuiteV20 {
         let pr = self.pr_pipeline.submit_package_pr(spec.clone());
 
         let mut pkg = UnifiedPackage::new(
-            format!("sigpkg-{}", pr.converted_spec.package_name),
+            format!("sovereign-{}", pr.converted_spec.package_name),
             pr.converted_spec.version.clone(),
         )
         .with_format(PackageFormat::SigmaPkg)
@@ -392,7 +392,7 @@ impl SovereignDistroPackageAdvancementsSuiteV20 {
         let res = UniversalMultiPmCliForwarderEngineV20::forward_command(cmd)?;
         if !res.is_simulation && res.action == "install" {
             for p in &res.packages {
-                let name = format!("sovereign-{}", p);
+                let name = format!("sigpkg-{}", p);
                 if !self.installed_packages.contains(&name) {
                     self.installed_packages.push(name);
                 }
@@ -480,7 +480,9 @@ mod tests {
             .convert_submit_and_install("vim-9.1.rpm", b"VIM_PAYLOAD")
             .unwrap();
         assert_eq!(sigpkg.name, "sovereign-vim");
-        assert!(suite.installed_packages.contains(&"sovereign-vim".to_string()));
+        assert!(suite
+            .installed_packages
+            .contains(&"sovereign-vim".to_string()));
 
         let response = suite.execute_cli_command("apt install tmux").unwrap();
         assert!(response.contains("tmux"));

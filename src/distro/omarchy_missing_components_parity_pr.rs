@@ -57,13 +57,29 @@ impl OmarchyWallustColorPaletteGeneratorEngine {
                 background_hex: "#1a1b26".to_string(),
                 foreground_hex: "#a9b1d6".to_string(),
                 ansi_16_colors: vec![
-                    "#15161e".to_string(), "#f7768e".to_string(), "#9ece6a".to_string(), "#e0af68".to_string(),
-                    "#7aa2f7".to_string(), "#bb9af7".to_string(), "#7dcfff".to_string(), "#a9b1d6".to_string(),
-                    "#414868".to_string(), "#f7768e".to_string(), "#9ece6a".to_string(), "#e0af68".to_string(),
-                    "#7aa2f7".to_string(), "#bb9af7".to_string(), "#7dcfff".to_string(), "#c0caf5".to_string(),
+                    "#15161e".to_string(),
+                    "#f7768e".to_string(),
+                    "#9ece6a".to_string(),
+                    "#e0af68".to_string(),
+                    "#7aa2f7".to_string(),
+                    "#bb9af7".to_string(),
+                    "#7dcfff".to_string(),
+                    "#a9b1d6".to_string(),
+                    "#414868".to_string(),
+                    "#f7768e".to_string(),
+                    "#9ece6a".to_string(),
+                    "#e0af68".to_string(),
+                    "#7aa2f7".to_string(),
+                    "#bb9af7".to_string(),
+                    "#7dcfff".to_string(),
+                    "#c0caf5".to_string(),
                 ],
                 hot_reload_targets: vec![
-                    "gtk4".to_string(), "qt6".to_string(), "foot".to_string(), "waybar".to_string(), "quickshell".to_string(),
+                    "gtk4".to_string(),
+                    "qt6".to_string(),
+                    "foot".to_string(),
+                    "waybar".to_string(),
+                    "quickshell".to_string(),
                 ],
             },
         );
@@ -73,7 +89,12 @@ impl OmarchyWallustColorPaletteGeneratorEngine {
         }
     }
 
-    pub fn generate_wallust_palette_pr_diff(&mut self, theme_name: &str, bg: &str, fg: &str) -> String {
+    pub fn generate_wallust_palette_pr_diff(
+        &mut self,
+        theme_name: &str,
+        bg: &str,
+        fg: &str,
+    ) -> String {
         let pr = OmarchyWallustPalettePR {
             theme_name: theme_name.to_string(),
             background_hex: bg.to_string(),
@@ -122,21 +143,20 @@ impl OmarchyHyprlandKeybindingWorkspaceBinderEngine {
         binds.insert("SUPER, Space".to_string(), "rofi -show drun".to_string());
 
         Self {
-            rules: vec![
-                HyprlandWindowRulePR {
-                    window_class: "quickshell".to_string(),
-                    title_pattern: "AI Floating Assistant".to_string(),
-                    workspace_target: 99,
-                    is_floating: true,
-                    is_scratchpad: true,
-                },
-            ],
+            rules: vec![HyprlandWindowRulePR {
+                window_class: "quickshell".to_string(),
+                title_pattern: "AI Floating Assistant".to_string(),
+                workspace_target: 99,
+                is_floating: true,
+                is_scratchpad: true,
+            }],
             chorded_binds: binds,
         }
     }
 
     pub fn generate_hyprland_binds_pr_diff(&mut self, mods_key: &str, command: &str) -> String {
-        self.chorded_binds.insert(mods_key.to_string(), command.to_string());
+        self.chorded_binds
+            .insert(mods_key.to_string(), command.to_string());
         format!(
             "--- a/hypr/hyprland.conf\n+++ b/hypr/hyprland.conf\n@@ -100,3 +100,4 @@\n+bind = {}, {}\n",
             mods_key, command
@@ -201,7 +221,8 @@ impl OmarchyOmakaseCliDoctorEngine {
                 self.in_sync = true;
                 "sigomarchy sync: Dotfiles synchronized with ~/.files".to_string()
             }
-            "backup" => "sigomarchy backup: Created zstd archive ~/.config/omarchy/backup.tar.zst".to_string(),
+            "backup" => "sigomarchy backup: Created zstd archive ~/.config/omarchy/backup.tar.zst"
+                .to_string(),
             _ => format!("sigomarchy: Unknown command '{}'", action),
         }
     }
@@ -253,7 +274,10 @@ impl OmarchyHerdrAiAgentRouterEngine {
     pub fn process_next(&mut self) -> Option<String> {
         if let Some(req) = self.requests.iter_mut().find(|r| !r.processed) {
             req.processed = true;
-            Some(format!("HerdrAgent[{}]: Processed prompt '{}'", req.agent_role, req.prompt))
+            Some(format!(
+                "HerdrAgent[{}]: Processed prompt '{}'",
+                req.agent_role, req.prompt
+            ))
         } else {
             None
         }
@@ -334,7 +358,10 @@ impl SovereignLinuxOmarchyMissingComponentsParityPrGateway {
     }
 
     pub fn validate_and_merge_pr(&mut self, pr_id: u64) -> Result<bool, &'static str> {
-        let sub = self.submissions.get_mut(&pr_id).ok_or("PR Submission not found");
+        let sub = self
+            .submissions
+            .get_mut(&pr_id)
+            .ok_or("PR Submission not found");
         match sub {
             Ok(s) => {
                 if s.diff_content.is_empty() {
@@ -371,7 +398,10 @@ mod tests {
         let mut binder = OmarchyHyprlandKeybindingWorkspaceBinderEngine::new();
         let diff = binder.generate_hyprland_binds_pr_diff("SUPER, T", "alacritty");
         assert!(diff.contains("SUPER, T"));
-        assert_eq!(binder.chorded_binds.get("SUPER, T"), Some(&"alacritty".to_string()));
+        assert_eq!(
+            binder.chorded_binds.get("SUPER, T"),
+            Some(&"alacritty".to_string())
+        );
     }
 
     #[test]
@@ -401,9 +431,11 @@ mod tests {
     #[test]
     fn test_sovereign_omarchy_missing_components_parity_pr_gateway() {
         let mut gateway = SovereignLinuxOmarchyMissingComponentsParityPrGateway::new();
-        let diff = gateway
-            .wallust_engine
-            .generate_wallust_palette_pr_diff("catppuccin-latte", "#eff1f5", "#4c4f69");
+        let diff = gateway.wallust_engine.generate_wallust_palette_pr_diff(
+            "catppuccin-latte",
+            "#eff1f5",
+            "#4c4f69",
+        );
 
         let pr_id = gateway.submit_omarchy_parity_pr(
             OmarchyPrType::WallustPalette,

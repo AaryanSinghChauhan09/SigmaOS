@@ -13,28 +13,36 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::boxed::Box;
-use std::string::{String, ToString};
 use std::format;
+use std::string::{String, ToString};
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
+use core::mem;
 /// OOP-based Clipboard for SigmaOS
 /// Based on Ideas-999-Structured: User Experience & Desktop Item 806
 /// Implements clipboard management and history
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type ClipboardID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum ClipboardFormat { Text = 0, Image = 1, HTML = 2, Files = 3 }
+pub enum ClipboardFormat {
+    Text = 0,
+    Image = 1,
+    HTML = 2,
+    Files = 3,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum ClipboardError { Success = 0, Empty = 1, InvalidFormat = 2 }
+pub enum ClipboardError {
+    Success = 0,
+    Empty = 1,
+    InvalidFormat = 2,
+}
 
 pub trait ClipboardItem {
     fn id(&self) -> ClipboardID;
@@ -67,7 +75,9 @@ impl SimpleClipboardItem {
 }
 
 impl ClipboardItem for SimpleClipboardItem {
-    fn id(&self) -> ClipboardID { self.id }
+    fn id(&self) -> ClipboardID {
+        self.id
+    }
     fn format(&self) -> ClipboardFormat {
         match self.format.load(Ordering::SeqCst) {
             0 => ClipboardFormat::Text,
@@ -76,12 +86,20 @@ impl ClipboardItem for SimpleClipboardItem {
             _ => ClipboardFormat::Files,
         }
     }
-    fn data(&self) -> &[u8] { &self.data }
-    fn timestamp(&self) -> u64 { self.timestamp.load(Ordering::SeqCst) as u64 }
+    fn data(&self) -> &[u8] {
+        &self.data
+    }
+    fn timestamp(&self) -> u64 {
+        self.timestamp.load(Ordering::SeqCst) as u64
+    }
 }
 
 pub trait Clipboard {
-    fn set_content(&mut self, format: ClipboardFormat, data: &[u8]) -> Result<ClipboardID, ClipboardError>;
+    fn set_content(
+        &mut self,
+        format: ClipboardFormat,
+        data: &[u8],
+    ) -> Result<ClipboardID, ClipboardError>;
     fn get_content(&self) -> Option<&dyn ClipboardItem>;
     fn clear(&mut self);
 }
@@ -105,25 +123,29 @@ impl SimpleClipboard {
 }
 
 impl Clipboard for SimpleClipboard {
-    fn set_content(&mut self, format: ClipboardFormat, data: &[u8]) -> Result<ClipboardID, ClipboardError> {
+    fn set_content(
+        &mut self,
+        format: ClipboardFormat,
+        data: &[u8],
+    ) -> Result<ClipboardID, ClipboardError> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
         let item = SimpleClipboardItem::new(id, format, data);
-        
+
         if let Some(old) = self.current.take() {
             self.history.push(Some(old));
             if self.history.len() > 50 {
                 self.history.remove(0);
             }
         }
-        
+
         self.current = Some(Box::new(item));
         Ok(id)
     }
-    
+
     fn get_content(&self) -> Option<&dyn ClipboardItem> {
         self.current.as_ref().map(|item| item.as_ref())
     }
-    
+
     fn clear(&mut self) {
         self.current = None;
     }
@@ -156,7 +178,7 @@ impl ClipboardHistory for SimpleClipboardHistory {
         }
         items
     }
-    
+
     fn restore_from_history(&mut self, index: usize) -> Result<(), ClipboardError> {
         if index < self.clipboard.history.len() {
             if let Some(item) = self.clipboard.history.remove(index) {
@@ -169,19 +191,31 @@ impl ClipboardHistory for SimpleClipboardHistory {
         }
         Err(ClipboardError::Empty)
     }
-    
+
     fn clear_history(&mut self) {
         self.clipboard.history.clear();
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
     fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity { self.grow(); }
+            if self.len >= self.capacity {
+                self.grow();
+            }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
@@ -203,7 +237,9 @@ impl<T> Vec<T> {
     }
     fn insert(&mut self, index: usize, item: T) {
         unsafe {
-            if self.len >= self.capacity { self.grow(); }
+            if self.len >= self.capacity {
+                self.grow();
+            }
             for i in (index..self.len).rev() {
                 core::ptr::copy_nonoverlapping(self.data.add(i), self.data.add(i + 1), 1);
             }
@@ -212,19 +248,29 @@ impl<T> Vec<T> {
         }
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
 
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
@@ -256,7 +302,6 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
         self.deref().iter()
     }
 }
-
 
 impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;

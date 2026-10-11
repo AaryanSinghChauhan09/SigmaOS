@@ -88,7 +88,11 @@ impl OmarchyHyprlandWindowManagerEngine {
         Ok(())
     }
 
-    pub fn process_swipe_gesture(&mut self, fingers: u8, delta_x: f32) -> Result<u32, &'static str> {
+    pub fn process_swipe_gesture(
+        &mut self,
+        fingers: u8,
+        delta_x: f32,
+    ) -> Result<u32, &'static str> {
         if fingers != 3 && fingers != 4 {
             return Err("Only 3 or 4 finger swipe gestures are supported");
         }
@@ -243,12 +247,18 @@ impl OmarchyWallustPaletteEngine {
 
     pub fn generate_palette_from_image_hash(&mut self, image_hash: u64) -> WallustPalette {
         let bg = format!("#{:06x}", (image_hash & 0xFFFFFF) % 0x222222 + 0x101010);
-        let fg = format!("#{:06x}", (image_hash >> 8 & 0xFFFFFF) % 0xDDDDDD + 0xAAAAAA);
+        let fg = format!(
+            "#{:06x}",
+            (image_hash >> 8 & 0xFFFFFF) % 0xDDDDDD + 0xAAAAAA
+        );
         let accent = format!("#{:06x}", (image_hash >> 16 & 0xFFFFFF) % 0xFFFFFF);
 
         let mut colors_16 = Vec::new();
         for i in 0..16 {
-            colors_16.push(format!("#{:06x}", (image_hash.wrapping_add(i * 0x112233)) % 0xFFFFFF));
+            colors_16.push(format!(
+                "#{:06x}",
+                (image_hash.wrapping_add(i * 0x112233)) % 0xFFFFFF
+            ));
         }
 
         self.current_palette = WallustPalette {
@@ -331,7 +341,14 @@ impl OmarchyThunarCustomActionsEngine {
         Self { actions }
     }
 
-    pub fn register_action(&mut self, key: &str, name: &str, cmd: &str, icon: &str, patterns: &[&str]) {
+    pub fn register_action(
+        &mut self,
+        key: &str,
+        name: &str,
+        cmd: &str,
+        icon: &str,
+        patterns: &[&str],
+    ) {
         self.actions.insert(
             key.to_string(),
             ThunarCustomAction {
@@ -408,7 +425,10 @@ impl OmarchyZellijSessionEngine {
     }
 
     pub fn attach_session(&mut self, name: &str) -> Result<String, &'static str> {
-        let sess = self.sessions.get_mut(name).ok_or("Zellij session not found")?;
+        let sess = self
+            .sessions
+            .get_mut(name)
+            .ok_or("Zellij session not found")?;
         sess.is_attached = true;
         Ok(format!("Attached to Zellij session '{}'", name))
     }
@@ -485,7 +505,10 @@ mod tests {
         hyprland.create_workspace(2, "2: Dev", HyprlandWindowLayout::Dwindle);
         hyprland.tile_window(2, 1001).unwrap();
 
-        assert_eq!(hyprland.workspaces.get(&2).unwrap().tiled_windows, vec![1001]);
+        assert_eq!(
+            hyprland.workspaces.get(&2).unwrap().tiled_windows,
+            vec![1001]
+        );
 
         let ws = hyprland.process_swipe_gesture(3, 60.0).unwrap();
         assert_eq!(ws, 2);

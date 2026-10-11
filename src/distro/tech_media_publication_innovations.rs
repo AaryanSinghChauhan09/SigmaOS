@@ -158,7 +158,8 @@ impl KDnuggetsZeroCopyVectorPipelineEngine {
         }
         let sum: f32 = input.iter().sum();
         let mean = sum / input.len() as f32;
-        let variance: f32 = input.iter().map(|&x| (x - mean) * (x - mean)).sum::<f32>() / input.len() as f32;
+        let variance: f32 =
+            input.iter().map(|&x| (x - mean) * (x - mean)).sum::<f32>() / input.len() as f32;
         let std_dev = variance.sqrt().max(1e-6);
         input.iter().map(|&x| (x - mean) / std_dev).collect()
     }
@@ -283,7 +284,8 @@ impl LinuxOrgKernelSysctlTuningEngine {
     }
 
     pub fn is_realtime_tuned(&self) -> bool {
-        self.swappiness <= 10 && (self.tcp_congestion_control == "bbr" || self.tcp_congestion_control == "bbr3")
+        self.swappiness <= 10
+            && (self.tcp_congestion_control == "bbr" || self.tcp_congestion_control == "bbr3")
     }
 }
 
@@ -801,7 +803,10 @@ impl AppualsAutomatedPackageResolverEngine {
     pub fn auto_repair(&mut self, err_code: u32) -> String {
         self.diagnostic_code = err_code;
         self.packages_repaired += 1;
-        format!("Diagnostic code {} resolved and package dependencies repaired.", err_code)
+        format!(
+            "Diagnostic code {} resolved and package dependencies repaired.",
+            err_code
+        )
     }
 }
 
@@ -1252,15 +1257,23 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
     }
 
     pub fn format_all_pr_proposals(&self) -> String {
-        let mut all_prs = String::from("# Master Suite PR Proposals Synthesized from Tech Media Publications & OS Parity\n\n");
+        let mut all_prs = String::from(
+            "# Master Suite PR Proposals Synthesized from Tech Media Publications & OS Parity\n\n",
+        );
         for insight in &self.insights {
             all_prs.push_str(&format!(
                 "## PR Proposal: [{}] {}\n",
                 insight.publication, insight.title
             ));
             all_prs.push_str(&format!("- **Category:** {}\n", insight.category));
-            all_prs.push_str(&format!("- **Action:** {}\n", insight.action_recommendation));
-            all_prs.push_str(&format!("- **Impact Score:** {}/100\n\n", insight.impact_score));
+            all_prs.push_str(&format!(
+                "- **Action:** {}\n",
+                insight.action_recommendation
+            ));
+            all_prs.push_str(&format!(
+                "- **Impact Score:** {}/100\n\n",
+                insight.impact_score
+            ));
         }
         all_prs
     }
@@ -1273,7 +1286,10 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             .collect()
     }
 
-    pub fn query_insights_by_flexible_domain(&self, raw_query: &str) -> Vec<TechMediaArticleInsight> {
+    pub fn query_insights_by_flexible_domain(
+        &self,
+        raw_query: &str,
+    ) -> Vec<TechMediaArticleInsight> {
         let mut clean = raw_query.trim();
         if clean.starts_with("https://") {
             clean = &clean[8..];
@@ -1344,8 +1360,12 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
     }
 
     pub fn format_multi_portal_pr_manifest(&self) -> String {
-        let mut manifest = String::from("# SigmaOS Tech Media Multi-Portal PR Proposals Manifest\n\n");
-        manifest.push_str(&format!("Total Registered Portals: {}\n\n", self.insights.len()));
+        let mut manifest =
+            String::from("# SigmaOS Tech Media Multi-Portal PR Proposals Manifest\n\n");
+        manifest.push_str(&format!(
+            "Total Registered Portals: {}\n\n",
+            self.insights.len()
+        ));
 
         for insight in &self.insights {
             manifest.push_str(&format!(
@@ -1465,7 +1485,9 @@ impl SovereignPublicationInspirationEngine {
     pub fn synthesize_and_verify_all_28_portals(&mut self) -> bool {
         let synthesis_engine = SovereignTechMediaArticleInsightSynthesisEngine::new();
         let insight_verified = synthesis_engine.get_insights_count() == 28
-            && !synthesis_engine.get_insights_by_domain("itsfoss.com").is_empty()
+            && !synthesis_engine
+                .get_insights_by_domain("itsfoss.com")
+                .is_empty()
             && !synthesis_engine.format_all_pr_proposals().is_empty();
 
         insight_verified
@@ -1483,7 +1505,10 @@ impl SovereignPublicationInspirationEngine {
             && self.makeuseof.recommend_de(512) == "Zenith-Minimal-Tiling"
             && self.pcworld.should_charge(75)
             && self.marktechpost.estimate_memory_mb(8192) > 2000
-            && self.windowslatest.win_to_posix("C:\\Users").contains("/mnt/c/Users")
+            && self
+                .windowslatest
+                .win_to_posix("C:\\Users")
+                .contains("/mnt/c/Users")
             && self.techspot.is_smooth()
             && self.thenewstack.is_observable()
             && self.techpowerup.is_thermal_safe()
@@ -1566,8 +1591,14 @@ mod tests {
         assert!(mtp.estimate_memory_mb(8192) > 2000);
 
         let winlatest = WindowsLatestWslPathInteropEngine::new();
-        assert_eq!(winlatest.win_to_posix("C:\\Users\\Sigma"), "/mnt/c/Users/Sigma");
-        assert_eq!(winlatest.posix_to_win("/mnt/c/Users/Sigma"), "C:\\Users\\Sigma");
+        assert_eq!(
+            winlatest.win_to_posix("C:\\Users\\Sigma"),
+            "/mnt/c/Users/Sigma"
+        );
+        assert_eq!(
+            winlatest.posix_to_win("/mnt/c/Users/Sigma"),
+            "C:\\Users\\Sigma"
+        );
 
         let techspot = TechSpotFramePacingDirectStorageEngine::new();
         assert!(techspot.is_smooth());
@@ -1624,7 +1655,9 @@ mod tests {
 
         let domain_insights = engine.get_insights_by_domain("linux.com");
         assert_eq!(domain_insights.len(), 1);
-        assert!(domain_insights[0].action_recommendation.contains("Landlock"));
+        assert!(domain_insights[0]
+            .action_recommendation
+            .contains("Landlock"));
 
         let category_insights = engine.get_insights_by_category("AI & Machine Learning");
         assert!(!category_insights.is_empty());
@@ -1644,9 +1677,13 @@ mod tests {
         assert_eq!(flex_itsfoss.len(), 1);
         assert_eq!(flex_itsfoss[0].publication_domain, "itsfoss.com");
 
-        let flex_concat = engine.query_insights_by_flexible_domain("techpowerup.techpwindowscentral.com");
+        let flex_concat =
+            engine.query_insights_by_flexible_domain("techpowerup.techpwindowscentral.com");
         assert!(flex_concat.len() >= 2);
-        let domains: Vec<String> = flex_concat.iter().map(|i| i.publication_domain.clone()).collect();
+        let domains: Vec<String> = flex_concat
+            .iter()
+            .map(|i| i.publication_domain.clone())
+            .collect();
         assert!(domains.contains(&String::from("techpowerup.com")));
         assert!(domains.contains(&String::from("windowscentral.com")));
 

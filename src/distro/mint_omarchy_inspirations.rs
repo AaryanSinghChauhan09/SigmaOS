@@ -98,9 +98,9 @@ impl OmarchySecureBoot {
 
     /// Verify boot chain integrity
     pub fn verify_boot_chain(&self) -> bool {
-        self.secure_boot_enabled && 
-        !self.bootloader_keys.is_empty() && 
-        !self.kernel_signatures.is_empty()
+        self.secure_boot_enabled
+            && !self.bootloader_keys.is_empty()
+            && !self.kernel_signatures.is_empty()
     }
 }
 
@@ -223,10 +223,13 @@ impl Default for MintOmarchySystem {
 /// Helper function for timestamp generation
 fn chrono_timestamp() -> String {
     // In real implementation, would use actual timestamp
-    format!("{}", std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
-        .unwrap_or_default()
-        .as_secs())
+    format!(
+        "{}",
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_secs()
+    )
 }
 
 #[cfg(test)]
@@ -238,7 +241,7 @@ mod tests {
         let mut manager = MintUpdateManager::new();
         manager.enable_auto_updates();
         assert!(manager.auto_updates_enabled);
-        
+
         let updates = manager.check_updates();
         assert!(updates.is_empty());
     }
@@ -248,7 +251,7 @@ mod tests {
         let mut boot = OmarchySecureBoot::new();
         boot.add_bootloader_key(String::from("vendor-key"));
         boot.add_kernel_signature(String::from("kernel-sig"));
-        
+
         assert!(boot.verify_boot_chain());
     }
 
@@ -256,7 +259,7 @@ mod tests {
     fn test_mint_user_experience() {
         let mut ux = MintUserExperience::new();
         ux.enable_user_friendly_mode();
-        
+
         assert!(ux.welcome_screen_enabled);
         assert!(ux.driver_manager_auto);
         assert!(ux.multimedia_codecs);
@@ -266,7 +269,7 @@ mod tests {
     fn test_omarchy_security_hardening() {
         let mut security = OmarchySecurityHardening::new();
         security.enable_maximum_hardening();
-        
+
         assert!(security.kernel_hardening);
         assert!(security.aslr_enabled);
         assert!(security.stack_protector);
@@ -276,7 +279,7 @@ mod tests {
     fn test_mint_omarchy_system() {
         let mut system = MintOmarchySystem::new();
         system.configure_optimal();
-        
+
         let status = system.get_status();
         assert!(status.contains("MintOmarchy System"));
         assert!(status.contains("Auto Updates: true"));

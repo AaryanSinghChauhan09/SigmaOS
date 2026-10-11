@@ -7,9 +7,9 @@
 
 extern crate alloc;
 
+use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
 
 /// 1. ALPM Hooks & systemd-tmpfiles Integration Engine
 #[derive(Debug, Clone)]
@@ -142,7 +142,10 @@ pub struct ArchPacdiff3WayConfigMergeEngine {
 impl ArchPacdiff3WayConfigMergeEngine {
     pub fn new() -> Self {
         Self {
-            pending_pacnew: vec!["/etc/pacman.conf.pacnew".to_string(), "/etc/mkinitcpio.conf.pacnew".to_string()],
+            pending_pacnew: vec![
+                "/etc/pacman.conf.pacnew".to_string(),
+                "/etc/mkinitcpio.conf.pacnew".to_string(),
+            ],
             pending_pacsave: vec!["/etc/locale.gen.pacsave".to_string()],
         }
     }
@@ -248,7 +251,9 @@ mod tests {
         let suite = SovereignArchLinuxAdvancementsSuiteV38::new();
         assert!(suite.verify_arch_gap_closure());
 
-        let hooks = suite.alpm_engine.execute_hooks("PostTransaction", "usr/lib/tmpfiles.d/*.conf");
+        let hooks = suite
+            .alpm_engine
+            .execute_hooks("PostTransaction", "usr/lib/tmpfiles.d/*.conf");
         assert!(!hooks.is_empty());
 
         assert_eq!(suite.cachyos_engine.select_optimized_repo(), "cachyos-v3");

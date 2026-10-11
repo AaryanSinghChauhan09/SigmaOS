@@ -21,9 +21,7 @@ use crate::package::pull_request_workflow::{
 pub mod pull_request_workflow;
 
 #[cfg(feature = "standalone_test")]
-pub use pull_request_workflow::{
-    ConsolidatedSovereignPackage, PullRequestPackageFormat,
-};
+pub use pull_request_workflow::{ConsolidatedSovereignPackage, PullRequestPackageFormat};
 
 /// Target staging channel for PR package deployments
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -49,7 +47,12 @@ pub struct TranspiledSigpkgPayload {
 /// 1. Debian/Ubuntu APT PR Transpiler
 pub struct AptDebianPrTranspiler;
 impl AptDebianPrTranspiler {
-    pub fn transpile(name: &str, version: &str, _control_data: &str, deps: &[&str]) -> TranspiledSigpkgPayload {
+    pub fn transpile(
+        name: &str,
+        version: &str,
+        _control_data: &str,
+        deps: &[&str],
+    ) -> TranspiledSigpkgPayload {
         let mapped_deps = deps.iter().map(|d| format!("sigma-compat-{}", d)).collect();
         TranspiledSigpkgPayload {
             sigpkg_id: format!("deb-{}-{}", name, version),
@@ -67,7 +70,12 @@ impl AptDebianPrTranspiler {
 /// 3b. Fedora Silverblue / Kinoite rpm-ostree & Flatpak PR Transpiler
 pub struct FedoraFlatpakRpmOstreePrTranspiler;
 impl FedoraFlatpakRpmOstreePrTranspiler {
-    pub fn transpile(name: &str, version: &str, _manifest_data: &str, deps: &[&str]) -> TranspiledSigpkgPayload {
+    pub fn transpile(
+        name: &str,
+        version: &str,
+        _manifest_data: &str,
+        deps: &[&str],
+    ) -> TranspiledSigpkgPayload {
         let mapped_deps = deps.iter().map(|d| format!("sigma-ostree-{}", d)).collect();
         TranspiledSigpkgPayload {
             sigpkg_id: format!("fcos-{}-{}", name, version),
@@ -85,7 +93,12 @@ impl FedoraFlatpakRpmOstreePrTranspiler {
 /// 3c. Fedora COPR / Koji Build Task & Bodhi Update Gate PR Transpiler
 pub struct FedoraCoprKojiPrTranspiler;
 impl FedoraCoprKojiPrTranspiler {
-    pub fn transpile(name: &str, version: &str, _spec_data: &str, deps: &[&str]) -> TranspiledSigpkgPayload {
+    pub fn transpile(
+        name: &str,
+        version: &str,
+        _spec_data: &str,
+        deps: &[&str],
+    ) -> TranspiledSigpkgPayload {
         let mapped_deps = deps.iter().map(|d| format!("sigma-koji-{}", d)).collect();
         TranspiledSigpkgPayload {
             sigpkg_id: format!("koji-{}-{}", name, version),
@@ -103,7 +116,12 @@ impl FedoraCoprKojiPrTranspiler {
 /// 2. Arch Linux Pacman / PKGBUILD PR Transpiler
 pub struct PacmanArchPrTranspiler;
 impl PacmanArchPrTranspiler {
-    pub fn transpile(name: &str, version: &str, _pkgbuild_data: &str, deps: &[&str]) -> TranspiledSigpkgPayload {
+    pub fn transpile(
+        name: &str,
+        version: &str,
+        _pkgbuild_data: &str,
+        deps: &[&str],
+    ) -> TranspiledSigpkgPayload {
         let mapped_deps = deps.iter().map(|d| format!("sigma-arch-{}", d)).collect();
         TranspiledSigpkgPayload {
             sigpkg_id: format!("pacman-{}-{}", name, version),
@@ -121,7 +139,12 @@ impl PacmanArchPrTranspiler {
 /// 3. Fedora/RHEL DNF / RPM PR Transpiler
 pub struct DnfFedoraPrTranspiler;
 impl DnfFedoraPrTranspiler {
-    pub fn transpile(name: &str, version: &str, _spec_data: &str, deps: &[&str]) -> TranspiledSigpkgPayload {
+    pub fn transpile(
+        name: &str,
+        version: &str,
+        _spec_data: &str,
+        deps: &[&str],
+    ) -> TranspiledSigpkgPayload {
         let mapped_deps = deps.iter().map(|d| format!("sigma-rpm-{}", d)).collect();
         TranspiledSigpkgPayload {
             sigpkg_id: format!("rpm-{}-{}", name, version),
@@ -139,7 +162,12 @@ impl DnfFedoraPrTranspiler {
 /// 4. Alpine Linux APK PR Transpiler
 pub struct ApkAlpinePrTranspiler;
 impl ApkAlpinePrTranspiler {
-    pub fn transpile(name: &str, version: &str, _apkindex_data: &str, deps: &[&str]) -> TranspiledSigpkgPayload {
+    pub fn transpile(
+        name: &str,
+        version: &str,
+        _apkindex_data: &str,
+        deps: &[&str],
+    ) -> TranspiledSigpkgPayload {
         let mapped_deps = deps.iter().map(|d| format!("sigma-apk-{}", d)).collect();
         TranspiledSigpkgPayload {
             sigpkg_id: format!("apk-{}-{}", name, version),
@@ -157,7 +185,12 @@ impl ApkAlpinePrTranspiler {
 /// 5. Void Linux XBPS PR Transpiler
 pub struct XbpsVoidPrTranspiler;
 impl XbpsVoidPrTranspiler {
-    pub fn transpile(name: &str, version: &str, _template_data: &str, deps: &[&str]) -> TranspiledSigpkgPayload {
+    pub fn transpile(
+        name: &str,
+        version: &str,
+        _template_data: &str,
+        deps: &[&str],
+    ) -> TranspiledSigpkgPayload {
         let mapped_deps = deps.iter().map(|d| format!("sigma-xbps-{}", d)).collect();
         TranspiledSigpkgPayload {
             sigpkg_id: format!("xbps-{}-{}", name, version),
@@ -175,7 +208,12 @@ impl XbpsVoidPrTranspiler {
 /// 6. BSD Ports (FreeBSD / OpenBSD / NetBSD) PR Transpiler
 pub struct PortsBsdPrTranspiler;
 impl PortsBsdPrTranspiler {
-    pub fn transpile(name: &str, version: &str, _makefile_data: &str, deps: &[&str]) -> TranspiledSigpkgPayload {
+    pub fn transpile(
+        name: &str,
+        version: &str,
+        _makefile_data: &str,
+        deps: &[&str],
+    ) -> TranspiledSigpkgPayload {
         let mapped_deps = deps.iter().map(|d| format!("sigma-bsd-{}", d)).collect();
         TranspiledSigpkgPayload {
             sigpkg_id: format!("bsdports-{}-{}", name, version),
@@ -193,7 +231,12 @@ impl PortsBsdPrTranspiler {
 /// 7. NixOS Flakes & GNU Guix PR Transpiler
 pub struct NixGuixPrTranspiler;
 impl NixGuixPrTranspiler {
-    pub fn transpile(name: &str, version: &str, _expr_data: &str, deps: &[&str]) -> TranspiledSigpkgPayload {
+    pub fn transpile(
+        name: &str,
+        version: &str,
+        _expr_data: &str,
+        deps: &[&str],
+    ) -> TranspiledSigpkgPayload {
         let mapped_deps = deps.iter().map(|d| format!("sigma-cas-{}", d)).collect();
         TranspiledSigpkgPayload {
             sigpkg_id: format!("nixguix-{}-{}", name, version),
@@ -211,7 +254,12 @@ impl NixGuixPrTranspiler {
 /// 8. openSUSE Zypper PR Transpiler
 pub struct ZypperSusePrTranspiler;
 impl ZypperSusePrTranspiler {
-    pub fn transpile(name: &str, version: &str, _spec_data: &str, deps: &[&str]) -> TranspiledSigpkgPayload {
+    pub fn transpile(
+        name: &str,
+        version: &str,
+        _spec_data: &str,
+        deps: &[&str],
+    ) -> TranspiledSigpkgPayload {
         let mapped_deps = deps.iter().map(|d| format!("sigma-zypper-{}", d)).collect();
         TranspiledSigpkgPayload {
             sigpkg_id: format!("zypper-{}-{}", name, version),
@@ -229,7 +277,12 @@ impl ZypperSusePrTranspiler {
 /// 9. Gentoo Portage Ebuild PR Transpiler
 pub struct GentooEbuildPrTranspiler;
 impl GentooEbuildPrTranspiler {
-    pub fn transpile(name: &str, version: &str, _ebuild_data: &str, deps: &[&str]) -> TranspiledSigpkgPayload {
+    pub fn transpile(
+        name: &str,
+        version: &str,
+        _ebuild_data: &str,
+        deps: &[&str],
+    ) -> TranspiledSigpkgPayload {
         let mapped_deps = deps.iter().map(|d| format!("sigma-ebuild-{}", d)).collect();
         TranspiledSigpkgPayload {
             sigpkg_id: format!("gentoo-{}-{}", name, version),
@@ -247,7 +300,12 @@ impl GentooEbuildPrTranspiler {
 /// 10. Flatpak / Snap PR Transpiler
 pub struct FlatpakSnapPrTranspiler;
 impl FlatpakSnapPrTranspiler {
-    pub fn transpile(name: &str, version: &str, _manifest_data: &str, deps: &[&str]) -> TranspiledSigpkgPayload {
+    pub fn transpile(
+        name: &str,
+        version: &str,
+        _manifest_data: &str,
+        deps: &[&str],
+    ) -> TranspiledSigpkgPayload {
         let mapped_deps = deps.iter().map(|d| format!("sigma-bundle-{}", d)).collect();
         TranspiledSigpkgPayload {
             sigpkg_id: format!("bundle-{}-{}", name, version),
@@ -283,24 +341,46 @@ impl SovereignUniversalPrExecutionMasterSuite {
         deps: &[&str],
     ) -> TranspiledSigpkgPayload {
         let payload = match format {
-            PullRequestPackageFormat::DebianDeb => AptDebianPrTranspiler::transpile(name, version, manifest_data, deps),
-            PullRequestPackageFormat::ArchPkgbuild => PacmanArchPrTranspiler::transpile(name, version, manifest_data, deps),
-            PullRequestPackageFormat::FedoraRpm => DnfFedoraPrTranspiler::transpile(name, version, manifest_data, deps),
-            PullRequestPackageFormat::AlpineApk => ApkAlpinePrTranspiler::transpile(name, version, manifest_data, deps),
-            PullRequestPackageFormat::VoidXbps => XbpsVoidPrTranspiler::transpile(name, version, manifest_data, deps),
-            PullRequestPackageFormat::FreeBsdPorts | PullRequestPackageFormat::OpenBsdPorts => PortsBsdPrTranspiler::transpile(name, version, manifest_data, deps),
-            PullRequestPackageFormat::NixFlake | PullRequestPackageFormat::GuixScheme => NixGuixPrTranspiler::transpile(name, version, manifest_data, deps),
-            PullRequestPackageFormat::ZypperSpec => ZypperSusePrTranspiler::transpile(name, version, manifest_data, deps),
-            PullRequestPackageFormat::GentooEbuild => GentooEbuildPrTranspiler::transpile(name, version, manifest_data, deps),
+            PullRequestPackageFormat::DebianDeb => {
+                AptDebianPrTranspiler::transpile(name, version, manifest_data, deps)
+            }
+            PullRequestPackageFormat::ArchPkgbuild => {
+                PacmanArchPrTranspiler::transpile(name, version, manifest_data, deps)
+            }
+            PullRequestPackageFormat::FedoraRpm => {
+                DnfFedoraPrTranspiler::transpile(name, version, manifest_data, deps)
+            }
+            PullRequestPackageFormat::AlpineApk => {
+                ApkAlpinePrTranspiler::transpile(name, version, manifest_data, deps)
+            }
+            PullRequestPackageFormat::VoidXbps => {
+                XbpsVoidPrTranspiler::transpile(name, version, manifest_data, deps)
+            }
+            PullRequestPackageFormat::FreeBsdPorts | PullRequestPackageFormat::OpenBsdPorts => {
+                PortsBsdPrTranspiler::transpile(name, version, manifest_data, deps)
+            }
+            PullRequestPackageFormat::NixFlake | PullRequestPackageFormat::GuixScheme => {
+                NixGuixPrTranspiler::transpile(name, version, manifest_data, deps)
+            }
+            PullRequestPackageFormat::ZypperSpec => {
+                ZypperSusePrTranspiler::transpile(name, version, manifest_data, deps)
+            }
+            PullRequestPackageFormat::GentooEbuild => {
+                GentooEbuildPrTranspiler::transpile(name, version, manifest_data, deps)
+            }
             _ => FlatpakSnapPrTranspiler::transpile(name, version, manifest_data, deps),
         };
 
-        self.staged_packages.insert(payload.sigpkg_id.clone(), payload.clone());
+        self.staged_packages
+            .insert(payload.sigpkg_id.clone(), payload.clone());
         payload
     }
 
     pub fn count_staged_by_channel(&self, channel: RepoStagingChannel) -> usize {
-        self.staged_packages.values().filter(|p| p.target_channel == channel).count()
+        self.staged_packages
+            .values()
+            .filter(|p| p.target_channel == channel)
+            .count()
     }
 }
 
@@ -321,17 +401,24 @@ mod tests {
         assert_eq!(deb.source_format, PullRequestPackageFormat::DebianDeb);
         assert_eq!(deb.target_channel, RepoStagingChannel::Testing);
 
-        let arch = PacmanArchPrTranspiler::transpile("ripgrep", "14.1.0", "pkgname=ripgrep", &["pcre2"]);
+        let arch =
+            PacmanArchPrTranspiler::transpile("ripgrep", "14.1.0", "pkgname=ripgrep", &["pcre2"]);
         assert_eq!(arch.source_format, PullRequestPackageFormat::ArchPkgbuild);
         assert_eq!(arch.target_channel, RepoStagingChannel::Rolling);
 
         let rpm = DnfFedoraPrTranspiler::transpile("htop", "3.3.0", "Name: htop", &["ncurses"]);
         assert_eq!(rpm.source_format, PullRequestPackageFormat::FedoraRpm);
 
-        let ostree = FedoraFlatpakRpmOstreePrTranspiler::transpile("org.fedoraproject.Media", "1.0", "app-id", &[]);
+        let ostree = FedoraFlatpakRpmOstreePrTranspiler::transpile(
+            "org.fedoraproject.Media",
+            "1.0",
+            "app-id",
+            &[],
+        );
         assert_eq!(ostree.sandbox_profile, "bubblewrap-flatpak-portal");
 
-        let koji = FedoraCoprKojiPrTranspiler::transpile("kernel", "6.8.0", "Name: kernel", &["gcc"]);
+        let koji =
+            FedoraCoprKojiPrTranspiler::transpile("kernel", "6.8.0", "Name: kernel", &["gcc"]);
         assert_eq!(koji.sandbox_profile, "selinux-mls-greenwave");
 
         let apk = ApkAlpinePrTranspiler::transpile("musl", "1.2.4", "P:musl", &[]);
@@ -343,13 +430,40 @@ mod tests {
     fn test_master_pr_execution_suite() {
         let mut master = SovereignUniversalPrExecutionMasterSuite::new();
 
-        master.transpile_and_stage_pr("curl", "8.5.0", PullRequestPackageFormat::DebianDeb, "Package: curl", &["libc6"]);
-        master.transpile_and_stage_pr("bash", "5.2.21", PullRequestPackageFormat::AlpineApk, "P:bash", &["musl"]);
-        master.transpile_and_stage_pr("git", "2.43.0", PullRequestPackageFormat::ArchPkgbuild, "pkgname=git", &["zlib"]);
+        master.transpile_and_stage_pr(
+            "curl",
+            "8.5.0",
+            PullRequestPackageFormat::DebianDeb,
+            "Package: curl",
+            &["libc6"],
+        );
+        master.transpile_and_stage_pr(
+            "bash",
+            "5.2.21",
+            PullRequestPackageFormat::AlpineApk,
+            "P:bash",
+            &["musl"],
+        );
+        master.transpile_and_stage_pr(
+            "git",
+            "2.43.0",
+            PullRequestPackageFormat::ArchPkgbuild,
+            "pkgname=git",
+            &["zlib"],
+        );
 
         assert_eq!(master.staged_packages.len(), 3);
-        assert_eq!(master.count_staged_by_channel(RepoStagingChannel::Stable), 1); // Alpine
-        assert_eq!(master.count_staged_by_channel(RepoStagingChannel::Testing), 1); // Debian
-        assert_eq!(master.count_staged_by_channel(RepoStagingChannel::Rolling), 1); // Arch
+        assert_eq!(
+            master.count_staged_by_channel(RepoStagingChannel::Stable),
+            1
+        ); // Alpine
+        assert_eq!(
+            master.count_staged_by_channel(RepoStagingChannel::Testing),
+            1
+        ); // Debian
+        assert_eq!(
+            master.count_staged_by_channel(RepoStagingChannel::Rolling),
+            1
+        ); // Arch
     }
 }

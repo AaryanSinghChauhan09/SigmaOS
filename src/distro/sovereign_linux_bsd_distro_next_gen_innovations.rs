@@ -59,7 +59,13 @@ impl FreeBsdCtlScsiTargetEngine {
         }
     }
 
-    pub fn register_lun(&mut self, lun_id: u32, path: &str, size_mb: u64, port_type: CtlPortType) -> String {
+    pub fn register_lun(
+        &mut self,
+        lun_id: u32,
+        path: &str,
+        size_mb: u64,
+        port_type: CtlPortType,
+    ) -> String {
         let lun = FreeBsdCtlScsiLun {
             lun_id,
             backend_path: path.to_string(),
@@ -79,11 +85,22 @@ impl FreeBsdCtlScsiTargetEngine {
             }
             lun.io_ops_processed += 1;
             match req.opcode {
-                ScsiCommandOpcode::Inquiry => Ok(format!("LUN {}: Vendor SigmaOS CTL SCSI Device", req.lun_id)),
+                ScsiCommandOpcode::Inquiry => Ok(format!(
+                    "LUN {}: Vendor SigmaOS CTL SCSI Device",
+                    req.lun_id
+                )),
                 ScsiCommandOpcode::TestUnitReady => Ok(format!("LUN {}: Ready", req.lun_id)),
-                ScsiCommandOpcode::Read10 => Ok(format!("LUN {}: Read {} blocks at LBA {}", req.lun_id, req.block_count, req.lba_offset)),
-                ScsiCommandOpcode::Write10 => Ok(format!("LUN {}: Wrote {} blocks at LBA {}", req.lun_id, req.block_count, req.lba_offset)),
-                ScsiCommandOpcode::Capacity10 => Ok(format!("LUN {}: Capacity {} MB", req.lun_id, lun.size_mb)),
+                ScsiCommandOpcode::Read10 => Ok(format!(
+                    "LUN {}: Read {} blocks at LBA {}",
+                    req.lun_id, req.block_count, req.lba_offset
+                )),
+                ScsiCommandOpcode::Write10 => Ok(format!(
+                    "LUN {}: Wrote {} blocks at LBA {}",
+                    req.lun_id, req.block_count, req.lba_offset
+                )),
+                ScsiCommandOpcode::Capacity10 => {
+                    Ok(format!("LUN {}: Capacity {} MB", req.lun_id, lun.size_mb))
+                }
             }
         } else {
             Err("FreeBSD CTL: LUN not found")
@@ -170,7 +187,10 @@ impl OpenBsdPledgeUnveilAuditGovernor {
     }
 
     pub fn pledge(&mut self, pid: usize, caps: &[PledgeCapability]) -> Result<(), &'static str> {
-        let prof = self.process_profiles.get_mut(&pid).ok_or("Process profile not found")?;
+        let prof = self
+            .process_profiles
+            .get_mut(&pid)
+            .ok_or("Process profile not found")?;
         if prof.is_pledge_locked {
             // Cannot expand capabilities once locked, only reduce
             for c in caps {
@@ -186,8 +206,16 @@ impl OpenBsdPledgeUnveilAuditGovernor {
         Ok(())
     }
 
-    pub fn unveil(&mut self, pid: usize, path: &str, permissions: &str) -> Result<(), &'static str> {
-        let prof = self.process_profiles.get_mut(&pid).ok_or("Process profile not found")?;
+    pub fn unveil(
+        &mut self,
+        pid: usize,
+        path: &str,
+        permissions: &str,
+    ) -> Result<(), &'static str> {
+        let prof = self
+            .process_profiles
+            .get_mut(&pid)
+            .ok_or("Process profile not found")?;
         let perm = UnveilPathPermission {
             path: path.to_string(),
             allow_read: permissions.contains('r'),
@@ -199,7 +227,12 @@ impl OpenBsdPledgeUnveilAuditGovernor {
         Ok(())
     }
 
-    pub fn check_access(&mut self, pid: usize, cap_req: Option<PledgeCapability>, path_req: Option<(&str, &str)>) -> bool {
+    pub fn check_access(
+        &mut self,
+        pid: usize,
+        cap_req: Option<PledgeCapability>,
+        path_req: Option<(&str, &str)>,
+    ) -> bool {
         let prof = match self.process_profiles.get(&pid) {
             Some(p) => p,
             None => return true,
@@ -232,7 +265,10 @@ impl OpenBsdPledgeUnveilAuditGovernor {
                         pid,
                         process_name: prof.process_name.clone(),
                         violation_type: "UNVEIL_VIOLATION".to_string(),
-                        details: format!("Access mode '{}' on path '{}' denied by unveil rules", access_mode, target_path),
+                        details: format!(
+                            "Access mode '{}' on path '{}' denied by unveil rules",
+                            access_mode, target_path
+                        ),
                         timestamp: 1700000000,
                     });
                     return false;
@@ -297,7 +333,13 @@ impl SystemdHomedPortableUserEngine {
         }
     }
 
-    pub fn create_user_home(&mut self, username: &str, uid: u32, backend: HomedStorageBackend, quota_gb: u64) -> Result<String, &'static str> {
+    pub fn create_user_home(
+        &mut self,
+        username: &str,
+        uid: u32,
+        backend: HomedStorageBackend,
+        quota_gb: u64,
+    ) -> Result<String, &'static str> {
         if self.users.contains_key(username) {
             return Err("systemd-homed: User record already exists");
         }
@@ -315,8 +357,15 @@ impl SystemdHomedPortableUserEngine {
         Ok(format!("Created systemd-homed user entry for {}", username))
     }
 
-    pub fn authenticate_and_unlock(&mut self, username: &str, passphrase: &str) -> Result<String, &'static str> {
-        let user = self.users.get_mut(username).ok_or("systemd-homed: User not found")?;
+    pub fn authenticate_and_unlock(
+        &mut self,
+        username: &str,
+        passphrase: &str,
+    ) -> Result<String, &'static str> {
+        let user = self
+            .users
+            .get_mut(username)
+            .ok_or("systemd-homed: User not found")?;
         if passphrase.is_empty() {
             return Err("systemd-homed: Empty passphrase denied");
         }
@@ -325,13 +374,19 @@ impl SystemdHomedPortableUserEngine {
     }
 
     pub fn lock_user_home(&mut self, username: &str) -> Result<(), &'static str> {
-        let user = self.users.get_mut(username).ok_or("systemd-homed: User not found")?;
+        let user = self
+            .users
+            .get_mut(username)
+            .ok_or("systemd-homed: User not found")?;
         user.state = HomedUserState::Locked;
         Ok(())
     }
 
     pub fn bind_fido2_key(&mut self, username: &str, _key_id: &str) -> Result<(), &'static str> {
-        let user = self.users.get_mut(username).ok_or("systemd-homed: User not found")?;
+        let user = self
+            .users
+            .get_mut(username)
+            .ok_or("systemd-homed: User not found")?;
         user.fido2_token_bound = true;
         Ok(())
     }
@@ -377,7 +432,13 @@ impl NixGuixReproducibleStoreVerifier {
         }
     }
 
-    pub fn add_store_path(&mut self, path: &str, nar_sha256: &str, refs: &[&str], reproducible: bool) {
+    pub fn add_store_path(
+        &mut self,
+        path: &str,
+        nar_sha256: &str,
+        refs: &[&str],
+        reproducible: bool,
+    ) {
         let entry = StorePathEntry {
             store_path: path.to_string(),
             nar_sha256: nar_sha256.to_string(),
@@ -388,7 +449,10 @@ impl NixGuixReproducibleStoreVerifier {
     }
 
     pub fn verify_closure_integrity(&self, root_path: &str) -> Result<usize, &'static str> {
-        let root = self.store_entries.get(root_path).ok_or("CAS Store: Root path not found")?;
+        let root = self
+            .store_entries
+            .get(root_path)
+            .ok_or("CAS Store: Root path not found")?;
         let mut visited = Vec::new();
         let mut queue = vec![root.clone()];
 
@@ -424,7 +488,9 @@ impl NixGuixReproducibleStoreVerifier {
     }
 
     pub fn rollback_generation(&self, target_generation_id: usize) -> Option<&GenerationRecord> {
-        self.generations.iter().find(|g| g.generation_id == target_generation_id)
+        self.generations
+            .iter()
+            .find(|g| g.generation_id == target_generation_id)
     }
 }
 
@@ -482,7 +548,12 @@ impl DragonFlyHammer2MultiMasterPfsSyncEngine {
         self.nodes.insert(id, node);
     }
 
-    pub fn submit_pfs_transaction(&mut self, tx_id: u64, source_pfs: &str, hash: &str) -> Result<u64, &'static str> {
+    pub fn submit_pfs_transaction(
+        &mut self,
+        tx_id: u64,
+        source_pfs: &str,
+        hash: &str,
+    ) -> Result<u64, &'static str> {
         let tx = PfsReplicationTransaction {
             transaction_id: tx_id,
             source_pfs: source_pfs.to_string(),
@@ -601,7 +672,9 @@ impl AlpineApkV3TranspilerEngine {
     }
 
     pub fn commit_apkovl_overlay(&mut self, modified_file: &str) -> bool {
-        self.active_overlay.modified_files.push(modified_file.to_string());
+        self.active_overlay
+            .modified_files
+            .push(modified_file.to_string());
         self.active_overlay.is_committed = true;
         true
     }
@@ -648,18 +721,27 @@ impl SovereignLinuxBsdNextGenInnovationsMasterSuite {
     }
 
     fn seed_defaults(&mut self) {
-        self.ctl_engine.register_lun(1, "/dev/zvol/tank/lun1", 10240, CtlPortType::VirtIoScsi);
+        self.ctl_engine
+            .register_lun(1, "/dev/zvol/tank/lun1", 10240, CtlPortType::VirtIoScsi);
         self.pledge_audit.register_process(1001, "sovereign-daemon");
-        let _ = self.homed_engine.create_user_home("sovereign", 1000, HomedStorageBackend::LuksLoopImage, 50);
-        self.cas_verifier.add_store_path("/nix/store/glibc-2.38", "abc123hash", &[], true);
-        self.hammer2_sync.add_cluster_node(1, "node1.sigmaos.org", Hammer2NodeRole::Master);
-        self.apk_transpiler.transpile_apk_to_sigpkg(ApkV3PackageSpec {
-            package_name: "musl".to_string(),
-            version: "1.2.4".to_string(),
-            architecture: "x86_64".to_string(),
-            triggers: vec!["ldconfig".to_string()],
-            dependencies: vec![],
-        });
+        let _ = self.homed_engine.create_user_home(
+            "sovereign",
+            1000,
+            HomedStorageBackend::LuksLoopImage,
+            50,
+        );
+        self.cas_verifier
+            .add_store_path("/nix/store/glibc-2.38", "abc123hash", &[], true);
+        self.hammer2_sync
+            .add_cluster_node(1, "node1.sigmaos.org", Hammer2NodeRole::Master);
+        self.apk_transpiler
+            .transpile_apk_to_sigpkg(ApkV3PackageSpec {
+                package_name: "musl".to_string(),
+                version: "1.2.4".to_string(),
+                architecture: "x86_64".to_string(),
+                triggers: vec!["ldconfig".to_string()],
+                dependencies: vec![],
+            });
     }
 
     pub fn run_full_verification(&mut self) -> NextGenDistroParityMetrics {
@@ -668,7 +750,12 @@ impl SovereignLinuxBsdNextGenInnovationsMasterSuite {
             security_violations_audited: self.pledge_audit.violation_count(),
             homed_users_managed: self.homed_engine.users.len(),
             cas_store_entries_verified: self.cas_verifier.store_entries.len(),
-            hammer2_cluster_nodes_active: self.hammer2_sync.nodes.values().filter(|n| n.is_active).count(),
+            hammer2_cluster_nodes_active: self
+                .hammer2_sync
+                .nodes
+                .values()
+                .filter(|n| n.is_active)
+                .count(),
             apk_packages_transpiled: self.apk_transpiler.packages.len(),
         }
     }
@@ -705,27 +792,46 @@ mod tests {
     fn test_openbsd_pledge_unveil_audit() {
         let mut auditor = OpenBsdPledgeUnveilAuditGovernor::new();
         auditor.register_process(500, "firefox");
-        auditor.pledge(500, &[PledgeCapability::StdIo, PledgeCapability::RPath]).unwrap();
+        auditor
+            .pledge(500, &[PledgeCapability::StdIo, PledgeCapability::RPath])
+            .unwrap();
         auditor.unveil(500, "/home/user", "r").unwrap();
 
         // Allowed access
-        assert!(auditor.check_access(500, Some(PledgeCapability::StdIo), Some(("/home/user/doc.txt", "r"))));
+        assert!(auditor.check_access(
+            500,
+            Some(PledgeCapability::StdIo),
+            Some(("/home/user/doc.txt", "r"))
+        ));
 
         // Denied capability access -> Violation logged
         assert!(!auditor.check_access(500, Some(PledgeCapability::UNix), None));
         assert_eq!(auditor.violation_count(), 1);
-        assert_eq!(auditor.latest_violations()[0].violation_type, "PLEDGE_VIOLATION");
+        assert_eq!(
+            auditor.latest_violations()[0].violation_type,
+            "PLEDGE_VIOLATION"
+        );
     }
 
     #[test]
     fn test_systemd_homed_portable_user() {
         let mut homed = SystemdHomedPortableUserEngine::new();
-        homed.create_user_home("alice", 1001, HomedStorageBackend::LuksLoopImage, 100).unwrap();
-        assert_eq!(homed.get_user_state("alice").unwrap(), HomedUserState::Locked);
+        homed
+            .create_user_home("alice", 1001, HomedStorageBackend::LuksLoopImage, 100)
+            .unwrap();
+        assert_eq!(
+            homed.get_user_state("alice").unwrap(),
+            HomedUserState::Locked
+        );
 
-        let res = homed.authenticate_and_unlock("alice", "secret_passphrase").unwrap();
+        let res = homed
+            .authenticate_and_unlock("alice", "secret_passphrase")
+            .unwrap();
         assert!(res.contains("Unlocked LUKS home"));
-        assert_eq!(homed.get_user_state("alice").unwrap(), HomedUserState::Unlocked);
+        assert_eq!(
+            homed.get_user_state("alice").unwrap(),
+            HomedUserState::Unlocked
+        );
     }
 
     #[test]
@@ -748,7 +854,9 @@ mod tests {
         hammer.add_cluster_node(1, "node1", Hammer2NodeRole::Master);
         hammer.add_cluster_node(2, "node2", Hammer2NodeRole::Slave);
 
-        let tx_id = hammer.submit_pfs_transaction(101, "root_pfs", "sha256_hash").unwrap();
+        let tx_id = hammer
+            .submit_pfs_transaction(101, "root_pfs", "sha256_hash")
+            .unwrap();
         let quorum = hammer.synchronize_quorum(tx_id).unwrap();
         assert!(quorum);
 

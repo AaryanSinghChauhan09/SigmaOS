@@ -3,14 +3,10 @@
 mod block;
 
 #[cfg(feature = "standalone_test_direct")]
-use block::{
-    BlockDeviceID, BlockError, BlockNumber, BlockOrientedDevice, DeviceClass,
-};
+use block::{BlockDeviceID, BlockError, BlockNumber, BlockOrientedDevice, DeviceClass};
 
 #[cfg(not(feature = "standalone_test_direct"))]
-use super::block::{
-    BlockDeviceID, BlockError, BlockNumber, BlockOrientedDevice, DeviceClass,
-};
+use super::block::{BlockDeviceID, BlockError, BlockNumber, BlockOrientedDevice, DeviceClass};
 
 use std::vec::Vec;
 
@@ -155,7 +151,9 @@ mod tests {
         assert!(virtio.read_block(2, &mut read_buf).is_ok());
         assert_eq!(read_buf, write_data);
 
-        let desc_id = virtio.submit_virtqueue_request(VIRTIO_BLK_T_IN, 2, 512).unwrap();
+        let desc_id = virtio
+            .submit_virtqueue_request(VIRTIO_BLK_T_IN, 2, 512)
+            .unwrap();
         assert_eq!(desc_id, 0);
 
         let processed = virtio.process_used_ring();

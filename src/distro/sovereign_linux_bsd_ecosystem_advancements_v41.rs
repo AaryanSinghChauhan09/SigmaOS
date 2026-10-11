@@ -90,8 +90,16 @@ impl FreeBsdNetGraphNetworkEngineV41 {
         node_b_id: u32,
         hook_b: &str,
     ) -> Result<(), &'static str> {
-        let name_b = self.nodes.get(&node_b_id).map(|n| n.node_name.clone()).ok_or("Node B not found")?;
-        let name_a = self.nodes.get(&node_a_id).map(|n| n.node_name.clone()).ok_or("Node A not found")?;
+        let name_b = self
+            .nodes
+            .get(&node_b_id)
+            .map(|n| n.node_name.clone())
+            .ok_or("Node B not found")?;
+        let name_a = self
+            .nodes
+            .get(&node_a_id)
+            .map(|n| n.node_name.clone())
+            .ok_or("Node A not found")?;
 
         if let Some(node_a) = self.nodes.get_mut(&node_a_id) {
             node_a.hooks.insert(
@@ -321,7 +329,8 @@ impl AlpineApkV3ChrootSandboxEngineV41 {
     }
 
     pub fn add_package(&mut self, name: &str, checksum: &str) {
-        self.package_checksums.insert(name.to_string(), checksum.to_string());
+        self.package_checksums
+            .insert(name.to_string(), checksum.to_string());
     }
 
     pub fn enter_chroot_sandbox(&mut self) {
@@ -333,7 +342,10 @@ impl AlpineApkV3ChrootSandboxEngineV41 {
     }
 
     pub fn verify_checksum(&self, name: &str, checksum: &str) -> bool {
-        self.package_checksums.get(name).map(|c| c == checksum).unwrap_or(false)
+        self.package_checksums
+            .get(name)
+            .map(|c| c == checksum)
+            .unwrap_or(false)
     }
 }
 
@@ -584,8 +596,10 @@ impl SovereignLinuxBsdEcosystemAdvancementsV41Suite {
         let vm_id = self.vmm.create_vm("obsd1", 1024, 2, "/var/vmm/obsd1.qcow2");
         self.vmm.start_vm(vm_id);
 
-        self.rump.spawn_rump_server("rump_net", RumpSubsystemKindV41::Net);
-        self.gentoo.register_atom("sys-apps/coreutils", "0", "0", &["multilib"]);
+        self.rump
+            .spawn_rump_server("rump_net", RumpSubsystemKindV41::Net);
+        self.gentoo
+            .register_atom("sys-apps/coreutils", "0", "0", &["multilib"]);
         self.alpine.add_package("musl", "sha256_musl");
 
         self.debian.register_trigger("ldconfig");
@@ -600,7 +614,9 @@ impl SovereignLinuxBsdEcosystemAdvancementsV41Suite {
         self.netgraph.get_node_count() == 2
             && self.vmm.stop_vm(vm_id)
             && self.rump.is_rump_server_running("rump_net")
-            && self.gentoo.resolve_use_expand("sys-apps/coreutils", "multilib")
+            && self
+                .gentoo
+                .resolve_use_expand("sys-apps/coreutils", "multilib")
             && self.alpine.verify_checksum("musl", "sha256_musl")
             && self.debian.process_triggers() == 1
             && self.fedora.is_approved()

@@ -24,9 +24,7 @@ impl PathBuf {
     }
 
     pub fn from<S: Into<String>>(s: S) -> Self {
-        PathBuf {
-            inner: s.into(),
-        }
+        PathBuf { inner: s.into() }
     }
 
     pub fn push(&mut self, path: &str) {
@@ -53,7 +51,11 @@ impl PathBuf {
     }
 
     pub fn file_name(&self) -> Option<PathBuf> {
-        self.inner.rsplit('/').next().filter(|s| !s.is_empty()).map(PathBuf::from)
+        self.inner
+            .rsplit('/')
+            .next()
+            .filter(|s| !s.is_empty())
+            .map(PathBuf::from)
     }
 
     pub fn extension(&self) -> Option<&str> {
@@ -61,7 +63,9 @@ impl PathBuf {
     }
 
     pub fn parent(&self) -> Option<PathBuf> {
-        self.inner.rfind('/').map(|idx| PathBuf::from(&self.inner[..idx]))
+        self.inner
+            .rfind('/')
+            .map(|idx| PathBuf::from(&self.inner[..idx]))
     }
 }
 

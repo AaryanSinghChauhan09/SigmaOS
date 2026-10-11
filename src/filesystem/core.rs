@@ -87,7 +87,10 @@ impl FilesystemCoreManager {
         bytes: u64,
         inodes: u64,
     ) -> Result<(), FsCoreError> {
-        let bounds = self.volumes.get_mut(vol_name).ok_or(FsCoreError::NotFound)?;
+        let bounds = self
+            .volumes
+            .get_mut(vol_name)
+            .ok_or(FsCoreError::NotFound)?;
         if bounds.used_bytes + bytes > bounds.total_bytes
             || bounds.used_inodes + inodes > bounds.total_inodes
         {
@@ -100,8 +103,16 @@ impl FilesystemCoreManager {
         Ok(())
     }
 
-    pub fn free_space(&mut self, vol_name: &str, bytes: u64, inodes: u64) -> Result<(), FsCoreError> {
-        let bounds = self.volumes.get_mut(vol_name).ok_or(FsCoreError::NotFound)?;
+    pub fn free_space(
+        &mut self,
+        vol_name: &str,
+        bytes: u64,
+        inodes: u64,
+    ) -> Result<(), FsCoreError> {
+        let bounds = self
+            .volumes
+            .get_mut(vol_name)
+            .ok_or(FsCoreError::NotFound)?;
         bounds.used_bytes = bounds.used_bytes.saturating_sub(bytes);
         bounds.free_bytes = (bounds.total_bytes - bounds.used_bytes).min(bounds.total_bytes);
         bounds.used_inodes = bounds.used_inodes.saturating_sub(inodes);
@@ -124,11 +135,7 @@ impl FilesystemCoreManager {
         Ok(tx_id)
     }
 
-    pub fn commit_transaction(
-        &mut self,
-        tx_id: u64,
-        expected_seq: u64,
-    ) -> Result<(), FsCoreError> {
+    pub fn commit_transaction(&mut self, tx_id: u64, expected_seq: u64) -> Result<(), FsCoreError> {
         let rec = match self.active_transactions.get_mut(&tx_id) {
             Some(r) => r,
             None => return Err(FsCoreError::TransactionFailed),

@@ -376,9 +376,18 @@ mod tests {
     fn test_detect_format() {
         assert_eq!(CaptainEngine::detect_format("test.deb"), CaptainFormat::Deb);
         assert_eq!(CaptainEngine::detect_format("test.rpm"), CaptainFormat::Rpm);
-        assert_eq!(CaptainEngine::detect_format("test.tar.gz"), CaptainFormat::TarGz);
-        assert_eq!(CaptainEngine::detect_format("test.tar.xz"), CaptainFormat::TarXz);
-        assert_eq!(CaptainEngine::detect_format("test.txt"), CaptainFormat::Unknown);
+        assert_eq!(
+            CaptainEngine::detect_format("test.tar.gz"),
+            CaptainFormat::TarGz
+        );
+        assert_eq!(
+            CaptainEngine::detect_format("test.tar.xz"),
+            CaptainFormat::TarXz
+        );
+        assert_eq!(
+            CaptainEngine::detect_format("test.txt"),
+            CaptainFormat::Unknown
+        );
     }
 
     #[test]

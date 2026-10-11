@@ -147,10 +147,7 @@ impl MountManager {
     }
 
     pub fn acquire_ref(&mut self, target: &str) -> Result<(), MountError> {
-        let entry = self
-            .mounts
-            .get_mut(target)
-            .ok_or(MountError::NotMounted)?;
+        let entry = self.mounts.get_mut(target).ok_or(MountError::NotMounted)?;
         if entry.state != MountState::Mounted {
             return Err(MountError::NotMounted);
         }
@@ -159,10 +156,7 @@ impl MountManager {
     }
 
     pub fn release_ref(&mut self, target: &str) -> Result<(), MountError> {
-        let entry = self
-            .mounts
-            .get_mut(target)
-            .ok_or(MountError::NotMounted)?;
+        let entry = self.mounts.get_mut(target).ok_or(MountError::NotMounted)?;
         if entry.open_ref_count > 0 {
             entry.open_ref_count -= 1;
         }
@@ -179,7 +173,9 @@ mod tests {
         let mut mgr = MountManager::new();
         let flags = CustomMountFlags::default();
 
-        assert!(mgr.mount("/dev/nvme0n1p1", "/mnt/data", "ext4", flags).is_ok());
+        assert!(mgr
+            .mount("/dev/nvme0n1p1", "/mnt/data", "ext4", flags)
+            .is_ok());
 
         // Acquire active file reference
         assert!(mgr.acquire_ref("/mnt/data").is_ok());

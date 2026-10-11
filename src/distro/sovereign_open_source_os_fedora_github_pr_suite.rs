@@ -20,7 +20,10 @@ use std::vec::Vec;
 pub enum ZincatiUpdateState {
     Idle,
     CheckingReleaseGraph,
-    UpdateAvailable { version: String, target_commit: String },
+    UpdateAvailable {
+        version: String,
+        target_commit: String,
+    },
     StagingDeployment,
     FinalizingBootLock,
     RebootPending,
@@ -51,7 +54,13 @@ impl FedoraCoreOsZincatiAutoUpdatePrEngine {
         }
     }
 
-    pub fn add_release_node(&mut self, version: &str, commit: &str, age_days: u32, is_deadend: bool) {
+    pub fn add_release_node(
+        &mut self,
+        version: &str,
+        commit: &str,
+        age_days: u32,
+        is_deadend: bool,
+    ) {
         self.release_graph.push(ZincatiReleaseNode {
             version: version.to_string(),
             commit: commit.to_string(),
@@ -62,7 +71,11 @@ impl FedoraCoreOsZincatiAutoUpdatePrEngine {
 
     pub fn check_for_updates(&mut self) -> Option<ZincatiReleaseNode> {
         self.state = ZincatiUpdateState::CheckingReleaseGraph;
-        let candidate = self.release_graph.iter().find(|n| !n.is_deadend && n.version != self.current_version).cloned();
+        let candidate = self
+            .release_graph
+            .iter()
+            .find(|n| !n.is_deadend && n.version != self.current_version)
+            .cloned();
 
         if let Some(ref target) = candidate {
             self.state = ZincatiUpdateState::UpdateAvailable {
@@ -152,18 +165,27 @@ impl FedoraKojiBodhiBuildPipelinePrEngine {
         self.next_task_id += 1;
 
         if spec_file.contains("Name:") && spec_file.contains("Version:") {
-            self.build_tasks.insert(task_id, KojiTaskStatus::SpecLintPassed);
+            self.build_tasks
+                .insert(task_id, KojiTaskStatus::SpecLintPassed);
         } else {
             self.build_tasks.insert(
                 task_id,
-                KojiTaskStatus::Failed("Invalid RPM spec file missing Name or Version tag".to_string()),
+                KojiTaskStatus::Failed(
+                    "Invalid RPM spec file missing Name or Version tag".to_string(),
+                ),
             );
         }
 
         task_id
     }
 
-    pub fn complete_koji_build(&mut self, task_id: u64, name: &str, version: &str, release: &str) -> bool {
+    pub fn complete_koji_build(
+        &mut self,
+        task_id: u64,
+        name: &str,
+        version: &str,
+        release: &str,
+    ) -> bool {
         if let Some(status) = self.build_tasks.get_mut(&task_id) {
             if *status == KojiTaskStatus::SpecLintPassed {
                 let nvr = format!("{}-{}-{}", name, version, release);
@@ -233,7 +255,12 @@ impl FedoraSelinuxContainerPolicyPrEngine {
         }
     }
 
-    pub fn generate_container_label(&mut self, container_id: &str, category_a: u32, category_b: u32) -> String {
+    pub fn generate_container_label(
+        &mut self,
+        container_id: &str,
+        category_a: u32,
+        category_b: u32,
+    ) -> String {
         let ctx = SelinuxContainerContext {
             user: "system_u".to_string(),
             role: "system_r".to_string(),
@@ -241,9 +268,15 @@ impl FedoraSelinuxContainerPolicyPrEngine {
             mcs_level: format!("s0:c{},c{}", category_a, category_b),
         };
 
-        let formatted = format!("{}:{}:{}:{}", ctx.user, ctx.role, ctx.domain_type, ctx.mcs_level);
+        let formatted = format!(
+            "{}:{}:{}:{}",
+            ctx.user, ctx.role, ctx.domain_type, ctx.mcs_level
+        );
         self.active_contexts.insert(container_id.to_string(), ctx);
-        self.audit_log.push(format!("SELinux label assigned to container '{}': {}", container_id, formatted));
+        self.audit_log.push(format!(
+            "SELinux label assigned to container '{}': {}",
+            container_id, formatted
+        ));
 
         formatted
     }
@@ -251,11 +284,17 @@ impl FedoraSelinuxContainerPolicyPrEngine {
     pub fn check_access(&mut self, container_id: &str, target_type: &str) -> bool {
         if let Some(ctx) = self.active_contexts.get(container_id) {
             if ctx.domain_type == "container_t" && target_type == "container_file_t" {
-                self.audit_log.push(format!("Access GRANTED: {} -> {}", container_id, target_type));
+                self.audit_log.push(format!(
+                    "Access GRANTED: {} -> {}",
+                    container_id, target_type
+                ));
                 return true;
             }
         }
-        self.audit_log.push(format!("Access DENIED: {} -> {}", container_id, target_type));
+        self.audit_log.push(format!(
+            "Access DENIED: {} -> {}",
+            container_id, target_type
+        ));
         false
     }
 }
@@ -299,7 +338,9 @@ impl FedoraMockFlatpakBuilderPrEngine {
         if !manifest.app_id.is_empty() && !manifest.command.is_empty() {
             let app_id = manifest.app_id.clone();
             self.flatpaks_built.insert(app_id, manifest);
-            self.ostree_commit_hash = Some("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855".to_string());
+            self.ostree_commit_hash = Some(
+                "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855".to_string(),
+            );
             true
         } else {
             false
@@ -346,9 +387,18 @@ impl SovereignOpenSourceOsAndFedoraGithubMasterPrSuite {
         pr.push_str("- **Mock & Flatpak Builder:** Isolated chroot builder and OSTree repository committer.\n\n");
 
         pr.push_str("## Implementation Diagnostics\n");
-        pr.push_str(&format!("- Zincati Current Version: {}\n", self.zincati.current_version));
-        pr.push_str(&format!("- Active SELinux Contexts: {}\n", self.selinux.active_contexts.len()));
-        pr.push_str(&format!("- Built Flatpak Applications: {}\n", self.mock_flatpak.flatpaks_built.len()));
+        pr.push_str(&format!(
+            "- Zincati Current Version: {}\n",
+            self.zincati.current_version
+        ));
+        pr.push_str(&format!(
+            "- Active SELinux Contexts: {}\n",
+            self.selinux.active_contexts.len()
+        ));
+        pr.push_str(&format!(
+            "- Built Flatpak Applications: {}\n",
+            self.mock_flatpak.flatpaks_built.len()
+        ));
 
         pr
     }
@@ -392,7 +442,13 @@ mod tests {
         assert!(engine.complete_koji_build(task_id, "test-pkg", "1.0.0", "1.fc39"));
         let score = engine.vote_karma("test-pkg-1.0.0-1.fc39", 3);
         assert_eq!(score, Some(3));
-        assert!(engine.bodhi_updates.get("test-pkg-1.0.0-1.fc39").unwrap().is_pushed_to_stable);
+        assert!(
+            engine
+                .bodhi_updates
+                .get("test-pkg-1.0.0-1.fc39")
+                .unwrap()
+                .is_pushed_to_stable
+        );
     }
 
     #[test]
@@ -425,7 +481,8 @@ mod tests {
     fn test_master_pr_suite() {
         let mut suite = SovereignOpenSourceOsAndFedoraGithubMasterPrSuite::new();
         let proposal = suite.generate_pr_proposal();
-        assert!(proposal.contains("Fedora GitHub & Open Source Operating System Comprehensive Parity Suite"));
+        assert!(proposal
+            .contains("Fedora GitHub & Open Source Operating System Comprehensive Parity Suite"));
         assert!(proposal.contains("Zincati Current Version:"));
     }
 }

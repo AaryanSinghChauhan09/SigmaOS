@@ -560,7 +560,11 @@ impl ArchLinuxSystemParityPullRequestEngine {
     }
 
     /// Generates unified diff for Arch parity PR
-    pub fn generate_unified_diff(&self, pr_id: u64, base_spec: &str) -> Result<String, &'static str> {
+    pub fn generate_unified_diff(
+        &self,
+        pr_id: u64,
+        base_spec: &str,
+    ) -> Result<String, &'static str> {
         self.gateway.generate_arch_component_diff(pr_id, base_spec)
     }
 
@@ -898,6 +902,6 @@ mod tests {
             let merged = engine.merge_parity_pr(pr_id).unwrap();
             assert_eq!(merged.name, name);
         }
-        assert_eq!(engine.parity_records.len(), 10);
+        assert_eq!(engine.parity_records.len(), 13);
     }
 }

@@ -6,7 +6,10 @@ use std::path::Path;
 
 #[test]
 fn test_shell_rules_file_exists_and_valid() {
-    assert!(Path::new("SHELL_RULES.toml").exists(), "SHELL_RULES.toml must exist in repo root");
+    assert!(
+        Path::new("SHELL_RULES.toml").exists(),
+        "SHELL_RULES.toml must exist in repo root"
+    );
     let content = fs::read_to_string("SHELL_RULES.toml").expect("Failed to read SHELL_RULES.toml");
 
     assert!(content.contains("[rule.deterministic_scripts]"));
@@ -24,8 +27,12 @@ fn test_shell_rules_file_exists_and_valid() {
 
 #[test]
 fn test_pull_request_template_exists() {
-    assert!(Path::new(".github/PULL_REQUEST_TEMPLATE.md").exists(), "PR template must exist");
-    let content = fs::read_to_string(".github/PULL_REQUEST_TEMPLATE.md").expect("Failed to read PR template");
+    assert!(
+        Path::new(".github/PULL_REQUEST_TEMPLATE.md").exists(),
+        "PR template must exist"
+    );
+    let content =
+        fs::read_to_string(".github/PULL_REQUEST_TEMPLATE.md").expect("Failed to read PR template");
     assert!(content.contains("## Shell component"));
     assert!(content.contains("## Shell safety review"));
 }
@@ -92,10 +99,16 @@ fn test_expansion_order_sequence() {
 
 #[test]
 fn test_diagnostics_formatting() {
-    let parse_err = format!("sigma-sh: parse error at line {}, col {}: {}", 1, 5, "unexpected token");
+    let parse_err = format!(
+        "sigma-sh: parse error at line {}, col {}: {}",
+        1, 5, "unexpected token"
+    );
     assert!(parse_err.contains("line 1, col 5"));
 
-    let cmd_err = format!("sigma-sh: {}: command not found (did you mean '{}'?)", "htep", "help");
+    let cmd_err = format!(
+        "sigma-sh: {}: command not found (did you mean '{}'?)",
+        "htep", "help"
+    );
     assert!(cmd_err.contains("command not found"));
     assert!(cmd_err.contains("did you mean 'help'?"));
 }

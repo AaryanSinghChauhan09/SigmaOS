@@ -17,9 +17,9 @@ use alloc::format;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec::Vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::BTreeMap;
@@ -28,9 +28,9 @@ use std::format;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
-#[cfg(any(feature = "standalone_test", test))]
 use std::vec;
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec::Vec;
 
 // ============================================================================
 // 1. NixOS Flakes Lockfile & Closure Graph Engine
@@ -66,7 +66,11 @@ impl NixFlakeLockClosureGraphEngine {
             submodules: false,
         };
         self.inputs.insert(name.to_string(), node);
-        let closure_path = format!("/nix/store/{}-{}-closure", &nar_hash[..nar_hash.len().min(12)], name);
+        let closure_path = format!(
+            "/nix/store/{}-{}-closure",
+            &nar_hash[..nar_hash.len().min(12)],
+            name
+        );
         self.closure_nodes.push(closure_path);
     }
 
@@ -307,7 +311,11 @@ impl FedoraOstreeSysrootStagingEngine {
         }
     }
 
-    pub fn stage_new_commit(&mut self, commit_hash: &str, overlays: &[&str]) -> OstreeDeploymentSlot {
+    pub fn stage_new_commit(
+        &mut self,
+        commit_hash: &str,
+        overlays: &[&str],
+    ) -> OstreeDeploymentSlot {
         let target_slot = match self.active_slot {
             OstreeDeploymentSlot::SlotA => OstreeDeploymentSlot::SlotB,
             OstreeDeploymentSlot::SlotB => OstreeDeploymentSlot::SlotA,
@@ -322,7 +330,10 @@ impl FedoraOstreeSysrootStagingEngine {
         target_slot
     }
 
-    pub fn atomic_switch_deployment(&mut self, commit_hash: &str) -> Result<OstreeDeploymentSlot, &'static str> {
+    pub fn atomic_switch_deployment(
+        &mut self,
+        commit_hash: &str,
+    ) -> Result<OstreeDeploymentSlot, &'static str> {
         if let Some(commit) = self.deployments.get_mut(commit_hash) {
             commit.is_active = true;
             self.active_slot = commit.slot.clone();
@@ -438,7 +449,11 @@ impl GentooEapi8SubslotSolverEngine {
         self.installed_atoms.insert(cat_pkg.to_string(), spec);
     }
 
-    pub fn update_subslot_and_find_rebuilds(&mut self, cat_pkg: &str, new_subslot: &str) -> Vec<String> {
+    pub fn update_subslot_and_find_rebuilds(
+        &mut self,
+        cat_pkg: &str,
+        new_subslot: &str,
+    ) -> Vec<String> {
         let mut rebuilds = Vec::new();
         if let Some(atom) = self.installed_atoms.get_mut(cat_pkg) {
             if atom.subslot != new_subslot {
@@ -612,13 +627,15 @@ impl NetBsdVeriexecFingerprintEngine {
     }
 
     pub fn register_fingerprint(&mut self, binary_path: &str, sha256_hash: &str) {
-        self.fingerprint_db.insert(binary_path.to_string(), sha256_hash.to_string());
+        self.fingerprint_db
+            .insert(binary_path.to_string(), sha256_hash.to_string());
     }
 
     pub fn verify_execution_fingerprint(&self, binary_path: &str, computed_sha256: &str) -> bool {
         match self.strict_level {
             VeriexecStrictLevel::Strict0DirectOnly => true,
-            VeriexecStrictLevel::Strict1EnforceFingerprint | VeriexecStrictLevel::Strict2LockdownNoDirectExec => {
+            VeriexecStrictLevel::Strict1EnforceFingerprint
+            | VeriexecStrictLevel::Strict2LockdownNoDirectExec => {
                 if let Some(registered) = self.fingerprint_db.get(binary_path) {
                     registered == computed_sha256
                 } else {
@@ -670,36 +687,75 @@ impl SovereignLinuxBsdEcosystemAdvancementsV25Suite {
     }
 
     pub fn execute_comprehensive_ecosystem_health_audit(&mut self) -> bool {
-        self.nix_flakes.register_input("nixpkgs", "github:nixos/nixpkgs", "sha256_nix123");
+        self.nix_flakes
+            .register_input("nixpkgs", "github:nixos/nixpkgs", "sha256_nix123");
         let nix_ok = self.nix_flakes.evaluate_hermetic_closure();
 
-        let casper_ch = self.freebsd_casper.spawn_casper_channel(CasperServiceType::DnsResolver, &["getaddrinfo"]);
-        let freebsd_ok = self.freebsd_casper.verify_casper_request(casper_ch, "getaddrinfo");
+        let casper_ch = self
+            .freebsd_casper
+            .spawn_casper_channel(CasperServiceType::DnsResolver, &["getaddrinfo"]);
+        let freebsd_ok = self
+            .freebsd_casper
+            .verify_casper_request(casper_ch, "getaddrinfo");
 
         let unveil_ok = self.openbsd_unveil.unveil("/usr/bin", "rx").is_ok();
 
         let lock_ok = self.arch_alpm.acquire_db_lock();
-        let arch_ok = lock_ok && self.arch_alpm.add_package("linux", "6.12.0", "pqc_sig_dilithium5").is_ok();
+        let arch_ok = lock_ok
+            && self
+                .arch_alpm
+                .add_package("linux", "6.12.0", "pqc_sig_dilithium5")
+                .is_ok();
         self.arch_alpm.release_db_lock();
 
-        let slot = self.fedora_ostree.stage_new_commit("sha256_commit_v2", &["htop.rpm"]);
+        let slot = self
+            .fedora_ostree
+            .stage_new_commit("sha256_commit_v2", &["htop.rpm"]);
         let fedora_ok = slot == OstreeDeploymentSlot::SlotB;
 
-        self.alpine_triggers.register_trigger("update-font-cache", "/usr/share/fonts", "fc-cache -f");
-        let alpine_ok = self.alpine_triggers.notify_file_change("/usr/share/fonts/dejavu.ttf") > 0;
+        self.alpine_triggers.register_trigger(
+            "update-font-cache",
+            "/usr/share/fonts",
+            "fc-cache -f",
+        );
+        let alpine_ok = self
+            .alpine_triggers
+            .notify_file_change("/usr/share/fonts/dejavu.ttf")
+            > 0;
 
-        self.gentoo_portage.register_atom("dev-libs/openssl", "0", "3.0", &["ssl"]);
-        let gentoo_ok = self.gentoo_portage.installed_atoms.contains_key("dev-libs/openssl");
+        self.gentoo_portage
+            .register_atom("dev-libs/openssl", "0", "3.0", &["ssl"]);
+        let gentoo_ok = self
+            .gentoo_portage
+            .installed_atoms
+            .contains_key("dev-libs/openssl");
 
-        let void_ok = self.void_runit_xbps.verify_xbps_rsa_signature("nginx", b"rsa_2048_bytes");
+        let void_ok = self
+            .void_runit_xbps
+            .verify_xbps_rsa_signature("nginx", b"rsa_2048_bytes");
 
         self.dragonfly_hammer2.create_pfs_node("@root", true);
-        let df_ok = self.dragonfly_hammer2.commit_pfs_transaction("@root").is_ok();
+        let df_ok = self
+            .dragonfly_hammer2
+            .commit_pfs_transaction("@root")
+            .is_ok();
 
-        self.netbsd_veriexec.register_fingerprint("/bin/ls", "sha256_ls_hash");
-        let netbsd_ok = self.netbsd_veriexec.verify_execution_fingerprint("/bin/ls", "sha256_ls_hash");
+        self.netbsd_veriexec
+            .register_fingerprint("/bin/ls", "sha256_ls_hash");
+        let netbsd_ok = self
+            .netbsd_veriexec
+            .verify_execution_fingerprint("/bin/ls", "sha256_ls_hash");
 
-        nix_ok && freebsd_ok && unveil_ok && arch_ok && fedora_ok && alpine_ok && gentoo_ok && void_ok && df_ok && netbsd_ok
+        nix_ok
+            && freebsd_ok
+            && unveil_ok
+            && arch_ok
+            && fedora_ok
+            && alpine_ok
+            && gentoo_ok
+            && void_ok
+            && df_ok
+            && netbsd_ok
     }
 }
 
@@ -764,7 +820,10 @@ mod tests {
     fn test_alpine_apk_v3_triggers() {
         let mut engine = AlpineApkV3TrigDbEngine::new();
         engine.register_trigger("icon-cache", "/usr/share/icons", "gtk-update-icon-cache");
-        assert_eq!(engine.notify_file_change("/usr/share/icons/hicolor/index.theme"), 1);
+        assert_eq!(
+            engine.notify_file_change("/usr/share/icons/hicolor/index.theme"),
+            1
+        );
         assert_eq!(engine.run_pending_triggers(), 1);
     }
 

@@ -27,9 +27,9 @@ use alloc::format;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec::Vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::BTreeMap;
@@ -38,9 +38,9 @@ use std::format;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
-#[cfg(any(feature = "standalone_test", test))]
 use std::vec;
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec::Vec;
 
 // ============================================================================
 // 1. Plan 9 rfork Namespace PR Engine
@@ -57,18 +57,26 @@ impl Plan9RforkNamespacePrEngine {
             namespace_flags: 0x01 | 0x02,
             mount_table: BTreeMap::new(),
         };
-        engine.mount_table.insert("/net".to_string(), "ip_server".to_string());
-        engine.mount_table.insert("/proc".to_string(), "proc_server".to_string());
+        engine
+            .mount_table
+            .insert("/net".to_string(), "ip_server".to_string());
+        engine
+            .mount_table
+            .insert("/proc".to_string(), "proc_server".to_string());
         engine
     }
 
     pub fn rfork_namespace(&mut self, flags: u32) -> Result<String, String> {
         self.namespace_flags |= flags;
-        Ok(format!("PR Proposal: Plan 9 rfork isolated namespace with flags 0x{:04x}", self.namespace_flags))
+        Ok(format!(
+            "PR Proposal: Plan 9 rfork isolated namespace with flags 0x{:04x}",
+            self.namespace_flags
+        ))
     }
 
     pub fn bind_synthetic_mount(&mut self, target: &str, server: &str) {
-        self.mount_table.insert(target.to_string(), server.to_string());
+        self.mount_table
+            .insert(target.to_string(), server.to_string());
     }
 }
 
@@ -121,7 +129,10 @@ impl Minix3ReincarnationRsPrEngine {
             status.crash_count += 1;
             status.pid += 1000;
             status.is_alive = true;
-            Ok(format!("PR Proposal: Minix 3 RS reincarnated crashed driver '{}' with new PID {}", name, status.pid))
+            Ok(format!(
+                "PR Proposal: Minix 3 RS reincarnated crashed driver '{}' with new PID {}",
+                name, status.pid
+            ))
         } else {
             Err(format!("Driver '{}' not managed by RS", name))
         }
@@ -154,7 +165,10 @@ impl NetBsdRumpFsPrEngine {
         if !self.mounted_rump_filesystems.contains(&entry) {
             self.mounted_rump_filesystems.push(entry.clone());
         }
-        Ok(format!("PR Proposal: NetBSD Rump Kernel mounted isolated {} filesystem at {}", fstype, mount_point))
+        Ok(format!(
+            "PR Proposal: NetBSD Rump Kernel mounted isolated {} filesystem at {}",
+            fstype, mount_point
+        ))
     }
 }
 
@@ -236,12 +250,20 @@ impl SmartOsCrossbowEtherstubPrEngine {
         }
     }
 
-    pub fn create_vnic_over_stub(&mut self, vnic: &str, stub: &str, bw_mbps: u32) -> Result<String, String> {
+    pub fn create_vnic_over_stub(
+        &mut self,
+        vnic: &str,
+        stub: &str,
+        bw_mbps: u32,
+    ) -> Result<String, String> {
         if !self.etherstubs.contains(&stub.to_string()) {
             return Err(format!("Etherstub '{}' does not exist", stub));
         }
         self.vnics.insert(vnic.to_string(), bw_mbps);
-        Ok(format!("PR Proposal: SmartOS Crossbow VNIC '{}' created over stub '{}' with {} Mbps limit", vnic, stub, bw_mbps))
+        Ok(format!(
+            "PR Proposal: SmartOS Crossbow VNIC '{}' created over stub '{}' with {} Mbps limit",
+            vnic, stub, bw_mbps
+        ))
     }
 }
 
@@ -280,7 +302,10 @@ impl AndroidApexContainerPrEngine {
             is_staged: true,
         };
         self.apex_modules.insert(name.to_string(), spec);
-        format!("PR Proposal: Staged Android APEX container '{}' v{}", name, version)
+        format!(
+            "PR Proposal: Staged Android APEX container '{}' v{}",
+            name, version
+        )
     }
 
     pub fn rollback_apex_update(&mut self, name: &str) -> bool {
@@ -307,7 +332,10 @@ pub struct CosmopolitanApeHeaderPrEngine;
 
 impl CosmopolitanApeHeaderPrEngine {
     pub fn format_ape_header_stub(target_binary: &str) -> String {
-        format!("APE_EXEC_WRAPPER:MZqFpD='Actually Portable Executable':{}", target_binary)
+        format!(
+            "APE_EXEC_WRAPPER:MZqFpD='Actually Portable Executable':{}",
+            target_binary
+        )
     }
 
     pub fn verify_ape_magic(header: &[u8]) -> bool {
@@ -413,7 +441,10 @@ impl FuchsiaZirconFidlHandlePrEngine {
 
     pub fn route_fidl_message(&mut self, ordinal: u64) -> String {
         self.channel_messages_count += 1;
-        format!("PR Proposal: Zircon channel routed FIDL message ordinal 0x{:08x}", ordinal)
+        format!(
+            "PR Proposal: Zircon channel routed FIDL message ordinal 0x{:08x}",
+            ordinal
+        )
     }
 }
 
@@ -456,12 +487,20 @@ impl SovereignOpenSourceOsGapClosureV31PrSuite {
 
     pub fn run_v31_open_source_pr_audit(&mut self) -> bool {
         let _plan9 = self.plan9.rfork_namespace(0x04).is_ok();
-        let _reinc = self.minix3.trigger_driver_crash_and_reincarnate("ahci_disk").is_ok();
+        let _reinc = self
+            .minix3
+            .trigger_driver_crash_and_reincarnate("ahci_disk")
+            .is_ok();
         let _rump = self.netbsd.rump_sys_mount("ext2fs", "/mnt").is_ok();
         let matches = self.haiku.live_query("META:title", "Haiku Guide");
         self.smartos.create_etherstub("stub0");
-        let _vnic = self.smartos.create_vnic_over_stub("vnic0", "stub0", 1000).is_ok();
-        let _apex = self.android.stage_apex_update("com.android.media", 340000000);
+        let _vnic = self
+            .smartos
+            .create_vnic_over_stub("vnic0", "stub0", 1000)
+            .is_ok();
+        let _apex = self
+            .android
+            .stage_apex_update("com.android.media", 340000000);
         let win = self.serenity.create_libgui_window("Terminal");
         let resolved = self.redox.resolve_scheme_path("file:/etc/hosts");
         let fidl = self.fuchsia.route_fidl_message(0x12345678);
@@ -493,8 +532,12 @@ mod tests {
     #[test]
     fn test_minix3_reincarnation() {
         let mut engine = Minix3ReincarnationRsPrEngine::new();
-        assert!(engine.trigger_driver_crash_and_reincarnate("pci_bus").is_ok());
-        assert!(engine.trigger_driver_crash_and_reincarnate("unknown").is_err());
+        assert!(engine
+            .trigger_driver_crash_and_reincarnate("pci_bus")
+            .is_ok());
+        assert!(engine
+            .trigger_driver_crash_and_reincarnate("unknown")
+            .is_err());
     }
 
     #[test]
@@ -514,8 +557,12 @@ mod tests {
     fn test_smartos_crossbow() {
         let mut engine = SmartOsCrossbowEtherstubPrEngine::new();
         engine.create_etherstub("switch0");
-        assert!(engine.create_vnic_over_stub("vnic1", "switch0", 100).is_ok());
-        assert!(engine.create_vnic_over_stub("vnic1", "missing", 100).is_err());
+        assert!(engine
+            .create_vnic_over_stub("vnic1", "switch0", 100)
+            .is_ok());
+        assert!(engine
+            .create_vnic_over_stub("vnic1", "missing", 100)
+            .is_err());
     }
 
     #[test]
@@ -527,7 +574,9 @@ mod tests {
 
     #[test]
     fn test_cosmopolitan_ape() {
-        assert!(CosmopolitanApeHeaderPrEngine::verify_ape_magic(b"MZqFpD=header"));
+        assert!(CosmopolitanApeHeaderPrEngine::verify_ape_magic(
+            b"MZqFpD=header"
+        ));
     }
 
     #[test]

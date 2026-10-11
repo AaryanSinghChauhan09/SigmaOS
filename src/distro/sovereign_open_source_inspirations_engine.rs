@@ -168,8 +168,16 @@ impl LinuxBcachefsMultiDeviceTieringEngine {
         Ok(tx_id)
     }
 
-    pub fn promote_block_tier(&mut self, transaction_id: u64, target_tier: StorageDeviceTier) -> bool {
-        if let Some(entry) = self.cow_journal.iter_mut().find(|e| e.transaction_id == transaction_id) {
+    pub fn promote_block_tier(
+        &mut self,
+        transaction_id: u64,
+        target_tier: StorageDeviceTier,
+    ) -> bool {
+        if let Some(entry) = self
+            .cow_journal
+            .iter_mut()
+            .find(|e| e.transaction_id == transaction_id)
+        {
             if entry.tier_assigned != target_tier {
                 entry.tier_assigned = target_tier;
                 if target_tier == StorageDeviceTier::FastSsd {
@@ -185,7 +193,11 @@ impl LinuxBcachefsMultiDeviceTieringEngine {
 
     pub fn verify_and_self_heal_block(&mut self, transaction_id: u64, current_data: &[u8]) -> bool {
         let current_checksum = fnv1a_64(current_data);
-        if let Some(entry) = self.cow_journal.iter_mut().find(|e| e.transaction_id == transaction_id) {
+        if let Some(entry) = self
+            .cow_journal
+            .iter_mut()
+            .find(|e| e.transaction_id == transaction_id)
+        {
             if entry.checksum != current_checksum {
                 // Checksum mismatch -> triggers replica self-healing
                 if entry.replica_device_ids.len() > 1 {
@@ -490,12 +502,7 @@ impl NixStoreContentAddressingDeduplicator {
         }
     }
 
-    pub fn add_store_item(
-        &mut self,
-        name: &str,
-        content: &[u8],
-        references: &[&str],
-    ) -> String {
+    pub fn add_store_item(&mut self, name: &str, content: &[u8], references: &[&str]) -> String {
         let content_hash = format!("{:016x}", fnv1a_64(content));
         let store_path = format!("/nix/store/{}-{}", content_hash, name);
 
@@ -822,7 +829,12 @@ mod tests {
         assert!(engine.register_device(2, "/dev/sda", StorageDeviceTier::CapacityHdd, 10_000_000));
 
         let tx_id = engine
-            .write_cow_block(42, 0, b"SigmaOS Bcachefs Test Block", StorageDeviceTier::FastSsd)
+            .write_cow_block(
+                42,
+                0,
+                b"SigmaOS Bcachefs Test Block",
+                StorageDeviceTier::FastSsd,
+            )
             .unwrap();
         assert_eq!(tx_id, 1);
 
@@ -837,9 +849,7 @@ mod tests {
         assert!(engine.map_shared_memory_region(0x200000, 1024 * 1024));
         assert!(engine.create_virtqueue(1, 32));
 
-        let desc_idx = engine
-            .push_descriptor(1, 0x200000, 2048, 0)
-            .unwrap();
+        let desc_idx = engine.push_descriptor(1, 0x200000, 2048, 0).unwrap();
         assert_eq!(desc_idx, 0);
 
         let desc = engine.pop_used_descriptor(1).unwrap();
@@ -856,7 +866,9 @@ mod tests {
             .is_ok());
         guard.lock_sandbox_policy();
 
-        assert!(guard.unveil("/var/log", PathAccessRights::read_write()).is_err());
+        assert!(guard
+            .unveil("/var/log", PathAccessRights::read_write())
+            .is_err());
         assert!(guard.evaluate_access("/etc/config/settings.toml", false, false));
         assert!(!guard.evaluate_access("/etc/config/settings.toml", true, false));
         assert!(!guard.evaluate_access("/root/secret", false, false));
@@ -870,7 +882,10 @@ mod tests {
         let path2 = nix.add_store_item("sh", b"BASH_BINARY_PAYLOAD", &[]);
 
         assert_eq!(path1, path2);
-        assert_eq!(nix.total_deduplicated_bytes, b"BASH_BINARY_PAYLOAD".len() as u64);
+        assert_eq!(
+            nix.total_deduplicated_bytes,
+            b"BASH_BINARY_PAYLOAD".len() as u64
+        );
 
         let path3 = nix.add_store_item("coreutils", b"COREUTILS_PAYLOAD", &[path1.as_str()]);
         nix.add_gc_root(&path3);

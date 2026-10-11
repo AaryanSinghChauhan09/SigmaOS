@@ -20,9 +20,9 @@ use alloc::format;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec::Vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::BTreeMap;
@@ -31,9 +31,9 @@ use std::format;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
-#[cfg(any(feature = "standalone_test", test))]
 use std::vec;
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec::Vec;
 
 // ============================================================================
 // 1. Clear Linux Stateless Architecture & Energy Performance Preference Engine
@@ -66,11 +66,13 @@ impl ClearLinuxStatelessPstateEngineV30 {
     }
 
     pub fn set_vendor_default(&mut self, path: &str, content: &str) {
-        self.vendor_defaults.insert(path.to_string(), content.to_string());
+        self.vendor_defaults
+            .insert(path.to_string(), content.to_string());
     }
 
     pub fn set_user_override(&mut self, path: &str, content: &str) {
-        self.user_overrides.insert(path.to_string(), content.to_string());
+        self.user_overrides
+            .insert(path.to_string(), content.to_string());
     }
 
     pub fn resolve_configuration(&self, path: &str) -> Option<String> {
@@ -254,7 +256,8 @@ impl AlpineApkV3ApkovlPersistenceEngineV30 {
     }
 
     pub fn add_package(&mut self, pkg_name: &str, sha256_hash: &str) {
-        self.package_checksums.insert(pkg_name.to_string(), sha256_hash.to_string());
+        self.package_checksums
+            .insert(pkg_name.to_string(), sha256_hash.to_string());
     }
 
     pub fn register_trigger(&mut self, name: &str, watched_dir: &str, cmd: &str) {
@@ -272,11 +275,18 @@ impl AlpineApkV3ApkovlPersistenceEngineV30 {
     }
 
     pub fn generate_apkovl_manifest(&self) -> String {
-        format!("APKOVL_ENTRIES:{};TOTAL_FILES:{}", self.apkovl_files.join(","), self.apkovl_files.len())
+        format!(
+            "APKOVL_ENTRIES:{};TOTAL_FILES:{}",
+            self.apkovl_files.join(","),
+            self.apkovl_files.len()
+        )
     }
 
     pub fn verify_package(&self, pkg_name: &str, hash: &str) -> bool {
-        self.package_checksums.get(pkg_name).map(|h| h == hash).unwrap_or(false)
+        self.package_checksums
+            .get(pkg_name)
+            .map(|h| h == hash)
+            .unwrap_or(false)
     }
 }
 
@@ -379,7 +389,8 @@ impl OpenBsdPledgeUnveilPfctlStateEngineV30 {
         if self.is_unveil_locked {
             return Err("Unveil table is locked");
         }
-        self.unveil_paths.insert(path.to_string(), perms.to_string());
+        self.unveil_paths
+            .insert(path.to_string(), perms.to_string());
         Ok(())
     }
 
@@ -510,7 +521,10 @@ impl FedoraOstreeBodhiKarmaEngineV30 {
         self.karma_score >= 3 && self.greenwave_ci_passed
     }
 
-    pub fn stage_and_switch_ostree_commit(&mut self, new_commit: &str) -> Result<OstreeSlot, &'static str> {
+    pub fn stage_and_switch_ostree_commit(
+        &mut self,
+        new_commit: &str,
+    ) -> Result<OstreeSlot, &'static str> {
         if !self.is_update_approved() {
             return Err("Update gated by Bodhi karma or Greenwave CI failure");
         }
@@ -587,7 +601,8 @@ impl NixGuixCasFlakeClosureEngineV30 {
         }
 
         let initial_count = self.store_derivations.len();
-        self.store_derivations.retain(|key, _| reachable.contains(key));
+        self.store_derivations
+            .retain(|key, _| reachable.contains(key));
         initial_count - self.store_derivations.len()
     }
 }
@@ -618,11 +633,15 @@ impl VoidXbpsRunitSupervisorEngineV30 {
     }
 
     pub fn register_xbps_package(&mut self, pkg_name: &str, sig: &str) {
-        self.installed_packages.insert(pkg_name.to_string(), sig.to_string());
+        self.installed_packages
+            .insert(pkg_name.to_string(), sig.to_string());
     }
 
     pub fn verify_xbps_signature(&self, pkg_name: &str, sig: &str) -> bool {
-        self.installed_packages.get(pkg_name).map(|s| s == sig).unwrap_or(false)
+        self.installed_packages
+            .get(pkg_name)
+            .map(|s| s == sig)
+            .unwrap_or(false)
     }
 
     pub fn set_runit_stage(&mut self, service_name: &str, stage: RunitServiceStage) {
@@ -681,7 +700,10 @@ impl DragonFlyHammer2ClusterPfsEngineV30 {
     }
 
     pub fn replicate_cluster_state(&mut self, master_name: &str, slave_name: &str) -> bool {
-        let master_seq = self.pfs_cluster.get(master_name).map(|n| n.transaction_sequence);
+        let master_seq = self
+            .pfs_cluster
+            .get(master_name)
+            .map(|n| n.transaction_sequence);
         if let Some(seq) = master_seq {
             if let Some(slave) = self.pfs_cluster.get_mut(slave_name) {
                 slave.transaction_sequence = seq;
@@ -715,7 +737,10 @@ impl SovereignLinuxBsdEcosystemAdvancementsV30Suite {
     pub fn new() -> Self {
         Self {
             clear_stateless: ClearLinuxStatelessPstateEngineV30::new(),
-            apparmor: UbuntuAppArmorV4ProfileMediationEngineV30::new("default-profile", AppArmorMediationMode::Enforce),
+            apparmor: UbuntuAppArmorV4ProfileMediationEngineV30::new(
+                "default-profile",
+                AppArmorMediationMode::Enforce,
+            ),
             scheduler: ArchCachyEevdfBoreSchedulerTunerV30::new(MicroArchIsaLevel::X86_64_V3),
             alpine: AlpineApkV3ApkovlPersistenceEngineV30::new(),
             freebsd_be: FreeBsdBectlCasperDelegationEngineV30::new(),
@@ -729,26 +754,34 @@ impl SovereignLinuxBsdEcosystemAdvancementsV30Suite {
     }
 
     pub fn run_master_distro_health_audit(&mut self) -> bool {
-        self.clear_stateless.set_vendor_default("/etc/systemd/system.conf", "LogLevel=info");
-        self.apparmor.add_rule("/usr/bin", "rx", Some("system"), None);
+        self.clear_stateless
+            .set_vendor_default("/etc/systemd/system.conf", "LogLevel=info");
+        self.apparmor
+            .add_rule("/usr/bin", "rx", Some("system"), None);
         self.scheduler.register_task(1001, 5_000_000);
         self.alpine.add_package("bash", "sha256_dummy_hash");
         self.freebsd_be.register_casper_service("casper.file");
         self.openbsd_security.set_pledge(&["stdio", "rpath"]);
-        self.gentoo_portage.register_atom("sys-libs/zlib", "0", "1.2", &["split-usr"]);
+        self.gentoo_portage
+            .register_atom("sys-libs/zlib", "0", "1.2", &["split-usr"]);
         self.fedora_ostree.submit_bodhi_karma(5);
         self.fedora_ostree.set_greenwave_ci_status(true);
-        self.nix_guix.register_derivation("/nix/store/drv-1", "nar-1", &[]);
+        self.nix_guix
+            .register_derivation("/nix/store/drv-1", "nar-1", &[]);
         self.void_runit.register_xbps_package("curl", "sig_curl");
         self.dragonfly_hammer2.register_pfs_node("root_pfs", true);
 
-        self.clear_stateless.resolve_configuration("/etc/systemd/system.conf").is_some()
+        self.clear_stateless
+            .resolve_configuration("/etc/systemd/system.conf")
+            .is_some()
             && self.apparmor.check_file_access("/usr/bin/ls", 'r')
             && self.scheduler.calculate_bore_score(1001) > 0
             && self.alpine.verify_package("bash", "sha256_dummy_hash")
             && self.freebsd_be.is_casper_service_permitted("casper.file")
             && self.openbsd_security.check_pledge("stdio")
-            && self.gentoo_portage.evaluate_use_conditional("sys-libs/zlib", "split-usr")
+            && self
+                .gentoo_portage
+                .evaluate_use_conditional("sys-libs/zlib", "split-usr")
             && self.fedora_ostree.is_update_approved()
             && self.void_runit.verify_xbps_signature("curl", "sig_curl")
     }
@@ -766,16 +799,28 @@ mod tests {
     fn test_clear_linux_stateless_pstate() {
         let mut clear = ClearLinuxStatelessPstateEngineV30::new();
         clear.set_vendor_default("/etc/sysctl.conf", "vm.swappiness=10");
-        assert_eq!(clear.resolve_configuration("/etc/sysctl.conf").unwrap(), "vm.swappiness=10");
+        assert_eq!(
+            clear.resolve_configuration("/etc/sysctl.conf").unwrap(),
+            "vm.swappiness=10"
+        );
         clear.set_user_override("/etc/sysctl.conf", "vm.swappiness=1");
-        assert_eq!(clear.resolve_configuration("/etc/sysctl.conf").unwrap(), "vm.swappiness=1");
+        assert_eq!(
+            clear.resolve_configuration("/etc/sysctl.conf").unwrap(),
+            "vm.swappiness=1"
+        );
         clear.set_epp_preference(EnergyPerformancePreference::Performance);
-        assert_eq!(clear.energy_preference, EnergyPerformancePreference::Performance);
+        assert_eq!(
+            clear.energy_preference,
+            EnergyPerformancePreference::Performance
+        );
     }
 
     #[test]
     fn test_ubuntu_apparmor_engine() {
-        let mut apparmor = UbuntuAppArmorV4ProfileMediationEngineV30::new("test-profile", AppArmorMediationMode::Enforce);
+        let mut apparmor = UbuntuAppArmorV4ProfileMediationEngineV30::new(
+            "test-profile",
+            AppArmorMediationMode::Enforce,
+        );
         apparmor.add_rule("/etc", "r", Some("system_bus"), None);
         assert!(apparmor.check_file_access("/etc/hosts", 'r'));
         assert!(!apparmor.check_file_access("/etc/hosts", 'w'));
@@ -796,7 +841,9 @@ mod tests {
         alpine.add_package("alpine-base", "hash123");
         alpine.track_apkovl_modified_file("/etc/network/interfaces");
         assert!(alpine.verify_package("alpine-base", "hash123"));
-        assert!(alpine.generate_apkovl_manifest().contains("/etc/network/interfaces"));
+        assert!(alpine
+            .generate_apkovl_manifest()
+            .contains("/etc/network/interfaces"));
     }
 
     #[test]
@@ -837,7 +884,10 @@ mod tests {
         fedora.submit_bodhi_karma(3);
         fedora.set_greenwave_ci_status(true);
         assert!(fedora.is_update_approved());
-        assert_eq!(fedora.stage_and_switch_ostree_commit("commit_v2").unwrap(), OstreeSlot::DeploymentB);
+        assert_eq!(
+            fedora.stage_and_switch_ostree_commit("commit_v2").unwrap(),
+            OstreeSlot::DeploymentB
+        );
     }
 
     #[test]
@@ -858,7 +908,10 @@ mod tests {
         void.register_xbps_package("void-repo", "sha256_key");
         assert!(void.verify_xbps_signature("void-repo", "sha256_key"));
         void.set_runit_stage("dhcpcd", RunitServiceStage::Stage2Supervised);
-        assert_eq!(void.get_service_stage("dhcpcd"), Some(RunitServiceStage::Stage2Supervised));
+        assert_eq!(
+            void.get_service_stage("dhcpcd"),
+            Some(RunitServiceStage::Stage2Supervised)
+        );
     }
 
     #[test]

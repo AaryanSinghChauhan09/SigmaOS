@@ -92,10 +92,7 @@ impl Default for AptkitConfig {
             download_only: false,
             fix_broken: false,
             show_progress: true,
-            dpkg_options: vec![
-                "--force-confdef".to_string(),
-                "--force-confold".to_string(),
-            ],
+            dpkg_options: vec!["--force-confdef".to_string(), "--force-confold".to_string()],
         }
     }
 }
@@ -241,7 +238,10 @@ impl AptkitEngine {
             .values()
             .filter(|pkg| {
                 pkg.name.to_lowercase().contains(&query.to_lowercase())
-                    || pkg.description.to_lowercase().contains(&query.to_lowercase())
+                    || pkg
+                        .description
+                        .to_lowercase()
+                        .contains(&query.to_lowercase())
             })
             .collect()
     }

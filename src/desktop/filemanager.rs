@@ -458,7 +458,11 @@ impl SpatialFileManagerEngine {
     }
 
     pub fn cache_thumbnail(&mut self, file_id: FileID, thumbnail_bytes: Vec<u8>) {
-        if let Some(existing) = self.thumbnail_cache.iter_mut().find(|(id, _)| *id == file_id) {
+        if let Some(existing) = self
+            .thumbnail_cache
+            .iter_mut()
+            .find(|(id, _)| *id == file_id)
+        {
             existing.1 = thumbnail_bytes;
         } else {
             self.thumbnail_cache.push((file_id, thumbnail_bytes));

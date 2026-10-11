@@ -16,9 +16,9 @@ use alloc::format;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec::Vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::BTreeMap;
@@ -27,9 +27,9 @@ use std::format;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
-#[cfg(any(feature = "standalone_test", test))]
 use std::vec;
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec::Vec;
 
 /// Omarchy Wallust / Matugen Dynamic Theme Palette Compiler
 #[derive(Debug, Clone)]
@@ -57,11 +57,17 @@ impl OmarchyWallustThemeCompilerEngine {
     }
 
     pub fn compile_hyprland_border_color(&self) -> String {
-        format!("col.active_border = rgba({}ff)", self.accent_color_hex.trim_start_matches('#'))
+        format!(
+            "col.active_border = rgba({}ff)",
+            self.accent_color_hex.trim_start_matches('#')
+        )
     }
 
     pub fn compile_waybar_css(&self) -> String {
-        format!("@define-color accent {};\n@define-color bg {};\n", self.accent_color_hex, self.dominant_color_hex)
+        format!(
+            "@define-color accent {};\n@define-color bg {};\n",
+            self.accent_color_hex, self.dominant_color_hex
+        )
     }
 }
 
@@ -79,7 +85,9 @@ impl OmarchyMiseToolchainManager {
         runtimes.insert("python".to_string(), "3.12.3".to_string());
         runtimes.insert("go".to_string(), "1.22.4".to_string());
         runtimes.insert("zig".to_string(), "0.13.0".to_string());
-        Self { pinned_runtimes: runtimes }
+        Self {
+            pinned_runtimes: runtimes,
+        }
     }
 
     pub fn generate_mise_toml(&self) -> String {
@@ -112,7 +120,11 @@ impl OmarchyQuickshellDesktopBridge {
     }
 
     pub fn render_qml_widget_tree(&self) -> String {
-        format!("QuickshellTree[fps={}]: [{}]", self.frame_rate_fps, self.active_widgets.join(", "))
+        format!(
+            "QuickshellTree[fps={}]: [{}]",
+            self.frame_rate_fps,
+            self.active_widgets.join(", ")
+        )
     }
 }
 
@@ -147,13 +159,21 @@ pub struct OmarchyLazyjournalLogViewer {
 impl OmarchyLazyjournalLogViewer {
     pub fn new() -> Self {
         Self {
-            active_filters: vec!["systemd".to_string(), "kernel".to_string(), "hyprland".to_string()],
+            active_filters: vec![
+                "systemd".to_string(),
+                "kernel".to_string(),
+                "hyprland".to_string(),
+            ],
             cached_entries_count: 512,
         }
     }
 
     pub fn query_journal_summary(&self) -> String {
-        format!("Lazyjournal: {} cached entries with filters ({})", self.cached_entries_count, self.active_filters.join(", "))
+        format!(
+            "Lazyjournal: {} cached entries with filters ({})",
+            self.cached_entries_count,
+            self.active_filters.join(", ")
+        )
     }
 }
 

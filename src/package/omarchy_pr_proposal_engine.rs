@@ -278,43 +278,63 @@ impl OmarchyDistroGapClosureEngine {
 
         feature_gaps.push(OmarchyFeatureGap {
             feature_name: String::from("Wayland Compositor & Window Manager"),
-            omarchy_implementation: String::from("Hyprland C++ compositor + Waybar STATUS bar + SwayNC"),
-            sigmaos_native_parity: String::from("SigmaOS Zenith DRM/KMS Wayland Compositor & Lock-Free Ring Buffer HUD"),
+            omarchy_implementation: String::from(
+                "Hyprland C++ compositor + Waybar STATUS bar + SwayNC",
+            ),
+            sigmaos_native_parity: String::from(
+                "SigmaOS Zenith DRM/KMS Wayland Compositor & Lock-Free Ring Buffer HUD",
+            ),
             parity_score_pct: 100,
         });
 
         feature_gaps.push(OmarchyFeatureGap {
             feature_name: String::from("Omakase Theme Preset Engine"),
-            omarchy_implementation: String::from("12 preset themes exported to Waybar/Ghostty/Hyprland configs"),
-            sigmaos_native_parity: String::from("OmarchyOmakaseThemeManager zero-allocation live exporter"),
+            omarchy_implementation: String::from(
+                "12 preset themes exported to Waybar/Ghostty/Hyprland configs",
+            ),
+            sigmaos_native_parity: String::from(
+                "OmarchyOmakaseThemeManager zero-allocation live exporter",
+            ),
             parity_score_pct: 100,
         });
 
         feature_gaps.push(OmarchyFeatureGap {
             feature_name: String::from("App Launcher & Command Palette"),
             omarchy_implementation: String::from("Walker D-Bus launcher + fuzzel fuzzy finder"),
-            sigmaos_native_parity: String::from("OmarchyCommandPalette ASCII zero-heap substring matching engine"),
+            sigmaos_native_parity: String::from(
+                "OmarchyCommandPalette ASCII zero-heap substring matching engine",
+            ),
             parity_score_pct: 100,
         });
 
         feature_gaps.push(OmarchyFeatureGap {
             feature_name: String::from("Terminal Emulator & Shell"),
-            omarchy_implementation: String::from("Ghostty VT100 terminal + Fish/Zsh Omakub prompt styling"),
-            sigmaos_native_parity: String::from("IntegratedTerminal VT100 emulator & OmarchyShell zero-dep shell"),
+            omarchy_implementation: String::from(
+                "Ghostty VT100 terminal + Fish/Zsh Omakub prompt styling",
+            ),
+            sigmaos_native_parity: String::from(
+                "IntegratedTerminal VT100 emulator & OmarchyShell zero-dep shell",
+            ),
             parity_score_pct: 100,
         });
 
         feature_gaps.push(OmarchyFeatureGap {
             feature_name: String::from("Screen Locker & Idle Daemon"),
-            omarchy_implementation: String::from("hyprlock PAM greeter + hypridle ACPI suspend listener"),
-            sigmaos_native_parity: String::from("OmarchyHyprlockScreenLocker sub-ms PAM verifier & AcpiPowerRegisterControlEngine"),
+            omarchy_implementation: String::from(
+                "hyprlock PAM greeter + hypridle ACPI suspend listener",
+            ),
+            sigmaos_native_parity: String::from(
+                "OmarchyHyprlockScreenLocker sub-ms PAM verifier & AcpiPowerRegisterControlEngine",
+            ),
             parity_score_pct: 100,
         });
 
         feature_gaps.push(OmarchyFeatureGap {
             feature_name: String::from("Neovim IDE Studio"),
             omarchy_implementation: String::from("Neovim + LazyVim + Node.js LSP server wrappers"),
-            sigmaos_native_parity: String::from("OmarchyNeovimPresetStudioEngine Pure Rust JSON-RPC LSP multiplexer"),
+            sigmaos_native_parity: String::from(
+                "OmarchyNeovimPresetStudioEngine Pure Rust JSON-RPC LSP multiplexer",
+            ),
             parity_score_pct: 100,
         });
 
@@ -338,15 +358,23 @@ impl OmarchyDistroGapClosureEngine {
         for gap in &self.feature_gaps {
             pr.push_str(&format!(
                 "- **{}** (Parity Score: {}%)\n  - *Omarchy:* {}\n  - *SigmaOS Native:* {}\n",
-                gap.feature_name, gap.parity_score_pct, gap.omarchy_implementation, gap.sigmaos_native_parity
+                gap.feature_name,
+                gap.parity_score_pct,
+                gap.omarchy_implementation,
+                gap.sigmaos_native_parity
             ));
         }
 
-        pr.push_str(&format!("\n**Overall Distro Gap Closure Parity Score:** {}%\n\n", self.compute_average_parity_score()));
+        pr.push_str(&format!(
+            "\n**Overall Distro Gap Closure Parity Score:** {}%\n\n",
+            self.compute_average_parity_score()
+        ));
         pr.push_str("#### PR Verification Check:\n");
         pr.push_str("- [x] Zero-dependency Rust #![no_std]/std compilation verified\n");
         pr.push_str("- [x] Standalone unit tests passed for all Omarchy parity suites\n");
-        pr.push_str("- [x] Zero-copy $O(1)$ memory footprint & sub-millisecond execution verified\n");
+        pr.push_str(
+            "- [x] Zero-copy $O(1)$ memory footprint & sub-millisecond execution verified\n",
+        );
         pr
     }
 }

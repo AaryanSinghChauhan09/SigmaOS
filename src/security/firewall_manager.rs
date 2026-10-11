@@ -79,7 +79,12 @@ pub struct NetworkFirewallRule {
 }
 
 impl NetworkFirewallRule {
-    pub fn new(id: String, action: FirewallAction, protocol: Protocol, description: String) -> Self {
+    pub fn new(
+        id: String,
+        action: FirewallAction,
+        protocol: Protocol,
+        description: String,
+    ) -> Self {
         Self {
             id,
             action,
@@ -190,7 +195,8 @@ impl NetworkFirewallManager {
             Protocol::All,
             "Allow established connections".to_string(),
         );
-        self.rules.insert("established".to_string(), established_rule);
+        self.rules
+            .insert("established".to_string(), established_rule);
 
         // Allow SSH
         let mut ssh_rule = NetworkFirewallRule::new(
@@ -220,9 +226,7 @@ impl NetworkFirewallManager {
 
     /// List enabled rules
     pub fn list_enabled(&self) -> Vec<&NetworkFirewallRule> {
-        self.rules.values()
-            .filter(|r| r.is_enabled)
-            .collect()
+        self.rules.values().filter(|r| r.is_enabled).collect()
     }
 
     /// Create a rule
@@ -247,7 +251,9 @@ impl NetworkFirewallManager {
 
     /// Enable a rule
     pub fn enable_rule(&mut self, id: &str) -> Result<(), String> {
-        let rule = self.rules.get_mut(id)
+        let rule = self
+            .rules
+            .get_mut(id)
             .ok_or_else(|| format!("Rule {} not found", id))?;
 
         rule.set_enabled(true);
@@ -256,7 +262,9 @@ impl NetworkFirewallManager {
 
     /// Disable a rule
     pub fn disable_rule(&mut self, id: &str) -> Result<(), String> {
-        let rule = self.rules.get_mut(id)
+        let rule = self
+            .rules
+            .get_mut(id)
             .ok_or_else(|| format!("Rule {} not found", id))?;
 
         rule.set_enabled(false);
@@ -265,7 +273,8 @@ impl NetworkFirewallManager {
 
     /// Remove a rule
     pub fn remove_rule(&mut self, id: &str) -> Result<(), String> {
-        self.rules.remove(id)
+        self.rules
+            .remove(id)
             .ok_or_else(|| format!("Rule {} not found", id))?;
         Ok(())
     }
@@ -288,13 +297,15 @@ impl NetworkFirewallManager {
     /// Get statistics
     pub fn get_statistics(&self) -> NetworkFirewallStatistics {
         let total_rules = self.rules.len();
-        let enabled_rules = self.rules.values()
-            .filter(|r| r.is_enabled)
-            .count();
-        let allow_rules = self.rules.values()
+        let enabled_rules = self.rules.values().filter(|r| r.is_enabled).count();
+        let allow_rules = self
+            .rules
+            .values()
             .filter(|r| r.action == FirewallAction::Allow)
             .count();
-        let deny_rules = self.rules.values()
+        let deny_rules = self
+            .rules
+            .values()
             .filter(|r| r.action == FirewallAction::Deny)
             .count();
         let total_zones = self.zones.len();
@@ -331,7 +342,10 @@ mod tests {
 
     #[test]
     fn test_firewall_action_from_str() {
-        assert_eq!(FirewallAction::from_str("allow"), Some(FirewallAction::Allow));
+        assert_eq!(
+            FirewallAction::from_str("allow"),
+            Some(FirewallAction::Allow)
+        );
         assert_eq!(FirewallAction::from_str("deny"), Some(FirewallAction::Deny));
     }
 

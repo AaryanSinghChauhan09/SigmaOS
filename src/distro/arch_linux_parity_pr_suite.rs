@@ -79,14 +79,20 @@ impl ArchLinuxPkgbuildSandboxingPrEngine {
     }
 
     fn seed_default_chroot(&mut self) {
-        self.active_chroots
-            .insert("extra-x86_64".to_string(), "/var/lib/archbuild/extra-x86_64".to_string());
+        self.active_chroots.insert(
+            "extra-x86_64".to_string(),
+            "/var/lib/archbuild/extra-x86_64".to_string(),
+        );
     }
 
     pub fn create_clean_chroot_sandbox(&mut self, chroot_name: &str) -> String {
         let path = format!("/var/lib/archbuild/{}-sandbox", chroot_name);
-        self.active_chroots.insert(chroot_name.to_string(), path.clone());
-        format!("Created makechrootpkg sandbox [{}] at {}", chroot_name, path)
+        self.active_chroots
+            .insert(chroot_name.to_string(), path.clone());
+        format!(
+            "Created makechrootpkg sandbox [{}] at {}",
+            chroot_name, path
+        )
     }
 }
 
@@ -197,8 +203,7 @@ impl ArchLinuxPacman7AlpmHookPrEngine {
     }
 
     fn seed_default_hook(&mut self) {
-        self.registered_hooks
-            .push("90-mkinitcpio.hook".to_string());
+        self.registered_hooks.push("90-mkinitcpio.hook".to_string());
     }
 
     pub fn add_transaction_hook(&mut self, hook_name: &str) {
@@ -269,7 +274,16 @@ impl ArchLinuxMkinitcpioPrEngine {
     fn seed_default_preset(&mut self) {
         self.presets.insert(
             "linux".to_string(),
-            vec!["base".to_string(), "udev".to_string(), "autodetect".to_string(), "modconf".to_string(), "block".to_string(), "filesystems".to_string(), "keyboard".to_string(), "fsck".to_string()],
+            vec![
+                "base".to_string(),
+                "udev".to_string(),
+                "autodetect".to_string(),
+                "modconf".to_string(),
+                "block".to_string(),
+                "filesystems".to_string(),
+                "keyboard".to_string(),
+                "fsck".to_string(),
+            ],
         );
     }
 
@@ -310,8 +324,12 @@ impl ArchLinuxDevtoolsPkgctlPrEngine {
     }
 
     pub fn clone_pkg_repo(&mut self, pkg_name: &str) -> String {
-        let url = format!("https://gitlab.archlinux.org/archlinux/packaging/packages/{}.git", pkg_name);
-        self.git_repos.insert(format!("pkgctl-{}", pkg_name), url.clone());
+        let url = format!(
+            "https://gitlab.archlinux.org/archlinux/packaging/packages/{}.git",
+            pkg_name
+        );
+        self.git_repos
+            .insert(format!("pkgctl-{}", pkg_name), url.clone());
         format!("pkgctl repo cloned from {}", url)
     }
 }
@@ -340,7 +358,8 @@ impl ArchLinuxKeyringPqcPrEngine {
     }
 
     fn seed_default_key(&mut self) {
-        self.trusted_keys.push("archlinux-master-key-pqc-dilithium5".to_string());
+        self.trusted_keys
+            .push("archlinux-master-key-pqc-dilithium5".to_string());
     }
 
     pub fn import_master_key(&mut self, key_id: &str) {
@@ -379,7 +398,8 @@ impl ArchLinuxArchinstallProfilePrEngine {
     }
 
     pub fn generate_profile(&mut self, profile_name: &str, profile_json: &str) {
-        self.json_profiles.insert(profile_name.to_string(), profile_json.to_string());
+        self.json_profiles
+            .insert(profile_name.to_string(), profile_json.to_string());
     }
 }
 
@@ -488,7 +508,10 @@ impl ArchLinuxMasterParityPrSuite {
     }
 
     pub fn process_and_merge_arch_pr(&mut self, pr_id: u32) -> Result<String, &'static str> {
-        let pr = self.pull_requests.get_mut(&pr_id).ok_or("Arch PR not found")?;
+        let pr = self
+            .pull_requests
+            .get_mut(&pr_id)
+            .ok_or("Arch PR not found")?;
         if !pr.pqc_verified {
             pr.status = ArchPrStatus::Rejected;
             return Err("PQC signature verification failed");
@@ -539,7 +562,11 @@ mod tests {
     #[test]
     fn test_arch_master_parity_pr_suite() {
         let mut master = ArchLinuxMasterParityPrSuite::new();
-        let pr_id = master.submit_arch_pr("Reflector Mirrorlist Speed Ranking", "reflector", "rate --latest 20");
+        let pr_id = master.submit_arch_pr(
+            "Reflector Mirrorlist Speed Ranking",
+            "reflector",
+            "rate --latest 20",
+        );
         let res = master.process_and_merge_arch_pr(pr_id).unwrap();
         assert!(res.contains("Successfully merged Arch Linux PR #1"));
     }

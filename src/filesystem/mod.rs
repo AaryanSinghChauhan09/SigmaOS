@@ -25,21 +25,15 @@ pub mod watch;
 pub mod zfs;
 pub mod zfs_arc;
 
+pub use crate::filesystem::sigma_fs::{
+    JournalState, SigmaFS, SigmaFhsAuditor, SigmaFhsHook, SigmaFhsNamespace, SigmaFhsRouter,
+    SigmaFsCrypt, SigmaFsVirtio,
+};
+pub use crate::filesystem::vfs::{FileType, FsError, Inode, VfsError, VirtualFilesystem};
 pub use cache::*;
 pub use core::*;
 pub use mount::*;
-pub use crate::filesystem::vfs::{FileType, FsError, Inode, VfsError, VirtualFilesystem};
 pub use smart_symlink::{LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule};
-pub use crate::filesystem::sigma_fs::{
-    JournalState,
-    SigmaFS,
-    SigmaFhsAuditor,
-    SigmaFhsHook,
-    SigmaFhsNamespace,
-    SigmaFhsRouter,
-    SigmaFsCrypt,
-    SigmaFsVirtio,
-};
 
 pub use archive::{
     ArchiveEntry, ArchiveError, ArchiveFormat, ArchiveHandler, ArchiveManager, ArchiveResult,
@@ -54,6 +48,9 @@ pub use disk_usage::{
     AnalysisMode, AnalysisStrategy, DeepAnalysisStrategy, DirectorySizeInfo, DiskUsageAnalyzer,
     DiskUsageError, DiskUsageInfo, FileSizeInfo, QuickAnalysisStrategy,
 };
+pub use file_monitor::{
+    EventFilter, EventId, FileEvent, FileEventType, WatchConfig, WatchId, WatchManager,
+};
 pub use manager::{
     ActivePane, BatchRegexRenamer, ClipboardOperation, FileItem, FileManager, FileManagerError,
     FileOperation, FileTagAnnotation, FileTagColor, FileTagManager, FileType as ManagerFileType,
@@ -64,9 +61,6 @@ pub use mount_namespace::{
     MountFlags, MountId, MountInfo, MountNamespace, MountNamespaceStats, MountSource,
 };
 pub use support::{FilesystemError, FilesystemType, SimpleFilesystem, SimpleFilesystemManager};
-pub use file_monitor::{
-    EventFilter, EventId, FileEvent, FileEventType, WatchConfig, WatchId, WatchManager,
-};
 pub mod fscrypt_autofs;
 pub mod sovereign_filesystem_hierarchy;
 pub mod sovereign_link_engine;

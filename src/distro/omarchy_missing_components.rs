@@ -290,7 +290,11 @@ impl OmarchyAutomaticUpdateNotifier {
             "Omarchy Updates Available: {} official, {} AUR (CAS Integrity: {})",
             self.pending_updates_count,
             self.aur_updates_count,
-            if self.cas_hash_verified { "PASSED" } else { "FAILED" }
+            if self.cas_hash_verified {
+                "PASSED"
+            } else {
+                "FAILED"
+            }
         )
     }
 }

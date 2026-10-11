@@ -68,7 +68,10 @@ impl FontFallbackChain {
 
     pub fn resolve_font_for_char(&self, ch: char) -> &str {
         let code = ch as u32;
-        if (0x4E00..=0x9FFF).contains(&code) || (0x3400..=0x4DBF).contains(&code) || (0xAC00..=0xD7AF).contains(&code) {
+        if (0x4E00..=0x9FFF).contains(&code)
+            || (0x3400..=0x4DBF).contains(&code)
+            || (0xAC00..=0xD7AF).contains(&code)
+        {
             &self.cjk_fallback_font
         } else if (0x1F300..=0x1FAFF).contains(&code) || (0x1F600..=0x1F64F).contains(&code) {
             &self.emoji_fallback_font

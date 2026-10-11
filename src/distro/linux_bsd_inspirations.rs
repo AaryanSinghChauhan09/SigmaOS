@@ -319,8 +319,7 @@ impl LinuxBsdSubsystemInspirationHarmonizer {
                     raw_path.to_string()
                 }
             }
-            DistroSubsystemMode::LinuxNix
-            | DistroSubsystemMode::LinuxNixOS2405 => {
+            DistroSubsystemMode::LinuxNix | DistroSubsystemMode::LinuxNixOS2405 => {
                 format!("/nix/store/sovereign-hash{}", raw_path)
             }
             _ => raw_path.to_string(),
@@ -341,10 +340,14 @@ impl LinuxBsdSubsystemInspirationHarmonizer {
             | DistroSubsystemMode::FreeBsdHardened
             | DistroSubsystemMode::FreeBsdHardenedPqc
             | DistroSubsystemMode::FreeBsdCapsicumHardened
-            | DistroSubsystemMode::FreeBsdBhyveVirtualization => "CapsicumJailsMandatoryAccessControl",
+            | DistroSubsystemMode::FreeBsdBhyveVirtualization => {
+                "CapsicumJailsMandatoryAccessControl"
+            }
 
             DistroSubsystemMode::LinuxQubes => "XenHypervisorMicrokernelIsolation",
-            DistroSubsystemMode::LinuxWhonix | DistroSubsystemMode::LinuxTails => "AmnesicTorGatewayIsolation",
+            DistroSubsystemMode::LinuxWhonix | DistroSubsystemMode::LinuxTails => {
+                "AmnesicTorGatewayIsolation"
+            }
             _ => "StandardCgroupV2NamespaceAppArmorSELinux",
         }
     }
@@ -358,7 +361,8 @@ impl LinuxBsdSubsystemInspirationHarmonizer {
             _ => "ping_health",
         };
 
-        self.process_subsystem_action(subsystem_name, test_action).is_ok()
+        self.process_subsystem_action(subsystem_name, test_action)
+            .is_ok()
     }
 }
 
@@ -4419,14 +4423,24 @@ mod cross_subsystem_tests {
             ServiceSupervisorType::OpenRC
         );
 
-        let mut bsd_harmonizer = LinuxBsdSubsystemInspirationHarmonizer::new(DistroSubsystemMode::FreeBsd);
-        assert_eq!(bsd_harmonizer.translate_vfs_path("/usr/bin/tool"), "/usr/local/bin/tool");
-        assert_eq!(bsd_harmonizer.get_security_isolation_level(), "CapsicumJailsMandatoryAccessControl");
+        let mut bsd_harmonizer =
+            LinuxBsdSubsystemInspirationHarmonizer::new(DistroSubsystemMode::FreeBsd);
+        assert_eq!(
+            bsd_harmonizer.translate_vfs_path("/usr/bin/tool"),
+            "/usr/local/bin/tool"
+        );
+        assert_eq!(
+            bsd_harmonizer.get_security_isolation_level(),
+            "CapsicumJailsMandatoryAccessControl"
+        );
         assert!(bsd_harmonizer.verify_subsystem_interoperability("auth"));
         assert!(bsd_harmonizer.verify_subsystem_interoperability("vfs"));
 
-        let nix_harmonizer = LinuxBsdSubsystemInspirationHarmonizer::new(DistroSubsystemMode::LinuxNix);
-        assert!(nix_harmonizer.translate_vfs_path("/bin/app").contains("/nix/store/sovereign-hash"));
+        let nix_harmonizer =
+            LinuxBsdSubsystemInspirationHarmonizer::new(DistroSubsystemMode::LinuxNix);
+        assert!(nix_harmonizer
+            .translate_vfs_path("/bin/app")
+            .contains("/nix/store/sovereign-hash"));
 
         let rhel_ent_bridge =
             SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxRedHatEnterprise);

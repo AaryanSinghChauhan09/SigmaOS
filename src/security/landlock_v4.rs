@@ -13,33 +13,45 @@ pub const LANDLOCK_ABI_VERSION: u32 = 4;
 
 // ─── FS Access Bitflags ───────────────────────────────────────────────────────
 pub mod fs_access {
-    pub const EXECUTE:     u64 = 1 << 0;
-    pub const WRITE_FILE:  u64 = 1 << 1;
-    pub const READ_FILE:   u64 = 1 << 2;
-    pub const READ_DIR:    u64 = 1 << 3;
-    pub const REMOVE_DIR:  u64 = 1 << 4;
+    pub const EXECUTE: u64 = 1 << 0;
+    pub const WRITE_FILE: u64 = 1 << 1;
+    pub const READ_FILE: u64 = 1 << 2;
+    pub const READ_DIR: u64 = 1 << 3;
+    pub const REMOVE_DIR: u64 = 1 << 4;
     pub const REMOVE_FILE: u64 = 1 << 5;
-    pub const MAKE_CHAR:   u64 = 1 << 6;
-    pub const MAKE_DIR:    u64 = 1 << 7;
-    pub const MAKE_REG:    u64 = 1 << 8;
-    pub const MAKE_SOCK:   u64 = 1 << 9;
-    pub const MAKE_FIFO:   u64 = 1 << 10;
-    pub const MAKE_BLOCK:  u64 = 1 << 11;
-    pub const MAKE_SYM:    u64 = 1 << 12;
-    pub const REFER:       u64 = 1 << 13;
-    pub const TRUNCATE:    u64 = 1 << 14;
+    pub const MAKE_CHAR: u64 = 1 << 6;
+    pub const MAKE_DIR: u64 = 1 << 7;
+    pub const MAKE_REG: u64 = 1 << 8;
+    pub const MAKE_SOCK: u64 = 1 << 9;
+    pub const MAKE_FIFO: u64 = 1 << 10;
+    pub const MAKE_BLOCK: u64 = 1 << 11;
+    pub const MAKE_SYM: u64 = 1 << 12;
+    pub const REFER: u64 = 1 << 13;
+    pub const TRUNCATE: u64 = 1 << 14;
 
     /// All FS access rights combined (ABI v4)
-    pub const ALL: u64 = EXECUTE | WRITE_FILE | READ_FILE | READ_DIR
-        | REMOVE_DIR | REMOVE_FILE | MAKE_CHAR | MAKE_DIR | MAKE_REG
-        | MAKE_SOCK | MAKE_FIFO | MAKE_BLOCK | MAKE_SYM | REFER | TRUNCATE;
+    pub const ALL: u64 = EXECUTE
+        | WRITE_FILE
+        | READ_FILE
+        | READ_DIR
+        | REMOVE_DIR
+        | REMOVE_FILE
+        | MAKE_CHAR
+        | MAKE_DIR
+        | MAKE_REG
+        | MAKE_SOCK
+        | MAKE_FIFO
+        | MAKE_BLOCK
+        | MAKE_SYM
+        | REFER
+        | TRUNCATE;
 }
 
 // ─── NET Access Bitflags (v4 additions) ───────────────────────────────────────
 pub mod net_access {
-    pub const BIND_TCP:    u64 = 1 << 0;
+    pub const BIND_TCP: u64 = 1 << 0;
     pub const CONNECT_TCP: u64 = 1 << 1;
-    pub const BIND_UDP:    u64 = 1 << 2;
+    pub const BIND_UDP: u64 = 1 << 2;
     pub const CONNECT_UDP: u64 = 1 << 3;
 
     pub const ALL: u64 = BIND_TCP | CONNECT_TCP | BIND_UDP | CONNECT_UDP;
@@ -57,7 +69,10 @@ pub struct LandlockRuleset {
 
 impl LandlockRuleset {
     pub const fn new(fs: u64, net: u64) -> Self {
-        Self { handled_access_fs: fs, handled_access_net: net }
+        Self {
+            handled_access_fs: fs,
+            handled_access_net: net,
+        }
     }
 }
 
@@ -106,7 +121,11 @@ pub struct LandlockContext {
 
 impl LandlockContext {
     pub fn new(ruleset: LandlockRuleset) -> Self {
-        Self { ruleset, rules: Vec::new(), enforced: false }
+        Self {
+            ruleset,
+            rules: Vec::new(),
+            enforced: false,
+        }
     }
 }
 
@@ -134,7 +153,10 @@ pub fn landlock_add_path_rule(
     if access & !ctx.ruleset.handled_access_fs != 0 {
         return Err(LandlockError::InvalidArgument);
     }
-    ctx.rules.push(LandlockRule::PathBeneath { access, fd: path_fd });
+    ctx.rules.push(LandlockRule::PathBeneath {
+        access,
+        fd: path_fd,
+    });
     Ok(())
 }
 
@@ -202,9 +224,7 @@ fn sys_landlock_add_rule(ruleset_fd: i32, rule: &LandlockRule) -> Result<(), Lan
         return Err(LandlockError::Syscall(-9)); // EBADF
     }
     match rule {
-        LandlockRule::PathBeneath { fd, .. } if *fd < 0 => {
-            Err(LandlockError::InvalidArgument)
-        }
+        LandlockRule::PathBeneath { fd, .. } if *fd < 0 => Err(LandlockError::InvalidArgument),
         _ => Ok(()),
     }
 }
@@ -304,11 +324,21 @@ mod tests {
     #[test]
     fn test_fs_access_bits_are_unique() {
         let bits = [
-            fs_access::EXECUTE, fs_access::WRITE_FILE, fs_access::READ_FILE,
-            fs_access::READ_DIR, fs_access::REMOVE_DIR, fs_access::REMOVE_FILE,
-            fs_access::MAKE_CHAR, fs_access::MAKE_DIR, fs_access::MAKE_REG,
-            fs_access::MAKE_SOCK, fs_access::MAKE_FIFO, fs_access::MAKE_BLOCK,
-            fs_access::MAKE_SYM, fs_access::REFER, fs_access::TRUNCATE,
+            fs_access::EXECUTE,
+            fs_access::WRITE_FILE,
+            fs_access::READ_FILE,
+            fs_access::READ_DIR,
+            fs_access::REMOVE_DIR,
+            fs_access::REMOVE_FILE,
+            fs_access::MAKE_CHAR,
+            fs_access::MAKE_DIR,
+            fs_access::MAKE_REG,
+            fs_access::MAKE_SOCK,
+            fs_access::MAKE_FIFO,
+            fs_access::MAKE_BLOCK,
+            fs_access::MAKE_SYM,
+            fs_access::REFER,
+            fs_access::TRUNCATE,
         ];
         let mut seen: u64 = 0;
         for &b in &bits {
@@ -320,8 +350,10 @@ mod tests {
     #[test]
     fn test_net_access_bits_are_unique() {
         let bits = [
-            net_access::BIND_TCP, net_access::CONNECT_TCP,
-            net_access::BIND_UDP, net_access::CONNECT_UDP,
+            net_access::BIND_TCP,
+            net_access::CONNECT_TCP,
+            net_access::BIND_UDP,
+            net_access::CONNECT_UDP,
         ];
         let mut seen: u64 = 0;
         for &b in &bits {
