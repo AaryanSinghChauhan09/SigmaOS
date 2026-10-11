@@ -351,6 +351,7 @@ pub use userland::system_utilities::*;
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
+    sovereign_virtualization_and_containers_pr::*,
 };
 
 pub use thread::{Mutex as ThreadMutex, Thread, ThreadError};
