@@ -2,14 +2,22 @@
 // eBPF-based scheduling system & CPU affinity manager
 
 pub mod affinity;
+pub mod core;
 pub mod distro_schedulers;
 pub mod ebpf_scheduler;
 pub mod eevdf;
 pub mod energy_aware;
 pub mod numa_scheduler;
 pub mod process;
+pub mod run_queue;
 pub mod scheduler;
 pub mod sovereign;
+
+pub use core::{
+    ProcessState, SchedulerCore, SchedulerError, SchedulerProcessControlBlock,
+    DEFAULT_STARVATION_THRESHOLD_TICKS, MAX_PROCESS_TABLE_SIZE,
+};
+pub use run_queue::{BoundedRunQueue, RunQueueError, TaskRunRef, MAX_RUNQUEUE_CAPACITY, NUM_PRIORITY_LEVELS};
 
 pub use distro_schedulers::*;
 pub use ebpf_scheduler::{
