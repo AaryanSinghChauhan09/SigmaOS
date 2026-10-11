@@ -898,6 +898,6 @@ mod tests {
             let merged = engine.merge_parity_pr(pr_id).unwrap();
             assert_eq!(merged.name, name);
         }
-        assert_eq!(engine.parity_records.len(), 10);
+        assert_eq!(engine.parity_records.len(), 13);
     }
 }

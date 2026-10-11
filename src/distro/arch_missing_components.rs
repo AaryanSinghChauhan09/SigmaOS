@@ -481,6 +481,25 @@ impl ArchPacmanHookRunner {
             registered_hooks: hooks,
         }
     }
+
+    pub fn match_hooks(&self, when: PacmanHookWhen, packages: &[&str]) -> Vec<PacmanHookRule> {
+        let mut matched = Vec::new();
+        for hook in &self.registered_hooks {
+            if hook.when == when {
+                for pkg in packages {
+                    for target in &hook.target_packages {
+                        let clean_target = target.trim_end_matches('*');
+                        if pkg.starts_with(clean_target) {
+                            if !matched.contains(hook) {
+                                matched.push(hook.clone());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        matched
+    }
 }
 
 impl Default for ArchPacmanHookRunner {
