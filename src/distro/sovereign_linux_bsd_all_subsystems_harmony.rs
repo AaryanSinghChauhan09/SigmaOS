@@ -495,6 +495,90 @@ impl SovereignSubsystemDistroHarmonyEngine {
     }
 }
 
+#[path = "sovereign_universal_subsystem_interop.rs"]
+pub mod sovereign_universal_subsystem_interop;
+
+use sovereign_universal_subsystem_interop::SovereignUniversalSubsystemInteropEngine;
+
+/// Universal Orchestrator combining subsystem harmony and interop engines across all Linux and BSD distro paradigms.
+pub struct SovereignUniversalCrossDistroSubsystemOrchestrator {
+    pub harmony_engine: SovereignSubsystemDistroHarmonyEngine,
+    pub interop_engine: SovereignUniversalSubsystemInteropEngine,
+    pub current_mode: String,
+}
+
+impl Default for SovereignUniversalCrossDistroSubsystemOrchestrator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl SovereignUniversalCrossDistroSubsystemOrchestrator {
+    pub fn new() -> Self {
+        Self {
+            harmony_engine: SovereignSubsystemDistroHarmonyEngine::new(),
+            interop_engine: SovereignUniversalSubsystemInteropEngine::new(),
+            current_mode: String::from("LinuxArch"),
+        }
+    }
+
+    /// Switch system-wide Linux & BSD distro paradigm mode across all 23 subsystems.
+    pub fn switch_distro_mode(&mut self, mode: &str) -> Result<usize, &'static str> {
+        self.current_mode = String::from(mode);
+        self.interop_engine
+            .sync_all_subsystems_with_distro_innovations(mode)
+    }
+
+    /// Route a cross-subsystem event through both harmony and interop protocol layers.
+    pub fn route_harmony_event(
+        &mut self,
+        source: SigmaOsSubsystem,
+        target: SigmaOsSubsystem,
+        action: &str,
+        payload: &str,
+    ) -> u64 {
+        let event_id = self
+            .harmony_engine
+            .dispatch_event(source, target, action, payload);
+
+        let _ = self.interop_engine.dispatch_event(
+            source.as_str().to_lowercase().as_str(),
+            target.as_str().to_lowercase().as_str(),
+            action,
+            payload,
+        );
+
+        event_id
+    }
+
+    /// Translate policies between subsystems and Linux/BSD distro inspirations.
+    pub fn translate_cross_subsystem_policy(
+        &self,
+        source: SigmaOsSubsystem,
+        target: SigmaOsSubsystem,
+    ) -> Option<SubsystemPolicyTranslation> {
+        self.harmony_engine
+            .translate_policy(source, target)
+            .cloned()
+    }
+
+    /// Verify absolute system-wide harmony and compatibility matrix across all subsystems.
+    pub fn verify_orchestration_harmony(&self) -> bool {
+        self.harmony_engine.verify_all_subsystems_compatibility_matrix()
+            && self
+                .interop_engine
+                .verify_all_subsystems_interoperability()
+    }
+
+    pub fn master_harmony_index(&self) -> u32 {
+        if self.verify_orchestration_harmony() {
+            100
+        } else {
+            0
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -560,5 +644,32 @@ mod tests {
             .expect("Harmonization should succeed");
         assert_eq!(count, 23 * 22);
         assert_eq!(engine.compute_harmony_index(), 100);
+    }
+
+    #[test]
+    fn test_cross_distro_orchestrator() {
+        let mut orchestrator = SovereignUniversalCrossDistroSubsystemOrchestrator::new();
+        assert!(orchestrator.verify_orchestration_harmony());
+        assert_eq!(orchestrator.master_harmony_index(), 100);
+
+        let synced = orchestrator
+            .switch_distro_mode("FreeBSD14")
+            .expect("Mode switch should succeed");
+        assert!(synced > 0);
+        assert_eq!(orchestrator.current_mode, "FreeBSD14");
+
+        let event_id = orchestrator.route_harmony_event(
+            SigmaOsSubsystem::KernelScheduling,
+            SigmaOsSubsystem::SecuritySandboxing,
+            "ENFORCE_SANDBOX",
+            "pledge=stdio",
+        );
+        assert_eq!(event_id, 1);
+
+        let policy = orchestrator.translate_cross_subsystem_policy(
+            SigmaOsSubsystem::KernelScheduling,
+            SigmaOsSubsystem::SecuritySandboxing,
+        );
+        assert!(policy.is_some());
     }
 }

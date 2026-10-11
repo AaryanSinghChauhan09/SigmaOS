@@ -606,6 +606,74 @@ impl SovereignUniversalSubsystemInteropEngine {
             "Trigger FineIBT and PaX CFI violation audits on security sandbox policy breaches",
             true,
         ));
+
+        self.add_interop_policy(SubsystemInteropPolicy::new(
+            "policy_ebpf_pledge",
+            UniversalSubsystemCategory::Networking,
+            UniversalSubsystemCategory::SecuritySandboxing,
+            "Bridge eBPF XDP network filters with OpenBSD Pledge promises and Unveil paths",
+            true,
+        ));
+
+        self.add_interop_policy(SubsystemInteropPolicy::new(
+            "policy_landlock_capsicum",
+            UniversalSubsystemCategory::SecuritySandboxing,
+            UniversalSubsystemCategory::FilesystemStorage,
+            "Translate Linux Landlock v5 access rights to FreeBSD Capsicum capability rights on VFS handles",
+            true,
+        ));
+
+        self.add_interop_policy(SubsystemInteropPolicy::new(
+            "policy_ai_orchestration",
+            UniversalSubsystemCategory::AiWorkflowAgent,
+            UniversalSubsystemCategory::InitSupervisor,
+            "Autonomous Herdr and Omakase agent dynamic service supervision and thread priority adjustment",
+            false,
+        ));
+
+        self.add_interop_policy(SubsystemInteropPolicy::new(
+            "policy_storage_sec",
+            UniversalSubsystemCategory::FilesystemStorage,
+            UniversalSubsystemCategory::SecuritySandboxing,
+            "Automated fscrypt directory encryption and ZFS/Btrfs CoW snapshot lock enforcement",
+            true,
+        ));
+
+        self.add_interop_policy(SubsystemInteropPolicy::new(
+            "policy_virt_sec",
+            UniversalSubsystemCategory::VirtualizationHypervisor,
+            UniversalSubsystemCategory::SecuritySandboxing,
+            "Hardware microVM guest isolation with Bhyve and OpenBSD VMM capability boundaries",
+            true,
+        ));
+
+        self.add_interop_policy(SubsystemInteropPolicy::new(
+            "policy_ipc_obs",
+            UniversalSubsystemCategory::IpcMemory,
+            UniversalSubsystemCategory::ObservabilityDiagnostics,
+            "Zero-copy ring buffer telemetry streaming to DTrace and eBPF tracing probes",
+            false,
+        ));
+    }
+
+    /// Synchronize all subsystems in a cross-distro mesh network topology.
+    pub fn sync_universal_cross_distro_mesh(&mut self) -> Result<usize, &'static str> {
+        let adapter_names: Vec<String> = self.subsystem_adapters.keys().cloned().collect();
+        let mut count = 0;
+        for origin in &adapter_names {
+            for target in &adapter_names {
+                if origin != target {
+                    let _ = self.dispatch_event(
+                        origin,
+                        target,
+                        "CROSS_DISTRO_MESH_SYNC",
+                        "active_distro_mesh=all",
+                    );
+                    count += 1;
+                }
+            }
+        }
+        Ok(count)
     }
 
     pub fn register_subsystem(&mut self, name: &str, adapter: SubsystemAdapterCapabilities) {
@@ -989,5 +1057,30 @@ mod tests {
         assert!(synced > 100);
         let score = harmonizer.compute_master_harmony_index();
         assert_eq!(score, 100);
+    }
+
+    #[test]
+    fn test_universal_cross_distro_mesh_sync_and_policies() {
+        let mut engine = SovereignUniversalSubsystemInteropEngine::new();
+        let count = engine
+            .sync_universal_cross_distro_mesh()
+            .expect("Mesh sync should succeed");
+        assert!(count >= 23 * 22);
+
+        let policy = engine
+            .translate_policy(
+                UniversalSubsystemCategory::Networking,
+                UniversalSubsystemCategory::SecuritySandboxing,
+            )
+            .expect("Policy ebpf_pledge should exist");
+        assert_eq!(policy.policy_id, "policy_ebpf_pledge");
+
+        let ai_policy = engine
+            .translate_policy(
+                UniversalSubsystemCategory::AiWorkflowAgent,
+                UniversalSubsystemCategory::InitSupervisor,
+            )
+            .expect("Policy ai_orchestration should exist");
+        assert_eq!(ai_policy.policy_id, "policy_ai_orchestration");
     }
 }
