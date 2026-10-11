@@ -4,7 +4,7 @@
 //
 // Zero-dependency, `#![no_std]` compliant Rust engine closing feature gaps between
 // SigmaOS and classic & modern open-source operating systems (Plan 9, Minix 3, NetBSD,
-// Haiku OS, SmartOS, OpenBSD, FreeBSD, DragonFly BSD, NixOS).
+// Haiku OS, SmartOS, OpenBSD, FreeBSD, DragonFly BSD, Redox OS, Fuchsia OS, SerenityOS).
 
 #[cfg(not(any(feature = "standalone_test", test)))]
 extern crate alloc;
@@ -882,5 +882,11 @@ mod tests {
         assert!(merge_res.contains("Successfully merged"));
 
         assert!(engine.merge_pr_proposal(9999).is_err());
+    }
+
+    #[test]
+    fn test_universal_synthesis_suite() {
+        let suite = SovereignUniversalOpenSourceOsPinnacleSynthesisSuite::new();
+        assert_eq!(suite.audit_system_capabilities(), 11);
     }
 }
