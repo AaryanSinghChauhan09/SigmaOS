@@ -606,4 +606,25 @@ mod tests {
             "Task should land on NUMA node 1 CPUs"
         );
     }
+
+    #[test]
+    fn test_cross_numa_socket_load_balancer_pull() {
+        let topo = SmpTopology::detect();
+        let mut balancer = SmpLoadBalancer::new(topo);
+        // Heavily load CPU 2 (NUMA node 1)
+        for i in 0..10 {
+            balancer
+                .run_queues
+                .get_mut(&2)
+                .unwrap()
+                .enqueue(Task::new(i, -20, 1));
+        }
+        // CPU 0 (NUMA node 0) is completely idle
+        balancer.rebalance(0);
+        let cpu0_tasks = balancer.run_queues[&0].nr_running.load(Ordering::Relaxed);
+        assert!(
+            cpu0_tasks > 0,
+            "Cross-NUMA pull should migrate tasks from socket 1 (CPU 2) to socket 0 (CPU 0)"
+        );
+    }
 }
