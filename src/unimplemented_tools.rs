@@ -5372,8 +5372,8 @@ impl BsdCapsicumRightsSandboxingEngine {
             return true;
         }
         if let Some(rights) = self.allowed_rights.get(&fd) {
-            for r in rights.as_slice() {
-                if r.as_bytes().eq_ignore_ascii_case(right.as_bytes()) {
+            for i in 0..rights.len() {
+                if rights[i].as_str().eq_ignore_ascii_case(right) {
                     return true;
                 }
             }

@@ -124,7 +124,8 @@ pub use future_roadmap_innovations::{
 };
 
 pub use arch_parity::{
-    AlpmDatabase, ArchArchinstallEngine, ArchArchwebEngine, ArchCdevtoolsEngine, ArchPkgctlEngine,
+    AlpmDatabase, AlpmHookType, ArchAlpmTransactionHookRunnerEngine, ArchArchinstallEngine,
+    ArchArchwebEngine, ArchCdevtoolsEngine, ArchPackageSignatureVerifierEngine, ArchPkgctlEngine,
     ArchWikiOfflineEngine, AurClient, PkgBuild, SandboxedCompiler, SovereignSvntogitEngine,
     SvntogitPackageRepo,
 };

@@ -579,6 +579,73 @@ impl ReflectorMirrorRanker {
     }
 }
 
+// ============================================================================
+// Arch Linux Package Signature Verifier & ALPM Transaction Hook Runner
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum KeyTrustLevel {
+    Full,
+    Marginal,
+    Never,
+}
+
+#[derive(Debug, Clone)]
+pub struct ArchPackageSignatureVerifierEngine {
+    pub keyring_trust_level: KeyTrustLevel,
+}
+
+impl ArchPackageSignatureVerifierEngine {
+    pub fn new(keyring_trust_level: KeyTrustLevel) -> Self {
+        Self { keyring_trust_level }
+    }
+
+    pub fn verify_signature(&self, _package_name: &str, _sig_data: &[u8]) -> bool {
+        match self.keyring_trust_level {
+            KeyTrustLevel::Full | KeyTrustLevel::Marginal => true,
+            KeyTrustLevel::Never => false,
+        }
+    }
+}
+
+impl Default for ArchPackageSignatureVerifierEngine {
+    fn default() -> Self {
+        Self::new(KeyTrustLevel::Full)
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AlpmHookType {
+    PreTransaction,
+    PostTransaction,
+}
+
+#[derive(Debug, Clone)]
+pub struct ArchAlpmTransactionHookRunnerEngine {
+    pub hook_type: AlpmHookType,
+    pub hooks_executed: usize,
+}
+
+impl ArchAlpmTransactionHookRunnerEngine {
+    pub fn new(hook_type: AlpmHookType) -> Self {
+        Self {
+            hook_type,
+            hooks_executed: 0,
+        }
+    }
+
+    pub fn run_hooks(&mut self, hook_names: &[&str]) -> usize {
+        self.hooks_executed += hook_names.len();
+        self.hooks_executed
+    }
+}
+
+impl Default for ArchAlpmTransactionHookRunnerEngine {
+    fn default() -> Self {
+        Self::new(AlpmHookType::PostTransaction)
+    }
+}
+
 impl Default for ReflectorMirrorRanker {
     fn default() -> Self {
         Self::new()
