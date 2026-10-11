@@ -24,6 +24,31 @@ pub use omarchy_gaming_enhanced::{
     SovereignSteamShaderPrecacheManager, SovereignOmarchyGamingPerformanceSuite,
     init_gaming_performance_suite, get_gaming_performance_suite,
 };
+pub mod software_manager;
+pub use software_manager::{
+    SoftwareManager, SoftwarePackage, SoftwareCategory,
+    init_software_manager, get_software_manager,
+};
+pub mod update_manager;
+pub use update_manager::{
+    UpdateManager, SystemUpdate, UpdateType, UpdatePriority,
+    init_update_manager, get_update_manager,
+};
+pub mod backup_tool;
+pub use backup_tool::{
+    BackupManager, Snapshot, SnapshotType,
+    init_backup_manager, get_backup_manager, create_manual_snapshot,
+};
+pub mod driver_manager;
+pub use driver_manager::{
+    DriverManager, HardwareDriver, DriverType, DriverStatus,
+    init_driver_manager, get_driver_manager,
+};
+pub mod system_tools;
+pub use system_tools::{
+    SystemToolsManager, SystemTool,
+    init_system_tools_manager, get_system_tools_manager,
+};
 pub mod omarchy_future_roadmap;
 pub mod omarchy_linux_gap_closure_pr_suite;
 pub use omarchy_linux_gap_closure_pr_suite::*;
