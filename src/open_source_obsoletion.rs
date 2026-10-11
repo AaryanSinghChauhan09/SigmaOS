@@ -4973,23 +4973,26 @@ impl SovereignOpenSourceObsoletionOrchestrator {
             .add_signature_rule(1001, "TCP", "any", 80, "ALERT HTTP Traffic");
         let _ = self.caddy_tls.provision_acme_certificate("api.sigmaos.org");
 
-        self.procs_viewer.register_process(ProcsProcessInfo {
-            pid: 1,
-            ppid: 0,
-            name: "sovereign_kernel".to_string(),
-            user: "root".to_string(),
-            cpu_pct: 0.1,
-            mem_rss_bytes: 10485760,
-            read_bytes_sec: 1024,
-            write_bytes_sec: 512,
-            state: "S".to_string(),
-        });
-        self.dust_usage.record_directory("/var/log", 1024000, 10, 1);
-        let _ = self
-            .dogdns_query
-            .execute_dns_query("sigmaos.org", DnsRecordType::A, "DoH");
-        self.gping_network.add_target_host("1.1.1.1");
-        self.gping_network.record_ping("1.1.1.1", 1, 10.5, true);
+        let mut hammer = open_source_os_gap_closure::Hammer2StorageEngine::new();
+        let _ = hammer.create_snapshot("pfs0", "root_snap_v1");
+
+        let mut crossbow = open_source_os_gap_closure::SmartOsCrossbowVnicEngine::new();
+        crossbow.create_vnic("vnic0", "eth0", [0x02, 0x11, 0x22, 0x33, 0x44, 0x55], 1000);
+
+        let mut obsd = SovereignNetBsdRumpEngine::new();
+        obsd.attach_rump_driver("tmpfs");
+
+        let mut redox = open_source_os_gap_closure::RedoxOsSchemeHandlerEngine::new("orbital");
+        let _ = redox.open("orbital:1/window", 0);
+
+        let mut fuchsia = open_source_os_gap_closure::FuchsiaZirconChannelEngine::new();
+        fuchsia.create_handle(201, 0x07);
+
+        let mut geom = open_source_os_gap_closure::FreeBsdGeomTopologyEngine::new();
+        geom.register_provider("stripe0", open_source_os_gap_closure::GeomClassType::Stripe, 512, 100000, &[]);
+
+        let mut serenity = open_source_os_gap_closure::SerenityOsLibGuiProtocolEngine::new();
+        serenity.create_window("gui_draw", 0, 0, 800, 600);
 
         Ok(format!(
             "Sovereign Stack Active: {} legacy open-source projects obsoleted",

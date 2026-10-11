@@ -293,43 +293,37 @@ mod tests {
 
     #[test]
     fn test_dragonfly_and_smartos_engines() {
-        let mut hammer = SovereignDragonFlyHammer2Engine::new("/hammer2");
-        assert_eq!(hammer.commit_transaction(), 2);
-        hammer.spawn_vkernel("vk0", 2001);
-        assert_eq!(hammer.active_vkernel_pids.get("vk0"), Some(&2001));
+        let mut hammer = crate::open_source_os_gap_closure::Hammer2StorageEngine::new();
+        let snap_res = hammer.create_snapshot("pfs0", "root_snap");
+        assert_eq!(snap_res, 1);
 
-        let mut crossbow = SovereignSmartOSCrossbowEngine::new();
-        crossbow.create_etherstub("stub0");
-        assert!(crossbow.create_vnic("vnic0", "stub0"));
-        crossbow.set_zone_rbac("zoneA", "sys_net_config");
-        assert_eq!(crossbow.zone_rbac_policies.get("zoneA").unwrap().len(), 1);
+        let mut crossbow = crate::open_source_os_gap_closure::SmartOsCrossbowVnicEngine::new();
+        let res = crossbow.create_vnic("vnic0", "eth0", [0x00, 0x11, 0x22, 0x33, 0x44, 0x55], 1000);
+        assert!(res.is_ok());
+        assert_eq!(crossbow.vnics[0].vnic_name, "vnic0");
     }
 
     #[test]
     fn test_openbsd_redox_fuchsia_freebsd_serenity_engines() {
-        let mut obsd = SovereignOpenBsdSecurityEngine::new(1);
-        obsd.pledge(&["stdio", "rpath"]);
-        obsd.unveil("/etc", "r");
-        assert_eq!(obsd.pledged_promises.len(), 2);
+        let mut obsd = crate::open_source_os_gap_closure::OpenBsdPledgeUnveilEngine::new();
+        assert!(obsd.pledge(&["stdio", "rpath"]).is_ok());
+        assert!(obsd.unveil("/etc", "r").is_ok());
 
-        let mut redox = SovereignRedoxSchemeEngine::new();
-        redox.register_scheme("proc", "proc_driver");
-        assert_eq!(
-            redox.resolve_scheme_url("proc:1/status"),
-            Some(&"proc_driver".to_string())
-        );
+        let mut redox = crate::open_source_os_gap_closure::RedoxOsSchemeHandlerEngine::new("proc");
+        let fd = redox.open("proc:1/status", 0);
+        assert!(fd > 0);
 
-        let mut fuchsia = SovereignFuchsiaZirconEngine::new();
-        fuchsia.create_channel(1001, 0x07);
-        assert!(fuchsia.write_channel_msg(1001, b"ping"));
+        let mut fuchsia = crate::open_source_os_gap_closure::FuchsiaZirconChannelEngine::new();
+        fuchsia.create_handle(101, 0x07);
+        assert_eq!(fuchsia.handles.len(), 1);
 
-        let mut geom = SovereignFreeBsdGeomEngine::new();
-        assert!(geom.register_provider("ada0", "DISK"));
+        let mut geom = crate::open_source_os_gap_closure::FreeBsdGeomTopologyEngine::new();
+        geom.register_provider("ada0", crate::open_source_os_gap_closure::GeomClassType::Stripe, 512, 1000000, &[]);
+        assert_eq!(geom.providers.len(), 1);
 
-        let mut serenity = SovereignSerenityCoreEngine::new();
-        serenity.post_event("PaintEvent");
-        serenity.set_property("window_title", "SigmaOS Terminal");
-        assert_eq!(serenity.event_queue.len(), 1);
+        let mut serenity = crate::open_source_os_gap_closure::SerenityOsLibGuiProtocolEngine::new();
+        let win_id = serenity.create_window("SigmaOS Terminal", 0, 0, 800, 600);
+        assert_eq!(win_id, 1);
     }
 
     #[test]
