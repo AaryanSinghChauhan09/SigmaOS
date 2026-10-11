@@ -176,6 +176,17 @@ impl WikiDataTransferEngine {
         );
 
         self.feature_specs.insert(
+            "SigmaOSGuiDevelopmentPlan".to_string(),
+            FeatureMdStatus {
+                spec_name: "30-SigmaOS-GUI-Development-Plan.md".to_string(),
+                source_path: "wiki/30-SigmaOS-GUI-Development-Plan.md".to_string(),
+                is_fully_implemented: true,
+                completion_percentage: 100,
+                wiki_mirrored: true,
+            },
+        );
+
+        self.feature_specs.insert(
             "KernelSignalInterruptionPlan".to_string(),
             FeatureMdStatus {
                 spec_name: "27-Kernel-Signal-Interruption-Plan.md".to_string(),

@@ -224,6 +224,12 @@ impl SovereignLinuxBsdWikiRoadmapParityEngine {
                 "src/kernel/sovereign_kernel_signal_interruption_suite.rs",
                 "wiki/27-Kernel-Signal-Interruption-Plan.md",
             ),
+            (
+                30,
+                "Sovereign GUI Development Plan & Gateway Engine",
+                "src/desktop/sovereign_gui_development_and_pr_suite.rs",
+                "wiki/30-SigmaOS-GUI-Development-Plan.md",
+            ),
         ];
 
         for (id, title, module, _spec) in default_ideas {
@@ -353,8 +359,8 @@ mod tests {
     #[test]
     fn test_wiki_roadmap_parity_engine() {
         let engine = SovereignLinuxBsdWikiRoadmapParityEngine::new();
-        assert_eq!(engine.total_ideas_count, 29);
-        assert_eq!(engine.implemented_ideas_count(), 29);
+        assert_eq!(engine.total_ideas_count, 30);
+        assert_eq!(engine.implemented_ideas_count(), 30);
         assert_eq!(engine.verification_percentage(), 100.0);
     }
 

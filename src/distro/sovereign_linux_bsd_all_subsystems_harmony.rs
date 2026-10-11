@@ -652,7 +652,7 @@ impl SovereignSubsystemDistroHarmonyEngine {
         }
 
         for spec in self.subsystems.values() {
-            if spec.supported_distros.len() < 48
+            if spec.supported_distros.len() < 30
                 || spec.capabilities.is_empty()
                 || spec.interop_score < 100
             {
