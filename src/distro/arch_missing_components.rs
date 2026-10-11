@@ -483,7 +483,7 @@ impl ArchPacmanHookRunner {
     }
 }
 
-impl Default for ArchPacmanHookRunner {
+impl Default for ArchMkinitcpioGenerator {
     fn default() -> Self {
         Self::new()
     }
@@ -546,6 +546,32 @@ pub struct PqcDilithiumKeySpec {
     pub owner_email: String,
     pub is_trusted: bool,
     pub dilithium_pubkey_hash: String,
+}
+
+pub struct ArchPacmanKeyringPqcEngine {
+    pub keys: BTreeMap<String, PqcDilithiumKeySpec>,
+}
+
+impl ArchPacmanCacheScrubber {
+    pub fn new(retain_keep_count: usize) -> Self {
+        Self {
+            cached_files: Vec::new(),
+            retain_keep_count,
+        }
+    }
+}
+
+impl Default for ArchPacmanKeyringPqcEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CachedPackageFile {
+    pub pkgname: String,
+    pub version: String,
+    pub file_size_bytes: u64,
 }
 
 pub struct ArchPacmanKeyringPqcEngine {
