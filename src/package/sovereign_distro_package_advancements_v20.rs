@@ -479,8 +479,8 @@ mod tests {
         let sigpkg = suite
             .convert_submit_and_install("vim-9.1.rpm", b"VIM_PAYLOAD")
             .unwrap();
-        assert_eq!(sigpkg.name, "sigpkg-vim");
-        assert!(suite.installed_packages.contains(&"sigpkg-vim".to_string()));
+        assert_eq!(sigpkg.name, "sovereign-vim");
+        assert!(suite.installed_packages.contains(&"sovereign-vim".to_string()));
 
         let response = suite.execute_cli_command("apt install tmux").unwrap();
         assert!(response.contains("tmux"));
