@@ -603,7 +603,6 @@ impl ArchPacmanCacheScrubber {
         }
     }
 
-    /// Calculates which old package cache files should be purged
     pub fn purge_unneeded_cache(&self) -> (usize, u64) {
         let mut by_name: BTreeMap<String, Vec<&CachedPackageFile>> = BTreeMap::new();
         for file in &self.cached_files {
@@ -634,7 +633,7 @@ impl Default for ArchPacmanCacheScrubber {
 }
 
 // =========================================================================
-// 11. BTRFS PACMAN SNAPSHOTTER ENGINE (snap-pac)
+// 12. BTRFS PACMAN SNAPSHOTTER ENGINE (snap-pac)
 // =========================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -696,7 +695,7 @@ impl Default for ArchBtrfsSnapperSnapshotter {
 }
 
 // =========================================================================
-// 12. ARCH AUDIT VULNERABILITY SCANNER (arch-audit)
+// 13. ARCH AUDIT VULNERABILITY SCANNER (arch-audit)
 // =========================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -755,7 +754,7 @@ impl Default for ArchAuditVulnerabilityScanner {
 }
 
 // =========================================================================
-// 13. MODPROBED-DB KERNEL MODULE LOGGER ENGINE (modprobed-db)
+// 14. MODPROBED-DB KERNEL MODULE LOGGER ENGINE (modprobed-db)
 // =========================================================================
 
 pub struct ArchModprobedDbEngine {
@@ -790,7 +789,6 @@ impl Default for ArchModprobedDbEngine {
 // UNIT TESTS
 // =========================================================================
 
-#[cfg(test)]
 #[cfg(test)]
 mod tests {
     use super::*;
