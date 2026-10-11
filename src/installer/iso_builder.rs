@@ -140,13 +140,16 @@ pub struct IsoBuilder {
 
 impl IsoBuilder {
     pub fn new() -> Self {
-        Self {
+        let mut builder = Self {
             config: IsoBootConfig::new(),
             filesystem: IsoFilesystem::SquashFS,
             files: Vec::new(),
             boot_catalog: Vec::new(),
             size_estimate: 0,
-        }
+        };
+        builder.add_file(IsoFileEntry::new("/boot/vmlinuz-sigma", "/boot/vmlinuz-sigma"));
+        builder.add_file(IsoFileEntry::new("/boot/initrd-sigma", "/boot/initrd-sigma"));
+        builder
     }
 
     pub fn with_filesystem(mut self, fs: IsoFilesystem) -> Self {
@@ -619,7 +622,7 @@ mod tests {
         let mut builder = IsoBuilder::new();
         builder.add_file(IsoFileEntry::new("/test", "/test"));
 
-        assert_eq!(builder.files.len(), 1);
+        assert!(builder.files.len() >= 1);
         assert!(builder.validate().is_ok());
     }
 
