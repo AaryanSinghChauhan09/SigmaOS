@@ -78,6 +78,7 @@ pub mod scanner;
 pub mod secrets;
 pub mod selinux;
 pub mod selinux_advanced;
+pub mod selinux_type_enforcement;
 pub mod unveil;
 pub mod vulnerability;
 pub use landlock::{LandlockEngine, LandlockPathBeneathAttr, LandlockRuleset};
@@ -176,6 +177,10 @@ pub use rules::{
 };
 pub use selinux::{PolicyRule, SELinuxPolicy, SecurityContext, SigmaSELinux};
 pub use selinux_advanced::{AdvancedSELinuxManager, MlsLevel, SELinuxBoolean, SELinuxModule};
+pub use selinux_type_enforcement::{
+    SecurityContext as SelinuxSecurityContext, TePolicy, TeRule, SelinuxTypeEnforcement,
+    init_selinux_enforcement, get_selinux_enforcement,
+};
 pub use sigma_pledge::{PledgeNamespace, PledgePromise as SigmaPledgePromise, SyscallFilter};
 pub use sigma_unveil::{
     UnveilEntry as SigmaUnveilEntry, UnveilManager as SigmaUnveilManager, UnveilPermissions,

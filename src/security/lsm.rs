@@ -13,10 +13,11 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-// (no_std only applicable at crate root - removed)
+#![no_std]
 
-use std::string::{String, ToString};
-use std::vec::Vec;
+extern crate alloc;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 
 use crate::filesystem::vfs::{FsError, Inode};
 
