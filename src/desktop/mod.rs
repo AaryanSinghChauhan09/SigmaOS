@@ -47,6 +47,12 @@ pub use swaylock::{
     SwaylockInstance, LockState,
     init_swaylock, get_swaylock, lock_screen, unlock_screen,
 };
+pub mod direct_scanout;
+pub use direct_scanout::{
+    DirectScanoutManager, ScanoutMode, DirectScanoutConfig,
+    init_direct_scanout_manager, get_direct_scanout_manager,
+    enable_gaming_direct_scanout, disable_direct_scanout,
+};
 pub mod xreader;
 pub use xreader::*;
 pub mod walker_launcher;
