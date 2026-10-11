@@ -3,6 +3,11 @@ use std::string::{String, ToString};
 /// Mandatory Access Control (MAC - Bell-LaPadula), and Hardware Network Filters for SigmaOS.
 use std::vec::Vec;
 
+#[cfg(feature = "standalone_test")]
+pub use super::ext4_ntfs_security::{
+    NtfsAce, NtfsDacl, NtfsSacl, NtfsSecurityDescriptor, SecurityIdentifier,
+};
+#[cfg(not(feature = "standalone_test"))]
 pub use crate::filesystem::ext4_ntfs_security::{
     NtfsAce, NtfsDacl, NtfsSacl, NtfsSecurityDescriptor, SecurityIdentifier,
 };

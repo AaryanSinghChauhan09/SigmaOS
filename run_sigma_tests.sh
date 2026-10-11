@@ -671,7 +671,7 @@ fi
 if [ -f "src/open_source_obsoletion.rs" ]; then
     echo "Running Open Source Obsoletion test suite..."
     mkdir -p build
-    rustc src/open_source_obsoletion.rs --crate-type=lib --test --edition=2021 --cfg 'feature="obsoletion_test"' -o build/test_open_source_obsoletion
+    rustc src/open_source_obsoletion.rs --crate-type=lib --test --edition=2021 --cfg 'feature="obsoletion_test"' --cfg 'feature="gap_closure_test"' -o build/test_open_source_obsoletion
     ./build/test_open_source_obsoletion
 fi
 
@@ -715,6 +715,13 @@ if [ -f "src/distro/sovereign_open_source_os_gap_closure_pr.rs" ]; then
     mkdir -p build
     rustc --test src/distro/sovereign_open_source_os_gap_closure_pr.rs --edition=2021 -o build/test_os_gap_closure_pr
     ./build/test_os_gap_closure_pr
+fi
+
+if [ -f "src/distro/sovereign_tech_media_wiki_ultimate_parity_pr.rs" ]; then
+    echo "Running Sovereign Tech Media, GitHub Wiki & Distro Ultimate Parity test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_tech_media_wiki_ultimate_parity_pr.rs --edition=2021 -o build/test_media_wiki_parity
+    ./build/test_media_wiki_parity
 fi
 
 if [ -f "src/distro/arch_linux_advancements_v38_pr.rs" ]; then
