@@ -778,10 +778,10 @@ mod tests {
         let sigpkg = suite
             .process_and_install_package("htop-3.3.0.deb", b"DEB_BINARY_DATA")
             .unwrap();
-        assert_eq!(sigpkg.name, "sigpkg-ripgrep-14.1.0");
+        assert_eq!(sigpkg.name, "sigpkg-htop-3.3.0");
         assert!(suite
             .transpiler_engine
             .installed_packages
-            .contains(&"sigpkg-ripgrep-14.1.0".to_string()));
+            .contains(&"sigpkg-htop-3.3.0".to_string()));
     }
 }

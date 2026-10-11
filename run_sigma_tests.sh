@@ -1036,6 +1036,13 @@ if [ -f "src/installer/migration_installer_pipeline.rs" ]; then
     ./build/test_installer_pipeline
 fi
 
+if [ -f "src/installer/sovereign_installer_and_system_tools_advancements.rs" ]; then
+    echo "Running Sovereign Installer and System Tools Advancements test suite..."
+    mkdir -p build
+    rustc --test src/installer/sovereign_installer_and_system_tools_advancements.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_installer_advancements
+    ./build/test_installer_advancements
+fi
+
 if [ -f "src/compatibility/mint_omarchy_migration_bridge.rs" ]; then
     echo "Running Mint & Omarchy Migration Bridge test suite..."
     mkdir -p build
