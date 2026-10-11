@@ -3,7 +3,10 @@
 #![allow(unexpected_cfgs)]
 #![allow(clippy::new_without_default)]
 
-#[cfg(not(any(feature = "standalone_test", test)))]
+// SigmaOS Sovereign KSM (Kernel Same-page Merging) Daemon Module
+// Inspired by Linux ksm.c and FreeBSD vm_pageout.c.
+// Implements background deduplication scan loop, sysfs tuning, and PR proposal specification.
+
 #[cfg(not(any(feature = "standalone_test", test)))]
 use std::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
@@ -41,6 +44,45 @@ impl KsmPage {
             shared_count: 1,
         }
     }
+}
+
+// ─── KSM Background Daemon State & Sysfs Configuration ───────────────────────
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum KsmDaemonState {
+    Idle,
+    Scanning,
+    Sleeping,
+    Stopped,
+}
+
+#[derive(Debug, Clone)]
+pub struct KsmDaemonConfiguration {
+    pub pages_to_scan: u32,      // `/sys/kernel/mm/ksm/pages_to_scan` (default 100)
+    pub sleep_millisecs: u32,    // `/sys/kernel/mm/ksm/sleep_millisecs` (default 20ms)
+    pub max_kernel_pages: u64,   // Cap on maximum merged pages
+    pub run_flag: u8,            // 0: stop, 1: run, 2: unmerge
+}
+
+impl Default for KsmDaemonConfiguration {
+    fn default() -> Self {
+        Self {
+            pages_to_scan: 100,
+            sleep_millisecs: 20,
+            max_kernel_pages: 1_000_000,
+            run_flag: 1,
+        }
+    }
+}
+
+/// Represents a Pull Request deployment specification for KSM background daemon loop.
+#[derive(Debug, Clone)]
+pub struct KsmDaemonPrSpec {
+    pub pr_id: u32,
+    pub title: String,
+    pub description: String,
+    pub pages_to_scan: u32,
+    pub sleep_millisecs: u32,
 }
 
 // ─── Sovereign KSM Memory Deduplicator ────────────────────────────────────────
@@ -139,8 +181,79 @@ impl SovereignKsmEngine {
     }
 }
 
+// ─── Sovereign KSM Background Scan Daemon Loop ────────────────────────────────
+
+pub struct SovereignKsmBackgroundDaemon {
+    pub engine: SovereignKsmEngine,
+    pub config: KsmDaemonConfiguration,
+    pub state: KsmDaemonState,
+    pub pending_candidates: Vec<(u32, u64, Vec<u8>)>,
+    pub scan_cycles_completed: u64,
+}
+
+impl SovereignKsmBackgroundDaemon {
+    pub fn new(page_size: usize) -> Self {
+        Self {
+            engine: SovereignKsmEngine::new(page_size),
+            config: KsmDaemonConfiguration::default(),
+            state: KsmDaemonState::Idle,
+            pending_candidates: Vec::new(),
+            scan_cycles_completed: 0,
+        }
+    }
+
+    pub fn register_candidate_page(&mut self, pid: u32, virt_addr: u64, data: Vec<u8>) {
+        self.pending_candidates.push((pid, virt_addr, data));
+    }
+
+    pub fn start_daemon(&mut self) {
+        self.config.run_flag = 1;
+        self.state = KsmDaemonState::Scanning;
+    }
+
+    pub fn stop_daemon(&mut self) {
+        self.config.run_flag = 0;
+        self.state = KsmDaemonState::Stopped;
+    }
+
+    pub fn run_scan_cycle(&mut self) -> u32 {
+        if self.config.run_flag != 1 || self.state == KsmDaemonState::Stopped {
+            return 0;
+        }
+
+        self.state = KsmDaemonState::Scanning;
+        let mut processed_in_cycle = 0;
+        let budget = self.config.pages_to_scan as usize;
+
+        let to_process: Vec<(u32, u64, Vec<u8>)> = self
+            .pending_candidates
+            .drain(..std::cmp::min(budget, self.pending_candidates.len()))
+            .collect();
+
+        for (pid, addr, data) in to_process {
+            self.engine.mergeable_page(pid, addr, &data);
+            processed_in_cycle += 1;
+        }
+
+        self.scan_cycles_completed += 1;
+        self.state = KsmDaemonState::Sleeping;
+        processed_in_cycle
+    }
+
+    pub fn generate_ksm_pr_spec(&self) -> KsmDaemonPrSpec {
+        KsmDaemonPrSpec {
+            pr_id: 302,
+            title: String::from("ksm: Add background page deduplication scan loop daemon and sysfs knobs"),
+            description: String::from(
+                "Integrates background page scanning daemon loop, sysfs tuning knobs (/sys/kernel/mm/ksm/), and stable/unstable tree deduplication inspired by Linux ksm.c and FreeBSD vm_pageout.c.",
+            ),
+            pages_to_scan: self.config.pages_to_scan,
+            sleep_millisecs: self.config.sleep_millisecs,
+        }
+    }
+}
+
 // ─── Tests ────────────────────────────────────────────────────────────────────
-#[cfg(test)]
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -204,5 +317,30 @@ mod tests {
     fn test_ksm_break_cow_nonexistent() {
         let mut ksm = SovereignKsmEngine::new(4096);
         assert!(!ksm.break_cow(0xDEADBEEF));
+    }
+
+    #[test]
+    fn test_ksm_background_daemon_scan_loop() {
+        let mut daemon = SovereignKsmBackgroundDaemon::new(4096);
+        daemon.register_candidate_page(100, 0x1000, b"duplicate page".to_vec());
+        daemon.register_candidate_page(200, 0x2000, b"duplicate page".to_vec());
+
+        daemon.start_daemon();
+        assert_eq!(daemon.state, KsmDaemonState::Scanning);
+
+        let scanned = daemon.run_scan_cycle();
+        assert_eq!(scanned, 2);
+        assert_eq!(daemon.scan_cycles_completed, 1);
+        assert_eq!(daemon.engine.pages_merged, 1);
+        assert_eq!(daemon.state, KsmDaemonState::Sleeping);
+    }
+
+    #[test]
+    fn test_ksm_pr_spec_generation() {
+        let daemon = SovereignKsmBackgroundDaemon::new(4096);
+        let pr = daemon.generate_ksm_pr_spec();
+        assert_eq!(pr.pr_id, 302);
+        assert!(pr.title.contains("ksm"));
+        assert_eq!(pr.pages_to_scan, 100);
     }
 }
