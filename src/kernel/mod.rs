@@ -63,7 +63,10 @@ pub mod performance;
 pub mod pipes;
 pub mod policy_mechanism;
 pub mod process;
+pub mod thread;
 pub mod roundrobin;
+
+pub use thread::*;
 pub mod sched;
 pub mod scheduler;
 pub mod structures;
