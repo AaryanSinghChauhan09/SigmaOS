@@ -7,6 +7,9 @@ pub mod security_sandbox;
 pub mod shell;
 pub mod stratum;
 pub mod system_utilities;
+pub mod job_control;
+pub mod terminal_emulator;
+
 
 pub use format_runner::*;
 pub use libc::*;

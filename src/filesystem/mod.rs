@@ -4,26 +4,35 @@ pub mod bsd_linux_innovations;
 pub mod btrfs;
 pub mod btrfs_snapshots;
 pub mod cache;
+pub mod complete_filesystems;
 pub mod core;
 pub mod cow_snapshot;
 pub mod defragmenter;
+pub mod devtmpfs;
 pub mod disk_usage;
 pub mod ext4;
 pub mod ext4_mount;
 pub mod ext4_ntfs_security;
 pub mod file_monitor;
+pub mod fuse;
 pub mod manager;
 pub mod mount;
 pub mod mount_namespace;
 pub mod sigma_fs;
 pub mod smart_symlink;
 pub mod snapshot_manager;
+pub mod squashfs;
 pub mod support;
 pub mod tmpfs;
 pub mod vfs;
 pub mod watch;
 pub mod zfs;
 pub mod zfs_arc;
+
+pub use complete_filesystems::*;
+pub use devtmpfs::{DevNode, DevTmpFs, KernelUevent, UeventAction};
+pub use fuse::{FuseChannel, FuseInHeader, FuseOpcode, FuseOutHeader};
+pub use squashfs::{SquashfsCompression, SquashfsReader, SquashfsSuperblock, SQUASHFS_MAGIC};
 
 pub use crate::filesystem::sigma_fs::{
     JournalState, SigmaFS, SigmaFhsAuditor, SigmaFhsHook, SigmaFhsNamespace, SigmaFhsRouter,
@@ -106,3 +115,12 @@ pub use hammer2::{
     Hammer2BlockRef, Hammer2Check, Hammer2Compress, Hammer2Inode, Hammer2PFS, Hammer2Snapshot,
     Hammer2Statfs, Hammer2Volume,
 };
+
+pub mod configfs;
+pub mod debugfs;
+pub mod fat32;
+pub mod luks2;
+pub mod ntfs;
+pub mod plan9_9p_network;
+pub mod smb_client;
+

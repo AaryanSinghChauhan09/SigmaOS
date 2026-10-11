@@ -9,6 +9,13 @@
 //! no_std-compatible interface for reading input events.
 
 pub mod event;
+pub mod hid_parser;
+pub mod input_device_manager;
+pub mod libinput_gestures;
+
+pub use hid_parser::*;
+pub use input_device_manager::*;
+pub use libinput_gestures::*;
 
 pub use event::{
     enumerate_devices, InputCode, InputDeviceInfo, InputEvent, InputEventReader, InputEventType,

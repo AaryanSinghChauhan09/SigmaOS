@@ -253,6 +253,15 @@ impl NtfsSecurityDescriptor {
 
         false // Step 3: Default Implicit Deny
     }
+
+    pub fn evaluate_access(
+        &self,
+        subject_sid: &SecurityIdentifier,
+        _subject_group_sids: &[SecurityIdentifier],
+        requested_rights: u32,
+    ) -> bool {
+        self.evaluate_ntfs_access(subject_sid, requested_rights)
+    }
 }
 
 #[cfg(test)]

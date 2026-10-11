@@ -9,10 +9,15 @@
 // SigmaOS Memory Module
 // Virtual memory management, paging, physical memory allocation, and TLB caching
 
+pub mod acpi_slit;
 pub mod allocator;
 pub mod cgroups;
+pub mod compaction;
+pub mod ioremap;
+pub mod ksm;
 pub mod kswapd;
 pub mod low_level;
+pub mod oom_killer;
 pub mod page_cache;
 pub mod paging;
 pub mod quota;
@@ -22,8 +27,18 @@ pub mod sovereign_address_translation;
 #[path = "huge_pages.rs"]
 pub mod thp;
 pub mod tlb_associative;
+pub mod userfaultfd;
 pub mod zone;
+pub mod zswap;
+
+pub use acpi_slit::AcpiSlitTable;
+pub use compaction::{CompactionStatus, PageCompactor};
+pub use ioremap::{IoremapAllocator, IoremapRegion, PageFlags};
+pub use ksm::{KsmDaemon, KsmMergedPage};
+pub use oom_killer::{OomKiller, OomProcessCandidate, OomVictim};
 pub use sovereign_address_translation::*;
+pub use userfaultfd::{UffdEvent, UffdMode, UserfaultFd};
+pub use zswap::{CompressedPage, ZswapPool};
 
 pub use paging::{
     MemoryError, PageDirectory, PageDirectoryPointerTable, PageTable, PageTableEntry,

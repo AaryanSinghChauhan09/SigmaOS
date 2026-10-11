@@ -3,6 +3,102 @@ use std::string::{String, ToString};
 /// Mandatory Access Control (MAC - Bell-LaPadula), and Hardware Network Filters for SigmaOS.
 use std::vec::Vec;
 
+pub use crate::filesystem::ext4_ntfs_security::{
+    NtfsAce, NtfsDacl, NtfsSacl, NtfsSecurityDescriptor, SecurityIdentifier,
+};
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Ext4FileType {
+    Unknown,
+    RegularFile,
+    Directory,
+    CharacterDevice,
+    BlockDevice,
+    Fifo,
+    Socket,
+    SymbolicLink,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Ext4InodeMode {
+    pub file_type: Ext4FileType,
+    pub permissions: u16,
+}
+
+impl Ext4InodeMode {
+    pub fn new(file_type: Ext4FileType, permissions: u16) -> Self {
+        Self { file_type, permissions }
+    }
+
+    pub fn is_suid(&self) -> bool {
+        (self.permissions & 0o4000) != 0
+    }
+
+    pub fn is_sgid(&self) -> bool {
+        (self.permissions & 0o2000) != 0
+    }
+
+    pub fn is_sticky(&self) -> bool {
+        (self.permissions & 0o1000) != 0
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Ext4Xattr {
+    pub name: Vec<u8>,
+    pub value: Vec<u8>,
+}
+
+impl Ext4Xattr {
+    pub fn new(name: &[u8], value: &[u8]) -> Self {
+        Self {
+            name: name.to_vec(),
+            value: value.to_vec(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct PosixAclTable {
+    pub entries: Vec<AclEntry>,
+}
+
+impl PosixAclTable {
+    pub fn new() -> Self {
+        Self { entries: Vec::new() }
+    }
+
+    pub fn add_entry(&mut self, entry: AclEntry) {
+        self.entries.push(entry);
+    }
+}
+
+pub struct Ext4AccessCheckEngine;
+
+impl Ext4AccessCheckEngine {
+    pub fn evaluate_ext4_access(
+        subject_uid: u32,
+        subject_gid: u32,
+        requested_mode: u16,
+        owner_uid: u32,
+        primary_gid: u32,
+        mode_bits: u16,
+        _acl_opt: Option<&PosixAclTable>,
+    ) -> bool {
+        if subject_uid == 0 {
+            return true; // Root bypass
+        }
+        let allowed = if subject_uid == owner_uid {
+            (mode_bits >> 6) & 0o7
+        } else if subject_gid == primary_gid {
+            (mode_bits >> 3) & 0o7
+        } else {
+            mode_bits & 0o7
+        };
+        (allowed & requested_mode) == requested_mode
+    }
+}
+
 pub type RoleID = usize;
 pub type PermissionID = usize;
 pub type UserID = u32;
@@ -21,6 +117,7 @@ pub enum AccessError {
     MacAddressBlocked = 5,
     CapabilityBounded = 6,
 }
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 1. ACCESS CONTROL MATRIX (ACM - 2D Grid Rights Mapping)

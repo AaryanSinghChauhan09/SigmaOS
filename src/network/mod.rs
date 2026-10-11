@@ -81,6 +81,28 @@ pub use virtual_switch::{
 };
 
 pub mod quic;
+pub mod bsd_pf;
+pub mod ebpf_jit;
+pub mod netlink;
+pub mod af_packet;
+pub mod bridge;
+pub mod illumos_crossbow;
+pub mod ipv6_routing;
+pub mod ktls;
+pub mod mptcp;
+pub mod net_config_daemon;
+pub mod openbsd_pf;
+pub mod pppoe;
+pub mod sctp;
+pub mod vlan;
+pub mod vxlan;
+
+
+pub use bsd_pf::{FilterAction, FilterRule, FirewallState, OpenBsdPacketFilter, TrafficDirection};
+pub use ebpf_jit::{EbpfInstruction, EbpfJitCompiler};
+pub use netlink::{NetlinkSocketRouter, NlMsgHdr, NETLINK_ROUTE, NETLINK_KOBJECT_UEVENT, NLM_F_REQUEST};
+
 
 // Re-export network stubs
 pub use crate::stubs::network_stubs::*;
+

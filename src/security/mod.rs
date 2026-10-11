@@ -7,6 +7,8 @@ pub use address_sanitizer::{
 };
 pub mod cap_rights;
 pub use cap_rights::CapRightsMask;
+pub mod acpi_aml_interpreter;
+pub mod arm_pac;
 pub mod audit;
 pub mod bsd_hardening;
 pub mod capability;
@@ -15,13 +17,24 @@ pub mod capsicum_wrapper;
 pub mod filesystem_encryption;
 pub mod governance;
 pub mod hardware_privilege;
+pub mod ima_evm;
+pub mod intel_cet;
+pub mod lockdown;
 pub mod pledge_unveil;
 pub mod pqc_enclave;
 pub mod sigma_pledge;
 pub mod sigma_unveil;
 pub mod system_audit;
 pub mod vault;
+pub mod vfs_hardening;
 pub mod vpn;
+
+pub use acpi_aml_interpreter::{AcpiSleepState, AmlInterpreter, AmlValue};
+pub use arm_pac::{ArmPacController, PacKeyType};
+pub use ima_evm::{ImaEvmController, ImaLogEntry};
+pub use intel_cet::IntelCetEngine;
+pub use lockdown::{KernelLockdownController, LockdownMode, LockdownReason};
+pub use vfs_hardening::{VfsHardeningConfig, VfsHardeningEnforcer};
 
 // SigmaOS Security Subsystem
 pub mod defensive_audit;

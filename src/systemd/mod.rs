@@ -2,9 +2,18 @@
 // SigmaOS Systemd Parity Module
 // systemd-inspired service management and initialization system
 
+pub mod logind;
+pub mod timesyncd;
+pub mod unit_parser;
+
+pub use logind::{LogindManager, LogindSeat, LogindSession, SessionClass, SessionState, SessionType};
+pub use timesyncd::{NtpPacket, TimesyncdEngine, NTP_PORT};
+pub use unit_parser::SystemdUnitFile;
+
 use std::collections::BTreeMap;
 use std::string::String;
 use std::vec::Vec;
+
 
 /// systemd-inspired service unit types
 #[derive(Debug, Clone, PartialEq)]
