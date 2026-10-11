@@ -509,10 +509,15 @@ impl SovereignDistroPackageAdvancementsSuiteV29 {
         &mut self,
         filename: &str,
         payload: &[u8],
-    ) -> Result<UnifiedPackage, String> {
+    ) -> Result<(String, bool, String, usize), String> {
         let manifest = self.inspector.inspect_package(filename, payload)?;
         let resolved = self.solver.solve_dependencies(&manifest.name, &manifest.dependencies);
         let cas_hash = self.cas_delta_governor.ingest_content(payload);
+        let snap_id = self.boot_snapshot_governor.create_boot_snapshot(
+            filename,
+            BootEnvBackendKindV29::FreeBsdBectlZfs,
+            vec![manifest.name.clone()],
+        );
 
         let mut pkg = UnifiedPackage::new(
             format!("sigpkg-v29-{}", manifest.name),

@@ -7217,11 +7217,15 @@ pub struct ExecutiveKpiItem {
 #[derive(Debug, Clone, Default)]
 pub struct SovereignExecutiveKpiScorecardEngine {
     kpis: Vec<ExecutiveKpiItem>,
+    pub dependencies: HashMap<String, Vec<String>>,
 }
 
 impl SovereignExecutiveKpiScorecardEngine {
     pub fn new() -> Self {
-        Self { kpis: Vec::new() }
+        Self {
+            kpis: Vec::new(),
+            dependencies: HashMap::new(),
+        }
     }
 
     /// Adds a KPI metric item to the executive scorecard.
@@ -7507,6 +7511,7 @@ pub struct EnterpriseAuditLogEntry {
 pub struct SovereignEnterpriseWorkflowAuditTrailEngine {
     audit_chain: Vec<EnterpriseAuditLogEntry>,
     next_id: u64,
+    pub locks: HashMap<String, CoauthoringLock>,
 }
 
 impl SovereignEnterpriseWorkflowAuditTrailEngine {
@@ -7514,6 +7519,7 @@ impl SovereignEnterpriseWorkflowAuditTrailEngine {
         Self {
             audit_chain: Vec::new(),
             next_id: 1,
+            locks: HashMap::new(),
         }
     }
 
@@ -8123,58 +8129,6 @@ pub struct DeskTicket {
     pub resolved_at_sec: Option<u64>,
 }
 
-#[derive(Debug, Clone, Default)]
-pub struct SovereignZohoDeskTicketSlaEscalationEngine;
-
-impl SovereignZohoDeskTicketSlaEscalationEngine {
-    pub fn new() -> Self {
-        Self
-    }
-
-    pub fn response_limit_sec(priority: SlaPriority) -> u64 {
-        match priority {
-            SlaPriority::Urgent => 15 * 60,  // 15 mins
-            SlaPriority::High => 60 * 60,    // 1 hour
-            SlaPriority::Medium => 4 * 3600, // 4 hours
-            SlaPriority::Low => 24 * 3600,   // 24 hours
-        }
-    }
-
-    pub fn resolution_limit_sec(priority: SlaPriority) -> u64 {
-        match priority {
-            SlaPriority::Urgent => 2 * 3600,  // 2 hours
-            SlaPriority::High => 8 * 3600,    // 8 hours
-            SlaPriority::Medium => 24 * 3600, // 24 hours
-            SlaPriority::Low => 72 * 3600,    // 72 hours
-        }
-    }
-
-    pub fn check_response_sla_breach(&self, ticket: &DeskTicket, current_time_sec: u64) -> bool {
-        let max_sec = Self::response_limit_sec(ticket.priority);
-        match ticket.first_response_at_sec {
-            Some(resp) => resp.saturating_sub(ticket.created_at_sec) > max_sec,
-            None => current_time_sec.saturating_sub(ticket.created_at_sec) > max_sec,
-        }
-    }
-
-    pub fn check_resolution_sla_breach(&self, ticket: &DeskTicket, current_time_sec: u64) -> bool {
-        let max_sec = Self::resolution_limit_sec(ticket.priority);
-        match ticket.resolved_at_sec {
-            Some(res) => res.saturating_sub(ticket.created_at_sec) > max_sec,
-            None => current_time_sec.saturating_sub(ticket.created_at_sec) > max_sec,
-        }
-    }
-
-    pub fn determine_escalation_level(&self, ticket: &DeskTicket, current_time_sec: u64) -> u8 {
-        if self.check_resolution_sla_breach(ticket, current_time_sec) {
-            2 // Critical Breach
-        } else if self.check_response_sla_breach(ticket, current_time_sec) {
-            1 // Response Breach Warning
-        } else {
-            0 // Normal
-        }
-    }
-}
 
 /// Zoho Books / Odoo Financials compound GST/VAT tax group calculation & exemption engine.
 #[derive(Debug, Clone)]
@@ -8239,36 +8193,6 @@ pub struct LeadSignal {
     pub timestamp_sec: u64,
 }
 
-#[derive(Debug, Clone, Default)]
-pub struct SovereignSalesforceEinsteinLeadScoringAiEngine;
-
-impl SovereignSalesforceEinsteinLeadScoringAiEngine {
-    pub fn new() -> Self {
-        Self
-    }
-
-    pub fn calculate_lead_score(
-        &self,
-        signals: &[LeadSignal],
-        current_time_sec: u64,
-        half_life_sec: f64,
-    ) -> f64 {
-        let mut score = 0.0;
-        for sig in signals {
-            let age_sec = (current_time_sec.saturating_sub(sig.timestamp_sec)) as f64;
-            let decay_factor = (-age_sec * (2.0f64.ln() / half_life_sec)).exp();
-            score += sig.weight * decay_factor;
-        }
-        score.clamp(0.0, 100.0)
-    }
-
-    pub fn predict_conversion_probability(&self, lead_score: f64) -> f64 {
-        // Sigmoid mapping capped between 0 and 100%
-        let score_norm = (lead_score - 50.0) / 10.0;
-        let prob = 1.0 / (1.0 + (-score_norm).exp());
-        (prob * 100.0).clamp(0.0, 100.0)
-    }
-}
 
 /// Salesforce CPQ / Zoho CRM tiered volume discount & approval matrix engine.
 #[derive(Debug, Clone)]
@@ -8278,45 +8202,6 @@ pub struct DiscountTier {
     pub discount_pct: f64,
 }
 
-#[derive(Debug, Clone, Default)]
-pub struct SovereignSalesforceCpqQuoteDiscountEngine {
-    pub tiers: Vec<DiscountTier>,
-}
-
-impl SovereignSalesforceCpqQuoteDiscountEngine {
-    pub fn new() -> Self {
-        Self { tiers: Vec::new() }
-    }
-
-    pub fn add_discount_tier(&mut self, min_qty: u32, max_qty: u32, discount_pct: f64) {
-        self.tiers.push(DiscountTier {
-            min_qty,
-            max_qty,
-            discount_pct,
-        });
-    }
-
-    pub fn calculate_discounted_price(&self, unit_price: f64, quantity: u32) -> (f64, f64) {
-        let applied_pct = self
-            .tiers
-            .iter()
-            .find(|t| quantity >= t.min_qty && quantity <= t.max_qty)
-            .map(|t| t.discount_pct)
-            .unwrap_or(0.0);
-
-        let subtotal = unit_price * (quantity as f64);
-        let total_discounted = subtotal * (1.0 - applied_pct / 100.0);
-        (total_discounted, applied_pct)
-    }
-
-    pub fn requires_executive_approval(
-        &self,
-        applied_discount_pct: f64,
-        total_amount: f64,
-    ) -> bool {
-        applied_discount_pct > 25.0 || total_amount > 100_000.0
-    }
-}
 
 /// Odoo MRP multi-level Bill of Materials (BOM) cost rollup & scrap loss engine.
 #[derive(Debug, Clone)]
@@ -8329,28 +8214,6 @@ pub struct OdooBomTreeNode {
     pub sub_components: Vec<OdooBomTreeNode>,
 }
 
-#[derive(Debug, Clone, Default)]
-pub struct SovereignOdooMrpBillOfMaterialsTreeEngine;
-
-impl SovereignOdooMrpBillOfMaterialsTreeEngine {
-    pub fn new() -> Self {
-        Self
-    }
-
-    pub fn calculate_total_bom_cost(&self, node: &OdooBomTreeNode) -> f64 {
-        let loss_multiplier = 1.0 + (node.scrap_loss_pct / 100.0);
-        if node.sub_components.is_empty() {
-            node.quantity_required * node.unit_cost * loss_multiplier
-        } else {
-            let sub_total: f64 = node
-                .sub_components
-                .iter()
-                .map(|sub| self.calculate_total_bom_cost(sub))
-                .sum();
-            (sub_total + (node.quantity_required * node.unit_cost)) * loss_multiplier
-        }
-    }
-}
 
 /// Bitrix24 Telephony IVR call queue router & auto lead creation engine.
 #[derive(Debug, Clone, PartialEq, Eq)]
