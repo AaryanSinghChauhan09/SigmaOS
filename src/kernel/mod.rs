@@ -174,6 +174,9 @@ pub use sovereign_clean_code_and_os_principles_engine::{
     SovereignCleanCodeAndOsPrinciplesEngine,
 };
 
+pub mod sovereign_kernel_signal_interruption_suite;
+pub use sovereign_kernel_signal_interruption_suite::*;
+
 pub mod low_level_hardware;
 pub use low_level_hardware::*;
 

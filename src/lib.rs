@@ -412,6 +412,7 @@ pub mod sigma_boot;
 pub mod sigma_sandbox;
 pub mod sigma_validation;
 pub mod signal;
+pub use signal::*;
 pub mod smartcard;
 pub mod support;
 pub mod syscall;
