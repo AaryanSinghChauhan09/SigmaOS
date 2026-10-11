@@ -962,6 +962,20 @@ if [ -f "src/distro/cachy_linux_missing_components_engine.rs" ]; then
     ./build/test_cachy_linux_missing_components_engine
 fi
 
+if [ -f "src/distro/cachy_linux_missing_components_pr_gateway.rs" ]; then
+    echo "Running Cachy Linux Missing Components PR Gateway test suite..."
+    mkdir -p build
+    rustc --test src/distro/cachy_linux_missing_components_pr_gateway.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_cachy_linux_missing_components_pr_gateway
+    ./build/test_cachy_linux_missing_components_pr_gateway
+fi
+
+if [ -f "src/distro/open_source_os_unimplemented_ideas_pr_gateway.rs" ]; then
+    echo "Running Open Source OS Unimplemented Ideas PR Gateway test suite..."
+    mkdir -p build
+    rustc --test src/distro/open_source_os_unimplemented_ideas_pr_gateway.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_open_source_os_unimplemented_ideas_pr_gateway
+    ./build/test_open_source_os_unimplemented_ideas_pr_gateway
+fi
+
 if [ -f "src/distro/sovereign_linux_bsd_ecosystem_advancements_v29.rs" ]; then
     echo "Running Sovereign Linux & BSD Ecosystem Advancements V29 test suite..."
     mkdir -p build
