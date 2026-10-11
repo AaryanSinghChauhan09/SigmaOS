@@ -455,67 +455,15 @@ pub struct ArchPacmanHookRunner {
 
 impl ArchPacmanHookRunner {
     pub fn new() -> Self {
-        let mut hooks = BTreeMap::new();
-        hooks.insert(
-            "base".to_string(),
-            InitramfsHookSpec {
-                name: "base".to_string(),
-                is_runtime: true,
-                dependencies: Vec::new(),
-            },
-        );
-        hooks.insert(
-            "udev".to_string(),
-            InitramfsHookSpec {
-                name: "udev".to_string(),
-                is_runtime: true,
-                dependencies: vec!["base".to_string()],
-            },
-        );
-        hooks.insert(
-            "autodetect".to_string(),
-            InitramfsHookSpec {
-                name: "autodetect".to_string(),
-                is_runtime: false,
-                dependencies: Vec::new(),
-            },
-        );
-        hooks.insert(
-            "kms".to_string(),
-            InitramfsHookSpec {
-                name: "kms".to_string(),
-                is_runtime: true,
-                dependencies: vec!["udev".to_string()],
-            },
-        );
-        hooks.insert(
-            "modconf".to_string(),
-            InitramfsHookSpec {
-                name: "modconf".to_string(),
-                is_runtime: false,
-                dependencies: Vec::new(),
-            },
-        );
-        hooks.insert(
-            "block".to_string(),
-            InitramfsHookSpec {
-                name: "block".to_string(),
-                is_runtime: true,
-                dependencies: vec!["udev".to_string()],
-            },
-        );
-        hooks.insert(
-            "filesystems".to_string(),
-            InitramfsHookSpec {
-                name: "filesystems".to_string(),
-                is_runtime: true,
-                dependencies: vec!["block".to_string()],
-            },
-        );
+        let rules = vec![PacmanHookRule {
+            name: "fontconfig".to_string(),
+            when: PacmanHookWhen::PostTransaction,
+            target_packages: vec!["fontconfig*".to_string(), "ttf-*".to_string()],
+            exec_command: "fc-cache -s".to_string(),
+        }];
 
         Self {
-            hooks,
-            compression_format: "zstd".to_string(),
+            registered_hooks: rules,
         }
     }
 
@@ -590,19 +538,12 @@ pub struct ArchPacmanCacheScrubber {
     pub retain_keep_count: usize,
 }
 
-impl ArchPacmanKeyringPqcEngine {
-    pub fn new() -> Self {
-        let mut keys = BTreeMap::new();
-        keys.insert(
-            "arch-master-1".to_string(),
-            PqcDilithiumKeySpec {
-                key_id: "arch-master-1".to_string(),
-                owner_email: "packager@archlinux.org".to_string(),
-                is_trusted: true,
-                dilithium_pubkey_hash: "pqc-dilithium5-hash-9901".to_string(),
-            },
-        );
-        Self { keys }
+impl ArchPacmanCacheScrubber {
+    pub fn new(retain_keep_count: usize) -> Self {
+        Self {
+            cached_files: Vec::new(),
+            retain_keep_count,
+        }
     }
 
     /// Calculates which old package cache files should be purged
@@ -626,6 +567,34 @@ impl ArchPacmanKeyringPqcEngine {
         }
 
         (purged_count, freed_bytes)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PqcDilithiumKeySpec {
+    pub key_id: String,
+    pub owner_email: String,
+    pub is_trusted: bool,
+    pub dilithium_pubkey_hash: String,
+}
+
+pub struct ArchPacmanKeyringPqcEngine {
+    pub keys: BTreeMap<String, PqcDilithiumKeySpec>,
+}
+
+impl ArchPacmanKeyringPqcEngine {
+    pub fn new() -> Self {
+        let mut keys = BTreeMap::new();
+        keys.insert(
+            "arch-master-1".to_string(),
+            PqcDilithiumKeySpec {
+                key_id: "arch-master-1".to_string(),
+                owner_email: "packager@archlinux.org".to_string(),
+                is_trusted: true,
+                dilithium_pubkey_hash: "pqc-dilithium5-hash-9901".to_string(),
+            },
+        );
+        Self { keys }
     }
 }
 
