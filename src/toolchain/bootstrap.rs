@@ -1,7 +1,12 @@
 // SigmaOS Linux-From-Scratch (LFS) and FreeBSD Inspired Bootstrap & Ports Engine
 // Designed for toolchain compiling, Stage 1/2 bootstrapping, and secure ports auditing
 
+#[cfg(not(test))]
 use crate::klib::collections::HashMap;
+#[cfg(test)]
+use std::collections::HashMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BootstrapStage {
@@ -120,7 +125,7 @@ mod tests {
 
     #[test]
     fn test_phase6_build_optimizer() {
-        let mut opt = Phase6BuildOptimizer::new();
+        let opt = Phase6BuildOptimizer::new();
         assert!(opt.lto_enabled);
         assert!(opt.pgo_profile_active);
 
