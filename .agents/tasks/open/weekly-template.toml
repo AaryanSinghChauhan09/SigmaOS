@@ -1,0 +1,19 @@
+id = "STUDY-2026-W42"
+title = "Study Linux VFS path resolution"
+cycle = "weekly"
+theme = "filesystem"
+upstream = ["linux", "xv6"]
+deliverables = [
+  "research/upstream/linux/vfs-path-resolution.md",
+  "research/decisions/ADR-008-vfs-path-resolution.md",
+  "implementation PR",
+  "test report"
+]
+
+success = [
+  "design note explains upstream model",
+  "SigmaOS adaptation is defined",
+  "unit tests pass",
+  "runtime path is identified",
+  "capability status updated only with evidence"
+]
