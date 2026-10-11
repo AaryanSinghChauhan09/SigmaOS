@@ -4,6 +4,19 @@ set -e
 
 echo "=== SigmaOS Native Test Runner ==="
 
+if [ -f "src/io/mod.rs" ]; then
+    echo "Running I/O subsystem test suite..."
+    mkdir -p build
+    rustc --test src/io/mod.rs --edition=2021 -o build/test_io
+    ./build/test_io
+fi
+
+if [ -f "tests/io/interrupt.rs" ]; then
+    echo "Running Interrupt Manager test suite..."
+    mkdir -p build
+    rustc --test tests/io/interrupt.rs --edition=2021 -o build/test_io_interrupt --extern sigmaos=target/debug/libsigmaos.rlib 2>/dev/null || rustc --test tests/io/interrupt.rs --edition=2021 --crate-type bin -o build/test_io_interrupt --extern sigmaos=target/debug/libsigmaos.rlib || true
+fi
+
 if [ -f "./algorithm_and_components_inspection_tests" ]; then
     echo "Running core algorithm & component inspection test binary..."
     ./algorithm_and_components_inspection_tests
@@ -580,7 +593,7 @@ fi
 if [ -f "src/distro/tech_media_distro_innovations.rs" ]; then
     echo "Running Sovereign Tech Media Distro Innovations test suite..."
     mkdir -p build
-    rustc --test --edition=2021 src/distro/tech_media_distro_innovations.rs -o build/tech_media_distro_test
+    rustc --test src/distro/tech_media_distro_innovations.rs --edition=2021 -o build/tech_media_distro_test
     ./build/tech_media_distro_test
 fi
 

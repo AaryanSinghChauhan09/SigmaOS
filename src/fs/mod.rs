@@ -71,3 +71,6 @@ pub use fanotify_sovereign::{
 
 pub mod fscrypt_sovereign;
 pub use fscrypt_sovereign::*;
+
+pub mod buffer;
+pub use buffer::{BufferCache, BufferError, BufferHead, BufferState};

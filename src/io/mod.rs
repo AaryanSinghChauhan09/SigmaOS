@@ -12,3 +12,25 @@ pub use io_uring_v2::{
     CqeV2, IoUringOpV2, IoUringRegisteredBuf, IoUringV2, MultishotState, NvmeUringCmd,
     RegisteredFileType,
 };
+
+// Interrupt management
+pub mod handler;
+pub mod interrupt;
+pub use handler::{HandlerId, HandlerMetadata, HandlerMode, InterruptPriority};
+pub use interrupt::{InterruptError, InterruptManager};
+
+// DMA management
+pub mod dma;
+pub mod dma_queue;
+pub use dma::{DmaError, DmaManager};
+pub use dma_queue::{DmaDescriptor, DmaDirection, ScatterGatherElement};
+
+// I/O Scheduler management
+pub mod scheduler;
+pub mod scheduler_queue;
+pub use scheduler::{IoScheduler, SchedulerError};
+pub use scheduler_queue::{IoOperationKind, IoPriority, IoRequest, IoStage};
+
+// Callback management
+pub mod callback;
+pub use callback::{CallbackHandle, CallbackManager, CallbackStatus};

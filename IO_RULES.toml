@@ -1,0 +1,27 @@
+[rule.io_completeness]
+requirement = "I/O management defines submit, interrupt, DMA, buffer, and scheduler semantics."
+enforcement = "I/O tests + rehearsals"
+
+[rule.no_leak]
+requirement = "I/O leaks are zero under stress tests."
+enforcement = "I/O stress tests"
+
+[rule.oom_metric]
+requirement = "I/O defines and measures OOM behavior."
+enforcement = "Limit rehearsal"
+
+[rule.interrupt_integrity]
+requirement = "Interrupt handler preserves scheduler and I/O integrity."
+enforcement = "Interrupt rehearsal"
+
+[rule.buffer_semantics]
+requirement = "Buffer eviction defines legal eviction and error codes."
+enforcement = "Buffer tests"
+
+[rule.no_model_only_status]
+requirement = "I/O features cannot be marked complete from model tests alone."
+enforcement = "Status audit"
+
+[rule.runtime_evidence]
+requirement = "Boot-affecting I/O changes require boot-to-shell or integration evidence."
+enforcement = "CI boot gate"
