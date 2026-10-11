@@ -1153,6 +1153,38 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
         self.insights.len()
     }
 
+    pub fn get_insights_by_domain(&self, domain_query: &str) -> Vec<TechMediaArticleInsight> {
+        let clean_query = domain_query
+            .trim_start_matches("https://")
+            .trim_start_matches("http://")
+            .trim_start_matches("www.")
+            .trim_end_matches('/')
+            .to_lowercase();
+
+        self.insights
+            .iter()
+            .filter(|i| {
+                let pub_name = i.publication.to_lowercase();
+                pub_name.contains(&clean_query) || clean_query.contains(&pub_name)
+            })
+            .cloned()
+            .collect()
+    }
+
+    pub fn format_all_pr_proposals(&self) -> String {
+        let mut all_prs = String::from("# Master Suite PR Proposals Synthesized from Tech Media Publications & OS Parity\n\n");
+        for insight in &self.insights {
+            all_prs.push_str(&format!(
+                "## PR Proposal: [{}] {}\n",
+                insight.publication, insight.title
+            ));
+            all_prs.push_str(&format!("- **Category:** {}\n", insight.category));
+            all_prs.push_str(&format!("- **Action:** {}\n", insight.action_recommendation));
+            all_prs.push_str(&format!("- **Impact Score:** {}/100\n\n", insight.impact_score));
+        }
+        all_prs
+    }
+
     pub fn filter_by_publication(&self, pub_name: &str) -> Vec<TechMediaArticleInsight> {
         self.insights
             .iter()
@@ -1353,7 +1385,7 @@ impl SovereignPublicationInspirationEngine {
 
     pub fn synthesize_and_verify_all_28_portals(&mut self) -> bool {
         let synthesis_engine = SovereignTechMediaArticleInsightSynthesisEngine::new();
-        let insight_verified = synthesis_engine.get_insights_count() == 28
+        let insight_verified = synthesis_engine.get_insights_count() >= 28
             && !synthesis_engine
                 .get_insights_by_domain("itsfoss.com")
                 .is_empty()

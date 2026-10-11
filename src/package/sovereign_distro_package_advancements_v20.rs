@@ -365,12 +365,12 @@ impl SovereignDistroPackageAdvancementsSuiteV20 {
         payload: &[u8],
     ) -> Result<UnifiedPackage, String> {
         let spec = self.converter.convert_package(filename, payload)?;
-        let _pr = self.pr_pipeline.submit_package_pr(spec.clone());
+        let pr = self.pr_pipeline.submit_package_pr(spec.clone());
 
         let mut pkg =
-            UnifiedPackage::new(format!("sovereign-{}", pr.package_name), pr.version.clone())
+            UnifiedPackage::new(format!("sigpkg-{}", pr.converted_spec.package_name), pr.converted_spec.version.clone())
                 .with_format(PackageFormat::SigmaPkg)
-                .with_provides(pr.package_name.clone());
+                .with_provides(pr.converted_spec.package_name.clone());
 
         for dep in &spec.canonical_dependencies {
             pkg = pkg.with_dependency(dep.clone());
@@ -417,14 +417,17 @@ mod tests {
 
     #[test]
     fn test_converter_all_formats() {
+        let mut pipeline = UniversalPrPackageSubmissionPipelineV20::new();
         let converter = UniversalAllPackageFormatConverterV20::new();
 
-        let pr1 = engine
-            .ingest_foreign_package_pr("gcc-13.2.0.pkg.tar.zst", b"ARCH_PAYLOAD")
+        let spec1 = converter
+            .convert_package("gcc-13.2.0.pkg.tar.zst", b"ARCH_PAYLOAD")
             .unwrap();
-        assert_eq!(pr1.original_format, PackageFormat::Pacman);
-        assert_eq!(pr1.package_name, "gcc-13");
+        let pr1 = pipeline.submit_package_pr(spec1);
+        assert_eq!(pr1.converted_spec.source_format, PackageFormat::Pacman);
+        assert_eq!(pr1.converted_spec.package_name, "gcc");
         assert!(pr1
+            .converted_spec
             .canonical_dependencies
             .contains(&"sovereign-libc".to_string()));
 
