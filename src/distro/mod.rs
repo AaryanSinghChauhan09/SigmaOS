@@ -452,6 +452,7 @@ pub mod arch_complete_parity_suite;
 pub mod arch_gap_closure_advancements_v24;
 pub mod arch_linux_advancements_v37_pr;
 pub mod arch_linux_gap_closure_pr_suite;
+pub mod arch_linux_gap_closure_v38_pr;
 pub mod arch_linux_parity_pr_suite;
 pub mod arch_linux_pinnacle_gap_closure;
 pub mod bsd_linux_innovations;
