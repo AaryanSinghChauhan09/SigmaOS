@@ -846,6 +846,34 @@ impl ArchPacmanCacheScrubber {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PqcDilithiumKeySpec {
+    pub key_id: String,
+    pub owner_email: String,
+    pub is_trusted: bool,
+    pub dilithium_pubkey_hash: String,
+}
+
+pub struct ArchPacmanKeyringPqcEngine {
+    pub keys: BTreeMap<String, PqcDilithiumKeySpec>,
+}
+
+impl ArchPacmanKeyringPqcEngine {
+    pub fn new() -> Self {
+        let mut keys = BTreeMap::new();
+        keys.insert(
+            "arch-master-1".to_string(),
+            PqcDilithiumKeySpec {
+                key_id: "arch-master-1".to_string(),
+                owner_email: "packager@archlinux.org".to_string(),
+                is_trusted: true,
+                dilithium_pubkey_hash: "pqc-dilithium5-hash-9901".to_string(),
+            },
+        );
+        Self { keys }
+    }
+}
+
 impl Default for ArchPacmanCacheScrubber {
     fn default() -> Self {
         Self::new(2)
