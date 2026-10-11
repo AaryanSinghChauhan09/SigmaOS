@@ -91,6 +91,7 @@ pub use kernel::{
     CfiFunctionSignature, KptrRestrictLevel, SovereignBareMetalElfKernelPrGateway,
     SovereignHardenedSecurityMitigationsEngine, SovereignKernelAdvancedOsParityPrGateway,
     SovereignKernelPinnacleSynthesisPrGateway, SovereignLinuxBsdKernelInnovationsPrGateway,
+    SovereignUefiLongModeBootPrGateway,
 };
 pub use process::{
     AdvancedIpcHub, BsdRusage, CancellationType, CoreDumpMetadata, EventFd,

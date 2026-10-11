@@ -317,6 +317,13 @@ if [ -f "src/kernel/sovereign_bare_metal_elf_kernel_pr.rs" ]; then
     ./build/sovereign_bare_metal_elf_kernel_pr_test
 fi
 
+if [ -f "src/kernel/sovereign_uefi_long_mode_boot_pr.rs" ]; then
+    echo "Running Sovereign UEFI Long Mode Boot & GOP Framebuffer PR Engine test suite..."
+    mkdir -p build
+    rustc --test src/kernel/sovereign_uefi_long_mode_boot_pr.rs --edition=2021 -o build/sovereign_uefi_long_mode_boot_pr_test
+    ./build/sovereign_uefi_long_mode_boot_pr_test
+fi
+
 if [ -f "src/iso/sovereign_rufus_installer_synthesis.rs" ]; then
     echo "Running Sovereign Rufus & ISOHybrid Installer Synthesis test suite..."
     mkdir -p build
