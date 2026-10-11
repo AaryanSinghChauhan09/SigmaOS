@@ -212,6 +212,18 @@ impl SovereignLinuxBsdWikiRoadmapParityEngine {
                 "src/distro/arch_linux_gap_closure_v43_pr.rs",
                 "Arch Linux Gap Closure V43 PR",
             ),
+            (
+                28,
+                "Signal Development and Maintenance Plan & Signal Parity PR Suite",
+                "src/signal/sovereign_signal_development_and_pr_suite.rs",
+                "wiki/26-Signal-Development-And-Maintenance-Plan.md",
+            ),
+            (
+                29,
+                "Kernel Signal Processing and Interruption Architecture Suite",
+                "src/kernel/sovereign_kernel_signal_interruption_suite.rs",
+                "wiki/27-Kernel-Signal-Interruption-Plan.md",
+            ),
         ];
 
         for (id, title, module, _spec) in default_ideas {
@@ -341,8 +353,8 @@ mod tests {
     #[test]
     fn test_wiki_roadmap_parity_engine() {
         let engine = SovereignLinuxBsdWikiRoadmapParityEngine::new();
-        assert_eq!(engine.total_ideas_count, 27);
-        assert_eq!(engine.implemented_ideas_count(), 27);
+        assert_eq!(engine.total_ideas_count, 29);
+        assert_eq!(engine.implemented_ideas_count(), 29);
         assert_eq!(engine.verification_percentage(), 100.0);
     }
 

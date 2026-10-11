@@ -1032,4 +1032,18 @@ if [ -f "src/distro/debian_github_repo_inspirations_pr.rs" ]; then
     ./build/test_debian_pr
 fi
 
+if [ -f "src/signal/sovereign_signal_development_and_pr_suite.rs" ]; then
+    echo "Running Sovereign Signal Development and Parity PR Suite..."
+    mkdir -p build
+    rustc --test src/signal/sovereign_signal_development_and_pr_suite.rs --edition=2021 -o build/test_signal_pr_suite
+    ./build/test_signal_pr_suite
+fi
+
+if [ -f "src/kernel/sovereign_kernel_signal_interruption_suite.rs" ]; then
+    echo "Running Sovereign Kernel Signal Interruption & Delivery Suite..."
+    mkdir -p build
+    rustc --test src/kernel/sovereign_kernel_signal_interruption_suite.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_kernel_signal_interruption
+    ./build/test_kernel_signal_interruption
+fi
+
 echo "All SigmaOS test suites completed."

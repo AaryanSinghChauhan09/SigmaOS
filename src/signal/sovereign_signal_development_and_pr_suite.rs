@@ -112,11 +112,30 @@ impl SignalNumber {
 
     pub fn default_action(&self) -> SignalDefaultAction {
         match self {
-            SignalNumber::SIGKILL | SignalNumber::SIGTERM | SignalNumber::SIGHUP | SignalNumber::SIGINT | SignalNumber::SIGPIPE | SignalNumber::SIGALRM | SignalNumber::SIGUSR1 | SignalNumber::SIGUSR2 | SignalNumber::SIGIO => SignalDefaultAction::Terminate,
-            SignalNumber::SIGILL | SignalNumber::SIGABRT | SignalNumber::SIGFPE | SignalNumber::SIGSEGV | SignalNumber::SIGBUS | SignalNumber::SIGTRAP | SignalNumber::SIGSYS => SignalDefaultAction::CoreDump,
-            SignalNumber::SIGSTOP | SignalNumber::SIGTSTP | SignalNumber::SIGTTIN | SignalNumber::SIGTTOU => SignalDefaultAction::Stop,
+            SignalNumber::SIGKILL
+            | SignalNumber::SIGTERM
+            | SignalNumber::SIGHUP
+            | SignalNumber::SIGINT
+            | SignalNumber::SIGPIPE
+            | SignalNumber::SIGALRM
+            | SignalNumber::SIGUSR1
+            | SignalNumber::SIGUSR2
+            | SignalNumber::SIGIO => SignalDefaultAction::Terminate,
+            SignalNumber::SIGILL
+            | SignalNumber::SIGABRT
+            | SignalNumber::SIGFPE
+            | SignalNumber::SIGSEGV
+            | SignalNumber::SIGBUS
+            | SignalNumber::SIGTRAP
+            | SignalNumber::SIGSYS => SignalDefaultAction::CoreDump,
+            SignalNumber::SIGSTOP
+            | SignalNumber::SIGTSTP
+            | SignalNumber::SIGTTIN
+            | SignalNumber::SIGTTOU => SignalDefaultAction::Stop,
             SignalNumber::SIGCONT => SignalDefaultAction::Continue,
-            SignalNumber::SIGCHLD | SignalNumber::SIGURG | SignalNumber::SIGWINCH => SignalDefaultAction::Ignore,
+            SignalNumber::SIGCHLD | SignalNumber::SIGURG | SignalNumber::SIGWINCH => {
+                SignalDefaultAction::Ignore
+            }
             _ => SignalDefaultAction::Terminate,
         }
     }
@@ -376,7 +395,9 @@ impl SovereignSignalDevelopmentAndPrSuite {
         };
 
         // Initialize default primary init process (PID 1, PGID 1, UID 0, GID 0) and main thread (TID 1)
-        suite.processes.insert(1, ProcessSignalState::new(1, 1, 0, 0));
+        suite
+            .processes
+            .insert(1, ProcessSignalState::new(1, 1, 0, 0));
         suite.threads.insert(1, ThreadSignalState::new(1, 1));
 
         // Seed 19 PR status tracking table
@@ -387,28 +408,71 @@ impl SovereignSignalDevelopmentAndPrSuite {
     fn seed_pr_status_table(&mut self) {
         let pr_titles = [
             (1, "docs(signal): define signal model and supported profile"),
-            (2, "test(signal): add signal ABI and status inventory checks"),
-            (3, "refactor(signal): separate generation pending selection and delivery"),
+            (
+                2,
+                "test(signal): add signal ABI and status inventory checks",
+            ),
+            (
+                3,
+                "refactor(signal): separate generation pending selection and delivery",
+            ),
             (4, "feat(signal): implement signal sets and thread masks"),
             (5, "feat(signal): implement sigaction with safe user-copy"),
-            (6, "feat(signal): implement process-directed and thread-directed generation"),
-            (7, "feat(signal): deliver default terminate stop and continue actions"),
-            (8, "feat(signal): deliver handlers through validated user signal frames"),
+            (
+                6,
+                "feat(signal): implement process-directed and thread-directed generation",
+            ),
+            (
+                7,
+                "feat(signal): deliver default terminate stop and continue actions",
+            ),
+            (
+                8,
+                "feat(signal): deliver handlers through validated user signal frames",
+            ),
             (9, "feat(signal): add sigreturn and context validation"),
-            (10, "feat(signal): add pending and synchronous wait interfaces"),
-            (11, "feat(signal): define blocking syscall interruption and restart rules"),
-            (12, "feat(signal): implement SIGCHLD and child lifecycle integration"),
-            (13, "feat(signal): add process-group and terminal-generated signals"),
+            (
+                10,
+                "feat(signal): add pending and synchronous wait interfaces",
+            ),
+            (
+                11,
+                "feat(signal): define blocking syscall interruption and restart rules",
+            ),
+            (
+                12,
+                "feat(signal): implement SIGCHLD and child lifecycle integration",
+            ),
+            (
+                13,
+                "feat(signal): add process-group and terminal-generated signals",
+            ),
             (14, "feat(signal): add alternate signal stack support"),
-            (15, "feat(signal): add queued real-time signals with resource limits"),
-            (16, "feat(signal): integrate signalfd as a pollable FD extension"),
-            (17, "feat(libc): align signal wrappers and constants with kernel ABI"),
-            (18, "test(signal): add QEMU stress and race regression suite"),
-            (19, "docs(signal): publish signal reference and maturity matrix"),
+            (
+                15,
+                "feat(signal): add queued real-time signals with resource limits",
+            ),
+            (
+                16,
+                "feat(signal): integrate signalfd as a pollable FD extension",
+            ),
+            (
+                17,
+                "feat(libc): align signal wrappers and constants with kernel ABI",
+            ),
+            (
+                18,
+                "test(signal): add QEMU stress and race regression suite",
+            ),
+            (
+                19,
+                "docs(signal): publish signal reference and maturity matrix",
+            ),
         ];
 
         for (pr_num, title) in pr_titles {
-            self.pr_status_map.insert(pr_num, (title.to_string(), SignalMaturityStatus::Prototype));
+            self.pr_status_map
+                .insert(pr_num, (title.to_string(), SignalMaturityStatus::Prototype));
         }
     }
 
@@ -439,11 +503,20 @@ impl SovereignSignalDevelopmentAndPrSuite {
     }
 
     /// PR 3: Separate Generation, Pending Selection, and Delivery
-    pub fn execute_pr3_separate_generation_pending_delivery(&mut self, pid: u32, tid: u32, sig: SignalNumber) -> Result<(), &'static str> {
+    pub fn execute_pr3_separate_generation_pending_delivery(
+        &mut self,
+        pid: u32,
+        tid: u32,
+        sig: SignalNumber,
+    ) -> Result<(), &'static str> {
         let proc_state = self.processes.get_mut(&pid).ok_or("Process not found")?;
 
         // Check disposition: if Ignore and not SIGKILL/SIGSTOP, discard
-        let action = proc_state.dispositions.get(&sig).cloned().unwrap_or_default();
+        let action = proc_state
+            .dispositions
+            .get(&sig)
+            .cloned()
+            .unwrap_or_default();
         if action.sa_handler == SigHandler::Ignore && !sig.is_uncatchable() {
             return Ok(()); // Discard ignored signal immediately
         }
@@ -466,7 +539,10 @@ impl SovereignSignalDevelopmentAndPrSuite {
         let thread_state = self.threads.get_mut(&tid).ok_or("Thread not found")?;
         if !thread_state.blocked_mask.is_member(sig) {
             // Unblocked: pop from pending and deliver
-            let idx = proc_state.pending_process_signals.iter().position(|(s, _)| *s == sig);
+            let idx = proc_state
+                .pending_process_signals
+                .iter()
+                .position(|(s, _)| *s == sig);
             if let Some(i) = idx {
                 proc_state.pending_process_signals.remove(i);
             }
@@ -479,7 +555,11 @@ impl SovereignSignalDevelopmentAndPrSuite {
     }
 
     /// PR 4: Implement Signal Sets and Thread Masks
-    pub fn execute_pr4_signal_sets_and_thread_masks(&mut self, tid: u32, mask_to_block: SigSet) -> Result<(), &'static str> {
+    pub fn execute_pr4_signal_sets_and_thread_masks(
+        &mut self,
+        tid: u32,
+        mask_to_block: SigSet,
+    ) -> Result<(), &'static str> {
         let thread = self.threads.get_mut(&tid).ok_or("Thread not found")?;
         thread.blocked_mask.block_mask(mask_to_block);
 
@@ -494,7 +574,13 @@ impl SovereignSignalDevelopmentAndPrSuite {
     }
 
     /// PR 5: Implement `sigaction` with Safe User Copy
-    pub fn execute_pr5_sigaction_safe_user_copy(&mut self, pid: u32, sig: SignalNumber, new_act: Option<SigAction>, old_act: &mut Option<SigAction>) -> Result<(), &'static str> {
+    pub fn execute_pr5_sigaction_safe_user_copy(
+        &mut self,
+        pid: u32,
+        sig: SignalNumber,
+        new_act: Option<SigAction>,
+        old_act: &mut Option<SigAction>,
+    ) -> Result<(), &'static str> {
         if sig.is_uncatchable() {
             return Err("EINVAL: Cannot set action for SIGKILL or SIGSTOP");
         }
@@ -518,8 +604,16 @@ impl SovereignSignalDevelopmentAndPrSuite {
     }
 
     /// PR 6: Process-directed and Thread-directed Generation with Permission Check
-    pub fn execute_pr6_process_thread_generation(&mut self, sender_uid: u32, target_pid: u32, sig: SignalNumber) -> Result<(), &'static str> {
-        let target_proc = self.processes.get_mut(&target_pid).ok_or("ESRCH: Process not found")?;
+    pub fn execute_pr6_process_thread_generation(
+        &mut self,
+        sender_uid: u32,
+        target_pid: u32,
+        sig: SignalNumber,
+    ) -> Result<(), &'static str> {
+        let target_proc = self
+            .processes
+            .get_mut(&target_pid)
+            .ok_or("ESRCH: Process not found")?;
 
         // Permission check: sender UID must equal target UID or sender UID == 0 (root)
         if sender_uid != 0 && sender_uid != target_proc.uid {
@@ -542,7 +636,11 @@ impl SovereignSignalDevelopmentAndPrSuite {
     }
 
     /// PR 7: Deliver Default Actions (Terminate, Stop, Continue, Ignore)
-    pub fn execute_pr7_deliver_default_actions(&mut self, pid: u32, sig: SignalNumber) -> Result<(), &'static str> {
+    pub fn execute_pr7_deliver_default_actions(
+        &mut self,
+        pid: u32,
+        sig: SignalNumber,
+    ) -> Result<(), &'static str> {
         let action = sig.default_action();
         let proc_state = self.processes.get_mut(&pid).ok_or("Process not found")?;
 
@@ -566,11 +664,20 @@ impl SovereignSignalDevelopmentAndPrSuite {
     }
 
     /// PR 8: Deliver Handlers through Validated User Signal Frames
-    pub fn execute_pr8_deliver_handlers_user_frames(&mut self, pid: u32, tid: u32, sig: SignalNumber) -> Result<UserSignalFrame, &'static str> {
+    pub fn execute_pr8_deliver_handlers_user_frames(
+        &mut self,
+        pid: u32,
+        tid: u32,
+        sig: SignalNumber,
+    ) -> Result<UserSignalFrame, &'static str> {
         let proc_state = self.processes.get(&pid).ok_or("Process not found")?;
         let thread_state = self.threads.get(&tid).ok_or("Thread not found")?;
 
-        let act = proc_state.dispositions.get(&sig).cloned().unwrap_or_default();
+        let act = proc_state
+            .dispositions
+            .get(&sig)
+            .cloned()
+            .unwrap_or_default();
         let handler_addr = match act.sa_handler {
             SigHandler::UserHandler(addr) => addr,
             _ => return Err("Signal does not have a user handler installed"),
@@ -597,7 +704,11 @@ impl SovereignSignalDevelopmentAndPrSuite {
     }
 
     /// PR 9: `sigreturn` and Context Validation
-    pub fn execute_pr9_sigreturn_context_validation(&mut self, tid: u32, frame: &UserSignalFrame) -> Result<(), &'static str> {
+    pub fn execute_pr9_sigreturn_context_validation(
+        &mut self,
+        tid: u32,
+        frame: &UserSignalFrame,
+    ) -> Result<(), &'static str> {
         if !frame.is_valid || frame.frame_version != 1 {
             return Err("EFAULT: Corrupted or forged signal frame detected");
         }
@@ -614,7 +725,11 @@ impl SovereignSignalDevelopmentAndPrSuite {
     }
 
     /// PR 10: Pending and Synchronous Wait Interfaces (`sigpending`, `sigsuspend`, `sigwaitinfo`)
-    pub fn execute_pr10_pending_and_synchronous_wait(&mut self, pid: u32, tid: u32) -> Result<SigSet, &'static str> {
+    pub fn execute_pr10_pending_and_synchronous_wait(
+        &mut self,
+        pid: u32,
+        tid: u32,
+    ) -> Result<SigSet, &'static str> {
         let proc_state = self.processes.get(&pid).ok_or("Process not found")?;
         let thread_state = self.threads.get(&tid).ok_or("Thread not found")?;
 
@@ -633,12 +748,21 @@ impl SovereignSignalDevelopmentAndPrSuite {
     }
 
     /// PR 11: Blocking Syscall Interruption and Restart Rules
-    pub fn execute_pr11_blocking_syscall_interruption(&mut self, pid: u32, tid: u32, sig: SignalNumber) -> Result<&'static str, &'static str> {
+    pub fn execute_pr11_blocking_syscall_interruption(
+        &mut self,
+        pid: u32,
+        tid: u32,
+        sig: SignalNumber,
+    ) -> Result<&'static str, &'static str> {
         let proc_state = self.processes.get(&pid).ok_or("Process not found")?;
         let thread_state = self.threads.get_mut(&tid).ok_or("Thread not found")?;
 
         if thread_state.is_blocked_on_syscall {
-            let act = proc_state.dispositions.get(&sig).cloned().unwrap_or_default();
+            let act = proc_state
+                .dispositions
+                .get(&sig)
+                .cloned()
+                .unwrap_or_default();
             let result = if act.sa_flags.sa_restart {
                 "RESTART_SYSCALL"
             } else {
@@ -656,10 +780,22 @@ impl SovereignSignalDevelopmentAndPrSuite {
     }
 
     /// PR 12: `SIGCHLD` and Child Lifecycle Integration
-    pub fn execute_pr12_sigchld_child_lifecycle(&mut self, parent_pid: u32, child_pid: u32, child_exit_code: i32) -> Result<(), &'static str> {
-        let parent = self.processes.get_mut(&parent_pid).ok_or("Parent process not found")?;
+    pub fn execute_pr12_sigchld_child_lifecycle(
+        &mut self,
+        parent_pid: u32,
+        child_pid: u32,
+        child_exit_code: i32,
+    ) -> Result<(), &'static str> {
+        let parent = self
+            .processes
+            .get_mut(&parent_pid)
+            .ok_or("Parent process not found")?;
 
-        let act = parent.dispositions.get(&SignalNumber::SIGCHLD).cloned().unwrap_or_default();
+        let act = parent
+            .dispositions
+            .get(&SignalNumber::SIGCHLD)
+            .cloned()
+            .unwrap_or_default();
         if !act.sa_flags.sa_nocldwait {
             let info = SigInfo {
                 si_signo: SignalNumber::SIGCHLD as u32,
@@ -667,7 +803,9 @@ impl SovereignSignalDevelopmentAndPrSuite {
                 si_status: child_exit_code,
                 ..Default::default()
             };
-            parent.pending_process_signals.push((SignalNumber::SIGCHLD, info));
+            parent
+                .pending_process_signals
+                .push((SignalNumber::SIGCHLD, info));
         }
 
         if let Some(entry) = self.pr_status_map.get_mut(&12) {
@@ -677,8 +815,14 @@ impl SovereignSignalDevelopmentAndPrSuite {
     }
 
     /// PR 13: Process Group and Terminal Generated Signals
-    pub fn execute_pr13_process_group_terminal_signals(&mut self, pgid: u32, sig: SignalNumber) -> Result<usize, &'static str> {
-        let target_pids: Vec<u32> = self.processes.values()
+    pub fn execute_pr13_process_group_terminal_signals(
+        &mut self,
+        pgid: u32,
+        sig: SignalNumber,
+    ) -> Result<usize, &'static str> {
+        let target_pids: Vec<u32> = self
+            .processes
+            .values()
             .filter(|p| p.pgid == pgid)
             .map(|p| p.pid)
             .collect();
@@ -695,7 +839,11 @@ impl SovereignSignalDevelopmentAndPrSuite {
     }
 
     /// PR 14: Alternate Signal Stack Support (`sigaltstack`)
-    pub fn execute_pr14_alternate_signal_stack(&mut self, tid: u32, new_stack: SigAltStack) -> Result<(), &'static str> {
+    pub fn execute_pr14_alternate_signal_stack(
+        &mut self,
+        tid: u32,
+        new_stack: SigAltStack,
+    ) -> Result<(), &'static str> {
         if new_stack.ss_size < 2048 && new_stack.is_enabled {
             return Err("ENOMEM: Alternate signal stack size too small");
         }
@@ -710,7 +858,12 @@ impl SovereignSignalDevelopmentAndPrSuite {
     }
 
     /// PR 15: Queued Real-Time Signals with Resource Limits
-    pub fn execute_pr15_queued_realtime_signals(&mut self, pid: u32, sig: SignalNumber, info: SigInfo) -> Result<(), &'static str> {
+    pub fn execute_pr15_queued_realtime_signals(
+        &mut self,
+        pid: u32,
+        sig: SignalNumber,
+        info: SigInfo,
+    ) -> Result<(), &'static str> {
         if !sig.is_realtime() {
             return Err("EINVAL: Not a real-time signal");
         }
@@ -729,7 +882,12 @@ impl SovereignSignalDevelopmentAndPrSuite {
     }
 
     /// PR 16: `signalfd` Pollable File Descriptor Integration
-    pub fn execute_pr16_signalfd_pollable_fd_integration(&mut self, pid: u32, fd: i32, mask: SigSet) -> Result<(), &'static str> {
+    pub fn execute_pr16_signalfd_pollable_fd_integration(
+        &mut self,
+        pid: u32,
+        fd: i32,
+        mask: SigSet,
+    ) -> Result<(), &'static str> {
         self.signal_fd_registry.insert(fd, (pid, mask));
 
         if let Some(entry) = self.pr_status_map.get_mut(&16) {
@@ -768,7 +926,10 @@ impl SovereignSignalDevelopmentAndPrSuite {
 
         let mut report = String::from("SigmaOS Signal Parity Maturity Matrix:\n");
         for (pr, (title, status)) in &self.pr_status_map {
-            report.push_str(&format!("PR {:02}: {:<65} | Status: {:?}\n", pr, title, status));
+            report.push_str(&format!(
+                "PR {:02}: {:<65} | Status: {:?}\n",
+                pr, title, status
+            ));
         }
 
         Ok(report)
@@ -788,7 +949,12 @@ impl SovereignSignalDevelopmentAndPrSuite {
             sa_flags: SigActionFlags::default(),
             sa_restorer: 0x8049000,
         };
-        self.execute_pr5_sigaction_safe_user_copy(1, SignalNumber::SIGUSR1, Some(new_act), &mut old_act)?;
+        self.execute_pr5_sigaction_safe_user_copy(
+            1,
+            SignalNumber::SIGUSR1,
+            Some(new_act),
+            &mut old_act,
+        )?;
         self.execute_pr6_process_thread_generation(0, 1, SignalNumber::SIGUSR2)?;
         self.execute_pr7_deliver_default_actions(1, SignalNumber::SIGWINCH)?;
         let _frame = self.execute_pr8_deliver_handlers_user_frames(1, 1, SignalNumber::SIGUSR1)?;
@@ -808,7 +974,8 @@ impl SovereignSignalDevelopmentAndPrSuite {
         if let Some(thread) = self.threads.get_mut(&1) {
             thread.is_blocked_on_syscall = true;
         }
-        let _interruption = self.execute_pr11_blocking_syscall_interruption(1, 1, SignalNumber::SIGUSR1)?;
+        let _interruption =
+            self.execute_pr11_blocking_syscall_interruption(1, 1, SignalNumber::SIGUSR1)?;
 
         self.execute_pr12_sigchld_child_lifecycle(1, 2, 0)?;
         self.execute_pr13_process_group_terminal_signals(1, SignalNumber::SIGINT)?;
@@ -840,11 +1007,26 @@ mod tests {
 
     #[test]
     fn test_signal_number_and_actions() {
-        assert_eq!(SignalNumber::SIGKILL.default_action(), SignalDefaultAction::Terminate);
-        assert_eq!(SignalNumber::SIGSEGV.default_action(), SignalDefaultAction::CoreDump);
-        assert_eq!(SignalNumber::SIGSTOP.default_action(), SignalDefaultAction::Stop);
-        assert_eq!(SignalNumber::SIGCONT.default_action(), SignalDefaultAction::Continue);
-        assert_eq!(SignalNumber::SIGCHLD.default_action(), SignalDefaultAction::Ignore);
+        assert_eq!(
+            SignalNumber::SIGKILL.default_action(),
+            SignalDefaultAction::Terminate
+        );
+        assert_eq!(
+            SignalNumber::SIGSEGV.default_action(),
+            SignalDefaultAction::CoreDump
+        );
+        assert_eq!(
+            SignalNumber::SIGSTOP.default_action(),
+            SignalDefaultAction::Stop
+        );
+        assert_eq!(
+            SignalNumber::SIGCONT.default_action(),
+            SignalDefaultAction::Continue
+        );
+        assert_eq!(
+            SignalNumber::SIGCHLD.default_action(),
+            SignalDefaultAction::Ignore
+        );
         assert!(SignalNumber::SIGKILL.is_uncatchable());
         assert!(SignalNumber::SIGSTOP.is_uncatchable());
         assert!(!SignalNumber::SIGTERM.is_uncatchable());
@@ -871,8 +1053,10 @@ mod tests {
         assert!(report.is_ok(), "Master PR suite failed: {:?}", report.err());
         let matrix_output = report.unwrap();
         assert!(matrix_output.contains("SigmaOS Signal Parity Maturity Matrix:"));
-        assert!(matrix_output.contains("PR 01: docs(signal): define signal model and supported profile"));
-        assert!(matrix_output.contains("PR 19: docs(signal): publish signal reference and maturity matrix"));
+        assert!(matrix_output
+            .contains("PR 01: docs(signal): define signal model and supported profile"));
+        assert!(matrix_output
+            .contains("PR 19: docs(signal): publish signal reference and maturity matrix"));
     }
 
     #[test]
@@ -880,7 +1064,12 @@ mod tests {
         let mut suite = SovereignSignalDevelopmentAndPrSuite::new();
         let mut old_act = None;
         let new_act = SigAction::default();
-        let res = suite.execute_pr5_sigaction_safe_user_copy(1, SignalNumber::SIGKILL, Some(new_act), &mut old_act);
+        let res = suite.execute_pr5_sigaction_safe_user_copy(
+            1,
+            SignalNumber::SIGKILL,
+            Some(new_act),
+            &mut old_act,
+        );
         assert!(res.is_err());
     }
 
@@ -888,7 +1077,9 @@ mod tests {
     fn test_permission_check_kill() {
         let mut suite = SovereignSignalDevelopmentAndPrSuite::new();
         // Add non-root process (PID 2, UID 1000)
-        suite.processes.insert(2, ProcessSignalState::new(2, 2, 1000, 1000));
+        suite
+            .processes
+            .insert(2, ProcessSignalState::new(2, 2, 1000, 1000));
 
         // Sending signal from UID 1001 to UID 1000 process must fail with EPERM
         let res = suite.execute_pr6_process_thread_generation(1001, 2, SignalNumber::SIGTERM);
@@ -916,9 +1107,15 @@ mod tests {
             p.real_time_queue_limit = 2;
         }
 
-        assert!(suite.execute_pr15_queued_realtime_signals(1, SignalNumber::SIGRTMIN, SigInfo::default()).is_ok());
-        assert!(suite.execute_pr15_queued_realtime_signals(1, SignalNumber::SIGRT1, SigInfo::default()).is_ok());
+        assert!(suite
+            .execute_pr15_queued_realtime_signals(1, SignalNumber::SIGRTMIN, SigInfo::default())
+            .is_ok());
+        assert!(suite
+            .execute_pr15_queued_realtime_signals(1, SignalNumber::SIGRT1, SigInfo::default())
+            .is_ok());
         // Third RT signal must fail due to limit
-        assert!(suite.execute_pr15_queued_realtime_signals(1, SignalNumber::SIGRT2, SigInfo::default()).is_err());
+        assert!(suite
+            .execute_pr15_queued_realtime_signals(1, SignalNumber::SIGRT2, SigInfo::default())
+            .is_err());
     }
 }
