@@ -24,9 +24,11 @@ pub mod search;
 pub mod snapshot_manager;
 pub mod sovereign_disk_manager;
 pub mod sql_engine;
+pub mod sovereign_storage_filesystem_innovations_pr_engine;
 pub mod virtio;
 pub mod volume;
 
+pub use sovereign_storage_filesystem_innovations_pr_engine::*;
 pub use block::{
     BlockDeviceID, BlockError, BlockNumber, BlockOpCode, BlockOrientedDevice,
     BoundedBlockDeviceManager, BoundedBlockRequest, DeviceClass, NvmeBlockDevice, RequestState,
