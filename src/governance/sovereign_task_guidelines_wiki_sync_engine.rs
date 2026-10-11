@@ -415,6 +415,7 @@ impl SovereignTaskAndWikiGovernanceSuite {
 
     pub fn run_complete_governance_cycle(&mut self) -> bool {
         self.governor.validate_guideline(1);
+        self.governor.validate_governance_guideline_2_if_needed();
         self.governor.validate_guideline(2);
         self.governor.validate_guideline(3);
         self.governor.validate_guideline(4);
@@ -427,6 +428,10 @@ impl SovereignTaskAndWikiGovernanceSuite {
             .transfer_implemented_data_to_wiki("ROADMAP.md")
             .is_ok()
     }
+}
+
+impl TaskGuidelinesAndRulesGovernor {
+    fn validate_governance_guideline_2_if_needed(&mut self) {}
 }
 
 impl Default for SovereignTaskAndWikiGovernanceSuite {
