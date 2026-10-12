@@ -140,7 +140,7 @@ pub struct TxDescriptor {
 }
 
 /// DMA buffer for PCIe
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct DmaBuffer {
     pub virt_addr: usize,
     pub phys_addr: u64,
@@ -251,10 +251,11 @@ impl RTL8169Driver {
         // Allocate DMA buffers for RX
         for _ in 0..NUM_RX_DESCRIPTORS {
             let dma_buf = self.allocate_dma_buffer(RX_BUFFER_SIZE)?;
+            let phys_addr = dma_buf.phys_addr;
             self.rx_buffers.push(dma_buf);
             
             let desc = RxDescriptor {
-                buffer_addr: dma_buf.phys_addr,
+                buffer_addr: phys_addr,
                 length: 0,
                 status: 0,
                 vlan: 0,
@@ -265,8 +266,10 @@ impl RTL8169Driver {
         
         // Program RX descriptor ring to hardware
         let rx_ring_phys = self.rx_ring.as_ptr() as u64;
-        self.write_reg(REG_TNPDS, (rx_ring_phys & 0xFFFFFFFF) as u32);
-        self.write_reg(REG_TNPDS + 4, (rx_ring_phys >> 32) as u32);
+        unsafe {
+            self.write_reg(REG_TNPDS, (rx_ring_phys & 0xFFFFFFFF) as u32);
+            self.write_reg(REG_TNPDS + 4, (rx_ring_phys >> 32) as u32);
+        }
         
         Ok(())
     }
@@ -276,10 +279,11 @@ impl RTL8169Driver {
         // Allocate DMA buffers for TX
         for _ in 0..NUM_TX_DESCRIPTORS {
             let dma_buf = self.allocate_dma_buffer(TX_BUFFER_SIZE)?;
+            let phys_addr = dma_buf.phys_addr;
             self.tx_buffers.push(dma_buf);
             
             let desc = TxDescriptor {
-                buffer_addr: dma_buf.phys_addr,
+                buffer_addr: phys_addr,
                 length: 0,
                 status: 0,
                 vlan: 0,
@@ -290,8 +294,10 @@ impl RTL8169Driver {
         
         // Program TX descriptor ring to hardware
         let tx_ring_phys = self.tx_ring.as_ptr() as u64;
-        self.write_reg(REG_TNPDS, (tx_ring_phys & 0xFFFFFFFF) as u32);
-        self.write_reg(REG_TNPDS + 4, (tx_ring_phys >> 32) as u32);
+        unsafe {
+            self.write_reg(REG_TNPDS, (tx_ring_phys & 0xFFFFFFFF) as u32);
+            self.write_reg(REG_TNPDS + 4, (tx_ring_phys >> 32) as u32);
+        }
         
         Ok(())
     }
