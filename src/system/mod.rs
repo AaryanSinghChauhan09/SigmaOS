@@ -35,6 +35,7 @@ pub mod sigmaservice;
 pub mod sigmaresource;
 pub mod sigmaconfig;
 pub mod sigmait;
+pub mod sigmaevent;
 pub mod sigmatime;
 pub mod sigmatimer;
 pub mod system_manager;
@@ -185,6 +186,10 @@ pub use sigmaconfig::{
 pub use sigmait::{
     SigmaAudit, AuditEvent, AuditEventType, AuditSeverity,
     init_sigmait, get_sigmait, log_audit_event,
+};
+pub use sigmaevent::{
+    SigmaEvent, SystemEvent, EventType, EventAction,
+    init_sigmaevent, get_sigmaevent, emit_system_event,
 };
 pub use power_manager::{
     BatteryInfo, PowerBatteryStatus, PowerConfig, PowerManager, PowerProfile, PowerSource,
