@@ -26,7 +26,7 @@ pub enum WaybarModuleType {
 }
 
 /// Waybar module
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct WaybarModule {
     pub id: String,
     pub module_type: WaybarModuleType,

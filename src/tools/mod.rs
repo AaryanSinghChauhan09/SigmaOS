@@ -52,6 +52,9 @@ pub use sovereign_commands::{
     SovereignDevDmesg, SovereignDfDu, SovereignGccToolchain, SovereignInitramfsSystemd,
     SovereignOpenBsdDoas, SovereignSudo, SovereignTopHtop,
 };
+pub mod sovereign_localization_and_misc_libraries_pr_suite;
+pub use sovereign_localization_and_misc_libraries_pr_suite::*;
+
 pub mod tech_media_extended_suite;
 pub use tech_media_extended_suite::{
     AssetStreamingConfig, DriverHealthStatus, EbpfObserverMetrics, FanThermalCurve,

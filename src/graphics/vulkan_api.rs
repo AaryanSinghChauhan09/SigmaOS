@@ -216,6 +216,7 @@ pub enum VkCommandBufferLevel {
 }
 
 /// Vulkan instance
+#[derive(Debug, Clone)]
 pub struct VulkanInstance {
     pub handle: VkInstance,
     pub physical_devices: Vec<VkPhysicalDevice>,
