@@ -4,6 +4,7 @@ pub mod compatibility;
 pub mod sigmaautomount;
 pub mod sigmahal;
 pub mod sigmabluetooth;
+pub mod sigmaprint;
 pub mod tech_powerup_hardware_monitors;
 pub mod win32;
 
@@ -31,4 +32,8 @@ pub use sigmaautomount::{
 pub use sigmabluetooth::{
     SigmaBluetooth, BluetoothDevice, BluetoothDeviceType, BluetoothDeviceStatus, AdapterState,
     init_sigmabluetooth, get_sigmabluetooth, pair_bluetooth_device, connect_bluetooth_device,
+};
+pub use sigmaprint::{
+    SigmaPrint, Printer, PrintJob, PrinterStatus, PrintJobStatus,
+    init_sigmaprint, get_sigmaprint, add_print_job,
 };
