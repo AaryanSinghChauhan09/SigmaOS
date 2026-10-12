@@ -355,7 +355,119 @@ impl Default for FedoraMockFlatpakBuilderPrEngine {
 }
 
 // ============================================================================
-// 5. Sovereign Open Source OS & Fedora Master PR Suite
+// 5. Fedora Greenboot IoT Health Check Engine
+// ============================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum GreenbootCheckStatus {
+    Passed,
+    Failed(String),
+}
+
+pub struct FedoraGreenbootHealthCheckPrEngine {
+    pub health_checks: BTreeMap<String, GreenbootCheckStatus>,
+    pub max_boot_attempts: u32,
+    pub current_boot_attempt: u32,
+    pub rollback_triggered: bool,
+}
+
+impl FedoraGreenbootHealthCheckPrEngine {
+    pub fn new(max_boot_attempts: u32) -> Self {
+        Self {
+            health_checks: BTreeMap::new(),
+            max_boot_attempts,
+            current_boot_attempt: 1,
+            rollback_triggered: false,
+        }
+    }
+
+    pub fn register_check(&mut self, script_name: &str, status: GreenbootCheckStatus) {
+        self.health_checks
+            .insert(script_name.to_string(), status);
+    }
+
+    pub fn evaluate_health(&mut self) -> bool {
+        let all_healthy = self
+            .health_checks
+            .values()
+            .all(|status| *status == GreenbootCheckStatus::Passed);
+
+        if !all_healthy {
+            self.current_boot_attempt += 1;
+            if self.current_boot_attempt > self.max_boot_attempts {
+                self.rollback_triggered = true;
+            }
+        }
+        all_healthy
+    }
+}
+
+impl Default for FedoraGreenbootHealthCheckPrEngine {
+    fn default() -> Self {
+        Self::new(3)
+    }
+}
+
+// ============================================================================
+// 6. Fedora Messaging Bus PR Engine
+// ============================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FedoraMessage {
+    pub topic: String,
+    pub message_id: String,
+    pub body: String,
+}
+
+pub struct FedoraMessagingBusPrEngine {
+    pub topic_subscriptions: Vec<String>,
+    pub dispatched_messages: Vec<FedoraMessage>,
+}
+
+impl FedoraMessagingBusPrEngine {
+    pub fn new() -> Self {
+        Self {
+            topic_subscriptions: Vec::new(),
+            dispatched_messages: Vec::new(),
+        }
+    }
+
+    pub fn subscribe(&mut self, topic_pattern: &str) {
+        self.topic_subscriptions.push(topic_pattern.to_string());
+    }
+
+    pub fn publish(&mut self, topic: &str, msg_id: &str, payload: &str) -> bool {
+        let matches = self.topic_subscriptions.iter().any(|pattern| {
+            if pattern == "#" || pattern == topic {
+                true
+            } else if pattern.ends_with('*') {
+                topic.starts_with(&pattern[..pattern.len() - 1])
+            } else {
+                false
+            }
+        });
+
+        if matches {
+            self.dispatched_messages.push(FedoraMessage {
+                topic: topic.to_string(),
+                message_id: msg_id.to_string(),
+                body: payload.to_string(),
+            });
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for FedoraMessagingBusPrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 7. Sovereign Open Source OS & Fedora Master PR Suite
 // ============================================================================
 
 pub struct SovereignOpenSourceOsAndFedoraGithubMasterPrSuite {
@@ -363,6 +475,8 @@ pub struct SovereignOpenSourceOsAndFedoraGithubMasterPrSuite {
     pub koji_bodhi: FedoraKojiBodhiBuildPipelinePrEngine,
     pub selinux: FedoraSelinuxContainerPolicyPrEngine,
     pub mock_flatpak: FedoraMockFlatpakBuilderPrEngine,
+    pub greenboot: FedoraGreenbootHealthCheckPrEngine,
+    pub messaging: FedoraMessagingBusPrEngine,
 }
 
 impl SovereignOpenSourceOsAndFedoraGithubMasterPrSuite {
@@ -372,6 +486,8 @@ impl SovereignOpenSourceOsAndFedoraGithubMasterPrSuite {
             koji_bodhi: FedoraKojiBodhiBuildPipelinePrEngine::default(),
             selinux: FedoraSelinuxContainerPolicyPrEngine::default(),
             mock_flatpak: FedoraMockFlatpakBuilderPrEngine::default(),
+            greenboot: FedoraGreenbootHealthCheckPrEngine::default(),
+            messaging: FedoraMessagingBusPrEngine::default(),
         }
     }
 
@@ -384,7 +500,9 @@ impl SovereignOpenSourceOsAndFedoraGithubMasterPrSuite {
         pr.push_str("- **Fedora CoreOS Zincati Auto-Updater:** Release graph traversal and reboot lock staging.\n");
         pr.push_str("- **Koji & Bodhi Build Pipeline:** RPM spec linter, task scheduling, Greenwave CI, and karma voting.\n");
         pr.push_str("- **SELinux Container Policy Governor:** MCS/MLS multi-category isolation and audit logging.\n");
-        pr.push_str("- **Mock & Flatpak Builder:** Isolated chroot builder and OSTree repository committer.\n\n");
+        pr.push_str("- **Mock & Flatpak Builder:** Isolated chroot builder and OSTree repository committer.\n");
+        pr.push_str("- **Greenboot Health Check:** IoT health check verification and fallback rollback staging.\n");
+        pr.push_str("- **Fedora Messaging Bus:** AMQP topic matching and message routing.\n\n");
 
         pr.push_str("## Implementation Diagnostics\n");
         pr.push_str(&format!(
@@ -398,6 +516,14 @@ impl SovereignOpenSourceOsAndFedoraGithubMasterPrSuite {
         pr.push_str(&format!(
             "- Built Flatpak Applications: {}\n",
             self.mock_flatpak.flatpaks_built.len()
+        ));
+        pr.push_str(&format!(
+            "- Greenboot Max Boot Attempts: {}\n",
+            self.greenboot.max_boot_attempts
+        ));
+        pr.push_str(&format!(
+            "- Messaging Subscriptions: {}\n",
+            self.messaging.topic_subscriptions.len()
         ));
 
         pr
@@ -478,11 +604,49 @@ mod tests {
     }
 
     #[test]
+    fn test_greenboot_health_check() {
+        let mut engine = FedoraGreenbootHealthCheckPrEngine::new(2);
+        engine.register_check("01_network.sh", GreenbootCheckStatus::Passed);
+        engine.register_check(
+            "02_dns.sh",
+            GreenbootCheckStatus::Failed("DNS lookup failed".to_string()),
+        );
+
+        assert!(!engine.evaluate_health());
+        assert_eq!(engine.current_boot_attempt, 2);
+        assert!(!engine.rollback_triggered);
+
+        // Second failure triggers rollback
+        assert!(!engine.evaluate_health());
+        assert_eq!(engine.current_boot_attempt, 3);
+        assert!(engine.rollback_triggered);
+    }
+
+    #[test]
+    fn test_messaging_bus() {
+        let mut engine = FedoraMessagingBusPrEngine::new();
+        engine.subscribe("org.fedoraproject.prod.buildsys.*");
+
+        assert!(engine.publish(
+            "org.fedoraproject.prod.buildsys.task.state.change",
+            "msg-001",
+            "{\"task_id\": 1001}"
+        ));
+        assert_eq!(engine.dispatched_messages.len(), 1);
+
+        assert!(!engine.publish(
+            "org.fedoraproject.prod.bodhi.update.comment",
+            "msg-002",
+            "{\"update\": 123}"
+        ));
+    }
+
+    #[test]
     fn test_master_pr_suite() {
         let mut suite = SovereignOpenSourceOsAndFedoraGithubMasterPrSuite::new();
         let proposal = suite.generate_pr_proposal();
         assert!(proposal
             .contains("Fedora GitHub & Open Source Operating System Comprehensive Parity Suite"));
-        assert!(proposal.contains("Zincati Current Version:"));
+        assert!(proposal.contains("Greenboot Max Boot Attempts:"));
     }
 }

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """
+<<<<<<< HEAD
 SigmaOS Agent CLI Runner
 Selects tasks from .agents/tasks/, executes runbook checks, parses success criteria,
 and produces structured evidence report artifacts.
@@ -126,6 +127,156 @@ def main():
     else:
         list_open_tasks()
 
+=======
+tools/agent_cli.py - SigmaOS Distro-Maintainer Agent CLI
+
+Selects, executes, and records structured agent tasks following the 9-stage lifecycle:
+1. SELECT  2. PLAN  3. ISOLATE  4. EXECUTE  5. VERIFY  6. RECORD  7. UPDATE STATUS  8. REVIEW  9. FOLLOW UP
+"""
+
+import sys
+import os
+import json
+import argparse
+import subprocess
+import time
+import datetime
+import hashlib
+
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+def load_task(task_path):
+    if sys.version_info >= (3, 11):
+        import tomllib
+        with open(task_path, 'rb') as f:
+            data = tomllib.load(f)
+            return data
+
+    data = {}
+    with open(task_path, 'r', encoding='utf-8') as f:
+        content = f.read()
+
+    lines = content.splitlines()
+    in_steps = False
+    in_evidence = False
+    in_success = False
+    steps = []
+    evidence = []
+    success = []
+
+    for line in lines:
+        line_str = line.strip()
+        if not line_str or line_str.startswith('#'):
+            continue
+        if line_str.startswith('id ='):
+            data['id'] = line_str.split('=', 1)[1].strip().strip('"')
+        elif line_str.startswith('title ='):
+            data['title'] = line_str.split('=', 1)[1].strip().strip('"')
+        elif line_str.startswith('agent ='):
+            data['agent'] = line_str.split('=', 1)[1].strip().strip('"')
+        elif line_str.startswith('priority ='):
+            data['priority'] = line_str.split('=', 1)[1].strip().strip('"')
+        elif line_str.startswith('steps = ['):
+            in_steps = True
+        elif line_str.startswith('evidence = ['):
+            in_evidence = True
+        elif line_str.startswith('success = ['):
+            in_success = True
+        elif line_str == ']':
+            in_steps = False
+            in_evidence = False
+            in_success = False
+        elif in_steps:
+            steps.append(line_str.strip('",'))
+        elif in_evidence:
+            evidence.append(line_str.strip('",'))
+        elif in_success:
+            success.append(line_str.strip('",'))
+
+    data['steps'] = steps
+    data['evidence'] = evidence
+    data['success'] = success
+    return data
+
+def run_command(cmd, cwd=REPO_ROOT):
+    start_time = time.time()
+    res = subprocess.run(cmd, shell=True, cwd=cwd, capture_output=True, text=True)
+    duration = time.time() - start_time
+    return {
+        "command": cmd,
+        "exit_code": res.returncode,
+        "stdout": res.stdout,
+        "stderr": res.stderr,
+        "duration_sec": round(duration, 3)
+    }
+
+def main():
+    parser = argparse.ArgumentParser(description="SigmaOS Agent Task Execution CLI")
+    parser.add_argument("--task", type=str, help="Path to TOML task file under .agents/tasks/")
+    parser.add_argument("--list-open", action="store_true", help="List all open tasks")
+    parser.add_argument("--run-checks", action="store_true", help="Run standard repo verification checks")
+
+    args = parser.parse_args()
+
+    if args.list_open:
+        open_dir = os.path.join(REPO_ROOT, ".agents", "tasks", "open")
+        if os.path.exists(open_dir):
+            tasks = [f for f in os.listdir(open_dir) if f.endswith(".toml")]
+            print(f"Open Agent Tasks ({len(tasks)}):")
+            for t in sorted(tasks):
+                print(f" - .agents/tasks/open/{t}")
+        else:
+            print("No open task directory found.")
+        return
+
+    if args.run_checks:
+        print("Executing standard SigmaOS Build & Test checks...")
+        cmds = [
+            "./run_sigma_tests.sh",
+            "python3 tools/capability_audit.py",
+            "python3 tools/boot_matrix.py",
+            "python3 tools/evidence_signer.py"
+        ]
+        results = []
+        all_passed = True
+        for cmd in cmds:
+            print(f" -> Running: {cmd}")
+            r = run_command(cmd)
+            results.append(r)
+            if r['exit_code'] != 0:
+                print(f"    FAILED (Exit code {r['exit_code']})")
+                all_passed = False
+            else:
+                print(f"    PASSED ({r['duration_sec']}s)")
+
+        report_dir = os.path.join(REPO_ROOT, "reports", "build")
+        os.makedirs(report_dir, exist_ok=True)
+        report_file = os.path.join(report_dir, "latest.json")
+
+        report_data = {
+            "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+            "status": "PASS" if all_passed else "FAIL",
+            "results": results
+        }
+        with open(report_file, 'w', encoding='utf-8') as f:
+            json.dump(report_data, f, indent=2)
+
+        print(f"Build report written to {report_file}")
+        sys.exit(0 if all_passed else 1)
+
+    if args.task:
+        task_path = os.path.abspath(args.task)
+        if not os.path.exists(task_path):
+            print(f"Error: Task file {task_path} does not exist.")
+            sys.exit(1)
+
+        task = load_task(task_path)
+        print(f"Loaded Task [{task.get('id', 'UNKNOWN')}]: {task.get('title', 'No title')}")
+        print(f"Assigned Agent: {task.get('agent', 'unassigned')}")
+        print("Steps:")
+        for idx, step in enumerate(task.get('steps', []), 1):
+            print(f"  {idx}. {step}")
+>>>>>>> origin/main
 
 if __name__ == "__main__":
     main()

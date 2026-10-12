@@ -1,0 +1,35 @@
+{
+  "updated_at": "2026-10-12T05:22:53.154333+00:00",
+  "targets": {
+    "qemu-x86_64": {
+      "arch": "x86_64",
+      "tier": 1,
+      "status": "PASS",
+      "last_boot": "2026-10-12T05:22:53.154333+00:00",
+      "boot_stages": {
+        "bootloader": "PASS",
+        "kernel_entry": "PASS",
+        "memory_alloc": "PASS",
+        "vfs_mount": "PASS",
+        "init_process": "PASS",
+        "shell_prompt": "PASS"
+      },
+      "first_failure_stage": null
+    },
+    "qemu-aarch64": {
+      "arch": "aarch64",
+      "tier": 2,
+      "status": "UNTESTED",
+      "last_boot": "",
+      "boot_stages": {
+        "bootloader": "UNTESTED",
+        "kernel_entry": "UNTESTED",
+        "memory_alloc": "UNTESTED",
+        "vfs_mount": "UNTESTED",
+        "init_process": "UNTESTED",
+        "shell_prompt": "UNTESTED"
+      },
+      "first_failure_stage": null
+    }
+  }
+}

@@ -1,10 +1,14 @@
-.PHONY: all check check-fast test test-fast bench fmt fmt-fix iso run clean help
+.PHONY: all check check-fast test test-fast bench fmt fmt-fix verify iso run clean help
 
 CARGO ?= cargo
 RUSTC ?= rustc
 PYTHON ?= python3
 
 all: check test
+
+# 0. Milestone M0 reproducible verify target
+verify: fmt check test
+	@echo "==> make verify succeeded: formatting, check, and standalone test suite passed cleanly."
 
 # 1. Code formatting
 fmt-fix:
