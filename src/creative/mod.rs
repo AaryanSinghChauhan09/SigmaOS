@@ -10,6 +10,8 @@ pub mod designcraft;
 pub mod effectcraft;
 pub mod lightcraft;
 pub mod mediacraft;
+pub mod audiocraft;
+pub mod vectoranimation;
 pub mod artcraft;
 
 pub use photocraft::{
@@ -71,6 +73,19 @@ pub use mediacraft::{
     EqualizerBand, EqualizerPreset, AudioSettings, VideoSettings,
     StreamProtocol, StreamSource,
     init_mediacraft, get_mediacraft,
+};
+pub use audiocraft::{
+    AudioEditor, AudioClip, AudioTrack as AudioCraftTrack, AudioEffect,
+    SampleFormat, SampleRate, ChannelConfig, TrackType,
+    AudioEffectType, AutomationPoint, AutomationInterpolation, AutomationLane,
+    AudioExportFormat,
+    init_audiocraft, get_audiocraft,
+};
+pub use vectoranimation::{
+    AnimationProject as VectorAnimationProject, AnimationLayer, AnimationLayerType,
+    Keyframe, InterpolationMode, Bone, Rig, Timeline, OnionSkin,
+    AnimationExportFormat,
+    init_vectoranimation, get_vectoranimation,
 };
 pub use artcraft::{
     ArtSuite, Project, Workspace,
