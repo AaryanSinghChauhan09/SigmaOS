@@ -151,7 +151,8 @@ impl GksuSecurityGuard {
         input_env: &[(String, String)],
         allowed_keys: &[String],
     ) -> Vec<(String, String)> {
-        let mut clean_env = Vec::new();
+        // Bolt performance optimization: Pre-allocate capacity to eliminate vector reallocations during environment sanitization
+        let mut clean_env = Vec::with_capacity(input_env.len().min(allowed_keys.len()));
         for (k, v) in input_env {
             if is_dangerous_environment_variable(k, v) {
                 continue;
