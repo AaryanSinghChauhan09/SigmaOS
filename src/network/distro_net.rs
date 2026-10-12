@@ -54,7 +54,11 @@ impl SynCookieEngine {
 
 impl Default for SynCookieEngine {
     fn default() -> Self {
-        Self::new(0xDEADBEEF)
+        let mut key_bytes = [0u8; 4];
+        crate::crypto::entropy::get_entropy_bytes(&mut key_bytes);
+        let secret = u32::from_ne_bytes(key_bytes);
+        let secret = if secret == 0 { 0x618B91D3 } else { secret };
+        Self::new(secret)
     }
 }
 

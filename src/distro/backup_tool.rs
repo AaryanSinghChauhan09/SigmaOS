@@ -9,7 +9,8 @@ extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use core::sync::atomic::{AtomicBool, Ordering};
+use alloc::format;
+use core::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 
 /// Snapshot type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

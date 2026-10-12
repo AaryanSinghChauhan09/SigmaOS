@@ -4,8 +4,11 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::collections::{HashMap, VecDeque};
-use alloc::sync::{Arc, Mutex};
+use crate::klib::collections::HashMap;
+use alloc::collections::VecDeque;
+use alloc::format;
+use alloc::string::{String, ToString};
+use std::sync::{Arc, Mutex};
 
 /// Message queue permissions
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

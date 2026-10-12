@@ -4,8 +4,8 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::collections::HashMap;
-use alloc::sync::atomic::{AtomicU32, AtomicU64, AtomicU8, Ordering};
+use crate::klib::collections::HashMap;
+use core::sync::atomic::{AtomicU32, AtomicU64, AtomicU8, Ordering};
 
 /// Interrupt vector
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

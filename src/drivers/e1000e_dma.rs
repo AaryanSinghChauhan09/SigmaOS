@@ -113,6 +113,7 @@ pub struct TxDescriptor {
 
 /// DMA buffer for PCIe
 #[derive(Debug)]
+#[derive(Clone)]
 pub struct DmaBuffer {
     pub virt_addr: usize,
     pub phys_addr: u64,
@@ -175,8 +176,8 @@ impl E1000eDriver {
             self.write_reg(REG_IMC, 0xFFFFFFFF);
             
             // 3. Setup DMA ring buffers
-            self.setup_rx_ring()?;
-            self.setup_tx_ring()?;
+            unsafe { self.setup_rx_ring() }?;
+            unsafe { self.setup_tx_ring() }?;
             
             // 4. Configure receive control
             let rctl = RCTL_EN | RCTL_SBP | RCTL_UPE | RCTL_MPE | RCTL_LBM_NONE 
@@ -195,7 +196,7 @@ impl E1000eDriver {
             self.read_mac_address();
             
             // 8. Setup multicast table
-            self.setup_multicast();
+            unsafe { self.setup_multicast() };
             
             self.initialized = true;
             self.link_up = true;
@@ -205,11 +206,11 @@ impl E1000eDriver {
     }
     
     /// Setup receive ring with DMA buffers
-    fn setup_rx_ring(&mut self) -> Result<(), &'static str> {
+    unsafe fn setup_rx_ring(&mut self) -> Result<(), &'static str> {
         // Allocate DMA buffers for RX
         for _ in 0..NUM_RX_DESCRIPTORS {
             let dma_buf = self.allocate_dma_buffer(RX_BUFFER_SIZE)?;
-            self.rx_buffers.push(dma_buf);
+            self.rx_buffers.push(dma_buf.clone());
             
             let desc = RxDescriptor {
                 buffer_addr: dma_buf.phys_addr,
@@ -237,11 +238,11 @@ impl E1000eDriver {
     }
     
     /// Setup transmit ring with DMA buffers
-    fn setup_tx_ring(&mut self) -> Result<(), &'static str> {
+    unsafe fn setup_tx_ring(&mut self) -> Result<(), &'static str> {
         // Allocate DMA buffers for TX
         for _ in 0..NUM_TX_DESCRIPTORS {
             let dma_buf = self.allocate_dma_buffer(TX_BUFFER_SIZE)?;
-            self.tx_buffers.push(dma_buf);
+            self.tx_buffers.push(dma_buf.clone());
             
             let desc = TxDescriptor {
                 buffer_addr: dma_buf.phys_addr,
@@ -288,7 +289,7 @@ impl E1000eDriver {
     }
     
     /// Setup multicast table
-    fn setup_multicast(&mut self) {
+    unsafe fn setup_multicast(&mut self) {
         // Clear multicast table
         for i in 0..128 {
             self.write_reg(REG_MTA + (i as u32 * 4), 0);

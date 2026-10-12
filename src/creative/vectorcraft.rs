@@ -154,3 +154,8 @@ mod tests {
         assert_eq!(editor.get_layer(id).unwrap().shapes.len(), 1);
     }
 }
+
+#[derive(Debug, Clone)]
+pub struct Layer {
+    pub name: alloc::string::String,
+}

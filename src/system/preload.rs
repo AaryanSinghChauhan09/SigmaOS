@@ -9,10 +9,10 @@ extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use core::sync::atomic::{AtomicBool, AtomicU32, Ordering};
+use core::sync::atomic::{AtomicBool, AtomicU32, AtomicU64, Ordering};
 
 /// Preload entry
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct PreloadEntry {
     pub name: String,
     pub path: String,
@@ -145,16 +145,13 @@ impl PreloadManager {
         }
         
         let mut loaded = 0;
-        let mut entries: Vec<_> = self.entries.values_mut().collect();
-        
-        // Sort by priority (higher priority first)
-        entries.sort_by(|a, b| b.priority.cmp(&a.priority));
-        
-        for entry in entries {
-            if !entry.is_loaded() && entry.priority >= 80 {
-                self.load_entry(&entry.name.clone())?;
-                loaded += 1;
-            }
+        let mut high_priority_names: Vec<String> = self.entries.values()
+            .filter(|e| !e.is_loaded() && e.priority >= 80)
+            .map(|e| e.name.clone())
+            .collect();
+        for name in high_priority_names {
+            self.load_entry(&name)?;
+            loaded += 1;
         }
         
         Ok(loaded)
@@ -179,7 +176,7 @@ impl PreloadManager {
     }
     
     /// Set max memory
-    pub fn set_max_memory(&self, max: u64) {
+    pub fn set_max_memory(&mut self, max: u64) {
         self.max_memory = max;
     }
     

@@ -16,7 +16,7 @@ pub use photocraft::{
     init_photocraft, get_photocraft,
 };
 pub use filmcraft::{
-    VideoEditor, VideoTrack, Timeline, Effect,
+    VideoEditor, VideoTrack, Timeline, Effect as FilmEffect,
     init_filmcraft, get_filmcraft,
 };
 pub use vectorcraft::{
@@ -36,7 +36,7 @@ pub use effectcraft::{
     init_effectcraft, get_effectcraft,
 };
 pub use lightcraft::{
-    LightEngine, Light, Material, Scene,
+    LightEngine, Light, LightType, Material, Scene,
     init_lightcraft, get_lightcraft,
 };
 pub use artcraft::{

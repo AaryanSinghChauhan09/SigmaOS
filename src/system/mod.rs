@@ -61,7 +61,7 @@ pub use abi::{
     AbiType, SovereignSyscallAbiCompatibilityEngine, SyscallAbiResult, SyscallRegisters64,
 };
 
-pub use automation::{AutomationTask, AutomationTaskKind, SovereignAutomationEngine, TaskStatus};
+pub use automation::{AutomationTask, AutomationTaskKind, SovereignAutomationEngine, TaskStatus as AutomationTaskStatus};
 
 pub use boot_manager::{BootManager, StartupEntry, StartupStatistics, StartupType};
 pub use cleanup::{
@@ -99,7 +99,7 @@ pub use power_manager::{
     PowerStatistics, SleepAction,
 };
 pub use process_supervisor::{
-    ProcessConfig, ProcessState, ProcessStatus, ProcessSupervisor, SupervisorError,
+    ProcessConfig, ProcessState as SupervisorProcessState, ProcessStatus, ProcessSupervisor, SupervisorError,
 };
 pub use sandbox::{
     CapabilitySandboxEnforcer, NamespaceSandboxEnforcer, NetworkPolicy, ProcessSandboxManager,
@@ -107,7 +107,7 @@ pub use sandbox::{
     SandboxProcess, SandboxProfile, SandboxResult,
 };
 pub use scheduler_manager::{
-    ScheduleFrequency, ScheduleStatus, ScheduledTask, SchedulerManager, SchedulerStatistics,
+    ScheduleFrequency as SchedulerScheduleFrequency, ScheduleStatus, ScheduledTask as SchedulerScheduledTask, SchedulerManager, SchedulerStatistics,
 };
 pub use service_manager::{
     SystemRestartPolicy, SystemService, SystemServiceConfig, SystemServiceManager,

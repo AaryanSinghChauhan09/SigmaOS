@@ -141,6 +141,7 @@ pub struct TxDescriptor {
 
 /// DMA buffer for PCIe
 #[derive(Debug)]
+#[derive(Clone)]
 pub struct DmaBuffer {
     pub virt_addr: usize,
     pub phys_addr: u64,
@@ -199,8 +200,8 @@ impl RTL8169Driver {
             self.write_reg(REG_IMR, 0xFFFFFFFF);
             
             // 3. Setup DMA ring buffers
-            self.setup_rx_ring()?;
-            self.setup_tx_ring()?;
+            unsafe { self.setup_rx_ring() }?;
+            unsafe { self.setup_tx_ring() }?;
             
             // 4. Configure receive control
             let rcr = RCR_RX_EN | RCR_APM | RCR_AM | RCR_AB | RCR_RX_FIFO_THRESH 
@@ -247,11 +248,11 @@ impl RTL8169Driver {
     }
     
     /// Setup receive ring with DMA buffers
-    fn setup_rx_ring(&mut self) -> Result<(), &'static str> {
+    unsafe fn setup_rx_ring(&mut self) -> Result<(), &'static str> {
         // Allocate DMA buffers for RX
         for _ in 0..NUM_RX_DESCRIPTORS {
             let dma_buf = self.allocate_dma_buffer(RX_BUFFER_SIZE)?;
-            self.rx_buffers.push(dma_buf);
+            self.rx_buffers.push(dma_buf.clone());
             
             let desc = RxDescriptor {
                 buffer_addr: dma_buf.phys_addr,
@@ -272,11 +273,11 @@ impl RTL8169Driver {
     }
     
     /// Setup transmit ring with DMA buffers
-    fn setup_tx_ring(&mut self) -> Result<(), &'static str> {
+    unsafe fn setup_tx_ring(&mut self) -> Result<(), &'static str> {
         // Allocate DMA buffers for TX
         for _ in 0..NUM_TX_DESCRIPTORS {
             let dma_buf = self.allocate_dma_buffer(TX_BUFFER_SIZE)?;
-            self.tx_buffers.push(dma_buf);
+            self.tx_buffers.push(dma_buf.clone());
             
             let desc = TxDescriptor {
                 buffer_addr: dma_buf.phys_addr,

@@ -4,8 +4,11 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::collections::HashMap;
-use alloc::sync::{Arc, Mutex};
+use crate::klib::collections::HashMap;
+use alloc::format;
+use alloc::string::{String, ToString};
+use std::sync::{Arc, Mutex};
+use alloc::vec::Vec;
 
 /// Shared memory permissions
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

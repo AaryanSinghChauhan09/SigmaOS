@@ -27,7 +27,7 @@ pub enum Effect {
 }
 
 /// Effect parameter
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub struct Parameter {
     pub name: String,
     pub value: f32,

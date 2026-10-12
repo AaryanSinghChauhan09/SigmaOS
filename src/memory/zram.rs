@@ -148,18 +148,19 @@ impl ZramDevice {
         } else {
             // Compress data (simulated - in real implementation would use actual compression)
             let compressed_data = self.compress(data);
-            let compression_ratio = compressed_data.len() as f64 / data.len() as f64;
+            let compr_len = compressed_data.len();
+            let compression_ratio = compr_len as f64 / data.len() as f64;
             
             self.pages.insert(index, CompressedPage {
                 index,
                 original_size: data.len() as u32,
-                compressed_size: compressed_data.len() as u32,
+                compressed_size: compr_len as u32,
                 is_zero: false,
                 data: compressed_data,
             });
             
             self.stats.orig_data_size += data.len() as u64;
-            self.stats.compr_data_size += compressed_data.len() as u64;
+            self.stats.compr_data_size += compr_len as u64;
         }
         
         self.stats.num_writes += 1;
