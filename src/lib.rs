@@ -339,10 +339,13 @@ pub use security::{
     SandboxPolicy, SovereignSecurityAndHardeningParityPrGateway,
 };
 pub use shell::{
-    ContextualCompleter, HistoryExpansionEngine, JobControlManager, ParameterExpansionEngine,
-    PipelineExecutor, ShellCommand, ShellManager as ShellProfileManager, ShellPledgeUnveilGuard,
-    ShellProfile, ShellStatistics, ShellSyntaxHighlighter, ShellType,
-    SimpleShellSession as ShellRepl, ZshPromptFormatter,
+    ContextualCompleter, HistoryExpansionEngine, InitSupervisorsAndTimersPrEngine,
+    JobControlManager, ParameterExpansionEngine, PipelineExecutor, PosixAndAdvancedShellsPrEngine,
+    ShellCommand, ShellManager as ShellProfileManager, ShellPledgeUnveilGuard, ShellProfile,
+    ShellStatistics, ShellSyntaxHighlighter, ShellType,
+    ShellsTerminalsSupervisorsPrProposalManifest, SimpleShellSession as ShellRepl,
+    SovereignShellsTerminalsSupervisorsParityPrGateway,
+    TerminalMultiplexersAndEmulatorsPrEngine, ZshPromptFormatter,
 };
 pub use sigpkg::{
     AdapterError, BuildSystem, ContentAddressedStore, CryptoVerifier, DebAdapter,
