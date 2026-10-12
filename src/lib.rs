@@ -38,6 +38,8 @@ pub use storage::*;
 pub mod system;
 pub use distro::sovereign_linux_bsd_wiki_master_engine::*;
 pub mod driver;
+pub mod system_apps;
+pub use system_apps::*;
 pub mod drivers;
 pub use drivers::sovereign_comprehensive_drivers::*;
 pub use drivers::sovereign_device_driver_development_and_pr_suite::*;
