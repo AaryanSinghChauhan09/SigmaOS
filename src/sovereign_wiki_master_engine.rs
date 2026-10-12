@@ -239,6 +239,11 @@ impl SovereignLinuxBsdWikiRoadmapParityEngine {
             (
                 32,
 <<<<<<< HEAD
+                "SigmaOS CLI Development Plan & Architecture Framework",
+                "src/tools/sigma_cli.rs",
+                "wiki/27-SigmaOS-CLI-Development-Plan.md",
+=======
+<<<<<<< HEAD
                 "Sovereign Linux & BSD Ecosystem Gap Closure V46 PR Suite",
                 "src/distro/sovereign_linux_bsd_ecosystem_gap_closure_v46_pr.rs",
                 "Linux & BSD Ecosystem Gap Closure V46 PR",
@@ -262,6 +267,7 @@ impl SovereignLinuxBsdWikiRoadmapParityEngine {
                 "Sovereign Kernel and Bootloader Advancements PR Suite V47",
                 "src/boot/sovereign_kernel_and_bootloader_advancements_v47_pr.rs",
                 "wiki/33-Kernel-and-Bootloader-Advancements-Plan.md",
+>>>>>>> origin/main
 >>>>>>> origin/main
 >>>>>>> origin/main
 >>>>>>> origin/main
@@ -407,8 +413,13 @@ mod tests {
         assert_eq!(engine.total_ideas_count, 32);
         assert_eq!(engine.implemented_ideas_count(), 32);
 =======
+<<<<<<< HEAD
+        assert_eq!(engine.total_ideas_count, 32);
+        assert_eq!(engine.implemented_ideas_count(), 32);
+=======
         assert_eq!(engine.total_ideas_count, 33);
         assert_eq!(engine.implemented_ideas_count(), 33);
+>>>>>>> origin/main
 >>>>>>> origin/main
 >>>>>>> origin/main
 >>>>>>> origin/main

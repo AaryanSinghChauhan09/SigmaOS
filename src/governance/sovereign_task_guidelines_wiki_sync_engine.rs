@@ -319,6 +319,17 @@ impl WikiDataTransferEngine {
             },
         );
 
+        self.feature_specs.insert(
+            "SigmaOSCliDevelopmentPlan".to_string(),
+            FeatureMdStatus {
+                spec_name: "27-SigmaOS-CLI-Development-Plan.md".to_string(),
+                source_path: "wiki/27-SigmaOS-CLI-Development-Plan.md".to_string(),
+                is_fully_implemented: true,
+                completion_percentage: 100,
+                wiki_mirrored: true,
+            },
+        );
+
         self.register_spec_file("UniversalPackageSystem", "Universal Package System", true);
         self.register_spec_file("Roadmap11Deployment", "Roadmap 11 Deployment", true);
         self.register_spec_file("ROADMAP.md", "SigmaOS Master Development Roadmap", true);
@@ -336,6 +347,11 @@ impl WikiDataTransferEngine {
         self.register_spec_file(
             "26-System-Utilities-Development-Plan.md",
             "System Utilities Development Plan PR",
+            true,
+        );
+        self.register_spec_file(
+            "27-SigmaOS-CLI-Development-Plan.md",
+            "SigmaOS CLI Development Plan PR",
             true,
         );
         self.register_spec_file(
