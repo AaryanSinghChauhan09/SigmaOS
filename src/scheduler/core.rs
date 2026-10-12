@@ -125,6 +125,31 @@ impl SchedulerCore {
         Ok(())
     }
 
+    /// Updates CPU affinity mask for a process and re-evaluates CPU core assignment.
+    pub fn set_cpu_affinity(&mut self, pid: u64, cpu_affinity: u64) -> Result<(), SchedulerError> {
+        if cpu_affinity == 0 {
+            return Err(SchedulerError::InvalidCpuAffinity);
+        }
+        let (old_cpu, is_ready) = {
+            let pcb = self.process_table.get_mut(&pid).ok_or(SchedulerError::ProcessNotFound(pid))?;
+            pcb.cpu_affinity = cpu_affinity;
+            (pcb.current_cpu, pcb.state == ProcessState::Ready)
+        };
+
+        // If task is ready, migrate to new optimal CPU core
+        if is_ready {
+            let old_cpu_idx = old_cpu as usize;
+            if let Ok(task_ref) = self.run_queues[old_cpu_idx].remove_task(pid) {
+                let target_cpu = self.select_best_cpu(cpu_affinity)?;
+                self.run_queues[target_cpu as usize].enqueue(task_ref, self.current_tick)?;
+                if let Some(pcb_mut) = self.process_table.get_mut(&pid) {
+                    pcb_mut.current_cpu = target_cpu;
+                }
+            }
+        }
+        Ok(())
+    }
+
     /// Enqueues process from `NEW` / `SLEEPING` / `STOPPED` into `READY` state.
     pub fn mark_ready(&mut self, pid: u64) -> Result<(), SchedulerError> {
         let (old_state, priority, cpu_affinity) = {
@@ -205,7 +230,7 @@ impl SchedulerCore {
             self.active_pids[cpu_idx] = Some(next_pid);
             Ok(Some(next_pid))
         } else {
-            Err(SchedulerError::ProcessNotFound(next_pid))
+            Err(SchedulerError::TaskCannotBeScheduled(next_pid))
         }
     }
 

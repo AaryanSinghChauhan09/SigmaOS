@@ -77,6 +77,10 @@ impl BoundedRunQueue {
         }
     }
 
+    pub fn cpu_id(&self) -> u32 {
+        self.cpu_id
+    }
+
     pub fn is_full(&self) -> bool {
         self.total_tasks >= self.capacity
     }
