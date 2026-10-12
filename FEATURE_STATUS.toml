@@ -6,11 +6,11 @@
 # the owning wiki page for integration, release blockers, tested configuration, and limitations.
 
 [kernel.thread_manager]
-status = "modeled"
-files = ["docs/thread-manager.md"]
+status = "unit-tested"
+files = ["src/kernel/thread.rs", "docs/thread-manager.md"]
 description = "Canonical thread lifecycle (New, Ready, Running, Blocked, Suspended, Zombie, Terminated), join/detach, wait channel wakeups, stack guard checks, and ownership contract"
-test_evidence = "Architectural specification and subsystem contract defined in docs/thread-manager.md; implementation pending"
-next_milestone = "Implement canonical Thread object and lifecycle unit tests"
+test_evidence = "Unit tests pass via rustc --test src/kernel/thread.rs (8 passed: lifecycle transitions, wait channel wake, join/detach, lock order tracker, stack guard bounds)"
+next_milestone = "Scheduler run-queue integration and preemption context switch test harness"
 
 [arch.x86_64]
 status = "partial"
