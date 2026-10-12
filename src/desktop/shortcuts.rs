@@ -86,7 +86,9 @@ impl KeyboardShortcut {
     }
 
     pub fn get_key_combination(&self) -> String {
-        let mut combo = String::new();
+        // Pre-allocate capacity based on modifier strings and key length to prevent intermediate allocations
+        let estimated_len = self.modifiers.len() * 6 + self.key.len();
+        let mut combo = String::with_capacity(estimated_len);
         for modifier in &self.modifiers {
             combo.push_str(modifier.as_str());
             combo.push('+');
