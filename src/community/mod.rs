@@ -1,6 +1,7 @@
 // SigmaOS Community Module
 pub mod contrib;
 pub mod infrastructure;
+pub mod sovereign_documentation_consolidation_pr_engine;
 pub mod toolkit;
 
 pub use contrib::{
@@ -12,6 +13,13 @@ pub use contrib::{
 pub use infrastructure::{
     BugSeverity, BugTracker, CommunityIssue, ContributorProfile, FundingSustainability,
     IssueStatus, MentorshipProgram, OnboardingStage, Sponsor,
+};
+
+pub use sovereign_documentation_consolidation_pr_engine::{
+    ManSection, SovereignDocumentationConsolidationPrGateway, SovereignHandbookArticle,
+    SovereignInfoNode, SovereignInfoPagesConsolidationEngine, SovereignManPage,
+    SovereignManPagesConsolidationEngine, SovereignPackageDocRecord,
+    SovereignUsrShareDocConsolidationEngine, SovereignWikiHandbookConsolidationEngine,
 };
 
 pub use toolkit::{

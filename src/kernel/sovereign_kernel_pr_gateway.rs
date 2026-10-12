@@ -297,18 +297,43 @@ impl SovereignKernelPrGatewayEngine {
         Ok(consolidated)
     }
 
-    /// Search active and merged Kernel PRs by author, subsystem, or title query
+    /// Search active and merged Kernel PRs by author, subsystem, or title query.
+    ///
+    /// # Performance Optimization (Bolt ⚡)
+    /// Uses zero-allocation ASCII substring window matching (`contains_ignore_case`),
+    /// eliminating up to 3 intermediate `String` heap allocations (`.to_lowercase()`) per
+    /// PR submission record per search query.
     pub fn search_kernel_prs(&self, query: &str) -> Vec<KernelPullRequestSubmission> {
-        let q = query.to_lowercase();
         self.pr_submissions
             .values()
             .filter(|sub| {
-                sub.title.to_lowercase().contains(&q)
-                    || sub.author.to_lowercase().contains(&q)
-                    || sub.target_subsystem.name().to_lowercase().contains(&q)
+                contains_ignore_case(&sub.title, query)
+                    || contains_ignore_case(&sub.author, query)
+                    || contains_ignore_case(sub.target_subsystem.name(), query)
             })
             .cloned()
             .collect()
+    }
+}
+
+/// Zero-allocation case-insensitive substring search helper.
+/// Checks whether `haystack` contains `needle`, ignoring ASCII case, without allocating heap Strings.
+#[inline]
+fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
+    if needle.is_empty() {
+        return true;
+    }
+    if haystack.len() < needle.len() {
+        return false;
+    }
+    if haystack.is_ascii() && needle.is_ascii() {
+        let needle_bytes = needle.as_bytes();
+        haystack
+            .as_bytes()
+            .windows(needle_bytes.len())
+            .any(|window| window.eq_ignore_ascii_case(needle_bytes))
+    } else {
+        haystack.to_lowercase().contains(&needle.to_lowercase())
     }
 }
 
