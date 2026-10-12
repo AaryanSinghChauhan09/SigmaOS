@@ -26,6 +26,7 @@ pub mod sigmaacpi;
 pub mod sigmasession;
 pub mod sigmamonitor;
 pub mod sigmalogrotate;
+pub mod sigmabackup;
 pub mod sigmatime;
 pub mod sigmatimer;
 pub mod system_manager;
@@ -140,6 +141,10 @@ pub use sigmamonitor::{
 pub use sigmalogrotate::{
     SigmaLogRotate, LogFileConfig, RotationPolicy, CompressionMethod,
     init_sigmalogrotate, get_sigmalogrotate, rotate_log_file,
+};
+pub use sigmabackup::{
+    SigmaBackup, BackupJob, BackupType, BackupStatus, CompressionLevel,
+    init_sigmabackup, get_sigmabackup, start_backup_job,
 };
 pub use power_manager::{
     BatteryInfo, PowerBatteryStatus, PowerConfig, PowerManager, PowerProfile, PowerSource,
