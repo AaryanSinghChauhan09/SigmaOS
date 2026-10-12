@@ -948,6 +948,13 @@ if [ -f "src/distro/sovereign_arch_gap_closure_pr_engine.rs" ]; then
     ./build/test_arch_pr_engine
 fi
 
+if [ -f "src/distro/bootable_vertical_slices_missing_components_pr.rs" ]; then
+    echo "Running Bootable Vertical Slices Missing Components PR Suite test suite..."
+    mkdir -p build
+    rustc --test src/distro/bootable_vertical_slices_missing_components_pr.rs --edition=2021 -o build/test_bootable_vertical_slices
+    ./build/test_bootable_vertical_slices
+fi
+
 if [ -f "src/distro/open_source_os_unimplemented_ideas_pr_suite.rs" ]; then
     echo "Running Open Source OS Unimplemented Ideas PR Suite test suite..."
     mkdir -p build

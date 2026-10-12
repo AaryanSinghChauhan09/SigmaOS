@@ -570,6 +570,9 @@ pub mod wiki_unimplemented_ideas;
 pub mod sovereign_tech_media_wiki_ultimate_parity_pr;
 pub use sovereign_tech_media_wiki_ultimate_parity_pr::*;
 
+pub mod bootable_vertical_slices_missing_components_pr;
+pub use bootable_vertical_slices_missing_components_pr::*;
+
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;
 pub use crate::stubs::large_distro_stubs::*;
