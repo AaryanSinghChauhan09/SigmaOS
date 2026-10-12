@@ -16,6 +16,7 @@
 pub mod async_io;
 pub mod bus;
 pub mod futex;
+pub mod sigmabus;
 pub mod helenos_async;
 pub mod ipc;
 pub mod ipc_namespace;
@@ -28,6 +29,10 @@ pub mod sovereign_async_procedure_call;
 pub mod std_streams;
 pub mod unix_socket;
 pub use bus::{BusEndpoint, BusName, IpcBus, IpcMessage, MessageType};
+pub use sigmabus::{
+    SigmaBus, BusMessage as SigmaBusMessage, ServiceEndpoint, MessageType as SigmaMessageType,
+    init_sigmabus, get_sigmabus, register_service_endpoint, send_bus_message,
+};
 
 pub use ipc::{
     IPCCapability, IPCEndpoint, IPCError, IPCInfo, IPCManager, IPCType, MessageQueue, Pipe,
