@@ -61,12 +61,9 @@ pub use package::{
     SovereignDistroPackageAdvancementsSuiteV14, SovereignDistroPackageAdvancementsSuiteV19,
     SovereignDistroPackageAdvancementsSuiteV20, SovereignDistroPackageAdvancementsSuiteV32,
     SovereignDistroPackageAdvancementsSuiteV33, SovereignDistroPackageAdvancementsSuiteV36,
-<<<<<<< HEAD
     UniversalForeignPackageFormat,
     UniversalForeignPackageFormatConverter,
-=======
     UniversalForeignPackageFormat, UniversalForeignPackageFormatConverter,
->>>>>>> origin/main
 };
 pub mod process;
 pub mod productivity;
@@ -162,12 +159,9 @@ pub use distro::sovereign_mint_omarchy_innovations_v31::*;
 pub use distro::sovereign_mint_omarchy_v32_apex_arsenal::*;
 pub use distro::sovereign_mint_omarchy_v33_apex_vanguard::*;
 pub use distro::sovereign_mint_omarchy_v34_apex_pantheon::*;
-<<<<<<< HEAD
 pub use distro::open_source_os_missing_components_v46_pr::*;
-=======
 pub use distro::debian_gap_closure_advancements_v26::*;
 pub use distro::open_source_os_unimplemented_ideas_pr_suite::*;
->>>>>>> origin/main
 pub use distro::sovereign_open_source_os_gap_closure_v27::*;
 pub use distro::sovereign_thousands_distro_components::*;
 pub use distro::sovereign_universal_subsystem_interop::*;
@@ -380,16 +374,13 @@ pub use userland::shell::{
 pub use userland::coreutils_pr_gateway::*;
 pub use userland::system_utilities::*;
 pub use virtualization::{
-<<<<<<< HEAD
     Container, KubernetesPod, ResourcePool, SovereignVirtualizationPrGatewayEngine,
     VirtualMachine, VirtualizationError, VirtualizationOrchestrator, VirtualizationPrCategory,
     VirtualizationPrStatus, VirtualizationPrSubmission, VirtualizationTech,
     VirtualizationTechnologyFormat, VmState,
-=======
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
     sovereign_virtualization_and_containers_pr::*,
->>>>>>> origin/main
 };
 
 pub use thread::{Mutex as ThreadMutex, Thread, ThreadError};
