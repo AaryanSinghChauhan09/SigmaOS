@@ -42,11 +42,15 @@ pub use pdfcraft::{
 };
 pub use designcraft::{
     DesignEditor, Canvas, Element, Color,
+    ColorModel, FontFamily, FontWeight, TextAlignment,
+    ElementType, TextElement, Layer, BlendMode as DesignBlendMode,
+    Guide, GuideOrientation, Grid,
+    Component, Style, StyleType, ExportFormat, Artboard,
     init_designcraft, get_designcraft,
 };
 pub use effectcraft::{
     EffectEngine, Effect as EffectCraftEffect, Parameter,
-    BlendMode, EffectCategory, ParameterType,
+    BlendMode as EffectBlendMode, EffectCategory, ParameterType,
     Keyframe, InterpolationType, AnimatedParameter,
     EffectInstance, NodeType, CompositingNode, NodeGraph,
     init_effectcraft, get_effectcraft,
