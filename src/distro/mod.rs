@@ -520,6 +520,7 @@ pub mod omarchy_server;
 pub mod omarchy_update_pipeline_synthesis;
 pub mod open_source_os_arch_unimplemented_parity_engine;
 pub mod open_source_os_unimplemented_ideas_pr;
+pub use open_source_os_unimplemented_ideas_pr::*;
 pub mod open_source_os_unimplemented_ideas_pr_suite;
 pub mod opensuse;
 pub mod sovereign_2030_distro_supremacy_engine;
