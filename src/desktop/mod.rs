@@ -541,6 +541,18 @@ pub use search_app::{
     SearchApp, SearchResult, SearchIndex, SearchType, FileTypeFilter, SortOrder,
     init_search_app, get_search_app,
 };
+pub use system_info::{
+    SystemInfo, CpuInfo, MemoryInfo, DiskInfo, GpuInfo, NetworkInfo,
+    init_system_info, get_system_info,
+};
+pub use keyboard_shortcuts::{
+    KeyboardShortcutsManager, KeyboardShortcut, ShortcutAction, KeyModifier, ShortcutCategory,
+    init_keyboard_shortcuts_manager, get_keyboard_shortcuts_manager,
+};
+pub use disk_manager::{
+    DiskManager, Disk, Partition, PartitionType, FileSystemType, DiskOperation, DiskOperationTask, OperationStatus,
+    init_disk_manager, get_disk_manager,
+};
 pub mod webapp_manager;
 pub use webapp_manager::*;
 pub mod appstore;
@@ -586,6 +598,9 @@ pub mod themes_manager;
 pub mod screen_recorder;
 pub mod timer_app;
 pub mod search_app;
+pub mod system_info;
+pub mod keyboard_shortcuts;
+pub mod disk_manager;
 pub mod text_scaling;
 pub mod universal_desktop_framework;
 pub mod volume_manager;
