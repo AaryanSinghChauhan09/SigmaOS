@@ -153,10 +153,13 @@ pub use sovereign_distro_package_advancements_v33::*;
 pub mod sovereign_distro_package_advancements_v34;
 pub use sovereign_distro_package_advancements_v34::*;
 
+<<<<<<< HEAD
 #[path = "../package/sovereign_distro_package_advancements_v35.rs"]
 pub mod sovereign_distro_package_advancements_v35;
 pub use sovereign_distro_package_advancements_v35::*;
 
+=======
+>>>>>>> origin/main
 #[path = "../package/sovereign_distro_package_advancements_v36.rs"]
 pub mod sovereign_distro_package_advancements_v36;
 pub use sovereign_distro_package_advancements_v36::*;

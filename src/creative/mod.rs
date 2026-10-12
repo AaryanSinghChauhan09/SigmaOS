@@ -20,7 +20,7 @@ pub use filmcraft::{
     init_filmcraft, get_filmcraft,
 };
 pub use vectorcraft::{
-    VectorEditor, Shape, Path, Layer as VectorLayer,
+    VectorEditor, Shape, Path, VectorLayer,
     init_vectorcraft, get_vectorcraft,
 };
 pub use pdfcraft::{
@@ -32,11 +32,11 @@ pub use designcraft::{
     init_designcraft, get_designcraft,
 };
 pub use effectcraft::{
-    EffectEngine, Effect, Parameter,
+    EffectEngine, Effect as EffectCraftEffect, Parameter,
     init_effectcraft, get_effectcraft,
 };
 pub use lightcraft::{
-    LightEngine, Light, Material, Scene,
+    LightEngine, Light, LightType, Material, Scene,
     init_lightcraft, get_lightcraft,
 };
 pub use artcraft::{
