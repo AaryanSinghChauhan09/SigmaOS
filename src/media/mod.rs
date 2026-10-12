@@ -17,9 +17,14 @@ pub use pix_image_organizer::{
 };
 
 pub use distro_media_engine::{
-    AudioSinkBackend, FfmpegHwEncoderBackend, FfmpegZeroCopyEncoder, GStreamerPulseAudioPipeline,
-    GstHardwareDecoder, LinuxBsdDistroMediaSuite, MpvAudioTrack, MpvFreeBsdSndioEngine,
-    SubtitleTrackEntry, VlcSubtitleManager,
+    AlsaMixerElement, AlsaPcmState, AlsaSampleFormat, AlsaSoundEngine, AudioSinkBackend,
+    AudioVideoPrStatus, AudioVideoPrSubmission, EncodingSessionSpec, FfmpegEngine,
+    FfmpegHwEncoderBackend, FfmpegZeroCopyEncoder, GStreamerEngine, GStreamerPulseAudioPipeline,
+    GstHardwareDecoder, JackProAudioEngine, JackTransportState, LinuxBsdAudioVideoPrGatewayEngine,
+    LinuxBsdDistroMediaSuite, MediaStreamPipeline, MpvAudioTrack, MpvFreeBsdSndioEngine,
+    MpvPlayerEngine, OssDspDevice, OssIoctlCmd, OssSoundEngine, PipeWireEngine, PipeWireNodeState,
+    PulseAudioEngine, PulseAudioSink, SndPcmHwParams, SndioEngine, SubtitleTrackEntry,
+    V4l2CaptureEngine, V4l2DeviceControl, VlcPlayerEngine, VlcSubtitleManager,
 };
 
 pub use sovereign_screen_recorder::{
