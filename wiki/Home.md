@@ -8,7 +8,11 @@ Welcome to the **SigmaOS Documentation Wiki**, organized following the [Arch Lin
 
 | Subsystem / Topic | Description | Link |
 |---|---|---|
+<<<<<<< HEAD
+| **Kernel** | Bare metal `_start` assembly, ELF loader, CFS/EEVDF/ULE schedulers, THP defrag & khugepaged, interrupts, KASAN/KMSAN | [Kernel](Kernel.md) • [Interrupt Handler Plan](INTERRUPT_HANDLER_PLAN.md) |
+=======
 | **Kernel** | Bare metal `_start` assembly, ELF loader, CFS/EEVDF/ULE schedulers, THP defrag & khugepaged, interrupts, KASAN/KMSAN, dispatcher architecture | [Kernel](Kernel.md) / [Dispatcher Plan](DISPATCHER_PLAN.md) |
+>>>>>>> origin/main
 | **Package Management** | Sovereign Universal Package Format Master, Arch ALPM, Debian dpkg/debconf, Fedora RPM/OSTree, Void xbps, Alpine apk | [Package Management](Package-Management.md) |
 | **Security & Sandboxing** | OpenBSD pledge/unveil, FreeBSD Capsicum, Linux Landlock v4, SELinux/AppArmor, Post-Quantum Cryptography (PQC), Secure Vault | [Security & Sandboxing](Security-and-Sandboxing.md) |
 | **Storage & Filesystems** | Virtual Filesystem (VFS), NVMe 2.0, AHCI SATA, Ext4, ZFS, Btrfs, FAT32, NTFS, SMB, LUKS2 encrypted partitions | [Storage & Filesystems](Storage-and-Filesystems.md) |
