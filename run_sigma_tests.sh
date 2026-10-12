@@ -696,6 +696,13 @@ if [ -f "src/boot/sovereign_assembly_bootstrap_pr_suite.rs" ]; then
     ./build/test_assembly_bootstrap_pr
 fi
 
+if [ -f "src/boot/sovereign_kernel_and_bootloader_advancements_v47_pr.rs" ]; then
+    echo "Running Sovereign Kernel & Bootloader Advancements PR Suite V47 test suite..."
+    mkdir -p build
+    rustc --test src/boot/sovereign_kernel_and_bootloader_advancements_v47_pr.rs --edition=2021 -o build/test_kernel_boot_advancements
+    ./build/test_kernel_boot_advancements
+fi
+
 if [ -f "src/distro/sovereign_linux_bsd_ecosystem_pinnacle_suite.rs" ]; then
     echo "Running Sovereign Linux & BSD Ecosystem Pinnacle Suite test suite..."
     mkdir -p build
