@@ -3,6 +3,24 @@
 //! Synthesizes capabilities inspired by Linux & BSD system administration, observability,
 //! and telemetry tooling:
 //! - Journald, Rsyslog, Syslog-ng, Syslogd & Logrotate: Multi-facility structured logging,
+<<<<<<< HEAD
+//!   RFC 5424 / RFC 3164 syslog framing, rate limiting, TCP/UDP/TLS network forwarding,
+//!   JSON/CEF output, and automated log rotation policies.
+//! - Dmesg: Kernel ring buffer logger with microsecond boot timestamps, severity levels,
+//!   kmsg formatting, and facility tag filtering.
+//! - Top, Htop, Btop, Atop & Iotop, Nethogs: Process activity telemetry, thread counts,
+//!   CPU/RAM utilization, per-process disk IOPS/bandwidth, per-process network sockets,
+//!   and process tree hierarchy.
+//! - Vmstat, Iostat, Sar, Sysstat, Mpstat & Pidstat: System memory, swap, context switches,
+//!   disk IOPS, multi-core CPU utilization breakdown, and time-series performance metrics.
+//! - Lsof, Fuser & Lslocks: Open file descriptor inspection across processes, paths, sockets,
+//!   POSIX/FLOCK file locks, and active mount point process identification.
+//! - Lspci, Lsusb, Dmidecode, Lscpu, Lsblk, Smartctl & Sensors: Comprehensive hardware
+//!   discovery for PCI, USB, SMBIOS/DMI tables, CPU ISA microarchitecture topology,
+//!   NVMe/SATA SMART health, and thermal/fan sensors.
+//! - Sosreport, Prometheus node_exporter, OpenTelemetry & Loki: Diagnostic archive bundle
+//!   generation, Prometheus metrics exposition, OpenTelemetry spans, and Loki log streams.
+=======
 //!   RFC 5424 syslog framing, rate limiting, Syslog-ng log pipelines, journalctl cursor
 //!   pagination & binary sealing verification, and logrotate policy parsing/execution.
 //! - Dmesg: Kernel ring buffer logger with microsecond boot timestamps, severity levels,
@@ -21,6 +39,7 @@
 //! - Diagnostics Pull Request Gateway: Sovereign PR gateway supporting diagnostic plugins,
 //!   metric exporters, log parsers, and hardware probes with automated CI gating, PQC signatures,
 //!   and unified diff generation.
+>>>>>>> origin/main
 
 use std::collections::{BTreeMap, HashMap};
 use std::string::{String, ToString};
@@ -364,6 +383,149 @@ impl JournaldRsyslogLogEngine {
             }
         }
         true
+    }
+}
+
+// ============================================================================
+// 1B. SYSLOG-NG / RSYSLOG NETWORK ROUTING & FORMATTING ENGINE
+// ============================================================================
+
+/// Syslog-ng Network Transport Mode
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SyslogNgTransportMode {
+    Udp,
+    Tcp,
+    Tls,
+    Relp,
+    LocalPipe,
+    File,
+}
+
+/// Output Formatting Specification
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LogFormatSpec {
+    Rfc5424,
+    Rfc3164,
+    Json,
+    Cef,
+}
+
+/// Destination Rule for Network Forwarding
+#[derive(Debug, Clone)]
+pub struct LogDestinationRule {
+    pub destination_id: String,
+    pub transport: SyslogNgTransportMode,
+    pub target_endpoint: String,
+    pub format: LogFormatSpec,
+    pub filter_facility: Option<SyslogFacility>,
+    pub min_severity: Option<LogSeverity>,
+}
+
+/// Syslog-ng & Rsyslog Advanced Routing Engine
+#[derive(Debug, Clone)]
+pub struct SyslogNgRsyslogRoutingEngine {
+    pub rules: Vec<LogDestinationRule>,
+}
+
+impl SyslogNgRsyslogRoutingEngine {
+    pub fn new() -> Self {
+        Self {
+            rules: vec![
+                LogDestinationRule {
+                    destination_id: "sec_siem_cef".to_string(),
+                    transport: SyslogNgTransportMode::Tls,
+                    target_endpoint: "10.0.0.50:6514".to_string(),
+                    format: LogFormatSpec::Cef,
+                    filter_facility: Some(SyslogFacility::AuthPriv),
+                    min_severity: Some(LogSeverity::Warning),
+                },
+                LogDestinationRule {
+                    destination_id: "central_json_log".to_string(),
+                    transport: SyslogNgTransportMode::Tcp,
+                    target_endpoint: "10.0.0.100:5140".to_string(),
+                    format: LogFormatSpec::Json,
+                    filter_facility: None,
+                    min_severity: Some(LogSeverity::Info),
+                },
+            ],
+        }
+    }
+
+    pub fn add_rule(&mut self, rule: LogDestinationRule) {
+        self.rules.push(rule);
+    }
+
+    pub fn format_json(&self, entry: &JournalLogEntry, hostname: &str) -> String {
+        let mut json = String::new();
+        json.push_str("{\"id\":");
+        json.push_str(&entry.id.to_string());
+        json.push_str(",\"timestamp_us\":");
+        json.push_str(&entry.timestamp_us.to_string());
+        json.push_str(",\"hostname\":\"");
+        json.push_str(hostname);
+        json.push_str("\",\"facility\":\"");
+        json.push_str(entry.facility.as_str());
+        json.push_str("\",\"severity\":\"");
+        json.push_str(entry.severity.as_str());
+        json.push_str("\",\"pid\":");
+        json.push_str(&entry.pid.to_string());
+        json.push_str(",\"app\":\"");
+        json.push_str(&entry.app_name);
+        json.push_str("\",\"message\":\"");
+        json.push_str(&entry.message.replace('"', "\\\""));
+        json.push_str("\"}");
+        json
+    }
+
+    pub fn format_cef(&self, entry: &JournalLogEntry, hostname: &str) -> String {
+        format!(
+            "CEF:0|SigmaOS|SovereignKernel|1.0|{:?}|{}|{}|src={} app={} pid={}",
+            entry.facility,
+            entry.severity.as_str(),
+            entry.message,
+            hostname,
+            entry.app_name,
+            entry.pid
+        )
+    }
+
+    pub fn route_entry(&self, entry: &JournalLogEntry, hostname: &str) -> Vec<(String, String)> {
+        let mut dispatched = Vec::new();
+        for rule in &self.rules {
+            if let Some(fac) = rule.filter_facility {
+                if entry.facility != fac {
+                    continue;
+                }
+            }
+            if let Some(sev) = rule.min_severity {
+                if entry.severity > sev {
+                    continue;
+                }
+            }
+
+            let formatted = match rule.format {
+                LogFormatSpec::Rfc5424 => entry.to_rfc5424(hostname),
+                LogFormatSpec::Rfc3164 => format!(
+                    "<{}> {} {}[{}]: {}",
+                    entry.syslog_pri(),
+                    hostname,
+                    entry.app_name,
+                    entry.pid,
+                    entry.message
+                ),
+                LogFormatSpec::Json => self.format_json(entry, hostname),
+                LogFormatSpec::Cef => self.format_cef(entry, hostname),
+            };
+
+            dispatched.push((rule.destination_id.clone(), formatted));
+        }
+        dispatched
+    }
+}
+
+impl Default for SyslogNgRsyslogRoutingEngine {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -748,7 +910,106 @@ impl Default for TopHtopProcessMonitorEngine {
 }
 
 // ============================================================================
-// 4. VMSTAT / IOSTAT / SAR METRICS COLLECTOR ENGINE
+// 3B. IOTOP & NETHOGS PROCESS I/O AND NETWORK MONITOR
+// ============================================================================
+
+/// Process Disk I/O Rate (`iotop`)
+#[derive(Debug, Clone)]
+pub struct ProcessIoTelemetry {
+    pub pid: u32,
+    pub command: String,
+    pub read_bytes_sec: u64,
+    pub write_bytes_sec: u64,
+    pub swapin_delay_pct: f32,
+    pub io_priority: u8, // 0..7 (be/realtime/idle)
+}
+
+/// Process Network Socket Throughput (`nethogs` / `iftop`)
+#[derive(Debug, Clone)]
+pub struct ProcessNetTelemetry {
+    pub pid: u32,
+    pub command: String,
+    pub rx_bytes_sec: u64,
+    pub tx_bytes_sec: u64,
+    pub active_sockets_count: u32,
+}
+
+/// Iotop & Nethogs Monitor
+#[derive(Debug, Clone)]
+pub struct IotopNethogsProcessIoNetMonitor {
+    pub io_stats: BTreeMap<u32, ProcessIoTelemetry>,
+    pub net_stats: BTreeMap<u32, ProcessNetTelemetry>,
+}
+
+impl IotopNethogsProcessIoNetMonitor {
+    pub fn new() -> Self {
+        let mut monitor = Self {
+            io_stats: BTreeMap::new(),
+            net_stats: BTreeMap::new(),
+        };
+        monitor.populate_samples();
+        monitor
+    }
+
+    fn populate_samples(&mut self) {
+        self.io_stats.insert(
+            540,
+            ProcessIoTelemetry {
+                pid: 540,
+                command: "zenith-desktop".to_string(),
+                read_bytes_sec: 1_048_576,
+                write_bytes_sec: 524_288,
+                swapin_delay_pct: 0.1,
+                io_priority: 4,
+            },
+        );
+
+        self.net_stats.insert(
+            540,
+            ProcessNetTelemetry {
+                pid: 540,
+                command: "zenith-desktop".to_string(),
+                rx_bytes_sec: 262_144,
+                tx_bytes_sec: 65_536,
+                active_sockets_count: 5,
+            },
+        );
+    }
+
+    pub fn update_io(&mut self, io: ProcessIoTelemetry) {
+        self.io_stats.insert(io.pid, io);
+    }
+
+    pub fn update_net(&mut self, net: ProcessNetTelemetry) {
+        self.net_stats.insert(net.pid, net);
+    }
+
+    pub fn top_io_consumers(&self) -> Vec<&ProcessIoTelemetry> {
+        let mut list: Vec<&ProcessIoTelemetry> = self.io_stats.values().collect();
+        list.sort_by(|a, b| {
+            (b.read_bytes_sec + b.write_bytes_sec)
+                .cmp(&(a.read_bytes_sec + a.write_bytes_sec))
+        });
+        list
+    }
+
+    pub fn top_net_consumers(&self) -> Vec<&ProcessNetTelemetry> {
+        let mut list: Vec<&ProcessNetTelemetry> = self.net_stats.values().collect();
+        list.sort_by(|a, b| {
+            (b.rx_bytes_sec + b.tx_bytes_sec).cmp(&(a.rx_bytes_sec + a.tx_bytes_sec))
+        });
+        list
+    }
+}
+
+impl Default for IotopNethogsProcessIoNetMonitor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 4. VMSTAT / IOSTAT / SAR / MPSTAT / PIDSTAT METRICS COLLECTOR ENGINE
 // ============================================================================
 
 /// Vmstat System Memory & CPU Activity Snapshot
@@ -789,11 +1050,40 @@ pub struct IostatDeviceSnapshot {
     pub util_pct: f32,
 }
 
+/// Per-CPU Core Activity Snapshot (`mpstat`)
+#[derive(Debug, Clone)]
+pub struct CpuCoreSnapshot {
+    pub core_id: u32,
+    pub user_pct: f32,
+    pub sys_pct: f32,
+    pub iowait_pct: f32,
+    pub irq_pct: f32,
+    pub softirq_pct: f32,
+    pub idle_pct: f32,
+}
+
+/// Per-Process Detailed Resource Snapshot (`pidstat`)
+#[derive(Debug, Clone)]
+pub struct PidstatSnapshot {
+    pub pid: u32,
+    pub command: String,
+    pub cpu_usr_pct: f32,
+    pub cpu_sys_pct: f32,
+    pub minflt_s: f32,
+    pub majflt_s: f32,
+    pub kb_rd_s: f32,
+    pub kb_wr_s: f32,
+    pub voluntary_ctxt_s: f32,
+    pub nonvoluntary_ctxt_s: f32,
+}
+
 /// Sar Time-Series Historical Performance Buffer (`sysstat`)
 #[derive(Debug, Clone)]
 pub struct VmstatIostatSarMetricsCollectorEngine {
     pub vmstat_history: Vec<VmstatSnapshot>,
     pub iostat_history: Vec<IostatDeviceSnapshot>,
+    pub core_snapshots: Vec<CpuCoreSnapshot>,
+    pub pidstat_snapshots: Vec<PidstatSnapshot>,
     pub max_history_capacity: usize,
 }
 
@@ -802,6 +1092,8 @@ impl VmstatIostatSarMetricsCollectorEngine {
         let mut engine = Self {
             vmstat_history: Vec::new(),
             iostat_history: Vec::new(),
+            core_snapshots: Vec::new(),
+            pidstat_snapshots: Vec::new(),
             max_history_capacity: 120,
         };
         engine.record_sample_snapshot();
@@ -841,6 +1133,29 @@ impl VmstatIostatSarMetricsCollectorEngine {
             write_await_ms: 0.98,
             avg_await_ms: 0.85,
             util_pct: 3.2,
+        });
+
+        self.core_snapshots.push(CpuCoreSnapshot {
+            core_id: 0,
+            user_pct: 12.0,
+            sys_pct: 4.0,
+            iowait_pct: 0.5,
+            irq_pct: 0.1,
+            softirq_pct: 0.2,
+            idle_pct: 83.2,
+        });
+
+        self.pidstat_snapshots.push(PidstatSnapshot {
+            pid: 540,
+            command: "zenith-desktop".to_string(),
+            cpu_usr_pct: 4.2,
+            cpu_sys_pct: 0.6,
+            minflt_s: 120.0,
+            majflt_s: 0.0,
+            kb_rd_s: 1024.0,
+            kb_wr_s: 512.0,
+            voluntary_ctxt_s: 450.0,
+            nonvoluntary_ctxt_s: 12.0,
         });
     }
 
@@ -908,7 +1223,7 @@ impl Default for VmstatIostatSarMetricsCollectorEngine {
 }
 
 // ============================================================================
-// 5. LSOF OPEN FILES INSPECTOR ENGINE
+// 5. LSOF, FUSER & LSLOCKS INSPECTOR ENGINE
 // ============================================================================
 
 /// Open File Descriptor Type (`lsof`)
@@ -1031,8 +1346,88 @@ impl Default for LsofOpenFilesInspectorEngine {
     }
 }
 
+/// System-Wide File Lock Type (`lslocks`)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FileLockType {
+    Posix,
+    Flock,
+    Ofd,
+    Lease,
+}
+
+/// System-Wide File Lock Mode
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FileLockMode {
+    Read,
+    Write,
+}
+
+/// File Lock Record (`lslocks`)
+#[derive(Debug, Clone)]
+pub struct FileLockRecord {
+    pub pid: u32,
+    pub command: String,
+    pub lock_type: FileLockType,
+    pub lock_mode: FileLockMode,
+    pub mandatory: bool,
+    pub inode: u64,
+    pub start_byte: u64,
+    pub end_byte: u64,
+    pub path_name: String,
+}
+
+/// Fuser & Lslocks Inspector
+#[derive(Debug, Clone)]
+pub struct FuserLslocksInspector {
+    pub locks: Vec<FileLockRecord>,
+}
+
+impl FuserLslocksInspector {
+    pub fn new() -> Self {
+        Self {
+            locks: vec![FileLockRecord {
+                pid: 102,
+                command: "journald".to_string(),
+                lock_type: FileLockType::Posix,
+                lock_mode: FileLockMode::Write,
+                mandatory: false,
+                inode: 40210,
+                start_byte: 0,
+                end_byte: 0, // 0 = EOF
+                path_name: "/var/log/journal/system.journal".to_string(),
+            }],
+        }
+    }
+
+    pub fn add_lock(&mut self, lock: FileLockRecord) {
+        self.locks.push(lock);
+    }
+
+    pub fn find_locks_for_path(&self, path: &str) -> Vec<&FileLockRecord> {
+        self.locks.iter().filter(|l| l.path_name == path).collect()
+    }
+
+    pub fn find_processes_holding_mount(
+        &self,
+        lsof: &LsofOpenFilesInspectorEngine,
+        mount_path: &str,
+    ) -> Vec<u32> {
+        lsof.open_files
+            .iter()
+            .filter(|f| f.path_name.starts_with(mount_path))
+            .map(|f| f.pid)
+            .collect()
+    }
+}
+
+impl Default for FuserLslocksInspector {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // ============================================================================
-// 6. HARDWARE DISCOVERY ENGINE (LSPCI, LSUSB, DMIDECODE)
+// 6. HARDWARE DISCOVERY ENGINE (LSPCI, LSUSB, DMIDECODE, LSCPU, LSBLK, SMARTCTL, SENSORS)
 // ============================================================================
 
 /// PCI Device Info (`lspci`)
@@ -1087,12 +1482,52 @@ pub struct DmiDecodeInfo {
     pub memory_slots_count: usize,
 }
 
+/// CPU Architecture Topology (`lscpu`)
+#[derive(Debug, Clone)]
+pub struct CpuTopologyInfo {
+    pub architecture: String,
+    pub online_cpus: u32,
+    pub sockets: u32,
+    pub cores_per_socket: u32,
+    pub threads_per_core: u32,
+    pub numa_nodes: u32,
+    pub l1_cache_kb: u32,
+    pub l2_cache_kb: u32,
+    pub l3_cache_kb: u32,
+    pub isa_extensions: Vec<String>,
+}
+
+/// Block Storage Device Info (`lsblk` / `smartctl`)
+#[derive(Debug, Clone)]
+pub struct BlockDeviceTopology {
+    pub name: String,
+    pub size_bytes: u64,
+    pub rotational: bool,
+    pub mountpoint: Option<String>,
+    pub smart_passed: bool,
+    pub temperature_celsius: u32,
+    pub power_on_hours: u32,
+    pub wear_level_pct: u8,
+}
+
+/// Thermal & Environmental Sensors (`sensors`)
+#[derive(Debug, Clone)]
+pub struct ThermalSensorRecord {
+    pub sensor_name: String,
+    pub temp_celsius: f32,
+    pub crit_temp_celsius: f32,
+    pub fan_rpm: Option<u32>,
+}
+
 /// Hardware Discovery Inspector Engine
 #[derive(Debug, Clone)]
 pub struct HardwareDiscoveryInspectorEngine {
     pub pci_devices: Vec<PciDeviceRecord>,
     pub usb_devices: Vec<UsbDeviceRecord>,
     pub dmi_info: DmiDecodeInfo,
+    pub cpu_topology: CpuTopologyInfo,
+    pub block_devices: Vec<BlockDeviceTopology>,
+    pub thermal_sensors: Vec<ThermalSensorRecord>,
 }
 
 impl HardwareDiscoveryInspectorEngine {
@@ -1143,6 +1578,39 @@ impl HardwareDiscoveryInspectorEngine {
                 processor_family: "x86-64 v4".to_string(),
                 memory_slots_count: 4,
             },
+            cpu_topology: CpuTopologyInfo {
+                architecture: "x86_64".to_string(),
+                online_cpus: 64,
+                sockets: 2,
+                cores_per_socket: 16,
+                threads_per_core: 2,
+                numa_nodes: 2,
+                l1_cache_kb: 32,
+                l2_cache_kb: 1024,
+                l3_cache_kb: 32768,
+                isa_extensions: vec![
+                    "avx2".to_string(),
+                    "avx512f".to_string(),
+                    "sha_ni".to_string(),
+                    "aes".to_string(),
+                ],
+            },
+            block_devices: vec![BlockDeviceTopology {
+                name: "nvme0n1".to_string(),
+                size_bytes: 2_000_398_934_016,
+                rotational: false,
+                mountpoint: Some("/".to_string()),
+                smart_passed: true,
+                temperature_celsius: 38,
+                power_on_hours: 1250,
+                wear_level_pct: 2,
+            }],
+            thermal_sensors: vec![ThermalSensorRecord {
+                sensor_name: "cpu_package_thermal".to_string(),
+                temp_celsius: 42.5,
+                crit_temp_celsius: 100.0,
+                fan_rpm: Some(1200),
+            }],
         }
     }
 
@@ -1169,7 +1637,11 @@ impl Default for HardwareDiscoveryInspectorEngine {
 }
 
 // ============================================================================
+<<<<<<< HEAD
+// 7. SOSREPORT, PROMETHEUS, OPENTELEMETRY & LOKI EXPORTER ENGINE
+=======
 // 7. SOSREPORT, PROMETHEUS NODE_EXPORTER & COLLECTD EXPORTER ENGINE
+>>>>>>> origin/main
 // ============================================================================
 
 /// Sosreport Diagnostic Archive Bundle
@@ -1183,7 +1655,22 @@ pub struct SosreportArchiveBundle {
     pub captured_files: BTreeMap<String, String>,
 }
 
+<<<<<<< HEAD
+/// OpenTelemetry Span Record
+#[derive(Debug, Clone)]
+pub struct OtelSpanRecord {
+    pub trace_id: String,
+    pub span_id: String,
+    pub name: String,
+    pub start_time_us: u64,
+    pub duration_us: u64,
+    pub attributes: BTreeMap<String, String>,
+}
+
+/// Sosreport, Prometheus, OpenTelemetry & Loki Exporter
+=======
 /// Sosreport, Prometheus & Collectd Exporter Engine
+>>>>>>> origin/main
 #[derive(Debug, Clone)]
 pub struct SosreportPrometheusExporterEngine {
     pub hostname: String,
@@ -1233,12 +1720,13 @@ impl SosreportPrometheusExporterEngine {
 
         // Include DMI / hardware discovery
         let dmi_txt = format!(
-            "BIOS Vendor: {}\nBIOS Version: {}\nSystem: {} {}\nSerial: {}\n",
+            "BIOS Vendor: {}\nBIOS Version: {}\nSystem: {} {}\nSerial: {}\nCPU Arch: {}\n",
             hw.dmi_info.bios_vendor,
             hw.dmi_info.bios_version,
             hw.dmi_info.sys_manufacturer,
             hw.dmi_info.sys_product_name,
-            hw.dmi_info.sys_serial_number
+            hw.dmi_info.sys_serial_number,
+            hw.cpu_topology.architecture
         );
         files.insert("sys/class/dmi/id/bios".to_string(), dmi_txt);
 
@@ -1297,6 +1785,29 @@ impl SosreportPrometheusExporterEngine {
         out
     }
 
+<<<<<<< HEAD
+    /// Export Loki Log Stream JSON payload
+    pub fn export_loki_log_stream(&self, journal: &JournaldRsyslogLogEngine) -> String {
+        let mut payload = String::from("{\"streams\":[{\"stream\":{\"host\":\"");
+        payload.push_str(&self.hostname);
+        payload.push_str("\"},\"values\":[");
+
+        for (idx, entry) in journal.entries.iter().enumerate() {
+            if idx > 0 {
+                payload.push(',');
+            }
+            payload.push_str(&format!(
+                "[\"{}\",\"[{}] [{}] {}\"]",
+                entry.timestamp_us * 1000,
+                entry.app_name,
+                entry.severity.as_str(),
+                entry.message.replace('"', "\\\"")
+            ));
+        }
+
+        payload.push_str("]}]}");
+        payload
+=======
     /// Export metrics in Collectd binary / RRD-style metric payload format
     pub fn export_collectd_metrics(
         &self,
@@ -1409,6 +1920,7 @@ impl LoggingMonitoringDiagnosticsPullRequestEngine {
             }
         }
         false
+>>>>>>> origin/main
     }
 }
 
@@ -1420,10 +1932,13 @@ impl LoggingMonitoringDiagnosticsPullRequestEngine {
 #[derive(Debug, Clone)]
 pub struct SovereignLinuxBsdLoggingMonitoringDiagnosticsSuite {
     pub journal: JournaldRsyslogLogEngine,
+    pub routing: SyslogNgRsyslogRoutingEngine,
     pub dmesg: DmesgKernelRingBufferEngine,
     pub top_monitor: TopHtopProcessMonitorEngine,
+    pub io_net_monitor: IotopNethogsProcessIoNetMonitor,
     pub vmstat_collector: VmstatIostatSarMetricsCollectorEngine,
     pub lsof_inspector: LsofOpenFilesInspectorEngine,
+    pub file_locks: FuserLslocksInspector,
     pub hardware: HardwareDiscoveryInspectorEngine,
     pub exporter: SosreportPrometheusExporterEngine,
     pub pr_gateway: LoggingMonitoringDiagnosticsPullRequestEngine,
@@ -1433,10 +1948,13 @@ impl SovereignLinuxBsdLoggingMonitoringDiagnosticsSuite {
     pub fn new(hostname: &str) -> Self {
         Self {
             journal: JournaldRsyslogLogEngine::new(hostname),
+            routing: SyslogNgRsyslogRoutingEngine::new(),
             dmesg: DmesgKernelRingBufferEngine::new(1000),
             top_monitor: TopHtopProcessMonitorEngine::new(),
+            io_net_monitor: IotopNethogsProcessIoNetMonitor::new(),
             vmstat_collector: VmstatIostatSarMetricsCollectorEngine::new(),
             lsof_inspector: LsofOpenFilesInspectorEngine::new(),
+            file_locks: FuserLslocksInspector::new(),
             hardware: HardwareDiscoveryInspectorEngine::new(),
             exporter: SosreportPrometheusExporterEngine::new(hostname),
             pr_gateway: LoggingMonitoringDiagnosticsPullRequestEngine::new(),
@@ -1452,8 +1970,13 @@ impl SovereignLinuxBsdLoggingMonitoringDiagnosticsSuite {
             self.journal.entries.len().to_string(),
         );
         diag.insert(
+<<<<<<< HEAD
+            "routing_destinations".to_string(),
+            self.routing.rules.len().to_string(),
+=======
             "journal_seal_valid".to_string(),
             self.journal.verify_journal_sealing_integrity().to_string(),
+>>>>>>> origin/main
         );
         diag.insert(
             "dmesg_records".to_string(),
@@ -1464,8 +1987,16 @@ impl SovereignLinuxBsdLoggingMonitoringDiagnosticsSuite {
             self.top_monitor.processes.len().to_string(),
         );
         diag.insert(
+            "monitored_io_processes".to_string(),
+            self.io_net_monitor.io_stats.len().to_string(),
+        );
+        diag.insert(
             "open_file_descriptors".to_string(),
             self.lsof_inspector.open_files.len().to_string(),
+        );
+        diag.insert(
+            "active_file_locks".to_string(),
+            self.file_locks.locks.len().to_string(),
         );
         diag.insert(
             "pci_devices_count".to_string(),
@@ -1474,6 +2005,10 @@ impl SovereignLinuxBsdLoggingMonitoringDiagnosticsSuite {
         diag.insert(
             "usb_devices_count".to_string(),
             self.hardware.usb_devices.len().to_string(),
+        );
+        diag.insert(
+            "cpu_online_cores".to_string(),
+            self.hardware.cpu_topology.online_cpus.to_string(),
         );
         diag.insert(
             "bios_vendor".to_string(),
@@ -1526,6 +2061,27 @@ mod tests {
     }
 
     #[test]
+    fn test_syslog_ng_routing_engine() {
+        let routing = SyslogNgRsyslogRoutingEngine::new();
+        let entry = JournalLogEntry {
+            id: 1,
+            timestamp_us: 1000000,
+            facility: SyslogFacility::AuthPriv,
+            severity: LogSeverity::Error,
+            pid: 400,
+            app_name: "sshd".to_string(),
+            message: "Failed password for root".to_string(),
+            metadata: BTreeMap::new(),
+        };
+
+        let routed = routing.route_entry(&entry, "sigma-node-1");
+        assert!(!routed.is_empty());
+        let json_fmt = routing.format_json(&entry, "sigma-node-1");
+        assert!(json_fmt.contains("sshd"));
+        assert!(json_fmt.contains("Failed password"));
+    }
+
+    #[test]
     fn test_dmesg_ring_buffer() {
         let mut dmesg = DmesgKernelRingBufferEngine::new(10);
         assert!(!dmesg.buffer.is_empty());
@@ -1561,10 +2117,23 @@ mod tests {
     }
 
     #[test]
+    fn test_iotop_nethogs_monitor() {
+        let io_net = IotopNethogsProcessIoNetMonitor::new();
+        let top_io = io_net.top_io_consumers();
+        assert_eq!(top_io.len(), 1);
+        assert_eq!(top_io[0].pid, 540);
+
+        let top_net = io_net.top_net_consumers();
+        assert_eq!(top_net.len(), 1);
+        assert_eq!(top_net[0].pid, 540);
+    }
+
+    #[test]
     fn test_vmstat_iostat_sar() {
         let collector = VmstatIostatSarMetricsCollectorEngine::new();
         assert!(!collector.vmstat_history.is_empty());
         assert!(!collector.iostat_history.is_empty());
+        assert!(!collector.core_snapshots.is_empty());
 
         let (user, sys, idle) = collector.calculate_sar_average_cpu();
         assert!(user > 0.0);
@@ -1576,16 +2145,25 @@ mod tests {
     }
 
     #[test]
-    fn test_lsof_inspector() {
+    fn test_lsof_fuser_lslocks() {
         let lsof = LsofOpenFilesInspectorEngine::new();
         let sys_files = lsof.find_by_pid(1);
         assert_eq!(sys_files.len(), 1);
 
+<<<<<<< HEAD
+        let locks = FuserLslocksInspector::new();
+        let journal_locks = locks.find_locks_for_path("/var/log/journal/system.journal");
+        assert_eq!(journal_locks.len(), 1);
+
+        let mount_pids = locks.find_processes_holding_mount(&lsof, "/");
+        assert!(mount_pids.contains(&1));
+=======
         let socket_files = lsof.find_by_path("@wayland-0");
         assert_eq!(socket_files.len(), 1);
 
         let listen_sockets = lsof.find_sockets_by_state(SocketState::Listen);
         assert_eq!(listen_sockets.len(), 1);
+>>>>>>> origin/main
     }
 
     #[test]
@@ -1594,13 +2172,20 @@ mod tests {
         assert_eq!(hw.pci_devices.len(), 2);
         assert_eq!(hw.usb_devices.len(), 1);
         assert_eq!(hw.dmi_info.bios_vendor, "American Megatrends Inc.");
+<<<<<<< HEAD
+        assert_eq!(hw.cpu_topology.online_cpus, 64);
+        assert_eq!(hw.block_devices[0].name, "nvme0n1");
+        assert!(hw.block_devices[0].smart_passed);
+        assert_eq!(hw.thermal_sensors[0].sensor_name, "cpu_package_thermal");
+=======
 
         let nvidia = hw.query_pci_by_driver("nvidia");
         assert_eq!(nvidia.len(), 1);
+>>>>>>> origin/main
     }
 
     #[test]
-    fn test_sosreport_and_prometheus_export() {
+    fn test_sosreport_prometheus_loki_export() {
         let suite = SovereignLinuxBsdLoggingMonitoringDiagnosticsSuite::new("test-host");
         let sos = suite
             .exporter
@@ -1614,6 +2199,10 @@ mod tests {
         assert!(prom.contains("node_cpu_seconds_total"));
         assert!(prom.contains("node_memory_MemFree_bytes"));
 
+<<<<<<< HEAD
+        let loki = suite.exporter.export_loki_log_stream(&suite.journal);
+        assert!(loki.contains("test-host"));
+=======
         let collectd = suite
             .exporter
             .export_collectd_metrics(&suite.top_monitor, &suite.vmstat_collector);
@@ -1634,5 +2223,6 @@ mod tests {
 
         assert!(pr_engine.run_automated_ci_pr_gate(&pr_id));
         assert!(pr_engine.merge_pr(&pr_id));
+>>>>>>> origin/main
     }
 }
