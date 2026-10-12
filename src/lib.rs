@@ -26,6 +26,7 @@ pub mod dashboard;
 pub mod desktop;
 pub mod development;
 pub mod device;
+pub use device::sovereign_device_management_inspirations_pr::*;
 pub mod diagnostics;
 pub use diagnostics::*;
 pub mod distro;
@@ -34,6 +35,7 @@ pub mod ipc;
 pub mod storage;
 pub use storage::*;
 pub mod system;
+pub use system::sovereign_init_and_supervisor_inspirations_pr::*;
 pub use distro::sovereign_linux_bsd_wiki_master_engine::*;
 pub mod driver;
 pub mod drivers;
@@ -58,12 +60,14 @@ pub use package::{
     SovereignDistroPackageAdvancementsSuiteV10, SovereignDistroPackageAdvancementsSuiteV11,
     SovereignDistroPackageAdvancementsSuiteV14, SovereignDistroPackageAdvancementsSuiteV19,
     SovereignDistroPackageAdvancementsSuiteV20, SovereignDistroPackageAdvancementsSuiteV32,
-    SovereignDistroPackageAdvancementsSuiteV33, UniversalForeignPackageFormat,
-    UniversalForeignPackageFormatConverter,
+    SovereignDistroPackageAdvancementsSuiteV33, SovereignDistroPackageAdvancementsSuiteV36,
+    UniversalForeignPackageFormat, UniversalForeignPackageFormatConverter,
 };
 pub mod process;
 pub mod productivity;
 pub use productivity::*;
+pub mod printing;
+pub use printing::*;
 pub mod remote;
 pub mod resilience;
 pub mod runtime;
@@ -96,6 +100,7 @@ pub use desktop::{
     PopOsKdeTilingWorkspaceGridEngine, SovereignUxMasterEngine, SwayRegolithWmEngine,
     WindowsCopilotAiAssistantSidebar, Xfce418Engine,
 };
+pub use desktop::sovereign_desktop_toolkits_and_services::*;
 pub use kernel::{
     CfiFunctionSignature, KptrRestrictLevel, SovereignHardenedSecurityMitigationsEngine,
     SovereignKernelDistroParityPrGateway, SovereignLinuxBsdKernelInnovationsPrGateway,
@@ -147,11 +152,15 @@ pub use distro::sovereign_mint_omarchy_innovations_v31::*;
 pub use distro::sovereign_mint_omarchy_v32_apex_arsenal::*;
 pub use distro::sovereign_mint_omarchy_v33_apex_vanguard::*;
 pub use distro::sovereign_mint_omarchy_v34_apex_pantheon::*;
+pub use distro::debian_gap_closure_advancements_v26::*;
+pub use distro::open_source_os_unimplemented_ideas_pr_suite::*;
 pub use distro::sovereign_open_source_os_gap_closure_v27::*;
 pub use distro::sovereign_thousands_distro_components::*;
 pub use distro::sovereign_universal_subsystem_interop::*;
 pub use distro::sovereign_universal_subsystem_interop::*;
+pub use distro::bootable_vertical_slices_missing_components_pr::*;
 pub use distro::sovereign_tech_media_wiki_ultimate_parity_pr::*;
+pub use distro::sovereign_open_source_os_apex_inspirations_v50::*;
 pub use distro::tech_media_publication_innovations::*;
 pub use distro::SovereignMasterSubsystemDistroHarmonizer;
 pub use kernel::tss_ring3_user_mode::*;
@@ -330,19 +339,23 @@ pub use security::hardening;
 pub use security::{
     AnonSurfShunt, AppSandboxEngine, ArithmeticSubstitutionDeobfuscator, CapabilityGate,
     CapabilityToken, ForensicStorageFilter, Permission, PledgeManager, PledgePromise, RoutingMode,
-    SandboxPolicy,
+    SandboxPolicy, SovereignSecurityAndHardeningParityPrGateway,
 };
 pub use shell::{
-    ContextualCompleter, HistoryExpansionEngine, JobControlManager, ParameterExpansionEngine,
-    PipelineExecutor, ShellCommand, ShellManager as ShellProfileManager, ShellPledgeUnveilGuard,
-    ShellProfile, ShellStatistics, ShellSyntaxHighlighter, ShellType,
-    SimpleShellSession as ShellRepl, ZshPromptFormatter,
+    ContextualCompleter, HistoryExpansionEngine, InitSupervisorsAndTimersPrEngine,
+    JobControlManager, ParameterExpansionEngine, PipelineExecutor, PosixAndAdvancedShellsPrEngine,
+    ShellCommand, ShellManager as ShellProfileManager, ShellPledgeUnveilGuard, ShellProfile,
+    ShellStatistics, ShellSyntaxHighlighter, ShellType,
+    ShellsTerminalsSupervisorsPrProposalManifest, SimpleShellSession as ShellRepl,
+    SovereignShellsTerminalsSupervisorsParityPrGateway,
+    TerminalMultiplexersAndEmulatorsPrEngine, ZshPromptFormatter,
 };
 pub use sigpkg::{
     AdapterError, BuildSystem, ContentAddressedStore, CryptoVerifier, DebAdapter,
     PackageDependencyResolver, PacmanAdapter, RecipeError, RecipeManager, RpmAdapter, SatSolver,
     Transaction, Version, MAX_RECIPE_DEPENDENCIES,
 };
+pub use userland::init::SovereignCoreUserlandInitEngine;
 pub use userland::shell::{
     Parser as UserlandShellParser, RedirectSpec, RedirectionEngine, Shell as UserlandShell,
     StreamTarget,
@@ -351,6 +364,7 @@ pub use userland::system_utilities::*;
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
+    sovereign_virtualization_and_containers_pr::*,
 };
 
 pub use thread::{Mutex as ThreadMutex, Thread, ThreadError};
@@ -400,6 +414,13 @@ pub mod monitor;
 pub mod monitoring;
 pub mod net;
 pub mod networking;
+
+pub use net::sovereign_networking_stack_and_daemons_pr::{
+    NetworkingPrProposalManifest, SovereignCoreTcpIpStackEngine, SovereignCryptoTunnelsAndVpnEngine,
+    SovereignDhcpDnsServicesEngine, SovereignNetUtilitiesAndDiagnosticsEngine,
+    SovereignNetworkConfigDaemonsEngine, SovereignNetworkingStackAndDaemonsParityPrGateway,
+    SovereignPacketFilteringAndFirewallEngine, SovereignWirelessAndBluetoothEngine,
+};
 pub mod nlp;
 pub mod notification;
 pub mod onboarding;
