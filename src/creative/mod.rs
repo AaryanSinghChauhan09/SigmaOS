@@ -18,6 +18,11 @@ pub use photocraft::{
 };
 pub use filmcraft::{
     VideoEditor, VideoTrack, Timeline, Effect,
+    VideoCodec, AudioCodec, Resolution, FrameRate,
+    Clip, Transition, TransitionType,
+    ColorGrading, ColorWheel,
+    AudioMixer, AudioChannel,
+    ExportSettings,
     init_filmcraft, get_filmcraft,
 };
 pub use vectorcraft::{
@@ -39,6 +44,9 @@ pub use effectcraft::{
 };
 pub use lightcraft::{
     LightEngine, Light, LightType, Material, Scene,
+    RawFormat, ColorSpace, ToneCurve, ToneCurvePoint, CurveType,
+    ColorMixer, ColorMixerBand, ColorGradingWheel, ThreeWayColorGrading,
+    Mask, MaskType, Preset, PhotoMetadata, Photo, Album, Rating, Flag,
     init_lightcraft, get_lightcraft,
 };
 pub use artcraft::{
