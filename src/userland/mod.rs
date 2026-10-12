@@ -14,6 +14,7 @@ pub mod coreutils_pr_gateway;
 
 pub use coreutils_pr_gateway::*;
 pub use format_runner::*;
+pub use init::*;
 pub use libc::*;
 pub use pkg::*;
 pub use security_sandbox::*;

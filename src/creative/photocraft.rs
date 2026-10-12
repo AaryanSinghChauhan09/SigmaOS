@@ -12,7 +12,7 @@ use alloc::vec::Vec;
 use core::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 
 /// Image layer
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct ImageLayer {
     pub id: u32,
     pub name: String,

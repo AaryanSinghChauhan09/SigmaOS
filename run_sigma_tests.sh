@@ -14,7 +14,11 @@ fi
 if [ -f "tests/io/interrupt.rs" ]; then
     echo "Running Interrupt Manager test suite..."
     mkdir -p build
-    rustc --test tests/io/interrupt.rs --edition=2021 -o build/test_io_interrupt --extern sigmaos=target/debug/libsigmaos.rlib 2>/dev/null || rustc --test tests/io/interrupt.rs --edition=2021 --crate-type bin -o build/test_io_interrupt --extern sigmaos=target/debug/libsigmaos.rlib || true
+    rustc --test tests/io/interrupt.rs --edition=2021 -o build/test_io_interrupt && ./build/test_io_interrupt
+    rustc --test tests/io/dma.rs --edition=2021 -o build/test_io_dma && ./build/test_io_dma
+    rustc --test tests/filesystem/buffer.rs --edition=2021 -o build/test_fs_buffer && ./build/test_fs_buffer
+    rustc --test tests/io/scheduler.rs --edition=2021 -o build/test_io_scheduler && ./build/test_io_scheduler
+    rustc --test tests/io/callback.rs --edition=2021 -o build/test_io_callback && ./build/test_io_callback
 fi
 
 if [ -f "./algorithm_and_components_inspection_tests" ]; then
@@ -104,6 +108,13 @@ if [ -f "src/desktop/mint_backup_tool.rs" ]; then
     mkdir -p build
     rustc --test --edition=2021 src/desktop/mint_backup_tool.rs -o build/mint_backup_tool_test
     ./build/mint_backup_tool_test
+fi
+
+if [ -f "src/backup/sovereign_backup_and_recovery_advancements.rs" ]; then
+    echo "Running Sovereign Backup & Recovery Advancements Master Suite test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/backup/sovereign_backup_and_recovery_advancements.rs -o build/sovereign_backup_advancements_test
+    ./build/sovereign_backup_advancements_test
 fi
 
 if [ -f "src/distro/linux_bsd_inspirations.rs" ]; then
@@ -535,6 +546,13 @@ if [ -f "src/package/sovereign_distro_package_advancements_v35.rs" ]; then
     ./build/sovereign_advancements_v35_test
 fi
 
+if [ -f "src/package/sovereign_distro_package_advancements_v36.rs" ]; then
+    echo "Running Sovereign Universal Package Advancements Suite V36 test suite..."
+    mkdir -p build
+    rustc --test src/package/sovereign_distro_package_advancements_v36.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v36_test
+    ./build/sovereign_advancements_v36_test
+fi
+
 if [ -f "src/package/sovereign_distro_package_advancements_v30.rs" ]; then
     echo "Running Sovereign Universal Package Advancements Suite V30 test suite..."
     mkdir -p build
@@ -647,6 +665,13 @@ if [ -f "src/drivers/sovereign_distro_driver_suite.rs" ]; then
     ./build/test_sovereign_distro_driver_suite
 fi
 
+if [ -f "src/tools/sovereign_localization_and_misc_libraries_pr_suite.rs" ]; then
+    echo "Running Sovereign Localization and Misc Libraries PR Suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/tools/sovereign_localization_and_misc_libraries_pr_suite.rs -o build/sovereign_localization_misc_test
+    ./build/sovereign_localization_misc_test
+fi
+
 if [ -f "src/tools/tech_media_innovations.rs" ]; then
     echo "Running Sovereign Tech Media Innovations test suite..."
     mkdir -p build
@@ -694,6 +719,13 @@ if [ -f "src/boot/sovereign_assembly_bootstrap_pr_suite.rs" ]; then
     mkdir -p build
     rustc --test src/boot/sovereign_assembly_bootstrap_pr_suite.rs --edition=2021 -o build/test_assembly_bootstrap_pr
     ./build/test_assembly_bootstrap_pr
+fi
+
+if [ -f "src/boot/sovereign_kernel_and_bootloader_advancements_v47_pr.rs" ]; then
+    echo "Running Sovereign Kernel & Bootloader Advancements PR Suite V47 test suite..."
+    mkdir -p build
+    rustc --test src/boot/sovereign_kernel_and_bootloader_advancements_v47_pr.rs --edition=2021 -o build/test_kernel_boot_advancements
+    ./build/test_kernel_boot_advancements
 fi
 
 if [ -f "src/distro/sovereign_linux_bsd_ecosystem_pinnacle_suite.rs" ]; then
@@ -899,6 +931,13 @@ if [ -f "src/distro/sovereign_linux_bsd_ecosystem_gap_closure_v43_pr.rs" ]; then
     ./build/test_gap_closure_v43_pr
 fi
 
+if [ -f "src/distro/sovereign_linux_bsd_ecosystem_gap_closure_v46_pr.rs" ]; then
+    echo "Running Sovereign Linux & BSD Ecosystem Gap Closure PR Suite V46 test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_linux_bsd_ecosystem_gap_closure_v46_pr.rs --edition=2021 -o build/test_gap_closure_v46_pr
+    ./build/test_gap_closure_v46_pr
+fi
+
 if [ -f "src/distro/omarchy_linux_gap_closure_pr_suite.rs" ]; then
     echo "Running Omarchy Linux Gap Closure & PR Gateway test suite..."
     mkdir -p build
@@ -948,6 +987,13 @@ if [ -f "src/distro/sovereign_arch_gap_closure_pr_engine.rs" ]; then
     ./build/test_arch_pr_engine
 fi
 
+if [ -f "src/distro/bootable_vertical_slices_missing_components_pr.rs" ]; then
+    echo "Running Bootable Vertical Slices Missing Components PR Suite test suite..."
+    mkdir -p build
+    rustc --test src/distro/bootable_vertical_slices_missing_components_pr.rs --edition=2021 -o build/test_bootable_vertical_slices
+    ./build/test_bootable_vertical_slices
+fi
+
 if [ -f "src/distro/open_source_os_unimplemented_ideas_pr_suite.rs" ]; then
     echo "Running Open Source OS Unimplemented Ideas PR Suite test suite..."
     mkdir -p build
@@ -955,11 +1001,32 @@ if [ -f "src/distro/open_source_os_unimplemented_ideas_pr_suite.rs" ]; then
     ./build/test_open_source_os_unimplemented_ideas_pr_suite
 fi
 
+if [ -f "src/distro/open_source_os_missing_components_v46_pr.rs" ]; then
+    echo "Running Open Source OS Missing Components V46 PR Suite..."
+    mkdir -p build
+    rustc --test src/distro/open_source_os_missing_components_v46_pr.rs --edition=2021 -o build/test_open_source_v46_pr
+    ./build/test_open_source_v46_pr
+fi
+
 if [ -f "src/distro/cachy_linux_missing_components_engine.rs" ]; then
     echo "Running Cachy Linux Missing Components Engine test suite..."
     mkdir -p build
     rustc --test src/distro/cachy_linux_missing_components_engine.rs --edition=2021 -o build/test_cachy_linux_missing_components_engine
     ./build/test_cachy_linux_missing_components_engine
+fi
+
+if [ -f "src/distro/cachy_linux_missing_components_pr_gateway.rs" ]; then
+    echo "Running Cachy Linux Missing Components PR Gateway test suite..."
+    mkdir -p build
+    rustc --test src/distro/cachy_linux_missing_components_pr_gateway.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_cachy_linux_missing_components_pr_gateway
+    ./build/test_cachy_linux_missing_components_pr_gateway
+fi
+
+if [ -f "src/distro/open_source_os_unimplemented_ideas_pr_gateway.rs" ]; then
+    echo "Running Open Source OS Unimplemented Ideas PR Gateway test suite..."
+    mkdir -p build
+    rustc --test src/distro/open_source_os_unimplemented_ideas_pr_gateway.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_open_source_os_unimplemented_ideas_pr_gateway
+    ./build/test_open_source_os_unimplemented_ideas_pr_gateway
 fi
 
 if [ -f "src/distro/sovereign_linux_bsd_ecosystem_advancements_v29.rs" ]; then
@@ -1050,6 +1117,13 @@ if [ -f "src/installer/migration_installer_pipeline.rs" ]; then
     ./build/test_installer_pipeline
 fi
 
+if [ -f "src/installer/sovereign_installer_and_system_tools_advancements.rs" ]; then
+    echo "Running Sovereign Installer and System Tools Advancements test suite..."
+    mkdir -p build
+    rustc --test src/installer/sovereign_installer_and_system_tools_advancements.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_installer_advancements
+    ./build/test_installer_advancements
+fi
+
 if [ -f "src/compatibility/mint_omarchy_migration_bridge.rs" ]; then
     echo "Running Mint & Omarchy Migration Bridge test suite..."
     mkdir -p build
@@ -1072,6 +1146,28 @@ if [ -f "src/distro/open_source_os_unimplemented_ideas_pr_suite.rs" ]; then
     mkdir -p build
     rustc --test src/distro/open_source_os_unimplemented_ideas_pr_suite.rs --edition=2021 -o build/test_os_ideas_suite
     ./build/test_os_ideas_suite
+fi
+
+<<<<<<< HEAD
+if [ -f "src/distro/open_source_os_unimplemented_ideas_pr_gateway.rs" ]; then
+    echo "Running Open Source OS Unimplemented Ideas PR Gateway test suite..."
+    mkdir -p build
+    rustc --test src/distro/open_source_os_unimplemented_ideas_pr_gateway.rs --edition=2021 -o build/test_os_ideas_gateway
+    ./build/test_os_ideas_gateway
+fi
+
+if [ -f "src/distro/arch_linux_github_repo_components_pr_engine.rs" ]; then
+    echo "Running Arch Linux GitHub Repo Components PR Engine test suite..."
+    mkdir -p build
+    rustc --test src/distro/arch_linux_github_repo_components_pr_engine.rs --edition=2021 -o build/test_arch_github_repo_components
+    ./build/test_arch_github_repo_components
+=======
+if [ -f "src/distro/sovereign_open_source_os_fedora_github_pr_suite.rs" ]; then
+    echo "Running Sovereign Open Source OS Fedora GitHub PR Suite test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_open_source_os_fedora_github_pr_suite.rs --edition=2021 -o build/test_fedora_github_pr_suite
+    ./build/test_fedora_github_pr_suite
+>>>>>>> origin/main
 fi
 
 if [ -f "src/distro/debian_github_repo_inspirations_pr.rs" ]; then
@@ -1109,11 +1205,59 @@ if [ -f "src/drivers/sovereign_device_driver_development_and_pr_suite.rs" ]; the
     ./build/test_device_driver_pr_suite
 fi
 
+<<<<<<< HEAD
 if [ -f "src/userland/coreutils_pr_gateway.rs" ]; then
     echo "Running Core Utilities & PR Gateway test suite..."
     mkdir -p build
     rustc --test src/userland/coreutils_pr_gateway.rs --edition=2021 -o build/test_coreutils_pr_gateway
     ./build/test_coreutils_pr_gateway
+=======
+<<<<<<< HEAD
+if [ -f "src/userland/system_utilities.rs" ]; then
+    echo "Running System Utilities Architecture & Registry Framework test suite..."
+    mkdir -p build
+    rustc --test src/userland/system_utilities.rs --edition=2021 -o build/test_system_utilities
+    ./build/test_system_utilities
+=======
+<<<<<<< HEAD
+if [ -f "src/productivity/sovereign_application_replacements_pr_suite.rs" ]; then
+    echo "Running Sovereign Application Replacements PR Suite..."
+    mkdir -p build
+    rustc --test src/productivity/sovereign_application_replacements_pr_suite.rs --edition=2021 -o build/test_app_replacements_pr_suite
+    ./build/test_app_replacements_pr_suite
+=======
+<<<<<<< HEAD
+if [ -f "src/system_apps/sovereign_system_apps_development_and_pr_suite.rs" ]; then
+    echo "Running Sovereign System Applications Development and PR Gateway Suite..."
+    mkdir -p build
+    rustc --test src/system_apps/sovereign_system_apps_development_and_pr_suite.rs --edition=2021 -o build/test_system_apps_pr_suite
+    ./build/test_system_apps_pr_suite
+=======
+<<<<<<< HEAD
+if [ -f "src/net/sovereign_network_development_and_pr_suite.rs" ]; then
+    echo "Running Sovereign Network Development and PR Suite..."
+    mkdir -p build
+    rustc --test src/net/sovereign_network_development_and_pr_suite.rs --edition=2021 -o build/test_network_development_pr_suite
+    ./build/test_network_development_pr_suite
+=======
+<<<<<<< HEAD
+if [ -f "src/shell/sovereign_command_interpreter.rs" ]; then
+    echo "Running Sovereign Command Interpreter and 17-PR Gateway Suite..."
+    mkdir -p build
+    rustc --test src/shell/sovereign_command_interpreter.rs --edition=2021 -o build/test_command_interpreter
+    ./build/test_command_interpreter
+=======
+if [ -f "src/distro/sovereign_open_source_os_apex_inspirations_v50.rs" ]; then
+    echo "Running Sovereign Open Source OS Apex Inspirations Engine (V50) test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_open_source_os_apex_inspirations_v50.rs --edition=2021 -o build/test_apex_v50
+    ./build/test_apex_v50
+>>>>>>> origin/main
+>>>>>>> origin/main
+>>>>>>> origin/main
+>>>>>>> origin/main
+>>>>>>> origin/main
+>>>>>>> origin/main
 fi
 
 echo "All SigmaOS test suites completed."

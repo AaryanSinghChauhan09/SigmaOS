@@ -7,9 +7,13 @@ pub mod orchestration;
 pub mod rancher;
 pub mod virtiofsd;
 pub mod firecracker;
-
+pub mod virtualization_pr_gateway;
 
 pub use virtiofsd::{VirtioFsConfig, VirtioFsDaemon, VirtioFsInodeMap};
+pub use virtualization_pr_gateway::{
+    SovereignVirtualizationPrGatewayEngine, VirtualizationPrCategory, VirtualizationPrStatus,
+    VirtualizationPrSubmission, VirtualizationTechnologyFormat,
+};
 
 
 pub use kvm_vcpu::{
@@ -33,3 +37,6 @@ pub use vendor_hardware::{
     AmdVmcbExecutionBlock, IntelVmcsExecutionState, MultiVendorVirtualizationEngine,
     NvidiaVgpuMediatedInstance, VirtualizationVendorType,
 };
+
+pub mod sovereign_virtualization_and_containers_pr;
+pub use sovereign_virtualization_and_containers_pr::*;
