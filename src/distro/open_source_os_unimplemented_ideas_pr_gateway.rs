@@ -22,14 +22,9 @@
 use std::collections::BTreeMap;
 use std::string::String;
 
-#[cfg(not(feature = "standalone_test"))]
-use crate::distro::open_source_os_unimplemented_ideas_pr_suite::OpenSourceOsUnimplementedIdeasPrMasterSuite;
-
-#[cfg(feature = "standalone_test")]
 #[path = "open_source_os_unimplemented_ideas_pr_suite.rs"]
 mod open_source_os_unimplemented_ideas_pr_suite;
 
-#[cfg(feature = "standalone_test")]
 use open_source_os_unimplemented_ideas_pr_suite::OpenSourceOsUnimplementedIdeasPrMasterSuite;
 
 /// Open Source Operating System PR Category Classification
