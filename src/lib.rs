@@ -61,7 +61,12 @@ pub use package::{
     SovereignDistroPackageAdvancementsSuiteV14, SovereignDistroPackageAdvancementsSuiteV19,
     SovereignDistroPackageAdvancementsSuiteV20, SovereignDistroPackageAdvancementsSuiteV32,
     SovereignDistroPackageAdvancementsSuiteV33, SovereignDistroPackageAdvancementsSuiteV36,
+<<<<<<< HEAD
+    UniversalForeignPackageFormat,
+    UniversalForeignPackageFormatConverter,
+=======
     UniversalForeignPackageFormat, UniversalForeignPackageFormatConverter,
+>>>>>>> origin/main
 };
 pub mod process;
 pub mod productivity;
