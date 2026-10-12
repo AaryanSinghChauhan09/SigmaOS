@@ -439,6 +439,24 @@ pub use terminal::{
     ColorScheme, CursorShape, ScrollbarPosition, BellMode,
     init_terminal, get_terminal,
 };
+pub use text_editor::{
+    TextEditor, Document, CursorPosition, Selection, EditorState,
+    Language, Theme, TabSize, LineEnding, Encoding,
+    init_text_editor, get_text_editor,
+};
+pub use calculator::{
+    Calculator, CalculatorMode, AngleUnit, MemoryOperation, CalculatorError,
+    init_calculator, get_calculator,
+};
+pub use calendar::{
+    CalendarManager, Calendar, Event, EventColor, Reminder, Recurrence, Date,
+    init_calendar, get_calendar,
+};
+pub use image_viewer::{
+    ImageViewer, Image, ImageMetadata,
+    ZoomMode, Rotation, FlipDirection, SlideshowMode,
+    init_image_viewer, get_image_viewer,
+};
 pub mod webapp_manager;
 pub use webapp_manager::*;
 pub mod appstore;
@@ -460,6 +478,10 @@ pub mod panel;
 pub mod screenshot;
 pub mod settings;
 pub mod terminal;
+pub mod text_editor;
+pub mod calculator;
+pub mod calendar;
+pub mod image_viewer;
 pub mod text_scaling;
 pub mod universal_desktop_framework;
 pub mod volume_manager;
