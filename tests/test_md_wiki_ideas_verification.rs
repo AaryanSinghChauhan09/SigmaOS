@@ -16,36 +16,23 @@ use wiki_unimplemented_ideas::*;
 
 #[test]
 fn test_sovereign_wiki_master_engine_full_parity() {
-    let suite = MasterWikiAndRoadmapVerificationSuite::new();
-    assert!(suite.health_check());
-    assert!(suite
-        .summary_report()
-        .contains("Parity Verification: 100.0%"));
+    let master = SovereignWikiMasterEngine::new();
+    assert!(master.evaluate_master_wiki_fulfillment());
 
-    let idea = RoadmapFeatureIdea {
-        idea_id: 1,
-        title: "Test Idea".to_string(),
-        source_type: FeatureSourceType::GithubWikiPage,
-        source_file: "wiki/01.md".to_string(),
-        target_module: "kernel".to_string(),
-        is_fully_implemented: true,
+    let idea = ImprovementIdeaRecord {
+        id: 1,
+        category: IdeaCategory::SystemUtilities,
+        name: "Test Idea".to_string(),
+        legacy_counterparts: "systemd, openrc".to_string(),
+        implementation_module: "src/system/sovereign_init_and_supervisor_inspirations_pr.rs".to_string(),
+        is_fulfilled: true,
     };
-    assert_eq!(idea.idea_id, 1);
-    assert_eq!(idea.title, "Test Idea");
-    assert_eq!(idea.source_type, FeatureSourceType::GithubWikiPage);
-    assert_eq!(idea.source_file, "wiki/01.md");
-    assert_eq!(idea.target_module, "kernel");
-    assert!(idea.is_fully_implemented);
-
-    let idea2 = RoadmapFeatureIdea {
-        idea_id: 2,
-        title: "Distro Spec".to_string(),
-        source_type: FeatureSourceType::DistroRoadmapSpec,
-        source_file: "wiki/02.md".to_string(),
-        target_module: "distro".to_string(),
-        is_fully_implemented: true,
-    };
-    assert_eq!(idea2.source_type, FeatureSourceType::DistroRoadmapSpec);
+    assert_eq!(idea.id, 1);
+    assert_eq!(idea.name, "Test Idea");
+    assert_eq!(idea.category, IdeaCategory::SystemUtilities);
+    assert_eq!(idea.legacy_counterparts, "systemd, openrc");
+    assert_eq!(idea.implementation_module, "src/system/sovereign_init_and_supervisor_inspirations_pr.rs");
+    assert!(idea.is_fulfilled);
 }
 
 #[test]
