@@ -12,6 +12,7 @@ pub mod lightcraft;
 pub mod mediacraft;
 pub mod audiocraft;
 pub mod vectoranimation;
+pub mod model3d;
 pub mod artcraft;
 
 pub use photocraft::{
@@ -86,6 +87,13 @@ pub use vectoranimation::{
     Keyframe, InterpolationMode, Bone, Rig, Timeline, OnionSkin,
     AnimationExportFormat,
     init_vectoranimation, get_vectoranimation,
+};
+pub use model3d::{
+    Scene as Model3DScene, Object3D, Mesh, Vertex,
+    MeshType, ObjectType, SculptBrushType, SculptBrush,
+    Material, Light, LightType, Camera,
+    ExportFormat as Model3DExportFormat,
+    init_model3d, get_model3d,
 };
 pub use artcraft::{
     ArtSuite, Project, Workspace,

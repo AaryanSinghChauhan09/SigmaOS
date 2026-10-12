@@ -22,6 +22,7 @@ pub mod container;
 pub mod contributing;
 pub mod creative;
 pub mod customization;
+pub mod database;
 pub mod dashboard;
 pub mod desktop;
 pub mod development;
