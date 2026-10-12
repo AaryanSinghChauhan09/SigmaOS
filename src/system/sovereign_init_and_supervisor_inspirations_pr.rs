@@ -120,6 +120,21 @@ impl SystemdInspirationsPrEngine {
         (status, status_msg, main_pid)
     }
 
+    /// Parse watchdog keep-alive deadline (`WATCHDOG=1` or `WATCHDOG_USEC=5000000`).
+    pub fn parse_watchdog_usec(&self, payload: &str) -> Option<u64> {
+        for line in payload.split('\n') {
+            let line = line.trim();
+            if line.starts_with("WATCHDOG_USEC=") {
+                if let Ok(usec) = line[14..].parse::<u64>() {
+                    return Some(usec);
+                }
+            } else if line == "WATCHDOG=1" {
+                return Some(5_000_000); // Standard 5s default fallback
+            }
+        }
+        None
+    }
+
     /// Validate Cgroups v2 resource limits configuration.
     pub fn validate_cgroups_v2_limits(
         &self,
@@ -220,6 +235,40 @@ impl OpenRcInspirationsPrEngine {
         (service_name, need, use_deps)
     }
 
+    /// Topologically sort services based on dependency graphs with cycle mitigation.
+    pub fn resolve_runlevel_dependencies(&self, services: &[(&str, &[&str])]) -> Vec<String> {
+        let mut ordered = Vec::new();
+        let mut visited = Vec::new();
+
+        let mut remaining: Vec<(&str, &[&str])> = services.to_vec();
+
+        while !remaining.is_empty() {
+            let mut progress = false;
+            let mut idx = 0;
+            while idx < remaining.len() {
+                let (svc, deps) = remaining[idx];
+                let all_met = deps.iter().all(|d| visited.contains(&d.to_string()));
+                if all_met {
+                    visited.push(svc.to_string());
+                    ordered.push(svc.to_string());
+                    remaining.remove(idx);
+                    progress = true;
+                } else {
+                    idx += 1;
+                }
+            }
+
+            if !progress && !remaining.is_empty() {
+                // Dependency cycle detected; force push first remaining item
+                let (svc, _) = remaining.remove(0);
+                visited.push(svc.to_string());
+                ordered.push(svc.to_string());
+            }
+        }
+
+        ordered
+    }
+
     /// Plan OpenRC runlevel transition queue.
     pub fn transition_runlevel(
         &self,
@@ -295,6 +344,29 @@ impl RunitS6InspirationsPrEngine {
             RunitS6State::Starting
         } else {
             RunitS6State::Up
+        }
+    }
+
+    /// Compute exponential backoff restart delay to prevent supervision thrashing.
+    pub fn calculate_backoff_delay(&self, restart_count: u32, max_delay_sec: u32) -> u32 {
+        if restart_count == 0 {
+            return 0;
+        }
+        let delay = 1u32.checked_shl(restart_count - 1).unwrap_or(max_delay_sec);
+        delay.min(max_delay_sec)
+    }
+
+    /// Evaluate `s6-log` log filter directive (`+` include, `-` exclude pattern).
+    pub fn match_s6_log_filter(&self, filter_expr: &str, log_line: &str) -> bool {
+        let filter_expr = filter_expr.trim();
+        if filter_expr.starts_with('+') {
+            let pattern = filter_expr[1..].trim_matches('*');
+            pattern.is_empty() || log_line.contains(pattern)
+        } else if filter_expr.starts_with('-') {
+            let pattern = filter_expr[1..].trim_matches('*');
+            !(pattern.is_empty() || log_line.contains(pattern))
+        } else {
+            true
         }
     }
 
@@ -414,6 +486,26 @@ impl SysVinitInspirationsPrEngine {
         })
     }
 
+    /// Sort `/etc/rc.d/rc*.d/` scripts into ordered Kill (`K*`) and Start (`S*`) execution lists.
+    pub fn sort_rc_d_scripts(&self, scripts: &[&str]) -> (Vec<String>, Vec<String>) {
+        let mut kill_scripts = Vec::new();
+        let mut start_scripts = Vec::new();
+
+        for s in scripts {
+            let filename = s.trim();
+            if filename.starts_with('K') {
+                kill_scripts.push(filename.to_string());
+            } else if filename.starts_with('S') {
+                start_scripts.push(filename.to_string());
+            }
+        }
+
+        kill_scripts.sort();
+        start_scripts.sort();
+
+        (kill_scripts, start_scripts)
+    }
+
     /// Simulate `telinit` command runlevel transition dispatching.
     pub fn execute_telinit(&self, target_runlevel: u8, entries: &[SysVInittabEntry]) -> Vec<String> {
         let mut commands = Vec::new();
@@ -526,6 +618,28 @@ impl BsdRcInspirationsPrEngine {
         map
     }
 
+    /// Merge `/etc/rc.conf.local` overrides onto base `/etc/rc.conf`.
+    pub fn merge_rc_conf_overrides(
+        &self,
+        base_conf: &BTreeMap<String, String>,
+        local_conf: &BTreeMap<String, String>,
+    ) -> BTreeMap<String, String> {
+        let mut merged = base_conf.clone();
+        for (k, v) in local_conf {
+            merged.insert(k.clone(), v.clone());
+        }
+        merged
+    }
+
+    /// Build `rc.subr` status check command.
+    pub fn build_rc_subr_status_query(&self, service_name: &str, pid_file: Option<&str>) -> String {
+        if let Some(pf) = pid_file {
+            alloc::format!("/etc/rc.d/{} status -p {}", service_name, pf)
+        } else {
+            alloc::format!("/etc/rc.d/{} status", service_name)
+        }
+    }
+
     /// Execute `rc.subr` command action routing (start, stop, restart, status, poll).
     pub fn execute_rc_subr_action(
         &self,
@@ -579,6 +693,24 @@ pub struct LaunchdInspirationsPrEngine;
 impl LaunchdInspirationsPrEngine {
     pub fn new() -> Self {
         Self
+    }
+
+    /// Evaluate macOS plist `KeepAlive` rules dictionary (SuccessfulExit, PathState, NetworkState).
+    pub fn evaluate_keep_alive_rules(
+        &self,
+        config: &LaunchdJobConfig,
+        last_exit_code: i32,
+        path_exists: bool,
+        network_up: bool,
+    ) -> bool {
+        if !config.keep_alive {
+            return false;
+        }
+        // If last exit code was non-zero, keep alive should restart
+        if last_exit_code != 0 {
+            return true;
+        }
+        path_exists || network_up
     }
 
     /// Simulate macOS / NextStep `launchd` IPC socket activation & Mach port event trigger.
@@ -639,6 +771,19 @@ pub struct CronAnacronTimersAtPrEngine;
 impl CronAnacronTimersAtPrEngine {
     pub fn new() -> Self {
         Self
+    }
+
+    /// Expand cron shorthand aliases (`@reboot`, `@hourly`, `@daily`, `@weekly`, `@monthly`, `@yearly`).
+    pub fn expand_cron_shorthand_alias(&self, alias: &str) -> Option<&'static str> {
+        match alias.trim() {
+            "@reboot" => Some("@reboot"),
+            "@hourly" => Some("0 * * * *"),
+            "@daily" | "@midnight" => Some("0 0 * * *"),
+            "@weekly" => Some("0 0 * * 0"),
+            "@monthly" => Some("0 0 1 * *"),
+            "@yearly" | "@annually" => Some("0 0 1 1 *"),
+            _ => None,
+        }
     }
 
     /// Evaluate Vixie Cron minute-resolution schedule matcher.
@@ -718,6 +863,15 @@ impl CronAnacronTimersAtPrEngine {
         }
     }
 
+    /// Sort `at` job queue by timestamp and priority letter (`'a'..'z'`).
+    pub fn sort_at_job_queue(&self, queue: &mut [AtJobSpec]) {
+        queue.sort_by(|a, b| {
+            a.run_at_timestamp
+                .cmp(&b.run_at_timestamp)
+                .then_with(|| a.queue_letter.cmp(&b.queue_letter))
+        });
+    }
+
     /// Process `at` / `batch` deferred job queue.
     pub fn pop_ready_at_jobs(
         &self,
@@ -793,6 +947,50 @@ impl SovereignInitAndSupervisorParityPrGateway {
             self.cron_timers_at.generate_proposal(),
         ]
     }
+
+    /// Render a comprehensive Pull Request proposal document in Markdown format.
+    pub fn generate_pr_proposal_markdown(&self) -> String {
+        let proposals = self.collect_all_proposals();
+        let mut doc = String::from("# Pull Request Proposal: Core Userland Supervisors, Init Systems, Timers & Job Schedulers Parity\n\n");
+        doc.push_str("## Executive Summary\n\n");
+        doc.push_str("This Pull Request introduces zero-dependency `#![no_std]` / `alloc` native parity engines for core userland supervisors, init systems, service managers, and task schedulers inspired by landmark Linux and BSD distributions.\n\n");
+        doc.push_str("## Subsystem Parity Matrix\n\n");
+        doc.push_str("| Target Subsystem | Original Init / Supervisor | Status | Performance / Capability Multiplier |\n");
+        doc.push_str("|:-----------------|:---------------------------|:-------|:------------------------------------|\n");
+
+        for prop in &proposals {
+            doc.push_str(&alloc::format!(
+                "| {} | {} | {} | {} |\n",
+                prop.target_subsystem, prop.original_system, prop.status, prop.performance_multiplier
+            ));
+        }
+
+        doc.push_str("\n## Proposed Architectural Components\n\n");
+        for (idx, prop) in proposals.iter().enumerate() {
+            doc.push_str(&alloc::format!(
+                "### {}. {}\n\n",
+                idx + 1, prop.pr_title
+            ));
+            doc.push_str(&alloc::format!(
+                "- **Original System**: {}\n", prop.original_system
+            ));
+            doc.push_str(&alloc::format!(
+                "- **Target Subsystem**: {}\n", prop.target_subsystem
+            ));
+            doc.push_str(&alloc::format!(
+                "- **Performance Impact**: {}\n\n", prop.performance_multiplier
+            ));
+            doc.push_str("**Added Submodules & Protocols:**\n");
+            for comp in &prop.components_added {
+                doc.push_str(&alloc::format!("- {}\n", comp));
+            }
+            doc.push('\n');
+        }
+
+        doc.push_str("## Implementation & Verification Strategy\n\n");
+        doc.push_str("All engines are fully verified via zero-dependency standalone Rust unit test suites (`--cfg 'feature=\"standalone_test\"'`), ensuring fast, deterministic, non-blocking execution in kernel and bare-metal environments.\n");
+        doc
+    }
 }
 
 // ============================================================================
@@ -817,6 +1015,9 @@ mod tests {
         assert_eq!(msg, Some("Operational".to_string()));
         assert_eq!(pid, Some(1024));
 
+        let wd = engine.parse_watchdog_usec("WATCHDOG_USEC=2000000");
+        assert_eq!(wd, Some(2000000));
+
         assert!(engine.validate_cgroups_v2_limits(512 * 1024 * 1024, 100, 256));
 
         let entry = engine.format_journald_entry("my-daemon", 6, "Started successfully", &[("UNIT", "my.service")]);
@@ -833,6 +1034,9 @@ mod tests {
         assert_eq!(need, vec!["net"]);
         assert_eq!(use_deps, vec!["logger"]);
 
+        let res = engine.resolve_runlevel_dependencies(&[("sshd", &["net"]), ("net", &[])]);
+        assert_eq!(res, vec!["net", "sshd"]);
+
         let services = [("sysfs", OpenRcRunlevel::SysInit), ("sshd", OpenRcRunlevel::Default)];
         let plan = engine.transition_runlevel(OpenRcRunlevel::SysInit, OpenRcRunlevel::Default, &services);
         assert_eq!(plan, vec!["sshd"]);
@@ -843,6 +1047,12 @@ mod tests {
         let engine = RunitS6InspirationsPrEngine::new();
         let status = engine.scan_runit_service_dir("ntpd", true, false);
         assert_eq!(status, RunitS6State::Up);
+
+        let delay = engine.calculate_backoff_delay(3, 60);
+        assert_eq!(delay, 4);
+
+        assert!(engine.match_s6_log_filter("+ERROR*", "ERROR: disk space low"));
+        assert!(!engine.match_s6_log_filter("-ERROR*", "ERROR: disk space low"));
 
         let steps = engine.compute_s6_transition_plan(true, RunitS6State::Down, &["dbus"]);
         assert!(steps.contains(&"s6-svc -u /service/dbus".to_string()));
@@ -858,6 +1068,10 @@ mod tests {
         assert_eq!(entry.id, "id");
         assert_eq!(entry.runlevels, vec![2, 3, 4, 5]);
         assert_eq!(entry.action, SysVInittabAction::Respawn);
+
+        let (k, s) = engine.sort_rc_d_scripts(&["S20sysctl", "K10network", "S10network"]);
+        assert_eq!(k, vec!["K10network"]);
+        assert_eq!(s, vec!["S10network", "S20sysctl"]);
 
         let cmds = engine.execute_telinit(3, &[entry]);
         assert_eq!(cmds.len(), 1);
@@ -886,6 +1100,13 @@ mod tests {
         let conf = engine.parse_rc_conf("sshd_enable=\"YES\"\nhostname=\"sigma\"\n");
         assert_eq!(conf.get("sshd_enable"), Some(&"YES".to_string()));
 
+        let local_conf = engine.parse_rc_conf("sshd_flags=\"-4\"\n");
+        let merged = engine.merge_rc_conf_overrides(&conf, &local_conf);
+        assert_eq!(merged.get("sshd_flags"), Some(&"-4".to_string()));
+
+        let status_cmd = engine.build_rc_subr_status_query("sshd", Some("/var/run/sshd.pid"));
+        assert_eq!(status_cmd, "/etc/rc.d/sshd status -p /var/run/sshd.pid");
+
         let res = engine.execute_rc_subr_action("sshd", "start", true, "-4");
         assert!(res.contains("Executing rc.subr: sshd start"));
     }
@@ -893,12 +1114,22 @@ mod tests {
     #[test]
     fn test_launchd_engine() {
         let engine = LaunchdInspirationsPrEngine::new();
+        let cfg = LaunchdJobConfig {
+            label: "com.example.daemon".to_string(),
+            program_arguments: vec!["/usr/bin/daemon".to_string()],
+            keep_alive: true,
+            throttle_interval_sec: 10,
+            sockets: vec![("IPv4".to_string(), 80)],
+        };
+        assert!(engine.evaluate_keep_alive_rules(&cfg, 1, false, false));
         assert!(engine.trigger_launchd_socket_activation("com.apple.sshd", "IPv4", 22));
     }
 
     #[test]
     fn test_cron_timers_at_engine() {
         let engine = CronAnacronTimersAtPrEngine::new();
+
+        assert_eq!(engine.expand_cron_shorthand_alias("@daily"), Some("0 0 * * *"));
 
         // Cron matcher
         assert!(engine.parse_and_match_cron("*/5", "12", "*", "*", "*", 10, 12, 1, 1, 1));
@@ -916,6 +1147,13 @@ mod tests {
         // at queue
         let mut queue = vec![
             AtJobSpec {
+                job_id: 2,
+                run_at_timestamp: 800,
+                queue_letter: 'a',
+                command: "later.sh".to_string(),
+                user: "root".to_string(),
+            },
+            AtJobSpec {
                 job_id: 1,
                 run_at_timestamp: 500,
                 queue_letter: 'a',
@@ -923,9 +1161,12 @@ mod tests {
                 user: "root".to_string(),
             },
         ];
+        engine.sort_at_job_queue(&mut queue);
+        assert_eq!(queue[0].job_id, 1);
+
         let ready = engine.pop_ready_at_jobs(&mut queue, 600, 0.5);
         assert_eq!(ready.len(), 1);
-        assert!(queue.is_empty());
+        assert_eq!(queue.len(), 1);
     }
 
     #[test]
@@ -938,5 +1179,11 @@ mod tests {
             assert_eq!(prop.status, "Ready for Merge");
             assert!(!prop.components_added.is_empty());
         }
+
+        let markdown = gateway.generate_pr_proposal_markdown();
+        assert!(markdown.contains("# Pull Request Proposal: Core Userland Supervisors"));
+        assert!(markdown.contains("systemd"));
+        assert!(markdown.contains("OpenRC"));
+        assert!(markdown.contains("launchd"));
     }
 }
