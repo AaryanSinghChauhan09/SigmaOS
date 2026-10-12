@@ -1257,14 +1257,16 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
     }
 
     pub fn format_all_pr_proposals(&self) -> String {
-        let mut all_prs = String::from(
-            "# Master Suite PR Proposals Synthesized from Tech Media Publications & OS Parity\n\n",
+        let mut all_prs = format!(
+            "# SigmaOS Tech Media Multi-Portal PR Proposals Manifest\nTotal Registered Portals: {}\n\n",
+            self.insights.len()
         );
         for insight in &self.insights {
             all_prs.push_str(&format!(
                 "## PR Proposal: [{}] {}\n",
                 insight.publication, insight.title
             ));
+            all_prs.push_str(&format!("- **Domain:** {}\n", insight.publication_domain));
             all_prs.push_str(&format!("- **Category:** {}\n", insight.category));
             all_prs.push_str(&format!(
                 "- **Action:** {}\n",

@@ -21,6 +21,7 @@ pub mod screen_recorder;
 pub mod screenshot;
 pub mod sigma_office;
 pub mod sigmadev;
+pub mod sovereign_application_replacements_pr_suite;
 pub mod sovereign_apps;
 pub mod subtitle_editor;
 pub mod system_settings;
@@ -44,6 +45,15 @@ pub use gamification::{
 pub use media::{AudioChannel, SigmaMediaEngine, GLOBAL_MEDIA_ENGINE};
 pub use reminders_advanced::{
     EnhancedRemindersEngine, RecurrencePattern, ReminderItem, ReminderPriority,
+};
+pub use sovereign_application_replacements_pr_suite::{
+    BrowserSandboxPolicy, ContainerIsolationLevel, DocumentFileType, EmailSecurityProtocol,
+    FileManagerLayout, LayerBlendMode, OfficeSuiteComponent, SovereignAppPrProposalManifest,
+    SovereignApplicationReplacementsPrGateway, SovereignBrowserEnginePrEngine,
+    SovereignDocumentViewerPrEngine, SovereignEditorEmulationMode,
+    SovereignFileManagerMatrixPrEngine, SovereignLibreOfficeSuitePrEngine,
+    SovereignRasterGraphicsPrEngine, SovereignTextEditorsPrEngine,
+    SovereignThunderbirdEmailPrEngine, VfsMountProtocol,
 };
 pub use sovereign_apps::{
     ProductivityTask, SigmaOfficeDocument, SigmaTasksBoard, SigmaVaultContainer, TaskPriority,
