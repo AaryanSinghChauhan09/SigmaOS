@@ -1,7 +1,10 @@
 //! Standalone Callback Manager Integration & Unit Tests
 
+#[path = "../../src/io/mod.rs"]
+pub mod io;
+
 use std::sync::atomic::{AtomicBool, Ordering};
-use sigmaos::io::{CallbackManager, CallbackStatus};
+use io::{CallbackManager, CallbackStatus};
 
 static CALLBACK_EXECUTED: AtomicBool = AtomicBool::new(false);
 
