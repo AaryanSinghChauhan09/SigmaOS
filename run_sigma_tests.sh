@@ -1109,4 +1109,11 @@ if [ -f "src/drivers/sovereign_device_driver_development_and_pr_suite.rs" ]; the
     ./build/test_device_driver_pr_suite
 fi
 
+if [ -f "src/net/sovereign_network_development_and_pr_suite.rs" ]; then
+    echo "Running Sovereign Network Development and PR Suite..."
+    mkdir -p build
+    rustc --test src/net/sovereign_network_development_and_pr_suite.rs --edition=2021 -o build/test_network_development_pr_suite
+    ./build/test_network_development_pr_suite
+fi
+
 echo "All SigmaOS test suites completed."
