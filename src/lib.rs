@@ -98,6 +98,7 @@ pub use desktop::{
     PopOsKdeTilingWorkspaceGridEngine, SovereignUxMasterEngine, SwayRegolithWmEngine,
     WindowsCopilotAiAssistantSidebar, Xfce418Engine,
 };
+pub use desktop::sovereign_desktop_toolkits_and_services::*;
 pub use kernel::{
     CfiFunctionSignature, KptrRestrictLevel, SovereignHardenedSecurityMitigationsEngine,
     SovereignKernelDistroParityPrGateway, SovereignLinuxBsdKernelInnovationsPrGateway,
