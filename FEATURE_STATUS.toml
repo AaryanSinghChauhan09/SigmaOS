@@ -5,6 +5,13 @@
 # Values such as "working" are legacy component statuses; use docs/PROJECT_STATUS.md and
 # the owning wiki page for integration, release blockers, tested configuration, and limitations.
 
+[kernel.dispatcher]
+status = "modeled"
+files = ["docs/DISPATCHER_PLAN.md", "wiki/DISPATCHER_PLAN.md"]
+description = "Master Architecture & Support Matrix Plan for SigmaOS dispatcher: boundary definition between scheduler, context-switch, interrupt handling, and deferred work; 8 invariants, 16-PR roadmap, periodic maintenance cadences, component rules, PR template, and merge gates."
+test_evidence = "Architecture specification published in docs/DISPATCHER_PLAN.md and wiki/DISPATCHER_PLAN.md"
+next_milestone = "PR 1: Define scheduler-dispatcher-IRQ boundaries & PR 2: Context-frame layout and invariant tests"
+
 [kernel.thread_manager]
 status = "modeled"
 files = ["docs/thread-manager.md"]
