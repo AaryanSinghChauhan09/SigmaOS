@@ -345,6 +345,11 @@ impl WikiDataTransferEngine {
             "Periodic Study Improve Prove Program PR Proposal",
             true,
         );
+        self.register_spec_file(
+            "34-SigmaOS-Command-Interpreter-Plan.md",
+            "Command Interpreter Development Plan PR",
+            true,
+        );
     }
 
     pub fn register_spec_file(&mut self, filename: &str, title: &str, fully_implemented: bool) {

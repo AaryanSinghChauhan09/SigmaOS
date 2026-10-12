@@ -1109,4 +1109,11 @@ if [ -f "src/drivers/sovereign_device_driver_development_and_pr_suite.rs" ]; the
     ./build/test_device_driver_pr_suite
 fi
 
+if [ -f "src/shell/sovereign_command_interpreter.rs" ]; then
+    echo "Running Sovereign Command Interpreter and 17-PR Gateway Suite..."
+    mkdir -p build
+    rustc --test src/shell/sovereign_command_interpreter.rs --edition=2021 -o build/test_command_interpreter
+    ./build/test_command_interpreter
+fi
+
 echo "All SigmaOS test suites completed."
