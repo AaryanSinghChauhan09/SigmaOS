@@ -30,14 +30,14 @@ pub enum SigmaLogLevel {
 impl fmt::Display for SigmaLogLevel {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            SigmaSigmaLogLevel::Emergency => write!(f, "EMERGENCY"),
-            SigmaSigmaLogLevel::Alert => write!(f, "ALERT"),
-            SigmaSigmaLogLevel::Critical => write!(f, "CRITICAL"),
-            SigmaSigmaLogLevel::Error => write!(f, "ERROR"),
-            SigmaSigmaLogLevel::Warning => write!(f, "WARNING"),
-            SigmaSigmaLogLevel::Notice => write!(f, "NOTICE"),
-            SigmaSigmaLogLevel::Info => write!(f, "INFO"),
-            SigmaSigmaLogLevel::Debug => write!(f, "DEBUG"),
+            SigmaLogLevel::Emergency => write!(f, "EMERGENCY"),
+            SigmaLogLevel::Alert => write!(f, "ALERT"),
+            SigmaLogLevel::Critical => write!(f, "CRITICAL"),
+            SigmaLogLevel::Error => write!(f, "ERROR"),
+            SigmaLogLevel::Warning => write!(f, "WARNING"),
+            SigmaLogLevel::Notice => write!(f, "NOTICE"),
+            SigmaLogLevel::Info => write!(f, "INFO"),
+            SigmaLogLevel::Debug => write!(f, "DEBUG"),
         }
     }
 }
@@ -336,7 +336,7 @@ impl SigmaLogConfig {
         Self {
             storage: LogStorage::Memory,
             rotation: RotationPolicy::default(),
-            default_level: SigmaSigmaLogLevel::Info,
+            default_level: SigmaLogLevel::Info,
             console_output: true,
             persistent: false,
             max_memory_entries: 10000,
@@ -652,16 +652,16 @@ macro_rules! log {
         );
     };
     (error, $($arg:tt)*) => {
-        log!(level: $crate::logging::sigmalog::SigmaSigmaLogLevel::Error, facility: $crate::logging::sigmalog::SigmaLogFacility::User, pid: 0, process: "sigmaos", $($arg)*);
+        log!(level: $crate::logging::sigmalog::SigmaLogLevel::Error, facility: $crate::logging::sigmalog::SigmaLogFacility::User, pid: 0, process: "sigmaos", $($arg)*);
     };
     (warn, $($arg:tt)*) => {
-        log!(level: $crate::logging::sigmalog::SigmaSigmaLogLevel::Warning, facility: $crate::logging::sigmalog::SigmaLogFacility::User, pid: 0, process: "sigmaos", $($arg)*);
+        log!(level: $crate::logging::sigmalog::SigmaLogLevel::Warning, facility: $crate::logging::sigmalog::SigmaLogFacility::User, pid: 0, process: "sigmaos", $($arg)*);
     };
     (info, $($arg:tt)*) => {
-        log!(level: $crate::logging::sigmalog::SigmaSigmaLogLevel::Info, facility: $crate::logging::sigmalog::SigmaLogFacility::User, pid: 0, process: "sigmaos", $($arg)*);
+        log!(level: $crate::logging::sigmalog::SigmaLogLevel::Info, facility: $crate::logging::sigmalog::SigmaLogFacility::User, pid: 0, process: "sigmaos", $($arg)*);
     };
     (debug, $($arg:tt)*) => {
-        log!(level: $crate::logging::sigmalog::SigmaSigmaLogLevel::Debug, facility: $crate::logging::sigmalog::SigmaLogFacility::User, pid: 0, process: "sigmaos", $($arg)*);
+        log!(level: $crate::logging::sigmalog::SigmaLogLevel::Debug, facility: $crate::logging::sigmalog::SigmaLogFacility::User, pid: 0, process: "sigmaos", $($arg)*);
     };
 }
 
