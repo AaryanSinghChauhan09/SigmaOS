@@ -12,7 +12,8 @@ pub mod lightcraft;
 pub mod artcraft;
 
 pub use photocraft::{
-    PhotoEditor, ImageLayer, Filter, Adjustment,
+    PhotoEditor, ImageLayer, Filter, Adjustment, LayerType, LayerMask, AdjustmentType,
+    LayerStyle, SelectionTool, SmartFilter, MaskType,
     init_photocraft, get_photocraft,
 };
 pub use filmcraft::{
@@ -20,7 +21,8 @@ pub use filmcraft::{
     init_filmcraft, get_filmcraft,
 };
 pub use vectorcraft::{
-    VectorEditor, Shape, Path, VectorLayer,
+    VectorEditor, Shape, Path, VectorLayer, PathPoint, FillRule, BooleanOperation,
+    PenToolMode, ShapeProperties,
     init_vectorcraft, get_vectorcraft,
 };
 pub use pdfcraft::{
