@@ -9,6 +9,7 @@ pub mod ring_buffer_stack;
 pub mod routing;
 pub mod security;
 pub mod sigmanet;
+pub mod sigmafirewall;
 pub mod socket;
 pub mod sovereign_remote_sharing;
 pub mod tcp;
@@ -62,6 +63,10 @@ pub use zenithnet::{
 pub use sigmanet::{
     SigmaNet, NetworkInterface as SigmaNetInterface, InterfaceType, InterfaceStatus, IpType, IpMethod,
     init_sigmanet, get_sigmanet, bring_up_interface, connect_interface,
+};
+pub use sigmafirewall::{
+    SigmaFirewall, FirewallRule, FirewallAction, FirewallProtocol,
+    init_sigmafirewall, get_sigmafirewall, add_firewall_rule,
 };
 
 #[path = "sovereign_async_io.rs"]
