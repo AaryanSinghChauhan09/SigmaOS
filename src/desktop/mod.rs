@@ -565,6 +565,14 @@ pub use audio_editor::{
     AudioEditor, AudioRegion, AudioTrack, AudioEffect, AudioFormat, SampleRate, BitDepth, ChannelCount, AudioTool,
     init_audio_editor, get_audio_editor,
 };
+pub use email_client::{
+    EmailClient, EmailAccount, Email, EmailFolder, EmailAttachment, AccountType, EncryptionType, EmailPriority,
+    init_email_client, get_email_client,
+};
+pub use contact_manager::{
+    ContactManager, Contact, ContactGroup, PhoneNumber, EmailAddress, Address, PhoneType, EmailType, AddressType,
+    init_contact_manager, get_contact_manager,
+};
 pub mod webapp_manager;
 pub use webapp_manager::*;
 pub mod appstore;
@@ -616,6 +624,8 @@ pub mod disk_manager;
 pub mod image_editor;
 pub mod video_editor;
 pub mod audio_editor;
+pub mod email_client;
+pub mod contact_manager;
 pub mod text_scaling;
 pub mod universal_desktop_framework;
 pub mod volume_manager;
