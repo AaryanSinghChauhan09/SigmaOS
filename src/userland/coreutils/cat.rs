@@ -61,17 +61,15 @@ where
         }
 
         if show_ends {
-            // Add $ at end of lines
-            let modified: Vec<u8> = buffer[..n]
-                .iter()
-                .flat_map(|&b| {
-                    if b == b'\n' {
-                        vec![b'$', b'\n']
-                    } else {
-                        vec![b]
-                    }
-                })
-                .collect();
+            // Performance optimization: Pre-allocate buffer capacity to avoid per-newline
+            // dynamic vector allocations (vec![b'$', b'\n']) and repeated heap allocations in flat_map.
+            let mut modified = Vec::with_capacity(n + 128);
+            for &b in &buffer[..n] {
+                if b == b'\n' {
+                    modified.push(b'$');
+                }
+                modified.push(b);
+            }
             writer
                 .write_all(&modified)
                 .map_err(|e| format!("cat: {}", e))?;
@@ -99,5 +97,15 @@ mod tests {
 
         copy_with_options(&mut reader, &mut output, false, false).unwrap();
         assert_eq!(String::from_utf8_lossy(&output), input);
+    }
+
+    #[test]
+    fn test_cat_show_ends() {
+        let input = "hello\nworld\n";
+        let mut reader = Cursor::new(input.as_bytes());
+        let mut output = Vec::new();
+
+        copy_with_options(&mut reader, &mut output, false, true).unwrap();
+        assert_eq!(String::from_utf8_lossy(&output), "hello$\nworld$\n");
     }
 }
