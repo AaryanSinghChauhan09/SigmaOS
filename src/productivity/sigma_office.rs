@@ -11252,6 +11252,338 @@ impl SovereignBitrix24SpeechAiSentimentAnalyzerEngine {
     }
 }
 
+/// Sovereign Google Sheets Statistical Pivot Heatmap Engine
+#[derive(Debug, Clone, Default)]
+pub struct SovereignGoogleSheetsStatisticalPivotHeatmapEngine;
+
+impl SovereignGoogleSheetsStatisticalPivotHeatmapEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn compute_pivot_heatmap_cell_intensities(&self, matrix: &[Vec<f64>]) -> Vec<Vec<f64>> {
+        let mut min_val = f64::MAX;
+        let mut max_val = f64::MIN;
+
+        for row in matrix {
+            for &val in row {
+                if val < min_val {
+                    min_val = val;
+                }
+                if val > max_val {
+                    max_val = val;
+                }
+            }
+        }
+
+        let range = if (max_val - min_val).abs() < 1e-9 {
+            1.0
+        } else {
+            max_val - min_val
+        };
+
+        matrix
+            .iter()
+            .map(|row| {
+                row.iter()
+                    .map(|&val| ((val - min_val) / range).min(1.0).max(0.0))
+                    .collect()
+            })
+            .collect()
+    }
+
+    pub fn calculate_quantile_bucket(&self, value: f64, quantiles: &[f64]) -> usize {
+        for (idx, &q) in quantiles.iter().enumerate() {
+            if value <= q {
+                return idx;
+            }
+        }
+        quantiles.len()
+    }
+}
+
+/// Sovereign Looker Studio Field Calculated Metric Engine
+#[derive(Debug, Clone, Default)]
+pub struct SovereignLookerStudioFieldCalculatedMetricEngine;
+
+impl SovereignLookerStudioFieldCalculatedMetricEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn calculate_kpi_ratio(&self, numerator: f64, denominator: f64) -> Option<f64> {
+        if denominator.abs() < 1e-9 {
+            None
+        } else {
+            Some(numerator / denominator)
+        }
+    }
+
+    pub fn evaluate_custom_metric_expression(&self, base_val: f64, multiplier: f64, offset: f64) -> f64 {
+        base_val * multiplier + offset
+    }
+}
+
+/// Sovereign Zoho Books Deferred Revenue Schedule Engine
+#[derive(Debug, Clone, Default)]
+pub struct SovereignZohoBooksDeferredRevenueScheduleEngine;
+
+impl SovereignZohoBooksDeferredRevenueScheduleEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn generate_straight_line_revenue_schedule(
+        &self,
+        total_amount: f64,
+        start_period: u32,
+        num_periods: u32,
+    ) -> Vec<(u32, f64)> {
+        if num_periods == 0 {
+            return vec![];
+        }
+
+        let period_amount = total_amount / num_periods as f64;
+        (0..num_periods)
+            .map(|i| (start_period + i, period_amount))
+            .collect()
+    }
+}
+
+/// Sovereign Zoho CRM Territory Scoring Engine
+#[derive(Debug, Clone, Default)]
+pub struct SovereignZohoCrmTerritoryScoringEngine;
+
+impl SovereignZohoCrmTerritoryScoringEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn calculate_account_territory_score(
+        &self,
+        revenue: f64,
+        employee_count: u32,
+        engagement_score: f64,
+    ) -> f64 {
+        let rev_score = (revenue / 100_000.0).min(50.0);
+        let emp_score = (employee_count as f64 / 10.0).min(30.0);
+        let eng_score = engagement_score.min(20.0);
+
+        (rev_score + emp_score + eng_score).min(100.0)
+    }
+
+    pub fn assign_territory(&self, score: f64, threshold: f64) -> &'static str {
+        if score >= threshold {
+            "Enterprise Tier A"
+        } else {
+            "Commercial Tier B"
+        }
+    }
+}
+
+/// Sovereign Microsoft Loop Interactive Card Payload
+#[derive(Debug, Clone, PartialEq)]
+pub struct LoopCard {
+    pub card_id: String,
+    pub title: String,
+    pub author: String,
+    pub version_hash: u64,
+    pub fields: HashMap<String, String>,
+}
+
+/// Sovereign Microsoft Loop Interactive Card Engine
+#[derive(Debug, Clone, Default)]
+pub struct SovereignMicrosoftLoopInteractiveCardEngine;
+
+impl SovereignMicrosoftLoopInteractiveCardEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn create_interactive_card(&self, title: &str, author: &str) -> LoopCard {
+        LoopCard {
+            card_id: format!("loop_card_{}", title.to_lowercase().replace(' ', "_")),
+            title: title.to_string(),
+            author: author.to_string(),
+            version_hash: 1001,
+            fields: HashMap::new(),
+        }
+    }
+
+    pub fn apply_field_update(&self, card: &mut LoopCard, key: &str, val: &str, _user: &str) {
+        card.fields.insert(key.to_string(), val.to_string());
+        card.version_hash += 1;
+    }
+
+    pub fn resolve_field_conflict(
+        &self,
+        local_val: &str,
+        remote_val: &str,
+        prefers_remote: bool,
+    ) -> String {
+        if prefers_remote {
+            remote_val.to_string()
+        } else {
+            local_val.to_string()
+        }
+    }
+}
+
+/// Sovereign Microsoft Power BI DAX Formula Engine
+#[derive(Debug, Clone, Default)]
+pub struct SovereignMicrosoftPowerBiDaxFormulaEngine;
+
+impl SovereignMicrosoftPowerBiDaxFormulaEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn evaluate_dax_measure(
+        &self,
+        fn_name: &str,
+        values: &[f64],
+        filter_threshold: Option<f64>,
+    ) -> f64 {
+        let filtered: Vec<f64> = match filter_threshold {
+            Some(thresh) => values.iter().copied().filter(|&v| v >= thresh).collect(),
+            None => values.to_vec(),
+        };
+
+        if filtered.is_empty() {
+            return 0.0;
+        }
+
+        match fn_name.to_uppercase().as_str() {
+            "SUM" | "CALCULATE" => filtered.iter().sum(),
+            "AVERAGE" => filtered.iter().sum::<f64>() / filtered.len() as f64,
+            "COUNT" => filtered.len() as f64,
+            "MAX" => filtered.iter().copied().fold(f64::MIN, f64::max),
+            "MIN" => filtered.iter().copied().fold(f64::MAX, f64::min),
+            _ => 0.0,
+        }
+    }
+}
+
+/// Sovereign Salesforce Einstein Opportunity Risk Assessment
+#[derive(Debug, Clone, PartialEq)]
+pub struct OpportunityRiskAssessment {
+    pub win_probability: f64,
+    pub churn_risk_score: f64,
+    pub risk_category: String,
+}
+
+/// Sovereign Salesforce Einstein Opportunity Churn Risk Engine
+#[derive(Debug, Clone, Default)]
+pub struct SovereignSalesforceEinsteinOpportunityChurnRiskEngine;
+
+impl SovereignSalesforceEinsteinOpportunityChurnRiskEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn calculate_opportunity_win_and_churn_risk(
+        &self,
+        _deal_value: f64,
+        stage_weight: f64,
+        inactivity_days: u32,
+    ) -> OpportunityRiskAssessment {
+        let decay = (inactivity_days as f64 * 0.02).min(0.8);
+        let win_probability = (stage_weight - decay).max(0.05).min(0.99);
+        let churn_risk_score = (1.0 - win_probability).min(1.0);
+
+        let risk_category = if churn_risk_score > 0.6 {
+            "High Risk".to_string()
+        } else if churn_risk_score > 0.3 {
+            "Moderate Risk".to_string()
+        } else {
+            "Low Risk".to_string()
+        };
+
+        OpportunityRiskAssessment {
+            win_probability,
+            churn_risk_score,
+            risk_category,
+        }
+    }
+}
+
+/// Sovereign Odoo Warehouse Cross-Docking Decision
+#[derive(Debug, Clone, PartialEq)]
+pub struct CrossDockDecision {
+    pub is_cross_dock_eligible: bool,
+    pub cross_dock_qty: u32,
+    pub putaway_qty: u32,
+}
+
+/// Sovereign Odoo Warehouse Cross-Docking Engine
+#[derive(Debug, Clone, Default)]
+pub struct SovereignOdooWarehouseCrossDockingEngine;
+
+impl SovereignOdooWarehouseCrossDockingEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn evaluate_cross_dock_eligibility(
+        &self,
+        inbound_qty: u32,
+        pending_outbound_orders: u32,
+    ) -> CrossDockDecision {
+        let cross_dock_qty = inbound_qty.min(pending_outbound_orders);
+        let putaway_qty = inbound_qty.saturating_sub(cross_dock_qty);
+
+        CrossDockDecision {
+            is_cross_dock_eligible: cross_dock_qty > 0,
+            cross_dock_qty,
+            putaway_qty,
+        }
+    }
+}
+
+/// Agent Workload Profile for Omnichannel Queue Routing
+#[derive(Debug, Clone)]
+pub struct AgentWorkloadProfile {
+    pub agent_id: String,
+    pub active_tickets: u32,
+    pub max_capacity: u32,
+    pub skills: Vec<String>,
+}
+
+/// Sovereign Bitrix24 Omnichannel Queue Routing Engine
+#[derive(Debug, Clone, Default)]
+pub struct SovereignBitrix24OmnichannelQueueRoutingEngine;
+
+impl SovereignBitrix24OmnichannelQueueRoutingEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn select_optimal_agent(
+        &self,
+        agents: &[AgentWorkloadProfile],
+        required_skill: &str,
+    ) -> Option<String> {
+        let mut best_agent: Option<(&AgentWorkloadProfile, u32)> = None;
+
+        for agent in agents {
+            if agent.active_tickets < agent.max_capacity && agent.skills.iter().any(|s| s == required_skill) {
+                let capacity_remaining = agent.max_capacity - agent.active_tickets;
+                match best_agent {
+                    None => {
+                        best_agent = Some((agent, capacity_remaining));
+                    }
+                    Some((_, best_rem)) if capacity_remaining > best_rem => {
+                        best_agent = Some((agent, capacity_remaining));
+                    }
+                    _ => {}
+                }
+            }
+        }
+
+        best_agent.map(|(a, _)| a.agent_id.clone())
+    }
+}
+
 #[cfg(test)]
 mod tests_phase2 {
     use super::sigma_types::CapabilityToken;
@@ -11478,5 +11810,81 @@ mod tests_phase2 {
             "The customer is very satisfied and loves the helpful software.",
         );
         assert!(analysis.sentiment_score > 0.5);
+
+        // 15. Sovereign Google Sheets Statistical Pivot Heatmap Engine
+        let heatmap_engine = SovereignGoogleSheetsStatisticalPivotHeatmapEngine::new();
+        let matrix = vec![vec![10.0, 50.0], vec![100.0, 200.0]];
+        let intensities = heatmap_engine.compute_pivot_heatmap_cell_intensities(&matrix);
+        assert_eq!(intensities[0][0], 0.0);
+        assert_eq!(intensities[1][1], 1.0);
+        assert_eq!(heatmap_engine.calculate_quantile_bucket(25.0, &[20.0, 50.0, 80.0]), 1);
+
+        // 16. Sovereign Looker Studio Field Calculated Metric Engine
+        let looker_metric_engine = SovereignLookerStudioFieldCalculatedMetricEngine::new();
+        let ratio = looker_metric_engine.calculate_kpi_ratio(150.0, 300.0);
+        assert_eq!(ratio, Some(0.5));
+        assert_eq!(looker_metric_engine.calculate_kpi_ratio(10.0, 0.0), None);
+        let custom_metric = looker_metric_engine.evaluate_custom_metric_expression(100.0, 1.1, 5.0);
+        assert!((custom_metric - 115.0).abs() < 1e-6);
+
+        // 17. Sovereign Zoho Books Deferred Revenue Schedule Engine
+        let deferred_rev_engine = SovereignZohoBooksDeferredRevenueScheduleEngine::new();
+        let schedule = deferred_rev_engine.generate_straight_line_revenue_schedule(12000.0, 1, 12);
+        assert_eq!(schedule.len(), 12);
+        assert_eq!(schedule[0], (1, 1000.0));
+        assert_eq!(schedule[11], (12, 1000.0));
+
+        // 18. Sovereign Zoho CRM Territory Scoring Engine
+        let territory_engine = SovereignZohoCrmTerritoryScoringEngine::new();
+        let score = territory_engine.calculate_account_territory_score(5_000_000.0, 200, 15.0);
+        assert!(score >= 80.0);
+        assert_eq!(territory_engine.assign_territory(score, 75.0), "Enterprise Tier A");
+
+        // 19. Sovereign Microsoft Loop Interactive Card Engine
+        let loop_engine = SovereignMicrosoftLoopInteractiveCardEngine::new();
+        let mut card = loop_engine.create_interactive_card("Q4 Budget Review", "Alice");
+        assert_eq!(card.author, "Alice");
+        loop_engine.apply_field_update(&mut card, "status", "Approved", "Bob");
+        assert_eq!(card.fields.get("status").map(|s| s.as_str()), Some("Approved"));
+        assert_eq!(loop_engine.resolve_field_conflict("Local Text", "Remote Text", true), "Remote Text");
+
+        // 20. Sovereign Microsoft Power BI DAX Formula Engine
+        let dax_engine = SovereignMicrosoftPowerBiDaxFormulaEngine::new();
+        let sum_val = dax_engine.evaluate_dax_measure("SUM", &[10.0, 20.0, 30.0], Some(15.0));
+        assert_eq!(sum_val, 50.0);
+        let avg_val = dax_engine.evaluate_dax_measure("AVERAGE", &[10.0, 20.0, 30.0], None);
+        assert_eq!(avg_val, 20.0);
+
+        // 21. Sovereign Salesforce Einstein Opportunity Churn Risk Engine
+        let churn_engine = SovereignSalesforceEinsteinOpportunityChurnRiskEngine::new();
+        let risk_assess = churn_engine.calculate_opportunity_win_and_churn_risk(100000.0, 0.7, 10);
+        assert!((risk_assess.win_probability - 0.5).abs() < 1e-6);
+        assert_eq!(risk_assess.risk_category, "Moderate Risk");
+
+        // 22. Sovereign Odoo Warehouse Cross-Docking Engine
+        let crossdock_engine = SovereignOdooWarehouseCrossDockingEngine::new();
+        let decision = crossdock_engine.evaluate_cross_dock_eligibility(100, 40);
+        assert!(decision.is_cross_dock_eligible);
+        assert_eq!(decision.cross_dock_qty, 40);
+        assert_eq!(decision.putaway_qty, 60);
+
+        // 23. Sovereign Bitrix24 Omnichannel Queue Routing Engine
+        let queue_engine = SovereignBitrix24OmnichannelQueueRoutingEngine::new();
+        let agents = vec![
+            AgentWorkloadProfile {
+                agent_id: "agent_1".to_string(),
+                active_tickets: 5,
+                max_capacity: 5,
+                skills: vec!["billing".to_string()],
+            },
+            AgentWorkloadProfile {
+                agent_id: "agent_2".to_string(),
+                active_tickets: 2,
+                max_capacity: 5,
+                skills: vec!["billing".to_string()],
+            },
+        ];
+        let chosen = queue_engine.select_optimal_agent(&agents, "billing");
+        assert_eq!(chosen, Some("agent_2".to_string()));
     }
 }

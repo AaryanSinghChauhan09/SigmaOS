@@ -7,7 +7,7 @@
 ---
 
 ## 1. Daily Development Process
-1. **Pre-Execution Check:** Always run `./run_sigma_tests.sh` to confirm zero test failures before editing source code.
+1. **Pre-Execution Check:** Always run `./run_sigma_tests.sh` and `python3 tests/boot/boot_to_shell_test.py` to confirm zero test failures before editing source code.
 2. **Direct Branch Commit Policy:** Do not create external GitHub pull requests. Instead, prepare comprehensive PR proposals in Markdown format under `docs/roadmap/` and mirror them in `wiki/` and `WIKI/`.
 3. **Tri-Agent Journaling:** Maintain entries in `.jules/bolt.md`, `.jules/palette.md`, and `.jules/sentinel.md` only for critical, actionable learnings.
 
@@ -18,7 +18,7 @@
 ### Domain 1: Code Quality & Testing
 * Preserve `#![no_std]` core kernel compatibility (`alloc` / `core` imports).
 * Maintain feature-gated standalone testing (`#[cfg(feature = "standalone_test")]`).
-* Run `cargo check --lib` and `./run_sigma_tests.sh` to ensure 0 compiler warnings/errors.
+* Run `./run_sigma_tests.sh` to ensure all 137 native Rust test binaries and Python boot smoke tests pass cleanly.
 
 ### Domain 2: Performance & Optimization (⚡ Bolt)
 * Maintain sub-200MB baseline idle memory footprint (~164MB achieved).
@@ -54,6 +54,6 @@
 ---
 
 ## 3. Immediate Action Items
-* Keep native unit tests green across all 137 Rust test binaries.
+* Keep native unit tests green across all test suites in `./run_sigma_tests.sh`.
 * Execute periodic release validation gates before tagging releases.
 * Continue expanding multi-distro package format support V33+ without regressions.

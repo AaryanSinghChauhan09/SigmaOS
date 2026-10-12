@@ -63,7 +63,10 @@ pub mod performance;
 pub mod pipes;
 pub mod policy_mechanism;
 pub mod process;
+pub mod thread;
 pub mod roundrobin;
+
+pub use thread::*;
 pub mod sched;
 pub mod scheduler;
 pub mod structures;
@@ -237,7 +240,7 @@ pub use shm_anon::{
     shm_open, shm_close, shm_unlink, mmap_shm, munmap_shm,
 };
 pub use event_notification::{
-    EpollEvent, EpollEventFlags, EpollInstance, EpollOp,
+    EpollEvent as KEpollEvent, EpollEventFlags, EpollInstance, EpollOp,
     KqueueEvent, KqueueEventFlags, KqueueFilter, KqueueInstance,
     EventNotificationManager, init_event_manager, get_event_manager,
 };

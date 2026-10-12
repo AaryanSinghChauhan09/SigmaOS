@@ -369,6 +369,27 @@ impl UniversalShellScriptTranspiler {
             let arg = l.trim_start_matches("string length ").trim();
             return format!("echo ${{#\"{}\"}}", arg);
         }
+        if l.contains("[1..") && l.contains("]") {
+            // Fish array range slice $var[1..3]
+            if let (Some(open), Some(close)) = (l.find('['), l.find(']')) {
+                let var = &l[..open];
+                let range = &l[open + 1..close];
+                let parts: Vec<&str> = range.split("..").collect();
+                if parts.len() == 2 {
+                    let start = parts[0];
+                    let end = parts[1];
+                    return format!("echo {} | cut -d' ' -f{}-{}", var, start, end);
+                }
+            }
+        }
+        if l.starts_with("function ") && l.contains("--on-event") {
+            let parts: Vec<&str> = l.split_whitespace().collect();
+            if parts.len() >= 2 {
+                let func_name = parts[1];
+                *in_func = true;
+                return format!("{}() {{ # event hook", func_name);
+            }
+        }
         l
     }
 
@@ -476,6 +497,15 @@ impl UniversalShellScriptTranspiler {
                 .trim_matches('\'');
             return format!(": $(( {} ))", expr);
         }
+        if l.starts_with("typeset -n ") {
+            let rest = l.trim_start_matches("typeset -n ").trim();
+            if let Some(eq) = rest.find('=') {
+                let ref_name = rest[..eq].trim();
+                let target_name = rest[eq + 1..].trim();
+                vars.insert(ref_name.to_string(), format!("${{{}}}", target_name));
+                return format!("eval \"{}=\\${{{}}}\"", ref_name, target_name);
+            }
+        }
         l
     }
 
@@ -520,6 +550,27 @@ impl UniversalShellScriptTranspiler {
                 .replace("New-Item -Path", "touch")
                 .replace("New-Item", "touch");
         }
+        if l.starts_with("Test-Path ") {
+            let path = l.trim_start_matches("Test-Path ").trim();
+            return format!("test -e {}", path);
+        }
+        if l.starts_with("Copy-Item ") {
+            let rest = l.trim_start_matches("Copy-Item ").trim();
+            return format!("cp -r {}", rest);
+        }
+        if l.starts_with("Move-Item ") {
+            let rest = l.trim_start_matches("Move-Item ").trim();
+            return format!("mv {}", rest);
+        }
+        if l.contains("Where-Object") {
+            return "grep -E".to_string();
+        }
+        if l.contains("Select-Object") {
+            return "cut -d' ' -f1".to_string();
+        }
+        if l.contains("ForEach-Object") {
+            return "xargs -n1".to_string();
+        }
         l
     }
 
@@ -535,6 +586,12 @@ impl UniversalShellScriptTranspiler {
                 let v = rest[eq + 1..].trim();
                 return format!("export {}={}", k, v);
             }
+        }
+        if l.contains("sort-by") {
+            return "sort -k2".to_string();
+        }
+        if l.contains("sys | get") {
+            return "uname -a".to_string();
         }
         l
     }
@@ -696,6 +753,18 @@ impl UniversalShellScriptTranspiler {
                 vars.insert(k.to_string(), v.to_string());
                 return format!("{}={}", k, v);
             }
+        }
+        if l.starts_with("readarray ") || l.starts_with("mapfile ") {
+            let name = l
+                .trim_start_matches("readarray -t ")
+                .trim_start_matches("readarray ")
+                .trim_start_matches("mapfile -t ")
+                .trim_start_matches("mapfile ")
+                .trim();
+            return format!("read -r {}", name);
+        }
+        if l.contains("[[") && l.contains("=~") {
+            return l.replace("[[", "[").replace("=~", "=").replace("]]", "]");
         }
         if l.starts_with("export ") {
             if let Some(eq) = l.find('=') {

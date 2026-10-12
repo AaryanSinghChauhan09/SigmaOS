@@ -4,7 +4,8 @@
 //
 // Implements missing open source operating system concepts across FreeBSD, OpenBSD,
 // NetBSD, DragonFly BSD, Illumos/Solaris, Redox OS, Haiku OS, Plan 9, Genode OS,
-// Minix 3, SerenityOS, and TempleOS in unified Pull Request (PR) format.
+// Minix 3, SerenityOS, TempleOS, Mach Microkernel, L4 Microkernel, MorphOS/AmigaOS,
+// OS/2 Warp, and QNX Neutrino in unified Pull Request (PR) format.
 
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
@@ -554,6 +555,266 @@ impl Default for SerenityLibGuiAndTempleHolyCPrEngine {
 }
 
 // ============================================================================
+// 11. Mach Microkernel Port Set & Capability Rights PR Engine
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MachPortRight {
+    Receive,
+    Send,
+    SendOnce,
+    PortSet,
+}
+
+#[derive(Debug, Clone)]
+pub struct MachPortRecord {
+    pub port_name: u32,
+    pub right: MachPortRight,
+    pub queue_limit: u32,
+}
+
+pub struct MachPortIpcPrEngine {
+    pub ports: BTreeMap<u32, MachPortRecord>,
+    pub port_sets: BTreeMap<u32, Vec<u32>>,
+    pub next_port_name: u32,
+}
+
+impl MachPortIpcPrEngine {
+    pub fn new() -> Self {
+        let mut engine = Self {
+            ports: BTreeMap::new(),
+            port_sets: BTreeMap::new(),
+            next_port_name: 100,
+        };
+        engine.allocate_port(MachPortRight::Receive);
+        engine
+    }
+
+    pub fn allocate_port(&mut self, right: MachPortRight) -> u32 {
+        let name = self.next_port_name;
+        self.next_port_name += 1;
+        self.ports.insert(
+            name,
+            MachPortRecord {
+                port_name: name,
+                right,
+                queue_limit: 64,
+            },
+        );
+        name
+    }
+
+    pub fn create_port_set(&mut self, members: &[u32]) -> u32 {
+        let set_name = self.next_port_name;
+        self.next_port_name += 1;
+        self.port_sets.insert(set_name, members.to_vec());
+        set_name
+    }
+}
+
+impl Default for MachPortIpcPrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 12. L4 Microkernel Capability Space & Fast IPC Subsystem
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct L4CapSlot {
+    pub slot_id: u32,
+    pub badge: u64,
+    pub permissions: u8,
+}
+
+pub struct L4CapabilitySpacePrEngine {
+    pub cspace: BTreeMap<u32, L4CapSlot>,
+    pub fast_ipc_counter: u64,
+}
+
+impl L4CapabilitySpacePrEngine {
+    pub fn new() -> Self {
+        let mut engine = Self {
+            cspace: BTreeMap::new(),
+            fast_ipc_counter: 0,
+        };
+        engine.insert_cap(1, 0xABC123, 0b111);
+        engine
+    }
+
+    pub fn insert_cap(&mut self, slot: u32, badge: u64, perms: u8) {
+        self.cspace.insert(
+            slot,
+            L4CapSlot {
+                slot_id: slot,
+                badge,
+                permissions: perms,
+            },
+        );
+    }
+
+    pub fn send_fast_ipc(&mut self, slot: u32, _msg: u64) -> bool {
+        if self.cspace.contains_key(&slot) {
+            self.fast_ipc_counter += 1;
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for L4CapabilitySpacePrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 13. MorphOS / AmigaOS Exec Library & Intuition Signal Messaging Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct ExecMsgPort {
+    pub port_name: String,
+    pub signal_bit: u8,
+    pub pending_messages: usize,
+}
+
+pub struct ExecIntuitionPrEngine {
+    pub ports: BTreeMap<String, ExecMsgPort>,
+}
+
+impl ExecIntuitionPrEngine {
+    pub fn new() -> Self {
+        let mut engine = Self {
+            ports: BTreeMap::new(),
+        };
+        engine.create_port("IntuitionWindowPort", 16);
+        engine
+    }
+
+    pub fn create_port(&mut self, name: &str, signal_bit: u8) {
+        self.ports.insert(
+            name.to_string(),
+            ExecMsgPort {
+                port_name: name.to_string(),
+                signal_bit,
+                pending_messages: 0,
+            },
+        );
+    }
+
+    pub fn put_msg(&mut self, port_name: &str) -> bool {
+        if let Some(port) = self.ports.get_mut(port_name) {
+            port.pending_messages += 1;
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for ExecIntuitionPrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 14. OS/2 Warp SOM (System Object Model) & Workplace Shell IPC Engine
+// ============================================================================
+
+pub struct Os2SomWpsPrEngine {
+    pub registered_objects: BTreeMap<String, String>,
+    pub dnd_events_routed: u32,
+}
+
+impl Os2SomWpsPrEngine {
+    pub fn new() -> Self {
+        let mut engine = Self {
+            registered_objects: BTreeMap::new(),
+            dnd_events_routed: 0,
+        };
+        engine.register_som_class("WPFolder", "WPFileSystem");
+        engine
+    }
+
+    pub fn register_som_class(&mut self, class_name: &str, parent_class: &str) {
+        self.registered_objects
+            .insert(class_name.to_string(), parent_class.to_string());
+    }
+
+    pub fn route_dnd_drop(&mut self) -> u32 {
+        self.dnd_events_routed += 1;
+        self.dnd_events_routed
+    }
+}
+
+impl Default for Os2SomWpsPrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 15. QNX Neutrino Resource Manager & Message Passing Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct ResMgrChannel {
+    pub chid: u32,
+    pub path: String,
+    pub active_connections: u32,
+}
+
+pub struct QnxNeutrinoResMgrPrEngine {
+    pub channels: BTreeMap<u32, ResMgrChannel>,
+    pub next_chid: u32,
+}
+
+impl QnxNeutrinoResMgrPrEngine {
+    pub fn new() -> Self {
+        let mut engine = Self {
+            channels: BTreeMap::new(),
+            next_chid: 1,
+        };
+        engine.attach_resmgr("/dev/ser1");
+        engine
+    }
+
+    pub fn attach_resmgr(&mut self, path: &str) -> u32 {
+        let chid = self.next_chid;
+        self.next_chid += 1;
+        self.channels.insert(
+            chid,
+            ResMgrChannel {
+                chid,
+                path: path.to_string(),
+                active_connections: 0,
+            },
+        );
+        chid
+    }
+
+    pub fn connect_client(&mut self, chid: u32) -> bool {
+        if let Some(ch) = self.channels.get_mut(&chid) {
+            ch.active_connections += 1;
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for QnxNeutrinoResMgrPrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
 // MASTER PR SUITE
 // ============================================================================
 
@@ -569,6 +830,11 @@ pub struct OpenSourceOsUnimplementedIdeasPrMasterSuite {
     pub genode_rpc: GenodeCapabilityRpcPrEngine,
     pub minix3_rs: Minix3ReincarnationServerPrEngine,
     pub serenity_temple: SerenityLibGuiAndTempleHolyCPrEngine,
+    pub mach_port: MachPortIpcPrEngine,
+    pub l4_cspace: L4CapabilitySpacePrEngine,
+    pub morphos_exec: ExecIntuitionPrEngine,
+    pub os2_som: Os2SomWpsPrEngine,
+    pub qnx_resmgr: QnxNeutrinoResMgrPrEngine,
 }
 
 impl OpenSourceOsUnimplementedIdeasPrMasterSuite {
@@ -585,6 +851,11 @@ impl OpenSourceOsUnimplementedIdeasPrMasterSuite {
             genode_rpc: GenodeCapabilityRpcPrEngine::new(),
             minix3_rs: Minix3ReincarnationServerPrEngine::new(),
             serenity_temple: SerenityLibGuiAndTempleHolyCPrEngine::new(),
+            mach_port: MachPortIpcPrEngine::new(),
+            l4_cspace: L4CapabilitySpacePrEngine::new(),
+            morphos_exec: ExecIntuitionPrEngine::new(),
+            os2_som: Os2SomWpsPrEngine::new(),
+            qnx_resmgr: QnxNeutrinoResMgrPrEngine::new(),
         }
     }
 
@@ -621,6 +892,17 @@ impl OpenSourceOsUnimplementedIdeasPrMasterSuite {
         self.serenity_temple.process_gui_ipc_event();
         self.serenity_temple
             .eval_holyc_symbol("Print(\"Hello HolyC\");");
+
+        let p = self.mach_port.allocate_port(MachPortRight::Send);
+        assert!(p > 0);
+
+        assert!(self.l4_cspace.send_fast_ipc(1, 0x1234));
+        assert!(self.morphos_exec.put_msg("IntuitionWindowPort"));
+
+        assert_eq!(self.os2_som.route_dnd_drop(), 1);
+
+        let chid = self.qnx_resmgr.attach_resmgr("/dev/con1");
+        assert!(self.qnx_resmgr.connect_client(chid));
 
         true
     }
@@ -686,6 +968,31 @@ mod tests {
         let mut haiku = HaikuBfsAttributeAndQueryPrEngine::new();
         haiku.add_attribute("/test.txt", "Author", "String", "Jules");
         assert_eq!(haiku.query_by_attribute("Author", "Jules").len(), 1);
+    }
+
+    #[test]
+    fn test_mach_l4_morphos_os2_qnx() {
+        let mut mach = MachPortIpcPrEngine::new();
+        let p1 = mach.allocate_port(MachPortRight::Send);
+        let p2 = mach.allocate_port(MachPortRight::Receive);
+        let set_id = mach.create_port_set(&[p1, p2]);
+        assert_eq!(mach.port_sets.get(&set_id).unwrap().len(), 2);
+
+        let mut l4 = L4CapabilitySpacePrEngine::new();
+        l4.insert_cap(2, 0xFEED, 0b101);
+        assert!(l4.send_fast_ipc(2, 999));
+
+        let mut exec = ExecIntuitionPrEngine::new();
+        exec.create_port("AppPort", 5);
+        assert!(exec.put_msg("AppPort"));
+
+        let mut som = Os2SomWpsPrEngine::new();
+        som.register_som_class("WPDataFile", "WPObject");
+        assert_eq!(som.route_dnd_drop(), 1);
+
+        let mut qnx = QnxNeutrinoResMgrPrEngine::new();
+        let ch = qnx.attach_resmgr("/dev/pty0");
+        assert!(qnx.connect_client(ch));
     }
 
     #[test]
