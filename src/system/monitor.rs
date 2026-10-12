@@ -52,7 +52,7 @@ pub enum ProcessState {
 }
 
 /// Network statistics
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub struct NetworkStats {
     pub interface: String,
     pub bytes_sent: u64,
@@ -62,7 +62,7 @@ pub struct NetworkStats {
 }
 
 /// Disk statistics
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub struct DiskStats {
     pub device: String,
     pub reads: u64,

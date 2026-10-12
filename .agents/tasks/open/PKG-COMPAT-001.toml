@@ -1,0 +1,26 @@
+id = "PKG-COMPAT-001"
+title = "Safely parse package metadata and perform dry-run dependency graph resolution"
+agent = "package-compat"
+priority = "P2"
+scope = ["src/package/", "src/sigpkg/", "src/compatibility/"]
+repeat = "weekly"
+
+steps = [
+  "load package test corpus",
+  "parse package manifests (.deb, .rpm, Arch, sigpkg)",
+  "build dependency DAG and verify cycle detection",
+  "execute sandboxed dry-run installation simulation",
+  "generate package dry-run report"
+]
+
+evidence = [
+  "reports/package/dry_run_report.json"
+]
+
+success = [
+  "metadata parsing accuracy >= 95%",
+  "dependency graph resolves without unhandled cycles",
+  "no untrusted package scripts executed on host"
+]
+
+on_failure = "flag parsing or dependency resolution errors in dry-run report"

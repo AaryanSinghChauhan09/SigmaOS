@@ -9,7 +9,7 @@ extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use core::sync::atomic::{AtomicU32, AtomicBool, AtomicF32, Ordering};
+use core::sync::atomic::{AtomicU32, AtomicBool, Ordering};
 
 /// Gamescope config
 #[derive(Debug, Clone, Copy)]

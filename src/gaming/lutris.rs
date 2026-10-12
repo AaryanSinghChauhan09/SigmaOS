@@ -77,7 +77,7 @@ impl LutrisManager {
     
     /// Launch game
     pub fn launch_game(&mut self, id: u32) -> Result<(), &'static str> {
-        let game = self.games.get_mut(id).ok_or("Game not found")?;
+        let game = self.games.get_mut(&id).ok_or("Game not found")?;
         
         if !game.installed {
             return Err("Game not installed");
@@ -93,7 +93,7 @@ impl LutrisManager {
     
     /// Stop game
     pub fn stop_game(&mut self, id: u32) -> Result<(), &'static str> {
-        let game = self.games.get_mut(id).ok_or("Game not found")?;
+        let game = self.games.get_mut(&id).ok_or("Game not found")?;
         
         game.running = false;
         
@@ -102,7 +102,7 @@ impl LutrisManager {
     
     /// Install game
     pub fn install_game(&mut self, id: u32) -> Result<(), &'static str> {
-        let game = self.games.get_mut(id).ok_or("Game not found")?;
+        let game = self.games.get_mut(&id).ok_or("Game not found")?;
         
         game.installed = true;
         

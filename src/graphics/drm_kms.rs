@@ -334,7 +334,7 @@ impl DrmKmsDevice {
     pub fn get_mode(&self, _connector_id: u32) -> Option<DrmMode> {
         // Return default 1920x1080@60Hz mode
         let mut name = [0u8; 32];
-        name[..10].copy_from_slice(b"1920x1080");
+        name[..9].copy_from_slice(b"1920x1080");
         Some(DrmMode {
             clock: 148500,
             hdisplay: 1920,
