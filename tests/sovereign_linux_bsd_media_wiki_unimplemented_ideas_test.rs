@@ -1,7 +1,10 @@
 // SPDX-License-Identifier: MIT
 // Comprehensive Verification Test Suite for Sovereign Linux & BSD Distros, Tech Media & GitHub Wiki Unimplemented Ideas
 
-use sigmaos::distro::sovereign_linux_bsd_media_wiki_unimplemented_ideas_engine::*;
+#[path = "../src/distro/sovereign_linux_bsd_media_wiki_unimplemented_ideas_engine.rs"]
+mod sovereign_linux_bsd_media_wiki_unimplemented_ideas_engine;
+
+use sovereign_linux_bsd_media_wiki_unimplemented_ideas_engine::*;
 
 #[test]
 fn test_tech_media_portal_intelligence_feed_full_coverage() {
