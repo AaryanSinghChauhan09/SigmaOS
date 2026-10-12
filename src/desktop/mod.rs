@@ -573,6 +573,18 @@ pub use contact_manager::{
     ContactManager, Contact, ContactGroup, PhoneNumber, EmailAddress, Address, PhoneType, EmailType, AddressType,
     init_contact_manager, get_contact_manager,
 };
+pub use news_reader::{
+    NewsReader, Feed, FeedItem, FeedType,
+    init_news_reader, get_news_reader,
+};
+pub use weather_map::{
+    WeatherMap, MapLocation, MapLayer, MapZoom,
+    init_weather_map, get_weather_map,
+};
+pub use dictionary::{
+    Dictionary, Word, Definition, Synonym, DictionaryType,
+    init_dictionary, get_dictionary,
+};
 pub mod webapp_manager;
 pub use webapp_manager::*;
 pub mod appstore;
@@ -626,6 +638,9 @@ pub mod video_editor;
 pub mod audio_editor;
 pub mod email_client;
 pub mod contact_manager;
+pub mod news_reader;
+pub mod weather_map;
+pub mod dictionary;
 pub mod text_scaling;
 pub mod universal_desktop_framework;
 pub mod volume_manager;
