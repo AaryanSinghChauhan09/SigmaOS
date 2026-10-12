@@ -1152,6 +1152,13 @@ if [ -f "src/drivers/sovereign_device_driver_development_and_pr_suite.rs" ]; the
 fi
 
 <<<<<<< HEAD
+if [ -f "src/net/sovereign_network_development_and_pr_suite.rs" ]; then
+    echo "Running Sovereign Network Development and PR Suite..."
+    mkdir -p build
+    rustc --test src/net/sovereign_network_development_and_pr_suite.rs --edition=2021 -o build/test_network_development_pr_suite
+    ./build/test_network_development_pr_suite
+=======
+<<<<<<< HEAD
 if [ -f "src/shell/sovereign_command_interpreter.rs" ]; then
     echo "Running Sovereign Command Interpreter and 17-PR Gateway Suite..."
     mkdir -p build
@@ -1163,6 +1170,7 @@ if [ -f "src/distro/sovereign_open_source_os_apex_inspirations_v50.rs" ]; then
     mkdir -p build
     rustc --test src/distro/sovereign_open_source_os_apex_inspirations_v50.rs --edition=2021 -o build/test_apex_v50
     ./build/test_apex_v50
+>>>>>>> origin/main
 >>>>>>> origin/main
 fi
 

@@ -90,6 +90,11 @@ pub use pf_firewall::{
     PfRule as PfFirewallRule, PfStateEntry as PfFirewallStateEntry, PfStats, PfTable,
 };
 
+<<<<<<< HEAD
+pub mod sovereign_network_development_and_pr_suite;
+pub use sovereign_network_development_and_pr_suite::{
+    NetworkPrTracker, NetworkSupportStatus, SovereignNetworkDevelopmentAndPrMasterSuite,
+=======
 pub mod sovereign_networking_stack_and_daemons_pr;
 pub use sovereign_networking_stack_and_daemons_pr::{
     CongestionControlAlgo, DnsLeaseRecord, FirewallAction as NetPrFirewallAction,
@@ -99,4 +104,5 @@ pub use sovereign_networking_stack_and_daemons_pr::{
     SovereignNetUtilitiesAndDiagnosticsEngine, SovereignNetworkConfigDaemonsEngine,
     SovereignNetworkingStackAndDaemonsParityPrGateway, SovereignPacketFilteringAndFirewallEngine,
     SovereignWirelessAndBluetoothEngine, TcpConnectionDescriptor, WifiAccessPointState,
+>>>>>>> origin/main
 };
