@@ -22,6 +22,7 @@ pub mod settings_manager;
 pub mod sigmacron;
 pub mod sigmapower;
 pub mod sigmathernal;
+pub mod sigmaacpi;
 pub mod sigmatime;
 pub mod sigmatimer;
 pub mod system_manager;
@@ -120,6 +121,10 @@ pub use sigmapower::{
 pub use sigmathernal::{
     SigmaThermal, ThermalZone, CoolingDevice, ThermalZoneType, CoolingDeviceType, TripPointType, ThermalPolicy,
     init_sigmathernal, get_sigmathernal, set_thermal_policy, update_temperature,
+};
+pub use sigmaacpi::{
+    SigmaACPI, AcpiEvent, AcpiAction, AcpiEventType, AcpiActionType,
+    init_sigmaacpi, get_sigmaacpi, add_acpi_event, register_acpi_action,
 };
 pub use power_manager::{
     BatteryInfo, PowerBatteryStatus, PowerConfig, PowerManager, PowerProfile, PowerSource,
