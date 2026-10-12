@@ -281,6 +281,16 @@ pub mod moksha;
 pub mod omarchy_omakase;
 pub mod omarchy_palette;
 pub mod omarchy_theme;
+pub mod unified_shell;
+pub use unified_shell::{
+    UnifiedShellEngine, Theme, ThemeVariant,
+    Plugin, PluginType, PluginState,
+    KeyBinding, KeyboardLayout,
+    UnifiedNotification, NotificationUrgency as ShellNotificationUrgency,
+    Widget, WidgetPosition,
+    Panel, OSDElement, PolicyRule,
+    init_unified_shell, get_unified_shell,
+};
 pub mod pantheon;
 pub mod screensaver;
 pub mod sovereign_navigation_engine;
@@ -448,13 +458,8 @@ pub mod xfce_engine;
 pub mod zenith;
 pub mod sovereign_gui_development_and_pr_suite;
 pub use sovereign_gui_development_and_pr_suite::*;
-<<<<<<< HEAD
 pub mod sovereign_desktop_toolkits_and_services;
 pub use sovereign_desktop_toolkits_and_services::*;
-=======
 pub mod sovereign_de_wm_innovation_engine;
 pub use sovereign_de_wm_innovation_engine::*;
->>>>>>> origin/main
 pub mod zenith_advanced_features;
-pub mod sovereign_desktop_toolkits_and_services;
-pub use sovereign_desktop_toolkits_and_services::*;
