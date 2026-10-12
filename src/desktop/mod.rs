@@ -496,6 +496,22 @@ pub use color_picker::{
     ColorPicker, Color, Palette, ColorFormat,
     init_color_picker, get_color_picker,
 };
+pub use audio_recorder::{
+    AudioRecorder, Recording, RecordingState, AudioFormat, SampleRate, BitDepth,
+    init_audio_recorder, get_audio_recorder,
+};
+pub use task_manager::{
+    TaskManager, Process, ProcessState,
+    init_task_manager, get_task_manager,
+};
+pub use archive_manager::{
+    ArchiveManager, Archive, ArchiveFormat, CompressionLevel,
+    init_archive_manager, get_archive_manager,
+};
+pub use pdf_viewer::{
+    PdfViewer, PdfDocument, ZoomLevel, PageMode,
+    init_pdf_viewer, get_pdf_viewer,
+};
 pub mod webapp_manager;
 pub use webapp_manager::*;
 pub mod appstore;
@@ -530,6 +546,10 @@ pub mod media_player;
 pub mod disk_usage_analyzer;
 pub mod system_cleaner;
 pub mod color_picker;
+pub mod audio_recorder;
+pub mod task_manager;
+pub mod archive_manager;
+pub mod pdf_viewer;
 pub mod text_scaling;
 pub mod universal_desktop_framework;
 pub mod volume_manager;
