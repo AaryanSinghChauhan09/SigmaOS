@@ -14,10 +14,10 @@ This document presents a comprehensive, actionable audit across **8 critical sys
 ---
 
 ## 1. Code Quality & Testing
-* **Syntax & Build Verification:** Clean compilation across Rust 2021 edition (`#![no_std]` core kernel and `std` userland services). Standalone test fixes applied in `arch_missing_components.rs`, `sovereign_distro_package_advancements_v20.rs`, `sovereign_distro_package_advancements_v30.rs`, `open_source_obsoletion.rs`, and `sovereign_universal_subsystem_interop.rs`.
+* **Syntax & Build Verification:** Clean compilation across Rust 2021 edition (`#![no_std]` core kernel and `std` userland services). Native test builds pass cleanly via `./run_sigma_tests.sh`.
 * **Linting & Unused Imports:** Unused imports (e.g., `ToString`, `String`, `std::vec`) and unused variables marked with leading underscores (`_addr`, `_ostree_ok`, `_pamac_res`, `_garuda_ok`, `_cosmic_res`, `_tails_ok`) trimmed across `src/memory/huge_pages.rs`, `src/memory/kswapd.rs`, `src/distro/sovereign_netbsd_parity_engine.rs`, and `src/distro/missing_linux_bsd_components.rs`.
-* **Unit Test Coverage:** 137 native Rust unit test suites and 15 Python/Pytest integration suites passing with 100% success rate across kernel, filesystem, package management, and desktop compositor domains.
-* **Algorithm Correctness:** Verified correctness of BTRFS snapshot rollbacks, SAT dependency resolution algorithms, BCACHEFS tiered storage allocation, and EEVDF/BORE CPU scheduling logic.
+* **Unit Test Coverage:** All native Rust unit test suites and Python integration suites (`tests/boot/boot_to_shell_test.py`) pass with 100% success rate across kernel, filesystem, package management, and desktop compositor domains.
+* **Algorithm Correctness:** Verified correctness of BTRFS snapshot rollbacks, SAT DPLL dependency resolution algorithms, BCACHEFS tiered storage allocation, and EEVDF/BORE CPU scheduling logic.
 
 ---
 
@@ -86,4 +86,4 @@ This document presents a comprehensive, actionable audit across **8 critical sys
 ## Next Steps Guidelines Summary
 1. Continue enforcing direct main-branch commits for roadmap documentation updates.
 2. Maintain sub-200MB idle memory footprint and sub-1.8s boot-to-desktop timing.
-3. Keep all 137 native Rust unit tests and 15 Pytest integration tests green on every update.
+3. Keep all native Rust unit test suites and Python boot tests green on every update.

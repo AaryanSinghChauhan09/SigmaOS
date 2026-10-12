@@ -30,7 +30,7 @@ pub enum UpdatePriority {
 }
 
 /// System update
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct SystemUpdate {
     pub name: String,
     pub version: String,

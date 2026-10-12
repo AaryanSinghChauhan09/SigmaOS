@@ -176,6 +176,17 @@ impl WikiDataTransferEngine {
         );
 
         self.feature_specs.insert(
+            "KernelAndBootloaderAdvancementsPlan".to_string(),
+            FeatureMdStatus {
+                spec_name: "33-Kernel-and-Bootloader-Advancements-Plan.md".to_string(),
+                source_path: "wiki/33-Kernel-and-Bootloader-Advancements-Plan.md".to_string(),
+                is_fully_implemented: true,
+                completion_percentage: 100,
+                wiki_mirrored: true,
+            },
+        );
+
+        self.feature_specs.insert(
             "DeviceDriverDevelopmentPlan".to_string(),
             FeatureMdStatus {
                 spec_name: "31-Device-Driver-Development-And-Maintenance-Plan.md".to_string(),
@@ -343,6 +354,11 @@ impl WikiDataTransferEngine {
         self.register_spec_file(
             "PR_PROPOSAL_PERIODIC_STUDY_IMPROVE_PROVE_PROGRAM.md",
             "Periodic Study Improve Prove Program PR Proposal",
+            true,
+        );
+        self.register_spec_file(
+            "34-SigmaOS-Command-Interpreter-Plan.md",
+            "Command Interpreter Development Plan PR",
             true,
         );
     }
