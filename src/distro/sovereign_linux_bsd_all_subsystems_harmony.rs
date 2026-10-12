@@ -45,6 +45,13 @@ pub enum LinuxBsdDistroInspiration {
     HaikuOS,
     QubesOS,
     WhonixOS,
+    SerpentOS,
+    VanillaOS,
+    OpenWrt,
+    BedrockLinux,
+    PCLinuxOS,
+    SteamOS,
+    NomadBSD,
 }
 
 impl LinuxBsdDistroInspiration {
@@ -86,6 +93,13 @@ impl LinuxBsdDistroInspiration {
             Self::HaikuOS => "HaikuOS",
             Self::QubesOS => "QubesOS",
             Self::WhonixOS => "WhonixOS",
+            Self::SerpentOS => "SerpentOS",
+            Self::VanillaOS => "VanillaOS",
+            Self::OpenWrt => "OpenWrt",
+            Self::BedrockLinux => "BedrockLinux",
+            Self::PCLinuxOS => "PCLinuxOS",
+            Self::SteamOS => "SteamOS",
+            Self::NomadBSD => "NomadBSD",
         }
     }
 }
@@ -124,6 +138,19 @@ pub enum SigmaOsSubsystem {
     CryptographySecurity,
     TelemetryObservability,
     AccessibilityInput,
+    StorageDrive,
+    BluetoothWireless,
+    ThermalCooling,
+    PrintingSpooler,
+    RecoveryBackup,
+    RemoteAccess,
+    ProductivityApplications,
+    DatabaseEmbedded,
+    RoboticsHardware,
+    RealTimeExtension,
+    UserlandPersona,
+    FirmwareMicrocode,
+    NetworkSecurityFirewall,
 }
 
 impl SigmaOsSubsystem {
@@ -160,6 +187,19 @@ impl SigmaOsSubsystem {
             Self::CryptographySecurity => "CryptographySecurity",
             Self::TelemetryObservability => "TelemetryObservability",
             Self::AccessibilityInput => "AccessibilityInput",
+            Self::StorageDrive => "StorageDrive",
+            Self::BluetoothWireless => "BluetoothWireless",
+            Self::ThermalCooling => "ThermalCooling",
+            Self::PrintingSpooler => "PrintingSpooler",
+            Self::RecoveryBackup => "RecoveryBackup",
+            Self::RemoteAccess => "RemoteAccess",
+            Self::ProductivityApplications => "ProductivityApplications",
+            Self::DatabaseEmbedded => "DatabaseEmbedded",
+            Self::RoboticsHardware => "RoboticsHardware",
+            Self::RealTimeExtension => "RealTimeExtension",
+            Self::UserlandPersona => "UserlandPersona",
+            Self::FirmwareMicrocode => "FirmwareMicrocode",
+            Self::NetworkSecurityFirewall => "NetworkSecurityFirewall",
         }
     }
 }
@@ -258,6 +298,13 @@ impl SovereignSubsystemDistroHarmonyEngine {
             LinuxBsdDistroInspiration::MidnightBSD,
             LinuxBsdDistroInspiration::RedoxOS,
             LinuxBsdDistroInspiration::HaikuOS,
+            LinuxBsdDistroInspiration::SerpentOS,
+            LinuxBsdDistroInspiration::VanillaOS,
+            LinuxBsdDistroInspiration::OpenWrt,
+            LinuxBsdDistroInspiration::BedrockLinux,
+            LinuxBsdDistroInspiration::PCLinuxOS,
+            LinuxBsdDistroInspiration::SteamOS,
+            LinuxBsdDistroInspiration::NomadBSD,
         ];
 
         let subsystems_list = [
@@ -516,6 +563,58 @@ impl SovereignSubsystemDistroHarmonyEngine {
                     "Braille_Display",
                 ],
             ),
+            (
+                SigmaOsSubsystem::StorageDrive,
+                vec!["NVMe_ZNS", "UFS_SCSI", "Bcachefs_Tiering", "ZFS_Pool"],
+            ),
+            (
+                SigmaOsSubsystem::BluetoothWireless,
+                vec!["BlueZ_54", "LE_Audio", "iwd_wifi6e", "wpa_supplicant"],
+            ),
+            (
+                SigmaOsSubsystem::ThermalCooling,
+                vec!["Hwmon_Sensors", "FanCurves", "ThermalThrottle"],
+            ),
+            (
+                SigmaOsSubsystem::PrintingSpooler,
+                vec!["CUPS_Ipp", "Sane_Scanner", "Ghostscript"],
+            ),
+            (
+                SigmaOsSubsystem::RecoveryBackup,
+                vec!["Timeshift", "Snapper", "MintBackup", "Btrfs_Snap"],
+            ),
+            (
+                SigmaOsSubsystem::RemoteAccess,
+                vec!["OpenSSH_PQC", "Dropbear", "Warpinator_Peer"],
+            ),
+            (
+                SigmaOsSubsystem::ProductivityApplications,
+                vec!["Xed_Editor", "XViewer", "Thingy_Reader", "Bulky_Renamer"],
+            ),
+            (
+                SigmaOsSubsystem::DatabaseEmbedded,
+                vec!["SQLite_WAL", "Haiku_BFS_Query", "DuckDB_Columnar"],
+            ),
+            (
+                SigmaOsSubsystem::RoboticsHardware,
+                vec!["ROS2_Executor", "CAN_Bus_Socket", "Realtime_Serial"],
+            ),
+            (
+                SigmaOsSubsystem::RealTimeExtension,
+                vec!["PREEMPT_RT", "NuttX_Scheduler", "Realtime_SigQueue"],
+            ),
+            (
+                SigmaOsSubsystem::UserlandPersona,
+                vec!["Glibc_Abi", "Musl_Abi", "FreeBSD_Persona", "OpenBSD_Persona"],
+            ),
+            (
+                SigmaOsSubsystem::FirmwareMicrocode,
+                vec!["Fwupd_Capsule", "Intel_Microcode", "Amd_Ucode", "UEFI_Capsule"],
+            ),
+            (
+                SigmaOsSubsystem::NetworkSecurityFirewall,
+                vec!["Nftables", "Pf_Firewall", "Iptables_Compat", "LandlockV5_Net"],
+            ),
         ];
 
         for (sub, caps) in subsystems_list {
@@ -742,7 +841,7 @@ impl SovereignSubsystemDistroHarmonyEngine {
     }
 
     pub fn verify_all_subsystems_compatibility_matrix(&self) -> bool {
-        if self.subsystems.len() < 31 {
+        if self.subsystems.len() < 44 {
             return false;
         }
 
@@ -880,7 +979,7 @@ mod tests {
     #[test]
     fn test_harmony_engine_initialization_and_verification() {
         let engine = SovereignSubsystemDistroHarmonyEngine::new();
-        assert_eq!(engine.subsystems.len(), 31);
+        assert_eq!(engine.subsystems.len(), 44);
         assert!(engine.verify_all_subsystems_compatibility_matrix());
         assert_eq!(engine.compute_harmony_index(), 100);
     }
@@ -921,7 +1020,7 @@ mod tests {
         let count = engine
             .harmonize_all_subsystems_and_distros()
             .expect("Harmonization should succeed");
-        assert_eq!(count, 31 * 30);
+        assert_eq!(count, 44 * 43);
         assert_eq!(engine.compute_harmony_index(), 100);
     }
 
