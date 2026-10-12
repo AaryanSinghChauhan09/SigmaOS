@@ -20,9 +20,9 @@ SigmaOS is a high-performance, safe-Rust operating system engineered for sub-mil
 
 ## THE 12 CORE SYSTEM SHARDS
 
-SigmaOS is structured into 12 core system shards. The table below provides a high-level truth status across each shard:
+SigmaOS is structured into 12 core system shards. The table below provides a high-level status across each shard:
 
-| Shard ID | System Shard Name | Working Status | Bare-Metal / QEMU Gap |
+| Shard ID | System Shard Name | Working Status | Bare-Metal / QEMU Hardware Gap |
 | :--- | :--- | :--- | :--- |
 | **Shard 1** | Kernel Core, CPU Architectures & Low-Level Foundations | **Working** (x86_64, Context Switch, Syscall ABI, TSS) | **Partial** (AArch64 / RISC-V 64 QEMU boot validation) |
 | **Shard 2** | Scheduler Primitives, Memory Allocators & Cgroups | **Working** (EEVDF, BORE, Buddy, Slab, RCU, Futex, NUMA) | **Implemented** (Requires real ACPI SLIT tables for multi-socket) |
@@ -52,12 +52,12 @@ SigmaOS is structured into 12 core system shards. The table below provides a hig
 - **WHAT'S NOT WORKING / PARTIAL:**
   - Bare-metal userland execution requires MSR calibration (`MSR_LSTAR`, `MSR_STAR`, `MSR_SFMASK`) and real hardware page table CR3 user-space mapping.
 - **WHY:**
-  - Unit tests validate memory offsets and assembly bit masks, but `sysretq`/`iretq` triggers a General Protection Fault (`#GP`) if user-space code pages lack the User/Supervisor bit (`PTE_USER = 0x04`) in page table entries.
+  - Unit tests validate memory offsets and assembly bit masks, but `sysretq`/`iretq` triggers a General Protection Fault (`#GP`) if user-space code pages lack the User/Supervisor bit (`PTE_USER = 0x04`) in page table entries or if the segment selector is invalid.
 - **HOW TO FIX IT (ALGORITHM A):**
   1. Open `src/arch/x86_64/tss_ring3_user_mode.rs` and `src/memory/page_table.rs`.
   2. In the page table allocation function for userland processes, ensure the PTE flags set `PTE_PRESENT | PTE_WRITABLE | PTE_USER` (`0x07`).
-  3. Load `MSR_LSTAR` (0xC0000082) with the address of `syscall_entry_stub`.
-  4. Set `MSR_STAR` (0xC0000081) lower 32 bits to 0 and upper 32 bits to kernel selector `0x08` and user selector `0x1B` (Ring 3 code/data segments).
+  3. Load `MSR_LSTAR` (`0xC0000082`) with the address of `syscall_entry_stub`.
+  4. Set `MSR_STAR` (`0xC0000081`) lower 32 bits to 0 and upper 32 bits to kernel selector `0x08` and user selector `0x1B` (Ring 3 code/data segments).
   5. Execute `ltr` instruction passing the TSS selector offset from GDT.
 
 #### 1.2 Multi-Architecture Bootstrap (AArch64 & RISC-V 64)
@@ -95,9 +95,10 @@ SigmaOS is structured into 12 core system shards. The table below provides a hig
 - **WHAT'S WORKING:**
   - `src/buddy.rs` & `src/memory/slab_allocator.rs`: Frame allocation up to order-10 pages and object caching for hot kernel structures.
   - `src/kernel/cgroup_v2_controller.rs`: Hierarchical resource limiting for CPU shares, memory pressure, and process isolation.
+  - `src/memory/huge_pages.rs`: Transparent Huge Pages (THP) defragmentation and `khugepaged` asynchronous page compaction daemon.
 - **WHAT'S NOT WORKING / PARTIAL:**
   - Dynamic kernel heap expansion when physical memory fragmentation occurs under severe allocation spikes.
-- **HOW TO FIX IT:**
+- **HOW TO FIX IT (ALGORITHM I):**
   1. Implement anti-fragmentation page compaction in `src/buddy.rs`: scan free lists for adjacent order `N` blocks and merge into order `N+1` when allocation fails.
 
 ---
@@ -108,13 +109,14 @@ SigmaOS is structured into 12 core system shards. The table below provides a hig
 - **WHAT'S WORKING:**
   - `src/driver/nvme_storage.rs`: Submission Queue Entry (SQE) 64-byte layout, Physical Region Page (PRP) list builder, volatile doorbell writes, completion queue polling.
   - `src/driver/ahci.rs`: Port enumeration, IDENTIFY DEVICE FIS assembly, PRDT DMA descriptor allocation.
+  - `src/driver/pci_enumeration.rs`: PCI BAR MMIO mapping structures (`PciBarMmioMapping`), parity mapping functions (`ioremap`, `ioremap_wc`, `iounmap`), and volatile MMIO accessors (`readb`, `readw`, `readl`, `readq`, `writeb`, `writew`, `writel`, `writeq`).
 - **WHAT'S NOT WORKING / PARTIAL:**
   - Physical PCI BAR MMIO address mapping into the kernel's virtual page table on real hardware.
 - **WHY:**
   - On real hardware, physical BAR0 addresses (e.g., `0xF7200000`) reside outside the identity-mapped kernel memory range and require MMIO page table mapping with `PTE_NOCACHE | PTE_WRITABLE`.
 - **HOW TO FIX IT (ALGORITHM D):**
   1. In `src/driver/nvme_storage.rs` / `src/driver/ahci.rs`, intercept BAR0 physical address during PCI scan.
-  2. Call `kernel_map_mmio_region(paddr, size)` from `src/memory/page_table.rs`.
+  2. Call `ioremap(paddr, size)` from `src/driver/pci_enumeration.rs`.
   3. Set page table entry flags to `PAGE_PRESENT | PAGE_WRITABLE | PAGE_NO_CACHE` (`0x1B`).
   4. Use returned virtual address for all volatile doorbell and register reads/writes.
 
@@ -136,7 +138,7 @@ SigmaOS is structured into 12 core system shards. The table below provides a hig
   - VirtIO NIC interrupt assertion wiring to Local APIC / IOAPIC.
 - **WHY:**
   - Packet reception currently polls the VirtIO RX queue ring buffer instead of firing IRQ interrupts.
-- **HOW TO FIX IT:**
+- **HOW TO FIX IT (ALGORITHM F):**
   1. Open `src/drivers/virtio_net.rs`.
   2. Bind VirtIO device vector to IOAPIC IRQ line in `src/arch/x86_64/apic.rs`.
   3. In interrupt handler, trigger ring buffer read and wake up waiting socket reader task.
@@ -168,6 +170,7 @@ SigmaOS is structured into 12 core system shards. The table below provides a hig
 - **WHAT'S WORKING:**
   - `src/package/declarative_app.rs`: Content-addressed immutable bundles, signed app store client, local generation snapshot store, 1-step rollbacks, CLI dispatcher (`sigmactl install/update/rollback`).
   - `src/package/sovereign_universal_pm_pr_bridge.rs`: 28-distro package format parser (Debian `control`, Arch `PKGBUILD`, RedHat `.spec`, Alpine `APKBUILD`, Void `template`, Gentoo `ebuild`, FreeBSD `+MANIFEST`, Nix `flake.nix`, etc.), SAT dependency solver, and automated Pull Request transaction generator.
+  - `src/package/debian.rs`: Debian `update-alternatives`, `apt-mark`, `dpkg` trigger engine, and multiarch path resolver.
 - **WHAT'S NOT WORKING / PARTIAL:**
   - All features are 100% complete and tested in Safe-Rust.
 
@@ -178,13 +181,13 @@ SigmaOS is structured into 12 core system shards. The table below provides a hig
 #### 7.1 Zenith Compositor & Distro Theme Parity
 - **WHAT'S WORKING:**
   - `src/desktop/compositor.rs` & `src/compositor/zenith_core.rs`: Wayland surface management, layout engine, window tiling model, and DMABUF zero-copy buffer pipe.
-  - `src/desktop/omarchy_omakase.rs`: Omarchy Hyprland window rule policy generator, Wallust/Matugen dynamic color palette engine, and Quickshell bar widget state manager.
+  - `src/desktop/omarchy_omakase.rs`: Omarchy Hyprland window rule policy generator, `OmarchyLazyTuiEngine`, `OmarchyHyprlandRuleEngine`, Wallust/Matugen dynamic color palette engine, and Quickshell bar widget state manager.
   - `src/pillars/suite.rs`: WCAG 2.1 AAA 7:1 contrast ratio validator and accessibility focus tracker.
 - **WHAT'S NOT WORKING / PARTIAL:**
   - Physical GPU page flipping on bare-metal Intel/AMD/NVIDIA graphics cards.
 - **WHY:**
   - Hardware atomic mode setting requires DRM KMS atomic commit IOCTLs on actual `/dev/dri/card0` devices.
-- **HOW TO FIX IT:**
+- **HOW TO FIX IT (ALGORITHM H):**
   1. Open `src/drivers/drm_kms.rs`.
   2. Wire `drmModeAtomicCommit` to swap framebuffer IDs on CRTC vblank interrupt.
 
@@ -196,6 +199,7 @@ SigmaOS is structured into 12 core system shards. The table below provides a hig
 - **WHAT'S WORKING:**
   - `src/security/hardening.rs`: `AslrEntropyEngine`, `StackCanary`, `DepNxProtectionEngine`, `SeccompSyscallFilterPolicy`, `SshHardeningPolicy`, and `ExploitDetectionGuard`.
   - `src/security/landlock.rs` & `src/security/pledge.rs`: Landlock V4 filesystem access restriction, OpenBSD pledge/unveil restrictions, and Capsicum rights capabilities.
+  - `src/security/kali_components.rs`: 19 penetration testing / reverse engineering / forensics / wireless security tools in Safe-Rust & `KaliLinuxPrProposalEngine`.
   - `src/package/sovereign_pr_package_gateway.rs`: Dilithium5 and Falcon-1024 PQC attestation header verification.
 - **WHAT'S NOT WORKING / PARTIAL:**
   - All features are 100% complete and verified in Safe-Rust.
@@ -212,7 +216,7 @@ SigmaOS is structured into 12 core system shards. The table below provides a hig
   - ACPI AML (ACPI Machine Language) byte-code interpreter for complex DSDT/SSDT table evaluation.
 - **WHY:**
   - Simple hardware tables (MADT, FADT, HPET) are static structs; control methods (`_DSM`, `_PR0`, `_PTS`) are written in AML bytecode and require an interpreter loop.
-- **HOW TO FIX IT (ALGORITHM F):**
+- **HOW TO FIX IT (ALGORITHM G):**
   1. In `src/drivers/acpi.rs`, parse `DSDT` table header to locate AML bytecode payload.
   2. Implement an AML opcode evaluator (`OpDef`, `NameOp`, `MethodOp`, `IfOp`, `ReturnOp`).
   3. Execute power state transitions (`_S5` soft-off shutdown) by writing power management values to `PM1a_CNT` register defined in FADT.
@@ -224,8 +228,8 @@ SigmaOS is structured into 12 core system shards. The table below provides a hig
 #### 10.1 120-Distro Subsystem Mode Matrix
 - **WHAT'S WORKING:**
   - `src/distro/linux_bsd_inspirations.rs`: 120 `DistroSubsystemMode` variants covering Linux Mint, Omarchy, Arch, Debian, Ubuntu, Fedora, Alpine, NixOS, Void, Gentoo, FreeBSD, OpenBSD, DragonFly BSD, NetBSD, Solaris, etc.
-  - `LinuxBsdPamAuthEngine`: Sub-millisecond PAM credential verification, SystemdHomed, BSD auth, and PQC tokens.
-  - `SovereignMasterSubsystemDistroHarmonizer`: Cross-subsystem state synchronization across all 174 active modules.
+  - `SovereignLinuxBsdSubsystemFullInteropMatrix`: Audits and verifies cross-distro interoperability across all 185 active subsystems.
+  - `LinuxBsdUltimateHarmonyGateway`: Integrates HAMMER2 PFS encryption, Alpine LBU overlay, OpenBSD KARL linking, Fedora Silverblue OSTree, and FreeBSD VIMAGE network stacks.
 - **WHAT'S NOT WORKING / PARTIAL:**
   - All features are 100% complete and verified via `test_all_distro_subsystem_modes_verification`.
 
@@ -236,7 +240,7 @@ SigmaOS is structured into 12 core system shards. The table below provides a hig
 #### 11.1 Governance & Task Sync Engine
 - **WHAT'S WORKING:**
   - `src/governance/sovereign_task_guidelines_wiki_sync_engine.rs`: Task governance rule enforcement (`ArchLinuxParityRule`, `ZeroDependencyKlibPurity`, `MultiDistroAbsorptionFormat`) and automated wiki documentation sync across 28 specifications.
-  - Autonomous AI SysAdmin roadmap and maintenance instructions.
+  - Autonomous AI SysAdmin roadmap and maintenance instructions (`docs/roadmap/AI_AGENT_ROADMAP_MINT_OMARCHY_DESKTOP_AUTONOMOUS_SYSADMIN.md`).
 - **WHAT'S NOT WORKING / PARTIAL:**
   - All features are 100% complete and verified in Safe-Rust.
 
@@ -247,7 +251,7 @@ SigmaOS is structured into 12 core system shards. The table below provides a hig
 #### 12.1 Omnipresent Native Replacements
 - **WHAT'S WORKING:**
   - `src/klib/`: Pure Safe-Rust collections (`HashMap`, `HashSet`, `BTreeMap`, `Vec`), string utilities, lock-free ring buffers, UUID generator, and cryptographic primitives without external dependencies.
-  - `SOVEREIGN_OS_ABSOLUTE_OMNIPRESENT_SELF_SUFFICIENCY_ULTRA_ENCYCLOPEDIA_V46.md`: 100% SHA-256 hash parity across `./`, `docs/`, `wiki/`, and `WIKI/`.
+  - `SOVEREIGN_OS_ABSOLUTE_OMNIPRESENT_SELF_SUFFICIENCY_ULTRA_ENCYCLOPEDIA_V49.md`: 100% SHA-256 hash parity across `./`, `docs/`, `wiki/`, and `WIKI/`.
 - **WHAT'S NOT WORKING / PARTIAL:**
   - All features are 100% complete and verified.
 
@@ -257,13 +261,23 @@ SigmaOS is structured into 12 core system shards. The table below provides a hig
 
 When modifying or expanding code in SigmaOS, AI agents may encounter standard Rust compiler errors. Use this cheat sheet for instant remediation:
 
-| Error Code | Error Description | Cause | Immediate AI Remediation Fix |
+| Error Code | Error Description | Cause | Immediate AI Remediation Action |
 | :--- | :--- | :--- | :--- |
 | **E0004** | Non-exhaustive match patterns | New variant added to enum (e.g. `DistroSubsystemMode`) without covering all match arms. | Add missing match arm or add `_ =>` wildcard fallback in `src/distro/linux_bsd_inspirations.rs`. |
+| **E0072** | Recursive type has infinite size | Struct directly contains itself without indirection (`Box` or `&`). | Wrap recursive fields in `Box<T>` or `Option<Box<T>>`. |
+| **E0204** | `Copy` trait cannot be implemented | Field type does not implement `Copy` (e.g. `String`, `Vec`, `AtomicU32`). | Remove `Copy` derive from struct or replace non-copy fields with copyable types. |
+| **E0252** | Name collision during import | Duplicate `use` statement importing items with the same identifier. | Use explicit scoping, alias with `use path as Alias;`, or remove duplicate import. |
+| **E0277** | Trait bound not satisfied | Expected type does not implement requested trait (e.g., `Clone`, `Display`). | Derive or manually implement the required trait on the struct/enum. |
+| **E0282** | Type annotations needed | Compiler cannot infer generic type parameter. | Add explicit type annotation (e.g., `let vec: Vec<u64> = ...`). |
 | **E0308** | Mismatched types | Expecting `usize` vs `u64` or `Result<T, E>` vs `Option<T>`. | Use explicit type conversion (e.g., `val as usize`) or pattern match with `.ok_or()` / `.map_err()`. |
+| **E0369** | Binary operation cannot be applied | Attempting `==` on a struct without `#[derive(PartialEq)]`. | Add `#[derive(PartialEq, Eq)]` above the struct/enum definition. |
 | **E0382** | Use of moved value | Variable borrowed after move. | Derive `Clone, Copy` on lightweight structs or use `.clone()` / references (`&`). |
-| **E0599** | Method not found in type | Missing trait import or missing method definition on struct. | Import required trait (e.g., `use core::fmt::Write;`) or implement missing method in `impl Struct`. |
+| **E0391** | Cyclic dependency in type definitions | Structs reference each other directly creating an infinite loop. | Use `Box`, reference primitives, or refactor struct relationships. |
 | **E0412** | Cannot find type in scope | Missing module re-export or missing `use` statement. | Check `src/lib.rs` / `src/klib/mod.rs` re-exports or add `use crate::...`. |
+| **E0423** | Expected function/struct, found type alias | Instantiating a type alias using struct construct syntax when alias is not a tuple struct. | Instantiate concrete struct type or call constructor function (e.g. `ProcessId::new(n)`). |
+| **E0425** | Cannot find value in scope | Variable or function identifier misspelled or out of scope. | Correct identifier spelling or import identifier into current scope. |
+| **E0428** | Name collision | Duplicate method, struct, or function name in same module. | Rename conflicting method or merge duplicate module blocks. |
+| **E0599** | Method not found in type | Missing trait import or missing method definition on struct. | Import required trait (e.g., `use core::fmt::Write;`) or implement missing method in `impl Struct`. |
 | **E0689** | Field or method access on ambiguous type | Type inference failed for integer/float literal. | Annotate type explicitly (e.g., `let x: u64 = 0;`). |
 
 ---
