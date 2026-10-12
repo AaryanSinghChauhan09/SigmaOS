@@ -3,6 +3,7 @@
 pub mod compatibility;
 pub mod sigmaautomount;
 pub mod sigmahal;
+pub mod sigmabluetooth;
 pub mod tech_powerup_hardware_monitors;
 pub mod win32;
 
@@ -26,4 +27,8 @@ pub use sigmahal::{
 pub use sigmaautomount::{
     SigmaAutoMount, MountPoint, MountOption, FsType, MountStatus,
     init_sigmaautomount, get_sigmaautomount, add_mount_point, mount_device, unmount_device,
+};
+pub use sigmabluetooth::{
+    SigmaBluetooth, BluetoothDevice, BluetoothDeviceType, BluetoothDeviceStatus, AdapterState,
+    init_sigmabluetooth, get_sigmabluetooth, pair_bluetooth_device, connect_bluetooth_device,
 };
