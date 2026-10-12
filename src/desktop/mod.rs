@@ -457,6 +457,28 @@ pub use image_viewer::{
     ZoomMode, Rotation, FlipDirection, SlideshowMode,
     init_image_viewer, get_image_viewer,
 };
+pub use password_manager::{
+    PasswordManager, PasswordEntry, Folder, PasswordStrength, GeneratorOptions,
+    init_password_manager, get_password_manager,
+};
+pub use screenshot_tool::{
+    ScreenshotTool, Screenshot, ScreenshotOptions,
+    CaptureMode, CaptureDelay, IncludeCursor, ImageFormat,
+    init_screenshot_tool, get_screenshot_tool,
+};
+pub use clipboard_manager::{
+    ClipboardManager, ClipboardItem,
+    init_clipboard_manager, get_clipboard_manager,
+};
+pub use notes_app::{
+    NotesApp, Note, NoteFolder, NoteColor,
+    init_notes_app, get_notes_app,
+};
+pub use weather_app::{
+    WeatherApp, CurrentWeather, ForecastDay, WeatherLocation,
+    WeatherCondition, TemperatureUnit, WindDirection,
+    init_weather_app, get_weather_app,
+};
 pub mod webapp_manager;
 pub use webapp_manager::*;
 pub mod appstore;
@@ -482,6 +504,11 @@ pub mod text_editor;
 pub mod calculator;
 pub mod calendar;
 pub mod image_viewer;
+pub mod password_manager;
+pub mod screenshot_tool;
+pub mod clipboard_manager;
+pub mod notes_app;
+pub mod weather_app;
 pub mod text_scaling;
 pub mod universal_desktop_framework;
 pub mod volume_manager;
