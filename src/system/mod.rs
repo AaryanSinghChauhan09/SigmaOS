@@ -19,6 +19,7 @@ pub mod power_manager;
 pub mod scheduler_manager;
 pub mod service_manager;
 pub mod settings_manager;
+pub mod sigmatime;
 pub mod system_manager;
 pub mod system_monitor;
 pub mod task_manager;
@@ -95,6 +96,10 @@ pub use optimizer::{
 pub use power::{
     BatterySaverManager, BatteryStatus, CpuPowerStrategy, DisplayPowerStrategy,
     NetworkPowerStrategy, PowerError, PowerMode, PowerResult, PowerStrategy,
+};
+pub use sigmatime::{
+    SigmaTime, TimeConfig, NtpServer, SyncStatus, TimeSource, SyncStats,
+    init_sigmatime, init_sigmatime_default, get_sigmatime, add_ntp_server, sync_time, get_current_time,
 };
 pub use power_manager::{
     BatteryInfo, PowerBatteryStatus, PowerConfig, PowerManager, PowerProfile, PowerSource,
