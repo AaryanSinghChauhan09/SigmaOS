@@ -927,6 +927,13 @@ if [ -f "src/distro/sovereign_linux_bsd_ecosystem_gap_closure_v43_pr.rs" ]; then
     ./build/test_gap_closure_v43_pr
 fi
 
+if [ -f "src/distro/sovereign_linux_bsd_ecosystem_gap_closure_v46_pr.rs" ]; then
+    echo "Running Sovereign Linux & BSD Ecosystem Gap Closure PR Suite V46 test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_linux_bsd_ecosystem_gap_closure_v46_pr.rs --edition=2021 -o build/test_gap_closure_v46_pr
+    ./build/test_gap_closure_v46_pr
+fi
+
 if [ -f "src/distro/omarchy_linux_gap_closure_pr_suite.rs" ]; then
     echo "Running Omarchy Linux Gap Closure & PR Gateway test suite..."
     mkdir -p build
