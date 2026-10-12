@@ -283,9 +283,9 @@ pub mod omarchy_palette;
 pub mod omarchy_theme;
 pub mod unified_shell;
 pub use unified_shell::{
-    UnifiedShellEngine, Theme, ThemeVariant,
+    UnifiedShellEngine, Theme as ShellTheme, ThemeVariant,
     Plugin, PluginType, PluginState,
-    KeyBinding, KeyboardLayout,
+    KeyBinding, KeyboardLayout as ShellKeyboardLayout,
     UnifiedNotification, NotificationUrgency as ShellNotificationUrgency,
     Widget, WidgetPosition,
     Panel, OSDElement, PolicyRule,
@@ -352,7 +352,7 @@ pub use zenith_compositor::{
 
 pub use zenith_config::{
     AppearanceConfig, CompositorBackend, CompositorConfig, InputConfig, MouseAcceleration,
-    OutputScale, Theme, ZenithConfig,
+    OutputScale, Theme as ZenithTheme, ZenithConfig,
 };
 
 pub use crate::desktop::sovereign_navigation_engine::{

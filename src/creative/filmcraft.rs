@@ -164,14 +164,14 @@ pub struct ExportSettings {
 }
 
 /// Timeline
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Timeline {
     pub tracks: Vec<VideoTrack>,
     pub transitions: Vec<Transition>,
     pub current_time: u32,
     pub duration: u32,
     pub zoom: f32,
-    pub snap_enabled: AtomicBool,
+    pub snap_enabled: bool,
 }
 
 /// Video effect
@@ -194,7 +194,7 @@ pub struct VideoEditor {
     pub color_grading: ColorGrading,
     pub audio_mixer: AudioMixer,
     pub export_settings: ExportSettings,
-    pub active: AtomicBool,
+    pub active: bool,
     pub hardware_acceleration: bool,
     pub proxy_enabled: bool,
 }
@@ -209,7 +209,7 @@ impl VideoEditor {
                 current_time: 0,
                 duration: 0,
                 zoom: 1.0,
-                snap_enabled: AtomicBool::new(true),
+                snap_enabled: true,
             },
             color_grading: ColorGrading {
                 lift: ColorWheel { hue: 0.0, saturation: 0.0, brightness: 0.0 },
@@ -231,7 +231,7 @@ impl VideoEditor {
                 bitrate: 5000,
                 container: "mp4".to_string(),
             },
-            active: AtomicBool::new(false),
+            active: false,
             hardware_acceleration: true,
             proxy_enabled: false,
         }
@@ -239,7 +239,7 @@ impl VideoEditor {
 
     /// Initialize video editor
     pub fn init(&mut self) {
-        self.active.store(true, Ordering::Relaxed);
+        self.active = true;
     }
 
     /// Create project
@@ -379,13 +379,12 @@ impl VideoEditor {
 
     /// Toggle snapping
     pub fn toggle_snapping(&mut self) {
-        let current = self.timeline.snap_enabled.load(Ordering::Relaxed);
-        self.timeline.snap_enabled.store(!current, Ordering::Relaxed);
+        self.timeline.snap_enabled = !self.timeline.snap_enabled;
     }
 
     /// Is active
     pub fn is_active(&self) -> bool {
-        self.active.load(Ordering::Relaxed)
+        self.active
     }
 
     /// Apply effect

@@ -214,7 +214,7 @@ pub struct CompositingNode {
     pub inputs: Vec<u32>, // input node IDs
     pub outputs: Vec<u32>, // output node IDs
     pub position: (f32, f32),
-    pub enabled: AtomicBool,
+    pub enabled: bool,
 }
 
 /// Node graph
@@ -344,7 +344,7 @@ impl EffectEngine {
             inputs: Vec::new(),
             outputs: Vec::new(),
             position: (x, y),
-            enabled: AtomicBool::new(true),
+            enabled: true,
         };
         self.node_graph.nodes.insert(id, node);
         id
@@ -352,11 +352,15 @@ impl EffectEngine {
 
     /// Connect nodes
     pub fn connect_nodes(&mut self, from_id: u32, to_id: u32) -> Result<(), &'static str> {
-        let from_node = self.node_graph.nodes.get_mut(&from_id).ok_or("Source node not found")?;
-        let to_node = self.node_graph.nodes.get_mut(&to_id).ok_or("Target node not found")?;
+        if !self.node_graph.nodes.contains_key(&from_id) {
+            return Err("Source node not found");
+        }
+        if !self.node_graph.nodes.contains_key(&to_id) {
+            return Err("Target node not found");
+        }
         
-        from_node.outputs.push(to_id);
-        to_node.inputs.push(from_id);
+        self.node_graph.nodes.get_mut(&from_id).unwrap().outputs.push(to_id);
+        self.node_graph.nodes.get_mut(&to_id).unwrap().inputs.push(from_id);
         self.node_graph.connections.push((from_id, to_id));
         Ok(())
     }

@@ -33,20 +33,20 @@ pub use vectorcraft::{
 };
 pub use pdfcraft::{
     PdfEditor, PdfPage, PdfElement,
-    FontFamily, FontSize, TextAlignment,
+    FontFamily as PdfFontFamily, FontSize, TextAlignment as PdfTextAlignment,
     TextObject, ImageObject, ShapeObject,
     ShapeType, AnnotationType, Annotation,
     FormFieldType, FormField,
     Bookmark, Hyperlink,
-    PdfMetadata, SecuritySettings, ExportFormat,
+    PdfMetadata, SecuritySettings, ExportFormat as PdfExportFormat,
     init_pdfcraft, get_pdfcraft,
 };
 pub use designcraft::{
     DesignEditor, Canvas, Element, Color,
     ColorModel, FontFamily, FontWeight, TextAlignment,
-    ElementType, TextElement, Layer, BlendMode as DesignBlendMode,
+    ElementType, TextElement, Layer, DesignBlendMode,
     Guide, GuideOrientation, Grid,
-    Component, Style, StyleType, ExportFormat, Artboard,
+    Component, Style, StyleType, ExportFormat as DesignExportFormat, Artboard,
     init_designcraft, get_designcraft,
 };
 pub use effectcraft::{
@@ -60,14 +60,14 @@ pub use lightcraft::{
     LightEngine, Light, LightType, Material, Scene,
     RawFormat, ColorSpace, ToneCurve, ToneCurvePoint, CurveType,
     ColorMixer, ColorMixerBand, ColorGradingWheel, ThreeWayColorGrading,
-    Mask, MaskType, Preset, PhotoMetadata, Photo, Album, Rating, Flag,
+    Mask, MaskType as LightMaskType, Preset, PhotoMetadata, Photo, Album, Rating, Flag,
     init_lightcraft, get_lightcraft,
 };
 pub use mediacraft::{
     MediaPlayer, MediaItem, MediaLibrary, Playlist,
-    MediaType, AudioCodec, VideoCodec, ContainerFormat,
+    MediaType, AudioCodec as MediaAudioCodec, VideoCodec as MediaVideoCodec, ContainerFormat,
     PlaybackState, RepeatMode, ShuffleMode,
-    AudioTrack, SubtitleTrack, VideoTrack,
+    AudioTrack, SubtitleTrack, VideoTrack as MediaVideoTrack,
     EqualizerBand, EqualizerPreset, AudioSettings, VideoSettings,
     StreamProtocol, StreamSource,
     init_mediacraft, get_mediacraft,

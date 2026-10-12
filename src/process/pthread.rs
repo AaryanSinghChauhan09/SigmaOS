@@ -198,7 +198,8 @@ impl PthreadManager {
     pub fn create(&mut self, func: ThreadFunc, arg: *mut u8, attr: Option<&PthreadAttr>) -> Result<PthreadT, i32> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst) as PthreadT;
         
-        let thread_attr = attr.unwrap_or(&PthreadAttr::default());
+        let default_attr = PthreadAttr::default();
+        let thread_attr = attr.unwrap_or(&default_attr);
         
         let tcb = Box::new(ThreadControlBlock {
             id,
@@ -246,7 +247,10 @@ impl PthreadManager {
     
     /// Detach a thread
     pub fn detach(&mut self, thread: PthreadT) -> i32 {
-        let tcb = self.threads.get_mut(&thread).ok_or(3)?; // ESRCH
+        let tcb = match self.threads.get_mut(&thread) {
+            Some(t) => t,
+            None => return 3, // ESRCH
+        };
         
         if tcb.detached.load(Ordering::SeqCst) {
             return 22; // EINVAL
@@ -293,12 +297,12 @@ impl PthreadManager {
     
     /// Get thread by ID
     pub fn get_thread(&self, thread: PthreadT) -> Option<&ThreadControlBlock> {
-        self.threads.get(&thread)
+        self.threads.get(&thread).map(|b| b.as_ref())
     }
     
     /// Get mutable thread by ID
     pub fn get_thread_mut(&mut self, thread: PthreadT) -> Option<&mut ThreadControlBlock> {
-        self.threads.get_mut(&thread)
+        self.threads.get_mut(&thread).map(|b| b.as_mut())
     }
 }
 

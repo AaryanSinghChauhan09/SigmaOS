@@ -281,8 +281,8 @@ impl PdfEditor {
 
     /// Create new PDF
     pub fn create_pdf(&mut self, name: String) {
-        self.document = Some(name);
         self.metadata.title = name.clone();
+        self.document = Some(name);
     }
 
     /// Add page

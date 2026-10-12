@@ -594,7 +594,7 @@ pub mod bootable_vertical_slices_missing_components_pr;
 pub use bootable_vertical_slices_missing_components_pr::*;
 
 pub mod sovereign_open_source_os_apex_inspirations_v50;
-pub use sovereign_open_source_os_apex_inspirations_v50::*;
+pub use sovereign_open_source_os_apex_inspirations_v50::{FlakeInput as ApexFlakeInput, *};
 
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;
