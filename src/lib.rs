@@ -400,6 +400,13 @@ pub mod monitor;
 pub mod monitoring;
 pub mod net;
 pub mod networking;
+
+pub use net::sovereign_networking_stack_and_daemons_pr::{
+    NetworkingPrProposalManifest, SovereignCoreTcpIpStackEngine, SovereignCryptoTunnelsAndVpnEngine,
+    SovereignDhcpDnsServicesEngine, SovereignNetUtilitiesAndDiagnosticsEngine,
+    SovereignNetworkConfigDaemonsEngine, SovereignNetworkingStackAndDaemonsParityPrGateway,
+    SovereignPacketFilteringAndFirewallEngine, SovereignWirelessAndBluetoothEngine,
+};
 pub mod nlp;
 pub mod notification;
 pub mod onboarding;
