@@ -528,6 +528,19 @@ pub use themes_manager::{
     ThemesManager, Theme, AppearanceSettings, ThemeType, ColorScheme, AccentColor,
     init_themes_manager, get_themes_manager,
 };
+pub use screen_recorder::{
+    ScreenRecorder, RecordingConfig, RecordingArea, VideoCodec, AudioCodec, ContainerFormat,
+    RecordingQuality, RecordingState,
+    init_screen_recorder, get_screen_recorder,
+};
+pub use timer_app::{
+    TimerApp, Timer, Stopwatch, Lap, Alarm, TimerState, StopwatchState, AlarmState,
+    init_timer_app, get_timer_app,
+};
+pub use search_app::{
+    SearchApp, SearchResult, SearchIndex, SearchType, FileTypeFilter, SortOrder,
+    init_search_app, get_search_app,
+};
 pub mod webapp_manager;
 pub use webapp_manager::*;
 pub mod appstore;
@@ -570,6 +583,9 @@ pub mod font_manager;
 pub mod bluetooth_manager;
 pub mod printer_manager;
 pub mod themes_manager;
+pub mod screen_recorder;
+pub mod timer_app;
+pub mod search_app;
 pub mod text_scaling;
 pub mod universal_desktop_framework;
 pub mod volume_manager;
