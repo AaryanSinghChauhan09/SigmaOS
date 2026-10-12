@@ -238,9 +238,21 @@ impl SovereignLinuxBsdWikiRoadmapParityEngine {
             ),
             (
                 32,
+<<<<<<< HEAD
                 "Command Interpreter Development Plan & PR Gateway Suite",
                 "src/shell/sovereign_command_interpreter.rs",
                 "wiki/34-SigmaOS-Command-Interpreter-Plan.md",
+=======
+                "System Apps Development Plan & Governance Suite",
+                "src/system_apps/sovereign_system_apps_development_and_pr_suite.rs",
+                "wiki/32-System-Apps-Development-Plan.md",
+            ),
+            (
+                33,
+                "Sovereign Kernel and Bootloader Advancements PR Suite V47",
+                "src/boot/sovereign_kernel_and_bootloader_advancements_v47_pr.rs",
+                "wiki/33-Kernel-and-Bootloader-Advancements-Plan.md",
+>>>>>>> origin/main
             ),
         ];
 
@@ -371,8 +383,13 @@ mod tests {
     #[test]
     fn test_wiki_roadmap_parity_engine() {
         let engine = SovereignLinuxBsdWikiRoadmapParityEngine::new();
+<<<<<<< HEAD
         assert_eq!(engine.total_ideas_count, 32);
         assert_eq!(engine.implemented_ideas_count(), 32);
+=======
+        assert_eq!(engine.total_ideas_count, 33);
+        assert_eq!(engine.implemented_ideas_count(), 33);
+>>>>>>> origin/main
         assert_eq!(engine.verification_percentage(), 100.0);
     }
 

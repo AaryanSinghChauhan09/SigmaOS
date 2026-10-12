@@ -8,82 +8,64 @@ Closes #<issue-id>
 
 ## Component
 
-<!-- kernel, memory, VFS, IPC, security, drivers, packaging, desktop, installer, etc. -->
-
-## Upstream study
-
-- Project:
-- Version/commit:
-- Research note:
-- ADR:
-
-## Component rules added or enforced
-
-- [ ] New rule
-- [ ] Existing rule enforced
-- [ ] Rule test added
-- [ ] CI gate added
-- [ ] Documentation updated
-
-## What SigmaOS adopts
-
-<!-- State the upstream principle or mechanism adopted. -->
-
-## What SigmaOS changes or rejects
-
-<!-- State simplifications, deviations, and rejected ideas. -->
-
-## Component impact
-
-- Component:
-- Maturity before:
-- Maturity after:
-- Runtime path affected:
+- [ ] Thread manager
+- [ ] Scheduler
+- [ ] Process management
+- [ ] Memory management
+- [ ] VFS / filesystems
+- [ ] Drivers
+- [ ] IPC
+- [ ] Security
+- [ ] Installer / packaging
+- [ ] Documentation
+- [ ] CI / tooling
 
 ## Changes
 
 - [ ] Source implementation
-- [ ] Unit tests
-- [ ] Integration tests
-- [ ] QEMU/runtime test
-- [ ] Documentation
-- [ ] Capability/status update
-- [ ] Regression protection
-- [ ] Security review, if applicable
+- [ ] Unit tests added / updated
+- [ ] Integration tests added / updated
+- [ ] Concurrency / stress tests added / updated
+- [ ] Fuzz tests added / updated
+- [ ] Boot smoke test performed, if kernel-facing
+- [ ] Documentation updated
+- [ ] `FEATURE_STATUS.toml` capability updated
 
 ## Verification
 
 ```bash
+cargo fmt --check
+cargo clippy --all-targets -- -D warnings
 cargo check --lib
 cargo test --lib
 ./run_sigma_tests.sh
-make check
-make test
-make format
 ```
 
-## Runtime evidence
+Paste relevant output below:
 
-- [ ] QEMU boot log
-- [ ] Installer/update test log
-- [ ] Package dry-run report
-- [ ] Hardware test log, if applicable
-- [ ] Artifact hash
+```text
+```
 
-## Safety and rollback
+## Capability Status
 
-- [ ] No broad credentials or host access introduced
-- [ ] Untrusted input is validated
-- [ ] Package scripts are sandboxed, if applicable
-- [ ] Rollback/recovery behavior defined
-- [ ] Security review completed, if applicable
+- Previous status:
+- New status:
+- Test evidence:
 
-## Reviewer checklist
+## Integration Impact
 
-- [ ] Scope is narrow
-- [ ] Component rules are enforceable
-- [ ] Tests cover the change and rules
-- [ ] Runtime evidence is linked
-- [ ] Documentation matches implementation
-- [ ] Capability status is evidence-based
-- [ ] No unsupported Linux/BSD parity claims
+- [ ] No runtime integration yet (unit-tested only)
+- [ ] Connected to runtime path
+- [ ] Boot path validated
+- [ ] Installer / update path validated
+- [ ] Hardware tested
+
+## Reviewer Checklist
+
+- [ ] Scope is narrow (one logical subsystem per PR)
+- [ ] Public API fully documented
+- [ ] `unsafe` code justified with safety invariant comments
+- [ ] Lock ordering documented and deadlock-safe
+- [ ] Error paths and timeout bounds tested
+- [ ] `FEATURE_STATUS.toml` feature status updated
+- [ ] No unsupported Linux/BSD compatibility claims

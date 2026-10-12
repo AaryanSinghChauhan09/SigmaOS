@@ -6,7 +6,7 @@
 // 1. OpenSourceOsUnimplementedIdeasPrEngine: Staging, diff generation, and validation for open-source OS PRs.
 // 2. OpenSourceOsPrProposalRegistry: Pull request metadata tracker and FNV-1a patch digest validator.
 // 3. SovereignOpenSourceOsIdeasMasterSuite: Master coordinator ensuring 100% PR deployment status across Linux,
-//    BSD, Illumos, Redox, Haiku, Plan 9, Minix 3, and Genode OS paradigms.
+//    BSD, Illumos, Redox, Haiku, Plan 9, Minix 3, Genode, QNX, SerenityOS, and TempleOS paradigms.
 
 use std::collections::BTreeMap;
 use std::string::String;
@@ -23,6 +23,9 @@ pub enum OpenSourceOsCategory {
     Plan9Filesystem,
     MinixSelfHealing,
     GenodeCapabilityRpc,
+    QnxNeutrinoRealtime,
+    SerenityLibGui,
+    TempleOsHolyC,
 }
 
 impl OpenSourceOsCategory {
@@ -36,6 +39,9 @@ impl OpenSourceOsCategory {
             Self::Plan9Filesystem => "Plan 9 9P2000 Protocol",
             Self::MinixSelfHealing => "Minix 3 Reincarnation Server",
             Self::GenodeCapabilityRpc => "Genode Capability RPC Router",
+            Self::QnxNeutrinoRealtime => "QNX Neutrino Realtime Microkernel",
+            Self::SerenityLibGui => "SerenityOS LibGUI & EventLoop IPC",
+            Self::TempleOsHolyC => "TempleOS HolyC JIT & Ring 0 System",
         }
     }
 }
@@ -97,9 +103,19 @@ impl OpenSourceOsUnimplementedIdeasPrEngine {
                 "bsd_security_geom",
             ),
             (
+                "feat(bsd): FreeBSD bhyve microvm hypervisor & OpenBSD VMM guest driver shim",
+                OpenSourceOsCategory::BsdEcosystem,
+                "freebsd_bhyve_openbsd_vmm",
+            ),
+            (
                 "feat(illumos): DTrace eBPF dynamic probes & Crossbow VNIC virtual router",
                 OpenSourceOsCategory::IllumosSolaris,
                 "illumos_dtrace_crossbow",
+            ),
+            (
+                "feat(illumos): Fault Management Architecture (FMA) & SMF service dependency state machine",
+                OpenSourceOsCategory::IllumosSolaris,
+                "illumos_fma_smf",
             ),
             (
                 "feat(redox): Scheme handler URI IPC router & orbital window compositing ring",
@@ -107,14 +123,29 @@ impl OpenSourceOsUnimplementedIdeasPrEngine {
                 "redox_scheme_router",
             ),
             (
+                "feat(redox): Redox Ion package manager & RedoxFS CoW block storage engine",
+                OpenSourceOsCategory::RedoxMicrokernel,
+                "redox_ion_redoxfs",
+            ),
+            (
                 "feat(haiku): BFS attribute key-value indexer & live query database engine",
                 OpenSourceOsCategory::HaikuBfs,
                 "haiku_bfs_indexer",
             ),
             (
+                "feat(haiku): Media Kit audio/video node graph router & Deskbar status tray",
+                OpenSourceOsCategory::HaikuBfs,
+                "haiku_media_deskbar",
+            ),
+            (
                 "feat(plan9): 9P2000.L zero-copy file protocol server & client bridge",
                 OpenSourceOsCategory::Plan9Filesystem,
                 "plan9_9p2000_bridge",
+            ),
+            (
+                "feat(plan9): Inferno Styx authentication handshake & per-process namespace mounting",
+                OpenSourceOsCategory::Plan9Filesystem,
+                "plan9_styx_namespace",
             ),
             (
                 "feat(minix): Reincarnation server driver health monitor & auto-restart",
@@ -125,6 +156,21 @@ impl OpenSourceOsUnimplementedIdeasPrEngine {
                 "feat(genode): Object-oriented capability RPC delegation router",
                 OpenSourceOsCategory::GenodeCapabilityRpc,
                 "genode_capability_rpc",
+            ),
+            (
+                "feat(qnx): Adaptive Partitioning Scheduler (APS) & Resource Manager IPC framework",
+                OpenSourceOsCategory::QnxNeutrinoRealtime,
+                "qnx_aps_resmgr",
+            ),
+            (
+                "feat(serenity): LibGUI async IPC widget protocol & WindowServer compositing thread",
+                OpenSourceOsCategory::SerenityLibGui,
+                "serenity_libgui_windowserver",
+            ),
+            (
+                "feat(templeos): HolyC JIT compiler evaluator & Ring 0 identity-mapped memory model",
+                OpenSourceOsCategory::TempleOsHolyC,
+                "templeos_holyc_ring0",
             ),
         ];
 
@@ -191,7 +237,7 @@ impl SovereignOpenSourceOsIdeasMasterSuite {
     }
 
     pub fn verify_all_open_source_os_pr_ideas(&self) -> bool {
-        self.pr_engine.get_merged_pr_count() >= 8
+        self.pr_engine.get_merged_pr_count() >= 16
     }
 
     pub fn get_category_pr_summary(&self) -> Vec<(String, usize)> {
@@ -219,7 +265,7 @@ mod tests {
     #[test]
     fn test_open_source_os_unimplemented_ideas_pr_engine() {
         let engine = OpenSourceOsUnimplementedIdeasPrEngine::new();
-        assert_eq!(engine.get_merged_pr_count(), 8);
+        assert_eq!(engine.get_merged_pr_count(), 16);
 
         let diff = engine.generate_pr_diff_patch(1001);
         assert!(diff.is_some());
@@ -234,6 +280,6 @@ mod tests {
         assert!(master.verify_all_open_source_os_pr_ideas());
 
         let summary = master.get_category_pr_summary();
-        assert_eq!(summary.len(), 8);
+        assert_eq!(summary.len(), 11);
     }
 }

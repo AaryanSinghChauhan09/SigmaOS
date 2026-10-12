@@ -34,7 +34,7 @@ pub enum TaskStatus {
 }
 
 /// Scheduled task
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct ScheduledTask {
     pub id: u32,
     pub name: String,
