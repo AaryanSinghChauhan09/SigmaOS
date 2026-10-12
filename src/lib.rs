@@ -150,6 +150,8 @@ pub use distro::sovereign_mint_omarchy_innovations_v31::*;
 pub use distro::sovereign_mint_omarchy_v32_apex_arsenal::*;
 pub use distro::sovereign_mint_omarchy_v33_apex_vanguard::*;
 pub use distro::sovereign_mint_omarchy_v34_apex_pantheon::*;
+pub use distro::debian_gap_closure_advancements_v26::*;
+pub use distro::open_source_os_unimplemented_ideas_pr_suite::*;
 pub use distro::sovereign_open_source_os_gap_closure_v27::*;
 pub use distro::sovereign_thousands_distro_components::*;
 pub use distro::sovereign_universal_subsystem_interop::*;
