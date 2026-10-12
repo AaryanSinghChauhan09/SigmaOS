@@ -597,6 +597,8 @@ pub mod clipboard;
 pub mod clipboard_advanced;
 pub mod desktop_portal;
 pub mod elementary_pantheon_innovations;
+pub mod elementary_os_github_inspired_components;
+pub use elementary_os_github_inspired_components::*;
 pub mod file_manager;
 pub mod filemanager;
 pub mod gaming_engine;

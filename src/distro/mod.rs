@@ -528,6 +528,9 @@ pub use open_source_os_unimplemented_ideas_pr::*;
 pub mod open_source_os_unimplemented_ideas_pr_suite;
 pub use open_source_os_unimplemented_ideas_pr_suite::*;
 
+pub mod open_source_os_nextgen_ideas_pr_suite;
+pub use open_source_os_nextgen_ideas_pr_suite::*;
+
 pub mod open_source_os_unimplemented_ideas_pr_gateway;
 pub use open_source_os_unimplemented_ideas_pr_gateway::*;
 
