@@ -20,6 +20,7 @@ pub mod scheduler_manager;
 pub mod service_manager;
 pub mod settings_manager;
 pub mod sigmacron;
+pub mod sigmapower;
 pub mod sigmatime;
 pub mod sigmatimer;
 pub mod system_manager;
@@ -110,6 +111,10 @@ pub use sigmacron::{
 pub use sigmatimer::{
     SigmaTimer, TimerUnit, TriggerType, TimerStatus, TimerAccuracy,
     init_sigmatimer, get_sigmatimer, add_timer_unit, enable_timer_unit, disable_timer_unit,
+};
+pub use sigmapower::{
+    SigmaPower, BatteryInfo as SigmaBatteryInfo, PowerProfile as SigmaPowerProfile, PowerState, BatteryStatus as SigmaBatteryStatus, PowerStats,
+    init_sigmapower, get_sigmapower, set_power_profile, suspend_system, shutdown_system,
 };
 pub use power_manager::{
     BatteryInfo, PowerBatteryStatus, PowerConfig, PowerManager, PowerProfile, PowerSource,
