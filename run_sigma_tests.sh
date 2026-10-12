@@ -1109,4 +1109,11 @@ if [ -f "src/drivers/sovereign_device_driver_development_and_pr_suite.rs" ]; the
     ./build/test_device_driver_pr_suite
 fi
 
+if [ -f "src/distro/sovereign_open_source_os_apex_inspirations_v50.rs" ]; then
+    echo "Running Sovereign Open Source OS Apex Inspirations Engine (V50) test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_open_source_os_apex_inspirations_v50.rs --edition=2021 -o build/test_apex_v50
+    ./build/test_apex_v50
+fi
+
 echo "All SigmaOS test suites completed."

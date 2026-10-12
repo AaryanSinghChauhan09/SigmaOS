@@ -570,6 +570,9 @@ pub mod wiki_unimplemented_ideas;
 pub mod sovereign_tech_media_wiki_ultimate_parity_pr;
 pub use sovereign_tech_media_wiki_ultimate_parity_pr::*;
 
+pub mod sovereign_open_source_os_apex_inspirations_v50;
+pub use sovereign_open_source_os_apex_inspirations_v50::*;
+
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;
 pub use crate::stubs::large_distro_stubs::*;
