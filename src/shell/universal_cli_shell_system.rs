@@ -470,12 +470,25 @@ impl UniversalShellScriptTranspiler {
     fn transpile_ksh_line(line: &str, vars: &mut BTreeMap<String, String>) -> String {
         let l = line.to_string();
 
-        if l.starts_with("typeset ") || l.starts_with("integer ") {
+        if l.starts_with("typeset -A ") {
+            let name = l.trim_start_matches("typeset -A ").trim();
+            return format!("# ksh associative array declaration: {}", name);
+        }
+        if l.starts_with("typeset -i ") || l.starts_with("integer ") {
             let rest = l
-                .trim_start_matches("typeset ")
-                .trim_start_matches("-i ")
+                .trim_start_matches("typeset -i ")
                 .trim_start_matches("integer ")
                 .trim();
+            if let Some(eq) = rest.find('=') {
+                let k = rest[..eq].trim();
+                let v = rest[eq + 1..].trim();
+                vars.insert(k.to_string(), v.to_string());
+                return format!("{}=$(( {} ))", k, v);
+            }
+            return format!(": ${{{}:-0}}", rest);
+        }
+        if l.starts_with("typeset ") {
+            let rest = l.trim_start_matches("typeset ").trim();
             if let Some(eq) = rest.find('=') {
                 let k = rest[..eq].trim();
                 let v = rest[eq + 1..].trim();
@@ -723,6 +736,14 @@ impl UniversalShellScriptTranspiler {
                 .trim();
             return format!("# zsh/bash assoc array declaration: {}", name);
         }
+        if l.starts_with("select ") {
+            let rest = l.trim_start_matches("select ").trim();
+            if let Some(in_pos) = rest.find(" in ") {
+                let var = rest[..in_pos].trim();
+                let list = rest[in_pos + 4..].trim().trim_end_matches("; do").trim();
+                return format!("for {} in {}; do # select loop emulation", var, list);
+            }
+        }
         if l.starts_with("export ") {
             if let Some(eq) = l.find('=') {
                 let k = l[7..eq].trim();
@@ -752,6 +773,14 @@ impl UniversalShellScriptTranspiler {
                 let v = rest[eq + 1..].trim();
                 vars.insert(k.to_string(), v.to_string());
                 return format!("{}={}", k, v);
+            }
+        }
+        if l.starts_with("select ") {
+            let rest = l.trim_start_matches("select ").trim();
+            if let Some(in_pos) = rest.find(" in ") {
+                let var = rest[..in_pos].trim();
+                let list = rest[in_pos + 4..].trim().trim_end_matches("; do").trim();
+                return format!("for {} in {}; do # select loop emulation", var, list);
             }
         }
         if l.starts_with("readarray ") || l.starts_with("mapfile ") {
@@ -1476,11 +1505,18 @@ mod tests {
             .contains("# zsh/bash assoc array declaration"));
 
         let bash_script =
-            "#!/bin/bash\ndeclare -g SERVICE=httpd\nlocal TIMEOUT=30\ndiff <(ls dir1) <(ls dir2)";
+            "#!/bin/bash\ndeclare -g SERVICE=httpd\nlocal TIMEOUT=30\ndiff <(ls dir1) <(ls dir2)\nselect OPT in item1 item2; do echo $OPT; done";
         let plan_bash = UniversalShellScriptTranspiler::transpile_script(bash_script);
         assert_eq!(plan_bash.target_format, ShellSystemFormat::Bash);
         assert!(plan_bash.posix_sh_script.contains("SERVICE=httpd"));
         assert!(plan_bash.posix_sh_script.contains("TIMEOUT=30"));
         assert!(plan_bash.posix_sh_script.contains("$( ls dir1 )"));
+        assert!(plan_bash.posix_sh_script.contains("for OPT in item1 item2; do"));
+
+        let ksh_script = "#!/bin/ksh\ntypeset -A cache\ninteger COUNTER=10";
+        let plan_ksh = UniversalShellScriptTranspiler::transpile_script(ksh_script);
+        assert_eq!(plan_ksh.target_format, ShellSystemFormat::Ksh);
+        assert!(plan_ksh.posix_sh_script.contains("COUNTER=$(( 10 ))"));
+        assert!(plan_ksh.posix_sh_script.contains("# ksh associative array declaration"));
     }
 }

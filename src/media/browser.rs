@@ -3429,6 +3429,18 @@ impl SovereignOpenSourceBrowserSuiteEngine {
             boost_count.to_string(),
         );
 
+        let v8_audited = self
+            .browser
+            .v8_isolate_governor
+            .verify_wx_sandbox_bounds(0x0000_7f00_0010_0000);
+        results.insert("chromium_v8_isolate_audited".to_string(), v8_audited.to_string());
+
+        let heap_compacted = self.browser.v8_isolate_governor.compact_isolate_heap();
+        results.insert(
+            "chromium_v8_heap_compacted_bytes".to_string(),
+            heap_compacted.to_string(),
+        );
+
         results
     }
 
