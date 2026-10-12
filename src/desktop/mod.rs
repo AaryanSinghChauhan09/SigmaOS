@@ -448,8 +448,13 @@ pub mod xfce_engine;
 pub mod zenith;
 pub mod sovereign_gui_development_and_pr_suite;
 pub use sovereign_gui_development_and_pr_suite::*;
+<<<<<<< HEAD
+pub mod sovereign_desktop_toolkits_and_services;
+pub use sovereign_desktop_toolkits_and_services::*;
+=======
 pub mod sovereign_de_wm_innovation_engine;
 pub use sovereign_de_wm_innovation_engine::*;
+>>>>>>> origin/main
 pub mod zenith_advanced_features;
 pub mod sovereign_desktop_toolkits_and_services;
 pub use sovereign_desktop_toolkits_and_services::*;

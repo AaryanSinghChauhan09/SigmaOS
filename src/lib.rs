@@ -102,8 +102,12 @@ pub mod virtualization;
 pub use desktop::{
     CachyosGamescopeHandheldOverlay, Gnome46MutterEngine, ItsFossQuickShareAndBackupHud,
     KdePlasma6Engine, LuminaBsdDesktopEngine, PhoronixPerformanceBenchmarkWidget,
-    PopOsKdeTilingWorkspaceGridEngine, SovereignUxMasterEngine, SwayRegolithWmEngine,
-    WindowsCopilotAiAssistantSidebar, Xfce418Engine,
+    PopOsKdeTilingWorkspaceGridEngine, SovereignClipboardManagerEngine,
+    SovereignDesktopNotificationDaemonEngine, SovereignDesktopServicesPrGatewayEngine,
+    SovereignDisplayManagerSuiteEngine, SovereignFontAndTextLayoutEngine, SovereignGtkQtToolkitEngine,
+    SovereignGvfsGioEngine, SovereignInputMethodFrameworkEngine, SovereignPolicyKitAuthorizationEngine,
+    SovereignScreenLockerEngine, SovereignUxMasterEngine, SovereignXdgDesktopPortalEngine,
+    SwayRegolithWmEngine, WindowsCopilotAiAssistantSidebar, Xfce418Engine,
 };
 pub use desktop::sovereign_desktop_toolkits_and_services::*;
 pub use kernel::{
