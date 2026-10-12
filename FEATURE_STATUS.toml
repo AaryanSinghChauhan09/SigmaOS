@@ -434,9 +434,9 @@ next_milestone = "ACPI table parsing and QEMU power state integration"
 
 [ipc.handler]
 status = "modeled"
-files = ["src/ipc/", "docs/ipc-handler.md"]
+files = ["src/ipc/", "docs/ipc-handler.md", "wiki/ipc-handler.md"]
 description = "Formally specified, testable IPC handler subsystem covering pipes, FIFOs, UNIX sockets, shared memory, message queues, futexes, event wakeups, signal control plane, FD passing, and access control policies."
-test_evidence = "Architecture specification complete in docs/ipc-handler.md; unit tests pass for futex and signal primitives."
+test_evidence = "Architecture specification complete in docs/ipc-handler.md and wiki/ipc-handler.md; unit tests pass for futex and signal primitives."
 next_milestone = "Phase 2 Core IPC objects and Phase 3 Anonymous Pipes implementation"
 
 <<<<<<< HEAD

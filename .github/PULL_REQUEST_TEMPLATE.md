@@ -23,6 +23,44 @@
 
 ## I/O component
 
+<<<<<<< HEAD
+- [ ] IPC handler
+- [ ] Pipes / FIFOs
+- [ ] UNIX-domain sockets
+- [ ] Shared memory
+- [ ] Message queues
+- [ ] Event wakeups
+- [ ] Signals
+- [ ] Process/thread management
+- [ ] VFS
+- [ ] Security
+- [ ] Documentation
+- [ ] CI / tooling
+
+## Upstream study / Motivation
+
+- Project / Reference:
+- Research note / ADR:
+
+## IPC & Subsystem Semantics
+
+- Blocking behavior:
+- Non-blocking behavior:
+- EOF / closure behavior:
+- Error behavior:
+- Permission model:
+- Resource limits:
+- Backpressure policy:
+
+## Security review
+
+- [ ] User input validated
+- [ ] Descriptor lifecycle checked
+- [ ] Capability/namespace checks enforced
+- [ ] No unbounded kernel allocation
+- [ ] `unsafe` justified with SAFETY comments
+- [ ] Threat model updated
+=======
 - [ ] I/O policy
 - [ ] Block device manager
 - [ ] virtio / NVMe / virtio
@@ -73,6 +111,7 @@
 -
 
 ## Shell safety review
+>>>>>>> origin/main
 
 - [ ] Expansion order is correct
 - [ ] Quoting behavior is preserved
@@ -170,8 +209,17 @@
 - [ ] Documentation
 - [ ] CI / tooling
 
-## Changes
+## Tests
 
+<<<<<<< HEAD
+- [ ] Unit tests
+- [ ] Integration tests
+- [ ] Concurrency/stress tests
+- [ ] Timeout tests
+- [ ] Fuzz tests
+- [ ] Resource-exhaustion tests
+- [ ] Regression test attached for fixed bug
+=======
 - [ ] Source implementation
 - [ ] Unit tests added / updated
 - [ ] Integration tests added / updated
@@ -180,6 +228,7 @@
 - [ ] Boot smoke test performed, if kernel-facing
 - [ ] Documentation updated
 - [ ] `FEATURE_STATUS.toml` capability updated
+>>>>>>> origin/main
 >>>>>>> origin/main
 
 ## Status updates
@@ -203,6 +252,23 @@ cargo test --lib
 ./run_sigma_tests.sh
 ```
 
+<<<<<<< HEAD
+Paste output below.
+
+## Capability status
+
+- Previous status:
+- New status:
+- Evidence:
+
+## Integration impact
+
+- [ ] Unit-tested only
+- [ ] Connected to runtime path
+- [ ] Boot path validated
+- [ ] Installer/update path validated
+- [ ] Hardware tested
+=======
 Paste relevant output below:
 
 ```text
@@ -213,6 +279,7 @@ Paste relevant output below:
 - Previous status:
 - New status:
 - Test evidence:
+>>>>>>> origin/main
 
 ## Integration Impact
 
