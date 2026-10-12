@@ -174,11 +174,15 @@ pub use boot_analyzer::{
     analyze_boot_time, analyze_blame, analyze_critical_chain,
 };
 pub use task_scheduler::{
-    TaskScheduler, ScheduledTask, ScheduleFrequency, TaskStatus,
+    TaskScheduler,
+    ScheduledTask as SchedTask,
+    ScheduleFrequency as SchedFrequency,
+    TaskStatus as SchedTaskStatus,
     init_task_scheduler, get_task_scheduler,
 };
 pub use monitor::{
-    SystemMonitor as SystemMonitorNew, CpuStats, MemoryStats, ProcessStats, ProcessState,
+    SystemMonitor as SystemMonitorNew, CpuStats, MemoryStats, ProcessStats,
+    ProcessState as MonitorProcessState,
     NetworkStats, DiskStats,
     init_system_monitor, get_system_monitor,
 };
