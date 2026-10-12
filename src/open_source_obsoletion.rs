@@ -4564,6 +4564,552 @@ impl Default for SovereignCaddyAutomaticTlsEngine {
     }
 }
 
+// =========================================================================
+// 81. SOVEREIGN ZOXIDE DIRECTORY JUMP ENGINE (Superseding Zoxide, Autojump, Fasd)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct DirectoryJumpEntry {
+    pub path: String,
+    pub frecency_score: f64,
+    pub last_visited_secs: u64,
+}
+
+pub struct SovereignZoxideDirectoryJumpEngine {
+    pub entries: Vec<DirectoryJumpEntry>,
+}
+
+impl SovereignZoxideDirectoryJumpEngine {
+    pub fn new() -> Self {
+        Self { entries: Vec::new() }
+    }
+
+    pub fn add_or_update_visit(&mut self, path: &str, current_secs: u64) {
+        if let Some(entry) = self.entries.iter_mut().find(|e| e.path == path) {
+            entry.frecency_score += 10.0;
+            entry.last_visited_secs = current_secs;
+        } else {
+            self.entries.push(DirectoryJumpEntry {
+                path: path.to_string(),
+                frecency_score: 10.0,
+                last_visited_secs: current_secs,
+            });
+        }
+    }
+
+    pub fn query_best_match(&self, query: &str) -> Option<String> {
+        let mut matches: Vec<&DirectoryJumpEntry> = self
+            .entries
+            .iter()
+            .filter(|e| e.path.contains(query))
+            .collect();
+        matches.sort_by(|a, b| {
+            b.frecency_score
+                .partial_cmp(&a.frecency_score)
+                .unwrap_or(core::cmp::Ordering::Equal)
+        });
+        matches.first().map(|e| e.path.clone())
+    }
+}
+
+impl Default for SovereignZoxideDirectoryJumpEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 82. SOVEREIGN HYPERFINE BENCHMARK ENGINE (Superseding Hyperfine)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct BenchmarkRunResult {
+    pub command: String,
+    pub mean_secs: f64,
+    pub stddev_secs: f64,
+    pub min_secs: f64,
+    pub max_secs: f64,
+    pub runs_count: u32,
+}
+
+pub struct SovereignHyperfineBenchmarkEngine {
+    pub warmup_runs: u32,
+    pub min_runs: u32,
+    pub results: Vec<BenchmarkRunResult>,
+}
+
+impl SovereignHyperfineBenchmarkEngine {
+    pub fn new(warmup_runs: u32, min_runs: u32) -> Self {
+        Self {
+            warmup_runs,
+            min_runs,
+            results: Vec::new(),
+        }
+    }
+
+    pub fn record_benchmark(
+        &mut self,
+        cmd: &str,
+        timings_secs: &[f64],
+    ) -> Result<BenchmarkRunResult, &'static str> {
+        if timings_secs.is_empty() {
+            return Err("Hyperfine: No timing measurements provided");
+        }
+        let count = timings_secs.len() as u32;
+        let sum: f64 = timings_secs.iter().sum();
+        let mean = sum / count as f64;
+        let mut min = timings_secs[0];
+        let mut max = timings_secs[0];
+        let mut variance_sum = 0.0;
+        for &t in timings_secs {
+            if t < min {
+                min = t;
+            }
+            if t > max {
+                max = t;
+            }
+            variance_sum += (t - mean) * (t - mean);
+        }
+        let stddev = (variance_sum / count as f64).sqrt();
+
+        let res = BenchmarkRunResult {
+            command: cmd.to_string(),
+            mean_secs: mean,
+            stddev_secs: stddev,
+            min_secs: min,
+            max_secs: max,
+            runs_count: count,
+        };
+        self.results.push(res.clone());
+        Ok(res)
+    }
+}
+
+impl Default for SovereignHyperfineBenchmarkEngine {
+    fn default() -> Self {
+        Self::new(3, 10)
+    }
+}
+
+// =========================================================================
+// 83. SOVEREIGN PROCS PROCESS VIEWER ENGINE (Superseding procs, ps)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ProcessDetailEntry {
+    pub pid: usize,
+    pub ppid: usize,
+    pub user: String,
+    pub name: String,
+    pub cpu_usage_pct: u32,
+    pub mem_kb: u64,
+    pub status: String,
+}
+
+pub struct SovereignProcsProcessViewerEngine {
+    pub processes: Vec<ProcessDetailEntry>,
+}
+
+impl SovereignProcsProcessViewerEngine {
+    pub fn new() -> Self {
+        Self {
+            processes: Vec::new(),
+        }
+    }
+
+    pub fn register_process(
+        &mut self,
+        pid: usize,
+        ppid: usize,
+        user: &str,
+        name: &str,
+        cpu: u32,
+        mem: u64,
+        status: &str,
+    ) {
+        self.processes.retain(|p| p.pid != pid);
+        self.processes.push(ProcessDetailEntry {
+            pid,
+            ppid,
+            user: user.to_string(),
+            name: name.to_string(),
+            cpu_usage_pct: cpu,
+            mem_kb: mem,
+            status: status.to_string(),
+        });
+    }
+
+    pub fn search_by_name(&self, query: &str) -> Vec<&ProcessDetailEntry> {
+        self.processes.iter().filter(|p| p.name.contains(query)).collect()
+    }
+}
+
+impl Default for SovereignProcsProcessViewerEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 84. SOVEREIGN DUST DISK USAGE ENGINE (Superseding dust, du, ncdu)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DirectoryUsageEntry {
+    pub path: String,
+    pub size_bytes: u64,
+    pub child_count: usize,
+}
+
+pub struct SovereignDustDiskUsageEngine {
+    pub usage_entries: Vec<DirectoryUsageEntry>,
+}
+
+impl SovereignDustDiskUsageEngine {
+    pub fn new() -> Self {
+        Self {
+            usage_entries: Vec::new(),
+        }
+    }
+
+    pub fn record_directory(&mut self, path: &str, size_bytes: u64, child_count: usize) {
+        self.usage_entries.retain(|e| e.path != path);
+        self.usage_entries.push(DirectoryUsageEntry {
+            path: path.to_string(),
+            size_bytes,
+            child_count,
+        });
+    }
+
+    pub fn get_top_used_directories(&self, limit: usize) -> Vec<DirectoryUsageEntry> {
+        let mut sorted = self.usage_entries.clone();
+        sorted.sort_by(|a, b| b.size_bytes.cmp(&a.size_bytes));
+        sorted.truncate(limit);
+        sorted
+    }
+}
+
+impl Default for SovereignDustDiskUsageEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 85. SOVEREIGN DOGDNS DNS QUERY ENGINE (Superseding dog, dig, nslookup)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DnsRecordResponse {
+    pub domain_name: String,
+    pub record_type: String, // "A", "AAAA", "CNAME", "TXT", "MX"
+    pub value: String,
+    pub ttl_secs: u32,
+}
+
+pub struct SovereignDogdnsDnsQueryEngine {
+    pub records: Vec<DnsRecordResponse>,
+    pub queried_count: u64,
+}
+
+impl SovereignDogdnsDnsQueryEngine {
+    pub fn new() -> Self {
+        Self {
+            records: Vec::new(),
+            queried_count: 0,
+        }
+    }
+
+    pub fn register_dns_record(&mut self, domain: &str, rec_type: &str, val: &str, ttl: u32) {
+        self.records.push(DnsRecordResponse {
+            domain_name: domain.to_string(),
+            record_type: rec_type.to_string(),
+            value: val.to_string(),
+            ttl_secs: ttl,
+        });
+    }
+
+    pub fn execute_dns_query(&mut self, domain: &str, rec_type: &str) -> Vec<DnsRecordResponse> {
+        self.queried_count += 1;
+        self.records
+            .iter()
+            .filter(|r| r.domain_name == domain && (rec_type == "ANY" || r.record_type == rec_type))
+            .cloned()
+            .collect()
+    }
+}
+
+impl Default for SovereignDogdnsDnsQueryEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 86. SOVEREIGN GPING NETWORK PING ENGINE (Superseding gping, ping)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct PingSample {
+    pub host: String,
+    pub latency_ms: f64,
+    pub timestamp_secs: u64,
+    pub success: bool,
+}
+
+pub struct SovereignGpingNetworkPingEngine {
+    pub samples: Vec<PingSample>,
+}
+
+impl SovereignGpingNetworkPingEngine {
+    pub fn new() -> Self {
+        Self { samples: Vec::new() }
+    }
+
+    pub fn record_ping(&mut self, host: &str, latency_ms: f64, timestamp: u64, success: bool) {
+        self.samples.push(PingSample {
+            host: host.to_string(),
+            latency_ms,
+            timestamp_secs: timestamp,
+            success,
+        });
+    }
+
+    pub fn calculate_average_latency(&self, host: &str) -> Option<f64> {
+        let host_samples: Vec<&PingSample> = self
+            .samples
+            .iter()
+            .filter(|s| s.host == host && s.success)
+            .collect();
+        if host_samples.is_empty() {
+            return None;
+        }
+        let sum: f64 = host_samples.iter().map(|s| s.latency_ms).sum();
+        Some(sum / host_samples.len() as f64)
+    }
+}
+
+impl Default for SovereignGpingNetworkPingEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 87. SOVEREIGN MPV MEDIA PIPELINE ENGINE (Superseding mpv, VLC)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MediaStreamTrack {
+    pub stream_id: u32,
+    pub codec_name: String,
+    pub media_type: String, // "video", "audio", "subtitle"
+    pub bitrate_kbps: u32,
+}
+
+pub struct SovereignMpvMediaPipelineEngine {
+    pub tracks: Vec<MediaStreamTrack>,
+    pub is_playing: bool,
+    pub current_position_secs: u64,
+    pub total_duration_secs: u64,
+}
+
+impl SovereignMpvMediaPipelineEngine {
+    pub fn new() -> Self {
+        Self {
+            tracks: Vec::new(),
+            is_playing: false,
+            current_position_secs: 0,
+            total_duration_secs: 0,
+        }
+    }
+
+    pub fn load_media_stream(&mut self, duration_secs: u64, tracks: Vec<MediaStreamTrack>) {
+        self.tracks = tracks;
+        self.total_duration_secs = duration_secs;
+        self.current_position_secs = 0;
+        self.is_playing = true;
+    }
+
+    pub fn seek_to(&mut self, position_secs: u64) -> u64 {
+        self.current_position_secs = position_secs.min(self.total_duration_secs);
+        self.current_position_secs
+    }
+}
+
+impl Default for SovereignMpvMediaPipelineEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 88. SOVEREIGN LSP CLIENT ENGINE (Superseding Neovim/VS Code LSP clients)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct LspDiagnosticItem {
+    pub file_path: String,
+    pub line_number: usize,
+    pub character_offset: usize,
+    pub severity: u8, // 1: Error, 2: Warning, 3: Info
+    pub message: String,
+}
+
+pub struct SovereignLspClientEngine {
+    pub language_id: String,
+    pub diagnostics: Vec<LspDiagnosticItem>,
+    pub active_requests_count: u64,
+}
+
+impl SovereignLspClientEngine {
+    pub fn new(language_id: &str) -> Self {
+        Self {
+            language_id: language_id.to_string(),
+            diagnostics: Vec::new(),
+            active_requests_count: 0,
+        }
+    }
+
+    pub fn publish_diagnostics(&mut self, file_path: &str, items: Vec<LspDiagnosticItem>) {
+        self.diagnostics.retain(|d| d.file_path != file_path);
+        self.diagnostics.extend(items);
+    }
+
+    pub fn get_diagnostics_for_file(&self, file_path: &str) -> Vec<LspDiagnosticItem> {
+        self.diagnostics
+            .iter()
+            .filter(|d| d.file_path == file_path)
+            .cloned()
+            .collect()
+    }
+}
+
+impl Default for SovereignLspClientEngine {
+    fn default() -> Self {
+        Self::new("rust")
+    }
+}
+
+// =========================================================================
+// 89. SOVEREIGN TOPGRADE UPDATE MANAGER ENGINE (Superseding Topgrade)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TopgradeUpdateStep {
+    pub step_name: String,
+    pub package_manager: String, // "pacman", "apt", "cargo", "flatpak", "git"
+    pub success: bool,
+    pub packages_updated_count: usize,
+}
+
+pub struct SovereignTopgradeUpdateManagerEngine {
+    pub steps: Vec<TopgradeUpdateStep>,
+    pub total_packages_updated: usize,
+}
+
+impl SovereignTopgradeUpdateManagerEngine {
+    pub fn new() -> Self {
+        Self {
+            steps: Vec::new(),
+            total_packages_updated: 0,
+        }
+    }
+
+    pub fn record_update_step(
+        &mut self,
+        name: &str,
+        pm: &str,
+        updated_count: usize,
+        success: bool,
+    ) {
+        self.steps.push(TopgradeUpdateStep {
+            step_name: name.to_string(),
+            package_manager: pm.to_string(),
+            success,
+            packages_updated_count: updated_count,
+        });
+        if success {
+            self.total_packages_updated += updated_count;
+        }
+    }
+
+    pub fn get_summary(&self) -> (usize, usize) {
+        let successful = self.steps.iter().filter(|s| s.success).count();
+        let failed = self.steps.len() - successful;
+        (successful, failed)
+    }
+}
+
+impl Default for SovereignTopgradeUpdateManagerEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 90. SOVEREIGN ATUIN SHELL HISTORY ENGINE (Superseding Atuin, McFly)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AtuinHistoryEntry {
+    pub history_id: String,
+    pub command: String,
+    pub exit_code: i32,
+    pub duration_ms: u64,
+    pub timestamp_secs: u64,
+    pub session_id: String,
+}
+
+pub struct SovereignAtuinShellHistoryEngine {
+    pub history_db: Vec<AtuinHistoryEntry>,
+    pub secret_encryption_key: [u8; 32],
+}
+
+impl SovereignAtuinShellHistoryEngine {
+    pub fn new(key: [u8; 32]) -> Self {
+        Self {
+            history_db: Vec::new(),
+            secret_encryption_key: key,
+        }
+    }
+
+    pub fn record_command(
+        &mut self,
+        cmd: &str,
+        exit_code: i32,
+        duration_ms: u64,
+        timestamp: u64,
+        session_id: &str,
+    ) -> String {
+        let id_num = self.history_db.len() + 1;
+        let history_id = format!("atuin_hist_{:06x}", id_num);
+        self.history_db.push(AtuinHistoryEntry {
+            history_id: history_id.clone(),
+            command: cmd.to_string(),
+            exit_code,
+            duration_ms,
+            timestamp_secs: timestamp,
+            session_id: session_id.to_string(),
+        });
+        history_id
+    }
+
+    pub fn search_history(&self, query: &str) -> Vec<AtuinHistoryEntry> {
+        self.history_db
+            .iter()
+            .filter(|h| h.command.contains(query))
+            .cloned()
+            .collect()
+    }
+}
+
+impl Default for SovereignAtuinShellHistoryEngine {
+    fn default() -> Self {
+        Self::new([0x33; 32])
+    }
+}
+
 pub struct SovereignOpenSourceObsoletionOrchestrator {
     pub vcs: SovereignVcsEngine,
     pub supervisor: SovereignInitSupervisor,
@@ -4657,6 +5203,16 @@ pub struct SovereignOpenSourceObsoletionOrchestrator {
     pub supabase_postgrest: SovereignSupabasePostgrestEngine,
     pub suricata_ids: SovereignSuricataIdsRulesEngine,
     pub caddy_tls: SovereignCaddyAutomaticTlsEngine,
+    pub zoxide_jump: SovereignZoxideDirectoryJumpEngine,
+    pub hyperfine_bench: SovereignHyperfineBenchmarkEngine,
+    pub procs_viewer: SovereignProcsProcessViewerEngine,
+    pub dust_usage: SovereignDustDiskUsageEngine,
+    pub dogdns_query: SovereignDogdnsDnsQueryEngine,
+    pub gping_network: SovereignGpingNetworkPingEngine,
+    pub mpv_media: SovereignMpvMediaPipelineEngine,
+    pub lsp_client: SovereignLspClientEngine,
+    pub topgrade_updater: SovereignTopgradeUpdateManagerEngine,
+    pub atuin_history: SovereignAtuinShellHistoryEngine,
     pub os_pr_proposals: SovereignOpenSourceOsPrProposalEngine,
     pub total_obsoleted_projects_count: u32,
 }
@@ -4787,8 +5343,18 @@ impl SovereignOpenSourceObsoletionOrchestrator {
             supabase_postgrest: SovereignSupabasePostgrestEngine::new(),
             suricata_ids: SovereignSuricataIdsRulesEngine::new(),
             caddy_tls: SovereignCaddyAutomaticTlsEngine::new(),
+            zoxide_jump: SovereignZoxideDirectoryJumpEngine::new(),
+            hyperfine_bench: SovereignHyperfineBenchmarkEngine::new(3, 10),
+            procs_viewer: SovereignProcsProcessViewerEngine::new(),
+            dust_usage: SovereignDustDiskUsageEngine::new(),
+            dogdns_query: SovereignDogdnsDnsQueryEngine::new(),
+            gping_network: SovereignGpingNetworkPingEngine::new(),
+            mpv_media: SovereignMpvMediaPipelineEngine::new(),
+            lsp_client: SovereignLspClientEngine::new("rust"),
+            topgrade_updater: SovereignTopgradeUpdateManagerEngine::new(),
+            atuin_history: SovereignAtuinShellHistoryEngine::new([0x33; 32]),
             os_pr_proposals: SovereignOpenSourceOsPrProposalEngine::new(),
-            total_obsoleted_projects_count: 110,
+            total_obsoleted_projects_count: 120,
         }
     }
 
@@ -4977,10 +5543,21 @@ impl SovereignOpenSourceObsoletionOrchestrator {
             .add_signature_rule(1001, "TCP", "any", 80, "ALERT HTTP Traffic");
         let _ = self.caddy_tls.provision_acme_certificate("api.sigmaos.org");
 
-        // self.procs_viewer.register_process(...)
-        // self.dust_usage.record_directory(...)
-        // self.dogdns_query.execute_dns_query(...)
-        // self.gping_network.record_ping(...)
+        self.zoxide_jump.add_or_update_visit("/home/sovereign/src", 1700000000);
+        let _ = self.hyperfine_bench.record_benchmark("sovereign_boot", &[0.012, 0.011, 0.013]);
+        self.procs_viewer.register_process(1, 0, "root", "sovereign_kernel", 5, 16384, "Running");
+        self.dust_usage.record_directory("/home/sovereign", 1024 * 1024 * 50, 12);
+        self.dogdns_query.register_dns_record("api.sigmaos.org", "A", "10.0.0.1", 300);
+        self.gping_network.record_ping("10.0.0.1", 1.2, 1700000000, true);
+        self.mpv_media.load_media_stream(120, vec![MediaStreamTrack {
+            stream_id: 1,
+            codec_name: "h264".to_string(),
+            media_type: "video".to_string(),
+            bitrate_kbps: 4000,
+        }]);
+        self.lsp_client.publish_diagnostics("src/main.rs", vec![]);
+        self.topgrade_updater.record_update_step("Pacman", "pacman", 5, true);
+        let _ = self.atuin_history.record_command("sigma status", 0, 15, 1700000000, "session_01");
 
         Ok(format!(
             "Sovereign Stack Active: {} legacy open-source projects obsoleted",
@@ -8376,8 +8953,8 @@ mod tests {
     fn test_sovereign_orchestrator_bootstrap() {
         let mut orchestrator = SovereignOpenSourceObsoletionOrchestrator::new();
         let status = orchestrator.bootstrap_sovereign_stack().unwrap();
-        assert!(status.contains("110 legacy open-source projects obsoleted"));
-        assert_eq!(orchestrator.total_obsoleted_projects_count, 110);
+        assert!(status.contains("120 legacy open-source projects obsoleted"));
+        assert_eq!(orchestrator.total_obsoleted_projects_count, 120);
         assert_eq!(orchestrator.serenity_async.processed_count, 0);
         assert_eq!(orchestrator.serenity_async.task_queue.len(), 1);
         assert_eq!(orchestrator.qubes_isolation.domains.len(), 1);
@@ -8953,5 +9530,136 @@ mod tests {
 
         let renewed = caddy.check_and_renew(1800000000 - 86400 * 10);
         assert_eq!(renewed, 1);
+    }
+
+    #[test]
+    fn test_sovereign_zoxide_directory_jump() {
+        let mut zoxide = SovereignZoxideDirectoryJumpEngine::new();
+        zoxide.add_or_update_visit("/home/user/code/sigmaos", 1000);
+        zoxide.add_or_update_visit("/home/user/code/sigmaos", 1005);
+        zoxide.add_or_update_visit("/home/user/docs", 1010);
+
+        let best = zoxide.query_best_match("sigmaos").unwrap();
+        assert_eq!(best, "/home/user/code/sigmaos");
+        assert_eq!(zoxide.query_best_match("nonexistent"), None);
+    }
+
+    #[test]
+    fn test_sovereign_hyperfine_benchmark() {
+        let mut hyperfine = SovereignHyperfineBenchmarkEngine::new(3, 10);
+        let res = hyperfine.record_benchmark("ls -la", &[0.010, 0.012, 0.011, 0.013, 0.009]).unwrap();
+        assert_eq!(res.command, "ls -la");
+        assert_eq!(res.runs_count, 5);
+        assert!(res.mean_secs > 0.0);
+        assert!(res.min_secs == 0.009);
+        assert!(res.max_secs == 0.013);
+    }
+
+    #[test]
+    fn test_sovereign_procs_process_viewer() {
+        let mut procs = SovereignProcsProcessViewerEngine::new();
+        procs.register_process(1, 0, "root", "init", 0, 1024, "S");
+        procs.register_process(42, 1, "sovereign", "sigma-daemon", 15, 8192, "R");
+
+        let matches = procs.search_by_name("sigma");
+        assert_eq!(matches.len(), 1);
+        assert_eq!(matches[0].pid, 42);
+        assert_eq!(matches[0].user, "sovereign");
+    }
+
+    #[test]
+    fn test_sovereign_dust_disk_usage() {
+        let mut dust = SovereignDustDiskUsageEngine::new();
+        dust.record_directory("/var/log", 500_000, 10);
+        dust.record_directory("/home/user", 5_000_000, 250);
+        dust.record_directory("/tmp", 100_000, 2);
+
+        let top = dust.get_top_used_directories(2);
+        assert_eq!(top.len(), 2);
+        assert_eq!(top[0].path, "/home/user");
+        assert_eq!(top[1].path, "/var/log");
+    }
+
+    #[test]
+    fn test_sovereign_dogdns_dns_query() {
+        let mut dog = SovereignDogdnsDnsQueryEngine::new();
+        dog.register_dns_record("sigmaos.org", "A", "192.168.1.1", 300);
+        dog.register_dns_record("sigmaos.org", "AAAA", "fe80::1", 300);
+
+        let res_a = dog.execute_dns_query("sigmaos.org", "A");
+        assert_eq!(res_a.len(), 1);
+        assert_eq!(res_a[0].value, "192.168.1.1");
+
+        let res_any = dog.execute_dns_query("sigmaos.org", "ANY");
+        assert_eq!(res_any.len(), 2);
+    }
+
+    #[test]
+    fn test_sovereign_gping_network_ping() {
+        let mut gping = SovereignGpingNetworkPingEngine::new();
+        gping.record_ping("1.1.1.1", 10.5, 100, true);
+        gping.record_ping("1.1.1.1", 11.5, 101, true);
+        gping.record_ping("1.1.1.1", 0.0, 102, false);
+
+        let avg = gping.calculate_average_latency("1.1.1.1").unwrap();
+        assert_eq!(avg, 11.0);
+        assert_eq!(gping.calculate_average_latency("8.8.8.8"), None);
+    }
+
+    #[test]
+    fn test_sovereign_mpv_media_pipeline() {
+        let mut mpv = SovereignMpvMediaPipelineEngine::new();
+        let track = MediaStreamTrack {
+            stream_id: 0,
+            codec_name: "h264".to_string(),
+            media_type: "video".to_string(),
+            bitrate_kbps: 5000,
+        };
+        mpv.load_media_stream(300, vec![track]);
+        assert!(mpv.is_playing);
+        assert_eq!(mpv.seek_to(150), 150);
+        assert_eq!(mpv.seek_to(400), 300); // capped at total duration
+    }
+
+    #[test]
+    fn test_sovereign_lsp_client() {
+        let mut lsp = SovereignLspClientEngine::new("rust");
+        let diag = LspDiagnosticItem {
+            file_path: "src/main.rs".to_string(),
+            line_number: 10,
+            character_offset: 5,
+            severity: 1,
+            message: "Mismatched types".to_string(),
+        };
+        lsp.publish_diagnostics("src/main.rs", vec![diag]);
+
+        let items = lsp.get_diagnostics_for_file("src/main.rs");
+        assert_eq!(items.len(), 1);
+        assert_eq!(items[0].message, "Mismatched types");
+    }
+
+    #[test]
+    fn test_sovereign_topgrade_update_manager() {
+        let mut topgrade = SovereignTopgradeUpdateManagerEngine::new();
+        topgrade.record_update_step("System Packages", "pacman", 42, true);
+        topgrade.record_update_step("Cargo Packages", "cargo", 5, true);
+        topgrade.record_update_step("Custom Script", "sh", 0, false);
+
+        let (success, failed) = topgrade.get_summary();
+        assert_eq!(success, 2);
+        assert_eq!(failed, 1);
+        assert_eq!(topgrade.total_packages_updated, 47);
+    }
+
+    #[test]
+    fn test_sovereign_atuin_shell_history() {
+        let mut atuin = SovereignAtuinShellHistoryEngine::new([0x55; 32]);
+        let id1 = atuin.record_command("cargo test", 0, 1500, 1000, "session1");
+        let _id2 = atuin.record_command("git status", 0, 10, 1005, "session1");
+
+        assert!(id1.starts_with("atuin_hist_"));
+        let search = atuin.search_history("cargo");
+        assert_eq!(search.len(), 1);
+        assert_eq!(search[0].command, "cargo test");
     }
 }

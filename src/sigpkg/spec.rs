@@ -5,11 +5,6 @@
 extern crate alloc;
 use alloc::boxed::Box;
 
-use core::mem;
-
-use core::ptr::{self, NonNull};
-use core::sync::atomic::{AtomicUsize, Ordering};
-
 /// Package version
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -382,8 +377,9 @@ impl SimplePackageManager {
     }
 
     /// Bolt ⚡ Performance Optimization: Fast index lookup by package name.
-    /// Supports both exact slice equality and null-terminated byte array matching,
-    /// eliminating redundant loop boilerplate across package manager operations.
+    /// Supports both exact slice equality and null-terminated byte array matching for arbitrary
+    /// `dyn Package` implementations. Hoists target name slice and length extraction outside
+    /// the iteration loop, and uses direct slice boundary comparison.
     #[inline]
     fn find_package_index(&self, name: &[u8]) -> Option<usize> {
         let target_len = name
@@ -395,7 +391,8 @@ impl SimplePackageManager {
         self.packages.iter().position(|package_option| {
             if let Some(ref package) = *package_option {
                 let pkg_name = package.as_ref().name();
-                pkg_name.starts_with(target_name)
+                pkg_name.len() >= target_len
+                    && &pkg_name[..target_len] == target_name
                     && pkg_name.get(target_len).map_or(true, |&byte| byte == 0)
             } else {
                 false
@@ -1037,8 +1034,32 @@ mod tests {
         )))
         .unwrap();
 
+        // Custom package returning a full null-padded fixed buffer
+        struct NullPaddedPackage;
+        impl Package for NullPaddedPackage {
+            fn name(&self) -> &[u8] {
+                b"zlib\0\0\0\0\0\0\0\0"
+            }
+            fn version(&self) -> PackageVersion {
+                PackageVersion::new(1, 2, 11)
+            }
+            fn dependencies(&self) -> &[PackageDependency] {
+                &[]
+            }
+            fn verify_signature(&self, _signature: &[u8]) -> bool {
+                true
+            }
+            fn info(&self) -> PackageInfo {
+                PackageInfo::new()
+            }
+        }
+
+        mgr.add_package(Box::new(NullPaddedPackage)).unwrap();
+
         assert!(mgr.get_package(b"libssl\0padding").is_some());
         assert!(mgr.get_package(b"libssl-extra").is_none());
         assert!(mgr.get_package(&[b'x'; 256]).is_none());
+        assert!(mgr.get_package(b"zlib").is_some());
+        assert!(mgr.get_package(b"zlib\0extra").is_some());
     }
 }

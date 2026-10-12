@@ -44,12 +44,12 @@ pub use wofi::{
 };
 pub mod mako;
 pub use mako::{
-    MakoDaemon, Notification, NotificationUrgency, MakoConfig, Layer,
+    MakoDaemon, Notification, NotificationUrgency, MakoConfig, Layer as MakoLayer,
     init_mako_daemon, get_mako_daemon, send_notification,
 };
 pub mod swaylock;
 pub use swaylock::{
-    SwaylockInstance, LockState,
+    SwaylockInstance, LockState as SwaylockLockState,
     init_swaylock, get_swaylock, lock_screen, unlock_screen,
 };
 pub mod direct_scanout;
@@ -320,7 +320,7 @@ pub use mint_tools::{
 };
 
 pub use screensaver::{
-    DpmsState, LockState, ScreenSaverConfig, ScreenSaverEngine, ScreenSaverFrame, ScreenSaverMode,
+    DpmsState, LockState as ScreensaverLockState, ScreenSaverConfig, ScreenSaverEngine, ScreenSaverFrame, ScreenSaverMode,
 };
 
 pub use pantheon::{
@@ -337,7 +337,7 @@ pub use moksha::{
 
 pub use zenith_compositor::{
     DamageRegion, InputEvent, InputEventData, InputEventType, Output, Surface, SurfaceType,
-    WindowGeometry, WindowState, ZenithCompositor, ZenithWindow,
+    WindowGeometry, WindowState as ZenithWindowState, ZenithCompositor, ZenithWindow,
 };
 
 pub use zenith_config::{
@@ -354,8 +354,15 @@ pub use crate::desktop::sovereign_navigation_engine::{
 pub use weather_panel::{WeatherCondition, WeatherData, WeatherForecast, WeatherPanel};
 pub mod compositor;
 pub use compositor::{
-    Compositor, DesktopEnvironment, InputEvent, InputEventType, Surface, SurfaceFormat,
-    Window, WindowAttributes, WindowState, WindowManager,
+    Compositor,
+    DesktopEnvironment as CompositorDesktopEnvironment,
+    InputEvent as CompositorInputEvent,
+    InputEventType as CompositorInputEventType,
+    Surface as CompositorSurface,
+    SurfaceFormat,
+    Window, WindowAttributes,
+    WindowState as CompositorWindowState,
+    WindowManager,
     init_desktop_environment, get_desktop_environment,
 };
 pub mod launcher;
@@ -398,8 +405,13 @@ pub mod omarchy_hidpi_scale_engine;
 pub use omarchy_hidpi_scale_engine::*;
 pub mod sigma_quickshell;
 pub use sigma_quickshell::{
-    Anchors, AppEntry, HyprlandEvent, LauncherContent, LayerSurface, NotificationContent,
-    NotificationUrgency, PanelContent, PanelItem, ReactiveCell, ShellWidget, SigmaQuickshell,
+    Anchors,
+    AppEntry as QuickshellAppEntry,
+    HyprlandEvent, LauncherContent,
+    LayerSurface as QuickshellLayerSurface,
+    NotificationContent,
+    NotificationUrgency as QuickshellNotificationUrgency,
+    PanelContent, PanelItem, ReactiveCell, ShellWidget, SigmaQuickshell,
     StatusBarContent, StatusBarModule, WidgetContent,
 };
 pub mod sigma_ghostty;
@@ -436,6 +448,13 @@ pub mod xfce_engine;
 pub mod zenith;
 pub mod sovereign_gui_development_and_pr_suite;
 pub use sovereign_gui_development_and_pr_suite::*;
+<<<<<<< HEAD
 pub mod sovereign_desktop_toolkits_and_services;
 pub use sovereign_desktop_toolkits_and_services::*;
+=======
+pub mod sovereign_de_wm_innovation_engine;
+pub use sovereign_de_wm_innovation_engine::*;
+>>>>>>> origin/main
 pub mod zenith_advanced_features;
+pub mod sovereign_desktop_toolkits_and_services;
+pub use sovereign_desktop_toolkits_and_services::*;
