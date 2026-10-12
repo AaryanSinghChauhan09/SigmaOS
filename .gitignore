@@ -75,8 +75,14 @@ WIKI/
 !docs/*.md
 !docs/**/*.md
 !Agents/*.md
+!.agents/*.md
+!.agents/**/*.md
+!reports/*.md
+!reports/**/*.md
 !.github/**/*.md
 !.github/*.md
 !README.md
 !CONTRIBUTING.md
 !scripts/*.py
+!tools/*.py
+!tools/**/*.py
