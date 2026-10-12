@@ -21,6 +21,7 @@ pub mod service_manager;
 pub mod settings_manager;
 pub mod sigmacron;
 pub mod sigmatime;
+pub mod sigmatimer;
 pub mod system_manager;
 pub mod system_monitor;
 pub mod task_manager;
@@ -105,6 +106,10 @@ pub use sigmatime::{
 pub use sigmacron::{
     SigmaCron, CronJob, CronSchedule, CronField, JobStatus, JobResult,
     init_sigmacron, get_sigmacron, add_cron_job, enable_cron_job, disable_cron_job,
+};
+pub use sigmatimer::{
+    SigmaTimer, TimerUnit, TriggerType, TimerStatus, TimerAccuracy,
+    init_sigmatimer, get_sigmatimer, add_timer_unit, enable_timer_unit, disable_timer_unit,
 };
 pub use power_manager::{
     BatteryInfo, PowerBatteryStatus, PowerConfig, PowerManager, PowerProfile, PowerSource,
