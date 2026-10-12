@@ -21,6 +21,7 @@ pub mod service_manager;
 pub mod settings_manager;
 pub mod sigmacron;
 pub mod sigmapower;
+pub mod sigmathernal;
 pub mod sigmatime;
 pub mod sigmatimer;
 pub mod system_manager;
@@ -115,6 +116,10 @@ pub use sigmatimer::{
 pub use sigmapower::{
     SigmaPower, BatteryInfo as SigmaBatteryInfo, PowerProfile as SigmaPowerProfile, PowerState, BatteryStatus as SigmaBatteryStatus, PowerStats,
     init_sigmapower, get_sigmapower, set_power_profile, suspend_system, shutdown_system,
+};
+pub use sigmathernal::{
+    SigmaThermal, ThermalZone, CoolingDevice, ThermalZoneType, CoolingDeviceType, TripPointType, ThermalPolicy,
+    init_sigmathernal, get_sigmathernal, set_thermal_policy, update_temperature,
 };
 pub use power_manager::{
     BatteryInfo, PowerBatteryStatus, PowerConfig, PowerManager, PowerProfile, PowerSource,
