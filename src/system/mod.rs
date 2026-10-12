@@ -33,6 +33,7 @@ pub mod sigmapkg;
 pub mod sigmaupdate;
 pub mod sigmaservice;
 pub mod sigmaresource;
+pub mod sigmaconfig;
 pub mod sigmatime;
 pub mod sigmatimer;
 pub mod system_manager;
@@ -175,6 +176,10 @@ pub use sigmaservice::{
 pub use sigmaresource::{
     SigmaResource, ResourceLimit, ResourceType,
     init_sigmaresource, get_sigmaresource, set_resource_limit,
+};
+pub use sigmaconfig::{
+    SigmaConfig, ConfigEntry, ConfigValue,
+    init_sigmaconfig, get_sigmaconfig, set_config_value,
 };
 pub use power_manager::{
     BatteryInfo, PowerBatteryStatus, PowerConfig, PowerManager, PowerProfile, PowerSource,
