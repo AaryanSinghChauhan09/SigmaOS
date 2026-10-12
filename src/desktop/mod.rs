@@ -512,6 +512,22 @@ pub use pdf_viewer::{
     PdfViewer, PdfDocument, ZoomLevel, PageMode,
     init_pdf_viewer, get_pdf_viewer,
 };
+pub use font_manager::{
+    FontManager, Font, FontFamily, FontStyle,
+    init_font_manager, get_font_manager,
+};
+pub use bluetooth_manager::{
+    BluetoothManager, BluetoothDevice, BluetoothAdapter, DeviceType, DeviceStatus,
+    init_bluetooth_manager, get_bluetooth_manager,
+};
+pub use printer_manager::{
+    PrinterManager, Printer, PrintJob, PrinterStatus, ConnectionType, PaperSize, PrintQuality,
+    init_printer_manager, get_printer_manager,
+};
+pub use themes_manager::{
+    ThemesManager, Theme, AppearanceSettings, ThemeType, ColorScheme, AccentColor,
+    init_themes_manager, get_themes_manager,
+};
 pub mod webapp_manager;
 pub use webapp_manager::*;
 pub mod appstore;
@@ -550,6 +566,10 @@ pub mod audio_recorder;
 pub mod task_manager;
 pub mod archive_manager;
 pub mod pdf_viewer;
+pub mod font_manager;
+pub mod bluetooth_manager;
+pub mod printer_manager;
+pub mod themes_manager;
 pub mod text_scaling;
 pub mod universal_desktop_framework;
 pub mod volume_manager;
