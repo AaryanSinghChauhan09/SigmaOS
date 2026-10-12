@@ -1,6 +1,9 @@
 //! Standalone DMA Manager Integration & Unit Tests
 
-use sigmaos::io::{
+#[path = "../../src/io/mod.rs"]
+pub mod io;
+
+use io::{
     DmaDirection, DmaError, DmaManager, ScatterGatherElement,
 };
 
