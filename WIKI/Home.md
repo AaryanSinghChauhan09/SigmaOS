@@ -24,6 +24,7 @@
 - [20-Pull-Request-Proposal-Open-Source-OS-Missing-Components](20-Pull-Request-Proposal-Open-Source-OS-Missing-Components.md)
 - [21-Arch-Linux-Missing-Components-Parity](21-Arch-Linux-Missing-Components-Parity.md)
 - [26-AI-Agent-Future-Development-Roadmap-SigmaOS-Components](26-AI-Agent-Future-Development-Roadmap-SigmaOS-Components.md)
+- [27-Consolidated-OS-Documentation-And-Wiki-Engine](27-Consolidated-OS-Documentation-And-Wiki-Engine.md)
 - [AI-and-Agent-Runtime](AI-and-Agent-Runtime.md)
 - [AI-and-ML-Engine](AI-and-ML-Engine.md)
 - [Accessibility-and-UX](Accessibility-and-UX.md)

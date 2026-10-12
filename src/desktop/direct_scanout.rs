@@ -18,7 +18,7 @@ pub enum ScanoutMode {
 }
 
 /// Direct scanout config
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug)]
 pub struct DirectScanoutConfig {
     pub enabled: AtomicBool,
     pub require_fullscreen: bool,
@@ -83,11 +83,11 @@ impl DirectScanoutManager {
             return Err("Direct scanout disabled");
         }
         
-        if self.config.require_fullscreen.load(Ordering::Relaxed) && !fullscreen {
+        if self.config.require_fullscreen && !fullscreen {
             return Err("Fullscreen required");
         }
         
-        if self.config.require_exclusive.load(Ordering::Relaxed) && !exclusive {
+        if self.config.require_exclusive && !exclusive {
             return Err("Exclusive access required");
         }
         
