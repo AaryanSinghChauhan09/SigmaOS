@@ -1,0 +1,27 @@
+id = "PKG-001"
+title = "Validate package metadata compatibility corpus and dry-run sandbox policy"
+agent = "package-compat-agent"
+priority = "P1"
+repeat = "weekly"
+scope = ["src/compatibility/", "src/distro/", "tools/sigma_pacman_compat.rs"]
+
+steps = [
+  "parse .deb metadata corpus",
+  "parse Arch PKGBUILD/desc corpus",
+  "parse FreeBSD pkg-plist corpus",
+  "validate dependency DAG resolution without circular deadlocks",
+  "dry-run package scriptlets in isolated VFS sandbox",
+  "generate compatibility report"
+]
+
+evidence = [
+  "reports/package/compatibility_matrix.json"
+]
+
+success = [
+  "zero panics on malformed package metadata",
+  "dependency DAG completes resolution in <100ms",
+  "no unhandled host VFS access in dry-run mode"
+]
+
+on_failure = "create blocked task with failing package specimen and parser error log"
