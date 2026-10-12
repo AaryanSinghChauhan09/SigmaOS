@@ -140,10 +140,10 @@ next_milestone = "Integration with scheduler and VFS for process resource enforc
 
 [userspace.shell]
 status = "prototype"
-files = ["src/userspace/shell.rs"]
-description = "Command parser with echo, pwd, ls builtins"
-test_evidence = "Manual — needs process execution"
-next_milestone = "Pipeline, redirection, job control"
+files = ["src/userspace/shell.rs", "src/shell/sovereign_command_interpreter.rs", "docs/shell/COMMAND_INTERPRETER_PLAN.md", "wiki/34-SigmaOS-Command-Interpreter-Plan.md"]
+description = "Command parser, AST lexer/parser, quote-aware expansion, built-ins, redirections, pipelines, interactive editing, job control, resource limits governor, and 17-PR sequence gateway suite"
+test_evidence = "Standalone unit tests pass via rustc --test src/shell/sovereign_command_interpreter.rs"
+next_milestone = "End-to-end QEMU boot-to-interactive-shell runtime integration"
 
 [tools.system_information]
 status = "partial"
