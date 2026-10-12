@@ -128,6 +128,8 @@ pub mod sovereign_distro_package_advancements_v34;
 pub use sovereign_distro_package_advancements_v34::*;
 pub mod sovereign_distro_package_advancements_v35;
 pub use sovereign_distro_package_advancements_v35::*;
+pub mod sovereign_distro_package_advancements_v36;
+pub use sovereign_distro_package_advancements_v36::*;
 pub mod sovereign_universal_multi_distro_pm_gateway;
 pub use sovereign_universal_multi_distro_pm_gateway::*;
 pub mod aptkit;
