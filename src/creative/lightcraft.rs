@@ -13,7 +13,7 @@ use core::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 
 /// Light type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Light {
+pub enum LightType {
     Point,
     Directional,
     Spot,
@@ -24,7 +24,7 @@ pub enum Light {
 /// Light
 pub struct Light {
     pub id: u32,
-    pub light_type: Light,
+    pub light_type: LightType,
     pub intensity: f32,
     pub color: (f32, f32, f32), // RGB
     pub position: (f32, f32, f32),
@@ -84,7 +84,7 @@ impl LightEngine {
     }
     
     /// Add light to scene
-    pub fn add_light(&mut self, scene_id: u32, light_type: Light, intensity: f32) -> Result<u32, &'static str> {
+    pub fn add_light(&mut self, scene_id: u32, light_type: LightType, intensity: f32) -> Result<u32, &'static str> {
         let scene = self.scenes.get_mut(&scene_id).ok_or("Scene not found")?;
         let light_id = scene.lights.len() as u32;
         let light = Light {
@@ -189,7 +189,7 @@ mod tests {
         let mut engine = LightEngine::new();
         engine.init();
         let scene_id = engine.create_scene("Scene1".to_string());
-        engine.add_light(scene_id, Light::Point, 1.0).unwrap();
+        engine.add_light(scene_id, LightType::Point, 1.0).unwrap();
         assert_eq!(engine.get_scene(scene_id).unwrap().lights.len(), 1);
     }
 }

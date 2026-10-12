@@ -1,0 +1,65 @@
+# CODEOWNERS for SigmaOS Subsystems
+
+# Global Maintainers & Security Officers
+*                   @sigmaos-devs/maintainers @sigmaos-devs/security-officers
+
+# Kernel Subsystem
+/kernel/            @sigmaos-devs/kernel-maintainers
+/src/kernel/        @sigmaos-devs/kernel-maintainers
+/src/arch/          @sigmaos-devs/kernel-maintainers
+/src/boot/          @sigmaos-devs/kernel-maintainers
+
+# Memory Management Subsystem
+/src/memory/        @sigmaos-devs/memory-maintainers
+/docs/memory/       @sigmaos-devs/memory-maintainers
+MEMORY_RULES.toml   @sigmaos-devs/memory-maintainers
+
+# VFS & Storage Subsystem
+/src/vfs/           @sigmaos-devs/filesystem-maintainers
+/src/fs/            @sigmaos-devs/filesystem-maintainers
+/src/storage/       @sigmaos-devs/filesystem-maintainers
+/docs/vfs/          @sigmaos-devs/filesystem-maintainers
+/docs/filesystem/   @sigmaos-devs/filesystem-maintainers
+VFS_RULES.toml      @sigmaos-devs/filesystem-maintainers
+STORAGE_RULES.toml  @sigmaos-devs/filesystem-maintainers
+
+# IPC & Process Subsystem
+/src/ipc/           @sigmaos-devs/ipc-maintainers
+/src/process/       @sigmaos-devs/ipc-maintainers
+/src/signal/        @sigmaos-devs/ipc-maintainers
+PROCESS_RULES.toml  @sigmaos-devs/ipc-maintainers
+SCHEDULER_RULES.toml @sigmaos-devs/ipc-maintainers
+
+# Security & Sandboxing Subsystem
+/src/security/      @sigmaos-devs/security-officers
+/docs/security/     @sigmaos-devs/security-officers
+SECURITY.md         @sigmaos-devs/security-officers
+SECURITY_ARCHITECTURE.md @sigmaos-devs/security-officers
+
+# Driver Subsystem
+/src/driver/        @sigmaos-devs/driver-maintainers
+/src/drivers/       @sigmaos-devs/driver-maintainers
+/docs/drivers/      @sigmaos-devs/driver-maintainers
+IO_RULES.toml       @sigmaos-devs/driver-maintainers
+
+# Packaging & Distro Compatibility
+/src/packaging/     @sigmaos-devs/packaging-maintainers
+/src/distro/        @sigmaos-devs/packaging-maintainers
+/src/compatibility/ @sigmaos-devs/packaging-maintainers
+/docs/component-rules/packaging.md @sigmaos-devs/packaging-maintainers
+
+# Desktop & Zenith UI Subsystem
+/zenith_desktop/    @sigmaos-devs/desktop-maintainers
+/src/desktop/       @sigmaos-devs/desktop-maintainers
+/docs/desktop/      @sigmaos-devs/desktop-maintainers
+
+# Installer Subsystem
+/installer/         @sigmaos-devs/installer-maintainers
+/iso_root/          @sigmaos-devs/installer-maintainers
+
+# Governance & Agent Maintenance
+/GOVERNANCE.md      @sigmaos-devs/maintainers
+/.agents/           @sigmaos-devs/maintainers
+/.jules/            @sigmaos-devs/maintainers
+/.kiro/             @sigmaos-devs/maintainers
+/Agents/            @sigmaos-devs/maintainers
