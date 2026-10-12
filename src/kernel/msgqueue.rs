@@ -1,11 +1,8 @@
 // Linux-inspired message queue for IPC
 // Provides System V style message queue
 
-#![no_std]
-
-extern crate alloc;
-use alloc::collections::{HashMap, VecDeque};
-use alloc::sync::{Arc, Mutex};
+use std::collections::{HashMap, VecDeque};
+use std::sync::{Arc, Mutex};
 
 /// Message queue permissions
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

@@ -12,7 +12,7 @@ use alloc::vec::Vec;
 use core::sync::atomic::{AtomicBool, Ordering};
 
 /// Software package
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct SoftwarePackage {
     pub name: String,
     pub version: String,

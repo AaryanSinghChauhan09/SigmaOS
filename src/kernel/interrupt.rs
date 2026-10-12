@@ -4,8 +4,8 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::collections::HashMap;
-use alloc::sync::atomic::{AtomicU32, AtomicU64, AtomicU8, Ordering};
+use alloc::collections::BTreeMap;
+use core::sync::atomic::{AtomicU32, AtomicU64, AtomicU8, Ordering};
 
 /// Interrupt vector
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -57,8 +57,8 @@ pub enum IrqTriggerType {
 /// Interrupt controller
 pub struct InterruptController {
     next_vector: AtomicU8,
-    descriptors: HashMap<u8, InterruptDescriptor>,
-    irq_lines: HashMap<u32, IrqLine>,
+    descriptors: BTreeMap<u8, InterruptDescriptor>,
+    irq_lines: BTreeMap<u32, IrqLine>,
     interrupt_count: AtomicU64,
 }
 
@@ -66,8 +66,8 @@ impl InterruptController {
     pub fn new() -> Self {
         Self {
             next_vector: AtomicU8::new(32), // Start from 32 (exceptions use 0-31)
-            descriptors: HashMap::new(),
-            irq_lines: HashMap::new(),
+            descriptors: BTreeMap::new(),
+            irq_lines: BTreeMap::new(),
             interrupt_count: AtomicU64::new(0),
         }
     }

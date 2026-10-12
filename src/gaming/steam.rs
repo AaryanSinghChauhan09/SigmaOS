@@ -24,7 +24,7 @@ pub struct SteamGame {
 }
 
 /// Proton version
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ProtonVersion {
     Proton5,
     Proton6,

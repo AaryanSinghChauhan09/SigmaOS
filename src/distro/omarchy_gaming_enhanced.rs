@@ -30,7 +30,7 @@ pub enum GpuProfile {
 }
 
 /// Game trigger conditions
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum GameTrigger {
     ProcessName(String),
     WindowTitle(String),
@@ -69,7 +69,7 @@ pub enum HudElement {
 }
 
 /// Developer stack
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum DeveloperStack {
     Rust,
     Go,

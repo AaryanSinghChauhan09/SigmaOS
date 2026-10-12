@@ -1,5 +1,6 @@
 pub mod advanced_accel;
 pub mod bsd_graphics;
+pub mod sovereign_graphics_display_pr_suite;
 pub mod compositor;
 pub mod drm_kms;
 pub mod gaming_layer;
@@ -24,6 +25,7 @@ pub use drm_kms::{
     DrmFramebuffer, DrmKmsDevice, DrmMode, DrmNodeType, DrmPlane, DrmPlaneType, GemBuffer,
 };
 pub use video::{PixelRgba, VideoFrame};
+pub use sovereign_graphics_display_pr_suite::*;
 
 // Color type for UI compatibility
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
