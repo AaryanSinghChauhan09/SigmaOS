@@ -29,7 +29,7 @@ pub enum WindowState {
 }
 
 /// Window
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct HyprlandWindow {
     pub id: u32,
     pub title: String,
@@ -226,13 +226,13 @@ impl HyprlandInstance {
     /// Create workspace
     pub fn create_workspace(&mut self, name: String) -> u32 {
         let id = self.next_workspace_id.fetch_add(1, Ordering::Relaxed);
-        let workspace = HyprandWorkspace::new(id, name);
+        let workspace = HyprlandWorkspace::new(id, name);
         self.workspaces.insert(id, workspace);
         id
     }
     
     /// Switch to workspace
-    pub fn switch_workspace(&self, workspace_id: u32) -> Result<(), &'static str> {
+    pub fn switch_workspace(&mut self, workspace_id: u32) -> Result<(), &'static str> {
         if !self.workspaces.contains_key(&workspace_id) {
             return Err("Workspace not found");
         }
@@ -303,12 +303,12 @@ static mut HYPRLAND_INSTANCE: Option<HyprlandInstance> = None;
 /// Initialize Hyprland
 pub fn init_hyprland() {
     unsafe {
-        HYPRLAND_INSTANCE = Some(HyprandInstance::new());
+        HYPRLAND_INSTANCE = Some(HyprlandInstance::new());
     }
 }
 
 /// Get global Hyprland instance
-pub fn get_hyprland() -> Option<&'static mut HyprandInstance> {
+pub fn get_hyprland() -> Option<&'static mut HyprlandInstance> {
     unsafe {
         HYPRLAND_INSTANCE.as_mut()
     }

@@ -213,4 +213,46 @@ assert.strictEqual(cmdPaletteEl.classList.contains("active"), false, "Expected c
 assert.strictEqual(cmdPaletteEl.getAttribute("aria-hidden"), "true", "Expected cmd-palette aria-hidden='true' on outside click");
 console.log("✓ Command Palette outside-click dismissal verified successfully!");
 
+// Test 11: WAI-ARIA Toolbar keyboard navigation
+const toolbarEl = createMockElement("test-toolbar", "nav");
+toolbarEl.setAttribute("role", "toolbar");
+
+const tool1 = createMockElement("tool1", "button");
+const tool2 = createMockElement("tool2", "button");
+const tool3 = createMockElement("tool3", "button");
+
+toolbarEl.children = [tool1, tool2, tool3];
+
+toolbarEl.querySelectorAll = (selector) => {
+  if (selector === 'button, [role="button"], [tabindex]:not([tabindex="-1"])') return [tool1, tool2, tool3];
+  return [];
+};
+
+global.document.querySelectorAll = (selector) => {
+  if (selector === '[role="toolbar"]') return [toolbarEl];
+  if (selector === 'button, [role="button"], [tabindex]:not([tabindex="-1"])') return [tool1, tool2, tool3];
+  return [];
+};
+
+zenith.initToolbarNavigation();
+
+// Focus tool1 and simulate ArrowRight
+tool1.focus();
+toolbarEl.dispatchEvent({ type: "keydown", key: "ArrowRight", preventDefault: () => {} });
+assert.strictEqual(global.document.activeElement, tool2, "Expected ArrowRight to move focus from tool1 to tool2");
+
+// Simulate ArrowLeft
+toolbarEl.dispatchEvent({ type: "keydown", key: "ArrowLeft", preventDefault: () => {} });
+assert.strictEqual(global.document.activeElement, tool1, "Expected ArrowLeft to move focus back to tool1");
+
+// Simulate End
+toolbarEl.dispatchEvent({ type: "keydown", key: "End", preventDefault: () => {} });
+assert.strictEqual(global.document.activeElement, tool3, "Expected End key to move focus to tool3");
+
+// Simulate Home
+toolbarEl.dispatchEvent({ type: "keydown", key: "Home", preventDefault: () => {} });
+assert.strictEqual(global.document.activeElement, tool1, "Expected Home key to move focus to tool1");
+
+console.log("✓ WAI-ARIA Toolbar keyboard navigation verified successfully!");
+
 console.log("All Command Palette & Desktop UX tests passed successfully!");
