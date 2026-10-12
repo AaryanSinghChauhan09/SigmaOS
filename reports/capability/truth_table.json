@@ -1,3 +1,183 @@
+<<<<<<< HEAD
+[
+  {
+    "category": "feature",
+    "component": "gdt_idt_bootstrap",
+    "claimed_status": "implemented",
+    "verified_status": "unimplemented",
+    "has_code": false,
+    "last_verified": "2026-10-12"
+  },
+  {
+    "category": "feature",
+    "component": "pic_8259_interrupts",
+    "claimed_status": "implemented",
+    "verified_status": "unimplemented",
+    "has_code": false,
+    "last_verified": "2026-10-12"
+  },
+  {
+    "category": "feature",
+    "component": "pit_8254_timer",
+    "claimed_status": "implemented",
+    "verified_status": "unimplemented",
+    "has_code": false,
+    "last_verified": "2026-10-12"
+  },
+  {
+    "category": "feature",
+    "component": "vga_text_mode",
+    "claimed_status": "implemented",
+    "verified_status": "unimplemented",
+    "has_code": false,
+    "last_verified": "2026-10-12"
+  },
+  {
+    "category": "feature",
+    "component": "uefi_boot",
+    "claimed_status": "prototype",
+    "verified_status": "unimplemented",
+    "has_code": false,
+    "last_verified": "2026-10-12"
+  },
+  {
+    "category": "feature",
+    "component": "linux_syscall_abi",
+    "claimed_status": "implemented",
+    "verified_status": "unimplemented",
+    "has_code": false,
+    "last_verified": "2026-10-12"
+  },
+  {
+    "category": "feature",
+    "component": "task_scheduler_eevdf",
+    "claimed_status": "implemented",
+    "verified_status": "unimplemented",
+    "has_code": false,
+    "last_verified": "2026-10-12"
+  },
+  {
+    "category": "feature",
+    "component": "bore_scheduler",
+    "claimed_status": "implemented",
+    "verified_status": "unimplemented",
+    "has_code": false,
+    "last_verified": "2026-10-12"
+  },
+  {
+    "category": "feature",
+    "component": "memory_buddy_allocator",
+    "claimed_status": "implemented",
+    "verified_status": "unimplemented",
+    "has_code": false,
+    "last_verified": "2026-10-12"
+  },
+  {
+    "category": "feature",
+    "component": "vfs_posix_primitives",
+    "claimed_status": "implemented",
+    "verified_status": "unimplemented",
+    "has_code": false,
+    "last_verified": "2026-10-12"
+  },
+  {
+    "category": "feature",
+    "component": "omakase_tiling_engine",
+    "claimed_status": "implemented",
+    "verified_status": "unimplemented",
+    "has_code": false,
+    "last_verified": "2026-10-12"
+  },
+  {
+    "category": "feature",
+    "component": "omarchy_theme_synthesis",
+    "claimed_status": "implemented",
+    "verified_status": "unimplemented",
+    "has_code": false,
+    "last_verified": "2026-10-12"
+  },
+  {
+    "category": "feature",
+    "component": "wayland_zenith_compositor",
+    "claimed_status": "prototype",
+    "verified_status": "unimplemented",
+    "has_code": false,
+    "last_verified": "2026-10-12"
+  },
+  {
+    "category": "feature",
+    "component": "mint_update_level_automation",
+    "claimed_status": "implemented",
+    "verified_status": "unimplemented",
+    "has_code": false,
+    "last_verified": "2026-10-12"
+  },
+  {
+    "category": "feature",
+    "component": "timeshift_atomic_rollback",
+    "claimed_status": "implemented",
+    "verified_status": "unimplemented",
+    "has_code": false,
+    "last_verified": "2026-10-12"
+  },
+  {
+    "category": "feature",
+    "component": "installer_dry_run_and_hardware_partitioning",
+    "claimed_status": "partial",
+    "verified_status": "unimplemented",
+    "has_code": false,
+    "last_verified": "2026-10-12"
+  },
+  {
+    "category": "feature",
+    "component": "wifi_networking",
+    "claimed_status": "partial",
+    "verified_status": "unimplemented",
+    "has_code": false,
+    "last_verified": "2026-10-12"
+  },
+  {
+    "category": "feature",
+    "component": "nvme_driver_mmio",
+    "claimed_status": "partial",
+    "verified_status": "unimplemented",
+    "has_code": false,
+    "last_verified": "2026-10-12"
+  },
+  {
+    "category": "feature",
+    "component": "ahci_sata_controller",
+    "claimed_status": "partial",
+    "verified_status": "model-only",
+    "has_code": true,
+    "last_verified": "2026-10-12"
+  },
+  {
+    "category": "feature",
+    "component": "acpi_table_parser",
+    "claimed_status": "partial",
+    "verified_status": "model-only",
+    "has_code": true,
+    "last_verified": "2026-10-12"
+  },
+  {
+    "category": "feature",
+    "component": "drm_kms_graphics",
+    "claimed_status": "partial",
+    "verified_status": "unimplemented",
+    "has_code": false,
+    "last_verified": "2026-10-12"
+  },
+  {
+    "category": "feature",
+    "component": "tss_ring3_transition",
+    "claimed_status": "partial",
+    "verified_status": "unimplemented",
+    "has_code": false,
+    "last_verified": "2026-10-12"
+  }
+]
+=======
 {
   "audit_timestamp": "2026-10-12T05:22:53.110995+00:00",
   "total_claims": 92,
@@ -649,3 +829,4 @@
     }
   ]
 }
+>>>>>>> origin/main
