@@ -6,15 +6,26 @@ use std::collections::HashMap;
 /// Desktop environment type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DesktopEnvironment {
-    Zenith,   // SigmaOS native Wayland compositor
-    GNOME,    // GNOME
-    KDE,      // KDE Plasma
-    XFCE,     // XFCE
-    MATE,     // MATE
-    Cinnamon, // Cinnamon (Linux Mint)
-    LXQt,     // LXQt
-    Pantheon, // Pantheon (elementary OS)
-    TTY,      // Text terminal
+    Zenith,        // SigmaOS native Wayland compositor
+    GNOME,         // GNOME
+    KDE,           // KDE Plasma
+    XFCE,          // XFCE
+    MATE,          // MATE
+    Cinnamon,      // Cinnamon (Linux Mint)
+    LXQt,          // LXQt
+    LXDE,          // LXDE
+    Budgie,        // Budgie Desktop
+    Enlightenment, // Enlightenment / Moksha
+    Pantheon,      // Pantheon (elementary OS)
+    I3,            // i3 Window Manager
+    Bspwm,         // bspwm Binary Space Partitioning WM
+    Dwm,           // dwm Dynamic Window Manager
+    Openbox,       // Openbox Stacking WM
+    Fluxbox,       // Fluxbox Window Manager
+    Awesome,       // awesome Dynamic WM
+    Hyprland,      // Hyprland Wayland Compositor
+    Sway,          // Sway Wayland Compositor
+    TTY,           // Text terminal
 }
 
 impl DesktopEnvironment {
@@ -27,7 +38,18 @@ impl DesktopEnvironment {
             DesktopEnvironment::MATE => "MATE",
             DesktopEnvironment::Cinnamon => "Cinnamon",
             DesktopEnvironment::LXQt => "LXQt",
+            DesktopEnvironment::LXDE => "LXDE",
+            DesktopEnvironment::Budgie => "Budgie",
+            DesktopEnvironment::Enlightenment => "Enlightenment",
             DesktopEnvironment::Pantheon => "Pantheon",
+            DesktopEnvironment::I3 => "i3",
+            DesktopEnvironment::Bspwm => "bspwm",
+            DesktopEnvironment::Dwm => "dwm",
+            DesktopEnvironment::Openbox => "Openbox",
+            DesktopEnvironment::Fluxbox => "Fluxbox",
+            DesktopEnvironment::Awesome => "awesome",
+            DesktopEnvironment::Hyprland => "Hyprland",
+            DesktopEnvironment::Sway => "Sway",
             DesktopEnvironment::TTY => "TTY",
         }
     }
@@ -41,7 +63,18 @@ impl DesktopEnvironment {
             "mate" => Some(DesktopEnvironment::MATE),
             "cinnamon" => Some(DesktopEnvironment::Cinnamon),
             "lxqt" => Some(DesktopEnvironment::LXQt),
+            "lxde" => Some(DesktopEnvironment::LXDE),
+            "budgie" => Some(DesktopEnvironment::Budgie),
+            "enlightenment" | "moksha" => Some(DesktopEnvironment::Enlightenment),
             "pantheon" => Some(DesktopEnvironment::Pantheon),
+            "i3" => Some(DesktopEnvironment::I3),
+            "bspwm" => Some(DesktopEnvironment::Bspwm),
+            "dwm" => Some(DesktopEnvironment::Dwm),
+            "openbox" => Some(DesktopEnvironment::Openbox),
+            "fluxbox" => Some(DesktopEnvironment::Fluxbox),
+            "awesome" => Some(DesktopEnvironment::Awesome),
+            "hyprland" => Some(DesktopEnvironment::Hyprland),
+            "sway" => Some(DesktopEnvironment::Sway),
             "tty" => Some(DesktopEnvironment::TTY),
             _ => None,
         }

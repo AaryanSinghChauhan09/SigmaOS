@@ -21,7 +21,7 @@ pub enum NotificationUrgency {
 }
 
 /// Notification
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Notification {
     pub id: u32,
     pub app_name: String,
@@ -171,7 +171,7 @@ impl MakoDaemon {
             .collect();
         
         if self.config.sort {
-            visible.sort_by(|a, b| b.urgency as i32 - a.urgency as i32);
+            visible.sort_by(|a, b| (b.urgency as i32).cmp(&(a.urgency as i32)));
         }
         
         visible.truncate(self.config.max_visible as usize);
