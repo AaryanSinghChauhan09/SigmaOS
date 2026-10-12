@@ -1088,6 +1088,13 @@ if [ -f "src/distro/open_source_os_unimplemented_ideas_pr_suite.rs" ]; then
     ./build/test_os_ideas_suite
 fi
 
+if [ -f "src/distro/sovereign_open_source_os_fedora_github_pr_suite.rs" ]; then
+    echo "Running Sovereign Open Source OS Fedora GitHub PR Suite test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_open_source_os_fedora_github_pr_suite.rs --edition=2021 -o build/test_fedora_github_pr_suite
+    ./build/test_fedora_github_pr_suite
+fi
+
 if [ -f "src/distro/debian_github_repo_inspirations_pr.rs" ]; then
     echo "Running Debian GitHub Repo Inspirations PR Suite test suite..."
     mkdir -p build
