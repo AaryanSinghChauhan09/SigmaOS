@@ -1,104 +1,74 @@
-//! System Monitor
-//!
-//! System monitoring inspired by Linux Mint's system monitor and Omarchy's
-//! system utilities, supporting CPU, memory, disk, and network monitoring.
+// SPDX-License-Identifier: MIT
+// SigmaOS - System Monitor
+// Inspired by htop, btop, and gnome-system-monitor
+// Provides system resource monitoring
 
-use std::collections::HashMap;
+#![no_std]
 
-/// CPU core
+extern crate alloc;
+use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use core::sync::atomic::{AtomicU32, Ordering};
+
+/// Process state
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ProcessState {
+    Running,
+    Sleeping,
+    Waiting,
+    Stopped,
+    Zombie,
+}
+
+/// Process
 #[derive(Debug, Clone)]
-pub struct CpuCore {
+pub struct Process {
+    pub pid: u32,
+    pub name: String,
+    pub state: ProcessState,
+    pub cpu_percent: f32,
+    pub memory_percent: f32,
+    pub memory_bytes: u64,
+    pub user: String,
+    pub priority: i32,
+    pub threads: u32,
+    pub command: String,
+}
+
+/// CPU core info
+#[derive(Debug, Clone)]
+pub struct CPUCore {
     pub id: u32,
     pub usage_percent: f32,
     pub frequency_mhz: u32,
+    pub temperature: Option<f32>,
 }
 
-impl CpuCore {
-    pub fn new(id: u32) -> Self {
-        Self {
-            id,
-            usage_percent: 0.0,
-            frequency_mhz: 0,
-        }
-    }
-
-    pub fn set_usage(&mut self, usage: f32) {
-        self.usage_percent = usage;
-    }
-
-    pub fn set_frequency(&mut self, freq: u32) {
-        self.frequency_mhz = freq;
-    }
-}
-
-/// Memory information
+/// Memory info
 #[derive(Debug, Clone)]
-pub struct RamMemoryInfo {
-    pub total_mb: u64,
-    pub used_mb: u64,
-    pub free_mb: u64,
-    pub available_mb: u64,
-    pub swap_total_mb: u64,
-    pub swap_used_mb: u64,
+pub struct MemoryInfo {
+    pub total: u64,
+    pub used: u64,
+    pub free: u64,
+    pub available: u64,
+    pub cached: u64,
+    pub buffers: u64,
+    pub swap_total: u64,
+    pub swap_used: u64,
 }
 
-impl RamMemoryInfo {
-    pub fn new() -> Self {
-        Self {
-            total_mb: 0,
-            used_mb: 0,
-            free_mb: 0,
-            available_mb: 0,
-            swap_total_mb: 0,
-            swap_used_mb: 0,
-        }
-    }
-
-    pub fn usage_percent(&self) -> f32 {
-        if self.total_mb == 0 {
-            0.0
-        } else {
-            (self.used_mb as f32 / self.total_mb as f32) * 100.0
-        }
-    }
-}
-
-impl Default for RamMemoryInfo {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Disk partition
+/// Disk info
 #[derive(Debug, Clone)]
-pub struct DiskPartition {
+pub struct DiskInfo {
     pub device: String,
     pub mount_point: String,
     pub file_system: String,
-    pub total_gb: u64,
-    pub used_gb: u64,
-    pub free_gb: u64,
-}
-
-impl DiskPartition {
-    pub fn new(device: String, mount_point: String, file_system: String) -> Self {
-        Self {
-            device,
-            mount_point,
-            file_system,
-            total_gb: 0,
-            used_gb: 0,
-            free_gb: 0,
-        }
-    }
-
-    pub fn usage_percent(&self) -> f32 {
-        if self.total_gb == 0 {
-            0.0
-        } else {
-            (self.used_gb as f32 / self.total_gb as f32) * 100.0
-        }
-    }
+    pub total_bytes: u64,
+    pub used_bytes: u64,
+    pub free_bytes: u64,
+    pub read_bytes_per_sec: u64,
+    pub write_bytes_per_sec: u64,
 }
 
 /// Network interface
@@ -109,212 +79,259 @@ pub struct NetworkInterface {
     pub bytes_recv: u64,
     pub packets_sent: u64,
     pub packets_recv: u64,
-    pub is_up: bool,
-}
-
-impl NetworkInterface {
-    pub fn new(name: String) -> Self {
-        Self {
-            name,
-            bytes_sent: 0,
-            bytes_recv: 0,
-            packets_sent: 0,
-            packets_recv: 0,
-            is_up: false,
-        }
-    }
-
-    pub fn set_up(&mut self, up: bool) {
-        self.is_up = up;
-    }
+    pub bytes_sent_per_sec: u64,
+    pub bytes_recv_per_sec: u64,
 }
 
 /// System monitor
-#[derive(Debug)]
 pub struct SystemMonitor {
-    cpu_cores: Vec<CpuCore>,
-    memory: RamMemoryInfo,
-    partitions: HashMap<String, DiskPartition>,
-    network_interfaces: HashMap<String, NetworkInterface>,
+    pub processes: Vec<Process>,
+    pub cpu_cores: Vec<CPUCore>,
+    pub memory: MemoryInfo,
+    pub disks: Vec<DiskInfo>,
+    pub network_interfaces: Vec<NetworkInterface>,
+    pub uptime_seconds: u64,
+    pub load_average: [f32; 3],
+    sort_by: String,
+    sort_descending: bool,
+    filter: String,
 }
 
 impl SystemMonitor {
     pub fn new() -> Self {
-        let mut monitor = Self {
+        Self {
+            processes: Vec::new(),
             cpu_cores: Vec::new(),
-            memory: RamMemoryInfo::new(),
-            partitions: HashMap::new(),
-            network_interfaces: HashMap::new(),
-        };
-
-        // Initialize CPU cores (simulated 4 cores)
-        for i in 0..4 {
-            let mut core = CpuCore::new(i);
-            core.set_frequency(2400); // 2.4 GHz
-            monitor.cpu_cores.push(core);
+            memory: MemoryInfo {
+                total: 0,
+                used: 0,
+                free: 0,
+                available: 0,
+                cached: 0,
+                buffers: 0,
+                swap_total: 0,
+                swap_used: 0,
+            },
+            disks: Vec::new(),
+            network_interfaces: Vec::new(),
+            uptime_seconds: 0,
+            load_average: [0.0, 0.0, 0.0],
+            sort_by: "cpu".to_string(),
+            sort_descending: true,
+            filter: String::new(),
         }
-
-        // Initialize memory (simulated 8 GB)
-        monitor.memory.total_mb = 8192;
-        monitor.memory.used_mb = 4096;
-        monitor.memory.free_mb = 4096;
-        monitor.memory.available_mb = 4096;
-
-        // Initialize partitions
-        let mut root =
-            DiskPartition::new("/dev/sda1".to_string(), "/".to_string(), "ext4".to_string());
-        root.total_gb = 100;
-        root.used_gb = 50;
-        root.free_gb = 50;
-        monitor.partitions.insert("/dev/sda1".to_string(), root);
-
-        // Initialize network interfaces
-        let mut eth0 = NetworkInterface::new("eth0".to_string());
-        eth0.set_up(true);
-        monitor.network_interfaces.insert("eth0".to_string(), eth0);
-
-        let mut wlan0 = NetworkInterface::new("wlan0".to_string());
-        wlan0.set_up(true);
-        monitor
-            .network_interfaces
-            .insert("wlan0".to_string(), wlan0);
-
-        monitor
     }
 
-    /// Get CPU cores
-    pub fn get_cpu_cores(&self) -> &Vec<CpuCore> {
-        &self.cpu_cores
+    /// Refresh all data
+    pub fn refresh(&mut self) {
+        self.refresh_processes();
+        self.refresh_cpu();
+        self.refresh_memory();
+        self.refresh_disks();
+        self.refresh_network();
+        self.refresh_uptime();
+        self.refresh_load_average();
     }
 
-    /// Get CPU usage (average)
-    pub fn get_cpu_usage(&self) -> f32 {
+    /// Refresh processes
+    fn refresh_processes(&mut self) {
+        // Simplified - in real implementation would read from /proc
+        self.processes.clear();
+    }
+
+    /// Refresh CPU
+    fn refresh_cpu(&mut self) {
+        // Simplified - in real implementation would read CPU stats
+        self.cpu_cores.clear();
+    }
+
+    /// Refresh memory
+    fn refresh_memory(&mut self) {
+        // Simplified - in real implementation would read from /proc/meminfo
+    }
+
+    /// Refresh disks
+    fn refresh_disks(&mut self) {
+        // Simplified - in real implementation would read from /proc/mounts and statfs
+    }
+
+    /// Refresh network
+    fn refresh_network(&mut self) {
+        // Simplified - in real implementation would read from /proc/net/dev
+    }
+
+    /// Refresh uptime
+    fn refresh_uptime(&mut self) {
+        // Simplified - in real implementation would read from /proc/uptime
+    }
+
+    /// Refresh load average
+    fn refresh_load_average(&mut self) {
+        // Simplified - in real implementation would read from /proc/loadavg
+    }
+
+    /// Kill process
+    pub fn kill_process(&mut self, pid: u32, signal: i32) -> Result<(), &'static str> {
+        let process = self.processes.iter().find(|p| p.pid == pid);
+        if process.is_none() {
+            return Err("Process not found");
+        }
+        // Simplified - in real implementation would send signal
+        Ok(())
+    }
+
+    /// Set sort by
+    pub fn set_sort_by(&mut self, field: String) {
+        self.sort_by = field;
+        self.sort_processes();
+    }
+
+    /// Toggle sort direction
+    pub fn toggle_sort_direction(&mut self) {
+        self.sort_descending = !self.sort_descending;
+        self.sort_processes();
+    }
+
+    /// Sort processes
+    fn sort_processes(&mut self) {
+        match self.sort_by.as_str() {
+            "pid" => {
+                self.processes.sort_by(|a, b| {
+                    if self.sort_descending {
+                        b.pid.cmp(&a.pid)
+                    } else {
+                        a.pid.cmp(&b.pid)
+                    }
+                });
+            }
+            "name" => {
+                self.processes.sort_by(|a, b| {
+                    if self.sort_descending {
+                        b.name.cmp(&a.name)
+                    } else {
+                        a.name.cmp(&b.name)
+                    }
+                });
+            }
+            "cpu" => {
+                self.processes.sort_by(|a, b| {
+                    if self.sort_descending {
+                        b.cpu_percent.partial_cmp(&a.cpu_percent).unwrap_or(core::cmp::Ordering::Equal)
+                    } else {
+                        a.cpu_percent.partial_cmp(&b.cpu_percent).unwrap_or(core::cmp::Ordering::Equal)
+                    }
+                });
+            }
+            "memory" => {
+                self.processes.sort_by(|a, b| {
+                    if self.sort_descending {
+                        b.memory_percent.partial_cmp(&a.memory_percent).unwrap_or(core::cmp::Ordering::Equal)
+                    } else {
+                        a.memory_percent.partial_cmp(&b.memory_percent).unwrap_or(core::cmp::Ordering::Equal)
+                    }
+                });
+            }
+            "user" => {
+                self.processes.sort_by(|a, b| {
+                    if self.sort_descending {
+                        b.user.cmp(&a.user)
+                    } else {
+                        a.user.cmp(&b.user)
+                    }
+                });
+            }
+            _ => {}
+        }
+    }
+
+    /// Set filter
+    pub fn set_filter(&mut self, filter: String) {
+        self.filter = filter;
+    }
+
+    /// Get filtered processes
+    pub fn get_filtered_processes(&self) -> Vec<&Process> {
+        if self.filter.is_empty() {
+            self.processes.iter().collect()
+        } else {
+            self.processes
+                .iter()
+                .filter(|p| {
+                    p.name.to_lowercase().contains(&self.filter.to_lowercase())
+                        || p.command.to_lowercase().contains(&self.filter.to_lowercase())
+                })
+                .collect()
+        }
+    }
+
+    /// Get CPU usage percent
+    pub fn get_cpu_usage_percent(&self) -> f32 {
         if self.cpu_cores.is_empty() {
             0.0
         } else {
-            let total: f32 = self.cpu_cores.iter().map(|c| c.usage_percent).sum();
-            total / self.cpu_cores.len() as f32
+            self.cpu_cores.iter().map(|c| c.usage_percent).sum::<f32>() / self.cpu_cores.len() as f32
         }
     }
 
-    /// Get memory info
-    pub fn get_memory(&self) -> &RamMemoryInfo {
-        &self.memory
-    }
-
-    /// Set memory info
-    pub fn set_memory(&mut self, memory: RamMemoryInfo) {
-        self.memory = memory;
-    }
-
-    /// Add a partition
-    pub fn add_partition(&mut self, partition: DiskPartition) {
-        self.partitions.insert(partition.device.clone(), partition);
-    }
-
-    /// Get a partition
-    pub fn get_partition(&self, device: &str) -> Option<&DiskPartition> {
-        self.partitions.get(device)
-    }
-
-    /// List all partitions
-    pub fn list_partitions(&self) -> Vec<&DiskPartition> {
-        self.partitions.values().collect()
-    }
-
-    /// Add a network interface
-    pub fn add_network_interface(&mut self, interface: NetworkInterface) {
-        self.network_interfaces
-            .insert(interface.name.clone(), interface);
-    }
-
-    /// Get a network interface
-    pub fn get_network_interface(&self, name: &str) -> Option<&NetworkInterface> {
-        self.network_interfaces.get(name)
-    }
-
-    /// List all network interfaces
-    pub fn list_network_interfaces(&self) -> Vec<&NetworkInterface> {
-        self.network_interfaces.values().collect()
-    }
-
-    /// Get total disk usage
-    pub fn get_total_disk_usage(&self) -> (u64, u64) {
-        let total: u64 = self.partitions.values().map(|p| p.total_gb).sum();
-        let used: u64 = self.partitions.values().map(|p| p.used_gb).sum();
-        (total, used)
-    }
-
-    /// Get total network traffic
-    pub fn get_total_network_traffic(&self) -> (u64, u64) {
-        let sent: u64 = self.network_interfaces.values().map(|n| n.bytes_sent).sum();
-        let recv: u64 = self.network_interfaces.values().map(|n| n.bytes_recv).sum();
-        (sent, recv)
-    }
-
-    /// Update simulated values
-    pub fn update(&mut self) {
-        // Simulate CPU usage changes
-        for core in &mut self.cpu_cores {
-            let usage = (core.id as f32 * 10.0 + 20.0) % 100.0;
-            core.set_usage(usage);
-        }
-
-        // Simulate memory usage changes
-        let used = (self.memory.total_mb as f32 * 0.5) as u64;
-        self.memory.used_mb = used;
-        self.memory.free_mb = self.memory.total_mb - used;
-        self.memory.available_mb = self.memory.free_mb;
-
-        // Simulate network traffic
-        for interface in self.network_interfaces.values_mut() {
-            interface.bytes_sent += 1024;
-            interface.bytes_recv += 2048;
-            interface.packets_sent += 10;
-            interface.packets_recv += 20;
-        }
-    }
-
-    /// Get statistics
-    pub fn get_statistics(&self) -> SystemMonitorStatistics {
-        let cpu_usage = self.get_cpu_usage();
-        let memory_usage = self.memory.usage_percent();
-        let (disk_total, disk_used) = self.get_total_disk_usage();
-        let disk_usage = if disk_total == 0 {
+    /// Get memory usage percent
+    pub fn get_memory_usage_percent(&self) -> f32 {
+        if self.memory.total == 0 {
             0.0
         } else {
-            (disk_used as f32 / disk_total as f32) * 100.0
-        };
-        let network_up = self.network_interfaces.values().filter(|n| n.is_up).count();
-
-        SystemMonitorStatistics {
-            cpu_cores: self.cpu_cores.len(),
-            cpu_usage,
-            memory_usage,
-            disk_partitions: self.partitions.len(),
-            disk_usage,
-            network_interfaces: self.network_interfaces.len(),
-            network_up,
+            (self.memory.used as f32 / self.memory.total as f32) * 100.0
         }
     }
-}
 
-impl Default for SystemMonitor {
-    fn default() -> Self {
-        Self::new()
+    /// Get swap usage percent
+    pub fn get_swap_usage_percent(&self) -> f32 {
+        if self.memory.swap_total == 0 {
+            0.0
+        } else {
+            (self.memory.swap_used as f32 / self.memory.swap_total as f32) * 100.0
+        }
+    }
+
+    /// Get total network bytes sent
+    pub fn get_total_bytes_sent(&self) -> u64 {
+        self.network_interfaces.iter().map(|n| n.bytes_sent).sum()
+    }
+
+    /// Get total network bytes received
+    pub fn get_total_bytes_recv(&self) -> u64 {
+        self.network_interfaces.iter().map(|n| n.bytes_recv).sum()
+    }
+
+    /// Get process by PID
+    pub fn get_process(&self, pid: u32) -> Option<&Process> {
+        self.processes.iter().find(|p| p.pid == pid)
+    }
+
+    /// Get process count
+    pub fn process_count(&self) -> usize {
+        self.processes.len()
+    }
+
+    /// Get thread count
+    pub fn thread_count(&self) -> u32 {
+        self.processes.iter().map(|p| p.threads).sum()
     }
 }
 
-/// System monitor statistics
-#[derive(Debug, Clone)]
-pub struct SystemMonitorStatistics {
-    pub cpu_cores: usize,
-    pub cpu_usage: f32,
-    pub memory_usage: f32,
-    pub disk_partitions: usize,
-    pub disk_usage: f32,
-    pub network_interfaces: usize,
-    pub network_up: usize,
+/// Global system monitor
+static mut SYSTEM_MONITOR: Option<SystemMonitor> = None;
+
+/// Initialize system monitor
+pub fn init_system_monitor() {
+    unsafe {
+        SYSTEM_MONITOR = Some(SystemMonitor::new());
+    }
+}
+
+/// Get system monitor
+pub fn get_system_monitor() -> &'static mut SystemMonitor {
+    unsafe {
+        SYSTEM_MONITOR.as_mut().expect("System monitor not initialized")
+    }
 }
 
 #[cfg(test)]
@@ -322,85 +339,50 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_cpu_core_creation() {
-        let core = CpuCore::new(0);
-        assert_eq!(core.id, 0);
-    }
-
-    #[test]
-    fn test_memory_info_creation() {
-        let mem = RamMemoryInfo::new();
-        assert_eq!(mem.total_mb, 0);
-    }
-
-    #[test]
-    fn test_memory_usage_percent() {
-        let mut mem = RamMemoryInfo::new();
-        mem.total_mb = 1000;
-        mem.used_mb = 500;
-        assert_eq!(mem.usage_percent(), 50.0);
-    }
-
-    #[test]
-    fn test_disk_partition_creation() {
-        let part = DiskPartition::new("/dev/sda1".to_string(), "/".to_string(), "ext4".to_string());
-        assert_eq!(part.mount_point, "/");
-    }
-
-    #[test]
-    fn test_disk_usage_percent() {
-        let mut part =
-            DiskPartition::new("/dev/sda1".to_string(), "/".to_string(), "ext4".to_string());
-        part.total_gb = 100;
-        part.used_gb = 50;
-        assert_eq!(part.usage_percent(), 50.0);
-    }
-
-    #[test]
     fn test_system_monitor_creation() {
-        let monitor = SystemMonitor::new();
-        assert_eq!(monitor.cpu_cores.len(), 4);
+        let sm = SystemMonitor::new();
+        assert_eq!(sm.process_count(), 0);
     }
 
     #[test]
-    fn test_get_cpu_usage() {
-        let monitor = SystemMonitor::new();
-        let usage = monitor.get_cpu_usage();
+    fn test_refresh() {
+        let mut sm = SystemMonitor::new();
+        sm.refresh();
+        // Should not panic
+    }
+
+    #[test]
+    fn test_set_sort_by() {
+        let mut sm = SystemMonitor::new();
+        sm.set_sort_by("cpu".to_string());
+        assert_eq!(sm.sort_by, "cpu");
+    }
+
+    #[test]
+    fn test_toggle_sort_direction() {
+        let mut sm = SystemMonitor::new();
+        sm.toggle_sort_direction();
+        assert!(!sm.sort_descending);
+    }
+
+    #[test]
+    fn test_set_filter() {
+        let mut sm = SystemMonitor::new();
+        sm.set_filter("test".to_string());
+        assert_eq!(sm.filter, "test");
+    }
+
+    #[test]
+    fn test_get_cpu_usage_percent() {
+        let sm = SystemMonitor::new();
+        let usage = sm.get_cpu_usage_percent();
         assert!(usage >= 0.0 && usage <= 100.0);
     }
 
     #[test]
-    fn test_add_partition() {
-        let mut monitor = SystemMonitor::new();
-        let part = DiskPartition::new(
-            "/dev/sda2".to_string(),
-            "/home".to_string(),
-            "ext4".to_string(),
-        );
-        monitor.add_partition(part);
-        assert!(monitor.get_partition("/dev/sda2").is_some());
-    }
-
-    #[test]
-    fn test_add_network_interface() {
-        let mut monitor = SystemMonitor::new();
-        let iface = NetworkInterface::new("eth1".to_string());
-        monitor.add_network_interface(iface);
-        assert!(monitor.get_network_interface("eth1").is_some());
-    }
-
-    #[test]
-    fn test_update() {
-        let mut monitor = SystemMonitor::new();
-        monitor.update();
-        let stats = monitor.get_statistics();
-        assert!(stats.cpu_usage > 0.0);
-    }
-
-    #[test]
-    fn test_statistics() {
-        let monitor = SystemMonitor::new();
-        let stats = monitor.get_statistics();
-        assert_eq!(stats.cpu_cores, 4);
+    fn test_get_memory_usage_percent() {
+        let sm = SystemMonitor::new();
+        let usage = sm.get_memory_usage_percent();
+        assert!(usage >= 0.0 && usage <= 100.0);
     }
 }

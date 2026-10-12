@@ -1,644 +1,292 @@
-/// OOP-based Desktop Terminal for SigmaOS
-/// Implements terminal emulator, ANSI escape interpretation, and shell integration.
-/// Inspired by Alacritty, GNOME-Terminal, xterm, and tmux from Linux & BSD distributions.
-use std::boxed::Box;
+// SPDX-License-Identifier: MIT
+// SigmaOS - Terminal Emulator
+// Inspired by GNOME Terminal
+// Provides terminal emulation and shell integration
 
-use core::mem;
-use core::sync::atomic::{AtomicUsize, Ordering};
+#![no_std]
 
-pub type TerminalID = usize;
+extern crate alloc;
+use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use core::sync::atomic::{AtomicU32, Ordering};
 
-#[repr(C)]
+/// Color scheme
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum TerminalError {
-    Success = 0,
-    NotFound = 1,
-    CommandFailed = 2,
+pub enum ColorScheme {
+    Default,
+    SolarizedLight,
+    SolarizedDark,
+    Tango,
+    Gruvbox,
+    Dracula,
+    Nord,
 }
 
-pub trait Terminal {
-    fn id(&self) -> TerminalID;
-    fn title(&self) -> &[u8];
-    fn working_directory(&self) -> &[u8];
-    fn set_working_directory(&mut self, path: &[u8]);
-}
-
-#[repr(C)]
-pub struct SimpleTerminal {
-    pub id: TerminalID,
-    pub title: [u8; 128],
-    pub title_len: u8,
-    pub working_directory: [u8; 256],
-    pub dir_len: u16,
-}
-
-impl SimpleTerminal {
-    pub fn new(id: TerminalID, title: &[u8]) -> Self {
-        let mut title_array = [0u8; 128];
-        let mut dir_array = [0u8; 256];
-        let title_len = title.len().min(127);
-        let default_dir = b"/home/user";
-        let dir_len = default_dir.len().min(255);
-        unsafe {
-            core::ptr::copy_nonoverlapping(title.as_ptr(), title_array.as_mut_ptr(), title_len);
-            core::ptr::copy_nonoverlapping(default_dir.as_ptr(), dir_array.as_mut_ptr(), dir_len);
-        }
-        SimpleTerminal {
-            id,
-            title: title_array,
-            title_len: title_len as u8,
-            working_directory: dir_array,
-            dir_len: dir_len as u16,
-        }
-    }
-}
-
-impl Terminal for SimpleTerminal {
-    fn id(&self) -> TerminalID {
-        self.id
-    }
-    fn title(&self) -> &[u8] {
-        // Bolt ⚡ Optimization: Store explicit title length on creation to eliminate
-        // O(N) zero-byte linear scanning (.position(|&b| b == 0)) on every title query,
-        // reducing slice lookup to instantaneous O(1) constant time.
-        &self.title[..self.title_len as usize]
-    }
-    fn working_directory(&self) -> &[u8] {
-        // Bolt ⚡ Optimization: Store explicit working directory length to eliminate
-        // O(N) zero-byte linear scanning (.position(|&b| b == 0)) on every directory lookup,
-        // reducing slice retrieval to instantaneous O(1) constant time.
-        &self.working_directory[..self.dir_len as usize]
-    }
-
-    fn set_working_directory(&mut self, path: &[u8]) {
-        let path_len = path.len().min(255);
-        unsafe {
-            core::ptr::copy_nonoverlapping(
-                path.as_ptr(),
-                self.working_directory.as_mut_ptr(),
-                path_len,
-            );
-        }
-        self.dir_len = path_len as u16;
-    }
-}
-
-pub trait TerminalManager {
-    fn create_terminal(&mut self, title: &[u8]) -> Result<TerminalID, TerminalError>;
-    fn close_terminal(&mut self, id: TerminalID) -> Result<(), TerminalError>;
-    fn get_terminal(&self, id: TerminalID) -> Option<&dyn Terminal>;
-    fn execute_command(
-        &mut self,
-        terminal_id: TerminalID,
-        command: &[u8],
-    ) -> Result<Vec<u8>, TerminalError>;
-}
-
-#[repr(C)]
-pub struct SimpleTerminalManager {
-    pub terminals: Vec<Option<Box<dyn Terminal>>>,
-    pub next_id: AtomicUsize,
-}
-
-impl SimpleTerminalManager {
-    pub fn new() -> Self {
-        SimpleTerminalManager {
-            terminals: Vec::new(),
-            next_id: AtomicUsize::new(1),
-        }
-    }
-}
-
-impl TerminalManager for SimpleTerminalManager {
-    fn create_terminal(&mut self, title: &[u8]) -> Result<TerminalID, TerminalError> {
-        let id = self.next_id.fetch_add(1, Ordering::SeqCst);
-        let terminal = SimpleTerminal::new(id, title);
-        self.terminals.push(Some(Box::new(terminal)));
-        Ok(id)
-    }
-
-    fn close_terminal(&mut self, id: TerminalID) -> Result<(), TerminalError> {
-        for terminal_option in &mut self.terminals {
-            if let Some(ref terminal) = *terminal_option {
-                let term_ref: &dyn Terminal = terminal.as_ref();
-                if term_ref.id() == id {
-                    *terminal_option = None;
-                    return Ok(());
-                }
-            }
-        }
-        Err(TerminalError::NotFound)
-    }
-
-    fn get_terminal(&self, id: TerminalID) -> Option<&dyn Terminal> {
-        for terminal_option in &self.terminals {
-            if let Some(ref terminal) = *terminal_option {
-                let term_ref: &dyn Terminal = terminal.as_ref();
-                if term_ref.id() == id {
-                    return Some(term_ref);
-                }
-            }
-        }
-        None
-    }
-
-    fn execute_command(
-        &mut self,
-        terminal_id: TerminalID,
-        command: &[u8],
-    ) -> Result<Vec<u8>, TerminalError> {
-        if self.get_terminal(terminal_id).is_some() {
-            let mut output = Vec::new();
-            for &byte in command {
-                output.push(byte);
-            }
-            output.push(b'\n');
-            Ok(output)
-        } else {
-            Err(TerminalError::NotFound)
-        }
-    }
-}
-
-pub trait ShellIntegration {
-    fn get_shell(&self) -> &[u8];
-    fn set_shell(&mut self, shell: &[u8]);
-    fn get_env_var(&self, key: &[u8]) -> Option<&[u8]>;
-    fn set_env_var(&mut self, key: &[u8], value: &[u8]);
-}
-
-#[repr(C)]
-pub struct SimpleShellIntegration {
-    pub shell: [u8; 64],
-    pub shell_len: u8,
-    pub env_vars: Vec<([u8; 64], u8, [u8; 256], u16)>,
-}
-
-impl SimpleShellIntegration {
-    pub fn new() -> Self {
-        let mut shell_array = [0u8; 64];
-        let default_shell = b"/bin/bash";
-        let shell_len = default_shell.len().min(63);
-        for i in 0..shell_len {
-            shell_array[i] = default_shell[i];
-        }
-        SimpleShellIntegration {
-            shell: shell_array,
-            shell_len: shell_len as u8,
-            env_vars: Vec::new(),
-        }
-    }
-}
-
-impl ShellIntegration for SimpleShellIntegration {
-    fn get_shell(&self) -> &[u8] {
-        // Bolt ⚡ Optimization: Use cached shell length for O(1) constant-time slice retrieval
-        &self.shell[..self.shell_len as usize]
-    }
-
-    fn set_shell(&mut self, shell: &[u8]) {
-        let shell_len = shell.len().min(63);
-        for i in 0..shell_len {
-            self.shell[i] = shell[i];
-        }
-        self.shell_len = shell_len as u8;
-    }
-
-    fn get_env_var(&self, key: &[u8]) -> Option<&[u8]> {
-        for &(ref k, k_len, ref v, v_len) in &self.env_vars {
-            // Bolt ⚡ Optimization: Instantaneous O(1) slice lookup using cached lengths,
-            // bypassing O(N) zero-byte searches on every environment variable access.
-            if &k[..k_len as usize] == key {
-                return Some(&v[..v_len as usize]);
-            }
-        }
-        None
-    }
-
-    fn set_env_var(&mut self, key: &[u8], value: &[u8]) {
-        let mut key_array = [0u8; 64];
-        let mut value_array = [0u8; 256];
-        let key_len = key.len().min(63);
-        let value_len = value.len().min(255);
-        for i in 0..key_len {
-            key_array[i] = key[i];
-        }
-        for i in 0..value_len {
-            value_array[i] = value[i];
-        }
-        self.env_vars
-            .push((key_array, key_len as u8, value_array, value_len as u16));
-    }
-}
-
-// ==============================================================================
-// 1. ANSI Escape Code Interpreter (SGR color and attribute parser)
-// ==============================================================================
+/// Cursor shape
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct TextAttribute {
-    pub fg_color: u8, // ANSI 8-color model (e.g. 31=Red, 32=Green)
-    pub bg_color: u8, // ANSI 8-color model (e.g. 40=Black, 41=Red)
-    pub is_bold: bool,
-    pub is_blinking: bool,
-    pub rgb_fg: Option<(u8, u8, u8)>,
-    pub rgb_bg: Option<(u8, u8, u8)>,
+pub enum CursorShape {
+    Block,
+    Underline,
+    Bar,
 }
 
-pub struct AnsiEscapeInterpreter {
-    pub active_attr: TextAttribute,
-    pub window_title: [u8; 128],
+/// Scrollbar position
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ScrollbarPosition {
+    Left,
+    Right,
+    Hidden,
 }
 
-impl AnsiEscapeInterpreter {
+/// Bell mode
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BellMode {
+    None,
+    Visual,
+    Audible,
+    Both,
+}
+
+/// Terminal profile
+#[derive(Debug, Clone)]
+pub struct TerminalProfile {
+    pub name: String,
+    pub color_scheme: ColorScheme,
+    pub font_name: String,
+    pub font_size: u32,
+    pub cursor_shape: CursorShape,
+    pub cursor_blink: bool,
+    pub scrollbar_position: ScrollbarPosition,
+    pub bell_mode: BellMode,
+    pub scrollback_lines: u32,
+    pub transparency: f32,
+    pub bold_is_bright: bool,
+}
+
+/// Terminal tab
+#[derive(Debug, Clone)]
+pub struct TerminalTab {
+    pub id: u32,
+    pub title: String,
+    pub profile_name: String,
+    pub current_directory: String,
+    pub is_active: bool,
+}
+
+/// Terminal session
+#[derive(Debug, Clone)]
+pub struct TerminalSession {
+    pub id: u32,
+    pub shell_command: String,
+    pub environment: BTreeMap<String, String>,
+    pub is_running: bool,
+}
+
+/// Terminal emulator
+pub struct TerminalEmulator {
+    pub profiles: BTreeMap<String, TerminalProfile>,
+    pub tabs: Vec<TerminalTab>,
+    pub sessions: BTreeMap<u32, TerminalSession>,
+    pub active_tab: Option<usize>,
+    pub next_tab_id: AtomicU32,
+    next_session_id: AtomicU32,
+}
+
+impl TerminalEmulator {
     pub fn new() -> Self {
-        Self {
-            active_attr: TextAttribute {
-                fg_color: 37, // White
-                bg_color: 40, // Black
-                is_bold: false,
-                is_blinking: false,
-                rgb_fg: None,
-                rgb_bg: None,
+        let mut profiles = BTreeMap::new();
+        
+        // Default profile
+        profiles.insert(
+            "Default".to_string(),
+            TerminalProfile {
+                name: "Default".to_string(),
+                color_scheme: ColorScheme::Default,
+                font_name: "Monospace".to_string(),
+                font_size: 12,
+                cursor_shape: CursorShape::Block,
+                cursor_blink: true,
+                scrollbar_position: ScrollbarPosition::Right,
+                bell_mode: BellMode::Both,
+                scrollback_lines: 10000,
+                transparency: 0.0,
+                bold_is_bright: false,
             },
-            window_title: [0u8; 128],
-        }
-    }
+        );
 
-    pub fn parse_escape_sequence(&mut self, code: &[u8]) -> bool {
-        // Parses OSC codes e.g. "\x1b]0;Title\x07"
-        if code.len() >= 4 && code[0] == b'\x1b' && code[1] == b']' {
-            let last_byte = code[code.len() - 1];
-            if last_byte == b'\x07' || last_byte == b'\\' {
-                if code.len() >= 5 && (code[2] == b'0' || code[2] == b'2') && code[3] == b';' {
-                    let title_slice = &code[4..code.len() - 1];
-                    let len = title_slice.len().min(127);
-                    self.window_title[..len].copy_from_slice(&title_slice[..len]);
-                    self.window_title[len] = 0;
-                    return true;
-                }
-            }
-        }
-
-        // Parses SGR codes (Select Graphic Rendition) e.g., "\x1b[31;1m" (Bold Red) or 24-bit RGB
-        if code.len() >= 3 && code[0] == b'\x1b' && code[1] == b'[' {
-            let last_byte = code[code.len() - 1];
-            if last_byte == b'm' {
-                if code.contains(&b'1') {
-                    self.active_attr.is_bold = true;
-                }
-                if code.contains(&b'0') {
-                    self.active_attr.is_bold = false;
-                    self.active_attr.is_blinking = false;
-                    self.active_attr.rgb_fg = None;
-                    self.active_attr.rgb_bg = None;
-                }
-                if code.contains(&b'5') {
-                    self.active_attr.is_blinking = true;
-                }
-                // Foregrounds
-                if code.contains(&b'3') && code.contains(&b'1') {
-                    self.active_attr.fg_color = 31;
-                } // Red
-                if code.contains(&b'3') && code.contains(&b'2') {
-                    self.active_attr.fg_color = 32;
-                } // Green
-
-                // Dynamic 24-bit TrueColor sequence parsing e.g. \x1b[38;2;R;G;Bm or \x1b[48;2;R;G;Bm
-                let mut i = 0;
-                while i < code.len() {
-                    if i + 4 <= code.len() && &code[i..i + 4] == b"38;2" {
-                        // Extract subsequent numbers after 38;2;
-                        let mut r: u8 = 0;
-                        let mut g: u8 = 0;
-                        let mut b: u8 = 0;
-                        let mut part_idx = 0;
-                        let mut curr = 0u16;
-                        for &byte in &code[i + 4..code.len() - 1] {
-                            if byte == b';' {
-                                if part_idx == 1 {
-                                    r = curr.min(255) as u8;
-                                } else if part_idx == 2 {
-                                    g = curr.min(255) as u8;
-                                }
-                                part_idx += 1;
-                                curr = 0;
-                            } else if byte.is_ascii_digit() {
-                                curr = curr * 10 + (byte - b'0') as u16;
-                            }
-                        }
-                        if part_idx == 3 || part_idx == 2 {
-                            b = curr.min(255) as u8;
-                        }
-                        self.active_attr.rgb_fg = Some((r, g, b));
-                    } else if i + 4 <= code.len() && &code[i..i + 4] == b"48;2" {
-                        let mut r: u8 = 0;
-                        let mut g: u8 = 0;
-                        let mut b: u8 = 0;
-                        let mut part_idx = 0;
-                        let mut curr = 0u16;
-                        for &byte in &code[i + 4..code.len() - 1] {
-                            if byte == b';' {
-                                if part_idx == 1 {
-                                    r = curr.min(255) as u8;
-                                } else if part_idx == 2 {
-                                    g = curr.min(255) as u8;
-                                }
-                                part_idx += 1;
-                                curr = 0;
-                            } else if byte.is_ascii_digit() {
-                                curr = curr * 10 + (byte - b'0') as u16;
-                            }
-                        }
-                        if part_idx == 3 || part_idx == 2 {
-                            b = curr.min(255) as u8;
-                        }
-                        self.active_attr.rgb_bg = Some((r, g, b));
-                    }
-                    i += 1;
-                }
-
-                return true;
-            }
-        }
-        false
-    }
-}
-
-impl Default for AnsiEscapeInterpreter {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ==============================================================================
-// 2. Scrollback Buffer and History Grid
-// ==============================================================================
-#[derive(Clone, Copy)]
-pub struct TerminalCell {
-    pub glyph: char,
-    pub attribute: TextAttribute,
-}
-
-pub struct ScrollbackGrid {
-    pub lines: Vec<Vec<TerminalCell>>,
-    pub cursor_row: usize,
-    pub cursor_col: usize,
-    pub max_scrollback_lines: usize,
-}
-
-impl ScrollbackGrid {
-    pub fn new() -> Self {
         Self {
-            lines: Vec::new(),
-            cursor_row: 0,
-            cursor_col: 0,
-            max_scrollback_lines: 1000,
+            profiles,
+            tabs: Vec::new(),
+            sessions: BTreeMap::new(),
+            active_tab: None,
+            next_tab_id: AtomicU32::new(1),
+            next_session_id: AtomicU32::new(1),
         }
     }
 
-    pub fn write_character(&mut self, ch: char, attr: TextAttribute) {
-        if self.lines.is_empty() {
-            self.lines.push(Vec::new());
+    /// Add profile
+    pub fn add_profile(&mut self, profile: TerminalProfile) {
+        self.profiles.insert(profile.name.clone(), profile);
+    }
+
+    /// Remove profile
+    pub fn remove_profile(&mut self, name: &str) -> Result<(), &'static str> {
+        if name == "Default" {
+            return Err("Cannot remove default profile");
         }
-        let row = self.lines.len() - 1;
-        self.lines[row].push(TerminalCell {
-            glyph: ch,
-            attribute: attr,
-        });
-        self.cursor_col += 1;
-
-        if ch == '\n' {
-            self.lines.push(Vec::new());
-            self.cursor_row += 1;
-            self.cursor_col = 0;
+        if !self.profiles.contains_key(name) {
+            return Err("Profile not found");
         }
-
-        // Limit scrollback history
-        if self.lines.len() > self.max_scrollback_lines {
-            self.lines.remove(0);
-            if self.cursor_row > 0 {
-                self.cursor_row -= 1;
-            }
-        }
-    }
-}
-
-impl Default for ScrollbackGrid {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ==============================================================================
-// 3. PTY (Pseudo-Terminal) Session Pair
-// ==============================================================================
-pub struct PtySessionPair {
-    pub master_fd: i32,
-    pub slave_fd: i32,
-    pub shell_path: [u8; 64],
-}
-
-impl PtySessionPair {
-    pub fn new(master: i32, slave: i32) -> Self {
-        let mut shell_arr = [0u8; 64];
-        let path = b"/bin/sigma-shell";
-        shell_arr[..path.len()].copy_from_slice(path);
-        Self {
-            master_fd: master,
-            slave_fd: slave,
-            shell_path: shell_arr,
-        }
-    }
-}
-
-// ==============================================================================
-// 4. UTF-8 Multi-byte Character Decoder
-// ==============================================================================
-pub struct Utf8Decoder {
-    pub expected_bytes: usize,
-    pub bytes_collected: Vec<u8>,
-}
-
-impl Utf8Decoder {
-    pub fn new() -> Self {
-        Self {
-            expected_bytes: 0,
-            bytes_collected: Vec::new(),
-        }
+        self.profiles.remove(name);
+        Ok(())
     }
 
-    pub fn decode_byte(&mut self, b: u8) -> Option<char> {
-        if self.expected_bytes == 0 {
-            if b & 0x80 == 0 {
-                return Some(b as char); // Standard 1-byte ASCII
-            } else if b & 0xE0 == 0xC0 {
-                self.expected_bytes = 2;
-                self.bytes_collected.push(b);
-            } else if b & 0xF0 == 0xE0 {
-                self.expected_bytes = 3;
-                self.bytes_collected.push(b);
-            } else if b & 0xF8 == 0xF0 {
-                self.expected_bytes = 4;
-                self.bytes_collected.push(b);
-            }
-        } else {
-            self.bytes_collected.push(b);
-            if self.bytes_collected.len() == self.expected_bytes {
-                // Decode multi-byte into char
-                let ch = match self.expected_bytes {
-                    2 => {
-                        let c = (((self.bytes_collected[0] & 0x1F) as u32) << 6)
-                            | ((self.bytes_collected[1] & 0x3F) as u32);
-                        core::char::from_u32(c)
-                    }
-                    3 => {
-                        let c = (((self.bytes_collected[0] & 0x0F) as u32) << 12)
-                            | (((self.bytes_collected[1] & 0x3F) as u32) << 6)
-                            | ((self.bytes_collected[2] & 0x3F) as u32);
-                        core::char::from_u32(c)
-                    }
-                    _ => Some('?'),
-                };
-                self.expected_bytes = 0;
-                self.bytes_collected.clear();
-                return ch;
-            }
-        }
-        None
+    /// Get profile
+    pub fn get_profile(&self, name: &str) -> Option<&TerminalProfile> {
+        self.profiles.get(name)
     }
-}
 
-impl Default for Utf8Decoder {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ==============================================================================
-// Vec Implementation
-// ==============================================================================
-pub struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
-
-impl<T> Vec<T> {
-    pub fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-    pub fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    pub fn remove(&mut self, index: usize) -> T {
-        unsafe {
-            let item = core::ptr::read(self.data.add(index));
-            for i in index..self.len - 1 {
-                core::ptr::copy_nonoverlapping(self.data.add(i + 1), self.data.add(i), 1);
-            }
-            self.len -= 1;
-            item
-        }
-    }
-    pub fn len(&self) -> usize {
-        self.len
-    }
-    pub fn is_empty(&self) -> bool {
-        self.len == 0
-    }
-    pub fn clear(&mut self) {
-        while self.len > 0 {
-            self.remove(0);
-        }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
+    /// Create tab
+    pub fn create_tab(&mut self, profile_name: String, title: String) -> usize {
+        let id = self.next_tab_id.fetch_add(1, Ordering::Relaxed);
+        let tab = TerminalTab {
+            id,
+            title,
+            profile_name,
+            current_directory: "/".to_string(),
+            is_active: false,
         };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-            self.data = new_data;
-            self.capacity = new_capacity;
+        self.tabs.push(tab);
+        if self.tabs.len() == 1 {
+            self.active_tab = Some(0);
+            self.tabs[0].is_active = true;
         }
+        self.tabs.len() - 1
     }
-}
 
-#[cfg(not(test))]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-
-#[cfg(test_disabled)]
-extern "C" {
-    fn malloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-
-#[cfg(test_disabled)]
-#[no_mangle]
-pub unsafe extern "C" fn alloc(size: usize) -> *mut u8 {
-    malloc(size)
-}
-
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+    /// Close tab
+    pub fn close_tab(&mut self, index: usize) -> Result<(), &'static str> {
+        if index >= self.tabs.len() {
+            return Err("Tab index out of bounds");
         }
-    }
-}
-
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        if self.tabs.len() == 1 {
+            return Err("Cannot close last tab");
         }
+        self.tabs.remove(index);
+        if self.active_tab == Some(index) {
+            self.active_tab = Some(index.saturating_sub(1));
+        } else if self.active_tab > Some(index) {
+            self.active_tab = self.active_tab.map(|a| a - 1);
+        }
+        if let Some(active) = self.active_tab {
+            self.tabs[active].is_active = true;
+        }
+        Ok(())
+    }
+
+    /// Switch tab
+    pub fn switch_tab(&mut self, index: usize) -> Result<(), &'static str> {
+        if index >= self.tabs.len() {
+            return Err("Tab index out of bounds");
+        }
+        if let Some(active) = self.active_tab {
+            self.tabs[active].is_active = false;
+        }
+        self.active_tab = Some(index);
+        self.tabs[index].is_active = true;
+        Ok(())
+    }
+
+    /// Set tab title
+    pub fn set_tab_title(&mut self, index: usize, title: String) -> Result<(), &'static str> {
+        if index >= self.tabs.len() {
+            return Err("Tab index out of bounds");
+        }
+        self.tabs[index].title = title;
+        Ok(())
+    }
+
+    /// Set current directory
+    pub fn set_current_directory(&mut self, index: usize, path: String) -> Result<(), &'static str> {
+        if index >= self.tabs.len() {
+            return Err("Tab index out of bounds");
+        }
+        self.tabs[index].current_directory = path;
+        Ok(())
+    }
+
+    /// Create session
+    pub fn create_session(&mut self, shell_command: String) -> u32 {
+        let id = self.next_session_id.fetch_add(1, Ordering::Relaxed);
+        let mut environment = BTreeMap::new();
+        environment.insert("TERM".to_string(), "xterm-256color".to_string());
+        environment.insert("LANG".to_string(), "en_US.UTF-8".to_string());
+        
+        let session = TerminalSession {
+            id,
+            shell_command,
+            environment,
+            is_running: true,
+        };
+        self.sessions.insert(id, session);
+        id
+    }
+
+    /// Close session
+    pub fn close_session(&mut self, id: u32) -> Result<(), &'static str> {
+        if !self.sessions.contains_key(&id) {
+            return Err("Session not found");
+        }
+        self.sessions.remove(&id);
+        Ok(())
+    }
+
+    /// Send input to session
+    pub fn send_input(&mut self, session_id: u32, input: String) -> Result<(), &'static str> {
+        let session = self.sessions.get_mut(&session_id).ok_or("Session not found")?;
+        if !session.is_running {
+            return Err("Session not running");
+        }
+        // Simplified - in real implementation would send to shell
+        Ok(())
+    }
+
+    /// Get active tab
+    pub fn get_active_tab(&self) -> Option<&TerminalTab> {
+        self.active_tab.and_then(|index| self.tabs.get(index))
+    }
+
+    /// Get tab count
+    pub fn tab_count(&self) -> usize {
+        self.tabs.len()
+    }
+
+    /// Get session count
+    pub fn session_count(&self) -> usize {
+        self.sessions.len()
+    }
+
+    /// List profiles
+    pub fn list_profiles(&self) -> Vec<&String> {
+        self.profiles.keys().collect()
     }
 }
 
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
+/// Global terminal emulator
+static mut TERMINAL_EMULATOR: Option<TerminalEmulator> = None;
 
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::Deref;
-        self.deref().iter()
+/// Initialize terminal emulator
+pub fn init_terminal() {
+    unsafe {
+        TERMINAL_EMULATOR = Some(TerminalEmulator::new());
     }
 }
 
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
+/// Get terminal emulator
+pub fn get_terminal() -> &'static mut TerminalEmulator {
+    unsafe {
+        TERMINAL_EMULATOR.as_mut().expect("Terminal emulator not initialized")
     }
 }
 
@@ -647,34 +295,61 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_simple_terminal_cached_slice_access() {
-        let mut term = SimpleTerminal::new(1, b"Sigma Term");
-        assert_eq!(term.title(), b"Sigma Term");
-        assert_eq!(term.working_directory(), b"/home/user");
-
-        term.set_working_directory(b"/var/log");
-        assert_eq!(term.working_directory(), b"/var/log");
+    fn test_terminal_creation() {
+        let term = TerminalEmulator::new();
+        assert!(term.profiles.contains_key("Default"));
     }
 
     #[test]
-    fn test_simple_shell_integration_cached_slice_access() {
-        let mut shell_integration = SimpleShellIntegration::new();
-        assert_eq!(shell_integration.get_shell(), b"/bin/bash");
+    fn test_add_profile() {
+        let mut term = TerminalEmulator::new();
+        let profile = TerminalProfile {
+            name: "Custom".to_string(),
+            color_scheme: ColorScheme::Dracula,
+            font_name: "Monospace".to_string(),
+            font_size: 14,
+            cursor_shape: CursorShape::Underline,
+            cursor_blink: false,
+            scrollbar_position: ScrollbarPosition::Left,
+            bell_mode: BellMode::Visual,
+            scrollback_lines: 5000,
+            transparency: 0.1,
+            bold_is_bright: true,
+        };
+        term.add_profile(profile);
+        assert!(term.profiles.contains_key("Custom"));
+    }
 
-        shell_integration.set_shell(b"/bin/zsh");
-        assert_eq!(shell_integration.get_shell(), b"/bin/zsh");
+    #[test]
+    fn test_create_tab() {
+        let mut term = TerminalEmulator::new();
+        let index = term.create_tab("Default".to_string(), "Terminal".to_string());
+        assert_eq!(term.tab_count(), 1);
+        assert_eq!(term.active_tab, Some(0));
+    }
 
-        shell_integration.set_env_var(b"PATH", b"/usr/bin:/bin");
-        shell_integration.set_env_var(b"TERM", b"xterm-256color");
+    #[test]
+    fn test_close_tab() {
+        let mut term = TerminalEmulator::new();
+        term.create_tab("Default".to_string(), "Tab1".to_string());
+        term.create_tab("Default".to_string(), "Tab2".to_string());
+        term.close_tab(0).unwrap();
+        assert_eq!(term.tab_count(), 1);
+    }
 
-        assert_eq!(
-            shell_integration.get_env_var(b"PATH"),
-            Some(&b"/usr/bin:/bin"[..])
-        );
-        assert_eq!(
-            shell_integration.get_env_var(b"TERM"),
-            Some(&b"xterm-256color"[..])
-        );
-        assert_eq!(shell_integration.get_env_var(b"NONEXISTENT"), None);
+    #[test]
+    fn test_switch_tab() {
+        let mut term = TerminalEmulator::new();
+        term.create_tab("Default".to_string(), "Tab1".to_string());
+        term.create_tab("Default".to_string(), "Tab2".to_string());
+        term.switch_tab(1).unwrap();
+        assert_eq!(term.active_tab, Some(1));
+    }
+
+    #[test]
+    fn test_create_session() {
+        let mut term = TerminalEmulator::new();
+        let id = term.create_session("/bin/bash".to_string());
+        assert!(term.sessions.contains_key(&id));
     }
 }

@@ -429,6 +429,16 @@ pub use sigma_ghostty::{
     CellAttrs, CursorStyle, GhosttyConfig, SigmaGhostty, TermCell, TermColor, TermGrid, VtAction,
     VtParser,
 };
+pub use file_manager::{
+    FileManager, File, FileType, FileMetadata, FilePermission,
+    ViewMode, SortOrder, SelectionMode,
+    init_file_manager, get_file_manager,
+};
+pub use terminal::{
+    TerminalEmulator, TerminalProfile, TerminalTab, TerminalSession,
+    ColorScheme, CursorShape, ScrollbarPosition, BellMode,
+    init_terminal, get_terminal,
+};
 pub mod webapp_manager;
 pub use webapp_manager::*;
 pub mod appstore;
@@ -436,6 +446,7 @@ pub mod clipboard;
 pub mod clipboard_advanced;
 pub mod desktop_portal;
 pub mod elementary_pantheon_innovations;
+pub mod file_manager;
 pub mod filemanager;
 pub mod gaming_engine;
 pub mod granite_contractor;

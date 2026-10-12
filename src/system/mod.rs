@@ -14,6 +14,7 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 pub mod boot_manager;
 pub mod monitor;
+pub mod network_manager;
 pub mod power_manager;
 pub mod scheduler_manager;
 pub mod service_manager;
@@ -199,4 +200,15 @@ pub use mint_tools::{
     SystemReport, DiagnosticEntry, DiagnosticTest, TestResult,
     HardwareInfo, SoftwareInfo,
     init_system_tools, get_system_tools,
+};
+pub use network_manager::{
+    NetworkManager, Connection, NetworkDevice,
+    ConnectionType, ConnectionState, IPMethod, WiFiSecurity,
+    IPAddress, DNSServer,
+    init_network_manager, get_network_manager,
+};
+pub use system_monitor::{
+    SystemMonitor as NewSystemMonitor, Process, ProcessState,
+    CPUCore, MemoryInfo, DiskInfo, NetworkInterface,
+    init_system_monitor as init_new_system_monitor, get_system_monitor as get_new_system_monitor,
 };
