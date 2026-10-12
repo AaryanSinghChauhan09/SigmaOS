@@ -520,7 +520,10 @@ pub mod omarchy_server;
 pub mod omarchy_update_pipeline_synthesis;
 pub mod open_source_os_arch_unimplemented_parity_engine;
 pub mod open_source_os_unimplemented_ideas_pr;
+pub use open_source_os_unimplemented_ideas_pr::*;
 pub mod open_source_os_unimplemented_ideas_pr_suite;
+pub use debian_gap_closure_advancements_v26::*;
+pub use open_source_os_unimplemented_ideas_pr_suite::*;
 pub mod opensuse;
 pub mod sovereign_2030_distro_supremacy_engine;
 pub mod sovereign_2032_distro_supremacy_engine;
@@ -572,6 +575,9 @@ pub use sovereign_tech_media_wiki_ultimate_parity_pr::*;
 
 pub mod bootable_vertical_slices_missing_components_pr;
 pub use bootable_vertical_slices_missing_components_pr::*;
+
+pub mod sovereign_open_source_os_apex_inspirations_v50;
+pub use sovereign_open_source_os_apex_inspirations_v50::*;
 
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;

@@ -106,6 +106,13 @@ if [ -f "src/desktop/mint_backup_tool.rs" ]; then
     ./build/mint_backup_tool_test
 fi
 
+if [ -f "src/backup/sovereign_backup_and_recovery_advancements.rs" ]; then
+    echo "Running Sovereign Backup & Recovery Advancements Master Suite test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/backup/sovereign_backup_and_recovery_advancements.rs -o build/sovereign_backup_advancements_test
+    ./build/sovereign_backup_advancements_test
+fi
+
 if [ -f "src/distro/linux_bsd_inspirations.rs" ]; then
     echo "Running Linux & BSD distro inspirations & subsystem bridge test suite..."
     mkdir -p build
@@ -535,6 +542,13 @@ if [ -f "src/package/sovereign_distro_package_advancements_v35.rs" ]; then
     ./build/sovereign_advancements_v35_test
 fi
 
+if [ -f "src/package/sovereign_distro_package_advancements_v36.rs" ]; then
+    echo "Running Sovereign Universal Package Advancements Suite V36 test suite..."
+    mkdir -p build
+    rustc --test src/package/sovereign_distro_package_advancements_v36.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v36_test
+    ./build/sovereign_advancements_v36_test
+fi
+
 if [ -f "src/package/sovereign_distro_package_advancements_v30.rs" ]; then
     echo "Running Sovereign Universal Package Advancements Suite V30 test suite..."
     mkdir -p build
@@ -647,6 +661,13 @@ if [ -f "src/drivers/sovereign_distro_driver_suite.rs" ]; then
     ./build/test_sovereign_distro_driver_suite
 fi
 
+if [ -f "src/tools/sovereign_localization_and_misc_libraries_pr_suite.rs" ]; then
+    echo "Running Sovereign Localization and Misc Libraries PR Suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/tools/sovereign_localization_and_misc_libraries_pr_suite.rs -o build/sovereign_localization_misc_test
+    ./build/sovereign_localization_misc_test
+fi
+
 if [ -f "src/tools/tech_media_innovations.rs" ]; then
     echo "Running Sovereign Tech Media Innovations test suite..."
     mkdir -p build
@@ -694,6 +715,13 @@ if [ -f "src/boot/sovereign_assembly_bootstrap_pr_suite.rs" ]; then
     mkdir -p build
     rustc --test src/boot/sovereign_assembly_bootstrap_pr_suite.rs --edition=2021 -o build/test_assembly_bootstrap_pr
     ./build/test_assembly_bootstrap_pr
+fi
+
+if [ -f "src/boot/sovereign_kernel_and_bootloader_advancements_v47_pr.rs" ]; then
+    echo "Running Sovereign Kernel & Bootloader Advancements PR Suite V47 test suite..."
+    mkdir -p build
+    rustc --test src/boot/sovereign_kernel_and_bootloader_advancements_v47_pr.rs --edition=2021 -o build/test_kernel_boot_advancements
+    ./build/test_kernel_boot_advancements
 fi
 
 if [ -f "src/distro/sovereign_linux_bsd_ecosystem_pinnacle_suite.rs" ]; then
@@ -1081,6 +1109,13 @@ if [ -f "src/distro/open_source_os_unimplemented_ideas_pr_suite.rs" ]; then
     ./build/test_os_ideas_suite
 fi
 
+if [ -f "src/distro/sovereign_open_source_os_fedora_github_pr_suite.rs" ]; then
+    echo "Running Sovereign Open Source OS Fedora GitHub PR Suite test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_open_source_os_fedora_github_pr_suite.rs --edition=2021 -o build/test_fedora_github_pr_suite
+    ./build/test_fedora_github_pr_suite
+fi
+
 if [ -f "src/distro/debian_github_repo_inspirations_pr.rs" ]; then
     echo "Running Debian GitHub Repo Inspirations PR Suite test suite..."
     mkdir -p build
@@ -1114,6 +1149,13 @@ if [ -f "src/drivers/sovereign_device_driver_development_and_pr_suite.rs" ]; the
     mkdir -p build
     rustc --test src/drivers/sovereign_device_driver_development_and_pr_suite.rs --edition=2021 -o build/test_device_driver_pr_suite
     ./build/test_device_driver_pr_suite
+fi
+
+if [ -f "src/distro/sovereign_open_source_os_apex_inspirations_v50.rs" ]; then
+    echo "Running Sovereign Open Source OS Apex Inspirations Engine (V50) test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_open_source_os_apex_inspirations_v50.rs --edition=2021 -o build/test_apex_v50
+    ./build/test_apex_v50
 fi
 
 echo "All SigmaOS test suites completed."

@@ -143,7 +143,7 @@ impl NvidiaDevice {
     }
     
     /// Update temperature
-    pub fn update_temperature(&self, temp: u32) {
+    pub fn update_temperature(&mut self, temp: u32) {
         self.temperature.store(temp, Ordering::Relaxed);
         
         // Thermal throttling
