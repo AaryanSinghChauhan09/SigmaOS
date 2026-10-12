@@ -8,6 +8,7 @@ pub mod ip;
 pub mod ring_buffer_stack;
 pub mod routing;
 pub mod security;
+pub mod sigmanet;
 pub mod socket;
 pub mod sovereign_remote_sharing;
 pub mod tcp;
@@ -57,6 +58,10 @@ pub use icmp::{
 pub use zenithnet::{
     EthernetFrame, IpProtocol, Ipv4Addr, Ipv4Header, MacAddr, NetworkError, NetworkInterface,
     PacketType, TcpHeader, TcpState as ZenithTcpState, UdpHeader, ZenithNet,
+};
+pub use sigmanet::{
+    SigmaNet, NetworkInterface as SigmaNetInterface, InterfaceType, InterfaceStatus, IpType, IpMethod,
+    init_sigmanet, get_sigmanet, bring_up_interface, connect_interface,
 };
 
 #[path = "sovereign_async_io.rs"]
