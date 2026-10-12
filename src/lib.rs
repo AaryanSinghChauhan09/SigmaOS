@@ -377,6 +377,7 @@ pub use userland::shell::{
     Parser as UserlandShellParser, RedirectSpec, RedirectionEngine, Shell as UserlandShell,
     StreamTarget,
 };
+pub use userland::coreutils_pr_gateway::*;
 pub use userland::system_utilities::*;
 pub use virtualization::{
 <<<<<<< HEAD
