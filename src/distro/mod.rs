@@ -524,8 +524,15 @@ pub use open_source_os_missing_components_v46_pr::*;
 pub mod open_source_os_unimplemented_ideas_pr;
 pub use open_source_os_unimplemented_ideas_pr::*;
 pub mod open_source_os_unimplemented_ideas_pr_suite;
+<<<<<<< HEAD
+pub mod open_source_os_unimplemented_ideas_pr_gateway;
+pub use open_source_os_unimplemented_ideas_pr_gateway::*;
+pub mod arch_linux_github_repo_components_pr_engine;
+pub use arch_linux_github_repo_components_pr_engine::*;
+=======
 pub use debian_gap_closure_advancements_v26::*;
 pub use open_source_os_unimplemented_ideas_pr_suite::*;
+>>>>>>> origin/main
 pub mod opensuse;
 pub mod sovereign_2030_distro_supremacy_engine;
 pub mod sovereign_2032_distro_supremacy_engine;

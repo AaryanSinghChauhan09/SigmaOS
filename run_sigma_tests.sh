@@ -1127,11 +1127,26 @@ if [ -f "src/distro/open_source_os_unimplemented_ideas_pr_suite.rs" ]; then
     ./build/test_os_ideas_suite
 fi
 
+<<<<<<< HEAD
+if [ -f "src/distro/open_source_os_unimplemented_ideas_pr_gateway.rs" ]; then
+    echo "Running Open Source OS Unimplemented Ideas PR Gateway test suite..."
+    mkdir -p build
+    rustc --test src/distro/open_source_os_unimplemented_ideas_pr_gateway.rs --edition=2021 -o build/test_os_ideas_gateway
+    ./build/test_os_ideas_gateway
+fi
+
+if [ -f "src/distro/arch_linux_github_repo_components_pr_engine.rs" ]; then
+    echo "Running Arch Linux GitHub Repo Components PR Engine test suite..."
+    mkdir -p build
+    rustc --test src/distro/arch_linux_github_repo_components_pr_engine.rs --edition=2021 -o build/test_arch_github_repo_components
+    ./build/test_arch_github_repo_components
+=======
 if [ -f "src/distro/sovereign_open_source_os_fedora_github_pr_suite.rs" ]; then
     echo "Running Sovereign Open Source OS Fedora GitHub PR Suite test suite..."
     mkdir -p build
     rustc --test src/distro/sovereign_open_source_os_fedora_github_pr_suite.rs --edition=2021 -o build/test_fedora_github_pr_suite
     ./build/test_fedora_github_pr_suite
+>>>>>>> origin/main
 fi
 
 if [ -f "src/distro/debian_github_repo_inspirations_pr.rs" ]; then
