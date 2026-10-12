@@ -299,6 +299,22 @@ impl FindutilsDiffutilsEngine {
 // 5. TEXT PROCESSING ENGINE (grep, sed, awk)
 // =========================================================================
 
+/// Bolt performance optimization: zero-allocation case-insensitive substring search.
+/// Eliminates intermediate `String` heap allocations during case-insensitive grep matching.
+pub fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
+    if needle.is_empty() {
+        return true;
+    }
+    if needle.len() > haystack.len() {
+        return false;
+    }
+    let needle_bytes = needle.as_bytes();
+    haystack
+        .as_bytes()
+        .windows(needle_bytes.len())
+        .any(|window| window.iter().zip(needle_bytes).all(|(&h, &n)| h.eq_ignore_ascii_case(&n)))
+}
+
 #[derive(Debug, Default)]
 pub struct TextProcessingEngine;
 
@@ -309,20 +325,15 @@ impl TextProcessingEngine {
 
     pub fn grep_match(&self, content: &str, pattern: &str, case_insensitive: bool) -> Vec<(usize, String)> {
         let mut matches = Vec::new();
-        let pat_target = if case_insensitive {
-            pattern.to_lowercase()
-        } else {
-            pattern.to_string()
-        };
 
         for (idx, line) in content.lines().enumerate() {
-            let line_check = if case_insensitive {
-                line.to_lowercase()
+            let is_match = if case_insensitive {
+                contains_ignore_case(line, pattern)
             } else {
-                line.to_string()
+                line.contains(pattern)
             };
 
-            if line_check.contains(&pat_target) {
+            if is_match {
                 matches.push((idx + 1, line.to_string()));
             }
         }
