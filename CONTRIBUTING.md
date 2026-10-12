@@ -33,12 +33,47 @@ All contributions to SigmaOS must strictly adhere to the following architectural
 
 ---
 
-## Development Workflow
+## Cadence-Based Engineering Program
 
-### Prerequisites
-- **Rust Toolchain**: `stable` toolchain with `rustfmt` and `clippy`.
-- **Build Utilities**: `python3`, `qemu-system-x86_64`, `gcc`, `make`.
+SigmaOS applies a structured cadence to ensure isolated components transition smoothly into reviewable, integrated pull requests:
 
+<<<<<<< HEAD
+| Period | Thread Manager / Scheduler Work | OS-Wide Maintenance | Required PR Output |
+|---|---|---|---|
+| **Daily** | Triage scheduler bugs, flaky tests, lock-order warnings, and regression reports | Triage CI failures, build breakage, security advisories, and documentation drift | Bug reports or small fix PRs |
+| **Weekly** | Implement one scheduler behavior: run queue, preemption, priority, affinity, or wait queue | Dependency/toolchain updates, lint cleanup, test-suite repair | One scoped PR per change |
+| **Biweekly** | Integration test: threads with signals, FDs, IPC, timers, and process exit | Component status audit: update `FEATURE_STATUS.toml` and docs with evidence | Status + test-evidence PR |
+| **Monthly** | Scheduler benchmark, contention test, starvation audit, deadlock/fuzz review | Release-candidate build, ISO smoke test, installer/update recovery test | Release-readiness PR |
+| **Quarterly** | Scheduler architecture review against Linux/BSD patterns; remove dead code | Roadmap consolidation, security review, API stability review | Architecture RFC + cleanup PRs |
+
+---
+
+## Enforceable Repository Rules
+
+### Code Rules
+
+- **Scope:** One logical subsystem change per PR.
+- **APIs:** No new public API without documentation, unit tests, and a capability-status update in `FEATURE_STATUS.toml`.
+- **Safety:** No `unsafe` Rust without an explicit safety comment explaining invariants, aliasing, lifetime, and panic behavior.
+- **Locking:** Every lock acquisition must have a documented lock order.
+- **Bounded Resources:** No unbounded allocation, recursion, or loops in kernel context.
+- **Concurrency Safety:** Every blocking operation must have a timeout or explicit wakeup path.
+- **Error Handling:** Every error must be handled or explicitly documented as fatal.
+- **Runtime Proof:** No feature is "complete" until it is connected to the runtime path and verified.
+
+### Testing Rules
+
+- Unit tests for pure logic (`rustc --test`).
+- Integration tests for cross-subsystem behavior.
+- Stress tests for concurrency and lock contention.
+- Fuzz tests for parsers, syscall inputs, filesystem paths, and network packets.
+- Boot smoke tests for kernel-facing changes.
+- Regression test attached to every fixed bug.
+
+### Verification Block
+
+Minimum mandatory verification commands before submitting a PR:
+=======
 ## Mandatory Subsystem & Component Rules
 
 All contributions must strictly comply with the following component rules:
@@ -63,10 +98,15 @@ All contributions must strictly comply with the following component rules:
 
 ### Fast Checks & Verification Block
 Before submitting a pull request, execute the required verification block:
+>>>>>>> origin/main
 
 ```bash
-# Code formatting check
 cargo fmt --check
+<<<<<<< HEAD
+cargo clippy --all-targets -- -D warnings
+cargo check --lib
+cargo test --lib
+=======
 
 # Clippy lint check with denied warnings
 cargo clippy --all-targets --all-features -- -D warnings
@@ -82,14 +122,29 @@ cargo test --lib
 ./scripts/changed_files_rustc_tests.sh
 
 # Execute complete test suite
+>>>>>>> origin/main
 ./run_sigma_tests.sh
 ```
+
+### Documentation Rules
+
+- Update `FEATURE_STATUS.toml` whenever implementation status changes.
+- Distinguish explicit statuses: `Modeled`, `Unit-tested`, `Integrated`, `Hardware-tested`, and `Release-ready`.
+- Subsystem documentation must list: purpose, public API, dependencies, limitations, tests, and known gaps.
+- No roadmap claim may say "complete" without a linked PR and verification evidence.
+
+### Security Rules
+
+- Threat-model every new syscall, IPC channel, driver interface, and parser.
+- Validate all user-supplied lengths, pointers, paths, and flags at boundaries.
+- Apply least privilege by default and fail closed on ambiguous capability checks.
+- Require a second reviewer for security-sensitive subsystems: scheduler, memory, drivers, crypto, IPC, and syscall dispatch.
 
 ---
 
 ## Submitting Pull Requests
 
-1. **Branch Naming**: Use descriptive branch names like `feature/virtio-blk-driver`, `fix/capability-check-syscall`, or `docs/architecture-update`.
+1. **Branch Naming**: Use descriptive branch names like `feat/thread-manager-lifecycle`, `fix/capability-check-syscall`, or `docs/architecture-update`.
 2. **PR Checklist**: Complete all items in `.github/PULL_REQUEST_TEMPLATE.md`.
 3. **Commit Messages**: Write clear, concise commit messages following standard conventions:
    ```
@@ -98,12 +153,3 @@ cargo test --lib
    Detailed explanation of the problem solved, design choices made,
    and test verification steps completed.
    ```
-
----
-
-## Open-Source OS Idea Adoption Process
-
-SigmaOS actively studies and adopts best-in-class concepts from open-source operating systems (Redox, seL4, Tock OS, Fuchsia, WASI, Linux, BSD). If you want to propose or port a feature:
-1. Open an issue using the **Open-Source OS Idea Adoption** template (`.github/ISSUE_TEMPLATE/oss_idea_adoption.md`).
-2. Timebox a 1–2 sprint prototype to demonstrate feasibility and measure performance/footprint metrics.
-3. Submit a PR referencing the proposal issue once unit tests and architectural checklists pass.

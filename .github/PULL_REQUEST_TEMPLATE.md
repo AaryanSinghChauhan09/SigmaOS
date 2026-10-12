@@ -1,7 +1,11 @@
 ## Summary
 
 <<<<<<< HEAD
+<!-- One paragraph: what changed and why. -->
+=======
+<<<<<<< HEAD
 <!-- What memory-management or component behavior changed and why? -->
+>>>>>>> origin/main
 
 ## Memory / Subsystem component
 
@@ -22,6 +26,19 @@
 
 ## Recurring task
 
+<<<<<<< HEAD
+- [ ] Thread manager
+- [ ] Scheduler
+- [ ] Process management
+- [ ] Memory management
+- [ ] VFS / filesystems
+- [ ] Drivers
+- [ ] IPC
+- [ ] Security
+- [ ] Installer / packaging
+- [ ] Documentation
+- [ ] CI / tooling
+=======
 - [ ] Every PR build & test validation
 - [ ] Daily CI triage
 - [ ] Weekly subsystem lifecycle review
@@ -145,10 +162,30 @@
 - SigmaOS current behavior:
 - New behavior:
 - Compatibility impact:
+>>>>>>> origin/main
 
 ## Changes
 
 -
+<<<<<<< HEAD
+
+## Motivation
+
+<!-- Link the issue, roadmap item, or gap-analysis entry. -->
+
+## Implementation notes
+
+<!-- Design decisions, data structures, locking, error handling. -->
+
+## Tests
+
+- [ ] Unit tests added/updated
+- [ ] Integration tests added/updated
+- [ ] Concurrency/stress tests added/updated
+- [ ] Fuzz tests added/updated
+- [ ] Boot smoke test performed, if kernel-facing
+- [ ] No regression in existing tests
+=======
 -
 
 <<<<<<< HEAD
@@ -305,6 +342,7 @@
 - [ ] `FEATURE_STATUS.toml` capability updated
 >>>>>>> origin/main
 >>>>>>> origin/main
+>>>>>>> origin/main
 
 ## Status updates
 
@@ -328,7 +366,11 @@ cargo test --lib
 ```
 
 <<<<<<< HEAD
-Paste output below.
+Paste relevant output below:
+
+```text
+
+```
 
 ## Capability status
 
@@ -338,6 +380,24 @@ Paste output below.
 
 ## Integration impact
 
+- [ ] No runtime integration yet
+- [ ] Connected to runtime path
+- [ ] Boot path validated
+- [ ] Installer/update path validated
+- [ ] Hardware tested
+=======
+<<<<<<< HEAD
+Paste output below.
+
+## Capability status
+
+- Previous status:
+- New status:
+- Evidence:
+
+## Integration impact
+>>>>>>> origin/main
+
 - [ ] Unit-tested only
 - [ ] Connected to runtime path
 - [ ] Boot path validated
@@ -346,6 +406,15 @@ Paste output below.
 =======
 Paste relevant output below:
 
+<<<<<<< HEAD
+- [ ] Scope is narrow
+- [ ] Public API documented
+- [ ] `unsafe` justified
+- [ ] Lock ordering documented
+- [ ] Error paths tested
+- [ ] Feature status updated in FEATURE_STATUS.toml
+- [ ] No unsupported compatibility claim
+=======
 ```text
 ```
 
@@ -373,6 +442,7 @@ Paste relevant output below:
 - [ ] Error paths and timeout bounds tested
 - [ ] `FEATURE_STATUS.toml` feature status updated
 - [ ] No unsupported Linux/BSD compatibility claims
+>>>>>>> origin/main
 >>>>>>> origin/main
 >>>>>>> origin/main
 >>>>>>> origin/main
