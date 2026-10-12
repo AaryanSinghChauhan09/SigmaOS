@@ -553,6 +553,18 @@ pub use disk_manager::{
     DiskManager, Disk, Partition, PartitionType, FileSystemType, DiskOperation, DiskOperationTask, OperationStatus,
     init_disk_manager, get_disk_manager,
 };
+pub use image_editor::{
+    ImageEditor, Layer, Selection, ImageFormat, ColorMode, ToolType, BlendMode,
+    init_image_editor, get_image_editor,
+};
+pub use video_editor::{
+    VideoEditor, Clip, Track, Transition, Effect, VideoCodec, AudioCodec, Resolution, FrameRate, ClipType,
+    init_video_editor, get_video_editor,
+};
+pub use audio_editor::{
+    AudioEditor, AudioRegion, AudioTrack, AudioEffect, AudioFormat, SampleRate, BitDepth, ChannelCount, AudioTool,
+    init_audio_editor, get_audio_editor,
+};
 pub mod webapp_manager;
 pub use webapp_manager::*;
 pub mod appstore;
@@ -601,6 +613,9 @@ pub mod search_app;
 pub mod system_info;
 pub mod keyboard_shortcuts;
 pub mod disk_manager;
+pub mod image_editor;
+pub mod video_editor;
+pub mod audio_editor;
 pub mod text_scaling;
 pub mod universal_desktop_framework;
 pub mod volume_manager;
