@@ -73,13 +73,7 @@ impl IRQController {
         IRQController {
             controller_type,
             irq_count: AtomicUsize::new(0),
-            handlers: {
-                let mut arr = [AtomicPtr::new(core::ptr::null_mut()); 256];
-                for i in 0..256 {
-                    arr[i] = AtomicPtr::new(core::ptr::null_mut());
-                }
-                arr
-            },
+            handlers: core::array::from_fn(|_| AtomicPtr::new(core::ptr::null_mut())),
             spurious_count: AtomicUsize::new(0),
         }
     }
@@ -177,8 +171,8 @@ impl IRQController {
             unsafe {
                 if (*handler).enabled.load(Ordering::Acquire) == 1 {
                     // Call handler function
-                    let func = (*handler).handler.load(Ordering::Acquire);
-                    let ctx = (*handler).context.load(Ordering::Acquire);
+                    let _func = (*handler).handler.load(Ordering::Acquire);
+                    let _ctx = (*handler).context.load(Ordering::Acquire);
 
                     // In real implementation, would call the function pointer
                     // let handler_fn: fn(*mut u8) = core::mem::transmute(func);
@@ -313,13 +307,13 @@ impl PLIC {
     }
 
     /// Claim interrupt
-    pub fn claim(&self, context_id: usize) -> Option<usize> {
+    pub fn claim(&self, _context_id: usize) -> Option<usize> {
         // Read from PLIC claim register
         None
     }
 
     /// Complete interrupt
-    pub fn complete(&self, context_id: usize, irq: usize) {
+    pub fn complete(&self, _context_id: usize, _irq: usize) {
         // Write to PLIC complete register
     }
 }

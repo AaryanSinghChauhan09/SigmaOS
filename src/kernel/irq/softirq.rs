@@ -13,9 +13,13 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
+extern crate alloc;
+use alloc::collections::VecDeque;
+use alloc::vec;
+use alloc::vec::Vec;
+
 /// SigmaOS Softirq and tasklets deferred execution engine
 /// Handles lower-priority interrupt bottom-half processing
-use crate::klib::VecDeque;
 use core::sync::atomic::{AtomicU32, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -97,8 +101,6 @@ impl Default for SoftirqEngine {
 mod tests {
     use super::*;
     use core::sync::atomic::{AtomicUsize, Ordering};
-
-    use std::sync::Arc;
 
     static CALLED_COUNT: AtomicUsize = AtomicUsize::new(0);
 
