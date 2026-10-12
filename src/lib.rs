@@ -8,6 +8,7 @@ extern crate alloc;
 pub mod stubs;
 
 pub mod ai;
+pub mod auth;
 pub mod compositor;
 pub mod graphics;
 
