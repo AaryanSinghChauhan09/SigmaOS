@@ -2,6 +2,7 @@ pub mod backup_manager;
 pub mod recovery;
 pub mod snapshot;
 pub mod sovereign_backup_and_recovery_advancements;
+pub mod sovereign_backup_recovery_pinnacle;
 
 pub use backup_manager::{
     BackupDestination, BackupJob, BackupJobManager, BackupJobStatistics, BackupSource,
@@ -12,4 +13,15 @@ pub use sovereign_backup_and_recovery_advancements::{
     SovereignBackupAndRecoveryMasterSuite, SovereignBsdDumpRestoreEngine,
     SovereignDdrescueTestDiskRecoveryEngine, SovereignRescueLiveIsoInstallerSuite,
     SovereignRsyncBorgResticBackupEngine, SovereignTimeshiftSnapperSnapshotGovernor,
+};
+pub use sovereign_backup_recovery_pinnacle::{
+    AdvancedCompressionMode, BsdDumpInodeMetadata, BsdDumpRecordType, BsdDumpVolumeHeader,
+    CarvedFileType, CasChunkRecord, ContentAddressedVaultSnapshot, DdrescueMapRecord,
+    DisklabeledPartition, EncryptedVaultHeader, InstallerPhase, ModularInstallerConfig,
+    PackageHookType, RetentionPolicyRules, RescueBindMount, SectorMapStatus,
+    SnapshotRecordV2, SovereignBackupRecoveryDistroPinnacleSuite,
+    SovereignBsdAndExt4DumpRestoreEngine, SovereignDdrescueTestdiskPhotorecEngine,
+    SovereignRescueLiveIsoAndInstallerSuite, SovereignRsyncResticBorgAdvancedEngine,
+    SovereignTimeshiftSnapperSnapshotGovernor as SovereignTimeshiftSnapperSnapshotGovernorV2,
+    SubsystemSnapshotBackend, VaultEncryptionMode,
 };
