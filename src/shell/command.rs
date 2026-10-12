@@ -64,16 +64,12 @@ impl ShellCommand for SimpleShellCommand {
     }
 
     fn execute(&mut self, _args: &[[u8; 64]]) -> Result<ShellVec<u8>, CommandError> {
-        let mut output = ShellVec::new();
+        // Bolt ⚡ Optimization: Pre-allocate capacity and use bulk extend_from_slice instead of
+        // individual byte pushes, eliminating repetitive allocation re-checks in command output loops.
         let name = self.name();
-        for &byte in name {
-            output.push(byte);
-        }
-        output.push(b':');
-        output.push(b' ');
-        output.push(b'o');
-        output.push(b'k');
-        output.push(b'\n');
+        let mut output = ShellVec::with_capacity(name.len() + 5);
+        output.extend_from_slice(name);
+        output.extend_from_slice(b": ok\n");
         Ok(output)
     }
 
@@ -345,6 +341,8 @@ impl ShellCommand for WhichCommand {
     }
 
     fn execute(&mut self, args: &[[u8; 64]]) -> Result<ShellVec<u8>, CommandError> {
+        // Bolt ⚡ Optimization: Use bulk extend_from_slice to append prefix, argument slice, and
+        // newline delimiter directly to output buffer.
         let mut output = ShellVec::new();
         for arg in args {
             let len = arg.iter().position(|&b| b == 0).unwrap_or(64);
@@ -352,12 +350,8 @@ impl ShellCommand for WhichCommand {
                 continue;
             }
             let s = &arg[..len];
-            for &b in b"/system/bin/" {
-                output.push(b);
-            }
-            for &b in s {
-                output.push(b);
-            }
+            output.extend_from_slice(b"/system/bin/");
+            output.extend_from_slice(s);
             output.push(b'\n');
         }
         Ok(output)
@@ -376,6 +370,8 @@ impl ShellCommand for TypeCommand {
     }
 
     fn execute(&mut self, args: &[[u8; 64]]) -> Result<ShellVec<u8>, CommandError> {
+        // Bolt ⚡ Optimization: Use bulk extend_from_slice to append argument slice and
+        // suffix string directly to output buffer.
         let mut output = ShellVec::new();
         for arg in args {
             let len = arg.iter().position(|&b| b == 0).unwrap_or(64);
@@ -383,12 +379,8 @@ impl ShellCommand for TypeCommand {
                 continue;
             }
             let s = &arg[..len];
-            for &b in s {
-                output.push(b);
-            }
-            for &b in b" is a shell builtin\n" {
-                output.push(b);
-            }
+            output.extend_from_slice(s);
+            output.extend_from_slice(b" is a shell builtin\n");
         }
         Ok(output)
     }
@@ -655,18 +647,15 @@ impl SimpleCommandRegistry {
     }
 
     pub fn get_mut<'a>(&'a mut self, name: &[u8]) -> Option<&'a mut (dyn ShellCommand + 'a)> {
+        // Bolt ⚡ Optimization: Single-pass iterator loop with early return,
+        // eliminating two-pass linear search (.position then indexing) in command lookup.
         let name_len = name.iter().position(|&b| b == 0).unwrap_or(name.len());
         let name_slice = &name[..name_len];
-        let idx = self.commands.iter().position(|cmd_opt| {
-            if let Some(ref cmd) = *cmd_opt {
-                cmd.name() == name_slice
-            } else {
-                false
-            }
-        });
-        if let Some(i) = idx {
-            if let Some(ref mut cmd_box) = self.commands[i] {
-                return Some(cmd_box.as_mut());
+        for slot in self.commands.iter_mut() {
+            if let Some(ref mut cmd) = *slot {
+                if cmd.name() == name_slice {
+                    return Some(cmd.as_mut());
+                }
             }
         }
         None
@@ -700,13 +689,14 @@ impl CommandRegistry for SimpleCommandRegistry {
     }
 
     fn get(&self, name: &[u8]) -> Option<&dyn ShellCommand> {
+        // Bolt ⚡ Optimization: Single-pass iterator lookup using as_deref(),
+        // eliminating redundant double referencing in registry lookups.
         let name_len = name.iter().position(|&b| b == 0).unwrap_or(name.len());
         let name_slice = &name[..name_len];
         self.commands
             .iter()
-            .filter_map(|cmd_opt| cmd_opt.as_ref())
+            .filter_map(|cmd_opt| cmd_opt.as_deref())
             .find(|cmd| cmd.name() == name_slice)
-            .map(|cmd| cmd.as_ref())
     }
 
     fn list(&self) -> ShellVec<&[u8]> {
@@ -854,11 +844,11 @@ impl Default for SimpleCommandHistory {
 
 impl CommandHistory for SimpleCommandHistory {
     fn add(&mut self, command: &[u8]) {
+        // Bolt ⚡ Optimization: Use bulk copy_from_slice instead of element-by-element byte copy loop
+        // when populating history entries.
         let mut cmd_array = [0u8; 256];
         let cmd_len = command.len().min(255);
-        for i in 0..cmd_len {
-            cmd_array[i] = command[i];
-        }
+        cmd_array[..cmd_len].copy_from_slice(&command[..cmd_len]);
         self.history.push(cmd_array);
         self.current_index
             .store(self.history.len(), Ordering::SeqCst);

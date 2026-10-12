@@ -13,6 +13,7 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 pub mod boot_manager;
+pub mod monitor;
 pub mod power_manager;
 pub mod scheduler_manager;
 pub mod service_manager;
@@ -20,6 +21,7 @@ pub mod settings_manager;
 pub mod system_manager;
 pub mod system_monitor;
 pub mod task_manager;
+pub mod task_scheduler;
 pub mod update_manager;
 pub mod user_manager;
 pub mod preload;
@@ -171,3 +173,19 @@ pub use boot_analyzer::{
     init_boot_analyzer, get_boot_analyzer,
     analyze_boot_time, analyze_blame, analyze_critical_chain,
 };
+pub use task_scheduler::{
+    TaskScheduler,
+    ScheduledTask as SchedTask,
+    ScheduleFrequency as SchedFrequency,
+    TaskStatus as SchedTaskStatus,
+    init_task_scheduler, get_task_scheduler,
+};
+pub use monitor::{
+    SystemMonitor as SystemMonitorNew, CpuStats, MemoryStats, ProcessStats,
+    ProcessState as MonitorProcessState,
+    NetworkStats, DiskStats,
+    init_system_monitor, get_system_monitor,
+};
+
+pub mod sovereign_init_and_supervisor_inspirations_pr;
+pub use sovereign_init_and_supervisor_inspirations_pr::*;

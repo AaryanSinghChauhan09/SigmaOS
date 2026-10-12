@@ -28,6 +28,10 @@ pub mod directory;
 pub mod permission;
 pub mod flock;
 pub mod lock;
+pub mod buffer;
+pub mod cache;
+
+pub use buffer::{BufferCache, BufferError, BufferHead, BufferState};
 
 pub use fd::{FileDescriptor, FileHandle, FsError, SeekFrom, FD_CLOEXEC, O_RDONLY, O_WRONLY, O_RDWR, O_CREAT, O_EXCL, O_TRUNC, O_APPEND, O_NONBLOCK, O_DIRECTORY};
 pub use fd_table::{ProcessFdTable, DEFAULT_MAX_FDS, STDIN_FILENO, STDOUT_FILENO, STDERR_FILENO};

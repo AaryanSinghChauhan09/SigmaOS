@@ -132,7 +132,7 @@ impl PcieHotplugManager {
     
     /// Initialize device interrupts after hot-insert
     fn initialize_device_interrupts(&mut self, slot_id: u16) -> Result<(), &'static str> {
-        let slot = self.slots.get(slot_id)
+        let slot = self.slots.get(&slot_id)
             .ok_or("Slot not found")?;
         
         if slot.vendor_id.is_none() || slot.device_id.is_none() {
@@ -165,7 +165,7 @@ impl PcieHotplugManager {
     
     /// Deinitialize device interrupts before hot-remove
     fn deinitialize_device_interrupts(&mut self, slot_id: u16) -> Result<(), &'static str> {
-        let slot = self.slots.get(slot_id)
+        let slot = self.slots.get(&slot_id)
             .ok_or("Slot not found")?;
         
         if let Some(vector) = slot.interrupt_vector {
@@ -192,7 +192,7 @@ impl PcieHotplugManager {
     
     /// Reconfigure interrupts after link state change
     fn reconfigure_interrupts(&mut self, slot_id: u16) -> Result<(), &'static str> {
-        let slot = self.slots.get(slot_id)
+        let slot = self.slots.get(&slot_id)
             .ok_or("Slot not found")?;
         
         if slot.state != PcieSlotState::PoweredOn {
@@ -214,7 +214,7 @@ impl PcieHotplugManager {
     
     /// Handle power state change
     fn handle_power_state_change(&mut self, slot_id: u16) -> Result<(), &'static str> {
-        let slot = self.slots.get_mut(slot_id)
+        let slot = self.slots.get_mut(&slot_id)
             .ok_or("Slot not found")?;
         
         match slot.state {
@@ -237,7 +237,7 @@ impl PcieHotplugManager {
     
     /// Identify device in slot
     pub fn identify_device(&mut self, slot_id: u16, vendor_id: u16, device_id: u16) -> Result<(), &'static str> {
-        let slot = self.slots.get_mut(slot_id)
+        let slot = self.slots.get_mut(&slot_id)
             .ok_or("Slot not found")?;
         
         slot.vendor_id = Some(vendor_id);
