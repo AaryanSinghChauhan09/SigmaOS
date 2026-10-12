@@ -436,4 +436,6 @@ pub mod xfce_engine;
 pub mod zenith;
 pub mod sovereign_gui_development_and_pr_suite;
 pub use sovereign_gui_development_and_pr_suite::*;
+pub mod sovereign_de_wm_innovation_engine;
+pub use sovereign_de_wm_innovation_engine::*;
 pub mod zenith_advanced_features;
