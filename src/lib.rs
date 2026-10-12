@@ -225,6 +225,7 @@ pub use dashboard::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
 };
 pub use distro::arch_missing_components_parity_pr::*;
+pub use distro::sovereign_openbsd_ultimate_parity_pr_suite::*;
 pub use distro::{
     AdminAction, AiSysAdmin, AppBundleRuntime, AppManifest, AppsAuditTool, AptCacheSimulator,
     ArchBuildSystem, ArchMirror, ArchPacmanHooksManager, ArchRepoType, AuditResult, AuditRule,
