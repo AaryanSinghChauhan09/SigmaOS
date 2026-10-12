@@ -25,6 +25,7 @@ pub mod task_scheduler;
 pub mod update_manager;
 pub mod user_manager;
 pub mod preload;
+pub mod mint_tools;
 
 // SigmaOS System Utilities Module
 // System-level utilities and tools
@@ -189,3 +190,13 @@ pub use monitor::{
 
 pub mod sovereign_init_and_supervisor_inspirations_pr;
 pub use sovereign_init_and_supervisor_inspirations_pr::*;
+
+pub use mint_tools::{
+    SystemToolsEngine, BackupConfig, BackupJob, BackupType, BackupStatus,
+    UpdateManager as MintUpdateManager, PackageUpdate, UpdateType, UpdateSeverity,
+    SoftwareManager, SoftwarePackage, SoftwareCategory,
+    DriverManager, Driver, DriverType, DriverStatus,
+    SystemReport, DiagnosticEntry, DiagnosticTest, TestResult,
+    HardwareInfo, SoftwareInfo,
+    init_system_tools, get_system_tools,
+};
