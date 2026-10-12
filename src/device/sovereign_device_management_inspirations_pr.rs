@@ -1048,6 +1048,48 @@ impl SovereignDeviceManagementParityPrGateway {
             self.dbus_broker.generate_proposal(),
         ]
     }
+
+    /// Generate a comprehensive Pull Request Proposal Markdown document for device management.
+    pub fn generate_pr_proposal_markdown(&self) -> String {
+        let proposals = self.collect_all_proposals();
+        let mut out = String::new();
+
+        out.push_str("# Pull Request Proposal: Linux & BSD Inspired Device Management, Event Processing & IPC Parity\n\n");
+        out.push_str("## Executive Summary\n\n");
+        out.push_str("This Pull Request introduces zero-dependency `#![no_std]` / `alloc` native parity engines for core device management, hardware hotplug, ACPI power events, battery management, session/seat tracking, privilege authorization, and IPC message routing inspired by premier Linux and BSD distributions.\n\n");
+
+        out.push_str("| Subsystem Engine | PR Title | Inspiration / Distros | Performance / Guarantee | Status |\n");
+        out.push_str("|---|---|---|---|---|\n");
+
+        for p in &proposals {
+            out.push_str(&format!(
+                "| **{}** | {} | {} | {} | {} |\n",
+                p.target_subsystem, p.pr_title, p.original_distros, p.performance_multiplier, p.status
+            ));
+        }
+
+        out.push_str("\n## Subsystem Details & Key Features\n\n");
+
+        for (i, p) in proposals.iter().enumerate() {
+            out.push_str(&format!("### {}. {}\n", i + 1, p.pr_title));
+            out.push_str(&format!("- **Target Subsystem:** {}\n", p.target_subsystem));
+            out.push_str(&format!("- **Inspired by:** {}\n", p.original_distros));
+            out.push_str("- **Components Added:**\n");
+            for component in &p.components_added {
+                out.push_str(&format!("  - {}\n", component));
+            }
+            out.push_str(&format!("- **Performance Guarantee:** {}\n", p.performance_multiplier));
+            out.push_str(&format!("- **Merge Readiness:** {}\n\n", p.status));
+        }
+
+        out.push_str("## Architectural Guarantees & Verification\n\n");
+        out.push_str("1. **Strict `#![no_std]` Core Compatibility**: Operates without `std` OS runtime dependencies, utilizing `alloc` primitives for dynamic structures.\n");
+        out.push_str("2. **Cross-Distro Parity**: Combines Linux `udev`, `eudev`, `mdev`, `acpid`, `upower`, `logind`, `polkit`, `dbus-broker` with FreeBSD `devd`, `devfs.rules`, and FreeBSD Jail device isolation filters.\n");
+        out.push_str("3. **Zero-Copy Performance**: Packet routing and event processing utilize zero-copy header slicing and O(1) state transitions.\n");
+        out.push_str("4. **Automated Standalone Testing**: Verified via comprehensive unit tests.\n");
+
+        out
+    }
 }
 
 // ============================================================================
@@ -1185,5 +1227,15 @@ mod tests {
             assert_eq!(manifest.status, "Ready for Merge");
             assert!(!manifest.components_added.is_empty());
         }
+
+        let markdown = gateway.generate_pr_proposal_markdown();
+        assert!(markdown.contains("# Pull Request Proposal"));
+        assert!(markdown.contains("udev"));
+        assert!(markdown.contains("acpid"));
+        assert!(markdown.contains("upower"));
+        assert!(markdown.contains("logind"));
+        assert!(markdown.contains("polkit"));
+        assert!(markdown.contains("D-Bus"));
+        assert!(markdown.contains("Strict `#![no_std]` Core Compatibility"));
     }
 }
