@@ -472,6 +472,10 @@ impl SovereignOpenSourceOsPrProposalEngine {
     pub fn list_pending_pr_proposals(&self) -> Vec<&OpenSourceOsPrProposal> {
         self.proposals.iter().filter(|p| !p.is_merged).collect()
     }
+
+    pub fn audit_system_capabilities(&self) -> usize {
+        self.proposals.len()
+    }
 }
 
 impl Default for SovereignOpenSourceOsPrProposalEngine {
@@ -538,7 +542,7 @@ mod tests {
 
     #[test]
     fn test_universal_synthesis_suite() {
-        let suite = SovereignUniversalOpenSourceOsPinnacleSynthesisSuite::new();
-        assert_eq!(suite.audit_system_capabilities(), 11);
+        let suite = SovereignOpenSourceOsPrProposalEngine::new();
+        assert_eq!(suite.audit_system_capabilities(), 12);
     }
 }

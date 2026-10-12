@@ -7,7 +7,10 @@ use std::format;
 
 use std::string::{String, ToString};
 use std::vec::Vec;
+#[cfg(not(test))]
 use crate::klib::collections::HashMap;
+#[cfg(test)]
+use std::collections::HashMap;
 
 /// FreeBSD VNET virtual network interface pair configuration (FreeBSD VNET/jails parity)
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -484,10 +487,7 @@ impl ContainerRuntime for DockerRuntime {
             image: config.image.clone(),
             state,
             created_at: 1700000000u64,
-                )
-            } else {
-                None
-            },
+            started_at: None,
         })
     }
 
@@ -635,10 +635,7 @@ impl ContainerRuntime for PodmanRuntime {
             image: config.image.clone(),
             state,
             created_at: 1700000000u64,
-                )
-            } else {
-                None
-            },
+            started_at: None,
         })
     }
 

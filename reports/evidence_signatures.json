@@ -1,0 +1,29 @@
+{
+  "signed_at": "2026-10-12T05:22:53.217686+00:00",
+  "artifacts": {
+    "reports/steward/stale-work.md": {
+      "sha256": "7ddb590618f2d451e5bd06489fb783ef8814d5f0bbf0027484841fe9e6776481",
+      "size_bytes": 254
+    },
+    "reports/steward/daily-status.md": {
+      "sha256": "652516e99db1ffda9b8b5c82e35b256d2b919f1f3d5c154973cbea39d08ce029",
+      "size_bytes": 626
+    },
+    "reports/boot/boot_matrix.json": {
+      "sha256": "06ae7d72335d36230cc4c87eb1e6ac0193780854f610582e2725103f80e4cc9e",
+      "size_bytes": 871
+    },
+    "reports/capability/verified_today.md": {
+      "sha256": "44beb2b77f4b461bd72a239cbbcb12f3dda3c68a4f8e5577131f87f4c242b73c",
+      "size_bytes": 2399
+    },
+    "reports/capability/truth_table.json": {
+      "sha256": "ae8f21f41791fcecbb1596427b03ef7445f9d035824fa0151d6698221d5e8dac",
+      "size_bytes": 21012
+    },
+    "reports/build/latest.json": {
+      "sha256": "ae6f03b17708827ace7b2350ba9b8b1dd86707bea1a13827dbbb0611f5b06333",
+      "size_bytes": 164511
+    }
+  }
+}

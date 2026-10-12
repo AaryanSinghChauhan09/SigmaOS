@@ -1,6 +1,9 @@
 //! Standalone I/O Scheduler Integration & Unit Tests
 
-use sigmaos::io::{
+#[path = "../../src/io/mod.rs"]
+pub mod io;
+
+use io::{
     IoOperationKind, IoPriority, IoScheduler, IoStage, SchedulerError,
 };
 

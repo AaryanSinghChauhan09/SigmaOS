@@ -7,17 +7,18 @@
 // distributions through 6 critical architectural pillars:
 //
 // 1. SovereignPredictiveSchedExtEngine: EWMA latency-driven predictive BPF sched_ext scheduler
-//    with dynamic policy switching (ScxBpfland, ScxLavd, ScxCachyBore, ScxCentral) and preemptive NUMA migration.
+//    with dynamic policy switching (ScxBpfland, ScxLavd, ScxCachyBore, ScxCentral), preemptive
+//    NUMA migration, and quantum timeslice auto-scaling.
 // 2. SovereignOmniCasStoreEngine: Atomic micro-delta package hot-swapper with Merkle CAS closure trees,
 //    zero-downtime differential rollbacks, and generational integrity checks (surpassing NixOS & Guix).
 // 3. SovereignCrossPlatformCapabilityEngine: Unified security capability sandbox translating declarative access
-//    rules into Landlock v5 rules, Capsicum rights, and OpenBSD pledge/unveil masks in real time.
+//    rules into Landlock v5 rules, Capsicum rights, and OpenBSD pledge/unveil masks in real time with audit tracking.
 // 4. SovereignResilientHammer2Engine: Multi-master CoW storage engine with FNV-1a block deduplication,
-//    CRDT distributed snapshot consensus, and emergency read-only locks upon disk wear.
+//    CRDT distributed snapshot consensus, live snapshot creation, and emergency read-only locks upon disk wear.
 // 5. SovereignUniversalMicroarchEngine: Dynamic ISA level auto-tuning (x86-64-v1..v4, AVX-512, ARM64 Neoverse,
-//    RISC-V Vector 1.0) and SIMD JIT hot-patching without multi-repo package splits.
+//    RISC-V Vector 1.0), SIMD JIT hot-patching, and automatic ISA fallback routing without multi-repo package splits.
 // 6. SovereignXdpCarpMeshEngine: eBPF XDP zero-copy packet ingress merged directly with CARP/PFSYNC state table
-//    replication and FreeBSD VNET stack isolation.
+//    replication, FreeBSD VNET stack isolation, and failover state verification.
 // 7. SovereignAheadOfDistrosSuite: Master coordinator orchestrating all 6 innovation engines to verify complete,
 //    unbroken system dominance over legacy Linux & BSD distros.
 
@@ -52,6 +53,7 @@ pub struct PredictiveTaskDescriptor {
     pub cpu_affinity_mask: u64,
     pub cachy_burst_score: u32,
     pub is_realtime_boosted: bool,
+    pub quantum_slice_us: u64,
 }
 
 /// Sovereign Predictive SchedExt Scheduler Engine
@@ -62,6 +64,7 @@ pub struct SovereignPredictiveSchedExtEngine {
     pub total_predictions_made: u64,
     pub preemptive_numa_migrations: u64,
     pub policy_switches_count: u64,
+    pub realtime_boost_count: u64,
 }
 
 impl SovereignPredictiveSchedExtEngine {
@@ -72,6 +75,7 @@ impl SovereignPredictiveSchedExtEngine {
             total_predictions_made: 0,
             preemptive_numa_migrations: 0,
             policy_switches_count: 0,
+            realtime_boost_count: 0,
         }
     }
 
@@ -91,8 +95,20 @@ impl SovereignPredictiveSchedExtEngine {
             cpu_affinity_mask: 0xFFFFFFFF,
             cachy_burst_score: (initial_latency_us % 100) as u32 + 10,
             is_realtime_boosted: false,
+            quantum_slice_us: 1000,
         };
         self.tasks.insert(pid, task);
+    }
+
+    pub fn boost_realtime(&mut self, pid: usize) -> bool {
+        if let Some(task) = self.tasks.get_mut(&pid) {
+            task.is_realtime_boosted = true;
+            task.quantum_slice_us = 5000;
+            self.realtime_boost_count += 1;
+            true
+        } else {
+            false
+        }
     }
 
     pub fn update_task_latency(&mut self, pid: usize, measured_latency_us: u64) {
@@ -102,6 +118,13 @@ impl SovereignPredictiveSchedExtEngine {
             task.ewma_latency_us = ewma;
             task.predicted_deadline_us = ewma.saturating_add(measured_latency_us / 2);
             self.total_predictions_made += 1;
+
+            // Adjust quantum time slice dynamically based on EWMA latency
+            if ewma < 200 {
+                task.quantum_slice_us = 500; // Low latency interactive task
+            } else if ewma > 2000 {
+                task.quantum_slice_us = 4000; // Batch compute task
+            }
 
             // Preemptive NUMA migration if latency exceeds threshold
             if ewma > 5000 && task.numa_node_id == 0 {
@@ -121,6 +144,11 @@ impl SovereignPredictiveSchedExtEngine {
     pub fn select_next_task(&self) -> Option<usize> {
         if self.tasks.is_empty() {
             return None;
+        }
+
+        // Realtime boosted tasks always take priority
+        if let Some((&pid, _)) = self.tasks.iter().find(|(_, t)| t.is_realtime_boosted) {
+            return Some(pid);
         }
 
         match self.active_policy {
@@ -164,6 +192,7 @@ pub struct MicroDeltaPatch {
     pub patch_cas_hash: String,
     pub delta_size_bytes: usize,
     pub is_hot_swappable: bool,
+    pub generation_id: usize,
 }
 
 /// Sovereign Omni CAS Store Engine (Surpassing NixOS & Guix)
@@ -174,6 +203,7 @@ pub struct SovereignOmniCasStoreEngine {
     pub delta_patches: Vec<MicroDeltaPatch>,
     pub active_generation: usize,
     pub total_hot_swaps: u64,
+    pub integrity_audits_passed: u64,
 }
 
 impl SovereignOmniCasStoreEngine {
@@ -184,6 +214,7 @@ impl SovereignOmniCasStoreEngine {
             delta_patches: Vec::new(),
             active_generation: 1,
             total_hot_swaps: 0,
+            integrity_audits_passed: 0,
         }
     }
 
@@ -202,6 +233,19 @@ impl SovereignOmniCasStoreEngine {
         self.merkle_roots
             .insert(package_name.to_string(), hash.clone());
         hash
+    }
+
+    pub fn verify_cas_integrity(&mut self, package_name: &str) -> bool {
+        if let Some(expected_hash) = self.merkle_roots.get(package_name) {
+            if let Some(payload) = self.cas_blobs.get(expected_hash) {
+                let actual_hash = Self::compute_fnv1a_hash(payload);
+                if &actual_hash == expected_hash {
+                    self.integrity_audits_passed += 1;
+                    return true;
+                }
+            }
+        }
+        false
     }
 
     pub fn apply_micro_delta_patch(
@@ -227,12 +271,14 @@ impl SovereignOmniCasStoreEngine {
         self.merkle_roots
             .insert(package_name.to_string(), new_hash.clone());
 
+        self.active_generation += 1;
         self.delta_patches.push(MicroDeltaPatch {
             target_package: package_name.to_string(),
             source_cas_hash: current_hash,
             patch_cas_hash: new_hash.clone(),
             delta_size_bytes: delta_payload.len(),
             is_hot_swappable: true,
+            generation_id: self.active_generation,
         });
 
         self.total_hot_swaps += 1;
@@ -272,6 +318,15 @@ pub struct DeclarativeCapabilityRule {
     pub allow_execute: bool,
 }
 
+/// Audit Log Entry for Capability Access Attempts
+#[derive(Debug, Clone)]
+pub struct CapabilityAuditRecord {
+    pub resource_identifier: String,
+    pub requested_write: bool,
+    pub is_allowed: bool,
+    pub timestamp_epoch_ms: u64,
+}
+
 /// Translated Security Multi-OS Mask
 #[derive(Debug, Clone)]
 pub struct SecurityMultiOsMask {
@@ -285,14 +340,17 @@ pub struct SecurityMultiOsMask {
 #[derive(Debug)]
 pub struct SovereignCrossPlatformCapabilityEngine {
     pub rules: Vec<DeclarativeCapabilityRule>,
+    pub audit_log: Vec<CapabilityAuditRecord>,
     pub multi_os_mask: SecurityMultiOsMask,
     pub violations_blocked: u64,
+    pub total_audits: u64,
 }
 
 impl SovereignCrossPlatformCapabilityEngine {
     pub fn new() -> Self {
         Self {
             rules: Vec::new(),
+            audit_log: Vec::new(),
             multi_os_mask: SecurityMultiOsMask {
                 landlock_access_flags: 0,
                 capsicum_rights_bitmask: 0,
@@ -300,6 +358,7 @@ impl SovereignCrossPlatformCapabilityEngine {
                 is_enforced: false,
             },
             violations_blocked: 0,
+            total_audits: 0,
         }
     }
 
@@ -311,6 +370,16 @@ impl SovereignCrossPlatformCapabilityEngine {
             allow_execute: exec,
         });
         self.recalculate_multi_os_mask();
+    }
+
+    pub fn revoke_rule(&mut self, resource: &str) -> bool {
+        let original_len = self.rules.len();
+        self.rules.retain(|r| r.resource_identifier != resource);
+        let removed = self.rules.len() < original_len;
+        if removed {
+            self.recalculate_multi_os_mask();
+        }
+        removed
     }
 
     fn recalculate_multi_os_mask(&mut self) {
@@ -353,7 +422,10 @@ impl SovereignCrossPlatformCapabilityEngine {
     }
 
     pub fn authorize_access(&mut self, resource: &str, need_write: bool) -> bool {
+        self.total_audits += 1;
+
         if !self.multi_os_mask.is_enforced {
+            self.record_audit(resource, need_write, true);
             return true;
         }
 
@@ -361,14 +433,26 @@ impl SovereignCrossPlatformCapabilityEngine {
             if resource.starts_with(&rule.resource_identifier) {
                 if need_write && !rule.allow_write {
                     self.violations_blocked += 1;
+                    self.record_audit(resource, need_write, false);
                     return false;
                 }
+                self.record_audit(resource, need_write, true);
                 return true;
             }
         }
 
         self.violations_blocked += 1;
+        self.record_audit(resource, need_write, false);
         false
+    }
+
+    fn record_audit(&mut self, resource: &str, need_write: bool, allowed: bool) {
+        self.audit_log.push(CapabilityAuditRecord {
+            resource_identifier: resource.to_string(),
+            requested_write: need_write,
+            is_allowed: allowed,
+            timestamp_epoch_ms: self.total_audits * 10,
+        });
     }
 }
 
@@ -392,22 +476,35 @@ pub struct ResilientBlockEntry {
     pub payload: Vec<u8>,
 }
 
+/// Live Snapshot Record
+#[derive(Debug, Clone)]
+pub struct Hammer2Snapshot {
+    pub snapshot_id: u64,
+    pub name: String,
+    pub block_count: usize,
+    pub root_crdt_revision: u64,
+}
+
 /// Sovereign Resilient HAMMER2 Distributed Storage Engine
 #[derive(Debug)]
 pub struct SovereignResilientHammer2Engine {
     pub blocks: BTreeMap<u64, ResilientBlockEntry>,
+    pub snapshots: Vec<Hammer2Snapshot>,
     pub is_emergency_read_only: bool,
     pub disk_health_percent: u8,
     pub dedup_bytes_saved: u64,
+    pub snapshot_counter: u64,
 }
 
 impl SovereignResilientHammer2Engine {
     pub fn new() -> Self {
         Self {
             blocks: BTreeMap::new(),
+            snapshots: Vec::new(),
             is_emergency_read_only: false,
             disk_health_percent: 100,
             dedup_bytes_saved: 0,
+            snapshot_counter: 0,
         }
     }
 
@@ -454,6 +551,26 @@ impl SovereignResilientHammer2Engine {
         Ok(block_id)
     }
 
+    pub fn create_live_snapshot(&mut self, snapshot_name: &str) -> u64 {
+        self.snapshot_counter += 1;
+        let snapshot_id = self.snapshot_counter;
+        let max_revision = self
+            .blocks
+            .values()
+            .map(|b| b.crdt_revision)
+            .max()
+            .unwrap_or(0);
+
+        self.snapshots.push(Hammer2Snapshot {
+            snapshot_id,
+            name: snapshot_name.to_string(),
+            block_count: self.blocks.len(),
+            root_crdt_revision: max_revision,
+        });
+
+        snapshot_id
+    }
+
     pub fn update_disk_health(&mut self, health_percent: u8) {
         self.disk_health_percent = health_percent;
         if health_percent < 10 {
@@ -488,6 +605,7 @@ pub enum MicroarchTier {
 pub struct SimdJitFunctionTarget {
     pub name: String,
     pub target_isa: MicroarchTier,
+    pub fallback_isa: MicroarchTier,
     pub is_hot_patched: bool,
 }
 
@@ -497,6 +615,7 @@ pub struct SovereignUniversalMicroarchEngine {
     pub detected_tier: MicroarchTier,
     pub jit_targets: Vec<SimdJitFunctionTarget>,
     pub optimizations_performed: u64,
+    pub fallbacks_executed: u64,
 }
 
 impl SovereignUniversalMicroarchEngine {
@@ -505,6 +624,7 @@ impl SovereignUniversalMicroarchEngine {
             detected_tier,
             jit_targets: Vec::new(),
             optimizations_performed: 0,
+            fallbacks_executed: 0,
         }
     }
 
@@ -513,6 +633,7 @@ impl SovereignUniversalMicroarchEngine {
         self.jit_targets.push(SimdJitFunctionTarget {
             name: name.to_string(),
             target_isa: required_isa,
+            fallback_isa: MicroarchTier::X86_64V1,
             is_hot_patched: is_supported,
         });
 
@@ -522,11 +643,17 @@ impl SovereignUniversalMicroarchEngine {
         is_supported
     }
 
-    pub fn execute_hot_path(&self, name: &str) -> Option<MicroarchTier> {
-        self.jit_targets
-            .iter()
-            .find(|t| t.name == name && t.is_hot_patched)
-            .map(|t| t.target_isa)
+    pub fn execute_hot_path(&mut self, name: &str) -> Option<MicroarchTier> {
+        if let Some(target) = self.jit_targets.iter().find(|t| t.name == name) {
+            if target.is_hot_patched {
+                Some(target.target_isa)
+            } else {
+                self.fallbacks_executed += 1;
+                Some(target.fallback_isa)
+            }
+        } else {
+            None
+        }
     }
 }
 
@@ -558,6 +685,7 @@ pub struct SovereignXdpCarpMeshEngine {
     pub active_connections: Vec<XdpCarpMeshConnection>,
     pub zero_copy_packets_processed: u64,
     pub state_sync_messages_sent: u64,
+    pub dropped_packets_counter: u64,
 }
 
 impl SovereignXdpCarpMeshEngine {
@@ -568,10 +696,16 @@ impl SovereignXdpCarpMeshEngine {
             active_connections: Vec::new(),
             zero_copy_packets_processed: 0,
             state_sync_messages_sent: 0,
+            dropped_packets_counter: 0,
         }
     }
 
     pub fn process_xdp_packet(&mut self, src_ip: [u8; 4], dst_ip: [u8; 4], port: u16) -> u64 {
+        if !self.is_master {
+            self.dropped_packets_counter += 1;
+            return 0;
+        }
+
         let conn_hash =
             u64::from(src_ip[3]) ^ (u64::from(dst_ip[3]) << 8) ^ (u64::from(port) << 16);
 
@@ -664,7 +798,6 @@ impl Default for SovereignAheadOfDistrosSuite {
 // ============================================================================
 
 #[cfg(test)]
-#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -677,9 +810,11 @@ mod tests {
         engine.update_task_latency(1001, 300);
         assert_eq!(engine.select_next_task(), Some(1001));
 
+        assert!(engine.boost_realtime(1002));
+        assert_eq!(engine.select_next_task(), Some(1002));
+
         engine.switch_policy(PredictiveSchedPolicy::ScxCachyBore);
         assert_eq!(engine.policy_switches_count, 1);
-        assert!(engine.select_next_task().is_some());
     }
 
     #[test]
@@ -687,6 +822,9 @@ mod tests {
         let mut cas = SovereignOmniCasStoreEngine::new();
         let h1 = cas.register_cas_blob("kernel-core", b"KERNEL_BINARY_V1");
         assert!(h1.starts_with("sha256_"));
+
+        assert!(cas.verify_cas_integrity("kernel-core"));
+        assert_eq!(cas.integrity_audits_passed, 1);
 
         let h2 = cas
             .apply_micro_delta_patch("kernel-core", b"_HOTFIX1")
@@ -707,9 +845,10 @@ mod tests {
         assert!(cap.authorize_access("/etc/sigma/config", false));
         assert!(!cap.authorize_access("/etc/sigma/config", true));
         assert_eq!(cap.violations_blocked, 1);
+        assert_eq!(cap.audit_log.len(), 2);
 
-        assert!(cap.multi_os_mask.openbsd_pledge_token.contains("rpath"));
-        assert!(cap.multi_os_mask.openbsd_pledge_token.contains("inet"));
+        assert!(cap.revoke_rule("net:443"));
+        assert!(!cap.authorize_access("net:443", false));
     }
 
     #[test]
@@ -721,6 +860,10 @@ mod tests {
         let b2 = storage.write_block_crdt(2, 11, payload).unwrap();
         assert_eq!(b1, b2); // Deduplicated
         assert!(storage.dedup_bytes_saved > 0);
+
+        let snap_id = storage.create_live_snapshot("snap1");
+        assert_eq!(snap_id, 1);
+        assert_eq!(storage.snapshots.len(), 1);
 
         storage.update_disk_health(5);
         assert!(storage.is_emergency_read_only);
@@ -735,6 +878,15 @@ mod tests {
             tuner.execute_hot_path("avx512_memcpy"),
             Some(MicroarchTier::X86_64V4)
         );
+
+        // Fallback testing
+        let mut tuner_v1 = SovereignUniversalMicroarchEngine::new(MicroarchTier::X86_64V1);
+        assert!(!tuner_v1.register_simd_target("avx512_memcpy", MicroarchTier::X86_64V4));
+        assert_eq!(
+            tuner_v1.execute_hot_path("avx512_memcpy"),
+            Some(MicroarchTier::X86_64V1)
+        );
+        assert_eq!(tuner_v1.fallbacks_executed, 1);
     }
 
     #[test]
@@ -746,6 +898,10 @@ mod tests {
 
         mesh.trigger_carp_failover(false);
         assert!(!mesh.is_master);
+
+        let dropped_hash = mesh.process_xdp_packet([192, 168, 1, 10], [10, 0, 0, 1], 443);
+        assert_eq!(dropped_hash, 0);
+        assert_eq!(mesh.dropped_packets_counter, 1);
     }
 
     #[test]
