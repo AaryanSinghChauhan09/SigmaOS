@@ -98,6 +98,26 @@ impl InitSupervisorsAndTimersPrEngine {
         }
     }
 
+    pub fn evaluate_anacron_catchup(&self, job_name: &str, last_run_timestamp_sec: u64, current_time_sec: u64, period_days: u32) -> ScheduledJobStatus {
+        let period_sec = (period_days as u64) * 86400;
+        let is_due = current_time_sec >= last_run_timestamp_sec + period_sec;
+        ScheduledJobStatus {
+            job_name: job_name.to_string(),
+            kind: ScheduledJobKind::Anacron,
+            next_fire_timestamp_sec: if is_due { current_time_sec } else { last_run_timestamp_sec + period_sec },
+            missed_execution_catchup: is_due,
+        }
+    }
+
+    pub fn evaluate_systemd_timer(&self, unit_name: &str, monotonic_sec: u64, current_time_sec: u64) -> ScheduledJobStatus {
+        ScheduledJobStatus {
+            job_name: unit_name.to_string(),
+            kind: ScheduledJobKind::SystemdTimer,
+            next_fire_timestamp_sec: current_time_sec + monotonic_sec,
+            missed_execution_catchup: false,
+        }
+    }
+
     pub fn evaluate_at_job(&self, job_name: &str, scheduled_timestamp_sec: u64, current_time_sec: u64) -> ScheduledJobStatus {
         ScheduledJobStatus {
             job_name: job_name.to_string(),
@@ -143,6 +163,40 @@ impl InitSupervisorsAndTimersPrEngine {
             performance_multiplier: "90x Lower Service Handshake Latency (<0.02ms)".to_string(),
             status: "Ready for Merge".to_string(),
         }
+    }
+
+    pub fn generate_pr_markdown(&self) -> String {
+        let manifest = self.generate_proposal();
+        let mut md = String::new();
+        md.push_str("# ");
+        md.push_str(&manifest.pr_title);
+        md.push_str("\n\n");
+        md.push_str("## Target Subsystem\n");
+        md.push_str(&manifest.target_subsystem);
+        md.push_str("\n\n## Distro Inspirations\n");
+        for insp in &manifest.distro_inspirations {
+            md.push_str("- ");
+            md.push_str(insp);
+            md.push_str("\n");
+        }
+        md.push_str("\n## Tools & Systems Covered\n");
+        for tool in &manifest.tools_covered {
+            md.push_str("- ");
+            md.push_str(tool);
+            md.push_str("\n");
+        }
+        md.push_str("\n## Key Features Added\n");
+        for feature in &manifest.key_features_added {
+            md.push_str("- ");
+            md.push_str(feature);
+            md.push_str("\n");
+        }
+        md.push_str("\n## Performance Improvement\n");
+        md.push_str(&manifest.performance_multiplier);
+        md.push_str("\n\n**Status:** ");
+        md.push_str(&manifest.status);
+        md.push_str("\n");
+        md
     }
 }
 
@@ -286,6 +340,40 @@ impl PosixAndAdvancedShellsPrEngine {
             status: "Ready for Merge".to_string(),
         }
     }
+
+    pub fn generate_pr_markdown(&self) -> String {
+        let manifest = self.generate_proposal();
+        let mut md = String::new();
+        md.push_str("# ");
+        md.push_str(&manifest.pr_title);
+        md.push_str("\n\n");
+        md.push_str("## Target Subsystem\n");
+        md.push_str(&manifest.target_subsystem);
+        md.push_str("\n\n## Distro Inspirations\n");
+        for insp in &manifest.distro_inspirations {
+            md.push_str("- ");
+            md.push_str(insp);
+            md.push_str("\n");
+        }
+        md.push_str("\n## Tools & Systems Covered\n");
+        for tool in &manifest.tools_covered {
+            md.push_str("- ");
+            md.push_str(tool);
+            md.push_str("\n");
+        }
+        md.push_str("\n## Key Features Added\n");
+        for feature in &manifest.key_features_added {
+            md.push_str("- ");
+            md.push_str(feature);
+            md.push_str("\n");
+        }
+        md.push_str("\n## Performance Improvement\n");
+        md.push_str(&manifest.performance_multiplier);
+        md.push_str("\n\n**Status:** ");
+        md.push_str(&manifest.status);
+        md.push_str("\n");
+        md
+    }
 }
 
 /// Terminal emulator kind.
@@ -400,6 +488,40 @@ impl TerminalMultiplexersAndEmulatorsPrEngine {
             status: "Ready for Merge".to_string(),
         }
     }
+
+    pub fn generate_pr_markdown(&self) -> String {
+        let manifest = self.generate_proposal();
+        let mut md = String::new();
+        md.push_str("# ");
+        md.push_str(&manifest.pr_title);
+        md.push_str("\n\n");
+        md.push_str("## Target Subsystem\n");
+        md.push_str(&manifest.target_subsystem);
+        md.push_str("\n\n## Distro Inspirations\n");
+        for insp in &manifest.distro_inspirations {
+            md.push_str("- ");
+            md.push_str(insp);
+            md.push_str("\n");
+        }
+        md.push_str("\n## Tools & Systems Covered\n");
+        for tool in &manifest.tools_covered {
+            md.push_str("- ");
+            md.push_str(tool);
+            md.push_str("\n");
+        }
+        md.push_str("\n## Key Features Added\n");
+        for feature in &manifest.key_features_added {
+            md.push_str("- ");
+            md.push_str(feature);
+            md.push_str("\n");
+        }
+        md.push_str("\n## Performance Improvement\n");
+        md.push_str(&manifest.performance_multiplier);
+        md.push_str("\n\n**Status:** ");
+        md.push_str(&manifest.status);
+        md.push_str("\n");
+        md
+    }
 }
 
 /// Master Gateway Coordinator for Shells, Terminals, Init Systems & Supervisors Parity.
@@ -439,6 +561,19 @@ impl SovereignShellsTerminalsSupervisorsParityPrGateway {
         summary.push_str("\nStatus: All Proposals Ready for Merge\n");
         summary
     }
+
+    pub fn generate_combined_pr_markdown(&self) -> String {
+        let mut combined = String::new();
+        combined.push_str("# PULL REQUEST PROPOSAL: SIGMAOS SHELLS, TERMINALS & SUPERVISORS PARITY\n\n");
+        combined.push_str(&self.generate_master_summary());
+        combined.push_str("\n---\n\n");
+        combined.push_str(&self.supervisors.generate_pr_markdown());
+        combined.push_str("\n---\n\n");
+        combined.push_str(&self.shells.generate_pr_markdown());
+        combined.push_str("\n---\n\n");
+        combined.push_str(&self.terminals.generate_pr_markdown());
+        combined
+    }
 }
 
 #[cfg(test)]
@@ -458,12 +593,22 @@ mod tests {
         assert_eq!(cron.job_name, "backup");
         assert!(cron.next_fire_timestamp_sec > 1000);
 
+        let anacron = engine.evaluate_anacron_catchup("daily_cleanup", 1000, 100000, 1);
+        assert!(anacron.missed_execution_catchup);
+
+        let systemd_timer = engine.evaluate_systemd_timer("backup.timer", 3600, 1000);
+        assert_eq!(systemd_timer.next_fire_timestamp_sec, 4600);
+
         let at_job = engine.evaluate_at_job("reboot_task", 1200, 1500);
         assert!(at_job.missed_execution_catchup);
 
         let proposal = engine.generate_proposal();
         assert!(proposal.pr_title.contains("Init Systems"));
         assert_eq!(proposal.status, "Ready for Merge");
+
+        let md = engine.generate_pr_markdown();
+        assert!(md.contains("# feat(init-supervisors)"));
+        assert!(md.contains("systemd"));
     }
 
     #[test]
@@ -486,6 +631,10 @@ mod tests {
         let proposal = engine.generate_proposal();
         assert!(proposal.pr_title.contains("Bash, Zsh, Fish"));
         assert_eq!(proposal.status, "Ready for Merge");
+
+        let md = engine.generate_pr_markdown();
+        assert!(md.contains("# feat(shells)"));
+        assert!(md.contains("Bash"));
     }
 
     #[test]
@@ -506,6 +655,10 @@ mod tests {
         let proposal = engine.generate_proposal();
         assert!(proposal.pr_title.contains("Terminal"));
         assert_eq!(proposal.status, "Ready for Merge");
+
+        let md = engine.generate_pr_markdown();
+        assert!(md.contains("# feat(terminals-multiplexers)"));
+        assert!(md.contains("tmux"));
     }
 
     #[test]
@@ -517,5 +670,8 @@ mod tests {
         let summary = gateway.generate_master_summary();
         assert!(summary.contains("SIGMAOS SHELLS, TERMINALS & SUPERVISORS PARITY PR PROPOSAL SUMMARY"));
         assert!(summary.contains("Total PR Proposals: 3"));
+
+        let combined = gateway.generate_combined_pr_markdown();
+        assert!(combined.contains("# PULL REQUEST PROPOSAL: SIGMAOS SHELLS, TERMINALS & SUPERVISORS PARITY"));
     }
 }

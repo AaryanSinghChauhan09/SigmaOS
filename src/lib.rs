@@ -337,10 +337,15 @@ pub use security::{
     SandboxPolicy,
 };
 pub use shell::{
-    ContextualCompleter, HistoryExpansionEngine, JobControlManager, ParameterExpansionEngine,
-    PipelineExecutor, ShellCommand, ShellManager as ShellProfileManager, ShellPledgeUnveilGuard,
-    ShellProfile, ShellStatistics, ShellSyntaxHighlighter, ShellType,
-    SimpleShellSession as ShellRepl, ZshPromptFormatter,
+    ContextualCompleter, HistoryExpansionEngine, InitSupervisorsAndTimersPrEngine,
+    JobControlManager, MultiplexerKind, PaneGridSplit, ParameterExpansionEngine,
+    PipelineExecutor, PosixAndAdvancedShellsPrEngine, ScheduledJobKind, ScheduledJobStatus,
+    ServiceUnitState, ShellCommand, ShellDialect, ShellExpansionResult,
+    ShellManager as ShellProfileManager, ShellPledgeUnveilGuard, ShellProfile, ShellStatistics,
+    ShellSyntaxHighlighter, ShellSyntaxToken, ShellTokenType, ShellType,
+    ShellsTerminalsSupervisorsPrProposalManifest, SimpleShellSession as ShellRepl,
+    SovereignShellsTerminalsSupervisorsParityPrGateway, SupervisorKind, TerminalCell,
+    TerminalEmulatorKind, TerminalMultiplexersAndEmulatorsPrEngine, ZshPromptFormatter,
 };
 pub use sigpkg::{
     AdapterError, BuildSystem, ContentAddressedStore, CryptoVerifier, DebAdapter,
