@@ -30,6 +30,7 @@ pub mod sigmabackup;
 pub mod sigmaintegrity;
 pub mod sigmarecovery;
 pub mod sigmapkg;
+pub mod sigmaupdate;
 pub mod sigmatime;
 pub mod sigmatimer;
 pub mod system_manager;
@@ -160,6 +161,10 @@ pub use sigmarecovery::{
 pub use sigmapkg::{
     SigmaPkg, Package, PackageState, PackageAction,
     init_sigmapkg, get_sigmapkg, install_package,
+};
+pub use sigmaupdate::{
+    SigmaUpdate, SystemUpdate, UpdateType, UpdateStatus, UpdatePolicy,
+    init_sigmaupdate, get_sigmaupdate, apply_system_update,
 };
 pub use power_manager::{
     BatteryInfo, PowerBatteryStatus, PowerConfig, PowerManager, PowerProfile, PowerSource,
