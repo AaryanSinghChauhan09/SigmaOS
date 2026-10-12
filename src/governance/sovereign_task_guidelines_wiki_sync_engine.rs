@@ -177,6 +177,12 @@ impl WikiDataTransferEngine {
 
         self.feature_specs.insert(
 <<<<<<< HEAD
+            "SystemAppsDevelopmentPlan".to_string(),
+            FeatureMdStatus {
+                spec_name: "32-System-Apps-Development-Plan.md".to_string(),
+                source_path: "wiki/32-System-Apps-Development-Plan.md".to_string(),
+=======
+<<<<<<< HEAD
             "NetworkDevelopmentAndMaintenancePlan".to_string(),
             FeatureMdStatus {
                 spec_name: "28-Network-Development-And-Maintenance-Plan.md".to_string(),
@@ -186,6 +192,7 @@ impl WikiDataTransferEngine {
             FeatureMdStatus {
                 spec_name: "33-Kernel-and-Bootloader-Advancements-Plan.md".to_string(),
                 source_path: "wiki/33-Kernel-and-Bootloader-Advancements-Plan.md".to_string(),
+>>>>>>> origin/main
 >>>>>>> origin/main
                 is_fully_implemented: true,
                 completion_percentage: 100,
@@ -377,6 +384,11 @@ impl WikiDataTransferEngine {
         self.register_spec_file(
             "31-Assembly-Bootstrap-Entry-Advancements-PR.md",
             "Assembly Bootstrap Entry Advancements PR",
+            true,
+        );
+        self.register_spec_file(
+            "32-System-Apps-Development-Plan.md",
+            "System Applications Development Plan PR",
             true,
         );
         self.register_spec_file(

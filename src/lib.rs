@@ -184,6 +184,8 @@ pub mod unimplemented_features;
 pub mod unimplemented_tools;
 pub mod wiki_unimplemented_ideas;
 pub use wiki_unimplemented_ideas::*;
+pub mod system_apps;
+pub use system_apps::*;
 pub mod arch;
 pub mod compiler;
 pub mod userland;

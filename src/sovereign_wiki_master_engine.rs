@@ -239,6 +239,12 @@ impl SovereignLinuxBsdWikiRoadmapParityEngine {
             (
                 32,
 <<<<<<< HEAD
+                "SigmaOS System Applications Development Plan & Gateway Engine",
+                "src/system_apps/sovereign_system_apps_development_and_pr_suite.rs",
+                "wiki/32-System-Apps-Development-Plan.md",
+            ),
+=======
+<<<<<<< HEAD
                 "SigmaOS CLI Development Plan & Architecture Framework",
                 "src/tools/sigma_cli.rs",
                 "wiki/27-SigmaOS-CLI-Development-Plan.md",
@@ -272,6 +278,7 @@ impl SovereignLinuxBsdWikiRoadmapParityEngine {
 >>>>>>> origin/main
 >>>>>>> origin/main
             ),
+>>>>>>> origin/main
         ];
 
         for (id, title, module, _spec) in default_ideas {
@@ -417,8 +424,13 @@ mod tests {
         assert_eq!(engine.total_ideas_count, 32);
         assert_eq!(engine.implemented_ideas_count(), 32);
 =======
+<<<<<<< HEAD
+        assert_eq!(engine.total_ideas_count, 32);
+        assert_eq!(engine.implemented_ideas_count(), 32);
+=======
         assert_eq!(engine.total_ideas_count, 33);
         assert_eq!(engine.implemented_ideas_count(), 33);
+>>>>>>> origin/main
 >>>>>>> origin/main
 >>>>>>> origin/main
 >>>>>>> origin/main
