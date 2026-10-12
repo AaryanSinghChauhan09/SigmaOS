@@ -32,6 +32,12 @@ pub use vectorcraft::{
 };
 pub use pdfcraft::{
     PdfEditor, PdfPage, PdfElement,
+    FontFamily, FontSize, TextAlignment,
+    TextObject, ImageObject, ShapeObject,
+    ShapeType, AnnotationType, Annotation,
+    FormFieldType, FormField,
+    Bookmark, Hyperlink,
+    PdfMetadata, SecuritySettings, ExportFormat,
     init_pdfcraft, get_pdfcraft,
 };
 pub use designcraft::{
