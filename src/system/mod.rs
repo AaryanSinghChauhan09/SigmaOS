@@ -28,6 +28,7 @@ pub mod sigmamonitor;
 pub mod sigmalogrotate;
 pub mod sigmabackup;
 pub mod sigmaintegrity;
+pub mod sigmarecovery;
 pub mod sigmatime;
 pub mod sigmatimer;
 pub mod system_manager;
@@ -150,6 +151,10 @@ pub use sigmabackup::{
 pub use sigmaintegrity::{
     SigmaIntegrity, FileIntegrityRecord, HashAlgorithm, FileStatus,
     init_sigmaintegrity, get_sigmaintegrity, check_file_integrity,
+};
+pub use sigmarecovery::{
+    SigmaRecovery, RecoverySnapshot, RecoveryMode, RecoveryAction,
+    init_sigmarecovery, get_sigmarecovery, boot_to_recovery,
 };
 pub use power_manager::{
     BatteryInfo, PowerBatteryStatus, PowerConfig, PowerManager, PowerProfile, PowerSource,
