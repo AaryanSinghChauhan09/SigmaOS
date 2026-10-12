@@ -1,0 +1,651 @@
+{
+  "audit_timestamp": "2026-10-12T05:22:53.110995+00:00",
+  "total_claims": 92,
+  "total_evidence_files": 7,
+  "claims": [
+    {
+      "component": "meta",
+      "capability": "target_architecture",
+      "claimed_status": "x86_64",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "meta",
+      "capability": "reference_platform",
+      "claimed_status": "qemu-system-x86_64",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "meta",
+      "capability": "version",
+      "claimed_status": "0.9.0-alpha",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "meta",
+      "capability": "zero_external_dependencies",
+      "claimed_status": "true",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.gdt_idt_bootstrap",
+      "capability": "status",
+      "claimed_status": "implemented",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.gdt_idt_bootstrap",
+      "capability": "tested_on",
+      "claimed_status": "[\"qemu-x86_64\", \"unit-test\"]",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.gdt_idt_bootstrap",
+      "capability": "required_for_release",
+      "claimed_status": "true",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.gdt_idt_bootstrap",
+      "capability": "description",
+      "claimed_status": "Early GDT and IDT setup with PIC 8259 remap (IRQs 32-47) preventing CPU exception collisions.",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.pic_8259_interrupts",
+      "capability": "status",
+      "claimed_status": "implemented",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.pic_8259_interrupts",
+      "capability": "tested_on",
+      "claimed_status": "[\"unit-test\"]",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.pic_8259_interrupts",
+      "capability": "required_for_release",
+      "claimed_status": "true",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.pic_8259_interrupts",
+      "capability": "description",
+      "claimed_status": "Dual 8259 PIC master/slave port I/O initialization, mask control, and EOI dispatch.",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.pit_8254_timer",
+      "capability": "status",
+      "claimed_status": "implemented",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.pit_8254_timer",
+      "capability": "tested_on",
+      "claimed_status": "[\"unit-test\"]",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.pit_8254_timer",
+      "capability": "required_for_release",
+      "claimed_status": "true",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.pit_8254_timer",
+      "capability": "description",
+      "claimed_status": "Programmable Interval Timer tick tracking at 100Hz using 1.193182 MHz oscillator divider.",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.vga_text_mode",
+      "capability": "status",
+      "claimed_status": "implemented",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.vga_text_mode",
+      "capability": "tested_on",
+      "claimed_status": "[\"qemu-x86_64\"]",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.vga_text_mode",
+      "capability": "required_for_release",
+      "claimed_status": "true",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.vga_text_mode",
+      "capability": "description",
+      "claimed_status": "VGA buffer text mode at 0xB8000 with 80x25 terminal scrolling and color attributes.",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.uefi_boot",
+      "capability": "status",
+      "claimed_status": "prototype",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.uefi_boot",
+      "capability": "tested_on",
+      "claimed_status": "[\"ovmf-x86_64\"]",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.uefi_boot",
+      "capability": "required_for_release",
+      "claimed_status": "true",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.uefi_boot",
+      "capability": "description",
+      "claimed_status": "GOP framebuffer query and EFI memory map transition to 64-bit long mode.",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.linux_syscall_abi",
+      "capability": "status",
+      "claimed_status": "implemented",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.linux_syscall_abi",
+      "capability": "tested_on",
+      "claimed_status": "[\"unit-test\"]",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.linux_syscall_abi",
+      "capability": "required_for_release",
+      "claimed_status": "true",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.linux_syscall_abi",
+      "capability": "description",
+      "claimed_status": "Direct x86_64 syscall dispatcher supporting read, write, open, close, mmap, brk, clone, exit, and io_uring.",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.task_scheduler_eevdf",
+      "capability": "status",
+      "claimed_status": "implemented",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.task_scheduler_eevdf",
+      "capability": "tested_on",
+      "claimed_status": "[\"unit-test\"]",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.task_scheduler_eevdf",
+      "capability": "required_for_release",
+      "claimed_status": "true",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.task_scheduler_eevdf",
+      "capability": "description",
+      "claimed_status": "Earliest Eligible Virtual Deadline First (EEVDF) scheduler inspired by Linux 6.6+.",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.bore_scheduler",
+      "capability": "status",
+      "claimed_status": "implemented",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.bore_scheduler",
+      "capability": "tested_on",
+      "claimed_status": "[\"unit-test\"]",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.bore_scheduler",
+      "capability": "required_for_release",
+      "claimed_status": "false",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.bore_scheduler",
+      "capability": "description",
+      "claimed_status": "Burst-Oriented Response Enhancer (BORE) interactivity-biased CPU scheduling.",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.memory_buddy_allocator",
+      "capability": "status",
+      "claimed_status": "implemented",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.memory_buddy_allocator",
+      "capability": "tested_on",
+      "claimed_status": "[\"unit-test\"]",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.memory_buddy_allocator",
+      "capability": "required_for_release",
+      "claimed_status": "true",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.memory_buddy_allocator",
+      "capability": "description",
+      "claimed_status": "Binary buddy memory allocator managing page frames across memory zones.",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.vfs_posix_primitives",
+      "capability": "status",
+      "claimed_status": "implemented",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.vfs_posix_primitives",
+      "capability": "tested_on",
+      "claimed_status": "[\"unit-test\"]",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.vfs_posix_primitives",
+      "capability": "required_for_release",
+      "claimed_status": "true",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.vfs_posix_primitives",
+      "capability": "description",
+      "claimed_status": "POSIX-compliant VFS inode/dentry hierarchy with file descriptors, pipes, and fifos.",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.omakase_tiling_engine",
+      "capability": "status",
+      "claimed_status": "implemented",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.omakase_tiling_engine",
+      "capability": "tested_on",
+      "claimed_status": "[\"unit-test\"]",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.omakase_tiling_engine",
+      "capability": "required_for_release",
+      "claimed_status": "true",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.omakase_tiling_engine",
+      "capability": "description",
+      "claimed_status": "Automated master-stack tiling window manager configuration with configurable inner/outer gaps.",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.omarchy_theme_synthesis",
+      "capability": "status",
+      "claimed_status": "implemented",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.omarchy_theme_synthesis",
+      "capability": "tested_on",
+      "claimed_status": "[\"unit-test\"]",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.omarchy_theme_synthesis",
+      "capability": "required_for_release",
+      "claimed_status": "true",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.omarchy_theme_synthesis",
+      "capability": "description",
+      "claimed_status": "Zero-friction dark/light developer theme palette, font fallback, and terminal padding.",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.wayland_zenith_compositor",
+      "capability": "status",
+      "claimed_status": "prototype",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.wayland_zenith_compositor",
+      "capability": "tested_on",
+      "claimed_status": "[\"qemu-virtio-gpu\"]",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.wayland_zenith_compositor",
+      "capability": "required_for_release",
+      "claimed_status": "true",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.wayland_zenith_compositor",
+      "capability": "description",
+      "claimed_status": "Zenith Wayland compositor backend handling client surface commits and input focus.",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.mint_update_level_automation",
+      "capability": "status",
+      "claimed_status": "implemented",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.mint_update_level_automation",
+      "capability": "tested_on",
+      "claimed_status": "[\"unit-test\"]",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.mint_update_level_automation",
+      "capability": "required_for_release",
+      "claimed_status": "true",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.mint_update_level_automation",
+      "capability": "description",
+      "claimed_status": "5-tier update classification policy preventing risky package upgrades on production systems.",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.timeshift_atomic_rollback",
+      "capability": "status",
+      "claimed_status": "implemented",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.timeshift_atomic_rollback",
+      "capability": "tested_on",
+      "claimed_status": "[\"unit-test\"]",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.timeshift_atomic_rollback",
+      "capability": "required_for_release",
+      "claimed_status": "true",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.timeshift_atomic_rollback",
+      "capability": "description",
+      "claimed_status": "Automated pre-install snapshot retention and rollback triggers for Btrfs/ZFS volumes.",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.installer_dry_run_and_hardware_partitioning",
+      "capability": "status",
+      "claimed_status": "partial",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.installer_dry_run_and_hardware_partitioning",
+      "capability": "tested_on",
+      "claimed_status": "[\"qemu-x86_64\"]",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.installer_dry_run_and_hardware_partitioning",
+      "capability": "required_for_release",
+      "claimed_status": "true",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.installer_dry_run_and_hardware_partitioning",
+      "capability": "description",
+      "claimed_status": "Guided installer with real block device probe, dry-run safety validation, and partition generation.",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.wifi_networking",
+      "capability": "status",
+      "claimed_status": "partial",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.wifi_networking",
+      "capability": "tested_on",
+      "claimed_status": "[\"qemu-e1000\"]",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.wifi_networking",
+      "capability": "required_for_release",
+      "claimed_status": "true",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.wifi_networking",
+      "capability": "description",
+      "claimed_status": "Ethernet functional; Wi-Fi 802.11 stack in hardware testing phase.",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.nvme_driver_mmio",
+      "capability": "status",
+      "claimed_status": "partial",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.nvme_driver_mmio",
+      "capability": "tested_on",
+      "claimed_status": "[\"unit-test\"]",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.nvme_driver_mmio",
+      "capability": "required_for_release",
+      "claimed_status": "true",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.nvme_driver_mmio",
+      "capability": "description",
+      "claimed_status": "NVMe controller with MMIO doorbell ring, queue pair management, submission/completion queues with proper volatile writes.",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.ahci_sata_controller",
+      "capability": "status",
+      "claimed_status": "partial",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.ahci_sata_controller",
+      "capability": "tested_on",
+      "claimed_status": "[\"unit-test\"]",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.ahci_sata_controller",
+      "capability": "required_for_release",
+      "claimed_status": "true",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.ahci_sata_controller",
+      "capability": "description",
+      "claimed_status": "AHCI SATA controller with port enumeration, device identification via signature matching, and FIS command construction.",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.acpi_table_parser",
+      "capability": "status",
+      "claimed_status": "partial",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.acpi_table_parser",
+      "capability": "tested_on",
+      "claimed_status": "[\"unit-test\"]",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.acpi_table_parser",
+      "capability": "required_for_release",
+      "claimed_status": "true",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.acpi_table_parser",
+      "capability": "description",
+      "claimed_status": "ACPI RSDP discovery in EBDA (0x80000-0x9FFFF) and BIOS ROM (0xE0000-0xFFFFF) with checksum verification.",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.drm_kms_graphics",
+      "capability": "status",
+      "claimed_status": "partial",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.drm_kms_graphics",
+      "capability": "tested_on",
+      "claimed_status": "[\"unit-test\"]",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.drm_kms_graphics",
+      "capability": "required_for_release",
+      "claimed_status": "true",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.drm_kms_graphics",
+      "capability": "description",
+      "claimed_status": "DRM/KMS subsystem with CRTC, encoder, connector management, mode setting infrastructure, and display mode detection.",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.tss_ring3_transition",
+      "capability": "status",
+      "claimed_status": "partial",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.tss_ring3_transition",
+      "capability": "tested_on",
+      "claimed_status": "[\"unit-test\"]",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.tss_ring3_transition",
+      "capability": "required_for_release",
+      "claimed_status": "true",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    },
+    {
+      "component": "feature.tss_ring3_transition",
+      "capability": "description",
+      "claimed_status": "TSS (Task State Segment) structure, InterruptFrame, UserModeContext for Ring 3 user mode transition via iretq/sysretq",
+      "evidence_exists": true,
+      "verified_level": "qemu-verified"
+    }
+  ]
+}
