@@ -236,6 +236,12 @@ impl SovereignLinuxBsdWikiRoadmapParityEngine {
                 "src/drivers/sovereign_device_driver_development_and_pr_suite.rs",
                 "wiki/31-Device-Driver-Development-And-Maintenance-Plan.md",
             ),
+            (
+                32,
+                "Sovereign Linux & BSD Ecosystem Gap Closure V46 PR Suite",
+                "src/distro/sovereign_linux_bsd_ecosystem_gap_closure_v46_pr.rs",
+                "Linux & BSD Ecosystem Gap Closure V46 PR",
+            ),
         ];
 
         for (id, title, module, _spec) in default_ideas {
@@ -365,8 +371,8 @@ mod tests {
     #[test]
     fn test_wiki_roadmap_parity_engine() {
         let engine = SovereignLinuxBsdWikiRoadmapParityEngine::new();
-        assert_eq!(engine.total_ideas_count, 31);
-        assert_eq!(engine.implemented_ideas_count(), 31);
+        assert_eq!(engine.total_ideas_count, 32);
+        assert_eq!(engine.implemented_ideas_count(), 32);
         assert_eq!(engine.verification_percentage(), 100.0);
     }
 
