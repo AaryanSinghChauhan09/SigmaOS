@@ -23,6 +23,7 @@ pub mod sigmacron;
 pub mod sigmapower;
 pub mod sigmathernal;
 pub mod sigmaacpi;
+pub mod sigmasession;
 pub mod sigmatime;
 pub mod sigmatimer;
 pub mod system_manager;
@@ -125,6 +126,10 @@ pub use sigmathernal::{
 pub use sigmaacpi::{
     SigmaACPI, AcpiEvent, AcpiAction, AcpiEventType, AcpiActionType,
     init_sigmaacpi, get_sigmaacpi, add_acpi_event, register_acpi_action,
+};
+pub use sigmasession::{
+    SigmaSession, UserSession, SessionType, SessionState,
+    init_sigmasession, get_sigmasession, add_user_session,
 };
 pub use power_manager::{
     BatteryInfo, PowerBatteryStatus, PowerConfig, PowerManager, PowerProfile, PowerSource,
