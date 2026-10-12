@@ -83,6 +83,41 @@ export function initKeyboardNavigation() {
 }
 
 /**
+ * Initializes WAI-ARIA toolbar keyboard navigation (ArrowRight, ArrowLeft, Home, End)
+ * for role="toolbar" containers (e.g. desktop dock).
+ */
+export function initToolbarNavigation() {
+  const toolbars = SovereignDomSelector.selectAll('[role="toolbar"]');
+  toolbars.forEach((toolbar) => {
+    toolbar.addEventListener("keydown", (event) => {
+      const items = SovereignDomSelector.selectAll('button, [role="button"], [tabindex]:not([tabindex="-1"])', toolbar).filter(
+        (item) => !item.disabled && item.offsetParent !== null,
+      );
+      if (items.length === 0) return;
+
+      const currentIndex = items.indexOf(document.activeElement);
+      if (currentIndex < 0) return;
+
+      let targetIndex = null;
+      if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+        targetIndex = (currentIndex + 1) % items.length;
+      } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+        targetIndex = (currentIndex - 1 + items.length) % items.length;
+      } else if (event.key === "Home") {
+        targetIndex = 0;
+      } else if (event.key === "End") {
+        targetIndex = items.length - 1;
+      }
+
+      if (targetIndex !== null) {
+        event.preventDefault();
+        items[targetIndex].focus();
+      }
+    });
+  });
+}
+
+/**
  * Initializes WAI-ARIA tablist keyboard navigation (Arrow keys, Home, End) with roving tabindex.
  */
 export function initTablistNavigation() {
@@ -1036,6 +1071,7 @@ if (typeof window !== "undefined" && typeof document !== "undefined") {
     initCommandPalette();
     initEscapeKeyDismissal();
     initDockShortcutNavigation();
+    initToolbarNavigation();
     initMenuNavigation();
     initContextMenu();
     initWindowFocus();
@@ -1282,6 +1318,7 @@ if (typeof window !== "undefined") {
   window.renderCommandResults = renderCommandResults;
   window.initCommandPalette = initCommandPalette;
   window.initWindowFocus = initWindowFocus;
+  window.initToolbarNavigation = initToolbarNavigation;
   window.updateDockAppStates = updateDockAppStates;
   window.showToast = showToast;
 }

@@ -153,7 +153,7 @@ impl AmdgpuDevice {
         }
         
         // Write to sysfs: /sys/class/drm/card0/device/pp_power_profile_mode
-        self.write_sysfs("pp_power_profile_mode", self.get_power_profile_string()).ok();
+        self.write_sysfs("pp_power_profile_mode", &self.get_power_profile_string()).ok();
     }
     
     /// Get power profile string for sysfs
@@ -186,7 +186,7 @@ impl AmdgpuDevice {
         }
         
         // Write to sysfs: /sys/class/drm/card0/device/pp_dpm_sclk
-        self.write_sysfs("pp_dpm_sclk", self.get_perf_level_string()).ok();
+        self.write_sysfs("pp_dpm_sclk", &self.get_perf_level_string()).ok();
     }
     
     /// Get performance level string for sysfs
@@ -267,7 +267,7 @@ impl AmdgpuDevice {
     }
     
     /// Update temperature (called by hardware monitor)
-    pub fn update_temperature(&self, temp: u32) {
+    pub fn update_temperature(&mut self, temp: u32) {
         self.temperature.store(temp, Ordering::Relaxed);
         
         // Thermal throttling
