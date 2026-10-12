@@ -5,12 +5,28 @@
 # Values such as "working" are legacy component statuses; use docs/PROJECT_STATUS.md and
 # the owning wiki page for integration, release blockers, tested configuration, and limitations.
 
+<<<<<<< HEAD
 [kernel.thread_manager]
+status = "unit-tested"
+files = ["docs/thread-manager.md", "src/kernel/thread.rs"]
+description = "Canonical thread lifecycle (New, Ready, Running, Blocked, Suspended, Zombie, Terminated), join/detach, wait channel wakeups, stack guard checks, CpuContext, and ownership contract"
+test_evidence = "Architectural specification in docs/thread-manager.md; 8 unit tests pass via rustc --test src/kernel/thread.rs"
+next_milestone = "Integrate canonical Thread objects into CPU run queue and scheduler dispatch path"
+=======
+[kernel.dispatcher]
 status = "modeled"
-files = ["docs/thread-manager.md"]
+files = ["docs/DISPATCHER_PLAN.md", "wiki/DISPATCHER_PLAN.md"]
+description = "Master Architecture & Support Matrix Plan for SigmaOS dispatcher: boundary definition between scheduler, context-switch, interrupt handling, and deferred work; 8 invariants, 16-PR roadmap, periodic maintenance cadences, component rules, PR template, and merge gates."
+test_evidence = "Architecture specification published in docs/DISPATCHER_PLAN.md and wiki/DISPATCHER_PLAN.md"
+next_milestone = "PR 1: Define scheduler-dispatcher-IRQ boundaries & PR 2: Context-frame layout and invariant tests"
+
+[kernel.thread_manager]
+status = "unit-tested"
+files = ["src/kernel/thread.rs", "docs/thread-manager.md"]
 description = "Canonical thread lifecycle (New, Ready, Running, Blocked, Suspended, Zombie, Terminated), join/detach, wait channel wakeups, stack guard checks, and ownership contract"
-test_evidence = "Architectural specification and subsystem contract defined in docs/thread-manager.md; implementation pending"
-next_milestone = "Implement canonical Thread object and lifecycle unit tests"
+test_evidence = "Unit tests pass via rustc --test src/kernel/thread.rs (8 passed: lifecycle transitions, wait channel wake, join/detach, lock order tracker, stack guard bounds)"
+next_milestone = "Scheduler run-queue integration and preemption context switch test harness"
+>>>>>>> origin/main
 
 [arch.x86_64]
 status = "partial"
@@ -105,14 +121,14 @@ next_milestone = "Process spawning via execve and service dependency enforcement
 
 [kernel.process_manager]
 status = "modeled"
-files = ["src/kernel/proc/process_lifecycle.rs", "src/kernel/process.rs", "docs/PROCESS_MANAGER_PLAN.md"]
+files = ["src/kernel/proc/process_lifecycle.rs", "src/kernel/process.rs", "docs/PROCESS_MANAGER_PLAN.md", "wiki/PROCESS_MANAGER_PLAN.md"]
 description = "Kernel process lifecycle, parent/child tracking, child status collection, and orphan reparenting architecture"
 test_evidence = "Process lifecycle state machine unit tests; runtime QEMU user process execution pending"
 next_milestone = "User-mode Ring 3 transition and execve launch path"
 
 [userspace.process_manager]
 status = "modeled"
-files = ["src/userspace/init.rs", "src/userspace/sigma_init.rs", "docs/PROCESS_MANAGER_PLAN.md"]
+files = ["src/userspace/init.rs", "src/userspace/sigma_init.rs", "docs/PROCESS_MANAGER_PLAN.md", "wiki/PROCESS_MANAGER_PLAN.md"]
 description = "Service supervision, declarative dependency validation, bounded restart policies, and graceful stop orchestration"
 test_evidence = "Service dependency state unit tests; end-to-end PID 1 service supervision under QEMU pending"
 next_milestone = "Supervise real user-mode binaries and enforce restart rate limits"
@@ -133,10 +149,10 @@ next_milestone = "Integration with scheduler and VFS for process resource enforc
 
 [userspace.shell]
 status = "prototype"
-files = ["src/userspace/shell.rs"]
-description = "Command parser with echo, pwd, ls builtins"
-test_evidence = "Manual — needs process execution"
-next_milestone = "Pipeline, redirection, job control"
+files = ["src/userspace/shell.rs", "src/shell/sovereign_command_interpreter.rs", "docs/shell/COMMAND_INTERPRETER_PLAN.md", "wiki/34-SigmaOS-Command-Interpreter-Plan.md"]
+description = "Command parser, AST lexer/parser, quote-aware expansion, built-ins, redirections, pipelines, interactive editing, job control, resource limits governor, and 17-PR sequence gateway suite"
+test_evidence = "Standalone unit tests pass via rustc --test src/shell/sovereign_command_interpreter.rs"
+next_milestone = "End-to-end QEMU boot-to-interactive-shell runtime integration"
 
 [tools.system_information]
 status = "partial"
@@ -427,7 +443,65 @@ next_milestone = "ACPI table parsing and QEMU power state integration"
 
 [ipc.handler]
 status = "modeled"
-files = ["src/ipc/", "docs/ipc-handler.md"]
+files = ["src/ipc/", "docs/ipc-handler.md", "wiki/ipc-handler.md"]
 description = "Formally specified, testable IPC handler subsystem covering pipes, FIFOs, UNIX sockets, shared memory, message queues, futexes, event wakeups, signal control plane, FD passing, and access control policies."
-test_evidence = "Architecture specification complete in docs/ipc-handler.md; unit tests pass for futex and signal primitives."
+test_evidence = "Architecture specification complete in docs/ipc-handler.md and wiki/ipc-handler.md; unit tests pass for futex and signal primitives."
 next_milestone = "Phase 2 Core IPC objects and Phase 3 Anonymous Pipes implementation"
+
+<<<<<<< HEAD
+[sync.wait_queue]
+status = "prototype"
+files = ["src/kernel/wait_queue.rs", "docs/PROCESS_SYNCHRONIZATION_PLAN.md"]
+description = "Scheduler-integrated wait queue primitive for sleeping tasks, supporting exclusive/non-exclusive wakeups and timeouts"
+test_evidence = "Unit tests pass via rustc --test src/kernel/wait_queue.rs"
+next_milestone = "EEVDF scheduler enqueue/dequeue task integration"
+
+[sync.spinlock]
+status = "working"
+files = ["src/kernel/sigma_spinlock.rs", "docs/PROCESS_SYNCHRONIZATION_PLAN.md"]
+description = "Bounded ticket spinlock and read/write spinlock for short SMP critical sections"
+test_evidence = "Unit tests pass via rustc --test src/kernel/sigma_spinlock.rs"
+next_milestone = "Per-CPU IRQ-save state validation"
+
+[sync.semaphore]
+status = "prototype"
+files = ["src/kernel/semaphore.rs", "docs/PROCESS_SYNCHRONIZATION_PLAN.md"]
+description = "Counting semaphore with bounded counter, wait/post operations, and multi-semaphore sets"
+test_evidence = "Unit tests pass via rustc --test src/kernel/semaphore.rs"
+next_milestone = "Process-shared unnamed semaphore support in shared memory"
+
+[sync.futex]
+status = "prototype"
+files = ["src/kernel/futex.rs", "src/ipc/futex.rs", "docs/PROCESS_SYNCHRONIZATION_PLAN.md"]
+description = "Fast Userspace Mutex (futex) key hashing, wait/wake queues, requeueing, and priority inheritance state"
+test_evidence = "Unit tests pass via rustc --test src/kernel/futex.rs and src/ipc/futex.rs"
+next_milestone = "User memory physical page resolution and futex wait/wake system call dispatch"
+
+[sync.flock]
+status = "prototype"
+files = ["src/kernel/flock.rs", "docs/PROCESS_SYNCHRONIZATION_PLAN.md"]
+description = "Advisory file locking mechanism with shared/exclusive locks and lock conflict resolution"
+test_evidence = "Unit tests pass via rustc --test src/kernel/flock.rs"
+next_milestone = "VFS file descriptor table integration"
+
+[sync.ipc_primitives]
+status = "prototype"
+files = ["src/kernel/pipe.rs", "src/kernel/eventfd.rs", "docs/PROCESS_SYNCHRONIZATION_PLAN.md"]
+description = "Interprocess synchronization primitives including pipes and eventfd counter/semaphore notifications"
+test_evidence = "Unit tests pass via rustc --test src/kernel/pipe.rs and src/kernel/eventfd.rs"
+next_milestone = "Non-blocking readiness polling and epoll/kqueue event loop binding"
+
+[sync.lockdep]
+status = "prototype"
+files = ["src/kernel/lockdep.rs", "docs/PROCESS_SYNCHRONIZATION_PLAN.md"]
+description = "Runtime lock dependency tracking graph for deadlock and lock ordering detection"
+test_evidence = "Architecture specification published in docs/PROCESS_SYNCHRONIZATION_PLAN.md"
+next_milestone = "Instrument kernel locks with lockdep annotations"
+=======
+[userspace.system_utilities]
+status = "modeled"
+files = ["docs/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md", "wiki/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md"]
+description = "SigmaOS System Utilities Master Architecture, POSIX compatibility baseline, 18-PR roadmap, periodic maintenance framework, and review merge gates"
+test_evidence = "Architectural specification and command contract roadmap published in docs/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md"
+next_milestone = "PR 1: Audit current tools and define compatibility policy; PR 3: Shared CLI contract helpers"
+>>>>>>> origin/main

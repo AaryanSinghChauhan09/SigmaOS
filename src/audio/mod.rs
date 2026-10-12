@@ -20,3 +20,10 @@ pub use podcast::{
 pub mod alsa_ucm;
 pub mod pipewire_server;
 pub mod sigma_audio_router;
+
+pub use crate::media::distro_media_engine::{
+    AlsaMixerElement, AlsaPcmState, AlsaSampleFormat, AlsaSoundEngine, AudioSinkBackend,
+    JackProAudioEngine, JackTransportState, OssDspDevice, OssIoctlCmd, OssSoundEngine,
+    PipeWireEngine, PipeWireNodeState, PulseAudioEngine, PulseAudioSink, SndPcmHwParams,
+    SndioEngine,
+};
