@@ -8474,6 +8474,340 @@ impl SovereignBitrix24OmnichannelCallQueueRouterEngine {
 }
 
 // Placeholder types for compilation
+// ============================================================================
+// ENTERPRISE SUITE SUITE INNOVATIONS V2: GOOGLE, MS, ZOHO, SALESFORCE, ODOO, BITRIX24
+// ============================================================================
+
+/// 1. Sovereign Google Sheets Linear Optimization Solver Engine
+#[derive(Debug, Clone, Default)]
+pub struct SovereignGoogleSheetsSolverOptimizationEngine;
+
+#[derive(Debug, Clone)]
+pub struct LinearConstraint {
+    pub coefficients: Vec<f64>,
+    pub rhs: f64,
+    pub is_less_than_or_equal: bool,
+}
+
+impl SovereignGoogleSheetsSolverOptimizationEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    /// Solves 2D linear optimization max (c1*x + c2*y) subject to upper bound constraints
+    pub fn solve_2d_linear_programming(
+        &self,
+        obj_weights: (f64, f64),
+        constraints: &[LinearConstraint],
+        x_bounds: (f64, f64),
+        y_bounds: (f64, f64),
+        step: f64,
+    ) -> (f64, f64, f64) {
+        let mut best_x = x_bounds.0;
+        let mut best_y = y_bounds.0;
+        let mut max_val = f64::NEG_INFINITY;
+
+        let mut x = x_bounds.0;
+        while x <= x_bounds.1 {
+            let mut y = y_bounds.0;
+            while y <= y_bounds.1 {
+                let mut feasible = true;
+                for c in constraints {
+                    let lhs = c.coefficients.get(0).cloned().unwrap_or(0.0) * x
+                        + c.coefficients.get(1).cloned().unwrap_or(0.0) * y;
+                    if c.is_less_than_or_equal {
+                        if lhs > c.rhs + 1e-6 {
+                            feasible = false;
+                            break;
+                        }
+                    } else if lhs < c.rhs - 1e-6 {
+                        feasible = false;
+                        break;
+                    }
+                }
+
+                if feasible {
+                    let obj = obj_weights.0 * x + obj_weights.1 * y;
+                    if obj > max_val {
+                        max_val = obj;
+                        best_x = x;
+                        best_y = y;
+                    }
+                }
+                y += step;
+            }
+            x += step;
+        }
+
+        if max_val == f64::NEG_INFINITY {
+            (0.0, 0.0, 0.0)
+        } else {
+            (best_x, best_y, max_val)
+        }
+    }
+}
+
+/// 2. Sovereign Microsoft Excel Solver & Scenario Manager Engine
+#[derive(Debug, Clone, Default)]
+pub struct SovereignMicrosoftExcelSolverScenarioManagerEngine;
+
+#[derive(Debug, Clone)]
+pub struct FinancialScenario {
+    pub name: String,
+    pub revenue_growth_rate: f64,
+    pub opex_margin: f64,
+    pub tax_rate: f64,
+}
+
+impl SovereignMicrosoftExcelSolverScenarioManagerEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn evaluate_scenario_net_income(
+        &self,
+        base_revenue: f64,
+        scenario: &FinancialScenario,
+    ) -> f64 {
+        let rev = base_revenue * (1.0 + scenario.revenue_growth_rate);
+        let opex = rev * scenario.opex_margin;
+        let ebt = rev - opex;
+        let tax = if ebt > 0.0 { ebt * scenario.tax_rate } else { 0.0 };
+        ebt - tax
+    }
+
+    pub fn compute_scenario_variance(
+        &self,
+        base_income: f64,
+        scenario_income: f64,
+    ) -> (f64, f64) {
+        let diff = scenario_income - base_income;
+        let pct = if base_income.abs() > 1e-6 {
+            (diff / base_income) * 100.0
+        } else {
+            0.0
+        };
+        (diff, pct)
+    }
+}
+
+/// 3. Sovereign Salesforce CPQ Usage-Based Billing Engine
+#[derive(Debug, Clone, Default)]
+pub struct SovereignSalesforceCpqUsageBasedBillingEngine;
+
+#[derive(Debug, Clone)]
+pub struct UsageTierRule {
+    pub min_units: u64,
+    pub max_units: Option<u64>,
+    pub unit_price: f64,
+}
+
+impl SovereignSalesforceCpqUsageBasedBillingEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn calculate_usage_bill(
+        &self,
+        consumed_units: u64,
+        tiers: &[UsageTierRule],
+        committed_amount: f64,
+    ) -> (f64, f64, f64) {
+        let mut total_rated = 0.0;
+        let mut remaining = consumed_units;
+
+        for tier in tiers {
+            if remaining == 0 {
+                break;
+            }
+            let tier_capacity = match tier.max_units {
+                Some(max_u) => max_u.saturating_sub(tier.min_units),
+                None => u64::MAX,
+            };
+            let units_in_tier = remaining.min(tier_capacity);
+            total_rated += units_in_tier as f64 * tier.unit_price;
+            remaining -= units_in_tier;
+        }
+
+        let overage = (total_rated - committed_amount).max(0.0);
+        let total_due = total_rated.max(committed_amount);
+        (total_rated, overage, total_due)
+    }
+}
+
+/// 4. Sovereign Zoho Books Multi-Entity Intercompany Engine
+#[derive(Debug, Clone, Default)]
+pub struct SovereignZohoBooksMultiEntityIntercompanyEngine;
+
+#[derive(Debug, Clone)]
+pub struct IntercompanyTransfer {
+    pub source_entity: String,
+    pub target_entity: String,
+    pub amount: f64,
+    pub currency: String,
+    pub transfer_type: String,
+}
+
+impl SovereignZohoBooksMultiEntityIntercompanyEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn calculate_elimination_entries(
+        &self,
+        transfers: &[IntercompanyTransfer],
+    ) -> (f64, Vec<(String, String, f64)>) {
+        let mut total_elimination = 0.0;
+        let mut pair_balances: HashMap<(String, String), f64> = HashMap::new();
+
+        for t in transfers {
+            total_elimination += t.amount;
+            let key = (t.source_entity.clone(), t.target_entity.clone());
+            *pair_balances.entry(key).or_insert(0.0) += t.amount;
+        }
+
+        let summary = pair_balances
+            .into_iter()
+            .map(|((s, t), amt)| (s, t, amt))
+            .collect();
+
+        (total_elimination, summary)
+    }
+}
+
+/// 5. Sovereign Odoo Preventive Maintenance Schedule Engine
+#[derive(Debug, Clone, Default)]
+pub struct SovereignOdooPreventiveMaintenanceScheduleEngine;
+
+impl SovereignOdooPreventiveMaintenanceScheduleEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn calculate_mtbf_mttr(
+        &self,
+        total_operating_hours: f64,
+        downtime_hours: f64,
+        breakdown_count: u32,
+    ) -> (f64, f64) {
+        if breakdown_count == 0 {
+            return (total_operating_hours, 0.0);
+        }
+        let mtbf = (total_operating_hours - downtime_hours) / breakdown_count as f64;
+        let mttr = downtime_hours / breakdown_count as f64;
+        (mtbf, mttr)
+    }
+
+    pub fn is_preventive_maintenance_due(
+        &self,
+        last_maintenance_date_days: u64,
+        current_date_days: u64,
+        interval_days: u64,
+    ) -> bool {
+        current_date_days >= last_maintenance_date_days + interval_days
+    }
+}
+
+/// 6. Sovereign Bitrix24 CRM Voice IVR Call Flow Engine
+#[derive(Debug, Clone, Default)]
+pub struct SovereignBitrix24CrmVoiceIvrCallFlowEngine {
+    menu_routes: HashMap<String, String>,
+}
+
+impl SovereignBitrix24CrmVoiceIvrCallFlowEngine {
+    pub fn new() -> Self {
+        Self {
+            menu_routes: HashMap::new(),
+        }
+    }
+
+    pub fn add_route(&mut self, dtmf_key: &str, destination: &str) {
+        self.menu_routes
+            .insert(dtmf_key.to_string(), destination.to_string());
+    }
+
+    pub fn process_dtmf_input(&self, key: &str) -> Option<String> {
+        self.menu_routes.get(key).cloned()
+    }
+}
+
+/// 7. Sovereign Google Workspace Gemini Smart Summary Engine
+#[derive(Debug, Clone, Default)]
+pub struct SovereignGoogleWorkspaceGeminiSmartSummaryEngine;
+
+#[derive(Debug, Clone)]
+pub struct DocumentSummary {
+    pub key_takeaways: Vec<String>,
+    pub action_items: Vec<String>,
+    pub word_count_reduction_pct: f64,
+}
+
+impl SovereignGoogleWorkspaceGeminiSmartSummaryEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn generate_smart_summary(&self, text: &str) -> DocumentSummary {
+        let lines: Vec<&str> = text.lines().map(|l| l.trim()).filter(|l| !l.is_empty()).collect();
+        let mut key_takeaways = Vec::new();
+        let mut action_items = Vec::new();
+
+        for line in &lines {
+            if line.contains("TODO") || line.contains("Action") || line.contains("Assign") {
+                action_items.push(line.to_string());
+            } else if line.len() > 10 {
+                if key_takeaways.len() < 3 {
+                    key_takeaways.push(line.to_string());
+                }
+            }
+        }
+
+        let orig_words = text.split_whitespace().count();
+        let summary_words = key_takeaways.iter().chain(action_items.iter()).map(|s| s.split_whitespace().count()).sum::<usize>();
+        let pct = if orig_words > 0 {
+            ((orig_words as f64 - summary_words as f64) / orig_words as f64) * 100.0
+        } else {
+            0.0
+        };
+
+        DocumentSummary {
+            key_takeaways,
+            action_items,
+            word_count_reduction_pct: pct.max(0.0),
+        }
+    }
+}
+
+/// 8. Sovereign Microsoft Loop Dynamic Canvas Sync Engine
+#[derive(Debug, Clone, Default)]
+pub struct SovereignMicrosoftLoopDynamicCanvasSyncEngine {
+    component_versions: HashMap<String, u64>,
+}
+
+impl SovereignMicrosoftLoopDynamicCanvasSyncEngine {
+    pub fn new() -> Self {
+        Self {
+            component_versions: HashMap::new(),
+        }
+    }
+
+    pub fn update_component(&mut self, comp_id: &str) -> u64 {
+        let entry = self.component_versions.entry(comp_id.to_string()).or_insert(0);
+        *entry += 1;
+        *entry
+    }
+
+    pub fn sync_remote_version(&mut self, comp_id: &str, remote_version: u64) -> bool {
+        let current = self.component_versions.entry(comp_id.to_string()).or_insert(0);
+        if remote_version > *current {
+            *current = remote_version;
+            true
+        } else {
+            false
+        }
+    }
+}
+
 mod sigma_types {
     pub type Result<T> = core::result::Result<T, &'static str>;
 
@@ -11886,5 +12220,83 @@ mod tests_phase2 {
         ];
         let chosen = queue_engine.select_optimal_agent(&agents, "billing");
         assert_eq!(chosen, Some("agent_2".to_string()));
+
+        // 24. Sovereign Google Sheets Linear Optimization Solver Engine
+        let solver = SovereignGoogleSheetsSolverOptimizationEngine::new();
+        let constraints = vec![LinearConstraint {
+            coefficients: vec![1.0, 1.0],
+            rhs: 10.0,
+            is_less_than_or_equal: true,
+        }];
+        let (x, y, obj) = solver.solve_2d_linear_programming((3.0, 5.0), &constraints, (0.0, 10.0), (0.0, 10.0), 1.0);
+        assert!(obj > 0.0);
+        assert!(x + y <= 10.0 + 1e-6);
+
+        // 25. Sovereign Microsoft Excel Solver & Scenario Manager Engine
+        let excel_scenario = SovereignMicrosoftExcelSolverScenarioManagerEngine::new();
+        let scenario = FinancialScenario {
+            name: "Upside".to_string(),
+            revenue_growth_rate: 0.20,
+            opex_margin: 0.50,
+            tax_rate: 0.20,
+        };
+        let net_inc = excel_scenario.evaluate_scenario_net_income(1_000_000.0, &scenario);
+        assert_eq!(net_inc, 480_000.0);
+        let (diff, pct) = excel_scenario.compute_scenario_variance(400_000.0, net_inc);
+        assert_eq!(diff, 80_000.0);
+        assert_eq!(pct, 20.0);
+
+        // 26. Sovereign Salesforce CPQ Usage-Based Billing Engine
+        let cpq_usage = SovereignSalesforceCpqUsageBasedBillingEngine::new();
+        let tiers = vec![
+            UsageTierRule { min_units: 0, max_units: Some(100), unit_price: 2.0 },
+            UsageTierRule { min_units: 100, max_units: None, unit_price: 1.5 },
+        ];
+        let (rated, overage, due) = cpq_usage.calculate_usage_bill(150, &tiers, 250.0);
+        assert_eq!(rated, 275.0);
+        assert_eq!(overage, 25.0);
+        assert_eq!(due, 275.0);
+
+        // 27. Sovereign Zoho Books Multi-Entity Intercompany Engine
+        let intercompany = SovereignZohoBooksMultiEntityIntercompanyEngine::new();
+        let transfers = vec![
+            IntercompanyTransfer {
+                source_entity: "US_HQ".to_string(),
+                target_entity: "EU_Subsidiary".to_string(),
+                amount: 50000.0,
+                currency: "USD".to_string(),
+                transfer_type: "Management Fee".to_string(),
+            },
+        ];
+        let (elim_tot, summary) = intercompany.calculate_elimination_entries(&transfers);
+        assert_eq!(elim_tot, 50000.0);
+        assert_eq!(summary.len(), 1);
+
+        // 28. Sovereign Odoo Preventive Maintenance Schedule Engine
+        let odoo_maint = SovereignOdooPreventiveMaintenanceScheduleEngine::new();
+        let (mtbf, mttr) = odoo_maint.calculate_mtbf_mttr(1000.0, 50.0, 5);
+        assert_eq!(mtbf, 190.0);
+        assert_eq!(mttr, 10.0);
+        assert!(odoo_maint.is_preventive_maintenance_due(100, 131, 30));
+
+        // 29. Sovereign Bitrix24 CRM Voice IVR Call Flow Engine
+        let mut ivr_flow = SovereignBitrix24CrmVoiceIvrCallFlowEngine::new();
+        ivr_flow.add_route("1", "Sales Queue");
+        ivr_flow.add_route("2", "Support Queue");
+        assert_eq!(ivr_flow.process_dtmf_input("1"), Some("Sales Queue".to_string()));
+        assert_eq!(ivr_flow.process_dtmf_input("9"), None);
+
+        // 30. Sovereign Google Workspace Gemini Smart Summary Engine
+        let gemini_summary = SovereignGoogleWorkspaceGeminiSmartSummaryEngine::new();
+        let doc_text = "Key project milestone reached.\nTODO: Submit quarterly financial report.\nReview budget allocations.";
+        let summary_res = gemini_summary.generate_smart_summary(doc_text);
+        assert!(!summary_res.action_items.is_empty());
+
+        // 31. Sovereign Microsoft Loop Dynamic Canvas Sync Engine
+        let mut loop_sync = SovereignMicrosoftLoopDynamicCanvasSyncEngine::new();
+        let v1 = loop_sync.update_component("card_budget");
+        assert_eq!(v1, 1);
+        assert!(loop_sync.sync_remote_version("card_budget", 5));
+        assert!(!loop_sync.sync_remote_version("card_budget", 3));
     }
 }
