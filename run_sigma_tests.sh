@@ -1001,6 +1001,13 @@ if [ -f "src/distro/open_source_os_unimplemented_ideas_pr_suite.rs" ]; then
     ./build/test_open_source_os_unimplemented_ideas_pr_suite
 fi
 
+if [ -f "src/distro/open_source_os_missing_components_v46_pr.rs" ]; then
+    echo "Running Open Source OS Missing Components V46 PR Suite..."
+    mkdir -p build
+    rustc --test src/distro/open_source_os_missing_components_v46_pr.rs --edition=2021 -o build/test_open_source_v46_pr
+    ./build/test_open_source_v46_pr
+fi
+
 if [ -f "src/distro/cachy_linux_missing_components_engine.rs" ]; then
     echo "Running Cachy Linux Missing Components Engine test suite..."
     mkdir -p build

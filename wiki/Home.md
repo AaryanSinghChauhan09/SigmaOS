@@ -18,7 +18,11 @@ Welcome to the **SigmaOS Documentation Wiki**, organized following the [Arch Lin
 | **Hardware & Drivers** | Modern NVMe, AHCI SATA, VirtIO family, PCI/PCIe discovery, CUPS/IPP printing, ACPI/APM power management | [Hardware & Drivers](Hardware-and-Drivers.md) |
 | **Init & System Supervision** | Systemd unit engine, OpenRC runlevels, Void runit supervisor, job control, deterministic boot-to-shell harness | [Init & System Supervision](Init-and-System-Supervision.md) |
 | **Diagnostics & Tracing** | Ftrace dynamic tracer, Perf PMU hardware performance counters, GDB remote serial stub, kernel crash dump, serial console | [Diagnostics & Tracing](Diagnostics-and-Tracing.md) |
+<<<<<<< HEAD
+| **Open Source Ecosystem PR Gateway** | Linux (Landlock, Bcachefs, APK v3, XBPS, Nix/Guix) and BSD (FreeBSD VNET/Capsicum, OpenBSD FineIBT/Unveil, HAMMER2, Qubes Xen) PR deployment | [Open Source Ecosystem PR Gateway](18-Open-Source-Ecosystem-Gap-Closure-PR-Gateway.md) |
+=======
 | **System Utilities & Maintenance** | Master system utilities plan, POSIX baseline, 18-PR roadmap, CLI contract helpers, periodic maintenance runner | [System Utilities](SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md) |
+>>>>>>> origin/main
 | **AI Agent Maintenance Guide** | Supreme architectural invariants, permitted languages (Rust, Zig, Nim only), memory safety, zero-dependency policy | [AI Agent Maintenance Guide](AI-Agent-Maintenance-Guide.md) |
 
 ---
