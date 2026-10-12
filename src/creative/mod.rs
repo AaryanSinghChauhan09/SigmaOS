@@ -9,6 +9,7 @@ pub mod pdfcraft;
 pub mod designcraft;
 pub mod effectcraft;
 pub mod lightcraft;
+pub mod mediacraft;
 pub mod artcraft;
 
 pub use photocraft::{
@@ -61,6 +62,15 @@ pub use lightcraft::{
     ColorMixer, ColorMixerBand, ColorGradingWheel, ThreeWayColorGrading,
     Mask, MaskType, Preset, PhotoMetadata, Photo, Album, Rating, Flag,
     init_lightcraft, get_lightcraft,
+};
+pub use mediacraft::{
+    MediaPlayer, MediaItem, MediaLibrary, Playlist,
+    MediaType, AudioCodec, VideoCodec, ContainerFormat,
+    PlaybackState, RepeatMode, ShuffleMode,
+    AudioTrack, SubtitleTrack, VideoTrack,
+    EqualizerBand, EqualizerPreset, AudioSettings, VideoSettings,
+    StreamProtocol, StreamSource,
+    init_mediacraft, get_mediacraft,
 };
 pub use artcraft::{
     ArtSuite, Project, Workspace,
