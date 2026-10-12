@@ -1,18 +1,38 @@
+[rule.status_honesty]
+requirement = "A component may not be marked complete without runtime or integration evidence."
+enforcement = "CI status audit"
+
+[rule.test_minimum]
+requirement = "Every new public function has at least one positive and one failure-path test."
+enforcement = "PR checklist + code review"
+
+[rule.no_silent_failure]
+requirement = "Errors must be typed, logged where appropriate, and propagated or explicitly handled."
+enforcement = "Clippy + review"
+
+[rule.no_unbounded_allocation]
+requirement = "Kernel and no_std paths must document allocation limits and OOM behavior."
+enforcement = "Review + targeted tests"
+
+[rule.api_stability]
+requirement = "Public kernel/userspace APIs require an ADR and compatibility note."
+enforcement = "PR label + review"
+
+[rule.security_review]
+requirement = "Privilege, syscall, filesystem, network, crypto, and driver changes require security review."
+enforcement = "CODEOWNERS + PR label"
+
+[rule.documentation]
+requirement = "Every component has purpose, interface, limitations, tests, and status."
+enforcement = "Docs lint + review"
+
+[rule.no_claim_without_evidence]
+requirement = "README, FEATURE_STATUS, and CAPABILITY_MATRIX claims must cite a test, log, or issue."
+enforcement = "Status audit"
+
 [rule.boot_first]
 requirement = "Boot-affecting changes must include or preserve a boot-to-shell validation path."
 enforcement = "CI + review"
-
-[rule.no_model_only_completion]
-requirement = "A subsystem cannot be marked complete from model tests alone."
-enforcement = "Status audit"
-
-[rule.syscall_contract]
-requirement = "Every syscall defines validation, capability, error, restart, and compatibility behavior."
-enforcement = "Syscall table test + review"
-
-[rule.memory_safety]
-requirement = "Allocation, ownership, locking, and interrupt-context rules must be explicit."
-enforcement = "Review + tests"
 
 [rule.driver_evidence]
 requirement = "Driver support claims require hardware or emulator evidence."
@@ -25,11 +45,3 @@ enforcement = "CI fuzz smoke"
 [rule.panic_discipline]
 requirement = "Panics are allowed only for unrecoverable invariant violations and must produce diagnostics."
 enforcement = "Review"
-
-[rule.security_review]
-requirement = "Privilege, syscall, crypto, driver, filesystem, and network changes require security review."
-enforcement = "CODEOWNERS + label"
-
-[rule.status_evidence]
-requirement = "FEATURE_STATUS and CAPABILITY_MATRIX changes require linked evidence."
-enforcement = "CI + review"
