@@ -1,11 +1,8 @@
 // Linux-inspired shared memory for IPC
 // Provides shared memory segments for inter-process communication
 
-#![no_std]
-
-extern crate alloc;
-use alloc::collections::HashMap;
-use alloc::sync::{Arc, Mutex};
+use std::collections::HashMap;
+use std::sync::{Arc, Mutex};
 
 /// Shared memory permissions
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

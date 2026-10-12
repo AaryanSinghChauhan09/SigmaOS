@@ -1,6 +1,9 @@
 //! Standalone Interrupt Manager Integration & Unit Tests
 
-use sigmaos::io::{
+#[path = "../../src/io/mod.rs"]
+pub mod io;
+
+use io::{
     HandlerMode, InterruptError, InterruptManager, InterruptPriority,
 };
 

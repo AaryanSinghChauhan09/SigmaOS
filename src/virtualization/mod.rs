@@ -33,3 +33,6 @@ pub use vendor_hardware::{
     AmdVmcbExecutionBlock, IntelVmcsExecutionState, MultiVendorVirtualizationEngine,
     NvidiaVgpuMediatedInstance, VirtualizationVendorType,
 };
+
+pub mod sovereign_virtualization_and_containers_pr;
+pub use sovereign_virtualization_and_containers_pr::*;
