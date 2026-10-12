@@ -479,6 +479,23 @@ pub use weather_app::{
     WeatherCondition, TemperatureUnit, WindDirection,
     init_weather_app, get_weather_app,
 };
+pub use media_player::{
+    MediaPlayer, MediaItem, Playlist, AudioTrack, SubtitleTrack, VideoTrack,
+    PlaybackState, RepeatMode, ShuffleMode, EqualizerBand,
+    init_media_player, get_media_player,
+};
+pub use disk_usage_analyzer::{
+    DiskUsageAnalyzer, FileSystemEntry, ScanResult,
+    init_disk_usage_analyzer, get_disk_usage_analyzer,
+};
+pub use system_cleaner::{
+    SystemCleaner, CleanerOption, CleanerCategory, CleanResult,
+    init_system_cleaner, get_system_cleaner,
+};
+pub use color_picker::{
+    ColorPicker, Color, Palette, ColorFormat,
+    init_color_picker, get_color_picker,
+};
 pub mod webapp_manager;
 pub use webapp_manager::*;
 pub mod appstore;
@@ -509,6 +526,10 @@ pub mod screenshot_tool;
 pub mod clipboard_manager;
 pub mod notes_app;
 pub mod weather_app;
+pub mod media_player;
+pub mod disk_usage_analyzer;
+pub mod system_cleaner;
+pub mod color_picker;
 pub mod text_scaling;
 pub mod universal_desktop_framework;
 pub mod volume_manager;
