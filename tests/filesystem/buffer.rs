@@ -1,6 +1,9 @@
 //! Standalone Buffer Cache Integration & Unit Tests
 
-use sigmaos::fs::{BufferCache, BufferError, BufferState};
+#[path = "../../src/fs/buffer.rs"]
+pub mod buffer;
+
+use buffer::{BufferCache, BufferError, BufferState};
 
 #[test]
 fn test_buffer_cache_allocation_and_lru() {
