@@ -46,6 +46,9 @@ pub use designcraft::{
 };
 pub use effectcraft::{
     EffectEngine, Effect as EffectCraftEffect, Parameter,
+    BlendMode, EffectCategory, ParameterType,
+    Keyframe, InterpolationType, AnimatedParameter,
+    EffectInstance, NodeType, CompositingNode, NodeGraph,
     init_effectcraft, get_effectcraft,
 };
 pub use lightcraft::{
