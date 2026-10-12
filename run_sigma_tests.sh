@@ -1199,6 +1199,13 @@ if [ -f "src/drivers/sovereign_device_driver_development_and_pr_suite.rs" ]; the
 fi
 
 <<<<<<< HEAD
+if [ -f "src/userland/system_utilities.rs" ]; then
+    echo "Running System Utilities Architecture & Registry Framework test suite..."
+    mkdir -p build
+    rustc --test src/userland/system_utilities.rs --edition=2021 -o build/test_system_utilities
+    ./build/test_system_utilities
+=======
+<<<<<<< HEAD
 if [ -f "src/productivity/sovereign_application_replacements_pr_suite.rs" ]; then
     echo "Running Sovereign Application Replacements PR Suite..."
     mkdir -p build
@@ -1231,6 +1238,7 @@ if [ -f "src/distro/sovereign_open_source_os_apex_inspirations_v50.rs" ]; then
     mkdir -p build
     rustc --test src/distro/sovereign_open_source_os_apex_inspirations_v50.rs --edition=2021 -o build/test_apex_v50
     ./build/test_apex_v50
+>>>>>>> origin/main
 >>>>>>> origin/main
 >>>>>>> origin/main
 >>>>>>> origin/main
