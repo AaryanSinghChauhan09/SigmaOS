@@ -14,7 +14,11 @@ fi
 if [ -f "tests/io/interrupt.rs" ]; then
     echo "Running Interrupt Manager test suite..."
     mkdir -p build
-    rustc --test tests/io/interrupt.rs --edition=2021 -o build/test_io_interrupt --extern sigmaos=target/debug/libsigmaos.rlib 2>/dev/null || rustc --test tests/io/interrupt.rs --edition=2021 --crate-type bin -o build/test_io_interrupt --extern sigmaos=target/debug/libsigmaos.rlib || true
+    rustc --test tests/io/interrupt.rs --edition=2021 -o build/test_io_interrupt && ./build/test_io_interrupt
+    rustc --test tests/io/dma.rs --edition=2021 -o build/test_io_dma && ./build/test_io_dma
+    rustc --test tests/filesystem/buffer.rs --edition=2021 -o build/test_fs_buffer && ./build/test_fs_buffer
+    rustc --test tests/io/scheduler.rs --edition=2021 -o build/test_io_scheduler && ./build/test_io_scheduler
+    rustc --test tests/io/callback.rs --edition=2021 -o build/test_io_callback && ./build/test_io_callback
 fi
 
 if [ -f "./algorithm_and_components_inspection_tests" ]; then
