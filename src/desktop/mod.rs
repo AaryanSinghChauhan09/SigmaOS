@@ -386,6 +386,11 @@ pub mod mint_desktop;
 pub mod mint_software_store;
 pub mod mint_update_manager;
 pub mod notification;
+pub mod sigmanotify;
+pub use sigmanotify::{
+    SigmaNotify, Notification as SystemNotification, NotificationUrgency, NotificationCategory,
+    init_sigmanotify, get_sigmanotify, show_notification,
+};
 pub mod omarchy_dynamic_workspace_suite;
 pub use omarchy_dynamic_workspace_suite::*;
 pub mod dev_workspace;
