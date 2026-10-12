@@ -661,6 +661,13 @@ if [ -f "src/drivers/sovereign_distro_driver_suite.rs" ]; then
     ./build/test_sovereign_distro_driver_suite
 fi
 
+if [ -f "src/tools/sovereign_localization_and_misc_libraries_pr_suite.rs" ]; then
+    echo "Running Sovereign Localization and Misc Libraries PR Suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/tools/sovereign_localization_and_misc_libraries_pr_suite.rs -o build/sovereign_localization_misc_test
+    ./build/sovereign_localization_misc_test
+fi
+
 if [ -f "src/tools/tech_media_innovations.rs" ]; then
     echo "Running Sovereign Tech Media Innovations test suite..."
     mkdir -p build
