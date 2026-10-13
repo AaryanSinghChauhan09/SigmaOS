@@ -5,10 +5,13 @@ pub mod network_config;
 pub mod network_namespace;
 pub mod network_syscalls;
 pub mod socket;
+pub mod sovereign_network_development_and_pr_suite;
 pub mod sovereign_tcpip_stack;
 pub mod stack;
 pub mod tcp_ip_implementation;
 pub mod torrent;
+
+pub use sovereign_network_development_and_pr_suite::*;
 
 pub use linux_bsd_network_innovations::{
     BbrState, CongestionAlgorithm, FreeBsdNetgraphGraphRouter, LinuxBbrCongestionEngine,

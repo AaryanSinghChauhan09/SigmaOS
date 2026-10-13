@@ -70,15 +70,13 @@ wiki_repo/
 *.md
 *.txt
 *.py
-WIKI/
 !.github/PULL_REQUEST_TEMPLATE.md
 !docs/*.md
 !docs/**/*.md
 !wiki/*.md
-<<<<<<< HEAD
 !wiki/**/*.md
-=======
->>>>>>> origin/main
+!WIKI/*.md
+!WIKI/**/*.md
 !Agents/*.md
 !.agents/*.md
 !.agents/**/*.md
