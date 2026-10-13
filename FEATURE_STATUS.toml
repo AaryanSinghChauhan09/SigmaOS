@@ -5,14 +5,6 @@
 # Values such as "working" are legacy component statuses; use docs/PROJECT_STATUS.md and
 # the owning wiki page for integration, release blockers, tested configuration, and limitations.
 
-<<<<<<< HEAD
-[kernel.thread_manager]
-status = "unit-tested"
-files = ["docs/thread-manager.md", "src/kernel/thread.rs"]
-description = "Canonical thread lifecycle (New, Ready, Running, Blocked, Suspended, Zombie, Terminated), join/detach, wait channel wakeups, stack guard checks, CpuContext, and ownership contract"
-test_evidence = "Architectural specification in docs/thread-manager.md; 8 unit tests pass via rustc --test src/kernel/thread.rs"
-next_milestone = "Integrate canonical Thread objects into CPU run queue and scheduler dispatch path"
-=======
 [kernel.dispatcher]
 status = "modeled"
 files = ["docs/DISPATCHER_PLAN.md", "wiki/DISPATCHER_PLAN.md"]
@@ -23,10 +15,9 @@ next_milestone = "PR 1: Define scheduler-dispatcher-IRQ boundaries & PR 2: Conte
 [kernel.thread_manager]
 status = "unit-tested"
 files = ["src/kernel/thread.rs", "docs/thread-manager.md"]
-description = "Canonical thread lifecycle (New, Ready, Running, Blocked, Suspended, Zombie, Terminated), join/detach, wait channel wakeups, stack guard checks, and ownership contract"
-test_evidence = "Unit tests pass via rustc --test src/kernel/thread.rs (8 passed: lifecycle transitions, wait channel wake, join/detach, lock order tracker, stack guard bounds)"
-next_milestone = "Scheduler run-queue integration and preemption context switch test harness"
->>>>>>> origin/main
+description = "Canonical thread lifecycle (New, Ready, Running, Blocked, Suspended, Zombie, Terminated), join/detach, wait channel wakeups, stack guard checks, CpuContext, and ownership contract"
+test_evidence = "Architectural specification in docs/thread-manager.md; 8 unit tests pass via rustc --test src/kernel/thread.rs"
+next_milestone = "Integrate canonical Thread objects into CPU run queue and scheduler dispatch path"
 
 [arch.x86_64]
 status = "partial"
@@ -448,7 +439,6 @@ description = "Formally specified, testable IPC handler subsystem covering pipes
 test_evidence = "Architecture specification complete in docs/ipc-handler.md and wiki/ipc-handler.md; unit tests pass for futex and signal primitives."
 next_milestone = "Phase 2 Core IPC objects and Phase 3 Anonymous Pipes implementation"
 
-<<<<<<< HEAD
 [sync.wait_queue]
 status = "prototype"
 files = ["src/kernel/wait_queue.rs", "docs/PROCESS_SYNCHRONIZATION_PLAN.md"]
@@ -497,11 +487,17 @@ files = ["src/kernel/lockdep.rs", "docs/PROCESS_SYNCHRONIZATION_PLAN.md"]
 description = "Runtime lock dependency tracking graph for deadlock and lock ordering detection"
 test_evidence = "Architecture specification published in docs/PROCESS_SYNCHRONIZATION_PLAN.md"
 next_milestone = "Instrument kernel locks with lockdep annotations"
-=======
+
 [userspace.system_utilities]
 status = "modeled"
 files = ["docs/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md", "wiki/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md"]
 description = "SigmaOS System Utilities Master Architecture, POSIX compatibility baseline, 18-PR roadmap, periodic maintenance framework, and review merge gates"
 test_evidence = "Architectural specification and command contract roadmap published in docs/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md"
 next_milestone = "PR 1: Audit current tools and define compatibility policy; PR 3: Shared CLI contract helpers"
->>>>>>> origin/main
+
+[userspace.system_apps]
+status = "modeled"
+files = ["docs/SYSTEM_APPS_DEVELOPMENT_PLAN.md", "wiki/32-System-Apps-Development-Plan.md", "src/system_apps/sovereign_system_apps_development_and_pr_suite.rs"]
+description = "User-facing and administrative system applications architecture, application catalog, manifest parser, typed service client, init lifecycle coordinator, diagnostics provider, and 18-PR gateway sequence"
+test_evidence = "Architectural specification published in docs/SYSTEM_APPS_DEVELOPMENT_PLAN.md; 6 unit tests pass via rustc --test src/system_apps/sovereign_system_apps_development_and_pr_suite.rs"
+next_milestone = "Connect service manager to real process spawning and launch path"
