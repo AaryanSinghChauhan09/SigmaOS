@@ -7,6 +7,7 @@ pub mod filmcraft;
 pub mod vectorcraft;
 pub mod pdfcraft;
 pub mod designcraft;
+pub mod designcraft_missing_components_parity_pr;
 pub mod effectcraft;
 pub mod lightcraft;
 pub mod mediacraft;
@@ -51,6 +52,16 @@ pub use designcraft::{
     Guide, GuideOrientation, Grid,
     Component, Style, StyleType, ExportFormat as DesignExportFormat, Artboard,
     init_designcraft, get_designcraft,
+};
+pub use designcraft_missing_components_parity_pr::{
+    DesigncraftPrCategory, DesigncraftPrProposalSpec,
+    DesigncraftInteractivePrototypingPrEngine,
+    DesigncraftAutoLayoutFlexEngine,
+    DesigncraftDesignSystemVariablesEngine,
+    DesigncraftVectorGeometryEngine,
+    DesigncraftMultiplayerCrdtEngine,
+    DesigncraftCodeExportEngine,
+    SovereignDesigncraftArtcraftParityPrGateway,
 };
 pub use effectcraft::{
     EffectEngine, Effect as EffectCraftEffect, Parameter,
