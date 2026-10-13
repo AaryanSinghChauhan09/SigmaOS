@@ -51,6 +51,7 @@ pub mod sigmadb;
 pub mod sigmamq;
 pub mod sigmacache;
 pub mod sigmanic;
+pub mod sigmastorage;
 pub mod sigmatime;
 pub mod sigmatimer;
 pub mod system_manager;
@@ -265,6 +266,10 @@ pub use sigmacache::{
 pub use sigmanic::{
     SigmaNIC, NetworkInterface, InterfaceState,
     init_sigmanic, get_sigmanic, bring_up_interface,
+};
+pub use sigmastorage::{
+    SigmaStorage, StorageVolume, VolumeState,
+    init_sigmastorage, get_sigmastorage, mount_storage_volume,
 };
 pub use power_manager::{
     BatteryInfo, PowerBatteryStatus, PowerConfig, PowerManager, PowerProfile, PowerSource,
