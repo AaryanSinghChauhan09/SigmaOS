@@ -32,6 +32,27 @@ pub enum UniversalSubsystemCategory {
     SystemAudit,
     AiWorkflowAgent,
     VirtualizationHypervisor,
+    ProcessActivity,
+    MemoryVirtualization,
+    TimeSynchronization,
+    SignalDelivery,
+    DeviceHotplug,
+    CryptographySecurity,
+    TelemetryObservability,
+    AccessibilityInput,
+    StorageDrive,
+    BluetoothWireless,
+    ThermalCooling,
+    PrintingSpooler,
+    RecoveryBackup,
+    RemoteAccess,
+    ProductivityApplications,
+    DatabaseEmbedded,
+    RoboticsHardware,
+    RealTimeExtension,
+    UserlandPersona,
+    FirmwareMicrocode,
+    NetworkSecurityFirewall,
 }
 
 impl UniversalSubsystemCategory {
@@ -60,6 +81,27 @@ impl UniversalSubsystemCategory {
             Self::SystemAudit => "SystemAudit",
             Self::AiWorkflowAgent => "AiWorkflowAgent",
             Self::VirtualizationHypervisor => "VirtualizationHypervisor",
+            Self::ProcessActivity => "ProcessActivity",
+            Self::MemoryVirtualization => "MemoryVirtualization",
+            Self::TimeSynchronization => "TimeSynchronization",
+            Self::SignalDelivery => "SignalDelivery",
+            Self::DeviceHotplug => "DeviceHotplug",
+            Self::CryptographySecurity => "CryptographySecurity",
+            Self::TelemetryObservability => "TelemetryObservability",
+            Self::AccessibilityInput => "AccessibilityInput",
+            Self::StorageDrive => "StorageDrive",
+            Self::BluetoothWireless => "BluetoothWireless",
+            Self::ThermalCooling => "ThermalCooling",
+            Self::PrintingSpooler => "PrintingSpooler",
+            Self::RecoveryBackup => "RecoveryBackup",
+            Self::RemoteAccess => "RemoteAccess",
+            Self::ProductivityApplications => "ProductivityApplications",
+            Self::DatabaseEmbedded => "DatabaseEmbedded",
+            Self::RoboticsHardware => "RoboticsHardware",
+            Self::RealTimeExtension => "RealTimeExtension",
+            Self::UserlandPersona => "UserlandPersona",
+            Self::FirmwareMicrocode => "FirmwareMicrocode",
+            Self::NetworkSecurityFirewall => "NetworkSecurityFirewall",
         }
     }
 }
@@ -489,6 +531,237 @@ impl SovereignUniversalSubsystemInteropEngine {
                     "firecracker_vm",
                 ],
                 7,
+            ),
+        );
+
+        self.register_subsystem(
+            "storage_drive",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::StorageDrive,
+                true,
+                true,
+                &["nvme_express", "ahci_sata", "virtio_blk", "nvme_pqc_encryption"],
+                8,
+            ),
+        );
+
+        self.register_subsystem(
+            "bluetooth",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::BluetoothWireless,
+                true,
+                true,
+                &["bluez_hci", "netbsd_bluetooth", "iwlwifi_mesh"],
+                5,
+            ),
+        );
+
+        self.register_subsystem(
+            "thermal",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::ThermalCooling,
+                true,
+                true,
+                &["intel_dptf", "amd_energy", "hwmon_cooling_fan"],
+                4,
+            ),
+        );
+
+        self.register_subsystem(
+            "printing",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::PrintingSpooler,
+                true,
+                true,
+                &["cups_ipp", "openbsd_lpd", "sane_scanner"],
+                6,
+            ),
+        );
+
+        self.register_subsystem(
+            "recovery",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::RecoveryBackup,
+                true,
+                true,
+                &["timeshift_btrfs", "freebsd_bectl", "zfs_send_recv"],
+                7,
+            ),
+        );
+
+        self.register_subsystem(
+            "remote_access",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::RemoteAccess,
+                true,
+                true,
+                &["openssh_pqc", "dropbear", "mosh_udp", "rdp_freerdp"],
+                6,
+            ),
+        );
+
+        self.register_subsystem(
+            "productivity",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::ProductivityApplications,
+                true,
+                true,
+                &["libreoffice_wasm", "xed_editor", "hypnotix_tv"],
+                8,
+            ),
+        );
+
+        self.register_subsystem(
+            "database",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::DatabaseEmbedded,
+                true,
+                true,
+                &["sqlite_vfs", "haiku_bfs_attr_sql", "lmdb_zero_copy"],
+                5,
+            ),
+        );
+
+        self.register_subsystem(
+            "robotics",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::RoboticsHardware,
+                true,
+                true,
+                &["ros2_realtime", "can_bus_socket", "ethercat_master"],
+                4,
+            ),
+        );
+
+        self.register_subsystem(
+            "realtime",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::RealTimeExtension,
+                true,
+                true,
+                &["preempt_rt", "nuttx_task_sched", "xenomai_cobalt"],
+                6,
+            ),
+        );
+
+        self.register_subsystem(
+            "userland_persona",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::UserlandPersona,
+                true,
+                true,
+                &["glibc_abi", "musl_apk", "freebsd_brand_sysvec", "openbsd_syscall"],
+                10,
+            ),
+        );
+
+        self.register_subsystem(
+            "firmware",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::FirmwareMicrocode,
+                true,
+                true,
+                &["fwupd_uefi", "intel_microcode", "amd_ucode", "open_silicon_pqc"],
+                5,
+            ),
+        );
+
+        self.register_subsystem(
+            "firewall",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::NetworkSecurityFirewall,
+                true,
+                true,
+                &["openbsd_pf", "nftables_bpf", "freebsd_ipfw", "netfilter_conntrack"],
+                7,
+            ),
+        );
+
+        self.register_subsystem(
+            "process_activity",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::ProcessActivity,
+                true,
+                true,
+                &["pidfd_signals", "cgroupv2_tasks", "procdesc_pdfork"],
+                8,
+            ),
+        );
+
+        self.register_subsystem(
+            "memory_virt",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::MemoryVirtualization,
+                true,
+                true,
+                &["damon_reclaim", "cxl_photonic_mesh", "zram_zstd", "mglru_pages"],
+                9,
+            ),
+        );
+
+        self.register_subsystem(
+            "time_sync",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::TimeSynchronization,
+                true,
+                true,
+                &["chrony_ntp", "ptp_hardware_clock", "microsecond_solar_clock"],
+                4,
+            ),
+        );
+
+        self.register_subsystem(
+            "signal_delivery",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::SignalDelivery,
+                true,
+                true,
+                &["realtime_sigqueue", "sigreturn_frame_guard", "uncatchable_bypass"],
+                5,
+            ),
+        );
+
+        self.register_subsystem(
+            "device_hotplug",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::DeviceHotplug,
+                true,
+                true,
+                &["udev_devd_bridge", "xhci_hotplug", "evdev_multitouch"],
+                6,
+            ),
+        );
+
+        self.register_subsystem(
+            "crypto_sec",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::CryptographySecurity,
+                true,
+                true,
+                &["pqc_dilithium", "falcon_1024", "kyber_1024", "luks2_geli"],
+                7,
+            ),
+        );
+
+        self.register_subsystem(
+            "telemetry_obs",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::TelemetryObservability,
+                true,
+                true,
+                &["prometheus_exporter", "privacy_telemetry_filter", "crashdump_pstore"],
+                6,
+            ),
+        );
+
+        self.register_subsystem(
+            "accessibility_input",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::AccessibilityInput,
+                true,
+                true,
+                &["orca_screenreader", "fcitx5_ime", "libinput_gestures", "braille_display"],
+                5,
             ),
         );
     }
