@@ -62,6 +62,7 @@ pub mod sigmamkfs;
 pub mod sigmamount;
 pub mod sigmaquota;
 pub mod sigmacrypto;
+pub mod sigmasnapshot;
 pub mod sigmatime;
 pub mod sigmatimer;
 pub mod system_manager;
@@ -321,6 +322,10 @@ pub use sigmaquota::{
 pub use sigmacrypto::{
     SigmaCrypto, EncryptedVolume, EncryptionKey, EncryptionType, EncryptionState,
     init_sigmacrypto, get_sigmacrypto, add_encryption_key,
+};
+pub use sigmasnapshot::{
+    SigmaSnapshot, Snapshot, SnapshotPolicy, SnapshotType, SnapshotState, SnapshotSchedule,
+    init_sigmasnapshot, get_sigmasnapshot, add_snapshot, restore_snapshot,
 };
 pub use power_manager::{
     BatteryInfo, PowerBatteryStatus, PowerConfig, PowerManager, PowerProfile, PowerSource,
