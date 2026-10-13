@@ -270,7 +270,9 @@ pub fn validate_env_key(key: &[u8]) -> Result<(), ValidationError> {
     Ok(())
 }
 
-/// Validate an environment variable value (no NUL; length-bounded).
+/// Validate an environment variable value (no NUL; length-bounded; no harmful ASCII control characters).
+/// Rejects non-whitespace ASCII control characters (`b < 32` except `\t`, `\n`, `\r`) and DEL (`127`)
+/// to prevent CWE-150 terminal escape sequence hijacking and environment injection.
 pub fn validate_env_value(val: &[u8]) -> Result<(), ValidationError> {
     if val.len() > MAX_ENV_VAR_LEN {
         return Err(ValidationError::TooLong);
@@ -278,6 +280,9 @@ pub fn validate_env_value(val: &[u8]) -> Result<(), ValidationError> {
     for &b in val {
         if b == 0 {
             return Err(ValidationError::NullByte);
+        }
+        if (b < 32 && b != b'\t' && b != b'\n' && b != b'\r') || b == 127 {
+            return Err(ValidationError::InvalidChars);
         }
     }
     Ok(())
@@ -747,6 +752,39 @@ mod tests {
         assert_eq!(validate_env_key(b""), Err(ValidationError::EmptyInput));
         let long_key = [b'A'; MAX_ENV_KEY_LEN + 1];
         assert_eq!(validate_env_key(&long_key), Err(ValidationError::TooLong));
+    }
+
+    #[test]
+    fn test_env_value_validation() {
+        assert_eq!(validate_env_value(b"/usr/bin:/bin"), Ok(()));
+        assert_eq!(validate_env_value(b"hello\nworld"), Ok(()));
+        assert_eq!(validate_env_value(b"tab\tspace value"), Ok(()));
+        assert_eq!(validate_env_value(b"crlf\r\nvalue"), Ok(()));
+        assert_eq!(validate_env_value(b""), Ok(()));
+
+        // Reject embedded NUL byte
+        assert_eq!(
+            validate_env_value(&[b'v', b'a', 0, b'l']),
+            Err(ValidationError::NullByte)
+        );
+
+        // Reject ASCII control characters
+        assert_eq!(
+            validate_env_value(b"val\x1b[31mue"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_env_value(b"val\x07ue"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_env_value(b"val\x7fue"),
+            Err(ValidationError::InvalidChars)
+        );
+
+        // Reject over-length value
+        let long_val = [b'a'; MAX_ENV_VAR_LEN + 1];
+        assert_eq!(validate_env_value(&long_val), Err(ValidationError::TooLong));
     }
 
     #[test]
