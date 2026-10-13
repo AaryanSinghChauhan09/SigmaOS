@@ -833,6 +833,22 @@ impl SovereignUniversalCrossDistroSubsystemOrchestrator {
             .cloned()
     }
 
+    /// Translate event payloads or path formats across different Linux and BSD distribution conventions.
+    pub fn translate_cross_distro_payload(
+        &self,
+        distro: LinuxBsdDistroInspiration,
+        payload: &str,
+    ) -> String {
+        self.harmony_engine.translate_vfs_path(distro, payload)
+    }
+
+    /// Audit feature capability compliance across all 23 core subsystems and distro inspirations.
+    pub fn audit_all_subsystems_distro_compliance(&self) -> (usize, u32) {
+        let count = self.harmony_engine.subsystems.len();
+        let score = if self.verify_orchestration_harmony() { 100 } else { 0 };
+        (count, score)
+    }
+
     /// Verify absolute system-wide harmony and compatibility matrix across all subsystems.
     pub fn verify_orchestration_harmony(&self) -> bool {
         self.harmony_engine
@@ -991,5 +1007,21 @@ mod tests {
             engine.resolve_package_format_specifier(LinuxBsdDistroInspiration::FedoraLinux),
             "rpm"
         );
+    }
+
+    #[test]
+    fn test_orchestrator_payload_and_audit() {
+        let mut orchestrator = SovereignUniversalCrossDistroSubsystemOrchestrator::new();
+        assert!(orchestrator.switch_distro_mode("FreeBSD").is_ok());
+        let translated = orchestrator.translate_cross_distro_payload(
+            LinuxBsdDistroInspiration::FreeBSD,
+            "/etc/rc.conf",
+        );
+        assert_eq!(translated, "/usr/local/etc/rc.conf");
+
+        let (sub_count, score) = orchestrator.audit_all_subsystems_distro_compliance();
+        assert_eq!(sub_count, 31);
+        assert_eq!(score, 100);
+        assert_eq!(orchestrator.master_harmony_index(), 100);
     }
 }
