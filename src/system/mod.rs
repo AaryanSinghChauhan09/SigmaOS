@@ -36,6 +36,7 @@ pub mod sigmaresource;
 pub mod sigmaconfig;
 pub mod sigmait;
 pub mod sigmaevent;
+pub mod sigmaswap;
 pub mod sigmatime;
 pub mod sigmatimer;
 pub mod system_manager;
@@ -190,6 +191,10 @@ pub use sigmait::{
 pub use sigmaevent::{
     SigmaEvent, SystemEvent, EventType, EventAction,
     init_sigmaevent, get_sigmaevent, emit_system_event,
+};
+pub use sigmaswap::{
+    SigmaSwap, SwapSpace, SwapPriority, SwapState,
+    init_sigmaswap, get_sigmaswap, activate_swap_space,
 };
 pub use power_manager::{
     BatteryInfo, PowerBatteryStatus, PowerConfig, PowerManager, PowerProfile, PowerSource,
