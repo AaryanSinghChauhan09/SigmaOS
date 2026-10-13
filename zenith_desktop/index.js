@@ -295,6 +295,7 @@ export function renderCommandResults(query = "") {
     noResults.style.color = "var(--text-muted)";
     noResults.style.fontSize = "0.85rem";
     noResults.setAttribute("role", "status");
+    noResults.setAttribute("aria-live", "polite");
     noResults.textContent = "No matching commands found";
     resultsContainer.appendChild(noResults);
     activeCommandIndex = -1;
@@ -330,6 +331,19 @@ export function renderCommandResults(query = "") {
       badge.textContent = cmd.shortcut;
       btn.appendChild(badge);
     }
+
+    btn.addEventListener("mouseenter", () => {
+      activeCommandIndex = idx;
+      const options = SovereignDomSelector.selectAll('[role="option"]', resultsContainer);
+      options.forEach((opt, optIdx) => {
+        const isSel = optIdx === activeCommandIndex;
+        opt.classList.toggle("selected", isSel);
+        opt.setAttribute("aria-selected", isSel ? "true" : "false");
+      });
+      if (cmdInput) {
+        cmdInput.setAttribute("aria-activedescendant", `cmd-option-${activeCommandIndex}`);
+      }
+    });
 
     btn.addEventListener("click", () => {
       cmd.action();

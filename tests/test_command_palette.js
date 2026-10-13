@@ -39,7 +39,24 @@ function createMockElement(id, tag = "div") {
     getAttribute(k) { return this.attributes[k]; },
     hasAttribute(k) { return k in this.attributes; },
     removeAttribute(k) { delete this.attributes[k]; },
+    get firstChild() { return this.children[0] || null; },
+    removeChild(child) {
+      const idx = this.children.indexOf(child);
+      if (idx >= 0) this.children.splice(idx, 1);
+    },
     appendChild(child) { this.children.push(child); },
+    querySelectorAll(selector) {
+      const results = [];
+      const matchSelector = (node) => {
+        if (selector === '[role="option"]' && node.role === "option") results.push(node);
+        else if (selector.startsWith('.') && node.classList && node.classList.contains(selector.slice(1))) results.push(node);
+        else if (selector.startsWith('#') && node.id === selector.slice(1)) results.push(node);
+        else if (selector === node.tag) results.push(node);
+        if (node.children) node.children.forEach(matchSelector);
+      };
+      this.children.forEach(matchSelector);
+      return results;
+    },
     addEventListener(event, fn) {
       if (!this.listeners[event]) this.listeners[event] = [];
       this.listeners[event].push(fn);
@@ -95,11 +112,24 @@ assert.strictEqual(filtered.length, 1, "Expected 1 matching command for 'termina
 assert.strictEqual(filtered[0].name.includes("Terminal"), true, "Matched command name should contain 'Terminal'");
 assert.strictEqual(cmdInputEl.getAttribute("aria-activedescendant"), "cmd-option-0", "Expected aria-activedescendant to point to 'cmd-option-0'");
 
-// Test 3: No results handling clears aria-activedescendant
+// Test 3: No results handling clears aria-activedescendant and sets aria-live
 const noResults = zenith.renderCommandResults("nonexistent_command_query_123");
 console.log(`✓ Nonexistent query returned empty list: ${noResults.length}`);
 assert.strictEqual(noResults.length, 0, "Expected 0 matching commands");
 assert.strictEqual(cmdInputEl.getAttribute("aria-activedescendant"), undefined, "Expected aria-activedescendant to be removed when no results");
+assert.strictEqual(cmdResultsEl.children[0].getAttribute("aria-live"), "polite", "Expected no-results status to have aria-live='polite'");
+
+// Test 3b: Mouseenter on command option item synchronizes activeCommandIndex, aria-selected, and aria-activedescendant
+zenith.renderCommandResults("");
+assert.strictEqual(cmdInputEl.getAttribute("aria-activedescendant"), "cmd-option-0", "Initial active descendant is option 0");
+const option2El = cmdResultsEl.children[2];
+option2El.dispatchEvent({ type: "mouseenter" });
+assert.strictEqual(cmdInputEl.getAttribute("aria-activedescendant"), "cmd-option-2", "Expected mouseenter on option 2 to update aria-activedescendant to 'cmd-option-2'");
+assert.strictEqual(option2El.getAttribute("aria-selected"), "true", "Expected hovered option 2 to have aria-selected='true'");
+assert.strictEqual(cmdResultsEl.children[0].getAttribute("aria-selected"), "false", "Expected unhovered option 0 to have aria-selected='false'");
+// Reset option selection to 0
+cmdResultsEl.children[0].dispatchEvent({ type: "mouseenter" });
+console.log("✓ Mouse hover option selection and ARIA active descendant synchronization verified successfully!");
 
 // Test 4: closeCommandPalette resets aria-expanded and initCommandPalette sets aria-haspopup
 zenith.initCommandPalette();
