@@ -59,6 +59,7 @@ pub mod sigmaraid;
 pub mod sigmafsck;
 pub mod sigmaparted;
 pub mod sigmamkfs;
+pub mod sigmamount;
 pub mod sigmatime;
 pub mod sigmatimer;
 pub mod system_manager;
@@ -306,6 +307,10 @@ pub use sigmaparted::{
 pub use sigmamkfs::{
     SigmaMkfs, Filesystem, FilesystemConfig, FilesystemState,
     init_sigmamkfs, get_sigmamkfs, create_filesystem,
+};
+pub use sigmamount::{
+    SigmaMount, MountEntry, MountState, MountOption,
+    init_sigmamount, get_sigmamount, add_mount_entry,
 };
 pub use power_manager::{
     BatteryInfo, PowerBatteryStatus, PowerConfig, PowerManager, PowerProfile, PowerSource,
