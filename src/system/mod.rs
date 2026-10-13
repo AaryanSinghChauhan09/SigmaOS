@@ -67,6 +67,7 @@ pub mod sigmafsmon;
 pub mod sigmadefrag;
 pub mod sigmatrim;
 pub mod sigmascheduledfsck;
+pub mod sigmanfs;
 pub mod sigmatime;
 pub mod sigmatimer;
 pub mod system_manager;
@@ -346,6 +347,10 @@ pub use sigmatrim::{
 pub use sigmascheduledfsck::{
     SigmaScheduledFSCK, FSCKScheduleTarget, ScheduledCheckRecord, FSCKSchedulePolicy, ScheduledCheckStatus,
     init_sigmascheduledfsck, get_sigmascheduledfsck, is_fsck_due, execute_scheduled_fsck,
+};
+pub use sigmanfs::{
+    SigmaNFS, NFSExport, NFSMount, NFSVersion, NFSConnectionState, NFSExportAccess, RootSquashPolicy,
+    init_sigmanfs, get_sigmanfs, mount_nfs, export_nfs_share,
 };
 pub use power_manager::{
     BatteryInfo, PowerBatteryStatus, PowerConfig, PowerManager, PowerProfile, PowerSource,
