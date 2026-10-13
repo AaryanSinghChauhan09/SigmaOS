@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 // Comprehensive Verification Test Suite for .MD Files & GitHub Wiki Unimplemented Ideas Parity
 
+extern crate alloc;
+
 #[path = "../src/sovereign_wiki_master_engine.rs"]
 mod sovereign_wiki_master_engine;
 
