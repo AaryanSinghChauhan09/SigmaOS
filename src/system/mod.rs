@@ -39,6 +39,7 @@ pub mod sigmaevent;
 pub mod sigmaswap;
 pub mod sigmaprocess;
 pub mod sigmafs;
+pub mod sigmadns;
 pub mod sigmatime;
 pub mod sigmatimer;
 pub mod system_manager;
@@ -205,6 +206,10 @@ pub use sigmaprocess::{
 pub use sigmafs::{
     SigmaFS, FsMount, FsType, MountState,
     init_sigmafs, get_sigmafs, mount_filesystem,
+};
+pub use sigmadns::{
+    SigmaDNS, DnsServer, DnsCacheEntry, DnsRecordType, ResolverState,
+    init_sigmadns, get_sigmadns, activate_dns_server,
 };
 pub use power_manager::{
     BatteryInfo, PowerBatteryStatus, PowerConfig, PowerManager, PowerProfile, PowerSource,
