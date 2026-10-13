@@ -64,6 +64,7 @@ pub mod sigmaquota;
 pub mod sigmacrypto;
 pub mod sigmasnapshot;
 pub mod sigmafsmon;
+pub mod sigmadefrag;
 pub mod sigmatime;
 pub mod sigmatimer;
 pub mod system_manager;
@@ -331,6 +332,10 @@ pub use sigmasnapshot::{
 pub use sigmafsmon::{
     SigmaFSMon, FSWatch, FSMetrics, FSEvent, FSAlert, FSEventType, FSMonState, AlertSeverity,
     init_sigmafsmon, get_sigmafsmon, add_fs_watch, record_fs_event,
+};
+pub use sigmadefrag::{
+    SigmaDefrag, DefragJob, FragmentationReport, DefragMode, DefragStatus,
+    init_sigmadefrag, get_sigmadefrag, start_defrag_job, get_defrag_status,
 };
 pub use power_manager::{
     BatteryInfo, PowerBatteryStatus, PowerConfig, PowerManager, PowerProfile, PowerSource,
