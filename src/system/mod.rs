@@ -56,6 +56,7 @@ pub mod sigmahwmon;
 pub mod sigmadevice;
 pub mod sigmalvm;
 pub mod sigmaraid;
+pub mod sigmafsck;
 pub mod sigmatime;
 pub mod sigmatimer;
 pub mod system_manager;
@@ -291,6 +292,10 @@ pub use sigmalvm::{
 pub use sigmaraid::{
     SigmaRAID, RAIDArray, RAIDDevice, RAIDLevel, RAIDState, RAIDDeviceState,
     init_sigmaraid, get_sigmaraid, create_raid_array,
+};
+pub use sigmafsck::{
+    SigmaFSCK, FilesystemError, CheckResult, FilesystemType, CheckMode, ErrorSeverity,
+    init_sigmafsck, get_sigmafsck, check_filesystem,
 };
 pub use power_manager::{
     BatteryInfo, PowerBatteryStatus, PowerConfig, PowerManager, PowerProfile, PowerSource,
