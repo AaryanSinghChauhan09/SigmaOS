@@ -1177,6 +1177,13 @@ if [ -f "src/distro/debian_github_repo_inspirations_pr.rs" ]; then
     ./build/test_debian_pr
 fi
 
+if [ -f "src/graphics/sovereign_graphics_display_pr_suite.rs" ]; then
+    echo "Running Sovereign Graphics & Display Subsystem PR Suite..."
+    mkdir -p build
+    rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/graphics/sovereign_graphics_display_pr_suite.rs -o build/test_graphics_pr_suite
+    ./build/test_graphics_pr_suite
+fi
+
 if [ -f "src/signal/sovereign_signal_development_and_pr_suite.rs" ]; then
     echo "Running Sovereign Signal Development and Parity PR Suite..."
     mkdir -p build

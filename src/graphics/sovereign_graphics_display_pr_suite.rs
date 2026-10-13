@@ -31,10 +31,32 @@ use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
 
+#[path = "bsd_graphics.rs"]
+mod bsd_graphics;
+#[path = "compositor.rs"]
+mod compositor;
+#[path = "drm_kms.rs"]
+mod drm_kms;
+#[path = "vulkan_api.rs"]
+mod vulkan_api;
+
+#[cfg(not(feature = "standalone_test"))]
 use super::bsd_graphics::FreeBsdWsconsFbEngine;
+#[cfg(not(feature = "standalone_test"))]
 use super::compositor::{CompositorCapability, SimpleCompositor};
+#[cfg(not(feature = "standalone_test"))]
 use super::drm_kms::{DrmKmsDevice, DrmNodeType};
+#[cfg(not(feature = "standalone_test"))]
 use super::vulkan_api::VulkanInstance;
+
+#[cfg(feature = "standalone_test")]
+use bsd_graphics::FreeBsdWsconsFbEngine;
+#[cfg(feature = "standalone_test")]
+use compositor::{CompositorCapability, SimpleCompositor};
+#[cfg(feature = "standalone_test")]
+use drm_kms::{DrmKmsDevice, DrmNodeType};
+#[cfg(feature = "standalone_test")]
+use vulkan_api::VulkanInstance;
 
 // =========================================================================
 // 1. PR ENUMS AND DATA STRUCTURES FOR GRAPHICS & DISPLAY SUBSYSTEM
