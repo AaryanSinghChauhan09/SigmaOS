@@ -50,6 +50,7 @@ pub mod sigmamail;
 pub mod sigmadb;
 pub mod sigmamq;
 pub mod sigmacache;
+pub mod sigmanic;
 pub mod sigmatime;
 pub mod sigmatimer;
 pub mod system_manager;
@@ -260,6 +261,10 @@ pub use sigmamq::{
 pub use sigmacache::{
     SigmaCache, CacheEntry, CacheEntryState,
     init_sigmacache, get_sigmacache, set_cache_entry,
+};
+pub use sigmanic::{
+    SigmaNIC, NetworkInterface, InterfaceState,
+    init_sigmanic, get_sigmanic, bring_up_interface,
 };
 pub use power_manager::{
     BatteryInfo, PowerBatteryStatus, PowerConfig, PowerManager, PowerProfile, PowerSource,
