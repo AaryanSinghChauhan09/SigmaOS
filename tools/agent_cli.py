@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 """
-<<<<<<< HEAD
 SigmaOS Agent CLI Runner
 Selects tasks from .agents/tasks/, executes runbook checks, parses success criteria,
 and produces structured evidence report artifacts.
@@ -127,7 +126,6 @@ def main():
     else:
         list_open_tasks()
 
-=======
 tools/agent_cli.py - SigmaOS Distro-Maintainer Agent CLI
 
 Selects, executes, and records structured agent tasks following the 9-stage lifecycle:
@@ -276,7 +274,6 @@ def main():
         print("Steps:")
         for idx, step in enumerate(task.get('steps', []), 1):
             print(f"  {idx}. {step}")
->>>>>>> origin/main
 
 if __name__ == "__main__":
     main()

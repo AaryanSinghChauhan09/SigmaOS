@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # SigmaOS Agent Registry and Operating Model
 
 [version]
@@ -74,7 +73,6 @@ allowed_tools = ["read_file", "write_file", "replace_with_git_merge_diff", "list
 permissions = { fs_read = true, fs_write_docs = true, code_write = false, network = false }
 recurring_cadence = "weekly"
 definition_of_done = "Documentation strictly reflects current QEMU-verified evidence without unverified claims."
-=======
 # SigmaOS Agent Registry
 # Defines agent roles, ownership boundaries, scopes, permissions, and report locations.
 
@@ -277,4 +275,3 @@ permissions = [
 ]
 reports = ["reports/capability/verified_today.md"]
 requires_human_approval = ["readme_architecture_redefinition"]
->>>>>>> origin/main

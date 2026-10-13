@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 """
-<<<<<<< HEAD
 SigmaOS Boot Matrix Tool
 Manages QEMU boot targets (x86_64, ARM64), captures serial console logs,
 records boot durations, and classifies boot failure points.
@@ -84,7 +83,6 @@ def main():
 
 if __name__ == "__main__":
     main()
-=======
 tools/boot_matrix.py - QEMU Boot Matrix & Serial Log Parser
 
 Tracks QEMU boot attempts, parses serial output logs, classifies failure points,
@@ -166,4 +164,3 @@ def update_boot_matrix(target="qemu-x86_64", status="PASS", stage_results=None):
 
 if __name__ == "__main__":
     update_boot_matrix()
->>>>>>> origin/main

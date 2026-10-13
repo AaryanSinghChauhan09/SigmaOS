@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Runbook: Capability Audit
 
 ## Purpose
@@ -16,7 +15,6 @@ Audit `CAPABILITY_MATRIX.toml`, `FEATURE_STATUS.toml`, and README claims against
    - `hardware-verified`: Verified on physical hardware
    - `blocked`: Known dependency blocker
 5. Output `reports/capability/truth_table.json` and update `reports/capability/verified_today.md`.
-=======
 # Runbook: Capability Auditor (`capability-audit`)
 
 ## Purpose
@@ -34,4 +32,3 @@ Prevent "aspirational completion" by validating every claim in `README.md`, `CAP
 4. Generate Evidence Outputs:
    - Update `reports/capability/truth_table.json` containing complete mapping of claim -> evidence link -> status.
    - Update `reports/capability/verified_today.md` formatted as a markdown dashboard.
->>>>>>> origin/main

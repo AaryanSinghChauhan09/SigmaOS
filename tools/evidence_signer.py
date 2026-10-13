@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 """
-<<<<<<< HEAD
 SigmaOS Evidence Signer Tool
 Generates SHA256 checksum manifests and attestation metadata for reports and evidence bundles.
 """
@@ -60,7 +59,6 @@ def main():
 
 if __name__ == "__main__":
     main()
-=======
 tools/evidence_signer.py - SHA256 Evidence Attestation Signer
 
 Generates cryptographic verification digests (SHA256) for agent execution outputs,
@@ -110,4 +108,3 @@ def sign_reports():
 
 if __name__ == "__main__":
     sign_reports()
->>>>>>> origin/main

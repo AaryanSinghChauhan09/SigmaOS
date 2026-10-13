@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 [
   {
     "category": "feature",
@@ -177,7 +176,6 @@
     "last_verified": "2026-10-12"
   }
 ]
-=======
 {
   "audit_timestamp": "2026-10-12T05:22:53.110995+00:00",
   "total_claims": 92,
@@ -829,4 +827,3 @@
     }
   ]
 }
->>>>>>> origin/main

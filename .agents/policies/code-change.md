@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Code Change Policy for Agents
 
 ## Rules for Code Modifications
@@ -8,7 +7,6 @@
 3. **Smallest Safe Increment**: Agents must modify the minimum number of lines required to complete a task. Avoid reformatting unrelated files.
 4. **No Interface Breaks**: Subsystem agents must not alter public module traits or cross-subsystem ABI contracts without an explicit integration review.
 5. **Mandatory Tests**: Every new feature or bug fix must include unit tests and regression tests proving correctness.
-=======
 # Code Change Policy for Autonomous Agents
 
 ## 1. Single Ownership & Boundaries
@@ -37,4 +35,3 @@ Branch naming convention:
 - SigmaOS explicitly draws inspiration from Linux, Arch Linux, Linux Mint, Redox, xv6, FreeBSD, and OpenBSD.
 - However, code presence or reference project alignment DOES NOT imply feature parity or bootability in SigmaOS.
 - Claims of parity must be backed by unit, integration, and QEMU runtime evidence.
->>>>>>> origin/main

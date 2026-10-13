@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Runbook: QEMU Boot and Runtime Validator
 
 ## Purpose
@@ -16,7 +15,6 @@ Build bootable ISO/RAM-disk image, launch QEMU x86_64, capture serial console ou
    - "SigmaOS Shell ready"
 4. Record boot duration, panic status, and exit status code.
 5. Generate structured boot JSON: `reports/boot/qemu_x86_64.json`.
-=======
 # Runbook: Boot and Runtime Validator (`qemu-boot`)
 
 ## Purpose
@@ -45,4 +43,3 @@ Prove the primary bootable path (firmware -> bootloader -> kernel -> init -> she
 6. Output reports:
    - Write structured JSON report to `reports/boot/qemu-x86_64.json`
    - Update `reports/boot/boot_matrix.json`
->>>>>>> origin/main

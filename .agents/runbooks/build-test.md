@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Runbook: Build and Test Sentinel
 
 ## Purpose
@@ -12,7 +11,6 @@ Execute repository-wide build checks, standalone module test suites, and generat
 5. Collect test exit codes, duration, and failure excerpts.
 6. Write test manifest to `reports/test/test_manifest.json`.
 7. If failures occur, classify as: compilation_error, test_assertion_failure, script_missing, or timeout.
-=======
 # Runbook: Build and Test Sentinel (`build-test`)
 
 ## Purpose
@@ -36,4 +34,3 @@ Ensure that all code changes undergo clean builds, flaky-test detection, and evi
 - All standard build and test commands exit with code 0.
 - No new flaky tests detected.
 - Verification hash generated and signed in `reports/test/latest.json`.
->>>>>>> origin/main

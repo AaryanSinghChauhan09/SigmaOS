@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 """
-<<<<<<< HEAD
 SigmaOS Capability Auditor Tool
 Cross-references CAPABILITY_MATRIX.toml and FEATURE_STATUS.toml against source code
 and test suites to maintain an evidence-backed truth table.
@@ -116,7 +115,6 @@ def main():
 
 if __name__ == "__main__":
     main()
-=======
 tools/capability_audit.py - Capability Auditor for SigmaOS
 
 Cross-checks CAPABILITY_MATRIX.toml, README.md, and source code against reports in reports/
@@ -193,4 +191,3 @@ def audit_capabilities():
 
 if __name__ == "__main__":
     audit_capabilities()
->>>>>>> origin/main

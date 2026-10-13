@@ -2,7 +2,6 @@ id = "BOOT-X86-001"
 title = "Validate QEMU x86_64 boot-to-shell"
 agent = "boot-runtime-validator"
 priority = "P0"
-<<<<<<< HEAD
 scope = ["installer/", "src/kernel/", "scripts/", "tests/"]
 repeat = "daily"
 
@@ -26,7 +25,6 @@ success = [
 ]
 
 on_failure = "create blocked task with failure classification and serial log excerpt"
-=======
 repeat = "daily"
 scope = ["installer/", "src/kernel/", "scripts/", "tests/"]
 
@@ -56,4 +54,3 @@ success = [
 ]
 
 on_failure = "create blocked task with failing stage and log excerpt"
->>>>>>> origin/main
