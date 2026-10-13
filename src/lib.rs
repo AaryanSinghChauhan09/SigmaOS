@@ -37,6 +37,7 @@ pub mod storage;
 pub use storage::*;
 pub mod system;
 pub use distro::sovereign_linux_bsd_wiki_master_engine::*;
+pub use distro::sovereign_open_source_os_apex_inspirations_v51::*;
 pub mod driver;
 pub mod drivers;
 pub use drivers::sovereign_comprehensive_drivers::*;
