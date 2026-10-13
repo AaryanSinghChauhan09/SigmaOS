@@ -185,7 +185,6 @@ impl Default for LockdepSubsystem {
 }
 
 #[cfg(test)]
-#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -221,17 +220,17 @@ mod tests {
         let mut lockdep = LockdepSubsystem::new();
 
         let id1 = lockdep.register_lock_class("mutex".to_string());
-        let id2 = lockdep.register_lock("rwlock".to_string());
+        let id2 = lockdep.register_lock_class("rwlock".to_string());
 
         assert!(lockdep.add_dependency(id1, id2).is_ok());
     }
 
     #[test]
     fn test_circular_detection() {
-        let mut lockdep = lockdep = LockdepSubsystem::new();
+        let mut lockdep = LockdepSubsystem::new();
 
         let id1 = lockdep.register_lock_class("mutex".to_string());
-        let id2 = lockdep.register_lock("rwlock".to_string());
+        let id2 = lockdep.register_lock_class("rwlock".to_string());
 
         lockdep.add_dependency(id1, id2).unwrap();
         lockdep.add_dependency(id2, id1).unwrap(); // Circular
