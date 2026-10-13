@@ -14,6 +14,7 @@ pub mod audiocraft;
 pub mod vectoranimation;
 pub mod model3d;
 pub mod artcraft;
+pub mod effectcraft_missing_components_parity_pr;
 
 pub use photocraft::{
     PhotoEditor, ImageLayer, Filter, Adjustment, LayerType, LayerMask, AdjustmentType,
@@ -98,4 +99,11 @@ pub use model3d::{
 pub use artcraft::{
     ArtSuite, Project, Workspace,
     init_artcraft, get_artcraft,
+};
+pub use effectcraft_missing_components_parity_pr::{
+    EffectcraftPrProposalManifest, ShaderFilterGraphPrEngine, ParticlePhysicsEffectPrEngine,
+    NeuralMatteSegmentationPrEngine, AudioReactiveVisualizerPrEngine,
+    Spatial3DDepthCompositorPrEngine, ArtCraftOpenFxPluginPrEngine,
+    SovereignEffectcraftArtcraftParityPrGateway, ShaderUniform, CompiledShaderNode,
+    Particle, ParticleEmitter, SegmentationMask, Point3D, OfxParam, OfxPluginDescriptor,
 };
