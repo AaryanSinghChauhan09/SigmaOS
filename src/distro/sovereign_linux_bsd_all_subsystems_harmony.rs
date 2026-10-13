@@ -992,4 +992,70 @@ mod tests {
             "rpm"
         );
     }
+
+    #[test]
+    fn test_all_31_subsystems_interop_matrix() {
+        let engine = SovereignSubsystemDistroHarmonyEngine::new();
+        assert_eq!(engine.subsystems.len(), 31);
+        let all_subsystems = [
+            SigmaOsSubsystem::KernelScheduling,
+            SigmaOsSubsystem::SecuritySandboxing,
+            SigmaOsSubsystem::FilesystemStorage,
+            SigmaOsSubsystem::Networking,
+            SigmaOsSubsystem::PackageManagement,
+            SigmaOsSubsystem::InitSupervisor,
+            SigmaOsSubsystem::DesktopCompositor,
+            SigmaOsSubsystem::AudioSound,
+            SigmaOsSubsystem::HardwarePower,
+            SigmaOsSubsystem::ContainerVirt,
+            SigmaOsSubsystem::ObservabilityDiagnostics,
+            SigmaOsSubsystem::ShellTerminal,
+            SigmaOsSubsystem::IpcMemory,
+            SigmaOsSubsystem::DriversHardware,
+            SigmaOsSubsystem::InstallerBoot,
+            SigmaOsSubsystem::AuthIdentity,
+            SigmaOsSubsystem::I18nLocalization,
+            SigmaOsSubsystem::MediaGraphics,
+            SigmaOsSubsystem::CompilerToolchain,
+            SigmaOsSubsystem::AutomationProvisioning,
+            SigmaOsSubsystem::SystemAudit,
+            SigmaOsSubsystem::AiWorkflowAgent,
+            SigmaOsSubsystem::VirtualizationHypervisor,
+            SigmaOsSubsystem::ProcessActivity,
+            SigmaOsSubsystem::MemoryVirtualization,
+            SigmaOsSubsystem::TimeSynchronization,
+            SigmaOsSubsystem::SignalDelivery,
+            SigmaOsSubsystem::DeviceHotplug,
+            SigmaOsSubsystem::CryptographySecurity,
+            SigmaOsSubsystem::TelemetryObservability,
+            SigmaOsSubsystem::AccessibilityInput,
+        ];
+        for sub in all_subsystems {
+            let spec = engine.subsystems.get(&sub).expect("Subsystem must exist in matrix");
+            assert!(!spec.capabilities.is_empty());
+            assert_eq!(spec.interop_score, 100);
+        }
+    }
+
+    #[test]
+    fn test_orchestrator_cross_subsystem_policy_routing() {
+        let mut orchestrator = SovereignUniversalCrossDistroSubsystemOrchestrator::new();
+        assert_eq!(orchestrator.master_harmony_index(), 100);
+        let event_id = orchestrator.route_harmony_event(
+            SigmaOsSubsystem::ProcessActivity,
+            SigmaOsSubsystem::TelemetryObservability,
+            "LOG_RUSAGE",
+            "pid=1001",
+        );
+        assert_eq!(event_id, 1);
+
+        let policy = orchestrator
+            .translate_cross_subsystem_policy(
+                SigmaOsSubsystem::DriversHardware,
+                SigmaOsSubsystem::KernelScheduling,
+            )
+            .expect("NetBSD driver policy should exist");
+        assert_eq!(policy.policy_id, "pol_netbsd_rump_drivers");
+        assert!(policy.enforce_strict_isolation);
+    }
 }
