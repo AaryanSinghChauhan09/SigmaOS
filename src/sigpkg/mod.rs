@@ -89,6 +89,7 @@ pub use crate::package::sovereign_distro_package_advancements_v3::*;
 pub use crate::package::sovereign_distro_package_advancements_v30::*;
 pub use crate::package::sovereign_distro_package_advancements_v31::*;
 pub use crate::package::sovereign_distro_package_advancements_v33::*;
+pub use crate::package::sovereign_distro_package_advancements_v37::*;
 pub use crate::package::sovereign_distro_package_advancements_v4::*;
 pub use crate::package::sovereign_distro_package_advancements_v5::*;
 pub use crate::package::sovereign_distro_package_advancements_v6::*;
@@ -152,6 +153,10 @@ pub use sovereign_distro_package_advancements_v33::*;
 #[path = "../package/sovereign_distro_package_advancements_v34.rs"]
 pub mod sovereign_distro_package_advancements_v34;
 pub use sovereign_distro_package_advancements_v34::*;
+
+#[path = "../package/sovereign_distro_package_advancements_v37.rs"]
+pub mod sovereign_distro_package_advancements_v37;
+pub use sovereign_distro_package_advancements_v37::*;
 
 #[path = "../package/bsd_linux_package_innovations.rs"]
 pub mod bsd_linux_package_innovations;
