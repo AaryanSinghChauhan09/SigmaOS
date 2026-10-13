@@ -152,6 +152,18 @@ impl GccClangLlvmToolchainPrEngine {
         flags
     }
 
+    pub fn generate_lld_map_file(&self, binary_name: &str) -> String {
+        format!(
+            "# LLD Linker Map File for {}\n\
+             # Parallel Section Merging & Symbol Allocation\n\
+             .text           0x0000000000400000       0x1000\n\
+             .rodata         0x0000000000401000        0x500\n\
+             .data           0x0000000000402000        0x200\n\
+             .bss            0x0000000000402200        0x100\n",
+            binary_name
+        )
+    }
+
     pub fn generate_binutils_flags(&self) -> Vec<String> {
         vec![
             "--enable-deterministic-archives".to_string(),
@@ -274,6 +286,16 @@ impl BuildSystemsPkgConfigPrEngine {
              cpu = '{}'\n\
              endian = 'little'\n",
             self.sysroot_prefix, target_triple
+        )
+    }
+
+    pub fn generate_autotools_m4_cache(&self, package_name: &str) -> String {
+        format!(
+            "# Autotools Pre-compiled m4 Macro Cache for {}\n\
+             m4_define([AC_SIGMAOS_SYSROOT], [{}])\n\
+             m4_define([AC_SIGMAOS_HOST], [x86_64-sigmaos])\n\
+             m4_include([/usr/share/aclocal/pkg.m4])\n",
+            package_name, self.sysroot_prefix
         )
     }
 
@@ -626,6 +648,10 @@ mod tests {
         let clang_flags = engine.generate_clang_flags();
         assert!(clang_flags.contains(&"-flto=thin".to_string()));
 
+        let map_file = engine.generate_lld_map_file("kernel.elf");
+        assert!(map_file.contains("kernel.elf"));
+        assert!(map_file.contains(".text"));
+
         let profile = engine.evaluate_compilation_profile(1_000_000);
         assert!(profile.estimated_optimized_size_bytes < 1_000_000);
         assert!(profile.hardening_active);
@@ -643,6 +669,10 @@ mod tests {
 
         let meson_cross = engine.generate_meson_cross_file("x86_64-sigmaos");
         assert!(meson_cross.contains("[host_machine]"));
+
+        let m4_cache = engine.generate_autotools_m4_cache("coreutils");
+        assert!(m4_cache.contains("coreutils"));
+        assert!(m4_cache.contains("AC_SIGMAOS_SYSROOT"));
 
         let graph = "build main.o: cc main.c\nbuild app: ld main.o";
         let nodes = engine.parse_ninja_build_graph(graph);
