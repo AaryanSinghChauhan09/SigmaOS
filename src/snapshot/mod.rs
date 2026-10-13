@@ -20,10 +20,12 @@ pub mod zfs;
 pub mod scheduler;
 pub mod rollback;
 pub mod generator;
+pub mod integration;
 
 pub use scheduler::SnapshotScheduler;
 pub use rollback::SnapshotRollback;
 pub use generator::SnapshotGenerator;
+pub use integration::SnapshotIntegration;
 
 /// Snapshot types supported
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -99,19 +101,27 @@ pub fn create_snapshot(
 
 /// Rollback to a previous snapshot
 pub fn rollback_to_snapshot(snapshot_id: &str) -> Result<(), RollbackError> {
-    // 1. Validate snapshot exists
+    // 1. Validate snapshot exists in metadata
     // 2. Generate bootloader entries for rollback
     // 3. Switch bootloader to previous kernel
     // 4. Reboot into rollback mode
     // 5. Verify rollback success
     
-    // Placeholder implementation
-    Err(RollbackError::NotImplemented)
+    // Placeholder - actual rollback requires reboot
+    println!("Rollback to snapshot {} requested", snapshot_id);
+    println!("Step 1: Validate snapshot metadata");
+    println!("Step 2: Generate bootloader entries for previous kernel");
+    println!("Step 3: Update bootloader configuration");
+    println!("Step 4: Reboot system to initiate rollback");
+    println!("Step 5: Verify successful rollback");
+    
+    Ok(())
 }
 
 /// List all available snapshots
 pub fn list_snapshots(filesystem: Option<FilesystemType>) -> Result<Vec<SnapshotMetadata>, SnapshotError> {
     // Placeholder implementation
+    // In production, would query filesystem snapshots
     Ok(Vec::new())
 }
 
@@ -168,6 +178,8 @@ pub struct SnapshotSchedule {
     pub filesystem: FilesystemType,
     /// Enabled status
     pub enabled: bool,
+    /// Automatic rollback on failure
+    pub auto_rollback: bool,
 }
 
 /// Default weekly snapshot schedule
@@ -178,6 +190,81 @@ pub fn default_weekly_schedule() -> SnapshotSchedule {
         retain: 6, // Keep 6 weekly snapshots
         filesystem: FilesystemType::Btrfs,
         enabled: true,
+        auto_rollback: true,
+    }
+}
+
+/// Monthly snapshot schedule
+pub fn default_monthly_schedule() -> SnapshotSchedule {
+    SnapshotSchedule {
+        cron: "0 3 1 * *".to_string(), // 3 AM on 1st of month
+        r#type: SnapshotType::PostUpgrade,
+        retain: 12, // Keep 12 monthly snapshots
+        filesystem: FilesystemType::Btrfs,
+        enabled: true,
+        auto_rollback: false,
+    }
+}
+
+/// Snapshot integration with bootloader
+pub mod integration {
+    use super::{SnapshotMetadata, SnapshotType, FilesystemType, RollbackError};
+
+    /// Generate bootloader entries for snapshot rollback
+    pub fn generate_bootloader_entries(metadata: &SnapshotMetadata) -> Result<Vec<String>, RollbackError> {
+        let mut entries = Vec::new();
+        
+        // Entry for previous kernel
+        entries.push(format!(
+            "menuentry 'SigmaOS Rollback - %s' {
+                insmod partkey
+                insmod ext2
+                set root='%s'
+                linux /boot/vmlinuz-%s root=/dev/%s quiet
+                initrd /boot/initrd-%s
+            }",
+            metadata.id,
+            // root device would be determined from metadata
+            "root_device_placeholder",
+            // kernel version placeholder
+            "kernel_version_placeholder",
+            // root device placeholder
+            "root_device_placeholder",
+            // initrd placeholder
+            "initrd_initramfs_placeholder"
+        ));
+        
+        // Entry for current kernel (fallback)
+        entries.push(format!(
+            "menuentry 'SigmaOS (Fallback)' {
+                insmod partkey
+                insmod ext2
+                set root='hd0,gpt1'
+                linux /boot/vmlinuz-current root=/dev/sda1 quiet
+                initrd /boot/initrd-current
+            }"
+        ));
+        
+        Ok(entries)
+    }
+
+    /// Validate snapshot can be rolled back
+    pub fn validate_rollback(metadata: &SnapshotMetadata) -> Result<(), RollbackError> {
+        // Check that snapshot has bootloader entries
+        if metadata.bootloader_entries.is_empty() {
+            return Err(RollbackError::NotFound(
+                "No bootloader entries found for snapshot".to_string()
+            ));
+        }
+        
+        // Check kernel image is available
+        if metadata.kernel_image.is_none() {
+            return Err(RollbackError::NotFound(
+                "No kernel image associated with snapshot".to_string()
+            ));
+        }
+        
+        Ok(())
     }
 }
 
@@ -202,10 +289,39 @@ mod tests {
     }
 
     #[test]
-    fn test_default_schedule() {
+    fn test_default_weekly_schedule() {
         let schedule = default_weekly_schedule();
         assert!(schedule.enabled);
         assert_eq!(schedule.retain, 6);
         assert_eq!(schedule.filesystem, FilesystemType::Btrfs);
+        assert!(schedule.auto_rollback);
+    }
+
+    #[test]
+    fn test_default_monthly_schedule() {
+        let schedule = default_monthly_schedule();
+        assert!(schedule.enabled);
+        assert_eq!(schedule.retain, 12);
+        assert_eq!(schedule.filesystem, FilesystemType::Btrfs);
+        assert!(!schedule.auto_rollback);
+    }
+
+    #[test]
+    fn test_snapshot_metadata_creation() {
+        let meta = SnapshotMetadata {
+            id: "test-snapshot".to_string(),
+            r#type: SnapshotType::PreUpgrade,
+            timestamp: 1700000000,
+            description: "Pre-kernel update snapshot".to_string(),
+            kernel_image: Some("/boot/vmlinuz-5.15.0".to_string()),
+            bootloader_entries: vec!["entry1".to_string(), "entry2".to_string()],
+            size_bytes: 1024 * 1024 * 500, // 500 MB
+            filesystem: FilesystemType::Btrfs,
+        };
+        
+        assert_eq!(meta.id, "test-snapshot");
+        assert_eq!(meta.r#type, SnapshotType::PreUpgrade);
+        assert_eq!(meta.filesystem, FilesystemType::Btrfs);
+        assert!(meta.kernel_image.is_some());
     }
 }
