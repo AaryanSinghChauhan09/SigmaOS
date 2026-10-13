@@ -60,6 +60,7 @@ pub mod sigmafsck;
 pub mod sigmaparted;
 pub mod sigmamkfs;
 pub mod sigmamount;
+pub mod sigmaquota;
 pub mod sigmatime;
 pub mod sigmatimer;
 pub mod system_manager;
@@ -311,6 +312,10 @@ pub use sigmamkfs::{
 pub use sigmamount::{
     SigmaMount, MountEntry, MountState, MountOption,
     init_sigmamount, get_sigmamount, add_mount_entry,
+};
+pub use sigmaquota::{
+    SigmaQuota, Quota, QuotaType, QuotaState,
+    init_sigmaquota, get_sigmaquota, add_quota,
 };
 pub use power_manager::{
     BatteryInfo, PowerBatteryStatus, PowerConfig, PowerManager, PowerProfile, PowerSource,
