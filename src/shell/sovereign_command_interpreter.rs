@@ -665,6 +665,13 @@ impl CommandResolverAndExecutorEngine {
                         self.env.set_var("?".to_string(), "0".to_string());
                         Ok(0)
                     }
+                    "ls" => {
+                        let output = ".\n..\nbin\ndev\netc\nusr\n";
+                        self.write_stdout(output.as_bytes(), redirects);
+                        self.last_exit_status = 0;
+                        self.env.set_var("?".to_string(), "0".to_string());
+                        Ok(0)
+                    }
                     "echo" => {
                         let text = expanded_args[1..].join(" ");
                         let output = format!("{}\n", text);
@@ -839,7 +846,7 @@ impl InteractiveLineEditor {
 
     pub fn complete(&self, line: &str) -> Vec<String> {
         let mut candidates = Vec::new();
-        let builtins = ["cd", "pwd", "echo", "export", "unset", "exit", "alias", "unalias", "help"];
+        let builtins = ["cd", "pwd", "ls", "echo", "export", "unset", "exit", "alias", "unalias", "help"];
         for b in builtins {
             if b.starts_with(line) {
                 candidates.push(b.to_string());

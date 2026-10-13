@@ -162,6 +162,17 @@ impl WikiDataTransferEngine {
 
     fn seed_known_feature_md_files(&mut self) {
         self.feature_specs.insert(
+            "CommandInterpreterPlan".to_string(),
+            FeatureMdStatus {
+                spec_name: "34-SigmaOS-Command-Interpreter-Plan.md".to_string(),
+                source_path: "wiki/34-SigmaOS-Command-Interpreter-Plan.md".to_string(),
+                is_fully_implemented: true,
+                completion_percentage: 100,
+                wiki_mirrored: true,
+            },
+        );
+
+        self.feature_specs.insert(
             "UniversalPackageSystem".to_string(),
             FeatureMdStatus {
                 spec_name: "SIGMAOS_UNIVERSAL_PACKAGE_SYSTEM_LINUX_BSD_PARITY_PR_PROPOSAL.md"
@@ -338,6 +349,11 @@ impl WikiDataTransferEngine {
         self.register_spec_file(
             "31-Assembly-Bootstrap-Entry-Advancements-PR.md",
             "Assembly Bootstrap Entry Advancements PR",
+            true,
+        );
+        self.register_spec_file(
+            "34-SigmaOS-Command-Interpreter-Plan.md",
+            "SigmaOS Command Interpreter Plan PR",
             true,
         );
         self.register_spec_file(
