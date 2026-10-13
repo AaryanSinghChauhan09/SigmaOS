@@ -47,13 +47,16 @@ pub use reminders_advanced::{
     EnhancedRemindersEngine, RecurrencePattern, ReminderItem, ReminderPriority,
 };
 pub use sovereign_application_replacements_pr_suite::{
-    BrowserSandboxPolicy, ContainerIsolationLevel, DocumentFileType, EmailSecurityProtocol,
-    FileManagerLayout, LayerBlendMode, OfficeSuiteComponent, SovereignAppPrProposalManifest,
+    BrowserSandboxPolicy, CodecDecodersAvailable, ContainerIsolationLevel, DocumentFileType,
+    EmailSecurityProtocol, EncryptionVaultAlgorithm, FileManagerLayout, LayerBlendMode,
+    OfficeSuiteComponent, SovereignAppPrProposalManifest,
     SovereignApplicationReplacementsPrGateway, SovereignBrowserEnginePrEngine,
     SovereignDocumentViewerPrEngine, SovereignEditorEmulationMode,
     SovereignFileManagerMatrixPrEngine, SovereignLibreOfficeSuitePrEngine,
-    SovereignRasterGraphicsPrEngine, SovereignTextEditorsPrEngine,
-    SovereignThunderbirdEmailPrEngine, VfsMountProtocol,
+    SovereignMediaPlayerAudioStudioPrEngine, SovereignPasswordVaultPassPrEngine,
+    SovereignRasterGraphicsPrEngine, SovereignSystemMonitorProcessPrEngine,
+    SovereignTerminalMultiplexerPrEngine, SovereignTextEditorsPrEngine,
+    SovereignThunderbirdEmailPrEngine, TerminalGraphicsProtocol, VfsMountProtocol,
 };
 pub use sovereign_apps::{
     ProductivityTask, SigmaOfficeDocument, SigmaTasksBoard, SigmaVaultContainer, TaskPriority,
