@@ -38,6 +38,7 @@ pub mod sigmait;
 pub mod sigmaevent;
 pub mod sigmaswap;
 pub mod sigmaprocess;
+pub mod sigmafs;
 pub mod sigmatime;
 pub mod sigmatimer;
 pub mod system_manager;
@@ -200,6 +201,10 @@ pub use sigmaswap::{
 pub use sigmaprocess::{
     SigmaProcess, ProcessInfo, ProcessState, Signal,
     init_sigmaprocess, get_sigmaprocess, send_process_signal,
+};
+pub use sigmafs::{
+    SigmaFS, FsMount, FsType, MountState,
+    init_sigmafs, get_sigmafs, mount_filesystem,
 };
 pub use power_manager::{
     BatteryInfo, PowerBatteryStatus, PowerConfig, PowerManager, PowerProfile, PowerSource,
