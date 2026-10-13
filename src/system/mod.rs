@@ -65,6 +65,7 @@ pub mod sigmacrypto;
 pub mod sigmasnapshot;
 pub mod sigmafsmon;
 pub mod sigmadefrag;
+pub mod sigmatrim;
 pub mod sigmatime;
 pub mod sigmatimer;
 pub mod system_manager;
@@ -336,6 +337,10 @@ pub use sigmafsmon::{
 pub use sigmadefrag::{
     SigmaDefrag, DefragJob, FragmentationReport, DefragMode, DefragStatus,
     init_sigmadefrag, get_sigmadefrag, start_defrag_job, get_defrag_status,
+};
+pub use sigmatrim::{
+    SigmaTRIM, TrimDevice, TrimResult, DiscardRange, DiscardType, TrimMode, TrimStatus,
+    init_sigmatrim, get_sigmatrim, trim_mount, is_trim_supported,
 };
 pub use power_manager::{
     BatteryInfo, PowerBatteryStatus, PowerConfig, PowerManager, PowerProfile, PowerSource,
