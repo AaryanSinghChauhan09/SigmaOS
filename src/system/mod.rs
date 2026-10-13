@@ -66,6 +66,7 @@ pub mod sigmasnapshot;
 pub mod sigmafsmon;
 pub mod sigmadefrag;
 pub mod sigmatrim;
+pub mod sigmascheduledfsck;
 pub mod sigmatime;
 pub mod sigmatimer;
 pub mod system_manager;
@@ -341,6 +342,10 @@ pub use sigmadefrag::{
 pub use sigmatrim::{
     SigmaTRIM, TrimDevice, TrimResult, DiscardRange, DiscardType, TrimMode, TrimStatus,
     init_sigmatrim, get_sigmatrim, trim_mount, is_trim_supported,
+};
+pub use sigmascheduledfsck::{
+    SigmaScheduledFSCK, FSCKScheduleTarget, ScheduledCheckRecord, FSCKSchedulePolicy, ScheduledCheckStatus,
+    init_sigmascheduledfsck, get_sigmascheduledfsck, is_fsck_due, execute_scheduled_fsck,
 };
 pub use power_manager::{
     BatteryInfo, PowerBatteryStatus, PowerConfig, PowerManager, PowerProfile, PowerSource,
