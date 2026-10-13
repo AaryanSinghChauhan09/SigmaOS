@@ -44,6 +44,7 @@ pub mod sigmadhcp;
 pub mod sigmantp;
 pub mod sigmassh;
 pub mod sigmaftp;
+pub mod sigmahttp;
 pub mod sigmatime;
 pub mod sigmatimer;
 pub mod system_manager;
@@ -230,6 +231,10 @@ pub use sigmassh::{
 pub use sigmaftp::{
     SigmaFTP, FtpConnection, FtpConnectionState, FtpTransferMode,
     init_sigmaftp, get_sigmaftp, authenticate_ftp_connection,
+};
+pub use sigmahttp::{
+    SigmaHTTP, HttpConnection, HttpConnectionState, HttpMethod,
+    init_sigmahttp, get_sigmahttp, process_http_request,
 };
 pub use power_manager::{
     BatteryInfo, PowerBatteryStatus, PowerConfig, PowerManager, PowerProfile, PowerSource,
