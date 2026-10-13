@@ -61,6 +61,7 @@ pub mod sigmaparted;
 pub mod sigmamkfs;
 pub mod sigmamount;
 pub mod sigmaquota;
+pub mod sigmacrypto;
 pub mod sigmatime;
 pub mod sigmatimer;
 pub mod system_manager;
@@ -316,6 +317,10 @@ pub use sigmamount::{
 pub use sigmaquota::{
     SigmaQuota, Quota, QuotaType, QuotaState,
     init_sigmaquota, get_sigmaquota, add_quota,
+};
+pub use sigmacrypto::{
+    SigmaCrypto, EncryptedVolume, EncryptionKey, EncryptionType, EncryptionState,
+    init_sigmacrypto, get_sigmacrypto, add_encryption_key,
 };
 pub use power_manager::{
     BatteryInfo, PowerBatteryStatus, PowerConfig, PowerManager, PowerProfile, PowerSource,
