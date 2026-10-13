@@ -63,6 +63,7 @@ pub mod sigmamount;
 pub mod sigmaquota;
 pub mod sigmacrypto;
 pub mod sigmasnapshot;
+pub mod sigmafsmon;
 pub mod sigmatime;
 pub mod sigmatimer;
 pub mod system_manager;
@@ -326,6 +327,10 @@ pub use sigmacrypto::{
 pub use sigmasnapshot::{
     SigmaSnapshot, Snapshot, SnapshotPolicy, SnapshotType, SnapshotState, SnapshotSchedule,
     init_sigmasnapshot, get_sigmasnapshot, add_snapshot, restore_snapshot,
+};
+pub use sigmafsmon::{
+    SigmaFSMon, FSWatch, FSMetrics, FSEvent, FSAlert, FSEventType, FSMonState, AlertSeverity,
+    init_sigmafsmon, get_sigmafsmon, add_fs_watch, record_fs_event,
 };
 pub use power_manager::{
     BatteryInfo, PowerBatteryStatus, PowerConfig, PowerManager, PowerProfile, PowerSource,
