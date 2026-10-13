@@ -592,6 +592,9 @@ pub use sovereign_tech_media_wiki_ultimate_parity_pr::*;
 pub mod sovereign_linux_bsd_lfs_master_harmony;
 pub use sovereign_linux_bsd_lfs_master_harmony::*;
 
+pub mod sovereign_lfs_bsd_pr_gateway;
+pub use sovereign_lfs_bsd_pr_gateway::*;
+
 pub mod bootable_vertical_slices_missing_components_pr;
 pub use bootable_vertical_slices_missing_components_pr::*;
 
