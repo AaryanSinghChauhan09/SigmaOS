@@ -523,6 +523,8 @@ pub mod omarchy_update_pipeline_synthesis;
 pub mod open_source_os_arch_unimplemented_parity_engine;
 pub mod open_source_os_missing_components_v46_pr;
 pub use open_source_os_missing_components_v46_pr::*;
+pub mod sovereign_open_source_os_inspiration_gap_closure_pr_engine;
+pub use sovereign_open_source_os_inspiration_gap_closure_pr_engine::*;
 pub mod open_source_os_unimplemented_ideas_pr;
 pub use open_source_os_unimplemented_ideas_pr::*;
 pub mod open_source_os_unimplemented_ideas_pr_suite;

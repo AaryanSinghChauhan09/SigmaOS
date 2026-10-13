@@ -345,6 +345,11 @@ impl WikiDataTransferEngine {
             "Periodic Study Improve Prove Program PR Proposal",
             true,
         );
+        self.register_spec_file(
+            "32-Open-Source-OS-Inspiration-Gap-Closure-PR-Engine.md",
+            "Open Source OS Inspiration Gap Closure PR Engine Spec",
+            true,
+        );
     }
 
     pub fn register_spec_file(&mut self, filename: &str, title: &str, fully_implemented: bool) {
