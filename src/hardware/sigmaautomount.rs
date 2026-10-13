@@ -301,11 +301,14 @@ impl SigmaAutoMount {
             return errors;
         }
 
-        for (device_id, mount_point) in self.mount_points.iter_mut() {
-            if mount_point.auto_mount && mount_point.status == MountStatus::NotMounted {
-                if let Err(e) = self.mount(device_id, current_time) {
-                    errors.push(e);
-                }
+        let pending_ids: Vec<String> = self.mount_points.iter()
+            .filter(|(_, mp)| mp.auto_mount && mp.status == MountStatus::NotMounted)
+            .map(|(id, _)| id.clone())
+            .collect();
+
+        for device_id in pending_ids {
+            if let Err(e) = self.mount(&device_id, current_time) {
+                errors.push(e);
             }
         }
 
@@ -340,7 +343,7 @@ impl Default for SigmaAutoMount {
 }
 
 /// Global SigmaAutoMount instance (placeholder for actual global state)
-static unsafe mut SIGMAAUTOMOUNT_INSTANCE: Option<SigmaAutoMount> = None;
+static mut SIGMAAUTOMOUNT_INSTANCE: Option<SigmaAutoMount> = None;
 
 /// Initialize the global SigmaAutoMount instance
 pub fn init_sigmaautomount() {

@@ -266,7 +266,7 @@ impl Default for SigmaUpdate {
 }
 
 /// Global SigmaUpdate instance (placeholder for actual global state)
-static unsafe mut SIGMAUPDATE_INSTANCE: Option<SigmaUpdate> = None;
+static mut SIGMAUPDATE_INSTANCE: Option<SigmaUpdate> = None;
 
 /// Initialize the global SigmaUpdate instance
 pub fn init_sigmaupdate() {

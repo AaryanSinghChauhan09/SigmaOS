@@ -133,6 +133,8 @@ pub mod sovereign_distro_package_advancements_v35;
 pub use sovereign_distro_package_advancements_v35::*;
 pub mod sovereign_distro_package_advancements_v36;
 pub use sovereign_distro_package_advancements_v36::*;
+pub mod sovereign_distro_package_advancements_v38;
+pub use sovereign_distro_package_advancements_v38::*;
 pub mod sovereign_universal_multi_distro_pm_gateway;
 pub use sovereign_universal_multi_distro_pm_gateway::*;
 pub mod aptkit;
@@ -224,7 +226,7 @@ pub use repository::{
     PackageTransactionJournal, PinPriority, RepoError, RepositoryManager, RepositoryMetadata,
     TransactionJournalEntry,
 };
-pub use repository_config::{RepoConfig, RepositoryConfigManager};
+pub use repository_config::RepositoryConfigManager;
 pub use store::{
     SigmaSoftwareStore,
     SoftwareRegistryEntry, /* StoreApp, StoreError, */

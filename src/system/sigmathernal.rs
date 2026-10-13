@@ -71,7 +71,7 @@ impl fmt::Display for CoolingDeviceType {
 }
 
 /// Thermal trip point type
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum TripPointType {
     /// Critical trip point
     Critical,
@@ -389,7 +389,7 @@ impl Default for SigmaThermal {
 }
 
 /// Global SigmaThermal instance (placeholder for actual global state)
-static unsafe mut SIGMATHERMAL_INSTANCE: Option<SigmaThermal> = None;
+static mut SIGMATHERMAL_INSTANCE: Option<SigmaThermal> = None;
 
 /// Initialize the global SigmaThermal instance
 pub fn init_sigmathernal() {

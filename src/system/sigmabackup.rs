@@ -277,7 +277,7 @@ impl Default for SigmaBackup {
 }
 
 /// Global SigmaBackup instance (placeholder for actual global state)
-static unsafe mut SIGMABACKUP_INSTANCE: Option<SigmaBackup> = None;
+static mut SIGMABACKUP_INSTANCE: Option<SigmaBackup> = None;
 
 /// Initialize the global SigmaBackup instance
 pub fn init_sigmabackup() {

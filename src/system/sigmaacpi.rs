@@ -14,7 +14,7 @@ use alloc::vec::Vec;
 use core::fmt;
 
 /// ACPI event type
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum AcpiEventType {
     /// Power button pressed
     PowerButton,
@@ -295,7 +295,7 @@ impl Default for SigmaACPI {
 }
 
 /// Global SigmaACPI instance (placeholder for actual global state)
-static unsafe mut SIGMAACPI_INSTANCE: Option<SigmaACPI> = None;
+static mut SIGMAACPI_INSTANCE: Option<SigmaACPI> = None;
 
 /// Initialize the global SigmaACPI instance
 pub fn init_sigmaacpi() {

@@ -14,7 +14,7 @@ use alloc::vec::Vec;
 use core::fmt;
 
 /// Resource type
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum ResourceType {
     /// CPU limit
     Cpu,
@@ -245,7 +245,7 @@ impl Default for SigmaResource {
 }
 
 /// Global SigmaResource instance (placeholder for actual global state)
-static unsafe mut SIGMARESOURCE_INSTANCE: Option<SigmaResource> = None;
+static mut SIGMARESOURCE_INSTANCE: Option<SigmaResource> = None;
 
 /// Initialize the global SigmaResource instance
 pub fn init_sigmaresource() {

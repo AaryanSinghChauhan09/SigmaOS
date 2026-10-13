@@ -246,7 +246,7 @@ impl SigmaBus {
     pub fn bus_stats(&self) -> BTreeMap<String, String> {
         let mut stats = BTreeMap::new();
         stats.insert("endpoints".to_string(), self.endpoint_count().to_string());
-        stats.insert("messages_sent".to_string(), self.message_count.to_string());
+        stats.insert("messages_sent".to_string(), self.message_count().to_string());
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
@@ -259,7 +259,7 @@ impl Default for SigmaBus {
 }
 
 /// Global SigmaBus instance (placeholder for actual global state)
-static unsafe mut SIGMABUS_INSTANCE: Option<SigmaBus> = None;
+static mut SIGMABUS_INSTANCE: Option<SigmaBus> = None;
 
 /// Initialize the global SigmaBus instance
 pub fn init_sigmabus() {
