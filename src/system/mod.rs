@@ -47,6 +47,7 @@ pub mod sigmaftp;
 pub mod sigmahttp;
 pub mod sigmaproxy;
 pub mod sigmamail;
+pub mod sigmadb;
 pub mod sigmatime;
 pub mod sigmatimer;
 pub mod system_manager;
@@ -245,6 +246,10 @@ pub use sigmaproxy::{
 pub use sigmamail::{
     SigmaMail, MailMessage, MailMessageState,
     init_sigmamail, get_sigmamail, send_mail_message,
+};
+pub use sigmadb::{
+    SigmaDB, DbConnection, DbConnectionState,
+    init_sigmadb, get_sigmadb, execute_db_query,
 };
 pub use power_manager::{
     BatteryInfo, PowerBatteryStatus, PowerConfig, PowerManager, PowerProfile, PowerSource,
