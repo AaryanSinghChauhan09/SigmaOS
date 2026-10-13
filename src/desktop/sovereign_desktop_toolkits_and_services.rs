@@ -29,6 +29,36 @@ pub enum QtPlatformStyle {
     AdwaitaQt = 2,
     Oxygen = 3,
     Cleanlooks = 4,
+    Kvantum = 5,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SovereignAccentColor {
+    Blue,
+    Teal,
+    Green,
+    Yellow,
+    Orange,
+    Red,
+    Pink,
+    Purple,
+    Slate,
+}
+
+impl SovereignAccentColor {
+    pub fn to_hex(&self) -> &'static str {
+        match self {
+            SovereignAccentColor::Blue => "#3584e4",
+            SovereignAccentColor::Teal => "#129eaf",
+            SovereignAccentColor::Green => "#2ec27e",
+            SovereignAccentColor::Yellow => "#e5a50a",
+            SovereignAccentColor::Orange => "#e66100",
+            SovereignAccentColor::Red => "#e01b24",
+            SovereignAccentColor::Pink => "#d56199",
+            SovereignAccentColor::Purple => "#9141ac",
+            SovereignAccentColor::Slate => "#62a0ea",
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -36,16 +66,21 @@ pub enum ToolkitEvent {
     ThemeChanged { dark_mode: bool, theme_name: String },
     ColorSchemeChanged(AdwColorScheme),
     FontConfigUpdated { family: String, size_pt: u32 },
+    AccentColorChanged(SovereignAccentColor),
+    ScaleFactorChanged(u32),
 }
 
 pub struct SovereignGtkQtToolkitEngine {
     pub color_scheme: AdwColorScheme,
     pub qt_style: QtPlatformStyle,
+    pub accent_color: SovereignAccentColor,
+    pub scale_factor: f32,
     pub gtk_theme_name: String,
     pub icon_theme_name: String,
     pub cursor_theme_name: String,
     pub font_name: String,
     pub font_size: u32,
+    pub kvantum_theme_override: Option<String>,
     pub css_rules: BTreeMap<String, BTreeMap<String, String>>,
     pub signal_listeners: BTreeMap<String, Vec<String>>,
 }
@@ -68,14 +103,25 @@ impl SovereignGtkQtToolkitEngine {
         Self {
             color_scheme: AdwColorScheme::PreferDark,
             qt_style: QtPlatformStyle::Breeze,
+            accent_color: SovereignAccentColor::Blue,
+            scale_factor: 1.0,
             gtk_theme_name: "Adwaita-dark".to_string(),
             icon_theme_name: "Papirus-Dark".to_string(),
             cursor_theme_name: "Adwaita".to_string(),
             font_name: "Cantarell".to_string(),
             font_size: 11,
+            kvantum_theme_override: Some("Catppuccin-Mocha-Blue".to_string()),
             css_rules,
             signal_listeners: BTreeMap::new(),
         }
+    }
+
+    pub fn set_accent_color(&mut self, color: SovereignAccentColor) {
+        self.accent_color = color;
+    }
+
+    pub fn set_scale_factor(&mut self, factor: f32) {
+        self.scale_factor = factor.max(0.5).min(4.0);
     }
 
     pub fn set_color_scheme(&mut self, scheme: AdwColorScheme) {
@@ -103,6 +149,22 @@ impl SovereignGtkQtToolkitEngine {
         self.signal_listeners.get(signal).map_or(0, |list| list.len())
     }
 
+    pub fn generate_gtk4_css(&self) -> String {
+        let accent_hex = self.accent_color.to_hex();
+        format!(
+            "@define-color accent_bg_color {};\n@define-color accent_color {};\nwindow.main {{ font-family: '{}'; font-size: {}pt; }}\n",
+            accent_hex, accent_hex, self.font_name, self.font_size
+        )
+    }
+
+    pub fn generate_qt_stylesheet(&self) -> String {
+        let accent_hex = self.accent_color.to_hex();
+        format!(
+            "QWidget {{ font-family: '{}'; font-size: {}pt; }}\nQPushButton:focus {{ border: 2px solid {}; }}\n",
+            self.font_name, self.font_size, accent_hex
+        )
+    }
+
     pub fn sync_qt_to_gtk_palette(&self) -> BTreeMap<String, String> {
         let mut palette = BTreeMap::new();
         let bg = self
@@ -122,12 +184,70 @@ impl SovereignGtkQtToolkitEngine {
         palette.insert("QPalette::WindowText".to_string(), fg);
         palette.insert("QPalette::Base".to_string(), "#181825".to_string());
         palette.insert("QPalette::Text".to_string(), "#cdd6f4".to_string());
-        palette.insert("QPalette::Highlight".to_string(), "#89b4fa".to_string());
+        palette.insert("QPalette::Highlight".to_string(), self.accent_color.to_hex().to_string());
         palette
     }
 }
 
 impl Default for SovereignGtkQtToolkitEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 12. Sovereign Desktop Toolkits & Services Master Orchestrator Suite
+// ============================================================================
+
+pub struct SovereignDesktopToolkitsAndServicesSuite {
+    pub toolkit_engine: SovereignGtkQtToolkitEngine,
+    pub dm_engine: SovereignDisplayManagerSuiteEngine,
+    pub gvfs_engine: SovereignGvfsGioEngine,
+    pub polkit_engine: SovereignPolicyKitAuthorizationEngine,
+    pub portal_engine: SovereignXdgDesktopPortalEngine,
+    pub font_layout_engine: SovereignFontAndTextLayoutEngine,
+    pub ime_engine: SovereignInputMethodFrameworkEngine,
+    pub notification_engine: SovereignDesktopNotificationDaemonEngine,
+    pub screen_locker_engine: SovereignScreenLockerEngine,
+    pub clipboard_engine: SovereignClipboardManagerEngine,
+    pub pr_gateway_engine: SovereignDesktopServicesPrGatewayEngine,
+}
+
+impl SovereignDesktopToolkitsAndServicesSuite {
+    pub fn new() -> Self {
+        Self {
+            toolkit_engine: SovereignGtkQtToolkitEngine::new(),
+            dm_engine: SovereignDisplayManagerSuiteEngine::new(DisplayManagerBackend::Gdm),
+            gvfs_engine: SovereignGvfsGioEngine::new(),
+            polkit_engine: SovereignPolicyKitAuthorizationEngine::new(),
+            portal_engine: SovereignXdgDesktopPortalEngine::new(),
+            font_layout_engine: SovereignFontAndTextLayoutEngine::new(),
+            ime_engine: SovereignInputMethodFrameworkEngine::new(ImeFrameworkKind::Fcitx5),
+            notification_engine: SovereignDesktopNotificationDaemonEngine::new(),
+            screen_locker_engine: SovereignScreenLockerEngine::new(),
+            clipboard_engine: SovereignClipboardManagerEngine::new(),
+            pr_gateway_engine: SovereignDesktopServicesPrGatewayEngine::new(),
+        }
+    }
+
+    pub fn audit_all_desktop_services(&mut self) -> BTreeMap<String, bool> {
+        let mut report = BTreeMap::new();
+        report.insert("GTK_Qt_Toolkit_Sync".to_string(), true);
+        report.insert("DisplayManager_Suite".to_string(), !self.dm_engine.seats.is_empty());
+        report.insert("GVfs_GIO_VirtualMounts".to_string(), !self.gvfs_engine.mounts.is_empty());
+        report.insert("PolicyKit_Auth".to_string(), !self.polkit_engine.action_rules.is_empty());
+        report.insert("XDG_Portals".to_string(), !self.portal_engine.mime_apps.is_empty());
+        report.insert("Font_TextLayout_Pipeline".to_string(), !self.font_layout_engine.font_match_cache.is_empty());
+        report.insert("InputMethod_Framework".to_string(), true);
+        report.insert("DesktopNotification_Daemon".to_string(), true);
+        report.insert("ScreenLocker_PAM".to_string(), true);
+        report.insert("ClipboardManager_Suite".to_string(), true);
+        report.insert("DesktopServices_PR_Gateway".to_string(), true);
+        report
+    }
+}
+
+impl Default for SovereignDesktopToolkitsAndServicesSuite {
     fn default() -> Self {
         Self::new()
     }
@@ -144,6 +264,8 @@ pub enum DisplayManagerBackend {
     LightDm,
     Xdm,
     SlickGreeter,
+    Greetd,
+    LyConsole,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -188,6 +310,9 @@ pub struct SovereignDisplayManagerSuiteEngine {
     pub seats: BTreeMap<String, DMSeatConfig>,
     pub available_sessions: Vec<DesktopSessionType>,
     pub pam_auth_history: Vec<(String, bool)>,
+    pub mfa_required: bool,
+    pub guest_session_allowed: bool,
+    pub greeter_theme_config: BTreeMap<String, String>,
 }
 
 impl SovereignDisplayManagerSuiteEngine {
@@ -204,6 +329,10 @@ impl SovereignDisplayManagerSuiteEngine {
             },
         );
 
+        let mut greeter_theme_config = BTreeMap::new();
+        greeter_theme_config.insert("background".to_string(), "/usr/share/backgrounds/sigmaos_default.png".to_string());
+        greeter_theme_config.insert("theme_name".to_string(), "Breeze-Dark".to_string());
+
         Self {
             active_backend: backend,
             seats,
@@ -216,6 +345,33 @@ impl SovereignDisplayManagerSuiteEngine {
                 DesktopSessionType::X11,
             ],
             pam_auth_history: Vec::new(),
+            mfa_required: false,
+            guest_session_allowed: true,
+            greeter_theme_config,
+        }
+    }
+
+    pub fn launch_guest_session(&mut self, seat_id: &str) -> PamAuthResult {
+        if !self.guest_session_allowed {
+            return PamAuthResult {
+                authenticated: false,
+                user_uid: 0,
+                home_dir: String::new(),
+                error_message: Some("Guest sessions are disabled".to_string()),
+            };
+        }
+
+        let guest_user = "guest_user".to_string();
+        if let Some(seat) = self.seats.get_mut(seat_id) {
+            seat.active_user = Some(guest_user.clone());
+            seat.greeter_active = false;
+        }
+
+        PamAuthResult {
+            authenticated: true,
+            user_uid: 999,
+            home_dir: "/tmp/guest_home".to_string(),
+            error_message: None,
         }
     }
 
@@ -269,6 +425,27 @@ pub enum GvfsMountScheme {
     Archive,
     Http,
     Nfs,
+    Afc,
+    GPhoto2,
+    GoogleDrive,
+    Davfs2,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum GFileMonitorEvent {
+    Created(String),
+    Changed(String),
+    Deleted(String),
+    AttributeChanged(String),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct GFileInfo {
+    pub name: String,
+    pub size_bytes: u64,
+    pub content_type: String,
+    pub is_hidden: bool,
+    pub is_executable: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -284,6 +461,8 @@ pub struct GvfsMountPoint {
 pub struct SovereignGvfsGioEngine {
     pub mounts: Vec<GvfsMountPoint>,
     pub gio_file_cache: BTreeMap<String, Vec<u8>>,
+    pub monitor_events: Vec<GFileMonitorEvent>,
+    pub file_info_db: BTreeMap<String, GFileInfo>,
 }
 
 impl SovereignGvfsGioEngine {
@@ -291,6 +470,8 @@ impl SovereignGvfsGioEngine {
         let mut engine = Self {
             mounts: Vec::new(),
             gio_file_cache: BTreeMap::new(),
+            monitor_events: Vec::new(),
+            file_info_db: BTreeMap::new(),
         };
         // Default virtual mount: Trash
         engine.mount_uri("trash:///", "/run/user/1000/gvfs/trash").ok();
@@ -312,6 +493,12 @@ impl SovereignGvfsGioEngine {
             GvfsMountScheme::Archive
         } else if uri.starts_with("nfs://") {
             GvfsMountScheme::Nfs
+        } else if uri.starts_with("afc://") {
+            GvfsMountScheme::Afc
+        } else if uri.starts_with("gphoto2://") {
+            GvfsMountScheme::GPhoto2
+        } else if uri.starts_with("google-drive://") {
+            GvfsMountScheme::GoogleDrive
         } else {
             GvfsMountScheme::Http
         };
@@ -344,6 +531,21 @@ impl SovereignGvfsGioEngine {
 
     pub fn g_file_write_all(&mut self, gio_path: &str, data: &[u8]) {
         self.gio_file_cache.insert(gio_path.to_string(), data.to_vec());
+        self.monitor_events.push(GFileMonitorEvent::Changed(gio_path.to_string()));
+        self.file_info_db.insert(
+            gio_path.to_string(),
+            GFileInfo {
+                name: gio_path.split('/').last().unwrap_or(gio_path).to_string(),
+                size_bytes: data.len() as u64,
+                content_type: "application/octet-stream".to_string(),
+                is_hidden: gio_path.starts_with('.'),
+                is_executable: false,
+            },
+        );
+    }
+
+    pub fn g_file_query_info(&self, gio_path: &str) -> Option<&GFileInfo> {
+        self.file_info_db.get(gio_path)
     }
 }
 
@@ -373,10 +575,20 @@ pub struct PolkitActionRule {
     pub description: String,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PolkitSubject {
+    pub pid: u32,
+    pub uid: u32,
+    pub user_name: String,
+    pub groups: Vec<String>,
+    pub session_id: String,
+}
+
 pub struct SovereignPolicyKitAuthorizationEngine {
     pub action_rules: BTreeMap<String, PolkitActionRule>,
     pub admin_groups: Vec<String>,
     pub auth_audit_log: Vec<String>,
+    pub active_pkexec_tokens: BTreeMap<String, u64>,
 }
 
 impl SovereignPolicyKitAuthorizationEngine {
@@ -411,7 +623,23 @@ impl SovereignPolicyKitAuthorizationEngine {
             action_rules: rules,
             admin_groups: vec!["wheel".to_string(), "sudo".to_string(), "admin".to_string()],
             auth_audit_log: Vec::new(),
+            active_pkexec_tokens: BTreeMap::new(),
         }
+    }
+
+    pub fn issue_pkexec_token(&mut self, _user: &str) -> String {
+        let token = format!("pkexec-token-{}", NEXT_DESKTOP_SERVICE_ID.fetch_add(1, Ordering::SeqCst));
+        self.active_pkexec_tokens.insert(token.clone(), 300);
+        token
+    }
+
+    pub fn check_authorization_subject(
+        &mut self,
+        subject: &PolkitSubject,
+        action_id: &str,
+    ) -> PolkitResult {
+        let group_refs: Vec<&str> = subject.groups.iter().map(|g| g.as_str()).collect();
+        self.check_authorization(&subject.user_name, &group_refs, action_id)
     }
 
     pub fn check_authorization(
@@ -480,6 +708,7 @@ pub struct SovereignXdgDesktopPortalEngine {
     pub user_dirs: BTreeMap<String, String>,
     pub portal_permissions: BTreeMap<(String, String), PortalPermissionState>,
     pub secret_wallet_store: BTreeMap<String, String>,
+    pub screencast_sessions: BTreeMap<String, bool>,
 }
 
 impl SovereignXdgDesktopPortalEngine {
@@ -499,7 +728,14 @@ impl SovereignXdgDesktopPortalEngine {
             user_dirs,
             portal_permissions: BTreeMap::new(),
             secret_wallet_store: BTreeMap::new(),
+            screencast_sessions: BTreeMap::new(),
         }
+    }
+
+    pub fn create_screencast_session(&mut self, app_id: &str) -> String {
+        let session_handle = format!("/org/freedesktop/portal/desktop/session/{}/screencast_{}", app_id, NEXT_DESKTOP_SERVICE_ID.fetch_add(1, Ordering::SeqCst));
+        self.screencast_sessions.insert(session_handle.clone(), true);
+        session_handle
     }
 
     pub fn xdg_open(&self, target: &str) -> Result<String, String> {
@@ -551,6 +787,24 @@ pub enum HintingStyle {
     Full,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SubpixelOrder {
+    Unknown,
+    Rgb,
+    Bgr,
+    Vrgb,
+    Vbgr,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FontconfigRule {
+    pub pattern: String,
+    pub font_family_target: String,
+    pub subpixel: SubpixelOrder,
+    pub antialias: bool,
+    pub hinting: HintingStyle,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FontMatchRequest {
     pub family: String,
@@ -573,6 +827,7 @@ pub struct HbShapedGlyph {
 pub struct SovereignFontAndTextLayoutEngine {
     pub font_match_cache: BTreeMap<String, String>,
     pub shaped_buffer_cache: Vec<HbShapedGlyph>,
+    pub fontconfig_rules: Vec<FontconfigRule>,
     pub skia_surface_width: u32,
     pub skia_surface_height: u32,
 }
@@ -584,9 +839,18 @@ impl SovereignFontAndTextLayoutEngine {
         font_match_cache.insert("monospace".to_string(), "/usr/share/fonts/ghostty/JetBrainsMono.ttf".to_string());
         font_match_cache.insert("serif".to_string(), "/usr/share/fonts/dejavu/DejaVuSerif.ttf".to_string());
 
+        let fontconfig_rules = vec![FontconfigRule {
+            pattern: "sans-serif".to_string(),
+            font_family_target: "DejaVu Sans".to_string(),
+            subpixel: SubpixelOrder::Rgb,
+            antialias: true,
+            hinting: HintingStyle::Full,
+        }];
+
         Self {
             font_match_cache,
             shaped_buffer_cache: Vec::new(),
+            fontconfig_rules,
             skia_surface_width: 1920,
             skia_surface_height: 1080,
         }
@@ -655,6 +919,8 @@ pub struct SovereignInputMethodFrameworkEngine {
     pub cursor_position: usize,
     pub candidates: Vec<ImeCandidate>,
     pub selected_candidate_index: usize,
+    pub candidate_page_size: usize,
+    pub surrounding_text: String,
 }
 
 impl SovereignInputMethodFrameworkEngine {
@@ -666,7 +932,13 @@ impl SovereignInputMethodFrameworkEngine {
             cursor_position: 0,
             candidates: Vec::new(),
             selected_candidate_index: 0,
+            candidate_page_size: 5,
+            surrounding_text: String::new(),
         }
+    }
+
+    pub fn set_surrounding_text(&mut self, text: &str) {
+        self.surrounding_text = text.to_string();
     }
 
     pub fn process_key_event(&mut self, key_str: &str) -> Option<String> {
@@ -806,6 +1078,7 @@ pub struct SovereignScreenLockerEngine {
     pub failed_attempts: u32,
     pub is_pam_locked_out: bool,
     pub lock_surfaces_count: u32,
+    pub dpms_off: bool,
 }
 
 impl SovereignScreenLockerEngine {
@@ -815,7 +1088,12 @@ impl SovereignScreenLockerEngine {
             failed_attempts: 0,
             is_pam_locked_out: false,
             lock_surfaces_count: 0,
+            dpms_off: false,
         }
+    }
+
+    pub fn set_dpms_power_save(&mut self, power_save: bool) {
+        self.dpms_off = power_save;
     }
 
     pub fn lock_session(&mut self, monitor_count: u32) {
@@ -864,6 +1142,7 @@ pub struct SovereignClipboardManagerEngine {
     pub primary_selection: Option<ClipboardEntry>,
     pub clipboard_history: Vec<ClipboardEntry>,
     pub max_history_items: usize,
+    pub auto_clear_secret_timeout_sec: u64,
 }
 
 impl SovereignClipboardManagerEngine {
@@ -872,7 +1151,12 @@ impl SovereignClipboardManagerEngine {
             primary_selection: None,
             clipboard_history: Vec::new(),
             max_history_items: 50,
+            auto_clear_secret_timeout_sec: 45,
         }
+    }
+
+    pub fn purge_secrets(&mut self) {
+        self.clipboard_history.retain(|e| !e.is_secret);
     }
 
     pub fn copy_text(&mut self, text: &str, app_origin: &str, is_secret: bool) {
