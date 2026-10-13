@@ -226,6 +226,8 @@ pub use dashboard::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
 };
 pub use distro::arch_missing_components_parity_pr::*;
+pub use distro::cachy_linux_missing_components_parity_pr::*;
+pub use distro::cachy_linux_missing_components_pr_gateway::*;
 pub use distro::{
     AdminAction, AiSysAdmin, AppBundleRuntime, AppManifest, AppsAuditTool, AptCacheSimulator,
     ArchBuildSystem, ArchMirror, ArchPacmanHooksManager, ArchRepoType, AuditResult, AuditRule,
