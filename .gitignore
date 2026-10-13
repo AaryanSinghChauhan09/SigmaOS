@@ -75,17 +75,16 @@ WIKI/
 !docs/*.md
 !docs/**/*.md
 !wiki/*.md
-<<<<<<< HEAD
 !wiki/**/*.md
-=======
->>>>>>> origin/main
 !Agents/*.md
+!Agents/**/*.md
 !.agents/*.md
 !.agents/**/*.md
 !reports/*.md
 !reports/**/*.md
 !.github/**/*.md
 !.github/*.md
+!SECURITY.md
 !README.md
 !CONTRIBUTING.md
 !AGENTS.md
