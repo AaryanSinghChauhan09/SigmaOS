@@ -22,8 +22,9 @@ pub mod pipewire_server;
 pub mod sigma_audio_router;
 
 pub use crate::media::distro_media_engine::{
-    AlsaMixerElement, AlsaPcmState, AlsaSampleFormat, AlsaSoundEngine, AudioSinkBackend,
-    JackProAudioEngine, JackTransportState, OssDspDevice, OssIoctlCmd, OssSoundEngine,
-    PipeWireEngine, PipeWireNodeState, PulseAudioEngine, PulseAudioSink, SndPcmHwParams,
-    SndioEngine,
+    AlsaMixerElement, AlsaPcmHwConfigEngine, AlsaPcmState, AlsaSampleFormat, AlsaSoundEngine,
+    AudioSinkBackend, JackProAudioEngine, JackRealtimeGraphEngine, JackTransportState,
+    OssDspDevice, OssIoctlCmd, OssMixerPeakMeterEngine, OssSoundEngine, PipeWireEngine,
+    PipeWireNodeState, PipeWireSpaBufferEngine, PulseAudioEngine, PulseAudioModuleRouterEngine,
+    PulseAudioSink, SndPcmHwParams, SndioEngine, SndioMidiPcmMultiplexerEngine,
 };
