@@ -593,6 +593,9 @@ pub use sovereign_linux_bsd_lfs_master_harmony::*;
 pub mod bootable_vertical_slices_missing_components_pr;
 pub use bootable_vertical_slices_missing_components_pr::*;
 
+pub mod sigmaos_gap_closing_evidence_gated_roadmap_pr;
+pub use sigmaos_gap_closing_evidence_gated_roadmap_pr::*;
+
 pub mod sovereign_open_source_os_apex_inspirations_v50;
 pub use sovereign_open_source_os_apex_inspirations_v50::{FlakeInput as ApexFlakeInput, *};
 
