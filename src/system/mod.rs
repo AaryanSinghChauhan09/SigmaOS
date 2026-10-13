@@ -55,6 +55,7 @@ pub mod sigmastorage;
 pub mod sigmahwmon;
 pub mod sigmadevice;
 pub mod sigmalvm;
+pub mod sigmaraid;
 pub mod sigmatime;
 pub mod sigmatimer;
 pub mod system_manager;
@@ -286,6 +287,10 @@ pub use sigmalvm::{
     SigmaLVM, PhysicalVolume, VolumeGroup, LogicalVolume,
     PVState, VGState, LVState,
     init_sigmalvm, get_sigmalvm, create_volume_group,
+};
+pub use sigmaraid::{
+    SigmaRAID, RAIDArray, RAIDDevice, RAIDLevel, RAIDState, RAIDDeviceState,
+    init_sigmaraid, get_sigmaraid, create_raid_array,
 };
 pub use power_manager::{
     BatteryInfo, PowerBatteryStatus, PowerConfig, PowerManager, PowerProfile, PowerSource,
