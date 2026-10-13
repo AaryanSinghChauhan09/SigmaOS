@@ -63,6 +63,12 @@ pub mod sigmamount;
 pub mod sigmaquota;
 pub mod sigmacrypto;
 pub mod sigmasnapshot;
+pub mod sigmafsmon;
+pub mod sigmadefrag;
+pub mod sigmatrim;
+pub mod sigmascheduledfsck;
+pub mod sigmanfs;
+pub mod sigmasmb;
 pub mod sigmatime;
 pub mod sigmatimer;
 pub mod system_manager;
@@ -326,6 +332,30 @@ pub use sigmacrypto::{
 pub use sigmasnapshot::{
     SigmaSnapshot, Snapshot, SnapshotPolicy, SnapshotType, SnapshotState, SnapshotSchedule,
     init_sigmasnapshot, get_sigmasnapshot, add_snapshot, restore_snapshot,
+};
+pub use sigmafsmon::{
+    SigmaFSMon, FSWatch, FSMetrics, FSEvent, FSAlert, FSEventType, FSMonState, AlertSeverity,
+    init_sigmafsmon, get_sigmafsmon, add_fs_watch, record_fs_event,
+};
+pub use sigmadefrag::{
+    SigmaDefrag, DefragJob, FragmentationReport, DefragMode, DefragStatus,
+    init_sigmadefrag, get_sigmadefrag, start_defrag_job, get_defrag_status,
+};
+pub use sigmatrim::{
+    SigmaTRIM, TrimDevice, TrimResult, DiscardRange, DiscardType, TrimMode, TrimStatus,
+    init_sigmatrim, get_sigmatrim, trim_mount, is_trim_supported,
+};
+pub use sigmascheduledfsck::{
+    SigmaScheduledFSCK, FSCKScheduleTarget, ScheduledCheckRecord, FSCKSchedulePolicy, ScheduledCheckStatus,
+    init_sigmascheduledfsck, get_sigmascheduledfsck, is_fsck_due, execute_scheduled_fsck,
+};
+pub use sigmanfs::{
+    SigmaNFS, NFSExport, NFSMount, NFSVersion, NFSConnectionState, NFSExportAccess, RootSquashPolicy,
+    init_sigmanfs, get_sigmanfs, mount_nfs, export_nfs_share,
+};
+pub use sigmasmb::{
+    SigmaSMB, SMBShare, SMBMount, SMBDialect, SMBConnectionState, SMBShareAccess,
+    init_sigmasmb, get_sigmasmb, mount_smb, export_smb_share,
 };
 pub use power_manager::{
     BatteryInfo, PowerBatteryStatus, PowerConfig, PowerManager, PowerProfile, PowerSource,
