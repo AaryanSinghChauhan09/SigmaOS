@@ -647,7 +647,7 @@ fi
 if [ -f "tests/test_md_wiki_ideas_verification.rs" ]; then
     echo "Running .MD Files & Wiki Ideas Master Verification test suite..."
     mkdir -p build
-    rustc --test --edition=2021 tests/test_md_wiki_ideas_verification.rs -o build/test_md_wiki_ideas
+    rustc --test --edition=2021 --cfg 'feature="standalone_test"' tests/test_md_wiki_ideas_verification.rs -o build/test_md_wiki_ideas
     ./build/test_md_wiki_ideas
 fi
 
@@ -1148,7 +1148,6 @@ if [ -f "src/distro/open_source_os_unimplemented_ideas_pr_suite.rs" ]; then
     ./build/test_os_ideas_suite
 fi
 
-<<<<<<< HEAD
 if [ -f "src/distro/open_source_os_unimplemented_ideas_pr_gateway.rs" ]; then
     echo "Running Open Source OS Unimplemented Ideas PR Gateway test suite..."
     mkdir -p build
@@ -1161,13 +1160,11 @@ if [ -f "src/distro/arch_linux_github_repo_components_pr_engine.rs" ]; then
     mkdir -p build
     rustc --test src/distro/arch_linux_github_repo_components_pr_engine.rs --edition=2021 -o build/test_arch_github_repo_components
     ./build/test_arch_github_repo_components
-=======
 if [ -f "src/distro/sovereign_open_source_os_fedora_github_pr_suite.rs" ]; then
     echo "Running Sovereign Open Source OS Fedora GitHub PR Suite test suite..."
     mkdir -p build
     rustc --test src/distro/sovereign_open_source_os_fedora_github_pr_suite.rs --edition=2021 -o build/test_fedora_github_pr_suite
     ./build/test_fedora_github_pr_suite
->>>>>>> origin/main
 fi
 
 if [ -f "src/distro/debian_github_repo_inspirations_pr.rs" ]; then
@@ -1205,59 +1202,64 @@ if [ -f "src/drivers/sovereign_device_driver_development_and_pr_suite.rs" ]; the
     ./build/test_device_driver_pr_suite
 fi
 
-<<<<<<< HEAD
 if [ -f "src/userland/coreutils_pr_gateway.rs" ]; then
     echo "Running Core Utilities & PR Gateway test suite..."
     mkdir -p build
     rustc --test src/userland/coreutils_pr_gateway.rs --edition=2021 -o build/test_coreutils_pr_gateway
     ./build/test_coreutils_pr_gateway
-=======
-<<<<<<< HEAD
 if [ -f "src/userland/system_utilities.rs" ]; then
     echo "Running System Utilities Architecture & Registry Framework test suite..."
     mkdir -p build
     rustc --test src/userland/system_utilities.rs --edition=2021 -o build/test_system_utilities
     ./build/test_system_utilities
-=======
-<<<<<<< HEAD
 if [ -f "src/productivity/sovereign_application_replacements_pr_suite.rs" ]; then
     echo "Running Sovereign Application Replacements PR Suite..."
     mkdir -p build
     rustc --test src/productivity/sovereign_application_replacements_pr_suite.rs --edition=2021 -o build/test_app_replacements_pr_suite
     ./build/test_app_replacements_pr_suite
-=======
-<<<<<<< HEAD
 if [ -f "src/system_apps/sovereign_system_apps_development_and_pr_suite.rs" ]; then
     echo "Running Sovereign System Applications Development and PR Gateway Suite..."
     mkdir -p build
     rustc --test src/system_apps/sovereign_system_apps_development_and_pr_suite.rs --edition=2021 -o build/test_system_apps_pr_suite
     ./build/test_system_apps_pr_suite
-=======
-<<<<<<< HEAD
 if [ -f "src/net/sovereign_network_development_and_pr_suite.rs" ]; then
     echo "Running Sovereign Network Development and PR Suite..."
     mkdir -p build
     rustc --test src/net/sovereign_network_development_and_pr_suite.rs --edition=2021 -o build/test_network_development_pr_suite
     ./build/test_network_development_pr_suite
-=======
-<<<<<<< HEAD
 if [ -f "src/shell/sovereign_command_interpreter.rs" ]; then
     echo "Running Sovereign Command Interpreter and 17-PR Gateway Suite..."
     mkdir -p build
     rustc --test src/shell/sovereign_command_interpreter.rs --edition=2021 -o build/test_command_interpreter
     ./build/test_command_interpreter
-=======
 if [ -f "src/distro/sovereign_open_source_os_apex_inspirations_v50.rs" ]; then
     echo "Running Sovereign Open Source OS Apex Inspirations Engine (V50) test suite..."
     mkdir -p build
     rustc --test src/distro/sovereign_open_source_os_apex_inspirations_v50.rs --edition=2021 -o build/test_apex_v50
     ./build/test_apex_v50
->>>>>>> origin/main
->>>>>>> origin/main
->>>>>>> origin/main
->>>>>>> origin/main
->>>>>>> origin/main
->>>>>>> origin/main
+fi
+
+
+if [ -f "tests/scheduler/core.rs" ]; then
+    echo "Running Scheduler Subsystem Core test suite..."
+    mkdir -p build
+    rustc --test tests/scheduler/core.rs --edition=2021 -o build/test_scheduler_core
+    ./build/test_scheduler_core
+    rustc --test tests/scheduler/scheduler_test.rs --edition=2021 -o build/test_scheduler_main
+    ./build/test_scheduler_main
+fi
+
+if [ -f "tests/scheduler/context_switch/context_switch_test.rs" ]; then
+    echo "Running Scheduler Context Switch, Preemption, Fairness, and Affinity test suites..."
+    mkdir -p build
+    rustc --test tests/scheduler/context_switch/context_switch_test.rs --edition=2021 -o build/test_context_switch
+    ./build/test_context_switch
+    rustc --test tests/scheduler/preemption/preemption_test.rs --edition=2021 -o build/test_preemption
+    ./build/test_preemption
+    rustc --test tests/scheduler/fairness/fairness_test.rs --edition=2021 -o build/test_fairness
+    ./build/test_fairness
+    rustc --test tests/scheduler/affinity/affinity_test.rs --edition=2021 -o build/test_affinity
+    ./build/test_affinity
 fi
 
 echo "All SigmaOS test suites completed."
