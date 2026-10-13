@@ -236,7 +236,7 @@ pub use distro::{
     ComplianceAuditor, ComponentType, ConferenceTalk, ConfigHook, CpuArchitecture, CpuCapabilities,
     CrossBuildPipeline, CrossbowVnic, DaxMemoryRegion, DebianPolicyEnforcer, DebianSocialContract,
     DevTool, DeveloperToolkit, DirectoryService, DirectoryUser, DllLoader, DllModule,
-    DpkgMultiArch, DragonFlyHammerFs, EcuController, EduChallenge, EduPlayground, ApexFlakeInput,
+    DpkgMultiArch, DragonFlyBsdMissingComponentsParityPrGateway, DragonFlyHammerFs, EcuController, EduChallenge, EduPlayground, ApexFlakeInput,
     ForumChannel, ForumPost, FreezeBasedStabilization, GNUGuixShepherdSupervisor, GdiObjectType,
     GentooPortageUseFlagsEngine, GuixDerivation, GuixFunctionalStore, HalError,
     Hammer2MultiMasterPfsReplication, Hammer2Snapshot, Hammer2TxgRecord, HardwareAbstractionLayer,
