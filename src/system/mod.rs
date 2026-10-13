@@ -41,6 +41,7 @@ pub mod sigmaprocess;
 pub mod sigmafs;
 pub mod sigmadns;
 pub mod sigmadhcp;
+pub mod sigmantp;
 pub mod sigmatime;
 pub mod sigmatimer;
 pub mod system_manager;
@@ -215,6 +216,10 @@ pub use sigmadns::{
 pub use sigmadhcp::{
     SigmaDHCP, DhcpLease, DhcpState,
     init_sigmadhcp, get_sigmadhcp, request_dhcp_lease,
+};
+pub use sigmantp::{
+    SigmaNTP, NtpServer, NtpServerState,
+    init_sigmantp, get_sigmantp, sync_ntp_time,
 };
 pub use power_manager::{
     BatteryInfo, PowerBatteryStatus, PowerConfig, PowerManager, PowerProfile, PowerSource,
