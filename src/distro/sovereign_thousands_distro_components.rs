@@ -57,7 +57,7 @@ pub struct SovereignThousandsDistroComponentsEngine {
 
 impl SovereignThousandsDistroComponentsEngine {
     pub fn new() -> Self {
-        let mut components = Vec::with_capacity(10050);
+        let mut components = Vec::with_capacity(25050);
         components.push(DistroComponentItem {
             id: 1,
             name: String::from("Core eBPF Sched_Ext Governor (Linux Generic)"),
@@ -49234,7 +49234,7 @@ impl SovereignThousandsDistroComponentsEngine {
             ],
         ];
 
-        for id in 4501..=10000u32 {
+        for id in 4501..=25000u32 {
             let cat_idx = ((id - 1) % 10) as usize;
             let category = categories[cat_idx];
             let distro = distros[(id as usize - 1) % distros.len()];
@@ -49327,7 +49327,7 @@ impl SovereignThousandsDistroComponentsEngine {
     }
 
     pub fn verify_catalog(&mut self) -> bool {
-        if self.components.len() < 10000 {
+        if self.components.len() < 25000 {
             return false;
         }
         let cat_items = self.filter_by_category(DistroComponentCategory::KernelScheduler);
@@ -49354,8 +49354,8 @@ mod tests {
     fn test_thousands_components_catalog_count() {
         let engine = SovereignThousandsDistroComponentsEngine::new();
         assert!(
-            engine.total_components() >= 10000,
-            "Engine catalog must contain at least 10000 components, got {}",
+            engine.total_components() >= 25000,
+            "Engine catalog must contain at least 25000 components, got {}",
             engine.total_components()
         );
     }
