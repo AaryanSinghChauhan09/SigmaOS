@@ -21,6 +21,16 @@ pub enum ProjectType {
     Design,
     Effect,
     Scene,
+    Audio,
+    Light,
+    Media,
+    Animation,
+    Model3D,
+    Drafting,
+    SoundCraft,
+    DeckCraft,
+    GridCraft,
+    CadCraft,
 }
 
 /// Project

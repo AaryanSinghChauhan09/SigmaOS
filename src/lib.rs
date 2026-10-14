@@ -22,6 +22,7 @@ pub mod compatibility;
 pub mod container;
 pub mod contributing;
 pub mod creative;
+pub use creative::sovereign_artcraft_craftlibs_pr_engine::*;
 pub mod customization;
 pub mod database;
 pub mod dashboard;
