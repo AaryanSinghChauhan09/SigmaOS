@@ -1212,7 +1212,6 @@ if [ -f "src/userland/coreutils_pr_gateway.rs" ]; then
     rustc --test src/userland/coreutils_pr_gateway.rs --edition=2021 -o build/test_coreutils_pr_gateway
     ./build/test_coreutils_pr_gateway
 fi
-
 if [ -f "src/userland/system_utilities.rs" ]; then
     echo "Running System Utilities Architecture & Registry Framework test suite..."
     mkdir -p build
@@ -1240,14 +1239,12 @@ if [ -f "src/net/sovereign_network_development_and_pr_suite.rs" ]; then
     rustc --test src/net/sovereign_network_development_and_pr_suite.rs --edition=2021 -o build/test_network_development_pr_suite
     ./build/test_network_development_pr_suite
 fi
-
 if [ -f "src/shell/sovereign_command_interpreter.rs" ]; then
     echo "Running Sovereign Command Interpreter and 17-PR Gateway Suite..."
     mkdir -p build
     rustc --test src/shell/sovereign_command_interpreter.rs --edition=2021 -o build/test_command_interpreter
     ./build/test_command_interpreter
 fi
-
 if [ -f "src/distro/sovereign_open_source_os_apex_inspirations_v50.rs" ]; then
     echo "Running Sovereign Open Source OS Apex Inspirations Engine (V50) test suite..."
     mkdir -p build
