@@ -6,7 +6,12 @@ The SigPkg Universal Package Manager provides multi-format foreign package trans
 SigmaOS aims to build a comprehensive system that matches and exceeds standard distributions like Linux Mint and Omarchy, offering deep integration, modern APIs, and zero-dependency sovereign architecture.
 
 ## Key Features & Capabilities
-- **Universal translation adapters for `.deb`, `.pkg.tar.zst`, and `.rpm`**: Universal translation adapters for `.deb`, `.pkg.tar.zst`, and `.rpm`\n- **Fast SAT solver for complete conflict and dependency resolution**: Fast SAT solver for complete conflict and dependency resolution\n- **Content-addressed CAS store preventing package file duplication**: Content-addressed CAS store preventing package file duplication\n- **Cryptographic signature verification (Ed25519) with atomic A/B updates**: Cryptographic signature verification (Ed25519) with atomic A/B updates
+- **Universal translation adapters for `.deb`, `.pkg.tar.zst`, `.rpm`, `.apk`, `.xbps`, `.eopkg`, `.hpkg`, `.nixpkg`, `.ebuild`, `.flatpak`, `.snap`, `.AppImage`, `.bottle`, etc. (130+ formats)**
+- **Fast SAT DPLL solver for complete conflict and dependency resolution with canonical `sovereign-*` primitive remapping**
+- **Object-Oriented Programming (OOP) design patterns architecture (Factory, Strategy, Command, Observer, Memento, Chain of Responsibility, Facade, Decorator, Template Method, Flyweight)**
+- **User-Defined Functions (UDF) maintainer scriptlet execution engine with multi-sandbox security isolation (Landlock v5, Pledge/Unveil, Capsicum, macOS App Sandbox)**
+- **Content-addressed CAS store zero-copy delta deduplication and multi-backend boot environment snapshot governor (FreeBSD bectl, OpenSUSE snapper, ZFS zsys, Bcachefs, Btrfs)**
+- **Foreign PM CLI command router (`apt`, `pacman`, `dnf`, `apk`, `xbps`, `zypper`, `emerge`, `pkg`, `nix`, `guix`, `snap`, `flatpak`, `eopkg`, `spack`, `brew`, `winget`, `cargo`, `pip`, `npm`, `pnpm`, `yarn`, `gem`, `luarocks`)**
 
 ## Architecture & Implementation Details
 This component is implemented natively in `#![no_std]` safe Rust with high-performance companion modules in Zig (for SIMD acceleration), Nim (for ergonomic networking/tools), and Shell (for automation harnesses). It interacts directly with the SigmaOS microkernel and VFS, completely bypassing legacy glibc or heavy runtime layers.

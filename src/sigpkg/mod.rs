@@ -89,6 +89,7 @@ pub use crate::package::sovereign_distro_package_advancements_v3::*;
 pub use crate::package::sovereign_distro_package_advancements_v30::*;
 pub use crate::package::sovereign_distro_package_advancements_v31::*;
 pub use crate::package::sovereign_distro_package_advancements_v33::*;
+pub use crate::package::sovereign_distro_package_advancements_v38::*;
 pub use crate::package::sovereign_distro_package_advancements_v4::*;
 pub use crate::package::sovereign_distro_package_advancements_v5::*;
 pub use crate::package::sovereign_distro_package_advancements_v6::*;
