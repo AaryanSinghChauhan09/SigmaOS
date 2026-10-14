@@ -8,6 +8,8 @@ The implementation covers full functionality across Type-1 and Type-2 Hypervisor
 
 1. **KVM & QEMU Kernel Virtual Machine Engine** (`KvmQemuEngine`)
    - Hardware acceleration (VT-x / AMD-V / ARM VE), vCPU state management, and CR0/CR4 control register sync.
+   - Confidential Computing VM attestation (`IntelTdx`, `AmdSevSnp`).
+   - Dynamic memory hotplugging via `plug_virtio_mem`.
    - KVM Dirty Page Ring logging for live migration.
    - `io_uring` asynchronous block engine for virtual disk I/O.
    - VFIO PCI device passthrough with IOMMU group isolation.
@@ -16,13 +18,16 @@ The implementation covers full functionality across Type-1 and Type-2 Hypervisor
 2. **libvirt Universal Domain Manager Engine** (`LibvirtDomainEngine`)
    - Unified domain management across Qemu/KVM, Xen, bhyve, and LXC drivers.
    - XML and JSON domain specification generation and parsing.
-   - Storage pool volume allocations (raw, qcow2, ZFS datasets).
+   - Storage pool volume allocations across `Directory`, `Zfs`, `LvmThin`, and `CephRbd` storage backends.
+   - `LibvirtNwFilterRule` firewall filtering rules for network interface security policies.
    - Virtual network bridge and TAP interface attachment.
    - *Inspiration:* RHEL, Fedora, AlmaLinux, Rocky Linux, Ubuntu.
 
 3. **Xen Hypervisor & XenStore Engine** (`XenHypervisorEngine`)
    - Dom0 control domain operations and DomU guest lifecycle management across PV, HVM, and PVH modes.
    - In-memory hierarchical XenStore key-value bus (`/local/domain/...`) with event notifications.
+   - `XenArgoPort` zero-copy socket channels for hypervisor-level inter-domain communication.
+   - `QubesDisposableVmPolicy` for disposable VM (DispVM) template management and netvm isolation.
    - Grant Table memory page sharing and zero-copy inter-domain channel creation.
    - *Inspiration:* Qubes OS, XenServer, Alpine Linux.
 
