@@ -47,6 +47,7 @@ pub mod crypto;
 pub mod filesystem;
 pub mod futuristic_modules;
 pub mod governance;
+pub use governance::*;
 pub mod gpu;
 pub mod gaming;
 pub mod init;
