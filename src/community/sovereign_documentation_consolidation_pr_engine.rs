@@ -94,6 +94,78 @@ impl SovereignManPagesConsolidationEngine {
     }
 
     fn populate_defaults(&mut self) {
+        // Section 1 - User Commands
+        self.register_page(SovereignManPage {
+            title: "sigma-sh".to_string(),
+            section: ManSection::UserCommands,
+            synopsis: "sigma-sh [-c COMMAND] [FILE]".to_string(),
+            description: "Sovereign interactive POSIX-compliant command interpreter with eBPF history tracking.".to_string(),
+            options: {
+                let mut opts = BTreeMap::new();
+                opts.insert("-c".to_string(), "Execute string command".to_string());
+                opts.insert("-l".to_string(), "Start as login shell".to_string());
+                opts
+            },
+            see_also: vec!["bash(1)".to_string(), "zsh(1)".to_string(), "tcsh(1)".to_string()],
+            bsd_linux_source: "OpenBSD ksh(1) & GNU bash(1)".to_string(),
+        });
+
+        // Section 2 - System Calls
+        self.register_page(SovereignManPage {
+            title: "pledge".to_string(),
+            section: ManSection::SystemCalls,
+            synopsis: "int pledge(const char *promises, const char *execpromises);".to_string(),
+            description: "OpenBSD-inspired system call restricting process privileges and kernel capability access.".to_string(),
+            options: BTreeMap::new(),
+            see_also: vec!["unveil(2)".to_string(), "seccomp(2)".to_string(), "landlock(7)".to_string()],
+            bsd_linux_source: "OpenBSD pledge(2)".to_string(),
+        });
+
+        // Section 3 - Library Functions
+        self.register_page(SovereignManPage {
+            title: "cap_rights_limit".to_string(),
+            section: ManSection::LibraryFunctions,
+            synopsis: "int cap_rights_limit(int fd, const cap_rights_t *rights);".to_string(),
+            description: "FreeBSD Capsicum capability rights limitation for file descriptors.".to_string(),
+            options: BTreeMap::new(),
+            see_also: vec!["pledge(2)".to_string(), "rights(4)".to_string()],
+            bsd_linux_source: "FreeBSD Capsicum cap_rights_limit(3)".to_string(),
+        });
+
+        // Section 4 - Special Files
+        self.register_page(SovereignManPage {
+            title: "bpf".to_string(),
+            section: ManSection::SpecialFiles,
+            synopsis: "/dev/bpf".to_string(),
+            description: "Berkeley Packet Filter device node for raw link-layer packet capturing.".to_string(),
+            options: BTreeMap::new(),
+            see_also: vec!["pcap(3)".to_string(), "netintro(4)".to_string()],
+            bsd_linux_source: "FreeBSD & OpenBSD bpf(4)".to_string(),
+        });
+
+        // Section 5 - File Formats
+        self.register_page(SovereignManPage {
+            title: "fstab".to_string(),
+            section: ManSection::FileFormats,
+            synopsis: "/etc/fstab".to_string(),
+            description: "Static filesystem information table specifying mount points and options.".to_string(),
+            options: BTreeMap::new(),
+            see_also: vec!["mount(8)".to_string(), "swapon(8)".to_string()],
+            bsd_linux_source: "POSIX & NetBSD fstab(5)".to_string(),
+        });
+
+        // Section 7 - Miscellaneous
+        self.register_page(SovereignManPage {
+            title: "cgroups".to_string(),
+            section: ManSection::Miscellaneous,
+            synopsis: "cgroup v2 hierarchy".to_string(),
+            description: "Linux control groups v2 resource management and container isolation.".to_string(),
+            options: BTreeMap::new(),
+            see_also: vec!["systemd(1)".to_string(), "landlock(7)".to_string()],
+            bsd_linux_source: "Linux kernel cgroups(7)".to_string(),
+        });
+
+        // Section 8 - System Admin
         self.register_page(SovereignManPage {
             title: "sigma-pkg".to_string(),
             section: ManSection::SystemAdmin,
@@ -110,14 +182,15 @@ impl SovereignManPagesConsolidationEngine {
             bsd_linux_source: "FreeBSD pkg(8) & Arch Linux pacman(8) hybrid".to_string(),
         });
 
+        // Section 9 - Kernel Routines
         self.register_page(SovereignManPage {
-            title: "pledge".to_string(),
-            section: ManSection::SystemCalls,
-            synopsis: "int pledge(const char *promises, const char *execpromises);".to_string(),
-            description: "OpenBSD-inspired system call restricting process privileges and kernel capability access.".to_string(),
+            title: "vfs".to_string(),
+            section: ManSection::KernelRoutines,
+            synopsis: "int vfs_mount(struct mount *mp, ...);".to_string(),
+            description: "Virtual Filesystem interface and inode/vnode dispatch layer.".to_string(),
             options: BTreeMap::new(),
-            see_also: vec!["unveil(2)".to_string(), "seccomp(2)".to_string(), "landlock(7)".to_string()],
-            bsd_linux_source: "OpenBSD pledge(2) man page".to_string(),
+            see_also: vec!["vnode(9)".to_string(), "mount(8)".to_string()],
+            bsd_linux_source: "FreeBSD & DragonFly BSD vfs(9)".to_string(),
         });
     }
 
@@ -195,7 +268,18 @@ impl SovereignInfoPagesConsolidationEngine {
             menu_items: vec![
                 ("Kernel Architecture".to_string(), "SMP, eBPF, Buddy Allocator".to_string()),
                 ("Packaging System".to_string(), "Universal package format and SAT solver".to_string()),
+                ("Sandboxing Security".to_string(), "Pledge, Unveil, Capsicum, Landlock".to_string()),
             ],
+        });
+
+        self.register_node(SovereignInfoNode {
+            title: "Kernel Architecture Details".to_string(),
+            node_name: "Kernel Architecture".to_string(),
+            up_node: "Top".to_string(),
+            next_node: "Packaging System".to_string(),
+            prev_node: "Top".to_string(),
+            content: "Detailed documentation on SMP multi-core dispatch, eBPF JIT, and lockless memory queues.".to_string(),
+            menu_items: vec![],
         });
     }
 
@@ -256,6 +340,18 @@ impl SovereignUsrShareDocConsolidationEngine {
                 changelog: "* 1.0.0: Initial release of sovereign kernel and tools.".to_string(),
                 copyright: "Copyright (c) 2026 SigmaOS Project. MIT License.".to_string(),
                 readme: "SigmaOS core utilities and system runtime documentation.".to_string(),
+            },
+        );
+
+        self.docs.insert(
+            "sigma-pkg".to_string(),
+            SovereignPackageDocRecord {
+                package_name: "sigma-pkg".to_string(),
+                version: "1.0.0".to_string(),
+                doc_path: "/usr/share/doc/sigma-pkg".to_string(),
+                changelog: "* 1.0.0: Multi-format package ingestion and DPLL SAT solver.".to_string(),
+                copyright: "Copyright (c) 2026 SigmaOS Project. MIT License.".to_string(),
+                readme: "Universal package manager documentation and schema definition.".to_string(),
             },
         );
     }
@@ -320,6 +416,20 @@ impl SovereignWikiHandbookConsolidationEngine {
                 ],
             },
         );
+
+        self.articles.insert(
+            "Package-Management".to_string(),
+            SovereignHandbookArticle {
+                title: "Universal Package Management Handbook".to_string(),
+                category: "Software Management".to_string(),
+                distro_inspiration: "Arch Linux pacman Wiki & FreeBSD pkg Handbook".to_string(),
+                content: "Comprehensive guide to managing 100+ package formats via sigma-pkg and DPLL constraint resolution.".to_string(),
+                troubleshooting_steps: vec![
+                    "Run `sigma-pkg --verify-signatures` if PQC attestation fails.".to_string(),
+                    "Use `sigma-pkg --rollback` to revert to previous boot environment snapshot.".to_string(),
+                ],
+            },
+        );
     }
 }
 
@@ -354,7 +464,7 @@ impl SovereignDocumentationConsolidationPrGateway {
         md.push_str("| **Man Pages (Sections 1..9)** | FreeBSD / OpenBSD / Arch / Debian | `wiki/Man-Pages-Catalog.md` | Standardized troff/mdoc markdown rendering |\n");
         md.push_str("| **GNU Info Pages** | GNU / Debian Texinfo | `wiki/Info-Pages-Tree.md` | Hierarchical node navigation & menu linking |\n");
         md.push_str("| **/usr/share/doc** | Debian / Fedora / Gentoo | `wiki/Package-Docs-Registry.md` | Offline package READMEs, copyright, changelogs |\n");
-        md.push_str("| **Arch Wiki & FreeBSD Handbook** | Arch Linux & FreeBSD | `wiki/27-Consolidated-OS-Documentation-And-Wiki-Engine.md` | Comprehensive system administration & guides |\n\n");
+        md.push_str("| **Arch Wiki & FreeBSD Handbook** | Arch Linux & FreeBSD | `wiki/Consolidated-OS-Documentation-System.md` | Comprehensive system administration & guides |\n\n");
 
         md.push_str("## Summary Statistics\n");
         md.push_str(&format!("* **Man Pages Registered:** {}\n", self.man_engine.pages.len()));

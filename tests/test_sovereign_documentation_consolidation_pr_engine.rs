@@ -1,12 +1,10 @@
 // SPDX-License-Identifier: MIT
 // Integration test for Sovereign OS Documentation & GitHub Wiki Consolidation Engine
 
-use sigmaos::community::sovereign_documentation_consolidation_pr_engine::{
-    ManSection, SovereignDocumentationConsolidationPrGateway, SovereignHandbookArticle,
-    SovereignInfoNode, SovereignInfoPagesConsolidationEngine, SovereignManPage,
-    SovereignManPagesConsolidationEngine, SovereignPackageDocRecord,
-    SovereignUsrShareDocConsolidationEngine, SovereignWikiHandbookConsolidationEngine,
-};
+#[path = "../src/community/sovereign_documentation_consolidation_pr_engine.rs"]
+mod sovereign_documentation_consolidation_pr_engine;
+
+use sovereign_documentation_consolidation_pr_engine::*;
 
 #[test]
 fn test_man_pages_consolidation_standalone() {
