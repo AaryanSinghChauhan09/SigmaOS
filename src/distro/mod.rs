@@ -18,36 +18,33 @@ pub mod omarchy_advanced_parity;
 pub mod omarchy_gaming_enhanced;
 pub use omarchy_advanced_parity::*;
 pub use omarchy_gaming_enhanced::{
-    SovereignOmarchyGamingGovernor, CpuGovernor, GpuProfile, GameTrigger, GamingState,
-    VrrMode, HudElement, DeveloperStack,
-    SovereignOmarchyHudEngine, SovereignOmarchyVrrPacingController,
-    SovereignSteamShaderPrecacheManager, SovereignOmarchyGamingPerformanceSuite,
-    init_gaming_performance_suite, get_gaming_performance_suite,
+    get_gaming_performance_suite, init_gaming_performance_suite, CpuGovernor, DeveloperStack,
+    GameTrigger, GamingState, GpuProfile, HudElement, SovereignOmarchyGamingGovernor,
+    SovereignOmarchyGamingPerformanceSuite, SovereignOmarchyHudEngine,
+    SovereignOmarchyVrrPacingController, SovereignSteamShaderPrecacheManager, VrrMode,
 };
 pub mod software_manager;
 pub use software_manager::{
-    SoftwareManager, SoftwarePackage, SoftwareCategory,
-    init_software_manager, get_software_manager,
+    get_software_manager, init_software_manager, SoftwareCategory, SoftwareManager, SoftwarePackage,
 };
 pub mod update_manager;
 pub use update_manager::{
-    UpdateManager, SystemUpdate, UpdateType, UpdatePriority,
-    init_update_manager, get_update_manager,
+    get_update_manager, init_update_manager, SystemUpdate, UpdateManager, UpdatePriority,
+    UpdateType,
 };
 pub mod backup_tool;
 pub use backup_tool::{
-    BackupManager, Snapshot, SnapshotType,
-    init_backup_manager, get_backup_manager, create_manual_snapshot,
+    create_manual_snapshot, get_backup_manager, init_backup_manager, BackupManager, Snapshot,
+    SnapshotType,
 };
 pub mod driver_manager;
 pub use driver_manager::{
-    DriverManager, HardwareDriver, DriverType, DriverStatus,
-    init_driver_manager, get_driver_manager,
+    get_driver_manager, init_driver_manager, DriverManager, DriverStatus, DriverType,
+    HardwareDriver,
 };
 pub mod system_tools;
 pub use system_tools::{
-    SystemToolsManager, SystemTool,
-    init_system_tools_manager, get_system_tools_manager,
+    get_system_tools_manager, init_system_tools_manager, SystemTool, SystemToolsManager,
 };
 pub mod omarchy_future_roadmap;
 pub mod omarchy_linux_gap_closure_pr_suite;

@@ -254,12 +254,9 @@ impl OpenSourceOsUnimplementedIdeasPrGateway {
             .attach_crossbow_vnic("vnic_app");
 
         self.master_suite.redox_scheme.register_scheme("audio");
-        self.master_suite.haiku_bfs.add_attribute(
-            "/app.pkg",
-            "SYS:PACKAGE_TYPE",
-            "String",
-            "hpkg",
-        );
+        self.master_suite
+            .haiku_bfs
+            .add_attribute("/app.pkg", "SYS:PACKAGE_TYPE", "String", "hpkg");
 
         let matches = self
             .master_suite

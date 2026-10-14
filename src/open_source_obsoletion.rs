@@ -4581,7 +4581,9 @@ pub struct SovereignZoxideDirectoryJumpEngine {
 
 impl SovereignZoxideDirectoryJumpEngine {
     pub fn new() -> Self {
-        Self { entries: Vec::new() }
+        Self {
+            entries: Vec::new(),
+        }
     }
 
     pub fn add_or_update_visit(&mut self, path: &str, current_secs: u64) {
@@ -4740,7 +4742,10 @@ impl SovereignProcsProcessViewerEngine {
     }
 
     pub fn search_by_name(&self, query: &str) -> Vec<&ProcessDetailEntry> {
-        self.processes.iter().filter(|p| p.name.contains(query)).collect()
+        self.processes
+            .iter()
+            .filter(|p| p.name.contains(query))
+            .collect()
     }
 }
 
@@ -4863,7 +4868,9 @@ pub struct SovereignGpingNetworkPingEngine {
 
 impl SovereignGpingNetworkPingEngine {
     pub fn new() -> Self {
-        Self { samples: Vec::new() }
+        Self {
+            samples: Vec::new(),
+        }
     }
 
     pub fn record_ping(&mut self, host: &str, latency_ms: f64, timestamp: u64, success: bool) {
@@ -5543,21 +5550,34 @@ impl SovereignOpenSourceObsoletionOrchestrator {
             .add_signature_rule(1001, "TCP", "any", 80, "ALERT HTTP Traffic");
         let _ = self.caddy_tls.provision_acme_certificate("api.sigmaos.org");
 
-        self.zoxide_jump.add_or_update_visit("/home/sovereign/src", 1700000000);
-        let _ = self.hyperfine_bench.record_benchmark("sovereign_boot", &[0.012, 0.011, 0.013]);
-        self.procs_viewer.register_process(1, 0, "root", "sovereign_kernel", 5, 16384, "Running");
-        self.dust_usage.record_directory("/home/sovereign", 1024 * 1024 * 50, 12);
-        self.dogdns_query.register_dns_record("api.sigmaos.org", "A", "10.0.0.1", 300);
-        self.gping_network.record_ping("10.0.0.1", 1.2, 1700000000, true);
-        self.mpv_media.load_media_stream(120, vec![MediaStreamTrack {
-            stream_id: 1,
-            codec_name: "h264".to_string(),
-            media_type: "video".to_string(),
-            bitrate_kbps: 4000,
-        }]);
+        self.zoxide_jump
+            .add_or_update_visit("/home/sovereign/src", 1700000000);
+        let _ = self
+            .hyperfine_bench
+            .record_benchmark("sovereign_boot", &[0.012, 0.011, 0.013]);
+        self.procs_viewer
+            .register_process(1, 0, "root", "sovereign_kernel", 5, 16384, "Running");
+        self.dust_usage
+            .record_directory("/home/sovereign", 1024 * 1024 * 50, 12);
+        self.dogdns_query
+            .register_dns_record("api.sigmaos.org", "A", "10.0.0.1", 300);
+        self.gping_network
+            .record_ping("10.0.0.1", 1.2, 1700000000, true);
+        self.mpv_media.load_media_stream(
+            120,
+            vec![MediaStreamTrack {
+                stream_id: 1,
+                codec_name: "h264".to_string(),
+                media_type: "video".to_string(),
+                bitrate_kbps: 4000,
+            }],
+        );
         self.lsp_client.publish_diagnostics("src/main.rs", vec![]);
-        self.topgrade_updater.record_update_step("Pacman", "pacman", 5, true);
-        let _ = self.atuin_history.record_command("sigma status", 0, 15, 1700000000, "session_01");
+        self.topgrade_updater
+            .record_update_step("Pacman", "pacman", 5, true);
+        let _ = self
+            .atuin_history
+            .record_command("sigma status", 0, 15, 1700000000, "session_01");
 
         Ok(format!(
             "Sovereign Stack Active: {} legacy open-source projects obsoleted",
@@ -9547,7 +9567,9 @@ mod tests {
     #[test]
     fn test_sovereign_hyperfine_benchmark() {
         let mut hyperfine = SovereignHyperfineBenchmarkEngine::new(3, 10);
-        let res = hyperfine.record_benchmark("ls -la", &[0.010, 0.012, 0.011, 0.013, 0.009]).unwrap();
+        let res = hyperfine
+            .record_benchmark("ls -la", &[0.010, 0.012, 0.011, 0.013, 0.009])
+            .unwrap();
         assert_eq!(res.command, "ls -la");
         assert_eq!(res.runs_count, 5);
         assert!(res.mean_secs > 0.0);

@@ -33,12 +33,12 @@ impl SystemToolsManager {
             active: AtomicBool::new(false),
         }
     }
-    
+
     /// Initialize system tools
     pub fn init(&mut self) {
         self.active.store(true, Ordering::Relaxed);
     }
-    
+
     /// Launch tool
     pub fn launch_tool(&self, tool: SystemTool) -> Result<(), &'static str> {
         match tool {
@@ -76,7 +76,7 @@ impl SystemToolsManager {
             }
         }
     }
-    
+
     /// Is active
     pub fn is_active(&self) -> bool {
         self.active.load(Ordering::Relaxed)
@@ -101,22 +101,20 @@ pub fn init_system_tools_manager() {
 
 /// Get global system tools manager
 pub fn get_system_tools_manager() -> Option<&'static mut SystemToolsManager> {
-    unsafe {
-        SYSTEM_TOOLS_MANAGER.as_mut()
-    }
+    unsafe { SYSTEM_TOOLS_MANAGER.as_mut() }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_system_tools_manager_init() {
         let mut manager = SystemToolsManager::new();
         manager.init();
         assert!(manager.is_active());
     }
-    
+
     #[test]
     fn test_launch_tool() {
         let manager = SystemToolsManager::new();
