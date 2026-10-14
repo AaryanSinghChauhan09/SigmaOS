@@ -3,24 +3,26 @@
 //! Synthesizes capabilities inspired by Linux & BSD system administration, observability,
 //! and telemetry tooling:
 //! - Journald, Rsyslog, Syslog-ng, Syslogd & Logrotate: Multi-facility structured logging,
-//!   RFC 5424 syslog framing, rate limiting, and automated log rotation policies.
+//!   RFC 5424 syslog framing, rate limiting, forward-secure sealing (FSS), syslog-ng pipeline routing,
+//!   and automated log rotation policies with size/time directives.
 //! - Dmesg: Kernel ring buffer logger with microsecond boot timestamps, severity levels,
-//!   and facility tag filtering.
-//! - Top & Htop: Process activity telemetry, thread counts, CPU/RAM utilization,
-//!   IO rates, and process tree hierarchy.
-//! - Vmstat, Iostat, Sar & Sysstat: System memory, swap, context switches, disk IOPS,
-//!   and historical time-series performance metrics.
-//! - Lsof: Open file descriptor inspection across processes, paths, sockets, and IPC handles.
-//! - Lspci, Lsusb & Dmidecode: Comprehensive hardware discovery for PCI, USB, and SMBIOS/DMI tables.
-//! - Sosreport, Prometheus node_exporter & Collectd: Diagnostic archive bundle generation
-//!   and standard Prometheus metrics exposition format.
+//!   facility tag filtering, ANSI severity colorization, and console printk loglevel masking.
+//! - Top, Htop & Btop: Process activity telemetry, thread counts, CPU/RAM utilization,
+//!   IO rates, process tree hierarchy, priority renicing, signal management, and CachyOS BORE interactivity scoring.
+//! - Vmstat, Iostat, Sar & Sysstat: System memory, swap, context switches, disk IOPS & await times,
+//!   network interface throughput, and historical binary time-series performance metrics.
+//! - Lsof: Open file descriptor inspection across processes, paths, socket states, and mmap shared libraries.
+//! - Lspci, Lsusb, Lscpu, Lsblk & Dmidecode: Comprehensive hardware discovery for PCI, USB, CPU topology,
+//!   block device trees, and SMBIOS/DMI tables.
+//! - Sosreport, Prometheus node_exporter & Collectd: Diagnostic archive bundle generation,
+//!   extended Prometheus metrics exposition format, Collectd JSON payloads, and Pull Request gateway submissions.
 
 use std::collections::{BTreeMap, HashMap};
 use std::string::{String, ToString};
 use std::vec::Vec;
 
 // ============================================================================
-// 1. JOURNALD / RSYSLOG / LOGROTATE LOG ENGINE
+// 1. JOURNALD / RSYSLOG / SYSLOG-NG / LOGROTATE LOG ENGINE
 // ============================================================================
 
 /// Syslog Facility inspired by Linux syslog.h & BSD RFC 5424
@@ -103,6 +105,16 @@ impl LogSeverity {
             LogSeverity::Debug => "DEBUG",
         }
     }
+
+    pub fn ansi_color(&self) -> &'static str {
+        match self {
+            LogSeverity::Emergency | LogSeverity::Alert | LogSeverity::Critical => "\x1b[1;31m", // Red Bold
+            LogSeverity::Error => "\x1b[31m",                                                    // Red
+            LogSeverity::Warning => "\x1b[33m",                                                  // Yellow
+            LogSeverity::Notice | LogSeverity::Info => "\x1b[32m",                               // Green
+            LogSeverity::Debug => "\x1b[36m",                                                    // Cyan
+        }
+    }
 }
 
 /// Structured Journald Log Entry
@@ -116,6 +128,7 @@ pub struct JournalLogEntry {
     pub app_name: String,
     pub message: String,
     pub metadata: BTreeMap<String, String>,
+    pub sealing_hash: Option<[u8; 32]>,
 }
 
 impl JournalLogEntry {
@@ -139,21 +152,69 @@ impl JournalLogEntry {
     }
 }
 
+/// Forward Secure Sealing (FSS) Verifier inspired by systemd-journald
+#[derive(Debug, Clone)]
+pub struct JournaldBinarySealingVerifier {
+    pub secret_seed: [u8; 32],
+    pub current_epoch: u64,
+}
+
+impl JournaldBinarySealingVerifier {
+    pub fn new(seed: [u8; 32]) -> Self {
+        Self {
+            secret_seed: seed,
+            current_epoch: 1,
+        }
+    }
+
+    pub fn compute_seal(&self, entry_id: u64, message: &str) -> [u8; 32] {
+        let mut hash = [0u8; 32];
+        let bytes = message.as_bytes();
+        for (i, b) in bytes.iter().enumerate() {
+            hash[i % 32] ^= b ^ (entry_id as u8) ^ (self.current_epoch as u8) ^ self.secret_seed[i % 32];
+        }
+        hash
+    }
+
+    pub fn verify_seal(&self, entry: &JournalLogEntry) -> bool {
+        if let Some(seal) = entry.sealing_hash {
+            let expected = self.compute_seal(entry.id, &entry.message);
+            seal == expected
+        } else {
+            false
+        }
+    }
+}
+
+/// Syslog-ng Pipeline Routing Directive
+#[derive(Debug, Clone)]
+pub struct SyslogNgFilterRule {
+    pub rule_name: String,
+    pub facility_filter: Option<SyslogFacility>,
+    pub severity_max: Option<LogSeverity>,
+    pub app_pattern: Option<String>,
+    pub destination_target: String,
+}
+
 /// Log Rotation Policy (`logrotate`)
 #[derive(Debug, Clone)]
 pub struct LogRotateConfig {
     pub max_entries_per_file: usize,
     pub max_rotated_generations: usize,
     pub compress_old_logs: bool,
+    pub rotate_daily: bool,
+    pub max_size_bytes: u64,
 }
 
-/// Journald & Rsyslog Unified Logging Engine
+/// Journald & Rsyslog & Syslog-ng Unified Logging Engine
 #[derive(Debug, Clone)]
 pub struct JournaldRsyslogLogEngine {
     pub hostname: String,
     pub entries: Vec<JournalLogEntry>,
     pub rotated_archives: Vec<Vec<JournalLogEntry>>,
     pub config: LogRotateConfig,
+    pub pipeline_rules: Vec<SyslogNgFilterRule>,
+    pub sealing_verifier: Option<JournaldBinarySealingVerifier>,
     pub next_id: u64,
     pub rate_limit_burst: usize,
     pub current_burst_count: usize,
@@ -169,11 +230,19 @@ impl JournaldRsyslogLogEngine {
                 max_entries_per_file: 500,
                 max_rotated_generations: 4,
                 compress_old_logs: true,
+                rotate_daily: true,
+                max_size_bytes: 10_485_760, // 10MB
             },
+            pipeline_rules: Vec::new(),
+            sealing_verifier: Some(JournaldBinarySealingVerifier::new([0x42; 32])),
             next_id: 1,
             rate_limit_burst: 100,
             current_burst_count: 0,
         }
+    }
+
+    pub fn add_pipeline_rule(&mut self, rule: SyslogNgFilterRule) {
+        self.pipeline_rules.push(rule);
     }
 
     pub fn log(
@@ -194,6 +263,11 @@ impl JournaldRsyslogLogEngine {
         let entry_id = self.next_id;
         self.next_id += 1;
 
+        let seal = self
+            .sealing_verifier
+            .as_ref()
+            .map(|v| v.compute_seal(entry_id, message));
+
         let entry = JournalLogEntry {
             id: entry_id,
             timestamp_us: entry_id * 10_000,
@@ -203,6 +277,7 @@ impl JournaldRsyslogLogEngine {
             app_name: app_name.to_string(),
             message: message.to_string(),
             metadata,
+            sealing_hash: seal,
         };
 
         self.entries.push(entry);
@@ -275,6 +350,7 @@ pub struct DmesgKernelRingBufferEngine {
     pub buffer: Vec<DmesgRecord>,
     pub max_capacity: usize,
     pub sequence_counter: u64,
+    pub console_loglevel: LogSeverity,
 }
 
 impl DmesgKernelRingBufferEngine {
@@ -283,9 +359,14 @@ impl DmesgKernelRingBufferEngine {
             buffer: Vec::new(),
             max_capacity: capacity,
             sequence_counter: 0,
+            console_loglevel: LogSeverity::Debug,
         };
         engine.populate_initial_kernel_boot_sequence();
         engine
+    }
+
+    pub fn set_console_loglevel(&mut self, level: LogSeverity) {
+        self.console_loglevel = level;
     }
 
     fn populate_initial_kernel_boot_sequence(&mut self) {
@@ -398,13 +479,29 @@ impl DmesgKernelRingBufferEngine {
             .collect()
     }
 
+    pub fn format_colorized_output(&self) -> Vec<String> {
+        self.buffer
+            .iter()
+            .filter(|rec| rec.severity <= self.console_loglevel)
+            .map(|rec| {
+                format!(
+                    "{}[{:10.6}] [{}] {}\x1b[0m",
+                    rec.severity.ansi_color(),
+                    rec.timestamp_us as f64 / 1_000_000.0,
+                    rec.subsystem,
+                    rec.message
+                )
+            })
+            .collect()
+    }
+
     pub fn clear(&mut self) {
         self.buffer.clear();
     }
 }
 
 // ============================================================================
-// 3. TOP & HTOP PROCESS MONITOR ENGINE
+// 3. TOP, HTOP & BTOP PROCESS MONITOR ENGINE
 // ============================================================================
 
 /// Process Execution State
@@ -429,7 +526,7 @@ impl ProcessState {
     }
 }
 
-/// Process Activity Telemetry Record (`top`/`htop`)
+/// Process Activity Telemetry Record (`top`/`htop`/`btop`)
 #[derive(Debug, Clone)]
 pub struct ProcessTelemetry {
     pub pid: u32,
@@ -444,6 +541,8 @@ pub struct ProcessTelemetry {
     pub num_threads: u32,
     pub read_bytes_sec: u64,
     pub write_bytes_sec: u64,
+    pub nice_priority: i8,
+    pub cachyos_bore_interactivity_score: u32,
 }
 
 /// Top & Htop Process Telemetry Monitor
@@ -482,6 +581,8 @@ impl TopHtopProcessMonitorEngine {
                 num_threads: 1,
                 read_bytes_sec: 1024,
                 write_bytes_sec: 512,
+                nice_priority: 0,
+                cachyos_bore_interactivity_score: 95,
             },
             ProcessTelemetry {
                 pid: 102,
@@ -496,6 +597,8 @@ impl TopHtopProcessMonitorEngine {
                 num_threads: 2,
                 read_bytes_sec: 4096,
                 write_bytes_sec: 16384,
+                nice_priority: -5,
+                cachyos_bore_interactivity_score: 88,
             },
             ProcessTelemetry {
                 pid: 540,
@@ -510,11 +613,34 @@ impl TopHtopProcessMonitorEngine {
                 num_threads: 8,
                 read_bytes_sec: 32768,
                 write_bytes_sec: 8192,
+                nice_priority: -10,
+                cachyos_bore_interactivity_score: 120,
             },
         ];
 
         for proc in samples {
             self.processes.insert(proc.pid, proc);
+        }
+    }
+
+    pub fn renice_process(&mut self, pid: u32, new_nice: i8) -> bool {
+        if let Some(proc) = self.processes.get_mut(&pid) {
+            proc.nice_priority = new_nice.clamp(-20, 19);
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn send_signal(&mut self, pid: u32, signal: u32) -> bool {
+        if let Some(proc) = self.processes.get_mut(&pid) {
+            if signal == 9 || signal == 15 {
+                // SIGKILL / SIGTERM
+                proc.state = ProcessState::Zombie;
+            }
+            true
+        } else {
+            false
         }
     }
 
@@ -582,8 +708,20 @@ pub struct IostatDeviceSnapshot {
     pub tps: f32,
     pub read_kb_sec: f32,
     pub write_kb_sec: f32,
+    pub r_await_ms: f32,
+    pub w_await_ms: f32,
     pub avg_await_ms: f32,
     pub util_pct: f32,
+}
+
+/// Network Interface Bandwidth Metrics (`sar -n DEV`)
+#[derive(Debug, Clone)]
+pub struct NetworkInterfaceSnapshot {
+    pub interface_name: String,
+    pub rx_packets_sec: f32,
+    pub tx_packets_sec: f32,
+    pub rx_bytes_sec: f32,
+    pub tx_bytes_sec: f32,
 }
 
 /// Sar Time-Series Historical Performance Buffer (`sysstat`)
@@ -591,6 +729,7 @@ pub struct IostatDeviceSnapshot {
 pub struct VmstatIostatSarMetricsCollectorEngine {
     pub vmstat_history: Vec<VmstatSnapshot>,
     pub iostat_history: Vec<IostatDeviceSnapshot>,
+    pub netstat_history: Vec<NetworkInterfaceSnapshot>,
     pub max_history_capacity: usize,
 }
 
@@ -599,6 +738,7 @@ impl VmstatIostatSarMetricsCollectorEngine {
         let mut engine = Self {
             vmstat_history: Vec::new(),
             iostat_history: Vec::new(),
+            netstat_history: Vec::new(),
             max_history_capacity: 120,
         };
         engine.record_sample_snapshot();
@@ -631,8 +771,18 @@ impl VmstatIostatSarMetricsCollectorEngine {
             tps: 42.5,
             read_kb_sec: 1024.0,
             write_kb_sec: 512.0,
+            r_await_ms: 0.75,
+            w_await_ms: 0.95,
             avg_await_ms: 0.85,
             util_pct: 3.2,
+        });
+
+        self.netstat_history.push(NetworkInterfaceSnapshot {
+            interface_name: "eth0".to_string(),
+            rx_packets_sec: 1250.0,
+            tx_packets_sec: 980.0,
+            rx_bytes_sec: 1_500_000.0,
+            tx_bytes_sec: 800_000.0,
         });
     }
 
@@ -693,6 +843,7 @@ pub enum OpenFileType {
     UnixSocket,
     Ipv4Socket,
     Ipv6Socket,
+    MmapSharedLib,
 }
 
 /// Open File Descriptor Record (`lsof`)
@@ -701,11 +852,12 @@ pub struct OpenFileRecord {
     pub pid: u32,
     pub command: String,
     pub user: String,
-    pub fd_name: String, // cwd, rtd, txt, 0u, 1w, 2w, etc.
+    pub fd_name: String, // cwd, rtd, txt, mem, 0u, 1w, 2w, etc.
     pub file_type: OpenFileType,
     pub device: String,
     pub node_inode: u64,
     pub path_name: String,
+    pub socket_state: Option<String>,
 }
 
 /// Lsof Open Files Inspector Engine
@@ -734,6 +886,7 @@ impl LsofOpenFilesInspectorEngine {
                 device: "8,1".to_string(),
                 node_inode: 2,
                 path_name: "/".to_string(),
+                socket_state: None,
             },
             OpenFileRecord {
                 pid: 540,
@@ -744,6 +897,7 @@ impl LsofOpenFilesInspectorEngine {
                 device: "0,12".to_string(),
                 node_inode: 15420,
                 path_name: "@wayland-0".to_string(),
+                socket_state: Some("ESTABLISHED".to_string()),
             },
             OpenFileRecord {
                 pid: 540,
@@ -754,6 +908,18 @@ impl LsofOpenFilesInspectorEngine {
                 device: "0,14".to_string(),
                 node_inode: 18910,
                 path_name: "127.0.0.1:8080".to_string(),
+                socket_state: Some("LISTEN".to_string()),
+            },
+            OpenFileRecord {
+                pid: 540,
+                command: "zenith-desktop".to_string(),
+                user: "sigma".to_string(),
+                fd_name: "mem".to_string(),
+                file_type: OpenFileType::MmapSharedLib,
+                device: "8,1".to_string(),
+                node_inode: 98124,
+                path_name: "/lib64/libwayland-client.so.0.21.0".to_string(),
+                socket_state: None,
             },
         ]);
     }
@@ -781,7 +947,7 @@ impl Default for LsofOpenFilesInspectorEngine {
 }
 
 // ============================================================================
-// 6. HARDWARE DISCOVERY ENGINE (LSPCI, LSUSB, DMIDECODE)
+// 6. HARDWARE DISCOVERY ENGINE (LSPCI, LSUSB, LSCPU, LSBLK, DMIDECODE)
 // ============================================================================
 
 /// PCI Device Info (`lspci`)
@@ -808,6 +974,35 @@ pub struct UsbDeviceRecord {
     pub speed_mbps: u32,
 }
 
+/// CPU Topology Info (`lscpu`)
+#[derive(Debug, Clone)]
+pub struct LscpuInfo {
+    pub architecture: String,
+    pub cpu_op_modes: String,
+    pub byte_order: String,
+    pub total_cpus: u32,
+    pub threads_per_core: u32,
+    pub cores_per_socket: u32,
+    pub sockets_count: u32,
+    pub vendor_id: String,
+    pub model_name: String,
+    pub cpu_mhz: f32,
+    pub simd_flags: Vec<String>,
+}
+
+/// Block Device Topology (`lsblk`)
+#[derive(Debug, Clone)]
+pub struct LsblkDiskTopology {
+    pub name: String,
+    pub maj_min: String,
+    pub rm: bool,
+    pub size_bytes: u64,
+    pub ro: bool,
+    pub dev_type: String, // disk, part, lvm
+    pub mountpoint: Option<String>,
+    pub io_scheduler: String,
+}
+
 /// DMI/SMBIOS System Info (`dmidecode`)
 #[derive(Debug, Clone)]
 pub struct DmiDecodeInfo {
@@ -827,6 +1022,8 @@ pub struct DmiDecodeInfo {
 pub struct HardwareDiscoveryInspectorEngine {
     pub pci_devices: Vec<PciDeviceRecord>,
     pub usb_devices: Vec<UsbDeviceRecord>,
+    pub cpu_info: LscpuInfo,
+    pub block_devices: Vec<LsblkDiskTopology>,
     pub dmi_info: DmiDecodeInfo,
 }
 
@@ -862,6 +1059,46 @@ impl HardwareDiscoveryInspectorEngine {
                 product: "USB Receiver".to_string(),
                 speed_mbps: 12,
             }],
+            cpu_info: LscpuInfo {
+                architecture: "x86_64".to_string(),
+                cpu_op_modes: "32-bit, 64-bit".to_string(),
+                byte_order: "Little Endian".to_string(),
+                total_cpus: 64,
+                threads_per_core: 2,
+                cores_per_socket: 32,
+                sockets_count: 1,
+                vendor_id: "GenuineIntel".to_string(),
+                model_name: "13th Gen Intel(R) Core(TM) i9-13900K".to_string(),
+                cpu_mhz: 3000.0,
+                simd_flags: vec![
+                    "fpu".to_string(),
+                    "sse2".to_string(),
+                    "avx2".to_string(),
+                    "avx512f".to_string(),
+                ],
+            },
+            block_devices: vec![
+                LsblkDiskTopology {
+                    name: "sda".to_string(),
+                    maj_min: "8:0".to_string(),
+                    rm: false,
+                    size_bytes: 1_000_204_886_016,
+                    ro: false,
+                    dev_type: "disk".to_string(),
+                    mountpoint: None,
+                    io_scheduler: "bfq".to_string(),
+                },
+                LsblkDiskTopology {
+                    name: "sda1".to_string(),
+                    maj_min: "8:1".to_string(),
+                    rm: false,
+                    size_bytes: 1_000_203_837_440,
+                    ro: false,
+                    dev_type: "part".to_string(),
+                    mountpoint: Some("/".to_string()),
+                    io_scheduler: "bfq".to_string(),
+                },
+            ],
             dmi_info: DmiDecodeInfo {
                 bios_vendor: "American Megatrends Inc.".to_string(),
                 bios_version: "2.40".to_string(),
@@ -892,7 +1129,7 @@ impl Default for HardwareDiscoveryInspectorEngine {
 }
 
 // ============================================================================
-// 7. SOSREPORT & PROMETHEUS NODE_EXPORTER ENGINE
+// 7. SOSREPORT, PROMETHEUS NODE_EXPORTER & COLLECTD EXPORTER ENGINE
 // ============================================================================
 
 /// Sosreport Diagnostic Archive Bundle
@@ -906,7 +1143,7 @@ pub struct SosreportArchiveBundle {
     pub captured_files: BTreeMap<String, String>,
 }
 
-/// Sosreport & Prometheus Node Exporter Engine
+/// Sosreport, Prometheus & Collectd Exporter Engine
 #[derive(Debug, Clone)]
 pub struct SosreportPrometheusExporterEngine {
     pub hostname: String,
@@ -950,12 +1187,13 @@ impl SosreportPrometheusExporterEngine {
 
         // Include DMI / hardware discovery
         let dmi_txt = format!(
-            "BIOS Vendor: {}\nBIOS Version: {}\nSystem: {} {}\nSerial: {}\n",
+            "BIOS Vendor: {}\nBIOS Version: {}\nSystem: {} {}\nSerial: {}\nCPU Cores: {}\n",
             hw.dmi_info.bios_vendor,
             hw.dmi_info.bios_version,
             hw.dmi_info.sys_manufacturer,
             hw.dmi_info.sys_product_name,
-            hw.dmi_info.sys_serial_number
+            hw.dmi_info.sys_serial_number,
+            hw.cpu_info.total_cpus
         );
         files.insert("sys/class/dmi/id/bios".to_string(), dmi_txt);
 
@@ -1013,6 +1251,93 @@ impl SosreportPrometheusExporterEngine {
 
         out
     }
+
+    /// Export metrics in Collectd JSON format
+    pub fn export_collectd_json(&self, top: &TopHtopProcessMonitorEngine) -> String {
+        format!(
+            "[{{\"host\":\"{}\",\"plugin\":\"cpu\",\"type\":\"percent\",\"values\":[{},{},{}]}}]",
+            self.hostname,
+            top.total_cpu_user_pct,
+            top.total_cpu_sys_pct,
+            top.total_cpu_idle_pct
+        )
+    }
+}
+
+// ============================================================================
+// 8. LOGGING, MONITORING & DIAGNOSTICS PULL REQUEST GATEWAY
+// ============================================================================
+
+/// Pull Request Submission for Diagnostics Subsystem
+#[derive(Debug, Clone)]
+pub struct DiagnosticsPrSubmission {
+    pub pr_id: u64,
+    pub title: String,
+    pub author: String,
+    pub tool_target: String,
+    pub feature_summary: String,
+    pub diff_payload: String,
+    pub pqc_signature: [u8; 64],
+    pub is_passed_ci: bool,
+}
+
+/// Pull Request Gateway Engine for Diagnostics Subsystem
+#[derive(Debug, Clone)]
+pub struct LoggingMonitoringDiagnosticsPullRequestEngine {
+    pub pending_prs: Vec<DiagnosticsPrSubmission>,
+    pub merged_prs: Vec<DiagnosticsPrSubmission>,
+}
+
+impl LoggingMonitoringDiagnosticsPullRequestEngine {
+    pub fn new() -> Self {
+        Self {
+            pending_prs: Vec::new(),
+            merged_prs: Vec::new(),
+        }
+    }
+
+    pub fn submit_pr(
+        &mut self,
+        title: &str,
+        author: &str,
+        tool_target: &str,
+        feature_summary: &str,
+        diff_payload: &str,
+    ) -> u64 {
+        let pr_id = (self.pending_prs.len() + self.merged_prs.len() + 1) as u64;
+        let pr = DiagnosticsPrSubmission {
+            pr_id,
+            title: title.to_string(),
+            author: author.to_string(),
+            tool_target: tool_target.to_string(),
+            feature_summary: feature_summary.to_string(),
+            diff_payload: diff_payload.to_string(),
+            pqc_signature: [0x77; 64],
+            is_passed_ci: true,
+        };
+        self.pending_prs.push(pr);
+        pr_id
+    }
+
+    pub fn verify_and_merge(&mut self, pr_id: u64) -> bool {
+        if let Some(idx) = self.pending_prs.iter().position(|pr| pr.pr_id == pr_id) {
+            let pr = self.pending_prs.remove(idx);
+            if pr.is_passed_ci {
+                self.merged_prs.push(pr);
+                true
+            } else {
+                false
+            }
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for LoggingMonitoringDiagnosticsPullRequestEngine {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 // ============================================================================
@@ -1029,6 +1354,7 @@ pub struct SovereignLinuxBsdLoggingMonitoringDiagnosticsSuite {
     pub lsof_inspector: LsofOpenFilesInspectorEngine,
     pub hardware: HardwareDiscoveryInspectorEngine,
     pub exporter: SosreportPrometheusExporterEngine,
+    pub pr_gateway: LoggingMonitoringDiagnosticsPullRequestEngine,
 }
 
 impl SovereignLinuxBsdLoggingMonitoringDiagnosticsSuite {
@@ -1041,6 +1367,7 @@ impl SovereignLinuxBsdLoggingMonitoringDiagnosticsSuite {
             lsof_inspector: LsofOpenFilesInspectorEngine::new(),
             hardware: HardwareDiscoveryInspectorEngine::new(),
             exporter: SosreportPrometheusExporterEngine::new(hostname),
+            pr_gateway: LoggingMonitoringDiagnosticsPullRequestEngine::new(),
         }
     }
 
@@ -1071,6 +1398,14 @@ impl SovereignLinuxBsdLoggingMonitoringDiagnosticsSuite {
         diag.insert(
             "usb_devices_count".to_string(),
             self.hardware.usb_devices.len().to_string(),
+        );
+        diag.insert(
+            "cpu_architecture".to_string(),
+            self.hardware.cpu_info.architecture.clone(),
+        );
+        diag.insert(
+            "block_devices_count".to_string(),
+            self.hardware.block_devices.len().to_string(),
         );
         diag.insert(
             "bios_vendor".to_string(),
@@ -1110,6 +1445,9 @@ mod tests {
         assert!(rfc5424.contains("sigma-node-1"));
         assert!(rfc5424.contains("Out of memory"));
 
+        let verifier = journal.sealing_verifier.as_ref().unwrap();
+        assert!(verifier.verify_seal(&journal.entries[0]));
+
         let queried = journal.query_journal(Some("kernel"), Some(LogSeverity::Error));
         assert_eq!(queried.len(), 1);
     }
@@ -1126,12 +1464,27 @@ mod tests {
         );
         let filtered = dmesg.filter(Some(LogSeverity::Warning), Some("usb"));
         assert!(!filtered.is_empty());
+
+        let formatted = dmesg.format_colorized_output();
+        assert!(!formatted.is_empty());
     }
 
     #[test]
     fn test_top_htop_process_monitor() {
-        let monitor = TopHtopProcessMonitorEngine::new();
+        let mut monitor = TopHtopProcessMonitorEngine::new();
         assert!(!monitor.processes.is_empty());
+
+        assert!(monitor.renice_process(540, -15));
+        assert_eq!(
+            monitor.processes.get(&540).unwrap().nice_priority,
+            -15
+        );
+
+        assert!(monitor.send_signal(540, 15));
+        assert_eq!(
+            monitor.processes.get(&540).unwrap().state,
+            ProcessState::Zombie
+        );
 
         let top_cpu = monitor.sort_by_cpu();
         assert!(top_cpu[0].cpu_usage_pct >= top_cpu[1].cpu_usage_pct);
@@ -1145,6 +1498,7 @@ mod tests {
         let collector = VmstatIostatSarMetricsCollectorEngine::new();
         assert!(!collector.vmstat_history.is_empty());
         assert!(!collector.iostat_history.is_empty());
+        assert!(!collector.netstat_history.is_empty());
 
         let (user, sys, idle) = collector.calculate_sar_average_cpu();
         assert!(user > 0.0);
@@ -1160,6 +1514,9 @@ mod tests {
 
         let socket_files = lsof.find_by_path("@wayland-0");
         assert_eq!(socket_files.len(), 1);
+
+        let mmap_files = lsof.find_by_path("libwayland-client");
+        assert_eq!(mmap_files.len(), 1);
     }
 
     #[test]
@@ -1167,6 +1524,8 @@ mod tests {
         let hw = HardwareDiscoveryInspectorEngine::new();
         assert_eq!(hw.pci_devices.len(), 2);
         assert_eq!(hw.usb_devices.len(), 1);
+        assert_eq!(hw.cpu_info.architecture, "x86_64");
+        assert_eq!(hw.block_devices.len(), 2);
         assert_eq!(hw.dmi_info.bios_vendor, "American Megatrends Inc.");
     }
 
@@ -1183,5 +1542,26 @@ mod tests {
             .export_prometheus_metrics(&suite.top_monitor, &suite.vmstat_collector);
         assert!(prom.contains("node_cpu_seconds_total"));
         assert!(prom.contains("node_memory_MemFree_bytes"));
+
+        let collectd = suite.exporter.export_collectd_json(&suite.top_monitor);
+        assert!(collectd.contains("test-host"));
+    }
+
+    #[test]
+    fn test_diagnostics_pr_gateway() {
+        let mut gateway = LoggingMonitoringDiagnosticsPullRequestEngine::new();
+        let pr_id = gateway.submit_pr(
+            "Add Btop GPU Telemetry",
+            "developer",
+            "btop",
+            "Adds GPU utilization and temperature tracking",
+            "+ gpu_temp_celsius: f32",
+        );
+        assert_eq!(pr_id, 1);
+        assert_eq!(gateway.pending_prs.len(), 1);
+
+        assert!(gateway.verify_and_merge(pr_id));
+        assert_eq!(gateway.merged_prs.len(), 1);
+        assert_eq!(gateway.pending_prs.len(), 0);
     }
 }
