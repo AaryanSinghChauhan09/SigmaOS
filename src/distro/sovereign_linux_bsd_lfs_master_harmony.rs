@@ -80,11 +80,7 @@ impl LfsCrossToolchainBootstrapEngine {
     }
 
     pub fn prepare_chroot_environment(&mut self) -> Result<usize, &'static str> {
-        if self.chroot_prepared {
-            return Ok(4);
-        }
         self.chroot_prepared = true;
-        self.current_pass = LfsBuildPass::Pass2TemporaryToolsChroot;
         Ok(4) // virtual mounts: /dev, /proc, /sys, /run
     }
 
@@ -93,18 +89,32 @@ impl LfsCrossToolchainBootstrapEngine {
         if let Some(pkg) = self.toolchain_packages.iter_mut().find(|p| p.build_pass == pass && !p.is_compiled) {
             pkg.is_compiled = true;
             let res = format!("{}-{} compiled into {}", pkg.name, pkg.version, pkg.install_prefix);
+
+            if self.toolchain_packages.iter().filter(|p| p.build_pass == pass).all(|p| p.is_compiled) {
+                match self.current_pass {
+                    LfsBuildPass::Pass1CrossToolchain => {
+                        self.current_pass = LfsBuildPass::Pass2TemporaryToolsChroot;
+                        self.chroot_prepared = true;
+                    }
+                    LfsBuildPass::Pass2TemporaryToolsChroot => {
+                        self.current_pass = LfsBuildPass::Pass3FinalSystemInstallation;
+                    }
+                    LfsBuildPass::Pass3FinalSystemInstallation => {}
+                }
+            }
             return Some(res);
         }
 
-        // Advance pass if all packages in current pass are complete
         if self.toolchain_packages.iter().filter(|p| p.build_pass == pass).all(|p| p.is_compiled) {
             match self.current_pass {
                 LfsBuildPass::Pass1CrossToolchain => {
                     self.current_pass = LfsBuildPass::Pass2TemporaryToolsChroot;
                     self.chroot_prepared = true;
+                    return self.compile_next_package();
                 }
                 LfsBuildPass::Pass2TemporaryToolsChroot => {
                     self.current_pass = LfsBuildPass::Pass3FinalSystemInstallation;
+                    return self.compile_next_package();
                 }
                 LfsBuildPass::Pass3FinalSystemInstallation => {}
             }
