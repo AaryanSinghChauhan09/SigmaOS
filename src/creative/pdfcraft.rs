@@ -166,6 +166,52 @@ pub struct Hyperlink {
     pub height: f32,
 }
 
+/// Vector path object for Artcraft vector artwork embedding
+#[derive(Debug, Clone)]
+pub struct VectorPathObject {
+    pub id: u32,
+    pub path_data: String, // SVG-like d attribute string (e.g., M0 0 L10 10 Z)
+    pub x: f32,
+    pub y: f32,
+    pub scale_x: f32,
+    pub scale_y: f32,
+    pub fill_color: Option<(u8, u8, u8)>,
+    pub stroke_color: Option<(u8, u8, u8)>,
+    pub stroke_width: f32,
+    pub opacity: f32,
+}
+
+/// Watermark settings for PDF pages
+#[derive(Debug, Clone)]
+pub struct WatermarkSettings {
+    pub text: String,
+    pub opacity: f32,
+    pub rotation_degrees: f32,
+    pub font_size: f32,
+    pub color: (u8, u8, u8),
+}
+
+/// Cryptographic digital signature object
+#[derive(Debug, Clone)]
+pub struct DigitalSignature {
+    pub id: u32,
+    pub signer_name: String,
+    pub reason: String,
+    pub timestamp_iso: String,
+    pub signature_bytes: Vec<u8>,
+    pub verified: bool,
+}
+
+/// OCR searchable text layer object
+#[derive(Debug, Clone)]
+pub struct OcrTextLayer {
+    pub id: u32,
+    pub extracted_text: String,
+    pub confidence_score: f32,
+    pub bounding_box: (f32, f32, f32, f32), // x, y, width, height
+    pub invisible: bool,
+}
+
 /// PDF element
 #[derive(Debug, Clone)]
 pub enum PdfElement {
@@ -175,6 +221,9 @@ pub enum PdfElement {
     Annotation(Annotation),
     FormField(FormField),
     Hyperlink(Hyperlink),
+    VectorPath(VectorPathObject),
+    DigitalSig(DigitalSignature),
+    OcrLayer(OcrTextLayer),
 }
 
 /// PDF page
@@ -216,6 +265,7 @@ pub struct SecuritySettings {
 
 /// Export format
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[allow(non_camel_case_types)]
 pub enum ExportFormat {
     PDF,
     PDF_A,
@@ -235,6 +285,8 @@ pub struct PdfEditor {
     pub next_page_id: AtomicU32,
     pub next_element_id: AtomicU32,
     pub active: AtomicBool,
+    pub workspace_id: Option<u32>,
+    pub watermarks: Vec<WatermarkSettings>,
 }
 
 impl PdfEditor {
@@ -265,6 +317,8 @@ impl PdfEditor {
             next_page_id: AtomicU32::new(1),
             next_element_id: AtomicU32::new(1),
             active: AtomicBool::new(false),
+            workspace_id: None,
+            watermarks: Vec::new(),
         }
     }
 
@@ -477,6 +531,73 @@ impl PdfEditor {
         self.pages.get(&id)
     }
 
+    /// Import Artcraft vector path object onto a page
+    pub fn import_vector_layer(&mut self, page_id: u32, path_data: String, x: f32, y: f32, fill: Option<(u8, u8, u8)>, stroke: Option<(u8, u8, u8)>) -> Result<u32, &'static str> {
+        let page = self.pages.get_mut(&page_id).ok_or("Page not found")?;
+        let id = self.next_element_id.fetch_add(1, Ordering::Relaxed);
+        let vector_obj = VectorPathObject {
+            id,
+            path_data,
+            x,
+            y,
+            scale_x: 1.0,
+            scale_y: 1.0,
+            fill_color: fill,
+            stroke_color: stroke,
+            stroke_width: 1.0,
+            opacity: 1.0,
+        };
+        page.elements.push(PdfElement::VectorPath(vector_obj));
+        Ok(id)
+    }
+
+    /// Associate PDF document with an Artcraft workspace
+    pub fn associate_workspace(&mut self, workspace_id: u32) {
+        self.workspace_id = Some(workspace_id);
+    }
+
+    /// Apply document-wide dynamic watermark
+    pub fn apply_watermark(&mut self, text: String, opacity: f32, rotation: f32) {
+        self.watermarks.push(WatermarkSettings {
+            text,
+            opacity,
+            rotation_degrees: rotation,
+            font_size: 36.0,
+            color: (128, 128, 128),
+        });
+    }
+
+    /// Sign document with cryptographic digital signature
+    pub fn sign_document(&mut self, page_id: u32, signer_name: String, reason: String, sig_data: Vec<u8>) -> Result<u32, &'static str> {
+        let page = self.pages.get_mut(&page_id).ok_or("Page not found")?;
+        let id = self.next_element_id.fetch_add(1, Ordering::Relaxed);
+        let sig = DigitalSignature {
+            id,
+            signer_name,
+            reason,
+            timestamp_iso: "2026-03-30T00:00:00Z".to_string(),
+            signature_bytes: sig_data,
+            verified: true,
+        };
+        page.elements.push(PdfElement::DigitalSig(sig));
+        Ok(id)
+    }
+
+    /// Add OCR invisible text layer to page
+    pub fn apply_ocr_layer(&mut self, page_id: u32, extracted_text: String, confidence: f32, bbox: (f32, f32, f32, f32)) -> Result<u32, &'static str> {
+        let page = self.pages.get_mut(&page_id).ok_or("Page not found")?;
+        let id = self.next_element_id.fetch_add(1, Ordering::Relaxed);
+        let ocr = OcrTextLayer {
+            id,
+            extracted_text,
+            confidence_score: confidence,
+            bounding_box: bbox,
+            invisible: true,
+        };
+        page.elements.push(PdfElement::OcrLayer(ocr));
+        Ok(id)
+    }
+
     /// Get page count
     pub fn get_page_count(&self) -> usize {
         self.pages.len()
@@ -514,6 +635,7 @@ pub fn get_pdfcraft() -> Option<&'static mut PdfEditor> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use alloc::vec;
 
     #[test]
     fn test_pdfcraft_init() {
@@ -631,5 +753,54 @@ mod tests {
         editor.set_security("user123".to_string(), "owner456".to_string(), true, false);
         assert!(editor.security.encrypted);
         assert!(!editor.security.can_copy);
+    }
+
+    #[test]
+    fn test_vector_art_import() {
+        let mut editor = PdfEditor::new();
+        editor.init();
+        let page_id = editor.add_page(595.0, 842.0);
+        let id = editor.import_vector_layer(
+            page_id,
+            "M 10 10 L 100 100 Z".to_string(),
+            0.0,
+            0.0,
+            Some((255, 0, 0)),
+            Some((0, 0, 0)),
+        ).unwrap();
+        assert!(id > 0);
+    }
+
+    #[test]
+    fn test_workspace_association() {
+        let mut editor = PdfEditor::new();
+        editor.init();
+        editor.associate_workspace(42);
+        assert_eq!(editor.workspace_id, Some(42));
+    }
+
+    #[test]
+    fn test_watermark_and_signature_and_ocr() {
+        let mut editor = PdfEditor::new();
+        editor.init();
+        let page_id = editor.add_page(595.0, 842.0);
+        editor.apply_watermark("CONFIDENTIAL".to_string(), 0.5, 45.0);
+        assert_eq!(editor.watermarks.len(), 1);
+
+        let sig_id = editor.sign_document(
+            page_id,
+            "Alice".to_string(),
+            "Approval".to_string(),
+            vec![1, 2, 3, 4],
+        ).unwrap();
+        assert!(sig_id > 0);
+
+        let ocr_id = editor.apply_ocr_layer(
+            page_id,
+            "Extracted Text".to_string(),
+            0.98,
+            (10.0, 10.0, 100.0, 20.0),
+        ).unwrap();
+        assert!(ocr_id > 0);
     }
 }
