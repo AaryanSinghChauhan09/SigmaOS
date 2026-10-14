@@ -1,7 +1,25 @@
 // src/shell/diagnostics/mod.rs
 // Diagnostics engine for SigmaOS shell
 
+#[cfg(not(feature = "std"))]
+extern crate alloc;
+
+#[cfg(feature = "std")]
+use std::format as alloc_format;
+#[cfg(feature = "std")]
+use std::string::{String, ToString};
+#[cfg(feature = "std")]
+use std::vec as alloc_vec;
+#[cfg(feature = "std")]
+use std::vec::Vec;
+
+#[cfg(not(feature = "std"))]
+use alloc::format as alloc_format;
+#[cfg(not(feature = "std"))]
 use alloc::string::{String, ToString};
+#[cfg(not(feature = "std"))]
+use alloc::vec as alloc_vec;
+#[cfg(not(feature = "std"))]
 use alloc::vec::Vec;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -25,27 +43,27 @@ pub struct ShellDiagnosticsEngine;
 
 impl ShellDiagnosticsEngine {
     pub fn format_parse_error(line: usize, col: usize, reason: &str, token: Option<&str>) -> String {
-        let mut msg = alloc::format!("sigma-sh: parse error at line {}, col {}: {}", line, col, reason);
+        let mut msg = alloc_format!("sigma-sh: parse error at line {}, col {}: {}", line, col, reason);
         if let Some(tok) = token {
-            msg.push_str(&alloc::format!(" Near token '{}'", tok));
+            msg.push_str(&alloc_format!(" Near token '{}'", tok));
         }
         msg
     }
 
     pub fn format_command_not_found(cmd: &str, candidates: &[&str]) -> String {
-        let mut msg = alloc::format!("sigma-sh: {}: command not found", cmd);
+        let mut msg = alloc_format!("sigma-sh: {}: command not found", cmd);
         if let Some(best) = Self::find_closest_match(cmd, candidates) {
-            msg.push_str(&alloc::format!(" (did you mean '{}'?)", best));
+            msg.push_str(&alloc_format!(" (did you mean '{}'?)", best));
         }
         msg
     }
 
     pub fn format_redirection_error(target: &str, reason: &str) -> String {
-        alloc::format!("sigma-sh: {}: {}", target, reason)
+        alloc_format!("sigma-sh: {}: {}", target, reason)
     }
 
     pub fn format_unclosed_block_error(block_type: &str, line: usize) -> String {
-        alloc::format!("sigma-sh: unclosed construct '{}' originating at line {}", block_type, line)
+        alloc_format!("sigma-sh: unclosed construct '{}' originating at line {}", block_type, line)
     }
 
     fn find_closest_match<'a>(cmd: &'a str, candidates: &[&'a str]) -> Option<&'a str> {
@@ -66,7 +84,7 @@ impl ShellDiagnosticsEngine {
     fn levenshtein_distance(s1: &str, s2: &str) -> usize {
         let v1: Vec<char> = s1.chars().collect();
         let v2: Vec<char> = s2.chars().collect();
-        let mut dp = alloc::vec![alloc::vec![0; v2.len() + 1]; v1.len() + 1];
+        let mut dp = alloc_vec![alloc_vec![0; v2.len() + 1]; v1.len() + 1];
 
         for i in 0..=v1.len() {
             dp[i][0] = i;

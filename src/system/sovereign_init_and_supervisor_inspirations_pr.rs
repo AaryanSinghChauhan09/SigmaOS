@@ -151,6 +151,16 @@ impl SystemdInspirationsPrEngine {
         entry
     }
 
+    /// Allocate socket activation file descriptors (SD_LISTEN_FDS_START = 3).
+    pub fn prepare_socket_activation(&self, listen_sockets: &[&str]) -> (i32, Vec<(i32, String)>) {
+        const SD_LISTEN_FDS_START: i32 = 3;
+        let mut fds = Vec::new();
+        for (i, sock) in listen_sockets.iter().enumerate() {
+            fds.push((SD_LISTEN_FDS_START + i as i32, sock.to_string()));
+        }
+        (listen_sockets.len() as i32, fds)
+    }
+
     /// Generate systemd Pull Request proposal.
     pub fn generate_proposal(&self) -> CoreUserlandPrProposalManifest {
         CoreUserlandPrProposalManifest {
@@ -591,6 +601,20 @@ impl LaunchdInspirationsPrEngine {
         !job_label.is_empty() && (!socket_family.is_empty() || port > 0)
     }
 
+    /// Evaluate KeepAlive rule matrix.
+    pub fn evaluate_keep_alive(
+        &self,
+        successful_exit: bool,
+        last_exit_code: i32,
+        network_state_active: bool,
+    ) -> bool {
+        if successful_exit && last_exit_code == 0 {
+            false
+        } else {
+            network_state_active
+        }
+    }
+
     /// Generate launchd Pull Request proposal.
     pub fn generate_proposal(&self) -> CoreUserlandPrProposalManifest {
         CoreUserlandPrProposalManifest {
@@ -641,7 +665,7 @@ impl CronAnacronTimersAtPrEngine {
         Self
     }
 
-    /// Evaluate Vixie Cron minute-resolution schedule matcher.
+    /// Evaluate Vixie Cron minute-resolution schedule matcher with macro expansion (@daily, @reboot, etc.).
     pub fn parse_and_match_cron(
         &self,
         minute_expr: &str,
@@ -655,6 +679,13 @@ impl CronAnacronTimersAtPrEngine {
         curr_month: u32,
         curr_dow: u32,
     ) -> bool {
+        if minute_expr == "@reboot" {
+            return false;
+        }
+        if minute_expr == "@daily" {
+            return curr_min == 0 && curr_hour == 0;
+        }
+
         let match_field = |expr: &str, val: u32| -> bool {
             if expr == "*" {
                 return true;
@@ -793,6 +824,40 @@ impl SovereignInitAndSupervisorParityPrGateway {
             self.cron_timers_at.generate_proposal(),
         ]
     }
+
+    /// Execute end-to-end verification across all supervisor and job scheduling engines.
+    pub fn run_master_verification(&self) -> bool {
+        // 1. systemd dependencies and sd_notify
+        let deps = self
+            .systemd
+            .evaluate_unit_dependencies("sys.service", &[], &["dbus.service"], &[], &["dbus.service"])
+            .is_ok();
+        let (num_fds, _) = self.systemd.prepare_socket_activation(&["/run/sys.sock"]);
+
+        // 2. OpenRC script parse and transition
+        let (svc, _, _) = self.openrc.parse_openrc_init_script("# provide: net\nneed dbus\n");
+        let openrc_ok = svc == "net";
+
+        // 3. runit / s6 state scan
+        let runit_st = self.runit_s6.scan_runit_service_dir("sys", true, false);
+
+        // 4. SysVinit inittab line parse
+        let inittab = self
+            .sysvinit
+            .parse_inittab_line("s1:123:respawn:/sbin/getty 38400 tty1")
+            .is_some();
+
+        // 5. BSD rc order sorting
+        let bsd_conf = self.bsd_rc.parse_rc_conf("sysd_enable=\"YES\"\n");
+
+        // 6. launchd trigger
+        let launchd_ok = self.launchd.trigger_launchd_socket_activation("com.sigma.sys", "IPv4", 8080);
+
+        // 7. Cron and timers
+        let cron_ok = self.cron_timers_at.parse_and_match_cron("*", "*", "*", "*", "*", 0, 0, 1, 1, 1);
+
+        deps && num_fds == 1 && openrc_ok && runit_st == RunitS6State::Up && inittab && bsd_conf.get("sysd_enable").map_or(false, |v| v == "YES") && launchd_ok && cron_ok
+    }
 }
 
 // ============================================================================
@@ -822,6 +887,11 @@ mod tests {
         let entry = engine.format_journald_entry("my-daemon", 6, "Started successfully", &[("UNIT", "my.service")]);
         assert!(entry.contains("SYSLOG_IDENTIFIER=my-daemon"));
         assert!(entry.contains("UNIT=my.service"));
+
+        let (count, fds) = engine.prepare_socket_activation(&["/run/http.sock", "/run/https.sock"]);
+        assert_eq!(count, 2);
+        assert_eq!(fds[0].0, 3);
+        assert_eq!(fds[1].0, 4);
     }
 
     #[test]
@@ -894,6 +964,8 @@ mod tests {
     fn test_launchd_engine() {
         let engine = LaunchdInspirationsPrEngine::new();
         assert!(engine.trigger_launchd_socket_activation("com.apple.sshd", "IPv4", 22));
+        assert!(engine.evaluate_keep_alive(false, 1, true));
+        assert!(!engine.evaluate_keep_alive(true, 0, true));
     }
 
     #[test]
@@ -903,6 +975,7 @@ mod tests {
         // Cron matcher
         assert!(engine.parse_and_match_cron("*/5", "12", "*", "*", "*", 10, 12, 1, 1, 1));
         assert!(!engine.parse_and_match_cron("0", "12", "*", "*", "*", 10, 12, 1, 1, 1));
+        assert!(engine.parse_and_match_cron("@daily", "0", "0", "0", "0", 0, 0, 1, 1, 1));
 
         // Anacron catchup
         assert!(engine.evaluate_anacron_job("daily.job", 1, 0, 1000, 1000 + 86400, 0.5, 2.0));
@@ -938,5 +1011,7 @@ mod tests {
             assert_eq!(prop.status, "Ready for Merge");
             assert!(!prop.components_added.is_empty());
         }
+
+        assert!(gateway.run_master_verification());
     }
 }

@@ -382,8 +382,7 @@ impl FedoraGreenbootHealthCheckPrEngine {
     }
 
     pub fn register_check(&mut self, script_name: &str, status: GreenbootCheckStatus) {
-        self.health_checks
-            .insert(script_name.to_string(), status);
+        self.health_checks.insert(script_name.to_string(), status);
     }
 
     pub fn evaluate_health(&mut self) -> bool {

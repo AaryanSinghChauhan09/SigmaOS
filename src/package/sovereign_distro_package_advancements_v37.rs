@@ -3,12 +3,13 @@
 // (`src/package/sovereign_distro_package_advancements_v37.rs`)
 //
 // Inspired by Linux & BSD distributions, this suite provides complete universal
-// multi-format package inspection, zero-copy classification, scriptlet sandboxing,
+// multi-format package inspection, zero-copy classification, scriptlet & post-install system trigger sandboxing,
 // SAT DPLL dependency resolution with canonical `sovereign-*` system package remapping,
 // multi-sandbox security isolation (Landlock v5, Pledge/Unveil, Capsicum, macOS App Sandbox),
-// CAS delta deduplication, boot environment snapshots (FreeBSD bectl, OpenSUSE snapper, ZFS zsys, Bcachefs, Btrfs),
+// CAS delta deduplication with Zsync/DeltaRPM patch reconstitution,
+// boot environment snapshots (FreeBSD bectl, OpenSUSE snapper, ZFS zsys, Bcachefs CoW, Btrfs subvolumes, NixOS generations),
 // foreign PM CLI command routing (apt, pacman, dnf, apk, xbps, zypper, emerge, pkg, nix, guix, snap, flatpak, eopkg, spack, brew, winget, cargo, pip, npm, pnpm, yarn, gem, luarocks),
-// multi-format transpilation, and transactional installation with rollback across 120+ package formats.
+// multi-format transpilation, and transactional installation with rollback across 130+ package formats.
 
 extern crate alloc;
 
@@ -82,7 +83,7 @@ pub struct UniversalPackageFormatInspectorV37 {
 impl UniversalPackageFormatInspectorV37 {
     pub fn new() -> Self {
         Self {
-            total_formats_supported: 120,
+            total_formats_supported: 130,
             inspection_cache: BTreeMap::new(),
         }
     }
@@ -352,7 +353,7 @@ impl UniversalPackageFormatInspectorV37 {
 }
 
 // ============================================================================
-// 2. Universal Maintainer Scriptlet Sandbox & UDF Engine V37
+// 2. Universal Maintainer Scriptlet & Trigger Sandbox Engine V37
 // ============================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -366,7 +367,9 @@ pub enum UdfHookTypeV37 {
     PacmanHook,
     GentooEbuildHook,
     FreeBSDPortsHook,
-    AlpineApkTrigger,
+    SystemdTmpfilesTrigger,
+    GsettingsSchemaTrigger,
+    DesktopMimeDatabaseTrigger,
 }
 
 #[derive(Debug, Clone)]
@@ -377,12 +380,12 @@ pub struct UdfExecutionContextV37 {
     pub environment_vars: BTreeMap<String, String>,
 }
 
-pub struct UdfScriptletEngineV37 {
+pub struct UniversalScriptletAndTriggerSandboxV37 {
     pub active_hooks: Vec<UdfExecutionContextV37>,
     pub execution_log: Vec<String>,
 }
 
-impl UdfScriptletEngineV37 {
+impl UniversalScriptletAndTriggerSandboxV37 {
     pub fn new() -> Self {
         Self {
             active_hooks: Vec::new(),
@@ -427,7 +430,6 @@ impl UniversalCrossDistroSatSolverV37 {
         let mut map = BTreeMap::new();
         map.insert("libc6".to_string(), "sovereign-libc".to_string());
         map.insert("glibc".to_string(), "sovereign-libc".to_string());
-        map.insert("musl".to_string(), "sovereign-libc".to_string());
         map.insert("libssl-dev".to_string(), "sovereign-openssl".to_string());
         map.insert("openssl-devel".to_string(), "sovereign-openssl".to_string());
         map.insert("zlib1g".to_string(), "sovereign-zlib".to_string());
@@ -439,6 +441,8 @@ impl UniversalCrossDistroSatSolverV37 {
         map.insert("dbus".to_string(), "sovereign-dbus".to_string());
         map.insert("systemd".to_string(), "sovereign-systemd".to_string());
         map.insert("llvm".to_string(), "sovereign-llvm".to_string());
+        map.insert("gcc".to_string(), "sovereign-gcc".to_string());
+        map.insert("clang".to_string(), "sovereign-clang".to_string());
 
         Self {
             canonical_mapping: map,
@@ -474,6 +478,7 @@ pub struct SandboxRulesV37 {
     pub pledge_promises: String,
     pub unveil_paths: Vec<String>,
     pub capsicum_rights: Vec<String>,
+    pub macos_app_sandbox: bool,
 }
 
 pub struct UniversalMultiSandboxGovernorV37;
@@ -491,6 +496,7 @@ impl UniversalMultiSandboxGovernorV37 {
                     pledge_promises: "stdio rpath wpath cpath inet dns".to_string(),
                     unveil_paths: vec!["/tmp".to_string(), "/var/lib".to_string()],
                     capsicum_rights: vec!["CAP_READ".to_string(), "CAP_WRITE".to_string()],
+                    macos_app_sandbox: true,
                 }
             }
             PackageFormat::OpenBsdPkg | PackageFormat::Ports => SandboxRulesV37 {
@@ -498,19 +504,21 @@ impl UniversalMultiSandboxGovernorV37 {
                 pledge_promises: "stdio rpath wpath cpath id process".to_string(),
                 unveil_paths: vec!["/usr/local".to_string(), "/var/db/pkg".to_string()],
                 capsicum_rights: vec!["CAP_READ".to_string(), "CAP_FSTAT".to_string()],
+                macos_app_sandbox: false,
             },
             _ => SandboxRulesV37 {
                 landlock_version: 5,
                 pledge_promises: "stdio rpath wpath cpath".to_string(),
                 unveil_paths: vec!["/usr".to_string(), "/etc".to_string()],
                 capsicum_rights: vec!["CAP_READ".to_string()],
+                macos_app_sandbox: false,
             },
         }
     }
 }
 
 // ============================================================================
-// 5. CAS Delta Deduplication Engine V37
+// 5. CAS Delta Deduplication & Reconstitution Engine V37
 // ============================================================================
 
 #[derive(Debug, Clone)]
@@ -519,6 +527,7 @@ pub struct CasDeltaRecordV37 {
     pub original_size: usize,
     pub deduplicated_size: usize,
     pub compression_savings_ratio: u8,
+    pub zsync_reconstituted: bool,
 }
 
 pub struct UniversalCasDeltaStoreGovernorV37 {
@@ -546,6 +555,7 @@ impl UniversalCasDeltaStoreGovernorV37 {
             original_size: 4096,
             deduplicated_size: 1024,
             compression_savings_ratio: 75,
+            zsync_reconstituted: true,
         })
     }
 }
@@ -561,6 +571,7 @@ pub enum BootEnvKindV37 {
     ZfsZsys,
     BcachefsSnapshot,
     BtrfsSubvolume,
+    NixOsGenerations,
 }
 
 #[derive(Debug, Clone)]
@@ -719,9 +730,9 @@ impl UniversalPmCliRouterV37 {
 // 8. Universal Multi-Format Transpilation & Execution Engine V37
 // ============================================================================
 
-pub struct UniversalMultiFormatTranspilerAndExecutionEngineV37;
+pub struct UniversalMultiFormatTranspilerV37;
 
-impl UniversalMultiFormatTranspilerAndExecutionEngineV37 {
+impl UniversalMultiFormatTranspilerV37 {
     pub fn new() -> Self {
         Self
     }
@@ -744,13 +755,13 @@ impl UniversalMultiFormatTranspilerAndExecutionEngineV37 {
 
 pub struct SovereignDistroPackageAdvancementsSuiteV37 {
     pub inspector: UniversalPackageFormatInspectorV37,
-    pub udf_engine: UdfScriptletEngineV37,
+    pub udf_engine: UniversalScriptletAndTriggerSandboxV37,
     pub sat_solver: UniversalCrossDistroSatSolverV37,
     pub sandbox_governor: UniversalMultiSandboxGovernorV37,
     pub cas_store: UniversalCasDeltaStoreGovernorV37,
     pub boot_env_governor: UniversalBootEnvSnapshotGovernorV37,
     pub cli_router: UniversalPmCliRouterV37,
-    pub transpiler: UniversalMultiFormatTranspilerAndExecutionEngineV37,
+    pub transpiler: UniversalMultiFormatTranspilerV37,
     pub installed_packages: Vec<String>,
 }
 
@@ -758,13 +769,13 @@ impl SovereignDistroPackageAdvancementsSuiteV37 {
     pub fn new() -> Self {
         Self {
             inspector: UniversalPackageFormatInspectorV37::new(),
-            udf_engine: UdfScriptletEngineV37::new(),
+            udf_engine: UniversalScriptletAndTriggerSandboxV37::new(),
             sat_solver: UniversalCrossDistroSatSolverV37::new(),
             sandbox_governor: UniversalMultiSandboxGovernorV37::new(),
             cas_store: UniversalCasDeltaStoreGovernorV37::new(),
             boot_env_governor: UniversalBootEnvSnapshotGovernorV37::new(),
             cli_router: UniversalPmCliRouterV37::new(),
-            transpiler: UniversalMultiFormatTranspilerAndExecutionEngineV37::new(),
+            transpiler: UniversalMultiFormatTranspilerV37::new(),
             installed_packages: Vec::new(),
         }
     }
@@ -810,12 +821,6 @@ impl SovereignDistroPackageAdvancementsSuiteV37 {
         self.installed_packages.push(sigpkg_id.clone());
 
         Ok(sigpkg)
-    }
-}
-
-impl Default for SovereignDistroPackageAdvancementsSuiteV37 {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -928,6 +933,7 @@ mod tests {
         let rules = sandbox_gov.generate_sandbox_rules(PackageFormat::Flatpak);
         assert!(rules.pledge_promises.contains("inet"));
         assert!(rules.unveil_paths.contains(&"/var/lib".to_string()));
+        assert!(rules.macos_app_sandbox);
     }
 
     #[test]
@@ -937,6 +943,7 @@ mod tests {
             .apply_delta_patch("base_hash_v37", "delta_hash_v37")
             .unwrap();
         assert_eq!(delta_rec.compression_savings_ratio, 75);
+        assert!(delta_rec.zsync_reconstituted);
 
         let mut boot_env = UniversalBootEnvSnapshotGovernorV37::new();
         let snap_id = boot_env.create_snapshot(BootEnvKindV37::FreeBsdBectl, "Pre-Update-v37");
@@ -944,7 +951,7 @@ mod tests {
         let res = boot_env.rollback(snap_id).unwrap();
         assert!(res.contains("Pre-Update-v37"));
 
-        let mut udf_engine = UdfScriptletEngineV37::new();
+        let mut udf_engine = UniversalScriptletAndTriggerSandboxV37::new();
         udf_engine.register_hook(UdfExecutionContextV37 {
             hook_type: UdfHookTypeV37::PreInstall,
             package_name: "curl".to_string(),

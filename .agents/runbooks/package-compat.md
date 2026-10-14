@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Runbook: Package Compatibility Audit
 
 ## Purpose
@@ -10,13 +9,8 @@ Safely parse package metadata (.deb, .rpm, Arch PKGBUILD/ALPM, sigpkg) and perfo
 3. Construct package dependency DAG and check for circular or missing dependencies.
 4. Perform dry-run installation simulation capturing target file locations.
 5. Record parsing accuracy, resolution time, and safety review flags in `reports/package/dry_run_report.json`.
-=======
 # Runbook: Package and Distro Compatibility Agent (`package-compat`)
-
-## Purpose
 Safely evaluate Linux and BSD package metadata parsing, dependency graph resolution, and sandboxed package execution without exposing the host system.
-
-## Procedure
 1. Fixed Package Corpus Parsing:
    - Parse sample metadata from `.deb`, `.rpm`, Arch `PKGBUILD`/`desc`, and FreeBSD `pkg-plist` manifests.
    - Verify zero-panic parsing against malformed inputs.
@@ -28,4 +22,3 @@ Safely evaluate Linux and BSD package metadata parsing, dependency graph resolut
    - Log all attempted syscalls and VFS modifications.
 4. Report Generation:
    - Output results to `reports/package/compatibility_matrix.json`.
->>>>>>> origin/main

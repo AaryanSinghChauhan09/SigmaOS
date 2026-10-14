@@ -62,13 +62,16 @@ impl SovereignOmarchyGamingGovernor {
             enabled: true,
             backend: GpuBackend::AmdGpu,
             current_profile: GamingProfile::default(),
-            triggers: vec![
-                GameTrigger {
-                    name_contains: vec!["steam".to_string(), "wine".to_string(), "proton".to_string(), "lutris".to_string()],
-                    category: "Game".to_string(),
-                    exe_suffix: vec![".exe".to_string()],
-                },
-            ],
+            triggers: vec![GameTrigger {
+                name_contains: vec![
+                    "steam".to_string(),
+                    "wine".to_string(),
+                    "proton".to_string(),
+                    "lutris".to_string(),
+                ],
+                category: "Game".to_string(),
+                exe_suffix: vec![".exe".to_string()],
+            }],
             is_gaming_mode: false,
             previous_cpu_governor: None,
         }
@@ -81,7 +84,11 @@ impl SovereignOmarchyGamingGovernor {
         }
 
         for trigger in &self.triggers {
-            if trigger.name_contains.iter().any(|name| process_name.contains(name)) {
+            if trigger
+                .name_contains
+                .iter()
+                .any(|name| process_name.contains(name))
+            {
                 self.activate_gaming_mode();
                 return true;
             }
@@ -247,7 +254,13 @@ impl SovereignOmarchyHudEngine {
 
     /// Cycle HUD position
     pub fn cycle_position(&mut self) {
-        let positions = vec!["top-left", "top-right", "bottom-left", "bottom-right", "center"];
+        let positions = vec![
+            "top-left",
+            "top-right",
+            "bottom-left",
+            "bottom-right",
+            "center",
+        ];
         if let Some(idx) = positions.iter().position(|p| p == &self.position) {
             self.position = positions[(idx + 1) % positions.len()].to_string();
         }
@@ -322,7 +335,11 @@ impl SovereignOmarchyDeveloperStacks {
             "go".to_string(),
             DevStack {
                 name: "go".to_string(),
-                tools: vec!["go".to_string(), "gopls".to_string(), "golangci-lint".to_string()],
+                tools: vec![
+                    "go".to_string(),
+                    "gopls".to_string(),
+                    "golangci-lint".to_string(),
+                ],
                 version_manager: "direct".to_string(),
             },
         );
@@ -346,7 +363,12 @@ impl SovereignOmarchyDeveloperStacks {
             "python".to_string(),
             DevStack {
                 name: "python".to_string(),
-                tools: vec!["python3".to_string(), "uv".to_string(), "ruff".to_string(), "pyright".to_string()],
+                tools: vec![
+                    "python3".to_string(),
+                    "uv".to_string(),
+                    "ruff".to_string(),
+                    "pyright".to_string(),
+                ],
                 version_manager: "uv".to_string(),
             },
         );
@@ -364,7 +386,11 @@ impl SovereignOmarchyDeveloperStacks {
             "nim".to_string(),
             DevStack {
                 name: "nim".to_string(),
-                tools: vec!["nim".to_string(), "nimble".to_string(), "nimlsp".to_string()],
+                tools: vec![
+                    "nim".to_string(),
+                    "nimble".to_string(),
+                    "nimlsp".to_string(),
+                ],
                 version_manager: "choosenim".to_string(),
             },
         );
