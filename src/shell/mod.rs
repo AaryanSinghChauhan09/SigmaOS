@@ -4,7 +4,9 @@
 pub mod alias_system;
 pub mod busybox_applet;
 pub mod command;
+pub mod diagnostics;
 pub mod intelligent_terminal;
+pub mod interactive;
 pub mod kimi_code_agent;
 pub mod manager;
 pub mod multicall;
@@ -18,8 +20,11 @@ pub mod universal_cli_shell_system;
 pub mod zsh_bash_parity;
 
 pub use self::command::{ShellCommand, SimpleShellSession};
+pub use self::diagnostics::*;
+pub use self::interactive::*;
 pub use self::repl::ShellRepl;
 pub use self::sigma_sh::*;
+pub use self::sovereign_command_interpreter::*;
 pub use self::universal_cli_shell_system::*;
 pub use self::zsh_bash_parity::*;
 pub use manager::{ShellManager, ShellProfile, ShellStatistics, ShellType};
