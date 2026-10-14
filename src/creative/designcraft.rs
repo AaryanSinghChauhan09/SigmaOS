@@ -233,6 +233,8 @@ pub enum ExportFormat {
 pub struct Artboard {
     pub id: u32,
     pub name: String,
+    pub x: f32,
+    pub y: f32,
     pub width: f32,
     pub height: f32,
     pub background: Color,
@@ -249,6 +251,7 @@ pub struct Canvas {
     pub background: Color,
     pub artboards: BTreeMap<u32, Artboard>,
     pub layers: BTreeMap<u32, Layer>,
+    pub elements: BTreeMap<u32, Element>,
     pub guides: Vec<Guide>,
     pub grid: Option<Grid>,
 }
@@ -308,6 +311,7 @@ impl DesignEditor {
             background: Color::rgb(255, 255, 255),
             artboards: BTreeMap::new(),
             layers: BTreeMap::new(),
+            elements: BTreeMap::new(),
             guides: Vec::new(),
             grid: None,
         };
@@ -322,6 +326,8 @@ impl DesignEditor {
         let artboard = Artboard {
             id,
             name,
+            x,
+            y,
             width,
             height,
             background: Color::rgb(255, 255, 255),
@@ -371,6 +377,7 @@ impl DesignEditor {
             corner_radius: 0.0,
         };
         layer.elements.push(id);
+        canvas.elements.insert(id, element);
         Ok(id)
     }
 
@@ -381,7 +388,9 @@ impl DesignEditor {
         if !layer.elements.contains(&element_id) {
             return Err("Element not in layer");
         }
-        // In a real implementation, we'd have a separate elements map
+        if let Some(elem) = canvas.elements.get_mut(&element_id) {
+            elem.fill = Some(color);
+        }
         Ok(())
     }
 
@@ -493,6 +502,7 @@ pub fn get_designcraft() -> Option<&'static mut DesignEditor> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use alloc::vec;
 
     #[test]
     fn test_designcraft_init() {
