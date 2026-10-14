@@ -689,7 +689,8 @@ fn test_shadow_passwords_usermod_and_sudo_policy() {
     let user = manager.create_user("charlie", "Charlie Sysadmin").unwrap();
     assert_eq!(user.username, "charlie");
 
-    let charlie_token_val = std::env::var("SIGMA_TEST_CHARLIE_TOKEN").unwrap_or_else(|_| (0..16).map(|i| (b'a' + (i % 26)) as char).collect());
+    let charlie_token_val = std::env::var("SIGMA_TEST_CHARLIE_TOKEN")
+        .unwrap_or_else(|_| (0..16).map(|i| (b'a' + (i % 26)) as char).collect());
     manager.set_password("charlie", &charlie_token_val).unwrap();
     assert!(manager.verify_password("charlie", &charlie_token_val));
 
