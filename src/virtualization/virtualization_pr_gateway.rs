@@ -18,6 +18,13 @@
 // - systemd-nspawn (Lightweight OS tree container isolation with systemd integration)
 // - FreeBSD Jails (Os-level virtualization with VNET network stacks and jail flags)
 // - Kubernetes (Production-grade container orchestration CRI, CNI, and Pod specifications)
+// - Firecracker (AWS MicroVM minimal vCPU & virtio-vsock isolation)
+// - Cloud-Hypervisor (Rust-vmm cloud hypervisor with virtio-mem dynamic ballooning)
+// - gVisor & Kata Containers (Sentry syscall interception & hardware microVM sandboxing)
+// - Incus (Clustered system container & VM manager with OVN & Ceph RBD)
+// - SmartOS Zones (Joyent/Illumos vmadm JSON VM specification & ZFS datasets)
+// - Apple Hypervisor.framework (macOS hv_vcpu execution & Rosetta 2 binary translation)
+// - Alpine Moby (Moby build toolchain & musl squashfs immutable initrd appliances)
 
 #[cfg(not(test))]
 use crate::klib::collections::BTreeMap;
@@ -46,6 +53,13 @@ pub enum VirtualizationTechnologyFormat {
     SystemdNspawn,
     FreeBsdJails,
     Kubernetes,
+    Firecracker,
+    CloudHypervisor,
+    GvisorKata,
+    Incus,
+    SmartOsZones,
+    AppleHypervisor,
+    AlpineMoby,
 }
 
 impl VirtualizationTechnologyFormat {
@@ -67,19 +81,26 @@ impl VirtualizationTechnologyFormat {
             Self::SystemdNspawn => "systemd-nspawn OS Tree Sandbox",
             Self::FreeBsdJails => "FreeBSD Jails with VNET Isolation",
             Self::Kubernetes => "Kubernetes Cloud-Native CRI & Pod Engine",
+            Self::Firecracker => "AWS Firecracker MicroVM Engine",
+            Self::CloudHypervisor => "Rust Cloud-Hypervisor VMM",
+            Self::GvisorKata => "gVisor & Kata Containers Sandbox",
+            Self::Incus => "Incus Clustered OVN & Ceph Daemon",
+            Self::SmartOsZones => "SmartOS vmadm Zone Virtualization",
+            Self::AppleHypervisor => "Apple Hypervisor.framework & Rosetta 2",
+            Self::AlpineMoby => "Alpine Moby Immutable Container Appliance",
         }
     }
 
     pub fn category(&self) -> VirtualizationPrCategory {
         match self {
-            Self::Kvm | Self::Qemu | Self::Xen | Self::Bhyve | Self::OpenBsdVmm | Self::VirtualBox => {
+            Self::Kvm | Self::Qemu | Self::Xen | Self::Bhyve | Self::OpenBsdVmm | Self::VirtualBox | Self::Firecracker | Self::CloudHypervisor | Self::AppleHypervisor => {
                 VirtualizationPrCategory::HypervisorCore
             }
-            Self::Docker | Self::Podman | Self::Containerd | Self::Runc | Self::Lxc | Self::Lxd | Self::SystemdNspawn => {
+            Self::Docker | Self::Podman | Self::Containerd | Self::Runc | Self::Lxc | Self::Lxd | Self::SystemdNspawn | Self::AlpineMoby => {
                 VirtualizationPrCategory::ContainerRuntime
             }
-            Self::FreeBsdJails => VirtualizationPrCategory::SecurityIsolation,
-            Self::Libvirt | Self::Kubernetes => VirtualizationPrCategory::OrchestrationCluster,
+            Self::FreeBsdJails | Self::GvisorKata | Self::SmartOsZones => VirtualizationPrCategory::SecurityIsolation,
+            Self::Libvirt | Self::Kubernetes | Self::Incus => VirtualizationPrCategory::OrchestrationCluster,
         }
     }
 }
@@ -304,6 +325,69 @@ impl SovereignVirtualizationPrGatewayEngine {
                 "[kubernetes]\ncri_endpoint=\"unix:///run/k3s/containerd/containerd.sock\"\ncni_bin_dir=\"/var/lib/rancher/k3s/data/current/bin\"\nembedded_k3s=true",
                 "apiVersion: v1\nkind: Pod\nmetadata:\n  name: sigma-k8s-pod\nspec:\n  containers:\n  - name: app\n    image: nginx:latest",
             ),
+            (
+                "AWS Firecracker MicroVM Execution & Virtio-VSock Gateway",
+                "firecracker-dev@sigmaos.org",
+                VirtualizationTechnologyFormat::Firecracker,
+                VirtualizationPrCategory::HypervisorCore,
+                "Implements Firecracker MicroVM execution, virtio-vsock zero-overhead host-guest communication, and jailer isolation.",
+                "[firecracker]\napi_socket=\"/run/firecracker.sock\"\nkernel=\"/boot/vmlinux\"\nvsock_cid=3",
+                "[microvm_config]\nvcpu_count = 2\nmem_size_mib = 512\nht_enabled = false",
+            ),
+            (
+                "Rust Cloud-Hypervisor VMM & Virtio-Mem Ballooning Engine",
+                "cloud-hypervisor@sigmaos.org",
+                VirtualizationTechnologyFormat::CloudHypervisor,
+                VirtualizationPrCategory::HypervisorCore,
+                "Provides Cloud-Hypervisor Rust VMM execution with virtio-mem dynamic memory ballooning and direct kernel boot.",
+                "[cloud_hypervisor]\napi_socket=\"/run/cloud-hypervisor.sock\"\nvirtio_mem=true\ndirect_kernel_boot=true",
+                "[ch_vm]\ncpus = 4\nmemory = 8192\ncmdline = \"console=ttyS0 console=hvc0 root=/dev/vda1\"",
+            ),
+            (
+                "gVisor Sentry Syscall Interception & Kata Containers Sandbox",
+                "sandbox-containers@sigmaos.org",
+                VirtualizationTechnologyFormat::GvisorKata,
+                VirtualizationPrCategory::SecurityIsolation,
+                "Adds gVisor Sentry syscall interception and Kata Containers microVM hardware pod sandboxing for untrusted multi-tenant workloads.",
+                "[gvisor_kata]\nruntime_type=\"io.containerd.runsc.v1\"\nsentry_enabled=true\nkata_hypervisor=\"cloud-hypervisor\"",
+                "[sandbox_config]\nmemory_mb = 1024\ncpu_quota = 200000\nnetwork_isolation = \"netns\"",
+            ),
+            (
+                "Incus Clustered OVN Switch & Ceph RBD Storage Gateway",
+                "incus-team@sigmaos.org",
+                VirtualizationTechnologyFormat::Incus,
+                VirtualizationPrCategory::OrchestrationCluster,
+                "Provides Incus multi-node cluster orchestration with OVN distributed virtual switches and Ceph RBD storage pool integration.",
+                "[incus]\ncluster_address=\"https://incus-cluster.local:8443\"\novn_network=true\nceph_rbd_pool=\"incus-storage\"",
+                "[incus_cluster_node]\nnode_name = \"incus-node-1\"\nrole = \"database_and_compute\"",
+            ),
+            (
+                "SmartOS vmadm Zone Specification & ZFS Dataset Engine",
+                "smartos-core@sigmaos.org",
+                VirtualizationTechnologyFormat::SmartOsZones,
+                VirtualizationPrCategory::SecurityIsolation,
+                "Provides SmartOS vmadm JSON VM specifications, KVM/bhyve inside zone-in-zone execution, and ZFS boot dataset management.",
+                "[smartos_vmadm]\nvmadm_path=\"/usr/sbin/vmadm\"\nzfs_dataset=\"zones/sigma-guest\"\nbrand=\"joyent\"",
+                "{\"brand\": \"joyent\", \"image_uuid\": \"fd2cc906-8938-11e3-beab-4359c665ac99\", \"ram\": 2048}",
+            ),
+            (
+                "Apple Hypervisor.framework & Rosetta 2 Translation Bridge",
+                "apple-hv@sigmaos.org",
+                VirtualizationTechnologyFormat::AppleHypervisor,
+                VirtualizationPrCategory::HypervisorCore,
+                "Implements Apple Hypervisor.framework hv_vcpu execution, Rosetta 2 x86_64 binary translation, and virtio-fs shared directory mounts.",
+                "[apple_hv]\nhv_vcpu_enabled=true\nrosetta2_guest=true\nvirtio_fs=true",
+                "[apple_hv_vm]\nvcpu = 4\nmemory_mb = 8192\nshared_directory = \"/Users/shared/workspace\"",
+            ),
+            (
+                "Alpine Moby Build Toolchain & Musl Squashfs Appliance Engine",
+                "alpine-moby@sigmaos.org",
+                VirtualizationTechnologyFormat::AlpineMoby,
+                VirtualizationPrCategory::ContainerRuntime,
+                "Provides Alpine Moby toolchain container appliance generation, musl libc initrd images, and read-only squashfs containers.",
+                "[alpine_moby]\nmoby_yaml=\"appliance.yml\"\nmusl_initrd=true\nsquashfs_rootfs=true",
+                "kernel: {image: \"linuxkit/kernel:6.6.x\", cmdline: \"console=ttyS0\"}\ninit: [\"alpine/musl-base:latest\"]",
+            ),
         ];
 
         for (title, author, tech, cat, desc, spec, manifest) in presets {
@@ -484,7 +568,7 @@ mod tests {
     #[test]
     fn test_virtualization_pr_gateway_preset_initialization() {
         let gateway = SovereignVirtualizationPrGatewayEngine::new();
-        assert_eq!(gateway.proposals.len(), 16);
+        assert_eq!(gateway.proposals.len(), 23);
 
         // Verify key technologies exist in presets
         let technologies: Vec<VirtualizationTechnologyFormat> =
@@ -506,6 +590,13 @@ mod tests {
         assert!(technologies.contains(&VirtualizationTechnologyFormat::SystemdNspawn));
         assert!(technologies.contains(&VirtualizationTechnologyFormat::FreeBsdJails));
         assert!(technologies.contains(&VirtualizationTechnologyFormat::Kubernetes));
+        assert!(technologies.contains(&VirtualizationTechnologyFormat::Firecracker));
+        assert!(technologies.contains(&VirtualizationTechnologyFormat::CloudHypervisor));
+        assert!(technologies.contains(&VirtualizationTechnologyFormat::GvisorKata));
+        assert!(technologies.contains(&VirtualizationTechnologyFormat::Incus));
+        assert!(technologies.contains(&VirtualizationTechnologyFormat::SmartOsZones));
+        assert!(technologies.contains(&VirtualizationTechnologyFormat::AppleHypervisor));
+        assert!(technologies.contains(&VirtualizationTechnologyFormat::AlpineMoby));
     }
 
     #[test]
@@ -516,7 +607,7 @@ mod tests {
             .submit_pr(
                 "Custom Firecracker MicroVM & Virtio-VSock PR".to_string(),
                 "virt-engineer@sigmaos.org".to_string(),
-                VirtualizationTechnologyFormat::Kvm,
+                VirtualizationTechnologyFormat::Firecracker,
                 VirtualizationPrCategory::HypervisorCore,
                 "MicroVM minimal jailer isolation".to_string(),
                 "[firecracker]\nvsock=true\njailer=true".to_string(),
@@ -536,7 +627,7 @@ mod tests {
         // Generate unified diff
         let diff = gateway.generate_pr_unified_diff(pr_id).unwrap();
         assert!(diff.contains("Custom Firecracker MicroVM"));
-        assert!(diff.contains("+++ b/virtualization/kvm/"));
+        assert!(diff.contains("+++ b/virtualization/firecracker/"));
 
         // Merge PR
         assert!(gateway.merge_pr(pr_id).unwrap());
@@ -559,5 +650,11 @@ mod tests {
         let k8s_results = gateway.search_prs("kubernetes");
         assert_eq!(k8s_results.len(), 1);
         assert_eq!(k8s_results[0].technology, VirtualizationTechnologyFormat::Kubernetes);
+
+        let fc_results = gateway.search_prs("Firecracker");
+        assert!(fc_results.len() >= 1);
+
+        let incus_results = gateway.search_prs("Incus");
+        assert_eq!(incus_results.len(), 1);
     }
 }
