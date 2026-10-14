@@ -32,7 +32,10 @@ pub struct Ext4InodeMode {
 
 impl Ext4InodeMode {
     pub fn new(file_type: Ext4FileType, permissions: u16) -> Self {
-        Self { file_type, permissions }
+        Self {
+            file_type,
+            permissions,
+        }
     }
 
     pub fn is_suid(&self) -> bool {
@@ -70,7 +73,9 @@ pub struct PosixAclTable {
 
 impl PosixAclTable {
     pub fn new() -> Self {
-        Self { entries: Vec::new() }
+        Self {
+            entries: Vec::new(),
+        }
     }
 
     pub fn add_entry(&mut self, entry: AclEntry) {
@@ -122,7 +127,6 @@ pub enum AccessError {
     MacAddressBlocked = 5,
     CapabilityBounded = 6,
 }
-
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 1. ACCESS CONTROL MATRIX (ACM - 2D Grid Rights Mapping)

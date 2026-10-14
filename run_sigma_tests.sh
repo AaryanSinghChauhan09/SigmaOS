@@ -201,6 +201,13 @@ if [ -f "src/compatibility/sovereign_mint_pr_components_engine.rs" ]; then
     ./build/test_mint_pr_deploy
 fi
 
+if [ -f "src/creative/effectcraft.rs" ]; then
+    echo "Running Sovereign EffectCraft Visual Effects PR test suite..."
+    mkdir -p build
+    rustc --test src/creative/effectcraft.rs --edition=2021 -o build/test_effectcraft
+    ./build/test_effectcraft
+fi
+
 if [ -f "src/distro/linux_bsd_distro_breakthroughs.rs" ]; then
     echo "Running Linux & BSD Distro Breakthroughs test suite..."
     mkdir -p build
