@@ -19,20 +19,15 @@ fn test_sovereign_wiki_master_engine_full_parity() {
     let master = SovereignWikiMasterEngine::new();
     assert!(master.evaluate_master_wiki_fulfillment());
 
-    let idea = ImprovementIdeaRecord {
-        id: 1,
-        name: "Test Idea".to_string(),
-        category: IdeaCategory::PerformanceAndKernel,
-        legacy_counterparts: "Linux".to_string(),
-        implementation_module: "kernel".to_string(),
-        is_fulfilled: true,
-    };
-    assert_eq!(idea.id, 1);
-    assert_eq!(idea.name, "Test Idea");
-    assert_eq!(idea.category, IdeaCategory::PerformanceAndKernel);
-    assert_eq!(idea.legacy_counterparts, "Linux");
-    assert_eq!(idea.implementation_module, "kernel");
-    assert!(idea.is_fulfilled);
+    let suite = Sovereign100IdeasSuite::new();
+    assert!(suite.verify_full_fulfillment());
+    assert!(suite.total_fulfilled_count() > 0);
+
+    let registry = SovereignShardsMasterRegistry::new();
+    assert!(registry.is_all_12_shards_active());
+
+    let gap = SovereignDistroGapClosureEngine::new();
+    assert!(gap.verify_all_gap_closures());
 }
 
 #[test]
