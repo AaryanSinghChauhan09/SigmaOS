@@ -2,10 +2,29 @@ id = "BOOT-X86-001"
 title = "Validate QEMU x86_64 boot-to-shell"
 agent = "boot-runtime-validator"
 priority = "P0"
-repeat = "daily"
 scope = ["installer/", "src/kernel/", "scripts/", "tests/"]
+repeat = "daily"
 
 steps = [
+  "check bootloader and ISO staging inputs",
+  "execute QEMU x86_64 boot simulation",
+  "parse serial log for boot milestones",
+  "verify shell prompt readiness",
+  "write boot validation report"
+]
+
+evidence = [
+  "reports/boot/qemu_x86_64.log",
+  "reports/boot/qemu_x86_64.json"
+]
+
+success = [
+  "QEMU process completes or reaches shell within timeout",
+  "kernel panic is false",
+  "serial log contains valid boot signature"
+]
+
+on_failure = "create blocked task with failure classification and serial log excerpt"
   "make clean",
   "cargo check --lib",
   "cargo test --lib",
@@ -15,19 +34,11 @@ steps = [
   "run smoke commands",
   "capture logs and screenshot",
   "write boot report"
-]
-
-evidence = [
   "reports/boot/qemu-x86_64.log",
   "reports/boot/qemu-x86_64.json",
   "reports/boot/boot_matrix.json"
-]
-
-success = [
   "build exits 0",
   "QEMU reaches shell within timeout",
   "smoke commands exit 0",
   "no kernel panic in serial log"
-]
-
 on_failure = "create blocked task with failing stage and log excerpt"

@@ -1,74 +1,81 @@
 ## Summary
 
-<!-- One paragraph: what changed and why. -->
+<!-- What file-management or component behavior changed and why? -->
 
-## Component
+## File component
 
-- [ ] Thread manager
-- [ ] Scheduler
-- [ ] Process management
-- [ ] Memory management
-- [ ] VFS / filesystems
-- [ ] Drivers
-- [ ] IPC
-- [ ] Security
-- [ ] Installer / packaging
+- [ ] File descriptor manager
+- [ ] Inode and directory manager
+- [ ] Permission manager
+- [ ] Lock manager
+- [ ] Mount / unmount
+- [ ] Cache
+- [ ] Filesystem
+- [ ] Recovery
+- [ ] procfs / diagnostics
+- [ ] Security / capabilities
 - [ ] Documentation
 - [ ] CI / tooling
+
+## Recurring task
+
+- [ ] PR validation
+- [ ] Daily CI triage
+- [ ] Weekly lifecycle review
+- [ ] Weekly Linux/BSD study
+- [ ] Biweekly memory audit
+- [ ] Biweekly signal/wait audit
+- [ ] Monthly boot validation
+- [ ] Quarterly architecture/security/release review
+
+## Reference behavior
+
+<!-- Required for lifecycle, ABI, or file changes -->
+
+- POSIX section:
+- Linux/BSD/Redox/xv6 reference:
+- SigmaOS current behavior:
+- New behavior:
+- Compatibility impact:
 
 ## Changes
 
 -
 
-## Motivation
+## File safety review
 
-<!-- Link the issue, roadmap item, or gap-analysis entry. -->
+- [ ] Lifecycle transitions are valid
+- [ ] Zombies are eventually reaped
+- [ ] Orphans are adopted
+- [ ] PID reuse is safe
+- [ ] Lock ordering is documented
+- [ ] Interrupt-context safety considered
+- [ ] Signal races considered
+- [ ] Double-unlink prevented
+- [ ] Resource limits enforced
+- [ ] No unbounded allocation or recursion
 
-## Implementation notes
+## Evidence
 
-<!-- Design decisions, data structures, locking, error handling. -->
+- [ ] `cargo check --lib`
+- [ ] `cargo fmt --check`
+- [ ] `cargo test --lib`
+- [ ] `./run_sigma_tests.sh`
+- [ ] New/updated unit tests
+- [ ] Integration tests
+- [ ] Fuzz target or documented exemption
+- [ ] Boot-to-boot evidence, if boot-affecting
+- [ ] File benchmark, if performance-affecting
+- [ ] Security review requested, if applicable
 
-## Tests
+## Status updates
 
-- [ ] Unit tests added/updated
-- [ ] Integration tests added/updated
-- [ ] Concurrency/stress tests added/updated
-- [ ] Fuzz tests added/updated
-- [ ] Boot smoke test performed, if kernel-facing
-- [ ] No regression in existing tests
+- [ ] `FEATURE_STATUS.toml`
+- [ ] `CAPABILITY_MATRIX.toml`
+- [ ] File documentation
+- [ ] Boot matrix, if applicable
 
-## Verification
+## Risks and rollback
 
-```bash
-cargo fmt --check
-cargo clippy --all-targets -- -D warnings
-cargo check --lib
-cargo test --lib
-./run_sigma_tests.sh
-```
-
-Paste relevant output below.
-
-## Capability status
-
-- Previous status:
-- New status:
-- Evidence:
-
-## Integration impact
-
-- [ ] No runtime integration yet (unit-tested only)
-- [ ] Connected to runtime path
-- [ ] Boot path validated
-- [ ] Installer/update path validated
-- [ ] Hardware tested
-
-## Reviewer checklist
-
-- [ ] Scope is narrow
-- [ ] Public API documented
-- [ ] `unsafe` justified
-- [ ] Lock ordering documented
-- [ ] Error paths tested
-- [ ] Feature status updated in FEATURE_STATUS.toml
-- [ ] No unsupported compatibility claim
+- Risk:
+- Rollback:

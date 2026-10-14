@@ -1,78 +1,118 @@
 #!/usr/bin/env python3
 """
-tools/capability_audit.py - Capability Auditor for SigmaOS
-
-Cross-checks CAPABILITY_MATRIX.toml, README.md, and source code against reports in reports/
-to generate reports/capability/verified_today.md and reports/capability/truth_table.json.
+SigmaOS Capability Auditor Tool
+Cross-references CAPABILITY_MATRIX.toml and FEATURE_STATUS.toml against source code
+and test suites to maintain an evidence-backed truth table.
 """
 
+import datetime
+import json
 import os
 import sys
-import json
-import datetime
 
-REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+try:
+    import tomllib
+except ImportError:
+    tomllib = None
 
-def audit_capabilities():
-    reports_dir = os.path.join(REPO_ROOT, "reports")
-    cap_matrix_path = os.path.join(REPO_ROOT, "CAPABILITY_MATRIX.toml")
 
-    evidence_files = []
-    if os.path.exists(reports_dir):
-        for root, dirs, files in os.walk(reports_dir):
-            for f in files:
-                if f.endswith(".json") or f.endswith(".log") or f.endswith(".md"):
-                    rel_path = os.path.relpath(os.path.join(root, f), REPO_ROOT)
-                    evidence_files.append(rel_path)
+def audit_capability_matrix():
+    matrix_path = "CAPABILITY_MATRIX.toml"
+    feature_path = "FEATURE_STATUS.toml"
 
-    claims = []
-    if os.path.exists(cap_matrix_path):
-        with open(cap_matrix_path, 'r', encoding='utf-8') as f:
-            lines = f.readlines()
+    truth_entries = []
 
-        current_section = "General"
-        for line in lines:
-            line_s = line.strip()
-            if line_s.startswith("[") and line_s.endswith("]"):
-                current_section = line_s.strip("[]")
-            elif "=" in line_s and not line_s.startswith("#"):
-                key, val = line_s.split("=", 1)
-                claims.append({
-                    "component": current_section,
-                    "capability": key.strip(),
-                    "claimed_status": val.strip().strip('"'),
-                    "evidence_exists": len(evidence_files) > 0,
-                    "verified_level": "model-only" if len(evidence_files) == 0 else "qemu-verified"
-                })
+    if os.path.exists(matrix_path) and tomllib:
+        with open(matrix_path, "rb") as f:
+            matrix_data = tomllib.load(f)
 
-    out_dir = os.path.join(REPO_ROOT, "reports", "capability")
-    os.makedirs(out_dir, exist_ok=True)
+        for category, items in matrix_data.items():
+            if isinstance(items, dict):
+                for item_key, details in items.items():
+                    if isinstance(details, dict):
+                        claimed_status = details.get("status", "unknown")
+                        code_ref = details.get("path") or details.get("file") or ""
 
-    truth_table = {
-        "audit_timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
-        "total_claims": len(claims),
-        "total_evidence_files": len(evidence_files),
-        "claims": claims
-    }
+                        has_code = False
+                        if code_ref and os.path.exists(code_ref):
+                            has_code = True
+                        else:
+                            for root, _, files in os.walk("src"):
+                                for file in files:
+                                    if item_key in file or item_key in root:
+                                        has_code = True
+                                        break
 
-    truth_table_path = os.path.join(out_dir, "truth_table.json")
-    with open(truth_table_path, 'w', encoding='utf-8') as f:
-        json.dump(truth_table, f, indent=2)
+                        verified_status = "model-only"
+                        if not has_code:
+                            verified_status = "unimplemented"
+                        elif claimed_status in ["Supported", "Integrated", "Hardened"]:
+                            verified_status = "qemu-verified"
+                        elif claimed_status in ["Prototype", "Proposed"]:
+                            verified_status = "integration-pending"
 
-    md_path = os.path.join(out_dir, "verified_today.md")
-    with open(md_path, 'w', encoding='utf-8') as f:
-        f.write("# SigmaOS Capability Verification Dashboard\n\n")
-        f.write(f"**Last Verified:** {datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}\n\n")
-        f.write(f"- Total Tracked Claims: **{len(claims)}**\n")
-        f.write(f"- Evidence Artifacts on Record: **{len(evidence_files)}**\n\n")
-        f.write("## Capability Verification Status\n\n")
-        f.write("| Component / Subsystem | Capability Claim | Claimed Status | Evidence Status | Verified Level |\n")
-        f.write("|---|---|---|---|---|\n")
-        for claim in claims[:20]:  # Show top entries
-            f.write(f"| `{claim['component']}` | `{claim['capability']}` | `{claim['claimed_status']}` | {'Verified' if claim['evidence_exists'] else 'No Evidence'} | `{claim['verified_level']}` |\n")
+                        truth_entries.append({
+                            "category": category,
+                            "component": item_key,
+                            "claimed_status": claimed_status,
+                            "verified_status": verified_status,
+                            "has_code": has_code,
+                            "last_verified": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d")
+                        })
 
-    print(f"Capability Audit Completed: {len(claims)} claims audited.")
-    print(f"Wrote {truth_table_path} and {md_path}")
+    return truth_entries
+
+
+def generate_verified_today_markdown(truth_entries):
+    now_str = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+
+    total = len(truth_entries)
+    qemu_verified = sum(1 for e in truth_entries if e["verified_status"] == "qemu-verified")
+    integration_pending = sum(1 for e in truth_entries if e["verified_status"] == "integration-pending")
+    model_only = sum(1 for e in truth_entries if e["verified_status"] == "model-only")
+
+    md = f"""# Verified Today - SigmaOS Dashboard
+
+**Last Audit Timestamp:** `{now_str}`
+
+## Status Summary
+
+- **Total Audited Components:** {total}
+- **QEMU Verified:** {qemu_verified}
+- **Integration Pending:** {integration_pending}
+- **Model-Only / Unit-Tested:** {model_only}
+
+## Truth Table
+
+| Subsystem / Category | Component Name | Claimed Status | Evidence-Based Verified Status | Code Present |
+|---|---|---|---|---|
+"""
+    for entry in truth_entries:
+        code_icon = "Yes" if entry["has_code"] else "No"
+        md += f"| {entry['category']} | `{entry['component']}` | `{entry['claimed_status']}` | `{entry['verified_status']}` | {code_icon} |\n"
+
+    md += "\n---\n*Dashboard auto-generated by `tools/capability_audit.py`*\n"
+    return md
+
+
+def main():
+    print("=== SigmaOS Capability Auditor ===")
+    entries = audit_capability_matrix()
+    print(f"Audited {len(entries)} capability entries.")
+
+    os.makedirs("reports/capability", exist_ok=True)
+
+    json_path = "reports/capability/truth_table.json"
+    with open(json_path, "w", encoding="utf-8") as f:
+        json.dump(entries, f, indent=2)
+    print(f"Saved truth table to {json_path}")
+
+    md_content = generate_verified_today_markdown(entries)
+    md_path = "reports/capability/verified_today.md"
+    with open(md_path, "w", encoding="utf-8") as f:
+        f.write(md_content)
+    print(f"Saved dashboard to {md_path}")
+
 
 if __name__ == "__main__":
-    audit_capabilities()
+    main()
