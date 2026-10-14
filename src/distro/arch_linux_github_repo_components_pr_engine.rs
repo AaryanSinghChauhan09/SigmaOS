@@ -65,7 +65,8 @@ impl ArchinstallAndArchisoPrEngine {
     pub fn submit_pr(&self, pr_id: u32) -> ArchLinuxPrProposalSpec {
         ArchLinuxPrProposalSpec {
             pr_id,
-            title: "PR Proposal: Archinstall Automated Profile & Archiso Live ISO Builder".to_string(),
+            title: "PR Proposal: Archinstall Automated Profile & Archiso Live ISO Builder"
+                .to_string(),
             target_repo: "archlinux/archinstall & archlinux/archiso".to_string(),
             branch_name: format!("feat/pr-{}-archinstall-archiso", pr_id),
             is_merged: true,
@@ -103,7 +104,8 @@ impl ArchReflectorAndPowerpillPrEngine {
     pub fn submit_pr(&self, pr_id: u32) -> ArchLinuxPrProposalSpec {
         ArchLinuxPrProposalSpec {
             pr_id,
-            title: "PR Proposal: Reflector Mirrorlist Latency Ranker & Powerpill Parallel Streams".to_string(),
+            title: "PR Proposal: Reflector Mirrorlist Latency Ranker & Powerpill Parallel Streams"
+                .to_string(),
             target_repo: "archlinux/reflector & powerpill".to_string(),
             branch_name: format!("feat/pr-{}-reflector-powerpill", pr_id),
             is_merged: true,
@@ -141,7 +143,8 @@ impl ArchPacmanKeyAndTestingPrEngine {
     pub fn submit_pr(&self, pr_id: u32) -> ArchLinuxPrProposalSpec {
         ArchLinuxPrProposalSpec {
             pr_id,
-            title: "PR Proposal: Pacman-Key Dilithium5 PQC Keyring & Arch-Testing Signoff Tracker".to_string(),
+            title: "PR Proposal: Pacman-Key Dilithium5 PQC Keyring & Arch-Testing Signoff Tracker"
+                .to_string(),
             target_repo: "archlinux/pacman & archlinux/arch-testing".to_string(),
             branch_name: format!("feat/pr-{}-pacman-pqc-testing", pr_id),
             is_merged: true,
@@ -179,7 +182,8 @@ impl ArchDevtoolsAndDbscriptsPrEngine {
     pub fn submit_pr(&self, pr_id: u32) -> ArchLinuxPrProposalSpec {
         ArchLinuxPrProposalSpec {
             pr_id,
-            title: "PR Proposal: Devtools Clean Chroot Builder & Dbscripts Repo-Add Automation".to_string(),
+            title: "PR Proposal: Devtools Clean Chroot Builder & Dbscripts Repo-Add Automation"
+                .to_string(),
             target_repo: "archlinux/devtools & archlinux/dbscripts".to_string(),
             branch_name: format!("feat/pr-{}-devtools-dbscripts", pr_id),
             is_merged: true,
@@ -217,7 +221,8 @@ impl ArchSecurityAndModprobedDbPrEngine {
     pub fn submit_pr(&self, pr_id: u32) -> ArchLinuxPrProposalSpec {
         ArchLinuxPrProposalSpec {
             pr_id,
-            title: "PR Proposal: Arch Security Tracker CVE Lookup & Modprobed-Db Kernel Profiler".to_string(),
+            title: "PR Proposal: Arch Security Tracker CVE Lookup & Modprobed-Db Kernel Profiler"
+                .to_string(),
             target_repo: "archlinux/arch-security-tracker & modprobed-db".to_string(),
             branch_name: format!("feat/pr-{}-security-modprobed", pr_id),
             is_merged: true,
@@ -255,7 +260,8 @@ impl ArchAurBuildAndDowngradePrEngine {
     pub fn submit_pr(&self, pr_id: u32) -> ArchLinuxPrProposalSpec {
         ArchLinuxPrProposalSpec {
             pr_id,
-            title: "PR Proposal: AUR-Build Local Repository Manager & Downgrade Package Cache".to_string(),
+            title: "PR Proposal: AUR-Build Local Repository Manager & Downgrade Package Cache"
+                .to_string(),
             target_repo: "archlinux/aurutils & downgrade".to_string(),
             branch_name: format!("feat/pr-{}-aur-downgrade", pr_id),
             is_merged: true,
@@ -299,7 +305,9 @@ impl ArchSysctlUdevCloudInitPrEngine {
     pub fn submit_pr(&self, pr_id: u32) -> ArchLinuxPrProposalSpec {
         ArchLinuxPrProposalSpec {
             pr_id,
-            title: "PR Proposal: Sysctl Hardening, Udev HWDB Rules & Arch-Boxes Cloud-Init Metadata".to_string(),
+            title:
+                "PR Proposal: Sysctl Hardening, Udev HWDB Rules & Arch-Boxes Cloud-Init Metadata"
+                    .to_string(),
             target_repo: "archlinux/arch-boxes & sysctl.d".to_string(),
             branch_name: format!("feat/pr-{}-sysctl-udev-cloudinit", pr_id),
             is_merged: true,

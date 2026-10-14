@@ -15,6 +15,11 @@
 ## 2025-05-25 - Zero-Allocation File Block Skipping via Seek
 **Learning:** Core utilities processing archived/chunked data (such as `tar`) often discard data blocks by allocating `vec![0u8; bytes_to_skip]` and reading bytes off disk into heap memory, causing $O(N)$ allocation and disk throughput overhead during index/header listing operations. Replacing buffer allocation with $O(1)$ zero-allocation `File::seek(SeekFrom::Current(bytes_to_skip))` eliminates both memory allocation and byte copy overhead completely.
 **Action:** Always use relative file seeking (`SeekFrom::Current`) instead of heap allocation buffers when skipping data blocks in stream processors and core utilities.
+
 ## 2025-05-25 - Pre-Allocating String Capacity in Key Combination Formatters
 **Learning:** In desktop shortcut formatting functions where multiple modifier strings and key labels are concatenated in sequence, `String::new()` incurs dynamic heap reallocations as characters are appended. Pre-allocating capacity using `String::with_capacity(estimated_len)` based on modifier count and key length eliminates intermediate buffer reallocations.
 **Action:** Pre-allocate String capacity using `String::with_capacity` when formatting multi-part key binding combinations or string labels.
+
+## 2025-05-28 - Zero-Allocation Case-Insensitive Sorting Comparators
+**Learning:** Calling `a.to_lowercase().cmp(&b.to_lowercase())` inside `slice::sort_by` generates $O(N \log N)$ heap `String` allocations per sort operation (hundreds of thousands of temporary heap allocations for large line lists). Using an iterator-based `cmp_ignore_case` helper (`a.bytes().map(|b| b.to_ascii_lowercase())` for ASCII fast-path and `char::to_lowercase` iterator chaining for non-ASCII) performs comparisons in-place with zero heap allocations.
+**Action:** Always use iterator-based case-insensitive byte/char comparison helpers inside `sort_by` comparators to eliminate $O(N \log N)$ heap allocations.
