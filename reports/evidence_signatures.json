@@ -1,29 +1,42 @@
 {
-  "signed_at": "2026-10-12T05:22:53.217686+00:00",
+  "timestamp": "2026-10-14T01:54:27.292669+00:00",
+  "signer": "SigmaOS Evidence Signer v1.0.0",
   "artifacts": {
-    "reports/steward/stale-work.md": {
-      "sha256": "7ddb590618f2d451e5bd06489fb783ef8814d5f0bbf0027484841fe9e6776481",
-      "size_bytes": 254
+    "build_test_sentinel/build-test-001_report.json": {
+      "sha256": "75a98dc18c98dc874085e4911d1ee35254533b6f78dd91678c8638e2e6641b3c",
+      "size_bytes": 1813
     },
-    "reports/steward/daily-status.md": {
+    "steward/daily-status.md": {
       "sha256": "652516e99db1ffda9b8b5c82e35b256d2b919f1f3d5c154973cbea39d08ce029",
       "size_bytes": 626
     },
-    "reports/boot/boot_matrix.json": {
-      "sha256": "06ae7d72335d36230cc4c87eb1e6ac0193780854f610582e2725103f80e4cc9e",
-      "size_bytes": 871
+    "steward/stale-work.md": {
+      "sha256": "7ddb590618f2d451e5bd06489fb783ef8814d5f0bbf0027484841fe9e6776481",
+      "size_bytes": 254
     },
-    "reports/capability/verified_today.md": {
-      "sha256": "44beb2b77f4b461bd72a239cbbcb12f3dda3c68a4f8e5577131f87f4c242b73c",
-      "size_bytes": 2399
+    "boot/boot_matrix.json": {
+      "sha256": "46a193b0f08c6c8a8808553e448a0d15f0a3a2fa7ef4f188d9fdc4d66a888861",
+      "size_bytes": 580
     },
-    "reports/capability/truth_table.json": {
-      "sha256": "ae8f21f41791fcecbb1596427b03ef7445f9d035824fa0151d6698221d5e8dac",
-      "size_bytes": 21012
+    "boot/qemu_x86_64.json": {
+      "sha256": "2e36efb2eea62907a6ba3b3451bcbfd5052a8a98538ade4bd5bda11de93e5337",
+      "size_bytes": 418
     },
-    "reports/build/latest.json": {
-      "sha256": "ae6f03b17708827ace7b2350ba9b8b1dd86707bea1a13827dbbb0611f5b06333",
-      "size_bytes": 164511
+    "boot/qemu_x86_64.log": {
+      "sha256": "24473f9f3c1b2772d37224408fe2cd4015d8c441e1934007a3b42ffde404118a",
+      "size_bytes": 730
+    },
+    "capability/truth_table.json": {
+      "sha256": "7b6a17b2b23b9dbf8639c3f51f4894c7cd8c8ef07a4a7cb957fade567e73fad0",
+      "size_bytes": 4598
+    },
+    "capability/verified_today.md": {
+      "sha256": "9a9b581b74e5f7c1c7e77439e8698ceb2f2cbfbbee3eda1a002f72983124ffa0",
+      "size_bytes": 2070
+    },
+    "build/latest.json": {
+      "sha256": "33fae2109810c78f1e03fe2f437fe5c71123f9c6381c1cd30fd10d7ca3b3deb8",
+      "size_bytes": 164179
     }
   }
 }
