@@ -35,6 +35,7 @@ pub mod sigmaservice;
 pub mod sigmaresource;
 pub mod sigmaconfig;
 pub mod sigmaconfigeditor;
+pub mod sigmatuning;
 pub mod sigmait;
 pub mod sigmaevent;
 pub mod sigmaswap;
@@ -222,6 +223,11 @@ pub use sigmaconfigeditor::{
     SigmaConfigEditor, ManagedFile, ConfigRevision, ConfigFormat, FileState, ValidationResult,
     init_sigmaconfigeditor, get_sigmaconfigeditor, get_sigmaconfigeditor_mut,
     register_config_file, get_config_property, set_config_property, rollback_config_file,
+};
+pub use sigmatuning::{
+    SigmaTuning, TunableParam, TuningCategory, TuningProfile,
+    init_sigmatuning, get_sigmatuning, get_sigmatuning_mut,
+    sysctl_get, sysctl_set, apply_tuning_profile,
 };
 pub use sigmait::{
     SigmaAudit, AuditEvent, AuditEventType, AuditSeverity,
