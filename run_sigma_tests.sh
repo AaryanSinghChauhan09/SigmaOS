@@ -54,6 +54,27 @@ if [ -f "src/init/systemd_init.rs" ]; then
     ./build/systemd_test
 fi
 
+if [ -f "src/system/sovereign_init_and_supervisor_inspirations_pr.rs" ]; then
+    echo "Running Sovereign Init & Supervisor Inspirations PR test suite..."
+    mkdir -p build
+    rustc --test src/system/sovereign_init_and_supervisor_inspirations_pr.rs --edition=2021 -o build/test_init_and_supervisor_pr
+    ./build/test_init_and_supervisor_pr
+fi
+
+if [ -f "src/system/sovereign_init_supervisor.rs" ]; then
+    echo "Running Sovereign Init Supervisor test suite..."
+    mkdir -p build
+    rustc --test src/system/sovereign_init_supervisor.rs --edition=2021 -o build/test_init_supervisor
+    ./build/test_init_supervisor
+fi
+
+if [ -f "src/system/sovereign_init_and_supervisor_advancements_v52.rs" ]; then
+    echo "Running Sovereign Init & Supervisor Advancements V52 test suite..."
+    mkdir -p build
+    rustc --test src/system/sovereign_init_and_supervisor_advancements_v52.rs --edition=2021 -o build/test_init_advancements_v52
+    ./build/test_init_advancements_v52
+fi
+
 if [ -f "src/memory/huge_pages.rs" ]; then
     echo "Running huge pages & transparent huge pages (THP) test suite..."
     mkdir -p build
