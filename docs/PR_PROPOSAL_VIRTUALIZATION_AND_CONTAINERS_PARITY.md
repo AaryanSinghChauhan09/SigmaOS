@@ -11,12 +11,13 @@ The implementation covers full functionality across Type-1 and Type-2 Hypervisor
    - KVM Dirty Page Ring logging for live migration.
    - `io_uring` asynchronous block engine for virtual disk I/O.
    - VFIO PCI device passthrough with IOMMU group isolation.
+   - QEMU disk image format conversion (`qemu-img`), qcow2 compression, and backing file chain tracking.
    - *Inspiration:* Debian, Red Hat Enterprise Linux, Arch Linux, Fedora, Ubuntu.
 
 2. **libvirt Universal Domain Manager Engine** (`LibvirtDomainEngine`)
    - Unified domain management across Qemu/KVM, Xen, bhyve, and LXC drivers.
    - XML and JSON domain specification generation and parsing.
-   - Storage pool volume allocations (raw, qcow2, ZFS datasets).
+   - Storage pool volume allocations (raw, qcow2, ZFS datasets) and dynamic NAT bridge attachments.
    - Virtual network bridge and TAP interface attachment.
    - *Inspiration:* RHEL, Fedora, AlmaLinux, Rocky Linux, Ubuntu.
 
@@ -36,6 +37,7 @@ The implementation covers full functionality across Type-1 and Type-2 Hypervisor
    - Rootless container execution using `/etc/subuid` and `/etc/subgid` user namespace mappings.
    - Linux Cgroups v2 resource controllers (`memory.max`, `cpu.weight`, `pids.max`).
    - systemd Quadlet container unit file generation (`.container`).
+   - Docker Compose service YAML transpilation and BuildKit OCI manifest handling.
    - OCI Runtime Specification generation and Containerd CRI sandbox initialization.
    - *Inspiration:* Fedora, Red Hat Enterprise Linux, Arch Linux, Alpine Linux.
 
@@ -47,12 +49,14 @@ The implementation covers full functionality across Type-1 and Type-2 Hypervisor
 
 7. **FreeBSD Jails & Illumos / Solaris Zones Engine** (`FreeBsdJailsZonesEngine`)
    - FreeBSD VNET network virtualization with isolated IP stacks and `epair` virtual ethernet pairs.
+   - FreeBSD RACCT/RCTL resource limit rules (`pcpu`, `memoryuse`).
    - Custom `devfs` rule set enforcement (`devfs.rules`).
    - Illumos / Solaris LX and Sparse Root Zones with ZFS dataset isolation and BrandZ emulation.
    - *Inspiration:* FreeBSD, SmartOS, OmniOS, Illumos, Solaris.
 
 8. **Kubernetes, K3s & Rancher Harvester Orchestrator Engine** (`KubernetesK3sRancherEngine`)
    - Kubernetes Kubelet CRI pod sandbox lifecycle management and cluster networking.
+   - Kubernetes CRI-O OCI runtime handler registration (runc, crun, kata, gvisor).
    - Embedded light-weight K3s control plane with SQLite backend support.
    - Rancher Harvester hyper-converged VM-to-pod mapping engine for unified VM and container management.
    - *Inspiration:* Rancher k3s, K3OS, Harvester, openSUSE MicroOS, Talos Linux.
