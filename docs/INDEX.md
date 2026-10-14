@@ -6,6 +6,7 @@ Welcome to the SigmaOS Architecture and Subsystem Development Master Index. This
 
 ## Architectural & Development Plans (`docs/`)
 
+- [Process Synchronization Master Architecture & Development Plan](PROCESS_SYNCHRONIZATION_PLAN.md) - 5 progression layers, 11 core design rules, 17-PR roadmap, maintenance framework, lock-context matrix, and review merge gates.
 - [System Utilities Development Plan](SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md) - Baseline rules, POSIX compatibility, 18-PR roadmap, component rules, periodic maintenance framework, and merge gates.
 - [Filesystem & Storage Parity Proposal](PR_PROPOSAL_FILESYSTEMS_AND_STORAGE_PARITY.md) - Multi-tiered storage engines, zswap writeback cache, and OverlayFS mount simulation.
 - [Toolchain & Development Ecosystem Proposal](PR_PROPOSAL_TOOLCHAIN_AND_DEVELOPMENT_PARITY.md) - Zero-dependency toolchain engines, compilers, build orchestration, and dynamic tracing.
@@ -14,6 +15,7 @@ Welcome to the SigmaOS Architecture and Subsystem Development Master Index. This
 
 ## Core Wiki Subsystem Guides (`wiki/`)
 
+- [Process Synchronization Plan](../wiki/PROCESS_SYNCHRONIZATION_PLAN.md)
 - [System Utilities Plan](../wiki/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md)
 - [Architectural Pillars](../wiki/Architectural-Pillars-Components.md)
 - [Kernel Functions & ABI](../wiki/Kernel-Functions-and-ABI-Components.md)
