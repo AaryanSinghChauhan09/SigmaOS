@@ -21,8 +21,6 @@ pub enum ProjectType {
     Design,
     Effect,
     Scene,
-    Deck,
-    Presentation,
 }
 
 /// Project
@@ -158,7 +156,6 @@ mod tests {
         suite.init();
         let workspace_id = suite.create_workspace("Workspace1".to_string());
         suite.create_project(workspace_id, "Photo Project".to_string(), ProjectType::Photo).unwrap();
-        suite.create_project(workspace_id, "Deck Presentation".to_string(), ProjectType::Deck).unwrap();
-        assert_eq!(suite.get_workspace(workspace_id).unwrap().projects.len(), 2);
+        assert_eq!(suite.get_workspace(workspace_id).unwrap().projects.len(), 1);
     }
 }
