@@ -40,6 +40,12 @@ function createMockElement(id, tag = "div") {
     hasAttribute(k) { return k in this.attributes; },
     removeAttribute(k) { delete this.attributes[k]; },
     appendChild(child) { this.children.push(child); },
+    querySelectorAll(selector) {
+      if (selector === ".command-item") {
+        return this.children.filter((c) => c.classList && c.classList.contains("command-item"));
+      }
+      return [];
+    },
     addEventListener(event, fn) {
       if (!this.listeners[event]) this.listeners[event] = [];
       this.listeners[event].push(fn);
@@ -65,7 +71,13 @@ global.document = {
   },
   createTextNode: (text) => ({ textContent: text }),
   getElementById: (id) => mockElements[id] || createMockElement(id),
-  querySelectorAll: () => [],
+  querySelectorAll: (selector, root = global.document) => {
+    if (selector === ".command-item") {
+      const container = mockElements["cmd-results"];
+      return container ? container.children.filter((c) => c.classList && c.classList.contains("command-item")) : [];
+    }
+    return [];
+  },
   addEventListener: (event, fn) => {
     if (!docListeners[event]) docListeners[event] = [];
     docListeners[event].push(fn);
@@ -112,6 +124,14 @@ assert.strictEqual(cmdInputEl.getAttribute("aria-activedescendant"), "cmd-option
 
 cmdInputEl.dispatchEvent({ type: "keydown", key: "ArrowUp", preventDefault: () => {} });
 assert.strictEqual(cmdInputEl.getAttribute("aria-activedescendant"), "cmd-option-0", "Expected aria-activedescendant to update to 'cmd-option-0' on ArrowUp");
+
+// Simulate mouseenter on option index 2 to test mouse hover synchronization
+const opt2 = cmdResultsEl.children[2];
+if (opt2) {
+  opt2.dispatchEvent({ type: "mouseenter" });
+  assert.strictEqual(cmdInputEl.getAttribute("aria-activedescendant"), "cmd-option-2", "Expected aria-activedescendant to update to 'cmd-option-2' on mouseenter");
+  assert.strictEqual(opt2.getAttribute("aria-selected"), "true", "Expected option 2 aria-selected='true' on mouseenter");
+}
 
 zenith.closeCommandPalette();
 assert.strictEqual(cmdInputEl.getAttribute("aria-expanded"), "false", "Expected aria-expanded to be 'false' on close");

@@ -18,36 +18,33 @@ pub mod omarchy_advanced_parity;
 pub mod omarchy_gaming_enhanced;
 pub use omarchy_advanced_parity::*;
 pub use omarchy_gaming_enhanced::{
-    SovereignOmarchyGamingGovernor, CpuGovernor, GpuProfile, GameTrigger, GamingState,
-    VrrMode, HudElement, DeveloperStack,
-    SovereignOmarchyHudEngine, SovereignOmarchyVrrPacingController,
-    SovereignSteamShaderPrecacheManager, SovereignOmarchyGamingPerformanceSuite,
-    init_gaming_performance_suite, get_gaming_performance_suite,
+    get_gaming_performance_suite, init_gaming_performance_suite, CpuGovernor, DeveloperStack,
+    GameTrigger, GamingState, GpuProfile, HudElement, SovereignOmarchyGamingGovernor,
+    SovereignOmarchyGamingPerformanceSuite, SovereignOmarchyHudEngine,
+    SovereignOmarchyVrrPacingController, SovereignSteamShaderPrecacheManager, VrrMode,
 };
 pub mod software_manager;
 pub use software_manager::{
-    SoftwareManager, SoftwarePackage, SoftwareCategory,
-    init_software_manager, get_software_manager,
+    get_software_manager, init_software_manager, SoftwareCategory, SoftwareManager, SoftwarePackage,
 };
 pub mod update_manager;
 pub use update_manager::{
-    UpdateManager, SystemUpdate, UpdateType, UpdatePriority,
-    init_update_manager, get_update_manager,
+    get_update_manager, init_update_manager, SystemUpdate, UpdateManager, UpdatePriority,
+    UpdateType,
 };
 pub mod backup_tool;
 pub use backup_tool::{
-    BackupManager, Snapshot, SnapshotType,
-    init_backup_manager, get_backup_manager, create_manual_snapshot,
+    create_manual_snapshot, get_backup_manager, init_backup_manager, BackupManager, Snapshot,
+    SnapshotType,
 };
 pub mod driver_manager;
 pub use driver_manager::{
-    DriverManager, HardwareDriver, DriverType, DriverStatus,
-    init_driver_manager, get_driver_manager,
+    get_driver_manager, init_driver_manager, DriverManager, DriverStatus, DriverType,
+    HardwareDriver,
 };
 pub mod system_tools;
 pub use system_tools::{
-    SystemToolsManager, SystemTool,
-    init_system_tools_manager, get_system_tools_manager,
+    get_system_tools_manager, init_system_tools_manager, SystemTool, SystemToolsManager,
 };
 pub mod omarchy_future_roadmap;
 pub mod omarchy_linux_gap_closure_pr_suite;
@@ -494,7 +491,9 @@ pub mod bsd_linux_innovations;
 pub mod bsd_parity;
 pub mod cachy;
 pub mod cachy_linux_missing_components_engine;
+pub mod cachy_linux_missing_components_parity_pr;
 pub mod cachy_linux_missing_components_pr_gateway;
+pub use cachy_linux_missing_components_parity_pr::*;
 pub use cachy_linux_missing_components_pr_gateway::*;
 pub mod debian_gap_closure_advancements_v26;
 pub mod debian_linux_gap_closure_v40_pr;
@@ -591,14 +590,26 @@ pub mod wiki_unimplemented_ideas;
 pub mod sovereign_tech_media_wiki_ultimate_parity_pr;
 pub use sovereign_tech_media_wiki_ultimate_parity_pr::*;
 
+pub mod sovereign_freebsd_ultimate_parity_pr_suite;
+pub use sovereign_freebsd_ultimate_parity_pr_suite::*;
+
 pub mod sovereign_linux_bsd_lfs_master_harmony;
 pub use sovereign_linux_bsd_lfs_master_harmony::*;
+
+pub mod sovereign_lfs_bsd_pr_gateway;
+pub use sovereign_lfs_bsd_pr_gateway::*;
 
 pub mod bootable_vertical_slices_missing_components_pr;
 pub use bootable_vertical_slices_missing_components_pr::*;
 
+pub mod repeatable_agent_operating_loop_pr;
+pub use repeatable_agent_operating_loop_pr::*;
+
 pub mod sovereign_open_source_os_apex_inspirations_v50;
 pub use sovereign_open_source_os_apex_inspirations_v50::{FlakeInput as ApexFlakeInput, *};
+
+pub mod arch_linux_missing_components_v51_pr;
+pub use arch_linux_missing_components_v51_pr::*;
 
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;
