@@ -34,6 +34,10 @@ pub mod sigmaupdate;
 pub mod sigmaservice;
 pub mod sigmaresource;
 pub mod sigmaconfig;
+pub mod sigmaconfigeditor;
+pub mod sigmatuning;
+pub mod sigmaalert;
+pub mod sigmahealth;
 pub mod sigmait;
 pub mod sigmaevent;
 pub mod sigmaswap;
@@ -69,6 +73,7 @@ pub mod sigmatrim;
 pub mod sigmascheduledfsck;
 pub mod sigmanfs;
 pub mod sigmasmb;
+pub mod sigmadistfs;
 pub mod sigmatime;
 pub mod sigmatimer;
 pub mod system_manager;
@@ -216,6 +221,26 @@ pub use sigmaconfig::{
     SigmaConfig, ConfigEntry, ConfigValue,
     init_sigmaconfig, get_sigmaconfig, set_config_value,
 };
+pub use sigmaconfigeditor::{
+    SigmaConfigEditor, ManagedFile, ConfigRevision, ConfigFormat, FileState, ValidationResult,
+    init_sigmaconfigeditor, get_sigmaconfigeditor, get_sigmaconfigeditor_mut,
+    register_config_file, get_config_property, set_config_property, rollback_config_file,
+};
+pub use sigmatuning::{
+    SigmaTuning, TunableParam, TuningCategory, TuningProfile,
+    init_sigmatuning, get_sigmatuning, get_sigmatuning_mut,
+    sysctl_get, sysctl_set, apply_tuning_profile,
+};
+pub use sigmaalert::{
+    SigmaAlert, Alert, AlertSeverity, AlertCategory, AlertStatus, AlertChannel,
+    init_sigmaalert, get_sigmaalert, get_sigmaalert_mut,
+    send_alert, resolve_alert, active_alert_count,
+};
+pub use sigmahealth::{
+    SigmaHealth, HealthProbe, Subsystem as HealthSubsystem, HealthState, SystemHealthReport,
+    init_sigmahealth, get_sigmahealth, get_sigmahealth_mut,
+    system_health_state, system_health_score, generate_health_report,
+};
 pub use sigmait::{
     SigmaAudit, AuditEvent, AuditEventType, AuditSeverity,
     init_sigmait, get_sigmait, log_audit_event,
@@ -330,8 +355,8 @@ pub use sigmacrypto::{
     init_sigmacrypto, get_sigmacrypto, add_encryption_key,
 };
 pub use sigmasnapshot::{
-    SigmaSnapshot, Snapshot, SnapshotPolicy, SnapshotType, SnapshotState, SnapshotSchedule,
-    init_sigmasnapshot, get_sigmasnapshot, add_snapshot, restore_snapshot,
+    SigmaSnapshot, Snapshot, SnapshotType, SnapshotState,
+    init_sigmasnapshot, get_sigmasnapshot, create_snapshot, restore_snapshot,
 };
 pub use sigmafsmon::{
     SigmaFSMon, FSWatch, FSMetrics, FSEvent, FSAlert, FSEventType, FSMonState, AlertSeverity,
@@ -356,6 +381,12 @@ pub use sigmanfs::{
 pub use sigmasmb::{
     SigmaSMB, SMBShare, SMBMount, SMBDialect, SMBConnectionState, SMBShareAccess,
     init_sigmasmb, get_sigmasmb, mount_smb, export_smb_share,
+};
+pub use sigmadistfs::{
+    SigmaDistFS, DistNode, DistVolume, DistFSType, ReplicationStrategy, NodeState,
+    ClusterHealth, VolumeState, VolumeType, ClusterStats,
+    init_sigmadistfs, get_sigmadistfs, get_sigmadistfs_mut,
+    add_distfs_node, create_distfs_volume, start_distfs_volume, distfs_cluster_health,
 };
 pub use power_manager::{
     BatteryInfo, PowerBatteryStatus, PowerConfig, PowerManager, PowerProfile, PowerSource,
@@ -455,6 +486,7 @@ pub use sovereign_init_and_supervisor_inspirations_pr::*;
 
 pub use mint_tools::{
     SystemToolsEngine, BackupConfig, BackupJob, BackupType, BackupStatus,
+    RestoreConfig, RestoreJob, RestoreStatus, RollbackRecord,
     MintUpdateManager, PackageUpdate, UpdateType, UpdateSeverity,
     SoftwareManager, SoftwarePackage, SoftwareCategory,
     DriverManager, Driver, DriverType, DriverStatus,

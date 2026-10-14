@@ -17,14 +17,18 @@ pub use pix_image_organizer::{
 };
 
 pub use distro_media_engine::{
-    AlsaMixerElement, AlsaPcmState, AlsaSampleFormat, AlsaSoundEngine, AudioSinkBackend,
-    AudioVideoPrStatus, AudioVideoPrSubmission, EncodingSessionSpec, FfmpegEngine,
-    FfmpegHwEncoderBackend, FfmpegZeroCopyEncoder, GStreamerEngine, GStreamerPulseAudioPipeline,
-    GstHardwareDecoder, JackProAudioEngine, JackTransportState, LinuxBsdAudioVideoPrGatewayEngine,
-    LinuxBsdDistroMediaSuite, MediaStreamPipeline, MpvAudioTrack, MpvFreeBsdSndioEngine,
-    MpvPlayerEngine, OssDspDevice, OssIoctlCmd, OssSoundEngine, PipeWireEngine, PipeWireNodeState,
-    PulseAudioEngine, PulseAudioSink, SndPcmHwParams, SndioEngine, SubtitleTrackEntry,
-    V4l2CaptureEngine, V4l2DeviceControl, VlcPlayerEngine, VlcSubtitleManager,
+    AlsaMixerElement, AlsaPcmHwConfigEngine, AlsaPcmState, AlsaSampleFormat, AlsaSoundEngine,
+    AudioSinkBackend, AudioVideoPrStatus, AudioVideoPrSubmission, BluetoothAudioCodec,
+    EncodingSessionSpec, FfmpegEngine, FfmpegFiltergraphAccelEngine, FfmpegHwEncoderBackend,
+    FfmpegZeroCopyEncoder, GStreamerDynamicPipelineEngine, GStreamerEngine, GStreamerPulseAudioPipeline,
+    GstHardwareDecoder, JackProAudioEngine, JackRealtimeGraphEngine, JackTransportState,
+    LinuxBsdAudioVideoGapClosurePrGateway, LinuxBsdAudioVideoPrGatewayEngine, LinuxBsdDistroMediaSuite,
+    MediaStreamPipeline, MpvAudioTrack, MpvFreeBsdSndioEngine, MpvIpcJsonRpcEngine, MpvPlayerEngine,
+    OssDspDevice, OssIoctlCmd, OssMixerPeakMeterEngine, OssSoundEngine, PipeWireEngine,
+    PipeWireNodeState, PipeWireSpaBufferEngine, PulseAudioEngine, PulseAudioModuleRouterEngine,
+    PulseAudioSink, SndPcmHwParams, SndioEngine, SndioMidiPcmMultiplexerEngine, SubtitleTrackEntry,
+    V4l2CaptureEngine, V4l2DeviceControl, V4l2DmaBufExporterEngine, VlcLibvlcCoreEngine,
+    VlcPlayerEngine, VlcSubtitleManager,
 };
 
 pub use sovereign_screen_recorder::{
