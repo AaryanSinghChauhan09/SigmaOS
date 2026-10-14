@@ -3,6 +3,7 @@
 // Creative applications framework inspired by GIMP, Krita, Inkscape, Blender, etc.
 
 pub mod photocraft;
+pub mod photocraft_missing_components_parity_pr;
 pub mod filmcraft;
 pub mod vectorcraft;
 pub mod pdfcraft;
@@ -13,13 +14,20 @@ pub mod mediacraft;
 pub mod audiocraft;
 pub mod vectoranimation;
 pub mod model3d;
+pub mod cadcraft;
 pub mod artcraft;
-pub mod effectcraft_missing_components_parity_pr;
+pub mod deckcraft;
 
 pub use photocraft::{
     PhotoEditor, ImageLayer, Filter, Adjustment, LayerType, LayerMask, AdjustmentType,
     LayerStyle, SelectionTool, SmartFilter, MaskType,
     init_photocraft, get_photocraft,
+};
+pub use photocraft_missing_components_parity_pr::{
+    PhotocraftPrProposalManifest, PhotocraftRawProcessingPrEngine,
+    PhotocraftAiInpaintingPrEngine, PhotocraftColorGradingFrequencySeparationPrEngine,
+    PhotocraftHdrExposureStackingPrEngine, PhotocraftVectorMaskPenPathPrEngine,
+    PhotocraftBatchActionMacroPrEngine, SovereignPhotocraftArtcraftParityPrGateway,
 };
 pub use filmcraft::{
     VideoEditor, VideoTrack, Timeline, Effect,
@@ -96,14 +104,25 @@ pub use model3d::{
     ExportFormat as Model3DExportFormat,
     init_model3d, get_model3d,
 };
+pub use cadcraft::{
+    CadCraftEngine, SketchEntity, SketchEntityType, GeometricConstraint, ConstraintType,
+    SolidFeature, SolidFeatureType, AssemblyMate, AssemblyMateType, AssemblyComponent,
+    CamToolpath, CamToolpathType, FeaMesh, FeaElement, ExportFormat as CadExportFormat,
+    CadCraftPullRequestSpec, CadCraft2dDraftingConstraintPrDeployer,
+    CadCraft3dSolidModelingPrDeployer, CadCraftAssemblyFemSimulationPrDeployer,
+    CadCraftMasterPrDeploymentSuite, fnv1a_cadcraft_pr_digest,
+    init_cadcraft, get_cadcraft,
+};
 pub use artcraft::{
     ArtSuite, Project, Workspace,
     init_artcraft, get_artcraft,
 };
-pub use effectcraft_missing_components_parity_pr::{
-    EffectcraftPrProposalManifest, ShaderFilterGraphPrEngine, ParticlePhysicsEffectPrEngine,
-    NeuralMatteSegmentationPrEngine, AudioReactiveVisualizerPrEngine,
-    Spatial3DDepthCompositorPrEngine, ArtCraftOpenFxPluginPrEngine,
-    SovereignEffectcraftArtcraftParityPrGateway, ShaderUniform, CompiledShaderNode,
-    Particle, ParticleEmitter, SegmentationMask, Point3D, OfxParam, OfxPluginDescriptor,
+pub use deckcraft::{
+    DeckCraftEngine, SlideDeck, Slide, SlideLayout, SlideElement, SlideTransition, SlideAnimation,
+    SlideTheme, PresenterNotes, AspectRatio, ElementType as DeckElementType,
+    TransitionType as DeckTransitionType, AnimationType as DeckAnimationType,
+    ExportFormat as DeckExportFormat, PresenterState, DeckCraftPullRequestSpec,
+    DeckCraftSlideLayoutMasterPrDeployer, DeckCraftAnimationTransitionPrDeployer,
+    DeckCraftPresenterZenithPrDeployer, DeckCraftMasterPrDeploymentSuite,
+    init_deckcraft, get_deckcraft, fnv1a_deckcraft_pr_digest,
 };
