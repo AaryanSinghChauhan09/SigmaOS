@@ -1,7 +1,17 @@
 // src/shell/interactive/mod.rs
 // Interactive shell baseline implementation for SigmaOS shell
 
+#[cfg(not(feature = "std"))]
+extern crate alloc;
+
+#[cfg(feature = "std")]
+use std::string::{String, ToString};
+#[cfg(feature = "std")]
+use std::vec::Vec;
+
+#[cfg(not(feature = "std"))]
 use alloc::string::{String, ToString};
+#[cfg(not(feature = "std"))]
 use alloc::vec::Vec;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -154,7 +164,7 @@ impl InteractiveShellEngine {
     }
 
     pub fn add_history(&mut self, cmd: &str) {
-        if self.history.last().map(|s| s.as_str()) != Some(cmd) {
+        if self.history.last().map(|s: &String| s.as_str()) != Some(cmd) {
             self.history.push(cmd.to_string());
             if self.history.len() > self.max_history_size {
                 self.history.remove(0);
