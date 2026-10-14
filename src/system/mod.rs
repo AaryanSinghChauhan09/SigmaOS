@@ -69,6 +69,7 @@ pub mod sigmatrim;
 pub mod sigmascheduledfsck;
 pub mod sigmanfs;
 pub mod sigmasmb;
+pub mod sigmadistfs;
 pub mod sigmatime;
 pub mod sigmatimer;
 pub mod system_manager;
@@ -330,8 +331,8 @@ pub use sigmacrypto::{
     init_sigmacrypto, get_sigmacrypto, add_encryption_key,
 };
 pub use sigmasnapshot::{
-    SigmaSnapshot, Snapshot, SnapshotPolicy, SnapshotType, SnapshotState, SnapshotSchedule,
-    init_sigmasnapshot, get_sigmasnapshot, add_snapshot, restore_snapshot,
+    SigmaSnapshot, Snapshot, SnapshotType, SnapshotState,
+    init_sigmasnapshot, get_sigmasnapshot, create_snapshot, restore_snapshot,
 };
 pub use sigmafsmon::{
     SigmaFSMon, FSWatch, FSMetrics, FSEvent, FSAlert, FSEventType, FSMonState, AlertSeverity,
@@ -356,6 +357,12 @@ pub use sigmanfs::{
 pub use sigmasmb::{
     SigmaSMB, SMBShare, SMBMount, SMBDialect, SMBConnectionState, SMBShareAccess,
     init_sigmasmb, get_sigmasmb, mount_smb, export_smb_share,
+};
+pub use sigmadistfs::{
+    SigmaDistFS, DistNode, DistVolume, DistFSType, ReplicationStrategy, NodeState,
+    ClusterHealth, VolumeState, VolumeType, ClusterStats,
+    init_sigmadistfs, get_sigmadistfs, get_sigmadistfs_mut,
+    add_distfs_node, create_distfs_volume, start_distfs_volume, distfs_cluster_health,
 };
 pub use power_manager::{
     BatteryInfo, PowerBatteryStatus, PowerConfig, PowerManager, PowerProfile, PowerSource,
