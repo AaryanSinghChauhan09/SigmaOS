@@ -620,6 +620,9 @@ pub use arch_linux_missing_components_v51_pr::*;
 pub mod arch_linux_missing_components_v53_pr;
 pub use arch_linux_missing_components_v53_pr::*;
 
+pub mod open_source_os_missing_components_v48_pr;
+pub use open_source_os_missing_components_v48_pr::*;
+
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;
 pub use crate::stubs::large_distro_stubs::*;
