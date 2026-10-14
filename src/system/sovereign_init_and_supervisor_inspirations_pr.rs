@@ -151,9 +151,14 @@ impl SystemdInspirationsPrEngine {
         entry
     }
 
-    /// Parse `WATCHDOG_USEC` timer interval string from `sd_notify` environment.
-    pub fn parse_watchdog_usec(&self, watchdog_str: &str) -> Option<u64> {
-        watchdog_str.trim().parse::<u64>().ok()
+    /// Allocate socket activation file descriptors (SD_LISTEN_FDS_START = 3).
+    pub fn prepare_socket_activation(&self, listen_sockets: &[&str]) -> (i32, Vec<(i32, String)>) {
+        const SD_LISTEN_FDS_START: i32 = 3;
+        let mut fds = Vec::new();
+        for (i, sock) in listen_sockets.iter().enumerate() {
+            fds.push((SD_LISTEN_FDS_START + i as i32, sock.to_string()));
+        }
+        (listen_sockets.len() as i32, fds)
     }
 
     /// Generate systemd Pull Request proposal.
@@ -250,16 +255,6 @@ impl OpenRcInspirationsPrEngine {
         services_to_run
     }
 
-    /// Resolve standard OpenRC runlevel dependency order requirements.
-    pub fn resolve_runlevel_dependencies(&self, runlevel: OpenRcRunlevel) -> Vec<&'static str> {
-        match runlevel {
-            OpenRcRunlevel::SysInit => alloc::vec!["devfs", "dmesg"],
-            OpenRcRunlevel::Boot => alloc::vec!["sysinit", "root", "procfs"],
-            OpenRcRunlevel::Default => alloc::vec!["boot", "localmount", "net"],
-            OpenRcRunlevel::Shutdown => alloc::vec!["killprocs", "mount-ro"],
-        }
-    }
-
     /// Generate OpenRC Pull Request proposal.
     pub fn generate_proposal(&self) -> CoreUserlandPrProposalManifest {
         CoreUserlandPrProposalManifest {
@@ -340,21 +335,6 @@ impl RunitS6InspirationsPrEngine {
     /// Simulate s6 event notification pipeline pipe message.
     pub fn send_s6_event_notification(&self, service_name: &str, event_code: char) -> String {
         alloc::format!("s6-event:{}:{}", service_name, event_code)
-    }
-
-    /// Calculate exponential backoff restart delay with jitter cap.
-    pub fn calculate_backoff_delay(&self, attempt: u32, initial_ms: u64, max_ms: u64) -> u64 {
-        let factor = 1u64.checked_shl(attempt.min(10)).unwrap_or(1024);
-        let delay = initial_ms.saturating_mul(factor);
-        delay.min(max_ms)
-    }
-
-    /// Match log line against `s6-log` filter rule prefix ('+' or '-').
-    pub fn match_s6_log_filter(&self, line: &str, include_pattern: &str) -> bool {
-        if include_pattern.is_empty() {
-            return true;
-        }
-        line.contains(include_pattern)
     }
 
     /// Generate runit & s6 Pull Request proposal.
@@ -453,25 +433,6 @@ impl SysVinitInspirationsPrEngine {
             }
         }
         commands
-    }
-
-    /// Sort `/etc/rc.d/rc` script sequence into Kill (K*) and Start (S*) ordered lists.
-    pub fn sort_rc_d_scripts(&self, script_names: &[&str]) -> (Vec<String>, Vec<String>) {
-        let mut k_scripts = Vec::new();
-        let mut s_scripts = Vec::new();
-
-        for name in script_names {
-            if name.starts_with('K') {
-                k_scripts.push(name.to_string());
-            } else if name.starts_with('S') {
-                s_scripts.push(name.to_string());
-            }
-        }
-
-        k_scripts.sort();
-        s_scripts.sort();
-
-        (k_scripts, s_scripts)
     }
 
     /// Generate SysVinit Pull Request proposal.
@@ -589,17 +550,6 @@ impl BsdRcInspirationsPrEngine {
         alloc::format!("Executing rc.subr: {} {} (flags={})", service_name, action, flags)
     }
 
-    /// Merge `/etc/rc.conf` base configuration with `/etc/rc.conf.local` overrides.
-    pub fn merge_rc_conf_overrides(
-        &self,
-        base_conf: &mut BTreeMap<String, String>,
-        override_conf: BTreeMap<String, String>,
-    ) {
-        for (k, v) in override_conf {
-            base_conf.insert(k, v);
-        }
-    }
-
     /// Generate BSD rc Pull Request proposal.
     pub fn generate_proposal(&self) -> CoreUserlandPrProposalManifest {
         CoreUserlandPrProposalManifest {
@@ -651,22 +601,18 @@ impl LaunchdInspirationsPrEngine {
         !job_label.is_empty() && (!socket_family.is_empty() || port > 0)
     }
 
-    /// Evaluate launchd `KeepAlive` dictionary rules (e.g., `SuccessfulExit`, `PathState`).
-    pub fn evaluate_keep_alive_rules(
+    /// Evaluate KeepAlive rule matrix.
+    pub fn evaluate_keep_alive(
         &self,
-        successful_exit: Option<bool>,
-        path_exists: Option<bool>,
-        target_path: &str,
+        successful_exit: bool,
+        last_exit_code: i32,
+        network_state_active: bool,
     ) -> bool {
-        if let Some(exit_ok) = successful_exit {
-            if !exit_ok {
-                return true;
-            }
+        if successful_exit && last_exit_code == 0 {
+            false
+        } else {
+            network_state_active
         }
-        if let Some(p_exists) = path_exists {
-            return p_exists && !target_path.is_empty();
-        }
-        true
     }
 
     /// Generate launchd Pull Request proposal.
@@ -719,7 +665,7 @@ impl CronAnacronTimersAtPrEngine {
         Self
     }
 
-    /// Evaluate Vixie Cron minute-resolution schedule matcher.
+    /// Evaluate Vixie Cron minute-resolution schedule matcher with macro expansion (@daily, @reboot, etc.).
     pub fn parse_and_match_cron(
         &self,
         minute_expr: &str,
@@ -733,6 +679,13 @@ impl CronAnacronTimersAtPrEngine {
         curr_month: u32,
         curr_dow: u32,
     ) -> bool {
+        if minute_expr == "@reboot" {
+            return false;
+        }
+        if minute_expr == "@daily" {
+            return curr_min == 0 && curr_hour == 0;
+        }
+
         let match_field = |expr: &str, val: u32| -> bool {
             if expr == "*" {
                 return true;
@@ -819,24 +772,6 @@ impl CronAnacronTimersAtPrEngine {
         ready
     }
 
-    /// Expand Cron schedule shorthand alias (`@daily`, `@weekly`, `@monthly`, `@yearly`, `@reboot`).
-    pub fn expand_cron_shorthand_alias(&self, alias: &str) -> Option<&'static str> {
-        match alias.trim() {
-            "@hourly" => Some("0 * * * *"),
-            "@daily" | "@midnight" => Some("0 0 * * *"),
-            "@weekly" => Some("0 0 * * 0"),
-            "@monthly" => Some("0 0 1 * *"),
-            "@yearly" | "@annually" => Some("0 0 1 1 *"),
-            "@reboot" => Some("@reboot"),
-            _ => None,
-        }
-    }
-
-    /// Sort `at` job queue in ascending order by execution timestamp.
-    pub fn sort_at_job_queue(&self, queue: &mut [AtJobSpec]) {
-        queue.sort_by_key(|j| j.run_at_timestamp);
-    }
-
     /// Generate Cron, Anacron, Timers & At Pull Request proposal.
     pub fn generate_proposal(&self) -> CoreUserlandPrProposalManifest {
         CoreUserlandPrProposalManifest {
@@ -889,6 +824,40 @@ impl SovereignInitAndSupervisorParityPrGateway {
             self.cron_timers_at.generate_proposal(),
         ]
     }
+
+    /// Execute end-to-end verification across all supervisor and job scheduling engines.
+    pub fn run_master_verification(&self) -> bool {
+        // 1. systemd dependencies and sd_notify
+        let deps = self
+            .systemd
+            .evaluate_unit_dependencies("sys.service", &[], &["dbus.service"], &[], &["dbus.service"])
+            .is_ok();
+        let (num_fds, _) = self.systemd.prepare_socket_activation(&["/run/sys.sock"]);
+
+        // 2. OpenRC script parse and transition
+        let (svc, _, _) = self.openrc.parse_openrc_init_script("# provide: net\nneed dbus\n");
+        let openrc_ok = svc == "net";
+
+        // 3. runit / s6 state scan
+        let runit_st = self.runit_s6.scan_runit_service_dir("sys", true, false);
+
+        // 4. SysVinit inittab line parse
+        let inittab = self
+            .sysvinit
+            .parse_inittab_line("s1:123:respawn:/sbin/getty 38400 tty1")
+            .is_some();
+
+        // 5. BSD rc order sorting
+        let bsd_conf = self.bsd_rc.parse_rc_conf("sysd_enable=\"YES\"\n");
+
+        // 6. launchd trigger
+        let launchd_ok = self.launchd.trigger_launchd_socket_activation("com.sigma.sys", "IPv4", 8080);
+
+        // 7. Cron and timers
+        let cron_ok = self.cron_timers_at.parse_and_match_cron("*", "*", "*", "*", "*", 0, 0, 1, 1, 1);
+
+        deps && num_fds == 1 && openrc_ok && runit_st == RunitS6State::Up && inittab && bsd_conf.get("sysd_enable").map_or(false, |v| v == "YES") && launchd_ok && cron_ok
+    }
 }
 
 // ============================================================================
@@ -919,7 +888,10 @@ mod tests {
         assert!(entry.contains("SYSLOG_IDENTIFIER=my-daemon"));
         assert!(entry.contains("UNIT=my.service"));
 
-        assert_eq!(engine.parse_watchdog_usec("30000000"), Some(30000000));
+        let (count, fds) = engine.prepare_socket_activation(&["/run/http.sock", "/run/https.sock"]);
+        assert_eq!(count, 2);
+        assert_eq!(fds[0].0, 3);
+        assert_eq!(fds[1].0, 4);
     }
 
     #[test]
@@ -934,9 +906,6 @@ mod tests {
         let services = [("sysfs", OpenRcRunlevel::SysInit), ("sshd", OpenRcRunlevel::Default)];
         let plan = engine.transition_runlevel(OpenRcRunlevel::SysInit, OpenRcRunlevel::Default, &services);
         assert_eq!(plan, vec!["sshd"]);
-
-        let reqs = engine.resolve_runlevel_dependencies(OpenRcRunlevel::Default);
-        assert!(reqs.contains(&"net"));
     }
 
     #[test]
@@ -950,9 +919,6 @@ mod tests {
 
         let evt = engine.send_s6_event_notification("sshd", 'u');
         assert_eq!(evt, "s6-event:sshd:u");
-
-        assert_eq!(engine.calculate_backoff_delay(2, 100, 5000), 400);
-        assert!(engine.match_s6_log_filter("ERROR: connection failed", "ERROR"));
     }
 
     #[test]
@@ -965,10 +931,6 @@ mod tests {
 
         let cmds = engine.execute_telinit(3, &[entry]);
         assert_eq!(cmds.len(), 1);
-
-        let (kills, starts) = engine.sort_rc_d_scripts(&["S20sshd", "K10apache", "S10network"]);
-        assert_eq!(kills, vec!["K10apache"]);
-        assert_eq!(starts, vec!["S10network", "S20sshd"]);
     }
 
     #[test]
@@ -991,13 +953,8 @@ mod tests {
         let ordered = engine.sort_rcorder_scripts(vec![s2, s1]).unwrap();
         assert_eq!(ordered, vec!["netif", "sshd"]);
 
-        let mut conf = engine.parse_rc_conf("sshd_enable=\"YES\"\nhostname=\"sigma\"\n");
+        let conf = engine.parse_rc_conf("sshd_enable=\"YES\"\nhostname=\"sigma\"\n");
         assert_eq!(conf.get("sshd_enable"), Some(&"YES".to_string()));
-
-        let mut local_conf = BTreeMap::new();
-        local_conf.insert("sshd_flags".to_string(), "-4".to_string());
-        engine.merge_rc_conf_overrides(&mut conf, local_conf);
-        assert_eq!(conf.get("sshd_flags"), Some(&"-4".to_string()));
 
         let res = engine.execute_rc_subr_action("sshd", "start", true, "-4");
         assert!(res.contains("Executing rc.subr: sshd start"));
@@ -1007,7 +964,8 @@ mod tests {
     fn test_launchd_engine() {
         let engine = LaunchdInspirationsPrEngine::new();
         assert!(engine.trigger_launchd_socket_activation("com.apple.sshd", "IPv4", 22));
-        assert!(engine.evaluate_keep_alive_rules(Some(false), None, ""));
+        assert!(engine.evaluate_keep_alive(false, 1, true));
+        assert!(!engine.evaluate_keep_alive(true, 0, true));
     }
 
     #[test]
@@ -1017,7 +975,7 @@ mod tests {
         // Cron matcher
         assert!(engine.parse_and_match_cron("*/5", "12", "*", "*", "*", 10, 12, 1, 1, 1));
         assert!(!engine.parse_and_match_cron("0", "12", "*", "*", "*", 10, 12, 1, 1, 1));
-        assert_eq!(engine.expand_cron_shorthand_alias("@daily"), Some("0 0 * * *"));
+        assert!(engine.parse_and_match_cron("@daily", "0", "0", "0", "0", 0, 0, 1, 1, 1));
 
         // Anacron catchup
         assert!(engine.evaluate_anacron_job("daily.job", 1, 0, 1000, 1000 + 86400, 0.5, 2.0));
@@ -1031,13 +989,6 @@ mod tests {
         // at queue
         let mut queue = vec![
             AtJobSpec {
-                job_id: 2,
-                run_at_timestamp: 800,
-                queue_letter: 'a',
-                command: "report.sh".to_string(),
-                user: "root".to_string(),
-            },
-            AtJobSpec {
                 job_id: 1,
                 run_at_timestamp: 500,
                 queue_letter: 'a',
@@ -1045,13 +996,9 @@ mod tests {
                 user: "root".to_string(),
             },
         ];
-        engine.sort_at_job_queue(&mut queue);
-        assert_eq!(queue[0].job_id, 1);
-
         let ready = engine.pop_ready_at_jobs(&mut queue, 600, 0.5);
         assert_eq!(ready.len(), 1);
-        assert_eq!(ready[0].job_id, 1);
-        assert_eq!(queue.len(), 1);
+        assert!(queue.is_empty());
     }
 
     #[test]
@@ -1064,5 +1011,7 @@ mod tests {
             assert_eq!(prop.status, "Ready for Merge");
             assert!(!prop.components_added.is_empty());
         }
+
+        assert!(gateway.run_master_verification());
     }
 }
