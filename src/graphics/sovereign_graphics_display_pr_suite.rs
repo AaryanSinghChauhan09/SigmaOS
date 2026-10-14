@@ -31,9 +31,35 @@ use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
 
+#[cfg(feature = "standalone_test")]
+#[path = "bsd_graphics.rs"]
+mod bsd_graphics;
+#[cfg(feature = "standalone_test")]
+#[path = "compositor.rs"]
+mod compositor;
+#[cfg(feature = "standalone_test")]
+#[path = "drm_kms.rs"]
+mod drm_kms;
+#[cfg(feature = "standalone_test")]
+#[path = "vulkan_api.rs"]
+mod vulkan_api;
+
+#[cfg(feature = "standalone_test")]
+use bsd_graphics::FreeBsdWsconsFbEngine;
+#[cfg(feature = "standalone_test")]
+use compositor::{CompositorCapability, SimpleCompositor};
+#[cfg(feature = "standalone_test")]
+use drm_kms::{DrmKmsDevice, DrmNodeType};
+#[cfg(feature = "standalone_test")]
+use vulkan_api::VulkanInstance;
+
+#[cfg(not(feature = "standalone_test"))]
 use super::bsd_graphics::FreeBsdWsconsFbEngine;
+#[cfg(not(feature = "standalone_test"))]
 use super::compositor::{CompositorCapability, SimpleCompositor};
+#[cfg(not(feature = "standalone_test"))]
 use super::drm_kms::{DrmKmsDevice, DrmNodeType};
+#[cfg(not(feature = "standalone_test"))]
 use super::vulkan_api::VulkanInstance;
 
 // =========================================================================
