@@ -47,13 +47,16 @@ pub use reminders_advanced::{
     EnhancedRemindersEngine, RecurrencePattern, ReminderItem, ReminderPriority,
 };
 pub use sovereign_application_replacements_pr_suite::{
-    BrowserSandboxPolicy, ContainerIsolationLevel, DocumentFileType, EmailSecurityProtocol,
-    FileManagerLayout, LayerBlendMode, OfficeSuiteComponent, SovereignAppPrProposalManifest,
+    BrowserSandboxPolicy, CodecDecodersAvailable, ContainerIsolationLevel, DocumentFileType,
+    EmailSecurityProtocol, EncryptionVaultAlgorithm, FileManagerLayout, LayerBlendMode,
+    OfficeSuiteComponent, SovereignAppPrProposalManifest,
     SovereignApplicationReplacementsPrGateway, SovereignBrowserEnginePrEngine,
     SovereignDocumentViewerPrEngine, SovereignEditorEmulationMode,
     SovereignFileManagerMatrixPrEngine, SovereignLibreOfficeSuitePrEngine,
-    SovereignRasterGraphicsPrEngine, SovereignTextEditorsPrEngine,
-    SovereignThunderbirdEmailPrEngine, VfsMountProtocol,
+    SovereignMediaPlayerAudioStudioPrEngine, SovereignPasswordVaultPassPrEngine,
+    SovereignRasterGraphicsPrEngine, SovereignSystemMonitorProcessPrEngine,
+    SovereignTerminalMultiplexerPrEngine, SovereignTextEditorsPrEngine,
+    SovereignThunderbirdEmailPrEngine, TerminalGraphicsProtocol, VfsMountProtocol,
 };
 pub use sovereign_apps::{
     ProductivityTask, SigmaOfficeDocument, SigmaTasksBoard, SigmaVaultContainer, TaskPriority,
@@ -116,5 +119,15 @@ pub use sigma_office::{
     SovereignWorkspaceAddonExtensionEngine, SpreadsheetProcessor, SuggestionEdit, TextProcessor,
     TicketPriority, TicketStatus, TypographyRenderer, VersionHistoryManager, VidScene,
     WebLayoutBlock, WhiteboardElement, WhiteboardElementType, WorkflowAction, WorkflowRule,
-    WorkflowTrigger, WorkgroupChannelMessage, WorkgroupTask,
+    WorkflowTrigger, WorkgroupChannelMessage, WorkgroupTask, CoauthorOpKind, CoauthorOperation,
+    FxAccountBalance, FxRevaluationResult, HeaderFooterSection, OeeCalculationResult,
+    OmnichannelSlaRule, RenewalQuote, SheetDataValidationRule, SlaStatus,
+    SovereignBitrix24OmnichannelSlaEscalationRouterEngine,
+    SovereignGoogleDocsWatermarkAndHeaderFooterLayoutEngine,
+    SovereignGoogleSheetsDataValidationListFormulaEngine,
+    SovereignMicrosoft365CoauthoringOperationalTransformEngine,
+    SovereignOdooMrpWorkCenterOeeEfficiencyEngine,
+    SovereignSalesforceCpqSubscriptionRenewalDiscountEngine,
+    SovereignZohoBooksMultiCurrencyFxRevaluationEngine, SubscriptionContract,
+    ValidationRuleKind, WatermarkSpec, WorkCenterOeeMetrics,
 };
