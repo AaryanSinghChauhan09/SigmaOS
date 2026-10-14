@@ -12,15 +12,15 @@ The goal is to achieve 100% native parity and execution supremacy across GNU Cor
 
 | Subsystem / Utility Suite | Distro Inspirations | Strategic Parity Implementation in SigmaOS |
 | :--- | :--- | :--- |
-| **GNU Coreutils & BSD Userland** | Debian, Arch Linux, FreeBSD, OpenBSD | Universal `cat`, `ls`, `cp`, `mv`, `rm`, `stat`, `df`, `wc`, `head`, `tail` with color output, extended permissions, block sizes, and inode introspection. |
+| **GNU Coreutils & BSD Userland** | Debian, Arch Linux, FreeBSD, OpenBSD | Universal `cat`, `ls`, `cp`, `mv`, `rm`, `stat`, `df`, `wc`, `head`, `tail`, `chmod`, `chown`, `touch`, `mkdir`, `du`, `env` with color output, extended permissions, block sizes, and inode introspection. |
 | **BusyBox Multicall Applets** | Alpine Linux, Buildroot, Embedded Linux | Multicall applet router, sandboxed applet execution with memory limits, and minimal footprint analysis. |
-| **util-linux System Subsystem** | Fedora, Gentoo, Arch Linux | `lsblk`, `blkid`, `lscpu`, `fdisk` GPT/MBR disk inspection, `losetup` loopback devices, `mount`/`umount` status, and `chrt`/`taskset` CPU affinity tuning. |
+| **util-linux System Subsystem** | Fedora, Gentoo, Arch Linux | `lsblk`, `blkid`, `lscpu`, `fdisk` GPT/MBR disk inspection, `losetup` loopback devices, `mount`/`umount` status, `chrt`/`taskset` CPU affinity tuning, `swapon`/`swapoff` swap inspection, `uptime` load averages, and `lsmod` loaded kernel module summaries. |
 | **findutils & diffutils** | Debian, NetBSD, FreeBSD | `find` predicate evaluation (`-name`, `-size`, `-type`), unified/context diff generation, and `patch` application. |
 | **Text Processing (grep, sed, awk)** | GNU Coreutils, OpenBSD, Illumos | Context matching (`grep -A -B -C`), streaming in-place replacement (`sed -i`), and AWK script column extraction and aggregate summation. |
 | **Archival & Multi-Format Compression** | Arch Linux, Clear Linux, FreeBSD | Pax/Ustar tar header parsing, multi-format magic byte auto-detection (`.zst`, `.lz4`, `.7z`, `.gz`, `.bz2`, `.xz`), and multi-threaded Zstd compression ratio estimation. |
 | **procps & psmisc Process Suite** | Ubuntu, Fedora, Illumos | EEVDF/BORE score process listing (`ps`, `top`), `pgrep`/`pkill` signal dispatching, `pstree` process hierarchy rendering, and memory telemetry (`free`). |
 | **Documentation, Pager & Manual Suite** | OpenBSD, Debian, FreeBSD | `less` viewport rendering, `man-db` lookups, `mandoc` roff macro translation, and Texinfo node navigation. |
-| **Auth, Privilege & Session Suite** | OpenBSD, FreeBSD, Linux PAM | `/etc/sudoers` & `/etc/doas.conf` rule evaluation, PAM multi-stack module verification, Argon2id/SHA-512 shadow password verification, and getty session initialization. |
+| **Auth, Privilege & Session Suite** | OpenBSD, FreeBSD, Linux PAM | `/etc/sudoers` & `/etc/doas.conf` rule evaluation, PAM multi-stage module chain verification (`pam_verify_module_chain`), Argon2id/SHA-512 shadow password verification, shadow password expiry governor (`verify_shadow_expiry`), and getty TTY session initialization (`getty_init_tty_spec`). |
 
 ---
 
@@ -62,7 +62,7 @@ The goal is to achieve 100% native parity and execution supremacy across GNU Cor
 - **Argon2id & PAM**: Support for Argon2id shadow hashes (`$argon2id$`) and multi-stage PAM authentication stacks.
 
 ### 10. Core Utilities PR Gateway Engine (`CoreUtilsPullRequestGatewayEngine`)
-- **Pre-Populated Proposals**: Pre-populated PR proposals (#3001..#3009) covering all 10 core utility categories with PQC Dilithium-5 digital signatures, automated CI gating, and merge pipeline.
+- **Pre-Populated Proposals**: Pre-populated PR proposals (#3001..#3012) covering all 10 core utility categories with PQC Dilithium-5 digital signatures, automated CI gating, category/status/author search filters (`get_prs_by_category`, `get_prs_by_status`, `get_prs_by_author`), and merge pipeline.
 
 ---
 
@@ -79,5 +79,9 @@ Verified via standalone Rust unit tests (`rustc --test --edition=2021 src/userla
 - `test_documentation_pager_engine`
 - `test_auth_privilege_session_engine`
 - `test_coreutils_pr_gateway_workflow`
+- `test_gnu_coreutils_expanded_helpers`
+- `test_util_linux_expanded_helpers`
+- `test_auth_privilege_expanded_helpers`
+- `test_coreutils_pr_gateway_filters`
 
 Status: **Ready for Merge**.
