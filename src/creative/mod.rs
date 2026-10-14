@@ -14,6 +14,7 @@ pub mod audiocraft;
 pub mod vectoranimation;
 pub mod model3d;
 pub mod artcraft;
+pub mod figcraft;
 
 pub use photocraft::{
     PhotoEditor, ImageLayer, Filter, Adjustment, LayerType, LayerMask, AdjustmentType,
@@ -98,4 +99,15 @@ pub use model3d::{
 pub use artcraft::{
     ArtSuite, Project, Workspace,
     init_artcraft, get_artcraft,
+};
+pub use figcraft::{
+    FigCraftPullRequestSpec, FigCraftUiUxAutoLayoutPrDeployer,
+    FigCraftInteractivePrototypingPrDeployer, FigCraftVectorCanvasDesignSystemPrDeployer,
+    FigCraftCollaborationExportPrDeployer, FigCraftMasterPrDeploymentSuite,
+    FigCraftEngine, AutoLayoutDirection, AutoLayoutAlign, AutoLayoutSizing,
+    HorizontalConstraint, VerticalConstraint, AutoLayoutFrame, TokenCategory, VariableMode,
+    DesignToken, PrototypeTrigger, PrototypeAction, TransitionType, EasingCurve,
+    PrototypeInteraction, VectorBooleanOp, VectorNetworkPath, DesignLibraryAsset,
+    CollaborativeCursor, DevModeTargetLanguage, AssetExportFormat,
+    fnv1a_figcraft_pr_digest, init_figcraft, get_figcraft,
 };
