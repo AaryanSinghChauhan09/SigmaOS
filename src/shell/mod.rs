@@ -14,6 +14,7 @@ pub mod repl;
 pub mod sigma_sh;
 pub mod sovereign_command_interpreter;
 pub mod sovereign_shell_parity;
+pub mod sovereign_shells_terminals_supervisors_pr;
 pub mod tech_media_shell_innovations;
 pub mod terminal_emulator;
 pub mod universal_cli_shell_system;
@@ -25,6 +26,7 @@ pub use self::interactive::*;
 pub use self::repl::ShellRepl;
 pub use self::sigma_sh::*;
 pub use self::sovereign_command_interpreter::*;
+pub use self::sovereign_shells_terminals_supervisors_pr::*;
 pub use self::universal_cli_shell_system::*;
 pub use self::zsh_bash_parity::*;
 pub use manager::{ShellManager, ShellProfile, ShellStatistics, ShellType};
@@ -98,7 +100,6 @@ impl Drop for SigmaShell {
     }
 }
 
-#[cfg(test)]
 #[cfg(test)]
 mod tests {
     use super::*;
