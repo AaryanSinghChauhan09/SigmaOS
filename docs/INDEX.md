@@ -6,6 +6,7 @@ Welcome to the SigmaOS Architecture and Subsystem Development Master Index. This
 
 ## Architectural & Development Plans (`docs/`)
 
+- [IPC Handler Master Architecture & Development Plan](ipc-handler.md) - Formally specified, testable IPC subsystem covering pipes, FIFOs, UNIX sockets, shared memory, message queues, event wakeups, signal control plane, FD passing, and security rules.
 - [System Utilities Development Plan](SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md) - Baseline rules, POSIX compatibility, 18-PR roadmap, component rules, periodic maintenance framework, and merge gates.
 - [Filesystem & Storage Parity Proposal](PR_PROPOSAL_FILESYSTEMS_AND_STORAGE_PARITY.md) - Multi-tiered storage engines, zswap writeback cache, and OverlayFS mount simulation.
 - [Toolchain & Development Ecosystem Proposal](PR_PROPOSAL_TOOLCHAIN_AND_DEVELOPMENT_PARITY.md) - Zero-dependency toolchain engines, compilers, build orchestration, and dynamic tracing.
