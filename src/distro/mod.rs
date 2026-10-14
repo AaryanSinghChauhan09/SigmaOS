@@ -101,6 +101,8 @@ pub mod arch_missing_components;
 pub mod arch_missing_components_parity_pr;
 pub mod arch_parity;
 pub use arch_missing_components_parity_pr::*;
+pub mod openbsd_missing_components_parity_pr;
+pub use openbsd_missing_components_parity_pr::*;
 
 pub use arch_missing_components::{
     AlpmInstalledPackage, ArchAlpmDbIntegrityEngine, ArchAuditVulnerabilityScanner,
@@ -598,8 +600,8 @@ pub use bootable_vertical_slices_missing_components_pr::*;
 pub mod sovereign_open_source_os_apex_inspirations_v50;
 pub use sovereign_open_source_os_apex_inspirations_v50::{FlakeInput as ApexFlakeInput, *};
 
-pub mod omarchy_linux_missing_components_v52_pr;
-pub use omarchy_linux_missing_components_v52_pr::*;
+pub mod arch_linux_missing_components_v51_pr;
+pub use arch_linux_missing_components_v51_pr::*;
 
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;
