@@ -21,10 +21,8 @@ pub enum ProjectType {
     Design,
     Effect,
     Scene,
-    Figcraft,
-    Fig,
-    UiUx,
-    Prototype,
+    Deck,
+    Presentation,
 }
 
 /// Project
@@ -160,16 +158,7 @@ mod tests {
         suite.init();
         let workspace_id = suite.create_workspace("Workspace1".to_string());
         suite.create_project(workspace_id, "Photo Project".to_string(), ProjectType::Photo).unwrap();
-        assert_eq!(suite.get_workspace(workspace_id).unwrap().projects.len(), 1);
-    }
-
-    #[test]
-    fn test_create_figcraft_project() {
-        let mut suite = ArtSuite::new();
-        suite.init();
-        let workspace_id = suite.create_workspace("UIUX Workspace".to_string());
-        let project_id = suite.create_project(workspace_id, "Figma Mobile App".to_string(), ProjectType::Figcraft).unwrap();
-        let project = suite.get_project(workspace_id, project_id).unwrap();
-        assert_eq!(project.project_type, ProjectType::Figcraft);
+        suite.create_project(workspace_id, "Deck Presentation".to_string(), ProjectType::Deck).unwrap();
+        assert_eq!(suite.get_workspace(workspace_id).unwrap().projects.len(), 2);
     }
 }

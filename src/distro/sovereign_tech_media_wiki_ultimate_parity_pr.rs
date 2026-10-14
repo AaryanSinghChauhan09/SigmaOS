@@ -48,38 +48,122 @@ impl SovereignTechMediaWikiUltimateParityEngine {
     /// Initialize engine with all 33 tech media portals and baseline ideas
     pub fn new() -> Self {
         let raw_portals = vec![
-            ("9to5Google", "9to5google.com", "https://9to5google.com/feed/"),
+            (
+                "9to5Google",
+                "9to5google.com",
+                "https://9to5google.com/feed/",
+            ),
             ("9to5Linux", "9to5linux.com", "https://9to5linux.com/feed/"),
             ("9to5Mac", "9to5mac.com", "https://9to5mac.com/feed/"),
-            ("Android Authority", "androidauthority.com", "https://androidauthority.com/feed/"),
-            ("Android Police", "androidpolice.com", "https://androidpolice.com/feed/"),
+            (
+                "Android Authority",
+                "androidauthority.com",
+                "https://androidauthority.com/feed/",
+            ),
+            (
+                "Android Police",
+                "androidpolice.com",
+                "https://androidpolice.com/feed/",
+            ),
             ("Appuals", "appuals.com", "https://appuals.com/feed/"),
-            ("DistroWatch", "distrowatch.com", "https://distrowatch.com/news/dw.xml"),
+            (
+                "DistroWatch",
+                "distrowatch.com",
+                "https://distrowatch.com/news/dw.xml",
+            ),
             ("Frappe", "frappe.io", "https://frappe.io/blog/feed"),
-            ("Geeky Gadgets", "geeky-gadgets.com", "https://www.geeky-gadgets.com/feed/"),
-            ("HW Busters", "hwbusters.com", "https://www.hwbusters.com/feed/"),
-            ("How-To Geek", "howtogeek.com", "https://www.howtogeek.com/feed/"),
-            ("InfoWorld", "infoworld.com", "https://www.infoworld.com/index.rss"),
+            (
+                "Geeky Gadgets",
+                "geeky-gadgets.com",
+                "https://www.geeky-gadgets.com/feed/",
+            ),
+            (
+                "HW Busters",
+                "hwbusters.com",
+                "https://www.hwbusters.com/feed/",
+            ),
+            (
+                "How-To Geek",
+                "howtogeek.com",
+                "https://www.howtogeek.com/feed/",
+            ),
+            (
+                "InfoWorld",
+                "infoworld.com",
+                "https://www.infoworld.com/index.rss",
+            ),
             ("It's FOSS", "itsfoss.com", "https://itsfoss.com/feed/"),
             ("IT Daily", "itdaily.com", "https://itdaily.com/feed/"),
             ("KDnuggets", "kdnuggets.com", "https://kdnuggets.com/feed"),
             ("Linux.com", "linux.com", "https://www.linux.com/feed/"),
-            ("Linux.org", "linux.org", "https://www.linux.org/forums/-/index.rss"),
-            ("Linux Foundation", "linuxfoundation.org", "https://www.linuxfoundation.org/feed"),
+            (
+                "Linux.org",
+                "linux.org",
+                "https://www.linux.org/forums/-/index.rss",
+            ),
+            (
+                "Linux Foundation",
+                "linuxfoundation.org",
+                "https://www.linuxfoundation.org/feed",
+            ),
             ("LinuxTeck", "linuxteck.com", "https://linuxteck.com/feed/"),
-            ("MakeUseOf", "makeuseof.com", "https://www.makeuseof.com/feed/"),
-            ("MarkTechPost", "marktechpost.com", "https://www.marktechpost.com/feed/"),
-            ("Open Source For You", "opensourceforu.com", "https://www.opensourceforu.com/feed/"),
+            (
+                "MakeUseOf",
+                "makeuseof.com",
+                "https://www.makeuseof.com/feed/",
+            ),
+            (
+                "MarkTechPost",
+                "marktechpost.com",
+                "https://www.marktechpost.com/feed/",
+            ),
+            (
+                "Open Source For You",
+                "opensourceforu.com",
+                "https://www.opensourceforu.com/feed/",
+            ),
             ("PCMag", "pcmag.com", "https://www.pcmag.com/rss"),
             ("PCWorld", "pcworld.com", "https://www.pcworld.com/feed"),
-            ("Phoronix", "phoronix.com", "https://www.phoronix.com/phoronix-rss.xml"),
-            ("TechCrunch", "techcrunch.com", "https://techcrunch.com/feed/"),
-            ("TechPowerUp", "techpowerup.com", "https://www.techpowerup.com/rss/news"),
-            ("TechSpot", "techspot.com", "https://www.techspot.com/backend.xml"),
-            ("The New Stack", "thenewstack.io", "https://thenewstack.io/feed/"),
-            ("Windows Central", "windowscentral.com", "https://www.windowscentral.com/feed"),
-            ("Windows Latest", "windowslatest.com", "https://www.windowslatest.com/feed/"),
-            ("XDA Developers", "xda-developers.com", "https://www.xda-developers.com/feed/"),
+            (
+                "Phoronix",
+                "phoronix.com",
+                "https://www.phoronix.com/phoronix-rss.xml",
+            ),
+            (
+                "TechCrunch",
+                "techcrunch.com",
+                "https://techcrunch.com/feed/",
+            ),
+            (
+                "TechPowerUp",
+                "techpowerup.com",
+                "https://www.techpowerup.com/rss/news",
+            ),
+            (
+                "TechSpot",
+                "techspot.com",
+                "https://www.techspot.com/backend.xml",
+            ),
+            (
+                "The New Stack",
+                "thenewstack.io",
+                "https://thenewstack.io/feed/",
+            ),
+            (
+                "Windows Central",
+                "windowscentral.com",
+                "https://www.windowscentral.com/feed",
+            ),
+            (
+                "Windows Latest",
+                "windowslatest.com",
+                "https://www.windowslatest.com/feed/",
+            ),
+            (
+                "XDA Developers",
+                "xda-developers.com",
+                "https://www.xda-developers.com/feed/",
+            ),
             ("ZDNet", "zdnet.com", "https://www.zdnet.com/news/rss.xml"),
         ];
 
@@ -217,9 +301,10 @@ fn contains_ignore_ascii_case(haystack: &str, needle: &str) -> bool {
     let haystack_bytes = haystack.as_bytes();
 
     haystack_bytes.windows(needle_bytes.len()).any(|window| {
-        window.iter().zip(needle_bytes).all(|(&h, &n)| {
-            h.to_ascii_lowercase() == n.to_ascii_lowercase()
-        })
+        window
+            .iter()
+            .zip(needle_bytes)
+            .all(|(&h, &n)| h.to_ascii_lowercase() == n.to_ascii_lowercase())
     })
 }
 
