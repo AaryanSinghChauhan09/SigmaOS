@@ -265,3 +265,5 @@ pub mod unified_access_control;
 pub mod visa_harness;
 pub mod sovereign_security_and_hardening_advancements_pr;
 pub use sovereign_security_and_hardening_advancements_pr::*;
+pub mod sovereign_security_management_plan;
+pub use sovereign_security_management_plan::*;
