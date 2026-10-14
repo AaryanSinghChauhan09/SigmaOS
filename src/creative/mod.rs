@@ -14,6 +14,7 @@ pub mod audiocraft;
 pub mod vectoranimation;
 pub mod model3d;
 pub mod artcraft;
+pub mod printcraft_missing_components_parity_pr;
 
 pub use photocraft::{
     PhotoEditor, ImageLayer, Filter, Adjustment, LayerType, LayerMask, AdjustmentType,
@@ -98,4 +99,12 @@ pub use model3d::{
 pub use artcraft::{
     ArtSuite, Project, Workspace,
     init_artcraft, get_artcraft,
+};
+pub use printcraft_missing_components_parity_pr::{
+    PrintcraftCmykColorSeparationPrEngine, PrintcraftPreflightValidationPrEngine,
+    PrintcraftBleedSlugCropMarksPrEngine, PrintcraftMasterPagesGridSystemPrEngine,
+    PrintcraftImpositionBookletPrEngine, PrintcraftPdfXExportPrEngine,
+    SovereignPrintcraftArtcraftParityPrGateway, PrintcraftPrProposalManifest,
+    CmykColorPlate, PreflightIssue, PreflightSeverity, PageGeometry, BaselineGrid,
+    ImpositionBindingType, PdfXStandard,
 };
