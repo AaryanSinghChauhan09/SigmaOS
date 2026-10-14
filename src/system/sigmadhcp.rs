@@ -233,7 +233,7 @@ impl Default for SigmaDHCP {
 }
 
 /// Global SigmaDHCP instance (placeholder for actual global state)
-static unsafe mut SIGMADHCP_INSTANCE: Option<SigmaDHCP> = None;
+static mut SIGMADHCP_INSTANCE: Option<SigmaDHCP> = None;
 
 /// Initialize the global SigmaDHCP instance
 pub fn init_sigmadhcp() {

@@ -259,7 +259,7 @@ impl Default for SigmaBus {
 }
 
 /// Global SigmaBus instance (placeholder for actual global state)
-static unsafe mut SIGMABUS_INSTANCE: Option<SigmaBus> = None;
+static mut SIGMABUS_INSTANCE: Option<SigmaBus> = None;
 
 /// Initialize the global SigmaBus instance
 pub fn init_sigmabus() {

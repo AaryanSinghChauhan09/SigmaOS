@@ -389,7 +389,7 @@ impl Default for SigmaThermal {
 }
 
 /// Global SigmaThermal instance (placeholder for actual global state)
-static unsafe mut SIGMATHERMAL_INSTANCE: Option<SigmaThermal> = None;
+static mut SIGMATHERMAL_INSTANCE: Option<SigmaThermal> = None;
 
 /// Initialize the global SigmaThermal instance
 pub fn init_sigmathernal() {

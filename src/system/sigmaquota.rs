@@ -220,7 +220,7 @@ impl Default for SigmaQuota {
 }
 
 /// Global SigmaQuota instance (placeholder for actual global state)
-static unsafe mutable SIGMAQUOTA_INSTANCE: Option<SigmaQuota> = None;
+static mut SIGMAQUOTA_INSTANCE: Option<SigmaQuota> = None;
 
 /// Initialize the global SigmaQuota instance
 pub fn init_sigmaquota() {

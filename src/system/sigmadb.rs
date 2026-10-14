@@ -223,7 +223,7 @@ impl Default for SigmaDB {
 }
 
 /// Global SigmaDB instance (placeholder for actual global state)
-static unsafe mut SIGMADB_INSTANCE: Option<SigmaDB> = None;
+static mut SIGMADB_INSTANCE: Option<SigmaDB> = None;
 
 /// Initialize the global SigmaDB instance
 pub fn init_sigmadb() {

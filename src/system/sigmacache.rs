@@ -205,7 +205,7 @@ impl Default for SigmaCache {
 }
 
 /// Global SigmaCache instance (placeholder for actual global state)
-static unsafe mutable SIGMACACHE_INSTANCE: Option<SigmaCache> = None;
+static mut SIGMACACHE_INSTANCE: Option<SigmaCache> = None;
 
 /// Initialize the global SigmaCache instance
 pub fn init_sigmacache() {

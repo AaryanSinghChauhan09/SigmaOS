@@ -261,7 +261,7 @@ impl Default for SigmaDNS {
 }
 
 /// Global SigmaDNS instance (placeholder for actual global state)
-static unsafe mut SIGMADNS_INSTANCE: Option<SigmaDNS> = None;
+static mut SIGMADNS_INSTANCE: Option<SigmaDNS> = None;
 
 /// Initialize the global SigmaDNS instance
 pub fn init_sigmadns() {

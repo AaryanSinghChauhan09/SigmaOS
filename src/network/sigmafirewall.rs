@@ -257,7 +257,7 @@ impl Default for SigmaFirewall {
 }
 
 /// Global SigmaFirewall instance (placeholder for actual global state)
-static unsafe mut SIGMAFIREWALL_INSTANCE: Option<SigmaFirewall> = None;
+static mut SIGMAFIREWALL_INSTANCE: Option<SigmaFirewall> = None;
 
 /// Initialize the global SigmaFirewall instance
 pub fn init_sigmafirewall() {

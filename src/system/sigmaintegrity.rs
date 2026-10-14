@@ -240,7 +240,7 @@ impl Default for SigmaIntegrity {
 }
 
 /// Global SigmaIntegrity instance (placeholder for actual global state)
-static unsafe mut SIGMAINTEGRITY_INSTANCE: Option<SigmaIntegrity> = None;
+static mut SIGMAINTEGRITY_INSTANCE: Option<SigmaIntegrity> = None;
 
 /// Initialize the global SigmaIntegrity instance
 pub fn init_sigmaintegrity() {

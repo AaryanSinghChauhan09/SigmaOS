@@ -240,7 +240,7 @@ impl Default for SigmaSSH {
 }
 
 /// Global SigmaSSH instance (placeholder for actual global state)
-static unsafe mut SIGMASSH_INSTANCE: Option<SigmaSSH> = None;
+static mut SIGMASSH_INSTANCE: Option<SigmaSSH> = None;
 
 /// Initialize the global SigmaSSH instance
 pub fn init_sigmassh() {

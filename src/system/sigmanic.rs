@@ -216,7 +216,7 @@ impl Default for SigmaNIC {
 }
 
 /// Global SigmaNIC instance (placeholder for actual global state)
-static unsafe mutable SIGMANIC_INSTANCE: Option<SigmaNIC> = None;
+static mut SIGMANIC_INSTANCE: Option<SigmaNIC> = None;
 
 /// Initialize the global SigmaNIC instance
 pub fn init_sigmanic() {

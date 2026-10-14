@@ -215,7 +215,7 @@ impl Default for SigmaMkfs {
 }
 
 /// Global SigmaMkfs instance (placeholder for actual global state)
-static unsafe mutable SIGMAMKFS_INSTANCE: Option<SigmaMkfs> = None;
+static mut SIGMAMKFS_INSTANCE: Option<SigmaMkfs> = None;
 
 /// Initialize the global SigmaMkfs instance
 pub fn init_sigmamkfs() {

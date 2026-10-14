@@ -291,7 +291,7 @@ impl Default for SigmaService {
 }
 
 /// Global SigmaService instance (placeholder for actual global state)
-static unsafe mut SIGMASERVICE_INSTANCE: Option<SigmaService> = None;
+static mut SIGMASERVICE_INSTANCE: Option<SigmaService> = None;
 
 /// Initialize the global SigmaService instance
 pub fn init_sigmaservice() {

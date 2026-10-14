@@ -316,7 +316,7 @@ impl Default for SigmaRAID {
 }
 
 /// Global SigmaRAID instance (placeholder for actual global state)
-static unsafe mutable SIGMARAD_INSTANCE: Option<SigmaRAID> = None;
+static mut SIGMARAD_INSTANCE: Option<SigmaRAID> = None;
 
 /// Initialize the global SigmaRAID instance
 pub fn init_sigmaraid() {

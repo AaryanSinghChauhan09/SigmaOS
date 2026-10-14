@@ -276,7 +276,7 @@ impl Default for SigmaHAL {
 }
 
 /// Global SigmaHAL instance (placeholder for actual global state)
-static unsafe mut SIGMAHAL_INSTANCE: Option<SigmaHAL> = None;
+static mut SIGMAHAL_INSTANCE: Option<SigmaHAL> = None;
 
 /// Initialize the global SigmaHAL instance
 pub fn init_sigmahal() {

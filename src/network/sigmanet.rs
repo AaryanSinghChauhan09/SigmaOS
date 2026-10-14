@@ -360,7 +360,7 @@ impl Default for SigmaNet {
 }
 
 /// Global SigmaNet instance (placeholder for actual global state)
-static unsafe mut SIGMANET_INSTANCE: Option<SigmaNet> = None;
+static mut SIGMANET_INSTANCE: Option<SigmaNet> = None;
 
 /// Initialize the global SigmaNet instance
 pub fn init_sigmanet() {

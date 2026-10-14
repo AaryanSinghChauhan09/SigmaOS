@@ -237,7 +237,7 @@ impl Default for SigmaSwap {
 }
 
 /// Global SigmaSwap instance (placeholder for actual global state)
-static unsafe mut SIGMASWAP_INSTANCE: Option<SigmaSwap> = None;
+static mut SIGMASWAP_INSTANCE: Option<SigmaSwap> = None;
 
 /// Initialize the global SigmaSwap instance
 pub fn init_sigmaswap() {

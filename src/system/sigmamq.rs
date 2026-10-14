@@ -242,7 +242,7 @@ impl Default for SigmaMQ {
 }
 
 /// Global SigmaMQ instance (placeholder for actual global state)
-static unsafe mutable SIGMAMQ_INSTANCE: Option<SigmaMQ> = None;
+static mut SIGMAMQ_INSTANCE: Option<SigmaMQ> = None;
 
 /// Initialize the global SigmaMQ instance
 pub fn init_sigmamq() {

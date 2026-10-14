@@ -273,7 +273,7 @@ impl Default for SigmaPkg {
 }
 
 /// Global SigmaPkg instance (placeholder for actual global state)
-static unsafe mut SIGMAPKG_INSTANCE: Option<SigmaPkg> = None;
+static mut SIGMAPKG_INSTANCE: Option<SigmaPkg> = None;
 
 /// Initialize the global SigmaPkg instance
 pub fn init_sigmapkg() {

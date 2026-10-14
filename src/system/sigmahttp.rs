@@ -276,7 +276,7 @@ impl Default for SigmaHTTP {
 }
 
 /// Global SigmaHTTP instance (placeholder for actual global state)
-static unsafe mut SIGMAHTTP_INSTANCE: Option<SigmaHTTP> = None;
+static mut SIGMAHTTP_INSTANCE: Option<SigmaHTTP> = None;
 
 /// Initialize the global SigmaHTTP instance
 pub fn init_sigmahttp() {

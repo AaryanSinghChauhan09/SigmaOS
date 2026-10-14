@@ -193,7 +193,7 @@ impl Default for SigmaStorage {
 }
 
 /// Global SigmaStorage instance (placeholder for actual global state)
-static unsafe mutable SIGMASTORAGE_INSTANCE: Option<SigmaStorage> = None;
+static mut SIGMASTORAGE_INSTANCE: Option<SigmaStorage> = None;
 
 /// Initialize the global SigmaStorage instance
 pub fn init_sigmastorage() {

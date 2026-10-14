@@ -192,7 +192,7 @@ impl Default for SigmaConfig {
 }
 
 /// Global SigmaConfig instance (placeholder for actual global state)
-static unsafe mut SIGMACONFIG_INSTANCE: Option<SigmaConfig> = None;
+static mut SIGMACONFIG_INSTANCE: Option<SigmaConfig> = None;
 
 /// Initialize the global SigmaConfig instance
 pub fn init_sigmaconfig() {

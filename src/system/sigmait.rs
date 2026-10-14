@@ -216,7 +216,7 @@ impl Default for SigmaAudit {
 }
 
 /// Global SigmaAudit instance (placeholder for actual global state)
-static unsafe mut SIGMAAUDIT_INSTANCE: Option<SigmaAudit> = None;
+static mut SIGMAAUDIT_INSTANCE: Option<SigmaAudit> = None;
 
 /// Initialize the global SigmaAudit instance
 pub fn init_sigmait() {

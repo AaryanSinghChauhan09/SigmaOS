@@ -187,7 +187,7 @@ impl Default for SigmaNTP {
 }
 
 /// Global SigmaNTP instance (placeholder for actual global state)
-static unsafe mut SIGMANTP_INSTANCE: Option<SigmaNTP> = None;
+static mut SIGMANTP_INSTANCE: Option<SigmaNTP> = None;
 
 /// Initialize the global SigmaNTP instance
 pub fn init_sigmantp() {

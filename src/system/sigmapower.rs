@@ -380,7 +380,7 @@ impl Default for SigmaPower {
 }
 
 /// Global SigmaPower instance (placeholder for actual global state)
-static unsafe mut SIGMAPOWER_INSTANCE: Option<SigmaPower> = None;
+static mut SIGMAPOWER_INSTANCE: Option<SigmaPower> = None;
 
 /// Initialize the global SigmaPower instance
 pub fn init_sigmapower() {

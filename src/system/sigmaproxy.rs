@@ -267,7 +267,7 @@ impl Default for SigmaProxy {
 }
 
 /// Global SigmaProxy instance (placeholder for actual global state)
-static unsafe mut SIGMAPROXY_INSTANCE: Option<SigmaProxy> = None;
+static mut SIGMAPROXY_INSTANCE: Option<SigmaProxy> = None;
 
 /// Initialize the global SigmaProxy instance
 pub fn init_sigmaproxy() {

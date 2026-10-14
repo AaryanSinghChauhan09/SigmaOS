@@ -200,7 +200,7 @@ impl Default for SigmaEvent {
 }
 
 /// Global SigmaEvent instance (placeholder for actual global state)
-static unsafe mut SIGMAEVENT_INSTANCE: Option<SigmaEvent> = None;
+static mut SIGMAEVENT_INSTANCE: Option<SigmaEvent> = None;
 
 /// Initialize the global SigmaEvent instance
 pub fn init_sigmaevent() {

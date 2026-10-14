@@ -289,7 +289,7 @@ impl Default for SigmaMonitor {
 }
 
 /// Global SigmaMonitor instance (placeholder for actual global state)
-static unsafe mut SIGMAMONITOR_INSTANCE: Option<SigmaMonitor> = None;
+static mut SIGMAMONITOR_INSTANCE: Option<SigmaMonitor> = None;
 
 /// Initialize the global SigmaMonitor instance
 pub fn init_sigmamonitor() {
