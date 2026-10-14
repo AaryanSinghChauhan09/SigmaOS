@@ -1,31 +1,17 @@
-# Kernel Threat Model & Trust Boundaries
+# SigmaOS Security Threat Model
 
-## Security Objectives
+## Assets
 
-1. Prevent unprivileged userspace processes from reading or corrupting kernel memory.
-2. Prevent lateral privilege escalation between isolated user processes.
-3. Protect kernel data structures from untrusted hardware input (USB, Network, PCI).
+- Kernel integrity and execution context
+- User process address spaces and capability tokens
+- System credentials (`/etc/shadow`, PQC keystores)
+- Storage volumes and filesystem structures
 
----
+## Threat Vector Analysis
 
-## Trust Boundaries
-
-```text
-[ Hardware / Peripherals ] ── (Untrusted Input Boundary) ──► [ Drivers ]
-                                                                │
-[ Untrusted Userspace ] ── (Syscall / Capability Boundary) ──► [ Kernel Core ]
-                                                                │
-                                                         [ Kernel Memory ]
-```
-
----
-
-## Threat Vectors & Mitigations
-
-| Threat Vector | Severity | Mitigation | Verification |
-|---|---|---|---|
-| Malformed Syscall Arguments | High | Address checking & pointer range validation before dereference | Fuzzing & negative tests |
-| Buffer Overflow in Driver/Network | High | Safe Rust bounds checks & W^X page protection | `AddressSanitizer` & Fuzzing |
-| Privilege Escalation | Critical | Mandatory Capability Token verification on entrypoints | Syscall audit suite |
-| Untrusted Module Load | High | Module signature attestation (Dilithium-5) | `LkmModuleLoaderEngine` tests |
-| Kernel Deadlock / DoS | Medium | Lock hierarchy enforcement & bounded queue depth limits | Concurrency audit |
+| Threat Vector | Mitigation Strategy | Verification / Test |
+|---|---|---|
+| Buffer Overflow / ROP | ASan shadow memory validation (`src/security/address_sanitizer.rs`), W^X memory paging | `cargo test --lib` ASan tests |
+| Unprivileged Syscall Privilege Escalation | Capability token validation on every syscall dispatch | `tests/kernel/tier1_kernel_execution_suite.rs` |
+| Malicious Package / Update Payload | Dilithium-5 PQC signature verification | `src/package/universal.rs` (`PqcPackageVerifier`) |
+| Malformed Network Packet RCE | Custom TCP/IP stack with explicit bounds clamping and fuzz testing | `fuzz/fuzz_targets/` |

@@ -1,21 +1,31 @@
-# SigmaOS Boot Matrix & Hardware Verification Log
+# SigmaOS Platform Boot Matrix & Validation Policy
 
-This document tracks QEMU boot validation results and architecture boot support.
+## Overview
 
----
+SigmaOS classifies platform bootability into clear validation tiers. Code existing in the repository does not imply bootability; every supported platform target requires deterministic boot-to-shell or diagnostic-prompt evidence.
 
-## Target Architectures & Boot Validation
+## Boot Validation Tiers
 
-| Architecture | Firmware / Machine | Boot Target | Current Status | Last Verification | Test Runner / Log |
-|---|---|---|---|---|---|
-| `x86_64` | QEMU q35 / EFI | Shell (`/bin/sh`) | Validated (Smoke Pass) | Monthly Automated | `tests/boot/boot_to_shell_test.py` |
-| `x86_64` | QEMU pc-i440fx / Legacy BIOS | Shell (`/bin/sh`) | Validated (Smoke Pass) | Monthly Automated | `scripts/ci/qemu_boot_smoke.sh` |
-| `aarch64` | QEMU virt / EFI | Early Diagnostic Shell | Experimental | Monthly Verification | `.github/workflows/multiarch_qemu_release.yml` |
-| `riscv64` | QEMU virt / OpenSBI | Early Diagnostic Shell | Experimental | Monthly Verification | `.github/workflows/sigma_multiarch_ci.yml` |
+| Tier | Status | Required Evidence | Target Architectures |
+|---|---|---|---|
+| **Tier 1: Continuous Automated (CI)** | Fully Verified | Headless QEMU boot-to-shell smoke test with JSON output | `x86_64-unknown-none` |
+| **Tier 2: Rehearsed Virtualization** | Developer Preview | Manual/semi-automated VM boot (QEMU, VirtualBox, VMware) | `x86_64`, `aarch64` |
+| **Tier 3: Experimental / Bare Metal** | Experimental | Hardware serial/framebuffer logs submitted by community | x86_64 PC, Raspberry Pi 4/5 |
 
----
+## Validation Policy
 
-## Failure Policy & CI Blocking Criteria
+1. **Deterministic State Markers**: A successful boot validation run must output explicit state markers:
+   - `[SIGMAOS_BOOT_START]`
+   - `[KERNEL_INIT_COMPLETE]`
+   - `[INIT_SERVICE_MANAGER_ONLINE]`
+   - `[SHELL_PROMPT_READY]`
+2. **Boot Regression Policy**: Any PR that causes regression in Tier 1 automated boot tests is immediately blocked or reverted.
+3. **Artifact Retention**: Every automated boot run must retain the boot log (`qemu_boot.log`) and structured diagnostic report (`boot_diagnostic.json`).
 
-1. **Main Branch Merge Blocker:** Any regression in the `x86_64` QEMU boot-to-shell smoke test (`tests/boot/boot_to_shell_test.py`) MUST block merging to `main`.
-2. **Diagnostic Log Retention:** Boot logs, serial output, and crash dumps generated during QEMU boot smoke tests must be preserved as CI artifacts for 30 days.
+## Platform Support Matrix
+
+| Target Architecture | Firmware | Display / Console | Automated CI Test | Current Status |
+|---|---|---|---|---|
+| `x86_64` (QEMU Q35) | UEFI / BIOS | Serial COM1 (`0x3F8`) | Yes (`scripts/ci/qemu_boot_smoke.sh`) | Pass |
+| `aarch64` (QEMU virt) | UEFI (EDK2) | PL011 UART | Planned | Developer Preview |
+| `riscv64` (QEMU virt) | OpenSBI | 16550 UART | Planned | Experimental |

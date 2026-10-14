@@ -1,62 +1,48 @@
-# Kernel Subsystem Integration Contracts
+# SigmaOS Kernel Subsystem Integration Contracts
 
-This document defines the formal integration contracts for critical SigmaOS kernel subsystems.
+## Overview
 
----
+SigmaOS kernel subsystems must adhere to explicit initialization order contracts, public API boundaries, dependency requirements, and panic/error handling policies.
 
-## 1. Subsystem Definitions & Contracts
+## Subsystem Contract Declarations
 
-### Paging & Memory Management (`kernel::mm::paging`)
-```toml
-[subsystem.paging]
-public_api = ["alloc_pages", "free_pages", "map_range", "unmap_range", "protect_range"]
-requires = ["physical_allocator", "page_tables", "interrupt_safety"]
-runtime_entry = "kernel::mm::paging"
-boot_dependency = "required"
-failure_policy = "panic_with_diagnostic"
-```
-*Invariants:* Page tables must enforce W^X (Write XOR Execute) isolation between user and kernel space. Address ranges must reject non-canonical addresses.
+### 1. Physical Memory Allocator (`PhysicalAllocator`)
+- **Public API**: `alloc_frame`, `free_frame`, `available_frames`
+- **Prerequisites**: Framebuffer/bootloader memory map handoff
+- **Failure Policy**: Panic with diagnostic panic report (`KernelPanicDiagnosticReport`)
+- **Boot Order Position**: 1
 
-### Scheduler Core (`kernel::sched::core`)
-```toml
-[subsystem.scheduler]
-public_api = ["schedule", "yield_now", "wake_up", "sleep_on", "set_priority"]
-requires = ["timer_subsystem", "interrupt_controller", "process_table"]
-runtime_entry = "kernel::sched::core"
-boot_dependency = "required"
-failure_policy = "panic_with_diagnostic"
-```
-*Invariants:* Scheduler run-queues must enforce starvation protection and Lost-Wakeup prevention.
+### 2. Paging & Virtual Memory (`Paging`)
+- **Public API**: `map_page`, `unmap_page`, `translate_address`
+- **Prerequisites**: `PhysicalAllocator`
+- **Failure Policy**: Double fault exception / kernel panic
+- **Boot Order Position**: 2
 
-### Virtual File System (`kernel::vfs`)
-```toml
-[subsystem.vfs]
-public_api = ["sys_open", "sys_read", "sys_write", "sys_close", "mount_fs"]
-requires = ["inode_manager", "block_cache", "permission_engine"]
-runtime_entry = "kernel::vfs"
-boot_dependency = "required"
-failure_policy = "graceful_error_return"
-```
-*Invariants:* Path validation must enforce canonical directory traversal, permissions evaluation, and bounded file descriptor tables.
+### 3. Process Manager (`ProcessManager`)
+- **Public API**: `create_process`, `terminate_process`, `schedule`
+- **Prerequisites**: `Paging`
+- **Failure Policy**: Process exit code / kernel panic if `init` (PID 1) fails
+- **Boot Order Position**: 3
 
-### Syscall Dispatcher (`kernel::syscall`)
-```toml
-[subsystem.syscall]
-public_api = ["dispatch_syscall", "register_syscall_handler", "validate_user_ptr"]
-requires = ["capability_engine", "process_context", "signal_delivery"]
-runtime_entry = "kernel::syscall"
-boot_dependency = "required"
-failure_policy = "return_errno_to_userspace"
-```
-*Invariants:* Pointers received from userspace must be checked for boundary violations and validity before copy-in/copy-out.
+### 4. Syscall Dispatcher (`SyscallDispatcher`)
+- **Public API**: `dispatch_syscall`, `register_handler`
+- **Prerequisites**: `Paging`, `ProcessManager`
+- **Failure Policy**: Return negative POSIX error code (e.g. `-EINVAL`, `-EPERM`)
+- **Boot Order Position**: 4
 
-### Driver Framework (`kernel::drivers`)
-```toml
-[subsystem.drivers]
-public_api = ["probe_device", "remove_device", "dispatch_irq", "register_driver"]
-requires = ["pci_bus", "io_manager", "dma_allocator"]
-runtime_entry = "kernel::drivers"
-boot_dependency = "optional"
-failure_policy = "isolate_and_log_error"
-```
-*Invariants:* Driver probing and removal must be leak-free and handle hardware disconnects cleanly without kernel panic.
+### 5. Storage Block Layer (`StorageBlock`)
+- **Public API**: `read_blocks`, `write_blocks`, `register_device`
+- **Prerequisites**: `Paging`
+- **Failure Policy**: Return `BlockIoError`
+- **Boot Order Position**: 5
+
+### 6. Virtual File System (`Vfs`)
+- **Public API**: `vfs_open`, `vfs_read`, `vfs_write`, `vfs_mount`
+- **Prerequisites**: `StorageBlock`, `SyscallDispatcher`
+- **Failure Policy**: Return POSIX file I/O error codes
+- **Boot Order Position**: 6
+
+## Verification
+
+Initialization order contracts are verified by integration test:
+- `tests/kernel/integration/subsystem_contracts_test.rs`

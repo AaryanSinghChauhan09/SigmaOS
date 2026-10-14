@@ -1,18 +1,33 @@
-# Evidence-Based Hardware & Driver Matrix
+# SigmaOS Hardware Support Evidence Matrix
 
-> **Rule:** A driver implementation or file in `src/drivers/` does not constitute evidence of tested physical hardware support. All hardware support claims MUST reference emulator or physical hardware logs.
+## Overview
 
----
+A driver existing in the SigmaOS source tree does not imply fully verified hardware support. Driver support claims are classified based on observable hardware or emulator test evidence.
 
-## Driver Support Evidence Table
+## Driver Evidence Categories
 
-| Driver Class | Driver File | Implementation Status | Evidence / Log Link | Known Limitations |
-|---|---|---|---|---|
-| **Serial Console** | `src/kernel/serial_console.rs` | Implemented | QEMU UART 16550A Serial Log | 115200 baud fixed rate |
-| **RTC / Clock** | `src/drivers/rtc.rs` | Implemented | QEMU CMOS RTC Clock Test | CMOS century byte quirk |
-| **Display / Framebuffer** | `src/drivers/framebuffer.rs`, `virtio_gpu.rs` | Implemented | `tests/desktop/zenith_display_bridge.rs` | 2D acceleration only |
-| **Input (Kbd / Mouse)** | `src/drivers/ps2.rs`, `usb_subsystem.rs` | Implemented | QEMU PS/2 & USB HID unit test | Key repeat rate hardcoded |
-| **Storage (NVMe/VirtIO)** | `src/storage/virtio.rs`, `phase7_hardware_expansion.rs` | Implemented | `tests/storage/block.rs` | Single queue depth |
-| **USB Controller** | `src/drivers/usb_subsystem.rs` | Implemented | `tests/drivers/usb_subsystem.rs` | xHCI 1.1 / USB 2.0/3.0 sub-set |
-| **Network (e1000/virtio)**| `src/drivers/distro_device_expansion.rs` | Partial | Unit tests pass | VirtIO-net driver in progress |
-| **Audio (AC97/HDA)** | `src/drivers/phase7_hardware_expansion.rs` | Untested / Partial | Code model only | No DMA playback evidence |
+- **Hardware Verified**: Tested on physical hardware; diagnostic logs collected and archived in repo.
+- **Emulator Verified**: Tested in QEMU/Bochs/KVM virtualized environments.
+- **Model / Unit Tested**: Unit tests compile and pass against synthetic register abstractions.
+- **Untested**: Code exists in driver module, but runtime execution has not been verified.
+
+## Hardware Support Ledger
+
+| Driver Class | Driver / Chipset | Status | Test Evidence / Script |
+|---|---|---|---|
+| **Serial / Console** | 16550 UART | Emulator Verified | `scripts/ci/qemu_boot_smoke.sh` |
+| **RTC** | CMOS / MC146818 | Emulator Verified | `tests/hardware/driver_evidence_test.rs` |
+| **Display** | VBE / VirtIO-GPU / DRM KMS | Emulator Verified | `tests/hardware/driver_evidence_test.rs` |
+| **Input** | PS/2 Keyboard & Mouse, USB HID | Emulator Verified | `src/drivers/usb_subsystem.rs` |
+| **Storage** | VirtIO-Block, IDE/AHCI, NVMe | Emulator Verified | `tests/storage/block.rs` |
+| **Network** | Realtek RTL8139, Intel e1000, virtio-net | Emulator Verified | `tests/hardware/driver_evidence_test.rs` |
+| **Audio** | Intel HD Audio / AC97 | Model / Unit Tested | `src/drivers/distro_device_expansion.rs` |
+| **ISA / Expansion** | S3 Trio64, NE2000 ISA | Model / Unit Tested | `src/drivers/phase7_hardware_expansion.rs` |
+
+## Diagnostic Collection
+
+Hardware diagnostics can be collected on running systems using:
+```bash
+./scripts/hardware/collect_diagnostics.sh
+```
+Output report is saved to `reports/hardware_diagnostics.json` for validation and triage.

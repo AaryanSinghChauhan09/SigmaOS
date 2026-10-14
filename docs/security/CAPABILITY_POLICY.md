@@ -1,32 +1,16 @@
-# Capability Enforcement Policy
+# SigmaOS Capability Security Policy
 
-## Fine-Grained Capability Tokens
+## Overview
 
-In SigmaOS, access to privileged system operations is controlled via granular capabilities:
+Processes in SigmaOS do not inherit full root privileges. Privilege is governed by granular capability tokens.
 
-| Capability Flag | Operation Permitted |
-|---|---|
-| `CAP_SYS_ADMIN` | System administration, mounting filesystems, sysctl configuration |
-| `CAP_NET_RAW` | Opening raw sockets, packet injection, network interface configuration |
-| `CAP_SYS_RAWIO` | Direct I/O port access (`inb`/`outb`), MMIO mapping |
-| `CAP_SYS_PTRACE` | Process tracing, memory inspection of other processes |
-| `CAP_DAC_OVERRIDE` | Bypassing file permission checks |
-| `CAP_KILL` | Sending signals to processes owned by other users |
+## Capability Hierarchy
 
----
+- `CAP_SYS_ADMIN`: Required for raw disk partition operations and mounting.
+- `CAP_NET_ADMIN`: Required for raw packet socket binding and network route changes.
+- `CAP_KILL`: Permission to send signals to other processes.
+- `CAP_PTRACE`: Privilege to inspect memory of other processes.
 
-## Syscall Entry Enforcement Rule
+## Enforcement Mechanism
 
-Every syscall dispatcher entrypoint that modifies system state, reads restricted data, or performs hardware I/O MUST invoke:
-
-```rust
-pub fn check_capability(task: &Task, cap: Capability) -> Result<(), SyscallError> {
-    if task.capabilities.contains(cap) {
-        Ok(())
-    } else {
-        Err(SyscallError::PermissionDenied)
-    }
-}
-```
-
-Failure to verify capabilities on privileged syscall paths is considered a **Critical Security Bug**.
+Every syscall entry point checks process capability mask against required capabilities before executing kernel handlers.
