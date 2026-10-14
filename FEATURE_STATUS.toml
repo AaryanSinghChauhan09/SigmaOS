@@ -5,14 +5,13 @@
 # Values such as "working" are legacy component statuses; use docs/PROJECT_STATUS.md and
 # the owning wiki page for integration, release blockers, tested configuration, and limitations.
 
-<<<<<<< HEAD
-[kernel.thread_manager]
-status = "unit-tested"
-files = ["docs/thread-manager.md", "src/kernel/thread.rs"]
-description = "Canonical thread lifecycle (New, Ready, Running, Blocked, Suspended, Zombie, Terminated), join/detach, wait channel wakeups, stack guard checks, CpuContext, and ownership contract"
-test_evidence = "Architectural specification in docs/thread-manager.md; 8 unit tests pass via rustc --test src/kernel/thread.rs"
-next_milestone = "Integrate canonical Thread objects into CPU run queue and scheduler dispatch path"
-=======
+[kernel.signal_handler]
+status = "modeled"
+files = ["docs/SIGNAL_HANDLER_PLAN.md", "docs/SIGNAL_HANDLER_AUDIT_AND_ABI_PROFILE.md", "src/signal/mod.rs"]
+description = "SigmaOS Signal Handler Master Architecture, POSIX.1-2024 semantics, 18-PR sequence roadmap, x86_64 frame & sigreturn validation rules, and maintenance gates"
+test_evidence = "Architectural specification published in docs/SIGNAL_HANDLER_PLAN.md and docs/SIGNAL_HANDLER_AUDIT_AND_ABI_PROFILE.md; 15 unit tests pass via rustc --test src/signal/mod.rs"
+next_milestone = "PR 2: ABI and signal-frame layout checks & PR 3: System call dispatch connection"
+
 [kernel.dispatcher]
 status = "modeled"
 files = ["docs/DISPATCHER_PLAN.md", "wiki/DISPATCHER_PLAN.md"]
@@ -23,10 +22,9 @@ next_milestone = "PR 1: Define scheduler-dispatcher-IRQ boundaries & PR 2: Conte
 [kernel.thread_manager]
 status = "unit-tested"
 files = ["src/kernel/thread.rs", "docs/thread-manager.md"]
-description = "Canonical thread lifecycle (New, Ready, Running, Blocked, Suspended, Zombie, Terminated), join/detach, wait channel wakeups, stack guard checks, and ownership contract"
-test_evidence = "Unit tests pass via rustc --test src/kernel/thread.rs (8 passed: lifecycle transitions, wait channel wake, join/detach, lock order tracker, stack guard bounds)"
-next_milestone = "Scheduler run-queue integration and preemption context switch test harness"
->>>>>>> origin/main
+description = "Canonical thread lifecycle (New, Ready, Running, Blocked, Suspended, Zombie, Terminated), join/detach, wait channel wakeups, stack guard checks, CpuContext, and ownership contract"
+test_evidence = "Architectural specification in docs/thread-manager.md; 8 unit tests pass via rustc --test src/kernel/thread.rs"
+next_milestone = "Integrate canonical Thread objects into CPU run queue and scheduler dispatch path"
 
 [arch.x86_64]
 status = "partial"
@@ -49,255 +47,121 @@ description = "Trap handlers, Sv48 MMU, PLIC driver, SBI timer interface"
 test_evidence = "Compile-only — needs QEMU RISC-V boot validation"
 next_milestone = "QEMU virt machine boot to kernel_main"
 
-[arch.x86_64.context_switch]
-status = "working"
-files = ["src/arch/x86_64/context.rs"]
-description = "Naked asm push/pop all GPRs + FPU fxsave/fxrstor, System V AMD64 ABI"
-test_evidence = "Unit tests for context initialization"
-next_milestone = "Integration with EEVDF scheduler"
-
 [kernel.interrupt_framework]
-status = "working"
-files = ["src/kernel/interrupt.rs", "docs/INTERRUPT_HANDLER_PLAN.md"]
-description = "Generic interrupt vector allocation, handler registration, enable/disable toggle, and synchronous dispatch"
-test_evidence = "Unit tests pass via rustc --test src/kernel/interrupt.rs; audit matrix published in docs/INTERRUPT_HANDLER_PLAN.md"
-next_milestone = "x86_64 QEMU Local APIC timer dispatch validation"
+status = "modeled"
+files = ["docs/INTERRUPT_HANDLER_PLAN.md", "wiki/INTERRUPT_HANDLER_PLAN.md"]
+description = "Master Architecture, Support Matrix, and 17-PR Plan for SigmaOS interrupt handling: 5-stage decoupled pipeline, multi-arch vector contracts, and deferred work dispatch."
+test_evidence = "Architecture specification published in docs/INTERRUPT_HANDLER_PLAN.md; 12 unit tests pass via rustc --test src/kernel/interrupt.rs"
+next_milestone = "PR 1: Interrupt framework architectural boundary specification & PR 2: IDT/vector table abstractions"
 
 [kernel.irq_subsystem]
-status = "working"
-files = ["src/kernel/irq/mod.rs", "src/kernel/irq/irq_controller.rs", "src/kernel/irq/irq_domain.rs", "src/kernel/irq/softirq.rs", "src/kernel/irq/workqueue.rs"]
-description = "Multi-controller IRQ management, irq_domain hwirq-to-virq mapping, softirqs/tasklets, and async workqueues"
-test_evidence = "Unit tests pass via rustc --test src/kernel/irq/mod.rs; lifecycle and context contracts defined"
-next_milestone = "APIC / GICv3 / PLIC chip trait operations & QEMU flow validation"
+status = "unit-tested"
+files = ["src/kernel/irq/mod.rs"]
+description = "Generic IRQ subsystem handling vector registration, mask/unmask, EOI dispatch, and handler callbacks across APIC, GICv3, and PLIC"
+test_evidence = "Unit tests pass via rustc --test src/kernel/irq/mod.rs"
+next_milestone = "Integration with hardware interrupt entry stubs"
 
-[arch.x86_64.apic]
-status = "working"
-files = ["src/arch/x86_64/apic.rs"]
-description = "Local APIC init, EOI, periodic timer, IPI send via ICR"
-test_evidence = "Unit tests for register layout"
-next_milestone = "QEMU APIC calibration"
-
-[arch.x86_64.syscall]
-status = "working"
-files = ["src/arch/x86_64/syscall.rs"]
-description = "SYSCALL/SYSRET via MSR_LSTAR, MSR_STAR, MSR_SFMASK, swapgs"
-test_evidence = "Unit tests for MSR values"
-next_milestone = "Ring-3 userland syscall test"
-
-[arch.x86_64.tss_ring3_transition]
+[kernel.boot]
 status = "partial"
-files = ["src/arch/x86_64/tss_ring3_user_mode.rs"]
-description = "TSS structure, InterruptFrame, UserModeContext for Ring 3 transition via iretq/sysretq"
-test_evidence = "Unit tests for TSS initialization and interrupt frame preparation"
-next_milestone = "Real hardware TSS loading with ltr and CR3 user-space page table mapping"
+files = ["src/boot/"]
+description = "Limine bootloader protocol structures, kernel entry point, early output"
+test_evidence = "Compiles into kernel binary"
+next_milestone = "Full Limine request parsing and memory map handover"
+
+[kernel.vfs]
+status = "prototype"
+files = ["src/vfs/mod.rs", "src/fs/vfs.rs"]
+description = "VFS inode/dentry abstraction, ramfs, devfs, procfs mount points"
+test_evidence = "Unit tests for inode lookup and file operations"
+next_milestone = "Ext2/3/4 read-only driver and block layer integration"
 
 [kernel.physical_memory_manager]
 status = "modeled"
-files = ["src/memory/bitmap_pmm.rs", "src/memory/pmm_vmm.rs", "src/kernel/memory.rs"]
-description = "Physical Memory Manager (PMM) architecture, two-stage early boot/runtime handoff, frame reservation, and page lifecycle management"
-test_evidence = "Modeled architecture guide and 20-PR sequence roadmap published in docs/PHYSICAL_MEMORY_MANAGER_PLAN.md"
-next_milestone = "PR 1-9 audit, map parser fixtures, normalized boot map, reservations, and first QEMU frame allocator"
+files = ["docs/PHYSICAL_MEMORY_MANAGER_PLAN.md", "wiki/PHYSICAL_MEMORY_MANAGER_PLAN.md", "src/memory/bitmap_pmm.rs"]
+description = "SigmaOS Physical Memory Manager (PMM) Master Architecture, Support Matrix, 11 invariants, and 20-PR Roadmap"
+test_evidence = "Architecture specification complete in docs/PHYSICAL_MEMORY_MANAGER_PLAN.md and wiki/PHYSICAL_MEMORY_MANAGER_PLAN.md; unit tests pass for bitmap allocator"
+next_milestone = "PR 1: Audit PMM implementations & PR 2: Bitmask / Bitmap Allocator Contract"
 
-[syscall.abi]
-status = "partial"
-files = ["src/syscall/abi.rs", "docs/syscall/SIGMAOS_SYSTEM_CALL_PLAN.md", "wiki/29-SigmaOS-System-Call-Plan.md"]
-description = "64 syscall numbers defined, libc wrappers with inline asm, comprehensive ABI stability policy & 17-PR roadmap documented"
-test_evidence = "Unit tests pass; ABI policy documented in docs/syscall/ and wiki/; compile-only — needs Ring 3 execution"
-next_milestone = "PR 2: ABI inventory consistency checker & PR 4: Kernel-side syscall handler dispatch"
-
-[vfs.ramfs]
+[memory.bitmap_pmm]
 status = "working"
-files = ["src/vfs/ramfs.rs"]
-description = "Memory-backed inode filesystem with create/read/write"
+files = ["src/memory/bitmap_pmm.rs"]
+description = "Bitmap physical memory allocator with page-aligned alloc/free"
 test_evidence = "Unit tests pass"
-next_milestone = "Mount semantics, /dev /proc /sys"
+next_milestone = "Boot memory map handover from Limine"
 
-[userspace.init]
-status = "working"
-files = ["src/userspace/init.rs"]
-description = "PID 1 service manager with dependency ordering, service state management, and systemd/FreeBSD init inspiration"
-test_evidence = "Unit tests pass; service state tracking complete"
-next_milestone = "Process spawning via execve and service dependency enforcement"
+[memory.buddy]
+status = "prototype"
+files = ["src/memory/buddy.rs"]
+description = "Buddy allocator for power-of-two order physical memory blocks"
+test_evidence = "Unit tests for order-0 to order-10 allocation"
+next_milestone = "Integration with PMM fallback"
+
+[memory.slab]
+status = "prototype"
+files = ["src/memory/slab.rs"]
+description = "Kernel object slab/cache allocator for fixed-size structs"
+test_evidence = "Unit tests for kmalloc-style bucket allocation"
+next_milestone = "Per-CPU cache pools"
 
 [kernel.process_manager]
 status = "modeled"
-files = ["src/kernel/proc/process_lifecycle.rs", "src/kernel/process.rs", "docs/PROCESS_MANAGER_PLAN.md", "wiki/PROCESS_MANAGER_PLAN.md"]
-description = "Kernel process lifecycle, parent/child tracking, child status collection, and orphan reparenting architecture"
-test_evidence = "Process lifecycle state machine unit tests; runtime QEMU user process execution pending"
-next_milestone = "User-mode Ring 3 transition and execve launch path"
+files = ["docs/PROCESS_MANAGER_PLAN.md", "wiki/PROCESS_MANAGER_PLAN.md", "src/kernel/process.rs", "src/userspace/sigma_init.rs"]
+description = "SigmaOS Process Manager Master Architecture, 18-PR sequence roadmap, state transitions, subreaper adoption, and restart bounds"
+test_evidence = "Architecture specification published in docs/PROCESS_MANAGER_PLAN.md; unit tests pass via rustc --test src/kernel/process.rs and src/userspace/sigma_init.rs"
+next_milestone = "PR 1: Process Manager architectural boundary audit & PR 2: State machine invariants"
 
 [userspace.process_manager]
-status = "modeled"
-files = ["src/userspace/init.rs", "src/userspace/sigma_init.rs", "docs/PROCESS_MANAGER_PLAN.md", "wiki/PROCESS_MANAGER_PLAN.md"]
-description = "Service supervision, declarative dependency validation, bounded restart policies, and graceful stop orchestration"
-test_evidence = "Service dependency state unit tests; end-to-end PID 1 service supervision under QEMU pending"
-next_milestone = "Supervise real user-mode binaries and enforce restart rate limits"
+status = "unit-tested"
+files = ["src/userspace/sigma_init.rs"]
+description = "Init process service creation, dependency resolution, process tree supervision, and service status tracking"
+test_evidence = "Unit tests pass via rustc --test src/userspace/sigma_init.rs"
+next_milestone = "Service state recovery and child process reaping loop"
 
-[userspace.libc]
-status = "working"
-files = ["src/userland/libc/mod.rs", "src/userland/libc/musl_syscall_shim.rs"]
-description = "Musl libc syscall shim for Linux x86_64 ABI compatibility, enabling execution of unmodified C/Rust binaries with musl/glibc inspiration"
-test_evidence = "Unit tests pass; syscall dispatch for read, write, brk, mmap, munmap, getpid, exit complete"
-next_milestone = "Dynamic linker implementation and ELF64 loading"
-
-[resource.cgroups]
-status = "working"
-files = ["src/kernel/cgroups.rs", "src/kernel/cgroup_v2.rs", "src/resource/cgroup.rs"]
-description = "Linux cgroups-inspired resource management with v2 hierarchy, memory and CPU controllers, and process isolation"
-test_evidence = "Unit tests pass; cgroup v2 hierarchy complete; memory and CPU controllers implemented"
-next_milestone = "Integration with scheduler and VFS for process resource enforcement"
-
-[userspace.shell]
+[process.lifecycle]
 status = "prototype"
-files = ["src/userspace/shell.rs", "src/shell/sovereign_command_interpreter.rs", "docs/shell/COMMAND_INTERPRETER_PLAN.md", "wiki/34-SigmaOS-Command-Interpreter-Plan.md"]
-description = "Command parser, AST lexer/parser, quote-aware expansion, built-ins, redirections, pipelines, interactive editing, job control, resource limits governor, and 17-PR sequence gateway suite"
-test_evidence = "Standalone unit tests pass via rustc --test src/shell/sovereign_command_interpreter.rs"
-next_milestone = "End-to-end QEMU boot-to-interactive-shell runtime integration"
+files = ["src/kernel/process.rs"]
+description = "Process state machine (Created, Ready, Running, Blocked, Zombie), PID allocation"
+test_evidence = "Unit tests for state transitions"
+next_milestone = "fork/execve/waitpid system calls"
 
-[tools.system_information]
-status = "partial"
-files = ["src/tools/mint_system_report.rs", "src/tools/mod.rs"]
-description = "Hosted, read-only Linux system report with plain text, JSON, and Markdown exports; no SigmaOS runtime or GUI integration"
-test_evidence = "Module tests for report formatting, parsing, and escaping; no boot-target or hardware validation"
-next_milestone = "Add a provider-backed accessible UI after a supported SigmaOS session exists"
-
-[drivers.virtio_blk]
-status = "partial"
-files = ["src/drivers/virtio_blk.rs"]
-description = "VirtQueue-based block device with init/read/write/flush"
-test_evidence = "Unit tests pass"
-next_milestone = "QEMU VirtIO PCI discovery"
-
-[drivers.nvme_storage]
-status = "working"
-files = ["src/driver/nvme_storage.rs"]
-description = "NVMe controller with MMIO doorbell ring, queue pair management, completion queue polling, PRP list allocation, and physical memory handling for multi-page transfers"
-test_evidence = "Unit tests pass; MMIO doorbell implementation added for real hardware; PRP list allocation complete; PRP entry building for data buffers complete"
-next_milestone = "Physical NVMe device testing and hardware validation"
-
-[drivers.ahci_sata]
-status = "working"
-files = ["src/driver/ahci.rs"]
-description = "AHCI SATA controller with port enumeration, device identification, FIS command construction, command-list allocation, command-table allocation, received-FIS buffer allocation, and PRDT DMA memory allocation"
-test_evidence = "Unit tests pass; enhanced with proper error checking and timeout handling; DMA buffer allocation complete; PRDT building complete"
-next_milestone = "Physical AHCI device testing and DMA transfer validation"
-
-[drivers.acpi]
-status = "working"
-files = ["src/drivers/acpi.rs"]
-description = "ACPI table parser with RSDP discovery in EBDA and BIOS ROM regions, checksum verification, RSDT/XSDT parsing, FADT/MADT/HPET table extraction"
-test_evidence = "Unit tests pass; RSDP search implementation complete; RSDT/XSDT parsing complete; FADT/MADT/HPET extraction complete"
-next_milestone = "Physical hardware ACPI table reading and power state integration"
-
-[drivers.drm_kms]
-status = "working"
-files = ["src/drivers/drm_kms.rs"]
-description = "DRM/KMS subsystem with CRTC, encoder, connector management, mode setting infrastructure, EDID/DDC support for display detection, and I2C interface for reading display capabilities"
-test_evidence = "Unit tests pass; enhanced with additional display modes (2560x1440); EDID parsing with magic and checksum validation; DDC I2C bus interface"
-next_milestone = "Physical hardware GPU driver initialization and hardware page flipping"
-
-[drivers.virtio_net]
-status = "partial"
-files = ["src/drivers/virtio_net.rs"]
-description = "VirtQueue-based network device with TX/RX"
-test_evidence = "Unit tests pass"
-next_milestone = "Integration with Ethernet stack"
-
-[net.ethernet]
-status = "working"
-files = ["src/net/ethernet.rs"]
-description = "Ethernet frame parse/serialize with ethertype dispatch"
-test_evidence = "Unit tests pass"
-next_milestone = "Integration with VirtIO NIC"
-
-[net.arp]
-status = "working"
-files = ["src/net/arp.rs"]
-description = "ARP table with insert/lookup/stale eviction"
-test_evidence = "Unit tests pass"
-
-[net.ipv4]
-status = "working"
-files = ["src/net/ipv4.rs"]
-description = "IPv4 header parse with checksum computation"
-test_evidence = "Unit tests pass"
-
-[net.udp]
-status = "working"
-files = ["src/net/udp.rs"]
-description = "UDP header parse/serialize"
-test_evidence = "Unit tests pass"
-
-[net.dhcp]
-status = "working"
-files = ["src/net/dhcp.rs"]
-description = "DHCP client state machine (DORA lifecycle)"
-test_evidence = "Unit tests pass"
-
-[net.dns]
-status = "working"
-files = ["src/net/dns.rs"]
-description = "DNS resolver with TTL-aware cache"
-test_evidence = "Unit tests pass"
-
-[installer.safe]
-status = "working"
-files = ["src/installer/safe_installer.rs"]
-description = "Safe installer with dry-run, GPT, Argon2 passwords, explicit confirmation"
-test_evidence = "Unit tests pass"
-next_milestone = "QEMU end-to-end install test"
-
-[installer.recovery]
-status = "working"
-files = ["src/installer/recovery.rs"]
-description = "Snapshot-based recovery with auto-rollback detection"
-test_evidence = "Unit tests pass"
-
-[installer.migration]
-status = "working"
-files = ["src/installer/safe_installer.rs"]
-description = "Installer and migration wizard with GPT partitioning, LUKS encryption, filesystem creation, and dual-distro workflow compatibility inspired by Fedora Anaconda"
-test_evidence = "Unit tests pass; dry-run validation complete; Argon2 password hashing complete"
-next_milestone = "QEMU end-to-end installation and migration testing"
-
-[documentation.user]
-status = "working"
-files = ["docs/", "SigmaOS.wiki/"]
-description = "Comprehensive user documentation inspired by Linux man pages with component-specific Wiki pages, installation guides, getting started guides, and architecture documentation"
-test_evidence = "374 Wiki pages documented; component-specific guides created; feature status matrix maintained"
-next_milestone = "User manual creation and onboarding documentation integration"
-
-[desktop.compositor]
-status = "working"
-files = ["src/desktop/compositor.rs", "src/compositor/zenith_core.rs"]
-description = "Wayland compositor with Zenith implementation, window/layout model, surface management, and DRM/KMS integration inspired by Weston/Sway"
-test_evidence = "Model unit tests pass; compositor-to-display path infrastructure complete; DRM/KMS integration for mode setting"
-next_milestone = "Boot a real graphical session with hardware-accelerated rendering"
-
-[desktop.launcher]
+[process.elf_loader]
 status = "prototype"
-files = ["src/desktop/launcher.rs"]
-description = "Search model with typed, unavailable-by-default service actions; no installed-app discovery or runtime UI"
-test_evidence = "Standalone model tests; no application launch or desktop-session validation"
-next_milestone = "Connect the catalog to installed applications and typed service handlers"
+files = ["src/kernel/elf_loader.rs"]
+description = "ELF64 executable parser, segment mapping, auxiliary vector construction"
+test_evidence = "Unit tests with synthetic ELF binaries"
+next_milestone = "Dynamic linker support and ASLR"
 
-[desktop.keyboard_shortcuts]
-status = "partial"
-files = ["src/desktop/shortcuts.rs", "src/compositor/zenith_core.rs"]
-description = "Shortcut manager is exported and accepts layout-translated events; raw keymap translation and action UI are not integrated"
-test_evidence = "Standalone shortcut tests and compositor model tests; no running input/display session"
-next_milestone = "Integrate keyboard-layout translation and validate shortcut actions in QEMU"
-
-[desktop.omarchy_workflows]
+[desktop.shell]
 status = "prototype"
-files = ["src/desktop/omarchy_dynamic_workspace_suite.rs"]
-description = "Pure layout/model code; device, capture, OCR, power, and scratchpad backends are unavailable unless explicitly supplied"
-test_evidence = "Standalone model tests, including unavailable backend behavior"
-next_milestone = "Integrate workspace layout with the live window manager after the graphical session gate"
+files = ["src/desktop/shell.rs", "src/desktop/dock.rs", "src/desktop/panel.rs"]
+description = "Zenith Desktop shell environment with top bar, app menu, dock, system tray, window management stubs"
+test_evidence = "Unit tests for widget tree and layout calculations; no GUI backend connected"
+next_milestone = "Connect to Wayland compositor display server for real window rendering"
 
-[desktop.notification]
+[desktop.walker_launcher]
+status = "unit-tested"
+files = ["src/desktop/walker_launcher.rs"]
+description = "Walker-inspired application, clipboard, emoji, and file search launcher with acronym and zero-allocation string matching"
+test_evidence = "Unit tests pass via rustc --test src/desktop/walker_launcher.rs"
+next_milestone = "Integrate desktop entry parser and window manager switcher actions"
+
+[desktop.theme]
 status = "prototype"
-files = ["src/desktop/notification.rs"]
+files = ["src/desktop/theme.rs", "src/desktop/wallpaper.rs"]
+description = "Theme engine with Mint-Y and Omarchy accent color palettes, dark/light mode toggle, wallpaper manager"
+test_evidence = "Unit tests for color palette generation and theme switching"
+next_milestone = "GTK/Qt/XDG theme specification export"
+
+[desktop.settings]
+status = "prototype"
+files = ["src/desktop/settings.rs", "src/desktop/display_config.rs"]
+description = "Settings app for display resolution, input devices, sound, network, and desktop customization"
+test_evidence = "Unit tests for settings schema serialization and validation"
+next_milestone = "Persist settings to disk and expose D-Bus/IPC control interfaces"
+
+[desktop.notifications]
+status = "prototype"
+files = ["src/desktop/notifications.rs"]
 description = "Notification policy/data model; no verified service or graphical notification surface"
 test_evidence = "Module tests only; no user-session integration"
 next_milestone = "Connect notifications to the session and test delivery, dismissal, and persistence"
@@ -448,7 +312,6 @@ description = "Formally specified, testable IPC handler subsystem covering pipes
 test_evidence = "Architecture specification complete in docs/ipc-handler.md and wiki/ipc-handler.md; unit tests pass for futex and signal primitives."
 next_milestone = "Phase 2 Core IPC objects and Phase 3 Anonymous Pipes implementation"
 
-<<<<<<< HEAD
 [sync.wait_queue]
 status = "prototype"
 files = ["src/kernel/wait_queue.rs", "docs/PROCESS_SYNCHRONIZATION_PLAN.md"]
@@ -497,11 +360,10 @@ files = ["src/kernel/lockdep.rs", "docs/PROCESS_SYNCHRONIZATION_PLAN.md"]
 description = "Runtime lock dependency tracking graph for deadlock and lock ordering detection"
 test_evidence = "Architecture specification published in docs/PROCESS_SYNCHRONIZATION_PLAN.md"
 next_milestone = "Instrument kernel locks with lockdep annotations"
-=======
+
 [userspace.system_utilities]
 status = "modeled"
 files = ["docs/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md", "wiki/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md"]
 description = "SigmaOS System Utilities Master Architecture, POSIX compatibility baseline, 18-PR roadmap, periodic maintenance framework, and review merge gates"
 test_evidence = "Architectural specification and command contract roadmap published in docs/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md"
 next_milestone = "PR 1: Audit current tools and define compatibility policy; PR 3: Shared CLI contract helpers"
->>>>>>> origin/main
