@@ -1,13 +1,16 @@
 # GitHub Security Policy & Guidelines
 
-This repository follows the SigmaOS Security Management Plan.
+This repository strictly adheres to the SigmaOS Security Management Plan.
 
-For vulnerability disclosures, security rules, and detailed PR roadmaps, please refer to:
+For full details on vulnerability disclosures, security rules, NIST SP 800-218 alignment, and the 16-PR Security Roadmap, please refer to:
 - Root Security Policy: [`SECURITY.md`](../SECURITY.md)
 - Complete Security Management Plan: [`docs/SECURITY.md`](../docs/SECURITY.md)
 
 ## Summary of Vulnerability Reporting
 
-- **Private Reporting Only:** Do NOT file public issues or PRs containing unpatched security vulnerabilities or exploits.
-- **Reporting Channel:** Use GitHub Private Vulnerability Reporting or contact security maintainers via `security@sigmaos.org`.
-- **Target Response:** Initial response within 3 business days; triage within 10 business days.
+- **Private Reporting Only:** Do NOT file public issues or pull requests containing unpatched security vulnerabilities or exploit code.
+- **Reporting Channels:**
+  - GitHub Private Vulnerability Reporting tab in this repository.
+  - Direct email: `security@sigmaos.org`
+- **Target SLA:** Initial acknowledgement within 3 business days; triage within 10 business days.
+- **Coordinated Disclosure:** Public advisories published after fixes are merged and backported.

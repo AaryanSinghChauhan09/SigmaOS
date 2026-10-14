@@ -9,16 +9,20 @@ pub mod printer_manager;
 pub mod scanner_manager;
 
 pub use printer_manager::{
-    BsdLpdProtocolQueueManager, GhostscriptColorModel, GhostscriptDevice,
-    GhostscriptRasterizationEngine, IppEverywhereDiscoveryEngine, IppPrinterAttributes,
-    LpdQueueControl, PopplerAnnotation, PopplerBackend, PopplerPdfRenderingEngine,
-    PpdOption, PpdPostScriptCompilerEngine, PrintJob, PrintJobStatus, Printer, PrinterManager,
+    BsdLpdAccountingQuotaEngine, BsdLpdProtocolQueueManager, CupsFilterPipelineEngine,
+    CupsFilterStage, GhostscriptColorModel, GhostscriptDevice, GhostscriptRasterizationEngine,
+    GhostscriptSecurityFontEngine, IppEverywhereDiscoveryEngine, IppPrinterAttributes,
+    LpdPrintAccount, LpdQueueControl, LpdUserQuota, PdfFormFieldInfo, PopplerAnnotation,
+    PopplerBackend, PopplerPdfRenderingEngine, PopplerVectorFormExtractionEngine, PpdOption,
+    PpdPostScriptCompilerEngine, PrintJob, PrintJobStatus, Printer, PrinterManager,
     PrinterStatistics, PrinterStatus, PrinterType,
 };
 pub use scanner_manager::{
-    AdfBatchScanEngine, DriverlessAirScanEngine, DriverlessScanProtocol,
-    PrintScanPullRequestGatewayEngine, PrintScanPrCategory, SaneBackendEngine,
-    SaneFrame, SaneParameters, SaneStatus, ScanColorMode, ScanFormat, ScanJob,
-    ScanJobStatus, ScanResolution, Scanner, ScannerManager, ScannerStatistics,
-    ScannerType,
+    AdfBatchOcrDocumentEngine, AdfBatchScanEngine, AirScanWsdDiscoveryEngine,
+    DiagnosticCheckResult, DiagnosticCheckStatus, DiscoveredNetworkScanner,
+    DriverlessAirScanEngine, DriverlessScanProtocol, PrintScanDiagnosticsTelemetryEngine,
+    PrintScanPrCategory, PrintScanPullRequestGatewayEngine, SaneBackendEngine, SaneFrame,
+    SaneOptionDescriptor, SaneOptionDescriptorEngine, SaneOptionValueType, SaneParameters,
+    SaneStatus, SaneUnit, ScanColorMode, ScanFormat, ScanJob, ScanJobStatus, ScanResolution,
+    ScannedPageMetadata, Scanner, ScannerManager, ScannerStatistics, ScannerType,
 };

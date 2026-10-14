@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # SigmaOS Agent Registry and Operating Model
 
 [version]
@@ -74,14 +73,9 @@ allowed_tools = ["read_file", "write_file", "replace_with_git_merge_diff", "list
 permissions = { fs_read = true, fs_write_docs = true, code_write = false, network = false }
 recurring_cadence = "weekly"
 definition_of_done = "Documentation strictly reflects current QEMU-verified evidence without unverified claims."
-=======
 # SigmaOS Agent Registry
 # Defines agent roles, ownership boundaries, scopes, permissions, and report locations.
-
 version = "1.0.0"
-
-[agents.repository-steward]
-name = "Repository Steward"
 description = "Keeps repository clean, coherent, and reviewable."
 scope = ["./", ".github/", "docs/", "reports/steward/"]
 permissions = [
@@ -99,9 +93,6 @@ requires_human_approval = [
   "branch_deletion",
   "architecture_refactor"
 ]
-
-[agents.build-test-sentinel]
-name = "Build and Test Sentinel"
 description = "Automates clean builds, test execution, and regression reporting."
 scope = ["Cargo.toml", "Cargo.lock", "Makefile", "scripts/", "tests/", "reports/build/", "reports/test/"]
 permissions = [
@@ -121,9 +112,6 @@ requires_human_approval = [
   "dependency_upgrade",
   "toolchain_bump"
 ]
-
-[agents.boot-runtime-validator]
-name = "Boot and Runtime Validator"
 description = "Validates boot-to-shell, installer, and QEMU runtime execution paths."
 scope = ["installer/", "src/kernel/", "scripts/", "tests/", "reports/boot/", "reports/installer/"]
 permissions = [
@@ -144,9 +132,6 @@ requires_human_approval = [
   "kernel_entry_change",
   "installer_disk_wipe"
 ]
-
-[agents.capability-auditor]
-name = "Capability Auditor"
 description = "Cross-checks capability status claims against actual test and boot evidence."
 scope = ["README.md", "CAPABILITY_MATRIX.toml", "FEATURE_STATUS.toml", "docs/", "reports/capability/"]
 permissions = [
@@ -162,7 +147,6 @@ reports = [
 requires_human_approval = [
   "status_upgrade_to_supported"
 ]
-
 [agents.scheduler-agent]
 name = "Scheduler Subsystem Agent"
 description = "Owns thread scheduling, process priority, starvation preventer, and CPU dispatching."
@@ -174,7 +158,6 @@ permissions = [
 ]
 reports = ["reports/test/scheduler.json"]
 requires_human_approval = ["kernel_interface_change"]
-
 [agents.memory-agent]
 name = "Memory Subsystem Agent"
 description = "Owns frame allocation, heap allocators, paging, and kernel virtual memory."
@@ -186,7 +169,6 @@ permissions = [
 ]
 reports = ["reports/test/memory.json"]
 requires_human_approval = ["kernel_security_boundary_change"]
-
 [agents.vfs-agent]
 name = "VFS and Filesystem Agent"
 description = "Owns path resolution, VFS trait abstractions, mount table, and filesystem drivers."
@@ -199,7 +181,6 @@ permissions = [
 ]
 reports = ["reports/test/vfs.json"]
 requires_human_approval = ["storage_format_change"]
-
 [agents.syscall-agent]
 name = "Syscall Subsystem Agent"
 description = "Owns ABI consistency, argument validation, and kernel syscall dispatching."
@@ -211,7 +192,6 @@ permissions = [
 ]
 reports = ["reports/test/syscall.json"]
 requires_human_approval = ["abi_breaking_change"]
-
 [agents.ipc-agent]
 name = "IPC Subsystem Agent"
 description = "Owns pipes, signals, Unix sockets, shared memory, and IPC message queues."
@@ -224,7 +204,6 @@ permissions = [
 ]
 reports = ["reports/test/ipc.json"]
 requires_human_approval = ["ipc_capability_change"]
-
 [agents.driver-agent]
 name = "Driver Subsystem Agent"
 description = "Owns hardware probe, device initialization, virtio drivers, and PCI/USB shims."
@@ -238,7 +217,6 @@ permissions = [
 ]
 reports = ["reports/test/drivers.json"]
 requires_human_approval = ["physical_hardware_claim"]
-
 [agents.security-agent]
 name = "Security Subsystem Agent"
 description = "Owns MAC policies, capability checks, sandboxing, pledge/unveil, and threat models."
@@ -251,9 +229,7 @@ permissions = [
 ]
 reports = ["reports/security/audit.json"]
 requires_human_approval = ["all_security_changes"]
-
 [agents.package-compat-agent]
-name = "Package and Distro Compatibility Agent"
 description = "Owns package metadata parsing, dependency graphs, and sandboxed package execution."
 scope = ["src/compatibility/", "src/distro/", "tools/sigma_pacman_compat.rs", "reports/package/"]
 permissions = [
@@ -264,9 +240,7 @@ permissions = [
 ]
 reports = ["reports/package/compatibility_matrix.json"]
 requires_human_approval = ["exec_host_package_scripts"]
-
 [agents.docs-onboarding-agent]
-name = "Documentation and Onboarding Agent"
 description = "Synchronizes README claims, contributor guides, and troubleshooting steps with verified reality."
 scope = ["README.md", "docs/", "WIKI/", "wiki/", ".github/PULL_REQUEST_TEMPLATE.md"]
 permissions = [
@@ -277,4 +251,3 @@ permissions = [
 ]
 reports = ["reports/capability/verified_today.md"]
 requires_human_approval = ["readme_architecture_redefinition"]
->>>>>>> origin/main
