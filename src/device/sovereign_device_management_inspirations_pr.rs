@@ -1048,6 +1048,29 @@ impl SovereignDeviceManagementParityPrGateway {
             self.dbus_broker.generate_proposal(),
         ]
     }
+
+    /// Generate full Pull Request Proposal documentation report in Markdown format.
+    pub fn generate_pr_proposal_markdown(&self) -> String {
+        let proposals = self.collect_all_proposals();
+        let mut md = String::from("# Pull Request Proposals: Linux & BSD Unified Device Management, Event Processing & IPC Parity Engine\n\n");
+        md.push_str("## Overview\n");
+        md.push_str("This collection of Pull Request proposals introduces native parity and high-performance zero-dependency `#![no_std]` / `alloc` implementations for Linux & BSD device management, hotplug, power daemons, user session managers, PolicyKit privilege authorization, and D-Bus IPC bus brokers in SigmaOS.\n\n---\n\n");
+
+        for (idx, p) in proposals.iter().enumerate() {
+            md.push_str(&format!("### PR #{}: {}\n", 1001 + idx, p.pr_title));
+            md.push_str(&format!("- **Target Subsystem**: {}\n", p.target_subsystem));
+            md.push_str(&format!("- **Original Distros & Subsystems**: {}\n", p.original_distros));
+            md.push_str(&format!("- **Performance Impact**: {}\n", p.performance_multiplier));
+            md.push_str(&format!("- **Status**: {}\n", p.status));
+            md.push_str("- **Key Components Added**:\n");
+            for comp in &p.components_added {
+                md.push_str(&format!("  - {}\n", comp));
+            }
+            md.push_str("\n");
+        }
+
+        md
+    }
 }
 
 // ============================================================================
@@ -1185,5 +1208,10 @@ mod tests {
             assert_eq!(manifest.status, "Ready for Merge");
             assert!(!manifest.components_added.is_empty());
         }
+
+        let markdown = gateway.generate_pr_proposal_markdown();
+        assert!(markdown.contains("Pull Request Proposals: Linux & BSD Unified Device Management"));
+        assert!(markdown.contains("PR #1001"));
+        assert!(markdown.contains("PR #1006"));
     }
 }

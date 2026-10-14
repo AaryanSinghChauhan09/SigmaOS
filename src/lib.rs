@@ -47,6 +47,7 @@ pub mod crypto;
 pub mod filesystem;
 pub mod futuristic_modules;
 pub mod governance;
+pub use governance::*;
 pub mod gpu;
 pub mod gaming;
 pub mod init;
@@ -136,6 +137,7 @@ pub mod open_source_os_missing_components_parity;
 pub use open_source_os_missing_components_parity::*;
 pub mod tools;
 pub use distro::additional_linux_bsd_components::*;
+pub use distro::open_source_os_debian_unimplemented_ideas_pr::*;
 pub use distro::omarchy_linux_gap_closure_pr_suite::*;
 pub use distro::omarchy_linux_missing_components_v52_pr::*;
 pub use distro::omarchy_omakase_ultimate_parity::*;
@@ -146,6 +148,7 @@ pub use distro::sovereign_2070_distro_supremacy_engine::*;
 pub use distro::sovereign_2075_distro_supremacy_engine::*;
 pub use distro::sovereign_linux_bsd_all_subsystems_harmony::*;
 pub use distro::sovereign_linux_bsd_ecosystem_gap_closure_v50_pr::*;
+pub use distro::sovereign_linux_bsd_ecosystem_gap_closure_v51_pr::*;
 pub use distro::sovereign_linux_bsd_ecosystem_parity_v42_pr::*;
 pub use distro::sovereign_linux_bsd_master_synthesis::*;
 pub use distro::sovereign_linux_bsd_pinnacle_innovations_v14::*;
@@ -160,6 +163,7 @@ pub use distro::sovereign_thousands_distro_components::*;
 pub use distro::sovereign_universal_subsystem_interop::*;
 pub use distro::sovereign_universal_subsystem_interop::*;
 pub use distro::sovereign_tech_media_wiki_ultimate_parity_pr::*;
+pub use distro::sovereign_freebsd_ultimate_parity_pr_suite::*;
 pub use distro::tech_media_publication_innovations::*;
 pub use distro::SovereignMasterSubsystemDistroHarmonizer;
 pub use kernel::tss_ring3_user_mode::*;
@@ -240,7 +244,7 @@ pub use distro::{
     ComplianceAuditor, ComponentType, ConferenceTalk, ConfigHook, CpuArchitecture, CpuCapabilities,
     CrossBuildPipeline, CrossbowVnic, DaxMemoryRegion, DebianPolicyEnforcer, DebianSocialContract,
     DevTool, DeveloperToolkit, DirectoryService, DirectoryUser, DllLoader, DllModule,
-    DpkgMultiArch, DragonFlyHammerFs, EcuController, EduChallenge, EduPlayground, ApexFlakeInput,
+    DpkgMultiArch, DragonFlyBsdMissingComponentsParityPrGateway, DragonFlyHammerFs, EcuController, EduChallenge, EduPlayground, ApexFlakeInput,
     ForumChannel, ForumPost, FreezeBasedStabilization, GNUGuixShepherdSupervisor, GdiObjectType,
     GentooPortageUseFlagsEngine, GuixDerivation, GuixFunctionalStore, HalError,
     Hammer2MultiMasterPfsReplication, Hammer2Snapshot, Hammer2TxgRecord, HardwareAbstractionLayer,
@@ -342,10 +346,13 @@ pub use security::{
     SandboxPolicy,
 };
 pub use shell::{
-    ContextualCompleter, HistoryExpansionEngine, JobControlManager, ParameterExpansionEngine,
-    PipelineExecutor, ShellCommand, ShellManager as ShellProfileManager, ShellPledgeUnveilGuard,
+    ContextualCompleter, HistoryExpansionEngine, InitSupervisorsAndTimersPrEngine, JobControlManager,
+    ParameterExpansionEngine, PipelineExecutor, PosixAndAdvancedShellsPrEngine,
+    ShellCommand, ShellManager as ShellProfileManager, ShellPledgeUnveilGuard,
     ShellProfile, ShellStatistics, ShellSyntaxHighlighter, ShellType,
-    SimpleShellSession as ShellRepl, ZshPromptFormatter,
+    ShellsTerminalsSupervisorsPrProposalManifest, SimpleShellSession as ShellRepl,
+    SovereignShellsTerminalsSupervisorsParityPrGateway, TerminalMultiplexersAndEmulatorsPrEngine,
+    ZshPromptFormatter,
 };
 pub use sigpkg::{
     AdapterError, BuildSystem, ContentAddressedStore, CryptoVerifier, DebAdapter,
@@ -357,6 +364,7 @@ pub use userland::shell::{
     Parser as UserlandShellParser, RedirectSpec, RedirectionEngine, Shell as UserlandShell,
     StreamTarget,
 };
+pub use userland::init::*;
 pub use userland::system_utilities::*;
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
