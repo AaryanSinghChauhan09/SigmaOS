@@ -21,6 +21,10 @@ pub enum ProjectType {
     Design,
     Effect,
     Scene,
+    Cad,
+    CadCraft,
+    Drafting,
+    SolidModel,
 }
 
 /// Project

@@ -13,6 +13,7 @@ pub mod mediacraft;
 pub mod audiocraft;
 pub mod vectoranimation;
 pub mod model3d;
+pub mod cadcraft;
 pub mod artcraft;
 
 pub use photocraft::{
@@ -94,6 +95,15 @@ pub use model3d::{
     Material, Light, LightType, Camera,
     ExportFormat as Model3DExportFormat,
     init_model3d, get_model3d,
+};
+pub use cadcraft::{
+    CadCraftEngine, SketchEntity, SketchEntityType, GeometricConstraint, ConstraintType,
+    SolidFeature, SolidFeatureType, AssemblyMate, AssemblyMateType, AssemblyComponent,
+    CamToolpath, CamToolpathType, FeaMesh, FeaElement, ExportFormat as CadExportFormat,
+    CadCraftPullRequestSpec, CadCraft2dDraftingConstraintPrDeployer,
+    CadCraft3dSolidModelingPrDeployer, CadCraftAssemblyFemSimulationPrDeployer,
+    CadCraftMasterPrDeploymentSuite, fnv1a_cadcraft_pr_digest,
+    init_cadcraft, get_cadcraft,
 };
 pub use artcraft::{
     ArtSuite, Project, Workspace,
