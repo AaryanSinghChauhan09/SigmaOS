@@ -75,7 +75,9 @@ impl LinuxLandlockBcachefsPrEngine {
     pub fn generate_pr(&self) -> OpenSourceOsV46PrSpec {
         OpenSourceOsV46PrSpec {
             pr_id: 4601,
-            title: String::from("[Linux Gap Closure] Landlock V5 Net Bindings & Bcachefs Storage Tiering"),
+            title: String::from(
+                "[Linux Gap Closure] Landlock V5 Net Bindings & Bcachefs Storage Tiering",
+            ),
             branch: String::from("pr/linux-landlock-v5-bcachefs"),
             os_origin: String::from("Linux 6.13+"),
             target_component: String::from("src/security/landlock_v5_bcachefs.rs"),
@@ -89,7 +91,9 @@ impl LinuxLandlockBcachefsPrEngine {
     }
 
     pub fn verify(&self) -> bool {
-        self.landlock_v5_active && self.bcachefs_tiering_enabled && !self.restricted_ports.is_empty()
+        self.landlock_v5_active
+            && self.bcachefs_tiering_enabled
+            && !self.restricted_ports.is_empty()
     }
 }
 
@@ -128,7 +132,9 @@ impl FreeBsdVnetCapsicumPrEngine {
     pub fn generate_pr(&self) -> OpenSourceOsV46PrSpec {
         OpenSourceOsV46PrSpec {
             pr_id: 4602,
-            title: String::from("[FreeBSD Gap Closure] Netlink VNET Jails & Capsicum Capability Rights"),
+            title: String::from(
+                "[FreeBSD Gap Closure] Netlink VNET Jails & Capsicum Capability Rights",
+            ),
             branch: String::from("pr/freebsd-vnet-capsicum"),
             os_origin: String::from("FreeBSD 14.1+"),
             target_component: String::from("src/security/freebsd_vnet_capsicum.rs"),
@@ -177,7 +183,9 @@ impl OpenBsdFineIbtUnveilPrEngine {
     pub fn generate_pr(&self) -> OpenSourceOsV46PrSpec {
         OpenSourceOsV46PrSpec {
             pr_id: 4603,
-            title: String::from("[OpenBSD Gap Closure] FineIBT Hardware CFI & Dynamic Unveil Shadow Stack"),
+            title: String::from(
+                "[OpenBSD Gap Closure] FineIBT Hardware CFI & Dynamic Unveil Shadow Stack",
+            ),
             branch: String::from("pr/openbsd-fineibt-unveil"),
             os_origin: String::from("OpenBSD 7.6+"),
             target_component: String::from("src/security/openbsd_fineibt_unveil.rs"),
@@ -275,7 +283,9 @@ impl NixGuixHermeticStorePrEngine {
     pub fn generate_pr(&self) -> OpenSourceOsV46PrSpec {
         OpenSourceOsV46PrSpec {
             pr_id: 4605,
-            title: String::from("[Nix/Guix Gap Closure] Hermetic Content-Addressed Store & Generation Rollbacks"),
+            title: String::from(
+                "[Nix/Guix Gap Closure] Hermetic Content-Addressed Store & Generation Rollbacks",
+            ),
             branch: String::from("pr/nix-guix-hermetic-store"),
             os_origin: String::from("NixOS & GNU Guix"),
             target_component: String::from("src/package/nix_guix_hermetic_store.rs"),
@@ -324,7 +334,9 @@ impl AlpineVoidPkgManagerPrEngine {
     pub fn generate_pr(&self) -> OpenSourceOsV46PrSpec {
         OpenSourceOsV46PrSpec {
             pr_id: 4606,
-            title: String::from("[Alpine/Void Gap Closure] APK v3 PQC Signatures & XBPS Dependency Resolution"),
+            title: String::from(
+                "[Alpine/Void Gap Closure] APK v3 PQC Signatures & XBPS Dependency Resolution",
+            ),
             branch: String::from("pr/alpine-void-pkg-managers"),
             os_origin: String::from("Alpine Linux & Void Linux"),
             target_component: String::from("src/package/alpine_void_pkg.rs"),
