@@ -595,6 +595,9 @@ pub use sovereign_linux_bsd_lfs_master_harmony::*;
 pub mod bootable_vertical_slices_missing_components_pr;
 pub use bootable_vertical_slices_missing_components_pr::*;
 
+pub mod repeatable_agent_operating_loop_pr;
+pub use repeatable_agent_operating_loop_pr::*;
+
 pub mod sovereign_open_source_os_apex_inspirations_v50;
 pub use sovereign_open_source_os_apex_inspirations_v50::{FlakeInput as ApexFlakeInput, *};
 

@@ -1,11 +1,6 @@
 ## Summary
 
-<<<<<<< HEAD
-<!-- One paragraph: what changed and why. -->
-=======
-<<<<<<< HEAD
 <!-- What memory-management or component behavior changed and why? -->
->>>>>>> origin/main
 
 ## Memory / Subsystem component
 
@@ -26,61 +21,6 @@
 
 ## Recurring task
 
-<<<<<<< HEAD
-- [ ] Thread manager
-- [ ] Scheduler
-- [ ] Process management
-- [ ] Memory management
-- [ ] VFS / filesystems
-- [ ] Drivers
-- [ ] IPC
-- [ ] Security
-- [ ] Installer / packaging
-- [ ] Documentation
-- [ ] CI / tooling
-=======
-- [ ] Every PR build & test validation
-- [ ] Daily CI triage
-- [ ] Weekly subsystem lifecycle review
-- [ ] Weekly Linux/BSD study
-- [ ] Biweekly allocator audit
-- [ ] Biweekly paging & protection audit
-- [ ] Monthly boot-to-shell validation
-- [ ] Monthly memory stress/fuzz triage
-- [ ] Monthly swap rehearsal
-- [ ] Quarterly architecture / security / release review
-
-## Reference behavior
-
-<!-- Required for lifecycle, ABI, or memory changes -->
-
-- POSIX section:
-- Linux/BSD/Redox reference:
-=======
-<<<<<<< HEAD
-<!-- What shell behavior changed and why? -->
-
-## Shell component
-
-- [ ] Lexer
-- [ ] Parser
-- [ ] Expansion
-- [ ] Executor
-- [ ] Pipelines
-- [ ] Redirection
-- [ ] Job control
-- [ ] Signals
-- [ ] Built-ins
-- [ ] Interactive line editor
-- [ ] Script runner
-- [ ] Diagnostics
-- [ ] Security / sandboxing
-=======
-<!-- What I/O-management behavior changed and why? -->
-
-## I/O component
-
-<<<<<<< HEAD
 - [ ] IPC handler
 - [ ] Pipes / FIFOs
 - [ ] UNIX-domain sockets
@@ -117,7 +57,6 @@
 - [ ] No unbounded kernel allocation
 - [ ] `unsafe` justified with SAFETY comments
 - [ ] Threat model updated
-=======
 - [ ] I/O policy
 - [ ] Block device manager
 - [ ] virtio / NVMe / virtio
@@ -133,13 +72,11 @@
 - [ ] Recovery
 - [ ] procfs / diagnostics
 - [ ] Security / capabilities
->>>>>>> origin/main
 - [ ] Documentation
 - [ ] CI / tooling
 
 ## Recurring task
 
-<<<<<<< HEAD
 - [ ] PR validation
 - [ ] Daily CI triage
 - [ ] Weekly feature/bug triage
@@ -158,37 +95,31 @@
 
 - POSIX section:
 - Bash/dash/Zsh/BusyBox reference:
->>>>>>> origin/main
 - SigmaOS current behavior:
 - New behavior:
 - Compatibility impact:
->>>>>>> origin/main
+- [ ] PR validation
+- [ ] Daily CI triage
+- [ ] Weekly feature/bug triage
+- [ ] Weekly POSIX/sh study
+- [ ] Biweekly parser/expansion audit
+- [ ] Biweekly built-in review
+- [ ] Monthly boot-to-shell validation
+- [ ] Monthly compatibility suite
+- [ ] Monthly fuzz triage
+- [ ] Monthly security review
+- [ ] Quarterly release/UX/performance review
+
+## Reference behavior
+
+<!-- Required for compatibility or grammar changes -->
+
+- POSIX section:
+- Bash/dash/Zsh/BusyBox reference:
 
 ## Changes
 
 -
-<<<<<<< HEAD
-
-## Motivation
-
-<!-- Link the issue, roadmap item, or gap-analysis entry. -->
-
-## Implementation notes
-
-<!-- Design decisions, data structures, locking, error handling. -->
-
-## Tests
-
-- [ ] Unit tests added/updated
-- [ ] Integration tests added/updated
-- [ ] Concurrency/stress tests added/updated
-- [ ] Fuzz tests added/updated
-- [ ] Boot smoke test performed, if kernel-facing
-- [ ] No regression in existing tests
-=======
--
-
-<<<<<<< HEAD
 ## Memory safety & concurrency review
 
 - [ ] Lifecycle transitions follow authoritative 11-stage state machine
@@ -201,9 +132,7 @@
 - [ ] W^X (Write XOR Execute) security policy enforced
 - [ ] Lost-wakeup / lost-update prevention flags checked (`reclaim_wakeup_notified`, `tlb_flush_required`)
 - [ ] OOM is treated as a designed state rather than an accidental panic
-=======
 ## Shell safety review
->>>>>>> origin/main
 
 - [ ] Expansion order is correct
 - [ ] Quoting behavior is preserved
@@ -237,8 +166,6 @@
 
 - Risk:
 - Rollback:
-=======
-<<<<<<< HEAD
 - [ ] PR validation
 - [ ] Daily CI triage
 - [ ] Weekly lifecycle review
@@ -274,7 +201,6 @@
 - [ ] Signal races considered
 - [ ] Double-completion prevented
 - [ ] Resource limits enforced
->>>>>>> origin/main
 - [ ] No unbounded allocation or recursion
 
 ## Evidence
@@ -283,47 +209,6 @@
 - [ ] `cargo fmt --check`
 - [ ] `cargo test --lib`
 - [ ] `./run_sigma_tests.sh`
-<<<<<<< HEAD
-- [ ] Standalone unit test suite (`tests/memory/physical.rs`, `tests/mm/paging.rs`, `tests/mm/virtual.rs`, `tests/swap/core.rs`)
-- [ ] Integration tests
-- [ ] Boot-to-shell evidence, if boot-affecting
-- [ ] Memory stress/benchmark report, if performance-affecting
-- [ ] Security review requested, if applicable
-
-## Status updates
-
-- [ ] `FEATURE_STATUS.toml`
-- [ ] `CAPABILITY_MATRIX.toml`
-- [ ] `MEMORY_RULES.toml`
-- [ ] Memory documentation (`docs/memory/`, `docs/mm/`, `docs/swap/`)
-
-## Risks and rollback
-
-- Risk:
-- Rollback:
-=======
-- [ ] New/updated unit tests
-- [ ] Integration tests
-- [ ] Fuzz target or documented exemption
-- [ ] Boot-to-boot evidence, if boot-affecting
-- [ ] I/O benchmark, if performance-affecting
-- [ ] Security review requested, if applicable
-=======
-- [ ] Thread manager
-- [ ] Scheduler
-- [ ] Process management
-- [ ] Memory management
-- [ ] VFS / filesystems
-- [ ] Drivers
-- [ ] IPC
-- [ ] Security
-- [ ] Installer / packaging
-- [ ] Documentation
-- [ ] CI / tooling
-
-## Tests
-
-<<<<<<< HEAD
 - [ ] Unit tests
 - [ ] Integration tests
 - [ ] Concurrency/stress tests
@@ -331,7 +216,6 @@
 - [ ] Fuzz tests
 - [ ] Resource-exhaustion tests
 - [ ] Regression test attached for fixed bug
-=======
 - [ ] Source implementation
 - [ ] Unit tests added / updated
 - [ ] Integration tests added / updated
@@ -340,53 +224,39 @@
 - [ ] Boot smoke test performed, if kernel-facing
 - [ ] Documentation updated
 - [ ] `FEATURE_STATUS.toml` capability updated
->>>>>>> origin/main
->>>>>>> origin/main
->>>>>>> origin/main
+- [ ] Unit tests
+- [ ] Integration tests
+- [ ] Concurrency/stress tests
+- [ ] Timeout tests
+- [ ] Fuzz tests
+- [ ] Resource-exhaustion tests
+- [ ] Regression test attached for fixed bug
+- [ ] Source implementation
+- [ ] Unit tests added / updated
+- [ ] Integration tests added / updated
+- [ ] Concurrency / stress tests added / updated
+- [ ] Fuzz tests added / updated
+- [ ] Boot smoke test performed, if kernel-facing
+- [ ] Documentation updated
+- [ ] `FEATURE_STATUS.toml` capability updated
+- [ ] Unit tests
+- [ ] Integration tests
+- [ ] Concurrency/stress tests
+- [ ] Timeout tests
+- [ ] Fuzz tests
+- [ ] Resource-exhaustion tests
+- [ ] Regression test attached for fixed bug
+- [ ] Source implementation
+- [ ] Unit tests added / updated
+- [ ] Integration tests added / updated
+- [ ] Concurrency / stress tests added / updated
+- [ ] Fuzz tests added / updated
+- [ ] Boot smoke test performed, if kernel-facing
+- [ ] Documentation updated
+- [ ] `FEATURE_STATUS.toml` capability updated
 
 ## Status updates
 
-<<<<<<< HEAD
-- [ ] `FEATURE_STATUS.toml`
-- [ ] `CAPABILITY_MATRIX.toml`
-- [ ] I/O documentation
-- [ ] Boot matrix, if applicable
-
-## Risks and rollback
-
-- Risk:
-- Rollback:
-=======
-```bash
-cargo fmt --check
-cargo clippy --all-targets -- -D warnings
-cargo check --lib
-cargo test --lib
-./run_sigma_tests.sh
-```
-
-<<<<<<< HEAD
-Paste relevant output below:
-
-```text
-
-```
-
-## Capability status
-
-- Previous status:
-- New status:
-- Evidence:
-
-## Integration impact
-
-- [ ] No runtime integration yet
-- [ ] Connected to runtime path
-- [ ] Boot path validated
-- [ ] Installer/update path validated
-- [ ] Hardware tested
-=======
-<<<<<<< HEAD
 Paste output below.
 
 ## Capability status
@@ -396,17 +266,14 @@ Paste output below.
 - Evidence:
 
 ## Integration impact
->>>>>>> origin/main
 
 - [ ] Unit-tested only
 - [ ] Connected to runtime path
 - [ ] Boot path validated
 - [ ] Installer/update path validated
 - [ ] Hardware tested
-=======
 Paste relevant output below:
 
-<<<<<<< HEAD
 - [ ] Scope is narrow
 - [ ] Public API documented
 - [ ] `unsafe` justified
@@ -414,7 +281,6 @@ Paste relevant output below:
 - [ ] Error paths tested
 - [ ] Feature status updated in FEATURE_STATUS.toml
 - [ ] No unsupported compatibility claim
-=======
 ```text
 ```
 
@@ -423,7 +289,6 @@ Paste relevant output below:
 - Previous status:
 - New status:
 - Test evidence:
->>>>>>> origin/main
 
 ## Integration Impact
 
@@ -442,7 +307,63 @@ Paste relevant output below:
 - [ ] Error paths and timeout bounds tested
 - [ ] `FEATURE_STATUS.toml` feature status updated
 - [ ] No unsupported Linux/BSD compatibility claims
->>>>>>> origin/main
->>>>>>> origin/main
->>>>>>> origin/main
->>>>>>> origin/main
+- [ ] Scope is narrow
+- [ ] Public API documented
+- [ ] `unsafe` justified
+- [ ] Lock ordering documented
+- [ ] Error paths tested
+- [ ] Feature status updated in FEATURE_STATUS.toml
+- [ ] No unsupported compatibility claim
+```text
+```
+
+## Capability Status
+
+- Previous status:
+- New status:
+- Test evidence:
+- [ ] Scope is narrow
+- [ ] Public API documented
+- [ ] `unsafe` justified
+- [ ] Lock ordering documented
+- [ ] Error paths tested
+- [ ] Feature status updated in FEATURE_STATUS.toml
+- [ ] No unsupported compatibility claim
+```text
+```
+
+## Capability Status
+
+- Previous status:
+- New status:
+- Test evidence:
+- [ ] Scope is narrow
+- [ ] Public API documented
+- [ ] `unsafe` justified
+- [ ] Lock ordering documented
+- [ ] Error paths tested
+- [ ] Feature status updated in FEATURE_STATUS.toml
+- [ ] No unsupported compatibility claim
+```text
+```
+
+## Capability Status
+
+- Previous status:
+- New status:
+- Test evidence:
+- [ ] Scope is narrow
+- [ ] Public API documented
+- [ ] `unsafe` justified
+- [ ] Lock ordering documented
+- [ ] Error paths tested
+- [ ] Feature status updated in FEATURE_STATUS.toml
+- [ ] No unsupported compatibility claim
+```text
+```
+
+## Capability Status
+
+- Previous status:
+- New status:
+- Test evidence:
