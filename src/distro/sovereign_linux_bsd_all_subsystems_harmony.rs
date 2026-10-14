@@ -258,6 +258,8 @@ impl SovereignSubsystemDistroHarmonyEngine {
             LinuxBsdDistroInspiration::MidnightBSD,
             LinuxBsdDistroInspiration::RedoxOS,
             LinuxBsdDistroInspiration::HaikuOS,
+            LinuxBsdDistroInspiration::QubesOS,
+            LinuxBsdDistroInspiration::WhonixOS,
         ];
 
         let subsystems_list = [
@@ -611,6 +613,54 @@ impl SovereignSubsystemDistroHarmonyEngine {
                 "rump_anykernel_userspace_driver_context_switch_guard",
                 true,
             ),
+            (
+                SigmaOsSubsystem::TelemetryObservability,
+                SigmaOsSubsystem::SecuritySandboxing,
+                LinuxBsdDistroInspiration::TailsOS,
+                "pol_telemetry_privacy_guard",
+                "amnesic_telemetry_scrubber_and_pii_filter",
+                true,
+            ),
+            (
+                SigmaOsSubsystem::CryptographySecurity,
+                SigmaOsSubsystem::FilesystemStorage,
+                LinuxBsdDistroInspiration::FreeBSD,
+                "pol_crypto_geli_luks",
+                "pqc_dilithium_geli_luks2_transparent_vfs_encryption",
+                true,
+            ),
+            (
+                SigmaOsSubsystem::AccessibilityInput,
+                SigmaOsSubsystem::DesktopCompositor,
+                LinuxBsdDistroInspiration::UbuntuLinux,
+                "pol_access_fcitx5_orca",
+                "wayland_input_method_v2_accessibility_overlay",
+                false,
+            ),
+            (
+                SigmaOsSubsystem::TimeSynchronization,
+                SigmaOsSubsystem::KernelScheduling,
+                LinuxBsdDistroInspiration::ClearLinux,
+                "pol_time_ptp_clock",
+                "ptp_hardware_clock_nanosecond_scheduler_timer",
+                false,
+            ),
+            (
+                SigmaOsSubsystem::DeviceHotplug,
+                SigmaOsSubsystem::DriversHardware,
+                LinuxBsdDistroInspiration::VoidLinux,
+                "pol_dev_udev_devd",
+                "udev_devd_bridge_hotplug_driver_auto_probe",
+                false,
+            ),
+            (
+                SigmaOsSubsystem::SignalDelivery,
+                SigmaOsSubsystem::ProcessActivity,
+                LinuxBsdDistroInspiration::OpenBSD,
+                "pol_sig_realtime_frame",
+                "sigreturn_frame_guard_and_uncatchable_signal_bypass",
+                true,
+            ),
         ];
 
         for (src, tgt, distro, id, rule, strict) in default_rules {
@@ -764,6 +814,83 @@ impl SovereignSubsystemDistroHarmonyEngine {
             0
         }
     }
+
+    /// Translate cross-subsystem payload specs between different Linux & BSD distro paradigms.
+    pub fn translate_cross_distro_payload(
+        &self,
+        source_distro: LinuxBsdDistroInspiration,
+        target_distro: LinuxBsdDistroInspiration,
+        payload: &str,
+    ) -> String {
+        if source_distro == target_distro {
+            return payload.to_string();
+        }
+
+        match (source_distro, target_distro) {
+            (LinuxBsdDistroInspiration::ArchLinux, LinuxBsdDistroInspiration::DebianGNU) => {
+                payload.replace("pacman_hook", "dpkg_trigger")
+                       .replace("pkg.tar.zst", "deb")
+            }
+            (LinuxBsdDistroInspiration::FreeBSD, LinuxBsdDistroInspiration::ArchLinux) => {
+                payload.replace("jail_vnet", "ebpf_xdp_namespace")
+                       .replace("pkg_freebsd", "pacman_alpm")
+            }
+            (LinuxBsdDistroInspiration::OpenBSD, LinuxBsdDistroInspiration::ArchLinux) => {
+                payload.replace("pledge_unveil", "landlock_v5_bpf")
+                       .replace("pf_rules", "nftables_rules")
+            }
+            (LinuxBsdDistroInspiration::NixOS, LinuxBsdDistroInspiration::GentooLinux) => {
+                payload.replace("flake_closure", "ebuild_use_flags")
+                       .replace("store_path", "portage_vdb")
+            }
+            _ => format!("transpiled_from_{}_to_{}:{}", source_distro.as_str(), target_distro.as_str(), payload),
+        }
+    }
+
+    /// Audit system-wide distro compliance across all 31 core subsystems.
+    pub fn audit_all_subsystems_distro_compliance(&self) -> (BTreeMap<String, bool>, u32) {
+        let mut audit_map = BTreeMap::new();
+        let mut compliant_count = 0;
+
+        for (subsystem, spec) in &self.subsystems {
+            let is_compliant = spec.supported_distros.len() >= 30
+                && !spec.capabilities.is_empty()
+                && spec.interop_score >= 100;
+
+            audit_map.insert(subsystem.as_str().to_string(), is_compliant);
+            if is_compliant {
+                compliant_count += 1;
+            }
+        }
+
+        let score = if self.subsystems.is_empty() {
+            0
+        } else {
+            (compliant_count * 100) / self.subsystems.len() as u32
+        };
+
+        (audit_map, score)
+    }
+
+    /// Execute a cross-subsystem workflow coordinating multiple subsystems across distro modes.
+    pub fn execute_cross_subsystem_workflow(
+        &mut self,
+        source: SigmaOsSubsystem,
+        target: SigmaOsSubsystem,
+        workflow_type: &str,
+        payload: &str,
+    ) -> Result<u64, String> {
+        if !self.subsystems.contains_key(&source) {
+            return Err(format!("Unknown source subsystem: {:?}", source));
+        }
+        if !self.subsystems.contains_key(&target) {
+            return Err(format!("Unknown target subsystem: {:?}", target));
+        }
+
+        let action = format!("WORKFLOW_{}", workflow_type.to_uppercase());
+        let event_id = self.dispatch_event(source, target, &action, payload);
+        Ok(event_id)
+    }
 }
 
 #[path = "sovereign_universal_subsystem_interop.rs"]
@@ -846,6 +973,34 @@ impl SovereignUniversalCrossDistroSubsystemOrchestrator {
         } else {
             0
         }
+    }
+
+    /// Translate cross-distro payload specs via the inner harmony engine.
+    pub fn translate_cross_distro_payload(
+        &self,
+        source_distro: LinuxBsdDistroInspiration,
+        target_distro: LinuxBsdDistroInspiration,
+        payload: &str,
+    ) -> String {
+        self.harmony_engine
+            .translate_cross_distro_payload(source_distro, target_distro, payload)
+    }
+
+    /// Perform system-wide distro compliance audit across all core subsystems.
+    pub fn audit_all_subsystems_distro_compliance(&self) -> (BTreeMap<String, bool>, u32) {
+        self.harmony_engine.audit_all_subsystems_distro_compliance()
+    }
+
+    /// Execute an automated cross-subsystem workflow.
+    pub fn execute_cross_subsystem_workflow(
+        &mut self,
+        source: SigmaOsSubsystem,
+        target: SigmaOsSubsystem,
+        workflow_type: &str,
+        payload: &str,
+    ) -> Result<u64, String> {
+        self.harmony_engine
+            .execute_cross_subsystem_workflow(source, target, workflow_type, payload)
     }
 }
 
@@ -941,7 +1096,46 @@ mod tests {
             assert!(spec
                 .supported_distros
                 .contains(&LinuxBsdDistroInspiration::HaikuOS));
+            assert!(spec
+                .supported_distros
+                .contains(&LinuxBsdDistroInspiration::QubesOS));
+            assert!(spec
+                .supported_distros
+                .contains(&LinuxBsdDistroInspiration::WhonixOS));
         }
+    }
+
+    #[test]
+    fn test_all_31_subsystems_and_36_distros_interop() {
+        let mut orchestrator = SovereignUniversalCrossDistroSubsystemOrchestrator::new();
+        assert!(orchestrator.verify_orchestration_harmony());
+        assert_eq!(orchestrator.master_harmony_index(), 100);
+
+        // Test policy translation across newly added cross-subsystem pairs
+        let telemetry_policy = orchestrator
+            .translate_cross_subsystem_policy(
+                SigmaOsSubsystem::TelemetryObservability,
+                SigmaOsSubsystem::SecuritySandboxing,
+            )
+            .expect("Telemetry -> Security policy should exist");
+        assert_eq!(telemetry_policy.policy_id, "pol_telemetry_privacy_guard");
+
+        let crypto_policy = orchestrator
+            .translate_cross_subsystem_policy(
+                SigmaOsSubsystem::CryptographySecurity,
+                SigmaOsSubsystem::FilesystemStorage,
+            )
+            .expect("Crypto -> Storage policy should exist");
+        assert_eq!(crypto_policy.policy_id, "pol_crypto_geli_luks");
+
+        // Route events across subsystems
+        let event_id = orchestrator.route_harmony_event(
+            SigmaOsSubsystem::DeviceHotplug,
+            SigmaOsSubsystem::DriversHardware,
+            "PROBE_USB_DEVICE",
+            "vendor_id=0x1234,product_id=0x5678",
+        );
+        assert!(event_id > 0);
     }
 
     #[test]
@@ -991,5 +1185,47 @@ mod tests {
             engine.resolve_package_format_specifier(LinuxBsdDistroInspiration::FedoraLinux),
             "rpm"
         );
+    }
+
+    #[test]
+    fn test_payload_translation_and_compliance_audit() {
+        let orchestrator = SovereignUniversalCrossDistroSubsystemOrchestrator::new();
+
+        let translated = orchestrator.translate_cross_distro_payload(
+            LinuxBsdDistroInspiration::ArchLinux,
+            LinuxBsdDistroInspiration::DebianGNU,
+            "pacman_hook:update_icons:pkg.tar.zst",
+        );
+        assert_eq!(translated, "dpkg_trigger:update_icons:deb");
+
+        let openbsd_translated = orchestrator.translate_cross_distro_payload(
+            LinuxBsdDistroInspiration::OpenBSD,
+            LinuxBsdDistroInspiration::ArchLinux,
+            "pledge_unveil:rpath:pf_rules:block",
+        );
+        assert_eq!(openbsd_translated, "landlock_v5_bpf:rpath:nftables_rules:block");
+
+        let (audit_map, score) = orchestrator.audit_all_subsystems_distro_compliance();
+        assert_eq!(audit_map.len(), 31);
+        assert_eq!(score, 100);
+        assert!(audit_map.values().all(|&v| v));
+    }
+
+    #[test]
+    fn test_cross_subsystem_workflow_execution() {
+        let mut orchestrator = SovereignUniversalCrossDistroSubsystemOrchestrator::new();
+
+        let event_id = orchestrator
+            .execute_cross_subsystem_workflow(
+                SigmaOsSubsystem::ProcessActivity,
+                SigmaOsSubsystem::MemoryVirtualization,
+                "reclaim_pages",
+                "target_pid=2048;threshold=80%",
+            )
+            .expect("Workflow execution should succeed");
+
+        assert!(event_id > 0);
+        assert!(orchestrator.verify_orchestration_harmony());
+        assert_eq!(orchestrator.master_harmony_index(), 100);
     }
 }
