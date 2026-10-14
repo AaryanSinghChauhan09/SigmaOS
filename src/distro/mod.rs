@@ -565,6 +565,8 @@ pub mod sovereign_linux_bsd_ecosystem_gap_closure_v46_pr;
 pub use sovereign_linux_bsd_ecosystem_gap_closure_v46_pr::*;
 pub mod sovereign_linux_bsd_ecosystem_gap_closure_v50_pr;
 pub use sovereign_linux_bsd_ecosystem_gap_closure_v50_pr::*;
+pub mod sovereign_linux_bsd_ecosystem_gap_closure_v51_pr;
+pub use sovereign_linux_bsd_ecosystem_gap_closure_v51_pr::*;
 pub mod sovereign_linux_bsd_ecosystem_pinnacle_suite;
 pub mod sovereign_linux_bsd_gap_closure_v39_pr;
 pub mod sovereign_linux_bsd_master_innovations;
