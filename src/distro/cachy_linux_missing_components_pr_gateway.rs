@@ -12,6 +12,12 @@
 // 5. `cachyos-hello` & `cachyos-gaming-meta` (Proton-CachyOS, LatencyFleX, MangoHud/VKBasalt).
 // 6. `cachyos-calamares-settings` (Btrfs subvolume defaults, Zstd-3 compression).
 // 7. `cachyos-ksm` UKSM Deduplicator (Ultra Kernel Samepage Merging background RAM deduplication).
+// 8. `cachyos-handheld` Handheld Gaming TDP & Gamescope VRR session management.
+// 9. `cachyos-snapper-support` Btrfs Snapper automatic transaction snapshots & Limine sync.
+// 10. `cachyos-kernel-manager` Interactive kernel builder with AutoFDO, Propeller & LTO.
+// 11. `cachyos-network-tuner` TCP BBRv3 congestion control & CACHY DoH server.
+// 12. `cachyos-gaming-meta-v2` Proton-CachyOS runtime with eSync, fSync & NTSync.
+// 13. `cachyos-chwd-gui` GUI Hardware Detection & Driver Auto-Installer Manager.
 
 use std::collections::BTreeMap;
 use std::string::String;
@@ -40,6 +46,12 @@ pub enum CachyPrCategory {
     HelloGamingMeta,
     CalamaresInstaller,
     UksmDeduplicator,
+    HandheldGaming,
+    SnapperBtrfsBackup,
+    InteractiveKernelBuilder,
+    NetworkTuning,
+    ProtonWineRuntime,
+    ChwdGuiInstaller,
 }
 
 impl CachyPrCategory {
@@ -52,6 +64,12 @@ impl CachyPrCategory {
             Self::HelloGamingMeta => "cachyos-hello & gaming-meta runtime environment",
             Self::CalamaresInstaller => "cachyos-calamares-settings & Btrfs subvolumes",
             Self::UksmDeduplicator => "cachyos-ksm UKSM background RAM deduplicator",
+            Self::HandheldGaming => "cachyos-handheld Steam Deck & ROG Ally TDP control",
+            Self::SnapperBtrfsBackup => "cachyos-snapper-support Btrfs snapshots & Limine sync",
+            Self::InteractiveKernelBuilder => "cachyos-kernel-manager interactive kernel compiler",
+            Self::NetworkTuning => "cachyos-network-tuner TCP BBRv3 & DoH server",
+            Self::ProtonWineRuntime => "cachyos-gaming-meta-v2 Proton/Wine eSync/fSync/NTSync",
+            Self::ChwdGuiInstaller => "cachyos-chwd-gui hardware detection & driver installer",
         }
     }
 }
@@ -136,6 +154,36 @@ impl CachyLinuxMissingComponentsPrGateway {
                 "feat(cachyos): UKSM background RAM deduplication daemon",
                 CachyPrCategory::UksmDeduplicator,
                 "cachyos_uksm",
+            ),
+            (
+                "feat(cachyos): Steam Deck & ROG Ally TDP control & Gamescope VRR session",
+                CachyPrCategory::HandheldGaming,
+                "cachyos_handheld",
+            ),
+            (
+                "feat(cachyos): Snapper Btrfs automatic transaction snapshots & Limine sync",
+                CachyPrCategory::SnapperBtrfsBackup,
+                "cachyos_snapper",
+            ),
+            (
+                "feat(cachyos): Interactive kernel builder with AutoFDO, Propeller & LTO",
+                CachyPrCategory::InteractiveKernelBuilder,
+                "cachyos_kernel_builder",
+            ),
+            (
+                "feat(cachyos): Network performance tuning with TCP BBRv3 & DoH server",
+                CachyPrCategory::NetworkTuning,
+                "cachyos_network",
+            ),
+            (
+                "feat(cachyos): Proton-CachyOS runtime with eSync, fSync & NTSync",
+                CachyPrCategory::ProtonWineRuntime,
+                "cachyos_proton_runtime",
+            ),
+            (
+                "feat(cachyos): GUI CHWD driver detection for Nvidia Open-DKMS & Mesa v4",
+                CachyPrCategory::ChwdGuiInstaller,
+                "cachyos_chwd_gui",
             ),
         ];
 
@@ -238,7 +286,7 @@ mod tests {
     #[test]
     fn test_cachy_pr_gateway_staging() {
         let gateway = CachyLinuxMissingComponentsPrGateway::new();
-        assert_eq!(gateway.get_merged_pr_count(), 7);
+        assert_eq!(gateway.get_merged_pr_count(), 13);
 
         let diff = gateway.generate_pr_diff_patch(2001);
         assert!(diff.is_some());
