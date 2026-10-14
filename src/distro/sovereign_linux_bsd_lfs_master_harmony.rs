@@ -50,92 +50,22 @@ impl LfsCrossToolchainBootstrapEngine {
 
     fn init_default_lfs_packages(&mut self) {
         let pkgs = [
-            (
-                "binutils",
-                "2.42",
-                LfsBuildPass::Pass1CrossToolchain,
-                "/tools",
-            ),
+            ("binutils", "2.42", LfsBuildPass::Pass1CrossToolchain, "/tools"),
             ("gcc", "13.2.0", LfsBuildPass::Pass1CrossToolchain, "/tools"),
-            (
-                "linux-headers",
-                "6.8.1",
-                LfsBuildPass::Pass1CrossToolchain,
-                "/tools",
-            ),
+            ("linux-headers", "6.8.1", LfsBuildPass::Pass1CrossToolchain, "/tools"),
             ("glibc", "2.39", LfsBuildPass::Pass1CrossToolchain, "/tools"),
-            (
-                "libstdc++",
-                "13.2.0",
-                LfsBuildPass::Pass1CrossToolchain,
-                "/tools",
-            ),
-            (
-                "m4",
-                "1.4.19",
-                LfsBuildPass::Pass2TemporaryToolsChroot,
-                "/tools",
-            ),
-            (
-                "ncurses",
-                "6.4",
-                LfsBuildPass::Pass2TemporaryToolsChroot,
-                "/tools",
-            ),
-            (
-                "bash",
-                "5.2.21",
-                LfsBuildPass::Pass2TemporaryToolsChroot,
-                "/tools",
-            ),
-            (
-                "coreutils",
-                "9.4",
-                LfsBuildPass::Pass2TemporaryToolsChroot,
-                "/tools",
-            ),
-            (
-                "man-pages",
-                "6.06",
-                LfsBuildPass::Pass3FinalSystemInstallation,
-                "/usr",
-            ),
-            (
-                "glibc",
-                "2.39",
-                LfsBuildPass::Pass3FinalSystemInstallation,
-                "/usr",
-            ),
-            (
-                "zlib",
-                "1.3.1",
-                LfsBuildPass::Pass3FinalSystemInstallation,
-                "/usr",
-            ),
-            (
-                "bzip2",
-                "1.0.8",
-                LfsBuildPass::Pass3FinalSystemInstallation,
-                "/usr",
-            ),
-            (
-                "binutils",
-                "2.42",
-                LfsBuildPass::Pass3FinalSystemInstallation,
-                "/usr",
-            ),
-            (
-                "gcc",
-                "13.2.0",
-                LfsBuildPass::Pass3FinalSystemInstallation,
-                "/usr",
-            ),
-            (
-                "systemd-or-sysvinit",
-                "3.0.0",
-                LfsBuildPass::Pass3FinalSystemInstallation,
-                "/usr",
-            ),
+            ("libstdc++", "13.2.0", LfsBuildPass::Pass1CrossToolchain, "/tools"),
+            ("m4", "1.4.19", LfsBuildPass::Pass2TemporaryToolsChroot, "/tools"),
+            ("ncurses", "6.4", LfsBuildPass::Pass2TemporaryToolsChroot, "/tools"),
+            ("bash", "5.2.21", LfsBuildPass::Pass2TemporaryToolsChroot, "/tools"),
+            ("coreutils", "9.4", LfsBuildPass::Pass2TemporaryToolsChroot, "/tools"),
+            ("man-pages", "6.06", LfsBuildPass::Pass3FinalSystemInstallation, "/usr"),
+            ("glibc", "2.39", LfsBuildPass::Pass3FinalSystemInstallation, "/usr"),
+            ("zlib", "1.3.1", LfsBuildPass::Pass3FinalSystemInstallation, "/usr"),
+            ("bzip2", "1.0.8", LfsBuildPass::Pass3FinalSystemInstallation, "/usr"),
+            ("binutils", "2.42", LfsBuildPass::Pass3FinalSystemInstallation, "/usr"),
+            ("gcc", "13.2.0", LfsBuildPass::Pass3FinalSystemInstallation, "/usr"),
+            ("systemd-or-sysvinit", "3.0.0", LfsBuildPass::Pass3FinalSystemInstallation, "/usr"),
         ];
 
         for (name, ver, pass, prefix) in pkgs {
@@ -150,43 +80,41 @@ impl LfsCrossToolchainBootstrapEngine {
     }
 
     pub fn prepare_chroot_environment(&mut self) -> Result<usize, &'static str> {
-        if self.chroot_prepared {
-            return Ok(4);
-        }
         self.chroot_prepared = true;
-        self.current_pass = LfsBuildPass::Pass2TemporaryToolsChroot;
         Ok(4) // virtual mounts: /dev, /proc, /sys, /run
     }
 
     pub fn compile_next_package(&mut self) -> Option<String> {
         let pass = self.current_pass;
-        if let Some(pkg) = self
-            .toolchain_packages
-            .iter_mut()
-            .find(|p| p.build_pass == pass && !p.is_compiled)
-        {
+        if let Some(pkg) = self.toolchain_packages.iter_mut().find(|p| p.build_pass == pass && !p.is_compiled) {
             pkg.is_compiled = true;
-            let res = format!(
-                "{}-{} compiled into {}",
-                pkg.name, pkg.version, pkg.install_prefix
-            );
+            let res = format!("{}-{} compiled into {}", pkg.name, pkg.version, pkg.install_prefix);
+
+            if self.toolchain_packages.iter().filter(|p| p.build_pass == pass).all(|p| p.is_compiled) {
+                match self.current_pass {
+                    LfsBuildPass::Pass1CrossToolchain => {
+                        self.current_pass = LfsBuildPass::Pass2TemporaryToolsChroot;
+                        self.chroot_prepared = true;
+                    }
+                    LfsBuildPass::Pass2TemporaryToolsChroot => {
+                        self.current_pass = LfsBuildPass::Pass3FinalSystemInstallation;
+                    }
+                    LfsBuildPass::Pass3FinalSystemInstallation => {}
+                }
+            }
             return Some(res);
         }
 
-        // Advance pass if all packages in current pass are complete
-        if self
-            .toolchain_packages
-            .iter()
-            .filter(|p| p.build_pass == pass)
-            .all(|p| p.is_compiled)
-        {
+        if self.toolchain_packages.iter().filter(|p| p.build_pass == pass).all(|p| p.is_compiled) {
             match self.current_pass {
                 LfsBuildPass::Pass1CrossToolchain => {
                     self.current_pass = LfsBuildPass::Pass2TemporaryToolsChroot;
                     self.chroot_prepared = true;
+                    return self.compile_next_package();
                 }
                 LfsBuildPass::Pass2TemporaryToolsChroot => {
                     self.current_pass = LfsBuildPass::Pass3FinalSystemInstallation;
+                    return self.compile_next_package();
                 }
                 LfsBuildPass::Pass3FinalSystemInstallation => {}
             }
@@ -239,41 +167,25 @@ impl LfsBootscriptsInitEngine {
             LfsBootscriptService {
                 name: "mountfs".to_string(),
                 script_path: "/etc/rc.d/init.d/mountfs".to_string(),
-                runlevels: vec![
-                    LfsRunlevel::Runlevel1SingleUser,
-                    LfsRunlevel::Runlevel3MultiUserNet,
-                    LfsRunlevel::Runlevel5Graphical,
-                ],
+                runlevels: vec![LfsRunlevel::Runlevel1SingleUser, LfsRunlevel::Runlevel3MultiUserNet, LfsRunlevel::Runlevel5Graphical],
                 is_active: false,
             },
             LfsBootscriptService {
                 name: "network".to_string(),
                 script_path: "/etc/rc.d/init.d/network".to_string(),
-                runlevels: vec![
-                    LfsRunlevel::Runlevel3MultiUserNet,
-                    LfsRunlevel::Runlevel5Graphical,
-                ],
+                runlevels: vec![LfsRunlevel::Runlevel3MultiUserNet, LfsRunlevel::Runlevel5Graphical],
                 is_active: false,
             },
             LfsBootscriptService {
                 name: "sysklogd".to_string(),
                 script_path: "/etc/rc.d/init.d/sysklogd".to_string(),
-                runlevels: vec![
-                    LfsRunlevel::Runlevel2MultiUserNoNet,
-                    LfsRunlevel::Runlevel3MultiUserNet,
-                    LfsRunlevel::Runlevel5Graphical,
-                ],
+                runlevels: vec![LfsRunlevel::Runlevel2MultiUserNoNet, LfsRunlevel::Runlevel3MultiUserNet, LfsRunlevel::Runlevel5Graphical],
                 is_active: false,
             },
             LfsBootscriptService {
                 name: "udev".to_string(),
                 script_path: "/etc/rc.d/init.d/udev".to_string(),
-                runlevels: vec![
-                    LfsRunlevel::Runlevel1SingleUser,
-                    LfsRunlevel::Runlevel2MultiUserNoNet,
-                    LfsRunlevel::Runlevel3MultiUserNet,
-                    LfsRunlevel::Runlevel5Graphical,
-                ],
+                runlevels: vec![LfsRunlevel::Runlevel1SingleUser, LfsRunlevel::Runlevel2MultiUserNoNet, LfsRunlevel::Runlevel3MultiUserNet, LfsRunlevel::Runlevel5Graphical],
                 is_active: false,
             },
         ];
@@ -331,12 +243,7 @@ impl LfsPkgtoolPackageEngine {
         }
     }
 
-    pub fn build_and_install_package(
-        &mut self,
-        pkg_name: &str,
-        version: &str,
-        files: &[&str],
-    ) -> bool {
+    pub fn build_and_install_package(&mut self, pkg_name: &str, version: &str, files: &[&str]) -> bool {
         let installed_files: Vec<String> = files.iter().map(|f| f.to_string()).collect();
         let manifest = LfsPackageManifest {
             package_name: pkg_name.to_string(),
@@ -344,8 +251,7 @@ impl LfsPkgtoolPackageEngine {
             installed_files,
             destdir_staged: true,
         };
-        self.installed_packages
-            .insert(pkg_name.to_string(), manifest);
+        self.installed_packages.insert(pkg_name.to_string(), manifest);
         true
     }
 
@@ -387,9 +293,7 @@ impl LfsKernelConfigOptimizer {
         opts.insert("CONFIG_SECCOMP".to_string(), "y".to_string());
         opts.insert("CONFIG_EXPERT".to_string(), "y".to_string());
         opts.insert("CONFIG_EMBEDDED".to_string(), "n".to_string());
-        Self {
-            config_options: opts,
-        }
+        Self { config_options: opts }
     }
 
     pub fn verify_required_lfs_options(&self) -> bool {
@@ -400,18 +304,13 @@ impl LfsKernelConfigOptimizer {
             "CONFIG_DEVTMPFS_MOUNT",
             "CONFIG_CGROUPS",
         ];
-        required
-            .iter()
-            .all(|req| self.config_options.get(*req) == Some(&"y".to_string()))
+        required.iter().all(|req| self.config_options.get(*req) == Some(&"y".to_string()))
     }
 
     pub fn optimize_strip_debug_and_sound_bloat(&mut self) {
-        self.config_options
-            .insert("CONFIG_DEBUG_INFO".to_string(), "n".to_string());
-        self.config_options
-            .insert("CONFIG_KCOV".to_string(), "n".to_string());
-        self.config_options
-            .insert("CONFIG_SOUND".to_string(), "m".to_string());
+        self.config_options.insert("CONFIG_DEBUG_INFO".to_string(), "n".to_string());
+        self.config_options.insert("CONFIG_KCOV".to_string(), "n".to_string());
+        self.config_options.insert("CONFIG_SOUND".to_string(), "m".to_string());
     }
 }
 
@@ -448,10 +347,7 @@ impl NetBsdRumpKernelIsolatedDriverEngine {
             return Err("Hypercall channel inactive");
         }
         if self.active_rump_drivers.contains(&driver.to_string()) {
-            Ok(format!(
-                "Rump hypercall execution succeeded for [{}] op [{}]",
-                driver, op
-            ))
+            Ok(format!("Rump hypercall execution succeeded for [{}] op [{}]", driver, op))
         } else {
             Err("Rump driver not attached")
         }
@@ -511,10 +407,7 @@ pub struct SovereignLinuxBsdLfsMasterHarmonyEngine {
 impl SovereignLinuxBsdLfsMasterHarmonyEngine {
     pub fn new() -> Self {
         Self {
-            lfs_toolchain: LfsCrossToolchainBootstrapEngine::new(
-                "/mnt/lfs",
-                "x86_64-lfs-linux-gnu",
-            ),
+            lfs_toolchain: LfsCrossToolchainBootstrapEngine::new("/mnt/lfs", "x86_64-lfs-linux-gnu"),
             lfs_bootscripts: LfsBootscriptsInitEngine::new(),
             lfs_pkgtool: LfsPkgtoolPackageEngine::new(),
             lfs_kernel_optimizer: LfsKernelConfigOptimizer::new(),
@@ -527,8 +420,7 @@ impl SovereignLinuxBsdLfsMasterHarmonyEngine {
     pub fn audit_and_verify_harmony(&mut self) -> bool {
         let ok_lfs_opt = self.lfs_kernel_optimizer.verify_required_lfs_options();
         let ok_rump = self.netbsd_rump.attach_userspace_driver("rump_pci");
-        self.lfs_bootscripts
-            .set_runlevel(LfsRunlevel::Runlevel3MultiUserNet);
+        self.lfs_bootscripts.set_runlevel(LfsRunlevel::Runlevel3MultiUserNet);
         ok_lfs_opt && ok_rump && self.interop_score == 100
     }
 }
