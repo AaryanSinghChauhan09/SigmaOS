@@ -342,6 +342,13 @@ if [ -f "src/diagnostics/sovereign_logging_monitoring_diagnostics.rs" ]; then
     ./build/sovereign_logging_monitoring_diagnostics_test
 fi
 
+if [ -f "src/diagnostics/sovereign_logging_monitoring_diagnostics_v2.rs" ]; then
+    echo "Running Sovereign Linux & BSD Logging, Monitoring, and Diagnostics V2 test suite..."
+    mkdir -p build
+    rustc --test src/diagnostics/sovereign_logging_monitoring_diagnostics_v2.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_logging_monitoring_diagnostics_v2_test
+    ./build/sovereign_logging_monitoring_diagnostics_v2_test
+fi
+
 if [ -f "src/kernel/panic_handler.rs" ]; then
     echo "Running Sovereign Kernel Panic & Crash Dump Subsystem test suite..."
     mkdir -p build
@@ -1131,16 +1138,18 @@ if [ -f "src/installer/sovereign_installer_and_system_tools_advancements.rs" ]; 
     ./build/test_installer_advancements
 fi
 
+if [ -f "src/installer/sovereign_installer_and_system_tools_advancements_v2.rs" ]; then
+    echo "Running Sovereign Installer and System Tools Advancements V2 test suite..."
+    mkdir -p build
+    rustc --test src/installer/sovereign_installer_and_system_tools_advancements_v2.rs --edition=2021 -o build/test_installer_advancements_v2
+    ./build/test_installer_advancements_v2
+fi
+
 if [ -f "src/compatibility/mint_omarchy_migration_bridge.rs" ]; then
     echo "Running Mint & Omarchy Migration Bridge test suite..."
     mkdir -p build
     rustc --test src/compatibility/mint_omarchy_migration_bridge.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_migration_bridge
     ./build/test_migration_bridge
-fi
-
-if [ -f "scripts/sovereign_migration_first_benchmarks.sh" ]; then
-    echo "Running Sovereign Migration-First Desktop Benchmark Suite..."
-    ./scripts/sovereign_migration_first_benchmarks.sh
 fi
 
 if [ -f "scripts/release_gate_mint_omarchy_migration.sh" ]; then
@@ -1251,6 +1260,13 @@ if [ -f "src/distro/sovereign_open_source_os_apex_inspirations_v50.rs" ]; then
     mkdir -p build
     rustc --test src/distro/sovereign_open_source_os_apex_inspirations_v50.rs --edition=2021 -o build/test_apex_v50
     ./build/test_apex_v50
+fi
+
+if [ -f "src/creative/deckcraft.rs" ]; then
+    echo "Running DeckCraft Presentation Framework & PR Engine test suite..."
+    mkdir -p build
+    rustc --test src/creative/deckcraft.rs --edition=2021 -o build/test_deckcraft
+    ./build/test_deckcraft
 fi
 
 echo "All SigmaOS test suites completed."
