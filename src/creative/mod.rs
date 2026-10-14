@@ -14,6 +14,7 @@ pub mod audiocraft;
 pub mod vectoranimation;
 pub mod model3d;
 pub mod artcraft;
+pub mod deckcraft;
 
 pub use photocraft::{
     PhotoEditor, ImageLayer, Filter, Adjustment, LayerType, LayerMask, AdjustmentType,
@@ -98,4 +99,13 @@ pub use model3d::{
 pub use artcraft::{
     ArtSuite, Project, Workspace,
     init_artcraft, get_artcraft,
+};
+pub use deckcraft::{
+    DeckCraftEngine, SlideDeck, Slide, SlideLayout, SlideElement, SlideTransition, SlideAnimation,
+    SlideTheme, PresenterNotes, AspectRatio, ElementType as DeckElementType,
+    TransitionType as DeckTransitionType, AnimationType as DeckAnimationType,
+    ExportFormat as DeckExportFormat, PresenterState, DeckCraftPullRequestSpec,
+    DeckCraftSlideLayoutMasterPrDeployer, DeckCraftAnimationTransitionPrDeployer,
+    DeckCraftPresenterZenithPrDeployer, DeckCraftMasterPrDeploymentSuite,
+    init_deckcraft, get_deckcraft, fnv1a_deckcraft_pr_digest,
 };
