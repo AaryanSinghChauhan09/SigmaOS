@@ -342,6 +342,13 @@ if [ -f "src/diagnostics/sovereign_logging_monitoring_diagnostics.rs" ]; then
     ./build/sovereign_logging_monitoring_diagnostics_test
 fi
 
+if [ -f "src/diagnostics/sovereign_logging_monitoring_diagnostics_v2.rs" ]; then
+    echo "Running Sovereign Linux & BSD Logging, Monitoring, and Diagnostics V2 test suite..."
+    mkdir -p build
+    rustc --test src/diagnostics/sovereign_logging_monitoring_diagnostics_v2.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_logging_monitoring_diagnostics_v2_test
+    ./build/sovereign_logging_monitoring_diagnostics_v2_test
+fi
+
 if [ -f "src/kernel/panic_handler.rs" ]; then
     echo "Running Sovereign Kernel Panic & Crash Dump Subsystem test suite..."
     mkdir -p build
@@ -1163,7 +1170,6 @@ if [ -f "src/distro/arch_linux_github_repo_components_pr_engine.rs" ]; then
     rustc --test src/distro/arch_linux_github_repo_components_pr_engine.rs --edition=2021 -o build/test_arch_github_repo_components
     ./build/test_arch_github_repo_components
 fi
-
 if [ -f "src/distro/sovereign_open_source_os_fedora_github_pr_suite.rs" ]; then
     echo "Running Sovereign Open Source OS Fedora GitHub PR Suite test suite..."
     mkdir -p build
@@ -1218,21 +1224,18 @@ if [ -f "src/userland/system_utilities.rs" ]; then
     rustc --test src/userland/system_utilities.rs --edition=2021 -o build/test_system_utilities
     ./build/test_system_utilities
 fi
-
 if [ -f "src/productivity/sovereign_application_replacements_pr_suite.rs" ]; then
     echo "Running Sovereign Application Replacements PR Suite..."
     mkdir -p build
     rustc --test src/productivity/sovereign_application_replacements_pr_suite.rs --edition=2021 -o build/test_app_replacements_pr_suite
     ./build/test_app_replacements_pr_suite
 fi
-
 if [ -f "src/system_apps/sovereign_system_apps_development_and_pr_suite.rs" ]; then
     echo "Running Sovereign System Applications Development and PR Gateway Suite..."
     mkdir -p build
     rustc --test src/system_apps/sovereign_system_apps_development_and_pr_suite.rs --edition=2021 -o build/test_system_apps_pr_suite
     ./build/test_system_apps_pr_suite
 fi
-
 if [ -f "src/net/sovereign_network_development_and_pr_suite.rs" ]; then
     echo "Running Sovereign Network Development and PR Suite..."
     mkdir -p build
