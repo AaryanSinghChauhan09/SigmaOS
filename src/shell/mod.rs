@@ -24,6 +24,7 @@ pub use self::diagnostics::*;
 pub use self::interactive::*;
 pub use self::repl::ShellRepl;
 pub use self::sigma_sh::*;
+pub use self::sovereign_command_interpreter::*;
 pub use self::universal_cli_shell_system::*;
 pub use self::zsh_bash_parity::*;
 pub use manager::{ShellManager, ShellProfile, ShellStatistics, ShellType};
