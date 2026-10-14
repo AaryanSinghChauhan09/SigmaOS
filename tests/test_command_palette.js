@@ -275,4 +275,32 @@ assert.strictEqual(global.document.activeElement, tool1, "Expected Home key to m
 
 console.log("✓ WAI-ARIA Toolbar keyboard navigation verified successfully!");
 
+// Test 12: Window maximize ARIA expanded and aria-label context preservation
+const maxWin = createMockElement("max-test-win");
+maxWin.classList.add("window");
+const maxBtn = createMockElement("max-test-btn", "button");
+maxBtn.classList.add("control-dot");
+maxBtn.classList.add("max");
+maxBtn.setAttribute("aria-label", "Maximize OmniShell Terminal");
+maxBtn.setAttribute("aria-expanded", "false");
+maxWin.children = [maxBtn];
+
+maxWin.querySelectorAll = (selector) => {
+  if (selector === ".control-dot.max") return [maxBtn];
+  return [];
+};
+
+mockElements["max-test-win"] = maxWin;
+
+zenith.maximizeWindow("max-test-win");
+assert.strictEqual(maxWin.classList.contains("maximized"), true, "Expected window to have .maximized class");
+assert.strictEqual(maxBtn.getAttribute("aria-expanded"), "true", "Expected aria-expanded='true' when window is maximized");
+assert.strictEqual(maxBtn.getAttribute("aria-label"), "Restore OmniShell Terminal", "Expected aria-label to update to 'Restore OmniShell Terminal'");
+
+zenith.maximizeWindow("max-test-win");
+assert.strictEqual(maxWin.classList.contains("maximized"), false, "Expected window to remove .maximized class");
+assert.strictEqual(maxBtn.getAttribute("aria-expanded"), "false", "Expected aria-expanded='false' when window is unmaximized");
+assert.strictEqual(maxBtn.getAttribute("aria-label"), "Maximize OmniShell Terminal", "Expected aria-label to revert to 'Maximize OmniShell Terminal'");
+console.log("✓ Window maximize ARIA state and title context preservation verified successfully!");
+
 console.log("All Command Palette & Desktop UX tests passed successfully!");
