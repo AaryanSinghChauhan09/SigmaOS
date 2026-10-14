@@ -1267,4 +1267,12 @@ if [ -f "src/distro/sovereign_open_source_os_apex_inspirations_v50.rs" ]; then
 >>>>>>> origin/main
 fi
 
+
+if [ -f "src/distro/sovereign_openbsd_ultimate_parity_pr_suite.rs" ]; then
+    echo "Running Sovereign OpenBSD Ultimate Parity PR test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_openbsd_ultimate_parity_pr_suite.rs --edition=2021 -o build/test_openbsd_ultimate_parity
+    ./build/test_openbsd_ultimate_parity
+fi
+
 echo "All SigmaOS test suites completed."

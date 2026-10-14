@@ -601,3 +601,6 @@ pub use sovereign_open_source_os_apex_inspirations_v50::{FlakeInput as ApexFlake
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;
 pub use crate::stubs::large_distro_stubs::*;
+
+pub mod sovereign_openbsd_ultimate_parity_pr_suite;
+pub use sovereign_openbsd_ultimate_parity_pr_suite::*;
