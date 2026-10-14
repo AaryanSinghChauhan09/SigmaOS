@@ -1,15 +1,17 @@
-# SigmaOS Threat Model & Boundary Analysis
+# SigmaOS Security Threat Model
 
-## System Boundaries & Threat Vectors
+## Assets
 
-### 1. Userland -> Kernel Boundary (Syscalls)
-- **Threat**: Buffer overflow, non-canonical address dereference, NULL-pointer injection, capability forgery.
-- **Mitigation**: Standardized `Posix450SyscallDispatcher` argument validation, copy-from-user boundary verification, capability token validation on entrypoint.
+- Kernel integrity and execution context
+- User process address spaces and capability tokens
+- System credentials (`/etc/shadow`, PQC keystores)
+- Storage volumes and filesystem structures
 
-### 2. Process -> Process Boundary (IPC & Shared Memory)
-- **Threat**: Privilege escalation, arbitrary memory inspection, unauthorized signal injection.
-- **Mitigation**: Process-local capability checks, sandboxing via Landlock/Unveil mechanisms, signal masking policy.
+## Threat Vector Analysis
 
-### 3. File System & Storage Boundary
-- **Threat**: Path traversal (`../`), unauthorized file descriptor inheritance, symlink races.
-- **Mitigation**: VFS path normalization, atomic file open flags (`O_CLOEXEC`), permission engine evaluation.
+| Threat Vector | Mitigation Strategy | Verification / Test |
+|---|---|---|
+| Buffer Overflow / ROP | ASan shadow memory validation (`src/security/address_sanitizer.rs`), W^X memory paging | `cargo test --lib` ASan tests |
+| Unprivileged Syscall Privilege Escalation | Capability token validation on every syscall dispatch | `tests/kernel/tier1_kernel_execution_suite.rs` |
+| Malicious Package / Update Payload | Dilithium-5 PQC signature verification | `src/package/universal.rs` (`PqcPackageVerifier`) |
+| Malformed Network Packet RCE | Custom TCP/IP stack with explicit bounds clamping and fuzz testing | `fuzz/fuzz_targets/` |

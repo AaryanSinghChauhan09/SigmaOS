@@ -1,18 +1,16 @@
-# SigmaOS Capability Policy Specification
+# SigmaOS Capability Security Policy
 
-## Capability Tokens
+## Overview
 
-Capabilities in SigmaOS are fine-grained permission tokens assigned to processes:
+Processes in SigmaOS do not inherit full root privileges. Privilege is governed by granular capability tokens.
 
-| Capability Flag | Description | Operations Protected |
-| :--- | :--- | :--- |
-| `CAP_SYS_ADMIN` | Global administration | Mounting, loading kernel modules, system halt |
-| `CAP_NET_ADMIN` | Network configuration | Socket binding < 1024, route changes, firewall rules |
-| `CAP_DAC_OVERRIDE` | Bypass file permissions | Read/write access ignoring inode DAC permission bits |
-| `CAP_SYS_PTRACE` | Process tracing | `ptrace`, reading `/proc/<pid>/mem` of other users |
+## Capability Hierarchy
 
----
+- `CAP_SYS_ADMIN`: Required for raw disk partition operations and mounting.
+- `CAP_NET_ADMIN`: Required for raw packet socket binding and network route changes.
+- `CAP_KILL`: Permission to send signals to other processes.
+- `CAP_PTRACE`: Privilege to inspect memory of other processes.
 
-## Evaluation Directives
-- Every privileged syscall path MUST invoke `verify_capability(token, cap)` before executing the privileged action.
-- Denied operations must generate an audit log record in system diagnostics.
+## Enforcement Mechanism
+
+Every syscall entry point checks process capability mask against required capabilities before executing kernel handlers.

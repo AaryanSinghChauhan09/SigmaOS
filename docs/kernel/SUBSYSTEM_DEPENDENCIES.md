@@ -1,34 +1,39 @@
-# SigmaOS Subsystem Dependencies Matrix
+# SigmaOS Subsystem Dependencies Graph
 
-## Dependency Topology
-
-```text
-                  +-----------------------+
-                  | Physical Memory (PMM) |
-                  +-----------+-----------+
+```
+                   +-------------------+
+                   | PhysicalAllocator |
+                   +---------+---------+
+                             |
+                             v
+                       +-----+-----+
+                       |  Paging   |
+                       +--+-----+--+
+                          |     |
+            +-------------+     +-------------+
+            |                                 |
+            v                                 v
+  +---------+-------+               +---------+-------+
+  | ProcessManager  |               |  StorageBlock   |
+  +---------+-------+               +---------+-------+
+            |                                 |
+            v                                 |
+  +---------+-------+                         |
+  | SyscallDispatcher |                        |
+  +---------+-------+                         |
+            |                                 |
+            +-----------------+---------------+
                               |
                               v
-                  +-----------+-----------+
-                  |  Virtual Memory (VMM) |
-                  +-----------+-----------+
-                              |
-                              v
-                  +-----------+-----------+
-                  |   Kernel Scheduler    |
-                  +-----------+-----------+
-                              |
-            +-----------------+-----------------+
-            |                                   |
-            v                                   v
-+-----------+-----------+           +-----------+-----------+
-| Direct VFS / Storage  |           | Process / Syscall IPC |
-+-----------------------+           +-----------------------+
+                        +-----+-----+
+                        |    Vfs    |
+                        +-----------+
 ```
 
-## Ordering Rules
-1. **Stage 0**: Physical Allocator initialization.
-2. **Stage 1**: Page Table setup and VMM address space isolation.
-3. **Stage 2**: Interrupt Vector Table (IDT/APIC) & Timer enabling.
-4. **Stage 3**: Scheduler core & Task PCB creation.
-5. **Stage 4**: VFS root mount & device driver probing.
-6. **Stage 5**: Userland init execution.
+## Topological Boot Sequence
+
+1. `PhysicalAllocator`
+2. `Paging`
+3. `ProcessManager` & `StorageBlock` (Parallel / Independent)
+4. `SyscallDispatcher` (Requires `Paging` + `ProcessManager`)
+5. `Vfs` (Requires `StorageBlock` + `SyscallDispatcher`)

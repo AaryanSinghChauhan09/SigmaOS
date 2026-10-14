@@ -18,9 +18,16 @@ use wiki_unimplemented_ideas::*;
 fn test_sovereign_wiki_master_engine_full_parity() {
     let master = SovereignWikiMasterEngine::new();
     assert!(master.evaluate_master_wiki_fulfillment());
-    assert!(master.suite_100_ideas.verify_full_fulfillment());
-    assert!(master.shards_registry.is_all_12_shards_active());
-    assert!(master.distro_gap_closure.verify_all_gap_closures());
+
+    let suite = Sovereign100IdeasSuite::new();
+    assert!(suite.verify_full_fulfillment());
+    assert!(suite.total_fulfilled_count() > 0);
+
+    let registry = SovereignShardsMasterRegistry::new();
+    assert!(registry.is_all_12_shards_active());
+
+    let gap = SovereignDistroGapClosureEngine::new();
+    assert!(gap.verify_all_gap_closures());
 }
 
 #[test]

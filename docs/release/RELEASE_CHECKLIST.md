@@ -1,11 +1,11 @@
-# SigmaOS Pre-Release Checklist
+# SigmaOS Quarterly Release Checklist
 
-## Quality Gates
+## Pre-Release Verification
 
-- [ ] All standalone and cargo unit test suites pass (`./run_sigma_tests.sh`).
-- [ ] Code formatting compliance (`cargo fmt --check`).
-- [ ] No new unsafe blocks introduced without explicit invariant safety comments.
-- [ ] QEMU boot-to-shell smoke test succeeds (`scripts/ci/qemu_boot_smoke.sh`).
-- [ ] Installer dry-run test suite passes (`installer/tests/dry_run.rs`).
-- [ ] Hardware driver claims backed by test evidence in `docs/platform/HARDWARE_SUPPORT.md`.
-- [ ] System status matrix updated in `docs/PROJECT_STATUS.md`.
+- [ ] All Tier 1 CI checks pass (`cargo check --lib`, `cargo test --lib`, `./run_sigma_tests.sh`)
+- [ ] Headless QEMU boot-to-shell smoke test succeeds (`scripts/ci/qemu_boot_smoke.sh`)
+- [ ] Installer safety suite passes (`installer/tests/dry_run.rs`, `installer/tests/failure_injection.rs`)
+- [ ] Driver evidence matrix updated in `docs/platform/HARDWARE_SUPPORT.md`
+- [ ] Security advisory review and fuzzing triage complete
+- [ ] Release preparation script executed (`scripts/release/prepare_release.sh`)
+- [ ] SBOM and provenance artifacts signed with cosign / PQC keys

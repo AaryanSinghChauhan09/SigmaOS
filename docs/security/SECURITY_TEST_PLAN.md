@@ -1,15 +1,14 @@
-# SigmaOS Security Testing & Verification Plan
+# SigmaOS Security Test Plan
 
-## Test Execution Matrix
+## Overview
 
-### 1. Negative Syscall Boundary Testing
-- Pass invalid / non-canonical memory pointers to `read`, `write`, `sys_mmap`.
-- Verify kernel returns `EFAULT` without crashing or panicking.
+Security verification in SigmaOS combines static auditing, fuzzing, standalone unit tests, and integration verification.
 
-### 2. Capability Bypassing Negative Tests
-- Attempt execution of `mount` or `insmod` from process without `CAP_SYS_ADMIN`.
-- Verify operation returns `EPERM` and logs audit entry.
+## Recurring Test Procedures
 
-### 3. W^X Violation Testing
-- Attempt code execution on user stack / writable heap memory page.
-- Verify page fault interrupt triggers process termination (`SIGSEGV`).
+1. **ASan Shadow Memory Error Detection**:
+   - Run `rustc --test --edition=2021 src/security/address_sanitizer.rs` to verify redzone overflow detection and use-after-free tracking.
+2. **Dilithium-5 PQC Verification**:
+   - Run `rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/package/universal.rs` to verify post-quantum signature checks.
+3. **Fuzz Smoke Matrix**:
+   - Execute cargo fuzz targets under `fuzz/fuzz_targets/` (Syscall argument parsing, VFS path parsing, IPC message parsing).

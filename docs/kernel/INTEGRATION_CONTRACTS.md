@@ -1,42 +1,48 @@
 # SigmaOS Kernel Subsystem Integration Contracts
 
-## Specification Format
+## Overview
 
-Every kernel subsystem must publish an integration contract defining its public entry points, dependencies, failure policies, and verification status.
+SigmaOS kernel subsystems must adhere to explicit initialization order contracts, public API boundaries, dependency requirements, and panic/error handling policies.
 
----
+## Subsystem Contract Declarations
 
-## Subsystem Contracts
+### 1. Physical Memory Allocator (`PhysicalAllocator`)
+- **Public API**: `alloc_frame`, `free_frame`, `available_frames`
+- **Prerequisites**: Framebuffer/bootloader memory map handoff
+- **Failure Policy**: Panic with diagnostic panic report (`KernelPanicDiagnosticReport`)
+- **Boot Order Position**: 1
 
-### `subsystem.paging`
-```toml
-[subsystem.paging]
-public_api = ["alloc_pages", "free_pages", "map_range", "unmap_range"]
-requires = ["physical_allocator", "page_tables", "interrupt_safety"]
-exposes_tests = ["tests/mm/paging.rs"]
-runtime_entry = "kernel::mm::paging"
-boot_dependency = "required"
-failure_policy = "panic_with_diagnostic"
-```
+### 2. Paging & Virtual Memory (`Paging`)
+- **Public API**: `map_page`, `unmap_page`, `translate_address`
+- **Prerequisites**: `PhysicalAllocator`
+- **Failure Policy**: Double fault exception / kernel panic
+- **Boot Order Position**: 2
 
-### `subsystem.scheduler`
-```toml
-[subsystem.scheduler]
-public_api = ["schedule", "yield_now", "wake_up", "enqueue_process"]
-requires = ["timer_interrupt", "process_table", "cpu_affinity"]
-exposes_tests = ["tests/scheduler/core.rs"]
-runtime_entry = "kernel::scheduler::core"
-boot_dependency = "required"
-failure_policy = "reschedule_or_panic"
-```
+### 3. Process Manager (`ProcessManager`)
+- **Public API**: `create_process`, `terminate_process`, `schedule`
+- **Prerequisites**: `Paging`
+- **Failure Policy**: Process exit code / kernel panic if `init` (PID 1) fails
+- **Boot Order Position**: 3
 
-### `subsystem.vfs`
-```toml
-[subsystem.vfs]
-public_api = ["open", "read", "write", "close", "mount", "unmount"]
-requires = ["inode_manager", "permission_engine", "fd_table"]
-exposes_tests = ["tests/filesystem/core.rs"]
-runtime_entry = "kernel::fs::vfs"
-boot_dependency = "required"
-failure_policy = "return_posix_errno"
-```
+### 4. Syscall Dispatcher (`SyscallDispatcher`)
+- **Public API**: `dispatch_syscall`, `register_handler`
+- **Prerequisites**: `Paging`, `ProcessManager`
+- **Failure Policy**: Return negative POSIX error code (e.g. `-EINVAL`, `-EPERM`)
+- **Boot Order Position**: 4
+
+### 5. Storage Block Layer (`StorageBlock`)
+- **Public API**: `read_blocks`, `write_blocks`, `register_device`
+- **Prerequisites**: `Paging`
+- **Failure Policy**: Return `BlockIoError`
+- **Boot Order Position**: 5
+
+### 6. Virtual File System (`Vfs`)
+- **Public API**: `vfs_open`, `vfs_read`, `vfs_write`, `vfs_mount`
+- **Prerequisites**: `StorageBlock`, `SyscallDispatcher`
+- **Failure Policy**: Return POSIX file I/O error codes
+- **Boot Order Position**: 6
+
+## Verification
+
+Initialization order contracts are verified by integration test:
+- `tests/kernel/integration/subsystem_contracts_test.rs`

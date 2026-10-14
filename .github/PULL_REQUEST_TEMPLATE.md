@@ -1,76 +1,81 @@
 ## Summary
 
-<!-- One paragraph: what changed and why. -->
+<!-- What file-management or component behavior changed and why? -->
 
-## Component
+## File component
 
-<!-- Choose one -->
-- [ ] Boot / platform
-- [ ] Kernel core
-- [ ] Memory
-- [ ] Scheduler
-- [ ] VFS / filesystems
-- [ ] Syscalls
-- [ ] Drivers
-- [ ] Networking
-- [ ] IPC
-- [ ] Security
-- [ ] Userspace
-- [ ] Desktop
-- [ ] Packaging / installer
+- [ ] File descriptor manager
+- [ ] Inode and directory manager
+- [ ] Permission manager
+- [ ] Lock manager
+- [ ] Mount / unmount
+- [ ] Cache
+- [ ] Filesystem
+- [ ] Recovery
+- [ ] procfs / diagnostics
+- [ ] Security / capabilities
 - [ ] Documentation
 - [ ] CI / tooling
 
-## Reference study
+## Recurring task
 
-<!-- Required for design-changing PRs -->
+- [ ] PR validation
+- [ ] Daily CI triage
+- [ ] Weekly lifecycle review
+- [ ] Weekly Linux/BSD study
+- [ ] Biweekly memory audit
+- [ ] Biweekly signal/wait audit
+- [ ] Monthly boot validation
+- [ ] Quarterly architecture/security/release review
 
-- Study document:
-- Reference projects:
-- Decision: Adopt / Adapt / Reject
-- Reason:
+## Reference behavior
+
+<!-- Required for lifecycle, ABI, or file changes -->
+
+- POSIX section:
+- Linux/BSD/Redox/xv6 reference:
+- SigmaOS current behavior:
+- New behavior:
+- Compatibility impact:
 
 ## Changes
 
 -
--
--
+
+## File safety review
+
+- [ ] Lifecycle transitions are valid
+- [ ] Zombies are eventually reaped
+- [ ] Orphans are adopted
+- [ ] PID reuse is safe
+- [ ] Lock ordering is documented
+- [ ] Interrupt-context safety considered
+- [ ] Signal races considered
+- [ ] Double-unlink prevented
+- [ ] Resource limits enforced
+- [ ] No unbounded allocation or recursion
 
 ## Evidence
-
-<!-- Do not mark complete without evidence. -->
 
 - [ ] `cargo check --lib`
 - [ ] `cargo fmt --check`
 - [ ] `cargo test --lib`
 - [ ] `./run_sigma_tests.sh`
-- [ ] New/updated tests included
-- [ ] QEMU boot evidence attached, if boot-related
-- [ ] Installer/recovery evidence attached, if installer-related
-- [ ] Hardware evidence attached, if driver-related
+- [ ] New/updated unit tests
+- [ ] Integration tests
+- [ ] Fuzz target or documented exemption
+- [ ] Boot-to-boot evidence, if boot-affecting
+- [ ] File benchmark, if performance-affecting
 - [ ] Security review requested, if applicable
 
-## Status impact
+## Status updates
 
-- [ ] `FEATURE_STATUS.toml` updated
-- [ ] `CAPABILITY_MATRIX.toml` updated
-- [ ] Component documentation updated
-- [ ] No unsupported “complete” claim introduced
+- [ ] `FEATURE_STATUS.toml`
+- [ ] `CAPABILITY_MATRIX.toml`
+- [ ] File documentation
+- [ ] Boot matrix, if applicable
 
-## Risks and limitations
+## Risks and rollback
 
--
--
-
-## Rollback plan
-
-<!-- How to revert or recover if this change regresses boot, install, update, or security. -->
-
-## Reviewer checklist
-
-- [ ] Scope is small and reviewable
-- [ ] Tests cover success and failure paths
-- [ ] Error handling is explicit
-- [ ] Unsafe code is justified
-- [ ] Documentation matches actual behavior
-- [ ] Status claims are evidence-based
+- Risk:
+- Rollback:

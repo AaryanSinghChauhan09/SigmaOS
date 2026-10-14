@@ -1,34 +1,61 @@
-# SigmaOS Recovery & Disaster Recovery Runbook
+# SigmaOS Installer & Recovery Runbook
 
-## Emergency Boot Options
+## Overview
 
-When system startup fails or installer update fails, pass one of the following kernel parameters at the bootloader menu:
+SigmaOS requires destructive operations (installer, disk partitioning, system updates, recovery) to be atomic, safe, and fully recoverable.
 
-- `sigmaos.recovery=1`: Boots directly into emergency maintenance shell with minimal read-only root mount.
-- `sigmaos.rollback=latest`: Automatically restores the previous boot snapshot created by Timeshift / Btrfs / ZFS.
-- `sigmaos.init=/bin/sh`: Direct single-user shell entry.
+## Principles of Safe Installation and Recovery
 
----
+1. **Dry-Run Mode First**: Every installation or update transaction must support a dry-run execution mode (`--dry-run`) that verifies system constraints without mutating disk partitions or writing filesystems.
+2. **Failure Injection Resiliency**: System installers must handle mid-transaction failures (power loss, corrupt payload, disk full) by reverting state or providing a clean rollback path.
+3. **Emergency Chroot Environment**: The installer ISO and recovery environment provide a minimal rescue shell with chroot capabilities to repair damaged bootloaders, `/etc/fstab`, or corrupted kernel images.
 
 ## Recovery Procedures
 
-### 1. Failed System Update Rollback
-```bash
-# Check available snapshot generations
-sigma-timeshift --list
+### 1. Emergency Rescue Boot
+Boot the SigmaOS Live Installer ISO and select **Emergency Recovery Shell** from the GRUB boot menu.
 
-# Restore prior stable generation
-sigma-timeshift --restore --snapshot 2026-10-14_02-00
+### 2. Mounting Target System
+```bash
+# Locate root partition
+sigma-disks --list
+
+# Mount target root and virtual filesystems
+mount /dev/sda2 /mnt
+mount -t proc proc /mnt/proc
+mount -t sysfs sys /mnt/sys
+mount --bind /dev /mnt/dev
+
+# Chroot into target system
+chroot /mnt /bin/sh
 ```
 
-### 2. Filesystem & Inode Repair
+### 3. Repairing Bootloader and Init Configuration
 ```bash
-# Perform non-destructive filesystem check on target root
-sigma-fsck /dev/sda2 --dry-run
+# Reinstall bootloader
+sigma-bootinstall --target=/dev/sda
+
+# Re-generate initramfs / boot configuration
+sigma-init-update --rebuild
 ```
 
-### 3. Emergency Diagnostics Collection
+### 4. Timeshift / Snapshot Rollback
 ```bash
-# Run diagnostics collector script
-/scripts/diagnostics/collect_system_report.sh /var/log/recovery_report.json
+# List available system snapshots
+timeshift --list
+
+# Restore to last known good snapshot
+timeshift --restore --snapshot "2026-10-14_02-00-00"
+```
+
+## Testing Recovery Workflows
+
+Installer safety and failure injection unit tests are defined in:
+- `installer/tests/dry_run.rs`
+- `installer/tests/failure_injection.rs`
+
+Run tests via:
+```bash
+rustc --test --edition=2021 installer/tests/dry_run.rs -o build/test_dry_run && ./build/test_dry_run
+rustc --test --edition=2021 installer/tests/failure_injection.rs -o build/test_failure_injection && ./build/test_failure_injection
 ```
