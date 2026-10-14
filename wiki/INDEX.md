@@ -6,6 +6,7 @@ Welcome to the SigmaOS GitHub Wiki Encyclopedia and Subsystem Reference Index.
 
 ## Core Development Plans & Architecture
 
+- [CPU Scheduler Development Plan](SCHEDULER_DEVELOPMENT_PLAN.md) - Subsystem audit, 9 policy invariants, 18-PR roadmap, periodic maintenance framework, and review merge gates.
 - [System Utilities Development Plan](SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md) - Master Architecture, POSIX compatibility baseline, 18-PR roadmap, component rules, periodic maintenance framework, and review merge gates.
 - [System Utilities Plan Mirror](SYSTEM_UTILITIES_PLAN.md) - Alternate index page for system utilities architecture.
 
