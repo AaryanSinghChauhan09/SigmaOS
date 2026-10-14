@@ -21,6 +21,13 @@ pub enum ProjectType {
     Design,
     Effect,
     Scene,
+    Audio,
+    Sound,
+    SoundCraft,
+    Deck,
+    Presentation,
+    Grid,
+    Spreadsheet,
 }
 
 /// Project

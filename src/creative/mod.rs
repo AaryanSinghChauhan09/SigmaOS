@@ -14,6 +14,7 @@ pub mod audiocraft;
 pub mod vectoranimation;
 pub mod model3d;
 pub mod artcraft;
+pub mod soundcraft;
 
 pub use photocraft::{
     PhotoEditor, ImageLayer, Filter, Adjustment, LayerType, LayerMask, AdjustmentType,
@@ -98,4 +99,14 @@ pub use model3d::{
 pub use artcraft::{
     ArtSuite, Project, Workspace,
     init_artcraft, get_artcraft,
+};
+pub use soundcraft::{
+    SoundCraftAudioClip, SoundCraftAudioEnginePrDeployer, SoundCraftAudioTrack,
+    SoundCraftChannelConfig, SoundCraftDspFilter, SoundCraftDspFilterType,
+    SoundCraftDspSynthesizerPrDeployer, SoundCraftEngine, SoundCraftMasterPrDeploymentSuite,
+    SoundCraftMasteringChain, SoundCraftMidiNote, SoundCraftMidiSequence, SoundCraftPluginFormat,
+    SoundCraftPluginHost, SoundCraftPullRequestSpec, SoundCraftSampleFormat, SoundCraftSampleRate,
+    SoundCraftSpatial3DPanner, SoundCraftSpatialMixingMasteringPrDeployer, SoundCraftSynthesizer,
+    SoundCraftTrackType, SoundCraftTransportState, fnv1a_soundcraft_pr_digest, get_soundcraft,
+    init_soundcraft,
 };
