@@ -25,3 +25,20 @@ success = [
 ]
 
 on_failure = "create blocked task with failure classification and serial log excerpt"
+  "make clean",
+  "cargo check --lib",
+  "cargo test --lib",
+  "build ISO artifact",
+  "boot QEMU with serial logging",
+  "wait for shell prompt",
+  "run smoke commands",
+  "capture logs and screenshot",
+  "write boot report"
+  "reports/boot/qemu-x86_64.log",
+  "reports/boot/qemu-x86_64.json",
+  "reports/boot/boot_matrix.json"
+  "build exits 0",
+  "QEMU reaches shell within timeout",
+  "smoke commands exit 0",
+  "no kernel panic in serial log"
+on_failure = "create blocked task with failing stage and log excerpt"

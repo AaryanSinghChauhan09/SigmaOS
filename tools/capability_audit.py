@@ -8,8 +8,12 @@ and test suites to maintain an evidence-backed truth table.
 import datetime
 import json
 import os
-import re
-import tomllib
+import sys
+
+try:
+    import tomllib
+except ImportError:
+    tomllib = None
 
 
 def audit_capability_matrix():
@@ -18,7 +22,7 @@ def audit_capability_matrix():
 
     truth_entries = []
 
-    if os.path.exists(matrix_path):
+    if os.path.exists(matrix_path) and tomllib:
         with open(matrix_path, "rb") as f:
             matrix_data = tomllib.load(f)
 
@@ -29,19 +33,16 @@ def audit_capability_matrix():
                         claimed_status = details.get("status", "unknown")
                         code_ref = details.get("path") or details.get("file") or ""
 
-                        # Verify source code presence
                         has_code = False
                         if code_ref and os.path.exists(code_ref):
                             has_code = True
                         else:
-                            # Search in src/
                             for root, _, files in os.walk("src"):
                                 for file in files:
                                     if item_key in file or item_key in root:
                                         has_code = True
                                         break
 
-                        # Classify status based on evidence rule
                         verified_status = "model-only"
                         if not has_code:
                             verified_status = "unimplemented"
@@ -102,13 +103,13 @@ def main():
     os.makedirs("reports/capability", exist_ok=True)
 
     json_path = "reports/capability/truth_table.json"
-    with open(json_path, "w") as f:
+    with open(json_path, "w", encoding="utf-8") as f:
         json.dump(entries, f, indent=2)
     print(f"Saved truth table to {json_path}")
 
     md_content = generate_verified_today_markdown(entries)
     md_path = "reports/capability/verified_today.md"
-    with open(md_path, "w") as f:
+    with open(md_path, "w", encoding="utf-8") as f:
         f.write(md_content)
     print(f"Saved dashboard to {md_path}")
 

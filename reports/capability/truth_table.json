@@ -5,7 +5,7 @@
     "claimed_status": "implemented",
     "verified_status": "unimplemented",
     "has_code": false,
-    "last_verified": "2026-10-12"
+    "last_verified": "2026-10-14"
   },
   {
     "category": "feature",
@@ -13,7 +13,7 @@
     "claimed_status": "implemented",
     "verified_status": "unimplemented",
     "has_code": false,
-    "last_verified": "2026-10-12"
+    "last_verified": "2026-10-14"
   },
   {
     "category": "feature",
@@ -21,7 +21,7 @@
     "claimed_status": "implemented",
     "verified_status": "unimplemented",
     "has_code": false,
-    "last_verified": "2026-10-12"
+    "last_verified": "2026-10-14"
   },
   {
     "category": "feature",
@@ -29,7 +29,7 @@
     "claimed_status": "implemented",
     "verified_status": "unimplemented",
     "has_code": false,
-    "last_verified": "2026-10-12"
+    "last_verified": "2026-10-14"
   },
   {
     "category": "feature",
@@ -37,7 +37,7 @@
     "claimed_status": "prototype",
     "verified_status": "unimplemented",
     "has_code": false,
-    "last_verified": "2026-10-12"
+    "last_verified": "2026-10-14"
   },
   {
     "category": "feature",
@@ -45,7 +45,7 @@
     "claimed_status": "implemented",
     "verified_status": "unimplemented",
     "has_code": false,
-    "last_verified": "2026-10-12"
+    "last_verified": "2026-10-14"
   },
   {
     "category": "feature",
@@ -53,7 +53,7 @@
     "claimed_status": "implemented",
     "verified_status": "unimplemented",
     "has_code": false,
-    "last_verified": "2026-10-12"
+    "last_verified": "2026-10-14"
   },
   {
     "category": "feature",
@@ -61,7 +61,7 @@
     "claimed_status": "implemented",
     "verified_status": "unimplemented",
     "has_code": false,
-    "last_verified": "2026-10-12"
+    "last_verified": "2026-10-14"
   },
   {
     "category": "feature",
@@ -69,7 +69,7 @@
     "claimed_status": "implemented",
     "verified_status": "unimplemented",
     "has_code": false,
-    "last_verified": "2026-10-12"
+    "last_verified": "2026-10-14"
   },
   {
     "category": "feature",
@@ -77,7 +77,7 @@
     "claimed_status": "implemented",
     "verified_status": "unimplemented",
     "has_code": false,
-    "last_verified": "2026-10-12"
+    "last_verified": "2026-10-14"
   },
   {
     "category": "feature",
@@ -85,7 +85,7 @@
     "claimed_status": "implemented",
     "verified_status": "unimplemented",
     "has_code": false,
-    "last_verified": "2026-10-12"
+    "last_verified": "2026-10-14"
   },
   {
     "category": "feature",
@@ -93,7 +93,7 @@
     "claimed_status": "implemented",
     "verified_status": "unimplemented",
     "has_code": false,
-    "last_verified": "2026-10-12"
+    "last_verified": "2026-10-14"
   },
   {
     "category": "feature",
@@ -101,7 +101,7 @@
     "claimed_status": "prototype",
     "verified_status": "unimplemented",
     "has_code": false,
-    "last_verified": "2026-10-12"
+    "last_verified": "2026-10-14"
   },
   {
     "category": "feature",
@@ -109,7 +109,7 @@
     "claimed_status": "implemented",
     "verified_status": "unimplemented",
     "has_code": false,
-    "last_verified": "2026-10-12"
+    "last_verified": "2026-10-14"
   },
   {
     "category": "feature",
@@ -117,7 +117,7 @@
     "claimed_status": "implemented",
     "verified_status": "unimplemented",
     "has_code": false,
-    "last_verified": "2026-10-12"
+    "last_verified": "2026-10-14"
   },
   {
     "category": "feature",
@@ -125,7 +125,7 @@
     "claimed_status": "partial",
     "verified_status": "unimplemented",
     "has_code": false,
-    "last_verified": "2026-10-12"
+    "last_verified": "2026-10-14"
   },
   {
     "category": "feature",
@@ -133,7 +133,7 @@
     "claimed_status": "partial",
     "verified_status": "unimplemented",
     "has_code": false,
-    "last_verified": "2026-10-12"
+    "last_verified": "2026-10-14"
   },
   {
     "category": "feature",
@@ -141,7 +141,7 @@
     "claimed_status": "partial",
     "verified_status": "unimplemented",
     "has_code": false,
-    "last_verified": "2026-10-12"
+    "last_verified": "2026-10-14"
   },
   {
     "category": "feature",
@@ -149,7 +149,7 @@
     "claimed_status": "partial",
     "verified_status": "model-only",
     "has_code": true,
-    "last_verified": "2026-10-12"
+    "last_verified": "2026-10-14"
   },
   {
     "category": "feature",
@@ -157,7 +157,7 @@
     "claimed_status": "partial",
     "verified_status": "model-only",
     "has_code": true,
-    "last_verified": "2026-10-12"
+    "last_verified": "2026-10-14"
   },
   {
     "category": "feature",
@@ -165,7 +165,7 @@
     "claimed_status": "partial",
     "verified_status": "unimplemented",
     "has_code": false,
-    "last_verified": "2026-10-12"
+    "last_verified": "2026-10-14"
   },
   {
     "category": "feature",
@@ -173,6 +173,6 @@
     "claimed_status": "partial",
     "verified_status": "unimplemented",
     "has_code": false,
-    "last_verified": "2026-10-12"
+    "last_verified": "2026-10-14"
   }
 ]

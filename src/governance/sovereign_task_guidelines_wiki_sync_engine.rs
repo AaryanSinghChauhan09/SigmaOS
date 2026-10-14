@@ -176,10 +176,10 @@ impl WikiDataTransferEngine {
         );
 
         self.feature_specs.insert(
-            "NetworkDevelopmentAndMaintenancePlan".to_string(),
+            "SigmaOSCliDevelopmentPlan".to_string(),
             FeatureMdStatus {
-                spec_name: "28-Network-Development-And-Maintenance-Plan.md".to_string(),
-                source_path: "wiki/28-Network-Development-And-Maintenance-Plan.md".to_string(),
+                spec_name: "27-SigmaOS-CLI-Development-Plan.md".to_string(),
+                source_path: "wiki/27-SigmaOS-CLI-Development-Plan.md".to_string(),
                 is_fully_implemented: true,
                 completion_percentage: 100,
                 wiki_mirrored: true,
@@ -329,6 +329,11 @@ impl WikiDataTransferEngine {
         self.register_spec_file(
             "26-System-Utilities-Development-Plan.md",
             "System Utilities Development Plan PR",
+            true,
+        );
+        self.register_spec_file(
+            "27-SigmaOS-CLI-Development-Plan.md",
+            "SigmaOS CLI Development Plan PR",
             true,
         );
         self.register_spec_file(

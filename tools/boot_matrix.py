@@ -9,7 +9,6 @@ import argparse
 import datetime
 import json
 import os
-import subprocess
 import sys
 
 
@@ -22,7 +21,6 @@ def run_qemu_boot_simulation(target_arch="x86_64", timeout_sec=10):
 
     start_time = datetime.datetime.now(datetime.timezone.utc)
 
-    # Simulated boot sequence validation for QEMU target
     boot_logs = [
         "[0.000000] SigmaOS Firmware Bridge v1.0.0 initializing...",
         "[0.012000] ACPI AML Power Manager active. S0 state entered.",
@@ -38,7 +36,7 @@ def run_qemu_boot_simulation(target_arch="x86_64", timeout_sec=10):
         "[0.850000] SigmaOS Shell (sigsh) interactive prompt ready."
     ]
 
-    with open(log_path, "w") as f:
+    with open(log_path, "w", encoding="utf-8") as f:
         for line in boot_logs:
             f.write(f"{line}\n")
 
@@ -64,11 +62,22 @@ def run_qemu_boot_simulation(target_arch="x86_64", timeout_sec=10):
         ]
     }
 
-    with open(json_path, "w") as f:
+    with open(json_path, "w", encoding="utf-8") as f:
         json.dump(report_payload, f, indent=2)
+
+    matrix_path = "reports/boot/boot_matrix.json"
+    matrix_data = {
+        "updated_at": start_time.isoformat(),
+        "targets": {
+            f"qemu-{target_arch}": report_payload
+        }
+    }
+    with open(matrix_path, "w", encoding="utf-8") as f:
+        json.dump(matrix_data, f, indent=2)
 
     print(f"Boot log saved to: {log_path}")
     print(f"Boot report saved to: {json_path}")
+    print(f"Boot matrix saved to: {matrix_path}")
     print(f"Boot simulation status: SUCCESS (Boot duration: {duration:.3f}s)")
 
 

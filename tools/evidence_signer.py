@@ -32,7 +32,7 @@ def sign_evidence_directory(reports_dir="reports"):
 
     for root, _, files in os.walk(reports_dir):
         for file in sorted(files):
-            if file == "evidence_manifest.json":
+            if file in ["evidence_manifest.json", "evidence_signatures.json"]:
                 continue
             fpath = os.path.join(root, file)
             rel_path = os.path.relpath(fpath, reports_dir)
@@ -43,10 +43,14 @@ def sign_evidence_directory(reports_dir="reports"):
             }
 
     manifest_path = os.path.join(reports_dir, "evidence_manifest.json")
-    with open(manifest_path, "w") as f:
+    with open(manifest_path, "w", encoding="utf-8") as f:
         json.dump(manifest, f, indent=2)
 
-    print(f"Evidence manifest generated at {manifest_path} with {len(manifest['artifacts'])} signed artifacts.")
+    sig_path = os.path.join(reports_dir, "evidence_signatures.json")
+    with open(sig_path, "w", encoding="utf-8") as f:
+        json.dump(manifest, f, indent=2)
+
+    print(f"Evidence manifest generated at {manifest_path} and {sig_path} with {len(manifest['artifacts'])} signed artifacts.")
 
 
 def main():
