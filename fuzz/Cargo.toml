@@ -30,3 +30,9 @@ name = "vfs_path_parser"
 path = "fuzz_targets/vfs_path_parser.rs"
 test = false
 doc = false
+
+[[bin]]
+name = "shell_lexer_parser"
+path = "fuzz_targets/shell_lexer_parser.rs"
+test = false
+doc = false
