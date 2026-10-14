@@ -8473,6 +8473,533 @@ impl SovereignBitrix24OmnichannelCallQueueRouterEngine {
     }
 }
 
+// ============================================================================
+// Google Workspace / Microsoft 365 / Zoho / Salesforce / Odoo / Bitrix24 New Innovations
+// ============================================================================
+
+/// Google Sheets / Excel Data Validation Engine
+#[derive(Debug, Clone)]
+pub enum ValidationRuleKind {
+    ListOfItems(Vec<String>),
+    NumericRange { min: f64, max: f64 },
+    CustomFormula(String),
+    RegexPattern(String),
+}
+
+#[derive(Debug, Clone)]
+pub struct SheetDataValidationRule {
+    pub rule_id: String,
+    pub field_name: String,
+    pub rule_kind: ValidationRuleKind,
+    pub allow_invalid_with_warning: bool,
+    pub error_message: String,
+}
+
+pub struct SovereignGoogleSheetsDataValidationListFormulaEngine;
+
+impl SovereignGoogleSheetsDataValidationListFormulaEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn validate_cell_value(&self, value: &str, rule: &SheetDataValidationRule) -> core::result::Result<bool, String> {
+        match &rule.rule_kind {
+            ValidationRuleKind::ListOfItems(items) => {
+                if items.iter().any(|i| i.trim().eq_ignore_ascii_case(value.trim())) {
+                    Ok(true)
+                } else if rule.allow_invalid_with_warning {
+                    Ok(false)
+                } else {
+                    Err(rule.error_message.clone())
+                }
+            }
+            ValidationRuleKind::NumericRange { min, max } => {
+                if let Ok(num) = value.trim().parse::<f64>() {
+                    if num >= *min && num <= *max {
+                        Ok(true)
+                    } else if rule.allow_invalid_with_warning {
+                        Ok(false)
+                    } else {
+                        Err(rule.error_message.clone())
+                    }
+                } else if rule.allow_invalid_with_warning {
+                    Ok(false)
+                } else {
+                    Err("Value is not a valid number".to_string())
+                }
+            }
+            ValidationRuleKind::CustomFormula(formula) => {
+                if formula.is_empty() || value.is_empty() {
+                    Ok(true)
+                } else if value.starts_with("=") || !value.is_empty() {
+                    Ok(true)
+                } else {
+                    Err(rule.error_message.clone())
+                }
+            }
+            ValidationRuleKind::RegexPattern(pattern) => {
+                if pattern.is_empty() || value.contains(pattern.trim_matches('^').trim_matches('$')) {
+                    Ok(true)
+                } else if rule.allow_invalid_with_warning {
+                    Ok(false)
+                } else {
+                    Err(rule.error_message.clone())
+                }
+            }
+        }
+    }
+
+    pub fn generate_dropdown_options(&self, rule: &SheetDataValidationRule) -> Vec<String> {
+        match &rule.rule_kind {
+            ValidationRuleKind::ListOfItems(items) => items.clone(),
+            _ => vec![],
+        }
+    }
+}
+
+/// Google Docs / MS Word Watermark & Header/Footer Layout Engine
+#[derive(Debug, Clone)]
+pub struct HeaderFooterSection {
+    pub header_text: String,
+    pub footer_text: String,
+    pub apply_to_first_page: bool,
+    pub odd_even_different: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct WatermarkSpec {
+    pub text: String,
+    pub font_size_pt: f32,
+    pub opacity: f32,
+    pub rotation_degrees: f32,
+    pub color_hex: String,
+}
+
+pub struct SovereignGoogleDocsWatermarkAndHeaderFooterLayoutEngine;
+
+impl SovereignGoogleDocsWatermarkAndHeaderFooterLayoutEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn format_header_footer(
+        &self,
+        section: &HeaderFooterSection,
+        page_number: usize,
+        total_pages: usize,
+        is_first_page: bool,
+    ) -> (String, String) {
+        if is_first_page && !section.apply_to_first_page {
+            return (String::new(), String::new());
+        }
+
+        let mut header = section.header_text.clone();
+        let mut footer = section.footer_text.clone();
+
+        if section.odd_even_different && page_number % 2 == 0 {
+            header = format!("[Even Page] {}", header);
+            footer = format!("[Even Page] {}", footer);
+        }
+
+        header = header.replace("{PAGE}", &page_number.to_string());
+        header = header.replace("{PAGES}", &total_pages.to_string());
+        footer = footer.replace("{PAGE}", &page_number.to_string());
+        footer = footer.replace("{PAGES}", &total_pages.to_string());
+
+        (header, footer)
+    }
+
+    pub fn calculate_watermark_transform(
+        &self,
+        spec: &WatermarkSpec,
+        page_width: f64,
+        page_height: f64,
+    ) -> (f64, f64, f64) {
+        let center_x = page_width / 2.0;
+        let center_y = page_height / 2.0;
+        let scale_factor = (spec.font_size_pt as f64 / 12.0).clamp(0.5, 5.0);
+        (center_x, center_y, scale_factor)
+    }
+}
+
+/// Microsoft 365 / Google Docs Operational Transformation (OT) Co-authoring Engine
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum CoauthorOpKind {
+    Insert { position: usize, text: String },
+    Delete { position: usize, length: usize },
+}
+
+#[derive(Debug, Clone)]
+pub struct CoauthorOperation {
+    pub op_kind: CoauthorOpKind,
+    pub site_id: usize,
+    pub vector_clock: u64,
+}
+
+pub struct SovereignMicrosoft365CoauthoringOperationalTransformEngine;
+
+impl SovereignMicrosoft365CoauthoringOperationalTransformEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn transform_operations(
+        &self,
+        op_a: &CoauthorOperation,
+        op_b: &CoauthorOperation,
+    ) -> (CoauthorOperation, CoauthorOperation) {
+        let mut prime_a = op_a.clone();
+        let mut prime_b = op_b.clone();
+
+        match (&op_a.op_kind, &op_b.op_kind) {
+            (
+                CoauthorOpKind::Insert { position: pos_a, text: text_a },
+                CoauthorOpKind::Insert { position: pos_b, text: _text_b },
+            ) => {
+                if pos_a < pos_b || (pos_a == pos_b && op_a.site_id < op_b.site_id) {
+                    if let CoauthorOpKind::Insert { position: ref mut p, .. } = prime_b.op_kind {
+                        *p += text_a.len();
+                    }
+                } else {
+                    if let CoauthorOpKind::Insert { position: ref mut p, .. } = prime_a.op_kind {
+                        *p += op_b_text_len(&op_b.op_kind);
+                    }
+                }
+            }
+            (
+                CoauthorOpKind::Insert { position: pos_a, text: text_a },
+                CoauthorOpKind::Delete { position: pos_b, length: len_b },
+            ) => {
+                if *pos_a <= *pos_b {
+                    if let CoauthorOpKind::Delete { position: ref mut p, .. } = prime_b.op_kind {
+                        *p += text_a.len();
+                    }
+                } else if *pos_a > *pos_b + *len_b {
+                    if let CoauthorOpKind::Insert { position: ref mut p, .. } = prime_a.op_kind {
+                        *p -= len_b;
+                    }
+                } else {
+                    if let CoauthorOpKind::Insert { position: ref mut p, .. } = prime_a.op_kind {
+                        *p = *pos_b;
+                    }
+                }
+            }
+            (
+                CoauthorOpKind::Delete { position: pos_a, length: len_a },
+                CoauthorOpKind::Insert { position: pos_b, text: text_b },
+            ) => {
+                if *pos_b <= *pos_a {
+                    if let CoauthorOpKind::Delete { position: ref mut p, .. } = prime_a.op_kind {
+                        *p += text_b.len();
+                    }
+                } else if *pos_b > *pos_a + *len_a {
+                    if let CoauthorOpKind::Insert { position: ref mut p, .. } = prime_b.op_kind {
+                        *p -= len_a;
+                    }
+                }
+            }
+            (
+                CoauthorOpKind::Delete { position: pos_a, length: len_a },
+                CoauthorOpKind::Delete { position: pos_b, length: len_b },
+            ) => {
+                if *pos_a < *pos_b {
+                    if let CoauthorOpKind::Delete { position: ref mut p, .. } = prime_b.op_kind {
+                        if *p >= *pos_a + *len_a {
+                            *p -= len_a;
+                        } else {
+                            *p = *pos_a;
+                        }
+                    }
+                } else if *pos_a > *pos_b {
+                    if let CoauthorOpKind::Delete { position: ref mut p, .. } = prime_a.op_kind {
+                        if *p >= *pos_b + *len_b {
+                            *p -= len_b;
+                        } else {
+                            *p = *pos_b;
+                        }
+                    }
+                }
+            }
+        }
+
+        (prime_a, prime_b)
+    }
+
+    pub fn apply_operation_to_text(&self, text: &mut String, op: &CoauthorOperation) {
+        match &op.op_kind {
+            CoauthorOpKind::Insert { position, text: insert_str } => {
+                let pos = (*position).min(text.len());
+                text.insert_str(pos, insert_str);
+            }
+            CoauthorOpKind::Delete { position, length } => {
+                let pos = (*position).min(text.len());
+                let end = (pos + length).min(text.len());
+                if pos < end {
+                    text.drain(pos..end);
+                }
+            }
+        }
+    }
+}
+
+fn op_b_text_len(kind: &CoauthorOpKind) -> usize {
+    match kind {
+        CoauthorOpKind::Insert { text, .. } => text.len(),
+        CoauthorOpKind::Delete { .. } => 0,
+    }
+}
+
+/// Zoho Books Multi-Currency Foreign Exchange (FX) Revaluation Engine
+#[derive(Debug, Clone)]
+pub struct FxAccountBalance {
+    pub account_id: String,
+    pub currency_code: String,
+    pub foreign_amount: f64,
+    pub base_book_value: f64,
+}
+
+#[derive(Debug, Clone)]
+pub struct FxRevaluationResult {
+    pub account_id: String,
+    pub currency_code: String,
+    pub foreign_amount: f64,
+    pub old_base_value: f64,
+    pub new_base_value: f64,
+    pub unrealized_gain_loss: f64,
+}
+
+pub struct SovereignZohoBooksMultiCurrencyFxRevaluationEngine;
+
+impl SovereignZohoBooksMultiCurrencyFxRevaluationEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn calculate_fx_revaluation(
+        &self,
+        accounts: &[FxAccountBalance],
+        spot_rates: &HashMap<String, f64>,
+    ) -> Vec<FxRevaluationResult> {
+        accounts
+            .iter()
+            .map(|acc| {
+                let rate = spot_rates.get(&acc.currency_code).copied().unwrap_or(1.0);
+                let new_base_value = acc.foreign_amount * rate;
+                let unrealized_gain_loss = new_base_value - acc.base_book_value;
+                FxRevaluationResult {
+                    account_id: acc.account_id.clone(),
+                    currency_code: acc.currency_code.clone(),
+                    foreign_amount: acc.foreign_amount,
+                    old_base_value: acc.base_book_value,
+                    new_base_value,
+                    unrealized_gain_loss,
+                }
+            })
+            .collect()
+    }
+
+    pub fn generate_revaluation_journal_entry(&self, revaluations: &[FxRevaluationResult]) -> (f64, f64) {
+        let mut total_gains = 0.0;
+        let mut total_losses = 0.0;
+
+        for r in revaluations {
+            if r.unrealized_gain_loss >= 0.0 {
+                total_gains += r.unrealized_gain_loss;
+            } else {
+                total_losses += r.unrealized_gain_loss.abs();
+            }
+        }
+
+        (total_losses, total_gains)
+    }
+}
+
+/// Salesforce CPQ Subscription Renewal & Discount Matrix Engine
+#[derive(Debug, Clone)]
+pub struct SubscriptionContract {
+    pub contract_id: String,
+    pub customer_id: String,
+    pub annual_recurring_revenue: f64,
+    pub current_discount_pct: f64,
+    pub renewal_uplift_pct: f64,
+    pub is_cotermed: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct RenewalQuote {
+    pub renewal_arr: f64,
+    pub net_mrr: f64,
+    pub final_discount_pct: f64,
+    pub total_quote_amount: f64,
+}
+
+pub struct SovereignSalesforceCpqSubscriptionRenewalDiscountEngine;
+
+impl SovereignSalesforceCpqSubscriptionRenewalDiscountEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn calculate_renewal_quote(
+        &self,
+        contract: &SubscriptionContract,
+        term_months: u32,
+        additional_expansion_arr: f64,
+        early_renewal_discount_bonus_pct: f64,
+    ) -> RenewalQuote {
+        let gross_arr = contract.annual_recurring_revenue * (1.0 + contract.renewal_uplift_pct / 100.0)
+            + additional_expansion_arr;
+        let effective_discount_pct = (contract.current_discount_pct - early_renewal_discount_bonus_pct).max(0.0);
+        let renewal_arr = gross_arr * (1.0 - effective_discount_pct / 100.0);
+        let net_mrr = renewal_arr / 12.0;
+        let total_quote_amount = renewal_arr * (term_months as f64 / 12.0);
+
+        RenewalQuote {
+            renewal_arr,
+            net_mrr,
+            final_discount_pct: effective_discount_pct,
+            total_quote_amount,
+        }
+    }
+}
+
+/// Odoo MRP Work Center Overall Equipment Effectiveness (OEE) Engine
+#[derive(Debug, Clone)]
+pub struct WorkCenterOeeMetrics {
+    pub planned_production_hours: f64,
+    pub actual_operating_hours: f64,
+    pub ideal_cycle_time_per_unit_sec: f64,
+    pub total_units_produced: u32,
+    pub good_units_produced: u32,
+}
+
+#[derive(Debug, Clone)]
+pub struct OeeCalculationResult {
+    pub availability_rate: f64,
+    pub performance_rate: f64,
+    pub quality_rate: f64,
+    pub overall_oee_pct: f64,
+    pub total_downtime_hours: f64,
+}
+
+pub struct SovereignOdooMrpWorkCenterOeeEfficiencyEngine;
+
+impl SovereignOdooMrpWorkCenterOeeEfficiencyEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn compute_work_center_oee(&self, metrics: &WorkCenterOeeMetrics) -> OeeCalculationResult {
+        let availability_rate = if metrics.planned_production_hours > 0.0 {
+            (metrics.actual_operating_hours / metrics.planned_production_hours).clamp(0.0, 1.0)
+        } else {
+            0.0
+        };
+
+        let operating_seconds = metrics.actual_operating_hours * 3600.0;
+        let performance_rate = if operating_seconds > 0.0 {
+            ((metrics.total_units_produced as f64 * metrics.ideal_cycle_time_per_unit_sec) / operating_seconds).clamp(0.0, 1.0)
+        } else {
+            0.0
+        };
+
+        let quality_rate = if metrics.total_units_produced > 0 {
+            (metrics.good_units_produced as f64 / metrics.total_units_produced as f64).clamp(0.0, 1.0)
+        } else {
+            0.0
+        };
+
+        let overall_oee_pct = availability_rate * performance_rate * quality_rate * 100.0;
+        let total_downtime_hours = (metrics.planned_production_hours - metrics.actual_operating_hours).max(0.0);
+
+        OeeCalculationResult {
+            availability_rate,
+            performance_rate,
+            quality_rate,
+            overall_oee_pct,
+            total_downtime_hours,
+        }
+    }
+
+    pub fn classify_oee_status(&self, oee_pct: f64) -> &'static str {
+        if oee_pct >= 85.0 {
+            "World Class"
+        } else if oee_pct >= 75.0 {
+            "Effective"
+        } else {
+            "Needs Improvement"
+        }
+    }
+}
+
+/// Bitrix24 Omnichannel SLA Escalation & Router Engine
+#[derive(Debug, Clone)]
+pub struct OmnichannelSlaRule {
+    pub priority: TicketPriority,
+    pub max_response_minutes: u32,
+    pub max_resolution_minutes: u32,
+    pub escalation_tier: u32,
+}
+
+#[derive(Debug, Clone)]
+pub struct SlaStatus {
+    pub is_response_breached: bool,
+    pub is_resolution_breached: bool,
+    pub current_tier: u32,
+    pub assigned_queue: String,
+}
+
+pub struct SovereignBitrix24OmnichannelSlaEscalationRouterEngine;
+
+impl SovereignBitrix24OmnichannelSlaEscalationRouterEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn evaluate_ticket_sla(
+        &self,
+        priority: TicketPriority,
+        elapsed_response_mins: u32,
+        elapsed_resolution_mins: u32,
+        rules: &[OmnichannelSlaRule],
+    ) -> SlaStatus {
+        let matching_rule = rules
+            .iter()
+            .find(|r| core::mem::discriminant(&r.priority) == core::mem::discriminant(&priority))
+            .cloned()
+            .unwrap_or(OmnichannelSlaRule {
+                priority,
+                max_response_minutes: 60,
+                max_resolution_minutes: 480,
+                escalation_tier: 1,
+            });
+
+        let is_response_breached = elapsed_response_mins > matching_rule.max_response_minutes;
+        let is_resolution_breached = elapsed_resolution_mins > matching_rule.max_resolution_minutes;
+
+        let current_tier = if is_resolution_breached {
+            matching_rule.escalation_tier + 2
+        } else if is_response_breached {
+            matching_rule.escalation_tier + 1
+        } else {
+            matching_rule.escalation_tier
+        };
+
+        let assigned_queue = match current_tier {
+            1 => "Tier 1 General Queue".to_string(),
+            2 => "Tier 2 Escalations Queue".to_string(),
+            _ => "Tier 3 Critical Engineering Queue".to_string(),
+        };
+
+        SlaStatus {
+            is_response_breached,
+            is_resolution_breached,
+            current_tier,
+            assigned_queue,
+        }
+    }
+}
+
 // Placeholder types for compilation
 mod sigma_types {
     pub type Result<T> = core::result::Result<T, &'static str>;
@@ -11886,5 +12413,122 @@ mod tests_phase2 {
         ];
         let chosen = queue_engine.select_optimal_agent(&agents, "billing");
         assert_eq!(chosen, Some("agent_2".to_string()));
+
+        // 24. Sovereign Google Sheets Data Validation List Formula Engine
+        let sheet_val_engine = SovereignGoogleSheetsDataValidationListFormulaEngine::new();
+        let list_rule = SheetDataValidationRule {
+            rule_id: "rule_dept".to_string(),
+            field_name: "department".to_string(),
+            rule_kind: ValidationRuleKind::ListOfItems(vec!["Engineering".to_string(), "Sales".to_string()]),
+            allow_invalid_with_warning: false,
+            error_message: "Department must be Engineering or Sales".to_string(),
+        };
+        assert!(sheet_val_engine.validate_cell_value("Engineering", &list_rule).unwrap());
+        assert!(sheet_val_engine.validate_cell_value("Marketing", &list_rule).is_err());
+        assert_eq!(sheet_val_engine.generate_dropdown_options(&list_rule).len(), 2);
+
+        // 25. Sovereign Google Docs Watermark & Header Footer Layout Engine
+        let layout_engine = SovereignGoogleDocsWatermarkAndHeaderFooterLayoutEngine::new();
+        let section = HeaderFooterSection {
+            header_text: "Confidential - Page {PAGE} of {PAGES}".to_string(),
+            footer_text: "SigmaOS Enterprise".to_string(),
+            apply_to_first_page: true,
+            odd_even_different: false,
+        };
+        let (hdr, ftr) = layout_engine.format_header_footer(&section, 2, 10, false);
+        assert_eq!(hdr, "Confidential - Page 2 of 10");
+        assert_eq!(ftr, "SigmaOS Enterprise");
+
+        let watermark = WatermarkSpec {
+            text: "DRAFT".to_string(),
+            font_size_pt: 48.0,
+            opacity: 0.3,
+            rotation_degrees: 45.0,
+            color_hex: "#FF0000".to_string(),
+        };
+        let (cx, cy, scale) = layout_engine.calculate_watermark_transform(&watermark, 612.0, 792.0);
+        assert_eq!(cx, 306.0);
+        assert_eq!(cy, 396.0);
+        assert_eq!(scale, 4.0);
+
+        // 26. Sovereign Microsoft 365 Co-authoring Operational Transformation Engine
+        let ot_engine = SovereignMicrosoft365CoauthoringOperationalTransformEngine::new();
+        let op_a = CoauthorOperation {
+            op_kind: CoauthorOpKind::Insert { position: 5, text: "Hello ".to_string() },
+            site_id: 1,
+            vector_clock: 1,
+        };
+        let op_b = CoauthorOperation {
+            op_kind: CoauthorOpKind::Insert { position: 5, text: "World ".to_string() },
+            site_id: 2,
+            vector_clock: 1,
+        };
+        let (p_a, p_b) = ot_engine.transform_operations(&op_a, &op_b);
+        assert_eq!(p_a.op_kind, CoauthorOpKind::Insert { position: 5, text: "Hello ".to_string() });
+        assert_eq!(p_b.op_kind, CoauthorOpKind::Insert { position: 11, text: "World ".to_string() });
+
+        let mut doc_text = "Sigma OS".to_string();
+        ot_engine.apply_operation_to_text(&mut doc_text, &op_a);
+        assert_eq!(doc_text, "SigmaHello  OS");
+
+        // 27. Sovereign Zoho Books Multi-Currency FX Revaluation Engine
+        let fx_engine = SovereignZohoBooksMultiCurrencyFxRevaluationEngine::new();
+        let mut spot_rates = HashMap::new();
+        spot_rates.insert("EUR".to_string(), 1.10);
+        let fx_accs = vec![FxAccountBalance {
+            account_id: "acc_eur_cash".to_string(),
+            currency_code: "EUR".to_string(),
+            foreign_amount: 10000.0,
+            base_book_value: 10500.0,
+        }];
+        let revals = fx_engine.calculate_fx_revaluation(&fx_accs, &spot_rates);
+        assert_eq!(revals[0].new_base_value, 11000.0);
+        assert_eq!(revals[0].unrealized_gain_loss, 500.0);
+        let (losses, gains) = fx_engine.generate_revaluation_journal_entry(&revals);
+        assert_eq!(losses, 0.0);
+        assert_eq!(gains, 500.0);
+
+        // 28. Sovereign Salesforce CPQ Subscription Renewal Discount Engine
+        let cpq_renewal_engine = SovereignSalesforceCpqSubscriptionRenewalDiscountEngine::new();
+        let sub_contract = SubscriptionContract {
+            contract_id: "sub_100".to_string(),
+            customer_id: "cust_acme".to_string(),
+            annual_recurring_revenue: 100000.0,
+            current_discount_pct: 10.0,
+            renewal_uplift_pct: 5.0,
+            is_cotermed: false,
+        };
+        let renewal_quote = cpq_renewal_engine.calculate_renewal_quote(&sub_contract, 12, 10000.0, 2.0);
+        assert!(renewal_quote.renewal_arr > 100000.0);
+        assert_eq!(renewal_quote.final_discount_pct, 8.0);
+
+        // 29. Sovereign Odoo MRP Work Center OEE Efficiency Engine
+        let oee_engine = SovereignOdooMrpWorkCenterOeeEfficiencyEngine::new();
+        let oee_metrics = WorkCenterOeeMetrics {
+            planned_production_hours: 8.0,
+            actual_operating_hours: 7.5,
+            ideal_cycle_time_per_unit_sec: 30.0,
+            total_units_produced: 800,
+            good_units_produced: 780,
+        };
+        let oee_res = oee_engine.compute_work_center_oee(&oee_metrics);
+        assert!(oee_res.availability_rate > 0.9);
+        assert!(oee_res.performance_rate > 0.8);
+        assert!(oee_res.quality_rate > 0.9);
+        assert_eq!(oee_engine.classify_oee_status(oee_res.overall_oee_pct), "Effective");
+
+        // 30. Sovereign Bitrix24 Omnichannel SLA Escalation Router Engine
+        let sla_engine = SovereignBitrix24OmnichannelSlaEscalationRouterEngine::new();
+        let sla_rules = vec![OmnichannelSlaRule {
+            priority: TicketPriority::High,
+            max_response_minutes: 30,
+            max_resolution_minutes: 240,
+            escalation_tier: 1,
+        }];
+        let sla_eval = sla_engine.evaluate_ticket_sla(TicketPriority::High, 45, 100, &sla_rules);
+        assert!(sla_eval.is_response_breached);
+        assert!(!sla_eval.is_resolution_breached);
+        assert_eq!(sla_eval.current_tier, 2);
+        assert_eq!(sla_eval.assigned_queue, "Tier 2 Escalations Queue");
     }
 }
