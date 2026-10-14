@@ -14,6 +14,7 @@ pub mod audiocraft;
 pub mod vectoranimation;
 pub mod model3d;
 pub mod artcraft;
+pub mod wordcraft;
 
 pub use photocraft::{
     PhotoEditor, ImageLayer, Filter, Adjustment, LayerType, LayerMask, AdjustmentType,
@@ -98,4 +99,12 @@ pub use model3d::{
 pub use artcraft::{
     ArtSuite, Project, Workspace,
     init_artcraft, get_artcraft,
+};
+pub use wordcraft::{
+    Document, Section, Paragraph, TextRun, TextStyle, Table, TableRow, TableCell,
+    Comment, TrackedChange, ChangeType, Alignment, FontFamily as WordCraftFontFamily,
+    DocumentExportFormat, WordCraftPullRequestSpec, WordCraftDocumentEnginePrDeployer,
+    WordCraftCollaborationRevisionPrDeployer, WordCraftExportConversionPrDeployer,
+    WordCraftMasterPrDeploymentSuite, fnv1a_wordcraft_pr_digest,
+    init_wordcraft, get_wordcraft,
 };

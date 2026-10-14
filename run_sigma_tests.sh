@@ -1267,4 +1267,11 @@ if [ -f "src/distro/sovereign_open_source_os_apex_inspirations_v50.rs" ]; then
 >>>>>>> origin/main
 fi
 
+if [ -f "src/creative/wordcraft.rs" ]; then
+    echo "Running WordCraft Creative Suite PR engine test suite..."
+    mkdir -p build
+    rustc --test src/creative/wordcraft.rs --edition=2021 -o build/test_wordcraft
+    ./build/test_wordcraft
+fi
+
 echo "All SigmaOS test suites completed."

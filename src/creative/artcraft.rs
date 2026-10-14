@@ -21,6 +21,10 @@ pub enum ProjectType {
     Design,
     Effect,
     Scene,
+    WordCraft,
+    Document,
+    TextDocument,
+    Word,
 }
 
 /// Project
