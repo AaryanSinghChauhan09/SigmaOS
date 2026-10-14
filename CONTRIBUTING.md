@@ -37,7 +37,6 @@ All contributions to SigmaOS must strictly adhere to the following architectural
 
 SigmaOS applies a structured cadence to ensure isolated components transition smoothly into reviewable, integrated pull requests:
 
-<<<<<<< HEAD
 | Period | Thread Manager / Scheduler Work | OS-Wide Maintenance | Required PR Output |
 |---|---|---|---|
 | **Daily** | Triage scheduler bugs, flaky tests, lock-order warnings, and regression reports | Triage CI failures, build breakage, security advisories, and documentation drift | Bug reports or small fix PRs |
@@ -73,56 +72,12 @@ SigmaOS applies a structured cadence to ensure isolated components transition sm
 ### Verification Block
 
 Minimum mandatory verification commands before submitting a PR:
-=======
-## Mandatory Subsystem & Component Rules
-
-All contributions must strictly comply with the following component rules:
-
-### Code Rules
-- **Logical Isolation:** One logical subsystem change per PR.
-- **API Completeness:** No new public API without documentation, tests, and a capability-status update in `FEATURE_STATUS.toml`.
-- **Unsafe Rust Safety Invariants:** No `unsafe` Rust without an explicit safety comment detailing invariants, aliasing guarantees, lifetime bounds, and panic safety.
-- **Lock Ordering:** Every lock acquisition must have a documented lock order to prevent deadlocks.
-- **Kernel Bounds:** No unbounded allocation, recursion, or loops in kernel context.
-- **Timeout Protection:** Every blocking operation must have a timeout or explicit wakeup path.
-- **Error Handling:** Every error must be handled or explicitly documented as fatal.
-- **Runtime Verification:** No feature is marked "complete" until connected to the runtime path and verified.
-
-### Testing Rules
-- **Unit Tests:** Unit tests for pure logic.
-- **Integration Tests:** Integration tests for cross-subsystem behavior.
-- **Stress & Concurrency:** Concurrency stress tests for synchronizations.
-- **Fuzzing:** Fuzz tests for parsers, syscall inputs, VFS paths, and network packets.
-- **Boot Smoke:** Boot smoke tests for kernel-facing changes.
-- **Bug Fix Regressions:** Regression test attached to every fixed bug.
-
-### Fast Checks & Verification Block
-Before submitting a pull request, execute the required verification block:
->>>>>>> origin/main
 
 ```bash
 cargo fmt --check
-<<<<<<< HEAD
 cargo clippy --all-targets -- -D warnings
 cargo check --lib
 cargo test --lib
-=======
-
-# Clippy lint check with denied warnings
-cargo clippy --all-targets --all-features -- -D warnings
-
-# Core workspace check & unit tests
-cargo check --lib
-cargo test --lib
-
-# Check no_std compliance across kernel modules
-./scripts/no_std_check.sh
-
-# Run standalone rustc unit tests for modified files
-./scripts/changed_files_rustc_tests.sh
-
-# Execute complete test suite
->>>>>>> origin/main
 ./run_sigma_tests.sh
 ```
 

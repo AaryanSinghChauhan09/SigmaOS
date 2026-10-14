@@ -12,12 +12,6 @@
 **Learning:** Replacing byte-by-byte `output.push(byte)` loops with `extend_from_slice` and pre-allocated `with_capacity` in hot shell command output builders eliminates repeated re-allocation checks. Replacing two-pass registry lookup (`.position()` followed by index subscripting) with a single-pass `iter_mut()` loop eliminates redundant linear scans over trait object pointers.
 **Action:** Always pre-allocate capacity and use bulk slice extension for byte buffer formatting, and use single-pass iterator loops for trait object searches.
 
-<<<<<<< HEAD
 ## 2025-05-25 - Zero-Allocation File Block Skipping via Seek
 **Learning:** Core utilities processing archived/chunked data (such as `tar`) often discard data blocks by allocating `vec![0u8; bytes_to_skip]` and reading bytes off disk into heap memory, causing $O(N)$ allocation and disk throughput overhead during index/header listing operations. Replacing buffer allocation with $O(1)$ zero-allocation `File::seek(SeekFrom::Current(bytes_to_skip))` eliminates both memory allocation and byte copy overhead completely.
 **Action:** Always use relative file seeking (`SeekFrom::Current`) instead of heap allocation buffers when skipping data blocks in stream processors and core utilities.
-=======
-## 2025-05-25 - Pre-Allocating String Capacity in Key Combination Formatters
-**Learning:** In desktop shortcut formatting functions where multiple modifier strings and key labels are concatenated in sequence, `String::new()` incurs dynamic heap reallocations as characters are appended. Pre-allocating capacity using `String::with_capacity(estimated_len)` based on modifier count and key length eliminates intermediate buffer reallocations.
-**Action:** Pre-allocate String capacity using `String::with_capacity` when formatting multi-part key binding combinations or string labels.
->>>>>>> origin/main
