@@ -367,3 +367,10 @@ files = ["docs/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md", "wiki/SYSTEM_UTILITIES_DEV
 description = "SigmaOS System Utilities Master Architecture, POSIX compatibility baseline, 18-PR roadmap, periodic maintenance framework, and review merge gates"
 test_evidence = "Architectural specification and command contract roadmap published in docs/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md"
 next_milestone = "PR 1: Audit current tools and define compatibility policy; PR 3: Shared CLI contract helpers"
+
+[userspace.cli_development_plan]
+status = "modeled"
+files = ["docs/SIGMAOS_CLI_DEVELOPMENT_PLAN.md", "wiki/27-SigmaOS-CLI-Development-Plan.md"]
+description = "SigmaOS CLI Development Plan defining two-layer architecture (system utilities vs shell engine), POSIX compatibility profile, 18-PR sequence, periodic maintenance cadence, command family rules, and merge gates."
+test_evidence = "Architectural specification published in docs/SIGMAOS_CLI_DEVELOPMENT_PLAN.md and wiki/27-SigmaOS-CLI-Development-Plan.md; verified via governance wiki sync tests."
+next_milestone = "PR 1: Define CLI architecture and command compatibility profile; PR 3: Shared argument, diagnostics, and output framework."
