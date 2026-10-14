@@ -33,7 +33,12 @@ impl LinuxIoUringFutex2V50PrEngine {
         Self
     }
 
-    pub fn process_pr(&self, pr_id: &str, sq_ring_entries: u32, futex_waitv_count: u32) -> EcosystemGapV50Pr {
+    pub fn process_pr(
+        &self,
+        pr_id: &str,
+        sq_ring_entries: u32,
+        futex_waitv_count: u32,
+    ) -> EcosystemGapV50Pr {
         EcosystemGapV50Pr {
             pr_id: pr_id.to_string(),
             title: format!("Linux 6.12+ io_uring SQPOLL & futex2 PR: {}", pr_id),
@@ -55,7 +60,12 @@ impl FreeBsdCapsicumCasperV50PrEngine {
         Self
     }
 
-    pub fn process_pr(&self, pr_id: &str, jail_name: &str, casper_service: &str) -> EcosystemGapV50Pr {
+    pub fn process_pr(
+        &self,
+        pr_id: &str,
+        jail_name: &str,
+        casper_service: &str,
+    ) -> EcosystemGapV50Pr {
         EcosystemGapV50Pr {
             pr_id: pr_id.to_string(),
             title: format!("FreeBSD Capsicum Casper PR: {}", jail_name),
@@ -187,7 +197,12 @@ impl NetBsdNpfJitFirewallV50PrEngine {
         Self
     }
 
-    pub fn process_pr(&self, pr_id: &str, rule_set_name: &str, byte_count: usize) -> EcosystemGapV50Pr {
+    pub fn process_pr(
+        &self,
+        pr_id: &str,
+        rule_set_name: &str,
+        byte_count: usize,
+    ) -> EcosystemGapV50Pr {
         EcosystemGapV50Pr {
             pr_id: pr_id.to_string(),
             title: format!("NetBSD NPF JIT PR: {}", rule_set_name),
@@ -278,15 +293,27 @@ impl SovereignLinuxBsdEcosystemGapClosureV50PrSuite {
     pub fn run_all_prs(&self) -> Vec<EcosystemGapV50Pr> {
         vec![
             self.io_uring_engine.process_pr("PR-V50-001", 1024, 16),
-            self.capsicum_engine.process_pr("PR-V50-002", "sandboxed_jail_1", "casper_dns"),
-            self.softraid_engine.process_pr("PR-V50-003", "sd0a_crypto", "AES-XTS-256"),
-            self.hammer2_engine.process_pr("PR-V50-004", "root_pfs", 2048),
-            self.portage_engine.process_pr("PR-V50-005", "sys-libs/zlib", "1.3"),
-            self.apk_engine.process_pr("PR-V50-006", "sovereign.apkovl.tar.gz"),
-            self.nix_guix_engine.process_pr("PR-V50-007", "github:SigmaOS/packages", "sha256-v50proof"),
-            self.npf_engine.process_pr("PR-V50-008", "stateful_firewall", 512),
-            self.clear_engine.process_pr("PR-V50-009", "extreme_performance"),
-            self.illumos_engine.process_pr("PR-V50-010", "vnic_switch0", "proc::sys_read"),
+            self.capsicum_engine
+                .process_pr("PR-V50-002", "sandboxed_jail_1", "casper_dns"),
+            self.softraid_engine
+                .process_pr("PR-V50-003", "sd0a_crypto", "AES-XTS-256"),
+            self.hammer2_engine
+                .process_pr("PR-V50-004", "root_pfs", 2048),
+            self.portage_engine
+                .process_pr("PR-V50-005", "sys-libs/zlib", "1.3"),
+            self.apk_engine
+                .process_pr("PR-V50-006", "sovereign.apkovl.tar.gz"),
+            self.nix_guix_engine.process_pr(
+                "PR-V50-007",
+                "github:SigmaOS/packages",
+                "sha256-v50proof",
+            ),
+            self.npf_engine
+                .process_pr("PR-V50-008", "stateful_firewall", 512),
+            self.clear_engine
+                .process_pr("PR-V50-009", "extreme_performance"),
+            self.illumos_engine
+                .process_pr("PR-V50-010", "vnic_switch0", "proc::sys_read"),
         ]
     }
 }
