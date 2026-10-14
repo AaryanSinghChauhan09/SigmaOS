@@ -36,6 +36,8 @@ pub mod sigmaresource;
 pub mod sigmaconfig;
 pub mod sigmaconfigeditor;
 pub mod sigmatuning;
+pub mod sigmaalert;
+pub mod sigmahealth;
 pub mod sigmait;
 pub mod sigmaevent;
 pub mod sigmaswap;
@@ -228,6 +230,16 @@ pub use sigmatuning::{
     SigmaTuning, TunableParam, TuningCategory, TuningProfile,
     init_sigmatuning, get_sigmatuning, get_sigmatuning_mut,
     sysctl_get, sysctl_set, apply_tuning_profile,
+};
+pub use sigmaalert::{
+    SigmaAlert, Alert, AlertSeverity, AlertCategory, AlertStatus, AlertChannel,
+    init_sigmaalert, get_sigmaalert, get_sigmaalert_mut,
+    send_alert, resolve_alert, active_alert_count,
+};
+pub use sigmahealth::{
+    SigmaHealth, HealthProbe, Subsystem as HealthSubsystem, HealthState, SystemHealthReport,
+    init_sigmahealth, get_sigmahealth, get_sigmahealth_mut,
+    system_health_state, system_health_score, generate_health_report,
 };
 pub use sigmait::{
     SigmaAudit, AuditEvent, AuditEventType, AuditSeverity,
