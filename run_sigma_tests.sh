@@ -1269,6 +1269,13 @@ if [ -f "src/distro/sovereign_open_source_os_apex_inspirations_v50.rs" ]; then
     ./build/test_apex_v50
 fi
 
+if [ -f "src/distro/sovereign_open_source_os_inspirations_pr.rs" ]; then
+    echo "Running Sovereign Open Source OS Inspirations Parity PR Engine test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_open_source_os_inspirations_pr.rs --edition=2021 -o build/test_open_source_os_inspirations_pr
+    ./build/test_open_source_os_inspirations_pr
+fi
+
 if [ -f "src/creative/deckcraft.rs" ]; then
     echo "Running DeckCraft Presentation Framework & PR Engine test suite..."
     mkdir -p build
