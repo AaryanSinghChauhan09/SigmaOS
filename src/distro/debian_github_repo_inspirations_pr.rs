@@ -920,7 +920,10 @@ impl DebianDpkgReconfigureStateEngine {
     }
 
     pub fn reconfigure_package(&mut self, pkg: &str) -> u32 {
-        let entry = self.reconfigured_packages.entry(pkg.to_string()).or_insert(0);
+        let entry = self
+            .reconfigured_packages
+            .entry(pkg.to_string())
+            .or_insert(0);
         *entry += 1;
         *entry
     }
@@ -950,7 +953,8 @@ impl DebianDep5CopyrightValidator {
     }
 
     pub fn validate_dep5_header(&self, content: &str) -> bool {
-        content.contains("Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/")
+        content
+            .contains("Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/")
             && content.contains("Upstream-Name:")
     }
 }
@@ -971,7 +975,8 @@ impl DebianDgetFetchVerifier {
     }
 
     pub fn fetch_source_package(&mut self, dsc_url: &str, pqc_hash: &str) {
-        self.downloaded_sources.insert(dsc_url.to_string(), pqc_hash.to_string());
+        self.downloaded_sources
+            .insert(dsc_url.to_string(), pqc_hash.to_string());
     }
 
     pub fn verify_source_integrity(&self, dsc_url: &str, expected_hash: &str) -> bool {
@@ -1219,7 +1224,9 @@ mod tests {
 
         let apt_file = DebianAptFileContentsIndexer::new();
         assert_eq!(
-            apt_file.search_contents("/usr/include/curl/curl.h").map(|s| s.as_str()),
+            apt_file
+                .search_contents("/usr/include/curl/curl.h")
+                .map(|s| s.as_str()),
             Some("libcurl4-openssl-dev")
         );
 
