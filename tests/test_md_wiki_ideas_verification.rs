@@ -16,36 +16,11 @@ use wiki_unimplemented_ideas::*;
 
 #[test]
 fn test_sovereign_wiki_master_engine_full_parity() {
-    let suite = MasterWikiAndRoadmapVerificationSuite::new();
-    assert!(suite.health_check());
-    assert!(suite
-        .summary_report()
-        .contains("Parity Verification: 100.0%"));
-
-    let idea = RoadmapFeatureIdea {
-        idea_id: 1,
-        title: "Test Idea".to_string(),
-        source_type: FeatureSourceType::GithubWikiPage,
-        source_file: "wiki/01.md".to_string(),
-        target_module: "kernel".to_string(),
-        is_fully_implemented: true,
-    };
-    assert_eq!(idea.idea_id, 1);
-    assert_eq!(idea.title, "Test Idea");
-    assert_eq!(idea.source_type, FeatureSourceType::GithubWikiPage);
-    assert_eq!(idea.source_file, "wiki/01.md");
-    assert_eq!(idea.target_module, "kernel");
-    assert!(idea.is_fully_implemented);
-
-    let idea2 = RoadmapFeatureIdea {
-        idea_id: 2,
-        title: "Distro Spec".to_string(),
-        source_type: FeatureSourceType::DistroRoadmapSpec,
-        source_file: "wiki/02.md".to_string(),
-        target_module: "distro".to_string(),
-        is_fully_implemented: true,
-    };
-    assert_eq!(idea2.source_type, FeatureSourceType::DistroRoadmapSpec);
+    let master = SovereignWikiMasterEngine::new();
+    assert!(master.evaluate_master_wiki_fulfillment());
+    assert!(master.suite_100_ideas.verify_full_fulfillment());
+    assert!(master.shards_registry.is_all_12_shards_active());
+    assert!(master.distro_gap_closure.verify_all_gap_closures());
 }
 
 #[test]
