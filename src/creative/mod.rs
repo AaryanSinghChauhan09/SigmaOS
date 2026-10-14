@@ -57,6 +57,9 @@ pub use effectcraft::{
     BlendMode as EffectBlendMode, EffectCategory, ParameterType,
     Keyframe, InterpolationType, AnimatedParameter,
     EffectInstance, NodeType, CompositingNode, NodeGraph,
+    EffectCraftPullRequestSpec, EffectCraftNodeCompositingPrDeployer,
+    EffectCraftParticleShaderPrDeployer, EffectCraftMotionTrackingKeyingPrDeployer,
+    EffectCraftMasterPrDeploymentSuite, fnv1a_effectcraft_pr_digest,
     init_effectcraft, get_effectcraft,
 };
 pub use lightcraft::{
