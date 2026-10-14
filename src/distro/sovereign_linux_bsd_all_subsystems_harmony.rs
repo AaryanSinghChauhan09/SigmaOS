@@ -258,6 +258,8 @@ impl SovereignSubsystemDistroHarmonyEngine {
             LinuxBsdDistroInspiration::MidnightBSD,
             LinuxBsdDistroInspiration::RedoxOS,
             LinuxBsdDistroInspiration::HaikuOS,
+            LinuxBsdDistroInspiration::QubesOS,
+            LinuxBsdDistroInspiration::WhonixOS,
         ];
 
         let subsystems_list = [
@@ -611,6 +613,54 @@ impl SovereignSubsystemDistroHarmonyEngine {
                 "rump_anykernel_userspace_driver_context_switch_guard",
                 true,
             ),
+            (
+                SigmaOsSubsystem::TelemetryObservability,
+                SigmaOsSubsystem::SecuritySandboxing,
+                LinuxBsdDistroInspiration::TailsOS,
+                "pol_telemetry_privacy_guard",
+                "amnesic_telemetry_scrubber_and_pii_filter",
+                true,
+            ),
+            (
+                SigmaOsSubsystem::CryptographySecurity,
+                SigmaOsSubsystem::FilesystemStorage,
+                LinuxBsdDistroInspiration::FreeBSD,
+                "pol_crypto_geli_luks",
+                "pqc_dilithium_geli_luks2_transparent_vfs_encryption",
+                true,
+            ),
+            (
+                SigmaOsSubsystem::AccessibilityInput,
+                SigmaOsSubsystem::DesktopCompositor,
+                LinuxBsdDistroInspiration::UbuntuLinux,
+                "pol_access_fcitx5_orca",
+                "wayland_input_method_v2_accessibility_overlay",
+                false,
+            ),
+            (
+                SigmaOsSubsystem::TimeSynchronization,
+                SigmaOsSubsystem::KernelScheduling,
+                LinuxBsdDistroInspiration::ClearLinux,
+                "pol_time_ptp_clock",
+                "ptp_hardware_clock_nanosecond_scheduler_timer",
+                false,
+            ),
+            (
+                SigmaOsSubsystem::DeviceHotplug,
+                SigmaOsSubsystem::DriversHardware,
+                LinuxBsdDistroInspiration::VoidLinux,
+                "pol_dev_udev_devd",
+                "udev_devd_bridge_hotplug_driver_auto_probe",
+                false,
+            ),
+            (
+                SigmaOsSubsystem::SignalDelivery,
+                SigmaOsSubsystem::ProcessActivity,
+                LinuxBsdDistroInspiration::OpenBSD,
+                "pol_sig_realtime_frame",
+                "sigreturn_frame_guard_and_uncatchable_signal_bypass",
+                true,
+            ),
         ];
 
         for (src, tgt, distro, id, rule, strict) in default_rules {
@@ -941,7 +991,46 @@ mod tests {
             assert!(spec
                 .supported_distros
                 .contains(&LinuxBsdDistroInspiration::HaikuOS));
+            assert!(spec
+                .supported_distros
+                .contains(&LinuxBsdDistroInspiration::QubesOS));
+            assert!(spec
+                .supported_distros
+                .contains(&LinuxBsdDistroInspiration::WhonixOS));
         }
+    }
+
+    #[test]
+    fn test_all_31_subsystems_and_36_distros_interop() {
+        let mut orchestrator = SovereignUniversalCrossDistroSubsystemOrchestrator::new();
+        assert!(orchestrator.verify_orchestration_harmony());
+        assert_eq!(orchestrator.master_harmony_index(), 100);
+
+        // Test policy translation across newly added cross-subsystem pairs
+        let telemetry_policy = orchestrator
+            .translate_cross_subsystem_policy(
+                SigmaOsSubsystem::TelemetryObservability,
+                SigmaOsSubsystem::SecuritySandboxing,
+            )
+            .expect("Telemetry -> Security policy should exist");
+        assert_eq!(telemetry_policy.policy_id, "pol_telemetry_privacy_guard");
+
+        let crypto_policy = orchestrator
+            .translate_cross_subsystem_policy(
+                SigmaOsSubsystem::CryptographySecurity,
+                SigmaOsSubsystem::FilesystemStorage,
+            )
+            .expect("Crypto -> Storage policy should exist");
+        assert_eq!(crypto_policy.policy_id, "pol_crypto_geli_luks");
+
+        // Route events across subsystems
+        let event_id = orchestrator.route_harmony_event(
+            SigmaOsSubsystem::DeviceHotplug,
+            SigmaOsSubsystem::DriversHardware,
+            "PROBE_USB_DEVICE",
+            "vendor_id=0x1234,product_id=0x5678",
+        );
+        assert!(event_id > 0);
     }
 
     #[test]
