@@ -158,6 +158,26 @@ impl UniversalPackageImporter {
             Some(UniversalPackageFormat::SpackHpc)
         } else if filename.ends_with(".conan") {
             Some(UniversalPackageFormat::ConanCpp)
+        } else if filename.ends_with(".spec") {
+            Some(UniversalPackageFormat::FedoraRpm)
+        } else if filename.contains("PKGBUILD") || filename.ends_with(".pkgbuild") {
+            Some(UniversalPackageFormat::ArchPacman)
+        } else if filename == "control" || filename.ends_with("/control") {
+            Some(UniversalPackageFormat::DebianDeb)
+        } else if filename.contains("APKINDEX") {
+            Some(UniversalPackageFormat::AlpineApk)
+        } else if filename.contains("+MANIFEST") {
+            Some(UniversalPackageFormat::FreeBsdPkg)
+        } else if filename.contains("+CONTENTS") {
+            Some(UniversalPackageFormat::OpenBsdPkg)
+        } else if filename.ends_with(".recipe") {
+            Some(UniversalPackageFormat::HaikuHpkg)
+        } else if filename.contains("pspec.xml") || filename.ends_with(".stone") {
+            Some(UniversalPackageFormat::SolusEopkg)
+        } else if filename.contains("snapcraft.yaml") {
+            Some(UniversalPackageFormat::SnapPackage)
+        } else if filename.ends_with(".kiss") || filename.ends_with(".cpt") || filename.contains("Pkgfile") {
+            Some(UniversalPackageFormat::CruxPkg)
         } else {
             None
         }
@@ -2894,5 +2914,69 @@ mod tests {
         assert!(translated.contains(&"sovereign-shell".to_string()));
         assert!(translated.contains(&"sovereign-libc".to_string()));
         assert!(translated.contains(&"sovereign-openssl".to_string()));
+    }
+
+    #[test]
+    fn test_expanded_distro_pm_dispatch_and_autodetect() {
+        let mut pkg_mgr = SigmaPkg {
+            config: PkgConfig::default(),
+            repositories: vec![],
+            local_packages: HashMap::new(),
+            cache_dir: PathBuf::from("/tmp/sigma_cache_expanded_test"),
+            database_dir: PathBuf::from("/tmp/sigma_db_expanded_test"),
+        };
+
+        let dnf5_res = pkg_mgr
+            .execute_universal_cli_command("dnf5 install clang")
+            .unwrap();
+        assert!(dnf5_res.contains("clang"));
+
+        let apt_cache_res = pkg_mgr
+            .execute_universal_cli_command("apt-cache search openssl")
+            .unwrap();
+        assert!(apt_cache_res.contains("Found"));
+
+        let slapt_res = pkg_mgr
+            .execute_universal_cli_command("slapt-get --install bash")
+            .unwrap();
+        assert!(slapt_res.contains("bash"));
+
+        let pkgman_res = pkg_mgr
+            .execute_universal_cli_command("pkgman install haiku-dep")
+            .unwrap();
+        assert!(pkgman_res.contains("haiku-dep"));
+
+        assert_eq!(
+            UniversalPackageImporter::autodetect_format("nginx.spec"),
+            Some(UniversalPackageFormat::FedoraRpm)
+        );
+        assert_eq!(
+            UniversalPackageImporter::autodetect_format("PKGBUILD"),
+            Some(UniversalPackageFormat::ArchPacman)
+        );
+        assert_eq!(
+            UniversalPackageImporter::autodetect_format("control"),
+            Some(UniversalPackageFormat::DebianDeb)
+        );
+        assert_eq!(
+            UniversalPackageImporter::autodetect_format("APKINDEX"),
+            Some(UniversalPackageFormat::AlpineApk)
+        );
+        assert_eq!(
+            UniversalPackageImporter::autodetect_format("+MANIFEST"),
+            Some(UniversalPackageFormat::FreeBsdPkg)
+        );
+        assert_eq!(
+            UniversalPackageImporter::autodetect_format("+CONTENTS"),
+            Some(UniversalPackageFormat::OpenBsdPkg)
+        );
+        assert_eq!(
+            UniversalPackageImporter::autodetect_format("app.recipe"),
+            Some(UniversalPackageFormat::HaikuHpkg)
+        );
+        assert_eq!(
+            UniversalPackageImporter::autodetect_format("pspec.xml"),
+            Some(UniversalPackageFormat::SolusEopkg)
+        );
     }
 }
