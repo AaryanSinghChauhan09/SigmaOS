@@ -1,16 +1,3 @@
-<<<<<<< HEAD
-# Runbook: Documentation Sync
-
-## Purpose
-Ensure README commands, build scripts, Makefile targets, and agent capability disclosures remain synchronized with actual test evidence.
-
-## Procedure
-1. Extract all bash commands documented in `README.md` and `CONTRIBUTING.md`.
-2. Verify each command against `Makefile`, `Cargo.toml`, and scripts in `scripts/` or `tools/`.
-3. Check `reports/capability/verified_today.md` for current verified status.
-4. Flag documentation discrepancies or unverified claims.
-5. Generate documentation synchronization report in `reports/docs/docs_sync_report.md`.
-=======
 # Runbook: Documentation and Onboarding Agent (`docs-sync`)
 
 ## Purpose
@@ -27,4 +14,3 @@ Ensure all documentation, onboarding guides, command references, and troubleshoo
    - Flag any statement in documentation promising unverified parity or production readiness without test logs.
 4. Update Contributor Quickstart:
    - Confirm clone, build, unit test, and QEMU smoke test steps function cleanly on fresh environments.
->>>>>>> origin/main

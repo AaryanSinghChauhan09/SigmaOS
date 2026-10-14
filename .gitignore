@@ -1,72 +1,32 @@
+# Generated build outputs and targets
 /target/
-**/target/
-**/*.rs.bk
-*.log
-*.tmp
-SigmaOS.wiki/
-
-node_modules/
-# Build artifacts and compiled binaries
-build/*
-!build/.gitkeep
-*.iso
-*.bin
-*.img
+/build/
 *.o
 *.a
 *.so
 *.dylib
 *.dll
 *.exe
-*.elf
-test_runner
-.cache/
-__pycache__/
-*.pyc
-/test_dma
-/test_runner
-/test_universal
-/tests/sigma_test_runner
-*.png
-target/
-wiki_repo/
-*.buildinfo
-/cgroup_v2_controllers
-/cron
-/eventfd
-/flock
-/hostname
-/inotify
-/io_uring
-/ioctl
-/landlock
-/mount_namespace
-/msgqueue
-/network_namespace
-/overlay
-/paging
-/pipe
-/process_group
-/procfs
-/resource
-/rlimit
-/semaphore
-/shm
-/signal
-/signalfd
-/socket
-/swap
-/sysfs
-/syslog
-/time
-/timerfd
-/tmpfs
-/umask
-/unveil
-/user_group
-/user_group_db
-/uts_namespace
-/zfs
+*.iso
+*.img
+
+# Logs and transient execution artifacts
+*.log
+*.tmp
+*.bin
+/tmp/
+
+# IDE and OS metadata
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Fuzzing artifacts
+fuzz/corpus/
+fuzz/artifacts/
+
+# System-level documentation files exception rules
 *.md
 *.txt
 *.py
@@ -75,10 +35,7 @@ WIKI/
 !docs/*.md
 !docs/**/*.md
 !wiki/*.md
-<<<<<<< HEAD
 !wiki/**/*.md
-=======
->>>>>>> origin/main
 !Agents/*.md
 !.agents/*.md
 !.agents/**/*.md
@@ -88,7 +45,3 @@ WIKI/
 !.github/*.md
 !README.md
 !CONTRIBUTING.md
-!AGENTS.md
-!scripts/*.py
-!tools/*.py
-!tools/**/*.py
