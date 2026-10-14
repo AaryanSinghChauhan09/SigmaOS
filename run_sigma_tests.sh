@@ -1255,4 +1255,11 @@ if [ -f "src/distro/sovereign_open_source_os_apex_inspirations_v50.rs" ]; then
     ./build/test_apex_v50
 fi
 
+if [ -f "src/creative/deckcraft.rs" ]; then
+    echo "Running DeckCraft Presentation Framework & PR Engine test suite..."
+    mkdir -p build
+    rustc --test src/creative/deckcraft.rs --edition=2021 -o build/test_deckcraft
+    ./build/test_deckcraft
+fi
+
 echo "All SigmaOS test suites completed."

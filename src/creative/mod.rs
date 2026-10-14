@@ -16,7 +16,7 @@ pub mod vectoranimation;
 pub mod model3d;
 pub mod cadcraft;
 pub mod artcraft;
-pub mod soundcraft;
+pub mod deckcraft;
 
 pub use photocraft::{
     PhotoEditor, ImageLayer, Filter, Adjustment, LayerType, LayerMask, AdjustmentType,
@@ -117,13 +117,12 @@ pub use artcraft::{
     ArtSuite, Project, Workspace,
     init_artcraft, get_artcraft,
 };
-pub use soundcraft::{
-    SoundCraftAudioClip, SoundCraftAudioEnginePrDeployer, SoundCraftAudioTrack,
-    SoundCraftChannelConfig, SoundCraftDspFilter, SoundCraftDspFilterType,
-    SoundCraftDspSynthesizerPrDeployer, SoundCraftEngine, SoundCraftMasterPrDeploymentSuite,
-    SoundCraftMasteringChain, SoundCraftMidiNote, SoundCraftMidiSequence, SoundCraftPluginFormat,
-    SoundCraftPluginHost, SoundCraftPullRequestSpec, SoundCraftSampleFormat, SoundCraftSampleRate,
-    SoundCraftSpatial3DPanner, SoundCraftSpatialMixingMasteringPrDeployer, SoundCraftSynthesizer,
-    SoundCraftTrackType, SoundCraftTransportState, fnv1a_soundcraft_pr_digest, get_soundcraft,
-    init_soundcraft,
+pub use deckcraft::{
+    DeckCraftEngine, SlideDeck, Slide, SlideLayout, SlideElement, SlideTransition, SlideAnimation,
+    SlideTheme, PresenterNotes, AspectRatio, ElementType as DeckElementType,
+    TransitionType as DeckTransitionType, AnimationType as DeckAnimationType,
+    ExportFormat as DeckExportFormat, PresenterState, DeckCraftPullRequestSpec,
+    DeckCraftSlideLayoutMasterPrDeployer, DeckCraftAnimationTransitionPrDeployer,
+    DeckCraftPresenterZenithPrDeployer, DeckCraftMasterPrDeploymentSuite,
+    init_deckcraft, get_deckcraft, fnv1a_deckcraft_pr_digest,
 };
