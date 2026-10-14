@@ -21,6 +21,8 @@ pub enum ProjectType {
     Design,
     Effect,
     Scene,
+    Grid,
+    Spreadsheet,
 }
 
 /// Project

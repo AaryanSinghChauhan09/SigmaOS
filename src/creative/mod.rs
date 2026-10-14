@@ -14,6 +14,7 @@ pub mod audiocraft;
 pub mod vectoranimation;
 pub mod model3d;
 pub mod artcraft;
+pub mod gridcraft;
 
 pub use photocraft::{
     PhotoEditor, ImageLayer, Filter, Adjustment, LayerType, LayerMask, AdjustmentType,
@@ -98,4 +99,9 @@ pub use model3d::{
 pub use artcraft::{
     ArtSuite, Project, Workspace,
     init_artcraft, get_artcraft,
+};
+pub use gridcraft::{
+    GridcraftEngine, GridcraftPrPullRequestSpec, FormulaEngine, Worksheet, Workbook,
+    PivotTableEngine, DataVisualizationEngine, GridcraftMasterPrDeploymentSuite,
+    init_gridcraft, get_gridcraft,
 };
