@@ -1,53 +1,59 @@
 ## Summary
 
-<!-- What changed and why? -->
+<!-- What file-management or component behavior changed and why? -->
 
-## Task type
+## File component
 
-- [ ] Daily CI maintenance
-- [ ] Weekly dependency/security review
-- [ ] Weekly open-source study
-- [ ] Biweekly component gap review
-- [ ] Monthly boot validation
-- [ ] Monthly installer/recovery rehearsal
-- [ ] Monthly package/update rehearsal
-- [ ] Quarterly release review
-- [ ] Quarterly architecture review
-- [ ] Quarterly hardware audit
-
-## Component
-
-- [ ] Boot / platform
-- [ ] Kernel
-- [ ] Memory
-- [ ] Scheduler
-- [ ] VFS / filesystems
-- [ ] Syscalls
-- [ ] Drivers
-- [ ] Networking
-- [ ] IPC
-- [ ] Security
-- [ ] Userspace
-- [ ] Desktop
-- [ ] Packaging / installer
+- [ ] File descriptor manager
+- [ ] Inode and directory manager
+- [ ] Permission manager
+- [ ] Lock manager
+- [ ] Mount / unmount
+- [ ] Cache
+- [ ] Filesystem
+- [ ] Recovery
+- [ ] procfs / diagnostics
+- [ ] Security / capabilities
 - [ ] Documentation
 - [ ] CI / tooling
+
+## Recurring task
+
+- [ ] PR validation
+- [ ] Daily CI triage
+- [ ] Weekly lifecycle review
+- [ ] Weekly Linux/BSD study
+- [ ] Biweekly memory audit
+- [ ] Biweekly signal/wait audit
+- [ ] Monthly boot validation
+- [ ] Quarterly architecture/security/release review
+
+## Reference behavior
+
+<!-- Required for lifecycle, ABI, or file changes -->
+
+- POSIX section:
+- Linux/BSD/Redox/xv6 reference:
+- SigmaOS current behavior:
+- New behavior:
+- Compatibility impact:
 
 ## Changes
 
 -
--
 
-## Memory safety & concurrency review
+## File safety review
 
-- [ ] Lifecycle transitions follow authoritative state machine
-- [ ] Race-free allocation and atomic ref counts verified
-- [ ] Lock ordering documented and respected
-- [ ] Double-free prevention enforced
-- [ ] Reserved memory regions strictly protected
-- [ ] User/kernel space isolation enforced
-- [ ] W^X (Write XOR Execute) security policy enforced
-- [ ] Resource limits and bounds checks enforced
+- [ ] Lifecycle transitions are valid
+- [ ] Zombies are eventually reaped
+- [ ] Orphans are adopted
+- [ ] PID reuse is safe
+- [ ] Lock ordering is documented
+- [ ] Interrupt-context safety considered
+- [ ] Signal races considered
+- [ ] Double-unlink prevented
+- [ ] Resource limits enforced
+- [ ] No unbounded allocation or recursion
 
 ## Evidence
 
@@ -55,18 +61,19 @@
 - [ ] `cargo fmt --check`
 - [ ] `cargo test --lib`
 - [ ] `./run_sigma_tests.sh`
-- [ ] New or updated unit/integration tests
-- [ ] QEMU boot evidence, if applicable
-- [ ] Installer/recovery evidence, if applicable
-- [ ] Hardware evidence, if applicable
+- [ ] New/updated unit tests
+- [ ] Integration tests
+- [ ] Fuzz target or documented exemption
+- [ ] Boot-to-boot evidence, if boot-affecting
+- [ ] File benchmark, if performance-affecting
 - [ ] Security review requested, if applicable
 
 ## Status updates
 
 - [ ] `FEATURE_STATUS.toml`
 - [ ] `CAPABILITY_MATRIX.toml`
-- [ ] Component documentation
-- [ ] Roadmap or release checklist
+- [ ] File documentation
+- [ ] Boot matrix, if applicable
 
 ## Risks and rollback
 
