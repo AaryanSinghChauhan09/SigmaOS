@@ -21,10 +21,13 @@ pub enum ProjectType {
     Design,
     Effect,
     Scene,
-    Cad,
-    CadCraft,
-    Drafting,
-    SolidModel,
+    Audio,
+    Sound,
+    SoundCraft,
+    Deck,
+    Presentation,
+    Grid,
+    Spreadsheet,
 }
 
 /// Project
