@@ -714,6 +714,13 @@ if [ -f "src/open_source_os_missing_components_parity.rs" ]; then
     ./build/test_open_source_missing_components
 fi
 
+if [ -f "src/distro/sovereign_openbsd_ultimate_parity_pr_suite.rs" ]; then
+    echo "Running Sovereign OpenBSD Ultimate Parity PR Suite test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_openbsd_ultimate_parity_pr_suite.rs --edition=2021 -o build/test_openbsd_ultimate_parity
+    ./build/test_openbsd_ultimate_parity
+fi
+
 if [ -f "src/open_source_obsoletion.rs" ]; then
     echo "Running Open Source Obsoletion test suite..."
     mkdir -p build

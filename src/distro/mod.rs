@@ -598,6 +598,8 @@ pub use sovereign_tech_media_wiki_ultimate_parity_pr::*;
 
 pub mod sovereign_freebsd_ultimate_parity_pr_suite;
 pub use sovereign_freebsd_ultimate_parity_pr_suite::*;
+pub mod sovereign_openbsd_ultimate_parity_pr_suite;
+pub use sovereign_openbsd_ultimate_parity_pr_suite::*;
 
 pub mod sovereign_linux_bsd_lfs_master_harmony;
 pub use sovereign_linux_bsd_lfs_master_harmony::*;
