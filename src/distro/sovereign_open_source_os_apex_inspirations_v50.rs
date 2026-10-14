@@ -38,7 +38,13 @@ impl LinuxSchedExtBpfGovernorEngine {
         }
     }
 
-    pub fn register_task(&mut self, pid: u32, policy: ScxPolicyKind, priority: u8, core_affinity: u32) {
+    pub fn register_task(
+        &mut self,
+        pid: u32,
+        policy: ScxPolicyKind,
+        priority: u8,
+        core_affinity: u32,
+    ) {
         self.registered_tasks.push(SchedTaskSpec {
             pid,
             policy,
@@ -51,7 +57,12 @@ impl LinuxSchedExtBpfGovernorEngine {
         self.registered_tasks
             .iter()
             .find(|t| t.pid == pid)
-            .map(|t| format!("Dispatched PID {} with policy {:?} on CPU core {}", t.pid, t.policy, t.core_affinity))
+            .map(|t| {
+                format!(
+                    "Dispatched PID {} with policy {:?} on CPU core {}",
+                    t.pid, t.policy, t.core_affinity
+                )
+            })
     }
 
     pub fn calculate_vtime_slice(&self, priority: u8) -> u64 {
@@ -150,7 +161,10 @@ impl OpenBsdPledgeUnveilMatrixGuard {
 
     pub fn validate_access(&self, promise: PledgePromise, path: &str) -> bool {
         let promise_ok = self.active_promises.contains(&promise);
-        let path_ok = self.unveiled_paths.iter().any(|u| path.starts_with(&u.path));
+        let path_ok = self
+            .unveiled_paths
+            .iter()
+            .any(|u| path.starts_with(&u.path));
         promise_ok && path_ok
     }
 }
@@ -220,10 +234,18 @@ pub struct HaikuBfsAttributeIndexEngine {
 
 impl HaikuBfsAttributeIndexEngine {
     pub fn new() -> Self {
-        Self { attributes: Vec::new() }
+        Self {
+            attributes: Vec::new(),
+        }
     }
 
-    pub fn index_file_attribute(&mut self, filepath: &str, name: &str, value: &str, attr_type: &str) {
+    pub fn index_file_attribute(
+        &mut self,
+        filepath: &str,
+        name: &str,
+        value: &str,
+        attr_type: &str,
+    ) {
         self.attributes.push((
             filepath.to_string(),
             BfsAttribute {
@@ -271,7 +293,9 @@ pub struct Plan99P2000WireProtocolServer {
 
 impl Plan99P2000WireProtocolServer {
     pub fn new() -> Self {
-        Self { mounted_tags: Vec::new() }
+        Self {
+            mounted_tags: Vec::new(),
+        }
     }
 
     pub fn process_frame(&mut self, frame: P9Frame) -> P9Frame {
@@ -350,7 +374,10 @@ impl AndroidBinderAshmemIpcEngine {
     }
 
     pub fn transact(&self, handle_id: u32, code: u32) -> String {
-        format!("Binder transaction code {} routed to handle {}", code, handle_id)
+        format!(
+            "Binder transaction code {} routed to handle {}",
+            code, handle_id
+        )
     }
 }
 
@@ -477,21 +504,27 @@ impl SovereignOpenSourceOsApexMasterSuite {
 
     pub fn run_apex_suite(&mut self) -> Vec<ApexAuditResult> {
         // 1. SchedExt
-        self.sched_ext.register_task(1001, ScxPolicyKind::Bpfland, 10, 0);
+        self.sched_ext
+            .register_task(1001, ScxPolicyKind::Bpfland, 10, 0);
 
         // 2. VNET Capsicum
-        self.vnet_capsicum.create_vnet_jail(1, "vnet0", "192.168.1.100", &["CAP_NET_BIND"]);
+        self.vnet_capsicum
+            .create_vnet_jail(1, "vnet0", "192.168.1.100", &["CAP_NET_BIND"]);
 
         // 3. Pledge Unveil
-        self.pledge_unveil.apply_pledge(&[PledgePromise::Stdio, PledgePromise::Rpath]);
+        self.pledge_unveil
+            .apply_pledge(&[PledgePromise::Stdio, PledgePromise::Rpath]);
         self.pledge_unveil.unveil_path("/usr/share", "r");
 
         // 4. Nix Flakes
-        self.flake_store.register_flake("nixpkgs", "github:NixOS/nixpkgs", "sha256-abc");
-        self.flake_store.add_store_package("/nix/store/pkg1", "hash1", 1024);
+        self.flake_store
+            .register_flake("nixpkgs", "github:NixOS/nixpkgs", "sha256-abc");
+        self.flake_store
+            .add_store_package("/nix/store/pkg1", "hash1", 1024);
 
         // 5. Haiku BFS
-        self.bfs_index.index_file_attribute("/doc.pdf", "META:title", "Thesis", "string");
+        self.bfs_index
+            .index_file_attribute("/doc.pdf", "META:title", "Thesis", "string");
 
         // 6. Plan 9
         let reply = self.plan9_server.process_frame(P9Frame {
@@ -501,14 +534,16 @@ impl SovereignOpenSourceOsApexMasterSuite {
         });
 
         // 7. Android Binder
-        self.binder_ashmem.register_binder(10, "android.hardware.display");
+        self.binder_ashmem
+            .register_binder(10, "android.hardware.display");
         self.binder_ashmem.create_ashmem_region(1, 4096);
 
         // 8. Cosmopolitan APE
         let ape_ok = self.ape_parser.parse_ape_header(b"MZqFCAAAAA").is_some();
 
         // 9. DTrace Crossbow
-        self.dtrace_crossbow.register_probe("syscall", "sys", "read", "entry");
+        self.dtrace_crossbow
+            .register_probe("syscall", "sys", "read", "entry");
         self.dtrace_crossbow.create_vnic("vnic0", "eth0", 1000);
 
         vec![
@@ -525,7 +560,11 @@ impl SovereignOpenSourceOsApexMasterSuite {
             ApexAuditResult {
                 subsystem_name: "OpenBSD Pledge/Unveil".to_string(),
                 status: "PASS".to_string(),
-                detail: format!("Access valid: {}", self.pledge_unveil.validate_access(PledgePromise::Rpath, "/usr/share/file")),
+                detail: format!(
+                    "Access valid: {}",
+                    self.pledge_unveil
+                        .validate_access(PledgePromise::Rpath, "/usr/share/file")
+                ),
             },
             ApexAuditResult {
                 subsystem_name: "NixOS Flakes Store".to_string(),
@@ -535,7 +574,10 @@ impl SovereignOpenSourceOsApexMasterSuite {
             ApexAuditResult {
                 subsystem_name: "Haiku BFS Index".to_string(),
                 status: "PASS".to_string(),
-                detail: format!("Matches: {:?}", self.bfs_index.query_attribute("META:title", "Thesis")),
+                detail: format!(
+                    "Matches: {:?}",
+                    self.bfs_index.query_attribute("META:title", "Thesis")
+                ),
             },
             ApexAuditResult {
                 subsystem_name: "Plan 9 9P2000 Wire".to_string(),
