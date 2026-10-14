@@ -1,19 +1,22 @@
 ## Summary
 
-<!-- What file-management or component behavior changed and why? -->
+<!-- What shell behavior changed and why? -->
 
-## File component
+## Shell component
 
-- [ ] File descriptor manager
-- [ ] Inode and directory manager
-- [ ] Permission manager
-- [ ] Lock manager
-- [ ] Mount / unmount
-- [ ] Cache
-- [ ] Filesystem
-- [ ] Recovery
-- [ ] procfs / diagnostics
-- [ ] Security / capabilities
+- [ ] Lexer
+- [ ] Parser
+- [ ] Expansion
+- [ ] Executor
+- [ ] Pipelines
+- [ ] Redirection
+- [ ] Job control
+- [ ] Signals
+- [ ] Built-ins
+- [ ] Interactive line editor
+- [ ] Script runner
+- [ ] Diagnostics
+- [ ] Security / sandboxing
 - [ ] Documentation
 - [ ] CI / tooling
 
@@ -21,19 +24,22 @@
 
 - [ ] PR validation
 - [ ] Daily CI triage
-- [ ] Weekly lifecycle review
-- [ ] Weekly Linux/BSD study
-- [ ] Biweekly memory audit
-- [ ] Biweekly signal/wait audit
-- [ ] Monthly boot validation
-- [ ] Quarterly architecture/security/release review
+- [ ] Weekly feature/bug triage
+- [ ] Weekly POSIX/sh study
+- [ ] Biweekly parser/expansion audit
+- [ ] Biweekly built-in review
+- [ ] Monthly boot-to-shell validation
+- [ ] Monthly compatibility suite
+- [ ] Monthly fuzz triage
+- [ ] Monthly security review
+- [ ] Quarterly release/UX/performance review
 
 ## Reference behavior
 
-<!-- Required for lifecycle, ABI, or file changes -->
+<!-- Required for compatibility or grammar changes -->
 
 - POSIX section:
-- Linux/BSD/Redox/xv6 reference:
+- Bash/dash/Zsh/BusyBox reference:
 - SigmaOS current behavior:
 - New behavior:
 - Compatibility impact:
@@ -41,19 +47,18 @@
 ## Changes
 
 -
+-
 
-## File safety review
+## Shell safety review
 
-- [ ] Lifecycle transitions are valid
-- [ ] Zombies are eventually reaped
-- [ ] Orphans are adopted
-- [ ] PID reuse is safe
-- [ ] Lock ordering is documented
-- [ ] Interrupt-context safety considered
-- [ ] Signal races considered
-- [ ] Double-unlink prevented
-- [ ] Resource limits enforced
-- [ ] No unbounded allocation or recursion
+- [ ] Expansion order is correct
+- [ ] Quoting behavior is preserved
+- [ ] Redirection failures are handled
+- [ ] Exit codes are explicit
+- [ ] Signal behavior is defined
+- [ ] No unbounded recursion or allocation
+- [ ] Interactive terminal state is restored
+- [ ] Script mode does not execute invalid partial input
 
 ## Evidence
 
@@ -61,18 +66,17 @@
 - [ ] `cargo fmt --check`
 - [ ] `cargo test --lib`
 - [ ] `./run_sigma_tests.sh`
-- [ ] New/updated unit tests
-- [ ] Integration tests
+- [ ] New/updated shell tests
+- [ ] POSIX/conformance test evidence
 - [ ] Fuzz target or documented exemption
-- [ ] Boot-to-boot evidence, if boot-affecting
-- [ ] File benchmark, if performance-affecting
+- [ ] Boot-to-shell evidence, if boot-affecting
 - [ ] Security review requested, if applicable
 
 ## Status updates
 
 - [ ] `FEATURE_STATUS.toml`
 - [ ] `CAPABILITY_MATRIX.toml`
-- [ ] File documentation
+- [ ] Shell documentation
 - [ ] Boot matrix, if applicable
 
 ## Risks and rollback
