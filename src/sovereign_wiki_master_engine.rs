@@ -298,54 +298,6 @@ impl Default for MasterWikiAndRoadmapVerificationSuite {
 }
 
 /// ---------------------------------------------------------------------------
-/// 5. Master Wiki and Roadmap Verification Suite & Types
-/// ---------------------------------------------------------------------------
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum FeatureSourceType {
-    GithubWikiPage,
-    DistroRoadmapSpec,
-}
-
-#[derive(Debug, Clone)]
-pub struct RoadmapFeatureIdea {
-    pub idea_id: u32,
-    pub title: String,
-    pub source_type: FeatureSourceType,
-    pub source_file: String,
-    pub target_module: String,
-    pub is_fully_implemented: bool,
-}
-
-pub struct MasterWikiAndRoadmapVerificationSuite {
-    pub master_engine: SovereignWikiMasterEngine,
-}
-
-impl MasterWikiAndRoadmapVerificationSuite {
-    pub fn new() -> Self {
-        Self {
-            master_engine: SovereignWikiMasterEngine::new(),
-        }
-    }
-
-    pub fn health_check(&self) -> bool {
-        self.master_engine.evaluate_master_wiki_fulfillment()
-    }
-
-    pub fn summary_report(&self) -> String {
-        format!(
-            "Master Wiki & Roadmap Verification Suite Status: Health OK, Parity Verification: 100.0% (All 100 Ideas, 12 Shards, Distro Gap Closures verified)"
-        )
-    }
-}
-
-impl Default for MasterWikiAndRoadmapVerificationSuite {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// ---------------------------------------------------------------------------
 /// 2. Twelve Sovereign Native System Shards (`S-SHARDS`) Engine
 /// ---------------------------------------------------------------------------
 
@@ -759,9 +711,11 @@ pub enum FeatureSourceType {
     GithubWikiPage,
     DistroRoadmapSpec,
     ArchitectureDocument,
+    DistroGapMatrix,
+    CoreArchitectureDoc,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RoadmapFeatureIdea {
     pub idea_id: u32,
     pub title: String,
@@ -798,56 +752,12 @@ impl SovereignWikiMasterEngine {
     }
 }
 
-pub struct MasterWikiAndRoadmapVerificationSuite {
-    pub master_engine: SovereignWikiMasterEngine,
-}
-
-impl MasterWikiAndRoadmapVerificationSuite {
-    pub fn new() -> Self {
-        Self {
-            master_engine: SovereignWikiMasterEngine::new(),
-        }
-    }
-
-    pub fn health_check(&self) -> bool {
-        self.master_engine.evaluate_master_wiki_fulfillment()
-    }
-
-    pub fn summary_report(&self) -> String {
-        format!(
-            "Sovereign Wiki Master Engine Parity Verification: 100.0% (Ideas: {}, Shards: 12)",
-            self.master_engine.suite_100_ideas.ideas.len()
-        )
-    }
-}
-
 impl Default for SovereignWikiMasterEngine {
     fn default() -> Self {
         Self::new()
     }
 }
 
-/// Feature source classification for roadmap feature ideas.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum FeatureSourceType {
-    GithubWikiPage,
-    DistroRoadmapSpec,
-    DistroGapMatrix,
-    CoreArchitectureDoc,
-}
-
-/// Descriptor for a roadmap feature idea tracked across markdown documentation and wiki.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct RoadmapFeatureIdea {
-    pub idea_id: u32,
-    pub title: String,
-    pub source_type: FeatureSourceType,
-    pub source_file: String,
-    pub target_module: String,
-    pub is_fully_implemented: bool,
-}
-
-/// Verification suite for validating .MD specifications & GitHub Wiki roadmap feature fulfillment.
 pub struct MasterWikiAndRoadmapVerificationSuite {
     pub master_engine: SovereignWikiMasterEngine,
 }
