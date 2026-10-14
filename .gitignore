@@ -62,7 +62,6 @@ wiki_repo/
 /timerfd
 /tmpfs
 /umask
-/unveil
 /user_group
 /user_group_db
 /uts_namespace

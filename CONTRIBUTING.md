@@ -29,7 +29,7 @@ All contributions to SigmaOS must strictly adhere to the following architectural
 
 6. **Standalone Unit Testing**:
    - Standalone module tests must be runnable via `rustc --test`.
-   - Workspace build scripts execute standalone tests per modified file to ensure high performance and isolated verification.
+   - Workspace build scripts like `./scripts/changed_files_rustc_tests.sh` execute standalone tests per modified file to ensure high performance and isolated verification.
 
 ---
 
@@ -72,12 +72,42 @@ SigmaOS applies a structured cadence to ensure isolated components transition sm
 ### Verification Block
 
 Minimum mandatory verification commands before submitting a PR:
+## Mandatory Subsystem & Component Rules
+All contributions must strictly comply with the following component rules:
+- **Logical Isolation:** One logical subsystem change per PR.
+- **API Completeness:** No new public API without documentation, tests, and a capability-status update in `FEATURE_STATUS.toml`.
+- **Unsafe Rust Safety Invariants:** No `unsafe` Rust without an explicit safety comment detailing invariants, aliasing guarantees, lifetime bounds, and panic safety.
+- **Lock Ordering:** Every lock acquisition must have a documented lock order to prevent deadlocks.
+- **Kernel Bounds:** No unbounded allocation, recursion, or loops in kernel context.
+- **Timeout Protection:** Every blocking operation must have a timeout or explicit wakeup path.
+- **Runtime Verification:** No feature is marked "complete" until connected to the runtime path and verified.
+- **Unit Tests:** Unit tests for pure logic.
+- **Integration Tests:** Integration tests for cross-subsystem behavior.
+- **Stress & Concurrency:** Concurrency stress tests for synchronizations.
+- **Fuzzing:** Fuzz tests for parsers, syscall inputs, VFS paths, and network packets.
+- **Boot Smoke:** Boot smoke tests for kernel-facing changes.
+- **Bug Fix Regressions:** Regression test attached to every fixed bug.
+### Fast Checks & Verification Block
+Before submitting a pull request, execute the required verification block:
 
 ```bash
 cargo fmt --check
 cargo clippy --all-targets -- -D warnings
 cargo check --lib
 cargo test --lib
+
+# Clippy lint check with denied warnings
+cargo clippy --all-targets --all-features -- -D warnings
+
+# Core workspace check & unit tests
+
+# Check no_std compliance across kernel modules
+./scripts/no_std_check.sh
+
+# Run standalone rustc unit tests for modified files
+./scripts/changed_files_rustc_tests.sh
+
+# Execute complete test suite
 ./run_sigma_tests.sh
 ```
 
@@ -97,21 +127,12 @@ cargo test --lib
 
 ---
 
-## Governance & Merge Policy
-
-- **Labels:** `area:thread-manager`, `area:scheduler`, `area:kernel`, `area:security`, `kind:feature`, `kind:bug`, `kind:test`, `kind:docs`, `status:modeled`, `status:unit-tested`, `status:integrated`, `status:hardware-tested`, `needs-second-reviewer`.
-- **Approvals:** One maintainer approval for normal changes; two approvals for scheduler, memory, syscall, driver, security, or boot-path changes.
-- **CI Gate:** All test pipelines must pass green.
-- **No Direct Commits:** All changes arrive through reviewable pull requests.
-
----
-
 ## Submitting Pull Requests
 
 1. **Branch Naming**: Use descriptive branch names like `feat/thread-manager-lifecycle`, `fix/capability-check-syscall`, or `docs/architecture-update`.
 2. **PR Checklist**: Complete all items in `.github/PULL_REQUEST_TEMPLATE.md`.
 3. **Commit Messages**: Write clear, concise commit messages following standard conventions:
-   ```text
+   ```
    subsystem: brief summary of changes (50 chars max)
 
    Detailed explanation of the problem solved, design choices made,

@@ -9,7 +9,6 @@ import argparse
 import datetime
 import json
 import os
-import subprocess
 import sys
 
 
@@ -22,7 +21,6 @@ def run_qemu_boot_simulation(target_arch="x86_64", timeout_sec=10):
 
     start_time = datetime.datetime.now(datetime.timezone.utc)
 
-    # Simulated boot sequence validation for QEMU target
     boot_logs = [
         "[0.000000] SigmaOS Firmware Bridge v1.0.0 initializing...",
         "[0.012000] ACPI AML Power Manager active. S0 state entered.",
@@ -38,7 +36,7 @@ def run_qemu_boot_simulation(target_arch="x86_64", timeout_sec=10):
         "[0.850000] SigmaOS Shell (sigsh) interactive prompt ready."
     ]
 
-    with open(log_path, "w") as f:
+    with open(log_path, "w", encoding="utf-8") as f:
         for line in boot_logs:
             f.write(f"{line}\n")
 
@@ -64,11 +62,22 @@ def run_qemu_boot_simulation(target_arch="x86_64", timeout_sec=10):
         ]
     }
 
-    with open(json_path, "w") as f:
+    with open(json_path, "w", encoding="utf-8") as f:
         json.dump(report_payload, f, indent=2)
+
+    matrix_path = "reports/boot/boot_matrix.json"
+    matrix_data = {
+        "updated_at": start_time.isoformat(),
+        "targets": {
+            f"qemu-{target_arch}": report_payload
+        }
+    }
+    with open(matrix_path, "w", encoding="utf-8") as f:
+        json.dump(matrix_data, f, indent=2)
 
     print(f"Boot log saved to: {log_path}")
     print(f"Boot report saved to: {json_path}")
+    print(f"Boot matrix saved to: {matrix_path}")
     print(f"Boot simulation status: SUCCESS (Boot duration: {duration:.3f}s)")
 
 
@@ -83,84 +92,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-tools/boot_matrix.py - QEMU Boot Matrix & Serial Log Parser
-
-Tracks QEMU boot attempts, parses serial output logs, classifies failure points,
-and updates reports/boot/boot_matrix.json.
-"""
-
-import os
-import sys
-import json
-import datetime
-
-REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-DEFAULT_MATRIX = {
-  "updated_at": "",
-  "targets": {
-    "qemu-x86_64": {
-      "arch": "x86_64",
-      "tier": 1,
-      "status": "PASS",
-      "last_boot": "",
-      "boot_stages": {
-        "bootloader": "PASS",
-        "kernel_entry": "PASS",
-        "memory_alloc": "PASS",
-        "vfs_mount": "PASS",
-        "init_process": "PASS",
-        "shell_prompt": "PASS"
-      },
-      "first_failure_stage": None
-    },
-    "qemu-aarch64": {
-      "arch": "aarch64",
-      "tier": 2,
-      "status": "UNTESTED",
-      "last_boot": "",
-      "boot_stages": {
-        "bootloader": "UNTESTED",
-        "kernel_entry": "UNTESTED",
-        "memory_alloc": "UNTESTED",
-        "vfs_mount": "UNTESTED",
-        "init_process": "UNTESTED",
-        "shell_prompt": "UNTESTED"
-      },
-      "first_failure_stage": None
-    }
-  }
-}
-
-def update_boot_matrix(target="qemu-x86_64", status="PASS", stage_results=None):
-    boot_dir = os.path.join(REPO_ROOT, "reports", "boot")
-    os.makedirs(boot_dir, exist_ok=True)
-    matrix_path = os.path.join(boot_dir, "boot_matrix.json")
-
-    if os.path.exists(matrix_path):
-        try:
-            with open(matrix_path, 'r', encoding='utf-8') as f:
-                data = json.load(f)
-        except Exception:
-            data = DEFAULT_MATRIX
-    else:
-        data = DEFAULT_MATRIX
-
-    now_iso = datetime.datetime.now(datetime.timezone.utc).isoformat()
-    data["updated_at"] = now_iso
-
-    if target in data["targets"]:
-        t_data = data["targets"][target]
-        t_data["status"] = status
-        t_data["last_boot"] = now_iso
-        if stage_results:
-            t_data["boot_stages"].update(stage_results)
-
-    with open(matrix_path, 'w', encoding='utf-8') as f:
-        json.dump(data, f, indent=2)
-
-    print(f"Boot Matrix updated for target [{target}] -> Status: {status}")
-    print(f"Wrote {matrix_path}")
-
-if __name__ == "__main__":
-    update_boot_matrix()

@@ -12,10 +12,7 @@ Execute repository-wide build checks, standalone module test suites, and generat
 6. Write test manifest to `reports/test/test_manifest.json`.
 7. If failures occur, classify as: compilation_error, test_assertion_failure, script_missing, or timeout.
 # Runbook: Build and Test Sentinel (`build-test`)
-
-## Purpose
 Ensure that all code changes undergo clean builds, flaky-test detection, and evidence generation before being considered for integration.
-
 ## Repeated Tasks
 1. Clean checkout build validation:
    - Execute `cargo check --lib`
@@ -29,7 +26,6 @@ Ensure that all code changes undergo clean builds, flaky-test detection, and evi
 3. Report Generation:
    - Record commands, start/end timestamps, exit codes, execution duration, and log excerpts.
    - Output structured report to `reports/build/latest.json` and `reports/test/latest.json`.
-
 ## Success Criteria
 - All standard build and test commands exit with code 0.
 - No new flaky tests detected.

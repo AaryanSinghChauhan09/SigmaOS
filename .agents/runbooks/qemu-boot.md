@@ -16,10 +16,7 @@ Build bootable ISO/RAM-disk image, launch QEMU x86_64, capture serial console ou
 4. Record boot duration, panic status, and exit status code.
 5. Generate structured boot JSON: `reports/boot/qemu_x86_64.json`.
 # Runbook: Boot and Runtime Validator (`qemu-boot`)
-
-## Purpose
 Prove the primary bootable path (firmware -> bootloader -> kernel -> init -> shell -> desktop) in QEMU x86_64 and record boot evidence.
-
 ## Daily Smoke Test Procedure
 1. Build the ISO or bootable kernel artifact in a clean environment:
    - `make iso` or `scripts/build_iso.sh`

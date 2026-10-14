@@ -10,11 +10,7 @@ Ensure README commands, build scripts, Makefile targets, and agent capability di
 4. Flag documentation discrepancies or unverified claims.
 5. Generate documentation synchronization report in `reports/docs/docs_sync_report.md`.
 # Runbook: Documentation and Onboarding Agent (`docs-sync`)
-
-## Purpose
 Ensure all documentation, onboarding guides, command references, and troubleshooting docs reflect the true, verified state of the repository.
-
-## Procedure
 1. Command Alignment Check:
    - Extract all code blocks and shell commands from `README.md` and `CONTRIBUTING.md`.
    - Verify commands match targets in `Makefile`, `Cargo.toml`, and `scripts/`.

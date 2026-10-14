@@ -10,11 +10,7 @@ Safely parse package metadata (.deb, .rpm, Arch PKGBUILD/ALPM, sigpkg) and perfo
 4. Perform dry-run installation simulation capturing target file locations.
 5. Record parsing accuracy, resolution time, and safety review flags in `reports/package/dry_run_report.json`.
 # Runbook: Package and Distro Compatibility Agent (`package-compat`)
-
-## Purpose
 Safely evaluate Linux and BSD package metadata parsing, dependency graph resolution, and sandboxed package execution without exposing the host system.
-
-## Procedure
 1. Fixed Package Corpus Parsing:
    - Parse sample metadata from `.deb`, `.rpm`, Arch `PKGBUILD`/`desc`, and FreeBSD `pkg-plist` manifests.
    - Verify zero-panic parsing against malformed inputs.

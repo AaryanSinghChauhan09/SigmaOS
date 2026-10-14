@@ -25,10 +25,6 @@ success = [
 ]
 
 on_failure = "create blocked task with failure classification and serial log excerpt"
-repeat = "daily"
-scope = ["installer/", "src/kernel/", "scripts/", "tests/"]
-
-steps = [
   "make clean",
   "cargo check --lib",
   "cargo test --lib",
@@ -38,19 +34,11 @@ steps = [
   "run smoke commands",
   "capture logs and screenshot",
   "write boot report"
-]
-
-evidence = [
   "reports/boot/qemu-x86_64.log",
   "reports/boot/qemu-x86_64.json",
   "reports/boot/boot_matrix.json"
-]
-
-success = [
   "build exits 0",
   "QEMU reaches shell within timeout",
   "smoke commands exit 0",
   "no kernel panic in serial log"
-]
-
 on_failure = "create blocked task with failing stage and log excerpt"

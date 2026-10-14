@@ -16,10 +16,7 @@ Audit `CAPABILITY_MATRIX.toml`, `FEATURE_STATUS.toml`, and README claims against
    - `blocked`: Known dependency blocker
 5. Output `reports/capability/truth_table.json` and update `reports/capability/verified_today.md`.
 # Runbook: Capability Auditor (`capability-audit`)
-
-## Purpose
 Prevent "aspirational completion" by validating every claim in `README.md`, `CAPABILITY_MATRIX.toml`, and `FEATURE_STATUS.toml` against actual evidence in `reports/`.
-
 ## Execution Steps
 1. Parse capability files:
    - Read `CAPABILITY_MATRIX.toml` and `FEATURE_STATUS.toml`.
