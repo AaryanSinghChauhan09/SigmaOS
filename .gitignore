@@ -27,6 +27,8 @@ __pycache__/
 /test_runner
 /test_universal
 /tests/sigma_test_runner
+/test_md_wiki_ideas_verification
+/sovereign_task_guidelines_wiki_sync_engine
 *.png
 target/
 wiki_repo/
