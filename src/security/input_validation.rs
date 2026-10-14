@@ -13,6 +13,7 @@ pub const MAX_ENV_VAR_LEN: usize = 32768;
 pub const MAX_ENV_KEY_LEN: usize = 256;
 pub const MAX_IPV4_LEN: usize = 15; // "255.255.255.255"
 pub const MAX_IPV6_LEN: usize = 39; // full IPv6 text
+pub const MAX_URL_LEN: usize = 2048; // Standard HTTP/HTTPS maximum URL length
 
 /// Errors produced by input validation routines.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -135,6 +136,62 @@ pub fn validate_filename(name: &[u8]) -> Result<(), ValidationError> {
             return Err(ValidationError::InvalidChars);
         }
     }
+    Ok(())
+}
+
+// ── URL Validation ─────────────────────────────────────────────────────────
+
+/// Validate a URL byte slice per RFC 3986 / RFC 3987.
+///
+/// Rules:
+/// - Non-empty, ≤ `MAX_URL_LEN` (2048 bytes)
+/// - Scheme must be allowlisted (`http://` or `https://`)
+/// - Rejects NUL bytes (`NullByte`) and ASCII control characters / spaces (`b <= 32` or `b == 127`, mitigating CWE-150 / CWE-117)
+/// - Rejects userinfo credentials (`user:pass@`) in authority to prevent SSRF and credential disclosure (CWE-918)
+pub fn validate_url(url: &[u8]) -> Result<(), ValidationError> {
+    if url.is_empty() {
+        return Err(ValidationError::EmptyInput);
+    }
+    if url.len() > MAX_URL_LEN {
+        return Err(ValidationError::TooLong);
+    }
+
+    // Check scheme: http:// or https://
+    let host_start = if url.starts_with(b"http://") {
+        7
+    } else if url.starts_with(b"https://") {
+        8
+    } else {
+        return Err(ValidationError::InvalidChars);
+    };
+
+    // Find end of host/authority part (before '/', '?', '#')
+    let rest = &url[host_start..];
+    let host_len = rest
+        .iter()
+        .position(|&b| b == b'/' || b == b'?' || b == b'#')
+        .unwrap_or(rest.len());
+    let authority = &rest[..host_len];
+
+    if authority.is_empty() {
+        return Err(ValidationError::InvalidChars);
+    }
+
+    // Reject userinfo credentials in authority (e.g., user:pass@host)
+    if authority.contains(&b'@') {
+        return Err(ValidationError::InvalidChars);
+    }
+
+    // Iterate through all bytes: check for NUL and control chars/spaces
+    for &b in url {
+        if b == 0 {
+            return Err(ValidationError::NullByte);
+        }
+        if b <= 32 || b == 127 {
+            return Err(ValidationError::InvalidChars);
+        }
+    }
+
     Ok(())
 }
 
@@ -906,6 +963,55 @@ mod tests {
         let mut out = [0u8; 20];
         let n = sanitize_for_log(input, &mut out);
         assert_eq!(&out[..n], b"hello?world?");
+    }
+
+    #[test]
+    fn test_validate_url() {
+        assert_eq!(validate_url(b"http://example.com"), Ok(()));
+        assert_eq!(validate_url(b"https://example.com/path?query=1#frag"), Ok(()));
+        assert_eq!(validate_url(b"http://127.0.0.1:8080/api/v1"), Ok(()));
+
+        // Empty and length checks
+        assert_eq!(validate_url(b""), Err(ValidationError::EmptyInput));
+        let long_url = [b'a'; MAX_URL_LEN + 1];
+        assert_eq!(validate_url(&long_url), Err(ValidationError::TooLong));
+
+        // Missing or invalid scheme
+        assert_eq!(validate_url(b"ftp://example.com"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_url(b"example.com"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_url(b"http:/example.com"), Err(ValidationError::InvalidChars));
+
+        // Empty authority
+        assert_eq!(validate_url(b"http://"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_url(b"https://"), Err(ValidationError::InvalidChars));
+
+        // Userinfo credentials rejection (mitigating SSRF / credential disclosure CWE-918)
+        assert_eq!(
+            validate_url(b"http://admin:secret@example.com/path"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_url(b"https://user@example.com"),
+            Err(ValidationError::InvalidChars)
+        );
+
+        // Control characters, spaces, and NUL bytes
+        assert_eq!(
+            validate_url(b"http://example.com/path with space"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_url(b"http://example.com/path\n"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_url(b"http://example.com/\x00path"),
+            Err(ValidationError::NullByte)
+        );
+        assert_eq!(
+            validate_url(b"http://example.com/\x7fpath"),
+            Err(ValidationError::InvalidChars)
+        );
     }
 
     #[test]

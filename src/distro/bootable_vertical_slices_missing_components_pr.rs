@@ -111,7 +111,9 @@ impl VerticalSliceRule {
     pub fn name(&self) -> &'static str {
         match self {
             Self::Rule1VerticalSlicesFirst => "Vertical slices first",
-            Self::Rule2InterfaceContractsBeforeImplementation => "Interface contracts before implementation",
+            Self::Rule2InterfaceContractsBeforeImplementation => {
+                "Interface contracts before implementation"
+            }
             Self::Rule3EvidenceGatedCompletion => "Evidence-gated completion",
             Self::Rule4CiIsMandatory => "CI is mandatory",
             Self::Rule5Reproducibility => "Reproducibility",
@@ -121,7 +123,9 @@ impl VerticalSliceRule {
             Self::Rule9RegressionTestsAreMandatory => "Regression tests are mandatory",
             Self::Rule10NoBorrowedStatusClaims => "No borrowed-status claims",
             Self::Rule11OneOwnerPerComponent => "One owner per component",
-            Self::Rule12HumanApprovalForDestructiveOperations => "Human approval for destructive or high-risk operations",
+            Self::Rule12HumanApprovalForDestructiveOperations => {
+                "Human approval for destructive or high-risk operations"
+            }
         }
     }
 }
@@ -350,7 +354,9 @@ impl BootableVerticalSlicesPrEngine {
         let milestones = self.get_milestones();
         let rules = self.get_rules();
 
-        let mut payload = String::from("PR: feat(roadmap): Implement Missing Components as Bootable Vertical Slices\n");
+        let mut payload = String::from(
+            "PR: feat(roadmap): Implement Missing Components as Bootable Vertical Slices\n",
+        );
         for m in &milestones {
             payload.push_str(m.code());
             payload.push_str(": ");
@@ -365,7 +371,9 @@ impl BootableVerticalSlicesPrEngine {
         let patch_digest = fnv1a_vertical_slice_digest(payload.as_bytes());
 
         BootableVerticalSlicesPrProposalSpec {
-            pr_title: String::from("feat(roadmap): Implement Missing Components as Bootable Vertical Slices"),
+            pr_title: String::from(
+                "feat(roadmap): Implement Missing Components as Bootable Vertical Slices",
+            ),
             pr_branch: String::from("feature/bootable-vertical-slices-roadmap"),
             milestones,
             rules,
