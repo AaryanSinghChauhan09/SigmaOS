@@ -6,6 +6,8 @@ Welcome to the SigmaOS GitHub Wiki Encyclopedia and Subsystem Reference Index.
 
 ## Core Development Plans & Architecture
 
+- [Signal Handler Architecture & Development Plan](SIGNAL_HANDLER_PLAN.md) - POSIX.1-2024 signal handler architecture, required safety rules, 18-PR roadmap, x86_64 frame & sigreturn validation rules, periodic maintenance schedule, and merge gates.
+- [Signal Path Audit & ABI Profile](SIGNAL_HANDLER_AUDIT_AND_ABI_PROFILE.md) - Subsystem component audit, POSIX signal numbers and default actions, data structure ABI layouts, and x86_64 user frame layout.
 - [System Utilities Development Plan](SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md) - Master Architecture, POSIX compatibility baseline, 18-PR roadmap, component rules, periodic maintenance framework, and review merge gates.
 - [System Utilities Plan Mirror](SYSTEM_UTILITIES_PLAN.md) - Alternate index page for system utilities architecture.
 
