@@ -98,6 +98,8 @@ pub mod arch_missing_components;
 pub mod arch_missing_components_parity_pr;
 pub mod arch_parity;
 pub use arch_missing_components_parity_pr::*;
+pub mod freebsd_missing_components_parity_pr;
+pub use freebsd_missing_components_parity_pr::*;
 pub mod openbsd_missing_components_parity_pr;
 pub use openbsd_missing_components_parity_pr::*;
 
