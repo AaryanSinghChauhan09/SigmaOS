@@ -56,18 +56,18 @@ impl UpdateManager {
             auto_update_enabled: AtomicBool::new(true),
         }
     }
-    
+
     /// Initialize update manager
     pub fn init(&mut self) {
         self.active.store(true, Ordering::Relaxed);
         self.check_for_updates();
     }
-    
+
     /// Check for updates
     pub fn check_for_updates(&mut self) {
         // In real implementation, would check package repositories
         // (apt update, dnf check-update, pacman -Syu, etc.)
-        
+
         // Add some sample updates
         self.add_update(SystemUpdate {
             name: "linux-firmware".to_string(),
@@ -78,7 +78,7 @@ impl UpdateManager {
             description: "Firmware packages for Linux kernel".to_string(),
             installed: AtomicBool::new(false),
         });
-        
+
         self.add_update(SystemUpdate {
             name: "openssl".to_string(),
             version: "3.1.0".to_string(),
@@ -88,7 +88,7 @@ impl UpdateManager {
             description: "Secure SSL/TLS library".to_string(),
             installed: AtomicBool::new(false),
         });
-        
+
         self.add_update(SystemUpdate {
             name: "firefox".to_string(),
             version: "121.0".to_string(),
@@ -99,31 +99,31 @@ impl UpdateManager {
             installed: AtomicBool::new(false),
         });
     }
-    
+
     /// Add update
     pub fn add_update(&mut self, update: SystemUpdate) {
         self.updates.insert(update.name.clone(), update);
     }
-    
+
     /// Get update
     pub fn get_update(&self, name: &str) -> Option<&SystemUpdate> {
         self.updates.get(name)
     }
-    
+
     /// Install update
     pub fn install_update(&mut self, name: &str) -> Result<(), &'static str> {
         let update = self.updates.get_mut(name).ok_or("Update not found")?;
-        
+
         // In real implementation, would run:
         // apt upgrade {name}
         // or dnf upgrade {name}
         // or pacman -S {name}
-        
+
         update.installed.store(true, Ordering::Relaxed);
-        
+
         Ok(())
     }
-    
+
     /// Install all updates
     pub fn install_all_updates(&mut self) -> Result<(), &'static str> {
         for update in self.updates.values_mut() {
@@ -133,50 +133,54 @@ impl UpdateManager {
         }
         Ok(())
     }
-    
+
     /// Get updates by priority
     pub fn get_updates_by_priority(&self, priority: UpdatePriority) -> Vec<&SystemUpdate> {
-        self.updates.values()
+        self.updates
+            .values()
             .filter(|u| u.priority == priority)
             .collect()
     }
-    
+
     /// Get security updates
     pub fn get_security_updates(&self) -> Vec<&SystemUpdate> {
-        self.updates.values()
+        self.updates
+            .values()
             .filter(|u| u.update_type == UpdateType::Security)
             .collect()
     }
-    
+
     /// Get kernel updates
     pub fn get_kernel_updates(&self) -> Vec<&SystemUpdate> {
-        self.updates.values()
+        self.updates
+            .values()
             .filter(|u| u.update_type == UpdateType::Kernel)
             .collect()
     }
-    
+
     /// Get pending updates
     pub fn get_pending_updates(&self) -> Vec<&SystemUpdate> {
-        self.updates.values()
+        self.updates
+            .values()
             .filter(|u| !u.installed.load(Ordering::Relaxed))
             .collect()
     }
-    
+
     /// Enable auto update
     pub fn enable_auto_update(&self) {
         self.auto_update_enabled.store(true, Ordering::Relaxed);
     }
-    
+
     /// Disable auto update
     pub fn disable_auto_update(&self) {
         self.auto_update_enabled.store(false, Ordering::Relaxed);
     }
-    
+
     /// Is auto update enabled
     pub fn is_auto_update_enabled(&self) -> bool {
         self.auto_update_enabled.load(Ordering::Relaxed)
     }
-    
+
     /// Is active
     pub fn is_active(&self) -> bool {
         self.active.load(Ordering::Relaxed)
@@ -201,15 +205,13 @@ pub fn init_update_manager() {
 
 /// Get global update manager
 pub fn get_update_manager() -> Option<&'static mut UpdateManager> {
-    unsafe {
-        UPDATE_MANAGER.as_mut()
-    }
+    unsafe { UPDATE_MANAGER.as_mut() }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_update_manager_init() {
         let mut manager = UpdateManager::new();
@@ -217,15 +219,19 @@ mod tests {
         assert!(manager.is_active());
         assert!(manager.updates.len() > 0);
     }
-    
+
     #[test]
     fn test_install_update() {
         let mut manager = UpdateManager::new();
         manager.check_for_updates();
         manager.install_update("openssl").unwrap();
-        assert!(manager.get_update("openssl").unwrap().installed.load(Ordering::Relaxed));
+        assert!(manager
+            .get_update("openssl")
+            .unwrap()
+            .installed
+            .load(Ordering::Relaxed));
     }
-    
+
     #[test]
     fn test_install_all_updates() {
         let mut manager = UpdateManager::new();
@@ -234,7 +240,7 @@ mod tests {
         let pending = manager.get_pending_updates();
         assert_eq!(pending.len(), 0);
     }
-    
+
     #[test]
     fn test_get_security_updates() {
         let mut manager = UpdateManager::new();
@@ -242,7 +248,7 @@ mod tests {
         let security = manager.get_security_updates();
         assert!(security.len() > 0);
     }
-    
+
     #[test]
     fn test_get_kernel_updates() {
         let mut manager = UpdateManager::new();
