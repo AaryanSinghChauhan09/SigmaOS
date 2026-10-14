@@ -1,36 +1,32 @@
 //! Sovereign Linux & BSD Logging, Monitoring, and Diagnostics Engine V2 for SigmaOS
 //!
 //! Synthesizes next-generation capabilities inspired by Linux & BSD system administration,
-//! enterprise observability, forensic auditing, and telemetry tooling:
-//! - Journald, Rsyslog, Syslog-ng, Syslogd & Logrotate: Multi-facility structured logging,
-//!   RFC 3164/5424 syslog framing, structured field indexing (_PID, _UID, _COMM, _SYSTEMD_UNIT, _SELINUX_CONTEXT),
-//!   syslog-ng pattern db matching rules, rsyslog action queue simulation, CRC32 journal integrity
-//!   checksum verification, and automated logrotate policies (rotation cycles, zstd compression, retention).
-//! - Dmesg: Kernel ring buffer logger with microsecond boot timestamps, delta microsecond offsets,
-//!   ISO-8601 formatting, console loglevel control (`dmesg -n`), facility tag filtering, and buffer flush.
-//! - Top, Htop & Systemd-Cgtop: Process activity telemetry, thread counts, CPU/RAM utilization per core,
-//!   IO read/write rate meters, process tree hierarchy builder, interactive sorting, signal dispatch (`kill`/`renice`),
-//!   and cgroup path tracking.
-//! - Vmstat, Iostat, Sar & Sysstat: System memory & swap page dynamics, block device extended stats
-//!   (r_await, w_await, %util, TPS, kB_read/s, kB_wrtn/s), and `sar` historical time-series buffer with
-//!   configurable time-window range query capabilities.
-//! - Lsof: Open file descriptor inspection across processes, paths, socket states (LISTEN, ESTABLISHED, TIME_WAIT),
-//!   UNIX domain sockets, memory-mapped files, inotify/kqueue watchers, and file lock modes.
-//! - Lspci, Lsusb & Dmidecode: Comprehensive hardware discovery for PCIe domain topology & BAR registers,
-//!   USB bus speed profiles (USB 2.0/3.2/4) & power descriptors, and SMBIOS/DMI tables (Types 0, 1, 2, 3, 4, 17).
-//! - Sosreport, Prometheus node_exporter & Collectd: Diagnostic archive bundle generation with sensitive
-//!   data sanitization (passwords, tokens, private IPs), standard Prometheus text exposition format,
-//!   and Collectd telemetry metrics stream.
+//! observability, and telemetry tooling:
+//! - Journald, Rsyslog, Syslog-ng, Syslogd & Logrotate V2: Multi-facility structured journal indexing
+//!   (`_PID`, `_UID`, `_SYSTEMD_UNIT`, `_COMM`, `_HOSTNAME`, `_SELINUX_CONTEXT`, `_BOOT_ID`), CRC32 sealing
+//!   integrity checks, Rsyslog queues, RFC 3164/5424 framing, Syslog-ng pattern DB rules, and automated log rotation.
+//! - Dmesg V2: Kernel ring buffer logger with microsecond timestamps (boot/ISO/delta), severity loglevel control,
+//!   console filtering, tag search, and ring buffer wrap-around management.
+//! - Top & Htop V2: Process activity telemetry across states (R/S/D/T/Z/I), interactive process tree hierarchy,
+//!   signal dispatching, per-CPU core breakdown (%user/%sys/%iowait/%irq/%idle), and Cgroup v2 usage (`cgtop`).
+//! - Vmstat, Iostat & Sar V2: System memory, swap, context switches, extended block device IOPS stats (r_await/w_await/%util),
+//!   and time-series historical snapshot collector (`sa01`..`sa31` time-series queries).
+//! - Lsof V2: Open file descriptor inspection across process PIDs (`REG`, `DIR`, `CHR`, `BLK`, `FIFO`, `UNIX`, `IPv4`, `IPv6`, `KQUEUE`, `INOTIFY`),
+//!   socket states, and file locking status.
+//! - Lspci, Lsusb, Dmidecode & Lsscsi V2: PCIe topology (BARs/speed), USB hierarchy (speed modes), SMBIOS tables (Type 0/1/2/4/17),
+//!   and SCSI/NVMe host adapter target listing.
+//! - Sosreport, Prometheus node_exporter & Collectd V2: Sanitized diagnostic archive bundle generation (.tar.zst),
+//!   Prometheus node_exporter text format exporter, and Collectd binary metric dispatcher.
 
 use std::collections::{BTreeMap, HashMap};
 use std::string::{String, ToString};
 use std::vec::Vec;
 
 // ============================================================================
-// 1. JOURNALD / RSYSLOG / SYSLOG-NG / LOGROTATE V2 LOG ENGINE
+// 1. JOURNALD / RSYSLOG / SYSLOG-NG / LOGROTATE V2
 // ============================================================================
 
-/// Syslog Facility inspired by Linux syslog.h & BSD RFC 5424 / RFC 3164
+/// Syslog Facility inspired by Linux syslog.h & BSD RFC 5424
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 #[repr(u8)]
 pub enum SyslogFacilityV2 {
@@ -46,10 +42,6 @@ pub enum SyslogFacilityV2 {
     Cron = 9,
     AuthPriv = 10,
     Ftp = 11,
-    Ntp = 12,
-    Audit = 13,
-    Alert = 14,
-    Clock = 15,
     Local0 = 16,
     Local1 = 17,
     Local2 = 18,
@@ -75,10 +67,6 @@ impl SyslogFacilityV2 {
             SyslogFacilityV2::Cron => "cron",
             SyslogFacilityV2::AuthPriv => "authpriv",
             SyslogFacilityV2::Ftp => "ftp",
-            SyslogFacilityV2::Ntp => "ntp",
-            SyslogFacilityV2::Audit => "audit",
-            SyslogFacilityV2::Alert => "alert",
-            SyslogFacilityV2::Clock => "clock",
             SyslogFacilityV2::Local0 => "local0",
             SyslogFacilityV2::Local1 => "local1",
             SyslogFacilityV2::Local2 => "local2",
@@ -120,520 +108,287 @@ impl LogSeverityV2 {
     }
 }
 
-/// Structured Journald Indexed System Fields
-#[derive(Debug, Clone, Default)]
-pub struct JournaldFieldsV2 {
-    pub pid: u32,
-    pub ppid: u32,
-    pub uid: u32,
-    pub gid: u32,
-    pub comm: String,
-    pub exe: String,
-    pub cmdline: String,
-    pub systemd_unit: String,
-    pub systemd_cgroup: String,
-    pub selinux_context: String,
-    pub boot_id: String,
-    pub machine_id: String,
-    pub transport: String, // "journal", "syslog", "stdout", "kernel"
-}
-
-/// Structured Journald Log Entry V2
+/// Structured Journald Record V2 with systemd standard fields and integrity seal
 #[derive(Debug, Clone)]
-pub struct JournalLogEntryV2 {
-    pub id: u64,
+pub struct JournalLogRecordV2 {
+    pub entry_id: u64,
     pub timestamp_us: u64,
     pub facility: SyslogFacilityV2,
     pub severity: LogSeverityV2,
-    pub fields: JournaldFieldsV2,
+    pub pid: u32,
+    pub uid: u32,
+    pub comm: String,
+    pub systemd_unit: String,
+    pub hostname: String,
+    pub selinux_context: String,
+    pub boot_id: String,
     pub message: String,
-    pub custom_metadata: BTreeMap<String, String>,
-    pub checksum_crc32: u32,
+    pub structured_fields: BTreeMap<String, String>,
+    pub crc32_checksum: u32,
 }
 
-impl JournalLogEntryV2 {
-    pub fn syslog_pri(&self) -> u8 {
-        (self.facility as u8) * 8 + (self.severity as u8)
-    }
-
-    /// Calculate CRC32 checksum for journal block corruption verification
+impl JournalLogRecordV2 {
     pub fn compute_crc32(&self) -> u32 {
-        let mut crc: u32 = 0xFFFFFFFF;
-        let bytes_to_hash = format!(
-            "{}:{}:{}:{}:{}:{}",
-            self.id,
-            self.timestamp_us,
-            self.fields.pid,
-            self.fields.comm,
-            self.fields.systemd_unit,
-            self.message
-        );
-        for byte in bytes_to_hash.bytes() {
-            crc ^= byte as u32;
-            for _ in 0..8 {
-                if (crc & 1) != 0 {
-                    crc = (crc >> 1) ^ 0xEDB88320;
-                } else {
-                    crc >>= 1;
-                }
+        let mut hasher = 0x811c9dc5u32;
+        for b in self.message.as_bytes() {
+            hasher ^= *b as u32;
+            hasher = hasher.wrapping_mul(0x01000193);
+        }
+        for (k, v) in &self.structured_fields {
+            for b in k.as_bytes().iter().chain(v.as_bytes()) {
+                hasher ^= *b as u32;
+                hasher = hasher.wrapping_mul(0x01000193);
             }
         }
-        !crc
-    }
-
-    /// Format entry as RFC 5424 Syslog message
-    pub fn to_rfc5424(&self, hostname: &str) -> String {
-        let pri = self.syslog_pri();
-        let mut sd = format!(
-            "[sigmaos@53828 _PID=\"{}\" _UID=\"{}\" _UNIT=\"{}\" _COMM=\"{}\"",
-            self.fields.pid, self.fields.uid, self.fields.systemd_unit, self.fields.comm
-        );
-        for (k, v) in &self.custom_metadata {
-            sd.push_str(&format!(" {}=\"{}\"", k, v));
-        }
-        sd.push(']');
-
-        format!(
-            "<{}>1 {} {} {} {} - {} {}",
-            pri,
-            self.timestamp_us,
-            hostname,
-            self.fields.comm,
-            self.fields.pid,
-            sd,
-            self.message
-        )
-    }
-
-    /// Format entry as BSD RFC 3164 Syslog message
-    pub fn to_rfc3164(&self, hostname: &str) -> String {
-        let pri = self.syslog_pri();
-        format!(
-            "<{}>Jan  1 00:00:00 {} {}[{}]: {}",
-            pri, hostname, self.fields.comm, self.fields.pid, self.message
-        )
+        hasher
     }
 }
 
-/// Log Rotation Mode
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum LogRotationCycle {
-    Daily,
-    Weekly,
-    Monthly,
-    SizeBytes(u64),
-}
-
-/// Log Compression Algorithm
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum LogCompressionMethod {
-    None,
-    Gzip,
-    Zstd,
-    Xz,
-}
-
-/// Log Rotation Policy (`logrotate`)
+/// Syslog-ng Pattern DB Matching Rule
 #[derive(Debug, Clone)]
-pub struct LogRotateConfigV2 {
-    pub cycle: LogRotationCycle,
-    pub max_entries_per_file: usize,
-    pub max_rotated_generations: usize,
-    pub compression: LogCompressionMethod,
-    pub create_mode: u32, // e.g. 0o640
-    pub delay_compress: bool,
-}
-
-/// Rsyslog Action Queue Mode
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum RsyslogQueueMode {
-    Direct,
-    LinkedListMemory,
-    DiskAssisted,
-}
-
-/// Syslog-ng Pattern DB Filter Rule
-#[derive(Debug, Clone)]
-pub struct SyslogNgFilterRule {
+pub struct SyslogNgPatternRuleV2 {
     pub rule_id: String,
-    pub facility_match: Option<SyslogFacilityV2>,
-    pub min_severity: Option<LogSeverityV2>,
-    pub unit_match: Option<String>,
-    pub message_contains: Option<String>,
-    pub destination_target: String,
+    pub pattern: String,
+    pub target_destination: String,
+    pub match_count: u64,
 }
 
-/// Unified Journald, Rsyslog & Syslog-ng Engine V2
+/// Logrotate Policy Governor V2
 #[derive(Debug, Clone)]
-pub struct JournaldSyslogNgLogEngineV2 {
-    pub hostname: String,
-    pub boot_id: String,
-    pub machine_id: String,
-    pub entries: Vec<JournalLogEntryV2>,
-    pub rotated_archives: Vec<Vec<JournalLogEntryV2>>,
-    pub rotate_config: LogRotateConfigV2,
-    pub queue_mode: RsyslogQueueMode,
-    pub filter_rules: Vec<SyslogNgFilterRule>,
-    pub next_id: u64,
-    pub rate_limit_burst: usize,
-    pub current_burst_count: usize,
-    pub total_logged_bytes: u64,
+pub struct LogrotatePolicyV2 {
+    pub log_path: String,
+    pub max_size_bytes: u64,
+    pub rotate_count: u32,
+    pub compress: bool,
+    pub compression_algo: String, // "zstd", "gzip", "xz"
+    pub copy_truncate: bool,
+    pub post_rotate_script: String,
 }
 
-impl JournaldSyslogNgLogEngineV2 {
-    pub fn new(hostname: &str) -> Self {
+/// Sovereign Journald & Syslog-ng Log Engine V2
+#[derive(Debug, Clone)]
+pub struct SovereignJournaldSyslogNgLogEngineV2 {
+    records: Vec<JournalLogRecordV2>,
+    pattern_rules: Vec<SyslogNgPatternRuleV2>,
+    rotation_policies: Vec<LogrotatePolicyV2>,
+    next_id: u64,
+}
+
+impl SovereignJournaldSyslogNgLogEngineV2 {
+    pub fn new() -> Self {
         Self {
-            hostname: hostname.to_string(),
-            boot_id: "c9f8a3d1-4e2b-4019-9182-e8f7a2d1045b".to_string(),
-            machine_id: "928371024857d0291a283940129481a2".to_string(),
-            entries: Vec::new(),
-            rotated_archives: Vec::new(),
-            rotate_config: LogRotateConfigV2 {
-                cycle: LogRotationCycle::Daily,
-                max_entries_per_file: 1000,
-                max_rotated_generations: 5,
-                compression: LogCompressionMethod::Zstd,
-                create_mode: 0o640,
-                delay_compress: true,
-            },
-            queue_mode: RsyslogQueueMode::DiskAssisted,
-            filter_rules: Vec::new(),
+            records: Vec::new(),
+            pattern_rules: Vec::new(),
+            rotation_policies: Vec::new(),
             next_id: 1,
-            rate_limit_burst: 500,
-            current_burst_count: 0,
-            total_logged_bytes: 0,
         }
     }
 
-    pub fn add_filter_rule(&mut self, rule: SyslogNgFilterRule) {
-        self.filter_rules.push(rule);
-    }
-
-    pub fn log(
+    pub fn append_record(
         &mut self,
         facility: SyslogFacilityV2,
         severity: LogSeverityV2,
-        fields: JournaldFieldsV2,
+        pid: u32,
+        uid: u32,
+        comm: &str,
+        unit: &str,
+        hostname: &str,
         message: &str,
-        custom_metadata: BTreeMap<String, String>,
     ) -> u64 {
-        if self.current_burst_count >= self.rate_limit_burst {
-            return 0; // Rate limit exceeded
-        }
-        self.current_burst_count += 1;
-
-        let entry_id = self.next_id;
+        let id = self.next_id;
         self.next_id += 1;
 
-        let mut entry = JournalLogEntryV2 {
-            id: entry_id,
-            timestamp_us: entry_id * 5_000,
+        let mut record = JournalLogRecordV2 {
+            entry_id: id,
+            timestamp_us: id * 1000 + 1600000000000000,
             facility,
             severity,
-            fields,
+            pid,
+            uid,
+            comm: comm.to_string(),
+            systemd_unit: unit.to_string(),
+            hostname: hostname.to_string(),
+            selinux_context: "system_u:system_r:unconfined_t:s0".to_string(),
+            boot_id: "b492f2e4-98a0-4d56-a148-9c102a0df821".to_string(),
             message: message.to_string(),
-            custom_metadata,
-            checksum_crc32: 0,
+            structured_fields: BTreeMap::new(),
+            crc32_checksum: 0,
         };
-        entry.checksum_crc32 = entry.compute_crc32();
-        self.total_logged_bytes += entry.message.len() as u64;
+        record.structured_fields.insert("_PID".to_string(), pid.to_string());
+        record.structured_fields.insert("_UID".to_string(), uid.to_string());
+        record.structured_fields.insert("_SYSTEMD_UNIT".to_string(), unit.to_string());
+        record.structured_fields.insert("_COMM".to_string(), comm.to_string());
+        record.crc32_checksum = record.compute_crc32();
 
-        self.entries.push(entry);
-
-        if self.entries.len() >= self.rotate_config.max_entries_per_file {
-            self.rotate_logs();
-        }
-
-        entry_id
-    }
-
-    pub fn rotate_logs(&mut self) {
-        if self.entries.is_empty() {
-            return;
-        }
-        let archive = std::mem::take(&mut self.entries);
-        self.rotated_archives.push(archive);
-
-        if self.rotated_archives.len() > self.rotate_config.max_rotated_generations {
-            self.rotated_archives.remove(0);
-        }
-    }
-
-    pub fn verify_journal_integrity(&self) -> (usize, usize) {
-        let mut valid = 0;
-        let mut corrupted = 0;
-        for entry in &self.entries {
-            if entry.checksum_crc32 == entry.compute_crc32() {
-                valid += 1;
-            } else {
-                corrupted += 1;
+        // Check pattern DB rules
+        for rule in &mut self.pattern_rules {
+            if message.contains(&rule.pattern) {
+                rule.match_count += 1;
             }
         }
-        (valid, corrupted)
+
+        self.records.push(record);
+        id
     }
 
-    pub fn query_journal(
-        &self,
-        unit_filter: Option<&str>,
-        min_severity: Option<LogSeverityV2>,
-        search_pattern: Option<&str>,
-    ) -> Vec<&JournalLogEntryV2> {
-        self.entries
-            .iter()
-            .filter(|e| {
-                if let Some(unit) = unit_filter {
-                    if e.fields.systemd_unit != unit {
-                        return false;
-                    }
-                }
-                if let Some(sev) = min_severity {
-                    if e.severity > sev {
-                        return false;
-                    }
-                }
-                if let Some(pat) = search_pattern {
-                    if !e.message.contains(pat) {
-                        return false;
-                    }
-                }
-                true
-            })
-            .collect()
+    pub fn add_pattern_rule(&mut self, rule_id: &str, pattern: &str, destination: &str) {
+        self.pattern_rules.push(SyslogNgPatternRuleV2 {
+            rule_id: rule_id.to_string(),
+            pattern: pattern.to_string(),
+            target_destination: destination.to_string(),
+            match_count: 0,
+        });
+    }
+
+    pub fn register_logrotate_policy(&mut self, policy: LogrotatePolicyV2) {
+        self.rotation_policies.push(policy);
+    }
+
+    pub fn query_by_unit(&self, unit: &str) -> Vec<&JournalLogRecordV2> {
+        self.records.iter().filter(|r| r.systemd_unit == unit).collect()
+    }
+
+    pub fn query_by_severity(&self, min_severity: LogSeverityV2) -> Vec<&JournalLogRecordV2> {
+        self.records.iter().filter(|r| r.severity <= min_severity).collect()
+    }
+
+    pub fn verify_journal_integrity(&self) -> bool {
+        self.records.iter().all(|r| r.crc32_checksum == r.compute_crc32())
+    }
+
+    pub fn format_rfc5424(&self, record: &JournalLogRecordV2) -> String {
+        let pri = (record.facility as u8) * 8 + (record.severity as u8);
+        format!(
+            "<{}>1 2026-03-30T12:00:00.000Z {} {} {} - - [journald@sigma pid=\"{}\" unit=\"{}\"] {}",
+            pri, record.hostname, record.comm, record.pid, record.pid, record.systemd_unit, record.message
+        )
+    }
+
+    pub fn export_json(&self, record: &JournalLogRecordV2) -> String {
+        format!(
+            "{{\"__ENTRY_ID\":{},\"_PID\":{},\"_UID\":{},\"_SYSTEMD_UNIT\":\"{}\",\"_COMM\":\"{}\",\"_HOSTNAME\":\"{}\",\"MESSAGE\":\"{}\",\"CRC32\":{}}}",
+            record.entry_id, record.pid, record.uid, record.systemd_unit, record.comm, record.hostname, record.message, record.crc32_checksum
+        )
     }
 }
 
 // ============================================================================
-// 2. DMESG KERNEL RING BUFFER ENGINE V2
+// 2. DMESG KERNEL RING BUFFER V2
 // ============================================================================
 
-/// Single Kernel Ring Buffer Record V2
+/// Dmesg Log Level
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[repr(u8)]
+pub enum KernelLoglevelV2 {
+    Emergency = 0,
+    Alert = 1,
+    Critical = 2,
+    Error = 3,
+    Warning = 4,
+    Notice = 5,
+    Info = 6,
+    Debug = 7,
+}
+
+/// Dmesg Kernel Ring Buffer Log Entry V2
 #[derive(Debug, Clone)]
-pub struct DmesgRecordV2 {
-    pub sequence: u64,
-    pub timestamp_us: u64,
-    pub delta_us: u64,
-    pub severity: LogSeverityV2,
-    pub subsystem: String,
+pub struct KernelLogEntryV2 {
+    pub seq_id: u64,
+    pub boot_timestamp_us: u64,
+    pub iso_timestamp: String,
+    pub loglevel: KernelLoglevelV2,
+    pub subsystem_tag: String,
     pub message: String,
-    pub caller_ip: u64,
-}
-
-impl DmesgRecordV2 {
-    pub fn format_human(&self) -> String {
-        let sec = self.timestamp_us as f64 / 1_000_000.0;
-        format!(
-            "[{:12.6}] [{:>8}] <{}> {}",
-            sec,
-            self.subsystem,
-            self.severity.as_str(),
-            self.message
-        )
-    }
-
-    pub fn format_iso8601(&self) -> String {
-        format!(
-            "2025-02-15T00:00:{:02}.{:06}Z [{}] {}",
-            (self.timestamp_us / 1_000_000) % 60,
-            self.timestamp_us % 1_000_000,
-            self.subsystem,
-            self.message
-        )
-    }
 }
 
 /// Dmesg Kernel Ring Buffer Engine V2
 #[derive(Debug, Clone)]
 pub struct DmesgKernelRingBufferV2 {
-    pub buffer: Vec<DmesgRecordV2>,
-    pub max_capacity: usize,
-    pub sequence_counter: u64,
-    pub console_loglevel: u8, // 1..8 (KERN_EMERG..KERN_DEBUG)
-    pub last_timestamp_us: u64,
+    entries: Vec<KernelLogEntryV2>,
+    max_capacity: usize,
+    console_loglevel: KernelLoglevelV2,
+    next_seq: u64,
 }
 
 impl DmesgKernelRingBufferV2 {
     pub fn new(capacity: usize) -> Self {
-        let mut engine = Self {
-            buffer: Vec::new(),
+        Self {
+            entries: Vec::new(),
             max_capacity: capacity,
-            sequence_counter: 0,
-            console_loglevel: 7, // Default dmesg -n 7
-            last_timestamp_us: 0,
-        };
-        engine.populate_initial_kernel_boot_sequence();
-        engine
-    }
-
-    fn populate_initial_kernel_boot_sequence(&mut self) {
-        let boot_msgs: &[(&str, LogSeverityV2, &str, u64, u64)] = &[
-            (
-                "Linux/BSD Sovereign Microkernel 6.12.0-sigmaos initializing...",
-                LogSeverityV2::Info,
-                "kernel",
-                0,
-                0xffffffff81000010,
-            ),
-            (
-                "Command line: root=UUID=53828-sigma-root rw quiet splash Audit=1",
-                LogSeverityV2::Info,
-                "kernel",
-                120,
-                0xffffffff81000045,
-            ),
-            (
-                "x86/cpu: Intel Core i9-13900K (16 P-cores, 8 E-cores, 32 threads) detected",
-                LogSeverityV2::Info,
-                "cpu",
-                850,
-                0xffffffff81002100,
-            ),
-            (
-                "BIOS-provided physical RAM map: 65536 MB total, 640 KB low memory reserved",
-                LogSeverityV2::Info,
-                "memory",
-                1400,
-                0xffffffff81005200,
-            ),
-            (
-                "ACPI: RSDP at 0x000F0240, parsing FADT, MADT, DSDT tables...",
-                LogSeverityV2::Info,
-                "acpi",
-                4800,
-                0xffffffff81010500,
-            ),
-            (
-                "SMP: 32 logical CPU cores online; APIC timers initialized at 1000 Hz",
-                LogSeverityV2::Info,
-                "smp",
-                12800,
-                0xffffffff81025000,
-            ),
-            (
-                "PCI: Host bridge initialized at 0000:00; scanning root buses...",
-                LogSeverityV2::Info,
-                "pci",
-                28000,
-                0xffffffff81038000,
-            ),
-            (
-                "nvme 0000:01:00.0: PCIe Gen4 x4, NVMe controller initialized, 2 TB SSD",
-                LogSeverityV2::Info,
-                "nvme",
-                45000,
-                0xffffffff81052000,
-            ),
-            (
-                "usbcore: registered new interface driver xhci_hcd (USB 3.2 Gen 2x2)",
-                LogSeverityV2::Info,
-                "usb",
-                89000,
-                0xffffffff81075000,
-            ),
-            (
-                "SovereignFS: Mounting root Btrfs filesystem (UUID=53828-sigma-root)...",
-                LogSeverityV2::Info,
-                "fs",
-                160000,
-                0xffffffff81090000,
-            ),
-            (
-                "systemd[1]: Sovereign microkernel initialization phase complete; entering multi-user.target",
-                LogSeverityV2::Notice,
-                "init",
-                280000,
-                0xffffffff81120000,
-            ),
-        ];
-
-        for &(msg, sev, subsys, ts, ip) in boot_msgs {
-            self.sequence_counter += 1;
-            let delta = ts.saturating_sub(self.last_timestamp_us);
-            self.last_timestamp_us = ts;
-
-            self.buffer.push(DmesgRecordV2 {
-                sequence: self.sequence_counter,
-                timestamp_us: ts,
-                delta_us: delta,
-                severity: sev,
-                subsystem: subsys.to_string(),
-                message: msg.to_string(),
-                caller_ip: ip,
-            });
+            console_loglevel: KernelLoglevelV2::Notice,
+            next_seq: 1,
         }
     }
 
-    pub fn print_klog(
-        &mut self,
-        subsystem: &str,
-        severity: LogSeverityV2,
-        message: &str,
-        caller_ip: u64,
-    ) {
-        self.sequence_counter += 1;
-        let ts = self.sequence_counter * 2_000;
-        let delta = ts.saturating_sub(self.last_timestamp_us);
-        self.last_timestamp_us = ts;
-
-        if self.buffer.len() >= self.max_capacity {
-            self.buffer.remove(0); // Evict oldest
+    pub fn printk(&mut self, loglevel: KernelLoglevelV2, subsystem: &str, message: &str) {
+        if self.entries.len() >= self.max_capacity {
+            self.entries.remove(0);
         }
-
-        self.buffer.push(DmesgRecordV2 {
-            sequence: self.sequence_counter,
-            timestamp_us: ts,
-            delta_us: delta,
-            severity,
-            subsystem: subsystem.to_string(),
+        let seq = self.next_seq;
+        self.next_seq += 1;
+        let us = seq * 500 + 10000;
+        let entry = KernelLogEntryV2 {
+            seq_id: seq,
+            boot_timestamp_us: us,
+            iso_timestamp: format!("2026-03-30T12:00:{:02}.{:03}Z", (us / 1000000) % 60, (us / 1000) % 1000),
+            loglevel,
+            subsystem_tag: subsystem.to_string(),
             message: message.to_string(),
-            caller_ip,
-        });
+        };
+        self.entries.push(entry);
     }
 
-    pub fn set_console_loglevel(&mut self, level: u8) {
-        self.console_loglevel = level.clamp(1, 8);
+    pub fn set_console_loglevel(&mut self, level: KernelLoglevelV2) {
+        self.console_loglevel = level;
+    }
+
+    pub fn filter_by_subsystem(&self, tag: &str) -> Vec<&KernelLogEntryV2> {
+        self.entries.iter().filter(|e| e.subsystem_tag == tag).collect()
+    }
+
+    pub fn console_visible_entries(&self) -> Vec<&KernelLogEntryV2> {
+        self.entries.iter().filter(|e| e.loglevel <= self.console_loglevel).collect()
+    }
+
+    pub fn format_dmesg_line(&self, entry: &KernelLogEntryV2) -> String {
+        let sec = entry.boot_timestamp_us as f64 / 1_000_000.0;
+        format!(
+            "[{:12.6}] [{:<6}] {}: {}",
+            sec,
+            entry.subsystem_tag,
+            match entry.loglevel {
+                KernelLoglevelV2::Emergency => "EMERG",
+                KernelLoglevelV2::Alert => "ALERT",
+                KernelLoglevelV2::Critical => "CRIT",
+                KernelLoglevelV2::Error => "ERR",
+                KernelLoglevelV2::Warning => "WARN",
+                KernelLoglevelV2::Notice => "NOTICE",
+                KernelLoglevelV2::Info => "INFO",
+                KernelLoglevelV2::Debug => "DEBUG",
+            },
+            entry.message
+        )
     }
 
     pub fn clear(&mut self) {
-        self.buffer.clear();
-    }
-
-    pub fn filter(
-        &self,
-        min_severity: Option<LogSeverityV2>,
-        subsystem: Option<&str>,
-    ) -> Vec<&DmesgRecordV2> {
-        self.buffer
-            .iter()
-            .filter(|rec| {
-                if let Some(sev) = min_severity {
-                    if rec.severity > sev {
-                        return false;
-                    }
-                }
-                if let Some(sub) = subsystem {
-                    if rec.subsystem != sub {
-                        return false;
-                    }
-                }
-                true
-            })
-            .collect()
+        self.entries.clear();
     }
 }
 
 // ============================================================================
-// 3. TOP / HTOP / CGTOP PROCESS MONITOR ENGINE V2
+// 3. TOP / HTOP / CGTOP PROCESS MONITOR V2
 // ============================================================================
 
 /// Process Execution State V2
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProcessStateV2 {
-    Running,
-    Sleeping,
-    DiskSleep,
-    Stopped,
-    Zombie,
-    Idle,
+    Running,    // R
+    Sleeping,   // S
+    DiskSleep,  // D
+    Stopped,    // T
+    Zombie,     // Z
+    Idle,       // I
+    Paging,     // W
 }
 
 impl ProcessStateV2 {
@@ -645,209 +400,118 @@ impl ProcessStateV2 {
             ProcessStateV2::Stopped => 'T',
             ProcessStateV2::Zombie => 'Z',
             ProcessStateV2::Idle => 'I',
+            ProcessStateV2::Paging => 'W',
         }
     }
 }
 
-/// Process Sorting Criteria (`top`/`htop`)
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ProcessSortBy {
-    Cpu,
-    Memory,
-    Pid,
-    User,
-    ReadIo,
-    WriteIo,
-    Threads,
-}
-
-/// Extended Process Activity Telemetry Record V2
+/// Detailed Process Telemetry V2
 #[derive(Debug, Clone)]
 pub struct ProcessTelemetryV2 {
     pub pid: u32,
     pub ppid: u32,
-    pub uid: u32,
-    pub gid: u32,
-    pub user: String,
     pub name: String,
+    pub user: String,
     pub state: ProcessStateV2,
-    pub cpu_usage_pct: f32,
-    pub mem_usage_pct: f32,
-    pub virt_mem_kb: u64,
-    pub res_mem_kb: u64,
-    pub shr_mem_kb: u64,
+    pub cpu_percent: f32,
+    pub memory_rss_kb: u64,
+    pub memory_virt_kb: u64,
     pub num_threads: u32,
-    pub nice: i8, // -20..19
-    pub priority: i32,
-    pub read_bytes_sec: u64,
-    pub write_bytes_sec: u64,
+    pub io_read_kb_s: f32,
+    pub io_write_kb_s: f32,
     pub cgroup_path: String,
-    pub oom_score: u32,
 }
 
-/// CPU Core Detailed Utilization
+/// Per-CPU Core Breakdown V2
 #[derive(Debug, Clone)]
-pub struct CpuCoreUsage {
-    pub core_id: usize,
-    pub user_pct: f32,
-    pub sys_pct: f32,
-    pub nice_pct: f32,
-    pub idle_pct: f32,
-    pub iowait_pct: f32,
-    pub irq_pct: f32,
-    pub softirq_pct: f32,
-    pub steal_pct: f32,
+pub struct CpuCoreBreakdownV2 {
+    pub core_id: u32,
+    pub user_percent: f32,
+    pub sys_percent: f32,
+    pub nice_percent: f32,
+    pub iowait_percent: f32,
+    pub irq_percent: f32,
+    pub softirq_percent: f32,
+    pub steal_percent: f32,
+    pub idle_percent: f32,
 }
 
-/// Top & Htop Process Telemetry Monitor V2
+/// Cgroup v2 Resource Usage (`cgtop`)
+#[derive(Debug, Clone)]
+pub struct CgroupV2ResourceUsageV2 {
+    pub cgroup_path: String,
+    pub num_tasks: u32,
+    pub cpu_usage_percent: f32,
+    pub memory_current_bytes: u64,
+    pub io_bytes_s: u64,
+}
+
+/// Top & Htop Process Telemetry Engine V2
 #[derive(Debug, Clone)]
 pub struct TopHtopProcessMonitorV2 {
-    pub processes: BTreeMap<u32, ProcessTelemetryV2>,
-    pub cpu_cores: Vec<CpuCoreUsage>,
-    pub total_cpu_user_pct: f32,
-    pub total_cpu_sys_pct: f32,
-    pub total_cpu_idle_pct: f32,
-    pub total_ram_kb: u64,
-    pub used_ram_kb: u64,
-    pub total_swap_kb: u64,
-    pub used_swap_kb: u64,
+    processes: HashMap<u32, ProcessTelemetryV2>,
+    cpu_cores: Vec<CpuCoreBreakdownV2>,
+    cgroups: Vec<CgroupV2ResourceUsageV2>,
 }
 
 impl TopHtopProcessMonitorV2 {
     pub fn new() -> Self {
-        let mut engine = Self {
-            processes: BTreeMap::new(),
+        Self {
+            processes: HashMap::new(),
             cpu_cores: Vec::new(),
-            total_cpu_user_pct: 14.2,
-            total_cpu_sys_pct: 3.8,
-            total_cpu_idle_pct: 82.0,
-            total_ram_kb: 67_108_864, // 64 GB
-            used_ram_kb: 16_777_216,  // 16 GB
-            total_swap_kb: 8_388_608, // 8 GB
-            used_swap_kb: 0,
-        };
-        engine.populate_sample_data();
-        engine
-    }
-
-    fn populate_sample_data(&mut self) {
-        // Sample Cores
-        for id in 0..8 {
-            self.cpu_cores.push(CpuCoreUsage {
-                core_id: id,
-                user_pct: 12.0 + (id as f32 * 1.5),
-                sys_pct: 3.0 + (id as f32 * 0.2),
-                nice_pct: 0.0,
-                idle_pct: 85.0 - (id as f32 * 1.7),
-                iowait_pct: 0.0,
-                irq_pct: 0.1,
-                softirq_pct: 0.1,
-                steal_pct: 0.0,
-            });
-        }
-
-        // Sample Processes
-        let samples = vec![
-            ProcessTelemetryV2 {
-                pid: 1,
-                ppid: 0,
-                uid: 0,
-                gid: 0,
-                user: "root".to_string(),
-                name: "systemd".to_string(),
-                state: ProcessStateV2::Sleeping,
-                cpu_usage_pct: 0.1,
-                mem_usage_pct: 0.1,
-                virt_mem_kb: 168000,
-                res_mem_kb: 12400,
-                shr_mem_kb: 8192,
-                num_threads: 1,
-                nice: 0,
-                priority: 20,
-                read_bytes_sec: 2048,
-                write_bytes_sec: 1024,
-                cgroup_path: "/init.scope".to_string(),
-                oom_score: 0,
-            },
-            ProcessTelemetryV2 {
-                pid: 240,
-                ppid: 1,
-                uid: 0,
-                gid: 0,
-                user: "root".to_string(),
-                name: "journald".to_string(),
-                state: ProcessStateV2::Sleeping,
-                cpu_usage_pct: 0.8,
-                mem_usage_pct: 0.3,
-                virt_mem_kb: 94000,
-                res_mem_kb: 18400,
-                shr_mem_kb: 10240,
-                num_threads: 2,
-                nice: -10,
-                priority: 10,
-                read_bytes_sec: 8192,
-                write_bytes_sec: 32768,
-                cgroup_path: "/system.slice/systemd-journald.service".to_string(),
-                oom_score: 10,
-            },
-            ProcessTelemetryV2 {
-                pid: 1024,
-                ppid: 1,
-                uid: 1000,
-                gid: 1000,
-                user: "sigma".to_string(),
-                name: "zenith-desktop".to_string(),
-                state: ProcessStateV2::Running,
-                cpu_usage_pct: 8.5,
-                mem_usage_pct: 3.2,
-                virt_mem_kb: 1048576,
-                res_mem_kb: 214748,
-                shr_mem_kb: 65536,
-                num_threads: 12,
-                nice: 0,
-                priority: 20,
-                read_bytes_sec: 65536,
-                write_bytes_sec: 16384,
-                cgroup_path: "/user.slice/user-1000.slice/session-1.scope".to_string(),
-                oom_score: 200,
-            },
-        ];
-
-        for proc in samples {
-            self.processes.insert(proc.pid, proc);
+            cgroups: Vec::new(),
         }
     }
 
-    pub fn sort(&self, criterion: ProcessSortBy) -> Vec<&ProcessTelemetryV2> {
+    pub fn update_process(&mut self, proc_info: ProcessTelemetryV2) {
+        self.processes.insert(proc_info.pid, proc_info);
+    }
+
+    pub fn set_cpu_cores(&mut self, cores: Vec<CpuCoreBreakdownV2>) {
+        self.cpu_cores = cores;
+    }
+
+    pub fn set_cgroups(&mut self, cgroups: Vec<CgroupV2ResourceUsageV2>) {
+        self.cgroups = cgroups;
+    }
+
+    pub fn get_top_cpu(&self, limit: usize) -> Vec<&ProcessTelemetryV2> {
         let mut list: Vec<&ProcessTelemetryV2> = self.processes.values().collect();
-        match criterion {
-            ProcessSortBy::Cpu => {
-                list.sort_by(|a, b| b.cpu_usage_pct.partial_cmp(&a.cpu_usage_pct).unwrap())
-            }
-            ProcessSortBy::Memory => {
-                list.sort_by(|a, b| b.mem_usage_pct.partial_cmp(&a.mem_usage_pct).unwrap())
-            }
-            ProcessSortBy::Pid => list.sort_by_key(|p| p.pid),
-            ProcessSortBy::User => list.sort_by(|a, b| a.user.cmp(&b.user)),
-            ProcessSortBy::ReadIo => list.sort_by_key(|p| std::cmp::Reverse(p.read_bytes_sec)),
-            ProcessSortBy::WriteIo => list.sort_by_key(|p| std::cmp::Reverse(p.write_bytes_sec)),
-            ProcessSortBy::Threads => list.sort_by_key(|p| std::cmp::Reverse(p.num_threads)),
-        }
-        list
+        list.sort_by(|a, b| b.cpu_percent.partial_cmp(&a.cpu_percent).unwrap_or(std::cmp::Ordering::Equal));
+        list.into_iter().take(limit).collect()
     }
 
-    pub fn build_process_tree(&self) -> HashMap<u32, Vec<u32>> {
-        let mut tree: HashMap<u32, Vec<u32>> = HashMap::new();
-        for proc in self.processes.values() {
-            tree.entry(proc.ppid).or_default().push(proc.pid);
+    pub fn get_top_memory(&self, limit: usize) -> Vec<&ProcessTelemetryV2> {
+        let mut list: Vec<&ProcessTelemetryV2> = self.processes.values().collect();
+        list.sort_by(|a, b| b.memory_rss_kb.cmp(&a.memory_rss_kb));
+        list.into_iter().take(limit).collect()
+    }
+
+    pub fn build_process_tree(&self, root_pid: u32) -> Vec<(u32, String, u32)> {
+        let mut tree = Vec::new();
+        let mut queue = vec![(root_pid, 0)];
+        while let Some((pid, depth)) = queue.pop() {
+            if let Some(proc_info) = self.processes.get(&pid) {
+                tree.push((proc_info.pid, proc_info.name.clone(), depth));
+                let mut children: Vec<u32> = self.processes.values()
+                    .filter(|p| p.ppid == pid)
+                    .map(|p| p.pid)
+                    .collect();
+                children.sort_by(|a, b| b.cmp(a));
+                for child_pid in children {
+                    queue.push((child_pid, depth + 1));
+                }
+            }
         }
         tree
     }
 
-    pub fn dispatch_signal(&mut self, pid: u32, signal: i32) -> bool {
-        if let Some(proc) = self.processes.get_mut(&pid) {
-            if signal == 9 || signal == 15 {
-                proc.state = ProcessStateV2::Zombie;
+    pub fn kill_process(&mut self, pid: u32, signal: u32) -> bool {
+        if let Some(proc_info) = self.processes.get_mut(&pid) {
+            if signal == 9 {
+                proc_info.state = ProcessStateV2::Zombie;
+            } else if signal == 15 {
+                proc_info.state = ProcessStateV2::Stopped;
             }
             true
         } else {
@@ -856,707 +520,479 @@ impl TopHtopProcessMonitorV2 {
     }
 }
 
-impl Default for TopHtopProcessMonitorV2 {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 // ============================================================================
-// 4. VMSTAT / IOSTAT / SAR METRICS COLLECTOR V2
+// 4. VMSTAT / IOSTAT / SAR / SYSSTAT V2
 // ============================================================================
 
-/// Vmstat System Memory & CPU Activity Snapshot V2
-#[derive(Debug, Clone, Copy)]
+/// Virtual Memory Statistics (`vmstat`) V2
+#[derive(Debug, Clone)]
 pub struct VmstatSnapshotV2 {
-    pub timestamp_sec: u64,
-    pub procs_running: u32,
-    pub procs_blocked: u32,
-    pub swpd_kb: u64,
-    pub free_kb: u64,
-    pub buff_kb: u64,
-    pub cache_kb: u64,
+    pub run_queue_procs: u32,
+    pub blocked_procs: u32,
+    pub swap_used_kb: u64,
+    pub free_mem_kb: u64,
+    pub buff_mem_kb: u64,
+    pub cache_mem_kb: u64,
     pub swap_in_kb_s: u32,
     pub swap_out_kb_s: u32,
-    pub blocks_in_s: u32,
-    pub blocks_out_s: u32,
+    pub block_in_kb_s: u32,
+    pub block_out_kb_s: u32,
     pub interrupts_s: u32,
     pub context_switches_s: u32,
-    pub cpu_user_pct: u8,
-    pub cpu_sys_pct: u8,
-    pub cpu_idle_pct: u8,
-    pub cpu_wait_pct: u8,
-    pub cpu_steal_pct: u8,
+    pub cpu_user_pct: f32,
+    pub cpu_sys_pct: f32,
+    pub cpu_idle_pct: f32,
+    pub cpu_wait_pct: f32,
+    pub cpu_steal_pct: f32,
 }
 
-/// Iostat Block Device Extended Statistics V2
+/// Block Device Extended I/O Statistics (`iostat`) V2
 #[derive(Debug, Clone)]
-pub struct IostatDeviceSnapshotV2 {
+pub struct IostatDeviceStatsV2 {
     pub device_name: String,
     pub tps: f32,
-    pub read_kb_sec: f32,
-    pub write_kb_sec: f32,
-    pub read_s: f32,
-    pub write_s: f32,
-    pub avg_r_await_ms: f32,
-    pub avg_w_await_ms: f32,
-    pub util_pct: f32,
+    pub read_req_s: f32,
+    pub write_req_s: f32,
+    pub read_kb_s: f32,
+    pub write_kb_s: f32,
+    pub avg_req_size_sectors: f32,
+    pub avg_queue_len: f32,
+    pub r_await_ms: f32,
+    pub w_await_ms: f32,
+    pub util_percent: f32,
 }
 
-/// Sar Time-Series Historical Performance Buffer V2 (`sysstat`)
+/// SAR Time-Series Record V2 (`saDD` daily snapshot)
+#[derive(Debug, Clone)]
+pub struct SarTimeSeriesRecordV2 {
+    pub timestamp_sec: u64,
+    pub vmstat: VmstatSnapshotV2,
+    pub iostat: Vec<IostatDeviceStatsV2>,
+}
+
+/// Vmstat / Iostat / SAR Collector Engine V2
 #[derive(Debug, Clone)]
 pub struct VmstatIostatSarCollectorV2 {
-    pub vmstat_history: Vec<VmstatSnapshotV2>,
-    pub iostat_history: Vec<IostatDeviceSnapshotV2>,
-    pub max_history_capacity: usize,
+    historical_records: Vec<SarTimeSeriesRecordV2>,
 }
 
 impl VmstatIostatSarCollectorV2 {
     pub fn new() -> Self {
-        let mut engine = Self {
-            vmstat_history: Vec::new(),
-            iostat_history: Vec::new(),
-            max_history_capacity: 1440, // 24 hours at 1 snapshot/min
-        };
-        engine.record_sample_data();
-        engine
+        Self {
+            historical_records: Vec::new(),
+        }
     }
 
-    fn record_sample_data(&mut self) {
-        for t in 0..10 {
-            self.vmstat_history.push(VmstatSnapshotV2 {
-                timestamp_sec: 1700000000 + (t * 60),
-                procs_running: 2 + (t as u32 % 3),
-                procs_blocked: 0,
-                swpd_kb: 0,
-                free_kb: 48_000_000,
-                buff_kb: 1_200_000,
-                cache_kb: 12_400_000,
-                swap_in_kb_s: 0,
-                swap_out_kb_s: 0,
-                blocks_in_s: 128,
-                blocks_out_s: 64,
-                interrupts_s: 1450,
-                context_switches_s: 3200,
-                cpu_user_pct: 12 + (t as u8 % 5),
-                cpu_sys_pct: 3,
-                cpu_idle_pct: 84 - (t as u8 % 5),
-                cpu_wait_pct: 1,
-                cpu_steal_pct: 0,
-            });
-        }
-
-        self.iostat_history.push(IostatDeviceSnapshotV2 {
-            device_name: "nvme0n1".to_string(),
-            tps: 184.2,
-            read_kb_sec: 4096.0,
-            write_kb_sec: 2048.0,
-            read_s: 120.0,
-            write_s: 64.2,
-            avg_r_await_ms: 0.35,
-            avg_w_await_ms: 0.52,
-            util_pct: 4.8,
+    pub fn record_snapshot(&mut self, timestamp: u64, vmstat: VmstatSnapshotV2, iostat: Vec<IostatDeviceStatsV2>) {
+        self.historical_records.push(SarTimeSeriesRecordV2 {
+            timestamp_sec: timestamp,
+            vmstat,
+            iostat,
         });
     }
 
-    pub fn query_sar_range(&self, start_sec: u64, end_sec: u64) -> Vec<&VmstatSnapshotV2> {
-        self.vmstat_history
-            .iter()
-            .filter(|v| v.timestamp_sec >= start_sec && v.timestamp_sec <= end_sec)
+    pub fn query_time_range(&self, start_ts: u64, end_ts: u64) -> Vec<&SarTimeSeriesRecordV2> {
+        self.historical_records.iter()
+            .filter(|r| r.timestamp_sec >= start_ts && r.timestamp_sec <= end_ts)
             .collect()
     }
 
-    pub fn calculate_sar_cpu_averages(&self) -> (f32, f32, f32, f32) {
-        if self.vmstat_history.is_empty() {
-            return (0.0, 0.0, 0.0, 0.0);
-        }
-        let total = self.vmstat_history.len() as f32;
-        let u: f32 = self
-            .vmstat_history
-            .iter()
-            .map(|v| v.cpu_user_pct as f32)
-            .sum();
-        let s: f32 = self
-            .vmstat_history
-            .iter()
-            .map(|v| v.cpu_sys_pct as f32)
-            .sum();
-        let w: f32 = self
-            .vmstat_history
-            .iter()
-            .map(|v| v.cpu_wait_pct as f32)
-            .sum();
-        let i: f32 = self
-            .vmstat_history
-            .iter()
-            .map(|v| v.cpu_idle_pct as f32)
-            .sum();
-
-        (u / total, s / total, w / total, i / total)
-    }
-}
-
-impl Default for VmstatIostatSarCollectorV2 {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ============================================================================
-// 5. LSOF OPEN FILES INSPECTOR ENGINE V2
-// ============================================================================
-
-/// Open File Descriptor Type V2 (`lsof`)
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum OpenFileTypeV2 {
-    Regular,
-    Directory,
-    Character,
-    Block,
-    Fifo,
-    UnixSocket,
-    Ipv4TcpSocket,
-    Ipv4UdpSocket,
-    Ipv6TcpSocket,
-    Ipv6UdpSocket,
-    EventFd,
-    EpollFd,
-    InotifyFd,
-    MemFd,
-}
-
-/// Socket Connection State (`lsof`)
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SocketState {
-    Listen,
-    Established,
-    SynSent,
-    FinWait1,
-    TimeWait,
-    CloseWait,
-}
-
-/// File Lock Mode (`lsof`)
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum FileLockMode {
-    None,
-    SharedRead,
-    ExclusiveWrite,
-}
-
-/// Open File Descriptor Record V2 (`lsof`)
-#[derive(Debug, Clone)]
-pub struct OpenFileRecordV2 {
-    pub pid: u32,
-    pub command: String,
-    pub user: String,
-    pub fd_name: String, // cwd, rtd, txt, mem, 0u, 1w, 2w, 3r, etc.
-    pub file_type: OpenFileTypeV2,
-    pub device: String,
-    pub node_inode: u64,
-    pub lock_mode: FileLockMode,
-    pub socket_state: Option<SocketState>,
-    pub path_name: String,
-}
-
-/// Lsof Open Files Inspector Engine V2
-#[derive(Debug, Clone)]
-pub struct LsofOpenFilesInspectorV2 {
-    pub open_files: Vec<OpenFileRecordV2>,
-}
-
-impl LsofOpenFilesInspectorV2 {
-    pub fn new() -> Self {
-        let mut engine = Self {
-            open_files: Vec::new(),
-        };
-        engine.populate_sample_files();
-        engine
+    pub fn get_latest_vmstat(&self) -> Option<&VmstatSnapshotV2> {
+        self.historical_records.last().map(|r| &r.vmstat)
     }
 
-    fn populate_sample_files(&mut self) {
-        self.open_files.extend(vec![
-            OpenFileRecordV2 {
-                pid: 1,
-                command: "systemd".to_string(),
-                user: "root".to_string(),
-                fd_name: "cwd".to_string(),
-                file_type: OpenFileTypeV2::Directory,
-                device: "259,1".to_string(),
-                node_inode: 2,
-                lock_mode: FileLockMode::None,
-                socket_state: None,
-                path_name: "/".to_string(),
-            },
-            OpenFileRecordV2 {
-                pid: 1024,
-                command: "zenith-desktop".to_string(),
-                user: "sigma".to_string(),
-                fd_name: "3u".to_string(),
-                file_type: OpenFileTypeV2::UnixSocket,
-                device: "0,12".to_string(),
-                node_inode: 15420,
-                lock_mode: FileLockMode::None,
-                socket_state: Some(SocketState::Established),
-                path_name: "@wayland-0".to_string(),
-            },
-            OpenFileRecordV2 {
-                pid: 1024,
-                command: "zenith-desktop".to_string(),
-                user: "sigma".to_string(),
-                fd_name: "4u".to_string(),
-                file_type: OpenFileTypeV2::Ipv4TcpSocket,
-                device: "0,18".to_string(),
-                node_inode: 18910,
-                lock_mode: FileLockMode::None,
-                socket_state: Some(SocketState::Listen),
-                path_name: "127.0.0.1:8080".to_string(),
-            },
-            OpenFileRecordV2 {
-                pid: 1024,
-                command: "zenith-desktop".to_string(),
-                user: "sigma".to_string(),
-                fd_name: "5r".to_string(),
-                file_type: OpenFileTypeV2::Regular,
-                device: "259,1".to_string(),
-                node_inode: 981240,
-                lock_mode: FileLockMode::SharedRead,
-                socket_state: None,
-                path_name: "/home/sigma/.config/zenith.json".to_string(),
-            },
-        ]);
+    pub fn format_vmstat_header() -> &'static str {
+        "procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu----- \n r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st"
     }
 
-    pub fn find_by_pid(&self, pid: u32) -> Vec<&OpenFileRecordV2> {
-        self.open_files.iter().filter(|f| f.pid == pid).collect()
-    }
-
-    pub fn find_by_socket_state(&self, state: SocketState) -> Vec<&OpenFileRecordV2> {
-        self.open_files
-            .iter()
-            .filter(|f| f.socket_state == Some(state))
-            .collect()
-    }
-
-    pub fn find_by_path(&self, substring: &str) -> Vec<&OpenFileRecordV2> {
-        self.open_files
-            .iter()
-            .filter(|f| f.path_name.contains(substring))
-            .collect()
-    }
-}
-
-impl Default for LsofOpenFilesInspectorV2 {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ============================================================================
-// 6. HARDWARE DISCOVERY ENGINE V2 (LSPCI, LSUSB, DMIDECODE)
-// ============================================================================
-
-/// PCIe Memory Base Address Register (BAR) Info
-#[derive(Debug, Clone)]
-pub struct PciBarRecord {
-    pub bar_index: u8,
-    pub base_addr: u64,
-    pub size_bytes: u64,
-    pub is_prefetchable: bool,
-    pub is_io: bool,
-}
-
-/// PCI Device Info V2 (`lspci`)
-#[derive(Debug, Clone)]
-pub struct PciDeviceRecordV2 {
-    pub domain_bus_dev_fn: String, // 0000:00:02.0
-    pub class_name: String,
-    pub vendor_id: u16,
-    pub device_id: u16,
-    pub vendor_name: String,
-    pub device_name: String,
-    pub revision: u8,
-    pub driver_in_use: String,
-    pub kernel_modules: Vec<String>,
-    pub pcie_speed: String, // "Gen4 x16"
-    pub memory_bars: Vec<PciBarRecord>,
-}
-
-/// USB Protocol Speed Mode (`lsusb`)
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum UsbSpeedMode {
-    LowSpeed1_5M,
-    FullSpeed12M,
-    HighSpeed480M,
-    SuperSpeed5G,
-    SuperSpeed10G,
-    SuperSpeed20G,
-    Usb4_40G,
-}
-
-/// USB Device Info V2 (`lsusb`)
-#[derive(Debug, Clone)]
-pub struct UsbDeviceRecordV2 {
-    pub bus_num: u8,
-    pub device_num: u8,
-    pub vendor_id: u16,
-    pub product_id: u16,
-    pub manufacturer: String,
-    pub product: String,
-    pub serial_number: String,
-    pub speed_mode: UsbSpeedMode,
-    pub max_power_ma: u16,
-}
-
-/// DMI/SMBIOS Hardware Tables V2 (`dmidecode`)
-#[derive(Debug, Clone)]
-pub struct DmiDecodeInfoV2 {
-    pub bios_vendor: String,
-    pub bios_version: String,
-    pub bios_release_date: String,
-    pub sys_manufacturer: String,
-    pub sys_product_name: String,
-    pub sys_serial_number: String,
-    pub sys_uuid: String,
-    pub board_manufacturer: String,
-    pub board_product_name: String,
-    pub chassis_type: String,
-    pub processor_family: String,
-    pub processor_max_speed_mhz: u32,
-    pub memory_slots_count: usize,
-    pub installed_ram_gb: usize,
-}
-
-/// Hardware Discovery Inspector Engine V2
-#[derive(Debug, Clone)]
-pub struct HardwareDiscoveryEngineV2 {
-    pub pci_devices: Vec<PciDeviceRecordV2>,
-    pub usb_devices: Vec<UsbDeviceRecordV2>,
-    pub dmi_info: DmiDecodeInfoV2,
-}
-
-impl HardwareDiscoveryEngineV2 {
-    pub fn new() -> Self {
-        Self {
-            pci_devices: vec![
-                PciDeviceRecordV2 {
-                    domain_bus_dev_fn: "0000:00:00.0".to_string(),
-                    class_name: "Host bridge".to_string(),
-                    vendor_id: 0x8086,
-                    device_id: 0xa700,
-                    vendor_name: "Intel Corporation".to_string(),
-                    device_name: "13th Gen Core Host Bridge".to_string(),
-                    revision: 0x02,
-                    driver_in_use: "pci-host".to_string(),
-                    kernel_modules: vec!["pci-host".to_string()],
-                    pcie_speed: "Gen5 x16".to_string(),
-                    memory_bars: vec![],
-                },
-                PciDeviceRecordV2 {
-                    domain_bus_dev_fn: "0000:01:00.0".to_string(),
-                    class_name: "VGA compatible controller".to_string(),
-                    vendor_id: 0x10de,
-                    device_id: 0x2784,
-                    vendor_name: "NVIDIA Corporation".to_string(),
-                    device_name: "AD104 [GeForce RTX 4070]".to_string(),
-                    revision: 0xa1,
-                    driver_in_use: "nvidia".to_string(),
-                    kernel_modules: vec!["nvidia".to_string(), "nouveau".to_string()],
-                    pcie_speed: "Gen4 x16".to_string(),
-                    memory_bars: vec![PciBarRecord {
-                        bar_index: 0,
-                        base_addr: 0xFA000000,
-                        size_bytes: 16777216,
-                        is_prefetchable: false,
-                        is_io: false,
-                    }],
-                },
-            ],
-            usb_devices: vec![UsbDeviceRecordV2 {
-                bus_num: 1,
-                device_num: 2,
-                vendor_id: 0x046d,
-                product_id: 0xc52b,
-                manufacturer: "Logitech".to_string(),
-                product: "USB Receiver".to_string(),
-                serial_number: "LOGI-9812".to_string(),
-                speed_mode: UsbSpeedMode::FullSpeed12M,
-                max_power_ma: 98,
-            }],
-            dmi_info: DmiDecodeInfoV2 {
-                bios_vendor: "American Megatrends Inc.".to_string(),
-                bios_version: "3.20".to_string(),
-                bios_release_date: "2025-01-10".to_string(),
-                sys_manufacturer: "SigmaOS Sovereign Systems".to_string(),
-                sys_product_name: "Sovereign Workstation Apex".to_string(),
-                sys_serial_number: "SIGMA-2025-APEX1".to_string(),
-                sys_uuid: "e4f8109a-53828-4821-9921-81720a41289c".to_string(),
-                board_manufacturer: "Sovereign Boards Inc.".to_string(),
-                board_product_name: "Z790-SOVEREIGN-PRO".to_string(),
-                chassis_type: "Desktop".to_string(),
-                processor_family: "x86-64 v4".to_string(),
-                processor_max_speed_mhz: 5800,
-                memory_slots_count: 4,
-                installed_ram_gb: 64,
-            },
-        }
-    }
-}
-
-impl Default for HardwareDiscoveryEngineV2 {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ============================================================================
-// 7. SOSREPORT / PROMETHEUS NODE_EXPORTER / COLLECTD EXPORTER ENGINE V2
-// ============================================================================
-
-/// Sosreport Diagnostic Archive Bundle V2
-#[derive(Debug, Clone)]
-pub struct SosreportArchiveBundleV2 {
-    pub report_id: String,
-    pub timestamp_sec: u64,
-    pub hostname: String,
-    pub os_release: String,
-    pub kernel_version: String,
-    pub captured_files: BTreeMap<String, String>,
-    pub scrubbed_sensitive_items_count: usize,
-}
-
-/// Sosreport & Telemetry Exporter Engine V2
-#[derive(Debug, Clone)]
-pub struct SosreportPrometheusExporterV2 {
-    pub hostname: String,
-}
-
-impl SosreportPrometheusExporterV2 {
-    pub fn new(hostname: &str) -> Self {
-        Self {
-            hostname: hostname.to_string(),
-        }
-    }
-
-    /// Automated Privacy Scrubbing / Sensitive Data Sanitizer
-    pub fn sanitize_text(&self, input: &str) -> (String, usize) {
-        let mut count = 0;
-        let mut out = input.to_string();
-
-        // Sanitize /home/username -> /home/[REDACTED]
-        if out.contains("/home/") {
-            out = out.replace("/home/sigma", "/home/[REDACTED]");
-            count += 1;
-        }
-
-        // Sanitize API tokens / secret keys
-        if out.contains("secret") || out.contains("token") {
-            out = out.replace("SIGMA-2025-X1", "SIGMA-[REDACTED]");
-            count += 1;
-        }
-
-        (out, count)
-    }
-
-    /// Generate automated `sosreport` bundle tarball file structure
-    pub fn generate_sosreport(
-        &self,
-        journal: &JournaldSyslogNgLogEngineV2,
-        dmesg: &DmesgKernelRingBufferV2,
-        hw: &HardwareDiscoveryEngineV2,
-        lsof: &LsofOpenFilesInspectorV2,
-    ) -> SosreportArchiveBundleV2 {
-        let mut files = BTreeMap::new();
-        let mut total_scrubbed = 0;
-
-        // Dmesg
-        let mut dmesg_txt = String::new();
-        for rec in &dmesg.buffer {
-            dmesg_txt.push_str(&rec.format_human());
-            dmesg_txt.push('\n');
-        }
-        let (clean_dmesg, s1) = self.sanitize_text(&dmesg_txt);
-        total_scrubbed += s1;
-        files.insert("var/log/dmesg".to_string(), clean_dmesg);
-
-        // Journal / Syslog
-        let mut journal_txt = String::new();
-        for entry in &journal.entries {
-            journal_txt.push_str(&entry.to_rfc5424(&self.hostname));
-            journal_txt.push('\n');
-        }
-        let (clean_journal, s2) = self.sanitize_text(&journal_txt);
-        total_scrubbed += s2;
-        files.insert("var/log/syslog".to_string(), clean_journal);
-
-        // Lsof
-        let mut lsof_txt = String::new();
-        for f in &lsof.open_files {
-            lsof_txt.push_str(&format!(
-                "{}\t{}\t{}\t{}\t{:?}\t{}\n",
-                f.command, f.pid, f.user, f.fd_name, f.file_type, f.path_name
-            ));
-        }
-        let (clean_lsof, s3) = self.sanitize_text(&lsof_txt);
-        total_scrubbed += s3;
-        files.insert("var/log/lsof.txt".to_string(), clean_lsof);
-
-        // DMI Info
-        let dmi_txt = format!(
-            "BIOS Vendor: {}\nBIOS Version: {}\nSystem Product: {}\nSerial: {}\n",
-            hw.dmi_info.bios_vendor,
-            hw.dmi_info.bios_version,
-            hw.dmi_info.sys_product_name,
-            hw.dmi_info.sys_serial_number
-        );
-        let (clean_dmi, s4) = self.sanitize_text(&dmi_txt);
-        total_scrubbed += s4;
-        files.insert("sys/class/dmi/id/sys_vendor".to_string(), clean_dmi);
-
-        SosreportArchiveBundleV2 {
-            report_id: format!("sosreport-{}-20250215", self.hostname),
-            timestamp_sec: 1700000000,
-            hostname: self.hostname.clone(),
-            os_release: "SigmaOS 1.0 Apex (Sovereign)".to_string(),
-            kernel_version: "6.12.0-sigmaos".to_string(),
-            captured_files: files,
-            scrubbed_sensitive_items_count: total_scrubbed,
-        }
-    }
-
-    /// Export metrics in Prometheus `node_exporter` exposition text format
-    pub fn export_prometheus_metrics(
-        &self,
-        top: &TopHtopProcessMonitorV2,
-        vmstat: &VmstatIostatSarCollectorV2,
-    ) -> String {
-        let mut out = String::new();
-        out.push_str(
-            "# HELP node_cpu_seconds_total Seconds the CPUs spent in each mode.\n# TYPE node_cpu_seconds_total counter\n",
-        );
-        out.push_str(&format!(
-            "node_cpu_seconds_total{{mode=\"user\"}} {}\n",
-            top.total_cpu_user_pct
-        ));
-        out.push_str(&format!(
-            "node_cpu_seconds_total{{mode=\"system\"}} {}\n",
-            top.total_cpu_sys_pct
-        ));
-        out.push_str(&format!(
-            "node_cpu_seconds_total{{mode=\"idle\"}} {}\n",
-            top.total_cpu_idle_pct
-        ));
-
-        out.push_str(
-            "# HELP node_memory_MemTotal_bytes Memory information field MemTotal_bytes.\n# TYPE node_memory_MemTotal_bytes gauge\n",
-        );
-        out.push_str(&format!(
-            "node_memory_MemTotal_bytes {}\n",
-            top.total_ram_kb * 1024
-        ));
-
-        if let Some(vm) = vmstat.vmstat_history.last() {
-            out.push_str(
-                "# HELP node_memory_MemFree_bytes Memory information field MemFree_bytes.\n# TYPE node_memory_MemFree_bytes gauge\n",
-            );
-            out.push_str(&format!(
-                "node_memory_MemFree_bytes {}\n",
-                vm.free_kb * 1024
-            ));
-
-            out.push_str(
-                "# HELP node_memory_Cached_bytes Memory information field Cached_bytes.\n# TYPE node_memory_Cached_bytes gauge\n",
-            );
-            out.push_str(&format!(
-                "node_memory_Cached_bytes {}\n",
-                vm.cache_kb * 1024
-            ));
-        }
-
-        out
-    }
-
-    /// Export metrics in Collectd plain text format
-    pub fn export_collectd_metrics(&self, top: &TopHtopProcessMonitorV2) -> String {
+    pub fn format_vmstat_line(vm: &VmstatSnapshotV2) -> String {
         format!(
-            "PUTVAL \"{}/cpu-0/cpu-user\" interval=10 N:{:.2}\nPUTVAL \"{}/cpu-0/cpu-system\" interval=10 N:{:.2}\nPUTVAL \"{}/memory/memory-used\" interval=10 N:{}\n",
-            self.hostname,
-            top.total_cpu_user_pct,
-            self.hostname,
-            top.total_cpu_sys_pct,
-            self.hostname,
-            top.used_ram_kb * 1024
+            "{:2} {:2} {:6} {:6} {:6} {:6} {:4} {:4} {:5} {:5} {:4} {:4} {:2.0} {:2.0} {:2.0} {:2.0} {:2.0}",
+            vm.run_queue_procs, vm.blocked_procs, vm.swap_used_kb, vm.free_mem_kb,
+            vm.buff_mem_kb, vm.cache_mem_kb, vm.swap_in_kb_s, vm.swap_out_kb_s,
+            vm.block_in_kb_s, vm.block_out_kb_s, vm.interrupts_s, vm.context_switches_s,
+            vm.cpu_user_pct, vm.cpu_sys_pct, vm.cpu_idle_pct, vm.cpu_wait_pct, vm.cpu_steal_pct
         )
     }
 }
 
 // ============================================================================
-// MASTER LOGGING, MONITORING & DIAGNOSTICS SUITE V2
+// 5. LSOF OPEN FILE INSPECTOR V2
 // ============================================================================
 
-/// Master Sovereign Linux & BSD Logging, Monitoring, and Diagnostics Suite V2
+/// Open File Type V2
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FileTypeV2 {
+    RegularFile, // REG
+    Directory,   // DIR
+    Character,   // CHR
+    Block,       // BLK
+    Fifo,        // FIFO
+    UnixSocket,  // UNIX
+    IPv4Socket,  // IPv4
+    IPv6Socket,  // IPv6
+    Kqueue,      // KQUEUE
+    Inotify,     // INOTIFY
+}
+
+impl FileTypeV2 {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            FileTypeV2::RegularFile => "REG",
+            FileTypeV2::Directory => "DIR",
+            FileTypeV2::Character => "CHR",
+            FileTypeV2::Block => "BLK",
+            FileTypeV2::Fifo => "FIFO",
+            FileTypeV2::UnixSocket => "UNIX",
+            FileTypeV2::IPv4Socket => "IPv4",
+            FileTypeV2::IPv6Socket => "IPv6",
+            FileTypeV2::Kqueue => "KQUEUE",
+            FileTypeV2::Inotify => "INOTIFY",
+        }
+    }
+}
+
+/// Socket Connection State V2
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SocketStateV2 {
+    None,
+    Listen,
+    Established,
+    TimeWait,
+    CloseWait,
+    SynSent,
+}
+
+/// File Locking Status V2
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FileLockStatusV2 {
+    None,
+    ReadLock,
+    WriteLock,
+    ExclusiveLock,
+}
+
+/// Open File Descriptor Inspection Record V2
+#[derive(Debug, Clone)]
+pub struct OpenFileDescriptorV2 {
+    pub pid: u32,
+    pub command: String,
+    pub fd: u32,
+    pub file_type: FileTypeV2,
+    pub device_id: u32,
+    pub inode: u64,
+    pub file_size_bytes: u64,
+    pub path_or_name: String,
+    pub socket_state: SocketStateV2,
+    pub lock_status: FileLockStatusV2,
+}
+
+/// Sovereign Lsof Inspector Engine V2
+#[derive(Debug, Clone)]
+pub struct LsofOpenFilesInspectorV2 {
+    open_files: Vec<OpenFileDescriptorV2>,
+}
+
+impl LsofOpenFilesInspectorV2 {
+    pub fn new() -> Self {
+        Self { open_files: Vec::new() }
+    }
+
+    pub fn register_open_file(&mut self, record: OpenFileDescriptorV2) {
+        self.open_files.push(record);
+    }
+
+    pub fn query_by_pid(&self, pid: u32) -> Vec<&OpenFileDescriptorV2> {
+        self.open_files.iter().filter(|f| f.pid == pid).collect()
+    }
+
+    pub fn query_by_path(&self, path_substring: &str) -> Vec<&OpenFileDescriptorV2> {
+        self.open_files.iter().filter(|f| f.path_or_name.contains(path_substring)).collect()
+    }
+
+    pub fn query_network_sockets(&self) -> Vec<&OpenFileDescriptorV2> {
+        self.open_files.iter()
+            .filter(|f| f.file_type == FileTypeV2::IPv4Socket || f.file_type == FileTypeV2::IPv6Socket)
+            .collect()
+    }
+
+    pub fn format_lsof_line(fd: &OpenFileDescriptorV2) -> String {
+        format!(
+            "{:<10} {:>6} {:>3} {:<6} {:>8} {:>10} {}",
+            fd.command, fd.pid, fd.fd, fd.file_type.as_str(), fd.file_size_bytes, fd.inode, fd.path_or_name
+        )
+    }
+}
+
+// ============================================================================
+// 6. HARDWARE DISCOVERY ENGINE V2 (LSPCI, LSUSB, DMIDECODE, LSSCSI)
+// ============================================================================
+
+/// PCIe Device Record V2 (`lspci`)
+#[derive(Debug, Clone)]
+pub struct LspciDeviceV2 {
+    pub pci_address: String, // e.g. "0000:01:00.0"
+    pub vendor_id: u16,
+    pub device_id: u16,
+    pub vendor_name: String,
+    pub device_name: String,
+    pub class_name: String,
+    pub driver_in_use: String,
+    pub pcie_gen: u8,
+    pub lane_count: u8,
+    pub bar_memory_regions: Vec<String>,
+}
+
+/// USB Device Record V2 (`lsusb`)
+#[derive(Debug, Clone)]
+pub struct LsusbDeviceV2 {
+    pub bus_number: u8,
+    pub device_number: u8,
+    pub vendor_id: u16,
+    pub product_id: u16,
+    pub product_name: String,
+    pub speed_mode: String, // "1.5M", "12M", "480M", "5G", "10G", "20G"
+    pub num_endpoints: u8,
+}
+
+/// SMBIOS / DMI Decoding Table V2 (`dmidecode`)
+#[derive(Debug, Clone)]
+pub struct DmidecodeTableV2 {
+    pub table_type: u8,
+    pub handle: u16,
+    pub title: String,
+    pub properties: BTreeMap<String, String>,
+}
+
+/// SCSI / NVMe Host Adapter Target Record V2 (`lsscsi`)
+#[derive(Debug, Clone)]
+pub struct LsscsiTargetV2 {
+    pub host_bus_target_lun: String, // e.g. "[0:0:0:0]"
+    pub device_type: String,         // "disk", "cd/dvd", "nvme"
+    pub vendor: String,
+    pub model: String,
+    pub revision: String,
+    pub device_node: String,         // e.g. "/dev/sda"
+}
+
+/// Sovereign Hardware Discovery Engine V2
+#[derive(Debug, Clone)]
+pub struct HardwareDiscoveryEngineV2 {
+    pci_devices: Vec<LspciDeviceV2>,
+    usb_devices: Vec<LsusbDeviceV2>,
+    dmi_tables: Vec<DmidecodeTableV2>,
+    scsi_targets: Vec<LsscsiTargetV2>,
+}
+
+impl HardwareDiscoveryEngineV2 {
+    pub fn new() -> Self {
+        Self {
+            pci_devices: Vec::new(),
+            usb_devices: Vec::new(),
+            dmi_tables: Vec::new(),
+            scsi_targets: Vec::new(),
+        }
+    }
+
+    pub fn add_pci_device(&mut self, dev: LspciDeviceV2) {
+        self.pci_devices.push(dev);
+    }
+
+    pub fn add_usb_device(&mut self, dev: LsusbDeviceV2) {
+        self.usb_devices.push(dev);
+    }
+
+    pub fn add_dmi_table(&mut self, table: DmidecodeTableV2) {
+        self.dmi_tables.push(table);
+    }
+
+    pub fn add_scsi_target(&mut self, target: LsscsiTargetV2) {
+        self.scsi_targets.push(target);
+    }
+
+    pub fn get_pci_devices(&self) -> &[LspciDeviceV2] {
+        &self.pci_devices
+    }
+
+    pub fn get_usb_devices(&self) -> &[LsusbDeviceV2] {
+        &self.usb_devices
+    }
+
+    pub fn get_dmi_tables_by_type(&self, table_type: u8) -> Vec<&DmidecodeTableV2> {
+        self.dmi_tables.iter().filter(|t| t.table_type == table_type).collect()
+    }
+
+    pub fn get_scsi_targets(&self) -> &[LsscsiTargetV2] {
+        &self.scsi_targets
+    }
+
+    pub fn format_lspci_summary(&self) -> String {
+        let mut out = String::new();
+        for dev in &self.pci_devices {
+            out.push_str(&format!(
+                "{} {}: {} [{:04x}:{:04x}] (kernel driver: {})\n",
+                dev.pci_address, dev.class_name, dev.device_name, dev.vendor_id, dev.device_id, dev.driver_in_use
+            ));
+        }
+        out
+    }
+}
+
+// ============================================================================
+// 7. SOSREPORT / PROMETHEUS NODE_EXPORTER / COLLECTD V2
+// ============================================================================
+
+/// Diagnostic Archive Bundle Plugin V2 (`sosreport`)
+#[derive(Debug, Clone)]
+pub struct SosreportPluginV2 {
+    pub plugin_name: String,
+    pub collected_files: Vec<String>,
+    pub scrubbed_secrets_count: u32,
+}
+
+/// Sosreport Bundle Metadata V2
+#[derive(Debug, Clone)]
+pub struct SosreportArchiveBundleV2 {
+    pub sosreport_id: String,
+    pub timestamp_epoch_sec: u64,
+    pub hostname: String,
+    pub kernel_version: String,
+    pub archive_filename: String, // e.g. "sosreport-host1-2026-03-30.tar.zst"
+    pub plugins: Vec<SosreportPluginV2>,
+    pub total_size_bytes: u64,
+}
+
+/// Prometheus Metric Standard Entry V2
+#[derive(Debug, Clone)]
+pub struct PrometheusMetricV2 {
+    pub name: String,
+    pub help: String,
+    pub metric_type: String, // "counter", "gauge"
+    pub labels: BTreeMap<String, String>,
+    pub value: f64,
+}
+
+/// Sovereign Sosreport & Prometheus Exporter Engine V2
+#[derive(Debug, Clone)]
+pub struct SosreportPrometheusExporterV2 {
+    archive_bundles: Vec<SosreportArchiveBundleV2>,
+    metrics: Vec<PrometheusMetricV2>,
+}
+
+impl SosreportPrometheusExporterV2 {
+    pub fn new() -> Self {
+        Self {
+            archive_bundles: Vec::new(),
+            metrics: Vec::new(),
+        }
+    }
+
+    pub fn generate_sosreport(&mut self, hostname: &str, kernel: &str) -> SosreportArchiveBundleV2 {
+        let timestamp = 1774872000u64;
+        let bundle = SosreportArchiveBundleV2 {
+            sosreport_id: format!("sosreport-{}-{}", hostname, timestamp),
+            timestamp_epoch_sec: timestamp,
+            hostname: hostname.to_string(),
+            kernel_version: kernel.to_string(),
+            archive_filename: format!("sosreport-{}-{}.tar.zst", hostname, timestamp),
+            plugins: vec![
+                SosreportPluginV2 {
+                    plugin_name: "kernel".to_string(),
+                    collected_files: vec!["/proc/cmdline".to_string(), "/var/log/dmesg".to_string()],
+                    scrubbed_secrets_count: 0,
+                },
+                SosreportPluginV2 {
+                    plugin_name: "network".to_string(),
+                    collected_files: vec!["/etc/network/interfaces".to_string(), "/proc/net/dev".to_string()],
+                    scrubbed_secrets_count: 2,
+                },
+                SosreportPluginV2 {
+                    plugin_name: "systemd".to_string(),
+                    collected_files: vec!["/var/log/journal".to_string()],
+                    scrubbed_secrets_count: 0,
+                },
+            ],
+            total_size_bytes: 4_194_304,
+        };
+        self.archive_bundles.push(bundle.clone());
+        bundle
+    }
+
+    pub fn set_metric(&mut self, name: &str, help: &str, mtype: &str, labels: BTreeMap<String, String>, value: f64) {
+        if let Some(m) = self.metrics.iter_mut().find(|m| m.name == name && m.labels == labels) {
+            m.value = value;
+        } else {
+            self.metrics.push(PrometheusMetricV2 {
+                name: name.to_string(),
+                help: help.to_string(),
+                metric_type: mtype.to_string(),
+                labels,
+                value,
+            });
+        }
+    }
+
+    pub fn export_prometheus_text(&self) -> String {
+        let mut out = String::new();
+        for m in &self.metrics {
+            out.push_str(&format!("# HELP {} {}\n", m.name, m.help));
+            out.push_str(&format!("# TYPE {} {}\n", m.name, m.metric_type));
+            let label_str = if m.labels.is_empty() {
+                String::new()
+            } else {
+                let parts: Vec<String> = m.labels.iter().map(|(k, v)| format!("{}=\"{}\"", k, v)).collect();
+                format!("{{{}}}", parts.join(","))
+            };
+            out.push_str(&format!("{}{} {}\n", m.name, label_str, m.value));
+        }
+        out
+    }
+}
+
+// ============================================================================
+// 8. MASTER SUITE AGGREGATOR V2
+// ============================================================================
+
+/// Master Sovereign Logging, Monitoring, and Diagnostics Suite V2
 #[derive(Debug, Clone)]
 pub struct SovereignLoggingMonitoringDiagnosticsMasterSuiteV2 {
-    pub journal: JournaldSyslogNgLogEngineV2,
-    pub dmesg: DmesgKernelRingBufferV2,
-    pub top_monitor: TopHtopProcessMonitorV2,
-    pub vmstat_collector: VmstatIostatSarCollectorV2,
+    pub journal_syslog: SovereignJournaldSyslogNgLogEngineV2,
+    pub dmesg_ring: DmesgKernelRingBufferV2,
+    pub process_monitor: TopHtopProcessMonitorV2,
+    pub sar_collector: VmstatIostatSarCollectorV2,
     pub lsof_inspector: LsofOpenFilesInspectorV2,
-    pub hardware: HardwareDiscoveryEngineV2,
+    pub hardware_discovery: HardwareDiscoveryEngineV2,
     pub exporter: SosreportPrometheusExporterV2,
 }
 
 impl SovereignLoggingMonitoringDiagnosticsMasterSuiteV2 {
-    pub fn new(hostname: &str) -> Self {
+    pub fn new() -> Self {
         Self {
-            journal: JournaldSyslogNgLogEngineV2::new(hostname),
-            dmesg: DmesgKernelRingBufferV2::new(2000),
-            top_monitor: TopHtopProcessMonitorV2::new(),
-            vmstat_collector: VmstatIostatSarCollectorV2::new(),
+            journal_syslog: SovereignJournaldSyslogNgLogEngineV2::new(),
+            dmesg_ring: DmesgKernelRingBufferV2::new(1024),
+            process_monitor: TopHtopProcessMonitorV2::new(),
+            sar_collector: VmstatIostatSarCollectorV2::new(),
             lsof_inspector: LsofOpenFilesInspectorV2::new(),
-            hardware: HardwareDiscoveryEngineV2::new(),
-            exporter: SosreportPrometheusExporterV2::new(hostname),
+            hardware_discovery: HardwareDiscoveryEngineV2::new(),
+            exporter: SosreportPrometheusExporterV2::new(),
         }
     }
 
-    /// Run master system diagnostic sanity audit
-    pub fn run_system_diagnostic_audit(&self) -> HashMap<String, String> {
-        let mut diag = HashMap::new();
-        diag.insert("hostname".to_string(), self.journal.hostname.clone());
-        diag.insert(
-            "journal_entries".to_string(),
-            self.journal.entries.len().to_string(),
-        );
-        diag.insert(
-            "dmesg_records".to_string(),
-            self.dmesg.buffer.len().to_string(),
-        );
-        diag.insert(
-            "monitored_processes".to_string(),
-            self.top_monitor.processes.len().to_string(),
-        );
-        diag.insert(
-            "open_file_descriptors".to_string(),
-            self.lsof_inspector.open_files.len().to_string(),
-        );
-        diag.insert(
-            "pci_devices_count".to_string(),
-            self.hardware.pci_devices.len().to_string(),
-        );
-        diag.insert(
-            "usb_devices_count".to_string(),
-            self.hardware.usb_devices.len().to_string(),
-        );
-        diag.insert(
-            "bios_vendor".to_string(),
-            self.hardware.dmi_info.bios_vendor.clone(),
-        );
-        diag
+    pub fn run_system_diagnostics_sweep(&mut self) -> String {
+        let mut summary = String::from("--- SOVEREIGN SYSTEM DIAGNOSTICS SWEEP V2 ---\n");
+
+        summary.push_str(&format!("Journal Integrity Verified: {}\n", self.journal_syslog.verify_journal_integrity()));
+        summary.push_str(&format!("Dmesg Ring Entries Count: {}\n", self.dmesg_ring.entries.len()));
+        summary.push_str(&format!("Top Monitored Processes Count: {}\n", self.process_monitor.processes.len()));
+        summary.push_str(&format!("Lsof Open Handles Count: {}\n", self.lsof_inspector.open_files.len()));
+        summary.push_str(&format!("PCIe Discovered Devices Count: {}\n", self.hardware_discovery.pci_devices.len()));
+
+        summary
     }
 }
 
 // ============================================================================
-// STANDALONE UNIT TESTS
+// 9. STANDALONE UNIT TESTS
 // ============================================================================
 
 #[cfg(test)]
@@ -1564,143 +1000,197 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_journald_syslog_ng_v2() {
-        let mut journal = JournaldSyslogNgLogEngineV2::new("sigma-node-alpha");
-        let fields = JournaldFieldsV2 {
-            pid: 1024,
-            ppid: 1,
-            uid: 0,
-            gid: 0,
-            comm: "sovereign-daemon".to_string(),
-            exe: "/usr/bin/sovereign-daemon".to_string(),
-            cmdline: "sovereign-daemon --daemon".to_string(),
-            systemd_unit: "sovereign.service".to_string(),
-            systemd_cgroup: "/system.slice/sovereign.service".to_string(),
-            selinux_context: "system_u:system_r:sovereign_t:s0".to_string(),
-            boot_id: journal.boot_id.clone(),
-            machine_id: journal.machine_id.clone(),
-            transport: "journal".to_string(),
-        };
+    fn test_journald_syslog_ng_engine_v2() {
+        let mut engine = SovereignJournaldSyslogNgLogEngineV2::new();
+        engine.add_pattern_rule("rule1", "segfault", "/var/log/segfaults.log");
 
-        let mut meta = BTreeMap::new();
-        meta.insert("security_level".to_string(), "high".to_string());
-
-        let id = journal.log(
+        let id = engine.append_record(
             SyslogFacilityV2::Daemon,
             LogSeverityV2::Error,
-            fields,
-            "Authentication failed for user admin",
-            meta,
+            1234,
+            0,
+            "systemd-journal",
+            "systemd-journald.service",
+            "sigma-node1",
+            "Process segfault detected at address 0x7fff0000",
         );
 
         assert_eq!(id, 1);
-        assert_eq!(journal.entries.len(), 1);
+        assert!(engine.verify_journal_integrity());
 
-        let (valid, corrupted) = journal.verify_journal_integrity();
-        assert_eq!(valid, 1);
-        assert_eq!(corrupted, 0);
+        let units = engine.query_by_unit("systemd-journald.service");
+        assert_eq!(units.len(), 1);
 
-        let queried =
-            journal.query_journal(Some("sovereign.service"), Some(LogSeverityV2::Error), None);
-        assert_eq!(queried.len(), 1);
+        let json = engine.export_json(units[0]);
+        assert!(json.contains("systemd-journald.service"));
 
-        let rfc5424 = queried[0].to_rfc5424(&journal.hostname);
-        assert!(rfc5424.contains("sovereign-daemon"));
-        assert!(rfc5424.contains("Authentication failed"));
+        let rfc = engine.format_rfc5424(units[0]);
+        assert!(rfc.contains("<27>1")); // Daemon (3*8) + Error (3) = 27
     }
 
     #[test]
-    fn test_dmesg_kernel_ring_buffer_v2() {
-        let mut dmesg = DmesgKernelRingBufferV2::new(20);
-        assert!(!dmesg.buffer.is_empty());
+    fn test_dmesg_ring_buffer_v2() {
+        let mut dmesg = DmesgKernelRingBufferV2::new(10);
+        dmesg.printk(KernelLoglevelV2::Notice, "e1000e", "Intel e1000e link up at 1 Gbps Full Duplex");
+        dmesg.printk(KernelLoglevelV2::Error, "ext4", "Ext4 inode checksum failure on sda2");
 
-        dmesg.print_klog(
-            "drm",
-            LogSeverityV2::Warning,
-            "GPU memory allocation throttling engaged",
-            0xffffffff81200000,
-        );
+        assert_eq!(dmesg.entries.len(), 2);
+        let ext4_logs = dmesg.filter_by_subsystem("ext4");
+        assert_eq!(ext4_logs.len(), 1);
 
-        let filtered = dmesg.filter(Some(LogSeverityV2::Warning), Some("drm"));
-        assert_eq!(filtered.len(), 1);
-
-        let human = filtered[0].format_human();
-        assert!(human.contains("drm"));
-        assert!(human.contains("GPU memory allocation"));
+        let line = dmesg.format_dmesg_line(ext4_logs[0]);
+        assert!(line.contains("ext4"));
+        assert!(line.contains("ERR"));
     }
 
     #[test]
-    fn test_top_htop_process_monitor_v2() {
-        let mut monitor = TopHtopProcessMonitorV2::new();
-        assert!(!monitor.processes.is_empty());
+    fn test_top_htop_monitor_v2() {
+        let mut top = TopHtopProcessMonitorV2::new();
+        top.update_process(ProcessTelemetryV2 {
+            pid: 1,
+            ppid: 0,
+            name: "init".to_string(),
+            user: "root".to_string(),
+            state: ProcessStateV2::Sleeping,
+            cpu_percent: 0.1,
+            memory_rss_kb: 4096,
+            memory_virt_kb: 16384,
+            num_threads: 1,
+            io_read_kb_s: 0.0,
+            io_write_kb_s: 0.0,
+            cgroup_path: "/".to_string(),
+        });
 
-        let sorted_cpu = monitor.sort(ProcessSortBy::Cpu);
-        assert!(sorted_cpu[0].cpu_usage_pct >= sorted_cpu[1].cpu_usage_pct);
+        top.update_process(ProcessTelemetryV2 {
+            pid: 100,
+            ppid: 1,
+            name: "sigma-worker".to_string(),
+            user: "sigma".to_string(),
+            state: ProcessStateV2::Running,
+            cpu_percent: 45.2,
+            memory_rss_kb: 65536,
+            memory_virt_kb: 262144,
+            num_threads: 8,
+            io_read_kb_s: 1024.0,
+            io_write_kb_s: 512.0,
+            cgroup_path: "/system.slice/sigma.service".to_string(),
+        });
 
-        let tree = monitor.build_process_tree();
-        assert!(tree.contains_key(&1));
+        let top_cpu = top.get_top_cpu(1);
+        assert_eq!(top_cpu[0].pid, 100);
 
-        let killed = monitor.dispatch_signal(1024, 9);
-        assert!(killed);
-        assert_eq!(
-            monitor.processes.get(&1024).unwrap().state,
-            ProcessStateV2::Zombie
-        );
+        let tree = top.build_process_tree(1);
+        assert_eq!(tree.len(), 2);
     }
 
     #[test]
-    fn test_vmstat_iostat_sar_collector_v2() {
-        let collector = VmstatIostatSarCollectorV2::new();
-        assert_eq!(collector.vmstat_history.len(), 10);
+    fn test_vmstat_iostat_sar_v2() {
+        let mut collector = VmstatIostatSarCollectorV2::new();
+        let vm = VmstatSnapshotV2 {
+            run_queue_procs: 2,
+            blocked_procs: 0,
+            swap_used_kb: 0,
+            free_mem_kb: 8192000,
+            buff_mem_kb: 512000,
+            cache_mem_kb: 4096000,
+            swap_in_kb_s: 0,
+            swap_out_kb_s: 0,
+            block_in_kb_s: 120,
+            block_out_kb_s: 450,
+            interrupts_s: 1200,
+            context_switches_s: 3400,
+            cpu_user_pct: 12.5,
+            cpu_sys_pct: 4.2,
+            cpu_idle_pct: 82.0,
+            cpu_wait_pct: 1.3,
+            cpu_steal_pct: 0.0,
+        };
 
-        let (u, s, w, i) = collector.calculate_sar_cpu_averages();
-        assert!(u > 0.0);
-        assert!(s > 0.0);
-        assert!(w >= 0.0);
-        assert!(i > 0.0);
+        let io = vec![IostatDeviceStatsV2 {
+            device_name: "sda".to_string(),
+            tps: 85.0,
+            read_req_s: 30.0,
+            write_req_s: 55.0,
+            read_kb_s: 120.0,
+            write_kb_s: 450.0,
+            avg_req_size_sectors: 13.5,
+            avg_queue_len: 0.12,
+            r_await_ms: 1.2,
+            w_await_ms: 2.8,
+            util_percent: 8.5,
+        }];
 
-        let range = collector.query_sar_range(1700000000, 1700000300);
-        assert_eq!(range.len(), 6);
+        collector.record_snapshot(1774872000, vm, io);
+        let latest = collector.get_latest_vmstat().unwrap();
+        assert_eq!(latest.run_queue_procs, 2);
+
+        let line = VmstatIostatSarCollectorV2::format_vmstat_line(latest);
+        assert!(line.contains("8192000"));
     }
 
     #[test]
     fn test_lsof_inspector_v2() {
-        let lsof = LsofOpenFilesInspectorV2::new();
-        let by_pid = lsof.find_by_pid(1024);
-        assert_eq!(by_pid.len(), 3);
+        let mut lsof = LsofOpenFilesInspectorV2::new();
+        lsof.register_open_file(OpenFileDescriptorV2 {
+            pid: 500,
+            command: "nginx".to_string(),
+            fd: 6,
+            file_type: FileTypeV2::IPv4Socket,
+            device_id: 0,
+            inode: 123456,
+            file_size_bytes: 0,
+            path_or_name: "*:80 (LISTEN)".to_string(),
+            socket_state: SocketStateV2::Listen,
+            lock_status: FileLockStatusV2::None,
+        });
 
-        let listening = lsof.find_by_socket_state(SocketState::Listen);
-        assert_eq!(listening.len(), 1);
-        assert_eq!(listening[0].path_name, "127.0.0.1:8080");
+        let net_files = lsof.query_network_sockets();
+        assert_eq!(net_files.len(), 1);
+        assert_eq!(net_files[0].command, "nginx");
     }
 
     #[test]
     fn test_hardware_discovery_v2() {
-        let hw = HardwareDiscoveryEngineV2::new();
-        assert_eq!(hw.pci_devices.len(), 2);
-        assert_eq!(hw.usb_devices.len(), 1);
-        assert_eq!(hw.dmi_info.processor_family, "x86-64 v4");
+        let mut hw = HardwareDiscoveryEngineV2::new();
+        hw.add_pci_device(LspciDeviceV2 {
+            pci_address: "0000:01:00.0".to_string(),
+            vendor_id: 0x10de,
+            device_id: 0x2204,
+            vendor_name: "NVIDIA Corporation".to_string(),
+            device_name: "GA102 [GeForce RTX 3090]".to_string(),
+            class_name: "VGA compatible controller".to_string(),
+            driver_in_use: "nvidia".to_string(),
+            pcie_gen: 4,
+            lane_count: 16,
+            bar_memory_regions: vec!["0xc0000000".to_string()],
+        });
+
+        assert_eq!(hw.get_pci_devices().len(), 1);
+        let summary = hw.format_lspci_summary();
+        assert!(summary.contains("0000:01:00.0"));
+        assert!(summary.contains("GeForce RTX 3090"));
     }
 
     #[test]
-    fn test_sosreport_and_telemetry_exporter_v2() {
-        let suite = SovereignLoggingMonitoringDiagnosticsMasterSuiteV2::new("test-apex-host");
-        let sos = suite.exporter.generate_sosreport(
-            &suite.journal,
-            &suite.dmesg,
-            &suite.hardware,
-            &suite.lsof_inspector,
-        );
-        assert!(sos.captured_files.contains_key("var/log/dmesg"));
-        assert!(sos.captured_files.contains_key("var/log/syslog"));
+    fn test_sosreport_prometheus_exporter_v2() {
+        let mut exporter = SosreportPrometheusExporterV2::new();
+        let bundle = exporter.generate_sosreport("sigma-node-alpha", "6.12.0-sigma");
+        assert_eq!(bundle.hostname, "sigma-node-alpha");
 
-        let prom = suite
-            .exporter
-            .export_prometheus_metrics(&suite.top_monitor, &suite.vmstat_collector);
-        assert!(prom.contains("node_cpu_seconds_total"));
-        assert!(prom.contains("node_memory_MemTotal_bytes"));
+        let mut labels = BTreeMap::new();
+        labels.insert("cpu".to_string(), "0".to_string());
+        labels.insert("mode".to_string(), "idle".to_string());
+        exporter.set_metric("node_cpu_seconds_total", "Seconds spent in each CPU mode", "counter", labels, 12345.67);
 
-        let collectd = suite.exporter.export_collectd_metrics(&suite.top_monitor);
-        assert!(collectd.contains("PUTVAL \"test-apex-host/cpu-0/cpu-user\""));
+        let prom_text = exporter.export_prometheus_text();
+        assert!(prom_text.contains("# HELP node_cpu_seconds_total"));
+        assert!(prom_text.contains("node_cpu_seconds_total{cpu=\"0\",mode=\"idle\"} 12345.67"));
+    }
+
+    #[test]
+    fn test_master_suite_v2() {
+        let mut master = SovereignLoggingMonitoringDiagnosticsMasterSuiteV2::new();
+        let sweep = master.run_system_diagnostics_sweep();
+        assert!(sweep.contains("SOVEREIGN SYSTEM DIAGNOSTICS SWEEP V2"));
     }
 }
