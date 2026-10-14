@@ -16,36 +16,33 @@ use wiki_unimplemented_ideas::*;
 
 #[test]
 fn test_sovereign_wiki_master_engine_full_parity() {
-    let suite = MasterWikiAndRoadmapVerificationSuite::new();
-    assert!(suite.health_check());
-    assert!(suite
-        .summary_report()
-        .contains("Parity Verification: 100.0%"));
+    let suite = SovereignWikiMasterEngine::new();
+    assert!(suite.evaluate_master_wiki_fulfillment());
 
-    let idea = RoadmapFeatureIdea {
-        idea_id: 1,
-        title: "Test Idea".to_string(),
-        source_type: FeatureSourceType::GithubWikiPage,
-        source_file: "wiki/01.md".to_string(),
-        target_module: "kernel".to_string(),
-        is_fully_implemented: true,
+    let idea = ImprovementIdeaRecord {
+        id: 1,
+        name: "Test Idea".to_string(),
+        category: IdeaCategory::PerformanceAndKernel,
+        legacy_counterparts: "Linux CUPS".to_string(),
+        implementation_module: "kernel".to_string(),
+        is_fulfilled: true,
     };
-    assert_eq!(idea.idea_id, 1);
-    assert_eq!(idea.title, "Test Idea");
-    assert_eq!(idea.source_type, FeatureSourceType::GithubWikiPage);
-    assert_eq!(idea.source_file, "wiki/01.md");
-    assert_eq!(idea.target_module, "kernel");
-    assert!(idea.is_fully_implemented);
+    assert_eq!(idea.id, 1);
+    assert_eq!(idea.name, "Test Idea");
+    assert_eq!(idea.category, IdeaCategory::PerformanceAndKernel);
+    assert_eq!(idea.legacy_counterparts, "Linux CUPS");
+    assert_eq!(idea.implementation_module, "kernel");
+    assert!(idea.is_fulfilled);
 
-    let idea2 = RoadmapFeatureIdea {
-        idea_id: 2,
-        title: "Distro Spec".to_string(),
-        source_type: FeatureSourceType::DistroRoadmapSpec,
-        source_file: "wiki/02.md".to_string(),
-        target_module: "distro".to_string(),
-        is_fully_implemented: true,
+    let idea2 = DistroGapFeatureRecord {
+        distro_name: "FreeBSD / SANE",
+        gap_feature_name: "Distro Spec",
+        sigma_counterpart: "distro",
+        verification_passed: true,
     };
-    assert_eq!(idea2.source_type, FeatureSourceType::DistroRoadmapSpec);
+    assert_eq!(idea2.distro_name, "FreeBSD / SANE");
+    assert_eq!(idea2.gap_feature_name, "Distro Spec");
+    assert!(idea2.verification_passed);
 }
 
 #[test]
