@@ -2,6 +2,7 @@
 // eBPF-based scheduling system & CPU affinity manager
 
 pub mod affinity;
+pub mod core;
 pub mod cpuidle;
 pub mod distro_schedulers;
 pub mod ebpf_scheduler;
@@ -11,6 +12,7 @@ pub mod numa_balancer;
 pub mod numa_scheduler;
 pub mod preempt_rt;
 pub mod process;
+pub mod run_queue;
 pub mod sched_deadline;
 pub mod scheduler;
 pub mod schedutil;
@@ -29,6 +31,8 @@ pub use ebpf_scheduler::{
 };
 
 pub use affinity::{CpuAffinityMask, NumaDomainTopology, ProcessCpuAssigner};
+pub use core::*;
+pub use run_queue::*;
 
 // SchedExt: Linux 6.11+ Extensible Scheduler Framework
 pub mod schedext;
