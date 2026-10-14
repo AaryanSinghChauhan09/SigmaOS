@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 // Comprehensive Verification Test Suite for .MD Files & GitHub Wiki Unimplemented Ideas Parity
 
+extern crate alloc;
+
 #[path = "../src/sovereign_wiki_master_engine.rs"]
 mod sovereign_wiki_master_engine;
 
@@ -407,14 +409,13 @@ fn test_sections_143_144_145_wiki_roadmap_parity() {
 
     // Section 145: Kernel Hardening & CFI
     let mut cfi_eng = SovereignKernelHardeningCfiEngine::new();
-    cfi_eng.set_kptr_restrict(KptrRestrictLevel::ZeroNonRoot);
     cfi_eng.set_kptr_restrict(KptrRestrictLevel::ExposeRaw);
-    cfi_eng.set_kptr_restrict(KptrRestrictLevel::ZeroAll);
+    assert_eq!(cfi_eng.sanitize_pointer(0x8000_0000, false), 0x8000_0000);
+    cfi_eng.set_kptr_restrict(KptrRestrictLevel::ZeroNonRoot);
     cfi_eng.set_dmesg_restrict(true);
     assert!(cfi_eng.dmesg_restrict);
 
     assert_eq!(cfi_eng.sanitize_pointer(0x8000_0000, false), 0);
-    cfi_eng.set_kptr_restrict(KptrRestrictLevel::ZeroNonRoot);
     assert_eq!(cfi_eng.sanitize_pointer(0x8000_0000, true), 0x8000_0000);
 
     cfi_eng.register_cfi_target(0x7FFF_0000, 0xABCDEF00);
