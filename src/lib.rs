@@ -333,9 +333,12 @@ pub use resilience::{
 };
 pub use security::hardening;
 pub use security::{
-    AnonSurfShunt, AppSandboxEngine, ArithmeticSubstitutionDeobfuscator, CapabilityGate,
-    CapabilityToken, ForensicStorageFilter, Permission, PledgeManager, PledgePromise, RoutingMode,
-    SandboxPolicy,
+    AnonSurfShunt, AntivirusAndCryptoEnginePrEngine, AppSandboxEngine,
+    ArithmeticSubstitutionDeobfuscator, AuditAndIntrusionPreventionPrEngine,
+    BsdHardeningAndIsolationPrEngine, CapabilityGate, CapabilityToken, ForensicStorageFilter,
+    IdentityAndEnterpriseAuthPrEngine, LinuxAccessControlAndSandboxingPrEngine, Permission,
+    PledgeManager, PledgePromise, RoutingMode, SandboxPolicy, SecurityPrProposalManifest,
+    SovereignSecurityAndHardeningParityPrGateway,
 };
 pub use shell::{
     ContextualCompleter, HistoryExpansionEngine, JobControlManager, ParameterExpansionEngine,
