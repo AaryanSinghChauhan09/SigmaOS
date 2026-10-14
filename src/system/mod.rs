@@ -468,6 +468,7 @@ pub use sovereign_init_and_supervisor_inspirations_pr::*;
 
 pub use mint_tools::{
     SystemToolsEngine, BackupConfig, BackupJob, BackupType, BackupStatus,
+    RestoreConfig, RestoreJob, RestoreStatus, RollbackRecord,
     MintUpdateManager, PackageUpdate, UpdateType, UpdateSeverity,
     SoftwareManager, SoftwarePackage, SoftwareCategory,
     DriverManager, Driver, DriverType, DriverStatus,
