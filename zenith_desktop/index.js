@@ -331,6 +331,22 @@ export function renderCommandResults(query = "") {
       btn.appendChild(badge);
     }
 
+    btn.addEventListener("mouseenter", () => {
+      activeCommandIndex = idx;
+      let items = SovereignDomSelector.selectAll(".command-item", resultsContainer);
+      if (items.length === 0 && resultsContainer && resultsContainer.children) {
+        items = Array.from(resultsContainer.children).filter((child) => child.role === "option" || child.id?.startsWith("cmd-option-"));
+      }
+      items.forEach((item, itemIdx) => {
+        const isSel = itemIdx === idx;
+        item.classList.toggle("selected", isSel);
+        item.setAttribute("aria-selected", isSel ? "true" : "false");
+      });
+      if (cmdInput) {
+        cmdInput.setAttribute("aria-activedescendant", `cmd-option-${idx}`);
+      }
+    });
+
     btn.addEventListener("click", () => {
       cmd.action();
       closeCommandPalette();
