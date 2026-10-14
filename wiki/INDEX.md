@@ -6,6 +6,7 @@ Welcome to the SigmaOS GitHub Wiki Encyclopedia and Subsystem Reference Index.
 
 ## Core Development Plans & Architecture
 
+- [Interrupt Handler Plan](INTERRUPT_HANDLER_PLAN.md) - Master Architecture, 5-stage decoupled pipeline, multi-arch support matrix, and 17-PR sequence roadmap.
 - [System Utilities Development Plan](SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md) - Master Architecture, POSIX compatibility baseline, 18-PR roadmap, component rules, periodic maintenance framework, and review merge gates.
 - [System Utilities Plan Mirror](SYSTEM_UTILITIES_PLAN.md) - Alternate index page for system utilities architecture.
 
