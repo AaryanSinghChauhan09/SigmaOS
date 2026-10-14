@@ -201,6 +201,13 @@ if [ -f "src/compatibility/sovereign_mint_pr_components_engine.rs" ]; then
     ./build/test_mint_pr_deploy
 fi
 
+if [ -f "src/creative/effectcraft.rs" ]; then
+    echo "Running Sovereign EffectCraft Visual Effects PR test suite..."
+    mkdir -p build
+    rustc --test src/creative/effectcraft.rs --edition=2021 -o build/test_effectcraft
+    ./build/test_effectcraft
+fi
+
 if [ -f "src/distro/linux_bsd_distro_breakthroughs.rs" ]; then
     echo "Running Linux & BSD Distro Breakthroughs test suite..."
     mkdir -p build
@@ -1136,6 +1143,13 @@ if [ -f "src/installer/sovereign_installer_and_system_tools_advancements.rs" ]; 
     mkdir -p build
     rustc --test src/installer/sovereign_installer_and_system_tools_advancements.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_installer_advancements
     ./build/test_installer_advancements
+fi
+
+if [ -f "src/installer/sovereign_installer_and_system_tools_advancements_v2.rs" ]; then
+    echo "Running Sovereign Installer and System Tools Advancements V2 test suite..."
+    mkdir -p build
+    rustc --test src/installer/sovereign_installer_and_system_tools_advancements_v2.rs --edition=2021 -o build/test_installer_advancements_v2
+    ./build/test_installer_advancements_v2
 fi
 
 if [ -f "src/compatibility/mint_omarchy_migration_bridge.rs" ]; then
