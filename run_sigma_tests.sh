@@ -1131,6 +1131,13 @@ if [ -f "src/distro/bootable_vertical_slices_missing_components_pr.rs" ]; then
     ./build/test_bootable_vertical_slices
 fi
 
+if [ -f "tests/test_sigmaos_gap_closing_evidence_gated_roadmap.rs" ]; then
+    echo "Running SigmaOS Evidence-Gated Roadmap Integration Test suite..."
+    mkdir -p build
+    rustc --test tests/test_sigmaos_gap_closing_evidence_gated_roadmap.rs --edition=2021 -o build/test_evidence_gated_roadmap
+    ./build/test_evidence_gated_roadmap
+fi
+
 if [ -f "src/distro/repeatable_agent_operating_loop_pr.rs" ]; then
     echo "Running Repeatable Agent Operating Loop PR Suite..."
     mkdir -p build

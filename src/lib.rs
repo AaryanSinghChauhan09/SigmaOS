@@ -492,3 +492,5 @@ pub mod workflow;
 pub mod io;
 
 pub use crate::distro::sovereign_openbsd_ultimate_parity_pr_suite::*;
+pub use crate::distro::bootable_vertical_slices_missing_components_pr::*;
+pub use crate::distro::sigmaos_gap_closing_evidence_gated_roadmap_pr::*;
