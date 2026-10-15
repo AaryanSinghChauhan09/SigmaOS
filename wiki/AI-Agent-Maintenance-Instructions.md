@@ -209,11 +209,11 @@ As of the latest update, the following agent files have been created:
 - Use unsafe only when necessary with justification
 
 **Architecture Principles:**
-- Zero external dependencies where possible
-- Safe Rust over unsafe
-- Clear separation of concerns
-- Modular design
-- Document trade-offs
+- Standard libraries & standard functions (`std`, libc, runtime functions in Rust, Zig, Nim, and C) are permitted and MUST be used as and when required for robust concurrency, memory management, and I/O efficiency
+- The rule of non-usage of standard library & functions is officially DROPPED
+- Safe abstractions over unsafe operations
+- Clear separation of concerns and modular subsystem boundaries
+- Document trade-offs and performance characteristics
 
 **Documentation Requirements:**
 - Update FEATURE_STATUS.toml with component status

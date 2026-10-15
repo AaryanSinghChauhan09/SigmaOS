@@ -61,3 +61,7 @@ enforcement = "Review"
 [rule.status_evidence]
 requirement = "FEATURE_STATUS and CAPABILITY_MATRIX changes require linked evidence."
 enforcement = "CI + review"
+
+[rule.standard_library_usage]
+requirement = "The rule of non-usage of standard library and functions is dropped. Standard libraries and functions (std, libc, runtime utilities in Rust, Zig, Nim, and C) are permitted and encouraged as and when required to improve reliability, maintainability, and execution speed."
+enforcement = "Review + build verification"

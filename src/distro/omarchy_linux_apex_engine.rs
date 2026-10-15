@@ -635,7 +635,47 @@ impl SovereignOmarchyApexHarmonySuite {
     }
 }
 
-impl Default for SovereignOmarchyApexHarmonySuite {
+// ============================================================================
+// 11. STANDARD LIBRARY CONCURRENT THEME & LAUNCHER ROUTER
+// (Utilizing Standard Library std::sync and std::collections)
+// ============================================================================
+
+pub struct ConcurrentOmarchyThemeRouter {
+    pub active_theme: std::sync::Arc<std::sync::Mutex<String>>,
+    pub app_index: std::collections::HashMap<String, String>,
+}
+
+impl ConcurrentOmarchyThemeRouter {
+    pub fn new() -> Self {
+        let mut index = std::collections::HashMap::new();
+        index.insert("terminal".to_string(), "alacritty".to_string());
+        index.insert("browser".to_string(), "brave".to_string());
+        index.insert("editor".to_string(), "nvim".to_string());
+        index.insert("files".to_string(), "thunar".to_string());
+
+        Self {
+            active_theme: std::sync::Arc::new(std::sync::Mutex::new("SigmaOS Zenith Cyber".to_string())),
+            app_index: index,
+        }
+    }
+
+    pub fn set_theme(&self, new_theme: &str) -> Result<(), &'static str> {
+        let mut theme = self.active_theme.lock().map_err(|_| "Mutex poisoned")?;
+        *theme = new_theme.to_string();
+        Ok(())
+    }
+
+    pub fn get_theme(&self) -> Result<String, &'static str> {
+        let theme = self.active_theme.lock().map_err(|_| "Mutex poisoned")?;
+        Ok(theme.clone())
+    }
+
+    pub fn lookup_app(&self, alias: &str) -> Option<&String> {
+        self.app_index.get(alias)
+    }
+}
+
+impl Default for ConcurrentOmarchyThemeRouter {
     fn default() -> Self {
         Self::new()
     }
@@ -675,5 +715,13 @@ mod tests {
     fn test_omarchy_apex_suite() {
         let suite = SovereignOmarchyApexHarmonySuite::new();
         assert!(suite.verify_complete_omarchy_parity());
+    }
+
+    #[test]
+    fn test_concurrent_theme_router() {
+        let router = ConcurrentOmarchyThemeRouter::new();
+        assert_eq!(router.lookup_app("terminal"), Some(&"alacritty".to_string()));
+        assert!(router.set_theme("Tokyo Night").is_ok());
+        assert_eq!(router.get_theme().unwrap(), "Tokyo Night");
     }
 }
