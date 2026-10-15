@@ -144,4 +144,12 @@ pub use sigma_office::{
     SovereignSalesforceCpqUsageBasedBillingEngine,
     SovereignZohoBooksMultiEntityIntercompanyEngine, UsageBillingResult,
     UsageConsumptionTier, WorkspaceSmartSummary,
+    AmortizationScheduleMonth, CapacityEvaluationResult, CubeAggregationFunc, CubeFactRecord,
+    CubeSliceResult, CustomerTransactionHistory, DashboardThemeSpec, LeadRoutingResult,
+    OmnichannelLeadAttributes, RevenueContractSpec, RfmSegmentCategory, RfmSegmentResult,
+    SovereignBitrix24OmnichannelLeadScoringRoutingEngine,
+    SovereignGoogleLookerStudioRealtimeDashboardThemeEngine,
+    SovereignMicrosoftExcelDataCubePivotEngine, SovereignOdooMrpWorkCenterCapacityPlannerEngine,
+    SovereignSalesforceRevenueCloudContractBillingEngine,
+    SovereignZohoAnalyticsRfmMarketBasketEngine, WorkCenterCapacitySpec,
 };

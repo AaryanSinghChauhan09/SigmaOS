@@ -12547,6 +12547,439 @@ impl SovereignGoogleWorkspaceGeminiSmartSummaryEngine {
     }
 }
 
+// ============================================================================
+// Google Looker Studio Realtime Dashboard Theme & Palette Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct DashboardThemeSpec {
+    pub theme_name: String,
+    pub background_color_hex: String,
+    pub text_color_hex: String,
+    pub primary_accent_color_hex: String,
+    pub chart_color_palette: Vec<String>,
+    pub is_dark_mode: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct SovereignGoogleLookerStudioRealtimeDashboardThemeEngine;
+
+impl SovereignGoogleLookerStudioRealtimeDashboardThemeEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn generate_preset_theme(&self, dark_mode: bool) -> DashboardThemeSpec {
+        if dark_mode {
+            DashboardThemeSpec {
+                theme_name: "Executive Dark Slate".to_string(),
+                background_color_hex: "#121826".to_string(),
+                text_color_hex: "#F3F4F6".to_string(),
+                primary_accent_color_hex: "#3B82F6".to_string(),
+                chart_color_palette: vec![
+                    "#3B82F6".to_string(),
+                    "#10B981".to_string(),
+                    "#F59E0B".to_string(),
+                    "#EF4444".to_string(),
+                    "#8B5CF6".to_string(),
+                ],
+                is_dark_mode: true,
+            }
+        } else {
+            DashboardThemeSpec {
+                theme_name: "Executive Pure Light".to_string(),
+                background_color_hex: "#FFFFFF".to_string(),
+                text_color_hex: "#111827".to_string(),
+                primary_accent_color_hex: "#2563EB".to_string(),
+                chart_color_palette: vec![
+                    "#2563EB".to_string(),
+                    "#059669".to_string(),
+                    "#D97706".to_string(),
+                    "#DC2626".to_string(),
+                    "#7C3AED".to_string(),
+                ],
+                is_dark_mode: false,
+            }
+        }
+    }
+
+    pub fn get_series_color(&self, theme: &DashboardThemeSpec, series_index: usize) -> String {
+        if theme.chart_color_palette.is_empty() {
+            "#000000".to_string()
+        } else {
+            theme.chart_color_palette[series_index % theme.chart_color_palette.len()].clone()
+        }
+    }
+}
+
+// ============================================================================
+// Microsoft Excel Multi-Dimensional Data Cube & Pivot Slicer Engine
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CubeAggregationFunc {
+    Sum,
+    Count,
+    Average,
+    Min,
+    Max,
+}
+
+#[derive(Debug, Clone)]
+pub struct CubeFactRecord {
+    pub dimensions: HashMap<String, String>,
+    pub measure_value: f64,
+}
+
+#[derive(Debug, Clone)]
+pub struct CubeSliceResult {
+    pub sliced_records_count: usize,
+    pub aggregated_value: f64,
+    pub dimension_filter_applied: HashMap<String, String>,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct SovereignMicrosoftExcelDataCubePivotEngine;
+
+impl SovereignMicrosoftExcelDataCubePivotEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn slice_and_aggregate(
+        &self,
+        facts: &[CubeFactRecord],
+        filter_dimensions: &HashMap<String, String>,
+        agg_func: CubeAggregationFunc,
+    ) -> CubeSliceResult {
+        let mut count = 0;
+        let mut sum = 0.0;
+        let mut min_val = f64::MAX;
+        let mut max_val = f64::MIN;
+
+        for fact in facts {
+            let mut matches = true;
+            for (dim_key, dim_val) in filter_dimensions {
+                if fact.dimensions.get(dim_key) != Some(dim_val) {
+                    matches = false;
+                    break;
+                }
+            }
+
+            if matches {
+                count += 1;
+                sum += fact.measure_value;
+                if fact.measure_value < min_val {
+                    min_val = fact.measure_value;
+                }
+                if fact.measure_value > max_val {
+                    max_val = fact.measure_value;
+                }
+            }
+        }
+
+        let aggregated_value = match agg_func {
+            CubeAggregationFunc::Sum => sum,
+            CubeAggregationFunc::Count => count as f64,
+            CubeAggregationFunc::Average => {
+                if count > 0 {
+                    sum / count as f64
+                } else {
+                    0.0
+                }
+            }
+            CubeAggregationFunc::Min => {
+                if count > 0 {
+                    min_val
+                } else {
+                    0.0
+                }
+            }
+            CubeAggregationFunc::Max => {
+                if count > 0 {
+                    max_val
+                } else {
+                    0.0
+                }
+            }
+        };
+
+        CubeSliceResult {
+            sliced_records_count: count,
+            aggregated_value,
+            dimension_filter_applied: filter_dimensions.clone(),
+        }
+    }
+}
+
+// ============================================================================
+// Zoho Analytics RFM Customer Segmentation & Market Basket Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct CustomerTransactionHistory {
+    pub customer_id: String,
+    pub days_since_last_purchase: u32,
+    pub total_order_count: u32,
+    pub total_spend_amount: f64,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum RfmSegmentCategory {
+    Champions,
+    LoyalCustomers,
+    AtRisk,
+    LostCustomers,
+    Promising,
+}
+
+#[derive(Debug, Clone)]
+pub struct RfmSegmentResult {
+    pub customer_id: String,
+    pub recency_score: u8,
+    pub frequency_score: u8,
+    pub monetary_score: u8,
+    pub rfm_combined_score: u16,
+    pub segment_category: RfmSegmentCategory,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct SovereignZohoAnalyticsRfmMarketBasketEngine;
+
+impl SovereignZohoAnalyticsRfmMarketBasketEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn compute_rfm_segment(&self, tx: &CustomerTransactionHistory) -> RfmSegmentResult {
+        let r_score = if tx.days_since_last_purchase <= 30 {
+            5
+        } else if tx.days_since_last_purchase <= 60 {
+            4
+        } else if tx.days_since_last_purchase <= 90 {
+            3
+        } else if tx.days_since_last_purchase <= 180 {
+            2
+        } else {
+            1
+        };
+
+        let f_score = if tx.total_order_count >= 20 {
+            5
+        } else if tx.total_order_count >= 10 {
+            4
+        } else if tx.total_order_count >= 5 {
+            3
+        } else if tx.total_order_count >= 2 {
+            2
+        } else {
+            1
+        };
+
+        let m_score = if tx.total_spend_amount >= 10000.0 {
+            5
+        } else if tx.total_spend_amount >= 5000.0 {
+            4
+        } else if tx.total_spend_amount >= 1000.0 {
+            3
+        } else if tx.total_spend_amount >= 250.0 {
+            2
+        } else {
+            1
+        };
+
+        let combined = (r_score as u16 * 100) + (f_score as u16 * 10) + (m_score as u16);
+
+        let category = if r_score >= 4 && f_score >= 4 && m_score >= 4 {
+            RfmSegmentCategory::Champions
+        } else if f_score >= 3 && m_score >= 3 {
+            RfmSegmentCategory::LoyalCustomers
+        } else if r_score <= 2 && f_score >= 3 {
+            RfmSegmentCategory::AtRisk
+        } else if r_score <= 2 && f_score <= 2 {
+            RfmSegmentCategory::LostCustomers
+        } else {
+            RfmSegmentCategory::Promising
+        };
+
+        RfmSegmentResult {
+            customer_id: tx.customer_id.clone(),
+            recency_score: r_score,
+            frequency_score: f_score,
+            monetary_score: m_score,
+            rfm_combined_score: combined,
+            segment_category: category,
+        }
+    }
+}
+
+// ============================================================================
+// Salesforce Revenue Cloud Contract Revenue Recognition & Amortization Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct RevenueContractSpec {
+    pub contract_id: String,
+    pub total_contract_value: f64,
+    pub contract_duration_months: u32,
+    pub start_month_offset: u32,
+}
+
+#[derive(Debug, Clone)]
+pub struct AmortizationScheduleMonth {
+    pub month_number: u32,
+    pub recognized_revenue: f64,
+    pub deferred_revenue_balance: f64,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct SovereignSalesforceRevenueCloudContractBillingEngine;
+
+impl SovereignSalesforceRevenueCloudContractBillingEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn generate_straight_line_schedule(
+        &self,
+        contract: &RevenueContractSpec,
+    ) -> Vec<AmortizationScheduleMonth> {
+        let mut schedule = Vec::new();
+        if contract.contract_duration_months == 0 {
+            return schedule;
+        }
+
+        let monthly_rev = contract.total_contract_value / contract.contract_duration_months as f64;
+        let mut remaining_deferred = contract.total_contract_value;
+
+        for m in 1..=contract.contract_duration_months {
+            let recognized = if m == contract.contract_duration_months {
+                remaining_deferred
+            } else {
+                monthly_rev
+            };
+            remaining_deferred -= recognized;
+            schedule.push(AmortizationScheduleMonth {
+                month_number: m + contract.start_month_offset,
+                recognized_revenue: recognized,
+                deferred_revenue_balance: (remaining_deferred * 100.0).round() / 100.0,
+            });
+        }
+
+        schedule
+    }
+}
+
+// ============================================================================
+// Odoo MRP Work Center Capacity Planner Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct WorkCenterCapacitySpec {
+    pub work_center_id: String,
+    pub max_daily_capacity_hours: f64,
+    pub current_scheduled_hours: f64,
+}
+
+#[derive(Debug, Clone)]
+pub struct CapacityEvaluationResult {
+    pub work_center_id: String,
+    pub utilization_pct: f64,
+    pub is_overloaded: bool,
+    pub available_capacity_hours: f64,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct SovereignOdooMrpWorkCenterCapacityPlannerEngine;
+
+impl SovereignOdooMrpWorkCenterCapacityPlannerEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn evaluate_capacity(&self, spec: &WorkCenterCapacitySpec) -> CapacityEvaluationResult {
+        let utilization = if spec.max_daily_capacity_hours > 0.0 {
+            (spec.current_scheduled_hours / spec.max_daily_capacity_hours) * 100.0
+        } else {
+            0.0
+        };
+
+        let available = (spec.max_daily_capacity_hours - spec.current_scheduled_hours).max(0.0);
+        let is_overloaded = spec.current_scheduled_hours > spec.max_daily_capacity_hours;
+
+        CapacityEvaluationResult {
+            work_center_id: spec.work_center_id.clone(),
+            utilization_pct: utilization,
+            is_overloaded,
+            available_capacity_hours: available,
+        }
+    }
+}
+
+// ============================================================================
+// Bitrix24 Omnichannel Lead Scoring & Routing Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct OmnichannelLeadAttributes {
+    pub lead_id: String,
+    pub channel_source: String,
+    pub page_views: u32,
+    pub form_submission_type: String,
+    pub country_code: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct LeadRoutingResult {
+    pub lead_id: String,
+    pub calculated_score: u32,
+    pub assigned_tier: String,
+    pub recommended_action: String,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct SovereignBitrix24OmnichannelLeadScoringRoutingEngine;
+
+impl SovereignBitrix24OmnichannelLeadScoringRoutingEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn score_and_route_lead(&self, lead: &OmnichannelLeadAttributes) -> LeadRoutingResult {
+        let mut score = 0;
+
+        match lead.channel_source.as_str() {
+            "Inbound Direct" => score += 30,
+            "Paid Search" => score += 20,
+            "Social Media" => score += 10,
+            _ => score += 5,
+        }
+
+        score += (lead.page_views * 2).min(20);
+
+        if lead.form_submission_type == "Demo Request" {
+            score += 40;
+        } else if lead.form_submission_type == "Whitepaper Download" {
+            score += 15;
+        }
+
+        let (tier, action) = if score >= 70 {
+            ("Tier 1 - High Intent".to_string(), "Assign immediately to Senior SDR for direct call".to_string())
+        } else if score >= 40 {
+            ("Tier 2 - Nurture".to_string(), "Add to 14-day automated email drip campaign".to_string())
+        } else {
+            ("Tier 3 - Low Intent".to_string(), "Log in CRM and send monthly newsletter".to_string())
+        };
+
+        LeadRoutingResult {
+            lead_id: lead.lead_id.clone(),
+            calculated_score: score,
+            assigned_tier: tier,
+            recommended_action: action,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests_phase2 {
     use super::sigma_types::CapabilityToken;
@@ -13058,5 +13491,74 @@ mod tests_phase2 {
         assert_eq!(summary_res.total_documents_analyzed, 12);
         assert_eq!(summary_res.total_spreadsheets_analyzed, 5);
         assert!(!summary_res.key_insights.is_empty());
+
+        // 38. Sovereign Google Looker Studio Realtime Dashboard Theme Engine
+        let theme_engine = SovereignGoogleLookerStudioRealtimeDashboardThemeEngine::new();
+        let dark_theme = theme_engine.generate_preset_theme(true);
+        assert!(dark_theme.is_dark_mode);
+        assert_eq!(theme_engine.get_series_color(&dark_theme, 0), "#3B82F6");
+
+        // 39. Sovereign Microsoft Excel Data Cube Pivot Engine
+        let cube_engine = SovereignMicrosoftExcelDataCubePivotEngine::new();
+        let mut dim1 = HashMap::new();
+        dim1.insert("Region".to_string(), "US".to_string());
+        let mut dim2 = HashMap::new();
+        dim2.insert("Region".to_string(), "EU".to_string());
+        let facts = vec![
+            CubeFactRecord { dimensions: dim1.clone(), measure_value: 100.0 },
+            CubeFactRecord { dimensions: dim1.clone(), measure_value: 200.0 },
+            CubeFactRecord { dimensions: dim2.clone(), measure_value: 300.0 },
+        ];
+        let slice_res = cube_engine.slice_and_aggregate(&facts, &dim1, CubeAggregationFunc::Sum);
+        assert_eq!(slice_res.sliced_records_count, 2);
+        assert_eq!(slice_res.aggregated_value, 300.0);
+
+        // 40. Sovereign Zoho Analytics RFM Market Basket Engine
+        let rfm_engine = SovereignZohoAnalyticsRfmMarketBasketEngine::new();
+        let cust_tx = CustomerTransactionHistory {
+            customer_id: "CUST_99".to_string(),
+            days_since_last_purchase: 15,
+            total_order_count: 25,
+            total_spend_amount: 15000.0,
+        };
+        let rfm_res = rfm_engine.compute_rfm_segment(&cust_tx);
+        assert_eq!(rfm_res.recency_score, 5);
+        assert_eq!(rfm_res.segment_category, RfmSegmentCategory::Champions);
+
+        // 41. Sovereign Salesforce Revenue Cloud Contract Billing Engine
+        let rev_engine = SovereignSalesforceRevenueCloudContractBillingEngine::new();
+        let contract = RevenueContractSpec {
+            contract_id: "CTR_001".to_string(),
+            total_contract_value: 12000.0,
+            contract_duration_months: 12,
+            start_month_offset: 0,
+        };
+        let schedule = rev_engine.generate_straight_line_schedule(&contract);
+        assert_eq!(schedule.len(), 12);
+        assert_eq!(schedule[0].recognized_revenue, 1000.0);
+
+        // 42. Sovereign Odoo MRP Work Center Capacity Planner Engine
+        let cap_engine = SovereignOdooMrpWorkCenterCapacityPlannerEngine::new();
+        let cap_spec = WorkCenterCapacitySpec {
+            work_center_id: "WC_ASSEMBLY".to_string(),
+            max_daily_capacity_hours: 8.0,
+            current_scheduled_hours: 6.0,
+        };
+        let cap_res = cap_engine.evaluate_capacity(&cap_spec);
+        assert_eq!(cap_res.utilization_pct, 75.0);
+        assert!(!cap_res.is_overloaded);
+
+        // 43. Sovereign Bitrix24 Omnichannel Lead Scoring Routing Engine
+        let lead_engine = SovereignBitrix24OmnichannelLeadScoringRoutingEngine::new();
+        let lead_attr = OmnichannelLeadAttributes {
+            lead_id: "LEAD_777".to_string(),
+            channel_source: "Inbound Direct".to_string(),
+            page_views: 10,
+            form_submission_type: "Demo Request".to_string(),
+            country_code: "US".to_string(),
+        };
+        let lead_res = lead_engine.score_and_route_lead(&lead_attr);
+        assert!(lead_res.calculated_score >= 70);
+        assert_eq!(lead_res.assigned_tier, "Tier 1 - High Intent");
     }
 }
