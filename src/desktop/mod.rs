@@ -664,3 +664,6 @@ pub use sovereign_de_wm_innovation_engine::*;
 pub mod zenith_advanced_features;
 pub mod elementary_os_missing_components_pr;
 pub use elementary_os_missing_components_pr::*;
+
+pub mod omarchy_hypr_ecosystem;
+pub use omarchy_hypr_ecosystem::*;
