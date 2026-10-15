@@ -51,7 +51,7 @@ Implement missing components in this order. Each item must be delivered through 
 | **P1** | Physical memory manager | xv6, Linux | Frame allocator | Allocation tests |
 | **P1** | Virtual memory/paging | xv6, Linux | Page tables and address spaces | Boot and memory tests |
 | **P1** | Interrupts and timer | xv6, OSDev | IDT, exception handlers, timer | Interrupt trace |
-| **P1** | [Scheduler](SCHEDULER_DEVELOPMENT_PLAN.md) | Linux, xv6 | Minimal round-robin scheduler | Process-switch test |
+| **P1** | [Scheduler](SCHEDULER_DEVELOPMENT_PLAN.md) & [Dispatcher](DISPATCHER_PLAN.md) | Linux, xv6 | Minimal round-robin scheduler and context switch | Process-switch test |
 | **P1** | Syscall interface | Linux, FreeBSD | Stable syscall table and validation | Syscall tests |
 | **P1** | Init and shell | Linux Mint, Arch | PID 1, service startup, shell | Boot-to-shell |
 | **P2** | VFS | Linux, xv6 | Path resolution, FDs, file ops | Filesystem tests |
