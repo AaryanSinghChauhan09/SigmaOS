@@ -6,6 +6,7 @@ Welcome to the SigmaOS GitHub Wiki Encyclopedia and Subsystem Reference Index.
 
 ## Core Development Plans & Architecture
 
+- [Process Manager Plan](PROCESS_MANAGER_PLAN.md) - Master Architecture, 18-PR sequence roadmap, process & service lifecycle contracts, subreaper adoption, and restart bounds.
 - [System Utilities Development Plan](SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md) - Master Architecture, POSIX compatibility baseline, 18-PR roadmap, component rules, periodic maintenance framework, and review merge gates.
 - [System Utilities Plan Mirror](SYSTEM_UTILITIES_PLAN.md) - Alternate index page for system utilities architecture.
 
