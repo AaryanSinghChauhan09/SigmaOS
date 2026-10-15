@@ -257,6 +257,13 @@ if [ -f "src/creative/effectcraft_missing_components_parity_pr.rs" ]; then
     ./build/test_effectcraft_missing
 fi
 
+if [ -f "src/creative/wordcraft_missing_components_parity_pr.rs" ]; then
+    echo "Running Sovereign Wordcraft & ArtCraft Missing Components Parity PR Gateway test suite..."
+    mkdir -p build
+    rustc --test src/creative/wordcraft_missing_components_parity_pr.rs --edition=2021 -o build/test_wordcraft_missing
+    ./build/test_wordcraft_missing
+fi
+
 if [ -f "src/distro/linux_bsd_distro_breakthroughs.rs" ]; then
     echo "Running Linux & BSD Distro Breakthroughs test suite..."
     mkdir -p build

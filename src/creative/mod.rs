@@ -17,6 +17,8 @@ pub mod audiocraft;
 pub mod vectoranimation;
 pub mod model3d;
 pub mod artcraft;
+pub mod wordcraft;
+pub mod wordcraft_missing_components_parity_pr;
 
 pub use photocraft::{
     PhotoEditor, ImageLayer, Filter, Adjustment, LayerType, LayerMask, AdjustmentType,
@@ -124,6 +126,12 @@ pub use model3d::{
     Material, Light, LightType, Camera,
     ExportFormat as Model3DExportFormat,
     init_model3d, get_model3d,
+};
+pub use wordcraft_missing_components_parity_pr::{
+    WordcraftPrProposalManifest, WordcraftTypographyLayoutPrEngine,
+    WordcraftStylesTemplatesThemesPrEngine, WordcraftReferenceCitationBibliographyPrEngine,
+    WordcraftLinguisticAiSpellGrammarPrEngine, WordcraftRealtimeCrdtCollabPrEngine,
+    WordcraftMailMergeAutomationPrEngine, SovereignWordcraftArtcraftParityPrGateway,
 };
 pub use artcraft::{
     ArtSuite, Project, Workspace,
