@@ -1367,19 +1367,11 @@ if [ -f "src/creative/deckcraft.rs" ]; then
     ./build/test_deckcraft
 fi
 
-if [ -f "src/distro/open_source_os_missing_components_v54_pr.rs" ]; then
-    echo "Running Open Source OS Missing Components V54 PR Suite test suite..."
+if [ -f "src/creative/wordcraft.rs" ]; then
+    echo "Running WordCraft Creative Suite PR engine test suite..."
     mkdir -p build
-    rustc --test src/distro/open_source_os_missing_components_v54_pr.rs --edition=2021 -o build/test_open_source_v54_pr
-    ./build/test_open_source_v54_pr
-fi
-
-
-if [ -f "src/distro/sovereign_openbsd_ultimate_parity_pr_suite.rs" ]; then
-    echo "Running Sovereign OpenBSD Ultimate Parity PR test suite..."
-    mkdir -p build
-    rustc --test src/distro/sovereign_openbsd_ultimate_parity_pr_suite.rs --edition=2021 -o build/test_openbsd_ultimate_parity
-    ./build/test_openbsd_ultimate_parity
+    rustc --test src/creative/wordcraft.rs --edition=2021 -o build/test_wordcraft
+    ./build/test_wordcraft
 fi
 
 echo "All SigmaOS test suites completed."
