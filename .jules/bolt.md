@@ -23,3 +23,7 @@
 ## 2025-05-28 - Zero-Allocation Case-Insensitive Sorting Comparators
 **Learning:** Calling `a.to_lowercase().cmp(&b.to_lowercase())` inside `slice::sort_by` generates $O(N \log N)$ heap `String` allocations per sort operation (hundreds of thousands of temporary heap allocations for large line lists). Using an iterator-based `cmp_ignore_case` helper (`a.bytes().map(|b| b.to_ascii_lowercase())` for ASCII fast-path and `char::to_lowercase` iterator chaining for non-ASCII) performs comparisons in-place with zero heap allocations.
 **Action:** Always use iterator-based case-insensitive byte/char comparison helpers inside `sort_by` comparators to eliminate $O(N \log N)$ heap allocations.
+
+## 2025-05-30 - Zero-Allocation String Filtering in Search Filters
+**Learning:** Performing `.to_lowercase()` or `.map(|k| k.to_lowercase()).collect()` inside iterator `.filter()` closures on every keystroke allocates temporary heap `String`s and `Vec<String>`s for every item in candidate lists (applications, emojis, keywords). Delegating directly to zero-allocation ASCII window helpers (`contains_ignore_case`, `eq_ignore_case`) completely removes heap allocation pressure during search query filtering.
+**Action:** Never invoke string-lowercasing or slice-collecting methods inside hot filter loops; use zero-allocation window comparison helpers instead.

@@ -197,34 +197,21 @@ impl WalkerLauncher {
 
     /// Search applications
     pub fn search_applications(&self, query: &str) -> Vec<SearchResult> {
-        let query_lower = query.to_lowercase();
+        // Bolt performance optimization: use zero-allocation case-insensitive matching helpers
+        // directly in filter closure to eliminate temporary heap String/Vec allocations per entry.
         let mut results: Vec<SearchResult> = self
             .applications
             .iter()
             .filter(|app| {
-                let name_lower = app.name.to_lowercase();
-                let desc_lower = app.description.to_lowercase();
-                let keywords_lower: Vec<String> =
-                    app.keywords.iter().map(|k| k.to_lowercase()).collect();
-
                 if self.config.fuzzy_search {
-                    name_lower.contains(&query_lower)
-                        || desc_lower.contains(&query_lower)
-                        || keywords_lower.iter().any(|k| k.contains(&query_lower))
+                    contains_ignore_case(&app.name, query)
+                        || contains_ignore_case(&app.description, query)
+                        || app.keywords.iter().any(|k| contains_ignore_case(k, query))
                 } else if self.config.acronym_search {
-                    name_lower.contains(&query_lower)
-                        || self.acronym_match(&name_lower, &query_lower)
+                    contains_ignore_case(&app.name, query)
+                        || self.acronym_match(&app.name, query)
                 } else {
-                    if self.config.fuzzy_search {
-                        contains_ignore_case(&app.name, query)
-                            || contains_ignore_case(&app.description, query)
-                            || app.keywords.iter().any(|k| contains_ignore_case(k, query))
-                    } else if self.config.acronym_search {
-                        contains_ignore_case(&app.name, query)
-                            || self.acronym_match(&app.name, query)
-                    } else {
-                        eq_ignore_case(&app.name, query)
-                    }
+                    eq_ignore_case(&app.name, query)
                 }
             })
             .map(|app| SearchResult {
@@ -274,16 +261,13 @@ impl WalkerLauncher {
 
     /// Search emojis
     pub fn search_emojis(&self, query: &str) -> Vec<SearchResult> {
-        let query_lower = query.to_lowercase();
+        // Bolt performance optimization: zero-allocation matching over emoji names and keywords
         let mut results: Vec<SearchResult> = self
             .emojis
             .iter()
             .filter(|emoji| {
-                let name_lower = emoji.name.to_lowercase();
-                let keywords_lower: Vec<String> =
-                    emoji.keywords.iter().map(|k| k.to_lowercase()).collect();
-                name_lower.contains(&query_lower)
-                    || keywords_lower.iter().any(|k| k.contains(&query_lower))
+                contains_ignore_case(&emoji.name, query)
+                    || emoji.keywords.iter().any(|k| contains_ignore_case(k, query))
             })
             .map(|emoji| SearchResult {
                 entry_type: "emoji".to_string(),
