@@ -888,7 +888,7 @@ impl UniversalCliOptionTranslator {
             };
         }
 
-        // 2. BSD & GNU CLI Option Translations (free, vmstat, ss/netstat, ip/ifconfig, df, du)
+        // 2. BSD & GNU CLI Option Translations (free, vmstat, ss/netstat, ip/ifconfig, df, du, sysctl, lsof, top)
         if cmd == "free" && args.get(0) == Some(&"-m") {
             return TranslatedCliOptionCommand {
                 original_command: trimmed.to_string(),
@@ -919,6 +919,30 @@ impl UniversalCliOptionTranslator {
                 canonical_command: "du".to_string(),
                 detected_style: OptionStyle::BsdShortCombined,
                 translated_args: vec!["-h".to_string(), "--max-depth=1".to_string()],
+            };
+        }
+        if cmd == "sysctl" && args.get(0) == Some(&"-a") {
+            return TranslatedCliOptionCommand {
+                original_command: trimmed.to_string(),
+                canonical_command: "sysctl".to_string(),
+                detected_style: OptionStyle::BsdShortCombined,
+                translated_args: vec!["-a".to_string()],
+            };
+        }
+        if cmd == "lsof" && args.get(0) == Some(&"-i") {
+            return TranslatedCliOptionCommand {
+                original_command: trimmed.to_string(),
+                canonical_command: "lsof".to_string(),
+                detected_style: OptionStyle::PosixSingleDash,
+                translated_args: vec!["-i".to_string()],
+            };
+        }
+        if cmd == "top" && args.get(0) == Some(&"-b") {
+            return TranslatedCliOptionCommand {
+                original_command: trimmed.to_string(),
+                canonical_command: "top".to_string(),
+                detected_style: OptionStyle::PosixSingleDash,
+                translated_args: vec!["-b".to_string(), "-n".to_string(), "1".to_string()],
             };
         }
 
