@@ -257,6 +257,13 @@ if [ -f "src/creative/effectcraft_missing_components_parity_pr.rs" ]; then
     ./build/test_effectcraft_missing
 fi
 
+if [ -f "src/creative/cadcraft.rs" ]; then
+    echo "Running CadCraft CAD/CAM/FEA Modeling Framework test suite..."
+    mkdir -p build
+    rustc --test src/creative/cadcraft.rs --edition=2021 -o build/test_cadcraft
+    ./build/test_cadcraft
+fi
+
 if [ -f "src/distro/linux_bsd_distro_breakthroughs.rs" ]; then
     echo "Running Linux & BSD Distro Breakthroughs test suite..."
     mkdir -p build
