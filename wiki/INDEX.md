@@ -6,6 +6,7 @@ Welcome to the SigmaOS GitHub Wiki Encyclopedia and Subsystem Reference Index.
 
 ## Core Development Plans & Architecture
 
+- [IPC Handler Master Architecture & Development Plan](ipc-handler.md) - Formally specified, testable IPC subsystem covering pipes, FIFOs, UNIX sockets, shared memory, message queues, event wakeups, signal control plane, FD passing, and security rules.
 - [System Utilities Development Plan](SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md) - Master Architecture, POSIX compatibility baseline, 18-PR roadmap, component rules, periodic maintenance framework, and review merge gates.
 - [System Utilities Plan Mirror](SYSTEM_UTILITIES_PLAN.md) - Alternate index page for system utilities architecture.
 
