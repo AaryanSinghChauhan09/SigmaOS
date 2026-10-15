@@ -670,3 +670,6 @@ pub use omarchy_hypr_ecosystem::*;
 
 pub mod omarchy_media_tools;
 pub use omarchy_media_tools::*;
+
+pub mod omarchy_terminal_gamemode;
+pub use omarchy_terminal_gamemode::*;
