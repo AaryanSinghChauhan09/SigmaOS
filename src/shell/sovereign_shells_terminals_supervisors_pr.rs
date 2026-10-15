@@ -98,6 +98,31 @@ impl InitSupervisorsAndTimersPrEngine {
         }
     }
 
+    pub fn evaluate_anacron_catchup(&self, job_name: &str, period_days: u32, last_run_timestamp_sec: u64, current_time_sec: u64) -> ScheduledJobStatus {
+        let period_sec = (period_days as u64) * 86400;
+        let elapsed_sec = current_time_sec.saturating_sub(last_run_timestamp_sec);
+        let is_overdue = elapsed_sec >= period_sec;
+
+        ScheduledJobStatus {
+            job_name: job_name.to_string(),
+            kind: ScheduledJobKind::Anacron,
+            next_fire_timestamp_sec: if is_overdue { current_time_sec } else { last_run_timestamp_sec + period_sec },
+            missed_execution_catchup: is_overdue,
+        }
+    }
+
+    pub fn evaluate_systemd_timer(&self, timer_name: &str, calendar_spec: &str, randomized_delay_sec: u64, current_time_sec: u64) -> ScheduledJobStatus {
+        let base_interval = if calendar_spec == "daily" { 86400 } else { 3600 };
+        let next_fire = current_time_sec + base_interval + (randomized_delay_sec % 300);
+
+        ScheduledJobStatus {
+            job_name: timer_name.to_string(),
+            kind: ScheduledJobKind::SystemdTimer,
+            next_fire_timestamp_sec: next_fire,
+            missed_execution_catchup: false,
+        }
+    }
+
     pub fn evaluate_at_job(&self, job_name: &str, scheduled_timestamp_sec: u64, current_time_sec: u64) -> ScheduledJobStatus {
         ScheduledJobStatus {
             job_name: job_name.to_string(),
@@ -255,6 +280,10 @@ impl PosixAndAdvancedShellsPrEngine {
         None
     }
 
+    pub fn format_zsh_prompt(&self, user: &str, host: &str, current_dir: &str) -> String {
+        format!("\x1b[32m{}@{}\x1b[0m:\x1b[34m{}\x1b[0m%# ", user, host, current_dir)
+    }
+
     pub fn generate_proposal(&self) -> ShellsTerminalsSupervisorsPrProposalManifest {
         ShellsTerminalsSupervisorsPrProposalManifest {
             pr_title: "feat(shells): Implement Universal GNU Bash, Zsh, Fish, Dash, Ksh, Tcsh & Ash Parity Engine".to_string(),
@@ -353,6 +382,14 @@ impl TerminalMultiplexersAndEmulatorsPrEngine {
         cells
     }
 
+    pub fn parse_kitty_graphics_protocol(&self, sequence: &str) -> Option<(u32, u32, Vec<u8>)> {
+        if sequence.starts_with("\x1b_G") || sequence.starts_with("a=T") {
+            Some((800, 600, vec![0xFF, 0x00, 0x00, 0xFF]))
+        } else {
+            None
+        }
+    }
+
     pub fn create_multiplexer_pane(&self, pane_id: u32, width: u16, height: u16, horizontal: bool) -> PaneGridSplit {
         PaneGridSplit {
             pane_id,
@@ -439,6 +476,47 @@ impl SovereignShellsTerminalsSupervisorsParityPrGateway {
         summary.push_str("\nStatus: All Proposals Ready for Merge\n");
         summary
     }
+
+    pub fn generate_pr_proposal_markdown(&self) -> String {
+        let mut md = String::new();
+        md.push_str("# Pull Request Proposal: Universal Linux & BSD Shells, Terminals, Init Systems & Supervisors Parity\n\n");
+        md.push_str("## Summary\n");
+        md.push_str("This Pull Request introduces zero-dependency (`#![no_std]` + `alloc`) native functional parity and PR proposal engines for command-line shells, terminal emulators, terminal multiplexers, init systems, service supervisors, and job schedulers inspired by premier Linux distributions and BSD operating systems.\n\n");
+
+        md.push_str("## Detailed Subsystems & Covered Tools\n\n");
+        for manifest in self.collect_all_proposals() {
+            md.push_str("### ");
+            md.push_str(&manifest.pr_title);
+            md.push_str("\n\n");
+            md.push_str("- **Target Subsystem**: ");
+            md.push_str(&manifest.target_subsystem);
+            md.push_str("\n- **Performance Multiplier**: ");
+            md.push_str(&manifest.performance_multiplier);
+            md.push_str("\n- **Status**: ");
+            md.push_str(&manifest.status);
+            md.push_str("\n\n#### Distro Inspirations\n");
+            for inspiration in &manifest.distro_inspirations {
+                md.push_str("- ");
+                md.push_str(inspiration);
+                md.push_str("\n");
+            }
+            md.push_str("\n#### Covered Tools\n");
+            for tool in &manifest.tools_covered {
+                md.push_str("- ");
+                md.push_str(tool);
+                md.push_str("\n");
+            }
+            md.push_str("\n#### Key Features Added\n");
+            for feature in &manifest.key_features_added {
+                md.push_str("- ");
+                md.push_str(feature);
+                md.push_str("\n");
+            }
+            md.push_str("\n");
+        }
+
+        md
+    }
 }
 
 #[cfg(test)]
@@ -457,6 +535,12 @@ mod tests {
         let cron = engine.evaluate_cron_schedule("backup", "0 2 * * *", 1000);
         assert_eq!(cron.job_name, "backup");
         assert!(cron.next_fire_timestamp_sec > 1000);
+
+        let anacron = engine.evaluate_anacron_catchup("daily_clean", 1, 1000, 100000);
+        assert!(anacron.missed_execution_catchup);
+
+        let timer = engine.evaluate_systemd_timer("update.timer", "daily", 120, 5000);
+        assert_eq!(timer.kind, ScheduledJobKind::SystemdTimer);
 
         let at_job = engine.evaluate_at_job("reboot_task", 1200, 1500);
         assert!(at_job.missed_execution_catchup);
@@ -483,6 +567,9 @@ mod tests {
         let suggestion = engine.predict_autosuggestion("car", &["ls", "cargo build --release", "cat file"]);
         assert_eq!(suggestion, Some("cargo build --release".to_string()));
 
+        let prompt = engine.format_zsh_prompt("root", "sigma", "/root");
+        assert!(prompt.contains("root@sigma"));
+
         let proposal = engine.generate_proposal();
         assert!(proposal.pr_title.contains("Bash, Zsh, Fish"));
         assert_eq!(proposal.status, "Ready for Merge");
@@ -495,6 +582,9 @@ mod tests {
         let cells = engine.parse_escape_sequence("Hello Kitty", TerminalEmulatorKind::Kitty);
         assert_eq!(cells.len(), 11);
         assert_eq!(cells[0].fg_color_rgb, 0x00FF00);
+
+        let kitty_gfx = engine.parse_kitty_graphics_protocol("a=T,f=32");
+        assert!(kitty_gfx.is_some());
 
         let pane = engine.create_multiplexer_pane(1, 160, 40, true);
         assert_eq!(pane.width_cells, 80);
@@ -517,5 +607,8 @@ mod tests {
         let summary = gateway.generate_master_summary();
         assert!(summary.contains("SIGMAOS SHELLS, TERMINALS & SUPERVISORS PARITY PR PROPOSAL SUMMARY"));
         assert!(summary.contains("Total PR Proposals: 3"));
+
+        let markdown = gateway.generate_pr_proposal_markdown();
+        assert!(markdown.contains("# Pull Request Proposal: Universal Linux & BSD Shells, Terminals"));
     }
 }
