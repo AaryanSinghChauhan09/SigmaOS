@@ -266,4 +266,5 @@ pub mod crash_dump;
 pub mod kasan;
 pub mod kmsan;
 pub mod serial_console;
+pub mod hardware_firmware_subsystem;
 
