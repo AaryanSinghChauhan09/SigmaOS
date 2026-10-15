@@ -14,7 +14,8 @@ This collection of Pull Request proposals introduces native parity and high-perf
 - **Resilience Rating**: PID 1 Fault-Tolerant State Recovery
 - **Key Features Implemented**:
   - Unit dependency graph solver with `Wants=`, `Requires=`, `After=`, and `Before=` ordering resolution
-  - `sd_notify` datagram socket protocol parser (`READY=1`, `STATUS=...`, `MAINPID=...`, `WATCHDOG=1`)
+  - `sd_notify` datagram socket protocol parser (`READY=1`, `STATUS=...`, `MAINPID=...`, `WATCHDOG=1`, `WATCHDOG_USEC=...`)
+  - Exponential backoff delay calculation for service restart attempts
   - Cgroups v2 resource governor enforcing `MemoryMax=`, `CPUWeight=`, and `TasksMax=`
   - Journald structured log entry formatter and binary ring buffer sink
   - Socket activation file descriptor passing (`SD_LISTEN_FDS_START`)
@@ -25,7 +26,7 @@ This collection of Pull Request proposals introduces native parity and high-perf
 - **Performance Impact**: Instantaneous Non-Blocking Shell-Based Service Boot
 - **Resilience Rating**: Modular Runlevel Rollback
 - **Key Features Implemented**:
-  - Runlevel state transition engine (`sysinit` -> `boot` -> `default` -> `shutdown`)
+  - Runlevel state transition engine and sequence chain resolver (`sysinit` -> `boot` -> `default` -> `shutdown`)
   - Gentoo `/etc/init.d/` `depend()` function parser (`need`, `use`, `provide`, `before`, `after`)
   - Async parallel service startup executor with lock dependency resolution
   - Stacked runlevel cascading and `netconf` network dynamic interface triggers
@@ -39,7 +40,7 @@ This collection of Pull Request proposals introduces native parity and high-perf
   - Void Linux `runit` `/service/` directory scanner and `run`/`finish` scriptlet state machine
   - Alpine `s6` lockless supervision tree using FIFO event notification pipes (`s6-event`)
   - `s6-rc` compiled atomic state machine dependency transition graph solver
-  - Supervised logger redirection (`s6-log` / `runsvlog`) with size-capped log rotation
+  - Supervised logger redirection (`s6-log` / `runsvlog`) with size-capped log rotation and directive prefix filtering (`+`/`-`)
 
 ### PR #4004: feat(supervisor/sysvinit): Implement /etc/inittab Parser, telinit Controller & Runlevels 0-6
 - **Category**: Service Supervisors & Init Systems
@@ -59,7 +60,7 @@ This collection of Pull Request proposals introduces native parity and high-perf
 - **Resilience Rating**: Multi-Layer Override Isolation
 - **Key Features Implemented**:
   - NetBSD/FreeBSD `rcorder` topological script sorter (`PROVIDE`, `REQUIRE`, `BEFORE`, `KEYWORD`)
-  - `/etc/rc.conf` base configuration and `/etc/rc.conf.local` override evaluator
+  - `/etc/rc.conf` base configuration and `/etc/rc.conf.local` override evaluator and merger
   - `rc.subr` shell subroutine library action router (`start`, `stop`, `restart`, `status`, `poll`, `forcestart`)
   - `rc.d` modular service architecture with parallel async invocation mode
 
@@ -71,7 +72,7 @@ This collection of Pull Request proposals introduces native parity and high-perf
 - **Key Features Implemented**:
   - LaunchAgent & LaunchDaemon plist property list configuration parser (`Label`, `ProgramArguments`, `Sockets`)
   - Mach port & IPC socket-listening activation trigger engine
-  - `KeepAlive` rule evaluation matrix (`SuccessfulExit`, `PathState`, `NetworkState`)
+  - `KeepAlive` rule evaluation matrix (`SuccessfulExit`, `PathState`, `NetworkState`, `ExitCondition`)
   - `ThrottleInterval` exponential backoff algorithm to prevent thrashing crashing daemons
 
 ---
@@ -84,7 +85,7 @@ This collection of Pull Request proposals introduces native parity and high-perf
 - **Performance Impact**: Microsecond-Accurate Scheduled Job Dispatch
 - **Resilience Rating**: Power-Loss Recovery with Persistent Timers
 - **Key Features Implemented**:
-  - Vixie Cron minute-resolution schedule matcher (`* * * * *`, `@daily`, `@weekly`, `@reboot` shorthand expansion)
+  - Vixie Cron minute-resolution schedule matcher and shorthand macro alias expansion (`@reboot`, `@hourly`, `@daily`, `@weekly`, `@monthly`, `@yearly`)
   - Anacron offline catchup manager with `RANDOM_DELAY` jitter and system load average thresholding
   - `systemd.timer` calendar (`OnCalendar=`) and monotonic timers (`OnBootSec=`, `OnActiveSec=`, `OnUnitActiveSec=`)
-  - POSIX `at` / `batch` deferred execution job scheduler with queue priorities (`a`..`z`) and timestamp ordering
+  - POSIX `at` / `batch` deferred execution job scheduler with queue priorities (`a`..`z`), timestamp ordering, and job queue sorting
