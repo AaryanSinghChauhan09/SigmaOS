@@ -532,6 +532,8 @@ pub mod open_source_os_missing_components_v46_pr;
 pub use open_source_os_missing_components_v46_pr::*;
 pub mod open_source_os_debian_unimplemented_ideas_pr;
 pub use open_source_os_debian_unimplemented_ideas_pr::*;
+pub mod debian_github_repo_unimplemented_ideas_v27_pr;
+pub use debian_github_repo_unimplemented_ideas_v27_pr::*;
 pub mod open_source_os_unimplemented_ideas_pr;
 pub use open_source_os_unimplemented_ideas_pr::*;
 pub mod open_source_os_unimplemented_ideas_pr_suite;
