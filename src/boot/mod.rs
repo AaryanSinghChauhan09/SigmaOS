@@ -79,3 +79,6 @@ pub use sovereign_assembly_bootstrap_pr_suite::*;
 
 pub mod sovereign_kernel_and_bootloader_advancements_v47_pr;
 pub use sovereign_kernel_and_bootloader_advancements_v47_pr::*;
+
+pub mod sovereign_kernel_and_boot_innovations_v52_pr;
+pub use sovereign_kernel_and_boot_innovations_v52_pr::*;
