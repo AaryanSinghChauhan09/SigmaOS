@@ -10,10 +10,12 @@ pub mod rfc;
 pub mod risk_mitigation;
 pub mod sovereign_task_guidelines_wiki_sync_engine;
 pub mod strategic_vision;
+pub mod study_to_implementation_pipeline_pr;
 pub mod supreme_court;
 
 pub use periodic_study_improve_prove_engine::*;
 pub use risk_mitigation::*;
+pub use study_to_implementation_pipeline_pr::*;
 
 use crate::klib::HashMap;
 use core::sync::atomic::{AtomicUsize, Ordering};

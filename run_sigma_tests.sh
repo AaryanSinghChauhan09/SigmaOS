@@ -18,6 +18,13 @@ if [ -f "tests/test_periodic_study_improve_prove.rs" ]; then
     ./build/test_periodic
 fi
 
+if [ -f "tests/test_study_to_implementation_pipeline.rs" ]; then
+    echo "Running Study-to-Implementation Pipeline Engine test suite..."
+    mkdir -p build
+    rustc --test tests/test_study_to_implementation_pipeline.rs --edition=2021 -o build/test_study_pipeline
+    ./build/test_study_pipeline
+fi
+
 if [ -f "tests/io/interrupt.rs" ]; then
     echo "Running Interrupt Manager test suite..."
     mkdir -p build
