@@ -1,32 +1,37 @@
-# SigmaOS AI Security Agent Instructions & Governance
+# Security, Sandboxing & Capability Management Component Agent
 
-## Role Overview
+## Component Overview
+The Security subsystem enforces fine-grained capability tokens, Landlock-style filesystem sandboxing, OpenBSD-style Pledge and Unveil, and cryptographic integrity.
 
-As an AI Security Agent working on SigmaOS, your purpose is to evaluate, maintain, and enhance system security, memory safety, privilege isolation, and supply chain integrity across all SigmaOS components.
+## Linux Inspiration
+Linux Landlock LSM, seccomp-bpf syscall filtering, AppArmor/SELinux mandatory access controls, and Linux capabilities (cap_enter).
 
-Your work must strictly align with the **SigmaOS Security Management Plan** detailed in [`docs/SECURITY.md`](../docs/SECURITY.md) and NIST SP 800-218 (Secure Software Development Framework).
+## BSD Inspiration
+OpenBSD pledge() and unveil() syscalls, FreeBSD Capsicum capability mode and MAC framework, OpenBSD W^X memory protection.
 
----
+## Current SigmaOS Status
+Pledge and unveil abstractions defined, fail-closed access control models implemented. Dynamic Landlock V4 path restriction and seccomp filters need completion.
 
-## Directives & Execution Guidelines
+## Critical Missing Features
+Full kernel syscall enforcement of pledge promises, Landlock-style hierarchical path rules, runtime capability bounding sets for unprivileged users, and TPM 2.0 PCR attestation.
 
-### 1. Evidence-Based Maturity Tracking
-- Never declare a security component "Supported" unless runtime, hardware, and recovery test evidence exists.
-- Treat source files and unit tests as "Prototype" or "Integrated" until full target verification is completed.
+## Implementation Priority
+CRITICAL (Phase 1)
 
-### 2. 16-PR Security Roadmap Execution
-- Track and implement PRs 1 through 16 as defined in `docs/SECURITY.md`.
-- Keep each PR focused on one reviewable security outcome.
-- Ensure all security fixes include unit tests or regression tests.
+## Key Files to Create/Improve
+src/security/sandbox.rs, src/security/pledge.rs, src/security/unveil.rs, src/security/capabilities.rs, src/security/tpm.rs
 
-### 3. Fail-Closed Invariants
-- All syscalls, IPC mechanisms, and userland inputs must default to denial (`EACCES` / `EPERM` / `EFAULT`).
-- Parsers (filesystems, packages, network protocols) must enforce strict buffer bounds and zeroize secrets.
+## Testing Strategy
+Pledge violation trap tests, jailbreak and path traversal regression suite, seccomp syscall denial audit.
 
-### 4. Vulnerability Disclosure Confidentiality
-- Never disclose unpatched vulnerability details in public commits, issues, or PR descriptions.
-- Direct security reports to private disclosure channels (`security@sigmaos.org` or GitHub Private Vulnerability Reporting).
+## Dependencies
+KERNEL_CORE_AGENT, FILESYSTEM_VFS_AGENT, PROCESS_MANAGEMENT_AGENT
 
-### 5. Review & Merge Gates
-- Enforce the 2-reviewer requirement for privilege boundary, cryptographic, boot, or update security changes.
-- Never rely on CI green status alone for security-sensitive merges.
+## Success Criteria
+Zero sandbox escape vulnerabilities, 100% fail-closed syscall defaults, sub-microsecond capability checking overhead.
+
+## Open Source Competitors Analysis
+Combines the ergonomic simplicity of OpenBSD pledge with the multi-dimensional path isolation of Linux Landlock in a single unified API.
+
+## Future Enhancements
+Formal verification of sandboxing invariants and micro-VM hardware-enforced enclave boundaries.

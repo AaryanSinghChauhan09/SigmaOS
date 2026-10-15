@@ -1,216 +1,116 @@
-# SigmaOS
+# SigmaOS Official Documentation & Architecture Wiki
 
-SigmaOS is a sovereign operating system built in Rust. Missing components are added through a **periodic, PR-only research-and-implementation pipeline**: each cycle studies one upstream OS mechanism, opens a tracking issue, implements the smallest connected component slice in a feature branch, validates it with the repository's documented checks and QEMU/runtime tests, and merges only through a reviewable pull request.
+Welcome to the SigmaOS Architecture and Component Documentation Wiki.
 
-> **IMPORTANT DISCLAIMER**
-> Roadmap proposals and design documents become completed work ONLY after their code path and stated checks are verified in runtime testing. Reference-project feature names (from Linux, FreeBSD, OpenBSD, Arch, Debian, Fedora, etc.) serve as design references and do NOT establish SigmaOS feature parity without explicit runtime evidence.
+## AI Agent Maintenance & Governance
+- [AI Agent Maintenance Instructions](./AI-Agent-Maintenance-Instructions.md)
 
----
+## Canonical Component Guides (Open Source Competitor Parity)
+- [Audio Subsystem Component Guide](./Audio-Subsystem-Component-Guide.md)
+- [Bootloader Component Guide](./Bootloader-Component-Guide.md)
+- [Cgroups Resource Governor Component Guide](./Cgroups-Resource-Governor-Component-Guide.md)
+- [Container Runtime Component Guide](./Container-Runtime-Component-Guide.md)
+- [Cryptography Component Guide](./Cryptography-Component-Guide.md)
+- [Desktop Environment Component Guide](./Desktop-Environment-Component-Guide.md)
+- [Dynamic Linker Loader Component Guide](./Dynamic-Linker-Loader-Component-Guide.md)
+- [Filesystem Vfs Component Guide](./Filesystem-Vfs-Component-Guide.md)
+- [Graphics Gpu Component Guide](./Graphics-Gpu-Component-Guide.md)
+- [Hardware Hal Drivers Component Guide](./Hardware-Hal-Drivers-Component-Guide.md)
+- [Init Supervisor Component Guide](./Init-Supervisor-Component-Guide.md)
+- [Input Accessibility Component Guide](./Input-Accessibility-Component-Guide.md)
+- [Internationalization I18n Component Guide](./Internationalization-I18n-Component-Guide.md)
+- [Interrupt Apic Component Guide](./Interrupt-Apic-Component-Guide.md)
+- [Ipc Component Guide](./Ipc-Component-Guide.md)
+- [Kernel Core Component Guide](./Kernel-Core-Component-Guide.md)
+- [Logging Component Guide](./Logging-Component-Guide.md)
+- [Memory Management Component Guide](./Memory-Management-Component-Guide.md)
+- [Networking Stack Component Guide](./Networking-Stack-Component-Guide.md)
+- [Package Management Component Guide](./Package-Management-Component-Guide.md)
+- [Power Management Component Guide](./Power-Management-Component-Guide.md)
+- [Scheduler Component Guide](./Scheduler-Component-Guide.md)
+- [Security Component Guide](./Security-Component-Guide.md)
+- [Storage Component Guide](./Storage-Component-Guide.md)
+- [System Calls Abi Component Guide](./System-Calls-Abi-Component-Guide.md)
+- [System Monitoring Component Guide](./System-Monitoring-Component-Guide.md)
+- [System Tracing Ebpf Component Guide](./System-Tracing-Ebpf-Component-Guide.md)
+- [Timekeeping Component Guide](./Timekeeping-Component-Guide.md)
+- [Virtualization Component Guide](./Virtualization-Component-Guide.md)
+- [Wayland Compositor Component Guide](./Wayland-Compositor-Component-Guide.md)
 
-## PR-Only Operating Model
-
-Every study, design, implementation, test, documentation, and status change must be represented by a pull request.
-
-```text
-PERIODIC STUDY CYCLE
-  → Open study issue
-  → Open research/ADR PR
-  → Open implementation PR
-  → Open test/evidence PR
-  → Open documentation/status PR
-  → CI + review + merge
-  → Close issue with linked PRs
-```
-
-For small changes, combine research, implementation, tests, and documentation into one PR. For kernel, security, installer, bootloader, update, or package-execution work, separate them into reviewable PRs.
-
----
-
-## Periodic Cadence
-
-| Cadence | Activity | PR type | Required evidence |
-|---|---|---|---|
-| **Daily** | Build/test/boot health | `chore/ci`, `fix/test`, `docs/status` | CI logs, test reports |
-| **Weekly** | Study one upstream mechanism | `docs/research`, `feat/<component>` | Research note, ADR, tests |
-| **Biweekly** | Revalidate a component | `test/<component>`, `fix/<component>` | Runtime regression report |
-| **Monthly** | Add or complete one missing component | `feat/<component>` | QEMU/runtime validation |
-| **Quarterly** | Roadmap and architecture review | `docs/roadmap`, `refactor/architecture` | Gap register and updated priorities |
-
----
-
-## Missing-Component Roadmap
-
-Implement missing components in this order. Each item must be delivered through one or more PRs and must produce runtime evidence.
-
-| Priority | Missing component | Upstream study | First PR deliverable | Validation |
-|---|---|---|---|---|
-| **P0** | Reproducible CI/build gate | Fedora, Debian | CI workflow and build manifest | Clean build and tests pass |
-| **P0** | QEMU boot validator | OSDev, xv6 | Boot script and boot matrix | QEMU boot-to-shell log |
-| **P0** | Bootloader integration | OSDev, GRUB/systemd-boot concepts | UEFI boot path | QEMU UEFI boot |
-| **P0** | Kernel entry and serial logging | xv6, Linux | Early console and kernel entry | Serial trace |
-| **P1** | Physical memory manager | xv6, Linux | Frame allocator | Allocation tests |
-| **P1** | Virtual memory/paging | xv6, Linux | Page tables and address spaces | Boot and memory tests |
-| **P1** | Interrupts and timer | xv6, OSDev | IDT, exception handlers, timer | Interrupt trace |
-| **P1** | [Scheduler](SCHEDULER_DEVELOPMENT_PLAN.md) | Linux, xv6 | Minimal round-robin scheduler | Process-switch test |
-| **P1** | Syscall interface | Linux, FreeBSD | Stable syscall table and validation | Syscall tests |
-| **P1** | Init and shell | Linux Mint, Arch | PID 1, service startup, shell | Boot-to-shell |
-| **P2** | VFS | Linux, xv6 | Path resolution, FDs, file ops | Filesystem tests |
-| **P2** | RAM-disk filesystem | Linux tmpfs concepts | Simple in-memory FS | QEMU RAM-disk boot |
-| **P2** | Processes and signals | Linux, xv6 | Process lifecycle and signals | Interop tests |
-| **P2** | Pipes and IPC | Linux, FreeBSD | Pipes, event queues, shared memory | IPC tests |
-| **P2** | Installer | Debian, Mint | Clean QEMU install | Install log |
-| **P2** | Atomic update/rollback | Fedora, Mint | Update manifest and rollback | Failed-update recovery test |
-| **P2** | Security capabilities | OpenBSD, Linux | Capability checks and sandbox policy | Denial tests |
-| **P3** | Drivers | Linux, FreeBSD | virtio-blk, virtio-net, VGA | Device logs |
-| **P3** | Networking | Linux, FreeBSD | Socket API and basic TCP/IP path | Network integration test |
-| **P3** | Desktop | Redox, Mint, Omarchy | Framebuffer, input, window launch | Graphical smoke test |
-| **P3** | Package manager | Arch, Debian | Metadata parser and dependency resolver | Package corpus tests |
-| **P3** | Distro compatibility | Arch, Debian, Fedora, BSD | Metadata compatibility layer | Compatibility matrix |
-
----
-
-## Branch and PR Conventions
-
-### Branch Naming
-
-```text
-study/<component>-<topic>-<short-id>
-feat/<component>-<capability>-<short-id>
-fix/<component>-<issue>-<short-id>
-test/<component>-<scenario>-<short-id>
-docs/<component>-<topic>-<short-id>
-chore/ci-<topic>-<short-id>
-security/<component>-<topic>-<short-id>
-```
-
-Examples:
-- `study/vfs-path-resolution-042`
-- `feat/kernel-qemu-boot-043`
-- `test/vfs-ramdisk-044`
-- `docs/capability-matrix-audit-045`
-- `security/package-sandbox-046`
-
-### Commit Convention
-
-Use Conventional Commits:
-
-```text
-feat(kernel): add QEMU x86_64 boot-to-shell validator
-fix(vfs): normalize path-resolution error codes
-test(memory): add frame allocator exhaustion tests
-docs(research): study Linux VFS path resolution
-chore(ci): require clean build and runtime smoke test
-security(package): sandbox package-script execution
-```
-
-### PR Title Format
-
-```text
-<type>(<component>): <concise change>
-
-feat(kernel): add QEMU x86_64 boot-to-shell validator
-```
-
----
-
-## Required PR Types
-
-### 1. Research PR
-- **Branch:** `study/<component>-<topic>-<id>`
-- **Adds:** `research/upstream/<project>/<topic>.md`, `research/decisions/ADR-<id>-<topic>.md`, `research/comparisons/<component>.md`
-- **Must contain:** Upstream project/commit, problem solved, core design/data structures, SigmaOS adaptation decision, security/failure assumptions, licensing analysis, implementation scope, and required validation.
-
-### 2. Implementation PR
-- **Branch:** `feat/<component>-<capability>-<id>`
-- **Adds/changes:** Component source under module boundary, public interface docs, minimal implementation, unit/integration tests, runtime hook/QEMU test, evidence-based status update.
-
-### 3. Test and Evidence PR
-- **Branch:** `test/<component>-<scenario>-<id>`
-- **Adds:** Regression tests, fuzz targets, QEMU boot/runtime test, report generator, evidence artifacts under `reports/`.
-
-### 4. Documentation and Status PR
-- **Branch:** `docs/<component>-<topic>-<id>`
-- **Adds:** Component docs, known limitations, troubleshooting guidance, `CAPABILITY_MATRIX.toml` & `FEATURE_STATUS.toml` updates with evidence links.
-
----
-
-## PR Review Rules
-
-1. **Rule 1: Every change is a PR** — No direct commits to `main`.
-2. **Rule 2: One PR, one outcome** — A PR adds one capability, fixes one regression, adds one test suite, or updates one doc area.
-3. **Rule 3: Research before implementation** — A missing component must have a study issue and ADR before a large implementation PR is opened.
-4. **Rule 4: Evidence before status** — Status matrices updated only with passing tests and runtime evidence.
-5. **Rule 5: Runtime path required** — New components must connect to the real boot/runtime path or remain labeled `Prototype`.
-6. **Rule 6: Security review is separate** — Core security mechanisms require a dedicated security review.
-7. **Rule 7: Least privilege** — No broad credentials, unrestricted network access, or unsandboxed execution.
-8. **Rule 8: Reproducibility** — PRs must be reproducible from a clean checkout using recorded commands and artifact hashes.
-9. **Rule 9: Rollback safety** — Storage, update, boot, and installer PRs must define rollback or recovery behavior.
-10. **Rule 10: License compliance** — Dual MIT/GPL-2.0. Copied upstream code requires license compatibility and attribution; otherwise use clean-room implementation.
-11. **Rule 11: No parity claims** — Reference projects are design references, not proof of SigmaOS feature parity.
-12. **Rule 12: Human approval for high-risk merges** — Bootloader, installer, update, security-boundary, package-execution, release, and destructive storage PRs require human approval.
-
----
-
-## Required Verification Commands
-
-Every PR must pass:
-
-```bash
-cargo check --lib
-cargo test --lib
-./run_sigma_tests.sh
-make check
-make test
-make format
-```
-
-Component-specific gates:
-
-| PR type | Additional required CI |
-|---|---|
-| Kernel/boot | QEMU boot smoke test |
-| VFS/filesystem | Filesystem conformance and QEMU RAM-disk test |
-| Memory | Allocation/fuzz tests |
-| Security | Denial tests and fuzzing |
-| Installer/update | Clean install and rollback test |
-| Packaging | Metadata corpus and dry-run tests |
-| Drivers | QEMU device-specific test |
-| Desktop | Graphical smoke test |
-
----
-
-## First Six PRs
-
-- **PR 1:** `chore(ci): add reproducible verification workflow`
-- **PR 2:** `docs(research): add periodic OS study framework`
-- **PR 3:** `feat(kernel): add QEMU x86_64 boot validator`
-- **PR 4:** `feat(kernel): implement minimal boot-to-shell path`
-- **PR 5:** `feat(vfs): add RAM-disk filesystem and path resolution`
-- **PR 6:** `feat(installer): add clean-install and rollback test harness`
-
----
-
-## First 30-Day PR Schedule
-
-| Week | Study focus | PRs to open |
-|---|---|---|
-| 1 | xv6/OSDev boot, Linux kernel entry | CI PR, research PR, QEMU validator PR |
-| 2 | xv6 memory, Linux paging | Memory research PR, memory implementation PR, test PR |
-| 3 | xv6 processes, Linux scheduling | Scheduler research PR, scheduler implementation PR, test PR |
-| 4 | Linux syscalls/VFS, xv6 filesystem | Syscall/VFS research PR, RAM-disk VFS PR, boot-to-shell PR |
-
----
-
-## Definition of Merged and Complete
-
-A missing component is considered added only when:
-1. A study issue and ADR exist.
-2. Implementation is merged through a PR.
-3. Unit and integration tests pass.
-4. The component is connected to a real runtime path.
-5. QEMU or hardware evidence exists.
-6. A regression test prevents reversal.
-7. Documentation and capability status are updated.
-8. Security review is complete where relevant.
-9. Rollback or recovery behavior is defined where relevant.
-10. CI remains green after merge.
+## Architecture, Subsystems & Strategic Roadmaps
+- [07 Security](./07-Security.md)
+- [15 Sovereign OS Self Sufficiency Encyclopedia V51](./15-Sovereign-OS-Self-Sufficiency-Encyclopedia-V51.md)
+- [15 Sovereign OS Self Sufficiency Encyclopedia V52](./15-Sovereign-OS-Self-Sufficiency-Encyclopedia-V52.md)
+- [16 Self Sufficiency Encyclopedia](./16-Self-Sufficiency-Encyclopedia.md)
+- [20 Tri Agent 500 Repos Absorption Master Plan](./20-Tri-Agent-500-Repos-Absorption-Master-Plan.md)
+- [21 Tri Agent 500 Repos Implementation Plan](./21-Tri-Agent-500-Repos-Implementation-Plan.md)
+- [22 Tri Agent 500 Repos Absorption Catalog Plan](./22-Tri-Agent-500-Repos-Absorption-Catalog-Plan.md)
+- [26 Signal Development And Maintenance Plan](./26-Signal-Development-And-Maintenance-Plan.md)
+- [26 System Utilities Development Plan](./26-System-Utilities-Development-Plan.md)
+- [27 SigmaOS CLI Development Plan](./27-SigmaOS-CLI-Development-Plan.md)
+- [28 Network Development And Maintenance Plan](./28-Network-Development-And-Maintenance-Plan.md)
+- [32 System Apps Development Plan](./32-System-Apps-Development-Plan.md)
+- [33 Open Source OS Inspiration V47 PR Suite](./33-Open-Source-OS-Inspiration-V47-PR-Suite.md)
+- [34 SigmaOS Command Interpreter Plan](./34-SigmaOS-Command-Interpreter-Plan.md)
+- [35 Localization And Misc Libraries Plan](./35-Localization-And-Misc-Libraries-Plan.md)
+- [35 Open Source OS Inspiration V54 PR Suite](./35-Open-Source-OS-Inspiration-V54-PR-Suite.md)
+- [Architectural Pillars Components](./Architectural-Pillars-Components.md)
+- [Audit and Compliance Components](./Audit-and-Compliance-Components.md)
+- [Community Toolkit Components](./Community-Toolkit-Components.md)
+- [Compiler Toolchain Components](./Compiler-Toolchain-Components.md)
+- [Consolidated OS Documentation System](./Consolidated-OS-Documentation-System.md)
+- [Gamified Productivity Components](./Gamified-Productivity-Components.md)
+- [INDEX](./INDEX.md)
+- [INTERRUPT_HANDLER_PLAN](./INTERRUPT_HANDLER_PLAN.md)
+- [ISO Builder and Rufus Components](./ISO-Builder-and-Rufus-Components.md)
+- [Info Pages Tree](./Info-Pages-Tree.md)
+- [Interrupt Handling and APIC Components](./Interrupt-Handling-and-APIC-Components.md)
+- [Kernel Core Library Klib Components](./Kernel-Core-Library-Klib-Components.md)
+- [Kernel Functions and ABI Components](./Kernel-Functions-and-ABI-Components.md)
+- [Kernel Thread and ThreadPool Components](./Kernel-Thread-and-ThreadPool-Components.md)
+- [Launch Ready Ecosystem Components](./Launch-Ready-Ecosystem-Components.md)
+- [Legal and Licensing Components](./Legal-and-Licensing-Components.md)
+- [Location and GPS Services Components](./Location-and-GPS-Services-Components.md)
+- [Man Pages Catalog](./Man-Pages-Catalog.md)
+- [Microphone and Audio Capture Components](./Microphone-and-Audio-Capture-Components.md)
+- [Natural Language Processing NLP Components](./Natural-Language-Processing-NLP-Components.md)
+- [POSIX Signal Handling Components](./POSIX-Signal-Handling-Components.md)
+- [PROCESS_MANAGER_PLAN](./PROCESS_MANAGER_PLAN.md)
+- [PROCESS_SYNCHRONIZATION_PLAN](./PROCESS_SYNCHRONIZATION_PLAN.md)
+- [PR_PROPOSAL_NETWORKING_STACK_AND_DAEMONS_PARITY](./PR_PROPOSAL_NETWORKING_STACK_AND_DAEMONS_PARITY.md)
+- [Package Docs Registry](./Package-Docs-Registry.md)
+- [Printing and Scanning Components](./Printing-and-Scanning-Components.md)
+- [Privacy and Anonymity Dashboard Components](./Privacy-and-Anonymity-Dashboard-Components.md)
+- [Process Lifecycle and Subreaper Components](./Process-Lifecycle-and-Subreaper-Components.md)
+- [Release Engineering Components](./Release-Engineering-Components.md)
+- [Remote Desktop and Shell Components](./Remote-Desktop-and-Shell-Components.md)
+- [Resilience and Self Healing Components](./Resilience-and-Self-Healing-Components.md)
+- [Resource Governor and Cgroups Components](./Resource-Governor-and-Cgroups-Components.md)
+- [SCHEDULER_DEVELOPMENT_PLAN](./SCHEDULER_DEVELOPMENT_PLAN.md)
+- [SCHEDULER_STATUS_AND_INVARIANTS](./SCHEDULER_STATUS_AND_INVARIANTS.md)
+- [SIGNAL_HANDLER_AUDIT_AND_ABI_PROFILE](./SIGNAL_HANDLER_AUDIT_AND_ABI_PROFILE.md)
+- [SIGNAL_HANDLER_PLAN](./SIGNAL_HANDLER_PLAN.md)
+- [SYSTEM_UTILITIES_DEVELOPMENT_PLAN](./SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md)
+- [SYSTEM_UTILITIES_PLAN](./SYSTEM_UTILITIES_PLAN.md)
+- [Secure Enclave and Boot Components](./Secure-Enclave-and-Boot-Components.md)
+- [Security and Sandboxing](./Security-and-Sandboxing.md)
+- [SigPkg Universal Package Manager Components](./SigPkg-Universal-Package-Manager-Components.md)
+- [Sigma Boot Components](./Sigma-Boot-Components.md)
+- [Sigma Sandbox Confinement Components](./Sigma-Sandbox-Confinement-Components.md)
+- [Sigma Validation Suite Components](./Sigma-Validation-Suite-Components.md)
+- [SigmaOS Linux Mint Gap Closure Report](./SigmaOS-Linux-Mint-Gap-Closure-Report.md)
+- [SigmaOS Omarchy Gap Closure Report](./SigmaOS-Omarchy-Gap-Closure-Report.md)
+- [SigmaOS vs Linux Mint Gap Analysis](./SigmaOS-vs-Linux-Mint-Gap-Analysis.md)
+- [Sovereign Mint Omarchy Apex Dominance V30](./Sovereign-Mint-Omarchy-Apex-Dominance-V30.md)
+- [Subsystem Integration Components](./Subsystem-Integration-Components.md)
+- [System Automation Engine Components](./System-Automation-Engine-Components.md)
+- [System Governance and RFC Components](./System-Governance-and-RFC-Components.md)
+- [System Logging and Rotation Components](./System-Logging-and-Rotation-Components.md)
+- [System Notification Daemon Components](./System-Notification-Daemon-Components.md)
+- [System Provisioning Components](./System-Provisioning-Components.md)
+- [Timer and High Res Clock Components](./Timer-and-High-Res-Clock-Components.md)
+- [Unified Dashboard Components](./Unified-Dashboard-Components.md)
+- [User Onboarding Wizard Components](./User-Onboarding-Wizard-Components.md)
+- [Virtual Machine MicroVM Components](./Virtual-Machine-MicroVM-Components.md)
+- [Workflow and Job Automation Components](./Workflow-and-Job-Automation-Components.md)
+- [ipc handler](./ipc-handler.md)
