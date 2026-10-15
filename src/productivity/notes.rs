@@ -23,6 +23,50 @@ use std::vec::Vec;
 use crate::klib::btreemap::BTreeMap;
 // PathBuf not in no_std
 
+/// Zero-allocation case-insensitive substring search helper.
+fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
+    if needle.is_empty() {
+        return true;
+    }
+    if needle.is_ascii() && haystack.is_ascii() {
+        let h_bytes = haystack.as_bytes();
+        let n_bytes = needle.as_bytes();
+        if n_bytes.len() > h_bytes.len() {
+            return false;
+        }
+        h_bytes.windows(n_bytes.len()).any(|window| {
+            window
+                .iter()
+                .zip(n_bytes)
+                .all(|(&h, &n)| h.to_ascii_lowercase() == n.to_ascii_lowercase())
+        })
+    } else {
+        haystack.to_lowercase().contains(&needle.to_lowercase())
+    }
+}
+
+/// Zero-allocation case-insensitive position search helper.
+fn find_ignore_case(haystack: &str, needle: &str) -> Option<usize> {
+    if needle.is_empty() {
+        return Some(0);
+    }
+    if needle.is_ascii() && haystack.is_ascii() {
+        let h_bytes = haystack.as_bytes();
+        let n_bytes = needle.as_bytes();
+        if n_bytes.len() > h_bytes.len() {
+            return None;
+        }
+        h_bytes.windows(n_bytes.len()).position(|window| {
+            window
+                .iter()
+                .zip(n_bytes)
+                .all(|(&h, &n)| h.to_ascii_lowercase() == n.to_ascii_lowercase())
+        })
+    } else {
+        haystack.to_lowercase().find(&needle.to_lowercase())
+    }
+}
+
 /// Note
 #[derive(Debug, Clone)]
 pub struct Note {
@@ -215,26 +259,25 @@ impl NoteTakingApp {
         self.storage.list_notes()
     }
 
-    /// Search notes
+    /// Search notes using zero-allocation case-insensitive substring matching
     pub fn search_notes(&self, query: &str) -> Vec<NoteSearchResult> {
-        let query_lower = query.to_lowercase();
         let mut results = Vec::new();
 
         if let Ok(notes) = self.storage.list_notes() {
             for note in notes {
-                let title_match = note.title.to_lowercase().contains(&query_lower);
-                let content_match = note.content.to_lowercase().contains(&query_lower);
+                let title_match = contains_ignore_case(&note.title, query);
+                let content_match = contains_ignore_case(&note.content, query);
                 let tag_match = note
                     .tags
                     .iter()
-                    .any(|t| t.to_lowercase().contains(&query_lower));
+                    .any(|t| contains_ignore_case(t, query));
 
                 if title_match || content_match || tag_match {
                     let relevance_score = if title_match { 1.0 } else { 0.5 };
 
                     // Create snippet
                     let snippet = if content_match {
-                        let pos = note.content.to_lowercase().find(&query_lower).unwrap_or(0);
+                        let pos = find_ignore_case(&note.content, query).unwrap_or(0);
                         let start = if pos > 20 { pos - 20 } else { 0 };
                         let end = core::cmp::min(pos + 40, note.content.len());
                         format!("...{}...", &note.content[start..end])
