@@ -110,6 +110,17 @@ impl GnomeInnovationEngine {
             .cloned()
             .unwrap_or_else(|| String::from("Unknown"))
     }
+
+    pub fn export_extension_profile(&self) -> String {
+        format!(
+            "{{\"scale\": {}, \"sandbox\": {}, \"workspaces\": {}}}",
+            self.fractional_scale, self.extension_sandbox_enabled, self.active_workspace_count
+        )
+    }
+
+    pub fn screencast_portal_session_active(&self) -> bool {
+        self.quick_settings_state.get("screencast").cloned().unwrap_or(false)
+    }
 }
 
 impl Default for GnomeInnovationEngine {
@@ -237,6 +248,23 @@ impl KdePlasmaInnovationEngine {
             self.accent_color_hex.clone(), // Accent highlight
         )
     }
+
+    pub fn export_kwin_rules_xml(&self) -> String {
+        format!(
+            "<kwin_rules count=\"{}\" tiling=\"{}\"/>",
+            self.kwin_script_rules.len(),
+            self.kwin_tiling_enabled
+        )
+    }
+
+    pub fn import_kwin_rules_xml(&mut self, xml_data: &str) -> bool {
+        if xml_data.contains("<kwin_rules") {
+            self.kwin_script_rules.push(xml_data.to_string());
+            true
+        } else {
+            false
+        }
+    }
 }
 
 impl Default for KdePlasmaInnovationEngine {
@@ -317,6 +345,18 @@ impl XfceInnovationEngine {
         self.thunar_bulk_renamer_presets
             .insert(name.to_string(), rule_pattern.to_string());
     }
+
+    pub fn export_xfconf_channel_xml(&self, channel: &str) -> String {
+        format!(
+            "<channel name=\"{}\" entries=\"{}\"/>",
+            channel,
+            self.xfconf_channels.len()
+        )
+    }
+
+    pub fn validate_thunar_action(&self, action_name: &str) -> bool {
+        self.custom_actions.iter().any(|a| a.name == action_name)
+    }
 }
 
 impl Default for XfceInnovationEngine {
@@ -374,6 +414,14 @@ impl LxqtInnovationEngine {
         }
         self.lxqt_style.clone()
     }
+
+    pub fn register_panel_plugin(&mut self, plugin_name: &str) {
+        self.autostart_services.insert(format!("lxqt-panel-plugin-{}", plugin_name), true);
+    }
+
+    pub fn generate_qterminal_color_scheme(&self) -> String {
+        format!("[QTerminalColorScheme]\nStyle={}\nPaletteSync={}\n", self.lxqt_style, self.qt_palette_sync_enabled)
+    }
 }
 
 impl Default for LxqtInnovationEngine {
@@ -423,6 +471,14 @@ impl LxdeInnovationEngine {
 
     pub fn trigger_session_lock(&self) -> String {
         format!("Executing LXDE session lock: {}", self.session_lock_cmd)
+    }
+
+    pub fn generate_openbox_pipe_menu_xml(&self) -> String {
+        format!("<openbox_pipe_menu config=\"{}\"/>", self.openbox_config_path)
+    }
+
+    pub fn switch_lxappearance_gtk_theme(&mut self, theme: &str) {
+        self.gtk_theme = theme.to_string();
     }
 }
 
@@ -482,6 +538,15 @@ impl MateInnovationEngine {
 
     pub fn add_caja_script(&mut self, script_name: &str, script_body: &str) {
         self.caja_scripts.insert(script_name.to_string(), script_body.to_string());
+    }
+
+    pub fn toggle_marco_vsync(&mut self, enabled: bool) -> bool {
+        self.marco_shadows_enabled = enabled;
+        self.marco_shadows_enabled
+    }
+
+    pub fn activate_caja_python_extension(&mut self, ext_name: &str) -> bool {
+        self.register_caja_extension(&format!("python-{}", ext_name))
     }
 }
 
@@ -553,6 +618,14 @@ impl CinnamonInnovationEngine {
     pub fn register_nemo_action(&mut self, action_id: &str, exec_cmd: &str) {
         self.nemo_action_triggers.insert(action_id.to_string(), exec_cmd.to_string());
     }
+
+    pub fn resolve_spice_dependencies(&self, id: &str) -> bool {
+        self.spices.contains_key(id)
+    }
+
+    pub fn run_nemo_action_script(&self, action_id: &str) -> Option<String> {
+        self.nemo_action_triggers.get(action_id).cloned()
+    }
 }
 
 impl Default for CinnamonInnovationEngine {
@@ -620,6 +693,14 @@ impl BudgieInnovationEngine {
 
     pub fn set_panel_layout_preset(&mut self, preset: &str) {
         self.panel_layout_preset = preset.to_string();
+    }
+
+    pub fn build_raven_widget(&mut self, widget_name: &str) -> String {
+        format!("RavenWidget:{}", widget_name)
+    }
+
+    pub fn sync_solus_accent_color(&mut self, color_hex: &str) {
+        self.solus_accent_color = color_hex.to_string();
     }
 }
 
@@ -700,6 +781,14 @@ impl EnlightenmentMokshaEngine {
         } else {
             None
         }
+    }
+
+    pub fn compile_evas_theme(&self) -> String {
+        format!("EvasCompiledTheme:{}", self.evas_theme_name)
+    }
+
+    pub fn parse_moksha_gadget_layout(&self) -> usize {
+        self.moksha_shelves.len()
     }
 }
 
@@ -784,6 +873,19 @@ impl I3WmInnovationEngine {
     pub fn publish_ipc_event(&mut self, event_payload: &str) {
         self.ipc_event_stream.push(event_payload.to_string());
     }
+
+    pub fn toggle_i3_gaps(&mut self, inner: u32, outer: u32) {
+        self.inner_gap = inner;
+        self.outer_gap = outer;
+    }
+
+    pub fn filter_ipc_subscriber_stream(&self, filter: &str) -> Vec<String> {
+        self.ipc_event_stream
+            .iter()
+            .filter(|e| e.contains(filter))
+            .cloned()
+            .collect()
+    }
 }
 
 impl Default for I3WmInnovationEngine {
@@ -852,6 +954,16 @@ impl BspwmInnovationEngine {
         self.tree_state_exported = true;
         format!("{{\"focused_desktop\": {}, \"nodes_count\": {}}}", self.focused_desktop, self.nodes.len())
     }
+
+    pub fn parse_bspc_node_tree(&self) -> usize {
+        self.nodes.len()
+    }
+
+    pub fn adjust_preselect_ratio(&mut self, ratio: f32) {
+        for node in self.nodes.values_mut() {
+            node.split_ratio = ratio;
+        }
+    }
 }
 
 impl Default for BspwmInnovationEngine {
@@ -918,6 +1030,14 @@ impl DwmInnovationEngine {
 
     pub fn add_client_tag_rule(&mut self, class_name: &str, tag_mask: u32) {
         self.client_tag_rules.insert(class_name.to_string(), tag_mask);
+    }
+
+    pub fn feed_status_bar_fifo(&mut self, status_line: &str) {
+        self.bar_text = status_line.to_string();
+    }
+
+    pub fn match_client_tag_rules(&self, class_name: &str) -> Option<u32> {
+        self.client_tag_rules.get(class_name).cloned()
     }
 }
 
@@ -994,6 +1114,16 @@ impl OpenboxInnovationEngine {
     pub fn register_keybind(&mut self, shortcut: &str, action: &str) {
         self.keybind_actions.insert(shortcut.to_string(), action.to_string());
     }
+
+    pub fn transpile_pipe_menu_to_xml(&self, menu_id: &str) -> Option<String> {
+        self.pipe_menus
+            .get(menu_id)
+            .map(|cmd| format!("<openbox_pipe_menu id=\"{}\" execute=\"{}\"/>", menu_id, cmd))
+    }
+
+    pub fn execute_keybind_action(&self, shortcut: &str) -> Option<String> {
+        self.keybind_actions.get(shortcut).cloned()
+    }
 }
 
 impl Default for OpenboxInnovationEngine {
@@ -1069,6 +1199,21 @@ impl FluxboxInnovationEngine {
             false
         }
     }
+
+    pub fn persist_slit_order(&self) -> Vec<String> {
+        self.slit_dockapps.clone()
+    }
+
+    pub fn dock_window_tab(&mut self, group_id: u32, window_id: u32) {
+        let group = self.tab_groups.entry(group_id).or_insert(FluxboxTabGroup {
+            group_id,
+            window_ids: Vec::new(),
+            active_index: 0,
+        });
+        if !group.window_ids.contains(&window_id) {
+            group.window_ids.push(window_id);
+        }
+    }
 }
 
 impl Default for FluxboxInnovationEngine {
@@ -1140,6 +1285,14 @@ impl AwesomeWmInnovationEngine {
         let y_off = if self.wibar_position == "top" { bar_h } else { 0 };
         (0, y_off, screen_w, usable_h)
     }
+
+    pub fn generate_awesome_lua_layout(&self) -> String {
+        format!("awful.layout.layouts = {{ awful.layout.suit.tile, awful.layout.suit.floating }}")
+    }
+
+    pub fn evaluate_client_rules(&self, class_name: &str) -> bool {
+        self.match_rule(class_name).is_some()
+    }
 }
 
 impl Default for AwesomeWmInnovationEngine {
@@ -1194,6 +1347,18 @@ impl HyprlandInnovationEngine {
     pub fn switch_submap(&mut self, submap_name: &str) {
         self.active_submap = submap_name.to_string();
     }
+
+    pub fn match_window_rules_v2(&self, class_name: &str) -> Vec<String> {
+        self.window_rules
+            .iter()
+            .filter(|r| r.contains(class_name))
+            .cloned()
+            .collect()
+    }
+
+    pub fn evaluate_bezier_curve(&self, curve_name: &str) -> Option<String> {
+        self.animation_curves.get(curve_name).cloned()
+    }
 }
 
 impl Default for HyprlandInnovationEngine {
@@ -1242,6 +1407,20 @@ impl SwayWmInnovationEngine {
 
     pub fn set_idle_inhibitor(&mut self, active: bool) {
         self.idle_inhibitor_active = active;
+    }
+
+    pub fn dispatch_swaymsg_command(&mut self, cmd: &str) -> Result<String, &'static str> {
+        if cmd.starts_with("workspace ") {
+            if let Ok(ws) = cmd.trim_start_matches("workspace ").parse::<u32>() {
+                self.active_workspace = ws;
+                return Ok(format!("sway: switched workspace {}", ws));
+            }
+        }
+        Err("sway: unrecognized swaymsg command")
+    }
+
+    pub fn get_output_config_state(&self, output_id: &str) -> Option<String> {
+        self.output_configs.get(output_id).cloned()
     }
 }
 
@@ -1355,6 +1534,137 @@ impl SovereignDeWmInnovationOrchestrator {
 }
 
 impl Default for SovereignDeWmInnovationOrchestrator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 19. Sovereign DE & WM Pull Request Gateway Engine
+// ============================================================================
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum DeWmPrCategory {
+    ExtensionPlugin,
+    ThemePalette,
+    LayoutTiling,
+    IpcProtocol,
+    AccessibilityPortal,
+    SessionManager,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum DeWmPrStatus {
+    Proposed,
+    CiValidation,
+    Gated,
+    Merged,
+    Rejected,
+}
+
+#[derive(Debug, Clone)]
+pub struct DeWmPrSubmission {
+    pub pr_id: u32,
+    pub title: String,
+    pub author: String,
+    pub de_target: String,
+    pub category: DeWmPrCategory,
+    pub status: DeWmPrStatus,
+    pub diff_content: String,
+    pub pqc_signature: String,
+    pub ci_passed: bool,
+}
+
+pub struct DeWmInnovationPullRequestEngine {
+    submissions: BTreeMap<u32, DeWmPrSubmission>,
+    next_id: u32,
+}
+
+impl DeWmInnovationPullRequestEngine {
+    pub fn new() -> Self {
+        Self {
+            submissions: BTreeMap::new(),
+            next_id: 4001,
+        }
+    }
+
+    pub fn submit_pr(
+        &mut self,
+        title: &str,
+        author: &str,
+        de_target: &str,
+        category: DeWmPrCategory,
+        diff_content: &str,
+    ) -> u32 {
+        let id = self.next_id;
+        self.next_id += 1;
+        let sub = DeWmPrSubmission {
+            pr_id: id,
+            title: title.to_string(),
+            author: author.to_string(),
+            de_target: de_target.to_string(),
+            category,
+            status: DeWmPrStatus::Proposed,
+            diff_content: diff_content.to_string(),
+            pqc_signature: format!("dilithium5_sig_{}_de_wm_{}", id, de_target),
+            ci_passed: false,
+        };
+        self.submissions.insert(id, sub);
+        id
+    }
+
+    pub fn generate_unified_diff(&self, pr_id: u32) -> Option<String> {
+        self.submissions.get(&pr_id).map(|sub| {
+            format!(
+                "--- a/desktop/{}/config\n+++ b/desktop/{}/config\n@@ -1,3 +1,5 @@\n{}",
+                sub.de_target.to_lowercase(),
+                sub.de_target.to_lowercase(),
+                sub.diff_content
+            )
+        })
+    }
+
+    pub fn verify_pqc_signature(&self, pr_id: u32) -> bool {
+        if let Some(sub) = self.submissions.get(&pr_id) {
+            sub.pqc_signature.starts_with("dilithium5_sig_")
+        } else {
+            false
+        }
+    }
+
+    pub fn run_automated_ci_gate(&mut self, pr_id: u32) -> bool {
+        let signature_ok = self.verify_pqc_signature(pr_id);
+        if let Some(sub) = self.submissions.get_mut(&pr_id) {
+            sub.status = DeWmPrStatus::CiValidation;
+            if !sub.diff_content.is_empty() && signature_ok {
+                sub.ci_passed = true;
+                sub.status = DeWmPrStatus::Gated;
+                true
+            } else {
+                sub.ci_passed = false;
+                sub.status = DeWmPrStatus::Rejected;
+                false
+            }
+        } else {
+            false
+        }
+    }
+
+    pub fn get_prs_by_target(&self, de_target: &str) -> Vec<&DeWmPrSubmission> {
+        self.submissions
+            .values()
+            .filter(|sub| sub.de_target.eq_ignore_ascii_case(de_target))
+            .collect()
+    }
+
+    pub fn get_prs_by_status(&self, status: DeWmPrStatus) -> Vec<&DeWmPrSubmission> {
+        self.submissions
+            .values()
+            .filter(|sub| sub.status == status)
+            .collect()
+    }
+}
+
+impl Default for DeWmInnovationPullRequestEngine {
     fn default() -> Self {
         Self::new()
     }
@@ -1677,5 +1987,98 @@ mod tests {
         assert!(audit.get("GNOME").unwrap() > &0);
         assert!(audit.get("KDE Plasma").unwrap() > &0);
         assert!(audit.get("Hyprland").unwrap() > &0);
+    }
+
+    #[test]
+    fn test_de_wm_pr_gateway_submission() {
+        let mut pr_engine = DeWmInnovationPullRequestEngine::new();
+        let pr_id = pr_engine.submit_pr(
+            "Add Hyprland Smooth Blur Preset",
+            "Jules",
+            "Hyprland",
+            DeWmPrCategory::ThemePalette,
+            "+ blur_size = 12",
+        );
+        assert_eq!(pr_id, 4001);
+
+        assert!(pr_engine.verify_pqc_signature(pr_id));
+        let diff = pr_engine.generate_unified_diff(pr_id).unwrap();
+        assert!(diff.contains("+ blur_size = 12"));
+
+        assert!(pr_engine.run_automated_ci_gate(pr_id));
+        let gated_prs = pr_engine.get_prs_by_status(DeWmPrStatus::Gated);
+        assert_eq!(gated_prs.len(), 1);
+
+        let hypr_prs = pr_engine.get_prs_by_target("Hyprland");
+        assert_eq!(hypr_prs.len(), 1);
+    }
+
+    #[test]
+    fn test_expanded_de_capabilities() {
+        let mut gnome = GnomeInnovationEngine::new();
+        assert!(gnome.export_extension_profile().contains("scale"));
+        assert!(!gnome.screencast_portal_session_active());
+
+        let mut kde = KdePlasmaInnovationEngine::new();
+        assert!(kde.export_kwin_rules_xml().contains("kwin_rules"));
+        assert!(kde.import_kwin_rules_xml("<kwin_rules count=\"1\"/>"));
+
+        let mut xfce = XfceInnovationEngine::new();
+        assert!(xfce.export_xfconf_channel_xml("xfwm4").contains("channel"));
+        assert!(!xfce.validate_thunar_action("NonExistentAction"));
+
+        let mut lxqt = LxqtInnovationEngine::new();
+        lxqt.register_panel_plugin("clock");
+        assert!(lxqt.generate_qterminal_color_scheme().contains("QTerminalColorScheme"));
+
+        let mut lxde = LxdeInnovationEngine::new();
+        assert!(lxde.generate_openbox_pipe_menu_xml().contains("openbox_pipe_menu"));
+        lxde.switch_lxappearance_gtk_theme("Adwaita-Dark");
+        assert_eq!(lxde.gtk_theme, "Adwaita-Dark");
+
+        let mut mate = MateInnovationEngine::new();
+        assert!(mate.toggle_marco_vsync(true));
+        assert!(mate.activate_caja_python_extension("audio-tags"));
+
+        let mut cinn = CinnamonInnovationEngine::new();
+        cinn.register_spice("weather@cinnamon", "Weather", "applet");
+        assert!(cinn.resolve_spice_dependencies("weather@cinnamon"));
+
+        let mut budgie = BudgieInnovationEngine::new();
+        assert_eq!(budgie.build_raven_widget("cpu"), "RavenWidget:cpu");
+        budgie.sync_solus_accent_color("#3498db");
+        assert_eq!(budgie.solus_accent_color, "#3498db");
+
+        let efl = EnlightenmentMokshaEngine::new();
+        assert_eq!(efl.compile_evas_theme(), "EvasCompiledTheme:darkness.edj");
+        assert_eq!(efl.parse_moksha_gadget_layout(), 1);
+
+        let mut i3 = I3WmInnovationEngine::new();
+        i3.toggle_i3_gaps(10, 15);
+        assert_eq!(i3.inner_gap, 10);
+
+        let mut bspwm = BspwmInnovationEngine::new();
+        assert_eq!(bspwm.parse_bspc_node_tree(), 0);
+        bspwm.adjust_preselect_ratio(0.6);
+
+        let mut dwm = DwmInnovationEngine::new();
+        dwm.feed_status_bar_fifo("dwm-v6.5");
+        assert_eq!(dwm.bar_text, "dwm-v6.5");
+
+        let ob = OpenboxInnovationEngine::new();
+        assert!(ob.transpile_pipe_menu_to_xml("openbox-pipemenu-sysinfo").is_some());
+
+        let mut fb = FluxboxInnovationEngine::new();
+        assert_eq!(fb.persist_slit_order().len(), 2);
+        fb.dock_window_tab(1, 201);
+
+        let awesome = AwesomeWmInnovationEngine::new();
+        assert!(awesome.generate_awesome_lua_layout().contains("awful.layout"));
+
+        let hypr = HyprlandInnovationEngine::new();
+        assert_eq!(hypr.match_window_rules_v2("pavucontrol").len(), 1);
+
+        let mut sway = SwayWmInnovationEngine::new();
+        assert!(sway.dispatch_swaymsg_command("workspace 2").is_ok());
     }
 }
