@@ -375,9 +375,9 @@ description = "SigmaOS System Utilities Master Architecture, POSIX compatibility
 test_evidence = "Architectural specification and command contract roadmap published in docs/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md"
 next_milestone = "PR 1: Audit current tools and define compatibility policy; PR 3: Shared CLI contract helpers"
 
-[net.development_plan]
+[userspace.cli_development_plan]
 status = "modeled"
-files = ["docs/net/NETWORK_DEVELOPMENT_AND_MAINTENANCE_PLAN.md", "wiki/28-Network-Development-And-Maintenance-Plan.md", "src/net/sovereign_network_development_and_pr_suite.rs"]
-description = "SigmaOS Network Development and Maintenance Plan: 13-PR execution roadmap, network architecture & support boundaries, VirtIO NIC receive/transmit path, interface & link-state model, IPv4/IPv6 host stack, RFC 9293 TCP transport, hardened DHCP/DNS, persistent configuration with rollback, CLI diagnostics, default-deny firewall policy, QEMU CI regression workflow, and periodic maintenance cadences."
-test_evidence = "Architecture and 13-PR execution plan published in docs/net/NETWORK_DEVELOPMENT_AND_MAINTENANCE_PLAN.md and wiki/28-Network-Development-And-Maintenance-Plan.md; unit tests pass via rustc --test src/net/sovereign_network_development_and_pr_suite.rs"
-next_milestone = "PR 12: Automated QEMU boot-to-network integration runner & PR 13: Matrix support publication"
+files = ["docs/SIGMAOS_CLI_DEVELOPMENT_PLAN.md", "wiki/27-SigmaOS-CLI-Development-Plan.md"]
+description = "SigmaOS CLI Development Plan defining two-layer architecture (system utilities vs shell engine), POSIX compatibility profile, 18-PR sequence, periodic maintenance cadence, command family rules, and merge gates."
+test_evidence = "Architectural specification published in docs/SIGMAOS_CLI_DEVELOPMENT_PLAN.md and wiki/27-SigmaOS-CLI-Development-Plan.md; verified via governance wiki sync tests."
+next_milestone = "PR 1: Define CLI architecture and command compatibility profile; PR 3: Shared argument, diagnostics, and output framework."

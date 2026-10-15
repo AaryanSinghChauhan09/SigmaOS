@@ -26,7 +26,7 @@ use std::string::{String, ToString};
 use std::vec::Vec;
 
 /// ---------------------------------------------------------------------------
-/// 1. Enums and Basic Data Structures
+/// 0. Common Enums & Types
 /// ---------------------------------------------------------------------------
 
 /// Feature Source Types across documentation and wiki specs
@@ -36,9 +36,12 @@ pub enum FeatureSourceType {
     DistroRoadmapSpec,
     ArticleIdea,
     ArchitectureDocument,
+    UnimplementedIdeas,
+    MediaWikiDoc,
+    AppReplacementPr,
+    SovereignArchitectureDoc,
     DistroGapMatrix,
     CoreArchitectureDoc,
-    SovereignArchitectureDoc,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -76,10 +79,10 @@ pub struct ImprovementIdeaRecord {
 }
 
 /// ---------------------------------------------------------------------------
-/// 2. 100 Improvement Ideas Suite
+/// 1. 100 Improvement Ideas Evaluator (Sovereign OS Ultra Spec)
 /// ---------------------------------------------------------------------------
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Sovereign100IdeasSuite {
     pub ideas: Vec<ImprovementIdeaRecord>,
 }
@@ -137,18 +140,34 @@ impl Default for Sovereign100IdeasSuite {
 }
 
 /// ---------------------------------------------------------------------------
-/// 3. Native Shards Master Registry
+/// 2. Twelve Sovereign Native System Shards (`S-SHARDS`) Engine
 /// ---------------------------------------------------------------------------
 
-#[derive(Debug, Clone)]
-pub struct SovereignShardRecord {
-    pub shard_id: u32,
-    pub name: String,
-    pub status: String,
-    pub active: bool,
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SovereignShardId {
+    Shard01ProductivityOffice,
+    Shard02MediaProcessingPlayback,
+    Shard03Creative2D3DCad,
+    Shard04FoundationalAiMl,
+    Shard05LlmCognitiveArchitectures,
+    Shard06AutonomousAiAgentSwarms,
+    Shard07QuantumResistantMeshNet,
+    Shard08SovereignFsStorage,
+    Shard09ZenithDesktopCompositor,
+    Shard10EdgeGlobalCompliance,
+    Shard11SystemAdministrationOps,
+    Shard12HardwareVirtualizationHypervisor,
 }
 
 #[derive(Debug, Clone)]
+pub struct SovereignShardDescriptor {
+    pub id: SovereignShardId,
+    pub code_name: &'static str,
+    pub absorbed_legacy_software: Vec<&'static str>,
+    pub zero_alloc_rust_native: bool,
+    pub status_active: bool,
+}
+
 pub struct SovereignShardsMasterRegistry {
     pub shards: Vec<SovereignShardRecord>,
 }
@@ -259,7 +278,7 @@ impl Default for SovereignDistroGapClosureEngine {
 /// 5. Sovereign Linux/BSD Wiki Roadmap Parity Engine
 /// ---------------------------------------------------------------------------
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct SovereignLinuxBsdWikiRoadmapParityEngine {
     pub ideas: Vec<RoadmapFeatureIdea>,
 }
@@ -362,7 +381,6 @@ impl Default for MasterWikiAndRoadmapVerificationSuite {
 /// 7. Sovereign Wiki Master Engine
 /// ---------------------------------------------------------------------------
 
-#[derive(Debug, Clone)]
 pub struct SovereignWikiMasterEngine {
     pub suite_100_ideas: Sovereign100IdeasSuite,
     pub shards_registry: SovereignShardsMasterRegistry,
