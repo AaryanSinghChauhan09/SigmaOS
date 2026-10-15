@@ -1,77 +1,81 @@
 ## Summary
 
-<!-- What scheduler or component behavior changed and why? -->
+<!-- What changed and why? -->
 
-## Scheduler component
+## Component
 
-- [ ] Scheduler core
-- [ ] Run queue / PID allocation
-- [ ] fork / clone
-- [ ] exec
-- [ ] Context switch
-- [ ] Preemption & quantum
-- [ ] Signals & wait queues
-- [ ] Zombie / reaping & orphan adoption
-- [ ] Resource limits & CPU affinity
-- [ ] Documentation & ADRs
+- [ ] IPC handler
+- [ ] Pipes / FIFOs
+- [ ] UNIX-domain sockets
+- [ ] Shared memory
+- [ ] Message queues
+- [ ] Event wakeups
+- [ ] Signals
+- [ ] Process/thread management
+- [ ] VFS
+- [ ] Security
+- [ ] Documentation
 - [ ] CI / tooling
-
-## Recurring task
-
-- [ ] PR validation
-- [ ] Daily CI triage
-- [ ] Weekly lifecycle review
-- [ ] Weekly Linux/BSD study
-- [ ] Biweekly scheduler audit
-- [ ] Biweekly signal/wait audit
-- [ ] Monthly boot validation
-- [ ] Quarterly architecture/security/release review
-
-## Reference behavior
-
-<!-- Required for lifecycle, ABI, or scheduler changes -->
-
-- POSIX section:
-- Linux/BSD/Redox reference:
-- SigmaOS current behavior:
-- New behavior:
-- Compatibility impact:
 
 ## Changes
 
 -
--
 
-## Scheduler safety review
+## Motivation
 
-- [ ] Lifecycle transitions are valid (NEW -> READY -> RUNNING -> SLEEPING -> READY, READY -> RUNNING -> ZOMBIE, RUNNING -> STOPPED -> READY, ANY -> ZOMBIE -> REAPED)
-- [ ] Zombies are eventually reaped
-- [ ] Orphans are adopted by PID 1
-- [ ] PID reuse is safe
-- [ ] Lock ordering and concurrency model documented
-- [ ] Interrupt-context safety considered
-- [ ] Lost-wakeup prevention verified
-- [ ] Double-reap and double-switch prevented
-- [ ] Resource limits and run-queue capacity enforced
-- [ ] No unbounded allocation or recursion
+<!-- Link issue, roadmap item, or gap-analysis entry. -->
+
+## IPC semantics
+
+- Blocking behavior:
+- Non-blocking behavior:
+- EOF / closure behavior:
+- Error behavior:
+- Permission model:
+- Resource limits:
+- Backpressure policy:
+
+## Security review
+
+- [ ] User input validated
+- [ ] Descriptor lifecycle checked
+- [ ] Capability/namespace checks enforced
+- [ ] No unbounded kernel allocation
+- [ ] `unsafe` justified with SAFETY comments
+- [ ] Threat model updated
+
+## Tests
+
+- [ ] Unit tests
+- [ ] Integration tests
+- [ ] Concurrency/stress tests
+- [ ] Timeout tests
+- [ ] Fuzz tests
+- [ ] Resource-exhaustion tests
+- [ ] Regression test for fixed bug
 
 ## Verification
 
 ```bash
+cargo fmt --check
+cargo clippy --all-targets -- -D warnings
 cargo check --lib
 cargo test --lib
 ./run_sigma_tests.sh
 ```
 
-## Runtime evidence
+Paste output below.
 
-- [ ] QEMU boot-to-shell log
-- [ ] Scheduler test / benchmark report
-- [ ] Artifact hash
+## Capability status
 
-## Safety and rollback
+- Previous status:
+- New status:
+- Evidence:
 
-- [ ] No broad credentials or host access introduced
-- [ ] Untrusted input validated
-- [ ] Rollback/recovery behavior defined
-- [ ] Security review completed, if applicable
+## Integration impact
+
+- [ ] Unit-tested only
+- [ ] Connected to runtime path
+- [ ] Boot path validated
+- [ ] Installer/update path validated
+- [ ] Hardware tested

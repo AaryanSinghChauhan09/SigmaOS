@@ -179,7 +179,10 @@ impl OpenBsdSyspatchSecurityPrEngine {
                 patch_id, patch_id, patch.description
             ))
         } else {
-            Err(format!("Patch '{}' not found in syspatch catalog", patch_id))
+            Err(format!(
+                "Patch '{}' not found in syspatch catalog",
+                patch_id
+            ))
         }
     }
 }
@@ -221,7 +224,9 @@ impl OpenBsdIkedIpsecPrEngine {
                 active: true,
             },
         );
-        Self { security_associations: sas }
+        Self {
+            security_associations: sas,
+        }
     }
 
     pub fn add_ikev2_tunnel(&mut self, name: &str, local: &str, remote: &str) -> String {
@@ -456,7 +461,8 @@ impl OpenBsdDpbPkgAddPrEngine {
     }
 
     pub fn pkg_add(&mut self, pkg_name: &str, version: &str) -> String {
-        self.installed_packages.insert(pkg_name.to_string(), version.to_string());
+        self.installed_packages
+            .insert(pkg_name.to_string(), version.to_string());
         format!(
             "pkg_add: Added package '{}' version {} verified via signify key",
             pkg_name, version
@@ -483,11 +489,14 @@ impl OpenBsdSoftraidCryptoPrEngine {
     pub fn new() -> Self {
         let mut vols = BTreeMap::new();
         vols.insert("sd0a".to_string(), "AES-XTS-256".to_string());
-        Self { crypto_volumes: vols }
+        Self {
+            crypto_volumes: vols,
+        }
     }
 
     pub fn attach_softraid_crypto(&mut self, chunk: &str, cipher: &str) -> String {
-        self.crypto_volumes.insert(chunk.to_string(), cipher.to_string());
+        self.crypto_volumes
+            .insert(chunk.to_string(), cipher.to_string());
         format!(
             "bioctl -c C -l {} softraid0: Created CRYPTO volume with {}",
             chunk, cipher
@@ -593,7 +602,9 @@ impl OpenBsdMissingComponentsV55PrSuite {
         );
         self.validate_and_merge_pr(patch_pr);
 
-        let iked_diff = self.iked.add_ikev2_tunnel("branch-office", "10.0.0.1", "10.0.1.1");
+        let iked_diff = self
+            .iked
+            .add_ikev2_tunnel("branch-office", "10.0.0.1", "10.0.1.1");
         let iked_pr = self.submit_pr_proposal(
             "Configure iked IKEv2 IPsec tunnel to branch-office",
             "jules",
@@ -603,7 +614,9 @@ impl OpenBsdMissingComponentsV55PrSuite {
         );
         self.validate_and_merge_pr(iked_pr);
 
-        self.proposals.values().all(|p| p.status == OpenBsdPrStatusV55::Merged)
+        self.proposals
+            .values()
+            .all(|p| p.status == OpenBsdPrStatusV55::Merged)
     }
 }
 
