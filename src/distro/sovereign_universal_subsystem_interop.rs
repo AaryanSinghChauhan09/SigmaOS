@@ -509,7 +509,7 @@ impl SovereignUniversalSubsystemInteropEngine {
         );
 
         self.register_subsystem(
-            "process",
+            "process_activity",
             SubsystemAdapterCapabilities::new(
                 UniversalSubsystemCategory::ProcessActivity,
                 true,
@@ -520,7 +520,7 @@ impl SovereignUniversalSubsystemInteropEngine {
         );
 
         self.register_subsystem(
-            "memory",
+            "memory_virt",
             SubsystemAdapterCapabilities::new(
                 UniversalSubsystemCategory::MemoryVirtualization,
                 true,
@@ -531,7 +531,7 @@ impl SovereignUniversalSubsystemInteropEngine {
         );
 
         self.register_subsystem(
-            "time",
+            "time_sync",
             SubsystemAdapterCapabilities::new(
                 UniversalSubsystemCategory::TimeSynchronization,
                 true,
@@ -542,7 +542,7 @@ impl SovereignUniversalSubsystemInteropEngine {
         );
 
         self.register_subsystem(
-            "signal",
+            "signal_delivery",
             SubsystemAdapterCapabilities::new(
                 UniversalSubsystemCategory::SignalDelivery,
                 true,
@@ -553,7 +553,7 @@ impl SovereignUniversalSubsystemInteropEngine {
         );
 
         self.register_subsystem(
-            "device",
+            "device_hotplug",
             SubsystemAdapterCapabilities::new(
                 UniversalSubsystemCategory::DeviceHotplug,
                 true,
@@ -564,7 +564,7 @@ impl SovereignUniversalSubsystemInteropEngine {
         );
 
         self.register_subsystem(
-            "crypto",
+            "crypto_sec",
             SubsystemAdapterCapabilities::new(
                 UniversalSubsystemCategory::CryptographySecurity,
                 true,
@@ -856,6 +856,54 @@ impl SovereignUniversalSubsystemInteropEngine {
         self.active_distro_mode = String::from(mode);
     }
 
+    /// Resolve subsystem name or alias to registered adapter key.
+    pub fn resolve_subsystem_key(&self, name: &str) -> Option<String> {
+        if self.subsystem_adapters.contains_key(name) {
+            return Some(String::from(name));
+        }
+        let lower = name.to_lowercase();
+        let alias = match lower.as_str() {
+            "kernel" | "kernelscheduling" | "kernel_scheduling" => "kernel",
+            "security" | "securitysandboxing" | "security_sandboxing" => "security",
+            "filesystem" | "filesystemstorage" | "filesystem_storage" => "filesystem",
+            "networking" | "network" => "networking",
+            "package" | "packagemanagement" | "package_management" => "package",
+            "init" | "initsupervisor" | "init_supervisor" => "init",
+            "desktop" | "desktopcompositor" | "desktop_compositor" => "desktop",
+            "audio" | "audiosound" | "audio_sound" => "audio",
+            "power" | "hardwarepower" | "hardware_power" => "power",
+            "container" | "containervirt" | "container_virt" => "container",
+            "observability" | "observabilitydiagnostics" | "observability_diagnostics" => "observability",
+            "shell" | "shellterminal" | "shell_terminal" => "shell",
+            "ipc_mem" | "ipcmemory" | "ipc_memory" => "ipc_mem",
+            "drivers" | "drivershardware" | "drivers_hardware" => "drivers",
+            "boot" | "installerboot" | "installer_boot" => "boot",
+            "auth" | "authidentity" | "auth_identity" => "auth",
+            "i18n" | "i18nlocalization" | "i18n_localization" => "i18n",
+            "media_graphics" | "mediagraphics" | "media" => "media_graphics",
+            "compiler" | "compilertoolchain" | "compiler_toolchain" => "compiler",
+            "automation" | "automationprovisioning" | "automation_provisioning" => "automation",
+            "audit" | "systemaudit" | "system_audit" => "audit",
+            "ai_agent" | "aiworkflowagent" | "ai_workflow_agent" => "ai_agent",
+            "virt_hypervisor" | "virtualizationhypervisor" | "virtualization_hypervisor" => "virt_hypervisor",
+            "process" | "processactivity" | "process_activity" => "process_activity",
+            "memory" | "memoryvirtualization" | "memory_virt" | "memory_virtualization" => "memory_virt",
+            "time" | "timesynchronization" | "time_sync" | "time_synchronization" => "time_sync",
+            "signal" | "signaldelivery" | "signal_delivery" => "signal_delivery",
+            "device" | "devicehotplug" | "device_hotplug" => "device_hotplug",
+            "crypto" | "cryptographysecurity" | "crypto_sec" | "cryptography_security" => "crypto_sec",
+            "telemetry" | "telemetryobservability" | "telemetry_observability" => "telemetry",
+            "accessibility" | "accessibilityinput" | "accessibility_input" => "accessibility",
+            _ => return None,
+        };
+
+        if self.subsystem_adapters.contains_key(alias) {
+            Some(String::from(alias))
+        } else {
+            None
+        }
+    }
+
     /// Dispatch an inter-subsystem operation event and record execution.
     pub fn dispatch_event(
         &mut self,
@@ -864,19 +912,15 @@ impl SovereignUniversalSubsystemInteropEngine {
         kind: &str,
         payload: &str,
     ) -> Result<u64, &'static str> {
-        if !self.subsystem_adapters.contains_key(origin) {
-            return Err("Unknown origin subsystem");
-        }
-        if !self.subsystem_adapters.contains_key(target) {
-            return Err("Unknown target subsystem");
-        }
+        let resolved_origin = self.resolve_subsystem_key(origin).ok_or("Unknown origin subsystem")?;
+        let resolved_target = self.resolve_subsystem_key(target).ok_or("Unknown target subsystem")?;
 
         self.event_counter += 1;
         let event = SubsystemInteropEvent {
             event_id: self.event_counter,
             timestamp: self.event_counter * 1000,
-            origin_subsystem: String::from(origin),
-            target_subsystem: String::from(target),
+            origin_subsystem: resolved_origin,
+            target_subsystem: resolved_target,
             event_kind: String::from(kind),
             payload: String::from(payload),
             handled: true,
@@ -950,21 +994,23 @@ impl SovereignUniversalSubsystemInteropEngine {
         target: &str,
         action: &str,
     ) -> Result<u64, &'static str> {
+        let resolved_origin = self.resolve_subsystem_key(origin).ok_or("Unknown origin subsystem")?;
+        let resolved_target = self.resolve_subsystem_key(target).ok_or("Unknown target subsystem")?;
         let origin_adapter = self
             .subsystem_adapters
-            .get(origin)
+            .get(&resolved_origin)
             .ok_or("Unknown origin subsystem")?
             .clone();
         let target_adapter = self
             .subsystem_adapters
-            .get(target)
+            .get(&resolved_target)
             .ok_or("Unknown target subsystem")?
             .clone();
 
         let _policy = self.translate_policy(origin_adapter.category, target_adapter.category);
 
         let payload = format!("action={};mode={}", action, self.active_distro_mode);
-        self.dispatch_event(origin, target, "cross_distro_op", &payload)
+        self.dispatch_event(&resolved_origin, &resolved_target, "cross_distro_op", &payload)
     }
 }
 
