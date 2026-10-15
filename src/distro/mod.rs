@@ -632,6 +632,9 @@ pub use repeatable_agent_operating_loop_pr::*;
 pub mod sovereign_open_source_os_apex_inspirations_v50;
 pub use sovereign_open_source_os_apex_inspirations_v50::{FlakeInput as ApexFlakeInput, *};
 
+pub mod sovereign_open_source_os_apex_inspirations_v52;
+pub use sovereign_open_source_os_apex_inspirations_v52::*;
+
 pub mod omarchy_linux_missing_components_v52_pr;
 pub use omarchy_linux_missing_components_v52_pr::*;
 
