@@ -176,6 +176,7 @@ pub use distro::sovereign_universal_subsystem_interop::*;
 pub use distro::sovereign_tech_media_wiki_ultimate_parity_pr::*;
 pub use distro::sovereign_freebsd_ultimate_parity_pr_suite::*;
 pub use distro::sovereign_openbsd_ultimate_parity_pr_suite::*;
+pub use distro::dragonflybsd_missing_components_parity_pr::*;
 pub use distro::openbsd_missing_components_parity_pr::*;
 pub use distro::openbsd_missing_components_v55_pr::*;
 pub use distro::tech_media_publication_innovations::*;
