@@ -381,3 +381,10 @@ files = ["docs/SECURITY.md", "Agents/SECURITY_AGENT.md", "wiki/07-Security.md", 
 description = "SigmaOS Security Management Plan, aligned with NIST SP 800-218 (SSDF) and Linux/BSD distribution security practices, defining baseline evidence-based security rules, 16-PR roadmap, periodic maintenance cadence, component security rules, PR merge gates, and rollout plan"
 test_evidence = "Documentation published in docs/SECURITY.md, Agents/SECURITY_AGENT.md, and wiki/07-Security.md; 3 unit tests pass via rustc --test src/security/sovereign_security_management_plan.rs"
 next_milestone = "PR 1: docs(security): establish threat model and security ownership & PR 2: docs(security): publish private vulnerability reporting"
+
+[userspace.command_interpreter]
+status = "integrated"
+files = ["docs/shell/COMMAND_INTERPRETER_PLAN.md", "wiki/34-SigmaOS-Command-Interpreter-Plan.md", "src/shell/sovereign_command_interpreter.rs", "src/userspace/shell.rs"]
+description = "SigmaOS Command Interpreter Development Plan and 17-PR Gateway Suite featuring AST lexer/parser, safe quoting/expansion, redirection, pipelines, built-ins (cd, pwd, echo, export, unset, exit, alias), interactive line editor, foreground job control, completion metadata, and resource limits governor"
+test_evidence = "Architecture specification in docs/shell/COMMAND_INTERPRETER_PLAN.md and wiki/34-SigmaOS-Command-Interpreter-Plan.md; standalone unit tests pass via rustc --test src/shell/sovereign_command_interpreter.rs"
+next_milestone = "PR 1: define command interpreter goals and compatibility profile & PR 6: implement POSIX-style redirection primitives"
