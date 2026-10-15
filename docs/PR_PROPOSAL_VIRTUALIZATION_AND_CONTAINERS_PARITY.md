@@ -4,7 +4,7 @@
 
 This Pull Request proposal introduces zero-dependency, `#![no_std]` / `alloc` native virtualization and containerization parity for **SigmaOS**, inspired by landmark Linux distributions and BSD operating systems.
 
-The implementation covers full functionality across Type-1 and Type-2 Hypervisors, MicroVMs, OCI Application Containers, System Containers, Sandbox Isolation Frameworks, and Container Orchestrators:
+The implementation covers full functionality across Type-1 and Type-2 Hypervisors, MicroVMs, OCI Application Containers, System Containers, Sandbox Isolation Frameworks, Clustered Orchestrators, and Immutable Appliances:
 
 1. **KVM & QEMU Kernel Virtual Machine Engine** (`KvmQemuEngine`)
    - Hardware acceleration (VT-x / AMD-V / ARM VE), vCPU state management, and CR0/CR4 control register sync.
@@ -14,14 +14,15 @@ The implementation covers full functionality across Type-1 and Type-2 Hypervisor
    - `io_uring` asynchronous block engine for virtual disk I/O.
    - VFIO PCI device passthrough with IOMMU group isolation.
    - QEMU disk image format conversion (`qemu-img`), qcow2 compression, and backing file chain tracking.
-   - *Inspiration:* Debian, Red Hat Enterprise Linux, Arch Linux, Fedora, Ubuntu.
+   - *Inspiration:* Debian, Red Hat Enterprise Linux, Arch Linux, Fedora, Ubuntu, CachyOS.
 
 2. **libvirt Universal Domain Manager Engine** (`LibvirtDomainEngine`)
-   - Unified domain management across Qemu/KVM, Xen, bhyve, and LXC drivers.
+   - Unified domain management across Qemu/KVM, Xen, bhyve, and OpenBSD vmm drivers.
    - XML and JSON domain specification generation and parsing.
-   - Storage pool volume allocations (raw, qcow2, ZFS datasets) and dynamic NAT bridge attachments.
+   - Network filter rules (`LibvirtNwFilterRule`) for MAC/IP firewall filtering.
+   - Storage pool volume allocations (raw, qcow2, ZFS datasets, Ceph RBD) and dynamic NAT bridge attachments.
    - Virtual network bridge and TAP interface attachment.
-   - *Inspiration:* RHEL, Fedora, AlmaLinux, Rocky Linux, Ubuntu.
+   - *Inspiration:* RHEL, Fedora, AlmaLinux, Rocky Linux, Ubuntu, Debian.
 
 3. **Xen Hypervisor & XenStore Engine** (`XenHypervisorEngine`)
    - Dom0 control domain operations and DomU guest lifecycle management across PV, HVM, and PVH modes.
@@ -31,7 +32,7 @@ The implementation covers full functionality across Type-1 and Type-2 Hypervisor
    - Grant Table memory page sharing and zero-copy inter-domain channel creation.
    - *Inspiration:* Qubes OS, XenServer, Alpine Linux.
 
-4. **VirtualBox, FreeBSD bhyve & OpenBSD vmd Engine** (`VirtualBoxBhyveVmmEngine`)
+4. **VirtualBox, FreeBSD bhyve & OpenBSD vmm Engine** (`VirtualBoxBhyveVmmEngine`)
    - FreeBSD `bhyve` virtual machine spawning with `bhyvectl` control interface and NVMe emulation.
    - OpenBSD `vmd` micro-VM initialization with strict `pledge("stdio rpath vmm")` security guarantees.
    - VirtualBox VMMdev guest backdoor IPC channel emulation.
@@ -65,5 +66,52 @@ The implementation covers full functionality across Type-1 and Type-2 Hypervisor
    - Rancher Harvester hyper-converged VM-to-pod mapping engine for unified VM and container management.
    - *Inspiration:* Rancher k3s, K3OS, Harvester, openSUSE MicroOS, Talos Linux.
 
-9. **Virtualization Parity PR Gateway** (`SovereignVirtualizationAndContainersParityPrGateway`)
-   - Gateway coordinator consolidating all proposals into unified PR manifests.
+9. **Firecracker MicroVM & Virtio-Vsock Engine** (`FirecrackerMicroVmEngine`)
+   - AWS Firecracker minimal MicroVM execution with fast boot times under 5ms.
+   - Virtio-vsock zero-overhead host-guest IPC communication.
+   - KVM vCPU execution paired with jailer process cgroup isolation.
+   - *Inspiration:* AWS Firecracker, Alpine Linux, Amazon Linux.
+
+10. **Cloud-Hypervisor Rust VMM Engine** (`CloudHypervisorVmmEngine`)
+    - Rust-vmm based Cloud-Hypervisor execution with dynamic `virtio-mem` memory ballooning.
+    - Direct kernel boot support bypassing firmware overhead.
+    - *Inspiration:* Cloud-Hypervisor, Intel VMM, Rust-vmm.
+
+11. **gVisor & Kata Containers Sandbox Engine** (`GvisorKataSandboxEngine`)
+    - gVisor Sentry user-space kernel syscall interception and Gofer file proxy.
+    - Kata Containers microVM pod hardware sandboxing.
+    - *Inspiration:* gVisor, Kata Containers, Google Cloud.
+
+12. **Apple Hypervisor.framework Engine** (`AppleHypervisorFrameworkEngine`)
+    - macOS `hv_vcpu` hardware acceleration and guest execution.
+    - Rosetta 2 guest binary translation for x86_64 code on Apple Silicon.
+    - Virtio-fs directory sharing.
+    - *Inspiration:* Apple Hypervisor.framework, macOS, Asahi Linux.
+
+13. **SmartOS / Illumos Zone Virtualization Engine** (`SmartOsZoneVirtualizationEngine`)
+    - `vmadm` JSON VM specifications for brand management (joyent, kvm, bhyve).
+    - Sub-second zone-in-zone creation with zero-copy ZFS cloning.
+    - *Inspiration:* SmartOS, Illumos, Joyent.
+
+14. **Alpine Moby & LinuxKit Appliance Engine** (`AlpineMobyApplianceEngine`)
+    - Moby toolchain appliance generation using musl libc base images.
+    - Immutable squashfs root filesystems and read-only initrd images.
+    - *Inspiration:* Alpine Linux, Moby, LinuxKit.
+
+15. **Incus Clustered Orchestration Engine** (`IncusClusteredOrchestrationEngine`)
+    - Multi-node Incus cluster management with OVN distributed virtual switches.
+    - Distributed storage pools using Ceph RBD with encryption.
+    - *Inspiration:* Incus, LXD, Ubuntu.
+
+16. **FreeBSD bhyve Capsicum Helper Engine** (`FreeBsdBhyveCapsicumEngine`)
+    - FreeBSD `bhyve` NVMe queue controller emulation.
+    - Capsicum capability rights (`CAP_READ`, `CAP_WRITE`, `CAP_SEEK`, `CAP_FSTAT`) restricted helper processes.
+    - *Inspiration:* FreeBSD bhyve, FreeBSD 14.
+
+17. **OpenBSD vmd Direct Boot Engine** (`OpenBsdVmdDirectBootEngine`)
+    - OpenBSD `vmd` direct ELF kernel booting bypassing BIOS/UEFI firmware.
+    - `vmmdev` shared guest memory regions and `unveil` file path isolation.
+    - *Inspiration:* OpenBSD vmd, OpenBSD 7.5.
+
+18. **Sovereign Virtualization & Containers Parity Gateway** (`SovereignVirtualizationAndContainersParityPrGateway`)
+    - Central gateway coordinator consolidating all 17 sub-engines into structured PR manifests (PR #4001 through PR #4018).

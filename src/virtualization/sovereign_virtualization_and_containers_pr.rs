@@ -209,6 +209,7 @@ pub struct LibvirtDomainEngine {
     pub storage_pool_type: LibvirtStoragePoolType,
     pub virtual_bridges: Vec<String>,
     pub storage_volumes: Vec<LibvirtStorageVolume>,
+    pub nwfilter_rules: Vec<LibvirtNwFilterRule>,
 }
 
 impl LibvirtDomainEngine {
@@ -222,6 +223,7 @@ impl LibvirtDomainEngine {
             storage_pool_type: LibvirtStoragePoolType::Directory,
             virtual_bridges: bridges,
             storage_volumes: Vec::new(),
+            nwfilter_rules: Vec::new(),
         }
     }
 
