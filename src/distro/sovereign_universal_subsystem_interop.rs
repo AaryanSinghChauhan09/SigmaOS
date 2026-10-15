@@ -32,6 +32,14 @@ pub enum UniversalSubsystemCategory {
     SystemAudit,
     AiWorkflowAgent,
     VirtualizationHypervisor,
+    ProcessActivity,
+    MemoryVirtualization,
+    TimeSynchronization,
+    SignalDelivery,
+    DeviceHotplug,
+    CryptographySecurity,
+    TelemetryObservability,
+    AccessibilityInput,
 }
 
 impl UniversalSubsystemCategory {
@@ -60,6 +68,14 @@ impl UniversalSubsystemCategory {
             Self::SystemAudit => "SystemAudit",
             Self::AiWorkflowAgent => "AiWorkflowAgent",
             Self::VirtualizationHypervisor => "VirtualizationHypervisor",
+            Self::ProcessActivity => "ProcessActivity",
+            Self::MemoryVirtualization => "MemoryVirtualization",
+            Self::TimeSynchronization => "TimeSynchronization",
+            Self::SignalDelivery => "SignalDelivery",
+            Self::DeviceHotplug => "DeviceHotplug",
+            Self::CryptographySecurity => "CryptographySecurity",
+            Self::TelemetryObservability => "TelemetryObservability",
+            Self::AccessibilityInput => "AccessibilityInput",
         }
     }
 }
@@ -491,6 +507,130 @@ impl SovereignUniversalSubsystemInteropEngine {
                 7,
             ),
         );
+
+        self.register_subsystem(
+            "process_activity",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::ProcessActivity,
+                true,
+                true,
+                &[
+                    "rusage_collector",
+                    "job_control",
+                    "cgroup_v2_tasks",
+                    "pidfd_signals",
+                ],
+                6,
+            ),
+        );
+
+        self.register_subsystem(
+            "memory_virt",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::MemoryVirtualization,
+                true,
+                true,
+                &[
+                    "damon_reclaim",
+                    "cxl_photonic_mesh",
+                    "zram_zstd",
+                    "mglru_pages",
+                ],
+                8,
+            ),
+        );
+
+        self.register_subsystem(
+            "time_sync",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::TimeSynchronization,
+                true,
+                true,
+                &[
+                    "chrony_ntp",
+                    "ptp_hardware_clock",
+                    "microsecond_solar_clock",
+                ],
+                5,
+            ),
+        );
+
+        self.register_subsystem(
+            "signal_delivery",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::SignalDelivery,
+                true,
+                true,
+                &[
+                    "realtime_sigqueue",
+                    "sigreturn_frame_guard",
+                    "uncatchable_bypass",
+                ],
+                4,
+            ),
+        );
+
+        self.register_subsystem(
+            "device_hotplug",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::DeviceHotplug,
+                true,
+                true,
+                &[
+                    "udev_devd_bridge",
+                    "xhci_hotplug",
+                    "evdev_multitouch",
+                ],
+                9,
+            ),
+        );
+
+        self.register_subsystem(
+            "crypto_sec",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::CryptographySecurity,
+                true,
+                true,
+                &[
+                    "pqc_dilithium",
+                    "falcon_1024",
+                    "kyber_1024",
+                    "luks2_geli",
+                ],
+                10,
+            ),
+        );
+
+        self.register_subsystem(
+            "telemetry",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::TelemetryObservability,
+                true,
+                true,
+                &[
+                    "prometheus_exporter",
+                    "privacy_telemetry_filter",
+                    "crashdump_pstore",
+                ],
+                6,
+            ),
+        );
+
+        self.register_subsystem(
+            "accessibility",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::AccessibilityInput,
+                true,
+                true,
+                &[
+                    "orca_screenreader",
+                    "fcitx5_ime",
+                    "libinput_gestures",
+                    "braille_display",
+                ],
+                7,
+            ),
+        );
     }
 
     /// Establish default cross-subsystem translation and isolation policies.
@@ -652,6 +792,54 @@ impl SovereignUniversalSubsystemInteropEngine {
             UniversalSubsystemCategory::IpcMemory,
             UniversalSubsystemCategory::ObservabilityDiagnostics,
             "Zero-copy ring buffer telemetry streaming to DTrace and eBPF tracing probes",
+            false,
+        ));
+
+        self.add_interop_policy(SubsystemInteropPolicy::new(
+            "policy_process_sec",
+            UniversalSubsystemCategory::ProcessActivity,
+            UniversalSubsystemCategory::SecuritySandboxing,
+            "Propagate cgroup_v2 resource constraints and pidfd permissions to Landlock/Capsicum sandboxes",
+            true,
+        ));
+
+        self.add_interop_policy(SubsystemInteropPolicy::new(
+            "policy_mem_kernel",
+            UniversalSubsystemCategory::MemoryVirtualization,
+            UniversalSubsystemCategory::KernelScheduling,
+            "Coordinate DAMON memory reclamation with EEVDF scheduling latency hints",
+            false,
+        ));
+
+        self.add_interop_policy(SubsystemInteropPolicy::new(
+            "policy_crypto_auth",
+            UniversalSubsystemCategory::CryptographySecurity,
+            UniversalSubsystemCategory::AuthIdentity,
+            "Enforce PQC Dilithium / Falcon signatures for FIDO2 and PAM authentication tokens",
+            true,
+        ));
+
+        self.add_interop_policy(SubsystemInteropPolicy::new(
+            "policy_hotplug_drivers",
+            UniversalSubsystemCategory::DeviceHotplug,
+            UniversalSubsystemCategory::DriversHardware,
+            "Trigger udev/devd hotplug device node initialization across Rump anykernel and native drivers",
+            true,
+        ));
+
+        self.add_interop_policy(SubsystemInteropPolicy::new(
+            "policy_time_telemetry",
+            UniversalSubsystemCategory::TimeSynchronization,
+            UniversalSubsystemCategory::TelemetryObservability,
+            "Synchronize microsecond PTP precision clocks with system telemetry and trace probes",
+            false,
+        ));
+
+        self.add_interop_policy(SubsystemInteropPolicy::new(
+            "policy_accessibility_desktop",
+            UniversalSubsystemCategory::AccessibilityInput,
+            UniversalSubsystemCategory::DesktopCompositor,
+            "Inject Orca screen reader and Fcitx5 IME input overlays into Wayland and BeAPI compositors",
             false,
         ));
     }
@@ -1019,7 +1207,40 @@ mod tests {
             UniversalSubsystemCategory::VirtualizationHypervisor.as_str(),
             "VirtualizationHypervisor"
         );
+        assert_eq!(
+            UniversalSubsystemCategory::ProcessActivity.as_str(),
+            "ProcessActivity"
+        );
+        assert_eq!(
+            UniversalSubsystemCategory::MemoryVirtualization.as_str(),
+            "MemoryVirtualization"
+        );
+        assert_eq!(
+            UniversalSubsystemCategory::TimeSynchronization.as_str(),
+            "TimeSynchronization"
+        );
+        assert_eq!(
+            UniversalSubsystemCategory::SignalDelivery.as_str(),
+            "SignalDelivery"
+        );
+        assert_eq!(
+            UniversalSubsystemCategory::DeviceHotplug.as_str(),
+            "DeviceHotplug"
+        );
+        assert_eq!(
+            UniversalSubsystemCategory::CryptographySecurity.as_str(),
+            "CryptographySecurity"
+        );
+        assert_eq!(
+            UniversalSubsystemCategory::TelemetryObservability.as_str(),
+            "TelemetryObservability"
+        );
+        assert_eq!(
+            UniversalSubsystemCategory::AccessibilityInput.as_str(),
+            "AccessibilityInput"
+        );
 
+        assert_eq!(engine.subsystem_adapters.len(), 31);
         assert!(engine.subsystem_adapters.contains_key("shell"));
         assert!(engine.subsystem_adapters.contains_key("ipc_mem"));
         assert!(engine.subsystem_adapters.contains_key("drivers"));
@@ -1030,6 +1251,14 @@ mod tests {
         assert!(engine.subsystem_adapters.contains_key("compiler"));
         assert!(engine.subsystem_adapters.contains_key("automation"));
         assert!(engine.subsystem_adapters.contains_key("audit"));
+        assert!(engine.subsystem_adapters.contains_key("process_activity"));
+        assert!(engine.subsystem_adapters.contains_key("memory_virt"));
+        assert!(engine.subsystem_adapters.contains_key("time_sync"));
+        assert!(engine.subsystem_adapters.contains_key("signal_delivery"));
+        assert!(engine.subsystem_adapters.contains_key("device_hotplug"));
+        assert!(engine.subsystem_adapters.contains_key("crypto_sec"));
+        assert!(engine.subsystem_adapters.contains_key("telemetry"));
+        assert!(engine.subsystem_adapters.contains_key("accessibility"));
 
         let event_id = engine
             .dispatch_cross_subsystem_operation_all_distros("shell", "ipc_mem", "alloc_ring_buffer")
@@ -1043,6 +1272,14 @@ mod tests {
             )
             .expect("Shell-IPC policy should exist");
         assert_eq!(policy.policy_id, "policy_shell_ipc");
+
+        let crypto_pol = engine
+            .translate_policy(
+                UniversalSubsystemCategory::CryptographySecurity,
+                UniversalSubsystemCategory::AuthIdentity,
+            )
+            .expect("Crypto-Auth policy should exist");
+        assert_eq!(crypto_pol.policy_id, "policy_crypto_auth");
 
         assert!(engine.verify_all_subsystems_interoperability());
         assert_eq!(engine.evaluate_system_wide_harmony_score(), 100);
