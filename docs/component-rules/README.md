@@ -24,7 +24,7 @@ Roadmap items remain proposals until their completion criteria pass; therefore, 
 
 ## Component Rule Lifecycle
 
-Every SigmaOS component must follow this 12-step loop:
+Every SigmaOS component must follow this loop:
 
 ```text
 1. SELECT COMPONENT
@@ -47,36 +47,49 @@ A component rule is enforceable only when it is connected to code, tests, CI, do
 
 ## Component Rule Template
 
-Each component maintains a rules document in `docs/component-rules/<component>.md` following this structure:
+Create one rules file per component under `docs/component-rules/`:
 
 ```markdown
-# Component Rules: <Component Name>
+# Component Rules: VFS
 
-## Component Owner
-<agent-owner>
+## Component owner
+filesystem-agent
 
-## Upstream References
-- <Upstream Ref 1>
-- <Upstream Ref 2>
+## Upstream references
+- Linux VFS
+- xv6 filesystem
+- FreeBSD VFS
 
 ## Purpose
-Define required behavior, safety boundaries, and validation for SigmaOS <Component> components.
+Define required behavior, safety boundaries, and validation
+for SigmaOS VFS components.
 
-## Mandatory Rules
-1. <Rule 1>
-2. <Rule 2>
+## Mandatory rules
+
+1. All path resolution must use the central resolver.
+2. Every filesystem operation must return a standardized error code.
+3. A failed operation must leave filesystem state coherent.
+4. New filesystem backends must implement the VFS trait contract.
+5. Path traversal, invalid components, and mount boundaries require tests.
+6. No VFS change may bypass capability checks.
+7. Every VFS change must include unit, integration, and QEMU runtime evidence.
 
 ## Prohibited
-- <Prohibited 1>
-- <Prohibited 2>
 
-## Required Evidence
+- Direct filesystem access outside the VFS abstraction
+- Silent error swallowing
+- Unsupported parity claims
+- Status promotion without runtime evidence
+
+## Required evidence
+
 - Unit test report
 - Integration test report
-- QEMU boot/runtime log
-- Regression test for bug fixes
+- QEMU RAM-disk boot log
+- Regression test for every bug fix
 
-## Promotion Criteria
+## Promotion criteria
+
 | Level | Requirement |
 |---|---|
 | Proposed | ADR and gap analysis |
@@ -85,6 +98,263 @@ Define required behavior, safety boundaries, and validation for SigmaOS <Compone
 | Hardened | Fuzzing, negative tests, security review |
 | Supported | Reproducible boot/install/update evidence |
 ```
+
+---
+
+## Component-Specific Rules
+
+### Kernel rules
+
+- All kernel changes must preserve a defined boot contract: firmware → bootloader → kernel entry → memory → interrupts → scheduler → init → shell.
+- Kernel code must minimize `unsafe`; every `unsafe` block requires a safety justification and test or review link.
+- Syscall handlers must validate every argument and return standardized errors.
+- A kernel panic must produce a classified diagnostic and avoid silently continuing.
+- Every kernel PR must run `cargo check --lib`, `cargo test --lib`, `./run_sigma_tests.sh`, and the relevant QEMU boot test.
+
+### Memory rules
+
+- Allocation and deallocation must be paired and measurable.
+- Allocation failure must be handled explicitly.
+- Paging changes require boot validation and memory-integrity tests.
+- No memory subsystem may expose raw pointers across module boundaries without a documented safety invariant.
+
+### VFS/filesystem rules
+
+- All file access must pass through the VFS abstraction.
+- Path resolution, mount boundaries, and error codes must be centralized.
+- Filesystem state must remain coherent after failed operations.
+- New filesystems require conformance tests before integration.
+
+### IPC rules
+
+- Pipes, signals, shared memory, message queues, and event mechanisms must have defined ownership and lifetime rules.
+- IPC must enforce capability checks.
+- Cross-process tests are mandatory for every IPC mechanism.
+
+### Security rules
+
+- Every privileged operation requires an explicit capability.
+- Denial tests are mandatory: protected operations must fail without the required capability.
+- Package scripts, downloaded binaries, and external repositories are untrusted by default.
+- Cryptographic, sandboxing, syscall, memory-safety, networking, and update changes require separate security review.
+
+### Driver rules
+
+- A driver name does not imply hardware support.
+- Every driver must define probe, initialization, error, and shutdown behavior.
+- Device support requires a named device, driver version, test date, and log.
+- QEMU virtio devices should be validated before physical hardware claims.
+
+### Packaging rules
+
+- Package metadata must be parsed before any installation action.
+- Dependency resolution must support dry-run mode.
+- Package scripts must run only in a sandbox with declared capabilities.
+- Updates must be atomic or recoverable; failed updates must restore the prior known-good state.
+
+### Desktop rules
+
+- Desktop features must not precede a stable boot and core-runtime path.
+- Every desktop change must define behavior for input loss, application crash, display failure, and shutdown.
+- Graphical claims require a QEMU graphical smoke test.
+
+### Installer/update rules
+
+- Installation must be testable in QEMU from a clean virtual disk.
+- Updates must define pre-checks, staged activation, rollback, and recovery.
+- A failed update must either complete atomically or restore the prior state.
+
+---
+
+## Periodic Study Plan
+
+### Weekly cycle
+
+Study one narrow mechanism, not an entire project.
+
+| Week | Study focus | Component improved | PR deliverable |
+|---|---|---|---|
+| 1 | xv6/OSDev boot and interrupts | Kernel/boot | QEMU boot validator and boot trace |
+| 2 | xv6 memory and Linux paging | Memory | Frame allocator and paging tests |
+| 3 | xv6 processes and Linux scheduling | Scheduler | Minimal scheduler and process-switch test |
+| 4 | Linux syscalls and VFS | Syscalls/VFS | Syscall table, path resolver, RAM-disk FS |
+| 5 | Linux IPC and FreeBSD IPC | IPC | Pipes, signals, FD lifecycle tests |
+| 6 | Arch/Debian packaging | Packaging | Metadata parser and dependency resolver |
+| 7 | Fedora/Mint updates | Installer/update | Atomic update and rollback test |
+| 8 | OpenBSD/FreeBSD security | Security | Capability denial tests and sandbox policy |
+| 9 | Linux drivers and virtio | Drivers | virtio-blk, virtio-net, VGA tests |
+| 10 | Redox/Rust OS design | Architecture | Unsafe-code policy and module boundaries |
+| 11 | Linux networking | Network | Socket and basic network integration test |
+| 12 | Mint/desktop onboarding | Zenith desktop | Graphical smoke test |
+
+### Monthly milestone
+
+Each month should complete one component milestone:
+
+| Month | Component milestone | Promotion target |
+|---|---|---|
+| 1 | QEMU x86_64 boot-to-shell | Kernel/boot: `Integrated` |
+| 2 | Memory allocator and paging validation | Memory: `Integrated` |
+| 3 | Scheduler and syscall foundation | Kernel: `Integrated` |
+| 4 | VFS and RAM-disk filesystem | VFS: `Integrated` |
+| 5 | Processes, signals, pipes | IPC: `Integrated` |
+| 6 | Installer, update, rollback | Installer/update: `Integrated` |
+| 7 | Capability model and sandbox | Security: `Hardened` |
+| 8 | Virtio device support | Drivers: `Integrated` |
+| 9 | Package metadata and dry-run | Packaging: `Integrated` |
+| 10 | Minimal desktop session | Desktop: `Prototype` or `Integrated` |
+
+---
+
+## PR-Only Workflow
+
+### 1. Open a study issue
+
+Every cycle begins with an issue:
+
+```markdown
+## Component
+VFS/filesystems
+
+## Upstream study
+Linux VFS path resolution
+
+## Gap
+Path resolution lacks consistent error handling and mount awareness.
+
+## Expected PRs
+- docs/research PR
+- feat/vfs implementation PR
+- test/vfs evidence PR
+- docs/status PR
+
+## Validation requirement
+QEMU RAM-disk boot and filesystem integration tests.
+```
+
+### 2. Open a research/ADR PR
+
+**Branch:** `study/vfs-path-resolution-042`
+
+**Adds**
+
+```text
+research/upstream/linux/vfs-path-resolution.md
+research/decisions/ADR-012-vfs-path-resolution.md
+research/comparisons/filesystem.md
+```
+
+**Required content**
+
+- Upstream project and commit/version.
+- Problem solved.
+- Data structures and control flow.
+- Security and failure assumptions.
+- SigmaOS adoption, simplification, and rejection decisions.
+- License/attribution analysis.
+- Validation requirements.
+
+### 3. Open an implementation PR
+
+**Branch:** `feat/vfs-path-resolution-043`
+
+**Adds**
+
+- Component source changes.
+- Public interface documentation.
+- Unit and integration tests.
+- Runtime hook or QEMU smoke test.
+- Capability/status update only when evidence supports it.
+
+### 4. Open a test/evidence PR
+
+**Branch:** `test/vfs-path-resolution-044`
+
+**Adds**
+
+- Regression tests.
+- Fuzz targets where relevant.
+- QEMU/runtime test.
+- Structured evidence under `reports/`.
+
+### 5. Open documentation/status PR
+
+**Branch:** `docs/vfs-status-045`
+
+**Adds**
+
+- Component rules.
+- Known limitations.
+- `CAPABILITY_MATRIX.toml` update.
+- `FEATURE_STATUS.toml` update.
+- Links to evidence.
+
+For small changes, combine research, implementation, tests, and documentation into one PR. For kernel, security, installer, bootloader, update, or package-execution work, keep them separate.
+
+---
+
+## Branch, Commit, and Title Conventions
+
+### Branches
+
+```text
+study/<component>-<topic>-<id>
+feat/<component>-<capability>-<id>
+fix/<component>-<issue>-<id>
+test/<component>-<scenario>-<id>
+docs/<component>-<topic>-<id>
+chore/ci-<topic>-<id>
+security/<component>-<topic>-<id>
+```
+
+### Commits
+
+```text
+docs(research): study Linux VFS path resolution
+feat(vfs): add centralized path resolver
+test(vfs): add malformed-path regression tests
+fix(kernel): classify boot failure at init stage
+security(package): sandbox package-script execution
+chore(ci): require QEMU boot evidence for kernel PRs
+```
+
+### PR titles
+
+```text
+<type>(<component>): <concise change>
+
+feat(vfs): add centralized path resolver
+security(package): sandbox package-script execution
+```
+
+---
+
+## CI Gates
+
+Every PR must pass the repository’s documented verification commands:
+
+```bash
+cargo check --lib
+cargo test --lib
+./run_sigma_tests.sh
+make check
+make test
+make format
+```
+
+Component-specific gates:
+
+| Component | Additional required gate |
+|---|---|
+| Kernel/boot | QEMU boot smoke test |
+| Memory | Allocation, exhaustion, and fuzz tests |
+| VFS/filesystem | Filesystem conformance and QEMU RAM-disk test |
+| IPC | Cross-process interoperability tests |
+| Security | Denial tests and fuzzing |
+| Drivers | QEMU device-specific test |
+| Packaging | Metadata corpus and dry-run tests |
+| Installer/update | Clean install and rollback test |
+| Desktop | Graphical smoke test |
 
 ---
 
@@ -107,39 +377,14 @@ Define required behavior, safety boundaries, and validation for SigmaOS <Compone
 
 ---
 
-## Periodic Study Plan
+## First 30-Day PR Schedule
 
-### Weekly Cadence
-
-| Week | Study focus | Component improved | PR deliverable |
-|---|---|---|---|
-| 1 | xv6/OSDev boot and interrupts | Kernel/boot | QEMU boot validator and boot trace |
-| 2 | xv6 memory and Linux paging | Memory | Frame allocator and paging tests |
-| 3 | xv6 processes and Linux scheduling | Scheduler | Minimal scheduler and process-switch test |
-| 4 | Linux syscalls and VFS | Syscalls/VFS | Syscall table, path resolver, RAM-disk FS |
-| 5 | Linux IPC and FreeBSD IPC | IPC | Pipes, signals, FD lifecycle tests |
-| 6 | Arch/Debian packaging | Packaging | Metadata parser and dependency resolver |
-| 7 | Fedora/Mint updates | Installer/update | Atomic update and rollback test |
-| 8 | OpenBSD/FreeBSD security | Security | Capability denial tests and sandbox policy |
-| 9 | Linux drivers and virtio | Drivers | virtio-blk, virtio-net, VGA tests |
-| 10 | Redox/Rust OS design | Architecture | Unsafe-code policy and module boundaries |
-| 11 | Linux networking | Network | Socket and basic network integration test |
-| 12 | Mint/desktop onboarding | Zenith desktop | Graphical smoke test |
-
-### Monthly Milestones
-
-| Month | Component milestone | Promotion target |
+| Week | Study focus | PRs to open |
 |---|---|---|
-| 1 | QEMU x86_64 boot-to-shell | Kernel/boot: `Integrated` |
-| 2 | Memory allocator and paging validation | Memory: `Integrated` |
-| 3 | Scheduler and syscall foundation | Kernel: `Integrated` |
-| 4 | VFS and RAM-disk filesystem | VFS: `Integrated` |
-| 5 | Processes, signals, pipes | IPC: `Integrated` |
-| 6 | Installer, update, rollback | Installer/update: `Integrated` |
-| 7 | Capability model and sandbox | Security: `Hardened` |
-| 8 | Virtio device support | Drivers: `Integrated` |
-| 9 | Package metadata and dry-run | Packaging: `Integrated` |
-| 10 | Minimal desktop session | Desktop: `Prototype` or `Integrated` |
+| 1 | xv6/OSDev boot, Linux kernel entry | `chore/ci` verification workflow; `docs/research` boot framework; `feat/kernel` QEMU validator |
+| 2 | xv6 memory, Linux paging | `docs/research` memory ADR; `feat/memory` allocator/paging; `test/memory` evidence |
+| 3 | xv6 processes, Linux scheduling | `docs/research` scheduler ADR; `feat/kernel` scheduler; `test/kernel` process-switch tests |
+| 4 | Linux syscalls/VFS, xv6 filesystem | `docs/research` VFS ADR; `feat/vfs` RAM-disk/path resolver; `feat/kernel` boot-to-shell |
 
 ---
 

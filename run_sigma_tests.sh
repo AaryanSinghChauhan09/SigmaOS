@@ -11,6 +11,13 @@ if [ -f "src/io/mod.rs" ]; then
     ./build/test_io
 fi
 
+if [ -f "tests/test_periodic_study_improve_prove.rs" ]; then
+    echo "Running Periodic Study-Improve-Prove Governance Engine test suite..."
+    mkdir -p build
+    rustc --test tests/test_periodic_study_improve_prove.rs --edition=2021 -o build/test_periodic
+    ./build/test_periodic
+fi
+
 if [ -f "tests/io/interrupt.rs" ]; then
     echo "Running Interrupt Manager test suite..."
     mkdir -p build
