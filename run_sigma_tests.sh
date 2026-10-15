@@ -1036,6 +1036,13 @@ if [ -f "src/distro/bootable_vertical_slices_missing_components_pr.rs" ]; then
     ./build/test_bootable_vertical_slices
 fi
 
+if [ -f "src/distro/repeatable_agent_operating_loop_pr.rs" ]; then
+    echo "Running Repeatable Agent Operating Loop PR Suite..."
+    mkdir -p build
+    rustc --test tests/test_repeatable_agent_operating_loop.rs --edition=2021 -o build/test_repeatable_agent_operating_loop
+    ./build/test_repeatable_agent_operating_loop
+fi
+
 if [ -f "src/distro/open_source_os_unimplemented_ideas_pr_suite.rs" ]; then
     echo "Running Open Source OS Unimplemented Ideas PR Suite test suite..."
     mkdir -p build

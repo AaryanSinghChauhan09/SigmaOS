@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-14T01:54:27.292669+00:00",
+  "timestamp": "2026-10-15T01:24:11.025650+00:00",
   "signer": "SigmaOS Evidence Signer v1.0.0",
   "artifacts": {
     "build_test_sentinel/build-test-001_report.json": {
@@ -15,11 +15,11 @@
       "size_bytes": 254
     },
     "boot/boot_matrix.json": {
-      "sha256": "46a193b0f08c6c8a8808553e448a0d15f0a3a2fa7ef4f188d9fdc4d66a888861",
+      "sha256": "0c3078ce2a1d1229f3fb0d4a6b97416af1a9309ef9d8b5d4d6768a2562ed369f",
       "size_bytes": 580
     },
     "boot/qemu_x86_64.json": {
-      "sha256": "2e36efb2eea62907a6ba3b3451bcbfd5052a8a98538ade4bd5bda11de93e5337",
+      "sha256": "889368272bf3f75ac9c63945a89ff4b9137aa50a7084942c61eb3c88ce707ed3",
       "size_bytes": 418
     },
     "boot/qemu_x86_64.log": {
@@ -27,16 +27,16 @@
       "size_bytes": 730
     },
     "capability/truth_table.json": {
-      "sha256": "7b6a17b2b23b9dbf8639c3f51f4894c7cd8c8ef07a4a7cb957fade567e73fad0",
+      "sha256": "e4e7f35b6d28bbaf36cfb79720902be3f0f65e7d981535a3c0a0e8147a087b20",
       "size_bytes": 4598
     },
     "capability/verified_today.md": {
-      "sha256": "9a9b581b74e5f7c1c7e77439e8698ceb2f2cbfbbee3eda1a002f72983124ffa0",
+      "sha256": "9ba4e757761c22734208a49d6fa3fe48ed38e8f13b6872e5a7126fd6cf494efd",
       "size_bytes": 2070
     },
     "build/latest.json": {
-      "sha256": "33fae2109810c78f1e03fe2f437fe5c71123f9c6381c1cd30fd10d7ca3b3deb8",
-      "size_bytes": 164179
+      "sha256": "8805fbb505aac8fc3b11f701f7d24ad4e9a89e78a6b5f7e8890d05721640387d",
+      "size_bytes": 165040
     }
   }
 }
