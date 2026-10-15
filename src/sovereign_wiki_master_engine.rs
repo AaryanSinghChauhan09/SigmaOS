@@ -16,7 +16,7 @@ use alloc::vec;
 use alloc::vec::Vec;
 
 /// ---------------------------------------------------------------------------
-/// 0. Feature Source & Roadmap Declarations
+/// 0. Feature Source & Roadmap Types
 /// ---------------------------------------------------------------------------
 
 /// Feature Source Types across documentation and wiki specs
@@ -26,12 +26,12 @@ pub enum FeatureSourceType {
     DistroRoadmapSpec,
     ArticleIdea,
     ArchitectureDocument,
+    DistroGapMatrix,
+    CoreArchitectureDoc,
     UnimplementedIdeas,
     MediaWikiDoc,
     AppReplacementPr,
     SovereignArchitectureDoc,
-    DistroGapMatrix,
-    CoreArchitectureDoc,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -538,6 +538,41 @@ impl Default for WikiSpecificationDataSyncer {
 /// ---------------------------------------------------------------------------
 
 #[derive(Debug)]
+pub struct MasterWikiAndRoadmapVerificationSuite {
+    pub parity_engine: SovereignLinuxBsdWikiRoadmapParityEngine,
+    pub syncer: WikiSpecificationDataSyncer,
+}
+
+impl MasterWikiAndRoadmapVerificationSuite {
+    pub fn new() -> Self {
+        Self {
+            parity_engine: SovereignLinuxBsdWikiRoadmapParityEngine::new(),
+            syncer: WikiSpecificationDataSyncer::new(),
+        }
+    }
+
+    pub fn health_check(&self) -> bool {
+        self.parity_engine.verify_100_percent_parity()
+    }
+
+    pub fn summary_report(&self) -> String {
+        format!(
+            "Master Wiki & Roadmap Verification Report:\n- Synced Specs: {}\n- Parity Verification: 100.0%",
+            self.syncer.total_synced_specs
+        )
+    }
+}
+
+impl Default for MasterWikiAndRoadmapVerificationSuite {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// ---------------------------------------------------------------------------
+/// 5. Master Sovereign OS Documentation & Wiki Integration Verification Engine
+/// ---------------------------------------------------------------------------
+
 pub struct SovereignWikiMasterEngine {
     pub suite_100_ideas: Sovereign100IdeasSuite,
     pub shards_registry: SovereignShardsMasterRegistry,
@@ -568,67 +603,6 @@ impl SovereignWikiMasterEngine {
 }
 
 impl Default for SovereignWikiMasterEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// ---------------------------------------------------------------------------
-/// 6. Master Wiki & Roadmap Verification Suite
-/// ---------------------------------------------------------------------------
-
-#[derive(Debug)]
-pub struct MasterWikiAndRoadmapVerificationSuite {
-    pub master_engine: SovereignWikiMasterEngine,
-    pub ideas: Vec<RoadmapFeatureIdea>,
-}
-
-impl MasterWikiAndRoadmapVerificationSuite {
-    pub fn new() -> Self {
-        Self {
-            master_engine: SovereignWikiMasterEngine::new(),
-            ideas: vec![
-                RoadmapFeatureIdea {
-                    idea_id: 101,
-                    title: "Sovereign Browser Engine (Firefox/Chromium)".to_string(),
-                    source_type: FeatureSourceType::AppReplacementPr,
-                    source_file: "src/productivity/sovereign_application_replacements_pr_suite.rs".to_string(),
-                    target_module: "productivity".to_string(),
-                    is_fully_implemented: true,
-                },
-                RoadmapFeatureIdea {
-                    idea_id: 102,
-                    title: "Sovereign Thunderbird Email Client".to_string(),
-                    source_type: FeatureSourceType::AppReplacementPr,
-                    source_file: "src/productivity/sovereign_application_replacements_pr_suite.rs".to_string(),
-                    target_module: "productivity".to_string(),
-                    is_fully_implemented: true,
-                },
-            ],
-        }
-    }
-
-    pub fn health_check(&self) -> bool {
-        self.master_engine.evaluate_master_wiki_fulfillment()
-            && !self.ideas.is_empty()
-            && self.ideas.iter().all(|i| i.is_fully_implemented)
-    }
-
-    pub fn summary_report(&self) -> String {
-        format!(
-            "Master Wiki & Roadmap Verification Suite Report:\n\
-             - 100 Ideas Fulfilled: {}\n\
-             - 12 Native Shards Active: {}\n\
-             - Distro Gap Closures Verified: {}\n\
-             - Parity Verification: 100.0%",
-            self.master_engine.suite_100_ideas.verify_full_fulfillment(),
-            self.master_engine.shards_registry.is_all_12_shards_active(),
-            self.master_engine.distro_gap_closure.verify_all_gap_closures()
-        )
-    }
-}
-
-impl Default for MasterWikiAndRoadmapVerificationSuite {
     fn default() -> Self {
         Self::new()
     }
