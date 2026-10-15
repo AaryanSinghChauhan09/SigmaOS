@@ -243,6 +243,13 @@ if [ -f "src/compatibility/sovereign_mint_pr_components_engine.rs" ]; then
     ./build/test_mint_pr_deploy
 fi
 
+if [ -f "src/creative/deckcraft.rs" ]; then
+    echo "Running Sovereign DeckCraft Presentation Slide PR test suite..."
+    mkdir -p build
+    rustc --test src/creative/deckcraft.rs --edition=2021 -o build/test_deckcraft
+    ./build/test_deckcraft
+fi
+
 if [ -f "src/creative/effectcraft.rs" ]; then
     echo "Running Sovereign EffectCraft Visual Effects PR test suite..."
     mkdir -p build
