@@ -33,97 +33,98 @@ All contributions to SigmaOS must strictly adhere to the following architectural
 
 ---
 
-## Cadence-Based Engineering Program
+## Engineering Cadence
 
 SigmaOS applies a structured cadence to ensure isolated components transition smoothly into reviewable, integrated pull requests:
 
-| Period | Thread Manager / Scheduler Work | OS-Wide Maintenance | Required PR Output |
+| Period | Thread manager / scheduler work | OS-wide maintenance | Required PR output |
 |---|---|---|---|
 | **Daily** | Triage scheduler bugs, flaky tests, lock-order warnings, and regression reports | Triage CI failures, build breakage, security advisories, and documentation drift | Bug reports or small fix PRs |
 | **Weekly** | Implement one scheduler behavior: run queue, preemption, priority, affinity, or wait queue | Dependency/toolchain updates, lint cleanup, test-suite repair | One scoped PR per change |
 | **Biweekly** | Integration test: threads with signals, FDs, IPC, timers, and process exit | Component status audit: update `FEATURE_STATUS.toml` and docs with evidence | Status + test-evidence PR |
 | **Monthly** | Scheduler benchmark, contention test, starvation audit, deadlock/fuzz review | Release-candidate build, ISO smoke test, installer/update recovery test | Release-readiness PR |
-| **Quarterly** | Scheduler architecture review against Linux/BSD patterns; remove dead code | Roadmap consolidation, security review, API stability review | Architecture RFC + cleanup PRs |
+| **Quarterly** | Scheduler architecture review against Linux/BSD patterns; remove dead code and duplicated plans | Roadmap consolidation, security review, API stability review, contributor survey | Architecture RFC + cleanup PRs |
 
 ---
 
-## Enforceable Repository Rules
+## Component Rules
+
+Enforceable repository rules for code, testing, documentation, and security:
 
 ### Code Rules
 
-- **Scope:** One logical subsystem change per PR.
-- **APIs:** No new public API without documentation, unit tests, and a capability-status update in `FEATURE_STATUS.toml`.
-- **Safety:** No `unsafe` Rust without an explicit safety comment explaining invariants, aliasing, lifetime, and panic behavior.
-- **Locking:** Every lock acquisition must have a documented lock order.
-- **Bounded Resources:** No unbounded allocation, recursion, or loops in kernel context.
-- **Concurrency Safety:** Every blocking operation must have a timeout or explicit wakeup path.
-- **Error Handling:** Every error must be handled or explicitly documented as fatal.
-- **Runtime Proof:** No feature is "complete" until it is connected to the runtime path and verified.
+- One logical subsystem change per PR.
+- No new public API without documentation, tests, and a capability-status update.
+- No `unsafe` Rust without a safety comment explaining invariants, aliasing, lifetime, and panic behavior.
+- Every lock acquisition must have a documented lock order.
+- No unbounded allocation, recursion, or loops in kernel context.
+- Every blocking operation must have a timeout or explicit wakeup path.
+- Every error must be handled or explicitly documented as fatal.
+- No feature is “complete” until it is connected to the runtime path and verified.
 
 ### Testing Rules
 
-- Unit tests for pure logic (`rustc --test`).
+- Unit tests for pure logic.
 - Integration tests for cross-subsystem behavior.
-- Stress tests for concurrency and lock contention.
+- Stress tests for concurrency.
 - Fuzz tests for parsers, syscall inputs, filesystem paths, and network packets.
 - Boot smoke tests for kernel-facing changes.
 - Regression test attached to every fixed bug.
 
 ### Verification Block
 
-Minimum mandatory verification commands before submitting a PR:
-## Mandatory Subsystem & Component Rules
-All contributions must strictly comply with the following component rules:
-- **Logical Isolation:** One logical subsystem change per PR.
-- **API Completeness:** No new public API without documentation, tests, and a capability-status update in `FEATURE_STATUS.toml`.
-- **Unsafe Rust Safety Invariants:** No `unsafe` Rust without an explicit safety comment detailing invariants, aliasing guarantees, lifetime bounds, and panic safety.
-- **Lock Ordering:** Every lock acquisition must have a documented lock order to prevent deadlocks.
-- **Kernel Bounds:** No unbounded allocation, recursion, or loops in kernel context.
-- **Timeout Protection:** Every blocking operation must have a timeout or explicit wakeup path.
-- **Runtime Verification:** No feature is marked "complete" until connected to the runtime path and verified.
-- **Unit Tests:** Unit tests for pure logic.
-- **Integration Tests:** Integration tests for cross-subsystem behavior.
-- **Stress & Concurrency:** Concurrency stress tests for synchronizations.
-- **Fuzzing:** Fuzz tests for parsers, syscall inputs, VFS paths, and network packets.
-- **Boot Smoke:** Boot smoke tests for kernel-facing changes.
-- **Bug Fix Regressions:** Regression test attached to every fixed bug.
-### Fast Checks & Verification Block
-Before submitting a pull request, execute the required verification block:
+Minimum verification block for every PR:
 
 ```bash
 cargo fmt --check
 cargo clippy --all-targets -- -D warnings
 cargo check --lib
 cargo test --lib
-
-# Clippy lint check with denied warnings
-cargo clippy --all-targets --all-features -- -D warnings
-
-# Core workspace check & unit tests
-
-# Check no_std compliance across kernel modules
-./scripts/no_std_check.sh
-
-# Run standalone rustc unit tests for modified files
-./scripts/changed_files_rustc_tests.sh
-
-# Execute complete test suite
 ./run_sigma_tests.sh
 ```
 
 ### Documentation Rules
 
 - Update `FEATURE_STATUS.toml` whenever implementation status changes.
-- Distinguish explicit statuses: `Modeled`, `Unit-tested`, `Integrated`, `Hardware-tested`, and `Release-ready`.
-- Subsystem documentation must list: purpose, public API, dependencies, limitations, tests, and known gaps.
-- No roadmap claim may say "complete" without a linked PR and verification evidence.
+- Distinguish `Modeled`, `Unit-tested`, `Integrated`, `Hardware-tested`, and `Release-ready`.
+- Every subsystem page must list: purpose, public API, dependencies, limitations, tests, and known gaps.
+- No roadmap claim may say “complete” without a linked PR and verification evidence.
 
 ### Security Rules
 
 - Threat-model every new syscall, IPC channel, driver interface, and parser.
-- Validate all user-supplied lengths, pointers, paths, and flags at boundaries.
-- Apply least privilege by default and fail closed on ambiguous capability checks.
-- Require a second reviewer for security-sensitive subsystems: scheduler, memory, drivers, crypto, IPC, and syscall dispatch.
+- Validate all user-supplied lengths, pointers, paths, and flags at the boundary.
+- Apply least privilege by default.
+- Fail closed on ambiguous permission or capability checks.
+- Require a second reviewer for security-sensitive changes: scheduler, memory, drivers, crypto, IPC, and syscall dispatch.
+
+---
+
+## Governance & Merge Policy
+
+Use labels:
+
+- `area:thread-manager`
+- `area:scheduler`
+- `area:kernel`
+- `area:security`
+- `kind:feature`
+- `kind:bug`
+- `kind:test`
+- `kind:docs`
+- `status:modeled`
+- `status:unit-tested`
+- `status:integrated`
+- `status:hardware-tested`
+- `needs-second-reviewer`
+
+Merge policy:
+
+- One maintainer approval for normal changes.
+- Two approvals for scheduler, memory, syscall, driver, security, or boot-path changes.
+- CI must be green.
+- No direct commits to `main`; all changes arrive through PRs.
+- Every merged PR must update tests, docs, or capability status when behavior changes.
 
 ---
 

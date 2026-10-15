@@ -21,17 +21,17 @@ Welcome to **SigmaOS**, a high-performance capability-based microkernel operatin
 
 ---
 
-## Cadence-Based Engineering Program
+## Engineering Cadence
 
 SigmaOS utilizes a cadence-based engineering workflow to transform isolated components into verified, integrated, reviewable pull requests.
 
-| Period | Thread Manager / Scheduler Work | OS-Wide Maintenance | Required PR Output |
+| Period | Thread manager / scheduler work | OS-wide maintenance | Required PR output |
 |---|---|---|---|
 | **Daily** | Triage scheduler bugs, flaky tests, lock-order warnings, and regression reports | Triage CI failures, build breakage, security advisories, and documentation drift | Bug reports or small fix PRs |
 | **Weekly** | Implement one scheduler behavior: run queue, preemption, priority, affinity, or wait queue | Dependency/toolchain updates, lint cleanup, test-suite repair | One scoped PR per change |
 | **Biweekly** | Integration test: threads with signals, FDs, IPC, timers, and process exit | Component status audit: update `FEATURE_STATUS.toml` and docs with evidence | Status + test-evidence PR |
 | **Monthly** | Scheduler benchmark, contention test, starvation audit, deadlock/fuzz review | Release-candidate build, ISO smoke test, installer/update recovery test | Release-readiness PR |
-| **Quarterly** | Scheduler architecture review against Linux/BSD patterns; remove dead code | Roadmap consolidation, security review, API stability review | Architecture RFC + cleanup PRs |
+| **Quarterly** | Scheduler architecture review against Linux/BSD patterns; remove dead code and duplicated plans | Roadmap consolidation, security review, API stability review, contributor survey | Architecture RFC + cleanup PRs |
 
 ---
 
@@ -46,13 +46,13 @@ SigmaOS utilizes a cadence-based engineering workflow to transform isolated comp
 - No unbounded allocation, recursion, or loops in kernel context.
 - Every blocking operation must have a timeout or explicit wakeup path.
 - Every error must be handled or explicitly documented as fatal.
-- No feature is "complete" until it is connected to the runtime path and verified with evidence.
+- No feature is “complete” until it is connected to the runtime path and verified.
 
 ### Testing Rules
 
-- Unit tests for pure logic (`rustc --test`).
+- Unit tests for pure logic.
 - Integration tests for cross-subsystem behavior.
-- Stress tests for concurrency and lock contention.
+- Stress tests for concurrency.
 - Fuzz tests for parsers, syscall inputs, filesystem paths, and network packets.
 - Boot smoke tests for kernel-facing changes.
 - Regression test attached to every fixed bug.
