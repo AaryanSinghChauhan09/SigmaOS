@@ -25,7 +25,7 @@ pub struct EcosystemGapV52Pr {
     pub payload: String,
 }
 
-// 1. Linux 6.13+ io_uring & futex2 Sync Engine PR V52
+// 1. Linux 6.13+ io_uring & futex2 Sync Engine PR
 pub struct LinuxIoUringFutex2V52PrEngine;
 
 impl LinuxIoUringFutex2V52PrEngine {
@@ -36,7 +36,7 @@ impl LinuxIoUringFutex2V52PrEngine {
     pub fn process_pr(&self, pr_id: &str, sq_ring_entries: u32, futex_waitv_count: u32) -> EcosystemGapV52Pr {
         EcosystemGapV52Pr {
             pr_id: pr_id.to_string(),
-            title: format!("Linux 6.13+ io_uring SQPOLL & futex2 PR V52: {}", pr_id),
+            title: format!("Linux 6.13+ io_uring SQPOLL & futex2 PR: {}", pr_id),
             os_origin: "Linux 6.13+".to_string(),
             status: PrStatus::Merged,
             payload: format!(
@@ -47,13 +47,7 @@ impl LinuxIoUringFutex2V52PrEngine {
     }
 }
 
-impl Default for LinuxIoUringFutex2V52PrEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// 2. FreeBSD Capsicum Casper IPC Delegation PR V52
+// 2. FreeBSD Capsicum Casper IPC Delegation PR
 pub struct FreeBsdCapsicumCasperV52PrEngine;
 
 impl FreeBsdCapsicumCasperV52PrEngine {
@@ -64,7 +58,7 @@ impl FreeBsdCapsicumCasperV52PrEngine {
     pub fn process_pr(&self, pr_id: &str, jail_name: &str, casper_service: &str) -> EcosystemGapV52Pr {
         EcosystemGapV52Pr {
             pr_id: pr_id.to_string(),
-            title: format!("FreeBSD Capsicum Casper PR V52: {}", jail_name),
+            title: format!("FreeBSD Capsicum Casper PR: {}", jail_name),
             os_origin: "FreeBSD".to_string(),
             status: PrStatus::Merged,
             payload: format!(
@@ -75,13 +69,7 @@ impl FreeBsdCapsicumCasperV52PrEngine {
     }
 }
 
-impl Default for FreeBsdCapsicumCasperV52PrEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// 3. OpenBSD Softraid BIOCTL Crypto Volume PR V52
+// 3. OpenBSD Softraid BIOCTL Crypto Volume PR
 pub struct OpenBsdSoftraidBioctlV52PrEngine;
 
 impl OpenBsdSoftraidBioctlV52PrEngine {
@@ -92,7 +80,7 @@ impl OpenBsdSoftraidBioctlV52PrEngine {
     pub fn process_pr(&self, pr_id: &str, volume_label: &str, cipher: &str) -> EcosystemGapV52Pr {
         EcosystemGapV52Pr {
             pr_id: pr_id.to_string(),
-            title: format!("OpenBSD softraid CRYPTO PR V52: {}", volume_label),
+            title: format!("OpenBSD softraid CRYPTO PR: {}", volume_label),
             os_origin: "OpenBSD".to_string(),
             status: PrStatus::Merged,
             payload: format!(
@@ -103,13 +91,7 @@ impl OpenBsdSoftraidBioctlV52PrEngine {
     }
 }
 
-impl Default for OpenBsdSoftraidBioctlV52PrEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// 4. DragonFly BSD HAMMER2 PFS Replication PR V52
+// 4. DragonFly BSD HAMMER2 PFS Replication PR
 pub struct DragonFlyHammer2PfsV52PrEngine;
 
 impl DragonFlyHammer2PfsV52PrEngine {
@@ -120,7 +102,7 @@ impl DragonFlyHammer2PfsV52PrEngine {
     pub fn process_pr(&self, pr_id: &str, pfs_name: &str, txg_seq: u64) -> EcosystemGapV52Pr {
         EcosystemGapV52Pr {
             pr_id: pr_id.to_string(),
-            title: format!("DragonFly HAMMER2 PFS PR V52: {}", pfs_name),
+            title: format!("DragonFly HAMMER2 PFS PR: {}", pfs_name),
             os_origin: "DragonFly BSD".to_string(),
             status: PrStatus::Merged,
             payload: format!(
@@ -131,13 +113,7 @@ impl DragonFlyHammer2PfsV52PrEngine {
     }
 }
 
-impl Default for DragonFlyHammer2PfsV52PrEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// 5. Gentoo Portage EAPI 9 Subslot Rebuild PR V52
+// 5. Gentoo Portage EAPI 9 Subslot Rebuild PR
 pub struct GentooPortageEapi9V52PrEngine;
 
 impl GentooPortageEapi9V52PrEngine {
@@ -148,7 +124,7 @@ impl GentooPortageEapi9V52PrEngine {
     pub fn process_pr(&self, pr_id: &str, pkg_atom: &str, subslot: &str) -> EcosystemGapV52Pr {
         EcosystemGapV52Pr {
             pr_id: pr_id.to_string(),
-            title: format!("Gentoo Portage EAPI 9 PR V52: {}", pkg_atom),
+            title: format!("Gentoo Portage EAPI 9 PR: {}", pkg_atom),
             os_origin: "Gentoo Linux".to_string(),
             status: PrStatus::Merged,
             payload: format!(
@@ -159,13 +135,7 @@ impl GentooPortageEapi9V52PrEngine {
     }
 }
 
-impl Default for GentooPortageEapi9V52PrEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// 6. Alpine Linux APK v3 Persistence PR V52
+// 6. Alpine Linux APK v3 Persistence PR
 pub struct AlpineApkV3ApkovlV52PrEngine;
 
 impl AlpineApkV3ApkovlV52PrEngine {
@@ -176,7 +146,7 @@ impl AlpineApkV3ApkovlV52PrEngine {
     pub fn process_pr(&self, pr_id: &str, apkovl_file: &str) -> EcosystemGapV52Pr {
         EcosystemGapV52Pr {
             pr_id: pr_id.to_string(),
-            title: format!("Alpine APK v3 apkovl PR V52: {}", apkovl_file),
+            title: format!("Alpine APK v3 apkovl PR: {}", apkovl_file),
             os_origin: "Alpine Linux".to_string(),
             status: PrStatus::Merged,
             payload: format!(
@@ -187,13 +157,7 @@ impl AlpineApkV3ApkovlV52PrEngine {
     }
 }
 
-impl Default for AlpineApkV3ApkovlV52PrEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// 7. NixOS / Guix Flake Hermetic CAS Store PR V52
+// 7. NixOS / Guix Flake Hermetic CAS Store PR
 pub struct NixGuixFlakeStoreV52PrEngine;
 
 impl NixGuixFlakeStoreV52PrEngine {
@@ -204,7 +168,7 @@ impl NixGuixFlakeStoreV52PrEngine {
     pub fn process_pr(&self, pr_id: &str, flake_ref: &str, store_hash: &str) -> EcosystemGapV52Pr {
         EcosystemGapV52Pr {
             pr_id: pr_id.to_string(),
-            title: format!("NixOS / Guix Flake Store PR V52: {}", flake_ref),
+            title: format!("NixOS / Guix Flake Store PR: {}", flake_ref),
             os_origin: "NixOS / GNU Guix".to_string(),
             status: PrStatus::Merged,
             payload: format!(
@@ -215,13 +179,7 @@ impl NixGuixFlakeStoreV52PrEngine {
     }
 }
 
-impl Default for NixGuixFlakeStoreV52PrEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// 8. NetBSD NPF N-code JIT Firewall PR V52
+// 8. NetBSD NPF N-code JIT Firewall PR
 pub struct NetBsdNpfJitFirewallV52PrEngine;
 
 impl NetBsdNpfJitFirewallV52PrEngine {
@@ -232,7 +190,7 @@ impl NetBsdNpfJitFirewallV52PrEngine {
     pub fn process_pr(&self, pr_id: &str, rule_set_name: &str, byte_count: usize) -> EcosystemGapV52Pr {
         EcosystemGapV52Pr {
             pr_id: pr_id.to_string(),
-            title: format!("NetBSD NPF JIT PR V52: {}", rule_set_name),
+            title: format!("NetBSD NPF JIT PR: {}", rule_set_name),
             os_origin: "NetBSD".to_string(),
             status: PrStatus::Merged,
             payload: format!(
@@ -243,13 +201,7 @@ impl NetBsdNpfJitFirewallV52PrEngine {
     }
 }
 
-impl Default for NetBsdNpfJitFirewallV52PrEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// 9. Clear Linux Stateless OS P-State Tuning PR V52
+// 9. Clear Linux Stateless OS P-State Tuning PR
 pub struct ClearLinuxStatelessPstateV52PrEngine;
 
 impl ClearLinuxStatelessPstateV52PrEngine {
@@ -260,7 +212,7 @@ impl ClearLinuxStatelessPstateV52PrEngine {
     pub fn process_pr(&self, pr_id: &str, profile_name: &str) -> EcosystemGapV52Pr {
         EcosystemGapV52Pr {
             pr_id: pr_id.to_string(),
-            title: format!("Clear Linux Stateless P-state PR V52: {}", profile_name),
+            title: format!("Clear Linux Stateless P-state PR: {}", profile_name),
             os_origin: "Clear Linux".to_string(),
             status: PrStatus::Merged,
             payload: format!(
@@ -271,13 +223,7 @@ impl ClearLinuxStatelessPstateV52PrEngine {
     }
 }
 
-impl Default for ClearLinuxStatelessPstateV52PrEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// 10. Illumos DTrace USDT & Crossbow VNIC PR V52
+// 10. Illumos DTrace USDT & Crossbow VNIC PR
 pub struct IllumosDtraceCrossbowV52PrEngine;
 
 impl IllumosDtraceCrossbowV52PrEngine {
@@ -288,7 +234,7 @@ impl IllumosDtraceCrossbowV52PrEngine {
     pub fn process_pr(&self, pr_id: &str, vnic_name: &str, probe_name: &str) -> EcosystemGapV52Pr {
         EcosystemGapV52Pr {
             pr_id: pr_id.to_string(),
-            title: format!("Illumos DTrace Crossbow PR V52: {}", vnic_name),
+            title: format!("Illumos DTrace Crossbow PR: {}", vnic_name),
             os_origin: "Illumos".to_string(),
             status: PrStatus::Merged,
             payload: format!(
@@ -296,12 +242,6 @@ impl IllumosDtraceCrossbowV52PrEngine {
                 vnic_name, probe_name
             ),
         }
-    }
-}
-
-impl Default for IllumosDtraceCrossbowV52PrEngine {
-    fn default() -> Self {
-        Self::new()
     }
 }
 

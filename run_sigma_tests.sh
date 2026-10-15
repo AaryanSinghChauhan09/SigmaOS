@@ -994,6 +994,13 @@ if [ -f "src/distro/sovereign_linux_bsd_ecosystem_gap_closure_v50_pr.rs" ]; then
     ./build/test_gap_closure_v50_pr
 fi
 
+if [ -f "src/distro/sovereign_linux_bsd_ecosystem_gap_closure_v51_pr.rs" ]; then
+    echo "Running Sovereign Linux & BSD Ecosystem Gap Closure PR Suite V51 test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_linux_bsd_ecosystem_gap_closure_v51_pr.rs --edition=2021 -o build/test_gap_closure_v51_pr
+    ./build/test_gap_closure_v51_pr
+fi
+
 if [ -f "src/distro/sovereign_linux_bsd_ecosystem_gap_closure_v52_pr.rs" ]; then
     echo "Running Sovereign Linux & BSD Ecosystem Gap Closure PR Suite V52 test suite..."
     mkdir -p build
