@@ -12,6 +12,13 @@ description = "SigmaOS Signal Handler Master Architecture, POSIX.1-2024 semantic
 test_evidence = "Architectural specification published in docs/SIGNAL_HANDLER_PLAN.md and docs/SIGNAL_HANDLER_AUDIT_AND_ABI_PROFILE.md; 15 unit tests pass via rustc --test src/signal/mod.rs"
 next_milestone = "PR 2: ABI and signal-frame layout checks & PR 3: System call dispatch connection"
 
+[kernel.signal_development_and_maintenance_plan]
+status = "integrated"
+files = ["docs/signal/SIGNAL_DEVELOPMENT_AND_MAINTENANCE_PLAN.md", "wiki/26-Signal-Development-And-Maintenance-Plan.md", "src/signal/sovereign_signal_development_and_pr_suite.rs"]
+description = "SigmaOS Signals Development and Maintenance Plan defining POSIX.1-2024 baseline, Linux/BSD comparative extension policy, signal rules, 19 proposed PR sequence, periodic maintenance cadences, cross-component implementation rules, PR template/merge gates, and maturity matrix"
+test_evidence = "Architecture specification published in docs/signal/SIGNAL_DEVELOPMENT_AND_MAINTENANCE_PLAN.md and wiki/26-Signal-Development-And-Maintenance-Plan.md; standalone unit tests pass via rustc --test src/signal/sovereign_signal_development_and_pr_suite.rs"
+next_milestone = "PR 1: Define signal model and supported profile"
+
 [kernel.dispatcher]
 status = "modeled"
 files = ["docs/DISPATCHER_PLAN.md", "wiki/DISPATCHER_PLAN.md"]
