@@ -32,6 +32,14 @@ pub enum UniversalSubsystemCategory {
     SystemAudit,
     AiWorkflowAgent,
     VirtualizationHypervisor,
+    ProcessActivity,
+    MemoryVirtualization,
+    TimeSynchronization,
+    SignalDelivery,
+    DeviceHotplug,
+    CryptographySecurity,
+    TelemetryObservability,
+    AccessibilityInput,
 }
 
 impl UniversalSubsystemCategory {
@@ -60,6 +68,14 @@ impl UniversalSubsystemCategory {
             Self::SystemAudit => "SystemAudit",
             Self::AiWorkflowAgent => "AiWorkflowAgent",
             Self::VirtualizationHypervisor => "VirtualizationHypervisor",
+            Self::ProcessActivity => "ProcessActivity",
+            Self::MemoryVirtualization => "MemoryVirtualization",
+            Self::TimeSynchronization => "TimeSynchronization",
+            Self::SignalDelivery => "SignalDelivery",
+            Self::DeviceHotplug => "DeviceHotplug",
+            Self::CryptographySecurity => "CryptographySecurity",
+            Self::TelemetryObservability => "TelemetryObservability",
+            Self::AccessibilityInput => "AccessibilityInput",
         }
     }
 }
@@ -491,6 +507,94 @@ impl SovereignUniversalSubsystemInteropEngine {
                 7,
             ),
         );
+
+        self.register_subsystem(
+            "process",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::ProcessActivity,
+                true,
+                true,
+                &["cgroup_v2", "freebsd_racct", "rusage_collector", "pidfd_signals"],
+                6,
+            ),
+        );
+
+        self.register_subsystem(
+            "memory",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::MemoryVirtualization,
+                true,
+                true,
+                &["mglru_reclaim", "damon_harvest", "zram_zstd", "cxl_photonic"],
+                7,
+            ),
+        );
+
+        self.register_subsystem(
+            "time",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::TimeSynchronization,
+                true,
+                true,
+                &["chrony_ntp", "ptp_hardware_clock", "solar_microsecond"],
+                4,
+            ),
+        );
+
+        self.register_subsystem(
+            "signal",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::SignalDelivery,
+                true,
+                true,
+                &["realtime_sigqueue", "sigreturn_frame_guard", "uncatchable_bypass"],
+                5,
+            ),
+        );
+
+        self.register_subsystem(
+            "device",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::DeviceHotplug,
+                true,
+                true,
+                &["udev_devd_bridge", "xhci_hotplug", "evdev_multitouch"],
+                6,
+            ),
+        );
+
+        self.register_subsystem(
+            "crypto",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::CryptographySecurity,
+                true,
+                true,
+                &["pqc_dilithium", "falcon_1024", "kyber_1024", "luks2_geli"],
+                8,
+            ),
+        );
+
+        self.register_subsystem(
+            "telemetry",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::TelemetryObservability,
+                true,
+                true,
+                &["prometheus_exporter", "privacy_filter", "crashdump_pstore"],
+                5,
+            ),
+        );
+
+        self.register_subsystem(
+            "accessibility",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::AccessibilityInput,
+                true,
+                true,
+                &["orca_screenreader", "fcitx5_ime", "libinput_gestures", "braille_display"],
+                6,
+            ),
+        );
     }
 
     /// Establish default cross-subsystem translation and isolation policies.
@@ -652,6 +756,70 @@ impl SovereignUniversalSubsystemInteropEngine {
             UniversalSubsystemCategory::IpcMemory,
             UniversalSubsystemCategory::ObservabilityDiagnostics,
             "Zero-copy ring buffer telemetry streaming to DTrace and eBPF tracing probes",
+            false,
+        ));
+
+        self.add_interop_policy(SubsystemInteropPolicy::new(
+            "policy_process_sec",
+            UniversalSubsystemCategory::ProcessActivity,
+            UniversalSubsystemCategory::SecuritySandboxing,
+            "Enforce FreeBSD RACCT and Linux CgroupV2 task limits inside Pledge/Capsicum sandboxes",
+            true,
+        ));
+
+        self.add_interop_policy(SubsystemInteropPolicy::new(
+            "policy_memory_fs",
+            UniversalSubsystemCategory::MemoryVirtualization,
+            UniversalSubsystemCategory::FilesystemStorage,
+            "Synchronize MGLRU page reclaim and DAMON monitoring with ZFS ARC & Bcachefs tiering",
+            false,
+        ));
+
+        self.add_interop_policy(SubsystemInteropPolicy::new(
+            "policy_time_sched",
+            UniversalSubsystemCategory::TimeSynchronization,
+            UniversalSubsystemCategory::KernelScheduling,
+            "Align Chrony PTP hardware clock interrupts with EEVDF/BORE scheduling quantums",
+            false,
+        ));
+
+        self.add_interop_policy(SubsystemInteropPolicy::new(
+            "policy_signal_process",
+            UniversalSubsystemCategory::SignalDelivery,
+            UniversalSubsystemCategory::ProcessActivity,
+            "Dispatch realtime signal queues and validate sigreturn frames on active tasks",
+            true,
+        ));
+
+        self.add_interop_policy(SubsystemInteropPolicy::new(
+            "policy_device_drivers",
+            UniversalSubsystemCategory::DeviceHotplug,
+            UniversalSubsystemCategory::DriversHardware,
+            "Bridge Udev and FreeBSD devd hotplug events to Rump anykernel and C shim driver probes",
+            false,
+        ));
+
+        self.add_interop_policy(SubsystemInteropPolicy::new(
+            "policy_crypto_auth",
+            UniversalSubsystemCategory::CryptographySecurity,
+            UniversalSubsystemCategory::AuthIdentity,
+            "Authenticate systemd-homed and BSD-Auth credentials using Dilithium PQC key derivation",
+            true,
+        ));
+
+        self.add_interop_policy(SubsystemInteropPolicy::new(
+            "policy_telemetry_obs",
+            UniversalSubsystemCategory::TelemetryObservability,
+            UniversalSubsystemCategory::ObservabilityDiagnostics,
+            "Filter sensitive payload data before exporting Prometheus metrics to DTrace and eBPF probes",
+            true,
+        ));
+
+        self.add_interop_policy(SubsystemInteropPolicy::new(
+            "policy_access_desktop",
+            UniversalSubsystemCategory::AccessibilityInput,
+            UniversalSubsystemCategory::DesktopCompositor,
+            "Route Orca screen reader, Fcitx5 IME, and multitouch gestures to Hyprland Wayland compositors",
             false,
         ));
     }
@@ -870,7 +1038,6 @@ impl Default for SovereignUniversalSubsystemDistroHarmonizer {
 }
 
 #[cfg(test)]
-#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -878,8 +1045,8 @@ mod tests {
     fn test_subsystem_interop_engine_initialization() {
         let engine = SovereignUniversalSubsystemInteropEngine::new();
         assert_eq!(engine.active_distro_mode, "LinuxArch");
-        assert!(engine.subsystem_adapters.len() >= 11);
-        assert!(engine.interop_policies.len() >= 5);
+        assert_eq!(engine.subsystem_adapters.len(), 31);
+        assert!(engine.interop_policies.len() >= 25);
         assert!(engine.verify_all_subsystems_interoperability());
         assert_eq!(engine.evaluate_system_wide_harmony_score(), 100);
     }
@@ -1065,7 +1232,7 @@ mod tests {
         let count = engine
             .sync_universal_cross_distro_mesh()
             .expect("Mesh sync should succeed");
-        assert!(count >= 23 * 22);
+        assert!(count >= 31 * 30);
 
         let policy = engine
             .translate_policy(

@@ -1,5 +1,5 @@
 // SigmaOS Sovereign Linux & BSD All Subsystems Harmony Engine
-// Integrates inspirations from Linux & BSD distributions across all 23 core subsystems of SigmaOS,
+// Integrates inspirations from Linux & BSD distributions across all 31 core subsystems of SigmaOS,
 // ensuring complete interoperability, event routing, policy translation, and full capability matrices.
 
 use std::collections::BTreeMap;
@@ -258,6 +258,8 @@ impl SovereignSubsystemDistroHarmonyEngine {
             LinuxBsdDistroInspiration::MidnightBSD,
             LinuxBsdDistroInspiration::RedoxOS,
             LinuxBsdDistroInspiration::HaikuOS,
+            LinuxBsdDistroInspiration::QubesOS,
+            LinuxBsdDistroInspiration::WhonixOS,
         ];
 
         let subsystems_list = [
@@ -611,6 +613,70 @@ impl SovereignSubsystemDistroHarmonyEngine {
                 "rump_anykernel_userspace_driver_context_switch_guard",
                 true,
             ),
+            (
+                SigmaOsSubsystem::ProcessActivity,
+                SigmaOsSubsystem::SecuritySandboxing,
+                LinuxBsdDistroInspiration::FreeBSD,
+                "pol_proc_sec",
+                "racct_rctl_cgroup_v2_task_resource_limit_enforcement",
+                true,
+            ),
+            (
+                SigmaOsSubsystem::MemoryVirtualization,
+                SigmaOsSubsystem::FilesystemStorage,
+                LinuxBsdDistroInspiration::ArchLinux,
+                "pol_mem_fs",
+                "mglru_page_reclaim_zfs_arc_bcachefs_cache_balancing",
+                false,
+            ),
+            (
+                SigmaOsSubsystem::TimeSynchronization,
+                SigmaOsSubsystem::KernelScheduling,
+                LinuxBsdDistroInspiration::AlpineLinux,
+                "pol_time_sched",
+                "chrony_ptp_hardware_clock_eevdf_quantum_alignment",
+                false,
+            ),
+            (
+                SigmaOsSubsystem::SignalDelivery,
+                SigmaOsSubsystem::ProcessActivity,
+                LinuxBsdDistroInspiration::OpenBSD,
+                "pol_sig_proc",
+                "realtime_sigqueue_sigreturn_frame_guard_verification",
+                true,
+            ),
+            (
+                SigmaOsSubsystem::DeviceHotplug,
+                SigmaOsSubsystem::DriversHardware,
+                LinuxBsdDistroInspiration::VoidLinux,
+                "pol_dev_drv",
+                "udev_devd_hotplug_probe_trigger_rump_driver",
+                false,
+            ),
+            (
+                SigmaOsSubsystem::CryptographySecurity,
+                SigmaOsSubsystem::AuthIdentity,
+                LinuxBsdDistroInspiration::DebianGNU,
+                "pol_crypto_auth",
+                "pqc_dilithium_luks2_geli_homed_authentication",
+                true,
+            ),
+            (
+                SigmaOsSubsystem::TelemetryObservability,
+                SigmaOsSubsystem::ObservabilityDiagnostics,
+                LinuxBsdDistroInspiration::TailsOS,
+                "pol_telem_obs",
+                "amnesic_privacy_telemetry_filtering_ebpf_dtrace",
+                true,
+            ),
+            (
+                SigmaOsSubsystem::AccessibilityInput,
+                SigmaOsSubsystem::DesktopCompositor,
+                LinuxBsdDistroInspiration::LinuxMint,
+                "pol_access_ui",
+                "orca_screenreader_fcitx5_ime_wayland_compositor_routing",
+                false,
+            ),
         ];
 
         for (src, tgt, distro, id, rule, strict) in default_rules {
@@ -793,7 +859,7 @@ impl SovereignUniversalCrossDistroSubsystemOrchestrator {
         }
     }
 
-    /// Switch system-wide Linux & BSD distro paradigm mode across all 23 subsystems.
+    /// Switch system-wide Linux & BSD distro paradigm mode across all 31 subsystems.
     pub fn switch_distro_mode(&mut self, mode: &str) -> Result<usize, &'static str> {
         self.current_mode = String::from(mode);
         self.interop_engine
@@ -941,6 +1007,12 @@ mod tests {
             assert!(spec
                 .supported_distros
                 .contains(&LinuxBsdDistroInspiration::HaikuOS));
+            assert!(spec
+                .supported_distros
+                .contains(&LinuxBsdDistroInspiration::QubesOS));
+            assert!(spec
+                .supported_distros
+                .contains(&LinuxBsdDistroInspiration::WhonixOS));
         }
     }
 
@@ -991,5 +1063,28 @@ mod tests {
             engine.resolve_package_format_specifier(LinuxBsdDistroInspiration::FedoraLinux),
             "rpm"
         );
+    }
+
+    #[test]
+    fn test_all_31_subsystems_and_36_distros_interop() {
+        let mut orchestrator = SovereignUniversalCrossDistroSubsystemOrchestrator::new();
+        assert!(orchestrator.verify_orchestration_harmony());
+        assert_eq!(orchestrator.master_harmony_index(), 100);
+
+        let event_id = orchestrator.route_harmony_event(
+            SigmaOsSubsystem::AccessibilityInput,
+            SigmaOsSubsystem::DesktopCompositor,
+            "ROUTE_ORCA_TTS",
+            "tts_rate=1.0",
+        );
+        assert!(event_id > 0);
+
+        let policy = orchestrator
+            .translate_cross_subsystem_policy(
+                SigmaOsSubsystem::ProcessActivity,
+                SigmaOsSubsystem::SecuritySandboxing,
+            )
+            .expect("ProcessActivity -> SecuritySandboxing policy must exist");
+        assert_eq!(policy.distro_inspiration, LinuxBsdDistroInspiration::FreeBSD);
     }
 }

@@ -5,8 +5,6 @@
 extern crate alloc;
 
 use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
 
@@ -49,69 +47,62 @@ impl Suite100Ideas {
         suite
     }
 
-    fn populate_100_ideas(&mut self) {
-        // System Utilities (11-23)
-        self.ideas.push(ImprovementIdeaRecord {
+    fn seed_100_ideas(&mut self) {
+        // System Utilities
+        self.features.push(RoadmapFeatureIdea {
             id: 11,
-            name: "Smart Temporary File & Cache Cleaner".to_string(),
-            category: IdeaCategory::SystemUtilities,
-            legacy_counterparts: "CCleaner, BleachBit".to_string(),
-            implementation_module: "src/system/cleanup.rs".to_string(),
-            is_fulfilled: true,
+            title: "Smart Temporary File & Cache Cleaner",
+            category: "System Utilities",
+            source_type: FeatureSourceType::RoadmapIdea,
+            fulfilled: true,
         });
-        self.ideas.push(ImprovementIdeaRecord {
+        self.features.push(RoadmapFeatureIdea {
             id: 12,
-            name: "SigmaFS Copy-on-Write Disk Defragmenter & Compact Engine".to_string(),
-            category: IdeaCategory::SystemUtilities,
-            legacy_counterparts: "Defraggler, e4defrag".to_string(),
-            implementation_module: "src/system/defrag.rs".to_string(),
-            is_fulfilled: true,
+            title: "SigmaFS Copy-on-Write Disk Defragmenter & Compact Engine",
+            category: "System Utilities",
+            source_type: FeatureSourceType::RoadmapIdea,
+            fulfilled: true,
         });
 
         // Package & App Management
-        self.ideas.push(ImprovementIdeaRecord {
+        self.features.push(RoadmapFeatureIdea {
             id: 31,
-            name: "Declarative User Environment Engine".to_string(),
-            category: IdeaCategory::PackageAndAppManagement,
-            legacy_counterparts: "NixOS home-manager, Guix System".to_string(),
-            implementation_module: "src/distro/wiki_ideas_implementation.rs".to_string(),
-            is_fulfilled: true,
+            title: "Declarative User Environment Engine",
+            category: "Package & App Management",
+            source_type: FeatureSourceType::RoadmapIdea,
+            fulfilled: true,
         });
-        self.ideas.push(ImprovementIdeaRecord {
+        self.features.push(RoadmapFeatureIdea {
             id: 32,
-            name: "SigmaOS Sovereign CLI Development Plan & Command Framework Engine".to_string(),
-            category: IdeaCategory::PackageAndAppManagement,
-            legacy_counterparts: "POSIX CLI, GNU Coreutils, FreeBSD CLI".to_string(),
-            implementation_module: "src/tools/sigma_cli.rs".to_string(),
-            is_fulfilled: true,
+            title: "SigmaOS Sovereign CLI Development Plan & Command Framework Engine",
+            category: "Package & App Management",
+            source_type: FeatureSourceType::RoadmapIdea,
+            fulfilled: true,
         });
 
         // Security & Privacy
-        self.ideas.push(ImprovementIdeaRecord {
+        self.features.push(RoadmapFeatureIdea {
             id: 34,
-            name: "Zero-Trust TPM Boot & PQC Micro-Domain Isolation".to_string(),
-            category: IdeaCategory::SecurityAndPrivacy,
-            legacy_counterparts: "Qubes OS, Coreboot, SecureBoot".to_string(),
-            implementation_module: "src/security/qubes_isolation.rs".to_string(),
-            is_fulfilled: true,
+            title: "Zero-Trust TPM Boot & PQC Micro-Domain Isolation",
+            category: "Security & Privacy",
+            source_type: FeatureSourceType::RoadmapIdea,
+            fulfilled: true,
         });
-        self.ideas.push(ImprovementIdeaRecord {
+        self.features.push(RoadmapFeatureIdea {
             id: 35,
-            name: "OpenBSD Pledge & Unveil Syscall Sandboxing Engine".to_string(),
-            category: IdeaCategory::SecurityAndPrivacy,
-            legacy_counterparts: "OpenBSD pledge/unveil, Landlock".to_string(),
-            implementation_module: "src/security/bsd_hardening.rs".to_string(),
-            is_fulfilled: true,
+            title: "OpenBSD Pledge & Unveil Syscall Sandboxing Engine",
+            category: "Security & Privacy",
+            source_type: FeatureSourceType::RoadmapIdea,
+            fulfilled: true,
         });
 
         // Compliance & Governance
-        self.ideas.push(ImprovementIdeaRecord {
+        self.features.push(RoadmapFeatureIdea {
             id: 100,
-            name: "Statutory Compliance Audit Ledger & Sovereign Supreme Court Charter".to_string(),
-            category: IdeaCategory::ComplianceAndGovernance,
-            legacy_counterparts: "HIPAA, SOC2, ISO27001, DFSG".to_string(),
-            implementation_module: "src/security/governance.rs".to_string(),
-            is_fulfilled: true,
+            title: "Statutory Compliance Audit Ledger & Sovereign Supreme Court Charter",
+            category: "Compliance & Governance",
+            source_type: FeatureSourceType::RoadmapIdea,
+            fulfilled: true,
         });
     }
 
@@ -121,6 +112,12 @@ impl Suite100Ideas {
 
     pub fn verify_full_fulfillment(&self) -> bool {
         self.features.iter().all(|f| f.fulfilled)
+    }
+}
+
+impl Default for Suite100Ideas {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -164,7 +161,7 @@ impl SovereignShardsMasterRegistry {
         reg
     }
 
-    fn seed_12_shards(&mut self) {
+    fn register_all_12_shards(&mut self) {
         self.shards.insert(1, SovereignShardDescriptor {
             id: SovereignShardId::Shard01ProductivityOffice,
             code_name: "S-SHARD 01: Productivity Office & Layout Engine",
@@ -301,29 +298,35 @@ impl SovereignDistroGapClosureEngine {
 
     fn seed_distro_gaps(&mut self) {
         self.gaps.push(DistroGapFeatureRecord {
-            feature_name: "pacman-contrib, checkupdates, AUR helper".to_string(),
-            source_distro: "Arch Linux".to_string(),
-            target_native_implementation: "ArchPacmanContribEngine".to_string(),
+            feature_name: "pacman-contrib, checkupdates, AUR helper",
+            source_distro: "Arch Linux",
+            target_native_implementation: "ArchPacmanContribEngine",
             gap_closed: true,
         });
 
         self.gaps.push(DistroGapFeatureRecord {
-            feature_name: "pledge, unveil, KARL, retguard, signify".to_string(),
-            source_distro: "OpenBSD".to_string(),
-            target_native_implementation: "OpenBsdPledgeUnveilEnforcementEngine & OpenBsdKarlRetguardEngine".to_string(),
+            feature_name: "pledge, unveil, KARL, retguard, signify",
+            source_distro: "OpenBSD",
+            target_native_implementation: "OpenBsdPledgeUnveilEnforcementEngine & OpenBsdKarlRetguardEngine",
             gap_closed: true,
         });
 
         self.gaps.push(DistroGapFeatureRecord {
-            feature_name: "bectl, MAC framework, GEOM, netgraph, poudriere".to_string(),
-            source_distro: "FreeBSD".to_string(),
-            target_native_implementation: "FreeBsdBectlBootEnvironmentEngine & FreeBsdMacFrameworkEngine".to_string(),
+            feature_name: "bectl, MAC framework, GEOM, netgraph, poudriere",
+            source_distro: "FreeBSD",
+            target_native_implementation: "FreeBsdBectlBootEnvironmentEngine & FreeBsdMacFrameworkEngine",
             gap_closed: true,
         });
     }
 
     pub fn verify_all_gap_closures(&self) -> bool {
         self.gaps.iter().all(|g| g.gap_closed)
+    }
+}
+
+impl Default for SovereignDistroGapClosureEngine {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -346,7 +349,7 @@ impl SovereignDocumentationParityEngine {
     }
 }
 
-impl Default for WikiSpecificationDataSyncer {
+impl Default for SovereignDocumentationParityEngine {
     fn default() -> Self {
         Self::new()
     }
@@ -380,7 +383,7 @@ impl SovereignWikiMasterEngine {
         let gap_closure_ok = self.distro_gap_closure.verify_all_gap_closures();
         let parity_ok = self.parity_engine.verify_100_percent_parity();
 
-        ideas_ok && shards_ok && gap_closure_ok && roadmap_ok
+        ideas_ok && shards_ok && gap_closure_ok && parity_ok
     }
 }
 
