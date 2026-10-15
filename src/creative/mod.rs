@@ -140,6 +140,12 @@ pub use model3d::{
     ExportFormat as Model3DExportFormat,
     init_model3d, get_model3d,
 };
+pub use wordcraft_missing_components_parity_pr::{
+    WordcraftPrProposalManifest, WordcraftTypographyLayoutPrEngine,
+    WordcraftStylesTemplatesThemesPrEngine, WordcraftReferenceCitationBibliographyPrEngine,
+    WordcraftLinguisticAiSpellGrammarPrEngine, WordcraftRealtimeCrdtCollabPrEngine,
+    WordcraftMailMergeAutomationPrEngine, SovereignWordcraftArtcraftParityPrGateway,
+};
 pub use artcraft::{
     ArtSuite, Project, Workspace,
     init_artcraft, get_artcraft,
