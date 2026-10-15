@@ -47,16 +47,19 @@ pub use reminders_advanced::{
     EnhancedRemindersEngine, RecurrencePattern, ReminderItem, ReminderPriority,
 };
 pub use sovereign_application_replacements_pr_suite::{
-    BrowserSandboxPolicy, CodecDecodersAvailable, ContainerIsolationLevel, DocumentFileType,
-    EmailSecurityProtocol, EncryptionVaultAlgorithm, FileManagerLayout, LayerBlendMode,
-    OfficeSuiteComponent, SovereignAppPrProposalManifest,
-    SovereignApplicationReplacementsPrGateway, SovereignBrowserEnginePrEngine,
+    BrowserSandboxPolicy, ChatProtocolDriver, CodecDecodersAvailable, CompressionFormatKind,
+    ContainerIsolationLevel, DocumentFileType, EmailSecurityProtocol, EncryptionVaultAlgorithm,
+    FileManagerLayout, LayerBlendMode, OfficeSuiteComponent, P2pEncryptionMode,
+    PartitionTableKind, SovereignAppPrProposalManifest, SovereignApplicationReplacementsPrGateway,
+    SovereignArchiveCompressionPrEngine, SovereignBittorrentP2pClientPrEngine,
+    SovereignBrowserEnginePrEngine, SovereignDiskPartitionStoragePrEngine,
     SovereignDocumentViewerPrEngine, SovereignEditorEmulationMode,
     SovereignFileManagerMatrixPrEngine, SovereignLibreOfficeSuitePrEngine,
-    SovereignMediaPlayerAudioStudioPrEngine, SovereignPasswordVaultPassPrEngine,
-    SovereignRasterGraphicsPrEngine, SovereignSystemMonitorProcessPrEngine,
-    SovereignTerminalMultiplexerPrEngine, SovereignTextEditorsPrEngine,
-    SovereignThunderbirdEmailPrEngine, TerminalGraphicsProtocol, VfsMountProtocol,
+    SovereignMatrixIrcMessagingPrEngine, SovereignMediaPlayerAudioStudioPrEngine,
+    SovereignPasswordVaultPassPrEngine, SovereignRasterGraphicsPrEngine,
+    SovereignSystemMonitorProcessPrEngine, SovereignTerminalMultiplexerPrEngine,
+    SovereignTextEditorsPrEngine, SovereignThunderbirdEmailPrEngine, TerminalGraphicsProtocol,
+    VfsMountProtocol,
 };
 pub use sovereign_apps::{
     ProductivityTask, SigmaOfficeDocument, SigmaTasksBoard, SigmaVaultContainer, TaskPriority,
