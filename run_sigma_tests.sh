@@ -1488,6 +1488,15 @@ if [ -f "src/community/sovereign_documentation_consolidation_pr_engine.rs" ]; th
     ./build/test_sovereign_documentation_consolidation_pr_engine
 fi
 
+if [ -f "tests/fs/fd_table.rs" ]; then
+    echo "Running File Management & VFS test suites..."
+    mkdir -p build
+    rustc --test tests/fs/fd_table.rs --edition=2021 -o build/test_vfs_fd_table && ./build/test_vfs_fd_table
+    rustc --test tests/fs/inode.rs --edition=2021 -o build/test_vfs_inode && ./build/test_vfs_inode
+    rustc --test tests/filesystem/permission.rs --edition=2021 -o build/test_vfs_permission && ./build/test_vfs_permission
+    rustc --test tests/filesystem/lock.rs --edition=2021 -o build/test_vfs_lock && ./build/test_vfs_lock
+fi
+
 if [ -f "tests/scheduler/core.rs" ]; then
     echo "Running Process Scheduler Core & Lifecycle test suite..."
     mkdir -p build

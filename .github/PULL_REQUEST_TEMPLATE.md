@@ -1,19 +1,20 @@
 ## Summary
 
-<!-- What scheduler or component behavior changed and why? -->
+<!-- What file-management behavior changed and why? -->
 
-## Scheduler component
+## File component
 
-- [ ] Scheduler core
-- [ ] Run queue / PID allocation
-- [ ] fork / clone
-- [ ] exec
-- [ ] Context switch
-- [ ] Preemption & quantum
-- [ ] Signals & wait queues
-- [ ] Zombie / reaping & orphan adoption
-- [ ] Resource limits & CPU affinity
-- [ ] Documentation & ADRs
+- [ ] File descriptor manager
+- [ ] Inode and directory manager
+- [ ] Permission manager
+- [ ] Lock manager
+- [ ] Mount / unmount
+- [ ] Cache
+- [ ] Filesystem
+- [ ] Recovery
+- [ ] procfs / diagnostics
+- [ ] Security / capabilities
+- [ ] Documentation
 - [ ] CI / tooling
 
 ## Recurring task
@@ -22,17 +23,17 @@
 - [ ] Daily CI triage
 - [ ] Weekly lifecycle review
 - [ ] Weekly Linux/BSD study
-- [ ] Biweekly scheduler audit
+- [ ] Biweekly memory audit
 - [ ] Biweekly signal/wait audit
 - [ ] Monthly boot validation
 - [ ] Quarterly architecture/security/release review
 
 ## Reference behavior
 
-<!-- Required for lifecycle, ABI, or scheduler changes -->
+<!-- Required for lifecycle, ABI, or file changes -->
 
 - POSIX section:
-- Linux/BSD/Redox reference:
+- Linux/BSD/Redox/xv6 reference:
 - SigmaOS current behavior:
 - New behavior:
 - Compatibility impact:
@@ -42,36 +43,40 @@
 -
 -
 
-## Scheduler safety review
+## File safety review
 
-- [ ] Lifecycle transitions are valid (NEW -> READY -> RUNNING -> SLEEPING -> READY, READY -> RUNNING -> ZOMBIE, RUNNING -> STOPPED -> READY, ANY -> ZOMBIE -> REAPED)
+- [ ] Lifecycle transitions are valid
 - [ ] Zombies are eventually reaped
-- [ ] Orphans are adopted by PID 1
+- [ ] Orphans are adopted
 - [ ] PID reuse is safe
-- [ ] Lock ordering and concurrency model documented
+- [ ] Lock ordering is documented
 - [ ] Interrupt-context safety considered
-- [ ] Lost-wakeup prevention verified
-- [ ] Double-reap and double-switch prevented
-- [ ] Resource limits and run-queue capacity enforced
+- [ ] Signal races considered
+- [ ] Double-unlink prevented
+- [ ] Resource limits enforced
 - [ ] No unbounded allocation or recursion
 
-## Verification
+## Evidence
 
-```bash
-cargo check --lib
-cargo test --lib
-./run_sigma_tests.sh
-```
+- [ ] `cargo check --lib`
+- [ ] `cargo fmt --check`
+- [ ] `cargo test --lib`
+- [ ] `./run_sigma_tests.sh`
+- [ ] New/updated unit tests
+- [ ] Integration tests
+- [ ] Fuzz target or documented exemption
+- [ ] Boot-to-boot evidence, if boot-affecting
+- [ ] File benchmark, if performance-affecting
+- [ ] Security review requested, if applicable
 
-## Runtime evidence
+## Status updates
 
-- [ ] QEMU boot-to-shell log
-- [ ] Scheduler test / benchmark report
-- [ ] Artifact hash
+- [ ] `FEATURE_STATUS.toml`
+- [ ] `CAPABILITY_MATRIX.toml`
+- [ ] File documentation
+- [ ] Boot matrix, if applicable
 
-## Safety and rollback
+## Risks and rollback
 
-- [ ] No broad credentials or host access introduced
-- [ ] Untrusted input validated
-- [ ] Rollback/recovery behavior defined
-- [ ] Security review completed, if applicable
+- Risk:
+- Rollback:
