@@ -362,7 +362,7 @@ impl Default for SigmaTimer {
 }
 
 /// Global SigmaTimer instance (placeholder for actual global state)
-static unsafe mut SIGMATIMER_INSTANCE: Option<SigmaTimer> = None;
+static mut SIGMATIMER_INSTANCE: Option<SigmaTimer> = None;
 
 /// Initialize the global SigmaTimer instance
 pub fn init_sigmatimer() {

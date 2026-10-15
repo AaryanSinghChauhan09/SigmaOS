@@ -230,7 +230,7 @@ impl Default for SigmaMount {
 }
 
 /// Global SigmaMount instance (placeholder for actual global state)
-static unsafe mutable SIGMAMOUNT_INSTANCE: Option<SigmaMount> = None;
+static mut SIGMAMOUNT_INSTANCE: Option<SigmaMount> = None;
 
 /// Initialize the global SigmaMount instance
 pub fn init_sigmamount() {

@@ -245,7 +245,7 @@ impl Default for SigmaResource {
 }
 
 /// Global SigmaResource instance (placeholder for actual global state)
-static unsafe mut SIGMARESOURCE_INSTANCE: Option<SigmaResource> = None;
+static mut SIGMARESOURCE_INSTANCE: Option<SigmaResource> = None;
 
 /// Initialize the global SigmaResource instance
 pub fn init_sigmaresource() {

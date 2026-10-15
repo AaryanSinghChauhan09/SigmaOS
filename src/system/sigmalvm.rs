@@ -359,7 +359,7 @@ impl Default for SigmaLVM {
 }
 
 /// Global SigmaLVM instance (placeholder for actual global state)
-static unsafe mutable SIGMALVM_INSTANCE: Option<SigmaLVM> = None;
+static mut SIGMALVM_INSTANCE: Option<SigmaLVM> = None;
 
 /// Initialize the global SigmaLVM instance
 pub fn init_sigmalvm() {

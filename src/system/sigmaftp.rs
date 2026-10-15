@@ -278,7 +278,7 @@ impl Default for SigmaFTP {
 }
 
 /// Global SigmaFTP instance (placeholder for actual global state)
-static unsafe mut SIGMAFTP_INSTANCE: Option<SigmaFTP> = None;
+static mut SIGMAFTP_INSTANCE: Option<SigmaFTP> = None;
 
 /// Initialize the global SigmaFTP instance
 pub fn init_sigmaftp() {

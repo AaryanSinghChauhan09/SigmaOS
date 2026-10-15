@@ -274,7 +274,7 @@ impl Default for SigmaNotify {
 }
 
 /// Global SigmaNotify instance (placeholder for actual global state)
-static unsafe mut SIGMANOTIFY_INSTANCE: Option<SigmaNotify> = None;
+static mut SIGMANOTIFY_INSTANCE: Option<SigmaNotify> = None;
 
 /// Initialize the global SigmaNotify instance
 pub fn init_sigmanotify() {

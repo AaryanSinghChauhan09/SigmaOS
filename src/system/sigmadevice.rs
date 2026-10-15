@@ -286,7 +286,7 @@ impl Default for SigmaDevice {
 }
 
 /// Global SigmaDevice instance (placeholder for actual global state)
-static unsafe mutable SIGMADEVICE_INSTANCE: Option<SigmaDevice> = None;
+static mut SIGMADEVICE_INSTANCE: Option<SigmaDevice> = None;
 
 /// Initialize the global SigmaDevice instance
 pub fn init_sigmadevice() {

@@ -247,7 +247,7 @@ impl Default for SigmaMail {
 }
 
 /// Global SigmaMail instance (placeholder for actual global state)
-static unsafe mut SIGMAMAIL_INSTANCE: Option<SigmaMail> = None;
+static mut SIGMAMAIL_INSTANCE: Option<SigmaMail> = None;
 
 /// Initialize the global SigmaMail instance
 pub fn init_sigmamail() {

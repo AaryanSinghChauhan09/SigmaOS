@@ -300,7 +300,7 @@ impl Default for SigmaFSCK {
 }
 
 /// Global SigmaFSCK instance (placeholder for actual global state)
-static unsafe mutable SIGMAFSCK_INSTANCE: Option<SigmaFSCK> = None;
+static mut SIGMAFSCK_INSTANCE: Option<SigmaFSCK> = None;
 
 /// Initialize the global SigmaFSCK instance
 pub fn init_sigmafsck() {

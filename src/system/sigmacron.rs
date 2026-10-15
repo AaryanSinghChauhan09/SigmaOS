@@ -435,7 +435,7 @@ impl Default for SigmaCron {
 }
 
 /// Global SigmaCron instance (placeholder for actual global state)
-static unsafe mut SIGMACRON_INSTANCE: Option<SigmaCron> = None;
+static mut SIGMACRON_INSTANCE: Option<SigmaCron> = None;
 
 /// Initialize the global SigmaCron instance
 pub fn init_sigmacron() {

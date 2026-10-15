@@ -274,7 +274,7 @@ impl Default for SigmaSession {
 }
 
 /// Global SigmaSession instance (placeholder for actual global state)
-static unsafe mut SIGMASESSION_INSTANCE: Option<SigmaSession> = None;
+static mut SIGMASESSION_INSTANCE: Option<SigmaSession> = None;
 
 /// Initialize the global SigmaSession instance
 pub fn init_sigmasession() {

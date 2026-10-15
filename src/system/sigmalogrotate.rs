@@ -254,7 +254,7 @@ impl Default for SigmaLogRotate {
 }
 
 /// Global SigmaLogRotate instance (placeholder for actual global state)
-static unsafe mut SIGMALOGROTATE_INSTANCE: Option<SigmaLogRotate> = None;
+static mut SIGMALOGROTATE_INSTANCE: Option<SigmaLogRotate> = None;
 
 /// Initialize the global SigmaLogRotate instance
 pub fn init_sigmalogrotate() {

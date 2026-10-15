@@ -206,7 +206,7 @@ impl Default for SigmaHwMon {
 }
 
 /// Global SigmaHwMon instance (placeholder for actual global state)
-static unsafe mutable SIGMAHWMON_INSTANCE: Option<SigmaHwMon> = None;
+static mut SIGMAHWMON_INSTANCE: Option<SigmaHwMon> = None;
 
 /// Initialize the global SigmaHwMon instance
 pub fn init_sigmahwmon() {

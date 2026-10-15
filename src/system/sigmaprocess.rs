@@ -234,7 +234,7 @@ impl Default for SigmaProcess {
 }
 
 /// Global SigmaProcess instance (placeholder for actual global state)
-static unsafe mut SIGMAPROCESS_INSTANCE: Option<SigmaProcess> = None;
+static mut SIGMAPROCESS_INSTANCE: Option<SigmaProcess> = None;
 
 /// Initialize the global SigmaProcess instance
 pub fn init_sigmaprocess() {

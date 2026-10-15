@@ -340,7 +340,7 @@ impl Default for SigmaAutoMount {
 }
 
 /// Global SigmaAutoMount instance (placeholder for actual global state)
-static unsafe mut SIGMAAUTOMOUNT_INSTANCE: Option<SigmaAutoMount> = None;
+static mut SIGMAAUTOMOUNT_INSTANCE: Option<SigmaAutoMount> = None;
 
 /// Initialize the global SigmaAutoMount instance
 pub fn init_sigmaautomount() {

@@ -326,7 +326,7 @@ impl Default for SigmaPrint {
 }
 
 /// Global SigmaPrint instance (placeholder for actual global state)
-static unsafe mut SIGMAPRINT_INSTANCE: Option<SigmaPrint> = None;
+static mut SIGMAPRINT_INSTANCE: Option<SigmaPrint> = None;
 
 /// Initialize the global SigmaPrint instance
 pub fn init_sigmaprint() {

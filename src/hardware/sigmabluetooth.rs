@@ -374,7 +374,7 @@ impl Default for SigmaBluetooth {
 }
 
 /// Global SigmaBluetooth instance (placeholder for actual global state)
-static unsafe mut SIGMABLUETOOTH_INSTANCE: Option<SigmaBluetooth> = None;
+static mut SIGMABLUETOOTH_INSTANCE: Option<SigmaBluetooth> = None;
 
 /// Initialize the global SigmaBluetooth instance
 pub fn init_sigmabluetooth() {

@@ -295,7 +295,7 @@ impl Default for SigmaACPI {
 }
 
 /// Global SigmaACPI instance (placeholder for actual global state)
-static unsafe mut SIGMAACPI_INSTANCE: Option<SigmaACPI> = None;
+static mut SIGMAACPI_INSTANCE: Option<SigmaACPI> = None;
 
 /// Initialize the global SigmaACPI instance
 pub fn init_sigmaacpi() {

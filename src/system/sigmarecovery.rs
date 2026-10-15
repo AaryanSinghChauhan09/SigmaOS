@@ -240,7 +240,7 @@ impl Default for SigmaRecovery {
 }
 
 /// Global SigmaRecovery instance (placeholder for actual global state)
-static unsafe mut SIGMARECOVERY_INSTANCE: Option<SigmaRecovery> = None;
+static mut SIGMARECOVERY_INSTANCE: Option<SigmaRecovery> = None;
 
 /// Initialize the global SigmaRecovery instance
 pub fn init_sigmarecovery() {

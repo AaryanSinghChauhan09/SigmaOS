@@ -314,7 +314,7 @@ impl Default for SigmaParted {
 }
 
 /// Global SigmaParted instance (placeholder for actual global state)
-static unsafe mutable SIGMAPARTED_INSTANCE: Option<SigmaParted> = None;
+static mut SIGMAPARTED_INSTANCE: Option<SigmaParted> = None;
 
 /// Initialize the global SigmaParted instance
 pub fn init_sigmaparted() {

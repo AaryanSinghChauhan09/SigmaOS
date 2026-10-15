@@ -224,7 +224,7 @@ impl Default for SigmaFS {
 }
 
 /// Global SigmaFS instance (placeholder for actual global state)
-static unsafe mut SIGMAFS_INSTANCE: Option<SigmaFS> = None;
+static mut SIGMAFS_INSTANCE: Option<SigmaFS> = None;
 
 /// Initialize the global SigmaFS instance
 pub fn init_sigmafs() {
