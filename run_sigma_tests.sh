@@ -18,6 +18,13 @@ if [ -f "tests/test_periodic_study_improve_prove.rs" ]; then
     ./build/test_periodic
 fi
 
+if [ -f "tests/test_sovereign_periodic_research_program.rs" ]; then
+    echo "Running Sovereign Periodic Research-and-Implementation Program test suite..."
+    mkdir -p build
+    rustc --test tests/test_sovereign_periodic_research_program.rs --edition=2021 -o build/test_periodic_research
+    ./build/test_periodic_research
+fi
+
 if [ -f "tests/io/interrupt.rs" ]; then
     echo "Running Interrupt Manager test suite..."
     mkdir -p build

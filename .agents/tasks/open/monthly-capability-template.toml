@@ -1,0 +1,21 @@
+id = "CAP-2026-M10"
+title = "Deliver QEMU x86_64 boot-to-shell"
+cycle = "monthly"
+priority = "P0"
+owner = "boot-runtime-agent"
+
+required_evidence = [
+  "reports/build/build-manifest.json",
+  "reports/test/test-report.json",
+  "reports/boot/qemu-x86_64.log",
+  "reports/boot/boot-matrix.json"
+]
+
+definition_of_done = [
+  "clean build succeeds",
+  "unit and integration tests pass",
+  "QEMU reaches shell",
+  "smoke command succeeds",
+  "no kernel panic",
+  "rollback or recovery path documented"
+]

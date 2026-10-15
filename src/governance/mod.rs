@@ -8,12 +8,14 @@ pub mod okr;
 pub mod periodic_study_improve_prove_engine;
 pub mod rfc;
 pub mod risk_mitigation;
+pub mod sovereign_periodic_research_program_engine;
 pub mod sovereign_task_guidelines_wiki_sync_engine;
 pub mod strategic_vision;
 pub mod supreme_court;
 
 pub use periodic_study_improve_prove_engine::*;
 pub use risk_mitigation::*;
+pub use sovereign_periodic_research_program_engine::*;
 
 use crate::klib::HashMap;
 use core::sync::atomic::{AtomicUsize, Ordering};
