@@ -85,6 +85,7 @@ WIKI/
 !README.md
 !CONTRIBUTING.md
 !AGENTS.md
+!GOVERNANCE.md
 !scripts/*.py
 !tools/*.py
 !tools/**/*.py
