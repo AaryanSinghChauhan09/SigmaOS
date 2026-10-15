@@ -2,14 +2,28 @@
 // Sovereign OS Wiki & Documentation Master Absorption Engine
 // (`src/sovereign_wiki_master_engine.rs`)
 
-use alloc::format;
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::string::{String, ToString};
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec::Vec;
+#[cfg(not(feature = "standalone_test"))]
+extern crate alloc;
+
+#[cfg(not(feature = "standalone_test"))]
 use alloc::collections::BTreeMap;
+#[cfg(not(feature = "standalone_test"))]
+use alloc::format;
+#[cfg(not(feature = "standalone_test"))]
+use alloc::string::{String, ToString};
+#[cfg(not(feature = "standalone_test"))]
+use alloc::vec;
+#[cfg(not(feature = "standalone_test"))]
+use alloc::vec::Vec;
+
+#[cfg(feature = "standalone_test")]
+use std::collections::BTreeMap;
+#[cfg(feature = "standalone_test")]
+use std::format;
+#[cfg(feature = "standalone_test")]
+use std::string::{String, ToString};
+#[cfg(feature = "standalone_test")]
+use std::vec::Vec;
 
 /// ---------------------------------------------------------------------------
 /// 0. Feature Source & Roadmap Types
@@ -81,19 +95,6 @@ impl Sovereign100IdeasSuite {
     }
 
     fn populate_100_ideas(&mut self) {
-        let categories = [
-            (IdeaCategory::MultimediaTools, "Hypnotix / Bulky / HandBrake Replacement"),
-            (IdeaCategory::SystemUtilities, "Sysinternals / BTOP / FastFetch Parity"),
-            (IdeaCategory::PackageAndAppManagement, "Universal Package Format Conversion"),
-            (IdeaCategory::SecurityAndPrivacy, "OpenBSD Pledge/Unveil & FreeBSD Capsicum"),
-            (IdeaCategory::PerformanceAndKernel, "EEVDF Scheduler & Bcachefs Storage"),
-            (IdeaCategory::NetworkingAndMesh, "XDP / eBPF Express Data Path Mesh"),
-            (IdeaCategory::UiAndDesktopExperience, "Zenith Direct Framebuffer Compositor"),
-            (IdeaCategory::DeveloperAndBuildTools, "Reproducible Devenv & Hermetic Toolchain"),
-            (IdeaCategory::ComplianceAndGovernance, "SLSA Level 4 & NIS2 Compliance Framework"),
-            (IdeaCategory::FuturisticAndAiInnovations, "Composite AI Multi-Agent Coordinator"),
-        ];
-
         // System Utilities (11-23)
         self.ideas.push(ImprovementIdeaRecord {
             id: 11,
@@ -210,8 +211,8 @@ pub struct SovereignShardsMasterRegistry {
 
 impl SovereignShardsMasterRegistry {
     pub fn new() -> Self {
-        let mut reg = Self { shards: Vec::new() };
-        reg.seed_12_shards();
+        let mut reg = Self { shards: BTreeMap::new() };
+        reg.register_all_12_shards();
         reg
     }
 
@@ -314,7 +315,7 @@ impl Default for SovereignShardsMasterRegistry {
 }
 
 /// ---------------------------------------------------------------------------
-/// 4. Distro Gap Closure Engine
+/// 3. Distro Gap Closure Engine
 /// ---------------------------------------------------------------------------
 
 #[derive(Debug, Clone)]
@@ -333,32 +334,32 @@ pub struct SovereignDistroGapClosureEngine {
 impl SovereignDistroGapClosureEngine {
     pub fn new() -> Self {
         let mut engine = Self {
-            features: Vec::with_capacity(16),
+            gaps: Vec::with_capacity(16),
         };
-        engine.register_distro_gaps();
+        engine.seed_distro_gaps();
         engine
     }
 
     fn seed_distro_gaps(&mut self) {
-        self.features.push(DistroGapFeatureRecord {
-            distro_name: "Arch Linux",
-            gap_feature_name: "pacman-contrib, checkupdates, AUR helper",
-            sigma_counterpart: "ArchPacmanContribEngine",
-            verification_passed: true,
+        self.gaps.push(DistroGapFeatureRecord {
+            source_distro: "Arch Linux".to_string(),
+            feature_name: "pacman-contrib, checkupdates, AUR helper".to_string(),
+            target_native_implementation: "ArchPacmanContribEngine".to_string(),
+            gap_closed: true,
         });
 
-        self.features.push(DistroGapFeatureRecord {
-            distro_name: "OpenBSD",
-            gap_feature_name: "pledge, unveil, KARL, retguard, signify",
-            sigma_counterpart: "OpenBsdPledgeUnveilEnforcementEngine & OpenBsdKarlRetguardEngine",
-            verification_passed: true,
+        self.gaps.push(DistroGapFeatureRecord {
+            source_distro: "OpenBSD".to_string(),
+            feature_name: "pledge, unveil, KARL, retguard, signify".to_string(),
+            target_native_implementation: "OpenBsdPledgeUnveilEnforcementEngine & OpenBsdKarlRetguardEngine".to_string(),
+            gap_closed: true,
         });
 
-        self.features.push(DistroGapFeatureRecord {
-            distro_name: "FreeBSD",
-            gap_feature_name: "bectl, MAC framework, GEOM, netgraph, poudriere",
-            sigma_counterpart: "FreeBsdBectlBootEnvironmentEngine & FreeBsdMacFrameworkEngine",
-            verification_passed: true,
+        self.gaps.push(DistroGapFeatureRecord {
+            source_distro: "FreeBSD".to_string(),
+            feature_name: "bectl, MAC framework, GEOM, netgraph, poudriere".to_string(),
+            target_native_implementation: "FreeBsdBectlBootEnvironmentEngine & FreeBsdMacFrameworkEngine".to_string(),
+            gap_closed: true,
         });
     }
 
@@ -444,6 +445,7 @@ impl Default for WikiSpecificationDataSyncer {
 /// 5. Master Sovereign OS Documentation & Wiki Integration Verification Engine
 /// ---------------------------------------------------------------------------
 
+#[derive(Debug)]
 pub struct SovereignWikiMasterEngine {
     pub suite_100_ideas: Sovereign100IdeasSuite,
     pub shards_registry: SovereignShardsMasterRegistry,
@@ -469,7 +471,7 @@ impl SovereignWikiMasterEngine {
         let gap_closure_ok = self.distro_gap_closure.verify_all_gap_closures();
         let roadmap_ok = self.parity_engine.verify_100_percent_parity();
 
-        ideas_ok && shards_ok && gap_closure_ok && parity_ok
+        ideas_ok && shards_ok && gap_closure_ok && roadmap_ok
     }
 }
 
