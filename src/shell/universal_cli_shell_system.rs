@@ -859,7 +859,7 @@ impl UniversalCliOptionTranslator {
         let args = &parts[1..];
 
         // 1. BSD Style Translations
-        if cmd == "ps" && args.get(0) == Some(&"aux") {
+        if cmd == "ps" && (args.get(0) == Some(&"aux") || args.get(0) == Some(&"-ef") || args.get(0) == Some(&"-A")) {
             return TranslatedCliOptionCommand {
                 original_command: trimmed.to_string(),
                 canonical_command: "ps".to_string(),
@@ -867,8 +867,12 @@ impl UniversalCliOptionTranslator {
                 translated_args: vec!["-e".to_string(), "-f".to_string()],
             };
         }
-        if cmd == "tar" && args.get(0) == Some(&"xvf") {
-            let mut tr_args = vec!["-x".to_string(), "-v".to_string(), "-f".to_string()];
+        if cmd == "tar" && (args.get(0) == Some(&"xvf") || args.get(0) == Some(&"czvf") || args.get(0) == Some(&"xjvf")) {
+            let mut tr_args = match args.get(0).copied() {
+                Some("czvf") => vec!["-c".to_string(), "-z".to_string(), "-v".to_string(), "-f".to_string()],
+                Some("xjvf") => vec!["-x".to_string(), "-j".to_string(), "-v".to_string(), "-f".to_string()],
+                _ => vec!["-x".to_string(), "-v".to_string(), "-f".to_string()],
+            };
             if args.len() > 1 {
                 tr_args.push(args[1].to_string());
             }
@@ -879,7 +883,7 @@ impl UniversalCliOptionTranslator {
                 translated_args: tr_args,
             };
         }
-        if cmd == "ls" && args.get(0) == Some(&"-G") {
+        if cmd == "ls" && (args.get(0) == Some(&"-G") || args.get(0) == Some(&"--color")) {
             return TranslatedCliOptionCommand {
                 original_command: trimmed.to_string(),
                 canonical_command: "ls".to_string(),
@@ -888,13 +892,43 @@ impl UniversalCliOptionTranslator {
             };
         }
 
-        // 2. BSD & GNU CLI Option Translations (free, vmstat, ss/netstat, ip/ifconfig, df, du, sysctl, lsof, top)
-        if cmd == "free" && args.get(0) == Some(&"-m") {
+        // 2. BSD & GNU CLI Option Translations (free, vmstat, ss/netstat, ip/ifconfig, df, du, sysctl, lsof, top, grep, sed, find)
+        if cmd == "grep" && (args.get(0) == Some(&"-P") || args.get(0) == Some(&"-E") || args.get(0) == Some(&"-R")) {
+            let flag = match args.get(0).copied() {
+                Some("-P") => "-E", // Perl regex -> Extended POSIX regex
+                Some("-R") => "-r", // Recursive
+                _ => "-E",
+            };
+            let mut tr_args = vec![flag.to_string()];
+            tr_args.extend(args.iter().skip(1).map(|s| s.to_string()));
+            return TranslatedCliOptionCommand {
+                original_command: trimmed.to_string(),
+                canonical_command: "grep".to_string(),
+                detected_style: OptionStyle::GnuLong,
+                translated_args: tr_args,
+            };
+        }
+        if cmd == "sed" && args.get(0) == Some(&"-i") {
+            let mut tr_args = vec!["-i".to_string()];
+            if args.get(1) == Some(&"''") {
+                // macOS BSD sed syntax sed -i '' 's/a/b/g' -> GNU sed -i 's/a/b/g'
+                tr_args.extend(args.iter().skip(2).map(|s| s.to_string()));
+            } else {
+                tr_args.extend(args.iter().skip(1).map(|s| s.to_string()));
+            }
+            return TranslatedCliOptionCommand {
+                original_command: trimmed.to_string(),
+                canonical_command: "sed".to_string(),
+                detected_style: OptionStyle::GnuLong,
+                translated_args: tr_args,
+            };
+        }
+        if cmd == "free" && (args.get(0) == Some(&"-m") || args.get(0) == Some(&"-h")) {
             return TranslatedCliOptionCommand {
                 original_command: trimmed.to_string(),
                 canonical_command: "free".to_string(),
                 detected_style: OptionStyle::GnuLong,
-                translated_args: vec!["-m".to_string()],
+                translated_args: vec![args[0].to_string()],
             };
         }
         if cmd == "ifconfig" && (args.is_empty() || args.get(0) == Some(&"-a")) {
@@ -905,12 +939,20 @@ impl UniversalCliOptionTranslator {
                 translated_args: vec!["addr".to_string(), "show".to_string()],
             };
         }
-        if cmd == "netstat" && args.get(0) == Some(&"-tulpn") {
+        if cmd == "netstat" && (args.get(0) == Some(&"-tulpn") || args.get(0) == Some(&"-an")) {
             return TranslatedCliOptionCommand {
                 original_command: trimmed.to_string(),
                 canonical_command: "ss".to_string(),
                 detected_style: OptionStyle::GnuLong,
-                translated_args: vec!["-tulpn".to_string()],
+                translated_args: vec![args[0].to_string()],
+            };
+        }
+        if cmd == "df" && args.get(0) == Some(&"-h") {
+            return TranslatedCliOptionCommand {
+                original_command: trimmed.to_string(),
+                canonical_command: "df".to_string(),
+                detected_style: OptionStyle::PosixSingleDash,
+                translated_args: vec!["-h".to_string()],
             };
         }
         if cmd == "du" && args.get(0) == Some(&"-hd") && args.get(1) == Some(&"1") {
@@ -1506,5 +1548,24 @@ mod tests {
         assert!(plan_bash.posix_sh_script.contains("SERVICE=httpd"));
         assert!(plan_bash.posix_sh_script.contains("TIMEOUT=30"));
         assert!(plan_bash.posix_sh_script.contains("$( ls dir1 )"));
+    }
+
+    #[test]
+    fn test_extended_cli_option_translation() {
+        let grep_p = UniversalCliOptionTranslator::translate_command("grep -P 'pattern' file.txt");
+        assert_eq!(grep_p.canonical_command, "grep");
+        assert_eq!(grep_p.translated_args[0], "-E");
+
+        let sed_i = UniversalCliOptionTranslator::translate_command("sed -i '' 's/old/new/g' file.txt");
+        assert_eq!(sed_i.canonical_command, "sed");
+        assert_eq!(sed_i.translated_args, vec!["-i", "'s/old/new/g'", "file.txt"]);
+
+        let df_h = UniversalCliOptionTranslator::translate_command("df -h");
+        assert_eq!(df_h.canonical_command, "df");
+        assert_eq!(df_h.translated_args, vec!["-h"]);
+
+        let netstat_an = UniversalCliOptionTranslator::translate_command("netstat -an");
+        assert_eq!(netstat_an.canonical_command, "ss");
+        assert_eq!(netstat_an.translated_args, vec!["-an"]);
     }
 }
