@@ -10,6 +10,7 @@ Welcome to the SigmaOS Architecture and Subsystem Development Master Index. This
 - [Signal Handler Architecture & Development Plan](SIGNAL_HANDLER_PLAN.md) - POSIX.1-2024 signal handler architecture, required safety rules, 18-PR roadmap, x86_64 frame & sigreturn validation rules, periodic maintenance schedule, and merge gates.
 - [Signal Path Audit & ABI Profile](SIGNAL_HANDLER_AUDIT_AND_ABI_PROFILE.md) - Subsystem component audit, POSIX signal numbers and default actions, data structure ABI layouts, and x86_64 user frame layout.
 - [Physical Memory Manager Plan](PHYSICAL_MEMORY_MANAGER_PLAN.md) - Two-stage physical memory management architecture, 11 PMM rules & invariants, 20-PR sequence roadmap, periodic maintenance schedule, cross-component implementation rules, and merge gates.
+- [CPU Scheduler Architecture & Development Plan](SCHEDULER_DEVELOPMENT_PLAN.md) - Multi-class scheduling architecture (CFS, BORE, EEVDF, Real-Time FIFO/RR, SchedExt), 9 core invariants, 18-PR sequence roadmap, periodic maintenance schedule, component rules, PR review template, and merge gates.
 - [System Utilities Development Plan](SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md) - Baseline rules, POSIX compatibility, 18-PR roadmap, component rules, periodic maintenance framework, and merge gates.
 - [Filesystem & Storage Parity Proposal](PR_PROPOSAL_FILESYSTEMS_AND_STORAGE_PARITY.md) - Multi-tiered storage engines, zswap writeback cache, and OverlayFS mount simulation.
 - [Toolchain & Development Ecosystem Proposal](PR_PROPOSAL_TOOLCHAIN_AND_DEVELOPMENT_PARITY.md) - Zero-dependency toolchain engines, compilers, build orchestration, and dynamic tracing.
@@ -29,6 +30,7 @@ Welcome to the SigmaOS Architecture and Subsystem Development Master Index. This
 - [Process Lifecycle & Subreaper](../wiki/Process-Lifecycle-and-Subreaper-Components.md)
 - [Physical Memory Manager Plan Mirror](../wiki/PHYSICAL_MEMORY_MANAGER_PLAN.md)
 - [Process Manager Plan Mirror](../wiki/PROCESS_MANAGER_PLAN.md)
+- [CPU Scheduler Development Plan Mirror](../wiki/SCHEDULER_DEVELOPMENT_PLAN.md)
 - [Resource Governor & Cgroups](../wiki/Resource-Governor-and-Cgroups-Components.md)
 - [Sigma Boot & Secure Enclave](../wiki/Sigma-Boot-Components.md)
 - [Sigma Sandbox Confinement](../wiki/Sigma-Sandbox-Confinement-Components.md)
