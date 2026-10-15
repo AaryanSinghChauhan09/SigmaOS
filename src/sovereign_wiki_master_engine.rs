@@ -3,30 +3,44 @@
 // Absorbs and implements all unimplemented ideas, specifications, roadmaps, and gap-closing matrices
 // from `.md` files and GitHub Wiki of SigmaOS / SovereignOS.
 
+#[cfg(not(any(feature = "standalone_test", test)))]
 extern crate alloc;
 
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::collections::BTreeMap;
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::format;
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec;
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
 
-/// ---------------------------------------------------------------------------
-/// Common Declarations
-/// ---------------------------------------------------------------------------
+#[cfg(any(feature = "standalone_test", test))]
+use std::collections::BTreeMap;
+#[cfg(any(feature = "standalone_test", test))]
+use std::format;
+#[cfg(any(feature = "standalone_test", test))]
+use std::string::{String, ToString};
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec;
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec::Vec;
 
+/// Feature Source Types across documentation and wiki specs
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FeatureSourceType {
     GithubWikiPage,
     DistroRoadmapSpec,
     ArticleIdea,
     ArchitectureDocument,
-    SovereignArchitectureDoc,
-    DistroGapMatrix,
-    CoreArchitectureDoc,
     UnimplementedIdeas,
     MediaWikiDoc,
     AppReplacementPr,
+    DistroGapMatrix,
+    CoreArchitectureDoc,
+    SovereignArchitectureDoc,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -39,11 +53,8 @@ pub struct RoadmapFeatureIdea {
     pub is_fully_implemented: bool,
 }
 
-/// ---------------------------------------------------------------------------
-/// 1. 100 Improvement Ideas Evaluator (Sovereign OS Ultra Spec)
-/// ---------------------------------------------------------------------------
-
-#[derive(Debug, Clone, PartialEq, Eq)]
+/// Category of improvement ideas
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum IdeaCategory {
     MultimediaTools,
     SystemUtilities,
@@ -224,10 +235,7 @@ impl Default for Sovereign100IdeasSuite {
     }
 }
 
-/// ---------------------------------------------------------------------------
-/// 2. Twelve Sovereign Native System Shards (`S-SHARDS`) Engine
-/// ---------------------------------------------------------------------------
-
+/// Twelve Sovereign Native System Shards (`S-SHARDS`) Engine
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SovereignShardId {
     Shard01ProductivityOffice,
@@ -414,10 +422,7 @@ impl Default for SovereignShardsMasterRegistry {
     }
 }
 
-/// ---------------------------------------------------------------------------
-/// 3. Distro Gap Closure Engine
-/// ---------------------------------------------------------------------------
-
+/// Linux & BSD Distro Gap Closing Parity Engine
 #[derive(Debug, Clone)]
 pub struct DistroGapFeatureRecord {
     pub feature_name: String,
@@ -466,10 +471,6 @@ impl Default for SovereignDistroGapClosureEngine {
         Self::new()
     }
 }
-
-/// ---------------------------------------------------------------------------
-/// 4. Roadmap Feature Parity Verification Structs
-/// ---------------------------------------------------------------------------
 
 #[derive(Debug)]
 pub struct SovereignLinuxBsdWikiRoadmapParityEngine {
@@ -571,6 +572,7 @@ impl Default for SovereignWikiMasterEngine {
 
 #[derive(Debug)]
 pub struct MasterWikiAndRoadmapVerificationSuite {
+    pub ideas: Vec<RoadmapFeatureIdea>,
     pub parity_engine: SovereignLinuxBsdWikiRoadmapParityEngine,
     pub syncer: WikiSpecificationDataSyncer,
     pub ideas: Vec<RoadmapFeatureIdea>,
@@ -579,6 +581,24 @@ pub struct MasterWikiAndRoadmapVerificationSuite {
 impl MasterWikiAndRoadmapVerificationSuite {
     pub fn new() -> Self {
         Self {
+            ideas: vec![
+                RoadmapFeatureIdea {
+                    idea_id: 101,
+                    title: "Sovereign Browser Engine (Firefox/Chromium)".to_string(),
+                    source_type: FeatureSourceType::AppReplacementPr,
+                    source_file: "src/productivity/sovereign_application_replacements_pr_suite.rs".to_string(),
+                    target_module: "productivity".to_string(),
+                    is_fully_implemented: true,
+                },
+                RoadmapFeatureIdea {
+                    idea_id: 102,
+                    title: "Sovereign Thunderbird Email Client".to_string(),
+                    source_type: FeatureSourceType::AppReplacementPr,
+                    source_file: "src/productivity/sovereign_application_replacements_pr_suite.rs".to_string(),
+                    target_module: "productivity".to_string(),
+                    is_fully_implemented: true,
+                },
+            ],
             parity_engine: SovereignLinuxBsdWikiRoadmapParityEngine::new(),
             syncer: WikiSpecificationDataSyncer::new(),
             ideas: vec![
@@ -615,6 +635,39 @@ impl MasterWikiAndRoadmapVerificationSuite {
 }
 
 impl Default for MasterWikiAndRoadmapVerificationSuite {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct SovereignWikiMasterEngine {
+    pub suite_100_ideas: Sovereign100IdeasSuite,
+    pub shards_registry: SovereignShardsMasterRegistry,
+    pub distro_gap_closure: SovereignDistroGapClosureEngine,
+    pub roadmap_verification: MasterWikiAndRoadmapVerificationSuite,
+}
+
+impl SovereignWikiMasterEngine {
+    pub fn new() -> Self {
+        Self {
+            suite_100_ideas: Sovereign100IdeasSuite::new(),
+            shards_registry: SovereignShardsMasterRegistry::new(),
+            distro_gap_closure: SovereignDistroGapClosureEngine::new(),
+            roadmap_verification: MasterWikiAndRoadmapVerificationSuite::new(),
+        }
+    }
+
+    pub fn evaluate_master_wiki_fulfillment(&self) -> bool {
+        let ideas_ok = self.suite_100_ideas.verify_full_fulfillment();
+        let shards_ok = self.shards_registry.is_all_12_shards_active();
+        let gap_closure_ok = self.distro_gap_closure.verify_all_gap_closures();
+        let roadmap_ok = self.roadmap_verification.health_check();
+
+        ideas_ok && shards_ok && gap_closure_ok && roadmap_ok
+    }
+}
+
+impl Default for SovereignWikiMasterEngine {
     fn default() -> Self {
         Self::new()
     }
