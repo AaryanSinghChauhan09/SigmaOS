@@ -1,54 +1,65 @@
 # SigmaOS I/O Management Policy
 
-## Subsystem Objective
+## 1. Overview and Subsystem Objective
+SigmaOS manages I/O as an authoritative, safe, observable, and recoverable lifecycle subsystem. The primary objective of the subsystem is to:
+> **Maintain SigmaOS I/O as a safe, observable, recoverable subsystem: submit, queue, execute, complete, and reclaim I/O requests without leaks, races, corruption, or undefined behavior.**
 
-Maintain SigmaOS I/O as a safe, observable, recoverable subsystem: submit, queue, execute, complete, and reclaim I/O requests without leaks, races, corruption, or undefined behavior.
-
-## Standard I/O Lifecycle Contract
-
-Every I/O transaction across SigmaOS must adhere to the 11-stage authoritative lifecycle contract:
+## 2. Mandatory I/O Lifecycle Contract
+Every I/O operation in SigmaOS must strictly adhere to the 10-stage unified lifecycle:
 
 ```text
 submit -> validate -> enqueue -> execute -> interrupt/DMA ->
 complete -> callback -> reclaim -> free -> error/recovery
 ```
 
-### Stage Requirements Matrix
+### Stage Requirements
 
-| Stage | Behavior & Guarantee |
-|---|---|
-| **Submit** | Request parameters resolved, validated, and accepted by kernel entry gate. Descriptor allocated, permissions and capabilities checked. |
-| **Validate** | Memory regions, buffer alignment, boundary checks, and request parameters verified before scheduling. |
-| **Enqueue** | Bounded placement into priority/scheduler queue without lock contention or allocation under spinlock. |
-| **Execute** | Issued to target hardware device or synthetic driver with strictly bounded execution timeout. |
-| **Interrupt / DMA** | Race-free interrupt handler dispatch, top-half queueing, and hardware DMA memory transfer with cache coherency barriers. |
-| **Complete** | Completed exactly once; status code, byte count, and completion events recorded. |
-| **Callback** | Completion notification dispatched to registered top-half/bottom-half or async ring listeners. |
-| **Reclaim** | Hardware descriptors, DMA buffer maps, and ring slots returned to recycling pools. |
-| **Free** | Allocated memory and temporary tracking structures returned to system allocators without memory leaks. |
-| **Error / Recovery** | Typed, diagnosable error propagation; device resets or queue flushing triggered without corrupting subsystem state. |
+| Stage | Required Behavior | Failure / Recovery Mode |
+|---|---|---|
+| **Submit** | Operation parameters specified; descriptor allocated, permissions checked. | `ResourceExhausted` if queue full; descriptor freed on error. |
+| **Validate** | Parameter sanity check (block ranges, non-zero lengths, memory permissions). | Immediate return of typed error (`InvalidStageTransition`, `InvalidScatterGatherList`). |
+| **Enqueue** | Placed into multi-queue scheduler (`RT`, `BE`, `Idle`) based on `IoPriority`. | Queue depth bounded; rejection if capacity exceeded. |
+| **Execute** | Issued to underlying device driver with deterministic timeout. | Driver timeout triggers hardware reset and recovery path. |
+| **Interrupt / DMA** | Interrupt handler safely triggered; DMA channel programmed with physical memory SG list. | Coherence check; lost interrupt/DMA detection via watchdog timer. |
+| **Complete** | Device confirms execution status; request transitions to completion state. | Double-completion guarded by atomic stage transitions. |
+| **Callback** | Registered completion handle invoked exactly once with status (`Success`, `Timeout`, `HardwareError`, `Canceled`). | Isolated callback execution; handle detached after invocation. |
+| **Reclaim** | DMA mappings unmapped; buffer locks released; state clean-up verified. | Safe resource reclamation even under error conditions. |
+| **Free** | Descriptor returned to global freelist or deallocated. | Zero-leak guarantee. |
+| **Error / Recovery** | Fault diagnosed, typed error returned, device re-initialized if necessary. | No global state corruption; isolated error propagation. |
 
-## I/O & Device Classes
+## 3. Subsystem Architecture Specifications
 
-1. **Request-Based I/O**: Block devices, NVMe submission/completion queues, virtio-blk queues.
-2. **Bio-Based I/O**: Direct file system block buffers (`src/fs/buffer.rs`), page-cache flush/sync, raw disk sector I/O.
-3. **Async Ring I/O**: Zero-copy async kernel submit/completion rings (`src/io/io_uring.rs`, `src/io/io_uring_v2.rs`).
+### 3.1 I/O Classes
+- **Request-Based:** Block and async device requests structured into `IoRequest` descriptors.
+- **Bio-Based:** Direct block buffer access managed via `BufferCache` with LRU eviction and dirty page flushes.
+- **Async I/O:** High-throughput `io_uring` and `io_uring_v2` multishot / zero-copy submission & completion rings.
 
-## Supported Hardware & Peripheral Classes
+### 3.2 Device Classes Supported
+- **NVMe:** Direct queue pair handling and NVMe passthrough commands.
+- **VirtIO:** VirtIO block and net virtqueue submission paths.
+- **Serial / Console:** Bounded UART IRQ delivery and ring buffer transmitter.
+- **USB:** xHCI host controller transfers.
 
-- **NVMe Subsystem**: PCIe NVMe controller queues, submission/completion doorbell registers, admin/IO ring pairs.
-- **VirtIO Devices**: `virtio-blk`, `virtio-net`, `virtio-console`, virtqueue split/packed ring descriptors.
-- **USB & Serial**: xHCI host controllers, USB mass storage, COM1 0x3F8 UART serial console transmitter.
-- **Block & Network**: Disk sector devices, virtio-net Ethernet frames, eBPF XDP socket buffers.
+### 3.3 Interrupt Model
+- Bounded IRQ routing table (`InterruptManager`).
+- Double-handler registration guards.
+- Bounded lost/spurious interrupt counters with threshold enforcement.
 
-## Hard Operating Limits & Safety Bounds
+### 3.4 DMA Model
+- Bounded physical DMA descriptor queue (`DmaManager`).
+- Validation of `ScatterGatherElement` lists before mapping.
+- Double-DMA mapping prevention and cache coherence tracking.
 
-- Maximum Concurrent In-Flight I/O Descriptors: 8,192 per device controller.
-- Timeout Default: 5,000ms per request (hardware reset triggered upon breach).
-- Maximum DMA Scatter-Gather Segments: 128 vectors per request.
-- Allocation in Interrupt Context: Strictly forbidden (pre-allocated ring pools required).
+### 3.5 Buffer Model
+- Multi-device block buffer cache (`BufferCache`).
+- LRU eviction policy; dirty buffer flush pipelines.
+- Pool exhaustion protection for locked buffers.
 
-## Hotplug & NUMA Policy
+### 3.6 Limits and OOM Behavior
+- Strict allocation bounds on queues, handler maps, buffer pools, and callbacks.
+- Rejection of incoming requests when limits are reached with typed errors (`QueueFull`, `PoolExhausted`, `TableFull`).
+- OOM treated as a normal, handled condition rather than causing kernel panic.
 
-- **NUMA Local Allocation**: Ring buffers and DMA descriptor pools are allocated from the NUMA node local to the target PCIe bus root complex.
-- **Hotplug Invalidation**: Upon device unplug, all in-flight requests transition to `Err(IoError::DeviceDisconnected)`, wait queues are unblocked, and resources are safely reclaimed.
+### 3.7 NUMA and Hotplug Behavior
+- NUMA-aware buffer allocation strategy when enabled.
+- Safe device detachment during hotplug events: in-flight requests canceled and completed with `Canceled` status; resources deallocated safely.

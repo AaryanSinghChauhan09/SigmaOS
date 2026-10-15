@@ -1,25 +1,25 @@
-# ADR 001: SigmaOS Unified I/O Lifecycle Subsystem Architecture
+# Architectural Decision Record: SigmaOS Unified I/O Management Subsystem
 
 ## Status
-Accepted (Phase 9 Core Kernel & Storage Parity)
+Accepted
 
 ## Context
-SigmaOS integrates high-performance asynchronous I/O (`io_uring_v2`), block buffer caching (`src/fs/buffer.rs`), DMA management (`src/io/dma.rs`), interrupt management (`src/io/interrupt.rs`), and I/O scheduling (`src/io/scheduler.rs`). Previously, I/O components were tested in model isolation, leading to potential gaps between model tests and real hardware/firmware execution.
+SigmaOS requires a high-performance, robust, and maintainable I/O subsystem capable of handling device I/O, interrupts, DMA, buffering, and scheduling across diverse workloads. Previously, I/O logic was distributed across experimental components (`io_uring`, `eventfd`, `fd_table`, `ioctl`). To ensure zero memory leaks, race-free operation, and strict error recovery, a authoritative I/O lifecycle contract must be defined and enforced across the codebase.
 
 ## Decision
-Establish an authoritative, unified I/O management subsystem adhering strictly to the 11-stage lifecycle:
+We establish the authoritative 10-stage I/O lifecycle:
+`submit -> validate -> enqueue -> execute -> interrupt/DMA -> complete -> callback -> reclaim -> free -> error/recovery`
 
-```text
-submit -> validate -> enqueue -> execute -> interrupt/DMA ->
-complete -> callback -> reclaim -> free -> error/recovery
-```
-
-### Key Architectural Invariants
-1. **Strict Non-Blocking Core**: No spinlock or blocking operation may occur in interrupt context. Memory allocation during IRQ handling is prohibited; pre-allocated pools must be utilized.
-2. **Exactly-Once Completion**: Every request submitted to the subsystem must terminate in either `complete` or `error/recovery` exactly once. Double-completion or abandoned request descriptors are treated as critical kernel panics or typed errors.
-3. **Bounded Queues & Resource Observability**: Every ring, queue, and table (Interrupt Table, DMA Queue, Scheduler Queue, Callback Queue, Buffer Set) must define explicit upper capacity bounds and measure OOM states.
-4. **POSIX & Modern Async API Stability**: Maintain backwards compatibility with standard POSIX synchronous file/socket descriptor calls while supporting zero-copy `io_uring_v2` submission/completion rings.
+To support this lifecycle, we define seven dedicated policy modules and native Rust management engines:
+1. **Interrupt Manager (`src/io/interrupt.rs`, `src/io/handler.rs`):** Race-free IRQ handler routing, double-handler guards, lost-interrupt detection.
+2. **DMA Manager (`src/io/dma.rs`, `src/io/dma_queue.rs`):** Physical memory scatter-gather mapping, cache coherence, double-DMA mapping prevention.
+3. **Block Buffer Cache (`src/fs/buffer.rs`):** Multi-device block cache, LRU eviction, dirty page flushing, lock-safety.
+4. **I/O Scheduler (`src/io/scheduler.rs`, `src/io/scheduler_queue.rs`):** Bounded multi-queue scheduling (RealTime, BestEffort, Idle) and stage transition tracking.
+5. **Completion Callback Manager (`src/io/callback.rs`):** Registration and single-invocation completion callback handles.
+6. **Component Rules (`IO_RULES.toml`):** Automated governance rules for I/O safety, completeness, OOM metrics, and boot evidence.
+7. **PR Validation Standard (`.github/PULL_REQUEST_TEMPLATE.md`):** Mandatory checklist for all I/O, storage, and driver pull requests.
 
 ## Consequences
-- All I/O components must validate their state transitions against the authoritative lifecycle.
-- CI and test harnesses must enforce `IO_RULES.toml` rules (`io_completeness`, `no_leak`, `oom_metric`, `interrupt_integrity`, `buffer_semantics`).
+- **Safety:** All I/O queues and buffer sets have bounded limits. Out-of-memory or capacity exhaustion conditions return typed error codes (`QueueFull`, `PoolExhausted`, `TableFull`) without panic or corruption.
+- **Observability:** Every stage transition in the 10-stage pipeline is inspectable and audited via tests and diagnostics.
+- **Maintainability:** Clear separation between scheduling, DMA mapping, interrupt routing, and buffer management simplifies subsystem evolution and hardware driver additions.

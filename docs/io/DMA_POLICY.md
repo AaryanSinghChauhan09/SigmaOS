@@ -1,11 +1,21 @@
 # SigmaOS DMA Management Policy
 
-## Subsystem Overview
-The DMA Manager (`src/io/dma.rs`, `src/io/dma_queue.rs`) manages Direct Memory Access buffer allocations, virtual-to-physical address mappings, scatter-gather lists, and cache coherency.
+## 1. Overview
+The DMA Manager subsystem (`src/io/dma.rs`, `src/io/dma_queue.rs`) governs physical memory scatter-gather mappings, hardware ring descriptors, cache coherence, and DMA transfer lifetimes.
 
-## Key Requirements & Invariants
+## 2. Key Invariants and Rules
 
-1. **Race-Free DMA Mapping**: Buffer mapping and unmapping operations are managed atomically using thread-safe state wrappers (`DmaState`).
-2. **Double-DMA & Lost-DMA Prevention**: Mapping reuse follows a strict buffer lifecycle (`Unmapped -> Mapping -> Active -> Unmapping -> Unmapped`). Attempting to map an active buffer or double-free a handle returns explicit typed errors.
-3. **Bounded Metadata & Alignment**: All DMA allocations enforce physical alignment (e.g., 4096-byte page boundaries for x86_64 / ARM64). Buffer queues enforce maximum capacity constraints (`max_queues`, `max_descriptors`).
-4. **OOM & Exhaustion Metrics**: Memory allocation failures return `Err(DmaError::OutOfMemory)`. Queue overflow returns `Err(DmaError::QueueFull)`.
+### 2.1 Queue Depth Limits
+- The `DmaManager` operates with a bounded `max_queue_depth`.
+- Attempting to map a DMA buffer when the queue is full returns `DmaError::QueueFull`.
+
+### 2.2 Scatter-Gather Validation
+- Every DMA mapping request must supply a non-empty list of valid `ScatterGatherElement` structures.
+- Empty or invalid scatter-gather lists return `DmaError::InvalidScatterGatherList`.
+
+### 2.3 Double-DMA Mapping Guard
+- Re-mapping an already active buffer ID returns `DmaError::DoubleDmaPrevented(buffer_id)`.
+
+### 2.4 Unmapping and Cache Coherence
+- Unmapping non-existent buffers returns `DmaError::BufferNotMapped(buffer_id)`.
+- Direction-aware cache invalidation and flush barriers (`DmaDirection::ToDevice`, `DmaDirection::FromDevice`, `DmaDirection::Bidirectional`) are enforced upon transfer start and completion.

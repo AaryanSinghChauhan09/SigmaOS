@@ -1,10 +1,17 @@
 # SigmaOS I/O Callback Policy
 
-## Subsystem Overview
-The Callback Manager (`src/io/callback.rs`) coordinates completion notifications and deferred callback-callback execution following request completion.
+## 1. Overview
+The Callback Manager subsystem (`src/io/callback.rs`) manages completion notifications for scheduled I/O operations.
 
-## Key Requirements & Invariants
+## 2. Key Invariants and Rules
 
-1. **Double-Callback Prevention**: Callbacks are registered with unique IDs and invoked exactly once upon I/O completion.
-2. **Stack Depth & Reciprocation Bounds**: Recursive callback execution is bounded to prevent kernel stack overflow (maximum recursion depth: 4).
-3. **Error Propagation**: Non-zero I/O completion statuses or hardware faults are delivered directly to the callback context, allowing clean resource unmap and retry logic.
+### 2.1 Single-Invocation Guarantee
+- Registered callbacks for a request ID are executed exactly once when `invoke_callbacks` is called.
+- After invocation, all handles associated with the request ID are removed from the registration map, preventing double-invocation races.
+
+### 2.2 Callback Status
+Callbacks receive a `CallbackStatus` outcome enum:
+- `Success`: Operation completed normally.
+- `Timeout`: Device operation timed out before hardware confirmation.
+- `HardwareError`: Controller or media failure reported by device.
+- `Canceled`: Operation canceled due to device hotplug or system shutdown.

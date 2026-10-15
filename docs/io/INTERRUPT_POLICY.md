@@ -1,12 +1,23 @@
 # SigmaOS Interrupt Management Policy
 
-## Subsystem Overview
-The Interrupt Manager (`src/io/interrupt.rs`, `src/io/handler.rs`) governs hardware IRQ lines, interrupt vector routing, top-half execution, and bottom-half/deferred work dispatch.
+## 1. Overview
+The Interrupt Management subsystem (`src/io/interrupt.rs`, `src/io/handler.rs`) provides race-free interrupt registration, dispatching, and monitoring for SigmaOS hardware device drivers.
 
-## Key Requirements & Invariants
+## 2. Key Invariants and Rules
 
-1. **Race-Free Handler Registration**: Handlers are registered and unregistered through `InterruptManager::register_handler` and `unregister_handler` with atomic handler ID generation (`next_handler_id`).
-2. **Double-Handler Prevention**: Re-registering an assigned IRQ line returns `Err(InterruptError::AlreadyRegistered(irq))` unless shared IRQ routing is explicitly enabled.
-3. **Bounded Handler Metadata**: The interrupt table capacity is bounded (`max_handlers`). Table overflow returns `Err(InterruptError::TableFull)`.
-4. **Lost & Spurious Interrupt Prevention**: Spurious or unassigned interrupts increment atomic counters (`spurious_interrupts`, `lost_interrupt_counters`). Exceeding 100 lost interrupts on an active line triggers `Err(InterruptError::LostInterruptThresholdExceeded(irq))`.
-5. **Context Safety**: Interrupt handlers must execute with zero allocation. Memory must be pre-allocated during initialization.
+### 2.1 Bounded Handler Capacity
+- The `InterruptManager` is instantiated with a fixed maximum capacity (`max_handlers`).
+- Attaching a handler when capacity is exceeded returns `InterruptError::TableFull`.
+
+### 2.2 Double-Handler Prevention
+- An IRQ line can be mapped to at most one handler at a time unless explicit handler sharing is configured.
+- Registering a second handler on an occupied IRQ without releasing the existing one returns `InterruptError::AlreadyRegistered(irq)`.
+
+### 2.3 Lost and Spurious Interrupt Detection
+- Each IRQ line tracks lost interrupts via an atomic counter (`ArcAtomicU32`).
+- If an IRQ fires without an active handler registered, it is counted as a spurious interrupt.
+- Exceeding the lost-interrupt threshold returns `InterruptError::LostInterruptThresholdExceeded(irq)`.
+
+### 2.4 Race-Free Execution
+- Handlers are assigned unique `HandlerId` descriptors.
+- Lookup and dispatch operations execute atomically, preventing races between handler unregistration and interrupt arrival.
