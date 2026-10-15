@@ -383,6 +383,8 @@ pub mod sovereign_2085_distro_supremacy_engine;
 pub use sovereign_2085_distro_supremacy_engine::*;
 pub mod sovereign_2090_distro_supremacy_engine;
 pub use sovereign_2090_distro_supremacy_engine::*;
+pub mod sovereign_2095_distro_supremacy_engine;
+pub use sovereign_2095_distro_supremacy_engine::*;
 pub mod sovereign_arch_gap_closure_pr_engine;
 pub use sovereign_arch_gap_closure_pr_engine::*;
 pub mod sovereign_2028_distro_supremacy_engine;
