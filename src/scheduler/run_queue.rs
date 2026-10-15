@@ -90,7 +90,7 @@ impl BoundedRunQueue {
     }
 
     pub fn contains(&self, pid: u64) -> bool {
-        for q in self.queues.iter() {
+        for q in &self.queues {
             if q.iter().any(|t| t.pid == pid) {
                 return true;
             }
