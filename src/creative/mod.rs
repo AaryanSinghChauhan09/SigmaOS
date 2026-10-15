@@ -147,7 +147,7 @@ pub use wordcraft_missing_components_parity_pr::{
     WordcraftMailMergeAutomationPrEngine, SovereignWordcraftArtcraftParityPrGateway,
 };
 pub use artcraft::{
-    ArtSuite, Project, Workspace,
+    ArtSuite, Project, Workspace, ProjectType,
     init_artcraft, get_artcraft,
 };
 pub use deckcraft::{
