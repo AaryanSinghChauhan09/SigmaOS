@@ -21,9 +21,35 @@ use std::vec::Vec;
 // SigmaOS Task Manager
 // OOP-based task management with Kanban boards and reminders
 
+#[cfg(not(feature = "standalone_test"))]
 use crate::klib::btreemap::BTreeMap;
+#[cfg(feature = "standalone_test")]
+use std::collections::BTreeMap;
 use core::time::Duration;
 // Instant not in no_std
+
+/// Zero-allocation case-insensitive substring search helper.
+/// Expects `needle_lower` to already be lowercase.
+fn contains_ignore_case(haystack: &str, needle_lower: &str) -> bool {
+    if needle_lower.is_empty() {
+        return true;
+    }
+    if needle_lower.is_ascii() && haystack.is_ascii() {
+        let h_bytes = haystack.as_bytes();
+        let n_bytes = needle_lower.as_bytes();
+        if n_bytes.len() > h_bytes.len() {
+            return false;
+        }
+        h_bytes.windows(n_bytes.len()).any(|window| {
+            window
+                .iter()
+                .zip(n_bytes)
+                .all(|(&h, &n)| h.to_ascii_lowercase() == n)
+        })
+    } else {
+        haystack.to_lowercase().contains(needle_lower)
+    }
+}
 
 /// Task
 #[derive(Debug, Clone)]
@@ -289,8 +315,8 @@ impl TaskManager {
         Ok(tasks
             .into_iter()
             .filter(|t| {
-                t.title.to_lowercase().contains(&query_lower)
-                    || t.description.to_lowercase().contains(&query_lower)
+                contains_ignore_case(&t.title, &query_lower)
+                    || contains_ignore_case(&t.description, &query_lower)
             })
             .collect())
     }
@@ -617,6 +643,33 @@ mod tests {
         manager.complete_task(&task_id).unwrap();
         let task = manager.get_task(&task_id).unwrap();
         assert_eq!(task.status, TaskStatus::Done);
+    }
+
+    #[test]
+    fn test_search_tasks_zero_alloc() {
+        let mut manager = TaskManager::default();
+        manager
+            .create_task(
+                "Implement Zero-Alloc Matching".to_string(),
+                "Optimize search iteration".to_string(),
+                TaskPriority::High,
+            )
+            .unwrap();
+        manager
+            .create_task(
+                "Other Task".to_string(),
+                "Nothing special".to_string(),
+                TaskPriority::Low,
+            )
+            .unwrap();
+
+        let results = manager.search_tasks("ZERO-ALLOC").unwrap();
+        assert_eq!(results.len(), 1);
+        assert_eq!(results[0].title, "Implement Zero-Alloc Matching");
+
+        let desc_results = manager.search_tasks("ITERATION").unwrap();
+        assert_eq!(desc_results.len(), 1);
+        assert_eq!(desc_results[0].title, "Implement Zero-Alloc Matching");
     }
 
     #[test]
