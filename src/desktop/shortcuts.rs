@@ -391,8 +391,25 @@ impl KeyboardShortcutsManager {
     }
 
     pub fn list_global_shortcuts(&self) -> Vec<String> {
-        self.get_shortcuts_by_category(ShortcutCategory::Global)
+        // Bolt ⚡ Optimization: Filter directly over `self.shortcuts.iter()` instead of calling
+        // `get_shortcuts_by_category()`. This eliminates creating temporary `Vec<KeyboardShortcut>`
+        // heap vectors and cloning inner `KeyboardShortcut` struct fields on every category listing.
+        self.shortcuts
             .iter()
+            .filter(|s| {
+                matches!(
+                    s.action,
+                    KeyAction::OpenLauncher
+                        | KeyAction::OpenTerminal
+                        | KeyAction::OpenFileManager
+                        | KeyAction::OpenWebBrowser
+                        | KeyAction::ShowDesktop
+                        | KeyAction::LockScreen
+                        | KeyAction::Screenshot
+                        | KeyAction::ScreenRecording
+                        | KeyAction::ToggleTheme
+                )
+            })
             .map(|s| {
                 format!(
                     "{} - {} ({})",
@@ -405,8 +422,17 @@ impl KeyboardShortcutsManager {
     }
 
     pub fn list_window_shortcuts(&self) -> Vec<String> {
-        self.get_shortcuts_by_category(ShortcutCategory::WindowManagement)
+        // Bolt ⚡ Optimization: Filter directly over `self.shortcuts.iter()` instead of calling
+        // `get_shortcuts_by_category()`. This eliminates creating temporary `Vec<KeyboardShortcut>`
+        // heap vectors and cloning inner `KeyboardShortcut` struct fields on every category listing.
+        self.shortcuts
             .iter()
+            .filter(|s| {
+                matches!(
+                    s.action,
+                    KeyAction::MaximizeWindow | KeyAction::TileWindow | KeyAction::CloseWindow
+                )
+            })
             .map(|s| {
                 format!(
                     "{} - {} ({})",
