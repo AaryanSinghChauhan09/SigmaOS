@@ -203,7 +203,7 @@ impl SovereignShardsMasterRegistry {
         reg
     }
 
-    fn register_all_12_shards(&mut self) {
+    fn seed_12_shards(&mut self) {
         self.shards.insert(1, SovereignShardDescriptor {
             id: SovereignShardId::Shard01ProductivityOffice,
             code_name: "S-SHARD 01: Productivity Office & Layout Engine",

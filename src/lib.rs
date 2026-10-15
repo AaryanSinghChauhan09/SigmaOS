@@ -371,6 +371,7 @@ pub use shell::{
     SovereignShellsTerminalsSupervisorsParityPrGateway, TerminalMultiplexersAndEmulatorsPrEngine,
     ZshPromptFormatter,
 };
+pub use shell::sovereign_command_interpreter::*;
 pub use sigpkg::{
     AdapterError, BuildSystem, ContentAddressedStore, CryptoVerifier, DebAdapter,
     PackageDependencyResolver, PacmanAdapter, RecipeError, RecipeManager, RpmAdapter, SatSolver,
