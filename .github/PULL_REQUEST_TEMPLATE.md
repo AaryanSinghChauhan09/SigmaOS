@@ -1,38 +1,45 @@
 ## Summary
 
-<!-- What scheduler or component behavior changed and why? -->
+<!-- What shell behavior changed and why? -->
 
-## Scheduler component
+## Shell component
 
-- [ ] Scheduler core
-- [ ] Run queue / PID allocation
-- [ ] fork / clone
-- [ ] exec
-- [ ] Context switch
-- [ ] Preemption & quantum
-- [ ] Signals & wait queues
-- [ ] Zombie / reaping & orphan adoption
-- [ ] Resource limits & CPU affinity
-- [ ] Documentation & ADRs
+- [ ] Lexer
+- [ ] Parser
+- [ ] Expansion
+- [ ] Executor
+- [ ] Pipelines
+- [ ] Redirection
+- [ ] Job control
+- [ ] Signals
+- [ ] Built-ins
+- [ ] Interactive line editor
+- [ ] Script runner
+- [ ] Diagnostics
+- [ ] Security / sandboxing
+- [ ] Documentation
 - [ ] CI / tooling
 
 ## Recurring task
 
 - [ ] PR validation
 - [ ] Daily CI triage
-- [ ] Weekly lifecycle review
-- [ ] Weekly Linux/BSD study
-- [ ] Biweekly scheduler audit
-- [ ] Biweekly signal/wait audit
-- [ ] Monthly boot validation
-- [ ] Quarterly architecture/security/release review
+- [ ] Weekly feature/bug triage
+- [ ] Weekly POSIX/sh study
+- [ ] Biweekly parser/expansion audit
+- [ ] Biweekly built-in review
+- [ ] Monthly boot-to-shell validation
+- [ ] Monthly compatibility suite
+- [ ] Monthly fuzz triage
+- [ ] Monthly security review
+- [ ] Quarterly release/UX/performance review
 
 ## Reference behavior
 
-<!-- Required for lifecycle, ABI, or scheduler changes -->
+<!-- Required for compatibility or grammar changes -->
 
 - POSIX section:
-- Linux/BSD/Redox reference:
+- Bash/dash/Zsh/BusyBox reference:
 - SigmaOS current behavior:
 - New behavior:
 - Compatibility impact:
@@ -42,36 +49,37 @@
 -
 -
 
-## Scheduler safety review
+## Shell safety review
 
-- [ ] Lifecycle transitions are valid (NEW -> READY -> RUNNING -> SLEEPING -> READY, READY -> RUNNING -> ZOMBIE, RUNNING -> STOPPED -> READY, ANY -> ZOMBIE -> REAPED)
-- [ ] Zombies are eventually reaped
-- [ ] Orphans are adopted by PID 1
-- [ ] PID reuse is safe
-- [ ] Lock ordering and concurrency model documented
-- [ ] Interrupt-context safety considered
-- [ ] Lost-wakeup prevention verified
-- [ ] Double-reap and double-switch prevented
-- [ ] Resource limits and run-queue capacity enforced
-- [ ] No unbounded allocation or recursion
+- [ ] Expansion order is correct
+- [ ] Quoting behavior is preserved
+- [ ] Redirection failures are handled
+- [ ] Exit codes are explicit
+- [ ] Signal behavior is defined
+- [ ] No unbounded recursion or allocation
+- [ ] Interactive terminal state is restored
+- [ ] Script mode does not execute invalid partial input
 
-## Verification
+## Evidence
 
-```bash
-cargo check --lib
-cargo test --lib
-./run_sigma_tests.sh
-```
+- [ ] `cargo check --lib`
+- [ ] `cargo fmt --check`
+- [ ] `cargo test --lib`
+- [ ] `./run_sigma_tests.sh`
+- [ ] New/updated shell tests
+- [ ] POSIX/conformance test evidence
+- [ ] Fuzz target or documented exemption
+- [ ] Boot-to-shell evidence, if boot-affecting
+- [ ] Security review requested, if applicable
 
-## Runtime evidence
+## Status updates
 
-- [ ] QEMU boot-to-shell log
-- [ ] Scheduler test / benchmark report
-- [ ] Artifact hash
+- [ ] `FEATURE_STATUS.toml`
+- [ ] `CAPABILITY_MATRIX.toml`
+- [ ] Shell documentation
+- [ ] Boot matrix, if applicable
 
-## Safety and rollback
+## Risks and rollback
 
-- [ ] No broad credentials or host access introduced
-- [ ] Untrusted input validated
-- [ ] Rollback/recovery behavior defined
-- [ ] Security review completed, if applicable
+- Risk:
+- Rollback:

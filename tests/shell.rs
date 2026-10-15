@@ -1,8 +1,13 @@
 // tests/shell.rs
 // Conformance and lifecycle test suite for SigmaOS shell
 
-use sigmaos::shell::diagnostics::ShellDiagnosticsEngine;
-use sigmaos::shell::interactive::{InteractiveShellEngine, SignalEvent};
+#[path = "../src/shell/diagnostics/mod.rs"]
+mod diagnostics;
+#[path = "../src/shell/interactive/mod.rs"]
+mod interactive;
+
+use diagnostics::ShellDiagnosticsEngine;
+use interactive::{InteractiveShellEngine, SignalEvent};
 
 #[test]
 fn test_interactive_prompt_rendering() {

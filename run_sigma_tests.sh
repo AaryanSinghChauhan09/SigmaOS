@@ -1466,6 +1466,21 @@ if [ -f "src/shell/sovereign_command_interpreter.rs" ]; then
     ./build/test_command_interpreter
 fi
 
+if [ -f "tests/shell_lifecycle_tests.rs" ]; then
+    echo "Running Sovereign Shell Lifecycle & Conformance Program Test Suites..."
+    mkdir -p build
+    rustc --test tests/shell_lifecycle_tests.rs --edition=2021 -o build/test_shell_lifecycle && ./build/test_shell_lifecycle
+    rustc --test tests/shell.rs --edition=2021 -o build/test_shell && ./build/test_shell
+    rustc --test tests/shell/conformance/conformance_test.rs --edition=2021 -o build/test_shell_conformance && ./build/test_shell_conformance
+    rustc --test tests/shell/posix/posix_test.rs --edition=2021 -o build/test_shell_posix && ./build/test_shell_posix
+    rustc --test tests/shell/regression/regression_test.rs --edition=2021 -o build/test_shell_regression && ./build/test_shell_regression
+    rustc --test tests/shell/interactive/interactive_test.rs --edition=2021 -o build/test_shell_interactive && ./build/test_shell_interactive
+    rustc --test tests/shell/parser/parser_test.rs --edition=2021 -o build/test_shell_parser && ./build/test_shell_parser
+    rustc --test tests/shell/builtins/builtins_test.rs --edition=2021 -o build/test_shell_builtins && ./build/test_shell_builtins
+    rustc --test tests/shell/exit_codes/exit_codes_test.rs --edition=2021 -o build/test_shell_exit_codes && ./build/test_shell_exit_codes
+    rustc --test tests/shell/diagnostics/diagnostics_test.rs --edition=2021 -o build/test_shell_diagnostics && ./build/test_shell_diagnostics
+fi
+
 
 if [ -f "src/distro/sovereign_open_source_os_apex_inspirations_v50.rs" ]; then
     echo "Running Sovereign Open Source OS Apex Inspirations Engine (V50) test suite..."
