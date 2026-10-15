@@ -1,81 +1,82 @@
 ## Summary
 
-<!-- What file-management or component behavior changed and why? -->
+<!-- What component does this PR improve, add, or regulate? -->
 
-## File component
+## Related issue
 
-- [ ] File descriptor manager
-- [ ] Inode and directory manager
-- [ ] Permission manager
-- [ ] Lock manager
-- [ ] Mount / unmount
-- [ ] Cache
-- [ ] Filesystem
-- [ ] Recovery
-- [ ] procfs / diagnostics
-- [ ] Security / capabilities
-- [ ] Documentation
-- [ ] CI / tooling
+Closes #<issue-id>
 
-## Recurring task
+## Component
 
-- [ ] PR validation
-- [ ] Daily CI triage
-- [ ] Weekly lifecycle review
-- [ ] Weekly Linux/BSD study
-- [ ] Biweekly memory audit
-- [ ] Biweekly signal/wait audit
-- [ ] Monthly boot validation
-- [ ] Quarterly architecture/security/release review
+<!-- kernel, memory, VFS, IPC, security, drivers, packaging, desktop, installer_update, etc. -->
 
-## Reference behavior
+## Upstream study
 
-<!-- Required for lifecycle, ABI, or file changes -->
+- Project:
+- Version/commit:
+- Research note:
+- ADR:
 
-- POSIX section:
-- Linux/BSD/Redox/xv6 reference:
-- SigmaOS current behavior:
-- New behavior:
-- Compatibility impact:
+## Component rules added or enforced
+
+- [ ] New rule
+- [ ] Existing rule enforced
+- [ ] Rule test added
+- [ ] CI gate added
+- [ ] Documentation updated
+
+## What SigmaOS adopts
+
+<!-- State the upstream principle or mechanism adopted. -->
+
+## What SigmaOS changes or rejects
+
+<!-- State simplifications, deviations, and rejected ideas. -->
 
 ## Changes
 
--
-
-## File safety review
-
-- [ ] Lifecycle transitions are valid
-- [ ] Zombies are eventually reaped
-- [ ] Orphans are adopted
-- [ ] PID reuse is safe
-- [ ] Lock ordering is documented
-- [ ] Interrupt-context safety considered
-- [ ] Signal races considered
-- [ ] Double-unlink prevented
-- [ ] Resource limits enforced
-- [ ] No unbounded allocation or recursion
-
-## Evidence
-
-- [ ] `cargo check --lib`
-- [ ] `cargo fmt --check`
-- [ ] `cargo test --lib`
-- [ ] `./run_sigma_tests.sh`
-- [ ] New/updated unit tests
+- [ ] Source implementation
+- [ ] Unit tests
 - [ ] Integration tests
-- [ ] Fuzz target or documented exemption
-- [ ] Boot-to-boot evidence, if boot-affecting
-- [ ] File benchmark, if performance-affecting
-- [ ] Security review requested, if applicable
+- [ ] QEMU/runtime test
+- [ ] Documentation
+- [ ] Capability/status update
+- [ ] Regression protection
+- [ ] Security review, if applicable
 
-## Status updates
+## Verification
 
-- [ ] `FEATURE_STATUS.toml`
-- [ ] `CAPABILITY_MATRIX.toml`
-- [ ] File documentation
-- [ ] Boot matrix, if applicable
+```bash
+cargo check --lib
+cargo test --lib
+./run_sigma_tests.sh
+make check
+make test
+make format
+```
 
-## Risks and rollback
+## Runtime evidence
 
-- Risk:
-- Rollback:
+- [ ] QEMU boot log
+- [ ] Installer/update test log
+- [ ] Package dry-run report
+- [ ] Hardware test log, if applicable
+- [ ] Artifact hash
+
+## Safety and rollback
+
+- [ ] No broad credentials or host access introduced
+- [ ] Untrusted input validated
+- [ ] Package scripts sandboxed, if applicable
+- [ ] Rollback/recovery behavior defined
+- [ ] Security review completed, if applicable
+
+## Reviewer checklist
+
+- [ ] Scope is narrow
+- [ ] Component rules are enforceable
+- [ ] Tests cover the rules
+- [ ] Runtime evidence is linked
+- [ ] Documentation matches implementation
+- [ ] Capability status is evidence-based
+- [ ] No unsupported Linux/BSD parity claims
