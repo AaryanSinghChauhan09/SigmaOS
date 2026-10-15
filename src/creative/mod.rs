@@ -74,13 +74,17 @@ pub use designcraft::{
     init_designcraft, get_designcraft,
 };
 pub use designcraft_missing_components_parity_pr::{
-    DesigncraftPrCategory, DesigncraftPrProposalSpec,
+    DesigncraftPrCategory, DesigncraftPrProposalSpec, DesigncraftPrProposalManifest,
     DesigncraftInteractivePrototypingPrEngine,
     DesigncraftAutoLayoutFlexEngine,
     DesigncraftDesignSystemVariablesEngine,
     DesigncraftVectorGeometryEngine,
     DesigncraftMultiplayerCrdtEngine,
     DesigncraftCodeExportEngine,
+    DesigncraftComponentVariantsPrEngine,
+    DesigncraftDesignTokensStyleDictionaryPrEngine,
+    DesigncraftIconSystemPackagingPrEngine,
+    DesigncraftAccessibilityAuditLintPrEngine,
     SovereignDesigncraftArtcraftParityPrGateway,
 };
 pub use effectcraft::{
