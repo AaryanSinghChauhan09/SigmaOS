@@ -6,7 +6,7 @@ Welcome to the SigmaOS Architecture and Subsystem Development Master Index. This
 
 ## Architectural & Development Plans (`docs/`)
 
-- [Interrupt Handler Master Architecture Plan](INTERRUPT_HANDLER_PLAN.md) - 5-stage decoupled pipeline, multi-arch vector contracts (x86_64, AArch64 GICv3, RISC-V PLIC), 17-PR sequence roadmap, and deferred work dispatch.
+- [CPU Scheduler Architecture & Development Plan](SCHEDULER_STATUS_AND_INVARIANTS.md) - Subsystem audit, 9 policy invariants, 18-PR roadmap, periodic maintenance framework, and review merge gates.
 - [System Utilities Development Plan](SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md) - Baseline rules, POSIX compatibility, 18-PR roadmap, component rules, periodic maintenance framework, and merge gates.
 - [Filesystem & Storage Parity Proposal](PR_PROPOSAL_FILESYSTEMS_AND_STORAGE_PARITY.md) - Multi-tiered storage engines, zswap writeback cache, and OverlayFS mount simulation.
 - [Toolchain & Development Ecosystem Proposal](PR_PROPOSAL_TOOLCHAIN_AND_DEVELOPMENT_PARITY.md) - Zero-dependency toolchain engines, compilers, build orchestration, and dynamic tracing.
@@ -15,7 +15,7 @@ Welcome to the SigmaOS Architecture and Subsystem Development Master Index. This
 
 ## Core Wiki Subsystem Guides (`wiki/`)
 
-- [Interrupt Handler Plan](../wiki/INTERRUPT_HANDLER_PLAN.md)
+- [CPU Scheduler Development Plan](../wiki/SCHEDULER_DEVELOPMENT_PLAN.md)
 - [System Utilities Plan](../wiki/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md)
 - [Architectural Pillars](../wiki/Architectural-Pillars-Components.md)
 - [Kernel Functions & ABI](../wiki/Kernel-Functions-and-ABI-Components.md)

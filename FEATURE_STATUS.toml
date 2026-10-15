@@ -223,7 +223,7 @@ next_milestone = "ARM NEON acceleration"
 
 [scheduler.core]
 status = "prototype"
-files = ["src/scheduler/scheduler.rs", "src/kernel/scheduler.rs"]
+files = ["docs/SCHEDULER_STATUS_AND_INVARIANTS.md", "docs/SCHEDULER_DEVELOPMENT_PLAN.md", "src/scheduler/scheduler.rs", "src/kernel/scheduler.rs"]
 description = "Core run-queue operations, class dispatch interface, and task state transitions (docs/SCHEDULER_STATUS_AND_INVARIANTS.md)"
 test_evidence = "Unit tests for run queues and state machine stubs"
 next_milestone = "PR 3: SchedClass interface refactor & PR 4: Task lifecycle run-queue integration"
