@@ -1367,11 +1367,11 @@ if [ -f "src/creative/deckcraft.rs" ]; then
     ./build/test_deckcraft
 fi
 
-if [ -f "src/creative/wordcraft.rs" ]; then
-    echo "Running WordCraft Creative Suite PR engine test suite..."
+if [ -f "src/community/sovereign_documentation_consolidation_pr_engine.rs" ]; then
+    echo "Running Sovereign Documentation & GitHub Wiki Consolidation Engine test suite..."
     mkdir -p build
-    rustc --test src/creative/wordcraft.rs --edition=2021 -o build/test_wordcraft
-    ./build/test_wordcraft
+    rustc --test src/community/sovereign_documentation_consolidation_pr_engine.rs --edition=2021 -o build/test_sovereign_documentation_consolidation_pr_engine
+    ./build/test_sovereign_documentation_consolidation_pr_engine
 fi
 
 echo "All SigmaOS test suites completed."

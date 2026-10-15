@@ -402,6 +402,12 @@ pub use process::spawn::{
     SimpleProcessSpawner, SimpleProcessWaiter, CLONE_NEWNET, CLONE_NEWNS, CLONE_NEWPID,
 };
 
+pub use community::sovereign_documentation_consolidation_pr_engine::{
+    ManSection as LibManSection, SovereignDocumentationConsolidationPrGateway,
+    SovereignHandbookArticle, SovereignInfoNode, SovereignInfoPagesConsolidationEngine,
+    SovereignManPage, SovereignManPagesConsolidationEngine, SovereignPackageDocRecord,
+    SovereignUsrShareDocConsolidationEngine, SovereignWikiHandbookConsolidationEngine,
+};
 pub use community::toolkit::{
     ArticleCategory, CommunityHandbookCatalog, HandbookArticle, PackageRecipe, RecipeSourceFormat,
     ReproduciblePackageRecipeManager, SecurityModelType, SecurityProfileTemplateStore,
