@@ -1,77 +1,83 @@
 ## Summary
 
-<!-- What scheduler or component behavior changed and why? -->
+<!-- What kernel or component behavior changed and why? -->
 
-## Scheduler component
+## Kernel component
 
-- [ ] Scheduler core
-- [ ] Run queue / PID allocation
-- [ ] fork / clone
-- [ ] exec
-- [ ] Context switch
-- [ ] Preemption & quantum
-- [ ] Signals & wait queues
-- [ ] Zombie / reaping & orphan adoption
-- [ ] Resource limits & CPU affinity
-- [ ] Documentation & ADRs
-- [ ] CI / tooling
+- [ ] Boot / arch init
+- [ ] Interrupts / traps
+- [ ] Memory / paging / swap
+- [ ] Scheduler / processes
+- [ ] VFS / filesystems
+- [ ] Syscalls / ELF
+- [ ] Drivers
+- [ ] Networking / sockets
+- [ ] IPC / signals / timers
+- [ ] Security / capabilities
+- [ ] Diagnostics
+- [ ] Build / CI
 
 ## Recurring task
 
-- [ ] PR validation
+- [ ] PR-level validation
 - [ ] Daily CI triage
-- [ ] Weekly lifecycle review
+- [ ] Weekly subsystem review
 - [ ] Weekly Linux/BSD study
-- [ ] Biweekly scheduler audit
-- [ ] Biweekly signal/wait audit
+- [ ] Biweekly syscall/ABI review
+- [ ] Biweekly memory/concurrency audit
 - [ ] Monthly boot validation
-- [ ] Quarterly architecture/security/release review
+- [ ] Monthly driver/hardware audit
+- [ ] Monthly fuzz triage
+- [ ] Monthly diagnostics rehearsal
+- [ ] Quarterly release/architecture/security review
 
-## Reference behavior
+## Reference study
 
-<!-- Required for lifecycle, ABI, or scheduler changes -->
+<!-- Required for design-changing kernel PRs -->
 
-- POSIX section:
-- Linux/BSD/Redox reference:
-- SigmaOS current behavior:
-- New behavior:
-- Compatibility impact:
+- Study document:
+- Linux/BSD/Redox/xv6 reference:
+- Decision: Adopt / Adapt / Reject
+- Reason:
 
 ## Changes
 
 -
 -
 
-## Scheduler safety review
+## Kernel safety review
 
-- [ ] Lifecycle transitions are valid (NEW -> READY -> RUNNING -> SLEEPING -> READY, READY -> RUNNING -> ZOMBIE, RUNNING -> STOPPED -> READY, ANY -> ZOMBIE -> REAPED)
-- [ ] Zombies are eventually reaped
-- [ ] Orphans are adopted by PID 1
-- [ ] PID reuse is safe
-- [ ] Lock ordering and concurrency model documented
+- [ ] No unnecessary `unsafe`
+- [ ] Every `unsafe` block documents invariants
+- [ ] Lock ordering documented
 - [ ] Interrupt-context safety considered
-- [ ] Lost-wakeup prevention verified
-- [ ] Double-reap and double-switch prevented
-- [ ] Resource limits and run-queue capacity enforced
-- [ ] No unbounded allocation or recursion
+- [ ] Allocation limits defined
+- [ ] OOM behavior defined
+- [ ] Error paths tested
+- [ ] No silent failure introduced
 
-## Verification
+## Evidence
 
-```bash
-cargo check --lib
-cargo test --lib
-./run_sigma_tests.sh
-```
+- [ ] `cargo check --lib`
+- [ ] `cargo fmt --check`
+- [ ] `cargo test --lib`
+- [ ] `./run_sigma_tests.sh`
+- [ ] New/updated unit tests
+- [ ] Integration tests
+- [ ] Fuzz target or reason for exemption
+- [ ] QEMU boot evidence, if boot-affecting
+- [ ] Driver/hardware evidence, if driver-affecting
+- [ ] Security review requested, if applicable
 
-## Runtime evidence
+## Status updates
 
-- [ ] QEMU boot-to-shell log
-- [ ] Scheduler test / benchmark report
-- [ ] Artifact hash
+- [ ] `FEATURE_STATUS.toml`
+- [ ] `CAPABILITY_MATRIX.toml`
+- [ ] Component documentation
+- [ ] Boot matrix, if applicable
+- [ ] Hardware matrix, if applicable
 
-## Safety and rollback
+## Risks and rollback
 
-- [ ] No broad credentials or host access introduced
-- [ ] Untrusted input validated
-- [ ] Rollback/recovery behavior defined
-- [ ] Security review completed, if applicable
+- Risk:
+- Rollback:
