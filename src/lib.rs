@@ -148,6 +148,7 @@ pub use distro::omarchy_linux_gap_closure_pr_suite::*;
 pub use distro::cachy_linux_missing_components_v56_pr::*;
 pub use distro::omarchy_linux_missing_components_v52_pr::*;
 pub use distro::omarchy_linux_missing_components_v57_pr::*;
+pub use distro::omarchy_linux_missing_components_v58_pr::*;
 pub use distro::open_source_os_missing_components_v54_pr::*;
 pub use distro::open_source_os_missing_components_v57_pr::*;
 pub use distro::omarchy_omakase_ultimate_parity::*;
