@@ -625,6 +625,9 @@ pub use bootable_vertical_slices_missing_components_pr::*;
 pub mod repeatable_agent_operating_loop_pr;
 pub use repeatable_agent_operating_loop_pr::*;
 
+pub mod distro_maintainer_operating_model_pr;
+pub use distro_maintainer_operating_model_pr::*;
+
 pub mod sovereign_open_source_os_apex_inspirations_v50;
 pub use sovereign_open_source_os_apex_inspirations_v50::{FlakeInput as ApexFlakeInput, *};
 
