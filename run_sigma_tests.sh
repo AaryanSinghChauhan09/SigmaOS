@@ -250,6 +250,20 @@ if [ -f "src/distro/sovereign_linux_bsd_all_subsystems_harmony.rs" ]; then
     ./build/test_subsystem_harmony
 fi
 
+if [ -f "src/distro/sovereign_linux_bsd_lfs_master_harmony.rs" ]; then
+    echo "Running Sovereign Linux & BSD LFS Master Harmony test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_linux_bsd_lfs_master_harmony.rs --edition=2021 -o build/test_lfs_harmony
+    ./build/test_lfs_harmony
+fi
+
+if [ -f "src/distro/sovereign_lfs_bsd_pr_gateway.rs" ]; then
+    echo "Running Sovereign LFS & BSD PR Gateway test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_lfs_bsd_pr_gateway.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_lfs_gateway
+    ./build/test_lfs_gateway
+fi
+
 
 if [ -f "src/distro/sovereign_linux_bsd_distro_next_gen_innovations.rs" ]; then
     echo "Running Next-Gen Sovereign Linux & BSD Distro Innovations test suite..."
