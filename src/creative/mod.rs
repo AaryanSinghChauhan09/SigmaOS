@@ -20,6 +20,8 @@ pub mod model3d;
 pub mod cadcraft;
 pub mod artcraft;
 pub mod deckcraft;
+pub mod gridcraft;
+pub mod gridcraft_missing_components_parity_pr;
 
 pub use photocraft::{
     PhotoEditor, ImageLayer, Filter, Adjustment, LayerType, LayerMask, AdjustmentType,
@@ -155,4 +157,18 @@ pub use deckcraft::{
     DeckCraftSlideLayoutMasterPrDeployer, DeckCraftAnimationTransitionPrDeployer,
     DeckCraftPresenterZenithPrDeployer, DeckCraftMasterPrDeploymentSuite,
     init_deckcraft, get_deckcraft, fnv1a_deckcraft_pr_digest,
+};
+pub use gridcraft::{
+    GridcraftPrPullRequestSpec, CellValue, NumberFormat, CellFormat, GridCell,
+    FormulaEngine, Worksheet, Workbook, AggregationType, PivotFieldOrientation,
+    PivotTable, PivotTableEngine, ChartType, Chart, DataVisualizationEngine,
+    GridcraftFormulaSpreadsheetPrDeployer, GridcraftPivotTableAnalyticsPrDeployer,
+    GridcraftChartVisualizationPrDeployer, GridcraftMasterPrDeploymentSuite,
+    GridcraftEngine, init_gridcraft, get_gridcraft,
+};
+pub use gridcraft_missing_components_parity_pr::{
+    GridcraftPrProposalManifest, GridcraftAdvancedFormulaXlookupPrEngine,
+    GridcraftDataValidationConditionalFormattingPrEngine, GridcraftRealtimeDataStreamSpillArrayPrEngine,
+    GridcraftFinancialGoalSeekSolverPrEngine, GridcraftMultiUserCrdtCollabPrEngine,
+    GridcraftMacroScriptingUdfPrEngine, SovereignGridcraftArtcraftParityPrGateway,
 };
