@@ -1414,6 +1414,14 @@ if [ -f "src/community/sovereign_documentation_consolidation_pr_engine.rs" ]; th
     ./build/test_sovereign_documentation_consolidation_pr_engine
 fi
 
-echo "All SigmaOS test suites completed."
+if [ -f "tests/scheduler/core.rs" ]; then
+    echo "Running Process Scheduler Core & Lifecycle test suite..."
+    mkdir -p build
+    rustc --test tests/scheduler/core.rs --edition=2021 -o build/test_sched_core && ./build/test_sched_core
+    rustc --test tests/scheduler/context_switch/context_switch_test.rs --edition=2021 -o build/test_sched_context_switch && ./build/test_sched_context_switch
+    rustc --test tests/scheduler/preemption/preemption_test.rs --edition=2021 -o build/test_sched_preemption && ./build/test_sched_preemption
+    rustc --test tests/scheduler/fairness/fairness_test.rs --edition=2021 -o build/test_sched_fairness && ./build/test_sched_fairness
+    rustc --test tests/scheduler/affinity/affinity_test.rs --edition=2021 -o build/test_sched_affinity && ./build/test_sched_affinity
+fi
 
 echo "All SigmaOS test suites completed."

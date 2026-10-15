@@ -1,7 +1,8 @@
-// SigmaOS Scheduler Module
-// eBPF-based scheduling system & CPU affinity manager
+// SigmaOS Scheduler Subsystem
+// Bounded multi-level priority queue scheduler, eBPF-based scheduling & CPU affinity manager
 
 pub mod affinity;
+pub mod core;
 pub mod cpuidle;
 pub mod distro_schedulers;
 pub mod ebpf_scheduler;
@@ -11,10 +12,17 @@ pub mod numa_balancer;
 pub mod numa_scheduler;
 pub mod preempt_rt;
 pub mod process;
+pub mod run_queue;
 pub mod sched_deadline;
 pub mod scheduler;
 pub mod schedutil;
 pub mod sovereign;
+
+pub use core::{
+    ProcessState, SchedulerCore, SchedulerError, SchedulerProcessControlBlock,
+    DEFAULT_STARVATION_THRESHOLD_TICKS, MAX_PROCESS_TABLE_SIZE,
+};
+pub use run_queue::{BoundedRunQueue, RunQueueError, TaskRunRef, MAX_RUNQUEUE_CAPACITY, NUM_PRIORITY_LEVELS};
 
 pub use cpuidle::{CState, CpuIdleGovernor};
 pub use numa_balancer::{NumaLoadBalancer, NumaNodeStats, NumaTask};

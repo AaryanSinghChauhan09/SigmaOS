@@ -343,7 +343,7 @@ impl SchedulerCore {
     /// Advance kernel timer tick and perform starvation boosting.
     pub fn timer_tick(&mut self) {
         self.current_tick += 1;
-        for rq in self.run_queues.iter_mut() {
+        for rq in &mut self.run_queues {
             rq.boost_starved_tasks(self.current_tick, self.starvation_threshold_ticks);
         }
     }
