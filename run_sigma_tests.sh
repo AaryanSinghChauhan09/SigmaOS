@@ -370,6 +370,13 @@ if [ -f "src/diagnostics/sovereign_logging_monitoring_diagnostics_v2.rs" ]; then
     ./build/sovereign_logging_monitoring_diagnostics_v2_test
 fi
 
+if [ -f "src/diagnostics/sovereign_logging_monitoring_diagnostics_v3.rs" ]; then
+    echo "Running Sovereign Linux & BSD Logging, Monitoring, and Diagnostics V3 test suite..."
+    mkdir -p build
+    rustc --test src/diagnostics/sovereign_logging_monitoring_diagnostics_v3.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_logging_monitoring_diagnostics_v3_test
+    ./build/sovereign_logging_monitoring_diagnostics_v3_test
+fi
+
 if [ -f "src/kernel/panic_handler.rs" ]; then
     echo "Running Sovereign Kernel Panic & Crash Dump Subsystem test suite..."
     mkdir -p build
