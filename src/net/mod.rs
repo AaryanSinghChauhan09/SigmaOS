@@ -90,5 +90,5 @@ pub use pf_firewall::{
     PfRule as PfFirewallRule, PfStateEntry as PfFirewallStateEntry, PfStats, PfTable,
 };
 
-pub mod sovereign_network_development_and_pr_suite;
-pub use sovereign_network_development_and_pr_suite::*;
+pub mod sovereign_networking_stack_and_daemons_pr;
+pub use sovereign_networking_stack_and_daemons_pr::*;
