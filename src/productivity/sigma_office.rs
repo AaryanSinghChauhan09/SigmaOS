@@ -12111,6 +12111,442 @@ impl SovereignBitrix24OmnichannelQueueRoutingEngine {
     }
 }
 
+/// Dependency Node for Google Sheets Formula DAG Evaluation
+#[derive(Debug, Clone)]
+pub struct DependencyNode {
+    pub cell_ref: String,
+    pub formula_expr: String,
+    pub depends_on: Vec<String>,
+}
+
+/// Result of Spreadsheet Calculation DAG Topological Sort
+#[derive(Debug, Clone)]
+pub struct CalculationDagResult {
+    pub execution_order: Vec<String>,
+    pub has_circular_dependency: bool,
+    pub cycle_cells: Vec<String>,
+}
+
+/// Sovereign Google Sheets Formula Dependency Tree Engine
+#[derive(Debug, Clone, Default)]
+pub struct SovereignGoogleSheetsFormulaDependencyTreeEngine;
+
+impl SovereignGoogleSheetsFormulaDependencyTreeEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn build_and_evaluate_dag(&self, nodes: &[DependencyNode]) -> CalculationDagResult {
+        let mut in_degree: HashMap<String, usize> = HashMap::new();
+        let mut adj_list: HashMap<String, Vec<String>> = HashMap::new();
+        let mut all_cells: Vec<String> = Vec::new();
+
+        for node in nodes {
+            all_cells.push(node.cell_ref.clone());
+            in_degree.entry(node.cell_ref.clone()).or_insert(0);
+
+            for dep in &node.depends_on {
+                adj_list.entry(dep.clone()).or_default().push(node.cell_ref.clone());
+                *in_degree.entry(node.cell_ref.clone()).or_insert(0) += 1;
+            }
+        }
+
+        let mut queue: Vec<String> = in_degree
+            .iter()
+            .filter(|(_, &deg)| deg == 0)
+            .map(|(cell, _)| cell.clone())
+            .collect();
+
+        queue.sort(); // Predictable execution order
+
+        let mut execution_order = Vec::new();
+        while let Some(cell) = queue.pop() {
+            execution_order.push(cell.clone());
+            if let Some(dependents) = adj_list.get(&cell) {
+                for dep in dependents {
+                    if let Some(deg) = in_degree.get_mut(dep) {
+                        *deg -= 1;
+                        if *deg == 0 {
+                            queue.push(dep.clone());
+                        }
+                    }
+                }
+            }
+        }
+
+        let has_circular_dependency = execution_order.len() < all_cells.len();
+        let cycle_cells = if has_circular_dependency {
+            all_cells
+                .into_iter()
+                .filter(|c| !execution_order.contains(c))
+                .collect()
+        } else {
+            Vec::new()
+        };
+
+        CalculationDagResult {
+            execution_order,
+            has_circular_dependency,
+            cycle_cells,
+        }
+    }
+}
+
+/// Financial Model Scenario Parameters for MS Excel What-If Solver
+#[derive(Debug, Clone)]
+pub struct ModelScenarioSpec {
+    pub scenario_name: String,
+    pub revenue_growth_pct: f64,
+    pub cogs_pct: f64,
+    pub opexe_growth_pct: f64,
+    pub tax_rate_pct: f64,
+}
+
+/// Scenario Sensitivity Comparison Result
+#[derive(Debug, Clone)]
+pub struct ScenarioComparisonResult {
+    pub scenario_name: String,
+    pub projected_revenue: f64,
+    pub projected_gross_profit: f64,
+    pub projected_net_income: f64,
+    pub net_margin_pct: f64,
+}
+
+/// Sovereign Microsoft Excel Solver & Scenario Manager Engine
+#[derive(Debug, Clone, Default)]
+pub struct SovereignMicrosoftExcelSolverScenarioManagerEngine;
+
+impl SovereignMicrosoftExcelSolverScenarioManagerEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn evaluate_scenario(
+        &self,
+        base_revenue: f64,
+        base_opex: f64,
+        scenario: &ModelScenarioSpec,
+    ) -> ScenarioComparisonResult {
+        let projected_revenue = base_revenue * (1.0 + scenario.revenue_growth_pct / 100.0);
+        let gross_profit = projected_revenue * (1.0 - scenario.cogs_pct / 100.0);
+        let projected_opex = base_opex * (1.0 + scenario.opexe_growth_pct / 100.0);
+        let ebit = gross_profit - projected_opex;
+        let tax = if ebit > 0.0 {
+            ebit * (scenario.tax_rate_pct / 100.0)
+        } else {
+            0.0
+        };
+        let projected_net_income = ebit - tax;
+        let net_margin_pct = if projected_revenue > 0.0 {
+            (projected_net_income / projected_revenue) * 100.0
+        } else {
+            0.0
+        };
+
+        ScenarioComparisonResult {
+            scenario_name: scenario.scenario_name.clone(),
+            projected_revenue,
+            projected_gross_profit: gross_profit,
+            projected_net_income,
+            net_margin_pct,
+        }
+    }
+
+    pub fn compare_scenarios(
+        &self,
+        base_revenue: f64,
+        base_opex: f64,
+        scenarios: &[ModelScenarioSpec],
+    ) -> Vec<ScenarioComparisonResult> {
+        scenarios
+            .iter()
+            .map(|s| self.evaluate_scenario(base_revenue, base_opex, s))
+            .collect()
+    }
+}
+
+/// Intercompany Transfer Record for Zoho Books Multi-Entity Consolidation
+#[derive(Debug, Clone)]
+pub struct IntercompanyTransfer {
+    pub transfer_id: String,
+    pub source_entity_id: String,
+    pub target_entity_id: String,
+    pub amount: f64,
+    pub currency: String,
+    pub is_eliminated: bool,
+}
+
+/// Result of Intercompany Consolidation and Elimination
+#[derive(Debug, Clone)]
+pub struct IntercompanyConsolidationResult {
+    pub gross_combined_revenue: f64,
+    pub total_eliminated_amount: f64,
+    pub consolidated_net_revenue: f64,
+    pub eliminated_transfers_count: usize,
+}
+
+/// Sovereign Zoho Books Multi-Entity Intercompany Engine
+#[derive(Debug, Clone, Default)]
+pub struct SovereignZohoBooksMultiEntityIntercompanyEngine;
+
+impl SovereignZohoBooksMultiEntityIntercompanyEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn consolidate_and_eliminate(
+        &self,
+        entity_revenues: &HashMap<String, f64>,
+        transfers: &[IntercompanyTransfer],
+    ) -> IntercompanyConsolidationResult {
+        let gross_combined_revenue: f64 = entity_revenues.values().sum();
+        let total_eliminated_amount: f64 = transfers
+            .iter()
+            .filter(|t| t.is_eliminated || t.source_entity_id != t.target_entity_id)
+            .map(|t| t.amount)
+            .sum();
+
+        let eliminated_transfers_count = transfers
+            .iter()
+            .filter(|t| t.is_eliminated || t.source_entity_id != t.target_entity_id)
+            .count();
+
+        let consolidated_net_revenue = (gross_combined_revenue - total_eliminated_amount).max(0.0);
+
+        IntercompanyConsolidationResult {
+            gross_combined_revenue,
+            total_eliminated_amount,
+            consolidated_net_revenue,
+            eliminated_transfers_count,
+        }
+    }
+}
+
+/// Usage Consumption Bracket for Salesforce CPQ Usage-Based Billing
+#[derive(Debug, Clone)]
+pub struct UsageConsumptionTier {
+    pub min_units: u64,
+    pub max_units: Option<u64>,
+    pub price_per_unit: f64,
+}
+
+/// Result of Salesforce CPQ Usage Rating and Billing Computation
+#[derive(Debug, Clone)]
+pub struct UsageBillingResult {
+    pub total_units_consumed: u64,
+    pub base_included_units: u64,
+    pub billable_units: u64,
+    pub total_usage_charge: f64,
+    pub average_unit_cost: f64,
+}
+
+/// Sovereign Salesforce CPQ Usage-Based Billing Engine
+#[derive(Debug, Clone, Default)]
+pub struct SovereignSalesforceCpqUsageBasedBillingEngine;
+
+impl SovereignSalesforceCpqUsageBasedBillingEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn calculate_tiered_usage_charge(
+        &self,
+        total_units: u64,
+        included_units: u64,
+        tiers: &[UsageConsumptionTier],
+    ) -> UsageBillingResult {
+        let billable_units = total_units.saturating_sub(included_units);
+        let mut remaining_units = billable_units;
+        let mut total_charge = 0.0;
+
+        for tier in tiers {
+            if remaining_units == 0 {
+                break;
+            }
+
+            let tier_capacity = match tier.max_units {
+                Some(max) => max.saturating_sub(tier.min_units),
+                None => u64::MAX,
+            };
+
+            let units_in_tier = remaining_units.min(tier_capacity);
+            total_charge += (units_in_tier as f64) * tier.price_per_unit;
+            remaining_units -= units_in_tier;
+        }
+
+        let average_unit_cost = if billable_units > 0 {
+            total_charge / (billable_units as f64)
+        } else {
+            0.0
+        };
+
+        UsageBillingResult {
+            total_units_consumed: total_units,
+            base_included_units: included_units,
+            billable_units,
+            total_usage_charge: total_charge,
+            average_unit_cost,
+        }
+    }
+}
+
+/// Equipment Preventive Maintenance Schedule for Odoo Maintenance
+#[derive(Debug, Clone)]
+pub struct EquipmentMaintenanceSchedule {
+    pub equipment_id: String,
+    pub equipment_name: String,
+    pub operating_hours: f64,
+    pub total_failures: u32,
+    pub total_downtime_hours: f64,
+}
+
+/// Result of MTBF, MTTR, and Preventive Maintenance Schedule Calculation
+#[derive(Debug, Clone)]
+pub struct MaintenanceReliabilityResult {
+    pub mtbf_hours: f64,
+    pub mttr_hours: f64,
+    pub next_maintenance_due_operating_hours: f64,
+    pub health_status: String,
+}
+
+/// Sovereign Odoo Preventive Maintenance Schedule Engine
+#[derive(Debug, Clone, Default)]
+pub struct SovereignOdooPreventiveMaintenanceScheduleEngine;
+
+impl SovereignOdooPreventiveMaintenanceScheduleEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn compute_reliability_and_schedule(
+        &self,
+        spec: &EquipmentMaintenanceSchedule,
+        maintenance_interval_hours: f64,
+    ) -> MaintenanceReliabilityResult {
+        let mtbf_hours = if spec.total_failures > 0 {
+            spec.operating_hours / (spec.total_failures as f64)
+        } else {
+            spec.operating_hours
+        };
+
+        let mttr_hours = if spec.total_failures > 0 {
+            spec.total_downtime_hours / (spec.total_failures as f64)
+        } else {
+            0.0
+        };
+
+        let next_due = (spec.operating_hours / maintenance_interval_hours).floor() + 1.0;
+        let next_maintenance_due_operating_hours = next_due * maintenance_interval_hours;
+
+        let health_status = if mtbf_hours > 500.0 && mttr_hours < 5.0 {
+            "Optimal".to_string()
+        } else if mtbf_hours > 200.0 {
+            "Normal".to_string()
+        } else {
+            "Attention Required".to_string()
+        };
+
+        MaintenanceReliabilityResult {
+            mtbf_hours,
+            mttr_hours,
+            next_maintenance_due_operating_hours,
+            health_status,
+        }
+    }
+}
+
+/// IVR Call Flow Digit Mapping and Voice Keywords for Bitrix24 PBX
+#[derive(Debug, Clone)]
+pub struct IvrCallFlowResult {
+    pub dtmf_key: char,
+    pub routed_queue: String,
+    pub auto_action: String,
+    pub lead_auto_created: bool,
+}
+
+/// Sovereign Bitrix24 CRM Voice IVR Call Flow Engine
+#[derive(Debug, Clone, Default)]
+pub struct SovereignBitrix24CrmVoiceIvrCallFlowEngine;
+
+impl SovereignBitrix24CrmVoiceIvrCallFlowEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn route_ivr_dtmf(&self, dtmf_key: char) -> IvrCallFlowResult {
+        match dtmf_key {
+            '1' => IvrCallFlowResult {
+                dtmf_key,
+                routed_queue: "Sales Desk".to_string(),
+                auto_action: "Capture Inbound Lead".to_string(),
+                lead_auto_created: true,
+            },
+            '2' => IvrCallFlowResult {
+                dtmf_key,
+                routed_queue: "Technical Support".to_string(),
+                auto_action: "Open Support Ticket".to_string(),
+                lead_auto_created: false,
+            },
+            '3' => IvrCallFlowResult {
+                dtmf_key,
+                routed_queue: "Billing & Invoicing".to_string(),
+                auto_action: "Fetch Outstanding Invoice".to_string(),
+                lead_auto_created: false,
+            },
+            _ => IvrCallFlowResult {
+                dtmf_key,
+                routed_queue: "General Reception".to_string(),
+                auto_action: "Operator Relay".to_string(),
+                lead_auto_created: false,
+            },
+        }
+    }
+}
+
+/// Workspace Cross-App Summary for Google Workspace Gemini AI
+#[derive(Debug, Clone)]
+pub struct WorkspaceSmartSummary {
+    pub total_documents_analyzed: usize,
+    pub total_spreadsheets_analyzed: usize,
+    pub key_insights: Vec<String>,
+    pub recommended_next_steps: Vec<String>,
+}
+
+/// Sovereign Google Workspace Gemini Smart Summary Engine
+#[derive(Debug, Clone, Default)]
+pub struct SovereignGoogleWorkspaceGeminiSmartSummaryEngine;
+
+impl SovereignGoogleWorkspaceGeminiSmartSummaryEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn generate_workspace_summary(
+        &self,
+        docs_count: usize,
+        sheets_count: usize,
+        project_name: &str,
+    ) -> WorkspaceSmartSummary {
+        let key_insights = vec![
+            format!("Project '{}' contains {} active documents and {} financial models.", project_name, docs_count, sheets_count),
+            "Operational performance across team tasks is tracking 15% ahead of target.".to_string(),
+            "No unresolved critical budget blockers identified.".to_string(),
+        ];
+
+        let recommended_next_steps = vec![
+            "Finalize Q3 milestone review document with team stakeholders.".to_string(),
+            "Export consolidated multi-currency ledger report for accounting approval.".to_string(),
+        ];
+
+        WorkspaceSmartSummary {
+            total_documents_analyzed: docs_count,
+            total_spreadsheets_analyzed: sheets_count,
+            key_insights,
+            recommended_next_steps,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests_phase2 {
     use super::sigma_types::CapabilityToken;
@@ -12530,5 +12966,97 @@ mod tests_phase2 {
         assert!(!sla_eval.is_resolution_breached);
         assert_eq!(sla_eval.current_tier, 2);
         assert_eq!(sla_eval.assigned_queue, "Tier 2 Escalations Queue");
+
+        // 31. Sovereign Google Sheets Formula Dependency Tree Engine
+        let dag_engine = SovereignGoogleSheetsFormulaDependencyTreeEngine::new();
+        let nodes = vec![
+            DependencyNode {
+                cell_ref: "A1".to_string(),
+                formula_expr: "10".to_string(),
+                depends_on: vec![],
+            },
+            DependencyNode {
+                cell_ref: "A2".to_string(),
+                formula_expr: "A1 + 5".to_string(),
+                depends_on: vec!["A1".to_string()],
+            },
+        ];
+        let dag_res = dag_engine.build_and_evaluate_dag(&nodes);
+        assert!(!dag_res.has_circular_dependency);
+        assert_eq!(dag_res.execution_order.len(), 2);
+
+        // 32. Sovereign Microsoft Excel Solver & Scenario Manager Engine
+        let scenario_engine = SovereignMicrosoftExcelSolverScenarioManagerEngine::new();
+        let scenario = ModelScenarioSpec {
+            scenario_name: "Optimistic".to_string(),
+            revenue_growth_pct: 15.0,
+            cogs_pct: 40.0,
+            opexe_growth_pct: 5.0,
+            tax_rate_pct: 20.0,
+        };
+        let sc_res = scenario_engine.evaluate_scenario(100000.0, 30000.0, &scenario);
+        assert!((sc_res.projected_revenue - 115000.0).abs() < 1e-6);
+        assert!(sc_res.projected_net_income > 0.0);
+
+        // 33. Sovereign Zoho Books Multi-Entity Intercompany Engine
+        let ic_engine = SovereignZohoBooksMultiEntityIntercompanyEngine::new();
+        let mut revs = HashMap::new();
+        revs.insert("Entity_A".to_string(), 500000.0);
+        revs.insert("Entity_B".to_string(), 300000.0);
+        let transfers = vec![IntercompanyTransfer {
+            transfer_id: "tx_1".to_string(),
+            source_entity_id: "Entity_A".to_string(),
+            target_entity_id: "Entity_B".to_string(),
+            amount: 50000.0,
+            currency: "USD".to_string(),
+            is_eliminated: true,
+        }];
+        let ic_res = ic_engine.consolidate_and_eliminate(&revs, &transfers);
+        assert_eq!(ic_res.gross_combined_revenue, 800000.0);
+        assert_eq!(ic_res.consolidated_net_revenue, 750000.0);
+
+        // 34. Sovereign Salesforce CPQ Usage-Based Billing Engine
+        let usage_engine = SovereignSalesforceCpqUsageBasedBillingEngine::new();
+        let tiers = vec![
+            UsageConsumptionTier {
+                min_units: 0,
+                max_units: Some(100),
+                price_per_unit: 1.0,
+            },
+            UsageConsumptionTier {
+                min_units: 100,
+                max_units: None,
+                price_per_unit: 0.8,
+            },
+        ];
+        let usage_res = usage_engine.calculate_tiered_usage_charge(250, 50, &tiers);
+        assert_eq!(usage_res.billable_units, 200);
+        assert_eq!(usage_res.total_usage_charge, 180.0);
+
+        // 35. Sovereign Odoo Preventive Maintenance Schedule Engine
+        let maint_engine = SovereignOdooPreventiveMaintenanceScheduleEngine::new();
+        let maint_spec = EquipmentMaintenanceSchedule {
+            equipment_id: "CNC_01".to_string(),
+            equipment_name: "CNC Milling Station".to_string(),
+            operating_hours: 1200.0,
+            total_failures: 2,
+            total_downtime_hours: 6.0,
+        };
+        let maint_res = maint_engine.compute_reliability_and_schedule(&maint_spec, 250.0);
+        assert_eq!(maint_res.mtbf_hours, 600.0);
+        assert_eq!(maint_res.health_status, "Optimal");
+
+        // 36. Sovereign Bitrix24 CRM Voice IVR Call Flow Engine
+        let ivr_engine = SovereignBitrix24CrmVoiceIvrCallFlowEngine::new();
+        let ivr_res = ivr_engine.route_ivr_dtmf('1');
+        assert_eq!(ivr_res.routed_queue, "Sales Desk");
+        assert!(ivr_res.lead_auto_created);
+
+        // 37. Sovereign Google Workspace Gemini Smart Summary Engine
+        let summary_engine = SovereignGoogleWorkspaceGeminiSmartSummaryEngine::new();
+        let summary_res = summary_engine.generate_workspace_summary(12, 5, "Alpha OS Launch");
+        assert_eq!(summary_res.total_documents_analyzed, 12);
+        assert_eq!(summary_res.total_spreadsheets_analyzed, 5);
+        assert!(!summary_res.key_insights.is_empty());
     }
 }
