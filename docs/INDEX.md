@@ -6,7 +6,8 @@ Welcome to the SigmaOS Architecture and Subsystem Development Master Index. This
 
 ## Architectural & Development Plans (`docs/`)
 
-- [Process Manager Plan](PROCESS_MANAGER_PLAN.md) - Master Architecture, 18-PR sequence roadmap, process & service lifecycle contracts, subreaper adoption, and restart bounds.
+- [Signal Handler Architecture & Development Plan](SIGNAL_HANDLER_PLAN.md) - POSIX.1-2024 signal handler architecture, required safety rules, 18-PR roadmap, x86_64 frame & sigreturn validation rules, periodic maintenance schedule, and merge gates.
+- [Signal Path Audit & ABI Profile](SIGNAL_HANDLER_AUDIT_AND_ABI_PROFILE.md) - Subsystem component audit, POSIX signal numbers and default actions, data structure ABI layouts, and x86_64 user frame layout.
 - [System Utilities Development Plan](SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md) - Baseline rules, POSIX compatibility, 18-PR roadmap, component rules, periodic maintenance framework, and merge gates.
 - [Filesystem & Storage Parity Proposal](PR_PROPOSAL_FILESYSTEMS_AND_STORAGE_PARITY.md) - Multi-tiered storage engines, zswap writeback cache, and OverlayFS mount simulation.
 - [Toolchain & Development Ecosystem Proposal](PR_PROPOSAL_TOOLCHAIN_AND_DEVELOPMENT_PARITY.md) - Zero-dependency toolchain engines, compilers, build orchestration, and dynamic tracing.
@@ -15,7 +16,8 @@ Welcome to the SigmaOS Architecture and Subsystem Development Master Index. This
 
 ## Core Wiki Subsystem Guides (`wiki/`)
 
-- [Process Synchronization Plan](../wiki/PROCESS_SYNCHRONIZATION_PLAN.md)
+- [Signal Handler Plan](../wiki/SIGNAL_HANDLER_PLAN.md)
+- [Signal Path Audit & ABI Profile](../wiki/SIGNAL_HANDLER_AUDIT_AND_ABI_PROFILE.md)
 - [System Utilities Plan](../wiki/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md)
 - [Architectural Pillars](../wiki/Architectural-Pillars-Components.md)
 - [Kernel Functions & ABI](../wiki/Kernel-Functions-and-ABI-Components.md)
