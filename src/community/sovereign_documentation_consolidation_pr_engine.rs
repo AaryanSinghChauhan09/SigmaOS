@@ -4,6 +4,8 @@
 // to consolidate Man pages, Info pages, /usr/share/doc, and Wiki/Handbooks into GitHub Wiki PR format.
 
 use std::collections::BTreeMap;
+use std::fs;
+use std::path::Path;
 
 /// Section category for traditional Unix/BSD/Linux man pages
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -110,6 +112,50 @@ impl SovereignManPagesConsolidationEngine {
             bsd_linux_source: "OpenBSD ksh(1) & GNU bash(1)".to_string(),
         });
 
+        self.register_page(SovereignManPage {
+            title: "sigma-ctl".to_string(),
+            section: ManSection::UserCommands,
+            synopsis: "sigma-ctl [COMMAND] [TARGET]".to_string(),
+            description: "System control utility for service supervision, target state changes, and unit inspection.".to_string(),
+            options: {
+                let mut opts = BTreeMap::new();
+                opts.insert("status".to_string(), "Query runtime status of service unit".to_string());
+                opts.insert("restart".to_string(), "Restart specified system daemon".to_string());
+                opts
+            },
+            see_also: vec!["systemctl(1)".to_string(), "rcctl(8)".to_string()],
+            bsd_linux_source: "systemd systemctl & OpenBSD rcctl(8)".to_string(),
+        });
+
+        self.register_page(SovereignManPage {
+            title: "sigma-top".to_string(),
+            section: ManSection::UserCommands,
+            synopsis: "sigma-top [-d DELAY] [-p PID]".to_string(),
+            description: "Interactive real-time process monitor with Cgroup v2 PSI metrics and per-CPU breakdown.".to_string(),
+            options: {
+                let mut opts = BTreeMap::new();
+                opts.insert("-d".to_string(), "Update delay interval in seconds".to_string());
+                opts.insert("-p".to_string(), "Filter inspection to specific process ID".to_string());
+                opts
+            },
+            see_also: vec!["htop(1)".to_string(), "top(1)".to_string()],
+            bsd_linux_source: "Linux htop(1) & FreeBSD top(1)".to_string(),
+        });
+
+        self.register_page(SovereignManPage {
+            title: "sigma-fetch".to_string(),
+            section: ManSection::UserCommands,
+            synopsis: "sigma-fetch [--json]".to_string(),
+            description: "Fast system information generator detailing kernel version, uptime, microarchitecture, and memory usage.".to_string(),
+            options: {
+                let mut opts = BTreeMap::new();
+                opts.insert("--json".to_string(), "Output system telemetry in JSON format".to_string());
+                opts
+            },
+            see_also: vec!["fastfetch(1)".to_string(), "neofetch(1)".to_string()],
+            bsd_linux_source: "Omarchy Fastfetch & Arch Linux custom tools".to_string(),
+        });
+
         // Section 2 - System Calls
         self.register_page(SovereignManPage {
             title: "pledge".to_string(),
@@ -119,6 +165,26 @@ impl SovereignManPagesConsolidationEngine {
             options: BTreeMap::new(),
             see_also: vec!["unveil(2)".to_string(), "seccomp(2)".to_string(), "landlock(7)".to_string()],
             bsd_linux_source: "OpenBSD pledge(2)".to_string(),
+        });
+
+        self.register_page(SovereignManPage {
+            title: "unveil".to_string(),
+            section: ManSection::SystemCalls,
+            synopsis: "int unveil(const char *path, const char *permissions);".to_string(),
+            description: "Restricts filesystem visibility for the calling process to explicit path subsets.".to_string(),
+            options: BTreeMap::new(),
+            see_also: vec!["pledge(2)".to_string(), "landlock(7)".to_string()],
+            bsd_linux_source: "OpenBSD unveil(2)".to_string(),
+        });
+
+        self.register_page(SovereignManPage {
+            title: "seccomp".to_string(),
+            section: ManSection::SystemCalls,
+            synopsis: "int seccomp(unsigned int operation, unsigned int flags, void *args);".to_string(),
+            description: "Linux Seccomp-BPF system call filtering mechanism for sandboxing isolated processes.".to_string(),
+            options: BTreeMap::new(),
+            see_also: vec!["pledge(2)".to_string(), "bpf(4)".to_string()],
+            bsd_linux_source: "Linux seccomp(2)".to_string(),
         });
 
         // Section 3 - Library Functions
@@ -132,6 +198,16 @@ impl SovereignManPagesConsolidationEngine {
             bsd_linux_source: "FreeBSD Capsicum cap_rights_limit(3)".to_string(),
         });
 
+        self.register_page(SovereignManPage {
+            title: "gettext".to_string(),
+            section: ManSection::LibraryFunctions,
+            synopsis: "char *gettext(const char *msgid);".to_string(),
+            description: "Looks up localized message strings in standard message catalogs.".to_string(),
+            options: BTreeMap::new(),
+            see_also: vec!["catgets(3)".to_string(), "ngettext(3)".to_string()],
+            bsd_linux_source: "GNU gettext(3) & FreeBSD catgets(3)".to_string(),
+        });
+
         // Section 4 - Special Files
         self.register_page(SovereignManPage {
             title: "bpf".to_string(),
@@ -141,6 +217,16 @@ impl SovereignManPagesConsolidationEngine {
             options: BTreeMap::new(),
             see_also: vec!["pcap(3)".to_string(), "netintro(4)".to_string()],
             bsd_linux_source: "FreeBSD & OpenBSD bpf(4)".to_string(),
+        });
+
+        self.register_page(SovereignManPage {
+            title: "zfs".to_string(),
+            section: ManSection::SpecialFiles,
+            synopsis: "/dev/zfs".to_string(),
+            description: "OpenZFS control device providing pool management, datasets, and snapshot transactions.".to_string(),
+            options: BTreeMap::new(),
+            see_also: vec!["zpool(8)".to_string(), "bectl(8)".to_string()],
+            bsd_linux_source: "OpenZFS / FreeBSD zfs(4)".to_string(),
         });
 
         // Section 5 - File Formats
@@ -154,6 +240,27 @@ impl SovereignManPagesConsolidationEngine {
             bsd_linux_source: "POSIX & NetBSD fstab(5)".to_string(),
         });
 
+        self.register_page(SovereignManPage {
+            title: "pacman.conf".to_string(),
+            section: ManSection::FileFormats,
+            synopsis: "/etc/pacman.conf".to_string(),
+            description: "Package manager configuration file specifying repositories, mirrors, and signature verification options.".to_string(),
+            options: BTreeMap::new(),
+            see_also: vec!["sigma-pkg(8)".to_string(), "pkg.conf(5)".to_string()],
+            bsd_linux_source: "Arch Linux pacman.conf(5)".to_string(),
+        });
+
+        // Section 6 - Games
+        self.register_page(SovereignManPage {
+            title: "sigma-quest".to_string(),
+            section: ManSection::Games,
+            synopsis: "sigma-quest".to_string(),
+            description: "Ncurses terminal adventure game demonstrating kernel syscall and audio subsystem features.".to_string(),
+            options: BTreeMap::new(),
+            see_also: vec!["ncurses(3)".to_string()],
+            bsd_linux_source: "BSD Games tradition (rogue/hack)".to_string(),
+        });
+
         // Section 7 - Miscellaneous
         self.register_page(SovereignManPage {
             title: "cgroups".to_string(),
@@ -163,6 +270,16 @@ impl SovereignManPagesConsolidationEngine {
             options: BTreeMap::new(),
             see_also: vec!["systemd(1)".to_string(), "landlock(7)".to_string()],
             bsd_linux_source: "Linux kernel cgroups(7)".to_string(),
+        });
+
+        self.register_page(SovereignManPage {
+            title: "pqc_signatures".to_string(),
+            section: ManSection::Miscellaneous,
+            synopsis: "Post-Quantum Cryptographic Attestation Specification".to_string(),
+            description: "Dilithium5 and Signify post-quantum digital signature standards used for package and kernel module attestation.".to_string(),
+            options: BTreeMap::new(),
+            see_also: vec!["sigma-pkg(8)".to_string(), "signify(1)".to_string()],
+            bsd_linux_source: "OpenBSD signify(1) & NIST PQC Standard".to_string(),
         });
 
         // Section 8 - System Admin
@@ -182,6 +299,21 @@ impl SovereignManPagesConsolidationEngine {
             bsd_linux_source: "FreeBSD pkg(8) & Arch Linux pacman(8) hybrid".to_string(),
         });
 
+        self.register_page(SovereignManPage {
+            title: "bectl".to_string(),
+            section: ManSection::SystemAdmin,
+            synopsis: "bectl [subcommand] [args]".to_string(),
+            description: "ZFS boot environment management utility for creating, mounting, and rolling back boot snapshots.".to_string(),
+            options: {
+                let mut opts = BTreeMap::new();
+                opts.insert("create".to_string(), "Create a new boot environment snapshot".to_string());
+                opts.insert("activate".to_string(), "Set specified boot environment as default for next boot".to_string());
+                opts
+            },
+            see_also: vec!["zfs(8)".to_string(), "snapper(8)".to_string()],
+            bsd_linux_source: "FreeBSD bectl(8) & Illumos beadm(1)".to_string(),
+        });
+
         // Section 9 - Kernel Routines
         self.register_page(SovereignManPage {
             title: "vfs".to_string(),
@@ -191,6 +323,16 @@ impl SovereignManPagesConsolidationEngine {
             options: BTreeMap::new(),
             see_also: vec!["vnode(9)".to_string(), "mount(8)".to_string()],
             bsd_linux_source: "FreeBSD & DragonFly BSD vfs(9)".to_string(),
+        });
+
+        self.register_page(SovereignManPage {
+            title: "buddy_allocator".to_string(),
+            section: ManSection::KernelRoutines,
+            synopsis: "void *buddy_alloc(size_t order);".to_string(),
+            description: "Physical buddy memory allocator with anti-fragmentation page compaction passes.".to_string(),
+            options: BTreeMap::new(),
+            see_also: vec!["vfs(9)".to_string()],
+            bsd_linux_source: "Linux mm buddy allocator & FreeBSD vm_page".to_string(),
         });
     }
 
@@ -204,6 +346,33 @@ impl SovereignManPagesConsolidationEngine {
             .values()
             .filter(|p| p.title.contains(query) || p.description.contains(query))
             .collect()
+    }
+
+    pub fn generate_catalog_markdown(&self) -> String {
+        let mut md = String::new();
+        md.push_str("# Consolidated Man Pages Catalog\n\n");
+        md.push_str("This catalog consolidates Unix/Linux/BSD manual pages across all 9 standard POSIX/BSD sections for SigmaOS.\n\n");
+
+        md.push_str("## Registered Manual Pages\n\n");
+        md.push_str("| Title | Section | Origin / Inspiration | Synopsis |\n");
+        md.push_str("| :--- | :--- | :--- | :--- |\n");
+
+        for page in self.pages.values() {
+            md.push_str(&format!(
+                "| **`{}`** | Section {} | {} | `{}` |\n",
+                page.title, page.section as u8, page.bsd_linux_source, page.synopsis
+            ));
+        }
+
+        md.push_str("\n---\n\n");
+        md.push_str("## Detailed Manual Page Specifications\n\n");
+
+        for page in self.pages.values() {
+            md.push_str(&page.to_markdown());
+            md.push_str("\n---\n\n");
+        }
+
+        md
     }
 }
 
@@ -269,6 +438,7 @@ impl SovereignInfoPagesConsolidationEngine {
                 ("Kernel Architecture".to_string(), "SMP, eBPF, Buddy Allocator".to_string()),
                 ("Packaging System".to_string(), "Universal package format and SAT solver".to_string()),
                 ("Sandboxing Security".to_string(), "Pledge, Unveil, Capsicum, Landlock".to_string()),
+                ("Storage and Filesystems".to_string(), "OpenZFS, Btrfs, and HAMMER2".to_string()),
             ],
         });
 
@@ -281,10 +451,67 @@ impl SovereignInfoPagesConsolidationEngine {
             content: "Detailed documentation on SMP multi-core dispatch, eBPF JIT, and lockless memory queues.".to_string(),
             menu_items: vec![],
         });
+
+        self.register_node(SovereignInfoNode {
+            title: "Packaging System Manual".to_string(),
+            node_name: "Packaging System".to_string(),
+            up_node: "Top".to_string(),
+            next_node: "Sandboxing Security".to_string(),
+            prev_node: "Kernel Architecture".to_string(),
+            content: "Comprehensive Texinfo documentation covering universal package ingestion across 100+ package formats and DPLL SAT dependency resolution.".to_string(),
+            menu_items: vec![],
+        });
+
+        self.register_node(SovereignInfoNode {
+            title: "Sandboxing Security Architecture".to_string(),
+            node_name: "Sandboxing Security".to_string(),
+            up_node: "Top".to_string(),
+            next_node: "Storage and Filesystems".to_string(),
+            prev_node: "Packaging System".to_string(),
+            content: "Multi-layered sandboxing governor synthesizing OpenBSD pledge/unveil, FreeBSD Capsicum, and Linux Landlock/Seccomp-BPF.".to_string(),
+            menu_items: vec![],
+        });
+
+        self.register_node(SovereignInfoNode {
+            title: "Storage and Filesystems Handbook".to_string(),
+            node_name: "Storage and Filesystems".to_string(),
+            up_node: "Top".to_string(),
+            next_node: "Top".to_string(),
+            prev_node: "Sandboxing Security".to_string(),
+            content: "High-reliability transactional storage management with OpenZFS pools, Btrfs subvolume Snapper snapshots, and DragonFly HAMMER2 PFS.".to_string(),
+            menu_items: vec![],
+        });
     }
 
     pub fn register_node(&mut self, node: SovereignInfoNode) {
         self.nodes.insert(node.node_name.clone(), node);
+    }
+
+    pub fn generate_tree_markdown(&self) -> String {
+        let mut md = String::new();
+        md.push_str("# GNU Info Pages Texinfo Navigation Tree\n\n");
+        md.push_str("This document presents the consolidated GNU Info Texinfo documentation tree for SigmaOS, providing structured hierarchical navigation.\n\n");
+
+        md.push_str("## Node Navigation Index\n\n");
+        md.push_str("| Node Name | Title | Up Node | Next Node | Prev Node |\n");
+        md.push_str("| :--- | :--- | :--- | :--- | :--- |\n");
+
+        for node in self.nodes.values() {
+            md.push_str(&format!(
+                "| **`{}`** | {} | `{}` | `{}` | `{}` |\n",
+                node.node_name, node.title, node.up_node, node.next_node, node.prev_node
+            ));
+        }
+
+        md.push_str("\n---\n\n");
+        md.push_str("## Detailed Texinfo Nodes\n\n");
+
+        for node in self.nodes.values() {
+            md.push_str(&node.to_markdown());
+            md.push_str("\n---\n\n");
+        }
+
+        md
     }
 }
 
@@ -354,6 +581,57 @@ impl SovereignUsrShareDocConsolidationEngine {
                 readme: "Universal package manager documentation and schema definition.".to_string(),
             },
         );
+
+        self.docs.insert(
+            "sigma-desktop".to_string(),
+            SovereignPackageDocRecord {
+                package_name: "sigma-desktop".to_string(),
+                version: "1.0.0".to_string(),
+                doc_path: "/usr/share/doc/sigma-desktop".to_string(),
+                changelog: "* 1.0.0: Hyprland tiling compositor with Quickshell and Omakase themes.".to_string(),
+                copyright: "Copyright (c) 2026 SigmaOS Project. MIT License.".to_string(),
+                readme: "Zero-download sovereign desktop environment configuration guide.".to_string(),
+            },
+        );
+
+        self.docs.insert(
+            "sigma-security".to_string(),
+            SovereignPackageDocRecord {
+                package_name: "sigma-security".to_string(),
+                version: "1.0.0".to_string(),
+                doc_path: "/usr/share/doc/sigma-security".to_string(),
+                changelog: "* 1.0.0: PQC Dilithium signatures & multi-sandbox policy governor.".to_string(),
+                copyright: "Copyright (c) 2026 SigmaOS Project. MIT License.".to_string(),
+                readme: "Security hardening guidelines, PQC attestation, and capability sandbox policies.".to_string(),
+            },
+        );
+    }
+
+    pub fn generate_registry_markdown(&self) -> String {
+        let mut md = String::new();
+        md.push_str("# /usr/share/doc Offline Package Docs Registry\n\n");
+        md.push_str("This registry indexes offline package documentation records stored in `/usr/share/doc/` across installed SigmaOS system packages.\n\n");
+
+        md.push_str("## Package Documentation Summary\n\n");
+        md.push_str("| Package Name | Version | Doc Path | Summary |\n");
+        md.push_str("| :--- | :--- | :--- | :--- |\n");
+
+        for doc in self.docs.values() {
+            md.push_str(&format!(
+                "| **`{}`** | v{} | `{}` | {} |\n",
+                doc.package_name, doc.version, doc.doc_path, doc.readme
+            ));
+        }
+
+        md.push_str("\n---\n\n");
+        md.push_str("## Individual Package Specifications\n\n");
+
+        for doc in self.docs.values() {
+            md.push_str(&doc.to_markdown());
+            md.push_str("\n---\n\n");
+        }
+
+        md
     }
 }
 
@@ -430,6 +708,61 @@ impl SovereignWikiHandbookConsolidationEngine {
                 ],
             },
         );
+
+        self.articles.insert(
+            "Security-Hardening-Guide".to_string(),
+            SovereignHandbookArticle {
+                title: "Security Hardening & Multi-Sandbox Policy Guide".to_string(),
+                category: "Security & Auditing".to_string(),
+                distro_inspiration: "OpenBSD Security Handbook & HardenedBSD".to_string(),
+                content: "Complete guide to process isolation, pledge/unveil restrictions, FreeBSD Capsicum capabilities, and Linux Landlock v5 policies.".to_string(),
+                troubleshooting_steps: vec![
+                    "Inspect audit log via `sigma-ctl status security-audit` for pledge violation alerts.".to_string(),
+                    "Verify memory protection status with `sigma-ctl status kernel-hardening`.".to_string(),
+                ],
+            },
+        );
+
+        self.articles.insert(
+            "Kernel-Compilation-Handbook".to_string(),
+            SovereignHandbookArticle {
+                title: "Kernel Compilation & Custom Module Build Handbook".to_string(),
+                category: "Kernel Development".to_string(),
+                distro_inspiration: "Gentoo Kernel Handbook & Debian Kernel Guide".to_string(),
+                content: "Guide to compiling sovereign kernel images, configuring microarchitecture optimization flags (x86-64 v1..v4/ARM), and building out-of-tree drivers.".to_string(),
+                troubleshooting_steps: vec![
+                    "Ensure target ISA flags match hardware capability (`sigma-fetch --json`).".to_string(),
+                    "Check initramfs microcode splicing if early boot panics occur.".to_string(),
+                ],
+            },
+        );
+    }
+
+    pub fn generate_handbook_markdown(&self) -> String {
+        let mut md = String::new();
+        md.push_str("# Consolidated OS Documentation & Handbook System\n\n");
+        md.push_str("Inspired by the **Arch Linux Wiki** and **FreeBSD Handbook**, this single-source-of-truth handbook provides comprehensive guides for operating and administering SigmaOS.\n\n");
+
+        md.push_str("## Handbook Articles Index\n\n");
+        md.push_str("| Article Title | Category | Distro Inspiration |\n");
+        md.push_str("| :--- | :--- | :--- |\n");
+
+        for article in self.articles.values() {
+            md.push_str(&format!(
+                "| **{}** | {} | {} |\n",
+                article.title, article.category, article.distro_inspiration
+            ));
+        }
+
+        md.push_str("\n---\n\n");
+        md.push_str("## Detailed Handbook Articles\n\n");
+
+        for article in self.articles.values() {
+            md.push_str(&article.to_markdown());
+            md.push_str("\n---\n\n");
+        }
+
+        md
     }
 }
 
@@ -478,6 +811,38 @@ impl SovereignDocumentationConsolidationPrGateway {
 
         md
     }
+
+    /// Exports consolidated documentation Markdown files to the target directory (`wiki/`).
+    pub fn export_all_wiki_pages<P: AsRef<Path>>(&self, target_dir: P) -> Result<Vec<String>, std::io::Error> {
+        let dir = target_dir.as_ref();
+        if !dir.exists() {
+            fs::create_dir_all(dir)?;
+        }
+
+        let mut generated_files = Vec::new();
+
+        // 1. Man Pages Catalog
+        let man_path = dir.join("Man-Pages-Catalog.md");
+        fs::write(&man_path, self.man_engine.generate_catalog_markdown())?;
+        generated_files.push(man_path.to_string_lossy().into_owned());
+
+        // 2. Info Pages Tree
+        let info_path = dir.join("Info-Pages-Tree.md");
+        fs::write(&info_path, self.info_engine.generate_tree_markdown())?;
+        generated_files.push(info_path.to_string_lossy().into_owned());
+
+        // 3. Package Docs Registry
+        let doc_path = dir.join("Package-Docs-Registry.md");
+        fs::write(&doc_path, self.doc_engine.generate_registry_markdown())?;
+        generated_files.push(doc_path.to_string_lossy().into_owned());
+
+        // 4. Consolidated OS Documentation System
+        let wiki_path = dir.join("Consolidated-OS-Documentation-System.md");
+        fs::write(&wiki_path, self.wiki_engine.generate_handbook_markdown())?;
+        generated_files.push(wiki_path.to_string_lossy().into_owned());
+
+        Ok(generated_files)
+    }
 }
 
 #[cfg(test)]
@@ -492,6 +857,10 @@ mod tests {
         assert_eq!(pages[0].section, ManSection::SystemAdmin);
         let md = pages[0].to_markdown();
         assert!(md.contains("SYNOPSIS"));
+
+        let catalog = engine.generate_catalog_markdown();
+        assert!(catalog.contains("Consolidated Man Pages Catalog"));
+        assert!(catalog.contains("sigma-sh"));
     }
 
     #[test]
@@ -501,6 +870,9 @@ mod tests {
         let node = &engine.nodes["Top"];
         let md = node.to_markdown();
         assert!(md.contains("Info Node:"));
+
+        let tree = engine.generate_tree_markdown();
+        assert!(tree.contains("GNU Info Pages Texinfo Navigation Tree"));
     }
 
     #[test]
@@ -510,6 +882,9 @@ mod tests {
         let rec = &engine.docs["sigma-core"];
         let md = rec.to_markdown();
         assert!(md.contains("sigma-core"));
+
+        let registry = engine.generate_registry_markdown();
+        assert!(registry.contains("/usr/share/doc Offline Package Docs Registry"));
     }
 
     #[test]
@@ -519,13 +894,26 @@ mod tests {
         let article = &engine.articles["Installation-Guide"];
         let md = article.to_markdown();
         assert!(md.contains("Installation & Deployment Guide"));
+
+        let handbook = engine.generate_handbook_markdown();
+        assert!(handbook.contains("Consolidated OS Documentation & Handbook System"));
     }
 
     #[test]
-    fn test_pr_gateway_generation() {
+    fn test_pr_gateway_generation_and_export() {
         let gateway = SovereignDocumentationConsolidationPrGateway::new();
         let md = gateway.generate_consolidated_pr_markdown();
         assert!(md.contains("Pull Request Proposal"));
         assert!(md.contains("Architectural Matrix"));
+
+        let temp_dir = std::env::temp_dir().join("sigma_doc_test_export");
+        let exported = gateway.export_all_wiki_pages(&temp_dir).expect("Export failed");
+        assert_eq!(exported.len(), 4);
+        assert!(temp_dir.join("Man-Pages-Catalog.md").exists());
+        assert!(temp_dir.join("Info-Pages-Tree.md").exists());
+        assert!(temp_dir.join("Package-Docs-Registry.md").exists());
+        assert!(temp_dir.join("Consolidated-OS-Documentation-System.md").exists());
+
+        let _ = fs::remove_dir_all(&temp_dir);
     }
 }

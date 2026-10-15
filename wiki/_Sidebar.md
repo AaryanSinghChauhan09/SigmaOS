@@ -141,3 +141,11 @@
 - [Printing (CUPS)](./Printing-Cups-Component-Guide.md)
 - [System Automation](./System-Automation-Component-Guide.md)
 - [AI Maintenance Policy](./AI-Agent-Maintenance-Instructions.md)
+
+---
+
+### [Consolidated Documentation System](./Consolidated-OS-Documentation-System.md)
+- [Man Pages Catalog (Sections 1..9)](./Man-Pages-Catalog.md)
+- [GNU Info Pages Tree](./Info-Pages-Tree.md)
+- [/usr/share/doc Package Registry](./Package-Docs-Registry.md)
+- [Arch Wiki & FreeBSD Handbook](./Consolidated-OS-Documentation-System.md)
