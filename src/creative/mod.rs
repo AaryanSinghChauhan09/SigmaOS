@@ -15,6 +15,7 @@ pub mod effectcraft_missing_components_parity_pr;
 pub mod lightcraft;
 pub mod mediacraft;
 pub mod audiocraft;
+pub mod soundcraft;
 pub mod vectoranimation;
 pub mod model3d;
 pub mod artcraft;
@@ -119,6 +120,12 @@ pub use audiocraft::{
     AudioEffectType, AutomationPoint, AutomationInterpolation, AutomationLane,
     AudioExportFormat,
     init_audiocraft, get_audiocraft,
+};
+pub use soundcraft::{
+    SoundCraftEngine, SoundTrack, SoundClip, Spatial3DPosition, Waveform, SynthesizerVoice,
+    SoundCraftPullRequestSpec, SoundCraftAudioEnginePrDeployer,
+    SoundCraftDspSynthesizerPrDeployer, SoundCraftSpatialMixingMasteringPrDeployer,
+    SoundCraftMasterPrDeploymentSuite, fnv1a_soundcraft_pr_digest,
 };
 pub use vectoranimation::{
     AnimationProject as VectorAnimationProject, AnimationLayer, AnimationLayerType,
