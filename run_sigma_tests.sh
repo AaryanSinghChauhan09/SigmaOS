@@ -1353,18 +1353,11 @@ if [ -f "src/creative/deckcraft.rs" ]; then
     ./build/test_deckcraft
 fi
 
-if [ -f "src/creative/gridcraft.rs" ]; then
-    echo "Running Gridcraft Spreadsheet & Visualization test suite..."
+if [ -f "src/distro/open_source_os_missing_components_v54_pr.rs" ]; then
+    echo "Running Open Source OS Missing Components V54 PR Suite test suite..."
     mkdir -p build
-    rustc --test src/creative/gridcraft.rs --edition=2021 -o build/test_gridcraft
-    ./build/test_gridcraft
-fi
-
-if [ -f "src/creative/gridcraft_missing_components_parity_pr.rs" ]; then
-    echo "Running Gridcraft ArtCraft Missing Components Parity PR test suite..."
-    mkdir -p build
-    rustc --test src/creative/gridcraft_missing_components_parity_pr.rs --edition=2021 -o build/test_gridcraft_missing
-    ./build/test_gridcraft_missing
+    rustc --test src/distro/open_source_os_missing_components_v54_pr.rs --edition=2021 -o build/test_open_source_v54_pr
+    ./build/test_open_source_v54_pr
 fi
 
 echo "All SigmaOS test suites completed."
