@@ -26,11 +26,11 @@ pub enum FeatureSourceType {
     DistroRoadmapSpec,
     ArticleIdea,
     ArchitectureDocument,
-    DistroGapMatrix,
-    CoreArchitectureDoc,
     UnimplementedIdeas,
     MediaWikiDoc,
     AppReplacementPr,
+    DistroGapMatrix,
+    CoreArchitectureDoc,
     SovereignArchitectureDoc,
 }
 
@@ -233,7 +233,7 @@ impl Default for Sovereign100IdeasSuite {
 /// 2. Twelve Sovereign Native System Shards (`S-SHARDS`) Engine
 /// ---------------------------------------------------------------------------
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum SovereignShardId {
     Shard01ProductivityOffice,
     Shard02MediaProcessingPlayback,
@@ -474,7 +474,7 @@ impl Default for SovereignDistroGapClosureEngine {
 /// 4. Roadmap Feature Parity Verification Engine
 /// ---------------------------------------------------------------------------
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct SovereignLinuxBsdWikiRoadmapParityEngine {
     pub ideas: Vec<RoadmapFeatureIdea>,
 }
@@ -580,6 +580,10 @@ impl Default for MasterWikiAndRoadmapVerificationSuite {
         Self::new()
     }
 }
+
+/// ---------------------------------------------------------------------------
+/// 5. Master Sovereign OS Documentation & Wiki Integration Verification Engine
+/// ---------------------------------------------------------------------------
 
 pub struct SovereignWikiMasterEngine {
     pub suite_100_ideas: Sovereign100IdeasSuite,
