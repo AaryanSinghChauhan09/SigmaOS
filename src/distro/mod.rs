@@ -620,7 +620,9 @@ pub mod sovereign_lfs_bsd_pr_gateway;
 pub use sovereign_lfs_bsd_pr_gateway::*;
 
 pub mod bootable_vertical_slices_missing_components_pr;
+pub mod sigmaos_gap_closing_evidence_gated_roadmap_pr;
 pub use bootable_vertical_slices_missing_components_pr::*;
+pub use sigmaos_gap_closing_evidence_gated_roadmap_pr::*;
 
 pub mod repeatable_agent_operating_loop_pr;
 pub use repeatable_agent_operating_loop_pr::*;
