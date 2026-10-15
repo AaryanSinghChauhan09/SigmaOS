@@ -68,7 +68,7 @@ impl Suite100Ideas {
             is_fulfilled: true,
         });
 
-        // Package & App Management (24-33)
+        // Package & App Management
         self.ideas.push(ImprovementIdeaRecord {
             id: 31,
             name: "Declarative User Environment Engine".to_string(),
@@ -86,7 +86,7 @@ impl Suite100Ideas {
             is_fulfilled: true,
         });
 
-        // Security & Privacy (34-45)
+        // Security & Privacy
         self.ideas.push(ImprovementIdeaRecord {
             id: 34,
             name: "Zero-Trust TPM Boot & PQC Micro-Domain Isolation".to_string(),
@@ -104,7 +104,7 @@ impl Suite100Ideas {
             is_fulfilled: true,
         });
 
-        // Compliance & Governance (46-100)
+        // Compliance & Governance
         self.ideas.push(ImprovementIdeaRecord {
             id: 100,
             name: "Statutory Compliance Audit Ledger & Sovereign Supreme Court Charter".to_string(),
