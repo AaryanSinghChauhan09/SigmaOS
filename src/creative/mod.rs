@@ -8,6 +8,7 @@ pub mod filmcraft;
 pub mod vectorcraft;
 pub mod pdfcraft;
 pub mod pdfcraft_artcraft_parity_pr;
+pub mod pdfcraft_missing_components_parity_pr;
 pub mod designcraft;
 pub mod designcraft_missing_components_parity_pr;
 pub mod effectcraft;
@@ -64,6 +65,10 @@ pub use pdfcraft_artcraft_parity_pr::{
     PdfcraftInteractiveFormsXfaPrEngine, PdfcraftColorPreflightCmykPrEngine,
     PdfcraftRedactionSanitizationPrEngine, PdfcraftPageImpositionBookletPrEngine,
     PdfcraftArchivalValidationPrEngine, SovereignPdfcraftArtcraftParityPrGateway,
+};
+pub use pdfcraft_missing_components_parity_pr::{
+    PdfcraftPrCategory, PdfcraftPrProposalManifest,
+    SovereignPdfcraftMissingComponentsParityPrGateway,
 };
 pub use designcraft::{
     DesignEditor, Canvas, Element, Color,
