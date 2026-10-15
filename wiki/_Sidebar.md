@@ -3,7 +3,7 @@
 
 ---
 
-### [Core System & Kernel](./Home.md#1-core-kernel--hardware)
+### [Core Kernel & Hardware](./Home.md#1-core-kernel--hardware)
 - [Kernel Core](./Kernel-Core-Component-Guide.md)
 - [Scheduler](./Scheduler-Component-Guide.md)
 - [Memory Management](./Memory-Management-Component-Guide.md)
@@ -17,6 +17,9 @@
 - [Interrupts & APIC](./Interrupt-Apic-Component-Guide.md)
 - [Timekeeping](./Timekeeping-Component-Guide.md)
 - [Firmware & Microcode](./Firmware-Microcode-Updater-Component-Guide.md)
+- [Sysctl Kernel Tunables](./Sysctl-Kernel-Tunables-Component-Guide.md)
+- [Udev & Devd Hotplug](./Udev-Devd-Hotplug-Device-Component-Guide.md)
+- [Hardware Watchdog](./Watchdog-Hardware-Recovery-Component-Guide.md)
 
 ---
 
@@ -24,6 +27,8 @@
 - [Virtual Filesystem (VFS)](./Filesystem-Vfs-Component-Guide.md)
 - [ZFS & HAMMER2 FS](./Zfs-Hammer2-Transactional-Fs-Component-Guide.md)
 - [Device Mapper & LUKS](./Device-Mapper-Lvm-Cryptsetup-Component-Guide.md)
+- [ZRAM Swap Compression](./Swap-Zram-Compression-Component-Guide.md)
+- [FUSE Userspace FS](./Fuse-Userspace-Filesystem-Component-Guide.md)
 - [Storage Engine](./Storage-Component-Guide.md)
 - [SMART Disk Health](./Smart-Disk-Health-Component-Guide.md)
 - [Crash Dump Core](./Crash-Dump-Core-Component-Guide.md)
@@ -47,6 +52,8 @@
 - [Security Architecture](./Security-Component-Guide.md)
 - [MAC (SELinux & AppArmor)](./Selinux-Apparmor-Mac-Component-Guide.md)
 - [Namespaces & Jails](./Namespaces-Isolation-Jails-Component-Guide.md)
+- [Seccomp-BPF Sandbox](./Seccomp-Bpf-Syscall-Filter-Component-Guide.md)
+- [TPM 2.0 & Measured Boot](./Hardware-Security-Module-Tpm2-Component-Guide.md)
 - [Cryptography](./Cryptography-Component-Guide.md)
 - [Keyring Secret Service](./Keyring-Secret-Service-Component-Guide.md)
 - [Firewall Security](./Firewall-Security-Component-Guide.md)
@@ -61,6 +68,7 @@
 - [Wireless WiFi](./Wireless-Wifi-Component-Guide.md)
 - [Bluetooth Stack](./Bluetooth-Stack-Component-Guide.md)
 - [Dynamic DNS Resolver](./Dynamic-Dns-Resolver-Component-Guide.md)
+- [NSSwitch & DNSSEC](./Dnssec-Nsswitch-Name-Service-Component-Guide.md)
 - [Location (GeoClue)](./Location-Geoclue-Component-Guide.md)
 
 ---
@@ -103,6 +111,7 @@
 - [Starship Prompt](./Starship-Prompt-Component-Guide.md)
 - [Shells (Bash, Zsh, Fish)](./Bash-Zsh-Fish-Shell-Component-Guide.md)
 - [Coreutils Parity](./Coreutils-Gnu-Bsd-Parity-Component-Guide.md)
+- [Serial TTY & PTY](./Serial-Tty-Pty-Virtual-Console-Component-Guide.md)
 - [Internationalization (i18n)](./Internationalization-I18n-Component-Guide.md)
 - [Input Accessibility](./Input-Accessibility-Component-Guide.md)
 - [Screen Reader](./Accessibility-Screen-Reader-Component-Guide.md)
@@ -125,6 +134,7 @@
 ### [Packages & Maintenance](./Home.md#10-package-management--maintenance)
 - [Package Management](./Package-Management-Component-Guide.md)
 - [Package Build Ports](./Package-Build-Ports-Component-Guide.md)
+- [Delta & Reproducible Builds](./Package-Delta-Reproducible-Build-Component-Guide.md)
 - [Live ISO Calamares](./Live-Iso-Installer-Calamares-Component-Guide.md)
 - [Bootloader](./Bootloader-Component-Guide.md)
 - [Power Management](./Power-Management-Component-Guide.md)

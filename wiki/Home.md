@@ -5,20 +5,20 @@
 
 ---
 
-## 🏛️ Subsystem Portals (90 Canonical Component Guides)
+## 🏛️ Subsystem Portals (100 Canonical Component Guides)
 
 | Portal | Subsystems | Key Highlights |
 | :--- | :--- | :--- |
-| [Core Kernel & Hardware](#1-core-kernel--hardware) | 13 Subsystems | Preemptive Scheduler, Physical/Virtual Memory, APIC, PCIe AER, IOMMU DMA, ACPI AML, cpufreq |
-| [Storage & Filesystems](#2-storage-volumes--filesystems) | 6 Subsystems | POSIX VFS, ZFS / HAMMER2 Transactional FS, Device Mapper, LUKS2, SMART Telemetry |
-| [Init & Service Supervisors](#3-init-supervisors--system-services) | 9 Subsystems | Dependency DAG init, SysV/BSD rc.d parity, cgroups v2 resource quotas, system monitoring |
-| [Security & Cryptography](#4-security-sandboxing--cryptography) | 8 Subsystems | Mandatory Access Control (SELinux/AppArmor), Namespaces & Jails, Cryptography, eBPF Tracing |
-| [Networking & Wireless](#5-networking--wireless-communications) | 6 Subsystems | Zero-copy TCP/IP, NetworkManager / IWD, 802.11 WiFi, Bluetooth, Dynamic DNS, GeoClue |
-| [Desktop & Wayland Ecosystem](#6-desktop-environment--wayland-compositor) | 19 Subsystems | Wayland Compositor, Hyprland Tiling, UWSM Session, Waybar, Walker, SwayNC, Omakase Themes |
+| [Core Kernel & Hardware](#1-core-kernel--hardware) | 16 Subsystems | Preemptive Scheduler, Paging, APIC, PCIe AER, IOMMU DMA, ACPI AML, cpufreq, Sysctl, Udev, Watchdog |
+| [Storage & Filesystems](#2-storage-volumes--filesystems) | 8 Subsystems | POSIX VFS, ZFS / HAMMER2 Transactional FS, Device Mapper, LUKS2, ZRAM Swap, FUSE Userspace FS, SMART |
+| [Init & Service Supervisors](#3-init-supervisors--system-services) | 9 Subsystems | Dependency DAG init, SysV/BSD rc.d parity, cgroups v2 resource quotas, system monitoring, dynamic linker |
+| [Security & Cryptography](#4-security-sandboxing--cryptography) | 10 Subsystems | Mandatory Access Control (SELinux/AppArmor), Namespaces & Jails, Seccomp-BPF, TPM 2.0, eBPF Tracing |
+| [Networking & Wireless](#5-networking--wireless-communications) | 7 Subsystems | Zero-copy TCP/IP, NetworkManager / IWD, 802.11 WiFi, Bluetooth, Dynamic DNS, NSSwitch / DNSSEC, GeoClue |
+| [Desktop & Wayland Ecosystem](#6-desktop-environment--wayland-compositor) | 19 Subsystems | Wayland Compositor, Hyprland Tiling, UWSM Session, Waybar, Walker, SwayNC, Omakase Themes, Night Light |
 | [Multimedia & Audio](#7-multimedia--audio-subsystem) | 6 Subsystems | PipeWire / ALSA audio, Wireplumber ducking policies, VA-API/VDPAU, Grimblast, WF-Recorder |
-| [Terminal, Shell & CLI](#8-terminal-shell--command-line) | 7 Subsystems | Alacritty/Kitty GPU terminal, Starship prompt, Bash/Zsh/Fish parity, GNU/BSD Coreutils |
+| [Terminal, Shell & CLI](#8-terminal-shell--command-line) | 8 Subsystems | Alacritty/Kitty GPU terminal, Starship prompt, Bash/Zsh/Fish parity, GNU/BSD Coreutils, Serial PTY |
 | [Gaming & Acceleration](#9-gaming-acceleration--virtualization) | 9 Subsystems | GameMode scheduler, MangoHud HUD, VKD3D-Proton Vulkan, DXVK, MicroVMs, VFIO Passthrough |
-| [Package & Distro Engineering](#10-package-management--maintenance) | 7 Subsystems | `sigpkg` binary packages, Ports build system, Calamares installer, UEFI bootloader, CUPS |
+| [Package & Distro Engineering](#10-package-management--maintenance) | 8 Subsystems | `sigpkg` binary packages, Ports build system, Delta Reproducible Builds, Calamares installer, UKI boot |
 
 ---
 
@@ -36,6 +36,9 @@
 - [Interrupt APIC Component Guide](./Interrupt-Apic-Component-Guide.md) &ndash; Local APIC, I/O APIC, MSI routing, and interrupt vector arbitration.
 - [Timekeeping Component Guide](./Timekeeping-Component-Guide.md) &ndash; TSC / HPET clock sources, high-resolution timers, and monotonic timekeeping.
 - [Firmware & Microcode Updater Component Guide](./Firmware-Microcode-Updater-Component-Guide.md) &ndash; CPU microcode patch loader and vendor firmware verification.
+- [Sysctl Kernel Tunables Component Guide](./Sysctl-Kernel-Tunables-Component-Guide.md) &ndash; Runtime kernel parameter tuning, /proc/sys hierarchy, and network buffers.
+- [Udev & Devd Hotplug Device Component Guide](./Udev-Devd-Hotplug-Device-Component-Guide.md) &ndash; Dynamic /dev node synthesizer, netlink uevent dispatcher, and persistent symlinks.
+- [Watchdog Hardware Recovery Component Guide](./Watchdog-Hardware-Recovery-Component-Guide.md) &ndash; Hardware watchdog timers, ping heartbeat daemon, and panic recovery reset.
 
 ---
 
@@ -43,6 +46,8 @@
 - [Filesystem VFS Component Guide](./Filesystem-Vfs-Component-Guide.md) &ndash; Virtual Filesystem switch, inode cache, and POSIX path resolution.
 - [ZFS & HAMMER2 Transactional FS Component Guide](./Zfs-Hammer2-Transactional-Fs-Component-Guide.md) &ndash; Copy-on-Write (CoW) transactional storage, snapshots, and checksum verification.
 - [Device Mapper, LVM & Cryptsetup Component Guide](./Device-Mapper-Lvm-Cryptsetup-Component-Guide.md) &ndash; Linear/striped volume mapping, LUKS2 AES-XTS encryption, and dm-verity.
+- [Swap ZRAM Compression Component Guide](./Swap-Zram-Compression-Component-Guide.md) &ndash; In-memory compressed swap devices using Zstandard and LZ4 compression.
+- [FUSE Userspace Filesystem Component Guide](./Fuse-Userspace-Filesystem-Component-Guide.md) &ndash; Kernel /dev/fuse request multiplexer for unprivileged user filesystems.
 - [Storage Component Guide](./Storage-Component-Guide.md) &ndash; Block I/O scheduler, NVMe queues, AHCI SATA, and asynchronous request dispatch.
 - [SMART Disk Health Component Guide](./Smart-Disk-Health-Component-Guide.md) &ndash; Disk telemetry monitoring, wear-level statistics, and thermal health reporting.
 - [Crash Dump Core Component Guide](./Crash-Dump-Core-Component-Guide.md) &ndash; Kernel panic crash dump captures, kdump memory reservations, and stack traces.
@@ -66,6 +71,8 @@
 - [Security Component Guide](./Security-Component-Guide.md) &ndash; Defense-in-depth system security architecture and privilege separation.
 - [Mandatory Access Control (MAC) Component Guide](./Selinux-Apparmor-Mac-Component-Guide.md) &ndash; SELinux, AppArmor, and FreeBSD MAC framework security enforcement.
 - [Namespaces & Jails Isolation Component Guide](./Namespaces-Isolation-Jails-Component-Guide.md) &ndash; PID/mount/net/IPC namespaces, FreeBSD Jails, and OpenBSD pledge/unveil.
+- [Seccomp-BPF Syscall Filter Component Guide](./Seccomp-Bpf-Syscall-Filter-Component-Guide.md) &ndash; Deterministic BPF system call boundary filter reducing attack surfaces.
+- [Hardware Security Module (TPM 2.0) Component Guide](./Hardware-Security-Module-Tpm2-Component-Guide.md) &ndash; Measured boot verification and cryptographic key unsealing via TPM 2.0.
 - [Cryptography Component Guide](./Cryptography-Component-Guide.md) &ndash; Hardware-accelerated AES-NI, ChaCha20-Poly1305, SHA-256/512, and secure RNG.
 - [Keyring Secret Service Component Guide](./Keyring-Secret-Service-Component-Guide.md) &ndash; User secret service, DBus secret API, and kernel keyring keys.
 - [Firewall Security Component Guide](./Firewall-Security-Component-Guide.md) &ndash; Stateful packet filtering, NAT, connection tracking, and nftables/pf parity.
@@ -80,6 +87,7 @@
 - [Wireless WiFi Component Guide](./Wireless-Wifi-Component-Guide.md) &ndash; IEEE 802.11 mac80211 wireless driver model, WPA3 SAE, and scan engine.
 - [Bluetooth Stack Component Guide](./Bluetooth-Stack-Component-Guide.md) &ndash; HCI host controller interface, BlueZ protocol compatibility, and BLE GATT services.
 - [Dynamic DNS Resolver Component Guide](./Dynamic-Dns-Resolver-Component-Guide.md) &ndash; Asynchronous caching DNS resolver with DNS-over-TLS/HTTPS support.
+- [NSSwitch & DNSSEC Component Guide](./Dnssec-Nsswitch-Name-Service-Component-Guide.md) &ndash; Name service switch dispatcher and DNSSEC cryptographic validation.
 - [Location (GeoClue) Component Guide](./Location-Geoclue-Component-Guide.md) &ndash; D-Bus location service, WiFi beacon geolocation, and GPS telemetry.
 
 ---
@@ -122,6 +130,7 @@
 - [Starship Prompt Component Guide](./Starship-Prompt-Component-Guide.md) &ndash; Ultra-fast cross-shell prompt with git status, runtime versions, and exit codes.
 - [Bash, Zsh & Fish Shell Component Guide](./Bash-Zsh-Fish-Shell-Component-Guide.md) &ndash; Full POSIX shell compliance with autocompletion, syntax highlighting, and history.
 - [Coreutils GNU & BSD Parity Component Guide](./Coreutils-Gnu-Bsd-Parity-Component-Guide.md) &ndash; Sovereign implementations of essential userland utilities (`ls`, `cp`, `grep`).
+- [Serial TTY & Virtual Terminal Component Guide](./Serial-Tty-Pty-Virtual-Console-Component-Guide.md) &ndash; POSIX termios line discipline, /dev/ptmx multiplexer, and UART serial console.
 - [Internationalization (i18n) Component Guide](./Internationalization-I18n-Component-Guide.md) &ndash; UTF-8 locale engine, timezone database, and multibyte font rendering.
 - [Input Accessibility Component Guide](./Input-Accessibility-Component-Guide.md) &ndash; Sticky keys, bounce keys, mousekeys, and on-screen virtual keyboard support.
 - [Accessibility Screen Reader Component Guide](./Accessibility-Screen-Reader-Component-Guide.md) &ndash; AT-SPI2 accessibility bridge, text-to-speech synthesis, and braille output.
@@ -144,6 +153,7 @@
 ### 10. Package Management & Maintenance
 - [Package Management Component Guide](./Package-Management-Component-Guide.md) &ndash; `sigpkg` sovereign package manager with cryptographic signing and rollback.
 - [Package Build Ports Component Guide](./Package-Build-Ports-Component-Guide.md) &ndash; BSD-style ports tree and PKGBUILD recipe build infrastructure.
+- [Package Delta & Reproducible Build Component Guide](./Package-Delta-Reproducible-Build-Component-Guide.md) &ndash; Bit-for-bit deterministic builds and zsync binary delta updates.
 - [Live ISO Installer (Calamares) Component Guide](./Live-Iso-Installer-Calamares-Component-Guide.md) &ndash; Graphical system installer with partition resizing and locale selection.
 - [Bootloader Component Guide](./Bootloader-Component-Guide.md) &ndash; UEFI / BIOS multi-boot loader supporting unified kernel images (UKIs).
 - [Power Management Component Guide](./Power-Management-Component-Guide.md) &ndash; Sleep state transitions, suspend-to-idle, and battery saver profiles.

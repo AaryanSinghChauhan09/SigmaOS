@@ -267,4 +267,5 @@ pub mod kasan;
 pub mod kmsan;
 pub mod serial_console;
 pub mod hardware_firmware_subsystem;
+pub mod sovereign_parity_apex_v100;
 
