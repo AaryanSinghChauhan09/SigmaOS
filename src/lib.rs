@@ -241,10 +241,11 @@ pub use dashboard::statutory_compliance::{
 pub use dashboard::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
 };
+pub use desktop::elementary_os_missing_components_pr::*;
 pub use distro::arch_missing_components_parity_pr::*;
 pub use distro::arch_linux_missing_components_v54_pr::*;
 pub use distro::openbsd_missing_components_parity_pr::*;
-pub use distro::openbsd_missing_components_v55_pr::*;
+pub use distro::open_source_os_missing_components_v48_pr::*;
 pub use distro::{
     AdminAction, AiSysAdmin, AppBundleRuntime, AppManifest, AppsAuditTool, AptCacheSimulator,
     ArchBuildSystem, ArchMirror, ArchPacmanHooksManager, ArchRepoType, AuditResult, AuditRule,
