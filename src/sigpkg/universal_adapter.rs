@@ -2483,7 +2483,7 @@ impl UniversalPmCommandDispatcher {
                 }
             }
             "dnf" | "dnf5" | "yum" | "zypper" | "microdnf" | "rpm" | "fedora" | "rhel" | "centos"
-            | "rocky" | "alma" | "almalinux" | "opensuse" | "suse" | "urpmi" | "urpmq" | "urpme" => {
+            | "rocky" | "alma" | "almalinux" | "opensuse" | "suse" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
@@ -2662,7 +2662,7 @@ impl UniversalPmCommandDispatcher {
                     }
                 }
             }
-            "slackpkg" | "installpkg" | "removepkg" | "slackware" | "slapt-get" => {
+            "slackpkg" | "installpkg" | "removepkg" | "slackware" => {
                 if pm == "installpkg" {
                     operation = UniversalPmOperation::Install;
                 } else if pm == "removepkg" {
