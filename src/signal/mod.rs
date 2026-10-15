@@ -19,8 +19,6 @@ pub use sovereign_signal_development_and_pr_suite::*;
 // S-Signal Dispatcher (Capability-Gated Async Signals)
 // Sovereign AI-Native zero-dependency implementation
 
-use std::vec::Vec;
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SovereignSignal {
     Terminate,

@@ -64,6 +64,8 @@
 - [IPC Component Guide](./Ipc-Component-Guide.md) &ndash; Shared memory, Unix domain sockets, pipes, and message queues.
 - [Dynamic Linker Loader Component Guide](./Dynamic-Linker-Loader-Component-Guide.md) &ndash; ELF shared object loader, symbol resolution, and lazy binding.
 - [System Calls ABI Component Guide](./System-Calls-Abi-Component-Guide.md) &ndash; POSIX syscall interface, register conventions, and error translation.
+- [Signal Handler Architecture Plan](./SIGNAL_HANDLER_PLAN.md) &ndash; POSIX.1-2024 signal handler architecture, safety rules, 18-PR roadmap, and merge gates.
+- [Signal Path Audit & ABI Profile](./SIGNAL_HANDLER_AUDIT_AND_ABI_PROFILE.md) &ndash; Subsystem audit, signal numbers, ABI layouts, and x86_64 user frame layout.
 
 ---
 
