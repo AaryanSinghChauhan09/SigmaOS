@@ -378,7 +378,7 @@ impl SovereignWikiMasterEngine {
         let ideas_ok = self.suite_100_ideas.verify_full_fulfillment();
         let shards_ok = self.shards_registry.is_all_12_shards_active();
         let gap_closure_ok = self.distro_gap_closure.verify_all_gap_closures();
-        let roadmap_ok = self.parity_engine.verify_100_percent_parity();
+        let parity_ok = self.parity_engine.verify_100_percent_parity();
 
         ideas_ok && shards_ok && gap_closure_ok && roadmap_ok
     }
