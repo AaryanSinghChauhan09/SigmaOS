@@ -642,3 +642,6 @@ pub use open_source_os_missing_components_v54_pr::*;
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;
 pub use crate::stubs::large_distro_stubs::*;
+
+pub mod sovereign_openbsd_ultimate_parity_pr_suite;
+pub use sovereign_openbsd_ultimate_parity_pr_suite::*;

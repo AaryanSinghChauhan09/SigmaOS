@@ -1367,4 +1367,12 @@ if [ -f "src/distro/open_source_os_missing_components_v54_pr.rs" ]; then
     ./build/test_open_source_v54_pr
 fi
 
+
+if [ -f "src/distro/sovereign_openbsd_ultimate_parity_pr_suite.rs" ]; then
+    echo "Running Sovereign OpenBSD Ultimate Parity PR test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_openbsd_ultimate_parity_pr_suite.rs --edition=2021 -o build/test_openbsd_ultimate_parity
+    ./build/test_openbsd_ultimate_parity
+fi
+
 echo "All SigmaOS test suites completed."
