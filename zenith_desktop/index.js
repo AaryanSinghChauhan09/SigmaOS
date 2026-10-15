@@ -1287,7 +1287,11 @@ export function maximizeWindow(winId) {
   const isMax = win.classList.toggle("maximized");
   const maxBtn = SovereignDomSelector.selectOne(".control-dot.max", win);
   if (maxBtn) {
-    const label = isMax ? "Restore Window" : "Maximize Window";
+    maxBtn.setAttribute("aria-expanded", isMax ? "true" : "false");
+    const currentLabel = maxBtn.getAttribute("aria-label") || "Maximize Window";
+    const label = isMax
+      ? currentLabel.replace(/^Maximize\b/, "Restore")
+      : currentLabel.replace(/^Restore\b/, "Maximize");
     maxBtn.setAttribute("aria-label", label);
     maxBtn.setAttribute("data-tooltip", isMax ? "Restore" : "Maximize");
   }
