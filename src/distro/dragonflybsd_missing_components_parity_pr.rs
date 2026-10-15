@@ -10,7 +10,11 @@
 // 4. DragonFlyDsynthDportsPrEngine (dsynth parallel dports builder & dependency solver)
 // 5. DragonFlyVarsymsResolverPrEngine (VFS Variant Symlink dynamic expansion)
 // 6. DragonFlyDevfsKqueuePrEngine (DevFS event notifications via kqueue)
-// 7. DragonFlyBsdMissingComponentsParityPrGateway (Master PR Gateway)
+// 7. DragonFlySwapcachePrEngine (Swapcache SSD caching layer for filesystem buffers)
+// 8. DragonFlyLocklessNamecachePrEngine (Lockless per-CPU VFS Namecache resolution)
+// 9. DragonFlyFirmlinkPrEngine (Firmlink directory bindings & mount isolation)
+// 10. DragonFlySmpIpiRendezvousPrEngine (SMP Cross-CPU IPI Rendezvous & token passing)
+// 11. DragonFlyBsdMissingComponentsParityPrGateway (Master PR Gateway)
 
 #[cfg(not(any(feature = "standalone_test", test)))]
 extern crate alloc;
@@ -289,7 +293,162 @@ impl DragonFlyDevfsKqueuePrEngine {
     }
 }
 
-/// 7. Master DragonFly BSD Missing Components Parity PR Gateway
+/// 7. DragonFly BSD Swapcache SSD Caching Engine
+#[derive(Debug, Clone)]
+pub struct SwapcacheMeta {
+    pub block_id: u64,
+    pub ssd_offset: u64,
+    pub clean: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct DragonFlySwapcachePrEngine {
+    pub cache_entries: BTreeMap<u64, SwapcacheMeta>,
+    pub total_cached_mb: usize,
+}
+
+impl DragonFlySwapcachePrEngine {
+    pub fn new() -> Self {
+        Self {
+            cache_entries: BTreeMap::new(),
+            total_cached_mb: 0,
+        }
+    }
+
+    pub fn cache_block(&mut self, block_id: u64, ssd_offset: u64) -> Result<String, String> {
+        let entry = SwapcacheMeta {
+            block_id,
+            ssd_offset,
+            clean: true,
+        };
+        self.cache_entries.insert(block_id, entry);
+        self.total_cached_mb += 4; // 4MB block
+        Ok(format!(
+            "Swapcache cached block 0x{:X} at SSD offset 0x{:X}",
+            block_id, ssd_offset
+        ))
+    }
+
+    pub fn lookup_block(&self, block_id: u64) -> Option<u64> {
+        self.cache_entries.get(&block_id).map(|meta| meta.ssd_offset)
+    }
+}
+
+/// 8. DragonFly BSD Lockless Per-CPU VFS Namecache Engine
+#[derive(Debug, Clone)]
+pub struct NamecacheEntry {
+    pub path: String,
+    pub inode_num: u64,
+    pub cpu_owner: u32,
+}
+
+#[derive(Debug, Clone)]
+pub struct DragonFlyLocklessNamecachePrEngine {
+    pub cpu_cache: BTreeMap<u32, Vec<NamecacheEntry>>,
+}
+
+impl DragonFlyLocklessNamecachePrEngine {
+    pub fn new() -> Self {
+        Self {
+            cpu_cache: BTreeMap::new(),
+        }
+    }
+
+    pub fn insert_entry(&mut self, cpu_id: u32, path: &str, inode_num: u64) -> Result<String, String> {
+        let entry = NamecacheEntry {
+            path: path.to_string(),
+            inode_num,
+            cpu_owner: cpu_id,
+        };
+        self.cpu_cache.entry(cpu_id).or_insert_with(Vec::new).push(entry);
+        Ok(format!(
+            "PR Proposal: Inserted lockless namecache entry '{}' (inode {}) on CPU {}",
+            path, inode_num, cpu_id
+        ))
+    }
+
+    pub fn resolve_entry(&self, cpu_id: u32, path: &str) -> Option<u64> {
+        self.cpu_cache
+            .get(&cpu_id)?
+            .iter()
+            .find(|e| e.path == path)
+            .map(|e| e.inode_num)
+    }
+}
+
+/// 9. DragonFly BSD Firmlink Directory Binding Engine
+#[derive(Debug, Clone)]
+pub struct FirmlinkBinding {
+    pub source_path: String,
+    pub target_path: String,
+    pub read_only: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct DragonFlyFirmlinkPrEngine {
+    pub bindings: BTreeMap<String, FirmlinkBinding>,
+}
+
+impl DragonFlyFirmlinkPrEngine {
+    pub fn new() -> Self {
+        Self {
+            bindings: BTreeMap::new(),
+        }
+    }
+
+    pub fn create_firmlink(&mut self, source: &str, target: &str, read_only: bool) -> Result<String, String> {
+        let binding = FirmlinkBinding {
+            source_path: source.to_string(),
+            target_path: target.to_string(),
+            read_only,
+        };
+        self.bindings.insert(target.to_string(), binding);
+        Ok(format!(
+            "PR Proposal: Created firmlink binding '{}' -> '{}' (ro: {})",
+            target, source, read_only
+        ))
+    }
+}
+
+/// 10. DragonFly BSD SMP Cross-CPU IPI Rendezvous Engine
+#[derive(Debug, Clone)]
+pub struct IpiRendezvousState {
+    pub active_cpus: u32,
+    pub current_token: u64,
+    pub synchronized_cpus: Vec<u32>,
+}
+
+#[derive(Debug, Clone)]
+pub struct DragonFlySmpIpiRendezvousPrEngine {
+    pub state: IpiRendezvousState,
+}
+
+impl DragonFlySmpIpiRendezvousPrEngine {
+    pub fn new(active_cpus: u32) -> Self {
+        Self {
+            state: IpiRendezvousState {
+                active_cpus,
+                current_token: 0,
+                synchronized_cpus: Vec::new(),
+            },
+        }
+    }
+
+    pub fn initiate_rendezvous(&mut self, token: u64) -> String {
+        self.state.current_token = token;
+        self.state.synchronized_cpus.clear();
+        format!("Initiated Cross-CPU IPI Rendezvous token 0x{:X}", token)
+    }
+
+    pub fn ack_cpu_rendezvous(&mut self, cpu_id: u32) -> bool {
+        if !self.state.synchronized_cpus.contains(&cpu_id) {
+            self.state.synchronized_cpus.push(cpu_id);
+        }
+        self.state.synchronized_cpus.len() as u32 == self.state.active_cpus
+    }
+}
+
+/// 11. Master DragonFly BSD Missing Components Parity PR Gateway
 pub struct DragonFlyBsdMissingComponentsParityPrGateway {
     pub lwkt: DragonFlyLwktMessagingPrEngine,
     pub hammer2: DragonFlyHammer2PfsReplicationPrEngine,
@@ -297,6 +456,10 @@ pub struct DragonFlyBsdMissingComponentsParityPrGateway {
     pub dsynth: DragonFlyDsynthDportsPrEngine,
     pub varsyms: DragonFlyVarsymsResolverPrEngine,
     pub devfs: DragonFlyDevfsKqueuePrEngine,
+    pub swapcache: DragonFlySwapcachePrEngine,
+    pub namecache: DragonFlyLocklessNamecachePrEngine,
+    pub firmlink: DragonFlyFirmlinkPrEngine,
+    pub ipi_rendezvous: DragonFlySmpIpiRendezvousPrEngine,
 }
 
 impl DragonFlyBsdMissingComponentsParityPrGateway {
@@ -308,6 +471,10 @@ impl DragonFlyBsdMissingComponentsParityPrGateway {
             dsynth: DragonFlyDsynthDportsPrEngine::new(),
             varsyms: DragonFlyVarsymsResolverPrEngine::new(),
             devfs: DragonFlyDevfsKqueuePrEngine::new(),
+            swapcache: DragonFlySwapcachePrEngine::new(),
+            namecache: DragonFlyLocklessNamecachePrEngine::new(),
+            firmlink: DragonFlyFirmlinkPrEngine::new(),
+            ipi_rendezvous: DragonFlySmpIpiRendezvousPrEngine::new(4),
         }
     }
 
@@ -321,10 +488,17 @@ impl DragonFlyBsdMissingComponentsParityPrGateway {
         let _ds = self.dsynth.build_dport("ports-mgmt/pkg").is_ok();
         let resolved = self.varsyms.resolve_path("/usr/obj/$ARCH/$SYS/kernel");
         let _dev = self.devfs.trigger_dev_event("/dev/hammer2", "NOTE_WRITE") > 0;
+        let _swp = self.swapcache.cache_block(0x1000, 0x5000).is_ok();
+        let _nc = self.namecache.insert_entry(0, "/usr/bin", 8192).is_ok();
+        let _fl = self.firmlink.create_firmlink("/var/log", "/usr/log", true).is_ok();
+        let _ipi = self.ipi_rendezvous.initiate_rendezvous(0xABC123);
+        let _ack = self.ipi_rendezvous.ack_cpu_rendezvous(0);
 
         resolved.contains("x86_64") && resolved.contains("DragonFly")
     }
 }
+
+pub type DragonFlyBsdMissingComponentsParityPrSuite = DragonFlyBsdMissingComponentsParityPrGateway;
 
 #[cfg(test)]
 mod tests {
@@ -348,5 +522,13 @@ mod tests {
 
         // Test HAMMER2 PFS
         assert_eq!(gateway.hammer2.cluster_nodes.len(), 2);
+
+        // Test Swapcache & Namecache
+        assert_eq!(gateway.swapcache.lookup_block(0x1000), Some(0x5000));
+        assert_eq!(gateway.namecache.resolve_entry(0, "/usr/bin"), Some(8192));
+
+        // Test Firmlink & IPI Rendezvous
+        assert!(gateway.firmlink.bindings.contains_key("/usr/log"));
+        assert!(!gateway.ipi_rendezvous.ack_cpu_rendezvous(1)); // Only 2 of 4 CPUs acked (0 and 1)
     }
 }

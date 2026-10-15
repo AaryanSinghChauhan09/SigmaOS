@@ -100,6 +100,8 @@ pub mod arch_parity;
 pub use arch_missing_components_parity_pr::*;
 pub mod openbsd_missing_components_parity_pr;
 pub use openbsd_missing_components_parity_pr::*;
+pub mod dragonflybsd_missing_components_parity_pr;
+pub use dragonflybsd_missing_components_parity_pr::*;
 
 pub use arch_missing_components::{
     AlpmInstalledPackage, ArchAlpmDbIntegrityEngine, ArchAuditVulnerabilityScanner,
