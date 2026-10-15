@@ -224,6 +224,160 @@ impl DEManager {
         let cinnamon_id = "cinnamon-x11".to_string();
         self.configs.insert(cinnamon_id.clone(), cinnamon);
         self.installed_des.push(cinnamon_id);
+
+        // MATE X11
+        let mate = DEConfig::new(
+            DesktopEnvironment::MATE,
+            DesktopDESessionType::X11,
+            "mate-session".to_string(),
+            "Xorg".to_string(),
+        );
+        let mate_id = "mate-x11".to_string();
+        self.configs.insert(mate_id.clone(), mate);
+        self.installed_des.push(mate_id);
+
+        // LXQt Wayland
+        let lxqt = DEConfig::new(
+            DesktopEnvironment::LXQt,
+            DesktopDESessionType::Wayland,
+            "startlxqtwayland".to_string(),
+            "lxqt-wayland".to_string(),
+        );
+        let lxqt_id = "lxqt-wayland".to_string();
+        self.configs.insert(lxqt_id.clone(), lxqt);
+        self.installed_des.push(lxqt_id);
+
+        // LXDE X11
+        let lxde = DEConfig::new(
+            DesktopEnvironment::LXDE,
+            DesktopDESessionType::X11,
+            "startlxde".to_string(),
+            "Xorg".to_string(),
+        );
+        let lxde_id = "lxde-x11".to_string();
+        self.configs.insert(lxde_id.clone(), lxde);
+        self.installed_des.push(lxde_id);
+
+        // Budgie X11
+        let budgie = DEConfig::new(
+            DesktopEnvironment::Budgie,
+            DesktopDESessionType::X11,
+            "budgie-desktop".to_string(),
+            "Xorg".to_string(),
+        );
+        let budgie_id = "budgie-x11".to_string();
+        self.configs.insert(budgie_id.clone(), budgie);
+        self.installed_des.push(budgie_id);
+
+        // Enlightenment Wayland
+        let efl = DEConfig::new(
+            DesktopEnvironment::Enlightenment,
+            DesktopDESessionType::Wayland,
+            "enlightenment_start".to_string(),
+            "wayland".to_string(),
+        );
+        let efl_id = "enlightenment-wayland".to_string();
+        self.configs.insert(efl_id.clone(), efl);
+        self.installed_des.push(efl_id);
+
+        // Pantheon X11
+        let pantheon = DEConfig::new(
+            DesktopEnvironment::Pantheon,
+            DesktopDESessionType::X11,
+            "io.elementary.wingpanel".to_string(),
+            "Xorg".to_string(),
+        );
+        let pantheon_id = "pantheon-x11".to_string();
+        self.configs.insert(pantheon_id.clone(), pantheon);
+        self.installed_des.push(pantheon_id);
+
+        // i3 Window Manager X11
+        let i3 = DEConfig::new(
+            DesktopEnvironment::I3,
+            DesktopDESessionType::X11,
+            "i3".to_string(),
+            "Xorg".to_string(),
+        );
+        let i3_id = "i3-x11".to_string();
+        self.configs.insert(i3_id.clone(), i3);
+        self.installed_des.push(i3_id);
+
+        // bspwm X11
+        let bspwm = DEConfig::new(
+            DesktopEnvironment::Bspwm,
+            DesktopDESessionType::X11,
+            "bspwm".to_string(),
+            "Xorg".to_string(),
+        );
+        let bspwm_id = "bspwm-x11".to_string();
+        self.configs.insert(bspwm_id.clone(), bspwm);
+        self.installed_des.push(bspwm_id);
+
+        // dwm X11
+        let dwm = DEConfig::new(
+            DesktopEnvironment::Dwm,
+            DesktopDESessionType::X11,
+            "dwm".to_string(),
+            "Xorg".to_string(),
+        );
+        let dwm_id = "dwm-x11".to_string();
+        self.configs.insert(dwm_id.clone(), dwm);
+        self.installed_des.push(dwm_id);
+
+        // Openbox X11
+        let openbox = DEConfig::new(
+            DesktopEnvironment::Openbox,
+            DesktopDESessionType::X11,
+            "openbox-session".to_string(),
+            "Xorg".to_string(),
+        );
+        let openbox_id = "openbox-x11".to_string();
+        self.configs.insert(openbox_id.clone(), openbox);
+        self.installed_des.push(openbox_id);
+
+        // Fluxbox X11
+        let fluxbox = DEConfig::new(
+            DesktopEnvironment::Fluxbox,
+            DesktopDESessionType::X11,
+            "startfluxbox".to_string(),
+            "Xorg".to_string(),
+        );
+        let fluxbox_id = "fluxbox-x11".to_string();
+        self.configs.insert(fluxbox_id.clone(), fluxbox);
+        self.installed_des.push(fluxbox_id);
+
+        // awesome X11
+        let awesome = DEConfig::new(
+            DesktopEnvironment::Awesome,
+            DesktopDESessionType::X11,
+            "awesome".to_string(),
+            "Xorg".to_string(),
+        );
+        let awesome_id = "awesome-x11".to_string();
+        self.configs.insert(awesome_id.clone(), awesome);
+        self.installed_des.push(awesome_id);
+
+        // Hyprland Wayland
+        let hyprland = DEConfig::new(
+            DesktopEnvironment::Hyprland,
+            DesktopDESessionType::Wayland,
+            "Hyprland".to_string(),
+            "wayland".to_string(),
+        );
+        let hyprland_id = "hyprland-wayland".to_string();
+        self.configs.insert(hyprland_id.clone(), hyprland);
+        self.installed_des.push(hyprland_id);
+
+        // Sway Wayland
+        let sway = DEConfig::new(
+            DesktopEnvironment::Sway,
+            DesktopDESessionType::Wayland,
+            "sway".to_string(),
+            "wayland".to_string(),
+        );
+        let sway_id = "sway-wayland".to_string();
+        self.configs.insert(sway_id.clone(), sway);
+        self.installed_des.push(sway_id);
     }
 
     pub fn add_config(&mut self, id: String, config: DEConfig) -> bool {
@@ -398,36 +552,36 @@ mod tests {
     #[test]
     fn test_de_manager_initialization() {
         let manager = DEManager::new();
-        assert_eq!(manager.get_configs().len(), 6);
+        assert_eq!(manager.get_configs().len(), 20);
         assert!(manager.get_default_de().is_some());
-        assert_eq!(manager.get_installed_des().len(), 5);
+        assert_eq!(manager.get_installed_des().len(), 19);
     }
 
     #[test]
     fn test_add_config() {
         let mut manager = DEManager::new();
         let config = DEConfig::new(
-            DesktopEnvironment::MATE,
-            DesktopDESessionType::X11,
-            "mate-session".to_string(),
-            "Xorg".to_string(),
+            DesktopEnvironment::TTY,
+            DesktopDESessionType::TTY,
+            "agetty".to_string(),
+            "tty".to_string(),
         );
-        assert!(manager.add_config("mate-x11".to_string(), config));
-        assert_eq!(manager.get_configs().len(), 7);
+        assert!(manager.add_config("tty-console".to_string(), config));
+        assert_eq!(manager.get_configs().len(), 21);
     }
 
     #[test]
     fn test_remove_config() {
         let mut manager = DEManager::new();
         let config = DEConfig::new(
-            DesktopEnvironment::MATE,
-            DesktopDESessionType::X11,
-            "mate-session".to_string(),
-            "Xorg".to_string(),
+            DesktopEnvironment::TTY,
+            DesktopDESessionType::TTY,
+            "agetty".to_string(),
+            "tty".to_string(),
         );
-        manager.add_config("mate-x11".to_string(), config);
-        assert!(manager.remove_config("mate-x11"));
-        assert_eq!(manager.get_configs().len(), 6);
+        manager.add_config("tty-console".to_string(), config);
+        assert!(manager.remove_config("tty-console"));
+        assert_eq!(manager.get_configs().len(), 20);
     }
 
     #[test]
@@ -444,14 +598,14 @@ mod tests {
     fn test_mark_installed() {
         let mut manager = DEManager::new();
         assert!(manager.mark_installed("gnome-x11"));
-        assert_eq!(manager.get_installed_des().len(), 6);
+        assert_eq!(manager.get_installed_des().len(), 20);
     }
 
     #[test]
     fn test_mark_uninstalled() {
         let mut manager = DEManager::new();
         assert!(manager.mark_uninstalled("gnome-wayland"));
-        assert_eq!(manager.get_installed_des().len(), 4);
+        assert_eq!(manager.get_installed_des().len(), 18);
     }
 
     #[test]
@@ -465,14 +619,37 @@ mod tests {
     fn test_get_configs_by_session_type() {
         let manager = DEManager::new();
         let wayland_configs = manager.get_configs_by_session_type(DesktopDESessionType::Wayland);
-        assert_eq!(wayland_configs.len(), 3);
+        assert_eq!(wayland_configs.len(), 7);
     }
 
     #[test]
     fn test_statistics() {
         let manager = DEManager::new();
         let stats = manager.get_statistics();
-        assert_eq!(stats.total_configs, 6);
-        assert_eq!(stats.installed_count, 5);
+        assert_eq!(stats.total_configs, 20);
+        assert_eq!(stats.installed_count, 19);
+    }
+
+    #[test]
+    fn test_expanded_de_manager_default_configs() {
+        let manager = DEManager::new();
+        assert_eq!(manager.get_configs_by_de(DesktopEnvironment::GNOME).len(), 2);
+        assert_eq!(manager.get_configs_by_de(DesktopEnvironment::KDE).len(), 1);
+        assert_eq!(manager.get_configs_by_de(DesktopEnvironment::XFCE).len(), 1);
+        assert_eq!(manager.get_configs_by_de(DesktopEnvironment::MATE).len(), 1);
+        assert_eq!(manager.get_configs_by_de(DesktopEnvironment::Cinnamon).len(), 1);
+        assert_eq!(manager.get_configs_by_de(DesktopEnvironment::LXQt).len(), 1);
+        assert_eq!(manager.get_configs_by_de(DesktopEnvironment::LXDE).len(), 1);
+        assert_eq!(manager.get_configs_by_de(DesktopEnvironment::Budgie).len(), 1);
+        assert_eq!(manager.get_configs_by_de(DesktopEnvironment::Enlightenment).len(), 1);
+        assert_eq!(manager.get_configs_by_de(DesktopEnvironment::Pantheon).len(), 1);
+        assert_eq!(manager.get_configs_by_de(DesktopEnvironment::I3).len(), 1);
+        assert_eq!(manager.get_configs_by_de(DesktopEnvironment::Bspwm).len(), 1);
+        assert_eq!(manager.get_configs_by_de(DesktopEnvironment::Dwm).len(), 1);
+        assert_eq!(manager.get_configs_by_de(DesktopEnvironment::Openbox).len(), 1);
+        assert_eq!(manager.get_configs_by_de(DesktopEnvironment::Fluxbox).len(), 1);
+        assert_eq!(manager.get_configs_by_de(DesktopEnvironment::Awesome).len(), 1);
+        assert_eq!(manager.get_configs_by_de(DesktopEnvironment::Hyprland).len(), 1);
+        assert_eq!(manager.get_configs_by_de(DesktopEnvironment::Sway).len(), 1);
     }
 }
