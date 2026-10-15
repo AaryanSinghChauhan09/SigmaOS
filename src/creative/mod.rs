@@ -3,6 +3,7 @@
 // Creative applications framework inspired by GIMP, Krita, Inkscape, Blender, etc.
 
 pub mod photocraft;
+pub mod photocraft_missing_components_parity_pr;
 pub mod filmcraft;
 pub mod vectorcraft;
 pub mod pdfcraft;
@@ -22,6 +23,12 @@ pub use photocraft::{
     PhotoEditor, ImageLayer, Filter, Adjustment, LayerType, LayerMask, AdjustmentType,
     LayerStyle, SelectionTool, SmartFilter, MaskType,
     init_photocraft, get_photocraft,
+};
+pub use photocraft_missing_components_parity_pr::{
+    PhotocraftPrProposalManifest, PhotocraftRawProcessingPrEngine,
+    PhotocraftAiInpaintingPrEngine, PhotocraftColorGradingFrequencySeparationPrEngine,
+    PhotocraftHdrExposureStackingPrEngine, PhotocraftVectorMaskPenPathPrEngine,
+    PhotocraftBatchActionMacroPrEngine, SovereignPhotocraftArtcraftParityPrGateway,
 };
 pub use filmcraft::{
     VideoEditor, VideoTrack, Timeline, Effect,
