@@ -79,6 +79,13 @@ impl Suite100Ideas {
             source_type: FeatureSourceType::RoadmapIdea,
             fulfilled: true,
         });
+        self.features.push(RoadmapFeatureIdea {
+            id: 33,
+            title: "SigmaOS System Applications Development Plan & Gateway Engine",
+            category: "Package & App Management",
+            source_type: FeatureSourceType::RoadmapIdea,
+            fulfilled: true,
+        });
 
         // Security & Privacy
         self.features.push(RoadmapFeatureIdea {

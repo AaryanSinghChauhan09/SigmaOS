@@ -176,6 +176,17 @@ impl WikiDataTransferEngine {
         );
 
         self.feature_specs.insert(
+            "SystemAppsDevelopmentPlan".to_string(),
+            FeatureMdStatus {
+                spec_name: "32-System-Apps-Development-Plan.md".to_string(),
+                source_path: "wiki/32-System-Apps-Development-Plan.md".to_string(),
+                is_fully_implemented: true,
+                completion_percentage: 100,
+                wiki_mirrored: true,
+            },
+        );
+
+        self.feature_specs.insert(
             "NetworkDevelopmentAndMaintenancePlan".to_string(),
             FeatureMdStatus {
                 spec_name: "28-Network-Development-And-Maintenance-Plan.md".to_string(),

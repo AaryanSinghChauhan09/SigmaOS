@@ -40,6 +40,8 @@ pub mod swap;
 pub use swap::*;
 pub mod system;
 pub use system::*;
+pub mod system_apps;
+pub use system_apps::*;
 pub use distro::sovereign_linux_bsd_wiki_master_engine::*;
 pub mod driver;
 pub mod drivers;
