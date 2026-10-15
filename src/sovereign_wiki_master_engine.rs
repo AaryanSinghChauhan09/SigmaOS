@@ -16,7 +16,7 @@ use alloc::vec;
 use alloc::vec::Vec;
 
 /// ---------------------------------------------------------------------------
-/// 0. Feature Source Types and Roadmap Feature Types
+/// 0. Master Wiki & Roadmap Feature Types
 /// ---------------------------------------------------------------------------
 
 /// Feature Source Types across documentation and wiki specs
@@ -26,9 +26,6 @@ pub enum FeatureSourceType {
     DistroRoadmapSpec,
     ArticleIdea,
     ArchitectureDocument,
-    UnimplementedIdeas,
-    MediaWikiDoc,
-    AppReplacementPr,
     DistroGapMatrix,
     CoreArchitectureDoc,
     SovereignArchitectureDoc,
@@ -230,7 +227,7 @@ impl Default for Sovereign100IdeasSuite {
 }
 
 /// ---------------------------------------------------------------------------
-/// 2. Twelve Sovereign Native System Shards (`S-SHARDS`) Engine
+/// 2. 12 Native System Shards Registry
 /// ---------------------------------------------------------------------------
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -265,22 +262,14 @@ pub struct SovereignShardsMasterRegistry {
 
 impl SovereignShardsMasterRegistry {
     pub fn new() -> Self {
-        let shard_names = [
-            ("S-SHARD-01", "Microkernel & Interrupt Vector"),
-            ("S-SHARD-02", "Process & Scheduler Governor"),
-            ("S-SHARD-03", "Memory & HugePages Compactor"),
-            ("S-SHARD-04", "VFS & Transactional Storage"),
-            ("S-SHARD-05", "Pledge & Unveil Sandbox Guard"),
-            ("S-SHARD-06", "Network & Proxy Firewall"),
-            ("S-SHARD-07", "Desktop & Display Server"),
-            ("S-SHARD-08", "SigPkg Universal Package Engine"),
-            ("S-SHARD-09", "Systemd & Service Init Manager"),
-            ("S-SHARD-10", "AI Agent & Telemetry Governor"),
-            ("S-SHARD-11", "Backup & Fail-Closed Recovery"),
-            ("S-SHARD-12", "Hardware & Driver Synthesis"),
-        ];
+        let mut registry = Self {
+            shards: BTreeMap::new(),
+        };
+        registry.populate_shards();
+        registry
+    }
 
-    fn register_all_12_shards(&mut self) {
+    fn populate_shards(&mut self) {
         self.shards.insert(
             1,
             SovereignShardDescriptor {
