@@ -11,6 +11,7 @@ Welcome to the SigmaOS Architecture and Subsystem Development Master Index. This
 - [Signal Path Audit & ABI Profile](SIGNAL_HANDLER_AUDIT_AND_ABI_PROFILE.md) - Subsystem component audit, POSIX signal numbers and default actions, data structure ABI layouts, and x86_64 user frame layout.
 - [Physical Memory Manager Plan](PHYSICAL_MEMORY_MANAGER_PLAN.md) - Two-stage physical memory management architecture, 11 PMM rules & invariants, 20-PR sequence roadmap, periodic maintenance schedule, cross-component implementation rules, and merge gates.
 - [System Utilities Development Plan](SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md) - Baseline rules, POSIX compatibility, 18-PR roadmap, component rules, periodic maintenance framework, and merge gates.
+- [Process Synchronization Plan](PROCESS_SYNCHRONIZATION_PLAN.md) - Master Architecture & Development Roadmap Plan establishing 5 integrated synchronization layers, 11 core design rules, 17-PR sequence roadmap, maintenance cadences, component rules, PR review template, and completion gates.
 - [Filesystem & Storage Parity Proposal](PR_PROPOSAL_FILESYSTEMS_AND_STORAGE_PARITY.md) - Multi-tiered storage engines, zswap writeback cache, and OverlayFS mount simulation.
 - [Toolchain & Development Ecosystem Proposal](PR_PROPOSAL_TOOLCHAIN_AND_DEVELOPMENT_PARITY.md) - Zero-dependency toolchain engines, compilers, build orchestration, and dynamic tracing.
 
@@ -29,6 +30,7 @@ Welcome to the SigmaOS Architecture and Subsystem Development Master Index. This
 - [Process Lifecycle & Subreaper](../wiki/Process-Lifecycle-and-Subreaper-Components.md)
 - [Physical Memory Manager Plan Mirror](../wiki/PHYSICAL_MEMORY_MANAGER_PLAN.md)
 - [Process Manager Plan Mirror](../wiki/PROCESS_MANAGER_PLAN.md)
+- [Process Synchronization Plan Mirror](../wiki/PROCESS_SYNCHRONIZATION_PLAN.md)
 - [Resource Governor & Cgroups](../wiki/Resource-Governor-and-Cgroups-Components.md)
 - [Sigma Boot & Secure Enclave](../wiki/Sigma-Boot-Components.md)
 - [Sigma Sandbox Confinement](../wiki/Sigma-Sandbox-Confinement-Components.md)

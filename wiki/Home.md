@@ -163,6 +163,7 @@
 ---
 
 ## 📚 Maintenance, Governance & Architecture
+- [Process Synchronization Plan](./PROCESS_SYNCHRONIZATION_PLAN.md) &ndash; Master Architecture & Development Roadmap Plan establishing 5 integrated synchronization layers, 11 core design rules, 17-PR roadmap, maintenance cadences, component rules, PR review template, and completion gates.
 - [AI Agent Maintenance Instructions](./AI-Agent-Maintenance-Instructions.md) &ndash; Canonical rules, standard library authorization, and One-File-Per-Component invariant.
 - [Contributing Guidelines](./CONTRIBUTING.md) &ndash; Submitting patches, test requirements, and coding conventions.
 - [Main Repository Codebase](https://github.com/AaryanSinghChauhan09/SigmaOS) &ndash; Official SigmaOS GitHub repository.
