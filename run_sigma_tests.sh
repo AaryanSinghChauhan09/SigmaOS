@@ -1159,6 +1159,13 @@ if [ -f "src/distro/repeatable_agent_operating_loop_pr.rs" ]; then
     ./build/test_repeatable_agent_operating_loop
 fi
 
+if [ -f "src/distro/distro_maintainer_operating_model_pr.rs" ]; then
+    echo "Running Distro-Maintainer Operating Model PR Suite..."
+    mkdir -p build
+    rustc --test tests/test_distro_maintainer_operating_model.rs --edition=2021 -o build/test_distro_maintainer_operating_model
+    ./build/test_distro_maintainer_operating_model
+fi
+
 if [ -f "src/distro/open_source_os_unimplemented_ideas_pr_suite.rs" ]; then
     echo "Running Open Source OS Unimplemented Ideas PR Suite test suite..."
     mkdir -p build
