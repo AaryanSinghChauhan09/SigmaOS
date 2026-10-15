@@ -1290,6 +1290,13 @@ if [ -f "src/shell/sovereign_command_interpreter.rs" ]; then
     rustc --test src/shell/sovereign_command_interpreter.rs --edition=2021 -o build/test_command_interpreter
     ./build/test_command_interpreter
 fi
+
+if [ -f "tests/shell_lifecycle_tests.rs" ]; then
+    echo "Running Shell Lifecycle & Conformance test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 tests/shell_lifecycle_tests.rs -o build/shell_lifecycle_tests
+    ./build/shell_lifecycle_tests
+fi
 if [ -f "src/distro/sovereign_open_source_os_apex_inspirations_v50.rs" ]; then
     echo "Running Sovereign Open Source OS Apex Inspirations Engine (V50) test suite..."
     mkdir -p build
