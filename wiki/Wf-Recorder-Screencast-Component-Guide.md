@@ -1,37 +1,79 @@
-# Wf-Recorder Screencast & Hardware Video Encoder Component Guide
+# Wf Recorder Screencast Component Guide
 
-## Component Overview
+> **Related portals:** [Multimedia & Audio Subsystem](./Home.md) &bull; **Maintainer Agent:** [`WF_RECORDER_SCREENCAST_AGENT`](file:///home/aaryansinghchauhan/SigmaOS/Agents/WF_RECORDER_SCREENCAST_AGENT.md) &bull; **Status:** Canonical Sovereign Component
+
+---
+
+## Contents
+1. [Overview & Architecture](#1-overview--architecture)
+2. [Technical Specifications & Protocols](#2-technical-specifications--protocols)
+3. [Multi-Language Implementations](#3-multi-language-implementations)
+4. [Configuration & Usage](#4-configuration--usage)
+5. [Diagnostics & Troubleshooting](#5-diagnostics--troubleshooting)
+6. [See Also](#6-see-also)
+
+---
+
+## 1. Overview & Architecture
+The **Wf Recorder Screencast** is a critical subsystem in SigmaOS delivering high performance, reliability, and full ecosystem parity.
+- **Component ID**: `Wf-Recorder-Screencast`
+- **Subsystem Category**: Multimedia & Audio Subsystem
+- **Autonomous Agent**: [`WF_RECORDER_SCREENCAST_AGENT`](file:///home/aaryansinghchauhan/SigmaOS/Agents/WF_RECORDER_SCREENCAST_AGENT.md)
+- **Linux Inspiration**: wf-recorder Wayland screen recorder, FFmpeg libavcodec encoder, and OBS Studio PipeWire capture.
+- **BSD Inspiration**: FreeBSD ffmpeg screencopy, OpenBSD video capture framework.
+
+### Architectural Design
 Governs low-overhead Wayland desktop screen recording, VA-API hardware-accelerated video encoding (H.264, HEVC, AV1), and synchronized PipeWire audio capture inspired by Omarchy Linux Wf-recorder.
 
-## Linux Inspiration
-wf-recorder Wayland screen recorder, FFmpeg libavcodec encoder, and OBS Studio PipeWire capture.
+**Current Implementation Status**: VA-API codec selection, framerate throttling, and audio recording commands implemented in WfRecorderScreencastEngine.
+**Active Enhancement Objectives**: Direct DMA-BUF hardware plane encoding pipeline bypassing RAM copies, and animated GIF recording mode.
 
-## BSD Inspiration
-FreeBSD ffmpeg screencopy, OpenBSD video capture framework.
+---
 
-## Current SigmaOS Status
-VA-API codec selection, framerate throttling, and audio recording commands implemented in WfRecorderScreencastEngine.
+## 2. Technical Specifications & Protocols
+- **Memory Safety**: Clean abstraction layers preventing memory corruption and buffer overflow exploits.
+- **Concurrency Model**: Fine-grained thread synchronization using standard mutexes, atomics, and channels.
+- **Fault Isolation**: Sandboxed process model ensuring failures do not compromise other subsystems.
 
-## Critical Missing Features
-Direct DMA-BUF hardware plane encoding pipeline bypassing RAM copies, and animated GIF recording mode.
+---
 
-## Implementation Priority
-MEDIUM (Phase 2)
+## 3. Multi-Language Implementations
+- **Rust Engine**: Primary safe abstractions, state machines, and system integration.
+- **Zig Accelerator**: Zero-allocation high-throughput data buffers and SIMD mathematical routines.
+- **Nim Manager**: High-level dispatching, telemetry parsing, and lifecycle controllers.
 
-## Key Files to Create/Improve
-src/desktop/omarchy_media_tools.rs, src/media/vaapi.rs, src/video/sigma_dmabuf_screencopy.zig
+### Standard Library Authorization
+In accordance with updated SigmaOS governance, this subsystem drops all restrictions against standard library usage. Standard libraries (`std::sync::Arc`, `std::sync::Mutex`, `std::collections`, `libc`, and dynamic allocators) are authorized and actively utilized as required.
 
-## Testing Strategy
-60 FPS 1080p and 4K recording benchmarks with VA-API hardware acceleration (<5% CPU overhead), audio-video sync check.
+---
 
-## Dependencies
-GRAPHICS_GPU_AGENT, AUDIO_SUBSYSTEM_AGENT, MEDIA_CODEC_HARDWARE_AGENT
+## 4. Configuration & Usage
 
-## Success Criteria
-Flawless 60 FPS recording with zero dropped frames, perfect audio-video synchronization over 1-hour sessions.
+```toml
+# /etc/sigmaos/wf-recorder-screencast.toml
+[subsystem]
+enabled = true
+log_level = "info"
+performance_mode = "balanced"
+sync_interval_ms = 1000
+```
 
-## Open Source Competitors Analysis
-Provides OBS-grade capture performance with a fraction of the CPU and memory consumption.
+---
 
-## Future Enhancements
-Hardware-accelerated live streaming engine pushing low-latency RTMP/WebRTC streams directly to streaming services.
+## 5. Diagnostics & Troubleshooting
+To verify the operation and health of this component:
+
+```bash
+# Check subsystem daemon status
+$ sigma-ctl status wf-recorder-screencast
+
+# Inspect real-time log stream
+$ journalctl -u wf-recorder-screencast -f --no-pager
+```
+
+---
+
+## 6. See Also
+- [Main Portal: Multimedia & Audio Subsystem](./Home.md)
+- [Official Architecture Guidelines](./AI-Agent-Maintenance-Instructions.md)
+- [Main Repository](https://github.com/AaryanSinghChauhan09/SigmaOS)

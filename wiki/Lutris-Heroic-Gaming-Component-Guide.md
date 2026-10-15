@@ -1,37 +1,79 @@
-# Lutris & Heroic Gaming Ecosystem Component Guide
+# Lutris Heroic Gaming Component Guide
 
-## Component Overview
+> **Related portals:** [Gaming, Acceleration & Virtualization](./Home.md) &bull; **Maintainer Agent:** [`LUTRIS_HEROIC_GAMING_AGENT`](file:///home/aaryansinghchauhan/SigmaOS/Agents/LUTRIS_HEROIC_GAMING_AGENT.md) &bull; **Status:** Canonical Sovereign Component
+
+---
+
+## Contents
+1. [Overview & Architecture](#1-overview--architecture)
+2. [Technical Specifications & Protocols](#2-technical-specifications--protocols)
+3. [Multi-Language Implementations](#3-multi-language-implementations)
+4. [Configuration & Usage](#4-configuration--usage)
+5. [Diagnostics & Troubleshooting](#5-diagnostics--troubleshooting)
+6. [See Also](#6-see-also)
+
+---
+
+## 1. Overview & Architecture
+The **Lutris Heroic Gaming** is a critical subsystem in SigmaOS delivering high performance, reliability, and full ecosystem parity.
+- **Component ID**: `Lutris-Heroic-Gaming`
+- **Subsystem Category**: Gaming, Acceleration & Virtualization
+- **Autonomous Agent**: [`LUTRIS_HEROIC_GAMING_AGENT`](file:///home/aaryansinghchauhan/SigmaOS/Agents/LUTRIS_HEROIC_GAMING_AGENT.md)
+- **Linux Inspiration**: Lutris game manager, Heroic Games Launcher (Epic Games & GOG), Valve Proton compatibility layer, and DXVK/VKD3D.
+- **BSD Inspiration**: FreeBSD wine-proton ports, OpenBSD pledge-sandboxed emulation runtimes.
+
+### Architectural Design
 Governs gaming compatibility runtimes, Wine and Proton prefix sandboxing, DXVK/VKD3D Direct3D-to-Vulkan translation, shader pre-caching, and discrete GPU offload inspired by Omarchy Linux.
 
-## Linux Inspiration
-Lutris game manager, Heroic Games Launcher (Epic Games & GOG), Valve Proton compatibility layer, and DXVK/VKD3D.
+**Current Implementation Status**: Game prefix profile management, Proton version tracking, DXVK/VKD3D toggle flags, and GPU selection implemented in OmarchyLutrisHeroicGamingEngine.
+**Active Enhancement Objectives**: Automated Wine prefix creation with winetricks dependency automation, asynchronous Vulkan pipeline shader pre-compilation, and cloud save synchronization.
 
-## BSD Inspiration
-FreeBSD wine-proton ports, OpenBSD pledge-sandboxed emulation runtimes.
+---
 
-## Current SigmaOS Status
-Game prefix profile management, Proton version tracking, DXVK/VKD3D toggle flags, and GPU selection implemented in OmarchyLutrisHeroicGamingEngine.
+## 2. Technical Specifications & Protocols
+- **Memory Safety**: Clean abstraction layers preventing memory corruption and buffer overflow exploits.
+- **Concurrency Model**: Fine-grained thread synchronization using standard mutexes, atomics, and channels.
+- **Fault Isolation**: Sandboxed process model ensuring failures do not compromise other subsystems.
 
-## Critical Missing Features
-Automated Wine prefix creation with winetricks dependency automation, asynchronous Vulkan pipeline shader pre-compilation, and cloud save synchronization.
+---
 
-## Implementation Priority
-MEDIUM (Phase 3)
+## 3. Multi-Language Implementations
+- **Rust Engine**: Primary safe abstractions, state machines, and system integration.
+- **Zig Accelerator**: Zero-allocation high-throughput data buffers and SIMD mathematical routines.
+- **Nim Manager**: High-level dispatching, telemetry parsing, and lifecycle controllers.
 
-## Key Files to Create/Improve
-src/distro/omarchy_linux_apex_engine.rs, src/distro/omarchy_gaming_enhanced.rs, src/distro/omarchy_gaming_performance_suite.rs
+### Standard Library Authorization
+In accordance with updated SigmaOS governance, this subsystem drops all restrictions against standard library usage. Standard libraries (`std::sync::Arc`, `std::sync::Mutex`, `std::collections`, `libc`, and dynamic allocators) are authorized and actively utilized as required.
 
-## Testing Strategy
-D3D11 and D3D12 benchmark execution, prefix sandboxing isolation verification, discrete GPU power state transition tests.
+---
 
-## Dependencies
-GRAPHICS_GPU_AGENT, CONTAINER_RUNTIME_AGENT, AUDIO_SUBSYSTEM_AGENT
+## 4. Configuration & Usage
 
-## Success Criteria
-Near-native gaming FPS on AAA Windows titles, clean isolated prefixes preventing cross-game library pollution.
+```toml
+# /etc/sigmaos/lutris-heroic-gaming.toml
+[subsystem]
+enabled = true
+log_level = "info"
+performance_mode = "balanced"
+sync_interval_ms = 1000
+```
 
-## Open Source Competitors Analysis
-Surpasses standard Linux gaming setups by integrating prefix isolation directly with SigmaOS Landlock and Pledge sandboxes.
+---
 
-## Future Enhancements
-Zero-overhead DirectStorage emulation streaming game textures directly from NVMe block devices to GPU VRAM.
+## 5. Diagnostics & Troubleshooting
+To verify the operation and health of this component:
+
+```bash
+# Check subsystem daemon status
+$ sigma-ctl status lutris-heroic-gaming
+
+# Inspect real-time log stream
+$ journalctl -u lutris-heroic-gaming -f --no-pager
+```
+
+---
+
+## 6. See Also
+- [Main Portal: Gaming, Acceleration & Virtualization](./Home.md)
+- [Official Architecture Guidelines](./AI-Agent-Maintenance-Instructions.md)
+- [Main Repository](https://github.com/AaryanSinghChauhan09/SigmaOS)

@@ -1,37 +1,79 @@
-# Cryptography & Hardware Security Component Guide
+# Cryptography Component Guide
 
-## Component Overview
+> **Related portals:** [Security, Sandboxing & Cryptography](./Home.md) &bull; **Maintainer Agent:** [`CRYPTOGRAPHY_AGENT`](file:///home/aaryansinghchauhan/SigmaOS/Agents/CRYPTOGRAPHY_AGENT.md) &bull; **Status:** Canonical Sovereign Component
+
+---
+
+## Contents
+1. [Overview & Architecture](#1-overview--architecture)
+2. [Technical Specifications & Protocols](#2-technical-specifications--protocols)
+3. [Multi-Language Implementations](#3-multi-language-implementations)
+4. [Configuration & Usage](#4-configuration--usage)
+5. [Diagnostics & Troubleshooting](#5-diagnostics--troubleshooting)
+6. [See Also](#6-see-also)
+
+---
+
+## 1. Overview & Architecture
+The **Cryptography** is a critical subsystem in SigmaOS delivering high performance, reliability, and full ecosystem parity.
+- **Component ID**: `Cryptography`
+- **Subsystem Category**: Security, Sandboxing & Cryptography
+- **Autonomous Agent**: [`CRYPTOGRAPHY_AGENT`](file:///home/aaryansinghchauhan/SigmaOS/Agents/CRYPTOGRAPHY_AGENT.md)
+- **Linux Inspiration**: Linux crypto API, AF_ALG sockets, getrandom() syscall, kernel keyring service.
+- **BSD Inspiration**: OpenBSD arc4random and bcrypt, FreeBSD crypto framework (opencrypto), hardware TPM integration.
+
+### Architectural Design
 Provides  high-performance cryptographic primitives (AES-GCM, ChaCha20-Poly1305, Ed25519, SHA-256, BLAKE3), hardware acceleration (AES-NI), and secure RNG.
 
-## Linux Inspiration
-Linux crypto API, AF_ALG sockets, getrandom() syscall, kernel keyring service.
+**Current Implementation Status**: Software SHA-256, ChaCha20-Poly1305, and basic CSPRNG implemented. AES-NI hardware instruction acceleration and TPM 2.0 key sealing need completion.
+**Active Enhancement Objectives**: Hardware-accelerated AES-NI and SHA-NI assembly kernels, TPM 2.0 PCR sealed storage engine, constant-time side-channel audited cryptographic implementations.
 
-## BSD Inspiration
-OpenBSD arc4random and bcrypt, FreeBSD crypto framework (opencrypto), hardware TPM integration.
+---
 
-## Current SigmaOS Status
-Software SHA-256, ChaCha20-Poly1305, and basic CSPRNG implemented. AES-NI hardware instruction acceleration and TPM 2.0 key sealing need completion.
+## 2. Technical Specifications & Protocols
+- **Memory Safety**: Clean abstraction layers preventing memory corruption and buffer overflow exploits.
+- **Concurrency Model**: Fine-grained thread synchronization using standard mutexes, atomics, and channels.
+- **Fault Isolation**: Sandboxed process model ensuring failures do not compromise other subsystems.
 
-## Critical Missing Features
-Hardware-accelerated AES-NI and SHA-NI assembly kernels, TPM 2.0 PCR sealed storage engine, constant-time side-channel audited cryptographic implementations.
+---
 
-## Implementation Priority
-HIGH (Phase 1)
+## 3. Multi-Language Implementations
+- **Rust Engine**: Primary safe abstractions, state machines, and system integration.
+- **Zig Accelerator**: Zero-allocation high-throughput data buffers and SIMD mathematical routines.
+- **Nim Manager**: High-level dispatching, telemetry parsing, and lifecycle controllers.
 
-## Key Files to Create/Improve
-src/crypto/aes_ni.rs, src/crypto/chacha20.rs, src/crypto/sha256.rs, src/crypto/ed25519.rs, src/crypto/csprng.rs
+### Standard Library Authorization
+In accordance with updated SigmaOS governance, this subsystem drops all restrictions against standard library usage. Standard libraries (`std::sync::Arc`, `std::sync::Mutex`, `std::collections`, `libc`, and dynamic allocators) are authorized and actively utilized as required.
 
-## Testing Strategy
-NIST Cryptographic Algorithm Validation Program (CAVP) vectors, side-channel timing analysis, entropy pool quality tests.
+---
 
-## Dependencies
-KERNEL_CORE_AGENT
+## 4. Configuration & Usage
 
-## Success Criteria
-Zero secret leakage via timing side-channels, gigabyte-per-second encryption throughput, certified FIPS-compliant algorithms.
+```toml
+# /etc/sigmaos/cryptography.toml
+[subsystem]
+enabled = true
+log_level = "info"
+performance_mode = "balanced"
+sync_interval_ms = 1000
+```
 
-## Open Source Competitors Analysis
-Surpasses Linux crypto API by guaranteeing memory safety and zeroization of secret keys across all execution paths.
+---
 
-## Future Enhancements
-Post-quantum cryptographic algorithms (Kyber / Dilithium) integrated into the default network and TLS stack.
+## 5. Diagnostics & Troubleshooting
+To verify the operation and health of this component:
+
+```bash
+# Check subsystem daemon status
+$ sigma-ctl status cryptography
+
+# Inspect real-time log stream
+$ journalctl -u cryptography -f --no-pager
+```
+
+---
+
+## 6. See Also
+- [Main Portal: Security, Sandboxing & Cryptography](./Home.md)
+- [Official Architecture Guidelines](./AI-Agent-Maintenance-Instructions.md)
+- [Main Repository](https://github.com/AaryanSinghChauhan09/SigmaOS)

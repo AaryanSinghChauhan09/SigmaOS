@@ -1,37 +1,79 @@
-# Wayland Clipboard History & Selection Manager Component Guide
+# Clipboard Manager Component Guide
 
-## Component Overview
+> **Related portals:** [Desktop Environment & Wayland Compositor](./Home.md) &bull; **Maintainer Agent:** [`CLIPBOARD_MANAGER_AGENT`](file:///home/aaryansinghchauhan/SigmaOS/Agents/CLIPBOARD_MANAGER_AGENT.md) &bull; **Status:** Canonical Sovereign Component
+
+---
+
+## Contents
+1. [Overview & Architecture](#1-overview--architecture)
+2. [Technical Specifications & Protocols](#2-technical-specifications--protocols)
+3. [Multi-Language Implementations](#3-multi-language-implementations)
+4. [Configuration & Usage](#4-configuration--usage)
+5. [Diagnostics & Troubleshooting](#5-diagnostics--troubleshooting)
+6. [See Also](#6-see-also)
+
+---
+
+## 1. Overview & Architecture
+The **Clipboard Manager** is a critical subsystem in SigmaOS delivering high performance, reliability, and full ecosystem parity.
+- **Component ID**: `Clipboard-Manager`
+- **Subsystem Category**: Desktop Environment & Wayland Compositor
+- **Autonomous Agent**: [`CLIPBOARD_MANAGER_AGENT`](file:///home/aaryansinghchauhan/SigmaOS/Agents/CLIPBOARD_MANAGER_AGENT.md)
+- **Linux Inspiration**: cliphist Wayland clipboard manager, wl-clipboard (wl-copy / wl-paste), and GPaste daemon.
+- **BSD Inspiration**: OpenBSD xclip/xsel selection forwarding, FreeBSD clipboard managers.
+
+### Architectural Design
 Governs Wayland primary selection, clipboard copy/paste history, multi-mime-type payload streaming (text, PNG, HTML), and secure password masking inspired by Omarchy Linux Cliphist.
 
-## Linux Inspiration
-cliphist Wayland clipboard manager, wl-clipboard (wl-copy / wl-paste), and GPaste daemon.
+**Current Implementation Status**: Ring buffer history, deduplication, and query search implemented in CliphistClipboardEngine and Zig sigma_cliphist_fast_ring.zig.
+**Active Enhancement Objectives**: Direct wl-data-control-v1 protocol client, encrypted clipboard persistence database, and automatic sensitive password purge.
 
-## BSD Inspiration
-OpenBSD xclip/xsel selection forwarding, FreeBSD clipboard managers.
+---
 
-## Current SigmaOS Status
-Ring buffer history, deduplication, and query search implemented in CliphistClipboardEngine and Zig sigma_cliphist_fast_ring.zig.
+## 2. Technical Specifications & Protocols
+- **Memory Safety**: Clean abstraction layers preventing memory corruption and buffer overflow exploits.
+- **Concurrency Model**: Fine-grained thread synchronization using standard mutexes, atomics, and channels.
+- **Fault Isolation**: Sandboxed process model ensuring failures do not compromise other subsystems.
 
-## Critical Missing Features
-Direct wl-data-control-v1 protocol client, encrypted clipboard persistence database, and automatic sensitive password purge.
+---
 
-## Implementation Priority
-HIGH (Phase 1)
+## 3. Multi-Language Implementations
+- **Rust Engine**: Primary safe abstractions, state machines, and system integration.
+- **Zig Accelerator**: Zero-allocation high-throughput data buffers and SIMD mathematical routines.
+- **Nim Manager**: High-level dispatching, telemetry parsing, and lifecycle controllers.
 
-## Key Files to Create/Improve
-src/desktop/omarchy_hypr_ecosystem.rs, src/desktop/sigma_cliphist_fast_ring.zig, src/ipc/pipe.rs
+### Standard Library Authorization
+In accordance with updated SigmaOS governance, this subsystem drops all restrictions against standard library usage. Standard libraries (`std::sync::Arc`, `std::sync::Mutex`, `std::collections`, `libc`, and dynamic allocators) are authorized and actively utilized as required.
 
-## Testing Strategy
-Large image clipboard transfer benchmarks (100MB+ payloads), rapid copy/paste stress tests, search filter accuracy.
+---
 
-## Dependencies
-WAYLAND_COMPOSITOR_AGENT, IPC_AGENT, SECURITY_AGENT
+## 4. Configuration & Usage
 
-## Success Criteria
-Sub-microsecond clipboard capture, zero system UI freeze on massive binary copies, automatic password filtering.
+```toml
+# /etc/sigmaos/clipboard-manager.toml
+[subsystem]
+enabled = true
+log_level = "info"
+performance_mode = "balanced"
+sync_interval_ms = 1000
+```
 
-## Open Source Competitors Analysis
-Combines the versatility of cliphist with a lock-free Zig ring buffer achieving 50x lower latency than SQLite-based managers.
+---
 
-## Future Enhancements
-End-to-end encrypted peer-to-peer clipboard sharing synchronizing text securely across developer workstations.
+## 5. Diagnostics & Troubleshooting
+To verify the operation and health of this component:
+
+```bash
+# Check subsystem daemon status
+$ sigma-ctl status clipboard-manager
+
+# Inspect real-time log stream
+$ journalctl -u clipboard-manager -f --no-pager
+```
+
+---
+
+## 6. See Also
+- [Main Portal: Desktop Environment & Wayland Compositor](./Home.md)
+- [Official Architecture Guidelines](./AI-Agent-Maintenance-Instructions.md)
+- [Main Repository](https://github.com/AaryanSinghChauhan09/SigmaOS)

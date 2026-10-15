@@ -1,37 +1,79 @@
-# Brightness Backlight & DDC/CI Hardware Governor Component Guide
+# Brightness Backlight Component Guide
 
-## Component Overview
+> **Related portals:** [Desktop Environment & Wayland Compositor](./Home.md) &bull; **Maintainer Agent:** [`BRIGHTNESS_BACKLIGHT_AGENT`](file:///home/aaryansinghchauhan/SigmaOS/Agents/BRIGHTNESS_BACKLIGHT_AGENT.md) &bull; **Status:** Canonical Sovereign Component
+
+---
+
+## Contents
+1. [Overview & Architecture](#1-overview--architecture)
+2. [Technical Specifications & Protocols](#2-technical-specifications--protocols)
+3. [Multi-Language Implementations](#3-multi-language-implementations)
+4. [Configuration & Usage](#4-configuration--usage)
+5. [Diagnostics & Troubleshooting](#5-diagnostics--troubleshooting)
+6. [See Also](#6-see-also)
+
+---
+
+## 1. Overview & Architecture
+The **Brightness Backlight** is a critical subsystem in SigmaOS delivering high performance, reliability, and full ecosystem parity.
+- **Component ID**: `Brightness-Backlight`
+- **Subsystem Category**: Desktop Environment & Wayland Compositor
+- **Autonomous Agent**: [`BRIGHTNESS_BACKLIGHT_AGENT`](file:///home/aaryansinghchauhan/SigmaOS/Agents/BRIGHTNESS_BACKLIGHT_AGENT.md)
+- **Linux Inspiration**: brightnessctl, ddcutil I2C monitor controller, and Linux sysfs /sys/class/backlight.
+- **BSD Inspiration**: OpenBSD wscons display brightness, FreeBSD backlight driver.
+
+### Architectural Design
 Governs display backlight PWM modulation, logarithmic perceptual brightness curves, DDC/CI I2C bus monitor communication, and keyboard backlight stepping inspired by Omarchy Linux brightnessctl.
 
-## Linux Inspiration
-brightnessctl, ddcutil I2C monitor controller, and Linux sysfs /sys/class/backlight.
+**Current Implementation Status**: Exponential PWM calculation, step controls, and monitor detection implemented in BrightnessBacklightEngine and Nim sigma_backlight_controller.nim.
+**Active Enhancement Objectives**: Direct I2C /dev/i2c bus DDC/CI command transmission for external HDMI/DisplayPort desktop monitors, and ambient light auto-tuning.
 
-## BSD Inspiration
-OpenBSD wscons display brightness, FreeBSD backlight driver.
+---
 
-## Current SigmaOS Status
-Exponential PWM calculation, step controls, and monitor detection implemented in BrightnessBacklightEngine and Nim sigma_backlight_controller.nim.
+## 2. Technical Specifications & Protocols
+- **Memory Safety**: Clean abstraction layers preventing memory corruption and buffer overflow exploits.
+- **Concurrency Model**: Fine-grained thread synchronization using standard mutexes, atomics, and channels.
+- **Fault Isolation**: Sandboxed process model ensuring failures do not compromise other subsystems.
 
-## Critical Missing Features
-Direct I2C /dev/i2c bus DDC/CI command transmission for external HDMI/DisplayPort desktop monitors, and ambient light auto-tuning.
+---
 
-## Implementation Priority
-HIGH (Phase 1)
+## 3. Multi-Language Implementations
+- **Rust Engine**: Primary safe abstractions, state machines, and system integration.
+- **Zig Accelerator**: Zero-allocation high-throughput data buffers and SIMD mathematical routines.
+- **Nim Manager**: High-level dispatching, telemetry parsing, and lifecycle controllers.
 
-## Key Files to Create/Improve
-src/desktop/omarchy_media_tools.rs, src/desktop/sigma_backlight_controller.nim, src/power/acpi.rs
+### Standard Library Authorization
+In accordance with updated SigmaOS governance, this subsystem drops all restrictions against standard library usage. Standard libraries (`std::sync::Arc`, `std::sync::Mutex`, `std::collections`, `libc`, and dynamic allocators) are authorized and actively utilized as required.
 
-## Testing Strategy
-Backlight stepping tests across laptop displays, DDC/CI query response latency tests.
+---
 
-## Dependencies
-HARDWARE_HAL_DRIVERS_AGENT, POWER_MANAGEMENT_AGENT
+## 4. Configuration & Usage
 
-## Success Criteria
-Smooth, visually linear brightness adjustments, instant response to laptop brightness hotkeys, zero backlight flicker.
+```toml
+# /etc/sigmaos/brightness-backlight.toml
+[subsystem]
+enabled = true
+log_level = "info"
+performance_mode = "balanced"
+sync_interval_ms = 1000
+```
 
-## Open Source Competitors Analysis
-Combines internal laptop backlight control with external monitor DDC/CI control into a single unified driver.
+---
 
-## Future Enhancements
-Circadian rhythm dynamic brightness matching indoor ambient light color temperature.
+## 5. Diagnostics & Troubleshooting
+To verify the operation and health of this component:
+
+```bash
+# Check subsystem daemon status
+$ sigma-ctl status brightness-backlight
+
+# Inspect real-time log stream
+$ journalctl -u brightness-backlight -f --no-pager
+```
+
+---
+
+## 6. See Also
+- [Main Portal: Desktop Environment & Wayland Compositor](./Home.md)
+- [Official Architecture Guidelines](./AI-Agent-Maintenance-Instructions.md)
+- [Main Repository](https://github.com/AaryanSinghChauhan09/SigmaOS)

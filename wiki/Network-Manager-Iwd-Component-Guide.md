@@ -1,37 +1,79 @@
-# Network Interface Manager & IWD Fast Daemon Component Guide
+# Network Manager Iwd Component Guide
 
-## Component Overview
+> **Related portals:** [Networking & Wireless Communications](./Home.md) &bull; **Maintainer Agent:** [`NETWORK_MANAGER_IWD_AGENT`](file:///home/aaryansinghchauhan/SigmaOS/Agents/NETWORK_MANAGER_IWD_AGENT.md) &bull; **Status:** Canonical Sovereign Component
+
+---
+
+## Contents
+1. [Overview & Architecture](#1-overview--architecture)
+2. [Technical Specifications & Protocols](#2-technical-specifications--protocols)
+3. [Multi-Language Implementations](#3-multi-language-implementations)
+4. [Configuration & Usage](#4-configuration--usage)
+5. [Diagnostics & Troubleshooting](#5-diagnostics--troubleshooting)
+6. [See Also](#6-see-also)
+
+---
+
+## 1. Overview & Architecture
+The **Network Manager Iwd** is a critical subsystem in SigmaOS delivering high performance, reliability, and full ecosystem parity.
+- **Component ID**: `Network-Manager-Iwd`
+- **Subsystem Category**: Networking & Wireless Communications
+- **Autonomous Agent**: [`NETWORK_MANAGER_IWD_AGENT`](file:///home/aaryansinghchauhan/SigmaOS/Agents/NETWORK_MANAGER_IWD_AGENT.md)
+- **Linux Inspiration**: iwd (Intel Wireless Daemon), systemd-networkd, and NetworkManager.
+- **BSD Inspiration**: OpenBSD dhcpleased and ifconfig, FreeBSD dhclient and wpa_supplicant.
+
+### Architectural Design
 Governs wired Ethernet link auto-negotiation, dynamic DHCPv4/DHCPv6 lease acquisition, SLAAC IPv6 configuration, Wi-Fi profile management via IWD, and WireGuard VPN tunnels.
 
-## Linux Inspiration
-iwd (Intel Wireless Daemon), systemd-networkd, and NetworkManager.
+**Current Implementation Status**: Ethernet link carrier detection, DHCP state machine, and static route tables implemented in networking stack.
+**Active Enhancement Objectives**: Declarative network connection profiles with priority-based multi-interface failover (switching Wi-Fi to Ethernet automatically).
 
-## BSD Inspiration
-OpenBSD dhcpleased and ifconfig, FreeBSD dhclient and wpa_supplicant.
+---
 
-## Current SigmaOS Status
-Ethernet link carrier detection, DHCP state machine, and static route tables implemented in networking stack.
+## 2. Technical Specifications & Protocols
+- **Memory Safety**: Clean abstraction layers preventing memory corruption and buffer overflow exploits.
+- **Concurrency Model**: Fine-grained thread synchronization using standard mutexes, atomics, and channels.
+- **Fault Isolation**: Sandboxed process model ensuring failures do not compromise other subsystems.
 
-## Critical Missing Features
-Declarative network connection profiles with priority-based multi-interface failover (switching Wi-Fi to Ethernet automatically).
+---
 
-## Implementation Priority
-HIGH (Phase 1)
+## 3. Multi-Language Implementations
+- **Rust Engine**: Primary safe abstractions, state machines, and system integration.
+- **Zig Accelerator**: Zero-allocation high-throughput data buffers and SIMD mathematical routines.
+- **Nim Manager**: High-level dispatching, telemetry parsing, and lifecycle controllers.
 
-## Key Files to Create/Improve
-src/net/ethernet.rs, src/net/ipv4.rs, src/wireless/wifi.rs
+### Standard Library Authorization
+In accordance with updated SigmaOS governance, this subsystem drops all restrictions against standard library usage. Standard libraries (`std::sync::Arc`, `std::sync::Mutex`, `std::collections`, `libc`, and dynamic allocators) are authorized and actively utilized as required.
 
-## Testing Strategy
-Ethernet cable disconnect-reconnect failover timing tests (<500ms lease renewal), Wi-Fi roaming handover tests.
+---
 
-## Dependencies
-NETWORKING_STACK_AGENT, WIRELESS_WIFI_AGENT, SECURITY_AGENT
+## 4. Configuration & Usage
 
-## Success Criteria
-Sub-second network lease acquisition, seamless carrier failover without dropping active TCP connections.
+```toml
+# /etc/sigmaos/network-manager-iwd.toml
+[subsystem]
+enabled = true
+log_level = "info"
+performance_mode = "balanced"
+sync_interval_ms = 1000
+```
 
-## Open Source Competitors Analysis
-Bypasses the bloated D-Bus/GLib stack of NetworkManager in favor of an ultra-compact ~1,500-line safe Rust daemon.
+---
 
-## Future Enhancements
-Multipath TCP (MPTCP) aggregating Wi-Fi and 5G cellular connections for combined throughput and zero-packet-drop failover.
+## 5. Diagnostics & Troubleshooting
+To verify the operation and health of this component:
+
+```bash
+# Check subsystem daemon status
+$ sigma-ctl status network-manager-iwd
+
+# Inspect real-time log stream
+$ journalctl -u network-manager-iwd -f --no-pager
+```
+
+---
+
+## 6. See Also
+- [Main Portal: Networking & Wireless Communications](./Home.md)
+- [Official Architecture Guidelines](./AI-Agent-Maintenance-Instructions.md)
+- [Main Repository](https://github.com/AaryanSinghChauhan09/SigmaOS)

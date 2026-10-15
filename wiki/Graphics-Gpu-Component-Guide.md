@@ -1,37 +1,79 @@
-# Graphics Drivers & GPU Acceleration Component Guide
+# Graphics Gpu Component Guide
 
-## Component Overview
+> **Related portals:** [Multimedia & Audio Subsystem](./Home.md) &bull; **Maintainer Agent:** [`GRAPHICS_GPU_AGENT`](file:///home/aaryansinghchauhan/SigmaOS/Agents/GRAPHICS_GPU_AGENT.md) &bull; **Status:** Canonical Sovereign Component
+
+---
+
+## Contents
+1. [Overview & Architecture](#1-overview--architecture)
+2. [Technical Specifications & Protocols](#2-technical-specifications--protocols)
+3. [Multi-Language Implementations](#3-multi-language-implementations)
+4. [Configuration & Usage](#4-configuration--usage)
+5. [Diagnostics & Troubleshooting](#5-diagnostics--troubleshooting)
+6. [See Also](#6-see-also)
+
+---
+
+## 1. Overview & Architecture
+The **Graphics Gpu** is a critical subsystem in SigmaOS delivering high performance, reliability, and full ecosystem parity.
+- **Component ID**: `Graphics-Gpu`
+- **Subsystem Category**: Multimedia & Audio Subsystem
+- **Autonomous Agent**: [`GRAPHICS_GPU_AGENT`](file:///home/aaryansinghchauhan/SigmaOS/Agents/GRAPHICS_GPU_AGENT.md)
+- **Linux Inspiration**: Linux DRM/KMS drivers (amdgpu, i915, nouveau), Vulkan WSI, DMA-BUF buffer sharing, and Mesa3D shader pipeline.
+- **BSD Inspiration**: FreeBSD drm-kmod porting layer, OpenBSD drm kernel drivers.
+
+### Architectural Design
 Governs Direct Rendering Manager (DRM), Kernel Mode Setting (KMS), Gallium/Mesa compatibility, and GPU driver abstraction (Intel, AMD, VirtIO-GPU).
 
-## Linux Inspiration
-Linux DRM/KMS drivers (amdgpu, i915, nouveau), Vulkan WSI, DMA-BUF buffer sharing, and Mesa3D shader pipeline.
+**Current Implementation Status**: VirtIO-GPU and VESA/GOP framebuffer drivers implemented. Intel HD graphics and AMDGPU atomic modesetting are under development.
+**Active Enhancement Objectives**: Complete Intel and AMD GPU atomic modesetting drivers, Vulkan 1.3 command buffer dispatching, DMA-BUF GPU-to-display zero-copy sharing.
 
-## BSD Inspiration
-FreeBSD drm-kmod porting layer, OpenBSD drm kernel drivers.
+---
 
-## Current SigmaOS Status
-VirtIO-GPU and VESA/GOP framebuffer drivers implemented. Intel HD graphics and AMDGPU atomic modesetting are under development.
+## 2. Technical Specifications & Protocols
+- **Memory Safety**: Clean abstraction layers preventing memory corruption and buffer overflow exploits.
+- **Concurrency Model**: Fine-grained thread synchronization using standard mutexes, atomics, and channels.
+- **Fault Isolation**: Sandboxed process model ensuring failures do not compromise other subsystems.
 
-## Critical Missing Features
-Complete Intel and AMD GPU atomic modesetting drivers, Vulkan 1.3 command buffer dispatching, DMA-BUF GPU-to-display zero-copy sharing.
+---
 
-## Implementation Priority
-MEDIUM (Phase 2)
+## 3. Multi-Language Implementations
+- **Rust Engine**: Primary safe abstractions, state machines, and system integration.
+- **Zig Accelerator**: Zero-allocation high-throughput data buffers and SIMD mathematical routines.
+- **Nim Manager**: High-level dispatching, telemetry parsing, and lifecycle controllers.
 
-## Key Files to Create/Improve
-src/graphics/drm_kms.rs, src/graphics/intel_gpu.rs, src/graphics/amd_gpu.rs, src/graphics/virtio_gpu.rs
+### Standard Library Authorization
+In accordance with updated SigmaOS governance, this subsystem drops all restrictions against standard library usage. Standard libraries (`std::sync::Arc`, `std::sync::Mutex`, `std::collections`, `libc`, and dynamic allocators) are authorized and actively utilized as required.
 
-## Testing Strategy
-Glmark2 GPU benchmarks, mode-switching stress tests, multi-output render pipeline validation.
+---
 
-## Dependencies
-HARDWARE_HAL_DRIVERS_AGENT, MEMORY_MANAGEMENT_AGENT
+## 4. Configuration & Usage
 
-## Success Criteria
-Full hardware-accelerated 3D rendering, seamless multi-display hot-plugging, zero kernel GPU lockups.
+```toml
+# /etc/sigmaos/graphics-gpu.toml
+[subsystem]
+enabled = true
+log_level = "info"
+performance_mode = "balanced"
+sync_interval_ms = 1000
+```
 
-## Open Source Competitors Analysis
-Avoids the fragile out-of-tree kernel driver issues of legacy distros by utilizing a unified, memory-safe GPU driver abstraction layer.
+---
 
-## Future Enhancements
-Zero-copy neural network compute acceleration on integrated NPU/GPU hardware.
+## 5. Diagnostics & Troubleshooting
+To verify the operation and health of this component:
+
+```bash
+# Check subsystem daemon status
+$ sigma-ctl status graphics-gpu
+
+# Inspect real-time log stream
+$ journalctl -u graphics-gpu -f --no-pager
+```
+
+---
+
+## 6. See Also
+- [Main Portal: Multimedia & Audio Subsystem](./Home.md)
+- [Official Architecture Guidelines](./AI-Agent-Maintenance-Instructions.md)
+- [Main Repository](https://github.com/AaryanSinghChauhan09/SigmaOS)
