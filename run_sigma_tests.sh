@@ -798,6 +798,13 @@ if [ -f "src/distro/sovereign_open_source_os_gap_closure_pr.rs" ]; then
     ./build/test_os_gap_closure_pr
 fi
 
+if [ -f "src/distro/freebsd_gap_closure_pr_engine.rs" ]; then
+    echo "Running Sovereign FreeBSD Complete Parity & Ecosystem Gap Closure PR Engine test suite..."
+    mkdir -p build
+    rustc --test src/distro/freebsd_gap_closure_pr_engine.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_freebsd_gap_closure_pr_engine
+    ./build/test_freebsd_gap_closure_pr_engine
+fi
+
 if [ -f "src/distro/sovereign_tech_media_wiki_ultimate_parity_pr.rs" ]; then
     echo "Running Sovereign Tech Media, GitHub Wiki & Distro Ultimate Parity test suite..."
     mkdir -p build
