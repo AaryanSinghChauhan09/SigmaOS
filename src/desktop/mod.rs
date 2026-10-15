@@ -667,3 +667,6 @@ pub use elementary_os_missing_components_pr::*;
 
 pub mod omarchy_hypr_ecosystem;
 pub use omarchy_hypr_ecosystem::*;
+
+pub mod omarchy_media_tools;
+pub use omarchy_media_tools::*;
