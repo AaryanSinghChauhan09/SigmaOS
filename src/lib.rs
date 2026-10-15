@@ -340,6 +340,7 @@ pub use resilience::{
     SystemSnapshot,
 };
 pub use security::hardening;
+pub use security::sovereign_security_management_plan::*;
 pub use security::{
     AnonSurfShunt, AppSandboxEngine, ArithmeticSubstitutionDeobfuscator, CapabilityGate,
     CapabilityToken, ForensicStorageFilter, Permission, PledgeManager, PledgePromise, RoutingMode,

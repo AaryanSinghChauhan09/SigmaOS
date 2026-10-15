@@ -47,6 +47,13 @@ if [ -f "src/security/kernel_hardening.rs" ]; then
     ./build/kernel_hardening_test
 fi
 
+if [ -f "src/security/sovereign_security_management_plan.rs" ]; then
+    echo "Running Sovereign Security Management Plan test suite..."
+    mkdir -p build
+    rustc --test src/security/sovereign_security_management_plan.rs --edition=2021 -o build/test_security_management_plan
+    ./build/test_security_management_plan
+fi
+
 if [ -f "src/init/systemd_init.rs" ]; then
     echo "Running systemd init & service manager test suite..."
     mkdir -p build
