@@ -914,6 +914,13 @@ if [ -f "src/distro/sovereign_tech_media_wiki_ultimate_parity_pr.rs" ]; then
     ./build/test_media_wiki_parity
 fi
 
+if [ -f "src/distro/sovereign_global_tech_media_wiki_distro_parity_pr.rs" ]; then
+    echo "Running Sovereign Global Tech Media, GitHub Wiki & Distro Parity PR test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_global_tech_media_wiki_distro_parity_pr.rs --edition=2021 -o build/test_global_media_wiki_parity
+    ./build/test_global_media_wiki_parity
+fi
+
 if [ -f "src/distro/arch_linux_advancements_v38_pr.rs" ]; then
     echo "Running Sovereign Arch Linux Advancements Suite V38 PR test suite..."
     mkdir -p build

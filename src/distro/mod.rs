@@ -612,6 +612,9 @@ pub use sovereign_freebsd_ultimate_parity_pr_suite::*;
 pub mod sovereign_openbsd_ultimate_parity_pr_suite;
 pub use sovereign_openbsd_ultimate_parity_pr_suite::*;
 
+pub mod sovereign_global_tech_media_wiki_distro_parity_pr;
+pub use sovereign_global_tech_media_wiki_distro_parity_pr::*;
+
 pub mod freebsd_gap_closure_pr_engine;
 pub use freebsd_gap_closure_pr_engine::*;
 
