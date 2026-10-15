@@ -7,6 +7,7 @@ pub mod photocraft_missing_components_parity_pr;
 pub mod filmcraft;
 pub mod vectorcraft;
 pub mod pdfcraft;
+pub mod pdfcraft_artcraft_parity_pr;
 pub mod designcraft;
 pub mod designcraft_missing_components_parity_pr;
 pub mod effectcraft;
@@ -54,6 +55,14 @@ pub use pdfcraft::{
     Bookmark, Hyperlink,
     PdfMetadata, SecuritySettings, ExportFormat as PdfExportFormat,
     init_pdfcraft, get_pdfcraft,
+};
+pub use pdfcraft_artcraft_parity_pr::{
+    PdfcraftArtcraftPrProposalManifest, PdfcraftVectorArtImportPrEngine,
+    PdfcraftMultiWorkspaceProjectPrEngine, PdfcraftBatchExportRenderPrEngine,
+    PdfcraftDigitalSignatureWatermarkPrEngine, PdfcraftOcrTextRecognitionPrEngine,
+    PdfcraftInteractiveFormsXfaPrEngine, PdfcraftColorPreflightCmykPrEngine,
+    PdfcraftRedactionSanitizationPrEngine, PdfcraftPageImpositionBookletPrEngine,
+    PdfcraftArchivalValidationPrEngine, SovereignPdfcraftArtcraftParityPrGateway,
 };
 pub use designcraft::{
     DesignEditor, Canvas, Element, Color,
