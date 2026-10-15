@@ -380,6 +380,13 @@ if [ -f "src/toolchain/distro_compiler_innovations.rs" ]; then
     ./build/distro_compiler_test
 fi
 
+if [ -f "src/toolchain/sovereign_toolchain_development_advancements_pr.rs" ]; then
+    echo "Running Sovereign Toolchain and Development Advancements PR test suite..."
+    mkdir -p build
+    rustc --test src/toolchain/sovereign_toolchain_development_advancements_pr.rs --edition=2021 -o build/test_adv_pr
+    ./build/test_adv_pr
+fi
+
 if [ -f "src/automation/macro.rs" ]; then
     echo "Running Macro recorder and playback test suite..."
     mkdir -p build
