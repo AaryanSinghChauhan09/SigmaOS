@@ -332,8 +332,12 @@ impl SyscallDispatcher {
 /// Syscall handlers
 unsafe fn handle_read(args: &SyscallArgs, _capability: Capability) -> SyscallResult {
     let _fd = args.arg0;
-    let _buffer = args.arg1 as *mut u8;
+    let buffer = args.arg1 as *mut u8;
     let size = args.arg2;
+
+    if buffer.is_null() && size > 0 {
+        return SyscallResult::error(EFAULT);
+    }
 
     // In a real implementation, this would call the file I/O system
     // For now, return success
@@ -342,8 +346,12 @@ unsafe fn handle_read(args: &SyscallArgs, _capability: Capability) -> SyscallRes
 
 unsafe fn handle_write(args: &SyscallArgs, _capability: Capability) -> SyscallResult {
     let _fd = args.arg0;
-    let _buffer = args.arg1 as *const u8;
+    let buffer = args.arg1 as *const u8;
     let size = args.arg2;
+
+    if buffer.is_null() && size > 0 {
+        return SyscallResult::error(EFAULT);
+    }
 
     // In a real implementation, this would call the file I/O system
     // For now, return success
@@ -351,9 +359,13 @@ unsafe fn handle_write(args: &SyscallArgs, _capability: Capability) -> SyscallRe
 }
 
 unsafe fn handle_open(args: &SyscallArgs, _capability: Capability) -> SyscallResult {
-    let _path = args.arg0 as *const u8;
+    let path = args.arg0 as *const u8;
     let _flags = args.arg1;
     let _mode = args.arg2;
+
+    if path.is_null() {
+        return SyscallResult::error(EFAULT);
+    }
 
     // In a real implementation, this would call the file I/O system
     // For now, return a fake fd
