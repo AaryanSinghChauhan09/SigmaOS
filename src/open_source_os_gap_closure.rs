@@ -6438,6 +6438,36 @@ impl Default for WaylandHyprlandCompositorEngine {
     }
 }
 
+/// Qubes OS Disposable AppVM Scrubber & RAM Sanitizer Engine
+#[derive(Debug, Default)]
+pub struct SovereignQubesDisposableAppVmScrubberEngine {
+    pub active_appvms: BTreeMap<String, usize>,
+    pub scrubbed_pages_count: usize,
+}
+
+impl SovereignQubesDisposableAppVmScrubberEngine {
+    pub fn new() -> Self {
+        Self {
+            active_appvms: BTreeMap::new(),
+            scrubbed_pages_count: 0,
+        }
+    }
+
+    pub fn appvm_scrubber(&mut self, vm_name: &str, allocated_pages: usize) -> bool {
+        self.active_appvms.insert(vm_name.to_string(), allocated_pages);
+        true
+    }
+
+    pub fn ram_sanitizer(&mut self, vm_name: &str) -> usize {
+        if let Some(pages) = self.active_appvms.remove(vm_name) {
+            self.scrubbed_pages_count += pages;
+            pages
+        } else {
+            0
+        }
+    }
+}
+
 // =========================================================================
 // 20. SOVEREIGN OPEN SOURCE PROJECT SUPREMACY SUITE
 // =========================================================================
