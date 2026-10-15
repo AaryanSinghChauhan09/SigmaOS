@@ -1,16 +1,21 @@
 ## Summary
 
-<!-- What file-management or component behavior changed and why? -->
+<!-- What I/O-management behavior changed and why? -->
 
-## File component
+## I/O component
 
-- [ ] File descriptor manager
-- [ ] Inode and directory manager
-- [ ] Permission manager
-- [ ] Lock manager
-- [ ] Mount / unmount
-- [ ] Cache
-- [ ] Filesystem
+- [ ] I/O policy
+- [ ] Block device manager
+- [ ] virtio / NVMe / virtio
+- [ ] Interrupt manager
+- [ ] DMA manager
+- [ ] Buffer manager
+- [ ] I/O scheduler
+- [ ] Submit / complete
+- [ ] Callback
+- [ ] Interrupt
+- [ ] DMA
+- [ ] Buffer
 - [ ] Recovery
 - [ ] procfs / diagnostics
 - [ ] Security / capabilities
