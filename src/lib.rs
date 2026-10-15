@@ -68,7 +68,8 @@ pub use package::{
     SovereignDistroPackageAdvancementsSuiteV14, SovereignDistroPackageAdvancementsSuiteV19,
     SovereignDistroPackageAdvancementsSuiteV20, SovereignDistroPackageAdvancementsSuiteV32,
     SovereignDistroPackageAdvancementsSuiteV33, SovereignDistroPackageAdvancementsSuiteV40,
-    SovereignDistroPackageAdvancementsSuiteV41, UniversalForeignPackageFormat,
+    SovereignDistroPackageAdvancementsSuiteV41, SovereignDistroPackageAdvancementsSuiteV47,
+    SovereignDistroPackageAdvancementsSuiteV50, UniversalForeignPackageFormat,
     UniversalForeignPackageFormatConverter,
 };
 pub mod process;
