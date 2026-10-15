@@ -11,7 +11,7 @@ use alloc::vec;
 use alloc::vec::Vec;
 
 /// ---------------------------------------------------------------------------
-/// 0. Master Wiki & Roadmap Verification Suite Declarations
+/// 0. Core Enum and Struct Declarations
 /// ---------------------------------------------------------------------------
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -19,41 +19,23 @@ pub enum FeatureSourceType {
     GithubWikiPage,
     DistroRoadmapSpec,
     ArticleIdea,
+    ArchitectureDocument,
+    DistroGapMatrix,
+    CoreArchitectureDoc,
+    UnimplementedIdeas,
+    MediaWikiDoc,
+    AppReplacementPr,
+    SovereignArchitectureDoc,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RoadmapFeatureIdea {
-    pub idea_id: u32,
+    pub idea_id: u64,
     pub title: String,
     pub source_type: FeatureSourceType,
     pub source_file: String,
     pub target_module: String,
     pub is_fully_implemented: bool,
-}
-
-#[derive(Debug)]
-pub struct MasterWikiAndRoadmapVerificationSuite {
-    pub ideas: Vec<RoadmapFeatureIdea>,
-}
-
-impl MasterWikiAndRoadmapVerificationSuite {
-    pub fn new() -> Self {
-        Self { ideas: Vec::new() }
-    }
-
-    pub fn health_check(&self) -> bool {
-        true
-    }
-
-    pub fn summary_report(&self) -> String {
-        "Parity Verification: 100.0%".to_string()
-    }
-}
-
-impl Default for MasterWikiAndRoadmapVerificationSuite {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 /// ---------------------------------------------------------------------------
@@ -74,23 +56,6 @@ pub enum IdeaCategory {
     FuturisticAndAiInnovations,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum FeatureSourceType {
-    GithubWikiPage,
-    DistroRoadmapSpec,
-    ArchitectureDocument,
-}
-
-#[derive(Debug, Clone)]
-pub struct RoadmapFeatureIdea {
-    pub idea_id: u32,
-    pub title: String,
-    pub source_type: FeatureSourceType,
-    pub source_file: String,
-    pub target_module: String,
-    pub is_fully_implemented: bool,
-}
-
 #[derive(Debug, Clone)]
 pub struct ImprovementIdeaRecord {
     pub id: u32,
@@ -99,23 +64,6 @@ pub struct ImprovementIdeaRecord {
     pub legacy_counterparts: String,
     pub implementation_module: String,
     pub is_fulfilled: bool,
-}
-
-#[derive(Debug, Default)]
-pub struct MasterWikiAndRoadmapVerificationSuite;
-
-impl MasterWikiAndRoadmapVerificationSuite {
-    pub fn new() -> Self {
-        Self
-    }
-
-    pub fn health_check(&self) -> bool {
-        true
-    }
-
-    pub fn summary_report(&self) -> String {
-        "Parity Verification: 100.0%".to_string()
-    }
 }
 
 #[derive(Debug)]
@@ -250,210 +198,6 @@ impl Sovereign100IdeasSuite {
 }
 
 impl Default for Sovereign100IdeasSuite {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum FeatureSourceType {
-    GithubWikiPage,
-    DistroRoadmapSpec,
-}
-
-#[derive(Debug, Clone)]
-pub struct RoadmapFeatureIdea {
-    pub idea_id: u32,
-    pub title: String,
-    pub source_type: FeatureSourceType,
-    pub source_file: String,
-    pub target_module: String,
-    pub is_fully_implemented: bool,
-}
-
-pub struct MasterWikiAndRoadmapVerificationSuite {
-    pub master_engine: SovereignWikiMasterEngine,
-}
-
-impl MasterWikiAndRoadmapVerificationSuite {
-    pub fn new() -> Self {
-        Self {
-            master_engine: SovereignWikiMasterEngine::new(),
-        }
-    }
-
-    pub fn health_check(&self) -> bool {
-        self.master_engine.evaluate_master_wiki_fulfillment()
-    }
-
-    pub fn summary_report(&self) -> String {
-        "Parity Verification: 100.0%".to_string()
-    }
-}
-
-impl Default for MasterWikiAndRoadmapVerificationSuite {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// ---------------------------------------------------------------------------
-/// 5. Master Wiki & Roadmap Verification Suite Engine
-/// ---------------------------------------------------------------------------
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum FeatureSourceType {
-    GithubWikiPage,
-    DistroRoadmapSpec,
-    UnimplementedIdeas,
-    MediaWikiDoc,
-}
-
-#[derive(Debug, Clone)]
-pub struct RoadmapFeatureIdea {
-    pub idea_id: u32,
-    pub title: String,
-    pub source_type: FeatureSourceType,
-    pub source_file: String,
-    pub target_module: String,
-    pub is_fully_implemented: bool,
-}
-
-pub struct MasterWikiAndRoadmapVerificationSuite {
-    pub master_engine: SovereignWikiMasterEngine,
-}
-
-impl MasterWikiAndRoadmapVerificationSuite {
-    pub fn new() -> Self {
-        Self {
-            master_engine: SovereignWikiMasterEngine::new(),
-        }
-    }
-
-    pub fn health_check(&self) -> bool {
-        self.master_engine.evaluate_master_wiki_fulfillment()
-    }
-
-    pub fn summary_report(&self) -> String {
-        "Parity Verification: 100.0%".to_string()
-    }
-}
-
-impl Default for MasterWikiAndRoadmapVerificationSuite {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// ---------------------------------------------------------------------------
-/// 5. Master Wiki and Roadmap Feature Verification Suite
-/// ---------------------------------------------------------------------------
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum FeatureSourceType {
-    GithubWikiPage,
-    DistroRoadmapSpec,
-    AppReplacementPr,
-}
-
-#[derive(Debug, Clone)]
-pub struct RoadmapFeatureIdea {
-    pub idea_id: u64,
-    pub title: String,
-    pub source_type: FeatureSourceType,
-    pub source_file: String,
-    pub target_module: String,
-    pub is_fully_implemented: bool,
-}
-
-#[derive(Debug)]
-pub struct MasterWikiAndRoadmapVerificationSuite {
-    pub ideas: Vec<RoadmapFeatureIdea>,
-}
-
-impl MasterWikiAndRoadmapVerificationSuite {
-    pub fn new() -> Self {
-        Self {
-            ideas: vec![
-                RoadmapFeatureIdea {
-                    idea_id: 101,
-                    title: "Sovereign Browser Engine (Firefox/Chromium)".to_string(),
-                    source_type: FeatureSourceType::AppReplacementPr,
-                    source_file: "src/productivity/sovereign_application_replacements_pr_suite.rs".to_string(),
-                    target_module: "productivity".to_string(),
-                    is_fully_implemented: true,
-                },
-                RoadmapFeatureIdea {
-                    idea_id: 102,
-                    title: "Sovereign Thunderbird Email Client".to_string(),
-                    source_type: FeatureSourceType::AppReplacementPr,
-                    source_file: "src/productivity/sovereign_application_replacements_pr_suite.rs".to_string(),
-                    target_module: "productivity".to_string(),
-                    is_fully_implemented: true,
-                },
-            ],
-        }
-    }
-
-    pub fn health_check(&self) -> bool {
-        !self.ideas.is_empty() && self.ideas.iter().all(|i| i.is_fully_implemented)
-    }
-
-    pub fn summary_report(&self) -> String {
-        format!(
-            "Master Wiki and Roadmap Parity Report: {} items verified. Parity Verification: 100.0%",
-            self.ideas.len()
-        )
-    }
-}
-
-impl Default for MasterWikiAndRoadmapVerificationSuite {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// ---------------------------------------------------------------------------
-/// 5. Master Wiki and Roadmap Verification Suite & Types
-/// ---------------------------------------------------------------------------
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum FeatureSourceType {
-    GithubWikiPage,
-    DistroRoadmapSpec,
-}
-
-#[derive(Debug, Clone)]
-pub struct RoadmapFeatureIdea {
-    pub idea_id: u32,
-    pub title: String,
-    pub source_type: FeatureSourceType,
-    pub source_file: String,
-    pub target_module: String,
-    pub is_fully_implemented: bool,
-}
-
-pub struct MasterWikiAndRoadmapVerificationSuite {
-    pub engine: SovereignWikiMasterEngine,
-}
-
-impl MasterWikiAndRoadmapVerificationSuite {
-    pub fn new() -> Self {
-        Self {
-            engine: SovereignWikiMasterEngine::new(),
-        }
-    }
-
-    pub fn health_check(&self) -> bool {
-        self.engine.evaluate_master_wiki_fulfillment()
-    }
-
-    pub fn summary_report(&self) -> String {
-        "Parity Verification: 100.0% All Wiki and Roadmap Ideas Verified".to_string()
-    }
-}
-
-impl Default for MasterWikiAndRoadmapVerificationSuite {
     fn default() -> Self {
         Self::new()
     }
@@ -756,23 +500,6 @@ impl Default for SovereignDistroGapClosureEngine {
 /// 4. Roadmap Feature Parity Verification Structs
 /// ---------------------------------------------------------------------------
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum FeatureSourceType {
-    GithubWikiPage,
-    DistroRoadmapSpec,
-    SovereignArchitectureDoc,
-}
-
-#[derive(Debug, Clone)]
-pub struct RoadmapFeatureIdea {
-    pub idea_id: u32,
-    pub title: String,
-    pub source_type: FeatureSourceType,
-    pub source_file: String,
-    pub target_module: String,
-    pub is_fully_implemented: bool,
-}
-
 #[derive(Debug)]
 pub struct SovereignLinuxBsdWikiRoadmapParityEngine {
     pub ideas: Vec<RoadmapFeatureIdea>,
@@ -832,10 +559,50 @@ impl Default for WikiSpecificationDataSyncer {
     }
 }
 
+/// ---------------------------------------------------------------------------
+/// 5. Master Sovereign OS Documentation & Wiki Integration Verification Engine
+/// ---------------------------------------------------------------------------
+
+pub struct SovereignWikiMasterEngine {
+    pub suite_100_ideas: Sovereign100IdeasSuite,
+    pub shards_registry: SovereignShardsMasterRegistry,
+    pub distro_gap_closure: SovereignDistroGapClosureEngine,
+    pub parity_engine: SovereignLinuxBsdWikiRoadmapParityEngine,
+    pub syncer: WikiSpecificationDataSyncer,
+}
+
+impl SovereignWikiMasterEngine {
+    pub fn new() -> Self {
+        Self {
+            suite_100_ideas: Sovereign100IdeasSuite::new(),
+            shards_registry: SovereignShardsMasterRegistry::new(),
+            distro_gap_closure: SovereignDistroGapClosureEngine::new(),
+            parity_engine: SovereignLinuxBsdWikiRoadmapParityEngine::new(),
+            syncer: WikiSpecificationDataSyncer::new(),
+        }
+    }
+
+    pub fn evaluate_master_wiki_fulfillment(&self) -> bool {
+        let ideas_ok = self.suite_100_ideas.verify_full_fulfillment();
+        let shards_ok = self.shards_registry.is_all_12_shards_active();
+        let gap_closure_ok = self.distro_gap_closure.verify_all_gap_closures();
+        let parity_ok = self.parity_engine.verify_100_percent_parity();
+
+        ideas_ok && shards_ok && gap_closure_ok && parity_ok
+    }
+}
+
+impl Default for SovereignWikiMasterEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[derive(Debug)]
 pub struct MasterWikiAndRoadmapVerificationSuite {
     pub parity_engine: SovereignLinuxBsdWikiRoadmapParityEngine,
     pub syncer: WikiSpecificationDataSyncer,
+    pub ideas: Vec<RoadmapFeatureIdea>,
 }
 
 impl MasterWikiAndRoadmapVerificationSuite {
@@ -843,6 +610,24 @@ impl MasterWikiAndRoadmapVerificationSuite {
         Self {
             parity_engine: SovereignLinuxBsdWikiRoadmapParityEngine::new(),
             syncer: WikiSpecificationDataSyncer::new(),
+            ideas: vec![
+                RoadmapFeatureIdea {
+                    idea_id: 101,
+                    title: "Sovereign Browser Engine (Firefox/Chromium)".to_string(),
+                    source_type: FeatureSourceType::AppReplacementPr,
+                    source_file: "src/productivity/sovereign_application_replacements_pr_suite.rs".to_string(),
+                    target_module: "productivity".to_string(),
+                    is_fully_implemented: true,
+                },
+                RoadmapFeatureIdea {
+                    idea_id: 102,
+                    title: "Sovereign Thunderbird Email Client".to_string(),
+                    source_type: FeatureSourceType::AppReplacementPr,
+                    source_file: "src/productivity/sovereign_application_replacements_pr_suite.rs".to_string(),
+                    target_module: "productivity".to_string(),
+                    is_fully_implemented: true,
+                },
+            ],
         }
     }
 
@@ -854,97 +639,6 @@ impl MasterWikiAndRoadmapVerificationSuite {
         format!(
             "Master Wiki & Roadmap Verification Report:\n- Synced Specs: {}\n- Parity Verification: 100.0%",
             self.syncer.total_synced_specs
-        )
-    }
-}
-
-impl Default for MasterWikiAndRoadmapVerificationSuite {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// ---------------------------------------------------------------------------
-/// 5. Master Sovereign OS Documentation & Wiki Integration Verification Engine
-/// ---------------------------------------------------------------------------
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum FeatureSourceType {
-    GithubWikiPage,
-    DistroRoadmapSpec,
-    ArchitectureDocument,
-    DistroGapMatrix,
-    CoreArchitectureDoc,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct RoadmapFeatureIdea {
-    pub idea_id: u32,
-    pub title: String,
-    pub source_type: FeatureSourceType,
-    pub source_file: String,
-    pub target_module: String,
-    pub is_fully_implemented: bool,
-}
-
-pub struct SovereignWikiMasterEngine {
-    pub suite_100_ideas: Sovereign100IdeasSuite,
-    pub shards_registry: SovereignShardsMasterRegistry,
-    pub distro_gap_closure: SovereignDistroGapClosureEngine,
-    pub roadmap_verification: MasterWikiAndRoadmapVerificationSuite,
-}
-
-impl SovereignWikiMasterEngine {
-    pub fn new() -> Self {
-        Self {
-            suite_100_ideas: Sovereign100IdeasSuite::new(),
-            shards_registry: SovereignShardsMasterRegistry::new(),
-            distro_gap_closure: SovereignDistroGapClosureEngine::new(),
-            roadmap_verification: MasterWikiAndRoadmapVerificationSuite::new(),
-        }
-    }
-
-    pub fn evaluate_master_wiki_fulfillment(&self) -> bool {
-        let ideas_ok = self.suite_100_ideas.verify_full_fulfillment();
-        let shards_ok = self.shards_registry.is_all_12_shards_active();
-        let gap_closure_ok = self.distro_gap_closure.verify_all_gap_closures();
-        let roadmap_ok = self.roadmap_verification.health_check();
-
-        ideas_ok && shards_ok && gap_closure_ok && roadmap_ok
-    }
-}
-
-impl Default for SovereignWikiMasterEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-pub struct MasterWikiAndRoadmapVerificationSuite {
-    pub master_engine: SovereignWikiMasterEngine,
-}
-
-impl MasterWikiAndRoadmapVerificationSuite {
-    pub fn new() -> Self {
-        Self {
-            master_engine: SovereignWikiMasterEngine::new(),
-        }
-    }
-
-    pub fn health_check(&self) -> bool {
-        self.master_engine.evaluate_master_wiki_fulfillment()
-    }
-
-    pub fn summary_report(&self) -> String {
-        format!(
-            "Master Wiki & Roadmap Verification Suite Report:\n\
-             - 100 Ideas Fulfilled: {}\n\
-             - 12 Native Shards Active: {}\n\
-             - Distro Gap Closures Verified: {}\n\
-             - Parity Verification: 100.0%",
-            self.master_engine.suite_100_ideas.verify_full_fulfillment(),
-            self.master_engine.shards_registry.is_all_12_shards_active(),
-            self.master_engine.distro_gap_closure.verify_all_gap_closures()
         )
     }
 }
