@@ -18,6 +18,7 @@ pub mod audiocraft;
 pub mod soundcraft;
 pub mod vectoranimation;
 pub mod model3d;
+pub mod cadcraft;
 pub mod artcraft;
 pub mod deckcraft;
 
