@@ -5,6 +5,7 @@ use std::vec::Vec;
 
 pub mod future_protocol;
 pub mod okr;
+pub mod periodic_pr_only_research_pipeline_engine;
 pub mod periodic_study_improve_prove_engine;
 pub mod rfc;
 pub mod risk_mitigation;
@@ -14,6 +15,7 @@ pub mod strategic_vision;
 pub mod study_to_implementation_pipeline_pr;
 pub mod supreme_court;
 
+pub use periodic_pr_only_research_pipeline_engine::*;
 pub use periodic_study_improve_prove_engine::*;
 pub use risk_mitigation::*;
 pub use study_to_implementation_pipeline_pr::*;

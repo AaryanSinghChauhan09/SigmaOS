@@ -1,59 +1,43 @@
 ## Summary
 
-<!-- What scheduler or component behavior changed and why? -->
+<!-- What component does this PR improve or add? -->
 
-## Scheduler component
+## Related issue
 
-- [ ] Scheduler core
-- [ ] Run queue / PID allocation
-- [ ] fork / clone
-- [ ] exec
-- [ ] Context switch
-- [ ] Preemption & quantum
-- [ ] Signals & wait queues
-- [ ] Zombie / reaping & orphan adoption
-- [ ] Resource limits & CPU affinity
-- [ ] Documentation & ADRs
-- [ ] CI / tooling
+Closes #<issue-id>
 
-## Recurring task
+## Upstream study
 
-- [ ] PR validation
-- [ ] Daily CI triage
-- [ ] Weekly lifecycle review
-- [ ] Weekly Linux/BSD study
-- [ ] Biweekly scheduler audit
-- [ ] Biweekly signal/wait audit
-- [ ] Monthly boot validation
-- [ ] Quarterly architecture/security/release review
+- Project:
+- Version/commit:
+- Research note:
+- ADR:
 
-## Reference behavior
+## What SigmaOS adopts
 
-<!-- Required for lifecycle, ABI, or scheduler changes -->
+<!-- State the design principle or mechanism adopted. -->
 
-- POSIX section:
-- Linux/BSD/Redox reference:
-- SigmaOS current behavior:
-- New behavior:
-- Compatibility impact:
+## What SigmaOS changes or rejects
+
+<!-- State simplifications, deviations, and rejected ideas. -->
+
+## Component impact
+
+- Component:
+- Maturity before:
+- Maturity after:
+- Runtime path affected:
 
 ## Changes
 
--
--
-
-## Scheduler safety review
-
-- [ ] Lifecycle transitions are valid (NEW -> READY -> RUNNING -> SLEEPING -> READY, READY -> RUNNING -> ZOMBIE, RUNNING -> STOPPED -> READY, ANY -> ZOMBIE -> REAPED)
-- [ ] Zombies are eventually reaped
-- [ ] Orphans are adopted by PID 1
-- [ ] PID reuse is safe
-- [ ] Lock ordering and concurrency model documented
-- [ ] Interrupt-context safety considered
-- [ ] Lost-wakeup prevention verified
-- [ ] Double-reap and double-switch prevented
-- [ ] Resource limits and run-queue capacity enforced
-- [ ] No unbounded allocation or recursion
+- [ ] Source implementation
+- [ ] Unit tests
+- [ ] Integration tests
+- [ ] QEMU/runtime test
+- [ ] Documentation
+- [ ] Capability/status update
+- [ ] Regression protection
+- [ ] Security review, if applicable
 
 ## Verification
 
@@ -61,17 +45,32 @@
 cargo check --lib
 cargo test --lib
 ./run_sigma_tests.sh
+make check
+make test
+make format
 ```
 
 ## Runtime evidence
 
-- [ ] QEMU boot-to-shell log
-- [ ] Scheduler test / benchmark report
+- [ ] QEMU boot log
+- [ ] Installer/update test log
+- [ ] Package dry-run report
+- [ ] Hardware test log, if applicable
 - [ ] Artifact hash
 
 ## Safety and rollback
 
 - [ ] No broad credentials or host access introduced
-- [ ] Untrusted input validated
+- [ ] Untrusted input is validated
+- [ ] Package scripts are sandboxed, if applicable
 - [ ] Rollback/recovery behavior defined
 - [ ] Security review completed, if applicable
+
+## Reviewer checklist
+
+- [ ] Scope is narrow
+- [ ] Tests cover the change
+- [ ] Runtime evidence is linked
+- [ ] Documentation matches implementation
+- [ ] Capability status is evidence-based
+- [ ] No unsupported parity claims
