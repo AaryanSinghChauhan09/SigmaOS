@@ -3,10 +3,8 @@
 // Absorbs and implements all unimplemented ideas, specifications, roadmaps, and gap-closing matrices
 // from `.md` files and GitHub Wiki of SigmaOS / SovereignOS.
 
-#[cfg(not(any(feature = "standalone_test", test)))]
 extern crate alloc;
 
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::collections::BTreeMap;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::format;
@@ -18,7 +16,7 @@ use alloc::vec;
 use alloc::vec::Vec;
 
 /// ---------------------------------------------------------------------------
-/// 0. Master Types & Feature Source Declarations
+/// 0. Master Wiki & Roadmap Feature Source Types
 /// ---------------------------------------------------------------------------
 
 /// Feature Source Types across documentation and wiki specs
@@ -28,12 +26,12 @@ pub enum FeatureSourceType {
     DistroRoadmapSpec,
     ArticleIdea,
     ArchitectureDocument,
+    DistroGapMatrix,
+    CoreArchitectureDoc,
     UnimplementedIdeas,
     MediaWikiDoc,
     AppReplacementPr,
     SovereignArchitectureDoc,
-    DistroGapMatrix,
-    CoreArchitectureDoc,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -44,53 +42,6 @@ pub struct RoadmapFeatureIdea {
     pub source_file: String,
     pub target_module: String,
     pub is_fully_implemented: bool,
-}
-
-#[derive(Debug)]
-pub struct MasterWikiAndRoadmapVerificationSuite {
-    pub ideas: Vec<RoadmapFeatureIdea>,
-}
-
-impl MasterWikiAndRoadmapVerificationSuite {
-    pub fn new() -> Self {
-        Self {
-            ideas: vec![
-                RoadmapFeatureIdea {
-                    idea_id: 101,
-                    title: "Sovereign Browser Engine (Firefox/Chromium)".to_string(),
-                    source_type: FeatureSourceType::AppReplacementPr,
-                    source_file: "src/productivity/sovereign_application_replacements_pr_suite.rs".to_string(),
-                    target_module: "productivity".to_string(),
-                    is_fully_implemented: true,
-                },
-                RoadmapFeatureIdea {
-                    idea_id: 102,
-                    title: "Sovereign Thunderbird Email Client".to_string(),
-                    source_type: FeatureSourceType::AppReplacementPr,
-                    source_file: "src/productivity/sovereign_application_replacements_pr_suite.rs".to_string(),
-                    target_module: "productivity".to_string(),
-                    is_fully_implemented: true,
-                },
-            ],
-        }
-    }
-
-    pub fn health_check(&self) -> bool {
-        !self.ideas.is_empty() && self.ideas.iter().all(|i| i.is_fully_implemented)
-    }
-
-    pub fn summary_report(&self) -> String {
-        format!(
-            "Master Wiki and Roadmap Parity Report: {} items verified. Parity Verification: 100.0%",
-            self.ideas.len()
-        )
-    }
-}
-
-impl Default for MasterWikiAndRoadmapVerificationSuite {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 /// ---------------------------------------------------------------------------
@@ -589,8 +540,7 @@ pub struct SovereignWikiMasterEngine {
     pub suite_100_ideas: Sovereign100IdeasSuite,
     pub shards_registry: SovereignShardsMasterRegistry,
     pub distro_gap_closure: SovereignDistroGapClosureEngine,
-    pub parity_engine: SovereignLinuxBsdWikiRoadmapParityEngine,
-    pub syncer: WikiSpecificationDataSyncer,
+    pub roadmap_parity: SovereignLinuxBsdWikiRoadmapParityEngine,
 }
 
 impl SovereignWikiMasterEngine {
@@ -599,8 +549,7 @@ impl SovereignWikiMasterEngine {
             suite_100_ideas: Sovereign100IdeasSuite::new(),
             shards_registry: SovereignShardsMasterRegistry::new(),
             distro_gap_closure: SovereignDistroGapClosureEngine::new(),
-            parity_engine: SovereignLinuxBsdWikiRoadmapParityEngine::new(),
-            syncer: WikiSpecificationDataSyncer::new(),
+            roadmap_parity: SovereignLinuxBsdWikiRoadmapParityEngine::new(),
         }
     }
 
@@ -608,7 +557,7 @@ impl SovereignWikiMasterEngine {
         let ideas_ok = self.suite_100_ideas.verify_full_fulfillment();
         let shards_ok = self.shards_registry.is_all_12_shards_active();
         let gap_closure_ok = self.distro_gap_closure.verify_all_gap_closures();
-        let roadmap_ok = self.parity_engine.verify_100_percent_parity();
+        let roadmap_ok = self.roadmap_parity.verify_100_percent_parity();
 
         ideas_ok && shards_ok && gap_closure_ok && roadmap_ok
     }

@@ -1,85 +1,75 @@
 ## Summary
 
-<!-- What shell behavior changed and why? -->
+<!-- One paragraph: what changed and why. -->
 
-## Shell component
+## Component
 
-- [ ] Lexer
-- [ ] Parser
-- [ ] Expansion
-- [ ] Executor
-- [ ] Pipelines
-- [ ] Redirection
-- [ ] Job control
-- [ ] Signals
-- [ ] Built-ins
-- [ ] Interactive line editor
-- [ ] Script runner
-- [ ] Diagnostics
-- [ ] Security / sandboxing
+- [ ] Thread manager
+- [ ] Scheduler
+- [ ] Process management
+- [ ] Memory management
+- [ ] VFS / filesystems
+- [ ] Drivers
+- [ ] IPC
+- [ ] Security
+- [ ] Installer / packaging
 - [ ] Documentation
 - [ ] CI / tooling
-
-## Recurring task
-
-- [ ] PR validation
-- [ ] Daily CI triage
-- [ ] Weekly feature/bug triage
-- [ ] Weekly POSIX/sh study
-- [ ] Biweekly parser/expansion audit
-- [ ] Biweekly built-in review
-- [ ] Monthly boot-to-shell validation
-- [ ] Monthly compatibility suite
-- [ ] Monthly fuzz triage
-- [ ] Monthly security review
-- [ ] Quarterly release/UX/performance review
-
-## Reference behavior
-
-<!-- Required for compatibility or grammar changes -->
-
-- POSIX section:
-- Bash/dash/Zsh/BusyBox reference:
-- SigmaOS current behavior:
-- New behavior:
-- Compatibility impact:
 
 ## Changes
 
 -
 -
 
-## Shell safety review
+## Motivation
 
-- [ ] Expansion order is correct
-- [ ] Quoting behavior is preserved
-- [ ] Redirection failures are handled
-- [ ] Exit codes are explicit
-- [ ] Signal behavior is defined
-- [ ] No unbounded recursion or allocation
-- [ ] Interactive terminal state is restored
-- [ ] Script mode does not execute invalid partial input
+<!-- Link the issue, roadmap item, or gap-analysis entry. -->
 
-## Evidence
+## Implementation notes
 
-- [ ] `cargo check --lib`
-- [ ] `cargo fmt --check`
-- [ ] `cargo test --lib`
-- [ ] `./run_sigma_tests.sh`
-- [ ] New/updated shell tests
-- [ ] POSIX/conformance test evidence
-- [ ] Fuzz target or documented exemption
-- [ ] Boot-to-shell evidence, if boot-affecting
-- [ ] Security review requested, if applicable
+<!-- Design decisions, data structures, locking, error handling. -->
 
-## Status updates
+## Tests
 
-- [ ] `FEATURE_STATUS.toml`
-- [ ] `CAPABILITY_MATRIX.toml`
-- [ ] Shell documentation
-- [ ] Boot matrix, if applicable
+- [ ] Unit tests added/updated
+- [ ] Integration tests added/updated
+- [ ] Concurrency/stress tests added/updated
+- [ ] Fuzz tests added/updated
+- [ ] Boot smoke test performed, if kernel-facing
+- [ ] No regression in existing tests
 
-## Risks and rollback
+## Verification
 
-- Risk:
-- Rollback:
+```bash
+cargo fmt --check
+cargo clippy --all-targets -- -D warnings
+cargo check --lib
+cargo test --lib
+./run_sigma_tests.sh
+```
+
+Paste relevant output below.
+
+## Capability status
+
+- Previous status:
+- New status:
+- Evidence:
+
+## Integration impact
+
+- [ ] No runtime integration yet
+- [ ] Connected to runtime path
+- [ ] Boot path validated
+- [ ] Installer/update path validated
+- [ ] Hardware tested
+
+## Reviewer checklist
+
+- [ ] Scope is narrow
+- [ ] Public API documented
+- [ ] `unsafe` justified
+- [ ] Lock ordering documented
+- [ ] Error paths tested
+- [ ] Feature status updated
+- [ ] No unsupported compatibility claim

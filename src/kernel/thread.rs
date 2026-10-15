@@ -3,6 +3,12 @@
 //! Provides the canonical `Thread` abstraction and lifecycle manager for SigmaOS.
 //! Integrates CPU context, stack limits, scheduling attributes, wait channels,
 //! signals, capabilities, join/detach mechanics, and lock-order tracking.
+//!
+//! Implements Phase 1 & Phase 2 of the SigmaOS Thread Manager contract:
+//! - Lifecycle States: New, Ready, Running, Blocked, Suspended, Zombie, Terminated.
+//! - Ownership: Kernel, User, Process, Detached.
+//! - Context: CpuContext, StackMeta with bounds and guard zone checks.
+//! - Synchronization: WaitChannelId wakeups and lock-order tracking.
 
 #![no_std]
 
