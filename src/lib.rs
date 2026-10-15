@@ -245,7 +245,7 @@ pub use dashboard::{
 };
 pub use desktop::elementary_os_missing_components_pr::*;
 pub use distro::arch_missing_components_parity_pr::*;
-pub use distro::arch_linux_missing_components_v54_pr::*;
+pub use distro::freebsd_missing_components_parity_pr::*;
 pub use distro::openbsd_missing_components_parity_pr::*;
 pub use distro::open_source_os_missing_components_v48_pr::*;
 pub use distro::{
