@@ -17,6 +17,7 @@ pub mod audiocraft;
 pub mod vectoranimation;
 pub mod model3d;
 pub mod artcraft;
+pub mod sovereign_artcraft_craftlibs_pr_engine;
 
 pub use photocraft::{
     PhotoEditor, ImageLayer, Filter, Adjustment, LayerType, LayerMask, AdjustmentType,
@@ -126,6 +127,12 @@ pub use model3d::{
     init_model3d, get_model3d,
 };
 pub use artcraft::{
-    ArtSuite, Project, Workspace,
+    ArtSuite, Project, Workspace, ProjectType,
     init_artcraft, get_artcraft,
+};
+pub use sovereign_artcraft_craftlibs_pr_engine::{
+    ArtcraftCraftlibsPrPullRequestSpec, ArtcraftPhotoDesignPrDeployer,
+    ArtcraftFilmEffectLightPrDeployer, ArtcraftAudioMedia3DPrDeployer,
+    ArtcraftSuiteIntegrationPrDeployer, ArtcraftCraftlibsMasterPrDeploymentSuite,
+    fnv1a_artcraft_pr_digest,
 };
