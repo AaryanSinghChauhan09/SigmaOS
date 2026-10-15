@@ -28,6 +28,17 @@ if [ -f "tests/io/interrupt.rs" ]; then
     rustc --test tests/io/callback.rs --edition=2021 -o build/test_io_callback && ./build/test_io_callback
 fi
 
+if [ -f "tests/storage/block.rs" ]; then
+    echo "Running Secondary Memory & Storage Subsystem test suites..."
+    mkdir -p build
+    rustc --test tests/storage/block.rs --edition=2021 -o build/test_storage_block && ./build/test_storage_block
+    rustc --test tests/filesystem/cache.rs --edition=2021 -o build/test_fs_cache && ./build/test_fs_cache
+    rustc --test tests/filesystem/core.rs --edition=2021 -o build/test_fs_core && ./build/test_fs_core
+    rustc --test tests/storage_block_tests.rs --edition=2021 -o build/test_storage_block_standalone && ./build/test_storage_block_standalone
+    rustc --test tests/filesystem_cache_tests.rs --edition=2021 -o build/test_fs_cache_standalone && ./build/test_fs_cache_standalone
+    rustc --test tests/filesystem_core_tests.rs --edition=2021 -o build/test_fs_core_standalone && ./build/test_fs_core_standalone
+fi
+
 if [ -f "./algorithm_and_components_inspection_tests" ]; then
     echo "Running core algorithm & component inspection test binary..."
     ./algorithm_and_components_inspection_tests
