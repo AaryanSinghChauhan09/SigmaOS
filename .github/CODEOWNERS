@@ -1,65 +1,74 @@
-# CODEOWNERS for SigmaOS Subsystems
+# CODEOWNERS for SigmaOS Subsystems & Role-Based Governance Model
 
-# Global Maintainers & Security Officers
-*                   @sigmaos-devs/maintainers @sigmaos-devs/security-officers
+# Global Maintainers, Security Officers, and Reviewers
+*                   @sigmaos-devs/maintainers @sigmaos-devs/security-officers @sigmaos-devs/reviewers
 
-# Kernel Subsystem
-/kernel/            @sigmaos-devs/kernel-maintainers
-/src/kernel/        @sigmaos-devs/kernel-maintainers
-/src/arch/          @sigmaos-devs/kernel-maintainers
-/src/boot/          @sigmaos-devs/kernel-maintainers
+# Kernel & Boot Subsystem
+/kernel/            @sigmaos-devs/maintainers
+/src/kernel/        @sigmaos-devs/maintainers
+/src/arch/          @sigmaos-devs/maintainers
+/src/boot/          @sigmaos-devs/maintainers
 
 # Memory Management Subsystem
-/src/memory/        @sigmaos-devs/memory-maintainers
-/docs/memory/       @sigmaos-devs/memory-maintainers
-MEMORY_RULES.toml   @sigmaos-devs/memory-maintainers
+/src/memory/        @sigmaos-devs/maintainers
+/docs/memory/       @sigmaos-devs/docs-stewards @sigmaos-devs/maintainers
+MEMORY_RULES.toml   @sigmaos-devs/maintainers
 
 # VFS & Storage Subsystem
-/src/vfs/           @sigmaos-devs/filesystem-maintainers
-/src/fs/            @sigmaos-devs/filesystem-maintainers
-/src/storage/       @sigmaos-devs/filesystem-maintainers
-/docs/vfs/          @sigmaos-devs/filesystem-maintainers
-/docs/filesystem/   @sigmaos-devs/filesystem-maintainers
-VFS_RULES.toml      @sigmaos-devs/filesystem-maintainers
-STORAGE_RULES.toml  @sigmaos-devs/filesystem-maintainers
+/src/vfs/           @sigmaos-devs/maintainers
+/src/fs/            @sigmaos-devs/maintainers
+/src/storage/       @sigmaos-devs/maintainers
+/docs/vfs/          @sigmaos-devs/docs-stewards
+/docs/filesystem/   @sigmaos-devs/docs-stewards
+VFS_RULES.toml      @sigmaos-devs/maintainers
+STORAGE_RULES.toml  @sigmaos-devs/maintainers
 
 # IPC & Process Subsystem
-/src/ipc/           @sigmaos-devs/ipc-maintainers
-/src/process/       @sigmaos-devs/ipc-maintainers
-/src/signal/        @sigmaos-devs/ipc-maintainers
-PROCESS_RULES.toml  @sigmaos-devs/ipc-maintainers
-SCHEDULER_RULES.toml @sigmaos-devs/ipc-maintainers
+/src/ipc/           @sigmaos-devs/maintainers
+/src/process/       @sigmaos-devs/maintainers
+/src/signal/        @sigmaos-devs/maintainers
+PROCESS_RULES.toml  @sigmaos-devs/maintainers
+SCHEDULER_RULES.toml @sigmaos-devs/maintainers
 
 # Security & Sandboxing Subsystem
 /src/security/      @sigmaos-devs/security-officers
-/docs/security/     @sigmaos-devs/security-officers
+/docs/security/     @sigmaos-devs/security-officers @sigmaos-devs/docs-stewards
 SECURITY.md         @sigmaos-devs/security-officers
 SECURITY_ARCHITECTURE.md @sigmaos-devs/security-officers
 
 # Driver Subsystem
-/src/driver/        @sigmaos-devs/driver-maintainers
-/src/drivers/       @sigmaos-devs/driver-maintainers
-/docs/drivers/      @sigmaos-devs/driver-maintainers
-IO_RULES.toml       @sigmaos-devs/driver-maintainers
+/src/driver/        @sigmaos-devs/maintainers
+/src/drivers/       @sigmaos-devs/maintainers
+/docs/drivers/      @sigmaos-devs/docs-stewards
+IO_RULES.toml       @sigmaos-devs/maintainers
 
 # Packaging & Distro Compatibility
-/src/packaging/     @sigmaos-devs/packaging-maintainers
-/src/distro/        @sigmaos-devs/packaging-maintainers
-/src/compatibility/ @sigmaos-devs/packaging-maintainers
-/docs/component-rules/packaging.md @sigmaos-devs/packaging-maintainers
+/src/packaging/     @sigmaos-devs/maintainers
+/src/distro/        @sigmaos-devs/maintainers
+/src/compatibility/ @sigmaos-devs/maintainers
+/docs/component-rules/packaging.md @sigmaos-devs/docs-stewards
 
 # Desktop & Zenith UI Subsystem
-/zenith_desktop/    @sigmaos-devs/desktop-maintainers
-/src/desktop/       @sigmaos-devs/desktop-maintainers
-/docs/desktop/      @sigmaos-devs/desktop-maintainers
+/zenith_desktop/    @sigmaos-devs/maintainers
+/src/desktop/       @sigmaos-devs/maintainers
+/docs/desktop/      @sigmaos-devs/docs-stewards
 
 # Installer Subsystem
-/installer/         @sigmaos-devs/installer-maintainers
-/iso_root/          @sigmaos-devs/installer-maintainers
+/installer/         @sigmaos-devs/release-managers @sigmaos-devs/maintainers
+/iso_root/          @sigmaos-devs/release-managers @sigmaos-devs/maintainers
 
-# Governance & Agent Maintenance
+# Governance, Agent Maintenance & Documentation
 /GOVERNANCE.md      @sigmaos-devs/maintainers
-/.agents/           @sigmaos-devs/maintainers
+/docs/              @sigmaos-devs/docs-stewards @sigmaos-devs/researchers
+/FEATURE_STATUS.toml @sigmaos-devs/docs-stewards @sigmaos-devs/maintainers
+/CAPABILITY_MATRIX.toml @sigmaos-devs/docs-stewards @sigmaos-devs/maintainers
+/.github/           @sigmaos-devs/maintainers @sigmaos-devs/triagers
+/.agents/           @sigmaos-devs/maintainers @sigmaos-devs/updaters
 /.jules/            @sigmaos-devs/maintainers
 /.kiro/             @sigmaos-devs/maintainers
 /Agents/            @sigmaos-devs/maintainers
+
+# Testing, Fuzzing & Benchmarks
+/tests/             @sigmaos-devs/testers-fuzzers
+/fuzz/              @sigmaos-devs/testers-fuzzers @sigmaos-devs/security-officers
+/reports/           @sigmaos-devs/benchmark-officers @sigmaos-devs/testers-fuzzers
