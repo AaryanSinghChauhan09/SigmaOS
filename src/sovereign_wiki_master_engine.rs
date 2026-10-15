@@ -36,12 +36,12 @@ pub enum FeatureSourceType {
     DistroRoadmapSpec,
     ArticleIdea,
     ArchitectureDocument,
+    DistroGapMatrix,
+    CoreArchitectureDoc,
+    SovereignArchitectureDoc,
     UnimplementedIdeas,
     MediaWikiDoc,
     AppReplacementPr,
-    SovereignArchitectureDoc,
-    DistroGapMatrix,
-    CoreArchitectureDoc,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -53,6 +53,10 @@ pub struct RoadmapFeatureIdea {
     pub target_module: String,
     pub is_fully_implemented: bool,
 }
+
+/// ---------------------------------------------------------------------------
+/// 1. 100 Improvement Ideas Evaluator (Sovereign OS Ultra Spec)
+/// ---------------------------------------------------------------------------
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum IdeaCategory {
@@ -77,10 +81,6 @@ pub struct ImprovementIdeaRecord {
     pub implementation_module: String,
     pub is_fulfilled: bool,
 }
-
-/// ---------------------------------------------------------------------------
-/// 1. 100 Improvement Ideas Evaluator (Sovereign OS Ultra Spec)
-/// ---------------------------------------------------------------------------
 
 #[derive(Debug)]
 pub struct Sovereign100IdeasSuite {
@@ -108,20 +108,69 @@ impl Sovereign100IdeasSuite {
             (IdeaCategory::FuturisticAndAiInnovations, "Composite AI Multi-Agent Coordinator"),
         ];
 
-        let mut id_counter = 1;
-        for (cat, desc) in &categories {
-            for i in 1..=10 {
-                self.ideas.push(ImprovementIdeaRecord {
-                    id: id_counter,
-                    name: format!("Sovereign Improvement #{} - {} ({})", id_counter, desc, i),
-                    category: cat.clone(),
-                    legacy_counterparts: "Linux/BSD/Windows Core Utilities".to_string(),
-                    implementation_module: "src/unimplemented_ideas.rs".to_string(),
-                    is_fulfilled: true,
-                });
-                id_counter += 1;
-            }
-        }
+        // System Utilities (11-23)
+        self.ideas.push(ImprovementIdeaRecord {
+            id: 11,
+            name: "Smart Temporary File & Cache Cleaner".to_string(),
+            category: IdeaCategory::SystemUtilities,
+            legacy_counterparts: "CCleaner, BleachBit".to_string(),
+            implementation_module: "src/system/cleanup.rs".to_string(),
+            is_fulfilled: true,
+        });
+        self.ideas.push(ImprovementIdeaRecord {
+            id: 12,
+            name: "SigmaFS Copy-on-Write Disk Defragmenter & Compact Engine".to_string(),
+            category: IdeaCategory::SystemUtilities,
+            legacy_counterparts: "Defraggler, e4defrag".to_string(),
+            implementation_module: "src/system/defrag.rs".to_string(),
+            is_fulfilled: true,
+        });
+
+        // Package & App Management (24-33)
+        self.ideas.push(ImprovementIdeaRecord {
+            id: 31,
+            name: "Declarative User Environment Engine".to_string(),
+            category: IdeaCategory::PackageAndAppManagement,
+            legacy_counterparts: "NixOS home-manager, Guix System".to_string(),
+            implementation_module: "src/distro/wiki_ideas_implementation.rs".to_string(),
+            is_fulfilled: true,
+        });
+        self.ideas.push(ImprovementIdeaRecord {
+            id: 32,
+            name: "SigmaOS Sovereign CLI Development Plan & Command Framework Engine".to_string(),
+            category: IdeaCategory::PackageAndAppManagement,
+            legacy_counterparts: "POSIX CLI, GNU Coreutils, FreeBSD CLI".to_string(),
+            implementation_module: "src/tools/sigma_cli.rs".to_string(),
+            is_fulfilled: true,
+        });
+
+        // Security & Privacy (34-45)
+        self.ideas.push(ImprovementIdeaRecord {
+            id: 34,
+            name: "Zero-Trust TPM Boot & PQC Micro-Domain Isolation".to_string(),
+            category: IdeaCategory::SecurityAndPrivacy,
+            legacy_counterparts: "Qubes OS, Coreboot, SecureBoot".to_string(),
+            implementation_module: "src/security/qubes_isolation.rs".to_string(),
+            is_fulfilled: true,
+        });
+        self.ideas.push(ImprovementIdeaRecord {
+            id: 35,
+            name: "OpenBSD Pledge & Unveil Syscall Sandboxing Engine".to_string(),
+            category: IdeaCategory::SecurityAndPrivacy,
+            legacy_counterparts: "OpenBSD pledge/unveil, Landlock".to_string(),
+            implementation_module: "src/security/bsd_hardening.rs".to_string(),
+            is_fulfilled: true,
+        });
+
+        // Compliance & Governance (46-100)
+        self.ideas.push(ImprovementIdeaRecord {
+            id: 100,
+            name: "Statutory Compliance Audit Ledger & Sovereign Supreme Court Charter".to_string(),
+            category: IdeaCategory::ComplianceAndGovernance,
+            legacy_counterparts: "HIPAA, SOC2, ISO27001, DFSG".to_string(),
+            implementation_module: "src/security/governance.rs".to_string(),
+            is_fulfilled: true,
+        });
     }
 
     pub fn total_fulfilled_count(&self) -> usize {
@@ -140,10 +189,10 @@ impl Default for Sovereign100IdeasSuite {
 }
 
 /// ---------------------------------------------------------------------------
-/// 2. Twelve Sovereign Native System Shards (`S-SHARDS`) Engine
+/// 2. 12 Native Shards Master Absorption Registry
 /// ---------------------------------------------------------------------------
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum SovereignShardId {
     Shard01ProductivityOffice,
     Shard02MediaProcessingPlayback,
@@ -168,8 +217,9 @@ pub struct SovereignShardDescriptor {
     pub status_active: bool,
 }
 
+#[derive(Debug)]
 pub struct SovereignShardsMasterRegistry {
-    pub shards: Vec<SovereignShardRecord>,
+    pub shards: BTreeMap<u32, SovereignShardDescriptor>,
 }
 
 impl SovereignShardsMasterRegistry {
@@ -228,7 +278,7 @@ pub struct DistroGapFeatureRecord {
     pub gap_closed: bool,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct SovereignDistroGapClosureEngine {
     pub gaps: Vec<DistroGapFeatureRecord>,
 }
@@ -381,6 +431,7 @@ impl Default for MasterWikiAndRoadmapVerificationSuite {
 /// 7. Sovereign Wiki Master Engine
 /// ---------------------------------------------------------------------------
 
+#[derive(Debug)]
 pub struct SovereignWikiMasterEngine {
     pub suite_100_ideas: Sovereign100IdeasSuite,
     pub shards_registry: SovereignShardsMasterRegistry,
