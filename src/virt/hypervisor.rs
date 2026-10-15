@@ -49,6 +49,7 @@ pub trait Guest {
 pub struct SimpleGuest {
     pub id: GuestID,
     pub name: [u8; 64],
+    pub name_len: u8, // O(1) length cache: stores exact slice byte length to eliminate O(N) zero-byte linear scans
     pub state: AtomicUsize,
     pub vcpus: AtomicUsize,
     pub memory_mb: AtomicUsize,
@@ -73,6 +74,7 @@ impl SimpleGuest {
         SimpleGuest {
             id,
             name: name_array,
+            name_len: name_len as u8,
             state: AtomicUsize::new(GuestState::Stopped as usize),
             vcpus: AtomicUsize::new(vcpus as usize),
             memory_mb: AtomicUsize::new(memory_mb as usize),
@@ -88,8 +90,8 @@ impl Guest for SimpleGuest {
         self.id
     }
     fn name(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
-        &self.name[..len]
+        // O(1) slice lookup using cached name_len, avoiding O(N) zero-byte linear scan (.position(|&b| b == 0))
+        &self.name[..self.name_len as usize]
     }
     fn state(&self) -> GuestState {
         let state_val = self.state.load(Ordering::SeqCst);
@@ -179,9 +181,11 @@ impl Hypervisor for SimpleHypervisor {
     }
 
     fn destroy_guest(&mut self, id: GuestID) -> Result<(), HypervisorError> {
+        // Single-pass mutable traversal: clear guest entry (*guest_option = None) upon Guest ID match
         for guest_option in &mut self.guests {
             if let Some(ref guest) = *guest_option {
                 if guest.id() == id {
+                    *guest_option = None;
                     return Ok(());
                 }
             }
