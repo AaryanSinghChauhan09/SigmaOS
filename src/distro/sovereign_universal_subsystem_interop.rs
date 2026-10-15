@@ -32,14 +32,6 @@ pub enum UniversalSubsystemCategory {
     SystemAudit,
     AiWorkflowAgent,
     VirtualizationHypervisor,
-    ProcessActivity,
-    MemoryVirtualization,
-    TimeSynchronization,
-    SignalDelivery,
-    DeviceHotplug,
-    CryptographySecurity,
-    TelemetryObservability,
-    AccessibilityInput,
 }
 
 impl UniversalSubsystemCategory {
@@ -68,14 +60,6 @@ impl UniversalSubsystemCategory {
             Self::SystemAudit => "SystemAudit",
             Self::AiWorkflowAgent => "AiWorkflowAgent",
             Self::VirtualizationHypervisor => "VirtualizationHypervisor",
-            Self::ProcessActivity => "ProcessActivity",
-            Self::MemoryVirtualization => "MemoryVirtualization",
-            Self::TimeSynchronization => "TimeSynchronization",
-            Self::SignalDelivery => "SignalDelivery",
-            Self::DeviceHotplug => "DeviceHotplug",
-            Self::CryptographySecurity => "CryptographySecurity",
-            Self::TelemetryObservability => "TelemetryObservability",
-            Self::AccessibilityInput => "AccessibilityInput",
         }
     }
 }
@@ -507,130 +491,6 @@ impl SovereignUniversalSubsystemInteropEngine {
                 7,
             ),
         );
-
-        self.register_subsystem(
-            "process_activity",
-            SubsystemAdapterCapabilities::new(
-                UniversalSubsystemCategory::ProcessActivity,
-                true,
-                true,
-                &[
-                    "rusage_collector",
-                    "job_control",
-                    "cgroupv2_tasks",
-                    "pidfd_signals",
-                ],
-                8,
-            ),
-        );
-
-        self.register_subsystem(
-            "memory_virt",
-            SubsystemAdapterCapabilities::new(
-                UniversalSubsystemCategory::MemoryVirtualization,
-                true,
-                true,
-                &[
-                    "damon_reclaim",
-                    "cxl_photonic_mesh",
-                    "zram_zstd",
-                    "mglru_pages",
-                ],
-                10,
-            ),
-        );
-
-        self.register_subsystem(
-            "time_sync",
-            SubsystemAdapterCapabilities::new(
-                UniversalSubsystemCategory::TimeSynchronization,
-                true,
-                true,
-                &[
-                    "chrony_ntp",
-                    "ptp_hardware_clock",
-                    "bsd_secure_time",
-                ],
-                5,
-            ),
-        );
-
-        self.register_subsystem(
-            "signal_delivery",
-            SubsystemAdapterCapabilities::new(
-                UniversalSubsystemCategory::SignalDelivery,
-                true,
-                true,
-                &[
-                    "realtime_sigqueue",
-                    "sigreturn_frame_guard",
-                    "uncatchable_bypass",
-                ],
-                6,
-            ),
-        );
-
-        self.register_subsystem(
-            "device_hotplug",
-            SubsystemAdapterCapabilities::new(
-                UniversalSubsystemCategory::DeviceHotplug,
-                true,
-                true,
-                &[
-                    "udev_devd_bridge",
-                    "xhci_hotplug",
-                    "evdev_multitouch",
-                ],
-                9,
-            ),
-        );
-
-        self.register_subsystem(
-            "crypto_security",
-            SubsystemAdapterCapabilities::new(
-                UniversalSubsystemCategory::CryptographySecurity,
-                true,
-                true,
-                &[
-                    "pqc_dilithium",
-                    "falcon_1024",
-                    "kyber_1024",
-                    "luks2_geli",
-                ],
-                12,
-            ),
-        );
-
-        self.register_subsystem(
-            "telemetry_obs",
-            SubsystemAdapterCapabilities::new(
-                UniversalSubsystemCategory::TelemetryObservability,
-                true,
-                true,
-                &[
-                    "prometheus_exporter",
-                    "privacy_telemetry_filter",
-                    "crashdump_pstore",
-                ],
-                7,
-            ),
-        );
-
-        self.register_subsystem(
-            "accessibility_input",
-            SubsystemAdapterCapabilities::new(
-                UniversalSubsystemCategory::AccessibilityInput,
-                true,
-                true,
-                &[
-                    "orca_screenreader",
-                    "fcitx5_ime",
-                    "libinput_gestures",
-                    "braille_display",
-                ],
-                6,
-            ),
-        );
     }
 
     /// Establish default cross-subsystem translation and isolation policies.
@@ -792,70 +652,6 @@ impl SovereignUniversalSubsystemInteropEngine {
             UniversalSubsystemCategory::IpcMemory,
             UniversalSubsystemCategory::ObservabilityDiagnostics,
             "Zero-copy ring buffer telemetry streaming to DTrace and eBPF tracing probes",
-            false,
-        ));
-
-        self.add_interop_policy(SubsystemInteropPolicy::new(
-            "policy_proc_sched",
-            UniversalSubsystemCategory::ProcessActivity,
-            UniversalSubsystemCategory::KernelScheduling,
-            "Sync CgroupV2 task activity telemetry into EEVDF/BORE scheduling queues",
-            true,
-        ));
-
-        self.add_interop_policy(SubsystemInteropPolicy::new(
-            "policy_mem_sec",
-            UniversalSubsystemCategory::MemoryVirtualization,
-            UniversalSubsystemCategory::SecuritySandboxing,
-            "Enforce DAMON MGLRU memory page protection and W^X KASLR randomization invariants",
-            true,
-        ));
-
-        self.add_interop_policy(SubsystemInteropPolicy::new(
-            "policy_time_net",
-            UniversalSubsystemCategory::TimeSynchronization,
-            UniversalSubsystemCategory::Networking,
-            "Align PTP hardware clock sub-microsecond timestamps with eBPF XDP network packets",
-            false,
-        ));
-
-        self.add_interop_policy(SubsystemInteropPolicy::new(
-            "policy_sig_proc",
-            UniversalSubsystemCategory::SignalDelivery,
-            UniversalSubsystemCategory::ProcessActivity,
-            "Deliver Realtime SigQueue events safely across pidfd process isolation domains",
-            true,
-        ));
-
-        self.add_interop_policy(SubsystemInteropPolicy::new(
-            "policy_hotplug_drivers",
-            UniversalSubsystemCategory::DeviceHotplug,
-            UniversalSubsystemCategory::DriversHardware,
-            "Bridge Udev/Devd hardware hotplug events with Rump Anykernel driver initialization",
-            false,
-        ));
-
-        self.add_interop_policy(SubsystemInteropPolicy::new(
-            "policy_crypto_storage",
-            UniversalSubsystemCategory::CryptographySecurity,
-            UniversalSubsystemCategory::FilesystemStorage,
-            "Enforce post-quantum Dilithium/Kyber keys and GELI/LUKS2 encryption on ZFS/Btrfs CoW volumes",
-            true,
-        ));
-
-        self.add_interop_policy(SubsystemInteropPolicy::new(
-            "policy_telemetry_audit",
-            UniversalSubsystemCategory::TelemetryObservability,
-            UniversalSubsystemCategory::SystemAudit,
-            "Stream Prometheus and Pstore crash dumps into privacy-respecting audit ledgers",
-            false,
-        ));
-
-        self.add_interop_policy(SubsystemInteropPolicy::new(
-            "policy_access_desktop",
-            UniversalSubsystemCategory::AccessibilityInput,
-            UniversalSubsystemCategory::DesktopCompositor,
-            "Route Orca screenreader and Braille display events directly through Wayland desktop compositor",
             false,
         ));
     }
@@ -1178,43 +974,9 @@ mod tests {
     fn test_expanded_subsystem_categories_interop() {
         let mut engine = SovereignUniversalSubsystemInteropEngine::new();
 
-        assert_eq!(engine.subsystem_adapters.len(), 31);
-
         assert_eq!(
             UniversalSubsystemCategory::ShellTerminal.as_str(),
             "ShellTerminal"
-        );
-        assert_eq!(
-            UniversalSubsystemCategory::ProcessActivity.as_str(),
-            "ProcessActivity"
-        );
-        assert_eq!(
-            UniversalSubsystemCategory::MemoryVirtualization.as_str(),
-            "MemoryVirtualization"
-        );
-        assert_eq!(
-            UniversalSubsystemCategory::TimeSynchronization.as_str(),
-            "TimeSynchronization"
-        );
-        assert_eq!(
-            UniversalSubsystemCategory::SignalDelivery.as_str(),
-            "SignalDelivery"
-        );
-        assert_eq!(
-            UniversalSubsystemCategory::DeviceHotplug.as_str(),
-            "DeviceHotplug"
-        );
-        assert_eq!(
-            UniversalSubsystemCategory::CryptographySecurity.as_str(),
-            "CryptographySecurity"
-        );
-        assert_eq!(
-            UniversalSubsystemCategory::TelemetryObservability.as_str(),
-            "TelemetryObservability"
-        );
-        assert_eq!(
-            UniversalSubsystemCategory::AccessibilityInput.as_str(),
-            "AccessibilityInput"
         );
         assert_eq!(UniversalSubsystemCategory::IpcMemory.as_str(), "IpcMemory");
         assert_eq!(
@@ -1268,14 +1030,6 @@ mod tests {
         assert!(engine.subsystem_adapters.contains_key("compiler"));
         assert!(engine.subsystem_adapters.contains_key("automation"));
         assert!(engine.subsystem_adapters.contains_key("audit"));
-        assert!(engine.subsystem_adapters.contains_key("process_activity"));
-        assert!(engine.subsystem_adapters.contains_key("memory_virt"));
-        assert!(engine.subsystem_adapters.contains_key("time_sync"));
-        assert!(engine.subsystem_adapters.contains_key("signal_delivery"));
-        assert!(engine.subsystem_adapters.contains_key("device_hotplug"));
-        assert!(engine.subsystem_adapters.contains_key("crypto_security"));
-        assert!(engine.subsystem_adapters.contains_key("telemetry_obs"));
-        assert!(engine.subsystem_adapters.contains_key("accessibility_input"));
 
         let event_id = engine
             .dispatch_cross_subsystem_operation_all_distros("shell", "ipc_mem", "alloc_ring_buffer")
@@ -1311,7 +1065,7 @@ mod tests {
         let count = engine
             .sync_universal_cross_distro_mesh()
             .expect("Mesh sync should succeed");
-        assert!(count >= 31 * 30);
+        assert!(count >= 23 * 22);
 
         let policy = engine
             .translate_policy(

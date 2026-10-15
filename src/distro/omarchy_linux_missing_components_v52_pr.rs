@@ -205,7 +205,11 @@ impl OmarchyHerdrAiSchedulerPrEngineV52 {
     }
 
     pub fn dispatch_agent_task(&self, task_name: &str) -> String {
-        format!("HerdrScheduler: Dispatched task '{}' across {} agents", task_name, self.scheduled_agents.len())
+        format!(
+            "HerdrScheduler: Dispatched task '{}' across {} agents",
+            task_name,
+            self.scheduled_agents.len()
+        )
     }
 }
 
@@ -289,7 +293,10 @@ impl OmarchyThunarZellijPrEngineV52 {
 
     pub fn spawn_terminal_in_dir(&mut self, session_name: &str, path: &str) -> String {
         self.active_zellij_sessions.push(session_name.to_string());
-        format!("zellij --session {} options --default-cwd {}", session_name, path)
+        format!(
+            "zellij --session {} options --default-cwd {}",
+            session_name, path
+        )
     }
 }
 

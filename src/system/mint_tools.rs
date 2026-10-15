@@ -8,7 +8,6 @@
 extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
-use alloc::vec;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 
@@ -53,45 +52,6 @@ pub struct BackupJob {
     pub error_message: Option<String>,
 }
 
-/// Restore configuration
-#[derive(Debug, Clone)]
-pub struct RestoreConfig {
-    pub backup_id: u32,
-    pub destination_path: String,
-    pub overwrite_existing: bool,
-    pub restore_permissions: bool,
-}
-
-/// Restore status
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum RestoreStatus {
-    Pending,
-    InProgress,
-    Completed,
-    Failed,
-}
-
-/// Restore job
-#[derive(Debug, Clone)]
-pub struct RestoreJob {
-    pub id: u32,
-    pub config: RestoreConfig,
-    pub status: RestoreStatus,
-    pub start_time: u64,
-    pub end_time: Option<u64>,
-    pub restored_bytes: u64,
-    pub error_message: Option<String>,
-}
-
-/// Rollback record for installed package updates
-#[derive(Debug, Clone)]
-pub struct RollbackRecord {
-    pub package_name: String,
-    pub version_before: String,
-    pub version_after: String,
-    pub installed_at: u64,
-}
-
 /// Update type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum UpdateType {
@@ -122,11 +82,10 @@ pub struct PackageUpdate {
     pub description: String,
 }
 
-/// Update manager with rollback support
+/// Update manager
 #[derive(Debug, Clone)]
 pub struct MintUpdateManager {
     pub available_updates: Vec<PackageUpdate>,
-    pub rollback_history: Vec<RollbackRecord>,
     pub auto_update_enabled: bool,
     pub last_check_time: u64,
     pub auto_update_time: String, // cron-style
@@ -271,13 +230,11 @@ pub struct SoftwareInfo {
 /// System tools engine
 pub struct SystemToolsEngine {
     pub backup_jobs: BTreeMap<u32, BackupJob>,
-    pub restore_jobs: BTreeMap<u32, RestoreJob>,
     pub update_manager: MintUpdateManager,
     pub software_manager: SoftwareManager,
     pub driver_manager: DriverManager,
     pub system_reports: BTreeMap<u32, SystemReport>,
     pub next_backup_id: AtomicU32,
-    pub next_restore_id: AtomicU32,
     pub next_report_id: AtomicU32,
     pub active: AtomicBool,
 }
@@ -286,10 +243,8 @@ impl SystemToolsEngine {
     pub fn new() -> Self {
         Self {
             backup_jobs: BTreeMap::new(),
-            restore_jobs: BTreeMap::new(),
             update_manager: MintUpdateManager {
                 available_updates: Vec::new(),
-                rollback_history: Vec::new(),
                 auto_update_enabled: true,
                 last_check_time: 0,
                 auto_update_time: "daily".to_string(),
@@ -316,7 +271,6 @@ impl SystemToolsEngine {
             },
             system_reports: BTreeMap::new(),
             next_backup_id: AtomicU32::new(1),
-            next_restore_id: AtomicU32::new(1),
             next_report_id: AtomicU32::new(1),
             active: AtomicBool::new(false),
         }
@@ -369,91 +323,20 @@ impl SystemToolsEngine {
         Ok(())
     }
 
-    /// Create restore job
-    pub fn create_restore(&mut self, config: RestoreConfig) -> Result<u32, &'static str> {
-        if !self.backup_jobs.contains_key(&config.backup_id) {
-            return Err("Backup not found");
-        }
-        let id = self.next_restore_id.fetch_add(1, Ordering::Relaxed);
-        let job = RestoreJob {
-            id,
-            config,
-            status: RestoreStatus::Pending,
-            start_time: 0,
-            end_time: None,
-            restored_bytes: 0,
-            error_message: None,
-        };
-        self.restore_jobs.insert(id, job);
-        Ok(id)
-    }
-
-    /// Start restore job
-    pub fn start_restore(&mut self, restore_id: u32) -> Result<(), &'static str> {
-        let job = self.restore_jobs.get_mut(&restore_id).ok_or("Restore job not found")?;
-        job.status = RestoreStatus::InProgress;
-        job.start_time = 0;
-        Ok(())
-    }
-
-    /// Complete restore job
-    pub fn complete_restore(&mut self, restore_id: u32, restored_bytes: u64) -> Result<(), &'static str> {
-        let job = self.restore_jobs.get_mut(&restore_id).ok_or("Restore job not found")?;
-        job.status = RestoreStatus::Completed;
-        job.end_time = Some(0);
-        job.restored_bytes = restored_bytes;
-        Ok(())
-    }
-
-    /// Fail restore job
-    pub fn fail_restore(&mut self, restore_id: u32, error: String) -> Result<(), &'static str> {
-        let job = self.restore_jobs.get_mut(&restore_id).ok_or("Restore job not found")?;
-        job.status = RestoreStatus::Failed;
-        job.end_time = Some(0);
-        job.error_message = Some(error);
-        Ok(())
-    }
-
     /// Check for updates
     pub fn check_updates(&mut self) {
         // In a real implementation, this would query package repositories
         self.update_manager.last_check_time = 0; // Would be actual timestamp
     }
 
-    /// Install update with rollback record
+    /// Install update
     pub fn install_update(&mut self, package_name: String) -> Result<(), &'static str> {
         let index = self.update_manager.available_updates.iter().position(|u| u.name == package_name);
         if let Some(idx) = index {
-            let update = self.update_manager.available_updates.remove(idx);
-            self.update_manager.rollback_history.push(RollbackRecord {
-                package_name: update.name,
-                version_before: update.version_old,
-                version_after: update.version_new,
-                installed_at: 0,
-            });
+            self.update_manager.available_updates.remove(idx);
             Ok(())
         } else {
             Err("Update not found")
-        }
-    }
-
-    /// Rollback package update to previous version
-    pub fn rollback_update(&mut self, package_name: &str) -> Result<RollbackRecord, &'static str> {
-        let pos = self.update_manager.rollback_history.iter().position(|r| r.package_name == package_name);
-        if let Some(idx) = pos {
-            let record = self.update_manager.rollback_history.remove(idx);
-            self.update_manager.available_updates.push(PackageUpdate {
-                name: record.package_name.clone(),
-                version_old: record.version_after.clone(),
-                version_new: record.version_before.clone(),
-                update_type: UpdateType::BugFix,
-                severity: UpdateSeverity::Medium,
-                size_bytes: 0,
-                description: "Rolled back update".to_string(),
-            });
-            Ok(record)
-        } else {
-            Err("No rollback record found for package")
         }
     }
 
@@ -659,59 +542,5 @@ mod tests {
         let report_id = tools.generate_report(hw_info, sw_info);
         tools.add_diagnostic(report_id, DiagnosticTest::CPU, TestResult::Pass, "CPU OK".to_string()).unwrap();
         assert_eq!(tools.system_reports[&report_id].diagnostics.len(), 1);
-    }
-
-    #[test]
-    fn test_restore() {
-        let mut tools = SystemToolsEngine::new();
-        tools.init();
-        let backup_config = BackupConfig {
-            name: "Full System".to_string(),
-            backup_type: BackupType::Full,
-            source_paths: vec!["/home".to_string()],
-            destination: "/backup".to_string(),
-            compression: true,
-            encryption: false,
-            include_hidden: false,
-        };
-        let backup_id = tools.create_backup(backup_config);
-        tools.complete_backup(backup_id, 1024 * 1024).unwrap();
-
-        let restore_config = RestoreConfig {
-            backup_id,
-            destination_path: "/restored".to_string(),
-            overwrite_existing: true,
-            restore_permissions: true,
-        };
-        let restore_id = tools.create_restore(restore_config).unwrap();
-        tools.start_restore(restore_id).unwrap();
-        assert_eq!(tools.restore_jobs[&restore_id].status, RestoreStatus::InProgress);
-
-        tools.complete_restore(restore_id, 1024 * 1024).unwrap();
-        assert_eq!(tools.restore_jobs[&restore_id].status, RestoreStatus::Completed);
-    }
-
-    #[test]
-    fn test_update_rollback() {
-        let mut tools = SystemToolsEngine::new();
-        tools.init();
-        tools.update_manager.available_updates.push(PackageUpdate {
-            name: "coreutils".to_string(),
-            version_old: "1.0.0".to_string(),
-            version_new: "1.1.0".to_string(),
-            update_type: UpdateType::BugFix,
-            severity: UpdateSeverity::Low,
-            size_bytes: 1024,
-            description: "Bug fixes".to_string(),
-        });
-
-        tools.install_update("coreutils".to_string()).unwrap();
-        assert_eq!(tools.update_manager.rollback_history.len(), 1);
-
-        let rollback = tools.rollback_update("coreutils").unwrap();
-        assert_eq!(rollback.package_name, "coreutils");
-        assert_eq!(rollback.version_before, "1.0.0");
-        assert_eq!(tools.update_manager.available_updates.len(), 1);
-        assert_eq!(tools.update_manager.available_updates[0].version_new, "1.0.0");
     }
 }

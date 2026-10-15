@@ -22,9 +22,6 @@ pub mod compatibility;
 pub mod container;
 pub mod contributing;
 pub mod creative;
-pub use creative::pdfcraft_artcraft_parity_pr::*;
-pub use creative::photocraft_missing_components_parity_pr::*;
-pub use creative::effectcraft_missing_components_parity_pr::*;
 pub mod customization;
 pub mod database;
 pub mod dashboard;
@@ -69,9 +66,8 @@ pub use package::{
     SovereignDistroPackageAdvancementsSuiteV10, SovereignDistroPackageAdvancementsSuiteV11,
     SovereignDistroPackageAdvancementsSuiteV14, SovereignDistroPackageAdvancementsSuiteV19,
     SovereignDistroPackageAdvancementsSuiteV20, SovereignDistroPackageAdvancementsSuiteV32,
-    SovereignDistroPackageAdvancementsSuiteV33, SovereignDistroPackageAdvancementsSuiteV39,
-    SovereignDistroPackageAdvancementsSuiteV40,
-    UniversalForeignPackageFormat, UniversalForeignPackageFormatConverter,
+    SovereignDistroPackageAdvancementsSuiteV33, UniversalForeignPackageFormat,
+    UniversalForeignPackageFormatConverter,
 };
 pub mod process;
 pub mod productivity;
@@ -247,9 +243,6 @@ pub use dashboard::{
 };
 pub use desktop::elementary_os_missing_components_pr::*;
 pub use distro::arch_missing_components_parity_pr::*;
-pub use distro::freebsd_missing_components_parity_pr::*;
-pub use distro::openbsd_missing_components_parity_pr::*;
-pub use distro::open_source_os_missing_components_v48_pr::*;
 pub use distro::{
     AdminAction, AiSysAdmin, AppBundleRuntime, AppManifest, AppsAuditTool, AptCacheSimulator,
     ArchBuildSystem, ArchMirror, ArchPacmanHooksManager, ArchRepoType, AuditResult, AuditRule,
