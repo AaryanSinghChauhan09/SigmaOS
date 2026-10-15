@@ -208,6 +208,38 @@ impl OpenSourceOsUnimplementedIdeasPrEngine {
         ))
     }
 
+    pub fn execute_pr_proposal(&mut self, pr_id: u32) -> bool {
+        if let Some(pr) = self.pr_proposals.get_mut(&pr_id) {
+            let patch_content = format!(
+                "PR #{}: {}\nCategory: {}\nTarget: {}\n",
+                pr.pr_id,
+                pr.title,
+                pr.category.as_str(),
+                pr.target_subsystem
+            );
+            let calculated_digest = fnv1a_pr_patch_digest(patch_content.as_bytes());
+            if calculated_digest == pr.patch_digest {
+                pr.is_validated = true;
+                pr.is_merged = true;
+                true
+            } else {
+                false
+            }
+        } else {
+            false
+        }
+    }
+
+    pub fn verify_all_prs(&mut self) -> bool {
+        let keys: Vec<u32> = self.pr_proposals.keys().copied().collect();
+        for pr_id in keys {
+            if !self.execute_pr_proposal(pr_id) {
+                return false;
+            }
+        }
+        true
+    }
+
     pub fn get_merged_pr_count(&self) -> usize {
         self.pr_proposals.values().filter(|pr| pr.is_merged).count()
     }
@@ -236,7 +268,10 @@ impl SovereignOpenSourceOsIdeasMasterSuite {
         }
     }
 
-    pub fn verify_all_open_source_os_pr_ideas(&self) -> bool {
+    pub fn verify_all_open_source_os_pr_ideas(&mut self) -> bool {
+        if !self.pr_engine.verify_all_prs() {
+            return false;
+        }
         self.pr_engine.get_merged_pr_count() >= 16
     }
 
@@ -276,7 +311,7 @@ mod tests {
 
     #[test]
     fn test_sovereign_open_source_os_ideas_master_suite() {
-        let master = SovereignOpenSourceOsIdeasMasterSuite::new();
+        let mut master = SovereignOpenSourceOsIdeasMasterSuite::new();
         assert!(master.verify_all_open_source_os_pr_ideas());
 
         let summary = master.get_category_pr_summary();
