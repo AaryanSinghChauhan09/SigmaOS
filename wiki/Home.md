@@ -50,7 +50,7 @@ Implement missing components in this order. Each item must be delivered through 
 | **P0** | Kernel entry and serial logging | xv6, Linux | Early console and kernel entry | Serial trace |
 | **P1** | Physical memory manager | xv6, Linux | Frame allocator | Allocation tests |
 | **P1** | Virtual memory/paging | xv6, Linux | Page tables and address spaces | Boot and memory tests |
-| **P1** | Interrupts and timer | xv6, OSDev | IDT, exception handlers, timer | Interrupt trace |
+| **P1** | [Interrupts and timer](INTERRUPT_HANDLER_PLAN.md) | xv6, OSDev | IDT, exception handlers, timer | Interrupt trace |
 | **P1** | Scheduler | Linux, xv6 | Minimal round-robin scheduler | Process-switch test |
 | **P1** | Syscall interface | Linux, FreeBSD | Stable syscall table and validation | Syscall tests |
 | **P1** | Init and shell | Linux Mint, Arch | PID 1, service startup, shell | Boot-to-shell |
