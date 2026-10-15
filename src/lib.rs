@@ -46,6 +46,7 @@ pub mod driver;
 pub mod drivers;
 pub use drivers::sovereign_comprehensive_drivers::*;
 pub use drivers::sovereign_device_driver_development_and_pr_suite::*;
+pub use net::sovereign_network_development_and_pr_suite::*;
 pub mod crypto;
 pub mod filesystem;
 pub mod futuristic_modules;
