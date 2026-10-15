@@ -117,6 +117,13 @@ if [ -f "src/backup/sovereign_backup_and_recovery_advancements.rs" ]; then
     ./build/sovereign_backup_advancements_test
 fi
 
+if [ -f "src/backup/sovereign_backup_recovery_pr_suite.rs" ]; then
+    echo "Running Sovereign Backup & Recovery PR Suite test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/backup/sovereign_backup_recovery_pr_suite.rs -o build/sovereign_backup_pr_suite_test
+    ./build/sovereign_backup_pr_suite_test
+fi
+
 if [ -f "src/distro/linux_bsd_inspirations.rs" ]; then
     echo "Running Linux & BSD distro inspirations & subsystem bridge test suite..."
     mkdir -p build

@@ -16,7 +16,7 @@ use alloc::vec;
 use alloc::vec::Vec;
 
 /// ---------------------------------------------------------------------------
-/// 0. Feature Source & Roadmap Types
+/// 0. Feature Source Types and Roadmap Feature Types
 /// ---------------------------------------------------------------------------
 
 /// Feature Source Types across documentation and wiki specs
@@ -474,7 +474,7 @@ impl Default for SovereignDistroGapClosureEngine {
 /// 4. Roadmap Feature Parity Verification Engine
 /// ---------------------------------------------------------------------------
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct SovereignLinuxBsdWikiRoadmapParityEngine {
     pub ideas: Vec<RoadmapFeatureIdea>,
 }
@@ -506,12 +506,6 @@ impl SovereignLinuxBsdWikiRoadmapParityEngine {
     }
 }
 
-impl Default for SovereignLinuxBsdWikiRoadmapParityEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 #[derive(Debug)]
 pub struct WikiSpecificationDataSyncer {
     pub total_synced_specs: usize,
@@ -534,11 +528,11 @@ impl Default for WikiSpecificationDataSyncer {
 }
 
 /// ---------------------------------------------------------------------------
-/// 5. Sovereign Wiki Master Engine
+/// 5. Master Wiki & Roadmap Verification Suite Engine
 /// ---------------------------------------------------------------------------
 
-#[derive(Debug)]
 pub struct MasterWikiAndRoadmapVerificationSuite {
+    pub ideas: Vec<RoadmapFeatureIdea>,
     pub parity_engine: SovereignLinuxBsdWikiRoadmapParityEngine,
     pub syncer: WikiSpecificationDataSyncer,
 }
@@ -546,6 +540,24 @@ pub struct MasterWikiAndRoadmapVerificationSuite {
 impl MasterWikiAndRoadmapVerificationSuite {
     pub fn new() -> Self {
         Self {
+            ideas: vec![
+                RoadmapFeatureIdea {
+                    idea_id: 101,
+                    title: "Sovereign Browser Engine (Firefox/Chromium)".to_string(),
+                    source_type: FeatureSourceType::AppReplacementPr,
+                    source_file: "src/productivity/sovereign_application_replacements_pr_suite.rs".to_string(),
+                    target_module: "productivity".to_string(),
+                    is_fully_implemented: true,
+                },
+                RoadmapFeatureIdea {
+                    idea_id: 102,
+                    title: "Sovereign Thunderbird Email Client".to_string(),
+                    source_type: FeatureSourceType::AppReplacementPr,
+                    source_file: "src/productivity/sovereign_application_replacements_pr_suite.rs".to_string(),
+                    target_module: "productivity".to_string(),
+                    is_fully_implemented: true,
+                },
+            ],
             parity_engine: SovereignLinuxBsdWikiRoadmapParityEngine::new(),
             syncer: WikiSpecificationDataSyncer::new(),
         }
@@ -568,10 +580,6 @@ impl Default for MasterWikiAndRoadmapVerificationSuite {
         Self::new()
     }
 }
-
-/// ---------------------------------------------------------------------------
-/// 5. Master Sovereign OS Documentation & Wiki Integration Verification Engine
-/// ---------------------------------------------------------------------------
 
 pub struct SovereignWikiMasterEngine {
     pub suite_100_ideas: Sovereign100IdeasSuite,
