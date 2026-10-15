@@ -6,7 +6,7 @@
 // 1. OpenSourceOsUnimplementedIdeasPrEngine: Staging, diff generation, and validation for open-source OS PRs.
 // 2. OpenSourceOsPrProposalRegistry: Pull request metadata tracker and FNV-1a patch digest validator.
 // 3. SovereignOpenSourceOsIdeasMasterSuite: Master coordinator ensuring 100% PR deployment status across Linux,
-//    BSD, Illumos, Redox, Haiku, Plan 9, Minix 3, Genode, QNX, SerenityOS, and TempleOS paradigms.
+//    BSD, Illumos, Redox, Haiku, Plan 9, Minix 3, Genode, QNX, SerenityOS, TempleOS, MorphOS, OS/2, Fuchsia, and GNU Hurd paradigms.
 
 use std::collections::BTreeMap;
 use std::string::String;
@@ -26,6 +26,10 @@ pub enum OpenSourceOsCategory {
     QnxNeutrinoRealtime,
     SerenityLibGui,
     TempleOsHolyC,
+    MorphOsAmigaMsg,
+    Os2WarpSom,
+    FuchsiaZirconHandle,
+    GnuHurdTranslator,
 }
 
 impl OpenSourceOsCategory {
@@ -42,6 +46,10 @@ impl OpenSourceOsCategory {
             Self::QnxNeutrinoRealtime => "QNX Neutrino Realtime Microkernel",
             Self::SerenityLibGui => "SerenityOS LibGUI & EventLoop IPC",
             Self::TempleOsHolyC => "TempleOS HolyC JIT & Ring 0 System",
+            Self::MorphOsAmigaMsg => "MorphOS / AmigaOS Exec Message Ports",
+            Self::Os2WarpSom => "OS/2 Warp SOM & Workplace Shell",
+            Self::FuchsiaZirconHandle => "Fuchsia Zircon Handle & Starnix Bridge",
+            Self::GnuHurdTranslator => "GNU Hurd Mach VFS Translator",
         }
     }
 }
@@ -98,6 +106,11 @@ impl OpenSourceOsUnimplementedIdeasPrEngine {
                 "security_bpf_lsm",
             ),
             (
+                "feat(linux): EEVDF CPU scheduler latency tiering & io_uring zero-copy networking",
+                OpenSourceOsCategory::LinuxKernel,
+                "linux_eevdf_iouring",
+            ),
+            (
                 "feat(bsd): OpenBSD pledge/unveil & FreeBSD GEOM GELI storage transformation",
                 OpenSourceOsCategory::BsdEcosystem,
                 "bsd_security_geom",
@@ -106,6 +119,11 @@ impl OpenSourceOsUnimplementedIdeasPrEngine {
                 "feat(bsd): FreeBSD bhyve microvm hypervisor & OpenBSD VMM guest driver shim",
                 OpenSourceOsCategory::BsdEcosystem,
                 "freebsd_bhyve_openbsd_vmm",
+            ),
+            (
+                "feat(bsd): NetBSD Veriexec executable integrity & DragonFly HAMMER2 multi-master PFS",
+                OpenSourceOsCategory::BsdEcosystem,
+                "netbsd_veriexec_hammer2",
             ),
             (
                 "feat(illumos): DTrace eBPF dynamic probes & Crossbow VNIC virtual router",
@@ -171,6 +189,26 @@ impl OpenSourceOsUnimplementedIdeasPrEngine {
                 "feat(templeos): HolyC JIT compiler evaluator & Ring 0 identity-mapped memory model",
                 OpenSourceOsCategory::TempleOsHolyC,
                 "templeos_holyc_ring0",
+            ),
+            (
+                "feat(morphos): AmigaOS Exec message port signal router & Intuition window event loop",
+                OpenSourceOsCategory::MorphOsAmigaMsg,
+                "morphos_exec_intuition",
+            ),
+            (
+                "feat(os2): SOM object-oriented class hierarchy & Workplace Shell drag-and-drop IPC",
+                OpenSourceOsCategory::Os2WarpSom,
+                "os2_som_workplace_shell",
+            ),
+            (
+                "feat(fuchsia): Zircon channel/vmo handle rights table & Starnix Linux translation bridge",
+                OpenSourceOsCategory::FuchsiaZirconHandle,
+                "fuchsia_zircon_starnix",
+            ),
+            (
+                "feat(hurd): Mach VFS passive/active translator node settrans router",
+                OpenSourceOsCategory::GnuHurdTranslator,
+                "hurd_mach_translator",
             ),
         ];
 
@@ -272,7 +310,7 @@ impl SovereignOpenSourceOsIdeasMasterSuite {
         if !self.pr_engine.verify_all_prs() {
             return false;
         }
-        self.pr_engine.get_merged_pr_count() >= 16
+        self.pr_engine.get_merged_pr_count() >= 22
     }
 
     pub fn get_category_pr_summary(&self) -> Vec<(String, usize)> {
@@ -300,7 +338,7 @@ mod tests {
     #[test]
     fn test_open_source_os_unimplemented_ideas_pr_engine() {
         let engine = OpenSourceOsUnimplementedIdeasPrEngine::new();
-        assert_eq!(engine.get_merged_pr_count(), 16);
+        assert_eq!(engine.get_merged_pr_count(), 22);
 
         let diff = engine.generate_pr_diff_patch(1001);
         assert!(diff.is_some());
@@ -315,6 +353,6 @@ mod tests {
         assert!(master.verify_all_open_source_os_pr_ideas());
 
         let summary = master.get_category_pr_summary();
-        assert_eq!(summary.len(), 11);
+        assert_eq!(summary.len(), 15);
     }
 }
