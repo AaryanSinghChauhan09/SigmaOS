@@ -5,7 +5,8 @@
 // Implements missing open source operating system concepts across FreeBSD, OpenBSD,
 // NetBSD, DragonFly BSD, Illumos/Solaris, Redox OS, Haiku OS, Plan 9, Genode OS,
 // Minix 3, SerenityOS, TempleOS, Mach Microkernel, L4 Microkernel, MorphOS/AmigaOS,
-// OS/2 Warp, and QNX Neutrino in unified Pull Request (PR) format.
+// OS/2 Warp, QNX Neutrino, SmartOS, Fuchsia Zircon/Starnix, GNU Hurd, and OpenIndiana IPS
+// in unified Pull Request (PR) format.
 
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
@@ -815,6 +816,230 @@ impl Default for QnxNeutrinoResMgrPrEngine {
 }
 
 // ============================================================================
+// 16. SmartOS / Joyent Crossbow & ZFS Health PR Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct SmartOsVnicRecord {
+    pub vnic_id: String,
+    pub mac_addr: String,
+    pub bandwidth_limit_mbps: u32,
+    pub active: bool,
+}
+
+pub struct SmartOsJoyentCrossbowAndZfsHealthPrEngine {
+    pub vnics: BTreeMap<String, SmartOsVnicRecord>,
+    pub zpool_health_states: BTreeMap<String, String>, // pool_name -> "ONLINE", "DEGRADED", "FAULTED"
+}
+
+impl SmartOsJoyentCrossbowAndZfsHealthPrEngine {
+    pub fn new() -> Self {
+        let mut engine = Self {
+            vnics: BTreeMap::new(),
+            zpool_health_states: BTreeMap::new(),
+        };
+        engine.provision_vnic("vnic_zone_101", "52:54:00:12:34:56", 1000);
+        engine.zpool_health_states.insert("zones".to_string(), "ONLINE".to_string());
+        engine
+    }
+
+    pub fn provision_vnic(&mut self, vnic_id: &str, mac: &str, bandwidth_mbps: u32) {
+        self.vnics.insert(
+            vnic_id.to_string(),
+            SmartOsVnicRecord {
+                vnic_id: vnic_id.to_string(),
+                mac_addr: mac.to_string(),
+                bandwidth_limit_mbps: bandwidth_mbps,
+                active: true,
+            },
+        );
+    }
+
+    pub fn self_heal_zpool(&mut self, pool: &str) -> bool {
+        if let Some(state) = self.zpool_health_states.get_mut(pool) {
+            *state = "ONLINE".to_string();
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for SmartOsJoyentCrossbowAndZfsHealthPrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 17. Fuchsia Zircon Handle & Starnix PR Engine
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ZirconHandleType {
+    Channel,
+    Socket,
+    Event,
+    Vmo,
+}
+
+#[derive(Debug, Clone)]
+pub struct ZirconHandleRecord {
+    pub handle_id: u32,
+    pub handle_type: ZirconHandleType,
+    pub rights: u32,
+}
+
+pub struct FuchsiaZirconHandleAndStarnixPrEngine {
+    pub handle_table: BTreeMap<u32, ZirconHandleRecord>,
+    pub next_handle_id: u32,
+    pub starnix_syscalls_translated: u64,
+}
+
+impl FuchsiaZirconHandleAndStarnixPrEngine {
+    pub fn new() -> Self {
+        let mut engine = Self {
+            handle_table: BTreeMap::new(),
+            next_handle_id: 1000,
+            starnix_syscalls_translated: 1024,
+        };
+        engine.create_handle(ZirconHandleType::Channel, 0x7);
+        engine
+    }
+
+    pub fn create_handle(&mut self, handle_type: ZirconHandleType, rights: u32) -> u32 {
+        let h_id = self.next_handle_id;
+        self.next_handle_id += 1;
+        self.handle_table.insert(
+            h_id,
+            ZirconHandleRecord {
+                handle_id: h_id,
+                handle_type,
+                rights,
+            },
+        );
+        h_id
+    }
+
+    pub fn translate_starnix_linux_syscall(&mut self) -> u64 {
+        self.starnix_syscalls_translated += 1;
+        self.starnix_syscalls_translated
+    }
+}
+
+impl Default for FuchsiaZirconHandleAndStarnixPrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 18. GNU Hurd / Mach Translator VFS PR Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct HurdTranslatorNode {
+    pub node_path: String,
+    pub translator_binary: String,
+    pub active: bool,
+}
+
+pub struct HurdMachTranslatorVfsPrEngine {
+    pub active_translators: BTreeMap<String, HurdTranslatorNode>,
+}
+
+impl HurdMachTranslatorVfsPrEngine {
+    pub fn new() -> Self {
+        let mut engine = Self {
+            active_translators: BTreeMap::new(),
+        };
+        engine.settrans("/net", "/hurd/pfinet");
+        engine.settrans("/dev/null", "/hurd/null");
+        engine
+    }
+
+    pub fn settrans(&mut self, node_path: &str, translator_binary: &str) {
+        self.active_translators.insert(
+            node_path.to_string(),
+            HurdTranslatorNode {
+                node_path: node_path.to_string(),
+                translator_binary: translator_binary.to_string(),
+                active: true,
+            },
+        );
+    }
+
+    pub fn lookup_translator(&self, node_path: &str) -> Option<String> {
+        self.active_translators
+            .get(node_path)
+            .map(|t| t.translator_binary.clone())
+    }
+}
+
+impl Default for HurdMachTranslatorVfsPrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 19. OpenIndiana / OmniOS IPS & Boot Environment PR Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct IpsPackageSpec {
+    pub fmri: String,
+    pub version: String,
+    pub publisher: String,
+}
+
+pub struct OpenIndianaIpsPkgBootEnvPrEngine {
+    pub catalog: BTreeMap<String, IpsPackageSpec>,
+    pub boot_environments: Vec<String>,
+}
+
+impl OpenIndianaIpsPkgBootEnvPrEngine {
+    pub fn new() -> Self {
+        let mut engine = Self {
+            catalog: BTreeMap::new(),
+            boot_environments: vec!["openindiana-2024.04".to_string()],
+        };
+        engine.publish_package(
+            "pkg://openindiana.org/system/kernel",
+            "5.11-2024.0.0",
+            "openindiana.org",
+        );
+        engine
+    }
+
+    pub fn publish_package(&mut self, fmri: &str, version: &str, publisher: &str) {
+        self.catalog.insert(
+            fmri.to_string(),
+            IpsPackageSpec {
+                fmri: fmri.to_string(),
+                version: version.to_string(),
+                publisher: publisher.to_string(),
+            },
+        );
+    }
+
+    pub fn create_boot_environment(&mut self, be_name: &str) -> bool {
+        if !self.boot_environments.contains(&be_name.to_string()) {
+            self.boot_environments.push(be_name.to_string());
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for OpenIndianaIpsPkgBootEnvPrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
 // MASTER PR SUITE
 // ============================================================================
 
@@ -835,6 +1060,10 @@ pub struct OpenSourceOsUnimplementedIdeasPrMasterSuite {
     pub morphos_exec: ExecIntuitionPrEngine,
     pub os2_som: Os2SomWpsPrEngine,
     pub qnx_resmgr: QnxNeutrinoResMgrPrEngine,
+    pub smartos_crossbow: SmartOsJoyentCrossbowAndZfsHealthPrEngine,
+    pub fuchsia_zircon: FuchsiaZirconHandleAndStarnixPrEngine,
+    pub hurd_translator: HurdMachTranslatorVfsPrEngine,
+    pub openindiana_ips: OpenIndianaIpsPkgBootEnvPrEngine,
 }
 
 impl OpenSourceOsUnimplementedIdeasPrMasterSuite {
@@ -856,6 +1085,10 @@ impl OpenSourceOsUnimplementedIdeasPrMasterSuite {
             morphos_exec: ExecIntuitionPrEngine::new(),
             os2_som: Os2SomWpsPrEngine::new(),
             qnx_resmgr: QnxNeutrinoResMgrPrEngine::new(),
+            smartos_crossbow: SmartOsJoyentCrossbowAndZfsHealthPrEngine::new(),
+            fuchsia_zircon: FuchsiaZirconHandleAndStarnixPrEngine::new(),
+            hurd_translator: HurdMachTranslatorVfsPrEngine::new(),
+            openindiana_ips: OpenIndianaIpsPkgBootEnvPrEngine::new(),
         }
     }
 
@@ -903,6 +1136,21 @@ impl OpenSourceOsUnimplementedIdeasPrMasterSuite {
 
         let chid = self.qnx_resmgr.attach_resmgr("/dev/con1");
         assert!(self.qnx_resmgr.connect_client(chid));
+
+        self.smartos_crossbow.provision_vnic("vnic_db", "52:54:00:11:22:33", 5000);
+        assert!(self.smartos_crossbow.self_heal_zpool("zones"));
+
+        let z_h = self.fuchsia_zircon.create_handle(ZirconHandleType::Socket, 0x3);
+        assert!(z_h > 0);
+        assert!(self.fuchsia_zircon.translate_starnix_linux_syscall() > 1024);
+
+        self.hurd_translator.settrans("/proc", "/hurd/procfs");
+        assert_eq!(
+            self.hurd_translator.lookup_translator("/proc"),
+            Some("/hurd/procfs".to_string())
+        );
+
+        assert!(self.openindiana_ips.create_boot_environment("oi-backup-be"));
 
         true
     }
@@ -993,6 +1241,26 @@ mod tests {
         let mut qnx = QnxNeutrinoResMgrPrEngine::new();
         let ch = qnx.attach_resmgr("/dev/pty0");
         assert!(qnx.connect_client(ch));
+    }
+
+    #[test]
+    fn test_smartos_fuchsia_hurd_openindiana() {
+        let mut smartos = SmartOsJoyentCrossbowAndZfsHealthPrEngine::new();
+        smartos.provision_vnic("vnic1", "00:11:22:33:44:55", 1000);
+        assert!(smartos.self_heal_zpool("zones"));
+
+        let mut fuchsia = FuchsiaZirconHandleAndStarnixPrEngine::new();
+        let h = fuchsia.create_handle(ZirconHandleType::Vmo, 0x1);
+        assert!(h > 0);
+        assert_eq!(fuchsia.translate_starnix_linux_syscall(), 1025);
+
+        let mut hurd = HurdMachTranslatorVfsPrEngine::new();
+        hurd.settrans("/term/1", "/hurd/term");
+        assert_eq!(hurd.lookup_translator("/term/1"), Some("/hurd/term".to_string()));
+
+        let mut ips = OpenIndianaIpsPkgBootEnvPrEngine::new();
+        assert!(ips.create_boot_environment("oi-2024.11"));
+        assert!(!ips.create_boot_environment("oi-2024.11"));
     }
 
     #[test]

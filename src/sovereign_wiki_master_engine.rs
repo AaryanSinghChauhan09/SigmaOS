@@ -18,7 +18,7 @@ use alloc::vec;
 use alloc::vec::Vec;
 
 /// ---------------------------------------------------------------------------
-/// Feature Source Types & Roadmap Feature Structs
+/// 0. Feature Source & Roadmap Common Types
 /// ---------------------------------------------------------------------------
 
 /// Feature Source Types across documentation and wiki specs
@@ -472,7 +472,7 @@ impl Default for SovereignDistroGapClosureEngine {
 }
 
 /// ---------------------------------------------------------------------------
-/// 4. Roadmap Feature Parity Verification Structs
+/// 4. Roadmap Feature Parity Verification Engine
 /// ---------------------------------------------------------------------------
 
 #[derive(Debug)]
@@ -535,7 +535,7 @@ impl Default for WikiSpecificationDataSyncer {
 }
 
 /// ---------------------------------------------------------------------------
-/// 5. Master Sovereign OS Documentation & Wiki Integration Verification Engine
+/// 5. Sovereign Wiki Master Engine
 /// ---------------------------------------------------------------------------
 
 pub struct SovereignWikiMasterEngine {
@@ -572,6 +572,10 @@ impl Default for SovereignWikiMasterEngine {
         Self::new()
     }
 }
+
+/// ---------------------------------------------------------------------------
+/// 6. Master Wiki and Roadmap Verification Suite
+/// ---------------------------------------------------------------------------
 
 pub struct MasterWikiAndRoadmapVerificationSuite {
     pub master_engine: SovereignWikiMasterEngine,
@@ -638,5 +642,12 @@ mod tests {
     fn test_master_wiki_engine_fulfillment() {
         let master = SovereignWikiMasterEngine::new();
         assert!(master.evaluate_master_wiki_fulfillment());
+    }
+
+    #[test]
+    fn test_master_wiki_verification_suite() {
+        let suite = MasterWikiAndRoadmapVerificationSuite::new();
+        assert!(suite.health_check());
+        assert!(suite.summary_report().contains("Parity Verification: 100.0%"));
     }
 }
