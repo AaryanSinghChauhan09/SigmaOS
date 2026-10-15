@@ -24,7 +24,7 @@ pub mod contributing;
 pub mod creative;
 pub use creative::pdfcraft_artcraft_parity_pr::*;
 pub use creative::photocraft_missing_components_parity_pr::*;
-pub use creative::gridcraft_missing_components_parity_pr::*;
+pub use creative::effectcraft_missing_components_parity_pr::*;
 pub mod customization;
 pub mod database;
 pub mod dashboard;
