@@ -43,6 +43,15 @@ pub struct VirtualizationAndContainersPrProposalManifest {
 // 1. KVM & QEMU HARDWARE VIRTUALIZATION ENGINE
 // ============================================================================
 
+/// Confidential VM Attestation Mode
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum ConfidentialVmMode {
+    #[default]
+    None,
+    IntelTdx,
+    AmdSevSnp,
+}
+
 /// vCPU execution state
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct KvmVcpuState {
@@ -75,6 +84,8 @@ pub struct KvmQemuEngine {
     pub io_uring_sqpoll_enabled: bool,
     pub vfio_passthrough_devices: Vec<VfioDevicePassthrough>,
     pub virtio_fs_inodes_cached: u64,
+    pub confidential_vm_mode: ConfidentialVmMode,
+    pub virtio_mem_plugged_mb: u64,
 }
 
 impl KvmQemuEngine {
@@ -86,7 +97,19 @@ impl KvmQemuEngine {
             io_uring_sqpoll_enabled: true,
             vfio_passthrough_devices: Vec::new(),
             virtio_fs_inodes_cached: 0,
+            confidential_vm_mode: ConfidentialVmMode::None,
+            virtio_mem_plugged_mb: 0,
         }
+    }
+
+    pub fn set_confidential_mode(&mut self, mode: ConfidentialVmMode) {
+        self.confidential_vm_mode = mode;
+    }
+
+    pub fn plug_virtio_mem(&mut self, additional_mb: u64) -> u64 {
+        self.virtio_mem_plugged_mb += additional_mb;
+        self.memory_mapped_bytes += additional_mb * 1024 * 1024;
+        self.virtio_mem_plugged_mb
     }
 
     pub fn add_vcpu(&mut self, vcpu_id: u32, core: u32) {
@@ -134,6 +157,23 @@ pub enum HypervisorType {
     OpenBsdVmm,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+pub enum LibvirtStoragePoolType {
+    #[default]
+    Directory,
+    Zfs,
+    LvmThin,
+    CephRbd,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct LibvirtNwFilterRule {
+    pub name: String,
+    pub action: String, // "accept", "drop", "reject"
+    pub direction: String, // "in", "out", "inout"
+    pub protocol: String, // "ip", "tcp", "udp", "icmp"
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct LibvirtDomainConfig {
     pub domain_name: String,
@@ -149,7 +189,9 @@ pub struct LibvirtDomainConfig {
 pub struct LibvirtDomainEngine {
     pub domains: Vec<LibvirtDomainConfig>,
     pub storage_pool_path: String,
+    pub storage_pool_type: LibvirtStoragePoolType,
     pub virtual_bridges: Vec<String>,
+    pub nwfilter_rules: Vec<LibvirtNwFilterRule>,
 }
 
 impl LibvirtDomainEngine {
@@ -160,8 +202,24 @@ impl LibvirtDomainEngine {
         Self {
             domains: Vec::new(),
             storage_pool_path: "/var/lib/libvirt/images".to_string(),
+            storage_pool_type: LibvirtStoragePoolType::Directory,
             virtual_bridges: bridges,
+            nwfilter_rules: Vec::new(),
         }
+    }
+
+    pub fn set_storage_pool(&mut self, pool_type: LibvirtStoragePoolType, path: &str) {
+        self.storage_pool_type = pool_type;
+        self.storage_pool_path = path.to_string();
+    }
+
+    pub fn add_nwfilter_rule(&mut self, name: &str, action: &str, direction: &str, protocol: &str) {
+        self.nwfilter_rules.push(LibvirtNwFilterRule {
+            name: name.to_string(),
+            action: action.to_string(),
+            direction: direction.to_string(),
+            protocol: protocol.to_string(),
+        });
     }
 
     pub fn define_domain(&mut self, name: &str, hyp: HypervisorType, memory_mb: u64, vcpus: u32) {
@@ -212,6 +270,21 @@ pub enum XenGuestMode {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
+pub struct XenArgoPort {
+    pub port_id: u32,
+    pub source_domid: u32,
+    pub dest_domid: u32,
+    pub ring_size_bytes: u32,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct QubesDisposableVmPolicy {
+    pub template_vm: String,
+    pub auto_wipe_on_shutdown: bool,
+    pub netvm_isolation: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct XenDomainInfo {
     pub domid: u32,
     pub name: String,
@@ -225,6 +298,8 @@ pub struct XenDomainInfo {
 pub struct XenHypervisorEngine {
     pub domains: Vec<XenDomainInfo>,
     pub xenstore_tree: BTreeMap<String, String>,
+    pub argo_ports: Vec<XenArgoPort>,
+    pub disp_vm_policies: Vec<QubesDisposableVmPolicy>,
 }
 
 impl XenHypervisorEngine {
@@ -232,6 +307,8 @@ impl XenHypervisorEngine {
         let mut engine = Self {
             domains: Vec::new(),
             xenstore_tree: BTreeMap::new(),
+            argo_ports: Vec::new(),
+            disp_vm_policies: Vec::new(),
         };
         // Register Dom0
         engine.domains.push(XenDomainInfo {
@@ -244,6 +321,23 @@ impl XenHypervisorEngine {
         });
         engine.xenstore_write("/local/domain/0/name", "Domain-0");
         engine
+    }
+
+    pub fn register_argo_port(&mut self, port: u32, src_dom: u32, dst_dom: u32, ring_size: u32) {
+        self.argo_ports.push(XenArgoPort {
+            port_id: port,
+            source_domid: src_dom,
+            dest_domid: dst_dom,
+            ring_size_bytes: ring_size,
+        });
+    }
+
+    pub fn set_qubes_dispvm_policy(&mut self, template: &str, netvm: &str) {
+        self.disp_vm_policies.push(QubesDisposableVmPolicy {
+            template_vm: template.to_string(),
+            auto_wipe_on_shutdown: true,
+            netvm_isolation: netvm.to_string(),
+        });
     }
 
     pub fn create_domu(&mut self, domid: u32, name: &str, mode: XenGuestMode, mem_mb: u64) {
@@ -1244,6 +1338,10 @@ mod tests {
         let mut engine = KvmQemuEngine::new();
         engine.add_vcpu(0, 0);
         engine.attach_vfio_device("0000:02:00.0", 0x10de, 0x2206, 15);
+        engine.set_confidential_mode(ConfidentialVmMode::IntelTdx);
+        assert_eq!(engine.confidential_vm_mode, ConfidentialVmMode::IntelTdx);
+        let plugged = engine.plug_virtio_mem(2048);
+        assert_eq!(plugged, 2048);
         assert_eq!(engine.vcpus.len(), 1);
         assert_eq!(engine.vfio_passthrough_devices.len(), 1);
         let sync = engine.simulate_dirty_page_ring_sync();
@@ -1254,6 +1352,10 @@ mod tests {
     fn test_libvirt_engine() {
         let mut engine = LibvirtDomainEngine::new();
         engine.define_domain("test-vm", HypervisorType::QemuKvm, 4096, 2);
+        engine.set_storage_pool(LibvirtStoragePoolType::Zfs, "zpool/libvirt");
+        engine.add_nwfilter_rule("clean-traffic", "accept", "inout", "ip");
+        assert_eq!(engine.storage_pool_type, LibvirtStoragePoolType::Zfs);
+        assert_eq!(engine.nwfilter_rules.len(), 1);
         assert!(engine.start_domain("test-vm"));
         let xml = engine.generate_domain_xml("test-vm");
         assert!(xml.is_some());
@@ -1264,6 +1366,10 @@ mod tests {
     fn test_xen_engine() {
         let mut engine = XenHypervisorEngine::new();
         engine.create_domu(10, "sys-usb", XenGuestMode::Pvh, 2048);
+        engine.register_argo_port(1, 0, 10, 65536);
+        engine.set_qubes_dispvm_policy("fedora-dvm", "sys-firewall");
+        assert_eq!(engine.argo_ports.len(), 1);
+        assert_eq!(engine.disp_vm_policies.len(), 1);
         assert_eq!(engine.domains.len(), 2);
         assert_eq!(engine.xenstore_read("/local/domain/10/name").unwrap(), "sys-usb");
     }
