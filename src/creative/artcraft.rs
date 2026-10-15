@@ -21,6 +21,9 @@ pub enum ProjectType {
     Design,
     Effect,
     Scene,
+    SoundCraft,
+    Audio,
+    Sound,
 }
 
 /// Project
