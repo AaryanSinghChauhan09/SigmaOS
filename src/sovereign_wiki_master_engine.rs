@@ -2,14 +2,27 @@
 // Sovereign OS Wiki & Documentation Master Absorption Engine
 // (`src/sovereign_wiki_master_engine.rs`)
 
-use alloc::format;
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::string::{String, ToString};
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec::Vec;
+extern crate alloc;
+
+#[cfg(not(feature = "standalone_test"))]
 use alloc::collections::BTreeMap;
+#[cfg(not(feature = "standalone_test"))]
+use alloc::format;
+#[cfg(not(feature = "standalone_test"))]
+use alloc::string::{String, ToString};
+#[cfg(not(feature = "standalone_test"))]
+use alloc::vec;
+#[cfg(not(feature = "standalone_test"))]
+use alloc::vec::Vec;
+
+#[cfg(feature = "standalone_test")]
+use std::collections::BTreeMap;
+#[cfg(feature = "standalone_test")]
+use std::format;
+#[cfg(feature = "standalone_test")]
+use std::string::{String, ToString};
+#[cfg(feature = "standalone_test")]
+use std::vec::Vec;
 
 /// ---------------------------------------------------------------------------
 /// 0. Feature Source & Roadmap Types
@@ -81,19 +94,6 @@ impl Sovereign100IdeasSuite {
     }
 
     fn populate_100_ideas(&mut self) {
-        let categories = [
-            (IdeaCategory::MultimediaTools, "Hypnotix / Bulky / HandBrake Replacement"),
-            (IdeaCategory::SystemUtilities, "Sysinternals / BTOP / FastFetch Parity"),
-            (IdeaCategory::PackageAndAppManagement, "Universal Package Format Conversion"),
-            (IdeaCategory::SecurityAndPrivacy, "OpenBSD Pledge/Unveil & FreeBSD Capsicum"),
-            (IdeaCategory::PerformanceAndKernel, "EEVDF Scheduler & Bcachefs Storage"),
-            (IdeaCategory::NetworkingAndMesh, "XDP / eBPF Express Data Path Mesh"),
-            (IdeaCategory::UiAndDesktopExperience, "Zenith Direct Framebuffer Compositor"),
-            (IdeaCategory::DeveloperAndBuildTools, "Reproducible Devenv & Hermetic Toolchain"),
-            (IdeaCategory::ComplianceAndGovernance, "SLSA Level 4 & NIS2 Compliance Framework"),
-            (IdeaCategory::FuturisticAndAiInnovations, "Composite AI Multi-Agent Coordinator"),
-        ];
-
         // System Utilities (11-23)
         self.ideas.push(ImprovementIdeaRecord {
             id: 11,
@@ -210,96 +210,134 @@ pub struct SovereignShardsMasterRegistry {
 
 impl SovereignShardsMasterRegistry {
     pub fn new() -> Self {
-        let mut reg = Self { shards: Vec::new() };
+        let mut reg = Self {
+            shards: BTreeMap::new(),
+        };
         reg.seed_12_shards();
         reg
     }
 
-    fn register_all_12_shards(&mut self) {
-        self.shards.insert(1, SovereignShardDescriptor {
-            id: SovereignShardId::Shard01ProductivityOffice,
-            code_name: "S-SHARD 01: Productivity Office & Layout Engine",
-            absorbed_legacy_software: vec!["LibreOffice", "Microsoft Office", "PDF Readers", "LaTeX"],
-            zero_alloc_rust_native: true,
-            status_active: true,
-        });
-        self.shards.insert(2, SovereignShardDescriptor {
-            id: SovereignShardId::Shard02MediaProcessingPlayback,
-            code_name: "S-SHARD 02: Media Processing, Demuxing & DSP Engine",
-            absorbed_legacy_software: vec!["VLC", "Audacity", "FFmpeg", "HandBrake"],
-            zero_alloc_rust_native: true,
-            status_active: true,
-        });
-        self.shards.insert(3, SovereignShardDescriptor {
-            id: SovereignShardId::Shard03Creative2D3DCad,
-            code_name: "S-SHARD 03: Creative 2D/3D & CAD Graphics Engine",
-            absorbed_legacy_software: vec!["GIMP", "Inkscape", "Krita", "Blender"],
-            zero_alloc_rust_native: true,
-            status_active: true,
-        });
-        self.shards.insert(4, SovereignShardDescriptor {
-            id: SovereignShardId::Shard04FoundationalAiMl,
-            code_name: "S-SHARD 04: Foundational AI & SIMD Matrix Multiply Engine",
-            absorbed_legacy_software: vec!["PyTorch", "TensorFlow", "ONNX", "OpenCV"],
-            zero_alloc_rust_native: true,
-            status_active: true,
-        });
-        self.shards.insert(5, SovereignShardDescriptor {
-            id: SovereignShardId::Shard05LlmCognitiveArchitectures,
-            code_name: "S-SHARD 05: LLM KV-Cache Inference & Cognitive Engine",
-            absorbed_legacy_software: vec!["llama.cpp", "vLLM", "Ollama", "SGLang"],
-            zero_alloc_rust_native: true,
-            status_active: true,
-        });
-        self.shards.insert(6, SovereignShardDescriptor {
-            id: SovereignShardId::Shard06AutonomousAiAgentSwarms,
-            code_name: "S-SHARD 06: Autonomous Goal-Oriented Swarm Orchestrator",
-            absorbed_legacy_software: vec!["AutoGPT", "CrewAI", "LangChain"],
-            zero_alloc_rust_native: true,
-            status_active: true,
-        });
-        self.shards.insert(7, SovereignShardDescriptor {
-            id: SovereignShardId::Shard07QuantumResistantMeshNet,
-            code_name: "S-SHARD 07: Post-Quantum Mesh Network & Noise Protocol Router",
-            absorbed_legacy_software: vec!["WireGuard", "OpenVPN", "Tailscale"],
-            zero_alloc_rust_native: true,
-            status_active: true,
-        });
-        self.shards.insert(8, SovereignShardDescriptor {
-            id: SovereignShardId::Shard08SovereignFsStorage,
-            code_name: "S-SHARD 08: SigmaFS Crash-Consistent Copy-on-Write Filesystem",
-            absorbed_legacy_software: vec!["ZFS", "Btrfs", "ext4"],
-            zero_alloc_rust_native: true,
-            status_active: true,
-        });
-        self.shards.insert(9, SovereignShardDescriptor {
-            id: SovereignShardId::Shard09ZenithDesktopCompositor,
-            code_name: "S-SHARD 09: Zenith Direct Framebuffer Compositor & UI Toolkit",
-            absorbed_legacy_software: vec!["Wayland", "X11", "GNOME Shell", "KDE Plasma"],
-            zero_alloc_rust_native: true,
-            status_active: true,
-        });
-        self.shards.insert(10, SovereignShardDescriptor {
-            id: SovereignShardId::Shard10EdgeGlobalCompliance,
-            code_name: "S-SHARD 10: Bare-Metal Compliance Ledger & Continuous Guardrails",
-            absorbed_legacy_software: vec!["Auditd", "OpenSCAP", "OSSEC"],
-            zero_alloc_rust_native: true,
-            status_active: true,
-        });
-        self.shards.insert(11, SovereignShardDescriptor {
-            id: SovereignShardId::Shard11SystemAdministrationOps,
-            code_name: "S-SHARD 11: Sovereign System Supervision & Telemetry Hub",
-            absorbed_legacy_software: vec!["Systemd", "Runit", "OpenRC", "Prometheus"],
-            zero_alloc_rust_native: true,
-            status_active: true,
-        });
-        self.shards.insert(12, SovereignShardDescriptor {
-            id: SovereignShardId::Shard12HardwareVirtualizationHypervisor,
-            code_name: "S-SHARD 12: SovereignVMM Type-1 Hypervisor & Micro-Container Isolation",
-            absorbed_legacy_software: vec!["KVM", "QEMU", "Docker", "Podman"],
-            zero_alloc_rust_native: true,
-            status_active: true,
-        });
+    pub fn seed_12_shards(&mut self) {
+        self.shards.insert(
+            1,
+            SovereignShardDescriptor {
+                id: SovereignShardId::Shard01ProductivityOffice,
+                code_name: "S-SHARD 01: Productivity Office & Layout Engine",
+                absorbed_legacy_software: vec!["LibreOffice", "Microsoft Office", "PDF Readers", "LaTeX"],
+                zero_alloc_rust_native: true,
+                status_active: true,
+            },
+        );
+        self.shards.insert(
+            2,
+            SovereignShardDescriptor {
+                id: SovereignShardId::Shard02MediaProcessingPlayback,
+                code_name: "S-SHARD 02: Media Processing, Demuxing & DSP Engine",
+                absorbed_legacy_software: vec!["VLC", "Audacity", "FFmpeg", "HandBrake"],
+                zero_alloc_rust_native: true,
+                status_active: true,
+            },
+        );
+        self.shards.insert(
+            3,
+            SovereignShardDescriptor {
+                id: SovereignShardId::Shard03Creative2D3DCad,
+                code_name: "S-SHARD 03: Creative 2D/3D & CAD Graphics Engine",
+                absorbed_legacy_software: vec!["GIMP", "Inkscape", "Krita", "Blender"],
+                zero_alloc_rust_native: true,
+                status_active: true,
+            },
+        );
+        self.shards.insert(
+            4,
+            SovereignShardDescriptor {
+                id: SovereignShardId::Shard04FoundationalAiMl,
+                code_name: "S-SHARD 04: Foundational AI & SIMD Matrix Multiply Engine",
+                absorbed_legacy_software: vec!["PyTorch", "TensorFlow", "ONNX", "OpenCV"],
+                zero_alloc_rust_native: true,
+                status_active: true,
+            },
+        );
+        self.shards.insert(
+            5,
+            SovereignShardDescriptor {
+                id: SovereignShardId::Shard05LlmCognitiveArchitectures,
+                code_name: "S-SHARD 05: LLM KV-Cache Inference & Cognitive Engine",
+                absorbed_legacy_software: vec!["llama.cpp", "vLLM", "Ollama", "SGLang"],
+                zero_alloc_rust_native: true,
+                status_active: true,
+            },
+        );
+        self.shards.insert(
+            6,
+            SovereignShardDescriptor {
+                id: SovereignShardId::Shard06AutonomousAiAgentSwarms,
+                code_name: "S-SHARD 06: Autonomous Goal-Oriented Swarm Orchestrator",
+                absorbed_legacy_software: vec!["AutoGPT", "CrewAI", "LangChain"],
+                zero_alloc_rust_native: true,
+                status_active: true,
+            },
+        );
+        self.shards.insert(
+            7,
+            SovereignShardDescriptor {
+                id: SovereignShardId::Shard07QuantumResistantMeshNet,
+                code_name: "S-SHARD 07: Post-Quantum Mesh Network & Noise Protocol Router",
+                absorbed_legacy_software: vec!["WireGuard", "OpenVPN", "Tailscale"],
+                zero_alloc_rust_native: true,
+                status_active: true,
+            },
+        );
+        self.shards.insert(
+            8,
+            SovereignShardDescriptor {
+                id: SovereignShardId::Shard08SovereignFsStorage,
+                code_name: "S-SHARD 08: SigmaFS Crash-Consistent Copy-on-Write Filesystem",
+                absorbed_legacy_software: vec!["ZFS", "Btrfs", "ext4"],
+                zero_alloc_rust_native: true,
+                status_active: true,
+            },
+        );
+        self.shards.insert(
+            9,
+            SovereignShardDescriptor {
+                id: SovereignShardId::Shard09ZenithDesktopCompositor,
+                code_name: "S-SHARD 09: Zenith Direct Framebuffer Compositor & UI Toolkit",
+                absorbed_legacy_software: vec!["Wayland", "X11", "GNOME Shell", "KDE Plasma"],
+                zero_alloc_rust_native: true,
+                status_active: true,
+            },
+        );
+        self.shards.insert(
+            10,
+            SovereignShardDescriptor {
+                id: SovereignShardId::Shard10EdgeGlobalCompliance,
+                code_name: "S-SHARD 10: Bare-Metal Compliance Ledger & Continuous Guardrails",
+                absorbed_legacy_software: vec!["Auditd", "OpenSCAP", "OSSEC"],
+                zero_alloc_rust_native: true,
+                status_active: true,
+            },
+        );
+        self.shards.insert(
+            11,
+            SovereignShardDescriptor {
+                id: SovereignShardId::Shard11SystemAdministrationOps,
+                code_name: "S-SHARD 11: Sovereign System Supervision & Telemetry Hub",
+                absorbed_legacy_software: vec!["Systemd", "Runit", "OpenRC", "Prometheus"],
+                zero_alloc_rust_native: true,
+                status_active: true,
+            },
+        );
+        self.shards.insert(
+            12,
+            SovereignShardDescriptor {
+                id: SovereignShardId::Shard12HardwareVirtualizationHypervisor,
+                code_name: "S-SHARD 12: SovereignVMM Type-1 Hypervisor & Micro-Container Isolation",
+                absorbed_legacy_software: vec!["KVM", "QEMU", "Docker", "Podman"],
+                zero_alloc_rust_native: true,
+                status_active: true,
+            },
+        );
     }
 
     pub fn is_all_12_shards_active(&self) -> bool {
@@ -314,7 +352,7 @@ impl Default for SovereignShardsMasterRegistry {
 }
 
 /// ---------------------------------------------------------------------------
-/// 4. Distro Gap Closure Engine
+/// 3. Distro Gap Closure Engine
 /// ---------------------------------------------------------------------------
 
 #[derive(Debug, Clone)]
@@ -333,32 +371,32 @@ pub struct SovereignDistroGapClosureEngine {
 impl SovereignDistroGapClosureEngine {
     pub fn new() -> Self {
         let mut engine = Self {
-            features: Vec::with_capacity(16),
+            gaps: Vec::with_capacity(16),
         };
-        engine.register_distro_gaps();
+        engine.seed_distro_gaps();
         engine
     }
 
-    fn seed_distro_gaps(&mut self) {
-        self.features.push(DistroGapFeatureRecord {
-            distro_name: "Arch Linux",
-            gap_feature_name: "pacman-contrib, checkupdates, AUR helper",
-            sigma_counterpart: "ArchPacmanContribEngine",
-            verification_passed: true,
+    pub fn seed_distro_gaps(&mut self) {
+        self.gaps.push(DistroGapFeatureRecord {
+            feature_name: "pacman-contrib, checkupdates, AUR helper".to_string(),
+            source_distro: "Arch Linux".to_string(),
+            target_native_implementation: "ArchPacmanContribEngine".to_string(),
+            gap_closed: true,
         });
 
-        self.features.push(DistroGapFeatureRecord {
-            distro_name: "OpenBSD",
-            gap_feature_name: "pledge, unveil, KARL, retguard, signify",
-            sigma_counterpart: "OpenBsdPledgeUnveilEnforcementEngine & OpenBsdKarlRetguardEngine",
-            verification_passed: true,
+        self.gaps.push(DistroGapFeatureRecord {
+            feature_name: "pledge, unveil, KARL, retguard, signify".to_string(),
+            source_distro: "OpenBSD".to_string(),
+            target_native_implementation: "OpenBsdPledgeUnveilEnforcementEngine & OpenBsdKarlRetguardEngine".to_string(),
+            gap_closed: true,
         });
 
-        self.features.push(DistroGapFeatureRecord {
-            distro_name: "FreeBSD",
-            gap_feature_name: "bectl, MAC framework, GEOM, netgraph, poudriere",
-            sigma_counterpart: "FreeBsdBectlBootEnvironmentEngine & FreeBsdMacFrameworkEngine",
-            verification_passed: true,
+        self.gaps.push(DistroGapFeatureRecord {
+            feature_name: "bectl, MAC framework, GEOM, netgraph, poudriere".to_string(),
+            source_distro: "FreeBSD".to_string(),
+            target_native_implementation: "FreeBsdBectlBootEnvironmentEngine & FreeBsdMacFrameworkEngine".to_string(),
+            gap_closed: true,
         });
     }
 
@@ -444,6 +482,7 @@ impl Default for WikiSpecificationDataSyncer {
 /// 5. Master Sovereign OS Documentation & Wiki Integration Verification Engine
 /// ---------------------------------------------------------------------------
 
+#[derive(Debug)]
 pub struct SovereignWikiMasterEngine {
     pub suite_100_ideas: Sovereign100IdeasSuite,
     pub shards_registry: SovereignShardsMasterRegistry,
@@ -469,7 +508,7 @@ impl SovereignWikiMasterEngine {
         let gap_closure_ok = self.distro_gap_closure.verify_all_gap_closures();
         let roadmap_ok = self.parity_engine.verify_100_percent_parity();
 
-        ideas_ok && shards_ok && gap_closure_ok && parity_ok
+        ideas_ok && shards_ok && gap_closure_ok && roadmap_ok
     }
 }
 

@@ -92,6 +92,10 @@ pub use crate::package::sovereign_distro_package_advancements_v33::*;
 pub use crate::package::sovereign_distro_package_advancements_v37::*;
 pub use crate::package::sovereign_distro_package_advancements_v40::*;
 pub use crate::package::sovereign_distro_package_advancements_v41::*;
+pub use crate::package::sovereign_distro_package_advancements_v47::*;
+
+#[path = "../package/sovereign_distro_package_advancements_v47.rs"]
+pub mod sovereign_distro_package_advancements_v47;
 pub use crate::package::sovereign_distro_package_advancements_v4::*;
 pub use crate::package::sovereign_distro_package_advancements_v5::*;
 pub use crate::package::sovereign_distro_package_advancements_v6::*;
