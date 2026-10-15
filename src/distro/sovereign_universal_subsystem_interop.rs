@@ -1186,7 +1186,40 @@ mod tests {
             UniversalSubsystemCategory::VirtualizationHypervisor.as_str(),
             "VirtualizationHypervisor"
         );
+        assert_eq!(
+            UniversalSubsystemCategory::ProcessActivity.as_str(),
+            "ProcessActivity"
+        );
+        assert_eq!(
+            UniversalSubsystemCategory::MemoryVirtualization.as_str(),
+            "MemoryVirtualization"
+        );
+        assert_eq!(
+            UniversalSubsystemCategory::TimeSynchronization.as_str(),
+            "TimeSynchronization"
+        );
+        assert_eq!(
+            UniversalSubsystemCategory::SignalDelivery.as_str(),
+            "SignalDelivery"
+        );
+        assert_eq!(
+            UniversalSubsystemCategory::DeviceHotplug.as_str(),
+            "DeviceHotplug"
+        );
+        assert_eq!(
+            UniversalSubsystemCategory::CryptographySecurity.as_str(),
+            "CryptographySecurity"
+        );
+        assert_eq!(
+            UniversalSubsystemCategory::TelemetryObservability.as_str(),
+            "TelemetryObservability"
+        );
+        assert_eq!(
+            UniversalSubsystemCategory::AccessibilityInput.as_str(),
+            "AccessibilityInput"
+        );
 
+        assert_eq!(engine.subsystem_adapters.len(), 31);
         assert!(engine.subsystem_adapters.contains_key("shell"));
         assert!(engine.subsystem_adapters.contains_key("ipc_mem"));
         assert!(engine.subsystem_adapters.contains_key("drivers"));
@@ -1197,6 +1230,14 @@ mod tests {
         assert!(engine.subsystem_adapters.contains_key("compiler"));
         assert!(engine.subsystem_adapters.contains_key("automation"));
         assert!(engine.subsystem_adapters.contains_key("audit"));
+        assert!(engine.subsystem_adapters.contains_key("process_activity"));
+        assert!(engine.subsystem_adapters.contains_key("memory_virt"));
+        assert!(engine.subsystem_adapters.contains_key("time_sync"));
+        assert!(engine.subsystem_adapters.contains_key("signal_delivery"));
+        assert!(engine.subsystem_adapters.contains_key("device_hotplug"));
+        assert!(engine.subsystem_adapters.contains_key("crypto_sec"));
+        assert!(engine.subsystem_adapters.contains_key("telemetry"));
+        assert!(engine.subsystem_adapters.contains_key("accessibility"));
 
         let event_id = engine
             .dispatch_cross_subsystem_operation_all_distros("shell", "ipc_mem", "alloc_ring_buffer")
@@ -1210,6 +1251,14 @@ mod tests {
             )
             .expect("Shell-IPC policy should exist");
         assert_eq!(policy.policy_id, "policy_shell_ipc");
+
+        let crypto_pol = engine
+            .translate_policy(
+                UniversalSubsystemCategory::CryptographySecurity,
+                UniversalSubsystemCategory::AuthIdentity,
+            )
+            .expect("Crypto-Auth policy should exist");
+        assert_eq!(crypto_pol.policy_id, "policy_crypto_auth");
 
         assert!(engine.verify_all_subsystems_interoperability());
         assert_eq!(engine.evaluate_system_wide_harmony_score(), 100);

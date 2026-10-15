@@ -45,6 +45,14 @@ pub enum LinuxBsdDistroInspiration {
     HaikuOS,
     QubesOS,
     WhonixOS,
+    MageiaLinux,
+    PuppyLinux,
+    TinyCoreLinux,
+    AntiXLinux,
+    ZorinOS,
+    SteamOS,
+    CachyOS,
+    DeepinOS,
 }
 
 impl LinuxBsdDistroInspiration {
@@ -86,6 +94,14 @@ impl LinuxBsdDistroInspiration {
             Self::HaikuOS => "HaikuOS",
             Self::QubesOS => "QubesOS",
             Self::WhonixOS => "WhonixOS",
+            Self::MageiaLinux => "MageiaLinux",
+            Self::PuppyLinux => "PuppyLinux",
+            Self::TinyCoreLinux => "TinyCoreLinux",
+            Self::AntiXLinux => "AntiXLinux",
+            Self::ZorinOS => "ZorinOS",
+            Self::SteamOS => "SteamOS",
+            Self::CachyOS => "CachyOS",
+            Self::DeepinOS => "DeepinOS",
         }
     }
 }
@@ -712,15 +728,32 @@ impl SovereignSubsystemDistroHarmonyEngine {
                     path.to_string()
                 }
             }
+            LinuxBsdDistroInspiration::VoidLinux => {
+                if path.starts_with("/var/db/pkg") {
+                    format!("/var/db/xbps{}", &path[11..])
+                } else {
+                    path.to_string()
+                }
+            }
+            LinuxBsdDistroInspiration::GentooLinux => {
+                if path.starts_with("/usr/portage") {
+                    format!("/var/db/repos/gentoo{}", &path[12..])
+                } else {
+                    path.to_string()
+                }
+            }
             _ => path.to_string(),
         }
     }
 
     pub fn map_security_isolation_level(&self, distro: LinuxBsdDistroInspiration) -> u32 {
         match distro {
-            LinuxBsdDistroInspiration::OpenBSD | LinuxBsdDistroInspiration::HardenedBSD => 100,
+            LinuxBsdDistroInspiration::OpenBSD
+            | LinuxBsdDistroInspiration::HardenedBSD
+            | LinuxBsdDistroInspiration::QubesOS => 100,
             LinuxBsdDistroInspiration::FreeBSD
             | LinuxBsdDistroInspiration::TailsOS
+            | LinuxBsdDistroInspiration::WhonixOS
             | LinuxBsdDistroInspiration::KaliLinux => 90,
             LinuxBsdDistroInspiration::NixOS
             | LinuxBsdDistroInspiration::AlpineLinux
@@ -736,22 +769,55 @@ impl SovereignSubsystemDistroHarmonyEngine {
         match distro {
             LinuxBsdDistroInspiration::ArchLinux
             | LinuxBsdDistroInspiration::GarudaLinux
+            | LinuxBsdDistroInspiration::CachyOS
             | LinuxBsdDistroInspiration::EndeavourOS => "pkg.tar.zst",
             LinuxBsdDistroInspiration::DebianGNU
             | LinuxBsdDistroInspiration::UbuntuLinux
             | LinuxBsdDistroInspiration::LinuxMint
             | LinuxBsdDistroInspiration::KaliLinux
+            | LinuxBsdDistroInspiration::ZorinOS
+            | LinuxBsdDistroInspiration::DeepinOS
             | LinuxBsdDistroInspiration::ParrotOS => "deb",
             LinuxBsdDistroInspiration::FedoraLinux
             | LinuxBsdDistroInspiration::OpenSUSE
+            | LinuxBsdDistroInspiration::MageiaLinux
             | LinuxBsdDistroInspiration::RockyLinux
             | LinuxBsdDistroInspiration::AlmaLinux => "rpm",
             LinuxBsdDistroInspiration::AlpineLinux => "apk",
+            LinuxBsdDistroInspiration::VoidLinux => "xbps",
+            LinuxBsdDistroInspiration::SolusLinux => "eopkg",
+            LinuxBsdDistroInspiration::TinyCoreLinux => "tcz",
+            LinuxBsdDistroInspiration::SlackwareLinux => "txz",
+            LinuxBsdDistroInspiration::HaikuOS => "hpkg",
             LinuxBsdDistroInspiration::FreeBSD
             | LinuxBsdDistroInspiration::GhostBSD
             | LinuxBsdDistroInspiration::HardenedBSD => "pkg",
             _ => "sigpkg",
         }
+    }
+
+    pub fn audit_all_subsystems_distro_compliance(&self) -> Vec<(SigmaOsSubsystem, bool, u32)> {
+        self.subsystems
+            .iter()
+            .map(|(&sub, spec)| {
+                let is_compliant = spec.supported_distros.len() >= 30 && spec.interop_score >= 100;
+                (sub, is_compliant, spec.interop_score)
+            })
+            .collect()
+    }
+
+    pub fn translate_cross_distro_payload(
+        &self,
+        distro: LinuxBsdDistroInspiration,
+        subsystem: SigmaOsSubsystem,
+        payload: &str,
+    ) -> String {
+        format!(
+            "[{}:{}] {}",
+            distro.as_str(),
+            subsystem.as_str(),
+            payload
+        )
     }
 
     pub fn dispatch_event(
@@ -928,6 +994,8 @@ mod tests {
             "Plan9Frontier"
         );
         assert_eq!(LinuxBsdDistroInspiration::GhostBSD.as_str(), "GhostBSD");
+        assert_eq!(LinuxBsdDistroInspiration::SteamOS.as_str(), "SteamOS");
+        assert_eq!(LinuxBsdDistroInspiration::CachyOS.as_str(), "CachyOS");
 
         assert_eq!(
             SigmaOsSubsystem::KernelScheduling.as_str(),
@@ -1056,6 +1124,10 @@ mod tests {
             "pkg.tar.zst"
         );
         assert_eq!(
+            engine.resolve_package_format_specifier(LinuxBsdDistroInspiration::VoidLinux),
+            "xbps"
+        );
+        assert_eq!(
             engine.resolve_package_format_specifier(LinuxBsdDistroInspiration::DebianGNU),
             "deb"
         );
@@ -1063,6 +1135,20 @@ mod tests {
             engine.resolve_package_format_specifier(LinuxBsdDistroInspiration::FedoraLinux),
             "rpm"
         );
+
+        let audits = engine.audit_all_subsystems_distro_compliance();
+        assert_eq!(audits.len(), 31);
+        for (_, compliant, score) in audits {
+            assert!(compliant);
+            assert_eq!(score, 100);
+        }
+
+        let translated = engine.translate_cross_distro_payload(
+            LinuxBsdDistroInspiration::FreeBSD,
+            SigmaOsSubsystem::SecuritySandboxing,
+            "mac_capsicum_enforce",
+        );
+        assert_eq!(translated, "[FreeBSD:SecuritySandboxing] mac_capsicum_enforce");
     }
 
     #[test]
