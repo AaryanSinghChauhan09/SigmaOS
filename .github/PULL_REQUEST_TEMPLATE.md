@@ -1,42 +1,44 @@
 ## Summary
 
-<!-- What file-management behavior changed and why? -->
+<!-- What kernel or component behavior changed and why? -->
 
-## File component
+## Kernel component
 
-- [ ] File descriptor manager
-- [ ] Inode and directory manager
-- [ ] Permission manager
-- [ ] Lock manager
-- [ ] Mount / unmount
-- [ ] Cache
-- [ ] Filesystem
-- [ ] Recovery
-- [ ] procfs / diagnostics
+- [ ] Boot / arch init
+- [ ] Interrupts / traps
+- [ ] Memory / paging / swap
+- [ ] Scheduler / processes
+- [ ] VFS / filesystems
+- [ ] Syscalls / ELF
+- [ ] Drivers
+- [ ] Networking / sockets
+- [ ] IPC / signals / timers
 - [ ] Security / capabilities
-- [ ] Documentation
-- [ ] CI / tooling
+- [ ] Diagnostics
+- [ ] Build / CI
 
 ## Component
 
-- [ ] PR validation
+- [ ] PR-level validation
 - [ ] Daily CI triage
-- [ ] Weekly lifecycle review
+- [ ] Weekly subsystem review
 - [ ] Weekly Linux/BSD study
-- [ ] Biweekly memory audit
-- [ ] Biweekly signal/wait audit
+- [ ] Biweekly syscall/ABI review
+- [ ] Biweekly memory/concurrency audit
 - [ ] Monthly boot validation
-- [ ] Quarterly architecture/security/release review
+- [ ] Monthly driver/hardware audit
+- [ ] Monthly fuzz triage
+- [ ] Monthly diagnostics rehearsal
+- [ ] Quarterly release/architecture/security review
 
-## Upstream study
+## Reference study
 
-<!-- Required for lifecycle, ABI, or file changes -->
+<!-- Required for design-changing kernel PRs -->
 
-- POSIX section:
+- Study document:
 - Linux/BSD/Redox/xv6 reference:
-- SigmaOS current behavior:
-- New behavior:
-- Compatibility impact:
+- Decision: Adopt / Adapt / Reject
+- Reason:
 
 ## Changes
 
@@ -49,18 +51,16 @@
 - [ ] Regression protection
 - [ ] Security review, if applicable
 
-## File safety review
+## Kernel safety review
 
-- [ ] Lifecycle transitions are valid
-- [ ] Zombies are eventually reaped
-- [ ] Orphans are adopted
-- [ ] PID reuse is safe
-- [ ] Lock ordering is documented
+- [ ] No unnecessary `unsafe`
+- [ ] Every `unsafe` block documents invariants
+- [ ] Lock ordering documented
 - [ ] Interrupt-context safety considered
-- [ ] Signal races considered
-- [ ] Double-unlink prevented
-- [ ] Resource limits enforced
-- [ ] No unbounded allocation or recursion
+- [ ] Allocation limits defined
+- [ ] OOM behavior defined
+- [ ] Error paths tested
+- [ ] No silent failure introduced
 
 ## Evidence
 
@@ -70,17 +70,18 @@
 - [ ] `./run_sigma_tests.sh`
 - [ ] New/updated unit tests
 - [ ] Integration tests
-- [ ] Fuzz target or documented exemption
-- [ ] Boot-to-boot evidence, if boot-affecting
-- [ ] File benchmark, if performance-affecting
+- [ ] Fuzz target or reason for exemption
+- [ ] QEMU boot evidence, if boot-affecting
+- [ ] Driver/hardware evidence, if driver-affecting
 - [ ] Security review requested, if applicable
 
 ## Status updates
 
 - [ ] `FEATURE_STATUS.toml`
 - [ ] `CAPABILITY_MATRIX.toml`
-- [ ] File documentation
+- [ ] Component documentation
 - [ ] Boot matrix, if applicable
+- [ ] Hardware matrix, if applicable
 
 ## Risks and rollback
 
