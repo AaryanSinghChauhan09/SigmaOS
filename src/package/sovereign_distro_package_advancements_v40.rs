@@ -417,11 +417,11 @@ impl UdfScriptletEngineV39 {
 // 3. Cross-Distro Dependency SAT DPLL Solver & Capability Governor V39
 // ============================================================================
 
-pub struct UniversalCrossDistroSatSolverV39 {
+pub struct UniversalCrossDistroSatSolverV40 {
     pub canonical_mapping: BTreeMap<String, String>,
 }
 
-impl UniversalCrossDistroSatSolverV39 {
+impl UniversalCrossDistroSatSolverV40 {
     pub fn new() -> Self {
         let mut map = BTreeMap::new();
         map.insert("libc6".to_string(), "sovereign-libc".to_string());
@@ -608,7 +608,7 @@ impl UniversalBootEnvSnapshotGovernorV39 {
 // ============================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum UniversalPmActionV39 {
+pub enum UniversalPmActionV40 {
     Install,
     Remove,
     Update,
@@ -620,7 +620,7 @@ pub enum UniversalPmActionV39 {
 #[derive(Debug, Clone)]
 pub struct RoutedPmCommandV39 {
     pub source_pm: String,
-    pub action: UniversalPmActionV39,
+    pub action: UniversalPmActionV40,
     pub target_packages: Vec<String>,
     pub dry_run: bool,
 }
@@ -672,7 +672,7 @@ impl UniversalPmCliRouterV39 {
                             .collect(),
                     )
                 } else {
-                    (UniversalPmActionV39::Update, vec![])
+                    (UniversalPmActionV40::Update, vec![])
                 }
             }
             "pacman" => {
@@ -697,7 +697,7 @@ impl UniversalPmCliRouterV39 {
                             .collect(),
                     )
                 } else {
-                    (UniversalPmActionV39::Query, vec![])
+                    (UniversalPmActionV40::Query, vec![])
                 }
             }
             "dnf" | "yum" | "zypper" | "apk" | "xbps-install" | "pkg" | "emerge" | "brew"
@@ -779,7 +779,7 @@ impl UniversalMultiFormatTranspilerAndExecutionEngineV39 {
 pub struct SovereignDistroPackageAdvancementsSuiteV39 {
     pub inspector: UniversalPackageFormatInspectorV39,
     pub udf_engine: UdfScriptletEngineV39,
-    pub sat_solver: UniversalCrossDistroSatSolverV39,
+    pub sat_solver: UniversalCrossDistroSatSolverV40,
     pub sandbox_governor: UniversalMultiSandboxGovernorV39,
     pub cas_store: UniversalCasDeltaStoreGovernorV39,
     pub boot_env_governor: UniversalBootEnvSnapshotGovernorV39,
@@ -793,7 +793,7 @@ impl SovereignDistroPackageAdvancementsSuiteV39 {
         Self {
             inspector: UniversalPackageFormatInspectorV39::new(),
             udf_engine: UdfScriptletEngineV39::new(),
-            sat_solver: UniversalCrossDistroSatSolverV39::new(),
+            sat_solver: UniversalCrossDistroSatSolverV40::new(),
             sandbox_governor: UniversalMultiSandboxGovernorV39::new(),
             cas_store: UniversalCasDeltaStoreGovernorV39::new(),
             boot_env_governor: UniversalBootEnvSnapshotGovernorV39::new(),
@@ -1000,7 +1000,7 @@ mod tests {
             .cli_router
             .route_command("apt install ripgrep --dry-run")
             .unwrap();
-        assert_eq!(cmd.action, UniversalPmActionV39::Install);
+        assert_eq!(cmd.action, UniversalPmActionV40::Install);
         assert!(cmd.dry_run);
 
         let sigpkg = suite
