@@ -26,6 +26,7 @@
 - [Kernel Core Component Guide](./Kernel-Core-Component-Guide.md) &ndash; Sovereign microkernel core, bootstrap, and multi-core AP bring-up.
 - [Scheduler Component Guide](./Scheduler-Component-Guide.md) &ndash; Multi-queue CFS / BORE low-latency preemptive task scheduler.
 - [Memory Management Component Guide](./Memory-Management-Component-Guide.md) &ndash; Paging, slab allocator, NUMA memory tiers, and page cache.
+- [Physical Memory Manager Plan](./PHYSICAL_MEMORY_MANAGER_PLAN.md) &ndash; Two-stage physical memory management architecture, 11 PMM rules & invariants, 20-PR sequence roadmap, periodic maintenance schedule, cross-component implementation rules, and merge gates.
 - [PCI Express Bus Enumeration Component Guide](./Pci-Express-Bus-Enumeration-Component-Guide.md) &ndash; PCIe root complex enumeration, MSI/MSI-X, and AER error logging.
 - [DMA & IOMMU Direct Memory Access Component Guide](./Dma-Iommu-Direct-Memory-Access-Component-Guide.md) &ndash; Zero-copy scatter-gather DMA memory manager and IOMMU domain translation.
 - [ACPI Power Resource Parser Component Guide](./Acpi-Power-Resource-Parser-Component-Guide.md) &ndash; ACPI AML bytecode interpreter, thermal trip points, and S0-S5 power states.

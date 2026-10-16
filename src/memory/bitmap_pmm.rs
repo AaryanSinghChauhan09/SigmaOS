@@ -2,7 +2,6 @@
 //! Physical Memory Bitmap Allocator, Self-Referential Page Tables, and Fast x86_64 Assembly Syscall Dispatcher.
 //! Implements bottom-up kernel primitives as described in Step 1, Step 2, and Step 3 specifications.
 
-use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 use std::vec;
 use std::vec::Vec;
 
@@ -142,7 +141,7 @@ impl SelfReferentialPagingEngine {
         pml4_table[SELF_REF_INDEX] = self.pml4_phys_addr | PAGE_PRESENT | PAGE_WRITE;
     }
 
-    pub fn vmm_get_pte_vaddr(&self, pml4_i: usize, pdp_i: usize, pd_i: usize, pt_i: usize) -> u64 {
+    pub fn vmm_get_pte_vaddr(&self, pml4_i: usize, pdp_i: usize, _pd_i: usize, pt_i: usize) -> u64 {
         0xFFFF_0000_0000_0000
             | ((SELF_REF_INDEX as u64) << 39)
             | ((pml4_i as u64) << 30)
