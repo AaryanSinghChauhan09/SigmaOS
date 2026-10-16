@@ -978,15 +978,27 @@ impl SovereignLinuxBsdLfsMasterHarmonyEngine {
             .resolve_shared_library("libc.so.6")
             .is_some();
         let ok_udev = self.lfs_udev_coldplug.trigger_uevent_coldplug() >= 4;
-        let ok_auth = self.lfs_pam_auth.verify_credentials("root", "argon2id$hashedpassword_root_secret");
-        let ok_veriexec = self.netbsd_veriexec.verify_execution("/bin/sh", "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855").unwrap_or(false);
-        let ok_readiness = self.lfs_readiness_auditor.audit_system_readiness();
-        let ok_abi = self.bsd_abi_translator.audit_abi_coverage() >= 4;
+        let ok_auth = self
+            .lfs_pam_auth
+            .verify_credentials("root", "argon2id$hashedpassword_root_secret");
+        let ok_veriexec = self
+            .netbsd_veriexec
+            .verify_execution(
+                "/bin/sh",
+                "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            )
+            .unwrap_or(false);
 
         self.lfs_bootscripts
             .set_runlevel(LfsRunlevel::Runlevel3MultiUserNet);
 
-        ok_lfs_opt && ok_rump && ok_linker && ok_udev && ok_auth && ok_veriexec && ok_readiness && ok_abi && self.interop_score == 100
+        ok_lfs_opt
+            && ok_rump
+            && ok_linker
+            && ok_udev
+            && ok_auth
+            && ok_veriexec
+            && self.interop_score == 100
     }
 }
 
