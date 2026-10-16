@@ -623,6 +623,9 @@ pub use sovereign_openbsd_complete_gap_closure_pr_suite::*;
 pub mod freebsd_missing_components_v59_pr;
 pub use freebsd_missing_components_v59_pr::*;
 
+pub mod sovereign_global_tech_media_wiki_distro_parity_pr;
+pub use sovereign_global_tech_media_wiki_distro_parity_pr::*;
+
 pub mod freebsd_gap_closure_pr_engine;
 pub use freebsd_gap_closure_pr_engine::*;
 
