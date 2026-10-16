@@ -20,3 +20,5 @@ pub mod sovereign_installer_and_system_tools_advancements_v2;
 pub use sovereign_installer_and_system_tools_advancements_v2::*;
 pub mod sovereign_installer_and_system_tools_advancements_v3;
 pub use sovereign_installer_and_system_tools_advancements_v3::*;
+pub mod sovereign_installer_and_system_tools_advancements_v4_pr;
+pub use sovereign_installer_and_system_tools_advancements_v4_pr::*;
