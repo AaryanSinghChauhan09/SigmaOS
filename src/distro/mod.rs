@@ -612,6 +612,9 @@ pub use sovereign_freebsd_ultimate_parity_pr_suite::*;
 pub mod sovereign_openbsd_ultimate_parity_pr_suite;
 pub use sovereign_openbsd_ultimate_parity_pr_suite::*;
 
+pub mod freebsd_missing_components_v59_pr;
+pub use freebsd_missing_components_v59_pr::*;
+
 pub mod freebsd_gap_closure_pr_engine;
 pub use freebsd_gap_closure_pr_engine::*;
 
