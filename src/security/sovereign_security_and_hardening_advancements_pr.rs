@@ -33,6 +33,17 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         Self
     }
 
+    pub fn generate_sssd_domain_conf(domain: &str, realm: &str, kdc: &str) -> String {
+        format!(
+            "[domain/{}]\nid_provider = ipa\nauth_provider = ipa\naccess_provider = ipa\nipa_domain = {}\nipa_server = {}\nkrb5_realm = {}\n",
+            domain, domain, kdc, realm
+        )
+    }
+
+    pub fn check_landlock_access(mask: u16, requested: u16) -> bool {
+        (mask & requested) == requested
+    }
+
     /// Parse and format SELinux security context string (user:role:type:sensitivity:categories).
     pub fn format_selinux_context(
         user: &str,
@@ -141,11 +152,6 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         }
     }
 
-    /// Check Landlock access rights mask.
-    pub fn check_landlock_access(handled_access: u64, requested_access: u64) -> bool {
-        (handled_access & requested_access) == requested_access
-    }
-
     /// Generate Linux Access Control & Sandboxing PR proposal.
     pub fn generate_proposal(&self) -> SecurityPrProposalManifest {
         SecurityPrProposalManifest {
@@ -174,6 +180,13 @@ pub struct BsdHardeningAndIsolationPrEngine;
 impl BsdHardeningAndIsolationPrEngine {
     pub fn new() -> Self {
         Self
+    }
+
+    pub fn generate_sssd_domain_conf(domain: &str, realm: &str, kdc: &str) -> String {
+        format!(
+            "[domain/{}]\nid_provider = ipa\nauth_provider = ipa\naccess_provider = ipa\nipa_domain = {}\nipa_server = {}\nkrb5_realm = {}\n",
+            domain, domain, kdc, realm
+        )
     }
 
     /// Verify OpenBSD pledge promise mask against required system syscall string.
@@ -409,6 +422,13 @@ impl IdentityAndEnterpriseAuthPrEngine {
         Self
     }
 
+    pub fn generate_sssd_domain_conf(domain: &str, realm: &str, kdc: &str) -> String {
+        format!(
+            "[domain/{}]\nid_provider = ipa\nauth_provider = ipa\naccess_provider = ipa\nipa_domain = {}\nipa_server = {}\nkrb5_realm = {}\n",
+            domain, domain, kdc, realm
+        )
+    }
+
     /// Parse LDAP Distinguished Name (DN) string (e.g., "cn=jules,ou=users,dc=sigmaos,dc=org").
     pub fn parse_ldap_dn(&self, dn: &str) -> Vec<(String, String)> {
         let mut parts = Vec::new();
@@ -423,14 +443,6 @@ impl IdentityAndEnterpriseAuthPrEngine {
     /// Simulate Kerberos v5 ticket validation.
     pub fn validate_kerberos_tgt(&self, realm: &str, principal: &str, ticket_bytes: &[u8]) -> bool {
         !realm.is_empty() && !principal.is_empty() && ticket_bytes.len() >= 16
-    }
-
-    /// Generate SSSD domain configuration section string.
-    pub fn generate_sssd_domain_conf(domain_name: &str, provider: &str, uri: &str) -> String {
-        alloc::format!(
-            "[domain/{}]\nid_provider = {}\nauth_provider = {}\nldap_uri = {}\ncache_credentials = true\n",
-            domain_name, provider, provider, uri
-        )
     }
 
     /// Generate Identity & Enterprise Authentication PR proposal.

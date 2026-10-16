@@ -80,8 +80,7 @@ impl SovereignWalkerEngine {
                     score += 10 + consecutive_bonus;
                     consecutive_bonus += 5;
                     // Start of word bonus
-                    if t_idx == 0 || text_bytes[t_idx - 1] == b' ' || text_bytes[t_idx - 1] == b'-'
-                    {
+                    if t_idx == 0 || text_bytes[t_idx - 1] == b' ' || text_bytes[t_idx - 1] == b'-' {
                         score += 15;
                     }
                     p_idx += 1;

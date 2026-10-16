@@ -62,21 +62,12 @@ impl TaskArtifact {
     pub fn summary(&self) -> String {
         match self {
             Self::PullRequest { pr_number, title } => format!("PR #{}: {}", pr_number, title),
-            Self::Issue {
-                issue_number,
-                title,
-            } => format!("Issue #{}: {}", issue_number, title),
+            Self::Issue { issue_number, title } => format!("Issue #{}: {}", issue_number, title),
             Self::Report { title, path } => format!("Report '{}' at {}", title, path),
             Self::TestResult { suite_name, passed } => {
-                format!(
-                    "Test Suite '{}': {}",
-                    suite_name,
-                    if *passed { "PASS" } else { "FAIL" }
-                )
+                format!("Test Suite '{}': {}", suite_name, if *passed { "PASS" } else { "FAIL" })
             }
-            Self::DocumentedDecision { adr_number, title } => {
-                format!("ADR-{:04}: {}", adr_number, title)
-            }
+            Self::DocumentedDecision { adr_number, title } => format!("ADR-{:04}: {}", adr_number, title),
         }
     }
 }
@@ -146,9 +137,7 @@ impl ReleaseTier {
             Self::DeveloperPreview => "QEMU boot reaches defined shell/diagnostic state",
             Self::TestDistribution => "Clean VM installation and recovery path verified",
             Self::ReleaseCandidate => "Full regression, security review, known-issue list",
-            Self::Stable => {
-                "Hardware matrix, update/rollback, support policy, and security process verified"
-            }
+            Self::Stable => "Hardware matrix, update/rollback, support policy, and security process verified",
         }
     }
 }
@@ -322,28 +311,22 @@ impl MaintenanceOperatingModelEngine {
         status: TaskResultStatus,
     ) -> Result<(), String> {
         if self.tasks.iter().any(|t| t.id == task_id) {
-            self.completed_artifacts
-                .push((task_id.to_string(), artifact, status));
+            self.completed_artifacts.push((task_id.to_string(), artifact, status));
             Ok(())
         } else {
-            Err(format!(
-                "Task ID '{}' not found in maintenance calendar",
-                task_id
-            ))
+            Err(format!("Task ID '{}' not found in maintenance calendar", task_id))
         }
     }
 
     /// Evaluates release tier readiness based on verified artifacts
     pub fn evaluate_release_readiness(&self, target_tier: ReleaseTier) -> bool {
-        let boot_verified = self
-            .completed_artifacts
-            .iter()
-            .any(|(id, _, status)| id == "monthly_boot" && status.is_verified());
+        let boot_verified = self.completed_artifacts.iter().any(|(id, _, status)| {
+            id == "monthly_boot" && status.is_verified()
+        });
 
-        let installer_verified = self
-            .completed_artifacts
-            .iter()
-            .any(|(id, _, status)| id == "monthly_installer" && status.is_verified());
+        let installer_verified = self.completed_artifacts.iter().any(|(id, _, status)| {
+            id == "monthly_installer" && status.is_verified()
+        });
 
         match target_tier {
             ReleaseTier::Experimental => true,
@@ -365,11 +348,7 @@ impl MaintenanceOperatingModelEngine {
         evidence_path: Option<String>,
         limits: String,
     ) {
-        if let Some(entry) = self
-            .hardware_matrix
-            .iter_mut()
-            .find(|e| e.driver_class == driver_class)
-        {
+        if let Some(entry) = self.hardware_matrix.iter_mut().find(|e| e.driver_class == driver_class) {
             entry.status = status;
             entry.evidence_path = evidence_path;
             entry.known_limits = limits;
