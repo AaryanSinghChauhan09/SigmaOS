@@ -98,7 +98,13 @@ impl PrinterManager {
     }
 
     /// Add printer
-    pub fn add_printer(&mut self, name: String, driver: String, location: String, connection_type: ConnectionType) {
+    pub fn add_printer(
+        &mut self,
+        name: String,
+        driver: String,
+        location: String,
+        connection_type: ConnectionType,
+    ) {
         let printer = Printer {
             name: name.clone(),
             driver,
@@ -149,8 +155,17 @@ impl PrinterManager {
     }
 
     /// Submit print job
-    pub fn submit_job(&mut self, printer_name: String, document_path: String, pages: u32, copies: u32) -> Result<u32, &'static str> {
-        let printer = self.printers.get_mut(&printer_name).ok_or("Printer not found")?;
+    pub fn submit_job(
+        &mut self,
+        printer_name: String,
+        document_path: String,
+        pages: u32,
+        copies: u32,
+    ) -> Result<u32, &'static str> {
+        let printer = self
+            .printers
+            .get_mut(&printer_name)
+            .ok_or("Printer not found")?;
         let job = PrintJob {
             id: self.next_job_id,
             name: format!("Job {}", self.next_job_id),
@@ -171,15 +186,25 @@ impl PrinterManager {
 
     /// Cancel job
     pub fn cancel_job(&mut self, printer_name: String, job_id: u32) -> Result<(), &'static str> {
-        let printer = self.printers.get_mut(&printer_name).ok_or("Printer not found")?;
-        let index = printer.queue.iter().position(|j| j.id == job_id).ok_or("Job not found")?;
+        let printer = self
+            .printers
+            .get_mut(&printer_name)
+            .ok_or("Printer not found")?;
+        let index = printer
+            .queue
+            .iter()
+            .position(|j| j.id == job_id)
+            .ok_or("Job not found")?;
         printer.queue.remove(index);
         Ok(())
     }
 
     /// Get jobs for printer
     pub fn get_jobs(&self, printer_name: &str) -> Vec<&PrintJob> {
-        self.printers.get(printer_name).map(|p| p.queue.iter().collect()).unwrap_or_default()
+        self.printers
+            .get(printer_name)
+            .map(|p| p.queue.iter().collect())
+            .unwrap_or_default()
     }
 
     /// Printer count
@@ -201,7 +226,9 @@ pub fn init_printer_manager() {
 /// Get printer manager
 pub fn get_printer_manager() -> &'static mut PrinterManager {
     unsafe {
-        PRINTER_MANAGER.as_mut().expect("Printer manager not initialized")
+        PRINTER_MANAGER
+            .as_mut()
+            .expect("Printer manager not initialized")
     }
 }
 
@@ -218,15 +245,32 @@ mod tests {
     #[test]
     fn test_add_printer() {
         let mut pm = PrinterManager::new();
-        pm.add_printer("HP LaserJet".to_string(), "hplip".to_string(), "Office".to_string(), ConnectionType::USB);
+        pm.add_printer(
+            "HP LaserJet".to_string(),
+            "hplip".to_string(),
+            "Office".to_string(),
+            ConnectionType::USB,
+        );
         assert_eq!(pm.printer_count(), 1);
     }
 
     #[test]
     fn test_submit_job() {
         let mut pm = PrinterManager::new();
-        pm.add_printer("HP LaserJet".to_string(), "hplip".to_string(), "Office".to_string(), ConnectionType::USB);
-        let job_id = pm.submit_job("HP LaserJet".to_string(), "/path/to/doc.pdf".to_string(), 5, 1).unwrap();
+        pm.add_printer(
+            "HP LaserJet".to_string(),
+            "hplip".to_string(),
+            "Office".to_string(),
+            ConnectionType::USB,
+        );
+        let job_id = pm
+            .submit_job(
+                "HP LaserJet".to_string(),
+                "/path/to/doc.pdf".to_string(),
+                5,
+                1,
+            )
+            .unwrap();
         assert_eq!(job_id, 1);
     }
 }

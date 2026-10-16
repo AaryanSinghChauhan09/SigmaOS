@@ -147,7 +147,8 @@ impl XfsOperationalState {
             if !ag.locked && ag.free_blocks >= blocks {
                 ag.locked = true;
                 ag.free_blocks -= blocks;
-                let phys = ((ag.ag_id as u64) * (ag.block_count as u64)) + (ag.block_count - ag.free_blocks - blocks) as u64;
+                let phys = ((ag.ag_id as u64) * (ag.block_count as u64))
+                    + (ag.block_count - ag.free_blocks - blocks) as u64;
                 ag.locked = false;
                 return Some((ag.ag_id, phys));
             }
@@ -156,7 +157,11 @@ impl XfsOperationalState {
     }
 
     pub fn reflink_clone(&mut self, logical_offset: u64, physical_block: u64, length: u64) -> bool {
-        if let Some(ext) = self.reflink_map.iter_mut().find(|e| e.physical_block == physical_block && e.length == length) {
+        if let Some(ext) = self
+            .reflink_map
+            .iter_mut()
+            .find(|e| e.physical_block == physical_block && e.length == length)
+        {
             ext.refcount += 1;
         } else {
             self.reflink_map.push(XfsReflinkExtent {
@@ -210,7 +215,13 @@ impl BtrfsOperationalState {
         state
     }
 
-    pub fn create_snapshot(&mut self, parent_id: u64, new_id: u64, name: String, read_only: bool) -> bool {
+    pub fn create_snapshot(
+        &mut self,
+        parent_id: u64,
+        new_id: u64,
+        name: String,
+        read_only: bool,
+    ) -> bool {
         if self.subvolumes.iter().any(|s| s.id == parent_id) {
             self.subvolumes.push(BtrfsSubvolume {
                 id: new_id,
@@ -329,7 +340,10 @@ impl UfsSoftUpdatesState {
     pub fn can_commit(&self, dep_id: u64) -> bool {
         if let Some(dep) = self.dependencies.iter().find(|d| d.dep_id == dep_id) {
             if let Some(p_id) = dep.parent_dep_id {
-                return self.dependencies.iter().any(|d| d.dep_id == p_id && d.completed);
+                return self
+                    .dependencies
+                    .iter()
+                    .any(|d| d.dep_id == p_id && d.completed);
             }
             return true;
         }
@@ -378,7 +392,11 @@ impl F2fsOperationalState {
     }
 
     pub fn write_block(&mut self, data_type: F2fsDataType) -> u32 {
-        if let Some(seg) = self.segments.iter_mut().find(|s| s.data_type == data_type && s.written_blocks < s.total_blocks) {
+        if let Some(seg) = self
+            .segments
+            .iter_mut()
+            .find(|s| s.data_type == data_type && s.written_blocks < s.total_blocks)
+        {
             seg.written_blocks += 1;
             return seg.segment_id;
         }
@@ -535,7 +553,10 @@ impl PseudoFsOperationalState {
 
     pub fn generate_proc_meminfo(&mut self) -> String {
         self.proc_reads_count += 1;
-        format!("MemTotal: 16384 MB\nMemFree: 8192 MB\nTmpfsUsed: {} KB\n", self.tmpfs_used_bytes / 1024)
+        format!(
+            "MemTotal: 16384 MB\nMemFree: 8192 MB\nTmpfsUsed: {} KB\n",
+            self.tmpfs_used_bytes / 1024
+        )
     }
 }
 
@@ -799,10 +820,23 @@ impl StorageUtilitiesEngine {
         }
     }
 
-    pub fn parse_smart_nvme_health(&self, temperature_k: u16, percentage_used: u8) -> (bool, String) {
-        let temp_c = if temperature_k > 273 { temperature_k - 273 } else { 0 };
+    pub fn parse_smart_nvme_health(
+        &self,
+        temperature_k: u16,
+        percentage_used: u8,
+    ) -> (bool, String) {
+        let temp_c = if temperature_k > 273 {
+            temperature_k - 273
+        } else {
+            0
+        };
         let is_healthy = temp_c < 75 && percentage_used < 90;
-        let msg = format!("NVMe Temp: {}C, Wear: {}%, Health: {}", temp_c, percentage_used, if is_healthy { "GOOD" } else { "WARNING" });
+        let msg = format!(
+            "NVMe Temp: {}C, Wear: {}%, Health: {}",
+            temp_c,
+            percentage_used,
+            if is_healthy { "GOOD" } else { "WARNING" }
+        );
         (is_healthy, msg)
     }
 }
@@ -1400,7 +1434,9 @@ impl SovereignStorageAndFilesystemParityPrGateway {
         let proposals = self.collect_all_proposals();
         let mut md = String::new();
 
-        md.push_str("# Pull Request Proposals: Linux & BSD Filesystems and Storage Parity Engine\n\n");
+        md.push_str(
+            "# Pull Request Proposals: Linux & BSD Filesystems and Storage Parity Engine\n\n",
+        );
         md.push_str("## Overview\n");
         md.push_str("This collection of Pull Request proposals introduces native parity and high-performance zero-dependency `#![no_std]` implementations for Linux & BSD filesystems, logical storage layers, disk encryption, and disk maintenance utilities in SigmaOS.\n\n");
 

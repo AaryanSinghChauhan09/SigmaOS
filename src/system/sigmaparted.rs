@@ -160,7 +160,8 @@ impl Disk {
 
     /// Add a partition
     pub fn add_partition(&mut self, partition: Partition) {
-        self.partitions.insert(partition.partition_number, partition);
+        self.partitions
+            .insert(partition.partition_number, partition);
     }
 
     /// Remove a partition
@@ -244,7 +245,11 @@ impl SigmaParted {
     }
 
     /// Create a partition table on a disk
-    pub fn create_partition_table(&mut self, disk_id: &str, table_type: PartitionTableType) -> bool {
+    pub fn create_partition_table(
+        &mut self,
+        disk_id: &str,
+        table_type: PartitionTableType,
+    ) -> bool {
         if let Some(disk) = self.disks.get_mut(disk_id) {
             disk.set_table_type(table_type);
             disk.partitions.clear();
@@ -274,7 +279,12 @@ impl SigmaParted {
     }
 
     /// Set partition flag
-    pub fn set_partition_flag(&mut self, disk_id: &str, partition_number: u32, flag: PartitionFlag) -> bool {
+    pub fn set_partition_flag(
+        &mut self,
+        disk_id: &str,
+        partition_number: u32,
+        flag: PartitionFlag,
+    ) -> bool {
         if let Some(disk) = self.disks.get_mut(disk_id) {
             if let Some(partition) = disk.partitions.get_mut(&partition_number) {
                 partition.add_flag(flag);
@@ -288,7 +298,12 @@ impl SigmaParted {
     }
 
     /// Clear partition flag
-    pub fn clear_partition_flag(&mut self, disk_id: &str, partition_number: u32, flag: PartitionFlag) -> bool {
+    pub fn clear_partition_flag(
+        &mut self,
+        disk_id: &str,
+        partition_number: u32,
+        flag: PartitionFlag,
+    ) -> bool {
         if let Some(disk) = self.disks.get_mut(disk_id) {
             if let Some(partition) = disk.partitions.get_mut(&partition_number) {
                 partition.remove_flag(flag);
@@ -325,16 +340,12 @@ pub fn init_sigmaparted() {
 
 /// Get the global SigmaParted instance
 pub fn get_sigmaparted() -> Option<&'static SigmaParted> {
-    unsafe {
-        SIGMAPARTED_INSTANCE.as_ref()
-    }
+    unsafe { SIGMAPARTED_INSTANCE.as_ref() }
 }
 
 /// Get mutable global SigmaParted instance
 pub fn get_sigmaparted_mut() -> Option<&'static mut SigmaParted> {
-    unsafe {
-        SIGMAPARTED_INSTANCE.as_mut()
-    }
+    unsafe { SIGMAPARTED_INSTANCE.as_mut() }
 }
 
 /// Convenience function to create a partition table

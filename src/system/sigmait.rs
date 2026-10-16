@@ -85,7 +85,14 @@ pub struct AuditEvent {
 
 impl AuditEvent {
     /// Create a new audit event
-    pub fn new(event_id: String, event_type: AuditEventType, severity: AuditSeverity, pid: u32, uid: u32, message: String) -> Self {
+    pub fn new(
+        event_id: String,
+        event_type: AuditEventType,
+        severity: AuditSeverity,
+        pid: u32,
+        uid: u32,
+        message: String,
+    ) -> Self {
         Self {
             event_id,
             event_type,
@@ -144,11 +151,11 @@ impl SigmaAudit {
         if !self.running {
             return Err("SigmaAudit not running".to_string());
         }
-        
+
         if self.events.contains_key(&event.event_id) {
             return Err(format!("Event '{}' already exists", event.event_id));
         }
-        
+
         self.events.insert(event.event_id.clone(), event);
         self.event_counter += 1;
         Ok(())
@@ -174,23 +181,23 @@ impl SigmaAudit {
 
     /// List events by type
     pub fn list_by_type(&self, event_type: AuditEventType) -> Vec<&AuditEvent> {
-        self.events.values()
+        self.events
+            .values()
             .filter(|e| e.event_type == event_type)
             .collect()
     }
 
     /// List events by severity
     pub fn list_by_severity(&self, severity: AuditSeverity) -> Vec<&AuditEvent> {
-        self.events.values()
+        self.events
+            .values()
             .filter(|e| e.severity == severity)
             .collect()
     }
 
     /// List events by PID
     pub fn list_by_pid(&self, pid: u32) -> Vec<&AuditEvent> {
-        self.events.values()
-            .filter(|e| e.pid == pid)
-            .collect()
+        self.events.values().filter(|e| e.pid == pid).collect()
     }
 
     /// Get event count
@@ -202,8 +209,18 @@ impl SigmaAudit {
     pub fn audit_stats(&self) -> BTreeMap<String, String> {
         let mut stats = BTreeMap::new();
         stats.insert("total_events".to_string(), self.event_count().to_string());
-        stats.insert("critical_events".to_string(), self.list_by_severity(AuditSeverity::Critical).len().to_string());
-        stats.insert("error_events".to_string(), self.list_by_severity(AuditSeverity::Error).len().to_string());
+        stats.insert(
+            "critical_events".to_string(),
+            self.list_by_severity(AuditSeverity::Critical)
+                .len()
+                .to_string(),
+        );
+        stats.insert(
+            "error_events".to_string(),
+            self.list_by_severity(AuditSeverity::Error)
+                .len()
+                .to_string(),
+        );
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
@@ -263,7 +280,7 @@ mod tests {
             AuditSeverity::Info,
             1234,
             1000,
-            "System call executed".to_string()
+            "System call executed".to_string(),
         )
         .with_timestamp(1234567890);
 
@@ -285,16 +302,16 @@ mod tests {
     fn test_sigmait_log_event() {
         let mut audit = SigmaAudit::new();
         audit.start();
-        
+
         let event = AuditEvent::new(
             "evt1".to_string(),
             AuditEventType::Syscall,
             AuditSeverity::Info,
             1234,
             1000,
-            "System call executed".to_string()
+            "System call executed".to_string(),
         );
-        
+
         assert!(audit.log_event(event).is_ok());
         assert_eq!(audit.event_count(), 1);
     }
@@ -303,18 +320,18 @@ mod tests {
     fn test_sigmait_list_by_type() {
         let mut audit = SigmaAudit::new();
         audit.start();
-        
+
         let event = AuditEvent::new(
             "evt1".to_string(),
             AuditEventType::Syscall,
             AuditSeverity::Info,
             1234,
             1000,
-            "System call executed".to_string()
+            "System call executed".to_string(),
         );
-        
+
         audit.log_event(event).unwrap();
-        
+
         let events = audit.list_by_type(AuditEventType::Syscall);
         assert_eq!(events.len(), 1);
     }
@@ -323,18 +340,18 @@ mod tests {
     fn test_sigmait_list_by_severity() {
         let mut audit = SigmaAudit::new();
         audit.start();
-        
+
         let event = AuditEvent::new(
             "evt1".to_string(),
             AuditEventType::Syscall,
             AuditSeverity::Critical,
             1234,
             1000,
-            "System call executed".to_string()
+            "System call executed".to_string(),
         );
-        
+
         audit.log_event(event).unwrap();
-        
+
         let events = audit.list_by_severity(AuditSeverity::Critical);
         assert_eq!(events.len(), 1);
     }
@@ -343,18 +360,18 @@ mod tests {
     fn test_sigmait_list_by_pid() {
         let mut audit = SigmaAudit::new();
         audit.start();
-        
+
         let event = AuditEvent::new(
             "evt1".to_string(),
             AuditEventType::Syscall,
             AuditSeverity::Info,
             1234,
             1000,
-            "System call executed".to_string()
+            "System call executed".to_string(),
         );
-        
+
         audit.log_event(event).unwrap();
-        
+
         let events = audit.list_by_pid(1234);
         assert_eq!(events.len(), 1);
     }
@@ -363,18 +380,18 @@ mod tests {
     fn test_sigmait_stats() {
         let mut audit = SigmaAudit::new();
         audit.start();
-        
+
         let event = AuditEvent::new(
             "evt1".to_string(),
             AuditEventType::Syscall,
             AuditSeverity::Critical,
             1234,
             1000,
-            "System call executed".to_string()
+            "System call executed".to_string(),
         );
-        
+
         audit.log_event(event).unwrap();
-        
+
         let stats = audit.audit_stats();
         assert_eq!(stats.get("total_events"), Some(&"1".to_string()));
         assert_eq!(stats.get("critical_events"), Some(&"1".to_string()));
@@ -383,19 +400,19 @@ mod tests {
     #[test]
     fn test_log_audit_event_convenience() {
         init_sigmait();
-        
+
         let mut audit = get_sigmait().unwrap();
         audit.start();
-        
+
         let event = AuditEvent::new(
             "evt1".to_string(),
             AuditEventType::Syscall,
             AuditSeverity::Info,
             1234,
             1000,
-            "System call executed".to_string()
+            "System call executed".to_string(),
         );
-        
+
         let result = log_audit_event(event);
         assert!(result.is_ok());
     }

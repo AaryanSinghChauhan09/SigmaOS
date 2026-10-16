@@ -156,7 +156,7 @@ impl SigmaPkg {
         if self.packages.contains_key(&package.name) {
             return Err(format!("Package '{}' already exists", package.name));
         }
-        
+
         self.packages.insert(package.name.clone(), package);
         Ok(())
     }
@@ -179,7 +179,7 @@ impl SigmaPkg {
         if !self.running {
             return Err("SigmaPkg not running".to_string());
         }
-        
+
         match self.packages.get_mut(name) {
             Some(package) => {
                 package.state = PackageState::Installed;
@@ -195,7 +195,7 @@ impl SigmaPkg {
         if !self.running {
             return Err("SigmaPkg not running".to_string());
         }
-        
+
         match self.packages.get_mut(name) {
             Some(package) => {
                 package.state = PackageState::NotInstalled;
@@ -211,7 +211,7 @@ impl SigmaPkg {
         if !self.running {
             return Err("SigmaPkg not running".to_string());
         }
-        
+
         match self.packages.get_mut(name) {
             Some(package) => {
                 package.version = new_version;
@@ -227,7 +227,7 @@ impl SigmaPkg {
         if !self.running {
             return Err("SigmaPkg not running".to_string());
         }
-        
+
         match self.packages.get_mut(name) {
             Some(package) => {
                 package.state = PackageState::NotInstalled;
@@ -245,7 +245,8 @@ impl SigmaPkg {
 
     /// List installed packages
     pub fn list_installed(&self) -> Vec<&Package> {
-        self.packages.values()
+        self.packages
+            .values()
             .filter(|p| p.state == PackageState::Installed)
             .collect()
     }
@@ -258,8 +259,14 @@ impl SigmaPkg {
     /// Get package manager statistics
     pub fn pkg_stats(&self) -> BTreeMap<String, String> {
         let mut stats = BTreeMap::new();
-        stats.insert("total_packages".to_string(), self.package_count().to_string());
-        stats.insert("installed_packages".to_string(), self.list_installed().len().to_string());
+        stats.insert(
+            "total_packages".to_string(),
+            self.package_count().to_string(),
+        );
+        stats.insert(
+            "installed_packages".to_string(),
+            self.list_installed().len().to_string(),
+        );
         stats.insert("total_actions".to_string(), self.action_counter.to_string());
         stats.insert("running".to_string(), self.running.to_string());
         stats
@@ -317,7 +324,7 @@ mod tests {
         let package = Package::new(
             "vim".to_string(),
             "1.0.0".to_string(),
-            "Text editor".to_string()
+            "Text editor".to_string(),
         )
         .with_state(PackageState::Installed)
         .with_size(1024)
@@ -341,13 +348,13 @@ mod tests {
     #[test]
     fn test_sigmapkg_add_package() {
         let mut pkg = SigmaPkg::new();
-        
+
         let package = Package::new(
             "vim".to_string(),
             "1.0.0".to_string(),
-            "Text editor".to_string()
+            "Text editor".to_string(),
         );
-        
+
         assert!(pkg.add_package(package).is_ok());
         assert_eq!(pkg.package_count(), 1);
     }
@@ -356,16 +363,16 @@ mod tests {
     fn test_sigmapkg_install() {
         let mut pkg = SigmaPkg::new();
         pkg.start();
-        
+
         let package = Package::new(
             "vim".to_string(),
             "1.0.0".to_string(),
-            "Text editor".to_string()
+            "Text editor".to_string(),
         );
-        
+
         pkg.add_package(package).unwrap();
         assert!(pkg.install("vim").is_ok());
-        
+
         let package = pkg.get_package("vim").unwrap();
         assert_eq!(package.state, PackageState::Installed);
     }
@@ -374,17 +381,17 @@ mod tests {
     fn test_sigmapkg_remove() {
         let mut pkg = SigmaPkg::new();
         pkg.start();
-        
+
         let package = Package::new(
             "vim".to_string(),
             "1.0.0".to_string(),
-            "Text editor".to_string()
+            "Text editor".to_string(),
         )
         .with_state(PackageState::Installed);
-        
+
         pkg.add_package(package).unwrap();
         assert!(pkg.remove("vim").is_ok());
-        
+
         let package = pkg.get_package("vim").unwrap();
         assert_eq!(package.state, PackageState::NotInstalled);
     }
@@ -393,16 +400,16 @@ mod tests {
     fn test_sigmapkg_upgrade() {
         let mut pkg = SigmaPkg::new();
         pkg.start();
-        
+
         let package = Package::new(
             "vim".to_string(),
             "1.0.0".to_string(),
-            "Text editor".to_string()
+            "Text editor".to_string(),
         );
-        
+
         pkg.add_package(package).unwrap();
         assert!(pkg.upgrade("vim", "2.0.0".to_string()).is_ok());
-        
+
         let package = pkg.get_package("vim").unwrap();
         assert_eq!(package.version, "2.0.0");
     }
@@ -410,16 +417,16 @@ mod tests {
     #[test]
     fn test_sigmapkg_list_installed() {
         let mut pkg = SigmaPkg::new();
-        
+
         let package = Package::new(
             "vim".to_string(),
             "1.0.0".to_string(),
-            "Text editor".to_string()
+            "Text editor".to_string(),
         )
         .with_state(PackageState::Installed);
-        
+
         pkg.add_package(package).unwrap();
-        
+
         let installed = pkg.list_installed();
         assert_eq!(installed.len(), 1);
     }
@@ -427,16 +434,16 @@ mod tests {
     #[test]
     fn test_sigmapkg_stats() {
         let mut pkg = SigmaPkg::new();
-        
+
         let package = Package::new(
             "vim".to_string(),
             "1.0.0".to_string(),
-            "Text editor".to_string()
+            "Text editor".to_string(),
         )
         .with_state(PackageState::Installed);
-        
+
         pkg.add_package(package).unwrap();
-        
+
         let stats = pkg.pkg_stats();
         assert_eq!(stats.get("total_packages"), Some(&"1".to_string()));
         assert_eq!(stats.get("installed_packages"), Some(&"1".to_string()));
@@ -445,18 +452,18 @@ mod tests {
     #[test]
     fn test_install_package_convenience() {
         init_sigmapkg();
-        
+
         let mut pkg = get_sigmapkg().unwrap();
         pkg.start();
-        
+
         let package = Package::new(
             "vim".to_string(),
             "1.0.0".to_string(),
-            "Text editor".to_string()
+            "Text editor".to_string(),
         );
-        
+
         pkg.add_package(package).unwrap();
-        
+
         let result = install_package("vim");
         assert!(result.is_ok());
     }

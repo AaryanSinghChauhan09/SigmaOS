@@ -105,8 +105,12 @@ impl AnacondaKickstartBlivetEngineV2 {
                 "lang" if tokens.len() > 1 => self.profile.lang = tokens[1].to_string(),
                 "keyboard" if tokens.len() > 1 => self.profile.keyboard = tokens[1].to_string(),
                 "timezone" if tokens.len() > 1 => self.profile.timezone = tokens[1].to_string(),
-                "rootpw" if tokens.len() > 1 => self.profile.root_password_hash = tokens[1].to_string(),
-                "network" if tokens.len() > 1 => self.profile.network_device = tokens[1].to_string(),
+                "rootpw" if tokens.len() > 1 => {
+                    self.profile.root_password_hash = tokens[1].to_string()
+                }
+                "network" if tokens.len() > 1 => {
+                    self.profile.network_device = tokens[1].to_string()
+                }
                 "part" if tokens.len() > 1 => {
                     let mountpoint = tokens[1].to_string();
                     let mut spec = KickstartPartitionSpecV2 {
@@ -136,14 +140,21 @@ impl AnacondaKickstartBlivetEngineV2 {
                     }
                     self.profile.partitions.push(spec);
                 }
-                "packages" => self.execution_log.push("Entering %packages section".to_string()),
-                "end" => self.execution_log.push("Completed section block".to_string()),
+                "packages" => self
+                    .execution_log
+                    .push("Entering %packages section".to_string()),
+                "end" => self
+                    .execution_log
+                    .push("Completed section block".to_string()),
                 pkg if !pkg.starts_with('%') => self.profile.package_groups.push(pkg.to_string()),
                 _ => {}
             }
         }
-        self.execution_log.push(format!("Parsed Kickstart profile V2 with {} partitions and {} packages",
-            self.profile.partitions.len(), self.profile.package_groups.len()));
+        self.execution_log.push(format!(
+            "Parsed Kickstart profile V2 with {} partitions and {} packages",
+            self.profile.partitions.len(),
+            self.profile.package_groups.len()
+        ));
         Ok(())
     }
 
@@ -187,7 +198,10 @@ impl AnacondaKickstartBlivetEngineV2 {
         for pkg in &self.profile.package_groups {
             self.installed_packages.push(format!("installed:{}", pkg));
         }
-        self.execution_log.push(format!("Anaconda V2: Installed {} packages to target storage", self.installed_packages.len()));
+        self.execution_log.push(format!(
+            "Anaconda V2: Installed {} packages to target storage",
+            self.installed_packages.len()
+        ));
         Ok(self.installed_packages.len())
     }
 }
@@ -227,17 +241,72 @@ pub struct CalamaresModularWizardEngineV2 {
 impl CalamaresModularWizardEngineV2 {
     pub fn new(branding: &str) -> Self {
         let default_modules = vec![
-            CalamaresModuleV2 { name: "welcome".to_string(), is_job_module: false, state: CalamaresModuleStateV2::Pending, execution_weight: 1 },
-            CalamaresModuleV2 { name: "locale".to_string(), is_job_module: false, state: CalamaresModuleStateV2::Pending, execution_weight: 1 },
-            CalamaresModuleV2 { name: "keyboard".to_string(), is_job_module: false, state: CalamaresModuleStateV2::Pending, execution_weight: 1 },
-            CalamaresModuleV2 { name: "partition".to_string(), is_job_module: false, state: CalamaresModuleStateV2::Pending, execution_weight: 2 },
-            CalamaresModuleV2 { name: "users".to_string(), is_job_module: false, state: CalamaresModuleStateV2::Pending, execution_weight: 1 },
-            CalamaresModuleV2 { name: "summary".to_string(), is_job_module: false, state: CalamaresModuleStateV2::Pending, execution_weight: 1 },
-            CalamaresModuleV2 { name: "exec_partition_jobs".to_string(), is_job_module: true, state: CalamaresModuleStateV2::Pending, execution_weight: 10 },
-            CalamaresModuleV2 { name: "exec_unpack_fs".to_string(), is_job_module: true, state: CalamaresModuleStateV2::Pending, execution_weight: 50 },
-            CalamaresModuleV2 { name: "exec_initramfs_hook".to_string(), is_job_module: true, state: CalamaresModuleStateV2::Pending, execution_weight: 15 },
-            CalamaresModuleV2 { name: "exec_bootloader".to_string(), is_job_module: true, state: CalamaresModuleStateV2::Pending, execution_weight: 10 },
-            CalamaresModuleV2 { name: "finished".to_string(), is_job_module: false, state: CalamaresModuleStateV2::Pending, execution_weight: 1 },
+            CalamaresModuleV2 {
+                name: "welcome".to_string(),
+                is_job_module: false,
+                state: CalamaresModuleStateV2::Pending,
+                execution_weight: 1,
+            },
+            CalamaresModuleV2 {
+                name: "locale".to_string(),
+                is_job_module: false,
+                state: CalamaresModuleStateV2::Pending,
+                execution_weight: 1,
+            },
+            CalamaresModuleV2 {
+                name: "keyboard".to_string(),
+                is_job_module: false,
+                state: CalamaresModuleStateV2::Pending,
+                execution_weight: 1,
+            },
+            CalamaresModuleV2 {
+                name: "partition".to_string(),
+                is_job_module: false,
+                state: CalamaresModuleStateV2::Pending,
+                execution_weight: 2,
+            },
+            CalamaresModuleV2 {
+                name: "users".to_string(),
+                is_job_module: false,
+                state: CalamaresModuleStateV2::Pending,
+                execution_weight: 1,
+            },
+            CalamaresModuleV2 {
+                name: "summary".to_string(),
+                is_job_module: false,
+                state: CalamaresModuleStateV2::Pending,
+                execution_weight: 1,
+            },
+            CalamaresModuleV2 {
+                name: "exec_partition_jobs".to_string(),
+                is_job_module: true,
+                state: CalamaresModuleStateV2::Pending,
+                execution_weight: 10,
+            },
+            CalamaresModuleV2 {
+                name: "exec_unpack_fs".to_string(),
+                is_job_module: true,
+                state: CalamaresModuleStateV2::Pending,
+                execution_weight: 50,
+            },
+            CalamaresModuleV2 {
+                name: "exec_initramfs_hook".to_string(),
+                is_job_module: true,
+                state: CalamaresModuleStateV2::Pending,
+                execution_weight: 15,
+            },
+            CalamaresModuleV2 {
+                name: "exec_bootloader".to_string(),
+                is_job_module: true,
+                state: CalamaresModuleStateV2::Pending,
+                execution_weight: 10,
+            },
+            CalamaresModuleV2 {
+                name: "finished".to_string(),
+                is_job_module: false,
+                state: CalamaresModuleStateV2::Pending,
+                execution_weight: 1,
+            },
         ];
         Self {
             branding_title: branding.to_string(),
@@ -250,7 +319,8 @@ impl CalamaresModularWizardEngineV2 {
 
     /// Set value in Calamares GlobalStorage registry
     pub fn set_global_storage(&mut self, key: &str, value: &str) {
-        self.global_storage.insert(key.to_string(), value.to_string());
+        self.global_storage
+            .insert(key.to_string(), value.to_string());
     }
 
     /// Get value from Calamares GlobalStorage registry
@@ -265,7 +335,10 @@ impl CalamaresModularWizardEngineV2 {
         }
         self.modules[self.active_step_index].state = CalamaresModuleStateV2::Completed;
         let completed_name = self.modules[self.active_step_index].name.clone();
-        self.execution_logs.push(format!("Calamares V2 module '{}' completed", completed_name));
+        self.execution_logs.push(format!(
+            "Calamares V2 module '{}' completed",
+            completed_name
+        ));
 
         self.active_step_index += 1;
         if self.active_step_index < self.modules.len() {
@@ -285,7 +358,10 @@ impl CalamaresModularWizardEngineV2 {
                 jobs_run += 1;
             }
         }
-        self.execution_logs.push(format!("Calamares V2 executed {} job modules successfully", jobs_run));
+        self.execution_logs.push(format!(
+            "Calamares V2 executed {} job modules successfully",
+            jobs_run
+        ));
         jobs_run
     }
 }
@@ -371,7 +447,8 @@ impl DebianInstallerDebconfUdebEngineV2 {
                 count += 1;
             }
         }
-        self.logs.push(format!("Loaded {} debconf preseed items", count));
+        self.logs
+            .push(format!("Loaded {} debconf preseed items", count));
         count
     }
 
@@ -390,7 +467,10 @@ impl DebianInstallerDebconfUdebEngineV2 {
                 loaded += 1;
             }
         }
-        self.logs.push(format!("Anna V2: Resolved and loaded {} udeb components into /tmp", loaded));
+        self.logs.push(format!(
+            "Anna V2: Resolved and loaded {} udeb components into /tmp",
+            loaded
+        ));
         loaded
     }
 
@@ -399,7 +479,10 @@ impl DebianInstallerDebconfUdebEngineV2 {
         if self.debconf_db.is_empty() {
             return Err("d-i V2: Preseed database uninitialized".to_string());
         }
-        self.logs.push(format!("d-i V2: Target system bootstrapped at {}", self.chroot_target));
+        self.logs.push(format!(
+            "d-i V2: Target system bootstrapped at {}",
+            self.chroot_target
+        ));
         Ok(format!("Bootstrap successful at {}", self.chroot_target))
     }
 }
@@ -423,9 +506,9 @@ pub enum ArchinstallProfileTypeV2 {
 pub struct ArchinstallConfigProfileV2 {
     pub target_disk: String,
     pub profile_type: ArchinstallProfileTypeV2,
-    pub audio_server: String, // e.g. "pipewire" or "pulseaudio"
+    pub audio_server: String,    // e.g. "pipewire" or "pulseaudio"
     pub network_manager: String, // e.g. "NetworkManager" or "systemd-networkd"
-    pub kernel: String, // e.g. "linux" or "linux-zen"
+    pub kernel: String,          // e.g. "linux" or "linux-zen"
     pub subvolumes: Vec<String>,
 }
 
@@ -455,7 +538,10 @@ impl ArchinstallProfileGeneratorV2 {
 
     /// Generate Btrfs/ZFS subvolume layout for archinstall profile
     pub fn generate_disk_subvolumes(&mut self) -> Result<Vec<String>, String> {
-        let profile = self.active_profile.as_ref().ok_or("Archinstall V2: Profile not loaded")?;
+        let profile = self
+            .active_profile
+            .as_ref()
+            .ok_or("Archinstall V2: Profile not loaded")?;
         let default_subs = if profile.subvolumes.is_empty() {
             vec![
                 "@".to_string(),
@@ -470,9 +556,14 @@ impl ArchinstallProfileGeneratorV2 {
 
         for sub in &default_subs {
             let uuid = "12345678-abcd-ef00-9999-112233445566";
-            self.generated_fstab.push(format!("UUID={} / btrfs subvol={} 0 0", uuid, sub));
+            self.generated_fstab
+                .push(format!("UUID={} / btrfs subvol={} 0 0", uuid, sub));
         }
-        self.logs.push(format!("Generated {} Btrfs subvolumes for target {}", default_subs.len(), profile.target_disk));
+        self.logs.push(format!(
+            "Generated {} Btrfs subvolumes for target {}",
+            default_subs.len(),
+            profile.target_disk
+        ));
         Ok(default_subs)
     }
 
@@ -483,7 +574,10 @@ impl ArchinstallProfileGeneratorV2 {
             cmds.push("ln -sf /usr/share/zoneinfo/UTC /etc/localtime".to_string());
             cmds.push("hwclock --systohc".to_string());
             cmds.push("locale-gen".to_string());
-            cmds.push(format!("pacman -S --noconfirm {} {}", prof.kernel, prof.audio_server));
+            cmds.push(format!(
+                "pacman -S --noconfirm {} {}",
+                prof.kernel, prof.audio_server
+            ));
             cmds.push(format!("systemctl enable {}", prof.network_manager));
         }
         self.chroot_commands = cmds.clone();
@@ -525,10 +619,26 @@ pub struct BsdInstallerZfsJailEngineV2 {
 impl BsdInstallerZfsJailEngineV2 {
     pub fn new(pool_type: BsdZpoolTypeV2) -> Self {
         let default_datasets = vec![
-            BsdZfsDatasetV2 { name: "zroot/ROOT/default".to_string(), mountpoint: "/".to_string(), compression: "lz4".to_string() },
-            BsdZfsDatasetV2 { name: "zroot/usr/home".to_string(), mountpoint: "/usr/home".to_string(), compression: "lz4".to_string() },
-            BsdZfsDatasetV2 { name: "zroot/var/audit".to_string(), mountpoint: "/var/audit".to_string(), compression: "zstd".to_string() },
-            BsdZfsDatasetV2 { name: "zroot/tmp".to_string(), mountpoint: "/tmp".to_string(), compression: "off".to_string() },
+            BsdZfsDatasetV2 {
+                name: "zroot/ROOT/default".to_string(),
+                mountpoint: "/".to_string(),
+                compression: "lz4".to_string(),
+            },
+            BsdZfsDatasetV2 {
+                name: "zroot/usr/home".to_string(),
+                mountpoint: "/usr/home".to_string(),
+                compression: "lz4".to_string(),
+            },
+            BsdZfsDatasetV2 {
+                name: "zroot/var/audit".to_string(),
+                mountpoint: "/var/audit".to_string(),
+                compression: "zstd".to_string(),
+            },
+            BsdZfsDatasetV2 {
+                name: "zroot/tmp".to_string(),
+                mountpoint: "/tmp".to_string(),
+                compression: "off".to_string(),
+            },
         ];
         Self {
             pool_type,
@@ -541,13 +651,21 @@ impl BsdInstallerZfsJailEngineV2 {
 
     /// Provision standard FreeBSD rc.conf and loader.conf options
     pub fn configure_bsd_system_defaults(&mut self, hostname: &str) {
-        self.rc_conf_entries.insert("hostname".to_string(), format!("\"{}\"", hostname));
-        self.rc_conf_entries.insert("zfs_enable".to_string(), "\"YES\"".to_string());
-        self.rc_conf_entries.insert("syslogd_flags".to_string(), "\"-ss\"".to_string());
+        self.rc_conf_entries
+            .insert("hostname".to_string(), format!("\"{}\"", hostname));
+        self.rc_conf_entries
+            .insert("zfs_enable".to_string(), "\"YES\"".to_string());
+        self.rc_conf_entries
+            .insert("syslogd_flags".to_string(), "\"-ss\"".to_string());
 
-        self.loader_conf_entries.insert("zfs_load".to_string(), "\"YES\"".to_string());
-        self.loader_conf_entries.insert("autoboot_delay".to_string(), "\"2\"".to_string());
-        self.logs.push(format!("Configured FreeBSD rc.conf & loader.conf for {}", hostname));
+        self.loader_conf_entries
+            .insert("zfs_load".to_string(), "\"YES\"".to_string());
+        self.loader_conf_entries
+            .insert("autoboot_delay".to_string(), "\"2\"".to_string());
+        self.logs.push(format!(
+            "Configured FreeBSD rc.conf & loader.conf for {}",
+            hostname
+        ));
     }
 
     /// Generate FreeBSD bsdinstall command script
@@ -555,8 +673,10 @@ impl BsdInstallerZfsJailEngineV2 {
         let mut script = String::from("#!/bin/sh\n# bsdinstall non-interactive provisioning V2\n");
         script.push_str("zfsboot setup zroot\n");
         for ds in &self.datasets {
-            script.push_str(&format!("zfs create -o mountpoint={} -o compression={} {}\n",
-                ds.mountpoint, ds.compression, ds.name));
+            script.push_str(&format!(
+                "zfs create -o mountpoint={} -o compression={} {}\n",
+                ds.mountpoint, ds.compression, ds.name
+            ));
         }
         for (k, v) in &self.rc_conf_entries {
             script.push_str(&format!("sysrc {}={}\n", k, v));
@@ -605,12 +725,15 @@ impl DracutEventDrivenInitramfsEngineV2 {
 
     /// Include a dracut module into generator spec
     pub fn include_module(&mut self, name: &str, stage: &str, binaries: &[&str]) {
-        self.modules.insert(name.to_string(), DracutModuleSpecV2 {
-            name: name.to_string(),
-            stage: stage.to_string(),
-            required_binaries: binaries.iter().map(|s| s.to_string()).collect(),
-            is_hostonly: self.is_hostonly_mode,
-        });
+        self.modules.insert(
+            name.to_string(),
+            DracutModuleSpecV2 {
+                name: name.to_string(),
+                stage: stage.to_string(),
+                required_binaries: binaries.iter().map(|s| s.to_string()).collect(),
+                is_hostonly: self.is_hostonly_mode,
+            },
+        );
     }
 
     /// Generate initramfs image byte archive (cpio equivalent)
@@ -618,13 +741,20 @@ impl DracutEventDrivenInitramfsEngineV2 {
         if self.modules.is_empty() {
             return Err("dracut V2: No modules included in initramfs image".to_string());
         }
-        let header = format!("DRACUT-INITRAMFS-CPIO-v2-kernel:{}-modules:{}\n",
-            self.target_kernel_version, self.modules.len());
+        let header = format!(
+            "DRACUT-INITRAMFS-CPIO-v2-kernel:{}-modules:{}\n",
+            self.target_kernel_version,
+            self.modules.len()
+        );
         let mut data = header.into_bytes();
         for (name, spec) in &self.modules {
             data.extend_from_slice(format!("MOD:{}:STAGE:{}\n", name, spec.stage).as_bytes());
         }
-        self.logs.push(format!("dracut V2: Generated {} byte initramfs image for {}", data.len(), self.target_kernel_version));
+        self.logs.push(format!(
+            "dracut V2: Generated {} byte initramfs image for {}",
+            data.len(),
+            self.target_kernel_version
+        ));
         Ok(data)
     }
 }
@@ -652,13 +782,34 @@ pub struct MkinitcpioHookGeneratorEngineV2 {
 impl MkinitcpioHookGeneratorEngineV2 {
     pub fn new(preset: &str) -> Self {
         let default_hooks = vec![
-            MkinitcpioHookV2 { name: "base".to_string(), run_stage: "early".to_string() },
-            MkinitcpioHookV2 { name: "udev".to_string(), run_stage: "early".to_string() },
-            MkinitcpioHookV2 { name: "autodetect".to_string(), run_stage: "build".to_string() },
-            MkinitcpioHookV2 { name: "modconf".to_string(), run_stage: "build".to_string() },
-            MkinitcpioHookV2 { name: "block".to_string(), run_stage: "runtime".to_string() },
-            MkinitcpioHookV2 { name: "filesystems".to_string(), run_stage: "runtime".to_string() },
-            MkinitcpioHookV2 { name: "fsck".to_string(), run_stage: "late".to_string() },
+            MkinitcpioHookV2 {
+                name: "base".to_string(),
+                run_stage: "early".to_string(),
+            },
+            MkinitcpioHookV2 {
+                name: "udev".to_string(),
+                run_stage: "early".to_string(),
+            },
+            MkinitcpioHookV2 {
+                name: "autodetect".to_string(),
+                run_stage: "build".to_string(),
+            },
+            MkinitcpioHookV2 {
+                name: "modconf".to_string(),
+                run_stage: "build".to_string(),
+            },
+            MkinitcpioHookV2 {
+                name: "block".to_string(),
+                run_stage: "runtime".to_string(),
+            },
+            MkinitcpioHookV2 {
+                name: "filesystems".to_string(),
+                run_stage: "runtime".to_string(),
+            },
+            MkinitcpioHookV2 {
+                name: "fsck".to_string(),
+                run_stage: "late".to_string(),
+            },
         ];
         Self {
             preset_name: preset.to_string(),
@@ -670,13 +821,23 @@ impl MkinitcpioHookGeneratorEngineV2 {
 
     /// Build mkinitcpio runtime image
     pub fn build_mkinitcpio_image(&mut self) -> Result<Vec<u8>, String> {
-        let mut image_bytes = format!("MKINITCPIO-PRESET-V2:{}-HOOKS:{}-COMPRESS:{}\n",
-            self.preset_name, self.build_hooks.len(), self.compression_type).into_bytes();
+        let mut image_bytes = format!(
+            "MKINITCPIO-PRESET-V2:{}-HOOKS:{}-COMPRESS:{}\n",
+            self.preset_name,
+            self.build_hooks.len(),
+            self.compression_type
+        )
+        .into_bytes();
         for hook in &self.build_hooks {
-            image_bytes.extend_from_slice(format!("HOOK:{}:STAGE:{}\n", hook.name, hook.run_stage).as_bytes());
+            image_bytes.extend_from_slice(
+                format!("HOOK:{}:STAGE:{}\n", hook.name, hook.run_stage).as_bytes(),
+            );
         }
-        self.logs.push(format!("mkinitcpio V2: Image built successfully for preset '{}' ({} bytes)",
-            self.preset_name, image_bytes.len()));
+        self.logs.push(format!(
+            "mkinitcpio V2: Image built successfully for preset '{}' ({} bytes)",
+            self.preset_name,
+            image_bytes.len()
+        ));
         Ok(image_bytes)
     }
 }
@@ -701,7 +862,8 @@ impl UpdateInitramfsDebianEngineV2 {
 
     /// Add a conf.d configuration file overlay
     pub fn add_conf_overlay(&mut self, filename: &str, content: &str) {
-        self.conf_d_overlays.insert(filename.to_string(), content.to_string());
+        self.conf_d_overlays
+            .insert(filename.to_string(), content.to_string());
     }
 
     /// Trigger `update-initramfs -u -k all`
@@ -752,10 +914,16 @@ impl AnsibleAgentlessPlaybookEngineV2 {
 
     /// Gather host facts (Fact Gathering stage)
     pub fn gather_facts(&mut self, host: &str) {
-        self.gathered_facts.insert(format!("{}:ansible_os_family", host), "SigmaOS".to_string());
-        self.gathered_facts.insert(format!("{}:ansible_architecture", host), "x86_64".to_string());
-        self.gathered_facts.insert(format!("{}:ansible_memtotal_mb", host), "16384".to_string());
-        self.logs.push(format!("Ansible V2: Gathered facts for host {}", host));
+        self.gathered_facts
+            .insert(format!("{}:ansible_os_family", host), "SigmaOS".to_string());
+        self.gathered_facts.insert(
+            format!("{}:ansible_architecture", host),
+            "x86_64".to_string(),
+        );
+        self.gathered_facts
+            .insert(format!("{}:ansible_memtotal_mb", host), "16384".to_string());
+        self.logs
+            .push(format!("Ansible V2: Gathered facts for host {}", host));
     }
 
     /// Add a task to playbook task queue
@@ -777,12 +945,17 @@ impl AnsibleAgentlessPlaybookEngineV2 {
         let mut unchanged_count = 0;
         for task in &self.tasks {
             // Idempotency check logic
-            if task.module_name == "service" && task.args.get("state") == Some(&"started".to_string()) {
+            if task.module_name == "service"
+                && task.args.get("state") == Some(&"started".to_string())
+            {
                 changed_count += 1;
             } else {
                 unchanged_count += 1;
             }
-            self.logs.push(format!("Ansible V2: Executed task '{}' [{}]", task.name, task.module_name));
+            self.logs.push(format!(
+                "Ansible V2: Executed task '{}' [{}]",
+                task.name, task.module_name
+            ));
         }
         Ok((changed_count, unchanged_count))
     }
@@ -811,8 +984,12 @@ pub struct PuppetResourceAbstractionEngineV2 {
 impl PuppetResourceAbstractionEngineV2 {
     pub fn new() -> Self {
         let mut engine = Self::default();
-        engine.facter_facts.insert("kernel".to_string(), "SigmaOS".to_string());
-        engine.facter_facts.insert("osfamily".to_string(), "SigmaOS".to_string());
+        engine
+            .facter_facts
+            .insert("kernel".to_string(), "SigmaOS".to_string());
+        engine
+            .facter_facts
+            .insert("osfamily".to_string(), "SigmaOS".to_string());
         engine
     }
 
@@ -832,7 +1009,10 @@ impl PuppetResourceAbstractionEngineV2 {
     /// Compile Puppet catalog and apply state convergence
     pub fn compile_and_enforce_catalog(&mut self) -> Result<usize, String> {
         let count = self.catalog_resources.len();
-        self.logs.push(format!("Puppet RAL V2: Compiled catalog and enforced {} resources", count));
+        self.logs.push(format!(
+            "Puppet RAL V2: Compiled catalog and enforced {} resources",
+            count
+        ));
         Ok(count)
     }
 }
@@ -864,7 +1044,8 @@ impl ChefRecipeConvergenceEngineV2 {
 
     /// Set Chef node attribute
     pub fn set_node_attribute(&mut self, key: &str, val: &str) {
-        self.node_attributes.insert(key.to_string(), val.to_string());
+        self.node_attributes
+            .insert(key.to_string(), val.to_string());
     }
 
     /// Add resource to recipe DSL
@@ -879,7 +1060,10 @@ impl ChefRecipeConvergenceEngineV2 {
     /// Run Chef client convergence pass
     pub fn run_chef_client_convergence(&mut self) -> Result<usize, String> {
         let count = self.recipe_resources.len();
-        self.logs.push(format!("Chef Client V2: Converged {} resources with node attributes", count));
+        self.logs.push(format!(
+            "Chef Client V2: Converged {} resources with node attributes",
+            count
+        ));
         Ok(count)
     }
 }
@@ -929,11 +1113,22 @@ impl CloudInitMultiStageEngineV2 {
     pub fn execute_stage(&mut self, stage: CloudInitStageV2) -> Result<bool, String> {
         self.current_stage = Some(stage);
         match stage {
-            CloudInitStageV2::Local => self.logs.push("cloud-init V2 [local]: Identified NoCloud metadata source".to_string()),
-            CloudInitStageV2::Network => self.logs.push(format!("cloud-init V2 [network]: Configured hostname '{}'", self.cloud_config.hostname)),
-            CloudInitStageV2::Config => self.logs.push(format!("cloud-init V2 [config]: Provisioned {} SSH keys & {} users",
-                self.cloud_config.ssh_authorized_keys.len(), self.cloud_config.users.len())),
-            CloudInitStageV2::Final => self.logs.push(format!("cloud-init V2 [final]: Executed {} user-data runcmd scripts", self.cloud_config.run_commands.len())),
+            CloudInitStageV2::Local => self
+                .logs
+                .push("cloud-init V2 [local]: Identified NoCloud metadata source".to_string()),
+            CloudInitStageV2::Network => self.logs.push(format!(
+                "cloud-init V2 [network]: Configured hostname '{}'",
+                self.cloud_config.hostname
+            )),
+            CloudInitStageV2::Config => self.logs.push(format!(
+                "cloud-init V2 [config]: Provisioned {} SSH keys & {} users",
+                self.cloud_config.ssh_authorized_keys.len(),
+                self.cloud_config.users.len()
+            )),
+            CloudInitStageV2::Final => self.logs.push(format!(
+                "cloud-init V2 [final]: Executed {} user-data runcmd scripts",
+                self.cloud_config.run_commands.len()
+            )),
         }
         Ok(true)
     }
@@ -997,8 +1192,11 @@ impl CoreOsIgnitionInitramfsEngineV2 {
             return Err("Ignition V2: Provisioning run-once constraint violated".to_string());
         }
         self.executed_once = true;
-        let summary = format!("Ignition V2: Provisioned {} files and {} systemd units in early initramfs",
-            self.files.len(), self.systemd_units.len());
+        let summary = format!(
+            "Ignition V2: Provisioned {} files and {} systemd units in early initramfs",
+            self.files.len(),
+            self.systemd_units.len()
+        );
         self.logs.push(summary.clone());
         Ok(summary)
     }
@@ -1046,11 +1244,18 @@ impl SovereignInstallerAndSystemToolsMasterSuiteV2 {
     }
 
     /// Master system deployment pipeline execution
-    pub fn execute_master_installation_pipeline(&mut self, target_disk: &str, hostname: &str) -> Result<String, String> {
+    pub fn execute_master_installation_pipeline(
+        &mut self,
+        target_disk: &str,
+        hostname: &str,
+    ) -> Result<String, String> {
         // 1. Storage & Installer prep
-        self.anaconda_engine.resolve_blivet_storage_graph(target_disk);
-        self.calamares_engine.set_global_storage("target_disk", target_disk);
-        self.calamares_engine.set_global_storage("hostname", hostname);
+        self.anaconda_engine
+            .resolve_blivet_storage_graph(target_disk);
+        self.calamares_engine
+            .set_global_storage("target_disk", target_disk);
+        self.calamares_engine
+            .set_global_storage("hostname", hostname);
 
         // 2. Early Boot Initramfs generation
         self.dracut_engine.generate_initramfs_image().ok();
@@ -1063,10 +1268,15 @@ impl SovereignInstallerAndSystemToolsMasterSuiteV2 {
         self.chef_engine.run_chef_client_convergence().ok();
 
         // 4. Cloud First-Boot Provisioning
-        self.cloud_init_engine.execute_stage(CloudInitStageV2::Local).ok();
+        self.cloud_init_engine
+            .execute_stage(CloudInitStageV2::Local)
+            .ok();
         self.ignition_engine.execute_initramfs_provisioning().ok();
 
-        Ok(format!("Sovereign Installer Master Pipeline V2 completed successfully for {} on {}", hostname, target_disk))
+        Ok(format!(
+            "Sovereign Installer Master Pipeline V2 completed successfully for {} on {}",
+            hostname, target_disk
+        ))
     }
 }
 
@@ -1104,95 +1314,132 @@ impl SovereignInstallerSystemToolsPrGatewayV2 {
     }
 
     fn register_proposals(&mut self) {
-        self.proposals.push(SovereignInstallerSystemToolsPrProposalV2 {
+        self.proposals
+            .push(SovereignInstallerSystemToolsPrProposalV2 {
             pr_id: 801,
             title: "rAnaconda Kickstart V2 and Blivet Thin Storage Tree".to_string(),
             target_subsystem: "Installer/rAnaconda".to_string(),
-            description: "Implements Kickstart v2 parser, LUKS2 keyslots, and LVM thin volume provisioning".to_string(),
+            description:
+                "Implements Kickstart v2 parser, LUKS2 keyslots, and LVM thin volume provisioning"
+                    .to_string(),
             status: "Merged".to_string(),
         });
-        self.proposals.push(SovereignInstallerSystemToolsPrProposalV2 {
-            pr_id: 802,
-            title: "Calamares QML Step Queue with Reactive GlobalStorage".to_string(),
-            target_subsystem: "Installer/Calamares".to_string(),
-            description: "Provides reactive GlobalStorage registry and async post-install job queue".to_string(),
-            status: "Merged".to_string(),
-        });
-        self.proposals.push(SovereignInstallerSystemToolsPrProposalV2 {
-            pr_id: 803,
-            title: "Debian-Installer Debconf Priority Preseed & Anna Udeb Solver".to_string(),
-            target_subsystem: "Installer/debian-installer".to_string(),
-            description: "Resolves debconf preseed database items and Anna udeb component graphs".to_string(),
-            status: "Merged".to_string(),
-        });
-        self.proposals.push(SovereignInstallerSystemToolsPrProposalV2 {
-            pr_id: 804,
-            title: "Archinstall Guided Profiles & Btrfs Subvolume Layout Generator".to_string(),
-            target_subsystem: "Installer/archinstall".to_string(),
-            description: "Generates Btrfs/ZFS subvolumes and arch-chroot boot script automation".to_string(),
-            status: "Merged".to_string(),
-        });
-        self.proposals.push(SovereignInstallerSystemToolsPrProposalV2 {
+        self.proposals
+            .push(SovereignInstallerSystemToolsPrProposalV2 {
+                pr_id: 802,
+                title: "Calamares QML Step Queue with Reactive GlobalStorage".to_string(),
+                target_subsystem: "Installer/Calamares".to_string(),
+                description:
+                    "Provides reactive GlobalStorage registry and async post-install job queue"
+                        .to_string(),
+                status: "Merged".to_string(),
+            });
+        self.proposals
+            .push(SovereignInstallerSystemToolsPrProposalV2 {
+                pr_id: 803,
+                title: "Debian-Installer Debconf Priority Preseed & Anna Udeb Solver".to_string(),
+                target_subsystem: "Installer/debian-installer".to_string(),
+                description:
+                    "Resolves debconf preseed database items and Anna udeb component graphs"
+                        .to_string(),
+                status: "Merged".to_string(),
+            });
+        self.proposals
+            .push(SovereignInstallerSystemToolsPrProposalV2 {
+                pr_id: 804,
+                title: "Archinstall Guided Profiles & Btrfs Subvolume Layout Generator".to_string(),
+                target_subsystem: "Installer/archinstall".to_string(),
+                description:
+                    "Generates Btrfs/ZFS subvolumes and arch-chroot boot script automation"
+                        .to_string(),
+                status: "Merged".to_string(),
+            });
+        self.proposals
+            .push(SovereignInstallerSystemToolsPrProposalV2 {
             pr_id: 805,
             title: "FreeBSD bsdinstall ZFS zroot & Jail Staging Engine".to_string(),
             target_subsystem: "Installer/bsdinstall".to_string(),
-            description: "Configures FreeBSD zroot pool layouts, rc.conf, loader.conf, and BSD jail staging".to_string(),
+            description:
+                "Configures FreeBSD zroot pool layouts, rc.conf, loader.conf, and BSD jail staging"
+                    .to_string(),
             status: "Merged".to_string(),
         });
-        self.proposals.push(SovereignInstallerSystemToolsPrProposalV2 {
-            pr_id: 806,
-            title: "Dracut Event-Driven Hostonly Initramfs Module Tree Generator".to_string(),
-            target_subsystem: "Initramfs/dracut".to_string(),
-            description: "Generates event-driven cpio initramfs archives with systemd-initrd integration".to_string(),
-            status: "Merged".to_string(),
-        });
-        self.proposals.push(SovereignInstallerSystemToolsPrProposalV2 {
-            pr_id: 807,
-            title: "Arch mkinitcpio Zstd Image Compression & Runtime Hooks".to_string(),
-            target_subsystem: "Initramfs/mkinitcpio".to_string(),
-            description: "Executes early/runtime build hooks with Zstd initramfs compression".to_string(),
-            status: "Merged".to_string(),
-        });
-        self.proposals.push(SovereignInstallerSystemToolsPrProposalV2 {
-            pr_id: 808,
-            title: "Debian update-initramfs Conf Overlay & Bootloader Sync".to_string(),
-            target_subsystem: "Initramfs/update-initramfs".to_string(),
-            description: "Merges conf.d overlay trees and synchronizes GRUB/systemd-boot entries".to_string(),
-            status: "Merged".to_string(),
-        });
-        self.proposals.push(SovereignInstallerSystemToolsPrProposalV2 {
-            pr_id: 809,
-            title: "Ansible Agentless Playbook & Fact Gathering Engine".to_string(),
-            target_subsystem: "IaC/Ansible".to_string(),
-            description: "Parses agentless YAML playbooks and performs idempotent task execution".to_string(),
-            status: "Merged".to_string(),
-        });
-        self.proposals.push(SovereignInstallerSystemToolsPrProposalV2 {
-            pr_id: 810,
-            title: "Puppet Resource Abstraction Layer (RAL) & Catalog Compiler".to_string(),
-            target_subsystem: "IaC/Puppet".to_string(),
-            description: "Compiles Puppet catalog and enforces declarative RAL state convergence".to_string(),
-            status: "Merged".to_string(),
-        });
-        self.proposals.push(SovereignInstallerSystemToolsPrProposalV2 {
-            pr_id: 811,
-            title: "Chef Cookbook Recipe Convergence & Node Attributes Resolver".to_string(),
-            target_subsystem: "IaC/Chef".to_string(),
-            description: "Applies Chef recipe DSL resources with node attribute precedence rules".to_string(),
-            status: "Merged".to_string(),
-        });
-        self.proposals.push(SovereignInstallerSystemToolsPrProposalV2 {
-            pr_id: 812,
-            title: "Cloud-Init 4-Stage Boot Lifecycle & Cloud-Config YAML Engine".to_string(),
-            target_subsystem: "Cloud/cloud-init".to_string(),
-            description: "Executes Local, Network, Config, and Final boot lifecycle stages".to_string(),
-            status: "Merged".to_string(),
-        });
-        self.proposals.push(SovereignInstallerSystemToolsPrProposalV2 {
+        self.proposals
+            .push(SovereignInstallerSystemToolsPrProposalV2 {
+                pr_id: 806,
+                title: "Dracut Event-Driven Hostonly Initramfs Module Tree Generator".to_string(),
+                target_subsystem: "Initramfs/dracut".to_string(),
+                description:
+                    "Generates event-driven cpio initramfs archives with systemd-initrd integration"
+                        .to_string(),
+                status: "Merged".to_string(),
+            });
+        self.proposals
+            .push(SovereignInstallerSystemToolsPrProposalV2 {
+                pr_id: 807,
+                title: "Arch mkinitcpio Zstd Image Compression & Runtime Hooks".to_string(),
+                target_subsystem: "Initramfs/mkinitcpio".to_string(),
+                description: "Executes early/runtime build hooks with Zstd initramfs compression"
+                    .to_string(),
+                status: "Merged".to_string(),
+            });
+        self.proposals
+            .push(SovereignInstallerSystemToolsPrProposalV2 {
+                pr_id: 808,
+                title: "Debian update-initramfs Conf Overlay & Bootloader Sync".to_string(),
+                target_subsystem: "Initramfs/update-initramfs".to_string(),
+                description:
+                    "Merges conf.d overlay trees and synchronizes GRUB/systemd-boot entries"
+                        .to_string(),
+                status: "Merged".to_string(),
+            });
+        self.proposals
+            .push(SovereignInstallerSystemToolsPrProposalV2 {
+                pr_id: 809,
+                title: "Ansible Agentless Playbook & Fact Gathering Engine".to_string(),
+                target_subsystem: "IaC/Ansible".to_string(),
+                description:
+                    "Parses agentless YAML playbooks and performs idempotent task execution"
+                        .to_string(),
+                status: "Merged".to_string(),
+            });
+        self.proposals
+            .push(SovereignInstallerSystemToolsPrProposalV2 {
+                pr_id: 810,
+                title: "Puppet Resource Abstraction Layer (RAL) & Catalog Compiler".to_string(),
+                target_subsystem: "IaC/Puppet".to_string(),
+                description:
+                    "Compiles Puppet catalog and enforces declarative RAL state convergence"
+                        .to_string(),
+                status: "Merged".to_string(),
+            });
+        self.proposals
+            .push(SovereignInstallerSystemToolsPrProposalV2 {
+                pr_id: 811,
+                title: "Chef Cookbook Recipe Convergence & Node Attributes Resolver".to_string(),
+                target_subsystem: "IaC/Chef".to_string(),
+                description:
+                    "Applies Chef recipe DSL resources with node attribute precedence rules"
+                        .to_string(),
+                status: "Merged".to_string(),
+            });
+        self.proposals
+            .push(SovereignInstallerSystemToolsPrProposalV2 {
+                pr_id: 812,
+                title: "Cloud-Init 4-Stage Boot Lifecycle & Cloud-Config YAML Engine".to_string(),
+                target_subsystem: "Cloud/cloud-init".to_string(),
+                description: "Executes Local, Network, Config, and Final boot lifecycle stages"
+                    .to_string(),
+                status: "Merged".to_string(),
+            });
+        self.proposals
+            .push(SovereignInstallerSystemToolsPrProposalV2 {
             pr_id: 813,
             title: "CoreOS Ignition v3 JSON Spec Early Initramfs Provisioner".to_string(),
             target_subsystem: "Cloud/Ignition".to_string(),
-            description: "Provisions files and systemd units in early initramfs with run-once constraints".to_string(),
+            description:
+                "Provisions files and systemd units in early initramfs with run-once constraints"
+                    .to_string(),
             status: "Merged".to_string(),
         });
     }
@@ -1252,7 +1499,8 @@ mod tests {
     #[test]
     fn test_debian_installer_debconf_and_anna_v2() {
         let mut di = DebianInstallerDebconfUdebEngineV2::new();
-        let preseed = "d-i debian-installer/locale string en_US\nd-i netcfg/choose_interface select eth0\n";
+        let preseed =
+            "d-i debian-installer/locale string en_US\nd-i netcfg/choose_interface select eth0\n";
         assert_eq!(di.load_preseed_file(preseed), 2);
 
         let udeb_count = di.resolve_anna_udeb_components();
@@ -1306,7 +1554,11 @@ mod tests {
     fn test_ansible_puppet_chef_automation_v2() {
         let mut ansible = AnsibleAgentlessPlaybookEngineV2::new("site.yml");
         ansible.gather_facts("node1");
-        ansible.add_task("Install nginx", "apt", &[("name", "nginx"), ("state", "present")]);
+        ansible.add_task(
+            "Install nginx",
+            "apt",
+            &[("name", "nginx"), ("state", "present")],
+        );
         let (changed, unchanged) = ansible.execute_playbook().unwrap();
         assert_eq!(changed + unchanged, 1);
 
@@ -1342,7 +1594,9 @@ mod tests {
     #[test]
     fn test_sovereign_installer_master_suite_v2() {
         let mut master = SovereignInstallerAndSystemToolsMasterSuiteV2::new();
-        let status = master.execute_master_installation_pipeline("/dev/nvme0n1", "sigmaos-workstation").unwrap();
+        let status = master
+            .execute_master_installation_pipeline("/dev/nvme0n1", "sigmaos-workstation")
+            .unwrap();
         assert!(status.contains("completed successfully"));
 
         let gateway = SovereignInstallerSystemToolsPrGatewayV2::new();

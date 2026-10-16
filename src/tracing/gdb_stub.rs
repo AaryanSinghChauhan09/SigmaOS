@@ -101,10 +101,22 @@ impl GdbStub {
                 // Read general registers
                 let mut hex_regs = String::with_capacity(512);
                 for reg in &[
-                    self.registers.rax, self.registers.rbx, self.registers.rcx, self.registers.rdx,
-                    self.registers.rsi, self.registers.rdi, self.registers.rbp, self.registers.rsp,
-                    self.registers.r8, self.registers.r9, self.registers.r10, self.registers.r11,
-                    self.registers.r12, self.registers.r13, self.registers.r14, self.registers.r15,
+                    self.registers.rax,
+                    self.registers.rbx,
+                    self.registers.rcx,
+                    self.registers.rdx,
+                    self.registers.rsi,
+                    self.registers.rdi,
+                    self.registers.rbp,
+                    self.registers.rsp,
+                    self.registers.r8,
+                    self.registers.r9,
+                    self.registers.r10,
+                    self.registers.r11,
+                    self.registers.r12,
+                    self.registers.r13,
+                    self.registers.r14,
+                    self.registers.r15,
                     self.registers.rip,
                 ] {
                     for b in reg.to_le_bytes() {
@@ -137,10 +149,13 @@ impl GdbStub {
 
     /// Insert INT 3 (`0xCC`) breakpoint at target address.
     pub fn insert_sw_breakpoint(&mut self, addr: usize, original_byte: u8) {
-        self.breakpoints.insert(addr, SoftwareBreakpoint {
-            address: addr,
-            original_byte,
-        });
+        self.breakpoints.insert(
+            addr,
+            SoftwareBreakpoint {
+                address: addr,
+                original_byte,
+            },
+        );
     }
 
     /// Remove breakpoint and restore original byte.

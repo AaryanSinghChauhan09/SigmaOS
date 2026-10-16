@@ -117,7 +117,7 @@ impl SigmaNIC {
         if self.interfaces.contains_key(&interface.name) {
             return Err(format!("Interface '{}' already exists", interface.name));
         }
-        
+
         self.interfaces.insert(interface.name.clone(), interface);
         self.interface_counter += 1;
         Ok(())
@@ -136,7 +136,7 @@ impl SigmaNIC {
         if !self.running {
             return Err("SigmaNIC not running".to_string());
         }
-        
+
         match self.interfaces.get_mut(name) {
             Some(interface) => {
                 interface.state = InterfaceState::Up;
@@ -151,7 +151,7 @@ impl SigmaNIC {
         if !self.running {
             return Err("SigmaNIC not running".to_string());
         }
-        
+
         match self.interfaces.get_mut(name) {
             Some(interface) => {
                 interface.state = InterfaceState::Down;
@@ -166,7 +166,7 @@ impl SigmaNIC {
         if !self.running {
             return Err("SigmaNIC not running".to_string());
         }
-        
+
         match self.interfaces.get_mut(name) {
             Some(interface) => {
                 interface.mtu = mtu;
@@ -188,7 +188,8 @@ impl SigmaNIC {
 
     /// List interfaces by state
     pub fn list_by_state(&self, state: InterfaceState) -> Vec<&NetworkInterface> {
-        self.interfaces.values()
+        self.interfaces
+            .values()
             .filter(|i| i.state == state)
             .collect()
     }
@@ -201,9 +202,18 @@ impl SigmaNIC {
     /// Get interface manager statistics
     pub fn nic_stats(&self) -> BTreeMap<String, String> {
         let mut stats = BTreeMap::new();
-        stats.insert("total_interfaces".to_string(), self.interface_count().to_string());
-        stats.insert("up_interfaces".to_string(), self.list_by_state(InterfaceState::Up).len().to_string());
-        stats.insert("down_interfaces".to_string(), self.list_by_state(InterfaceState::Down).len().to_string());
+        stats.insert(
+            "total_interfaces".to_string(),
+            self.interface_count().to_string(),
+        );
+        stats.insert(
+            "up_interfaces".to_string(),
+            self.list_by_state(InterfaceState::Up).len().to_string(),
+        );
+        stats.insert(
+            "down_interfaces".to_string(),
+            self.list_by_state(InterfaceState::Down).len().to_string(),
+        );
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
@@ -255,7 +265,7 @@ mod tests {
             "eth0".to_string(),
             "00:11:22:33:44:55".to_string(),
             "192.168.1.100".to_string(),
-            "255.255.255.0".to_string()
+            "255.255.255.0".to_string(),
         )
         .with_state(InterfaceState::Up)
         .with_mtu(9000);
@@ -278,14 +288,14 @@ mod tests {
     #[test]
     fn test_sigmanic_add_interface() {
         let mut nic = SigmaNIC::new();
-        
+
         let interface = NetworkInterface::new(
             "eth0".to_string(),
             "00:11:22:33:44:55".to_string(),
             "192.168.1.100".to_string(),
-            "255.255.255.0".to_string()
+            "255.255.255.0".to_string(),
         );
-        
+
         assert!(nic.add_interface(interface).is_ok());
         assert_eq!(nic.interface_count(), 1);
     }
@@ -294,17 +304,17 @@ mod tests {
     fn test_sigmanic_bring_up() {
         let mut nic = SigmaNIC::new();
         nic.start();
-        
+
         let interface = NetworkInterface::new(
             "eth0".to_string(),
             "00:11:22:33:44:55".to_string(),
             "192.168.1.100".to_string(),
-            "255.255.255.0".to_string()
+            "255.255.255.0".to_string(),
         );
-        
+
         nic.add_interface(interface).unwrap();
         assert!(nic.bring_up("eth0").is_ok());
-        
+
         let iface = nic.get_interface("eth0").unwrap();
         assert_eq!(iface.state, InterfaceState::Up);
     }
@@ -313,18 +323,18 @@ mod tests {
     fn test_sigmanic_bring_down() {
         let mut nic = SigmaNIC::new();
         nic.start();
-        
+
         let interface = NetworkInterface::new(
             "eth0".to_string(),
             "00:11:22:33:44:55".to_string(),
             "192.168.1.100".to_string(),
-            "255.255.255.0".to_string()
+            "255.255.255.0".to_string(),
         )
         .with_state(InterfaceState::Up);
-        
+
         nic.add_interface(interface).unwrap();
         assert!(nic.bring_down("eth0").is_ok());
-        
+
         let iface = nic.get_interface("eth0").unwrap();
         assert_eq!(iface.state, InterfaceState::Down);
     }
@@ -333,17 +343,17 @@ mod tests {
     fn test_sigmanic_set_mtu() {
         let mut nic = SigmaNIC::new();
         nic.start();
-        
+
         let interface = NetworkInterface::new(
             "eth0".to_string(),
             "00:11:22:33:44:55".to_string(),
             "192.168.1.100".to_string(),
-            "255.255.255.0".to_string()
+            "255.255.255.0".to_string(),
         );
-        
+
         nic.add_interface(interface).unwrap();
         assert!(nic.set_mtu("eth0", 9000).is_ok());
-        
+
         let iface = nic.get_interface("eth0").unwrap();
         assert_eq!(iface.mtu, 9000);
     }
@@ -351,17 +361,17 @@ mod tests {
     #[test]
     fn test_sigmanic_list_by_state() {
         let mut nic = SigmaNIC::new();
-        
+
         let interface = NetworkInterface::new(
             "eth0".to_string(),
             "00:11:22:33:44:55".to_string(),
             "192.168.1.100".to_string(),
-            "255.255.255.0".to_string()
+            "255.255.255.0".to_string(),
         )
         .with_state(InterfaceState::Up);
-        
+
         nic.add_interface(interface).unwrap();
-        
+
         let interfaces = nic.list_by_state(InterfaceState::Up);
         assert_eq!(interfaces.len(), 1);
     }
@@ -369,17 +379,17 @@ mod tests {
     #[test]
     fn test_sigmanic_stats() {
         let mut nic = SigmaNIC::new();
-        
+
         let interface = NetworkInterface::new(
             "eth0".to_string(),
             "00:11:22:33:44:55".to_string(),
             "192.168.1.100".to_string(),
-            "255.255.255.0".to_string()
+            "255.255.255.0".to_string(),
         )
         .with_state(InterfaceState::Up);
-        
+
         nic.add_interface(interface).unwrap();
-        
+
         let stats = nic.nic_stats();
         assert_eq!(stats.get("total_interfaces"), Some(&"1".to_string()));
         assert_eq!(stats.get("up_interfaces"), Some(&"1".to_string()));
@@ -388,19 +398,19 @@ mod tests {
     #[test]
     fn test_bring_up_interface_convenience() {
         init_sigmanic();
-        
+
         let mut nic = get_sigmanic().unwrap();
         nic.start();
-        
+
         let interface = NetworkInterface::new(
             "eth0".to_string(),
             "00:11:22:33:44:55".to_string(),
             "192.168.1.100".to_string(),
-            "255.255.255.0".to_string()
+            "255.255.255.0".to_string(),
         );
-        
+
         nic.add_interface(interface).unwrap();
-        
+
         let result = bring_up_interface("eth0");
         assert!(result.is_ok());
     }

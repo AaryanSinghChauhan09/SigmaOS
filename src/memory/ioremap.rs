@@ -47,7 +47,8 @@ impl IoremapAllocator {
     pub fn map_mmio(&mut self, phys_addr: u64, size: usize, flags: PageFlags) -> u64 {
         // Check if already mapped
         for reg in &self.regions {
-            if reg.phys_addr == phys_addr && reg.size >= size && reg.flags == flags && reg.is_mapped {
+            if reg.phys_addr == phys_addr && reg.size >= size && reg.flags == flags && reg.is_mapped
+            {
                 return reg.virt_addr;
             }
         }
@@ -92,7 +93,10 @@ impl IoremapAllocator {
     /// Look up physical address for a mapped virtual address
     pub fn virt_to_phys(&self, virt_addr: u64) -> Option<u64> {
         for reg in &self.regions {
-            if reg.is_mapped && virt_addr >= reg.virt_addr && virt_addr < reg.virt_addr + reg.size as u64 {
+            if reg.is_mapped
+                && virt_addr >= reg.virt_addr
+                && virt_addr < reg.virt_addr + reg.size as u64
+            {
                 let offset = virt_addr - reg.virt_addr;
                 return Some(reg.phys_addr + offset);
             }
@@ -112,7 +116,10 @@ mod tests {
         let virt = allocator.ioremap_nocache(bar0_phys, 0x4000);
 
         assert_eq!(virt, 0xFFFF_8000_0000_0000);
-        assert_eq!(allocator.virt_to_phys(virt + 0x100), Some(bar0_phys + 0x100));
+        assert_eq!(
+            allocator.virt_to_phys(virt + 0x100),
+            Some(bar0_phys + 0x100)
+        );
 
         assert!(allocator.iounmap(virt));
         assert_eq!(allocator.virt_to_phys(virt), None);

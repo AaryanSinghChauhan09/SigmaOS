@@ -176,7 +176,10 @@ impl JailManager {
 
     /// jail_remove(jid) — remove a jail and kill all processes inside
     pub fn remove(&mut self, jid: JailId) -> Result<(), JailError> {
-        let pos = self.jails.iter().position(|j| j.jid == jid)
+        let pos = self
+            .jails
+            .iter()
+            .position(|j| j.jid == jid)
             .ok_or(JailError::NotFound(jid))?;
         let jail = &mut self.jails[pos];
         jail.dying = true;
@@ -200,7 +203,11 @@ impl JailManager {
     }
 
     /// Create a child jail (hierarchical jails, FreeBSD 8+)
-    pub fn create_child(&mut self, parent_jid: JailId, config: JailConfig) -> Result<JailId, JailError> {
+    pub fn create_child(
+        &mut self,
+        parent_jid: JailId,
+        config: JailConfig,
+    ) -> Result<JailId, JailError> {
         let _parent = self.find_jail(parent_jid)?;
         let child_jid = self.create(config)?;
         // Link parent → child
@@ -214,12 +221,16 @@ impl JailManager {
     }
 
     fn find_jail_ref(&self, jid: JailId) -> Result<&Jail, JailError> {
-        self.jails.iter().find(|j| j.jid == jid)
+        self.jails
+            .iter()
+            .find(|j| j.jid == jid)
             .ok_or(JailError::NotFound(jid))
     }
 
     fn find_jail(&mut self, jid: JailId) -> Result<&mut Jail, JailError> {
-        self.jails.iter_mut().find(|j| j.jid == jid)
+        self.jails
+            .iter_mut()
+            .find(|j| j.jid == jid)
             .ok_or(JailError::NotFound(jid))
     }
 
@@ -250,7 +261,12 @@ impl JailManager {
         Ok(())
     }
 
-    fn set_uts_names(&self, jid: JailId, hostname: &str, domainname: &str) -> Result<(), JailError> {
+    fn set_uts_names(
+        &self,
+        jid: JailId,
+        hostname: &str,
+        domainname: &str,
+    ) -> Result<(), JailError> {
         let _ = (jid, hostname, domainname);
         // sethostname() + setdomainname() within the jail's UTS namespace
         Ok(())

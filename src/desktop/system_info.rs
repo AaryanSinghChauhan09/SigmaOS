@@ -254,9 +254,7 @@ pub fn init_system_info() {
 
 /// Get system info
 pub fn get_system_info() -> &'static mut SystemInfo {
-    unsafe {
-        SYSTEM_INFO.as_mut().expect("System info not initialized")
-    }
+    unsafe { SYSTEM_INFO.as_mut().expect("System info not initialized") }
 }
 
 #[cfg(test)]

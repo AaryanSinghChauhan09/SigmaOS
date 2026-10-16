@@ -31,7 +31,8 @@ impl SigmaShell {
                 self.executor.captured_stderr.clear();
                 match self.executor.execute_ast(&ast) {
                     Ok(_) => {
-                        let stdout = String::from_utf8_lossy(&self.executor.captured_stdout).to_string();
+                        let stdout =
+                            String::from_utf8_lossy(&self.executor.captured_stdout).to_string();
                         if stdout.is_empty() {
                             // Legacy fallback formatting for echo/pwd/ls if stdout was empty
                             let mut parts = trimmed.split_whitespace();

@@ -968,7 +968,10 @@ mod tests {
     #[test]
     fn test_validate_url() {
         assert_eq!(validate_url(b"http://example.com"), Ok(()));
-        assert_eq!(validate_url(b"https://example.com/path?query=1#frag"), Ok(()));
+        assert_eq!(
+            validate_url(b"https://example.com/path?query=1#frag"),
+            Ok(())
+        );
         assert_eq!(validate_url(b"http://127.0.0.1:8080/api/v1"), Ok(()));
 
         // Empty and length checks
@@ -977,13 +980,25 @@ mod tests {
         assert_eq!(validate_url(&long_url), Err(ValidationError::TooLong));
 
         // Missing or invalid scheme
-        assert_eq!(validate_url(b"ftp://example.com"), Err(ValidationError::InvalidChars));
-        assert_eq!(validate_url(b"example.com"), Err(ValidationError::InvalidChars));
-        assert_eq!(validate_url(b"http:/example.com"), Err(ValidationError::InvalidChars));
+        assert_eq!(
+            validate_url(b"ftp://example.com"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_url(b"example.com"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_url(b"http:/example.com"),
+            Err(ValidationError::InvalidChars)
+        );
 
         // Empty authority
         assert_eq!(validate_url(b"http://"), Err(ValidationError::InvalidChars));
-        assert_eq!(validate_url(b"https://"), Err(ValidationError::InvalidChars));
+        assert_eq!(
+            validate_url(b"https://"),
+            Err(ValidationError::InvalidChars)
+        );
 
         // Userinfo credentials rejection (mitigating SSRF / credential disclosure CWE-918)
         assert_eq!(

@@ -236,19 +236,34 @@ impl AudioEditor {
     }
 
     /// Apply effect parameter
-    pub fn set_effect_parameter(&mut self, effect_id: u32, param: String, value: f32) -> Result<(), &'static str> {
-        let effect = self.effects.iter_mut().find(|e| e.id == effect_id).ok_or("Effect not found")?;
+    pub fn set_effect_parameter(
+        &mut self,
+        effect_id: u32,
+        param: String,
+        value: f32,
+    ) -> Result<(), &'static str> {
+        let effect = self
+            .effects
+            .iter_mut()
+            .find(|e| e.id == effect_id)
+            .ok_or("Effect not found")?;
         effect.parameters.insert(param, value);
         Ok(())
     }
 
     /// Add automation point
-    pub fn add_automation_point(&mut self, lane_index: usize, point: AutomationPoint) -> Result<(), &'static str> {
+    pub fn add_automation_point(
+        &mut self,
+        lane_index: usize,
+        point: AutomationPoint,
+    ) -> Result<(), &'static str> {
         if lane_index >= self.automation_lanes.len() {
             return Err("Automation lane not found");
         }
         self.automation_lanes[lane_index].points.push(point);
-        self.automation_lanes[lane_index].points.sort_by(|a, b| a.time.partial_cmp(&b.time).unwrap());
+        self.automation_lanes[lane_index]
+            .points
+            .sort_by(|a, b| a.time.partial_cmp(&b.time).unwrap());
         Ok(())
     }
 
@@ -287,9 +302,7 @@ pub fn init_audiocraft() {
 
 /// Get audio editor
 pub fn get_audiocraft() -> &'static mut AudioEditor {
-    unsafe {
-        AUDIO_EDITOR.as_mut().expect("AudioCraft not initialized")
-    }
+    unsafe { AUDIO_EDITOR.as_mut().expect("AudioCraft not initialized") }
 }
 
 #[cfg(test)]

@@ -34,19 +34,19 @@ impl WaypaperInstance {
             active: AtomicBool::new(false),
         }
     }
-    
+
     /// Initialize Waypaper
     pub fn init(&mut self) {
         self.active.store(true, Ordering::Relaxed);
         self.load_wallpapers();
     }
-    
+
     /// Load wallpapers
     pub fn load_wallpapers(&mut self) {
         // In real implementation, would scan wallpaper directories
         // ~/.local/share/wallpapers/
         // /usr/share/wallpapers/
-        
+
         // Add some sample wallpapers
         self.wallpapers.push(Wallpaper {
             path: "/usr/share/wallpapers/default.jpg".to_string(),
@@ -54,7 +54,7 @@ impl WaypaperInstance {
             favorite: true,
         });
     }
-    
+
     /// Add wallpaper
     pub fn add_wallpaper(&mut self, path: String, name: String) {
         let wallpaper = Wallpaper {
@@ -64,34 +64,32 @@ impl WaypaperInstance {
         };
         self.wallpapers.push(wallpaper);
     }
-    
+
     /// Set wallpaper
     pub fn set_wallpaper(&mut self, path: String) -> Result<(), &'static str> {
         // In real implementation, would use swww or hyprpaper:
         // swww img {path}
         // hyprctl hyprpaper wallpaper {path}
-        
+
         self.current_wallpaper = Some(path);
         Ok(())
     }
-    
+
     /// Get current wallpaper
     pub fn get_current_wallpaper(&self) -> Option<&String> {
         self.current_wallpaper.as_ref()
     }
-    
+
     /// Get all wallpapers
     pub fn get_wallpapers(&self) -> &Vec<Wallpaper> {
         &self.wallpapers
     }
-    
+
     /// Get favorite wallpapers
     pub fn get_favorites(&self) -> Vec<&Wallpaper> {
-        self.wallpapers.iter()
-            .filter(|w| w.favorite)
-            .collect()
+        self.wallpapers.iter().filter(|w| w.favorite).collect()
     }
-    
+
     /// Set favorite
     pub fn set_favorite(&mut self, path: String, favorite: bool) -> Result<(), &'static str> {
         for wallpaper in &mut self.wallpapers {
@@ -102,7 +100,7 @@ impl WaypaperInstance {
         }
         Err("Wallpaper not found")
     }
-    
+
     /// Is active
     pub fn is_active(&self) -> bool {
         self.active.load(Ordering::Relaxed)
@@ -127,9 +125,7 @@ pub fn init_waypaper() {
 
 /// Get global Waypaper instance
 pub fn get_waypaper() -> Option<&'static mut WaypaperInstance> {
-    unsafe {
-        WAYPAPER_INSTANCE.as_mut()
-    }
+    unsafe { WAYPAPER_INSTANCE.as_mut() }
 }
 
 /// Set wallpaper (convenience function)
@@ -144,7 +140,7 @@ pub fn set_wallpaper(path: String) -> Result<(), &'static str> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_waypaper_init() {
         let mut waypaper = WaypaperInstance::new();
@@ -152,26 +148,30 @@ mod tests {
         assert!(waypaper.is_active());
         assert!(waypaper.wallpapers.len() > 0);
     }
-    
+
     #[test]
     fn test_add_wallpaper() {
         let mut waypaper = WaypaperInstance::new();
         waypaper.add_wallpaper("/path/to/wallpaper.jpg".to_string(), "Test".to_string());
         assert_eq!(waypaper.wallpapers.len(), 1);
     }
-    
+
     #[test]
     fn test_set_wallpaper() {
         let mut waypaper = WaypaperInstance::new();
-        waypaper.set_wallpaper("/path/to/wallpaper.jpg".to_string()).unwrap();
+        waypaper
+            .set_wallpaper("/path/to/wallpaper.jpg".to_string())
+            .unwrap();
         assert!(waypaper.get_current_wallpaper().is_some());
     }
-    
+
     #[test]
     fn test_set_favorite() {
         let mut waypaper = WaypaperInstance::new();
         waypaper.add_wallpaper("/path/to/wallpaper.jpg".to_string(), "Test".to_string());
-        waypaper.set_favorite("/path/to/wallpaper.jpg".to_string(), true).unwrap();
+        waypaper
+            .set_favorite("/path/to/wallpaper.jpg".to_string(), true)
+            .unwrap();
         assert!(waypaper.get_favorites().len() > 0);
     }
 }
