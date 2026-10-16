@@ -492,6 +492,8 @@ pub mod arch_linux_parity_pr_suite;
 pub mod arch_linux_pinnacle_gap_closure;
 pub mod bsd_linux_innovations;
 pub mod bsd_parity;
+pub mod dragonflybsd_missing_components_parity_pr;
+pub use dragonflybsd_missing_components_parity_pr::*;
 pub mod openbsd_missing_components_parity_pr;
 pub use openbsd_missing_components_parity_pr::*;
 pub mod openbsd_missing_components_v55_pr;
