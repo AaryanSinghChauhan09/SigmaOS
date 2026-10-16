@@ -630,7 +630,6 @@ pub mod audio_recorder;
 pub mod task_manager;
 pub mod archive_manager;
 pub mod pdf_viewer;
-pub mod font_manager;
 pub mod bluetooth_manager;
 pub mod printer_manager;
 pub mod themes_manager;

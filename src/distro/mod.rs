@@ -644,6 +644,9 @@ pub use omarchy_linux_missing_components_v52_pr::*;
 pub mod omarchy_linux_missing_components_v57_pr;
 pub use omarchy_linux_missing_components_v57_pr::*;
 
+pub mod omarchy_linux_missing_components_v58_pr;
+pub use omarchy_linux_missing_components_v58_pr::*;
+
 pub mod arch_linux_missing_components_v53_pr;
 pub use arch_linux_missing_components_v53_pr::*;
 
@@ -659,6 +662,3 @@ pub use omarchy_linux_apex_engine::*;
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;
 pub use crate::stubs::large_distro_stubs::*;
-
-pub mod sovereign_openbsd_ultimate_parity_pr_suite;
-pub use sovereign_openbsd_ultimate_parity_pr_suite::*;
