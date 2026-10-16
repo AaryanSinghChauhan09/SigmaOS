@@ -242,7 +242,10 @@ impl E1000eDriver {
         unsafe {
             self.write_reg(REG_RDBAL, (rx_ring_phys & 0xFFFFFFFF) as u32);
             self.write_reg(REG_RDBAH, (rx_ring_phys >> 32) as u32);
-            self.write_reg(REG_RDLEN, (NUM_RX_DESCRIPTORS * core::mem::size_of::<RxDescriptor>()) as u32);
+            self.write_reg(
+                REG_RDLEN,
+                (NUM_RX_DESCRIPTORS * core::mem::size_of::<RxDescriptor>()) as u32,
+            );
             self.write_reg(REG_RDH, 0);
             self.write_reg(REG_RDT, (NUM_RX_DESCRIPTORS - 1) as u32);
 
@@ -278,7 +281,10 @@ impl E1000eDriver {
         unsafe {
             self.write_reg(REG_TDBAL, (tx_ring_phys & 0xFFFFFFFF) as u32);
             self.write_reg(REG_TDBAH, (tx_ring_phys >> 32) as u32);
-            self.write_reg(REG_TDLEN, (NUM_TX_DESCRIPTORS * core::mem::size_of::<TxDescriptor>()) as u32);
+            self.write_reg(
+                REG_TDLEN,
+                (NUM_TX_DESCRIPTORS * core::mem::size_of::<TxDescriptor>()) as u32,
+            );
             self.write_reg(REG_TDH, 0);
             self.write_reg(REG_TDT, 0);
 

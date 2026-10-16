@@ -429,7 +429,9 @@ impl IdentityAndEnterpriseAuthPrEngine {
     pub fn generate_sssd_domain_conf(domain: &str, provider: &str, uri: &str) -> String {
         alloc::format!(
             "[domain/{}]\nid_provider = {}\nldap_uri = {}\ncache_credentials = true\n",
-            domain, provider, uri
+            domain,
+            provider,
+            uri
         )
     }
 

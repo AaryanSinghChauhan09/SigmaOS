@@ -293,7 +293,9 @@ impl NixGuixFlakeCasMerkleClosureEngine {
     pub fn new() -> Self {
         Self {
             store_generations_count: 92,
-            merkle_root_blake3: "blake3:a3f12c48d901b234fe01a89c92015e1234567890abcdef1234567890abcdef12".to_string(),
+            merkle_root_blake3:
+                "blake3:a3f12c48d901b234fe01a89c92015e1234567890abcdef1234567890abcdef12"
+                    .to_string(),
             closure_depth: 48,
         }
     }
