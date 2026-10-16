@@ -5309,7 +5309,10 @@ impl SovereignLlamaCppGgufEngine {
         }
     }
 
-    pub fn parse_gguf_file(&mut self, header_bytes: &[u8]) -> Result<GgufModelHeader, &'static str> {
+    pub fn parse_gguf_file(
+        &mut self,
+        header_bytes: &[u8],
+    ) -> Result<GgufModelHeader, &'static str> {
         if header_bytes.len() < 16 {
             return Err("LlamaCppGguf: Header buffer too small");
         }
@@ -5465,8 +5468,14 @@ impl SovereignGlancesMonitoringEngine {
         if self.export_format == "PROMETHEUS" {
             let mut out = String::new();
             for (node, telemetry) in &self.node_telemetry {
-                out.push_str(&format!("node_cpu_utilization{{node=\"{}\"}} {}\n", node, telemetry.cpu_pct));
-                out.push_str(&format!("node_memory_utilization{{node=\"{}\"}} {}\n", node, telemetry.memory_pct));
+                out.push_str(&format!(
+                    "node_cpu_utilization{{node=\"{}\"}} {}\n",
+                    node, telemetry.cpu_pct
+                ));
+                out.push_str(&format!(
+                    "node_memory_utilization{{node=\"{}\"}} {}\n",
+                    node, telemetry.memory_pct
+                ));
             }
             out
         } else {
@@ -5956,18 +5965,28 @@ impl SovereignOpenSourceObsoletionOrchestrator {
         self.lazygit_ui.track_file_status("src/lib.rs", "M", false);
         self.lazygit_ui.stage_all_files();
 
-        let tunnel_url = self.mux_p2p_tunnel.establish_p2p_tunnel("dev-tunnel", 8080)?;
+        let tunnel_url = self
+            .mux_p2p_tunnel
+            .establish_p2p_tunnel("dev-tunnel", 8080)?;
         let _ = self.mux_p2p_tunnel.proxy_payload("dev-tunnel", 2048)?;
         assert!(tunnel_url.contains("dev-tunnel"));
 
-        let _gguf_header = self.llama_cpp_gguf.parse_gguf_file(b"GGUF_version_3_header_bytes")?;
-        let _ = self.llama_cpp_gguf.evaluate_inference_prompt("Execute quantum kernel tasks");
+        let _gguf_header = self
+            .llama_cpp_gguf
+            .parse_gguf_file(b"GGUF_version_3_header_bytes")?;
+        let _ = self
+            .llama_cpp_gguf
+            .evaluate_inference_prompt("Execute quantum kernel tasks");
 
-        let resolved_ver = self.uv_fast_installer.resolve_lockfile("pydantic", ">=2.0.0");
+        let resolved_ver = self
+            .uv_fast_installer
+            .resolve_lockfile("pydantic", ">=2.0.0");
         assert_eq!(resolved_ver, "2.0.0");
-        self.uv_fast_installer.hardlink_from_cache("pydantic", "2.0.0");
+        self.uv_fast_installer
+            .hardlink_from_cache("pydantic", "2.0.0");
 
-        self.glances_monitor.update_node_metrics("node-01", 25.0, 45.0, 0.0);
+        self.glances_monitor
+            .update_node_metrics("node-01", 25.0, 45.0, 0.0);
         let _telemetry_json = self.glances_monitor.export_telemetry_stream();
 
         Ok(format!(
@@ -10093,7 +10112,9 @@ mod tests {
     #[test]
     fn test_sovereign_mux_p2p_tunnel() {
         let mut tunnel_engine = SovereignMuxP2pTunnelEngine::new();
-        let url = tunnel_engine.establish_p2p_tunnel("app-tunnel", 3000).unwrap();
+        let url = tunnel_engine
+            .establish_p2p_tunnel("app-tunnel", 3000)
+            .unwrap();
         assert_eq!(url, "https://app-tunnel.sovereign.tunnel");
 
         let bytes = tunnel_engine.proxy_payload("app-tunnel", 512).unwrap();
@@ -10136,7 +10157,14 @@ mod tests {
         glances.update_node_metrics("node-alpha", 45.0, 60.0, 5.0);
         glances.update_node_metrics("node-beta", 92.0, 70.0, 10.0);
 
-        assert_eq!(glances.node_telemetry.get("node-beta").unwrap().active_alerts_count, 1);
+        assert_eq!(
+            glances
+                .node_telemetry
+                .get("node-beta")
+                .unwrap()
+                .active_alerts_count,
+            1
+        );
 
         glances.export_format = "PROMETHEUS".to_string();
         let prom = glances.export_telemetry_stream();
