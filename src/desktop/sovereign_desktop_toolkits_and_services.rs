@@ -294,10 +294,10 @@ pub struct DMSeatConfig {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct XdmcpSessionHandshake {
-    pub session_id: u32,
-    pub remote_address: String,
+    pub session_id: usize,
+    pub client_address: String,
     pub display_number: u32,
-    pub authenticated: bool,
+    pub status: String,
 }
 
 pub struct XdmcpSessionManager {
@@ -402,6 +402,18 @@ impl SovereignDisplayManagerSuiteEngine {
                 ),
             }
         }
+    }
+
+    pub fn initiate_xdmcp_remote_handshake(&mut self, client_address: &str, display_number: u32) -> usize {
+        let id = NEXT_DESKTOP_SERVICE_ID.fetch_add(1, Ordering::SeqCst);
+        self.xdmcp_sessions.push(XdmcpSessionHandshake {
+            session_id: id,
+            client_address: client_address.to_string(),
+            display_number,
+            status: "Active".to_string(),
+        });
+        self.xdmcp_manager.initiate_handshake(&format!(":{}", display_number), client_address);
+        id
     }
 
     pub fn create_seat(&mut self, seat_id: &str, vt_number: u32) {
@@ -699,6 +711,15 @@ impl SovereignPolicyKitAuthorizationEngine {
 
     pub fn add_js_rule(&mut self, action_prefix: &str, result: PolkitResult) {
         self.js_rules.push((action_prefix.to_string(), result));
+    }
+
+    pub fn eval_js_policy_rules(&self, action_id: &str) -> Option<PolkitResult> {
+        for (prefix, result) in &self.js_rules {
+            if action_id.starts_with(prefix) {
+                return Some(*result);
+            }
+        }
+        None
     }
 
     pub fn revoke_cached_authorizations(&mut self, user: &str) -> usize {
@@ -1683,9 +1704,7 @@ mod tests {
         let qss = engine.generate_qt_qss();
         assert!(qss.contains("selection-background-color: #129eaf;"));
 
-        assert!(engine.parse_and_apply_kvantum_config(
-            "theme=Catppuccin-Mocha\nblur_radius=20\ntranslucent_windows=true"
-        ));
+        assert!(engine.parse_and_apply_kvantum_config("theme=Catppuccin-Mocha\nblur=true\ntranslucent=true"));
         assert_eq!(engine.qt_style, QtPlatformStyle::Kvantum);
         assert_eq!(engine.kvantum_spec.theme_name, "Catppuccin-Mocha");
 
