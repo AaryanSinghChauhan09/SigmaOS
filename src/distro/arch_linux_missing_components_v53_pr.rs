@@ -106,7 +106,9 @@ impl ArchPacmanDeltaSyncPrEngine {
     pub fn generate_pr(&self) -> ArchLinuxV53PrSpec {
         ArchLinuxV53PrSpec {
             pr_id: 5301,
-            title: String::from("[Arch Gap Closure] ALPM Delta Updates & xdelta3 Patch Reconstructor Engine"),
+            title: String::from(
+                "[Arch Gap Closure] ALPM Delta Updates & xdelta3 Patch Reconstructor Engine",
+            ),
             branch: String::from("pr/arch-alpm-delta-sync"),
             target_component: String::from("src/package/arch_alpm_delta.rs"),
             gap_closure_score: 100,
@@ -250,7 +252,9 @@ impl ArchDbscriptsRepoManagerPrEngine {
     pub fn generate_pr(&self) -> ArchLinuxV53PrSpec {
         ArchLinuxV53PrSpec {
             pr_id: 5303,
-            title: String::from("[Arch Gap Closure] dbscripts Official Repository Database Manager"),
+            title: String::from(
+                "[Arch Gap Closure] dbscripts Official Repository Database Manager",
+            ),
             branch: String::from("pr/arch-dbscripts-repo-manager"),
             target_component: String::from("src/package/arch_dbscripts.rs"),
             gap_closure_score: 100,
@@ -465,7 +469,9 @@ impl ArchWikiOfflineDocsPrEngine {
     pub fn generate_pr(&self) -> ArchLinuxV53PrSpec {
         ArchLinuxV53PrSpec {
             pr_id: 5306,
-            title: String::from("[Arch Gap Closure] Offline ArchWiki Parser & Terminal Search Engine"),
+            title: String::from(
+                "[Arch Gap Closure] Offline ArchWiki Parser & Terminal Search Engine",
+            ),
             branch: String::from("pr/arch-wiki-offline-docs"),
             target_component: String::from("src/doc/arch_wiki_offline.rs"),
             gap_closure_score: 100,
@@ -643,7 +649,9 @@ impl ArchAspSourceFetcherPrEngine {
             SourcePkgSpec {
                 pkgname: String::from("systemd"),
                 repo: String::from("core"),
-                git_url: String::from("https://gitlab.archlinux.org/archlinux/packaging/packages/systemd.git"),
+                git_url: String::from(
+                    "https://gitlab.archlinux.org/archlinux/packaging/packages/systemd.git",
+                ),
             },
         );
         map.insert(
@@ -651,7 +659,9 @@ impl ArchAspSourceFetcherPrEngine {
             SourcePkgSpec {
                 pkgname: String::from("hyprland"),
                 repo: String::from("extra"),
-                git_url: String::from("https://gitlab.archlinux.org/archlinux/packaging/packages/hyprland.git"),
+                git_url: String::from(
+                    "https://gitlab.archlinux.org/archlinux/packaging/packages/hyprland.git",
+                ),
             },
         );
         Self {
@@ -667,7 +677,9 @@ impl ArchAspSourceFetcherPrEngine {
     pub fn generate_pr(&self) -> ArchLinuxV53PrSpec {
         ArchLinuxV53PrSpec {
             pr_id: 5309,
-            title: String::from("[Arch Gap Closure] asp / pkgctl Source Repository & PKGBUILD Fetcher"),
+            title: String::from(
+                "[Arch Gap Closure] asp / pkgctl Source Repository & PKGBUILD Fetcher",
+            ),
             branch: String::from("pr/arch-pkgctl-source-fetcher"),
             target_component: String::from("src/package/arch_pkgctl_asp.rs"),
             gap_closure_score: 100,
@@ -716,7 +728,9 @@ impl ArchMakepkgChecksumsPrEngine {
     pub fn generate_pr(&self) -> ArchLinuxV53PrSpec {
         ArchLinuxV53PrSpec {
             pr_id: 5310,
-            title: String::from("[Arch Gap Closure] makepkg Checksums Validator & .SRCINFO Generator"),
+            title: String::from(
+                "[Arch Gap Closure] makepkg Checksums Validator & .SRCINFO Generator",
+            ),
             branch: String::from("pr/arch-makepkg-updpkgsums"),
             target_component: String::from("src/package/arch_makepkg_checksums.rs"),
             gap_closure_score: 100,
@@ -782,7 +796,9 @@ impl ArchSbctlSecureBootPrEngine {
     pub fn generate_pr(&self) -> ArchLinuxV53PrSpec {
         ArchLinuxV53PrSpec {
             pr_id: 5311,
-            title: String::from("[Arch Gap Closure] sbctl SecureBoot Key Manager & UKI Binary Signing Engine"),
+            title: String::from(
+                "[Arch Gap Closure] sbctl SecureBoot Key Manager & UKI Binary Signing Engine",
+            ),
             branch: String::from("pr/arch-sbctl-secureboot"),
             target_component: String::from("src/security/arch_sbctl_secureboot.rs"),
             gap_closure_score: 100,
