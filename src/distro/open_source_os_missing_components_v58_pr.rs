@@ -169,7 +169,8 @@ impl OpenBsd76PledgeUnveilDynamicAuditEngine {
     }
 
     pub fn unveil_path(&mut self, path: &str, permissions: &str) -> bool {
-        self.unveil_paths.insert(path.to_string(), permissions.to_string());
+        self.unveil_paths
+            .insert(path.to_string(), permissions.to_string());
         true
     }
 
@@ -357,7 +358,8 @@ impl NixGuixHermeticClosureTreeEngine {
         Self {
             closure_tree_depth: 32,
             store_generations_count: 85,
-            merkle_root: "blake3:9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08".to_string(),
+            merkle_root: "blake3:9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
+                .to_string(),
         }
     }
 
@@ -553,14 +555,18 @@ impl SovereignOpenSourceOsV58MasterSuite {
         let rump_msg = self.rump_hypercall.route_hypercall(0x40);
         assert!(rump_msg.contains("hypercall vector 64"));
 
-        let bfs_results = self.haiku_bfs_query.query_metadata("SELECT * WHERE name == '*.rs'");
+        let bfs_results = self
+            .haiku_bfs_query
+            .query_metadata("SELECT * WHERE name == '*.rs'");
         assert_eq!(bfs_results.len(), 2);
 
         let p9_msg = self.plan9_9p.mount_synthetic_9p("/dev/vfs_synthetic");
         assert!(p9_msg.contains("/dev/vfs_synthetic"));
         assert!(self.plan9_9p.rfork_isolate(0x0002_0000));
 
-        let nix_msg = self.nix_closure.build_closure_tree("github:sigmaos/flake_v58");
+        let nix_msg = self
+            .nix_closure
+            .build_closure_tree("github:sigmaos/flake_v58");
         assert!(nix_msg.contains("depth 33"));
         let remaining_gens = self.nix_closure.gc_old_generations();
         assert_eq!(remaining_gens, 80);
@@ -574,7 +580,10 @@ impl SovereignOpenSourceOsV58MasterSuite {
     }
 
     pub fn get_merged_pr_count(&self) -> usize {
-        self.submissions.values().filter(|s| s.status == OsPrStatusV58::Merged).count()
+        self.submissions
+            .values()
+            .filter(|s| s.status == OsPrStatusV58::Merged)
+            .count()
     }
 }
 

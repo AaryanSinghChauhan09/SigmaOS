@@ -213,7 +213,10 @@ impl DebianDgitGitRepoBridgePrEngine {
             debian_version: version.to_string(),
             git_ref: git_ref.to_string(),
         });
-        format!("Pushed debian version {} from git ref {} (hash: {})", version, git_ref, hash)
+        format!(
+            "Pushed debian version {} from git ref {} (hash: {})",
+            version, git_ref, hash
+        )
     }
 
     pub fn fetch_from_archive(&self, version: &str) -> Option<String> {
@@ -306,7 +309,10 @@ impl DebianSecurityCveTrackerPrEngine {
         let mut vulnerabilities = Vec::new();
         for adv in self.advisories.values() {
             if adv.affected_package == pkg && installed_ver != adv.fixed_version {
-                vulnerabilities.push(format!("{}: Upgrade to {} ({})", adv.cve_id, adv.fixed_version, adv.severity));
+                vulnerabilities.push(format!(
+                    "{}: Upgrade to {} ({})",
+                    adv.cve_id, adv.fixed_version, adv.severity
+                ));
             }
         }
         vulnerabilities
@@ -387,7 +393,8 @@ impl DebianReproducibleBuildsValidatorPrEngine {
     }
 
     pub fn record_build(&mut self, pkg_version: &str, sha256: &str) {
-        self.build_hashes.insert(pkg_version.to_string(), sha256.to_string());
+        self.build_hashes
+            .insert(pkg_version.to_string(), sha256.to_string());
     }
 
     pub fn verify_reproducibility(&self, pkg_version: &str, independent_sha256: &str) -> bool {
@@ -428,7 +435,11 @@ impl DebianDpkgVendorOriginPolicyEngine {
             current_vendor: "SigmaOS".to_string(),
         };
         engine.register_vendor("Debian", None, "https://bugs.debian.org");
-        engine.register_vendor("SigmaOS", Some("Debian".to_string()), "https://bugs.sigmaos.org");
+        engine.register_vendor(
+            "SigmaOS",
+            Some("Debian".to_string()),
+            "https://bugs.sigmaos.org",
+        );
         engine
     }
 
@@ -510,7 +521,8 @@ impl DebianAptCacherNgProxyCacheEngine {
             cached.clone()
         } else {
             self.miss_count += 1;
-            self.cached_urls.insert(url.to_string(), remote_bytes.to_vec());
+            self.cached_urls
+                .insert(url.to_string(), remote_bytes.to_vec());
             remote_bytes.to_vec()
         }
     }
@@ -792,11 +804,14 @@ impl NixOsFlakeLockPqcStorePrEngine {
     }
 
     pub fn register_store_item(&mut self, input: &str, pqc_hash: &str) {
-        self.store_hashes.insert(input.to_string(), pqc_hash.to_string());
+        self.store_hashes
+            .insert(input.to_string(), pqc_hash.to_string());
     }
 
     pub fn verify_store_integrity(&self, input: &str, expected_hash: &str) -> bool {
-        self.store_hashes.get(input).map_or(false, |h| h == expected_hash)
+        self.store_hashes
+            .get(input)
+            .map_or(false, |h| h == expected_hash)
     }
 }
 
@@ -900,11 +915,31 @@ impl OpenSourceOsUnimplementedIdeasPrMatrixEngine {
 
     fn register_default_proposals(&mut self) {
         let proposals = [
-            ("feat(debian): debsums, lintian, dpkg-vendor, & d-i netboot PR", "Debian GNU/Linux", "Package & Admin"),
-            ("feat(openbsd): syspatch errata & privsep daemon isolation", "OpenBSD", "Kernel & Security"),
-            ("feat(freebsd): bhyve NVMe direct DMA & ctld iSCSI LUNs", "FreeBSD", "Virtualization & Storage"),
-            ("feat(illumos): FMA fmd fault telemetry & IPMP failover", "Illumos/Solaris", "Observability & Net"),
-            ("feat(plan9/nixos): Plan 9 Factotum & NixOS flake CAS PQC", "Plan 9 & NixOS", "Auth & Store"),
+            (
+                "feat(debian): debsums, lintian, dpkg-vendor, & d-i netboot PR",
+                "Debian GNU/Linux",
+                "Package & Admin",
+            ),
+            (
+                "feat(openbsd): syspatch errata & privsep daemon isolation",
+                "OpenBSD",
+                "Kernel & Security",
+            ),
+            (
+                "feat(freebsd): bhyve NVMe direct DMA & ctld iSCSI LUNs",
+                "FreeBSD",
+                "Virtualization & Storage",
+            ),
+            (
+                "feat(illumos): FMA fmd fault telemetry & IPMP failover",
+                "Illumos/Solaris",
+                "Observability & Net",
+            ),
+            (
+                "feat(plan9/nixos): Plan 9 Factotum & NixOS flake CAS PQC",
+                "Plan 9 & NixOS",
+                "Auth & Store",
+            ),
         ];
 
         for (title, os, sub) in proposals {
@@ -1001,23 +1036,39 @@ impl MasterOpenSourceOsDebianIdeasSuite {
     }
 
     pub fn run_master_audit(&mut self) -> bool {
-        let (valid, total) = self.debsums.verify_package_integrity("coreutils").unwrap_or((0, 0));
+        let (valid, total) = self
+            .debsums
+            .verify_package_integrity("coreutils")
+            .unwrap_or((0, 0));
         let tags_count = self.lintian.analyze_package("sigma-core", true, false);
         let _ = self.dgit.push_to_archive("1.0.0-1", "refs/heads/main");
 
         let is_env_ready = self.build_essential.verify_build_environment(&[
-            "gcc", "g++", "make", "dpkg-dev", "libc6-dev"
+            "gcc",
+            "g++",
+            "make",
+            "dpkg-dev",
+            "libc6-dev",
         ]);
 
-        let vulns = self.cve_tracker.check_package_vulnerability("openssl", "3.0.10-1");
+        let vulns = self
+            .cve_tracker
+            .check_package_vulnerability("openssl", "3.0.10-1");
         self.apt_key.migrate_to_pqc("debian-archive-keyring");
 
-        self.reproducible.record_build("sigma-core_1.0.0", "hash_abc_123");
-        let is_repro = self.reproducible.verify_reproducibility("sigma-core_1.0.0", "hash_abc_123");
+        self.reproducible
+            .record_build("sigma-core_1.0.0", "hash_abc_123");
+        let is_repro = self
+            .reproducible
+            .verify_reproducibility("sigma-core_1.0.0", "hash_abc_123");
 
         let is_derived = self.dpkg_vendor.is_vendor_derived("SigmaOS", "Debian");
-        let pxe_cfg = self.netboot.generate_pxe_config("bookworm", "http://sigma.org/preseed.cfg");
-        let cached = self.apt_cacher.fetch_package("http://deb.debian.org/test.deb", b"pkg_bytes");
+        let pxe_cfg = self
+            .netboot
+            .generate_pxe_config("bookworm", "http://sigma.org/preseed.cfg");
+        let cached = self
+            .apt_cacher
+            .fetch_package("http://deb.debian.org/test.deb", b"pkg_bytes");
         self.popcon.record_access("bash", 0);
         let is_merged = self.usr_merge.verify_usr_merged("/bin/bash");
 
@@ -1030,11 +1081,18 @@ impl MasterOpenSourceOsDebianIdeasSuite {
         let is_fma = self.illumos_fma.is_self_healed();
         let failed_link = self.illumos_ipmp.failover_link("e1000g0");
 
-        self.nix_store.register_store_item("flake.lock", "dilithium5_hash_nix");
-        let is_nix_cas = self.nix_store.verify_store_integrity("flake.lock", "dilithium5_hash_nix");
+        self.nix_store
+            .register_store_item("flake.lock", "dilithium5_hash_nix");
+        let is_nix_cas = self
+            .nix_store
+            .verify_store_integrity("flake.lock", "dilithium5_hash_nix");
 
-        self.haiku_bfs.set_attribute("/boot/file.txt", "META:title", "SigmaOS Note");
-        let is_haiku_attr = self.haiku_bfs.query_attribute("/boot/file.txt", "META:title").is_some();
+        self.haiku_bfs
+            .set_attribute("/boot/file.txt", "META:title", "SigmaOS Note");
+        let is_haiku_attr = self
+            .haiku_bfs
+            .query_attribute("/boot/file.txt", "META:title")
+            .is_some();
 
         self.plan9_factotum.add_key("pass", "jules", "secret123");
         let is_factotum_auth = self.plan9_factotum.authenticate_challenge("pass", "jules");
@@ -1096,13 +1154,22 @@ mod tests {
         let mut dgit = DebianDgitGitRepoBridgePrEngine::new();
         let msg = dgit.push_to_archive("2.0.0-1", "refs/heads/master");
         assert!(msg.contains("2.0.0-1"));
-        assert_eq!(dgit.fetch_from_archive("2.0.0-1"), Some("refs/heads/master".to_string()));
+        assert_eq!(
+            dgit.fetch_from_archive("2.0.0-1"),
+            Some("refs/heads/master".to_string())
+        );
     }
 
     #[test]
     fn test_build_essential_and_cve_tracker() {
         let build_essential = DebianBuildEssentialMetapkgPrEngine::new();
-        assert!(build_essential.verify_build_environment(&["gcc", "g++", "make", "dpkg-dev", "libc6-dev"]));
+        assert!(build_essential.verify_build_environment(&[
+            "gcc",
+            "g++",
+            "make",
+            "dpkg-dev",
+            "libc6-dev"
+        ]));
         assert!(!build_essential.verify_build_environment(&["gcc"]));
 
         let cve_tracker = DebianSecurityCveTrackerPrEngine::new();
@@ -1115,7 +1182,13 @@ mod tests {
     fn test_apt_key_and_reproducible() {
         let mut apt_key = DebianAptKeyPqcMigrationPrEngine::new();
         assert!(apt_key.migrate_to_pqc("debian-archive-keyring"));
-        assert!(apt_key.trusted_keyrings.get("debian-archive-keyring").unwrap().is_pqc_dilithium5);
+        assert!(
+            apt_key
+                .trusted_keyrings
+                .get("debian-archive-keyring")
+                .unwrap()
+                .is_pqc_dilithium5
+        );
 
         let mut repro = DebianReproducibleBuildsValidatorPrEngine::new();
         repro.record_build("bash_5.2", "sha256_123");
@@ -1173,7 +1246,10 @@ mod tests {
 
         let mut bfs = HaikuQueryAttributeFsPrEngine::new();
         bfs.set_attribute("/doc", "author", "Jules");
-        assert_eq!(bfs.query_attribute("/doc", "author"), Some(&"Jules".to_string()));
+        assert_eq!(
+            bfs.query_attribute("/doc", "author"),
+            Some(&"Jules".to_string())
+        );
 
         let mut factotum = Plan9FactotumAuthAgentPrEngine::new();
         factotum.add_key("ssh", "root", "secret");
