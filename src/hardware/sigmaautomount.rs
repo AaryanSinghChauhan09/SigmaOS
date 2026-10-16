@@ -301,11 +301,16 @@ impl SigmaAutoMount {
             return errors;
         }
 
-        for (device_id, mount_point) in self.mount_points.iter_mut() {
-            if mount_point.auto_mount && mount_point.status == MountStatus::NotMounted {
-                if let Err(e) = self.mount(device_id, current_time) {
-                    errors.push(e);
-                }
+        let to_mount: Vec<String> = self
+            .mount_points
+            .iter()
+            .filter(|(_, mp)| mp.auto_mount && mp.status == MountStatus::NotMounted)
+            .map(|(id, _)| id.clone())
+            .collect();
+
+        for device_id in to_mount {
+            if let Err(e) = self.mount(&device_id, current_time) {
+                errors.push(e);
             }
         }
 

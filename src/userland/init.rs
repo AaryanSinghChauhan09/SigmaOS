@@ -1108,6 +1108,7 @@ pub struct VixieCronEnvContext {
     pub mailto: Option<String>,
     pub path: String,
     pub shell: String,
+    pub home: String,
     pub env_vars: BTreeMap<String, String>,
 }
 
@@ -1117,6 +1118,7 @@ impl Default for VixieCronEnvContext {
             mailto: Some("root".to_string()),
             path: "/usr/bin:/bin:/usr/sbin:/sbin".to_string(),
             shell: "/bin/sh".to_string(),
+            home: "/root".to_string(),
             env_vars: BTreeMap::new(),
         }
     }
@@ -1189,14 +1191,14 @@ impl AtSpoolQueueManager {
 
 /// Userland Init Clean-Room Pull Request Proposal Gateway
 #[derive(Debug, Clone)]
-pub struct UserlandInitPrGatewayEngine {
+pub struct UserlandInitCleanRoomPrGatewayEngine {
     pub pr_id: u32,
     pub title: String,
     pub author: String,
     pub pqc_signature: String,
 }
 
-impl UserlandInitPrGatewayEngine {
+impl UserlandInitCleanRoomPrGatewayEngine {
     pub fn new(pr_id: u32, title: &str, author: &str) -> Self {
         Self {
             pr_id,
@@ -1306,25 +1308,6 @@ impl VixieCronEntry {
     }
 }
 
-/// Vixie Cron Environment Context
-#[derive(Debug, Clone)]
-pub struct VixieCronEnvContext {
-    pub mailto: Option<String>,
-    pub path: String,
-    pub shell: String,
-    pub home: String,
-}
-
-impl Default for VixieCronEnvContext {
-    fn default() -> Self {
-        Self {
-            mailto: Some("root".to_string()),
-            path: "/usr/bin:/bin".to_string(),
-            shell: "/bin/sh".to_string(),
-            home: "/root".to_string(),
-        }
-    }
-}
 
 /// Anacron Catchup Job Specification
 #[derive(Debug, Clone)]
@@ -2002,7 +1985,7 @@ mod tests {
 
     #[test]
     fn test_userland_init_pr_gateway() {
-        let gw = UserlandInitPrGatewayEngine::new(4001, "feat(init): Complete Init Parity", "SovereignAgent");
+        let gw = UserlandInitCleanRoomPrGatewayEngine::new(4001, "feat(init): Complete Init Parity", "SovereignAgent");
         assert!(gw.run_automated_ci_gate());
         let diff = gw.generate_unified_diff();
         assert!(diff.contains("PR #4001"));

@@ -90,7 +90,7 @@ impl Dictionary {
             if let Some(pos) = self.history.iter().position(|w| w == &text) {
                 self.history.remove(pos);
             }
-            self.history.insert(0, text);
+            self.history.insert(0, text.clone());
             if self.history.len() > 100 {
                 self.history.pop();
             }
