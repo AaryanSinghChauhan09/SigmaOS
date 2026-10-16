@@ -141,6 +141,8 @@ pub mod tools;
 pub use distro::additional_linux_bsd_components::*;
 pub use distro::cachy_linux_missing_components_v56_pr::*;
 pub use distro::cachy_linux_missing_components_v58_pr::*;
+pub use distro::debian_github_repo_unimplemented_ideas_v27_pr::*;
+pub use distro::omarchy_linux_gap_closure_pr_suite::*;
 pub use distro::omarchy_linux_missing_components_v52_pr::*;
 pub use distro::omarchy_linux_missing_components_v57_pr::*;
 pub use distro::omarchy_omakase_ultimate_parity::*;
