@@ -227,16 +227,26 @@ impl SigmaHAL {
 
     /// List devices by type
     pub fn list_devices_by_type(&self, device_type: DeviceType) -> Vec<&HardwareDevice> {
-        self.devices.values().filter(|d| d.device_type == device_type).collect()
+        self.devices
+            .values()
+            .filter(|d| d.device_type == device_type)
+            .collect()
     }
 
     /// List active devices
     pub fn list_active_devices(&self) -> Vec<&HardwareDevice> {
-        self.devices.values().filter(|d| d.status == DeviceStatus::Active).collect()
+        self.devices
+            .values()
+            .filter(|d| d.status == DeviceStatus::Active)
+            .collect()
     }
 
     /// Update device status
-    pub fn update_device_status(&mut self, device_id: &str, status: DeviceStatus) -> Result<(), String> {
+    pub fn update_device_status(
+        &mut self,
+        device_id: &str,
+        status: DeviceStatus,
+    ) -> Result<(), String> {
         match self.devices.get_mut(device_id) {
             Some(device) => {
                 device.status = status;
@@ -253,17 +263,32 @@ impl SigmaHAL {
 
     /// Get device count by type
     pub fn device_count_by_type(&self, device_type: DeviceType) -> usize {
-        self.devices.values().filter(|d| d.device_type == device_type).count()
+        self.devices
+            .values()
+            .filter(|d| d.device_type == device_type)
+            .count()
     }
 
     /// Get HAL statistics
     pub fn hal_stats(&self) -> BTreeMap<String, String> {
         let mut stats = BTreeMap::new();
         stats.insert("total_devices".to_string(), self.device_count().to_string());
-        stats.insert("pci_devices".to_string(), self.device_count_by_type(DeviceType::PCI).to_string());
-        stats.insert("usb_devices".to_string(), self.device_count_by_type(DeviceType::USB).to_string());
-        stats.insert("network_devices".to_string(), self.device_count_by_type(DeviceType::Network).to_string());
-        stats.insert("storage_devices".to_string(), self.device_count_by_type(DeviceType::Storage).to_string());
+        stats.insert(
+            "pci_devices".to_string(),
+            self.device_count_by_type(DeviceType::PCI).to_string(),
+        );
+        stats.insert(
+            "usb_devices".to_string(),
+            self.device_count_by_type(DeviceType::USB).to_string(),
+        );
+        stats.insert(
+            "network_devices".to_string(),
+            self.device_count_by_type(DeviceType::Network).to_string(),
+        );
+        stats.insert(
+            "storage_devices".to_string(),
+            self.device_count_by_type(DeviceType::Storage).to_string(),
+        );
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
@@ -326,13 +351,17 @@ mod tests {
 
     #[test]
     fn test_hardware_device() {
-        let device = HardwareDevice::new("pci-0000:00:1f.0".to_string(), DeviceType::PCI, "Intel HD Audio".to_string())
-            .with_vendor("Intel".to_string())
-            .with_model("HD Audio".to_string())
-            .with_status(DeviceStatus::Active)
-            .with_path("/sys/devices/pci0000:00/0000:00:1f.0".to_string())
-            .with_driver("snd_hda_intel".to_string())
-            .with_property("class".to_string(), "audio".to_string());
+        let device = HardwareDevice::new(
+            "pci-0000:00:1f.0".to_string(),
+            DeviceType::PCI,
+            "Intel HD Audio".to_string(),
+        )
+        .with_vendor("Intel".to_string())
+        .with_model("HD Audio".to_string())
+        .with_status(DeviceStatus::Active)
+        .with_path("/sys/devices/pci0000:00/0000:00:1f.0".to_string())
+        .with_driver("snd_hda_intel".to_string())
+        .with_property("class".to_string(), "audio".to_string());
 
         assert_eq!(device.device_id, "pci-0000:00:1f.0");
         assert_eq!(device.device_type, DeviceType::PCI);
@@ -353,8 +382,12 @@ mod tests {
     #[test]
     fn test_sigmahal_add_device() {
         let mut hal = SigmaHAL::new();
-        
-        let device = HardwareDevice::new("test-device".to_string(), DeviceType::Unknown, "Test Device".to_string());
+
+        let device = HardwareDevice::new(
+            "test-device".to_string(),
+            DeviceType::Unknown,
+            "Test Device".to_string(),
+        );
         assert!(hal.add_device(device).is_ok());
         assert_eq!(hal.device_count(), 1);
     }
@@ -362,10 +395,18 @@ mod tests {
     #[test]
     fn test_sigmahal_duplicate_device() {
         let mut hal = SigmaHAL::new();
-        
-        let device1 = HardwareDevice::new("test-device".to_string(), DeviceType::Unknown, "Test Device".to_string());
-        let device2 = HardwareDevice::new("test-device".to_string(), DeviceType::Unknown, "Test Device 2".to_string());
-        
+
+        let device1 = HardwareDevice::new(
+            "test-device".to_string(),
+            DeviceType::Unknown,
+            "Test Device".to_string(),
+        );
+        let device2 = HardwareDevice::new(
+            "test-device".to_string(),
+            DeviceType::Unknown,
+            "Test Device 2".to_string(),
+        );
+
         assert!(hal.add_device(device1).is_ok());
         assert!(hal.add_device(device2).is_err());
     }
@@ -373,13 +414,21 @@ mod tests {
     #[test]
     fn test_sigmahal_list_devices() {
         let mut hal = SigmaHAL::new();
-        
-        let device1 = HardwareDevice::new("device1".to_string(), DeviceType::PCI, "Device 1".to_string());
-        let device2 = HardwareDevice::new("device2".to_string(), DeviceType::USB, "Device 2".to_string());
-        
+
+        let device1 = HardwareDevice::new(
+            "device1".to_string(),
+            DeviceType::PCI,
+            "Device 1".to_string(),
+        );
+        let device2 = HardwareDevice::new(
+            "device2".to_string(),
+            DeviceType::USB,
+            "Device 2".to_string(),
+        );
+
         hal.add_device(device1).unwrap();
         hal.add_device(device2).unwrap();
-        
+
         let devices = hal.list_devices();
         assert_eq!(devices.len(), 2);
     }
@@ -387,15 +436,27 @@ mod tests {
     #[test]
     fn test_sigmahal_list_by_type() {
         let mut hal = SigmaHAL::new();
-        
-        let device1 = HardwareDevice::new("device1".to_string(), DeviceType::PCI, "Device 1".to_string());
-        let device2 = HardwareDevice::new("device2".to_string(), DeviceType::USB, "Device 2".to_string());
-        let device3 = HardwareDevice::new("device3".to_string(), DeviceType::PCI, "Device 3".to_string());
-        
+
+        let device1 = HardwareDevice::new(
+            "device1".to_string(),
+            DeviceType::PCI,
+            "Device 1".to_string(),
+        );
+        let device2 = HardwareDevice::new(
+            "device2".to_string(),
+            DeviceType::USB,
+            "Device 2".to_string(),
+        );
+        let device3 = HardwareDevice::new(
+            "device3".to_string(),
+            DeviceType::PCI,
+            "Device 3".to_string(),
+        );
+
         hal.add_device(device1).unwrap();
         hal.add_device(device2).unwrap();
         hal.add_device(device3).unwrap();
-        
+
         let pci_devices = hal.list_devices_by_type(DeviceType::PCI);
         assert_eq!(pci_devices.len(), 2);
     }
@@ -403,12 +464,18 @@ mod tests {
     #[test]
     fn test_sigmahal_update_status() {
         let mut hal = SigmaHAL::new();
-        
-        let device = HardwareDevice::new("test-device".to_string(), DeviceType::Unknown, "Test Device".to_string());
+
+        let device = HardwareDevice::new(
+            "test-device".to_string(),
+            DeviceType::Unknown,
+            "Test Device".to_string(),
+        );
         hal.add_device(device).unwrap();
-        
-        assert!(hal.update_device_status("test-device", DeviceStatus::Active).is_ok());
-        
+
+        assert!(hal
+            .update_device_status("test-device", DeviceStatus::Active)
+            .is_ok());
+
         let device = hal.get_device("test-device").unwrap();
         assert_eq!(device.status, DeviceStatus::Active);
     }
@@ -416,13 +483,21 @@ mod tests {
     #[test]
     fn test_sigmahal_stats() {
         let mut hal = SigmaHAL::new();
-        
-        let device1 = HardwareDevice::new("pci-device".to_string(), DeviceType::PCI, "PCI Device".to_string());
-        let device2 = HardwareDevice::new("usb-device".to_string(), DeviceType::USB, "USB Device".to_string());
-        
+
+        let device1 = HardwareDevice::new(
+            "pci-device".to_string(),
+            DeviceType::PCI,
+            "PCI Device".to_string(),
+        );
+        let device2 = HardwareDevice::new(
+            "usb-device".to_string(),
+            DeviceType::USB,
+            "USB Device".to_string(),
+        );
+
         hal.add_device(device1).unwrap();
         hal.add_device(device2).unwrap();
-        
+
         let stats = hal.hal_stats();
         assert_eq!(stats.get("total_devices"), Some(&"2".to_string()));
         assert_eq!(stats.get("pci_devices"), Some(&"1".to_string()));
@@ -432,20 +507,28 @@ mod tests {
     #[test]
     fn test_add_hardware_device_convenience() {
         init_sigmahal();
-        
-        let device = HardwareDevice::new("test-device".to_string(), DeviceType::Unknown, "Test Device".to_string());
+
+        let device = HardwareDevice::new(
+            "test-device".to_string(),
+            DeviceType::Unknown,
+            "Test Device".to_string(),
+        );
         let result = add_hardware_device(device);
-        
+
         assert!(result.is_ok());
     }
 
     #[test]
     fn test_update_device_status_convenience() {
         init_sigmahal();
-        
-        let device = HardwareDevice::new("test-device".to_string(), DeviceType::Unknown, "Test Device".to_string());
+
+        let device = HardwareDevice::new(
+            "test-device".to_string(),
+            DeviceType::Unknown,
+            "Test Device".to_string(),
+        );
         add_hardware_device(device).unwrap();
-        
+
         let result = update_device_status("test-device", DeviceStatus::Active);
         assert!(result.is_ok());
     }

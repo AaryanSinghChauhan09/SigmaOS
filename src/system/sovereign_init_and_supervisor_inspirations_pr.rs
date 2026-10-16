@@ -140,7 +140,9 @@ impl SystemdInspirationsPrEngine {
     ) -> String {
         let mut entry = alloc::format!(
             "SYSLOG_IDENTIFIER={}\nPRIORITY={}\nMESSAGE={}\n",
-            syslog_identifier, priority, message
+            syslog_identifier,
+            priority,
+            message
         );
         for (k, v) in extra_fields {
             entry.push_str(k);
@@ -164,7 +166,9 @@ impl SystemdInspirationsPrEngine {
     /// Generate systemd Pull Request proposal.
     pub fn generate_proposal(&self) -> CoreUserlandPrProposalManifest {
         CoreUserlandPrProposalManifest {
-            pr_title: "feat(systemd): Implement Unit Dependency Graph, sd_notify, Cgroups v2 & Journald".to_string(),
+            pr_title:
+                "feat(systemd): Implement Unit Dependency Graph, sd_notify, Cgroups v2 & Journald"
+                    .to_string(),
             target_subsystem: "Core Init & Supervisor (PID 1)".to_string(),
             original_system: "systemd".to_string(),
             components_added: alloc::vec![
@@ -174,7 +178,8 @@ impl SystemdInspirationsPrEngine {
                 "Journald structured log entry formatter & binary ring sink".to_string(),
                 "Socket activation file descriptor passing (SD_LISTEN_FDS_START)".to_string(),
             ],
-            performance_multiplier: "0.1s Parallel Boot & Zero-Downtime Socket Activation".to_string(),
+            performance_multiplier: "0.1s Parallel Boot & Zero-Downtime Socket Activation"
+                .to_string(),
             status: "Ready for Merge".to_string(),
         }
     }
@@ -203,7 +208,10 @@ impl OpenRcInspirationsPrEngine {
     }
 
     /// Parse `/etc/init.d/` shell script dependency header block (depend() function simulation).
-    pub fn parse_openrc_init_script(&self, script_content: &str) -> (String, Vec<String>, Vec<String>) {
+    pub fn parse_openrc_init_script(
+        &self,
+        script_content: &str,
+    ) -> (String, Vec<String>, Vec<String>) {
         let mut service_name = String::from("unknown");
         let mut need = Vec::new();
         let mut use_deps = Vec::new();
@@ -297,7 +305,12 @@ impl RunitS6InspirationsPrEngine {
     }
 
     /// Simulate Void Linux `runit` `/service/` directory scanner and process state transitions.
-    pub fn scan_runit_service_dir(&self, _service_name: &str, run_exists: bool, finish_exists: bool) -> RunitS6State {
+    pub fn scan_runit_service_dir(
+        &self,
+        _service_name: &str,
+        run_exists: bool,
+        finish_exists: bool,
+    ) -> RunitS6State {
         if !run_exists {
             return RunitS6State::Down;
         }
@@ -425,7 +438,11 @@ impl SysVinitInspirationsPrEngine {
     }
 
     /// Simulate `telinit` command runlevel transition dispatching.
-    pub fn execute_telinit(&self, target_runlevel: u8, entries: &[SysVInittabEntry]) -> Vec<String> {
+    pub fn execute_telinit(
+        &self,
+        target_runlevel: u8,
+        entries: &[SysVInittabEntry],
+    ) -> Vec<String> {
         let mut commands = Vec::new();
         for entry in entries {
             if entry.runlevels.contains(&target_runlevel) || entry.runlevels.is_empty() {
@@ -438,7 +455,9 @@ impl SysVinitInspirationsPrEngine {
     /// Generate SysVinit Pull Request proposal.
     pub fn generate_proposal(&self) -> CoreUserlandPrProposalManifest {
         CoreUserlandPrProposalManifest {
-            pr_title: "feat(sysvinit): Implement /etc/inittab Parser, telinit Controller & Runlevels 0-6".to_string(),
+            pr_title:
+                "feat(sysvinit): Implement /etc/inittab Parser, telinit Controller & Runlevels 0-6"
+                    .to_string(),
             target_subsystem: "Legacy Unix Init Compatibility".to_string(),
             original_system: "System V Init (SysVinit)".to_string(),
             components_added: alloc::vec![
@@ -477,7 +496,10 @@ impl BsdRcInspirationsPrEngine {
     }
 
     /// Simulate FreeBSD / OpenBSD / NetBSD `rcorder` topological dependency sorting.
-    pub fn sort_rcorder_scripts(&self, mut scripts: Vec<BsdRcScript>) -> Result<Vec<String>, &'static str> {
+    pub fn sort_rcorder_scripts(
+        &self,
+        mut scripts: Vec<BsdRcScript>,
+    ) -> Result<Vec<String>, &'static str> {
         let mut ordered = Vec::new();
         let mut visited = Vec::new();
 
@@ -545,9 +567,18 @@ impl BsdRcInspirationsPrEngine {
         flags: &str,
     ) -> String {
         if !enabled && action != "forcestart" && action != "status" {
-            return alloc::format!("Cannot {} {}: service is disabled in rc.conf", action, service_name);
+            return alloc::format!(
+                "Cannot {} {}: service is disabled in rc.conf",
+                action,
+                service_name
+            );
         }
-        alloc::format!("Executing rc.subr: {} {} (flags={})", service_name, action, flags)
+        alloc::format!(
+            "Executing rc.subr: {} {} (flags={})",
+            service_name,
+            action,
+            flags
+        )
     }
 
     /// Generate BSD rc Pull Request proposal.
@@ -830,12 +861,20 @@ impl SovereignInitAndSupervisorParityPrGateway {
         // 1. systemd dependencies and sd_notify
         let deps = self
             .systemd
-            .evaluate_unit_dependencies("sys.service", &[], &["dbus.service"], &[], &["dbus.service"])
+            .evaluate_unit_dependencies(
+                "sys.service",
+                &[],
+                &["dbus.service"],
+                &[],
+                &["dbus.service"],
+            )
             .is_ok();
         let (num_fds, _) = self.systemd.prepare_socket_activation(&["/run/sys.sock"]);
 
         // 2. OpenRC script parse and transition
-        let (svc, _, _) = self.openrc.parse_openrc_init_script("# provide: net\nneed dbus\n");
+        let (svc, _, _) = self
+            .openrc
+            .parse_openrc_init_script("# provide: net\nneed dbus\n");
         let openrc_ok = svc == "net";
 
         // 3. runit / s6 state scan
@@ -851,12 +890,22 @@ impl SovereignInitAndSupervisorParityPrGateway {
         let bsd_conf = self.bsd_rc.parse_rc_conf("sysd_enable=\"YES\"\n");
 
         // 6. launchd trigger
-        let launchd_ok = self.launchd.trigger_launchd_socket_activation("com.sigma.sys", "IPv4", 8080);
+        let launchd_ok =
+            self.launchd
+                .trigger_launchd_socket_activation("com.sigma.sys", "IPv4", 8080);
 
         // 7. Cron and timers
-        let cron_ok = self.cron_timers_at.parse_and_match_cron("*", "*", "*", "*", "*", 0, 0, 1, 1, 1);
+        let cron_ok = self
+            .cron_timers_at
+            .parse_and_match_cron("*", "*", "*", "*", "*", 0, 0, 1, 1, 1);
 
-        deps && num_fds == 1 && openrc_ok && runit_st == RunitS6State::Up && inittab && bsd_conf.get("sysd_enable").map_or(false, |v| v == "YES") && launchd_ok && cron_ok
+        deps && num_fds == 1
+            && openrc_ok
+            && runit_st == RunitS6State::Up
+            && inittab
+            && bsd_conf.get("sysd_enable").map_or(false, |v| v == "YES")
+            && launchd_ok
+            && cron_ok
     }
 }
 
@@ -873,18 +922,30 @@ mod tests {
         let engine = SystemdInspirationsPrEngine::new();
         let active = ["network.target", "dbus.service"];
         let deps = engine
-            .evaluate_unit_dependencies("nginx.service", &["network.target"], &["dbus.service"], &["network.target"], &active)
+            .evaluate_unit_dependencies(
+                "nginx.service",
+                &["network.target"],
+                &["dbus.service"],
+                &["network.target"],
+                &active,
+            )
             .unwrap();
         assert!(deps.contains(&"nginx.service".to_string()));
 
-        let (status, msg, pid) = engine.parse_sd_notify_payload(100, "READY=1\nSTATUS=Operational\nMAINPID=1024");
+        let (status, msg, pid) =
+            engine.parse_sd_notify_payload(100, "READY=1\nSTATUS=Operational\nMAINPID=1024");
         assert_eq!(status, Some(SystemdServiceStatus::Active));
         assert_eq!(msg, Some("Operational".to_string()));
         assert_eq!(pid, Some(1024));
 
         assert!(engine.validate_cgroups_v2_limits(512 * 1024 * 1024, 100, 256));
 
-        let entry = engine.format_journald_entry("my-daemon", 6, "Started successfully", &[("UNIT", "my.service")]);
+        let entry = engine.format_journald_entry(
+            "my-daemon",
+            6,
+            "Started successfully",
+            &[("UNIT", "my.service")],
+        );
         assert!(entry.contains("SYSLOG_IDENTIFIER=my-daemon"));
         assert!(entry.contains("UNIT=my.service"));
 
@@ -903,8 +964,12 @@ mod tests {
         assert_eq!(need, vec!["net"]);
         assert_eq!(use_deps, vec!["logger"]);
 
-        let services = [("sysfs", OpenRcRunlevel::SysInit), ("sshd", OpenRcRunlevel::Default)];
-        let plan = engine.transition_runlevel(OpenRcRunlevel::SysInit, OpenRcRunlevel::Default, &services);
+        let services = [
+            ("sysfs", OpenRcRunlevel::SysInit),
+            ("sshd", OpenRcRunlevel::Default),
+        ];
+        let plan =
+            engine.transition_runlevel(OpenRcRunlevel::SysInit, OpenRcRunlevel::Default, &services);
         assert_eq!(plan, vec!["sshd"]);
     }
 
@@ -924,7 +989,9 @@ mod tests {
     #[test]
     fn test_sysvinit_engine() {
         let engine = SysVinitInspirationsPrEngine::new();
-        let entry = engine.parse_inittab_line("id:2345:respawn:/sbin/getty 38400 tty1").unwrap();
+        let entry = engine
+            .parse_inittab_line("id:2345:respawn:/sbin/getty 38400 tty1")
+            .unwrap();
         assert_eq!(entry.id, "id");
         assert_eq!(entry.runlevels, vec![2, 3, 4, 5]);
         assert_eq!(entry.action, SysVInittabAction::Respawn);
@@ -987,15 +1054,13 @@ mod tests {
         assert!(!engine.should_trigger_timer(&trigger, 100, 120, 0));
 
         // at queue
-        let mut queue = vec![
-            AtJobSpec {
-                job_id: 1,
-                run_at_timestamp: 500,
-                queue_letter: 'a',
-                command: "backup.sh".to_string(),
-                user: "root".to_string(),
-            },
-        ];
+        let mut queue = vec![AtJobSpec {
+            job_id: 1,
+            run_at_timestamp: 500,
+            queue_letter: 'a',
+            command: "backup.sh".to_string(),
+            user: "root".to_string(),
+        }];
         let ready = engine.pop_ready_at_jobs(&mut queue, 600, 0.5);
         assert_eq!(ready.len(), 1);
         assert!(queue.is_empty());

@@ -534,7 +534,9 @@ mod tests {
         assert_eq!(event.pid, 4201);
 
         uffd.trigger_page_fault(0x7fff_0000_1000, UffdMode::Missing, 4201);
-        assert!(uffd.resolve_page_fault_copy(0x7fff_0000_1000, &[0u8; 4096]).unwrap());
+        assert!(uffd
+            .resolve_page_fault_copy(0x7fff_0000_1000, &[0u8; 4096])
+            .unwrap());
         assert_eq!(uffd.pending_faults.len(), 0);
     }
 

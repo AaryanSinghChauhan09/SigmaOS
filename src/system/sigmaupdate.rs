@@ -106,7 +106,13 @@ pub struct SystemUpdate {
 
 impl SystemUpdate {
     /// Create a new system update
-    pub fn new(update_id: String, package: String, old_version: String, new_version: String, update_type: UpdateType) -> Self {
+    pub fn new(
+        update_id: String,
+        package: String,
+        old_version: String,
+        new_version: String,
+        update_type: UpdateType,
+    ) -> Self {
         Self {
             update_id,
             package,
@@ -184,7 +190,7 @@ impl SigmaUpdate {
         if self.updates.contains_key(&update.update_id) {
             return Err(format!("Update '{}' already exists", update.update_id));
         }
-        
+
         self.updates.insert(update.update_id.clone(), update);
         self.update_counter += 1;
         Ok(())
@@ -208,13 +214,13 @@ impl SigmaUpdate {
         if !self.running {
             return Err("SigmaUpdate not running".to_string());
         }
-        
+
         match self.updates.get_mut(update_id) {
             Some(update) => {
                 if self.policy == UpdatePolicy::ManualOnly {
                     return Err("Manual-only policy, cannot auto-apply".to_string());
                 }
-                
+
                 update.status = UpdateStatus::Installing;
                 update.status = UpdateStatus::Completed;
                 Ok(())
@@ -230,14 +236,16 @@ impl SigmaUpdate {
 
     /// List pending updates
     pub fn list_pending(&self) -> Vec<&SystemUpdate> {
-        self.updates.values()
+        self.updates
+            .values()
             .filter(|u| u.status == UpdateStatus::Pending)
             .collect()
     }
 
     /// List security updates
     pub fn list_security(&self) -> Vec<&SystemUpdate> {
-        self.updates.values()
+        self.updates
+            .values()
             .filter(|u| u.update_type == UpdateType::Security)
             .collect()
     }
@@ -251,8 +259,14 @@ impl SigmaUpdate {
     pub fn update_stats(&self) -> BTreeMap<String, String> {
         let mut stats = BTreeMap::new();
         stats.insert("total_updates".to_string(), self.update_count().to_string());
-        stats.insert("pending_updates".to_string(), self.list_pending().len().to_string());
-        stats.insert("security_updates".to_string(), self.list_security().len().to_string());
+        stats.insert(
+            "pending_updates".to_string(),
+            self.list_pending().len().to_string(),
+        );
+        stats.insert(
+            "security_updates".to_string(),
+            self.list_security().len().to_string(),
+        );
         stats.insert("policy".to_string(), self.policy.to_string());
         stats.insert("running".to_string(), self.running.to_string());
         stats
@@ -318,7 +332,7 @@ mod tests {
             "vim".to_string(),
             "1.0.0".to_string(),
             "2.0.0".to_string(),
-            UpdateType::Security
+            UpdateType::Security,
         )
         .with_status(UpdateStatus::Completed)
         .with_size(1024);
@@ -348,15 +362,15 @@ mod tests {
     #[test]
     fn test_sigmaupdate_add_update() {
         let mut update = SigmaUpdate::new();
-        
+
         let sys_update = SystemUpdate::new(
             "update1".to_string(),
             "vim".to_string(),
             "1.0.0".to_string(),
             "2.0.0".to_string(),
-            UpdateType::Security
+            UpdateType::Security,
         );
-        
+
         assert!(update.add_update(sys_update).is_ok());
         assert_eq!(update.update_count(), 1);
     }
@@ -365,18 +379,18 @@ mod tests {
     fn test_sigmaupdate_apply_update() {
         let mut update = SigmaUpdate::new();
         update.start();
-        
+
         let sys_update = SystemUpdate::new(
             "update1".to_string(),
             "vim".to_string(),
             "1.0.0".to_string(),
             "2.0.0".to_string(),
-            UpdateType::Security
+            UpdateType::Security,
         );
-        
+
         update.add_update(sys_update).unwrap();
         assert!(update.apply_update("update1").is_ok());
-        
+
         let sys_update = update.get_update("update1").unwrap();
         assert_eq!(sys_update.status, UpdateStatus::Completed);
     }
@@ -384,18 +398,18 @@ mod tests {
     #[test]
     fn test_sigmaupdate_list_pending() {
         let mut update = SigmaUpdate::new();
-        
+
         let sys_update = SystemUpdate::new(
             "update1".to_string(),
             "vim".to_string(),
             "1.0.0".to_string(),
             "2.0.0".to_string(),
-            UpdateType::Security
+            UpdateType::Security,
         )
         .with_status(UpdateStatus::Pending);
-        
+
         update.add_update(sys_update).unwrap();
-        
+
         let pending = update.list_pending();
         assert_eq!(pending.len(), 1);
     }
@@ -403,17 +417,17 @@ mod tests {
     #[test]
     fn test_sigmaupdate_list_security() {
         let mut update = SigmaUpdate::new();
-        
+
         let sys_update = SystemUpdate::new(
             "update1".to_string(),
             "vim".to_string(),
             "1.0.0".to_string(),
             "2.0.0".to_string(),
-            UpdateType::Security
+            UpdateType::Security,
         );
-        
+
         update.add_update(sys_update).unwrap();
-        
+
         let security = update.list_security();
         assert_eq!(security.len(), 1);
     }
@@ -421,18 +435,18 @@ mod tests {
     #[test]
     fn test_sigmaupdate_stats() {
         let mut update = SigmaUpdate::new();
-        
+
         let sys_update = SystemUpdate::new(
             "update1".to_string(),
             "vim".to_string(),
             "1.0.0".to_string(),
             "2.0.0".to_string(),
-            UpdateType::Security
+            UpdateType::Security,
         )
         .with_status(UpdateStatus::Pending);
-        
+
         update.add_update(sys_update).unwrap();
-        
+
         let stats = update.update_stats();
         assert_eq!(stats.get("total_updates"), Some(&"1".to_string()));
         assert_eq!(stats.get("pending_updates"), Some(&"1".to_string()));
@@ -441,20 +455,20 @@ mod tests {
     #[test]
     fn test_apply_system_update_convenience() {
         init_sigmaupdate();
-        
+
         let mut update = get_sigmaupdate().unwrap();
         update.start();
-        
+
         let sys_update = SystemUpdate::new(
             "update1".to_string(),
             "vim".to_string(),
             "1.0.0".to_string(),
             "2.0.0".to_string(),
-            UpdateType::Security
+            UpdateType::Security,
         );
-        
+
         update.add_update(sys_update).unwrap();
-        
+
         let result = apply_system_update("update1");
         assert!(result.is_ok());
     }

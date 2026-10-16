@@ -208,7 +208,7 @@ impl TimeConfig {
         Self {
             sync_interval: 3600, // 1 hour
             max_sync_attempts: 5,
-            min_sync_interval: 64, // 64 seconds
+            min_sync_interval: 64,    // 64 seconds
             max_sync_interval: 86400, // 24 hours
             sync_rtc: true,
             enable_drift_correction: true,
@@ -374,22 +374,23 @@ impl SigmaTime {
             // In a real implementation, this would perform actual NTP synchronization
             // For now, we simulate a successful sync
             let server_address = server.address.clone();
-            
+
             // Simulate successful sync
             self.stats.increment_success();
-            self.stats.update_last_sync(current_timestamp, server_address.clone());
+            self.stats
+                .update_last_sync(current_timestamp, server_address.clone());
             self.time_source = TimeSource::NtpServer;
             self.sync_status = SyncStatus::Synced;
-            
+
             // Simulate time adjustment (small drift correction)
             let simulated_offset = 50; // 50ms offset
             self.stats.set_offset(simulated_offset);
             self.stats.set_root_delay(100);
             self.stats.set_root_dispersion(50);
-            
+
             // Update current time (in real implementation, this would be from NTP)
             self.current_time = current_timestamp;
-            
+
             return Ok(format!("Synced with {}", server_address));
         }
 
@@ -433,11 +434,26 @@ impl SigmaTime {
         let mut stats = BTreeMap::new();
         stats.insert("status".to_string(), self.sync_status.to_string());
         stats.insert("time_source".to_string(), self.time_source.to_string());
-        stats.insert("sync_attempts".to_string(), self.stats.sync_attempts.to_string());
-        stats.insert("successful_syncs".to_string(), self.stats.successful_syncs.to_string());
-        stats.insert("failed_syncs".to_string(), self.stats.failed_syncs.to_string());
-        stats.insert("current_offset_ms".to_string(), self.stats.current_offset.to_string());
-        stats.insert("ntp_servers".to_string(), self.ntp_servers.len().to_string());
+        stats.insert(
+            "sync_attempts".to_string(),
+            self.stats.sync_attempts.to_string(),
+        );
+        stats.insert(
+            "successful_syncs".to_string(),
+            self.stats.successful_syncs.to_string(),
+        );
+        stats.insert(
+            "failed_syncs".to_string(),
+            self.stats.failed_syncs.to_string(),
+        );
+        stats.insert(
+            "current_offset_ms".to_string(),
+            self.stats.current_offset.to_string(),
+        );
+        stats.insert(
+            "ntp_servers".to_string(),
+            self.ntp_servers.len().to_string(),
+        );
         if let Some(last) = self.stats.last_sync {
             stats.insert("last_sync".to_string(), last.to_string());
         }
@@ -530,12 +546,12 @@ mod tests {
     #[test]
     fn test_sync_stats() {
         let mut stats = SyncStats::new();
-        
+
         stats.increment_attempts();
         stats.increment_success();
         stats.update_last_sync(1000, "pool.ntp.org".to_string());
         stats.set_offset(50);
-        
+
         assert_eq!(stats.sync_attempts, 1);
         assert_eq!(stats.successful_syncs, 1);
         assert_eq!(stats.last_sync, Some(1000));
@@ -570,23 +586,23 @@ mod tests {
     #[test]
     fn test_sigmatime_add_server() {
         let mut time = SigmaTime::with_default_config();
-        
+
         let server = NtpServer::new("pool.ntp.org".to_string());
         time.add_ntp_server(server);
-        
+
         assert_eq!(time.ntp_servers().len(), 1);
     }
 
     #[test]
     fn test_sigmatime_server_priority() {
         let mut time = SigmaTime::with_default_config();
-        
+
         let server1 = NtpServer::new("server1.org".to_string()).with_priority(100);
         let server2 = NtpServer::new("server2.org".to_string()).with_priority(50);
-        
+
         time.add_ntp_server(server1);
         time.add_ntp_server(server2);
-        
+
         // Should be sorted by priority (lower first)
         assert_eq!(time.ntp_servers()[0].address, "server2.org");
         assert_eq!(time.ntp_servers()[1].address, "server1.org");
@@ -595,9 +611,9 @@ mod tests {
     #[test]
     fn test_sigmatime_set_time() {
         let mut time = SigmaTime::with_default_config();
-        
+
         time.set_time(1000);
-        
+
         assert_eq!(time.current_time(), 1000);
         assert_eq!(time.time_source(), TimeSource::Manual);
         assert_eq!(time.sync_status(), SyncStatus::Synced);
@@ -607,12 +623,12 @@ mod tests {
     fn test_sigmatime_sync_time() {
         let mut time = SigmaTime::with_default_config();
         time.start();
-        
+
         let server = NtpServer::new("pool.ntp.org".to_string());
         time.add_ntp_server(server);
-        
+
         let result = time.sync_time(1000);
-        
+
         assert!(result.is_ok());
         assert_eq!(time.sync_status(), SyncStatus::Synced);
         assert_eq!(time.time_source(), TimeSource::NtpServer);
@@ -621,14 +637,15 @@ mod tests {
     #[test]
     fn test_sigmatime_needs_sync() {
         let mut time = SigmaTime::with_default_config();
-        
+
         // Should need sync initially
         assert!(time.needs_sync(1000));
-        
+
         // After sync, should not need sync immediately
-        time.stats.update_last_sync(1000, "pool.ntp.org".to_string());
+        time.stats
+            .update_last_sync(1000, "pool.ntp.org".to_string());
         assert!(!time.needs_sync(1500)); // 500 seconds later
-        
+
         // Should need sync after interval
         assert!(time.needs_sync(5000)); // 4000 seconds later
     }
@@ -637,12 +654,12 @@ mod tests {
     fn test_sigmatime_server_stats() {
         let mut time = SigmaTime::with_default_config();
         time.start();
-        
+
         let server = NtpServer::new("pool.ntp.org".to_string());
         time.add_ntp_server(server);
-        
+
         time.sync_time(1000).unwrap();
-        
+
         let stats = time.server_stats();
         assert_eq!(stats.get("status"), Some(&"synced".to_string()));
         assert_eq!(stats.get("time_source"), Some(&"ntp_server".to_string()));
@@ -651,9 +668,9 @@ mod tests {
     #[test]
     fn test_add_ntp_server_convenience() {
         init_sigmatime_default();
-        
+
         add_ntp_server("pool.ntp.org".to_string(), 123, 50);
-        
+
         let time = get_sigmatime().unwrap();
         assert_eq!(time.ntp_servers().len(), 1);
     }
@@ -661,13 +678,13 @@ mod tests {
     #[test]
     fn test_sync_time_convenience() {
         init_sigmatime_default();
-        
+
         let mut time = get_sigmatime().unwrap();
         time.start();
-        
+
         let server = NtpServer::new("pool.ntp.org".to_string());
         time.add_ntp_server(server);
-        
+
         let result = sync_time(1000);
         assert!(result.is_ok());
     }
@@ -675,10 +692,10 @@ mod tests {
     #[test]
     fn test_get_current_time_convenience() {
         init_sigmatime_default();
-        
+
         let mut time = get_sigmatime().unwrap();
         time.set_time(1000);
-        
+
         let current = get_current_time();
         assert_eq!(current, Some(1000));
     }

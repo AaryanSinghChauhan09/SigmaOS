@@ -105,7 +105,14 @@ impl WeatherApp {
     }
 
     /// Add location
-    pub fn add_location(&mut self, name: String, latitude: f32, longitude: f32, country: String, timezone: String) {
+    pub fn add_location(
+        &mut self,
+        name: String,
+        latitude: f32,
+        longitude: f32,
+        country: String,
+        timezone: String,
+    ) {
         let location = WeatherLocation {
             name,
             latitude,
@@ -169,14 +176,23 @@ impl WeatherApp {
     }
 
     /// Convert temperature
-    pub fn convert_temperature(&self, temp: f32, from: TemperatureUnit, to: TemperatureUnit) -> f32 {
+    pub fn convert_temperature(
+        &self,
+        temp: f32,
+        from: TemperatureUnit,
+        to: TemperatureUnit,
+    ) -> f32 {
         match (from, to) {
             (TemperatureUnit::Celsius, TemperatureUnit::Fahrenheit) => temp * 9.0 / 5.0 + 32.0,
             (TemperatureUnit::Celsius, TemperatureUnit::Kelvin) => temp + 273.15,
             (TemperatureUnit::Fahrenheit, TemperatureUnit::Celsius) => (temp - 32.0) * 5.0 / 9.0,
-            (TemperatureUnit::Fahrenheit, TemperatureUnit::Kelvin) => (temp - 32.0) * 5.0 / 9.0 + 273.15,
+            (TemperatureUnit::Fahrenheit, TemperatureUnit::Kelvin) => {
+                (temp - 32.0) * 5.0 / 9.0 + 273.15
+            }
             (TemperatureUnit::Kelvin, TemperatureUnit::Celsius) => temp - 273.15,
-            (TemperatureUnit::Kelvin, TemperatureUnit::Fahrenheit) => (temp - 273.15) * 9.0 / 5.0 + 32.0,
+            (TemperatureUnit::Kelvin, TemperatureUnit::Fahrenheit) => {
+                (temp - 273.15) * 9.0 / 5.0 + 32.0
+            }
             _ => temp,
         }
     }
@@ -214,9 +230,7 @@ pub fn init_weather_app() {
 
 /// Get weather app
 pub fn get_weather_app() -> &'static mut WeatherApp {
-    unsafe {
-        WEATHER_APP.as_mut().expect("Weather app not initialized")
-    }
+    unsafe { WEATHER_APP.as_mut().expect("Weather app not initialized") }
 }
 
 #[cfg(test)]
@@ -237,7 +251,7 @@ mod tests {
             40.7128,
             -74.0060,
             "US".to_string(),
-            "America/New_York".to_string()
+            "America/New_York".to_string(),
         );
         assert_eq!(app.location_count(), 1);
     }
@@ -245,7 +259,13 @@ mod tests {
     #[test]
     fn test_remove_location() {
         let mut app = WeatherApp::new();
-        app.add_location("Test".to_string(), 0.0, 0.0, "US".to_string(), "UTC".to_string());
+        app.add_location(
+            "Test".to_string(),
+            0.0,
+            0.0,
+            "US".to_string(),
+            "UTC".to_string(),
+        );
         app.remove_location(0).unwrap();
         assert_eq!(app.location_count(), 0);
     }
@@ -254,14 +274,24 @@ mod tests {
     fn test_convert_temperature() {
         let app = WeatherApp::new();
         let celsius = 20.0;
-        let fahrenheit = app.convert_temperature(celsius, TemperatureUnit::Celsius, TemperatureUnit::Fahrenheit);
+        let fahrenheit = app.convert_temperature(
+            celsius,
+            TemperatureUnit::Celsius,
+            TemperatureUnit::Fahrenheit,
+        );
         assert!((fahrenheit - 68.0).abs() < 0.1);
     }
 
     #[test]
     fn test_refresh() {
         let mut app = WeatherApp::new();
-        app.add_location("Test".to_string(), 0.0, 0.0, "US".to_string(), "UTC".to_string());
+        app.add_location(
+            "Test".to_string(),
+            0.0,
+            0.0,
+            "US".to_string(),
+            "UTC".to_string(),
+        );
         app.refresh();
         assert!(app.get_current_weather().is_some());
     }

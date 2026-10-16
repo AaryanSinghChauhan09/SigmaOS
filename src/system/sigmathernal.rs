@@ -244,7 +244,7 @@ impl SigmaThermal {
         if !self.running {
             return Err("SigmaThermal not running".to_string());
         }
-        
+
         self.current_policy = policy;
         Ok(())
     }
@@ -287,9 +287,13 @@ impl SigmaThermal {
     /// Add cooling device
     pub fn add_cooling_device(&mut self, device: CoolingDevice) -> Result<(), String> {
         if self.cooling_devices.contains_key(&device.device_id) {
-            return Err(format!("Cooling device '{}' already exists", device.device_id));
+            return Err(format!(
+                "Cooling device '{}' already exists",
+                device.device_id
+            ));
         }
-        self.cooling_devices.insert(device.device_id.clone(), device);
+        self.cooling_devices
+            .insert(device.device_id.clone(), device);
         Ok(())
     }
 
@@ -298,7 +302,10 @@ impl SigmaThermal {
         match self.cooling_devices.get_mut(device_id) {
             Some(device) => {
                 if state > device.max_state {
-                    return Err(format!("State {} exceeds max state {}", state, device.max_state));
+                    return Err(format!(
+                        "State {} exceeds max state {}",
+                        state, device.max_state
+                    ));
                 }
                 device.state = state;
                 Ok(())
@@ -320,7 +327,7 @@ impl SigmaThermal {
     /// Check trip points and trigger cooling
     pub fn check_trip_points(&mut self) -> Vec<String> {
         let mut actions = Vec::new();
-        
+
         if !self.running {
             return actions;
         }
@@ -329,19 +336,35 @@ impl SigmaThermal {
             for (trip_type, trip_temp) in &zone.trip_points {
                 if zone.temperature >= *trip_temp {
                     self.trip_triggers += 1;
-                    
+
                     match trip_type {
                         TripPointType::Critical => {
-                            actions.push(format!("CRITICAL: Zone {} at {}°C", zone_id, zone.temperature / 1000));
+                            actions.push(format!(
+                                "CRITICAL: Zone {} at {}°C",
+                                zone_id,
+                                zone.temperature / 1000
+                            ));
                         }
                         TripPointType::Hot => {
-                            actions.push(format!("HOT: Zone {} at {}°C", zone_id, zone.temperature / 1000));
+                            actions.push(format!(
+                                "HOT: Zone {} at {}°C",
+                                zone_id,
+                                zone.temperature / 1000
+                            ));
                         }
                         TripPointType::Passive => {
-                            actions.push(format!("PASSIVE: Zone {} at {}°C", zone_id, zone.temperature / 1000));
+                            actions.push(format!(
+                                "PASSIVE: Zone {} at {}°C",
+                                zone_id,
+                                zone.temperature / 1000
+                            ));
                         }
                         TripPointType::Active => {
-                            actions.push(format!("ACTIVE: Zone {} at {}°C", zone_id, zone.temperature / 1000));
+                            actions.push(format!(
+                                "ACTIVE: Zone {} at {}°C",
+                                zone_id,
+                                zone.temperature / 1000
+                            ));
                         }
                     }
                 }
@@ -353,7 +376,8 @@ impl SigmaThermal {
 
     /// Get maximum temperature across all zones
     pub fn max_temperature(&self) -> i32 {
-        self.thermal_zones.values()
+        self.thermal_zones
+            .values()
             .map(|z| z.temperature)
             .max()
             .unwrap_or(0)
@@ -372,11 +396,23 @@ impl SigmaThermal {
     /// Get thermal statistics
     pub fn thermal_stats(&self) -> BTreeMap<String, String> {
         let mut stats = BTreeMap::new();
-        stats.insert("thermal_zones".to_string(), self.thermal_zone_count().to_string());
-        stats.insert("cooling_devices".to_string(), self.cooling_device_count().to_string());
-        stats.insert("max_temperature".to_string(), (self.max_temperature() / 1000).to_string());
+        stats.insert(
+            "thermal_zones".to_string(),
+            self.thermal_zone_count().to_string(),
+        );
+        stats.insert(
+            "cooling_devices".to_string(),
+            self.cooling_device_count().to_string(),
+        );
+        stats.insert(
+            "max_temperature".to_string(),
+            (self.max_temperature() / 1000).to_string(),
+        );
         stats.insert("trip_triggers".to_string(), self.trip_triggers.to_string());
-        stats.insert("current_policy".to_string(), self.current_policy.to_string());
+        stats.insert(
+            "current_policy".to_string(),
+            self.current_policy.to_string(),
+        );
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
@@ -480,7 +516,7 @@ mod tests {
     fn test_sigmathernal_set_policy() {
         let mut thermal = SigmaThermal::new();
         thermal.start();
-        
+
         assert!(thermal.set_policy(ThermalPolicy::Performance).is_ok());
         assert_eq!(thermal.get_policy(), ThermalPolicy::Performance);
     }
@@ -488,7 +524,7 @@ mod tests {
     #[test]
     fn test_sigmathernal_add_thermal_zone() {
         let mut thermal = SigmaThermal::new();
-        
+
         let zone = ThermalZone::new("cpu0".to_string(), ThermalZoneType::CPU);
         assert!(thermal.add_thermal_zone(zone).is_ok());
         assert_eq!(thermal.thermal_zone_count(), 1);
@@ -497,12 +533,12 @@ mod tests {
     #[test]
     fn test_sigmathernal_update_temperature() {
         let mut thermal = SigmaThermal::new();
-        
+
         let zone = ThermalZone::new("cpu0".to_string(), ThermalZoneType::CPU);
         thermal.add_thermal_zone(zone).unwrap();
-        
+
         assert!(thermal.update_temperature("cpu0", 50000).is_ok());
-        
+
         let zone = thermal.get_thermal_zone("cpu0").unwrap();
         assert_eq!(zone.temperature, 50000);
     }
@@ -510,7 +546,7 @@ mod tests {
     #[test]
     fn test_sigmathernal_add_cooling_device() {
         let mut thermal = SigmaThermal::new();
-        
+
         let device = CoolingDevice::new("fan0".to_string(), CoolingDeviceType::Fan);
         assert!(thermal.add_cooling_device(device).is_ok());
         assert_eq!(thermal.cooling_device_count(), 1);
@@ -519,12 +555,12 @@ mod tests {
     #[test]
     fn test_sigmathernal_update_cooling_state() {
         let mut thermal = SigmaThermal::new();
-        
+
         let device = CoolingDevice::new("fan0".to_string(), CoolingDeviceType::Fan);
         thermal.add_cooling_device(device).unwrap();
-        
+
         assert!(thermal.update_cooling_state("fan0", 75).is_ok());
-        
+
         let device = thermal.get_cooling_device("fan0").unwrap();
         assert_eq!(device.state, 75);
     }
@@ -533,13 +569,13 @@ mod tests {
     fn test_sigmathernal_check_trip_points() {
         let mut thermal = SigmaThermal::new();
         thermal.start();
-        
+
         let zone = ThermalZone::new("cpu0".to_string(), ThermalZoneType::CPU)
             .with_temperature(95000)
             .with_trip_point(TripPointType::Critical, 90000);
-        
+
         thermal.add_thermal_zone(zone).unwrap();
-        
+
         let actions = thermal.check_trip_points();
         assert!(!actions.is_empty());
     }
@@ -547,23 +583,25 @@ mod tests {
     #[test]
     fn test_sigmathernal_max_temperature() {
         let mut thermal = SigmaThermal::new();
-        
-        let zone1 = ThermalZone::new("cpu0".to_string(), ThermalZoneType::CPU).with_temperature(45000);
-        let zone2 = ThermalZone::new("gpu0".to_string(), ThermalZoneType::GPU).with_temperature(60000);
-        
+
+        let zone1 =
+            ThermalZone::new("cpu0".to_string(), ThermalZoneType::CPU).with_temperature(45000);
+        let zone2 =
+            ThermalZone::new("gpu0".to_string(), ThermalZoneType::GPU).with_temperature(60000);
+
         thermal.add_thermal_zone(zone1).unwrap();
         thermal.add_thermal_zone(zone2).unwrap();
-        
+
         assert_eq!(thermal.max_temperature(), 60000);
     }
 
     #[test]
     fn test_set_thermal_policy_convenience() {
         init_sigmathernal();
-        
+
         let mut thermal = get_sigmathernal().unwrap();
         thermal.start();
-        
+
         let result = set_thermal_policy(ThermalPolicy::Performance);
         assert!(result.is_ok());
     }
@@ -571,12 +609,12 @@ mod tests {
     #[test]
     fn test_update_temperature_convenience() {
         init_sigmathernal();
-        
+
         let mut thermal = get_sigmathernal().unwrap();
-        
+
         let zone = ThermalZone::new("cpu0".to_string(), ThermalZoneType::CPU);
         thermal.add_thermal_zone(zone).unwrap();
-        
+
         let result = update_temperature("cpu0", 50000);
         assert!(result.is_ok());
     }

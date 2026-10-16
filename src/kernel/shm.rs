@@ -72,7 +72,7 @@ impl ShmSegment {
     pub fn new(id: u64, key: i32, size: usize, perm: ShmPerm) -> Self {
         let mut data = alloc::vec::Vec::with_capacity(size);
         data.resize(size, 0);
-        
+
         Self {
             id,
             key,

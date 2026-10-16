@@ -9,8 +9,8 @@ extern crate alloc;
 pub struct VfsHardeningConfig {
     pub protected_symlinks: bool, // Prevent following symlinks in sticky world-writable dirs if follower != owner
     pub protected_hardlinks: bool, // Prevent hardlinking to files caller doesn't own or can't write to
-    pub protected_fifos: bool,     // Prevent opening FIFOs in sticky world-writable dirs not owned by caller
-    pub protected_regular: bool,  // Prevent opening regular files in sticky world-writable dirs not owned by caller
+    pub protected_fifos: bool, // Prevent opening FIFOs in sticky world-writable dirs not owned by caller
+    pub protected_regular: bool, // Prevent opening regular files in sticky world-writable dirs not owned by caller
 }
 
 impl Default for VfsHardeningConfig {
@@ -83,13 +83,17 @@ impl VfsHardeningEnforcer {
         // Cannot hardlink to setuid/setgid files
         if target_file_has_suid_sgid {
             self.violations_count += 1;
-            return Err("EPERM: Hardlink to setuid/setgid binary rejected by fs.protected_hardlinks");
+            return Err(
+                "EPERM: Hardlink to setuid/setgid binary rejected by fs.protected_hardlinks",
+            );
         }
 
         // Must own the target or have read+write permissions to regular file
         if creator_uid != target_file_uid && (!target_file_is_regular || !caller_has_write_perm) {
             self.violations_count += 1;
-            return Err("EPERM: Hardlink creation to unowned file without write permissions rejected");
+            return Err(
+                "EPERM: Hardlink creation to unowned file without write permissions rejected",
+            );
         }
 
         Ok(())
@@ -105,15 +109,11 @@ mod tests {
         let mut enforcer = VfsHardeningEnforcer::default();
 
         // Symlink in /tmp (sticky) owned by victim (uid 1000). Attacker (uid 2000) tries to follow -> FAIL
-        assert!(enforcer
-            .verify_symlink_follow(2000, 1000, 0, true)
-            .is_err());
+        assert!(enforcer.verify_symlink_follow(2000, 1000, 0, true).is_err());
         assert_eq!(enforcer.violations_count, 1);
 
         // Owner (uid 1000) following own symlink -> OK
-        assert!(enforcer
-            .verify_symlink_follow(1000, 1000, 0, true)
-            .is_ok());
+        assert!(enforcer.verify_symlink_follow(1000, 1000, 0, true).is_ok());
 
         // Hardlink to setuid file -> FAIL
         assert!(enforcer

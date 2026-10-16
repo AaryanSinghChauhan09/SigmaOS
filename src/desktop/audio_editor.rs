@@ -175,7 +175,11 @@ impl AudioEditor {
 
     /// Remove track
     pub fn remove_track(&mut self, track_id: u32) -> Result<(), &'static str> {
-        let index = self.tracks.iter().position(|t| t.id == track_id).ok_or("Track not found")?;
+        let index = self
+            .tracks
+            .iter()
+            .position(|t| t.id == track_id)
+            .ok_or("Track not found")?;
         self.tracks.remove(index);
         Ok(())
     }
@@ -187,7 +191,11 @@ impl AudioEditor {
 
     /// Remove region
     pub fn remove_region(&mut self, region_id: String) -> Result<(), &'static str> {
-        let index = self.regions.iter().position(|r| r.id == region_id).ok_or("Region not found")?;
+        let index = self
+            .regions
+            .iter()
+            .position(|r| r.id == region_id)
+            .ok_or("Region not found")?;
         self.regions.remove(index);
         Ok(())
     }
@@ -290,9 +298,7 @@ pub fn init_audio_editor() {
 
 /// Get audio editor
 pub fn get_audio_editor() -> &'static mut AudioEditor {
-    unsafe {
-        AUDIO_EDITOR.as_mut().expect("Audio editor not initialized")
-    }
+    unsafe { AUDIO_EDITOR.as_mut().expect("Audio editor not initialized") }
 }
 
 #[cfg(test)]

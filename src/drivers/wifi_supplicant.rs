@@ -62,7 +62,12 @@ impl Wpa3Supplicant {
     }
 
     /// Initiate connection to a target Wi-Fi network
-    pub fn connect(&mut self, ssid: &str, passphrase: &str, security: WifiSecurity) -> Result<(), &'static str> {
+    pub fn connect(
+        &mut self,
+        ssid: &str,
+        passphrase: &str,
+        security: WifiSecurity,
+    ) -> Result<(), &'static str> {
         self.active_ssid = Some(String::from(ssid));
         self.passphrase = Some(String::from(passphrase));
 
@@ -84,7 +89,11 @@ impl Wpa3Supplicant {
     }
 
     /// Process SAE Commit / Confirm exchange (Dragonfly handshake)
-    pub fn process_sae_exchange(&mut self, ap_scalar: &[u8], ap_element: &[u8]) -> Result<bool, &'static str> {
+    pub fn process_sae_exchange(
+        &mut self,
+        ap_scalar: &[u8],
+        ap_element: &[u8],
+    ) -> Result<bool, &'static str> {
         if self.state != SupplicantState::AuthenticatingSae {
             return Err("Not in SAE authentication state");
         }
@@ -100,7 +109,11 @@ impl Wpa3Supplicant {
     }
 
     /// Process 4-Way EAPOL Handshake Steps (Messages 1 through 4)
-    pub fn process_eapol_message(&mut self, msg_num: u8, anonce: &[u8; 32]) -> Result<u8, &'static str> {
+    pub fn process_eapol_message(
+        &mut self,
+        msg_num: u8,
+        anonce: &[u8; 32],
+    ) -> Result<u8, &'static str> {
         match (self.handshake_step, msg_num) {
             (1, 1) => {
                 // Received Message 1 from AP: derive PTK using SNonce and ANonce
@@ -142,7 +155,9 @@ mod tests {
     #[test]
     fn test_wpa3_sae_and_four_way_handshake() {
         let mut supp = Wpa3Supplicant::new();
-        assert!(supp.connect("Home_Wifi", "SecretKey123!", WifiSecurity::Wpa3Sae).is_ok());
+        assert!(supp
+            .connect("Home_Wifi", "SecretKey123!", WifiSecurity::Wpa3Sae)
+            .is_ok());
         assert_eq!(supp.state, SupplicantState::AuthenticatingSae);
 
         // SAE Commit/Confirm

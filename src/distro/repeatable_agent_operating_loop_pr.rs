@@ -150,9 +150,13 @@ impl EvidenceStatusLevel {
         match self {
             Self::Unimplemented => "No credible implementation found in codebase.",
             Self::ModelOnly => "Unit-tested model exists, but no connected runtime path.",
-            Self::IntegrationPending => "Code exists but is not connected end-to-end to kernel boot/runtime.",
+            Self::IntegrationPending => {
+                "Code exists but is not connected end-to-end to kernel boot/runtime."
+            }
             Self::QemuVerified => "Passes automated QEMU boot and runtime execution tests.",
-            Self::HardwareVerified => "Tested on named physical hardware with serial/kernel logs on record.",
+            Self::HardwareVerified => {
+                "Tested on named physical hardware with serial/kernel logs on record."
+            }
             Self::Blocked => "Known dependency, design, or validation blocker prevents progress.",
         }
     }
@@ -359,7 +363,9 @@ impl RepeatableAgentOperatingLoopPrEngine {
         let stages = self.get_stages();
         let status_levels = self.get_status_levels();
 
-        let mut payload = String::from("PR: feat(distro): Turn Repository into Repeatable Agent Operating Loop\n");
+        let mut payload = String::from(
+            "PR: feat(distro): Turn Repository into Repeatable Agent Operating Loop\n",
+        );
         for r in &roles {
             payload.push_str(r.code());
             payload.push_str(": ");
@@ -374,7 +380,9 @@ impl RepeatableAgentOperatingLoopPrEngine {
         let patch_digest = fnv1a_agent_loop_digest(payload.as_bytes());
 
         RepeatableAgentOperatingLoopPrSpec {
-            pr_title: String::from("feat(distro): Turn Repository into Repeatable Agent Operating Loop"),
+            pr_title: String::from(
+                "feat(distro): Turn Repository into Repeatable Agent Operating Loop",
+            ),
             pr_branch: String::from("feat/agent-operating-loop"),
             roles,
             stages,

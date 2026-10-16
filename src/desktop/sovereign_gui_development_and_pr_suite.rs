@@ -61,25 +61,139 @@ impl GuiDevelopmentPlanTracker {
 
     fn seed_19_prs(&mut self) {
         let pr_data = [
-            (1, "docs(desktop): define GUI scope, session architecture, and support status", "Audit src/desktop/, src/compositor/, src/drivers/drm_kms.rs", "Components classified by evidence level; QEMU target selected", GuiPrStage::AuditBaseline),
-            (2, "test(desktop): add deterministic compositor and rendering fixtures", "Geometry, damage, z-order, focus, scale, color fixtures", "Deterministic pixel/snapshot tests running display-less", GuiPrStage::AuditBaseline),
-            (3, "feat(display): establish framebuffer and output discovery contract", "Connect DRM/KMS model to single software output path", "QEMU test pattern displayed; invalid modes/buffers rejected", GuiPrStage::BootableDesktopSlice),
-            (4, "feat(compositor): implement buffer import, surface commit, and release lifecycle", "Wayland-like surface state, commit, damage, release, disconnect", "Safe buffer lifecycle; malformed requests cannot panic or leak", GuiPrStage::BootableDesktopSlice),
-            (5, "feat(compositor): implement frame scheduling and software composition", "Frame callbacks/timing, damage tracking, basic alpha composition", "Deterministic multi-surface composition; no idle busy loop", GuiPrStage::BootableDesktopSlice),
-            (6, "feat(input): connect keyboard and pointer devices to session events", "Device discovery, keymap translation, pointer coords, focus routing", "Events reach focused surface; unplug/reset handled cleanly", GuiPrStage::BootableDesktopSlice),
-            (7, "feat(compositor): add core window management and focus policy", "Window map/unmap, stacking, focus transfer, move/resize, workspace", "Deterministic focus/stacking; keyboard operation supported", GuiPrStage::BootableDesktopSlice),
-            (8, "feat(desktop): add session manager and graphical login handoff", "Startup/shutdown, environment, user session, supervisor, console fallback", "Boot reaches graphical session; graceful console fallback on failure", GuiPrStage::BootableDesktopSlice),
-            (9, "feat(desktop): add installed-app discovery and typed launcher actions", "Metadata parsing, search, favorites, typed launch service", "Responsive search; no raw shell-string execution", GuiPrStage::UsableCoreUx),
-            (10, "feat(desktop): add keyboard shortcuts and command palette actions", "Key event translation to actions; command palette integration", "Shortcuts discoverable; character-only shortcuts not sole path", GuiPrStage::UsableCoreUx),
-            (11, "feat(desktop): implement session notification service and surface", "Session-scoped notification service, actions, dismissal, priority", "Notifications rendered in session; lock-screen privacy enforced", GuiPrStage::UsableCoreUx),
-            (12, "feat(desktop): add settings service for display input and appearance", "Display, scale, keyboard, pointer, theme, a11y settings", "Changes validated before apply; user settings persist with rollback", GuiPrStage::UsableCoreUx),
-            (13, "feat(desktop): add file chooser and privileged-action confirmation portals", "Minimal portal APIs for file access, screenshot, capture", "Explicit per-request consent; file handle passing instead of raw paths", GuiPrStage::SecurityAndAccessibility),
-            (14, "feat(accessibility): add accessibility tree and assistive technology bridge", "Semantic roles, names, values, focus events, AT-SPI IPC bridge", "Core UI surfaces expose semantic nodes; focus changes announced", GuiPrStage::SecurityAndAccessibility),
-            (15, "feat(desktop): add text scaling high contrast reduced motion and themes", "Scalable UI layout, high contrast, reduced motion, theme tokens", "No clipping at scales; visible focus; measured contrast", GuiPrStage::SecurityAndAccessibility),
-            (16, "security(compositor): isolate clients and validate protocol resources", "Resource ownership, quotas, request validation, clipboard policy", "Strict client isolation; resource exhaustion handled cleanly", GuiPrStage::SecurityAndAccessibility),
-            (17, "feat(display): add validated atomic modeset and page-flip path", "Hardware page-flip/atomic commit path with software fallback", "Atomic state validation before commit; completion events verified", GuiPrStage::HardwareAndReleaseReadiness),
-            (18, "test(desktop): add QEMU graphical-session and accessibility workflow", "Automate boot, input, app launch, focus, notification, shutdown", "CI automation passes on QEMU target without internet access", GuiPrStage::HardwareAndReleaseReadiness),
-            (19, "docs(desktop): publish support matrix and recovery guide", "Document QEMU/GPU/mode support, session controls, recovery guide", "Support matrix links directly to repeatable test evidence", GuiPrStage::HardwareAndReleaseReadiness),
+            (
+                1,
+                "docs(desktop): define GUI scope, session architecture, and support status",
+                "Audit src/desktop/, src/compositor/, src/drivers/drm_kms.rs",
+                "Components classified by evidence level; QEMU target selected",
+                GuiPrStage::AuditBaseline,
+            ),
+            (
+                2,
+                "test(desktop): add deterministic compositor and rendering fixtures",
+                "Geometry, damage, z-order, focus, scale, color fixtures",
+                "Deterministic pixel/snapshot tests running display-less",
+                GuiPrStage::AuditBaseline,
+            ),
+            (
+                3,
+                "feat(display): establish framebuffer and output discovery contract",
+                "Connect DRM/KMS model to single software output path",
+                "QEMU test pattern displayed; invalid modes/buffers rejected",
+                GuiPrStage::BootableDesktopSlice,
+            ),
+            (
+                4,
+                "feat(compositor): implement buffer import, surface commit, and release lifecycle",
+                "Wayland-like surface state, commit, damage, release, disconnect",
+                "Safe buffer lifecycle; malformed requests cannot panic or leak",
+                GuiPrStage::BootableDesktopSlice,
+            ),
+            (
+                5,
+                "feat(compositor): implement frame scheduling and software composition",
+                "Frame callbacks/timing, damage tracking, basic alpha composition",
+                "Deterministic multi-surface composition; no idle busy loop",
+                GuiPrStage::BootableDesktopSlice,
+            ),
+            (
+                6,
+                "feat(input): connect keyboard and pointer devices to session events",
+                "Device discovery, keymap translation, pointer coords, focus routing",
+                "Events reach focused surface; unplug/reset handled cleanly",
+                GuiPrStage::BootableDesktopSlice,
+            ),
+            (
+                7,
+                "feat(compositor): add core window management and focus policy",
+                "Window map/unmap, stacking, focus transfer, move/resize, workspace",
+                "Deterministic focus/stacking; keyboard operation supported",
+                GuiPrStage::BootableDesktopSlice,
+            ),
+            (
+                8,
+                "feat(desktop): add session manager and graphical login handoff",
+                "Startup/shutdown, environment, user session, supervisor, console fallback",
+                "Boot reaches graphical session; graceful console fallback on failure",
+                GuiPrStage::BootableDesktopSlice,
+            ),
+            (
+                9,
+                "feat(desktop): add installed-app discovery and typed launcher actions",
+                "Metadata parsing, search, favorites, typed launch service",
+                "Responsive search; no raw shell-string execution",
+                GuiPrStage::UsableCoreUx,
+            ),
+            (
+                10,
+                "feat(desktop): add keyboard shortcuts and command palette actions",
+                "Key event translation to actions; command palette integration",
+                "Shortcuts discoverable; character-only shortcuts not sole path",
+                GuiPrStage::UsableCoreUx,
+            ),
+            (
+                11,
+                "feat(desktop): implement session notification service and surface",
+                "Session-scoped notification service, actions, dismissal, priority",
+                "Notifications rendered in session; lock-screen privacy enforced",
+                GuiPrStage::UsableCoreUx,
+            ),
+            (
+                12,
+                "feat(desktop): add settings service for display input and appearance",
+                "Display, scale, keyboard, pointer, theme, a11y settings",
+                "Changes validated before apply; user settings persist with rollback",
+                GuiPrStage::UsableCoreUx,
+            ),
+            (
+                13,
+                "feat(desktop): add file chooser and privileged-action confirmation portals",
+                "Minimal portal APIs for file access, screenshot, capture",
+                "Explicit per-request consent; file handle passing instead of raw paths",
+                GuiPrStage::SecurityAndAccessibility,
+            ),
+            (
+                14,
+                "feat(accessibility): add accessibility tree and assistive technology bridge",
+                "Semantic roles, names, values, focus events, AT-SPI IPC bridge",
+                "Core UI surfaces expose semantic nodes; focus changes announced",
+                GuiPrStage::SecurityAndAccessibility,
+            ),
+            (
+                15,
+                "feat(desktop): add text scaling high contrast reduced motion and themes",
+                "Scalable UI layout, high contrast, reduced motion, theme tokens",
+                "No clipping at scales; visible focus; measured contrast",
+                GuiPrStage::SecurityAndAccessibility,
+            ),
+            (
+                16,
+                "security(compositor): isolate clients and validate protocol resources",
+                "Resource ownership, quotas, request validation, clipboard policy",
+                "Strict client isolation; resource exhaustion handled cleanly",
+                GuiPrStage::SecurityAndAccessibility,
+            ),
+            (
+                17,
+                "feat(display): add validated atomic modeset and page-flip path",
+                "Hardware page-flip/atomic commit path with software fallback",
+                "Atomic state validation before commit; completion events verified",
+                GuiPrStage::HardwareAndReleaseReadiness,
+            ),
+            (
+                18,
+                "test(desktop): add QEMU graphical-session and accessibility workflow",
+                "Automate boot, input, app launch, focus, notification, shutdown",
+                "CI automation passes on QEMU target without internet access",
+                GuiPrStage::HardwareAndReleaseReadiness,
+            ),
+            (
+                19,
+                "docs(desktop): publish support matrix and recovery guide",
+                "Document QEMU/GPU/mode support, session controls, recovery guide",
+                "Support matrix links directly to repeatable test evidence",
+                GuiPrStage::HardwareAndReleaseReadiness,
+            ),
         ];
 
         for (num, title, scope, criteria, stage) in pr_data {
@@ -107,8 +221,17 @@ impl GuiDevelopmentPlanTracker {
     }
 
     pub fn overall_gui_status(&self) -> GuiSupportStatus {
-        let all_supported = self.prs.values().all(|p| p.status == GuiSupportStatus::Supported);
-        let integrated_count = self.prs.values().filter(|p| p.status == GuiSupportStatus::Integrated || p.status == GuiSupportStatus::Supported).count();
+        let all_supported = self
+            .prs
+            .values()
+            .all(|p| p.status == GuiSupportStatus::Supported);
+        let integrated_count = self
+            .prs
+            .values()
+            .filter(|p| {
+                p.status == GuiSupportStatus::Integrated || p.status == GuiSupportStatus::Supported
+            })
+            .count();
 
         if all_supported {
             GuiSupportStatus::Supported
@@ -196,7 +319,12 @@ impl WaylandClientBufferIsolationGovernor {
         Ok(())
     }
 
-    pub fn commit_surface(&mut self, client_id: u32, surface_id: u32, buffer_id: u32) -> Result<(), &'static str> {
+    pub fn commit_surface(
+        &mut self,
+        client_id: u32,
+        surface_id: u32,
+        buffer_id: u32,
+    ) -> Result<(), &'static str> {
         if let Some(buf) = self.buffers.get_mut(&buffer_id) {
             if buf.client_id != client_id {
                 return Err("Wayland Isolation Security Violation: Client cannot access another client's buffer");
@@ -265,21 +393,49 @@ impl DrmKmsAtomicModesetValidator {
     pub fn new() -> Self {
         Self {
             supported_modes: vec![
-                DrmDisplayMode { mode_id: 1, width: 1024, height: 768, refresh_rate_hz: 60, pixel_clock_khz: 65000 },
-                DrmDisplayMode { mode_id: 2, width: 1920, height: 1080, refresh_rate_hz: 60, pixel_clock_khz: 148500 },
-                DrmDisplayMode { mode_id: 3, width: 2560, height: 1440, refresh_rate_hz: 60, pixel_clock_khz: 241500 },
-                DrmDisplayMode { mode_id: 4, width: 3840, height: 2160, refresh_rate_hz: 60, pixel_clock_khz: 533250 },
+                DrmDisplayMode {
+                    mode_id: 1,
+                    width: 1024,
+                    height: 768,
+                    refresh_rate_hz: 60,
+                    pixel_clock_khz: 65000,
+                },
+                DrmDisplayMode {
+                    mode_id: 2,
+                    width: 1920,
+                    height: 1080,
+                    refresh_rate_hz: 60,
+                    pixel_clock_khz: 148500,
+                },
+                DrmDisplayMode {
+                    mode_id: 3,
+                    width: 2560,
+                    height: 1440,
+                    refresh_rate_hz: 60,
+                    pixel_clock_khz: 241500,
+                },
+                DrmDisplayMode {
+                    mode_id: 4,
+                    width: 3840,
+                    height: 2160,
+                    refresh_rate_hz: 60,
+                    pixel_clock_khz: 533250,
+                },
             ],
         }
     }
 
     pub fn validate_atomic_commit(&self, state: &AtomicModesetState) -> Result<(), &'static str> {
         if state.crtc_id == 0 || state.connector_id == 0 || state.framebuffer_id == 0 {
-            return Err("DRM/KMS Atomic Validation Error: Invalid CRTC, connector, or framebuffer handle");
+            return Err(
+                "DRM/KMS Atomic Validation Error: Invalid CRTC, connector, or framebuffer handle",
+            );
         }
 
         let mode_supported = self.supported_modes.iter().any(|m| {
-            m.width == state.mode.width && m.height == state.mode.height && m.refresh_rate_hz == state.mode.refresh_rate_hz
+            m.width == state.mode.width
+                && m.height == state.mode.height
+                && m.refresh_rate_hz == state.mode.refresh_rate_hz
         });
 
         if !mode_supported {
@@ -337,7 +493,13 @@ impl AssistiveTechnologyBridge {
         }
     }
 
-    pub fn register_node(&mut self, node_id: u32, parent_id: Option<u32>, role: AccessibilityRole, name: &str) {
+    pub fn register_node(
+        &mut self,
+        node_id: u32,
+        parent_id: Option<u32>,
+        role: AccessibilityRole,
+        name: &str,
+    ) {
         let node = AccessibilityNode {
             node_id,
             parent_id,
@@ -360,7 +522,11 @@ impl AssistiveTechnologyBridge {
         if let Some(target) = self.nodes.get_mut(&node_id) {
             target.is_focused = true;
             self.active_focus_id = Some(node_id);
-            self.announcements.push(format!("Focus changed to {}: {}", target.role_str(), target.name));
+            self.announcements.push(format!(
+                "Focus changed to {}: {}",
+                target.role_str(),
+                target.name
+            ));
             Ok(())
         } else {
             Err("Assistive Technology Bridge Error: Node ID not found")
@@ -413,13 +579,21 @@ impl TypedPortalAccessMediator {
         }
     }
 
-    pub fn request_portal_access(&mut self, client_id: u32, action: PortalActionType, target_spec: &str) -> Result<String, &'static str> {
+    pub fn request_portal_access(
+        &mut self,
+        client_id: u32,
+        action: PortalActionType,
+        target_spec: &str,
+    ) -> Result<String, &'static str> {
         if client_id == 0 {
             return Err("Portal Error: Invalid client ID");
         }
 
         self.pending_requests_count += 1;
-        let handle = format!("portal_handle_client_{}_{:?}_{}", client_id, action, target_spec);
+        let handle = format!(
+            "portal_handle_client_{}_{:?}_{}",
+            client_id, action, target_spec
+        );
         self.authorized_handles.push(handle.clone());
         Ok(handle)
     }
@@ -501,14 +675,22 @@ mod tests {
     fn test_gui_pr_tracker() {
         let tracker = GuiDevelopmentPlanTracker::new();
         assert_eq!(tracker.prs.len(), 19);
-        assert_eq!(tracker.prs.get(&1).unwrap().stage, GuiPrStage::AuditBaseline);
-        assert_eq!(tracker.prs.get(&19).unwrap().stage, GuiPrStage::HardwareAndReleaseReadiness);
+        assert_eq!(
+            tracker.prs.get(&1).unwrap().stage,
+            GuiPrStage::AuditBaseline
+        );
+        assert_eq!(
+            tracker.prs.get(&19).unwrap().stage,
+            GuiPrStage::HardwareAndReleaseReadiness
+        );
     }
 
     #[test]
     fn test_wayland_buffer_isolation() {
         let mut governor = WaylandClientBufferIsolationGovernor::new();
-        assert!(governor.import_buffer(10, 1, 100, 1920, 1080, 1920 * 4, "XRGB8888").is_ok());
+        assert!(governor
+            .import_buffer(10, 1, 100, 1920, 1080, 1920 * 4, "XRGB8888")
+            .is_ok());
         assert!(governor.commit_surface(10, 1, 100).is_ok());
         // Foreign client isolation check
         assert!(governor.commit_surface(99, 1, 100).is_err());
@@ -521,7 +703,13 @@ mod tests {
         let valid_state = AtomicModesetState {
             crtc_id: 1,
             connector_id: 1,
-            mode: DrmDisplayMode { mode_id: 2, width: 1920, height: 1080, refresh_rate_hz: 60, pixel_clock_khz: 148500 },
+            mode: DrmDisplayMode {
+                mode_id: 2,
+                width: 1920,
+                height: 1080,
+                refresh_rate_hz: 60,
+                pixel_clock_khz: 148500,
+            },
             framebuffer_id: 10,
             is_valid: true,
         };
@@ -530,17 +718,30 @@ mod tests {
         let invalid_mode_state = AtomicModesetState {
             crtc_id: 1,
             connector_id: 1,
-            mode: DrmDisplayMode { mode_id: 99, width: 1234, height: 5678, refresh_rate_hz: 144, pixel_clock_khz: 999999 },
+            mode: DrmDisplayMode {
+                mode_id: 99,
+                width: 1234,
+                height: 5678,
+                refresh_rate_hz: 144,
+                pixel_clock_khz: 999999,
+            },
             framebuffer_id: 10,
             is_valid: true,
         };
-        assert!(validator.validate_atomic_commit(&invalid_mode_state).is_err());
+        assert!(validator
+            .validate_atomic_commit(&invalid_mode_state)
+            .is_err());
     }
 
     #[test]
     fn test_assistive_technology_bridge() {
         let mut bridge = AssistiveTechnologyBridge::new();
-        bridge.register_node(1, None, AccessibilityRole::Window, "Main Application Window");
+        bridge.register_node(
+            1,
+            None,
+            AccessibilityRole::Window,
+            "Main Application Window",
+        );
         bridge.register_node(2, Some(1), AccessibilityRole::Button, "Submit Button");
         assert!(bridge.set_focus(2).is_ok());
         assert_eq!(bridge.announcements.len(), 1);
@@ -550,7 +751,9 @@ mod tests {
     #[test]
     fn test_typed_portal_mediator() {
         let mut mediator = TypedPortalAccessMediator::new();
-        let handle = mediator.request_portal_access(1, PortalActionType::OpenFileChooser, "*.txt").unwrap();
+        let handle = mediator
+            .request_portal_access(1, PortalActionType::OpenFileChooser, "*.txt")
+            .unwrap();
         assert!(handle.contains("OpenFileChooser"));
         assert_eq!(mediator.authorized_handles.len(), 1);
     }

@@ -55,21 +55,111 @@ impl DriverPrTracker {
 
     fn seed_15_prs(&mut self) {
         let pr_data = [
-            (1, "docs(drivers): audit driver status and define support evidence", "Audit source, tests, wiki, and FEATURE_STATUS.toml", "Separated evidence; no unsupported claims", DriverSupportStatus::Supported),
-            (2, "feat(drivers): define device, bus, and driver lifecycle interfaces", "Device descriptors, bus enumeration, probe/remove lifecycles", "Mock bus enumeration, probe failure cleanup tested", DriverSupportStatus::Integrated),
-            (3, "feat(drivers): add managed resource acquisition and rollback", "RAII resource guards for MMIO, IRQ, DMA, queues", "Probe rollback releases all acquired resources in reverse order", DriverSupportStatus::Integrated),
-            (4, "feat(mmio): add validated register access and ordering APIs", "Typed MMIO mapping, volatile width-aware access, bounds checks", "Out-of-range MMIO rejected; barriers documented", DriverSupportStatus::Integrated),
-            (5, "feat(dma): add device DMA mapping API with masks and ownership", "Coherent/streaming DMA mappings, address masks, directions, sync", "Typed CPU vs DMA addresses; map/unmap/sync enforced", DriverSupportStatus::Integrated),
-            (6, "feat(irq): define interrupt registration and deferred work contract", "IRQ registration, context checks, shared dispatch, deferred task queue", "Non-blocking handlers; synchronized detach; no sleep in IRQ", DriverSupportStatus::Integrated),
-            (7, "feat(pci): add QEMU PCI enumeration and resource ownership", "PCI config space scan, BAR size calculation, device tree generation", "PCI devices enumerated once; overlapping BARs rejected", DriverSupportStatus::Integrated),
-            (8, "feat(drivers): integrate VirtIO block through PCI discovery", "Connect VirtIO block to PCI discovery, virtqueue, DMA, IRQ, VFS", "QEMU VirtIO block sector read/write/flush and clean shutdown", DriverSupportStatus::Integrated),
-            (9, "feat(drivers): connect VirtIO network queues to Ethernet stack", "Integrate VirtIO net with interface lifecycle, TX/RX virtqueues, stack", "QEMU NIC frame transmit/receive, queue reset, link lifecycle", DriverSupportStatus::Integrated),
-            (10, "feat(drivers): add device diagnostics and health reporting", "Identity, state, error counters, read-only diagnostic snapshots", "Diagnostics redact secrets; failed devices report actionable status", DriverSupportStatus::Integrated),
-            (11, "feat(drivers): implement suspend resume and shutdown contracts", "Power state transitions; quiesce DMA/IRQs before suspend/shutdown", "Power lifecycle tested; DMA/IRQ stopped before teardown", DriverSupportStatus::Integrated),
-            (12, "test(drivers): add fault-injection and lifecycle test harness", "Alloc/map/IRQ/timeout/reset failure injection harness", "Failure points covered; resource counts return to baseline", DriverSupportStatus::Integrated),
-            (13, "test(drivers): add QEMU hardware matrix and boot smoke checks", "Automate QEMU machines for PCI, VirtIO, serial, storage, input", "CI verifies discovery, bind, I/O, error, and teardown", DriverSupportStatus::Integrated),
-            (14, "security(drivers): add driver threat model and DMA isolation policy", "Untrusted device assumptions, DMA confinement, privileged register rules", "Threat model defined; address bounds enforced", DriverSupportStatus::Integrated),
-            (15, "docs(drivers): publish device support matrix and recovery guide", "Document known QEMU/hardware devices, firmware, and recovery", "Supported entries link directly to repeatable evidence", DriverSupportStatus::Supported),
+            (
+                1,
+                "docs(drivers): audit driver status and define support evidence",
+                "Audit source, tests, wiki, and FEATURE_STATUS.toml",
+                "Separated evidence; no unsupported claims",
+                DriverSupportStatus::Supported,
+            ),
+            (
+                2,
+                "feat(drivers): define device, bus, and driver lifecycle interfaces",
+                "Device descriptors, bus enumeration, probe/remove lifecycles",
+                "Mock bus enumeration, probe failure cleanup tested",
+                DriverSupportStatus::Integrated,
+            ),
+            (
+                3,
+                "feat(drivers): add managed resource acquisition and rollback",
+                "RAII resource guards for MMIO, IRQ, DMA, queues",
+                "Probe rollback releases all acquired resources in reverse order",
+                DriverSupportStatus::Integrated,
+            ),
+            (
+                4,
+                "feat(mmio): add validated register access and ordering APIs",
+                "Typed MMIO mapping, volatile width-aware access, bounds checks",
+                "Out-of-range MMIO rejected; barriers documented",
+                DriverSupportStatus::Integrated,
+            ),
+            (
+                5,
+                "feat(dma): add device DMA mapping API with masks and ownership",
+                "Coherent/streaming DMA mappings, address masks, directions, sync",
+                "Typed CPU vs DMA addresses; map/unmap/sync enforced",
+                DriverSupportStatus::Integrated,
+            ),
+            (
+                6,
+                "feat(irq): define interrupt registration and deferred work contract",
+                "IRQ registration, context checks, shared dispatch, deferred task queue",
+                "Non-blocking handlers; synchronized detach; no sleep in IRQ",
+                DriverSupportStatus::Integrated,
+            ),
+            (
+                7,
+                "feat(pci): add QEMU PCI enumeration and resource ownership",
+                "PCI config space scan, BAR size calculation, device tree generation",
+                "PCI devices enumerated once; overlapping BARs rejected",
+                DriverSupportStatus::Integrated,
+            ),
+            (
+                8,
+                "feat(drivers): integrate VirtIO block through PCI discovery",
+                "Connect VirtIO block to PCI discovery, virtqueue, DMA, IRQ, VFS",
+                "QEMU VirtIO block sector read/write/flush and clean shutdown",
+                DriverSupportStatus::Integrated,
+            ),
+            (
+                9,
+                "feat(drivers): connect VirtIO network queues to Ethernet stack",
+                "Integrate VirtIO net with interface lifecycle, TX/RX virtqueues, stack",
+                "QEMU NIC frame transmit/receive, queue reset, link lifecycle",
+                DriverSupportStatus::Integrated,
+            ),
+            (
+                10,
+                "feat(drivers): add device diagnostics and health reporting",
+                "Identity, state, error counters, read-only diagnostic snapshots",
+                "Diagnostics redact secrets; failed devices report actionable status",
+                DriverSupportStatus::Integrated,
+            ),
+            (
+                11,
+                "feat(drivers): implement suspend resume and shutdown contracts",
+                "Power state transitions; quiesce DMA/IRQs before suspend/shutdown",
+                "Power lifecycle tested; DMA/IRQ stopped before teardown",
+                DriverSupportStatus::Integrated,
+            ),
+            (
+                12,
+                "test(drivers): add fault-injection and lifecycle test harness",
+                "Alloc/map/IRQ/timeout/reset failure injection harness",
+                "Failure points covered; resource counts return to baseline",
+                DriverSupportStatus::Integrated,
+            ),
+            (
+                13,
+                "test(drivers): add QEMU hardware matrix and boot smoke checks",
+                "Automate QEMU machines for PCI, VirtIO, serial, storage, input",
+                "CI verifies discovery, bind, I/O, error, and teardown",
+                DriverSupportStatus::Integrated,
+            ),
+            (
+                14,
+                "security(drivers): add driver threat model and DMA isolation policy",
+                "Untrusted device assumptions, DMA confinement, privileged register rules",
+                "Threat model defined; address bounds enforced",
+                DriverSupportStatus::Integrated,
+            ),
+            (
+                15,
+                "docs(drivers): publish device support matrix and recovery guide",
+                "Document known QEMU/hardware devices, firmware, and recovery",
+                "Supported entries link directly to repeatable evidence",
+                DriverSupportStatus::Supported,
+            ),
         ];
 
         for (num, title, main_work, criteria, status) in pr_data {
@@ -99,7 +189,10 @@ impl DriverPrTracker {
         let integrated_count = self
             .prs
             .values()
-            .filter(|p| p.status == DriverSupportStatus::Integrated || p.status == DriverSupportStatus::Supported)
+            .filter(|p| {
+                p.status == DriverSupportStatus::Integrated
+                    || p.status == DriverSupportStatus::Supported
+            })
             .count();
 
         if integrated_count == self.prs.len() {
@@ -190,7 +283,8 @@ impl BusDeviceLifecycleGovernor {
         if self.devices.contains_key(&descriptor.device_key) {
             return Err("Bus Lifecycle Error: Device already registered");
         }
-        self.devices.insert(descriptor.device_key.clone(), descriptor);
+        self.devices
+            .insert(descriptor.device_key.clone(), descriptor);
         Ok(())
     }
 
@@ -523,7 +617,10 @@ impl InterruptAndDeferredWorkContract {
         Ok(())
     }
 
-    pub fn validate_handler_context_safety(&self, attempt_allocation_or_sleep: bool) -> Result<(), &'static str> {
+    pub fn validate_handler_context_safety(
+        &self,
+        attempt_allocation_or_sleep: bool,
+    ) -> Result<(), &'static str> {
         if self.is_in_irq_context && attempt_allocation_or_sleep {
             return Err("IRQ Safety Violation: Unbounded allocation or sleeping operation prohibited in IRQ context");
         }
@@ -1057,8 +1154,14 @@ mod tests {
     fn test_driver_pr_tracker() {
         let tracker = DriverPrTracker::new();
         assert_eq!(tracker.prs.len(), 15);
-        assert_eq!(tracker.prs.get(&1).unwrap().status, DriverSupportStatus::Supported);
-        assert_eq!(tracker.prs.get(&8).unwrap().status, DriverSupportStatus::Integrated);
+        assert_eq!(
+            tracker.prs.get(&1).unwrap().status,
+            DriverSupportStatus::Supported
+        );
+        assert_eq!(
+            tracker.prs.get(&8).unwrap().status,
+            DriverSupportStatus::Integrated
+        );
         assert_eq!(tracker.overall_status(), DriverSupportStatus::Supported);
     }
 

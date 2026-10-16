@@ -176,7 +176,10 @@ impl UniversalPackageImporter {
             Some(UniversalPackageFormat::SolusEopkg)
         } else if filename.contains("snapcraft.yaml") {
             Some(UniversalPackageFormat::SnapPackage)
-        } else if filename.ends_with(".kiss") || filename.ends_with(".cpt") || filename.contains("Pkgfile") {
+        } else if filename.ends_with(".kiss")
+            || filename.ends_with(".cpt")
+            || filename.contains("Pkgfile")
+        {
             Some(UniversalPackageFormat::CruxPkg)
         } else {
             None

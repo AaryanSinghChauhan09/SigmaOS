@@ -3,8 +3,7 @@
 pub mod sigmapam;
 
 pub use sigmapam::{
-    SigmaPAM, PamConfig, PamModule, PamService, PamFlag, AuthResult,
-    UserAccount, AuthRequest, AuthResponse, PasswordAuthModule,
-    init_sigmapam, init_sigmapam_default, get_sigmapam,
-    authenticate_user, check_account,
+    authenticate_user, check_account, get_sigmapam, init_sigmapam, init_sigmapam_default,
+    AuthRequest, AuthResponse, AuthResult, PamConfig, PamFlag, PamModule, PamService,
+    PasswordAuthModule, SigmaPAM, UserAccount,
 };

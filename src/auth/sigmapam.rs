@@ -134,13 +134,7 @@ pub struct UserAccount {
 
 impl UserAccount {
     /// Create a new user account
-    pub fn new(
-        username: String,
-        uid: u32,
-        gid: u32,
-        home_dir: String,
-        shell: String,
-    ) -> Self {
+    pub fn new(username: String, uid: u32, gid: u32, home_dir: String, shell: String) -> Self {
         Self {
             username,
             uid,
@@ -204,7 +198,8 @@ impl UserAccount {
         }
         if let Some(expiry) = self.account_expiry {
             // In a real implementation, check against current time
-            if expiry < 1000 { // Placeholder check
+            if expiry < 1000 {
+                // Placeholder check
                 return false;
             }
         }
@@ -327,19 +322,19 @@ impl AuthResponse {
 pub trait PamModule {
     /// Module name
     fn name(&self) -> &str;
-    
+
     /// Authenticate user
     fn authenticate(&self, request: &AuthRequest) -> AuthResult;
-    
+
     /// Check account validity
     fn account_check(&self, request: &AuthRequest) -> AuthResult;
-    
+
     /// Open session
     fn session_open(&self, request: &AuthRequest) -> AuthResult;
-    
+
     /// Close session
     fn session_close(&self, request: &AuthRequest) -> AuthResult;
-    
+
     /// Change password
     fn password_change(&self, request: &AuthRequest) -> AuthResult;
 }
@@ -399,7 +394,7 @@ impl PamModule for PasswordAuthModule {
     fn authenticate(&self, request: &AuthRequest) -> AuthResult {
         // Get stored password hash
         let stored_hash = self.user_db.get(&request.username);
-        
+
         match stored_hash {
             Some(hash) => {
                 // In a real implementation, use constant-time comparison
@@ -516,7 +511,7 @@ impl SigmaPAM {
     /// Create a new SigmaPAM instance
     pub fn new(config: PamConfig) -> Self {
         let password_auth = PasswordAuthModule::new();
-        
+
         Self {
             config,
             modules: BTreeMap::new(),
@@ -532,7 +527,7 @@ impl SigmaPAM {
             .add_account_module(PamFlag::Required, "pam_unix".to_string())
             .add_session_module(PamFlag::Required, "pam_unix".to_string())
             .add_password_module(PamFlag::Required, "pam_unix".to_string());
-        
+
         Self::new(config)
     }
 
@@ -566,9 +561,9 @@ impl SigmaPAM {
 
         // Use default password auth module
         let result = self.password_auth.authenticate(request);
-        
+
         let mut response = AuthResponse::new(result);
-        
+
         if result == AuthResult::Success {
             if let Some(account) = self.password_auth.get_account(&request.username) {
                 response = response.with_account(account.clone());
@@ -659,11 +654,7 @@ pub fn get_sigmapam() -> Option<&'static mut SigmaPAM> {
 /// Convenience function to authenticate a user
 pub fn authenticate_user(username: &str, password_hash: &str, service: PamService) -> AuthResponse {
     if let Some(pam) = get_sigmapam() {
-        let request = AuthRequest::new(
-            username.to_string(),
-            password_hash.to_string(),
-            service,
-        );
+        let request = AuthRequest::new(username.to_string(), password_hash.to_string(), service);
         pam.authenticate(&request)
     } else {
         AuthResponse::new(AuthResult::ServiceError)
@@ -673,11 +664,7 @@ pub fn authenticate_user(username: &str, password_hash: &str, service: PamServic
 /// Convenience function to check account validity
 pub fn check_account(username: &str, service: PamService) -> AuthResult {
     if let Some(pam) = get_sigmapam() {
-        let request = AuthRequest::new(
-            username.to_string(),
-            String::new(),
-            service,
-        );
+        let request = AuthRequest::new(username.to_string(), String::new(), service);
         pam.account_check(&request)
     } else {
         AuthResult::ServiceError
@@ -713,7 +700,7 @@ mod tests {
             1000,
             1000,
             "/home/alice".to_string(),
-            "/bin/bash".to_string()
+            "/bin/bash".to_string(),
         )
         .with_full_name("Alice Smith".to_string())
         .with_enabled(true);
@@ -731,7 +718,7 @@ mod tests {
             1000,
             1000,
             "/home/alice".to_string(),
-            "/bin/bash".to_string()
+            "/bin/bash".to_string(),
         );
 
         assert!(account.is_valid());
@@ -750,7 +737,7 @@ mod tests {
             1000,
             1000,
             "/home/alice".to_string(),
-            "/bin/bash".to_string()
+            "/bin/bash".to_string(),
         )
         .with_max_failed_attempts(3);
 
@@ -770,13 +757,10 @@ mod tests {
 
     #[test]
     fn test_auth_request_creation() {
-        let request = AuthRequest::new(
-            "alice".to_string(),
-            "hash123".to_string(),
-            PamService::Auth
-        )
-        .with_remote_host("192.168.1.100".to_string())
-        .with_terminal("tty1".to_string());
+        let request =
+            AuthRequest::new("alice".to_string(), "hash123".to_string(), PamService::Auth)
+                .with_remote_host("192.168.1.100".to_string())
+                .with_terminal("tty1".to_string());
 
         assert_eq!(request.username, "alice");
         assert_eq!(request.service, PamService::Auth);
@@ -787,32 +771,32 @@ mod tests {
     #[test]
     fn test_password_auth_module() {
         let mut module = PasswordAuthModule::new();
-        
+
         let account = UserAccount::new(
             "alice".to_string(),
             1000,
             1000,
             "/home/alice".to_string(),
-            "/bin/bash".to_string()
+            "/bin/bash".to_string(),
         );
-        
+
         module.add_user("alice".to_string(), "correct_hash".to_string(), account);
-        
+
         let request = AuthRequest::new(
             "alice".to_string(),
             "correct_hash".to_string(),
-            PamService::Auth
+            PamService::Auth,
         );
-        
+
         let result = module.authenticate(&request);
         assert_eq!(result, AuthResult::Success);
-        
+
         let request = AuthRequest::new(
             "alice".to_string(),
             "wrong_hash".to_string(),
-            PamService::Auth
+            PamService::Auth,
         );
-        
+
         let result = module.authenticate(&request);
         assert_eq!(result, AuthResult::AuthError);
     }
@@ -831,23 +815,21 @@ mod tests {
     fn test_sigmapam_authenticate() {
         let mut pam = SigmaPAM::with_default_config();
         pam.start();
-        
+
         let account = UserAccount::new(
             "alice".to_string(),
             1000,
             1000,
             "/home/alice".to_string(),
-            "/bin/bash".to_string()
+            "/bin/bash".to_string(),
         );
-        
-        pam.get_password_auth().add_user("alice".to_string(), "hash123".to_string(), account);
-        
-        let request = AuthRequest::new(
-            "alice".to_string(),
-            "hash123".to_string(),
-            PamService::Auth
-        );
-        
+
+        pam.get_password_auth()
+            .add_user("alice".to_string(), "hash123".to_string(), account);
+
+        let request =
+            AuthRequest::new("alice".to_string(), "hash123".to_string(), PamService::Auth);
+
         let response = pam.authenticate(&request);
         assert_eq!(response.result, AuthResult::Success);
         assert!(response.account.is_some());
@@ -856,18 +838,19 @@ mod tests {
     #[test]
     fn test_authenticate_user_convenience() {
         init_sigmapam_default();
-        
+
         let mut pam = get_sigmapam().unwrap();
         let account = UserAccount::new(
             "alice".to_string(),
             1000,
             1000,
             "/home/alice".to_string(),
-            "/bin/bash".to_string()
+            "/bin/bash".to_string(),
         );
-        
-        pam.get_password_auth().add_user("alice".to_string(), "hash123".to_string(), account);
-        
+
+        pam.get_password_auth()
+            .add_user("alice".to_string(), "hash123".to_string(), account);
+
         let response = authenticate_user("alice", "hash123", PamService::Auth);
         assert_eq!(response.result, AuthResult::Success);
     }
@@ -875,18 +858,19 @@ mod tests {
     #[test]
     fn test_check_account_convenience() {
         init_sigmapam_default();
-        
+
         let mut pam = get_sigmapam().unwrap();
         let account = UserAccount::new(
             "alice".to_string(),
             1000,
             1000,
             "/home/alice".to_string(),
-            "/bin/bash".to_string()
+            "/bin/bash".to_string(),
         );
-        
-        pam.get_password_auth().add_user("alice".to_string(), "hash123".to_string(), account);
-        
+
+        pam.get_password_auth()
+            .add_user("alice".to_string(), "hash123".to_string(), account);
+
         let result = check_account("alice", PamService::Account);
         assert_eq!(result, AuthResult::Success);
     }

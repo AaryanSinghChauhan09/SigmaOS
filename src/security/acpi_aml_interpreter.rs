@@ -64,8 +64,13 @@ impl AmlInterpreter {
             pm1a_control_reg,
             pm1b_control_reg,
         };
-        interp.namespace.insert(String::from("\\_OS"), AmlValue::String(String::from("SigmaOS")));
-        interp.namespace.insert(String::from("\\_REV"), AmlValue::Integer(2));
+        interp.namespace.insert(
+            String::from("\\_OS"),
+            AmlValue::String(String::from("SigmaOS")),
+        );
+        interp
+            .namespace
+            .insert(String::from("\\_REV"), AmlValue::Integer(2));
         interp
     }
 
@@ -110,7 +115,8 @@ impl AmlInterpreter {
             }
             AML_DWORD_PREFIX => {
                 if *offset + 4 <= bytecode.len() {
-                    let val = u32::from_le_bytes(bytecode[*offset..*offset + 4].try_into().ok()?) as u64;
+                    let val =
+                        u32::from_le_bytes(bytecode[*offset..*offset + 4].try_into().ok()?) as u64;
                     *offset += 4;
                     Some(val)
                 } else {
@@ -196,8 +202,10 @@ mod tests {
         // Bytecode for ADD(10, 20) -> RETURN result
         let bytecode = [
             AML_ADD_OP,
-            AML_BYTE_PREFIX, 10,
-            AML_BYTE_PREFIX, 20,
+            AML_BYTE_PREFIX,
+            10,
+            AML_BYTE_PREFIX,
+            20,
             AML_RETURN_OP,
         ];
 

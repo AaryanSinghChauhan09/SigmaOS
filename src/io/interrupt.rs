@@ -1,9 +1,9 @@
 //! SigmaOS Interrupt Manager Subsystem
 
+use super::handler::{HandlerId, HandlerMetadata, HandlerMode, InterruptPriority};
 use std::collections::BTreeMap;
 use std::sync::atomic::{AtomicU32, AtomicU64, Ordering};
 use std::sync::Arc;
-use super::handler::{HandlerId, HandlerMetadata, HandlerMode, InterruptPriority};
 
 /// Typed error for interrupt management operations.
 #[derive(Debug, Clone, PartialEq, Eq)]

@@ -165,8 +165,16 @@ impl TerminalGlyphBufferEngine {
     pub fn new(cols: usize, rows: usize) -> Self {
         let blank_cell = TerminalCell {
             character: ' ',
-            fg: RgbColor { r: 200, g: 200, b: 200 },
-            bg: RgbColor { r: 15, g: 15, b: 20 },
+            fg: RgbColor {
+                r: 200,
+                g: 200,
+                b: 200,
+            },
+            bg: RgbColor {
+                r: 15,
+                g: 15,
+                b: 20,
+            },
             bold: false,
             underline: false,
         };

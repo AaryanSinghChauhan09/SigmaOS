@@ -54,12 +54,18 @@ impl ProcessInitialStack {
     ) -> Self {
         let mut env_map = BTreeMap::new();
         for (k, v) in envp {
-            env_map.insert(alloc::string::String::from(*k), alloc::string::String::from(*v));
+            env_map.insert(
+                alloc::string::String::from(*k),
+                alloc::string::String::from(*v),
+            );
         }
 
         Self {
             argc: argv.len(),
-            argv: argv.iter().map(|s| alloc::string::String::from(*s)).collect(),
+            argv: argv
+                .iter()
+                .map(|s| alloc::string::String::from(*s))
+                .collect(),
             envp: env_map,
             auxv: auxv_entries.to_vec(),
             stack_canary: canary,
@@ -68,7 +74,10 @@ impl ProcessInitialStack {
 
     /// Retrieve value from auxiliary vector
     pub fn get_auxv(&self, a_type: u64) -> Option<u64> {
-        self.auxv.iter().find(|e| e.a_type == a_type).map(|e| e.a_val)
+        self.auxv
+            .iter()
+            .find(|e| e.a_type == a_type)
+            .map(|e| e.a_val)
     }
 
     pub fn page_size(&self) -> u64 {

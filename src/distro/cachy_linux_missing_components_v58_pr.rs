@@ -434,7 +434,10 @@ impl CachyOsHandheldGamingTdpPrEngineV58 {
             return Err("TDP limit out of bounds (5W-30W)");
         }
         self.tdp_watts = watts;
-        Ok(format!("Handheld TDP set to {}W for {}", watts, self.device_name))
+        Ok(format!(
+            "Handheld TDP set to {}W for {}",
+            watts, self.device_name
+        ))
     }
 }
 
@@ -597,7 +600,9 @@ impl CachyLinuxMissingComponentsV58PrSuite {
         let bore_msg = self.scx_bore_engine.set_mode(ScxBoreV2Mode::GamingRealtime);
         assert!(bore_msg.contains("GamingRealtime"));
 
-        let repo_url = self.package_download_engine.resolve_optimal_repository_url();
+        let repo_url = self
+            .package_download_engine
+            .resolve_optimal_repository_url();
         assert!(repo_url.contains("x86_64_v4"));
 
         let compiler_flags = self.kernel_pgo_engine.generate_compiler_flags();
@@ -606,7 +611,9 @@ impl CachyLinuxMissingComponentsV58PrSuite {
         let hybrid_msg = self.chwd_gpu_engine.configure_hybrid_prime();
         assert!(hybrid_msg.contains("CHWD Hybrid PRIME"));
 
-        let gamemode_msg = self.gamemode_ananicy.activate_gamemode_for_process("cyberpunk2077.exe");
+        let gamemode_msg = self
+            .gamemode_ananicy
+            .activate_gamemode_for_process("cyberpunk2077.exe");
         assert!(gamemode_msg.contains("cyberpunk2077.exe"));
 
         let net_msg = self.network_bbrv3.apply_network_optimizations();
@@ -615,7 +622,9 @@ impl CachyLinuxMissingComponentsV58PrSuite {
         let proton_envs = self.proton_ntsync.render_proton_env();
         assert!(proton_envs.iter().any(|(k, _)| k == "PROTON_USE_NTSYNC"));
 
-        let snap_count = self.btrfs_snapper.take_pre_transaction_snapshot("Pacman upgrade v58");
+        let snap_count = self
+            .btrfs_snapper
+            .take_pre_transaction_snapshot("Pacman upgrade v58");
         assert!(snap_count > 10);
 
         let tdp_msg = self.handheld_tdp.set_tdp_watts(25);
@@ -628,7 +637,10 @@ impl CachyLinuxMissingComponentsV58PrSuite {
     }
 
     pub fn get_merged_pr_count(&self) -> usize {
-        self.submissions.values().filter(|s| s.status == CachyPrStatusV58::Merged).count()
+        self.submissions
+            .values()
+            .filter(|s| s.status == CachyPrStatusV58::Merged)
+            .count()
     }
 }
 
@@ -656,11 +668,18 @@ mod tests {
 
     #[test]
     fn test_package_download_and_fallback() {
-        let mut engine = CachyOsPackageDbParallelDownloadPrEngineV58::new(MicroarchTierV58::X86_64_V4);
-        assert_eq!(engine.resolve_optimal_repository_url(), "https://mirror.cachyos.org/repo/x86_64_v4");
+        let mut engine =
+            CachyOsPackageDbParallelDownloadPrEngineV58::new(MicroarchTierV58::X86_64_V4);
+        assert_eq!(
+            engine.resolve_optimal_repository_url(),
+            "https://mirror.cachyos.org/repo/x86_64_v4"
+        );
 
         assert_eq!(engine.fallback_to_lower_tier(), MicroarchTierV58::X86_64_V3);
-        assert_eq!(engine.resolve_optimal_repository_url(), "https://mirror.cachyos.org/repo/x86_64_v3");
+        assert_eq!(
+            engine.resolve_optimal_repository_url(),
+            "https://mirror.cachyos.org/repo/x86_64_v3"
+        );
     }
 
     #[test]

@@ -54,7 +54,7 @@ impl TaskManager {
     pub fn refresh(&mut self) {
         // Simplified - in real implementation would read from /proc
         self.processs.clear();
-        
+
         // Add sample processes
         self.processs.push(Process {
             pid: 1,
@@ -70,7 +70,11 @@ impl TaskManager {
 
     /// Kill process
     pub fn kill_process(&mut self, pid: u32, signal: i32) -> Result<(), &'static str> {
-        let index = self.processes.iter().position(|p| p.pid == pid).ok_or("Process not found")?;
+        let index = self
+            .processes
+            .iter()
+            .position(|p| p.pid == pid)
+            .ok_or("Process not found")?;
         self.processes.remove(index);
         Ok(())
     }
@@ -119,9 +123,7 @@ pub fn init_task_manager() {
 
 /// Get task manager
 pub fn get_task_manager() -> &'static mut TaskManager {
-    unsafe {
-        TASK_MANAGER.as_mut().expect("Task manager not initialized")
-    }
+    unsafe { TASK_MANAGER.as_mut().expect("Task manager not initialized") }
 }
 
 #[cfg(test)]

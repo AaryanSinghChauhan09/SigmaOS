@@ -142,7 +142,11 @@ impl CheckResult {
         self.total_errors = self.errors.len();
         self.fixed_errors = self.errors.iter().filter(|e| e.fixed).count();
         self.critical_errors = self.errors.iter().filter(|e| e.is_critical()).count();
-        self.warnings = self.errors.iter().filter(|e| e.severity == ErrorSeverity::Warning).count();
+        self.warnings = self
+            .errors
+            .iter()
+            .filter(|e| e.severity == ErrorSeverity::Warning)
+            .count();
         self.clean = self.total_errors == 0 || self.fixed_errors == self.total_errors;
     }
 }
@@ -247,7 +251,8 @@ impl SigmaFSCK {
         }
 
         result.update_stats();
-        self.check_results.insert(filesystem_path.clone(), result.clone());
+        self.check_results
+            .insert(filesystem_path.clone(), result.clone());
         result
     }
 
@@ -311,16 +316,12 @@ pub fn init_sigmafsck() {
 
 /// Get the global SigmaFSCK instance
 pub fn get_sigmafsck() -> Option<&'static SigmaFSCK> {
-    unsafe {
-        SIGMAFSCK_INSTANCE.as_ref()
-    }
+    unsafe { SIGMAFSCK_INSTANCE.as_ref() }
 }
 
 /// Get mutable global SigmaFSCK instance
 pub fn get_sigmafsck_mut() -> Option<&'static mut SigmaFSCK> {
-    unsafe {
-        SIGMAFSCK_INSTANCE.as_mut()
-    }
+    unsafe { SIGMAFSCK_INSTANCE.as_mut() }
 }
 
 /// Convenience function to check a filesystem
@@ -385,10 +386,7 @@ mod tests {
 
     #[test]
     fn test_check_result_creation() {
-        let result = CheckResult::new(
-            "/dev/sda1".to_string(),
-            FilesystemType::Ext4,
-        );
+        let result = CheckResult::new("/dev/sda1".to_string(), FilesystemType::Ext4);
 
         assert_eq!(result.filesystem_path, "/dev/sda1");
         assert_eq!(result.filesystem_type, FilesystemType::Ext4);
@@ -398,10 +396,7 @@ mod tests {
 
     #[test]
     fn test_check_result_add_error() {
-        let mut result = CheckResult::new(
-            "/dev/sda1".to_string(),
-            FilesystemType::Ext4,
-        );
+        let mut result = CheckResult::new("/dev/sda1".to_string(), FilesystemType::Ext4);
 
         let error = FilesystemError::new(
             "err1".to_string(),
@@ -418,10 +413,7 @@ mod tests {
 
     #[test]
     fn test_check_result_update_stats() {
-        let mut result = CheckResult::new(
-            "/dev/sda1".to_string(),
-            FilesystemType::Ext4,
-        );
+        let mut result = CheckResult::new("/dev/sda1".to_string(), FilesystemType::Ext4);
 
         let mut error1 = FilesystemError::new(
             "err1".to_string(),
@@ -511,9 +503,21 @@ mod tests {
     fn test_fsck_list_results_by_type() {
         let mut fsck = SigmaFSCK::new();
 
-        fsck.check_filesystem("/dev/sda1".to_string(), FilesystemType::Ext4, CheckMode::ReadOnly);
-        fsck.check_filesystem("/dev/sda2".to_string(), FilesystemType::Ext4, CheckMode::ReadOnly);
-        fsck.check_filesystem("/dev/sdb1".to_string(), FilesystemType::Xfs, CheckMode::ReadOnly);
+        fsck.check_filesystem(
+            "/dev/sda1".to_string(),
+            FilesystemType::Ext4,
+            CheckMode::ReadOnly,
+        );
+        fsck.check_filesystem(
+            "/dev/sda2".to_string(),
+            FilesystemType::Ext4,
+            CheckMode::ReadOnly,
+        );
+        fsck.check_filesystem(
+            "/dev/sdb1".to_string(),
+            FilesystemType::Xfs,
+            CheckMode::ReadOnly,
+        );
 
         let ext4_results = fsck.list_results_by_type(FilesystemType::Ext4);
         assert_eq!(ext4_results.len(), 2);
@@ -526,8 +530,16 @@ mod tests {
     fn test_fsck_list_results_with_errors() {
         let mut fsck = SigmaFSCK::new();
 
-        fsck.check_filesystem("/dev/sda1".to_string(), FilesystemType::Ext4, CheckMode::ReadOnly);
-        fsck.check_filesystem("/dev/sda2".to_string(), FilesystemType::Ext4, CheckMode::Repair);
+        fsck.check_filesystem(
+            "/dev/sda1".to_string(),
+            FilesystemType::Ext4,
+            CheckMode::ReadOnly,
+        );
+        fsck.check_filesystem(
+            "/dev/sda2".to_string(),
+            FilesystemType::Ext4,
+            CheckMode::Repair,
+        );
 
         let error_results = fsck.list_results_with_errors();
         assert_eq!(error_results.len(), 2);
@@ -537,8 +549,16 @@ mod tests {
     fn test_fsck_list_results_with_critical() {
         let mut fsck = SigmaFSCK::new();
 
-        fsck.check_filesystem("/dev/sda1".to_string(), FilesystemType::Ext4, CheckMode::Force);
-        fsck.check_filesystem("/dev/sda2".to_string(), FilesystemType::Ext4, CheckMode::Repair);
+        fsck.check_filesystem(
+            "/dev/sda1".to_string(),
+            FilesystemType::Ext4,
+            CheckMode::Force,
+        );
+        fsck.check_filesystem(
+            "/dev/sda2".to_string(),
+            FilesystemType::Ext4,
+            CheckMode::Repair,
+        );
 
         let critical_results = fsck.list_results_with_critical();
         assert_eq!(critical_results.len(), 1);
@@ -548,7 +568,11 @@ mod tests {
     fn test_fsck_clear_results() {
         let mut fsck = SigmaFSCK::new();
 
-        fsck.check_filesystem("/dev/sda1".to_string(), FilesystemType::Ext4, CheckMode::ReadOnly);
+        fsck.check_filesystem(
+            "/dev/sda1".to_string(),
+            FilesystemType::Ext4,
+            CheckMode::ReadOnly,
+        );
         assert_eq!(fsck.result_count(), 1);
 
         fsck.clear_results();

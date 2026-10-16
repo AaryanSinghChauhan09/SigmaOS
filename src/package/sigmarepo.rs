@@ -632,7 +632,7 @@ mod tests {
         let mut repo = Repository::new(
             "test-repo".to_string(),
             "https://example.com/repo".to_string(),
-            RepoType::Official
+            RepoType::Official,
         )
         .with_priority(RepoPriority::High)
         .with_enabled(true);
@@ -652,7 +652,7 @@ mod tests {
         let mut repo = Repository::new(
             "test-repo".to_string(),
             "https://example.com/repo".to_string(),
-            RepoType::Official
+            RepoType::Official,
         );
 
         let metadata1 = PackageMetadata::new("test-pkg".to_string(), "1.0.0".to_string());
@@ -670,7 +670,7 @@ mod tests {
         let mut repo = Repository::new(
             "test-repo".to_string(),
             "https://example.com/repo".to_string(),
-            RepoType::Official
+            RepoType::Official,
         );
 
         assert!(repo.needs_update(1000, 3600));
@@ -698,7 +698,7 @@ mod tests {
         let repo = Repository::new(
             "test-repo".to_string(),
             "https://example.com/repo".to_string(),
-            RepoType::Official
+            RepoType::Official,
         );
 
         assert!(repo_mgr.add_repository(repo).is_ok());
@@ -714,7 +714,7 @@ mod tests {
         let mut repo = Repository::new(
             "test-repo".to_string(),
             "https://example.com/repo".to_string(),
-            RepoType::Official
+            RepoType::Official,
         );
 
         let metadata = PackageMetadata::new("test-pkg".to_string(), "1.0.0".to_string());
@@ -735,7 +735,7 @@ mod tests {
         let repo = Repository::new(
             "test-repo".to_string(),
             "https://example.com/repo".to_string(),
-            RepoType::Official
+            RepoType::Official,
         );
 
         repo_mgr.add_repository(repo).unwrap();
@@ -751,14 +751,14 @@ mod tests {
         let mut repo1 = Repository::new(
             "repo1".to_string(),
             "https://example.com/repo1".to_string(),
-            RepoType::Official
+            RepoType::Official,
         )
         .with_priority(RepoPriority::Low);
 
         let mut repo2 = Repository::new(
             "repo2".to_string(),
             "https://example.com/repo2".to_string(),
-            RepoType::Official
+            RepoType::Official,
         )
         .with_priority(RepoPriority::High);
 
@@ -779,25 +779,25 @@ mod tests {
     #[test]
     fn test_add_repository_convenience() {
         init_sigmarepo_default();
-        
+
         let result = add_repository(
             "test-repo".to_string(),
             "https://example.com/repo".to_string(),
-            RepoType::Official
+            RepoType::Official,
         );
-        
+
         assert!(result.is_ok());
     }
 
     #[test]
     fn test_search_package_convenience() {
         init_sigmarepo_default();
-        
+
         let mut repo_mgr = get_sigmarepo().unwrap();
         let mut repo = Repository::new(
             "test-repo".to_string(),
             "https://example.com/repo".to_string(),
-            RepoType::Official
+            RepoType::Official,
         );
 
         let metadata = PackageMetadata::new("test-pkg".to_string(), "1.0.0".to_string());

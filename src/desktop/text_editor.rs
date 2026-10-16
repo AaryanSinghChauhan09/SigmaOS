@@ -248,7 +248,11 @@ impl TextEditor {
     /// Insert text at cursor
     pub fn insert_text(&mut self, index: usize, text: String) -> Result<(), &'static str> {
         let document = self.documents.get_mut(index).ok_or("Document not found")?;
-        let line_start = document.content.lines().take(self.editor_state.cursor.line).fold(0, |acc, line| acc + line.len() + 1);
+        let line_start = document
+            .content
+            .lines()
+            .take(self.editor_state.cursor.line)
+            .fold(0, |acc, line| acc + line.len() + 1);
         let column = self.editor_state.cursor.column;
         document.content.insert_str(line_start + column, &text);
         document.modified = true;
@@ -259,7 +263,11 @@ impl TextEditor {
     /// Delete text at cursor
     pub fn delete_text(&mut self, index: usize, length: usize) -> Result<(), &'static str> {
         let document = self.documents.get_mut(index).ok_or("Document not found")?;
-        let line_start = document.content.lines().take(self.editor_state.cursor.line).fold(0, |acc, line| acc + line.len() + 1);
+        let line_start = document
+            .content
+            .lines()
+            .take(self.editor_state.cursor.line)
+            .fold(0, |acc, line| acc + line.len() + 1);
         let column = self.editor_state.cursor.column;
         let start = line_start + column;
         let end = start + length;
@@ -308,7 +316,8 @@ impl TextEditor {
 
     /// Get active document
     pub fn get_active_document(&self) -> Option<&Document> {
-        self.active_document.and_then(|index| self.documents.get(index))
+        self.active_document
+            .and_then(|index| self.documents.get(index))
     }
 
     /// Get line count
@@ -372,9 +381,7 @@ pub fn init_text_editor() {
 
 /// Get text editor
 pub fn get_text_editor() -> &'static mut TextEditor {
-    unsafe {
-        TEXT_EDITOR.as_mut().expect("Text editor not initialized")
-    }
+    unsafe { TEXT_EDITOR.as_mut().expect("Text editor not initialized") }
 }
 
 #[cfg(test)]
@@ -398,7 +405,11 @@ mod tests {
     #[test]
     fn test_open_document() {
         let mut editor = TextEditor::new();
-        let index = editor.open_document("/path/to/file.txt".to_string(), "content".to_string(), Language::Plain);
+        let index = editor.open_document(
+            "/path/to/file.txt".to_string(),
+            "content".to_string(),
+            Language::Plain,
+        );
         assert_eq!(editor.document_count(), 1);
     }
 
@@ -406,7 +417,9 @@ mod tests {
     fn test_set_content() {
         let mut editor = TextEditor::new();
         let index = editor.new_document("test.txt".to_string(), Language::Plain);
-        editor.set_content(index, "Hello, World!".to_string()).unwrap();
+        editor
+            .set_content(index, "Hello, World!".to_string())
+            .unwrap();
         assert!(editor.documents[index].modified);
     }
 

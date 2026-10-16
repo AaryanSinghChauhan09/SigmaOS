@@ -16,8 +16,8 @@ use core::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 pub struct ServiceBootTime {
     pub name: String,
     pub start_time: u64, // milliseconds
-    pub end_time: u64, // milliseconds
-    pub duration: u64, // milliseconds
+    pub end_time: u64,   // milliseconds
+    pub duration: u64,   // milliseconds
     pub status: ServiceStatus,
 }
 
@@ -33,9 +33,9 @@ pub enum ServiceStatus {
 #[derive(Debug, Clone)]
 pub struct BootAnalysis {
     pub total_boot_time: u64, // milliseconds
-    pub kernel_time: u64, // milliseconds
-    pub initrd_time: u64, // milliseconds
-    pub userspace_time: u64, // milliseconds
+    pub kernel_time: u64,     // milliseconds
+    pub initrd_time: u64,     // milliseconds
+    pub userspace_time: u64,  // milliseconds
     pub services: Vec<ServiceBootTime>,
     pub slowest_services: Vec<ServiceBootTime>,
 }
@@ -55,13 +55,13 @@ impl BootAnalyzer {
             enabled: AtomicBool::new(true),
         }
     }
-    
+
     /// Initialize boot analyzer
     pub fn init(&mut self) {
         self.enabled.store(true, Ordering::Relaxed);
         self.boot_time.store(0, Ordering::Relaxed);
     }
-    
+
     /// Record service start
     pub fn record_service_start(&mut self, name: String, start_time: u64) {
         let service = ServiceBootTime {
@@ -73,7 +73,7 @@ impl BootAnalyzer {
         };
         self.service_times.insert(name, service);
     }
-    
+
     /// Record service end
     pub fn record_service_end(&mut self, name: String, end_time: u64, status: ServiceStatus) {
         if let Some(service) = self.service_times.get_mut(&name) {
@@ -82,33 +82,33 @@ impl BootAnalyzer {
             service.status = status;
         }
     }
-    
+
     /// Set total boot time
     pub fn set_boot_time(&self, time: u64) {
         self.boot_time.store(time, Ordering::Relaxed);
     }
-    
+
     /// Get total boot time
     pub fn get_boot_time(&self) -> u64 {
         self.boot_time.load(Ordering::Relaxed)
     }
-    
+
     /// Analyze boot
     pub fn analyze(&self) -> BootAnalysis {
         let total_boot_time = self.boot_time.load(Ordering::Relaxed);
-        
+
         // Estimate kernel, initrd, userspace times
         let kernel_time = total_boot_time / 4;
         let initrd_time = total_boot_time / 4;
         let userspace_time = total_boot_time / 2;
-        
+
         let services: Vec<_> = self.service_times.values().cloned().collect();
-        
+
         // Find slowest services
         let mut slowest_services = services.clone();
         slowest_services.sort_by(|a, b| b.duration.cmp(&a.duration));
         slowest_services.truncate(10); // Top 10 slowest
-        
+
         BootAnalysis {
             total_boot_time,
             kernel_time,
@@ -118,19 +118,19 @@ impl BootAnalyzer {
             slowest_services,
         }
     }
-    
+
     /// Get critical path
     pub fn get_critical_path(&self) -> Vec<ServiceBootTime> {
         let mut services: Vec<_> = self.service_times.values().cloned().collect();
         services.sort_by(|a, b| a.start_time.cmp(&b.start_time));
         services
     }
-    
+
     /// Get service time
     pub fn get_service_time(&self, name: &str) -> Option<u64> {
         self.service_times.get(name).map(|s| s.duration)
     }
-    
+
     /// Enable/disable analyzer
     pub fn set_enabled(&self, enabled: bool) {
         self.enabled.store(enabled, Ordering::Relaxed);
@@ -155,9 +155,7 @@ pub fn init_boot_analyzer() {
 
 /// Get global boot analyzer
 pub fn get_boot_analyzer() -> Option<&'static mut BootAnalyzer> {
-    unsafe {
-        BOOT_ANALYZER.as_mut()
-    }
+    unsafe { BOOT_ANALYZER.as_mut() }
 }
 
 /// Get boot time (equivalent to systemd-analyze time)
@@ -198,7 +196,10 @@ pub fn analyze_critical_chain() -> String {
         let mut output = String::new();
         output.push_str("Critical path:\n");
         for service in &critical_path {
-            output.push_str(&format!("{} @{}ms +{}ms\n", service.name, service.start_time, service.duration));
+            output.push_str(&format!(
+                "{} @{}ms +{}ms\n",
+                service.name, service.start_time, service.duration
+            ));
         }
         output
     } else {
@@ -209,14 +210,14 @@ pub fn analyze_critical_chain() -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_boot_analyzer_init() {
         let analyzer = BootAnalyzer::new();
         analyzer.init();
         assert!(analyzer.enabled.load(Ordering::Relaxed));
     }
-    
+
     #[test]
     fn test_record_service() {
         let mut analyzer = BootAnalyzer::new();
@@ -224,7 +225,7 @@ mod tests {
         analyzer.record_service_end("test_service".to_string(), 200, ServiceStatus::Success);
         assert_eq!(analyzer.get_service_time("test_service"), Some(100));
     }
-    
+
     #[test]
     fn test_analyze() {
         let mut analyzer = BootAnalyzer::new();
@@ -233,12 +234,12 @@ mod tests {
         analyzer.record_service_start("service2".to_string(), 200);
         analyzer.record_service_end("service2".to_string(), 300, ServiceStatus::Success);
         analyzer.set_boot_time(4000);
-        
+
         let analysis = analyzer.analyze();
         assert_eq!(analysis.total_boot_time, 4000);
         assert_eq!(analysis.services.len(), 2);
     }
-    
+
     #[test]
     fn test_analyze_boot_time() {
         init_boot_analyzer();
@@ -248,7 +249,7 @@ mod tests {
         let result = analyze_boot_time();
         assert!(result.contains("5000ms"));
     }
-    
+
     #[test]
     fn test_analyze_blame() {
         init_boot_analyzer();
@@ -259,7 +260,7 @@ mod tests {
         let result = analyze_blame();
         assert!(result.contains("Slowest services"));
     }
-    
+
     #[test]
     fn test_analyze_critical_chain() {
         init_boot_analyzer();

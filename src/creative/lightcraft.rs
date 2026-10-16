@@ -256,7 +256,12 @@ impl LightEngine {
     }
 
     /// Add light to scene
-    pub fn add_light(&mut self, scene_id: u32, light_type: LightType, intensity: f32) -> Result<u32, &'static str> {
+    pub fn add_light(
+        &mut self,
+        scene_id: u32,
+        light_type: LightType,
+        intensity: f32,
+    ) -> Result<u32, &'static str> {
         let scene = self.scenes.get_mut(&scene_id).ok_or("Scene not found")?;
         let light_id = scene.lights.len() as u32;
         let light = Light {
@@ -281,15 +286,33 @@ impl LightEngine {
             flag: Flag::None,
             tone_curve: ToneCurve {
                 points: vec![
-                    ToneCurvePoint { input: 0.0, output: 0.0 },
-                    ToneCurvePoint { input: 1.0, output: 1.0 },
+                    ToneCurvePoint {
+                        input: 0.0,
+                        output: 0.0,
+                    },
+                    ToneCurvePoint {
+                        input: 1.0,
+                        output: 1.0,
+                    },
                 ],
                 curve_type: CurveType::Linear,
             },
             color_mixer: ColorMixer {
-                shadows: ColorMixerBand { hue: 0.0, saturation: 0.0, luminance: 0.0 },
-                midtones: ColorMixerBand { hue: 0.0, saturation: 0.0, luminance: 0.0 },
-                highlights: ColorMixerBand { hue: 0.0, saturation: 0.0, luminance: 0.0 },
+                shadows: ColorMixerBand {
+                    hue: 0.0,
+                    saturation: 0.0,
+                    luminance: 0.0,
+                },
+                midtones: ColorMixerBand {
+                    hue: 0.0,
+                    saturation: 0.0,
+                    luminance: 0.0,
+                },
+                highlights: ColorMixerBand {
+                    hue: 0.0,
+                    saturation: 0.0,
+                    luminance: 0.0,
+                },
             },
             masks: Vec::new(),
             processed: false,
@@ -336,16 +359,31 @@ impl LightEngine {
     }
 
     /// Set tone curve
-    pub fn set_tone_curve(&mut self, photo_id: u32, points: Vec<ToneCurvePoint>, curve_type: CurveType) -> Result<(), &'static str> {
+    pub fn set_tone_curve(
+        &mut self,
+        photo_id: u32,
+        points: Vec<ToneCurvePoint>,
+        curve_type: CurveType,
+    ) -> Result<(), &'static str> {
         let photo = self.photos.get_mut(&photo_id).ok_or("Photo not found")?;
         photo.tone_curve = ToneCurve { points, curve_type };
         Ok(())
     }
 
     /// Set color mixer
-    pub fn set_color_mixer(&mut self, photo_id: u32, shadows: ColorMixerBand, midtones: ColorMixerBand, highlights: ColorMixerBand) -> Result<(), &'static str> {
+    pub fn set_color_mixer(
+        &mut self,
+        photo_id: u32,
+        shadows: ColorMixerBand,
+        midtones: ColorMixerBand,
+        highlights: ColorMixerBand,
+    ) -> Result<(), &'static str> {
         let photo = self.photos.get_mut(&photo_id).ok_or("Photo not found")?;
-        photo.color_mixer = ColorMixer { shadows, midtones, highlights };
+        photo.color_mixer = ColorMixer {
+            shadows,
+            midtones,
+            highlights,
+        };
         Ok(())
     }
 
@@ -365,7 +403,13 @@ impl LightEngine {
     }
 
     /// Create preset
-    pub fn create_preset(&mut self, name: String, tone_curve: ToneCurve, color_mixer: ColorMixer, three_way_grading: ThreeWayColorGrading) -> u32 {
+    pub fn create_preset(
+        &mut self,
+        name: String,
+        tone_curve: ToneCurve,
+        color_mixer: ColorMixer,
+        three_way_grading: ThreeWayColorGrading,
+    ) -> u32 {
         let id = self.presets.len() as u32;
         let preset = Preset {
             id,
@@ -419,7 +463,10 @@ impl LightEngine {
     /// Disable light
     pub fn disable_light(&mut self, scene_id: u32, light_id: u32) -> Result<(), &'static str> {
         let scene = self.scenes.get_mut(&scene_id).ok_or("Scene not found")?;
-        let light = scene.lights.get_mut(light_id as usize).ok_or("Light not found")?;
+        let light = scene
+            .lights
+            .get_mut(light_id as usize)
+            .ok_or("Light not found")?;
         light.enabled.store(false, Ordering::Relaxed);
         Ok(())
     }
@@ -458,9 +505,7 @@ pub fn init_lightcraft() {
 
 /// Get global lightcraft
 pub fn get_lightcraft() -> Option<&'static mut LightEngine> {
-    unsafe {
-        LIGHTCRAFT.as_mut()
-    }
+    unsafe { LIGHTCRAFT.as_mut() }
 }
 
 #[cfg(test)]
@@ -566,12 +611,26 @@ mod tests {
         };
         let photo_id = engine.import_photo(metadata);
         let points = vec![
-            ToneCurvePoint { input: 0.0, output: 0.0 },
-            ToneCurvePoint { input: 0.5, output: 0.6 },
-            ToneCurvePoint { input: 1.0, output: 1.0 },
+            ToneCurvePoint {
+                input: 0.0,
+                output: 0.0,
+            },
+            ToneCurvePoint {
+                input: 0.5,
+                output: 0.6,
+            },
+            ToneCurvePoint {
+                input: 1.0,
+                output: 1.0,
+            },
         ];
-        engine.set_tone_curve(photo_id, points, CurveType::Spline).unwrap();
-        assert_eq!(engine.get_photo(photo_id).unwrap().tone_curve.points.len(), 3);
+        engine
+            .set_tone_curve(photo_id, points, CurveType::Spline)
+            .unwrap();
+        assert_eq!(
+            engine.get_photo(photo_id).unwrap().tone_curve.points.len(),
+            3
+        );
     }
 
     #[test]
@@ -580,22 +639,50 @@ mod tests {
         engine.init();
         let tone_curve = ToneCurve {
             points: vec![
-                ToneCurvePoint { input: 0.0, output: 0.0 },
-                ToneCurvePoint { input: 1.0, output: 1.0 },
+                ToneCurvePoint {
+                    input: 0.0,
+                    output: 0.0,
+                },
+                ToneCurvePoint {
+                    input: 1.0,
+                    output: 1.0,
+                },
             ],
             curve_type: CurveType::Linear,
         };
         let color_mixer = ColorMixer {
-            shadows: ColorMixerBand { hue: 0.0, saturation: 0.0, luminance: 0.0 },
-            midtones: ColorMixerBand { hue: 0.0, saturation: 0.0, luminance: 0.0 },
-            highlights: ColorMixerBand { hue: 0.0, saturation: 0.0, luminance: 0.0 },
+            shadows: ColorMixerBand {
+                hue: 0.0,
+                saturation: 0.0,
+                luminance: 0.0,
+            },
+            midtones: ColorMixerBand {
+                hue: 0.0,
+                saturation: 0.0,
+                luminance: 0.0,
+            },
+            highlights: ColorMixerBand {
+                hue: 0.0,
+                saturation: 0.0,
+                luminance: 0.0,
+            },
         };
         let three_way = ThreeWayColorGrading {
-            shadows: ColorGradingWheel { hue: 0.0, saturation: 0.0 },
-            midtones: ColorGradingWheel { hue: 0.0, saturation: 0.0 },
-            highlights: ColorGradingWheel { hue: 0.0, saturation: 0.0 },
+            shadows: ColorGradingWheel {
+                hue: 0.0,
+                saturation: 0.0,
+            },
+            midtones: ColorGradingWheel {
+                hue: 0.0,
+                saturation: 0.0,
+            },
+            highlights: ColorGradingWheel {
+                hue: 0.0,
+                saturation: 0.0,
+            },
         };
-        let preset_id = engine.create_preset("Cinematic".to_string(), tone_curve, color_mixer, three_way);
+        let preset_id =
+            engine.create_preset("Cinematic".to_string(), tone_curve, color_mixer, three_way);
         assert!(engine.presets.contains_key(&preset_id));
     }
 
