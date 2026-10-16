@@ -125,6 +125,11 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         flags
     }
 
+    /// Check Landlock v5 access rights bitmask against required access mask.
+    pub fn check_landlock_access(allowed_mask: u64, required_access: u64) -> bool {
+        (allowed_mask & required_access) == required_access
+    }
+
     /// Calculate cgroups v2 memory limit in bytes from string (e.g., "512M", "2G").
     pub fn parse_cgroup_memory_limit(limit_str: &str) -> u64 {
         if limit_str == "max" {
@@ -402,6 +407,14 @@ pub struct IdentityAndEnterpriseAuthPrEngine;
 impl IdentityAndEnterpriseAuthPrEngine {
     pub fn new() -> Self {
         Self
+    }
+
+    /// Generate SSSD domain configuration file section string.
+    pub fn generate_sssd_domain_conf(domain: &str, provider: &str, uri: &str) -> String {
+        alloc::format!(
+            "[domain/{}]\nid_provider = {}\nauth_provider = {}\nldap_uri = {}\ncache_credentials = true\n",
+            domain, provider, provider, uri
+        )
     }
 
     /// Parse LDAP Distinguished Name (DN) string (e.g., "cn=jules,ou=users,dc=sigmaos,dc=org").
