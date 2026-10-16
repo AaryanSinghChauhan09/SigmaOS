@@ -608,7 +608,7 @@ impl UniversalBootEnvSnapshotGovernorV39 {
 // ============================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum UniversalPmActionV39 {
+pub enum UniversalPmActionV40 {
     Install,
     Remove,
     Update,
@@ -617,10 +617,12 @@ pub enum UniversalPmActionV39 {
     Audit,
 }
 
+pub type UniversalPmActionV39 = UniversalPmActionV40;
+
 #[derive(Debug, Clone)]
 pub struct RoutedPmCommandV39 {
     pub source_pm: String,
-    pub action: UniversalPmActionV39,
+    pub action: UniversalPmActionV40,
     pub target_packages: Vec<String>,
     pub dry_run: bool,
 }
@@ -947,7 +949,7 @@ mod tests {
 
     #[test]
     fn test_sat_solver_and_sandboxing_v40() {
-        let solver = UniversalCrossDistroSatSolverV40::new();
+        let solver = UniversalCrossDistroSatSolverV39::new();
         let raw_deps = vec![
             "libssl-dev".to_string(),
             "glibc".to_string(),
