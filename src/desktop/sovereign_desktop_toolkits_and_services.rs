@@ -292,6 +292,14 @@ pub struct DMSeatConfig {
     pub bound_input_devices: Vec<String>,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct XdmcpSessionHandshake {
+    pub session_id: u32,
+    pub remote_address: String,
+    pub display_number: u32,
+    pub authenticated: bool,
+}
+
 pub struct XdmcpSessionManager {
     pub listening_port: u16,
     pub active_xdmcp_connections: BTreeMap<String, String>,
@@ -366,7 +374,7 @@ impl SovereignDisplayManagerSuiteEngine {
                 || req.fido2_security_key.is_some());
         let mfa_ok = req.mfa_otp.as_deref() == Some("123456") || req.mfa_otp.is_none();
 
-        let final_ok = auth_success && mfa_ok;
+        let final_ok = auth_success && mfa_ok && fido_ok;
         self.pam_auth_history.push((req.username.clone(), final_ok));
 
         if final_ok {
@@ -432,6 +440,17 @@ impl SovereignDisplayManagerSuiteEngine {
         } else {
             false
         }
+    }
+
+    pub fn initiate_xdmcp_remote_handshake(&mut self, remote_addr: &str, display_num: u32) -> u32 {
+        let sid = NEXT_DESKTOP_SERVICE_ID.fetch_add(1, Ordering::SeqCst) as u32;
+        self.xdmcp_sessions.push(XdmcpSessionHandshake {
+            session_id: sid,
+            remote_address: remote_addr.to_string(),
+            display_number: display_num,
+            authenticated: true,
+        });
+        sid
     }
 }
 
@@ -680,6 +699,29 @@ impl SovereignPolicyKitAuthorizationEngine {
 
     pub fn add_js_rule(&mut self, action_prefix: &str, result: PolkitResult) {
         self.js_rules.push((action_prefix.to_string(), result));
+    }
+
+    pub fn revoke_cached_authorizations(&mut self, user: &str) -> usize {
+        let keys_to_remove: Vec<(String, String)> = self
+            .auth_cache
+            .keys()
+            .filter(|(u, _)| u == user)
+            .cloned()
+            .collect();
+        let count = keys_to_remove.len();
+        for k in keys_to_remove {
+            self.auth_cache.remove(&k);
+        }
+        count
+    }
+
+    pub fn eval_js_policy_rules(&self, action_id: &str) -> Option<PolkitResult> {
+        for (prefix, res) in &self.js_rules {
+            if action_id.starts_with(prefix) {
+                return Some(*res);
+            }
+        }
+        None
     }
 
     pub fn check_authorization(
@@ -974,12 +1016,8 @@ impl SovereignFontAndTextLayoutEngine {
 
         Self {
             font_match_cache,
-            opentype_features: vec![
-                "liga".to_string(),
-                "kern".to_string(),
-                "zero".to_string(),
-                "smcp".to_string(),
-            ],
+            fontconfig_aliases,
+            opentype_features: vec!["liga".to_string(), "kern".to_string(), "zero".to_string(), "smcp".to_string()],
             shaped_buffer_cache: Vec::new(),
             skia_surface_width: 1920,
             skia_surface_height: 1080,
@@ -1649,11 +1687,7 @@ mod tests {
             "theme=Catppuccin-Mocha\nblur_radius=20\ntranslucent_windows=true"
         ));
         assert_eq!(engine.qt_style, QtPlatformStyle::Kvantum);
-        let spec = engine.kvantum_spec.as_ref().unwrap();
-        assert_eq!(
-            spec.svg_path,
-            "/usr/share/Kvantum/Catppuccin-Mocha/Catppuccin-Mocha.svg"
-        );
+        assert_eq!(engine.kvantum_spec.theme_name, "Catppuccin-Mocha");
 
         engine.connect_signal("clicked", "btn_handler_1");
         assert_eq!(engine.emit_signal("clicked"), 1);
