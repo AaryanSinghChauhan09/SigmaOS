@@ -146,8 +146,12 @@ impl CachyOsPackageDbParallelSyncPrEngineV58 {
 
     pub fn resolve_optimal_repo_url(&self) -> String {
         match self.active_tier {
-            MicroarchTierLevelV58::X86_64_V4 => "https://mirror.cachyos.org/repo/x86_64_v4".to_string(),
-            MicroarchTierLevelV58::X86_64_V3 => "https://mirror.cachyos.org/repo/x86_64_v3".to_string(),
+            MicroarchTierLevelV58::X86_64_V4 => {
+                "https://mirror.cachyos.org/repo/x86_64_v4".to_string()
+            }
+            MicroarchTierLevelV58::X86_64_V3 => {
+                "https://mirror.cachyos.org/repo/x86_64_v3".to_string()
+            }
             MicroarchTierLevelV58::X86_64_V2 | MicroarchTierLevelV58::GenericX86_64 => {
                 "https://mirror.cachyos.org/repo/x86_64".to_string()
             }
@@ -419,7 +423,10 @@ impl CachyOsHandheldTdpGamescopePrEngineV58 {
             return Err("TDP watts out of valid handheld range (5W..35W)");
         }
         self.tdp_watts = watts;
-        Ok(format!("Handheld TDP set to {}W for {}", watts, self.target_device))
+        Ok(format!(
+            "Handheld TDP set to {}W for {}",
+            watts, self.target_device
+        ))
     }
 }
 
@@ -579,7 +586,9 @@ impl CachyLinuxMissingComponentsV58PrSuite {
     }
 
     pub fn execute_and_verify_all(&mut self) -> bool {
-        let sched_msg = self.sched_ext_engine.set_scheduler(ScxSchedulerKindV58::ScxBoreV2);
+        let sched_msg = self
+            .sched_ext_engine
+            .set_scheduler(ScxSchedulerKindV58::ScxBoreV2);
         assert!(sched_msg.contains("ScxBoreV2"));
 
         let repo_url = self.package_download_engine.resolve_optimal_repo_url();
@@ -591,7 +600,9 @@ impl CachyLinuxMissingComponentsV58PrSuite {
         let hybrid_msg = self.chwd_gpu_engine.auto_configure_hybrid_drivers();
         assert!(hybrid_msg.contains("CHWD Hybrid PRIME"));
 
-        let gamemode_msg = self.gamemode_ananicy.apply_gamemode_for_process("witcher3.exe");
+        let gamemode_msg = self
+            .gamemode_ananicy
+            .apply_gamemode_for_process("witcher3.exe");
         assert!(gamemode_msg.contains("witcher3.exe"));
 
         let net_msg = self.network_bbrv3.apply_network_settings();
@@ -600,7 +611,9 @@ impl CachyLinuxMissingComponentsV58PrSuite {
         let proton_envs = self.proton_ntsync.render_proton_env_vars();
         assert!(proton_envs.iter().any(|(k, _)| k == "PROTON_USE_NTSYNC"));
 
-        let snap_cnt = self.btrfs_snapper.create_pre_transaction_snapshot("Pacman update");
+        let snap_cnt = self
+            .btrfs_snapper
+            .create_pre_transaction_snapshot("Pacman update");
         assert!(snap_cnt > 12);
 
         let tdp_msg = self.handheld_tdp.set_tdp_watts(25);
@@ -613,7 +626,10 @@ impl CachyLinuxMissingComponentsV58PrSuite {
     }
 
     pub fn get_merged_pr_count(&self) -> usize {
-        self.submissions.values().filter(|s| s.status == CachyPrStatusV58::Merged).count()
+        self.submissions
+            .values()
+            .filter(|s| s.status == CachyPrStatusV58::Merged)
+            .count()
     }
 }
 
@@ -637,10 +653,17 @@ mod tests {
         let msg = sched.set_scheduler(ScxSchedulerKindV58::ScxBoreV2);
         assert!(msg.contains("ScxBoreV2"));
 
-        let mut sync = CachyOsPackageDbParallelSyncPrEngineV58::new(MicroarchTierLevelV58::X86_64_V4);
-        assert_eq!(sync.resolve_optimal_repo_url(), "https://mirror.cachyos.org/repo/x86_64_v4");
+        let mut sync =
+            CachyOsPackageDbParallelSyncPrEngineV58::new(MicroarchTierLevelV58::X86_64_V4);
+        assert_eq!(
+            sync.resolve_optimal_repo_url(),
+            "https://mirror.cachyos.org/repo/x86_64_v4"
+        );
         assert_eq!(sync.fallback_tier(), MicroarchTierLevelV58::X86_64_V3);
-        assert_eq!(sync.resolve_optimal_repo_url(), "https://mirror.cachyos.org/repo/x86_64_v3");
+        assert_eq!(
+            sync.resolve_optimal_repo_url(),
+            "https://mirror.cachyos.org/repo/x86_64_v3"
+        );
     }
 
     #[test]
