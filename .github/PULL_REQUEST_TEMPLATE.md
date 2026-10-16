@@ -17,6 +17,14 @@
 - [ ] Diagnostics
 - [ ] Build / CI
 
+## Shell component
+
+- [ ] Shell parser / lexer
+- [ ] Builtins / environment
+- [ ] Redirection / pipes
+- [ ] Job control / signals
+- [ ] Interactive shell / prompt
+
 ## Component
 
 - [ ] PR-level validation
@@ -36,7 +44,8 @@
 <!-- Required for design-changing kernel PRs -->
 
 - Study document:
-- Linux/BSD/Redox/xv6 reference:
+- Upstream study / Linux/BSD/Redox/xv6 reference:
+- What SigmaOS adopts:
 - Decision: Adopt / Adapt / Reject
 - Reason:
 
@@ -51,7 +60,19 @@
 - [ ] Regression protection
 - [ ] Security review, if applicable
 
-## Kernel safety review
+## Shell safety review
+
+- [ ] Deterministic script execution verified
+- [ ] Explicit exit status codes
+- [ ] Safe expansion order
+- [ ] Quoting integrity & redirection safety
+- [ ] No unbounded input or partial execution on parse error
+
+## Reviewer checklist & Safety and rollback
+
+- [ ] Upstream study notes provided
+- [ ] Reviewer checklist completed
+- [ ] Safety and rollback plan defined
 
 - [ ] No unnecessary `unsafe`
 - [ ] Every `unsafe` block documents invariants

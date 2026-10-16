@@ -617,6 +617,9 @@ pub enum UniversalPmActionV39 {
     Audit,
 }
 
+pub type UniversalPmActionV40 = UniversalPmActionV39;
+pub type UniversalCrossDistroSatSolverV40 = UniversalCrossDistroSatSolverV39;
+
 #[derive(Debug, Clone)]
 pub struct RoutedPmCommandV39 {
     pub source_pm: String,
