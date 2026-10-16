@@ -401,7 +401,10 @@ impl Linux615SchedExtGovernorV58PrEngine {
 
     pub fn tune_latency(&mut self, target_us: u64) -> String {
         self.timeslice_us = target_us;
-        format!("Linux 6.15 Sched_Ext V58: Tuned latency target to {}us", self.timeslice_us)
+        format!(
+            "Linux 6.15 Sched_Ext V58: Tuned latency target to {}us",
+            self.timeslice_us
+        )
     }
 }
 
@@ -688,16 +691,56 @@ impl OpenSourceOsMissingComponentsV58PrSuite {
 
     fn stage_v58_prs(&mut self) {
         let proposals = [
-            ("feat(kernel): Sched_ext eBPF AI Workload Governor V58", "sched_ext", "scx-governor-v58"),
-            ("feat(bcachefs): Photonic Erasure Coding & CoW Tiering V58", "bcachefs", "bcachefs-erasure-v58"),
-            ("feat(freebsd): Capsicum Casper IPC & VNET Micro-jails V58", "capsicum", "capsicum-casper-v58"),
-            ("feat(openbsd): FineIBT CFI & Pinsyscall Shadow Stack V58", "fine_ibt", "fineibt-pinsyscall-v58"),
-            ("feat(hammer2): DragonFly BSD HAMMER2 Cluster Replication V58", "hammer2", "hammer2-cluster-v58"),
-            ("feat(nix): Hermetic CAS Store & Pure Flake Closure V58", "nix_guix", "nix-guix-hermetic-v58"),
-            ("feat(alpine): APK v3 PQC Dilithium-5 & Apkovl Overlay V58", "alpine", "apk-v3-overlay-v58"),
-            ("feat(netbsd): NPF N-code JIT Bytecode Firewall V58", "netbsd", "npf-jit-firewall-v58"),
-            ("feat(clear): Stateless /usr Separation & P-state Tuning V58", "clear", "stateless-pstate-v58"),
-            ("feat(illumos): DTrace Dynamic USDT & Crossbow VNIC Mesh V58", "illumos", "dtrace-crossbow-v58"),
+            (
+                "feat(kernel): Sched_ext eBPF AI Workload Governor V58",
+                "sched_ext",
+                "scx-governor-v58",
+            ),
+            (
+                "feat(bcachefs): Photonic Erasure Coding & CoW Tiering V58",
+                "bcachefs",
+                "bcachefs-erasure-v58",
+            ),
+            (
+                "feat(freebsd): Capsicum Casper IPC & VNET Micro-jails V58",
+                "capsicum",
+                "capsicum-casper-v58",
+            ),
+            (
+                "feat(openbsd): FineIBT CFI & Pinsyscall Shadow Stack V58",
+                "fine_ibt",
+                "fineibt-pinsyscall-v58",
+            ),
+            (
+                "feat(hammer2): DragonFly BSD HAMMER2 Cluster Replication V58",
+                "hammer2",
+                "hammer2-cluster-v58",
+            ),
+            (
+                "feat(nix): Hermetic CAS Store & Pure Flake Closure V58",
+                "nix_guix",
+                "nix-guix-hermetic-v58",
+            ),
+            (
+                "feat(alpine): APK v3 PQC Dilithium-5 & Apkovl Overlay V58",
+                "alpine",
+                "apk-v3-overlay-v58",
+            ),
+            (
+                "feat(netbsd): NPF N-code JIT Bytecode Firewall V58",
+                "netbsd",
+                "npf-jit-firewall-v58",
+            ),
+            (
+                "feat(clear): Stateless /usr Separation & P-state Tuning V58",
+                "clear",
+                "stateless-pstate-v58",
+            ),
+            (
+                "feat(illumos): DTrace Dynamic USDT & Crossbow VNIC Mesh V58",
+                "illumos",
+                "dtrace-crossbow-v58",
+            ),
         ];
 
         for (title, sub, comp) in proposals {
@@ -736,7 +779,10 @@ impl OpenSourceOsMissingComponentsV58PrSuite {
     }
 
     pub fn get_merged_pr_count(&self) -> usize {
-        self.submissions.values().filter(|s| s.status == OsPrStatusV58::Merged).count()
+        self.submissions
+            .values()
+            .filter(|s| s.status == OsPrStatusV58::Merged)
+            .count()
     }
 }
 
