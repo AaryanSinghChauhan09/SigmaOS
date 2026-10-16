@@ -15,6 +15,7 @@
 
 // SigmaOS Package Module
 pub mod alpine_apk;
+pub mod alpm_engine;
 pub mod apm;
 pub mod arch_aur;
 pub mod aur_integration;

@@ -13,6 +13,7 @@ pub mod firmware;
 pub mod firmware_bridge;
 pub mod initramfs;
 pub mod initramfs_builder;
+pub mod mkinitcpio_engine;
 pub mod kernel_ld_script;
 pub mod multiboot2;
 pub mod optimization;

@@ -1,3 +1,4 @@
+pub mod arch_install_scripts;
 pub mod gui_wizard;
 pub mod iso_installer;
 pub mod lightning_installer;

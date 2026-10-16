@@ -16,6 +16,7 @@ pub mod tcp;
 pub mod tcp_complete;
 pub mod tcp_udp;
 pub mod wireless_manager;
+pub mod warpinator_engine;
 pub mod zenithnet;
 
 pub use device_discovery::{
