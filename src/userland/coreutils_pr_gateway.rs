@@ -331,7 +331,13 @@ impl GnuCoreutilsBsdUserlandEngine {
             .collect()
     }
 
-    pub fn run_sort(&self, items: &[&str], numeric: bool, reverse: bool, unique: bool) -> Vec<String> {
+    pub fn run_sort(
+        &self,
+        items: &[&str],
+        numeric: bool,
+        reverse: bool,
+        unique: bool,
+    ) -> Vec<String> {
         let mut list: Vec<String> = items.iter().map(|s| s.to_string()).collect();
         if numeric {
             list.sort_by(|a, b| {
@@ -1020,9 +1026,17 @@ impl TextProcessingEngine {
         with_line_numbers: bool,
     ) -> (usize, Vec<String>) {
         let mut lines = Vec::new();
-        let pat_target = if case_insensitive { pattern.to_lowercase() } else { pattern.to_string() };
+        let pat_target = if case_insensitive {
+            pattern.to_lowercase()
+        } else {
+            pattern.to_string()
+        };
         for (idx, line) in content.lines().enumerate() {
-            let check = if case_insensitive { line.to_lowercase() } else { line.to_string() };
+            let check = if case_insensitive {
+                line.to_lowercase()
+            } else {
+                line.to_string()
+            };
             let matches = check.contains(&pat_target);
             let keep = if invert_match { !matches } else { matches };
             if keep {
@@ -1130,7 +1144,11 @@ impl ArchivalCompressionEngine {
         map
     }
 
-    pub fn configure_compression_level(&self, fmt: CompressionFormat, level: u32) -> Result<String, &'static str> {
+    pub fn configure_compression_level(
+        &self,
+        fmt: CompressionFormat,
+        level: u32,
+    ) -> Result<String, &'static str> {
         Ok(format!("{:?} level {} configured", fmt, level))
     }
 }
@@ -1251,7 +1269,10 @@ impl ProcpsPsmiscEngine {
         let count = pids.len();
         (
             count,
-            format!("killall: sent signal {} to {} process(es) matching '{}'", signal, count, name),
+            format!(
+                "killall: sent signal {} to {} process(es) matching '{}'",
+                signal, count, name
+            ),
         )
     }
 
@@ -1734,15 +1755,27 @@ impl CoreUtilsPullRequestGatewayEngine {
     }
 
     pub fn get_prs_by_category(&self, category: CoreUtilsPrCategory) -> Vec<CoreUtilsPrSubmission> {
-        self.submissions.values().filter(|s| s.category == category).cloned().collect()
+        self.submissions
+            .values()
+            .filter(|s| s.category == category)
+            .cloned()
+            .collect()
     }
 
     pub fn get_prs_by_status(&self, status: CoreUtilsPrStatus) -> Vec<CoreUtilsPrSubmission> {
-        self.submissions.values().filter(|s| s.status == status).cloned().collect()
+        self.submissions
+            .values()
+            .filter(|s| s.status == status)
+            .cloned()
+            .collect()
     }
 
     pub fn get_prs_by_author(&self, author: &str) -> Vec<CoreUtilsPrSubmission> {
-        self.submissions.values().filter(|s| s.author == author).cloned().collect()
+        self.submissions
+            .values()
+            .filter(|s| s.author == author)
+            .cloned()
+            .collect()
     }
 }
 
