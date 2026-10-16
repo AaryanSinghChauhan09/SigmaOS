@@ -738,6 +738,25 @@ impl SovereignSubsystemDistroHarmonyEngine {
         }
     }
 
+    pub fn audit_all_subsystems_distro_compliance(&self) -> Vec<(SigmaOsSubsystem, bool, u32)> {
+        self.subsystems
+            .iter()
+            .map(|(&sub, spec)| {
+                let is_compliant = spec.supported_distros.len() >= 30 && spec.interop_score >= 100;
+                (sub, is_compliant, spec.interop_score)
+            })
+            .collect()
+    }
+
+    pub fn translate_cross_distro_payload(
+        &self,
+        distro: LinuxBsdDistroInspiration,
+        subsystem: SigmaOsSubsystem,
+        payload: &str,
+    ) -> String {
+        format!("[{}:{}] {}", distro.as_str(), subsystem.as_str(), payload)
+    }
+
     pub fn dispatch_event(
         &mut self,
         source: SigmaOsSubsystem,
@@ -1186,6 +1205,23 @@ mod tests {
             engine.resolve_package_format_specifier(LinuxBsdDistroInspiration::FedoraLinux),
             "rpm"
         );
+
+        let audits = engine.audit_all_subsystems_distro_compliance();
+        assert_eq!(audits.len(), 31);
+        for (_, compliant, score) in audits {
+            assert!(compliant);
+            assert_eq!(score, 100);
+        }
+
+        let translated = engine.translate_cross_distro_payload(
+            LinuxBsdDistroInspiration::FreeBSD,
+            SigmaOsSubsystem::SecuritySandboxing,
+            "mac_capsicum_enforce",
+        );
+        assert_eq!(
+            translated,
+            "[FreeBSD:SecuritySandboxing] mac_capsicum_enforce"
+        );
     }
 
     #[test]
@@ -1231,5 +1267,24 @@ mod tests {
         assert!(event_id > 0);
         assert!(orchestrator.verify_orchestration_harmony());
         assert_eq!(orchestrator.master_harmony_index(), 100);
+
+        let event_id = orchestrator.route_harmony_event(
+            SigmaOsSubsystem::AccessibilityInput,
+            SigmaOsSubsystem::DesktopCompositor,
+            "ROUTE_ORCA_TTS",
+            "tts_rate=1.0",
+        );
+        assert!(event_id > 0);
+
+        let policy = orchestrator
+            .translate_cross_subsystem_policy(
+                SigmaOsSubsystem::ProcessActivity,
+                SigmaOsSubsystem::SecuritySandboxing,
+            )
+            .expect("ProcessActivity -> SecuritySandboxing policy must exist");
+        assert_eq!(
+            policy.distro_inspiration,
+            LinuxBsdDistroInspiration::FreeBSD
+        );
     }
 }

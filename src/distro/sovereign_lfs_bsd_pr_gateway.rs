@@ -51,6 +51,14 @@ impl LfsBsdPrCategory {
             Self::LfsSysvInitRunlevels => "LFS SysV init bootscripts & runlevels",
             Self::LfsPkgtoolDestdir => "LFS self-hosted source package build & DESTDIR staging",
             Self::LfsKernelConfigOptimizer => "LFS minimal zero-bloat kernel .config optimizer",
+            Self::LfsGlibcDynamicLinker => {
+                "LFS glibc dynamic linker & ld.so.cache search path resolution"
+            }
+            Self::LfsUdevColdplug => "LFS devtmpfs virtual device management & udev coldplug rules",
+            Self::LfsPamShadowAuth => "BLFS PAM auth rules & shadow password salted hashing",
+            Self::LfsPorgCollisionTracker => {
+                "LFS porg/paco source package build file collision detector"
+            }
             Self::OpenBsdKarlRelinking => {
                 "OpenBSD KARL kernel address randomization & pledge/unveil"
             }
@@ -59,7 +67,13 @@ impl LfsBsdPrCategory {
             Self::NetBsdRumpVeriexec => {
                 "NetBSD Rump Kernel hypercall drivers & Veriexec signatures"
             }
+            Self::NetBsdVeriexecSignatures => {
+                "NetBSD Veriexec cryptographic SHA-256 binary fingerprint audit"
+            }
             Self::DragonFlyHammer2Pfs => "DragonFly BSD HAMMER2 PFS multi-master snapshots & logs",
+            Self::DragonFlyHammer2PfsReplication => {
+                "DragonFly BSD HAMMER2 PFS multi-master transaction replication"
+            }
             Self::DragonFlyVkernelSandbox => "DragonFly BSD VKernel virtual kernel execution",
         }
     }

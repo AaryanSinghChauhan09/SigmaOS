@@ -515,12 +515,12 @@ impl SovereignUniversalSubsystemInteropEngine {
                 true,
                 true,
                 &[
+                    "cgroup_v2",
+                    "freebsd_racct",
                     "rusage_collector",
-                    "job_control",
-                    "cgroupv2_tasks",
                     "pidfd_signals",
                 ],
-                8,
+                6,
             ),
         );
 
@@ -531,12 +531,12 @@ impl SovereignUniversalSubsystemInteropEngine {
                 true,
                 true,
                 &[
-                    "damon_reclaim",
-                    "cxl_photonic_mesh",
+                    "mglru_reclaim",
+                    "damon_harvest",
                     "zram_zstd",
-                    "mglru_pages",
+                    "cxl_photonic",
                 ],
-                10,
+                7,
             ),
         );
 
@@ -562,7 +562,7 @@ impl SovereignUniversalSubsystemInteropEngine {
                     "sigreturn_frame_guard",
                     "uncatchable_bypass",
                 ],
-                6,
+                5,
             ),
         );
 
@@ -879,6 +879,62 @@ impl SovereignUniversalSubsystemInteropEngine {
         self.active_distro_mode = String::from(mode);
     }
 
+    /// Resolve subsystem name or alias to registered adapter key.
+    pub fn resolve_subsystem_key(&self, name: &str) -> Option<String> {
+        if self.subsystem_adapters.contains_key(name) {
+            return Some(String::from(name));
+        }
+        let lower = name.to_lowercase();
+        let alias = match lower.as_str() {
+            "kernel" | "kernelscheduling" | "kernel_scheduling" => "kernel",
+            "security" | "securitysandboxing" | "security_sandboxing" => "security",
+            "filesystem" | "filesystemstorage" | "filesystem_storage" => "filesystem",
+            "networking" | "network" => "networking",
+            "package" | "packagemanagement" | "package_management" => "package",
+            "init" | "initsupervisor" | "init_supervisor" => "init",
+            "desktop" | "desktopcompositor" | "desktop_compositor" => "desktop",
+            "audio" | "audiosound" | "audio_sound" => "audio",
+            "power" | "hardwarepower" | "hardware_power" => "power",
+            "container" | "containervirt" | "container_virt" => "container",
+            "observability" | "observabilitydiagnostics" | "observability_diagnostics" => {
+                "observability"
+            }
+            "shell" | "shellterminal" | "shell_terminal" => "shell",
+            "ipc_mem" | "ipcmemory" | "ipc_memory" => "ipc_mem",
+            "drivers" | "drivershardware" | "drivers_hardware" => "drivers",
+            "boot" | "installerboot" | "installer_boot" => "boot",
+            "auth" | "authidentity" | "auth_identity" => "auth",
+            "i18n" | "i18nlocalization" | "i18n_localization" => "i18n",
+            "media_graphics" | "mediagraphics" | "media" => "media_graphics",
+            "compiler" | "compilertoolchain" | "compiler_toolchain" => "compiler",
+            "automation" | "automationprovisioning" | "automation_provisioning" => "automation",
+            "audit" | "systemaudit" | "system_audit" => "audit",
+            "ai_agent" | "aiworkflowagent" | "ai_workflow_agent" => "ai_agent",
+            "virt_hypervisor" | "virtualizationhypervisor" | "virtualization_hypervisor" => {
+                "virt_hypervisor"
+            }
+            "process" | "processactivity" | "process_activity" => "process_activity",
+            "memory" | "memoryvirtualization" | "memory_virt" | "memory_virtualization" => {
+                "memory_virt"
+            }
+            "time" | "timesynchronization" | "time_sync" | "time_synchronization" => "time_sync",
+            "signal" | "signaldelivery" | "signal_delivery" => "signal_delivery",
+            "device" | "devicehotplug" | "device_hotplug" => "device_hotplug",
+            "crypto" | "cryptographysecurity" | "crypto_sec" | "cryptography_security" => {
+                "crypto_sec"
+            }
+            "telemetry" | "telemetryobservability" | "telemetry_observability" => "telemetry",
+            "accessibility" | "accessibilityinput" | "accessibility_input" => "accessibility",
+            _ => return None,
+        };
+
+        if self.subsystem_adapters.contains_key(alias) {
+            Some(String::from(alias))
+        } else {
+            None
+        }
+    }
+
     /// Dispatch an inter-subsystem operation event and record execution.
     pub fn dispatch_event(
         &mut self,
@@ -887,12 +943,12 @@ impl SovereignUniversalSubsystemInteropEngine {
         kind: &str,
         payload: &str,
     ) -> Result<u64, &'static str> {
-        if !self.subsystem_adapters.contains_key(origin) {
-            return Err("Unknown origin subsystem");
-        }
-        if !self.subsystem_adapters.contains_key(target) {
-            return Err("Unknown target subsystem");
-        }
+        let resolved_origin = self
+            .resolve_subsystem_key(origin)
+            .ok_or("Unknown origin subsystem")?;
+        let resolved_target = self
+            .resolve_subsystem_key(target)
+            .ok_or("Unknown target subsystem")?;
 
         self.event_counter += 1;
         let event = SubsystemInteropEvent {
@@ -973,6 +1029,12 @@ impl SovereignUniversalSubsystemInteropEngine {
         target: &str,
         action: &str,
     ) -> Result<u64, &'static str> {
+        let resolved_origin = self
+            .resolve_subsystem_key(origin)
+            .ok_or("Unknown origin subsystem")?;
+        let resolved_target = self
+            .resolve_subsystem_key(target)
+            .ok_or("Unknown target subsystem")?;
         let origin_adapter = self
             .subsystem_adapters
             .get(origin)
@@ -987,7 +1049,12 @@ impl SovereignUniversalSubsystemInteropEngine {
         let _policy = self.translate_policy(origin_adapter.category, target_adapter.category);
 
         let payload = format!("action={};mode={}", action, self.active_distro_mode);
-        self.dispatch_event(origin, target, "cross_distro_op", &payload)
+        self.dispatch_event(
+            &resolved_origin,
+            &resolved_target,
+            "cross_distro_op",
+            &payload,
+        )
     }
 }
 

@@ -1288,7 +1288,10 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
             .collect()
     }
 
-    pub fn query_insights_by_flexible_domain(&self, raw_query: &str) -> Vec<TechMediaArticleInsight> {
+    pub fn query_insights_by_flexible_domain(
+        &self,
+        raw_query: &str,
+    ) -> Vec<TechMediaArticleInsight> {
         let mut clean = raw_query.trim();
         if clean.starts_with("https://") {
             clean = &clean[8..];
@@ -1779,9 +1782,13 @@ mod tests {
         assert_eq!(flex_itsfoss.len(), 1);
         assert_eq!(flex_itsfoss[0].publication_domain, "itsfoss.com");
 
-        let flex_concat = engine.query_insights_by_flexible_domain("techpowerup.techpwindowscentral.com");
+        let flex_concat =
+            engine.query_insights_by_flexible_domain("techpowerup.techpwindowscentral.com");
         assert!(flex_concat.len() >= 2);
-        let domains: Vec<String> = flex_concat.iter().map(|i| i.publication_domain.clone()).collect();
+        let domains: Vec<String> = flex_concat
+            .iter()
+            .map(|i| i.publication_domain.clone())
+            .collect();
         assert!(domains.contains(&String::from("techpowerup.com")));
         assert!(domains.contains(&String::from("windowscentral.com")));
 
