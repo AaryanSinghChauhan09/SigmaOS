@@ -1,77 +1,74 @@
 ## Summary
 
-<!-- What scheduler or component behavior changed and why? -->
+<!-- One paragraph: what changed and why. -->
 
-## Scheduler component
+## Component
 
-- [ ] Scheduler core
-- [ ] Run queue / PID allocation
-- [ ] fork / clone
-- [ ] exec
-- [ ] Context switch
-- [ ] Preemption & quantum
-- [ ] Signals & wait queues
-- [ ] Zombie / reaping & orphan adoption
-- [ ] Resource limits & CPU affinity
-- [ ] Documentation & ADRs
+- [ ] Thread manager
+- [ ] Scheduler
+- [ ] Process management
+- [ ] Memory management
+- [ ] VFS / filesystems
+- [ ] Drivers
+- [ ] IPC
+- [ ] Security
+- [ ] Installer / packaging
+- [ ] Documentation
 - [ ] CI / tooling
-
-## Recurring task
-
-- [ ] PR validation
-- [ ] Daily CI triage
-- [ ] Weekly lifecycle review
-- [ ] Weekly Linux/BSD study
-- [ ] Biweekly scheduler audit
-- [ ] Biweekly signal/wait audit
-- [ ] Monthly boot validation
-- [ ] Quarterly architecture/security/release review
-
-## Reference behavior
-
-<!-- Required for lifecycle, ABI, or scheduler changes -->
-
-- POSIX section:
-- Linux/BSD/Redox reference:
-- SigmaOS current behavior:
-- New behavior:
-- Compatibility impact:
 
 ## Changes
 
 -
--
 
-## Scheduler safety review
+## Motivation
 
-- [ ] Lifecycle transitions are valid (NEW -> READY -> RUNNING -> SLEEPING -> READY, READY -> RUNNING -> ZOMBIE, RUNNING -> STOPPED -> READY, ANY -> ZOMBIE -> REAPED)
-- [ ] Zombies are eventually reaped
-- [ ] Orphans are adopted by PID 1
-- [ ] PID reuse is safe
-- [ ] Lock ordering and concurrency model documented
-- [ ] Interrupt-context safety considered
-- [ ] Lost-wakeup prevention verified
-- [ ] Double-reap and double-switch prevented
-- [ ] Resource limits and run-queue capacity enforced
-- [ ] No unbounded allocation or recursion
+<!-- Link the issue, roadmap item, or gap-analysis entry. -->
+
+## Implementation notes
+
+<!-- Design decisions, data structures, locking, error handling. -->
+
+## Tests
+
+- [ ] Unit tests added/updated
+- [ ] Integration tests added/updated
+- [ ] Concurrency/stress tests added/updated
+- [ ] Fuzz tests added/updated
+- [ ] Boot smoke test performed, if kernel-facing
+- [ ] No regression in existing tests
 
 ## Verification
 
 ```bash
+cargo fmt --check
+cargo clippy --all-targets -- -D warnings
 cargo check --lib
 cargo test --lib
 ./run_sigma_tests.sh
 ```
 
-## Runtime evidence
+Paste relevant output below.
 
-- [ ] QEMU boot-to-shell log
-- [ ] Scheduler test / benchmark report
-- [ ] Artifact hash
+## Capability status
 
-## Safety and rollback
+- Previous status:
+- New status:
+- Evidence:
 
-- [ ] No broad credentials or host access introduced
-- [ ] Untrusted input validated
-- [ ] Rollback/recovery behavior defined
-- [ ] Security review completed, if applicable
+## Integration impact
+
+- [ ] No runtime integration yet
+- [ ] Connected to runtime path
+- [ ] Boot path validated
+- [ ] Installer/update path validated
+- [ ] Hardware tested
+
+## Reviewer checklist
+
+- [ ] Scope is narrow
+- [ ] Public API documented
+- [ ] `unsafe` justified
+- [ ] Lock ordering documented
+- [ ] Error paths tested
+- [ ] Feature status updated
+- [ ] No unsupported compatibility claim
