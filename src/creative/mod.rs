@@ -10,6 +10,8 @@ pub mod pdfcraft;
 pub mod pdfcraft_artcraft_parity_pr;
 pub mod designcraft;
 pub mod designcraft_missing_components_parity_pr;
+pub mod figcraft;
+pub mod figcraft_missing_components_parity_pr;
 pub mod effectcraft;
 pub mod effectcraft_missing_components_parity_pr;
 pub mod lightcraft;
@@ -146,6 +148,21 @@ pub use wordcraft_missing_components_parity_pr::{
     WordcraftStylesTemplatesThemesPrEngine, WordcraftReferenceCitationBibliographyPrEngine,
     WordcraftLinguisticAiSpellGrammarPrEngine, WordcraftRealtimeCrdtCollabPrEngine,
     WordcraftMailMergeAutomationPrEngine, SovereignWordcraftArtcraftParityPrGateway,
+};
+pub use figcraft::{
+    FigCraftEngine, FigCraftMasterPrDeploymentSuite, FigCraftPullRequestSpec,
+    FigCraftUiUxAutoLayoutPrDeployer, FigCraftInteractivePrototypingPrDeployer,
+    FigCraftVectorCanvasDesignSystemPrDeployer, FigCraftCollaborationExportPrDeployer,
+    fnv1a_figcraft_pr_digest, init_figcraft, get_figcraft,
+};
+pub use figcraft_missing_components_parity_pr::{
+    FigcraftPrProposalManifest, FigcraftAdvancedAutoLayoutFlexGridPrEngine,
+    FigcraftInteractivePrototypingSmartAnimatePrEngine,
+    FigcraftDesignSystemTokensVariablesPrEngine,
+    FigcraftVectorBooleanNetworkTopologyPrEngine,
+    FigcraftRealtimeCrdtMultiUserCollabPrEngine,
+    FigcraftDevModeCodeGenerationInspectPrEngine,
+    SovereignFigcraftArtcraftParityPrGateway,
 };
 pub use artcraft::{
     ArtSuite, Project, Workspace, ProjectType,
