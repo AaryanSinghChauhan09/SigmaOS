@@ -19,6 +19,7 @@ pub mod soundcraft;
 pub mod vectoranimation;
 pub mod model3d;
 pub mod cadcraft;
+pub mod cadcraft_missing_components_parity_pr;
 pub mod artcraft;
 pub mod deckcraft;
 
@@ -146,6 +147,12 @@ pub use wordcraft_missing_components_parity_pr::{
     WordcraftStylesTemplatesThemesPrEngine, WordcraftReferenceCitationBibliographyPrEngine,
     WordcraftLinguisticAiSpellGrammarPrEngine, WordcraftRealtimeCrdtCollabPrEngine,
     WordcraftMailMergeAutomationPrEngine, SovereignWordcraftArtcraftParityPrGateway,
+};
+pub use cadcraft_missing_components_parity_pr::{
+    CadcraftPrProposalManifest, CadcraftNurbsCurveSurfacePrEngine,
+    CadcraftParametricConstraintSolver3dPrEngine, CadcraftMultiAxisCncCamToolpathPrEngine,
+    CadcraftNonLinearTransientFeaCaePrEngine, CadcraftSheetMetalSurfaceUnfoldPrEngine,
+    CadcraftEdaPcb3dIntegrationPrEngine, SovereignCadcraftArtcraftParityPrGateway,
 };
 pub use artcraft::{
     ArtSuite, Project, Workspace, ProjectType,
