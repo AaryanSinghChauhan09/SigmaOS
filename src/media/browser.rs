@@ -3171,6 +3171,11 @@ impl SovereignOpenSourceBrowserSuiteEngine {
         (grid_tracks.len(), dom_reflows)
     }
 
+    /// Performs an open-source browser suite audit across Firefox, Chromium, LibreWolf, Brave, Tor, DuckDuckGo, Ladybird, Vivaldi, Zen, Floorp, Mullvad, and Arc engines
+    pub fn execute_open_source_browser_audit(&mut self, url: &str) -> BTreeMap<String, String> {
+        self.run_comprehensive_browser_suite_audit(url)
+    }
+
     /// Performs comprehensive open-source web browser privacy, security, and layout audit
     pub fn run_comprehensive_browser_suite_audit(
         &mut self,
