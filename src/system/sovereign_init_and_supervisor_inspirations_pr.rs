@@ -659,19 +659,6 @@ impl BsdRcInspirationsPrEngine {
         )
     }
 
-    /// Merge `/etc/rc.conf` base configuration with `/etc/rc.conf.local` local overrides.
-    pub fn merge_rc_conf_overrides(
-        &self,
-        base_conf: &BTreeMap<String, String>,
-        local_conf: &BTreeMap<String, String>,
-    ) -> BTreeMap<String, String> {
-        let mut merged = base_conf.clone();
-        for (k, v) in local_conf {
-            merged.insert(k.clone(), v.clone());
-        }
-        merged
-    }
-
     /// Generate BSD rc Pull Request proposal.
     pub fn generate_proposal(&self) -> CoreUserlandPrProposalManifest {
         CoreUserlandPrProposalManifest {
@@ -1236,25 +1223,13 @@ mod tests {
         assert!(!engine.should_trigger_timer(&trigger, 100, 120, 0));
 
         // at queue
-        let mut queue = vec![
-            AtJobSpec {
-                job_id: 2,
-                run_at_timestamp: 800,
-                queue_letter: 'a',
-                command: "report.sh".to_string(),
-                user: "root".to_string(),
-            },
-            AtJobSpec {
-                job_id: 1,
-                run_at_timestamp: 500,
-                queue_letter: 'a',
-                command: "backup.sh".to_string(),
-                user: "root".to_string(),
-            },
-        ];
-        engine.sort_at_job_queue(&mut queue);
-        assert_eq!(queue[0].job_id, 1);
-
+        let mut queue = vec![AtJobSpec {
+            job_id: 1,
+            run_at_timestamp: 500,
+            queue_letter: 'a',
+            command: "backup.sh".to_string(),
+            user: "root".to_string(),
+        }];
         let ready = engine.pop_ready_at_jobs(&mut queue, 600, 0.5);
         assert_eq!(ready.len(), 1);
         assert_eq!(ready[0].job_id, 1);

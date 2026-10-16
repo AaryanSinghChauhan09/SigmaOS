@@ -384,15 +384,16 @@ impl SigmaInit {
 
     /// Start a service
     pub fn start_service(&mut self, name: &str) -> Result<(), String> {
-        // Check dependencies first with immutable borrow
-        {
-            let service = self.services.get(name)
-                .ok_or_else(|| format!("Service '{}' not found", name))?;
-            for dep in &service.dependencies {
-                if let Some(dep_service) = self.services.get(dep) {
-                    if dep_service.state != ServiceState::Running {
-                        return Err(format!("Dependency '{}' is not running", dep));
-                    }
+        let service = self
+            .services
+            .get_mut(name)
+            .ok_or_else(|| format!("Service '{}' not found", name))?;
+
+        // Check dependencies
+        for dep in &service.dependencies {
+            if let Some(dep_service) = self.services.get(dep) {
+                if dep_service.state != ServiceState::Running {
+                    return Err(format!("Dependency '{}' is not running", dep));
                 }
             }
         }
@@ -487,9 +488,10 @@ impl SigmaInit {
 
     /// Switch to a target
     pub fn switch_target(&mut self, target_name: &str) -> Result<(), String> {
-        let target_services: Vec<String> = self.targets.get(target_name)
-            .ok_or_else(|| format!("Target '{}' not found", target_name))?
-            .services.clone();
+        let target = self
+            .targets
+            .get(target_name)
+            .ok_or_else(|| format!("Target '{}' not found", target_name))?;
 
         // Stop current target services
         if let Some(current) = &self.current_target {

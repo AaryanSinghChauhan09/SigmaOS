@@ -61,15 +61,21 @@ impl DesigncraftPrCategory {
     pub fn as_str(&self) -> &'static str {
         match self {
             Self::InteractivePrototypingFlow => "interactive prototyping flow & screen transitions",
-            Self::AutoLayoutFlexContainer => "auto-layout flexbox containers & responsive resizing constraints",
-            Self::DesignSystemVariablesTheme => "design system tokens, theme modes & variable aliasing",
-            Self::VectorGeometryBooleanOps => "boolean geometry operations, bezier knots & stroke caps",
-            Self::MultiplayerCrdtStateSync => "real-time multiplayer CRDT state sync & collaborative cursors",
-            Self::CodeExporterMultiFramework => "design-to-code generator & multi-framework asset exporter",
-            Self::ComponentVariantsStateMachine => "component variant sets, state machines & property overrides",
-            Self::DesignTokensStyleDictionary => "w3c design tokens JSON parser & style dictionary transformer",
-            Self::IconSystemPackagingSymbols => "vector icon library packaging, SVG sprite sheets & icon fonts",
-            Self::AccessibilityAuditWcagLint => "WCAG 2.1 AA/AAA accessibility contrast audit & color blindness simulator",
+            Self::AutoLayoutFlexContainer => {
+                "auto-layout flexbox containers & responsive resizing constraints"
+            }
+            Self::DesignSystemVariablesTheme => {
+                "design system tokens, theme modes & variable aliasing"
+            }
+            Self::VectorGeometryBooleanOps => {
+                "boolean geometry operations, bezier knots & stroke caps"
+            }
+            Self::MultiplayerCrdtStateSync => {
+                "real-time multiplayer CRDT state sync & collaborative cursors"
+            }
+            Self::CodeExporterMultiFramework => {
+                "design-to-code generator & multi-framework asset exporter"
+            }
         }
     }
 }
@@ -1240,10 +1246,27 @@ impl SovereignDesigncraftArtcraftParityPrGateway {
             handle_out_x: 5.0,
             handle_out_y: 0.0,
         };
-        let p1 = self.geometry_engine.create_path(String::from("PathA"), vec![knot1.clone()], true);
-        let p2 = self.geometry_engine.create_path(String::from("PathB"), vec![knot1], true);
-        let merged_p = self.geometry_engine.perform_boolean_op(p1, p2, BooleanOpType::Union);
+        let p1 = self.geometry_engine.create_path(
+            String::from("PathA"),
+            alloc::vec![knot1.clone()],
+            true,
+        );
+        let p2 = self
+            .geometry_engine
+            .create_path(String::from("PathB"), alloc::vec![knot1], true);
+        let merged_p = self
+            .geometry_engine
+            .perform_boolean_op(p1, p2, BooleanOpType::Union);
         assert!(merged_p.is_some());
+        assert_eq!(
+            self.geometry_engine
+                .paths
+                .get(&merged_p.unwrap())
+                .unwrap()
+                .knots
+                .len(),
+            2
+        );
 
         // 5. Verify CRDT Multi-user
         self.crdt_engine

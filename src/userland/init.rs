@@ -297,29 +297,12 @@ pub struct SystemdPathMonitorEngine {
 }
 
 impl SystemdPathMonitorEngine {
-    pub fn new() -> Self {
-        Self::default()
-    }
-
-    pub fn register_path(&mut self, unit: SystemdPathUnit) {
-        self.paths.insert(unit.name.clone(), unit);
-    }
-
-    pub fn check_path_events(&self, modified_path: &str) -> Vec<String> {
-        let mut triggered = Vec::new();
-        for path_unit in self.paths.values() {
-            if path_unit.path_changed.as_deref() == Some(modified_path)
-                || path_unit.path_modified.as_deref() == Some(modified_path)
-                || path_unit.path_exists.as_deref() == Some(modified_path)
-                || path_unit.directory_not_empty.as_deref() == Some(modified_path)
-            {
-                triggered.push(path_unit.unit_to_trigger.clone());
-            }
-        }
-        triggered
-    }
-
-    pub fn check_trigger(&self, path: &str, event: SystemdPathEventType, is_dir_nonempty: bool) -> bool {
+    pub fn check_trigger(
+        &self,
+        path: &str,
+        event: SystemdPathEventType,
+        is_dir_nonempty: bool,
+    ) -> bool {
         if self.monitored_path != path {
             return false;
         }
@@ -490,7 +473,85 @@ pub struct OpenRcHeader {
     pub use_deps: Vec<String>,
     pub before: Vec<String>,
     pub after: Vec<String>,
-    pub keywords: Vec<String>,
+    pub keywords: Vec<String>, // e.g. "keyword -docker -jail"
+}
+
+/// OpenRC Dependency Solver Engine
+#[derive(Debug, Clone, Default)]
+pub struct OpenRcDependencySolverEngine;
+
+impl OpenRcDependencySolverEngine {
+    pub fn resolve_order(
+        scripts: &BTreeMap<String, OpenRcHeader>,
+    ) -> Result<Vec<String>, &'static str> {
+        let mut sorted = Vec::new();
+        let mut visited = BTreeSet::new();
+        let mut temp_mark = BTreeSet::new();
+
+        fn visit(
+            node: &String,
+            scripts: &BTreeMap<String, OpenRcHeader>,
+            visited: &mut BTreeSet<String>,
+            temp_mark: &mut BTreeSet<String>,
+            sorted: &mut Vec<String>,
+        ) -> Result<(), &'static str> {
+            if temp_mark.contains(node) {
+                return Err("Cyclic dependency in OpenRC scripts");
+            }
+            if !visited.contains(node) {
+                temp_mark.insert(node.clone());
+                if let Some(header) = scripts.get(node) {
+                    for dep in &header.need {
+                        if scripts.contains_key(dep) {
+                            visit(dep, scripts, visited, temp_mark, sorted)?;
+                        }
+                    }
+                    for dep in &header.use_deps {
+                        if scripts.contains_key(dep) {
+                            visit(dep, scripts, visited, temp_mark, sorted)?;
+                        }
+                    }
+                }
+                temp_mark.remove(node);
+                visited.insert(node.clone());
+                sorted.push(node.clone());
+            }
+            Ok(())
+        }
+
+        for node in scripts.keys() {
+            visit(node, scripts, &mut visited, &mut temp_mark, &mut sorted)?;
+        }
+        Ok(sorted)
+    }
+}
+
+/// OpenRC Status & Runlevel Controller Engine
+#[derive(Debug, Clone)]
+pub struct OpenRcStatusControllerEngine {
+    pub current_runlevel: OpenRcRunlevel,
+    pub active_services: BTreeSet<String>,
+}
+
+impl OpenRcStatusControllerEngine {
+    pub fn new(initial_runlevel: OpenRcRunlevel) -> Self {
+        Self {
+            current_runlevel: initial_runlevel,
+            active_services: BTreeSet::new(),
+        }
+    }
+
+    pub fn transition_runlevel(&mut self, target: OpenRcRunlevel) {
+        self.current_runlevel = target;
+    }
+
+    pub fn mark_started(&mut self, service_name: &str) {
+        self.active_services.insert(service_name.to_string());
+    }
+
+    pub fn mark_stopped(&mut self, service_name: &str) {
+        self.active_services.remove(service_name);
+    }
 }
 
 impl OpenRcHeader {
@@ -499,17 +560,29 @@ impl OpenRcHeader {
         for line in script_content.lines() {
             let trimmed = line.trim();
             if let Some(rest) = trimmed.strip_prefix("provide") {
-                header.provide.extend(rest.split_whitespace().map(|s| s.to_string()));
+                header
+                    .provide
+                    .extend(rest.split_whitespace().map(|s| s.to_string()));
             } else if let Some(rest) = trimmed.strip_prefix("need") {
-                header.need.extend(rest.split_whitespace().map(|s| s.to_string()));
+                header
+                    .need
+                    .extend(rest.split_whitespace().map(|s| s.to_string()));
             } else if let Some(rest) = trimmed.strip_prefix("use") {
-                header.use_deps.extend(rest.split_whitespace().map(|s| s.to_string()));
+                header
+                    .use_deps
+                    .extend(rest.split_whitespace().map(|s| s.to_string()));
             } else if let Some(rest) = trimmed.strip_prefix("before") {
-                header.before.extend(rest.split_whitespace().map(|s| s.to_string()));
+                header
+                    .before
+                    .extend(rest.split_whitespace().map(|s| s.to_string()));
             } else if let Some(rest) = trimmed.strip_prefix("after") {
-                header.after.extend(rest.split_whitespace().map(|s| s.to_string()));
+                header
+                    .after
+                    .extend(rest.split_whitespace().map(|s| s.to_string()));
             } else if let Some(rest) = trimmed.strip_prefix("keyword") {
-                header.keywords.extend(rest.split_whitespace().map(|s| s.to_string()));
+                header
+                    .keywords
+                    .extend(rest.split_whitespace().map(|s| s.to_string()));
             }
         }
         header
@@ -728,7 +801,12 @@ impl RunitS6SupervisionTreeGovernor {
         self.current_stage = stage;
     }
 
-    pub fn register_service(&mut self, name: String, srv: SupervisedService, log_srv: Option<String>) {
+    pub fn register_service(
+        &mut self,
+        name: String,
+        srv: SupervisedService,
+        log_srv: Option<String>,
+    ) {
         if let Some(log) = log_srv {
             self.log_pipelines.insert(name.clone(), log);
         }
@@ -892,86 +970,12 @@ impl SysVinitRunlevelStateMachine {
             .collect()
     }
 
-    pub fn switch_runlevel(&mut self, target_runlevel: char) -> (Vec<String>, Vec<String>) {
-        self.current_runlevel = target_runlevel;
-        let mut stop_scripts = Vec::new();
-        let mut start_scripts = Vec::new();
-
-        for entry in &self.inittab_entries {
-            if entry.runlevels.contains(&target_runlevel) {
-                if entry.action == SysVAction::Respawn
-                    || entry.action == SysVAction::Once
-                    || entry.action == SysVAction::Wait
-                {
-                    start_scripts.push(format!("S{:02}{}", start_scripts.len(), entry.id));
-                }
-            } else {
-                stop_scripts.push(format!("K{:02}{}", stop_scripts.len(), entry.id));
-            }
-        }
-
-        let stops: Vec<SysVInittabEntry> = all_entries
-            .iter()
-            .filter(|e| e.runlevels.contains(&old_rl) && !e.runlevels.contains(&new_runlevel))
-            .cloned()
-            .collect();
-
-        let starts: Vec<SysVInittabEntry> = all_entries
-            .iter()
-            .filter(|e| e.runlevels.contains(&new_runlevel) || e.runlevels.is_empty())
-            .cloned()
-            .collect();
-
-        (stops, starts)
-    }
-
-    pub fn set_runlevel(&mut self, new_runlevel: char) -> Vec<SysVInittabEntry> {
-        self.transition_runlevel(new_runlevel)
-    }
-
-    pub fn transition_runlevel(&mut self, new_runlevel: char) -> Vec<SysVInittabEntry> {
-        self.current_runlevel = new_runlevel;
-        let all_entries = if !self.inittab_entries.is_empty() {
-            &self.inittab_entries
-        } else {
-            &self.entries
-        };
-        all_entries
-            .iter()
-            .filter(|e| e.runlevels.contains(&new_runlevel) || e.runlevels.is_empty())
-            .cloned()
-            .collect()
-    }
-
-    pub fn spawn_respawn_processes(&self) -> Vec<SysVInittabEntry> {
-        let all_entries = if !self.inittab_entries.is_empty() {
-            &self.inittab_entries
-        } else {
-            &self.entries
-        };
-        all_entries
-            .iter()
-            .filter(|e| e.action == SysVAction::Respawn && (e.runlevels.contains(&self.current_runlevel) || e.runlevels.is_empty()))
-            .cloned()
-            .collect()
-    }
-
-    pub fn get_active_processes(&self) -> Vec<&SysVInittabEntry> {
-        let all_entries = if !self.inittab_entries.is_empty() {
-            &self.inittab_entries
-        } else {
-            &self.entries
-        };
-        all_entries
-            .iter()
-            .filter(|e| e.runlevels.contains(&self.current_runlevel) || e.runlevels.is_empty())
-            .collect()
-    }
-
     pub fn spawn_respawn_processes(&mut self) -> Vec<String> {
         let mut spawned = Vec::new();
         for entry in &self.inittab_entries {
-            if entry.action == SysVAction::Respawn && entry.runlevels.contains(&self.current_runlevel) {
+            if entry.action == SysVAction::Respawn
+                && entry.runlevels.contains(&self.current_runlevel)
+            {
                 if !self.active_processes.contains_key(&entry.id) {
                     let mock_pid = 4000 + entry.id.len() as u32;
                     self.active_processes.insert(entry.id.clone(), mock_pid);
@@ -987,7 +991,43 @@ impl SysVinitRunlevelStateMachine {
 // BSD rc.subr & rcorder Subsystem
 // ============================================================================
 
-/// BSD rc script metadata
+/// SysVinit Runlevel State Machine
+pub struct SysVinitRunlevelStateMachine {
+    pub current_runlevel: char, // '0'..'6', 'S'
+    pub entries: Vec<SysVInittabEntry>,
+}
+
+impl SysVinitRunlevelStateMachine {
+    pub fn new(initial_runlevel: char) -> Self {
+        Self {
+            current_runlevel: initial_runlevel,
+            entries: Vec::new(),
+        }
+    }
+
+    pub fn switch_runlevel(&mut self, target_runlevel: char) -> (Vec<String>, Vec<String>) {
+        self.current_runlevel = target_runlevel;
+        let mut stop_scripts = Vec::new();
+        let mut start_scripts = Vec::new();
+
+        for entry in &self.entries {
+            if entry.runlevels.contains(&target_runlevel) {
+                if entry.action == SysVAction::Respawn
+                    || entry.action == SysVAction::Once
+                    || entry.action == SysVAction::Wait
+                {
+                    start_scripts.push(format!("S{:02}{}", start_scripts.len(), entry.id));
+                }
+            } else {
+                stop_scripts.push(format!("K{:02}{}", stop_scripts.len(), entry.id));
+            }
+        }
+
+        (stop_scripts, start_scripts)
+    }
+}
+
+/// BSD `rc.d` / `rc.subr` Directives
 #[derive(Debug, Clone, Default)]
 pub struct BsdRcScript {
     pub name: String,
@@ -1104,6 +1144,85 @@ impl BsdRcSubrEngine {
             true
         }
     }
+}
+
+impl BsdRcScript {
+    pub fn parse(content: &str) -> Self {
+        let mut script = BsdRcScript::default();
+        for line in content.lines() {
+            let line = line.trim();
+            if line.starts_with("# PROVIDE:") {
+                let rest = &line["# PROVIDE:".len()..];
+                let provides: Vec<String> =
+                    rest.split_whitespace().map(|s| s.to_string()).collect();
+                if script.name.is_empty() && !provides.is_empty() {
+                    script.name = provides[0].clone();
+                }
+                script.provides.extend(provides);
+            } else if line.starts_with("# REQUIRE:") {
+                let rest = &line["# REQUIRE:".len()..];
+                script
+                    .requires
+                    .extend(rest.split_whitespace().map(|s| s.to_string()));
+            } else if line.starts_with("# BEFORE:") {
+                let rest = &line["# BEFORE:".len()..];
+                script
+                    .before
+                    .extend(rest.split_whitespace().map(|s| s.to_string()));
+            } else if line.starts_with("# KEYWORD:") {
+                let rest = &line["# KEYWORD:".len()..];
+                script
+                    .keywords
+                    .extend(rest.split_whitespace().map(|s| s.to_string()));
+            } else if line.starts_with("precmd=") {
+                script.precmd = Some(line["precmd=".len()..].trim_matches('"').to_string());
+            } else if line.starts_with("postcmd=") {
+                script.postcmd = Some(line["postcmd=".len()..].trim_matches('"').to_string());
+            } else if line.contains("_enable=") {
+                let parts: Vec<&str> = line.split('=').collect();
+                if !parts.is_empty() {
+                    script.enabled_variable = Some(parts[0].trim().to_string());
+                }
+            }
+        }
+        script
+    }
+}
+
+/// BSD `rc.subr` & `rcorder` Dependency Engine
+pub struct BsdRcSubrEngine {
+    pub rc_conf: BTreeMap<String, String>, // e.g. "sshd_enable" -> "YES"
+    pub scripts: BTreeMap<String, BsdRcScript>,
+}
+
+impl BsdRcSubrEngine {
+    pub fn new() -> Self {
+        Self {
+            rc_conf: BTreeMap::new(),
+            scripts: BTreeMap::new(),
+        }
+    }
+
+    pub fn set_rc_conf(&mut self, key: String, val: String) {
+        self.rc_conf.insert(key, val);
+    }
+
+    pub fn register_script(&mut self, script: BsdRcScript) {
+        self.scripts.insert(script.name.clone(), script);
+    }
+
+    pub fn is_enabled(&self, script_name: &str) -> bool {
+        if let Some(script) = self.scripts.get(script_name) {
+            if let Some(var) = &script.enabled_variable {
+                if let Some(val) = self.rc_conf.get(var) {
+                    return val.eq_ignore_ascii_case("YES")
+                        || val == "1"
+                        || val.eq_ignore_ascii_case("TRUE");
+                }
+            }
+        }
+        false
+    }
 
     pub fn compute_rcorder(&self) -> Vec<String> {
         self.scripts.keys().cloned().collect()
@@ -1142,11 +1261,11 @@ impl LaunchdJobSupervisorEngine {
 
     pub fn register_job(&mut self, job: LaunchdJobSpec) {
         if job.run_at_load {
-            self.job_states.insert(job.label.clone(), ServiceState::Running);
-            let mock_pid = 5000 + job.label.len() as u32;
-            self.running_pids.insert(job.label.clone(), mock_pid);
+            self.job_states
+                .insert(job.label.clone(), ServiceState::Running);
         } else {
-            self.job_states.insert(job.label.clone(), ServiceState::Stopped);
+            self.job_states
+                .insert(job.label.clone(), ServiceState::Stopped);
         }
         self.jobs.insert(job.label.clone(), job);
     }
@@ -1158,9 +1277,8 @@ impl LaunchdJobSupervisorEngine {
     pub fn trigger_mach_service(&mut self, mach_service: &str) -> Option<String> {
         for job in self.jobs.values() {
             if job.mach_services.contains(&mach_service.to_string()) {
-                self.job_states.insert(job.label.clone(), ServiceState::Running);
-                let mock_pid = 5000 + job.label.len() as u32;
-                self.running_pids.insert(job.label.clone(), mock_pid);
+                self.job_states
+                    .insert(job.label.clone(), ServiceState::Running);
                 return Some(job.label.clone());
             }
         }
@@ -1401,18 +1519,25 @@ impl AtSpoolQueueManager {
         }
     }
 
-    pub fn schedule_at_job(&mut self, execute_at: u64, command: String, queue: char, max_load: Option<f32>) -> u64 {
+    pub fn schedule_at_job(
+        &mut self,
+        execute_at: u64,
+        command: String,
+        queue: char,
+        max_load: Option<f32>,
+    ) -> u64 {
         let id = self.next_job_id;
         self.next_job_id += 1;
-        let job = AtJob {
-            job_id: id,
-            execute_at,
-            command,
-            queue,
-            max_load_average: max_load,
-        };
-        self.jobs.insert(id, job.clone());
-        self.queued_jobs.push(job);
+        self.jobs.insert(
+            id,
+            AtJob {
+                job_id: id,
+                execute_at,
+                command,
+                queue,
+                max_load_average: max_load,
+            },
+        );
         id
     }
 
@@ -1465,7 +1590,8 @@ impl SystemdTimerSpec {
     ) -> bool {
         if let Some(boot_sec) = self.on_boot_sec {
             if now_timestamp >= boot_timestamp + boot_sec
-                && (self.last_trigger_timestamp == 0 || self.last_trigger_timestamp < boot_timestamp)
+                && (self.last_trigger_timestamp == 0
+                    || self.last_trigger_timestamp < boot_timestamp)
             {
                 return true;
             }
@@ -1649,34 +1775,13 @@ impl UserlandInitPrGatewayEngine {
         }
     }
 
-    pub fn new_gateway() -> Self {
-        Self {
-            pr_id: 0,
-            title: String::new(),
-            author: String::new(),
-            pqc_signature: String::new(),
-            submissions: BTreeMap::new(),
-            next_pr_id: 5001,
-        }
-    }
-
-    pub fn generate_unified_diff(&self) -> String {
-        format!(
-            "--- a/src/userland/init.rs
-+++ b/src/userland/init.rs
-@@ -1,5 +1,120 @@
-+# PR #{}: {}
-+# Author: {}
-",
-            self.pr_id, self.title, self.author
-        )
-    }
-
-    pub fn run_automated_ci_gate(&self) -> bool {
-        !self.title.is_empty() && self.pqc_signature.starts_with("dilithium5:")
-    }
-
-    pub fn submit_pr(&mut self, title: String, author: String, target_subsystem: String, description: String) -> u64 {
+    pub fn submit_pr(
+        &mut self,
+        title: String,
+        author: String,
+        target_subsystem: String,
+        description: String,
+    ) -> u64 {
         let pr_id = self.next_pr_id;
         self.next_pr_id += 1;
 
@@ -1859,16 +1964,20 @@ mod tests {
 
     #[test]
     fn test_runit_s6_supervision_tree() {
-        let mut tree = RunitS6SupervisionTreeGovernor::new("/var/service");
-        tree.register_service("nginx".to_string(), SupervisedService {
-            service_dir: "/etc/service/nginx".to_string(),
-            run_script: "./run".to_string(),
-            finish_script: None,
-            state: ServiceState::Starting,
-            pid: Some(123),
-            auto_restart: true,
-            notification_fd: Some(3),
-        }, Some("nginx-log".to_string()));
+        let mut tree = RunitS6SupervisionTreeGovernor::new();
+        tree.register_service(
+            "nginx".to_string(),
+            SupervisedService {
+                service_dir: "/etc/service/nginx".to_string(),
+                run_script: "./run".to_string(),
+                finish_script: None,
+                state: ServiceState::Starting,
+                pid: Some(123),
+                auto_restart: true,
+                notification_fd: Some(3),
+            },
+            Some("nginx-log".to_string()),
+        );
 
         tree.enter_stage(SupervisionStage::Stage2SupervisionLoop);
         let ready = tree.parse_s6_readiness("nginx", "READY");
@@ -2070,20 +2179,20 @@ mod tests {
             ServiceState::Running
         );
 
-        assert!(RunitS6SupervisionTreeGovernor::parse_s6_readiness_notification_static("READY=1"));
-        assert!(RunitS6SupervisionTreeGovernor::parse_s6_readiness_notification_static("ready notification"));
+        assert!(RunitS6SupervisionTreeGovernor::parse_s6_readiness_notification("READY=1"));
+        assert!(
+            RunitS6SupervisionTreeGovernor::parse_s6_readiness_notification("ready notification")
+        );
     }
 
     #[test]
     fn test_sysv_and_bsd_rc_subr() {
-        let entries = vec![
-            SysVInittabEntry {
-                id: "1".to_string(),
-                runlevels: vec!['2', '3'],
-                action: SysVAction::Respawn,
-                process: "/sbin/getty tty1".to_string(),
-            }
-        ];
+        let entries = vec![SysVInittabEntry {
+            id: "1".to_string(),
+            runlevels: vec!['2', '3'],
+            action: SysVAction::Respawn,
+            process: "/sbin/getty tty1".to_string(),
+        }];
         let mut sysv = SysVinitRunlevelStateMachine::new('1', entries);
         let matching = sysv.transition_runlevel('2');
         assert_eq!(matching.len(), 1);
@@ -2132,8 +2241,12 @@ mod tests {
     }
 
     #[test]
-    fn test_userland_init_pr_gateway_single() {
-        let gw = UserlandInitPrGatewayEngine::new(4001, "feat(init): Complete Init Parity", "SovereignAgent");
+    fn test_userland_init_pr_gateway() {
+        let gw = UserlandInitPrGatewayEngine::new(
+            4001,
+            "feat(init): Complete Init Parity",
+            "SovereignAgent",
+        );
         assert!(gw.run_automated_ci_gate());
         let diff = gw.generate_unified_diff();
         assert!(diff.contains("PR #4001"));

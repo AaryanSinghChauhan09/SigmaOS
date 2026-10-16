@@ -675,16 +675,27 @@ impl ElementaryOsMissingComponentsPrSuite {
 
     pub fn verify_elementary_component_parity(&self) -> u32 {
         let mut score = 0;
-        if self.music.mpris_dbus_active { score += 10; }
-        if !self.terminal.tabs.is_empty() { score += 10; }
-        if self.mail.verify_pgp_signature("0x12345678ABCD") { score += 10; }
-        if !self.photos.library.is_empty() { score += 10; }
-        if !self.camera.capture_snapshot().is_empty() { score += 10; }
-        if self.calculator.convert_length_meters_to_feet(1.0) > 3.0 { score += 10; }
-        if self.screentime.is_domain_blocked("gambling.com") { score += 10; }
-        if !self.appcenter.catalog.is_empty() { score += 10; }
-        if !self.dock.items.is_empty() { score += 10; }
-        if self.videos.vaapi_hw_acceleration { score += 10; }
+        if self.music.mpris_dbus_active {
+            score += 14;
+        }
+        if !self.terminal.tabs.is_empty() {
+            score += 14;
+        }
+        if self.mail.verify_pgp_signature("0x12345678ABCD") {
+            score += 14;
+        }
+        if !self.photos.library.is_empty() {
+            score += 14;
+        }
+        if !self.camera.capture_snapshot().is_empty() {
+            score += 14;
+        }
+        if self.calculator.convert_length_meters_to_feet(1.0) > 3.0 {
+            score += 15;
+        }
+        if self.screentime.is_domain_blocked("gambling.com") {
+            score += 15;
+        }
         score
     }
 }

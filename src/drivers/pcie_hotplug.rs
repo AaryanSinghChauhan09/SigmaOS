@@ -141,9 +141,9 @@ impl PcieHotplugManager {
         if slot.vendor_id.is_none() || slot.device_id.is_none() {
             return Err("Device not identified");
         }
-        
-        let device_id = (slot.vendor_id.unwrap() as u32) << 16 | (slot.device_id.unwrap() as u32);
-        
+
+        let device_id = (slot.vendor_id.unwrap() as u16) << 16 | (slot.device_id.unwrap() as u16);
+
         // Configure MSI for the device
         let config = MsiConfig {
             enable: true,

@@ -139,7 +139,8 @@ impl GnuCoreutilsBsdUserlandEngine {
             }
 
             if long_format {
-                let perm_str = Self::octal_to_symbolic_mode(entry.permissions, entry.is_dir);
+                let file_type = if entry.is_dir { 'd' } else { '-' };
+                let perm_str = format!("{}{:o}", file_type, entry.permissions & 0o777);
                 result.push(format!(
                     "{} {:>8} {:>8} {:>10} {}",
                     perm_str, entry.owner, entry.group, entry.size, entry.path
@@ -167,20 +168,6 @@ impl GnuCoreutilsBsdUserlandEngine {
                 .skip(skip_count)
                 .map(|s| s.to_string())
                 .collect()
-        }
-    }
-
-    pub fn run_head_tail_bytes(
-        &self,
-        content: &[u8],
-        bytes_count: usize,
-        is_head: bool,
-    ) -> Vec<u8> {
-        if is_head {
-            content.iter().take(bytes_count).copied().collect()
-        } else {
-            let skip = content.len().saturating_sub(bytes_count);
-            content.iter().skip(skip).copied().collect()
         }
     }
 
@@ -325,53 +312,6 @@ impl GnuCoreutilsBsdUserlandEngine {
             results.push(format!("{}\ttotal", total_blocks * 512 / 1024));
         }
         results
-    }
-
-    pub fn run_sort(
-        &self,
-        lines: &[&str],
-        numeric: bool,
-        reverse: bool,
-        unique: bool,
-    ) -> Vec<String> {
-        let mut list: Vec<String> = lines.iter().map(|s| s.to_string()).collect();
-        if numeric {
-            list.sort_by(|a, b| {
-                let na: f64 = a.parse().unwrap_or(0.0);
-                let nb: f64 = b.parse().unwrap_or(0.0);
-                na.partial_cmp(&nb).unwrap_or(core::cmp::Ordering::Equal)
-            });
-        } else {
-            list.sort();
-        }
-        if unique {
-            list.dedup();
-        }
-        if reverse {
-            list.reverse();
-        }
-        list
-    }
-
-    pub fn run_tr(&self, input: &str, set1: &str, set2: &str, delete: bool) -> String {
-        if delete {
-            input.chars().filter(|c| !set1.contains(*c)).collect()
-        } else if !set1.is_empty() && !set2.is_empty() {
-            let s1_chars: Vec<char> = set1.chars().collect();
-            let s2_chars: Vec<char> = set2.chars().collect();
-            input
-                .chars()
-                .map(|c| {
-                    if let Some(pos) = s1_chars.iter().position(|&x| x == c) {
-                        *s2_chars.get(pos).unwrap_or(&c)
-                    } else {
-                        c
-                    }
-                })
-                .collect()
-        } else {
-            input.to_string()
-        }
     }
 
     pub fn run_env(
@@ -901,36 +841,6 @@ impl TextProcessingEngine {
         matches
     }
 
-    pub fn grep_match_extended(
-        &self,
-        content: &str,
-        pattern: &str,
-        invert_match: bool,
-        count_only: bool,
-        line_numbers: bool,
-    ) -> (usize, Vec<String>) {
-        let mut lines_out = Vec::new();
-        let mut count = 0;
-
-        for (idx, line) in content.lines().enumerate() {
-            let matches = line.contains(pattern);
-            let keep = if invert_match { !matches } else { matches };
-
-            if keep {
-                count += 1;
-                if !count_only {
-                    if line_numbers {
-                        lines_out.push(format!("{}:{}", idx + 1, line));
-                    } else {
-                        lines_out.push(line.to_string());
-                    }
-                }
-            }
-        }
-
-        (count, lines_out)
-    }
-
     pub fn grep_match_context(
         &self,
         content: &str,
@@ -1097,37 +1007,6 @@ impl ArchivalCompressionEngine {
         }
     }
 
-    pub fn parse_pax_header(&self, header_bytes: &[u8]) -> BTreeMap<String, String> {
-        let mut map = BTreeMap::new();
-        if let Ok(text) = core::str::from_utf8(header_bytes) {
-            for line in text.lines() {
-                if let Some(space_idx) = line.find(' ') {
-                    let kv = &line[space_idx + 1..];
-                    if let Some(eq_idx) = kv.find('=') {
-                        let key = kv[..eq_idx].trim().to_string();
-                        let val = kv[eq_idx + 1..].trim().to_string();
-                        map.insert(key, val);
-                    }
-                }
-            }
-        }
-        map
-    }
-
-    pub fn configure_compression_level(
-        &self,
-        format: CompressionFormat,
-        level: u32,
-    ) -> Result<String, &'static str> {
-        match format {
-            CompressionFormat::Zstd if level <= 22 => Ok(format!("Zstd level {}", level)),
-            CompressionFormat::Gzip if level <= 9 => Ok(format!("Gzip level {}", level)),
-            CompressionFormat::Xz if level <= 9 => Ok(format!("Xz level {}", level)),
-            CompressionFormat::Bzip2 if level <= 9 => Ok(format!("Bzip2 level {}", level)),
-            _ => Err("Invalid compression level for specified algorithm"),
-        }
-    }
-
     pub fn parallel_zstd_compression_ratio(
         &self,
         original_size: usize,
@@ -1252,42 +1131,6 @@ impl ProcpsPsmiscEngine {
         )
     }
 
-    pub fn killall_signal(&self, exact_name: &str, signal: i32) -> (usize, String) {
-        let pids: Vec<u32> = self
-            .ps_list_processes()
-            .into_iter()
-            .filter(|p| p.name == exact_name)
-            .map(|p| p.pid)
-            .collect();
-        let count = pids.len();
-        (
-            count,
-            format!(
-                "killall: sent signal {} to {} process(es) named '{}'",
-                signal, count, exact_name
-            ),
-        )
-    }
-
-    pub fn fuser_lookup_file(&self, path: &str) -> Vec<u32> {
-        if path.contains("terminal") || path.contains("1024") {
-            vec![1024]
-        } else if path.contains("zenith") {
-            vec![420]
-        } else {
-            vec![]
-        }
-    }
-
-    pub fn proc_statm_summary(&self, pid: u32) -> Option<(u64, u64, u64)> {
-        match pid {
-            1 => Some((16384, 8192, 4096)),
-            420 => Some((65536, 32768, 16384)),
-            1024 => Some((32768, 16384, 8192)),
-            _ => None,
-        }
-    }
-
     pub fn pstree_hierarchy(&self) -> String {
         let mut tree = String::new();
         tree.push_str("systemd(1)---zenith_desktop(420)---terminal(1024)\n");
@@ -1354,16 +1197,6 @@ impl DocumentationPagerEngine {
             "btrfs" => {
                 Some("BTRFS(8) System Administration - Btrfs filesystem utilities".to_string())
             }
-            _ => None,
-        }
-    }
-
-    pub fn man_db_lookup_section(&self, page_name: &str, section: u8) -> Option<String> {
-        match (page_name, section) {
-            ("ls", 1) => Some("LS(1) User Commands".to_string()),
-            ("sudo", 8) => Some("SUDO(8) System Administration".to_string()),
-            ("passwd", 1) => Some("PASSWD(1) User Commands".to_string()),
-            ("passwd", 5) => Some("PASSWD(5) File Formats".to_string()),
             _ => None,
         }
     }
@@ -1507,23 +1340,6 @@ impl AuthPrivilegeSessionEngine {
                 "PAM: Session granted for user '{}' under service '{}'",
                 user, service
             ))
-        }
-    }
-
-    pub fn pam_environment_manage(
-        &self,
-        env_map: &mut BTreeMap<String, String>,
-        action: &str,
-        key: &str,
-        val: &str,
-    ) -> bool {
-        match action {
-            "set" => {
-                env_map.insert(key.to_string(), val.to_string());
-                true
-            }
-            "unset" => env_map.remove(key).is_some(),
-            _ => false,
         }
     }
 
