@@ -193,6 +193,8 @@ pub mod userland;
 
 pub mod audit;
 pub mod backup;
+pub use backup::sovereign_backup_recovery_advancements_v2_pr::*;
+pub use backup::sovereign_backup_recovery_pr_suite::*;
 pub mod bluetooth;
 pub mod boot;
 pub use boot::start_assembly_entry::*;
