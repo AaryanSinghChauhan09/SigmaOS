@@ -5,8 +5,6 @@
 pub mod postgres;
 
 pub use postgres::{
-    Database, Table, Column, ColumnType,
-    Value, Row, Index, IndexType, Constraint, ConstraintType,
-    Transaction, TransactionState, IsolationLevel,
-    init_database, get_database,
+    get_database, init_database, Column, ColumnType, Constraint, ConstraintType, Database, Index,
+    IndexType, IsolationLevel, Row, Table, Transaction, TransactionState, Value,
 };

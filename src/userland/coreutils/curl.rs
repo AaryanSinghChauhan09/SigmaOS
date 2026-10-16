@@ -104,7 +104,10 @@ pub struct Header {
 
 impl Header {
     pub fn new(name: impl Into<String>, value: impl Into<String>) -> Self {
-        Self { name: name.into(), value: value.into() }
+        Self {
+            name: name.into(),
+            value: value.into(),
+        }
     }
 }
 
@@ -257,7 +260,8 @@ impl Response {
     /// Returns the value of the first header with the given name
     /// (case-insensitive).
     pub fn header(&self, name: &str) -> Option<&str> {
-        self.headers.iter()
+        self.headers
+            .iter()
             .find(|h| h.name.eq_ignore_ascii_case(name))
             .map(|h| h.value.as_str())
     }
@@ -384,17 +388,29 @@ pub struct ProgressBar {
 
 impl ProgressBar {
     pub fn new(total: u64, width: usize) -> Self {
-        Self { total, downloaded: 0, width }
+        Self {
+            total,
+            downloaded: 0,
+            width,
+        }
     }
 
     /// Updates progress and writes the bar to the provided output slice.
     pub fn update(&mut self, downloaded: u64, buf: &mut String) {
         self.downloaded = downloaded;
-        let pct = if self.total == 0 { 0.0 } else { self.downloaded as f64 / self.total as f64 };
+        let pct = if self.total == 0 {
+            0.0
+        } else {
+            self.downloaded as f64 / self.total as f64
+        };
         let filled = ((pct * self.width as f64) as usize).min(self.width);
         buf.push('[');
         for i in 0..self.width {
-            if i < filled { buf.push('#'); } else { buf.push(' '); }
+            if i < filled {
+                buf.push('#');
+            } else {
+                buf.push(' ');
+            }
         }
         buf.push_str(&alloc::format!("] {:.1}%", pct * 100.0));
     }
@@ -467,19 +483,21 @@ pub fn run(args: &[&str]) -> Result<Response, CurlError> {
                 i += 1;
                 if let Some(d) = args.get(i) {
                     body = Some(d.as_bytes().to_vec());
-                    if method == HttpMethod::Get { method = HttpMethod::Post; }
+                    if method == HttpMethod::Get {
+                        method = HttpMethod::Post;
+                    }
                 }
             }
             "-o" | "--output" => {
                 i += 1;
                 output = args.get(i).map(|s| String::from(*s));
             }
-            "-k" | "--insecure" => { insecure = true; }
+            "-k" | "--insecure" => {
+                insecure = true;
+            }
             "--max-redirs" => {
                 i += 1;
-                max_redirects = args.get(i)
-                    .and_then(|s| s.parse().ok())
-                    .unwrap_or(30);
+                max_redirects = args.get(i).and_then(|s| s.parse().ok()).unwrap_or(30);
             }
             arg if !arg.starts_with('-') => {
                 url = arg.into();
@@ -488,11 +506,18 @@ pub fn run(args: &[&str]) -> Result<Response, CurlError> {
         }
         i += 1;
     }
-    let mut req = Request::new(method, url)
-        .max_redirects(max_redirects);
-    for h in headers { req.headers.push(h); }
-    if let Some(b) = body { req = req.body(b); }
-    if let Some(o) = output { req = req.output(o); }
-    if insecure { req = req.insecure(); }
+    let mut req = Request::new(method, url).max_redirects(max_redirects);
+    for h in headers {
+        req.headers.push(h);
+    }
+    if let Some(b) = body {
+        req = req.body(b);
+    }
+    if let Some(o) = output {
+        req = req.output(o);
+    }
+    if insecure {
+        req = req.insecure();
+    }
     Client::new().execute(req)
 }

@@ -187,14 +187,15 @@ impl Database {
     pub fn insert_row(&mut self, table_name: &str, row: Row) -> Result<(), &'static str> {
         let table = self.tables.get(table_name).ok_or("Table not found")?;
         let data = self.data.get_mut(table_name).ok_or("Data not found")?;
-        
+
         // Validate columns
         for column in &table.columns {
-            if !row.contains_key(&column.name) && !column.nullable && column.default_value.is_none() {
+            if !row.contains_key(&column.name) && !column.nullable && column.default_value.is_none()
+            {
                 return Err("Missing required column");
             }
         }
-        
+
         data.push(row);
         Ok(())
     }
@@ -206,7 +207,12 @@ impl Database {
     }
 
     /// Update row
-    pub fn update_row(&mut self, table_name: &str, row_index: usize, updates: Row) -> Result<(), &'static str> {
+    pub fn update_row(
+        &mut self,
+        table_name: &str,
+        row_index: usize,
+        updates: Row,
+    ) -> Result<(), &'static str> {
         let data = self.data.get_mut(table_name).ok_or("Table not found")?;
         if row_index >= data.len() {
             return Err("Row index out of bounds");
@@ -229,7 +235,14 @@ impl Database {
     }
 
     /// Create index
-    pub fn create_index(&mut self, name: String, table_name: String, columns: Vec<String>, index_type: IndexType, unique: bool) -> Result<(), &'static str> {
+    pub fn create_index(
+        &mut self,
+        name: String,
+        table_name: String,
+        columns: Vec<String>,
+        index_type: IndexType,
+        unique: bool,
+    ) -> Result<(), &'static str> {
         if !self.tables.contains_key(&table_name) {
             return Err("Table not found");
         }
@@ -277,7 +290,10 @@ impl Database {
 
     /// Commit transaction
     pub fn commit_transaction(&mut self, transaction_id: u32) -> Result<(), &'static str> {
-        let transaction = self.active_transactions.get_mut(&transaction_id).ok_or("Transaction not found")?;
+        let transaction = self
+            .active_transactions
+            .get_mut(&transaction_id)
+            .ok_or("Transaction not found")?;
         transaction.state = TransactionState::InCommit;
         self.active_transactions.remove(&transaction_id);
         Ok(())
@@ -285,7 +301,10 @@ impl Database {
 
     /// Rollback transaction
     pub fn rollback_transaction(&mut self, transaction_id: u32) -> Result<(), &'static str> {
-        let transaction = self.active_transactions.get_mut(&transaction_id).ok_or("Transaction not found")?;
+        let transaction = self
+            .active_transactions
+            .get_mut(&transaction_id)
+            .ok_or("Transaction not found")?;
         transaction.state = TransactionState::InRollback;
         self.active_transactions.remove(&transaction_id);
         Ok(())
@@ -295,14 +314,18 @@ impl Database {
     pub fn execute_query(&mut self, query: &str) -> Result<Vec<Row>, &'static str> {
         // Simplified query parser - in real implementation would use full SQL parser
         let query_lower = query.to_lowercase();
-        
+
         if query_lower.starts_with("select") {
             // Extract table name
             let parts: Vec<&str> = query_lower.split("from").collect();
             if parts.len() < 2 {
                 return Err("Invalid SELECT query");
             }
-            let table_name = parts[1].trim().split_whitespace().next().ok_or("No table name")?;
+            let table_name = parts[1]
+                .trim()
+                .split_whitespace()
+                .next()
+                .ok_or("No table name")?;
             self.select_rows(table_name)
         } else if query_lower.starts_with("insert") {
             Ok(Vec::new())
@@ -343,9 +366,7 @@ pub fn init_database(name: String) {
 
 /// Get database
 pub fn get_database() -> &'static mut Database {
-    unsafe {
-        DATABASE.as_mut().expect("Database not initialized")
-    }
+    unsafe { DATABASE.as_mut().expect("Database not initialized") }
 }
 
 #[cfg(test)]
@@ -405,34 +426,32 @@ mod tests {
             },
         ];
         db.create_table("users".to_string(), columns).unwrap();
-        
+
         let mut row = Row::new();
         row.insert("id".to_string(), Value::Integer(1));
         row.insert("name".to_string(), Value::Text("Alice".to_string()));
         db.insert_row("users", row).unwrap();
-        
+
         assert_eq!(db.get_size(), 1);
     }
 
     #[test]
     fn test_select_rows() {
         let mut db = Database::new("test_db".to_string());
-        let columns = vec![
-            Column {
-                name: "id".to_string(),
-                column_type: ColumnType::Integer,
-                nullable: false,
-                primary_key: true,
-                unique: true,
-                default_value: None,
-            },
-        ];
+        let columns = vec![Column {
+            name: "id".to_string(),
+            column_type: ColumnType::Integer,
+            nullable: false,
+            primary_key: true,
+            unique: true,
+            default_value: None,
+        }];
         db.create_table("users".to_string(), columns).unwrap();
-        
+
         let mut row = Row::new();
         row.insert("id".to_string(), Value::Integer(1));
         db.insert_row("users", row).unwrap();
-        
+
         let rows = db.select_rows("users").unwrap();
         assert_eq!(rows.len(), 1);
     }

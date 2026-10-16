@@ -108,7 +108,11 @@ mod tests {
 
     #[test]
     fn test_case_insensitive_sort() {
-        let mut lines = vec!["banana".to_string(), "Apple".to_string(), "CHERRY".to_string()];
+        let mut lines = vec![
+            "banana".to_string(),
+            "Apple".to_string(),
+            "CHERRY".to_string(),
+        ];
         lines.sort_by(|a, b| cmp_ignore_case(a, b));
         assert_eq!(lines, vec!["Apple", "banana", "CHERRY"]);
     }

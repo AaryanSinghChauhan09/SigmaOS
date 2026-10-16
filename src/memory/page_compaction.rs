@@ -11,9 +11,9 @@
 //!
 //! Formatted in PR Proposal format as `LinuxFreeBsdBuddyPageCompactionPrEngine`.
 
-use std::vec::Vec;
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Page Compaction Status (`COMPACTION_*` Linux / FreeBSD parity)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -104,7 +104,8 @@ impl PageCompactionEngine {
             if self.page_frames[i].is_free {
                 total_free += 1;
                 let mut contiguous = 1;
-                while i + contiguous < self.total_pages && self.page_frames[i + contiguous].is_free {
+                while i + contiguous < self.total_pages && self.page_frames[i + contiguous].is_free
+                {
                     contiguous += 1;
                 }
                 if contiguous >= block_size {
@@ -187,7 +188,10 @@ impl PageCompactionEngine {
     }
 
     /// Try to allocate contiguous block of order N, invoking fallback compaction pass if fragmented
-    pub fn alloc_pages_with_compaction_fallback(&mut self, order: usize) -> Option<(usize, CompactionStatus)> {
+    pub fn alloc_pages_with_compaction_fallback(
+        &mut self,
+        order: usize,
+    ) -> Option<(usize, CompactionStatus)> {
         // Fast path: Try direct buddy allocation without compaction
         if let Some(pfn) = self.find_contiguous_free_block(order) {
             let size = 1 << order;
@@ -274,10 +278,22 @@ impl LinuxFreeBsdBuddyPageCompactionPrEngine {
         let mut summary = BTreeMap::new();
         summary.insert("title".to_string(), self.pr_title.clone());
         summary.insert("subsystem".to_string(), self.kernel_subsystem.clone());
-        summary.insert("total_managed_pages".to_string(), self.compaction_engine.total_pages.to_string());
-        summary.insert("pages_migrated".to_string(), self.compaction_engine.pages_migrated.to_string());
-        summary.insert("compaction_scans".to_string(), self.compaction_engine.migration_scans.to_string());
-        summary.insert("compaction_successes".to_string(), self.compaction_engine.compaction_successes.to_string());
+        summary.insert(
+            "total_managed_pages".to_string(),
+            self.compaction_engine.total_pages.to_string(),
+        );
+        summary.insert(
+            "pages_migrated".to_string(),
+            self.compaction_engine.pages_migrated.to_string(),
+        );
+        summary.insert(
+            "compaction_scans".to_string(),
+            self.compaction_engine.migration_scans.to_string(),
+        );
+        summary.insert(
+            "compaction_successes".to_string(),
+            self.compaction_engine.compaction_successes.to_string(),
+        );
         summary
     }
 }

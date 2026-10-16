@@ -77,7 +77,13 @@ pub struct SystemEvent {
 
 impl SystemEvent {
     /// Create a new system event
-    pub fn new(event_id: String, event_type: EventType, action: EventAction, source: String, data: String) -> Self {
+    pub fn new(
+        event_id: String,
+        event_type: EventType,
+        action: EventAction,
+        source: String,
+        data: String,
+    ) -> Self {
         Self {
             event_id,
             event_type,
@@ -135,11 +141,11 @@ impl SigmaEvent {
         if !self.running {
             return Err("SigmaEvent not running".to_string());
         }
-        
+
         if self.events.contains_key(&event.event_id) {
             return Err(format!("Event '{}' already exists", event.event_id));
         }
-        
+
         self.events.insert(event.event_id.clone(), event);
         self.event_counter += 1;
         Ok(())
@@ -165,14 +171,16 @@ impl SigmaEvent {
 
     /// List events by type
     pub fn list_by_type(&self, event_type: EventType) -> Vec<&SystemEvent> {
-        self.events.values()
+        self.events
+            .values()
             .filter(|e| e.event_type == event_type)
             .collect()
     }
 
     /// List events by action
     pub fn list_by_action(&self, action: EventAction) -> Vec<&SystemEvent> {
-        self.events.values()
+        self.events
+            .values()
             .filter(|e| e.action == action)
             .collect()
     }
@@ -186,8 +194,14 @@ impl SigmaEvent {
     pub fn event_stats(&self) -> BTreeMap<String, String> {
         let mut stats = BTreeMap::new();
         stats.insert("total_events".to_string(), self.event_count().to_string());
-        stats.insert("device_events".to_string(), self.list_by_type(EventType::Device).len().to_string());
-        stats.insert("network_events".to_string(), self.list_by_type(EventType::Network).len().to_string());
+        stats.insert(
+            "device_events".to_string(),
+            self.list_by_type(EventType::Device).len().to_string(),
+        );
+        stats.insert(
+            "network_events".to_string(),
+            self.list_by_type(EventType::Network).len().to_string(),
+        );
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
@@ -246,7 +260,7 @@ mod tests {
             EventType::Device,
             EventAction::Add,
             "udev".to_string(),
-            "Device added".to_string()
+            "Device added".to_string(),
         )
         .with_timestamp(1234567890);
 
@@ -268,15 +282,15 @@ mod tests {
     fn test_sigmaevent_emit_event() {
         let mut event = SigmaEvent::new();
         event.start();
-        
+
         let sys_event = SystemEvent::new(
             "evt1".to_string(),
             EventType::Device,
             EventAction::Add,
             "udev".to_string(),
-            "Device added".to_string()
+            "Device added".to_string(),
         );
-        
+
         assert!(event.emit_event(sys_event).is_ok());
         assert_eq!(event.event_count(), 1);
     }
@@ -285,17 +299,17 @@ mod tests {
     fn test_sigmaevent_list_by_type() {
         let mut event = SigmaEvent::new();
         event.start();
-        
+
         let sys_event = SystemEvent::new(
             "evt1".to_string(),
             EventType::Device,
             EventAction::Add,
             "udev".to_string(),
-            "Device added".to_string()
+            "Device added".to_string(),
         );
-        
+
         event.emit_event(sys_event).unwrap();
-        
+
         let events = event.list_by_type(EventType::Device);
         assert_eq!(events.len(), 1);
     }
@@ -304,17 +318,17 @@ mod tests {
     fn test_sigmaevent_list_by_action() {
         let mut event = SigmaEvent::new();
         event.start();
-        
+
         let sys_event = SystemEvent::new(
             "evt1".to_string(),
             EventType::Device,
             EventAction::Add,
             "udev".to_string(),
-            "Device added".to_string()
+            "Device added".to_string(),
         );
-        
+
         event.emit_event(sys_event).unwrap();
-        
+
         let events = event.list_by_action(EventAction::Add);
         assert_eq!(events.len(), 1);
     }
@@ -323,17 +337,17 @@ mod tests {
     fn test_sigmaevent_stats() {
         let mut event = SigmaEvent::new();
         event.start();
-        
+
         let sys_event = SystemEvent::new(
             "evt1".to_string(),
             EventType::Device,
             EventAction::Add,
             "udev".to_string(),
-            "Device added".to_string()
+            "Device added".to_string(),
         );
-        
+
         event.emit_event(sys_event).unwrap();
-        
+
         let stats = event.event_stats();
         assert_eq!(stats.get("total_events"), Some(&"1".to_string()));
         assert_eq!(stats.get("device_events"), Some(&"1".to_string()));
@@ -342,18 +356,18 @@ mod tests {
     #[test]
     fn test_emit_system_event_convenience() {
         init_sigmaevent();
-        
+
         let mut event = get_sigmaevent().unwrap();
         event.start();
-        
+
         let sys_event = SystemEvent::new(
             "evt1".to_string(),
             EventType::Device,
             EventAction::Add,
             "udev".to_string(),
-            "Device added".to_string()
+            "Device added".to_string(),
         );
-        
+
         let result = emit_system_event(sys_event);
         assert!(result.is_ok());
     }

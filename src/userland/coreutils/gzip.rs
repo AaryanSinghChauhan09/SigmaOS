@@ -70,6 +70,8 @@ impl GzipHeader {
 pub fn inspect_gzip(path: &str) -> Result<GzipHeader, String> {
     let mut file = File::open(Path::new(path)).map_err(|e| format!("gzip: {}: {}", path, e))?;
     let mut buf = [0u8; 512];
-    let n = file.read(&mut buf).map_err(|e| format!("gzip read: {}", e))?;
+    let n = file
+        .read(&mut buf)
+        .map_err(|e| format!("gzip read: {}", e))?;
     GzipHeader::parse(&buf[..n])
 }

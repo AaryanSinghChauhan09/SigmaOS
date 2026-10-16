@@ -125,8 +125,14 @@ impl XWaylandServer {
     }
 
     /// Process X11 `MapWindow` request, creating corresponding Wayland surface.
-    pub fn map_window(&mut self, window_id: X11WindowId) -> Result<WaylandSurfaceId, XWaylandError> {
-        let window = self.windows.get_mut(&window_id).ok_or(XWaylandError::WindowNotFound)?;
+    pub fn map_window(
+        &mut self,
+        window_id: X11WindowId,
+    ) -> Result<WaylandSurfaceId, XWaylandError> {
+        let window = self
+            .windows
+            .get_mut(&window_id)
+            .ok_or(XWaylandError::WindowNotFound)?;
 
         if window.wayland_surface_id.is_none() {
             let surf_id = self.next_surface_id;
@@ -140,7 +146,10 @@ impl XWaylandServer {
 
     /// Process X11 `UnmapWindow` request.
     pub fn unmap_window(&mut self, window_id: X11WindowId) -> Result<(), XWaylandError> {
-        let window = self.windows.get_mut(&window_id).ok_or(XWaylandError::WindowNotFound)?;
+        let window = self
+            .windows
+            .get_mut(&window_id)
+            .ok_or(XWaylandError::WindowNotFound)?;
         window.state = WindowState::Unmapped;
         Ok(())
     }

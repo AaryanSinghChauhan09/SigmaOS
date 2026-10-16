@@ -19,11 +19,11 @@ pub enum OomPolicy {
 /// Memory event types for cgroup notifications
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MemEvent {
-    Low,           // Memory usage approaching limit
-    High,          // Memory usage exceeded limit
-    Oom,           // Out of memory condition
-    OomKill,       // Process killed due to OOM
-    Max,           // Memory usage hit max limit
+    Low,     // Memory usage approaching limit
+    High,    // Memory usage exceeded limit
+    Oom,     // Out of memory condition
+    OomKill, // Process killed due to OOM
+    Max,     // Memory usage hit max limit
 }
 
 /// Memory statistics for a cgroup
@@ -135,7 +135,12 @@ impl MemCgroupManager {
     }
 
     /// Add a process to a cgroup
-    pub fn add_process(&mut self, pid: u32, cgroup_id: usize, oom_score_adj: i32) -> Result<(), String> {
+    pub fn add_process(
+        &mut self,
+        pid: u32,
+        cgroup_id: usize,
+        oom_score_adj: i32,
+    ) -> Result<(), String> {
         if !self.groups.contains_key(&cgroup_id) {
             return Err(format!("Cgroup {} does not exist", cgroup_id));
         }
@@ -210,7 +215,9 @@ impl MemCgroupManager {
 
     /// Charge memory for a specific process
     pub fn charge_process_memory(&mut self, pid: u32, bytes: usize) -> Result<(), String> {
-        let cgroup_id = *self.pid_to_cgroup.get(&pid)
+        let cgroup_id = *self
+            .pid_to_cgroup
+            .get(&pid)
             .ok_or_else(|| format!("Process {} not in any cgroup", pid))?;
 
         // Charge to cgroup
@@ -312,11 +319,10 @@ impl MemCgroupManager {
         }
 
         // Collect alive processes in this cgroup
-        let mut candidates: Vec<&CgroupProcess> = self.processes
+        let mut candidates: Vec<&CgroupProcess> = self
+            .processes
             .values()
-            .filter(|p| {
-                p.alive && self.pid_to_cgroup.get(&p.pid) == Some(&cgroup_id)
-            })
+            .filter(|p| p.alive && self.pid_to_cgroup.get(&p.pid) == Some(&cgroup_id))
             .collect();
 
         if candidates.is_empty() {
@@ -455,11 +461,17 @@ mod tests {
 
         // Charge swap
         assert!(manager.charge_swap(container_cg, 512 * 1024).is_ok());
-        assert_eq!(manager.groups.get(&container_cg).unwrap().swap_usage, 512 * 1024);
+        assert_eq!(
+            manager.groups.get(&container_cg).unwrap().swap_usage,
+            512 * 1024
+        );
 
         // Uncharge swap
         manager.uncharge_swap(container_cg, 256 * 1024);
-        assert_eq!(manager.groups.get(&container_cg).unwrap().swap_usage, 256 * 1024);
+        assert_eq!(
+            manager.groups.get(&container_cg).unwrap().swap_usage,
+            256 * 1024
+        );
     }
 
     #[test]
@@ -539,12 +551,21 @@ mod tests {
         let container_cg = manager.create_cgroup("/docker/container-7", Some(0), 1024 * 1024);
 
         manager.charge_memory(container_cg, 400 * 1024).unwrap();
-        assert_eq!(manager.groups.get(&container_cg).unwrap().max_usage, 400 * 1024);
+        assert_eq!(
+            manager.groups.get(&container_cg).unwrap().max_usage,
+            400 * 1024
+        );
 
         manager.charge_memory(container_cg, 200 * 1024).unwrap();
-        assert_eq!(manager.groups.get(&container_cg).unwrap().max_usage, 600 * 1024);
+        assert_eq!(
+            manager.groups.get(&container_cg).unwrap().max_usage,
+            600 * 1024
+        );
 
         manager.uncharge_memory(container_cg, 300 * 1024);
-        assert_eq!(manager.groups.get(&container_cg).unwrap().max_usage, 600 * 1024); // Max unchanged
+        assert_eq!(
+            manager.groups.get(&container_cg).unwrap().max_usage,
+            600 * 1024
+        ); // Max unchanged
     }
 }

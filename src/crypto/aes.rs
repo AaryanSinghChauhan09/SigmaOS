@@ -270,7 +270,9 @@ mod tests {
     use super::*;
 
     fn generate_test_entropy(len: usize) -> Vec<u8> {
-        (0..len).map(|i| ((i.wrapping_mul(31).wrapping_add(17)) & 0xFF) as u8).collect()
+        (0..len)
+            .map(|i| ((i.wrapping_mul(31).wrapping_add(17)) & 0xFF) as u8)
+            .collect()
     }
 
     #[test]

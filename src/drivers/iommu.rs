@@ -104,7 +104,9 @@ impl IommuController {
         perms: IommuPermissions,
     ) -> Result<(), &'static str> {
         let domain = self.domains.get_mut(&domain_id).ok_or("Domain not found")?;
-        domain.iova_page_table.insert(iova & !4095, (phys_addr & !4095, perms));
+        domain
+            .iova_page_table
+            .insert(iova & !4095, (phys_addr & !4095, perms));
         Ok(())
     }
 
@@ -149,19 +151,31 @@ mod tests {
         iommu.is_enabled = true;
 
         let domain_id = iommu.create_domain();
-        let nic_bdf = PciBdf { bus: 0, device: 3, function: 0 };
+        let nic_bdf = PciBdf {
+            bus: 0,
+            device: 3,
+            function: 0,
+        };
         assert!(iommu.attach_device(domain_id, nic_bdf).is_ok());
 
         let iova = 0x1000_2000u64;
         let phys = 0x8000_2000u64;
-        assert!(iommu.map_iova(domain_id, iova, phys, IommuPermissions::ReadWrite).is_ok());
+        assert!(iommu
+            .map_iova(domain_id, iova, phys, IommuPermissions::ReadWrite)
+            .is_ok());
 
         // Valid DMA read
-        let translated = iommu.translate_dma(nic_bdf, iova, false).expect("DMA translated");
+        let translated = iommu
+            .translate_dma(nic_bdf, iova, false)
+            .expect("DMA translated");
         assert_eq!(translated, phys);
 
         // Rogue device attempting access to same IOVA -> rejected!
-        let rogue_bdf = PciBdf { bus: 1, device: 0, function: 0 };
+        let rogue_bdf = PciBdf {
+            bus: 1,
+            device: 0,
+            function: 0,
+        };
         assert!(iommu.translate_dma(rogue_bdf, iova, false).is_err());
         assert_eq!(iommu.translation_faults_count, 1);
     }

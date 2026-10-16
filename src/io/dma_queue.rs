@@ -27,7 +27,12 @@ pub struct DmaDescriptor {
 }
 
 impl DmaDescriptor {
-    pub fn new(id: u64, buffer_id: u64, sg_list: Vec<ScatterGatherElement>, direction: DmaDirection) -> Self {
+    pub fn new(
+        id: u64,
+        buffer_id: u64,
+        sg_list: Vec<ScatterGatherElement>,
+        direction: DmaDirection,
+    ) -> Self {
         let total_bytes = sg_list.iter().map(|e| e.length as usize).sum();
         Self {
             id,

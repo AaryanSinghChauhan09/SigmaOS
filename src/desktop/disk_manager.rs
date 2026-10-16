@@ -111,7 +111,11 @@ impl DiskManager {
 
     /// Remove disk
     pub fn remove_disk(&mut self, name: String) -> Result<(), &'static str> {
-        let index = self.disks.iter().position(|d| d.name == name).ok_or("Disk not found")?;
+        let index = self
+            .disks
+            .iter()
+            .position(|d| d.name == name)
+            .ok_or("Disk not found")?;
         self.disks.remove(index);
         Ok(())
     }
@@ -134,7 +138,11 @@ impl DiskManager {
         file_system: FileSystemType,
         size: u64,
     ) -> Result<(), &'static str> {
-        let disk = self.disks.iter_mut().find(|d| d.name == disk_name).ok_or("Disk not found")?;
+        let disk = self
+            .disks
+            .iter_mut()
+            .find(|d| d.name == disk_name)
+            .ok_or("Disk not found")?;
         let partition_number = disk.partitions.len() as u32 + 1;
         let partition = Partition {
             number: partition_number,
@@ -158,7 +166,11 @@ impl DiskManager {
         disk_name: String,
         partition_number: u32,
     ) -> Result<(), &'static str> {
-        let disk = self.disks.iter_mut().find(|d| d.name == disk_name).ok_or("Disk not found")?;
+        let disk = self
+            .disks
+            .iter_mut()
+            .find(|d| d.name == disk_name)
+            .ok_or("Disk not found")?;
         let index = disk
             .partitions
             .iter()
@@ -175,7 +187,11 @@ impl DiskManager {
         partition_number: u32,
         file_system: FileSystemType,
     ) -> Result<(), &'static str> {
-        let disk = self.disks.iter_mut().find(|d| d.name == disk_name).ok_or("Disk not found")?;
+        let disk = self
+            .disks
+            .iter_mut()
+            .find(|d| d.name == disk_name)
+            .ok_or("Disk not found")?;
         let partition = disk
             .partitions
             .iter_mut()
@@ -193,7 +209,11 @@ impl DiskManager {
         partition_number: u32,
         mount_point: String,
     ) -> Result<(), &'static str> {
-        let disk = self.disks.iter_mut().find(|d| d.name == disk_name).ok_or("Disk not found")?;
+        let disk = self
+            .disks
+            .iter_mut()
+            .find(|d| d.name == disk_name)
+            .ok_or("Disk not found")?;
         let partition = disk
             .partitions
             .iter_mut()
@@ -210,7 +230,11 @@ impl DiskManager {
         disk_name: String,
         partition_number: u32,
     ) -> Result<(), &'static str> {
-        let disk = self.disks.iter_mut().find(|d| d.name == disk_name).ok_or("Disk not found")?;
+        let disk = self
+            .disks
+            .iter_mut()
+            .find(|d| d.name == disk_name)
+            .ok_or("Disk not found")?;
         let partition = disk
             .partitions
             .iter_mut()
@@ -271,9 +295,7 @@ pub fn init_disk_manager() {
 
 /// Get disk manager
 pub fn get_disk_manager() -> &'static mut DiskManager {
-    unsafe {
-        DISK_MANAGER.as_mut().expect("Disk manager not initialized")
-    }
+    unsafe { DISK_MANAGER.as_mut().expect("Disk manager not initialized") }
 }
 
 #[cfg(test)]
@@ -317,8 +339,13 @@ mod tests {
             partitions: Vec::new(),
         };
         dm.add_disk(disk);
-        dm.create_partition("sda".to_string(), PartitionType::Primary, FileSystemType::Ext4, 100 * 1024 * 1024 * 1024)
-            .unwrap();
+        dm.create_partition(
+            "sda".to_string(),
+            PartitionType::Primary,
+            FileSystemType::Ext4,
+            100 * 1024 * 1024 * 1024,
+        )
+        .unwrap();
         let disk = dm.get_disk("sda").unwrap();
         assert_eq!(disk.partitions.len(), 1);
     }

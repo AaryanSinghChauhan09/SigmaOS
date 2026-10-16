@@ -79,8 +79,15 @@ impl DeviceMapperController {
     }
 
     /// Load mapping table entries for a device
-    pub fn load_table(&mut self, dev_idx: usize, table: &[DmTableEntry]) -> Result<(), &'static str> {
-        let dev = self.devices.get_mut(dev_idx).ok_or("Device index invalid")?;
+    pub fn load_table(
+        &mut self,
+        dev_idx: usize,
+        table: &[DmTableEntry],
+    ) -> Result<(), &'static str> {
+        let dev = self
+            .devices
+            .get_mut(dev_idx)
+            .ok_or("Device index invalid")?;
         let mut total = 0u64;
         for entry in table {
             total += entry.length_sectors;
@@ -92,7 +99,10 @@ impl DeviceMapperController {
 
     /// Resume / activate the mapped device
     pub fn resume(&mut self, dev_idx: usize) -> Result<(), &'static str> {
-        let dev = self.devices.get_mut(dev_idx).ok_or("Device index invalid")?;
+        let dev = self
+            .devices
+            .get_mut(dev_idx)
+            .ok_or("Device index invalid")?;
         dev.is_active = true;
         Ok(())
     }
@@ -109,7 +119,10 @@ impl DeviceMapperController {
             if sector >= entry.start_sector && sector < entry.start_sector + entry.length_sectors {
                 let offset_in_range = sector - entry.start_sector;
                 match &entry.target {
-                    DmTargetType::Linear { target_dev, offset_sectors } => {
+                    DmTargetType::Linear {
+                        target_dev,
+                        offset_sectors,
+                    } => {
                         return Ok((target_dev.clone(), offset_sectors + offset_in_range));
                     }
                     DmTargetType::Crypt { target_dev, .. } => {
@@ -118,7 +131,10 @@ impl DeviceMapperController {
                     DmTargetType::Verity { data_dev, .. } => {
                         return Ok((data_dev.clone(), offset_in_range));
                     }
-                    DmTargetType::Striped { target_devs, chunk_size_sectors } => {
+                    DmTargetType::Striped {
+                        target_devs,
+                        chunk_size_sectors,
+                    } => {
                         let chunk = (offset_in_range / (*chunk_size_sectors as u64)) as usize;
                         let target_idx = chunk % target_devs.len();
                         return Ok((target_devs[target_idx].clone(), offset_in_range));
@@ -140,16 +156,14 @@ mod tests {
         let mut dm = DeviceMapperController::new();
         let idx = dm.create_device("root-luks", "uuid-1234").expect("Created");
 
-        let table = [
-            DmTableEntry {
-                start_sector: 0,
-                length_sectors: 2048,
-                target: DmTargetType::Linear {
-                    target_dev: String::from("/dev/nvme0n1p2"),
-                    offset_sectors: 4096,
-                },
+        let table = [DmTableEntry {
+            start_sector: 0,
+            length_sectors: 2048,
+            target: DmTargetType::Linear {
+                target_dev: String::from("/dev/nvme0n1p2"),
+                offset_sectors: 4096,
             },
-        ];
+        }];
 
         assert!(dm.load_table(idx, &table).is_ok());
         assert!(dm.resume(idx).is_ok());

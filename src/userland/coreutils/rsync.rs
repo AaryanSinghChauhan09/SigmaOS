@@ -132,7 +132,11 @@ impl RsyncEngine {
     }
 
     /// Sender step: compare source data against receiver signatures and produce delta stream.
-    pub fn compute_delta(&mut self, source_data: &[u8], signatures: &[BlockSignature]) -> Vec<DeltaToken> {
+    pub fn compute_delta(
+        &mut self,
+        source_data: &[u8],
+        signatures: &[BlockSignature],
+    ) -> Vec<DeltaToken> {
         self.stats.total_bytes += source_data.len() as u64;
 
         // Build weak checksum lookup table: weak_checksum -> list of BlockSignatures

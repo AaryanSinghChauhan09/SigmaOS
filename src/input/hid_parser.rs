@@ -174,7 +174,13 @@ impl HidParser {
     }
 
     /// Parse report descriptor into input, output, and feature fields
-    pub fn parse(&self) -> (Vec<HidReportField>, Vec<HidReportField>, Vec<HidReportField>) {
+    pub fn parse(
+        &self,
+    ) -> (
+        Vec<HidReportField>,
+        Vec<HidReportField>,
+        Vec<HidReportField>,
+    ) {
         let mut input_fields = Vec::new();
         let mut output_fields = Vec::new();
         let mut feature_fields = Vec::new();
@@ -360,7 +366,7 @@ mod tests {
             0x95, 0x03, //   Report Count (3)
             0x75, 0x01, //   Report Size (1)
             0x81, 0x02, //   Input (Data, Var, Abs)
-            0xC0,       // End Collection
+            0xC0, // End Collection
         ];
 
         let parser = HidParser::new(&mouse_desc);

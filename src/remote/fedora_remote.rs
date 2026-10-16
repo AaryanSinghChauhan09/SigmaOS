@@ -237,10 +237,9 @@ mod tests {
         assert!(ipa.active_ticket.is_none());
         assert!(!ipa.verify_gssapi_token(b"GSSAPI_TICKET_BLOB"));
 
-        let test_pass = std::env::var("SIGMA_TEST_IPA_PASS").unwrap_or_else(|_| "auth_token_ipa_session".to_string());
-        let ticket = ipa
-            .kinit("admin@FEDORA.LOCAL", &test_pass)
-            .unwrap();
+        let test_pass = std::env::var("SIGMA_TEST_IPA_PASS")
+            .unwrap_or_else(|_| "auth_token_ipa_session".to_string());
+        let ticket = ipa.kinit("admin@FEDORA.LOCAL", &test_pass).unwrap();
         assert_eq!(ticket.realm, "FEDORA.LOCAL");
         assert!(ipa.verify_gssapi_token(b"GSSAPI_TICKET_BLOB"));
     }

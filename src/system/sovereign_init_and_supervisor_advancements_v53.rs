@@ -56,13 +56,32 @@ impl SystemdAdvancementsV53Engine {
     }
 
     /// Parse systemd D-Bus wire protocol method call payload for PID 1 (`org.freedesktop.systemd1.Manager`).
-    pub fn parse_dbus_method_call(&self, member: &str, unit_name: &str, mode: &str) -> Option<SystemdDBusMethodV53> {
+    pub fn parse_dbus_method_call(
+        &self,
+        member: &str,
+        unit_name: &str,
+        mode: &str,
+    ) -> Option<SystemdDBusMethodV53> {
         match member {
-            "StartUnit" => Some(SystemdDBusMethodV53::StartUnit(unit_name.to_string(), mode.to_string())),
-            "StopUnit" => Some(SystemdDBusMethodV53::StopUnit(unit_name.to_string(), mode.to_string())),
-            "RestartUnit" => Some(SystemdDBusMethodV53::RestartUnit(unit_name.to_string(), mode.to_string())),
-            "ReloadUnit" => Some(SystemdDBusMethodV53::ReloadUnit(unit_name.to_string(), mode.to_string())),
-            "GetUnit" | "GetUnitState" => Some(SystemdDBusMethodV53::GetUnitState(unit_name.to_string())),
+            "StartUnit" => Some(SystemdDBusMethodV53::StartUnit(
+                unit_name.to_string(),
+                mode.to_string(),
+            )),
+            "StopUnit" => Some(SystemdDBusMethodV53::StopUnit(
+                unit_name.to_string(),
+                mode.to_string(),
+            )),
+            "RestartUnit" => Some(SystemdDBusMethodV53::RestartUnit(
+                unit_name.to_string(),
+                mode.to_string(),
+            )),
+            "ReloadUnit" => Some(SystemdDBusMethodV53::ReloadUnit(
+                unit_name.to_string(),
+                mode.to_string(),
+            )),
+            "GetUnit" | "GetUnitState" => {
+                Some(SystemdDBusMethodV53::GetUnitState(unit_name.to_string()))
+            }
             _ => None,
         }
     }
@@ -83,19 +102,17 @@ impl SystemdAdvancementsV53Engine {
             } else {
                 format!("{}.mount", unit_name)
             };
-            generated_units.push(format!("[Mount]\nWhat={}\nWhere={}\nType={}", spec, mountpoint, fstype));
+            generated_units.push(format!(
+                "[Mount]\nWhat={}\nWhere={}\nType={}",
+                spec, mountpoint, fstype
+            ));
             let _ = name;
         }
         generated_units
     }
 
     /// Simulate `systemd-run` transient unit creation.
-    pub fn create_transient_unit(
-        &self,
-        unit_name: &str,
-        command: &str,
-        is_scope: bool,
-    ) -> String {
+    pub fn create_transient_unit(&self, unit_name: &str, command: &str, is_scope: bool) -> String {
         let kind = if is_scope { "Scope" } else { "Service" };
         format!(
             "[Unit]\nDescription=Transient {}\n[{}]\nExecStart={}\n",
@@ -313,14 +330,16 @@ impl SysVinitAdvancementsV53Engine {
     /// Generate SysVinit V53 proposal manifest.
     pub fn generate_proposal(&self) -> CoreUserlandV53Manifest {
         CoreUserlandV53Manifest {
-            pr_title: "feat(sysvinit_v53): Clean System Shutdown Sequence & rc.d Script Locking".to_string(),
+            pr_title: "feat(sysvinit_v53): Clean System Shutdown Sequence & rc.d Script Locking"
+                .to_string(),
             target_subsystem: "Legacy Unix Init Compatibility".to_string(),
             original_system: "System V Init (SysVinit)".to_string(),
             components_added: vec![
                 "Deterministic 6-stage shutdown / poweroff / reboot sequence builder".to_string(),
                 "flock file locking for rc.d parallel script execution".to_string(),
             ],
-            performance_multiplier: "Clean Unmount & Zero Filesystem Corruption on Reboot".to_string(),
+            performance_multiplier: "Clean Unmount & Zero Filesystem Corruption on Reboot"
+                .to_string(),
             status: "Ready for Integration".to_string(),
         }
     }
@@ -363,7 +382,8 @@ impl BsdRcAdvancementsV53Engine {
     /// Generate BSD rc V53 proposal manifest.
     pub fn generate_proposal(&self) -> CoreUserlandV53Manifest {
         CoreUserlandV53Manifest {
-            pr_title: "feat(bsd_rc_v53): FreeBSD service(8) & OpenBSD rcctl(8) Interface".to_string(),
+            pr_title: "feat(bsd_rc_v53): FreeBSD service(8) & OpenBSD rcctl(8) Interface"
+                .to_string(),
             target_subsystem: "BSD Core Init & Service Framework".to_string(),
             original_system: "BSD rc (FreeBSD / OpenBSD / NetBSD)".to_string(),
             components_added: vec![
@@ -441,14 +461,21 @@ impl LaunchdAndroidInitAdvancementsV53Engine {
     }
 
     /// Evaluate macOS `launchd` `OnDemand` KeepAlive matrix with complex path state triggers.
-    pub fn evaluate_launchd_ondemand(&self, path_exists: bool, network_up: bool, job_requested: bool) -> bool {
+    pub fn evaluate_launchd_ondemand(
+        &self,
+        path_exists: bool,
+        network_up: bool,
+        job_requested: bool,
+    ) -> bool {
         job_requested || (path_exists && network_up)
     }
 
     /// Generate launchd & Android init V53 proposal manifest.
     pub fn generate_proposal(&self) -> CoreUserlandV53Manifest {
         CoreUserlandV53Manifest {
-            pr_title: "feat(launchd_android_v53): Android init.rc Parser & macOS launchd OnDemand Engine".to_string(),
+            pr_title:
+                "feat(launchd_android_v53): Android init.rc Parser & macOS launchd OnDemand Engine"
+                    .to_string(),
             target_subsystem: "Apple launchd & Android Init Supervisor".to_system(),
             original_system: "launchd & Android init".to_string(),
             components_added: vec![
@@ -493,7 +520,10 @@ impl CronAnacronTimersAtV53Engine {
     }
 
     /// Parse `/etc/crontab` or `/etc/cron.d/*` system crontab file with user field and environment assignments.
-    pub fn parse_system_crontab(&self, content: &str) -> (BTreeMap<String, String>, Vec<CrontabRecordV53>) {
+    pub fn parse_system_crontab(
+        &self,
+        content: &str,
+    ) -> (BTreeMap<String, String>, Vec<CrontabRecordV53>) {
         let mut env = BTreeMap::new();
         let mut records = Vec::new();
 
@@ -513,7 +543,11 @@ impl CronAnacronTimersAtV53Engine {
                     let schedule = parts[0..5].join(" ");
                     let user = parts[5].to_string();
                     let command = parts[6..].join(" ");
-                    records.push(CrontabRecordV53 { schedule, user, command });
+                    records.push(CrontabRecordV53 {
+                        schedule,
+                        user,
+                        command,
+                    });
                 }
             }
         }
@@ -523,18 +557,25 @@ impl CronAnacronTimersAtV53Engine {
 
     /// Format timer stamp state file content (`/var/lib/systemd/timers/stamp-*.timer`).
     pub fn format_timer_stamp(&self, timer_name: &str, last_trigger_usec: u64) -> String {
-        format!("LAST_TRIGGER_USEC={}\nTIMER_NAME={}\n", last_trigger_usec, timer_name)
+        format!(
+            "LAST_TRIGGER_USEC={}\nTIMER_NAME={}\n",
+            last_trigger_usec, timer_name
+        )
     }
 
     /// Generate Cron, Anacron, Timers & At V53 proposal manifest.
     pub fn generate_proposal(&self) -> CoreUserlandV53Manifest {
         CoreUserlandV53Manifest {
-            pr_title: "feat(cron_timers_at_v53): System Crontab Parser, Persistent Stamp Files & At Spool".to_string(),
+            pr_title:
+                "feat(cron_timers_at_v53): System Crontab Parser, Persistent Stamp Files & At Spool"
+                    .to_string(),
             target_subsystem: "Job Scheduling & Timers Subsystem".to_string(),
             original_system: "Cron / systemd.timer / at".to_string(),
             components_added: vec![
-                "/etc/crontab and /etc/cron.d/ file parser with environment variable bindings".to_string(),
-                "Persistent timer stamp file store (/var/lib/systemd/timers/stamp-*.timer)".to_string(),
+                "/etc/crontab and /etc/cron.d/ file parser with environment variable bindings"
+                    .to_string(),
+                "Persistent timer stamp file store (/var/lib/systemd/timers/stamp-*.timer)"
+                    .to_string(),
                 "/var/spool/at/ spool queue manager with file lock protection".to_string(),
             ],
             performance_multiplier: "Persistent Power-Loss Recovery for Timers & Crons".to_string(),
@@ -580,7 +621,10 @@ impl SovereignInitAndSupervisorAdvancementsV53Suite {
     /// Execute end-to-end verification across all supervisor V53 engines.
     pub fn run_master_verification(&self) -> bool {
         // 1. systemd D-Bus method parse
-        let dbus_ok = self.systemd.parse_dbus_method_call("StartUnit", "nginx.service", "replace").is_some();
+        let dbus_ok = self
+            .systemd
+            .parse_dbus_method_call("StartUnit", "nginx.service", "replace")
+            .is_some();
 
         // 2. OpenRC env default parse
         let openrc_env = self.openrc.parse_environment_defaults("PORT=8080\n");
@@ -596,10 +640,14 @@ impl SovereignInitAndSupervisorAdvancementsV53Suite {
         let bsd_cmd = self.bsd_rc.parse_service_command(&["sshd", "status"]);
 
         // 6. Android init parser
-        let android_blocks = self.launchd_android.parse_android_init_rc("on boot\n    setprop ro.debuggable 1\n");
+        let android_blocks = self
+            .launchd_android
+            .parse_android_init_rc("on boot\n    setprop ro.debuggable 1\n");
 
         // 7. System crontab parser
-        let (cron_env, cron_recs) = self.cron_timers_at.parse_system_crontab("SHELL=/bin/bash\n0 * * * * root /bin/backup\n");
+        let (cron_env, cron_recs) = self
+            .cron_timers_at
+            .parse_system_crontab("SHELL=/bin/bash\n0 * * * * root /bin/backup\n");
 
         dbus_ok
             && openrc_env.get("PORT").map_or(false, |v| v == "8080")
@@ -623,8 +671,13 @@ mod tests {
     #[test]
     fn test_systemd_v53_engine() {
         let engine = SystemdAdvancementsV53Engine::new();
-        let method = engine.parse_dbus_method_call("StartUnit", "sshd.service", "replace").unwrap();
-        assert_eq!(method, SystemdDBusMethodV53::StartUnit("sshd.service".to_string(), "replace".to_string()));
+        let method = engine
+            .parse_dbus_method_call("StartUnit", "sshd.service", "replace")
+            .unwrap();
+        assert_eq!(
+            method,
+            SystemdDBusMethodV53::StartUnit("sshd.service".to_string(), "replace".to_string())
+        );
 
         let units = engine.execute_system_generators(&[("/dev/sda1", "/mnt/data", "ext4")]);
         assert_eq!(units.len(), 1);
@@ -678,7 +731,9 @@ mod tests {
         let cmd = engine.parse_service_command(&["nginx", "restart"]).unwrap();
         assert_eq!(cmd, ("nginx".to_string(), "restart".to_string()));
 
-        let rcctl = engine.parse_rcctl_command(&["set", "sshd", "status", "on"]).unwrap();
+        let rcctl = engine
+            .parse_rcctl_command(&["set", "sshd", "status", "on"])
+            .unwrap();
         assert_eq!(rcctl.0, "sshd");
         assert_eq!(rcctl.2, "on");
     }

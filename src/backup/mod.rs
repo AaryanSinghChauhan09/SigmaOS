@@ -18,7 +18,8 @@ pub use sovereign_backup_and_recovery_advancements::{
 pub use sovereign_backup_recovery_pinnacle::{
     SovereignBackupRecoveryDistroPinnacleSuite, SovereignBsdAndExt4DumpRestoreEngine,
     SovereignDdrescueTestdiskPhotorecEngine, SovereignRescueLiveIsoAndInstallerSuite,
-    SovereignRsyncResticBorgAdvancedEngine, SovereignTimeshiftSnapperSnapshotGovernor as SovereignTimeshiftSnapperSnapshotGovernorPinnacle,
+    SovereignRsyncResticBorgAdvancedEngine,
+    SovereignTimeshiftSnapperSnapshotGovernor as SovereignTimeshiftSnapperSnapshotGovernorPinnacle,
 };
 pub use sovereign_backup_recovery_pr_suite::{
     SovereignBackupRecoveryPrGateway, SovereignBackupRecoveryPrProposalManifest,

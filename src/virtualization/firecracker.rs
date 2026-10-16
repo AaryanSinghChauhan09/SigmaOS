@@ -214,7 +214,7 @@ impl FirecrackerClient {
     /// GET /vm — get current VM state
     pub fn get_vm_state(&self) -> Result<MicroVmState, FirecrackerError> {
         let _response = self.api_get("/vm")?;
-        // Parse JSON {"state": "Running"} 
+        // Parse JSON {"state": "Running"}
         Ok(self.vm_state)
     }
 

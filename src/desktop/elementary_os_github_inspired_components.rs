@@ -281,19 +281,14 @@ impl ElementaryTasksEngine {
     }
 
     pub fn create_list(&mut self, list_name: &str) {
-        self.task_lists
-            .entry(list_name.to_string())
-            .or_default();
+        self.task_lists.entry(list_name.to_string()).or_default();
     }
 
     pub fn add_task(&mut self, list_name: &str, title: &str, due_ts: u64) -> u32 {
         let id = self.next_task_id;
         self.next_task_id += 1;
 
-        let entry = self
-            .task_lists
-            .entry(list_name.to_string())
-            .or_default();
+        let entry = self.task_lists.entry(list_name.to_string()).or_default();
         entry.push(ElementaryTaskItem {
             id,
             title: title.to_string(),

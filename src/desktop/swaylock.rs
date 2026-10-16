@@ -37,22 +37,22 @@ impl SwaylockInstance {
             max_attempts: 3,
         }
     }
-    
+
     /// Lock screen
     pub fn lock(&mut self) {
         self.state = LockState::Locking;
         self.locked.store(true, Ordering::Relaxed);
         self.state = LockState::Locked;
     }
-    
+
     /// Unlock screen
     pub fn unlock(&mut self, password: &str) -> Result<(), &'static str> {
         if !self.locked.load(Ordering::Relaxed) {
             return Err("Screen not locked");
         }
-        
+
         self.state = LockState::Unlocking;
-        
+
         if password == self.password {
             self.locked.store(false, Ordering::Relaxed);
             self.state = LockState::Unlocked;
@@ -61,31 +61,31 @@ impl SwaylockInstance {
         } else {
             self.attempts += 1;
             self.state = LockState::Locked;
-            
+
             if self.attempts >= self.max_attempts {
                 // In real implementation, would trigger security measures
                 return Err("Too many failed attempts");
             }
-            
+
             Err("Incorrect password")
         }
     }
-    
+
     /// Set password
     pub fn set_password(&mut self, password: String) {
         self.password = password;
     }
-    
+
     /// Is locked
     pub fn is_locked(&self) -> bool {
         self.locked.load(Ordering::Relaxed)
     }
-    
+
     /// Get state
     pub fn get_state(&self) -> LockState {
         self.state
     }
-    
+
     /// Get remaining attempts
     pub fn get_remaining_attempts(&self) -> u32 {
         self.max_attempts - self.attempts
@@ -110,9 +110,7 @@ pub fn init_swaylock() {
 
 /// Get global swaylock instance
 pub fn get_swaylock() -> Option<&'static mut SwaylockInstance> {
-    unsafe {
-        SWAYLOCK_INSTANCE.as_mut()
-    }
+    unsafe { SWAYLOCK_INSTANCE.as_mut() }
 }
 
 /// Lock screen
@@ -134,13 +132,13 @@ pub fn unlock_screen(password: &str) -> Result<(), &'static str> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_swaylock_init() {
         let swaylock = SwaylockInstance::new();
         assert!(!swaylock.is_locked());
     }
-    
+
     #[test]
     fn test_lock() {
         let mut swaylock = SwaylockInstance::new();
@@ -148,7 +146,7 @@ mod tests {
         assert!(swaylock.is_locked());
         assert_eq!(swaylock.get_state(), LockState::Locked);
     }
-    
+
     #[test]
     fn test_unlock() {
         let mut swaylock = SwaylockInstance::new();
@@ -157,7 +155,7 @@ mod tests {
         swaylock.unlock("password").unwrap();
         assert!(!swaylock.is_locked());
     }
-    
+
     #[test]
     fn test_unlock_wrong_password() {
         let mut swaylock = SwaylockInstance::new();
@@ -166,7 +164,7 @@ mod tests {
         assert!(swaylock.unlock("wrong").is_err());
         assert!(swaylock.is_locked());
     }
-    
+
     #[test]
     fn test_max_attempts() {
         let mut swaylock = SwaylockInstance::new();
