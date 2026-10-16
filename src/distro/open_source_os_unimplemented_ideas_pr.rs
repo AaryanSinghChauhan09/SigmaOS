@@ -26,6 +26,10 @@ pub enum OpenSourceOsCategory {
     QnxNeutrinoRealtime,
     SerenityLibGui,
     TempleOsHolyC,
+    AmigaMorphOsExec,
+    Os2WarpSom,
+    FuchsiaZircon,
+    GnuHurdTranslator,
 }
 
 impl OpenSourceOsCategory {
@@ -42,6 +46,10 @@ impl OpenSourceOsCategory {
             Self::QnxNeutrinoRealtime => "QNX Neutrino Realtime Microkernel",
             Self::SerenityLibGui => "SerenityOS LibGUI & EventLoop IPC",
             Self::TempleOsHolyC => "TempleOS HolyC JIT & Ring 0 System",
+            Self::AmigaMorphOsExec => "AmigaOS/MorphOS Exec Message Ports",
+            Self::Os2WarpSom => "OS/2 Warp SOM & Workplace Shell",
+            Self::FuchsiaZircon => "Fuchsia Zircon Handle & Starnix Bridge",
+            Self::GnuHurdTranslator => "GNU Hurd Mach VFS Translators",
         }
     }
 }
@@ -172,6 +180,31 @@ impl OpenSourceOsUnimplementedIdeasPrEngine {
                 OpenSourceOsCategory::TempleOsHolyC,
                 "templeos_holyc_ring0",
             ),
+            (
+                "feat(amiga): Exec zero-copy message port IPC & MorphOS Ambient desktop integration",
+                OpenSourceOsCategory::AmigaMorphOsExec,
+                "amiga_exec_msgport",
+            ),
+            (
+                "feat(os2): System Object Model (SOM) dynamic object broker & Workplace Shell drag-and-drop",
+                OpenSourceOsCategory::Os2WarpSom,
+                "os2_som_workplace_shell",
+            ),
+            (
+                "feat(fuchsia): Zircon handle capability rights & Starnix Linux syscall translation bridge",
+                OpenSourceOsCategory::FuchsiaZircon,
+                "fuchsia_zircon_starnix",
+            ),
+            (
+                "feat(hurd): Mach microkernel VFS active translator mounting & Hurd auth server",
+                OpenSourceOsCategory::GnuHurdTranslator,
+                "gnu_hurd_mach_translator",
+            ),
+            (
+                "feat(linux): EEVDF virtual deadline scheduler & io_uring async storage submitter",
+                OpenSourceOsCategory::LinuxKernel,
+                "linux_eevdf_iouring",
+            ),
         ];
 
         for (title, cat, target_sub) in pr_definitions {
@@ -300,7 +333,7 @@ mod tests {
     #[test]
     fn test_open_source_os_unimplemented_ideas_pr_engine() {
         let engine = OpenSourceOsUnimplementedIdeasPrEngine::new();
-        assert_eq!(engine.get_merged_pr_count(), 16);
+        assert_eq!(engine.get_merged_pr_count(), 21);
 
         let diff = engine.generate_pr_diff_patch(1001);
         assert!(diff.is_some());
@@ -315,6 +348,6 @@ mod tests {
         assert!(master.verify_all_open_source_os_pr_ideas());
 
         let summary = master.get_category_pr_summary();
-        assert_eq!(summary.len(), 11);
+        assert_eq!(summary.len(), 15);
     }
 }
