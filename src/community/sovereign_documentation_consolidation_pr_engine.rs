@@ -442,10 +442,18 @@ impl SovereignInfoPagesConsolidationEngine {
             prev_node: "None".to_string(),
             content: "Welcome to the GNU Info Texinfo manual tree for SigmaOS.".to_string(),
             menu_items: vec![
-                ("Kernel Architecture".to_string(), "SMP, eBPF, Buddy Allocator".to_string()),
-                ("Packaging System".to_string(), "Universal package format and SAT solver".to_string()),
-                ("Sandboxing Security".to_string(), "Pledge, Unveil, Capsicum, Landlock".to_string()),
-                ("Storage and Filesystems".to_string(), "OpenZFS, Btrfs, and HAMMER2".to_string()),
+                (
+                    "Kernel Architecture".to_string(),
+                    "SMP, eBPF, Buddy Allocator".to_string(),
+                ),
+                (
+                    "Packaging System".to_string(),
+                    "Universal package format and SAT solver".to_string(),
+                ),
+                (
+                    "Sandboxing Security".to_string(),
+                    "Pledge, Unveil, Capsicum, Landlock".to_string(),
+                ),
             ],
         });
 
