@@ -35,7 +35,8 @@
 
 <!-- Required for design-changing kernel PRs -->
 
-- Study document:
+- Upstream study:
+- What SigmaOS adopts:
 - Linux/BSD/Redox/xv6 reference:
 - Decision: Adopt / Adapt / Reject
 - Reason:
@@ -62,6 +63,19 @@
 - [ ] Error paths tested
 - [ ] No silent failure introduced
 
+## Shell component
+
+- [ ] Interactive REPL
+- [ ] Scripting engine
+- [ ] Job control
+- [ ] Builtins
+
+## Shell safety review
+
+- [ ] Input validation
+- [ ] Signal handling
+- [ ] Memory safety
+
 ## Evidence
 
 - [ ] `cargo check --lib`
@@ -87,3 +101,6 @@
 
 - Risk:
 - Rollback:
+- Safety and rollback:
+
+## Reviewer checklist
