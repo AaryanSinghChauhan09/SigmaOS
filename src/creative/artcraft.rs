@@ -23,6 +23,9 @@ pub enum ProjectType {
     Scene,
     Deck,
     Presentation,
+    Grid,
+    Spreadsheet,
+    GridCraft,
 }
 
 /// Project

@@ -289,6 +289,20 @@ if [ -f "src/creative/effectcraft_missing_components_parity_pr.rs" ]; then
     ./build/test_effectcraft_missing
 fi
 
+if [ -f "src/creative/gridcraft.rs" ]; then
+    echo "Running Sovereign Gridcraft Spreadsheet PR test suite..."
+    mkdir -p build
+    rustc --test src/creative/gridcraft.rs --edition=2021 -o build/test_gridcraft
+    ./build/test_gridcraft
+fi
+
+if [ -f "src/creative/gridcraft_missing_components_parity_pr.rs" ]; then
+    echo "Running Sovereign Gridcraft & ArtCraft Missing Components Parity PR Gateway test suite..."
+    mkdir -p build
+    rustc --test src/creative/gridcraft_missing_components_parity_pr.rs --edition=2021 -o build/test_gridcraft_missing
+    ./build/test_gridcraft_missing
+fi
+
 if [ -f "src/creative/wordcraft_missing_components_parity_pr.rs" ]; then
     echo "Running Sovereign Wordcraft & ArtCraft Missing Components Parity PR Gateway test suite..."
     mkdir -p build

@@ -21,6 +21,8 @@ pub mod model3d;
 pub mod cadcraft;
 pub mod artcraft;
 pub mod deckcraft;
+pub mod gridcraft;
+pub mod gridcraft_missing_components_parity_pr;
 
 pub use photocraft::{
     PhotoEditor, ImageLayer, Filter, Adjustment, LayerType, LayerMask, AdjustmentType,
@@ -157,4 +159,16 @@ pub use deckcraft::{
     DeckCraftPresenterZenithPrDeployer, PresentationDeck, Slide, SlideElement,
     SlideLayoutType, SlideExporterEngine, PresenterState, DeckExportFormat,
     fnv1a_deckcraft_pr_digest, init_deckcraft, get_deckcraft,
+};
+pub use gridcraft::{
+    GridcraftEngine, GridcraftMasterPrDeploymentSuite, GridcraftPrPullRequestSpec,
+    GridcraftFormulaSpreadsheetPrDeployer, GridcraftPivotTableAnalyticsPrDeployer,
+    GridcraftChartVisualizationPrDeployer, Worksheet, Workbook, PivotTable, Chart,
+    init_gridcraft, get_gridcraft,
+};
+pub use gridcraft_missing_components_parity_pr::{
+    GridcraftPrProposalManifest, GridcraftAdvancedFormulaXlookupPrEngine,
+    GridcraftDataValidationConditionalFormattingPrEngine, GridcraftRealtimeDataStreamSpillArrayPrEngine,
+    GridcraftFinancialGoalSeekSolverPrEngine, GridcraftMultiUserCrdtCollabPrEngine,
+    GridcraftMacroScriptingUdfPrEngine, SovereignGridcraftArtcraftParityPrGateway,
 };
