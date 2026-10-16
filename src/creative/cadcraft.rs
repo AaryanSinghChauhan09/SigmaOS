@@ -276,7 +276,11 @@ impl CadCraftEngine {
         self.active.load(Ordering::Relaxed)
     }
 
-    pub fn add_sketch_entity(&mut self, entity_type: SketchEntityType, points: Vec<[f32; 2]>) -> u32 {
+    pub fn add_sketch_entity(
+        &mut self,
+        entity_type: SketchEntityType,
+        points: Vec<[f32; 2]>,
+    ) -> u32 {
         let id = self.next_entity_id.fetch_add(1, Ordering::Relaxed);
         let entity = SketchEntity {
             id,
@@ -382,7 +386,9 @@ impl CadCraftEngine {
                 out.extend_from_slice(b"0\nSECTION\n2\nHEADER\n0\nENDSEC\n0\nEOF\n");
             }
             ExportFormat::STEP => {
-                out.extend_from_slice(b"ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\nENDSEC;\nEND-ISO-10303-21;\n");
+                out.extend_from_slice(
+                    b"ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\nENDSEC;\nEND-ISO-10303-21;\n",
+                );
             }
             _ => {
                 out.extend_from_slice(b"CADCRAFT_EXPORT\n");
@@ -566,7 +572,12 @@ impl BRepSolidModel {
         }
     }
 
-    pub fn extrude_sketch(&mut self, sketch: &ParametricSketch2D, depth: f64, _draft_angle_deg: f64) -> bool {
+    pub fn extrude_sketch(
+        &mut self,
+        sketch: &ParametricSketch2D,
+        depth: f64,
+        _draft_angle_deg: f64,
+    ) -> bool {
         for p in &sketch.points {
             self.vertices.push(Vector3D::new(p[0], p[1], 0.0));
             self.vertices.push(Vector3D::new(p[0], p[1], depth));
@@ -854,14 +865,13 @@ mod tests {
     fn test_sketch_entities_and_constraints() {
         let mut engine = CadCraftEngine::new();
         engine.init();
-        let e1 =
-            engine.add_sketch_entity(SketchEntityType::Line, vec![[0.0, 0.0], [10.0, 0.0]]);
-        let e2 = engine.add_sketch_entity(
-            SketchEntityType::Line,
-            vec![[10.0, 0.0], [10.0, 10.0]],
-        );
+        let e1 = engine.add_sketch_entity(SketchEntityType::Line, vec![[0.0, 0.0], [10.0, 0.0]]);
+        let e2 = engine.add_sketch_entity(SketchEntityType::Line, vec![[10.0, 0.0], [10.0, 10.0]]);
         let c1 = engine.add_geometric_constraint(
-            ConstraintType::Perpendicular { line1_idx: 0, line2_idx: 1 },
+            ConstraintType::Perpendicular {
+                line1_idx: 0,
+                line2_idx: 1,
+            },
             vec![e1, e2],
             90.0,
         );

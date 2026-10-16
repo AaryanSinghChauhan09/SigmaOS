@@ -69,7 +69,12 @@ impl DragonFlyLwktMessagingPrEngine {
         }
     }
 
-    pub fn dispatch_message(&mut self, target_cpu: u32, payload: &str, priority: u8) -> Result<u64, String> {
+    pub fn dispatch_message(
+        &mut self,
+        target_cpu: u32,
+        payload: &str,
+        priority: u8,
+    ) -> Result<u64, String> {
         let msg_id = self.next_msg_id;
         self.next_msg_id += 1;
         let message = DragonFlyLwktMessage {
@@ -131,7 +136,10 @@ impl DragonFlyHammer2PfsReplicationPrEngine {
             deduplicated_blocks: 0,
         };
         self.cluster_nodes.insert(snapshot_name.to_string(), node);
-        format!("HAMMER2 PFS Snapshot '{}' created at TX {}", snapshot_name, self.current_tx)
+        format!(
+            "HAMMER2 PFS Snapshot '{}' created at TX {}",
+            snapshot_name, self.current_tx
+        )
     }
 
     pub fn sync_pfs_cluster(&mut self) -> usize {
@@ -172,7 +180,10 @@ impl DragonFlyVKernelUserlandPrEngine {
             is_running: true,
         };
         self.active_vkernels.insert(pid, state);
-        Ok(format!("Spawned DragonFly vkernel PID {} with {}MB RAM", pid, mem_mb))
+        Ok(format!(
+            "Spawned DragonFly vkernel PID {} with {}MB RAM",
+            pid, mem_mb
+        ))
     }
 
     pub fn simulate_trap_intercept(&mut self, pid: u32) -> Result<u64, String> {
@@ -221,7 +232,10 @@ impl DragonFlyDsynthDportsPrEngine {
             self.completed_ports.push(port_name.to_string());
             worker.current_port = None;
             worker.status = "IDLE".to_string();
-            Ok(format!("dsynth worker {} successfully built dport '{}'", worker.id, port_name))
+            Ok(format!(
+                "dsynth worker {} successfully built dport '{}'",
+                worker.id, port_name
+            ))
         } else {
             Err("All dsynth workers are busy".to_string())
         }
@@ -330,7 +344,9 @@ impl DragonFlySwapcachePrEngine {
     }
 
     pub fn lookup_block(&self, block_id: u64) -> Option<u64> {
-        self.cache_entries.get(&block_id).map(|meta| meta.ssd_offset)
+        self.cache_entries
+            .get(&block_id)
+            .map(|meta| meta.ssd_offset)
     }
 }
 
@@ -354,13 +370,21 @@ impl DragonFlyLocklessNamecachePrEngine {
         }
     }
 
-    pub fn insert_entry(&mut self, cpu_id: u32, path: &str, inode_num: u64) -> Result<String, String> {
+    pub fn insert_entry(
+        &mut self,
+        cpu_id: u32,
+        path: &str,
+        inode_num: u64,
+    ) -> Result<String, String> {
         let entry = NamecacheEntry {
             path: path.to_string(),
             inode_num,
             cpu_owner: cpu_id,
         };
-        self.cpu_cache.entry(cpu_id).or_insert_with(Vec::new).push(entry);
+        self.cpu_cache
+            .entry(cpu_id)
+            .or_insert_with(Vec::new)
+            .push(entry);
         Ok(format!(
             "PR Proposal: Inserted lockless namecache entry '{}' (inode {}) on CPU {}",
             path, inode_num, cpu_id
@@ -396,7 +420,12 @@ impl DragonFlyFirmlinkPrEngine {
         }
     }
 
-    pub fn create_firmlink(&mut self, source: &str, target: &str, read_only: bool) -> Result<String, String> {
+    pub fn create_firmlink(
+        &mut self,
+        source: &str,
+        target: &str,
+        read_only: bool,
+    ) -> Result<String, String> {
         let binding = FirmlinkBinding {
             source_path: source.to_string(),
             target_path: target.to_string(),
@@ -479,7 +508,10 @@ impl DragonFlyBsdMissingComponentsParityPrGateway {
     }
 
     pub fn execute_dragonfly_parity_eval(&mut self) -> bool {
-        let _msg = self.lwkt.dispatch_message(0, "LWKT_SCHEDULE_SYNC", 10).is_ok();
+        let _msg = self
+            .lwkt
+            .dispatch_message(0, "LWKT_SCHEDULE_SYNC", 10)
+            .is_ok();
         let _proc = self.lwkt.process_cpu_queue(0) > 0;
         let _pfs = self.hammer2.create_pfs_snapshot("pfs_backup");
         let _sync = self.hammer2.sync_pfs_cluster() >= 2;
@@ -490,7 +522,10 @@ impl DragonFlyBsdMissingComponentsParityPrGateway {
         let _dev = self.devfs.trigger_dev_event("/dev/hammer2", "NOTE_WRITE") > 0;
         let _swp = self.swapcache.cache_block(0x1000, 0x5000).is_ok();
         let _nc = self.namecache.insert_entry(0, "/usr/bin", 8192).is_ok();
-        let _fl = self.firmlink.create_firmlink("/var/log", "/usr/log", true).is_ok();
+        let _fl = self
+            .firmlink
+            .create_firmlink("/var/log", "/usr/log", true)
+            .is_ok();
         let _ipi = self.ipi_rendezvous.initiate_rendezvous(0xABC123);
         let _ack = self.ipi_rendezvous.ack_cpu_rendezvous(0);
 
