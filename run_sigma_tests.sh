@@ -1565,6 +1565,17 @@ if [ -f "src/community/sovereign_documentation_consolidation_pr_engine.rs" ]; th
     ./build/test_sovereign_documentation_consolidation_pr_engine
 fi
 
+if [ -f "tests/process/lifecycle/lifecycle_test.rs" ]; then
+    echo "Running Process Subsystem & Lifecycle test suite..."
+    mkdir -p build
+    rustc --test tests/process/lifecycle/lifecycle_test.rs --edition=2021 -o build/test_proc_lifecycle && ./build/test_proc_lifecycle
+    rustc --test tests/process/pid_allocator.rs --edition=2021 -o build/test_pid_allocator && ./build/test_pid_allocator
+    rustc --test tests/process/fork_exec/fork_exec_test.rs --edition=2021 -o build/test_fork_exec && ./build/test_fork_exec
+    rustc --test tests/process/wait_reap/wait_reap_test.rs --edition=2021 -o build/test_wait_reap && ./build/test_wait_reap
+    rustc --test tests/process/rlimits/rlimit_test.rs --edition=2021 -o build/test_rlimit && ./build/test_rlimit
+    rustc --test tests/process/namespaces/namespace_test.rs --edition=2021 -o build/test_namespaces && ./build/test_namespaces
+fi
+
 if [ -f "tests/scheduler/core.rs" ]; then
     echo "Running Process Scheduler Core & Lifecycle test suite..."
     mkdir -p build
