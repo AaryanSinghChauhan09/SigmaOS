@@ -331,7 +331,13 @@ impl GnuCoreutilsBsdUserlandEngine {
             .collect()
     }
 
-    pub fn run_sort(&self, items: &[&str], numeric: bool, reverse: bool, unique: bool) -> Vec<String> {
+    pub fn run_sort(
+        &self,
+        items: &[&str],
+        numeric: bool,
+        reverse: bool,
+        unique: bool,
+    ) -> Vec<String> {
         let mut list: Vec<String> = items.iter().map(|s| s.to_string()).collect();
         if unique {
             list.sort();
@@ -1116,7 +1122,11 @@ impl ArchivalCompressionEngine {
         map
     }
 
-    pub fn configure_compression_level(&self, format: CompressionFormat, level: u32) -> Result<String, &'static str> {
+    pub fn configure_compression_level(
+        &self,
+        format: CompressionFormat,
+        level: u32,
+    ) -> Result<String, &'static str> {
         Ok(format!("Configured {:?} level {}", format, level))
     }
 
@@ -1719,15 +1729,27 @@ impl CoreUtilsPullRequestGatewayEngine {
     }
 
     pub fn get_prs_by_category(&self, category: CoreUtilsPrCategory) -> Vec<CoreUtilsPrSubmission> {
-        self.submissions.values().filter(|s| s.category == category).cloned().collect()
+        self.submissions
+            .values()
+            .filter(|s| s.category == category)
+            .cloned()
+            .collect()
     }
 
     pub fn get_prs_by_status(&self, status: CoreUtilsPrStatus) -> Vec<CoreUtilsPrSubmission> {
-        self.submissions.values().filter(|s| s.status == status).cloned().collect()
+        self.submissions
+            .values()
+            .filter(|s| s.status == status)
+            .cloned()
+            .collect()
     }
 
     pub fn get_prs_by_author(&self, author: &str) -> Vec<CoreUtilsPrSubmission> {
-        self.submissions.values().filter(|s| s.author == author).cloned().collect()
+        self.submissions
+            .values()
+            .filter(|s| s.author == author)
+            .cloned()
+            .collect()
     }
 
     pub fn collect_all_proposals(&self) -> Vec<CoreUtilsPrSubmission> {
