@@ -1,5 +1,5 @@
 // SigmaOS Sovereign Linux & BSD All Subsystems Harmony Engine
-// Integrates inspirations from Linux & BSD distributions across all 31 core subsystems of SigmaOS,
+// Integrates inspirations from Linux & BSD distributions across all 23 core subsystems of SigmaOS,
 // ensuring complete interoperability, event routing, policy translation, and full capability matrices.
 
 use std::collections::BTreeMap;
@@ -45,14 +45,6 @@ pub enum LinuxBsdDistroInspiration {
     HaikuOS,
     QubesOS,
     WhonixOS,
-    MageiaLinux,
-    PuppyLinux,
-    TinyCoreLinux,
-    AntiXLinux,
-    ZorinOS,
-    SteamOS,
-    CachyOS,
-    DeepinOS,
 }
 
 impl LinuxBsdDistroInspiration {
@@ -94,14 +86,6 @@ impl LinuxBsdDistroInspiration {
             Self::HaikuOS => "HaikuOS",
             Self::QubesOS => "QubesOS",
             Self::WhonixOS => "WhonixOS",
-            Self::MageiaLinux => "MageiaLinux",
-            Self::PuppyLinux => "PuppyLinux",
-            Self::TinyCoreLinux => "TinyCoreLinux",
-            Self::AntiXLinux => "AntiXLinux",
-            Self::ZorinOS => "ZorinOS",
-            Self::SteamOS => "SteamOS",
-            Self::CachyOS => "CachyOS",
-            Self::DeepinOS => "DeepinOS",
         }
     }
 }
@@ -630,68 +614,52 @@ impl SovereignSubsystemDistroHarmonyEngine {
                 true,
             ),
             (
-                SigmaOsSubsystem::ProcessActivity,
+                SigmaOsSubsystem::TelemetryObservability,
                 SigmaOsSubsystem::SecuritySandboxing,
-                LinuxBsdDistroInspiration::FreeBSD,
-                "pol_proc_sec",
-                "racct_rctl_cgroup_v2_task_resource_limit_enforcement",
+                LinuxBsdDistroInspiration::TailsOS,
+                "pol_telemetry_privacy_guard",
+                "amnesic_telemetry_scrubber_and_pii_filter",
                 true,
             ),
             (
-                SigmaOsSubsystem::MemoryVirtualization,
+                SigmaOsSubsystem::CryptographySecurity,
                 SigmaOsSubsystem::FilesystemStorage,
-                LinuxBsdDistroInspiration::ArchLinux,
-                "pol_mem_fs",
-                "mglru_page_reclaim_zfs_arc_bcachefs_cache_balancing",
+                LinuxBsdDistroInspiration::FreeBSD,
+                "pol_crypto_geli_luks",
+                "pqc_dilithium_geli_luks2_transparent_vfs_encryption",
+                true,
+            ),
+            (
+                SigmaOsSubsystem::AccessibilityInput,
+                SigmaOsSubsystem::DesktopCompositor,
+                LinuxBsdDistroInspiration::UbuntuLinux,
+                "pol_access_fcitx5_orca",
+                "wayland_input_method_v2_accessibility_overlay",
                 false,
             ),
             (
                 SigmaOsSubsystem::TimeSynchronization,
                 SigmaOsSubsystem::KernelScheduling,
-                LinuxBsdDistroInspiration::AlpineLinux,
-                "pol_time_sched",
-                "chrony_ptp_hardware_clock_eevdf_quantum_alignment",
+                LinuxBsdDistroInspiration::ClearLinux,
+                "pol_time_ptp_clock",
+                "ptp_hardware_clock_nanosecond_scheduler_timer",
+                false,
+            ),
+            (
+                SigmaOsSubsystem::DeviceHotplug,
+                SigmaOsSubsystem::DriversHardware,
+                LinuxBsdDistroInspiration::VoidLinux,
+                "pol_dev_udev_devd",
+                "udev_devd_bridge_hotplug_driver_auto_probe",
                 false,
             ),
             (
                 SigmaOsSubsystem::SignalDelivery,
                 SigmaOsSubsystem::ProcessActivity,
                 LinuxBsdDistroInspiration::OpenBSD,
-                "pol_sig_proc",
-                "realtime_sigqueue_sigreturn_frame_guard_verification",
+                "pol_sig_realtime_frame",
+                "sigreturn_frame_guard_and_uncatchable_signal_bypass",
                 true,
-            ),
-            (
-                SigmaOsSubsystem::DeviceHotplug,
-                SigmaOsSubsystem::DriversHardware,
-                LinuxBsdDistroInspiration::VoidLinux,
-                "pol_dev_drv",
-                "udev_devd_hotplug_probe_trigger_rump_driver",
-                false,
-            ),
-            (
-                SigmaOsSubsystem::CryptographySecurity,
-                SigmaOsSubsystem::AuthIdentity,
-                LinuxBsdDistroInspiration::DebianGNU,
-                "pol_crypto_auth",
-                "pqc_dilithium_luks2_geli_homed_authentication",
-                true,
-            ),
-            (
-                SigmaOsSubsystem::TelemetryObservability,
-                SigmaOsSubsystem::ObservabilityDiagnostics,
-                LinuxBsdDistroInspiration::TailsOS,
-                "pol_telem_obs",
-                "amnesic_privacy_telemetry_filtering_ebpf_dtrace",
-                true,
-            ),
-            (
-                SigmaOsSubsystem::AccessibilityInput,
-                SigmaOsSubsystem::DesktopCompositor,
-                LinuxBsdDistroInspiration::LinuxMint,
-                "pol_access_ui",
-                "orca_screenreader_fcitx5_ime_wayland_compositor_routing",
-                false,
             ),
         ];
 
@@ -728,32 +696,15 @@ impl SovereignSubsystemDistroHarmonyEngine {
                     path.to_string()
                 }
             }
-            LinuxBsdDistroInspiration::VoidLinux => {
-                if path.starts_with("/var/db/pkg") {
-                    format!("/var/db/xbps{}", &path[11..])
-                } else {
-                    path.to_string()
-                }
-            }
-            LinuxBsdDistroInspiration::GentooLinux => {
-                if path.starts_with("/usr/portage") {
-                    format!("/var/db/repos/gentoo{}", &path[12..])
-                } else {
-                    path.to_string()
-                }
-            }
             _ => path.to_string(),
         }
     }
 
     pub fn map_security_isolation_level(&self, distro: LinuxBsdDistroInspiration) -> u32 {
         match distro {
-            LinuxBsdDistroInspiration::OpenBSD
-            | LinuxBsdDistroInspiration::HardenedBSD
-            | LinuxBsdDistroInspiration::QubesOS => 100,
+            LinuxBsdDistroInspiration::OpenBSD | LinuxBsdDistroInspiration::HardenedBSD => 100,
             LinuxBsdDistroInspiration::FreeBSD
             | LinuxBsdDistroInspiration::TailsOS
-            | LinuxBsdDistroInspiration::WhonixOS
             | LinuxBsdDistroInspiration::KaliLinux => 90,
             LinuxBsdDistroInspiration::NixOS
             | LinuxBsdDistroInspiration::AlpineLinux
@@ -769,55 +720,22 @@ impl SovereignSubsystemDistroHarmonyEngine {
         match distro {
             LinuxBsdDistroInspiration::ArchLinux
             | LinuxBsdDistroInspiration::GarudaLinux
-            | LinuxBsdDistroInspiration::CachyOS
             | LinuxBsdDistroInspiration::EndeavourOS => "pkg.tar.zst",
             LinuxBsdDistroInspiration::DebianGNU
             | LinuxBsdDistroInspiration::UbuntuLinux
             | LinuxBsdDistroInspiration::LinuxMint
             | LinuxBsdDistroInspiration::KaliLinux
-            | LinuxBsdDistroInspiration::ZorinOS
-            | LinuxBsdDistroInspiration::DeepinOS
             | LinuxBsdDistroInspiration::ParrotOS => "deb",
             LinuxBsdDistroInspiration::FedoraLinux
             | LinuxBsdDistroInspiration::OpenSUSE
-            | LinuxBsdDistroInspiration::MageiaLinux
             | LinuxBsdDistroInspiration::RockyLinux
             | LinuxBsdDistroInspiration::AlmaLinux => "rpm",
             LinuxBsdDistroInspiration::AlpineLinux => "apk",
-            LinuxBsdDistroInspiration::VoidLinux => "xbps",
-            LinuxBsdDistroInspiration::SolusLinux => "eopkg",
-            LinuxBsdDistroInspiration::TinyCoreLinux => "tcz",
-            LinuxBsdDistroInspiration::SlackwareLinux => "txz",
-            LinuxBsdDistroInspiration::HaikuOS => "hpkg",
             LinuxBsdDistroInspiration::FreeBSD
             | LinuxBsdDistroInspiration::GhostBSD
             | LinuxBsdDistroInspiration::HardenedBSD => "pkg",
             _ => "sigpkg",
         }
-    }
-
-    pub fn audit_all_subsystems_distro_compliance(&self) -> Vec<(SigmaOsSubsystem, bool, u32)> {
-        self.subsystems
-            .iter()
-            .map(|(&sub, spec)| {
-                let is_compliant = spec.supported_distros.len() >= 30 && spec.interop_score >= 100;
-                (sub, is_compliant, spec.interop_score)
-            })
-            .collect()
-    }
-
-    pub fn translate_cross_distro_payload(
-        &self,
-        distro: LinuxBsdDistroInspiration,
-        subsystem: SigmaOsSubsystem,
-        payload: &str,
-    ) -> String {
-        format!(
-            "[{}:{}] {}",
-            distro.as_str(),
-            subsystem.as_str(),
-            payload
-        )
     }
 
     pub fn dispatch_event(
@@ -896,6 +814,84 @@ impl SovereignSubsystemDistroHarmonyEngine {
             0
         }
     }
+
+    /// Translate cross-subsystem payload specs between different Linux & BSD distro paradigms.
+    pub fn translate_cross_distro_payload(
+        &self,
+        source_distro: LinuxBsdDistroInspiration,
+        target_distro: LinuxBsdDistroInspiration,
+        payload: &str,
+    ) -> String {
+        if source_distro == target_distro {
+            return payload.to_string();
+        }
+
+        match (source_distro, target_distro) {
+            (LinuxBsdDistroInspiration::ArchLinux, LinuxBsdDistroInspiration::DebianGNU) => payload
+                .replace("pacman_hook", "dpkg_trigger")
+                .replace("pkg.tar.zst", "deb"),
+            (LinuxBsdDistroInspiration::FreeBSD, LinuxBsdDistroInspiration::ArchLinux) => payload
+                .replace("jail_vnet", "ebpf_xdp_namespace")
+                .replace("pkg_freebsd", "pacman_alpm"),
+            (LinuxBsdDistroInspiration::OpenBSD, LinuxBsdDistroInspiration::ArchLinux) => payload
+                .replace("pledge_unveil", "landlock_v5_bpf")
+                .replace("pf_rules", "nftables_rules"),
+            (LinuxBsdDistroInspiration::NixOS, LinuxBsdDistroInspiration::GentooLinux) => payload
+                .replace("flake_closure", "ebuild_use_flags")
+                .replace("store_path", "portage_vdb"),
+            _ => format!(
+                "transpiled_from_{}_to_{}:{}",
+                source_distro.as_str(),
+                target_distro.as_str(),
+                payload
+            ),
+        }
+    }
+
+    /// Audit system-wide distro compliance across all 31 core subsystems.
+    pub fn audit_all_subsystems_distro_compliance(&self) -> (BTreeMap<String, bool>, u32) {
+        let mut audit_map = BTreeMap::new();
+        let mut compliant_count = 0;
+
+        for (subsystem, spec) in &self.subsystems {
+            let is_compliant = spec.supported_distros.len() >= 30
+                && !spec.capabilities.is_empty()
+                && spec.interop_score >= 100;
+
+            audit_map.insert(subsystem.as_str().to_string(), is_compliant);
+            if is_compliant {
+                compliant_count += 1;
+            }
+        }
+
+        let score = if self.subsystems.is_empty() {
+            0
+        } else {
+            (compliant_count * 100) / self.subsystems.len() as u32
+        };
+
+        (audit_map, score)
+    }
+
+    /// Execute a cross-subsystem workflow coordinating multiple subsystems across distro modes.
+    pub fn execute_cross_subsystem_workflow(
+        &mut self,
+        source: SigmaOsSubsystem,
+        target: SigmaOsSubsystem,
+        workflow_type: &str,
+        payload: &str,
+    ) -> Result<u64, String> {
+        if !self.subsystems.contains_key(&source) {
+            return Err(format!("Unknown source subsystem: {:?}", source));
+        }
+        if !self.subsystems.contains_key(&target) {
+            return Err(format!("Unknown target subsystem: {:?}", target));
+        }
+
+        let action = format!("WORKFLOW_{}", workflow_type.to_uppercase());
+        let event_id = self.dispatch_event(source, target, &action, payload);
+        Ok(event_id)
+    }
 }
 
 #[path = "sovereign_universal_subsystem_interop.rs"]
@@ -925,7 +921,7 @@ impl SovereignUniversalCrossDistroSubsystemOrchestrator {
         }
     }
 
-    /// Switch system-wide Linux & BSD distro paradigm mode across all 31 subsystems.
+    /// Switch system-wide Linux & BSD distro paradigm mode across all 23 subsystems.
     pub fn switch_distro_mode(&mut self, mode: &str) -> Result<usize, &'static str> {
         self.current_mode = String::from(mode);
         self.interop_engine
@@ -979,6 +975,34 @@ impl SovereignUniversalCrossDistroSubsystemOrchestrator {
             0
         }
     }
+
+    /// Translate cross-distro payload specs via the inner harmony engine.
+    pub fn translate_cross_distro_payload(
+        &self,
+        source_distro: LinuxBsdDistroInspiration,
+        target_distro: LinuxBsdDistroInspiration,
+        payload: &str,
+    ) -> String {
+        self.harmony_engine
+            .translate_cross_distro_payload(source_distro, target_distro, payload)
+    }
+
+    /// Perform system-wide distro compliance audit across all core subsystems.
+    pub fn audit_all_subsystems_distro_compliance(&self) -> (BTreeMap<String, bool>, u32) {
+        self.harmony_engine.audit_all_subsystems_distro_compliance()
+    }
+
+    /// Execute an automated cross-subsystem workflow.
+    pub fn execute_cross_subsystem_workflow(
+        &mut self,
+        source: SigmaOsSubsystem,
+        target: SigmaOsSubsystem,
+        workflow_type: &str,
+        payload: &str,
+    ) -> Result<u64, String> {
+        self.harmony_engine
+            .execute_cross_subsystem_workflow(source, target, workflow_type, payload)
+    }
 }
 
 #[cfg(test)]
@@ -994,8 +1018,6 @@ mod tests {
             "Plan9Frontier"
         );
         assert_eq!(LinuxBsdDistroInspiration::GhostBSD.as_str(), "GhostBSD");
-        assert_eq!(LinuxBsdDistroInspiration::SteamOS.as_str(), "SteamOS");
-        assert_eq!(LinuxBsdDistroInspiration::CachyOS.as_str(), "CachyOS");
 
         assert_eq!(
             SigmaOsSubsystem::KernelScheduling.as_str(),
@@ -1085,6 +1107,39 @@ mod tests {
     }
 
     #[test]
+    fn test_all_31_subsystems_and_36_distros_interop() {
+        let mut orchestrator = SovereignUniversalCrossDistroSubsystemOrchestrator::new();
+        assert!(orchestrator.verify_orchestration_harmony());
+        assert_eq!(orchestrator.master_harmony_index(), 100);
+
+        // Test policy translation across newly added cross-subsystem pairs
+        let telemetry_policy = orchestrator
+            .translate_cross_subsystem_policy(
+                SigmaOsSubsystem::TelemetryObservability,
+                SigmaOsSubsystem::SecuritySandboxing,
+            )
+            .expect("Telemetry -> Security policy should exist");
+        assert_eq!(telemetry_policy.policy_id, "pol_telemetry_privacy_guard");
+
+        let crypto_policy = orchestrator
+            .translate_cross_subsystem_policy(
+                SigmaOsSubsystem::CryptographySecurity,
+                SigmaOsSubsystem::FilesystemStorage,
+            )
+            .expect("Crypto -> Storage policy should exist");
+        assert_eq!(crypto_policy.policy_id, "pol_crypto_geli_luks");
+
+        // Route events across subsystems
+        let event_id = orchestrator.route_harmony_event(
+            SigmaOsSubsystem::DeviceHotplug,
+            SigmaOsSubsystem::DriversHardware,
+            "PROBE_USB_DEVICE",
+            "vendor_id=0x1234,product_id=0x5678",
+        );
+        assert!(event_id > 0);
+    }
+
+    #[test]
     fn test_cross_distro_policy_translations() {
         let engine = SovereignSubsystemDistroHarmonyEngine::new();
         let policy = engine
@@ -1124,10 +1179,6 @@ mod tests {
             "pkg.tar.zst"
         );
         assert_eq!(
-            engine.resolve_package_format_specifier(LinuxBsdDistroInspiration::VoidLinux),
-            "xbps"
-        );
-        assert_eq!(
             engine.resolve_package_format_specifier(LinuxBsdDistroInspiration::DebianGNU),
             "deb"
         );
@@ -1135,42 +1186,50 @@ mod tests {
             engine.resolve_package_format_specifier(LinuxBsdDistroInspiration::FedoraLinux),
             "rpm"
         );
-
-        let audits = engine.audit_all_subsystems_distro_compliance();
-        assert_eq!(audits.len(), 31);
-        for (_, compliant, score) in audits {
-            assert!(compliant);
-            assert_eq!(score, 100);
-        }
-
-        let translated = engine.translate_cross_distro_payload(
-            LinuxBsdDistroInspiration::FreeBSD,
-            SigmaOsSubsystem::SecuritySandboxing,
-            "mac_capsicum_enforce",
-        );
-        assert_eq!(translated, "[FreeBSD:SecuritySandboxing] mac_capsicum_enforce");
     }
 
     #[test]
-    fn test_all_31_subsystems_and_36_distros_interop() {
+    fn test_payload_translation_and_compliance_audit() {
+        let orchestrator = SovereignUniversalCrossDistroSubsystemOrchestrator::new();
+
+        let translated = orchestrator.translate_cross_distro_payload(
+            LinuxBsdDistroInspiration::ArchLinux,
+            LinuxBsdDistroInspiration::DebianGNU,
+            "pacman_hook:update_icons:pkg.tar.zst",
+        );
+        assert_eq!(translated, "dpkg_trigger:update_icons:deb");
+
+        let openbsd_translated = orchestrator.translate_cross_distro_payload(
+            LinuxBsdDistroInspiration::OpenBSD,
+            LinuxBsdDistroInspiration::ArchLinux,
+            "pledge_unveil:rpath:pf_rules:block",
+        );
+        assert_eq!(
+            openbsd_translated,
+            "landlock_v5_bpf:rpath:nftables_rules:block"
+        );
+
+        let (audit_map, score) = orchestrator.audit_all_subsystems_distro_compliance();
+        assert_eq!(audit_map.len(), 31);
+        assert_eq!(score, 100);
+        assert!(audit_map.values().all(|&v| v));
+    }
+
+    #[test]
+    fn test_cross_subsystem_workflow_execution() {
         let mut orchestrator = SovereignUniversalCrossDistroSubsystemOrchestrator::new();
+
+        let event_id = orchestrator
+            .execute_cross_subsystem_workflow(
+                SigmaOsSubsystem::ProcessActivity,
+                SigmaOsSubsystem::MemoryVirtualization,
+                "reclaim_pages",
+                "target_pid=2048;threshold=80%",
+            )
+            .expect("Workflow execution should succeed");
+
+        assert!(event_id > 0);
         assert!(orchestrator.verify_orchestration_harmony());
         assert_eq!(orchestrator.master_harmony_index(), 100);
-
-        let event_id = orchestrator.route_harmony_event(
-            SigmaOsSubsystem::AccessibilityInput,
-            SigmaOsSubsystem::DesktopCompositor,
-            "ROUTE_ORCA_TTS",
-            "tts_rate=1.0",
-        );
-        assert!(event_id > 0);
-
-        let policy = orchestrator
-            .translate_cross_subsystem_policy(
-                SigmaOsSubsystem::ProcessActivity,
-                SigmaOsSubsystem::SecuritySandboxing,
-            )
-            .expect("ProcessActivity -> SecuritySandboxing policy must exist");
-        assert_eq!(policy.distro_inspiration, LinuxBsdDistroInspiration::FreeBSD);
     }
 }

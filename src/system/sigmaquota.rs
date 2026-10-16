@@ -231,16 +231,12 @@ pub fn init_sigmaquota() {
 
 /// Get the global SigmaQuota instance
 pub fn get_sigmaquota() -> Option<&'static SigmaQuota> {
-    unsafe {
-        SIGMAQUOTA_INSTANCE.as_ref()
-    }
+    unsafe { SIGMAQUOTA_INSTANCE.as_ref() }
 }
 
 /// Get mutable global SigmaQuota instance
 pub fn get_sigmaquota_mut() -> Option<&'static mut SigmaQuota> {
-    unsafe {
-        SIGMAQUOTA_INSTANCE.as_mut()
-    }
+    unsafe { SIGMAQUOTA_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add a quota

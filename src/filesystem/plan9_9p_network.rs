@@ -57,7 +57,7 @@ pub enum MsgType {
 /// Plan 9 Qid (Unique Inode Identifier)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Qid {
-    pub qtype: u8,   // 0x80 = Directory, 0x00 = File
+    pub qtype: u8, // 0x80 = Directory, 0x00 = File
     pub version: u32,
     pub path: u64,
 }
@@ -103,13 +103,20 @@ impl Plan9Server {
         };
 
         // Initialize root directory node (path = 0)
-        server.nodes.insert(0, Plan9Node {
-            qid: Qid { qtype: 0x80, version: 0, path: 0 },
-            name: String::from("/"),
-            is_dir: true,
-            content: Vec::new(),
-            children: Vec::new(),
-        });
+        server.nodes.insert(
+            0,
+            Plan9Node {
+                qid: Qid {
+                    qtype: 0x80,
+                    version: 0,
+                    path: 0,
+                },
+                name: String::from("/"),
+                is_dir: true,
+                content: Vec::new(),
+                children: Vec::new(),
+            },
+        );
 
         server
     }
@@ -126,21 +133,34 @@ impl Plan9Server {
     }
 
     /// Process Tattach: establish root fid.
-    pub fn handle_tattach(&mut self, fid_num: u32, _uname: &str, _aname: &str) -> Result<Qid, &'static str> {
+    pub fn handle_tattach(
+        &mut self,
+        fid_num: u32,
+        _uname: &str,
+        _aname: &str,
+    ) -> Result<Qid, &'static str> {
         let root_qid = self.nodes.get(&0).ok_or("Root missing")?.qid;
-        self.fids.insert(fid_num, Fid {
-            fid: fid_num,
-            qid: root_qid,
-            path: String::from("/"),
-            is_open: false,
-            open_mode: 0,
-            offset: 0,
-        });
+        self.fids.insert(
+            fid_num,
+            Fid {
+                fid: fid_num,
+                qid: root_qid,
+                path: String::from("/"),
+                is_open: false,
+                open_mode: 0,
+                offset: 0,
+            },
+        );
         Ok(root_qid)
     }
 
     /// Process Twalk: navigate directory tree from existing fid.
-    pub fn handle_twalk(&mut self, fid_num: u32, new_fid_num: u32, names: &[String]) -> Result<Vec<Qid>, &'static str> {
+    pub fn handle_twalk(
+        &mut self,
+        fid_num: u32,
+        new_fid_num: u32,
+        names: &[String],
+    ) -> Result<Vec<Qid>, &'static str> {
         let current_fid = self.fids.get(&fid_num).ok_or("Invalid fid")?.clone();
         let mut current_qid = current_fid.qid;
         let mut qids = Vec::new();
@@ -168,20 +188,28 @@ impl Plan9Server {
             }
         }
 
-        self.fids.insert(new_fid_num, Fid {
-            fid: new_fid_num,
-            qid: current_qid,
-            path: current_fid.path,
-            is_open: false,
-            open_mode: 0,
-            offset: 0,
-        });
+        self.fids.insert(
+            new_fid_num,
+            Fid {
+                fid: new_fid_num,
+                qid: current_qid,
+                path: current_fid.path,
+                is_open: false,
+                open_mode: 0,
+                offset: 0,
+            },
+        );
 
         Ok(qids)
     }
 
     /// Process Tread: read bytes from fid.
-    pub fn handle_tread(&mut self, fid_num: u32, offset: u64, count: u32) -> Result<Vec<u8>, &'static str> {
+    pub fn handle_tread(
+        &mut self,
+        fid_num: u32,
+        offset: u64,
+        count: u32,
+    ) -> Result<Vec<u8>, &'static str> {
         let fid = self.fids.get(&fid_num).ok_or("Invalid fid")?;
         let node = self.nodes.get(&fid.qid.path).ok_or("Node not found")?;
 

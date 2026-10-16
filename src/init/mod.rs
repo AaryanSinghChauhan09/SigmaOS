@@ -3,6 +3,6 @@
 pub mod sigmainit;
 
 pub use sigmainit::{
-    SigmaInit, Service, Target, ServiceState, ServiceType, RestartPolicy, SystemState,
-    init_sigmainit, get_sigmainit,
+    get_sigmainit, init_sigmainit, RestartPolicy, Service, ServiceState, ServiceType, SigmaInit,
+    SystemState, Target,
 };

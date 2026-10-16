@@ -13,7 +13,6 @@ pub mod client;
 pub mod daemon;
 pub mod https_mirror_client;
 
-
 pub use aurweb::{
     AurComment, AurCommentThread, AurGitRepoManager, AurGitRepository, AurPackageRecord,
     AurRpcQueryType, AurRpcResponse, AurVotingSystem, SovereignAurWebEngine,

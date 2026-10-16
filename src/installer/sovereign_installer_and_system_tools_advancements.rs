@@ -102,8 +102,12 @@ impl AnacondaStorageAndPayloadEngine {
                 "lang" if tokens.len() > 1 => self.profile.lang = tokens[1].to_string(),
                 "keyboard" if tokens.len() > 1 => self.profile.keyboard = tokens[1].to_string(),
                 "timezone" if tokens.len() > 1 => self.profile.timezone = tokens[1].to_string(),
-                "rootpw" if tokens.len() > 1 => self.profile.root_password_hash = tokens[1].to_string(),
-                "network" if tokens.len() > 1 => self.profile.network_device = tokens[1].to_string(),
+                "rootpw" if tokens.len() > 1 => {
+                    self.profile.root_password_hash = tokens[1].to_string()
+                }
+                "network" if tokens.len() > 1 => {
+                    self.profile.network_device = tokens[1].to_string()
+                }
                 "part" if tokens.len() > 1 => {
                     let mountpoint = tokens[1].to_string();
                     let mut spec = KickstartPartitionSpec {
@@ -129,14 +133,21 @@ impl AnacondaStorageAndPayloadEngine {
                     }
                     self.profile.partitions.push(spec);
                 }
-                "packages" => self.execution_log.push("Entering %packages section".to_string()),
-                "end" => self.execution_log.push("Completed section block".to_string()),
+                "packages" => self
+                    .execution_log
+                    .push("Entering %packages section".to_string()),
+                "end" => self
+                    .execution_log
+                    .push("Completed section block".to_string()),
                 pkg if !pkg.starts_with('%') => self.profile.package_groups.push(pkg.to_string()),
                 _ => {}
             }
         }
-        self.execution_log.push(format!("Parsed Kickstart profile with {} partitions and {} packages",
-            self.profile.partitions.len(), self.profile.package_groups.len()));
+        self.execution_log.push(format!(
+            "Parsed Kickstart profile with {} partitions and {} packages",
+            self.profile.partitions.len(),
+            self.profile.package_groups.len()
+        ));
         Ok(())
     }
 
@@ -177,7 +188,10 @@ impl AnacondaStorageAndPayloadEngine {
         for pkg in &self.profile.package_groups {
             self.installed_packages.push(format!("installed:{}", pkg));
         }
-        self.execution_log.push(format!("Anaconda: Installed {} packages to target storage", self.installed_packages.len()));
+        self.execution_log.push(format!(
+            "Anaconda: Installed {} packages to target storage",
+            self.installed_packages.len()
+        ));
         Ok(self.installed_packages.len())
     }
 }
@@ -216,16 +230,56 @@ pub struct CalamaresModularWizardEngine {
 impl CalamaresModularWizardEngine {
     pub fn new(branding: &str) -> Self {
         let default_modules = vec![
-            CalamaresModule { name: "welcome".to_string(), is_job_module: false, state: CalamaresModuleState::Pending },
-            CalamaresModule { name: "locale".to_string(), is_job_module: false, state: CalamaresModuleState::Pending },
-            CalamaresModule { name: "keyboard".to_string(), is_job_module: false, state: CalamaresModuleState::Pending },
-            CalamaresModule { name: "partition".to_string(), is_job_module: false, state: CalamaresModuleState::Pending },
-            CalamaresModule { name: "users".to_string(), is_job_module: false, state: CalamaresModuleState::Pending },
-            CalamaresModule { name: "summary".to_string(), is_job_module: false, state: CalamaresModuleState::Pending },
-            CalamaresModule { name: "exec_partition_jobs".to_string(), is_job_module: true, state: CalamaresModuleState::Pending },
-            CalamaresModule { name: "exec_unpack_fs".to_string(), is_job_module: true, state: CalamaresModuleState::Pending },
-            CalamaresModule { name: "exec_initramfs_hook".to_string(), is_job_module: true, state: CalamaresModuleState::Pending },
-            CalamaresModule { name: "finished".to_string(), is_job_module: false, state: CalamaresModuleState::Pending },
+            CalamaresModule {
+                name: "welcome".to_string(),
+                is_job_module: false,
+                state: CalamaresModuleState::Pending,
+            },
+            CalamaresModule {
+                name: "locale".to_string(),
+                is_job_module: false,
+                state: CalamaresModuleState::Pending,
+            },
+            CalamaresModule {
+                name: "keyboard".to_string(),
+                is_job_module: false,
+                state: CalamaresModuleState::Pending,
+            },
+            CalamaresModule {
+                name: "partition".to_string(),
+                is_job_module: false,
+                state: CalamaresModuleState::Pending,
+            },
+            CalamaresModule {
+                name: "users".to_string(),
+                is_job_module: false,
+                state: CalamaresModuleState::Pending,
+            },
+            CalamaresModule {
+                name: "summary".to_string(),
+                is_job_module: false,
+                state: CalamaresModuleState::Pending,
+            },
+            CalamaresModule {
+                name: "exec_partition_jobs".to_string(),
+                is_job_module: true,
+                state: CalamaresModuleState::Pending,
+            },
+            CalamaresModule {
+                name: "exec_unpack_fs".to_string(),
+                is_job_module: true,
+                state: CalamaresModuleState::Pending,
+            },
+            CalamaresModule {
+                name: "exec_initramfs_hook".to_string(),
+                is_job_module: true,
+                state: CalamaresModuleState::Pending,
+            },
+            CalamaresModule {
+                name: "finished".to_string(),
+                is_job_module: false,
+                state: CalamaresModuleState::Pending,
+            },
         ];
         Self {
             branding_title: branding.to_string(),
@@ -238,7 +292,8 @@ impl CalamaresModularWizardEngine {
 
     /// Set value in Calamares GlobalStorage registry
     pub fn set_global_storage(&mut self, key: &str, value: &str) {
-        self.global_storage.insert(key.to_string(), value.to_string());
+        self.global_storage
+            .insert(key.to_string(), value.to_string());
     }
 
     /// Get value from Calamares GlobalStorage registry
@@ -253,7 +308,8 @@ impl CalamaresModularWizardEngine {
         }
         self.modules[self.active_step_index].state = CalamaresModuleState::Completed;
         let completed_name = self.modules[self.active_step_index].name.clone();
-        self.execution_logs.push(format!("Calamares module '{}' completed", completed_name));
+        self.execution_logs
+            .push(format!("Calamares module '{}' completed", completed_name));
 
         self.active_step_index += 1;
         if self.active_step_index < self.modules.len() {
@@ -273,7 +329,10 @@ impl CalamaresModularWizardEngine {
                 jobs_run += 1;
             }
         }
-        self.execution_logs.push(format!("Calamares executed {} job modules successfully", jobs_run));
+        self.execution_logs.push(format!(
+            "Calamares executed {} job modules successfully",
+            jobs_run
+        ));
         jobs_run
     }
 }
@@ -359,7 +418,8 @@ impl DebianInstallerDebconfEngine {
                 count += 1;
             }
         }
-        self.logs.push(format!("Loaded {} debconf preseed items", count));
+        self.logs
+            .push(format!("Loaded {} debconf preseed items", count));
         count
     }
 
@@ -378,7 +438,10 @@ impl DebianInstallerDebconfEngine {
                 loaded += 1;
             }
         }
-        self.logs.push(format!("Anna: Resolved and loaded {} udeb components into /tmp", loaded));
+        self.logs.push(format!(
+            "Anna: Resolved and loaded {} udeb components into /tmp",
+            loaded
+        ));
         loaded
     }
 
@@ -387,7 +450,10 @@ impl DebianInstallerDebconfEngine {
         if self.debconf_db.is_empty() {
             return Err("d-i: Preseed database uninitialized".to_string());
         }
-        self.logs.push(format!("d-i: Target system bootstrapped at {}", self.chroot_target));
+        self.logs.push(format!(
+            "d-i: Target system bootstrapped at {}",
+            self.chroot_target
+        ));
         Ok(format!("Bootstrap successful at {}", self.chroot_target))
     }
 }
@@ -411,9 +477,9 @@ pub enum ArchinstallProfileType {
 pub struct ArchinstallConfigProfile {
     pub target_disk: String,
     pub profile_type: ArchinstallProfileType,
-    pub audio_server: String, // e.g. "pipewire" or "pulseaudio"
+    pub audio_server: String,    // e.g. "pipewire" or "pulseaudio"
     pub network_manager: String, // e.g. "NetworkManager" or "systemd-networkd"
-    pub kernel: String, // e.g. "linux" or "linux-zen"
+    pub kernel: String,          // e.g. "linux" or "linux-zen"
     pub subvolumes: Vec<String>,
 }
 
@@ -443,7 +509,10 @@ impl ArchinstallProfileEngine {
 
     /// Generate Btrfs/ZFS subvolume layout for archinstall profile
     pub fn generate_disk_subvolumes(&mut self) -> Result<Vec<String>, String> {
-        let profile = self.active_profile.as_ref().ok_or("Archinstall: Profile not loaded")?;
+        let profile = self
+            .active_profile
+            .as_ref()
+            .ok_or("Archinstall: Profile not loaded")?;
         let default_subs = if profile.subvolumes.is_empty() {
             vec![
                 "@".to_string(),
@@ -458,9 +527,14 @@ impl ArchinstallProfileEngine {
 
         for sub in &default_subs {
             let uuid = "12345678-abcd-ef00-9999-112233445566";
-            self.generated_fstab.push(format!("UUID={} / btrfs subvol={} 0 0", uuid, sub));
+            self.generated_fstab
+                .push(format!("UUID={} / btrfs subvol={} 0 0", uuid, sub));
         }
-        self.logs.push(format!("Generated {} Btrfs subvolumes for target {}", default_subs.len(), profile.target_disk));
+        self.logs.push(format!(
+            "Generated {} Btrfs subvolumes for target {}",
+            default_subs.len(),
+            profile.target_disk
+        ));
         Ok(default_subs)
     }
 
@@ -471,7 +545,10 @@ impl ArchinstallProfileEngine {
             cmds.push("ln -sf /usr/share/zoneinfo/UTC /etc/localtime".to_string());
             cmds.push("hwclock --systohc".to_string());
             cmds.push("locale-gen".to_string());
-            cmds.push(format!("pacman -S --noconfirm {} {}", prof.kernel, prof.audio_server));
+            cmds.push(format!(
+                "pacman -S --noconfirm {} {}",
+                prof.kernel, prof.audio_server
+            ));
             cmds.push(format!("systemctl enable {}", prof.network_manager));
         }
         self.chroot_commands = cmds.clone();
@@ -513,10 +590,26 @@ pub struct BsdInstallerZfsConfigEngine {
 impl BsdInstallerZfsConfigEngine {
     pub fn new(pool_type: BsdZpoolType) -> Self {
         let default_datasets = vec![
-            BsdZfsDataset { name: "zroot/ROOT/default".to_string(), mountpoint: "/".to_string(), compression: "lz4".to_string() },
-            BsdZfsDataset { name: "zroot/usr/home".to_string(), mountpoint: "/usr/home".to_string(), compression: "lz4".to_string() },
-            BsdZfsDataset { name: "zroot/var/audit".to_string(), mountpoint: "/var/audit".to_string(), compression: "zstd".to_string() },
-            BsdZfsDataset { name: "zroot/tmp".to_string(), mountpoint: "/tmp".to_string(), compression: "off".to_string() },
+            BsdZfsDataset {
+                name: "zroot/ROOT/default".to_string(),
+                mountpoint: "/".to_string(),
+                compression: "lz4".to_string(),
+            },
+            BsdZfsDataset {
+                name: "zroot/usr/home".to_string(),
+                mountpoint: "/usr/home".to_string(),
+                compression: "lz4".to_string(),
+            },
+            BsdZfsDataset {
+                name: "zroot/var/audit".to_string(),
+                mountpoint: "/var/audit".to_string(),
+                compression: "zstd".to_string(),
+            },
+            BsdZfsDataset {
+                name: "zroot/tmp".to_string(),
+                mountpoint: "/tmp".to_string(),
+                compression: "off".to_string(),
+            },
         ];
         Self {
             pool_type,
@@ -529,13 +622,21 @@ impl BsdInstallerZfsConfigEngine {
 
     /// Provision standard FreeBSD rc.conf and loader.conf options
     pub fn configure_bsd_system_defaults(&mut self, hostname: &str) {
-        self.rc_conf_entries.insert("hostname".to_string(), format!("\"{}\"", hostname));
-        self.rc_conf_entries.insert("zfs_enable".to_string(), "\"YES\"".to_string());
-        self.rc_conf_entries.insert("syslogd_flags".to_string(), "\"-ss\"".to_string());
+        self.rc_conf_entries
+            .insert("hostname".to_string(), format!("\"{}\"", hostname));
+        self.rc_conf_entries
+            .insert("zfs_enable".to_string(), "\"YES\"".to_string());
+        self.rc_conf_entries
+            .insert("syslogd_flags".to_string(), "\"-ss\"".to_string());
 
-        self.loader_conf_entries.insert("zfs_load".to_string(), "\"YES\"".to_string());
-        self.loader_conf_entries.insert("autoboot_delay".to_string(), "\"2\"".to_string());
-        self.logs.push(format!("Configured FreeBSD rc.conf & loader.conf for {}", hostname));
+        self.loader_conf_entries
+            .insert("zfs_load".to_string(), "\"YES\"".to_string());
+        self.loader_conf_entries
+            .insert("autoboot_delay".to_string(), "\"2\"".to_string());
+        self.logs.push(format!(
+            "Configured FreeBSD rc.conf & loader.conf for {}",
+            hostname
+        ));
     }
 
     /// Generate FreeBSD bsdinstall command script
@@ -543,8 +644,10 @@ impl BsdInstallerZfsConfigEngine {
         let mut script = String::from("#!/bin/sh\n# bsdinstall non-interactive provisioning\n");
         script.push_str("zfsboot setup zroot\n");
         for ds in &self.datasets {
-            script.push_str(&format!("zfs create -o mountpoint={} -o compression={} {}\n",
-                ds.mountpoint, ds.compression, ds.name));
+            script.push_str(&format!(
+                "zfs create -o mountpoint={} -o compression={} {}\n",
+                ds.mountpoint, ds.compression, ds.name
+            ));
         }
         for (k, v) in &self.rc_conf_entries {
             script.push_str(&format!("sysrc {}={}\n", k, v));
@@ -593,12 +696,15 @@ impl DracutEventDrivenInitramfsEngine {
 
     /// Include a dracut module into generator spec
     pub fn include_module(&mut self, name: &str, stage: &str, binaries: &[&str]) {
-        self.modules.insert(name.to_string(), DracutModuleSpec {
-            name: name.to_string(),
-            stage: stage.to_string(),
-            required_binaries: binaries.iter().map(|s| s.to_string()).collect(),
-            is_hostonly: self.is_hostonly_mode,
-        });
+        self.modules.insert(
+            name.to_string(),
+            DracutModuleSpec {
+                name: name.to_string(),
+                stage: stage.to_string(),
+                required_binaries: binaries.iter().map(|s| s.to_string()).collect(),
+                is_hostonly: self.is_hostonly_mode,
+            },
+        );
     }
 
     /// Generate initramfs image byte archive (cpio equivalent)
@@ -606,13 +712,20 @@ impl DracutEventDrivenInitramfsEngine {
         if self.modules.is_empty() {
             return Err("dracut: No modules included in initramfs image".to_string());
         }
-        let header = format!("DRACUT-INITRAMFS-CPIO-v1-kernel:{}-modules:{}\n",
-            self.target_kernel_version, self.modules.len());
+        let header = format!(
+            "DRACUT-INITRAMFS-CPIO-v1-kernel:{}-modules:{}\n",
+            self.target_kernel_version,
+            self.modules.len()
+        );
         let mut data = header.into_bytes();
         for (name, spec) in &self.modules {
             data.extend_from_slice(format!("MOD:{}:STAGE:{}\n", name, spec.stage).as_bytes());
         }
-        self.logs.push(format!("dracut: Generated {} byte initramfs image for {}", data.len(), self.target_kernel_version));
+        self.logs.push(format!(
+            "dracut: Generated {} byte initramfs image for {}",
+            data.len(),
+            self.target_kernel_version
+        ));
         Ok(data)
     }
 }
@@ -640,13 +753,34 @@ pub struct MkinitcpioHookGeneratorEngine {
 impl MkinitcpioHookGeneratorEngine {
     pub fn new(preset: &str) -> Self {
         let default_hooks = vec![
-            MkinitcpioHook { name: "base".to_string(), run_stage: "early".to_string() },
-            MkinitcpioHook { name: "udev".to_string(), run_stage: "early".to_string() },
-            MkinitcpioHook { name: "autodetect".to_string(), run_stage: "build".to_string() },
-            MkinitcpioHook { name: "modconf".to_string(), run_stage: "build".to_string() },
-            MkinitcpioHook { name: "block".to_string(), run_stage: "runtime".to_string() },
-            MkinitcpioHook { name: "filesystems".to_string(), run_stage: "runtime".to_string() },
-            MkinitcpioHook { name: "fsck".to_string(), run_stage: "late".to_string() },
+            MkinitcpioHook {
+                name: "base".to_string(),
+                run_stage: "early".to_string(),
+            },
+            MkinitcpioHook {
+                name: "udev".to_string(),
+                run_stage: "early".to_string(),
+            },
+            MkinitcpioHook {
+                name: "autodetect".to_string(),
+                run_stage: "build".to_string(),
+            },
+            MkinitcpioHook {
+                name: "modconf".to_string(),
+                run_stage: "build".to_string(),
+            },
+            MkinitcpioHook {
+                name: "block".to_string(),
+                run_stage: "runtime".to_string(),
+            },
+            MkinitcpioHook {
+                name: "filesystems".to_string(),
+                run_stage: "runtime".to_string(),
+            },
+            MkinitcpioHook {
+                name: "fsck".to_string(),
+                run_stage: "late".to_string(),
+            },
         ];
         Self {
             preset_name: preset.to_string(),
@@ -658,13 +792,23 @@ impl MkinitcpioHookGeneratorEngine {
 
     /// Build mkinitcpio runtime image
     pub fn build_mkinitcpio_image(&mut self) -> Result<Vec<u8>, String> {
-        let mut image_bytes = format!("MKINITCPIO-PRESET:{}-HOOKS:{}-COMPRESS:{}\n",
-            self.preset_name, self.build_hooks.len(), self.compression_type).into_bytes();
+        let mut image_bytes = format!(
+            "MKINITCPIO-PRESET:{}-HOOKS:{}-COMPRESS:{}\n",
+            self.preset_name,
+            self.build_hooks.len(),
+            self.compression_type
+        )
+        .into_bytes();
         for hook in &self.build_hooks {
-            image_bytes.extend_from_slice(format!("HOOK:{}:STAGE:{}\n", hook.name, hook.run_stage).as_bytes());
+            image_bytes.extend_from_slice(
+                format!("HOOK:{}:STAGE:{}\n", hook.name, hook.run_stage).as_bytes(),
+            );
         }
-        self.logs.push(format!("mkinitcpio: Image built successfully for preset '{}' ({} bytes)",
-            self.preset_name, image_bytes.len()));
+        self.logs.push(format!(
+            "mkinitcpio: Image built successfully for preset '{}' ({} bytes)",
+            self.preset_name,
+            image_bytes.len()
+        ));
         Ok(image_bytes)
     }
 }
@@ -689,7 +833,8 @@ impl UpdateInitramfsDebianEngine {
 
     /// Add a conf.d configuration file overlay
     pub fn add_conf_overlay(&mut self, filename: &str, content: &str) {
-        self.conf_d_overlays.insert(filename.to_string(), content.to_string());
+        self.conf_d_overlays
+            .insert(filename.to_string(), content.to_string());
     }
 
     /// Trigger `update-initramfs -u -k all`
@@ -740,10 +885,16 @@ impl AnsibleAgentlessPlaybookEngine {
 
     /// Gather host facts (Fact Gathering stage)
     pub fn gather_facts(&mut self, host: &str) {
-        self.gathered_facts.insert(format!("{}:ansible_os_family", host), "SigmaOS".to_string());
-        self.gathered_facts.insert(format!("{}:ansible_architecture", host), "x86_64".to_string());
-        self.gathered_facts.insert(format!("{}:ansible_memtotal_mb", host), "16384".to_string());
-        self.logs.push(format!("Ansible: Gathered facts for host {}", host));
+        self.gathered_facts
+            .insert(format!("{}:ansible_os_family", host), "SigmaOS".to_string());
+        self.gathered_facts.insert(
+            format!("{}:ansible_architecture", host),
+            "x86_64".to_string(),
+        );
+        self.gathered_facts
+            .insert(format!("{}:ansible_memtotal_mb", host), "16384".to_string());
+        self.logs
+            .push(format!("Ansible: Gathered facts for host {}", host));
     }
 
     /// Add a task to playbook task queue
@@ -765,12 +916,17 @@ impl AnsibleAgentlessPlaybookEngine {
         let mut unchanged_count = 0;
         for task in &self.tasks {
             // Idempotency check logic
-            if task.module_name == "service" && task.args.get("state") == Some(&"started".to_string()) {
+            if task.module_name == "service"
+                && task.args.get("state") == Some(&"started".to_string())
+            {
                 changed_count += 1;
             } else {
                 unchanged_count += 1;
             }
-            self.logs.push(format!("Ansible: Executed task '{}' [{}]", task.name, task.module_name));
+            self.logs.push(format!(
+                "Ansible: Executed task '{}' [{}]",
+                task.name, task.module_name
+            ));
         }
         Ok((changed_count, unchanged_count))
     }
@@ -799,8 +955,12 @@ pub struct PuppetResourceAbstractionEngine {
 impl PuppetResourceAbstractionEngine {
     pub fn new() -> Self {
         let mut engine = Self::default();
-        engine.facter_facts.insert("kernel".to_string(), "SigmaOS".to_string());
-        engine.facter_facts.insert("osfamily".to_string(), "SigmaOS".to_string());
+        engine
+            .facter_facts
+            .insert("kernel".to_string(), "SigmaOS".to_string());
+        engine
+            .facter_facts
+            .insert("osfamily".to_string(), "SigmaOS".to_string());
         engine
     }
 
@@ -820,7 +980,10 @@ impl PuppetResourceAbstractionEngine {
     /// Compile Puppet catalog and apply state convergence
     pub fn compile_and_enforce_catalog(&mut self) -> Result<usize, String> {
         let count = self.catalog_resources.len();
-        self.logs.push(format!("Puppet RAL: Compiled catalog and enforced {} resources", count));
+        self.logs.push(format!(
+            "Puppet RAL: Compiled catalog and enforced {} resources",
+            count
+        ));
         Ok(count)
     }
 }
@@ -852,7 +1015,8 @@ impl ChefRecipeConvergenceEngine {
 
     /// Set Chef node attribute
     pub fn set_node_attribute(&mut self, key: &str, val: &str) {
-        self.node_attributes.insert(key.to_string(), val.to_string());
+        self.node_attributes
+            .insert(key.to_string(), val.to_string());
     }
 
     /// Add resource to recipe DSL
@@ -867,7 +1031,10 @@ impl ChefRecipeConvergenceEngine {
     /// Run Chef client convergence pass
     pub fn run_chef_client_convergence(&mut self) -> Result<usize, String> {
         let count = self.recipe_resources.len();
-        self.logs.push(format!("Chef Client: Converged {} resources with node attributes", count));
+        self.logs.push(format!(
+            "Chef Client: Converged {} resources with node attributes",
+            count
+        ));
         Ok(count)
     }
 }
@@ -917,11 +1084,22 @@ impl CloudInitMultiStageEngine {
     pub fn execute_stage(&mut self, stage: CloudInitStage) -> Result<bool, String> {
         self.current_stage = Some(stage);
         match stage {
-            CloudInitStage::Local => self.logs.push("cloud-init [local]: Identified NoCloud metadata source".to_string()),
-            CloudInitStage::Network => self.logs.push(format!("cloud-init [network]: Configured hostname '{}'", self.cloud_config.hostname)),
-            CloudInitStage::Config => self.logs.push(format!("cloud-init [config]: Provisioned {} SSH keys & {} users",
-                self.cloud_config.ssh_authorized_keys.len(), self.cloud_config.users.len())),
-            CloudInitStage::Final => self.logs.push(format!("cloud-init [final]: Executed {} user-data runcmd scripts", self.cloud_config.run_commands.len())),
+            CloudInitStage::Local => self
+                .logs
+                .push("cloud-init [local]: Identified NoCloud metadata source".to_string()),
+            CloudInitStage::Network => self.logs.push(format!(
+                "cloud-init [network]: Configured hostname '{}'",
+                self.cloud_config.hostname
+            )),
+            CloudInitStage::Config => self.logs.push(format!(
+                "cloud-init [config]: Provisioned {} SSH keys & {} users",
+                self.cloud_config.ssh_authorized_keys.len(),
+                self.cloud_config.users.len()
+            )),
+            CloudInitStage::Final => self.logs.push(format!(
+                "cloud-init [final]: Executed {} user-data runcmd scripts",
+                self.cloud_config.run_commands.len()
+            )),
         }
         Ok(true)
     }
@@ -985,8 +1163,11 @@ impl CoreOsIgnitionInitramfsEngine {
             return Err("Ignition: Provisioning run-once constraint violated".to_string());
         }
         self.executed_once = true;
-        let summary = format!("Ignition: Provisioned {} files and {} systemd units in early initramfs",
-            self.files.len(), self.systemd_units.len());
+        let summary = format!(
+            "Ignition: Provisioned {} files and {} systemd units in early initramfs",
+            self.files.len(),
+            self.systemd_units.len()
+        );
         self.logs.push(summary.clone());
         Ok(summary)
     }
@@ -1034,11 +1215,18 @@ impl SovereignInstallerAndSystemToolsMasterSuite {
     }
 
     /// Master system deployment pipeline execution
-    pub fn execute_master_installation_pipeline(&mut self, target_disk: &str, hostname: &str) -> Result<String, String> {
+    pub fn execute_master_installation_pipeline(
+        &mut self,
+        target_disk: &str,
+        hostname: &str,
+    ) -> Result<String, String> {
         // 1. Storage & Installer prep
-        self.anaconda_engine.resolve_blivet_storage_graph(target_disk);
-        self.calamares_engine.set_global_storage("target_disk", target_disk);
-        self.calamares_engine.set_global_storage("hostname", hostname);
+        self.anaconda_engine
+            .resolve_blivet_storage_graph(target_disk);
+        self.calamares_engine
+            .set_global_storage("target_disk", target_disk);
+        self.calamares_engine
+            .set_global_storage("hostname", hostname);
 
         // 2. Early Boot Initramfs generation
         self.dracut_engine.generate_initramfs_image().ok();
@@ -1051,10 +1239,15 @@ impl SovereignInstallerAndSystemToolsMasterSuite {
         self.chef_engine.run_chef_client_convergence().ok();
 
         // 4. Cloud First-Boot Provisioning
-        self.cloud_init_engine.execute_stage(CloudInitStage::Local).ok();
+        self.cloud_init_engine
+            .execute_stage(CloudInitStage::Local)
+            .ok();
         self.ignition_engine.execute_initramfs_provisioning().ok();
 
-        Ok(format!("Sovereign Installer Master Pipeline completed successfully for {} on {}", hostname, target_disk))
+        Ok(format!(
+            "Sovereign Installer Master Pipeline completed successfully for {} on {}",
+            hostname, target_disk
+        ))
     }
 }
 
@@ -1114,7 +1307,8 @@ mod tests {
     #[test]
     fn test_debian_installer_debconf_and_anna() {
         let mut di = DebianInstallerDebconfEngine::new();
-        let preseed = "d-i debian-installer/locale string en_US\nd-i netcfg/choose_interface select eth0\n";
+        let preseed =
+            "d-i debian-installer/locale string en_US\nd-i netcfg/choose_interface select eth0\n";
         assert_eq!(di.load_preseed_file(preseed), 2);
 
         let udeb_count = di.resolve_anna_udeb_components();
@@ -1168,7 +1362,11 @@ mod tests {
     fn test_ansible_puppet_chef_automation() {
         let mut ansible = AnsibleAgentlessPlaybookEngine::new("site.yml");
         ansible.gather_facts("node1");
-        ansible.add_task("Install nginx", "apt", &[("name", "nginx"), ("state", "present")]);
+        ansible.add_task(
+            "Install nginx",
+            "apt",
+            &[("name", "nginx"), ("state", "present")],
+        );
         let (changed, unchanged) = ansible.execute_playbook().unwrap();
         assert_eq!(changed + unchanged, 1);
 
@@ -1204,7 +1402,9 @@ mod tests {
     #[test]
     fn test_sovereign_installer_master_suite() {
         let mut master = SovereignInstallerAndSystemToolsMasterSuite::new();
-        let status = master.execute_master_installation_pipeline("/dev/nvme0n1", "sigmaos-workstation").unwrap();
+        let status = master
+            .execute_master_installation_pipeline("/dev/nvme0n1", "sigmaos-workstation")
+            .unwrap();
         assert!(status.contains("completed successfully"));
     }
 }

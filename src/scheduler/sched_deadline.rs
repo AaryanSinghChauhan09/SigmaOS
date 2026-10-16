@@ -48,7 +48,10 @@ impl DeadlineScheduler {
 
     /// Perform CBS schedulability admission control test
     pub fn admit_task(&mut self, mut task: DeadlineTask) -> Result<(), &'static str> {
-        if task.runtime_ns > task.deadline_ns || task.deadline_ns > task.period_ns || task.period_ns == 0 {
+        if task.runtime_ns > task.deadline_ns
+            || task.deadline_ns > task.period_ns
+            || task.period_ns == 0
+        {
             return Err("Invalid deadline parameters: runtime <= deadline <= period required");
         }
 
@@ -124,26 +127,30 @@ mod tests {
         let mut sched = DeadlineScheduler::new(95);
 
         // Task A: 10ms runtime every 30ms (33% bw)
-        sched.admit_task(DeadlineTask {
-            pid: 10,
-            runtime_ns: 10_000_000,
-            deadline_ns: 30_000_000,
-            period_ns: 30_000_000,
-            remaining_budget_ns: 0,
-            current_absolute_deadline_ns: 0,
-            is_throttled: false,
-        }).expect("Admit Task A");
+        sched
+            .admit_task(DeadlineTask {
+                pid: 10,
+                runtime_ns: 10_000_000,
+                deadline_ns: 30_000_000,
+                period_ns: 30_000_000,
+                remaining_budget_ns: 0,
+                current_absolute_deadline_ns: 0,
+                is_throttled: false,
+            })
+            .expect("Admit Task A");
 
         // Task B: 5ms runtime every 20ms (25% bw)
-        sched.admit_task(DeadlineTask {
-            pid: 20,
-            runtime_ns: 5_000_000,
-            deadline_ns: 20_000_000,
-            period_ns: 20_000_000,
-            remaining_budget_ns: 0,
-            current_absolute_deadline_ns: 0,
-            is_throttled: false,
-        }).expect("Admit Task B");
+        sched
+            .admit_task(DeadlineTask {
+                pid: 20,
+                runtime_ns: 5_000_000,
+                deadline_ns: 20_000_000,
+                period_ns: 20_000_000,
+                remaining_budget_ns: 0,
+                current_absolute_deadline_ns: 0,
+                is_throttled: false,
+            })
+            .expect("Admit Task B");
 
         // Earliest deadline should pick Task B (deadline +20ms vs +30ms)
         assert_eq!(sched.pick_next_task(), Some(20));

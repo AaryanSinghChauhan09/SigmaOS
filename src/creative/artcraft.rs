@@ -60,12 +60,12 @@ impl ArtSuite {
             active: AtomicBool::new(false),
         }
     }
-    
+
     /// Initialize art suite
     pub fn init(&mut self) {
         self.active.store(true, Ordering::Relaxed);
     }
-    
+
     /// Create workspace
     pub fn create_workspace(&mut self, name: String) -> u32 {
         let id = self.next_workspace_id.fetch_add(1, Ordering::Relaxed);
@@ -77,10 +77,18 @@ impl ArtSuite {
         self.workspaces.insert(id, workspace);
         id
     }
-    
+
     /// Create project
-    pub fn create_project(&mut self, workspace_id: u32, name: String, project_type: ProjectType) -> Result<u32, &'static str> {
-        let workspace = self.workspaces.get_mut(&workspace_id).ok_or("Workspace not found")?;
+    pub fn create_project(
+        &mut self,
+        workspace_id: u32,
+        name: String,
+        project_type: ProjectType,
+    ) -> Result<u32, &'static str> {
+        let workspace = self
+            .workspaces
+            .get_mut(&workspace_id)
+            .ok_or("Workspace not found")?;
         let id = self.next_project_id.fetch_add(1, Ordering::Relaxed);
         let project = Project {
             id,
@@ -92,18 +100,18 @@ impl ArtSuite {
         workspace.projects.push(project);
         Ok(id)
     }
-    
+
     /// Get workspace
     pub fn get_workspace(&self, id: u32) -> Option<&Workspace> {
         self.workspaces.get(&id)
     }
-    
+
     /// Get project
     pub fn get_project(&self, workspace_id: u32, project_id: u32) -> Option<&Project> {
         let workspace = self.workspaces.get(&workspace_id)?;
         workspace.projects.iter().find(|p| p.id == project_id)
     }
-    
+
     /// Is active
     pub fn is_active(&self) -> bool {
         self.active.load(Ordering::Relaxed)
@@ -128,22 +136,20 @@ pub fn init_artcraft() {
 
 /// Get global artcraft
 pub fn get_artcraft() -> Option<&'static mut ArtSuite> {
-    unsafe {
-        ARTCRAFT.as_mut()
-    }
+    unsafe { ARTCRAFT.as_mut() }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_artcraft_init() {
         let mut suite = ArtSuite::new();
         suite.init();
         assert!(suite.is_active());
     }
-    
+
     #[test]
     fn test_create_workspace() {
         let mut suite = ArtSuite::new();
@@ -151,13 +157,26 @@ mod tests {
         let id = suite.create_workspace("Workspace1".to_string());
         assert!(suite.get_workspace(id).is_some());
     }
-    
+
     #[test]
     fn test_create_project() {
         let mut suite = ArtSuite::new();
         suite.init();
         let workspace_id = suite.create_workspace("Workspace1".to_string());
-        suite.create_project(workspace_id, "Photo Project".to_string(), ProjectType::Photo).unwrap();
-        assert_eq!(suite.get_workspace(workspace_id).unwrap().projects.len(), 1);
+        suite
+            .create_project(
+                workspace_id,
+                "Photo Project".to_string(),
+                ProjectType::Photo,
+            )
+            .unwrap();
+        suite
+            .create_project(
+                workspace_id,
+                "Deck Presentation".to_string(),
+                ProjectType::Deck,
+            )
+            .unwrap();
+        assert_eq!(suite.get_workspace(workspace_id).unwrap().projects.len(), 2);
     }
 }

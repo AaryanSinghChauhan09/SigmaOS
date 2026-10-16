@@ -321,16 +321,12 @@ pub fn init_sigmasnapshot() {
 
 /// Get the global SigmaSnapshot instance
 pub fn get_sigmasnapshot() -> Option<&'static SigmaSnapshot> {
-    unsafe {
-        SIGMASNAPSHOT_INSTANCE.as_ref()
-    }
+    unsafe { SIGMASNAPSHOT_INSTANCE.as_ref() }
 }
 
 /// Get mutable global SigmaSnapshot instance
 pub fn get_sigmasnapshot_mut() -> Option<&'static mut SigmaSnapshot> {
-    unsafe {
-        SIGMASNAPSHOT_INSTANCE.as_mut()
-    }
+    unsafe { SIGMASNAPSHOT_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add a snapshot

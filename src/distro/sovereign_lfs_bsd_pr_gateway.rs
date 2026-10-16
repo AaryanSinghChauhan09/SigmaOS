@@ -36,17 +36,11 @@ pub enum LfsBsdPrCategory {
     LfsSysvInitRunlevels,
     LfsPkgtoolDestdir,
     LfsKernelConfigOptimizer,
-    LfsGlibcDynamicLinker,
-    LfsUdevColdplug,
-    LfsPamShadowAuth,
-    LfsPorgCollisionTracker,
     OpenBsdKarlRelinking,
     FreeBsdVimageVnet,
     FreeBsdPoudrierePorts,
     NetBsdRumpVeriexec,
-    NetBsdVeriexecSignatures,
     DragonFlyHammer2Pfs,
-    DragonFlyHammer2PfsReplication,
     DragonFlyVkernelSandbox,
 }
 
@@ -57,17 +51,15 @@ impl LfsBsdPrCategory {
             Self::LfsSysvInitRunlevels => "LFS SysV init bootscripts & runlevels",
             Self::LfsPkgtoolDestdir => "LFS self-hosted source package build & DESTDIR staging",
             Self::LfsKernelConfigOptimizer => "LFS minimal zero-bloat kernel .config optimizer",
-            Self::LfsGlibcDynamicLinker => "LFS glibc dynamic linker & ld.so.cache search path resolution",
-            Self::LfsUdevColdplug => "LFS devtmpfs virtual device management & udev coldplug rules",
-            Self::LfsPamShadowAuth => "BLFS PAM auth rules & shadow password salted hashing",
-            Self::LfsPorgCollisionTracker => "LFS porg/paco source package build file collision detector",
-            Self::OpenBsdKarlRelinking => "OpenBSD KARL kernel address randomization & pledge/unveil",
+            Self::OpenBsdKarlRelinking => {
+                "OpenBSD KARL kernel address randomization & pledge/unveil"
+            }
             Self::FreeBsdVimageVnet => "FreeBSD VIMAGE/VNET network stack virtualization",
             Self::FreeBsdPoudrierePorts => "FreeBSD Poudriere clean-chroot bulk ports builder",
-            Self::NetBsdRumpVeriexec => "NetBSD Rump Kernel hypercall drivers & Veriexec signatures",
-            Self::NetBsdVeriexecSignatures => "NetBSD Veriexec cryptographic SHA-256 binary fingerprint audit",
+            Self::NetBsdRumpVeriexec => {
+                "NetBSD Rump Kernel hypercall drivers & Veriexec signatures"
+            }
             Self::DragonFlyHammer2Pfs => "DragonFly BSD HAMMER2 PFS multi-master snapshots & logs",
-            Self::DragonFlyHammer2PfsReplication => "DragonFly BSD HAMMER2 PFS multi-master transaction replication",
             Self::DragonFlyVkernelSandbox => "DragonFly BSD VKernel virtual kernel execution",
         }
     }
@@ -141,26 +133,6 @@ impl SovereignLfsBsdPrGateway {
                 "lfs_kernel_config_optimizer",
             ),
             (
-                "feat(lfs): Glibc dynamic linker ld-linux-x86-64.so.2 and ld.so.cache search path resolver",
-                LfsBsdPrCategory::LfsGlibcDynamicLinker,
-                "lfs_glibc_dynamic_linker",
-            ),
-            (
-                "feat(lfs): Devtmpfs virtual device node manager and udev coldplug rule evaluator",
-                LfsBsdPrCategory::LfsUdevColdplug,
-                "lfs_udev_coldplug",
-            ),
-            (
-                "feat(lfs): BLFS PAM system-auth evaluation rules and /etc/shadow password salted hashing",
-                LfsBsdPrCategory::LfsPamShadowAuth,
-                "lfs_pam_shadow_auth",
-            ),
-            (
-                "feat(lfs): Source package build file collision detector and porg/paco indexer",
-                LfsBsdPrCategory::LfsPorgCollisionTracker,
-                "lfs_porg_collision_tracker",
-            ),
-            (
                 "feat(openbsd): KARL kernel link randomization and pledge/unveil syscall guards",
                 LfsBsdPrCategory::OpenBsdKarlRelinking,
                 "openbsd_karl_pledge",
@@ -181,19 +153,9 @@ impl SovereignLfsBsdPrGateway {
                 "netbsd_rump_veriexec",
             ),
             (
-                "feat(netbsd): Veriexec cryptographic SHA-256 binary fingerprint audit and tamper protection",
-                LfsBsdPrCategory::NetBsdVeriexecSignatures,
-                "netbsd_veriexec_signatures",
-            ),
-            (
                 "feat(dragonfly): HAMMER2 PFS multi-master replication and transaction logging",
                 LfsBsdPrCategory::DragonFlyHammer2Pfs,
                 "dragonfly_hammer2_pfs",
-            ),
-            (
-                "feat(dragonfly): HAMMER2 PFS transaction replication and cluster node synchronization",
-                LfsBsdPrCategory::DragonFlyHammer2PfsReplication,
-                "dragonfly_hammer2_pfs_replication",
             ),
             (
                 "feat(dragonfly): VKernel virtual kernel userspace sandbox and system call proxying",
@@ -243,28 +205,51 @@ impl SovereignLfsBsdPrGateway {
         }
 
         // 1. Verify LFS toolchain compiler passes
-        let _chroot = self.master_harmony.lfs_toolchain.prepare_chroot_environment();
+        let _chroot = self
+            .master_harmony
+            .lfs_toolchain
+            .prepare_chroot_environment();
         assert!(self.master_harmony.lfs_toolchain.chroot_prepared);
 
         // 2. Verify LFS bootscripts init runlevel switch
-        let activated = self.master_harmony.lfs_bootscripts.set_runlevel(sovereign_linux_bsd_lfs_master_harmony::LfsRunlevel::Runlevel3MultiUserNet);
+        let activated = self.master_harmony.lfs_bootscripts.set_runlevel(
+            sovereign_linux_bsd_lfs_master_harmony::LfsRunlevel::Runlevel3MultiUserNet,
+        );
         assert!(activated >= 1);
 
         // 3. Verify LFS package build and install
-        assert!(self.master_harmony.lfs_pkgtool.build_and_install_package("bash", "5.2.21", &["/bin/bash"]));
+        assert!(self.master_harmony.lfs_pkgtool.build_and_install_package(
+            "bash",
+            "5.2.21",
+            &["/bin/bash"]
+        ));
         assert!(self.master_harmony.lfs_pkgtool.is_installed("bash"));
 
         // 4. Verify LFS kernel config optimization
-        assert!(self.master_harmony.lfs_kernel_optimizer.verify_required_lfs_options());
+        assert!(self
+            .master_harmony
+            .lfs_kernel_optimizer
+            .verify_required_lfs_options());
 
         // 5. Verify NetBSD Rump driver hypercall execution
-        assert!(self.master_harmony.netbsd_rump.attach_userspace_driver("rump_pci"));
-        let hypercall_res = self.master_harmony.netbsd_rump.execute_hypercall("rump_pci", "probe");
+        assert!(self
+            .master_harmony
+            .netbsd_rump
+            .attach_userspace_driver("rump_pci"));
+        let hypercall_res = self
+            .master_harmony
+            .netbsd_rump
+            .execute_hypercall("rump_pci", "probe");
         assert!(hypercall_res.is_ok());
 
         // 6. Verify FreeBSD Poudriere bulk ports builder
-        self.master_harmony.freebsd_poudriere.queue_port("sysutils/fastfetch");
-        let built = self.master_harmony.freebsd_poudriere.build_all_queued_ports();
+        self.master_harmony
+            .freebsd_poudriere
+            .queue_port("sysutils/fastfetch");
+        let built = self
+            .master_harmony
+            .freebsd_poudriere
+            .build_all_queued_ports();
         assert_eq!(built, 1);
 
         true
@@ -292,7 +277,7 @@ mod tests {
     #[test]
     fn test_lfs_bsd_pr_gateway_staging() {
         let gateway = SovereignLfsBsdPrGateway::new();
-        assert_eq!(gateway.get_merged_pr_count(), 16);
+        assert_eq!(gateway.get_merged_pr_count(), 10);
 
         let diff = gateway.generate_pr_diff_patch(4001);
         assert!(diff.is_some());

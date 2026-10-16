@@ -157,7 +157,7 @@ impl SigmaDNS {
         if self.servers.contains_key(&server.server_id) {
             return Err(format!("Server '{}' already exists", server.server_id));
         }
-        
+
         self.servers.insert(server.server_id.clone(), server);
         self.server_counter += 1;
         Ok(())
@@ -176,7 +176,7 @@ impl SigmaDNS {
         if !self.running {
             return Err("SigmaDNS not running".to_string());
         }
-        
+
         match self.servers.get_mut(server_id) {
             Some(server) => {
                 server.state = ResolverState::Active;
@@ -191,7 +191,7 @@ impl SigmaDNS {
         if !self.running {
             return Err("SigmaDNS not running".to_string());
         }
-        
+
         match self.servers.get_mut(server_id) {
             Some(server) => {
                 server.state = ResolverState::Inactive;
@@ -206,8 +206,11 @@ impl SigmaDNS {
         if !self.running {
             return Err("SigmaDNS not running".to_string());
         }
-        
-        self.cache.entry(entry.domain.clone()).or_insert_with(Vec::new).push(entry);
+
+        self.cache
+            .entry(entry.domain.clone())
+            .or_insert_with(Vec::new)
+            .push(entry);
         Ok(())
     }
 
@@ -228,7 +231,8 @@ impl SigmaDNS {
 
     /// List active servers
     pub fn list_active_servers(&self) -> Vec<&DnsServer> {
-        self.servers.values()
+        self.servers
+            .values()
             .filter(|s| s.state == ResolverState::Active)
             .collect()
     }
@@ -247,8 +251,14 @@ impl SigmaDNS {
     pub fn dns_stats(&self) -> BTreeMap<String, String> {
         let mut stats = BTreeMap::new();
         stats.insert("total_servers".to_string(), self.server_count().to_string());
-        stats.insert("active_servers".to_string(), self.list_active_servers().len().to_string());
-        stats.insert("cache_entries".to_string(), self.cache_entry_count().to_string());
+        stats.insert(
+            "active_servers".to_string(),
+            self.list_active_servers().len().to_string(),
+        );
+        stats.insert(
+            "cache_entries".to_string(),
+            self.cache_entry_count().to_string(),
+        );
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
@@ -302,12 +312,8 @@ mod tests {
 
     #[test]
     fn test_dns_server() {
-        let server = DnsServer::new(
-            "server1".to_string(),
-            "8.8.8.8".to_string(),
-            53
-        )
-        .with_state(ResolverState::Active);
+        let server = DnsServer::new("server1".to_string(), "8.8.8.8".to_string(), 53)
+            .with_state(ResolverState::Active);
 
         assert_eq!(server.server_id, "server1");
         assert_eq!(server.state, ResolverState::Active);
@@ -319,7 +325,7 @@ mod tests {
             "example.com".to_string(),
             DnsRecordType::A,
             "93.184.216.34".to_string(),
-            300
+            300,
         );
 
         assert_eq!(entry.domain, "example.com");
@@ -339,13 +345,9 @@ mod tests {
     #[test]
     fn test_sigmadns_add_server() {
         let mut dns = SigmaDNS::new();
-        
-        let server = DnsServer::new(
-            "server1".to_string(),
-            "8.8.8.8".to_string(),
-            53
-        );
-        
+
+        let server = DnsServer::new("server1".to_string(), "8.8.8.8".to_string(), 53);
+
         assert!(dns.add_server(server).is_ok());
         assert_eq!(dns.server_count(), 1);
     }
@@ -354,16 +356,12 @@ mod tests {
     fn test_sigmadns_activate_server() {
         let mut dns = SigmaDNS::new();
         dns.start();
-        
-        let server = DnsServer::new(
-            "server1".to_string(),
-            "8.8.8.8".to_string(),
-            53
-        );
-        
+
+        let server = DnsServer::new("server1".to_string(), "8.8.8.8".to_string(), 53);
+
         dns.add_server(server).unwrap();
         assert!(dns.activate_server("server1").is_ok());
-        
+
         let server = dns.get_server("server1").unwrap();
         assert_eq!(server.state, ResolverState::Active);
     }
@@ -372,14 +370,14 @@ mod tests {
     fn test_sigmadns_add_cache_entry() {
         let mut dns = SigmaDNS::new();
         dns.start();
-        
+
         let entry = DnsCacheEntry::new(
             "example.com".to_string(),
             DnsRecordType::A,
             "93.184.216.34".to_string(),
-            300
+            300,
         );
-        
+
         assert!(dns.add_cache_entry(entry).is_ok());
         assert_eq!(dns.cache_entry_count(), 1);
     }
@@ -387,16 +385,12 @@ mod tests {
     #[test]
     fn test_sigmadns_list_active_servers() {
         let mut dns = SigmaDNS::new();
-        
-        let server = DnsServer::new(
-            "server1".to_string(),
-            "8.8.8.8".to_string(),
-            53
-        )
-        .with_state(ResolverState::Active);
-        
+
+        let server = DnsServer::new("server1".to_string(), "8.8.8.8".to_string(), 53)
+            .with_state(ResolverState::Active);
+
         dns.add_server(server).unwrap();
-        
+
         let active = dns.list_active_servers();
         assert_eq!(active.len(), 1);
     }
@@ -404,16 +398,12 @@ mod tests {
     #[test]
     fn test_sigmadns_stats() {
         let mut dns = SigmaDNS::new();
-        
-        let server = DnsServer::new(
-            "server1".to_string(),
-            "8.8.8.8".to_string(),
-            53
-        )
-        .with_state(ResolverState::Active);
-        
+
+        let server = DnsServer::new("server1".to_string(), "8.8.8.8".to_string(), 53)
+            .with_state(ResolverState::Active);
+
         dns.add_server(server).unwrap();
-        
+
         let stats = dns.dns_stats();
         assert_eq!(stats.get("total_servers"), Some(&"1".to_string()));
         assert_eq!(stats.get("active_servers"), Some(&"1".to_string()));
@@ -422,18 +412,14 @@ mod tests {
     #[test]
     fn test_activate_dns_server_convenience() {
         init_sigmadns();
-        
+
         let mut dns = get_sigmadns().unwrap();
         dns.start();
-        
-        let server = DnsServer::new(
-            "server1".to_string(),
-            "8.8.8.8".to_string(),
-            53
-        );
-        
+
+        let server = DnsServer::new("server1".to_string(), "8.8.8.8".to_string(), 53);
+
         dns.add_server(server).unwrap();
-        
+
         let result = activate_dns_server("server1");
         assert!(result.is_ok());
     }

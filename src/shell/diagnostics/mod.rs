@@ -42,8 +42,18 @@ pub struct ShellDiagnostic {
 pub struct ShellDiagnosticsEngine;
 
 impl ShellDiagnosticsEngine {
-    pub fn format_parse_error(line: usize, col: usize, reason: &str, token: Option<&str>) -> String {
-        let mut msg = alloc_format!("sigma-sh: parse error at line {}, col {}: {}", line, col, reason);
+    pub fn format_parse_error(
+        line: usize,
+        col: usize,
+        reason: &str,
+        token: Option<&str>,
+    ) -> String {
+        let mut msg = alloc_format!(
+            "sigma-sh: parse error at line {}, col {}: {}",
+            line,
+            col,
+            reason
+        );
         if let Some(tok) = token {
             msg.push_str(&alloc_format!(" Near token '{}'", tok));
         }
@@ -63,7 +73,11 @@ impl ShellDiagnosticsEngine {
     }
 
     pub fn format_unclosed_block_error(block_type: &str, line: usize) -> String {
-        alloc_format!("sigma-sh: unclosed construct '{}' originating at line {}", block_type, line)
+        alloc_format!(
+            "sigma-sh: unclosed construct '{}' originating at line {}",
+            block_type,
+            line
+        )
     }
 
     fn find_closest_match<'a>(cmd: &'a str, candidates: &[&'a str]) -> Option<&'a str> {
@@ -114,7 +128,10 @@ mod tests {
     #[test]
     fn test_format_parse_error() {
         let err = ShellDiagnosticsEngine::format_parse_error(1, 10, "unexpected EOF", Some("\""));
-        assert_eq!(err, "sigma-sh: parse error at line 1, col 10: unexpected EOF Near token '\"'");
+        assert_eq!(
+            err,
+            "sigma-sh: parse error at line 1, col 10: unexpected EOF Near token '\"'"
+        );
     }
 
     #[test]
@@ -126,7 +143,8 @@ mod tests {
 
     #[test]
     fn test_redirection_error() {
-        let err = ShellDiagnosticsEngine::format_redirection_error("/root/test.txt", "Permission denied");
+        let err =
+            ShellDiagnosticsEngine::format_redirection_error("/root/test.txt", "Permission denied");
         assert_eq!(err, "sigma-sh: /root/test.txt: Permission denied");
     }
 }

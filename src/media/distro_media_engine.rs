@@ -442,7 +442,11 @@ impl AlsaPcmHwConfigEngine {
     pub fn new(card: &str) -> Self {
         Self {
             soundcard_id: card.to_string(),
-            ucm_verbs: vec!["HiFi".to_string(), "VoiceCall".to_string(), "HDMI".to_string()],
+            ucm_verbs: vec![
+                "HiFi".to_string(),
+                "VoiceCall".to_string(),
+                "HDMI".to_string(),
+            ],
             current_verb: "HiFi".to_string(),
             software_mixing_dmix_enabled: true,
             period_bytes: 2048,
@@ -455,7 +459,10 @@ impl AlsaPcmHwConfigEngine {
             self.current_verb = verb.to_string();
             Ok(())
         } else {
-            Err(format!("UCM verb '{}' not supported on {}", verb, self.soundcard_id))
+            Err(format!(
+                "UCM verb '{}' not supported on {}",
+                verb, self.soundcard_id
+            ))
         }
     }
 
@@ -468,43 +475,6 @@ impl AlsaPcmHwConfigEngine {
 impl Default for AlsaPcmHwConfigEngine {
     fn default() -> Self {
         Self::new("hw:0")
-    }
-}
-
-/// ALSA Userland PCM Hardware Plugin (`ioplug` / `extplug`) Engine
-#[derive(Debug, Clone)]
-pub struct AlsaHardwarePluginIoplugEngine {
-    pub plugin_name: String,
-    pub pcm_pointer_frames: u64,
-    pub pcm_delay_frames: i64,
-    pub softvol_db_scale: f32,
-    pub is_extplug_active: bool,
-}
-
-impl AlsaHardwarePluginIoplugEngine {
-    pub fn new(plugin: &str) -> Self {
-        Self {
-            plugin_name: plugin.to_string(),
-            pcm_pointer_frames: 0,
-            pcm_delay_frames: 64,
-            softvol_db_scale: 0.0,
-            is_extplug_active: true,
-        }
-    }
-
-    pub fn update_pointer(&mut self, frames: u64) -> u64 {
-        self.pcm_pointer_frames = frames;
-        self.pcm_pointer_frames
-    }
-
-    pub fn set_softvol_db(&mut self, db: f32) {
-        self.softvol_db_scale = db.clamp(-51.0, 0.0);
-    }
-}
-
-impl Default for AlsaHardwarePluginIoplugEngine {
-    fn default() -> Self {
-        Self::new("softvol_ioplug")
     }
 }
 
@@ -630,48 +600,6 @@ impl Default for OssMixerPeakMeterEngine {
     }
 }
 
-/// OSS v4 `/dev/mixer` Extension Controls & Channel Level Monitoring Engine
-#[derive(Debug, Clone)]
-pub struct Oss4MixerDeviceControlEngine {
-    pub mixer_dev_path: String,
-    pub extension_controls: BTreeMap<String, i32>,
-    pub channel_peak_meters: Vec<f32>,
-}
-
-impl Oss4MixerDeviceControlEngine {
-    pub fn new(path: &str) -> Self {
-        let mut ctrls = BTreeMap::new();
-        ctrls.insert("pcm.bass".to_string(), 50);
-        ctrls.insert("pcm.treble".to_string(), 50);
-        ctrls.insert("pcm.synth".to_string(), 75);
-
-        Self {
-            mixer_dev_path: path.to_string(),
-            extension_controls: ctrls,
-            channel_peak_meters: vec![-10.0, -10.0],
-        }
-    }
-
-    pub fn set_extension_control(&mut self, name: &str, val: i32) -> Result<(), String> {
-        let ctrl = self
-            .extension_controls
-            .get_mut(name)
-            .ok_or_else(|| format!("OSS4 Mixer extension control '{}' not found", name))?;
-        *ctrl = val.clamp(0, 100);
-        Ok(())
-    }
-
-    pub fn update_peaks(&mut self, peaks: Vec<f32>) {
-        self.channel_peak_meters = peaks;
-    }
-}
-
-impl Default for Oss4MixerDeviceControlEngine {
-    fn default() -> Self {
-        Self::new("/dev/mixer0")
-    }
-}
-
 // =========================================================================
 // 7. PULSEAUDIO ENGINE
 // =========================================================================
@@ -737,15 +665,21 @@ impl Default for PulseAudioEngine {
 #[derive(Debug, Clone)]
 pub struct PulseAudioModuleRouterEngine {
     pub active_modules: BTreeMap<String, String>, // module_name -> args
-    pub stream_cork_map: BTreeMap<u32, bool>, // stream_id -> is_corked
+    pub stream_cork_map: BTreeMap<u32, bool>,     // stream_id -> is_corked
     pub ducking_level_percent: u32,
 }
 
 impl PulseAudioModuleRouterEngine {
     pub fn new() -> Self {
         let mut modules = BTreeMap::new();
-        modules.insert("module-role-cork".to_string(), "cork_roles=phone,nav".to_string());
-        modules.insert("module-combine-sink".to_string(), "sink_name=combined_all".to_string());
+        modules.insert(
+            "module-role-cork".to_string(),
+            "cork_roles=phone,nav".to_string(),
+        );
+        modules.insert(
+            "module-combine-sink".to_string(),
+            "sink_name=combined_all".to_string(),
+        );
 
         Self {
             active_modules: modules,
@@ -755,7 +689,8 @@ impl PulseAudioModuleRouterEngine {
     }
 
     pub fn load_module_with_args(&mut self, name: &str, args: &str) {
-        self.active_modules.insert(name.to_string(), args.to_string());
+        self.active_modules
+            .insert(name.to_string(), args.to_string());
     }
 
     pub fn set_stream_cork(&mut self, stream_id: u32, corked: bool) {
@@ -774,41 +709,6 @@ impl PulseAudioModuleRouterEngine {
 impl Default for PulseAudioModuleRouterEngine {
     fn default() -> Self {
         Self::new()
-    }
-}
-
-/// PulseAudio Simple Protocol & Network Audio TCP / RAOP Streaming Engine
-#[derive(Debug, Clone)]
-pub struct PulseAudioNetworkAudioEngine {
-    pub tcp_server_port: u16,
-    pub is_zeroconf_published: bool,
-    pub connected_clients_count: u32,
-    pub network_jitter_ms: u32,
-}
-
-impl PulseAudioNetworkAudioEngine {
-    pub fn new(port: u16) -> Self {
-        Self {
-            tcp_server_port: port,
-            is_zeroconf_published: true,
-            connected_clients_count: 0,
-            network_jitter_ms: 5,
-        }
-    }
-
-    pub fn register_client(&mut self) -> u32 {
-        self.connected_clients_count += 1;
-        self.connected_clients_count
-    }
-
-    pub fn update_jitter(&mut self, jitter_ms: u32) {
-        self.network_jitter_ms = jitter_ms;
-    }
-}
-
-impl Default for PulseAudioNetworkAudioEngine {
-    fn default() -> Self {
-        Self::new(4713)
     }
 }
 
@@ -898,51 +798,12 @@ impl PipeWireSpaBufferEngine {
     }
 
     pub fn update_pod_property(&mut self, key: &str, value: &str) {
-        self.spa_pod_properties.insert(key.to_string(), value.to_string());
+        self.spa_pod_properties
+            .insert(key.to_string(), value.to_string());
     }
 }
 
 impl Default for PipeWireSpaBufferEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// PipeWire SPA Filter-Chain Equalizer & Convolver Node Graph Engine
-#[derive(Debug, Clone)]
-pub struct PipeWireFilterChainEngine {
-    pub filter_nodes: Vec<String>,
-    pub impulse_response_file: String,
-    pub equalizer_bands_gain_db: Vec<f32>,
-}
-
-impl PipeWireFilterChainEngine {
-    pub fn new() -> Self {
-        Self {
-            filter_nodes: vec![
-                "spa_filter_convolver".to_string(),
-                "spa_filter_eq_15band".to_string(),
-            ],
-            impulse_response_file: "/usr/share/pipewire/convolver/room_ir.wav".to_string(),
-            equalizer_bands_gain_db: vec![0.0; 15],
-        }
-    }
-
-    pub fn set_band_gain(&mut self, band_idx: usize, gain_db: f32) -> Result<(), String> {
-        if band_idx < self.equalizer_bands_gain_db.len() {
-            self.equalizer_bands_gain_db[band_idx] = gain_db.clamp(-24.0, 12.0);
-            Ok(())
-        } else {
-            Err(format!("Equalizer band index {} out of range", band_idx))
-        }
-    }
-
-    pub fn set_impulse_response(&mut self, ir_file: &str) {
-        self.impulse_response_file = ir_file.to_string();
-    }
-}
-
-impl Default for PipeWireFilterChainEngine {
     fn default() -> Self {
         Self::new()
     }
@@ -1051,39 +912,6 @@ impl Default for JackRealtimeGraphEngine {
     }
 }
 
-/// JACK Session API v2 Graph Save/Restore Engine
-#[derive(Debug, Clone)]
-pub struct JackSessionControlEngine {
-    pub session_dir: String,
-    pub is_session_saved: bool,
-    pub saved_connections: Vec<(String, String)>,
-}
-
-impl JackSessionControlEngine {
-    pub fn new(dir: &str) -> Self {
-        Self {
-            session_dir: dir.to_string(),
-            is_session_saved: false,
-            saved_connections: Vec::new(),
-        }
-    }
-
-    pub fn save_session(&mut self, connections: Vec<(String, String)>) {
-        self.saved_connections = connections;
-        self.is_session_saved = true;
-    }
-
-    pub fn restore_session(&self) -> &Vec<(String, String)> {
-        &self.saved_connections
-    }
-}
-
-impl Default for JackSessionControlEngine {
-    fn default() -> Self {
-        Self::new("/tmp/jack_sessions")
-    }
-}
-
 // =========================================================================
 // 10. SNDIO BSD AUDIO DAEMON ENGINE
 // =========================================================================
@@ -1171,41 +999,6 @@ impl Default for SndioMidiPcmMultiplexerEngine {
     }
 }
 
-/// Sndio Raw MIDI Time Code (MTC) Clock Generator & Position Sync Engine
-#[derive(Debug, Clone)]
-pub struct SndioRawMTCClockEngine {
-    pub mtc_fps: u8, // e.g. 24, 25, 30
-    pub current_timecode_ms: u64,
-    pub is_clock_running: bool,
-}
-
-impl SndioRawMTCClockEngine {
-    pub fn new(fps: u8) -> Self {
-        Self {
-            mtc_fps: fps,
-            current_timecode_ms: 0,
-            is_clock_running: false,
-        }
-    }
-
-    pub fn start_clock(&mut self) {
-        self.is_clock_running = true;
-    }
-
-    pub fn advance_ticks(&mut self, delta_ms: u64) -> u64 {
-        if self.is_clock_running {
-            self.current_timecode_ms += delta_ms;
-        }
-        self.current_timecode_ms
-    }
-}
-
-impl Default for SndioRawMTCClockEngine {
-    fn default() -> Self {
-        Self::new(30)
-    }
-}
-
 // =========================================================================
 // 11. GSTREAMER MULTIMEDIA FRAMEWORK ENGINE
 // =========================================================================
@@ -1257,7 +1050,8 @@ impl GStreamerDynamicPipelineEngine {
                 "mp4mux".to_string(),
                 "filesink".to_string(),
             ],
-            active_caps: "video/x-raw,format=NV12,width=3840,height=2160,framerate=60/1".to_string(),
+            active_caps: "video/x-raw,format=NV12,width=3840,height=2160,framerate=60/1"
+                .to_string(),
             bus_events_queue: Vec::new(),
         }
     }
@@ -1278,40 +1072,6 @@ impl GStreamerDynamicPipelineEngine {
 impl Default for GStreamerDynamicPipelineEngine {
     fn default() -> Self {
         Self::new()
-    }
-}
-
-/// GStreamer RTSP Server & RTP Packetization Streaming Engine
-#[derive(Debug, Clone)]
-pub struct GStreamerRtpRtspStreamEngine {
-    pub rtsp_mount_point: String,
-    pub server_port: u16,
-    pub active_rtp_payload_type: u8,
-    pub is_rtsp_serving: bool,
-}
-
-impl GStreamerRtpRtspStreamEngine {
-    pub fn new(mount: &str, port: u16) -> Self {
-        Self {
-            rtsp_mount_point: mount.to_string(),
-            server_port: port,
-            active_rtp_payload_type: 96, // Dynamic H.264 payload
-            is_rtsp_serving: false,
-        }
-    }
-
-    pub fn start_server(&mut self) {
-        self.is_rtsp_serving = true;
-    }
-
-    pub fn stop_server(&mut self) {
-        self.is_rtsp_serving = false;
-    }
-}
-
-impl Default for GStreamerRtpRtspStreamEngine {
-    fn default() -> Self {
-        Self::new("/test", 8554)
     }
 }
 
@@ -1378,43 +1138,6 @@ impl FfmpegFiltergraphAccelEngine {
 impl Default for FfmpegFiltergraphAccelEngine {
     fn default() -> Self {
         Self::new()
-    }
-}
-
-/// FFmpeg `AVIOContext` Custom Memory I/O Callback Engine
-#[derive(Debug, Clone)]
-pub struct FfmpegCustomIoBufferEngine {
-    pub io_buffer_size: usize,
-    pub bytes_read_total: u64,
-    pub bytes_written_total: u64,
-    pub current_seek_offset: u64,
-}
-
-impl FfmpegCustomIoBufferEngine {
-    pub fn new(buffer_size: usize) -> Self {
-        Self {
-            io_buffer_size: buffer_size,
-            bytes_read_total: 0,
-            bytes_written_total: 0,
-            current_seek_offset: 0,
-        }
-    }
-
-    pub fn read_packet_callback(&mut self, size: usize) -> usize {
-        let read_bytes = size.min(self.io_buffer_size);
-        self.bytes_read_total += read_bytes as u64;
-        self.current_seek_offset += read_bytes as u64;
-        read_bytes
-    }
-
-    pub fn seek_callback(&mut self, offset: u64) {
-        self.current_seek_offset = offset;
-    }
-}
-
-impl Default for FfmpegCustomIoBufferEngine {
-    fn default() -> Self {
-        Self::new(32768)
     }
 }
 
@@ -1529,38 +1252,6 @@ impl Default for V4l2DmaBufExporterEngine {
     }
 }
 
-/// V4L2 Media Controller `/dev/media*` Topology & Subdevice Pad Routing Engine
-#[derive(Debug, Clone)]
-pub struct V4l2SubdeviceMediaControllerEngine {
-    pub media_dev_path: String,
-    pub subdev_nodes: Vec<String>,
-    pub active_links: Vec<(String, String)>,
-}
-
-impl V4l2SubdeviceMediaControllerEngine {
-    pub fn new(media_dev: &str) -> Self {
-        Self {
-            media_dev_path: media_dev.to_string(),
-            subdev_nodes: vec![
-                "/dev/v4l-subdev0".to_string(),
-                "/dev/v4l-subdev1".to_string(),
-            ],
-            active_links: Vec::new(),
-        }
-    }
-
-    pub fn setup_link(&mut self, source_pad: &str, sink_pad: &str) {
-        self.active_links
-            .push((source_pad.to_string(), sink_pad.to_string()));
-    }
-}
-
-impl Default for V4l2SubdeviceMediaControllerEngine {
-    fn default() -> Self {
-        Self::new("/dev/media0")
-    }
-}
-
 // =========================================================================
 // 14. VLC MEDIA PLAYER ENGINE
 // =========================================================================
@@ -1638,36 +1329,6 @@ impl Default for VlcLibvlcCoreEngine {
     }
 }
 
-/// VLC Dynamic Plugin Module Registry Engine
-#[derive(Debug, Clone)]
-pub struct VlcPluginModuleRegistryEngine {
-    pub loaded_plugins: BTreeMap<String, String>, // plugin_name -> capability
-}
-
-impl VlcPluginModuleRegistryEngine {
-    pub fn new() -> Self {
-        let mut plugins = BTreeMap::new();
-        plugins.insert("alsa_output".to_string(), "audio output".to_string());
-        plugins.insert("v4l2_access".to_string(), "access".to_string());
-        plugins.insert("avcodec_dec".to_string(), "decoder".to_string());
-
-        Self {
-            loaded_plugins: plugins,
-        }
-    }
-
-    pub fn register_plugin(&mut self, name: &str, capability: &str) {
-        self.loaded_plugins
-            .insert(name.to_string(), capability.to_string());
-    }
-}
-
-impl Default for VlcPluginModuleRegistryEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 // =========================================================================
 // 15. MPV PLAYER ENGINE
 // =========================================================================
@@ -1735,41 +1396,6 @@ impl MpvIpcJsonRpcEngine {
 impl Default for MpvIpcJsonRpcEngine {
     fn default() -> Self {
         Self::new("/tmp/mpvsocket")
-    }
-}
-
-/// mpv Property Observer Event Loop Dispatcher Engine
-#[derive(Debug, Clone)]
-pub struct MpvPropertyObserverEngine {
-    pub observed_properties: BTreeMap<u64, String>,
-    pub property_change_events: Vec<(u64, String)>,
-    pub next_reply_id: u64,
-}
-
-impl MpvPropertyObserverEngine {
-    pub fn new() -> Self {
-        Self {
-            observed_properties: BTreeMap::new(),
-            property_change_events: Vec::new(),
-            next_reply_id: 1,
-        }
-    }
-
-    pub fn observe_property(&mut self, prop_name: &str) -> u64 {
-        let id = self.next_reply_id;
-        self.next_reply_id += 1;
-        self.observed_properties.insert(id, prop_name.to_string());
-        id
-    }
-
-    pub fn push_change_event(&mut self, id: u64, new_val: &str) {
-        self.property_change_events.push((id, new_val.to_string()));
-    }
-}
-
-impl Default for MpvPropertyObserverEngine {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -1870,27 +1496,34 @@ impl LinuxBsdAudioVideoGapClosurePrGateway {
         let mut gateway = LinuxBsdAudioVideoPrGatewayEngine::new();
         let prs = vec![
             ("ALSA UCM2 Profile Sequencer & Software Mixing", "ALSA"),
-            ("ALSA Userland Hardware Plugin ioplug Interface", "ALSA"),
-            ("OSS v4 /dev/dsp Peak Meter Querying & Fragment Tuning", "OSS"),
-            ("OSS v4 /dev/mixer Extension Controls & Channel Levels", "OSS"),
-            ("PulseAudio Dynamic Module Router & Audio Ducking", "PulseAudio"),
-            ("PulseAudio Simple Protocol & Network Audio Streaming", "PulseAudio"),
-            ("PipeWire SPA POD Buffer & Bluetooth Codec Engine", "PipeWire"),
-            ("PipeWire SPA Filter-Chain Equalizer & Convolver Node Graph", "PipeWire"),
-            ("JACK Pro-Audio Realtime Graph Cycle Synchronization", "JACK"),
-            ("JACK Session API v2 Graph Save and Restore", "JACK"),
+            (
+                "OSS v4 /dev/dsp Peak Meter Querying & Fragment Tuning",
+                "OSS",
+            ),
+            (
+                "PulseAudio Dynamic Module Router & Audio Ducking",
+                "PulseAudio",
+            ),
+            (
+                "PipeWire SPA POD Buffer & Bluetooth Codec Engine",
+                "PipeWire",
+            ),
+            (
+                "JACK Pro-Audio Realtime Graph Cycle Synchronization",
+                "JACK",
+            ),
             ("sndio OpenBSD MIDI & PCM Stream Multiplexer", "sndio"),
-            ("sndio Raw MIDI Time Code (MTC) Clock Generator", "sndio"),
-            ("GStreamer Dynamic Pipeline Linkage & Caps Negotiation", "GStreamer"),
-            ("GStreamer RTSP Server & RTP Packetization Engine", "GStreamer"),
+            (
+                "GStreamer Dynamic Pipeline Linkage & Caps Negotiation",
+                "GStreamer",
+            ),
             ("FFmpeg Zero-Copy Filtergraph Execution Engine", "FFmpeg"),
-            ("FFmpeg AVIOContext Custom Memory I/O Callbacks", "FFmpeg"),
-            ("V4L2 DMABUF Buffer Exporter & Camera Control Engine", "V4L2"),
-            ("V4L2 Media Controller Topology & Subdevice Pad Routing", "V4L2"),
+            (
+                "V4L2 DMABUF Buffer Exporter & Camera Control Engine",
+                "V4L2",
+            ),
             ("VLC LibVLC Core Instance & ASS Subtitle Renderer", "VLC"),
-            ("VLC Dynamic Plugin Module Registry Engine", "VLC"),
             ("mpv IPC JSON-RPC Protocol & GPU-Next Shader Engine", "mpv"),
-            ("mpv Property Observer Event Loop Dispatcher", "mpv"),
         ];
 
         for (title, subsystem) in prs {
@@ -1919,37 +1552,26 @@ pub struct LinuxBsdDistroMediaSuite {
     pub vlc_subtitles: VlcSubtitleManager,
     pub alsa_engine: AlsaSoundEngine,
     pub alsa_pcm_config: AlsaPcmHwConfigEngine,
-    pub alsa_ioplug: AlsaHardwarePluginIoplugEngine,
     pub oss_engine: OssSoundEngine,
     pub oss_peak_meter: OssMixerPeakMeterEngine,
-    pub oss4_mixer_control: Oss4MixerDeviceControlEngine,
     pub pulseaudio_engine: PulseAudioEngine,
     pub pulseaudio_router: PulseAudioModuleRouterEngine,
-    pub pulseaudio_network: PulseAudioNetworkAudioEngine,
     pub pipewire_engine: PipeWireEngine,
     pub pipewire_spa_buffer: PipeWireSpaBufferEngine,
-    pub pipewire_filter_chain: PipeWireFilterChainEngine,
     pub jack_engine: JackProAudioEngine,
     pub jack_realtime_graph: JackRealtimeGraphEngine,
-    pub jack_session_control: JackSessionControlEngine,
     pub sndio_engine: SndioEngine,
     pub sndio_midi_pcm: SndioMidiPcmMultiplexerEngine,
-    pub sndio_mtc_clock: SndioRawMTCClockEngine,
     pub gstreamer_engine: GStreamerEngine,
     pub gstreamer_dynamic_pipeline: GStreamerDynamicPipelineEngine,
-    pub gstreamer_rtsp_stream: GStreamerRtpRtspStreamEngine,
     pub ffmpeg_engine: FfmpegEngine,
     pub ffmpeg_filtergraph_accel: FfmpegFiltergraphAccelEngine,
-    pub ffmpeg_custom_io: FfmpegCustomIoBufferEngine,
     pub v4l2_engine: V4l2CaptureEngine,
     pub v4l2_dmabuf_exporter: V4l2DmaBufExporterEngine,
-    pub v4l2_media_controller: V4l2SubdeviceMediaControllerEngine,
     pub vlc_engine: VlcPlayerEngine,
     pub vlc_libvlc_core: VlcLibvlcCoreEngine,
-    pub vlc_plugin_registry: VlcPluginModuleRegistryEngine,
     pub mpv_engine: MpvPlayerEngine,
     pub mpv_ipc_jsonrpc: MpvIpcJsonRpcEngine,
-    pub mpv_property_observer: MpvPropertyObserverEngine,
     pub pr_gateway: LinuxBsdAudioVideoPrGatewayEngine,
     pub gap_closure_pr_gateway: LinuxBsdAudioVideoGapClosurePrGateway,
 }
@@ -1963,37 +1585,26 @@ impl LinuxBsdDistroMediaSuite {
             vlc_subtitles: VlcSubtitleManager::new(),
             alsa_engine: AlsaSoundEngine::new("hw:0"),
             alsa_pcm_config: AlsaPcmHwConfigEngine::new("hw:0"),
-            alsa_ioplug: AlsaHardwarePluginIoplugEngine::new("softvol_ioplug"),
             oss_engine: OssSoundEngine::new(),
             oss_peak_meter: OssMixerPeakMeterEngine::new("/dev/dsp0"),
-            oss4_mixer_control: Oss4MixerDeviceControlEngine::new("/dev/mixer0"),
             pulseaudio_engine: PulseAudioEngine::new(),
             pulseaudio_router: PulseAudioModuleRouterEngine::new(),
-            pulseaudio_network: PulseAudioNetworkAudioEngine::new(4713),
             pipewire_engine: PipeWireEngine::new(),
             pipewire_spa_buffer: PipeWireSpaBufferEngine::new(),
-            pipewire_filter_chain: PipeWireFilterChainEngine::new(),
             jack_engine: JackProAudioEngine::new("SigmaAudioJackClient"),
             jack_realtime_graph: JackRealtimeGraphEngine::new("SigmaJackRealtimeClient"),
-            jack_session_control: JackSessionControlEngine::new("/tmp/jack_sessions"),
             sndio_engine: SndioEngine::new("snd/0"),
             sndio_midi_pcm: SndioMidiPcmMultiplexerEngine::new("rmidi/0"),
-            sndio_mtc_clock: SndioRawMTCClockEngine::new(30),
             gstreamer_engine: GStreamerEngine::new(),
             gstreamer_dynamic_pipeline: GStreamerDynamicPipelineEngine::new(),
-            gstreamer_rtsp_stream: GStreamerRtpRtspStreamEngine::new("/test", 8554),
             ffmpeg_engine: FfmpegEngine::new(),
             ffmpeg_filtergraph_accel: FfmpegFiltergraphAccelEngine::new(),
-            ffmpeg_custom_io: FfmpegCustomIoBufferEngine::new(32768),
             v4l2_engine: V4l2CaptureEngine::new("/dev/video0"),
             v4l2_dmabuf_exporter: V4l2DmaBufExporterEngine::new("/dev/video0"),
-            v4l2_media_controller: V4l2SubdeviceMediaControllerEngine::new("/dev/media0"),
             vlc_engine: VlcPlayerEngine::new(),
             vlc_libvlc_core: VlcLibvlcCoreEngine::new(),
-            vlc_plugin_registry: VlcPluginModuleRegistryEngine::new(),
             mpv_engine: MpvPlayerEngine::new(),
             mpv_ipc_jsonrpc: MpvIpcJsonRpcEngine::new("/tmp/mpvsocket"),
-            mpv_property_observer: MpvPropertyObserverEngine::new(),
             pr_gateway: LinuxBsdAudioVideoPrGatewayEngine::new(),
             gap_closure_pr_gateway: LinuxBsdAudioVideoGapClosurePrGateway::new(),
         }
@@ -2204,74 +1815,6 @@ mod tests {
         assert_eq!(merged_status, AudioVideoPrStatus::Merged);
 
         let gap_closure = LinuxBsdAudioVideoGapClosurePrGateway::new();
-        assert_eq!(gap_closure.gateway.submissions.len(), 22);
-    }
-
-    #[test]
-    fn test_new_advanced_media_engines() {
-        // ALSA ioplug
-        let mut ioplug = AlsaHardwarePluginIoplugEngine::new("softvol_ioplug");
-        assert_eq!(ioplug.update_pointer(1024), 1024);
-        ioplug.set_softvol_db(-6.0);
-        assert_eq!(ioplug.softvol_db_scale, -6.0);
-
-        // OSS4 mixer
-        let mut oss4 = Oss4MixerDeviceControlEngine::new("/dev/mixer0");
-        assert!(oss4.set_extension_control("pcm.bass", 80).is_ok());
-        assert_eq!(*oss4.extension_controls.get("pcm.bass").unwrap(), 80);
-
-        // PulseAudio network
-        let mut pa_net = PulseAudioNetworkAudioEngine::new(4713);
-        assert_eq!(pa_net.register_client(), 1);
-        pa_net.update_jitter(12);
-        assert_eq!(pa_net.network_jitter_ms, 12);
-
-        // PipeWire filter chain
-        let mut pw_filter = PipeWireFilterChainEngine::new();
-        assert!(pw_filter.set_band_gain(0, 3.5).is_ok());
-        assert_eq!(pw_filter.equalizer_bands_gain_db[0], 3.5);
-
-        // JACK session control
-        let mut jack_session = JackSessionControlEngine::new("/tmp/jack_sessions");
-        jack_session.save_session(vec![("sys:out_1".to_string(), "app:in_1".to_string())]);
-        assert!(jack_session.is_session_saved);
-        assert_eq!(jack_session.restore_session().len(), 1);
-
-        // sndio MTC clock
-        let mut mtc = SndioRawMTCClockEngine::new(30);
-        mtc.start_clock();
-        assert_eq!(mtc.advance_ticks(100), 100);
-
-        // GStreamer RTSP
-        let mut rtsp = GStreamerRtpRtspStreamEngine::new("/live", 8554);
-        rtsp.start_server();
-        assert!(rtsp.is_rtsp_serving);
-
-        // FFmpeg custom IO
-        let mut custom_io = FfmpegCustomIoBufferEngine::new(4096);
-        let read = custom_io.read_packet_callback(2048);
-        assert_eq!(read, 2048);
-        assert_eq!(custom_io.bytes_read_total, 2048);
-
-        // V4L2 subdevice media controller
-        let mut media_ctrl = V4l2SubdeviceMediaControllerEngine::new("/dev/media0");
-        media_ctrl.setup_link("/dev/v4l-subdev0:1", "/dev/v4l-subdev1:0");
-        assert_eq!(media_ctrl.active_links.len(), 1);
-
-        // VLC plugin registry
-        let mut vlc_plugins = VlcPluginModuleRegistryEngine::new();
-        vlc_plugins.register_plugin("jack_output", "audio output");
-        assert_eq!(vlc_plugins.loaded_plugins.get("jack_output").unwrap(), "audio output");
-
-        // mpv property observer
-        let mut mpv_obs = MpvPropertyObserverEngine::new();
-        let obs_id = mpv_obs.observe_property("pause");
-        assert_eq!(obs_id, 1);
-        mpv_obs.push_change_event(obs_id, "yes");
-        assert_eq!(mpv_obs.property_change_events.len(), 1);
-
-        // Verify master suite instantiation
-        let suite = LinuxBsdDistroMediaSuite::new();
-        assert_eq!(suite.gap_closure_pr_gateway.gateway.submissions.len(), 22);
+        assert_eq!(gap_closure.gateway.submissions.len(), 11);
     }
 }

@@ -199,7 +199,7 @@ impl SigmaNotify {
         let id = notification.notification_id.clone();
         self.notifications.insert(id.clone(), notification.clone());
         self.notification_counter += 1;
-        
+
         // Add to history
         self.history.push(notification);
         if self.history.len() > self.max_history {
@@ -229,14 +229,16 @@ impl SigmaNotify {
 
     /// List notifications by category
     pub fn list_by_category(&self, category: NotificationCategory) -> Vec<&Notification> {
-        self.notifications.values()
+        self.notifications
+            .values()
             .filter(|n| n.category == category)
             .collect()
     }
 
     /// List notifications by urgency
     pub fn list_by_urgency(&self, urgency: NotificationUrgency) -> Vec<&Notification> {
-        self.notifications.values()
+        self.notifications
+            .values()
             .filter(|n| n.urgency == urgency)
             .collect()
     }
@@ -259,9 +261,15 @@ impl SigmaNotify {
     /// Get notification statistics
     pub fn notification_stats(&self) -> BTreeMap<String, String> {
         let mut stats = BTreeMap::new();
-        stats.insert("active_notifications".to_string(), self.notification_count().to_string());
+        stats.insert(
+            "active_notifications".to_string(),
+            self.notification_count().to_string(),
+        );
         stats.insert("history_size".to_string(), self.history.len().to_string());
-        stats.insert("total_shown".to_string(), self.notification_counter.to_string());
+        stats.insert(
+            "total_shown".to_string(),
+            self.notification_counter.to_string(),
+        );
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
@@ -319,7 +327,7 @@ mod tests {
             "notif1".to_string(),
             "TestApp".to_string(),
             "Test Summary".to_string(),
-            "Test Body".to_string()
+            "Test Body".to_string(),
         )
         .with_icon("icon.png".to_string())
         .with_urgency(NotificationUrgency::Critical)
@@ -345,14 +353,14 @@ mod tests {
     fn test_sigmanotify_show_notification() {
         let mut notify = SigmaNotify::new();
         notify.start();
-        
+
         let notification = Notification::new(
             "notif1".to_string(),
             "TestApp".to_string(),
             "Test Summary".to_string(),
-            "Test Body".to_string()
+            "Test Body".to_string(),
         );
-        
+
         assert!(notify.show_notification(notification).is_ok());
         assert_eq!(notify.notification_count(), 1);
     }
@@ -361,14 +369,14 @@ mod tests {
     fn test_sigmanotify_close_notification() {
         let mut notify = SigmaNotify::new();
         notify.start();
-        
+
         let notification = Notification::new(
             "notif1".to_string(),
             "TestApp".to_string(),
             "Test Summary".to_string(),
-            "Test Body".to_string()
+            "Test Body".to_string(),
         );
-        
+
         notify.show_notification(notification).unwrap();
         assert!(notify.close_notification("notif1").is_ok());
         assert_eq!(notify.notification_count(), 0);
@@ -378,17 +386,17 @@ mod tests {
     fn test_sigmanotify_list_by_category() {
         let mut notify = SigmaNotify::new();
         notify.start();
-        
+
         let notification = Notification::new(
             "notif1".to_string(),
             "TestApp".to_string(),
             "Test Summary".to_string(),
-            "Test Body".to_string()
+            "Test Body".to_string(),
         )
         .with_category(NotificationCategory::System);
-        
+
         notify.show_notification(notification).unwrap();
-        
+
         let system_notifs = notify.list_by_category(NotificationCategory::System);
         assert_eq!(system_notifs.len(), 1);
     }
@@ -397,17 +405,17 @@ mod tests {
     fn test_sigmanotify_list_by_urgency() {
         let mut notify = SigmaNotify::new();
         notify.start();
-        
+
         let notification = Notification::new(
             "notif1".to_string(),
             "TestApp".to_string(),
             "Test Summary".to_string(),
-            "Test Body".to_string()
+            "Test Body".to_string(),
         )
         .with_urgency(NotificationUrgency::Critical);
-        
+
         notify.show_notification(notification).unwrap();
-        
+
         let critical_notifs = notify.list_by_urgency(NotificationUrgency::Critical);
         assert_eq!(critical_notifs.len(), 1);
     }
@@ -416,16 +424,16 @@ mod tests {
     fn test_sigmanotify_history() {
         let mut notify = SigmaNotify::new();
         notify.start();
-        
+
         let notification = Notification::new(
             "notif1".to_string(),
             "TestApp".to_string(),
             "Test Summary".to_string(),
-            "Test Body".to_string()
+            "Test Body".to_string(),
         );
-        
+
         notify.show_notification(notification).unwrap();
-        
+
         let history = notify.get_history();
         assert_eq!(history.len(), 1);
     }
@@ -434,16 +442,16 @@ mod tests {
     fn test_sigmanotify_stats() {
         let mut notify = SigmaNotify::new();
         notify.start();
-        
+
         let notification = Notification::new(
             "notif1".to_string(),
             "TestApp".to_string(),
             "Test Summary".to_string(),
-            "Test Body".to_string()
+            "Test Body".to_string(),
         );
-        
+
         notify.show_notification(notification).unwrap();
-        
+
         let stats = notify.notification_stats();
         assert_eq!(stats.get("active_notifications"), Some(&"1".to_string()));
         assert_eq!(stats.get("total_shown"), Some(&"1".to_string()));
@@ -452,17 +460,17 @@ mod tests {
     #[test]
     fn test_show_notification_convenience() {
         init_sigmanotify();
-        
+
         let mut notify = get_sigmanotify().unwrap();
         notify.start();
-        
+
         let notification = Notification::new(
             "notif1".to_string(),
             "TestApp".to_string(),
             "Test Summary".to_string(),
-            "Test Body".to_string()
+            "Test Body".to_string(),
         );
-        
+
         let result = show_notification(notification);
         assert!(result.is_ok());
     }

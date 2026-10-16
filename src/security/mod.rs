@@ -178,8 +178,8 @@ pub use rules::{
 pub use selinux::{PolicyRule, SELinuxPolicy, SecurityContext, SigmaSELinux};
 pub use selinux_advanced::{AdvancedSELinuxManager, MlsLevel, SELinuxBoolean, SELinuxModule};
 pub use selinux_type_enforcement::{
-    SecurityContext as SelinuxSecurityContext, TePolicy, TeRule, SelinuxTypeEnforcement,
-    init_selinux_enforcement, get_selinux_enforcement,
+    get_selinux_enforcement, init_selinux_enforcement, SecurityContext as SelinuxSecurityContext,
+    SelinuxTypeEnforcement, TePolicy, TeRule,
 };
 pub use sigma_pledge::{PledgeNamespace, PledgePromise as SigmaPledgePromise, SyscallFilter};
 pub use sigma_unveil::{
@@ -257,13 +257,13 @@ pub mod securelevels;
 pub mod selinux_integration;
 pub mod sigma_seccomp_bpf;
 pub mod sovereign_portable_sandbox_engine;
+pub mod sovereign_security_and_hardening_advancements_pr;
 pub mod sudo_engine;
 pub mod system_policy_rules;
 pub mod tpm2;
 pub mod trust_zone;
 pub mod unified_access_control;
 pub mod visa_harness;
-pub mod sovereign_security_and_hardening_advancements_pr;
 pub use sovereign_security_and_hardening_advancements_pr::*;
 pub mod sovereign_security_management_plan;
 pub use sovereign_security_management_plan::*;

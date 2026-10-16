@@ -1473,15 +1473,21 @@ impl SovereignTechMediaComponentOptimizerEngine {
             summary.optimization_score
         ));
         report.push_str("## High-Impact Component Optimization Directives:\n");
-        report.push_str("1. [ItsFOSS] Zero-alloc CLI prompt theme caching & Pantheon AppCenter PWYW gateway\n");
+        report.push_str(
+            "1. [ItsFOSS] Zero-alloc CLI prompt theme caching & Pantheon AppCenter PWYW gateway\n",
+        );
         report.push_str("2. [9to5Linux] Linux Kernel 6.12 LTS PREEMPT_RT realtime preemption\n");
         report.push_str("3. [GeekyGadgets] SBC GPIO telemetry & I2C sensor bus monitoring\n");
         report.push_str("4. [Linux.com] Landlock V5 sandboxing & zero-trust system hardening\n");
         report.push_str("5. [KDnuggets] Zero-copy SIMD vector normalization & drift calculation\n");
         report.push_str("6. [HWBusters] ATX 3.1 12V-2x6 transient power rail protection\n");
-        report.push_str("7. [Linux.org] Kernel sysctl tuning (vm.swappiness=10, bbr congestion control)\n");
+        report.push_str(
+            "7. [Linux.org] Kernel sysctl tuning (vm.swappiness=10, bbr congestion control)\n",
+        );
         report.push_str("8. [MarkTechPost] SLM INT4 quantization & low-memory vector embeddings\n");
-        report.push_str("9. [TechPowerUp] GPU VRM hotspot thermal protection & acoustic fan control\n");
+        report.push_str(
+            "9. [TechPowerUp] GPU VRM hotspot thermal protection & acoustic fan control\n",
+        );
         report.push_str("10. [Phoronix] Automated Phoronix Test Suite regression benchmarks\n");
         report
     }

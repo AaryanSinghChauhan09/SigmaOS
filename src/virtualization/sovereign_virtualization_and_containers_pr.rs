@@ -43,15 +43,6 @@ pub struct VirtualizationAndContainersPrProposalManifest {
 // 1. KVM & QEMU HARDWARE VIRTUALIZATION ENGINE
 // ============================================================================
 
-/// Confidential VM Attestation Mode
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
-pub enum ConfidentialVmMode {
-    #[default]
-    None,
-    IntelTdx,
-    AmdSevSnp,
-}
-
 /// vCPU execution state
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct KvmVcpuState {
@@ -75,16 +66,6 @@ pub struct VfioDevicePassthrough {
     pub dma_mapped_bytes: u64,
 }
 
-/// QEMU Disk Image Specification
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct QemuDiskImageSpec {
-    pub image_path: String,
-    pub format: String, // e.g. "qcow2", "raw", "vmdk", "vhdx"
-    pub size_bytes: u64,
-    pub backing_file: Option<String>,
-    pub is_compressed: bool,
-}
-
 /// KVM & QEMU Hardware Acceleration Operational State
 #[derive(Debug, Clone, Default)]
 pub struct KvmQemuEngine {
@@ -94,7 +75,6 @@ pub struct KvmQemuEngine {
     pub io_uring_sqpoll_enabled: bool,
     pub vfio_passthrough_devices: Vec<VfioDevicePassthrough>,
     pub virtio_fs_inodes_cached: u64,
-    pub disk_images: Vec<QemuDiskImageSpec>,
 }
 
 impl KvmQemuEngine {
@@ -106,18 +86,7 @@ impl KvmQemuEngine {
             io_uring_sqpoll_enabled: true,
             vfio_passthrough_devices: Vec::new(),
             virtio_fs_inodes_cached: 0,
-            disk_images: Vec::new(),
         }
-    }
-
-    pub fn convert_disk_image(&mut self, path: &str, fmt: &str, size_bytes: u64, backing: Option<&str>) {
-        self.disk_images.push(QemuDiskImageSpec {
-            image_path: path.to_string(),
-            format: fmt.to_string(),
-            size_bytes,
-            backing_file: backing.map(|s| s.to_string()),
-            is_compressed: fmt == "qcow2",
-        });
     }
 
     pub fn add_vcpu(&mut self, vcpu_id: u32, core: u32) {
@@ -165,23 +134,6 @@ pub enum HypervisorType {
     OpenBsdVmm,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Default)]
-pub enum LibvirtStoragePoolType {
-    #[default]
-    Directory,
-    Zfs,
-    LvmThin,
-    CephRbd,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct LibvirtNwFilterRule {
-    pub name: String,
-    pub action: String, // "accept", "drop", "reject"
-    pub direction: String, // "in", "out", "inout"
-    pub protocol: String, // "ip", "tcp", "udp", "icmp"
-}
-
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct LibvirtDomainConfig {
     pub domain_name: String,
@@ -193,22 +145,11 @@ pub struct LibvirtDomainConfig {
     pub is_active: bool,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct LibvirtStorageVolume {
-    pub volume_name: String,
-    pub pool_name: String,
-    pub capacity_bytes: u64,
-    pub allocation_bytes: u64,
-    pub format: String,
-}
-
 #[derive(Debug, Clone, Default)]
 pub struct LibvirtDomainEngine {
     pub domains: Vec<LibvirtDomainConfig>,
     pub storage_pool_path: String,
-    pub storage_pool_type: LibvirtStoragePoolType,
     pub virtual_bridges: Vec<String>,
-    pub storage_volumes: Vec<LibvirtStorageVolume>,
 }
 
 impl LibvirtDomainEngine {
@@ -219,40 +160,8 @@ impl LibvirtDomainEngine {
         Self {
             domains: Vec::new(),
             storage_pool_path: "/var/lib/libvirt/images".to_string(),
-            storage_pool_type: LibvirtStoragePoolType::Directory,
             virtual_bridges: bridges,
-            storage_volumes: Vec::new(),
         }
-    }
-
-    pub fn create_storage_volume(&mut self, name: &str, pool: &str, capacity_bytes: u64, fmt: &str) {
-        self.storage_volumes.push(LibvirtStorageVolume {
-            volume_name: name.to_string(),
-            pool_name: pool.to_string(),
-            capacity_bytes,
-            allocation_bytes: 1024 * 1024 * 1024,
-            format: fmt.to_string(),
-        });
-    }
-
-    pub fn add_nat_bridge(&mut self, bridge_name: &str) {
-        if !self.virtual_bridges.contains(&bridge_name.to_string()) {
-            self.virtual_bridges.push(bridge_name.to_string());
-        }
-    }
-
-    pub fn set_storage_pool(&mut self, pool_type: LibvirtStoragePoolType, path: &str) {
-        self.storage_pool_type = pool_type;
-        self.storage_pool_path = path.to_string();
-    }
-
-    pub fn add_nwfilter_rule(&mut self, name: &str, action: &str, direction: &str, protocol: &str) {
-        self.nwfilter_rules.push(LibvirtNwFilterRule {
-            name: name.to_string(),
-            action: action.to_string(),
-            direction: direction.to_string(),
-            protocol: protocol.to_string(),
-        });
     }
 
     pub fn define_domain(&mut self, name: &str, hyp: HypervisorType, memory_mb: u64, vcpus: u32) {
@@ -297,24 +206,9 @@ impl LibvirtDomainEngine {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum XenGuestMode {
-    Paravirtualized,       // PV
-    HardwareVirtualMachine,// HVM
-    Pvh,                   // PVH
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct XenArgoPort {
-    pub port_id: u32,
-    pub source_domid: u32,
-    pub dest_domid: u32,
-    pub ring_size_bytes: u32,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct QubesDisposableVmPolicy {
-    pub template_vm: String,
-    pub auto_wipe_on_shutdown: bool,
-    pub netvm_isolation: String,
+    Paravirtualized,        // PV
+    HardwareVirtualMachine, // HVM
+    Pvh,                    // PVH
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -331,8 +225,6 @@ pub struct XenDomainInfo {
 pub struct XenHypervisorEngine {
     pub domains: Vec<XenDomainInfo>,
     pub xenstore_tree: BTreeMap<String, String>,
-    pub argo_ports: Vec<XenArgoPort>,
-    pub disp_vm_policies: Vec<QubesDisposableVmPolicy>,
 }
 
 impl XenHypervisorEngine {
@@ -340,8 +232,6 @@ impl XenHypervisorEngine {
         let mut engine = Self {
             domains: Vec::new(),
             xenstore_tree: BTreeMap::new(),
-            argo_ports: Vec::new(),
-            disp_vm_policies: Vec::new(),
         };
         // Register Dom0
         engine.domains.push(XenDomainInfo {
@@ -354,23 +244,6 @@ impl XenHypervisorEngine {
         });
         engine.xenstore_write("/local/domain/0/name", "Domain-0");
         engine
-    }
-
-    pub fn register_argo_port(&mut self, port: u32, src_dom: u32, dst_dom: u32, ring_size: u32) {
-        self.argo_ports.push(XenArgoPort {
-            port_id: port,
-            source_domid: src_dom,
-            dest_domid: dst_dom,
-            ring_size_bytes: ring_size,
-        });
-    }
-
-    pub fn set_qubes_dispvm_policy(&mut self, template: &str, netvm: &str) {
-        self.disp_vm_policies.push(QubesDisposableVmPolicy {
-            template_vm: template.to_string(),
-            auto_wipe_on_shutdown: true,
-            netvm_isolation: netvm.to_string(),
-        });
     }
 
     pub fn create_domu(&mut self, domid: u32, name: &str, mode: XenGuestMode, mem_mb: u64) {
@@ -483,20 +356,11 @@ pub struct OciContainerSpec {
     pub cgroup_memory_limit_bytes: u64,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct DockerComposeServiceSpec {
-    pub service_name: String,
-    pub image: String,
-    pub ports: Vec<String>,
-    pub environment: Vec<String>,
-}
-
 #[derive(Debug, Clone, Default)]
 pub struct OciDockerPodmanRuncEngine {
     pub containers: Vec<OciContainerSpec>,
     pub podman_quadlet_units: Vec<String>,
     pub containerd_cri_sockets: Vec<String>,
-    pub compose_services: Vec<DockerComposeServiceSpec>,
 }
 
 impl OciDockerPodmanRuncEngine {
@@ -508,17 +372,7 @@ impl OciDockerPodmanRuncEngine {
             containers: Vec::new(),
             podman_quadlet_units: Vec::new(),
             containerd_cri_sockets: cri,
-            compose_services: Vec::new(),
         }
-    }
-
-    pub fn transpile_docker_compose_service(&mut self, service: &str, image: &str, port: &str) {
-        self.compose_services.push(DockerComposeServiceSpec {
-            service_name: service.to_string(),
-            image: image.to_string(),
-            ports: alloc::vec![port.to_string()],
-            environment: alloc::vec!["ENV=production".to_string()],
-        });
     }
 
     pub fn run_rootless_podman_container(&mut self, id: &str, image: &str, mem_mb: u64) {
@@ -527,8 +381,16 @@ impl OciDockerPodmanRuncEngine {
             image: image.to_string(),
             command: alloc::vec!["/bin/sh".to_string()],
             rootless: true,
-            uid_mapping: SubUidGidMapping { host_start_id: 100000, container_start_id: 0, id_range_count: 65536 },
-            gid_mapping: SubUidGidMapping { host_start_id: 100000, container_start_id: 0, id_range_count: 65536 },
+            uid_mapping: SubUidGidMapping {
+                host_start_id: 100000,
+                container_start_id: 0,
+                id_range_count: 65536,
+            },
+            gid_mapping: SubUidGidMapping {
+                host_start_id: 100000,
+                container_start_id: 0,
+                id_range_count: 65536,
+            },
             cgroup_cpu_weight: 100,
             cgroup_memory_limit_bytes: mem_mb * 1024 * 1024,
         });
@@ -601,7 +463,6 @@ pub struct FreeBsdJailConfig {
     pub epair_interface: String,
     pub devfs_ruleset: u32,
     pub racct_pcpu_max: u32,
-    pub racct_memory_bytes_max: u64,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -646,15 +507,7 @@ impl FreeBsdJailsZonesEngine {
             epair_interface: epair.to_string(),
             devfs_ruleset: 4,
             racct_pcpu_max: 50,
-            racct_memory_bytes_max: 2048 * 1024 * 1024,
         });
-    }
-
-    pub fn set_jail_racct_limits(&mut self, name: &str, pcpu_max: u32, mem_bytes: u64) {
-        if let Some(j) = self.jails.iter_mut().find(|j| j.name == name) {
-            j.racct_pcpu_max = pcpu_max;
-            j.racct_memory_bytes_max = mem_bytes;
-        }
     }
 
     pub fn create_illumos_lx_zone(&mut self, name: &str, mem_mb: u64) {
@@ -687,26 +540,14 @@ pub struct KubernetesK3sRancherEngine {
     pub pods: Vec<KubernetesPodState>,
     pub k3s_embedded_datastore: String,
     pub harvester_vm_mappings: BTreeMap<String, String>,
-    pub crio_runtime_handlers: Vec<String>,
 }
 
 impl KubernetesK3sRancherEngine {
     pub fn new() -> Self {
-        let mut crio = Vec::new();
-        crio.push("runc".to_string());
-        crio.push("crun".to_string());
-        crio.push("kata".to_string());
         Self {
             pods: Vec::new(),
             k3s_embedded_datastore: "sqlite3:///var/lib/rancher/k3s/server/db/state.db".to_string(),
             harvester_vm_mappings: BTreeMap::new(),
-            crio_runtime_handlers: crio,
-        }
-    }
-
-    pub fn register_crio_runtime_handler(&mut self, handler: &str) {
-        if !self.crio_runtime_handlers.contains(&handler.to_string()) {
-            self.crio_runtime_handlers.push(handler.to_string());
         }
     }
 
@@ -722,7 +563,8 @@ impl KubernetesK3sRancherEngine {
     }
 
     pub fn map_harvester_vm_to_pod(&mut self, vm_name: &str, pod_name: &str) {
-        self.harvester_vm_mappings.insert(vm_name.to_string(), pod_name.to_string());
+        self.harvester_vm_mappings
+            .insert(vm_name.to_string(), pod_name.to_string());
     }
 }
 
@@ -826,7 +668,9 @@ pub struct GvisorKataSandboxEngine {
 
 impl GvisorKataSandboxEngine {
     pub fn new() -> Self {
-        Self { sandboxes: Vec::new() }
+        Self {
+            sandboxes: Vec::new(),
+        }
     }
 
     pub fn create_gvisor_sentry_sandbox(&mut self, id: &str, mem_mb: u64) {
@@ -869,7 +713,9 @@ pub struct AppleHypervisorFrameworkEngine {
 
 impl AppleHypervisorFrameworkEngine {
     pub fn new() -> Self {
-        Self { instances: Vec::new() }
+        Self {
+            instances: Vec::new(),
+        }
     }
 
     pub fn launch_apple_hv_guest(&mut self, id: &str, vcpus: u32, rosetta: bool) {
@@ -942,7 +788,9 @@ pub struct AlpineMobyApplianceEngine {
 
 impl AlpineMobyApplianceEngine {
     pub fn new() -> Self {
-        Self { appliances: Vec::new() }
+        Self {
+            appliances: Vec::new(),
+        }
     }
 
     pub fn build_moby_appliance(&mut self, name: &str, pkgs: &[&str]) {
@@ -1007,7 +855,9 @@ pub struct FreeBsdBhyveCapsicumEngine {
 
 impl FreeBsdBhyveCapsicumEngine {
     pub fn new() -> Self {
-        Self { helpers: Vec::new() }
+        Self {
+            helpers: Vec::new(),
+        }
     }
 
     pub fn register_capsicum_bhyve_helper(&mut self, vm_name: &str, pid: u32) {
@@ -1100,8 +950,13 @@ impl SovereignVirtualizationAndContainersParityPrGateway {
         vbox_bhyve_vmm.launch_openbsd_vmd_vm("obsd-router", "stdio rpath wpath cpath inet vmm");
 
         let mut oci_docker_podman = OciDockerPodmanRuncEngine::new();
-        oci_docker_podman.run_rootless_podman_container("podman-web-1", "quay.io/fedora/fedora:39", 2048);
-        oci_docker_podman.generate_podman_quadlet_unit("web-server", "docker.io/library/nginx:alpine");
+        oci_docker_podman.run_rootless_podman_container(
+            "podman-web-1",
+            "quay.io/fedora/fedora:39",
+            2048,
+        );
+        oci_docker_podman
+            .generate_podman_quadlet_unit("web-server", "docker.io/library/nginx:alpine");
 
         let mut lxc_lxd_nspawn = LxcLxdNspawnEngine::new();
         lxc_lxd_nspawn.spawn_nspawn_chroot("arch-chroot-container", "/var/lib/machines/arch", true);
@@ -1129,7 +984,12 @@ impl SovereignVirtualizationAndContainersParityPrGateway {
         apple_hv.launch_apple_hv_guest("apple-hv-vm1", 4, true);
 
         let mut smartos_zones = SmartOsZoneVirtualizationEngine::new();
-        smartos_zones.create_vmadm_zone("11111111-2222-3333-4444-555555555555", "zone-web", "joyent", 2048);
+        smartos_zones.create_vmadm_zone(
+            "11111111-2222-3333-4444-555555555555",
+            "zone-web",
+            "joyent",
+            2048,
+        );
 
         let mut alpine_moby = AlpineMobyApplianceEngine::new();
         alpine_moby.build_moby_appliance("moby-router", &["wireguard-tools", "dnsmasq"]);
@@ -1395,7 +1255,11 @@ impl SovereignVirtualizationAndContainersParityPrGateway {
         for p in &proposals {
             md.push_str(&format!(
                 "- **PR #{}:** {} (`{}`)\n  - *Inspirations:* {}\n  - *Isolation:* {}\n",
-                p.pr_id, p.title, p.category, p.inspiration_sources.join(", "), p.isolation_level
+                p.pr_id,
+                p.title,
+                p.category,
+                p.inspiration_sources.join(", "),
+                p.isolation_level
             ));
         }
         md
@@ -1411,10 +1275,8 @@ mod tests {
         let mut engine = KvmQemuEngine::new();
         engine.add_vcpu(0, 0);
         engine.attach_vfio_device("0000:02:00.0", 0x10de, 0x2206, 15);
-        engine.convert_disk_image("/var/lib/libvirt/images/disk.qcow2", "qcow2", 20 * 1024 * 1024 * 1024, None);
         assert_eq!(engine.vcpus.len(), 1);
         assert_eq!(engine.vfio_passthrough_devices.len(), 1);
-        assert_eq!(engine.disk_images.len(), 1);
         let sync = engine.simulate_dirty_page_ring_sync();
         assert!(sync > 0);
     }
@@ -1423,11 +1285,7 @@ mod tests {
     fn test_libvirt_engine() {
         let mut engine = LibvirtDomainEngine::new();
         engine.define_domain("test-vm", HypervisorType::QemuKvm, 4096, 2);
-        engine.create_storage_volume("vol1", "default", 100 * 1024 * 1024 * 1024, "qcow2");
-        engine.add_nat_bridge("virbr2");
         assert!(engine.start_domain("test-vm"));
-        assert_eq!(engine.storage_volumes.len(), 1);
-        assert!(engine.virtual_bridges.contains(&"virbr2".to_string()));
         let xml = engine.generate_domain_xml("test-vm");
         assert!(xml.is_some());
         assert!(xml.unwrap().contains("test-vm"));
@@ -1437,12 +1295,11 @@ mod tests {
     fn test_xen_engine() {
         let mut engine = XenHypervisorEngine::new();
         engine.create_domu(10, "sys-usb", XenGuestMode::Pvh, 2048);
-        engine.register_argo_port(1, 0, 10, 65536);
-        engine.set_qubes_dispvm_policy("fedora-dvm", "sys-firewall");
-        assert_eq!(engine.argo_ports.len(), 1);
-        assert_eq!(engine.disp_vm_policies.len(), 1);
         assert_eq!(engine.domains.len(), 2);
-        assert_eq!(engine.xenstore_read("/local/domain/10/name").unwrap(), "sys-usb");
+        assert_eq!(
+            engine.xenstore_read("/local/domain/10/name").unwrap(),
+            "sys-usb"
+        );
     }
 
     #[test]
@@ -1458,11 +1315,9 @@ mod tests {
     fn test_oci_podman_engine() {
         let mut engine = OciDockerPodmanRuncEngine::new();
         engine.run_rootless_podman_container("c1", "alpine:latest", 512);
-        engine.transpile_docker_compose_service("web", "nginx:alpine", "80:80");
         let quadlet = engine.generate_podman_quadlet_unit("web", "nginx:latest");
         assert!(quadlet.contains("[Container]"));
         assert_eq!(engine.containers.len(), 1);
-        assert_eq!(engine.compose_services.len(), 1);
     }
 
     #[test]
@@ -1478,10 +1333,8 @@ mod tests {
     fn test_jails_zones_engine() {
         let mut engine = FreeBsdJailsZonesEngine::new();
         engine.create_vnet_jail("jail1", "/jails/1", "epair1b");
-        engine.set_jail_racct_limits("jail1", 80, 4096 * 1024 * 1024);
         engine.create_illumos_lx_zone("zone1", 2048);
         assert_eq!(engine.jails.len(), 1);
-        assert_eq!(engine.jails[0].racct_pcpu_max, 80);
         assert_eq!(engine.zones.len(), 2); // global + zone1
     }
 
@@ -1490,10 +1343,11 @@ mod tests {
         let mut engine = KubernetesK3sRancherEngine::new();
         engine.deploy_pod("prod", "web-pod", "10.42.1.50");
         engine.map_harvester_vm_to_pod("vm-web", "pod-web");
-        engine.register_crio_runtime_handler("gvisor");
         assert_eq!(engine.pods.len(), 1);
-        assert_eq!(engine.harvester_vm_mappings.get("vm-web").unwrap(), "pod-web");
-        assert!(engine.crio_runtime_handlers.contains(&"gvisor".to_string()));
+        assert_eq!(
+            engine.harvester_vm_mappings.get("vm-web").unwrap(),
+            "pod-web"
+        );
     }
 
     #[test]

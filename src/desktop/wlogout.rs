@@ -34,27 +34,27 @@ impl WlogoutInstance {
             current_action: LogoutAction::Cancel,
         }
     }
-    
+
     /// Show logout screen
     pub fn show(&self) {
         self.visible.store(true, Ordering::Relaxed);
     }
-    
+
     /// Hide logout screen
     pub fn hide(&self) {
         self.visible.store(false, Ordering::Relaxed);
     }
-    
+
     /// Is visible
     pub fn is_visible(&self) -> bool {
         self.visible.load(Ordering::Relaxed)
     }
-    
+
     /// Select action
     pub fn select_action(&mut self, action: LogoutAction) {
         self.current_action = action;
     }
-    
+
     /// Confirm action
     pub fn confirm_action(&self) -> Result<(), &'static str> {
         match self.current_action {
@@ -82,12 +82,10 @@ impl WlogoutInstance {
                 // Shutdown system
                 Ok(())
             }
-            LogoutAction::Cancel => {
-                Ok(())
-            }
+            LogoutAction::Cancel => Ok(()),
         }
     }
-    
+
     /// Get current action
     pub fn get_current_action(&self) -> LogoutAction {
         self.current_action
@@ -112,9 +110,7 @@ pub fn init_wlogout() {
 
 /// Get global Wlogout instance
 pub fn get_wlogout() -> Option<&'static mut WlogoutInstance> {
-    unsafe {
-        WLOGOUT_INSTANCE.as_mut()
-    }
+    unsafe { WLOGOUT_INSTANCE.as_mut() }
 }
 
 /// Show logout screen
@@ -134,13 +130,13 @@ pub fn hide_wlogout() {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_wlogout_init() {
         let wlogout = WlogoutInstance::new();
         assert!(!wlogout.is_visible());
     }
-    
+
     #[test]
     fn test_show_hide() {
         let wlogout = WlogoutInstance::new();
@@ -149,14 +145,14 @@ mod tests {
         wlogout.hide();
         assert!(!wlogout.is_visible());
     }
-    
+
     #[test]
     fn test_select_action() {
         let mut wlogout = WlogoutInstance::new();
         wlogout.select_action(LogoutAction::Shutdown);
         assert_eq!(wlogout.get_current_action(), LogoutAction::Shutdown);
     }
-    
+
     #[test]
     fn test_confirm_action() {
         let mut wlogout = WlogoutInstance::new();

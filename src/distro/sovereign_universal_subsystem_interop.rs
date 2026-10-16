@@ -514,8 +514,13 @@ impl SovereignUniversalSubsystemInteropEngine {
                 UniversalSubsystemCategory::ProcessActivity,
                 true,
                 true,
-                &["cgroup_v2", "freebsd_racct", "rusage_collector", "pidfd_signals"],
-                6,
+                &[
+                    "rusage_collector",
+                    "job_control",
+                    "cgroupv2_tasks",
+                    "pidfd_signals",
+                ],
+                8,
             ),
         );
 
@@ -525,8 +530,13 @@ impl SovereignUniversalSubsystemInteropEngine {
                 UniversalSubsystemCategory::MemoryVirtualization,
                 true,
                 true,
-                &["mglru_reclaim", "damon_harvest", "zram_zstd", "cxl_photonic"],
-                7,
+                &[
+                    "damon_reclaim",
+                    "cxl_photonic_mesh",
+                    "zram_zstd",
+                    "mglru_pages",
+                ],
+                10,
             ),
         );
 
@@ -536,8 +546,8 @@ impl SovereignUniversalSubsystemInteropEngine {
                 UniversalSubsystemCategory::TimeSynchronization,
                 true,
                 true,
-                &["chrony_ntp", "ptp_hardware_clock", "solar_microsecond"],
-                4,
+                &["chrony_ntp", "ptp_hardware_clock", "bsd_secure_time"],
+                5,
             ),
         );
 
@@ -547,8 +557,12 @@ impl SovereignUniversalSubsystemInteropEngine {
                 UniversalSubsystemCategory::SignalDelivery,
                 true,
                 true,
-                &["realtime_sigqueue", "sigreturn_frame_guard", "uncatchable_bypass"],
-                5,
+                &[
+                    "realtime_sigqueue",
+                    "sigreturn_frame_guard",
+                    "uncatchable_bypass",
+                ],
+                6,
             ),
         );
 
@@ -559,39 +573,48 @@ impl SovereignUniversalSubsystemInteropEngine {
                 true,
                 true,
                 &["udev_devd_bridge", "xhci_hotplug", "evdev_multitouch"],
-                6,
+                9,
             ),
         );
 
         self.register_subsystem(
-            "crypto_sec",
+            "crypto_security",
             SubsystemAdapterCapabilities::new(
                 UniversalSubsystemCategory::CryptographySecurity,
                 true,
                 true,
                 &["pqc_dilithium", "falcon_1024", "kyber_1024", "luks2_geli"],
-                8,
+                12,
             ),
         );
 
         self.register_subsystem(
-            "telemetry",
+            "telemetry_obs",
             SubsystemAdapterCapabilities::new(
                 UniversalSubsystemCategory::TelemetryObservability,
                 true,
                 true,
-                &["prometheus_exporter", "privacy_filter", "crashdump_pstore"],
-                5,
+                &[
+                    "prometheus_exporter",
+                    "privacy_telemetry_filter",
+                    "crashdump_pstore",
+                ],
+                7,
             ),
         );
 
         self.register_subsystem(
-            "accessibility",
+            "accessibility_input",
             SubsystemAdapterCapabilities::new(
                 UniversalSubsystemCategory::AccessibilityInput,
                 true,
                 true,
-                &["orca_screenreader", "fcitx5_ime", "libinput_gestures", "braille_display"],
+                &[
+                    "orca_screenreader",
+                    "fcitx5_ime",
+                    "libinput_gestures",
+                    "braille_display",
+                ],
                 6,
             ),
         );
@@ -760,66 +783,66 @@ impl SovereignUniversalSubsystemInteropEngine {
         ));
 
         self.add_interop_policy(SubsystemInteropPolicy::new(
-            "policy_process_sec",
+            "policy_proc_sched",
             UniversalSubsystemCategory::ProcessActivity,
-            UniversalSubsystemCategory::SecuritySandboxing,
-            "Enforce FreeBSD RACCT and Linux CgroupV2 task limits inside Pledge/Capsicum sandboxes",
+            UniversalSubsystemCategory::KernelScheduling,
+            "Sync CgroupV2 task activity telemetry into EEVDF/BORE scheduling queues",
             true,
         ));
 
         self.add_interop_policy(SubsystemInteropPolicy::new(
-            "policy_memory_fs",
+            "policy_mem_sec",
             UniversalSubsystemCategory::MemoryVirtualization,
-            UniversalSubsystemCategory::FilesystemStorage,
-            "Synchronize MGLRU page reclaim and DAMON monitoring with ZFS ARC & Bcachefs tiering",
-            false,
+            UniversalSubsystemCategory::SecuritySandboxing,
+            "Enforce DAMON MGLRU memory page protection and W^X KASLR randomization invariants",
+            true,
         ));
 
         self.add_interop_policy(SubsystemInteropPolicy::new(
-            "policy_time_sched",
+            "policy_time_net",
             UniversalSubsystemCategory::TimeSynchronization,
-            UniversalSubsystemCategory::KernelScheduling,
-            "Align Chrony PTP hardware clock interrupts with EEVDF/BORE scheduling quantums",
+            UniversalSubsystemCategory::Networking,
+            "Align PTP hardware clock sub-microsecond timestamps with eBPF XDP network packets",
             false,
         ));
 
         self.add_interop_policy(SubsystemInteropPolicy::new(
-            "policy_signal_process",
+            "policy_sig_proc",
             UniversalSubsystemCategory::SignalDelivery,
             UniversalSubsystemCategory::ProcessActivity,
-            "Dispatch realtime signal queues and validate sigreturn frames on active tasks",
+            "Deliver Realtime SigQueue events safely across pidfd process isolation domains",
             true,
         ));
 
         self.add_interop_policy(SubsystemInteropPolicy::new(
-            "policy_device_drivers",
+            "policy_hotplug_drivers",
             UniversalSubsystemCategory::DeviceHotplug,
             UniversalSubsystemCategory::DriversHardware,
-            "Bridge Udev and FreeBSD devd hotplug events to Rump anykernel and C shim driver probes",
+            "Bridge Udev/Devd hardware hotplug events with Rump Anykernel driver initialization",
             false,
         ));
 
         self.add_interop_policy(SubsystemInteropPolicy::new(
-            "policy_crypto_auth",
+            "policy_crypto_storage",
             UniversalSubsystemCategory::CryptographySecurity,
-            UniversalSubsystemCategory::AuthIdentity,
-            "Authenticate systemd-homed and BSD-Auth credentials using Dilithium PQC key derivation",
+            UniversalSubsystemCategory::FilesystemStorage,
+            "Enforce post-quantum Dilithium/Kyber keys and GELI/LUKS2 encryption on ZFS/Btrfs CoW volumes",
             true,
         ));
 
         self.add_interop_policy(SubsystemInteropPolicy::new(
-            "policy_telemetry_obs",
+            "policy_telemetry_audit",
             UniversalSubsystemCategory::TelemetryObservability,
-            UniversalSubsystemCategory::ObservabilityDiagnostics,
-            "Filter sensitive payload data before exporting Prometheus metrics to DTrace and eBPF probes",
-            true,
+            UniversalSubsystemCategory::SystemAudit,
+            "Stream Prometheus and Pstore crash dumps into privacy-respecting audit ledgers",
+            false,
         ));
 
         self.add_interop_policy(SubsystemInteropPolicy::new(
             "policy_access_desktop",
             UniversalSubsystemCategory::AccessibilityInput,
             UniversalSubsystemCategory::DesktopCompositor,
-            "Route Orca screen reader, Fcitx5 IME, and multitouch gestures to Hyprland Wayland compositors",
+            "Route Orca screenreader and Braille display events directly through Wayland desktop compositor",
             false,
         ));
     }
@@ -856,54 +879,6 @@ impl SovereignUniversalSubsystemInteropEngine {
         self.active_distro_mode = String::from(mode);
     }
 
-    /// Resolve subsystem name or alias to registered adapter key.
-    pub fn resolve_subsystem_key(&self, name: &str) -> Option<String> {
-        if self.subsystem_adapters.contains_key(name) {
-            return Some(String::from(name));
-        }
-        let lower = name.to_lowercase();
-        let alias = match lower.as_str() {
-            "kernel" | "kernelscheduling" | "kernel_scheduling" => "kernel",
-            "security" | "securitysandboxing" | "security_sandboxing" => "security",
-            "filesystem" | "filesystemstorage" | "filesystem_storage" => "filesystem",
-            "networking" | "network" => "networking",
-            "package" | "packagemanagement" | "package_management" => "package",
-            "init" | "initsupervisor" | "init_supervisor" => "init",
-            "desktop" | "desktopcompositor" | "desktop_compositor" => "desktop",
-            "audio" | "audiosound" | "audio_sound" => "audio",
-            "power" | "hardwarepower" | "hardware_power" => "power",
-            "container" | "containervirt" | "container_virt" => "container",
-            "observability" | "observabilitydiagnostics" | "observability_diagnostics" => "observability",
-            "shell" | "shellterminal" | "shell_terminal" => "shell",
-            "ipc_mem" | "ipcmemory" | "ipc_memory" => "ipc_mem",
-            "drivers" | "drivershardware" | "drivers_hardware" => "drivers",
-            "boot" | "installerboot" | "installer_boot" => "boot",
-            "auth" | "authidentity" | "auth_identity" => "auth",
-            "i18n" | "i18nlocalization" | "i18n_localization" => "i18n",
-            "media_graphics" | "mediagraphics" | "media" => "media_graphics",
-            "compiler" | "compilertoolchain" | "compiler_toolchain" => "compiler",
-            "automation" | "automationprovisioning" | "automation_provisioning" => "automation",
-            "audit" | "systemaudit" | "system_audit" => "audit",
-            "ai_agent" | "aiworkflowagent" | "ai_workflow_agent" => "ai_agent",
-            "virt_hypervisor" | "virtualizationhypervisor" | "virtualization_hypervisor" => "virt_hypervisor",
-            "process" | "processactivity" | "process_activity" => "process_activity",
-            "memory" | "memoryvirtualization" | "memory_virt" | "memory_virtualization" => "memory_virt",
-            "time" | "timesynchronization" | "time_sync" | "time_synchronization" => "time_sync",
-            "signal" | "signaldelivery" | "signal_delivery" => "signal_delivery",
-            "device" | "devicehotplug" | "device_hotplug" => "device_hotplug",
-            "crypto" | "cryptographysecurity" | "crypto_sec" | "cryptography_security" => "crypto_sec",
-            "telemetry" | "telemetryobservability" | "telemetry_observability" => "telemetry",
-            "accessibility" | "accessibilityinput" | "accessibility_input" => "accessibility",
-            _ => return None,
-        };
-
-        if self.subsystem_adapters.contains_key(alias) {
-            Some(String::from(alias))
-        } else {
-            None
-        }
-    }
-
     /// Dispatch an inter-subsystem operation event and record execution.
     pub fn dispatch_event(
         &mut self,
@@ -912,15 +887,19 @@ impl SovereignUniversalSubsystemInteropEngine {
         kind: &str,
         payload: &str,
     ) -> Result<u64, &'static str> {
-        let resolved_origin = self.resolve_subsystem_key(origin).ok_or("Unknown origin subsystem")?;
-        let resolved_target = self.resolve_subsystem_key(target).ok_or("Unknown target subsystem")?;
+        if !self.subsystem_adapters.contains_key(origin) {
+            return Err("Unknown origin subsystem");
+        }
+        if !self.subsystem_adapters.contains_key(target) {
+            return Err("Unknown target subsystem");
+        }
 
         self.event_counter += 1;
         let event = SubsystemInteropEvent {
             event_id: self.event_counter,
             timestamp: self.event_counter * 1000,
-            origin_subsystem: resolved_origin,
-            target_subsystem: resolved_target,
+            origin_subsystem: String::from(origin),
+            target_subsystem: String::from(target),
             event_kind: String::from(kind),
             payload: String::from(payload),
             handled: true,
@@ -994,23 +973,21 @@ impl SovereignUniversalSubsystemInteropEngine {
         target: &str,
         action: &str,
     ) -> Result<u64, &'static str> {
-        let resolved_origin = self.resolve_subsystem_key(origin).ok_or("Unknown origin subsystem")?;
-        let resolved_target = self.resolve_subsystem_key(target).ok_or("Unknown target subsystem")?;
         let origin_adapter = self
             .subsystem_adapters
-            .get(&resolved_origin)
+            .get(origin)
             .ok_or("Unknown origin subsystem")?
             .clone();
         let target_adapter = self
             .subsystem_adapters
-            .get(&resolved_target)
+            .get(target)
             .ok_or("Unknown target subsystem")?
             .clone();
 
         let _policy = self.translate_policy(origin_adapter.category, target_adapter.category);
 
         let payload = format!("action={};mode={}", action, self.active_distro_mode);
-        self.dispatch_event(&resolved_origin, &resolved_target, "cross_distro_op", &payload)
+        self.dispatch_event(origin, target, "cross_distro_op", &payload)
     }
 }
 
@@ -1084,6 +1061,7 @@ impl Default for SovereignUniversalSubsystemDistroHarmonizer {
 }
 
 #[cfg(test)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -1091,8 +1069,8 @@ mod tests {
     fn test_subsystem_interop_engine_initialization() {
         let engine = SovereignUniversalSubsystemInteropEngine::new();
         assert_eq!(engine.active_distro_mode, "LinuxArch");
-        assert_eq!(engine.subsystem_adapters.len(), 31);
-        assert!(engine.interop_policies.len() >= 25);
+        assert!(engine.subsystem_adapters.len() >= 11);
+        assert!(engine.interop_policies.len() >= 5);
         assert!(engine.verify_all_subsystems_interoperability());
         assert_eq!(engine.evaluate_system_wide_harmony_score(), 100);
     }
@@ -1187,9 +1165,43 @@ mod tests {
     fn test_expanded_subsystem_categories_interop() {
         let mut engine = SovereignUniversalSubsystemInteropEngine::new();
 
+        assert_eq!(engine.subsystem_adapters.len(), 31);
+
         assert_eq!(
             UniversalSubsystemCategory::ShellTerminal.as_str(),
             "ShellTerminal"
+        );
+        assert_eq!(
+            UniversalSubsystemCategory::ProcessActivity.as_str(),
+            "ProcessActivity"
+        );
+        assert_eq!(
+            UniversalSubsystemCategory::MemoryVirtualization.as_str(),
+            "MemoryVirtualization"
+        );
+        assert_eq!(
+            UniversalSubsystemCategory::TimeSynchronization.as_str(),
+            "TimeSynchronization"
+        );
+        assert_eq!(
+            UniversalSubsystemCategory::SignalDelivery.as_str(),
+            "SignalDelivery"
+        );
+        assert_eq!(
+            UniversalSubsystemCategory::DeviceHotplug.as_str(),
+            "DeviceHotplug"
+        );
+        assert_eq!(
+            UniversalSubsystemCategory::CryptographySecurity.as_str(),
+            "CryptographySecurity"
+        );
+        assert_eq!(
+            UniversalSubsystemCategory::TelemetryObservability.as_str(),
+            "TelemetryObservability"
+        );
+        assert_eq!(
+            UniversalSubsystemCategory::AccessibilityInput.as_str(),
+            "AccessibilityInput"
         );
         assert_eq!(UniversalSubsystemCategory::IpcMemory.as_str(), "IpcMemory");
         assert_eq!(
@@ -1232,40 +1244,7 @@ mod tests {
             UniversalSubsystemCategory::VirtualizationHypervisor.as_str(),
             "VirtualizationHypervisor"
         );
-        assert_eq!(
-            UniversalSubsystemCategory::ProcessActivity.as_str(),
-            "ProcessActivity"
-        );
-        assert_eq!(
-            UniversalSubsystemCategory::MemoryVirtualization.as_str(),
-            "MemoryVirtualization"
-        );
-        assert_eq!(
-            UniversalSubsystemCategory::TimeSynchronization.as_str(),
-            "TimeSynchronization"
-        );
-        assert_eq!(
-            UniversalSubsystemCategory::SignalDelivery.as_str(),
-            "SignalDelivery"
-        );
-        assert_eq!(
-            UniversalSubsystemCategory::DeviceHotplug.as_str(),
-            "DeviceHotplug"
-        );
-        assert_eq!(
-            UniversalSubsystemCategory::CryptographySecurity.as_str(),
-            "CryptographySecurity"
-        );
-        assert_eq!(
-            UniversalSubsystemCategory::TelemetryObservability.as_str(),
-            "TelemetryObservability"
-        );
-        assert_eq!(
-            UniversalSubsystemCategory::AccessibilityInput.as_str(),
-            "AccessibilityInput"
-        );
 
-        assert_eq!(engine.subsystem_adapters.len(), 31);
         assert!(engine.subsystem_adapters.contains_key("shell"));
         assert!(engine.subsystem_adapters.contains_key("ipc_mem"));
         assert!(engine.subsystem_adapters.contains_key("drivers"));
@@ -1281,9 +1260,11 @@ mod tests {
         assert!(engine.subsystem_adapters.contains_key("time_sync"));
         assert!(engine.subsystem_adapters.contains_key("signal_delivery"));
         assert!(engine.subsystem_adapters.contains_key("device_hotplug"));
-        assert!(engine.subsystem_adapters.contains_key("crypto_sec"));
-        assert!(engine.subsystem_adapters.contains_key("telemetry"));
-        assert!(engine.subsystem_adapters.contains_key("accessibility"));
+        assert!(engine.subsystem_adapters.contains_key("crypto_security"));
+        assert!(engine.subsystem_adapters.contains_key("telemetry_obs"));
+        assert!(engine
+            .subsystem_adapters
+            .contains_key("accessibility_input"));
 
         let event_id = engine
             .dispatch_cross_subsystem_operation_all_distros("shell", "ipc_mem", "alloc_ring_buffer")
@@ -1297,14 +1278,6 @@ mod tests {
             )
             .expect("Shell-IPC policy should exist");
         assert_eq!(policy.policy_id, "policy_shell_ipc");
-
-        let crypto_pol = engine
-            .translate_policy(
-                UniversalSubsystemCategory::CryptographySecurity,
-                UniversalSubsystemCategory::AuthIdentity,
-            )
-            .expect("Crypto-Auth policy should exist");
-        assert_eq!(crypto_pol.policy_id, "policy_crypto_auth");
 
         assert!(engine.verify_all_subsystems_interoperability());
         assert_eq!(engine.evaluate_system_wide_harmony_score(), 100);

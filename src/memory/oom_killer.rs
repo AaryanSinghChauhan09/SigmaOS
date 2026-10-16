@@ -148,7 +148,9 @@ mod tests {
             },
         ];
 
-        let victim = killer.select_victim(&candidates).expect("Should pick victim");
+        let victim = killer
+            .select_victim(&candidates)
+            .expect("Should pick victim");
         assert_eq!(victim.pid, 500);
         assert_eq!(victim.name, "leaky-browser");
     }

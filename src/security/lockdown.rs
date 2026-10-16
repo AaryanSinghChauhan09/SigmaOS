@@ -102,7 +102,10 @@ mod tests {
 
         // Ratchet to Integrity
         assert!(KernelLockdownController::set_level(LockdownMode::Integrity).is_ok());
-        assert_eq!(KernelLockdownController::current_level(), LockdownMode::Integrity);
+        assert_eq!(
+            KernelLockdownController::current_level(),
+            LockdownMode::Integrity
+        );
 
         // Raw memory access should now be blocked
         assert!(lsm.verify_action(LockdownReason::DevMemAccess).is_err());
@@ -113,6 +116,8 @@ mod tests {
 
         // Ratchet up to Confidentiality
         assert!(KernelLockdownController::set_level(LockdownMode::Confidentiality).is_ok());
-        assert!(lsm.verify_action(LockdownReason::TracefsKernelPointers).is_err());
+        assert!(lsm
+            .verify_action(LockdownReason::TracefsKernelPointers)
+            .is_err());
     }
 }

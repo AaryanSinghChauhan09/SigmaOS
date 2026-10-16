@@ -125,7 +125,11 @@ impl SshClientSession {
     }
 
     /// Authenticate via public key.
-    pub fn authenticate_publickey(&mut self, _pubkey: &[u8], _signature: &[u8]) -> Result<(), SshError> {
+    pub fn authenticate_publickey(
+        &mut self,
+        _pubkey: &[u8],
+        _signature: &[u8],
+    ) -> Result<(), SshError> {
         self.authenticated = true;
         Ok(())
     }
@@ -164,7 +168,10 @@ impl SshClientSession {
 
     /// Request interactive PTY and shell on a channel.
     pub fn request_shell(&mut self, channel_id: u32) -> Result<(), SshError> {
-        let channel = self.channels.get_mut(&channel_id).ok_or(SshError::ChannelNotFound)?;
+        let channel = self
+            .channels
+            .get_mut(&channel_id)
+            .ok_or(SshError::ChannelNotFound)?;
         if channel.is_closed {
             return Err(SshError::ChannelClosed);
         }
@@ -173,7 +180,10 @@ impl SshClientSession {
 
     /// Send data on an open channel.
     pub fn send_channel_data(&mut self, channel_id: u32, data: &[u8]) -> Result<(), SshError> {
-        let channel = self.channels.get_mut(&channel_id).ok_or(SshError::ChannelNotFound)?;
+        let channel = self
+            .channels
+            .get_mut(&channel_id)
+            .ok_or(SshError::ChannelNotFound)?;
         if channel.is_closed {
             return Err(SshError::ChannelClosed);
         }

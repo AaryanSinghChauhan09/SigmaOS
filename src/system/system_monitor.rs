@@ -216,18 +216,26 @@ impl SystemMonitor {
             "cpu" => {
                 self.processes.sort_by(|a, b| {
                     if self.sort_descending {
-                        b.cpu_percent.partial_cmp(&a.cpu_percent).unwrap_or(core::cmp::Ordering::Equal)
+                        b.cpu_percent
+                            .partial_cmp(&a.cpu_percent)
+                            .unwrap_or(core::cmp::Ordering::Equal)
                     } else {
-                        a.cpu_percent.partial_cmp(&b.cpu_percent).unwrap_or(core::cmp::Ordering::Equal)
+                        a.cpu_percent
+                            .partial_cmp(&b.cpu_percent)
+                            .unwrap_or(core::cmp::Ordering::Equal)
                     }
                 });
             }
             "memory" => {
                 self.processes.sort_by(|a, b| {
                     if self.sort_descending {
-                        b.memory_percent.partial_cmp(&a.memory_percent).unwrap_or(core::cmp::Ordering::Equal)
+                        b.memory_percent
+                            .partial_cmp(&a.memory_percent)
+                            .unwrap_or(core::cmp::Ordering::Equal)
                     } else {
-                        a.memory_percent.partial_cmp(&b.memory_percent).unwrap_or(core::cmp::Ordering::Equal)
+                        a.memory_percent
+                            .partial_cmp(&b.memory_percent)
+                            .unwrap_or(core::cmp::Ordering::Equal)
                     }
                 });
             }
@@ -258,7 +266,9 @@ impl SystemMonitor {
                 .iter()
                 .filter(|p| {
                     p.name.to_lowercase().contains(&self.filter.to_lowercase())
-                        || p.command.to_lowercase().contains(&self.filter.to_lowercase())
+                        || p.command
+                            .to_lowercase()
+                            .contains(&self.filter.to_lowercase())
                 })
                 .collect()
         }
@@ -269,7 +279,8 @@ impl SystemMonitor {
         if self.cpu_cores.is_empty() {
             0.0
         } else {
-            self.cpu_cores.iter().map(|c| c.usage_percent).sum::<f32>() / self.cpu_cores.len() as f32
+            self.cpu_cores.iter().map(|c| c.usage_percent).sum::<f32>()
+                / self.cpu_cores.len() as f32
         }
     }
 
@@ -330,7 +341,9 @@ pub fn init_system_monitor() {
 /// Get system monitor
 pub fn get_system_monitor() -> &'static mut SystemMonitor {
     unsafe {
-        SYSTEM_MONITOR.as_mut().expect("System monitor not initialized")
+        SYSTEM_MONITOR
+            .as_mut()
+            .expect("System monitor not initialized")
     }
 }
 

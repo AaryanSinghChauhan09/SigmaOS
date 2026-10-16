@@ -49,12 +49,8 @@ pub use paging::{
 
 pub use allocator::{BuddyAllocator, MemoryBlock, SlabAllocator, SlabCache, SlabObject};
 pub use cgroups::{MemCgroup, MemCgroupManager};
-pub use zram::{
-    ZramConfig, ZramStats, ZramDevice, ZramManager,
-    CompressionAlgorithm,
-    init_zram_manager, get_zram_manager, create_default_zram,
-};
 pub use kswapd::{LinuxKswapd, PageState};
+pub use page_compaction::*;
 pub use quota::{
     MemoryController, MemoryStats, MemoryUnit, OomEvent, OomPolicy, PageCacheStat,
     ProcessMemoryAccount,
@@ -66,5 +62,8 @@ pub use segmentation_paging::{
 };
 pub use thp::{HugePageBlock, HugePageFlags, SovereignHugePageEngine, TransparentHugePageMode};
 pub use tlb_associative::{AssociativeTlbCache, TlbAssociativityMode, TlbEntry, TlbPageFlags};
-pub use page_compaction::*;
 pub use zone::{BsdZoneAllocator, Slab, Zone, ZoneStats};
+pub use zram::{
+    create_default_zram, get_zram_manager, init_zram_manager, CompressionAlgorithm, ZramConfig,
+    ZramDevice, ZramManager, ZramStats,
+};

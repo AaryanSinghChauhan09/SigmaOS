@@ -44,12 +44,15 @@ impl RobustFutexManager {
 
     /// Register acquisition of a robust futex by a thread
     pub fn lock(&mut self, uaddr: u64, caller_tid: u32, priority: i32) -> Result<(), &'static str> {
-        let state = self.tracked_futexes.entry(uaddr).or_insert_with(|| RobustFutexState {
-            uaddr,
-            owner_tid: 0,
-            owner_died: false,
-            waiters: Vec::new(),
-        });
+        let state = self
+            .tracked_futexes
+            .entry(uaddr)
+            .or_insert_with(|| RobustFutexState {
+                uaddr,
+                owner_tid: 0,
+                owner_died: false,
+                waiters: Vec::new(),
+            });
 
         if state.owner_tid == 0 {
             state.owner_tid = caller_tid;

@@ -214,7 +214,13 @@ impl UnifiedShellEngine {
     }
 
     /// Register plugin
-    pub fn register_plugin(&mut self, name: String, plugin_type: PluginType, version: String, config: String) -> u32 {
+    pub fn register_plugin(
+        &mut self,
+        name: String,
+        plugin_type: PluginType,
+        version: String,
+        config: String,
+    ) -> u32 {
         let id = self.next_plugin_id.fetch_add(1, Ordering::Relaxed);
         let plugin = Plugin {
             id,
@@ -243,7 +249,13 @@ impl UnifiedShellEngine {
     }
 
     /// Add key binding
-    pub fn add_key_binding(&mut self, modifiers: Vec<String>, key: String, action: String, context: String) -> u32 {
+    pub fn add_key_binding(
+        &mut self,
+        modifiers: Vec<String>,
+        key: String,
+        action: String,
+        context: String,
+    ) -> u32 {
         let id = self.keyboard_layout.bindings.len() as u32;
         let binding = KeyBinding {
             id,
@@ -257,7 +269,14 @@ impl UnifiedShellEngine {
     }
 
     /// Send notification
-    pub fn send_notification(&mut self, app_name: String, title: String, body: String, urgency: NotificationUrgency, timeout: u32) -> u32 {
+    pub fn send_notification(
+        &mut self,
+        app_name: String,
+        title: String,
+        body: String,
+        urgency: NotificationUrgency,
+        timeout: u32,
+    ) -> u32 {
         let id = self.next_notification_id.fetch_add(1, Ordering::Relaxed);
         let notification = UnifiedNotification {
             id,
@@ -301,7 +320,11 @@ impl UnifiedShellEngine {
     }
 
     /// Add widget to panel
-    pub fn add_widget_to_panel(&mut self, panel_id: u32, widget_id: u32) -> Result<(), &'static str> {
+    pub fn add_widget_to_panel(
+        &mut self,
+        panel_id: u32,
+        widget_id: u32,
+    ) -> Result<(), &'static str> {
         let panel = self.panels.get_mut(&panel_id).ok_or("Panel not found")?;
         if !panel.widgets.contains(&widget_id) {
             panel.widgets.push(widget_id);
@@ -310,7 +333,13 @@ impl UnifiedShellEngine {
     }
 
     /// Show OSD
-    pub fn show_osd(&mut self, osd_type: String, position: (f32, f32), duration: u32, content: String) -> u32 {
+    pub fn show_osd(
+        &mut self,
+        osd_type: String,
+        position: (f32, f32),
+        duration: u32,
+        content: String,
+    ) -> u32 {
         let id = self.osd_elements.len() as u32;
         let osd = OSDElement {
             id,
@@ -339,14 +368,20 @@ impl UnifiedShellEngine {
 
     /// Enable policy rule
     pub fn enable_policy_rule(&mut self, rule_id: u32) -> Result<(), &'static str> {
-        let rule = self.policy_rules.get_mut(&rule_id).ok_or("Rule not found")?;
+        let rule = self
+            .policy_rules
+            .get_mut(&rule_id)
+            .ok_or("Rule not found")?;
         rule.enabled = true;
         Ok(())
     }
 
     /// Disable policy rule
     pub fn disable_policy_rule(&mut self, rule_id: u32) -> Result<(), &'static str> {
-        let rule = self.policy_rules.get_mut(&rule_id).ok_or("Rule not found")?;
+        let rule = self
+            .policy_rules
+            .get_mut(&rule_id)
+            .ok_or("Rule not found")?;
         rule.enabled = false;
         Ok(())
     }
@@ -382,9 +417,7 @@ pub fn init_unified_shell() {
 
 /// Get global unified shell
 pub fn get_unified_shell() -> Option<&'static mut UnifiedShellEngine> {
-    unsafe {
-        UNIFIED_SHELL.as_mut()
-    }
+    unsafe { UNIFIED_SHELL.as_mut() }
 }
 
 #[cfg(test)]
@@ -418,7 +451,12 @@ mod tests {
     fn test_plugins() {
         let mut shell = UnifiedShellEngine::new();
         shell.init();
-        let plugin_id = shell.register_plugin("Launcher".to_string(), PluginType::Launcher, "1.0".to_string(), "{}".to_string());
+        let plugin_id = shell.register_plugin(
+            "Launcher".to_string(),
+            PluginType::Launcher,
+            "1.0".to_string(),
+            "{}".to_string(),
+        );
         assert!(shell.plugins.contains_key(&plugin_id));
         shell.disable_plugin(plugin_id).unwrap();
         assert_eq!(shell.plugins[&plugin_id].state, PluginState::Disabled);
@@ -428,15 +466,29 @@ mod tests {
     fn test_key_bindings() {
         let mut shell = UnifiedShellEngine::new();
         shell.init();
-        let binding_id = shell.add_key_binding(vec!["Ctrl".to_string()], "Space".to_string(), "launcher".to_string(), "global".to_string());
-        assert_eq!(shell.keyboard_layout.bindings[binding_id as usize].action, "launcher");
+        let binding_id = shell.add_key_binding(
+            vec!["Ctrl".to_string()],
+            "Space".to_string(),
+            "launcher".to_string(),
+            "global".to_string(),
+        );
+        assert_eq!(
+            shell.keyboard_layout.bindings[binding_id as usize].action,
+            "launcher"
+        );
     }
 
     #[test]
     fn test_notifications() {
         let mut shell = UnifiedShellEngine::new();
         shell.init();
-        let id = shell.send_notification("TestApp".to_string(), "Test Title".to_string(), "Test Body".to_string(), NotificationUrgency::Normal, 5000);
+        let id = shell.send_notification(
+            "TestApp".to_string(),
+            "Test Title".to_string(),
+            "Test Body".to_string(),
+            NotificationUrgency::Normal,
+            5000,
+        );
         assert_eq!(shell.notifications.len(), 1);
         assert_eq!(shell.notifications[0].title, "Test Title");
     }
@@ -445,7 +497,8 @@ mod tests {
     fn test_widgets() {
         let mut shell = UnifiedShellEngine::new();
         shell.init();
-        let widget_id = shell.add_widget("Clock".to_string(), WidgetPosition::Top, "{}".to_string());
+        let widget_id =
+            shell.add_widget("Clock".to_string(), WidgetPosition::Top, "{}".to_string());
         assert!(shell.widgets.contains_key(&widget_id));
         shell.toggle_widget(widget_id).unwrap();
         assert!(!shell.widgets[&widget_id].visible);
@@ -457,7 +510,11 @@ mod tests {
         shell.init();
         let panel_id = shell.create_panel(WidgetPosition::Bottom, 30, false);
         assert!(shell.panels.contains_key(&panel_id));
-        let widget_id = shell.add_widget("Status".to_string(), WidgetPosition::Bottom, "{}".to_string());
+        let widget_id = shell.add_widget(
+            "Status".to_string(),
+            WidgetPosition::Bottom,
+            "{}".to_string(),
+        );
         shell.add_widget_to_panel(panel_id, widget_id).unwrap();
         assert_eq!(shell.panels[&panel_id].widgets.len(), 1);
     }
@@ -466,7 +523,12 @@ mod tests {
     fn test_osd() {
         let mut shell = UnifiedShellEngine::new();
         shell.init();
-        let osd_id = shell.show_osd("volume".to_string(), (0.5, 0.5), 2000, "Volume: 50%".to_string());
+        let osd_id = shell.show_osd(
+            "volume".to_string(),
+            (0.5, 0.5),
+            2000,
+            "Volume: 50%".to_string(),
+        );
         assert_eq!(shell.osd_elements.len(), 1);
         assert_eq!(shell.osd_elements[0].osd_type, "volume");
     }
@@ -475,7 +537,11 @@ mod tests {
     fn test_policy_rules() {
         let mut shell = UnifiedShellEngine::new();
         shell.init();
-        let rule_id = shell.add_policy_rule("auto_lock".to_string(), "idle > 600".to_string(), "lock_screen".to_string());
+        let rule_id = shell.add_policy_rule(
+            "auto_lock".to_string(),
+            "idle > 600".to_string(),
+            "lock_screen".to_string(),
+        );
         assert!(shell.policy_rules.contains_key(&rule_id));
         shell.disable_policy_rule(rule_id).unwrap();
         assert!(!shell.policy_rules[&rule_id].enabled);

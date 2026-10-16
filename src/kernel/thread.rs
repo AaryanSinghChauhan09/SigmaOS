@@ -464,13 +464,7 @@ mod tests {
     #[test]
     fn test_valid_state_transitions() {
         let stack = StackMeta::new(0x1000, 0x4000, 0x1000);
-        let mut thread = Thread::new(
-            ThreadId(1),
-            1,
-            "worker",
-            ThreadOwnership::User,
-            stack,
-        );
+        let mut thread = Thread::new(ThreadId(1), 1, "worker", ThreadOwnership::User, stack);
 
         assert_eq!(thread.state, ThreadState::New);
 
@@ -497,13 +491,7 @@ mod tests {
     #[test]
     fn test_invalid_state_transitions() {
         let stack = StackMeta::new(0x1000, 0x4000, 0x1000);
-        let mut thread = Thread::new(
-            ThreadId(2),
-            1,
-            "bad_trans",
-            ThreadOwnership::User,
-            stack,
-        );
+        let mut thread = Thread::new(ThreadId(2), 1, "bad_trans", ThreadOwnership::User, stack);
 
         // Invalid: New -> Running (must go through Ready)
         assert!(thread.transition_to(ThreadState::Running).is_err());
@@ -515,13 +503,7 @@ mod tests {
     #[test]
     fn test_detach_and_join() {
         let stack = StackMeta::new(0x1000, 0x4000, 0x1000);
-        let mut thread = Thread::new(
-            ThreadId(3),
-            1,
-            "detached",
-            ThreadOwnership::User,
-            stack,
-        );
+        let mut thread = Thread::new(ThreadId(3), 1, "detached", ThreadOwnership::User, stack);
 
         thread.transition_to(ThreadState::Ready).unwrap();
         thread.transition_to(ThreadState::Running).unwrap();
@@ -539,13 +521,7 @@ mod tests {
     #[test]
     fn test_lock_order_tracker() {
         let stack = StackMeta::new(0x1000, 0x4000, 0x1000);
-        let mut thread = Thread::new(
-            ThreadId(4),
-            1,
-            "lock_test",
-            ThreadOwnership::User,
-            stack,
-        );
+        let mut thread = Thread::new(ThreadId(4), 1, "lock_test", ThreadOwnership::User, stack);
 
         assert!(thread.acquire_lock(0x1000).is_ok());
         assert!(thread.acquire_lock(0x2000).is_ok());
@@ -573,13 +549,19 @@ mod tests {
             .unwrap()
             .transition_to(ThreadState::Running)
             .unwrap();
-        tm.find_mut(t1).unwrap().block_on(WaitChannelId(42)).unwrap();
+        tm.find_mut(t1)
+            .unwrap()
+            .block_on(WaitChannelId(42))
+            .unwrap();
 
         tm.find_mut(t2)
             .unwrap()
             .transition_to(ThreadState::Running)
             .unwrap();
-        tm.find_mut(t2).unwrap().block_on(WaitChannelId(42)).unwrap();
+        tm.find_mut(t2)
+            .unwrap()
+            .block_on(WaitChannelId(42))
+            .unwrap();
 
         let woken = tm.wake_wait_channel(WaitChannelId(42));
         assert_eq!(woken, 2);
@@ -603,13 +585,7 @@ mod tests {
     #[test]
     fn test_suspension_and_resume_lifecycle() {
         let stack = StackMeta::new(0x1000, 0x4000, 0x1000);
-        let mut thread = Thread::new(
-            ThreadId(5),
-            1,
-            "suspend_test",
-            ThreadOwnership::User,
-            stack,
-        );
+        let mut thread = Thread::new(ThreadId(5), 1, "suspend_test", ThreadOwnership::User, stack);
 
         thread.transition_to(ThreadState::Ready).unwrap();
         thread.transition_to(ThreadState::Running).unwrap();
@@ -630,7 +606,10 @@ mod tests {
         let t2 = tm.create_thread(1, "t2", ThreadOwnership::User, stack);
 
         tm.enqueue_ready(t1).unwrap();
-        tm.find_mut(t1).unwrap().transition_to(ThreadState::Running).unwrap();
+        tm.find_mut(t1)
+            .unwrap()
+            .transition_to(ThreadState::Running)
+            .unwrap();
         tm.find_mut(t1).unwrap().exit(0).unwrap(); // Detached -> Terminated immediately
 
         assert_eq!(tm.find(t1).unwrap().state, ThreadState::Terminated);

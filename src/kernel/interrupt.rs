@@ -266,7 +266,7 @@ impl InterruptController {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_allocate_vector() {
         let controller = InterruptController::new();

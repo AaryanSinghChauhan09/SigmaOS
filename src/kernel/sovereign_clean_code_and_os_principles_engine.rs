@@ -86,16 +86,13 @@ impl SovereignOopsAndSolidPrinciplesEngine {
         uses_composition_over_inheritance: bool,
         has_polymorphism: bool,
     ) -> bool {
-        has_encapsulation && has_abstraction && uses_composition_over_inheritance && has_polymorphism
+        has_encapsulation
+            && has_abstraction
+            && uses_composition_over_inheritance
+            && has_polymorphism
     }
 
-    pub fn audit_solid_compliance(
-        srp: bool,
-        ocp: bool,
-        lsp: bool,
-        isp: bool,
-        dip: bool,
-    ) -> bool {
+    pub fn audit_solid_compliance(srp: bool, ocp: bool, lsp: bool, isp: bool, dip: bool) -> bool {
         srp && ocp && lsp && isp && dip
     }
 }
@@ -394,12 +391,14 @@ mod tests {
         assert!(SolidDesignValidator::verify_interface_segregation(3));
         assert!(SolidDesignValidator::verify_dependency_inversion(true));
 
-        assert!(SovereignOopsAndSolidPrinciplesEngine::audit_oops_compliance(
-            true, true, true, true
-        ));
-        assert!(SovereignOopsAndSolidPrinciplesEngine::audit_solid_compliance(
-            true, true, true, true, true
-        ));
+        assert!(
+            SovereignOopsAndSolidPrinciplesEngine::audit_oops_compliance(true, true, true, true)
+        );
+        assert!(
+            SovereignOopsAndSolidPrinciplesEngine::audit_solid_compliance(
+                true, true, true, true, true
+            )
+        );
     }
 
     #[test]
@@ -411,7 +410,9 @@ mod tests {
         assert!(!CleanCodeMetricsEvaluator::evaluate_kiss_simplicity(15));
 
         assert!(CleanCodeMetricsEvaluator::evaluate_yagni_necessity(true));
-        assert!(CleanCodeMetricsEvaluator::evaluate_separation_of_concerns(2));
+        assert!(CleanCodeMetricsEvaluator::evaluate_separation_of_concerns(
+            2
+        ));
 
         assert!(DesignByContractGuard::verify_precondition(|| 1 + 1 == 2));
         assert!(DesignByContractGuard::verify_postcondition(|| true));

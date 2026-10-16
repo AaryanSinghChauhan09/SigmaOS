@@ -164,10 +164,14 @@ impl SigmaRecovery {
     /// Add a recovery snapshot
     pub fn add_snapshot(&mut self, snapshot: RecoverySnapshot) -> Result<(), String> {
         if self.snapshots.contains_key(&snapshot.snapshot_id) {
-            return Err(format!("Snapshot '{}' already exists", snapshot.snapshot_id));
+            return Err(format!(
+                "Snapshot '{}' already exists",
+                snapshot.snapshot_id
+            ));
         }
-        
-        self.snapshots.insert(snapshot.snapshot_id.clone(), snapshot);
+
+        self.snapshots
+            .insert(snapshot.snapshot_id.clone(), snapshot);
         self.snapshot_counter += 1;
         Ok(())
     }
@@ -190,7 +194,7 @@ impl SigmaRecovery {
         if !self.running {
             return Err("SigmaRecovery not running".to_string());
         }
-        
+
         self.current_mode = RecoveryMode::Recovery;
         Ok(())
     }
@@ -200,7 +204,7 @@ impl SigmaRecovery {
         if !self.running {
             return Err("SigmaRecovery not running".to_string());
         }
-        
+
         self.current_mode = RecoveryMode::Normal;
         Ok(())
     }
@@ -212,9 +216,7 @@ impl SigmaRecovery {
 
     /// List bootable snapshots
     pub fn list_bootable(&self) -> Vec<&RecoverySnapshot> {
-        self.snapshots.values()
-            .filter(|s| s.bootable)
-            .collect()
+        self.snapshots.values().filter(|s| s.bootable).collect()
     }
 
     /// Get snapshot count
@@ -225,8 +227,14 @@ impl SigmaRecovery {
     /// Get recovery statistics
     pub fn recovery_stats(&self) -> BTreeMap<String, String> {
         let mut stats = BTreeMap::new();
-        stats.insert("total_snapshots".to_string(), self.snapshot_count().to_string());
-        stats.insert("bootable_snapshots".to_string(), self.list_bootable().len().to_string());
+        stats.insert(
+            "total_snapshots".to_string(),
+            self.snapshot_count().to_string(),
+        );
+        stats.insert(
+            "bootable_snapshots".to_string(),
+            self.list_bootable().len().to_string(),
+        );
         stats.insert("current_mode".to_string(), self.current_mode.to_string());
         stats.insert("running".to_string(), self.running.to_string());
         stats
@@ -276,7 +284,10 @@ mod tests {
     #[test]
     fn test_recovery_action_display() {
         assert_eq!(RecoveryAction::BootShell.to_string(), "boot_shell");
-        assert_eq!(RecoveryAction::BootSingleUser.to_string(), "boot_single_user");
+        assert_eq!(
+            RecoveryAction::BootSingleUser.to_string(),
+            "boot_single_user"
+        );
     }
 
     #[test]
@@ -284,7 +295,7 @@ mod tests {
         let snapshot = RecoverySnapshot::new(
             "snap1".to_string(),
             "Before Update".to_string(),
-            "System snapshot before update".to_string()
+            "System snapshot before update".to_string(),
         )
         .with_timestamp(1234567890)
         .with_size(1024)
@@ -315,13 +326,13 @@ mod tests {
     #[test]
     fn test_sigmarecovery_add_snapshot() {
         let mut recovery = SigmaRecovery::new();
-        
+
         let snapshot = RecoverySnapshot::new(
             "snap1".to_string(),
             "Before Update".to_string(),
-            "System snapshot before update".to_string()
+            "System snapshot before update".to_string(),
         );
-        
+
         assert!(recovery.add_snapshot(snapshot).is_ok());
         assert_eq!(recovery.snapshot_count(), 1);
     }
@@ -330,7 +341,7 @@ mod tests {
     fn test_sigmarecovery_boot_recovery() {
         let mut recovery = SigmaRecovery::new();
         recovery.start();
-        
+
         assert!(recovery.boot_recovery(RecoveryAction::BootShell).is_ok());
         assert_eq!(recovery.get_mode(), RecoveryMode::Recovery);
     }
@@ -339,7 +350,7 @@ mod tests {
     fn test_sigmarecovery_boot_normal() {
         let mut recovery = SigmaRecovery::new();
         recovery.start();
-        
+
         assert!(recovery.boot_normal().is_ok());
         assert_eq!(recovery.get_mode(), RecoveryMode::Normal);
     }
@@ -347,16 +358,16 @@ mod tests {
     #[test]
     fn test_sigmarecovery_list_bootable() {
         let mut recovery = SigmaRecovery::new();
-        
+
         let snapshot = RecoverySnapshot::new(
             "snap1".to_string(),
             "Before Update".to_string(),
-            "System snapshot before update".to_string()
+            "System snapshot before update".to_string(),
         )
         .with_bootable(true);
-        
+
         recovery.add_snapshot(snapshot).unwrap();
-        
+
         let bootable = recovery.list_bootable();
         assert_eq!(bootable.len(), 1);
     }
@@ -364,16 +375,16 @@ mod tests {
     #[test]
     fn test_sigmarecovery_stats() {
         let mut recovery = SigmaRecovery::new();
-        
+
         let snapshot = RecoverySnapshot::new(
             "snap1".to_string(),
             "Before Update".to_string(),
-            "System snapshot before update".to_string()
+            "System snapshot before update".to_string(),
         )
         .with_bootable(true);
-        
+
         recovery.add_snapshot(snapshot).unwrap();
-        
+
         let stats = recovery.recovery_stats();
         assert_eq!(stats.get("total_snapshots"), Some(&"1".to_string()));
         assert_eq!(stats.get("bootable_snapshots"), Some(&"1".to_string()));
@@ -382,10 +393,10 @@ mod tests {
     #[test]
     fn test_boot_to_recovery_convenience() {
         init_sigmarecovery();
-        
+
         let mut recovery = get_sigmarecovery().unwrap();
         recovery.start();
-        
+
         let result = boot_to_recovery(RecoveryAction::BootShell);
         assert!(result.is_ok());
     }

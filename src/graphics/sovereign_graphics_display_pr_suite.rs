@@ -223,7 +223,14 @@ impl SovereignX11ServerEngine {
         atom
     }
 
-    pub fn create_window(&mut self, parent: u32, x: i32, y: i32, width: u32, height: u32) -> Result<u32, &'static str> {
+    pub fn create_window(
+        &mut self,
+        parent: u32,
+        x: i32,
+        y: i32,
+        width: u32,
+        height: u32,
+    ) -> Result<u32, &'static str> {
         if !self.windows.contains_key(&parent) {
             return Err("Parent window does not exist");
         }
@@ -256,7 +263,12 @@ impl SovereignX11ServerEngine {
         Ok(())
     }
 
-    pub fn set_property(&mut self, win_id: u32, atom: u32, data: Vec<u8>) -> Result<(), &'static str> {
+    pub fn set_property(
+        &mut self,
+        win_id: u32,
+        atom: u32,
+        data: Vec<u8>,
+    ) -> Result<(), &'static str> {
         let win = self.windows.get_mut(&win_id).ok_or("Window not found")?;
         win.properties.insert(atom, data);
         Ok(())
@@ -317,20 +329,40 @@ impl SovereignWaylandCoreEngine {
         id
     }
 
-    pub fn attach_buffer(&mut self, surface_id: u64, buffer: WaylandBufferDescriptor) -> Result<(), &'static str> {
-        let surf = self.surfaces.get_mut(&surface_id).ok_or("Surface not found")?;
+    pub fn attach_buffer(
+        &mut self,
+        surface_id: u64,
+        buffer: WaylandBufferDescriptor,
+    ) -> Result<(), &'static str> {
+        let surf = self
+            .surfaces
+            .get_mut(&surface_id)
+            .ok_or("Surface not found")?;
         surf.attached_buffer = Some(buffer);
         Ok(())
     }
 
-    pub fn add_damage(&mut self, surface_id: u64, x: i32, y: i32, w: u32, h: u32) -> Result<(), &'static str> {
-        let surf = self.surfaces.get_mut(&surface_id).ok_or("Surface not found")?;
+    pub fn add_damage(
+        &mut self,
+        surface_id: u64,
+        x: i32,
+        y: i32,
+        w: u32,
+        h: u32,
+    ) -> Result<(), &'static str> {
+        let surf = self
+            .surfaces
+            .get_mut(&surface_id)
+            .ok_or("Surface not found")?;
         surf.damage_rects.push((x, y, w, h));
         Ok(())
     }
 
     pub fn commit(&mut self, surface_id: u64) -> Result<(), &'static str> {
-        let surf = self.surfaces.get_mut(&surface_id).ok_or("Surface not found")?;
+        let surf = self
+            .surfaces
+            .get_mut(&surface_id)
+            .ok_or("Surface not found")?;
         surf.configured = true;
         self.active_focus_surface = Some(surface_id);
         Ok(())
@@ -507,7 +539,7 @@ impl SovereignLibdrmBridgeEngine {
 #[derive(Debug, Clone)]
 pub struct VulkanSwapchain {
     pub images_count: u32,
-    pub format: u32, // VK_FORMAT_B8G8R8A8_UNORM
+    pub format: u32,          // VK_FORMAT_B8G8R8A8_UNORM
     pub present_mode: String, // VK_PRESENT_MODE_MAILBOX_KHR
     pub current_image_idx: u32,
 }
@@ -544,7 +576,8 @@ impl SovereignVulkanApiEngine {
 
     pub fn submit_command_buffer(&mut self) -> u32 {
         self.submitted_cmd_buffers += 1;
-        self.swapchain.current_image_idx = (self.swapchain.current_image_idx + 1) % self.swapchain.images_count;
+        self.swapchain.current_image_idx =
+            (self.swapchain.current_image_idx + 1) % self.swapchain.images_count;
         self.swapchain.current_image_idx
     }
 }
@@ -662,7 +695,12 @@ impl SovereignSwayEngine {
         }
     }
 
-    pub fn add_container(&mut self, parent_id: u64, title: &str, split: SwaySplitDirection) -> Result<u64, &'static str> {
+    pub fn add_container(
+        &mut self,
+        parent_id: u64,
+        title: &str,
+        split: SwaySplitDirection,
+    ) -> Result<u64, &'static str> {
         if !self.containers.contains_key(&parent_id) {
             return Err("Parent container not found");
         }
@@ -929,7 +967,8 @@ impl SovereignLibinputEngine {
     }
 
     pub fn is_palm_touch(&self, touch_x: u32, touchpad_w: u32) -> bool {
-        touch_x < self.palm_rejection_zone_width_px || touch_x > (touchpad_w - self.palm_rejection_zone_width_px)
+        touch_x < self.palm_rejection_zone_width_px
+            || touch_x > (touchpad_w - self.palm_rejection_zone_width_px)
     }
 
     pub fn calculate_accel_delta(&self, delta_x: f32, delta_y: f32) -> (f32, f32) {
@@ -1239,7 +1278,10 @@ impl SovereignGraphicsDisplayPrGatewayEngine {
         }
     }
 
-    pub fn run_automated_ci_gating(&mut self, pr_id: u32) -> Result<GraphicsDisplayPrStatus, &'static str> {
+    pub fn run_automated_ci_gating(
+        &mut self,
+        pr_id: u32,
+    ) -> Result<GraphicsDisplayPrStatus, &'static str> {
         let pr = self.prs.get_mut(&pr_id).ok_or("PR not found")?;
         if !pr.satisfies_sat_constraints {
             pr.status = GraphicsDisplayPrStatus::Rejected;
@@ -1256,7 +1298,9 @@ impl SovereignGraphicsDisplayPrGatewayEngine {
 
     pub fn merge_pr(&mut self, pr_id: u32) -> Result<GraphicsDisplayPrStatus, &'static str> {
         let pr = self.prs.get_mut(&pr_id).ok_or("PR not found")?;
-        if pr.status != GraphicsDisplayPrStatus::CiValidationPass && pr.status != GraphicsDisplayPrStatus::Gated {
+        if pr.status != GraphicsDisplayPrStatus::CiValidationPass
+            && pr.status != GraphicsDisplayPrStatus::Gated
+        {
             return Err("PR must pass CI validation gating before merging");
         }
         pr.status = GraphicsDisplayPrStatus::Merged;
@@ -1267,7 +1311,11 @@ impl SovereignGraphicsDisplayPrGatewayEngine {
         self.prs.get(&pr_id).map(|pr| pr.diff_content.clone())
     }
 
-    pub fn search_prs(&self, category: Option<GraphicsDisplayPrCategory>, status: Option<GraphicsDisplayPrStatus>) -> Vec<GraphicsDisplayPrDefinition> {
+    pub fn search_prs(
+        &self,
+        category: Option<GraphicsDisplayPrCategory>,
+        status: Option<GraphicsDisplayPrStatus>,
+    ) -> Vec<GraphicsDisplayPrDefinition> {
         self.prs
             .values()
             .filter(|pr| {
@@ -1361,15 +1409,24 @@ impl SovereignGraphicsDisplayMasterSuiteEngine {
         // 3. Audit Wayland Engine
         let surf_id = self.wayland_engine.create_surface();
         let commit_res = self.wayland_engine.commit(surf_id);
-        results.insert("Wayland Surface & xdg_shell Commit Functional", commit_res.is_ok());
+        results.insert(
+            "Wayland Surface & xdg_shell Commit Functional",
+            commit_res.is_ok(),
+        );
 
         // 4. Audit Mesa & DRI3
         let dri3_buf = self.mesa_engine.allocate_dri3_buffer(1920, 1080, 32);
-        results.insert("Mesa EGL & DRI3 Buffer Exchange Functional", dri3_buf.stride == 1920 * 4);
+        results.insert(
+            "Mesa EGL & DRI3 Buffer Exchange Functional",
+            dri3_buf.stride == 1920 * 4,
+        );
 
         // 5. Audit DRM/KMS
         let gem_obj = self.drm_engine.create_gem_object(1920, 1080, 32);
-        results.insert("DRM/KMS GEM & PRIME Buffer Allocation Functional", gem_obj.pitch == 1920 * 4);
+        results.insert(
+            "DRM/KMS GEM & PRIME Buffer Allocation Functional",
+            gem_obj.pitch == 1920 * 4,
+        );
 
         // 6. Audit libdrm
         let cap = self.libdrm_engine.get_cap("DRM_CAP_DUMB_BUFFER");
@@ -1377,7 +1434,10 @@ impl SovereignGraphicsDisplayMasterSuiteEngine {
 
         // 7. Audit Vulkan API
         let vk_img = self.vulkan_engine.submit_command_buffer();
-        results.insert("Vulkan 3D Command Buffer & Swapchain Functional", vk_img < 3);
+        results.insert(
+            "Vulkan 3D Command Buffer & Swapchain Functional",
+            vk_img < 3,
+        );
 
         // 8. Audit OpenGL API
         let render_ok = self.opengl_engine.render_frame();
@@ -1388,8 +1448,13 @@ impl SovereignGraphicsDisplayMasterSuiteEngine {
         results.insert("Weston Output Repaint Functional", views > 0);
 
         // 10. Audit Sway Tiling Engine
-        let sway_node = self.sway_engine.add_container(1, "Terminal", SwaySplitDirection::Horizontal);
-        results.insert("Sway Tiling Window Tree Container Functional", sway_node.is_ok());
+        let sway_node =
+            self.sway_engine
+                .add_container(1, "Terminal", SwaySplitDirection::Horizontal);
+        results.insert(
+            "Sway Tiling Window Tree Container Functional",
+            sway_node.is_ok(),
+        );
 
         // 11. Audit wlroots Library
         let scene_node = self.wlroots_engine.create_scene_node(50, 50);
@@ -1397,11 +1462,17 @@ impl SovereignGraphicsDisplayMasterSuiteEngine {
 
         // 12. Audit Mutter & Fractional Scaling
         let buffer_px = self.mutter_engine.transform_logical_to_buffer(100.0);
-        results.insert("Mutter Clutter Fractional Scaling Functional", buffer_px == 125);
+        results.insert(
+            "Mutter Clutter Fractional Scaling Functional",
+            buffer_px == 125,
+        );
 
         // 13. Audit KWin Plasma Effects
         let (kw_w, kw_h) = self.kwin_engine.calculate_window_total_bounds(800, 600);
-        results.insert("KWin Window Decoration Geometry Functional", kw_w == 832 && kw_h == 660);
+        results.insert(
+            "KWin Window Decoration Geometry Functional",
+            kw_w == 832 && kw_h == 660,
+        );
 
         // 14. Audit Compiz 3D Cube & Physics
         self.compiz_engine.rotate_cube(0.5);
@@ -1414,7 +1485,13 @@ impl SovereignGraphicsDisplayMasterSuiteEngine {
 
         // 16. Audit Xwayland Bridge
         self.xwayland_engine.sync_clipboard("Wayland Selection");
-        results.insert("Xwayland Glamor & Clipboard Bridge Functional", !self.xwayland_engine.x11_to_wayland_clipboard_payload.is_empty());
+        results.insert(
+            "Xwayland Glamor & Clipboard Bridge Functional",
+            !self
+                .xwayland_engine
+                .x11_to_wayland_clipboard_payload
+                .is_empty(),
+        );
 
         // 17. Audit evdev Input Parser
         let packet = EvdevEventPacket {
@@ -1425,7 +1502,10 @@ impl SovereignGraphicsDisplayMasterSuiteEngine {
             value: 450,
         };
         let evdev_res = self.evdev_engine.process_packet(packet);
-        results.insert("evdev Multitouch Slot Parsing Functional", evdev_res.is_some());
+        results.insert(
+            "evdev Multitouch Slot Parsing Functional",
+            evdev_res.is_some(),
+        );
 
         // 18. Audit libinput Gesture & Accel
         let is_palm = self.libinput_engine.is_palm_touch(10, 1000);
@@ -1434,12 +1514,18 @@ impl SovereignGraphicsDisplayMasterSuiteEngine {
         // 19. Audit Console Framebuffer
         self.fbdev_engine.draw_pixel(100, 100, 0xFF00FF00);
         self.fbdev_engine.swap_framebuffer();
-        results.insert("Console Framebuffer fbdev Pixel Drawing Functional", self.fbdev_engine.pixels[100 * 1920 + 100] == 0xFF00FF00);
+        results.insert(
+            "Console Framebuffer fbdev Pixel Drawing Functional",
+            self.fbdev_engine.pixels[100 * 1920 + 100] == 0xFF00FF00,
+        );
 
         // 20. Audit Virtual Terminal matrix
         self.vt_engine.write_char('A');
         let switched = self.vt_engine.switch_vt(2).is_ok();
-        results.insert("Virtual Terminal Matrix & VT Switcher Functional", switched && self.vt_engine.screen_matrix[0] == 'A');
+        results.insert(
+            "Virtual Terminal Matrix & VT Switcher Functional",
+            switched && self.vt_engine.screen_matrix[0] == 'A',
+        );
 
         results
     }
@@ -1521,7 +1607,9 @@ mod tests {
     #[test]
     fn test_sway_and_wlroots_compositors() {
         let mut sway = SovereignSwayEngine::new();
-        let node = sway.add_container(1, "SubTerm", SwaySplitDirection::Vertical).unwrap();
+        let node = sway
+            .add_container(1, "SubTerm", SwaySplitDirection::Vertical)
+            .unwrap();
         assert_eq!(node, 2);
 
         let mut wlr = SovereignWlrootsEngine::new();

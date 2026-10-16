@@ -59,7 +59,7 @@ pub struct NotesApp {
 impl NotesApp {
     pub fn new() -> Self {
         let mut folders = BTreeMap::new();
-        
+
         // Default folder
         folders.insert(
             1,
@@ -104,7 +104,13 @@ impl NotesApp {
     }
 
     /// Add note
-    pub fn add_note(&mut self, title: String, content: String, folder_id: Option<u32>, color: NoteColor) -> u32 {
+    pub fn add_note(
+        &mut self,
+        title: String,
+        content: String,
+        folder_id: Option<u32>,
+        color: NoteColor,
+    ) -> u32 {
         let id = self.next_note_id.fetch_add(1, Ordering::Relaxed);
         let now = 0; // Simplified
         let note = Note {
@@ -123,7 +129,13 @@ impl NotesApp {
     }
 
     /// Update note
-    pub fn update_note(&mut self, id: u32, title: String, content: String, color: NoteColor) -> Result<(), &'static str> {
+    pub fn update_note(
+        &mut self,
+        id: u32,
+        title: String,
+        content: String,
+        color: NoteColor,
+    ) -> Result<(), &'static str> {
         let note = self.notes.get_mut(&id).ok_or("Note not found")?;
         note.title = title;
         note.content = content;
@@ -201,7 +213,9 @@ impl NotesApp {
             .filter(|n| {
                 n.title.to_lowercase().contains(&query_lower)
                     || n.content.to_lowercase().contains(&query_lower)
-                    || n.tags.iter().any(|t| t.to_lowercase().contains(&query_lower))
+                    || n.tags
+                        .iter()
+                        .any(|t| t.to_lowercase().contains(&query_lower))
             })
             .collect()
     }
@@ -252,9 +266,7 @@ pub fn init_notes_app() {
 
 /// Get notes app
 pub fn get_notes_app() -> &'static mut NotesApp {
-    unsafe {
-        NOTES_APP.as_mut().expect("Notes app not initialized")
-    }
+    unsafe { NOTES_APP.as_mut().expect("Notes app not initialized") }
 }
 
 #[cfg(test)]
@@ -275,7 +287,7 @@ mod tests {
             "Test Note".to_string(),
             "Content".to_string(),
             Some(1),
-            NoteColor::Blue
+            NoteColor::Blue,
         );
         assert_eq!(app.note_count(), 1);
     }
@@ -283,7 +295,12 @@ mod tests {
     #[test]
     fn test_pin_note() {
         let mut app = NotesApp::new();
-        let id = app.add_note("Test".to_string(), "Content".to_string(), Some(1), NoteColor::Default);
+        let id = app.add_note(
+            "Test".to_string(),
+            "Content".to_string(),
+            Some(1),
+            NoteColor::Default,
+        );
         app.pin_note(id).unwrap();
         assert!(app.get_note(id).unwrap().pinned);
     }
@@ -291,7 +308,12 @@ mod tests {
     #[test]
     fn test_search_notes() {
         let mut app = NotesApp::new();
-        app.add_note("Shopping List".to_string(), "Milk, Eggs".to_string(), Some(1), NoteColor::Default);
+        app.add_note(
+            "Shopping List".to_string(),
+            "Milk, Eggs".to_string(),
+            Some(1),
+            NoteColor::Default,
+        );
         let results = app.search_notes("shopping");
         assert_eq!(results.len(), 1);
     }
@@ -299,8 +321,17 @@ mod tests {
     #[test]
     fn test_add_tag() {
         let mut app = NotesApp::new();
-        let id = app.add_note("Test".to_string(), "Content".to_string(), Some(1), NoteColor::Default);
+        let id = app.add_note(
+            "Test".to_string(),
+            "Content".to_string(),
+            Some(1),
+            NoteColor::Default,
+        );
         app.add_tag(id, "important".to_string()).unwrap();
-        assert!(app.get_note(id).unwrap().tags.contains(&"important".to_string()));
+        assert!(app
+            .get_note(id)
+            .unwrap()
+            .tags
+            .contains(&"important".to_string()));
     }
 }

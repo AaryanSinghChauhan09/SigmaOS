@@ -78,6 +78,7 @@ WIKI/
 !wiki/*.md
 !wiki/**/*.md
 !Agents/*.md
+!.kilo/agent/*.md
 !.agents/*.md
 !.agents/**/*.md
 !reports/*.md
