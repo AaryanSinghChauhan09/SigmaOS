@@ -50,6 +50,7 @@ pub struct WikiFeatureAuditRecord {
 }
 
 /// Master Verification Engine for Linux & BSD Wiki Roadmap
+#[derive(Debug)]
 pub struct SovereignLinuxBsdWikiMasterEngine {
     pub audit_records: BTreeMap<String, WikiFeatureAuditRecord>,
 }
