@@ -105,7 +105,9 @@ mod tests {
 
         assert_eq!(controller.current_state(), AcpiSleepState::S0Working);
 
-        let (pm1a, _) = controller.transition_sleep(AcpiSleepState::S3SuspendToRam).unwrap();
+        let (pm1a, _) = controller
+            .transition_sleep(AcpiSleepState::S3SuspendToRam)
+            .unwrap();
         assert_eq!(controller.current_state(), AcpiSleepState::S3SuspendToRam);
         assert_eq!(pm1a, (0x05 << 10) | AcpiSleepController::SLP_EN);
 

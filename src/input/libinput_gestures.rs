@@ -124,7 +124,11 @@ impl LibinputGestureEngine {
     }
 
     /// Process two-finger pinch-to-zoom distance delta
-    pub fn process_pinch_delta(&mut self, distance_ratio: f64, angle_delta: f64) -> Option<GesturePinchEvent> {
+    pub fn process_pinch_delta(
+        &mut self,
+        distance_ratio: f64,
+        angle_delta: f64,
+    ) -> Option<GesturePinchEvent> {
         if self.active_fingers != 2 {
             return None;
         }

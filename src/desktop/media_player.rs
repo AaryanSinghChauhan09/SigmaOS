@@ -113,7 +113,9 @@ pub struct MediaPlayer {
 impl MediaPlayer {
     pub fn new() -> Self {
         let mut equalizer = Vec::new();
-        let frequencies = [60.0, 170.0, 310.0, 600.0, 1000.0, 3000.0, 6000.0, 12000.0, 14000.0, 16000.0];
+        let frequencies = [
+            60.0, 170.0, 310.0, 600.0, 1000.0, 3000.0, 6000.0, 12000.0, 14000.0, 16000.0,
+        ];
         for freq in frequencies {
             equalizer.push(EqualizerBand {
                 frequency: freq,
@@ -265,20 +267,33 @@ impl MediaPlayer {
     }
 
     /// Add to playlist
-    pub fn add_to_playlist(&mut self, playlist_id: u32, item: MediaItem) -> Result<(), &'static str> {
-        let playlist = self.playlists.get_mut(playlist_id as usize).ok_or("Playlist not found")?;
+    pub fn add_to_playlist(
+        &mut self,
+        playlist_id: u32,
+        item: MediaItem,
+    ) -> Result<(), &'static str> {
+        let playlist = self
+            .playlists
+            .get_mut(playlist_id as usize)
+            .ok_or("Playlist not found")?;
         playlist.items.push(item);
         Ok(())
     }
 
     /// Get current position
     pub fn get_position(&self) -> f32 {
-        self.current_item.as_ref().map(|i| i.position).unwrap_or(0.0)
+        self.current_item
+            .as_ref()
+            .map(|i| i.position)
+            .unwrap_or(0.0)
     }
 
     /// Get duration
     pub fn get_duration(&self) -> f32 {
-        self.current_item.as_ref().map(|i| i.duration).unwrap_or(0.0)
+        self.current_item
+            .as_ref()
+            .map(|i| i.duration)
+            .unwrap_or(0.0)
     }
 }
 
@@ -294,9 +309,7 @@ pub fn init_media_player() {
 
 /// Get media player
 pub fn get_media_player() -> &'static mut MediaPlayer {
-    unsafe {
-        MEDIA_PLAYER.as_mut().expect("Media player not initialized")
-    }
+    unsafe { MEDIA_PLAYER.as_mut().expect("Media player not initialized") }
 }
 
 #[cfg(test)]

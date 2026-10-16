@@ -15,7 +15,12 @@ pub enum RecordingArea {
     Fullscreen,
     Window,
     Selection,
-    Custom { x: u32, y: u32, width: u32, height: u32 },
+    Custom {
+        x: u32,
+        y: u32,
+        width: u32,
+        height: u32,
+    },
 }
 
 /// Video codec
@@ -229,7 +234,9 @@ pub fn init_screen_recorder() {
 /// Get screen recorder
 pub fn get_screen_recorder() -> &'static mut ScreenRecorder {
     unsafe {
-        SCREEN_RECORDER.as_mut().expect("Screen recorder not initialized")
+        SCREEN_RECORDER
+            .as_mut()
+            .expect("Screen recorder not initialized")
     }
 }
 

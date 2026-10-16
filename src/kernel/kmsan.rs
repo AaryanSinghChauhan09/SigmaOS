@@ -131,7 +131,11 @@ impl KmsanShadowMap {
     #[inline]
     fn offset(&self, addr: usize) -> Option<usize> {
         let off = addr.wrapping_sub(self.base_addr);
-        if off < self.covered_bytes { Some(off) } else { None }
+        if off < self.covered_bytes {
+            Some(off)
+        } else {
+            None
+        }
     }
 
     /// Mark a range of kernel memory as **initialized** (clear shadow bits).
@@ -213,7 +217,11 @@ impl KmsanOriginMap {
     fn word_index(&self, addr: usize) -> Option<usize> {
         let off = addr.wrapping_sub(self.base_addr);
         let idx = off / 4;
-        if idx < self.word_count { Some(idx) } else { None }
+        if idx < self.word_count {
+            Some(idx)
+        } else {
+            None
+        }
     }
 
     /// Set the origin of a word-aligned kernel address.
@@ -233,9 +241,7 @@ impl KmsanOriginMap {
     /// Propagate origins from `src` range to `dst` range (word-by-word).
     pub fn propagate(&mut self, dst: usize, src: usize, byte_size: usize) {
         let words = (byte_size + 3) / 4;
-        let copied: Vec<OriginId> = (0..words)
-            .map(|i| self.get_origin(src + i * 4))
-            .collect();
+        let copied: Vec<OriginId> = (0..words).map(|i| self.get_origin(src + i * 4)).collect();
         for (i, &oid) in copied.iter().enumerate() {
             self.set_origin(dst + i * 4, oid);
         }
@@ -369,7 +375,7 @@ impl KmsanEngine {
             creation_pc,
             label,
             stack_trace: [0; 16], // TODO: capture real stack
-            timestamp_ns: 0,       // TODO: read TSC
+            timestamp_ns: 0,      // TODO: read TSC
         };
         if let Ok(mut table) = self.origin_table.lock() {
             table.insert(id, entry);
@@ -441,7 +447,8 @@ impl KmsanEngine {
         if !self.enabled {
             return;
         }
-        self.shadow.mark_uninitialized(frame.frame_sp, frame.frame_size);
+        self.shadow
+            .mark_uninitialized(frame.frame_sp, frame.frame_size);
     }
 
     /// Instrumentation hook for `memset(dst, val, size)`.
@@ -475,7 +482,9 @@ impl KmsanEngine {
             return;
         }
         self.shadow.mark_initialized(dst, size);
-        self.stats.copy_from_user_checks.fetch_add(1, Ordering::Relaxed);
+        self.stats
+            .copy_from_user_checks
+            .fetch_add(1, Ordering::Relaxed);
     }
 
     /// Check that `[addr, addr+size)` is entirely initialized before a use.

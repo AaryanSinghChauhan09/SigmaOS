@@ -172,7 +172,11 @@ impl VideoEditor {
 
     /// Remove track
     pub fn remove_track(&mut self, track_id: u32) -> Result<(), &'static str> {
-        let index = self.tracks.iter().position(|t| t.id == track_id).ok_or("Track not found")?;
+        let index = self
+            .tracks
+            .iter()
+            .position(|t| t.id == track_id)
+            .ok_or("Track not found")?;
         self.tracks.remove(index);
         Ok(())
     }
@@ -184,7 +188,11 @@ impl VideoEditor {
 
     /// Remove clip
     pub fn remove_clip(&mut self, clip_id: String) -> Result<(), &'static str> {
-        let index = self.clips.iter().position(|c| c.id == clip_id).ok_or("Clip not found")?;
+        let index = self
+            .clips
+            .iter()
+            .position(|c| c.id == clip_id)
+            .ok_or("Clip not found")?;
         self.clips.remove(index);
         Ok(())
     }
@@ -273,9 +281,7 @@ pub fn init_video_editor() {
 
 /// Get video editor
 pub fn get_video_editor() -> &'static mut VideoEditor {
-    unsafe {
-        VIDEO_EDITOR.as_mut().expect("Video editor not initialized")
-    }
+    unsafe { VIDEO_EDITOR.as_mut().expect("Video editor not initialized") }
 }
 
 #[cfg(test)]

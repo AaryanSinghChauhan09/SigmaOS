@@ -210,7 +210,7 @@ impl SigmaMonitor {
         if self.stats.cpu_cores.is_empty() {
             return 0.0;
         }
-        
+
         let total_user: f32 = self.stats.cpu_cores.iter().map(|c| c.user_percent).sum();
         let total_system: f32 = self.stats.cpu_cores.iter().map(|c| c.system_percent).sum();
         (total_user + total_system) / self.stats.cpu_cores.len() as f32
@@ -226,7 +226,7 @@ impl SigmaMonitor {
         if self.stats.disks.is_empty() {
             return 0.0;
         }
-        
+
         let total_used: f32 = self.stats.disks.iter().map(|d| d.used_percent).sum();
         total_used / self.stats.disks.len() as f32
     }
@@ -269,14 +269,38 @@ impl SigmaMonitor {
     /// Get monitor statistics
     pub fn monitor_stats(&self) -> BTreeMap<String, String> {
         let mut stats = BTreeMap::new();
-        stats.insert("cpu_cores".to_string(), self.stats.cpu_cores.len().to_string());
-        stats.insert("cpu_usage".to_string(), format!("{:.1}", self.get_cpu_usage()));
-        stats.insert("memory_usage".to_string(), format!("{:.1}", self.get_memory_usage()));
-        stats.insert("disk_usage".to_string(), format!("{:.1}", self.get_disk_usage()));
-        stats.insert("load_1min".to_string(), format!("{:.2}", self.stats.load_avg.0));
-        stats.insert("load_5min".to_string(), format!("{:.2}", self.stats.load_avg.1));
-        stats.insert("load_15min".to_string(), format!("{:.2}", self.stats.load_avg.2));
-        stats.insert("uptime_seconds".to_string(), self.stats.uptime_seconds.to_string());
+        stats.insert(
+            "cpu_cores".to_string(),
+            self.stats.cpu_cores.len().to_string(),
+        );
+        stats.insert(
+            "cpu_usage".to_string(),
+            format!("{:.1}", self.get_cpu_usage()),
+        );
+        stats.insert(
+            "memory_usage".to_string(),
+            format!("{:.1}", self.get_memory_usage()),
+        );
+        stats.insert(
+            "disk_usage".to_string(),
+            format!("{:.1}", self.get_disk_usage()),
+        );
+        stats.insert(
+            "load_1min".to_string(),
+            format!("{:.2}", self.stats.load_avg.0),
+        );
+        stats.insert(
+            "load_5min".to_string(),
+            format!("{:.2}", self.stats.load_avg.1),
+        );
+        stats.insert(
+            "load_15min".to_string(),
+            format!("{:.2}", self.stats.load_avg.2),
+        );
+        stats.insert(
+            "uptime_seconds".to_string(),
+            self.stats.uptime_seconds.to_string(),
+        );
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
@@ -413,10 +437,10 @@ mod tests {
     fn test_sigmamonitor_stats() {
         let mut monitor = SigmaMonitor::new();
         monitor.start();
-        
+
         let core = CpuCoreStats::new(0);
         monitor.add_cpu_core(core);
-        
+
         let stats = monitor.monitor_stats();
         assert_eq!(stats.get("cpu_cores"), Some(&"1".to_string()));
         assert_eq!(stats.get("running"), Some(&"true".to_string()));
@@ -425,10 +449,10 @@ mod tests {
     #[test]
     fn test_update_system_stats_convenience() {
         init_sigmamonitor();
-        
+
         let mut monitor = get_sigmamonitor().unwrap();
         monitor.set_update_interval(5);
-        
+
         let result = update_system_stats();
         assert!(result.is_ok());
     }

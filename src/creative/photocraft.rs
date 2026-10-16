@@ -289,19 +289,19 @@ impl PhotoEditor {
             psd_compatible: true,
         }
     }
-    
+
     /// Initialize photo editor
     pub fn init(&mut self) {
         self.active.store(true, Ordering::Relaxed);
     }
-    
+
     /// Load image
     pub fn load_image(&mut self, path: String) -> Result<(), &'static str> {
         self.current_image = Some(path.clone());
         self.history.push(format!("Load: {}", path));
         Ok(())
     }
-    
+
     /// Create layer
     pub fn create_layer(&mut self, name: String, layer_type: LayerType) -> u32 {
         let id = self.next_layer_id.fetch_add(1, Ordering::Relaxed);
@@ -320,28 +320,38 @@ impl PhotoEditor {
         self.layers.insert(id, layer);
         id
     }
-    
+
     /// Get layer
     pub fn get_layer(&self, id: u32) -> Option<&ImageLayer> {
         self.layers.get(&id)
     }
-    
+
     /// Apply filter
-    pub fn apply_filter(&mut self, layer_id: u32, filter: Filter, value: f32) -> Result<(), &'static str> {
+    pub fn apply_filter(
+        &mut self,
+        layer_id: u32,
+        filter: Filter,
+        value: f32,
+    ) -> Result<(), &'static str> {
         self.layers.get_mut(&layer_id).ok_or("Layer not found")?;
-        self.history.push(format!("Apply filter: {:?} with value {}", filter, value));
+        self.history
+            .push(format!("Apply filter: {:?} with value {}", filter, value));
         Ok(())
     }
-    
+
     /// Adjust layer opacity
     pub fn adjust_opacity(&mut self, layer_id: u32, opacity: f32) -> Result<(), &'static str> {
         let layer = self.layers.get_mut(&layer_id).ok_or("Layer not found")?;
         layer.opacity = opacity;
         Ok(())
     }
-    
+
     /// Set blend mode
-    pub fn set_blend_mode(&mut self, layer_id: u32, blend_mode: BlendMode) -> Result<(), &'static str> {
+    pub fn set_blend_mode(
+        &mut self,
+        layer_id: u32,
+        blend_mode: BlendMode,
+    ) -> Result<(), &'static str> {
         let layer = self.layers.get_mut(&layer_id).ok_or("Layer not found")?;
         layer.blend_mode = blend_mode;
         Ok(())
@@ -373,7 +383,11 @@ impl PhotoEditor {
     }
 
     /// Set layer style
-    pub fn set_layer_style(&mut self, layer_id: u32, style: LayerStyle) -> Result<(), &'static str> {
+    pub fn set_layer_style(
+        &mut self,
+        layer_id: u32,
+        style: LayerStyle,
+    ) -> Result<(), &'static str> {
         let layer = self.layers.get_mut(&layer_id).ok_or("Layer not found")?;
         layer.layer_style = Some(style);
         Ok(())
@@ -392,7 +406,7 @@ impl PhotoEditor {
         layer.locked.store(false, Ordering::Relaxed);
         Ok(())
     }
-    
+
     /// Undo
     pub fn undo(&mut self) -> Result<(), &'static str> {
         if self.history.is_empty() {
@@ -401,12 +415,12 @@ impl PhotoEditor {
         self.history.pop();
         Ok(())
     }
-    
+
     /// Get current image
     pub fn get_current_image(&self) -> Option<&String> {
         self.current_image.as_ref()
     }
-    
+
     /// Is active
     pub fn is_active(&self) -> bool {
         self.active.load(Ordering::Relaxed)
@@ -431,22 +445,20 @@ pub fn init_photocraft() {
 
 /// Get global photo editor
 pub fn get_photocraft() -> Option<&'static mut PhotoEditor> {
-    unsafe {
-        PHOTOCRAFT.as_mut()
-    }
+    unsafe { PHOTOCRAFT.as_mut() }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_photocraft_init() {
         let mut editor = PhotoEditor::new();
         editor.init();
         assert!(editor.is_active());
     }
-    
+
     #[test]
     fn test_load_image() {
         let mut editor = PhotoEditor::new();
@@ -454,7 +466,7 @@ mod tests {
         editor.load_image("/path/to/image.jpg".to_string()).unwrap();
         assert!(editor.get_current_image().is_some());
     }
-    
+
     #[test]
     fn test_create_layer() {
         let mut editor = PhotoEditor::new();

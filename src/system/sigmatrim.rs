@@ -103,7 +103,12 @@ pub struct TrimResult {
 
 impl TrimResult {
     /// Create a successful TRIM result
-    pub fn success(mount_point: String, bytes_trimmed: u64, blocks_freed: u64, timestamp: u64) -> Self {
+    pub fn success(
+        mount_point: String,
+        bytes_trimmed: u64,
+        blocks_freed: u64,
+        timestamp: u64,
+    ) -> Self {
         Self {
             mount_point,
             status: TrimStatus::Completed,
@@ -190,7 +195,9 @@ impl SigmaTRIM {
 
     /// Check if mount point supports TRIM
     pub fn is_supported(&self, mount_point: &str) -> bool {
-        self.devices.get(mount_point).map_or(false, |d| d.supports_trim())
+        self.devices
+            .get(mount_point)
+            .map_or(false, |d| d.supports_trim())
     }
 
     /// Execute a TRIM operation on a mount point
@@ -269,16 +276,12 @@ pub fn init_sigmatrim() {
 
 /// Get global SigmaTRIM instance
 pub fn get_sigmatrim() -> Option<&'static SigmaTRIM> {
-    unsafe {
-        SIGMA_TRIM_INSTANCE.as_ref()
-    }
+    unsafe { SIGMA_TRIM_INSTANCE.as_ref() }
 }
 
 /// Get mutable global SigmaTRIM instance
 pub fn get_sigmatrim_mut() -> Option<&'static mut SigmaTRIM> {
-    unsafe {
-        SIGMA_TRIM_INSTANCE.as_mut()
-    }
+    unsafe { SIGMA_TRIM_INSTANCE.as_mut() }
 }
 
 /// Convenience function to execute a TRIM on a mount point

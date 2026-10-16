@@ -84,17 +84,21 @@ impl DiskUsageAnalyzer {
     /// Get largest directories
     pub fn get_largest_directories(&self, limit: usize) -> Vec<&FileSystemEntry> {
         let mut entries = Vec::new();
-        
+
         if let Some(ref scan) = self.current_scan {
             self.collect_directories(&scan.root, &mut entries);
         }
-        
+
         entries.sort_by(|a, b| b.size.cmp(&a.size));
         entries.into_iter().take(limit).collect()
     }
 
     /// Collect directories recursively
-    fn collect_directories<'a>(&'a self, entry: &'a FileSystemEntry, entries: &mut Vec<&'a FileSystemEntry>) {
+    fn collect_directories<'a>(
+        &'a self,
+        entry: &'a FileSystemEntry,
+        entries: &mut Vec<&'a FileSystemEntry>,
+    ) {
         if entry.is_directory {
             entries.push(entry);
             for child in &entry.children {
@@ -106,18 +110,22 @@ impl DiskUsageAnalyzer {
     /// Find large files
     pub fn find_large_files(&self, threshold: u64) -> Vec<&FileSystemEntry> {
         let mut files = Vec::new();
-        
+
         if let Some(ref scan) = self.current_scan {
             self.collect_files(&scan.root, &mut files);
         }
-        
+
         files.retain(|f| f.size >= threshold);
         files.sort_by(|a, b| b.size.cmp(&a.size));
         files
     }
 
     /// Collect files recursively
-    fn collect_files<'a>(&'a self, entry: &'a FileSystemEntry, files: &mut Vec<&'a FileSystemEntry>) {
+    fn collect_files<'a>(
+        &'a self,
+        entry: &'a FileSystemEntry,
+        files: &mut Vec<&'a FileSystemEntry>,
+    ) {
         if entry.is_directory {
             for child in &entry.children {
                 self.collect_files(child, files);
@@ -182,7 +190,9 @@ pub fn init_disk_usage_analyzer() {
 /// Get disk usage analyzer
 pub fn get_disk_usage_analyzer() -> &'static mut DiskUsageAnalyzer {
     unsafe {
-        DISK_USAGE_ANALYZER.as_mut().expect("Disk usage analyzer not initialized")
+        DISK_USAGE_ANALYZER
+            .as_mut()
+            .expect("Disk usage analyzer not initialized")
     }
 }
 
@@ -207,7 +217,10 @@ mod tests {
     fn test_format_size() {
         assert_eq!(DiskUsageAnalyzer::format_size(1024), "1.00 KB");
         assert_eq!(DiskUsageAnalyzer::format_size(1024 * 1024), "1.00 MB");
-        assert_eq!(DiskUsageAnalyzer::format_size(1024 * 1024 * 1024), "1.00 GB");
+        assert_eq!(
+            DiskUsageAnalyzer::format_size(1024 * 1024 * 1024),
+            "1.00 GB"
+        );
     }
 
     #[test]

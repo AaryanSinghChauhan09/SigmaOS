@@ -212,7 +212,11 @@ impl ImageEditor {
     }
 
     /// Set layer blend mode
-    pub fn set_layer_blend_mode(&mut self, index: usize, blend_mode: BlendMode) -> Result<(), &'static str> {
+    pub fn set_layer_blend_mode(
+        &mut self,
+        index: usize,
+        blend_mode: BlendMode,
+    ) -> Result<(), &'static str> {
         let layer = self.layers.get_mut(index).ok_or("Layer not found")?;
         layer.blend_mode = blend_mode;
         Ok(())
@@ -311,9 +315,7 @@ pub fn init_image_editor() {
 
 /// Get image editor
 pub fn get_image_editor() -> &'static mut ImageEditor {
-    unsafe {
-        IMAGE_EDITOR.as_mut().expect("Image editor not initialized")
-    }
+    unsafe { IMAGE_EDITOR.as_mut().expect("Image editor not initialized") }
 }
 
 #[cfg(test)]

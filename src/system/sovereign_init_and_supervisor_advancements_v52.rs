@@ -96,7 +96,12 @@ impl SystemdAdvancementsV52Engine {
         &self,
         _pid: u32,
         payload: &str,
-    ) -> (Option<SystemdServiceStatusV52>, Option<String>, Option<u32>, Option<u64>) {
+    ) -> (
+        Option<SystemdServiceStatusV52>,
+        Option<String>,
+        Option<u32>,
+        Option<u64>,
+    ) {
         let mut status = None;
         let mut status_msg = None;
         let mut main_pid = None;
@@ -134,7 +139,10 @@ impl SystemdAdvancementsV52Engine {
         pids_max: u32,
         memory_psi_pct: f32,
     ) -> bool {
-        memory_max_bytes > 0 && (1..=10000).contains(&cpu_weight) && pids_max > 0 && (0.0..=100.0).contains(&memory_psi_pct)
+        memory_max_bytes > 0
+            && (1..=10000).contains(&cpu_weight)
+            && pids_max > 0
+            && (0.0..=100.0).contains(&memory_psi_pct)
     }
 
     /// Format Journald structured log entries with binary header protocol frame.
@@ -211,7 +219,10 @@ impl OpenRcAdvancementsV52Engine {
     }
 
     /// Parse `/etc/init.d/` shell script dependency header block (`depend()` block parser).
-    pub fn parse_openrc_init_script(&self, script_content: &str) -> (String, Vec<String>, Vec<String>, Vec<String>) {
+    pub fn parse_openrc_init_script(
+        &self,
+        script_content: &str,
+    ) -> (String, Vec<String>, Vec<String>, Vec<String>) {
         let mut service_name = String::from("unknown");
         let mut need = Vec::new();
         let mut use_deps = Vec::new();
@@ -270,12 +281,16 @@ impl OpenRcAdvancementsV52Engine {
     /// Generate OpenRC Pull Request proposal manifest.
     pub fn generate_proposal(&self) -> CoreUserlandV52Manifest {
         CoreUserlandV52Manifest {
-            pr_title: "feat(openrc_v52): Parallel Runlevel Dependency Graph & /etc/init.d/ Script Parsing".to_string(),
+            pr_title:
+                "feat(openrc_v52): Parallel Runlevel Dependency Graph & /etc/init.d/ Script Parsing"
+                    .to_string(),
             target_subsystem: "Dependency-Based Init System".to_string(),
             original_system: "OpenRC (Gentoo / Alpine)".to_string(),
             components_added: vec![
-                "Runlevel transition manager (sysinit -> boot -> default -> nonetwork -> shutdown)".to_string(),
-                "Gentoo /etc/init.d/ depend() parser (need, use, provide, before, after)".to_string(),
+                "Runlevel transition manager (sysinit -> boot -> default -> nonetwork -> shutdown)"
+                    .to_string(),
+                "Gentoo /etc/init.d/ depend() parser (need, use, provide, before, after)"
+                    .to_string(),
                 "Parallel async service startup matrix with lock checks".to_string(),
                 "Stacked runlevel cascading & network trigger dispatcher".to_string(),
             ],
@@ -309,7 +324,12 @@ impl RunitS6AdvancementsV52Engine {
     }
 
     /// Simulate Void Linux `runit` 3-stage supervision tree & `/service/` scanner.
-    pub fn scan_runit_service_dir(&self, _service_name: &str, run_exists: bool, finish_exists: bool) -> RunitS6StateV52 {
+    pub fn scan_runit_service_dir(
+        &self,
+        _service_name: &str,
+        run_exists: bool,
+        finish_exists: bool,
+    ) -> RunitS6StateV52 {
         if !run_exists {
             return RunitS6StateV52::Down;
         }
@@ -352,7 +372,9 @@ impl RunitS6AdvancementsV52Engine {
     /// Generate runit & s6 Pull Request proposal manifest.
     pub fn generate_proposal(&self) -> CoreUserlandV52Manifest {
         CoreUserlandV52Manifest {
-            pr_title: "feat(runit_s6_v52): Lockless Supervision Tree, 3-Stage Runit & s6-rc Pipelines".to_string(),
+            pr_title:
+                "feat(runit_s6_v52): Lockless Supervision Tree, 3-Stage Runit & s6-rc Pipelines"
+                    .to_string(),
             target_subsystem: "Lightweight Process Supervisor".to_string(),
             original_system: "runit (Void Linux) & s6 (Alpine)".to_string(),
             components_added: vec![
@@ -439,7 +461,11 @@ impl SysVinitAdvancementsV52Engine {
     }
 
     /// Simulate `telinit` runlevel transition dispatching.
-    pub fn execute_telinit(&self, target_runlevel: u8, entries: &[SysVInittabEntryV52]) -> Vec<String> {
+    pub fn execute_telinit(
+        &self,
+        target_runlevel: u8,
+        entries: &[SysVInittabEntryV52],
+    ) -> Vec<String> {
         let mut commands = Vec::new();
         for entry in entries {
             if entry.runlevels.contains(&target_runlevel) || entry.runlevels.is_empty() {
@@ -452,7 +478,9 @@ impl SysVinitAdvancementsV52Engine {
     /// Generate SysVinit Pull Request proposal manifest.
     pub fn generate_proposal(&self) -> CoreUserlandV52Manifest {
         CoreUserlandV52Manifest {
-            pr_title: "feat(sysvinit_v52): Declarative /etc/inittab Parser & telinit State Controller".to_string(),
+            pr_title:
+                "feat(sysvinit_v52): Declarative /etc/inittab Parser & telinit State Controller"
+                    .to_string(),
             target_subsystem: "Legacy Unix Init Compatibility".to_string(),
             original_system: "System V Init (SysVinit)".to_string(),
             components_added: vec![
@@ -491,7 +519,10 @@ impl BsdRcAdvancementsV52Engine {
     }
 
     /// Simulate FreeBSD / OpenBSD / NetBSD `rcorder` topological dependency sorting.
-    pub fn sort_rcorder_scripts(&self, mut scripts: Vec<BsdRcScriptV52>) -> Result<Vec<String>, &'static str> {
+    pub fn sort_rcorder_scripts(
+        &self,
+        mut scripts: Vec<BsdRcScriptV52>,
+    ) -> Result<Vec<String>, &'static str> {
         let mut ordered = Vec::new();
         let mut visited = Vec::new();
 
@@ -558,24 +589,35 @@ impl BsdRcAdvancementsV52Engine {
         flags: &str,
     ) -> String {
         if !enabled && action != "forcestart" && action != "status" {
-            return format!("Cannot {} {}: service is disabled in rc.conf", action, service_name);
+            return format!(
+                "Cannot {} {}: service is disabled in rc.conf",
+                action, service_name
+            );
         }
-        format!("Executing rc.subr: {} {} (flags={})", service_name, action, flags)
+        format!(
+            "Executing rc.subr: {} {} (flags={})",
+            service_name, action, flags
+        )
     }
 
     /// Generate BSD rc Pull Request proposal manifest.
     pub fn generate_proposal(&self) -> CoreUserlandV52Manifest {
         CoreUserlandV52Manifest {
-            pr_title: "feat(bsd_rc_v52): FreeBSD rcorder Topological Sorting, /etc/rc.conf & rc.subr".to_string(),
+            pr_title:
+                "feat(bsd_rc_v52): FreeBSD rcorder Topological Sorting, /etc/rc.conf & rc.subr"
+                    .to_string(),
             target_subsystem: "BSD Core Init & Service Framework".to_string(),
             original_system: "BSD rc (FreeBSD / OpenBSD / NetBSD)".to_string(),
             components_added: vec![
                 "rcorder topological script sorter (PROVIDE, REQUIRE, BEFORE, KEYWORD)".to_string(),
-                "OpenBSD /etc/rc.conf & /etc/rc.conf.local key-value configuration evaluator".to_string(),
-                "rc.subr shell subroutine library router (start, stop, restart, status, poll)".to_string(),
+                "OpenBSD /etc/rc.conf & /etc/rc.conf.local key-value configuration evaluator"
+                    .to_string(),
+                "rc.subr shell subroutine library router (start, stop, restart, status, poll)"
+                    .to_string(),
                 "rc.d modular service architecture with fast parallel execution mode".to_string(),
             ],
-            performance_multiplier: "Zero-Overhead Deterministic Service Dependency Resolution".to_string(),
+            performance_multiplier: "Zero-Overhead Deterministic Service Dependency Resolution"
+                .to_string(),
             status: "Ready for Integration".to_string(),
         }
     }
@@ -631,16 +673,20 @@ impl LaunchdAdvancementsV52Engine {
     /// Generate launchd Pull Request proposal manifest.
     pub fn generate_proposal(&self) -> CoreUserlandV52Manifest {
         CoreUserlandV52Manifest {
-            pr_title: "feat(launchd_v52): macOS launchd Plist Agents, Mach Port Activation & KeepAlive".to_string(),
+            pr_title:
+                "feat(launchd_v52): macOS launchd Plist Agents, Mach Port Activation & KeepAlive"
+                    .to_string(),
             target_subsystem: "Apple launchd Supervisor".to_string(),
             original_system: "launchd (macOS / NextStep)".to_string(),
             components_added: vec![
                 "LaunchAgent & LaunchDaemon plist property list configuration parser".to_string(),
                 "Mach port & IPC socket-listening activation trigger engine".to_string(),
-                "KeepAlive rule evaluation matrix (SuccessfulExit, PathState, NetworkState)".to_string(),
+                "KeepAlive rule evaluation matrix (SuccessfulExit, PathState, NetworkState)"
+                    .to_string(),
                 "ThrottleInterval backoff algorithm to prevent thrashing daemons".to_string(),
             ],
-            performance_multiplier: "On-Demand Resource Allocation & Mach Message Activation".to_string(),
+            performance_multiplier: "On-Demand Resource Allocation & Mach Message Activation"
+                .to_string(),
             status: "Ready for Integration".to_string(),
         }
     }
@@ -788,17 +834,25 @@ impl CronAnacronTimersAtV52Engine {
     /// Generate Cron, Anacron, Timers & At Pull Request proposal manifest.
     pub fn generate_proposal(&self) -> CoreUserlandV52Manifest {
         CoreUserlandV52Manifest {
-            pr_title: "feat(cron_timers_at_v52): Vixie Cron, Anacron Catchup, systemd.timer & at Queue".to_string(),
+            pr_title:
+                "feat(cron_timers_at_v52): Vixie Cron, Anacron Catchup, systemd.timer & at Queue"
+                    .to_string(),
             target_subsystem: "Job Scheduling & Timers Subsystem".to_string(),
             original_system: "Cron / Anacron / systemd.timer / at".to_string(),
             components_added: vec![
-                "Vixie Cron minute-resolution schedule matcher (* * * * *, @daily, @reboot)".to_string(),
-                "Anacron catchup manager with RANDOM_DELAY jitter & max load average thresholding".to_string(),
-                "systemd.timer calendar (OnCalendar) & monotonic timers (OnBootSec, OnActiveSec)".to_string(),
-                "at / batch deferred execution job scheduler with priority queues ('a'..'z')".to_string(),
-                "MAILTO notification output router & systemd persistent timer state store".to_string(),
+                "Vixie Cron minute-resolution schedule matcher (* * * * *, @daily, @reboot)"
+                    .to_string(),
+                "Anacron catchup manager with RANDOM_DELAY jitter & max load average thresholding"
+                    .to_string(),
+                "systemd.timer calendar (OnCalendar) & monotonic timers (OnBootSec, OnActiveSec)"
+                    .to_string(),
+                "at / batch deferred execution job scheduler with priority queues ('a'..'z')"
+                    .to_string(),
+                "MAILTO notification output router & systemd persistent timer state store"
+                    .to_string(),
             ],
-            performance_multiplier: "Microsecond-Accurate Job Dispatch & Zero Missed Timers".to_string(),
+            performance_multiplier: "Microsecond-Accurate Job Dispatch & Zero Missed Timers"
+                .to_string(),
             status: "Ready for Integration".to_string(),
         }
     }
@@ -843,12 +897,20 @@ impl SovereignInitAndSupervisorAdvancementsV52Suite {
         // 1. systemd dependencies and sd_notify
         let deps = self
             .systemd
-            .evaluate_unit_dependencies("sys.service", &[], &["dbus.service"], &[], &["dbus.service"])
+            .evaluate_unit_dependencies(
+                "sys.service",
+                &[],
+                &["dbus.service"],
+                &[],
+                &["dbus.service"],
+            )
             .is_ok();
         let (num_fds, _) = self.systemd.prepare_socket_activation(&["/run/sys.sock"]);
 
         // 2. OpenRC script parse and transition
-        let (svc, _, _, _) = self.openrc.parse_openrc_init_script("# provide: net\nneed dbus\n");
+        let (svc, _, _, _) = self
+            .openrc
+            .parse_openrc_init_script("# provide: net\nneed dbus\n");
         let openrc_ok = svc == "net";
 
         // 3. runit / s6 state scan
@@ -864,12 +926,22 @@ impl SovereignInitAndSupervisorAdvancementsV52Suite {
         let bsd_conf = self.bsd_rc.parse_rc_conf("sysd_enable=\"YES\"\n");
 
         // 6. launchd trigger
-        let launchd_ok = self.launchd.trigger_launchd_socket_activation("com.sigma.sys", "IPv4", 8080);
+        let launchd_ok =
+            self.launchd
+                .trigger_launchd_socket_activation("com.sigma.sys", "IPv4", 8080);
 
         // 7. Cron and timers
-        let cron_ok = self.cron_timers_at.parse_and_match_cron("*", "*", "*", "*", "*", 0, 0, 1, 1, 1);
+        let cron_ok = self
+            .cron_timers_at
+            .parse_and_match_cron("*", "*", "*", "*", "*", 0, 0, 1, 1, 1);
 
-        deps && num_fds == 1 && openrc_ok && runit_st == RunitS6StateV52::Up && inittab && bsd_conf.get("sysd_enable").map_or(false, |v| v == "YES") && launchd_ok && cron_ok
+        deps && num_fds == 1
+            && openrc_ok
+            && runit_st == RunitS6StateV52::Up
+            && inittab
+            && bsd_conf.get("sysd_enable").map_or(false, |v| v == "YES")
+            && launchd_ok
+            && cron_ok
     }
 }
 
@@ -886,11 +958,20 @@ mod tests {
         let engine = SystemdAdvancementsV52Engine::new();
         let active = ["network.target", "dbus.service"];
         let deps = engine
-            .evaluate_unit_dependencies("nginx.service", &["network.target"], &["dbus.service"], &["network.target"], &active)
+            .evaluate_unit_dependencies(
+                "nginx.service",
+                &["network.target"],
+                &["dbus.service"],
+                &["network.target"],
+                &active,
+            )
             .unwrap();
         assert!(deps.contains(&"nginx.service".to_string()));
 
-        let (status, msg, pid, ping) = engine.parse_sd_notify_payload(100, "READY=1\nSTATUS=Operational\nMAINPID=1024\nWATCHDOG_USEC=5000000");
+        let (status, msg, pid, ping) = engine.parse_sd_notify_payload(
+            100,
+            "READY=1\nSTATUS=Operational\nMAINPID=1024\nWATCHDOG_USEC=5000000",
+        );
         assert_eq!(status, Some(SystemdServiceStatusV52::Active));
         assert_eq!(msg, Some("Operational".to_string()));
         assert_eq!(pid, Some(1024));
@@ -898,7 +979,12 @@ mod tests {
 
         assert!(engine.validate_cgroups_v2_psi_limits(512 * 1024 * 1024, 100, 256, 15.0));
 
-        let entry = engine.format_journald_entry("my-daemon", 6, "Started successfully", &[("UNIT", "my.service")]);
+        let entry = engine.format_journald_entry(
+            "my-daemon",
+            6,
+            "Started successfully",
+            &[("UNIT", "my.service")],
+        );
         assert!(entry.contains("SYSLOG_IDENTIFIER=my-daemon"));
         assert!(entry.contains("UNIT=my.service"));
 
@@ -918,8 +1004,15 @@ mod tests {
         assert_eq!(use_deps, vec!["logger"]);
         assert_eq!(before, vec!["local"]);
 
-        let services = [("sysfs", OpenRcRunlevelV52::SysInit), ("sshd", OpenRcRunlevelV52::Default)];
-        let plan = engine.transition_runlevel(OpenRcRunlevelV52::SysInit, OpenRcRunlevelV52::Default, &services);
+        let services = [
+            ("sysfs", OpenRcRunlevelV52::SysInit),
+            ("sshd", OpenRcRunlevelV52::Default),
+        ];
+        let plan = engine.transition_runlevel(
+            OpenRcRunlevelV52::SysInit,
+            OpenRcRunlevelV52::Default,
+            &services,
+        );
         assert_eq!(plan, vec!["sshd"]);
     }
 
@@ -939,7 +1032,9 @@ mod tests {
     #[test]
     fn test_sysvinit_v52_engine() {
         let engine = SysVinitAdvancementsV52Engine::new();
-        let entry = engine.parse_inittab_line("id:2345:respawn:/sbin/getty 38400 tty1").unwrap();
+        let entry = engine
+            .parse_inittab_line("id:2345:respawn:/sbin/getty 38400 tty1")
+            .unwrap();
         assert_eq!(entry.id, "id");
         assert_eq!(entry.runlevels, vec![2, 3, 4, 5]);
         assert_eq!(entry.action, SysVInittabActionV52::Respawn);
@@ -998,15 +1093,13 @@ mod tests {
         assert!(engine.should_trigger_timer(&trigger, 100, 130, 0));
         assert!(!engine.should_trigger_timer(&trigger, 100, 120, 0));
 
-        let mut queue = vec![
-            AtJobSpecV52 {
-                job_id: 1,
-                run_at_timestamp: 500,
-                queue_letter: 'a',
-                command: "backup.sh".to_string(),
-                user: "root".to_string(),
-            },
-        ];
+        let mut queue = vec![AtJobSpecV52 {
+            job_id: 1,
+            run_at_timestamp: 500,
+            queue_letter: 'a',
+            command: "backup.sh".to_string(),
+            user: "root".to_string(),
+        }];
         let ready = engine.pop_ready_at_jobs(&mut queue, 600, 0.5);
         assert_eq!(ready.len(), 1);
         assert!(queue.is_empty());

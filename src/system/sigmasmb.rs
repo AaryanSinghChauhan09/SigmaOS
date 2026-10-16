@@ -261,16 +261,12 @@ pub fn init_sigmasmb() {
 
 /// Get global SigmaSMB reference
 pub fn get_sigmasmb() -> Option<&'static SigmaSMB> {
-    unsafe {
-        SIGMA_SMB_INSTANCE.as_ref()
-    }
+    unsafe { SIGMA_SMB_INSTANCE.as_ref() }
 }
 
 /// Get mutable global SigmaSMB reference
 pub fn get_sigmasmb_mut() -> Option<&'static mut SigmaSMB> {
-    unsafe {
-        SIGMA_SMB_INSTANCE.as_mut()
-    }
+    unsafe { SIGMA_SMB_INSTANCE.as_mut() }
 }
 
 /// Convenience function to mount a remote SMB share

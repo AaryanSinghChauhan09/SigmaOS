@@ -283,10 +283,7 @@ impl MptcpConnection {
     }
 
     /// Process a received MP_CAPABLE in SYN-ACK; record remote key.
-    pub fn process_mp_capable_synack(
-        &mut self,
-        opt: MpCapable,
-    ) -> Result<(), MptcpError> {
+    pub fn process_mp_capable_synack(&mut self, opt: MpCapable) -> Result<(), MptcpError> {
         if self.state != MptcpState::Closed {
             return Err(MptcpError::InvalidState);
         }
@@ -317,28 +314,29 @@ impl MptcpConnection {
 
     /// Remove a subflow by ID.
     pub fn remove_subflow(&mut self, id: u8) -> Result<(), MptcpError> {
-        self.subflows.remove(&id).ok_or(MptcpError::SubflowNotFound)?;
+        self.subflows
+            .remove(&id)
+            .ok_or(MptcpError::SubflowNotFound)?;
         Ok(())
     }
 
     /// Select the best subflow for the next transmission according to the scheduler.
     pub fn select_subflow(&self) -> Option<u8> {
-        let established: Vec<_> = self.subflows.iter()
+        let established: Vec<_> = self
+            .subflows
+            .iter()
             .filter(|(_, sf)| sf.state == SubflowState::Established && !sf.is_backup)
             .collect();
         match self.scheduler {
-            Scheduler::LowestRtt => {
-                established.iter()
-                    .min_by_key(|(_, sf)| sf.rtt_us)
-                    .map(|(&id, _)| id)
-            }
+            Scheduler::LowestRtt => established
+                .iter()
+                .min_by_key(|(_, sf)| sf.rtt_us)
+                .map(|(&id, _)| id),
             Scheduler::RoundRobin => {
                 // TODO: track round-robin index
                 established.first().map(|(&id, _)| id)
             }
-            Scheduler::Redundant => {
-                established.first().map(|(&id, _)| id)
-            }
+            Scheduler::Redundant => established.first().map(|(&id, _)| id),
         }
     }
 
@@ -365,7 +363,11 @@ impl MptcpConnection {
     }
 
     /// Process a received DSS segment; reassemble and deliver in-order data.
-    pub fn receive(&mut self, dss: DssOption, data: Vec<u8>) -> Result<Option<Vec<u8>>, MptcpError> {
+    pub fn receive(
+        &mut self,
+        dss: DssOption,
+        data: Vec<u8>,
+    ) -> Result<Option<Vec<u8>>, MptcpError> {
         // Buffer out-of-order data
         self.reassembly.insert(dss.dsn, data);
         // Deliver contiguous data
@@ -379,6 +381,10 @@ impl MptcpConnection {
                 break;
             }
         }
-        if delivered.is_empty() { Ok(None) } else { Ok(Some(delivered)) }
+        if delivered.is_empty() {
+            Ok(None)
+        } else {
+            Ok(Some(delivered))
+        }
     }
 }
