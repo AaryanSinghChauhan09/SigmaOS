@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Sovereign Distro Package Advancements Suite V50
 // (`src/package/sovereign_distro_package_advancements_v50.rs`)
+// Provides universal package format inspection, zero-copy classification, scriptlet sandboxing, SAT DPLL dependency resolution across Linux & BSD package formats (.air, .bottle, .ipa, .ports, .pkg, .aab, .apk, AppImage, .eopkg, .nixpkg, .portage, .deb, .tar.gz, .xz, .rpm, .ebuild, .pkg.tar.xz, Flatpak, .app, .hap, .PiSi, .tgz, .superdeb, .lzm, pup, .snap, pacman, .tar, .pet, etc.).
 //
 // Inspired by Linux & BSD distributions, this suite provides complete universal
 // multi-format package inspection, zero-copy classification, scriptlet sandboxing,

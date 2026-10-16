@@ -125,6 +125,11 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         flags
     }
 
+    /// Check Landlock v5 access permission bitmask.
+    pub fn check_landlock_access(held_rights: u64, required_right: u64) -> bool {
+        (held_rights & required_right) == required_right
+    }
+
     /// Calculate cgroups v2 memory limit in bytes from string (e.g., "512M", "2G").
     pub fn parse_cgroup_memory_limit(limit_str: &str) -> u64 {
         if limit_str == "max" {
@@ -413,6 +418,14 @@ impl IdentityAndEnterpriseAuthPrEngine {
             }
         }
         parts
+    }
+
+    /// Generate SSSD domain configuration file string.
+    pub fn generate_sssd_domain_conf(domain: &str, provider: &str, uri: &str) -> String {
+        alloc::format!(
+            "[domain/{}]\nid_provider = {}\nldap_uri = {}\ncache_credentials = true\n",
+            domain, provider, uri
+        )
     }
 
     /// Simulate Kerberos v5 ticket validation.
