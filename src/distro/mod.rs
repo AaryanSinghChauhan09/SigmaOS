@@ -611,6 +611,8 @@ pub mod sovereign_freebsd_ultimate_parity_pr_suite;
 pub use sovereign_freebsd_ultimate_parity_pr_suite::*;
 pub mod sovereign_openbsd_ultimate_parity_pr_suite;
 pub use sovereign_openbsd_ultimate_parity_pr_suite::*;
+pub mod sovereign_openbsd_complete_gap_closure_pr_suite;
+pub use sovereign_openbsd_complete_gap_closure_pr_suite::*;
 
 pub mod freebsd_gap_closure_pr_engine;
 pub use freebsd_gap_closure_pr_engine::*;
@@ -659,6 +661,3 @@ pub use omarchy_linux_apex_engine::*;
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;
 pub use crate::stubs::large_distro_stubs::*;
-
-pub mod sovereign_openbsd_ultimate_parity_pr_suite;
-pub use sovereign_openbsd_ultimate_parity_pr_suite::*;

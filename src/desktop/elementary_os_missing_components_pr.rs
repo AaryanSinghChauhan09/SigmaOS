@@ -161,12 +161,19 @@ impl PantheonTerminalEngine {
         new_id
     }
 
-    pub fn execute_command_with_notify(&mut self, process_name: &str, duration_seconds: u32) -> Option<String> {
+    pub fn execute_command_with_notify(
+        &mut self,
+        process_name: &str,
+        duration_seconds: u32,
+    ) -> Option<String> {
         if let Some(tab) = self.tabs.get_mut(self.active_tab_index) {
             tab.last_active_process = Some(process_name.to_string());
         }
         if duration_seconds >= self.long_process_notify_seconds {
-            Some(format!("Notification: Process '{}' completed in {}s", process_name, duration_seconds))
+            Some(format!(
+                "Notification: Process '{}' completed in {}s",
+                process_name, duration_seconds
+            ))
         } else {
             None
         }
@@ -223,7 +230,9 @@ impl ElementaryMailEngine {
     }
 
     pub fn verify_pgp_signature(&self, key_id: &str) -> bool {
-        self.accounts.iter().any(|acc| acc.pgp_key_id.as_deref() == Some(key_id))
+        self.accounts
+            .iter()
+            .any(|acc| acc.pgp_key_id.as_deref() == Some(key_id))
     }
 
     pub fn generate_pr_proposal(&self) -> ElementaryComponentPrProposal {
@@ -264,7 +273,9 @@ pub struct PantheonPhotosEngine {
 
 impl PantheonPhotosEngine {
     pub fn new() -> Self {
-        let mut engine = Self { library: Vec::new() };
+        let mut engine = Self {
+            library: Vec::new(),
+        };
         engine.library.push(PhotoRecord {
             id: "photo-01".to_string(),
             file_path: "/home/user/Pictures/wallpaper.jpg".to_string(),
@@ -325,7 +336,10 @@ impl ElementaryCameraEngine {
     }
 
     pub fn capture_snapshot(&self) -> String {
-        format!("snapshot_{}x{}_delay{}s.png", self.active_resolution.0, self.active_resolution.1, self.timer_delay_seconds)
+        format!(
+            "snapshot_{}x{}_delay{}s.png",
+            self.active_resolution.0, self.active_resolution.1, self.timer_delay_seconds
+        )
     }
 
     pub fn generate_pr_proposal(&self) -> ElementaryComponentPrProposal {
@@ -356,7 +370,9 @@ pub struct PantheonCalculatorEngine {
 
 impl PantheonCalculatorEngine {
     pub fn new() -> Self {
-        Self { history_log: Vec::new() }
+        Self {
+            history_log: Vec::new(),
+        }
     }
 
     pub fn evaluate_expression(&mut self, expr: &str) -> Result<f64, String> {
@@ -480,13 +496,27 @@ impl ElementaryOsMissingComponentsPrSuite {
 
     pub fn verify_elementary_component_parity(&self) -> u32 {
         let mut score = 0;
-        if self.music.mpris_dbus_active { score += 14; }
-        if !self.terminal.tabs.is_empty() { score += 14; }
-        if self.mail.verify_pgp_signature("0x12345678ABCD") { score += 14; }
-        if !self.photos.library.is_empty() { score += 14; }
-        if !self.camera.capture_snapshot().is_empty() { score += 14; }
-        if self.calculator.convert_length_meters_to_feet(1.0) > 3.0 { score += 15; }
-        if self.screentime.is_domain_blocked("gambling.com") { score += 15; }
+        if self.music.mpris_dbus_active {
+            score += 14;
+        }
+        if !self.terminal.tabs.is_empty() {
+            score += 14;
+        }
+        if self.mail.verify_pgp_signature("0x12345678ABCD") {
+            score += 14;
+        }
+        if !self.photos.library.is_empty() {
+            score += 14;
+        }
+        if !self.camera.capture_snapshot().is_empty() {
+            score += 14;
+        }
+        if self.calculator.convert_length_meters_to_feet(1.0) > 3.0 {
+            score += 15;
+        }
+        if self.screentime.is_domain_blocked("gambling.com") {
+            score += 15;
+        }
         score
     }
 }
@@ -508,6 +538,9 @@ mod tests {
         }
 
         let parity_score = suite.verify_elementary_component_parity();
-        assert_eq!(parity_score, 100, "Elementary component parity score must reach 100%");
+        assert_eq!(
+            parity_score, 100,
+            "Elementary component parity score must reach 100%"
+        );
     }
 }

@@ -341,7 +341,8 @@ impl Fat32Table {
     pub fn from_bytes(data: &[u8]) -> Self {
         let mut entries = Vec::with_capacity(data.len() / 4);
         for chunk in data.chunks_exact(4) {
-            entries.push(u32::from_le_bytes([chunk[0], chunk[1], chunk[2], chunk[3]]) & 0x0FFF_FFFF);
+            entries
+                .push(u32::from_le_bytes([chunk[0], chunk[1], chunk[2], chunk[3]]) & 0x0FFF_FFFF);
         }
         Fat32Table { entries }
     }
@@ -369,7 +370,9 @@ impl Fat32Table {
                 return Err(Fat32Error::ChainTooLong);
             }
             chain.push(current);
-            current = self.get(current).ok_or(Fat32Error::InvalidCluster(current))?;
+            current = self
+                .get(current)
+                .ok_or(Fat32Error::InvalidCluster(current))?;
         }
         Ok(chain)
     }
@@ -544,13 +547,22 @@ impl Fat32Volume {
     /// * `vbr` - 512-byte Volume Boot Record.
     /// * `fat_data` - Complete FAT sector data.
     /// * `fsinfo_sector` - 512-byte FSINFO sector.
-    pub fn mount(vbr: &[u8; 512], fat_data: &[u8], fsinfo_sector: &[u8; 512]) -> Result<Self, Fat32Error> {
+    pub fn mount(
+        vbr: &[u8; 512],
+        fat_data: &[u8],
+        fsinfo_sector: &[u8; 512],
+    ) -> Result<Self, Fat32Error> {
         let bpb = Fat32Bpb::from_bytes(vbr).ok_or(Fat32Error::InvalidSignature)?;
         let fat = Fat32Table::from_bytes(fat_data);
         // SAFETY: fsinfo_sector is the correct size.
         let fsinfo: Fat32FsInfo =
             unsafe { core::ptr::read_unaligned(fsinfo_sector.as_ptr() as *const Fat32FsInfo) };
-        Ok(Fat32Volume { bpb, fat, fsinfo, read_only: false })
+        Ok(Fat32Volume {
+            bpb,
+            fat,
+            fsinfo,
+            read_only: false,
+        })
     }
 
     /// Read a file's cluster chain given its starting cluster.

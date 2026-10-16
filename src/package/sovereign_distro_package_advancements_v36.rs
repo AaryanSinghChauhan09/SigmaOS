@@ -680,7 +680,8 @@ impl UniversalPmCliRouterV36 {
                     (UniversalPmActionV36::Query, vec![])
                 }
             }
-            "dnf" | "yum" | "zypper" | "apk" | "xbps-install" | "pkg" | "emerge" | "brew" | "cargo" | "pip" | "npm" | "pnpm" | "yarn" | "gem" | "luarocks" => {
+            "dnf" | "yum" | "zypper" | "apk" | "xbps-install" | "pkg" | "emerge" | "brew"
+            | "cargo" | "pip" | "npm" | "pnpm" | "yarn" | "gem" | "luarocks" => {
                 if parts.contains(&"install") || parts.contains(&"add") || parts.contains(&"-i") {
                     (
                         UniversalPmActionV36::Install,
@@ -912,9 +913,16 @@ mod tests {
     #[test]
     fn test_sat_solver_and_sandboxing_v36() {
         let solver = UniversalCrossDistroSatSolverV36::new();
-        let raw_deps = vec!["libssl-dev".to_string(), "glibc".to_string(), "dbus".to_string()];
+        let raw_deps = vec![
+            "libssl-dev".to_string(),
+            "glibc".to_string(),
+            "dbus".to_string(),
+        ];
         let solved = solver.solve_dependencies(&raw_deps).unwrap();
-        assert_eq!(solved, vec!["sovereign-openssl", "sovereign-libc", "sovereign-dbus"]);
+        assert_eq!(
+            solved,
+            vec!["sovereign-openssl", "sovereign-libc", "sovereign-dbus"]
+        );
 
         let sandbox_gov = UniversalMultiSandboxGovernorV36::new();
         let rules = sandbox_gov.generate_sandbox_rules(PackageFormat::Flatpak);

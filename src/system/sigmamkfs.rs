@@ -226,16 +226,12 @@ pub fn init_sigmamkfs() {
 
 /// Get the global SigmaMkfs instance
 pub fn get_sigmamkfs() -> Option<&'static SigmaMkfs> {
-    unsafe {
-        SIGMAMKFS_INSTANCE.as_ref()
-    }
+    unsafe { SIGMAMKFS_INSTANCE.as_ref() }
 }
 
 /// Get mutable global SigmaMkfs instance
 pub fn get_sigmamkfs_mut() -> Option<&'static mut SigmaMkfs> {
-    unsafe {
-        SIGMAMKFS_INSTANCE.as_mut()
-    }
+    unsafe { SIGMAMKFS_INSTANCE.as_mut() }
 }
 
 /// Convenience function to create a filesystem
@@ -253,10 +249,7 @@ mod tests {
 
     #[test]
     fn test_filesystem_config_creation() {
-        let config = FilesystemConfig::new(
-            "root".to_string(),
-            "1234-5678".to_string(),
-        );
+        let config = FilesystemConfig::new("root".to_string(), "1234-5678".to_string());
 
         assert_eq!(config.label, "root");
         assert_eq!(config.uuid, "1234-5678");
@@ -266,10 +259,7 @@ mod tests {
 
     #[test]
     fn test_filesystem_config_modification() {
-        let mut config = FilesystemConfig::new(
-            "root".to_string(),
-            "1234-5678".to_string(),
-        );
+        let mut config = FilesystemConfig::new("root".to_string(), "1234-5678".to_string());
 
         config.set_block_size(8192);
         config.set_inode_size(512);
@@ -284,10 +274,7 @@ mod tests {
 
     #[test]
     fn test_filesystem_creation() {
-        let config = FilesystemConfig::new(
-            "root".to_string(),
-            "1234-5678".to_string(),
-        );
+        let config = FilesystemConfig::new("root".to_string(), "1234-5678".to_string());
 
         let filesystem = Filesystem::new(
             "fs1".to_string(),
@@ -305,10 +292,7 @@ mod tests {
 
     #[test]
     fn test_filesystem_state() {
-        let config = FilesystemConfig::new(
-            "root".to_string(),
-            "1234-5678".to_string(),
-        );
+        let config = FilesystemConfig::new("root".to_string(), "1234-5678".to_string());
 
         let mut filesystem = Filesystem::new(
             "fs1".to_string(),
@@ -327,10 +311,7 @@ mod tests {
 
     #[test]
     fn test_filesystem_space() {
-        let config = FilesystemConfig::new(
-            "root".to_string(),
-            "1234-5678".to_string(),
-        );
+        let config = FilesystemConfig::new("root".to_string(), "1234-5678".to_string());
 
         let mut filesystem = Filesystem::new(
             "fs1".to_string(),
@@ -363,10 +344,7 @@ mod tests {
     #[test]
     fn test_sigmamkfs_create_filesystem() {
         let mut mkfs = SigmaMkfs::new();
-        let config = FilesystemConfig::new(
-            "root".to_string(),
-            "1234-5678".to_string(),
-        );
+        let config = FilesystemConfig::new("root".to_string(), "1234-5678".to_string());
 
         let filesystem = Filesystem::new(
             "fs1".to_string(),
@@ -387,10 +365,7 @@ mod tests {
     #[test]
     fn test_sigmamkfs_remove_filesystem() {
         let mut mkfs = SigmaMkfs::new();
-        let config = FilesystemConfig::new(
-            "root".to_string(),
-            "1234-5678".to_string(),
-        );
+        let config = FilesystemConfig::new("root".to_string(), "1234-5678".to_string());
 
         let filesystem = Filesystem::new(
             "fs1".to_string(),

@@ -73,7 +73,10 @@ impl SigmaLinuxCxlMemoryTieringEngine {
             if page.is_hot && page.tier != MemoryTier::Tier0FastDram {
                 page.tier = MemoryTier::Tier0FastDram;
                 self.promoted_count += 1;
-            } else if !page.is_hot && page.tier == MemoryTier::Tier0FastDram && page.access_count == 0 {
+            } else if !page.is_hot
+                && page.tier == MemoryTier::Tier0FastDram
+                && page.access_count == 0
+            {
                 page.tier = MemoryTier::Tier1CxlPersistent;
                 self.demoted_count += 1;
             }
@@ -176,8 +179,14 @@ impl OpenBsdPinSyscallWexEngine {
     }
 
     pub fn validate_syscall_entry(&mut self, syscall_nr: u32, call_site_ip: u64) -> bool {
-        if let Some(rule) = self.pinned_syscalls.iter().find(|r| r.syscall_nr == syscall_nr) {
-            if call_site_ip >= rule.allowed_code_address_start && call_site_ip <= rule.allowed_code_address_end {
+        if let Some(rule) = self
+            .pinned_syscalls
+            .iter()
+            .find(|r| r.syscall_nr == syscall_nr)
+        {
+            if call_site_ip >= rule.allowed_code_address_start
+                && call_site_ip <= rule.allowed_code_address_end
+            {
                 return true;
             } else {
                 self.wx_violations_blocked += 1;
@@ -271,7 +280,11 @@ impl NetBsdRumpKernelIsolatedEngine {
     }
 
     pub fn dispatch_isolated_call(&mut self, driver_name: &str) -> bool {
-        if let Some(drv) = self.drivers.iter_mut().find(|d| d.driver_name == driver_name) {
+        if let Some(drv) = self
+            .drivers
+            .iter_mut()
+            .find(|d| d.driver_name == driver_name)
+        {
             if drv.active {
                 self.translated_syscall_count += 1;
                 return true;
@@ -350,16 +363,19 @@ impl SovereignKernelDistroParityPrGateway {
 
     pub fn generate_distro_kernel_pr_proposal(&mut self) -> DistroKernelPrDescriptor {
         // Setup initial subsystem state
-        self.cxl_tiering.register_page(0x100, MemoryTier::Tier1CxlPersistent);
+        self.cxl_tiering
+            .register_page(0x100, MemoryTier::Tier1CxlPersistent);
         self.cxl_tiering.touch_page(0x100);
 
         let _ = self.zfs_arc.lookup_or_read(1001, 4096);
 
-        self.openbsd_pin_wx.register_pinned_syscall(1, 0x7FFF_0000, 0x7FFF_1000);
+        self.openbsd_pin_wx
+            .register_pinned_syscall(1, 0x7FFF_0000, 0x7FFF_1000);
 
         self.hammer2_engine.insert_node(1, 100, 200, 0x8000_0000);
 
-        self.netbsd_rump.register_rump_driver("rump_pci_nvme", "storage");
+        self.netbsd_rump
+            .register_rump_driver("rump_pci_nvme", "storage");
 
         self.illumos_crossbow.create_vnic(1, "vnic0", 10000, 1);
 
@@ -368,7 +384,9 @@ impl SovereignKernelDistroParityPrGateway {
             "Integrates Linux 6.13+ CXL 3.0 multi-tier memory management, FreeBSD OpenZFS ARC & VDEV async storage queues, OpenBSD pinsyscall & W^X memory page protection, DragonFly BSD HAMMER2 lockless B-tree, NetBSD Rump isolated driver execution, and Illumos Crossbow VNIC flow control.",
         );
 
-        let pqc_sig = String::from("DILITHIUM5_SIG_9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f");
+        let pqc_sig = String::from(
+            "DILITHIUM5_SIG_9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f",
+        );
 
         DistroKernelPrDescriptor {
             pr_id: String::from("PR-KERNEL-OPEN-SOURCE-DISTROS-2026-V1"),

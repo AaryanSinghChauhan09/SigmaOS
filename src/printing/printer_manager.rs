@@ -287,9 +287,21 @@ impl IppEverywhereDiscoveryEngine {
         let mut discovered = Vec::new();
 
         let network_printers = vec![
-            ("ipp-001", "HP Color LaserJet IPP", "ipps://192.168.1.50/ipp/print"),
-            ("ipp-002", "Epson EcoTank IPP", "ipp://192.168.1.51/ipp/print"),
-            ("ipp-003", "Brother HL-L8360CDW", "ipps://192.168.1.52/ipp/print"),
+            (
+                "ipp-001",
+                "HP Color LaserJet IPP",
+                "ipps://192.168.1.50/ipp/print",
+            ),
+            (
+                "ipp-002",
+                "Epson EcoTank IPP",
+                "ipp://192.168.1.51/ipp/print",
+            ),
+            (
+                "ipp-003",
+                "Brother HL-L8360CDW",
+                "ipps://192.168.1.52/ipp/print",
+            ),
         ];
 
         for (id, name, uri) in network_printers {
@@ -298,7 +310,12 @@ impl IppEverywhereDiscoveryEngine {
             attrs.printer_uri_supported = vec![uri.to_string()];
             self.discovered_attributes.insert(id.to_string(), attrs);
 
-            let mut printer = Printer::new(id.to_string(), name.to_string(), PrinterType::IPP, uri.to_string());
+            let mut printer = Printer::new(
+                id.to_string(),
+                name.to_string(),
+                PrinterType::IPP,
+                uri.to_string(),
+            );
             printer.set_driver("everywhere".to_string());
             printer.set_location("Network Subnet".to_string());
             discovered.push(printer);
@@ -340,7 +357,11 @@ impl IppEverywhereDiscoveryEngine {
             attrs.printer_name,
             attrs.printer_name,
             attrs.printer_name,
-            if attrs.color_supported { "True" } else { "False" }
+            if attrs.color_supported {
+                "True"
+            } else {
+                "False"
+            }
         );
 
         Ok(ppd)
@@ -387,9 +408,20 @@ impl BsdLpdProtocolQueueManager {
     }
 
     /// Process BSD lpr command (Receive print job)
-    pub fn lpr_submit(&mut self, job_number: u32, host: &str, user: &str, payload: &[u8]) -> Result<(String, String), String> {
-        if self.control_state == LpdQueueControl::Disabled || self.control_state == LpdQueueControl::Locked {
-            return Err(format!("LPD Queue {} is disabled or locked", self.queue_name));
+    pub fn lpr_submit(
+        &mut self,
+        job_number: u32,
+        host: &str,
+        user: &str,
+        payload: &[u8],
+    ) -> Result<(String, String), String> {
+        if self.control_state == LpdQueueControl::Disabled
+            || self.control_state == LpdQueueControl::Locked
+        {
+            return Err(format!(
+                "LPD Queue {} is disabled or locked",
+                self.queue_name
+            ));
         }
 
         let cf_name = format!("cfA{:03}{}", job_number % 1000, host);
@@ -514,7 +546,10 @@ impl PpdPostScriptCompilerEngine {
             text: "2-Sided Printing".to_string(),
             choices: vec![
                 ("None".to_string(), "Off (1-Sided)".to_string()),
-                ("DuplexNoTumble".to_string(), "Long-Edge (Standard)".to_string()),
+                (
+                    "DuplexNoTumble".to_string(),
+                    "Long-Edge (Standard)".to_string(),
+                ),
                 ("DuplexTumble".to_string(), "Short-Edge (Flip)".to_string()),
             ],
             default_choice: "None".to_string(),
@@ -528,7 +563,8 @@ impl PpdPostScriptCompilerEngine {
     }
 
     pub fn add_constraint(&mut self, option1: &str, option2: &str) {
-        self.ui_constraints.push((option1.to_string(), option2.to_string()));
+        self.ui_constraints
+            .push((option1.to_string(), option2.to_string()));
     }
 
     /// Compile into standard CUPS PPD source text
@@ -541,7 +577,10 @@ impl PpdPostScriptCompilerEngine {
 
         for (opt_name, option) in &self.options {
             out.push_str(&format!("*OpenUI *{}/{}: PickOne\n", opt_name, option.text));
-            out.push_str(&format!("*Default{}: {}\n", opt_name, option.default_choice));
+            out.push_str(&format!(
+                "*Default{}: {}\n",
+                opt_name, option.default_choice
+            ));
             for (choice, choice_text) in &option.choices {
                 out.push_str(&format!("*{} {}/{}: \"\"\n", opt_name, choice, choice_text));
             }
@@ -726,7 +765,12 @@ impl PopplerPdfRenderingEngine {
     }
 
     /// Render PDF page to bitmap buffer via Cairo/Splash backend
-    pub fn render_page_to_bitmap(&self, pdf_data: &[u8], page_num: u32, dpi: u32) -> Result<Vec<u8>, String> {
+    pub fn render_page_to_bitmap(
+        &self,
+        pdf_data: &[u8],
+        page_num: u32,
+        dpi: u32,
+    ) -> Result<Vec<u8>, String> {
         if pdf_data.is_empty() {
             return Err("Empty PDF data".to_string());
         }
@@ -793,15 +837,31 @@ impl CupsFilterPipelineEngine {
     }
 
     /// Resolve optimal filter chain from input MIME to output MIME
-    pub fn resolve_filter_chain(&self, input_mime: &str, output_mime: &str) -> Result<Vec<CupsFilterStage>, String> {
+    pub fn resolve_filter_chain(
+        &self,
+        input_mime: &str,
+        output_mime: &str,
+    ) -> Result<Vec<CupsFilterStage>, String> {
         match (input_mime, output_mime) {
             ("text/plain", "application/postscript") => Ok(vec![CupsFilterStage::TextToPs]),
             ("application/pdf", "application/postscript") => Ok(vec![CupsFilterStage::PdfToPs]),
-            ("application/pdf", "image/pwg-raster") => Ok(vec![CupsFilterStage::PdfToPs, CupsFilterStage::PsToRaster, CupsFilterStage::RasterToPwg]),
-            ("application/postscript", "image/pwg-raster") => Ok(vec![CupsFilterStage::PsToRaster, CupsFilterStage::RasterToPwg]),
-            ("application/postscript", "application/vnd.hp-PCL") => Ok(vec![CupsFilterStage::GstoPxl]),
+            ("application/pdf", "image/pwg-raster") => Ok(vec![
+                CupsFilterStage::PdfToPs,
+                CupsFilterStage::PsToRaster,
+                CupsFilterStage::RasterToPwg,
+            ]),
+            ("application/postscript", "image/pwg-raster") => Ok(vec![
+                CupsFilterStage::PsToRaster,
+                CupsFilterStage::RasterToPwg,
+            ]),
+            ("application/postscript", "application/vnd.hp-PCL") => {
+                Ok(vec![CupsFilterStage::GstoPxl])
+            }
             ("image/pwg-raster", "image/pwg-raster") => Ok(vec![]),
-            _ => Err(format!("No CUPS filter route from {} to {}", input_mime, output_mime)),
+            _ => Err(format!(
+                "No CUPS filter route from {} to {}",
+                input_mime, output_mime
+            )),
         }
     }
 
@@ -826,14 +886,17 @@ impl CupsFilterPipelineEngine {
 
     /// Estimate total CPU/memory cost for filter pipeline execution
     pub fn estimate_processing_cost(&self, chain: &[CupsFilterStage], page_count: u32) -> u64 {
-        let cost_per_stage: u64 = chain.iter().map(|s| match s {
-            CupsFilterStage::TextToPs => 10,
-            CupsFilterStage::PdfToPs => 50,
-            CupsFilterStage::PsToRaster => 120,
-            CupsFilterStage::RasterToPwg => 30,
-            CupsFilterStage::RasterToEpson => 40,
-            CupsFilterStage::GstoPxl => 90,
-        }).sum();
+        let cost_per_stage: u64 = chain
+            .iter()
+            .map(|s| match s {
+                CupsFilterStage::TextToPs => 10,
+                CupsFilterStage::PdfToPs => 50,
+                CupsFilterStage::PsToRaster => 120,
+                CupsFilterStage::RasterToPwg => 30,
+                CupsFilterStage::RasterToEpson => 40,
+                CupsFilterStage::GstoPxl => 90,
+            })
+            .sum();
 
         cost_per_stage * (page_count as u64)
     }
@@ -886,12 +949,15 @@ impl BsdLpdAccountingQuotaEngine {
 
     /// Set user page quota and per-page billing rate
     pub fn set_user_quota(&mut self, user: &str, page_quota: u32, rate_per_page: f64) {
-        let quota = self.user_quotas.entry(user.to_string()).or_insert_with(|| LpdUserQuota {
-            user: user.to_string(),
-            page_quota,
-            pages_printed: 0,
-            rate_per_page,
-        });
+        let quota = self
+            .user_quotas
+            .entry(user.to_string())
+            .or_insert_with(|| LpdUserQuota {
+                user: user.to_string(),
+                page_quota,
+                pages_printed: 0,
+                rate_per_page,
+            });
         quota.page_quota = page_quota;
         quota.rate_per_page = rate_per_page;
     }
@@ -906,12 +972,22 @@ impl BsdLpdAccountingQuotaEngine {
     }
 
     /// Record completed print job and update accounting ledger
-    pub fn record_print_job(&mut self, job_id: u32, user: &str, pages: u32, is_color: bool) -> Result<f64, String> {
+    pub fn record_print_job(
+        &mut self,
+        job_id: u32,
+        user: &str,
+        pages: u32,
+        is_color: bool,
+    ) -> Result<f64, String> {
         if !self.check_quota(user, pages) {
             return Err(format!("Quota exceeded for user {}", user));
         }
 
-        let rate = self.user_quotas.get(user).map(|q| q.rate_per_page).unwrap_or(0.10);
+        let rate = self
+            .user_quotas
+            .get(user)
+            .map(|q| q.rate_per_page)
+            .unwrap_or(0.10);
         let color_multiplier = if is_color { 2.5 } else { 1.0 };
         let total_charge = (pages as f64) * rate * color_multiplier;
 
@@ -1118,10 +1194,16 @@ impl CupsIppAirPrintServerEngine {
             ("qtotal".to_string(), "1".to_string()),
             ("pdl".to_string(), self.pdl_supported.join(",")),
             ("rp".to_string(), format!("printers/{}", self.service_name)),
-            ("note".to_string(), "Sovereign CUPS AirPrint Server".to_string()),
+            (
+                "note".to_string(),
+                "Sovereign CUPS AirPrint Server".to_string(),
+            ),
             ("Color".to_string(), "T".to_string()),
             ("Duplex".to_string(), "T".to_string()),
-            ("UUID".to_string(), "00000000-0000-0000-0000-000000000001".to_string()),
+            (
+                "UUID".to_string(),
+                "00000000-0000-0000-0000-000000000001".to_string(),
+            ),
         ]
     }
 
@@ -1135,13 +1217,20 @@ impl CupsIppAirPrintServerEngine {
     }
 
     /// Receive IPP job over AirPrint channel
-    pub fn receive_ipp_job(&self, job_uri: &str, mime: &str, payload: &[u8]) -> Result<String, String> {
+    pub fn receive_ipp_job(
+        &self,
+        job_uri: &str,
+        mime: &str,
+        payload: &[u8],
+    ) -> Result<String, String> {
         if payload.is_empty() {
             return Err("Empty AirPrint IPP payload".to_string());
         }
         Ok(format!(
             "Received IPP AirPrint job on {} (mime={}, size={} bytes)",
-            job_uri, mime, payload.len()
+            job_uri,
+            mime,
+            payload.len()
         ))
     }
 }
@@ -1192,7 +1281,12 @@ impl CupsAccountingJobQuotaEngine {
     }
 
     /// Generate standard CUPS job banner / header sheet
-    pub fn generate_banner_header_sheet(&self, job_title: &str, user: &str, classification: &str) -> String {
+    pub fn generate_banner_header_sheet(
+        &self,
+        job_title: &str,
+        user: &str,
+        classification: &str,
+    ) -> String {
         format!(
             "=====================================================\n\
              CUPS BANNER SHEET - {}\n\
@@ -1211,7 +1305,10 @@ impl CupsAccountingJobQuotaEngine {
 
     /// Record audit log entry
     pub fn log_audit_entry(&mut self, user: &str, action: &str, details: &str) {
-        let entry = format!("[CUPS-AUDIT] user={} action={} details={}", user, action, details);
+        let entry = format!(
+            "[CUPS-AUDIT] user={} action={} details={}",
+            user, action, details
+        );
         self.audit_log.push(entry);
     }
 }
@@ -1334,7 +1431,13 @@ impl GhostscriptColorManagementEngine {
     /// Generate halftone screening matrix for specified angle
     pub fn build_halftone_screen_matrix(&self, angle_deg: f32) -> Vec<f32> {
         let rad = angle_deg.to_radians();
-        vec![rad.cos(), rad.sin(), -rad.sin(), rad.cos(), self.halftone_screen_frequency]
+        vec![
+            rad.cos(),
+            rad.sin(),
+            -rad.sin(),
+            rad.cos(),
+            self.halftone_screen_frequency,
+        ]
     }
 }
 
@@ -1427,7 +1530,12 @@ impl PopplerDigitalSignatureFormEngine {
     }
 
     /// Update AcroForm field value programmatically
-    pub fn update_acroform_value(&self, pdf_bytes: &[u8], field_name: &str, value: &str) -> Result<Vec<u8>, String> {
+    pub fn update_acroform_value(
+        &self,
+        pdf_bytes: &[u8],
+        field_name: &str,
+        value: &str,
+    ) -> Result<Vec<u8>, String> {
         if pdf_bytes.is_empty() {
             return Err("Empty PDF buffer".to_string());
         }
@@ -1444,7 +1552,8 @@ impl PopplerDigitalSignatureFormEngine {
            <fields>\n\
              <field name=\"CustomerName\"><value>Sovereign User</value></field>\n\
            </fields>\n\
-         </xfdf>".to_string()
+         </xfdf>"
+            .to_string()
     }
 }
 
@@ -1821,7 +1930,10 @@ mod tests {
         assert_eq!(count, 3);
         assert!(manager.get_printer("ipp-001").is_some());
 
-        let ppd = manager.ipp_discovery.generate_ppd_from_ipp_attributes("ipp-001").unwrap();
+        let ppd = manager
+            .ipp_discovery
+            .generate_ppd_from_ipp_attributes("ipp-001")
+            .unwrap();
         assert!(ppd.contains("*PPD-Adobe: \"4.3\""));
         assert!(ppd.contains("HP Color LaserJet IPP"));
     }
@@ -1870,21 +1982,27 @@ mod tests {
         let text = poppler.extract_text(b"%PDF-1.5 Header").unwrap();
         assert!(text.contains("Sovereign PDF Document Content"));
 
-        let bitmap = poppler.render_page_to_bitmap(b"%PDF-1.5 Header", 1, 300).unwrap();
+        let bitmap = poppler
+            .render_page_to_bitmap(b"%PDF-1.5 Header", 1, 300)
+            .unwrap();
         assert!(bitmap.len() > 100);
     }
 
     #[test]
     fn test_cups_filter_pipeline_engine() {
         let pipeline = CupsFilterPipelineEngine::new();
-        let chain = pipeline.resolve_filter_chain("application/pdf", "image/pwg-raster").unwrap();
+        let chain = pipeline
+            .resolve_filter_chain("application/pdf", "image/pwg-raster")
+            .unwrap();
         assert_eq!(chain.len(), 3);
         assert_eq!(chain[0], CupsFilterStage::PdfToPs);
 
         let cost = pipeline.estimate_processing_cost(&chain, 10);
         assert_eq!(cost, 2000);
 
-        let filtered = pipeline.execute_filter_pipeline("application/pdf", "application/postscript", b"PDF DATA").unwrap();
+        let filtered = pipeline
+            .execute_filter_pipeline("application/pdf", "application/postscript", b"PDF DATA")
+            .unwrap();
         assert!(filtered.starts_with(b"%%CUPS-FILTER-STAGE: pdftops"));
     }
 
@@ -1936,7 +2054,11 @@ mod tests {
         let bcast = airprint.start_mdns_broadcast();
         assert!(bcast.is_ok());
 
-        let res = airprint.receive_ipp_job("ipp://localhost/printers/Office-Printer", "application/pdf", b"SAMPLE PDF");
+        let res = airprint.receive_ipp_job(
+            "ipp://localhost/printers/Office-Printer",
+            "application/pdf",
+            b"SAMPLE PDF",
+        );
         assert!(res.is_ok());
     }
 
@@ -1956,13 +2078,18 @@ mod tests {
     #[test]
     fn test_cups_mime_filter_converter_engine() {
         let conv = CupsMimeFilterConverterEngine::new();
-        let pwg = conv.convert_apple_raster_to_pwg(b"URF RASTER DATA").unwrap();
+        let pwg = conv
+            .convert_apple_raster_to_pwg(b"URF RASTER DATA")
+            .unwrap();
         assert!(pwg.starts_with(b"RaS2PWG-RASTER-DATA-HEADER"));
 
         let ps = conv.convert_pcl_to_postscript(b"PCL COMMANDS").unwrap();
         assert!(ps.starts_with(b"%!PS-Adobe-3.0 Transpiled from PCL"));
 
-        assert_eq!(conv.apply_error_recovery_policy("paper-jam"), CupsJobRecoveryPolicy::StopPrinter);
+        assert_eq!(
+            conv.apply_error_recovery_policy("paper-jam"),
+            CupsJobRecoveryPolicy::StopPrinter
+        );
     }
 
     #[test]
@@ -1982,18 +2109,24 @@ mod tests {
         let distiller = GhostscriptPdfDistillerEngine::new(PdfComplianceStandard::PdfA2b);
         assert!(distiller.audit_compliance(b"%PDF-1.7 Sample").unwrap());
 
-        let compressed = distiller.compress_pdf_stream(b"%PDF-1.7 Stream Data").unwrap();
+        let compressed = distiller
+            .compress_pdf_stream(b"%PDF-1.7 Stream Data")
+            .unwrap();
         assert!(compressed.starts_with(b"%PDF-1.7 Optimized Stream"));
     }
 
     #[test]
     fn test_poppler_digital_signature_form_engine() {
         let sig_engine = PopplerDigitalSignatureFormEngine::new();
-        let (valid, details) = sig_engine.verify_pqc_pkcs7_signature(b"%PDF-1.7 Signed").unwrap();
+        let (valid, details) = sig_engine
+            .verify_pqc_pkcs7_signature(b"%PDF-1.7 Signed")
+            .unwrap();
         assert!(valid);
         assert!(details.contains("Dilithium5-PKCS7 Signature Validated"));
 
-        let updated = sig_engine.update_acroform_value(b"%PDF-1.7 Form", "User", "John").unwrap();
+        let updated = sig_engine
+            .update_acroform_value(b"%PDF-1.7 Form", "User", "John")
+            .unwrap();
         assert!(updated.len() > 10);
 
         let xfdf = sig_engine.export_xfdf_forms_data(b"%PDF-1.7 Form");

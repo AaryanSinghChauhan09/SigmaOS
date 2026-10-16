@@ -111,19 +111,19 @@ impl SigmaMQ {
         if !self.running {
             return Err("SigmaMQ not running".to_string());
         }
-        
+
         if self.messages.contains_key(&message.message_id) {
             return Err(format!("Message '{}' already exists", message.message_id));
         }
-        
+
         let queue = message.queue.clone();
         self.messages.insert(message.message_id.clone(), message);
-        
+
         self.queue_messages
             .entry(queue)
             .or_insert_with(Vec::new)
             .push(message.message_id.clone());
-        
+
         self.message_counter += 1;
         Ok(())
     }
@@ -133,7 +133,7 @@ impl SigmaMQ {
         if !self.running {
             return Err("SigmaMQ not running".to_string());
         }
-        
+
         if let Some(message_ids) = self.queue_messages.get_mut(queue) {
             if let Some(message_id) = message_ids.first() {
                 let id = message_id.clone();
@@ -151,7 +151,7 @@ impl SigmaMQ {
         if !self.running {
             return Err("SigmaMQ not running".to_string());
         }
-        
+
         match self.messages.get_mut(message_id) {
             Some(message) => {
                 message.state = MessageState::Acknowledged;
@@ -166,7 +166,7 @@ impl SigmaMQ {
         if !self.running {
             return Err("SigmaMQ not running".to_string());
         }
-        
+
         match self.messages.get_mut(message_id) {
             Some(message) => {
                 message.state = MessageState::Failed;
@@ -201,7 +201,8 @@ impl SigmaMQ {
     /// List messages by queue
     pub fn list_by_queue(&self, queue: &str) -> Vec<&Message> {
         if let Some(message_ids) = self.queue_messages.get(queue) {
-            message_ids.iter()
+            message_ids
+                .iter()
                 .filter_map(|id| self.messages.get(id))
                 .collect()
         } else {
@@ -211,7 +212,8 @@ impl SigmaMQ {
 
     /// List messages by state
     pub fn list_by_state(&self, state: MessageState) -> Vec<&Message> {
-        self.messages.values()
+        self.messages
+            .values()
             .filter(|m| m.state == state)
             .collect()
     }
@@ -224,12 +226,34 @@ impl SigmaMQ {
     /// Get queue statistics
     pub fn queue_stats(&self) -> BTreeMap<String, String> {
         let mut stats = BTreeMap::new();
-        stats.insert("total_messages".to_string(), self.message_count().to_string());
-        stats.insert("queued_messages".to_string(), self.list_by_state(MessageState::Queued).len().to_string());
-        stats.insert("processing_messages".to_string(), self.list_by_state(MessageState::Processing).len().to_string());
-        stats.insert("acknowledged_messages".to_string(), self.list_by_state(MessageState::Acknowledged).len().to_string());
-        stats.insert("failed_messages".to_string(), self.list_by_state(MessageState::Failed).len().to_string());
-        stats.insert("total_queues".to_string(), self.queue_messages.len().to_string());
+        stats.insert(
+            "total_messages".to_string(),
+            self.message_count().to_string(),
+        );
+        stats.insert(
+            "queued_messages".to_string(),
+            self.list_by_state(MessageState::Queued).len().to_string(),
+        );
+        stats.insert(
+            "processing_messages".to_string(),
+            self.list_by_state(MessageState::Processing)
+                .len()
+                .to_string(),
+        );
+        stats.insert(
+            "acknowledged_messages".to_string(),
+            self.list_by_state(MessageState::Acknowledged)
+                .len()
+                .to_string(),
+        );
+        stats.insert(
+            "failed_messages".to_string(),
+            self.list_by_state(MessageState::Failed).len().to_string(),
+        );
+        stats.insert(
+            "total_queues".to_string(),
+            self.queue_messages.len().to_string(),
+        );
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
@@ -280,7 +304,7 @@ mod tests {
         let message = Message::new(
             "msg1".to_string(),
             "test_queue".to_string(),
-            "payload".to_string()
+            "payload".to_string(),
         )
         .with_state(MessageState::Acknowledged);
 
@@ -303,13 +327,13 @@ mod tests {
     fn test_sigmamq_publish() {
         let mut mq = SigmaMQ::new();
         mq.start();
-        
+
         let message = Message::new(
             "msg1".to_string(),
             "test_queue".to_string(),
-            "payload".to_string()
+            "payload".to_string(),
         );
-        
+
         assert!(mq.publish(message).is_ok());
         assert_eq!(mq.message_count(), 1);
     }
@@ -318,16 +342,16 @@ mod tests {
     fn test_sigmamq_consume() {
         let mut mq = SigmaMQ::new();
         mq.start();
-        
+
         let message = Message::new(
             "msg1".to_string(),
             "test_queue".to_string(),
-            "payload".to_string()
+            "payload".to_string(),
         );
-        
+
         mq.publish(message).unwrap();
         let result = mq.consume("test_queue");
-        
+
         assert!(result.is_ok());
         assert!(result.unwrap().is_some());
     }
@@ -336,17 +360,17 @@ mod tests {
     fn test_sigmamq_acknowledge() {
         let mut mq = SigmaMQ::new();
         mq.start();
-        
+
         let message = Message::new(
             "msg1".to_string(),
             "test_queue".to_string(),
-            "payload".to_string()
+            "payload".to_string(),
         )
         .with_state(MessageState::Processing);
-        
+
         mq.publish(message).unwrap();
         assert!(mq.acknowledge("msg1").is_ok());
-        
+
         let msg = mq.get_message("msg1").unwrap();
         assert_eq!(msg.state, MessageState::Acknowledged);
     }
@@ -355,15 +379,15 @@ mod tests {
     fn test_sigmamq_list_by_queue() {
         let mut mq = SigmaMQ::new();
         mq.start();
-        
+
         let message = Message::new(
             "msg1".to_string(),
             "test_queue".to_string(),
-            "payload".to_string()
+            "payload".to_string(),
         );
-        
+
         mq.publish(message).unwrap();
-        
+
         let messages = mq.list_by_queue("test_queue");
         assert_eq!(messages.len(), 1);
     }
@@ -372,16 +396,16 @@ mod tests {
     fn test_sigmamq_list_by_state() {
         let mut mq = SigmaMQ::new();
         mq.start();
-        
+
         let message = Message::new(
             "msg1".to_string(),
             "test_queue".to_string(),
-            "payload".to_string()
+            "payload".to_string(),
         )
         .with_state(MessageState::Acknowledged);
-        
+
         mq.publish(message).unwrap();
-        
+
         let messages = mq.list_by_state(MessageState::Acknowledged);
         assert_eq!(messages.len(), 1);
     }
@@ -390,15 +414,15 @@ mod tests {
     fn test_sigmamq_stats() {
         let mut mq = SigmaMQ::new();
         mq.start();
-        
+
         let message = Message::new(
             "msg1".to_string(),
             "test_queue".to_string(),
-            "payload".to_string()
+            "payload".to_string(),
         );
-        
+
         mq.publish(message).unwrap();
-        
+
         let stats = mq.queue_stats();
         assert_eq!(stats.get("total_messages"), Some(&"1".to_string()));
         assert_eq!(stats.get("total_queues"), Some(&"1".to_string()));
@@ -407,16 +431,16 @@ mod tests {
     #[test]
     fn test_publish_message_convenience() {
         init_sigmamq();
-        
+
         let mut mq = get_sigmamq().unwrap();
         mq.start();
-        
+
         let message = Message::new(
             "msg1".to_string(),
             "test_queue".to_string(),
-            "payload".to_string()
+            "payload".to_string(),
         );
-        
+
         let result = publish_message(message);
         assert!(result.is_ok());
     }

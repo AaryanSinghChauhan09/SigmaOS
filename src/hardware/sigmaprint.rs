@@ -125,7 +125,12 @@ pub struct PrintJob {
 
 impl PrintJob {
     /// Create a new print job
-    pub fn new(job_id: String, printer_id: String, document_name: String, file_path: String) -> Self {
+    pub fn new(
+        job_id: String,
+        printer_id: String,
+        document_name: String,
+        file_path: String,
+    ) -> Self {
         Self {
             job_id,
             printer_id,
@@ -193,14 +198,14 @@ impl SigmaPrint {
         if self.printers.contains_key(&printer.printer_id) {
             return Err(format!("Printer '{}' already exists", printer.printer_id));
         }
-        
+
         // If this is the default, unset other defaults
         if printer.is_default {
             for p in self.printers.values_mut() {
                 p.is_default = false;
             }
         }
-        
+
         self.printers.insert(printer.printer_id.clone(), printer);
         Ok(())
     }
@@ -228,15 +233,15 @@ impl SigmaPrint {
         if !self.printers.contains_key(printer_id) {
             return Err(format!("Printer '{}' not found", printer_id));
         }
-        
+
         for p in self.printers.values_mut() {
             p.is_default = false;
         }
-        
+
         if let Some(printer) = self.printers.get_mut(printer_id) {
             printer.is_default = true;
         }
-        
+
         Ok(())
     }
 
@@ -250,11 +255,11 @@ impl SigmaPrint {
         if !self.running {
             return Err("SigmaPrint not running".to_string());
         }
-        
+
         if !self.printers.contains_key(&job.printer_id) {
             return Err(format!("Printer '{}' not found", job.printer_id));
         }
-        
+
         self.jobs.insert(job.job_id.clone(), job);
         self.job_counter += 1;
         Ok(())
@@ -286,14 +291,16 @@ impl SigmaPrint {
 
     /// List jobs by printer
     pub fn list_jobs_by_printer(&self, printer_id: &str) -> Vec<&PrintJob> {
-        self.jobs.values()
+        self.jobs
+            .values()
             .filter(|j| j.printer_id == printer_id)
             .collect()
     }
 
     /// List pending jobs
     pub fn list_pending(&self) -> Vec<&PrintJob> {
-        self.jobs.values()
+        self.jobs
+            .values()
             .filter(|j| j.status == PrintJobStatus::Pending)
             .collect()
     }
@@ -311,9 +318,15 @@ impl SigmaPrint {
     /// Get print statistics
     pub fn print_stats(&self) -> BTreeMap<String, String> {
         let mut stats = BTreeMap::new();
-        stats.insert("total_printers".to_string(), self.printer_count().to_string());
+        stats.insert(
+            "total_printers".to_string(),
+            self.printer_count().to_string(),
+        );
         stats.insert("total_jobs".to_string(), self.job_count().to_string());
-        stats.insert("pending_jobs".to_string(), self.list_pending().len().to_string());
+        stats.insert(
+            "pending_jobs".to_string(),
+            self.list_pending().len().to_string(),
+        );
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
@@ -370,7 +383,7 @@ mod tests {
         let printer = Printer::new(
             "printer1".to_string(),
             "HP LaserJet".to_string(),
-            "Office".to_string()
+            "Office".to_string(),
         )
         .with_status(PrinterStatus::Printing)
         .with_default(true);
@@ -386,7 +399,7 @@ mod tests {
             "job1".to_string(),
             "printer1".to_string(),
             "Document.pdf".to_string(),
-            "/tmp/document.pdf".to_string()
+            "/tmp/document.pdf".to_string(),
         )
         .with_pages(5)
         .with_status(PrintJobStatus::Completed);
@@ -409,13 +422,13 @@ mod tests {
     #[test]
     fn test_sigmaprint_add_printer() {
         let mut print = SigmaPrint::new();
-        
+
         let printer = Printer::new(
             "printer1".to_string(),
             "HP LaserJet".to_string(),
-            "Office".to_string()
+            "Office".to_string(),
         );
-        
+
         assert!(print.add_printer(printer).is_ok());
         assert_eq!(print.printer_count(), 1);
     }
@@ -423,24 +436,24 @@ mod tests {
     #[test]
     fn test_sigmaprint_set_default() {
         let mut print = SigmaPrint::new();
-        
+
         let printer1 = Printer::new(
             "printer1".to_string(),
             "HP LaserJet".to_string(),
-            "Office".to_string()
+            "Office".to_string(),
         );
-        
+
         let printer2 = Printer::new(
             "printer2".to_string(),
             "Canon Pixma".to_string(),
-            "Home".to_string()
+            "Home".to_string(),
         );
-        
+
         print.add_printer(printer1).unwrap();
         print.add_printer(printer2).unwrap();
-        
+
         assert!(print.set_default_printer("printer2").is_ok());
-        
+
         let default = print.get_default_printer().unwrap();
         assert_eq!(default.printer_id, "printer2");
     }
@@ -449,22 +462,22 @@ mod tests {
     fn test_sigmaprint_add_job() {
         let mut print = SigmaPrint::new();
         print.start();
-        
+
         let printer = Printer::new(
             "printer1".to_string(),
             "HP LaserJet".to_string(),
-            "Office".to_string()
+            "Office".to_string(),
         );
-        
+
         print.add_printer(printer).unwrap();
-        
+
         let job = PrintJob::new(
             "job1".to_string(),
             "printer1".to_string(),
             "Document.pdf".to_string(),
-            "/tmp/document.pdf".to_string()
+            "/tmp/document.pdf".to_string(),
         );
-        
+
         assert!(print.add_job(job).is_ok());
         assert_eq!(print.job_count(), 1);
     }
@@ -473,25 +486,25 @@ mod tests {
     fn test_sigmaprint_cancel_job() {
         let mut print = SigmaPrint::new();
         print.start();
-        
+
         let printer = Printer::new(
             "printer1".to_string(),
             "HP LaserJet".to_string(),
-            "Office".to_string()
+            "Office".to_string(),
         );
-        
+
         print.add_printer(printer).unwrap();
-        
+
         let job = PrintJob::new(
             "job1".to_string(),
             "printer1".to_string(),
             "Document.pdf".to_string(),
-            "/tmp/document.pdf".to_string()
+            "/tmp/document.pdf".to_string(),
         );
-        
+
         print.add_job(job).unwrap();
         assert!(print.cancel_job("job1").is_ok());
-        
+
         let job = print.get_job("job1").unwrap();
         assert_eq!(job.status, PrintJobStatus::Cancelled);
     }
@@ -500,24 +513,24 @@ mod tests {
     fn test_sigmaprint_list_by_printer() {
         let mut print = SigmaPrint::new();
         print.start();
-        
+
         let printer = Printer::new(
             "printer1".to_string(),
             "HP LaserJet".to_string(),
-            "Office".to_string()
+            "Office".to_string(),
         );
-        
+
         print.add_printer(printer).unwrap();
-        
+
         let job = PrintJob::new(
             "job1".to_string(),
             "printer1".to_string(),
             "Document.pdf".to_string(),
-            "/tmp/document.pdf".to_string()
+            "/tmp/document.pdf".to_string(),
         );
-        
+
         print.add_job(job).unwrap();
-        
+
         let jobs = print.list_jobs_by_printer("printer1");
         assert_eq!(jobs.len(), 1);
     }
@@ -526,24 +539,24 @@ mod tests {
     fn test_sigmaprint_stats() {
         let mut print = SigmaPrint::new();
         print.start();
-        
+
         let printer = Printer::new(
             "printer1".to_string(),
             "HP LaserJet".to_string(),
-            "Office".to_string()
+            "Office".to_string(),
         );
-        
+
         print.add_printer(printer).unwrap();
-        
+
         let job = PrintJob::new(
             "job1".to_string(),
             "printer1".to_string(),
             "Document.pdf".to_string(),
-            "/tmp/document.pdf".to_string()
+            "/tmp/document.pdf".to_string(),
         );
-        
+
         print.add_job(job).unwrap();
-        
+
         let stats = print.print_stats();
         assert_eq!(stats.get("total_printers"), Some(&"1".to_string()));
         assert_eq!(stats.get("total_jobs"), Some(&"1".to_string()));
@@ -552,25 +565,25 @@ mod tests {
     #[test]
     fn test_add_print_job_convenience() {
         init_sigmaprint();
-        
+
         let mut print = get_sigmaprint().unwrap();
         print.start();
-        
+
         let printer = Printer::new(
             "printer1".to_string(),
             "HP LaserJet".to_string(),
-            "Office".to_string()
+            "Office".to_string(),
         );
-        
+
         print.add_printer(printer).unwrap();
-        
+
         let job = PrintJob::new(
             "job1".to_string(),
             "printer1".to_string(),
             "Document.pdf".to_string(),
-            "/tmp/document.pdf".to_string()
+            "/tmp/document.pdf".to_string(),
         );
-        
+
         let result = add_print_job(job);
         assert!(result.is_ok());
     }

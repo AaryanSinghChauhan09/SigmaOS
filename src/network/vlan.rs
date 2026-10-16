@@ -106,7 +106,11 @@ impl VlanTag {
         if vid < VLAN_ID_MIN || vid > VLAN_ID_MAX {
             return Err(VlanError::InvalidVid);
         }
-        Ok(VlanTag { pcp: pcp & 0x07, dei, vid })
+        Ok(VlanTag {
+            pcp: pcp & 0x07,
+            dei,
+            vid,
+        })
     }
 
     /// Encode as two TCI bytes (after TPID).
@@ -138,10 +142,10 @@ pub fn tag_insert(frame: &[u8], tag: VlanTag) -> Result<Vec<u8>, VlanError> {
     let tci = tag.to_tci_bytes();
     let tpid = TPID_8021Q.to_be_bytes();
     let mut out = Vec::with_capacity(frame.len() + 4);
-    out.extend_from_slice(&frame[..12]);      // DA + SA
-    out.extend_from_slice(&tpid);              // TPID 0x8100
-    out.extend_from_slice(&tci);               // PCP | DEI | VID
-    out.extend_from_slice(&frame[12..]);       // EtherType + payload
+    out.extend_from_slice(&frame[..12]); // DA + SA
+    out.extend_from_slice(&tpid); // TPID 0x8100
+    out.extend_from_slice(&tci); // PCP | DEI | VID
+    out.extend_from_slice(&frame[12..]); // EtherType + payload
     Ok(out)
 }
 
@@ -158,8 +162,8 @@ pub fn tag_strip(frame: &[u8]) -> Result<(Vec<u8>, VlanTag), VlanError> {
     }
     let tag = VlanTag::from_tci_bytes([frame[14], frame[15]]);
     let mut out = Vec::with_capacity(frame.len() - 4);
-    out.extend_from_slice(&frame[..12]);       // DA + SA
-    out.extend_from_slice(&frame[16..]);       // EtherType + payload (tag removed)
+    out.extend_from_slice(&frame[..12]); // DA + SA
+    out.extend_from_slice(&frame[16..]); // EtherType + payload (tag removed)
     Ok((out, tag))
 }
 

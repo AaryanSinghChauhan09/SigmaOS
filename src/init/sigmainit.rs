@@ -384,7 +384,9 @@ impl SigmaInit {
 
     /// Start a service
     pub fn start_service(&mut self, name: &str) -> Result<(), String> {
-        let service = self.services.get_mut(name)
+        let service = self
+            .services
+            .get_mut(name)
             .ok_or_else(|| format!("Service '{}' not found", name))?;
 
         // Check dependencies
@@ -410,7 +412,9 @@ impl SigmaInit {
 
     /// Stop a service
     pub fn stop_service(&mut self, name: &str) -> Result<(), String> {
-        let service = self.services.get_mut(name)
+        let service = self
+            .services
+            .get_mut(name)
             .ok_or_else(|| format!("Service '{}' not found", name))?;
 
         if service.state != ServiceState::Running {
@@ -437,7 +441,9 @@ impl SigmaInit {
 
     /// Reload a service
     pub fn reload_service(&mut self, name: &str) -> Result<(), String> {
-        let service = self.services.get_mut(name)
+        let service = self
+            .services
+            .get_mut(name)
             .ok_or_else(|| format!("Service '{}' not found", name))?;
 
         if service.state != ServiceState::Running {
@@ -456,7 +462,9 @@ impl SigmaInit {
 
     /// Enable a service (start at boot)
     pub fn enable_service(&mut self, name: &str) -> Result<(), String> {
-        let service = self.services.get_mut(name)
+        let service = self
+            .services
+            .get_mut(name)
             .ok_or_else(|| format!("Service '{}' not found", name))?;
 
         service.enabled = true;
@@ -465,7 +473,9 @@ impl SigmaInit {
 
     /// Disable a service (don't start at boot)
     pub fn disable_service(&mut self, name: &str) -> Result<(), String> {
-        let service = self.services.get_mut(name)
+        let service = self
+            .services
+            .get_mut(name)
             .ok_or_else(|| format!("Service '{}' not found", name))?;
 
         service.enabled = false;
@@ -474,7 +484,9 @@ impl SigmaInit {
 
     /// Switch to a target
     pub fn switch_target(&mut self, target_name: &str) -> Result<(), String> {
-        let target = self.targets.get(target_name)
+        let target = self
+            .targets
+            .get(target_name)
             .ok_or_else(|| format!("Target '{}' not found", target_name))?;
 
         // Stop current target services
@@ -530,10 +542,7 @@ impl SigmaInit {
 
     /// Get enabled services
     pub fn get_enabled_services(&self) -> Vec<&Service> {
-        self.services
-            .values()
-            .filter(|s| s.enabled)
-            .collect()
+        self.services.values().filter(|s| s.enabled).collect()
     }
 
     /// Get failed services
@@ -594,7 +603,7 @@ mod tests {
         let service = Service::new(
             "test".to_string(),
             "Test service".to_string(),
-            "/usr/bin/test".to_string()
+            "/usr/bin/test".to_string(),
         )
         .with_service_type(ServiceType::Simple)
         .with_enabled(true);
@@ -609,7 +618,7 @@ mod tests {
         let service = Service::new(
             "test".to_string(),
             "Test service".to_string(),
-            "/usr/bin/test".to_string()
+            "/usr/bin/test".to_string(),
         )
         .with_arg("--daemon".to_string())
         .with_arg("--config".to_string())
@@ -624,23 +633,23 @@ mod tests {
         let service = Service::new(
             "test".to_string(),
             "Test service".to_string(),
-            "/usr/bin/test".to_string()
+            "/usr/bin/test".to_string(),
         )
         .with_env("PATH".to_string(), "/usr/bin".to_string())
         .with_env("HOME".to_string(), "/root".to_string());
 
         assert_eq!(service.environment.len(), 2);
-        assert_eq!(service.environment.get("PATH"), Some(&"/usr/bin".to_string()));
+        assert_eq!(
+            service.environment.get("PATH"),
+            Some(&"/usr/bin".to_string())
+        );
     }
 
     #[test]
     fn test_target_creation() {
-        let target = Target::new(
-            "multi-user".to_string(),
-            "Multi-user target".to_string()
-        )
-        .with_service("network".to_string())
-        .with_service("syslog".to_string());
+        let target = Target::new("multi-user".to_string(), "Multi-user target".to_string())
+            .with_service("network".to_string())
+            .with_service("syslog".to_string());
 
         assert_eq!(target.name, "multi-user");
         assert_eq!(target.services.len(), 2);
@@ -662,7 +671,7 @@ mod tests {
         let service = Service::new(
             "test".to_string(),
             "Test service".to_string(),
-            "/usr/bin/test".to_string()
+            "/usr/bin/test".to_string(),
         );
 
         init.register_service(service);
@@ -672,10 +681,7 @@ mod tests {
     #[test]
     fn test_target_registration() {
         let mut init = SigmaInit::new();
-        let target = Target::new(
-            "multi-user".to_string(),
-            "Multi-user target".to_string()
-        );
+        let target = Target::new("multi-user".to_string(), "Multi-user target".to_string());
 
         init.register_target(target);
         assert!(init.get_target("multi-user").is_some());
@@ -687,7 +693,7 @@ mod tests {
         let service = Service::new(
             "test".to_string(),
             "Test service".to_string(),
-            "/usr/bin/test".to_string()
+            "/usr/bin/test".to_string(),
         );
 
         init.register_service(service);
@@ -705,7 +711,7 @@ mod tests {
         let service = Service::new(
             "test".to_string(),
             "Test service".to_string(),
-            "/usr/bin/test".to_string()
+            "/usr/bin/test".to_string(),
         );
 
         init.register_service(service);
@@ -724,7 +730,7 @@ mod tests {
         let service = Service::new(
             "test".to_string(),
             "Test service".to_string(),
-            "/usr/bin/test".to_string()
+            "/usr/bin/test".to_string(),
         );
 
         init.register_service(service);
@@ -742,7 +748,7 @@ mod tests {
         let service = Service::new(
             "test".to_string(),
             "Test service".to_string(),
-            "/usr/bin/test".to_string()
+            "/usr/bin/test".to_string(),
         );
 
         init.register_service(service);
@@ -760,16 +766,16 @@ mod tests {
     #[test]
     fn test_get_services_by_state() {
         let mut init = SigmaInit::new();
-        
+
         let service1 = Service::new(
             "test1".to_string(),
             "Test service 1".to_string(),
-            "/usr/bin/test1".to_string()
+            "/usr/bin/test1".to_string(),
         );
         let service2 = Service::new(
             "test2".to_string(),
             "Test service 2".to_string(),
-            "/usr/bin/test2".to_string()
+            "/usr/bin/test2".to_string(),
         );
 
         init.register_service(service1);

@@ -68,17 +68,31 @@ impl MinixRendezvousEngine {
 
     /// Asynchronous non-blocking hardware/kernel interrupt notification
     pub fn notify(&mut self, src: i32, dst: i32, msg_type: i32) -> Result<(), &'static str> {
-        let notifs = self.notifications.get_mut(&dst).ok_or("Destination endpoint not found")?;
+        let notifs = self
+            .notifications
+            .get_mut(&dst)
+            .ok_or("Destination endpoint not found")?;
         notifs.push(MinixMessage::new(src, msg_type, &[]));
         Ok(())
     }
 
     /// Synchronous rendezvous: sender transfers message directly to receiver
-    pub fn send_rendezvous(&mut self, src: i32, dst: i32, msg: MinixMessage) -> Result<Option<MinixMessage>, &'static str> {
-        let dst_state = self.process_states.get(&dst).cloned().ok_or("Target endpoint not registered")?;
+    pub fn send_rendezvous(
+        &mut self,
+        src: i32,
+        dst: i32,
+        msg: MinixMessage,
+    ) -> Result<Option<MinixMessage>, &'static str> {
+        let dst_state = self
+            .process_states
+            .get(&dst)
+            .cloned()
+            .ok_or("Target endpoint not registered")?;
 
         match dst_state {
-            RendezvousState::BlockedOnReceive { from } if from == src || from == IPC_ENDPOINT_ANY => {
+            RendezvousState::BlockedOnReceive { from }
+                if from == src || from == IPC_ENDPOINT_ANY =>
+            {
                 // Rendez-vous achieved! Unblock receiver and deliver message immediately
                 self.process_states.insert(dst, RendezvousState::Ready);
                 self.process_states.insert(src, RendezvousState::Ready);
@@ -86,14 +100,24 @@ impl MinixRendezvousEngine {
             }
             _ => {
                 // Receiver not waiting -> Sender blocks
-                self.process_states.insert(src, RendezvousState::BlockedOnSend { target: dst, message: msg });
+                self.process_states.insert(
+                    src,
+                    RendezvousState::BlockedOnSend {
+                        target: dst,
+                        message: msg,
+                    },
+                );
                 Ok(None)
             }
         }
     }
 
     /// Synchronous rendezvous: receiver waits for sender
-    pub fn receive_rendezvous(&mut self, dst: i32, from: i32) -> Result<Option<MinixMessage>, &'static str> {
+    pub fn receive_rendezvous(
+        &mut self,
+        dst: i32,
+        from: i32,
+    ) -> Result<Option<MinixMessage>, &'static str> {
         // First check pending async notifications
         if let Some(notifs) = self.notifications.get_mut(&dst) {
             if !notifs.is_empty() {
@@ -115,7 +139,8 @@ impl MinixRendezvousEngine {
         }
 
         // No sender waiting -> Receiver blocks
-        self.process_states.insert(dst, RendezvousState::BlockedOnReceive { from });
+        self.process_states
+            .insert(dst, RendezvousState::BlockedOnReceive { from });
         Ok(None)
     }
 

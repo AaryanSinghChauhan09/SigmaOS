@@ -78,16 +78,16 @@ pub const PPP_PROTO_IP: u16 = 0x0021;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u16)]
 pub enum TagType {
-    EndOfList     = 0x0000,
-    ServiceName   = 0x0101,
-    AcName        = 0x0102,
-    HostUniq      = 0x0103,
-    AcCookie      = 0x0104,
-    VendorSpec    = 0x0105,
-    RelaySessionId= 0x0110,
+    EndOfList = 0x0000,
+    ServiceName = 0x0101,
+    AcName = 0x0102,
+    HostUniq = 0x0103,
+    AcCookie = 0x0104,
+    VendorSpec = 0x0105,
+    RelaySessionId = 0x0110,
     ServiceNameError = 0x0201,
     AcSystemError = 0x0202,
-    GenericError  = 0x0203,
+    GenericError = 0x0203,
 }
 
 // ─── Discovery FSM states ─────────────────────────────────────────────────────
@@ -144,7 +144,10 @@ pub struct PppoeTag {
 
 impl PppoeTag {
     pub fn new(tag_type: TagType, value: Vec<u8>) -> Self {
-        PppoeTag { tag_type: tag_type as u16, value }
+        PppoeTag {
+            tag_type: tag_type as u16,
+            value,
+        }
     }
 
     pub fn to_bytes(&self) -> Vec<u8> {
@@ -171,7 +174,12 @@ pub struct PppoeHeader {
 
 impl PppoeHeader {
     pub fn new(code: u8, session_id: u16, payload_len: u16) -> Self {
-        PppoeHeader { ver_type: PPPOE_VER_TYPE, code, session_id, payload_len }
+        PppoeHeader {
+            ver_type: PPPOE_VER_TYPE,
+            code,
+            session_id,
+            payload_len,
+        }
     }
 
     pub fn to_bytes(&self) -> [u8; 6] {
@@ -181,7 +189,9 @@ impl PppoeHeader {
     }
 
     pub fn from_bytes(raw: &[u8]) -> Result<Self, PppoeError> {
-        if raw.len() < 6 { return Err(PppoeError::InvalidPacket); }
+        if raw.len() < 6 {
+            return Err(PppoeError::InvalidPacket);
+        }
         Ok(PppoeHeader {
             ver_type: raw[0],
             code: raw[1],
@@ -244,10 +254,7 @@ impl PppoeClient {
 
     /// Build a PADI packet (broadcast to find access concentrators).
     pub fn build_padi(&self) -> Vec<u8> {
-        let svc_tag = PppoeTag::new(
-            TagType::ServiceName,
-            self.service_name.as_bytes().to_vec(),
-        );
+        let svc_tag = PppoeTag::new(TagType::ServiceName, self.service_name.as_bytes().to_vec());
         let uniq_tag = PppoeTag::new(TagType::HostUniq, self.host_uniq.to_vec());
         let mut payload = svc_tag.to_bytes();
         payload.extend_from_slice(&uniq_tag.to_bytes());
@@ -270,10 +277,7 @@ impl PppoeClient {
 
     /// Build a PADR packet directed at the selected AC.
     pub fn build_padr(&self) -> Vec<u8> {
-        let svc_tag = PppoeTag::new(
-            TagType::ServiceName,
-            self.service_name.as_bytes().to_vec(),
-        );
+        let svc_tag = PppoeTag::new(TagType::ServiceName, self.service_name.as_bytes().to_vec());
         let mut payload = svc_tag.to_bytes();
         if !self.ac_cookie.is_empty() {
             let cookie = PppoeTag::new(TagType::AcCookie, self.ac_cookie.clone());
@@ -310,7 +314,11 @@ impl PppoeClient {
     }
 
     /// Encapsulate a PPP frame in a PPPoE session packet.
-    pub fn encapsulate(&mut self, ppp_proto: u16, ppp_payload: &[u8]) -> Result<Vec<u8>, PppoeError> {
+    pub fn encapsulate(
+        &mut self,
+        ppp_proto: u16,
+        ppp_payload: &[u8],
+    ) -> Result<Vec<u8>, PppoeError> {
         if self.state != PppoeState::SessionUp {
             return Err(PppoeError::WrongState);
         }

@@ -3502,7 +3502,9 @@ pub struct FirefoxGeckoCssGridSubgridEngine {
 impl FirefoxGeckoCssGridSubgridEngine {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        Self { subgrid_tracks_enabled: true }
+        Self {
+            subgrid_tracks_enabled: true,
+        }
     }
 
     pub fn compute_subgrid_fr_tracks(&self, available_width: f32, fr_weights: &[f32]) -> Vec<f32> {
@@ -3510,7 +3512,10 @@ impl FirefoxGeckoCssGridSubgridEngine {
         if total_weight <= 0.0 {
             return Vec::new();
         }
-        fr_weights.iter().map(|&w| (w / total_weight) * available_width).collect()
+        fr_weights
+            .iter()
+            .map(|&w| (w / total_weight) * available_width)
+            .collect()
     }
 }
 
@@ -3553,7 +3558,8 @@ impl LibreWolfStrictRfpTimerJitterEngine {
     }
 
     pub fn quantize_performance_now(&self, raw_time_ms: f64) -> f64 {
-        let quantized = (raw_time_ms / self.quantization_step_ms).floor() * self.quantization_step_ms;
+        let quantized =
+            (raw_time_ms / self.quantization_step_ms).floor() * self.quantization_step_ms;
         quantized + (self.jitter_microseconds / 1000.0)
     }
 }
@@ -3565,11 +3571,16 @@ pub struct BraveShieldsFirstPartyEphemeralStorageEngine {
 impl BraveShieldsFirstPartyEphemeralStorageEngine {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        Self { active_storage_jars: BTreeMap::new() }
+        Self {
+            active_storage_jars: BTreeMap::new(),
+        }
     }
 
     pub fn partition_domain_storage(&mut self, domain: &str, key: &str, value: &str) {
-        self.active_storage_jars.entry(domain.to_string()).or_default().insert(key.to_string(), value.to_string());
+        self.active_storage_jars
+            .entry(domain.to_string())
+            .or_default()
+            .insert(key.to_string(), value.to_string());
     }
 
     pub fn auto_purge_isolation_jar(&mut self, domain: &str) -> usize {
@@ -3588,7 +3599,9 @@ pub struct TorOnionRendezvousHandshakeEngine {
 impl TorOnionRendezvousHandshakeEngine {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        Self { active_rendezvous_circuits: Vec::new() }
+        Self {
+            active_rendezvous_circuits: Vec::new(),
+        }
     }
 
     pub fn create_6hop_rendezvous_circuit(&mut self, onion_addr: &str) -> Vec<String> {
@@ -3616,7 +3629,9 @@ pub struct LadybirdLibWebCss3SelectorEngine {
 impl LadybirdLibWebCss3SelectorEngine {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        Self { match_rules: Vec::new() }
+        Self {
+            match_rules: Vec::new(),
+        }
     }
 
     pub fn calculate_specificity(&self, selector: &str) -> (u32, u32, u32) {

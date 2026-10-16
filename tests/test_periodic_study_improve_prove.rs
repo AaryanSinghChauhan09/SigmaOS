@@ -64,8 +64,8 @@ fn test_maturity_promotion_rule_3_enforcement() {
         study.clone(),
         "research/decisions/ADR-012-vfs.md".into(),
         "VFS path resolution error handling".into(),
-        14, // unit tests added
-        2,  // integration tests added
+        14,   // unit tests added
+        2,    // integration tests added
         None, // NO runtime evidence path
         ComponentMaturity::Integrated,
     );
@@ -104,10 +104,7 @@ fn test_monthly_milestone_completion_and_report() {
 
     // Complete Month 1 milestone
     assert!(engine
-        .complete_monthly_milestone(
-            1,
-            "reports/boot/qemu-x86_64-boot-matrix.json".into()
-        )
+        .complete_monthly_milestone(1, "reports/boot/qemu-x86_64-boot-matrix.json".into())
         .is_ok());
 
     let summary = engine.generate_program_summary();

@@ -148,7 +148,12 @@ impl BpfProgram {
     pub fn accept_all() -> Self {
         BpfProgram {
             insns: vec![
-                BpfInsn { code: 0x06, jt: 0, jf: 0, k: 0xFFFF_FFFF }, // RET #-1
+                BpfInsn {
+                    code: 0x06,
+                    jt: 0,
+                    jf: 0,
+                    k: 0xFFFF_FFFF,
+                }, // RET #-1
             ],
         }
     }
@@ -336,20 +341,22 @@ impl PacketSocket {
     /// Configure a TPACKET_V3 RX ring buffer.
     pub fn setup_rx_ring(&mut self, cfg: TpacketReq3) -> Result<(), PacketError> {
         // TODO: mmap the ring buffer from kernel
-        self.rx_ring = (0..cfg.tp_block_nr).map(|i| RingBlock {
-            desc: TpacketBlockDesc {
-                version: TPACKET_V3,
-                offset_to_priv: 0,
-                num_pkts: 0,
-                offset_to_first_pkt: 48,
-                blk_len: 0,
-                seq_num: 0,
-                ts_first_pkt: (0, 0),
-                ts_last_pkt: (0, 0),
-                status: BlockStatus::Kernel,
-            },
-            data: vec![0u8; cfg.tp_block_size],
-        }).collect();
+        self.rx_ring = (0..cfg.tp_block_nr)
+            .map(|i| RingBlock {
+                desc: TpacketBlockDesc {
+                    version: TPACKET_V3,
+                    offset_to_priv: 0,
+                    num_pkts: 0,
+                    offset_to_first_pkt: 48,
+                    blk_len: 0,
+                    seq_num: 0,
+                    ts_first_pkt: (0, 0),
+                    ts_last_pkt: (0, 0),
+                    status: BlockStatus::Kernel,
+                },
+                data: vec![0u8; cfg.tp_block_size],
+            })
+            .collect();
         self.ring_cfg = Some(cfg);
         Ok(())
     }

@@ -142,12 +142,18 @@ impl NewsReader {
 
     /// Get unread count
     pub fn get_unread_count(&self) -> usize {
-        self.feeds.iter().flat_map(|f| f.items.iter().filter(|i| !i.read)).count()
+        self.feeds
+            .iter()
+            .flat_map(|f| f.items.iter().filter(|i| !i.read))
+            .count()
     }
 
     /// Get starred items
     pub fn get_starred_items(&self) -> Vec<&FeedItem> {
-        self.feeds.iter().flat_map(|f| f.items.iter().filter(|i| i.starred)).collect()
+        self.feeds
+            .iter()
+            .flat_map(|f| f.items.iter().filter(|i| i.starred))
+            .collect()
     }
 
     /// Get feeds
@@ -173,9 +179,7 @@ pub fn init_news_reader() {
 
 /// Get news reader
 pub fn get_news_reader() -> &'static mut NewsReader {
-    unsafe {
-        NEWS_READER.as_mut().expect("News reader not initialized")
-    }
+    unsafe { NEWS_READER.as_mut().expect("News reader not initialized") }
 }
 
 #[cfg(test)]

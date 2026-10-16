@@ -321,7 +321,7 @@ mod tests {
         let endpoint = ServiceEndpoint::new(
             "org.example.Service".to_string(),
             "/org/example/Service".to_string(),
-            "org.example.Interface".to_string()
+            "org.example.Interface".to_string(),
         )
         .with_method("Method1".to_string())
         .with_method("Method2".to_string())
@@ -345,13 +345,13 @@ mod tests {
     #[test]
     fn test_sigmabus_register_endpoint() {
         let mut bus = SigmaBus::new();
-        
+
         let endpoint = ServiceEndpoint::new(
             "org.example.Service".to_string(),
             "/org/example/Service".to_string(),
-            "org.example.Interface".to_string()
+            "org.example.Interface".to_string(),
         );
-        
+
         assert!(bus.register_endpoint(endpoint).is_ok());
         assert_eq!(bus.endpoint_count(), 1);
     }
@@ -359,19 +359,19 @@ mod tests {
     #[test]
     fn test_sigmabus_duplicate_endpoint() {
         let mut bus = SigmaBus::new();
-        
+
         let endpoint1 = ServiceEndpoint::new(
             "org.example.Service".to_string(),
             "/org/example/Service".to_string(),
-            "org.example.Interface".to_string()
+            "org.example.Interface".to_string(),
         );
-        
+
         let endpoint2 = ServiceEndpoint::new(
             "org.example.Service".to_string(),
             "/org/example/Service2".to_string(),
-            "org.example.Interface2".to_string()
+            "org.example.Interface2".to_string(),
         );
-        
+
         assert!(bus.register_endpoint(endpoint1).is_ok());
         assert!(bus.register_endpoint(endpoint2).is_err());
     }
@@ -380,7 +380,7 @@ mod tests {
     fn test_sigmabus_send_message() {
         let mut bus = SigmaBus::new();
         bus.start();
-        
+
         let message = BusMessage::new(MessageType::MethodCall, "sender".to_string());
         assert!(bus.send_message(message).is_ok());
         assert_eq!(bus.message_count(), 1);
@@ -389,7 +389,7 @@ mod tests {
     #[test]
     fn test_sigmabus_send_message_not_running() {
         let mut bus = SigmaBus::new();
-        
+
         let message = BusMessage::new(MessageType::MethodCall, "sender".to_string());
         assert!(bus.send_message(message).is_err());
     }
@@ -398,18 +398,18 @@ mod tests {
     fn test_sigmabus_stats() {
         let mut bus = SigmaBus::new();
         bus.start();
-        
+
         let endpoint = ServiceEndpoint::new(
             "org.example.Service".to_string(),
             "/org/example/Service".to_string(),
-            "org.example.Interface".to_string()
+            "org.example.Interface".to_string(),
         );
-        
+
         bus.register_endpoint(endpoint).unwrap();
-        
+
         let message = BusMessage::new(MessageType::MethodCall, "sender".to_string());
         bus.send_message(message).unwrap();
-        
+
         let stats = bus.bus_stats();
         assert_eq!(stats.get("endpoints"), Some(&"1".to_string()));
         assert_eq!(stats.get("messages_sent"), Some(&"1".to_string()));
@@ -419,13 +419,13 @@ mod tests {
     #[test]
     fn test_register_service_endpoint_convenience() {
         init_sigmabus();
-        
+
         let endpoint = ServiceEndpoint::new(
             "org.example.Service".to_string(),
             "/org/example/Service".to_string(),
-            "org.example.Interface".to_string()
+            "org.example.Interface".to_string(),
         );
-        
+
         let result = register_service_endpoint(endpoint);
         assert!(result.is_ok());
     }
@@ -433,13 +433,13 @@ mod tests {
     #[test]
     fn test_send_bus_message_convenience() {
         init_sigmabus();
-        
+
         let mut bus = get_sigmabus().unwrap();
         bus.start();
-        
+
         let message = BusMessage::new(MessageType::MethodCall, "sender".to_string());
         let result = send_bus_message(message);
-        
+
         assert!(result.is_ok());
     }
 }

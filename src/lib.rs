@@ -24,8 +24,8 @@ pub mod contributing;
 pub mod creative;
 pub use creative::wordcraft_missing_components_parity_pr::*;
 pub mod customization;
-pub mod database;
 pub mod dashboard;
+pub mod database;
 pub mod desktop;
 pub mod development;
 pub mod device;
@@ -39,8 +39,8 @@ pub use storage::*;
 pub mod swap;
 pub use swap::*;
 pub mod system;
-pub use system::*;
 pub use distro::sovereign_linux_bsd_wiki_master_engine::*;
+pub use system::*;
 pub mod driver;
 pub mod drivers;
 pub use drivers::sovereign_comprehensive_drivers::*;
@@ -51,8 +51,8 @@ pub mod filesystem;
 pub mod futuristic_modules;
 pub mod governance;
 pub use governance::*;
-pub mod gpu;
 pub mod gaming;
+pub mod gpu;
 pub mod init;
 pub mod kernel;
 pub mod klib;
@@ -100,13 +100,13 @@ pub mod interrupt;
 pub mod ml;
 pub mod thread;
 pub mod virtualization;
+pub use desktop::sovereign_desktop_toolkits_and_services::*;
 pub use desktop::{
     CachyosGamescopeHandheldOverlay, Gnome46MutterEngine, ItsFossQuickShareAndBackupHud,
     KdePlasma6Engine, LuminaBsdDesktopEngine, PhoronixPerformanceBenchmarkWidget,
     PopOsKdeTilingWorkspaceGridEngine, SovereignUxMasterEngine, SwayRegolithWmEngine,
     WindowsCopilotAiAssistantSidebar, Xfce418Engine,
 };
-pub use desktop::sovereign_desktop_toolkits_and_services::*;
 pub use kernel::{
     CfiFunctionSignature, KptrRestrictLevel, SovereignHardenedSecurityMitigationsEngine,
     SovereignKernelDistroParityPrGateway, SovereignKernelOpenSourceInnovationsPrGateway,
@@ -142,24 +142,27 @@ pub mod open_source_os_missing_components_parity;
 pub use open_source_os_missing_components_parity::*;
 pub mod tools;
 pub use distro::additional_linux_bsd_components::*;
-pub use distro::debian_github_repo_unimplemented_ideas_v27_pr::*;
-pub use distro::open_source_os_debian_unimplemented_ideas_pr::*;
-pub use distro::omarchy_linux_gap_closure_pr_suite::*;
 pub use distro::cachy_linux_missing_components_v56_pr::*;
+pub use distro::debian_github_repo_unimplemented_ideas_v27_pr::*;
+pub use distro::omarchy_linux_gap_closure_pr_suite::*;
 pub use distro::omarchy_linux_missing_components_v52_pr::*;
 pub use distro::omarchy_linux_missing_components_v57_pr::*;
+pub use distro::omarchy_omakase_ultimate_parity::*;
+pub use distro::open_source_os_debian_unimplemented_ideas_pr::*;
+pub use distro::open_source_os_missing_components_v54_pr::*;
 pub use distro::open_source_os_missing_components_v54_pr::*;
 pub use distro::open_source_os_missing_components_v57_pr::*;
-pub use distro::omarchy_omakase_ultimate_parity::*;
+pub use distro::openbsd_missing_components_parity_pr::*;
+pub use distro::openbsd_missing_components_v55_pr::*;
 pub use distro::sovereign_2050_distro_supremacy_engine::*;
 pub use distro::sovereign_2055_distro_supremacy_engine::*;
 pub use distro::sovereign_2060_distro_supremacy_engine::*;
 pub use distro::sovereign_2070_distro_supremacy_engine::*;
 pub use distro::sovereign_2075_distro_supremacy_engine::*;
+pub use distro::sovereign_freebsd_ultimate_parity_pr_suite::*;
 pub use distro::sovereign_linux_bsd_all_subsystems_harmony::*;
 pub use distro::sovereign_linux_bsd_ecosystem_gap_closure_v50_pr::*;
 pub use distro::sovereign_linux_bsd_ecosystem_gap_closure_v51_pr::*;
-pub use distro::open_source_os_missing_components_v54_pr::*;
 pub use distro::sovereign_linux_bsd_ecosystem_parity_v42_pr::*;
 pub use distro::sovereign_linux_bsd_master_synthesis::*;
 pub use distro::sovereign_linux_bsd_pinnacle_innovations_v14::*;
@@ -170,14 +173,12 @@ pub use distro::sovereign_mint_omarchy_v32_apex_arsenal::*;
 pub use distro::sovereign_mint_omarchy_v33_apex_vanguard::*;
 pub use distro::sovereign_mint_omarchy_v34_apex_pantheon::*;
 pub use distro::sovereign_open_source_os_gap_closure_v27::*;
+pub use distro::sovereign_openbsd_complete_gap_closure_pr_suite::*;
+pub use distro::sovereign_openbsd_ultimate_parity_pr_suite::*;
+pub use distro::sovereign_tech_media_wiki_ultimate_parity_pr::*;
 pub use distro::sovereign_thousands_distro_components::*;
 pub use distro::sovereign_universal_subsystem_interop::*;
 pub use distro::sovereign_universal_subsystem_interop::*;
-pub use distro::sovereign_tech_media_wiki_ultimate_parity_pr::*;
-pub use distro::sovereign_freebsd_ultimate_parity_pr_suite::*;
-pub use distro::sovereign_openbsd_ultimate_parity_pr_suite::*;
-pub use distro::openbsd_missing_components_parity_pr::*;
-pub use distro::openbsd_missing_components_v55_pr::*;
 pub use distro::tech_media_publication_innovations::*;
 pub use distro::SovereignMasterSubsystemDistroHarmonizer;
 pub use kernel::tss_ring3_user_mode::*;
@@ -199,8 +200,8 @@ pub mod backup;
 pub use backup::sovereign_backup_recovery_pr_suite::*;
 pub mod bluetooth;
 pub mod boot;
-pub use boot::*;
 pub use boot::start_assembly_entry::*;
+pub use boot::*;
 pub mod toolchain {
     pub mod adapter;
     pub mod bootstrap;
@@ -250,18 +251,19 @@ pub use dashboard::{
 pub use desktop::elementary_os_missing_components_pr::*;
 pub use distro::arch_missing_components_parity_pr::*;
 pub use distro::{
-    AdminAction, AiSysAdmin, AppBundleRuntime, AppManifest, AppsAuditTool, AptCacheSimulator,
-    ArchBuildSystem, ArchMirror, ArchPacmanHooksManager, ArchRepoType, AuditResult, AuditRule,
-    AurHelper, AurPackage, BackupSnapshot, BackupSystem, BoreSchedulerGovernor, BountyStatus,
-    BsdSecureNtpConstraintSync, BsdStatefulPacketFilter, BugBountyProgram, BugBountyReport,
-    BuildJob, BuildStatus, BundleError, CachyKernelVariant, CachyPackageRepo, CanFrame,
-    CertificationStatus, ChannelManager, CloudInitBootstrapEngine, CommunityConference,
-    ComplianceAuditor, ComponentType, ConferenceTalk, ConfigHook, CpuArchitecture, CpuCapabilities,
-    CrossBuildPipeline, CrossbowVnic, DaxMemoryRegion, DebianPolicyEnforcer, DebianSocialContract,
-    DevTool, DeveloperToolkit, DirectoryService, DirectoryUser, DllLoader, DllModule,
-    DpkgMultiArch, DragonFlyBsdMissingComponentsParityPrGateway, DragonFlyHammerFs, EcuController, EduChallenge, EduPlayground, ApexFlakeInput,
-    ForumChannel, ForumPost, FreezeBasedStabilization, GNUGuixShepherdSupervisor, GdiObjectType,
-    GentooPortageUseFlagsEngine, GuixDerivation, GuixFunctionalStore, HalError,
+    AdminAction, AiSysAdmin, ApexFlakeInput, AppBundleRuntime, AppManifest, AppsAuditTool,
+    AptCacheSimulator, ArchBuildSystem, ArchMirror, ArchPacmanHooksManager, ArchRepoType,
+    AuditResult, AuditRule, AurHelper, AurPackage, BackupSnapshot, BackupSystem,
+    BoreSchedulerGovernor, BountyStatus, BsdSecureNtpConstraintSync, BsdStatefulPacketFilter,
+    BugBountyProgram, BugBountyReport, BuildJob, BuildStatus, BundleError, CachyKernelVariant,
+    CachyPackageRepo, CanFrame, CertificationStatus, ChannelManager, CloudInitBootstrapEngine,
+    CommunityConference, ComplianceAuditor, ComponentType, ConferenceTalk, ConfigHook,
+    CpuArchitecture, CpuCapabilities, CrossBuildPipeline, CrossbowVnic, DaxMemoryRegion,
+    DebianPolicyEnforcer, DebianSocialContract, DevTool, DeveloperToolkit, DirectoryService,
+    DirectoryUser, DllLoader, DllModule, DpkgMultiArch,
+    DragonFlyBsdMissingComponentsParityPrGateway, DragonFlyHammerFs, EcuController, EduChallenge,
+    EduPlayground, ForumChannel, ForumPost, FreezeBasedStabilization, GNUGuixShepherdSupervisor,
+    GdiObjectType, GentooPortageUseFlagsEngine, GuixDerivation, GuixFunctionalStore, HalError,
     Hammer2MultiMasterPfsReplication, Hammer2Snapshot, Hammer2TxgRecord, HardwareAbstractionLayer,
     HardwareCertificate, HardwareCertificationProgram, HardwareProfile, HardwareRegressionSuite,
     HelpSystem, HookAction, HookWhen, HowToGuide, HpcClusterJob, HpcJobState, ImeCandidate,
@@ -364,27 +366,27 @@ pub use security::{
     PledgeManager, PledgePromise, RoutingMode, SandboxPolicy, SecurityPrProposalManifest,
     SovereignSecurityAndHardeningParityPrGateway,
 };
+pub use shell::sovereign_command_interpreter::*;
 pub use shell::{
-    ContextualCompleter, HistoryExpansionEngine, InitSupervisorsAndTimersPrEngine, JobControlManager,
-    ParameterExpansionEngine, PipelineExecutor, PosixAndAdvancedShellsPrEngine,
-    ShellCommand, ShellManager as ShellProfileManager, ShellPledgeUnveilGuard,
-    ShellProfile, ShellStatistics, ShellSyntaxHighlighter, ShellType,
+    ContextualCompleter, HistoryExpansionEngine, InitSupervisorsAndTimersPrEngine,
+    JobControlManager, ParameterExpansionEngine, PipelineExecutor, PosixAndAdvancedShellsPrEngine,
+    ShellCommand, ShellManager as ShellProfileManager, ShellPledgeUnveilGuard, ShellProfile,
+    ShellStatistics, ShellSyntaxHighlighter, ShellType,
     ShellsTerminalsSupervisorsPrProposalManifest, SimpleShellSession as ShellRepl,
     SovereignShellsTerminalsSupervisorsParityPrGateway, TerminalMultiplexersAndEmulatorsPrEngine,
     ZshPromptFormatter,
 };
-pub use shell::sovereign_command_interpreter::*;
 pub use sigpkg::{
     AdapterError, BuildSystem, ContentAddressedStore, CryptoVerifier, DebAdapter,
     PackageDependencyResolver, PacmanAdapter, RecipeError, RecipeManager, RpmAdapter, SatSolver,
     Transaction, Version, MAX_RECIPE_DEPENDENCIES,
 };
 pub use userland::init::*;
+pub use userland::init::*;
 pub use userland::shell::{
     Parser as UserlandShellParser, RedirectSpec, RedirectionEngine, Shell as UserlandShell,
     StreamTarget,
 };
-pub use userland::init::*;
 pub use userland::system_utilities::*;
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
@@ -494,6 +496,5 @@ pub mod workflow;
 
 pub mod io;
 
-pub use crate::distro::sovereign_openbsd_ultimate_parity_pr_suite::*;
 pub use crate::distro::bootable_vertical_slices_missing_components_pr::*;
 pub use crate::distro::sigmaos_gap_closing_evidence_gated_roadmap_pr::*;

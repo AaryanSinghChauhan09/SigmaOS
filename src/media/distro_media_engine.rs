@@ -442,7 +442,11 @@ impl AlsaPcmHwConfigEngine {
     pub fn new(card: &str) -> Self {
         Self {
             soundcard_id: card.to_string(),
-            ucm_verbs: vec!["HiFi".to_string(), "VoiceCall".to_string(), "HDMI".to_string()],
+            ucm_verbs: vec![
+                "HiFi".to_string(),
+                "VoiceCall".to_string(),
+                "HDMI".to_string(),
+            ],
             current_verb: "HiFi".to_string(),
             software_mixing_dmix_enabled: true,
             period_bytes: 2048,
@@ -455,7 +459,10 @@ impl AlsaPcmHwConfigEngine {
             self.current_verb = verb.to_string();
             Ok(())
         } else {
-            Err(format!("UCM verb '{}' not supported on {}", verb, self.soundcard_id))
+            Err(format!(
+                "UCM verb '{}' not supported on {}",
+                verb, self.soundcard_id
+            ))
         }
     }
 
@@ -737,15 +744,21 @@ impl Default for PulseAudioEngine {
 #[derive(Debug, Clone)]
 pub struct PulseAudioModuleRouterEngine {
     pub active_modules: BTreeMap<String, String>, // module_name -> args
-    pub stream_cork_map: BTreeMap<u32, bool>, // stream_id -> is_corked
+    pub stream_cork_map: BTreeMap<u32, bool>,     // stream_id -> is_corked
     pub ducking_level_percent: u32,
 }
 
 impl PulseAudioModuleRouterEngine {
     pub fn new() -> Self {
         let mut modules = BTreeMap::new();
-        modules.insert("module-role-cork".to_string(), "cork_roles=phone,nav".to_string());
-        modules.insert("module-combine-sink".to_string(), "sink_name=combined_all".to_string());
+        modules.insert(
+            "module-role-cork".to_string(),
+            "cork_roles=phone,nav".to_string(),
+        );
+        modules.insert(
+            "module-combine-sink".to_string(),
+            "sink_name=combined_all".to_string(),
+        );
 
         Self {
             active_modules: modules,
@@ -755,7 +768,8 @@ impl PulseAudioModuleRouterEngine {
     }
 
     pub fn load_module_with_args(&mut self, name: &str, args: &str) {
-        self.active_modules.insert(name.to_string(), args.to_string());
+        self.active_modules
+            .insert(name.to_string(), args.to_string());
     }
 
     pub fn set_stream_cork(&mut self, stream_id: u32, corked: bool) {
@@ -898,7 +912,8 @@ impl PipeWireSpaBufferEngine {
     }
 
     pub fn update_pod_property(&mut self, key: &str, value: &str) {
-        self.spa_pod_properties.insert(key.to_string(), value.to_string());
+        self.spa_pod_properties
+            .insert(key.to_string(), value.to_string());
     }
 }
 
@@ -1257,7 +1272,8 @@ impl GStreamerDynamicPipelineEngine {
                 "mp4mux".to_string(),
                 "filesink".to_string(),
             ],
-            active_caps: "video/x-raw,format=NV12,width=3840,height=2160,framerate=60/1".to_string(),
+            active_caps: "video/x-raw,format=NV12,width=3840,height=2160,framerate=60/1"
+                .to_string(),
             bus_events_queue: Vec::new(),
         }
     }
@@ -1871,22 +1887,55 @@ impl LinuxBsdAudioVideoGapClosurePrGateway {
         let prs = vec![
             ("ALSA UCM2 Profile Sequencer & Software Mixing", "ALSA"),
             ("ALSA Userland Hardware Plugin ioplug Interface", "ALSA"),
-            ("OSS v4 /dev/dsp Peak Meter Querying & Fragment Tuning", "OSS"),
-            ("OSS v4 /dev/mixer Extension Controls & Channel Levels", "OSS"),
-            ("PulseAudio Dynamic Module Router & Audio Ducking", "PulseAudio"),
-            ("PulseAudio Simple Protocol & Network Audio Streaming", "PulseAudio"),
-            ("PipeWire SPA POD Buffer & Bluetooth Codec Engine", "PipeWire"),
-            ("PipeWire SPA Filter-Chain Equalizer & Convolver Node Graph", "PipeWire"),
-            ("JACK Pro-Audio Realtime Graph Cycle Synchronization", "JACK"),
+            (
+                "OSS v4 /dev/dsp Peak Meter Querying & Fragment Tuning",
+                "OSS",
+            ),
+            (
+                "OSS v4 /dev/mixer Extension Controls & Channel Levels",
+                "OSS",
+            ),
+            (
+                "PulseAudio Dynamic Module Router & Audio Ducking",
+                "PulseAudio",
+            ),
+            (
+                "PulseAudio Simple Protocol & Network Audio Streaming",
+                "PulseAudio",
+            ),
+            (
+                "PipeWire SPA POD Buffer & Bluetooth Codec Engine",
+                "PipeWire",
+            ),
+            (
+                "PipeWire SPA Filter-Chain Equalizer & Convolver Node Graph",
+                "PipeWire",
+            ),
+            (
+                "JACK Pro-Audio Realtime Graph Cycle Synchronization",
+                "JACK",
+            ),
             ("JACK Session API v2 Graph Save and Restore", "JACK"),
             ("sndio OpenBSD MIDI & PCM Stream Multiplexer", "sndio"),
             ("sndio Raw MIDI Time Code (MTC) Clock Generator", "sndio"),
-            ("GStreamer Dynamic Pipeline Linkage & Caps Negotiation", "GStreamer"),
-            ("GStreamer RTSP Server & RTP Packetization Engine", "GStreamer"),
+            (
+                "GStreamer Dynamic Pipeline Linkage & Caps Negotiation",
+                "GStreamer",
+            ),
+            (
+                "GStreamer RTSP Server & RTP Packetization Engine",
+                "GStreamer",
+            ),
             ("FFmpeg Zero-Copy Filtergraph Execution Engine", "FFmpeg"),
             ("FFmpeg AVIOContext Custom Memory I/O Callbacks", "FFmpeg"),
-            ("V4L2 DMABUF Buffer Exporter & Camera Control Engine", "V4L2"),
-            ("V4L2 Media Controller Topology & Subdevice Pad Routing", "V4L2"),
+            (
+                "V4L2 DMABUF Buffer Exporter & Camera Control Engine",
+                "V4L2",
+            ),
+            (
+                "V4L2 Media Controller Topology & Subdevice Pad Routing",
+                "V4L2",
+            ),
             ("VLC LibVLC Core Instance & ASS Subtitle Renderer", "VLC"),
             ("VLC Dynamic Plugin Module Registry Engine", "VLC"),
             ("mpv IPC JSON-RPC Protocol & GPU-Next Shader Engine", "mpv"),
@@ -2261,7 +2310,10 @@ mod tests {
         // VLC plugin registry
         let mut vlc_plugins = VlcPluginModuleRegistryEngine::new();
         vlc_plugins.register_plugin("jack_output", "audio output");
-        assert_eq!(vlc_plugins.loaded_plugins.get("jack_output").unwrap(), "audio output");
+        assert_eq!(
+            vlc_plugins.loaded_plugins.get("jack_output").unwrap(),
+            "audio output"
+        );
 
         // mpv property observer
         let mut mpv_obs = MpvPropertyObserverEngine::new();
