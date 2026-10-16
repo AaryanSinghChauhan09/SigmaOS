@@ -318,6 +318,23 @@ impl CadCraftEngine {
         id
     }
 
+    pub fn add_sketch_entity(
+        &mut self,
+        entity_type: SketchEntityType,
+        points: Vec<[f32; 2]>,
+    ) -> u32 {
+        let id = self.next_entity_id.fetch_add(1, Ordering::Relaxed);
+        let entity = SketchEntity {
+            id,
+            entity_type,
+            points,
+            dimensions: Vec::new(),
+            properties: BTreeMap::new(),
+        };
+        self.sketch_entities.insert(id, entity);
+        id
+    }
+
     pub fn add_assembly_component(&mut self, name: String, location: [f32; 3]) -> u32 {
         let id = self.next_component_id.fetch_add(1, Ordering::Relaxed);
         let component = AssemblyComponent {
@@ -332,18 +349,25 @@ impl CadCraftEngine {
         id
     }
 
-            for constraint in &self.constraints {
-                match constraint {
-                    GeometricConstraintType::Distance {
-                        point1_idx,
-                        point2_idx,
-                        target_distance,
-                    } => {
-                        let (p1, p2) =
-                            match (&self.entities[*point1_idx], &self.entities[*point2_idx]) {
-                                (SketchEntity::Point(a), SketchEntity::Point(b)) => (*a, *b),
-                                _ => continue,
-                            };
+    pub fn generate_cam_toolpath(
+        &mut self,
+        toolpath_type: CamToolpathType,
+        tool_diameter: f32,
+        feed_rate: f32,
+    ) -> u32 {
+        let id = self.next_toolpath_id.fetch_add(1, Ordering::Relaxed);
+        let toolpath = CamToolpath {
+            id,
+            toolpath_type,
+            tool_diameter,
+            feed_rate,
+            spindle_speed: 12000.0,
+            pass_depth: 1.5,
+            waypoints: Vec::new(),
+        };
+        self.cam_toolpaths.insert(id, toolpath);
+        id
+    }
 
     pub fn run_fea_analysis(&mut self, name: String, node_count: u32, element_count: u32) -> u32 {
         let id = self.next_fea_id.fetch_add(1, Ordering::Relaxed);
@@ -360,80 +384,18 @@ impl CadCraftEngine {
         id
     }
 
-                        if current_dist > 1e-9 {
-                            let factor = 0.5 * (1.0 - target_distance / current_dist);
-                            let shift_x = dx * factor;
-                            let shift_y = dy * factor;
-
-                            if let SketchEntity::Point(p) = &mut self.entities[*point1_idx] {
-                                p.x += shift_x;
-                                p.y += shift_y;
-                            }
-                            if let SketchEntity::Point(p) = &mut self.entities[*point2_idx] {
-                                p.x -= shift_x;
-                                p.y -= shift_y;
-                            }
-                        }
-                    }
-                    GeometricConstraintType::Coincident {
-                        point1_idx,
-                        point2_idx,
-                    } => {
-                        let (p1, p2) =
-                            match (&self.entities[*point1_idx], &self.entities[*point2_idx]) {
-                                (SketchEntity::Point(a), SketchEntity::Point(b)) => (*a, *b),
-                                _ => continue,
-                            };
-
-                        let dx = (p2.x - p1.x).abs();
-                        let dy = (p2.y - p1.y).abs();
-                        let error = dx.max(dy);
-                        if error > max_error {
-                            max_error = error;
-                        }
-
-                        let mid_x = (p1.x + p2.x) * 0.5;
-                        let mid_y = (p1.y + p2.y) * 0.5;
-
-                        if let SketchEntity::Point(p) = &mut self.entities[*point1_idx] {
-                            p.x = mid_x;
-                            p.y = mid_y;
-                        }
-                        if let SketchEntity::Point(p) = &mut self.entities[*point2_idx] {
-                            p.x = mid_x;
-                            p.y = mid_y;
-                        }
-                    }
-                    GeometricConstraintType::EqualLength {
-                        line1_idx,
-                        line2_idx,
-                    } => {
-                        let len1 = match &self.entities[*line1_idx] {
-                            SketchEntity::Line(l) => l.length(),
-                            _ => continue,
-                        };
-                        let len2 = match &self.entities[*line2_idx] {
-                            SketchEntity::Line(l) => l.length(),
-                            _ => continue,
-                        };
-
-                        let error = (len1 - len2).abs();
-                        if error > max_error {
-                            max_error = error;
-                        }
-                    }
-                    _ => {}
-                }
+    pub fn export_cad(&self, format: ExportFormat) -> Vec<u8> {
+        let mut buf = Vec::new();
+        match format {
+            ExportFormat::DXF => {
+                buf.extend_from_slice(b"0\nSECTION\n2\nHEADER\n0\nENDSEC\n0\nEOF\n")
             }
-
-            if max_error < tolerance {
-                self.solved = true;
-                return true;
-            }
+            ExportFormat::STEP => buf.extend_from_slice(
+                b"ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\nENDSEC;\nEND-ISO-10303-21;\n",
+            ),
+            _ => buf.extend_from_slice(b"CadCraft Export\n"),
         }
-
-        self.solved = true;
-        true
+        buf
     }
 }
 

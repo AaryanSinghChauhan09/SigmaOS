@@ -88,7 +88,12 @@ impl SovereignWarpinatorEngine {
     }
 
     /// Initiate file send to target peer
-    pub fn initiate_send(&mut self, peer_uuid: &str, file_name: &str, file_size: u64) -> Result<u64, &'static str> {
+    pub fn initiate_send(
+        &mut self,
+        peer_uuid: &str,
+        file_name: &str,
+        file_size: u64,
+    ) -> Result<u64, &'static str> {
         if !self.known_peers.contains_key(peer_uuid) {
             return Err("Peer not found in active discovery table");
         }
@@ -111,7 +116,11 @@ impl SovereignWarpinatorEngine {
     }
 
     /// Advance transferred chunk
-    pub fn advance_transfer(&mut self, session_id: u64, chunk_len: u64) -> Result<bool, &'static str> {
+    pub fn advance_transfer(
+        &mut self,
+        session_id: u64,
+        chunk_len: u64,
+    ) -> Result<bool, &'static str> {
         if let Some(session) = self.transfers.get_mut(&session_id) {
             session.transferred_bytes += chunk_len;
             if session.transferred_bytes >= session.total_bytes {
@@ -151,7 +160,9 @@ mod tests {
         engine.register_peer(peer);
         assert_eq!(engine.active_peers_count(), 1);
 
-        let sid = engine.initiate_send("peer-mint-01", "iso_image.iso", 10_000).unwrap();
+        let sid = engine
+            .initiate_send("peer-mint-01", "iso_image.iso", 10_000)
+            .unwrap();
         assert_eq!(sid, 1);
 
         let done = engine.advance_transfer(sid, 5000).unwrap();

@@ -382,12 +382,7 @@ impl GnuCoreutilsBsdUserlandEngine {
         }
     }
 
-    pub fn run_head_tail_bytes(
-        &self,
-        data: &[u8],
-        bytes_count: usize,
-        is_head: bool,
-    ) -> Vec<u8> {
+    pub fn run_head_tail_bytes(&self, data: &[u8], bytes_count: usize, is_head: bool) -> Vec<u8> {
         if is_head {
             data.iter().take(bytes_count).copied().collect()
         } else {

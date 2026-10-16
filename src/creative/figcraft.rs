@@ -190,12 +190,21 @@ impl FigCraftUiUxAutoLayoutPrDeployer {
         let mut variant_props = Vec::new();
         variant_props.push(ComponentVariantProp {
             name: String::from("State"),
-            options: alloc::vec![String::from("Default"), String::from("Hover"), String::from("Pressed"), String::from("Disabled")],
+            options: alloc::vec![
+                String::from("Default"),
+                String::from("Hover"),
+                String::from("Pressed"),
+                String::from("Disabled")
+            ],
             default_value: String::from("Default"),
         });
         variant_props.push(ComponentVariantProp {
             name: String::from("Size"),
-            options: alloc::vec![String::from("Small"), String::from("Medium"), String::from("Large")],
+            options: alloc::vec![
+                String::from("Small"),
+                String::from("Medium"),
+                String::from("Large")
+            ],
             default_value: String::from("Medium"),
         });
 
@@ -208,7 +217,9 @@ impl FigCraftUiUxAutoLayoutPrDeployer {
     }
 
     pub fn verify_auto_layout_engine(&self) -> bool {
-        !self.frames.is_empty() && !self.tokens.is_empty() && !self.component_variant_props.is_empty()
+        !self.frames.is_empty()
+            && !self.tokens.is_empty()
+            && !self.component_variant_props.is_empty()
     }
 
     pub fn generate_pr(&self) -> FigCraftPullRequestSpec {
@@ -435,8 +446,18 @@ impl FigCraftVectorCanvasDesignSystemPrDeployer {
             VectorNetworkPath {
                 id: 1,
                 points: alloc::vec![
-                    VectorNodePoint { x: 0.0, y: 0.0, handle_in: None, handle_out: Some((5.0, 10.0)) },
-                    VectorNodePoint { x: 20.0, y: 30.0, handle_in: Some((15.0, 25.0)), handle_out: None },
+                    VectorNodePoint {
+                        x: 0.0,
+                        y: 0.0,
+                        handle_in: None,
+                        handle_out: Some((5.0, 10.0))
+                    },
+                    VectorNodePoint {
+                        x: 20.0,
+                        y: 30.0,
+                        handle_in: Some((15.0, 25.0)),
+                        handle_out: None
+                    },
                 ],
                 closed: false,
                 boolean_op: Some(VectorBooleanOp::Union),
@@ -649,7 +670,9 @@ impl FigCraftMasterPrDeploymentSuite {
         self.auto_layout_deployer.verify_auto_layout_engine()
             && self.prototyping_deployer.verify_prototyping_engine()
             && self.vector_canvas_deployer.verify_vector_canvas_engine()
-            && self.collaboration_deployer.verify_collaboration_export_engine()
+            && self
+                .collaboration_deployer
+                .verify_collaboration_export_engine()
     }
 
     pub fn figcraft_parity_score(&self) -> f32 {
