@@ -47,6 +47,28 @@ pub struct NoteFolder {
     pub parent_id: Option<u32>,
 }
 
+/// Zero-allocation case-insensitive substring search helper.
+fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
+    if needle.is_empty() {
+        return true;
+    }
+    if needle.is_ascii() && haystack.is_ascii() {
+        let h_bytes = haystack.as_bytes();
+        let n_bytes = needle.as_bytes();
+        if n_bytes.len() > h_bytes.len() {
+            return false;
+        }
+        h_bytes.windows(n_bytes.len()).any(|window| {
+            window
+                .iter()
+                .zip(n_bytes)
+                .all(|(&h, &n)| h.to_ascii_lowercase() == n.to_ascii_lowercase())
+        })
+    } else {
+        haystack.to_lowercase().contains(&needle.to_lowercase())
+    }
+}
+
 /// Notes application
 pub struct NotesApp {
     pub notes: BTreeMap<u32, Note>,
@@ -205,17 +227,14 @@ impl NotesApp {
         Ok(())
     }
 
-    /// Search notes
+    /// Search notes using zero-allocation case-insensitive substring matching
     pub fn search_notes(&self, query: &str) -> Vec<&Note> {
-        let query_lower = query.to_lowercase();
         self.notes
             .values()
             .filter(|n| {
-                n.title.to_lowercase().contains(&query_lower)
-                    || n.content.to_lowercase().contains(&query_lower)
-                    || n.tags
-                        .iter()
-                        .any(|t| t.to_lowercase().contains(&query_lower))
+                contains_ignore_case(&n.title, query)
+                    || contains_ignore_case(&n.content, query)
+                    || n.tags.iter().any(|t| contains_ignore_case(t, query))
             })
             .collect()
     }
