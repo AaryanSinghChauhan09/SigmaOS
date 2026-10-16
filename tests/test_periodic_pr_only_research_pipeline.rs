@@ -12,7 +12,11 @@ fn test_pipeline_engine_full_verification() {
 
     // Verify 5 cadence rules
     assert_eq!(engine.cadence_rules.len(), 5);
-    let cadences: Vec<&str> = engine.cadence_rules.iter().map(|c| c.cadence.as_str()).collect();
+    let cadences: Vec<&str> = engine
+        .cadence_rules
+        .iter()
+        .map(|c| c.cadence.as_str())
+        .collect();
     assert!(cadences.contains(&"Daily"));
     assert!(cadences.contains(&"Weekly"));
     assert!(cadences.contains(&"Biweekly"));
@@ -24,10 +28,18 @@ fn test_pipeline_engine_full_verification() {
 
     let p0_items = engine.get_roadmap_by_priority(ComponentPriority::P0);
     assert_eq!(p0_items.len(), 4);
-    assert!(p0_items.iter().any(|i| i.component_name == "Reproducible CI/build gate"));
-    assert!(p0_items.iter().any(|i| i.component_name == "QEMU boot validator"));
-    assert!(p0_items.iter().any(|i| i.component_name == "Bootloader integration"));
-    assert!(p0_items.iter().any(|i| i.component_name == "Kernel entry and serial logging"));
+    assert!(p0_items
+        .iter()
+        .any(|i| i.component_name == "Reproducible CI/build gate"));
+    assert!(p0_items
+        .iter()
+        .any(|i| i.component_name == "QEMU boot validator"));
+    assert!(p0_items
+        .iter()
+        .any(|i| i.component_name == "Bootloader integration"));
+    assert!(p0_items
+        .iter()
+        .any(|i| i.component_name == "Kernel entry and serial logging"));
 
     let p1_items = engine.get_roadmap_by_priority(ComponentPriority::P1);
     assert_eq!(p1_items.len(), 6);
@@ -44,7 +56,10 @@ fn test_pipeline_engine_full_verification() {
         assert!(rule.enforced);
     }
     assert_eq!(engine.get_rule(1).unwrap().name, "Every change is a PR");
-    assert_eq!(engine.get_rule(12).unwrap().name, "Human approval for high-risk merges");
+    assert_eq!(
+        engine.get_rule(12).unwrap().name,
+        "Human approval for high-risk merges"
+    );
 
     // Verify 10 definition of done criteria
     assert_eq!(engine.definition_of_done.len(), 10);
@@ -56,7 +71,9 @@ fn test_pipeline_engine_full_verification() {
     assert_eq!(engine.first_six_prs.len(), 6);
     assert_eq!(engine.first_six_prs[0].pr_number, 1);
     assert!(engine.first_six_prs[0].title.contains("chore(ci)"));
-    assert!(engine.first_six_prs[3].title.contains("feat(kernel): implement minimal boot-to-shell path"));
+    assert!(engine.first_six_prs[3]
+        .title
+        .contains("feat(kernel): implement minimal boot-to-shell path"));
 
     // Verify 30-day schedule
     assert_eq!(engine.thirty_day_schedule.len(), 4);
@@ -84,8 +101,12 @@ fn test_github_templates_exist() {
     let pr_template = fs::read_to_string(".github/PULL_REQUEST_TEMPLATE.md")
         .expect("PULL_REQUEST_TEMPLATE.md should exist");
     assert!(pr_template.contains("Reference study") || pr_template.contains("Upstream study"));
-    assert!(pr_template.contains("Kernel safety review") || pr_template.contains("What SigmaOS adopts"));
-    assert!(pr_template.contains("Risks and rollback") || pr_template.contains("Safety and rollback"));
+    assert!(
+        pr_template.contains("Kernel safety review") || pr_template.contains("What SigmaOS adopts")
+    );
+    assert!(
+        pr_template.contains("Risks and rollback") || pr_template.contains("Safety and rollback")
+    );
     assert!(pr_template.contains("Evidence") || pr_template.contains("Reviewer checklist"));
 
     // Check Study Issue Template
@@ -95,8 +116,9 @@ fn test_github_templates_exist() {
     assert!(study_issue.contains("upstream_project"));
 
     // Check Missing Component Issue Template
-    let missing_comp_issue = fs::read_to_string(".github/ISSUE_TEMPLATE/missing_component_issue.yml")
-        .expect("missing_component_issue.yml should exist");
+    let missing_comp_issue =
+        fs::read_to_string(".github/ISSUE_TEMPLATE/missing_component_issue.yml")
+            .expect("missing_component_issue.yml should exist");
     assert!(missing_comp_issue.contains("Missing component issue"));
     assert!(missing_comp_issue.contains("minimum_viable_slice"));
 }
