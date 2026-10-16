@@ -107,7 +107,12 @@ impl SovereignRsyncRollingDeltaPrEngine {
     }
 
     /// Compute Adler32 rolling checksum & block delta
-    pub fn compute_block_delta(&mut self, session_id: u64, old_data: &[u8], new_data: &[u8]) -> (usize, usize) {
+    pub fn compute_block_delta(
+        &mut self,
+        session_id: u64,
+        old_data: &[u8],
+        new_data: &[u8],
+    ) -> (usize, usize) {
         let block_size = 64;
         let mut matched = 0;
         let mut modified = 0;
@@ -138,12 +143,15 @@ impl SovereignRsyncRollingDeltaPrEngine {
     pub fn generate_proposal(&self) -> SovereignBackupRecoveryPrProposalManifest {
         SovereignBackupRecoveryPrProposalManifest {
             pr_id: 301,
-            pr_title: "feat(rsync): Sovereign Rsync Protocol 31 Rolling-Checksum & Delta Sync Engine".to_string(),
+            pr_title:
+                "feat(rsync): Sovereign Rsync Protocol 31 Rolling-Checksum & Delta Sync Engine"
+                    .to_string(),
             target_subsystem: "File-Level Backup & Synchronization".to_string(),
             inspirators: vec![
                 "GNU rsync 3.2+ Protocol 31 stream negotiation".to_string(),
                 "Adler32 rolling checksum & MD5/XXH64 strong block digest".to_string(),
-                "OpenBSD / FreeBSD rsync-core hardlink inode tracking & xattr/ACL preservation".to_string(),
+                "OpenBSD / FreeBSD rsync-core hardlink inode tracking & xattr/ACL preservation"
+                    .to_string(),
             ],
             components_added: vec![
                 "SovereignRsyncRollingDeltaPrEngine protocol 31 delta pipeline".to_string(),
@@ -151,8 +159,10 @@ impl SovereignRsyncRollingDeltaPrEngine {
                 "Sparse file zero-skip detector and xattr/ACL metadata synchronizer".to_string(),
                 "Network-friendly compression stream wrapper (Zstd / LZ4)".to_string(),
             ],
-            performance_advantage: "95% Reduction in Network Bandwidth Usage, 10x Faster Block Diffing".to_string(),
-            zero_dependency_status: "Built-In Sovereign Replacement (Zero external C dependencies)".to_string(),
+            performance_advantage:
+                "95% Reduction in Network Bandwidth Usage, 10x Faster Block Diffing".to_string(),
+            zero_dependency_status: "Built-In Sovereign Replacement (Zero external C dependencies)"
+                .to_string(),
         }
     }
 }
@@ -171,11 +181,11 @@ pub const BSD_TAPE_MAGIC: u32 = 0x00013912;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BsdDumpHeaderKind {
-    TapeHeader, // TS_TAPE
-    InodeHeader,// TS_INODE
-    BitsHeader, // TS_BITS
-    AddrHeader, // TS_ADDR
-    EndHeader,  // TS_END
+    TapeHeader,  // TS_TAPE
+    InodeHeader, // TS_INODE
+    BitsHeader,  // TS_BITS
+    AddrHeader,  // TS_ADDR
+    EndHeader,   // TS_END
 }
 
 #[derive(Debug, Clone)]
@@ -236,21 +246,36 @@ impl SovereignBsdDumpRestoreTapePrEngine {
     }
 
     /// Interactive BSD restore shell command simulator (`restore -i`)
-    pub fn execute_restore_shell_command(&mut self, cmd: &str, arg: &str) -> Result<String, String> {
+    pub fn execute_restore_shell_command(
+        &mut self,
+        cmd: &str,
+        arg: &str,
+    ) -> Result<String, String> {
         match cmd {
             "ls" => {
                 let items: Vec<String> = self
                     .inodes
                     .iter()
                     .map(|i| {
-                        let mark = if self.marked_inodes.contains(&i.ino) { "*" } else { " " };
-                        format!("{}ino #{:06} | mode {:o} | {:8} B | {}", mark, i.ino, i.mode, i.size_bytes, i.file_path)
+                        let mark = if self.marked_inodes.contains(&i.ino) {
+                            "*"
+                        } else {
+                            " "
+                        };
+                        format!(
+                            "{}ino #{:06} | mode {:o} | {:8} B | {}",
+                            mark, i.ino, i.mode, i.size_bytes, i.file_path
+                        )
                     })
                     .collect();
                 Ok(items.join("\n"))
             }
             "cd" => {
-                self.current_restore_dir = if arg.is_empty() { "/".to_string() } else { arg.to_string() };
+                self.current_restore_dir = if arg.is_empty() {
+                    "/".to_string()
+                } else {
+                    arg.to_string()
+                };
                 Ok(format!("Directory changed to {}", self.current_restore_dir))
             }
             "add" => {
@@ -280,7 +305,10 @@ impl SovereignBsdDumpRestoreTapePrEngine {
                 self.marked_inodes.clear();
                 Ok(format!("Extracted {} marked inode records", count))
             }
-            "pwd" => Ok(format!("Current restore directory: {}", self.current_restore_dir)),
+            "pwd" => Ok(format!(
+                "Current restore directory: {}",
+                self.current_restore_dir
+            )),
             _ => Err(format!("Unknown BSD restore command: {}", cmd)),
         }
     }
@@ -288,7 +316,8 @@ impl SovereignBsdDumpRestoreTapePrEngine {
     pub fn generate_proposal(&self) -> SovereignBackupRecoveryPrProposalManifest {
         SovereignBackupRecoveryPrProposalManifest {
             pr_id: 302,
-            pr_title: "feat(dump): Sovereign BSD dump(8) & restore(8) Tape & File Inode Engine".to_string(),
+            pr_title: "feat(dump): Sovereign BSD dump(8) & restore(8) Tape & File Inode Engine"
+                .to_string(),
             target_subsystem: "Low-Level Inode & Filesystem Backup".to_string(),
             inspirators: vec![
                 "FreeBSD dump(8) & restore(8) Level 0..9 incremental dump protocol".to_string(),
@@ -297,11 +326,14 @@ impl SovereignBsdDumpRestoreTapePrEngine {
             ],
             components_added: vec![
                 "SovereignBsdDumpRestoreTapePrEngine header & inode bitmap builder".to_string(),
-                "Interactive restore shell (`restore -i`) simulator with add/delete/extract state".to_string(),
+                "Interactive restore shell (`restore -i`) simulator with add/delete/extract state"
+                    .to_string(),
                 "Multi-volume tape header packager with checksum verification".to_string(),
             ],
-            performance_advantage: "Direct Inode Bitmap Traversal, 5x Faster than File-System Walking".to_string(),
-            zero_dependency_status: "Built-In Sovereign Replacement (Zero external dependencies)".to_string(),
+            performance_advantage:
+                "Direct Inode Bitmap Traversal, 5x Faster than File-System Walking".to_string(),
+            zero_dependency_status: "Built-In Sovereign Replacement (Zero external dependencies)"
+                .to_string(),
         }
     }
 }
@@ -412,7 +444,12 @@ impl SovereignBorgResticDeduplicatedVaultPrEngine {
         tags: Vec<String>,
     ) -> String {
         let snap_num = self.snapshots.len() + 1;
-        let snapshot_id = format!("snap-{:04}-{}-{}", snap_num, file_paths.len(), self.vault_id);
+        let snapshot_id = format!(
+            "snap-{:04}-{}-{}",
+            snap_num,
+            file_paths.len(),
+            self.vault_id
+        );
         let mut chunk_hashes = Vec::new();
         let mut total_size = 0u64;
 
@@ -523,10 +560,18 @@ impl SovereignTimeshiftSnapperSnapshotGovernorPrEngine {
         let snapshot_id = self.snapshots.len() as u32 + 1;
         let path = match self.backend {
             SnapshotBackendKind::BtrfsSubvolume => format!("@snapshots/{}_{}", snapshot_id, name),
-            SnapshotBackendKind::ZfsDataset => format!("zroot/ROOT/default@snap_{}_{}", snapshot_id, name),
-            SnapshotBackendKind::DragonFlyHammer2Pfs => format!("/build/hammer2/pfs/{}_{}", snapshot_id, name),
-            SnapshotBackendKind::Ext4LvmThin => format!("/dev/vg0/thin_snap_{}_{}", snapshot_id, name),
-            SnapshotBackendKind::BcachefsSnapshot => format!("/mnt/bcachefs/@snap_{}_{}", snapshot_id, name),
+            SnapshotBackendKind::ZfsDataset => {
+                format!("zroot/ROOT/default@snap_{}_{}", snapshot_id, name)
+            }
+            SnapshotBackendKind::DragonFlyHammer2Pfs => {
+                format!("/build/hammer2/pfs/{}_{}", snapshot_id, name)
+            }
+            SnapshotBackendKind::Ext4LvmThin => {
+                format!("/dev/vg0/thin_snap_{}_{}", snapshot_id, name)
+            }
+            SnapshotBackendKind::BcachefsSnapshot => {
+                format!("/mnt/bcachefs/@snap_{}_{}", snapshot_id, name)
+            }
         };
 
         self.snapshots.push(SystemSnapshotInfo {
@@ -556,10 +601,16 @@ impl SovereignTimeshiftSnapperSnapshotGovernorPrEngine {
 
         let msg = match snap.backend {
             SnapshotBackendKind::BtrfsSubvolume => {
-                format!("Btrfs subvolume atomic swap: mv {} /@ && update grub-btrfs", snap.path_or_dataset)
+                format!(
+                    "Btrfs subvolume atomic swap: mv {} /@ && update grub-btrfs",
+                    snap.path_or_dataset
+                )
             }
             SnapshotBackendKind::ZfsDataset => {
-                format!("ZFS bectl activate {} && zfs rollback -r {}", snap.name, snap.path_or_dataset)
+                format!(
+                    "ZFS bectl activate {} && zfs rollback -r {}",
+                    snap.name, snap.path_or_dataset
+                )
             }
             SnapshotBackendKind::DragonFlyHammer2Pfs => {
                 format!("HAMMER2 PFS root mount switch -> {}", snap.path_or_dataset)
@@ -578,7 +629,8 @@ impl SovereignTimeshiftSnapperSnapshotGovernorPrEngine {
     pub fn generate_proposal(&self) -> SovereignBackupRecoveryPrProposalManifest {
         SovereignBackupRecoveryPrProposalManifest {
             pr_id: 304,
-            pr_title: "feat(timeshift): Sovereign Timeshift & Snapper Filesystem Snapshot Governor".to_string(),
+            pr_title: "feat(timeshift): Sovereign Timeshift & Snapper Filesystem Snapshot Governor"
+                .to_string(),
             target_subsystem: "Filesystem & Boot Environment Snapshots".to_string(),
             inspirators: vec![
                 "Linux Timeshift Btrfs subvolume & RSYNC system restore points".to_string(),
@@ -586,13 +638,17 @@ impl SovereignTimeshiftSnapperSnapshotGovernorPrEngine {
                 "FreeBSD `bectl` & DragonFly HAMMER2 PFS snapshot/rollback".to_string(),
             ],
             components_added: vec![
-                "SovereignTimeshiftSnapperSnapshotGovernorPrEngine multi-backend orchestrator".to_string(),
-                "Package manager pre/post transaction hook hooks (APT, Pacman, DNF, APK, pkg)".to_string(),
+                "SovereignTimeshiftSnapperSnapshotGovernorPrEngine multi-backend orchestrator"
+                    .to_string(),
+                "Package manager pre/post transaction hook hooks (APT, Pacman, DNF, APK, pkg)"
+                    .to_string(),
                 "Timeline scheduling engine (hourly, daily, weekly, monthly, boot)".to_string(),
                 "Atomic boot environment rollback engine with GRUB2/systemd-boot sync".to_string(),
             ],
-            performance_advantage: "Instant CoW Snapshots (<2ms Creation Time), Zero Runtime Copy Overhead".to_string(),
-            zero_dependency_status: "Built-In Sovereign Replacement (Zero external dependencies)".to_string(),
+            performance_advantage:
+                "Instant CoW Snapshots (<2ms Creation Time), Zero Runtime Copy Overhead".to_string(),
+            zero_dependency_status: "Built-In Sovereign Replacement (Zero external dependencies)"
+                .to_string(),
         }
     }
 }
@@ -648,7 +704,9 @@ impl SovereignDdrescueBadSectorRescuePrEngine {
         let chunk_size = 200_000u64;
 
         for offset in (0..total_size).step_by(chunk_size as usize) {
-            let is_bad = bad_sectors.iter().any(|&bad| bad >= offset && bad < offset + chunk_size);
+            let is_bad = bad_sectors
+                .iter()
+                .any(|&bad| bad >= offset && bad < offset + chunk_size);
             if is_bad {
                 self.total_error_bytes += chunk_size;
                 self.mapfile.push(DdrescueMapEntry {
@@ -866,7 +924,11 @@ impl SovereignRescueLiveModeOverlayfsPrEngine {
             ("/proc", "/proc", "proc"),
             ("/sys", "/sys", "sysfs"),
             ("/run", "/run", "tmpfs"),
-            ("/sys/firmware/efi/efivars", "/sys/firmware/efi/efivars", "efivarfs"),
+            (
+                "/sys/firmware/efi/efivars",
+                "/sys/firmware/efi/efivars",
+                "efivarfs",
+            ),
         ];
 
         for (src, sub, fs) in default_mounts {
@@ -879,20 +941,33 @@ impl SovereignRescueLiveModeOverlayfsPrEngine {
             });
         }
 
-        self.repair_logs.push(format!("Rescue chroot bound at {}", target_root));
+        self.repair_logs
+            .push(format!("Rescue chroot bound at {}", target_root));
         self.chroot_mounts.len()
     }
 
     pub fn repair_bootloader_and_fstab(&mut self, target_root: &str) -> Result<String, String> {
-        self.repair_logs.push(format!("{}: GRUB2 / systemd-boot NVRAM entry re-written", target_root));
-        self.repair_logs.push(format!("{}: Reconstructed /etc/fstab with blkid UUIDs", target_root));
-        self.repair_logs.push(format!("{}: Rebuilt initramfs via dracut / mkinitcpio", target_root));
+        self.repair_logs.push(format!(
+            "{}: GRUB2 / systemd-boot NVRAM entry re-written",
+            target_root
+        ));
+        self.repair_logs.push(format!(
+            "{}: Reconstructed /etc/fstab with blkid UUIDs",
+            target_root
+        ));
+        self.repair_logs.push(format!(
+            "{}: Rebuilt initramfs via dracut / mkinitcpio",
+            target_root
+        ));
 
         Ok("Bootloader, fstab, and initramfs repaired successfully".to_string())
     }
 
     pub fn reset_root_password(&mut self, target_root: &str) -> bool {
-        self.repair_logs.push(format!("{}: Root account password unlocked in /etc/shadow", target_root));
+        self.repair_logs.push(format!(
+            "{}: Root account password unlocked in /etc/shadow",
+            target_root
+        ));
         true
     }
 
@@ -952,20 +1027,26 @@ impl SovereignLiveIsoInstallerToolkitPrEngine {
     pub fn generate_proposal(&self) -> SovereignBackupRecoveryPrProposalManifest {
         SovereignBackupRecoveryPrProposalManifest {
             pr_id: 309,
-            pr_title: "feat(installer): Sovereign ISOHybrid Live ISO & Modular System Installer Suite".to_string(),
+            pr_title:
+                "feat(installer): Sovereign ISOHybrid Live ISO & Modular System Installer Suite"
+                    .to_string(),
             target_subsystem: "OS Distribution Boot Media & Installer Suite".to_string(),
             inspirators: vec![
                 "ISOHybrid dual-boot UEFI/BIOS bootloader staging (syslinux / GRUB2)".to_string(),
                 "SquashFS with Zstd maximum compression ratio".to_string(),
-                "Calamares, Anaconda, Debian-Installer, Archinstall, and bsdinstall frameworks".to_string(),
+                "Calamares, Anaconda, Debian-Installer, Archinstall, and bsdinstall frameworks"
+                    .to_string(),
             ],
             components_added: vec![
                 "SovereignLiveIsoInstallerToolkitPrEngine bootable media generator".to_string(),
                 "Zstd-compressed SquashFS image packager".to_string(),
-                "Unattended installation preseed parser (CIDATA / Kickstart / Arch JSON)".to_string(),
+                "Unattended installation preseed parser (CIDATA / Kickstart / Arch JSON)"
+                    .to_string(),
             ],
-            performance_advantage: "40% Smaller ISO Image Size, 5x Faster SquashFS Decompression Speed".to_string(),
-            zero_dependency_status: "Built-In Sovereign Replacement (Zero external dependencies)".to_string(),
+            performance_advantage:
+                "40% Smaller ISO Image Size, 5x Faster SquashFS Decompression Speed".to_string(),
+            zero_dependency_status: "Built-In Sovereign Replacement (Zero external dependencies)"
+                .to_string(),
         }
     }
 }
@@ -998,9 +1079,16 @@ impl SovereignBackupRecoveryPrGateway {
         Self {
             rsync_engine: SovereignRsyncRollingDeltaPrEngine::new(),
             bsd_dump_engine: SovereignBsdDumpRestoreTapePrEngine::new("/dev/zroot/var", 0),
-            borg_restic_engine: SovereignBorgResticDeduplicatedVaultPrEngine::new("gateway-vault-01"),
-            snapshot_governor: SovereignTimeshiftSnapperSnapshotGovernorPrEngine::new(SnapshotBackendKind::BtrfsSubvolume),
-            ddrescue_engine: SovereignDdrescueBadSectorRescuePrEngine::new("/dev/nvme0n1", "/mnt/rescue.img"),
+            borg_restic_engine: SovereignBorgResticDeduplicatedVaultPrEngine::new(
+                "gateway-vault-01",
+            ),
+            snapshot_governor: SovereignTimeshiftSnapperSnapshotGovernorPrEngine::new(
+                SnapshotBackendKind::BtrfsSubvolume,
+            ),
+            ddrescue_engine: SovereignDdrescueBadSectorRescuePrEngine::new(
+                "/dev/nvme0n1",
+                "/mnt/rescue.img",
+            ),
             testdisk_engine: SovereignTestDiskPartitionSearchPrEngine::new("/dev/nvme0n1"),
             photorec_engine: SovereignPhotoRecFileCarvingPrEngine::new(),
             rescue_mode_engine: SovereignRescueLiveModeOverlayfsPrEngine::new(),
@@ -1022,7 +1110,10 @@ impl SovereignBackupRecoveryPrGateway {
         ]
     }
 
-    pub fn get_proposal_by_id(&self, pr_id: u64) -> Option<SovereignBackupRecoveryPrProposalManifest> {
+    pub fn get_proposal_by_id(
+        &self,
+        pr_id: u64,
+    ) -> Option<SovereignBackupRecoveryPrProposalManifest> {
         self.collect_all_proposals()
             .into_iter()
             .find(|manifest| manifest.pr_id == pr_id)
@@ -1040,7 +1131,8 @@ mod tests {
     #[test]
     fn test_rsync_rolling_delta_pr_engine() {
         let mut engine = SovereignRsyncRollingDeltaPrEngine::new();
-        let sid = engine.create_transfer_session("/etc/passwd", "/mnt/backup/passwd", 64, true, true);
+        let sid =
+            engine.create_transfer_session("/etc/passwd", "/mnt/backup/passwd", 64, true, true);
         assert_eq!(sid, 2);
 
         let file1 = b"SOVEREIGN_SYSTEM_DATA_BLOCK_01".to_vec();
@@ -1094,7 +1186,9 @@ mod tests {
 
     #[test]
     fn test_timeshift_snapper_governor_pr_engine() {
-        let mut governor = SovereignTimeshiftSnapperSnapshotGovernorPrEngine::new(SnapshotBackendKind::BtrfsSubvolume);
+        let mut governor = SovereignTimeshiftSnapperSnapshotGovernorPrEngine::new(
+            SnapshotBackendKind::BtrfsSubvolume,
+        );
         let id1 = governor.create_snapshot("pre_apt", SnapshotHookTrigger::PreAptUpgrade);
         assert_eq!(id1, 1);
 
@@ -1107,7 +1201,8 @@ mod tests {
 
     #[test]
     fn test_ddrescue_bad_sector_rescue_pr_engine() {
-        let mut rescue = SovereignDdrescueBadSectorRescuePrEngine::new("/dev/sdb", "/mnt/rescue.img");
+        let mut rescue =
+            SovereignDdrescueBadSectorRescuePrEngine::new("/dev/sdb", "/mnt/rescue.img");
         rescue.run_rescue_pass(&[400_000]);
         assert!(rescue.total_rescued_bytes > 0);
         assert!(rescue.total_error_bytes > 0);

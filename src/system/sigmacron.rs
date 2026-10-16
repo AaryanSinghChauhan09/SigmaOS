@@ -233,7 +233,7 @@ impl CronJob {
     pub fn record_run(&mut self, result: JobResult, timestamp: u64) {
         self.last_run = Some(timestamp);
         self.run_count += 1;
-        
+
         match result {
             JobResult::Success => self.success_count += 1,
             JobResult::Failure | JobResult::Timeout => self.failure_count += 1,
@@ -243,8 +243,10 @@ impl CronJob {
 
     /// Get cron expression
     pub fn cron_expression(&self) -> String {
-        format!("{} {} {} {} {}",
-            self.minute, self.hour, self.day_of_month, self.month, self.day_of_week)
+        format!(
+            "{} {} {} {} {}",
+            self.minute, self.hour, self.day_of_month, self.month, self.day_of_week
+        )
     }
 }
 
@@ -287,7 +289,7 @@ impl CronSchedule {
         if parts.len() != 5 {
             return Err("Invalid cron expression".to_string());
         }
-        
+
         Ok(Self::new(
             parts[0].to_string(),
             parts[1].to_string(),
@@ -299,8 +301,10 @@ impl CronSchedule {
 
     /// Get as expression
     pub fn expression(&self) -> String {
-        format!("{} {} {} {} {}",
-            self.minute, self.hour, self.day_of_month, self.month, self.day_of_week)
+        format!(
+            "{} {} {} {} {}",
+            self.minute, self.hour, self.day_of_month, self.month, self.day_of_week
+        )
     }
 }
 
@@ -422,8 +426,14 @@ impl SigmaCron {
     pub fn job_stats(&self) -> BTreeMap<String, String> {
         let mut stats = BTreeMap::new();
         stats.insert("total_jobs".to_string(), self.job_count().to_string());
-        stats.insert("enabled_jobs".to_string(), self.enabled_job_count().to_string());
-        stats.insert("disabled_jobs".to_string(), (self.job_count() - self.enabled_job_count()).to_string());
+        stats.insert(
+            "enabled_jobs".to_string(),
+            self.enabled_job_count().to_string(),
+        );
+        stats.insert(
+            "disabled_jobs".to_string(),
+            (self.job_count() - self.enabled_job_count()).to_string(),
+        );
         stats
     }
 }
@@ -520,7 +530,7 @@ mod tests {
     #[test]
     fn test_cron_job_enable_disable() {
         let mut job = CronJob::new("test-job".to_string(), "/bin/echo".to_string());
-        
+
         assert!(job.enabled);
         job.disable();
         assert!(!job.enabled);
@@ -531,13 +541,13 @@ mod tests {
     #[test]
     fn test_cron_job_record_run() {
         let mut job = CronJob::new("test-job".to_string(), "/bin/echo".to_string());
-        
+
         job.record_run(JobResult::Success, 1000);
         assert_eq!(job.run_count, 1);
         assert_eq!(job.success_count, 1);
         assert_eq!(job.failure_count, 0);
         assert_eq!(job.last_run, Some(1000));
-        
+
         job.record_run(JobResult::Failure, 2000);
         assert_eq!(job.run_count, 2);
         assert_eq!(job.success_count, 1);
@@ -553,7 +563,7 @@ mod tests {
             "*".to_string(),
             "*".to_string(),
         );
-        
+
         assert_eq!(schedule.minute, "0");
         assert_eq!(schedule.hour, "*/6");
         assert_eq!(schedule.expression(), "0 */6 * * *");
@@ -562,7 +572,7 @@ mod tests {
     #[test]
     fn test_cron_schedule_from_expression() {
         let schedule = CronSchedule::from_expression("0 */6 * * *").unwrap();
-        
+
         assert_eq!(schedule.minute, "0");
         assert_eq!(schedule.hour, "*/6");
     }
@@ -580,7 +590,7 @@ mod tests {
     #[test]
     fn test_sigmacron_add_job() {
         let mut cron = SigmaCron::new();
-        
+
         let job = CronJob::new("test-job".to_string(), "/bin/echo".to_string());
         assert!(cron.add_job(job).is_ok());
         assert_eq!(cron.job_count(), 1);
@@ -589,10 +599,10 @@ mod tests {
     #[test]
     fn test_sigmacron_duplicate_job() {
         let mut cron = SigmaCron::new();
-        
+
         let job1 = CronJob::new("test-job".to_string(), "/bin/echo".to_string());
         let job2 = CronJob::new("test-job".to_string(), "/bin/ls".to_string());
-        
+
         assert!(cron.add_job(job1).is_ok());
         assert!(cron.add_job(job2).is_err());
     }
@@ -600,10 +610,10 @@ mod tests {
     #[test]
     fn test_sigmacron_enable_disable() {
         let mut cron = SigmaCron::new();
-        
+
         let job = CronJob::new("test-job".to_string(), "/bin/echo".to_string());
         cron.add_job(job).unwrap();
-        
+
         assert!(cron.enable_job("test-job").is_ok());
         assert!(cron.disable_job("test-job").is_ok());
     }
@@ -611,13 +621,13 @@ mod tests {
     #[test]
     fn test_sigmacron_list_jobs() {
         let mut cron = SigmaCron::new();
-        
+
         let job1 = CronJob::new("job1".to_string(), "/bin/echo".to_string());
         let job2 = CronJob::new("job2".to_string(), "/bin/ls".to_string());
-        
+
         cron.add_job(job1).unwrap();
         cron.add_job(job2).unwrap();
-        
+
         let jobs = cron.list_jobs();
         assert_eq!(jobs.len(), 2);
     }
@@ -625,15 +635,15 @@ mod tests {
     #[test]
     fn test_sigmacron_enabled_jobs() {
         let mut cron = SigmaCron::new();
-        
+
         let mut job1 = CronJob::new("job1".to_string(), "/bin/echo".to_string());
         job1.disable();
-        
+
         let job2 = CronJob::new("job2".to_string(), "/bin/ls".to_string());
-        
+
         cron.add_job(job1).unwrap();
         cron.add_job(job2).unwrap();
-        
+
         let enabled = cron.list_enabled_jobs();
         assert_eq!(enabled.len(), 1);
     }
@@ -641,15 +651,15 @@ mod tests {
     #[test]
     fn test_sigmacron_stats() {
         let mut cron = SigmaCron::new();
-        
+
         let mut job1 = CronJob::new("job1".to_string(), "/bin/echo".to_string());
         job1.disable();
-        
+
         let job2 = CronJob::new("job2".to_string(), "/bin/ls".to_string());
-        
+
         cron.add_job(job1).unwrap();
         cron.add_job(job2).unwrap();
-        
+
         let stats = cron.job_stats();
         assert_eq!(stats.get("total_jobs"), Some(&"2".to_string()));
         assert_eq!(stats.get("enabled_jobs"), Some(&"1".to_string()));
@@ -659,20 +669,20 @@ mod tests {
     #[test]
     fn test_add_cron_job_convenience() {
         init_sigmacron();
-        
+
         let job = CronJob::new("test-job".to_string(), "/bin/echo".to_string());
         let result = add_cron_job(job);
-        
+
         assert!(result.is_ok());
     }
 
     #[test]
     fn test_enable_cron_job_convenience() {
         init_sigmacron();
-        
+
         let job = CronJob::new("test-job".to_string(), "/bin/echo".to_string());
         add_cron_job(job).unwrap();
-        
+
         let result = enable_cron_job("test-job");
         assert!(result.is_ok());
     }
@@ -680,10 +690,10 @@ mod tests {
     #[test]
     fn test_disable_cron_job_convenience() {
         init_sigmacron();
-        
+
         let job = CronJob::new("test-job".to_string(), "/bin/echo".to_string());
         add_cron_job(job).unwrap();
-        
+
         let result = disable_cron_job("test-job");
         assert!(result.is_ok());
     }

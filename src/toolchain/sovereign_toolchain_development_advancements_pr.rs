@@ -29,10 +29,10 @@ pub struct ToolchainDevelopmentPrProposalManifest {
 /// Optimization profile inspired by distro compilers.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ToolchainOptMode {
-    ClearLinuxO3, // Clear Linux AVX-512/FMV auto-tuning (-O3 -march=native -ffast-math)
-    CachyOsBore,  // CachyOS BORE scheduler & LTO/PGO profile optimization
+    ClearLinuxO3,  // Clear Linux AVX-512/FMV auto-tuning (-O3 -march=native -ffast-math)
+    CachyOsBore,   // CachyOS BORE scheduler & LTO/PGO profile optimization
     GentooUseFlag, // Gentoo Portage USE flag conditioned optimization
-    StandardO2,   // Standard distro optimization (-O2 -mtune=generic)
+    StandardO2,    // Standard distro optimization (-O2 -mtune=generic)
 }
 
 /// Hardening profile inspired by Linux & BSD security posture.
@@ -190,13 +190,16 @@ impl GccClangLlvmToolchainPrEngine {
 
     pub fn generate_proposal(&self) -> ToolchainDevelopmentPrProposalManifest {
         ToolchainDevelopmentPrProposalManifest {
-            pr_title: "feat(toolchain): Implement Distro-Optimized GCC, Clang/LLVM, binutils & LLD Engine".to_string(),
+            pr_title:
+                "feat(toolchain): Implement Distro-Optimized GCC, Clang/LLVM, binutils & LLD Engine"
+                    .to_string(),
             target_subsystem: "Compiler & Linker Optimization Subsystem".to_string(),
             distro_inspirations: vec![
                 "Clear Linux (AVX-512/FMV auto-tuning & zero-overhead flag injection)".to_string(),
                 "CachyOS (ThinLTO, PGO, BORE CPU scheduler compiler passes)".to_string(),
                 "Gentoo (Portage USE flag conditionally compiled binary optimization)".to_string(),
-                "Fedora/NixOS (Fortify Source v3, Stack Clash Protection, DWARF5 debug indexes)".to_string(),
+                "Fedora/NixOS (Fortify Source v3, Stack Clash Protection, DWARF5 debug indexes)"
+                    .to_string(),
                 "OpenBSD (Retguard return address validation & static PIE binaries)".to_string(),
             ],
             tools_covered: vec![
@@ -207,9 +210,11 @@ impl GccClangLlvmToolchainPrEngine {
             ],
             key_features_added: vec![
                 "AVX-512 & AVX2 Function Multi-Versioning (FMV) dispatch matrix".to_string(),
-                "ThinLTO & Profile-Guided Optimization (PGO) automated profile collector".to_string(),
+                "ThinLTO & Profile-Guided Optimization (PGO) automated profile collector"
+                    .to_string(),
                 "OpenBSD Retguard return-address XOR cookie stack frame guard".to_string(),
-                "Fedora-style -D_FORTIFY_SOURCE=3 + -fstack-clash-protection hardening injections".to_string(),
+                "Fedora-style -D_FORTIFY_SOURCE=3 + -fstack-clash-protection hardening injections"
+                    .to_string(),
                 "LLD lock-free parallel ELF section merging (3.8x faster linking)".to_string(),
             ],
             performance_multiplier: "4.2x Faster Compilation & 3.8x Link Speedup".to_string(),
@@ -310,10 +315,7 @@ impl BuildSystemsPkgConfigPrEngine {
                     let rule_and_inputs: Vec<&str> = parts[1].trim().split_whitespace().collect();
                     if !rule_and_inputs.is_empty() {
                         let rule = rule_and_inputs[0].to_string();
-                        let inputs = rule_and_inputs[1..]
-                            .iter()
-                            .map(|s| s.to_string())
-                            .collect();
+                        let inputs = rule_and_inputs[1..].iter().map(|s| s.to_string()).collect();
                         nodes.push(NinjaBuildGraphNode {
                             target,
                             rule,
@@ -326,7 +328,11 @@ impl BuildSystemsPkgConfigPrEngine {
         nodes
     }
 
-    pub fn query_pkg_config(&self, pkg_name: &str, required_version: &str) -> Option<PkgConfigQueryResult> {
+    pub fn query_pkg_config(
+        &self,
+        pkg_name: &str,
+        required_version: &str,
+    ) -> Option<PkgConfigQueryResult> {
         if pkg_name.is_empty() {
             return None;
         }
@@ -423,7 +429,12 @@ impl DebuggerTracerProfilerPrEngine {
         Self
     }
 
-    pub fn strace_ebpf_event_interceptor(&self, syscall_nr: u64, pid: u32, args: [u64; 6]) -> SyscallTraceEvent {
+    pub fn strace_ebpf_event_interceptor(
+        &self,
+        syscall_nr: u64,
+        pid: u32,
+        args: [u64; 6],
+    ) -> SyscallTraceEvent {
         SyscallTraceEvent {
             syscall_nr,
             pid,
@@ -432,7 +443,13 @@ impl DebuggerTracerProfilerPrEngine {
         }
     }
 
-    pub fn dtrace_probe_fire(&self, provider: &str, probe_name: &str, arg0: u64, arg1: u64) -> DTraceProbeResult {
+    pub fn dtrace_probe_fire(
+        &self,
+        provider: &str,
+        probe_name: &str,
+        arg0: u64,
+        arg1: u64,
+    ) -> DTraceProbeResult {
         DTraceProbeResult {
             provider: provider.to_string(),
             probe_name: probe_name.to_string(),
@@ -442,7 +459,12 @@ impl DebuggerTracerProfilerPrEngine {
         }
     }
 
-    pub fn valgrind_shadow_memory_validate(&self, address: usize, _len: usize, is_write: bool) -> ShadowMemoryStatus {
+    pub fn valgrind_shadow_memory_validate(
+        &self,
+        address: usize,
+        _len: usize,
+        is_write: bool,
+    ) -> ShadowMemoryStatus {
         if address == 0 {
             return ShadowMemoryStatus::UseAfterFree;
         }
@@ -452,7 +474,12 @@ impl DebuggerTracerProfilerPrEngine {
         ShadowMemoryStatus::Valid
     }
 
-    pub fn perf_sample_hardware_counters(&self, cycles: u64, instructions: u64, cache_misses: u64) -> PerfSampleResult {
+    pub fn perf_sample_hardware_counters(
+        &self,
+        cycles: u64,
+        instructions: u64,
+        cache_misses: u64,
+    ) -> PerfSampleResult {
         let ipc = if cycles > 0 {
             instructions as f64 / cycles as f64
         } else {
@@ -525,7 +552,11 @@ impl VcsAndLanguageRuntimesPrEngine {
         Self
     }
 
-    pub fn git_packfile_index_lookup(&self, object_sha256: &[u8; 32], pack_index_data: &[u8]) -> Option<usize> {
+    pub fn git_packfile_index_lookup(
+        &self,
+        object_sha256: &[u8; 32],
+        pack_index_data: &[u8],
+    ) -> Option<usize> {
         if pack_index_data.len() < 8 {
             return None;
         }
@@ -537,8 +568,14 @@ impl VcsAndLanguageRuntimesPrEngine {
         }
     }
 
-    pub fn cargo_vendor_mirror_verify(&self, package_name: &str, checksum: &str, crate_tarball: &[u8]) -> CargoVendorMirrorResult {
-        let is_valid = !package_name.is_empty() && !checksum.is_empty() && !crate_tarball.is_empty();
+    pub fn cargo_vendor_mirror_verify(
+        &self,
+        package_name: &str,
+        checksum: &str,
+        crate_tarball: &[u8],
+    ) -> CargoVendorMirrorResult {
+        let is_valid =
+            !package_name.is_empty() && !checksum.is_empty() && !crate_tarball.is_empty();
         CargoVendorMirrorResult {
             package_name: package_name.to_string(),
             is_valid,
@@ -546,7 +583,11 @@ impl VcsAndLanguageRuntimesPrEngine {
         }
     }
 
-    pub fn go_cgo_zero_copy_bridge_dispatch(&self, buffer_ptr: usize, len: usize) -> Result<u32, ()> {
+    pub fn go_cgo_zero_copy_bridge_dispatch(
+        &self,
+        buffer_ptr: usize,
+        len: usize,
+    ) -> Result<u32, ()> {
         if buffer_ptr == 0 || len == 0 {
             Err(())
         } else {
@@ -554,7 +595,10 @@ impl VcsAndLanguageRuntimesPrEngine {
         }
     }
 
-    pub fn openjdk_graalvm_native_image_optimize(&self, jar_size_bytes: usize) -> GraalVmNativeImageResult {
+    pub fn openjdk_graalvm_native_image_optimize(
+        &self,
+        jar_size_bytes: usize,
+    ) -> GraalVmNativeImageResult {
         GraalVmNativeImageResult {
             original_jar_size_bytes: jar_size_bytes,
             native_elf_size_bytes: (jar_size_bytes as f64 * 0.40) as usize,

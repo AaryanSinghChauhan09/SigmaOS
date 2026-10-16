@@ -254,7 +254,8 @@ impl FileManager {
                 self.files.sort_by(|a, b| a.name.cmp(&b.name));
             }
             SortOrder::Size => {
-                self.files.sort_by(|a, b| a.metadata.size.cmp(&b.metadata.size));
+                self.files
+                    .sort_by(|a, b| a.metadata.size.cmp(&b.metadata.size));
             }
             SortOrder::Type => {
                 self.files.sort_by(|a, b| {
@@ -264,10 +265,12 @@ impl FileManager {
                 });
             }
             SortOrder::Modified => {
-                self.files.sort_by(|a, b| a.metadata.modified.cmp(&b.metadata.modified));
+                self.files
+                    .sort_by(|a, b| a.metadata.modified.cmp(&b.metadata.modified));
             }
             SortOrder::Created => {
-                self.files.sort_by(|a, b| a.metadata.created.cmp(&b.metadata.created));
+                self.files
+                    .sort_by(|a, b| a.metadata.created.cmp(&b.metadata.created));
             }
         }
     }
@@ -331,9 +334,7 @@ pub fn init_file_manager(initial_path: String) {
 
 /// Get file manager
 pub fn get_file_manager() -> &'static mut FileManager {
-    unsafe {
-        FILE_MANAGER.as_mut().expect("File manager not initialized")
-    }
+    unsafe { FILE_MANAGER.as_mut().expect("File manager not initialized") }
 }
 
 #[cfg(test)]

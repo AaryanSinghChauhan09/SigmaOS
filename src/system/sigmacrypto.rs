@@ -92,12 +92,7 @@ pub struct EncryptionKey {
 
 impl EncryptionKey {
     /// Create a new encryption key
-    pub fn new(
-        key_id: String,
-        key_name: String,
-        key_type: EncryptionType,
-        key_size: u32,
-    ) -> Self {
+    pub fn new(key_id: String, key_name: String, key_type: EncryptionType, key_size: u32) -> Self {
         Self {
             key_id,
             key_name,
@@ -205,10 +200,7 @@ impl SigmaCrypto {
 
     /// List volumes by state
     pub fn list_volumes_by_state(&self, state: EncryptionState) -> Vec<&EncryptedVolume> {
-        self.volumes
-            .values()
-            .filter(|v| v.state == state)
-            .collect()
+        self.volumes.values().filter(|v| v.state == state).collect()
     }
 
     /// Lock a volume
@@ -260,16 +252,12 @@ pub fn init_sigmacrypto() {
 
 /// Get the global SigmaCrypto instance
 pub fn get_sigmacrypto() -> Option<&'static SigmaCrypto> {
-    unsafe {
-        SIGMACRYPTO_INSTANCE.as_ref()
-    }
+    unsafe { SIGMACRYPTO_INSTANCE.as_ref() }
 }
 
 /// Get mutable global SigmaCrypto instance
 pub fn get_sigmacrypto_mut() -> Option<&'static mut SigmaCrypto> {
-    unsafe {
-        SIGMACRYPTO_INSTANCE.as_mut()
-    }
+    unsafe { SIGMACRYPTO_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add an encryption key

@@ -24,9 +24,9 @@ pub mod sigma_boot;
 pub mod sigma_bootloader;
 pub mod smp_apic_calibration;
 pub mod sovereign_multi_distro_bootloader;
+pub mod start_assembly_entry;
 pub mod uefi;
 pub mod uefi_gop_framebuffer;
-pub mod start_assembly_entry;
 pub mod verified;
 
 pub use initramfs::*;

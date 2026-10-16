@@ -104,13 +104,26 @@ pub struct Job {
 
 impl Job {
     /// Creates a new `Job` with the given parameters.
-    pub fn new(job_id: usize, pgid: Pgid, pids: Vec<Pid>, command: String, background: bool) -> Self {
+    pub fn new(
+        job_id: usize,
+        pgid: Pgid,
+        pids: Vec<Pid>,
+        command: String,
+        background: bool,
+    ) -> Self {
         let status = if background {
             JobStatus::BackgroundRunning
         } else {
             JobStatus::ForegroundRunning
         };
-        Self { job_id, pgid, pids, command, status, background }
+        Self {
+            job_id,
+            pgid,
+            pids,
+            command,
+            status,
+            background,
+        }
     }
 
     /// Returns `true` if the job has finished executing.
@@ -132,14 +145,18 @@ pub struct JobTable {
 impl JobTable {
     /// Creates an empty `JobTable`.
     pub fn new() -> Self {
-        Self { jobs: Vec::new(), next_id: 1 }
+        Self {
+            jobs: Vec::new(),
+            next_id: 1,
+        }
     }
 
     /// Inserts a new job and returns its assigned job ID.
     pub fn add(&mut self, pgid: Pgid, pids: Vec<Pid>, command: String, background: bool) -> usize {
         let id = self.next_id;
         self.next_id += 1;
-        self.jobs.push(Job::new(id, pgid, pids, command, background));
+        self.jobs
+            .push(Job::new(id, pgid, pids, command, background));
         id
     }
 
@@ -160,10 +177,7 @@ impl JobTable {
 
     /// Removes finished jobs and returns them (for the shell to report).
     pub fn reap_done(&mut self) -> Vec<Job> {
-        let done: Vec<Job> = self.jobs.iter()
-            .filter(|j| j.is_done())
-            .cloned()
-            .collect();
+        let done: Vec<Job> = self.jobs.iter().filter(|j| j.is_done()).cloned().collect();
         self.jobs.retain(|j| !j.is_done());
         done
     }
@@ -191,7 +205,11 @@ pub struct ControllingTerminal {
 impl ControllingTerminal {
     /// Opens the given terminal file descriptor as a controlling terminal.
     pub fn new(fd: i32, session: Sid, foreground_pgid: Pgid) -> Self {
-        Self { fd, session, foreground_pgid }
+        Self {
+            fd,
+            session,
+            foreground_pgid,
+        }
     }
 
     /// Returns the current foreground process group.
@@ -257,8 +275,15 @@ impl Session {
 /// 1. Send `SIGCONT` to the job's process group.
 /// 2. Call `tcsetpgrp` to give the job the terminal.
 /// 3. Wait for the job to finish or stop (`waitpid` with `WUNTRACED`).
-pub fn fg(table: &mut JobTable, terminal: &mut ControllingTerminal, job_id: usize, caller_sid: Sid) -> Result<(), JobControlError> {
-    let job = table.get_mut(job_id).ok_or(JobControlError::NoSuchJob(job_id))?;
+pub fn fg(
+    table: &mut JobTable,
+    terminal: &mut ControllingTerminal,
+    job_id: usize,
+    caller_sid: Sid,
+) -> Result<(), JobControlError> {
+    let job = table
+        .get_mut(job_id)
+        .ok_or(JobControlError::NoSuchJob(job_id))?;
     let pgid = job.pgid;
     job.status = JobStatus::ForegroundRunning;
     job.background = false;
@@ -273,7 +298,9 @@ pub fn fg(table: &mut JobTable, terminal: &mut ControllingTerminal, job_id: usiz
 /// Sends `SIGCONT` to the job's process group without transferring terminal
 /// ownership.
 pub fn bg(table: &mut JobTable, job_id: usize) -> Result<(), JobControlError> {
-    let job = table.get_mut(job_id).ok_or(JobControlError::NoSuchJob(job_id))?;
+    let job = table
+        .get_mut(job_id)
+        .ok_or(JobControlError::NoSuchJob(job_id))?;
     if job.status != JobStatus::Stopped {
         return Err(JobControlError::NotStopped);
     }

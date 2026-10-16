@@ -35,11 +35,26 @@ impl ArmPacController {
     pub fn new() -> Self {
         Self {
             keys: [
-                PacKey128 { hi: 0x0123_4567_89AB_CDEF, lo: 0xFEDC_BA98_7654_3210 }, // IA
-                PacKey128 { hi: 0x1111_2222_3333_4444, lo: 0x5555_6666_7777_8888 }, // IB
-                PacKey128 { hi: 0x9999_AAAA_BBBB_CCCC, lo: 0xDDDD_EEEE_FFFF_0000 }, // DA
-                PacKey128 { hi: 0xA1B2_C3D4_E5F6_0718, lo: 0x293A_4B5C_6D7E_8F90 }, // DB
-                PacKey128 { hi: 0xCAFE_BABE_DEAD_BEEF, lo: 0xFEED_FACE_1234_5678 }, // GA
+                PacKey128 {
+                    hi: 0x0123_4567_89AB_CDEF,
+                    lo: 0xFEDC_BA98_7654_3210,
+                }, // IA
+                PacKey128 {
+                    hi: 0x1111_2222_3333_4444,
+                    lo: 0x5555_6666_7777_8888,
+                }, // IB
+                PacKey128 {
+                    hi: 0x9999_AAAA_BBBB_CCCC,
+                    lo: 0xDDDD_EEEE_FFFF_0000,
+                }, // DA
+                PacKey128 {
+                    hi: 0xA1B2_C3D4_E5F6_0718,
+                    lo: 0x293A_4B5C_6D7E_8F90,
+                }, // DB
+                PacKey128 {
+                    hi: 0xCAFE_BABE_DEAD_BEEF,
+                    lo: 0xFEED_FACE_1234_5678,
+                }, // GA
             ],
             pac_traps_count: 0,
         }
@@ -62,7 +77,12 @@ impl ArmPacController {
     }
 
     /// Authenticate and strip PAC from pointer (AUTIA/AUTDA emulation)
-    pub fn authenticate_pointer(&mut self, signed_ptr: u64, modifier: u64, key_type: PacKeyType) -> Result<u64, &'static str> {
+    pub fn authenticate_pointer(
+        &mut self,
+        signed_ptr: u64,
+        modifier: u64,
+        key_type: PacKeyType,
+    ) -> Result<u64, &'static str> {
         let key_idx = key_type as usize;
         let embedded_tag = (signed_ptr >> 48) as u16;
         let raw_ptr = signed_ptr & !PAC_MASK_UPPER;

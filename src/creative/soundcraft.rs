@@ -110,10 +110,19 @@ impl SynthesizerVoice {
     pub fn generate_sample(&self, phase: f32) -> f32 {
         let raw_wave = match self.waveform {
             Waveform::Sine => (phase * 2.0 * core::f32::consts::PI).sin(),
-            Waveform::Square => if (phase % 1.0) < 0.5 { 1.0 } else { -1.0 },
+            Waveform::Square => {
+                if (phase % 1.0) < 0.5 {
+                    1.0
+                } else {
+                    -1.0
+                }
+            }
             Waveform::Sawtooth => 2.0 * (phase % 1.0) - 1.0,
             Waveform::Triangle => 2.0 * (2.0 * (phase % 1.0) - 1.0).abs() - 1.0,
-            Waveform::Wavetable => (phase * 2.0 * core::f32::consts::PI).sin() * 0.8 + 0.2 * (phase * 4.0 * core::f32::consts::PI).sin(),
+            Waveform::Wavetable => {
+                (phase * 2.0 * core::f32::consts::PI).sin() * 0.8
+                    + 0.2 * (phase * 4.0 * core::f32::consts::PI).sin()
+            }
             Waveform::Noise => 0.0, // Pseudorandom white noise fallback
         };
         raw_wave * self.amplitude
@@ -207,7 +216,12 @@ impl SoundCraftEngine {
         id
     }
 
-    pub fn add_clip_to_track(&mut self, track_id: u32, clip_name: &str, samples: Vec<f32>) -> Result<u32, &'static str> {
+    pub fn add_clip_to_track(
+        &mut self,
+        track_id: u32,
+        clip_name: &str,
+        samples: Vec<f32>,
+    ) -> Result<u32, &'static str> {
         let track = self.tracks.get_mut(&track_id).ok_or("Track not found")?;
         let clip_id = self.next_clip_id.fetch_add(1, Ordering::Relaxed);
         let len = samples.len() as u64;
@@ -496,7 +510,9 @@ mod tests {
         assert_eq!(track_id, 1);
 
         let samples = vec![0.1, 0.2, 0.3, 0.4];
-        let clip_id = engine.add_clip_to_track(track_id, "Verse 1", samples).unwrap();
+        let clip_id = engine
+            .add_clip_to_track(track_id, "Verse 1", samples)
+            .unwrap();
         assert_eq!(clip_id, 1);
 
         let mix = engine.mixdown();

@@ -98,7 +98,11 @@ impl BoundedRunQueue {
         false
     }
 
-    pub fn enqueue(&mut self, mut task: TaskRunRef, current_tick: u64) -> Result<(), RunQueueError> {
+    pub fn enqueue(
+        &mut self,
+        mut task: TaskRunRef,
+        current_tick: u64,
+    ) -> Result<(), RunQueueError> {
         if self.is_full() {
             return Err(RunQueueError::CapacityExceeded);
         }
@@ -155,7 +159,11 @@ impl BoundedRunQueue {
         Err(RunQueueError::TaskNotFound)
     }
 
-    pub fn boost_starved_tasks(&mut self, current_tick: u64, starvation_threshold_ticks: u64) -> usize {
+    pub fn boost_starved_tasks(
+        &mut self,
+        current_tick: u64,
+        starvation_threshold_ticks: u64,
+    ) -> usize {
         let mut boosted_count = 0;
 
         // Iterate in reverse over queues up to level 60 to prevent re-boosting moved tasks in same pass

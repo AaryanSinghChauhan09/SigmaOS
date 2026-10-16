@@ -53,11 +53,11 @@ pub struct PhotocraftPrProposalManifest {
 /// RAW image development parameters.
 #[derive(Debug, Clone)]
 pub struct RawDevelopmentParams {
-    pub color_temperature: u32, // Kelvin (e.g., 5500)
+    pub color_temperature: u32,  // Kelvin (e.g., 5500)
     pub tint: i32,               // -100 to +100
-    pub exposure_ev: f32,       // -5.0 to +5.0 EV
-    pub highlight_recovery: f32,// 0.0 to 1.0
-    pub shadow_boost: f32,      // 0.0 to 1.0
+    pub exposure_ev: f32,        // -5.0 to +5.0 EV
+    pub highlight_recovery: f32, // 0.0 to 1.0
+    pub shadow_boost: f32,       // 0.0 to 1.0
     pub lens_profile_enabled: bool,
     pub chromatic_aberration_correction: bool,
 }
@@ -85,7 +85,13 @@ impl PhotocraftRawProcessingPrEngine {
         }
     }
 
-    pub fn develop_raw_frame(&mut self, raw_bayer_pixels: &[u16], width: u32, height: u32, output_rgb: &mut [u8]) -> Result<usize, String> {
+    pub fn develop_raw_frame(
+        &mut self,
+        raw_bayer_pixels: &[u16],
+        width: u32,
+        height: u32,
+        output_rgb: &mut [u8],
+    ) -> Result<usize, String> {
         if raw_bayer_pixels.len() != (width * height) as usize {
             return Err("Bayer buffer size mismatch for width x height".to_string());
         }
@@ -121,7 +127,9 @@ impl PhotocraftRawProcessingPrEngine {
 
     pub fn generate_proposal(&self) -> PhotocraftPrProposalManifest {
         PhotocraftPrProposalManifest {
-            pr_title: "feat(photocraft): Non-Destructive RAW Bayer Engine & Lens Distortion Pipeline".to_string(),
+            pr_title:
+                "feat(photocraft): Non-Destructive RAW Bayer Engine & Lens Distortion Pipeline"
+                    .to_string(),
             target_subsystem: "RAW Image Development Subsystem".to_string(),
             original_suite: "ArtCraft PhotoCraft RAW / Darktable Engine".to_string(),
             components_added: vec![
@@ -170,7 +178,13 @@ impl PhotocraftAiInpaintingPrEngine {
         }
     }
 
-    pub fn execute_inpaint(&mut self, image_rgba: &mut [u8], mask_alpha: &[u8], width: u32, height: u32) -> Result<usize, String> {
+    pub fn execute_inpaint(
+        &mut self,
+        image_rgba: &mut [u8],
+        mask_alpha: &[u8],
+        width: u32,
+        height: u32,
+    ) -> Result<usize, String> {
         let pixel_count = (width * height) as usize;
         if image_rgba.len() != pixel_count * 4 || mask_alpha.len() != pixel_count {
             return Err("Buffer dimensions mismatch for inpainting execution".to_string());
@@ -181,7 +195,11 @@ impl PhotocraftAiInpaintingPrEngine {
         for i in 0..pixel_count {
             if mask_alpha[i] > 128 {
                 let px = i * 4;
-                let sample_pixel_idx = if i >= 1 { i - 1 } else { (i + 1).min(pixel_count.saturating_sub(1)) };
+                let sample_pixel_idx = if i >= 1 {
+                    i - 1
+                } else {
+                    (i + 1).min(pixel_count.saturating_sub(1))
+                };
                 let sample_idx = sample_pixel_idx * 4;
 
                 image_rgba[px] = image_rgba[sample_idx];
@@ -193,14 +211,17 @@ impl PhotocraftAiInpaintingPrEngine {
             }
         }
 
-        self.neural_confidence = 0.95 + (inpainted_pixels as f32 / pixel_count.max(1) as f32) * 0.04;
+        self.neural_confidence =
+            0.95 + (inpainted_pixels as f32 / pixel_count.max(1) as f32) * 0.04;
         Ok(inpainted_pixels)
     }
 
     pub fn generate_proposal(&self) -> PhotocraftAiInpaintingPrEngineProposal {
         PhotocraftAiInpaintingPrEngineProposal {
             manifest: PhotocraftPrProposalManifest {
-                pr_title: "feat(photocraft): AI Neural Inpainting & Content-Aware Spot Healing Brush".to_string(),
+                pr_title:
+                    "feat(photocraft): AI Neural Inpainting & Content-Aware Spot Healing Brush"
+                        .to_string(),
                 target_subsystem: "AI Generative Editing Matrix".to_string(),
                 original_suite: "ArtCraft PhotoCraft Neural Inpainter".to_string(),
                 components_added: vec![
@@ -297,11 +318,14 @@ impl PhotocraftColorGradingFrequencySeparationPrEngine {
 
     pub fn generate_proposal(&self) -> PhotocraftPrProposalManifest {
         PhotocraftPrProposalManifest {
-            pr_title: "feat(photocraft): High/Low Frequency Separation & 3D LUT Color Grading Matrix".to_string(),
+            pr_title:
+                "feat(photocraft): High/Low Frequency Separation & 3D LUT Color Grading Matrix"
+                    .to_string(),
             target_subsystem: "Retouching & Color Science Suite".to_string(),
             original_suite: "ArtCraft PhotoCraft Frequency Separator".to_string(),
             components_added: vec![
-                "Non-destructive high/low frequency layer separation for skin smoothing".to_string(),
+                "Non-destructive high/low frequency layer separation for skin smoothing"
+                    .to_string(),
                 "32x32x32 3D LUT cubic interpolation color space converter".to_string(),
                 "Split toning, shadow/highlight luminance wheels & CMYK curve mapping".to_string(),
             ],
@@ -343,7 +367,12 @@ impl PhotocraftHdrExposureStackingPrEngine {
         }
     }
 
-    pub fn merge_hdr_brackets(&mut self, brackets: &[ExposureFrame], width: u32, height: u32) -> Result<Vec<u8>, String> {
+    pub fn merge_hdr_brackets(
+        &mut self,
+        brackets: &[ExposureFrame],
+        width: u32,
+        height: u32,
+    ) -> Result<Vec<u8>, String> {
         if brackets.is_empty() {
             return Err("No exposure brackets provided for HDR merge".to_string());
         }
@@ -366,7 +395,12 @@ impl PhotocraftHdrExposureStackingPrEngine {
         Ok(hdr_output)
     }
 
-    pub fn execute_focus_stacking(&mut self, frames: &[Vec<u8>], width: u32, height: u32) -> Result<Vec<u8>, String> {
+    pub fn execute_focus_stacking(
+        &mut self,
+        frames: &[Vec<u8>],
+        width: u32,
+        height: u32,
+    ) -> Result<Vec<u8>, String> {
         if frames.is_empty() {
             return Err("No focus stack frames provided".to_string());
         }
@@ -389,7 +423,8 @@ impl PhotocraftHdrExposureStackingPrEngine {
 
     pub fn generate_proposal(&self) -> PhotocraftPrProposalManifest {
         PhotocraftPrProposalManifest {
-            pr_title: "feat(photocraft): HDR Exposure Bracketing & Sub-Pixel Focus Stacking Engine".to_string(),
+            pr_title: "feat(photocraft): HDR Exposure Bracketing & Sub-Pixel Focus Stacking Engine"
+                .to_string(),
             target_subsystem: "Multi-Exposure & Depth Compositor".to_string(),
             original_suite: "ArtCraft PhotoCraft HDR & Focus Stack Studio".to_string(),
             components_added: vec![
@@ -459,7 +494,12 @@ impl PhotocraftVectorMaskPenPathPrEngine {
         id
     }
 
-    pub fn rasterize_vector_mask(&self, path_id: u32, width: u32, height: u32) -> Result<Vec<u8>, String> {
+    pub fn rasterize_vector_mask(
+        &self,
+        path_id: u32,
+        width: u32,
+        height: u32,
+    ) -> Result<Vec<u8>, String> {
         let path = self.paths.get(&path_id).ok_or("Vector path not found")?;
         let mask_size = (width * height) as usize;
         let mut alpha_mask = vec![0u8; mask_size];
@@ -476,12 +516,14 @@ impl PhotocraftVectorMaskPenPathPrEngine {
 
     pub fn generate_proposal(&self) -> PhotocraftPrProposalManifest {
         PhotocraftPrProposalManifest {
-            pr_title: "feat(photocraft): Vector Masks, Precision Bezier Pen Tool & Clipping Paths".to_string(),
+            pr_title: "feat(photocraft): Vector Masks, Precision Bezier Pen Tool & Clipping Paths"
+                .to_string(),
             target_subsystem: "Vector Selection & Clipping Path Pipeline".to_string(),
             original_suite: "ArtCraft PhotoCraft Pen & Vector Engine".to_string(),
             components_added: vec![
                 "Sub-pixel smooth Bezier pen tool path editor with smart snapping".to_string(),
-                "Non-destructive vector mask layers with feathering and density controls".to_string(),
+                "Non-destructive vector mask layers with feathering and density controls"
+                    .to_string(),
                 "EPS & SVG clipping path export for print pre-press workflow".to_string(),
             ],
             performance_multiplier: "GPU-Accelerated Resolution-Independent Masking".to_string(),
@@ -556,7 +598,9 @@ impl PhotocraftBatchActionMacroPrEngine {
 
     pub fn generate_proposal(&self) -> PhotocraftPrProposalManifest {
         PhotocraftPrProposalManifest {
-            pr_title: "feat(photocraft): Batch Action Macro Recorder & Multi-Format Watermark Exporter".to_string(),
+            pr_title:
+                "feat(photocraft): Batch Action Macro Recorder & Multi-Format Watermark Exporter"
+                    .to_string(),
             target_subsystem: "Automation & Export Pipeline".to_string(),
             original_suite: "ArtCraft PhotoCraft Batch Automator".to_string(),
             components_added: vec![
@@ -606,24 +650,38 @@ impl SovereignPhotocraftArtcraftParityPrGateway {
     pub fn evaluate_photocraft_parity(&mut self) -> bool {
         let raw_bayer = vec![1000u16; 16];
         let mut rgb_out = vec![0u8; 48];
-        let _raw_ok = self.raw_engine.develop_raw_frame(&raw_bayer, 4, 4, &mut rgb_out).is_ok();
+        let _raw_ok = self
+            .raw_engine
+            .develop_raw_frame(&raw_bayer, 4, 4, &mut rgb_out)
+            .is_ok();
 
         let mut img = vec![255u8; 16];
         let mask = vec![0u8, 255u8, 0u8, 0u8];
-        let _inpaint_ok = self.inpainting_engine.execute_inpaint(&mut img, &mask, 2, 2).is_ok();
+        let _inpaint_ok = self
+            .inpainting_engine
+            .execute_inpaint(&mut img, &mask, 2, 2)
+            .is_ok();
 
         let in_rgb = vec![100u8; 12];
         let mut low = vec![0u8; 12];
         let mut high = vec![0u8; 12];
-        let _freq_ok = self.color_grading_engine.perform_frequency_separation(&in_rgb, &mut low, &mut high).is_ok();
+        let _freq_ok = self
+            .color_grading_engine
+            .perform_frequency_separation(&in_rgb, &mut low, &mut high)
+            .is_ok();
 
         let pt = BezierPoint {
             anchor: [0.0, 0.0],
             control_in: [0.0, 0.0],
             control_out: [0.0, 0.0],
         };
-        let path_id = self.vector_mask_engine.create_pen_path("CropMask", vec![pt], true);
-        let _mask_ok = self.vector_mask_engine.rasterize_vector_mask(path_id, 4, 4).is_ok();
+        let path_id = self
+            .vector_mask_engine
+            .create_pen_path("CropMask", vec![pt], true);
+        let _mask_ok = self
+            .vector_mask_engine
+            .rasterize_vector_mask(path_id, 4, 4)
+            .is_ok();
 
         true
     }
@@ -682,7 +740,7 @@ mod tests {
     #[test]
     fn test_ai_inpainting_engine_functional() {
         let mut engine = PhotocraftAiInpaintingPrEngine::new();
-        let mut rgba = vec![255, 0, 0, 255,  100, 100, 100, 255]; // 2x1 pixels (8 bytes)
+        let mut rgba = vec![255, 0, 0, 255, 100, 100, 100, 255]; // 2x1 pixels (8 bytes)
         let mask = vec![0, 255]; // 2 pixels mask
 
         let res = engine.execute_inpaint(&mut rgba, &mask, 2, 1);
@@ -705,8 +763,14 @@ mod tests {
     #[test]
     fn test_hdr_exposure_stacking_functional() {
         let mut engine = PhotocraftHdrExposureStackingPrEngine::new();
-        let frame1 = ExposureFrame { ev_offset: -1.0, rgb_data: vec![50, 50, 50] };
-        let frame2 = ExposureFrame { ev_offset: 1.0, rgb_data: vec![150, 150, 150] };
+        let frame1 = ExposureFrame {
+            ev_offset: -1.0,
+            rgb_data: vec![50, 50, 50],
+        };
+        let frame2 = ExposureFrame {
+            ev_offset: 1.0,
+            rgb_data: vec![150, 150, 150],
+        };
 
         let hdr = engine.merge_hdr_brackets(&[frame1, frame2], 1, 1).unwrap();
         assert_eq!(hdr[0], 100); // Average of 50 and 150

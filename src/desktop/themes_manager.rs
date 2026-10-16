@@ -92,8 +92,16 @@ impl ThemesManager {
                 monospace_font_name: "Monospace 11".to_string(),
                 font_size: 11,
             },
-            available_gtk_themes: vec!["Adwaita".to_string(), "Yaru".to_string(), "Pop".to_string()],
-            available_icon_themes: vec!["Adwaita".to_string(), "Yaru".to_string(), "Pop".to_string()],
+            available_gtk_themes: vec![
+                "Adwaita".to_string(),
+                "Yaru".to_string(),
+                "Pop".to_string(),
+            ],
+            available_icon_themes: vec![
+                "Adwaita".to_string(),
+                "Yaru".to_string(),
+                "Pop".to_string(),
+            ],
             available_cursor_themes: vec!["Adwaita".to_string(), "Yaru".to_string()],
         }
     }
@@ -107,7 +115,10 @@ impl ThemesManager {
             is_installed: true,
             is_default: false,
         };
-        self.themes.entry(name.clone()).or_insert_with(Vec::new).push(theme);
+        self.themes
+            .entry(name.clone())
+            .or_insert_with(Vec::new)
+            .push(theme);
     }
 
     /// Remove theme
@@ -175,7 +186,11 @@ impl ThemesManager {
 
     /// Get themes by type
     pub fn get_themes_by_type(&self, theme_type: ThemeType) -> Vec<&Theme> {
-        self.themes.values().flatten().filter(|t| t.theme_type == theme_type).collect()
+        self.themes
+            .values()
+            .flatten()
+            .filter(|t| t.theme_type == theme_type)
+            .collect()
     }
 
     /// Get available GTK themes
@@ -207,7 +222,9 @@ pub fn init_themes_manager() {
 /// Get themes manager
 pub fn get_themes_manager() -> &'static mut ThemesManager {
     unsafe {
-        THEMES_MANAGER.as_mut().expect("Themes manager not initialized")
+        THEMES_MANAGER
+            .as_mut()
+            .expect("Themes manager not initialized")
     }
 }
 

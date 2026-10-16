@@ -211,7 +211,7 @@ impl SigmaNet {
         if self.interfaces.contains_key(&interface.name) {
             return Err(format!("Interface '{}' already exists", interface.name));
         }
-        
+
         self.interfaces.insert(interface.name.clone(), interface);
         self.interface_counter += 1;
         Ok(())
@@ -275,7 +275,12 @@ impl SigmaNet {
     }
 
     /// Set IP configuration
-    pub fn set_ip(&mut self, name: &str, ip_address: String, ip_type: IpType) -> Result<(), String> {
+    pub fn set_ip(
+        &mut self,
+        name: &str,
+        ip_address: String,
+        ip_type: IpType,
+    ) -> Result<(), String> {
         match self.interfaces.get_mut(name) {
             Some(interface) => {
                 interface.ip_address = Some(ip_address);
@@ -326,14 +331,16 @@ impl SigmaNet {
 
     /// List interfaces by type
     pub fn list_by_type(&self, interface_type: InterfaceType) -> Vec<&NetworkInterface> {
-        self.interfaces.values()
+        self.interfaces
+            .values()
             .filter(|i| i.interface_type == interface_type)
             .collect()
     }
 
     /// List connected interfaces
     pub fn list_connected(&self) -> Vec<&NetworkInterface> {
-        self.interfaces.values()
+        self.interfaces
+            .values()
             .filter(|i| i.status == InterfaceStatus::Connected)
             .collect()
     }
@@ -346,8 +353,14 @@ impl SigmaNet {
     /// Get network statistics
     pub fn network_stats(&self) -> BTreeMap<String, String> {
         let mut stats = BTreeMap::new();
-        stats.insert("total_interfaces".to_string(), self.interface_count().to_string());
-        stats.insert("connected_interfaces".to_string(), self.list_connected().len().to_string());
+        stats.insert(
+            "total_interfaces".to_string(),
+            self.interface_count().to_string(),
+        );
+        stats.insert(
+            "connected_interfaces".to_string(),
+            self.list_connected().len().to_string(),
+        );
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
@@ -425,7 +438,7 @@ mod tests {
         let interface = NetworkInterface::new(
             "eth0".to_string(),
             InterfaceType::Ethernet,
-            "00:11:22:33:44:55".to_string()
+            "00:11:22:33:44:55".to_string(),
         )
         .with_status(InterfaceStatus::Connected)
         .with_ip("192.168.1.100".to_string(), IpType::IPv4)
@@ -450,13 +463,13 @@ mod tests {
     #[test]
     fn test_sigmanet_add_interface() {
         let mut net = SigmaNet::new();
-        
+
         let interface = NetworkInterface::new(
             "eth0".to_string(),
             InterfaceType::Ethernet,
-            "00:11:22:33:44:55".to_string()
+            "00:11:22:33:44:55".to_string(),
         );
-        
+
         assert!(net.add_interface(interface).is_ok());
         assert_eq!(net.interface_count(), 1);
     }
@@ -464,16 +477,16 @@ mod tests {
     #[test]
     fn test_sigmanet_bring_up() {
         let mut net = SigmaNet::new();
-        
+
         let interface = NetworkInterface::new(
             "eth0".to_string(),
             InterfaceType::Ethernet,
-            "00:11:22:33:44:55".to_string()
+            "00:11:22:33:44:55".to_string(),
         );
-        
+
         net.add_interface(interface).unwrap();
         assert!(net.bring_up("eth0").is_ok());
-        
+
         let interface = net.get_interface("eth0").unwrap();
         assert_eq!(interface.status, InterfaceStatus::Up);
     }
@@ -481,16 +494,16 @@ mod tests {
     #[test]
     fn test_sigmanet_connect() {
         let mut net = SigmaNet::new();
-        
+
         let interface = NetworkInterface::new(
             "eth0".to_string(),
             InterfaceType::Ethernet,
-            "00:11:22:33:44:55".to_string()
+            "00:11:22:33:44:55".to_string(),
         );
-        
+
         net.add_interface(interface).unwrap();
         assert!(net.connect("eth0").is_ok());
-        
+
         let interface = net.get_interface("eth0").unwrap();
         assert_eq!(interface.status, InterfaceStatus::Connected);
     }
@@ -498,16 +511,18 @@ mod tests {
     #[test]
     fn test_sigmanet_set_ip() {
         let mut net = SigmaNet::new();
-        
+
         let interface = NetworkInterface::new(
             "eth0".to_string(),
             InterfaceType::Ethernet,
-            "00:11:22:33:44:55".to_string()
+            "00:11:22:33:44:55".to_string(),
         );
-        
+
         net.add_interface(interface).unwrap();
-        assert!(net.set_ip("eth0", "192.168.1.100".to_string(), IpType::IPv4).is_ok());
-        
+        assert!(net
+            .set_ip("eth0", "192.168.1.100".to_string(), IpType::IPv4)
+            .is_ok());
+
         let interface = net.get_interface("eth0").unwrap();
         assert_eq!(interface.ip_address, Some("192.168.1.100".to_string()));
     }
@@ -515,15 +530,15 @@ mod tests {
     #[test]
     fn test_sigmanet_list_by_type() {
         let mut net = SigmaNet::new();
-        
+
         let interface = NetworkInterface::new(
             "eth0".to_string(),
             InterfaceType::Ethernet,
-            "00:11:22:33:44:55".to_string()
+            "00:11:22:33:44:55".to_string(),
         );
-        
+
         net.add_interface(interface).unwrap();
-        
+
         let interfaces = net.list_by_type(InterfaceType::Ethernet);
         assert_eq!(interfaces.len(), 1);
     }
@@ -531,16 +546,16 @@ mod tests {
     #[test]
     fn test_sigmanet_stats() {
         let mut net = SigmaNet::new();
-        
+
         let interface = NetworkInterface::new(
             "eth0".to_string(),
             InterfaceType::Ethernet,
-            "00:11:22:33:44:55".to_string()
+            "00:11:22:33:44:55".to_string(),
         )
         .with_status(InterfaceStatus::Connected);
-        
+
         net.add_interface(interface).unwrap();
-        
+
         let stats = net.network_stats();
         assert_eq!(stats.get("total_interfaces"), Some(&"1".to_string()));
         assert_eq!(stats.get("connected_interfaces"), Some(&"1".to_string()));
@@ -549,17 +564,17 @@ mod tests {
     #[test]
     fn test_bring_up_interface_convenience() {
         init_sigmanet();
-        
+
         let mut net = get_sigmanet().unwrap();
-        
+
         let interface = NetworkInterface::new(
             "eth0".to_string(),
             InterfaceType::Ethernet,
-            "00:11:22:33:44:55".to_string()
+            "00:11:22:33:44:55".to_string(),
         );
-        
+
         net.add_interface(interface).unwrap();
-        
+
         let result = bring_up_interface("eth0");
         assert!(result.is_ok());
     }
@@ -567,17 +582,17 @@ mod tests {
     #[test]
     fn test_connect_interface_convenience() {
         init_sigmanet();
-        
+
         let mut net = get_sigmanet().unwrap();
-        
+
         let interface = NetworkInterface::new(
             "eth0".to_string(),
             InterfaceType::Ethernet,
-            "00:11:22:33:44:55".to_string()
+            "00:11:22:33:44:55".to_string(),
         );
-        
+
         net.add_interface(interface).unwrap();
-        
+
         let result = connect_interface("eth0");
         assert!(result.is_ok());
     }

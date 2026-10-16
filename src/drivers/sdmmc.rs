@@ -102,7 +102,11 @@ impl SdHostController {
     }
 
     /// Write a single 512-byte block to sector LBA
-    pub fn write_sector(&mut self, lba: u64, buf: &[u8; SD_BLOCK_SIZE]) -> Result<(), &'static str> {
+    pub fn write_sector(
+        &mut self,
+        lba: u64,
+        buf: &[u8; SD_BLOCK_SIZE],
+    ) -> Result<(), &'static str> {
         let card = self.card.as_ref().ok_or("No SD card initialized")?;
         if card.state != SdCardState::Transfer {
             return Err("Card not in transfer state");

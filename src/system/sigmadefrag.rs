@@ -132,7 +132,10 @@ impl DefragJob {
 
     /// Check if job is currently active
     pub fn is_active(&self) -> bool {
-        matches!(self.status, DefragStatus::Scanning | DefragStatus::Defragmenting)
+        matches!(
+            self.status,
+            DefragStatus::Scanning | DefragStatus::Defragmenting
+        )
     }
 }
 
@@ -271,16 +274,12 @@ pub fn init_sigmadefrag() {
 
 /// Get global SigmaDefrag instance
 pub fn get_sigmadefrag() -> Option<&'static SigmaDefrag> {
-    unsafe {
-        SIGMA_DEFRAG_INSTANCE.as_ref()
-    }
+    unsafe { SIGMA_DEFRAG_INSTANCE.as_ref() }
 }
 
 /// Get mutable global SigmaDefrag instance
 pub fn get_sigmadefrag_mut() -> Option<&'static mut SigmaDefrag> {
-    unsafe {
-        SIGMA_DEFRAG_INSTANCE.as_mut()
-    }
+    unsafe { SIGMA_DEFRAG_INSTANCE.as_mut() }
 }
 
 /// Convenience function to start a defragmentation job
@@ -307,13 +306,8 @@ mod tests {
 
     #[test]
     fn test_fragmentation_report_scoring() {
-        let report = FragmentationReport::new(
-            "/home/user/largefile.bin".to_string(),
-            1,
-            1,
-            200,
-            100,
-        );
+        let report =
+            FragmentationReport::new("/home/user/largefile.bin".to_string(), 1, 1, 200, 100);
         assert_eq!(report.fragmentation_score_pct, 50);
         assert!(report.needs_defragmentation(20));
         assert!(!report.needs_defragmentation(60));
@@ -349,13 +343,7 @@ mod tests {
         mgr.start();
         assert!(mgr.is_running());
 
-        let rep = FragmentationReport::new(
-            "/var".to_string(),
-            500,
-            100,
-            1000,
-            800,
-        );
+        let rep = FragmentationReport::new("/var".to_string(), 500, 100, 1000, 800);
         mgr.record_report(rep);
         assert!(mgr.get_report("/var").is_some());
 
@@ -374,7 +362,10 @@ mod tests {
         assert_eq!(mgr.get_job("j1").unwrap().status, DefragStatus::Paused);
 
         assert!(mgr.resume_job("j1"));
-        assert_eq!(mgr.get_job("j1").unwrap().status, DefragStatus::Defragmenting);
+        assert_eq!(
+            mgr.get_job("j1").unwrap().status,
+            DefragStatus::Defragmenting
+        );
 
         assert!(mgr.abort_job("j1"));
         assert_eq!(mgr.get_job("j1").unwrap().status, DefragStatus::Aborted);

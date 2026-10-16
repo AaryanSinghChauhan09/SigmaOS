@@ -1319,7 +1319,9 @@ impl SovereignUniversalShInterpreterEngine {
         }
 
         let shebang_script = format!("{}\n{}", target_format.primary_shebang(), script_code);
-        let plan = self.cross_dialect_engine.run_universal_sh_script(&shebang_script)?;
+        let plan = self
+            .cross_dialect_engine
+            .run_universal_sh_script(&shebang_script)?;
 
         Ok(format!(
             "Universal POSIX /bin/sh Execution Success [{}]\nTranspiled POSIX Script:\n{}\nStages Count: {}",

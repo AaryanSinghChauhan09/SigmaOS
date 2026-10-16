@@ -42,8 +42,8 @@ pub mod repository_config;
 pub mod resolver;
 pub mod sandbox;
 pub mod sigma_pkg;
-pub mod signing;
 pub mod sigmarepo;
+pub mod signing;
 pub mod sovereign_distro_package_matrix;
 pub mod spac;
 pub mod store;
@@ -51,9 +51,13 @@ pub mod universal;
 pub mod updater;
 pub mod zsync_delta;
 
+pub use sigmarepo::{
+    add_repository, get_sigmarepo, init_sigmarepo, init_sigmarepo_default, search_package,
+};
+pub use sigmarepo::{
+    PackageDependency, PackageMetadata, RepoConfig, RepoPriority, RepoType, Repository, SigmaRepo,
+};
 pub use sovereign_distro_package_matrix::*;
-pub use sigmarepo::{SigmaRepo, RepoConfig, Repository, PackageMetadata, PackageDependency, RepoPriority, RepoType};
-pub use sigmarepo::{init_sigmarepo, init_sigmarepo_default, get_sigmarepo, add_repository, search_package};
 pub use zsync_delta::{DeltaOp, RollingAdler32, ZsyncBlockSignature, ZsyncDeltaEngine};
 pub mod sovereign_distro_package_advancements_v5;
 pub use sovereign_distro_package_advancements_v5::*;

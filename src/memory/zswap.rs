@@ -77,7 +77,9 @@ impl ZswapPool {
     /// Attempt to store a dirty page into the zswap pool
     pub fn store(&mut self, pfn: u64, data: &[u8; PAGE_SIZE]) -> Result<u32, &'static str> {
         let compressed = Self::compress_page(data);
-        if compressed.len() >= PAGE_SIZE || self.current_bytes + compressed.len() > self.max_pool_bytes {
+        if compressed.len() >= PAGE_SIZE
+            || self.current_bytes + compressed.len() > self.max_pool_bytes
+        {
             self.rejected_pages_count += 1;
             return Err("Page not compressible enough or zswap pool is full");
         }
@@ -137,7 +139,9 @@ mod tests {
             page_data[i] = b'A';
         }
 
-        let ratio = pool.store(100, &page_data).expect("Should compress and store");
+        let ratio = pool
+            .store(100, &page_data)
+            .expect("Should compress and store");
         assert!(ratio < 10); // Highly compressible
 
         let mut out = [0u8; PAGE_SIZE];

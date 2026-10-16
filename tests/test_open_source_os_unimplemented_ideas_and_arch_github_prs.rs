@@ -8,8 +8,8 @@ mod open_source_os_unimplemented_ideas_pr_gateway;
 #[path = "../src/distro/arch_linux_github_repo_components_pr_engine.rs"]
 mod arch_linux_github_repo_components_pr_engine;
 
-use open_source_os_unimplemented_ideas_pr_gateway::*;
 use arch_linux_github_repo_components_pr_engine::*;
+use open_source_os_unimplemented_ideas_pr_gateway::*;
 
 #[test]
 fn test_open_source_os_unimplemented_ideas_pr_gateway_full_cycle() {
@@ -24,14 +24,21 @@ fn test_open_source_os_unimplemented_ideas_pr_gateway_full_cycle() {
     }
 
     let success = gateway.execute_and_verify_all_prs();
-    assert!(success, "Execution and runtime verification of all 14 Open Source OS PR proposals failed");
+    assert!(
+        success,
+        "Execution and runtime verification of all 14 Open Source OS PR proposals failed"
+    );
 }
 
 #[test]
 fn test_arch_linux_github_repo_components_pr_engine_full_cycle() {
     let master = SovereignArchLinuxGitHubRepoComponentsPrEngine::new();
     let prs = master.execute_all_arch_prs();
-    assert_eq!(prs.len(), 7, "Expected 7 Arch Linux GitHub repo PR proposals");
+    assert_eq!(
+        prs.len(),
+        7,
+        "Expected 7 Arch Linux GitHub repo PR proposals"
+    );
 
     let expected_repos = [
         "archlinux/archinstall & archlinux/archiso",

@@ -109,7 +109,8 @@ impl SovereignBrowserEnginePrEngine {
     pub fn generate_proposal(&self) -> SovereignAppPrProposalManifest {
         SovereignAppPrProposalManifest {
             pr_id: 201,
-            pr_title: "feat(browser): Sovereign Firefox & Chromium Web Engine Replacement".to_string(),
+            pr_title: "feat(browser): Sovereign Firefox & Chromium Web Engine Replacement"
+                .to_string(),
             target_app_category: "Web Browsers & Layout Engines".to_string(),
             replaced_applications: vec![
                 "Mozilla Firefox".to_string(),
@@ -130,8 +131,11 @@ impl SovereignBrowserEnginePrEngine {
                 "Multi-Account Container Jar & total cookie partition engine".to_string(),
                 "Built-in WebAssembly runtime and HTTPS-Everywhere DNS router".to_string(),
             ],
-            performance_advantage: "85% Lower RAM Footprint (18MB vs 450MB per tab), 12x Faster Page Launch".to_string(),
-            zero_download_status: "Built-In Sovereign Replacement (No external download required)".to_string(),
+            performance_advantage:
+                "85% Lower RAM Footprint (18MB vs 450MB per tab), 12x Faster Page Launch"
+                    .to_string(),
+            zero_download_status: "Built-In Sovereign Replacement (No external download required)"
+                .to_string(),
         }
     }
 }
@@ -212,7 +216,8 @@ impl SovereignThunderbirdEmailPrEngine {
     pub fn generate_proposal(&self) -> SovereignAppPrProposalManifest {
         SovereignAppPrProposalManifest {
             pr_id: 202,
-            pr_title: "feat(email): Sovereign Thunderbird Mail & Communications Replacement".to_string(),
+            pr_title: "feat(email): Sovereign Thunderbird Mail & Communications Replacement"
+                .to_string(),
             target_app_category: "Email Clients & PIM Suites".to_string(),
             replaced_applications: vec![
                 "Mozilla Thunderbird".to_string(),
@@ -232,8 +237,10 @@ impl SovereignThunderbirdEmailPrEngine {
                 "Integrated RSS/Atom feed aggregator & CardDAV contact book".to_string(),
                 "CalDAV event scheduling engine with offline conflict resolver".to_string(),
             ],
-            performance_advantage: "90% Memory Reduction (<12MB vs 320MB), Instant Search Indexing".to_string(),
-            zero_download_status: "Built-In Sovereign Replacement (No external download required)".to_string(),
+            performance_advantage: "90% Memory Reduction (<12MB vs 320MB), Instant Search Indexing"
+                .to_string(),
+            zero_download_status: "Built-In Sovereign Replacement (No external download required)"
+                .to_string(),
         }
     }
 }
@@ -283,7 +290,9 @@ impl SovereignLibreOfficeSuitePrEngine {
     pub fn generate_proposal(&self) -> SovereignAppPrProposalManifest {
         SovereignAppPrProposalManifest {
             pr_id: 203,
-            pr_title: "feat(office): Sovereign LibreOffice Suite Replacement (Writer/Calc/Impress/Draw)".to_string(),
+            pr_title:
+                "feat(office): Sovereign LibreOffice Suite Replacement (Writer/Calc/Impress/Draw)"
+                    .to_string(),
             target_app_category: "Office & Productivity Suites".to_string(),
             replaced_applications: vec![
                 "LibreOffice (Writer, Calc, Impress, Draw, Math)".to_string(),
@@ -304,8 +313,10 @@ impl SovereignLibreOfficeSuitePrEngine {
                 "Writer typography engine with real-time spellcheck and tracking".to_string(),
                 "Impress presentation slide animator & Math LaTeX renderer".to_string(),
             ],
-            performance_advantage: "10x Faster File Load, 95% Reduced Startup Time (<8ms cold boot)".to_string(),
-            zero_download_status: "Built-In Sovereign Replacement (No external download required)".to_string(),
+            performance_advantage:
+                "10x Faster File Load, 95% Reduced Startup Time (<8ms cold boot)".to_string(),
+            zero_download_status: "Built-In Sovereign Replacement (No external download required)"
+                .to_string(),
         }
     }
 }
@@ -354,7 +365,11 @@ impl SovereignTextEditorsPrEngine {
         };
 
         engine.open_buffer("config.rs", SovereignEditorEmulationMode::VimModal, 350);
-        engine.open_buffer("notes.org", SovereignEditorEmulationMode::EmacsLispOrgMode, 120);
+        engine.open_buffer(
+            "notes.org",
+            SovereignEditorEmulationMode::EmacsLispOrgMode,
+            120,
+        );
         engine
     }
 
@@ -477,7 +492,8 @@ impl SovereignRasterGraphicsPrEngine {
     pub fn generate_proposal(&self) -> SovereignAppPrProposalManifest {
         SovereignAppPrProposalManifest {
             pr_id: 205,
-            pr_title: "feat(gimp): Sovereign GIMP Raster Graphics & Image Studio Replacement".to_string(),
+            pr_title: "feat(gimp): Sovereign GIMP Raster Graphics & Image Studio Replacement"
+                .to_string(),
             target_app_category: "Image Editing & Digital Illustration".to_string(),
             replaced_applications: vec![
                 "GIMP (GNU Image Manipulation Program)".to_string(),
@@ -494,11 +510,14 @@ impl SovereignRasterGraphicsPrEngine {
             components_added: vec![
                 "SigmaGraphicsImageStudioEngine SIMD-accelerated canvas compositor".to_string(),
                 "GEGL-inspired non-destructive filter pipeline & color curves manager".to_string(),
-                "Selection mask, vector paths, and brush engine with pen pressure support".to_string(),
+                "Selection mask, vector paths, and brush engine with pen pressure support"
+                    .to_string(),
                 "Multi-format I/O for PNG, JPEG, WebP, SVG, and native XCF/SIGMA-IMG".to_string(),
             ],
-            performance_advantage: "Hardware-Accelerated 60 FPS Canvas Zoom/Pan, 70% Less Memory".to_string(),
-            zero_download_status: "Built-In Sovereign Replacement (No external download required)".to_string(),
+            performance_advantage: "Hardware-Accelerated 60 FPS Canvas Zoom/Pan, 70% Less Memory"
+                .to_string(),
+            zero_download_status: "Built-In Sovereign Replacement (No external download required)"
+                .to_string(),
         }
     }
 }
@@ -543,7 +562,9 @@ impl SovereignDocumentViewerPrEngine {
     pub fn generate_proposal(&self) -> SovereignAppPrProposalManifest {
         SovereignAppPrProposalManifest {
             pr_id: 206,
-            pr_title: "feat(evince): Sovereign Evince PDF & Multi-Format Document Reader Replacement".to_string(),
+            pr_title:
+                "feat(evince): Sovereign Evince PDF & Multi-Format Document Reader Replacement"
+                    .to_string(),
             target_app_category: "Document & PDF Viewers".to_string(),
             replaced_applications: vec![
                 "GNOME Evince".to_string(),
@@ -563,8 +584,10 @@ impl SovereignDocumentViewerPrEngine {
                 "Interactive document annotation layer (sticky notes, text highlights)".to_string(),
                 "Direct print subsystem integration and EPUB/CBR comic book reader".to_string(),
             ],
-            performance_advantage: "Sub-10ms Page Render, Zero-Lag 4K Continuous Scrolling".to_string(),
-            zero_download_status: "Built-In Sovereign Replacement (No external download required)".to_string(),
+            performance_advantage: "Sub-10ms Page Render, Zero-Lag 4K Continuous Scrolling"
+                .to_string(),
+            zero_download_status: "Built-In Sovereign Replacement (No external download required)"
+                .to_string(),
         }
     }
 }
@@ -581,9 +604,9 @@ impl Default for SovereignDocumentViewerPrEngine {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FileManagerLayout {
-    SpatialSingleWindow,   // GNOME Nautilus spatial mode
-    DualPaneSplitView,     // KDE Dolphin F3 split / Midnight Commander
-    TabbedGridDetails,     // XFCE Thunar / PCManFM grid
+    SpatialSingleWindow, // GNOME Nautilus spatial mode
+    DualPaneSplitView,   // KDE Dolphin F3 split / Midnight Commander
+    TabbedGridDetails,   // XFCE Thunar / PCManFM grid
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -618,7 +641,8 @@ impl SovereignFileManagerMatrixPrEngine {
     }
 
     pub fn mount_location(&mut self, path: &str, protocol: VfsMountProtocol) {
-        self.mounted_vfs_locations.insert(path.to_string(), protocol);
+        self.mounted_vfs_locations
+            .insert(path.to_string(), protocol);
     }
 
     pub fn generate_proposal(&self) -> SovereignAppPrProposalManifest {
@@ -1254,8 +1278,12 @@ mod tests {
 
         let proposal = engine.generate_proposal();
         assert_eq!(proposal.pr_id, 201);
-        assert!(proposal.replaced_applications.contains(&"Mozilla Firefox".to_string()));
-        assert!(proposal.replaced_applications.contains(&"Google Chromium".to_string()));
+        assert!(proposal
+            .replaced_applications
+            .contains(&"Mozilla Firefox".to_string()));
+        assert!(proposal
+            .replaced_applications
+            .contains(&"Google Chromium".to_string()));
     }
 
     #[test]
@@ -1274,7 +1302,9 @@ mod tests {
 
         let proposal = engine.generate_proposal();
         assert_eq!(proposal.pr_id, 202);
-        assert!(proposal.replaced_applications.contains(&"Mozilla Thunderbird".to_string()));
+        assert!(proposal
+            .replaced_applications
+            .contains(&"Mozilla Thunderbird".to_string()));
     }
 
     #[test]
@@ -1284,7 +1314,9 @@ mod tests {
 
         let proposal = engine.generate_proposal();
         assert_eq!(proposal.pr_id, 203);
-        assert!(proposal.replaced_applications.contains(&"LibreOffice (Writer, Calc, Impress, Draw, Math)".to_string()));
+        assert!(proposal
+            .replaced_applications
+            .contains(&"LibreOffice (Writer, Calc, Impress, Draw, Math)".to_string()));
     }
 
     #[test]
@@ -1292,14 +1324,22 @@ mod tests {
         let mut engine = SovereignTextEditorsPrEngine::new();
         assert_eq!(engine.buffers.len(), 2);
 
-        let buf_id = engine.open_buffer("main.c", SovereignEditorEmulationMode::NanoSimpleKeybindings, 80);
+        let buf_id = engine.open_buffer(
+            "main.c",
+            SovereignEditorEmulationMode::NanoSimpleKeybindings,
+            80,
+        );
         assert_eq!(buf_id, 3);
 
         let proposal = engine.generate_proposal();
         assert_eq!(proposal.pr_id, 204);
         assert!(proposal.replaced_applications.contains(&"Vim".to_string()));
-        assert!(proposal.replaced_applications.contains(&"Neovim".to_string()));
-        assert!(proposal.replaced_applications.contains(&"GNU Emacs".to_string()));
+        assert!(proposal
+            .replaced_applications
+            .contains(&"Neovim".to_string()));
+        assert!(proposal
+            .replaced_applications
+            .contains(&"GNU Emacs".to_string()));
         assert!(proposal.replaced_applications.contains(&"nano".to_string()));
     }
 
@@ -1313,7 +1353,9 @@ mod tests {
 
         let proposal = engine.generate_proposal();
         assert_eq!(proposal.pr_id, 205);
-        assert!(proposal.replaced_applications.contains(&"GIMP (GNU Image Manipulation Program)".to_string()));
+        assert!(proposal
+            .replaced_applications
+            .contains(&"GIMP (GNU Image Manipulation Program)".to_string()));
     }
 
     #[test]
@@ -1323,7 +1365,9 @@ mod tests {
 
         let proposal = engine.generate_proposal();
         assert_eq!(proposal.pr_id, 206);
-        assert!(proposal.replaced_applications.contains(&"GNOME Evince".to_string()));
+        assert!(proposal
+            .replaced_applications
+            .contains(&"GNOME Evince".to_string()));
     }
 
     #[test]
@@ -1336,10 +1380,18 @@ mod tests {
 
         let proposal = engine.generate_proposal();
         assert_eq!(proposal.pr_id, 207);
-        assert!(proposal.replaced_applications.contains(&"GNOME Nautilus".to_string()));
-        assert!(proposal.replaced_applications.contains(&"KDE Dolphin".to_string()));
-        assert!(proposal.replaced_applications.contains(&"XFCE Thunar".to_string()));
-        assert!(proposal.replaced_applications.contains(&"LXDE/LXQt PCManFM".to_string()));
+        assert!(proposal
+            .replaced_applications
+            .contains(&"GNOME Nautilus".to_string()));
+        assert!(proposal
+            .replaced_applications
+            .contains(&"KDE Dolphin".to_string()));
+        assert!(proposal
+            .replaced_applications
+            .contains(&"XFCE Thunar".to_string()));
+        assert!(proposal
+            .replaced_applications
+            .contains(&"LXDE/LXQt PCManFM".to_string()));
     }
 
     #[test]
@@ -1349,8 +1401,12 @@ mod tests {
 
         let proposal = engine.generate_proposal();
         assert_eq!(proposal.pr_id, 208);
-        assert!(proposal.replaced_applications.contains(&"Alacritty".to_string()));
-        assert!(proposal.replaced_applications.contains(&"Kitty".to_string()));
+        assert!(proposal
+            .replaced_applications
+            .contains(&"Alacritty".to_string()));
+        assert!(proposal
+            .replaced_applications
+            .contains(&"Kitty".to_string()));
         assert!(proposal.replaced_applications.contains(&"tmux".to_string()));
     }
 
@@ -1361,8 +1417,12 @@ mod tests {
 
         let proposal = engine.generate_proposal();
         assert_eq!(proposal.pr_id, 209);
-        assert!(proposal.replaced_applications.contains(&"VLC Media Player".to_string()));
-        assert!(proposal.replaced_applications.contains(&"Audacity".to_string()));
+        assert!(proposal
+            .replaced_applications
+            .contains(&"VLC Media Player".to_string()));
+        assert!(proposal
+            .replaced_applications
+            .contains(&"Audacity".to_string()));
     }
 
     #[test]
@@ -1372,7 +1432,9 @@ mod tests {
 
         let proposal = engine.generate_proposal();
         assert_eq!(proposal.pr_id, 210);
-        assert!(proposal.replaced_applications.contains(&"KeePassXC".to_string()));
+        assert!(proposal
+            .replaced_applications
+            .contains(&"KeePassXC".to_string()));
     }
 
     #[test]
@@ -1392,9 +1454,15 @@ mod tests {
 
         let proposal = engine.generate_proposal();
         assert_eq!(proposal.pr_id, 212);
-        assert!(proposal.replaced_applications.contains(&"Transmission".to_string()));
-        assert!(proposal.replaced_applications.contains(&"Deluge".to_string()));
-        assert!(proposal.replaced_applications.contains(&"qBittorrent".to_string()));
+        assert!(proposal
+            .replaced_applications
+            .contains(&"Transmission".to_string()));
+        assert!(proposal
+            .replaced_applications
+            .contains(&"Deluge".to_string()));
+        assert!(proposal
+            .replaced_applications
+            .contains(&"qBittorrent".to_string()));
     }
 
     #[test]
@@ -1404,9 +1472,15 @@ mod tests {
 
         let proposal = engine.generate_proposal();
         assert_eq!(proposal.pr_id, 213);
-        assert!(proposal.replaced_applications.contains(&"HexChat".to_string()));
-        assert!(proposal.replaced_applications.contains(&"Element (Matrix)".to_string()));
-        assert!(proposal.replaced_applications.contains(&"WeeChat".to_string()));
+        assert!(proposal
+            .replaced_applications
+            .contains(&"HexChat".to_string()));
+        assert!(proposal
+            .replaced_applications
+            .contains(&"Element (Matrix)".to_string()));
+        assert!(proposal
+            .replaced_applications
+            .contains(&"WeeChat".to_string()));
     }
 
     #[test]
@@ -1416,8 +1490,12 @@ mod tests {
 
         let proposal = engine.generate_proposal();
         assert_eq!(proposal.pr_id, 214);
-        assert!(proposal.replaced_applications.contains(&"KDE Ark".to_string()));
-        assert!(proposal.replaced_applications.contains(&"GNOME File Roller".to_string()));
+        assert!(proposal
+            .replaced_applications
+            .contains(&"KDE Ark".to_string()));
+        assert!(proposal
+            .replaced_applications
+            .contains(&"GNOME File Roller".to_string()));
     }
 
     #[test]
@@ -1427,8 +1505,12 @@ mod tests {
 
         let proposal = engine.generate_proposal();
         assert_eq!(proposal.pr_id, 215);
-        assert!(proposal.replaced_applications.contains(&"GParted".to_string()));
-        assert!(proposal.replaced_applications.contains(&"GNOME Disks (gnome-disk-utility)".to_string()));
+        assert!(proposal
+            .replaced_applications
+            .contains(&"GParted".to_string()));
+        assert!(proposal
+            .replaced_applications
+            .contains(&"GNOME Disks (gnome-disk-utility)".to_string()));
     }
 
     #[test]

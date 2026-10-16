@@ -238,18 +238,22 @@ impl UdevEudevMdevDevdDevfsEngine {
                 self.active_symlinks.push((symlink_path, target_node));
             }
             if let Some(cmd) = &rule.run_command {
-                self.executed_commands.push(format!("EXEC: {} /dev/{}", cmd, uevent.devname));
+                self.executed_commands
+                    .push(format!("EXEC: {} /dev/{}", cmd, uevent.devname));
             }
         }
 
         // Evaluate FreeBSD devd rules
         for devd_rule in &self.devd_rules {
-            if uevent.subsystem.eq_ignore_ascii_case(&devd_rule.match_subsystem)
+            if uevent
+                .subsystem
+                .eq_ignore_ascii_case(&devd_rule.match_subsystem)
                 || devd_rule.match_system == "DEVFS"
             {
                 matches_count += 1;
                 let script_exec = devd_rule.action_script.replace("%cdev", &uevent.devname);
-                self.executed_commands.push(format!("DEVD_EXEC: {}", script_exec));
+                self.executed_commands
+                    .push(format!("DEVD_EXEC: {}", script_exec));
             }
         }
 
@@ -257,7 +261,10 @@ impl UdevEudevMdevDevdDevfsEngine {
     }
 
     /// Process legacy hotplug device event from `udev_devd_rules_mod::HotplugDeviceEvent`.
-    pub fn process_legacy_hotplug_event(&mut self, legacy_event: &udev_devd_rules_mod::HotplugDeviceEvent) -> usize {
+    pub fn process_legacy_hotplug_event(
+        &mut self,
+        legacy_event: &udev_devd_rules_mod::HotplugDeviceEvent,
+    ) -> usize {
         let action = match legacy_event.action {
             udev_devd_rules_mod::DeviceEventAction::Add => DynamicDeviceAction::Add,
             udev_devd_rules_mod::DeviceEventAction::Remove => DynamicDeviceAction::Remove,
@@ -461,7 +468,9 @@ impl AcpidPowerDaemonEngine {
     /// Generate acpid PR proposal.
     pub fn generate_proposal(&self) -> DeviceManagementPrProposalManifest {
         DeviceManagementPrProposalManifest {
-            pr_title: "feat(acpid): Implement ACPI Ring Parser & Thermal/Lid/Power Event Dispatcher".to_string(),
+            pr_title:
+                "feat(acpid): Implement ACPI Ring Parser & Thermal/Lid/Power Event Dispatcher"
+                    .to_string(),
             target_subsystem: "ACPI Power Subsystem & Thermal Daemon".to_string(),
             original_distros: "Linux acpid, FreeBSD powerd, OpenBSD apmd".to_string(),
             components_added: alloc::vec![
@@ -576,14 +585,17 @@ impl UpowerBatteryPowerEngine {
 
     /// Estimate remaining time to empty (in seconds) during discharge.
     pub fn estimate_time_to_empty_seconds(&self, dev_name: &str) -> Option<u32> {
-        self.devices.iter().find(|d| d.name == dev_name).and_then(|d| {
-            if d.state == BatteryState::Discharging && d.power_rate_w > 0.0 {
-                let hours = d.energy_now_wh / d.power_rate_w;
-                Some((hours * 3600.0) as u32)
-            } else {
-                None
-            }
-        })
+        self.devices
+            .iter()
+            .find(|d| d.name == dev_name)
+            .and_then(|d| {
+                if d.state == BatteryState::Discharging && d.power_rate_w > 0.0 {
+                    let hours = d.energy_now_wh / d.power_rate_w;
+                    Some((hours * 3600.0) as u32)
+                } else {
+                    None
+                }
+            })
     }
 
     /// Recommend Power Profile policy based on AC connection and percentage.
@@ -705,7 +717,12 @@ impl LogindElogindSessionEngine {
     }
 
     /// Delegate privileged DRI or Evdev input file descriptor to unprivileged session controller.
-    pub fn take_device_fd(&mut self, session_id: &str, dev_path: &str, caller_uid: u32) -> Result<u32, &'static str> {
+    pub fn take_device_fd(
+        &mut self,
+        session_id: &str,
+        dev_path: &str,
+        caller_uid: u32,
+    ) -> Result<u32, &'static str> {
         let session = self
             .sessions
             .iter()
@@ -725,7 +742,14 @@ impl LogindElogindSessionEngine {
     }
 
     /// Create an inhibitor lock (prevents sleep or shutdown during critical tasks like package installs).
-    pub fn create_inhibitor_lock(&mut self, lock_type: &str, who: &str, why: &str, mode: &str, pid: u32) {
+    pub fn create_inhibitor_lock(
+        &mut self,
+        lock_type: &str,
+        who: &str,
+        why: &str,
+        mode: &str,
+        pid: u32,
+    ) {
         self.inhibitors.push(LogindInhibitorLock {
             lock_type: lock_type.to_string(),
             who: who.to_string(),
@@ -741,9 +765,14 @@ impl LogindElogindSessionEngine {
     }
 
     /// Request power transition (Suspend, Reboot, etc.).
-    pub fn request_power_transition(&self, transition: SystemPowerTransition) -> Result<&'static str, &'static str> {
+    pub fn request_power_transition(
+        &self,
+        transition: SystemPowerTransition,
+    ) -> Result<&'static str, &'static str> {
         let target_lock = match transition {
-            SystemPowerTransition::Suspend | SystemPowerTransition::Hibernate | SystemPowerTransition::HybridSleep => "sleep",
+            SystemPowerTransition::Suspend
+            | SystemPowerTransition::Hibernate
+            | SystemPowerTransition::HybridSleep => "sleep",
             SystemPowerTransition::Reboot | SystemPowerTransition::PowerOff => "shutdown",
         };
 
@@ -840,7 +869,12 @@ impl PolkitAuthorizationEngine {
     }
 
     /// Check privilege authorization for a subject caller.
-    pub fn check_authorization(&self, action_id: &str, subject: &PolkitSubject, is_active_session: bool) -> PolkitAuthResult {
+    pub fn check_authorization(
+        &self,
+        action_id: &str,
+        subject: &PolkitSubject,
+        is_active_session: bool,
+    ) -> PolkitAuthResult {
         if subject.uid == 0 {
             return PolkitAuthResult::Yes; // Root is always authorized
         }
@@ -955,8 +989,18 @@ impl DbusSystemBusBrokerEngine {
     }
 
     /// Request well-known D-Bus bus name ownership.
-    pub fn request_bus_name(&mut self, name: &str, unique_id: &str, pid: u32, uid: u32) -> Result<(), &'static str> {
-        if self.registered_names.iter().any(|n| n.well_known_name == name) {
+    pub fn request_bus_name(
+        &mut self,
+        name: &str,
+        unique_id: &str,
+        pid: u32,
+        uid: u32,
+    ) -> Result<(), &'static str> {
+        if self
+            .registered_names
+            .iter()
+            .any(|n| n.well_known_name == name)
+        {
             return Err("Name already owned");
         }
 
@@ -974,7 +1018,9 @@ impl DbusSystemBusBrokerEngine {
         let routed = match msg.msg_type {
             DbusMessageType::MethodCall => {
                 if let Some(dest) = &msg.destination {
-                    self.registered_names.iter().any(|n| n.well_known_name == *dest || n.owner_unique_id == *dest)
+                    self.registered_names
+                        .iter()
+                        .any(|n| n.well_known_name == *dest || n.owner_unique_id == *dest)
                 } else {
                     false
                 }
@@ -1059,8 +1105,14 @@ impl SovereignDeviceManagementParityPrGateway {
         for (idx, p) in proposals.iter().enumerate() {
             md.push_str(&format!("### PR #{}: {}\n", 1001 + idx, p.pr_title));
             md.push_str(&format!("- **Target Subsystem**: {}\n", p.target_subsystem));
-            md.push_str(&format!("- **Original Distros & Subsystems**: {}\n", p.original_distros));
-            md.push_str(&format!("- **Performance Impact**: {}\n", p.performance_multiplier));
+            md.push_str(&format!(
+                "- **Original Distros & Subsystems**: {}\n",
+                p.original_distros
+            ));
+            md.push_str(&format!(
+                "- **Performance Impact**: {}\n",
+                p.performance_multiplier
+            ));
             md.push_str(&format!("- **Status**: {}\n", p.status));
             md.push_str("- **Key Components Added**:\n");
             for comp in &p.components_added {
@@ -1098,7 +1150,10 @@ mod tests {
 
         let matches = engine.process_uevent(&nvme_event);
         assert!(matches >= 1);
-        assert!(engine.active_symlinks.iter().any(|(s, _)| s.contains("disk/by-id/nvme-drive-nvme0n1")));
+        assert!(engine
+            .active_symlinks
+            .iter()
+            .any(|(s, _)| s.contains("disk/by-id/nvme-drive-nvme0n1")));
 
         // Test legacy hotplug bridge
         let legacy_evt = udev_devd_rules_mod::HotplugDeviceEvent {
@@ -1125,13 +1180,18 @@ mod tests {
     fn test_acpid_event_parsing_and_dispatch() {
         let mut acpid = AcpidPowerDaemonEngine::new();
 
-        let parsed = acpid.parse_acpi_event_line("button/power PWRF 00000080 00000000").unwrap();
+        let parsed = acpid
+            .parse_acpi_event_line("button/power PWRF 00000080 00000000")
+            .unwrap();
         assert_eq!(parsed.kind, AcpiEventKind::PowerButton);
         assert_eq!(parsed.device_class, "button/power");
 
         let handled = acpid.dispatch_event(&parsed);
         assert!(handled);
-        assert!(acpid.handled_events.iter().any(|e| e.contains("powerbtn.sh")));
+        assert!(acpid
+            .handled_events
+            .iter()
+            .any(|e| e.contains("powerbtn.sh")));
     }
 
     #[test]
@@ -1152,11 +1212,19 @@ mod tests {
     fn test_logind_session_fd_passing_and_inhibitor() {
         let mut logind = LogindElogindSessionEngine::new();
 
-        let fd = logind.take_device_fd("session-1", "/dev/dri/card0", 1000).unwrap();
+        let fd = logind
+            .take_device_fd("session-1", "/dev/dri/card0", 1000)
+            .unwrap();
         assert!(fd >= 10);
 
         // Test inhibitor lock
-        logind.create_inhibitor_lock("sleep", "package-manager", "Installing updates", "delay", 1234);
+        logind.create_inhibitor_lock(
+            "sleep",
+            "package-manager",
+            "Installing updates",
+            "delay",
+            1234,
+        );
 
         let power_res = logind.request_power_transition(SystemPowerTransition::Suspend);
         assert!(power_res.is_err()); // Blocked by inhibitor
@@ -1166,14 +1234,20 @@ mod tests {
     fn test_polkit_privilege_checks() {
         let polkit = PolkitAuthorizationEngine::new();
 
-        let subject = PolkitSubject { pid: 4321, uid: 1000, session_id: "session-1".to_string() };
+        let subject = PolkitSubject {
+            pid: 4321,
+            uid: 1000,
+            session_id: "session-1".to_string(),
+        };
 
         // Active session mounting is allowed ('Yes')
-        let auth_active = polkit.check_authorization("org.freedesktop.udisks2.filesystem-mount", &subject, true);
+        let auth_active =
+            polkit.check_authorization("org.freedesktop.udisks2.filesystem-mount", &subject, true);
         assert_eq!(auth_active, PolkitAuthResult::Yes);
 
         // Inactive session mounting requires admin auth ('AuthAdmin')
-        let auth_inactive = polkit.check_authorization("org.freedesktop.udisks2.filesystem-mount", &subject, false);
+        let auth_inactive =
+            polkit.check_authorization("org.freedesktop.udisks2.filesystem-mount", &subject, false);
         assert_eq!(auth_inactive, PolkitAuthResult::AuthAdmin);
     }
 

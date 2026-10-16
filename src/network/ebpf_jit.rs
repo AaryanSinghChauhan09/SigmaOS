@@ -78,12 +78,12 @@ impl EbpfJitCompiler {
 
         // 1. Prologue: push rbp; mov rbp, rsp; push rbx; push r13; push r14; push r15
         self.code.extend_from_slice(&[
-            0x55,                   // push rbp
-            0x48, 0x89, 0xE5,       // mov rbp, rsp
-            0x53,                   // push rbx
-            0x41, 0x55,             // push r13
-            0x41, 0x56,             // push r14
-            0x41, 0x57,             // push r15
+            0x55, // push rbp
+            0x48, 0x89, 0xE5, // mov rbp, rsp
+            0x53, // push rbx
+            0x41, 0x55, // push r13
+            0x41, 0x56, // push r14
+            0x41, 0x57, // push r15
         ]);
 
         for inst in instructions {
@@ -115,12 +115,12 @@ impl EbpfJitCompiler {
                         // mov rax, r0 (return value in rax)
                         // Epilogue: pop r15; pop r14; pop r13; pop rbx; leave; ret
                         self.code.extend_from_slice(&[
-                            0x41, 0x5F,       // pop r15
-                            0x41, 0x5E,       // pop r14
-                            0x41, 0x5D,       // pop r13
-                            0x5B,             // pop rbx
-                            0xC9,             // leave
-                            0xC3,             // ret
+                            0x41, 0x5F, // pop r15
+                            0x41, 0x5E, // pop r14
+                            0x41, 0x5D, // pop r13
+                            0x5B, // pop rbx
+                            0xC9, // leave
+                            0xC3, // ret
                         ]);
                     }
                 }

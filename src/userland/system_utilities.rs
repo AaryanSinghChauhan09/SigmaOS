@@ -812,7 +812,10 @@ impl MkdirEngine {
             }
 
             if parents {
-                stdout.push_str(&format!("mkdir: created directory parent chain for '{}'\n", path));
+                stdout.push_str(&format!(
+                    "mkdir: created directory parent chain for '{}'\n",
+                    path
+                ));
             } else {
                 stdout.push_str(&format!("mkdir: created directory '{}'\n", path));
             }
@@ -918,7 +921,10 @@ pub struct PeriodicTaskRecord {
 pub struct PeriodicRunnerEngine;
 
 impl PeriodicRunnerEngine {
-    pub fn run(group_filter: Option<PeriodicTaskGroup>, service_available: bool) -> SystemUtilityOutput {
+    pub fn run(
+        group_filter: Option<PeriodicTaskGroup>,
+        service_available: bool,
+    ) -> SystemUtilityOutput {
         if !service_available {
             return SystemUtilityOutput::failure(
                 EXIT_FAILURE,
@@ -949,11 +955,14 @@ impl PeriodicRunnerEngine {
                 name: "100.security_permissions_audit".to_string(),
                 group: PeriodicTaskGroup::Security,
                 result: PeriodicTaskResult::Pass,
-                summary: "No unauthorized SUID binaries or world-writable system files detected".to_string(),
+                summary: "No unauthorized SUID binaries or world-writable system files detected"
+                    .to_string(),
             },
         ];
 
-        let mut stdout = String::from("SigmaOS Periodic Maintenance Report\n====================================\n");
+        let mut stdout = String::from(
+            "SigmaOS Periodic Maintenance Report\n====================================\n",
+        );
         let mut executed_count = 0;
 
         for task in &tasks {

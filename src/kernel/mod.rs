@@ -63,8 +63,8 @@ pub mod performance;
 pub mod pipes;
 pub mod policy_mechanism;
 pub mod process;
-pub mod thread;
 pub mod roundrobin;
+pub mod thread;
 
 pub use thread::*;
 pub mod sched;
@@ -231,41 +231,39 @@ pub use module_tools::{
 };
 pub use procfs_linux::{ProcFs, ProcessInfo};
 pub use sysfs_manager::{Sysfs, SysfsAttribute, SysfsKobject};
+pub mod cpu_frequency;
+pub mod event_notification;
 pub mod msgqueue;
+pub mod msi_routing;
 pub mod shm;
 pub mod shm_anon;
-pub mod event_notification;
-pub mod msi_routing;
 pub mod timekeeping;
-pub mod cpu_frequency;
-pub use shm_anon::{
-    ShmAnonMapping, ShmAnonManager, init_shm_anon, get_shm_anon_manager,
-    shm_open, shm_close, shm_unlink, mmap_shm, munmap_shm,
+pub use cpu_frequency::{
+    get_cpu_frequency_manager, init_cpu_frequency_manager, CpuFrequencyController,
+    CpuFrequencyManager, CpuGovernor,
 };
 pub use event_notification::{
-    EpollEvent as KEpollEvent, EpollEventFlags, EpollInstance, EpollOp,
-    KqueueEvent, KqueueEventFlags, KqueueFilter, KqueueInstance,
-    EventNotificationManager, init_event_manager, get_event_manager,
+    get_event_manager, init_event_manager, EpollEvent as KEpollEvent, EpollEventFlags,
+    EpollInstance, EpollOp, EventNotificationManager, KqueueEvent, KqueueEventFlags, KqueueFilter,
+    KqueueInstance,
 };
 pub use msi_routing::{
-    MsiCapabilityHeader, MsixCapability, MsiVector, MsixTableEntry,
-    MsiConfig, MsixConfig, MsiRoutingEngine, init_msi_routing, get_msi_routing_engine,
+    get_msi_routing_engine, init_msi_routing, MsiCapabilityHeader, MsiConfig, MsiRoutingEngine,
+    MsiVector, MsixCapability, MsixConfig, MsixTableEntry,
+};
+pub use shm_anon::{
+    get_shm_anon_manager, init_shm_anon, mmap_shm, munmap_shm, shm_close, shm_open, shm_unlink,
+    ShmAnonManager, ShmAnonMapping,
 };
 pub use timekeeping::{
-    Timekeeper, ClockSource, ClockQuality, HighResTimer, TimerManager,
-    init_timekeeping, get_timekeeper, get_timer_manager,
-    get_current_time, get_current_time_seconds,
+    get_current_time, get_current_time_seconds, get_timekeeper, get_timer_manager,
+    init_timekeeping, ClockQuality, ClockSource, HighResTimer, Timekeeper, TimerManager,
 };
-pub use cpu_frequency::{
-    CpuGovernor, CpuFrequencyController, CpuFrequencyManager,
-    init_cpu_frequency_manager, get_cpu_frequency_manager,
-};
-pub mod smp_load_balancer;
-pub mod wx_pte_hardening;
 pub mod crash_dump;
+pub mod hardware_firmware_subsystem;
 pub mod kasan;
 pub mod kmsan;
 pub mod serial_console;
-pub mod hardware_firmware_subsystem;
+pub mod smp_load_balancer;
 pub mod sovereign_parity_apex_v100;
-
+pub mod wx_pte_hardening;

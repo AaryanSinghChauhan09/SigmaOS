@@ -176,7 +176,12 @@ impl IppClient {
     }
 
     /// Submit a print job with document bytes.
-    pub fn print_job(&mut self, job_name: &str, mime_type: &str, document_data: Vec<u8>) -> IppMessage {
+    pub fn print_job(
+        &mut self,
+        job_name: &str,
+        mime_type: &str,
+        document_data: Vec<u8>,
+    ) -> IppMessage {
         let id = self.request_counter;
         self.request_counter += 1;
 

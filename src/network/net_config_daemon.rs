@@ -78,20 +78,20 @@ pub struct DhcpLease {
 /// DHCP packet structure (RFC 2131)
 #[repr(C)]
 pub struct DhcpPacket {
-    pub op: u8,       // 1=BOOTREQUEST, 2=BOOTREPLY
-    pub htype: u8,    // Hardware type (1=Ethernet)
-    pub hlen: u8,     // Hardware address length (6 for MAC)
-    pub hops: u8,     // Relay agent hops
-    pub xid: u32,     // Transaction ID (random)
-    pub secs: u16,    // Seconds elapsed
-    pub flags: u16,   // Broadcast flag (0x8000)
-    pub ciaddr: u32,  // Client IP (0 if requesting)
-    pub yiaddr: u32,  // 'Your' IP (server fills this)
-    pub siaddr: u32,  // Server IP
-    pub giaddr: u32,  // Relay agent IP
-    pub chaddr: [u8; 16], // Client hardware address (MAC in first 6 bytes)
-    pub sname: [u8; 64],  // Optional server hostname
-    pub file: [u8; 128],  // Boot file name
+    pub op: u8,             // 1=BOOTREQUEST, 2=BOOTREPLY
+    pub htype: u8,          // Hardware type (1=Ethernet)
+    pub hlen: u8,           // Hardware address length (6 for MAC)
+    pub hops: u8,           // Relay agent hops
+    pub xid: u32,           // Transaction ID (random)
+    pub secs: u16,          // Seconds elapsed
+    pub flags: u16,         // Broadcast flag (0x8000)
+    pub ciaddr: u32,        // Client IP (0 if requesting)
+    pub yiaddr: u32,        // 'Your' IP (server fills this)
+    pub siaddr: u32,        // Server IP
+    pub giaddr: u32,        // Relay agent IP
+    pub chaddr: [u8; 16],   // Client hardware address (MAC in first 6 bytes)
+    pub sname: [u8; 64],    // Optional server hostname
+    pub file: [u8; 128],    // Boot file name
     pub options: [u8; 308], // Options (magic cookie + option data)
 }
 
@@ -247,7 +247,11 @@ impl NetworkConfigDaemon {
     }
 
     /// Apply DNS configuration to /etc/resolv.conf
-    pub fn write_resolv_conf(&self, servers: &[[u8; 4]], domain: &str) -> Result<(), NetConfigError> {
+    pub fn write_resolv_conf(
+        &self,
+        servers: &[[u8; 4]],
+        domain: &str,
+    ) -> Result<(), NetConfigError> {
         let _ = (servers, domain);
         // Write "nameserver x.x.x.x\n" for each server
         // Write "search domain\n" if domain is non-empty
@@ -255,7 +259,12 @@ impl NetworkConfigDaemon {
     }
 
     /// Configure a Wi-Fi station connection using nl80211
-    pub fn wifi_connect(&self, interface: &str, ssid: &str, passphrase: &str) -> Result<(), NetConfigError> {
+    pub fn wifi_connect(
+        &self,
+        interface: &str,
+        ssid: &str,
+        passphrase: &str,
+    ) -> Result<(), NetConfigError> {
         let _ = (interface, ssid, passphrase);
         // 1. nl80211 NL80211_CMD_TRIGGER_SCAN
         // 2. Wait for NL80211_CMD_NEW_SCAN_RESULTS
