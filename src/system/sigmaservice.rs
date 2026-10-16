@@ -22,9 +22,9 @@ pub enum ServiceState {
     Stopped,
     /// Starting
     Starting,
-    /// Stopping,
-    /// Failed,
-    /// Reloading,
+    Stopping,
+    Failed,
+    Reloading,
 }
 
 impl fmt::Display for ServiceState {
