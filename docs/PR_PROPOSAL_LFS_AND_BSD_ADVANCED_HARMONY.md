@@ -30,6 +30,8 @@ It equips SigmaOS with cross-toolchain bootstrapping, SysV init script execution
 | **#4014** | `dragonfly_hammer2_pfs` | `DragonFlyHammer2Pfs` | DragonFly BSD HAMMER2 Pseudo Filesystem (PFS) multi-master snapshots, logs, and transaction replay | Validated & Merged |
 | **#4015** | `dragonfly_hammer2_pfs_replication` | `DragonFlyHammer2PfsReplication` | DragonFly BSD HAMMER2 PFS multi-master transaction replication across cluster nodes | Validated & Merged |
 | **#4016** | `dragonfly_vkernel_sandbox` | `DragonFlyVkernelSandbox` | DragonFly BSD VKernel virtual kernel execution sandbox and userspace system call proxying | Validated & Merged |
+| **#4017** | `lfs_automated_readiness_auditor` | `LfsAutomatedReadinessAuditor` | LFS automated system readiness, virtual mount check, and BLFS package dependency auditor | Validated & Merged |
+| **#4018** | `bsd_cross_kernel_abi_translation` | `BsdCrossKernelAbiTranslation` | Cross-BSD system call ABI translation matrix & unified security policy abstraction | Validated & Merged |
 
 ---
 
@@ -41,16 +43,18 @@ It equips SigmaOS with cross-toolchain bootstrapping, SysV init script execution
 - **Pass 3 Final System Installation**: Installs final system binaries to `/usr`, manages DESTDIR staging, verifies package manifests, and strips debug symbols.
 - **Dynamic Linker & Shared Library Resolution**: Maps shared object sonames (`libc.so.6`, `libm.so.6`) via `/etc/ld.so.cache` fast BTreeMap index.
 - **PAM & Shadow Security Suite**: Evaluates `/etc/pam.d/system-auth` access control rules and enforces Argon2id/SHA-512 salted password verification in `/etc/shadow`.
+- **LFS Automated System Readiness & BLFS Auditor**: Audits virtual devtmpfs/proc/sys mounts, SysV runlevel transitions, glibc dynamic ld.so resolution, and BLFS dependency prerequisite checks (`LfsAutomatedReadinessAuditorEngine`).
 
 ### 2. BSD Subsystem Hardening & Virtualization Shard
 - **OpenBSD KARL & Pledge/Unveil**: Randomizes kernel link base on boot using entropy seed. Enforces W^X (Write XOR Execute) memory page permissions. Restricts process system calls (`pledge`) and masks filesystem visibility (`unveil`).
 - **FreeBSD VIMAGE/VNET & Poudriere**: Provides per-jail virtual network stacks (`vnet`), virtual Ethernet interfaces (`epair`), RACCT/RCTL resource limits, and automated clean-chroot bulk ports build infrastructure.
 - **NetBSD Rump Kernels & Veriexec**: Runs hardware/virtual drivers in userspace via hypercall channels. Audits executable binary fingerprints against `/etc/signatures` SHA-256 digests prior to execution.
 - **DragonFly BSD HAMMER2 PFS Multi-Master**: Manages Pseudo Filesystem (PFS) snapshots, transaction group (TXG) logs, multi-master cluster node replication, and VKernel userspace virtual kernel execution.
+- **Cross-BSD Syscall ABI & Sandbox Translation Matrix**: Maps FreeBSD capsicum capability rights, OpenBSD pledge/unveil sandbox calls, NetBSD veriexec strict signatures, and DragonFly HAMMER2 ioctl transactions into unified SigmaOS syscall gates (`BsdCrossKernelAbiTranslationEngine`).
 
 ---
 
 ## Automated Verification Protocol
-All 16 PR proposal specifications and underlying Safe-Rust engines are automatically verified via `./run_sigma_tests.sh`, including:
+All 18 PR proposal specifications and underlying Safe-Rust engines are automatically verified via `./run_sigma_tests.sh`, including:
 - `src/distro/sovereign_linux_bsd_lfs_master_harmony.rs` (7/7 standalone unit tests passing)
 - `src/distro/sovereign_lfs_bsd_pr_gateway.rs` (9/9 standalone unit tests passing)

@@ -42,6 +42,8 @@ pub enum LfsBsdPrCategory {
     NetBsdRumpVeriexec,
     DragonFlyHammer2Pfs,
     DragonFlyVkernelSandbox,
+    LfsAutomatedReadinessAuditor,
+    BsdCrossKernelAbiTranslation,
 }
 
 impl LfsBsdPrCategory {
@@ -75,6 +77,8 @@ impl LfsBsdPrCategory {
                 "DragonFly BSD HAMMER2 PFS multi-master transaction replication"
             }
             Self::DragonFlyVkernelSandbox => "DragonFly BSD VKernel virtual kernel execution",
+            Self::LfsAutomatedReadinessAuditor => "LFS automated system readiness & BLFS dependency auditor",
+            Self::BsdCrossKernelAbiTranslation => "Cross-BSD system call ABI & sandbox translation matrix",
         }
     }
 }
@@ -176,6 +180,16 @@ impl SovereignLfsBsdPrGateway {
                 LfsBsdPrCategory::DragonFlyVkernelSandbox,
                 "dragonfly_vkernel_sandbox",
             ),
+            (
+                "feat(lfs): LFS automated system readiness & BLFS package dependency auditor",
+                LfsBsdPrCategory::LfsAutomatedReadinessAuditor,
+                "lfs_automated_readiness_auditor",
+            ),
+            (
+                "feat(bsd): Cross-BSD system call ABI and security policy translation matrix",
+                LfsBsdPrCategory::BsdCrossKernelAbiTranslation,
+                "bsd_cross_kernel_abi_translation",
+            ),
         ];
 
         for (title, cat, target_sub) in definitions {
@@ -266,6 +280,12 @@ impl SovereignLfsBsdPrGateway {
             .build_all_queued_ports();
         assert_eq!(built, 1);
 
+        // 7. Verify LFS readiness auditor
+        assert!(self.master_harmony.lfs_readiness_auditor.audit_system_readiness());
+
+        // 8. Verify BSD cross-kernel ABI translator
+        assert!(self.master_harmony.bsd_abi_translator.audit_abi_coverage() >= 4);
+
         true
     }
 
@@ -291,13 +311,21 @@ mod tests {
     #[test]
     fn test_lfs_bsd_pr_gateway_staging() {
         let gateway = SovereignLfsBsdPrGateway::new();
-        assert_eq!(gateway.get_merged_pr_count(), 10);
+        assert_eq!(gateway.get_merged_pr_count(), 18);
 
         let diff = gateway.generate_pr_diff_patch(4001);
         assert!(diff.is_some());
         let diff_str = diff.unwrap();
         assert!(diff_str.contains("PR #4001"));
         assert!(diff_str.contains("lfs_toolchain_bootstrap"));
+
+        let diff_auditor = gateway.generate_pr_diff_patch(4017);
+        assert!(diff_auditor.is_some());
+        assert!(diff_auditor.unwrap().contains("PR #4017"));
+
+        let diff_abi = gateway.generate_pr_diff_patch(4018);
+        assert!(diff_abi.is_some());
+        assert!(diff_abi.unwrap().contains("PR #4018"));
     }
 
     #[test]
