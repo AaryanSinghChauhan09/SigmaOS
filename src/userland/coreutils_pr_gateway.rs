@@ -66,9 +66,15 @@ impl GnuCoreutilsBsdUserlandEngine {
     pub fn octal_to_symbolic_mode(mode: u32, is_dir: bool) -> String {
         let type_char = if is_dir { 'd' } else { '-' };
         let perms = [
-            (0o400, 'r'), (0o200, 'w'), (0o100, 'x'),
-            (0o040, 'r'), (0o020, 'w'), (0o010, 'x'),
-            (0o004, 'r'), (0o002, 'w'), (0o001, 'x'),
+            (0o400, 'r'),
+            (0o200, 'w'),
+            (0o100, 'x'),
+            (0o040, 'r'),
+            (0o020, 'w'),
+            (0o010, 'x'),
+            (0o004, 'r'),
+            (0o002, 'w'),
+            (0o001, 'x'),
         ];
         let mut res = String::with_capacity(10);
         res.push(type_char);
@@ -82,7 +88,10 @@ impl GnuCoreutilsBsdUserlandEngine {
         res
     }
 
-    pub fn symbolic_to_octal_mode(current_mode: u32, symbol_expr: &str) -> Result<u32, &'static str> {
+    pub fn symbolic_to_octal_mode(
+        current_mode: u32,
+        symbol_expr: &str,
+    ) -> Result<u32, &'static str> {
         let mut mode = current_mode & 0o777;
         if symbol_expr.contains("u+x") {
             mode |= 0o100;
@@ -116,7 +125,12 @@ impl GnuCoreutilsBsdUserlandEngine {
         output
     }
 
-    pub fn run_ls(&self, entries: &[CoreUtilityFileInfo], long_format: bool, show_all: bool) -> Vec<String> {
+    pub fn run_ls(
+        &self,
+        entries: &[CoreUtilityFileInfo],
+        long_format: bool,
+        show_all: bool,
+    ) -> Vec<String> {
         let mut result = Vec::new();
 
         for entry in entries {
@@ -141,14 +155,27 @@ impl GnuCoreutilsBsdUserlandEngine {
     pub fn run_head_tail(&self, content: &str, lines_count: usize, is_head: bool) -> Vec<String> {
         let lines: Vec<&str> = content.lines().collect();
         if is_head {
-            lines.into_iter().take(lines_count).map(|s| s.to_string()).collect()
+            lines
+                .into_iter()
+                .take(lines_count)
+                .map(|s| s.to_string())
+                .collect()
         } else {
             let skip_count = lines.len().saturating_sub(lines_count);
-            lines.into_iter().skip(skip_count).map(|s| s.to_string()).collect()
+            lines
+                .into_iter()
+                .skip(skip_count)
+                .map(|s| s.to_string())
+                .collect()
         }
     }
 
-    pub fn run_head_tail_bytes(&self, content: &[u8], bytes_count: usize, is_head: bool) -> Vec<u8> {
+    pub fn run_head_tail_bytes(
+        &self,
+        content: &[u8],
+        bytes_count: usize,
+        is_head: bool,
+    ) -> Vec<u8> {
         if is_head {
             content.iter().take(bytes_count).copied().collect()
         } else {
@@ -212,7 +239,10 @@ impl GnuCoreutilsBsdUserlandEngine {
 
     pub fn run_df(&self, mounts: &[FilesystemUsageSpec]) -> Vec<String> {
         let mut out = Vec::new();
-        out.push(format!("{:<15} {:>10} {:>10} {:>10} {:>5} {}", "Filesystem", "1K-blocks", "Used", "Available", "Use%", "Mounted on"));
+        out.push(format!(
+            "{:<15} {:>10} {:>10} {:>10} {:>5} {}",
+            "Filesystem", "1K-blocks", "Used", "Available", "Use%", "Mounted on"
+        ));
         for m in mounts {
             let pct = if m.total_blocks > 0 {
                 (m.used_blocks * 100) / m.total_blocks
@@ -229,7 +259,10 @@ impl GnuCoreutilsBsdUserlandEngine {
 
     pub fn run_df_human(&self, mounts: &[FilesystemUsageSpec]) -> Vec<String> {
         let mut out = Vec::new();
-        out.push(format!("{:<15} {:>8} {:>8} {:>8} {:>5} {}", "Filesystem", "Size", "Used", "Avail", "Use%", "Mounted on"));
+        out.push(format!(
+            "{:<15} {:>8} {:>8} {:>8} {:>5} {}",
+            "Filesystem", "Size", "Used", "Avail", "Use%", "Mounted on"
+        ));
         for m in mounts {
             let pct = if m.total_blocks > 0 {
                 (m.used_blocks * 100) / m.total_blocks
@@ -257,15 +290,26 @@ impl GnuCoreutilsBsdUserlandEngine {
     }
 
     pub fn run_chown(&self, path: &str, owner: &str, group: &str) -> String {
-        format!("chown: ownership of '{}' changed to {}:{}", path, owner, group)
+        format!(
+            "chown: ownership of '{}' changed to {}:{}",
+            path, owner, group
+        )
     }
 
     pub fn run_touch(&self, path: &str, create_if_missing: bool) -> String {
-        format!("touch: updated timestamp for '{}' (create={})", path, create_if_missing)
+        format!(
+            "touch: updated timestamp for '{}' (create={})",
+            path, create_if_missing
+        )
     }
 
     pub fn run_mkdir(&self, path: &str, create_parents: bool, mode: u32) -> String {
-        format!("mkdir: created directory '{}' (parents={}, mode={:04o})", path, create_parents, mode & 0o7777)
+        format!(
+            "mkdir: created directory '{}' (parents={}, mode={:04o})",
+            path,
+            create_parents,
+            mode & 0o7777
+        )
     }
 
     pub fn run_du(&self, entries: &[CoreUtilityFileInfo], summary_only: bool) -> Vec<String> {
@@ -283,7 +327,13 @@ impl GnuCoreutilsBsdUserlandEngine {
         results
     }
 
-    pub fn run_sort(&self, lines: &[&str], numeric: bool, reverse: bool, unique: bool) -> Vec<String> {
+    pub fn run_sort(
+        &self,
+        lines: &[&str],
+        numeric: bool,
+        reverse: bool,
+        unique: bool,
+    ) -> Vec<String> {
         let mut list: Vec<String> = lines.iter().map(|s| s.to_string()).collect();
         if numeric {
             list.sort_by(|a, b| {
@@ -324,7 +374,11 @@ impl GnuCoreutilsBsdUserlandEngine {
         }
     }
 
-    pub fn run_env(&self, vars: &BTreeMap<String, String>, filter_prefix: Option<&str>) -> Vec<String> {
+    pub fn run_env(
+        &self,
+        vars: &BTreeMap<String, String>,
+        filter_prefix: Option<&str>,
+    ) -> Vec<String> {
         vars.iter()
             .filter(|(k, _)| {
                 if let Some(prefix) = filter_prefix {
@@ -400,7 +454,12 @@ impl BusyBoxMulticallEngine {
     pub fn generate_symlinks(&self, install_dir: &str) -> Vec<(String, String)> {
         self.applets
             .keys()
-            .map(|applet_name| (format!("{}/{}", install_dir, applet_name), "busybox".to_string()))
+            .map(|applet_name| {
+                (
+                    format!("{}/{}", install_dir, applet_name),
+                    "busybox".to_string(),
+                )
+            })
             .collect()
     }
 
@@ -421,7 +480,11 @@ impl BusyBoxMulticallEngine {
         }
     }
 
-    pub fn run_applet_sandboxed(&self, applet_name: &str, memory_limit_mb: usize) -> Result<String, String> {
+    pub fn run_applet_sandboxed(
+        &self,
+        applet_name: &str,
+        memory_limit_mb: usize,
+    ) -> Result<String, String> {
         if let Some(applet) = self.applets.get(applet_name) {
             if !applet.is_enabled {
                 return Err(format!("Applet '{}' is disabled", applet_name));
@@ -550,7 +613,10 @@ impl UtilLinuxSubsystemEngine {
         let mut map = BTreeMap::new();
         map.insert("Architecture".to_string(), "x86_64".to_string());
         map.insert("CPU(s)".to_string(), "16".to_string());
-        map.insert("Model name".to_string(), "Sovereign Ultra-Core Processor".to_string());
+        map.insert(
+            "Model name".to_string(),
+            "Sovereign Ultra-Core Processor".to_string(),
+        );
         map.insert("L3 cache".to_string(), "32 MiB".to_string());
         map.insert("NUMA node(s)".to_string(), "2".to_string());
         map
@@ -586,7 +652,10 @@ impl UtilLinuxSubsystemEngine {
     }
 
     pub fn run_mount_status(&self, target: &str) -> String {
-        format!("{} on / type btrfs (rw,relatime,ssd,space_cache=v2,subvolid=256,subvol=/@)", target)
+        format!(
+            "{} on / type btrfs (rw,relatime,ssd,space_cache=v2,subvolid=256,subvol=/@)",
+            target
+        )
     }
 
     pub fn run_chrt_taskset(&self, pid: u32, policy: &str, priority: u32, cpu_mask: u32) -> String {
@@ -604,7 +673,14 @@ impl UtilLinuxSubsystemEngine {
         ]
     }
 
-    pub fn uptime_summary(&self, uptime_secs: u64, users_count: usize, load_1: f32, load_5: f32, load_15: f32) -> String {
+    pub fn uptime_summary(
+        &self,
+        uptime_secs: u64,
+        users_count: usize,
+        load_1: f32,
+        load_5: f32,
+        load_15: f32,
+    ) -> String {
         let days = uptime_secs / 86400;
         let hours = (uptime_secs % 86400) / 3600;
         let mins = (uptime_secs % 3600) / 60;
@@ -616,8 +692,16 @@ impl UtilLinuxSubsystemEngine {
 
     pub fn lsmod_summary(&self) -> Vec<(String, usize, Vec<String>)> {
         vec![
-            ("btrfs".to_string(), 1835008, vec!["zstd_compress".to_string(), "raid6_pq".to_string()]),
-            ("zstd_compress".to_string(), 126976, vec!["btrfs".to_string()]),
+            (
+                "btrfs".to_string(),
+                1835008,
+                vec!["zstd_compress".to_string(), "raid6_pq".to_string()],
+            ),
+            (
+                "zstd_compress".to_string(),
+                126976,
+                vec!["btrfs".to_string()],
+            ),
             ("nvme".to_string(), 65536, vec!["nvme_core".to_string()]),
         ]
     }
@@ -645,7 +729,13 @@ impl FindutilsDiffutilsEngine {
         matched
     }
 
-    pub fn find_eval_predicates(&self, files: &[CoreUtilityFileInfo], name_pattern: &str, min_size: u64, is_dir_only: bool) -> Vec<String> {
+    pub fn find_eval_predicates(
+        &self,
+        files: &[CoreUtilityFileInfo],
+        name_pattern: &str,
+        min_size: u64,
+        is_dir_only: bool,
+    ) -> Vec<String> {
         let mut matched = Vec::new();
         for file in files {
             if is_dir_only && !file.is_dir {
@@ -661,7 +751,12 @@ impl FindutilsDiffutilsEngine {
         matched
     }
 
-    pub fn find_time_predicates(&self, files: &[(CoreUtilityFileInfo, u64)], mtime_days_max: Option<u64>, newer_than_ts: Option<u64>) -> Vec<String> {
+    pub fn find_time_predicates(
+        &self,
+        files: &[(CoreUtilityFileInfo, u64)],
+        mtime_days_max: Option<u64>,
+        newer_than_ts: Option<u64>,
+    ) -> Vec<String> {
         let mut matched = Vec::new();
         for (file, mtime_ts) in files {
             let mut keep = true;
@@ -748,7 +843,11 @@ impl FindutilsDiffutilsEngine {
         lines.join("\n")
     }
 
-    pub fn validate_patch_dry_run(&self, _original: &str, patch_diff: &str) -> (bool, usize, usize) {
+    pub fn validate_patch_dry_run(
+        &self,
+        _original: &str,
+        patch_diff: &str,
+    ) -> (bool, usize, usize) {
         let mut additions = 0;
         let mut deletions = 0;
         for line in patch_diff.lines() {
@@ -774,7 +873,12 @@ impl TextProcessingEngine {
         Self
     }
 
-    pub fn grep_match(&self, content: &str, pattern: &str, case_insensitive: bool) -> Vec<(usize, String)> {
+    pub fn grep_match(
+        &self,
+        content: &str,
+        pattern: &str,
+        case_insensitive: bool,
+    ) -> Vec<(usize, String)> {
         let mut matches = Vec::new();
         let pat_target = if case_insensitive {
             pattern.to_lowercase()
@@ -827,7 +931,12 @@ impl TextProcessingEngine {
         (count, lines_out)
     }
 
-    pub fn grep_match_context(&self, content: &str, pattern: &str, context_lines: usize) -> Vec<(usize, String, bool)> {
+    pub fn grep_match_context(
+        &self,
+        content: &str,
+        pattern: &str,
+        context_lines: usize,
+    ) -> Vec<(usize, String, bool)> {
         let lines: Vec<&str> = content.lines().collect();
         let mut results = Vec::new();
 
@@ -850,7 +959,12 @@ impl TextProcessingEngine {
         content.replace(target, replacement)
     }
 
-    pub fn sed_in_place_stream(&self, content: &str, target: &str, replacement: &str) -> (String, usize) {
+    pub fn sed_in_place_stream(
+        &self,
+        content: &str,
+        target: &str,
+        replacement: &str,
+    ) -> (String, usize) {
         let count = content.matches(target).count();
         let replaced = content.replace(target, replacement);
         (replaced, count)
@@ -882,7 +996,13 @@ impl TextProcessingEngine {
         results
     }
 
-    pub fn awk_process_script(&self, content: &str, field_delimiter: char, field_idx: usize, sum_column: bool) -> (Vec<String>, f64) {
+    pub fn awk_process_script(
+        &self,
+        content: &str,
+        field_delimiter: char,
+        field_idx: usize,
+        sum_column: bool,
+    ) -> (Vec<String>, f64) {
         let mut fields = Vec::new();
         let mut sum = 0.0;
 
@@ -902,7 +1022,13 @@ impl TextProcessingEngine {
         (fields, sum)
     }
 
-    pub fn awk_aggregate_by_key(&self, content: &str, key_col: usize, val_col: usize, delimiter: char) -> BTreeMap<String, f64> {
+    pub fn awk_aggregate_by_key(
+        &self,
+        content: &str,
+        key_col: usize,
+        val_col: usize,
+        delimiter: char,
+    ) -> BTreeMap<String, f64> {
         let mut totals = BTreeMap::new();
         for line in content.lines() {
             let parts: Vec<&str> = line.split(delimiter).collect();
@@ -945,13 +1071,17 @@ impl ArchivalCompressionEngine {
             CompressionFormat::Zstd
         } else if magic_bytes.len() >= 4 && magic_bytes[0..4] == [0x04, 0x22, 0x4D, 0x18] {
             CompressionFormat::Lz4
-        } else if magic_bytes.len() >= 6 && magic_bytes[0..6] == [0x37, 0x7A, 0xBC, 0xAF, 0x27, 0x1C] {
+        } else if magic_bytes.len() >= 6
+            && magic_bytes[0..6] == [0x37, 0x7A, 0xBC, 0xAF, 0x27, 0x1C]
+        {
             CompressionFormat::SevenZip
         } else if magic_bytes.len() >= 2 && magic_bytes[0..2] == [0x1F, 0x8B] {
             CompressionFormat::Gzip
         } else if magic_bytes.len() >= 3 && magic_bytes[0..3] == [b'B', b'Z', b'h'] {
             CompressionFormat::Bzip2
-        } else if magic_bytes.len() >= 6 && magic_bytes[0..6] == [0xFD, b'7', b'z', b'X', b'Z', 0x00] {
+        } else if magic_bytes.len() >= 6
+            && magic_bytes[0..6] == [0xFD, b'7', b'z', b'X', b'Z', 0x00]
+        {
             CompressionFormat::Xz
         } else {
             CompressionFormat::Tar
@@ -984,7 +1114,11 @@ impl ArchivalCompressionEngine {
         map
     }
 
-    pub fn configure_compression_level(&self, format: CompressionFormat, level: u32) -> Result<String, &'static str> {
+    pub fn configure_compression_level(
+        &self,
+        format: CompressionFormat,
+        level: u32,
+    ) -> Result<String, &'static str> {
         match format {
             CompressionFormat::Zstd if level <= 22 => Ok(format!("Zstd level {}", level)),
             CompressionFormat::Gzip if level <= 9 => Ok(format!("Gzip level {}", level)),
@@ -994,7 +1128,12 @@ impl ArchivalCompressionEngine {
         }
     }
 
-    pub fn parallel_zstd_compression_ratio(&self, original_size: usize, compressed_size: usize, threads: usize) -> (f64, String) {
+    pub fn parallel_zstd_compression_ratio(
+        &self,
+        original_size: usize,
+        compressed_size: usize,
+        threads: usize,
+    ) -> (f64, String) {
         let ratio = if original_size > 0 {
             compressed_size as f64 / original_size as f64
         } else {
@@ -1002,7 +1141,10 @@ impl ArchivalCompressionEngine {
         };
         let desc = format!(
             "Zstd multithreaded (threads={}): {} -> {} bytes (ratio: {:.2}%)",
-            threads, original_size, compressed_size, ratio * 100.0
+            threads,
+            original_size,
+            compressed_size,
+            ratio * 100.0
         );
         (ratio, desc)
     }
@@ -1070,9 +1212,21 @@ impl ProcpsPsmiscEngine {
     pub fn top_sorted(&self, sort_key: &str) -> Vec<ProcessInfo> {
         let mut list = self.ps_list_processes();
         match sort_key {
-            "cpu" => list.sort_by(|a, b| b.cpu_percent.partial_cmp(&a.cpu_percent).unwrap_or(core::cmp::Ordering::Equal)),
-            "mem" => list.sort_by(|a, b| b.mem_percent.partial_cmp(&a.mem_percent).unwrap_or(core::cmp::Ordering::Equal)),
-            "eevdf" => list.sort_by(|a, b| b.eevdf_score.partial_cmp(&a.eevdf_score).unwrap_or(core::cmp::Ordering::Equal)),
+            "cpu" => list.sort_by(|a, b| {
+                b.cpu_percent
+                    .partial_cmp(&a.cpu_percent)
+                    .unwrap_or(core::cmp::Ordering::Equal)
+            }),
+            "mem" => list.sort_by(|a, b| {
+                b.mem_percent
+                    .partial_cmp(&a.mem_percent)
+                    .unwrap_or(core::cmp::Ordering::Equal)
+            }),
+            "eevdf" => list.sort_by(|a, b| {
+                b.eevdf_score
+                    .partial_cmp(&a.eevdf_score)
+                    .unwrap_or(core::cmp::Ordering::Equal)
+            }),
             _ => list.sort_by_key(|p| p.pid),
         }
         list
@@ -1089,17 +1243,30 @@ impl ProcpsPsmiscEngine {
     pub fn pkill_signal(&self, name: &str, signal: i32) -> (usize, String) {
         let pids = self.pgrep_find(name);
         let count = pids.len();
-        (count, format!("pkill: sent signal {} to {} process(es) matching '{}'", signal, count, name))
+        (
+            count,
+            format!(
+                "pkill: sent signal {} to {} process(es) matching '{}'",
+                signal, count, name
+            ),
+        )
     }
 
     pub fn killall_signal(&self, exact_name: &str, signal: i32) -> (usize, String) {
-        let pids: Vec<u32> = self.ps_list_processes()
+        let pids: Vec<u32> = self
+            .ps_list_processes()
             .into_iter()
             .filter(|p| p.name == exact_name)
             .map(|p| p.pid)
             .collect();
         let count = pids.len();
-        (count, format!("killall: sent signal {} to {} process(es) named '{}'", signal, count, exact_name))
+        (
+            count,
+            format!(
+                "killall: sent signal {} to {} process(es) named '{}'",
+                signal, count, exact_name
+            ),
+        )
     }
 
     pub fn fuser_lookup_file(&self, path: &str) -> Vec<u32> {
@@ -1129,8 +1296,8 @@ impl ProcpsPsmiscEngine {
 
     pub fn free_memory_summary(&self) -> (u64, u64, u64) {
         let total = 32_768; // 32 GB
-        let used = 8_192;   // 8 GB
-        let free = 24_576;  // 24 GB
+        let used = 8_192; // 8 GB
+        let free = 24_576; // 24 GB
         (total, used, free)
     }
 }
@@ -1153,7 +1320,13 @@ impl DocumentationPagerEngine {
         lines[line_offset..end].join("\n")
     }
 
-    pub fn less_search(&self, text: &str, pattern: &str, start_line: usize, forward: bool) -> Option<usize> {
+    pub fn less_search(
+        &self,
+        text: &str,
+        pattern: &str,
+        start_line: usize,
+        forward: bool,
+    ) -> Option<usize> {
         let lines: Vec<&str> = text.lines().collect();
         if forward {
             for i in start_line..lines.len() {
@@ -1175,8 +1348,12 @@ impl DocumentationPagerEngine {
         match page_name {
             "ls" => Some("LS(1) User Commands - List directory contents".to_string()),
             "grep" => Some("GREP(1) User Commands - Print lines matching a pattern".to_string()),
-            "sudo" => Some("SUDO(8) System Administration - Execute a command as another user".to_string()),
-            "btrfs" => Some("BTRFS(8) System Administration - Btrfs filesystem utilities".to_string()),
+            "sudo" => Some(
+                "SUDO(8) System Administration - Execute a command as another user".to_string(),
+            ),
+            "btrfs" => {
+                Some("BTRFS(8) System Administration - Btrfs filesystem utilities".to_string())
+            }
             _ => None,
         }
     }
@@ -1279,7 +1456,12 @@ impl AuthPrivilegeSessionEngine {
         }
     }
 
-    pub fn evaluate_doas_conf(&self, user: &str, command: &str, rule_options: &[&str]) -> (bool, bool) {
+    pub fn evaluate_doas_conf(
+        &self,
+        user: &str,
+        command: &str,
+        rule_options: &[&str],
+    ) -> (bool, bool) {
         let permitted = self.evaluate_doas(user, command);
         let nopass = rule_options.contains(&"nopass");
         (permitted, nopass)
@@ -1300,8 +1482,17 @@ impl AuthPrivilegeSessionEngine {
         }
     }
 
-    pub fn verify_shadow_hash_multi_algo(&self, user: &str, shadow_entry: &str, attempt: &str) -> bool {
-        if shadow_entry.starts_with("$argon2id$") || shadow_entry.starts_with("$6$") || shadow_entry.starts_with("$5$") || shadow_entry.starts_with("$1$") {
+    pub fn verify_shadow_hash_multi_algo(
+        &self,
+        user: &str,
+        shadow_entry: &str,
+        attempt: &str,
+    ) -> bool {
+        if shadow_entry.starts_with("$argon2id$")
+            || shadow_entry.starts_with("$6$")
+            || shadow_entry.starts_with("$5$")
+            || shadow_entry.starts_with("$1$")
+        {
             shadow_entry.contains(attempt) || attempt == "sovereign_pass"
         } else {
             self.verify_shadow_hash(user, shadow_entry, attempt)
@@ -1312,19 +1503,26 @@ impl AuthPrivilegeSessionEngine {
         if user.is_empty() {
             Err("PAM: Empty username provided")
         } else {
-            Ok(format!("PAM: Session granted for user '{}' under service '{}'", user, service))
+            Ok(format!(
+                "PAM: Session granted for user '{}' under service '{}'",
+                user, service
+            ))
         }
     }
 
-    pub fn pam_environment_manage(&self, env_map: &mut BTreeMap<String, String>, action: &str, key: &str, val: &str) -> bool {
+    pub fn pam_environment_manage(
+        &self,
+        env_map: &mut BTreeMap<String, String>,
+        action: &str,
+        key: &str,
+        val: &str,
+    ) -> bool {
         match action {
             "set" => {
                 env_map.insert(key.to_string(), val.to_string());
                 true
             }
-            "unset" => {
-                env_map.remove(key).is_some()
-            }
+            "unset" => env_map.remove(key).is_some(),
             _ => false,
         }
     }
@@ -1336,14 +1534,24 @@ impl AuthPrivilegeSessionEngine {
             .collect()
     }
 
-    pub fn verify_shadow_expiry(&self, days_since_epoch: u32, last_changed: u32, max_days: u32) -> bool {
+    pub fn verify_shadow_expiry(
+        &self,
+        days_since_epoch: u32,
+        last_changed: u32,
+        max_days: u32,
+    ) -> bool {
         if max_days == 0 || max_days == 99999 {
             return false; // password never expires
         }
         days_since_epoch >= (last_changed + max_days)
     }
 
-    pub fn pam_verify_module_chain(&self, user: &str, service: &str, required_modules: &[&str]) -> (bool, Vec<String>) {
+    pub fn pam_verify_module_chain(
+        &self,
+        user: &str,
+        service: &str,
+        required_modules: &[&str],
+    ) -> (bool, Vec<String>) {
         let mut audit_log = Vec::new();
         let mut all_passed = true;
 
@@ -1352,7 +1560,13 @@ impl AuthPrivilegeSessionEngine {
             if !pass {
                 all_passed = false;
             }
-            audit_log.push(format!("PAM [{}] service='{}' user='{}' -> {}", module, service, user, if pass { "SUCCESS" } else { "FAILURE" }));
+            audit_log.push(format!(
+                "PAM [{}] service='{}' user='{}' -> {}",
+                module,
+                service,
+                user,
+                if pass { "SUCCESS" } else { "FAILURE" }
+            ));
         }
 
         (all_passed, audit_log)
@@ -1365,7 +1579,13 @@ impl AuthPrivilegeSessionEngine {
         )
     }
 
-    pub fn getty_render_motd(&self, banner_template: &str, hostname: &str, kernel_ver: &str, active_tty: &str) -> String {
+    pub fn getty_render_motd(
+        &self,
+        banner_template: &str,
+        hostname: &str,
+        kernel_ver: &str,
+        active_tty: &str,
+    ) -> String {
         let mut motd = banner_template.to_string();
         motd = motd.replace("%h", hostname);
         motd = motd.replace("%r", kernel_ver);
@@ -1540,7 +1760,9 @@ impl CoreUtilsPullRequestGatewayEngine {
     }
 
     pub fn get_pr_unified_diff(&self, pr_id: u64) -> Option<String> {
-        self.submissions.get(&pr_id).map(|pr| pr.unified_diff.clone())
+        self.submissions
+            .get(&pr_id)
+            .map(|pr| pr.unified_diff.clone())
     }
 
     pub fn collect_all_proposals(&self) -> Vec<CoreUtilsPrSubmission> {
@@ -1725,7 +1947,11 @@ mod tests {
         assert!(auth.evaluate_sudoers("sovereign", "ls"));
         assert!(auth.evaluate_doas("sovereign", "pacman -Syu"));
         assert!(auth.pam_authenticate("root", "login").is_ok());
-        assert!(auth.verify_argon2id_shadow("root", "$argon2id$v=19$m=4096,t=3,p=1$salt$sovereign_pass", "sovereign_pass"));
+        assert!(auth.verify_argon2id_shadow(
+            "root",
+            "$argon2id$v=19$m=4096,t=3,p=1$salt$sovereign_pass",
+            "sovereign_pass"
+        ));
     }
 
     #[test]
@@ -1783,7 +2009,10 @@ mod tests {
         assert!(env_res[0].starts_with("PATH="));
 
         // Human readable formatting & symbolic modes
-        assert_eq!(GnuCoreutilsBsdUserlandEngine::format_human_size(1500000000), "1.4G");
+        assert_eq!(
+            GnuCoreutilsBsdUserlandEngine::format_human_size(1500000000),
+            "1.4G"
+        );
         let sym_mode = GnuCoreutilsBsdUserlandEngine::octal_to_symbolic_mode(0o755, true);
         assert_eq!(sym_mode, "drwxr-xr-x");
 
@@ -1871,7 +2100,8 @@ mod tests {
     #[test]
     fn test_text_processing_expanded_helpers() {
         let text = TextProcessingEngine::new();
-        let (cnt, lines) = text.grep_match_extended("apple\nbanana\ncherry", "a", false, false, true);
+        let (cnt, lines) =
+            text.grep_match_extended("apple\nbanana\ncherry", "a", false, false, true);
         assert_eq!(cnt, 2);
         assert_eq!(lines[0], "1:apple");
 
@@ -1935,7 +2165,8 @@ mod tests {
         assert!(auth.verify_shadow_expiry(20000, 10000, 90));
         assert!(!auth.verify_shadow_expiry(20000, 10000, 99999));
 
-        let (all_pass, audit) = auth.pam_verify_module_chain("sovereign", "sudo", &["pam_unix", "pam_permit"]);
+        let (all_pass, audit) =
+            auth.pam_verify_module_chain("sovereign", "sudo", &["pam_unix", "pam_permit"]);
         assert!(all_pass);
         assert_eq!(audit.len(), 2);
 
@@ -1955,8 +2186,16 @@ mod tests {
         assert!(auth.pam_environment_manage(&mut pam_env, "set", "LANG", "en_US.UTF-8"));
         assert_eq!(pam_env.get("LANG"), Some(&"en_US.UTF-8".to_string()));
 
-        let motd = auth.getty_render_motd("Welcome to %h running kernel %r on %l", "sigmaos-host", "6.14.0", "tty1");
-        assert_eq!(motd, "Welcome to sigmaos-host running kernel 6.14.0 on tty1");
+        let motd = auth.getty_render_motd(
+            "Welcome to %h running kernel %r on %l",
+            "sigmaos-host",
+            "6.14.0",
+            "tty1",
+        );
+        assert_eq!(
+            motd,
+            "Welcome to sigmaos-host running kernel 6.14.0 on tty1"
+        );
     }
 
     #[test]
