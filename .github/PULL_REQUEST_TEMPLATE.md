@@ -1,66 +1,83 @@
 ## Summary
 
-<!-- What kernel or component behavior changed and why? -->
+<!-- What secondary-memory, shell, or subsystem behavior changed and why? -->
 
-## Kernel component
+## Storage component
 
-- [ ] Boot / arch init
-- [ ] Interrupts / traps
-- [ ] Memory / paging / swap
-- [ ] Scheduler / processes
-- [ ] VFS / filesystems
-- [ ] Syscalls / ELF
-- [ ] Drivers
-- [ ] Networking / sockets
-- [ ] IPC / signals / timers
+- [ ] Block device manager
+- [ ] virtio / NVMe / virtio
+- [ ] Block cache manager
+- [ ] Filesystem manager
+- [ ] Mount / unmount
+- [ ] Cache
+- [ ] Filesystem
+- [ ] Recovery
+- [ ] procfs / diagnostics
 - [ ] Security / capabilities
-- [ ] Diagnostics
-- [ ] Build / CI
+- [ ] Documentation
+- [ ] CI / tooling
 
-## Component
+## Shell component
 
-- [ ] PR-level validation
+- [ ] Lexer / Parser
+- [ ] Expansion engine
+- [ ] Builtin commands
+- [ ] Redirection / Piping
+- [ ] Job control / Signals
+- [ ] Interactive REPL
+- [ ] Diagnostics / Error formatting
+- [ ] Conformance / POSIX
+
+## Recurring task
+
+- [ ] PR validation
 - [ ] Daily CI triage
-- [ ] Weekly subsystem review
+- [ ] Weekly lifecycle review
 - [ ] Weekly Linux/BSD study
-- [ ] Biweekly syscall/ABI review
-- [ ] Biweekly memory/concurrency audit
+- [ ] Biweekly storage audit
+- [ ] Biweekly signal/wait audit
 - [ ] Monthly boot validation
-- [ ] Monthly driver/hardware audit
-- [ ] Monthly fuzz triage
-- [ ] Monthly diagnostics rehearsal
-- [ ] Quarterly release/architecture/security review
+- [ ] Quarterly architecture/security/release review
 
-## Reference study
+## Reference behavior
 
-<!-- Required for design-changing kernel PRs -->
+<!-- Required for lifecycle, ABI, or storage changes -->
+<!-- Upstream study: Open-source OS references and Linux/BSD/Redox/xv6 study notes -->
+<!-- What SigmaOS adopts: Subsystem architecture and component improvements -->
 
-- Study document:
+- POSIX section:
 - Linux/BSD/Redox/xv6 reference:
-- Decision: Adopt / Adapt / Reject
-- Reason:
+- SigmaOS current behavior:
+- New behavior:
+- Compatibility impact:
 
 ## Changes
 
-- [ ] Source implementation
-- [ ] Unit tests
-- [ ] Integration tests
-- [ ] QEMU/runtime test
-- [ ] Documentation
-- [ ] Capability/status update
-- [ ] Regression protection
-- [ ] Security review, if applicable
+-
 
-## Kernel safety review
+## Storage safety review
 
-- [ ] No unnecessary `unsafe`
-- [ ] Every `unsafe` block documents invariants
-- [ ] Lock ordering documented
+- [ ] Lifecycle transitions are valid
+- [ ] Zombies are eventually reaped
+- [ ] Orphans are adopted
+- [ ] PID reuse is safe
+- [ ] Lock ordering is documented
 - [ ] Interrupt-context safety considered
-- [ ] Allocation limits defined
-- [ ] OOM behavior defined
-- [ ] Error paths tested
-- [ ] No silent failure introduced
+- [ ] Signal races considered
+- [ ] Double-completion prevented
+- [ ] Resource limits enforced
+- [ ] No unbounded allocation or recursion
+
+## Shell safety review
+
+<!-- Safety and rollback review checklist -->
+<!-- Reviewer checklist: Verification, lock ordering, memory limits, and runtime evidence -->
+
+- [ ] Deterministic script execution
+- [ ] Explicit exit status codes
+- [ ] No partial execution on parse error
+- [ ] Quoting and expansion integrity verified
+- [ ] Redirection and file descriptor limits enforced
 
 ## Evidence
 
@@ -70,18 +87,17 @@
 - [ ] `./run_sigma_tests.sh`
 - [ ] New/updated unit tests
 - [ ] Integration tests
-- [ ] Fuzz target or reason for exemption
-- [ ] QEMU boot evidence, if boot-affecting
-- [ ] Driver/hardware evidence, if driver-affecting
+- [ ] Fuzz target or documented exemption
+- [ ] Boot-to-shell evidence, if boot-affecting
+- [ ] Storage benchmark, if performance-affecting
 - [ ] Security review requested, if applicable
 
 ## Status updates
 
 - [ ] `FEATURE_STATUS.toml`
 - [ ] `CAPABILITY_MATRIX.toml`
-- [ ] Component documentation
+- [ ] Storage documentation
 - [ ] Boot matrix, if applicable
-- [ ] Hardware matrix, if applicable
 
 ## Risks and rollback
 
