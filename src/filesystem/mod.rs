@@ -88,6 +88,10 @@ pub use ext4::{
 pub use fscrypt_autofs::{
     AutofsMountTrigger, FscryptInodeRecord, FscryptPolicy, SovereignFscryptAutofsEngine,
 };
+pub use mqueue::{
+    get_mqueue_fs, init_mqueue_fs, mq_close, mq_getattr, mq_open, mq_receive, mq_send, mq_setattr,
+    mq_unlink, MqueueAttr, MqueueFileType, MqueueInode, MqueueStats, MqueueSuperblock,
+};
 pub use snapshot_manager::{
     RetentionPolicy, SnapshotBackend, SnapshotManager, SnapshotManagerError, SnapshotRecord,
     SnapshotSchedule,
@@ -105,11 +109,6 @@ pub use zfs::{
     ZfsVdev,
 };
 pub use zfs_arc::{ArcConfig, ArcEntry, ArcStats, ZfsArc};
-pub use mqueue::{
-    MqueueAttr, MqueueInode, MqueueFileType, MqueueStats, MqueueSuperblock,
-    init_mqueue_fs, get_mqueue_fs, mq_open, mq_close, mq_unlink, mq_send, mq_receive,
-    mq_getattr, mq_setattr,
-};
 
 pub type FileDescriptor = i32;
 pub type FilePermissions = u32;
@@ -129,4 +128,3 @@ pub mod mqueue;
 pub mod ntfs;
 pub mod plan9_9p_network;
 pub mod smb_client;
-

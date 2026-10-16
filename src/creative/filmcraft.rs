@@ -64,12 +64,12 @@ pub enum FrameRate {
 pub struct Clip {
     pub id: u32,
     pub name: String,
-    pub start_time: u32,  // position on timeline in frames
-    pub duration: u32,    // duration in frames
-    pub in_point: u32,    // in point in frames
-    pub out_point: u32,   // out point in frames
-    pub speed: f32,       // playback speed (1.0 = normal)
-    pub reversed: bool,   // whether clip is reversed
+    pub start_time: u32, // position on timeline in frames
+    pub duration: u32,   // duration in frames
+    pub in_point: u32,   // in point in frames
+    pub out_point: u32,  // out point in frames
+    pub speed: f32,      // playback speed (1.0 = normal)
+    pub reversed: bool,  // whether clip is reversed
 }
 
 /// Track type
@@ -110,7 +110,7 @@ pub enum TransitionType {
 pub struct Transition {
     pub id: u32,
     pub transition_type: TransitionType,
-    pub duration: u32,  // in frames
+    pub duration: u32, // in frames
     pub from_clip_id: u32,
     pub to_clip_id: u32,
 }
@@ -140,7 +140,7 @@ pub struct AudioChannel {
     pub id: u32,
     pub name: String,
     pub volume: f32,
-    pub pan: f32,  // -1.0 (left) to 1.0 (right)
+    pub pan: f32, // -1.0 (left) to 1.0 (right)
     pub muted: bool,
     pub solo: bool,
 }
@@ -159,8 +159,8 @@ pub struct ExportSettings {
     pub audio_codec: AudioCodec,
     pub resolution: Resolution,
     pub frame_rate: FrameRate,
-    pub bitrate: u32,  // in kbps
-    pub container: String,  // e.g., "mp4", "mov", "mkv"
+    pub bitrate: u32,      // in kbps
+    pub container: String, // e.g., "mp4", "mov", "mkv"
 }
 
 /// Timeline
@@ -212,10 +212,26 @@ impl VideoEditor {
                 snap_enabled: true,
             },
             color_grading: ColorGrading {
-                lift: ColorWheel { hue: 0.0, saturation: 0.0, brightness: 0.0 },
-                gamma: ColorWheel { hue: 0.0, saturation: 0.0, brightness: 0.0 },
-                gain: ColorWheel { hue: 0.0, saturation: 0.0, brightness: 0.0 },
-                offset: ColorWheel { hue: 0.0, saturation: 0.0, brightness: 0.0 },
+                lift: ColorWheel {
+                    hue: 0.0,
+                    saturation: 0.0,
+                    brightness: 0.0,
+                },
+                gamma: ColorWheel {
+                    hue: 0.0,
+                    saturation: 0.0,
+                    brightness: 0.0,
+                },
+                gain: ColorWheel {
+                    hue: 0.0,
+                    saturation: 0.0,
+                    brightness: 0.0,
+                },
+                offset: ColorWheel {
+                    hue: 0.0,
+                    saturation: 0.0,
+                    brightness: 0.0,
+                },
                 saturation: 1.0,
                 contrast: 1.0,
             },
@@ -264,8 +280,18 @@ impl VideoEditor {
     }
 
     /// Add clip to track
-    pub fn add_clip(&mut self, track_id: u32, name: String, start_time: u32, duration: u32) -> Result<u32, &'static str> {
-        let track = self.timeline.tracks.get_mut(track_id as usize).ok_or("Track not found")?;
+    pub fn add_clip(
+        &mut self,
+        track_id: u32,
+        name: String,
+        start_time: u32,
+        duration: u32,
+    ) -> Result<u32, &'static str> {
+        let track = self
+            .timeline
+            .tracks
+            .get_mut(track_id as usize)
+            .ok_or("Track not found")?;
         let clip_id = track.clips.len() as u32;
         let clip = Clip {
             id: clip_id,
@@ -282,7 +308,13 @@ impl VideoEditor {
     }
 
     /// Add transition
-    pub fn add_transition(&mut self, transition_type: TransitionType, duration: u32, from_clip_id: u32, to_clip_id: u32) -> u32 {
+    pub fn add_transition(
+        &mut self,
+        transition_type: TransitionType,
+        duration: u32,
+        from_clip_id: u32,
+        to_clip_id: u32,
+    ) -> u32 {
         let id = self.timeline.transitions.len() as u32;
         let transition = Transition {
             id,
@@ -297,30 +329,62 @@ impl VideoEditor {
 
     /// Lock track
     pub fn lock_track(&mut self, track_id: u32, locked: bool) -> Result<(), &'static str> {
-        let track = self.timeline.tracks.get_mut(track_id as usize).ok_or("Track not found")?;
+        let track = self
+            .timeline
+            .tracks
+            .get_mut(track_id as usize)
+            .ok_or("Track not found")?;
         track.locked = locked;
         Ok(())
     }
 
     /// Mute track
     pub fn mute_track(&mut self, track_id: u32, muted: bool) -> Result<(), &'static str> {
-        let track = self.timeline.tracks.get_mut(track_id as usize).ok_or("Track not found")?;
+        let track = self
+            .timeline
+            .tracks
+            .get_mut(track_id as usize)
+            .ok_or("Track not found")?;
         track.muted = muted;
         Ok(())
     }
 
     /// Set clip speed
-    pub fn set_clip_speed(&mut self, track_id: u32, clip_id: u32, speed: f32) -> Result<(), &'static str> {
-        let track = self.timeline.tracks.get_mut(track_id as usize).ok_or("Track not found")?;
-        let clip = track.clips.get_mut(clip_id as usize).ok_or("Clip not found")?;
+    pub fn set_clip_speed(
+        &mut self,
+        track_id: u32,
+        clip_id: u32,
+        speed: f32,
+    ) -> Result<(), &'static str> {
+        let track = self
+            .timeline
+            .tracks
+            .get_mut(track_id as usize)
+            .ok_or("Track not found")?;
+        let clip = track
+            .clips
+            .get_mut(clip_id as usize)
+            .ok_or("Clip not found")?;
         clip.speed = speed;
         Ok(())
     }
 
     /// Reverse clip
-    pub fn reverse_clip(&mut self, track_id: u32, clip_id: u32, reversed: bool) -> Result<(), &'static str> {
-        let track = self.timeline.tracks.get_mut(track_id as usize).ok_or("Track not found")?;
-        let clip = track.clips.get_mut(clip_id as usize).ok_or("Clip not found")?;
+    pub fn reverse_clip(
+        &mut self,
+        track_id: u32,
+        clip_id: u32,
+        reversed: bool,
+    ) -> Result<(), &'static str> {
+        let track = self
+            .timeline
+            .tracks
+            .get_mut(track_id as usize)
+            .ok_or("Track not found")?;
+        let clip = track
+            .clips
+            .get_mut(clip_id as usize)
+            .ok_or("Clip not found")?;
         clip.reversed = reversed;
         Ok(())
     }
@@ -349,13 +413,23 @@ impl VideoEditor {
 
     /// Set channel volume
     pub fn set_channel_volume(&mut self, channel_id: u32, volume: f32) -> Result<(), &'static str> {
-        let channel = self.audio_mixer.channels.get_mut(channel_id as usize).ok_or("Channel not found")?;
+        let channel = self
+            .audio_mixer
+            .channels
+            .get_mut(channel_id as usize)
+            .ok_or("Channel not found")?;
         channel.volume = volume.clamp(0.0, 1.0);
         Ok(())
     }
 
     /// Set export settings
-    pub fn set_export_settings(&mut self, video_codec: VideoCodec, audio_codec: AudioCodec, resolution: Resolution, frame_rate: FrameRate) {
+    pub fn set_export_settings(
+        &mut self,
+        video_codec: VideoCodec,
+        audio_codec: AudioCodec,
+        resolution: Resolution,
+        frame_rate: FrameRate,
+    ) {
         self.export_settings.video_codec = video_codec;
         self.export_settings.audio_codec = audio_codec;
         self.export_settings.resolution = resolution;
@@ -389,7 +463,10 @@ impl VideoEditor {
 
     /// Apply effect
     pub fn apply_effect(&mut self, track_id: u32, effect: Effect) -> Result<(), &'static str> {
-        self.timeline.tracks.get(track_id as usize).ok_or("Track not found")?;
+        self.timeline
+            .tracks
+            .get(track_id as usize)
+            .ok_or("Track not found")?;
         Ok(())
     }
 }
@@ -412,9 +489,7 @@ pub fn init_filmcraft() {
 
 /// Get global filmcraft
 pub fn get_filmcraft() -> Option<&'static mut VideoEditor> {
-    unsafe {
-        FILMCRAFT.as_mut()
-    }
+    unsafe { FILMCRAFT.as_mut() }
 }
 
 #[cfg(test)]
@@ -450,7 +525,9 @@ mod tests {
         let mut editor = VideoEditor::new();
         editor.init();
         let track_id = editor.add_track("Video Track".to_string(), TrackType::Video);
-        let clip_id = editor.add_clip(track_id, "Clip 1".to_string(), 0, 300).unwrap();
+        let clip_id = editor
+            .add_clip(track_id, "Clip 1".to_string(), 0, 300)
+            .unwrap();
         assert_eq!(clip_id, 0);
         assert_eq!(editor.timeline.tracks[track_id as usize].clips.len(), 1);
     }
@@ -460,9 +537,14 @@ mod tests {
         let mut editor = VideoEditor::new();
         editor.init();
         let track_id = editor.add_track("Video Track".to_string(), TrackType::Video);
-        let clip_id = editor.add_clip(track_id, "Clip 1".to_string(), 0, 300).unwrap();
+        let clip_id = editor
+            .add_clip(track_id, "Clip 1".to_string(), 0, 300)
+            .unwrap();
         editor.set_clip_speed(track_id, clip_id, 2.0).unwrap();
-        assert_eq!(editor.timeline.tracks[track_id as usize].clips[clip_id as usize].speed, 2.0);
+        assert_eq!(
+            editor.timeline.tracks[track_id as usize].clips[clip_id as usize].speed,
+            2.0
+        );
     }
 
     #[test]
@@ -470,7 +552,9 @@ mod tests {
         let mut editor = VideoEditor::new();
         editor.init();
         let track_id = editor.add_track("Video Track".to_string(), TrackType::Video);
-        let clip_id = editor.add_clip(track_id, "Clip 1".to_string(), 0, 300).unwrap();
+        let clip_id = editor
+            .add_clip(track_id, "Clip 1".to_string(), 0, 300)
+            .unwrap();
         editor.reverse_clip(track_id, clip_id, true).unwrap();
         assert!(editor.timeline.tracks[track_id as usize].clips[clip_id as usize].reversed);
     }
@@ -499,9 +583,21 @@ mod tests {
     fn test_color_grading() {
         let mut editor = VideoEditor::new();
         editor.init();
-        let lift = ColorWheel { hue: 0.1, saturation: 0.2, brightness: 0.3 };
-        let gamma = ColorWheel { hue: 0.0, saturation: 0.0, brightness: 0.0 };
-        let gain = ColorWheel { hue: -0.1, saturation: 0.1, brightness: 0.1 };
+        let lift = ColorWheel {
+            hue: 0.1,
+            saturation: 0.2,
+            brightness: 0.3,
+        };
+        let gamma = ColorWheel {
+            hue: 0.0,
+            saturation: 0.0,
+            brightness: 0.0,
+        };
+        let gain = ColorWheel {
+            hue: -0.1,
+            saturation: 0.1,
+            brightness: 0.1,
+        };
         editor.set_color_grading(lift, gamma, gain);
         assert_eq!(editor.color_grading.lift.hue, 0.1);
     }
@@ -520,7 +616,12 @@ mod tests {
     fn test_export_settings() {
         let mut editor = VideoEditor::new();
         editor.init();
-        editor.set_export_settings(VideoCodec::H265, AudioCodec::AAC, Resolution::UHD2160, FrameRate::FPS60);
+        editor.set_export_settings(
+            VideoCodec::H265,
+            AudioCodec::AAC,
+            Resolution::UHD2160,
+            FrameRate::FPS60,
+        );
         assert_eq!(editor.export_settings.video_codec, VideoCodec::H265);
         assert_eq!(editor.export_settings.resolution, Resolution::UHD2160);
         assert_eq!(editor.export_settings.frame_rate, FrameRate::FPS60);

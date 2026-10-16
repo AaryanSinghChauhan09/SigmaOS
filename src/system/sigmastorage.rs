@@ -108,7 +108,7 @@ impl SigmaStorage {
         if self.volumes.contains_key(&volume.name) {
             return Err(format!("Volume '{}' already exists", volume.name));
         }
-        
+
         self.volumes.insert(volume.name.clone(), volume);
         self.volume_counter += 1;
         Ok(())
@@ -127,7 +127,7 @@ impl SigmaStorage {
         if !self.running {
             return Err("SigmaStorage not running".to_string());
         }
-        
+
         match self.volumes.get_mut(name) {
             Some(volume) => {
                 volume.state = VolumeState::InUse;
@@ -142,7 +142,7 @@ impl SigmaStorage {
         if !self.running {
             return Err("SigmaStorage not running".to_string());
         }
-        
+
         match self.volumes.get_mut(name) {
             Some(volume) => {
                 volume.state = VolumeState::Available;
@@ -164,9 +164,7 @@ impl SigmaStorage {
 
     /// List volumes by state
     pub fn list_by_state(&self, state: VolumeState) -> Vec<&StorageVolume> {
-        self.volumes.values()
-            .filter(|v| v.state == state)
-            .collect()
+        self.volumes.values().filter(|v| v.state == state).collect()
     }
 
     /// Get volume count
@@ -178,9 +176,18 @@ impl SigmaStorage {
     pub fn storage_stats(&self) -> BTreeMap<String, String> {
         let mut stats = BTreeMap::new();
         stats.insert("total_volumes".to_string(), self.volume_count().to_string());
-        stats.insert("available_volumes".to_string(), self.list_by_state(VolumeState::Available).len().to_string());
-        stats.insert("in_use_volumes".to_string(), self.list_by_state(VolumeState::InUse).len().to_string());
-        stats.insert("offline_volumes".to_string(), self.list_by_state(VolumeState::Offline).len().to_string());
+        stats.insert(
+            "available_volumes".to_string(),
+            self.list_by_state(VolumeState::Available).len().to_string(),
+        );
+        stats.insert(
+            "in_use_volumes".to_string(),
+            self.list_by_state(VolumeState::InUse).len().to_string(),
+        );
+        stats.insert(
+            "offline_volumes".to_string(),
+            self.list_by_state(VolumeState::Offline).len().to_string(),
+        );
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
@@ -232,7 +239,7 @@ mod tests {
             "vol1".to_string(),
             "/dev/sda1".to_string(),
             1024 * 1024 * 1024,
-            "ext4".to_string()
+            "ext4".to_string(),
         )
         .with_state(VolumeState::InUse);
 
@@ -253,14 +260,14 @@ mod tests {
     #[test]
     fn test_sigmastorage_add_volume() {
         let mut storage = SigmaStorage::new();
-        
+
         let volume = StorageVolume::new(
             "vol1".to_string(),
             "/dev/sda1".to_string(),
             1024 * 1024 * 1024,
-            "ext4".to_string()
+            "ext4".to_string(),
         );
-        
+
         assert!(storage.add_volume(volume).is_ok());
         assert_eq!(storage.volume_count(), 1);
     }
@@ -269,17 +276,17 @@ mod tests {
     fn test_sigmastorage_mount_volume() {
         let mut storage = SigmaStorage::new();
         storage.start();
-        
+
         let volume = StorageVolume::new(
             "vol1".to_string(),
             "/dev/sda1".to_string(),
             1024 * 1024 * 1024,
-            "ext4".to_string()
+            "ext4".to_string(),
         );
-        
+
         storage.add_volume(volume).unwrap();
         assert!(storage.mount_volume("vol1").is_ok());
-        
+
         let vol = storage.get_volume("vol1").unwrap();
         assert_eq!(vol.state, VolumeState::InUse);
     }
@@ -288,18 +295,18 @@ mod tests {
     fn test_sigmastorage_unmount_volume() {
         let mut storage = SigmaStorage::new();
         storage.start();
-        
+
         let volume = StorageVolume::new(
             "vol1".to_string(),
             "/dev/sda1".to_string(),
             1024 * 1024 * 1024,
-            "ext4".to_string()
+            "ext4".to_string(),
         )
         .with_state(VolumeState::InUse);
-        
+
         storage.add_volume(volume).unwrap();
         assert!(storage.unmount_volume("vol1").is_ok());
-        
+
         let vol = storage.get_volume("vol1").unwrap();
         assert_eq!(vol.state, VolumeState::Available);
     }
@@ -307,17 +314,17 @@ mod tests {
     #[test]
     fn test_sigmastorage_list_by_state() {
         let mut storage = SigmaStorage::new();
-        
+
         let volume = StorageVolume::new(
             "vol1".to_string(),
             "/dev/sda1".to_string(),
             1024 * 1024 * 1024,
-            "ext4".to_string()
+            "ext4".to_string(),
         )
         .with_state(VolumeState::InUse);
-        
+
         storage.add_volume(volume).unwrap();
-        
+
         let volumes = storage.list_by_state(VolumeState::InUse);
         assert_eq!(volumes.len(), 1);
     }
@@ -325,17 +332,17 @@ mod tests {
     #[test]
     fn test_sigmastorage_stats() {
         let mut storage = SigmaStorage::new();
-        
+
         let volume = StorageVolume::new(
             "vol1".to_string(),
             "/dev/sda1".to_string(),
             1024 * 1024 * 1024,
-            "ext4".to_string()
+            "ext4".to_string(),
         )
         .with_state(VolumeState::InUse);
-        
+
         storage.add_volume(volume).unwrap();
-        
+
         let stats = storage.storage_stats();
         assert_eq!(stats.get("total_volumes"), Some(&"1".to_string()));
         assert_eq!(stats.get("in_use_volumes"), Some(&"1".to_string()));
@@ -344,19 +351,19 @@ mod tests {
     #[test]
     fn test_mount_storage_volume_convenience() {
         init_sigmastorage();
-        
+
         let mut storage = get_sigmastorage().unwrap();
         storage.start();
-        
+
         let volume = StorageVolume::new(
             "vol1".to_string(),
             "/dev/sda1".to_string(),
             1024 * 1024 * 1024,
-            "ext4".to_string()
+            "ext4".to_string(),
         );
-        
+
         storage.add_volume(volume).unwrap();
-        
+
         let result = mount_storage_volume("vol1");
         assert!(result.is_ok());
     }

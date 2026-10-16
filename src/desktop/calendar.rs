@@ -90,7 +90,7 @@ pub struct CalendarManager {
 impl CalendarManager {
     pub fn new() -> Self {
         let mut calendars = BTreeMap::new();
-        
+
         // Default calendar
         let id = 1;
         calendars.insert(
@@ -144,14 +144,20 @@ impl CalendarManager {
 
     /// Add event
     pub fn add_event(&mut self, calendar_id: u32, event: Event) -> Result<(), &'static str> {
-        let calendar = self.calendars.get_mut(&calendar_id).ok_or("Calendar not found")?;
+        let calendar = self
+            .calendars
+            .get_mut(&calendar_id)
+            .ok_or("Calendar not found")?;
         calendar.events.push(event);
         Ok(())
     }
 
     /// Remove event
     pub fn remove_event(&mut self, calendar_id: u32, event_id: u32) -> Result<(), &'static str> {
-        let calendar = self.calendars.get_mut(&calendar_id).ok_or("Calendar not found")?;
+        let calendar = self
+            .calendars
+            .get_mut(&calendar_id)
+            .ok_or("Calendar not found")?;
         calendar.events.retain(|e| e.id != event_id);
         Ok(())
     }
@@ -300,7 +306,9 @@ pub fn init_calendar() {
 /// Get calendar manager
 pub fn get_calendar() -> &'static mut CalendarManager {
     unsafe {
-        CALENDAR_MANAGER.as_mut().expect("Calendar manager not initialized")
+        CALENDAR_MANAGER
+            .as_mut()
+            .expect("Calendar manager not initialized")
     }
 }
 

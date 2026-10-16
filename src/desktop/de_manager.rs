@@ -633,23 +633,61 @@ mod tests {
     #[test]
     fn test_expanded_de_manager_default_configs() {
         let manager = DEManager::new();
-        assert_eq!(manager.get_configs_by_de(DesktopEnvironment::GNOME).len(), 2);
+        assert_eq!(
+            manager.get_configs_by_de(DesktopEnvironment::GNOME).len(),
+            2
+        );
         assert_eq!(manager.get_configs_by_de(DesktopEnvironment::KDE).len(), 1);
         assert_eq!(manager.get_configs_by_de(DesktopEnvironment::XFCE).len(), 1);
         assert_eq!(manager.get_configs_by_de(DesktopEnvironment::MATE).len(), 1);
-        assert_eq!(manager.get_configs_by_de(DesktopEnvironment::Cinnamon).len(), 1);
+        assert_eq!(
+            manager
+                .get_configs_by_de(DesktopEnvironment::Cinnamon)
+                .len(),
+            1
+        );
         assert_eq!(manager.get_configs_by_de(DesktopEnvironment::LXQt).len(), 1);
         assert_eq!(manager.get_configs_by_de(DesktopEnvironment::LXDE).len(), 1);
-        assert_eq!(manager.get_configs_by_de(DesktopEnvironment::Budgie).len(), 1);
-        assert_eq!(manager.get_configs_by_de(DesktopEnvironment::Enlightenment).len(), 1);
-        assert_eq!(manager.get_configs_by_de(DesktopEnvironment::Pantheon).len(), 1);
+        assert_eq!(
+            manager.get_configs_by_de(DesktopEnvironment::Budgie).len(),
+            1
+        );
+        assert_eq!(
+            manager
+                .get_configs_by_de(DesktopEnvironment::Enlightenment)
+                .len(),
+            1
+        );
+        assert_eq!(
+            manager
+                .get_configs_by_de(DesktopEnvironment::Pantheon)
+                .len(),
+            1
+        );
         assert_eq!(manager.get_configs_by_de(DesktopEnvironment::I3).len(), 1);
-        assert_eq!(manager.get_configs_by_de(DesktopEnvironment::Bspwm).len(), 1);
+        assert_eq!(
+            manager.get_configs_by_de(DesktopEnvironment::Bspwm).len(),
+            1
+        );
         assert_eq!(manager.get_configs_by_de(DesktopEnvironment::Dwm).len(), 1);
-        assert_eq!(manager.get_configs_by_de(DesktopEnvironment::Openbox).len(), 1);
-        assert_eq!(manager.get_configs_by_de(DesktopEnvironment::Fluxbox).len(), 1);
-        assert_eq!(manager.get_configs_by_de(DesktopEnvironment::Awesome).len(), 1);
-        assert_eq!(manager.get_configs_by_de(DesktopEnvironment::Hyprland).len(), 1);
+        assert_eq!(
+            manager.get_configs_by_de(DesktopEnvironment::Openbox).len(),
+            1
+        );
+        assert_eq!(
+            manager.get_configs_by_de(DesktopEnvironment::Fluxbox).len(),
+            1
+        );
+        assert_eq!(
+            manager.get_configs_by_de(DesktopEnvironment::Awesome).len(),
+            1
+        );
+        assert_eq!(
+            manager
+                .get_configs_by_de(DesktopEnvironment::Hyprland)
+                .len(),
+            1
+        );
         assert_eq!(manager.get_configs_by_de(DesktopEnvironment::Sway).len(), 1);
     }
 }

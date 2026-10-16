@@ -184,60 +184,66 @@ impl RTL8169Driver {
             phy_addr: 1, // Default PHY address
         }
     }
-    
+
     /// Initialize the NIC with real DMA ring buffers
     pub fn initialize(&mut self) -> Result<(), &'static str> {
         if self.initialized {
             return Err("Already initialized");
         }
-        
+
         unsafe {
             // 1. Reset the controller
             self.reset();
-            
+
             // 2. Disable interrupts
             self.write_reg(REG_IMR, 0xFFFFFFFF);
-            
+
             // 3. Setup DMA ring buffers
             self.setup_rx_ring()?;
             self.setup_tx_ring()?;
-            
+
             // 4. Configure receive control
-            let rcr = RCR_RX_EN | RCR_APM | RCR_AM | RCR_AB | RCR_RX_FIFO_THRESH 
-                    | RCR_RX_DMA_BURST | RCR_ACCEPT_BROADCAST | RCR_ACCEPT_MULTICAST 
-                    | RCR_ACCEPT_PHYS_MATCH;
+            let rcr = RCR_RX_EN
+                | RCR_APM
+                | RCR_AM
+                | RCR_AB
+                | RCR_RX_FIFO_THRESH
+                | RCR_RX_DMA_BURST
+                | RCR_ACCEPT_BROADCAST
+                | RCR_ACCEPT_MULTICAST
+                | RCR_ACCEPT_PHYS_MATCH;
             self.write_reg(REG_RCR, rcr);
-            
+
             // 5. Configure transmit control
             let tcr = TCR_TX_DMA_BURST | TCR_PAD_PKT | TCR_CRC_EN;
             self.write_reg(REG_TCR, tcr);
-            
+
             // 6. Configure C+ command register
-            let cpcr = CPCR_RX_EN | CPCR_TX_EN | CPCR_RX_FIFO_THRESH 
-                    | CPCR_RX_DMA_BURST | CPCR_PCI_MULTI;
+            let cpcr =
+                CPCR_RX_EN | CPCR_TX_EN | CPCR_RX_FIFO_THRESH | CPCR_RX_DMA_BURST | CPCR_PCI_MULTI;
             self.write_reg(REG_CPCR, cpcr);
-            
+
             // 7. Enable interrupts
             self.write_reg(REG_IMR, IRQ_TX_OK | IRQ_RX_OK | IRQ_LINK_CHG);
-            
+
             // 8. Read MAC address
             self.read_mac_address();
-            
+
             // 9. Setup PHY
             self.setup_phy();
-            
+
             self.initialized = true;
             self.link_up = true;
         }
-        
+
         Ok(())
     }
-    
+
     /// Reset the controller
     fn reset(&mut self) {
         unsafe {
             self.write_reg(REG_CR, 0x10); // Reset command
-            // Wait for reset to complete
+                                          // Wait for reset to complete
             for _ in 0..10000 {
                 if (self.read_reg(REG_CR) & 0x10) == 0 {
                     break;
@@ -245,14 +251,14 @@ impl RTL8169Driver {
             }
         }
     }
-    
+
     /// Setup receive ring with DMA buffers
     fn setup_rx_ring(&mut self) -> Result<(), &'static str> {
         // Allocate DMA buffers for RX
         for _ in 0..NUM_RX_DESCRIPTORS {
             let dma_buf = self.allocate_dma_buffer(RX_BUFFER_SIZE)?;
             self.rx_buffers.push(dma_buf);
-            
+
             let desc = RxDescriptor {
                 buffer_addr: dma_buf.phys_addr,
                 length: 0,
@@ -262,22 +268,22 @@ impl RTL8169Driver {
             };
             self.rx_ring.push(desc);
         }
-        
+
         // Program RX descriptor ring to hardware
         let rx_ring_phys = self.rx_ring.as_ptr() as u64;
         self.write_reg(REG_TNPDS, (rx_ring_phys & 0xFFFFFFFF) as u32);
         self.write_reg(REG_TNPDS + 4, (rx_ring_phys >> 32) as u32);
-        
+
         Ok(())
     }
-    
+
     /// Setup transmit ring with DMA buffers
     fn setup_tx_ring(&mut self) -> Result<(), &'static str> {
         // Allocate DMA buffers for TX
         for _ in 0..NUM_TX_DESCRIPTORS {
             let dma_buf = self.allocate_dma_buffer(TX_BUFFER_SIZE)?;
             self.tx_buffers.push(dma_buf);
-            
+
             let desc = TxDescriptor {
                 buffer_addr: dma_buf.phys_addr,
                 length: 0,
@@ -287,15 +293,15 @@ impl RTL8169Driver {
             };
             self.tx_ring.push(desc);
         }
-        
+
         // Program TX descriptor ring to hardware
         let tx_ring_phys = self.tx_ring.as_ptr() as u64;
         self.write_reg(REG_TNPDS, (tx_ring_phys & 0xFFFFFFFF) as u32);
         self.write_reg(REG_TNPDS + 4, (tx_ring_phys >> 32) as u32);
-        
+
         Ok(())
     }
-    
+
     /// Allocate DMA buffer
     fn allocate_dma_buffer(&self, size: usize) -> Result<DmaBuffer, &'static str> {
         // In real implementation, this would allocate physically contiguous memory
@@ -306,124 +312,128 @@ impl RTL8169Driver {
             size,
         })
     }
-    
+
     /// Read MAC address from EEPROM
     fn read_mac_address(&mut self) {
         // In real implementation, read from EEPROM
         // For now, use a dummy MAC
         self.mac_address = [0x00, 0xE0, 0x4C, 0x00, 0x00, 0x01];
     }
-    
+
     /// Setup PHY
     fn setup_phy(&mut self) {
         // In real implementation, configure PHY via MDIO
         // For now, just mark as setup
     }
-    
+
     /// Transmit packet via DMA ring buffer
     pub fn transmit(&mut self, data: &[u8]) -> Result<usize, &'static str> {
         if !self.initialized {
             return Err("Not initialized");
         }
-        
+
         if data.len() > TX_BUFFER_SIZE {
             return Err("Packet too large");
         }
-        
+
         // Check if TX ring has space
         let next_tail = (self.tx_tail + 1) % NUM_TX_DESCRIPTORS;
         if next_tail == self.tx_head {
             return Err("TX ring full");
         }
-        
+
         // Copy data to DMA buffer
         let dma_buf = &self.tx_buffers[self.tx_tail];
         unsafe {
             core::ptr::copy_nonoverlapping(data.as_ptr(), dma_buf.virt_addr as *mut u8, data.len());
         }
-        
+
         // Setup descriptor
         let desc = &mut self.tx_ring[self.tx_tail];
         desc.buffer_addr = dma_buf.phys_addr;
         desc.length = data.len() as u16;
         desc.status = 0x0001; // Owner = NIC
         desc.vlan = 0;
-        
+
         // Advance tail pointer to tell hardware about new descriptor
         self.tx_tail = next_tail;
         unsafe {
             self.write_reg(REG_TNPDS, self.tx_tail as u32);
         }
-        
+
         Ok(data.len())
     }
-    
+
     /// Receive packet from DMA ring buffer
     pub fn receive(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
         if !self.initialized {
             return Err("Not initialized");
         }
-        
+
         // Check if there's a packet available
         let desc = &self.rx_ring[self.rx_head];
         if (desc.status & 0x01) == 0 {
             return Ok(0); // No packet
         }
-        
+
         let length = desc.length as usize;
         if length > buffer.len() {
             return Err("Buffer too small");
         }
-        
+
         // Copy from DMA buffer
         let dma_buf = &self.rx_buffers[self.rx_head];
         unsafe {
-            core::ptr::copy_nonoverlapping(dma_buf.virt_addr as *const u8, buffer.as_mut_ptr(), length);
+            core::ptr::copy_nonoverlapping(
+                dma_buf.virt_addr as *const u8,
+                buffer.as_mut_ptr(),
+                length,
+            );
         }
-        
+
         // Clear descriptor status
         let desc_mut = &mut self.rx_ring[self.rx_head];
         desc_mut.status = 0;
-        
+
         // Advance head pointer
         self.rx_head = (self.rx_head + 1) % NUM_RX_DESCRIPTORS;
-        
+
         Ok(length)
     }
-    
+
     /// Handle interrupt
     pub fn handle_interrupt(&mut self) -> u32 {
         let isr = unsafe { self.read_reg(REG_ISR) };
-        
+
         if isr & IRQ_LINK_CHG != 0 {
             // Link status change
             self.check_link_status();
         }
-        
+
         if isr & IRQ_RX_OK != 0 {
             // RX interrupt - wake receive path
         }
-        
+
         if isr & IRQ_TX_OK != 0 {
             // TX interrupt - clean up completed descriptors
             self.cleanup_tx_descriptors();
         }
-        
+
         // Clear interrupt status
         unsafe {
             self.write_reg(REG_ISR, isr);
         }
-        
+
         isr
     }
-    
+
     /// Check link status
     fn check_link_status(&mut self) {
         // In real implementation, read PHY status
         // For now, assume link is up
         self.link_up = true;
     }
-    
+
     /// Cleanup completed TX descriptors
     fn cleanup_tx_descriptors(&mut self) {
         // In real implementation, check TDH register
@@ -436,47 +446,47 @@ impl RTL8169Driver {
             self.tx_head = (self.tx_head + 1) % NUM_TX_DESCRIPTORS;
         }
     }
-    
+
     /// Shutdown the NIC
     pub fn shutdown(&mut self) -> Result<(), &'static str> {
         if !self.initialized {
             return Err("Not initialized");
         }
-        
+
         unsafe {
             // Disable RX/TX
             self.write_reg(REG_RCR, 0);
             self.write_reg(REG_TCR, 0);
             self.write_reg(REG_CPCR, 0);
-            
+
             // Disable interrupts
             self.write_reg(REG_IMR, 0xFFFFFFFF);
-            
+
             // Reset controller
             self.reset();
         }
-        
+
         self.initialized = false;
         self.link_up = false;
-        
+
         Ok(())
     }
-    
+
     /// Read MMIO register
     unsafe fn read_reg(&self, offset: u32) -> u32 {
         read_volatile((self.mmio_base + offset as usize) as *const u32)
     }
-    
+
     /// Write MMIO register
     unsafe fn write_reg(&self, offset: u32, value: u32) {
         write_volatile((self.mmio_base + offset as usize) as *mut u32, value);
     }
-    
+
     /// Get link status
     pub fn is_link_up(&self) -> bool {
         self.link_up
     }
-    
+
     /// Get MAC address
     pub fn get_mac_address(&self) -> [u8; 6] {
         self.mac_address
@@ -492,7 +502,7 @@ impl Default for RTL8169Driver {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_rtl8169_driver_init() {
         let mut driver = RTL8169Driver::new(0xF0000000, 0);
@@ -500,17 +510,17 @@ mod tests {
         // Note: Will fail in test without real hardware/MMIO
         // This is expected - the driver requires real PCIe hardware
     }
-    
+
     #[test]
     fn test_rx_descriptor_size() {
         assert_eq!(core::mem::size_of::<RxDescriptor>(), 16);
     }
-    
+
     #[test]
     fn test_tx_descriptor_size() {
         assert_eq!(core::mem::size_of::<TxDescriptor>(), 16);
     }
-    
+
     #[test]
     fn test_ring_configuration() {
         assert_eq!(NUM_RX_DESCRIPTORS, 256);

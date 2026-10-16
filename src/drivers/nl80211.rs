@@ -84,7 +84,12 @@ impl Nl80211Subsystem {
     }
 
     /// Add a logical network interface on top of a Wiphy
-    pub fn add_interface(&mut self, wiphy_idx: u32, if_name: &str, mac: [u8; 6]) -> Result<u32, &'static str> {
+    pub fn add_interface(
+        &mut self,
+        wiphy_idx: u32,
+        if_name: &str,
+        mac: [u8; 6],
+    ) -> Result<u32, &'static str> {
         if wiphy_idx >= self.wiphys.len() as u32 {
             return Err("Invalid wiphy index");
         }

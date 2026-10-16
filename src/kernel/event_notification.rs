@@ -77,7 +77,7 @@ impl EpollInstance {
             ready_events: Vec::new(),
         }
     }
-    
+
     /// Add/modify/delete file descriptor monitoring
     pub fn ctl(&mut self, op: EpollOp, fd: i32, event: EpollEvent) -> Result<(), &'static str> {
         match op {
@@ -88,7 +88,9 @@ impl EpollInstance {
                 self.monitored_fds.insert(fd, event);
             }
             EpollOp::Del => {
-                self.monitored_fds.remove(&fd).ok_or("File descriptor not monitored")?;
+                self.monitored_fds
+                    .remove(&fd)
+                    .ok_or("File descriptor not monitored")?;
             }
             EpollOp::Mod => {
                 self.monitored_fds.insert(fd, event);
@@ -96,7 +98,7 @@ impl EpollInstance {
         }
         Ok(())
     }
-    
+
     /// Wait for events (blocking)
     pub fn wait(&mut self, max_events: usize, timeout_ms: i32) -> Result<usize, &'static str> {
         // In real implementation, this would block until events arrive
@@ -104,14 +106,14 @@ impl EpollInstance {
         let count = self.ready_events.len().min(max_events);
         Ok(count)
     }
-    
+
     /// Get ready events
     pub fn get_events(&mut self) -> Vec<EpollEvent> {
         let events = self.ready_events.clone();
         self.ready_events.clear();
         events
     }
-    
+
     /// Signal that a file descriptor is ready (called by other subsystems)
     pub fn signal_ready(&mut self, fd: i32, event_flags: EpollEventFlags) {
         if let Some(event) = self.monitored_fds.get(&fd) {
@@ -196,39 +198,45 @@ impl KqueueInstance {
             ready_events: Vec::new(),
         }
     }
-    
+
     /// Register event interest
     pub fn kevent(&mut self, changelist: &[KqueueEvent]) -> Result<usize, &'static str> {
         let mut nchanges = 0;
-        
+
         for event in changelist {
             let flags = event.flags;
-            
+
             if flags.0 & KqueueEventFlags::ADD != 0 || flags.0 & KqueueEventFlags::ENABLE != 0 {
                 self.monitored.insert(event.ident, *event);
                 nchanges += 1;
-            } else if flags.0 & KqueueEventFlags::DELETE != 0 || flags.0 & KqueueEventFlags::DISABLE != 0 {
+            } else if flags.0 & KqueueEventFlags::DELETE != 0
+                || flags.0 & KqueueEventFlags::DISABLE != 0
+            {
                 self.monitored.remove(&event.ident);
                 nchanges += 1;
             }
         }
-        
+
         Ok(nchanges)
     }
-    
+
     /// Wait for events
-    pub fn kevent_wait(&mut self, max_events: usize, timeout_ms: i32) -> Result<usize, &'static str> {
+    pub fn kevent_wait(
+        &mut self,
+        max_events: usize,
+        timeout_ms: i32,
+    ) -> Result<usize, &'static str> {
         let count = self.ready_events.len().min(max_events);
         Ok(count)
     }
-    
+
     /// Get ready events
     pub fn get_events(&mut self) -> Vec<KqueueEvent> {
         let events = self.ready_events.clone();
         self.ready_events.clear();
         events
     }
-    
+
     /// Signal event (called by other subsystems)
     pub fn signal_event(&mut self, ident: usize, filter: KqueueFilter, fflags: u32) {
         if let Some(event) = self.monitored.get(&ident) {
@@ -261,66 +269,89 @@ impl EventNotificationManager {
             next_kq_id: 1,
         }
     }
-    
+
     /// Create epoll instance
     pub fn epoll_create(&mut self) -> Result<i32, &'static str> {
         let ep_id = self.next_ep_id;
         self.next_ep_id += 1;
-        
+
         let instance = EpollInstance::new(ep_id);
         self.epoll_instances.insert(ep_id, instance);
-        
+
         Ok(ep_id as i32)
     }
-    
+
     /// epoll_ctl operation
-    pub fn epoll_ctl(&mut self, epfd: i32, op: EpollOp, fd: i32, event: EpollEvent) -> Result<(), &'static str> {
+    pub fn epoll_ctl(
+        &mut self,
+        epfd: i32,
+        op: EpollOp,
+        fd: i32,
+        event: EpollEvent,
+    ) -> Result<(), &'static str> {
         let ep_id = epfd as usize;
-        let instance = self.epoll_instances.get_mut(&ep_id)
+        let instance = self
+            .epoll_instances
+            .get_mut(&ep_id)
             .ok_or("Invalid epoll file descriptor")?;
-        
+
         instance.ctl(op, fd, event)
     }
-    
+
     /// epoll_wait
-    pub fn epoll_wait(&mut self, epfd: i32, max_events: usize, timeout_ms: i32) -> Result<Vec<EpollEvent>, &'static str> {
+    pub fn epoll_wait(
+        &mut self,
+        epfd: i32,
+        max_events: usize,
+        timeout_ms: i32,
+    ) -> Result<Vec<EpollEvent>, &'static str> {
         let ep_id = epfd as usize;
-        let instance = self.epoll_instances.get_mut(&ep_id)
+        let instance = self
+            .epoll_instances
+            .get_mut(&ep_id)
             .ok_or("Invalid epoll file descriptor")?;
-        
+
         instance.wait(max_events, timeout_ms)?;
         Ok(instance.get_events())
     }
-    
+
     /// Create kqueue instance
     pub fn kqueue_create(&mut self) -> Result<i32, &'static str> {
         let kq_id = self.next_kq_id;
         self.next_kq_id += 1;
-        
+
         let instance = KqueueInstance::new(kq_id);
         self.kqueue_instances.insert(kq_id, instance);
-        
+
         Ok(kq_id as i32)
     }
-    
+
     /// kevent syscall
-    pub fn kevent(&mut self, kq: i32, changelist: &[KqueueEvent], max_events: usize, timeout_ms: i32) -> Result<Vec<KqueueEvent>, &'static str> {
+    pub fn kevent(
+        &mut self,
+        kq: i32,
+        changelist: &[KqueueEvent],
+        max_events: usize,
+        timeout_ms: i32,
+    ) -> Result<Vec<KqueueEvent>, &'static str> {
         let kq_id = kq as usize;
-        let instance = self.kqueue_instances.get_mut(&kq_id)
+        let instance = self
+            .kqueue_instances
+            .get_mut(&kq_id)
             .ok_or("Invalid kqueue file descriptor")?;
-        
+
         instance.kevent(changelist)?;
         instance.kevent_wait(max_events, timeout_ms)?;
         Ok(instance.get_events())
     }
-    
+
     /// Signal file descriptor ready (for integration with VFS, sockets, etc.)
     pub fn signal_fd_ready(&mut self, fd: i32, event_flags: EpollEventFlags) {
         for instance in self.epoll_instances.values_mut() {
             instance.signal_ready(fd, event_flags);
         }
     }
-    
+
     /// Signal kqueue event
     pub fn signal_kqueue_event(&mut self, ident: usize, filter: KqueueFilter, fflags: u32) {
         for instance in self.kqueue_instances.values_mut() {
@@ -347,143 +378,141 @@ pub fn init_event_manager() {
 
 /// Get the global event notification manager
 pub fn get_event_manager() -> Option<&'static mut EventNotificationManager> {
-    unsafe {
-        EVENT_MANAGER.as_mut()
-    }
+    unsafe { EVENT_MANAGER.as_mut() }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_epoll_create() {
         let mut manager = EventNotificationManager::new();
         let epfd = manager.epoll_create().unwrap();
         assert!(epfd > 0);
     }
-    
+
     #[test]
     fn test_epoll_ctl_add() {
         let mut manager = EventNotificationManager::new();
         let epfd = manager.epoll_create().unwrap();
-        
+
         let event = EpollEvent::new(EpollEventFlags(EpollEventFlags::IN), 42);
         manager.epoll_ctl(epfd, EpollOp::Add, 3, event).unwrap();
     }
-    
+
     #[test]
     fn test_epoll_ctl_mod() {
         let mut manager = EventNotificationManager::new();
         let epfd = manager.epoll_create().unwrap();
-        
+
         let event = EpollEvent::new(EpollEventFlags(EpollEventFlags::IN), 42);
         manager.epoll_ctl(epfd, EpollOp::Add, 3, event).unwrap();
-        
+
         let event2 = EpollEvent::new(EpollEventFlags(EpollEventFlags::OUT), 43);
         manager.epoll_ctl(epfd, EpollOp::Mod, 3, event2).unwrap();
     }
-    
+
     #[test]
     fn test_epoll_ctl_del() {
         let mut manager = EventNotificationManager::new();
         let epfd = manager.epoll_create().unwrap();
-        
+
         let event = EpollEvent::new(EpollEventFlags(EpollEventFlags::IN), 42);
         manager.epoll_ctl(epfd, EpollOp::Add, 3, event).unwrap();
         manager.epoll_ctl(epfd, EpollOp::Del, 3, event).unwrap();
     }
-    
+
     #[test]
     fn test_epoll_wait() {
         let mut manager = EventNotificationManager::new();
         let epfd = manager.epoll_create().unwrap();
-        
+
         let event = EpollEvent::new(EpollEventFlags(EpollEventFlags::IN), 42);
         manager.epoll_ctl(epfd, EpollOp::Add, 3, event).unwrap();
-        
+
         let events = manager.epoll_wait(epfd, 10, 100).unwrap();
         assert_eq!(events.len(), 0);
     }
-    
+
     #[test]
     fn test_signal_fd_ready() {
         let mut manager = EventNotificationManager::new();
         let epfd = manager.epoll_create().unwrap();
-        
+
         let event = EpollEvent::new(EpollEventFlags(EpollEventFlags::IN), 42);
         manager.epoll_ctl(epfd, EpollOp::Add, 3, event).unwrap();
-        
+
         manager.signal_fd_ready(3, EpollEventFlags(EpollEventFlags::IN));
-        
+
         let events = manager.epoll_wait(epfd, 10, 100).unwrap();
         assert_eq!(events.len(), 1);
     }
-    
+
     #[test]
     fn test_kqueue_create() {
         let mut manager = EventNotificationManager::new();
         let kq = manager.kqueue_create().unwrap();
         assert!(kq > 0);
     }
-    
+
     #[test]
     fn test_kevent_add() {
         let mut manager = EventNotificationManager::new();
         let kq = manager.kqueue_create().unwrap();
-        
+
         let event = KqueueEvent::new(
             3,
             KqueueFilter::Read,
             KqueueEventFlags(KqueueEventFlags::ADD),
             42,
         );
-        
+
         let nchanges = manager.kevent(kq, &[event], 10, 100).unwrap();
         assert_eq!(nchanges, 0);
     }
-    
+
     #[test]
     fn test_kevent_delete() {
         let mut manager = EventNotificationManager::new();
         let kq = manager.kqueue_create().unwrap();
-        
+
         let event = KqueueEvent::new(
             3,
             KqueueFilter::Read,
             KqueueEventFlags(KqueueEventFlags::ADD),
             42,
         );
-        
+
         manager.kevent(kq, &[event], 10, 100).unwrap();
-        
+
         let event2 = KqueueEvent::new(
             3,
             KqueueFilter::Read,
             KqueueEventFlags(KqueueEventFlags::DELETE),
             42,
         );
-        
+
         let nchanges = manager.kevent(kq, &[event2], 10, 100).unwrap();
         assert_eq!(nchanges, 0);
     }
-    
+
     #[test]
     fn test_signal_kqueue_event() {
         let mut manager = EventNotificationManager::new();
         let kq = manager.kqueue_create().unwrap();
-        
+
         let event = KqueueEvent::new(
             3,
             KqueueFilter::Read,
             KqueueEventFlags(KqueueEventFlags::ADD),
             42,
         );
-        
+
         manager.kevent(kq, &[event], 10, 100).unwrap();
-        
+
         manager.signal_kqueue_event(3, KqueueFilter::Read, 0x100);
-        
+
         let events = manager.kevent(kq, &[], 10, 100).unwrap();
         assert_eq!(events.len(), 1);
     }

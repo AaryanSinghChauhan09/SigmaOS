@@ -7,10 +7,10 @@
 
 extern crate alloc;
 
-use alloc::string::String;
-use alloc::vec::Vec;
-use alloc::vec;
 use alloc::format;
+use alloc::string::String;
+use alloc::vec;
+use alloc::vec::Vec;
 
 /// 1. X86_64 Assembly Bootstrap Engine
 #[derive(Debug, Clone)]
@@ -32,9 +32,9 @@ impl X86_64AssemblyBootstrapEngine {
         Self {
             cpu_state: CpuRegisterState {
                 cr0_flags: (1 << 31) | (1 << 0), // Paging + Protection
-                cr3_pml4_base: 0x0010_0000,       // Physical PML4 table address
+                cr3_pml4_base: 0x0010_0000,      // Physical PML4 table address
                 cr4_flags: (1 << 5) | (1 << 7),  // PAE + PGE
-                efer_msr: (1 << 8) | (1 << 11),   // LME + NXE
+                efer_msr: (1 << 8) | (1 << 11),  // LME + NXE
             },
             gdt_entries_count: 5,
         }
@@ -57,13 +57,16 @@ pub struct BsdLocoreBootstrapEngine {
 impl BsdLocoreBootstrapEngine {
     pub fn new() -> Self {
         Self {
-            early_uart_port: 0x3F8, // COM1 Serial Port
+            early_uart_port: 0x3F8,  // COM1 Serial Port
             stack_size_bytes: 65536, // 64 KB kernel stack
         }
     }
 
     pub fn write_early_serial_char(&self, ch: u8) -> String {
-        format!("COM1 (0x{:03X}): char '{}' written", self.early_uart_port, ch as char)
+        format!(
+            "COM1 (0x{:03X}): char '{}' written",
+            self.early_uart_port, ch as char
+        )
     }
 }
 

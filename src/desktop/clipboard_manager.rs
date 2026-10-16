@@ -40,7 +40,7 @@ impl ClipboardManager {
     /// Set clipboard content
     pub fn set_content(&mut self, content: String) {
         self.current_content = content.clone();
-        
+
         // Add to history
         let item = ClipboardItem {
             id: self.next_id,
@@ -49,9 +49,9 @@ impl ClipboardManager {
             is_pinned: false,
         };
         self.next_id += 1;
-        
+
         self.history.push_front(item);
-        
+
         // Limit history size
         while self.history.len() > self.max_history_size {
             self.history.pop_back();
@@ -80,21 +80,33 @@ impl ClipboardManager {
 
     /// Pin item
     pub fn pin_item(&mut self, id: u32) -> Result<(), &'static str> {
-        let item = self.history.iter_mut().find(|i| i.id == id).ok_or("Item not found")?;
+        let item = self
+            .history
+            .iter_mut()
+            .find(|i| i.id == id)
+            .ok_or("Item not found")?;
         item.is_pinned = true;
         Ok(())
     }
 
     /// Unpin item
     pub fn unpin_item(&mut self, id: u32) -> Result<(), &'static str> {
-        let item = self.history.iter_mut().find(|i| i.id == id).ok_or("Item not found")?;
+        let item = self
+            .history
+            .iter_mut()
+            .find(|i| i.id == id)
+            .ok_or("Item not found")?;
         item.is_pinned = false;
         Ok(())
     }
 
     /// Remove item from history
     pub fn remove_item(&mut self, id: u32) -> Result<(), &'static str> {
-        let index = self.history.iter().position(|i| i.id == id).ok_or("Item not found")?;
+        let index = self
+            .history
+            .iter()
+            .position(|i| i.id == id)
+            .ok_or("Item not found")?;
         if self.history[index].is_pinned {
             return Err("Cannot remove pinned item");
         }
@@ -155,7 +167,9 @@ pub fn init_clipboard_manager() {
 /// Get clipboard manager
 pub fn get_clipboard_manager() -> &'static mut ClipboardManager {
     unsafe {
-        CLIPBOARD_MANAGER.as_mut().expect("Clipboard manager not initialized")
+        CLIPBOARD_MANAGER
+            .as_mut()
+            .expect("Clipboard manager not initialized")
     }
 }
 

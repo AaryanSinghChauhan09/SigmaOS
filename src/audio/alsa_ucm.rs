@@ -61,10 +61,18 @@ impl AlsaUcmManager {
 
     /// Switch active audio verb (e.g. "HiFi")
     pub fn set_verb(&mut self, verb_name: &str) -> Result<(), &'static str> {
-        let verb = self.verbs.get(verb_name).ok_or("Verb not found in UCM profile")?;
+        let verb = self
+            .verbs
+            .get(verb_name)
+            .ok_or("Verb not found in UCM profile")?;
         for cmd in &verb.enable_sequence {
-            if let UcmControlCommand::CSet { control_name, value } = cmd {
-                self.applied_mixer_controls.insert(control_name.clone(), value.clone());
+            if let UcmControlCommand::CSet {
+                control_name,
+                value,
+            } = cmd
+            {
+                self.applied_mixer_controls
+                    .insert(control_name.clone(), value.clone());
             }
         }
         self.active_verb = Some(String::from(verb_name));
@@ -76,11 +84,19 @@ impl AlsaUcmManager {
     pub fn enable_device(&mut self, device_name: &str) -> Result<(), &'static str> {
         let active_verb_name = self.active_verb.as_ref().ok_or("No active verb set")?;
         let verb = self.verbs.get(active_verb_name).ok_or("Verb missing")?;
-        let dev = verb.devices.get(device_name).ok_or("Device profile not found")?;
+        let dev = verb
+            .devices
+            .get(device_name)
+            .ok_or("Device profile not found")?;
 
         for cmd in &dev.enable_sequence {
-            if let UcmControlCommand::CSet { control_name, value } = cmd {
-                self.applied_mixer_controls.insert(control_name.clone(), value.clone());
+            if let UcmControlCommand::CSet {
+                control_name,
+                value,
+            } = cmd
+            {
+                self.applied_mixer_controls
+                    .insert(control_name.clone(), value.clone());
             }
         }
 

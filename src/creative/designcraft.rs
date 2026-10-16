@@ -320,8 +320,19 @@ impl DesignEditor {
     }
 
     /// Add artboard to canvas
-    pub fn add_artboard(&mut self, canvas_id: u32, name: String, x: f32, y: f32, width: f32, height: f32) -> Result<u32, &'static str> {
-        let canvas = self.canvases.get_mut(&canvas_id).ok_or("Canvas not found")?;
+    pub fn add_artboard(
+        &mut self,
+        canvas_id: u32,
+        name: String,
+        x: f32,
+        y: f32,
+        width: f32,
+        height: f32,
+    ) -> Result<u32, &'static str> {
+        let canvas = self
+            .canvases
+            .get_mut(&canvas_id)
+            .ok_or("Canvas not found")?;
         let id = canvas.artboards.len() as u32;
         let artboard = Artboard {
             id,
@@ -339,7 +350,10 @@ impl DesignEditor {
 
     /// Add layer
     pub fn add_layer(&mut self, canvas_id: u32, name: String) -> Result<u32, &'static str> {
-        let canvas = self.canvases.get_mut(&canvas_id).ok_or("Canvas not found")?;
+        let canvas = self
+            .canvases
+            .get_mut(&canvas_id)
+            .ok_or("Canvas not found")?;
         let id = self.next_layer_id.fetch_add(1, Ordering::Relaxed);
         let layer = Layer {
             id,
@@ -355,8 +369,21 @@ impl DesignEditor {
     }
 
     /// Add element
-    pub fn add_element(&mut self, canvas_id: u32, layer_id: u32, element_type: ElementType, name: String, x: f32, y: f32, width: f32, height: f32) -> Result<u32, &'static str> {
-        let canvas = self.canvases.get_mut(&canvas_id).ok_or("Canvas not found")?;
+    pub fn add_element(
+        &mut self,
+        canvas_id: u32,
+        layer_id: u32,
+        element_type: ElementType,
+        name: String,
+        x: f32,
+        y: f32,
+        width: f32,
+        height: f32,
+    ) -> Result<u32, &'static str> {
+        let canvas = self
+            .canvases
+            .get_mut(&canvas_id)
+            .ok_or("Canvas not found")?;
         let layer = canvas.layers.get_mut(&layer_id).ok_or("Layer not found")?;
         let id = self.next_element_id.fetch_add(1, Ordering::Relaxed);
         let element = Element {
@@ -382,8 +409,17 @@ impl DesignEditor {
     }
 
     /// Set element fill
-    pub fn set_element_fill(&mut self, canvas_id: u32, layer_id: u32, element_id: u32, color: Color) -> Result<(), &'static str> {
-        let canvas = self.canvases.get_mut(&canvas_id).ok_or("Canvas not found")?;
+    pub fn set_element_fill(
+        &mut self,
+        canvas_id: u32,
+        layer_id: u32,
+        element_id: u32,
+        color: Color,
+    ) -> Result<(), &'static str> {
+        let canvas = self
+            .canvases
+            .get_mut(&canvas_id)
+            .ok_or("Canvas not found")?;
         let layer = canvas.layers.get_mut(&layer_id).ok_or("Layer not found")?;
         if !layer.elements.contains(&element_id) {
             return Err("Element not in layer");
@@ -395,8 +431,16 @@ impl DesignEditor {
     }
 
     /// Add guide
-    pub fn add_guide(&mut self, canvas_id: u32, orientation: GuideOrientation, position: f32) -> Result<(), &'static str> {
-        let canvas = self.canvases.get_mut(&canvas_id).ok_or("Canvas not found")?;
+    pub fn add_guide(
+        &mut self,
+        canvas_id: u32,
+        orientation: GuideOrientation,
+        position: f32,
+    ) -> Result<(), &'static str> {
+        let canvas = self
+            .canvases
+            .get_mut(&canvas_id)
+            .ok_or("Canvas not found")?;
         let id = canvas.guides.len() as u32;
         let guide = Guide {
             id,
@@ -409,8 +453,16 @@ impl DesignEditor {
     }
 
     /// Set grid
-    pub fn set_grid(&mut self, canvas_id: u32, size: f32, enabled: bool) -> Result<(), &'static str> {
-        let canvas = self.canvases.get_mut(&canvas_id).ok_or("Canvas not found")?;
+    pub fn set_grid(
+        &mut self,
+        canvas_id: u32,
+        size: f32,
+        enabled: bool,
+    ) -> Result<(), &'static str> {
+        let canvas = self
+            .canvases
+            .get_mut(&canvas_id)
+            .ok_or("Canvas not found")?;
         canvas.grid = Some(Grid {
             id: 0,
             size,
@@ -459,8 +511,15 @@ impl DesignEditor {
     }
 
     /// Set canvas background
-    pub fn set_canvas_background(&mut self, canvas_id: u32, color: Color) -> Result<(), &'static str> {
-        let canvas = self.canvases.get_mut(&canvas_id).ok_or("Canvas not found")?;
+    pub fn set_canvas_background(
+        &mut self,
+        canvas_id: u32,
+        color: Color,
+    ) -> Result<(), &'static str> {
+        let canvas = self
+            .canvases
+            .get_mut(&canvas_id)
+            .ok_or("Canvas not found")?;
         canvas.background = color;
         Ok(())
     }
@@ -494,9 +553,7 @@ pub fn init_designcraft() {
 
 /// Get global designcraft
 pub fn get_designcraft() -> Option<&'static mut DesignEditor> {
-    unsafe {
-        DESIGNCRAFT.as_mut()
-    }
+    unsafe { DESIGNCRAFT.as_mut() }
 }
 
 #[cfg(test)]
@@ -531,7 +588,7 @@ mod tests {
     fn test_colors() {
         let rgb = Color::rgb(255, 0, 0);
         assert_eq!(rgb.model, ColorModel::RGB);
-        
+
         let hsla = Color::hsla(0.0, 100.0, 50.0, 1.0);
         assert_eq!(hsla.model, ColorModel::HSL);
     }
@@ -541,8 +598,14 @@ mod tests {
         let mut editor = DesignEditor::new();
         editor.init();
         let canvas_id = editor.create_canvas("Canvas".to_string(), 1920.0, 1080.0);
-        let artboard_id = editor.add_artboard(canvas_id, "Artboard 1".to_string(), 0.0, 0.0, 375.0, 667.0).unwrap();
-        assert!(editor.get_canvas(canvas_id).unwrap().artboards.contains_key(&artboard_id));
+        let artboard_id = editor
+            .add_artboard(canvas_id, "Artboard 1".to_string(), 0.0, 0.0, 375.0, 667.0)
+            .unwrap();
+        assert!(editor
+            .get_canvas(canvas_id)
+            .unwrap()
+            .artboards
+            .contains_key(&artboard_id));
     }
 
     #[test]
@@ -551,7 +614,11 @@ mod tests {
         editor.init();
         let canvas_id = editor.create_canvas("Canvas".to_string(), 1920.0, 1080.0);
         let layer_id = editor.add_layer(canvas_id, "Layer 1".to_string()).unwrap();
-        assert!(editor.get_canvas(canvas_id).unwrap().layers.contains_key(&layer_id));
+        assert!(editor
+            .get_canvas(canvas_id)
+            .unwrap()
+            .layers
+            .contains_key(&layer_id));
     }
 
     #[test]
@@ -560,8 +627,21 @@ mod tests {
         editor.init();
         let canvas_id = editor.create_canvas("Canvas".to_string(), 1920.0, 1080.0);
         let layer_id = editor.add_layer(canvas_id, "Layer 1".to_string()).unwrap();
-        let element_id = editor.add_element(canvas_id, layer_id, ElementType::Rectangle, "Rect".to_string(), 100.0, 100.0, 200.0, 150.0).unwrap();
-        assert!(editor.get_canvas(canvas_id).unwrap().layers[&layer_id].elements.contains(&element_id));
+        let element_id = editor
+            .add_element(
+                canvas_id,
+                layer_id,
+                ElementType::Rectangle,
+                "Rect".to_string(),
+                100.0,
+                100.0,
+                200.0,
+                150.0,
+            )
+            .unwrap();
+        assert!(editor.get_canvas(canvas_id).unwrap().layers[&layer_id]
+            .elements
+            .contains(&element_id));
     }
 
     #[test]
@@ -569,7 +649,9 @@ mod tests {
         let mut editor = DesignEditor::new();
         editor.init();
         let canvas_id = editor.create_canvas("Canvas".to_string(), 1920.0, 1080.0);
-        editor.add_guide(canvas_id, GuideOrientation::Vertical, 960.0).unwrap();
+        editor
+            .add_guide(canvas_id, GuideOrientation::Vertical, 960.0)
+            .unwrap();
         assert_eq!(editor.get_canvas(canvas_id).unwrap().guides.len(), 1);
     }
 
@@ -611,7 +693,11 @@ mod tests {
     fn test_styles() {
         let mut editor = DesignEditor::new();
         editor.init();
-        let style_id = editor.create_style("Primary Color".to_string(), StyleType::Color, "#0066FF".to_string());
+        let style_id = editor.create_style(
+            "Primary Color".to_string(),
+            StyleType::Color,
+            "#0066FF".to_string(),
+        );
         assert!(editor.styles.contains_key(&style_id));
     }
 

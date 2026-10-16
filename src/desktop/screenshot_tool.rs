@@ -108,7 +108,7 @@ impl ScreenshotTool {
             file_path: options.file_path.clone(),
             thumbnail: Vec::new(),
         };
-        
+
         self.screenshots.push(screenshot.clone());
         self.last_screenshot = Some(screenshot.clone());
         Ok(screenshot)
@@ -211,7 +211,9 @@ pub fn init_screenshot_tool() {
 /// Get screenshot tool
 pub fn get_screenshot_tool() -> &'static mut ScreenshotTool {
     unsafe {
-        SCREENSHOT_TOOL.as_mut().expect("Screenshot tool not initialized")
+        SCREENSHOT_TOOL
+            .as_mut()
+            .expect("Screenshot tool not initialized")
     }
 }
 

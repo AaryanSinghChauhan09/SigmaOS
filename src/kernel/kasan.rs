@@ -249,7 +249,9 @@ impl KasanReport {
 
         let mut out = String::new();
         out.push_str("==================================================================\n");
-        out.push_str(&format!("BUG: KASAN: {err} in kernel at address {addr:#018x}\n"));
+        out.push_str(&format!(
+            "BUG: KASAN: {err} in kernel at address {addr:#018x}\n"
+        ));
         out.push_str(&format!("{access} of size {size} at addr {addr:#018x}\n"));
         out.push_str(&format!("Shadow byte: {shadow:#04x}\n"));
         out.push_str(&format!("Fault PC:    {:#018x}\n", self.fault_pc));
@@ -266,10 +268,7 @@ impl KasanReport {
                 m.alloc_pc, m.user_size
             ));
             if m.in_quarantine {
-                out.push_str(&format!(
-                    "Freed by task at {:#018x}\n",
-                    m.free_pc
-                ));
+                out.push_str(&format!("Freed by task at {:#018x}\n", m.free_pc));
             }
         }
         out.push_str("==================================================================\n");
@@ -409,14 +408,16 @@ impl KasanEngine {
 
         // Poison left redzone (at user_addr - left)
         let left_addr = user_addr.wrapping_sub(left);
-        self.shadow.poison(left_addr, left, ShadowByte::HeapLeftRedzone);
+        self.shadow
+            .poison(left_addr, left, ShadowByte::HeapLeftRedzone);
 
         // Unpoison usable region
         self.shadow.unpoison(user_addr, user_size);
 
         // Poison right redzone (at user_addr + user_size)
         let right_addr = user_addr + user_size;
-        self.shadow.poison(right_addr, right, ShadowByte::HeapRightRedzone);
+        self.shadow
+            .poison(right_addr, right, ShadowByte::HeapRightRedzone);
 
         self.alloc_count.fetch_add(1, Ordering::Relaxed);
         let _ = alloc_pc; // TODO: record in per-object metadata slab
@@ -430,7 +431,8 @@ impl KasanEngine {
         if !self.enabled {
             return;
         }
-        self.shadow.poison(user_addr, user_size, ShadowByte::FreedObject);
+        self.shadow
+            .poison(user_addr, user_size, ShadowByte::FreedObject);
 
         let meta = KasanAllocationMeta {
             user_addr,
@@ -488,10 +490,14 @@ impl KasanEngine {
         // Update statistics
         match (access_type, shadow_val) {
             (AccessType::Read, 0xFC) => {
-                self.stats.use_after_free_reads.fetch_add(1, Ordering::Relaxed);
+                self.stats
+                    .use_after_free_reads
+                    .fetch_add(1, Ordering::Relaxed);
             }
             (AccessType::Write, 0xFC) => {
-                self.stats.use_after_free_writes.fetch_add(1, Ordering::Relaxed);
+                self.stats
+                    .use_after_free_writes
+                    .fetch_add(1, Ordering::Relaxed);
             }
             (AccessType::Read, 0xFA | 0xFB) => {
                 self.stats.heap_oob_reads.fetch_add(1, Ordering::Relaxed);
@@ -517,7 +523,7 @@ impl KasanEngine {
             fault_pc,
             error_type,
             stack_trace: [0; 16], // TODO: unwind stack
-            alloc_meta: None,      // TODO: look up object metadata
+            alloc_meta: None,     // TODO: look up object metadata
         };
 
         if let Ok(mut ring) = self.recent_reports.lock() {

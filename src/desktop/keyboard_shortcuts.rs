@@ -170,7 +170,10 @@ impl KeyboardShortcutsManager {
             is_enabled: true,
         };
         self.shortcuts.insert(id.clone(), shortcut);
-        self.categories.entry(category).or_insert_with(Vec::new).push(id);
+        self.categories
+            .entry(category)
+            .or_insert_with(Vec::new)
+            .push(id);
     }
 
     /// Remove shortcut
@@ -235,11 +238,7 @@ impl KeyboardShortcutsManager {
     pub fn get_shortcuts_by_category(&self, category: ShortcutCategory) -> Vec<&KeyboardShortcut> {
         self.categories
             .get(&category)
-            .map(|ids| {
-                ids.iter()
-                    .filter_map(|id| self.shortcuts.get(id))
-                    .collect()
-            })
+            .map(|ids| ids.iter().filter_map(|id| self.shortcuts.get(id)).collect())
             .unwrap_or_default()
     }
 
@@ -308,8 +307,12 @@ mod tests {
     #[test]
     fn test_update_shortcut() {
         let mut ksm = KeyboardShortcutsManager::new();
-        ksm.update_shortcut("system-lock".to_string(), KeyModifier::CtrlShift, "L".to_string())
-            .unwrap();
+        ksm.update_shortcut(
+            "system-lock".to_string(),
+            KeyModifier::CtrlShift,
+            "L".to_string(),
+        )
+        .unwrap();
         let shortcut = ksm.shortcuts.get("system-lock").unwrap();
         assert_eq!(shortcut.modifier, KeyModifier::CtrlShift);
     }

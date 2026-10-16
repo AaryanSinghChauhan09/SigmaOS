@@ -200,7 +200,10 @@ impl SigmaACPI {
     /// Unregister an action for an event type
     pub fn unregister_action(&mut self, event_type: AcpiEventType) -> Result<(), String> {
         if self.actions.remove(&event_type).is_none() {
-            return Err(format!("No action registered for event type: {}", event_type));
+            return Err(format!(
+                "No action registered for event type: {}",
+                event_type
+            ));
         }
         Ok(())
     }
@@ -220,7 +223,7 @@ impl SigmaACPI {
         if !self.running {
             return Err("SigmaACPI not running".to_string());
         }
-        
+
         self.event_queue.push(event);
         self.event_counter += 1;
         Ok(())
@@ -229,7 +232,7 @@ impl SigmaACPI {
     /// Process the event queue
     pub fn process_events(&mut self) -> Vec<String> {
         let mut results = Vec::new();
-        
+
         if !self.running {
             return results;
         }
@@ -237,7 +240,7 @@ impl SigmaACPI {
         for event in self.event_queue.drain(..) {
             if let Some(action) = self.actions.get(&event.event_type) {
                 self.action_counter += 1;
-                
+
                 match action.action_type {
                     AcpiActionType::Shutdown => {
                         results.push(format!("Shutdown triggered by {}", event.event_type));
@@ -249,17 +252,26 @@ impl SigmaACPI {
                         results.push(format!("Hibernate triggered by {}", event.event_type));
                     }
                     AcpiActionType::ScreenBrightness => {
-                        results.push(format!("Screen brightness set to {} by {}", action.parameter, event.event_type));
+                        results.push(format!(
+                            "Screen brightness set to {} by {}",
+                            action.parameter, event.event_type
+                        ));
                     }
                     AcpiActionType::ExecuteCommand => {
-                        results.push(format!("Execute command: {} by {}", action.parameter, event.event_type));
+                        results.push(format!(
+                            "Execute command: {} by {}",
+                            action.parameter, event.event_type
+                        ));
                     }
                     AcpiActionType::Ignore => {
                         results.push(format!("Ignored event: {}", event.event_type));
                     }
                 }
             } else {
-                results.push(format!("No action registered for event: {}", event.event_type));
+                results.push(format!(
+                    "No action registered for event: {}",
+                    event.event_type
+                ));
             }
         }
 
@@ -279,10 +291,22 @@ impl SigmaACPI {
     /// Get ACPI statistics
     pub fn acpi_stats(&self) -> BTreeMap<String, String> {
         let mut stats = BTreeMap::new();
-        stats.insert("actions_registered".to_string(), self.action_count().to_string());
-        stats.insert("events_queued".to_string(), self.event_queue_size().to_string());
-        stats.insert("events_processed".to_string(), self.event_counter.to_string());
-        stats.insert("actions_executed".to_string(), self.action_counter.to_string());
+        stats.insert(
+            "actions_registered".to_string(),
+            self.action_count().to_string(),
+        );
+        stats.insert(
+            "events_queued".to_string(),
+            self.event_queue_size().to_string(),
+        );
+        stats.insert(
+            "events_processed".to_string(),
+            self.event_counter.to_string(),
+        );
+        stats.insert(
+            "actions_executed".to_string(),
+            self.action_counter.to_string(),
+        );
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
@@ -349,7 +373,7 @@ mod tests {
             "event1".to_string(),
             AcpiEventType::PowerButton,
             "pressed".to_string(),
-            1000
+            1000,
         );
 
         assert_eq!(event.event_id, "event1");
@@ -362,7 +386,7 @@ mod tests {
         let action = AcpiAction::new(
             "action1".to_string(),
             AcpiEventType::PowerButton,
-            AcpiActionType::Shutdown
+            AcpiActionType::Shutdown,
         )
         .with_parameter("now".to_string());
 
@@ -384,13 +408,13 @@ mod tests {
     #[test]
     fn test_sigmaacpi_register_action() {
         let mut acpi = SigmaACPI::new();
-        
+
         let action = AcpiAction::new(
             "action1".to_string(),
             AcpiEventType::PowerButton,
-            AcpiActionType::Shutdown
+            AcpiActionType::Shutdown,
         );
-        
+
         assert!(acpi.register_action(action).is_ok());
         assert_eq!(acpi.action_count(), 1);
     }
@@ -398,13 +422,13 @@ mod tests {
     #[test]
     fn test_sigmaacpi_unregister_action() {
         let mut acpi = SigmaACPI::new();
-        
+
         let action = AcpiAction::new(
             "action1".to_string(),
             AcpiEventType::PowerButton,
-            AcpiActionType::Shutdown
+            AcpiActionType::Shutdown,
         );
-        
+
         acpi.register_action(action).unwrap();
         assert!(acpi.unregister_action(AcpiEventType::PowerButton).is_ok());
         assert_eq!(acpi.action_count(), 0);
@@ -414,14 +438,14 @@ mod tests {
     fn test_sigmaacpi_add_event() {
         let mut acpi = SigmaACPI::new();
         acpi.start();
-        
+
         let event = AcpiEvent::new(
             "event1".to_string(),
             AcpiEventType::PowerButton,
             "pressed".to_string(),
-            1000
+            1000,
         );
-        
+
         assert!(acpi.add_event(event).is_ok());
         assert_eq!(acpi.event_queue_size(), 1);
     }
@@ -430,24 +454,24 @@ mod tests {
     fn test_sigmaacpi_process_events() {
         let mut acpi = SigmaACPI::new();
         acpi.start();
-        
+
         let action = AcpiAction::new(
             "action1".to_string(),
             AcpiEventType::PowerButton,
-            AcpiActionType::Shutdown
+            AcpiActionType::Shutdown,
         );
-        
+
         acpi.register_action(action).unwrap();
-        
+
         let event = AcpiEvent::new(
             "event1".to_string(),
             AcpiEventType::PowerButton,
             "pressed".to_string(),
-            1000
+            1000,
         );
-        
+
         acpi.add_event(event).unwrap();
-        
+
         let results = acpi.process_events();
         assert!(!results.is_empty());
     }
@@ -456,15 +480,15 @@ mod tests {
     fn test_sigmaacpi_stats() {
         let mut acpi = SigmaACPI::new();
         acpi.start();
-        
+
         let action = AcpiAction::new(
             "action1".to_string(),
             AcpiEventType::PowerButton,
-            AcpiActionType::Shutdown
+            AcpiActionType::Shutdown,
         );
-        
+
         acpi.register_action(action).unwrap();
-        
+
         let stats = acpi.acpi_stats();
         assert_eq!(stats.get("actions_registered"), Some(&"1".to_string()));
         assert_eq!(stats.get("running"), Some(&"true".to_string()));
@@ -473,17 +497,17 @@ mod tests {
     #[test]
     fn test_add_acpi_event_convenience() {
         init_sigmaacpi();
-        
+
         let mut acpi = get_sigmaacpi().unwrap();
         acpi.start();
-        
+
         let event = AcpiEvent::new(
             "event1".to_string(),
             AcpiEventType::PowerButton,
             "pressed".to_string(),
-            1000
+            1000,
         );
-        
+
         let result = add_acpi_event(event);
         assert!(result.is_ok());
     }
@@ -491,13 +515,13 @@ mod tests {
     #[test]
     fn test_register_acpi_action_convenience() {
         init_sigmaacpi();
-        
+
         let action = AcpiAction::new(
             "action1".to_string(),
             AcpiEventType::PowerButton,
-            AcpiActionType::Shutdown
+            AcpiActionType::Shutdown,
         );
-        
+
         let result = register_acpi_action(action);
         assert!(result.is_ok());
     }

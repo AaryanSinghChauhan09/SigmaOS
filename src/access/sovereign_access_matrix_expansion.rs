@@ -554,7 +554,8 @@ mod tests {
     fn test_ldap_directory_engine() {
         let mut ldap =
             LdapLightweightDirectoryEngine::new("ldap://auth.sigmaos.org", "dc=sigmaos,dc=org");
-        let test_pass = std::env::var("SIGMA_TEST_LDAP_PASS").unwrap_or_else(|_| "auth_token_verified".to_string());
+        let test_pass = std::env::var("SIGMA_TEST_LDAP_PASS")
+            .unwrap_or_else(|_| "auth_token_verified".to_string());
         assert!(ldap.bind_credentials("admin_dn", &test_pass).is_ok());
 
         let alice = ldap.search_user_by_uid("alice").unwrap();

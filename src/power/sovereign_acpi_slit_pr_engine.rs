@@ -140,7 +140,11 @@ impl SovereignAcpiSlitPrMasterSuite {
     }
 
     /// Construct a synthetic ACPI 6.5 SLIT table binary for a 2-node socket
-    pub fn build_synthetic_slit_table(node_count: usize, local_dist: u8, remote_dist: u8) -> Vec<u8> {
+    pub fn build_synthetic_slit_table(
+        node_count: usize,
+        local_dist: u8,
+        remote_dist: u8,
+    ) -> Vec<u8> {
         let mut bytes = vec![0u8; 44 + (node_count * node_count)];
         bytes[0..4].copy_from_slice(SLIT_SIGNATURE);
         let total_len = bytes.len() as u32;

@@ -110,7 +110,9 @@ impl LogSeverityV4 {
 
     pub fn ansi_color(&self) -> &'static str {
         match self {
-            LogSeverityV4::Emergency | LogSeverityV4::Alert | LogSeverityV4::Critical => "\x1b[1;31m",
+            LogSeverityV4::Emergency | LogSeverityV4::Alert | LogSeverityV4::Critical => {
+                "\x1b[1;31m"
+            }
             LogSeverityV4::Error => "\x1b[31m",
             LogSeverityV4::Warning => "\x1b[33m",
             LogSeverityV4::Notice | LogSeverityV4::Info => "\x1b[32m",
@@ -293,8 +295,12 @@ impl SovereignJournaldSyslogEngineV4 {
             fss_epoch: self.fss_sealer.current_epoch,
             fss_signature: sig,
         };
-        record.structured_fields.insert("_PID".to_string(), pid.to_string());
-        record.structured_fields.insert("_SYSTEMD_UNIT".to_string(), unit.to_string());
+        record
+            .structured_fields
+            .insert("_PID".to_string(), pid.to_string());
+        record
+            .structured_fields
+            .insert("_SYSTEMD_UNIT".to_string(), unit.to_string());
 
         self.records.push(record);
         Some(id)
@@ -535,7 +541,12 @@ impl TopHtopMonitorEngineV4 {
     pub fn render_tree_representation(&self, root_pid: u32) -> Vec<String> {
         let mut lines = Vec::new();
         if let Some(p) = self.processes.get(&root_pid) {
-            lines.push(format!("PID {} [{}] (RSS: {} KB)", p.pid, p.name, p.rss_bytes / 1024));
+            lines.push(format!(
+                "PID {} [{}] (RSS: {} KB)",
+                p.pid,
+                p.name,
+                p.rss_bytes / 1024
+            ));
             for child in self.processes.values().filter(|c| c.ppid == root_pid) {
                 lines.push(format!(
                     "  └── PID {} [{}] (CPU: {:.1}%)",
@@ -712,11 +723,16 @@ impl LsofInspectorEngineV4 {
     }
 
     pub fn run_fuser_query(&self, resource: &str) -> Option<&FuserProcessMappingV4> {
-        self.fuser_mappings.iter().find(|m| m.target_resource == resource)
+        self.fuser_mappings
+            .iter()
+            .find(|m| m.target_resource == resource)
     }
 
     pub fn query_sockstat(&self, proto: &str) -> Vec<&BsdSockstatEntryV4> {
-        self.sockstat_entries.iter().filter(|s| s.proto == proto).collect()
+        self.sockstat_entries
+            .iter()
+            .filter(|s| s.proto == proto)
+            .collect()
     }
 
     pub fn get_ipc_segments(&self) -> &[SysVIpcSegmentV4] {
@@ -917,7 +933,13 @@ impl SosreportPrometheusOpenTelemetryExporterV4 {
         format!("{{\"resourceMetrics\":[{}]}}", entries.join(","))
     }
 
-    pub fn export_collectd_json(&self, hostname: &str, user_cpu: f32, sys_cpu: f32, idle_cpu: f32) -> String {
+    pub fn export_collectd_json(
+        &self,
+        hostname: &str,
+        user_cpu: f32,
+        sys_cpu: f32,
+        idle_cpu: f32,
+    ) -> String {
         format!(
             "[{{\"host\":\"{}\",\"plugin\":\"cpu\",\"type\":\"percent\",\"values\":[{},{},{}]}}]",
             hostname, user_cpu, sys_cpu, idle_cpu
@@ -973,10 +995,12 @@ impl LoggingMonitoringDiagnosticsPullRequestGatewayV4 {
     fn seed_presets(&mut self) {
         self.submissions.push(DiagnosticsPrSubmissionV4 {
             pr_id: 401,
-            title: "PR #401: Forward Secure Sealing (FSS) HMAC-SHA256 Journald Integration".to_string(),
+            title: "PR #401: Forward Secure Sealing (FSS) HMAC-SHA256 Journald Integration"
+                .to_string(),
             author: "SigmaLoggingTeam".to_string(),
             target_component: "journald".to_string(),
-            description: "Implements FSS epoch signature verification for journal integrity".to_string(),
+            description: "Implements FSS epoch signature verification for journal integrity"
+                .to_string(),
             pqc_signature: "DILITHIUM5_SIG_FSS_JOURNAL_401".to_string(),
             status: DiagnosticsPrStatusV4::Merged,
         });
@@ -986,7 +1010,8 @@ impl LoggingMonitoringDiagnosticsPullRequestGatewayV4 {
             title: "PR #402: Cgroup v2 Pressure Stall Information (PSI) Telemetry".to_string(),
             author: "SigmaTelemetryTeam".to_string(),
             target_component: "top_htop_cgtop".to_string(),
-            description: "Implements CPU, Memory, and IO PSI metrics parsing and display".to_string(),
+            description: "Implements CPU, Memory, and IO PSI metrics parsing and display"
+                .to_string(),
             pqc_signature: "DILITHIUM5_SIG_PSI_402".to_string(),
             status: DiagnosticsPrStatusV4::CiGated,
         });

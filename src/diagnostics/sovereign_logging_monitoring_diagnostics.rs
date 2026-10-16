@@ -109,10 +109,10 @@ impl LogSeverity {
     pub fn ansi_color(&self) -> &'static str {
         match self {
             LogSeverity::Emergency | LogSeverity::Alert | LogSeverity::Critical => "\x1b[1;31m", // Red Bold
-            LogSeverity::Error => "\x1b[31m",                                                    // Red
-            LogSeverity::Warning => "\x1b[33m",                                                  // Yellow
-            LogSeverity::Notice | LogSeverity::Info => "\x1b[32m",                               // Green
-            LogSeverity::Debug => "\x1b[36m",                                                    // Cyan
+            LogSeverity::Error => "\x1b[31m",   // Red
+            LogSeverity::Warning => "\x1b[33m", // Yellow
+            LogSeverity::Notice | LogSeverity::Info => "\x1b[32m", // Green
+            LogSeverity::Debug => "\x1b[36m",   // Cyan
         }
     }
 }
@@ -171,7 +171,8 @@ impl JournaldBinarySealingVerifier {
         let mut hash = [0u8; 32];
         let bytes = message.as_bytes();
         for (i, b) in bytes.iter().enumerate() {
-            hash[i % 32] ^= b ^ (entry_id as u8) ^ (self.current_epoch as u8) ^ self.secret_seed[i % 32];
+            hash[i % 32] ^=
+                b ^ (entry_id as u8) ^ (self.current_epoch as u8) ^ self.secret_seed[i % 32];
         }
         hash
     }
@@ -1256,10 +1257,7 @@ impl SosreportPrometheusExporterEngine {
     pub fn export_collectd_json(&self, top: &TopHtopProcessMonitorEngine) -> String {
         format!(
             "[{{\"host\":\"{}\",\"plugin\":\"cpu\",\"type\":\"percent\",\"values\":[{},{},{}]}}]",
-            self.hostname,
-            top.total_cpu_user_pct,
-            top.total_cpu_sys_pct,
-            top.total_cpu_idle_pct
+            self.hostname, top.total_cpu_user_pct, top.total_cpu_sys_pct, top.total_cpu_idle_pct
         )
     }
 }
@@ -1475,10 +1473,7 @@ mod tests {
         assert!(!monitor.processes.is_empty());
 
         assert!(monitor.renice_process(540, -15));
-        assert_eq!(
-            monitor.processes.get(&540).unwrap().nice_priority,
-            -15
-        );
+        assert_eq!(monitor.processes.get(&540).unwrap().nice_priority, -15);
 
         assert!(monitor.send_signal(540, 15));
         assert_eq!(

@@ -160,10 +160,7 @@ impl SigmaHwMon {
 
     /// List sensors by state
     pub fn list_sensors_by_state(&self, state: SensorState) -> Vec<&HardwareSensor> {
-        self.sensors
-            .values()
-            .filter(|s| s.state == state)
-            .collect()
+        self.sensors.values().filter(|s| s.state == state).collect()
     }
 
     /// List sensors in alert state (warning or critical)
@@ -192,10 +189,13 @@ impl SigmaHwMon {
         if temp_sensors.is_empty() {
             return None;
         }
-        temp_sensors.iter().map(|s| s.current_value).fold(
-            f64::NEG_INFINITY,
-            |acc, &val| if val > acc { val } else { acc },
-        )
+        temp_sensors
+            .iter()
+            .map(|s| s.current_value)
+            .fold(
+                f64::NEG_INFINITY,
+                |acc, &val| if val > acc { val } else { acc },
+            )
     }
 }
 
@@ -217,16 +217,12 @@ pub fn init_sigmahwmon() {
 
 /// Get the global SigmaHwMon instance
 pub fn get_sigmahwmon() -> Option<&'static SigmaHwMon> {
-    unsafe {
-        SIGMAHWMON_INSTANCE.as_ref()
-    }
+    unsafe { SIGMAHWMON_INSTANCE.as_ref() }
 }
 
 /// Get mutable global SigmaHwMon instance
 pub fn get_sigmahwmon_mut() -> Option<&'static mut SigmaHwMon> {
-    unsafe {
-        SIGMAHWMON_INSTANCE.as_mut()
-    }
+    unsafe { SIGMAHWMON_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add a sensor

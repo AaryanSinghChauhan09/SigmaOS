@@ -140,11 +140,16 @@ impl StudyToImplementationPipelineEngine {
         self.study_items.push(UpstreamStudyItem {
             project_name: "xv6".to_string(),
             concept_name: "Minimal Kernel Clarity".to_string(),
-            upstream_problem: "Minimal educational boot and process scheduling pipeline".to_string(),
-            data_structure_control_flow: "bootmain -> entry.S -> main() -> userinit() -> scheduler()".to_string(),
-            security_failure_assumptions: "Single-tenant hardware, panic on unexpected state".to_string(),
-            adopted_directly: "Clean boot-to-shell progression and transaction-logged buffer cache".to_string(),
-            simplified_for_rust: "Type-safe x86_64 long mode bootloader and Rust FrameAllocator".to_string(),
+            upstream_problem: "Minimal educational boot and process scheduling pipeline"
+                .to_string(),
+            data_structure_control_flow:
+                "bootmain -> entry.S -> main() -> userinit() -> scheduler()".to_string(),
+            security_failure_assumptions: "Single-tenant hardware, panic on unexpected state"
+                .to_string(),
+            adopted_directly: "Clean boot-to-shell progression and transaction-logged buffer cache"
+                .to_string(),
+            simplified_for_rust: "Type-safe x86_64 long mode bootloader and Rust FrameAllocator"
+                .to_string(),
             exit_test_criteria: "QEMU x86_64 boots to shell and executes commands".to_string(),
             licensing_attribution: "MIT License".to_string(),
         });
@@ -152,23 +157,33 @@ impl StudyToImplementationPipelineEngine {
         self.study_items.push(UpstreamStudyItem {
             project_name: "Linux Kernel".to_string(),
             concept_name: "Scalable Kernel Abstractions".to_string(),
-            upstream_problem: "Multi-core scheduling, VFS abstractions, and unified driver model".to_string(),
-            data_structure_control_flow: "EEVDF cfs_rq, VFS dentry/inode lookup, PCI device probe".to_string(),
-            security_failure_assumptions: "DAC permissions, LSM hooks, fail-closed system call errors".to_string(),
-            adopted_directly: "VFS path resolution traits, mount namespaces, EEVDF virtual deadline rules".to_string(),
-            simplified_for_rust: "Safe Rust traits (VFileSystem, VNode) wrapped in Spinlock/Arc".to_string(),
-            exit_test_criteria: "Process file operations and scheduling covered by integration tests".to_string(),
+            upstream_problem: "Multi-core scheduling, VFS abstractions, and unified driver model"
+                .to_string(),
+            data_structure_control_flow: "EEVDF cfs_rq, VFS dentry/inode lookup, PCI device probe"
+                .to_string(),
+            security_failure_assumptions:
+                "DAC permissions, LSM hooks, fail-closed system call errors".to_string(),
+            adopted_directly:
+                "VFS path resolution traits, mount namespaces, EEVDF virtual deadline rules"
+                    .to_string(),
+            simplified_for_rust: "Safe Rust traits (VFileSystem, VNode) wrapped in Spinlock/Arc"
+                .to_string(),
+            exit_test_criteria:
+                "Process file operations and scheduling covered by integration tests".to_string(),
             licensing_attribution: "GPL-2.0 License (Clean-room design in SigmaOS)".to_string(),
         });
 
         self.study_items.push(UpstreamStudyItem {
             project_name: "Redox OS".to_string(),
             concept_name: "Rust-Native Architecture".to_string(),
-            upstream_problem: "Userspace driver isolation and capability-oriented schemes".to_string(),
+            upstream_problem: "Userspace driver isolation and capability-oriented schemes"
+                .to_string(),
             data_structure_control_flow: "Microkernel Scheme handler IPC loops".to_string(),
             security_failure_assumptions: "Least-privilege scheme access controls".to_string(),
-            adopted_directly: "Safe Rust concurrency guarantees and capability token architecture".to_string(),
-            simplified_for_rust: "Combined POSIX VFS traits with Scheme extension hooks".to_string(),
+            adopted_directly: "Safe Rust concurrency guarantees and capability token architecture"
+                .to_string(),
+            simplified_for_rust: "Combined POSIX VFS traits with Scheme extension hooks"
+                .to_string(),
             exit_test_criteria: "Ring 3 driver isolation tests without panic".to_string(),
             licensing_attribution: "MIT License".to_string(),
         });
@@ -188,23 +203,35 @@ impl StudyToImplementationPipelineEngine {
         self.study_items.push(UpstreamStudyItem {
             project_name: "Linux Mint".to_string(),
             concept_name: "Update Safety & Recovery".to_string(),
-            upstream_problem: "Desktop onboarding, pre-flight update validation, and Timeshift restore".to_string(),
-            data_structure_control_flow: "Pre-flight checks -> Staged payload -> Timeshift snapshot -> Switch".to_string(),
-            security_failure_assumptions: "Rollback on post-install script or boot failure".to_string(),
-            adopted_directly: "Pre-flight update checks and Timeshift system recovery workflow".to_string(),
-            simplified_for_rust: "Native Rust Timeshift backup manifest and OverlayFS staging".to_string(),
-            exit_test_criteria: "Simulated failed update restores pre-update snapshot cleanly".to_string(),
+            upstream_problem:
+                "Desktop onboarding, pre-flight update validation, and Timeshift restore"
+                    .to_string(),
+            data_structure_control_flow:
+                "Pre-flight checks -> Staged payload -> Timeshift snapshot -> Switch".to_string(),
+            security_failure_assumptions: "Rollback on post-install script or boot failure"
+                .to_string(),
+            adopted_directly: "Pre-flight update checks and Timeshift system recovery workflow"
+                .to_string(),
+            simplified_for_rust: "Native Rust Timeshift backup manifest and OverlayFS staging"
+                .to_string(),
+            exit_test_criteria: "Simulated failed update restores pre-update snapshot cleanly"
+                .to_string(),
             licensing_attribution: "GPL-3.0 License".to_string(),
         });
 
         self.study_items.push(UpstreamStudyItem {
             project_name: "FreeBSD".to_string(),
             concept_name: "Release Discipline & Jails".to_string(),
-            upstream_problem: "Tier-based release qualification, jail isolation, and ZFS boot environments".to_string(),
-            data_structure_control_flow: "jail_set() syscall -> prison alloc -> VNET isolation".to_string(),
+            upstream_problem:
+                "Tier-based release qualification, jail isolation, and ZFS boot environments"
+                    .to_string(),
+            data_structure_control_flow: "jail_set() syscall -> prison alloc -> VNET isolation"
+                .to_string(),
             security_failure_assumptions: "Strict default-deny jail permissions".to_string(),
-            adopted_directly: "Tiered platform support checklist and jail container isolation".to_string(),
-            simplified_for_rust: "Unified SigmaSandboxContainer merging Jails with Linux cgroups v2".to_string(),
+            adopted_directly: "Tiered platform support checklist and jail container isolation"
+                .to_string(),
+            simplified_for_rust:
+                "Unified SigmaSandboxContainer merging Jails with Linux cgroups v2".to_string(),
             exit_test_criteria: "Jailed process capability denial tests pass".to_string(),
             licensing_attribution: "BSD 2-Clause License".to_string(),
         });
@@ -212,12 +239,18 @@ impl StudyToImplementationPipelineEngine {
         self.study_items.push(UpstreamStudyItem {
             project_name: "OpenBSD".to_string(),
             concept_name: "Secure Defaults & Pledge/Unveil".to_string(),
-            upstream_problem: "Proactive security, W^X memory, pledge syscall masks, and unveil path radix trees".to_string(),
-            data_structure_control_flow: "pledge() mask update -> unveil() tree insert -> Syscall filter check".to_string(),
-            security_failure_assumptions: "Fail-closed process termination on promise violation".to_string(),
-            adopted_directly: "pledge promise masks, unveil path trees, and W^X memory alloc".to_string(),
+            upstream_problem:
+                "Proactive security, W^X memory, pledge syscall masks, and unveil path radix trees"
+                    .to_string(),
+            data_structure_control_flow:
+                "pledge() mask update -> unveil() tree insert -> Syscall filter check".to_string(),
+            security_failure_assumptions: "Fail-closed process termination on promise violation"
+                .to_string(),
+            adopted_directly: "pledge promise masks, unveil path trees, and W^X memory alloc"
+                .to_string(),
             simplified_for_rust: "Monotonic ProcessCapabilityGuard in safe Rust".to_string(),
-            exit_test_criteria: "Pledged process attempting revoked syscall triggers termination".to_string(),
+            exit_test_criteria: "Pledged process attempting revoked syscall triggers termination"
+                .to_string(),
             licensing_attribution: "ISC / BSD License".to_string(),
         });
 
@@ -236,11 +269,15 @@ impl StudyToImplementationPipelineEngine {
         self.study_items.push(UpstreamStudyItem {
             project_name: "Fedora".to_string(),
             concept_name: "CI Gating & Atomic Updates".to_string(),
-            upstream_problem: "Automated test gating (Greenwave) and rpm-ostree atomic image deployments".to_string(),
-            data_structure_control_flow: "Code push -> CI suite -> Gating decision -> Staged deployment".to_string(),
+            upstream_problem:
+                "Automated test gating (Greenwave) and rpm-ostree atomic image deployments"
+                    .to_string(),
+            data_structure_control_flow:
+                "Code push -> CI suite -> Gating decision -> Staged deployment".to_string(),
             security_failure_assumptions: "Failed test suite blocks update promotion".to_string(),
             adopted_directly: "CI gating rules and staged atomic deployments".to_string(),
-            simplified_for_rust: "Native SovereignReleaseGateGovernor integrated with test runner".to_string(),
+            simplified_for_rust: "Native SovereignReleaseGateGovernor integrated with test runner"
+                .to_string(),
             exit_test_criteria: "Failing CI test blocks release gate promotion".to_string(),
             licensing_attribution: "MIT / GPL License".to_string(),
         });
@@ -248,23 +285,33 @@ impl StudyToImplementationPipelineEngine {
         self.study_items.push(UpstreamStudyItem {
             project_name: "NixOS".to_string(),
             concept_name: "Declarative Configuration".to_string(),
-            upstream_problem: "Pure functional system configuration, store paths, and generation rollbacks".to_string(),
-            data_structure_control_flow: "Nix AST eval -> Derivation build -> Generation switch".to_string(),
-            security_failure_assumptions: "Immutable store paths prevent configuration drift".to_string(),
-            adopted_directly: "Declarative system configuration schema and generation rollbacks".to_string(),
+            upstream_problem:
+                "Pure functional system configuration, store paths, and generation rollbacks"
+                    .to_string(),
+            data_structure_control_flow: "Nix AST eval -> Derivation build -> Generation switch"
+                .to_string(),
+            security_failure_assumptions: "Immutable store paths prevent configuration drift"
+                .to_string(),
+            adopted_directly: "Declarative system configuration schema and generation rollbacks"
+                .to_string(),
             simplified_for_rust: "Strongly typed TOML system schema (system.toml)".to_string(),
-            exit_test_criteria: "Declarative schema parser and generation rollback tests pass".to_string(),
+            exit_test_criteria: "Declarative schema parser and generation rollback tests pass"
+                .to_string(),
             licensing_attribution: "MIT License".to_string(),
         });
 
         self.study_items.push(UpstreamStudyItem {
             project_name: "OSDev".to_string(),
             concept_name: "First Bootable Milestones".to_string(),
-            upstream_problem: "Bare-metal x86_64 initialization, GDT/IDT, 16550 UART, VGA, and timer".to_string(),
-            data_structure_control_flow: "Firmware handoff -> GDT/IDT -> Serial trace -> Kernel main".to_string(),
-            security_failure_assumptions: "Panic handler dumps CPU registers to COM1 serial".to_string(),
+            upstream_problem:
+                "Bare-metal x86_64 initialization, GDT/IDT, 16550 UART, VGA, and timer".to_string(),
+            data_structure_control_flow:
+                "Firmware handoff -> GDT/IDT -> Serial trace -> Kernel main".to_string(),
+            security_failure_assumptions: "Panic handler dumps CPU registers to COM1 serial"
+                .to_string(),
             adopted_directly: "QEMU x86_64 UEFI boot trace logging contract".to_string(),
-            simplified_for_rust: "Rust bootloader entry point and type-safe interrupt descriptors".to_string(),
+            simplified_for_rust: "Rust bootloader entry point and type-safe interrupt descriptors"
+                .to_string(),
             exit_test_criteria: "Boot trace confirms Stage 1 through Stage 4 execution".to_string(),
             licensing_attribution: "Public Domain / CC0".to_string(),
         });
@@ -275,9 +322,11 @@ impl StudyToImplementationPipelineEngine {
             adr_id: "ADR-001".to_string(),
             title: "QEMU x86_64 UEFI Boot Path and Serial Logging".to_string(),
             status: AdrStatus::Accepted,
-            context: "SigmaOS requires a deterministic 64-bit boot sequence with serial tracing.".to_string(),
+            context: "SigmaOS requires a deterministic 64-bit boot sequence with serial tracing."
+                .to_string(),
             upstream_study_ref: "xv6 & OSDev".to_string(),
-            decision: "Adopt a 4-stage UEFI long-mode bootloader pipeline with COM1 logging.".to_string(),
+            decision: "Adopt a 4-stage UEFI long-mode bootloader pipeline with COM1 logging."
+                .to_string(),
             consequences: "Early errors emit detailed register dumps before CPU halt.".to_string(),
             validation_method: "QEMU x86_64 boot trace smoke test".to_string(),
         });
@@ -286,10 +335,13 @@ impl StudyToImplementationPipelineEngine {
             adr_id: "ADR-002".to_string(),
             title: "EEVDF Starvation-Free Scheduler Model".to_string(),
             status: AdrStatus::Accepted,
-            context: "Requires scalable CPU scheduler with virtual deadline calculation.".to_string(),
+            context: "Requires scalable CPU scheduler with virtual deadline calculation."
+                .to_string(),
             upstream_study_ref: "Linux Kernel EEVDF".to_string(),
-            decision: "Hybrid EEVDF/Round-Robin scheduler with 10ms slice preemption limits.".to_string(),
-            consequences: "Guaranteed upper bound on scheduling latency; zero task starvation.".to_string(),
+            decision: "Hybrid EEVDF/Round-Robin scheduler with 10ms slice preemption limits."
+                .to_string(),
+            consequences: "Guaranteed upper bound on scheduling latency; zero task starvation."
+                .to_string(),
             validation_method: "Fairness unit test across priority nice levels".to_string(),
         });
 
@@ -297,10 +349,14 @@ impl StudyToImplementationPipelineEngine {
             adr_id: "ADR-003".to_string(),
             title: "Trait-Based Virtual Filesystem (VFS) Interface".to_string(),
             status: AdrStatus::Accepted,
-            context: "Requires filesystem abstraction supporting multiple backends and mount namespaces.".to_string(),
+            context:
+                "Requires filesystem abstraction supporting multiple backends and mount namespaces."
+                    .to_string(),
             upstream_study_ref: "Linux VFS & xv6 Filesystem".to_string(),
-            decision: "Trait-based VFS (VFileSystem, VNode) with canonical path lookup safeguards.".to_string(),
-            consequences: "Filesystem backends are decoupled and isolated in safe Rust.".to_string(),
+            decision: "Trait-based VFS (VFileSystem, VNode) with canonical path lookup safeguards."
+                .to_string(),
+            consequences: "Filesystem backends are decoupled and isolated in safe Rust."
+                .to_string(),
             validation_method: "VFS mount and RAM disk integration test suite".to_string(),
         });
 
@@ -308,10 +364,13 @@ impl StudyToImplementationPipelineEngine {
             adr_id: "ADR-004".to_string(),
             title: "Universal Package Format and Staged Atomic Updates".to_string(),
             status: AdrStatus::Accepted,
-            context: "Requires transparent packaging with staged updates and failure rollback.".to_string(),
+            context: "Requires transparent packaging with staged updates and failure rollback."
+                .to_string(),
             upstream_study_ref: "Arch, Debian, Fedora & Linux Mint".to_string(),
-            decision: "Dual-layer .sigpkg format, SAT solver, and Timeshift rollback trigger.".to_string(),
-            consequences: "Zero partial update corruption; automated recovery on failure.".to_string(),
+            decision: "Dual-layer .sigpkg format, SAT solver, and Timeshift rollback trigger."
+                .to_string(),
+            consequences: "Zero partial update corruption; automated recovery on failure."
+                .to_string(),
             validation_method: "Simulated failed update rollback test".to_string(),
         });
 
@@ -319,10 +378,14 @@ impl StudyToImplementationPipelineEngine {
             adr_id: "ADR-005".to_string(),
             title: "Dual pledge/unveil and Landlock Capability Model".to_string(),
             status: AdrStatus::Accepted,
-            context: "Requires least-privilege sandboxing for processes and package scripts.".to_string(),
+            context: "Requires least-privilege sandboxing for processes and package scripts."
+                .to_string(),
             upstream_study_ref: "OpenBSD & Linux Landlock".to_string(),
-            decision: "Unified pledge promise bitmask and unveil path tree capability engine.".to_string(),
-            consequences: "Unauthorized access attempts trigger process termination and audit logs.".to_string(),
+            decision: "Unified pledge promise bitmask and unveil path tree capability engine."
+                .to_string(),
+            consequences:
+                "Unauthorized access attempts trigger process termination and audit logs."
+                    .to_string(),
             validation_method: "Capability denial security unit test suite".to_string(),
         });
     }
@@ -353,7 +416,8 @@ impl StudyToImplementationPipelineEngine {
                     sigmaos_decision: "Native implementation".to_string(),
                 },
             ],
-            tradeoff_analysis: "Combines Linux virtual deadline fairness with Rust safe concurrency.".to_string(),
+            tradeoff_analysis:
+                "Combines Linux virtual deadline fairness with Rust safe concurrency.".to_string(),
         });
 
         self.comparison_matrices.push(ComparisonMatrix {
@@ -381,7 +445,8 @@ impl StudyToImplementationPipelineEngine {
                     sigmaos_decision: "Native implementation".to_string(),
                 },
             ],
-            tradeoff_analysis: "Trait-based VFS provides clean abstraction and safety in Rust.".to_string(),
+            tradeoff_analysis: "Trait-based VFS provides clean abstraction and safety in Rust."
+                .to_string(),
         });
     }
 
@@ -390,10 +455,19 @@ impl StudyToImplementationPipelineEngine {
             phase_id: 1,
             name: "OS Fundamentals".to_string(),
             duration_weeks: 2,
-            study_focus: "Boot process, CPU modes, paging, interrupts, scheduler, basic shell".to_string(),
-            primary_references: vec!["xv6".to_string(), "OSDev".to_string(), "Linux Docs".to_string()],
-            sigmaos_implementation: "QEMU x86_64 UEFI boot, COM1 logging, FrameAllocator, PML4 paging, scheduler".to_string(),
-            exit_test_criteria: "QEMU x86_64 boots to shell, executes basic command, and shuts down cleanly".to_string(),
+            study_focus: "Boot process, CPU modes, paging, interrupts, scheduler, basic shell"
+                .to_string(),
+            primary_references: vec![
+                "xv6".to_string(),
+                "OSDev".to_string(),
+                "Linux Docs".to_string(),
+            ],
+            sigmaos_implementation:
+                "QEMU x86_64 UEFI boot, COM1 logging, FrameAllocator, PML4 paging, scheduler"
+                    .to_string(),
+            exit_test_criteria:
+                "QEMU x86_64 boots to shell, executes basic command, and shuts down cleanly"
+                    .to_string(),
             exit_test_passed: true,
         });
 
@@ -401,10 +475,19 @@ impl StudyToImplementationPipelineEngine {
             phase_id: 2,
             name: "Kernel Services".to_string(),
             duration_weeks: 3,
-            study_focus: "Fair scheduler, VFS path resolution, process creation, IPC, syscall table".to_string(),
-            primary_references: vec!["Linux Kernel".to_string(), "FreeBSD".to_string(), "OpenBSD".to_string()],
-            sigmaos_implementation: "EEVDF scheduler, trait VFS, process fork/exec, pipes, signals".to_string(),
-            exit_test_criteria: "Process can create, open/read/write files, use pipes, receive signal, and exit".to_string(),
+            study_focus:
+                "Fair scheduler, VFS path resolution, process creation, IPC, syscall table"
+                    .to_string(),
+            primary_references: vec![
+                "Linux Kernel".to_string(),
+                "FreeBSD".to_string(),
+                "OpenBSD".to_string(),
+            ],
+            sigmaos_implementation: "EEVDF scheduler, trait VFS, process fork/exec, pipes, signals"
+                .to_string(),
+            exit_test_criteria:
+                "Process can create, open/read/write files, use pipes, receive signal, and exit"
+                    .to_string(),
             exit_test_passed: true,
         });
 
@@ -434,26 +517,65 @@ impl StudyToImplementationPipelineEngine {
             phase_id: 5,
             name: "Desktop & Hardware".to_string(),
             duration_weeks: 4,
-            study_focus: "Input, DRM/KMS, VirtIO drivers, device matrices, Mint onboarding".to_string(),
-            primary_references: vec!["Linux DRM".to_string(), "VirtIO Specs".to_string(), "Linux Mint".to_string()],
-            sigmaos_implementation: "VirtIO-blk, VirtIO-net, framebuffer graphics, Zenith Compositor, hardware matrix".to_string(),
-            exit_test_criteria: "QEMU boots to graphical session, accepts input, launches app without panic".to_string(),
+            study_focus: "Input, DRM/KMS, VirtIO drivers, device matrices, Mint onboarding"
+                .to_string(),
+            primary_references: vec![
+                "Linux DRM".to_string(),
+                "VirtIO Specs".to_string(),
+                "Linux Mint".to_string(),
+            ],
+            sigmaos_implementation:
+                "VirtIO-blk, VirtIO-net, framebuffer graphics, Zenith Compositor, hardware matrix"
+                    .to_string(),
+            exit_test_criteria:
+                "QEMU boots to graphical session, accepts input, launches app without panic"
+                    .to_string(),
             exit_test_passed: true,
         });
     }
 
     fn seed_cycle_steps(&mut self) {
         let steps = [
-            ("SELECT a narrow OS concept", "Identify a single mechanism rather than a whole OS."),
-            ("STUDY upstream implementation and documentation", "Analyze core data structures and control flow."),
-            ("WRITE a design note for SigmaOS", "Record study answers in research/upstream/."),
-            ("DEFINE the smallest testable slice", "Specify minimum viable interface boundary."),
-            ("IMPLEMENT behind a clear module boundary", "Write no_std + alloc safe Rust code."),
-            ("ADD unit, integration, and runtime tests", "Cover happy path and edge cases."),
-            ("VALIDATE in QEMU or on named hardware", "Verify through actual runtime execution."),
-            ("DOCUMENT what was adopted, changed, and rejected", "Write Architecture Decision Record (ADR)."),
-            ("ADD regression protection", "Implement failing regression test safeguard."),
-            ("UPDATE capability status with evidence", "Log evidence in CAPABILITY_MATRIX.toml."),
+            (
+                "SELECT a narrow OS concept",
+                "Identify a single mechanism rather than a whole OS.",
+            ),
+            (
+                "STUDY upstream implementation and documentation",
+                "Analyze core data structures and control flow.",
+            ),
+            (
+                "WRITE a design note for SigmaOS",
+                "Record study answers in research/upstream/.",
+            ),
+            (
+                "DEFINE the smallest testable slice",
+                "Specify minimum viable interface boundary.",
+            ),
+            (
+                "IMPLEMENT behind a clear module boundary",
+                "Write no_std + alloc safe Rust code.",
+            ),
+            (
+                "ADD unit, integration, and runtime tests",
+                "Cover happy path and edge cases.",
+            ),
+            (
+                "VALIDATE in QEMU or on named hardware",
+                "Verify through actual runtime execution.",
+            ),
+            (
+                "DOCUMENT what was adopted, changed, and rejected",
+                "Write Architecture Decision Record (ADR).",
+            ),
+            (
+                "ADD regression protection",
+                "Implement failing regression test safeguard.",
+            ),
+            (
+                "UPDATE capability status with evidence",
+                "Log evidence in CAPABILITY_MATRIX.toml.",
+            ),
         ];
 
         for (idx, (name, desc)) in steps.iter().enumerate() {
@@ -468,18 +590,54 @@ impl StudyToImplementationPipelineEngine {
 
     fn seed_rules(&mut self) {
         let rules = [
-            ("Study one concept at a time", "Focus on a single mechanism at a time."),
-            ("Extract the invariant, not the code", "Record underlying rules rather than copying code."),
-            ("License and attribution first", "Confirm MIT/GPL-2.0 compatibility before adaptation."),
-            ("Implement the smallest vertical slice", "Build minimum connected end-to-end path."),
-            ("Runtime validation is mandatory", "Must be exercised via real QEMU or runtime execution."),
-            ("CI gates merges", "All tests in run_sigma_tests.sh must pass before merge."),
-            ("Security changes get separate review", "Dedicated review for isolation and syscalls."),
-            ("Reproducibility", "Log commit, toolchain, timestamps, and hashes."),
-            ("Least privilege", "Restrict process, script, and CI runner privileges."),
-            ("Document adoption boundaries", "Explicitly state adopted, modified, and rejected parts."),
-            ("Regression tests are mandatory", "Add tests that fail if behavior regresses."),
-            ("Human approval for high-risk work", "Require human sign-off for boot, installer, update, and storage."),
+            (
+                "Study one concept at a time",
+                "Focus on a single mechanism at a time.",
+            ),
+            (
+                "Extract the invariant, not the code",
+                "Record underlying rules rather than copying code.",
+            ),
+            (
+                "License and attribution first",
+                "Confirm MIT/GPL-2.0 compatibility before adaptation.",
+            ),
+            (
+                "Implement the smallest vertical slice",
+                "Build minimum connected end-to-end path.",
+            ),
+            (
+                "Runtime validation is mandatory",
+                "Must be exercised via real QEMU or runtime execution.",
+            ),
+            (
+                "CI gates merges",
+                "All tests in run_sigma_tests.sh must pass before merge.",
+            ),
+            (
+                "Security changes get separate review",
+                "Dedicated review for isolation and syscalls.",
+            ),
+            (
+                "Reproducibility",
+                "Log commit, toolchain, timestamps, and hashes.",
+            ),
+            (
+                "Least privilege",
+                "Restrict process, script, and CI runner privileges.",
+            ),
+            (
+                "Document adoption boundaries",
+                "Explicitly state adopted, modified, and rejected parts.",
+            ),
+            (
+                "Regression tests are mandatory",
+                "Add tests that fail if behavior regresses.",
+            ),
+            (
+                "Human approval for high-risk work",
+                "Require human sign-off for boot, installer, update, and storage.",
+            ),
         ];
 
         for (idx, (name, desc)) in rules.iter().enumerate() {
@@ -523,11 +681,30 @@ impl StudyToImplementationPipelinePrGateway {
 
     pub fn generate_pr_proposal_summary(&self) -> String {
         let mut report = String::from("# Study-to-Implementation Pipeline Gateway Report\n\n");
-        report.push_str(&format!("- Total Study Items Registered: {}\n", self.engine.study_items.len()));
-        report.push_str(&format!("- Accepted ADR Records: {}\n", self.engine.adrs.len()));
-        report.push_str(&format!("- Curriculum Phases Verified: {}/5\n", self.engine.curriculum_phases.len()));
-        report.push_str(&format!("- Mandatory Rules Enforced: {}/12\n", self.engine.rules.len()));
-        report.push_str(&format!("- Overall Pipeline Status: {}\n", if self.engine.validate_pipeline_health() { "VERIFIED PASS" } else { "FAILED" }));
+        report.push_str(&format!(
+            "- Total Study Items Registered: {}\n",
+            self.engine.study_items.len()
+        ));
+        report.push_str(&format!(
+            "- Accepted ADR Records: {}\n",
+            self.engine.adrs.len()
+        ));
+        report.push_str(&format!(
+            "- Curriculum Phases Verified: {}/5\n",
+            self.engine.curriculum_phases.len()
+        ));
+        report.push_str(&format!(
+            "- Mandatory Rules Enforced: {}/12\n",
+            self.engine.rules.len()
+        ));
+        report.push_str(&format!(
+            "- Overall Pipeline Status: {}\n",
+            if self.engine.validate_pipeline_health() {
+                "VERIFIED PASS"
+            } else {
+                "FAILED"
+            }
+        ));
         report
     }
 }

@@ -31,7 +31,7 @@ pub enum IndexFormat {
 pub struct Mirror {
     pub url: String,
     pub country: String,
-    pub score: f32,   // lower = faster (round-trip ms)
+    pub score: f32, // lower = faster (round-trip ms)
     pub https: bool,
 }
 
@@ -73,7 +73,7 @@ pub struct PackageIndexEntry {
 pub struct ZsyncBlock {
     pub offset: u64,
     pub size: u32,
-    pub rsum: u32,   // Rolling (Adler-32 like) checksum
+    pub rsum: u32,          // Rolling (Adler-32 like) checksum
     pub checksum: [u8; 16], // MD4 of block
 }
 
@@ -145,11 +145,19 @@ impl MirrorClient {
     ///
     /// Downloads and decompresses the index (e.g., core.db.tar.gz for Arch,
     /// Packages.gz for Debian), parses it into PackageIndexEntry records.
-    pub async fn fetch_index(&mut self, format: IndexFormat) -> Result<Vec<PackageIndexEntry>, MirrorError> {
-        let mirror = self.active_mirror.as_ref().ok_or(MirrorError::NoActiveMirror)?;
+    pub async fn fetch_index(
+        &mut self,
+        format: IndexFormat,
+    ) -> Result<Vec<PackageIndexEntry>, MirrorError> {
+        let mirror = self
+            .active_mirror
+            .as_ref()
+            .ok_or(MirrorError::NoActiveMirror)?;
         let index_url = match format {
             IndexFormat::ArchDb => format!("{}/core/os/x86_64/core.db.tar.gz", mirror.url),
-            IndexFormat::DebianPackages => format!("{}/dists/stable/main/binary-amd64/Packages.gz", mirror.url),
+            IndexFormat::DebianPackages => {
+                format!("{}/dists/stable/main/binary-amd64/Packages.gz", mirror.url)
+            }
             IndexFormat::AlpineApk => format!("{}/edge/main/x86_64/APKINDEX.tar.gz", mirror.url),
             IndexFormat::FedoraRepo => format!("{}/repodata/primary.xml.gz", mirror.url),
             IndexFormat::SigmaDb => format!("{}/sigma.db", mirror.url),

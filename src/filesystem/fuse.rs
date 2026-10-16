@@ -162,7 +162,11 @@ impl FuseChannel {
     }
 
     /// Completes a FUSE request with userspace daemon response
-    pub fn complete_request(&mut self, unique: u64, error: i32) -> Result<FuseOutHeader, &'static str> {
+    pub fn complete_request(
+        &mut self,
+        unique: u64,
+        error: i32,
+    ) -> Result<FuseOutHeader, &'static str> {
         if self.pending_requests.remove(&unique).is_none() {
             return Err("Unknown or timed out FUSE unique identifier");
         }
