@@ -25,6 +25,7 @@
 ### 1. Core Kernel & Hardware
 - [Kernel Core Component Guide](./Kernel-Core-Component-Guide.md) &ndash; Sovereign microkernel core, bootstrap, and multi-core AP bring-up.
 - [Scheduler Component Guide](./Scheduler-Component-Guide.md) &ndash; Multi-queue CFS / BORE low-latency preemptive task scheduler.
+- [Dispatcher Master Architecture & Support Matrix Plan](./DISPATCHER_PLAN.md) &ndash; Boundary definition between scheduler, context-switch, interrupt handling, and deferred work; 16-PR roadmap.
 - [Memory Management Component Guide](./Memory-Management-Component-Guide.md) &ndash; Paging, slab allocator, NUMA memory tiers, and page cache.
 - [PCI Express Bus Enumeration Component Guide](./Pci-Express-Bus-Enumeration-Component-Guide.md) &ndash; PCIe root complex enumeration, MSI/MSI-X, and AER error logging.
 - [DMA & IOMMU Direct Memory Access Component Guide](./Dma-Iommu-Direct-Memory-Access-Component-Guide.md) &ndash; Zero-copy scatter-gather DMA memory manager and IOMMU domain translation.
