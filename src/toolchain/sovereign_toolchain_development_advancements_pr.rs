@@ -569,10 +569,17 @@ impl DebuggerTracerProfilerPrEngine {
     }
 
     pub fn bpftrace_script_evaluator(&self, script: &str) -> String {
-        format!("bpftrace eBPF byte-code generated for script ({})", script.len())
+        format!(
+            "bpftrace eBPF byte-code generated for script ({})",
+            script.len()
+        )
     }
 
-    pub fn sanitizer_event_validator(&self, sanitizer_type: &str, address: usize) -> ShadowMemoryStatus {
+    pub fn sanitizer_event_validator(
+        &self,
+        sanitizer_type: &str,
+        address: usize,
+    ) -> ShadowMemoryStatus {
         if address == 0 {
             return ShadowMemoryStatus::UseAfterFree;
         }
@@ -807,11 +814,17 @@ impl VcsAndLanguageRuntimesPrEngine {
     }
 
     pub fn swift_module_compile_dispatch(&self, module_name: &str) -> String {
-        format!("swiftc -emit-module -enable-library-evolution {}", module_name)
+        format!(
+            "swiftc -emit-module -enable-library-evolution {}",
+            module_name
+        )
     }
 
     pub fn bun_deno_runtime_evaluator(&self, runtime_name: &str, script_path: &str) -> String {
-        format!("{} run --allow-all {} (sub-millisecond JS execution)", runtime_name, script_path)
+        format!(
+            "{} run --allow-all {} (sub-millisecond JS execution)",
+            runtime_name, script_path
+        )
     }
 
     pub fn generate_proposal(&self) -> ToolchainDevelopmentPrProposalManifest {
