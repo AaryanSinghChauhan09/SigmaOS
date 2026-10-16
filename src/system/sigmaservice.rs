@@ -24,7 +24,7 @@ pub enum ServiceState {
     Starting,
     /// Stopping,
     /// Failed,
-    /// Reloading,
+    Reloading,
 }
 
 impl fmt::Display for ServiceState {
@@ -87,7 +87,12 @@ pub struct Service {
 
 impl Service {
     /// Create a new service
-    pub fn new(name: String, description: String, service_type: ServiceType, exec_path: String) -> Self {
+    pub fn new(
+        name: String,
+        description: String,
+        service_type: ServiceType,
+        exec_path: String,
+    ) -> Self {
         Self {
             name,
             description,
@@ -165,7 +170,7 @@ impl SigmaService {
         if self.services.contains_key(&service.name) {
             return Err(format!("Service '{}' already exists", service.name));
         }
-        
+
         self.services.insert(service.name.clone(), service);
         self.service_counter += 1;
         Ok(())
@@ -189,7 +194,7 @@ impl SigmaService {
         if !self.running {
             return Err("SigmaService not running".to_string());
         }
-        
+
         match self.services.get_mut(name) {
             Some(service) => {
                 service.state = ServiceState::Starting;
@@ -205,7 +210,7 @@ impl SigmaService {
         if !self.running {
             return Err("SigmaService not running".to_string());
         }
-        
+
         match self.services.get_mut(name) {
             Some(service) => {
                 service.state = ServiceState::Stopping;
@@ -221,7 +226,7 @@ impl SigmaService {
         if !self.running {
             return Err("SigmaService not running".to_string());
         }
-        
+
         match self.services.get_mut(name) {
             Some(service) => {
                 service.state = ServiceState::Stopping;
@@ -238,7 +243,7 @@ impl SigmaService {
         if !self.running {
             return Err("SigmaService not running".to_string());
         }
-        
+
         match self.services.get_mut(name) {
             Some(service) => {
                 service.state = ServiceState::Reloading;
@@ -256,14 +261,16 @@ impl SigmaService {
 
     /// List running services
     pub fn list_running(&self) -> Vec<&Service> {
-        self.services.values()
+        self.services
+            .values()
             .filter(|s| s.state == ServiceState::Running)
             .collect()
     }
 
     /// List failed services
     pub fn list_failed(&self) -> Vec<&Service> {
-        self.services.values()
+        self.services
+            .values()
             .filter(|s| s.state == ServiceState::Failed)
             .collect()
     }
@@ -276,9 +283,18 @@ impl SigmaService {
     /// Get service manager statistics
     pub fn service_stats(&self) -> BTreeMap<String, String> {
         let mut stats = BTreeMap::new();
-        stats.insert("total_services".to_string(), self.service_count().to_string());
-        stats.insert("running_services".to_string(), self.list_running().len().to_string());
-        stats.insert("failed_services".to_string(), self.list_failed().len().to_string());
+        stats.insert(
+            "total_services".to_string(),
+            self.service_count().to_string(),
+        );
+        stats.insert(
+            "running_services".to_string(),
+            self.list_running().len().to_string(),
+        );
+        stats.insert(
+            "failed_services".to_string(),
+            self.list_failed().len().to_string(),
+        );
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
@@ -336,7 +352,7 @@ mod tests {
             "nginx".to_string(),
             "Web server".to_string(),
             ServiceType::Simple,
-            "/usr/bin/nginx".to_string()
+            "/usr/bin/nginx".to_string(),
         )
         .with_state(ServiceState::Running)
         .with_args(vec!["-g".to_string(), "daemon off;".to_string()])
@@ -360,14 +376,14 @@ mod tests {
     #[test]
     fn test_sigmaservice_add_service() {
         let mut service = SigmaService::new();
-        
+
         let svc = Service::new(
             "nginx".to_string(),
             "Web server".to_string(),
             ServiceType::Simple,
-            "/usr/bin/nginx".to_string()
+            "/usr/bin/nginx".to_string(),
         );
-        
+
         assert!(service.add_service(svc).is_ok());
         assert_eq!(service.service_count(), 1);
     }
@@ -376,17 +392,17 @@ mod tests {
     fn test_sigmaservice_start_service() {
         let mut service = SigmaService::new();
         service.start();
-        
+
         let svc = Service::new(
             "nginx".to_string(),
             "Web server".to_string(),
             ServiceType::Simple,
-            "/usr/bin/nginx".to_string()
+            "/usr/bin/nginx".to_string(),
         );
-        
+
         service.add_service(svc).unwrap();
         assert!(service.start_service("nginx").is_ok());
-        
+
         let svc = service.get_service("nginx").unwrap();
         assert_eq!(svc.state, ServiceState::Running);
     }
@@ -395,18 +411,18 @@ mod tests {
     fn test_sigmaservice_stop_service() {
         let mut service = SigmaService::new();
         service.start();
-        
+
         let svc = Service::new(
             "nginx".to_string(),
             "Web server".to_string(),
             ServiceType::Simple,
-            "/usr/bin/nginx".to_string()
+            "/usr/bin/nginx".to_string(),
         )
         .with_state(ServiceState::Running);
-        
+
         service.add_service(svc).unwrap();
         assert!(service.stop_service("nginx").is_ok());
-        
+
         let svc = service.get_service("nginx").unwrap();
         assert_eq!(svc.state, ServiceState::Stopped);
     }
@@ -415,18 +431,18 @@ mod tests {
     fn test_sigmaservice_restart_service() {
         let mut service = SigmaService::new();
         service.start();
-        
+
         let svc = Service::new(
             "nginx".to_string(),
             "Web server".to_string(),
             ServiceType::Simple,
-            "/usr/bin/nginx".to_string()
+            "/usr/bin/nginx".to_string(),
         )
         .with_state(ServiceState::Running);
-        
+
         service.add_service(svc).unwrap();
         assert!(service.restart_service("nginx").is_ok());
-        
+
         let svc = service.get_service("nginx").unwrap();
         assert_eq!(svc.state, ServiceState::Running);
     }
@@ -434,17 +450,17 @@ mod tests {
     #[test]
     fn test_sigmaservice_list_running() {
         let mut service = SigmaService::new();
-        
+
         let svc = Service::new(
             "nginx".to_string(),
             "Web server".to_string(),
             ServiceType::Simple,
-            "/usr/bin/nginx".to_string()
+            "/usr/bin/nginx".to_string(),
         )
         .with_state(ServiceState::Running);
-        
+
         service.add_service(svc).unwrap();
-        
+
         let running = service.list_running();
         assert_eq!(running.len(), 1);
     }
@@ -452,17 +468,17 @@ mod tests {
     #[test]
     fn test_sigmaservice_stats() {
         let mut service = SigmaService::new();
-        
+
         let svc = Service::new(
             "nginx".to_string(),
             "Web server".to_string(),
             ServiceType::Simple,
-            "/usr/bin/nginx".to_string()
+            "/usr/bin/nginx".to_string(),
         )
         .with_state(ServiceState::Running);
-        
+
         service.add_service(svc).unwrap();
-        
+
         let stats = service.service_stats();
         assert_eq!(stats.get("total_services"), Some(&"1".to_string()));
         assert_eq!(stats.get("running_services"), Some(&"1".to_string()));
@@ -471,19 +487,19 @@ mod tests {
     #[test]
     fn test_start_service_convenience() {
         init_sigmaservice();
-        
+
         let mut service = get_sigmaservice().unwrap();
         service.start();
-        
+
         let svc = Service::new(
             "nginx".to_string(),
             "Web server".to_string(),
             ServiceType::Simple,
-            "/usr/bin/nginx".to_string()
+            "/usr/bin/nginx".to_string(),
         );
-        
+
         service.add_service(svc).unwrap();
-        
+
         let result = start_service("nginx");
         assert!(result.is_ok());
     }

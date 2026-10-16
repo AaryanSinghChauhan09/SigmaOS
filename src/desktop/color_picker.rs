@@ -31,7 +31,12 @@ pub struct Color {
 
 impl Color {
     pub fn new(red: u8, green: u8, blue: u8, alpha: u8) -> Self {
-        Self { red, green, blue, alpha }
+        Self {
+            red,
+            green,
+            blue,
+            alpha,
+        }
     }
 
     /// Convert to hex
@@ -46,7 +51,10 @@ impl Color {
 
     /// Convert to RGBA string
     pub fn to_rgba_string(&self) -> String {
-        format!("rgba({}, {}, {}, {})", self.red, self.green, self.blue, self.alpha)
+        format!(
+            "rgba({}, {}, {}, {})",
+            self.red, self.green, self.blue, self.alpha
+        )
     }
 
     /// Convert to HSL
@@ -201,7 +209,13 @@ impl ColorPicker {
             }
             ColorFormat::CMYK => {
                 let (c, m, y, k) = self.current_color.to_cmyk();
-                format!("cmyk({:.0}%, {:.0}%, {:.0}%, {:.0}%)", c * 100.0, m * 100.0, y * 100.0, k * 100.0)
+                format!(
+                    "cmyk({:.0}%, {:.0}%, {:.0}%, {:.0}%)",
+                    c * 100.0,
+                    m * 100.0,
+                    y * 100.0,
+                    k * 100.0
+                )
             }
         }
     }
@@ -209,11 +223,12 @@ impl ColorPicker {
     /// Add to recent
     fn add_to_recent(&mut self, color: Color) {
         // Remove if already exists
-        self.recent_colors.retain(|c| c.red != color.red || c.green != color.green || c.blue != color.blue);
-        
+        self.recent_colors
+            .retain(|c| c.red != color.red || c.green != color.green || c.blue != color.blue);
+
         // Add to front
         self.recent_colors.insert(0, color);
-        
+
         // Limit size
         while self.recent_colors.len() > self.max_recent {
             self.recent_colors.pop();
@@ -235,8 +250,15 @@ impl ColorPicker {
     }
 
     /// Add color to palette
-    pub fn add_to_palette(&mut self, palette_index: usize, color: Color) -> Result<(), &'static str> {
-        let palette = self.palettes.get_mut(palette_index).ok_or("Palette not found")?;
+    pub fn add_to_palette(
+        &mut self,
+        palette_index: usize,
+        color: Color,
+    ) -> Result<(), &'static str> {
+        let palette = self
+            .palettes
+            .get_mut(palette_index)
+            .ok_or("Palette not found")?;
         palette.colors.push(color);
         Ok(())
     }
@@ -269,9 +291,7 @@ pub fn init_color_picker() {
 
 /// Get color picker
 pub fn get_color_picker() -> &'static mut ColorPicker {
-    unsafe {
-        COLOR_PICKER.as_mut().expect("Color picker not initialized")
-    }
+    unsafe { COLOR_PICKER.as_mut().expect("Color picker not initialized") }
 }
 
 #[cfg(test)]

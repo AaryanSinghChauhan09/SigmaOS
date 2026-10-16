@@ -8,8 +8,8 @@ pub mod ip;
 pub mod ring_buffer_stack;
 pub mod routing;
 pub mod security;
-pub mod sigmanet;
 pub mod sigmafirewall;
+pub mod sigmanet;
 pub mod socket;
 pub mod sovereign_remote_sharing;
 pub mod tcp;
@@ -56,17 +56,17 @@ pub use icmp::{
     IcmpError, IcmpHandler, IcmpHeader, IcmpPacket, IcmpStats, IcmpTimeExceededCode, IcmpType,
     IcmpUnreachableCode,
 };
+pub use sigmafirewall::{
+    add_firewall_rule, get_sigmafirewall, init_sigmafirewall, FirewallAction, FirewallProtocol,
+    FirewallRule, SigmaFirewall,
+};
+pub use sigmanet::{
+    bring_up_interface, connect_interface, get_sigmanet, init_sigmanet, InterfaceStatus,
+    InterfaceType, IpMethod, IpType, NetworkInterface as SigmaNetInterface, SigmaNet,
+};
 pub use zenithnet::{
     EthernetFrame, IpProtocol, Ipv4Addr, Ipv4Header, MacAddr, NetworkError, NetworkInterface,
     PacketType, TcpHeader, TcpState as ZenithTcpState, UdpHeader, ZenithNet,
-};
-pub use sigmanet::{
-    SigmaNet, NetworkInterface as SigmaNetInterface, InterfaceType, InterfaceStatus, IpType, IpMethod,
-    init_sigmanet, get_sigmanet, bring_up_interface, connect_interface,
-};
-pub use sigmafirewall::{
-    SigmaFirewall, FirewallRule, FirewallAction, FirewallProtocol,
-    init_sigmafirewall, get_sigmafirewall, add_firewall_rule,
 };
 
 #[path = "sovereign_async_io.rs"]
@@ -90,29 +90,28 @@ pub use virtual_switch::{
     VirtualSwitchBridge, VirtualSwitchEngine,
 };
 
-pub mod quic;
-pub mod bsd_pf;
-pub mod ebpf_jit;
-pub mod netlink;
 pub mod af_packet;
 pub mod bridge;
+pub mod bsd_pf;
+pub mod ebpf_jit;
 pub mod illumos_crossbow;
 pub mod ipv6_routing;
 pub mod ktls;
 pub mod mptcp;
 pub mod net_config_daemon;
+pub mod netlink;
 pub mod openbsd_pf;
 pub mod pppoe;
+pub mod quic;
 pub mod sctp;
 pub mod vlan;
 pub mod vxlan;
 
-
 pub use bsd_pf::{FilterAction, FilterRule, FirewallState, OpenBsdPacketFilter, TrafficDirection};
 pub use ebpf_jit::{EbpfInstruction, EbpfJitCompiler};
-pub use netlink::{NetlinkSocketRouter, NlMsgHdr, NETLINK_ROUTE, NETLINK_KOBJECT_UEVENT, NLM_F_REQUEST};
-
+pub use netlink::{
+    NetlinkSocketRouter, NlMsgHdr, NETLINK_KOBJECT_UEVENT, NETLINK_ROUTE, NLM_F_REQUEST,
+};
 
 // Re-export network stubs
 pub use crate::stubs::network_stubs::*;
-

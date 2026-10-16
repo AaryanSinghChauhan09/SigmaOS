@@ -54,7 +54,13 @@ impl LinuxEbpfCoReRingBufferEngine {
         }
     }
 
-    pub fn register_btf_relocation(&mut self, type_name: &str, field: &str, kind: BtfFieldKind, kernel_off: u32) {
+    pub fn register_btf_relocation(
+        &mut self,
+        type_name: &str,
+        field: &str,
+        kind: BtfFieldKind,
+        kernel_off: u32,
+    ) {
         self.relocations.push(BtfRelocationRecord {
             type_name: String::from(type_name),
             field_name: String::from(field),
@@ -189,7 +195,11 @@ impl DragonFlyHammer2PathCompressorEngine {
     }
 
     pub fn perform_atomic_rollback(&mut self, subvol: u32) -> bool {
-        if let Some(_snap) = self.paths.iter().find(|p| p.subvolume_id == subvol && p.is_snapshot) {
+        if let Some(_snap) = self
+            .paths
+            .iter()
+            .find(|p| p.subvolume_id == subvol && p.is_snapshot)
+        {
             self.snapshot_rollback_ops += 1;
             return true;
         }
@@ -217,7 +227,11 @@ impl NetBsdRumpVeriexecEngine {
         true
     }
 
-    pub fn verify_file_signature(&mut self, expected_hash: &[u8; 32], computed_hash: &[u8; 32]) -> bool {
+    pub fn verify_file_signature(
+        &mut self,
+        expected_hash: &[u8; 32],
+        computed_hash: &[u8; 32],
+    ) -> bool {
         if expected_hash == computed_hash {
             self.verified_signatures += 1;
             true
@@ -288,7 +302,11 @@ impl MacOsXnuMachIpcEngine {
     }
 
     pub fn proxy_mach_message(&mut self, port_name: u32) -> bool {
-        if let Some(_port) = self.ports.iter().find(|p| p.port_name == port_name && p.is_valid) {
+        if let Some(_port) = self
+            .ports
+            .iter()
+            .find(|p| p.port_name == port_name && p.is_valid)
+        {
             self.messages_proxied += 1;
             return true;
         }
@@ -330,23 +348,33 @@ impl SovereignKernelOpenSourceInnovationsPrGateway {
         }
     }
 
-    pub fn generate_kernel_innovations_pr_proposal(&mut self) -> KernelOpenSourceInnovationsPrDescriptor {
-        self.ebpf_core.register_btf_relocation("task_struct", "pid", BtfFieldKind::StructOffset, 16);
+    pub fn generate_kernel_innovations_pr_proposal(
+        &mut self,
+    ) -> KernelOpenSourceInnovationsPrDescriptor {
+        self.ebpf_core.register_btf_relocation(
+            "task_struct",
+            "pid",
+            BtfFieldKind::StructOffset,
+            16,
+        );
         self.ebpf_core.apply_core_relocations(0);
 
-        self.geom_zfs.attach_geom_provider("ada0", GeomClassKind::GeomEliEncryption, 209715200);
+        self.geom_zfs
+            .attach_geom_provider("ada0", GeomClassKind::GeomEliEncryption, 209715200);
         self.geom_zfs.flush_slog_transaction();
 
         let ret_addr = 0xFFFFFFFF81001020;
         let canary = self.karl_retguard.compute_retguard_canary(ret_addr);
         let _ = self.karl_retguard.verify_stack_frame(ret_addr, canary);
 
-        self.hammer2_compressor.register_path(1, "/var/snapshots/snap01", 100, true);
+        self.hammer2_compressor
+            .register_path(1, "/var/snapshots/snap01", 100, true);
         let _ = self.hammer2_compressor.perform_atomic_rollback(100);
 
         self.rump_veriexec.translate_rump_syscall(3);
 
-        self.xnu_mach.allocate_port(1001, MachPortRightKind::PortRightSend);
+        self.xnu_mach
+            .allocate_port(1001, MachPortRightKind::PortRightSend);
         let _ = self.xnu_mach.proxy_mach_message(1001);
 
         let title = String::from("feat(kernel): Implement Sovereign Kernel Open Source OS Innovations Parity Engine & PQC Gateway");
@@ -355,7 +383,9 @@ impl SovereignKernelOpenSourceInnovationsPrGateway {
             self.ebpf_core.relocations.len()
         );
 
-        let pqc_sig = String::from("DILITHIUM5_SIG_7f8e9d0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e");
+        let pqc_sig = String::from(
+            "DILITHIUM5_SIG_7f8e9d0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e",
+        );
 
         KernelOpenSourceInnovationsPrDescriptor {
             pr_id: String::from("PR-KERNEL-OPEN-SOURCE-INNOVATIONS-2026-V1"),

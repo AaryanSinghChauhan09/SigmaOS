@@ -79,7 +79,12 @@ pub struct FtpConnection {
 
 impl FtpConnection {
     /// Create a new FTP connection
-    pub fn new(connection_id: String, client_address: String, client_port: u16, username: String) -> Self {
+    pub fn new(
+        connection_id: String,
+        client_address: String,
+        client_port: u16,
+        username: String,
+    ) -> Self {
         Self {
             connection_id,
             client_address,
@@ -148,10 +153,14 @@ impl SigmaFTP {
     /// Add an FTP connection
     pub fn add_connection(&mut self, connection: FtpConnection) -> Result<(), String> {
         if self.connections.contains_key(&connection.connection_id) {
-            return Err(format!("Connection '{}' already exists", connection.connection_id));
+            return Err(format!(
+                "Connection '{}' already exists",
+                connection.connection_id
+            ));
         }
-        
-        self.connections.insert(connection.connection_id.clone(), connection);
+
+        self.connections
+            .insert(connection.connection_id.clone(), connection);
         self.connection_counter += 1;
         Ok(())
     }
@@ -169,7 +178,7 @@ impl SigmaFTP {
         if !self.running {
             return Err("SigmaFTP not running".to_string());
         }
-        
+
         match self.connections.get_mut(connection_id) {
             Some(connection) => {
                 connection.state = FtpConnectionState::Authenticated;
@@ -184,7 +193,7 @@ impl SigmaFTP {
         if !self.running {
             return Err("SigmaFTP not running".to_string());
         }
-        
+
         match self.connections.get_mut(connection_id) {
             Some(connection) => {
                 connection.state = FtpConnectionState::Active;
@@ -199,7 +208,7 @@ impl SigmaFTP {
         if !self.running {
             return Err("SigmaFTP not running".to_string());
         }
-        
+
         match self.connections.get_mut(connection_id) {
             Some(connection) => {
                 connection.state = FtpConnectionState::Closed;
@@ -210,11 +219,15 @@ impl SigmaFTP {
     }
 
     /// Change directory for a connection
-    pub fn change_directory(&mut self, connection_id: &str, directory: String) -> Result<(), String> {
+    pub fn change_directory(
+        &mut self,
+        connection_id: &str,
+        directory: String,
+    ) -> Result<(), String> {
         if !self.running {
             return Err("SigmaFTP not running".to_string());
         }
-        
+
         match self.connections.get_mut(connection_id) {
             Some(connection) => {
                 connection.current_directory = directory;
@@ -225,11 +238,15 @@ impl SigmaFTP {
     }
 
     /// Set transfer mode for a connection
-    pub fn set_transfer_mode(&mut self, connection_id: &str, mode: FtpTransferMode) -> Result<(), String> {
+    pub fn set_transfer_mode(
+        &mut self,
+        connection_id: &str,
+        mode: FtpTransferMode,
+    ) -> Result<(), String> {
         if !self.running {
             return Err("SigmaFTP not running".to_string());
         }
-        
+
         match self.connections.get_mut(connection_id) {
             Some(connection) => {
                 connection.transfer_mode = mode;
@@ -251,7 +268,8 @@ impl SigmaFTP {
 
     /// List connections by state
     pub fn list_by_state(&self, state: FtpConnectionState) -> Vec<&FtpConnection> {
-        self.connections.values()
+        self.connections
+            .values()
             .filter(|c| c.state == state)
             .collect()
     }
@@ -264,8 +282,16 @@ impl SigmaFTP {
     /// Get FTP server statistics
     pub fn ftp_stats(&self) -> BTreeMap<String, String> {
         let mut stats = BTreeMap::new();
-        stats.insert("total_connections".to_string(), self.connection_count().to_string());
-        stats.insert("active_connections".to_string(), self.list_by_state(FtpConnectionState::Active).len().to_string());
+        stats.insert(
+            "total_connections".to_string(),
+            self.connection_count().to_string(),
+        );
+        stats.insert(
+            "active_connections".to_string(),
+            self.list_by_state(FtpConnectionState::Active)
+                .len()
+                .to_string(),
+        );
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
@@ -323,7 +349,7 @@ mod tests {
             "conn1".to_string(),
             "192.168.1.100".to_string(),
             12345,
-            "user".to_string()
+            "user".to_string(),
         )
         .with_transfer_mode(FtpTransferMode::Ascii)
         .with_state(FtpConnectionState::Active)
@@ -348,14 +374,14 @@ mod tests {
     #[test]
     fn test_sigmaftp_add_connection() {
         let mut ftp = SigmaFTP::new();
-        
+
         let connection = FtpConnection::new(
             "conn1".to_string(),
             "192.168.1.100".to_string(),
             12345,
-            "user".to_string()
+            "user".to_string(),
         );
-        
+
         assert!(ftp.add_connection(connection).is_ok());
         assert_eq!(ftp.connection_count(), 1);
     }
@@ -364,17 +390,17 @@ mod tests {
     fn test_sigmaftp_authenticate_connection() {
         let mut ftp = SigmaFTP::new();
         ftp.start();
-        
+
         let connection = FtpConnection::new(
             "conn1".to_string(),
             "192.168.1.100".to_string(),
             12345,
-            "user".to_string()
+            "user".to_string(),
         );
-        
+
         ftp.add_connection(connection).unwrap();
         assert!(ftp.authenticate_connection("conn1").is_ok());
-        
+
         let conn = ftp.get_connection("conn1").unwrap();
         assert_eq!(conn.state, FtpConnectionState::Authenticated);
     }
@@ -383,18 +409,18 @@ mod tests {
     fn test_sigmaftp_activate_connection() {
         let mut ftp = SigmaFTP::new();
         ftp.start();
-        
+
         let connection = FtpConnection::new(
             "conn1".to_string(),
             "192.168.1.100".to_string(),
             12345,
-            "user".to_string()
+            "user".to_string(),
         )
         .with_state(FtpConnectionState::Authenticated);
-        
+
         ftp.add_connection(connection).unwrap();
         assert!(ftp.activate_connection("conn1").is_ok());
-        
+
         let conn = ftp.get_connection("conn1").unwrap();
         assert_eq!(conn.state, FtpConnectionState::Active);
     }
@@ -403,17 +429,19 @@ mod tests {
     fn test_sigmaftp_change_directory() {
         let mut ftp = SigmaFTP::new();
         ftp.start();
-        
+
         let connection = FtpConnection::new(
             "conn1".to_string(),
             "192.168.1.100".to_string(),
             12345,
-            "user".to_string()
+            "user".to_string(),
         );
-        
+
         ftp.add_connection(connection).unwrap();
-        assert!(ftp.change_directory("conn1", "/home/user".to_string()).is_ok());
-        
+        assert!(ftp
+            .change_directory("conn1", "/home/user".to_string())
+            .is_ok());
+
         let conn = ftp.get_connection("conn1").unwrap();
         assert_eq!(conn.current_directory, "/home/user");
     }
@@ -422,17 +450,19 @@ mod tests {
     fn test_sigmaftp_set_transfer_mode() {
         let mut ftp = SigmaFTP::new();
         ftp.start();
-        
+
         let connection = FtpConnection::new(
             "conn1".to_string(),
             "192.168.1.100".to_string(),
             12345,
-            "user".to_string()
+            "user".to_string(),
         );
-        
+
         ftp.add_connection(connection).unwrap();
-        assert!(ftp.set_transfer_mode("conn1", FtpTransferMode::Ascii).is_ok());
-        
+        assert!(ftp
+            .set_transfer_mode("conn1", FtpTransferMode::Ascii)
+            .is_ok());
+
         let conn = ftp.get_connection("conn1").unwrap();
         assert_eq!(conn.transfer_mode, FtpTransferMode::Ascii);
     }
@@ -440,17 +470,17 @@ mod tests {
     #[test]
     fn test_sigmaftp_list_by_state() {
         let mut ftp = SigmaFTP::new();
-        
+
         let connection = FtpConnection::new(
             "conn1".to_string(),
             "192.168.1.100".to_string(),
             12345,
-            "user".to_string()
+            "user".to_string(),
         )
         .with_state(FtpConnectionState::Active);
-        
+
         ftp.add_connection(connection).unwrap();
-        
+
         let connections = ftp.list_by_state(FtpConnectionState::Active);
         assert_eq!(connections.len(), 1);
     }
@@ -458,17 +488,17 @@ mod tests {
     #[test]
     fn test_sigmaftp_stats() {
         let mut ftp = SigmaFTP::new();
-        
+
         let connection = FtpConnection::new(
             "conn1".to_string(),
             "192.168.1.100".to_string(),
             12345,
-            "user".to_string()
+            "user".to_string(),
         )
         .with_state(FtpConnectionState::Active);
-        
+
         ftp.add_connection(connection).unwrap();
-        
+
         let stats = ftp.ftp_stats();
         assert_eq!(stats.get("total_connections"), Some(&"1".to_string()));
         assert_eq!(stats.get("active_connections"), Some(&"1".to_string()));
@@ -477,19 +507,19 @@ mod tests {
     #[test]
     fn test_authenticate_ftp_connection_convenience() {
         init_sigmaftp();
-        
+
         let mut ftp = get_sigmaftp().unwrap();
         ftp.start();
-        
+
         let connection = FtpConnection::new(
             "conn1".to_string(),
             "192.168.1.100".to_string(),
             12345,
-            "user".to_string()
+            "user".to_string(),
         );
-        
+
         ftp.add_connection(connection).unwrap();
-        
+
         let result = authenticate_ftp_connection("conn1");
         assert!(result.is_ok());
     }

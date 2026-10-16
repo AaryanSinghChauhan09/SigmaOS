@@ -180,28 +180,44 @@ impl EmailClient {
 
     /// Mark as read
     pub fn mark_as_read(&mut self, email_id: String) -> Result<(), &'static str> {
-        let email = self.emails.iter_mut().find(|e| e.id == email_id).ok_or("Email not found")?;
+        let email = self
+            .emails
+            .iter_mut()
+            .find(|e| e.id == email_id)
+            .ok_or("Email not found")?;
         email.read = true;
         Ok(())
     }
 
     /// Mark as unread
     pub fn mark_as_unread(&mut self, email_id: String) -> Result<(), &'static str> {
-        let email = self.emails.iter_mut().find(|e| e.id == email_id).ok_or("Email not found")?;
+        let email = self
+            .emails
+            .iter_mut()
+            .find(|e| e.id == email_id)
+            .ok_or("Email not found")?;
         email.read = false;
         Ok(())
     }
 
     /// Toggle star
     pub fn toggle_star(&mut self, email_id: String) -> Result<(), &'static str> {
-        let email = self.emails.iter_mut().find(|e| e.id == email_id).ok_or("Email not found")?;
+        let email = self
+            .emails
+            .iter_mut()
+            .find(|e| e.id == email_id)
+            .ok_or("Email not found")?;
         email.starred = !email.starred;
         Ok(())
     }
 
     /// Delete email
     pub fn delete_email(&mut self, email_id: String) -> Result<(), &'static str> {
-        let index = self.emails.iter().position(|e| e.id == email_id).ok_or("Email not found")?;
+        let index = self
+            .emails
+            .iter()
+            .position(|e| e.id == email_id)
+            .ok_or("Email not found")?;
         self.emails.remove(index);
         Ok(())
     }
@@ -239,9 +255,7 @@ pub fn init_email_client() {
 
 /// Get email client
 pub fn get_email_client() -> &'static mut EmailClient {
-    unsafe {
-        EMAIL_CLIENT.as_mut().expect("Email client not initialized")
-    }
+    unsafe { EMAIL_CLIENT.as_mut().expect("Email client not initialized") }
 }
 
 #[cfg(test)]

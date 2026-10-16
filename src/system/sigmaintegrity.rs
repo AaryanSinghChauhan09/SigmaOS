@@ -141,7 +141,7 @@ impl SigmaIntegrity {
         if self.records.contains_key(&record.path) {
             return Err(format!("Record for '{}' already exists", record.path));
         }
-        
+
         self.records.insert(record.path.clone(), record);
         self.record_counter += 1;
         Ok(())
@@ -161,7 +161,12 @@ impl SigmaIntegrity {
     }
 
     /// Update a file integrity record
-    pub fn update_record(&mut self, path: &str, new_hash: String, new_size: u64) -> Result<(), String> {
+    pub fn update_record(
+        &mut self,
+        path: &str,
+        new_hash: String,
+        new_size: u64,
+    ) -> Result<(), String> {
         match self.records.get_mut(path) {
             Some(record) => {
                 if record.hash != new_hash || record.size != new_size {
@@ -178,7 +183,12 @@ impl SigmaIntegrity {
     }
 
     /// Check file integrity
-    pub fn check_integrity(&mut self, path: &str, current_hash: String, current_size: u64) -> Result<(), String> {
+    pub fn check_integrity(
+        &mut self,
+        path: &str,
+        current_hash: String,
+        current_size: u64,
+    ) -> Result<(), String> {
         match self.records.get_mut(path) {
             Some(record) => {
                 if record.hash != current_hash || record.size != current_size {
@@ -210,7 +220,8 @@ impl SigmaIntegrity {
 
     /// List records by status
     pub fn list_by_status(&self, status: FileStatus) -> Vec<&FileIntegrityRecord> {
-        self.records.values()
+        self.records
+            .values()
             .filter(|r| r.status == status)
             .collect()
     }
@@ -224,10 +235,22 @@ impl SigmaIntegrity {
     pub fn integrity_stats(&self) -> BTreeMap<String, String> {
         let mut stats = BTreeMap::new();
         stats.insert("total_records".to_string(), self.record_count().to_string());
-        stats.insert("ok_files".to_string(), self.list_by_status(FileStatus::Ok).len().to_string());
-        stats.insert("modified_files".to_string(), self.list_by_status(FileStatus::Modified).len().to_string());
-        stats.insert("deleted_files".to_string(), self.list_by_status(FileStatus::Deleted).len().to_string());
-        stats.insert("new_files".to_string(), self.list_by_status(FileStatus::New).len().to_string());
+        stats.insert(
+            "ok_files".to_string(),
+            self.list_by_status(FileStatus::Ok).len().to_string(),
+        );
+        stats.insert(
+            "modified_files".to_string(),
+            self.list_by_status(FileStatus::Modified).len().to_string(),
+        );
+        stats.insert(
+            "deleted_files".to_string(),
+            self.list_by_status(FileStatus::Deleted).len().to_string(),
+        );
+        stats.insert(
+            "new_files".to_string(),
+            self.list_by_status(FileStatus::New).len().to_string(),
+        );
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
@@ -255,7 +278,11 @@ pub fn get_sigmaintegrity() -> Option<&'static mut SigmaIntegrity> {
 }
 
 /// Convenience function to check file integrity
-pub fn check_file_integrity(path: &str, current_hash: String, current_size: u64) -> Result<(), String> {
+pub fn check_file_integrity(
+    path: &str,
+    current_hash: String,
+    current_size: u64,
+) -> Result<(), String> {
     if let Some(integrity) = get_sigmaintegrity() {
         integrity.check_integrity(path, current_hash, current_size)
     } else {
@@ -285,7 +312,7 @@ mod tests {
             "/etc/passwd".to_string(),
             HashAlgorithm::Sha256,
             "abc123".to_string(),
-            1024
+            1024,
         )
         .with_status(FileStatus::Ok)
         .with_timestamp(1234567890);
@@ -308,14 +335,14 @@ mod tests {
     #[test]
     fn test_sigmaintegrity_add_record() {
         let mut integrity = SigmaIntegrity::new();
-        
+
         let record = FileIntegrityRecord::new(
             "/etc/passwd".to_string(),
             HashAlgorithm::Sha256,
             "abc123".to_string(),
-            1024
+            1024,
         );
-        
+
         assert!(integrity.add_record(record).is_ok());
         assert_eq!(integrity.record_count(), 1);
     }
@@ -323,17 +350,19 @@ mod tests {
     #[test]
     fn test_sigmaintegrity_update_record() {
         let mut integrity = SigmaIntegrity::new();
-        
+
         let record = FileIntegrityRecord::new(
             "/etc/passwd".to_string(),
             HashAlgorithm::Sha256,
             "abc123".to_string(),
-            1024
+            1024,
         );
-        
+
         integrity.add_record(record).unwrap();
-        assert!(integrity.update_record("/etc/passwd", "def456".to_string(), 2048).is_ok());
-        
+        assert!(integrity
+            .update_record("/etc/passwd", "def456".to_string(), 2048)
+            .is_ok());
+
         let record = integrity.get_record("/etc/passwd").unwrap();
         assert_eq!(record.status, FileStatus::Modified);
     }
@@ -341,17 +370,19 @@ mod tests {
     #[test]
     fn test_sigmaintegrity_check_integrity() {
         let mut integrity = SigmaIntegrity::new();
-        
+
         let record = FileIntegrityRecord::new(
             "/etc/passwd".to_string(),
             HashAlgorithm::Sha256,
             "abc123".to_string(),
-            1024
+            1024,
         );
-        
+
         integrity.add_record(record).unwrap();
-        assert!(integrity.check_integrity("/etc/passwd", "abc123".to_string(), 1024).is_ok());
-        
+        assert!(integrity
+            .check_integrity("/etc/passwd", "abc123".to_string(), 1024)
+            .is_ok());
+
         let record = integrity.get_record("/etc/passwd").unwrap();
         assert_eq!(record.status, FileStatus::Ok);
     }
@@ -359,17 +390,17 @@ mod tests {
     #[test]
     fn test_sigmaintegrity_mark_deleted() {
         let mut integrity = SigmaIntegrity::new();
-        
+
         let record = FileIntegrityRecord::new(
             "/etc/passwd".to_string(),
             HashAlgorithm::Sha256,
             "abc123".to_string(),
-            1024
+            1024,
         );
-        
+
         integrity.add_record(record).unwrap();
         assert!(integrity.mark_deleted("/etc/passwd").is_ok());
-        
+
         let record = integrity.get_record("/etc/passwd").unwrap();
         assert_eq!(record.status, FileStatus::Deleted);
     }
@@ -377,17 +408,17 @@ mod tests {
     #[test]
     fn test_sigmaintegrity_list_by_status() {
         let mut integrity = SigmaIntegrity::new();
-        
+
         let record = FileIntegrityRecord::new(
             "/etc/passwd".to_string(),
             HashAlgorithm::Sha256,
             "abc123".to_string(),
-            1024
+            1024,
         )
         .with_status(FileStatus::Modified);
-        
+
         integrity.add_record(record).unwrap();
-        
+
         let modified = integrity.list_by_status(FileStatus::Modified);
         assert_eq!(modified.len(), 1);
     }
@@ -395,17 +426,17 @@ mod tests {
     #[test]
     fn test_sigmaintegrity_stats() {
         let mut integrity = SigmaIntegrity::new();
-        
+
         let record = FileIntegrityRecord::new(
             "/etc/passwd".to_string(),
             HashAlgorithm::Sha256,
             "abc123".to_string(),
-            1024
+            1024,
         )
         .with_status(FileStatus::Ok);
-        
+
         integrity.add_record(record).unwrap();
-        
+
         let stats = integrity.integrity_stats();
         assert_eq!(stats.get("total_records"), Some(&"1".to_string()));
         assert_eq!(stats.get("ok_files"), Some(&"1".to_string()));
@@ -414,18 +445,18 @@ mod tests {
     #[test]
     fn test_check_file_integrity_convenience() {
         init_sigmaintegrity();
-        
+
         let mut integrity = get_sigmaintegrity().unwrap();
-        
+
         let record = FileIntegrityRecord::new(
             "/etc/passwd".to_string(),
             HashAlgorithm::Sha256,
             "abc123".to_string(),
-            1024
+            1024,
         );
-        
+
         integrity.add_record(record).unwrap();
-        
+
         let result = check_file_integrity("/etc/passwd", "abc123".to_string(), 1024);
         assert!(result.is_ok());
     }

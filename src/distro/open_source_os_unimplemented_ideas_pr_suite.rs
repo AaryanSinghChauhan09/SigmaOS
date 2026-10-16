@@ -839,7 +839,9 @@ impl SmartOsJoyentCrossbowAndZfsHealthPrEngine {
             zpool_health_states: BTreeMap::new(),
         };
         engine.provision_vnic("vnic_zone_101", "52:54:00:12:34:56", 1000);
-        engine.zpool_health_states.insert("zones".to_string(), "ONLINE".to_string());
+        engine
+            .zpool_health_states
+            .insert("zones".to_string(), "ONLINE".to_string());
         engine
     }
 
@@ -1137,10 +1139,13 @@ impl OpenSourceOsUnimplementedIdeasPrMasterSuite {
         let chid = self.qnx_resmgr.attach_resmgr("/dev/con1");
         assert!(self.qnx_resmgr.connect_client(chid));
 
-        self.smartos_crossbow.provision_vnic("vnic_db", "52:54:00:11:22:33", 5000);
+        self.smartos_crossbow
+            .provision_vnic("vnic_db", "52:54:00:11:22:33", 5000);
         assert!(self.smartos_crossbow.self_heal_zpool("zones"));
 
-        let z_h = self.fuchsia_zircon.create_handle(ZirconHandleType::Socket, 0x3);
+        let z_h = self
+            .fuchsia_zircon
+            .create_handle(ZirconHandleType::Socket, 0x3);
         assert!(z_h > 0);
         assert!(self.fuchsia_zircon.translate_starnix_linux_syscall() > 1024);
 
@@ -1256,7 +1261,10 @@ mod tests {
 
         let mut hurd = HurdMachTranslatorVfsPrEngine::new();
         hurd.settrans("/term/1", "/hurd/term");
-        assert_eq!(hurd.lookup_translator("/term/1"), Some("/hurd/term".to_string()));
+        assert_eq!(
+            hurd.lookup_translator("/term/1"),
+            Some("/hurd/term".to_string())
+        );
 
         let mut ips = OpenIndianaIpsPkgBootEnvPrEngine::new();
         assert!(ips.create_boot_environment("oi-2024.11"));

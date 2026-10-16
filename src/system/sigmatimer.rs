@@ -349,8 +349,14 @@ impl SigmaTimer {
     pub fn timer_stats(&self) -> BTreeMap<String, String> {
         let mut stats = BTreeMap::new();
         stats.insert("total_timers".to_string(), self.timer_count().to_string());
-        stats.insert("enabled_timers".to_string(), self.enabled_timer_count().to_string());
-        stats.insert("disabled_timers".to_string(), (self.timer_count() - self.enabled_timer_count()).to_string());
+        stats.insert(
+            "enabled_timers".to_string(),
+            self.enabled_timer_count().to_string(),
+        );
+        stats.insert(
+            "disabled_timers".to_string(),
+            (self.timer_count() - self.enabled_timer_count()).to_string(),
+        );
         stats
     }
 }
@@ -452,8 +458,8 @@ mod tests {
 
     #[test]
     fn test_timer_unit_boot() {
-        let timer = TimerUnit::new("boot-task".to_string(), "task.service".to_string())
-            .with_boot_delay(60);
+        let timer =
+            TimerUnit::new("boot-task".to_string(), "task.service".to_string()).with_boot_delay(60);
 
         assert_eq!(timer.trigger_type, TriggerType::Boot);
         assert_eq!(timer.boot_delay, 60);
@@ -462,7 +468,7 @@ mod tests {
     #[test]
     fn test_timer_unit_enable_disable() {
         let mut timer = TimerUnit::new("test".to_string(), "test.service".to_string());
-        
+
         assert!(timer.enabled);
         timer.disable();
         assert!(!timer.enabled);
@@ -473,11 +479,11 @@ mod tests {
     #[test]
     fn test_timer_unit_record_trigger() {
         let mut timer = TimerUnit::new("test".to_string(), "test.service".to_string());
-        
+
         timer.record_trigger(1000);
         assert_eq!(timer.trigger_count, 1);
         assert_eq!(timer.last_trigger, Some(1000));
-        
+
         timer.record_trigger(2000);
         assert_eq!(timer.trigger_count, 2);
     }
@@ -495,7 +501,7 @@ mod tests {
     #[test]
     fn test_sigmatimer_add_timer() {
         let mut timer_mgr = SigmaTimer::new();
-        
+
         let timer = TimerUnit::new("test".to_string(), "test.service".to_string());
         assert!(timer_mgr.add_timer(timer).is_ok());
         assert_eq!(timer_mgr.timer_count(), 1);
@@ -504,10 +510,10 @@ mod tests {
     #[test]
     fn test_sigmatimer_duplicate_timer() {
         let mut timer_mgr = SigmaTimer::new();
-        
+
         let timer1 = TimerUnit::new("test".to_string(), "test.service".to_string());
         let timer2 = TimerUnit::new("test".to_string(), "test2.service".to_string());
-        
+
         assert!(timer_mgr.add_timer(timer1).is_ok());
         assert!(timer_mgr.add_timer(timer2).is_err());
     }
@@ -515,10 +521,10 @@ mod tests {
     #[test]
     fn test_sigmatimer_enable_disable() {
         let mut timer_mgr = SigmaTimer::new();
-        
+
         let timer = TimerUnit::new("test".to_string(), "test.service".to_string());
         timer_mgr.add_timer(timer).unwrap();
-        
+
         assert!(timer_mgr.enable_timer("test").is_ok());
         assert!(timer_mgr.disable_timer("test").is_ok());
     }
@@ -526,13 +532,13 @@ mod tests {
     #[test]
     fn test_sigmatimer_list_timers() {
         let mut timer_mgr = SigmaTimer::new();
-        
+
         let timer1 = TimerUnit::new("timer1".to_string(), "service1.service".to_string());
         let timer2 = TimerUnit::new("timer2".to_string(), "service2.service".to_string());
-        
+
         timer_mgr.add_timer(timer1).unwrap();
         timer_mgr.add_timer(timer2).unwrap();
-        
+
         let timers = timer_mgr.list_timers();
         assert_eq!(timers.len(), 2);
     }
@@ -540,15 +546,15 @@ mod tests {
     #[test]
     fn test_sigmatimer_enabled_timers() {
         let mut timer_mgr = SigmaTimer::new();
-        
+
         let mut timer1 = TimerUnit::new("timer1".to_string(), "service1.service".to_string());
         timer1.disable();
-        
+
         let timer2 = TimerUnit::new("timer2".to_string(), "service2.service".to_string());
-        
+
         timer_mgr.add_timer(timer1).unwrap();
         timer_mgr.add_timer(timer2).unwrap();
-        
+
         let enabled = timer_mgr.list_enabled_timers();
         assert_eq!(enabled.len(), 1);
     }
@@ -556,15 +562,15 @@ mod tests {
     #[test]
     fn test_sigmatimer_stats() {
         let mut timer_mgr = SigmaTimer::new();
-        
+
         let mut timer1 = TimerUnit::new("timer1".to_string(), "service1.service".to_string());
         timer1.disable();
-        
+
         let timer2 = TimerUnit::new("timer2".to_string(), "service2.service".to_string());
-        
+
         timer_mgr.add_timer(timer1).unwrap();
         timer_mgr.add_timer(timer2).unwrap();
-        
+
         let stats = timer_mgr.timer_stats();
         assert_eq!(stats.get("total_timers"), Some(&"2".to_string()));
         assert_eq!(stats.get("enabled_timers"), Some(&"1".to_string()));
@@ -574,20 +580,20 @@ mod tests {
     #[test]
     fn test_add_timer_unit_convenience() {
         init_sigmatimer();
-        
+
         let timer = TimerUnit::new("test".to_string(), "test.service".to_string());
         let result = add_timer_unit(timer);
-        
+
         assert!(result.is_ok());
     }
 
     #[test]
     fn test_enable_timer_unit_convenience() {
         init_sigmatimer();
-        
+
         let timer = TimerUnit::new("test".to_string(), "test.service".to_string());
         add_timer_unit(timer).unwrap();
-        
+
         let result = enable_timer_unit("test");
         assert!(result.is_ok());
     }
@@ -595,10 +601,10 @@ mod tests {
     #[test]
     fn test_disable_timer_unit_convenience() {
         init_sigmatimer();
-        
+
         let timer = TimerUnit::new("test".to_string(), "test.service".to_string());
         add_timer_unit(timer).unwrap();
-        
+
         let result = disable_timer_unit("test");
         assert!(result.is_ok());
     }

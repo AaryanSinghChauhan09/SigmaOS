@@ -157,10 +157,14 @@ impl SigmaProxy {
     /// Add a proxy connection
     pub fn add_connection(&mut self, connection: ProxyConnection) -> Result<(), String> {
         if self.connections.contains_key(&connection.connection_id) {
-            return Err(format!("Connection '{}' already exists", connection.connection_id));
+            return Err(format!(
+                "Connection '{}' already exists",
+                connection.connection_id
+            ));
         }
-        
-        self.connections.insert(connection.connection_id.clone(), connection);
+
+        self.connections
+            .insert(connection.connection_id.clone(), connection);
         self.connection_counter += 1;
         Ok(())
     }
@@ -178,7 +182,7 @@ impl SigmaProxy {
         if !self.running {
             return Err("SigmaProxy not running".to_string());
         }
-        
+
         match self.connections.get_mut(connection_id) {
             Some(connection) => {
                 connection.state = ProxyConnectionState::Forwarding;
@@ -193,7 +197,7 @@ impl SigmaProxy {
         if !self.running {
             return Err("SigmaProxy not running".to_string());
         }
-        
+
         match self.connections.get_mut(connection_id) {
             Some(connection) => {
                 connection.state = ProxyConnectionState::Responding;
@@ -208,7 +212,7 @@ impl SigmaProxy {
         if !self.running {
             return Err("SigmaProxy not running".to_string());
         }
-        
+
         match self.connections.get_mut(connection_id) {
             Some(connection) => {
                 connection.state = ProxyConnectionState::Closed;
@@ -230,14 +234,16 @@ impl SigmaProxy {
 
     /// List connections by state
     pub fn list_by_state(&self, state: ProxyConnectionState) -> Vec<&ProxyConnection> {
-        self.connections.values()
+        self.connections
+            .values()
             .filter(|c| c.state == state)
             .collect()
     }
 
     /// List connections by protocol
     pub fn list_by_protocol(&self, protocol: ProxyProtocol) -> Vec<&ProxyConnection> {
-        self.connections.values()
+        self.connections
+            .values()
             .filter(|c| c.protocol == protocol)
             .collect()
     }
@@ -250,11 +256,32 @@ impl SigmaProxy {
     /// Get proxy server statistics
     pub fn proxy_stats(&self) -> BTreeMap<String, String> {
         let mut stats = BTreeMap::new();
-        stats.insert("total_connections".to_string(), self.connection_count().to_string());
-        stats.insert("forwarding_connections".to_string(), self.list_by_state(ProxyConnectionState::Forwarding).len().to_string());
-        stats.insert("responding_connections".to_string(), self.list_by_state(ProxyConnectionState::Responding).len().to_string());
-        stats.insert("http_connections".to_string(), self.list_by_protocol(ProxyProtocol::Http).len().to_string());
-        stats.insert("https_connections".to_string(), self.list_by_protocol(ProxyProtocol::Https).len().to_string());
+        stats.insert(
+            "total_connections".to_string(),
+            self.connection_count().to_string(),
+        );
+        stats.insert(
+            "forwarding_connections".to_string(),
+            self.list_by_state(ProxyConnectionState::Forwarding)
+                .len()
+                .to_string(),
+        );
+        stats.insert(
+            "responding_connections".to_string(),
+            self.list_by_state(ProxyConnectionState::Responding)
+                .len()
+                .to_string(),
+        );
+        stats.insert(
+            "http_connections".to_string(),
+            self.list_by_protocol(ProxyProtocol::Http).len().to_string(),
+        );
+        stats.insert(
+            "https_connections".to_string(),
+            self.list_by_protocol(ProxyProtocol::Https)
+                .len()
+                .to_string(),
+        );
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
@@ -308,15 +335,12 @@ mod tests {
 
     #[test]
     fn test_proxy_connection() {
-        let connection = ProxyConnection::new(
-            "conn1".to_string(),
-            "192.168.1.100".to_string(),
-            12345
-        )
-        .with_protocol(ProxyProtocol::Https)
-        .with_target_host("example.com".to_string())
-        .with_target_port(443)
-        .with_state(ProxyConnectionState::Forwarding);
+        let connection =
+            ProxyConnection::new("conn1".to_string(), "192.168.1.100".to_string(), 12345)
+                .with_protocol(ProxyProtocol::Https)
+                .with_target_host("example.com".to_string())
+                .with_target_port(443)
+                .with_state(ProxyConnectionState::Forwarding);
 
         assert_eq!(connection.connection_id, "conn1");
         assert_eq!(connection.protocol, ProxyProtocol::Https);
@@ -337,13 +361,10 @@ mod tests {
     #[test]
     fn test_sigmaproxy_add_connection() {
         let mut proxy = SigmaProxy::new();
-        
-        let connection = ProxyConnection::new(
-            "conn1".to_string(),
-            "192.168.1.100".to_string(),
-            12345
-        );
-        
+
+        let connection =
+            ProxyConnection::new("conn1".to_string(), "192.168.1.100".to_string(), 12345);
+
         assert!(proxy.add_connection(connection).is_ok());
         assert_eq!(proxy.connection_count(), 1);
     }
@@ -352,16 +373,13 @@ mod tests {
     fn test_sigmaproxy_forward_request() {
         let mut proxy = SigmaProxy::new();
         proxy.start();
-        
-        let connection = ProxyConnection::new(
-            "conn1".to_string(),
-            "192.168.1.100".to_string(),
-            12345
-        );
-        
+
+        let connection =
+            ProxyConnection::new("conn1".to_string(), "192.168.1.100".to_string(), 12345);
+
         proxy.add_connection(connection).unwrap();
         assert!(proxy.forward_request("conn1").is_ok());
-        
+
         let conn = proxy.get_connection("conn1").unwrap();
         assert_eq!(conn.state, ProxyConnectionState::Forwarding);
     }
@@ -370,17 +388,14 @@ mod tests {
     fn test_sigmaproxy_send_response() {
         let mut proxy = SigmaProxy::new();
         proxy.start();
-        
-        let connection = ProxyConnection::new(
-            "conn1".to_string(),
-            "192.168.1.100".to_string(),
-            12345
-        )
-        .with_state(ProxyConnectionState::Forwarding);
-        
+
+        let connection =
+            ProxyConnection::new("conn1".to_string(), "192.168.1.100".to_string(), 12345)
+                .with_state(ProxyConnectionState::Forwarding);
+
         proxy.add_connection(connection).unwrap();
         assert!(proxy.send_response("conn1").is_ok());
-        
+
         let conn = proxy.get_connection("conn1").unwrap();
         assert_eq!(conn.state, ProxyConnectionState::Responding);
     }
@@ -388,16 +403,13 @@ mod tests {
     #[test]
     fn test_sigmaproxy_list_by_state() {
         let mut proxy = SigmaProxy::new();
-        
-        let connection = ProxyConnection::new(
-            "conn1".to_string(),
-            "192.168.1.100".to_string(),
-            12345
-        )
-        .with_state(ProxyConnectionState::Forwarding);
-        
+
+        let connection =
+            ProxyConnection::new("conn1".to_string(), "192.168.1.100".to_string(), 12345)
+                .with_state(ProxyConnectionState::Forwarding);
+
         proxy.add_connection(connection).unwrap();
-        
+
         let connections = proxy.list_by_state(ProxyConnectionState::Forwarding);
         assert_eq!(connections.len(), 1);
     }
@@ -405,16 +417,13 @@ mod tests {
     #[test]
     fn test_sigmaproxy_list_by_protocol() {
         let mut proxy = SigmaProxy::new();
-        
-        let connection = ProxyConnection::new(
-            "conn1".to_string(),
-            "192.168.1.100".to_string(),
-            12345
-        )
-        .with_protocol(ProxyProtocol::Https);
-        
+
+        let connection =
+            ProxyConnection::new("conn1".to_string(), "192.168.1.100".to_string(), 12345)
+                .with_protocol(ProxyProtocol::Https);
+
         proxy.add_connection(connection).unwrap();
-        
+
         let connections = proxy.list_by_protocol(ProxyProtocol::Https);
         assert_eq!(connections.len(), 1);
     }
@@ -422,17 +431,14 @@ mod tests {
     #[test]
     fn test_sigmaproxy_stats() {
         let mut proxy = SigmaProxy::new();
-        
-        let connection = ProxyConnection::new(
-            "conn1".to_string(),
-            "192.168.1.100".to_string(),
-            12345
-        )
-        .with_protocol(ProxyProtocol::Http)
-        .with_state(ProxyConnectionState::Forwarding);
-        
+
+        let connection =
+            ProxyConnection::new("conn1".to_string(), "192.168.1.100".to_string(), 12345)
+                .with_protocol(ProxyProtocol::Http)
+                .with_state(ProxyConnectionState::Forwarding);
+
         proxy.add_connection(connection).unwrap();
-        
+
         let stats = proxy.proxy_stats();
         assert_eq!(stats.get("total_connections"), Some(&"1".to_string()));
         assert_eq!(stats.get("forwarding_connections"), Some(&"1".to_string()));
@@ -442,18 +448,15 @@ mod tests {
     #[test]
     fn test_forward_proxy_request_convenience() {
         init_sigmaproxy();
-        
+
         let mut proxy = get_sigmaproxy().unwrap();
         proxy.start();
-        
-        let connection = ProxyConnection::new(
-            "conn1".to_string(),
-            "192.168.1.100".to_string(),
-            12345
-        );
-        
+
+        let connection =
+            ProxyConnection::new("conn1".to_string(), "192.168.1.100".to_string(), 12345);
+
         proxy.add_connection(connection).unwrap();
-        
+
         let result = forward_proxy_request("conn1");
         assert!(result.is_ok());
     }

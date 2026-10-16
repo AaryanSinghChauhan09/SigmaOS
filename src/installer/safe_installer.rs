@@ -240,8 +240,13 @@ mod tests {
     #[test]
     fn test_ordering_enforced() {
         let cred = get_test_credential();
-        let mut inst =
-            SafeInstaller::new("h", "u", &cred, DiskTarget::Explicit("/dev/vda".into()), true);
+        let mut inst = SafeInstaller::new(
+            "h",
+            "u",
+            &cred,
+            DiskTarget::Explicit("/dev/vda".into()),
+            true,
+        );
         inst.discover_disks();
         inst.confirm_destructive();
         assert!(inst.install_system().is_err()); // must partition first

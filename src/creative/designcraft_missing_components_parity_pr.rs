@@ -35,11 +35,21 @@ impl DesigncraftPrCategory {
     pub fn as_str(&self) -> &'static str {
         match self {
             Self::InteractivePrototypingFlow => "interactive prototyping flow & screen transitions",
-            Self::AutoLayoutFlexContainer => "auto-layout flexbox containers & responsive resizing constraints",
-            Self::DesignSystemVariablesTheme => "design system tokens, theme modes & variable aliasing",
-            Self::VectorGeometryBooleanOps => "boolean geometry operations, bezier knots & stroke caps",
-            Self::MultiplayerCrdtStateSync => "real-time multiplayer CRDT state sync & collaborative cursors",
-            Self::CodeExporterMultiFramework => "design-to-code generator & multi-framework asset exporter",
+            Self::AutoLayoutFlexContainer => {
+                "auto-layout flexbox containers & responsive resizing constraints"
+            }
+            Self::DesignSystemVariablesTheme => {
+                "design system tokens, theme modes & variable aliasing"
+            }
+            Self::VectorGeometryBooleanOps => {
+                "boolean geometry operations, bezier knots & stroke caps"
+            }
+            Self::MultiplayerCrdtStateSync => {
+                "real-time multiplayer CRDT state sync & collaborative cursors"
+            }
+            Self::CodeExporterMultiFramework => {
+                "design-to-code generator & multi-framework asset exporter"
+            }
         }
     }
 }
@@ -146,7 +156,11 @@ impl DesigncraftInteractivePrototypingPrEngine {
         id
     }
 
-    pub fn trigger_event(&mut self, source_element_id: u32, trigger_type: PrototypeTrigger) -> bool {
+    pub fn trigger_event(
+        &mut self,
+        source_element_id: u32,
+        trigger_type: PrototypeTrigger,
+    ) -> bool {
         let mut triggered = false;
         let keys: Vec<u32> = self.interactions.keys().cloned().collect();
         for k in keys {
@@ -241,7 +255,11 @@ impl DesigncraftAutoLayoutFlexEngine {
         self.frames.insert(frame.frame_id, frame);
     }
 
-    pub fn compute_frame_dimensions(&self, frame_id: u32, child_sizes: &[(f32, f32)]) -> (f32, f32) {
+    pub fn compute_frame_dimensions(
+        &self,
+        frame_id: u32,
+        child_sizes: &[(f32, f32)],
+    ) -> (f32, f32) {
         let frame = match self.frames.get(&frame_id) {
             Some(f) => f,
             None => return (0.0, 0.0),
@@ -331,19 +349,31 @@ impl DesigncraftDesignSystemVariablesEngine {
             scope: VariableScope::Fills,
             values_by_mode: BTreeMap::new(),
         };
-        primary_color.values_by_mode.insert(String::from("Light"), DesignVariableValue::Color(String::from("#0066FF")));
-        primary_color.values_by_mode.insert(String::from("Dark"), DesignVariableValue::Color(String::from("#3385FF")));
+        primary_color.values_by_mode.insert(
+            String::from("Light"),
+            DesignVariableValue::Color(String::from("#0066FF")),
+        );
+        primary_color.values_by_mode.insert(
+            String::from("Dark"),
+            DesignVariableValue::Color(String::from("#3385FF")),
+        );
 
         let mut spacing_unit = DesignVariable {
             key: String::from("spacing.md"),
             scope: VariableScope::Gap,
             values_by_mode: BTreeMap::new(),
         };
-        spacing_unit.values_by_mode.insert(String::from("Light"), DesignVariableValue::Number(16.0));
-        spacing_unit.values_by_mode.insert(String::from("Dark"), DesignVariableValue::Number(16.0));
+        spacing_unit
+            .values_by_mode
+            .insert(String::from("Light"), DesignVariableValue::Number(16.0));
+        spacing_unit
+            .values_by_mode
+            .insert(String::from("Dark"), DesignVariableValue::Number(16.0));
 
-        self.variables.insert(primary_color.key.clone(), primary_color);
-        self.variables.insert(spacing_unit.key.clone(), spacing_unit);
+        self.variables
+            .insert(primary_color.key.clone(), primary_color);
+        self.variables
+            .insert(spacing_unit.key.clone(), spacing_unit);
     }
 
     pub fn set_mode(&mut self, mode: String) {
@@ -425,12 +455,22 @@ impl DesigncraftVectorGeometryEngine {
 
     pub fn create_path(&mut self, name: String, knots: Vec<BezierKnot>, closed: bool) -> u32 {
         let id = self.next_path_id.fetch_add(1, Ordering::Relaxed);
-        let path = VectorPath { id, name, knots, closed };
+        let path = VectorPath {
+            id,
+            name,
+            knots,
+            closed,
+        };
         self.paths.insert(id, path);
         id
     }
 
-    pub fn perform_boolean_op(&mut self, path_a_id: u32, path_b_id: u32, op: BooleanOpType) -> Option<u32> {
+    pub fn perform_boolean_op(
+        &mut self,
+        path_a_id: u32,
+        path_b_id: u32,
+        op: BooleanOpType,
+    ) -> Option<u32> {
         let path_a = self.paths.get(&path_a_id)?.clone();
         let path_b = self.paths.get(&path_b_id)?.clone();
 
@@ -440,17 +480,31 @@ impl DesigncraftVectorGeometryEngine {
                 combined_knots.extend(path_b.knots);
             }
             BooleanOpType::Subtract => {
-                combined_knots.retain(|k| !path_b.knots.iter().any(|bk| (bk.x - k.x).abs() < 0.001 && (bk.y - k.y).abs() < 0.001));
+                combined_knots.retain(|k| {
+                    !path_b
+                        .knots
+                        .iter()
+                        .any(|bk| (bk.x - k.x).abs() < 0.001 && (bk.y - k.y).abs() < 0.001)
+                });
             }
             BooleanOpType::Intersect => {
-                combined_knots.retain(|k| path_b.knots.iter().any(|bk| (bk.x - k.x).abs() < 0.001 && (bk.y - k.y).abs() < 0.001));
+                combined_knots.retain(|k| {
+                    path_b
+                        .knots
+                        .iter()
+                        .any(|bk| (bk.x - k.x).abs() < 0.001 && (bk.y - k.y).abs() < 0.001)
+                });
             }
             BooleanOpType::Exclude => {
                 combined_knots.extend(path_b.knots);
             }
         }
 
-        let id = self.create_path(format!("Result_{:?}_{}_{}", op, path_a_id, path_b_id), combined_knots, true);
+        let id = self.create_path(
+            format!("Result_{:?}_{}_{}", op, path_a_id, path_b_id),
+            combined_knots,
+            true,
+        );
         Some(id)
     }
 }
@@ -552,10 +606,20 @@ impl DesigncraftCodeExportEngine {
         Self { target }
     }
 
-    pub fn export_element_code(&self, element_name: &str, x: f32, y: f32, width: f32, height: f32) -> String {
+    pub fn export_element_code(
+        &self,
+        element_name: &str,
+        x: f32,
+        y: f32,
+        width: f32,
+        height: f32,
+    ) -> String {
         match self.target {
             CodeFrameworkTarget::CssTailwind => {
-                format!("className=\"absolute left-[{}px] top-[{}px] w-[{}px] h-[{}px]\"", x, y, width, height)
+                format!(
+                    "className=\"absolute left-[{}px] top-[{}px] w-[{}px] h-[{}px]\"",
+                    x, y, width, height
+                )
             }
             CodeFrameworkTarget::ReactJsx => {
                 format!("<div id=\"{}\" style={{{{ position: 'absolute', left: '{}px', top: '{}px', width: '{}px', height: '{}px' }}}} />", element_name, x, y, width, height)
@@ -564,10 +628,16 @@ impl DesigncraftCodeExportEngine {
                 format!("<div class=\"{}\" style=\"position: absolute; left: {}px; top: {}px; width: {}px; height: {}px;\"></div>", element_name, x, y, width, height)
             }
             CodeFrameworkTarget::FlutterSwiftUI => {
-                format!("Positioned(left: {}, top: {}, width: {}, height: {}, child: Container())", x, y, width, height)
+                format!(
+                    "Positioned(left: {}, top: {}, width: {}, height: {}, child: Container())",
+                    x, y, width, height
+                )
             }
             CodeFrameworkTarget::SvgPdfMarkup => {
-                format!("<rect id=\"{}\" x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" />", element_name, x, y, width, height)
+                format!(
+                    "<rect id=\"{}\" x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" />",
+                    element_name, x, y, width, height
+                )
             }
         }
     }
@@ -684,7 +754,9 @@ impl SovereignDesigncraftArtcraftParityPrGateway {
             300,
         );
         assert!(inter_id >= 100);
-        let triggered = self.prototyping_engine.trigger_event(10, PrototypeTrigger::OnClick);
+        let triggered = self
+            .prototyping_engine
+            .trigger_event(10, PrototypeTrigger::OnClick);
         assert!(triggered);
         assert_eq!(self.prototyping_engine.active_screen_id, 2);
 
@@ -694,18 +766,27 @@ impl SovereignDesigncraftArtcraftParityPrGateway {
             direction: FlexDirection::Horizontal,
             primary_align: FlexAlign::Start,
             counter_align: FlexAlign::Center,
-            padding: Padding { top: 10.0, right: 10.0, bottom: 10.0, left: 10.0 },
+            padding: Padding {
+                top: 10.0,
+                right: 10.0,
+                bottom: 10.0,
+                left: 10.0,
+            },
             item_gap: 8.0,
             horizontal_resizing: ResizingConstraint::HugContent,
             vertical_resizing: ResizingConstraint::HugContent,
             child_element_ids: Vec::new(),
         });
-        let (w, h) = self.auto_layout_engine.compute_frame_dimensions(1, &[(100.0, 40.0), (120.0, 40.0)]);
+        let (w, h) = self
+            .auto_layout_engine
+            .compute_frame_dimensions(1, &[(100.0, 40.0), (120.0, 40.0)]);
         assert_eq!(w, 248.0); // 10 + 100 + 8 + 120 + 10
-        assert_eq!(h, 60.0);  // 10 + 40 + 10
+        assert_eq!(h, 60.0); // 10 + 40 + 10
 
         // 3. Verify Design Tokens
-        let token = self.variables_engine.get_variable_value("color.brand.primary");
+        let token = self
+            .variables_engine
+            .get_variable_value("color.brand.primary");
         assert!(token.is_some());
 
         // 4. Verify Geometry
@@ -717,19 +798,38 @@ impl SovereignDesigncraftArtcraftParityPrGateway {
             handle_out_x: 5.0,
             handle_out_y: 0.0,
         };
-        let p1 = self.geometry_engine.create_path(String::from("PathA"), alloc::vec![knot1.clone()], true);
-        let p2 = self.geometry_engine.create_path(String::from("PathB"), alloc::vec![knot1], true);
-        let merged_p = self.geometry_engine.perform_boolean_op(p1, p2, BooleanOpType::Union);
+        let p1 = self.geometry_engine.create_path(
+            String::from("PathA"),
+            alloc::vec![knot1.clone()],
+            true,
+        );
+        let p2 = self
+            .geometry_engine
+            .create_path(String::from("PathB"), alloc::vec![knot1], true);
+        let merged_p = self
+            .geometry_engine
+            .perform_boolean_op(p1, p2, BooleanOpType::Union);
         assert!(merged_p.is_some());
-        assert_eq!(self.geometry_engine.paths.get(&merged_p.unwrap()).unwrap().knots.len(), 2);
+        assert_eq!(
+            self.geometry_engine
+                .paths
+                .get(&merged_p.unwrap())
+                .unwrap()
+                .knots
+                .len(),
+            2
+        );
 
         // 5. Verify CRDT Multi-user
-        self.crdt_engine.update_user_cursor(1, String::from("Alice"), 150.0, 200.0);
+        self.crdt_engine
+            .update_user_cursor(1, String::from("Alice"), 150.0, 200.0);
         let op_id = self.crdt_engine.push_crdt_op(1, String::from("Move"), 10);
         assert!(op_id > 0);
 
         // 6. Verify Code Exporter
-        let code = self.exporter_engine.export_element_code("Button", 10.0, 20.0, 100.0, 40.0);
+        let code = self
+            .exporter_engine
+            .export_element_code("Button", 10.0, 20.0, 100.0, 40.0);
         assert!(code.contains("left-[10px]"));
 
         true

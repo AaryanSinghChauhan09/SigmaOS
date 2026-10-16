@@ -166,7 +166,12 @@ impl Ipv6RoutingEngine {
     }
 
     /// Process a received Router Advertisement (RA).
-    pub fn handle_router_advertisement(&mut self, router_ip: Ipv6Addr, prefix: Ipv6Addr, prefix_len: u8) {
+    pub fn handle_router_advertisement(
+        &mut self,
+        router_ip: Ipv6Addr,
+        prefix: Ipv6Addr,
+        prefix_len: u8,
+    ) {
         self.default_router = Some(router_ip);
 
         // Configure default route ::/0 via this router
@@ -189,14 +194,23 @@ impl Ipv6RoutingEngine {
     }
 
     /// Update or insert neighbor entry upon receiving Neighbor Advertisement.
-    pub fn update_neighbor(&mut self, ip: Ipv6Addr, mac: [u8; 6], is_router: bool, current_tick: u64) {
-        self.neighbor_cache.insert(ip, NeighborEntry {
+    pub fn update_neighbor(
+        &mut self,
+        ip: Ipv6Addr,
+        mac: [u8; 6],
+        is_router: bool,
+        current_tick: u64,
+    ) {
+        self.neighbor_cache.insert(
             ip,
-            link_layer_addr: mac,
-            state: NeighborState::Reachable,
-            is_router,
-            reachable_until_tick: current_tick + 30000,
-        });
+            NeighborEntry {
+                ip,
+                link_layer_addr: mac,
+                state: NeighborState::Reachable,
+                is_router,
+                reachable_until_tick: current_tick + 30000,
+            },
+        );
     }
 }
 

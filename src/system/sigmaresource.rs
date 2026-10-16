@@ -116,16 +116,19 @@ impl SigmaResource {
     pub fn add_limit(&mut self, limit: ResourceLimit) -> Result<(), String> {
         let pid = limit.pid;
         let resource_type = limit.resource_type;
-        
+
         if !self.limits.contains_key(&pid) {
             self.limits.insert(pid, BTreeMap::new());
         }
-        
+
         let pid_limits = self.limits.get_mut(&pid).unwrap();
         if pid_limits.contains_key(&resource_type) {
-            return Err(format!("Limit for PID {} resource type {} already exists", pid, resource_type));
+            return Err(format!(
+                "Limit for PID {} resource type {} already exists",
+                pid, resource_type
+            ));
         }
-        
+
         pid_limits.insert(resource_type, limit);
         self.limit_counter += 1;
         Ok(())
@@ -136,9 +139,12 @@ impl SigmaResource {
         match self.limits.get_mut(&pid) {
             Some(pid_limits) => {
                 if pid_limits.remove(&resource_type).is_none() {
-                    return Err(format!("Limit for PID {} resource type {} not found", pid, resource_type));
+                    return Err(format!(
+                        "Limit for PID {} resource type {} not found",
+                        pid, resource_type
+                    ));
                 }
-                
+
                 if pid_limits.is_empty() {
                     self.limits.remove(&pid);
                 }
@@ -150,21 +156,29 @@ impl SigmaResource {
 
     /// Get a resource limit
     pub fn get_limit(&self, pid: u32, resource_type: ResourceType) -> Option<&ResourceLimit> {
-        self.limits.get(&pid).and_then(|limits| limits.get(&resource_type))
+        self.limits
+            .get(&pid)
+            .and_then(|limits| limits.get(&resource_type))
     }
 
     /// Set a resource limit
-    pub fn set_limit(&mut self, pid: u32, resource_type: ResourceType, limit: u64) -> Result<(), String> {
+    pub fn set_limit(
+        &mut self,
+        pid: u32,
+        resource_type: ResourceType,
+        limit: u64,
+    ) -> Result<(), String> {
         match self.limits.get_mut(&pid) {
-            Some(pid_limits) => {
-                match pid_limits.get_mut(&resource_type) {
-                    Some(res_limit) => {
-                        res_limit.limit = limit;
-                        Ok(())
-                    }
-                    None => Err(format!("Limit for PID {} resource type {} not found", pid, resource_type)),
+            Some(pid_limits) => match pid_limits.get_mut(&resource_type) {
+                Some(res_limit) => {
+                    res_limit.limit = limit;
+                    Ok(())
                 }
-            }
+                None => Err(format!(
+                    "Limit for PID {} resource type {} not found",
+                    pid, resource_type
+                )),
+            },
             None => Err(format!("Limits for PID {} not found", pid)),
         }
     }
@@ -172,15 +186,16 @@ impl SigmaResource {
     /// Enable a resource limit
     pub fn enable_limit(&mut self, pid: u32, resource_type: ResourceType) -> Result<(), String> {
         match self.limits.get_mut(&pid) {
-            Some(pid_limits) => {
-                match pid_limits.get_mut(&resource_type) {
-                    Some(res_limit) => {
-                        res_limit.enabled = true;
-                        Ok(())
-                    }
-                    None => Err(format!("Limit for PID {} resource type {} not found", pid, resource_type)),
+            Some(pid_limits) => match pid_limits.get_mut(&resource_type) {
+                Some(res_limit) => {
+                    res_limit.enabled = true;
+                    Ok(())
                 }
-            }
+                None => Err(format!(
+                    "Limit for PID {} resource type {} not found",
+                    pid, resource_type
+                )),
+            },
             None => Err(format!("Limits for PID {} not found", pid)),
         }
     }
@@ -188,15 +203,16 @@ impl SigmaResource {
     /// Disable a resource limit
     pub fn disable_limit(&mut self, pid: u32, resource_type: ResourceType) -> Result<(), String> {
         match self.limits.get_mut(&pid) {
-            Some(pid_limits) => {
-                match pid_limits.get_mut(&resource_type) {
-                    Some(res_limit) => {
-                        res_limit.enabled = false;
-                        Ok(())
-                    }
-                    None => Err(format!("Limit for PID {} resource type {} not found", pid, resource_type)),
+            Some(pid_limits) => match pid_limits.get_mut(&resource_type) {
+                Some(res_limit) => {
+                    res_limit.enabled = false;
+                    Ok(())
                 }
-            }
+                None => Err(format!(
+                    "Limit for PID {} resource type {} not found",
+                    pid, resource_type
+                )),
+            },
             None => Err(format!("Limits for PID {} not found", pid)),
         }
     }
@@ -231,7 +247,10 @@ impl SigmaResource {
     pub fn resource_stats(&self) -> BTreeMap<String, String> {
         let mut stats = BTreeMap::new();
         stats.insert("total_limits".to_string(), self.limit_count().to_string());
-        stats.insert("enabled_limits".to_string(), self.list_enabled().len().to_string());
+        stats.insert(
+            "enabled_limits".to_string(),
+            self.list_enabled().len().to_string(),
+        );
         stats.insert("tracked_pids".to_string(), self.limits.len().to_string());
         stats.insert("running".to_string(), self.running.to_string());
         stats
@@ -280,13 +299,9 @@ mod tests {
 
     #[test]
     fn test_resource_limit() {
-        let limit = ResourceLimit::new(
-            ResourceType::Cpu,
-            1234,
-            80
-        )
-        .with_current(50)
-        .with_enabled(true);
+        let limit = ResourceLimit::new(ResourceType::Cpu, 1234, 80)
+            .with_current(50)
+            .with_enabled(true);
 
         assert_eq!(limit.resource_type, ResourceType::Cpu);
         assert_eq!(limit.limit, 80);
@@ -306,13 +321,9 @@ mod tests {
     #[test]
     fn test_sigmaresource_add_limit() {
         let mut resource = SigmaResource::new();
-        
-        let limit = ResourceLimit::new(
-            ResourceType::Cpu,
-            1234,
-            80
-        );
-        
+
+        let limit = ResourceLimit::new(ResourceType::Cpu, 1234, 80);
+
         assert!(resource.add_limit(limit).is_ok());
         assert_eq!(resource.limit_count(), 1);
     }
@@ -320,16 +331,12 @@ mod tests {
     #[test]
     fn test_sigmaresource_set_limit() {
         let mut resource = SigmaResource::new();
-        
-        let limit = ResourceLimit::new(
-            ResourceType::Cpu,
-            1234,
-            80
-        );
-        
+
+        let limit = ResourceLimit::new(ResourceType::Cpu, 1234, 80);
+
         resource.add_limit(limit).unwrap();
         assert!(resource.set_limit(1234, ResourceType::Cpu, 90).is_ok());
-        
+
         let limit = resource.get_limit(1234, ResourceType::Cpu).unwrap();
         assert_eq!(limit.limit, 90);
     }
@@ -337,17 +344,12 @@ mod tests {
     #[test]
     fn test_sigmaresource_enable_limit() {
         let mut resource = SigmaResource::new();
-        
-        let limit = ResourceLimit::new(
-            ResourceType::Cpu,
-            1234,
-            80
-        )
-        .with_enabled(false);
-        
+
+        let limit = ResourceLimit::new(ResourceType::Cpu, 1234, 80).with_enabled(false);
+
         resource.add_limit(limit).unwrap();
         assert!(resource.enable_limit(1234, ResourceType::Cpu).is_ok());
-        
+
         let limit = resource.get_limit(1234, ResourceType::Cpu).unwrap();
         assert!(limit.enabled);
     }
@@ -355,16 +357,12 @@ mod tests {
     #[test]
     fn test_sigmaresource_disable_limit() {
         let mut resource = SigmaResource::new();
-        
-        let limit = ResourceLimit::new(
-            ResourceType::Cpu,
-            1234,
-            80
-        );
-        
+
+        let limit = ResourceLimit::new(ResourceType::Cpu, 1234, 80);
+
         resource.add_limit(limit).unwrap();
         assert!(resource.disable_limit(1234, ResourceType::Cpu).is_ok());
-        
+
         let limit = resource.get_limit(1234, ResourceType::Cpu).unwrap();
         assert!(!limit.enabled);
     }
@@ -372,15 +370,11 @@ mod tests {
     #[test]
     fn test_sigmaresource_list_limits() {
         let mut resource = SigmaResource::new();
-        
-        let limit = ResourceLimit::new(
-            ResourceType::Cpu,
-            1234,
-            80
-        );
-        
+
+        let limit = ResourceLimit::new(ResourceType::Cpu, 1234, 80);
+
         resource.add_limit(limit).unwrap();
-        
+
         let limits = resource.list_limits(1234);
         assert_eq!(limits.len(), 1);
     }
@@ -388,16 +382,11 @@ mod tests {
     #[test]
     fn test_sigmaresource_list_enabled() {
         let mut resource = SigmaResource::new();
-        
-        let limit = ResourceLimit::new(
-            ResourceType::Cpu,
-            1234,
-            80
-        )
-        .with_enabled(true);
-        
+
+        let limit = ResourceLimit::new(ResourceType::Cpu, 1234, 80).with_enabled(true);
+
         resource.add_limit(limit).unwrap();
-        
+
         let enabled = resource.list_enabled();
         assert_eq!(enabled.len(), 1);
     }
@@ -405,16 +394,11 @@ mod tests {
     #[test]
     fn test_sigmaresource_stats() {
         let mut resource = SigmaResource::new();
-        
-        let limit = ResourceLimit::new(
-            ResourceType::Cpu,
-            1234,
-            80
-        )
-        .with_enabled(true);
-        
+
+        let limit = ResourceLimit::new(ResourceType::Cpu, 1234, 80).with_enabled(true);
+
         resource.add_limit(limit).unwrap();
-        
+
         let stats = resource.resource_stats();
         assert_eq!(stats.get("total_limits"), Some(&"1".to_string()));
         assert_eq!(stats.get("enabled_limits"), Some(&"1".to_string()));
@@ -423,17 +407,13 @@ mod tests {
     #[test]
     fn test_set_resource_limit_convenience() {
         init_sigmaresource();
-        
+
         let mut resource = get_sigmaresource().unwrap();
-        
-        let limit = ResourceLimit::new(
-            ResourceType::Cpu,
-            1234,
-            80
-        );
-        
+
+        let limit = ResourceLimit::new(ResourceType::Cpu, 1234, 80);
+
         resource.add_limit(limit).unwrap();
-        
+
         let result = set_resource_limit(1234, ResourceType::Cpu, 90);
         assert!(result.is_ok());
     }

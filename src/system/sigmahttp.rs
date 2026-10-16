@@ -166,10 +166,14 @@ impl SigmaHTTP {
     /// Add an HTTP connection
     pub fn add_connection(&mut self, connection: HttpConnection) -> Result<(), String> {
         if self.connections.contains_key(&connection.connection_id) {
-            return Err(format!("Connection '{}' already exists", connection.connection_id));
+            return Err(format!(
+                "Connection '{}' already exists",
+                connection.connection_id
+            ));
         }
-        
-        self.connections.insert(connection.connection_id.clone(), connection);
+
+        self.connections
+            .insert(connection.connection_id.clone(), connection);
         self.connection_counter += 1;
         Ok(())
     }
@@ -187,7 +191,7 @@ impl SigmaHTTP {
         if !self.running {
             return Err("SigmaHTTP not running".to_string());
         }
-        
+
         match self.connections.get_mut(connection_id) {
             Some(connection) => {
                 connection.state = HttpConnectionState::Processing;
@@ -202,7 +206,7 @@ impl SigmaHTTP {
         if !self.running {
             return Err("SigmaHTTP not running".to_string());
         }
-        
+
         match self.connections.get_mut(connection_id) {
             Some(connection) => {
                 connection.state = HttpConnectionState::Responding;
@@ -217,7 +221,7 @@ impl SigmaHTTP {
         if !self.running {
             return Err("SigmaHTTP not running".to_string());
         }
-        
+
         match self.connections.get_mut(connection_id) {
             Some(connection) => {
                 connection.state = HttpConnectionState::Closed;
@@ -239,14 +243,16 @@ impl SigmaHTTP {
 
     /// List connections by state
     pub fn list_by_state(&self, state: HttpConnectionState) -> Vec<&HttpConnection> {
-        self.connections.values()
+        self.connections
+            .values()
             .filter(|c| c.state == state)
             .collect()
     }
 
     /// List connections by method
     pub fn list_by_method(&self, method: HttpMethod) -> Vec<&HttpConnection> {
-        self.connections.values()
+        self.connections
+            .values()
             .filter(|c| c.method == method)
             .collect()
     }
@@ -259,11 +265,30 @@ impl SigmaHTTP {
     /// Get HTTP server statistics
     pub fn http_stats(&self) -> BTreeMap<String, String> {
         let mut stats = BTreeMap::new();
-        stats.insert("total_connections".to_string(), self.connection_count().to_string());
-        stats.insert("processing_connections".to_string(), self.list_by_state(HttpConnectionState::Processing).len().to_string());
-        stats.insert("responding_connections".to_string(), self.list_by_state(HttpConnectionState::Responding).len().to_string());
-        stats.insert("get_requests".to_string(), self.list_by_method(HttpMethod::Get).len().to_string());
-        stats.insert("post_requests".to_string(), self.list_by_method(HttpMethod::Post).len().to_string());
+        stats.insert(
+            "total_connections".to_string(),
+            self.connection_count().to_string(),
+        );
+        stats.insert(
+            "processing_connections".to_string(),
+            self.list_by_state(HttpConnectionState::Processing)
+                .len()
+                .to_string(),
+        );
+        stats.insert(
+            "responding_connections".to_string(),
+            self.list_by_state(HttpConnectionState::Responding)
+                .len()
+                .to_string(),
+        );
+        stats.insert(
+            "get_requests".to_string(),
+            self.list_by_method(HttpMethod::Get).len().to_string(),
+        );
+        stats.insert(
+            "post_requests".to_string(),
+            self.list_by_method(HttpMethod::Post).len().to_string(),
+        );
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
@@ -317,15 +342,12 @@ mod tests {
 
     #[test]
     fn test_http_connection() {
-        let connection = HttpConnection::new(
-            "conn1".to_string(),
-            "192.168.1.100".to_string(),
-            12345
-        )
-        .with_method(HttpMethod::Post)
-        .with_path("/api/data".to_string())
-        .with_version("HTTP/1.1".to_string())
-        .with_state(HttpConnectionState::Processing);
+        let connection =
+            HttpConnection::new("conn1".to_string(), "192.168.1.100".to_string(), 12345)
+                .with_method(HttpMethod::Post)
+                .with_path("/api/data".to_string())
+                .with_version("HTTP/1.1".to_string())
+                .with_state(HttpConnectionState::Processing);
 
         assert_eq!(connection.connection_id, "conn1");
         assert_eq!(connection.method, HttpMethod::Post);
@@ -346,13 +368,10 @@ mod tests {
     #[test]
     fn test_sigmahttp_add_connection() {
         let mut http = SigmaHTTP::new();
-        
-        let connection = HttpConnection::new(
-            "conn1".to_string(),
-            "192.168.1.100".to_string(),
-            12345
-        );
-        
+
+        let connection =
+            HttpConnection::new("conn1".to_string(), "192.168.1.100".to_string(), 12345);
+
         assert!(http.add_connection(connection).is_ok());
         assert_eq!(http.connection_count(), 1);
     }
@@ -361,16 +380,13 @@ mod tests {
     fn test_sigmahttp_process_request() {
         let mut http = SigmaHTTP::new();
         http.start();
-        
-        let connection = HttpConnection::new(
-            "conn1".to_string(),
-            "192.168.1.100".to_string(),
-            12345
-        );
-        
+
+        let connection =
+            HttpConnection::new("conn1".to_string(), "192.168.1.100".to_string(), 12345);
+
         http.add_connection(connection).unwrap();
         assert!(http.process_request("conn1").is_ok());
-        
+
         let conn = http.get_connection("conn1").unwrap();
         assert_eq!(conn.state, HttpConnectionState::Processing);
     }
@@ -379,17 +395,14 @@ mod tests {
     fn test_sigmahttp_send_response() {
         let mut http = SigmaHTTP::new();
         http.start();
-        
-        let connection = HttpConnection::new(
-            "conn1".to_string(),
-            "192.168.1.100".to_string(),
-            12345
-        )
-        .with_state(HttpConnectionState::Processing);
-        
+
+        let connection =
+            HttpConnection::new("conn1".to_string(), "192.168.1.100".to_string(), 12345)
+                .with_state(HttpConnectionState::Processing);
+
         http.add_connection(connection).unwrap();
         assert!(http.send_response("conn1").is_ok());
-        
+
         let conn = http.get_connection("conn1").unwrap();
         assert_eq!(conn.state, HttpConnectionState::Responding);
     }
@@ -397,16 +410,13 @@ mod tests {
     #[test]
     fn test_sigmahttp_list_by_state() {
         let mut http = SigmaHTTP::new();
-        
-        let connection = HttpConnection::new(
-            "conn1".to_string(),
-            "192.168.1.100".to_string(),
-            12345
-        )
-        .with_state(HttpConnectionState::Processing);
-        
+
+        let connection =
+            HttpConnection::new("conn1".to_string(), "192.168.1.100".to_string(), 12345)
+                .with_state(HttpConnectionState::Processing);
+
         http.add_connection(connection).unwrap();
-        
+
         let connections = http.list_by_state(HttpConnectionState::Processing);
         assert_eq!(connections.len(), 1);
     }
@@ -414,16 +424,13 @@ mod tests {
     #[test]
     fn test_sigmahttp_list_by_method() {
         let mut http = SigmaHTTP::new();
-        
-        let connection = HttpConnection::new(
-            "conn1".to_string(),
-            "192.168.1.100".to_string(),
-            12345
-        )
-        .with_method(HttpMethod::Post);
-        
+
+        let connection =
+            HttpConnection::new("conn1".to_string(), "192.168.1.100".to_string(), 12345)
+                .with_method(HttpMethod::Post);
+
         http.add_connection(connection).unwrap();
-        
+
         let connections = http.list_by_method(HttpMethod::Post);
         assert_eq!(connections.len(), 1);
     }
@@ -431,17 +438,14 @@ mod tests {
     #[test]
     fn test_sigmahttp_stats() {
         let mut http = SigmaHTTP::new();
-        
-        let connection = HttpConnection::new(
-            "conn1".to_string(),
-            "192.168.1.100".to_string(),
-            12345
-        )
-        .with_method(HttpMethod::Get)
-        .with_state(HttpConnectionState::Processing);
-        
+
+        let connection =
+            HttpConnection::new("conn1".to_string(), "192.168.1.100".to_string(), 12345)
+                .with_method(HttpMethod::Get)
+                .with_state(HttpConnectionState::Processing);
+
         http.add_connection(connection).unwrap();
-        
+
         let stats = http.http_stats();
         assert_eq!(stats.get("total_connections"), Some(&"1".to_string()));
         assert_eq!(stats.get("processing_connections"), Some(&"1".to_string()));
@@ -451,18 +455,15 @@ mod tests {
     #[test]
     fn test_process_http_request_convenience() {
         init_sigmahttp();
-        
+
         let mut http = get_sigmahttp().unwrap();
         http.start();
-        
-        let connection = HttpConnection::new(
-            "conn1".to_string(),
-            "192.168.1.100".to_string(),
-            12345
-        );
-        
+
+        let connection =
+            HttpConnection::new("conn1".to_string(), "192.168.1.100".to_string(), 12345);
+
         http.add_connection(connection).unwrap();
-        
+
         let result = process_http_request("conn1");
         assert!(result.is_ok());
     }

@@ -321,6 +321,7 @@ pub mod elf_dynamic_linker;
 pub mod elf_execution;
 pub mod endeavour;
 pub mod federation;
+pub mod freebsd_jails_impl;
 pub mod mint_omarchy_migration_bridge;
 pub mod posix_signals;
 pub mod pthreads;
@@ -331,6 +332,4 @@ pub mod ubuntu_apt;
 pub mod universal_app_interface;
 pub mod void_linux;
 pub mod wasm_sandbox;
-pub mod freebsd_jails_impl;
 pub use mint_omarchy_migration_bridge::*;
-

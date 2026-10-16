@@ -59,75 +59,69 @@ impl LutrisManager {
             active: AtomicBool::new(false),
         }
     }
-    
+
     /// Initialize Lutris manager
     pub fn init(&mut self) {
         self.active.store(true, Ordering::Relaxed);
     }
-    
+
     /// Add game
     pub fn add_game(&mut self, game: LutrisGame) {
         self.games.insert(game.id, game);
     }
-    
+
     /// Get game
     pub fn get_game(&self, id: u32) -> Option<&LutrisGame> {
         self.games.get(&id)
     }
-    
+
     /// Launch game
     pub fn launch_game(&mut self, id: u32) -> Result<(), &'static str> {
         let game = self.games.get_mut(&id).ok_or("Game not found")?;
-        
+
         if !game.installed {
             return Err("Game not installed");
         }
-        
+
         game.running = true;
-        
+
         // In real implementation, would run:
         // lutris lutris:rungame/{id}
-        
+
         Ok(())
     }
-    
+
     /// Stop game
     pub fn stop_game(&mut self, id: u32) -> Result<(), &'static str> {
         let game = self.games.get_mut(&id).ok_or("Game not found")?;
-        
+
         game.running = false;
-        
+
         Ok(())
     }
-    
+
     /// Install game
     pub fn install_game(&mut self, id: u32) -> Result<(), &'static str> {
         let game = self.games.get_mut(&id).ok_or("Game not found")?;
-        
+
         game.installed = true;
-        
+
         Ok(())
     }
-    
+
     /// Get games by runner
     pub fn get_games_by_runner(&self, runner: LutrisRunner) -> Vec<&LutrisGame> {
-        self.games.values()
-            .filter(|g| g.runner == runner)
-            .collect()
+        self.games.values().filter(|g| g.runner == runner).collect()
     }
-    
+
     /// Get installed games
     pub fn get_installed_games(&self) -> Vec<&LutrisGame> {
-        self.games.values()
-            .filter(|g| g.installed)
-            .collect()
+        self.games.values().filter(|g| g.installed).collect()
     }
-    
+
     /// Get running games
     pub fn get_running_games(&self) -> Vec<&LutrisGame> {
-        self.games.values()
-            .filter(|g| g.running)
-            .collect()
+        self.games.values().filter(|g| g.running).collect()
     }
 }
 
@@ -149,22 +143,20 @@ pub fn init_lutris_manager() {
 
 /// Get global Lutris manager
 pub fn get_lutris_manager() -> Option<&'static mut LutrisManager> {
-    unsafe {
-        LUTRIS_MANAGER.as_mut()
-    }
+    unsafe { LUTRIS_MANAGER.as_mut() }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_lutris_manager_init() {
         let mut manager = LutrisManager::new();
         manager.init();
         assert!(manager.active.load(Ordering::Relaxed));
     }
-    
+
     #[test]
     fn test_add_game() {
         let mut manager = LutrisManager::new();
@@ -179,7 +171,7 @@ mod tests {
         manager.add_game(game);
         assert!(manager.get_game(1).is_some());
     }
-    
+
     #[test]
     fn test_launch_game() {
         let mut manager = LutrisManager::new();
@@ -195,7 +187,7 @@ mod tests {
         manager.launch_game(1).unwrap();
         assert!(manager.get_game(1).unwrap().running);
     }
-    
+
     #[test]
     fn test_get_games_by_runner() {
         let mut manager = LutrisManager::new();

@@ -297,16 +297,12 @@ pub fn init_sigmadevice() {
 
 /// Get the global SigmaDevice instance
 pub fn get_sigmadevice() -> Option<&'static SigmaDevice> {
-    unsafe {
-        SIGMADEVICE_INSTANCE.as_ref()
-    }
+    unsafe { SIGMADEVICE_INSTANCE.as_ref() }
 }
 
 /// Get mutable global SigmaDevice instance
 pub fn get_sigmadevice_mut() -> Option<&'static mut SigmaDevice> {
-    unsafe {
-        SIGMADEVICE_INSTANCE.as_mut()
-    }
+    unsafe { SIGMADEVICE_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add a device

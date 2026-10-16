@@ -241,16 +241,12 @@ pub fn init_sigmamount() {
 
 /// Get the global SigmaMount instance
 pub fn get_sigmamount() -> Option<&'static SigmaMount> {
-    unsafe {
-        SIGMAMOUNT_INSTANCE.as_ref()
-    }
+    unsafe { SIGMAMOUNT_INSTANCE.as_ref() }
 }
 
 /// Get mutable global SigmaMount instance
 pub fn get_sigmamount_mut() -> Option<&'static mut SigmaMount> {
-    unsafe {
-        SIGMAMOUNT_INSTANCE.as_mut()
-    }
+    unsafe { SIGMAMOUNT_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add a mount entry

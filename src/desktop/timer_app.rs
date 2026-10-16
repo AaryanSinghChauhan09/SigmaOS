@@ -253,9 +253,7 @@ pub fn init_timer_app() {
 
 /// Get timer app
 pub fn get_timer_app() -> &'static mut TimerApp {
-    unsafe {
-        TIMER_APP.as_mut().expect("Timer app not initialized")
-    }
+    unsafe { TIMER_APP.as_mut().expect("Timer app not initialized") }
 }
 
 #[cfg(test)]

@@ -72,7 +72,12 @@ pub struct Smb2Header {
 
 impl Smb2Header {
     /// Create an outgoing request header with default fields.
-    pub fn new_request(command: Smb2Command, message_id: u64, session_id: u64, tree_id: u32) -> Self {
+    pub fn new_request(
+        command: Smb2Command,
+        message_id: u64,
+        session_id: u64,
+        tree_id: u32,
+    ) -> Self {
         Smb2Header {
             protocol_id: SMB2_MAGIC,
             structure_size: 64,
@@ -344,7 +349,13 @@ impl CompoundRequestBuilder {
     ///
     /// The builder patches the `NextCommand` field of the previous header to
     /// point to this new command.
-    pub fn add_command(&mut self, session_id: u64, tree_id: u32, command: Smb2Command, body: &[u8]) {
+    pub fn add_command(
+        &mut self,
+        session_id: u64,
+        tree_id: u32,
+        command: Smb2Command,
+        body: &[u8],
+    ) {
         let header = Smb2Header::new_request(command, self.message_id, session_id, tree_id);
         self.message_id += 1;
 

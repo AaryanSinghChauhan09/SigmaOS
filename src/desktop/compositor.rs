@@ -7,9 +7,9 @@
 
 extern crate alloc;
 use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
 use alloc::sync::Arc;
 use alloc::vec::Vec;
-use alloc::string::{String, ToString};
 
 /// Window state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -89,34 +89,34 @@ impl Window {
             focused: false,
         }
     }
-    
+
     pub fn set_surface(&mut self, surface: Surface) {
         self.surface = Some(surface);
     }
-    
+
     pub fn show(&mut self) {
         self.visible = true;
     }
-    
+
     pub fn hide(&mut self) {
         self.visible = false;
     }
-    
+
     pub fn minimize(&mut self) {
         self.attributes.state = WindowState::Minimized;
         self.visible = false;
     }
-    
+
     pub fn maximize(&mut self) {
         self.attributes.state = WindowState::Maximized;
         self.visible = true;
     }
-    
+
     pub fn fullscreen(&mut self) {
         self.attributes.state = WindowState::Fullscreen;
         self.visible = true;
     }
-    
+
     pub fn restore(&mut self) {
         self.attributes.state = WindowState::Normal;
         self.visible = true;
@@ -162,12 +162,12 @@ impl Compositor {
             output_height,
         }
     }
-    
+
     /// Create a new surface
     pub fn create_surface(&mut self, width: u32, height: u32, format: SurfaceFormat) -> u32 {
         let id = self.next_surface_id;
         self.next_surface_id += 1;
-        
+
         let buffer_size = (width * height * 4) as usize; // 4 bytes per pixel for RGBA
         let surface = Surface {
             id,
@@ -176,73 +176,83 @@ impl Compositor {
             format,
             buffer: vec![0u8; buffer_size],
         };
-        
+
         self.surfaces.insert(id, surface);
         id
     }
-    
+
     /// Destroy a surface
     pub fn destroy_surface(&mut self, surface_id: u32) -> Result<(), &'static str> {
-        self.surfaces.remove(&surface_id)
+        self.surfaces
+            .remove(&surface_id)
             .ok_or("Surface not found")?;
         Ok(())
     }
-    
+
     /// Get a surface
     pub fn get_surface(&self, surface_id: u32) -> Option<&Surface> {
         self.surfaces.get(&surface_id)
     }
-    
+
     /// Get a mutable surface
     pub fn get_surface_mut(&mut self, surface_id: u32) -> Option<&mut Surface> {
         self.surfaces.get_mut(&surface_id)
     }
-    
+
     /// Compose surfaces to output
     pub fn compose(&self, output_buffer: &mut [u8]) -> Result<(), &'static str> {
         // Clear output buffer
         for byte in output_buffer.iter_mut() {
             *byte = 0;
         }
-        
+
         // Composite all surfaces (simplified - just overlay)
         for surface in self.surfaces.values() {
             self.composite_surface(surface, output_buffer)?;
         }
-        
+
         Ok(())
     }
-    
+
     /// Composite a single surface
-    fn composite_surface(&self, surface: &Surface, output_buffer: &mut [u8]) -> Result<(), &'static str> {
+    fn composite_surface(
+        &self,
+        surface: &Surface,
+        output_buffer: &mut [u8],
+    ) -> Result<(), &'static str> {
         let output_stride = self.output_width as usize * 4;
         let surface_stride = surface.width as usize * 4;
-        
+
         // Simple copy (no alpha blending for now)
         for y in 0..surface.height as usize {
             if y >= self.output_height as usize {
                 break;
             }
-            
+
             let output_offset = y * output_stride;
             let surface_offset = y * surface_stride;
-            
+
             for x in 0..surface.width as usize {
                 if x >= self.output_width as usize {
                     break;
                 }
-                
+
                 let pixel_offset = x * 4;
-                if output_offset + pixel_offset + 3 < output_buffer.len() 
-                    && surface_offset + pixel_offset + 3 < surface.buffer.len() {
-                    output_buffer[output_offset + pixel_offset] = surface.buffer[surface_offset + pixel_offset];
-                    output_buffer[output_offset + pixel_offset + 1] = surface.buffer[surface_offset + pixel_offset + 1];
-                    output_buffer[output_offset + pixel_offset + 2] = surface.buffer[surface_offset + pixel_offset + 2];
-                    output_buffer[output_offset + pixel_offset + 3] = surface.buffer[surface_offset + pixel_offset + 3];
+                if output_offset + pixel_offset + 3 < output_buffer.len()
+                    && surface_offset + pixel_offset + 3 < surface.buffer.len()
+                {
+                    output_buffer[output_offset + pixel_offset] =
+                        surface.buffer[surface_offset + pixel_offset];
+                    output_buffer[output_offset + pixel_offset + 1] =
+                        surface.buffer[surface_offset + pixel_offset + 1];
+                    output_buffer[output_offset + pixel_offset + 2] =
+                        surface.buffer[surface_offset + pixel_offset + 2];
+                    output_buffer[output_offset + pixel_offset + 3] =
+                        surface.buffer[surface_offset + pixel_offset + 3];
                 }
             }
         }
-        
+
         Ok(())
     }
 }
@@ -270,42 +280,41 @@ impl WindowManager {
             compositor: Compositor::new(output_width, output_height),
         }
     }
-    
+
     /// Create a new window
     pub fn create_window(&mut self, attributes: WindowAttributes) -> u32 {
         let id = self.next_window_id;
         self.next_window_id += 1;
-        
+
         let window = Window::new(id, attributes);
         self.windows.insert(id, window);
-        
+
         // Auto-focus new window
         self.focus_window(id);
-        
+
         id
     }
-    
+
     /// Destroy a window
     pub fn destroy_window(&mut self, window_id: u32) -> Result<(), &'static str> {
         if self.focused_window == Some(window_id) {
             self.focused_window = None;
         }
-        
-        self.windows.remove(&window_id)
-            .ok_or("Window not found")?;
+
+        self.windows.remove(&window_id).ok_or("Window not found")?;
         Ok(())
     }
-    
+
     /// Get a window
     pub fn get_window(&self, window_id: u32) -> Option<&Window> {
         self.windows.get(&window_id)
     }
-    
+
     /// Get a mutable window
     pub fn get_window_mut(&mut self, window_id: u32) -> Option<&mut Window> {
         self.windows.get_mut(&window_id)
     }
-    
+
     /// Focus a window
     pub fn focus_window(&mut self, window_id: u32) {
         // Unfocus previous window
@@ -314,14 +323,14 @@ impl WindowManager {
                 window.focused = false;
             }
         }
-        
+
         // Focus new window
         if let Some(window) = self.windows.get_mut(&window_id) {
             window.focused = true;
             self.focused_window = Some(window_id);
         }
     }
-    
+
     /// Handle input event
     pub fn handle_input(&mut self, event: InputEvent) -> Result<(), &'static str> {
         match event.event_type {
@@ -339,31 +348,34 @@ impl WindowManager {
             }
             _ => {}
         }
-        
+
         Ok(())
     }
-    
+
     /// Find window at position
     fn find_window_at(&self, x: i32, y: i32) -> Option<u32> {
         for (id, window) in self.windows.iter().rev() {
             if !window.visible {
                 continue;
             }
-            
+
             let attrs = &window.attributes;
-            if x >= attrs.x && x < (attrs.x + attrs.width as i32)
-                && y >= attrs.y && y < (attrs.y + attrs.height as i32) {
+            if x >= attrs.x
+                && x < (attrs.x + attrs.width as i32)
+                && y >= attrs.y
+                && y < (attrs.y + attrs.height as i32)
+            {
                 return Some(*id);
             }
         }
         None
     }
-    
+
     /// Get compositor
     pub fn get_compositor(&mut self) -> &mut Compositor {
         &mut self.compositor
     }
-    
+
     /// Render frame
     pub fn render_frame(&mut self, output_buffer: &mut [u8]) -> Result<(), &'static str> {
         // Update surfaces from windows
@@ -374,7 +386,7 @@ impl WindowManager {
                 }
             }
         }
-        
+
         // Compose
         self.compositor.compose(output_buffer)
     }
@@ -399,7 +411,7 @@ impl DesktopEnvironment {
             running: false,
         }
     }
-    
+
     /// Initialize desktop environment
     pub fn initialize(&mut self) -> Result<(), &'static str> {
         // Initialize compositor
@@ -408,7 +420,7 @@ impl DesktopEnvironment {
         self.running = true;
         Ok(())
     }
-    
+
     /// Run main loop
     pub fn run(&mut self) -> Result<(), &'static str> {
         while self.running {
@@ -418,13 +430,13 @@ impl DesktopEnvironment {
         }
         Ok(())
     }
-    
+
     /// Shutdown desktop environment
     pub fn shutdown(&mut self) -> Result<(), &'static str> {
         self.running = false;
         Ok(())
     }
-    
+
     /// Get window manager
     pub fn get_window_manager(&mut self) -> &mut WindowManager {
         &mut self.window_manager
@@ -449,22 +461,20 @@ pub fn init_desktop_environment(output_width: u32, output_height: u32) {
 
 /// Get global desktop environment
 pub fn get_desktop_environment() -> Option<&'static mut DesktopEnvironment> {
-    unsafe {
-        DESKTOP_ENV.as_mut()
-    }
+    unsafe { DESKTOP_ENV.as_mut() }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_compositor_create_surface() {
         let mut compositor = Compositor::new(1920, 1080);
         let surface_id = compositor.create_surface(800, 600, SurfaceFormat::ARGB8888);
         assert!(compositor.get_surface(surface_id).is_some());
     }
-    
+
     #[test]
     fn test_compositor_destroy_surface() {
         let mut compositor = Compositor::new(1920, 1080);
@@ -472,7 +482,7 @@ mod tests {
         compositor.destroy_surface(surface_id).unwrap();
         assert!(compositor.get_surface(surface_id).is_none());
     }
-    
+
     #[test]
     fn test_window_manager_create_window() {
         let mut wm = WindowManager::new(1920, 1080);
@@ -480,7 +490,7 @@ mod tests {
         let window_id = wm.create_window(attrs);
         assert!(wm.get_window(window_id).is_some());
     }
-    
+
     #[test]
     fn test_window_manager_focus_window() {
         let mut wm = WindowManager::new(1920, 1080);
@@ -489,7 +499,7 @@ mod tests {
         wm.focus_window(window_id);
         assert_eq!(wm.focused_window, Some(window_id));
     }
-    
+
     #[test]
     fn test_window_minimize() {
         let mut wm = WindowManager::new(1920, 1080);
@@ -501,7 +511,7 @@ mod tests {
             assert!(!window.visible);
         }
     }
-    
+
     #[test]
     fn test_window_maximize() {
         let mut wm = WindowManager::new(1920, 1080);
@@ -513,14 +523,14 @@ mod tests {
             assert!(window.visible);
         }
     }
-    
+
     #[test]
     fn test_desktop_environment_init() {
         let mut desktop = DesktopEnvironment::new(1920, 1080);
         desktop.initialize().unwrap();
         assert!(desktop.running);
     }
-    
+
     #[test]
     fn test_window_attributes_default() {
         let attrs = WindowAttributes::default();

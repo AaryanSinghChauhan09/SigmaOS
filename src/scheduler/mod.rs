@@ -22,7 +22,9 @@ pub use core::{
     ProcessState, SchedulerCore, SchedulerError, SchedulerProcessControlBlock,
     DEFAULT_STARVATION_THRESHOLD_TICKS, MAX_PROCESS_TABLE_SIZE,
 };
-pub use run_queue::{BoundedRunQueue, RunQueueError, TaskRunRef, MAX_RUNQUEUE_CAPACITY, NUM_PRIORITY_LEVELS};
+pub use run_queue::{
+    BoundedRunQueue, RunQueueError, TaskRunRef, MAX_RUNQUEUE_CAPACITY, NUM_PRIORITY_LEVELS,
+};
 
 pub use cpuidle::{CState, CpuIdleGovernor};
 pub use numa_balancer::{NumaLoadBalancer, NumaNodeStats, NumaTask};

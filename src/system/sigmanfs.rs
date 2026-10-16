@@ -271,16 +271,12 @@ pub fn init_sigmanfs() {
 
 /// Get global SigmaNFS instance
 pub fn get_sigmanfs() -> Option<&'static SigmaNFS> {
-    unsafe {
-        SIGMA_NFS_INSTANCE.as_ref()
-    }
+    unsafe { SIGMA_NFS_INSTANCE.as_ref() }
 }
 
 /// Get mutable global SigmaNFS instance
 pub fn get_sigmanfs_mut() -> Option<&'static mut SigmaNFS> {
-    unsafe {
-        SIGMA_NFS_INSTANCE.as_mut()
-    }
+    unsafe { SIGMA_NFS_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add and connect a remote NFS mount

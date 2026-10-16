@@ -125,7 +125,11 @@ impl KtlsSocketContext {
     }
 
     /// Encapsulate and encrypt plaintext payload into TLS 1.3 records.
-    pub fn encrypt_record(&mut self, plaintext: &[u8], out_record: &mut Vec<u8>) -> Result<(), KtlsError> {
+    pub fn encrypt_record(
+        &mut self,
+        plaintext: &[u8],
+        out_record: &mut Vec<u8>,
+    ) -> Result<(), KtlsError> {
         let crypto = self.tx_crypto.as_mut().ok_or(KtlsError::TxNotConfigured)?;
 
         // TLS 1.3 record: Header (5 bytes) + Encrypted(Plaintext + InnerType) + AuthTag (16 bytes)
@@ -153,7 +157,11 @@ impl KtlsSocketContext {
     }
 
     /// Decrypt an incoming TLS record.
-    pub fn decrypt_record(&mut self, record_data: &[u8], plaintext: &mut Vec<u8>) -> Result<ContentType, KtlsError> {
+    pub fn decrypt_record(
+        &mut self,
+        record_data: &[u8],
+        plaintext: &mut Vec<u8>,
+    ) -> Result<ContentType, KtlsError> {
         let crypto = self.rx_crypto.as_mut().ok_or(KtlsError::RxNotConfigured)?;
 
         if record_data.len() < 5 + 16 + 1 {
@@ -181,7 +189,11 @@ impl KtlsSocketContext {
     }
 
     /// Zero-copy sendfile directly over TLS socket.
-    pub fn sendfile_tls(&mut self, file_bytes: &[u8], out_packets: &mut Vec<Vec<u8>>) -> Result<usize, KtlsError> {
+    pub fn sendfile_tls(
+        &mut self,
+        file_bytes: &[u8],
+        out_packets: &mut Vec<Vec<u8>>,
+    ) -> Result<usize, KtlsError> {
         const MAX_TLS_FRAGMENT: usize = 16384; // 16KB per TLS record
         let mut offset = 0;
 

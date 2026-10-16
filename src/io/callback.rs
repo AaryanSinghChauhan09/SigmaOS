@@ -28,7 +28,10 @@ impl CallbackManager {
 
     /// Register a completion callback for a given request ID.
     pub fn register_callback(&mut self, req_id: u64, callback: CallbackHandle) {
-        self.callbacks.entry(req_id).or_insert_with(Vec::new).push(callback);
+        self.callbacks
+            .entry(req_id)
+            .or_insert_with(Vec::new)
+            .push(callback);
     }
 
     /// Invoke all registered callbacks for a completed request exactly once.

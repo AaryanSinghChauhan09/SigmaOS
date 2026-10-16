@@ -347,7 +347,9 @@ impl Calculator {
 
     /// Parse display to float
     fn parse_display(&self) -> Result<f64, CalculatorError> {
-        self.display.parse::<f64>().map_err(|_| CalculatorError::InvalidInput)
+        self.display
+            .parse::<f64>()
+            .map_err(|_| CalculatorError::InvalidInput)
     }
 
     /// Get display value
@@ -373,9 +375,7 @@ pub fn init_calculator() {
 
 /// Get calculator
 pub fn get_calculator() -> &'static mut Calculator {
-    unsafe {
-        CALCULATOR.as_mut().expect("Calculator not initialized")
-    }
+    unsafe { CALCULATOR.as_mut().expect("Calculator not initialized") }
 }
 
 #[cfg(test)]

@@ -105,7 +105,7 @@ impl SigmaCache {
         if !self.running {
             return Err("SigmaCache not running".to_string());
         }
-        
+
         let key = entry.key.clone();
         self.entries.insert(key.clone(), entry);
         self.entry_counter += 1;
@@ -122,7 +122,7 @@ impl SigmaCache {
         if !self.running {
             return Err("SigmaCache not running".to_string());
         }
-        
+
         if self.entries.remove(key).is_none() {
             return Err(format!("Key '{}' not found", key));
         }
@@ -134,7 +134,7 @@ impl SigmaCache {
         if !self.running {
             return Err("SigmaCache not running".to_string());
         }
-        
+
         match self.entries.get_mut(key) {
             Some(entry) => {
                 entry.state = CacheEntryState::Expired;
@@ -149,7 +149,7 @@ impl SigmaCache {
         if !self.running {
             return Err("SigmaCache not running".to_string());
         }
-        
+
         match self.entries.get_mut(key) {
             Some(entry) => {
                 entry.state = CacheEntryState::Evicted;
@@ -166,9 +166,7 @@ impl SigmaCache {
 
     /// List entries by state
     pub fn list_by_state(&self, state: CacheEntryState) -> Vec<&CacheEntry> {
-        self.entries.values()
-            .filter(|e| e.state == state)
-            .collect()
+        self.entries.values().filter(|e| e.state == state).collect()
     }
 
     /// Get entry count
@@ -181,7 +179,7 @@ impl SigmaCache {
         if !self.running {
             return Err("SigmaCache not running".to_string());
         }
-        
+
         self.entries.clear();
         Ok(())
     }
@@ -190,9 +188,24 @@ impl SigmaCache {
     pub fn cache_stats(&self) -> BTreeMap<String, String> {
         let mut stats = BTreeMap::new();
         stats.insert("total_entries".to_string(), self.entry_count().to_string());
-        stats.insert("active_entries".to_string(), self.list_by_state(CacheEntryState::Active).len().to_string());
-        stats.insert("expired_entries".to_string(), self.list_by_state(CacheEntryState::Expired).len().to_string());
-        stats.insert("evicted_entries".to_string(), self.list_by_state(CacheEntryState::Evicted).len().to_string());
+        stats.insert(
+            "active_entries".to_string(),
+            self.list_by_state(CacheEntryState::Active)
+                .len()
+                .to_string(),
+        );
+        stats.insert(
+            "expired_entries".to_string(),
+            self.list_by_state(CacheEntryState::Expired)
+                .len()
+                .to_string(),
+        );
+        stats.insert(
+            "evicted_entries".to_string(),
+            self.list_by_state(CacheEntryState::Evicted)
+                .len()
+                .to_string(),
+        );
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
@@ -240,12 +253,8 @@ mod tests {
 
     #[test]
     fn test_cache_entry() {
-        let entry = CacheEntry::new(
-            "key1".to_string(),
-            "value1".to_string(),
-            3600
-        )
-        .with_state(CacheEntryState::Expired);
+        let entry = CacheEntry::new("key1".to_string(), "value1".to_string(), 3600)
+            .with_state(CacheEntryState::Expired);
 
         assert_eq!(entry.key, "key1");
         assert_eq!(entry.value, "value1");
@@ -266,13 +275,9 @@ mod tests {
     fn test_sigmacache_set() {
         let mut cache = SigmaCache::new();
         cache.start();
-        
-        let entry = CacheEntry::new(
-            "key1".to_string(),
-            "value1".to_string(),
-            3600
-        );
-        
+
+        let entry = CacheEntry::new("key1".to_string(), "value1".to_string(), 3600);
+
         assert!(cache.set(entry).is_ok());
         assert_eq!(cache.entry_count(), 1);
     }
@@ -281,16 +286,12 @@ mod tests {
     fn test_sigmacache_get() {
         let mut cache = SigmaCache::new();
         cache.start();
-        
-        let entry = CacheEntry::new(
-            "key1".to_string(),
-            "value1".to_string(),
-            3600
-        );
-        
+
+        let entry = CacheEntry::new("key1".to_string(), "value1".to_string(), 3600);
+
         cache.set(entry).unwrap();
         let result = cache.get("key1");
-        
+
         assert!(result.is_some());
         assert_eq!(result.unwrap().value, "value1");
     }
@@ -299,13 +300,9 @@ mod tests {
     fn test_sigmacache_delete() {
         let mut cache = SigmaCache::new();
         cache.start();
-        
-        let entry = CacheEntry::new(
-            "key1".to_string(),
-            "value1".to_string(),
-            3600
-        );
-        
+
+        let entry = CacheEntry::new("key1".to_string(), "value1".to_string(), 3600);
+
         cache.set(entry).unwrap();
         assert!(cache.delete("key1").is_ok());
         assert_eq!(cache.entry_count(), 0);
@@ -315,16 +312,12 @@ mod tests {
     fn test_sigmacache_expire() {
         let mut cache = SigmaCache::new();
         cache.start();
-        
-        let entry = CacheEntry::new(
-            "key1".to_string(),
-            "value1".to_string(),
-            3600
-        );
-        
+
+        let entry = CacheEntry::new("key1".to_string(), "value1".to_string(), 3600);
+
         cache.set(entry).unwrap();
         assert!(cache.expire("key1").is_ok());
-        
+
         let entry = cache.get("key1").unwrap();
         assert_eq!(entry.state, CacheEntryState::Expired);
     }
@@ -333,16 +326,12 @@ mod tests {
     fn test_sigmacache_evict() {
         let mut cache = SigmaCache::new();
         cache.start();
-        
-        let entry = CacheEntry::new(
-            "key1".to_string(),
-            "value1".to_string(),
-            3600
-        );
-        
+
+        let entry = CacheEntry::new("key1".to_string(), "value1".to_string(), 3600);
+
         cache.set(entry).unwrap();
         assert!(cache.evict("key1").is_ok());
-        
+
         let entry = cache.get("key1").unwrap();
         assert_eq!(entry.state, CacheEntryState::Evicted);
     }
@@ -351,16 +340,12 @@ mod tests {
     fn test_sigmacache_list_by_state() {
         let mut cache = SigmaCache::new();
         cache.start();
-        
-        let entry = CacheEntry::new(
-            "key1".to_string(),
-            "value1".to_string(),
-            3600
-        )
-        .with_state(CacheEntryState::Expired);
-        
+
+        let entry = CacheEntry::new("key1".to_string(), "value1".to_string(), 3600)
+            .with_state(CacheEntryState::Expired);
+
         cache.set(entry).unwrap();
-        
+
         let entries = cache.list_by_state(CacheEntryState::Expired);
         assert_eq!(entries.len(), 1);
     }
@@ -369,13 +354,9 @@ mod tests {
     fn test_sigmacache_clear() {
         let mut cache = SigmaCache::new();
         cache.start();
-        
-        let entry = CacheEntry::new(
-            "key1".to_string(),
-            "value1".to_string(),
-            3600
-        );
-        
+
+        let entry = CacheEntry::new("key1".to_string(), "value1".to_string(), 3600);
+
         cache.set(entry).unwrap();
         assert!(cache.clear().is_ok());
         assert_eq!(cache.entry_count(), 0);
@@ -385,15 +366,11 @@ mod tests {
     fn test_sigmacache_stats() {
         let mut cache = SigmaCache::new();
         cache.start();
-        
-        let entry = CacheEntry::new(
-            "key1".to_string(),
-            "value1".to_string(),
-            3600
-        );
-        
+
+        let entry = CacheEntry::new("key1".to_string(), "value1".to_string(), 3600);
+
         cache.set(entry).unwrap();
-        
+
         let stats = cache.cache_stats();
         assert_eq!(stats.get("total_entries"), Some(&"1".to_string()));
         assert_eq!(stats.get("active_entries"), Some(&"1".to_string()));
@@ -402,16 +379,12 @@ mod tests {
     #[test]
     fn test_set_cache_entry_convenience() {
         init_sigmacache();
-        
+
         let mut cache = get_sigmacache().unwrap();
         cache.start();
-        
-        let entry = CacheEntry::new(
-            "key1".to_string(),
-            "value1".to_string(),
-            3600
-        );
-        
+
+        let entry = CacheEntry::new("key1".to_string(), "value1".to_string(), 3600);
+
         let result = set_cache_entry(entry);
         assert!(result.is_ok());
     }

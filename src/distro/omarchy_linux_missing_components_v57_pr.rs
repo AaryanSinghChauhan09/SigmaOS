@@ -366,10 +366,7 @@ pub struct OmarchyFlatpakPwaSandboxPrEngineV57 {
 impl OmarchyFlatpakPwaSandboxPrEngineV57 {
     pub fn new() -> Self {
         let mut apps = BTreeMap::new();
-        apps.insert(
-            "org.gimp.GIMP".to_string(),
-            "wayland, x11, ipc".to_string(),
-        );
+        apps.insert("org.gimp.GIMP".to_string(), "wayland, x11, ipc".to_string());
         apps.insert("com.spotify.Client".to_string(), "pulseaudio".to_string());
         Self {
             sandboxed_apps: apps,
