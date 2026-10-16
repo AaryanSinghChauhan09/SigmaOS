@@ -163,8 +163,6 @@ pub use distro::sovereign_freebsd_ultimate_parity_pr_suite::*;
 pub use distro::sovereign_linux_bsd_all_subsystems_harmony::*;
 pub use distro::sovereign_linux_bsd_ecosystem_gap_closure_v50_pr::*;
 pub use distro::sovereign_linux_bsd_ecosystem_gap_closure_v51_pr::*;
-pub use distro::sovereign_linux_bsd_ecosystem_gap_closure_v58_pr::*;
-pub use distro::open_source_os_missing_components_v54_pr::*;
 pub use distro::sovereign_linux_bsd_ecosystem_parity_v42_pr::*;
 pub use distro::sovereign_linux_bsd_master_synthesis::*;
 pub use distro::sovereign_linux_bsd_pinnacle_innovations_v14::*;
@@ -380,6 +378,7 @@ pub use sigpkg::{
     Transaction, Version, MAX_RECIPE_DEPENDENCIES,
 };
 pub use userland::coreutils_pr_gateway::*;
+pub use userland::init::*;
 pub use userland::init::*;
 pub use userland::init::*;
 pub use userland::init::*;
