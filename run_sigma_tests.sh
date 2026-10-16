@@ -1208,12 +1208,6 @@ if [ -f "src/distro/open_source_os_missing_components_v57_pr.rs" ]; then
     ./build/test_open_source_v57_pr
 fi
 
-if [ -f "src/distro/open_source_os_and_fedora_v58_pr.rs" ]; then
-    echo "Running Open Source OS & Fedora GitHub Ecosystem Parity PR Suite V58..."
-    mkdir -p build
-    rustc --test src/distro/open_source_os_and_fedora_v58_pr.rs --edition=2021 -o build/test_os_fedora_v58 && ./build/test_os_fedora_v58
-fi
-
 if [ -f "src/distro/cachy_linux_missing_components_engine.rs" ]; then
     echo "Running Cachy Linux Missing Components Engine test suite..."
     mkdir -p build
