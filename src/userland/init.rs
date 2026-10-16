@@ -2197,3 +2197,5 @@ mod tests {
         assert!(diff.contains("PR #4001"));
     }
 }
+}
+}
