@@ -1,14 +1,10 @@
 ## Summary
 
-<!-- What component does this PR improve, add, or regulate? -->
+<!-- What component does this PR improve or add? -->
 
 ## Related issue
 
 Closes #<issue-id>
-
-## Component
-
-<!-- kernel, memory, VFS, IPC, security, drivers, packaging, desktop, etc. -->
 
 ## Upstream study
 
@@ -17,21 +13,20 @@ Closes #<issue-id>
 - Research note:
 - ADR:
 
-## Component rules added or enforced
-
-- [ ] New rule
-- [ ] Existing rule enforced
-- [ ] Rule test added
-- [ ] CI gate added
-- [ ] Documentation updated
-
 ## What SigmaOS adopts
 
-<!-- State the upstream principle or mechanism adopted. -->
+<!-- State the design principle or mechanism adopted. -->
 
 ## What SigmaOS changes or rejects
 
 <!-- State simplifications, deviations, and rejected ideas. -->
+
+## Component impact
+
+- Component:
+- Maturity before:
+- Maturity after:
+- Runtime path affected:
 
 ## Changes
 
@@ -70,17 +65,16 @@ Paste relevant output below.
 - Evidence:
 
 - [ ] No broad credentials or host access introduced
-- [ ] Untrusted input validated
-- [ ] Package scripts sandboxed, if applicable
+- [ ] Untrusted input is validated
+- [ ] Package scripts are sandboxed, if applicable
 - [ ] Rollback/recovery behavior defined
 - [ ] Security review completed, if applicable
 
 ## Reviewer checklist
 
 - [ ] Scope is narrow
-- [ ] Component rules are enforceable
-- [ ] Tests cover the rules
+- [ ] Tests cover the change
 - [ ] Runtime evidence is linked
 - [ ] Documentation matches implementation
 - [ ] Capability status is evidence-based
-- [ ] No unsupported Linux/BSD parity claims
+- [ ] No unsupported parity claims
