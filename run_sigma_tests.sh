@@ -1671,6 +1671,15 @@ if [ -f "src/community/sovereign_documentation_consolidation_pr_engine.rs" ]; th
     ./build/test_sovereign_documentation_consolidation_pr_engine
 fi
 
+if [ -f "tests/memory/physical.rs" ]; then
+    echo "Running Main Memory Subsystem test suites..."
+    mkdir -p build
+    [ -f "tests/memory/physical.rs" ] && rustc --test tests/memory/physical.rs --edition=2021 -o build/test_mem_physical && ./build/test_mem_physical
+    [ -f "tests/mm/paging.rs" ] && rustc --test tests/mm/paging.rs --edition=2021 -o build/test_mm_paging && ./build/test_mm_paging
+    [ -f "tests/mm/virtual.rs" ] && rustc --test tests/mm/virtual.rs --edition=2021 -o build/test_mm_virtual && ./build/test_mm_virtual
+    [ -f "tests/swap/core.rs" ] && rustc --test tests/swap/core.rs --edition=2021 -o build/test_swap_core && ./build/test_swap_core
+fi
+
 if [ -f "tests/fs/fd_table.rs" ]; then
     echo "Running File Management & VFS test suites..."
     mkdir -p build
