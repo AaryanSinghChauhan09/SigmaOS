@@ -386,8 +386,12 @@ impl CadCraftEngine {
     }
 
     pub fn export_cad(&self, format: ExportFormat) -> Vec<u8> {
-        format!("CAD Export ({:?}) - Entities: {}", format, self.sketch_entities.len())
-            .into_bytes()
+        format!(
+            "CAD Export ({:?}) - Entities: {}",
+            format,
+            self.sketch_entities.len()
+        )
+        .into_bytes()
     }
 }
 

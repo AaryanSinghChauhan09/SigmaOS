@@ -282,7 +282,7 @@ impl SigmaLVM {
             vg.size += pv.size;
             vg.free += pv.free;
             vg.pv_count += 1;
-            pv.vg_name = vg_name.clone();
+            pv.vg_name = vg_name.to_string();
             pv.set_state(PVState::InUse);
             true
         } else {

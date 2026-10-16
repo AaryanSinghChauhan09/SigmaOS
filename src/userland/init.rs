@@ -357,7 +357,9 @@ impl SystemdTransientScopeGovernor {
     }
 
     pub fn get_scope_limit(&self, scope_name: &str) -> Option<&SystemdCgroupsv2Slice> {
-        self.transient_scopes.get(scope_name).or_else(|| self.active_scopes.get(scope_name))
+        self.transient_scopes
+            .get(scope_name)
+            .or_else(|| self.active_scopes.get(scope_name))
     }
 }
 
@@ -398,7 +400,11 @@ impl SystemdOnCalendarParser {
 
     pub fn parse_expression(expr: &str) -> Option<(u32, u32)> {
         let trimmed = expr.trim();
-        if trimmed == "daily" || trimmed == "*-*-* 00:00:00" || trimmed == "weekly" || trimmed == "hourly" {
+        if trimmed == "daily"
+            || trimmed == "*-*-* 00:00:00"
+            || trimmed == "weekly"
+            || trimmed == "hourly"
+        {
             Some((0, 0))
         } else {
             None
@@ -484,17 +490,29 @@ impl OpenRcHeader {
         for line in script_content.lines() {
             let trimmed = line.trim();
             if let Some(rest) = trimmed.strip_prefix("provide") {
-                header.provide.extend(rest.split_whitespace().map(|s| s.to_string()));
+                header
+                    .provide
+                    .extend(rest.split_whitespace().map(|s| s.to_string()));
             } else if let Some(rest) = trimmed.strip_prefix("need") {
-                header.need.extend(rest.split_whitespace().map(|s| s.to_string()));
+                header
+                    .need
+                    .extend(rest.split_whitespace().map(|s| s.to_string()));
             } else if let Some(rest) = trimmed.strip_prefix("use") {
-                header.use_deps.extend(rest.split_whitespace().map(|s| s.to_string()));
+                header
+                    .use_deps
+                    .extend(rest.split_whitespace().map(|s| s.to_string()));
             } else if let Some(rest) = trimmed.strip_prefix("before") {
-                header.before.extend(rest.split_whitespace().map(|s| s.to_string()));
+                header
+                    .before
+                    .extend(rest.split_whitespace().map(|s| s.to_string()));
             } else if let Some(rest) = trimmed.strip_prefix("after") {
-                header.after.extend(rest.split_whitespace().map(|s| s.to_string()));
+                header
+                    .after
+                    .extend(rest.split_whitespace().map(|s| s.to_string()));
             } else if let Some(rest) = trimmed.strip_prefix("keyword") {
-                header.keywords.extend(rest.split_whitespace().map(|s| s.to_string()));
+                header
+                    .keywords
+                    .extend(rest.split_whitespace().map(|s| s.to_string()));
             }
         }
         header
@@ -584,12 +602,14 @@ impl OpenRcStatusControllerEngine {
 
     pub fn mark_started(&mut self, service_name: &str) {
         self.active_services.insert(service_name.to_string());
-        self.service_statuses.insert(service_name.to_string(), ServiceState::Running);
+        self.service_statuses
+            .insert(service_name.to_string(), ServiceState::Running);
     }
 
     pub fn mark_stopped(&mut self, service_name: &str) {
         self.active_services.remove(service_name);
-        self.service_statuses.insert(service_name.to_string(), ServiceState::Stopped);
+        self.service_statuses
+            .insert(service_name.to_string(), ServiceState::Stopped);
     }
 
     pub fn update_status(&mut self, service: String, state: ServiceState) {
@@ -717,7 +737,11 @@ impl RunitS6SupervisionTreeGovernor {
         self.services.insert(name, srv);
     }
 
-    pub fn scan_service_directory(&mut self, service_dir_path: &str, known_services: &[(&str, &str)]) {
+    pub fn scan_service_directory(
+        &mut self,
+        service_dir_path: &str,
+        known_services: &[(&str, &str)],
+    ) {
         self.service_dir_path = service_dir_path.to_string();
         for (name, script) in known_services {
             self.active_services.insert(
@@ -748,13 +772,21 @@ impl RunitS6SupervisionTreeGovernor {
         }
         if let Some(srv) = self.services.get_mut(service_name) {
             srv.pid = self.active_services.get(service_name).and_then(|s| s.pid);
-            srv.state = self.active_services.get(service_name).map(|s| s.state).unwrap_or(ServiceState::Stopped);
+            srv.state = self
+                .active_services
+                .get(service_name)
+                .map(|s| s.state)
+                .unwrap_or(ServiceState::Stopped);
         }
     }
 
     pub fn parse_s6_readiness_notification(&mut self, service_name: &str, line: &str) -> bool {
         let trimmed = line.trim();
-        if trimmed == "READY" || trimmed == "READY=1" || trimmed.contains("s6-notifyready") || trimmed.starts_with("ready") {
+        if trimmed == "READY"
+            || trimmed == "READY=1"
+            || trimmed.contains("s6-notifyready")
+            || trimmed.starts_with("ready")
+        {
             if let Some(srv) = self.services.get_mut(service_name) {
                 srv.state = ServiceState::Running;
                 return true;
@@ -842,14 +874,21 @@ impl SysVinitRunlevelStateMachine {
         self.current_runlevel = new_runlevel;
         self.inittab_entries
             .iter()
-            .filter(|e| e.runlevels.contains(&new_runlevel) || e.runlevels.contains(&'a') || e.runlevels.contains(&'b') || e.runlevels.contains(&'c'))
+            .filter(|e| {
+                e.runlevels.contains(&new_runlevel)
+                    || e.runlevels.contains(&'a')
+                    || e.runlevels.contains(&'b')
+                    || e.runlevels.contains(&'c')
+            })
             .collect()
     }
 
     pub fn spawn_respawn_processes(&mut self) -> Vec<String> {
         let mut spawned = Vec::new();
         for entry in &self.inittab_entries {
-            if entry.action == SysVAction::Respawn && entry.runlevels.contains(&self.current_runlevel) {
+            if entry.action == SysVAction::Respawn
+                && entry.runlevels.contains(&self.current_runlevel)
+            {
                 if !self.active_processes.contains_key(&entry.id) {
                     let mock_pid = 4000 + entry.id.len() as u32;
                     self.active_processes.insert(entry.id.clone(), mock_pid);
@@ -1044,9 +1083,11 @@ impl LaunchdJobSupervisorEngine {
             if job.keep_alive {
                 let mock_pid = 5000 + label.len() as u32;
                 self.running_pids.insert(label.to_string(), mock_pid);
-                self.job_states.insert(label.to_string(), ServiceState::Running);
+                self.job_states
+                    .insert(label.to_string(), ServiceState::Running);
             } else {
-                self.job_states.insert(label.to_string(), ServiceState::Stopped);
+                self.job_states
+                    .insert(label.to_string(), ServiceState::Stopped);
             }
         }
     }
@@ -1871,7 +1912,11 @@ mod tests {
 
     #[test]
     fn test_userland_clean_room_pr_gateway() {
-        let gw = UserlandInitCleanRoomPrGatewayEngine::new(4001, "feat(init): Complete Init Parity", "SovereignAgent");
+        let gw = UserlandInitCleanRoomPrGatewayEngine::new(
+            4001,
+            "feat(init): Complete Init Parity",
+            "SovereignAgent",
+        );
         assert!(gw.run_automated_ci_gate());
         let diff = gw.generate_unified_diff();
         assert!(diff.contains("PR #4001"));

@@ -331,7 +331,13 @@ impl GnuCoreutilsBsdUserlandEngine {
             .collect()
     }
 
-    pub fn run_sort(&self, items: &[&str], numeric: bool, reverse: bool, unique: bool) -> Vec<String> {
+    pub fn run_sort(
+        &self,
+        items: &[&str],
+        numeric: bool,
+        reverse: bool,
+        unique: bool,
+    ) -> Vec<String> {
         let mut list: Vec<String> = items.iter().map(|s| s.to_string()).collect();
         if numeric {
             list.sort_by(|a, b| {
@@ -1580,9 +1586,7 @@ impl AuthPrivilegeSessionEngine {
                 env_map.insert(key.to_string(), val.to_string());
                 true
             }
-            "unset" => {
-                env_map.remove(key).is_some()
-            }
+            "unset" => env_map.remove(key).is_some(),
             _ => false,
         }
     }
