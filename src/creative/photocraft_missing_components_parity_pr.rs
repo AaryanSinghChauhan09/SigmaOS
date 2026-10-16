@@ -199,12 +199,6 @@ pub struct PhotocraftAiInpaintingPrEngineProposal {
     pub manifest: PhotocraftPrProposalManifest,
 }
 
-impl Default for PhotocraftAiInpaintingPrEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 // ============================================================================
 // 3. Multi-Channel Color Grading & Frequency Separation PR Engine
 // ============================================================================
