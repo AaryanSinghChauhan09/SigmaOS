@@ -91,7 +91,9 @@ impl ArchPacmanKeyringWotPrEngine {
     pub fn generate_pr(&self) -> ArchLinuxV55PrSpec {
         ArchLinuxV55PrSpec {
             pr_id: 5501,
-            title: String::from("[Arch Gap Closure] pacman-key WOT PGP Keyring Manager & Web of Trust Verifier"),
+            title: String::from(
+                "[Arch Gap Closure] pacman-key WOT PGP Keyring Manager & Web of Trust Verifier",
+            ),
             branch: String::from("pr/arch-pacman-keyring-wot"),
             target_component: String::from("src/security/arch_pacman_keyring.rs"),
             gap_closure_score: 100,
@@ -221,7 +223,9 @@ impl ArchinstallAutomatedProfilePrEngine {
     pub fn generate_pr(&self) -> ArchLinuxV55PrSpec {
         ArchLinuxV55PrSpec {
             pr_id: 5503,
-            title: String::from("[Arch Gap Closure] archinstall Automated Installation Profile & Partition Builder"),
+            title: String::from(
+                "[Arch Gap Closure] archinstall Automated Installation Profile & Partition Builder",
+            ),
             branch: String::from("pr/archinstall-automated-profile"),
             target_component: String::from("src/installer/archinstall_profile.rs"),
             gap_closure_score: 100,
@@ -293,7 +297,9 @@ impl ArchAuditSecurityScannerPrEngine {
     pub fn generate_pr(&self) -> ArchLinuxV55PrSpec {
         ArchLinuxV55PrSpec {
             pr_id: 5504,
-            title: String::from("[Arch Gap Closure] arch-audit Security Advisory ASA Vulnerability Scanner"),
+            title: String::from(
+                "[Arch Gap Closure] arch-audit Security Advisory ASA Vulnerability Scanner",
+            ),
             branch: String::from("pr/arch-audit-security-scanner"),
             target_component: String::from("src/security/arch_audit_scanner.rs"),
             gap_closure_score: 100,
@@ -348,8 +354,7 @@ impl ArchDevtoolsChrootBuilderPrEngine {
             status: ArchPrStatus::Merged,
             summary: format!(
                 "devtools chroot builder initialized for environment '{}' at '{}'",
-                self.build_env,
-                self.chroot_dir
+                self.build_env, self.chroot_dir
             ),
         }
     }
@@ -390,15 +395,16 @@ impl ArchPaccacheScrubberPrEngine {
     pub fn generate_pr(&self) -> ArchLinuxV55PrSpec {
         ArchLinuxV55PrSpec {
             pr_id: 5506,
-            title: String::from("[Arch Gap Closure] paccache Package Cache Scrubber & Cleaner Engine"),
+            title: String::from(
+                "[Arch Gap Closure] paccache Package Cache Scrubber & Cleaner Engine",
+            ),
             branch: String::from("pr/arch-paccache-scrubber"),
             target_component: String::from("src/package/arch_paccache_scrubber.rs"),
             gap_closure_score: 100,
             status: ArchPrStatus::Merged,
             summary: format!(
                 "paccache scrubber configured keeping {} latest package versions at '{}'",
-                self.keep_versions,
-                self.cache_path
+                self.keep_versions, self.cache_path
             ),
         }
     }
@@ -452,7 +458,9 @@ impl ArchDowngradeAlaFetcherPrEngine {
     pub fn generate_pr(&self) -> ArchLinuxV55PrSpec {
         ArchLinuxV55PrSpec {
             pr_id: 5507,
-            title: String::from("[Arch Gap Closure] downgrade Arch Linux Archive ALA Snapshot Fetcher"),
+            title: String::from(
+                "[Arch Gap Closure] downgrade Arch Linux Archive ALA Snapshot Fetcher",
+            ),
             branch: String::from("pr/arch-downgrade-ala-fetcher"),
             target_component: String::from("src/package/arch_downgrade_ala.rs"),
             gap_closure_score: 100,
@@ -507,7 +515,9 @@ impl ArchModprobedDbProfilerPrEngine {
     pub fn generate_pr(&self) -> ArchLinuxV55PrSpec {
         ArchLinuxV55PrSpec {
             pr_id: 5508,
-            title: String::from("[Arch Gap Closure] modprobed-db Active Kernel Module Usage Profiler"),
+            title: String::from(
+                "[Arch Gap Closure] modprobed-db Active Kernel Module Usage Profiler",
+            ),
             branch: String::from("pr/arch-modprobed-db-profiler"),
             target_component: String::from("src/system/arch_modprobed_db.rs"),
             gap_closure_score: 100,
@@ -581,7 +591,9 @@ impl ArchGenfstabUuidMountPrEngine {
     pub fn generate_pr(&self) -> ArchLinuxV55PrSpec {
         ArchLinuxV55PrSpec {
             pr_id: 5509,
-            title: String::from("[Arch Gap Closure] genfstab fstab Entry Generator & UUID Resolver"),
+            title: String::from(
+                "[Arch Gap Closure] genfstab fstab Entry Generator & UUID Resolver",
+            ),
             branch: String::from("pr/arch-genfstab-generator"),
             target_component: String::from("src/system/arch_genfstab.rs"),
             gap_closure_score: 100,
@@ -626,17 +638,17 @@ impl ArchSystemdBootEntriesPrEngine {
     pub fn new() -> Self {
         Self {
             loader_config_path: String::from("/boot/loader/loader.conf"),
-            entries: vec![
-                SystemdBootEntrySpec {
-                    title: String::from("Arch Linux"),
-                    linux: String::from("/vmlinuz-linux"),
-                    initrd: vec![
-                        String::from("/intel-ucode.img"),
-                        String::from("/initramfs-linux.img"),
-                    ],
-                    options: String::from("root=UUID=e5f6g7h8-1234-5678-90ab-cdef12345678 rw quiet splash"),
-                },
-            ],
+            entries: vec![SystemdBootEntrySpec {
+                title: String::from("Arch Linux"),
+                linux: String::from("/vmlinuz-linux"),
+                initrd: vec![
+                    String::from("/intel-ucode.img"),
+                    String::from("/initramfs-linux.img"),
+                ],
+                options: String::from(
+                    "root=UUID=e5f6g7h8-1234-5678-90ab-cdef12345678 rw quiet splash",
+                ),
+            }],
         }
     }
 
