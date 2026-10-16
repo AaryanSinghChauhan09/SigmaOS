@@ -402,8 +402,8 @@ impl SigmaLog {
     /// Create a new SigmaLog instance
     pub fn new(config: SigmaLogConfig) -> Self {
         Self {
-            config,
             logs: Vec::with_capacity(config.max_memory_entries),
+            config,
             log_counter: 0,
             running: false,
         }

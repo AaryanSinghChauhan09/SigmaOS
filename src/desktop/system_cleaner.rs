@@ -247,11 +247,9 @@ impl SystemCleaner {
         let mut result = self.preview_clean();
 
         // Simulate cleaning
-        for id in self.options.keys() {
-            if let Some(option) = self.options.get_mut(id) {
-                if option.enabled {
-                    option.space_freed = 1024 * 1024; // 1MB
-                }
+        for option in self.options.values_mut() {
+            if option.enabled {
+                option.space_freed = 1024 * 1024; // 1MB
             }
         }
 

@@ -223,10 +223,11 @@ impl E1000eDriver {
         // Allocate DMA buffers for RX
         for _ in 0..NUM_RX_DESCRIPTORS {
             let dma_buf = self.allocate_dma_buffer(RX_BUFFER_SIZE)?;
+            let phys_addr = dma_buf.phys_addr;
             self.rx_buffers.push(dma_buf);
 
             let desc = RxDescriptor {
-                buffer_addr: dma_buf.phys_addr,
+                buffer_addr: phys_addr,
                 length: 0,
                 checksum: 0,
                 status: 0,
@@ -238,18 +239,17 @@ impl E1000eDriver {
 
         // Program RX descriptor ring to hardware
         let rx_ring_phys = self.rx_ring.as_ptr() as u64;
-        self.write_reg(REG_RDBAL, (rx_ring_phys & 0xFFFFFFFF) as u32);
-        self.write_reg(REG_RDBAH, (rx_ring_phys >> 32) as u32);
-        self.write_reg(
-            REG_RDLEN,
-            (NUM_RX_DESCRIPTORS * core::mem::size_of::<RxDescriptor>()) as u32,
-        );
-        self.write_reg(REG_RDH, 0);
-        self.write_reg(REG_RDT, (NUM_RX_DESCRIPTORS - 1) as u32);
+        unsafe {
+            self.write_reg(REG_RDBAL, (rx_ring_phys & 0xFFFFFFFF) as u32);
+            self.write_reg(REG_RDBAH, (rx_ring_phys >> 32) as u32);
+            self.write_reg(REG_RDLEN, (NUM_RX_DESCRIPTORS * core::mem::size_of::<RxDescriptor>()) as u32);
+            self.write_reg(REG_RDH, 0);
+            self.write_reg(REG_RDT, (NUM_RX_DESCRIPTORS - 1) as u32);
 
-        // Enable RX descriptor ring
-        self.write_reg(REG_RXDCTL, 0x01); // Enable
-
+            // Enable RX descriptor ring
+            self.write_reg(REG_RXDCTL, 0x01); // Enable
+        }
+        
         Ok(())
     }
 
@@ -258,10 +258,11 @@ impl E1000eDriver {
         // Allocate DMA buffers for TX
         for _ in 0..NUM_TX_DESCRIPTORS {
             let dma_buf = self.allocate_dma_buffer(TX_BUFFER_SIZE)?;
+            let phys_addr = dma_buf.phys_addr;
             self.tx_buffers.push(dma_buf);
 
             let desc = TxDescriptor {
-                buffer_addr: dma_buf.phys_addr,
+                buffer_addr: phys_addr,
                 length: 0,
                 cso: 0,
                 cmd: 0,
@@ -274,18 +275,17 @@ impl E1000eDriver {
 
         // Program TX descriptor ring to hardware
         let tx_ring_phys = self.tx_ring.as_ptr() as u64;
-        self.write_reg(REG_TDBAL, (tx_ring_phys & 0xFFFFFFFF) as u32);
-        self.write_reg(REG_TDBAH, (tx_ring_phys >> 32) as u32);
-        self.write_reg(
-            REG_TDLEN,
-            (NUM_TX_DESCRIPTORS * core::mem::size_of::<TxDescriptor>()) as u32,
-        );
-        self.write_reg(REG_TDH, 0);
-        self.write_reg(REG_TDT, 0);
+        unsafe {
+            self.write_reg(REG_TDBAL, (tx_ring_phys & 0xFFFFFFFF) as u32);
+            self.write_reg(REG_TDBAH, (tx_ring_phys >> 32) as u32);
+            self.write_reg(REG_TDLEN, (NUM_TX_DESCRIPTORS * core::mem::size_of::<TxDescriptor>()) as u32);
+            self.write_reg(REG_TDH, 0);
+            self.write_reg(REG_TDT, 0);
 
-        // Enable TX descriptor ring
-        self.write_reg(REG_TXDCTL, 0x01); // Enable
-
+            // Enable TX descriptor ring
+            self.write_reg(REG_TXDCTL, 0x01); // Enable
+        }
+        
         Ok(())
     }
 
@@ -311,7 +311,9 @@ impl E1000eDriver {
     fn setup_multicast(&mut self) {
         // Clear multicast table
         for i in 0..128 {
-            self.write_reg(REG_MTA + (i as u32 * 4), 0);
+            unsafe {
+                self.write_reg(REG_MTA + (i as u32 * 4), 0);
+            }
         }
     }
 
