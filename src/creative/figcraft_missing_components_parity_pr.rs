@@ -97,7 +97,13 @@ impl FigcraftAdvancedAutoLayoutFlexGridPrEngine {
                 GridTrackSize::Fractional(2.0),
                 GridTrackSize::Fixed(200.0),
             ],
-            grid_rows: vec![GridTrackSize::Auto, GridTrackSize::MinMax { min: 100.0, max: 300.0 }],
+            grid_rows: vec![
+                GridTrackSize::Auto,
+                GridTrackSize::MinMax {
+                    min: 100.0,
+                    max: 300.0,
+                },
+            ],
             item_spacing_gap: 16.0,
             wrap_mode: FlexWrapMode::Wrap,
             negative_margins_allowed: true,
@@ -143,7 +149,11 @@ impl FigcraftAdvancedAutoLayoutFlexGridPrEngine {
     }
 
     /// Evaluate 2D grid positioning for child bounding boxes
-    pub fn evaluate_grid_matrix(&self, parent_box: &LayoutBoundingBox, item_count: usize) -> Vec<LayoutBoundingBox> {
+    pub fn evaluate_grid_matrix(
+        &self,
+        parent_box: &LayoutBoundingBox,
+        item_count: usize,
+    ) -> Vec<LayoutBoundingBox> {
         let col_widths = self.calculate_fractional_widths(parent_box.width);
         let num_cols = col_widths.len().max(1);
         let mut boxes = Vec::with_capacity(item_count);
@@ -268,7 +278,11 @@ impl FigcraftInteractivePrototypingSmartAnimatePrEngine {
     }
 
     /// Match layer topology between two artboard frames for Smart Animate path morphing
-    pub fn match_smart_animate_layers(&mut self, source_layers: &[(u32, &str)], target_layers: &[(u32, &str)]) -> usize {
+    pub fn match_smart_animate_layers(
+        &mut self,
+        source_layers: &[(u32, &str)],
+        target_layers: &[(u32, &str)],
+    ) -> usize {
         self.matched_layers.clear();
 
         for &(src_id, src_name) in source_layers {
@@ -345,8 +359,14 @@ impl FigcraftDesignSystemTokensVariablesPrEngine {
         let mut vars = BTreeMap::new();
 
         let mut bg_modes = BTreeMap::new();
-        bg_modes.insert("Light".to_string(), VariableValue::ColorHex("#FFFFFF".to_string()));
-        bg_modes.insert("Dark".to_string(), VariableValue::ColorHex("#121212".to_string()));
+        bg_modes.insert(
+            "Light".to_string(),
+            VariableValue::ColorHex("#FFFFFF".to_string()),
+        );
+        bg_modes.insert(
+            "Dark".to_string(),
+            VariableValue::ColorHex("#121212".to_string()),
+        );
         vars.insert(
             1,
             DesignVariable {
@@ -383,7 +403,10 @@ impl FigcraftDesignSystemTokensVariablesPrEngine {
     /// Resolve variable token value under active mode with alias graph traversal
     pub fn resolve_variable_value(&self, var_id: u32, mode: &str) -> Option<VariableValue> {
         let var = self.variables.get(&var_id)?;
-        let val = var.values_by_mode.get(mode).or_else(|| var.values_by_mode.values().next())?;
+        let val = var
+            .values_by_mode
+            .get(mode)
+            .or_else(|| var.values_by_mode.values().next())?;
 
         match val {
             VariableValue::AliasRef(ref_id) => self.resolve_variable_value(*ref_id, mode),
@@ -405,7 +428,10 @@ impl FigcraftDesignSystemTokensVariablesPrEngine {
                     VariableValue::Boolean(b) => format!("{}", b),
                     _ => "\"\"".to_string(),
                 };
-                entries.push(format!("    \"{}\": {{ \"value\": {} }}", var.name, val_str));
+                entries.push(format!(
+                    "    \"{}\": {{ \"value\": {} }}",
+                    var.name, val_str
+                ));
             }
         }
 
@@ -603,7 +629,9 @@ impl FigcraftRealtimeCrdtMultiUserCollabPrEngine {
     pub fn apply_canvas_delta(&mut self, delta: CanvasEditDelta) -> bool {
         let mut replace_idx = None;
         for (i, existing) in self.delta_log.iter().enumerate() {
-            if existing.element_id == delta.element_id && existing.property_name == delta.property_name {
+            if existing.element_id == delta.element_id
+                && existing.property_name == delta.property_name
+            {
                 if delta.timestamp_lamport > existing.timestamp_lamport {
                     replace_idx = Some(i);
                 } else {
@@ -687,7 +715,11 @@ impl FigcraftDevModeCodeGenerationInspectPrEngine {
     fn relative_luminance(&self, r: u8, g: u8, b: u8) -> f32 {
         fn channel_lum(c: u8) -> f32 {
             let s = (c as f32) / 255.0;
-            if s <= 0.03928 { s / 12.92 } else { ((s + 0.055) / 1.055).powf(2.4) }
+            if s <= 0.03928 {
+                s / 12.92
+            } else {
+                ((s + 0.055) / 1.055).powf(2.4)
+            }
         }
         0.2126 * channel_lum(r) + 0.7152 * channel_lum(g) + 0.0722 * channel_lum(b)
     }
@@ -787,7 +819,9 @@ impl SovereignFigcraftArtcraftParityPrGateway {
         let widths = self.layout_engine.calculate_fractional_widths(1000.0);
         let layout_ok = widths.len() == 3 && widths[0] > 0.0;
 
-        let spring_pos = self.prototyping_engine.evaluate_spring_position(0.5, 0.0, 100.0);
+        let spring_pos = self
+            .prototyping_engine
+            .evaluate_spring_position(0.5, 0.0, 100.0);
         let prototyping_ok = spring_pos > 0.0;
 
         let var_val = self.variables_engine.resolve_variable_value(1, "Light");
@@ -796,17 +830,20 @@ impl SovereignFigcraftArtcraftParityPrGateway {
         let (p1, p2, p3) = self.vector_engine.calculate_squircle_corner_curve(16.0);
         let vector_ok = p1 > 0.0 && p2 > 0.0 && p3 >= 0.0;
 
-        self.crdt_collab_engine.register_collaborator(PresenceCursor {
-            client_id: 1,
-            user_name: "Alice".to_string(),
-            cursor_x: 100.0,
-            cursor_y: 200.0,
-            active_selection: vec![10],
-            color_hex: "#FF0055".to_string(),
-        });
+        self.crdt_collab_engine
+            .register_collaborator(PresenceCursor {
+                client_id: 1,
+                user_name: "Alice".to_string(),
+                cursor_x: 100.0,
+                cursor_y: 200.0,
+                active_selection: vec![10],
+                color_hex: "#FF0055".to_string(),
+            });
         let crdt_ok = self.crdt_collab_engine.active_cursors.contains_key(&1);
 
-        let contrast = self.devmode_engine.compute_wcag_contrast_ratio((0, 0, 0), (255, 255, 255));
+        let contrast = self
+            .devmode_engine
+            .compute_wcag_contrast_ratio((0, 0, 0), (255, 255, 255));
         let devmode_ok = contrast > 20.0; // Black on White ~21:1
 
         layout_ok && prototyping_ok && variables_ok && vector_ok && crdt_ok && devmode_ok
@@ -828,7 +865,10 @@ impl SovereignFigcraftArtcraftParityPrGateway {
         if proposals.is_empty() {
             0.0
         } else {
-            let ready_count = proposals.iter().filter(|p| p.status == "Ready for Merge").count();
+            let ready_count = proposals
+                .iter()
+                .filter(|p| p.status == "Ready for Merge")
+                .count();
             (ready_count as f64 / proposals.len() as f64) * 100.0
         }
     }
@@ -865,7 +905,12 @@ mod tests {
         assert_eq!(widths.len(), 3);
         assert_eq!(widths[2], 200.0); // Fixed 200px
 
-        let parent_box = LayoutBoundingBox { x: 0.0, y: 0.0, width: 1000.0, height: 600.0 };
+        let parent_box = LayoutBoundingBox {
+            x: 0.0,
+            y: 0.0,
+            width: 1000.0,
+            height: 600.0,
+        };
         let grid_boxes = engine.evaluate_grid_matrix(&parent_box, 6);
         assert_eq!(grid_boxes.len(), 6);
         assert_eq!(grid_boxes[0].x, 0.0);
@@ -907,8 +952,18 @@ mod tests {
         assert!(p2 < 20.0);
         assert!(p3 >= 0.0);
 
-        let b1 = LayoutBoundingBox { x: 0.0, y: 0.0, width: 100.0, height: 100.0 };
-        let b2 = LayoutBoundingBox { x: 50.0, y: 50.0, width: 100.0, height: 100.0 };
+        let b1 = LayoutBoundingBox {
+            x: 0.0,
+            y: 0.0,
+            width: 100.0,
+            height: 100.0,
+        };
+        let b2 = LayoutBoundingBox {
+            x: 50.0,
+            y: 50.0,
+            width: 100.0,
+            height: 100.0,
+        };
         let union_b = engine.compute_boolean_bounds(&b1, &b2, VectorBooleanOp::Union);
         assert_eq!(union_b.width, 150.0);
         assert_eq!(union_b.height, 150.0);

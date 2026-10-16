@@ -110,7 +110,10 @@ impl SovereignMkinitcpioEngine {
 
     /// Build initramfs image for a specified preset
     pub fn build_preset(&self, preset_name: &str) -> Result<InitramfsArtifact, &'static str> {
-        let preset = self.presets.iter().find(|p| p.name == preset_name)
+        let preset = self
+            .presets
+            .iter()
+            .find(|p| p.name == preset_name)
             .ok_or("Preset not found")?;
 
         // Calculate modules needed from hooks
