@@ -174,9 +174,7 @@ impl SovereignManPagesConsolidationEngine {
             title: "unveil".to_string(),
             section: ManSection::SystemCalls,
             synopsis: "int unveil(const char *path, const char *permissions);".to_string(),
-            description:
-                "Restricts filesystem visibility for the calling process to explicit path subsets."
-                    .to_string(),
+            description: "Restricts filesystem visibility for the calling process to explicit path subsets.".to_string(),
             options: BTreeMap::new(),
             see_also: vec!["pledge(2)".to_string(), "landlock(7)".to_string()],
             bsd_linux_source: "OpenBSD unveil(2)".to_string(),
@@ -208,8 +206,7 @@ impl SovereignManPagesConsolidationEngine {
             title: "gettext".to_string(),
             section: ManSection::LibraryFunctions,
             synopsis: "char *gettext(const char *msgid);".to_string(),
-            description: "Looks up localized message strings in standard message catalogs."
-                .to_string(),
+            description: "Looks up localized message strings in standard message catalogs.".to_string(),
             options: BTreeMap::new(),
             see_also: vec!["catgets(3)".to_string(), "ngettext(3)".to_string()],
             bsd_linux_source: "GNU gettext(3) & FreeBSD catgets(3)".to_string(),
@@ -339,9 +336,7 @@ impl SovereignManPagesConsolidationEngine {
             title: "buddy_allocator".to_string(),
             section: ManSection::KernelRoutines,
             synopsis: "void *buddy_alloc(size_t order);".to_string(),
-            description:
-                "Physical buddy memory allocator with anti-fragmentation page compaction passes."
-                    .to_string(),
+            description: "Physical buddy memory allocator with anti-fragmentation page compaction passes.".to_string(),
             options: BTreeMap::new(),
             see_also: vec!["vfs(9)".to_string()],
             bsd_linux_source: "Linux mm buddy allocator & FreeBSD vm_page".to_string(),
@@ -613,12 +608,9 @@ impl SovereignUsrShareDocConsolidationEngine {
                 package_name: "sigma-desktop".to_string(),
                 version: "1.0.0".to_string(),
                 doc_path: "/usr/share/doc/sigma-desktop".to_string(),
-                changelog:
-                    "* 1.0.0: Hyprland tiling compositor with Quickshell and Omakase themes."
-                        .to_string(),
+                changelog: "* 1.0.0: Hyprland tiling compositor with Quickshell and Omakase themes.".to_string(),
                 copyright: "Copyright (c) 2026 SigmaOS Project. MIT License.".to_string(),
-                readme: "Zero-download sovereign desktop environment configuration guide."
-                    .to_string(),
+                readme: "Zero-download sovereign desktop environment configuration guide.".to_string(),
             },
         );
 
@@ -858,10 +850,7 @@ impl SovereignDocumentationConsolidationPrGateway {
     }
 
     /// Exports consolidated documentation Markdown files to the target directory (`wiki/`).
-    pub fn export_all_wiki_pages<P: AsRef<Path>>(
-        &self,
-        target_dir: P,
-    ) -> Result<Vec<String>, std::io::Error> {
+    pub fn export_all_wiki_pages<P: AsRef<Path>>(&self, target_dir: P) -> Result<Vec<String>, std::io::Error> {
         let dir = target_dir.as_ref();
         if !dir.exists() {
             fs::create_dir_all(dir)?;
@@ -955,16 +944,12 @@ mod tests {
         assert!(md.contains("Architectural Matrix"));
 
         let temp_dir = std::env::temp_dir().join("sigma_doc_test_export");
-        let exported = gateway
-            .export_all_wiki_pages(&temp_dir)
-            .expect("Export failed");
+        let exported = gateway.export_all_wiki_pages(&temp_dir).expect("Export failed");
         assert_eq!(exported.len(), 4);
         assert!(temp_dir.join("Man-Pages-Catalog.md").exists());
         assert!(temp_dir.join("Info-Pages-Tree.md").exists());
         assert!(temp_dir.join("Package-Docs-Registry.md").exists());
-        assert!(temp_dir
-            .join("Consolidated-OS-Documentation-System.md")
-            .exists());
+        assert!(temp_dir.join("Consolidated-OS-Documentation-System.md").exists());
 
         let _ = fs::remove_dir_all(&temp_dir);
     }
