@@ -487,7 +487,8 @@ pub struct FedoraRpmOstreeAtomicSysrootPrEngine {
 impl FedoraRpmOstreeAtomicSysrootPrEngine {
     pub fn new() -> Self {
         let active = RpmOstreeDeployment {
-            checksum: "a1b2c3d4e5f67890a1b2c3d4e5f67890a1b2c3d4e5f67890a1b2c3d4e5f67890".to_string(),
+            checksum: "a1b2c3d4e5f67890a1b2c3d4e5f67890a1b2c3d4e5f67890a1b2c3d4e5f67890"
+                .to_string(),
             version: "39.20240101.0".to_string(),
             layered_packages: vec!["htop".to_string()],
             is_booted: true,
