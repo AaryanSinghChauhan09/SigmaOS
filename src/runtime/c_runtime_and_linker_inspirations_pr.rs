@@ -126,6 +126,36 @@ impl GlibcInspirationsPrEngine {
         loaded_objects.len()
     }
 
+    /// Simulate glibc malloc_info XML heap telemetry output generator.
+    pub fn malloc_info_xml_telemetry(
+        &self,
+        total_allocated: usize,
+        active_arenas: usize,
+    ) -> String {
+        format!(
+            "<malloc version=\"1\"><heap size=\"{}\"/><arenas count=\"{}\"/></malloc>",
+            total_allocated, active_arenas
+        )
+    }
+
+    /// Parse glibc dlopen mode flags (RTLD_LAZY=0x1, RTLD_NOW=0x2, RTLD_GLOBAL=0x100, RTLD_NODELETE=0x1000).
+    pub fn resolve_dlopen_flags(&self, flags: u32) -> Vec<&'static str> {
+        let mut modes = Vec::new();
+        if (flags & 0x01) != 0 {
+            modes.push("RTLD_LAZY");
+        }
+        if (flags & 0x02) != 0 {
+            modes.push("RTLD_NOW");
+        }
+        if (flags & 0x100) != 0 {
+            modes.push("RTLD_GLOBAL");
+        }
+        if (flags & 0x1000) != 0 {
+            modes.push("RTLD_NODELETE");
+        }
+        modes
+    }
+
     /// Generate glibc pull request proposal.
     pub fn generate_proposal(&self) -> CRuntimePrProposalManifest {
         CRuntimePrProposalManifest {
@@ -194,6 +224,25 @@ impl MuslLibcInspirationsPrEngine {
         }
     }
 
+    /// Simulate musl __set_thread_area TLS thread pointer initialization.
+    pub fn set_thread_area(&self, tp_val: usize) -> Result<usize, &'static str> {
+        if tp_val != 0 {
+            Ok(tp_val)
+        } else {
+            Err("null_thread_pointer")
+        }
+    }
+
+    /// Simulate musl pthread_atfork handler dispatch cycle (prepare, parent, child).
+    pub fn pthread_atfork_dispatch(&self, phase: &str) -> &'static str {
+        match phase {
+            "prepare" => "atfork_prepare_locks_acquired",
+            "parent" => "atfork_parent_locks_released",
+            "child" => "atfork_child_state_reset",
+            _ => "atfork_phase_unknown",
+        }
+    }
+
     /// Generate musl libc pull request proposal.
     pub fn generate_proposal(&self) -> CRuntimePrProposalManifest {
         CRuntimePrProposalManifest {
@@ -245,6 +294,20 @@ impl UclibcInspirationsPrEngine {
             features.push("LOCALE_SUPPORT");
         }
         features
+    }
+
+    /// Compute uClibc-ng / standard ELF SysV symbol hash.
+    pub fn compute_elf_sysv_hash(name: &str) -> u32 {
+        let mut h: u32 = 0;
+        for &b in name.as_bytes() {
+            h = (h << 4).wrapping_add(b as u32);
+            let g = h & 0xF0000000;
+            if g != 0 {
+                h ^= g >> 24;
+            }
+            h &= !g;
+        }
+        h
     }
 
     /// Generate uClibc-ng pull request proposal.
@@ -329,6 +392,30 @@ impl BsdLibcInspirationsPrEngine {
         (active_rights & required_right) == required_right
     }
 
+    /// OpenBSD getentropy system entropy request (max 256 bytes).
+    pub fn getentropy_fill(&self, buf: &mut [u8], seed: u64) -> Result<(), &'static str> {
+        if buf.len() > 256 {
+            return Err("getentropy_size_limit_exceeded");
+        }
+        self.arc4random_buf(buf, seed);
+        Ok(())
+    }
+
+    /// OpenBSD unveil path privilege access level evaluation.
+    pub fn unveil_path_check(
+        &self,
+        target_path: &str,
+        unveil_path: &str,
+        granted_permissions: &str,
+        requested_perm: char,
+    ) -> bool {
+        if target_path.starts_with(unveil_path) {
+            granted_permissions.contains(requested_perm)
+        } else {
+            false
+        }
+    }
+
     /// Generate BSD libc pull request proposal.
     pub fn generate_proposal(&self) -> CRuntimePrProposalManifest {
         CRuntimePrProposalManifest {
@@ -376,6 +463,19 @@ impl BionicInspirationsPrEngine {
             "ro.product.model" => Some("SigmaOS-Sovereign"),
             "sys.usb.config" => Some("adb"),
             _ => None,
+        }
+    }
+
+    /// Simulate Bionic android_dlopen_ext linker namespace isolation loader.
+    pub fn android_dlopen_ext_namespace(
+        &self,
+        lib_name: &str,
+        namespace_id: &str,
+    ) -> Result<String, &'static str> {
+        if namespace_id.is_empty() {
+            Err("invalid_namespace")
+        } else {
+            Ok(format!("ns:{}:{}", namespace_id, lib_name))
         }
     }
 
@@ -511,6 +611,15 @@ impl LibstdcxxInspirationsPrEngine {
         }
     }
 
+    /// Simulate __cxa_begin_catch and __cxa_end_catch exception handling nesting counter.
+    pub fn cxa_exception_nesting_counter(&self, current_nesting: usize, is_begin: bool) -> usize {
+        if is_begin {
+            current_nesting.saturating_add(1)
+        } else {
+            current_nesting.saturating_sub(1)
+        }
+    }
+
     /// Generate libstdc++ pull request proposal.
     pub fn generate_proposal(&self) -> CRuntimePrProposalManifest {
         CRuntimePrProposalManifest {
@@ -597,6 +706,13 @@ impl LibcxxInspirationsPrEngine {
         }
     }
 
+    /// Fast float formatting simulator for libc++ <charconv>.
+    pub fn fast_to_chars_f64_sim(&self, val: f64) -> String {
+        let int_part = val as u64;
+        let frac_part = ((val - (int_part as f64)) * 100.0) as u64;
+        format!("{}.{:02}", int_part, frac_part)
+    }
+
     /// Generate libc++ pull request proposal.
     pub fn generate_proposal(&self) -> CRuntimePrProposalManifest {
         CRuntimePrProposalManifest {
@@ -677,6 +793,11 @@ impl DynamicLinkerLdSoInspirationsPrEngine {
     /// Verify GNU_RELRO memory page protection hardening flag on dynamic relocations.
     pub fn verify_gnu_relro_protection(&self, flags: u32) -> bool {
         (flags & 0x01) != 0
+    }
+
+    /// Match dynamic ELF symbol versioning descriptors (DT_VERDEF / DT_VERNEED).
+    pub fn match_elf_symbol_versions(&self, symbol_ver: &str, library_ver_defs: &[&str]) -> bool {
+        library_ver_defs.contains(&symbol_ver)
     }
 
     /// Generate Dynamic Linker pull request proposal.
@@ -821,6 +942,11 @@ mod tests {
 
         assert!(engine.malloc_trim(512));
         assert_eq!(engine.dl_iterate_phdr(&["libc.so.6", "libm.so.6"]), 2);
+
+        let xml = engine.malloc_info_xml_telemetry(1024, 2);
+        assert!(xml.contains("heap size=\"1024\""));
+        let dl_flags = engine.resolve_dlopen_flags(0x101);
+        assert_eq!(dl_flags, alloc::vec!["RTLD_LAZY", "RTLD_GLOBAL"]);
     }
 
     #[test]
@@ -843,6 +969,12 @@ mod tests {
         assert!(engine.simulate_lockless_stdio_flush("stdout"));
         assert_eq!(engine.execute_syscall_cp(1), Ok(1));
         assert_eq!(engine.execute_syscall_cp(0), Err("invalid_syscall_zero"));
+        assert_eq!(engine.set_thread_area(0x7fff0000), Ok(0x7fff0000));
+        assert_eq!(engine.set_thread_area(0), Err("null_thread_pointer"));
+        assert_eq!(
+            engine.pthread_atfork_dispatch("prepare"),
+            "atfork_prepare_locks_acquired"
+        );
     }
 
     #[test]
@@ -855,6 +987,9 @@ mod tests {
         assert_eq!(features.len(), 2);
         assert_eq!(features[0], "IPV6_SUPPORT");
         assert_eq!(features[1], "WCHAR_SUPPORT");
+
+        let elf_hash = UclibcInspirationsPrEngine::compute_elf_sysv_hash("memcpy");
+        assert_ne!(elf_hash, 0);
     }
 
     #[test]
@@ -883,6 +1018,17 @@ mod tests {
 
         assert!(engine.verify_capsicum_rights(0x0F, 0x03));
         assert!(!engine.verify_capsicum_rights(0x01, 0x02));
+
+        let mut ent_buf = [0u8; 32];
+        assert_eq!(engine.getentropy_fill(&mut ent_buf, 0x999), Ok(()));
+        let mut oversize_buf = [0u8; 300];
+        assert_eq!(
+            engine.getentropy_fill(&mut oversize_buf, 0x999),
+            Err("getentropy_size_limit_exceeded")
+        );
+
+        assert!(engine.unveil_path_check("/etc/passwd", "/etc", "r", 'r'));
+        assert!(!engine.unveil_path_check("/etc/passwd", "/etc", "r", 'w'));
     }
 
     #[test]
@@ -896,6 +1042,10 @@ mod tests {
             Some("SigmaOS-Sovereign")
         );
         assert_eq!(bionic.get_system_property("unknown"), None);
+        assert_eq!(
+            bionic.android_dlopen_ext_namespace("libart.so", "default"),
+            Ok("ns:default:libart.so".to_string())
+        );
 
         let newlib = NewlibInspirationsPrEngine::new();
         let (tid, ctx) = newlib.get_reent_context(42);
@@ -930,6 +1080,9 @@ mod tests {
 
         assert_eq!(engine.lookup_unwind_eh_frame(0x12345678), Some(0x12345670));
         assert_eq!(engine.lookup_unwind_eh_frame(0), None);
+
+        assert_eq!(engine.cxa_exception_nesting_counter(0, true), 1);
+        assert_eq!(engine.cxa_exception_nesting_counter(1, false), 0);
     }
 
     #[test]
@@ -945,6 +1098,9 @@ mod tests {
 
         assert_eq!(engine.futex_atomic_wait(5, 5), "futex_wait_blocked");
         assert_eq!(engine.futex_atomic_wait(6, 5), "value_changed_no_wait");
+
+        let float_str = engine.fast_to_chars_f64_sim(3.14159);
+        assert_eq!(float_str, "3.14");
     }
 
     #[test]
@@ -972,6 +1128,8 @@ mod tests {
         );
         assert!(engine.verify_gnu_relro_protection(0x01));
         assert!(!engine.verify_gnu_relro_protection(0x00));
+
+        assert!(engine.match_elf_symbol_versions("GLIBC_2.34", &["GLIBC_2.2.5", "GLIBC_2.34"]));
     }
 
     #[test]
@@ -991,5 +1149,10 @@ mod tests {
         ));
         assert!(markdown.contains("glibc"));
         assert!(markdown.contains("bionic"));
+
+        #[cfg(not(target_os = "none"))]
+        {
+            let _ = std::fs::write("docs/PR_PROPOSAL_C_RUNTIME_AND_LINKER_PARITY.md", &markdown);
+        }
     }
 }
