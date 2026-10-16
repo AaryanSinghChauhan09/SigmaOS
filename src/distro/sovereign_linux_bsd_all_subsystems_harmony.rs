@@ -746,7 +746,9 @@ impl SovereignSubsystemDistroHarmonyEngine {
         }
     }
 
-    pub fn audit_all_subsystems_distro_compliance_list(&self) -> Vec<(SigmaOsSubsystem, bool, u32)> {
+    pub fn audit_all_subsystems_distro_compliance_list(
+        &self,
+    ) -> Vec<(SigmaOsSubsystem, bool, u32)> {
         self.subsystems
             .iter()
             .map(|(&sub, spec)| {
