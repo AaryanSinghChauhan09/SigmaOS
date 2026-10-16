@@ -23,6 +23,7 @@ pub mod photocraft_missing_components_parity_pr;
 pub mod soundcraft;
 pub mod vectoranimation;
 pub mod vectorcraft;
+pub mod wordcraft;
 
 pub use artcraft::{get_artcraft, init_artcraft, ArtSuite, Project, ProjectType, Workspace};
 pub use audiocraft::{
@@ -122,6 +123,18 @@ pub use vectoranimation::{
 pub use vectorcraft::{
     get_vectorcraft, init_vectorcraft, BooleanOperation, FillRule, Path, PathPoint, PenToolMode,
     Shape, ShapeProperties, VectorEditor, VectorLayer,
+};
+pub use wordcraft::{
+    fnv1a_wordcraft_pr_digest, get_wordcraft, init_wordcraft, Alignment as WordCraftAlignment,
+    ChangeType as WordCraftChangeType, Comment as WordCraftComment,
+    Document as WordCraftDocument, DocumentExportFormat as WordCraftDocumentExportFormat,
+    FontFamily as WordCraftFontFamily, Paragraph as WordCraftParagraph,
+    Section as WordCraftSection, Table as WordCraftTable, TableCell as WordCraftTableCell,
+    TableRow as WordCraftTableRow, TextStyle as WordCraftTextStyle,
+    TrackedChange as WordCraftTrackedChange,
+    WordCraftCollaborationRevisionPrDeployer, WordCraftDocumentEnginePrDeployer,
+    WordCraftExportConversionPrDeployer, WordCraftMasterPrDeploymentSuite,
+    WordCraftPullRequestSpec,
 };
 pub use wordcraft_missing_components_parity_pr::{
     SovereignWordcraftArtcraftParityPrGateway, WordcraftLinguisticAiSpellGrammarPrEngine,
