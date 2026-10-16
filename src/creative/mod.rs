@@ -8,6 +8,8 @@ pub mod cadcraft;
 pub mod deckcraft;
 pub mod designcraft;
 pub mod designcraft_missing_components_parity_pr;
+pub mod figcraft;
+pub mod figcraft_missing_components_parity_pr;
 pub mod effectcraft;
 pub mod effectcraft_missing_components_parity_pr;
 pub mod filmcraft;
@@ -24,9 +26,55 @@ pub mod vectorcraft;
 
 pub use artcraft::{get_artcraft, init_artcraft, ArtSuite, Project, ProjectType, Workspace};
 pub use audiocraft::{
-    get_audiocraft, init_audiocraft, AudioClip, AudioEditor, AudioEffect, AudioEffectType,
-    AudioExportFormat, AudioTrack as AudioCraftTrack, AutomationInterpolation, AutomationLane,
-    AutomationPoint, ChannelConfig, SampleFormat, SampleRate, TrackType,
+    AudioEditor, AudioClip, AudioTrack as AudioCraftTrack, AudioEffect,
+    SampleFormat, SampleRate, ChannelConfig, TrackType,
+    AudioEffectType, AutomationPoint, AutomationInterpolation, AutomationLane,
+    AudioExportFormat,
+    init_audiocraft, get_audiocraft,
+};
+pub use soundcraft::{
+    SoundCraftEngine, SoundTrack, SoundClip, Spatial3DPosition, Waveform, SynthesizerVoice,
+    SoundCraftPullRequestSpec, SoundCraftAudioEnginePrDeployer,
+    SoundCraftDspSynthesizerPrDeployer, SoundCraftSpatialMixingMasteringPrDeployer,
+    SoundCraftMasterPrDeploymentSuite, fnv1a_soundcraft_pr_digest,
+};
+pub use vectoranimation::{
+    AnimationProject as VectorAnimationProject, AnimationLayer, AnimationLayerType,
+    Keyframe, InterpolationMode, Bone, Rig, Timeline, OnionSkin,
+    AnimationExportFormat,
+    init_vectoranimation, get_vectoranimation,
+};
+pub use model3d::{
+    Scene as Model3DScene, Object3D, Mesh, Vertex,
+    MeshType, ObjectType, SculptBrushType, SculptBrush,
+    Material, Light, LightType, Camera,
+    ExportFormat as Model3DExportFormat,
+    init_model3d, get_model3d,
+};
+pub use wordcraft_missing_components_parity_pr::{
+    WordcraftPrProposalManifest, WordcraftTypographyLayoutPrEngine,
+    WordcraftStylesTemplatesThemesPrEngine, WordcraftReferenceCitationBibliographyPrEngine,
+    WordcraftLinguisticAiSpellGrammarPrEngine, WordcraftRealtimeCrdtCollabPrEngine,
+    WordcraftMailMergeAutomationPrEngine, SovereignWordcraftArtcraftParityPrGateway,
+};
+pub use figcraft::{
+    FigCraftEngine, FigCraftMasterPrDeploymentSuite, FigCraftPullRequestSpec,
+    FigCraftUiUxAutoLayoutPrDeployer, FigCraftInteractivePrototypingPrDeployer,
+    FigCraftVectorCanvasDesignSystemPrDeployer, FigCraftCollaborationExportPrDeployer,
+    fnv1a_figcraft_pr_digest, init_figcraft, get_figcraft,
+};
+pub use figcraft_missing_components_parity_pr::{
+    FigcraftPrProposalManifest, FigcraftAdvancedAutoLayoutFlexGridPrEngine,
+    FigcraftInteractivePrototypingSmartAnimatePrEngine,
+    FigcraftDesignSystemTokensVariablesPrEngine,
+    FigcraftVectorBooleanNetworkTopologyPrEngine,
+    FigcraftRealtimeCrdtMultiUserCollabPrEngine,
+    FigcraftDevModeCodeGenerationInspectPrEngine,
+    SovereignFigcraftArtcraftParityPrGateway,
+};
+pub use artcraft::{
+    ArtSuite, Project, Workspace, ProjectType,
+    init_artcraft, get_artcraft,
 };
 pub use deckcraft::{
     fnv1a_deckcraft_pr_digest, get_deckcraft, init_deckcraft,
