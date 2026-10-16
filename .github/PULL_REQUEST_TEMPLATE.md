@@ -1,22 +1,19 @@
 ## Summary
 
-<!-- What shell behavior changed and why? -->
+<!-- What secondary-memory behavior changed and why? -->
 
-## Shell component
+## Storage component
 
-- [ ] Lexer
-- [ ] Parser
-- [ ] Expansion
-- [ ] Executor
-- [ ] Pipelines
-- [ ] Redirection
-- [ ] Job control
-- [ ] Signals
-- [ ] Built-ins
-- [ ] Interactive line editor
-- [ ] Script runner
-- [ ] Diagnostics
-- [ ] Security / sandboxing
+- [ ] Block device manager
+- [ ] virtio / NVMe / virtio
+- [ ] Block cache manager
+- [ ] Filesystem manager
+- [ ] Mount / unmount
+- [ ] Cache
+- [ ] Filesystem
+- [ ] Recovery
+- [ ] procfs / diagnostics
+- [ ] Security / capabilities
 - [ ] Documentation
 - [ ] CI / tooling
 
@@ -24,22 +21,19 @@
 
 - [ ] PR validation
 - [ ] Daily CI triage
-- [ ] Weekly feature/bug triage
-- [ ] Weekly POSIX/sh study
-- [ ] Biweekly parser/expansion audit
-- [ ] Biweekly built-in review
-- [ ] Monthly boot-to-shell validation
-- [ ] Monthly compatibility suite
-- [ ] Monthly fuzz triage
-- [ ] Monthly security review
-- [ ] Quarterly release/UX/performance review
+- [ ] Weekly lifecycle review
+- [ ] Weekly Linux/BSD study
+- [ ] Biweekly storage audit
+- [ ] Biweekly signal/wait audit
+- [ ] Monthly boot validation
+- [ ] Quarterly architecture/security/release review
 
 ## Upstream study
 
-<!-- Required for compatibility or grammar changes -->
+<!-- Required for lifecycle, ABI, or storage changes -->
 
 - POSIX section:
-- Bash/dash/Zsh/BusyBox reference:
+- Linux/BSD/Redox/xv6 reference:
 - SigmaOS current behavior:
 - New behavior:
 - Compatibility impact:
@@ -55,16 +49,18 @@
 - [ ] Regression protection
 - [ ] Security review, if applicable
 
-## Shell safety review
+## Storage safety review
 
-- [ ] Expansion order is correct
-- [ ] Quoting behavior is preserved
-- [ ] Redirection failures are handled
-- [ ] Exit codes are explicit
-- [ ] Signal behavior is defined
-- [ ] No unbounded recursion or allocation
-- [ ] Interactive terminal state is restored
-- [ ] Script mode does not execute invalid partial input
+- [ ] Lifecycle transitions are valid
+- [ ] Zombies are eventually reaped
+- [ ] Orphans are adopted
+- [ ] PID reuse is safe
+- [ ] Lock ordering is documented
+- [ ] Interrupt-context safety considered
+- [ ] Signal races considered
+- [ ] Double-completion prevented
+- [ ] Resource limits enforced
+- [ ] No unbounded allocation or recursion
 
 ## Evidence
 
@@ -72,17 +68,18 @@
 - [ ] `cargo fmt --check`
 - [ ] `cargo test --lib`
 - [ ] `./run_sigma_tests.sh`
-- [ ] New/updated shell tests
-- [ ] POSIX/conformance test evidence
+- [ ] New/updated unit tests
+- [ ] Integration tests
 - [ ] Fuzz target or documented exemption
 - [ ] Boot-to-shell evidence, if boot-affecting
+- [ ] Storage benchmark, if performance-affecting
 - [ ] Security review requested, if applicable
 
 ## Status updates
 
 - [ ] `FEATURE_STATUS.toml`
 - [ ] `CAPABILITY_MATRIX.toml`
-- [ ] Shell documentation
+- [ ] Storage documentation
 - [ ] Boot matrix, if applicable
 
 ## Risks and rollback
