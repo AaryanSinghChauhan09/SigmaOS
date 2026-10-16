@@ -620,6 +620,9 @@ pub use freebsd_missing_components_v59_pr::*;
 pub mod freebsd_gap_closure_pr_engine;
 pub use freebsd_gap_closure_pr_engine::*;
 
+pub mod sovereign_freebsd_advanced_subsystems_pr;
+pub use sovereign_freebsd_advanced_subsystems_pr::*;
+
 pub mod sovereign_linux_bsd_lfs_master_harmony;
 pub use sovereign_linux_bsd_lfs_master_harmony::*;
 
