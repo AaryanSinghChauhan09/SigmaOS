@@ -332,19 +332,6 @@ impl CadCraftEngine {
         id
     }
 
-            for constraint in &self.constraints {
-                match constraint {
-                    GeometricConstraintType::Distance {
-                        point1_idx,
-                        point2_idx,
-                        target_distance,
-                    } => {
-                        let (p1, p2) =
-                            match (&self.entities[*point1_idx], &self.entities[*point2_idx]) {
-                                (SketchEntity::Point(a), SketchEntity::Point(b)) => (*a, *b),
-                                _ => continue,
-                            };
-
     pub fn run_fea_analysis(&mut self, name: String, node_count: u32, element_count: u32) -> u32 {
         let id = self.next_fea_id.fetch_add(1, Ordering::Relaxed);
         let mesh = FeaMesh {
@@ -359,6 +346,30 @@ impl CadCraftEngine {
         self.fea_meshes.insert(id, mesh);
         id
     }
+
+    pub fn solve_sketch(&mut self, tolerance: f32) -> bool {
+        let mut max_error: f32 = 0.0;
+        for _iteration in 0..100 {
+            max_error = 0.0;
+            for constraint in self.constraints.values().cloned().collect::<Vec<_>>() {
+                match &constraint.constraint_type {
+                    GeometricConstraintType::Distance {
+                        point1_idx,
+                        point2_idx,
+                        target_distance,
+                    } => {
+                        let (p1, p2) =
+                            match (&self.entities[*point1_idx], &self.entities[*point2_idx]) {
+                                (SketchEntity::Point(a), SketchEntity::Point(b)) => (*a, *b),
+                                _ => continue,
+                            };
+                        let dx = p2.x - p1.x;
+                        let dy = p2.y - p1.y;
+                        let current_dist = (dx * dx + dy * dy).sqrt();
+                        let error = (current_dist - target_distance).abs();
+                        if error > max_error {
+                            max_error = error;
+                        }
 
                         if current_dist > 1e-9 {
                             let factor = 0.5 * (1.0 - target_distance / current_dist);

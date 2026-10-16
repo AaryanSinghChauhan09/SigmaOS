@@ -133,16 +133,16 @@ impl GnomeInnovationEngine {
     }
 
     pub fn check_extension_updates(&self) -> Vec<String> {
-        self.extension_health_status
-            .keys()
-            .cloned()
-            .collect()
+        self.extension_health_status.keys().cloned().collect()
     }
 
     pub fn export_extension_profile(&self) -> String {
         format!(
             "{{\"scale\": {}, \"sandbox\": {}, \"workspaces\": {}, \"corner_radius\": {}}}",
-            self.fractional_scale, self.extension_sandbox_enabled, self.active_workspace_count, self.window_corner_radius
+            self.fractional_scale,
+            self.extension_sandbox_enabled,
+            self.active_workspace_count,
+            self.window_corner_radius
         )
     }
 
@@ -283,7 +283,11 @@ impl KdePlasmaInnovationEngine {
         self.window_rules.push(rule);
     }
 
-    pub fn evaluate_kwin_window_rule(&self, class_name: &str, title: &str) -> Option<&KWinWindowRule> {
+    pub fn evaluate_kwin_window_rule(
+        &self,
+        class_name: &str,
+        title: &str,
+    ) -> Option<&KWinWindowRule> {
         self.window_rules.iter().find(|r| {
             (r.match_class.is_empty() || r.match_class.eq_ignore_ascii_case(class_name))
                 && (r.match_title.is_empty() || r.match_title.eq_ignore_ascii_case(title))
@@ -435,7 +439,8 @@ impl XfceInnovationEngine {
     }
 
     pub fn set_thunar_emblem(&mut self, file_path: &str, emblem: &str) {
-        self.thunar_emblem_map.insert(file_path.to_string(), emblem.to_string());
+        self.thunar_emblem_map
+            .insert(file_path.to_string(), emblem.to_string());
     }
 
     pub fn set_panel_autohide(&mut self, mode: &str) {
@@ -1064,7 +1069,8 @@ impl I3WmInnovationEngine {
     }
 
     pub fn register_criteria_rule(&mut self, criteria: &str, command: &str) {
-        self.criteria_rules.insert(criteria.to_string(), command.to_string());
+        self.criteria_rules
+            .insert(criteria.to_string(), command.to_string());
     }
 
     pub fn match_criteria(&self, criteria: &str) -> Option<String> {
@@ -1544,7 +1550,8 @@ impl AwesomeWmInnovationEngine {
     }
 
     pub fn show_naughty_notification(&mut self, title: &str, text: &str, urgency: &str) {
-        self.naughty_notifications.push(format!("[{}] {}: {}", urgency, title, text));
+        self.naughty_notifications
+            .push(format!("[{}] {}: {}", urgency, title, text));
     }
 
     pub fn match_rule(&self, class_name: &str) -> Option<&AwesomeRule> {
@@ -1642,7 +1649,8 @@ impl HyprlandInnovationEngine {
     }
 
     pub fn configure_input_device(&mut self, device_id: &str, config_line: &str) {
-        self.input_device_configs.insert(device_id.to_string(), config_line.to_string());
+        self.input_device_configs
+            .insert(device_id.to_string(), config_line.to_string());
     }
 
     pub fn set_animation_curve(&mut self, name: &str, bezier: &str) {
@@ -2258,7 +2266,10 @@ mod tests {
         i3.toggle_smart_gaps(false);
         assert!(!i3.smart_gaps_enabled);
         i3.register_criteria_rule("class=Firefox", "move workspace 2");
-        assert_eq!(i3.match_criteria("class=Firefox"), Some(String::from("move workspace 2")));
+        assert_eq!(
+            i3.match_criteria("class=Firefox"),
+            Some(String::from("move workspace 2"))
+        );
     }
 
     #[test]
@@ -2279,7 +2290,10 @@ mod tests {
         bspwm.set_automatic_scheme("spiral");
         assert_eq!(bspwm.automatic_scheme, "spiral");
         bspwm.set_node_flag(101, "sticky", true);
-        assert_eq!(bspwm.node_flags.get(&101), Some(&vec![String::from("sticky")]));
+        assert_eq!(
+            bspwm.node_flags.get(&101),
+            Some(&vec![String::from("sticky")])
+        );
     }
 
     #[test]
@@ -2389,7 +2403,10 @@ mod tests {
         hypr.add_workspace_rule("workspace = 1, monitor:eDP-1, default:true");
         assert_eq!(hypr.workspace_rules.len(), 1);
         hypr.configure_input_device("touchpad", "tap_to_click = true");
-        assert_eq!(hypr.input_device_configs.get("touchpad"), Some(&String::from("tap_to_click = true")));
+        assert_eq!(
+            hypr.input_device_configs.get("touchpad"),
+            Some(&String::from("tap_to_click = true"))
+        );
     }
 
     #[test]
@@ -2410,9 +2427,15 @@ mod tests {
         sway.set_idle_inhibitor(true);
         assert!(sway.idle_inhibitor_active);
         sway.register_sway_criteria("app_id=pavucontrol", "floating enable");
-        assert_eq!(sway.match_sway_criteria("app_id=pavucontrol"), Some(String::from("floating enable")));
+        assert_eq!(
+            sway.match_sway_criteria("app_id=pavucontrol"),
+            Some(String::from("floating enable"))
+        );
         sway.set_output_transform("eDP-1", "90");
-        assert_eq!(sway.output_transforms.get("eDP-1"), Some(&String::from("90")));
+        assert_eq!(
+            sway.output_transforms.get("eDP-1"),
+            Some(&String::from("90"))
+        );
     }
 
     #[test]
