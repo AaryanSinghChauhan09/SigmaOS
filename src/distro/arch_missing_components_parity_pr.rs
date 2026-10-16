@@ -232,7 +232,10 @@ impl ArchinstallProfilePrEngine {
     }
 
     pub fn render_profile_cmd(&self) -> String {
-        format!("archinstall --profile {} --desktop {}", self.profile_name, self.desktop_env)
+        format!(
+            "archinstall --profile {} --desktop {}",
+            self.profile_name, self.desktop_env
+        )
     }
 }
 
@@ -255,7 +258,10 @@ impl ArchAuditScannerPrEngine {
     }
 
     pub fn scan_advisories(&self) -> Result<String, String> {
-        Ok(format!("arch-audit: {} security advisories scanned", self.cve_advisories_count))
+        Ok(format!(
+            "arch-audit: {} security advisories scanned",
+            self.cve_advisories_count
+        ))
     }
 }
 
@@ -278,7 +284,10 @@ impl ArchDevtoolsChrootPrEngine {
     }
 
     pub fn execute_clean_build(&self) -> String {
-        format!("devtools: Executing clean chroot build via {}", self.build_env)
+        format!(
+            "devtools: Executing clean chroot build via {}",
+            self.build_env
+        )
     }
 }
 
